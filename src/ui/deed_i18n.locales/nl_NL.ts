@@ -1148,4 +1148,81 @@ export const table: DeedLocaleTable = {
 
     name: 'Een Ongeketende Bron',
   },
+  exp_arcane_calligraphy: {
+    name: 'Een Vaste Hand',
+    desc: 'Voltooi Arcanische Kalligrafie in Oostbeek Dal.',
+  },
+  exp_arcane_calligraphy_gold: {
+    name: 'Geschreven in Sterrenlicht',
+    desc: 'Behaal een Goudwaardigheid in Arcanische Kalligrafie.',
+    title: 'de Runenschrijver',
+  },
+  exp_forge_helper: {
+    name: 'Een Helpend Hamer',
+    desc: 'Help Smid Mara een schild af te werken bij Wyrmwatch.',
+  },
+  exp_last_barricade: {
+    name: 'De Laatste Barricade',
+    desc: 'Houd het boshoos tegen de ondodenhorde.',
+  },
+  exp_borrowed_face: {
+    name: 'Een Geleend Gezicht',
+    desc: 'Onthul en verslaa de infiltrant onder de Fenbrugs wacht.',
+  },
+  exp_windrider_slalom: {
+    name: 'Windrijder Slalom',
+    desc: 'Voltooi de mechanische zweeftochtval door de Stormkuil canyon.',
+  },
+  exp_duskweave_dispatches: {
+    name: 'Schemerweven Depecches',
+    desc: 'Haal de bandietebrievendepecches terug terwijl je de betoverde mantel van Valerie draagt.',
+  },
+  exp_wisp_maze: {
+    name: 'Een Licht in het Doolhof',
+    desc: 'Haal de gestolen geldbeurzen terug en ontvluch het Evertuindoolhof.',
+  },
+  prog_rift_watch_trusted: {
+    name: 'Vertrouwd door de Riftswacht',
+    desc: 'Bereik Vertrouwde Standing met de Riftswacht.',
+  },
+  prog_church_order_trusted: {
+    name: 'Vertrouwd door de Kerkorde',
+    desc: 'Bereik Vertrouwde Standing met de Kerkorde.',
+  },
+  prog_automatons_trusted: {
+    name: 'Vertrouwd door de Automaten',
+    desc: 'Bereik Vertrouwde Standing met de Automaten.',
+  },
+  prog_rift_watch_champion: {
+    name: 'Kampioen van de Riftswacht',
+    desc: 'Bereik Kampioen Standing met de Riftswacht.',
+    title: 'Riftswachter',
+  },
+  prog_church_order_champion: {
+    name: 'Kampioen van de Kerkorde',
+    desc: 'Bereik Kampioen Standing met de Kerkorde.',
+    title: 'Dageraadwachter',
+  },
+  prog_automatons_champion: {
+    name: 'Kampioen van de Automaten',
+    desc: 'Bereik Kampioen Standing met de Automaten.',
+    title: 'Smidmeester',
+  },
+  prog_faction_champion_all: {
+    name: 'Kampioen van elke Vaan',
+    desc: 'Bereik Kampioen Standing met de Riftswacht, de Kerkorde en de Automaten.',
+  },
+  exp_clue_first_casket: {
+    name: 'Schat Gevonden',
+    desc: 'Open een Schatskist opgegraven aan het eind van een aanwijzingsrol jacht.',
+  },
+  exp_clue_ten_caskets: {
+    name: 'Schatzoeker',
+    desc: 'Open 10 Schatstkisten opgegraven aan het eind van aanwijzingsrol jachten.',
+    title: 'Schatzoeker',
+  },
+  exp_harbor_to_harbor: {
+    name: 'Haven naar Haven',
+    desc: 'Vaar beide veren heen en terug: Oostbeek naar Maanrust, en Wickhaven naar Wyrmwatch.',
+  },
 };

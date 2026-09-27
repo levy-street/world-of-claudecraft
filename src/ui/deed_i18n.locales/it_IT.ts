@@ -1186,4 +1186,81 @@ export const table: DeedLocaleTable = {
     name: 'Una Fonte Liberata',
     desc: 'Forgia personalmente Spezzaforgia e torna da Maelin con il martello finito.',
   },
+  exp_arcane_calligraphy: {
+    name: 'Una Mano Ferma',
+    desc: 'Completa la Calligrafia Arcana nella Valle di Eastbrook.',
+  },
+  exp_arcane_calligraphy_gold: {
+    name: 'Scritto nella Luce delle Stelle',
+    desc: 'Ottieni una valutazione Oro nella Calligrafia Arcana.',
+    title: 'Evocarune',
+  },
+  exp_forge_helper: {
+    name: "Un Martello d'Aiuto",
+    desc: 'Aiuta Fabbro Mara a completare uno scudo a Wyrmwatch.',
+  },
+  exp_last_barricade: {
+    name: "L'Ultima Barricata",
+    desc: "Difendi il passo nella foresta dall'orda di non morti.",
+  },
+  exp_borrowed_face: {
+    name: 'Un Volto in Prestito',
+    desc: "Smaschera e sconfiggi l'infiltrato tra la Guardia di Fenbridge.",
+  },
+  exp_windrider_slalom: {
+    name: 'Slalom del Cavalcavento',
+    desc: "Completa la discesa con l'aliante meccanico attraverso il canyon del Galecrest.",
+  },
+  exp_duskweave_dispatches: {
+    name: 'Dispacci Crepuscolotessuti',
+    desc: 'Recupera i dispacci dei banditi indossando il mantello incantato di Valerie.',
+  },
+  exp_wisp_maze: {
+    name: 'Una Luce nel Labirinto',
+    desc: "Recupera le borse di monete rubate e fuggi dal labirinto dell'Evergarden.",
+  },
+  prog_rift_watch_trusted: {
+    name: 'Fidato dalla Guardia degli Squarci',
+    desc: 'Raggiungi la reputazione Fidata con la Guardia degli Squarci.',
+  },
+  prog_church_order_trusted: {
+    name: "Fidato dall'Ordine della Chiesa",
+    desc: "Raggiungi la reputazione Fidata con l'Ordine della Chiesa.",
+  },
+  prog_automatons_trusted: {
+    name: 'Fidato dagli Automi',
+    desc: 'Raggiungi la reputazione Fidata con gli Automi.',
+  },
+  prog_rift_watch_champion: {
+    name: 'Campione della Guardia degli Squarci',
+    desc: 'Raggiungi la reputazione Campione con la Guardia degli Squarci.',
+    title: 'Guardiano degli Squarci',
+  },
+  prog_church_order_champion: {
+    name: "Campione dell'Ordine della Chiesa",
+    desc: "Raggiungi la reputazione Campione con l'Ordine della Chiesa.",
+    title: "Custode dell'Alba",
+  },
+  prog_automatons_champion: {
+    name: 'Campione degli Automi',
+    desc: 'Raggiungi la reputazione Campione con gli Automi.',
+    title: 'Mastro Forgiatore',
+  },
+  prog_faction_champion_all: {
+    name: 'Campione di Ogni Vessillo',
+    desc: "Raggiungi la reputazione Campione con la Guardia degli Squarci, l'Ordine della Chiesa e gli Automi.",
+  },
+  exp_clue_first_casket: {
+    name: 'Tesoro Trovato',
+    desc: 'Apri un Cofanetto del Tesoro dissotterrato alla fine di una caccia con pergamena indizio.',
+  },
+  exp_clue_ten_caskets: {
+    name: 'Cacciatore di Tesori',
+    desc: 'Apri 10 Cofanetti del Tesoro dissotterrati alla fine di cacce con pergamena indizio.',
+    title: 'Cacciatore di Tesori',
+  },
+  exp_harbor_to_harbor: {
+    name: 'Da Porto a Porto',
+    desc: 'Naviga su entrambi i traghetti andata e ritorno: da Eastbrook a Moonrest, e da Wickharbor a Wyrmwatch.',
+  },
 };

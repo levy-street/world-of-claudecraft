@@ -194,20 +194,20 @@ export const zh_CN: EnTranslations = {
         "description": "创建预组队公告场景。"
       },
       "hillwarn": {
-        "label": "Hill countdown",
-        "description": "Announce a hill now; it rises after the full warning."
+        "label": "山丘倒计时",
+        "description": "立即宣布山丘出现；倒计时结束后山丘升起。"
       },
       "hillnow": {
-        "label": "Raise hill now",
-        "description": "Raise a hill at once and stand on it."
+        "label": "立即升起山丘",
+        "description": "立即升起一座山丘并站上去。"
       },
       "hillrise": {
-        "label": "Skip hill countdown",
-        "description": "Raise the announced hill right away."
+        "label": "跳过山丘倒计时",
+        "description": "立即升起已宣布的山丘。"
       },
       "hillend": {
-        "label": "End hill",
-        "description": "Make the current hill fall now."
+        "label": "结束山丘",
+        "description": "让当前山丘立即回落。"
       }
     }
   },
@@ -523,7 +523,7 @@ export const zh_CN: EnTranslations = {
       "incendiary": "燃烧弹",
       "integrity": "火炮耐久",
       "exit": "离开火炮",
-      "wave": "Wave {wave}/{total}",
+      "wave": "第 {wave} / {total} 波",
       "endlessWave": "无尽波次 {wave}（第 {round} 轮）",
       "resultWaves": "坚守波数：{waves}。",
       "enemies": "剩余敌人：{count}",
@@ -1492,7 +1492,7 @@ export const zh_CN: EnTranslations = {
       "wqBoardsLabel": "世界任务排行榜",
       "wqMedal": "奖牌",
       "wqWaves": "坚守波数",
-      "wqTime": "Time",
+      "wqTime": "用时",
       "gliderCourseNames": {
         "downs": "海岸环线",
         "valleys": "山谷环线",
@@ -1505,10 +1505,10 @@ export const zh_CN: EnTranslations = {
       "gliderPersonalRules": "离线纪录随此角色保存。请按顺序穿过所有圆环。每日纪录每天重置。",
       "gliderRules": "完整飞行用时最短者获胜。穿过每个圆环。每日纪录随服务器重置。纪录会在30秒内更新。",
       "wqPoints": "得分",
-      "wqSeconds": "{seconds}s",
-      "wqNoMedal": "None",
+      "wqSeconds": "{seconds}秒",
+      "wqNoMedal": "无",
       "wqMedals": {
-        "gold": "Gold",
+        "gold": "金牌",
         "silver": "银牌",
         "bronze": "铜牌"
       },
@@ -1705,7 +1705,7 @@ export const zh_CN: EnTranslations = {
       "breakdownSummary": "{tab}：{value}",
       "breakdownRow": "{value}（{percent}）",
       "breakdownOther": "其他（{count}）",
-      "targetsHeader": "Targets",
+      "targetsHeader": "目标",
       "percent": "{value}%",
       "petAbility": "{pet}：{ability}",
       "melee": "近战",
@@ -1714,150 +1714,150 @@ export const zh_CN: EnTranslations = {
       "dock": "将此统计停靠回统计窗口",
       "separate": "分离{meter}",
       "regroup": "合并{meter}",
-      "settingsTitle": "Details / Meter Settings",
-      "optionsEngineBadge": "WoC Details! Engine",
-      "resetDefaults": "Reset to Defaults",
-      "closeSettings": "Close",
-      "densityCompact": "Density: Compact (16px)",
-      "densityStandard": "Density: Standard (20px)",
-      "bgGlass": "Background: Glass (76%)",
-      "bgSolid": "Background: Solid (98%)",
-      "bgMinimal": "Background: Minimal (45%)",
-      "numDetailed": "Numbers: Detailed",
-      "numCompact": "Numbers: Abbreviated (k/M)",
-      "raidTotalsOn": "Header group total: Yes",
-      "raidTotalsOff": "Header group total: No",
-      "tabGeneral": "Window & Background",
-      "tabGeneralDesc": "Opacity, scale, lock",
-      "tabBars": "Bars & Textures",
-      "tabBarsDesc": "Height, spacing, animation",
-      "tabText": "Text & Typography",
-      "tabTextDesc": "Fonts, k/M, DPS, rank",
-      "tabHeader": "Header & Title",
-      "tabHeaderDesc": "Group total, title bar",
-      "tabCombat": "Combat & Limits",
-      "tabCombatDesc": "Max rows, shields",
-      "tabPresets": "Quick Themes",
-      "tabPresetsDesc": "One-click presets",
-      "tabProfiles": "Profiles & Import",
-      "tabProfilesDesc": "Export, import, and profiles",
-      "groupWindow": "Window Appearance & Background",
-      "bgMode": "Background Mode",
-      "bgModeDesc": "Visual styling for the meter panel.",
-      "optGlass": "Glass (Blur)",
-      "optGlassDesc": "Frosted blur effect",
-      "optSolid": "Solid",
-      "optSolidDesc": "Dark high-contrast panel",
-      "optMinimal": "Minimal",
-      "optMinimalDesc": "Faint translucent",
-      "optTransparent": "Transparent",
-      "optTransparentDesc": "No background, bars only",
-      "bgOpacity": "Background Opacity",
-      "bgOpacityDesc": "Opacity percentage for the window background.",
-      "windowScale": "Window Scale",
-      "windowScaleDesc": "Increase or decrease the overall meter scale.",
-      "lockPosition": "Lock Position",
-      "lockPositionDesc": "Lock the window to prevent accidental dragging or resizing in combat.",
-      "groupBars": "Bar Geometry & Texture",
-      "barHeight": "Bar Height",
-      "barHeightDesc": "Vertical thickness of each combat row (14px compact to 26px spacious).",
-      "barSpacing": "Bar Spacing",
-      "barSpacingDesc": "Vertical pixel gap between adjacent rows.",
-      "barTexture": "Bar Texture",
-      "barTextureDesc": "Visual finish and shading over the class color.",
-      "texSpecular": "Glossy (Specular)",
-      "texSpecularDesc": "Top highlight reflection with bevel",
-      "texSmooth": "Smooth (Flat)",
-      "texSmoothDesc": "Clean flat class color",
-      "texGradient": "Gradient",
-      "texGradientDesc": "Smooth horizontal color gradient",
-      "barAnimation": "Smooth Bar Animation",
-      "barAnimationDesc": "Fluidly interpolates bar growth and decay in real time.",
-      "alwaysShowMe": "Always Show Me",
-      "alwaysShowMeDesc": "Pins your player bar to the bottom if ranked outside visible rows.",
-      "groupText": "Text Formatting & Telemetry",
-      "numFormat": "Number Format",
-      "numFormatDesc": "Display style for totals.",
-      "optNumCompact": "Abbreviated (k / M)",
-      "optNumCompactDesc": "Example: 145.2k, 1.2M",
-      "optNumDetailed": "Full Detailed",
-      "optNumDetailedDesc": "Example: 145,200, 1,240,500",
-      "optNumDamageDps": "Damage | DPS",
-      "optNumDamageDpsDesc": "Example: 239.2k | 18.4k (clean telemetry bar)",
-      "showDps": "Show Rate per Second (DPS / HPS)",
-      "showDpsDesc": "Shows damage or healing rate per second on each bar.",
-      "showPercent": "Show Percentage (%)",
-      "showPercentDesc": "Shows percent contribution of total group output.",
-      "showRank": "Show Rank (#1, #2...)",
-      "showRankDesc": "Shows ordinal rank number beside the name.",
-      "showClassIcon": "Show Class Icon",
-      "showClassIconDesc": "Displays class or role icon next to each player.",
-      "groupFont": "Combat Typography (Font Family)",
-      "groupHeader": "Header Customization",
-      "showTitleBar": "Show Title Bar",
-      "showTitleBarDesc": "Displays top bar with combat segment name and controls.",
-      "showRaidTotals": "Group Summary in Subtitle",
-      "showRaidTotalsDesc": "Displays cumulative group DPS/HPS in the header subtitle.",
-      "groupCombat": "Combat Rules & Limits",
-      "maxRows": "Maximum Visible Rows",
-      "maxRowsDesc": "Simultaneous bars (0 = unlimited, auto-fit to window height).",
-      "autoRows": " (Auto)",
-      "barsUnit": " bars",
-      "includeShields": "Count Absorbs as Healing",
-      "includeShieldsDesc": "Adds absorbed shield damage (Psalm of Warding, etc.) to Healing meter.",
-      "groupPresets": "One-Click Quick Themes",
-      "applyPreset": "Apply Theme",
-      "presetDetailsName": "Modern Glass",
-      "presetDetailsDesc": "Frosted blur background, specular glossy bars, abbreviated numbers, and full telemetry.",
-      "presetDetailsBadge": "Recommended",
-      "presetClassicName": "Classic Solid",
-      "presetClassicDesc": "Dark high-contrast solid panel, flat class bars, uncompressed detailed numbers in classic layout.",
-      "presetClassicBadge": "Classic",
-      "presetMinimalName": "Pure Minimal",
-      "presetMinimalDesc": "Nearly transparent background, compact 16px bars without gaps, direct text without percentages.",
-      "presetMinimalBadge": "Clean",
-      "presetRaidName": "Raid Focus",
-      "presetRaidDesc": "Designed for raids: compact 18px density, 10-bar limit, visible group total, and pinned player bar.",
-      "presetRaidBadge": "Raid",
-      "presetProGradientName": "Pro Gradient",
-      "presetProGradientDesc": "Floating transparent panel, horizontal gradient bars, spec icons, and Damage | DPS telemetry.",
-      "presetProGradientBadge": "Pro",
-      "groupManageProfiles": "Profile Management",
-      "activeProfile": "Active Profile",
-      "activeProfileDesc": "Select or manage independent profiles for different gameplay scenarios.",
-      "saveAs": "Save As...",
-      "duplicate": "Duplicate",
-      "deleteProfile": "Delete",
-      "cannotDeleteDefault": "The Default profile cannot be deleted",
-      "promptNewProfile": "Name of the new profile:",
-      "profileCopySuffix": " (Copy)",
-      "groupExport": "Export Current Profile",
-      "exportDesc": "Encoded profile string of your current configuration. Copy it to share or backup.",
-      "copyString": "Copy Profile String",
-      "copiedFeedback": "Copied to clipboard!",
-      "groupImport": "Import Profile",
-      "importDesc": "Paste a profile string (!WoC-Details:... or JSON) to apply and save.",
-      "importPlaceholder": "Paste profile string here (!WoC-Details:...)",
-      "importNamePlaceholder": "Profile name (optional)",
-      "importApply": "Import & Apply",
-      "errEmptyProfile": "Please paste a profile string.",
-      "errInvalidProfile": "Error: Invalid or corrupt profile string.",
-      "importSuccess": "Profile \"{name}\" imported successfully!",
-      "reportSent": "Report copied and sent to chat",
-      "reportNoData": "No data recorded.",
-      "noDetailedData": "No detailed data",
-      "noDeathEvents": "No events logged before death",
-      "killedBy": "Killed by {killer} ({ability})",
-      "lethalHit": "Lethal Hit",
-      "recentCombatEvents": "Last {count} combat events",
-      "backComparison": "Comparison",
-      "comparisonNeedTwo": "At least 2 fights are required to compare",
-      "backTimeline": "Timeline",
-      "timelineCombatEvents": "Combat events: {count}",
-      "backDev": "Balance / Dev",
-      "balanceAbilitiesCount": "Logged abilities: {count}",
-      "targetSubtitle": "Target: {target}",
-      "noTargetData": "No player data for this target"
+      "settingsTitle": "Details / 统计设置",
+      "optionsEngineBadge": "WoC Details! 引擎",
+      "resetDefaults": "重置为默认值",
+      "closeSettings": "关闭",
+      "densityCompact": "密度：紧凑（16像素）",
+      "densityStandard": "密度：标准（20像素）",
+      "bgGlass": "背景：玻璃（76%）",
+      "bgSolid": "背景：纯色（98%）",
+      "bgMinimal": "背景：极简（45%）",
+      "numDetailed": "数字：详细",
+      "numCompact": "数字：缩写（k/M）",
+      "raidTotalsOn": "标题栏团队总计：是",
+      "raidTotalsOff": "标题栏团队总计：否",
+      "tabGeneral": "窗口与背景",
+      "tabGeneralDesc": "不透明度、缩放、锁定",
+      "tabBars": "条形与材质",
+      "tabBarsDesc": "高度、间距、动画",
+      "tabText": "文本与字体",
+      "tabTextDesc": "字体、k/M、DPS、排名",
+      "tabHeader": "标题栏",
+      "tabHeaderDesc": "团队总计、标题栏",
+      "tabCombat": "战斗与限制",
+      "tabCombatDesc": "最大行数、护盾",
+      "tabPresets": "快速主题",
+      "tabPresetsDesc": "一键预设",
+      "tabProfiles": "配置与导入",
+      "tabProfilesDesc": "导出、导入与配置",
+      "groupWindow": "窗口外观与背景",
+      "bgMode": "背景模式",
+      "bgModeDesc": "统计面板的视觉样式。",
+      "optGlass": "玻璃（模糊）",
+      "optGlassDesc": "磨砂模糊效果",
+      "optSolid": "纯色",
+      "optSolidDesc": "深色高对比度面板",
+      "optMinimal": "极简",
+      "optMinimalDesc": "淡雅半透明",
+      "optTransparent": "透明",
+      "optTransparentDesc": "无背景，仅显示条形",
+      "bgOpacity": "背景不透明度",
+      "bgOpacityDesc": "窗口背景的不透明度百分比。",
+      "windowScale": "窗口缩放",
+      "windowScaleDesc": "增大或减小统计窗口的整体缩放。",
+      "lockPosition": "锁定位置",
+      "lockPositionDesc": "锁定窗口，防止在战斗中被意外拖动或调整大小。",
+      "groupBars": "条形外观与材质",
+      "barHeight": "条形高度",
+      "barHeightDesc": "每一行战斗数据的竖直厚度（紧凑14像素到宽松26像素）。",
+      "barSpacing": "条形间距",
+      "barSpacingDesc": "相邻行之间的竖直像素间隙。",
+      "barTexture": "条形材质",
+      "barTextureDesc": "叠加在职业颜色之上的视觉质感与明暗效果。",
+      "texSpecular": "光泽（高光）",
+      "texSpecularDesc": "带有斜角的顶部高光反射",
+      "texSmooth": "平滑（扁平）",
+      "texSmoothDesc": "简洁的扁平职业颜色",
+      "texGradient": "渐变",
+      "texGradientDesc": "平滑的水平颜色渐变",
+      "barAnimation": "平滑条形动画",
+      "barAnimationDesc": "实时平滑过渡条形的增长和衰减。",
+      "alwaysShowMe": "始终显示我",
+      "alwaysShowMeDesc": "当你的排名超出可见行数时，将你的玩家条固定在底部。",
+      "groupText": "文本格式与数据显示",
+      "numFormat": "数字格式",
+      "numFormatDesc": "总计的显示样式。",
+      "optNumCompact": "缩写（k / M）",
+      "optNumCompactDesc": "示例：145.2k、1.2M",
+      "optNumDetailed": "完整详细",
+      "optNumDetailedDesc": "示例：145,200、1,240,500",
+      "optNumDamageDps": "伤害 | DPS",
+      "optNumDamageDpsDesc": "示例：239.2k | 18.4k（简洁数据条）",
+      "showDps": "显示每秒速率（DPS / HPS）",
+      "showDpsDesc": "在每条数据上显示每秒伤害或治疗速率。",
+      "showPercent": "显示百分比（%）",
+      "showPercentDesc": "显示占团队总输出的百分比贡献。",
+      "showRank": "显示排名（#1、#2...）",
+      "showRankDesc": "在名字旁边显示名次序号。",
+      "showClassIcon": "显示职业图标",
+      "showClassIconDesc": "在每名玩家旁边显示职业或职责图标。",
+      "groupFont": "战斗字体（字体族）",
+      "groupHeader": "标题栏自定义",
+      "showTitleBar": "显示标题栏",
+      "showTitleBarDesc": "在顶部显示带有战斗分段名称和控制按钮的标题栏。",
+      "showRaidTotals": "副标题中的团队摘要",
+      "showRaidTotalsDesc": "在标题栏副标题中显示团队累计 DPS/HPS。",
+      "groupCombat": "战斗规则与限制",
+      "maxRows": "最大可见行数",
+      "maxRowsDesc": "同时显示的条形数量（0 = 不限，自动适配窗口高度）。",
+      "autoRows": "（自动）",
+      "barsUnit": "条",
+      "includeShields": "将吸收量计入治疗",
+      "includeShieldsDesc": "将护盾吸收的伤害（如守护圣咏等）计入治疗统计。",
+      "groupPresets": "一键快速主题",
+      "applyPreset": "应用主题",
+      "presetDetailsName": "现代玻璃",
+      "presetDetailsDesc": "磨砂模糊背景，高光光泽条形，缩写数字，以及完整数据显示。",
+      "presetDetailsBadge": "推荐",
+      "presetClassicName": "经典纯色",
+      "presetClassicDesc": "深色高对比度纯色面板，扁平职业色条形，经典布局下的完整详细数字。",
+      "presetClassicBadge": "经典",
+      "presetMinimalName": "纯粹极简",
+      "presetMinimalDesc": "近乎透明的背景，紧凑无间隙的16像素条形，直接显示文本而不带百分比。",
+      "presetMinimalBadge": "简洁",
+      "presetRaidName": "团队焦点",
+      "presetRaidDesc": "专为团队副本设计：紧凑18像素密度，最多10条限制，显示团队总计，并固定玩家条。",
+      "presetRaidBadge": "团队",
+      "presetProGradientName": "专业渐变",
+      "presetProGradientDesc": "悬浮透明面板，水平渐变条形，专精图标，以及伤害 | DPS 数据显示。",
+      "presetProGradientBadge": "专业",
+      "groupManageProfiles": "配置管理",
+      "activeProfile": "当前配置",
+      "activeProfileDesc": "为不同的游玩场景选择或管理独立的配置。",
+      "saveAs": "另存为...",
+      "duplicate": "复制",
+      "deleteProfile": "删除",
+      "cannotDeleteDefault": "默认配置无法删除",
+      "promptNewProfile": "新配置的名称：",
+      "profileCopySuffix": "（副本）",
+      "groupExport": "导出当前配置",
+      "exportDesc": "你当前配置的编码字符串。复制它即可分享或备份。",
+      "copyString": "复制配置字符串",
+      "copiedFeedback": "已复制到剪贴板！",
+      "groupImport": "导入配置",
+      "importDesc": "粘贴配置字符串（!WoC-Details:... 或 JSON）以应用并保存。",
+      "importPlaceholder": "在此粘贴配置字符串（!WoC-Details:...）",
+      "importNamePlaceholder": "配置名称（可选）",
+      "importApply": "导入并应用",
+      "errEmptyProfile": "请粘贴配置字符串。",
+      "errInvalidProfile": "错误：配置字符串无效或已损坏。",
+      "importSuccess": "配置“{name}”导入成功！",
+      "reportSent": "报告已复制并发送到聊天",
+      "reportNoData": "未记录任何数据。",
+      "noDetailedData": "没有详细数据",
+      "noDeathEvents": "死亡前没有记录到任何事件",
+      "killedBy": "死于{killer}（{ability}）",
+      "lethalHit": "致命打击",
+      "recentCombatEvents": "最近 {count} 条战斗事件",
+      "backComparison": "对比",
+      "comparisonNeedTwo": "至少需要 2 场战斗才能进行对比",
+      "backTimeline": "时间线",
+      "timelineCombatEvents": "战斗事件：{count}",
+      "backDev": "平衡 / 开发",
+      "balanceAbilitiesCount": "已记录技能：{count}",
+      "targetSubtitle": "目标：{target}",
+      "noTargetData": "没有该目标的玩家数据"
     },
     "auraTooltip": {
       "caster": "施放者：{name}"
@@ -2115,7 +2115,7 @@ export const zh_CN: EnTranslations = {
       "clickMoveLeft": "左键",
       "clickMoveRight": "右键",
       "version": "v{version}（{build}）",
-      "overlays": "Overlays",
+      "overlays": "光环",
       "browserEffects": "浏览器特效",
       "browserEffectsAuto": "自动",
       "browserEffectsFull": "完整",
@@ -2145,9 +2145,9 @@ export const zh_CN: EnTranslations = {
       "gfxBloom": "泛光",
       "gfxAntiAliasing": "抗锯齿",
       "gfxDynamicLights": "动态光源",
-      "gfxGhostFade": "Camera Ghost",
-      "gfxGhostFadeDithered": "Dithered",
-      "gfxGhostFadeSmooth": "Smooth",
+      "gfxGhostFade": "遮挡渐隐",
+      "gfxGhostFadeDithered": "抖动",
+      "gfxGhostFadeSmooth": "平滑",
       "gfxParticleEffects": "粒子特效",
       "gfxHalf": "半",
       "gfxCustomNote": "调整任一细节旋钮会将画质预设切换为“高级”：一套基于“高”画质基础、以当前预设所示等级为起点的自定义组合。",
@@ -2208,7 +2208,7 @@ export const zh_CN: EnTranslations = {
       "targetHealthText": "目标生命值文字",
       "aurasOnPlayerFrame": "增益显示在玩家框",
       "auraBarBelowFrame": "增益显示在玩家框下方",
-      "targetAurasBelowFrame": "Target Auras Below the Frame",
+      "targetAurasBelowFrame": "目标光环显示在框体下方",
       "alwaysShowAllBuffs": "始终显示所有增益",
       "showAuraCaster": "在提示中显示光环施放者",
       "highContrastBackground": "高对比度背景",
@@ -2568,78 +2568,78 @@ export const zh_CN: EnTranslations = {
       }
     },
     "cooldownManager": {
-      "title": "Cooldown Manager",
-      "intro": "Floating buttons for the spells you pick. They cannot be clicked: each one shows its cooldown, dims while you cannot cast it, and lights up when it is ready.",
-      "generalTitle": "General",
-      "enabled": "Show Cooldown Manager",
-      "idleOpacity": "Opacity While Not Ready",
-      "combatOnly": "Sounds Only in Combat",
-      "dragHint": "While this menu is open, every group shows on screen and you can drag it to move it.",
-      "addSingle": "Add Single Button",
-      "addGrid": "Add Button Group",
-      "addLine": "Add Line of Spells",
-      "groupsFull": "You have the most groups allowed. Delete one to add another.",
-      "noGroups": "Add a single button, a group of buttons or a line of spells to get started.",
-      "groupSingle": "Single Button {index}",
-      "groupGrid": "Button Group {index}",
-      "groupLine": "Line of Spells {index}",
-      "groupName": "Group Name",
-      "spellCount": "{count} / {max} spells",
-      "orientation": "Orientation",
-      "horizontal": "Horizontal",
-      "vertical": "Vertical",
-      "columns": "# Columns",
-      "rows": "# Rows",
-      "direction": "Icon Direction",
-      "dirRight": "Right",
-      "dirLeft": "Left",
-      "dirDown": "Down",
-      "dirUp": "Up",
-      "iconSize": "Icon Size",
-      "iconPadding": "Icon Padding",
-      "opacity": "Opacity",
-      "visibility": "Visibility",
-      "visAlways": "Always Visible",
-      "visCombat": "In Combat",
-      "visHidden": "Hidden",
-      "visHiddenHint": "A hidden group still plays its sounds and lights your action bar.",
-      "showTimer": "Show Timer",
-      "positionX": "Horizontal Position",
-      "positionY": "Vertical Position",
-      "resetPosition": "Reset to Default Position",
-      "deleteGroup": "Delete Group",
-      "deleteGroupAria": "Delete {group}",
-      "trackedTitle": "Tracked Spells",
-      "trackedHint": "Drag a spell onto a group, or select it to choose its group and alerts. A button follows its spell when it changes into another one, and lights up when it does.",
-      "search": "Search spells",
-      "searchPlaceholder": "Search",
-      "notDisplayed": "Not Displayed",
-      "otherSpells": "Other Spells",
-      "otherSpellsHint": "Spells from your other specializations, talent choices and higher levels. Place one now and its button appears once you know it.",
-      "notKnown": "{spell} (not known yet)",
-      "aurasTitle": "Procs, Engines and Buffs",
-      "aurasHint": "Engine resources and their stacks, procs, and the buffs your spells put on you. Anything else that has been on you shows up here too.",
-      "auraFallback": "Aura",
-      "onlyWhileActive": "Only Show While Active",
-      "alertStacks": "Alert at Stacks",
-      "alertStacksAny": "On gain",
-      "alertStacksHint": "The button lights, pulses and chimes once the aura reaches this many stacks. On gain means as soon as it appears.",
-      "auraSoundHint": "Plays when the aura comes up, or when it reaches your stack goal.",
-      "emptySection": "Drop a spell here.",
-      "spellsEmpty": "You do not know any spells yet.",
-      "selectSpell": "Select {spell}",
-      "group": "Group",
-      "groupFullOption": "{group} (full)",
-      "notInGroupHint": "Put this spell in a group to show its button.",
-      "moveEarlier": "Move {spell} earlier",
-      "moveLater": "Move {spell} later",
-      "glowWhenReady": "Light Up When Ready",
-      "glowWhenReadyHint": "Brightens and outlines the button while the spell can be cast.",
-      "hotbarGlow": "Hotbar Glow",
-      "hotbarGlowHint": "Also lights this spell on your action bar while it is ready.",
-      "onlyWhenReady": "Only Show When Ready",
-      "sound": "Ready Sound",
-      "soundHint": "Plays when the spell becomes ready, or when its button changes into another spell while ready."
+      "title": "冷却管理器",
+      "intro": "为你选择的法术显示浮动按钮。它们不能被点击：每个按钮都会显示冷却时间，你无法施放时会变暗，就绪时会点亮。",
+      "generalTitle": "常规",
+      "enabled": "显示冷却管理器",
+      "idleOpacity": "未就绪时的不透明度",
+      "combatOnly": "仅在战斗中播放提示音",
+      "dragHint": "此菜单打开时，每个组都会显示在屏幕上，你可以拖动来移动它。",
+      "addSingle": "添加单个按钮",
+      "addGrid": "添加按钮组",
+      "addLine": "添加法术行",
+      "groupsFull": "你已达到可添加的组数上限。删除一个才能再添加。",
+      "noGroups": "添加单个按钮、一组按钮或一行法术即可开始。",
+      "groupSingle": "单个按钮 {index}",
+      "groupGrid": "按钮组 {index}",
+      "groupLine": "法术行 {index}",
+      "groupName": "组名称",
+      "spellCount": "{count} / {max} 个法术",
+      "orientation": "排列方向",
+      "horizontal": "水平",
+      "vertical": "垂直",
+      "columns": "列数",
+      "rows": "行数",
+      "direction": "图标方向",
+      "dirRight": "右",
+      "dirLeft": "左",
+      "dirDown": "下",
+      "dirUp": "上",
+      "iconSize": "图标大小",
+      "iconPadding": "图标间距",
+      "opacity": "不透明度",
+      "visibility": "可见性",
+      "visAlways": "始终可见",
+      "visCombat": "战斗中",
+      "visHidden": "隐藏",
+      "visHiddenHint": "隐藏的组仍会播放提示音并点亮你的动作条。",
+      "showTimer": "显示计时",
+      "positionX": "水平位置",
+      "positionY": "垂直位置",
+      "resetPosition": "重置为默认位置",
+      "deleteGroup": "删除组",
+      "deleteGroupAria": "删除{group}",
+      "trackedTitle": "已追踪法术",
+      "trackedHint": "将法术拖到某个组上，或选中它来设置所属组和提醒。当法术变为另一个法术时，按钮会跟随切换，并在切换时高亮。",
+      "search": "搜索法术",
+      "searchPlaceholder": "搜索",
+      "notDisplayed": "不显示",
+      "otherSpells": "其他法术",
+      "otherSpellsHint": "来自你其他专精、天赋选择和更高等级的法术。现在放置一个，等你学会后按钮就会出现。",
+      "notKnown": "{spell}（尚未学会）",
+      "aurasTitle": "触发效果、引擎资源与增益",
+      "aurasHint": "引擎资源及其层数、触发效果，以及你的法术施加在你身上的增益。其他任何曾出现在你身上的效果也会显示在这里。",
+      "auraFallback": "光环",
+      "onlyWhileActive": "仅在激活时显示",
+      "alertStacks": "层数提醒",
+      "alertStacksAny": "获得时",
+      "alertStacksHint": "光环叠加到这个层数时，按钮会发光、脉动并发出提示音。“获得时”指光环一出现就立即提醒。",
+      "auraSoundHint": "光环出现时播放，或者叠加到达你设定的层数目标时播放。",
+      "emptySection": "将法术拖到此处。",
+      "spellsEmpty": "你尚未学会任何法术。",
+      "selectSpell": "选择{spell}",
+      "group": "组",
+      "groupFullOption": "{group}（已满）",
+      "notInGroupHint": "将此法术放入一个组，才能显示其按钮。",
+      "moveEarlier": "将{spell}前移",
+      "moveLater": "将{spell}后移",
+      "glowWhenReady": "就绪时高亮",
+      "glowWhenReadyHint": "法术可以施放时，按钮会变亮并显示轮廓。",
+      "hotbarGlow": "动作条高亮",
+      "hotbarGlowHint": "法术就绪时，也会在你的动作条上点亮它。",
+      "onlyWhenReady": "仅在就绪时显示",
+      "sound": "就绪提示音",
+      "soundHint": "法术就绪时播放，或者按钮在就绪状态下切换为另一个法术时播放。"
     },
     "auraOverlay": {
       "title": "光环",
@@ -2765,79 +2765,79 @@ export const zh_CN: EnTranslations = {
         "battlegroundComplete": "荆谷原野参战",
         "battlegroundKill": "荣誉击杀",
         "battlegroundAssist": "助攻击杀",
-        "worldKill": "world kill",
-        "worldAssist": "world kill assisted",
-        "hillHold": "holding the hill"
+        "worldKill": "世界击杀",
+        "worldAssist": "世界击杀助攻",
+        "hillHold": "占据山丘"
       },
       "floatReasons": {
         "kill": "击杀",
         "assist": "助攻",
         "firstWin": "首胜",
-        "hill": "Hill"
+        "hill": "山丘"
       }
     },
     "worldPvp": {
-      "tab": "World PvP",
-      "title": "World PvP",
-      "blurb": "Raise your flag to fight other flagged players anywhere in the open world. Defeat one and take a share of their purse, plus Honor toward Warfare gear. Battlegrounds and Arenas still pay more.",
-      "statusOn": "Your PvP flag is up. Flagged players can attack you.",
-      "statusOff": "Your PvP flag is down. You cannot attack or be attacked in the open world.",
-      "statusOffFfa": "Your PvP flag is down, but on free-for-all ground you can still attack and be attacked.",
-      "statusDisarming": "Your flag drops in {time}, or when your current fight ends.",
-      "zoneSanctuary": "Sanctuary: no world PvP here.",
-      "zoneContested": "Contested ground: only flagged players fight here.",
-      "zoneFfa": "Free-for-all ground: everyone here is fair game.",
-      "realmDisabled": "World PvP is disabled on this realm.",
-      "groundSanctuary": "The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP at all.",
-      "groundContested": "Everywhere else is contested: only two flagged players can fight.",
-      "groundFfa": "The Drakelands, the Frostveil Reach and the Amberfall are free-for-all: everyone there can fight, flag or not.",
-      "groupLine": "Party and raid members are never hostile to each other. Guildmates outside your group can fight.",
-      "markLine": "Attacking an unflagged player there raises your own flag; attacking a flagged one never does.",
-      "aidLine": "Healing, shielding or buffing a flagged player in a world fight raises your flag.",
-      "stakeLine": "The loser pays {cap} or {percent} of their purse, whichever is less.",
-      "noStakeLine": "An unflagged player killed on free-for-all ground loses no gold.",
-      "noTakeLine": "An unflagged fighter takes no gold either: it only moves between two flagged players.",
-      "honorLine": "{honor} Honor per kill, split between everyone who helped.",
-      "splitLine": "A clean 1v1 pays the whole pot; helpers and their healers share it.",
-      "repeatLine": "Repeat kills of one player pay {second}, then {third}, then nothing; the count clears {reset} after the first kill.",
-      "greyLine": "Players more than {levels} levels below you pay nothing.",
-      "disarmLine": "Switching off takes {minutes} minutes and waits for combat to end.",
-      "record": "Record: {kills} kills, {deaths} deaths",
-      "enable": "Enable World PvP",
-      "disable": "Disable World PvP",
-      "keepUp": "Keep Flag Up",
-      "confirmBody": "Other flagged players will be able to attack you anywhere and take up to {cap} from your purse when they win. You can switch off again, but it takes {minutes} minutes.",
-      "confirmAccept": "Raise Flag",
-      "confirmCancel": "Cancel",
-      "levelReq": "Requires level {level}.",
-      "pending": "Waiting for your PvP status from the realm.",
-      "commandHint": "Chat: /pvp toggles the flag, /pvp on and /pvp off set it."
+      "tab": "世界 PvP",
+      "title": "世界 PvP",
+      "blurb": "升起旗帜后，你可以在开放世界的任何地方与其他已开启旗帜的玩家战斗。击败一人可分得对方钱袋中的一部分，外加用于兑换战争装备的荣誉。战场和竞技场仍然给予更多回报。",
+      "statusOn": "你的 PvP 旗帜已升起。已开启旗帜的玩家可以攻击你。",
+      "statusOff": "你的 PvP 旗帜已降下。你无法在开放世界中攻击他人或被攻击。",
+      "statusOffFfa": "你的 PvP 旗帜已降下，但在自由混战地带你仍然可以攻击他人或被攻击。",
+      "statusDisarming": "你的旗帜将在 {time} 后降下，或在当前战斗结束时降下。",
+      "zoneSanctuary": "圣域：此地不会发生世界 PvP。",
+      "zoneContested": "争夺地带：只有已开启旗帜的玩家才能在此交战。",
+      "zoneFfa": "自由混战地带：这里的每个人都可能成为目标。",
+      "realmDisabled": "世界 PvP 在此服务器已禁用。",
+      "groundSanctuary": "试炼之滨与东溪谷是圣域：完全不会发生世界 PvP。",
+      "groundContested": "其余地方均为争夺地带：只有双方都开启旗帜的玩家才能交战。",
+      "groundFfa": "龙裔荒原、霜幕之境与琥珀秋境是自由混战地带：无论是否开启旗帜，身处其中的每个人都可以战斗。",
+      "groupLine": "小队和团队成员之间永远不会互相为敌。不在你队伍中的公会成员则可以战斗。",
+      "markLine": "在那里攻击未开启旗帜的玩家会升起你自己的旗帜；攻击已开启旗帜的玩家则永远不会。",
+      "aidLine": "在世界战斗中为一名已开启旗帜的玩家治疗、上护盾或增益，会升起你自己的旗帜。",
+      "stakeLine": "败者支付 {cap} 或其钱袋 {percent} 中较少的一项。",
+      "noStakeLine": "在自由混战地带被击杀的未开启旗帜玩家不会损失金币。",
+      "noTakeLine": "未开启旗帜的战斗者同样不会获得金币：金币只在两名已开启旗帜的玩家之间转移。",
+      "honorLine": "每次击杀获得 {honor} 点荣誉，由所有出力者平分。",
+      "splitLine": "干净的一对一可独得全部奖励；助战者和治疗者共同分享。",
+      "repeatLine": "重复击杀同一名玩家，收益依次为 {second}、{third}，此后归零；计数会在首次击杀 {reset} 后清零。",
+      "greyLine": "等级比你低 {levels} 级以上的玩家不会付出任何代价。",
+      "disarmLine": "关闭需要 {minutes} 分钟，并会等待战斗结束。",
+      "record": "战绩：{kills} 杀，{deaths} 死",
+      "enable": "开启世界 PvP",
+      "disable": "关闭世界 PvP",
+      "keepUp": "保持旗帜开启",
+      "confirmBody": "其他已开启旗帜的玩家将能在任何地方攻击你，获胜时最多可从你的钱袋中拿走 {cap}。你可以再次关闭，但需要 {minutes} 分钟。",
+      "confirmAccept": "升起旗帜",
+      "confirmCancel": "取消",
+      "levelReq": "需要等级 {level}。",
+      "pending": "正在等待服务器返回你的 PvP 状态。",
+      "commandHint": "聊天输入：/pvp 切换旗帜，/pvp on 和 /pvp off 直接设置。"
     },
     "hill": {
-      "title": "King of the Hill",
-      "rising": "The hill has not risen yet",
-      "heldYou": "Your group holds the hill",
-      "heldOther": "Another group holds the hill",
-      "heldNone": "Nobody holds the hill",
-      "counts": "Inside: you {yours}, holder {theirs}",
-      "countsUnheld": "Inside: you {yours}, largest rival {theirs}",
-      "countsHolding": "Inside: you {yours}, rival {theirs}",
-      "contestYou": "Taking the hill: {seconds} of {total}",
-      "contestOther": "Losing the hill: {seconds} of {total}",
-      "contestNone": "Hold a majority inside for {total} to take it",
-      "inside": "You are inside the circle",
-      "distance": "{yards} yd to the circle",
-      "rises": "Rises in {minutes}",
-      "falls": "Falls in {minutes}",
-      "standingRaid": "Raid members do not count: only parties can hold the hill"
+      "title": "山丘之王",
+      "rising": "山丘尚未升起",
+      "heldYou": "你的队伍占据着山丘",
+      "heldOther": "另一支队伍占据着山丘",
+      "heldNone": "无人占据山丘",
+      "counts": "圈内：你方 {yours}，占据者 {theirs}",
+      "countsUnheld": "圈内：你方 {yours}，最大对手 {theirs}",
+      "countsHolding": "圈内：你方 {yours}，对手 {theirs}",
+      "contestYou": "正在占据山丘：{seconds} / {total}",
+      "contestOther": "正在失去山丘：{seconds} / {total}",
+      "contestNone": "在圈内保持人数优势 {total} 即可占据它",
+      "inside": "你在圈内",
+      "distance": "距离圆圈 {yards} 码",
+      "rises": "{minutes} 后升起",
+      "falls": "{minutes} 后消失",
+      "standingRaid": "团队成员不计入人数：只有队伍才能占据山丘"
     },
     "warfareShop": {
       "gossipOption": "浏览战争套装",
       "gossipOptionAria": "浏览 {name} 提供的战争套装商店",
       "jewelry": "饰品",
       "weapons": "武器",
-      "groupSeason2": "Warfare Season 2: Vanguard",
-      "groupEntry": "Warfare Season 1",
+      "groupSeason2": "战争赛季 2：先锋",
+      "groupEntry": "战争赛季 1",
       "owned": "已拥有",
       "buyAria": "以 {honor} 购买 {item}",
       "buyOwnedAria": "以 {honor} 购买 {item}，已拥有",
@@ -2961,7 +2961,7 @@ export const zh_CN: EnTranslations = {
       "names": {
         "spellPower": "法术强度",
         "healPower": "治疗强度",
-        "spellCrit": "Spell Crit",
+        "spellCrit": "法术暴击",
         "critRating": "暴击等级",
         "hasteRating": "急速等级",
         "parry": "招架",
@@ -2978,17 +2978,17 @@ export const zh_CN: EnTranslations = {
         "armor": "减轻受到的物理打击。对等级较低的攻击者减伤效果更强，最高减伤上限为75%。",
         "attackPower": "强化你的武器攻击。每14点攻击强度可提高1点每秒伤害。",
         "spellPower": "提高你法术造成的伤害和治疗的强度。每点智力都会提供少量法术强度，此外还有来自装备和增益的加成。",
-        "healPower": "Increases the healing of your heals and heal-over-time effects, and the size of your absorb shields. It is your Spell Power plus the Healing Power from your gear and set bonuses, which adds to healing but never to damage.",
+        "healPower": "提高你的治疗与持续治疗效果的治疗量，以及你的吸收护盾的量。它等于你的法术强度加上装备和套装奖励提供的治疗强度，只会提高治疗，从不提高伤害。",
         "dps": "你的预估武器每秒伤害，由武器的伤害与速度以及你的攻击强度共同计算得出。",
         "critChance": "你的攻击造成暴击的几率，暴击将造成双倍伤害。",
-        "spellCrit": "Your chance for a spell or heal to strike critically, dealing 150% damage or healing. Spells and heals roll this instead of Crit Chance: Intellect raises only this chance, while crit rating, talents, and set bonuses raise both.",
+        "spellCrit": "你的法术或治疗产生暴击的几率，暴击造成150%的伤害或治疗。法术和治疗使用此几率而非暴击几率：智力只会提高这一几率，而暴击等级、天赋和套装奖励则会同时提高两者。",
         "dodge": "你完全躲开来袭近战攻击、不受任何伤害的几率。",
         "critRating": "来自装备和套装奖励的暴击等级，提升你的暴击几率。约每10点等级提供1%暴击。",
         "hasteRating": "来自装备和套装奖励的急速等级，加快你的攻击和施法速度。约每10点等级提供1%急速。",
         "parry": "你完全招架来自正面近战攻击、不受任何伤害的几率。来自背后的攻击无法被招架。",
         "hitRating": "来自装备和套装奖励的命中等级，降低你的攻击被闪避和法术被抵抗的几率，对更高等级的敌人尤其有效。约每10点等级提供1%命中。",
         "warfare": "对玩家造成的伤害提高 {increase}%，受到玩家造成的伤害降低 {reduction}%。",
-        "warfareWithHealth": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts."
+        "warfareWithHealth": "对玩家造成的伤害提高 {increase}%，受到玩家造成的伤害降低 {reduction}%。此外，在地下城、团队副本、探秘与裂隙以外的地方，还会使你的最大生命值提高 {health}%。"
       },
       "effects": {
         "attackPower": "+{value} 攻击强度",
@@ -3448,8 +3448,8 @@ export const zh_CN: EnTranslations = {
       "hint": "专注点会在每种材料的基础产出上叠加加成。未专注的材料保持基础产出不变。",
       "tierHint": "每在一种材料上投入{points}点专注，其采集品阶就会提升一阶，最多提升{steps}阶；不足{points}点时仍会提高产出。",
       "townOnlyHint": "专注只能在城镇中调整。",
-      "preferenceHint": "Focus raises the grade and amount of what you harvest. To harvest only one material, set a Harvest Preference from your Field Kit or the Professions window.",
-      "pendingLine": "Saved. Your re-spec to this allocation completes in {time}.",
+      "preferenceHint": "专注会提高你采集到的品级与数量。若只想采集单一材料，请通过你的野外工具包或专业窗口设置采集偏好。",
+      "pendingLine": "已保存。你向此分配方案的重新分配将在 {time} 后完成。",
       "budgetLabel": "剩余点数：{remaining} / {budget}",
       "saveButton": "保存专注",
       "notInTownHint": "你必须在城镇中才能设置专注。",
@@ -3859,8 +3859,8 @@ export const zh_CN: EnTranslations = {
         "kingsWrathSummary": "尼思拉克西斯在本场战斗剩余时间内，普通难度造成 {bonusNormal} 更多伤害，英雄难度为 {bonusHeroic}。坟场爆裂每 {eruptionEveryNormal} 秒发生一次（英雄难度为 {eruptionEveryHeroic} 秒）。",
         "kingsWrathResponse": "使用剩余的防御技能应对无法躲避的伤害。在团队结束战斗前，继续干净地应对此前的所有机制。",
         "boneStormName": "白骨风暴",
-        "boneStormSummary": "国王之怒开始后 {first} 秒，以及此后每隔 {everyNormal} 秒，尼思拉克西斯都会开始持续 {duration} 秒的白骨风暴。此时他无视仇恨，以 {speed} 倍常速移动，并发起 {charges} 次冲锋，每次持续 {chargeSeconds} 秒。他的旋转攻击会在 {radius} 码内每秒造成 {whirlNormal} 最大生命值的伤害。每次冲锋都会以一次白骨重击结束，在相同范围内造成 {slamNormal} 最大生命值的伤害。碎墓打击会在风暴结束 {rearm} 秒后重新启用。",
-        "boneStormHeroicSummary": "国王之怒开始后 {first} 秒，以及此后每隔 {everyHeroic} 秒，尼思拉克西斯都会开始持续 {duration} 秒的白骨风暴。此时他无视仇恨，以 {speed} 倍常速移动，并发起 {charges} 次冲锋，每次持续 {chargeSeconds} 秒。他的旋转攻击会在 {radius} 码内每秒造成 {whirlHeroic} 最大生命值的伤害。每次冲锋都会以一次白骨重击结束，在相同范围内造成 {slamHeroic} 最大生命值的伤害。碎墓打击会在风暴结束 {rearm} 秒后重新启用。",
+        "boneStormSummary": "国王之怒开始后 {first} 秒，以及此后每隔 {everyNormal} 秒，尼思拉克西斯都会开始持续 {duration} 秒的白骨风暴。此时他无视仇恨，以 {speed} 倍常速移动，并发起 {charges} 次冲锋，每次持续 {chargeSeconds} 秒。他的旋转攻击会在 {radius} 码内每秒造成 {whirlNormal} 最大生命值的伤害。每次冲锋都会以一次白骨重击结束，在相同范围内造成 {slamNormal} 最大生命值的伤害。风暴开始的一瞬间，所有存活的灵魂撕裂标记都会立即释放，但不会解决，并且灵魂撕裂引爆后不会立即开始风暴。碎墓打击会在风暴结束 {rearm} 秒后重新启用。",
+        "boneStormHeroicSummary": "国王之怒开始后 {first} 秒，以及此后每隔 {everyHeroic} 秒，尼思拉克西斯都会开始持续 {duration} 秒的白骨风暴。此时他无视仇恨，以 {speed} 倍常速移动，并发起 {charges} 次冲锋，每次持续 {chargeSeconds} 秒。他的旋转攻击会在 {radius} 码内每秒造成 {whirlHeroic} 最大生命值的伤害。每次冲锋都会以一次白骨重击结束，在相同范围内造成 {slamHeroic} 最大生命值的伤害。风暴开始的一瞬间，所有存活的灵魂撕裂标记都会立即释放，但不会解决，并且灵魂撕裂引爆后不会立即开始风暴。碎墓打击会在风暴结束 {rearm} 秒后重新启用。",
         "boneStormResponse": "分散站位并持续远离尼思拉克西斯。被冲锋锁定的队员应逃离，其他人则为冲锋路径留出空间，风暴结束后由坦克重新接回仇恨。",
         "crownEnduresName": "王冠不朽",
         "crownEnduresSummary": "从开战起 {enrageNormal} 秒后（奥德里克修士在生命值70%时登场的期间计时会暂停），王冠不朽将触发强制狂暴。尼思拉克西斯获得 {damage} 更多伤害和 {haste} 更快的攻击速度，此后每 {rampEveryNormal} 秒再获得 {rampStep} 伤害提升。此机制没有计时条，警告会在剩余 {warn60}、{warn30} 和 {warn10} 秒时以呐喊形式出现。",
@@ -3947,8 +3947,8 @@ export const zh_CN: EnTranslations = {
       "iceFloesCasts": "接下来{n}个有施法时间的法术可在移动中施放",
       "freeCast": "下一次施法不消耗任何资源",
       "instantCast": "下一个有施法时间的法术变为瞬发",
-      "benisonPrayers": "Your next Choirmend heals for {pct}% more and consumes all stacks.",
-      "benisonWhisper": "Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.",
+      "benisonPrayers": "你的下一次圣歌愈疗治疗量提高 {pct}%，并消耗所有层数。",
+      "benisonWhisper": "你的下一次低语祈祷将变为瞬发，且治疗量提高 {pct}%。请在此效果消失前使用它。",
       "cheapCast": "下一个法术消耗降低{pct}%",
       "radiantResonance": "你的下一次治愈之光将瞬发，或下一次黎明之拥的法力消耗降低 {pct}%，施法时间缩短至 {castTime} 秒",
       "solarReprisal": "你的下一次向阳飞盾不消耗法力、无视冷却时间且伤害提高 {pct}%；恩典之锤无视冷却时间并为你恢复相当于伤害量 100% 的生命值；或使治愈之光变为瞬发",
@@ -4133,7 +4133,7 @@ export const zh_CN: EnTranslations = {
       "resetErrInvalid": "此重置链接无效或已过期。请重新申请一个。"
     },
     "loot": {
-      "rollWon": "Congratulations! You won {item} with a roll of {roll}",
+      "rollWon": "恭喜！你掷出 {roll} 点，赢得了 {item}！",
       "chestTitle": "宝箱",
       "takeLootButton": "拾取战利品",
       "takeLootTooltip": "收取金币和掉落的物品。不会用掉采集机会。",
@@ -4384,7 +4384,7 @@ export const zh_CN: EnTranslations = {
       "exceptional": "卓越",
       "magnificent": "华丽",
       "transcendent": "超凡",
-      "itemName": "{item}, {quality}",
+      "itemName": "{item}，{quality}",
       "tooltip": "{quality}：+{levels} 物品等级。强化后仍会保留。"
     },
     "itemTooltip": {
@@ -4823,8 +4823,8 @@ export const zh_CN: EnTranslations = {
       "vaultTab": "仓库",
       "vaultCapacityNote": "每种材料最多可存放{cap}个。",
       "vaultEmpty": "你的材料仓库是空的。点击背包中的材料即可存入。",
-      "vaultSearchAria": "Search vault materials by name",
-      "vaultSearchNoMatch": "No material in your vault matches your search.",
+      "vaultSearchAria": "按名称搜索保险库材料",
+      "vaultSearchNoMatch": "你的保险库中没有材料匹配该搜索。",
       "vaultRowAria": "{item}：已存{count}/{cap}",
       "vaultLockedIntro": "解锁材料仓库，在银行旁囤积制造材料。每种材料都有自己的空间，最多可存{cap}个。",
       "vaultUnlockButton": "解锁材料仓库",
@@ -5495,7 +5495,7 @@ export const zh_CN: EnTranslations = {
         "dormantKnowledge": "{craft}知识已保留，但在其组合或爱好未启用时处于休眠状态。"
       },
       "stationRequired": "必须位于{station}才能制作该物品。",
-      "mobileStationTitle": "{name}'s {station}",
+      "mobileStationTitle": "{name}的{station}",
       "stationName": {
         "forge": "锻造坊",
         "kitchens": "厨房",
@@ -6258,8 +6258,8 @@ export const zh_CN: EnTranslations = {
         "mail": "邮箱",
         "passage": "通道"
       },
-      "collapseHint": "Collapse map sidebar",
-      "expandHint": "Expand map sidebar"
+      "collapseHint": "收起地图侧栏",
+      "expandHint": "展开地图侧栏"
     },
     "arenaGate": {
       "minLevelNote": "需要等级 {level}"
@@ -7242,7 +7242,7 @@ export const zh_CN: EnTranslations = {
       "ifHudOpacity": "HUD 面板盖在背后的世界上时有多实。",
       "ifTooltipScale": "提示框文字的大小，在小屏幕或超大屏幕上都很实用。",
       "ifHighContrastText": "更粗、对比度更高的界面文字。它首先是一项无障碍选项，在明亮的屏幕上也非常好用。",
-      "ifColorblindMode": "Recolors the Nythraxis floor hazards (the Grave Eruption strike ring, the Grave Flame and Soulfire pools, the Gravefire line, and the Soul Rend marks) onto a colorblind-safe palette with distinct hues and brightness, so overlapping circles keep their edges. Sizes, timers, and positions never change.",
+      "ifColorblindMode": "将尼思拉克西斯的地面危险标识（坟场爆裂的预警圆环、坟场烈焰与灵魂之火的地面毒池、墓火直线，以及灵魂撕裂标记）重新上色为色盲安全配色，各标识色相与明暗分明，让重叠的圆圈也能分清边界。大小、计时与位置始终不变。",
       "ifHighContrastBackground": "在起始界面和角色界面背后使用更朴素、对比度更高的背景。",
       "ifInvertLookY": "翻转鼠标视角的上下方向。",
       "ifShowItemLevel": "在每个物品提示框里加上一行物品等级。默认关闭，以保留只显示属性的经典提示框。",
@@ -7262,7 +7262,7 @@ export const zh_CN: EnTranslations = {
       "ifPartyShowAuras": "队伍框体上是否显示增益和减益。相应的开关还涵盖资源条、吸收盾、宠物，以及你自己是否出现在队伍列表里。",
       "ifAurasOnPlayerFrame": "除了光环条之外，也把你的增益和减益显示在你自己的单位框体上。",
       "ifAuraBarBelowFrame": "把增益条移到你的单位框体下方，而不是上方。只有在增益显示于玩家框时才有效。",
-      "ifTargetAurasBelowFrame": "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
+      "ifTargetAurasBelowFrame": "把目标框体的增益和减益列悬挂在框体下方而非上方，这是经典布局。默认关闭，因为默认状态下目标框体正好位于动作条正上方；等你把框体移到下方留有空间的位置后，再开启这个选项。",
       "ifAlwaysShowAllBuffs": "即使在低画质预设下也显示所有生效中的增益，绕过该档位平时的增益图标上限。",
       "ifShowAuraCaster": "在每个增益 / 减益提示中加上一行“施放者”，说明是谁施加的。便于分辨多名骑士的祝福等同名增益。",
       "ifTargetOfTarget": "显示你的目标正在攻击谁，这是判断坦克有没有拉住的经典办法。",
@@ -8217,8 +8217,8 @@ export const zh_CN: EnTranslations = {
       "warfareBodyStatsStay": "每一件战争装备都带有战争进攻等级与战争防御等级，而这两项等级对怪物毫无作用。它们只在你与其他玩家交手时生效，无论是决斗、竞技场还是战场：进攻提高你造成的伤害，防御削减你受到的伤害，各自都有自己的上限。每个护甲系列同时也是一套套装，它的套装效果同样是只对玩家生效的战争等级或效果，因此一整身荣誉装备的套装效果在地下城首领面前一文不值。装备本身仍带有普通属性、护甲与武器伤害，这些在任何地方都照常生效；面对怪物时哑火的，只是战争等级与套装效果。",
       "warfareTradeBody": "这正是刻意为之的取舍。战争套装是为与玩家交战而生的，不是绕过地下城品级的捷径：在同一个部位上，一件战争装备永远不会带有同部位地下城史诗所拥有的战斗属性，而它所带来的一切都只花在其他玩家身上。想在竞技场里站得住脚，就去买它；想更快地打通英雄难度，就去地下城里挣你的装备。",
       "warfareTradeBodyRatingSpent": "这正是刻意为之的取舍。战争套装是为与玩家交战而生的，不是绕过地下城品级的捷径：在同一个部位上，一件战争装备永远不会带有同部位地下城史诗所拥有的战斗属性，而它转而带有的战争等级与套装效果，则全都花在其他玩家身上。想在竞技场里站得住脚，就去买它；想更快地打通英雄难度，就去地下城里挣你的装备。",
-      "vanguardHeading": "Vanguard gear: Warfare Season 2",
-      "vanguardBody": "Vanguard gear is the second season of Warfare gear, sold by the same two quartermasters above the original tier, which stays on sale. Every spec has its own Vanguard set of five pieces, for the head, shoulders, chest, legs and hands, and the shop lists only the three sets your class can wear, followed by the Vanguard weapons you can wield. A Vanguard piece carries the same Warfare ratings as the original tier at a higher item level, and each set has two bonuses, at two and four pieces, that change one of your spec's abilities. Unlike the original sets, those bonuses work everywhere, monsters included, but they are built for fighting players, so a raid set stays the better choice inside a raid."
+      "vanguardHeading": "先锋套装：战争第二赛季",
+      "vanguardBody": "先锋套装是战争套装的第二个赛季，由同样的两位军需官在原有品级之上出售，原品级仍照常在售。每个专精都有自己专属的五件先锋套装，涵盖头部、肩部、胸部、腿部与双手，商店只会列出你的职业能穿的三套装备，随后是你能使用的先锋武器。先锋装备带有与原有品级相同的战争等级，只是物品等级更高，并且每套装备都有两条套装效果，分别在凑齐两件与四件时触发，会改变你某个专精技能的效果。与原有套装不同，这些效果在任何场合都会生效，包括对怪物，但它们是为对抗玩家而设计的，因此在团队副本里，团队副本套装仍是更好的选择。"
     },
     "worldPvpPage": {
       "heading": "世界 PvP",
@@ -9067,7 +9067,7 @@ export const zh_CN: EnTranslations = {
       "parryBody": "招架是战士自己的防御：有几率把一次近战打击整个挡开、不受任何伤害，并随力量成长。只有从正面袭来的攻击才会被招架，这也是你该始终面向正在打你的东西的又一个理由。其他职业面板上的这一行，会一直停在零。",
       "warfareTitle": "战争",
       "warfareBody": "战争是唯一一项只在对抗其他玩家时才作数的属性：它提高你对他们造成的伤害，也降低你从他们那里受到的伤害，你的面板会把这两半写在同一行上。面对生物时它毫无作用。它来自你用荣誉换购的战争装备，因此它是参与 PvP 的回报，而不是升级途中该去追求的东西。",
-      "warfareBodyPets": "Warfare is the stat honor gear carries for fighting players. In fights between players it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them. It also raises your maximum health everywhere except dungeons, raids, delves and rifts, so a player in honor gear is far harder to kill than one without it. Your sheet shows all of it on one line. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
+      "warfareBodyPets": "战争是荣誉装备所带有的属性，用于对抗其他玩家。在玩家之间的战斗中，它提高你和你的宠物对其他玩家及其宠物造成的伤害，也降低你和你的宠物从他们那里受到的伤害。除了在地下城、团队副本、探秘和裂隙中，它在任何地方都会提高你的最大生命值，因此穿着荣誉装备的玩家远比没有穿的更难被击杀。你的面板会把这一切都写在同一行上。它来自你用荣誉换购的战争装备，因此它是参与 PvP 的回报，而不是升级途中该去追求的东西。"
     },
     "progression": {
       "intro": "每一场战斗、每一个任务、每一步北行，都会让你的英雄更强。这里讲的是升级如何运作，以及登顶之后是什么让你持续成长。",
@@ -11129,16 +11129,16 @@ export const zh_CN: EnTranslations = {
       "xpGainRested": "你获得 {amount} 点经验（休息奖励 {rested} 点）。",
       "deathTitle": "你已经死亡。",
       "releaseSpirit": "释放灵魂",
-      "deathRecap": "Recap",
-      "deathRecapTitle": "Death Recap",
-      "deathRecapKiller": "Killing blow: {killer} ({ability})",
-      "deathRecapNoKiller": "Combat events leading to death",
-      "deathRecapLethal": "Killing Blow",
-      "deathRecapClose": "Close",
-      "deathRecapNoEvents": "No combat events recorded.",
-      "deathRecapCrit": "Crit",
-      "deathRecapDamage": "Damage",
-      "deathRecapHeal": "Healing",
+      "deathRecap": "回顾",
+      "deathRecapTitle": "死亡回顾",
+      "deathRecapKiller": "致命一击：{killer}（{ability}）",
+      "deathRecapNoKiller": "导致死亡的战斗事件",
+      "deathRecapLethal": "致命一击",
+      "deathRecapClose": "关闭",
+      "deathRecapNoEvents": "未记录任何战斗事件。",
+      "deathRecapCrit": "暴击",
+      "deathRecapDamage": "伤害",
+      "deathRecapHeal": "治疗",
       "chatTab": "聊天",
       "combatLogTab": "战斗记录",
       "chatPlaceholder": "说点什么...（/s 说话，/w 名字 密语，/r 回复，/p 队伍，/gu 公会，/o 官员，/general 综合，! 显示社区指令）",
@@ -11350,7 +11350,7 @@ export const zh_CN: EnTranslations = {
       "compactChat": "紧凑聊天框",
       "frostedPanels": "毛玻璃面板",
       "highContrastText": "高对比度文字",
-      "colorblindMode": "Colorblind Mode",
+      "colorblindMode": "色盲模式",
       "reduceMotion": "减少动画",
       "showFps": "显示帧率",
       "invertLookY": "反转视角（Y轴）",
@@ -11412,19 +11412,19 @@ export const zh_CN: EnTranslations = {
       "threat": "仇恨",
       "damageShort": "伤害",
       "healingShort": "治疗",
-      "damageTaken": "Damage Taken",
-      "damageTakenShort": "Taken",
-      "avoidableDmg": "Avoidable Damage",
-      "avoidableDmgShort": "Avoid.",
-      "interrupts": "Interrupts",
-      "interruptsShort": "Int",
-      "dispels": "Dispels",
-      "dispelsShort": "Disp",
-      "deaths": "Deaths",
-      "deathsShort": "Dead",
-      "reset": "Reset meters",
-      "resetHint": "Reset combat data",
-      "groupTotal": "Total: {total} ({rate})",
+      "damageTaken": "承受伤害",
+      "damageTakenShort": "承受",
+      "avoidableDmg": "可避免伤害",
+      "avoidableDmgShort": "可避免",
+      "interrupts": "打断",
+      "interruptsShort": "打断",
+      "dispels": "驱散",
+      "dispelsShort": "驱散",
+      "deaths": "死亡",
+      "deathsShort": "阵亡",
+      "reset": "重置统计",
+      "resetHint": "重置战斗数据",
+      "groupTotal": "总计：{total}（{rate}）",
       "current": "当前",
       "lastFight": "上一场战斗",
       "fightIndex": "战斗 -{index}",
@@ -11436,16 +11436,16 @@ export const zh_CN: EnTranslations = {
       "segmentSummary": "{label} - {duration}",
       "olderSegment": "较早片段",
       "newerSegment": "较新片段",
-      "selectSegment": "Select fight segment",
-      "selectMode": "Select meter mode",
-      "back": "Back",
-      "resetFight": "Reset current fight",
-      "resetAll": "Reset all data",
-      "criticals": "Criticals: {count}",
-      "hits": "Hits: {count}",
-      "topAbility": "Top: {name}",
-      "activity": "Activity: {pct}",
-      "newWindow": "New window",
+      "selectSegment": "选择战斗片段",
+      "selectMode": "选择统计模式",
+      "back": "返回",
+      "resetFight": "重置当前战斗",
+      "resetAll": "重置全部数据",
+      "criticals": "暴击：{count}",
+      "hits": "命中：{count}",
+      "topAbility": "最高：{name}",
+      "activity": "参与度：{pct}",
+      "newWindow": "新建窗口",
       "close": "关闭统计"
     },
     "chat": {
@@ -11928,9 +11928,9 @@ export const zh_CN: EnTranslations = {
       "anyTarget": "敌方或友方目标",
       "selfOnly": "仅对自己",
       "damageRange": "{min} 到 {max}",
-      "edictExplosion": "While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.",
-      "edictDamage": "Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.",
-      "verdictDamage": "Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.",
+      "edictExplosion": "神圣升华生效期间，爆炸会在 {radius} 米内造成 {damage} 点物理伤害，目标超过 {cap} 个时伤害降低。此伤害随攻击强度提升。",
+      "edictDamage": "以武器伤害的 {weaponPercent}% 加上 {damage} 点物理伤害进行打击。武器伤害会计入攻击强度。",
+      "verdictDamage": "终末敕令引爆，造成 {verdictSingleDamage} 点神圣伤害。黎明坠击引爆，在 {verdictAreaRadius} 米内造成 {verdictAreaDamage} 点神圣伤害，目标超过 {verdictAreaCap} 个时伤害降低。两次引爆的伤害均不随法术强度提升。同一时间只有一名敌人能承受你的印记。",
       "finisherDamage": "{base} 加每个连击点 {perCombo}"
     },
     "resources": {
@@ -12176,7 +12176,7 @@ export const zh_CN: EnTranslations = {
         },
         "weapons": {
           "0": "连发弩",
-          "1": "Twin Shot",
+          "1": "双重射击",
           "2": "穿透射击",
           "3": "爆炸射击"
         },
@@ -12187,7 +12187,7 @@ export const zh_CN: EnTranslations = {
         "failed": "防守失败。再试一次！",
         "replay": "与队长交谈即可重试。每次轮换只发放一次奖励。",
         "medals": {
-          "gold": "Gold",
+          "gold": "金牌",
           "silver": "银牌",
           "bronze": "铜牌"
         }
@@ -12217,7 +12217,7 @@ export const zh_CN: EnTranslations = {
         "preparing": "干得漂亮！下一个要求……",
         "fuel": "柴堆",
         "metal": "铁锭箱",
-        "water": "Well",
+        "water": "水井",
         "tools": "铁砧",
         "request": {
           "fuel": "把火烧旺！加点木柴！",
@@ -12236,7 +12236,7 @@ export const zh_CN: EnTranslations = {
         "result": "{rating}！{seconds}秒。失误：{mistakes}。",
         "replay": "与玛拉交谈再试一次。每次轮换只能获得一次奖励。",
         "medals": {
-          "gold": "Gold",
+          "gold": "金牌",
           "silver": "银牌",
           "bronze": "铜牌"
         },
@@ -12266,7 +12266,7 @@ export const zh_CN: EnTranslations = {
         "flying": "风环：{rings}/{total} | 时间：{time}秒 | 速度：{speed} 码/秒",
         "climb": "爬升",
         "climbTip": "按住以拉起机头，以速度换取高度。轻点可小幅调整。飞得太慢会失去升力。",
-        "dive": "Dive",
+        "dive": "俯冲",
         "diveTip": "按住以压低机头并获得速度。轻点可小幅调整。",
         "controls": "按住鼠标右键向上看以爬升，但会损失速度；向下看以俯冲并获得速度。飞得太慢会失去升力。左/右键转向；后退减速。跳跃或上浮/下潜也可控制俯仰。向前飞过风洞可获得加速，每次尝试中每个风洞仅限一次。",
         "landed": "{rating}！在 {time} 秒内穿过了 {rings}/{total} 个风环。",
@@ -12277,7 +12277,7 @@ export const zh_CN: EnTranslations = {
         "complete": "着陆完成！",
         "score": "得分：{score}。",
         "medals": {
-          "gold": "Gold",
+          "gold": "金牌",
           "silver": "银牌",
           "bronze": "铜牌"
         }
@@ -12349,7 +12349,7 @@ export const zh_CN: EnTranslations = {
       "puzzleTargetEndpoint": "终点：{direction}。",
       "puzzleTileAria": "{rotation} {connectors} {power} {source} {target}",
       "puzzleRetry": "重试",
-      "puzzleTimer": "{seconds}s",
+      "puzzleTimer": "{seconds}秒",
       "puzzleTimerAria": "剩余时间：{seconds} 秒",
       "startQuest": "开始世界任务",
       "startEscort": "开始护送",
@@ -12362,7 +12362,7 @@ export const zh_CN: EnTranslations = {
       "match3Instructions": "选择两个相邻的糖果。只有组成三个或更多相同糖果的一排时，交换才会计入。",
       "match3Moves": "步数：{current}/{total}",
       "match3Cleared": "已消除糖果：{current}/{total}",
-      "match3Announcement": "{moves}. {cleared}.",
+      "match3Announcement": "{moves}。{cleared}。",
       "match3Cell": "第 {row} 行，第 {column} 列：{candy}",
       "match3Selected": "已选择",
       "match3Reset": "重新开始关卡",
@@ -12373,10 +12373,10 @@ export const zh_CN: EnTranslations = {
       "match3DefeatTitle": "苦涩的失败",
       "match3DefeatDetail": "步数已用尽。新一盘糖果正等着你。",
       "match3TryAgain": "再试一次",
-      "match3ResultAnnouncement": "{title}. {detail} {moves}. {cleared}.",
-      "match3ResultSummary": "{title}. {detail} {cleared}.",
-      "semanticSummary": "{name}. {progress}. {reward}.",
-      "semanticSummaryTimed": "{name}. {progress}. {reward}. {time}.",
+      "match3ResultAnnouncement": "{title}。{detail}{moves}。{cleared}。",
+      "match3ResultSummary": "{title}。{detail}{cleared}。",
+      "semanticSummary": "{name}。{progress}。{reward}。",
+      "semanticSummaryTimed": "{name}。{progress}。{reward}。{time}。",
       "match3Candy": {
         "berry": "莓果水晶",
         "citrus": "柑橘球",
@@ -12682,39 +12682,39 @@ export const zh_CN: EnTranslations = {
       "historyNote": "你在世界市场的近期销售记录。",
       "saleBuyer": "售予{buyer}",
       "saleOlder": "另有 {count} 笔较早的交易，已计入总额。",
-      "ordersTab": "Wanted",
-      "ordersNote": "Post what you want and the gold is held at the Merchant. Listings at or under your price fill at once; the rest waits for a seller. The Merchant takes a {cut}% cut from whoever delivers. You have {used}/{max} orders open.",
-      "ordersListAria": "Open buy orders",
-      "ordersEmpty": "No open orders yet. Post one and gatherers will see what you need.",
-      "orderCardTitle": "Place an order",
-      "orderPickLabel": "Item wanted",
-      "orderPickEmpty": "Search for an item below, or pick one from the strip at the bottom.",
-      "orderSearchPlaceholder": "Search items...",
-      "orderSearchAria": "Search for an item to order",
-      "orderPickNone": "No item matches.",
-      "orderQuantity": "Units wanted",
-      "orderPriceEach": "Price each",
-      "orderEscrowLine": "Gold held at the Merchant: {total}",
-      "orderCannotAfford": "You cannot afford {total} for this order.",
-      "orderAtCap": "You have no free order slots. Withdraw one first.",
-      "orderPlaceButton": "Place Order",
-      "orderConfirmTitle": "Confirm Order",
-      "orderConfirmBody": "Order {item} x{count} at {each} each? {total} is held at the Merchant until the order is filled or withdrawn.",
-      "orderWanted": "x{count} wanted",
-      "orderBy": "Wanted by {buyer}",
-      "orderMine": "Your order",
-      "orderEach": "each",
-      "orderDeliver": "Deliver",
-      "orderDeliverAria": "Deliver {item} to {buyer}",
-      "orderDeliverNone": "None of this item in your bags.",
-      "orderWithdraw": "Withdraw",
-      "orderWithdrawAria": "Withdraw your order for {item}",
-      "orderDeliverConfirmTitle": "Confirm Delivery",
-      "orderDeliverConfirmBody": "Deliver {item} x{count} to {buyer} for {total} ({each} each)? You collect {proceeds} after the Merchant's cut.",
-      "unlistedTitle": "Not on the market",
-      "unlistedNote": "Materials with no listing at all. Post an order for one, or gather and list it.",
-      "unlistedNone": "Every material has at least one listing right now.",
-      "unlistedStageAria": "Order {item}"
+      "ordersTab": "求购",
+      "ordersNote": "发布你想要的物品，金币会托管在商人处。价格等于或低于你出价的上架物品会立即成交；其余的则等待卖家。商人会从交货者那里抽取 {cut}% 的费用。你目前有 {used}/{max} 个订单待处理。",
+      "ordersListAria": "待处理的求购订单",
+      "ordersEmpty": "目前还没有待处理的订单。发布一个，采集者就能看到你需要什么。",
+      "orderCardTitle": "下订单",
+      "orderPickLabel": "求购的物品",
+      "orderPickEmpty": "在下方搜索物品，或从底部的物品栏中选择一件。",
+      "orderSearchPlaceholder": "搜索物品...",
+      "orderSearchAria": "搜索要订购的物品",
+      "orderPickNone": "没有匹配的物品。",
+      "orderQuantity": "求购数量",
+      "orderPriceEach": "单价",
+      "orderEscrowLine": "托管在商人处的金币：{total}",
+      "orderCannotAfford": "你无法负担这份订单需要的 {total}。",
+      "orderAtCap": "你没有空闲的订单位。请先撤回一个。",
+      "orderPlaceButton": "下订单",
+      "orderConfirmTitle": "确认订单",
+      "orderConfirmBody": "以每个 {each} 的价格订购 {count} 个 {item}？{total} 将托管在商人处，直到订单完成或被撤回。",
+      "orderWanted": "求购 x{count}",
+      "orderBy": "求购者：{buyer}",
+      "orderMine": "你的订单",
+      "orderEach": "每个",
+      "orderDeliver": "交货",
+      "orderDeliverAria": "将{item}交付给{buyer}",
+      "orderDeliverNone": "你的背包里没有这件物品。",
+      "orderWithdraw": "撤回",
+      "orderWithdrawAria": "撤回你对{item}的订单",
+      "orderDeliverConfirmTitle": "确认交货",
+      "orderDeliverConfirmBody": "以 {total}（每个 {each}）向 {buyer} 交付 {count} 个 {item}？扣除商人的抽成后，你将获得 {proceeds}。",
+      "unlistedTitle": "市场无货",
+      "unlistedNote": "完全没有上架的材料。为它发布一个订单，或者自己采集后上架。",
+      "unlistedNone": "目前每种材料都至少有一条上架。",
+      "unlistedStageAria": "订购{item}"
     },
     "logs": {
       "listedItem": "已将 {item} 以 {money} 上架到世界市场。",
@@ -12723,11 +12723,11 @@ export const zh_CN: EnTranslations = {
       "collectedMoney": "你从商人处领取了 {money}。",
       "reclaimedItem": "已从市场取回 {item}。",
       "expiredListing": "你的 {item} 市场上架已过期，正在商人处等待领取。",
-      "orderPlaced": "Placed an order for {item} x{count} at {each} each.",
-      "orderDelivered": "Delivered {item} x{count} to {buyer} for {money}. Collect {proceeds} from the Merchant.",
-      "orderReceived": "{seller} delivered {item} x{count} to your order. Collect it from the Merchant.",
-      "orderWithdrawn": "Withdrew your order for {item}; {money} returned.",
-      "orderExpired": "Your order for {item} expired; {money} waits at the Merchant.",
+      "orderPlaced": "已以每个 {each} 的价格订购 {count} 个 {item}。",
+      "orderDelivered": "已向 {buyer} 交付 {count} 个 {item}，价值 {money}。请到商人处领取 {proceeds}。",
+      "orderReceived": "{seller} 向你的订单交付了 {count} 个 {item}。请到商人处领取。",
+      "orderWithdrawn": "已撤回你对{item}的订单；{money} 已退还。",
+      "orderExpired": "你对{item}的订单已过期；{money} 正在商人处等候领取。",
       "boughtBackItem": "你以 {money} 回购了 {item}。"
     },
     "errors": {
@@ -12747,11 +12747,11 @@ export const zh_CN: EnTranslations = {
       "nothingToCollect": "你没有可领取内容。",
       "sweepNoListings": "没有可扫货的该物品上架。",
       "sweepPriceChanged": "扫货送达前价格已变化。请核对报价后重试。",
-      "orderCountNeeded": "Name how many you want.",
-      "tooManyOrders": "You may keep at most {count} orders open at once.",
-      "orderClosed": "That order is no longer open.",
-      "orderOwn": "That is your own order. Cancel it to withdraw it.",
-      "orderNotYours": "That is not your order."
+      "orderCountNeeded": "请指定你想要的数量。",
+      "tooManyOrders": "你最多只能同时保留 {count} 个待处理订单。",
+      "orderClosed": "该订单已不再开放。",
+      "orderOwn": "那是你自己的订单。取消它即可撤回。",
+      "orderNotYours": "那不是你的订单。"
     },
     "loot": {
       "takeAll": "全部拾取",
@@ -13484,16 +13484,16 @@ export const zh_CN: EnTranslations = {
         "description": "被动：奥术闪电和天穹连锁会获得雷霆，最多5层。达到5层时，大地震击造成的伤害提高125%，或裂地震波造成的伤害提高100%，随后消耗全部雷霆。（雷霆召唤）"
       },
       "lightning_overload": {
-        "name": "Arc Overload",
-        "description": "Passive: Arc Bolt and Skybranch have a 20% chance to Overload, striking their first target again for 50% of the damage dealt and granting 1 Thunder. (Thundercall)"
+        "name": "电弧超载",
+        "description": "被动：电弧箭和叉状闪电有20%几率触发超载，对其首个目标再次造成50%的已造成伤害，并获得1点雷霆。（唤雷）"
       },
       "lava_burst": {
-        "name": "Magma Burst",
-        "description": "Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
+        "name": "岩浆爆发",
+        "description": "造成{damage}点火焰伤害。对被你的余烬震击点燃的目标必定造成暴击。岩浆涌动：余烬震击每次跳动都有20%几率重置本技能的冷却时间，并使你接下来10秒内的下一次岩浆爆发变为瞬发。伤害随法术强度提升。（唤雷）"
       },
       "thunderstorm": {
-        "name": "Stormbreak",
-        "description": "Call down a thunderclap, dealing {damage} Nature damage to enemies within 10 yards and slowing them by 50% for 5 sec. Restores 8% of your maximum Mana. Damage increases with Spell Power. (Thundercall)"
+        "name": "碎风暴",
+        "description": "召唤雷鸣霹雳，对10码内的敌人造成{damage}点自然伤害，并使其减速50%，持续5秒。恢复你8%的最大法力值。伤害随法术强度提升。（唤雷）"
       },
       "rockbiter_weapon": {
         "name": "缚石武器",
@@ -17394,421 +17394,421 @@ export const zh_CN: EnTranslations = {
         "name": "风暴颂歌链甲之靴"
       },
       "vanguard_warrior_arms_helmet": {
-        "name": "Bladewake Greathelm"
+        "name": "刃潮头盔"
       },
       "vanguard_warrior_arms_shoulder": {
-        "name": "Bladewake Pauldrons"
+        "name": "刃潮肩铠"
       },
       "vanguard_warrior_arms_chest": {
-        "name": "Bladewake Hauberk"
+        "name": "刃潮锁甲"
       },
       "vanguard_warrior_arms_legs": {
-        "name": "Bladewake Legplates"
+        "name": "刃潮腿甲"
       },
       "vanguard_warrior_arms_gloves": {
-        "name": "Bladewake Crushers"
+        "name": "刃潮护手"
       },
       "vanguard_warrior_fury_helmet": {
-        "name": "Bloodmarch Visage"
+        "name": "血行头盔"
       },
       "vanguard_warrior_fury_shoulder": {
-        "name": "Bloodmarch Shoulderguards"
+        "name": "血行肩铠"
       },
       "vanguard_warrior_fury_chest": {
-        "name": "Bloodmarch Chainmail"
+        "name": "血行锁甲"
       },
       "vanguard_warrior_fury_legs": {
-        "name": "Bloodmarch Leggings"
+        "name": "血行腿甲"
       },
       "vanguard_warrior_fury_gloves": {
-        "name": "Bloodmarch Grips"
+        "name": "血行护手"
       },
       "vanguard_warrior_prot_helmet": {
-        "name": "Ironmarch Helm"
+        "name": "铁行头盔"
       },
       "vanguard_warrior_prot_shoulder": {
-        "name": "Ironmarch Spaulders"
+        "name": "铁行肩铠"
       },
       "vanguard_warrior_prot_chest": {
-        "name": "Ironmarch Chestguard"
+        "name": "铁行锁甲"
       },
       "vanguard_warrior_prot_legs": {
-        "name": "Ironmarch Legguards"
+        "name": "铁行腿甲"
       },
       "vanguard_warrior_prot_gloves": {
-        "name": "Ironmarch Handguards"
+        "name": "铁行护手"
       },
       "vanguard_paladin_holy_helmet": {
-        "name": "Sunvigil Circlet"
+        "name": "日誓头盔"
       },
       "vanguard_paladin_holy_shoulder": {
-        "name": "Sunvigil Mantle"
+        "name": "日誓肩铠"
       },
       "vanguard_paladin_holy_chest": {
-        "name": "Sunvigil Hauberk"
+        "name": "日誓锁甲"
       },
       "vanguard_paladin_holy_legs": {
-        "name": "Sunvigil Legmail"
+        "name": "日誓腿甲"
       },
       "vanguard_paladin_holy_gloves": {
-        "name": "Sunvigil Gloves"
+        "name": "日誓护手"
       },
       "vanguard_paladin_protection_helmet": {
-        "name": "Shieldvow Helm"
+        "name": "盾誓头盔"
       },
       "vanguard_paladin_protection_shoulder": {
-        "name": "Shieldvow Pauldrons"
+        "name": "盾誓肩铠"
       },
       "vanguard_paladin_protection_chest": {
-        "name": "Shieldvow Breastplate"
+        "name": "盾誓锁甲"
       },
       "vanguard_paladin_protection_legs": {
-        "name": "Shieldvow Legplates"
+        "name": "盾誓腿甲"
       },
       "vanguard_paladin_protection_gloves": {
-        "name": "Shieldvow Gauntlets"
+        "name": "盾誓护手"
       },
       "vanguard_paladin_retribution_helmet": {
-        "name": "Lightbrand Crown"
+        "name": "光印头盔"
       },
       "vanguard_paladin_retribution_shoulder": {
-        "name": "Lightbrand Spaulders"
+        "name": "光印肩铠"
       },
       "vanguard_paladin_retribution_chest": {
-        "name": "Lightbrand Cuirass"
+        "name": "光印锁甲"
       },
       "vanguard_paladin_retribution_legs": {
-        "name": "Lightbrand Legguards"
+        "name": "光印腿甲"
       },
       "vanguard_paladin_retribution_gloves": {
-        "name": "Lightbrand Gauntlets"
+        "name": "光印护手"
       },
       "vanguard_hunter_beast_mastery_helmet": {
-        "name": "Packwarden Coif"
+        "name": "群卫罩帽"
       },
       "vanguard_hunter_beast_mastery_shoulder": {
-        "name": "Packwarden Spaulders"
+        "name": "群卫肩甲"
       },
       "vanguard_hunter_beast_mastery_chest": {
-        "name": "Packwarden Jerkin"
+        "name": "群卫外衣"
       },
       "vanguard_hunter_beast_mastery_legs": {
-        "name": "Packwarden Legguards"
+        "name": "群卫皮裤"
       },
       "vanguard_hunter_beast_mastery_gloves": {
-        "name": "Packwarden Gauntlets"
+        "name": "群卫手甲"
       },
       "vanguard_hunter_marksmanship_helmet": {
-        "name": "Farsight Coif"
+        "name": "远见罩帽"
       },
       "vanguard_hunter_marksmanship_shoulder": {
-        "name": "Farsight Spaulders"
+        "name": "远见肩甲"
       },
       "vanguard_hunter_marksmanship_chest": {
-        "name": "Farsight Jerkin"
+        "name": "远见外衣"
       },
       "vanguard_hunter_marksmanship_legs": {
-        "name": "Farsight Legguards"
+        "name": "远见皮裤"
       },
       "vanguard_hunter_marksmanship_gloves": {
-        "name": "Farsight Gauntlets"
+        "name": "远见手甲"
       },
       "vanguard_hunter_survival_helmet": {
-        "name": "Snaretooth Coif"
+        "name": "陷牙罩帽"
       },
       "vanguard_hunter_survival_shoulder": {
-        "name": "Snaretooth Spaulders"
+        "name": "陷牙肩甲"
       },
       "vanguard_hunter_survival_chest": {
-        "name": "Snaretooth Jerkin"
+        "name": "陷牙外衣"
       },
       "vanguard_hunter_survival_legs": {
-        "name": "Snaretooth Legguards"
+        "name": "陷牙皮裤"
       },
       "vanguard_hunter_survival_gloves": {
-        "name": "Snaretooth Gauntlets"
+        "name": "陷牙手甲"
       },
       "vanguard_rogue_assassination_helmet": {
-        "name": "Nightcut Hood"
+        "name": "夜切罩帽"
       },
       "vanguard_rogue_assassination_shoulder": {
-        "name": "Nightcut Shoulderpads"
+        "name": "夜切肩甲"
       },
       "vanguard_rogue_assassination_chest": {
-        "name": "Nightcut Tunic"
+        "name": "夜切外衣"
       },
       "vanguard_rogue_assassination_legs": {
-        "name": "Nightcut Breeches"
+        "name": "夜切皮裤"
       },
       "vanguard_rogue_assassination_gloves": {
-        "name": "Nightcut Gloves"
+        "name": "夜切手甲"
       },
       "vanguard_rogue_combat_helmet": {
-        "name": "Brawlmark Hood"
+        "name": "斗痕罩帽"
       },
       "vanguard_rogue_combat_shoulder": {
-        "name": "Brawlmark Shoulderpads"
+        "name": "斗痕肩甲"
       },
       "vanguard_rogue_combat_chest": {
-        "name": "Brawlmark Tunic"
+        "name": "斗痕外衣"
       },
       "vanguard_rogue_combat_legs": {
-        "name": "Brawlmark Breeches"
+        "name": "斗痕皮裤"
       },
       "vanguard_rogue_combat_gloves": {
-        "name": "Brawlmark Gloves"
+        "name": "斗痕手甲"
       },
       "vanguard_rogue_subtlety_helmet": {
-        "name": "Shadewalk Hood"
+        "name": "影行罩帽"
       },
       "vanguard_rogue_subtlety_shoulder": {
-        "name": "Shadewalk Shoulderpads"
+        "name": "影行肩甲"
       },
       "vanguard_rogue_subtlety_chest": {
-        "name": "Shadewalk Tunic"
+        "name": "影行外衣"
       },
       "vanguard_rogue_subtlety_legs": {
-        "name": "Shadewalk Breeches"
+        "name": "影行皮裤"
       },
       "vanguard_rogue_subtlety_gloves": {
-        "name": "Shadewalk Gloves"
+        "name": "影行手甲"
       },
       "vanguard_priest_discipline_helmet": {
-        "name": "Veilpsalm Cowl"
+        "name": "帷咏兜帽"
       },
       "vanguard_priest_discipline_shoulder": {
-        "name": "Veilpsalm Mantle"
+        "name": "帷咏衬肩"
       },
       "vanguard_priest_discipline_chest": {
-        "name": "Veilpsalm Robe"
+        "name": "帷咏长袍"
       },
       "vanguard_priest_discipline_legs": {
-        "name": "Veilpsalm Leggings"
+        "name": "帷咏护腿"
       },
       "vanguard_priest_discipline_gloves": {
-        "name": "Veilpsalm Handwraps"
+        "name": "帷咏裹手"
       },
       "vanguard_priest_holy_helmet": {
-        "name": "Gracewing Cowl"
+        "name": "恩翼兜帽"
       },
       "vanguard_priest_holy_shoulder": {
-        "name": "Gracewing Mantle"
+        "name": "恩翼衬肩"
       },
       "vanguard_priest_holy_chest": {
-        "name": "Gracewing Robe"
+        "name": "恩翼长袍"
       },
       "vanguard_priest_holy_legs": {
-        "name": "Gracewing Leggings"
+        "name": "恩翼护腿"
       },
       "vanguard_priest_holy_gloves": {
-        "name": "Gracewing Handwraps"
+        "name": "恩翼裹手"
       },
       "vanguard_priest_shadow_helmet": {
-        "name": "Duskhymn Cowl"
+        "name": "暮咏兜帽"
       },
       "vanguard_priest_shadow_shoulder": {
-        "name": "Duskhymn Mantle"
+        "name": "暮咏衬肩"
       },
       "vanguard_priest_shadow_chest": {
-        "name": "Duskhymn Robe"
+        "name": "暮咏长袍"
       },
       "vanguard_priest_shadow_legs": {
-        "name": "Duskhymn Leggings"
+        "name": "暮咏护腿"
       },
       "vanguard_priest_shadow_gloves": {
-        "name": "Duskhymn Handwraps"
+        "name": "暮咏裹手"
       },
       "vanguard_shaman_elemental_helmet": {
-        "name": "Tempestwrit Coif"
+        "name": "风暴铭头盔"
       },
       "vanguard_shaman_elemental_shoulder": {
-        "name": "Tempestwrit Pauldrons"
+        "name": "风暴铭肩铠"
       },
       "vanguard_shaman_elemental_chest": {
-        "name": "Tempestwrit Hauberk"
+        "name": "风暴铭锁甲"
       },
       "vanguard_shaman_elemental_legs": {
-        "name": "Tempestwrit Legmail"
+        "name": "风暴铭腿甲"
       },
       "vanguard_shaman_elemental_gloves": {
-        "name": "Tempestwrit Gauntlets"
+        "name": "风暴铭护手"
       },
       "vanguard_shaman_enhancement_helmet": {
-        "name": "Galeborn Helm"
+        "name": "风裔头盔"
       },
       "vanguard_shaman_enhancement_shoulder": {
-        "name": "Galeborn Spaulders"
+        "name": "风裔肩铠"
       },
       "vanguard_shaman_enhancement_chest": {
-        "name": "Galeborn Chainmail"
+        "name": "风裔锁甲"
       },
       "vanguard_shaman_enhancement_legs": {
-        "name": "Galeborn Legguards"
+        "name": "风裔腿甲"
       },
       "vanguard_shaman_enhancement_gloves": {
-        "name": "Galeborn Grips"
+        "name": "风裔护手"
       },
       "vanguard_shaman_restoration_helmet": {
-        "name": "Brineward Circlet"
+        "name": "盐潮头盔"
       },
       "vanguard_shaman_restoration_shoulder": {
-        "name": "Brineward Mantle"
+        "name": "盐潮肩铠"
       },
       "vanguard_shaman_restoration_chest": {
-        "name": "Brineward Hauberk"
+        "name": "盐潮锁甲"
       },
       "vanguard_shaman_restoration_legs": {
-        "name": "Brineward Kilt"
+        "name": "盐潮腿甲"
       },
       "vanguard_shaman_restoration_gloves": {
-        "name": "Brineward Handwraps"
+        "name": "盐潮护手"
       },
       "vanguard_mage_arcane_helmet": {
-        "name": "Hourbinder's Hood"
+        "name": "缚时兜帽"
       },
       "vanguard_mage_arcane_shoulder": {
-        "name": "Hourbinder's Amice"
+        "name": "缚时衬肩"
       },
       "vanguard_mage_arcane_chest": {
-        "name": "Hourbinder's Robe"
+        "name": "缚时长袍"
       },
       "vanguard_mage_arcane_legs": {
-        "name": "Hourbinder's Trousers"
+        "name": "缚时护腿"
       },
       "vanguard_mage_arcane_gloves": {
-        "name": "Hourbinder's Gloves"
+        "name": "缚时裹手"
       },
       "vanguard_mage_fire_helmet": {
-        "name": "Emberlash Cowl"
+        "name": "烬鞭兜帽"
       },
       "vanguard_mage_fire_shoulder": {
-        "name": "Emberlash Mantle"
+        "name": "烬鞭衬肩"
       },
       "vanguard_mage_fire_chest": {
-        "name": "Emberlash Robes"
+        "name": "烬鞭长袍"
       },
       "vanguard_mage_fire_legs": {
-        "name": "Emberlash Leggings"
+        "name": "烬鞭护腿"
       },
       "vanguard_mage_fire_gloves": {
-        "name": "Emberlash Gloves"
+        "name": "烬鞭裹手"
       },
       "vanguard_mage_frost_helmet": {
-        "name": "Rimewarden Hood"
+        "name": "霜卫兜帽"
       },
       "vanguard_mage_frost_shoulder": {
-        "name": "Rimewarden Shoulderpads"
+        "name": "霜卫衬肩"
       },
       "vanguard_mage_frost_chest": {
-        "name": "Rimewarden Vestment"
+        "name": "霜卫长袍"
       },
       "vanguard_mage_frost_legs": {
-        "name": "Rimewarden Legwraps"
+        "name": "霜卫护腿"
       },
       "vanguard_mage_frost_gloves": {
-        "name": "Rimewarden Mitts"
+        "name": "霜卫裹手"
       },
       "vanguard_warlock_affliction_helmet": {
-        "name": "Dreadquill Hood"
+        "name": "惧羽兜帽"
       },
       "vanguard_warlock_affliction_shoulder": {
-        "name": "Dreadquill Mantle"
+        "name": "惧羽衬肩"
       },
       "vanguard_warlock_affliction_chest": {
-        "name": "Dreadquill Robe"
+        "name": "惧羽长袍"
       },
       "vanguard_warlock_affliction_legs": {
-        "name": "Dreadquill Leggings"
+        "name": "惧羽护腿"
       },
       "vanguard_warlock_affliction_gloves": {
-        "name": "Dreadquill Handwraps"
+        "name": "惧羽裹手"
       },
       "vanguard_warlock_demonology_helmet": {
-        "name": "Marrowbound Cowl"
+        "name": "骨缚兜帽"
       },
       "vanguard_warlock_demonology_shoulder": {
-        "name": "Marrowbound Spaulders"
+        "name": "骨缚衬肩"
       },
       "vanguard_warlock_demonology_chest": {
-        "name": "Marrowbound Robe"
+        "name": "骨缚长袍"
       },
       "vanguard_warlock_demonology_legs": {
-        "name": "Marrowbound Leggings"
+        "name": "骨缚护腿"
       },
       "vanguard_warlock_demonology_gloves": {
-        "name": "Marrowbound Grips"
+        "name": "骨缚裹手"
       },
       "vanguard_warlock_destruction_helmet": {
-        "name": "Slagcrown Hood"
+        "name": "渣冠兜帽"
       },
       "vanguard_warlock_destruction_shoulder": {
-        "name": "Slagcrown Mantle"
+        "name": "渣冠衬肩"
       },
       "vanguard_warlock_destruction_chest": {
-        "name": "Slagcrown Robes"
+        "name": "渣冠长袍"
       },
       "vanguard_warlock_destruction_legs": {
-        "name": "Slagcrown Leggings"
+        "name": "渣冠护腿"
       },
       "vanguard_warlock_destruction_gloves": {
-        "name": "Slagcrown Gloves"
+        "name": "渣冠裹手"
       },
       "vanguard_druid_balance_helmet": {
-        "name": "Starwarden Headdress"
+        "name": "星卫罩帽"
       },
       "vanguard_druid_balance_shoulder": {
-        "name": "Starwarden Spaulders"
+        "name": "星卫肩甲"
       },
       "vanguard_druid_balance_chest": {
-        "name": "Starwarden Vest"
+        "name": "星卫外衣"
       },
       "vanguard_druid_balance_legs": {
-        "name": "Starwarden Breeches"
+        "name": "星卫皮裤"
       },
       "vanguard_druid_balance_gloves": {
-        "name": "Starwarden Gloves"
+        "name": "星卫手甲"
       },
       "vanguard_druid_feral_helmet": {
-        "name": "Bloodmane Helm"
+        "name": "血鬃罩帽"
       },
       "vanguard_druid_feral_shoulder": {
-        "name": "Bloodmane Shoulderpads"
+        "name": "血鬃肩甲"
       },
       "vanguard_druid_feral_chest": {
-        "name": "Bloodmane Tunic"
+        "name": "血鬃外衣"
       },
       "vanguard_druid_feral_legs": {
-        "name": "Bloodmane Legguards"
+        "name": "血鬃皮裤"
       },
       "vanguard_druid_feral_gloves": {
-        "name": "Bloodmane Grips"
+        "name": "血鬃手甲"
       },
       "vanguard_druid_restoration_helmet": {
-        "name": "Thistlebloom Crown"
+        "name": "蓟花罩帽"
       },
       "vanguard_druid_restoration_shoulder": {
-        "name": "Thistlebloom Mantle"
+        "name": "蓟花肩甲"
       },
       "vanguard_druid_restoration_chest": {
-        "name": "Thistlebloom Vest"
+        "name": "蓟花外衣"
       },
       "vanguard_druid_restoration_legs": {
-        "name": "Thistlebloom Leggings"
+        "name": "蓟花皮裤"
       },
       "vanguard_druid_restoration_gloves": {
-        "name": "Thistlebloom Gloves"
+        "name": "蓟花手甲"
       },
       "vanguard_verdict_greatsword": {
-        "name": "Vanguard's Verdict"
+        "name": "先锋之裁决"
       },
       "vanguard_oath_blade": {
-        "name": "Vanguard's Oath"
+        "name": "先锋之誓约"
       },
       "vanguard_fang_dagger": {
-        "name": "Vanguard's Fang"
+        "name": "先锋之牙"
       },
       "vanguard_warstaff": {
-        "name": "Vanguard's Warstaff"
+        "name": "先锋之战杖"
       },
       "conjured_water4": {
         "name": "魔法泉水"
@@ -19533,7 +19533,7 @@ export const zh_CN: EnTranslations = {
         "greeting": "从断崖峭壁上呼啸而来的热气流今天格外猛烈。准备好系上机械滑翔翼，到回旋赛道上试试你的翅膀了吗？"
       },
       "glider_apprentice": {
-        "name": "Skye",
+        "name": "斯凯",
         "title": "泽菲尔的学徒",
         "greeting": "顺着峡谷飞得真漂亮。什么时候需要一股魔法上升气流送你回断崖的泽菲尔那里，就来找我。"
       },

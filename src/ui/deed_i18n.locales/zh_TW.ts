@@ -880,4 +880,68 @@ export const table: DeedLocaleTable = {
     name: '港口到港口',
     desc: '搭乘兩條渡船各往返一次：東溪至月棲鎮，燭港至望龍哨。',
   },
+  exp_forge_helper: {
+    name: '助鎚之手',
+    desc: '在望龍哨幫助鐵匠瑪拉完成一面盾牌。',
+  },
+  exp_last_barricade: {
+    name: '最後的路障',
+    desc: '守住森林隘口的路障，擋下不死敵群。',
+  },
+  exp_borrowed_face: {
+    name: '借來的臉',
+    desc: '找出並擊敗混入芬橋守備隊中的借臉者。',
+  },
+  exp_windrider_slalom: {
+    name: '御風者迴旋賽',
+    desc: '在疾風崖峽谷完成機械滑翔翼滑降。',
+  },
+  exp_duskweave_dispatches: {
+    name: '暮織急件',
+    desc: '穿上薇拉莉的暮織斗篷，奪回強盜的急件。',
+  },
+  exp_wisp_maze: {
+    name: '迷宮之光',
+    desc: '尋回被偷走的錢袋，逃出常青園的迷宮。',
+  },
+  prog_rift_watch_trusted: {
+    name: '裂隙守望的信任',
+    desc: '在裂隙守望陣營中達到信任聲望。',
+  },
+  prog_church_order_trusted: {
+    name: '教會修會的信任',
+    desc: '在教會修會陣營中達到信任聲望。',
+  },
+  prog_automatons_trusted: {
+    name: '機械造物的信任',
+    desc: '在機械造物陣營中達到信任聲望。',
+  },
+  prog_rift_watch_champion: {
+    name: '裂隙守望的冠軍',
+    desc: '在裂隙守望陣營中達到冠軍聲望。',
+    title: '裂隙守衛',
+  },
+  prog_church_order_champion: {
+    name: '教會修會的冠軍',
+    desc: '在教會修會陣營中達到冠軍聲望。',
+    title: '晨曦守護者',
+  },
+  prog_automatons_champion: {
+    name: '機械造物的冠軍',
+    desc: '在機械造物陣營中達到冠軍聲望。',
+    title: '鍛造大師',
+  },
+  prog_faction_champion_all: {
+    name: '眾旗冠軍',
+    desc: '在裂隙守望、教會修會與機械造物三大陣營中都達到冠軍聲望。',
+  },
+  exp_clue_first_casket: {
+    name: '尋得寶藏',
+    desc: '打開一次線索卷軸尋寶挖出的寶藏匣。',
+  },
+  exp_clue_ten_caskets: {
+    name: '尋寶獵人',
+    desc: '打開10個線索卷軸尋寶挖出的寶藏匣。',
+    title: '尋寶獵人',
+  },
 };

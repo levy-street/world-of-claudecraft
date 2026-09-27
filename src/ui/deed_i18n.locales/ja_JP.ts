@@ -1043,4 +1043,68 @@ export const table: DeedLocaleTable = {
     name: '港から港へ',
     desc: 'イーストブルックとムーンレスト、ウィックハーバーとワームウォッチ、二つの渡し船でそれぞれ往復する。',
   },
+  exp_forge_helper: {
+    name: '手を貸す鎚',
+    desc: 'ワームウォッチで鍛冶師マーラの盾作りを手伝う。',
+  },
+  exp_last_barricade: {
+    name: '最後の防柵',
+    desc: 'アンデッドの大軍から森の峠を守り抜く。',
+  },
+  exp_borrowed_face: {
+    name: '借り物の顔',
+    desc: 'フェンブリッジの衛兵に紛れ込んだ潜入者の正体を暴いて倒す。',
+  },
+  exp_windrider_slalom: {
+    name: 'ウィンドライダー・スラローム',
+    desc: 'ゲイルクレストの峡谷を抜ける機械仕掛けのグライダー滑空を完了する。',
+  },
+  exp_duskweave_dispatches: {
+    name: '宵織りの命令書',
+    desc: 'ヴァレリーの宵織りのマントをまとって、盗賊の命令書を取り戻す。',
+  },
+  exp_wisp_maze: {
+    name: '迷宮の灯り',
+    desc: '盗まれた財布をすべて取り戻し、エバーガーデンの迷宮から脱出する。',
+  },
+  prog_rift_watch_trusted: {
+    name: 'リフトの見張りの信頼',
+    desc: 'リフトの見張りで信頼に達する。',
+  },
+  prog_church_order_trusted: {
+    name: '教会修道会の信頼',
+    desc: '教会修道会で信頼に達する。',
+  },
+  prog_automatons_trusted: {
+    name: 'オートマトンの信頼',
+    desc: 'オートマトンで信頼に達する。',
+  },
+  prog_rift_watch_champion: {
+    name: 'リフトの見張りのチャンピオン',
+    desc: 'リフトの見張りでチャンピオンに達する。',
+    title: 'リフト守護者',
+  },
+  prog_church_order_champion: {
+    name: '教会修道会のチャンピオン',
+    desc: '教会修道会でチャンピオンに達する。',
+    title: '暁の番人',
+  },
+  prog_automatons_champion: {
+    name: 'オートマトンのチャンピオン',
+    desc: 'オートマトンでチャンピオンに達する。',
+    title: '鍛冶大匠',
+  },
+  prog_faction_champion_all: {
+    name: '全勢力のチャンピオン',
+    desc: 'リフトの見張り、教会修道会、オートマトンのすべてでチャンピオンに達する。',
+  },
+  exp_clue_first_casket: {
+    name: '宝箱発見',
+    desc: '手がかりの巻物の宝探しの最後に掘り出した宝箱を開ける。',
+  },
+  exp_clue_ten_caskets: {
+    name: '宝探しの名手',
+    desc: '手がかりの巻物の宝探しの最後に掘り出した宝箱を10個開ける。',
+    title: '宝探しの名手',
+  },
 };

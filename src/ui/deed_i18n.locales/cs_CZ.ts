@@ -1118,4 +1118,81 @@ export const table: DeedLocaleTable = {
 
     name: 'Osvobozený pramen',
   },
+  exp_arcane_calligraphy: {
+    name: 'Pevná ruka',
+    desc: 'Dokonči Éterickou kaligrafii v Eastbrookském údolí.',
+  },
+  exp_arcane_calligraphy_gold: {
+    name: 'Psáno hvězdným svitem',
+    desc: 'Získej zlaté hodnocení v Éterické kaligrafii.',
+    title: 'Sesilatel run',
+  },
+  exp_forge_helper: {
+    name: 'Pomocné kladivo',
+    desc: 'Pomoz Kovářce Maře dokončit štít ve Wyrmwatchi.',
+  },
+  exp_last_barricade: {
+    name: 'Poslední barikáda',
+    desc: 'Udrž lesní průsmyk proti hordě nemrtvých.',
+  },
+  exp_borrowed_face: {
+    name: 'Vypůjčená tvář',
+    desc: 'Odhal a poraz vetřelce v řadách hlídky Fenbridge.',
+  },
+  exp_windrider_slalom: {
+    name: 'Vichrojezdecký slalom',
+    desc: 'Dokonči sestup na mechanickém kluzáku kaňonem Vichrného hřebene.',
+  },
+  exp_duskweave_dispatches: {
+    name: 'Soumračné depeše',
+    desc: 'Získej zpět loupežnické depeše v očarovaném plášti Valerie.',
+  },
+  exp_wisp_maze: {
+    name: 'Světlo v bludišti',
+    desc: 'Zachraň ukradené měšce s mincemi a unikni z bludiště Věčné zahrady.',
+  },
+  prog_rift_watch_trusted: {
+    name: 'Důvěra Hlídky trhlin',
+    desc: 'Dosáhni postavení Důvěryhodného u Hlídky trhlin.',
+  },
+  prog_church_order_trusted: {
+    name: 'Důvěra Církevního řádu',
+    desc: 'Dosáhni postavení Důvěryhodného u Církevního řádu.',
+  },
+  prog_automatons_trusted: {
+    name: 'Důvěra Automatů',
+    desc: 'Dosáhni postavení Důvěryhodného u Automatů.',
+  },
+  prog_rift_watch_champion: {
+    name: 'Šampion Hlídky trhlin',
+    desc: 'Dosáhni postavení Šampiona u Hlídky trhlin.',
+    title: 'Trhlinostrážce',
+  },
+  prog_church_order_champion: {
+    name: 'Šampion Církevního řádu',
+    desc: 'Dosáhni postavení Šampiona u Církevního řádu.',
+    title: 'Úsvitostrážce',
+  },
+  prog_automatons_champion: {
+    name: 'Šampion Automatů',
+    desc: 'Dosáhni postavení Šampiona u Automatů.',
+    title: 'Kovmistr',
+  },
+  prog_faction_champion_all: {
+    name: 'Šampion každého praporu',
+    desc: 'Dosáhni postavení Šampiona u Hlídky trhlin, Církevního řádu a Automatů.',
+  },
+  exp_clue_first_casket: {
+    name: 'Poklad nalezen',
+    desc: 'Otevři Truhlu s pokladem vykopanou na konci pátrání s Hádankovým svitkem.',
+  },
+  exp_clue_ten_caskets: {
+    name: 'Lovec pokladů',
+    desc: 'Otevři 10 Truhel s pokladem vykopaných na konci pátrání s Hádankovými svitky.',
+    title: 'Lovec pokladů',
+  },
+  exp_harbor_to_harbor: {
+    name: 'Z přístavu do přístavu',
+    desc: 'Popluj oběma přívozy tam a zpět: z Eastbrooku do Moonrestu a z Wickharboru do Wyrmwatche.',
+  },
 };

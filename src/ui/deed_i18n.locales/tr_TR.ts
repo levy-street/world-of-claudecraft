@@ -1116,4 +1116,81 @@ export const table: DeedLocaleTable = {
 
     name: 'Zincirlerinden Kurtulmuş Bir Kaynak',
   },
+  exp_arcane_calligraphy: {
+    name: 'İstikrarlı El',
+    desc: "Eastbrook Vale'de Arcane Calligraphy'i tamamla.",
+  },
+  exp_arcane_calligraphy_gold: {
+    name: 'Yıldız Işığında Yazılı',
+    desc: "Arcane Calligraphy'de Altın derecelendir.",
+    title: 'Rün Çağırıcısı',
+  },
+  exp_forge_helper: {
+    name: 'Yardımcı Çekiç',
+    desc: "Smith Mara'nın Wyrmwatch'de bir kalkanı tamamlamasına yardım et.",
+  },
+  exp_last_barricade: {
+    name: 'Son Barikat',
+    desc: 'Orman geçidini ölü ordusunun saldırısından tut.',
+  },
+  exp_borrowed_face: {
+    name: 'Ödünç Alınmış Yüz',
+    desc: 'Fenbridge nöbetinin arasındaki casus ortaya çıkar ve yenildir.',
+  },
+  exp_windrider_slalom: {
+    name: 'Rüzgar Binici Slalom',
+    desc: 'Mekanik planör iniş Galecrest boğazından tamamla.',
+  },
+  exp_duskweave_dispatches: {
+    name: 'Alacakaranlık Dokuma Komutları',
+    desc: "Valerie'nin büyülenmiş pelerini giyen halde eşkiya komutlarını kurtar.",
+  },
+  exp_wisp_maze: {
+    name: 'Labirentte Bir Işık',
+    desc: 'Çalınan para keselerini kurtar ve Evergarden labirentinden kaç.',
+  },
+  prog_rift_watch_trusted: {
+    name: 'Rift Watch tarafından Güvenilir',
+    desc: 'Rift Watch ile Güvenilir derecesine ulaş.',
+  },
+  prog_church_order_trusted: {
+    name: 'Church Order tarafından Güvenilir',
+    desc: 'Church Order ile Güvenilir derecesine ulaş.',
+  },
+  prog_automatons_trusted: {
+    name: 'Otomatlar tarafından Güvenilir',
+    desc: 'Otomatlar ile Güvenilir derecesine ulaş.',
+  },
+  prog_rift_watch_champion: {
+    name: 'Rift Watch Şampiyonu',
+    desc: 'Rift Watch ile Şampiyon derecesine ulaş.',
+    title: 'Yarık Bekçi',
+  },
+  prog_church_order_champion: {
+    name: 'Church Order Şampiyonu',
+    desc: 'Church Order ile Şampiyon derecesine ulaş.',
+    title: 'Şafak Bekçi',
+  },
+  prog_automatons_champion: {
+    name: 'Otomatlar Şampiyonu',
+    desc: 'Otomatlar ile Şampiyon derecesine ulaş.',
+    title: 'Dövme Üstası',
+  },
+  prog_faction_champion_all: {
+    name: 'Her Bayrak Şampiyonu',
+    desc: 'Rift Watch, Church Order ve Otomatlar ile Şampiyon derecesine ulaş.',
+  },
+  exp_clue_first_casket: {
+    name: 'Hazine Bulundu',
+    desc: 'İpucu tomarı avının sonunda kazılan bir Hazine Sandığını aç.',
+  },
+  exp_clue_ten_caskets: {
+    name: 'Hazine Avçısı',
+    desc: 'İpucu tomarı avının sonunda kazılan 10 Hazine Sandığını aç.',
+    title: 'Hazine Avçısı',
+  },
+  exp_harbor_to_harbor: {
+    name: "Liman'dan Limana",
+    desc: "Her iki feribotu geri ve ileri sür: Eastbrook'tan Moonrest'e ve Wickharbor'dan Wyrmwatch'e.",
+  },
 };

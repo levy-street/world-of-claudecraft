@@ -1091,4 +1091,68 @@ export const table: DeedLocaleTable = {
     name: '항구에서 항구로',
     desc: '이스트브룩과 문레스트, 윅하버와 와이름 감시탑을 잇는 두 여객선을 각각 왕복하십시오.',
   },
+  exp_forge_helper: {
+    name: '도움의 망치',
+    desc: '웜워치에서 대장장이 마라가 방패를 완성하도록 도우십시오.',
+  },
+  exp_last_barricade: {
+    name: '최후의 방벽',
+    desc: '언데드 무리에 맞서 숲길목을 지키십시오.',
+  },
+  exp_borrowed_face: {
+    name: '빌린 얼굴',
+    desc: '펜브리지 경비대에 숨은 침입자의 정체를 밝히고 처치하십시오.',
+  },
+  exp_windrider_slalom: {
+    name: '바람기수 슬라럼',
+    desc: '게일크레스트 협곡을 가로지르는 기계 활공기 활강을 완료하십시오.',
+  },
+  exp_duskweave_dispatches: {
+    name: '황혼결 명령서',
+    desc: '발레리의 마법 망토를 걸친 채 도적의 명령서를 되찾으십시오.',
+  },
+  exp_wisp_maze: {
+    name: '미로 속의 빛',
+    desc: '훔쳐 간 동전 주머니를 되찾고 상록 정원의 미로를 탈출하십시오.',
+  },
+  prog_rift_watch_trusted: {
+    name: '균열 감시단의 신뢰',
+    desc: '균열 감시단과 신뢰 단계에 도달하십시오.',
+  },
+  prog_church_order_trusted: {
+    name: '교단의 신뢰',
+    desc: '교단과 신뢰 단계에 도달하십시오.',
+  },
+  prog_automatons_trusted: {
+    name: '오토마톤의 신뢰',
+    desc: '오토마톤과 신뢰 단계에 도달하십시오.',
+  },
+  prog_rift_watch_champion: {
+    name: '균열 감시단의 챔피언',
+    desc: '균열 감시단과 챔피언 단계에 도달하십시오.',
+    title: '균열 파수꾼',
+  },
+  prog_church_order_champion: {
+    name: '교단의 챔피언',
+    desc: '교단과 챔피언 단계에 도달하십시오.',
+    title: '여명지기',
+  },
+  prog_automatons_champion: {
+    name: '오토마톤의 챔피언',
+    desc: '오토마톤과 챔피언 단계에 도달하십시오.',
+    title: '대장 명인',
+  },
+  prog_faction_champion_all: {
+    name: '모든 깃발의 챔피언',
+    desc: '균열 감시단, 교단, 오토마톤 모두와 챔피언 단계에 도달하십시오.',
+  },
+  exp_clue_first_casket: {
+    name: '보물 발견',
+    desc: '단서 두루마리 보물찾기 끝에서 파낸 보물 상자를 여십시오.',
+  },
+  exp_clue_ten_caskets: {
+    name: '보물 사냥꾼',
+    desc: '단서 두루마리 보물찾기 끝에서 파낸 보물 상자 10개를 여십시오.',
+    title: '보물 사냥꾼',
+  },
 };

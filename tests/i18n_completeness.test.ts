@@ -285,27 +285,31 @@ describe('i18n whole-catalog completeness', () => {
     // Keep literal digests over the 104 marker rows so unintended copy changes fail.
     // Recipe: sha256(JSON.stringify(Object.entries(flatten(TABLES[lang]))
     //   .filter(([key]) => key.startsWith('hud.core.mapMarker')))).
+    // Re-minted at the v0.44.0 release fill (2026-09-27): the world-quest marker
+    // labels (activeWorldQuest, availableWorldQuest, worldBoss) were pending in
+    // every locale and are now translated, so all twenty digests move; recomputed
+    // with the recipe above over the regenerated tables.
     const expected = {
-      es: 'bb5609235e6e6499b3ac17f4fe16581eff544d092763b7940183d6e4c8143e18',
-      es_ES: 'bb5609235e6e6499b3ac17f4fe16581eff544d092763b7940183d6e4c8143e18',
-      fr_FR: '4c6a10eb0e92fcdceda8e58b9ea43024d78aaf63ccad105e9ff12de44dfc141a',
-      fr_CA: '4c6a10eb0e92fcdceda8e58b9ea43024d78aaf63ccad105e9ff12de44dfc141a',
-      it_IT: '69af0fe5152f43d94f2d68414624114d229bc8f1c6bc31bf323a51eccfe6d262',
-      de_DE: '8e1d573925ee2b90c6f4c4bcd3456d73359194376ec426d66536385b784bde85',
+      es: 'c69eaf5d6ba5971203b96b74508c273e4472a4de2b250f1dc8549ce5c7108f90',
+      es_ES: 'c69eaf5d6ba5971203b96b74508c273e4472a4de2b250f1dc8549ce5c7108f90',
+      fr_FR: '237adb036a254bf3c2b77544804bd0c582cbf6f8e942337dfae203d1c2f20796',
+      fr_CA: '237adb036a254bf3c2b77544804bd0c582cbf6f8e942337dfae203d1c2f20796',
+      it_IT: 'f759b8856361c9d74f04a21e8473b7d40b74123f2256fadf4710ee6c59cfa0e7',
+      de_DE: '62ab491f523993e5cc353db76098ea20d37a257b095d1d9cbc02e61672415df0',
       zh_CN: '2dadd5833c54018a95fb86cc09c251f8bbdefd84c59e7e425cd4828369d8fa64',
       zh_TW: '2f5faeaead3450e2cd61cc3374f674e1831a1fbd80f9a1d66b7a54f61b143ea6',
       ko_KR: '761c4b1bbad1b0c40023c198022edf33f84b54235826ed16759f2fd362e7bfbb',
       ja_JP: '5cc3263072b51a78324d07d1f3a7c0c0b194857a51758037b5207b91295e4dfc',
-      pt_BR: '053f1d0b7102f067719cfba1c7299ba27382eb943745602bc9b9f64c26c2c613',
+      pt_BR: '9ef461731adef6efda45007e5aa27cfd44d9758bf3fd1ea36e7e1b04c219a1ea',
       ru_RU: 'cc9ee4d8070a4533ab958c883ccf7c22c3c43870cbeddcfa93e4d3d554a82b19',
-      cs_CZ: '3cdc301dc903fba5b7e50d48c60fe637bb3b25c381848dda42953529c2789558',
-      nl_NL: '43ea60cd6606d21a7521da16c9c60eb6d13ac3ecd5ee99ce96bbdcb5354bc611',
-      pl_PL: 'b3584429dde3958b901c479db3198523f52f4439e20e179dadec4d3fbfc53bd1',
-      id_ID: 'a2d31ef6f1b78ae549ad52216d764ecc56835d5768bdbae34462f5781dd3020f',
-      tr_TR: 'b731bd8d72a9dd98952aecba6476405177af1076ee474309e7b871da007191c1',
-      sv_SE: '129b14d69918a87e9b6bd9624c74a799861369a496544c818e618814661a66e0',
-      vi_VN: '5797464fc3d40bb6bcb7e7a1024a9fb83720d4a2d16dfb8bd8174274b8412c44',
-      da_DK: '7d0f7f9fe8ad34366a96225a5134d207344d07018c9b5ac45cb81aee0085d8ae',
+      cs_CZ: '21d2150557f5177168168ff30fc08608866ffc2974eaf304646bd3a85069573d',
+      nl_NL: '6da086f7a9723fb714a5d4a9714e51d73284df62a78b80c124c128cc6d02fac0',
+      pl_PL: 'bc457837c42a59049509b85716169bba8bef7a3beec84ad3a664688eadb14d4a',
+      id_ID: 'e8d14c46b89747bdb84f7470cbba88bc9ac86136483907ce2b7ace1495c52a9a',
+      tr_TR: '7e02a4c63d7a8c7f513d4305e869a46717322c4fcd431a0e0887280e6e434034',
+      sv_SE: '81bffba1f21fe2b01293e33186ccce4001228ff293c127c2eca317f724130a29',
+      vi_VN: 'fe3aa798370be294218235f64d595978c1d8b1e23fa6742ed4fafc195df43921',
+      da_DK: '5cf82206c6d987da3cbdaee84d05ea89a31cce052fb339a24ffc6c1db2b60845',
     } as const satisfies Partial<Record<SupportedLanguage, string>>;
 
     for (const [lang, digest] of Object.entries(expected) as Array<

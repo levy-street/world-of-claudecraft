@@ -194,20 +194,20 @@ export const cs_CZ: EnTranslations = {
         "description": "Vytvoř scénář s předem sestavenou nabídkou skupiny."
       },
       "hillwarn": {
-        "label": "Hill countdown",
-        "description": "Announce a hill now; it rises after the full warning."
+        "label": "Odpočet kopce",
+        "description": "Ohlas kopec hned; vyvolá se po celém odpočtu."
       },
       "hillnow": {
-        "label": "Raise hill now",
-        "description": "Raise a hill at once and stand on it."
+        "label": "Vyvolat kopec hned",
+        "description": "Okamžitě vyvolej kopec a postav se na něj."
       },
       "hillrise": {
-        "label": "Skip hill countdown",
-        "description": "Raise the announced hill right away."
+        "label": "Přeskočit odpočet kopce",
+        "description": "Ihned vyvolej ohlášený kopec."
       },
       "hillend": {
-        "label": "End hill",
-        "description": "Make the current hill fall now."
+        "label": "Ukončit kopec",
+        "description": "Nech aktuální kopec ihned spadnout."
       }
     }
   },
@@ -348,46 +348,46 @@ export const cs_CZ: EnTranslations = {
   },
   "hudChrome": {
     "framePresets": {
-      "apply": "Apply",
-      "pickerLabel": "Frame Presets: {name}",
-      "overwrite": "Overwrite Preset",
-      "overwriteBody": "Replace the saved preset \"{name}\" with your current layout?",
-      "current": "Current Layout",
-      "new": "New Preset",
-      "empty": "No saved presets",
-      "deleteNamed": "Delete {name}",
-      "deleteBody": "Delete the frame preset \"{name}\"?",
-      "title": "Frame Presets",
-      "name": "Preset Name",
-      "slot": "Preset {slot}",
-      "remove": "Delete",
-      "saved": "Done.",
-      "failed": "Could not save or load the preset."
+      "apply": "Použít",
+      "pickerLabel": "Předvolby rámečků: {name}",
+      "overwrite": "Přepsat předvolbu",
+      "overwriteBody": "Nahradit uloženou předvolbu \"{name}\" tvým aktuálním rozložením?",
+      "current": "Aktuální rozložení",
+      "new": "Nová předvolba",
+      "empty": "Žádné uložené předvolby",
+      "deleteNamed": "Smazat {name}",
+      "deleteBody": "Smazat předvolbu rámečků \"{name}\"?",
+      "title": "Předvolby rámečků",
+      "name": "Název předvolby",
+      "slot": "Předvolba {slot}",
+      "remove": "Smazat",
+      "saved": "Hotovo.",
+      "failed": "Předvolbu se nepodařilo uložit ani načíst."
     },
     "frameMenus": {
-      "hide": "Hide Frame",
-      "units": "Unit Frames",
-      "bars": "Action Bars",
-      "trackers": "Trackers",
-      "auras": "Auras",
-      "combat": "Combat Displays",
-      "other": "Other HUD Elements",
-      "options": "Frame Options",
-      "allOptions": "All Frame Options",
-      "independentTarget": "Lock Target of Target to Target"
+      "hide": "Skrýt rámeček",
+      "units": "Rámečky jednotek",
+      "bars": "Akční lišty",
+      "trackers": "Trackery",
+      "auras": "Aury",
+      "combat": "Bojová zobrazení",
+      "other": "Ostatní prvky HUD",
+      "options": "Nastavení rámečku",
+      "allOptions": "Všechna nastavení rámečků",
+      "independentTarget": "Uzamknout Cíl cíle k Cíli"
     },
     "focusTargets": {
-      "showEmpty": "Show Empty Focus Frames",
-      "assignHint": "Select a target. Press {key} or click {button}.",
-      "assignClickHint": "Select a target. Click {button}.",
-      "ally": "Ally",
-      "enemy": "Enemy",
-      "unset": "Unset Focus",
-      "frame1": "Focus 1",
-      "frame2": "Focus 2",
-      "frame3": "Focus 3",
-      "assign": "Set focus {slot}",
-      "target": "Target focus {slot}"
+      "showEmpty": "Zobrazit prázdné rámečky zaměření",
+      "assignHint": "Vyber cíl. Stiskni {key}, nebo klikni na {button}.",
+      "assignClickHint": "Vyber cíl. Klikni na {button}.",
+      "ally": "Spojenec",
+      "enemy": "Nepřítel",
+      "unset": "Zrušit zaměření",
+      "frame1": "Zaměření 1",
+      "frame2": "Zaměření 2",
+      "frame3": "Zaměření 3",
+      "assign": "Nastavit zaměření {slot}",
+      "target": "Cíl: Zaměření {slot}"
     },
     "professionTrainers": {
       "blacksmithing": "Trenér kovářství",
@@ -402,153 +402,153 @@ export const cs_CZ: EnTranslations = {
       "nameplate": "<{title}>"
     },
     "weeklyRewards": {
-      "title": "The Weekly Vault",
-      "tab": "Weekly Rewards",
-      "intro": "Each completed milestone earns one vault. After the Crucible reset, open each vault to roll its loot, then select one item for the week. Opened rewards are saved and unclaimed weeks stay available.",
-      "approachKeeper": "Stand near the Vault Keeper to view your weekly rewards.",
-      "nextReset": "Crucible weekly reset",
+      "title": "Týdenní trezor",
+      "tab": "Týdenní odměny",
+      "intro": "Každý dokončený milník získá jeden trezor. Po resetu Kelímku otevři každý trezor a vylosuj jeho kořist, poté vyber jeden předmět pro tento týden. Otevřené odměny se ukládají a nevyzvednuté týdny zůstávají dostupné.",
+      "approachKeeper": "Přistup ke strážci trezoru, chceš-li zobrazit své týdenní odměny.",
+      "nextReset": "Týdenní reset Kelímku",
       "countdown": "{days}d {hours}h {minutes}m {seconds}s",
       "progress": "{count} / {max}",
-      "milestone": "1 loot-table roll",
-      "lockedRoll": "Unlocks 1 loot-table roll",
-      "earned": "Vaults available after next reset: {count}",
-      "normal": "Normal",
-      "heroic": "Heroic",
-      "mixedClears": "{heroic} Heroic / {normal} Normal",
-      "heroicClears": "{count} Heroic",
-      "normalClears": "{count} Normal",
-      "viewPossibleLoot": "View possible loot",
-      "chooseTable": "Select which table to roll off",
-      "selectAllTables": "Select all",
-      "selectedTables": "{count} tables selected",
-      "selectedTable": "{count} table selected",
-      "noLevelLoot": "No eligible loot at your current level.",
-      "tableItemCount": "{count} items",
-      "tableItem": "{count} item",
-      "previouslyRolled": "Previously rolled reward",
-      "noTables": "No eligible equipment from your recorded boss clears at this difficulty.",
-      "tablesExhausted": "All eligible items have already been rolled. Choose a revealed reward.",
-      "heroicUpgradeOne": "{count} more Heroic dungeon clear to upgrade",
-      "heroicUpgradeMany": "{count} more Heroic dungeon clears to upgrade",
+      "milestone": "1 los z tabulky kořisti",
+      "lockedRoll": "Odemkne 1 los z tabulky kořisti",
+      "earned": "Trezory dostupné po dalším resetu: {count}",
+      "normal": "Normální",
+      "heroic": "Hrdinská",
+      "mixedClears": "{heroic} hrdinských / {normal} normálních",
+      "heroicClears": "{count} hrdinských",
+      "normalClears": "{count} normálních",
+      "viewPossibleLoot": "Zobrazit možnou kořist",
+      "chooseTable": "Vyber tabulku, ze které se bude losovat",
+      "selectAllTables": "Vybrat vše",
+      "selectedTables": "Vybráno {count} tabulek",
+      "selectedTable": "Vybrána {count} tabulka",
+      "noLevelLoot": "Na tvé současné úrovni není žádná vhodná kořist.",
+      "tableItemCount": "{count} předmětů",
+      "tableItem": "{count} předmět",
+      "previouslyRolled": "Dříve vylosovaná odměna",
+      "noTables": "Z tvých zaznamenaných vyčištění bossů na této obtížnosti nepochází žádná vhodná výbava.",
+      "tablesExhausted": "Všechny vhodné předměty už byly vylosovány. Vyber odhalenou odměnu.",
+      "heroicUpgradeOne": "Ještě {count} hrdinské vyčištění dungeonu na vylepšení",
+      "heroicUpgradeMany": "Ještě {count} hrdinských vyčištění dungeonu na vylepšení",
       "completedTask": {
-        "raidOne": "{count} Raid Encounter Cleared",
-        "raidMany": "{count} Raid Encounters Cleared",
-        "dungeonOne": "{count} Dungeon Cleared",
-        "dungeonMany": "{count} Dungeons Cleared",
-        "worldOne": "{count} World Quest Completed",
-        "worldMany": "{count} World Quests Completed",
-        "pvpOne": "{count} Rated Match Won",
-        "pvpMany": "{count} Rated Matches Won"
+        "raidOne": "{count} vyčištěný raidový souboj",
+        "raidMany": "{count} vyčištěných raidových soubojů",
+        "dungeonOne": "{count} vyčištěný dungeon",
+        "dungeonMany": "{count} vyčištěných dungeonů",
+        "worldOne": "{count} dokončený světový úkol",
+        "worldMany": "{count} dokončených světových úkolů",
+        "pvpOne": "{count} vyhraný hodnocený zápas",
+        "pvpMany": "{count} vyhraných hodnocených zápasů"
       },
       "requiredTask": {
-        "raidOne": "Clear {count} Raid Encounter",
-        "raidMany": "Clear {count} Raid Encounters",
-        "dungeonOne": "Clear {count} Dungeon",
-        "dungeonMany": "Clear {count} Dungeons",
-        "worldOne": "Complete {count} World Quest",
-        "worldMany": "Complete {count} World Quests",
-        "pvpOne": "Win {count} Rated Match",
-        "pvpMany": "Win {count} Rated Matches"
+        "raidOne": "Vyčisti {count} raidový souboj",
+        "raidMany": "Vyčisti {count} raidových soubojů",
+        "dungeonOne": "Vyčisti {count} dungeon",
+        "dungeonMany": "Vyčisti {count} dungeonů",
+        "worldOne": "Dokonči {count} světový úkol",
+        "worldMany": "Dokonči {count} světových úkolů",
+        "pvpOne": "Vyhraj {count} hodnocený zápas",
+        "pvpMany": "Vyhraj {count} hodnocených zápasů"
       },
-      "readyWeeks": "Unclaimed weeks: {count}. Claim the oldest completed week first.",
-      "claimLastWeek": "Claim last week's reward",
-      "readyTitle": "Your weekly rewards are ready",
-      "readyDescription": "A completed week of rewards is waiting. Open your earned vaults, then choose one item to claim.",
-      "notNow": "Not now",
-      "completedWeek": "Week ended {date}",
-      "currentWeek": "Back to this week's progress",
-      "openRewards": "Open your earned vaults",
-      "openedCount": "{count} of {total} vaults opened. Open them all to choose your reward.",
-      "openingSavedReward": "Opening vault and saving your reward...",
-      "rewardNumber": "Reward {count}",
-      "openVault": "Open vault: {name}",
-      "inspectItem": "Inspect {name}",
-      "selectItem": "Select {name}",
-      "revealed": "Revealed",
-      "revealedItem": "Revealed: {name}",
-      "chooseReward": "Choose one reward",
-      "confirmTitle": "Claim {name}?",
-      "confirmClaim": "Confirm claim",
-      "backToChoices": "Back to choices",
-      "claimRequested": "Claim requested. If your bags are full, make room and choose again.",
-      "waiting": "No rewards ready yet. This week's earned vaults unlock at the next reset.",
-      "chooseOne": "Choose carefully: taking one item gives up every other choice for that week.",
-      "itemLevel": "Item level {level}",
-      "backlogFull": "Your saved weeks are full. Collect rewards to make room for future weeks.",
-      "claim": "Take selected item",
-      "poolSize": "View {count} items",
-      "worldPoolRule": "Normal Nythraxis equipment. No raid clears required.",
-      "poolRule": "Every listed item has an equal chance. Items match your class restrictions. Defeated raids unlock their loot at that difficulty. Legendary items are excluded.",
-      "selectionPoolRule": "For raids and dungeons, select one or more tables before opening. Dungeon tables combine bosses you have cleared at this difficulty. Rolls exclude duplicates, legendary items and equipment requiring more than {maxLevelOffset} levels above your level.",
-      "rare": "Rare",
-      "epic": "Epic",
-      "unavailable": "Not yet available",
-      "worldUnavailable": "World quest rewards will become available when rotating world quests arrive.",
+      "readyWeeks": "Nevyzvednuté týdny: {count}. Nejdřív vyzvedni nejstarší dokončený týden.",
+      "claimLastWeek": "Vyzvednout odměnu z minulého týdne",
+      "readyTitle": "Tvé týdenní odměny jsou připravené",
+      "readyDescription": "Čeká dokončený týden odměn. Otevři získané trezory a poté vyber jeden předmět, který si vyzvedneš.",
+      "notNow": "Teď ne",
+      "completedWeek": "Týden skončil {date}",
+      "currentWeek": "Zpět na postup tohoto týdne",
+      "openRewards": "Otevřít získané trezory",
+      "openedCount": "Otevřeno {count} z {total} trezorů. Otevři je všechny, ať si vybereš odměnu.",
+      "openingSavedReward": "Otvírám trezor a ukládám tvou odměnu...",
+      "rewardNumber": "Odměna {count}",
+      "openVault": "Otevřít trezor: {name}",
+      "inspectItem": "Prohlédnout {name}",
+      "selectItem": "Vybrat {name}",
+      "revealed": "Odhaleno",
+      "revealedItem": "Odhaleno: {name}",
+      "chooseReward": "Vyber jednu odměnu",
+      "confirmTitle": "Vyzvednout {name}?",
+      "confirmClaim": "Potvrdit vyzvednutí",
+      "backToChoices": "Zpět na výběr",
+      "claimRequested": "Vyzvednutí požadováno. Pokud máš plné brašny, udělej místo a vyber znovu.",
+      "waiting": "Zatím žádné odměny nejsou připravené. Získané trezory tohoto týdne se odemknou při dalším resetu.",
+      "chooseOne": "Vybírej pečlivě: vzetí jednoho předmětu tě připraví o všechny ostatní možnosti tohoto týdne.",
+      "itemLevel": "Úroveň předmětu {level}",
+      "backlogFull": "Tvé uložené týdny jsou plné. Vyzvedni si odměny, ať uvolníš místo pro další týdny.",
+      "claim": "Vzít vybraný předmět",
+      "poolSize": "Zobrazit {count} předmětů",
+      "worldPoolRule": "Normální výbava Nythraxis. Vyčištění raidu se nevyžaduje.",
+      "poolRule": "Každý uvedený předmět má stejnou šanci. Předměty odpovídají omezením tvé třídy. Poražené raidy odemknou svou kořist na dané obtížnosti. Legendární předměty jsou vyloučeny.",
+      "selectionPoolRule": "U raidů a dungeonů vyber před otevřením jednu nebo víc tabulek. Tabulky dungeonů kombinují bossy, které jsi na této obtížnosti porazil(a). Losování vylučuje duplicity, legendární předměty a výbavu vyžadující o víc než {maxLevelOffset} úrovní víc, než je tvá úroveň.",
+      "rare": "Vzácné",
+      "epic": "Epické",
+      "unavailable": "Zatím nedostupné",
+      "worldUnavailable": "Odměny ze světových úkolů budou dostupné, jakmile dorazí rotující světové úkoly.",
       "category": {
-        "raid": "Raids",
-        "dungeon": "Dungeons",
-        "world": "World Quests",
+        "raid": "Raidy",
+        "dungeon": "Dungeony",
+        "world": "Světové úkoly",
         "pvp": "PvP"
       },
       "task": {
-        "raid": "Defeat different raid encounters. Each encounter counts once; a Heroic clear upgrades its credit.",
-        "dungeon": "Complete dungeons. Your best clears determine the reward difficulty at each milestone.",
-        "world": "Complete rotating world quests. Story quests do not count.",
-        "pvp": "Win ranked arena or rated battleground matches. Practice matches and forfeits do not count."
+        "raid": "Poraz různé raidové souboje. Každý souboj se počítá jednou; hrdinské vyčištění vylepší jeho kredit.",
+        "dungeon": "Dokonči dungeony. Obtížnost odměny na každém milníku určí tvá nejlepší vyčištění.",
+        "world": "Dokonči rotující světové úkoly. Příběhové úkoly se nepočítají.",
+        "pvp": "Vyhraj hodnocené zápasy v aréně nebo na bojišti. Tréninkové zápasy a vzdání se se nepočítají."
       },
       "pool": {
-        "raid": "Normal raid loot",
-        "raid_heroic": "Heroic raid loot",
-        "dungeon": "Normal dungeon loot",
-        "dungeon_heroic": "Heroic dungeon loot",
-        "world": "World quest loot",
-        "pvp": "WARFARE equipment"
+        "raid": "Kořist z normálních raidů",
+        "raid_heroic": "Kořist z hrdinských raidů",
+        "dungeon": "Kořist z normálních dungeonů",
+        "dungeon_heroic": "Kořist z hrdinských dungeonů",
+        "world": "Kořist ze světových úkolů",
+        "pvp": "Výbava VÁLEČNICTVÍ"
       }
     },
     "ferry": {
-      "regionLabel": "Ferry timetable",
-      "departsIn": "The ferry to {dest} departs in {time}",
-      "castingOff": "The ferry to {dest} is casting off",
-      "boardHint": "Stand on its deck when it sails. The crossing is free.",
-      "sailing": "Sailing to {dest}"
+      "regionLabel": "Jízdní řád přívozu",
+      "departsIn": "Přívoz do {dest} odplouvá za {time}",
+      "castingOff": "Přívoz do {dest} odráží od mola",
+      "boardHint": "Stůj na jeho palubě, když vypluje. Přeplavba je zdarma.",
+      "sailing": "Pluje do {dest}"
     },
     "materialStackSelectionUnavailable": "Tento výběr materiálu už není dostupný.",
     "vehicle": {
-      "title": "North Watch Cannon",
-      "objective": "Defend the north watch",
-      "lastKeepTitle": "The Last Keep Cannon",
-      "lastKeepObjective": "Defend the approach to The Last Keep",
-      "cannonball": "Cannonball",
-      "grapeshot": "Grapeshot",
-      "incendiary": "Incendiary Shot",
-      "integrity": "Cannon integrity",
-      "exit": "Leave cannon",
-      "wave": "Wave {wave}/{total}",
-      "endlessWave": "Endless wave {wave} (round {round})",
-      "resultWaves": "Waves held: {waves}.",
-      "enemies": "Enemies remaining: {count}",
-      "countdown": "Prepare: {seconds}",
-      "hint": "Choose a shot, then click the ground to fire.",
-      "aim": "Click to fire. Right click or Escape cancels aiming.",
-      "sapperWarning": "Sapper incoming! Stop the explosive carrier before it reaches the line.",
-      "chargeWarning": "Commander orders a charge! All surviving enemies move faster.",
-      "armorHint": "Break the silver shields with Cannonball, then use Incendiary Shot.",
-      "exposedHint": "Broken armor: Incendiary Shot deals double damage.",
-      "barrelHint": "Shoot the marked powder barrels when enemies gather around them.",
-      "barrelRules": "Direct hits ignite powder barrels: {damage} damage within {radius} yards, with chain explosions.",
-      "armorRules": "Armored troops take {reduction} less damage until Cannonball breaks their armor. Broken armor takes {bonus} more fire damage.",
-      "shake": "Camera shake",
-      "gold": "Gold medal",
-      "silver": "Silver medal",
-      "bronze": "Bronze medal",
-      "failed": "Defense failed",
-      "result": "{medal}: integrity {integrity}, accuracy {accuracy}.",
-      "medalRules": "Gold: at least {goldIntegrity} integrity and {goldAccuracy} accuracy. Silver: {silverIntegrity} and {silverAccuracy}. Any other victory earns Bronze. Enemy or barrel hits count; each shot counts once. Medals grant no extra money.",
-      "shotDamage": "Deal {damage} damage to each enemy within {radius} yards of the impact.",
-      "shotSlow": "Slow enemies hit by {amount} for {seconds} sec.",
-      "shotBurn": "Leave fire for {seconds} sec, dealing {damage} damage each second to enemies standing in it.",
-      "shotTiming": "Cooldown: {cooldown} sec. Impact after {flight} sec. All shots share {recovery} sec recovery.",
-      "shotRules": "Aim inside the marked field. No mana cost. Damage does not scale with gear or talents."
+      "title": "Dělo severní hlídky",
+      "objective": "Braň severní hlídku",
+      "lastKeepTitle": "Dělo Poslední tvrze",
+      "lastKeepObjective": "Braň přístup k Poslední tvrzi",
+      "cannonball": "Kanonová koule",
+      "grapeshot": "Kartáč",
+      "incendiary": "Zápalný výstřel",
+      "integrity": "Odolnost děla",
+      "exit": "Opustit kanón",
+      "wave": "Vlna {wave}/{total}",
+      "endlessWave": "Nekonečná vlna {wave} (kolo {round})",
+      "resultWaves": "Odražené vlny: {waves}.",
+      "enemies": "Zbývající nepřátelé: {count}",
+      "countdown": "Připrav se: {seconds}",
+      "hint": "Vyber typ střely, pak klikni na zem a vystřel.",
+      "aim": "Klikni pro výstřel. Pravé tlačítko nebo Escape zruší míření.",
+      "sapperWarning": "Sapér se blíží! Zastav nosiče výbušnin, než dosáhne linie.",
+      "chargeWarning": "Velitel nařizuje výpad! Všichni přeživší nepřátelé se pohybují rychleji.",
+      "armorHint": "Prolom stříbrné štíty Kanonovou koulí, pak použij Zápalný výstřel.",
+      "exposedHint": "Prolomené brnění: Zápalný výstřel způsobí dvojnásobné poškození.",
+      "barrelHint": "Střílej na označené sudy s prachem, když se kolem nich shromáždí nepřátelé.",
+      "barrelRules": "Přímé zásahy zapálí sudy s prachem: {damage} poškození v okruhu {radius} yardů, s řetězovými výbuchy.",
+      "armorRules": "Obrněné jednotky utrpí o {reduction} méně poškození, dokud Kanonová koule neprolomí jejich brnění. Prolomené brnění utrpí o {bonus} více ohnivého poškození.",
+      "shake": "Otřesy kamery",
+      "gold": "Zlatá medaile",
+      "silver": "Stříbrná medaile",
+      "bronze": "Bronzová medaile",
+      "failed": "Obrana selhala",
+      "result": "{medal}: odolnost {integrity}, přesnost {accuracy}.",
+      "medalRules": "Zlato: alespoň {goldIntegrity} odolnosti a {goldAccuracy} přesnosti. Stříbro: {silverIntegrity} a {silverAccuracy}. Jakékoli jiné vítězství získá Bronz. Počítají se zásahy nepřátel i sudů; každý výstřel se počítá jen jednou. Medaile neudělují žádné peníze navíc.",
+      "shotDamage": "Udělí {damage} poškození každému nepříteli do {radius} yardů od dopadu.",
+      "shotSlow": "Zpomalí zasažené nepřátele o {amount} na {seconds} s.",
+      "shotBurn": "Zanechá oheň na {seconds} s, který každou sekundu udělí {damage} poškození nepřátelům stojícím v něm.",
+      "shotTiming": "Cooldown: {cooldown} s. Dopad po {flight} s. Všechny výstřely sdílí {recovery} s zotavení.",
+      "shotRules": "Miř do vyznačeného pole. Bez nákladů many. Poškození neroste s výbavou ani talenty."
     },
     "warlock": {
       "doomLabel": "Odsouzení",
@@ -594,18 +594,18 @@ export const cs_CZ: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Vzkřísit u mrtvoly",
       "resurrectAtHealer": "Bledý strážce (Strážcovo mýto)",
-      "ghostHint": "Run to the location of your death or talk to the Pale Keeper to revive",
+      "ghostHint": "Doběhni na místo své smrti, nebo promluv s Bledým strážcem a nech se vzkřísit",
       "spiritHealerAlive": "Bledý strážce dohlíží na mrtvé. Ty jsi stále mezi živými.",
-      "keeperTalkTitle": "The Pale Keeper",
-      "keeperTalkBody": "I can raise you where you stand, but my Toll comes with it: the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to where you fell revives you with no penalty.",
-      "keeperTalkSparedBody": "I can raise you where you stand. My Toll would normally come with it, a weakening of all you are for a time, but you are new to this world, so I will spare you it. Walking your spirit back to where you fell revives you with no penalty either way.",
-      "keeperTalkAccept": "Revive Me",
-      "keeperTalkLeave": "Leave",
+      "keeperTalkTitle": "Bledý strážce",
+      "keeperTalkBody": "Můžu tě vzkřísit tam, kde stojíš, ale přijde s tím mé mýto: Strážcovo mýto sníží všechny tvé vlastnosti o 75 %, na vyšších úrovních až na 10 minut. Dojdeš-li duchem zpátky na místo, kde jsi padl(a), vzkřísíš se bez postihu.",
+      "keeperTalkSparedBody": "Můžu tě vzkřísit tam, kde stojíš. Obvykle by s tím přišlo mé mýto, dočasné oslabení všeho, čím jsi, ale do tohoto světa jsi teprve nedávno vstoupil(a), takže tě ho ušetřím. Dojdeš-li duchem zpátky na místo, kde jsi padl(a), vzkřísíš se bez postihu tak jako tak.",
+      "keeperTalkAccept": "Vzkřísit mě",
+      "keeperTalkLeave": "Odejít",
       "healerConfirmTitle": "Přijmout strážcovo mýto?",
       "healerConfirmBody": "Bledý strážce tě zde oživí, ale Strážcovo mýto sníží všechny tvé vlastnosti o 75 %, na vyšších úrovních až na 10 minut. Když se jako duch vrátíš ke svému tělu, oživíš se bez postihu.",
-      "keeperConfirmBody": "Are you sure? The Pale Keeper will revive you, but you will be weaker for it: the Keeper's Toll reduces all of your attributes by 75% until it fades, up to 10 minutes at higher levels.",
-      "keeperConfirmSparedTitle": "Let the Keeper raise you?",
-      "keeperConfirmSparedBody": "Are you sure? The Pale Keeper will revive you here. You are below level 10, so the Keeper's Toll will not weaken you this time.",
+      "keeperConfirmBody": "Opravdu chceš pokračovat? Bledý strážce tě vzkřísí, ale bude to na tobě znát: Strážcovo mýto sníží všechny tvé vlastnosti o 75 %, dokud nevyprchá, na vyšších úrovních až na 10 minut.",
+      "keeperConfirmSparedTitle": "Nechat se vzkřísit Strážcem?",
+      "keeperConfirmSparedBody": "Opravdu chceš pokračovat? Bledý strážce tě vzkřísí přímo tady. Jsi pod úrovní 10, takže tě tentokrát Strážcovo mýto neoslabí.",
       "healerConfirmAccept": "Oživ mě",
       "healerConfirmCancel": "Zrušit"
     },
@@ -620,7 +620,7 @@ export const cs_CZ: EnTranslations = {
       "help": "Záchrana: /unstuck spustí nehybné odpočítávání, které tě přemístí na nedaleké dostupné bezpečné místo.",
       "helpAtGraveyard": "Záchrana: /unstuck spustí nehybné odpočítávání a poté pošle tvého ducha na nejbližší hřbitov. Návrat přes Bledého strážce vyžaduje Strážcovo mýtné.",
       "helpUnstuckSickness": "Záchrana: /unstuck spustí nehybné odpočítávání a poté tě přenese na nejbližší hřbitov, a pokud jsi padl, oživí tě. Nemoc z vyproštění na tobě zůstane až 5 minut.",
-      "helpUnstuckWindow": "Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.",
+      "helpUnstuckWindow": "Záchrana: /unstuck spustí nehybné odpočítávání, poté tě přesune na nejbližší hřbitov a oživí tě, pokud jsi padl(a). První použití za hodinu je zdarma. Použiješ-li ho znovu do hodiny od posledního použití, zanechá ti to Nemoc ze zaseknutí až na 5 minut.",
       "started": "Vyproštění za {seconds} sekund. Pohyb, boj, utrpění zranění nebo zahájení jiné akce ho zruší.",
       "countdown": "Vyproštění: {seconds}",
       "completed": "Přemístěno na nejbližší dostupné bezpečné místo.",
@@ -628,8 +628,8 @@ export const cs_CZ: EnTranslations = {
       "revivedAtGraveyard": "Byl jsi vrácen na nejbližší hřbitov a oživen. Strážcovo mýtné na tobě leží.",
       "movedToGraveyard": "Byl jsi přenesen na nejbližší hřbitov. Nemoc z vyproštění na tobě leží.",
       "revivedAtGraveyardUnstuck": "Byl jsi přenesen na nejbližší hřbitov a oživen. Nemoc z vyproštění na tobě leží.",
-      "movedToGraveyardFree": "You have been moved to the nearest graveyard. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
-      "revivedAtGraveyardFree": "You have been moved to the nearest graveyard and revived. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
+      "movedToGraveyardFree": "Byl(a) jsi přesunut(a) na nejbližší hřbitov. Použiješ-li Unstuck znovu do hodiny, zanechá ti to Nemoc ze zaseknutí.",
+      "revivedAtGraveyardFree": "Byl(a) jsi přesunut(a) na nejbližší hřbitov a oživen(a). Použiješ-li Unstuck znovu do hodiny, zanechá ti to Nemoc ze zaseknutí.",
       "cancelledMoved": "Vyproštění zrušeno, protože ses pohnul.",
       "cancelledDamaged": "Vyproštění zrušeno, protože jsi utrpěl zranění.",
       "cancelledCombat": "Vyproštění zrušeno, protože jsi vstoupil do boje.",
@@ -736,15 +736,15 @@ export const cs_CZ: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Okno výměny bylo zavřeno.",
-      "offerQuantityHint": "You will be asked how many to offer",
-      "offerQuantityTitle": "Offer {item}",
-      "offerQuantityInput": "Quantity to offer",
-      "offerQuantityConfirm": "Offer",
-      "offerQuantityAll": "Offer all",
-      "offerRemoveTitle": "Remove {item}",
-      "offerRemoveInput": "Quantity to remove",
-      "offerRemove": "Remove",
-      "offerRemoveAll": "Remove all",
+      "offerQuantityHint": "Budeš dotázán(a), kolik chceš nabídnout",
+      "offerQuantityTitle": "Nabídnout {item}",
+      "offerQuantityInput": "Množství k nabídnutí",
+      "offerQuantityConfirm": "Nabídnout",
+      "offerQuantityAll": "Nabídnout vše",
+      "offerRemoveTitle": "Odebrat {item}",
+      "offerRemoveInput": "Množství k odebrání",
+      "offerRemove": "Odebrat",
+      "offerRemoveAll": "Odebrat vše",
       "woc": {
         "tabGold": "Zlato",
         "tabWoc": "$WOC",
@@ -1488,56 +1488,56 @@ export const cs_CZ: EnTranslations = {
       "devTierCol": "Odznak",
       "mergedPrs": "Sloučené PR",
       "devEmpty": "Zatím žádní hodnocení přispěvatelé.",
-      "tabWorldQuests": "World Quests",
-      "wqBoardsLabel": "World quest scoreboards",
-      "wqMedal": "Medal",
-      "wqWaves": "Waves held",
-      "wqTime": "Time",
+      "tabWorldQuests": "Světové úkoly",
+      "wqBoardsLabel": "Žebříčky světových úkolů",
+      "wqMedal": "Medaile",
+      "wqWaves": "Udržené vlny",
+      "wqTime": "Čas",
       "gliderCourseNames": {
-        "downs": "Coastal Circuit",
-        "valleys": "Valley Circuit",
-        "switchbacks": "Ridge Switchbacks"
+        "downs": "Pobřežní okruh",
+        "valleys": "Údolní okruh",
+        "switchbacks": "Hřebenové serpentiny"
       },
-      "gliderDaily": "{course}: Today",
-      "gliderLifetime": "{course}: All time",
-      "gliderStart": "Fly this course",
-      "gliderRankings": "Glider course records",
-      "gliderPersonalRules": "Your offline records, saved with this character. Pass every ring in order. Daily records reset each day.",
-      "gliderRules": "Fastest complete flight wins. Pass every ring. Daily records reset with the realm. Records refresh within 30 seconds.",
-      "wqPoints": "Score",
-      "wqSeconds": "{seconds}s",
-      "wqNoMedal": "None",
+      "gliderDaily": "{course}: Dnes",
+      "gliderLifetime": "{course}: Celkově",
+      "gliderStart": "Absolvovat tuto dráhu",
+      "gliderRankings": "Rekordy dráhy pro kluzák",
+      "gliderPersonalRules": "Tvé offline rekordy, uložené u této postavy. Prolétni všechny kruhy popořadě. Denní rekordy se každý den resetují.",
+      "gliderRules": "Vyhrává nejrychlejší dokončený let. Prolétni všechny kruhy. Denní rekordy se resetují spolu s říší. Rekordy se aktualizují do 30 sekund.",
+      "wqPoints": "Skóre",
+      "wqSeconds": "{seconds} s",
+      "wqNoMedal": "Žádná",
       "wqMedals": {
-        "gold": "Gold",
-        "silver": "Silver",
-        "bronze": "Bronze"
+        "gold": "Zlatá",
+        "silver": "Stříbrná",
+        "bronze": "Bronzová"
       },
-      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot.",
+      "wqEmpty": "Na této nástěnce ještě nejsou žádná skóre. Dokonči světový úkol a získej si místo.",
       "podiumLabel": "První tři",
       "unclaimed": "Nevyzvednuto",
       "prestigeTitle": "Prestiž {rank}"
     },
     "wqLadder": {
-      "title": "World Quest Rankings",
-      "subtitle": "The best attempt of every hero, one ladder per medal world quest.",
-      "close": "Close World Quest Rankings",
+      "title": "Žebříček světových úkolů",
+      "subtitle": "Nejlepší pokus každého hrdiny, jeden žebříček na každý medailový světový úkol.",
+      "close": "Zavřít žebříček světových úkolů",
       "rankedBy": {
-        "waves": "Ranked by waves held",
-        "seconds": "Ranked by fastest time",
-        "points": "Ranked by highest score"
+        "waves": "Řazeno podle odražených vln",
+        "seconds": "Řazeno podle nejrychlejšího času",
+        "points": "Řazeno podle nejvyššího skóre"
       },
       "rankedByMedal": {
-        "waves": "Ranked by medal, then waves held",
-        "seconds": "Ranked by medal, then fastest time",
-        "points": "Ranked by medal, then highest score"
+        "waves": "Řazeno podle medaile, poté podle odražených vln",
+        "seconds": "Řazeno podle medaile, poté podle nejrychlejšího času",
+        "points": "Řazeno podle medaile, poté podle nejvyššího skóre"
       },
-      "podiumLabel": "Top three",
-      "unclaimed": "Unclaimed",
-      "totalOne": "One hero ranked",
-      "totalMany": "{count} heroes ranked",
-      "selfLabel": "Your best",
-      "selfRank": "Rank {rank}",
-      "selfNone": "You have no score on this board yet. Finish the world quest to join the ladder."
+      "podiumLabel": "Nejlepší tři",
+      "unclaimed": "Nevyzvednuto",
+      "totalOne": "Jeden zařazený hrdina",
+      "totalMany": "{count} zařazených hrdinů",
+      "selfLabel": "Tvůj nejlepší výkon",
+      "selfRank": "Pořadí {rank}",
+      "selfNone": "Na tomto žebříčku zatím nemáš žádné skóre. Dokonči světový úkol, ať se do žebříčku zapíšeš."
     },
     "pledge": {
       "open": "Přijímá přihlášky",
@@ -1567,46 +1567,46 @@ export const cs_CZ: EnTranslations = {
       "withdraw": "Zrušit přihlášku"
     },
     "guildRanks": {
-      "tab": "Ranks",
-      "introEdit": "Name your guild ranks and choose what each one may do. Changes apply to everyone holding the rank once you save.",
-      "introView": "Each rank title and what it may do. Only the Guild Master can change them.",
-      "colRank": "Rank",
-      "colTitle": "Title",
-      "colMembers": "Members",
-      "colActions": "Order",
-      "numbered": "Rank {n}",
+      "tab": "Hodnosti",
+      "introEdit": "Pojmenuj hodnosti svého cechu a urči, co každá z nich smí dělat. Změny se po uložení projeví u všech, kdo danou hodnost mají.",
+      "introView": "Titul každé hodnosti a co smí dělat. Měnit je může jen Vůdce cechu.",
+      "colRank": "Hodnost",
+      "colTitle": "Titul",
+      "colMembers": "Členové",
+      "colActions": "Pořadí",
+      "numbered": "Hodnost {n}",
       "perm": {
-        "invite": "Invite",
-        "remove": "Remove",
-        "promote": "Promote",
-        "bank": "Guild Bank",
-        "officerChat": "Officer Chat",
-        "motd": "Billboard",
-        "events": "Calendar"
+        "invite": "Zvát",
+        "remove": "Vylučovat",
+        "promote": "Povyšovat",
+        "bank": "Cechovní banka",
+        "officerChat": "Důstojnický chat",
+        "motd": "Nástěnka",
+        "events": "Kalendář"
       },
       "permHint": {
-        "invite": "Invite players to the guild and answer their pledges.",
-        "remove": "Remove members who hold a lower rank.",
-        "promote": "Promote and demote members who hold a lower rank, up to one rank below their own.",
-        "bank": "Deposit and withdraw copper and items in the guild bank. Every member can view it.",
-        "officerChat": "Read and speak in officer chat.",
-        "motd": "Edit the guild billboard.",
-        "events": "Add and remove guild calendar events."
+        "invite": "Zvát hráče do cechu a odpovídat na jejich žádosti o přijetí.",
+        "remove": "Vylučovat členy s nižší hodností.",
+        "promote": "Povyšovat a snižovat členy s nižší hodností, až po jednu hodnost pod svou vlastní.",
+        "bank": "Vkládat a vybírat měďáky a předměty z cechovní banky. Prohlížet ji může každý člen.",
+        "officerChat": "Číst a psát v důstojnickém chatu.",
+        "motd": "Upravovat cechovní nástěnku.",
+        "events": "Přidávat a odstraňovat události v cechovním kalendáři."
       },
-      "titleLabel": "Title for {rank}",
-      "permLabel": "{perm} for {rank}",
-      "leaderLocked": "The Guild Master always holds every permission.",
-      "add": "Add Rank",
-      "save": "Save Ranks",
-      "moveUp": "Move {rank} up",
-      "moveDown": "Move {rank} down",
-      "remove": "Remove {rank}",
-      "full": "A guild can have at most {max} ranks.",
-      "invalidTitle": "Rank titles use letters, numbers, spaces, apostrophes, and hyphens, up to {max} characters.",
-      "removeConfirm": "Members holding {rank} will become {fallback}. Remove this rank?",
-      "removeAccept": "Remove Rank",
-      "promoteTo": "Promote {name} to {rank}",
-      "demoteTo": "Demote {name} to {rank}"
+      "titleLabel": "Titul pro {rank}",
+      "permLabel": "{perm} pro {rank}",
+      "leaderLocked": "Vůdce cechu má vždy všechna oprávnění.",
+      "add": "Přidat hodnost",
+      "save": "Uložit hodnosti",
+      "moveUp": "Posunout {rank} nahoru",
+      "moveDown": "Posunout {rank} dolů",
+      "remove": "Odstranit {rank}",
+      "full": "Cech může mít nejvýše {max} hodností.",
+      "invalidTitle": "Tituly hodností mohou obsahovat písmena, čísla, mezery, apostrofy a pomlčky, nejvýše {max} znaků.",
+      "removeConfirm": "Členové s hodností {rank} se stanou {fallback}. Odstranit tuto hodnost?",
+      "removeAccept": "Odstranit hodnost",
+      "promoteTo": "Povýšit {name} na {rank}",
+      "demoteTo": "Snížit {name} na {rank}"
     },
     "raidLockout": {
       "title": "Raidové zámky",
@@ -1705,7 +1705,7 @@ export const cs_CZ: EnTranslations = {
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Ostatní ({count})",
-      "targetsHeader": "Targets",
+      "targetsHeader": "Cíle",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
       "melee": "Boj zblízka",
@@ -1714,153 +1714,153 @@ export const cs_CZ: EnTranslations = {
       "dock": "Vrátit tento měřič zpět do okna měřičů",
       "separate": "Oddělit {meter}",
       "regroup": "Znovu seskupit {meter}",
-      "settingsTitle": "Details / Meter Settings",
-      "optionsEngineBadge": "WoC Details! Engine",
-      "resetDefaults": "Reset to Defaults",
-      "closeSettings": "Close",
-      "densityCompact": "Density: Compact (16px)",
-      "densityStandard": "Density: Standard (20px)",
-      "bgGlass": "Background: Glass (76%)",
-      "bgSolid": "Background: Solid (98%)",
-      "bgMinimal": "Background: Minimal (45%)",
-      "numDetailed": "Numbers: Detailed",
-      "numCompact": "Numbers: Abbreviated (k/M)",
-      "raidTotalsOn": "Header group total: Yes",
-      "raidTotalsOff": "Header group total: No",
-      "tabGeneral": "Window & Background",
-      "tabGeneralDesc": "Opacity, scale, lock",
-      "tabBars": "Bars & Textures",
-      "tabBarsDesc": "Height, spacing, animation",
-      "tabText": "Text & Typography",
-      "tabTextDesc": "Fonts, k/M, DPS, rank",
-      "tabHeader": "Header & Title",
-      "tabHeaderDesc": "Group total, title bar",
-      "tabCombat": "Combat & Limits",
-      "tabCombatDesc": "Max rows, shields",
-      "tabPresets": "Quick Themes",
-      "tabPresetsDesc": "One-click presets",
-      "tabProfiles": "Profiles & Import",
-      "tabProfilesDesc": "Export, import, and profiles",
-      "groupWindow": "Window Appearance & Background",
-      "bgMode": "Background Mode",
-      "bgModeDesc": "Visual styling for the meter panel.",
-      "optGlass": "Glass (Blur)",
-      "optGlassDesc": "Frosted blur effect",
-      "optSolid": "Solid",
-      "optSolidDesc": "Dark high-contrast panel",
-      "optMinimal": "Minimal",
-      "optMinimalDesc": "Faint translucent",
-      "optTransparent": "Transparent",
-      "optTransparentDesc": "No background, bars only",
-      "bgOpacity": "Background Opacity",
-      "bgOpacityDesc": "Opacity percentage for the window background.",
-      "windowScale": "Window Scale",
-      "windowScaleDesc": "Increase or decrease the overall meter scale.",
-      "lockPosition": "Lock Position",
-      "lockPositionDesc": "Lock the window to prevent accidental dragging or resizing in combat.",
-      "groupBars": "Bar Geometry & Texture",
-      "barHeight": "Bar Height",
-      "barHeightDesc": "Vertical thickness of each combat row (14px compact to 26px spacious).",
-      "barSpacing": "Bar Spacing",
-      "barSpacingDesc": "Vertical pixel gap between adjacent rows.",
-      "barTexture": "Bar Texture",
-      "barTextureDesc": "Visual finish and shading over the class color.",
-      "texSpecular": "Glossy (Specular)",
-      "texSpecularDesc": "Top highlight reflection with bevel",
-      "texSmooth": "Smooth (Flat)",
-      "texSmoothDesc": "Clean flat class color",
-      "texGradient": "Gradient",
-      "texGradientDesc": "Smooth horizontal color gradient",
-      "barAnimation": "Smooth Bar Animation",
-      "barAnimationDesc": "Fluidly interpolates bar growth and decay in real time.",
-      "alwaysShowMe": "Always Show Me",
-      "alwaysShowMeDesc": "Pins your player bar to the bottom if ranked outside visible rows.",
-      "groupText": "Text Formatting & Telemetry",
-      "numFormat": "Number Format",
-      "numFormatDesc": "Display style for totals.",
-      "optNumCompact": "Abbreviated (k / M)",
-      "optNumCompactDesc": "Example: 145.2k, 1.2M",
-      "optNumDetailed": "Full Detailed",
-      "optNumDetailedDesc": "Example: 145,200, 1,240,500",
-      "optNumDamageDps": "Damage | DPS",
-      "optNumDamageDpsDesc": "Example: 239.2k | 18.4k (clean telemetry bar)",
-      "showDps": "Show Rate per Second (DPS / HPS)",
-      "showDpsDesc": "Shows damage or healing rate per second on each bar.",
-      "showPercent": "Show Percentage (%)",
-      "showPercentDesc": "Shows percent contribution of total group output.",
-      "showRank": "Show Rank (#1, #2...)",
-      "showRankDesc": "Shows ordinal rank number beside the name.",
-      "showClassIcon": "Show Class Icon",
-      "showClassIconDesc": "Displays class or role icon next to each player.",
-      "groupFont": "Combat Typography (Font Family)",
-      "groupHeader": "Header Customization",
-      "showTitleBar": "Show Title Bar",
-      "showTitleBarDesc": "Displays top bar with combat segment name and controls.",
-      "showRaidTotals": "Group Summary in Subtitle",
-      "showRaidTotalsDesc": "Displays cumulative group DPS/HPS in the header subtitle.",
-      "groupCombat": "Combat Rules & Limits",
-      "maxRows": "Maximum Visible Rows",
-      "maxRowsDesc": "Simultaneous bars (0 = unlimited, auto-fit to window height).",
+      "settingsTitle": "Nastavení Details / měřičů",
+      "optionsEngineBadge": "Engine WoC Details!",
+      "resetDefaults": "Obnovit výchozí nastavení",
+      "closeSettings": "Zavřít",
+      "densityCompact": "Hustota: Kompaktní (16 px)",
+      "densityStandard": "Hustota: Standardní (20 px)",
+      "bgGlass": "Pozadí: Sklo (76 %)",
+      "bgSolid": "Pozadí: Plné (98 %)",
+      "bgMinimal": "Pozadí: Minimalistické (45 %)",
+      "numDetailed": "Čísla: Podrobná",
+      "numCompact": "Čísla: Zkrácená (k/M)",
+      "raidTotalsOn": "Součet skupiny v záhlaví: Ano",
+      "raidTotalsOff": "Součet skupiny v záhlaví: Ne",
+      "tabGeneral": "Okno a pozadí",
+      "tabGeneralDesc": "Průhlednost, měřítko, uzamčení",
+      "tabBars": "Lišty a textury",
+      "tabBarsDesc": "Výška, rozestup, animace",
+      "tabText": "Text a typografie",
+      "tabTextDesc": "Písma, k/M, DPS, pořadí",
+      "tabHeader": "Záhlaví a název",
+      "tabHeaderDesc": "Součet skupiny, záhlaví",
+      "tabCombat": "Boj a limity",
+      "tabCombatDesc": "Max. řádků, štíty",
+      "tabPresets": "Rychlé motivy",
+      "tabPresetsDesc": "Předvolby na jedno kliknutí",
+      "tabProfiles": "Profily a import",
+      "tabProfilesDesc": "Export, import a profily",
+      "groupWindow": "Vzhled okna a pozadí",
+      "bgMode": "Režim pozadí",
+      "bgModeDesc": "Vizuální styl panelu měřičů.",
+      "optGlass": "Sklo (rozostření)",
+      "optGlassDesc": "Matný rozostřený efekt",
+      "optSolid": "Plné",
+      "optSolidDesc": "Tmavý kontrastní panel",
+      "optMinimal": "Minimalistické",
+      "optMinimalDesc": "Jemně průsvitné",
+      "optTransparent": "Průhledné",
+      "optTransparentDesc": "Bez pozadí, jen lišty",
+      "bgOpacity": "Průhlednost pozadí",
+      "bgOpacityDesc": "Procento průhlednosti pozadí okna.",
+      "windowScale": "Měřítko okna",
+      "windowScaleDesc": "Zvětší nebo zmenší celkové měřítko měřičů.",
+      "lockPosition": "Uzamknout polohu",
+      "lockPositionDesc": "Uzamkne okno, aby ho nešlo v boji omylem přesunout nebo změnit jeho velikost.",
+      "groupBars": "Tvar a textura lišt",
+      "barHeight": "Výška lišty",
+      "barHeightDesc": "Svislá tloušťka každého bojového řádku (14 px kompaktní až 26 px prostorné).",
+      "barSpacing": "Rozestup lišt",
+      "barSpacingDesc": "Svislá mezera v pixelech mezi sousedními řádky.",
+      "barTexture": "Textura lišty",
+      "barTextureDesc": "Vizuální povrch a stínování přes barvu třídy.",
+      "texSpecular": "Lesklé (odlesk)",
+      "texSpecularDesc": "Horní odlesk se zkosením",
+      "texSmooth": "Hladké (ploché)",
+      "texSmoothDesc": "Čistá plochá barva třídy",
+      "texGradient": "Přechod",
+      "texGradientDesc": "Plynulý vodorovný barevný přechod",
+      "barAnimation": "Plynulá animace lišt",
+      "barAnimationDesc": "Plynule interpoluje růst a pokles lišt v reálném čase.",
+      "alwaysShowMe": "Vždy zobrazit mě",
+      "alwaysShowMeDesc": "Připne tvou lištu dolů, pokud se tvé pořadí dostane mimo viditelné řádky.",
+      "groupText": "Formátování textu a telemetrie",
+      "numFormat": "Formát čísel",
+      "numFormatDesc": "Styl zobrazení součtů.",
+      "optNumCompact": "Zkrácená (k / M)",
+      "optNumCompactDesc": "Příklad: 145,2k, 1,2M",
+      "optNumDetailed": "Plně podrobná",
+      "optNumDetailedDesc": "Příklad: 145 200, 1 240 500",
+      "optNumDamageDps": "Poškození | DPS",
+      "optNumDamageDpsDesc": "Příklad: 239,2k | 18,4k (přehledná telemetrická lišta)",
+      "showDps": "Zobrazit hodnotu za sekundu (DPS / HPS)",
+      "showDpsDesc": "Zobrazí poškození nebo léčení za sekundu na každé liště.",
+      "showPercent": "Zobrazit procenta (%)",
+      "showPercentDesc": "Zobrazí procentuální podíl na celkovém výkonu skupiny.",
+      "showRank": "Zobrazit pořadí (#1, #2...)",
+      "showRankDesc": "Zobrazí pořadové číslo vedle jména.",
+      "showClassIcon": "Zobrazit ikonu třídy",
+      "showClassIconDesc": "Zobrazí ikonu třídy nebo role vedle každého hráče.",
+      "groupFont": "Bojové písmo (rodina písma)",
+      "groupHeader": "Přizpůsobení záhlaví",
+      "showTitleBar": "Zobrazit záhlaví",
+      "showTitleBarDesc": "Zobrazí horní lištu s názvem bojového úseku a ovládacími prvky.",
+      "showRaidTotals": "Souhrn skupiny v podtitulku",
+      "showRaidTotalsDesc": "Zobrazí souhrnné DPS/HPS skupiny v podtitulku záhlaví.",
+      "groupCombat": "Pravidla a limity boje",
+      "maxRows": "Maximální počet viditelných řádků",
+      "maxRowsDesc": "Počet lišt najednou (0 = neomezeno, automaticky podle výšky okna).",
       "autoRows": " (Auto)",
-      "barsUnit": " bars",
-      "includeShields": "Count Absorbs as Healing",
-      "includeShieldsDesc": "Adds absorbed shield damage (Psalm of Warding, etc.) to Healing meter.",
-      "groupPresets": "One-Click Quick Themes",
-      "applyPreset": "Apply Theme",
-      "presetDetailsName": "Modern Glass",
-      "presetDetailsDesc": "Frosted blur background, specular glossy bars, abbreviated numbers, and full telemetry.",
-      "presetDetailsBadge": "Recommended",
-      "presetClassicName": "Classic Solid",
-      "presetClassicDesc": "Dark high-contrast solid panel, flat class bars, uncompressed detailed numbers in classic layout.",
-      "presetClassicBadge": "Classic",
-      "presetMinimalName": "Pure Minimal",
-      "presetMinimalDesc": "Nearly transparent background, compact 16px bars without gaps, direct text without percentages.",
-      "presetMinimalBadge": "Clean",
-      "presetRaidName": "Raid Focus",
-      "presetRaidDesc": "Designed for raids: compact 18px density, 10-bar limit, visible group total, and pinned player bar.",
+      "barsUnit": " lišt",
+      "includeShields": "Počítat absorpce jako léčení",
+      "includeShieldsDesc": "Přidá poškození pohlcené štítem (Žalm ochrany atd.) do měřiče léčení.",
+      "groupPresets": "Rychlé motivy na jedno kliknutí",
+      "applyPreset": "Použít motiv",
+      "presetDetailsName": "Moderní sklo",
+      "presetDetailsDesc": "Matné rozostřené pozadí, lesklé lišty s odleskem, zkrácená čísla a plná telemetrie.",
+      "presetDetailsBadge": "Doporučeno",
+      "presetClassicName": "Klasický plný",
+      "presetClassicDesc": "Tmavý kontrastní plný panel, ploché lišty v barvě třídy, nezkrácená podrobná čísla v klasickém rozložení.",
+      "presetClassicBadge": "Klasický",
+      "presetMinimalName": "Čistě minimalistický",
+      "presetMinimalDesc": "Téměř průhledné pozadí, kompaktní 16px lišty bez mezer, přímý text bez procent.",
+      "presetMinimalBadge": "Čistý",
+      "presetRaidName": "Raidové zaměření",
+      "presetRaidDesc": "Navrženo pro raidy: kompaktní hustota 18 px, limit 10 lišt, viditelný součet skupiny a připnutá lišta hráče.",
       "presetRaidBadge": "Raid",
-      "presetProGradientName": "Pro Gradient",
-      "presetProGradientDesc": "Floating transparent panel, horizontal gradient bars, spec icons, and Damage | DPS telemetry.",
+      "presetProGradientName": "Pro přechod",
+      "presetProGradientDesc": "Plovoucí průhledný panel, vodorovné přechodové lišty, ikony specializace a telemetrie Poškození | DPS.",
       "presetProGradientBadge": "Pro",
-      "groupManageProfiles": "Profile Management",
-      "activeProfile": "Active Profile",
-      "activeProfileDesc": "Select or manage independent profiles for different gameplay scenarios.",
-      "saveAs": "Save As...",
-      "duplicate": "Duplicate",
-      "deleteProfile": "Delete",
-      "cannotDeleteDefault": "The Default profile cannot be deleted",
-      "promptNewProfile": "Name of the new profile:",
-      "profileCopySuffix": " (Copy)",
-      "groupExport": "Export Current Profile",
-      "exportDesc": "Encoded profile string of your current configuration. Copy it to share or backup.",
-      "copyString": "Copy Profile String",
-      "copiedFeedback": "Copied to clipboard!",
-      "groupImport": "Import Profile",
-      "importDesc": "Paste a profile string (!WoC-Details:... or JSON) to apply and save.",
-      "importPlaceholder": "Paste profile string here (!WoC-Details:...)",
-      "importNamePlaceholder": "Profile name (optional)",
-      "importApply": "Import & Apply",
-      "errEmptyProfile": "Please paste a profile string.",
-      "errInvalidProfile": "Error: Invalid or corrupt profile string.",
-      "importSuccess": "Profile \"{name}\" imported successfully!",
-      "reportSent": "Report copied and sent to chat",
-      "reportNoData": "No data recorded.",
-      "noDetailedData": "No detailed data",
-      "noDeathEvents": "No events logged before death",
-      "killedBy": "Killed by {killer} ({ability})",
-      "lethalHit": "Lethal Hit",
-      "recentCombatEvents": "Last {count} combat events",
-      "backComparison": "Comparison",
-      "comparisonNeedTwo": "At least 2 fights are required to compare",
-      "backTimeline": "Timeline",
-      "timelineCombatEvents": "Combat events: {count}",
-      "backDev": "Balance / Dev",
-      "balanceAbilitiesCount": "Logged abilities: {count}",
-      "targetSubtitle": "Target: {target}",
-      "noTargetData": "No player data for this target"
+      "groupManageProfiles": "Správa profilů",
+      "activeProfile": "Aktivní profil",
+      "activeProfileDesc": "Vyber nebo spravuj samostatné profily pro různé herní situace.",
+      "saveAs": "Uložit jako...",
+      "duplicate": "Duplikovat",
+      "deleteProfile": "Smazat",
+      "cannotDeleteDefault": "Výchozí profil nelze smazat",
+      "promptNewProfile": "Název nového profilu:",
+      "profileCopySuffix": " (kopie)",
+      "groupExport": "Exportovat aktuální profil",
+      "exportDesc": "Zakódovaný řetězec profilu tvého aktuálního nastavení. Zkopíruj ho pro sdílení nebo zálohu.",
+      "copyString": "Zkopírovat řetězec profilu",
+      "copiedFeedback": "Zkopírováno do schránky!",
+      "groupImport": "Importovat profil",
+      "importDesc": "Vlož řetězec profilu (!WoC-Details:... nebo JSON) a ulož ho jako aktivní.",
+      "importPlaceholder": "Sem vlož řetězec profilu (!WoC-Details:...)",
+      "importNamePlaceholder": "Název profilu (volitelné)",
+      "importApply": "Importovat a použít",
+      "errEmptyProfile": "Vlož prosím řetězec profilu.",
+      "errInvalidProfile": "Chyba: Neplatný nebo poškozený řetězec profilu.",
+      "importSuccess": "Profil \"{name}\" úspěšně importován!",
+      "reportSent": "Report zkopírován a odeslán do chatu",
+      "reportNoData": "Nebyla zaznamenána žádná data.",
+      "noDetailedData": "Žádná podrobná data",
+      "noDeathEvents": "Před smrtí nebyly zaznamenány žádné události",
+      "killedBy": "Zabit(a): {killer} ({ability})",
+      "lethalHit": "Smrtící zásah",
+      "recentCombatEvents": "Posledních {count} bojových událostí",
+      "backComparison": "Porovnání",
+      "comparisonNeedTwo": "K porovnání jsou potřeba alespoň 2 boje",
+      "backTimeline": "Časová osa",
+      "timelineCombatEvents": "Bojové události: {count}",
+      "backDev": "Balanc / Vývoj",
+      "balanceAbilitiesCount": "Zaznamenané schopnosti: {count}",
+      "targetSubtitle": "Cíl: {target}",
+      "noTargetData": "Pro tento cíl nejsou žádná hráčská data"
     },
     "auraTooltip": {
-      "caster": "Cast by {name}"
+      "caster": "Sesláno: {name}"
     },
     "auraTracks": {
       "defensives": "Obranné cooldowny",
@@ -1887,7 +1887,7 @@ export const cs_CZ: EnTranslations = {
       "buffs": "Buffy",
       "unlock": "Přesunout okno aur cíle",
       "lock": "Zamknout okno aur cíle",
-      "close": "Close target aura window",
+      "close": "Zavřít okno aur cíle",
       "configureRows": "Nastavit aury cíle",
       "fewerRows": "Upřednostnit méně řad aur",
       "moreRows": "Upřednostnit více řad aur",
@@ -1981,7 +1981,7 @@ export const cs_CZ: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Pozemní otřásač Hrůzného jiskření",
       "name_drakemaw_raptor": "Raptor z Dračí tlamy",
-      "name_avian_strider": "Viridian Valestrider",
+      "name_avian_strider": "Smaragdový údolní běžec",
       "name_mech_bird": "Mechanický pták Cluckwork",
       "name_lanternback_troll": "Grumbol Lanternback",
       "name_chimeglass_tortoise": "Tolliver Chimeglass",
@@ -1998,7 +1998,7 @@ export const cs_CZ: EnTranslations = {
       "desc_rallycart_skin": "Drobné závodní auto s mohutným řevem.",
       "desc_terrorspark_groundshaker": "Kompaktní obrněný stroj s těžkými pásy, velkorážním kanónem a sedlem pro nebojácné piloty.",
       "desc_drakemaw_raptor": "Osedlaný raptor z líhně v Kaldeře Dračí tlamy, samé šlachy a hbitost, ještě slabě páchnoucí popelem.",
-      "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
+      "desc_avian_strider": "Mohutný sedlový pták, jehož těžké spáry a složená křídla promění každou cestu v hřmící trysk.",
       "desc_mech_bird": "Ručně vyrobené strojové válečné kuře, které sprintuje na cvakací serva, natahovací klíč se stále otáčí.",
       "desc_lanternback_troll": "Horský troll, který lampáři zlomili do jha, nesl přes ramena železný trůn a na obou pažích hořela bouřková lucerna.",
       "desc_chimeglass_tortoise": "Solná želva, která překonala tři generace karavanů. Tinkers mu vybrousil brýle z bouřkového skla a pověsil mu na hrdlo bronzový zvon, takže ho cesta slyší dlouho předtím, než ho uvidí.",
@@ -2115,7 +2115,7 @@ export const cs_CZ: EnTranslations = {
       "clickMoveLeft": "Levé kliknutí",
       "clickMoveRight": "Pravé kliknutí",
       "version": "v{version} ({build})",
-      "overlays": "Overlays",
+      "overlays": "Překryvy",
       "browserEffects": "Efekty prohlížeče",
       "browserEffectsAuto": "Automaticky",
       "browserEffectsFull": "Plné",
@@ -2145,9 +2145,9 @@ export const cs_CZ: EnTranslations = {
       "gfxBloom": "Bloom",
       "gfxAntiAliasing": "Anti-Aliasing",
       "gfxDynamicLights": "Dynamické osvětlení",
-      "gfxGhostFade": "Camera Ghost",
-      "gfxGhostFadeDithered": "Dithered",
-      "gfxGhostFadeSmooth": "Smooth",
+      "gfxGhostFade": "Přízrak kamery",
+      "gfxGhostFadeDithered": "Rozptýlené",
+      "gfxGhostFadeSmooth": "Plynulé",
       "gfxParticleEffects": "Efekty částic",
       "gfxHalf": "Poloviční",
       "gfxCustomNote": "Změna kteréhokoli ovladače přepne přednastavení kvality na Pokročilé: vlastní mix postavený na základu kvality Vysoká, vycházející z úrovní zobrazených pro tvé aktuální přednastavení.",
@@ -2172,15 +2172,15 @@ export const cs_CZ: EnTranslations = {
       "shaderWarmOff": "Vypnuto",
       "shaderWarmOn": "Zapnuto",
       "shaderWarmNote": "Předem zahřívá mezipaměť shaderů na pozadí, aby se zabránilo zasekávání ve hře. Automaticky: zapnuto jen při podpoře grafickým systémem. (Doporučeno). Zapnuto: vynuceno všude. Na některých sestavách může zhoršit výkon. Vypnuto: zakázáno.",
-      "frameRateCap": "Frame Rate Limit",
+      "frameRateCap": "Omezení snímkové frekvence",
       "frameRateCapAuto": "Auto",
-      "frameRateCapDisplay": "Display",
+      "frameRateCapDisplay": "Displej",
       "frameRateCapSixty": "60",
       "frameRateCapThirty": "30",
-      "frameRateCapNote": "Limits how many images the game draws each second. On a computer that cannot keep up with its display, a lower limit gives a steadier picture and keeps the computer cooler. The limit follows your display, so the real rate can differ a little from the number. Auto lowers the limit only when this computer cannot keep up with its display, then keeps it steady. (Recommended). Display: no limit.",
-      "frameRateCapStatusPaced": "Drawing {fps} images per second on a {hz} Hz display.",
-      "frameRateCapStatusUnpaced": "Limiting to {fps} images per second.",
-      "frameRateCapStatusInert": "This display already runs at or under this limit, so the limit changes nothing.",
+      "frameRateCapNote": "Omezuje, kolik obrázků hra vykreslí za sekundu. Na počítači, který nestíhá tempo svého displeje, dá nižší limit stabilnější obraz a udrží počítač chladnější. Limit se řídí tvým displejem, takže se skutečná frekvence může od čísla mírně lišit. Auto sníží limit jen tehdy, když tento počítač nestíhá tempo svého displeje, a pak ho drží stabilní. (Doporučeno). Displej: bez omezení.",
+      "frameRateCapStatusPaced": "Vykresluje {fps} obrázků za sekundu na displeji {hz} Hz.",
+      "frameRateCapStatusUnpaced": "Omezeno na {fps} obrázků za sekundu.",
+      "frameRateCapStatusInert": "Tento displej už běží na této hodnotě nebo pod ní, takže limit nic nemění.",
       "gpuBackend": "Grafické rozhraní",
       "gpuBackendAuto": "Automaticky",
       "gpuBackendVulkan": "Vulkan",
@@ -2208,9 +2208,9 @@ export const cs_CZ: EnTranslations = {
       "targetHealthText": "Text cíleného zdraví",
       "aurasOnPlayerFrame": "Buffy na rámu hráče",
       "auraBarBelowFrame": "Buffy pod rámem hráče",
-      "targetAurasBelowFrame": "Target Auras Below the Frame",
+      "targetAurasBelowFrame": "Aury cíle pod rámečkem",
       "alwaysShowAllBuffs": "Vždy zobrazit všechny buffy",
-      "showAuraCaster": "Show Aura Caster in Tooltips",
+      "showAuraCaster": "Zobrazit sesilatele aury v tooltipech",
       "highContrastBackground": "Vysoce kontrastní pozadí",
       "startAttackOnAbility": "Automatický útok při použití schopnosti",
       "stopAutoAttackOnTargetSwitch": "Zastavit automatický útok při přepnutí cíle",
@@ -2245,11 +2245,11 @@ export const cs_CZ: EnTranslations = {
       "showFriendlyTrack": "Zobrazovat moje bonusy na spojencích",
       "showShieldTrack": "Zobrazovat moje štíty",
       "waterRipples": "Vlnky na vodě (brázdy)",
-      "actionCam": "Action Cam",
-      "actionCamShoulder": "Action Cam Shoulder",
-      "actionCamShoulderLeft": "Left {pct}",
-      "actionCamShoulderRight": "Right {pct}",
-      "actionCamShoulderCenter": "Center",
+      "actionCam": "Akční kamera",
+      "actionCamShoulder": "Rameno akční kamery",
+      "actionCamShoulderLeft": "Vlevo {pct}",
+      "actionCamShoulderRight": "Vpravo {pct}",
+      "actionCamShoulderCenter": "Uprostřed",
       "showAttackButton": "Zobrazit tlačítko útoku",
       "showDailyRewardsChest": "Zobrazit truhlu denních odměn",
       "mobileCameraJoystick": "Joystick kamery",
@@ -2324,7 +2324,7 @@ export const cs_CZ: EnTranslations = {
       "crossHotbarEditHelp": "Podržte levý nárazník a stiskněte tlačítko na horní straně pro uspořádání lišty s ovladačem."
     },
     "perf": {
-      "title": "Performance",
+      "title": "Výkon",
       "overlaySection": "Performance overlay",
       "enable": "Zobrazit performance overlay",
       "description": "Vyber, které statistiky zobrazit, kde bude overlay umístěný a jak bude vypadat.",
@@ -2568,78 +2568,78 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "cooldownManager": {
-      "title": "Cooldown Manager",
-      "intro": "Floating buttons for the spells you pick. They cannot be clicked: each one shows its cooldown, dims while you cannot cast it, and lights up when it is ready.",
-      "generalTitle": "General",
-      "enabled": "Show Cooldown Manager",
-      "idleOpacity": "Opacity While Not Ready",
-      "combatOnly": "Sounds Only in Combat",
-      "dragHint": "While this menu is open, every group shows on screen and you can drag it to move it.",
-      "addSingle": "Add Single Button",
-      "addGrid": "Add Button Group",
-      "addLine": "Add Line of Spells",
-      "groupsFull": "You have the most groups allowed. Delete one to add another.",
-      "noGroups": "Add a single button, a group of buttons or a line of spells to get started.",
-      "groupSingle": "Single Button {index}",
-      "groupGrid": "Button Group {index}",
-      "groupLine": "Line of Spells {index}",
-      "groupName": "Group Name",
-      "spellCount": "{count} / {max} spells",
-      "orientation": "Orientation",
-      "horizontal": "Horizontal",
-      "vertical": "Vertical",
-      "columns": "# Columns",
-      "rows": "# Rows",
-      "direction": "Icon Direction",
-      "dirRight": "Right",
-      "dirLeft": "Left",
-      "dirDown": "Down",
-      "dirUp": "Up",
-      "iconSize": "Icon Size",
-      "iconPadding": "Icon Padding",
-      "opacity": "Opacity",
-      "visibility": "Visibility",
-      "visAlways": "Always Visible",
-      "visCombat": "In Combat",
-      "visHidden": "Hidden",
-      "visHiddenHint": "A hidden group still plays its sounds and lights your action bar.",
-      "showTimer": "Show Timer",
-      "positionX": "Horizontal Position",
-      "positionY": "Vertical Position",
-      "resetPosition": "Reset to Default Position",
-      "deleteGroup": "Delete Group",
-      "deleteGroupAria": "Delete {group}",
-      "trackedTitle": "Tracked Spells",
-      "trackedHint": "Drag a spell onto a group, or select it to choose its group and alerts. A button follows its spell when it changes into another one, and lights up when it does.",
-      "search": "Search spells",
-      "searchPlaceholder": "Search",
-      "notDisplayed": "Not Displayed",
-      "otherSpells": "Other Spells",
-      "otherSpellsHint": "Spells from your other specializations, talent choices and higher levels. Place one now and its button appears once you know it.",
-      "notKnown": "{spell} (not known yet)",
-      "aurasTitle": "Procs, Engines and Buffs",
-      "aurasHint": "Engine resources and their stacks, procs, and the buffs your spells put on you. Anything else that has been on you shows up here too.",
+      "title": "Správce cooldownů",
+      "intro": "Plovoucí tlačítka pro kouzla, která si vybereš. Nedají se kliknout: každé ukazuje svůj cooldown, ztlumí se, dokud kouzlo nemůžeš seslat, a rozsvítí se, jakmile je připravené.",
+      "generalTitle": "Obecné",
+      "enabled": "Zobrazit Správce cooldownů",
+      "idleOpacity": "Průhlednost, když není připraveno",
+      "combatOnly": "Zvuky jen v boji",
+      "dragHint": "Dokud je toto menu otevřené, každá skupina se zobrazuje na obrazovce a můžeš ji přetažením přesunout.",
+      "addSingle": "Přidat jednotlivé tlačítko",
+      "addGrid": "Přidat skupinu tlačítek",
+      "addLine": "Přidat řadu kouzel",
+      "groupsFull": "Máš maximální povolený počet skupin. Jednu smaž, abys mohl(a) přidat další.",
+      "noGroups": "Pro začátek přidej jednotlivé tlačítko, skupinu tlačítek nebo řadu kouzel.",
+      "groupSingle": "Jednotlivé tlačítko {index}",
+      "groupGrid": "Skupina tlačítek {index}",
+      "groupLine": "Řada kouzel {index}",
+      "groupName": "Název skupiny",
+      "spellCount": "{count} / {max} kouzel",
+      "orientation": "Orientace",
+      "horizontal": "Vodorovně",
+      "vertical": "Svisle",
+      "columns": "Počet sloupců",
+      "rows": "Počet řádků",
+      "direction": "Směr ikon",
+      "dirRight": "Doprava",
+      "dirLeft": "Doleva",
+      "dirDown": "Dolů",
+      "dirUp": "Nahoru",
+      "iconSize": "Velikost ikon",
+      "iconPadding": "Odsazení ikon",
+      "opacity": "Průhlednost",
+      "visibility": "Viditelnost",
+      "visAlways": "Vždy viditelné",
+      "visCombat": "V boji",
+      "visHidden": "Skryté",
+      "visHiddenHint": "Skrytá skupina pořád přehrává své zvuky a rozsvěcí tvou akční lištu.",
+      "showTimer": "Zobrazit časovač",
+      "positionX": "Vodorovná poloha",
+      "positionY": "Svislá poloha",
+      "resetPosition": "Obnovit výchozí polohu",
+      "deleteGroup": "Smazat skupinu",
+      "deleteGroupAria": "Smazat {group}",
+      "trackedTitle": "Sledovaná kouzla",
+      "trackedHint": "Přetáhni kouzlo na skupinu, nebo ho vyber a nastav jeho skupinu a upozornění. Tlačítko sleduje své kouzlo, když se změní na jiné, a při té změně se rozsvítí.",
+      "search": "Hledat kouzla",
+      "searchPlaceholder": "Hledat",
+      "notDisplayed": "Nezobrazeno",
+      "otherSpells": "Ostatní kouzla",
+      "otherSpellsHint": "Kouzla z tvých ostatních specializací, volby talentů a vyšších úrovní. Umísti jedno už teď a jeho tlačítko se objeví, jakmile ho poznáš.",
+      "notKnown": "{spell} (zatím neznámé)",
+      "aurasTitle": "Procy, enginy a buffy",
+      "aurasHint": "Zdroje enginu a jejich nabití, procy a buffy, které na tebe uvalí tvá kouzla. Objeví se tu i cokoli dalšího, co jsi na sobě měl(a).",
       "auraFallback": "Aura",
-      "onlyWhileActive": "Only Show While Active",
-      "alertStacks": "Alert at Stacks",
-      "alertStacksAny": "On gain",
-      "alertStacksHint": "The button lights, pulses and chimes once the aura reaches this many stacks. On gain means as soon as it appears.",
-      "auraSoundHint": "Plays when the aura comes up, or when it reaches your stack goal.",
-      "emptySection": "Drop a spell here.",
-      "spellsEmpty": "You do not know any spells yet.",
-      "selectSpell": "Select {spell}",
-      "group": "Group",
-      "groupFullOption": "{group} (full)",
-      "notInGroupHint": "Put this spell in a group to show its button.",
-      "moveEarlier": "Move {spell} earlier",
-      "moveLater": "Move {spell} later",
-      "glowWhenReady": "Light Up When Ready",
-      "glowWhenReadyHint": "Brightens and outlines the button while the spell can be cast.",
-      "hotbarGlow": "Hotbar Glow",
-      "hotbarGlowHint": "Also lights this spell on your action bar while it is ready.",
-      "onlyWhenReady": "Only Show When Ready",
-      "sound": "Ready Sound",
-      "soundHint": "Plays when the spell becomes ready, or when its button changes into another spell while ready."
+      "onlyWhileActive": "Zobrazit jen, když je aktivní",
+      "alertStacks": "Upozornit při nabití",
+      "alertStacksAny": "Při získání",
+      "alertStacksHint": "Tlačítko se rozsvítí, zapulzuje a zazvoní, jakmile aura dosáhne tohoto počtu nabití. Při získání znamená hned, jak se objeví.",
+      "auraSoundHint": "Přehraje se, když se aura objeví, nebo když dosáhne tvého cílového počtu nabití.",
+      "emptySection": "Sem přetáhni kouzlo.",
+      "spellsEmpty": "Zatím neznáš žádná kouzla.",
+      "selectSpell": "Vybrat {spell}",
+      "group": "Skupina",
+      "groupFullOption": "{group} (plná)",
+      "notInGroupHint": "Vlož toto kouzlo do skupiny, aby se zobrazilo jeho tlačítko.",
+      "moveEarlier": "Přesunout {spell} dříve",
+      "moveLater": "Přesunout {spell} později",
+      "glowWhenReady": "Rozsvítit, když je připraveno",
+      "glowWhenReadyHint": "Rozjasní a zvýrazní obrys tlačítka, dokud lze kouzlo seslat.",
+      "hotbarGlow": "Záře na akční liště",
+      "hotbarGlowHint": "Také rozsvítí toto kouzlo na tvé akční liště, dokud je připravené.",
+      "onlyWhenReady": "Zobrazit jen, když je připraveno",
+      "sound": "Zvuk připravenosti",
+      "soundHint": "Přehraje se, když je kouzlo připravené, nebo když se jeho tlačítko změní na jiné kouzlo, zatímco je připravené."
     },
     "auraOverlay": {
       "title": "Aury",
@@ -2765,79 +2765,79 @@ export const cs_CZ: EnTranslations = {
         "battlegroundComplete": "odehraná bitva o Thornhollowská pole",
         "battlegroundKill": "čestné zabití",
         "battlegroundAssist": "asistence u zabití",
-        "worldKill": "world kill",
-        "worldAssist": "world kill assisted",
-        "hillHold": "holding the hill"
+        "worldKill": "světové zabití",
+        "worldAssist": "asistence u světového zabití",
+        "hillHold": "držení kopce"
       },
       "floatReasons": {
         "kill": "Zabití",
         "assist": "Asistence",
         "firstWin": "První výhra",
-        "hill": "Hill"
+        "hill": "Kopec"
       }
     },
     "worldPvp": {
-      "tab": "World PvP",
-      "title": "World PvP",
-      "blurb": "Raise your flag to fight other flagged players anywhere in the open world. Defeat one and take a share of their purse, plus Honor toward Warfare gear. Battlegrounds and Arenas still pay more.",
-      "statusOn": "Your PvP flag is up. Flagged players can attack you.",
-      "statusOff": "Your PvP flag is down. You cannot attack or be attacked in the open world.",
-      "statusOffFfa": "Your PvP flag is down, but on free-for-all ground you can still attack and be attacked.",
-      "statusDisarming": "Your flag drops in {time}, or when your current fight ends.",
-      "zoneSanctuary": "Sanctuary: no world PvP here.",
-      "zoneContested": "Contested ground: only flagged players fight here.",
-      "zoneFfa": "Free-for-all ground: everyone here is fair game.",
-      "realmDisabled": "World PvP is disabled on this realm.",
-      "groundSanctuary": "The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP at all.",
-      "groundContested": "Everywhere else is contested: only two flagged players can fight.",
-      "groundFfa": "The Drakelands, the Frostveil Reach and the Amberfall are free-for-all: everyone there can fight, flag or not.",
-      "groupLine": "Party and raid members are never hostile to each other. Guildmates outside your group can fight.",
-      "markLine": "Attacking an unflagged player there raises your own flag; attacking a flagged one never does.",
-      "aidLine": "Healing, shielding or buffing a flagged player in a world fight raises your flag.",
-      "stakeLine": "The loser pays {cap} or {percent} of their purse, whichever is less.",
-      "noStakeLine": "An unflagged player killed on free-for-all ground loses no gold.",
-      "noTakeLine": "An unflagged fighter takes no gold either: it only moves between two flagged players.",
-      "honorLine": "{honor} Honor per kill, split between everyone who helped.",
-      "splitLine": "A clean 1v1 pays the whole pot; helpers and their healers share it.",
-      "repeatLine": "Repeat kills of one player pay {second}, then {third}, then nothing; the count clears {reset} after the first kill.",
-      "greyLine": "Players more than {levels} levels below you pay nothing.",
-      "disarmLine": "Switching off takes {minutes} minutes and waits for combat to end.",
-      "record": "Record: {kills} kills, {deaths} deaths",
-      "enable": "Enable World PvP",
-      "disable": "Disable World PvP",
-      "keepUp": "Keep Flag Up",
-      "confirmBody": "Other flagged players will be able to attack you anywhere and take up to {cap} from your purse when they win. You can switch off again, but it takes {minutes} minutes.",
-      "confirmAccept": "Raise Flag",
-      "confirmCancel": "Cancel",
-      "levelReq": "Requires level {level}.",
-      "pending": "Waiting for your PvP status from the realm.",
-      "commandHint": "Chat: /pvp toggles the flag, /pvp on and /pvp off set it."
+      "tab": "Světové PvP",
+      "title": "Světové PvP",
+      "blurb": "Zvedni vlajku a bojuj s ostatními hráči se zvednutou vlajkou kdekoli v otevřeném světě. Poraz jednoho a vezmi si podíl z jeho měšce, plus Čest na výbavu Válečnictví. Bojiště a arény pořád vyplácejí víc.",
+      "statusOn": "Tvá PvP vlajka je nahoře. Hráči se zvednutou vlajkou tě mohou napadnout.",
+      "statusOff": "Tvá PvP vlajka je dole. Nemůžeš útočit ani být napaden(a) v otevřeném světě.",
+      "statusOffFfa": "Tvá PvP vlajka je dole, ale na volném území pořád můžeš útočit i být napaden(a).",
+      "statusDisarming": "Tvá vlajka spadne za {time}, nebo až skončí tvůj současný boj.",
+      "zoneSanctuary": "Útočiště: žádné světové PvP tady neprobíhá.",
+      "zoneContested": "Sporné území: bojují tu jen hráči se zvednutou vlajkou.",
+      "zoneFfa": "Volné území: tady je každý platným cílem.",
+      "realmDisabled": "Světové PvP je na této říši vypnuté.",
+      "groundSanctuary": "Zkušební pobřeží a Eastbrookské údolí jsou útočiště: žádné světové PvP tam vůbec neprobíhá.",
+      "groundContested": "Všude jinde je území sporné: bojovat mohou jen dva hráči se zvednutou vlajkou.",
+      "groundFfa": "Dračí země, Kraj Mrazivého závoje a Jantarový pád jsou volné území: tam může bojovat kdokoli, s vlajkou i bez ní.",
+      "groupLine": "Členové skupiny a raidu vůči sobě nikdy nejsou nepřátelští. Cechovní spolubojovníci mimo tvou skupinu mohou bojovat.",
+      "markLine": "Napadení hráče bez vlajky tam zvedne tvou vlastní vlajku; napadení hráče se zvednutou vlajkou ji nezvedne nikdy.",
+      "aidLine": "Léčení, štítování nebo posilování hráče se zvednutou vlajkou ve světovém boji zvedne i tvou vlajku.",
+      "stakeLine": "Poražený zaplatí {cap} nebo {percent} svého měšce, podle toho, co je méně.",
+      "noStakeLine": "Hráč bez vlajky zabitý na volném území neztrácí žádné zlato.",
+      "noTakeLine": "Bojovník bez vlajky také nezískává žádné zlato: to se přesouvá jen mezi dvěma hráči se zvednutou vlajkou.",
+      "honorLine": "{honor} cti za zabití, rozděleno mezi všechny, kdo pomohli.",
+      "splitLine": "Čisté 1 na 1 vyplatí celý vklad; pomocníci a jejich léčitelé se o něj dělí.",
+      "repeatLine": "Opakovaná zabití jednoho hráče vyplatí {second}, pak {third}, pak nic; počítadlo se vynuluje {reset} po prvním zabití.",
+      "greyLine": "Hráči o víc než {levels} úrovní níž než ty neplatí nic.",
+      "disarmLine": "Vypnutí trvá {minutes} minut a čeká na konec boje.",
+      "record": "Bilance: {kills} zabití, {deaths} úmrtí",
+      "enable": "Zapnout světové PvP",
+      "disable": "Vypnout světové PvP",
+      "keepUp": "Nechat vlajku nahoře",
+      "confirmBody": "Ostatní hráči se zvednutou vlajkou tě budou moct napadnout kdekoli a při výhře ti vzít až {cap} z měšce. Můžeš to zase vypnout, ale trvá to {minutes} minut.",
+      "confirmAccept": "Zvednout vlajku",
+      "confirmCancel": "Zrušit",
+      "levelReq": "Vyžaduje úroveň {level}.",
+      "pending": "Čeká se na tvůj PvP stav od říše.",
+      "commandHint": "Chat: /pvp přepíná vlajku, /pvp on a /pvp off ji nastaví."
     },
     "hill": {
-      "title": "King of the Hill",
-      "rising": "The hill has not risen yet",
-      "heldYou": "Your group holds the hill",
-      "heldOther": "Another group holds the hill",
-      "heldNone": "Nobody holds the hill",
-      "counts": "Inside: you {yours}, holder {theirs}",
-      "countsUnheld": "Inside: you {yours}, largest rival {theirs}",
-      "countsHolding": "Inside: you {yours}, rival {theirs}",
-      "contestYou": "Taking the hill: {seconds} of {total}",
-      "contestOther": "Losing the hill: {seconds} of {total}",
-      "contestNone": "Hold a majority inside for {total} to take it",
-      "inside": "You are inside the circle",
-      "distance": "{yards} yd to the circle",
-      "rises": "Rises in {minutes}",
-      "falls": "Falls in {minutes}",
-      "standingRaid": "Raid members do not count: only parties can hold the hill"
+      "title": "Král kopce",
+      "rising": "Kopec ještě nevystoupil",
+      "heldYou": "Kopec ovládá tvá skupina",
+      "heldOther": "Kopec ovládá jiná skupina",
+      "heldNone": "Kopec nikdo neovládá",
+      "counts": "Uvnitř: ty {yours}, držitel {theirs}",
+      "countsUnheld": "Uvnitř: ty {yours}, největší soupeř {theirs}",
+      "countsHolding": "Uvnitř: ty {yours}, soupeř {theirs}",
+      "contestYou": "Ovládáš kopec: {seconds} z {total}",
+      "contestOther": "Ztrácíš kopec: {seconds} z {total}",
+      "contestNone": "Udrž si uvnitř většinu po {total}, abys ji ovládl(a)",
+      "inside": "Jsi uvnitř kruhu",
+      "distance": "{yards} yardů ke kruhu",
+      "rises": "Vystoupí za {minutes}",
+      "falls": "Padne za {minutes}",
+      "standingRaid": "Členové raidu se nepočítají: kopec mohou ovládat jen skupiny"
     },
     "warfareShop": {
       "gossipOption": "Prohlédnout válečnické sady",
       "gossipOptionAria": "Prohlédnout obchod s válečnickými sadami, který nabízí {name}",
       "jewelry": "Šperky",
       "weapons": "Zbraně",
-      "groupSeason2": "Warfare Season 2: Vanguard",
-      "groupEntry": "Warfare Season 1",
+      "groupSeason2": "Válečnictví, sezóna 2: Předvoj",
+      "groupEntry": "Válečnictví, sezóna 1",
       "owned": "Vlastněno",
       "buyAria": "Koupit {item} za {honor}",
       "buyOwnedAria": "Koupit {item} za {honor}, již vlastníš",
@@ -2845,9 +2845,9 @@ export const cs_CZ: EnTranslations = {
     },
     "charSheet": {
       "offense": "Útok",
-      "spell": "Spell",
+      "spell": "Kouzlo",
       "defense": "Obrana",
-      "ratings": "Ratings",
+      "ratings": "Hodnocení",
       "playtimeLabel": "Odehraný čas",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Méně než minuta",
@@ -2862,94 +2862,94 @@ export const cs_CZ: EnTranslations = {
       "stats": "Statistiky",
       "progression": "Postup",
       "skills": "Dovednosti",
-      "reputation": "Reputation",
-      "currencies": "Currencies",
-      "character": "Character",
-      "professions": "Professions",
+      "reputation": "Reputace",
+      "currencies": "Měny",
+      "character": "Postava",
+      "professions": "Profese",
       "gathering": "Shromáždění",
       "crafting": "Řemeslnictví",
       "openProfessions": "Otevřené profese"
     },
     "currencies": {
-      "intro": "None of these take bag space. Coin stays in your bag as always.",
-      "activities": "Activities",
-      "factions": "Factions",
-      "honor": "Honor",
-      "delveMark": "Delve Mark",
+      "intro": "Žádná z nich nezabírá místo v brašně. Mince zůstávají v brašně jako obvykle.",
+      "activities": "Aktivity",
+      "factions": "Frakce",
+      "honor": "Čest",
+      "delveMark": "Výpravní žeton",
       "wocToken": "WoC Token",
-      "heroicMarkNote": "Heroic dungeons . spend at the heroic quartermaster",
-      "honorNote": "Battlegrounds and the arena",
-      "delveMarkNote": "Delves completed",
-      "wocTokenNote": "Linked wallet balance",
-      "walletNotLinked": "No wallet linked",
-      "wocPreview": "Preview balance, not yet verified",
-      "lifetime": "Lifetime {amount}",
-      "factionPending": "Faction currency: pending Stage 2"
+      "heroicMarkNote": "Hrdinské dungeony . utrácej u hrdinského intendanta",
+      "honorNote": "Bitevní pole a aréna",
+      "delveMarkNote": "Dokončené výpravy",
+      "wocTokenNote": "Zůstatek propojené peněženky",
+      "walletNotLinked": "Žádná propojená peněženka",
+      "wocPreview": "Náhled zůstatku, zatím neověřeno",
+      "lifetime": "Získáno celkem: {amount}",
+      "factionPending": "Frakční měna: čeká na 2. fázi"
     },
     "reputation": {
-      "intro": "All three factions progress at once: every world quest counts toward the faction of its zone.",
+      "intro": "Všechny tři frakce postupují najednou: každý světový úkol se počítá do frakce své zóny.",
       "faction": {
-        "rift_watch": "Rift Watch",
-        "church_order": "Church Order",
-        "automatons": "Automatons"
+        "rift_watch": "Hlídka trhlin",
+        "church_order": "Církevní řád",
+        "automatons": "Automati"
       },
       "hub": {
-        "rift_watch": "Drifthaven",
-        "church_order": "Brother Aldric",
+        "rift_watch": "Naplavený přístav",
+        "church_order": "Bratr Aldric",
         "automatons": "Wyrmwatch"
       },
       "hubLine": "{hub} . {zone}",
       "tier": {
-        "unknown": "Unknown",
-        "recognized": "Recognized",
-        "trusted": "Trusted",
-        "proven": "Proven",
-        "vanguard": "Vanguard",
-        "champion": "Champion"
+        "unknown": "Neznámý",
+        "recognized": "Uznávaný",
+        "trusted": "Důvěryhodný",
+        "proven": "Osvědčený",
+        "vanguard": "Předvoj",
+        "champion": "Šampion"
       },
       "factionTitle": {
         "rift_watch": {
-          "unknown": "Outsider",
-          "recognized": "Watcher",
-          "trusted": "Riftwalker",
-          "proven": "Warden",
-          "vanguard": "Riftwarden",
-          "champion": "Champion"
+          "unknown": "Cizinec",
+          "recognized": "Pozorovatel",
+          "trusted": "Chodec trhlin",
+          "proven": "Dozorce",
+          "vanguard": "Strážce trhlin",
+          "champion": "Šampion"
         },
         "church_order": {
-          "unknown": "Outsider",
-          "recognized": "Acolyte",
-          "trusted": "Keeper",
-          "proven": "Templar",
-          "vanguard": "Dawnkeeper",
-          "champion": "Champion"
+          "unknown": "Cizinec",
+          "recognized": "Akolyta",
+          "trusted": "Strážce",
+          "proven": "Templář",
+          "vanguard": "Strážce úsvitu",
+          "champion": "Šampion"
         },
         "automatons": {
-          "unknown": "Outsider",
-          "recognized": "Operator",
-          "trusted": "Mechanist",
-          "proven": "Artificer",
-          "vanguard": "Forgemaster",
-          "champion": "Champion"
+          "unknown": "Cizinec",
+          "recognized": "Operátor",
+          "trusted": "Mechanik",
+          "proven": "Konstruktér",
+          "vanguard": "Mistr kovář",
+          "champion": "Šampion"
         }
       },
       "progress": "{current} / {next}",
-      "next": "Next: {tier}",
-      "maxed": "Highest standing reached",
-      "cappedByLevel": "Standing pauses at {tier} until level 16",
-      "today": "Today",
-      "questsDone": "World quests completed",
+      "next": "Další: {tier}",
+      "maxed": "Dosaženo nejvyššího postavení",
+      "cappedByLevel": "Postavení se zastaví na {tier} až do úrovně 16",
+      "today": "Dnes",
+      "questsDone": "Dokončené světové úkoly",
       "questsDoneValue": "{done} / {total}",
-      "resetsIn": "Board",
-      "resetsUnknown": "No board today",
-      "title": "Faction title",
+      "resetsIn": "Nástěnka",
+      "resetsUnknown": "Dnes žádná nástěnka",
+      "title": "Frakční titul",
       "titleLine": "{faction} . {tier}",
-      "legend": "Standing tiers",
-      "vendorGate": "Requires {tier} with {faction}.",
-      "standingGained": "+{amount} {faction} Standing.",
-      "tierReachedBanner": "Now {tier} with the {faction}",
-      "tierReachedSubtext": "Faction title: {title}",
-      "tierReachedLine": "You are now {tier} with the {faction}. Your faction title is now {title}."
+      "legend": "Stupně postavení",
+      "vendorGate": "Vyžaduje postavení {tier} u frakce {faction}.",
+      "standingGained": "+{amount} postavení u frakce {faction}.",
+      "tierReachedBanner": "Nyní {tier} u frakce {faction}",
+      "tierReachedSubtext": "Frakční titul: {title}",
+      "tierReachedLine": "Nyní jsi {tier} u frakce {faction}. Tvůj frakční titul je nyní {title}."
     },
     "questLog": {
       "completed": "Dokončeno",
@@ -2961,7 +2961,7 @@ export const cs_CZ: EnTranslations = {
       "names": {
         "spellPower": "Síla kouzel",
         "healPower": "Síla léčení",
-        "spellCrit": "Spell Crit",
+        "spellCrit": "Kritický zásah kouzlem",
         "critRating": "Hodnocení kritického zásahu",
         "hasteRating": "Hodnocení rychlosti",
         "parry": "Odražení",
@@ -2978,17 +2978,17 @@ export const cs_CZ: EnTranslations = {
         "armor": "Tlumí příchozí fyzické údery. Redukce je větší proti útočníkům nižší úrovně a je zastropovaná na 75 %.",
         "attackPower": "Posiluje útoky zbraní. Každých 14 síly útoku přidá 1 poškození za sekundu.",
         "spellPower": "Zvyšuje poškození tvých kouzel a sílu tvého léčení. Každý bod Intelektu dává trochu síly kouzel navíc k vybavení a buffům.",
-        "healPower": "Increases the healing of your heals and heal-over-time effects, and the size of your absorb shields. It is your Spell Power plus the Healing Power from your gear and set bonuses, which adds to healing but never to damage.",
+        "healPower": "Zvyšuje léčení tvých kouzel a efektů léčení v čase a velikost tvých absorpčních štítů. Je to tvoje Síla kouzel plus Síla léčení z výbavy a bonusů sad, která se přičítá k léčení, ale nikdy k poškození.",
         "dps": "Odhadované poškození zbraně za sekundu, které kombinuje poškození a rychlost zbraně s tvojí silou útoku.",
         "critChance": "Tvoje šance, že útok zasáhne kriticky a způsobí dvojnásobné poškození.",
-        "spellCrit": "Your chance for a spell or heal to strike critically, dealing 150% damage or healing. Spells and heals roll this instead of Crit Chance: Intellect raises only this chance, while crit rating, talents, and set bonuses raise both.",
+        "spellCrit": "Tvoje šance, že kouzlo nebo léčení zasáhne kriticky a způsobí 150 % poškození nebo léčení. Kouzla a léčení počítají s touto šancí místo Kritického zásahu: Intelekt zvyšuje jen tuto šanci, zatímco hodnocení kritického zásahu, talenty a bonusy sad zvyšují obě.",
         "dodge": "Tvoje šance úplně se vyhnout příchozímu útoku na blízko a neutrpět poškození.",
         "critRating": "Hodnocení kritického zásahu z tvé výbavy a bonusů sad, které zvyšuje tvoji šanci na kritický zásah. Přibližně 10 hodnocení dá 1 % kritického zásahu.",
         "hasteRating": "Hodnocení rychlosti z tvé výbavy a bonusů sad, které zrychluje tvé útoky a sesílání kouzel. Přibližně 10 hodnocení dá 1 % rychlosti.",
         "parry": "Tvoje šance zcela odrazit čelní útok na blízko a neutrpět žádné poškození. Úder zezadu odrazit nelze.",
         "hitRating": "Hodnocení zásahu z vybavení a bonusů sady, snižující četnost mašení tvých útoků a odolávání tvým kouzlům, zejména proti nepřátelům vyšší úrovně. Přibližně 10 bodů hodnocení přidá 1 % zásahu.",
         "warfare": "Zvýší poškození způsobené hráčům o {increase} % a sníží poškození utrpěné od hráčů o {reduction} %.",
-        "warfareWithHealth": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts."
+        "warfareWithHealth": "Zvyšuje poškození způsobené hráčům o {increase} % a snižuje poškození utrpěné od hráčů o {reduction} %. Také zvyšuje tvé maximální zdraví o {health} % všude kromě dungeonů, raidů, výprav a trhlin."
       },
       "effects": {
         "attackPower": "+{value} síla útoku",
@@ -3058,44 +3058,44 @@ export const cs_CZ: EnTranslations = {
       "hot": "rozkvete {name}, léčení v čase, které obnoví {total} během {duration} s"
     },
     "trinkets": {
-      "equipLine": "Equip: {effect}",
+      "equipLine": "Nasazení: {effect}",
       "scaled": "{base} (+{bonus})",
-      "useLine": "Use: {effect} ({cooldown} cooldown)",
+      "useLine": "Použití: {effect} (cooldown {cooldown})",
       "cooldownMinutes": "{minutes} min",
-      "cooldownSeconds": "{seconds} sec",
+      "cooldownSeconds": "{seconds} s",
       "gambleResult": "{item}: {fortune}!",
-      "snakeEyes": "Snake Eyes",
-      "equippedLine": "Equipped",
-      "equipLockout": "Equipping it starts a {seconds} sec cooldown on its use, or the cooldown left on the trinket it replaces if that is longer.",
+      "snakeEyes": "Hadí oči",
+      "equippedLine": "Nasazeno",
+      "equipLockout": "Nasazení spustí {seconds}s cooldown na jeho použití, nebo zbývající cooldown cetky, kterou nahrazuje, pokud je delší.",
       "equip": {
-        "lastStand": "Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage ({absorbPct}% of your maximum health) for {duration} sec. Can occur once every {icd} sec.",
-        "hourglass": "Overhealing from your direct heals is stored in the hourglass, up to {cap} ({capPct}% of your maximum health). Stored healing fades {fade} sec after it last grew.",
-        "twinStrike": "Your auto-attack hits have a {chance}% chance to make an extra main-hand melee swing. Can occur once every {icd} sec.",
-        "tally": "Your auto-attack critical hits and your killing blows each add a tally mark, up to {max}. Marks last {duration} sec, refreshed whenever you gain one.",
-        "storm": "Each spell you cast adds a charge, up to {max}. Charges last {duration} sec, refreshed whenever you gain one.",
-        "heat": "Your melee and ranged weapon hits each add a heat stack, up to {max}. Heat lasts {duration} sec, refreshed whenever you gain a stack.",
-        "ignite": "Your melee and ranged weapon critical hits set the target alight, dealing {tick} Fire damage every {every} sec for {duration} sec. A new critical hit refreshes it. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.",
-        "guardHeat": "Each attack you parry, dodge or block adds a heat stack, up to {max}. Heat lasts {duration} sec, refreshed whenever you gain a stack."
+        "lastStand": "Utrpění poškození pod {threshold} % zdraví udělí štít, který pohltí {absorb} poškození ({absorbPct} % tvého maximálního zdraví) po dobu {duration} s. Může nastat jednou za {icd} s.",
+        "hourglass": "Přeléčení z tvých přímých léčení se ukládá do přesýpacích hodin, až do {cap} ({capPct} % tvého maximálního zdraví). Uložené léčení vyprchá {fade} s poté, co naposledy vzrostlo.",
+        "twinStrike": "Tvé automatické útoky mají {chance}% šanci provést navíc úder hlavní zbraní na blízko. Může nastat jednou za {icd} s.",
+        "tally": "Tvé kritické automatické útoky a tvé smrtící údery přidají zápis, až do {max}. Zápisy trvají {duration} s a obnoví se pokaždé, když nějaký získáš.",
+        "storm": "Každé kouzlo, které sešleš, přidá nabití, až do {max}. Nabití trvají {duration} s a obnoví se pokaždé, když nějaké získáš.",
+        "heat": "Každý tvůj úder zbraní na blízko i na dálku přidá nabití žáru, až do {max}. Žár trvá {duration} s a obnoví se pokaždé, když získáš nové nabití.",
+        "ignite": "Tvé kritické zásahy zbraní na blízko i na dálku zapálí cíl a způsobí {tick} ohnivého poškození každých {every} s po dobu {duration} s. Nový kritický zásah to obnoví. Poškození roste se silou útoku nebo útočnou silou na dálku, podle toho, která je vyšší.",
+        "guardHeat": "Každý útok, který vykryješ, uhneš mu nebo ho zablokuješ, přidá nabití žáru, až do {max}. Žár trvá {duration} s a obnoví se pokaždé, když získáš nové nabití."
       },
       "use": {
-        "retaliate": "For {duration} sec, an enemy that hits you directly takes Physical damage equal to {pct}% of the health that hit took from you. Periodic damage does not trigger it.",
-        "anchor": "For {duration} sec, take {reduction}% less damage but move at {speed}% speed. Removes stuns, roots, slows, fears, polymorphs, silences, blinds, hexes, disarms and incapacitating effects on you, and you ignore new ones and knockbacks while it lasts.",
-        "hourglass": "Turn all stored healing into a shield on the party member within {range} yd with the lowest health percentage, you included. The shield lasts {duration} sec. Requires stored healing.",
-        "wellspring": "Heal you and party members within {radius} yd for {tick} every {every} sec for {duration} sec. Healing increases with Healing Power.",
-        "bleedEdge": "For {duration} sec, your auto-attack hits apply Talon Wound, which deals {tick} Physical damage per stack every {every} sec for {bleedDuration} sec and stacks up to {stacks} times. Damage increases with Attack Power.",
-        "tallyStrike": "Spend all tally marks to strike your target within {range} yd for {perMark} Physical damage per mark ({max} at {maxMarks} marks). Damage increases with Attack Power. Requires a tally mark.",
-        "stormjar": "Release all charges as a bolt at your target within {range} yd that jumps to up to {extra} more enemies within {jumpRange} yd. Each enemy takes {perCharge} Nature damage per charge ({max} at {maxCharges} charges). Damage increases with Spell Power. Requires a charge.",
-        "echo": "For {duration} sec, your next {casts} direct heals or direct non-Physical damage hits repeat for {pct}% of their amount.",
-        "gamble": "Roll one of four fortunes for {duration} sec: {keenEdge} (deal {keenPct}% more damage), {luckyStreak} (heal {heal} over the duration), {gildedGuard} (a shield that absorbs {absorb} damage), or {snakeEyes} (no effect, but this cooldown is halved).",
-        "blink": "Step {yards} yd forward, then take {reduction}% less damage for {guard} sec.",
-        "sprint": "Increase your movement speed by {speed}% for {duration} sec. Does not stack with other speed increases.",
-        "defiance": "Remove all stuns, roots, slows, fears, polymorphs, silences, blinds, hexes, disarms and incapacitating effects on you. Usable while stunned.",
-        "brand": "Brand an enemy player within {range} yd, reducing the healing they receive by {cut}% for {duration} sec.",
-        "temper": "Spend all heat stacks to temper your weapon for {duration} sec. Your melee and ranged weapon hits deal {damage} extra Fire damage, increased by {perHeat}% for each heat stack spent (up to {maxBonus}% at {maxHeat} stacks). Each killing blow adds {killExtend} sec, up to {maxDuration} sec in total. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.",
-        "kindlingOrb": "Summon an ember orb beside you for {duration} sec. Each spell you cast at an enemy makes it fire a bolt at that enemy for {damage} Fire damage. Damage increases with Spell Power.",
-        "pierce": "For {duration} sec, your auto-attacks, shots and physical abilities (not bleeds) also strike the enemy nearest your target within {reach} yd for {share}% of the damage dealt.",
-        "lantern": "Set a lantern at your feet for {duration} sec. A direct heal from anyone on you or a party member within {radius} yd of it also heals the most wounded other party member in its light for {share}% of the heal.",
-        "heartNova": "Spend all heat stacks on a fire nova that deals {perHeat} Fire damage per stack ({max} at {maxHeat} stacks) to each enemy within {radius} yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack."
+        "retaliate": "Po dobu {duration} s utrpí nepřítel, který tě zasáhne přímo, fyzické poškození rovné {pct} % zdraví, které ti tím zásahem vzal. Periodické poškození to nespustí.",
+        "anchor": "Po dobu {duration} s utrpíš o {reduction} % méně poškození, ale pohybuješ se rychlostí {speed} %. Odstraní z tebe omráčení, zakořenění, zpomalení, strach, polymorfování, umlčení, oslepení, kletby, odzbrojení a znehybňující efekty a po dobu trvání ignoruješ nové i odhození.",
+        "hourglass": "Přemění všechno uložené léčení na štít pro člena skupiny v okruhu {range} yardů s nejnižším procentem zdraví, včetně tebe. Štít trvá {duration} s. Vyžaduje uložené léčení.",
+        "wellspring": "Vyléčí tebe a členy skupiny v okruhu {radius} yardů za {tick} každých {every} s po dobu {duration} s. Léčení roste se silou léčení.",
+        "bleedEdge": "Po dobu {duration} s tvé automatické útoky způsobují Zranění drápem, které způsobí {tick} fyzického poškození za nabití každých {every} s po dobu {bleedDuration} s a hromadí se až {stacks}x. Poškození roste se silou útoku.",
+        "tallyStrike": "Utratíš všechny zápisy a udeříš cíl v okruhu {range} yardů za {perMark} fyzického poškození za zápis ({max} při {maxMarks} zápisech). Poškození roste se silou útoku. Vyžaduje zápis.",
+        "stormjar": "Uvolní všechna nabití jako blesk na tvůj cíl v okruhu {range} yardů, který přeskočí až na {extra} dalších nepřátel v okruhu {jumpRange} yardů. Každý nepřítel utrpí {perCharge} přírodního poškození za nabití ({max} při {maxCharges} nabitích). Poškození roste se silou kouzel. Vyžaduje nabití.",
+        "echo": "Po dobu {duration} s se tvých příštích {casts} přímých léčení nebo přímých útoků nefyzickým poškozením zopakuje za {pct} % jejich hodnoty.",
+        "gamble": "Na {duration} s hodíš jedno ze čtyř štěstí: {keenEdge} (způsobíš o {keenPct} % více poškození), {luckyStreak} (vyléčíš {heal} po dobu trvání), {gildedGuard} (štít, který pohltí {absorb} poškození), nebo {snakeEyes} (žádný efekt, ale tento cooldown je poloviční).",
+        "blink": "Popojdi {yards} yardů vpřed a poté po dobu {guard} s utrpíš o {reduction} % méně poškození.",
+        "sprint": "Zvýší tvou rychlost pohybu o {speed} % po dobu {duration} s. Nesčítá se s jinými zvýšeními rychlosti.",
+        "defiance": "Odstraní z tebe všechna omráčení, zakořenění, zpomalení, strach, polymorfování, umlčení, oslepení, kletby, odzbrojení a znehybňující efekty. Použitelné i během omráčení.",
+        "brand": "Označíš nepřátelského hráče v okruhu {range} yardů a po dobu {duration} s mu sníží přijímané léčení o {cut} %.",
+        "temper": "Utratíš všechna nabití žáru a zakalíš svou zbraň na {duration} s. Tvé údery zbraní na blízko i na dálku způsobí {damage} ohnivého poškození navíc, zvýšeného o {perHeat} % za každé utracené nabití žáru (až {maxBonus} % při {maxHeat} nabitích). Každý smrtící úder přidá {killExtend} s, až do celkových {maxDuration} s. Poškození roste se silou útoku nebo útočnou silou na dálku, podle toho, která je vyšší.",
+        "kindlingOrb": "Přivoláš vedle sebe žhavou kouli na {duration} s. Každé kouzlo, které sešleš na nepřítele, ji přiměje vystřelit na něj šíp za {damage} ohnivého poškození. Poškození roste se silou kouzel.",
+        "pierce": "Po dobu {duration} s tvé automatické útoky, výstřely a fyzické schopnosti (kromě krvácení) zasáhnou navíc i nejbližšího nepřítele k tvému cíli v okruhu {reach} yardů za {share} % způsobeného poškození.",
+        "lantern": "Umístíš si k nohám lucernu na {duration} s. Přímé léčení od kohokoli na tebe nebo na člena skupiny v okruhu {radius} yardů od ní také vyléčí nejzraněnějšího jiného člena skupiny v jejím světle za {share} % léčení.",
+        "heartNova": "Utratíš všechna nabití žáru na ohnivou novu, která způsobí {perHeat} ohnivého poškození za nabití ({max} při {maxHeat} nabitích) každému nepříteli v okruhu {radius} yardů a vyprovokuje každého tvora, kterého zasáhne. Poškození roste se silou útoku. Vyžaduje nabití žáru."
       }
     },
     "questShare": {
@@ -3267,16 +3267,16 @@ export const cs_CZ: EnTranslations = {
       "failed": "Hlášení chyby se nepodařilo odeslat. Zkus to prosím znovu."
     },
     "hostDiag": {
-      "title": "System Report",
-      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
-      "create": "Generate system report",
-      "running": "Collecting system details...",
-      "saved": "Report saved as {fileName}.",
-      "savedNoName": "Report saved.",
-      "failed": "The report could not be created. Please try again."
+      "title": "Systémový report",
+      "intro": "Shromáždí podrobnosti o tomto počítači, včetně programů, které nejvíc zatěžují procesor a paměť, do souboru, který pomáhá diagnostikovat problémy s výkonem. Nic se nikam neodesílá: soubor zůstává v tvém počítači.",
+      "create": "Vytvořit systémový report",
+      "running": "Shromažďují se systémové údaje...",
+      "saved": "Report uložen jako {fileName}.",
+      "savedNoName": "Report uložen.",
+      "failed": "Report se nepodařilo vytvořit. Zkus to prosím znovu."
     },
     "paperdoll": {
-      "trinketSlot": "Trinket",
+      "trinketSlot": "Cetka",
       "unequipAria": "Sundat {item}",
       "unequipHint": "Klikni na x, pravé kliknutí, nebo přetáhni do batohů pro sundání",
       "hideHelmAria": "Skrýt přilbu",
@@ -3448,8 +3448,8 @@ export const cs_CZ: EnTranslations = {
       "hint": "Body zaměření přidávají bonus nad základní výnos každé součásti. Nezaměřené součásti zůstávají na základní hodnotě.",
       "tierHint": "Každých {points} bodů na komponentě zvýší její úroveň sklizně o jeden stupeň, až o {steps} stupňů; méně než {points} bodů přesto zvýší výnos.",
       "townOnlyHint": "Tato nastavení platí pouze ve vašem domovském městě.",
-      "preferenceHint": "Focus raises the grade and amount of what you harvest. To harvest only one material, set a Harvest Preference from your Field Kit or the Professions window.",
-      "pendingLine": "Saved. Your re-spec to this allocation completes in {time}.",
+      "preferenceHint": "Zaměření zvyšuje jakost a množství toho, co sklidíš. Chceš-li sklízet jen jeden materiál, nastav si Preferenci sklizně ve své Polní výbavě nebo v okně Profese.",
+      "pendingLine": "Uloženo. Tvá úprava na toto rozložení bude dokončena za {time}.",
       "budgetLabel": "Zbývající body: {remaining} / {budget}",
       "saveButton": "Uložit zaměření",
       "notInTownHint": "Zaměření lze nastavit jen ve městě.",
@@ -3859,8 +3859,8 @@ export const cs_CZ: EnTranslations = {
         "kingsWrathSummary": "Nythraxis způsobuje o {bonusNormal} vyšší poškození na Normal nebo o {bonusHeroic} na Heroic po zbytek boje. Hrobová erupce nastává každých {eruptionEveryNormal} s ({eruptionEveryHeroic} na Heroic).",
         "kingsWrathResponse": "Použijte zbývající obranné cooldowny na nevyhnutelné poškození. Udržte všechny dřívější mechaniky čisté, zatímco raid dokončuje boj.",
         "boneStormName": "Kostěná bouře",
-        "boneStormSummary": "Počínaje {first} s po začátku Králova hněvu a pak každých {everyNormal} s Nythraxis zahájí Kostěnou bouři na {duration} s. Ignoruje hrozbu, pohybuje se {speed}násobkem běžné rychlosti a provede {charges} výpadů, každý v trvání {chargeSeconds} s. Jeho vír způsobí každou sekundu v dosahu {radius} yardů {whirlNormal} maximálního zdraví. Každý výpad končí Kostěným úderem ve stejném dosahu za {slamNormal} maximálního zdraví. Hrobobijec se znovu připraví {rearm} s po jejím konci.",
-        "boneStormHeroicSummary": "Počínaje {first} s po začátku Králova hněvu a pak každých {everyHeroic} s Nythraxis zahájí Kostěnou bouři na {duration} s. Ignoruje hrozbu, pohybuje se {speed}násobkem běžné rychlosti a provede {charges} výpadů, každý v trvání {chargeSeconds} s. Jeho vír způsobí každou sekundu v dosahu {radius} yardů {whirlHeroic} maximálního zdraví. Každý výpad končí Kostěným úderem ve stejném dosahu za {slamHeroic} maximálního zdraví. Hrobobijec se znovu připraví {rearm} s po jejím konci.",
+        "boneStormSummary": "Počínaje {first} s po začátku Králova hněvu a pak každých {everyNormal} s Nythraxis zahájí Kostěnou bouři na {duration} s. Ignoruje hrozbu, pohybuje se {speed}násobkem běžné rychlosti a provede {charges} výpadů, každý v trvání {chargeSeconds} s. Jeho vír způsobí každou sekundu v dosahu {radius} yardů {whirlNormal} maximálního zdraví. Každý výpad končí Kostěným úderem ve stejném dosahu za {slamNormal} maximálního zdraví. Všechny aktivní značky Trhání duše jsou v okamžiku zahájení bouře uvolněny nevyřešené, a bouře se nikdy nezahájí ihned po detonaci Trhání duše. Hrobobijec se znovu připraví {rearm} s po jejím konci.",
+        "boneStormHeroicSummary": "Počínaje {first} s po začátku Králova hněvu a pak každých {everyHeroic} s Nythraxis zahájí Kostěnou bouři na {duration} s. Ignoruje hrozbu, pohybuje se {speed}násobkem běžné rychlosti a provede {charges} výpadů, každý v trvání {chargeSeconds} s. Jeho vír způsobí každou sekundu v dosahu {radius} yardů {whirlHeroic} maximálního zdraví. Každý výpad končí Kostěným úderem ve stejném dosahu za {slamHeroic} maximálního zdraví. Všechny aktivní značky Trhání duše jsou v okamžiku zahájení bouře uvolněny nevyřešené, a bouře se nikdy nezahájí ihned po detonaci Trhání duše. Hrobobijec se znovu připraví {rearm} s po jejím konci.",
         "boneStormResponse": "Rozestupte se a nepřestávejte před Nythraxisem utíkat. Označený raider běží pryč, zatímco všichni ostatní nechají kolem trasy výpadu místo; tankové ho po konci bouře znovu převezmou.",
         "crownEnduresName": "Koruna vytrvá",
         "crownEnduresSummary": "V {enrageNormal} s od začátku boje (hodiny se zastaví, když bratr Aldric vstoupí při 70%) se Koruna vytrvá spustí jako tvrdé rozzuření. Nythraxis získá o {damage} vyšší poškození a o {haste} rychlejší útoky, poté každých {rampEveryNormal} s další {rampStep} poškození. Není zde žádná časová lišta. Varování přicházejí jako výkřiky při {warn60}, {warn30} a {warn10} s do konce.",
@@ -3918,7 +3918,7 @@ export const cs_CZ: EnTranslations = {
       "forbiddenReflectionLock": "Zakázaný odraz zatím nelze znovu připravit",
       "internalCooldown": "Tento efekt nelze spustit znovu, dokud nevyprší časovač",
       "carriedFlag": "Neseš nepřátelskou vlajku. Zrušením tohoto efektu ji upustíš.",
-      "carryingFreight": "You are carrying freight. Movement speed is reduced by {pct}%.",
+      "carryingFreight": "Neseš náklad. Rychlost pohybu je snížena o {pct} %.",
       "battleStance": "Bojový postoj: o 10 % vyšší generování vzteku",
       "berserkerStance": "Postoj berserka: kritické zásahy o 3 % častěji a o 3 % tvrdší",
       "crit": "Zvyšuje šanci na kritický zásah o {pct} %",
@@ -3947,8 +3947,8 @@ export const cs_CZ: EnTranslations = {
       "iceFloesCasts": "Tvoje příštích {n} kouzel s dobou sesílání lze sesílat za pohybu",
       "freeCast": "Tvoje příští seslání nestojí nic",
       "instantCast": "Tvoje příští kouzlo s dobou sesílání je okamžité",
-      "benisonPrayers": "Your next Choirmend heals for {pct}% more and consumes all stacks.",
-      "benisonWhisper": "Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.",
+      "benisonPrayers": "Tvé příští Sborové zacelení vyléčí o {pct} % více a spotřebuje všechna nabití.",
+      "benisonWhisper": "Tvá příští Šeptaná modlitba je okamžitá a vyléčí o {pct} % více. Použij ji, než tento efekt vyprší.",
       "cheapCast": "Tvoje příští kouzlo stojí o {pct} % méně",
       "radiantResonance": "Tvé další Léčivé světlo bude okamžité, nebo tvé další Objetí úsvitu stojí o {pct}% méně many a sesílá se za {castTime} s",
       "solarReprisal": "Tvůj další Sluneční disk nestojí manu, ignoruje obnovu a způsobí o {pct}% větší poškození; Kladivo milosti ignoruje svou obnovu a vyléčí tě za 100% způsobeného poškození; nebo je Léčivé světlo okamžité",
@@ -3969,38 +3969,38 @@ export const cs_CZ: EnTranslations = {
       "nextAttackCrit": "Tvůj příští útok je zaručeně kritický zásah",
       "healEcho": "Pokles pod {threshold} % zdraví obnoví {value} zdraví",
       "trinket": {
-        "lastStandCooldown": "Bastion Sigil's Last Bastion shield was used. Falling below {threshold}% health cannot raise it again until this expires.",
-        "lastBastion": "Absorbs {value} damage. Bastion Sigil raised it when you took damage below {threshold}% health.",
-        "retaliate": "Enemies that hit you directly take Physical damage equal to {pct}% of the health that hit took from you. Periodic damage does not trigger it.",
-        "moored": "You take {reduction}% less damage but move at {speed}% speed. You ignore stuns, roots, slows, fears, polymorphs, silences, blinds, hexes, disarms, incapacitating effects and knockbacks.",
-        "hourglassStored": "Holds {stored} healing stored from your overhealing. Use Mender's Hourglass to turn it into a shield on the party member within {range} yd with the lowest health percentage, you included.",
-        "hourglassShield": "Absorbs {value} damage. Made from the healing a Mender's Hourglass stored.",
-        "wellspring": "Restores {tick} health every {every} sec.",
-        "twinStrikeCooldown": "Paired Talons just made an extra swing. It cannot make another until this expires.",
-        "bleedEdge": "Your auto-attack hits apply Talon Wound: {tick} Physical damage per stack every {every} sec for {duration} sec, stacking up to {max} times.",
-        "bleedEdgeOther": "Auto-attack hits apply Talon Wound, a Physical bleed that stacks up to {max} times. Damage increases with Attack Power.",
-        "talonWound": "Deals {damage} Physical damage every {every} sec ({stacks}/{max} stacks). Each new stack adds damage and refreshes the duration.",
-        "tally": "Tally marks: {stacks}/{max}. Use Hunter's Tally to spend them all on a strike at your target for {damage} Physical damage ({perMark} per mark).",
-        "tallyOther": "Tally marks: {stacks}/{max}. Hunter's Tally spends them all on a Physical strike that deals more damage for each mark.",
-        "storm": "Charges: {stacks}/{max}. Use Stormjar to release them as a bolt that hits your target and up to {extra} more enemies within {jumpRange} yd of each other for {damage} Nature damage each ({perCharge} per charge).",
-        "stormOther": "Charges: {stacks}/{max}. Stormjar releases them as a Nature bolt that hits the target and up to {extra} more enemies, dealing more damage for each charge.",
-        "echo": "Your next {casts} direct heals or direct non-Physical damage hits repeat for {pct}% of their amount.",
-        "keenEdge": "Gambler's Die fortune: you deal {pct}% more damage.",
-        "luckyStreak": "Gambler's Die fortune: restores {tick} health every {every} sec.",
-        "gildedGuard": "Gambler's Die fortune: absorbs {value} damage.",
-        "riftGuard": "You take {pct}% less damage.",
-        "sprint": "Movement speed increased by {pct}%. Does not stack with other speed increases.",
-        "brand": "Healing received is reduced by {pct}%.",
-        "forgeHeat": "Heat: {stacks}/{max}. Using Forgefather's Temper spends it all, and its weapon fire deals {pct}% more damage.",
-        "tempered": "Your melee and ranged weapon hits deal {damage} extra Fire damage ({pct}% more from the heat spent). Each killing blow adds {killExtend} sec, up to {maxDuration} sec in total.",
-        "temperedOther": "Melee and ranged weapon hits deal extra Fire damage, {pct}% more from the heat spent. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.",
-        "kindlingOrb": "Each spell you cast at an enemy makes the orb fire a bolt at that enemy for {damage} Fire damage. It holds its fire at a polymorphed, incapacitated or blinded enemy.",
-        "kindlingOrbOther": "Each spell cast at an enemy makes the orb fire a bolt of Fire damage at that enemy. Damage increases with Spell Power.",
-        "moltenIgnite": "Deals {damage} Fire damage every {every} sec. Another weapon critical hit refreshes it.",
-        "pierce": "Your auto-attacks, shots and physical abilities (not bleeds) also strike the enemy nearest your target within {reach} yd for {pct}% of the damage dealt.",
-        "lantern": "A direct heal from anyone on you or a party member within {radius} yd of the lantern also heals the most wounded other party member in its light for {pct}% of the heal.",
-        "crucibleHeat": "Heat: {stacks}/{max}. Use Heart of the Crucible to spend it all on a fire nova that deals {damage} Fire damage to each enemy within {radius} yd and taunts every creature it hits.",
-        "crucibleHeatOther": "Heat: {stacks}/{max}. Heart of the Crucible spends it all on a fire nova within {radius} yd that deals more Fire damage for each stack and taunts every creature it hits."
+        "lastStandCooldown": "Štít Poslední bašty z Pečeti bašty byl použit. Pokles pod {threshold} % zdraví ho nemůže znovu vyvolat, dokud toto nevyprší.",
+        "lastBastion": "Pohltí {value} poškození. Pečeť bašty ho vyvolala, když jsi utrpěl(a) poškození pod {threshold} % zdraví.",
+        "retaliate": "Nepřátelé, kteří tě zasáhnou přímo, utrpí fyzické poškození rovné {pct} % zdraví, které ti tím zásahem vzali. Periodické poškození to nespustí.",
+        "moored": "Utrpíš o {reduction} % méně poškození, ale pohybuješ se rychlostí {speed} %. Ignoruješ omráčení, zakořenění, zpomalení, strach, polymorfování, umlčení, oslepení, kletby, odzbrojení, znehybňující efekty a odhození.",
+        "hourglassStored": "Uchovává {stored} nahromaděného léčení z tvého přeléčení. Použij Přesýpací hodiny hojitele a proměň ho ve štít pro člena skupiny v okruhu {range} yardů s nejnižším procentem zdraví, včetně tebe.",
+        "hourglassShield": "Pohltí {value} poškození. Vytvořeno z léčení uloženého v Přesýpacích hodinách hojitele.",
+        "wellspring": "Obnoví {tick} zdraví každých {every} s.",
+        "twinStrikeCooldown": "Spárované spáry právě provedly úder navíc. Nemohou provést další, dokud toto nevyprší.",
+        "bleedEdge": "Tvé automatické útoky způsobují Zranění drápem: {tick} fyzického poškození za nabití každých {every} s po dobu {duration} s, hromadí se až {max}x.",
+        "bleedEdgeOther": "Automatické útoky způsobují Zranění drápem, fyzické krvácení, které se hromadí až {max}x. Poškození roste se silou útoku.",
+        "talonWound": "Způsobí {damage} fyzického poškození každých {every} s ({stacks}/{max} nabití). Každé nové nabití přidá poškození a obnoví trvání.",
+        "tally": "Zápisy: {stacks}/{max}. Použij Lovcův zápis a utrať je všechny na úder proti svému cíli za {damage} fyzického poškození ({perMark} za zápis).",
+        "tallyOther": "Zápisy: {stacks}/{max}. Lovcův zápis je všechny utratí na fyzický úder, který způsobí víc poškození za každý zápis.",
+        "storm": "Nabití: {stacks}/{max}. Použij Bouřnou nádobu a uvolni je jako blesk, který zasáhne tvůj cíl a až {extra} dalších nepřátel v okruhu {jumpRange} yardů od sebe navzájem za {damage} přírodního poškození každého ({perCharge} za nabití).",
+        "stormOther": "Nabití: {stacks}/{max}. Bouřná nádoba je uvolní jako přírodní blesk, který zasáhne cíl a až {extra} dalších nepřátel a způsobí víc poškození za každé nabití.",
+        "echo": "Tvých dalších {casts} přímých léčení nebo přímých útoků nefyzickým poškozením se zopakuje za {pct} % jejich hodnoty.",
+        "keenEdge": "Štěstí Hazardní kostky: způsobíš o {pct} % více poškození.",
+        "luckyStreak": "Štěstí Hazardní kostky: obnoví {tick} zdraví každých {every} s.",
+        "gildedGuard": "Štěstí Hazardní kostky: pohltí {value} poškození.",
+        "riftGuard": "Utrpíš o {pct} % méně poškození.",
+        "sprint": "Rychlost pohybu zvýšena o {pct} %. Nesčítá se s jinými zvýšeními rychlosti.",
+        "brand": "Přijaté léčení je sníženo o {pct} %.",
+        "forgeHeat": "Žár: {stacks}/{max}. Použití Kovářského kaliče spotřebuje všechen žár a jeho ohnivý úder zbraní způsobí o {pct} % více poškození.",
+        "tempered": "Tvé údery zbraní na blízko a na dálku způsobí {damage} ohnivého poškození navíc (o {pct} % více z vydaného žáru). Každý smrtící úder přidá {killExtend} s, až do celkových {maxDuration} s.",
+        "temperedOther": "Údery zbraní na blízko a na dálku způsobí ohnivé poškození navíc, o {pct} % více z vydaného žáru. Poškození roste se silou útoku nebo útočnou silou na dálku, podle toho, která je vyšší.",
+        "kindlingOrb": "Každé kouzlo, které sešleš na nepřítele, přiměje kouli vystřelit na něj šíp za {damage} ohnivého poškození. Koule zadrží svůj oheň proti zpolymorfovanému, znehybněnému nebo oslepenému nepříteli.",
+        "kindlingOrbOther": "Každé kouzlo sesláté na nepřítele přiměje kouli vystřelit šíp ohnivého poškození na tohoto nepřítele. Poškození roste se silou kouzel.",
+        "moltenIgnite": "Způsobí {damage} ohnivého poškození každých {every} s. Další kritický zásah zbraní ho obnoví.",
+        "pierce": "Tvé automatické útoky, výstřely a fyzické schopnosti (kromě krvácení) zasáhnou navíc i nejbližšího nepřítele k tvému cíli v okruhu {reach} yardů za {pct} % způsobeného poškození.",
+        "lantern": "Přímé léčení od kohokoli na tebe nebo člena skupiny v okruhu {radius} yardů od lucerny také vyléčí nejzraněnějšího jiného člena skupiny v jejím světle za {pct} % léčení.",
+        "crucibleHeat": "Žár: {stacks}/{max}. Použij Srdce tavicího kelímku a vydej všechen žár na ohnivou novu, která způsobí {damage} ohnivého poškození každému nepříteli v okruhu {radius} yardů a vyprovokuje každého tvora, kterého zasáhne.",
+        "crucibleHeatOther": "Žár: {stacks}/{max}. Srdce tavicího kelímku vydá všechen žár na ohnivou novu v okruhu {radius} yardů, která způsobí větší ohnivé poškození za každé nabití a vyprovokuje každého tvora, kterého zasáhne."
       },
       "increase": {
         "ap": "Zvyšuje sílu útoku o {value}",
@@ -4133,7 +4133,7 @@ export const cs_CZ: EnTranslations = {
       "resetErrInvalid": "Tento odkaz pro obnovení je neplatný nebo vypršel. Požádejte o nový."
     },
     "loot": {
-      "rollWon": "Congratulations! You won {item} with a roll of {roll}",
+      "rollWon": "Gratulujeme! Vyhrál(a) jsi {item} s hodem {roll}",
       "chestTitle": "Truhla",
       "takeLootButton": "Sebrat kořist",
       "takeLootTooltip": "Sebrat veškerou kořist",
@@ -4233,8 +4233,8 @@ export const cs_CZ: EnTranslations = {
       "label": "Resetovat pozice rámů"
     },
     "interfaceUnlock": {
-      "combineTrackers": "Combine Tracker Frames",
-      "combineAuras": "Combine Aura Frames",
+      "combineTrackers": "Sloučit rámečky trackerů",
+      "combineAuras": "Sloučit rámečky aur",
       "label": "Upravit rámečky",
       "unlock": "Odemknout rozhraní",
       "lock": "Zamknout rozhraní",
@@ -4245,8 +4245,8 @@ export const cs_CZ: EnTranslations = {
       "lockFrame": "Zamknout tento rámeček",
       "resizeFrame": "Změnit velikost tohoto rámečku",
       "frameNames": {
-        "trackerGroup": "Trackers",
-        "auraGroup": "Aura trackers",
+        "trackerGroup": "Trackery",
+        "auraGroup": "Trackery aur",
         "actionBar1": "Akční lišta",
         "actionBar2": "Akční lišta 2",
         "actionBar3": "Akční lišta 3",
@@ -4379,13 +4379,13 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "lootQuality": {
-      "ordinary": "Ordinary",
-      "superior": "Superior",
-      "exceptional": "Exceptional",
-      "magnificent": "Magnificent",
-      "transcendent": "Transcendent",
+      "ordinary": "Obyčejné",
+      "superior": "Nadprůměrné",
+      "exceptional": "Výjimečné",
+      "magnificent": "Nádherné",
+      "transcendent": "Transcendentní",
       "itemName": "{item}, {quality}",
-      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
+      "tooltip": "{quality}: +{levels} úrovní předmětu. Zachová se při vylepšování."
     },
     "itemTooltip": {
       "requiresLevel": "Vyžaduje úroveň {level}",
@@ -4823,8 +4823,8 @@ export const cs_CZ: EnTranslations = {
       "vaultTab": "Trezor",
       "vaultCapacityNote": "Každý materiál pojme až {cap}.",
       "vaultEmpty": "Tvůj trezor je prázdný. Klikni na materiál ve svých batozích, ať ho uložíš.",
-      "vaultSearchAria": "Search vault materials by name",
-      "vaultSearchNoMatch": "No material in your vault matches your search.",
+      "vaultSearchAria": "Hledat materiály v trezoru podle jména",
+      "vaultSearchNoMatch": "Žádný materiál ve tvém trezoru neodpovídá hledání.",
       "vaultRowAria": "{item}: uloženo {count} z {cap}",
       "vaultLockedIntro": "Odemkni Trezor materiálů a hromaď řemeslné suroviny vedle své banky. Každý materiál dostane vlastní prostor s kapacitou až {cap} kusů.",
       "vaultUnlockButton": "Odemknout Trezor materiálů",
@@ -5293,17 +5293,17 @@ export const cs_CZ: EnTranslations = {
       "enchant_chest_lucent_stamina": "Rytina na hrudi: Zářivá výdrž",
       "enchant_feet_lucent_agility": "Rytina na botách: Zářivá hbitost",
       "enchant_lucent_infusion": "Zářivá infuze",
-      "enchant_weapon_riftwalkers_grace": "Riftwalker's Grace",
-      "enchant_weapon_dawnfire_etching": "Weapon Etching: Dawnfire",
-      "enchant_weapon_dawns_benediction": "Weapon Etching: Dawn's Benediction",
-      "enchant_weapon_piston_drive": "Weapon Etching: Piston Drive"
+      "enchant_weapon_riftwalkers_grace": "Milost chodce trhlin",
+      "enchant_weapon_dawnfire_etching": "Rytina na zbrani: Plamen úsvitu",
+      "enchant_weapon_dawns_benediction": "Rytina na zbrani: Požehnání úsvitu",
+      "enchant_weapon_piston_drive": "Rytina na zbrani: Pohon pístu"
     },
     "enchantDescription": {
       "enchant_weapon_lastflame_zeal": "Zásahy zblízka, které zasáhnou cíl, ti mohou dát 50 Síly na 15 s a vyléčit 200 zdraví. Platí modifikátory léčení. Každý zásah má šanci 1 % za 0,6 s základní rychlosti úderu použité zbraně. Neexistuje interní cooldown. Obě ruce sdílejí jeden bonus; každé spuštění obnoví jeho trvání a bonus se nikdy nesčítá. Útoky na dálku tento efekt nespouštějí. Vlčí forma místo toho používá základní rychlost úderu 1 s.",
-      "enchant_weapon_riftwalkers_grace": "Your landed melee attacks can grant 60 Agility and 2% faster melee attacks for 15 sec. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
-      "enchant_weapon_dawnfire_etching": "Permanently etches a weapon with 18 Spell Power. Spell Power also counts toward Healing Power. A flat bonus; it does not scale.",
-      "enchant_weapon_dawns_benediction": "Permanently etches a weapon with 34 Healing Power. Healing Power raises heals only, never spell damage. A flat bonus; it does not scale.",
-      "enchant_weapon_piston_drive": "Permanently etches a two-handed weapon with 12 Strength and 25 Critical Strike Rating. Cannot be applied to a one-handed weapon. A flat bonus; it does not scale."
+      "enchant_weapon_riftwalkers_grace": "Tvé úspěšné útoky na blízko mohou udělit 60 obratnosti a o 2 % rychlejší útoky na blízko na 15 s. Každý zásah má šanci 1 % za každých 0,6 s základní rychlosti útočící zbraně. Bez vnitřního cooldownu. Obě ruce sdílí jeden buff; jakékoli spuštění ho obnoví a nikdy se nehromadí. Útoky na dálku tento efekt nespouští. Kočičí podoba místo toho používá svou základní rychlost útoku 1 s.",
+      "enchant_weapon_dawnfire_etching": "Natrvalo vyryje do zbraně 18 síly kouzel. Síla kouzel se počítá i do síly léčení. Pevný bonus, neškáluje se.",
+      "enchant_weapon_dawns_benediction": "Natrvalo vyryje do zbraně 34 síly léčení. Síla léčení zvyšuje jen léčení, nikdy poškození kouzel. Pevný bonus, neškáluje se.",
+      "enchant_weapon_piston_drive": "Natrvalo vyryje do obouruční zbraně 12 síly a 25 hodnocení kritického zásahu. Nelze použít na jednoruční zbraň. Pevný bonus, neškáluje se."
     },
     "professions": {
       "title": "Profese",
@@ -5495,7 +5495,7 @@ export const cs_CZ: EnTranslations = {
         "dormantKnowledge": "Znalosti {craft} jsou zachovány, ale dočasně neaktivní, dokud nebude aktivní jejich pár nebo koníček."
       },
       "stationRequired": "Abyste to mohli vytvořit, musíte být na {station}.",
-      "mobileStationTitle": "{name}'s {station}",
+      "mobileStationTitle": "{station} ({name})",
       "stationName": {
         "forge": "Kovárna",
         "kitchens": "Kuchyně",
@@ -6226,30 +6226,30 @@ export const cs_CZ: EnTranslations = {
       "untrack": "Untrack",
       "track": "Dráha",
       "worldQuests": {
-        "heading": "World quests today",
+        "heading": "Dnešní světové úkoly",
         "count": "{done} / {total}",
-        "empty": "No world quests today",
-        "replacement": "Replacement",
+        "empty": "Dnes žádné světové úkoly",
+        "replacement": "Náhrada",
         "state": {
-          "active": "In progress",
-          "completed": "Done"
+          "active": "Rozpracováno",
+          "completed": "Hotovo"
         },
-        "reroll": "Replace quest",
-        "rerollNote": "One replacement available today",
-        "rerollUsed": "Replacement used today",
+        "reroll": "Vyměnit úkol",
+        "rerollNote": "Dnes dostupná jedna výměna",
+        "rerollUsed": "Výměna dnes již použita",
         "rerollReason": {
-          "noCycle": "No board today",
-          "usedToday": "Replacement used today",
-          "completed": "A completed quest cannot be replaced",
-          "inProgress": "A quest in progress cannot be replaced",
-          "notActive": "This quest is not on your board",
-          "noAlternative": "No other quest is available in that zone today",
-          "unknown": "This quest cannot be replaced today"
+          "noCycle": "Dnes žádná nástěnka",
+          "usedToday": "Výměna dnes již použita",
+          "completed": "Dokončený úkol nelze vyměnit",
+          "inProgress": "Rozpracovaný úkol nelze vyměnit",
+          "notActive": "Tento úkol není na tvé nástěnce",
+          "noAlternative": "V této zóně dnes není dostupný žádný jiný úkol",
+          "unknown": "Tento úkol dnes nelze vyměnit"
         },
-        "confirmTitle": "Replace this world quest?",
-        "confirmBody": "You can replace only one world quest a day, and it cannot be undone. {quest} will be swapped for another quest in its zone.",
-        "confirmOk": "Replace",
-        "confirmCancel": "Cancel"
+        "confirmTitle": "Vyměnit tento světový úkol?",
+        "confirmBody": "Denně můžeš vyměnit jen jeden světový úkol a nelze to vzít zpět. {quest} bude vyměněn za jiný úkol ve své zóně.",
+        "confirmOk": "Vyměnit",
+        "confirmCancel": "Zrušit"
       },
       "legend": {
         "dungeon": "Žalář",
@@ -6258,8 +6258,8 @@ export const cs_CZ: EnTranslations = {
         "mail": "Mail",
         "passage": "Průchod"
       },
-      "collapseHint": "Collapse map sidebar",
-      "expandHint": "Expand map sidebar"
+      "collapseHint": "Sbalit boční panel mapy",
+      "expandHint": "Rozbalit boční panel mapy"
     },
     "arenaGate": {
       "minLevelNote": "Vyžaduje úroveň {level}"
@@ -6495,8 +6495,8 @@ export const cs_CZ: EnTranslations = {
       "listingStatusCancelled": "Zrušeno",
       "listingStatusSuspended": "Pozastaveno",
       "listingStatusUnsold": "Neprodáno",
-      "charselectWebLink": "Bid, buy, or sell on the $WOC Exchange website",
-      "charselectWebNote": "Enter the game with a character to bid, buy, or sell."
+      "charselectWebLink": "Nabízej, kupuj nebo prodávej na webu Burzy $WOC",
+      "charselectWebNote": "Abys mohl(a) nabízet, kupovat nebo prodávat, vstup do hry s postavou."
     },
     "lootExplorer": {
       "title": "Průzkumník kořisti",
@@ -6536,59 +6536,59 @@ export const cs_CZ: EnTranslations = {
       "resultCount": "Výsledky {count}"
     },
     "weekly": {
-      "title": "Weekly Quests",
-      "close": "Close weekly quests",
-      "subtitle": "Pick one of the four charges. It",
-      "resetsIn": "resets in {time}.",
-      "anyDifficulty": "Any difficulty",
-      "choose": "Choose quest",
-      "inProgress": "In progress ({count}/{required})",
-      "completed": "Completed this week",
-      "lockedThisWeek": "Locked this week",
-      "footerPick": "You may hold one weekly charge at a time. Pick a card to read its terms.",
-      "footerHeld": "Your charge for the week is set. The other three unlock at the reset.",
-      "dialogHeading": "Weekly quest: {category}",
-      "objectives": "Quest objectives",
-      "rewards": "Rewards",
-      "alsoReceive": "You will also receive:",
+      "title": "Týdenní úkoly",
+      "close": "Zavřít týdenní úkoly",
+      "subtitle": "Vyber jeden ze čtyř závazků. Ten",
+      "resetsIn": "obnoví se za {time}.",
+      "anyDifficulty": "Libovolná obtížnost",
+      "choose": "Vybrat úkol",
+      "inProgress": "Probíhá ({count}/{required})",
+      "completed": "Dokončeno tento týden",
+      "lockedThisWeek": "Tento týden uzamčeno",
+      "footerPick": "Najednou můžeš mít jen jeden týdenní závazek. Vyber kartu a přečti si její podmínky.",
+      "footerHeld": "Tvůj závazek na tento týden je nastaven. Zbylé tři se odemknou při resetu.",
+      "dialogHeading": "Týdenní úkol: {category}",
+      "objectives": "Cíle úkolu",
+      "rewards": "Odměny",
+      "alsoReceive": "Navíc obdržíš:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Opens into one Normal raid piece for your class (never a tier-set piece), plus {count} x {item}.",
-      "dialogNote": "Only one weekly charge can be active. It {reset}",
-      "accept": "Accept",
-      "decline": "Decline",
+      "cacheDesc": "Otevře jeden kus raidové výbavy v normální obtížnosti pro tvou třídu (nikdy sadový kus), plus {count}x {item}.",
+      "dialogNote": "Aktivní může být jen jeden týdenní závazek. Ten {reset}",
+      "accept": "Přijmout",
+      "decline": "Odmítnout",
       "kinds": {
         "dungeons": {
-          "category": "Dungeons",
-          "lore": "The depths of the realm never rest: the Derelict Mech stirs again and the Hollow Crypt wakes. Gather your allies and cleanse the dungeons of their corruption.",
-          "goal": "Complete {count} dungeons on any difficulty.",
-          "goalLabel": "Dungeons completed"
+          "category": "Dungeony",
+          "lore": "Hlubiny říše nikdy neodpočívají: Opuštěný mech se znovu hýbe a Dutá krypta se probouzí. Shromáždi spojence a očisti dungeony od jejich zkázy.",
+          "goal": "Dokonči {count} dungeonů v libovolné obtížnosti.",
+          "goalLabel": "Dokončené dungeony"
         },
         "raid": {
           "category": "Raid",
-          "lore": "Ancient powers wake in the Crucible of the Last Flame and on the heights of Thornpeak. Face Ignivar or Nythraxis and bring down the enemy commander.",
-          "goal": "Take part in {count} raid on any difficulty.",
-          "goalLabel": "Raids completed"
+          "lore": "Prastaré síly se probouzejí v Tavicím kelímku Posledního plamene a na výšinách Thornpeaku. Postav se Ignivarovi nebo Nythraxis a sraz nepřátelského velitele k zemi.",
+          "goal": "Zúčastni se {count} raidu v libovolné obtížnosti.",
+          "goalLabel": "Dokončené raidy"
         },
         "battlegrounds": {
-          "category": "Battlegrounds",
-          "lore": "War banners fly over Thornhollow Fields. Fight beside your faction, hold the flag and prove your worth in battle; every match counts, won or lost.",
-          "goal": "Complete {count} battlegrounds.",
-          "goalLabel": "Battlegrounds completed"
+          "category": "Bojiště",
+          "lore": "Nad Thornhollowskými poli vlají válečné korouhve. Bojuj po boku své frakce, drž vlajku a prokaž svou hodnotu v bitvě; počítá se každý zápas, vyhraný i prohraný.",
+          "goal": "Dokonči {count} bojišť.",
+          "goalLabel": "Dokončená bojiště"
         },
         "worldboss": {
-          "category": "World boss",
-          "lore": "Mighty foes roam the wild lands, each strong enough to defy whole armies. Join whoever is near and bring down one colossal aberration.",
-          "goal": "Defeat {count} world boss in the wild lands.",
-          "goalLabel": "World bosses defeated"
+          "category": "Světový boss",
+          "lore": "Divočinou se prohánějí mocní nepřátelé, každý dost silný, aby vzdoroval celým armádám. Přidej se ke komukoli poblíž a srazte společně jedno kolosální zrůdné stvoření.",
+          "goal": "Poraz {count} světového bosse v divočině.",
+          "goalLabel": "Poražení světoví bossové"
         }
       },
-      "commendHeading": "Emissary's commendation",
-      "commendNote": "{amount} standing to one faction of your choice, once a week.",
-      "commendClaimed": "This week's commendation went to the {faction}.",
-      "commendRewardLine": "{amount} standing with a faction of your choice",
-      "chosen": "Weekly quest taken: {category}",
+      "commendHeading": "Doporučení vyslance",
+      "commendNote": "{amount} postavení u frakce dle vlastního výběru, jednou týdně.",
+      "commendClaimed": "Doporučení tohoto týdne připadlo frakci {faction}.",
+      "commendRewardLine": "{amount} postavení u frakce dle vlastního výběru",
+      "chosen": "Přijat týdenní úkol: {category}",
       "progress": "{label}: {count}/{required}",
-      "done": "Weekly quest complete: {category}"
+      "done": "Týdenní úkol dokončen: {category}"
     }
   },
   "gatherEvent": {
@@ -6699,7 +6699,7 @@ export const cs_CZ: EnTranslations = {
       "unknown": "Cech s tímto názvem neexistuje."
     },
     "world_quests": {
-      "unknown_board": "No scoreboard by that name."
+      "unknown_board": "Tabule s tímto názvem neexistuje."
     },
     "steam": {
       "disabled": "Propojení účtu Steam není momentálně k dispozici.",
@@ -6803,65 +6803,65 @@ export const cs_CZ: EnTranslations = {
   "clues": {
     "items": {
       "clue_scroll": {
-        "desc": "A sealed riddle earned by finishing every zone slot of the day. Use it to begin a treasure hunt, and use it again on the hidden spot when the last clue says to dig."
+        "desc": "Zapečetěná hádanka, kterou získáš za dokončení všech zónových úkolů dne. Použij ji k zahájení pátrání po pokladu a znovu ji použij na skrytém místě, jakmile poslední indicie řekne, ať kopeš."
       },
       "treasure_casket": {
-        "desc": "A locked casket dug up at the end of a treasure hunt. Use it to open it and claim what the hunt buried."
+        "desc": "Zamčená truhla vykopaná na konci pátrání po pokladu. Použij ji k otevření a vyzvedni si to, co pátrání ukrylo."
       }
     },
     "hunt_drakelands_gate_ashes": {
-      "0": "The road out of Wyrmwatch runs west into a stand of old trees that guards the gate. Stand beneath the Gatewood and the trail begins.",
-      "1": "A far-dune watcher keeps to the eastern sands, north of the garrison. Find Scout Yerrin and ask what the wind carried in.",
-      "2": "The keeper of the garrison stores has not eaten since the last patrol. Bring Quartermaster Sela 2 x Cottage Loaf.",
-      "3": "East and a little south of where the cinders drift into dunes, a scorched patch of ground hides what the ash buried. Use the scroll there and dig.",
-      "title": "Ashes at the Gate"
+      "0": "Cesta z Wyrmwatche vede na západ do staré hájku, který střeží bránu. Postav se pod Gatewood a stezka začne.",
+      "1": "Hlídka vzdálených dun se drží východního písku, severně od posádky. Najdi Zvěda Yerrina a zeptej se, co přinesl vítr.",
+      "2": "Strážkyně posádkových zásob nejedla od poslední hlídky. Přines Intendantce Sele 2x Vesnický bochník.",
+      "3": "Na východ a trochu na jih od místa, kde popel přechází v duny, se skrývá spálený kus země s tím, co pohřbil popel. Použij tam svitek a kopej.",
+      "title": "Popel u brány"
     },
     "hunt_frostveil_aurora_vigil": {
-      "0": "Where the terraces climb toward the lights that dance at night, kneel on the Aurora Steps and let the sky notice you.",
-      "1": "The one who reads the lights waits close by the steps. Speak with Aurorist Veyla about what the sky spelled out.",
-      "2": "East of the howling terraces, a little to the south, the snow lies flatter than it should. Use the scroll there and dig.",
-      "title": "Lights over the Steps"
+      "0": "Tam, kde terasy stoupají ke světlům tančícím v noci, poklekni na Aurora Steps a nech oblohu, ať si tě všimne.",
+      "1": "Ta, co čte světla, čeká nedaleko schodů. Promluv s Auroristkou Veylou o tom, co obloha vzkázala.",
+      "2": "Východně od vyjících teras, kousek na jih, leží sníh plošší, než by měl. Použij tam svitek a kopej.",
+      "title": "Světla nad schody"
     },
     "hunt_amberfall_lantern_ferry": {
-      "0": "At the water's edge north of Lanternmere, the keeper of the lantern ferries knows which light went out. Speak with Ferrymaster Caddow.",
-      "1": "A single stone leans against the sky northeast of the great mere, older than the town. Stand at the Leaning Monolith.",
-      "2": "The keeper of the gilded rows waters her orchard by hand and thirsts for it. Bring Orchardist Pomeline 3 x Cold Well Water.",
-      "3": "Northeast of the rise where the cindermaples burn red, the leaves lie in a circle that no wind made. Use the scroll there and dig.",
-      "title": "Lanterns on the Mere"
+      "0": "Na břehu vody severně od Lanternmere ví strážce lucernových přívozů, které světlo zhaslo. Promluv s Převozním mistrem Caddowem.",
+      "1": "Osamělý kámen se opírá o nebe severovýchodně od velkého jezera, starší než město samotné. Postav se u Leaning Monolith.",
+      "2": "Strážkyně zlacených řad zalévá svůj sad vlastníma rukama a žízní po tom. Přines Sadařce Pomeline 3x Studenou studniční vodu.",
+      "3": "Severovýchodně od návrší, kde hoří škvárové javory rudou barvou, leží listí do kruhu, který nevytvořil žádný vítr. Použij tam svitek a kopej.",
+      "title": "Lucerny nad jezerem"
     },
     "hunt_willowfen_fenwitch_salt": {
-      "0": "The fen-witch of Willowweep will not talk to anyone who comes empty-handed. Bring Mother Sedge 1 x Cooking Salt.",
-      "1": "Where the fen goes flat and the air makes everyone drowsy, stand on the Drowsy Flats and sigh, as the witch told you.",
-      "2": "Southeast of the pools that shine in the bog, a hummock of dry ground stays dry all year. Use the scroll there and dig.",
-      "title": "The Fen-Witch's Salt"
+      "0": "Bažinná čarodějka z Willowweep nepromluví s nikým, kdo přijde s prázdnýma rukama. Přines Matce Sedge 1x Kuchyňskou sůl.",
+      "1": "Tam, kde se bažina zplošťuje a vzduch uspává každého, postav se na Drowsy Flats a povzdechni si, jak ti řekla čarodějka.",
+      "2": "Jihovýchodně od tůní, jež se lesknou v močálu, zůstává jeden pahorek suché země suchý po celý rok. Použij tam svitek a kopej.",
+      "title": "Sůl bažinné čarodějky"
     },
     "hunt_nightbloom_sleepless_vigil": {
-      "0": "Northeast of Moonrest, where the stones keep a watch that never ends, stand at the Standing Vigil.",
-      "1": "The watcher at the vigil counts stars the way others count coins. Speak with Astronomer Cassian about the one that fell.",
-      "2": "North of the town lies a barrow whose sleeper never rests. Salute the Sleepless Barrow so the sleeper knows a friend has come.",
-      "3": "Southeast of the field where the gloam gathers, the moonlight pools on one bare patch of soil. Use the scroll there and dig.",
-      "title": "Vigil of the Sleepless"
+      "0": "Severovýchodně od Moonrestu, kde kameny drží hlídku, jež nikdy nekončí, postav se u Standing Vigil.",
+      "1": "Hlídač u vigilie počítá hvězdy tak, jako jiní počítají mince. Promluv s Astronomem Cassianem o té, co spadla.",
+      "2": "Severně od města leží mohyla, jejíž spáč nikdy neodpočívá. Pozdrav Sleepless Barrow, ať spáč pozná, že přišel přítel.",
+      "3": "Jihovýchodně od pole, kde se stahuje soumrak, se měsíční svit sbírá na jednom holém kusu půdy. Použij tam svitek a kopej.",
+      "title": "Vigilie beze spánku"
     },
     "hunt_wraithwood_mournstone_candles": {
-      "0": "The candlewright of Gibbetmere sells light to people who fear the dark. Speak with Widow Tansy about a candle that was never paid for.",
-      "1": "The last vicar of the Mournstone has been fasting on prayers alone. Bring Vicar Creel 2 x Salted Jerky.",
-      "2": "Northeast of the town, past the crows, a glade hangs its own strange fruit. Stand in the Hanging Glade.",
-      "3": "Southeast of the clearing where the huntsman set his snares, the leaf litter has been turned over recently. Use the scroll there and dig.",
-      "title": "Candles for the Mournstone"
+      "0": "Svícnař z Gibbetmere prodává světlo lidem, kteří se bojí tmy. Promluv s Vdovou Tansy o svíci, za kterou nikdy nikdo nezaplatil.",
+      "1": "Poslední vikář Mournstonu se postí jen na modlitbách. Přines Vikáři Creelovi 2x Solené sušené maso.",
+      "2": "Severovýchodně od města, za havrany, visí paseka svým vlastním podivným ovocem. Postav se do Hanging Glade.",
+      "3": "Jihovýchodně od mýtiny, kde lovčí kladl své nástrahy, byl listový spad nedávno obrácen naruby. Použij tam svitek a kopej.",
+      "title": "Svíce pro Mournstone"
     },
     "hunt_palmreach_sunken_idol": {
-      "0": "Deep in the tangle, northwest of the lagoon, the vines pour down like a waterfall. Stand at the Vinefall.",
-      "1": "A hermit who went into the tangle and came back out lives close to the falling vines. Speak with Okrim about what he saw down there.",
-      "2": "To the east, an idol sits half-drowned and still watching. Cower before the Sunken Idol, the way the hermit said the divers do.",
-      "3": "Northeast of where the tangle opens its mouth to the sea, the sand has been heaped higher than the tide reaches. Use the scroll there and dig.",
-      "title": "The Idol's Secret"
+      "0": "Hluboko v houští, severozápadně od laguny, se liány řítí dolů jako vodopád. Postav se u Vinefall.",
+      "1": "Poblíž padajících lián žije poustevník, který vstoupil do houští a vrátil se zpátky. Promluv s Okrimem o tom, co tam dole viděl.",
+      "2": "Na východ sedí napůl potopená modla a stále sleduje okolí. Skloň se před Sunken Idol, tak, jak podle poustevníka dělají potápěči.",
+      "3": "Severovýchodně od místa, kde houští otevírá svá ústa k moři, je písek navršen výš, než kam dosahuje příliv. Použij tam svitek a kopej.",
+      "title": "Tajemství modly"
     },
     "hunt_evergarden_beacon_road": {
-      "0": "The parterre gardener along the walk north of Hedgewick swears her beds are starving. Bring Farmer Verbena 2 x Compost.",
-      "1": "In the far southeast corner of the garden, an old mill still turns for no miller. Stand at the Old Mill.",
-      "2": "Follow the road south over the border into the Galecrest and out to the coast. The keeper of the old beacon, Keeper Bram, has the last word.",
-      "3": "Northwest of the old beacon, just off the path down from the light, the turf has been cut and laid back. Use the scroll there and dig.",
-      "title": "Beacon and Bloom"
+      "0": "Zahradnice parteru podél cesty severně od Hedgewicku přísahá, že její záhony hladoví. Přines Farmářce Verbeně 2x Kompost.",
+      "1": "V nejjižnějším a nejvýchodnějším koutě zahrady se stále točí starý mlýn, ačkoli nemá mlynáře. Postav se u Old Mill.",
+      "2": "Sleduj cestu na jih přes hranici do Vichrného hřebene a dál k pobřeží. Strážce starého majáku, Strážce Bram, má poslední slovo.",
+      "3": "Severozápadně od starého majáku, kousek od cesty vedoucí od světla dolů, byl drn odříznut a znovu položen zpátky. Použij tam svitek a kopej.",
+      "title": "Maják a květ"
     }
   },
   "guide": {
@@ -6886,7 +6886,7 @@ export const cs_CZ: EnTranslations = {
       "progression": "Levelování a postup",
       "world": "Svět",
       "quests": "Úkoly",
-      "factions": "Factions & Standing",
+      "factions": "Frakce a postavení",
       "dungeons": "Dungeony a raidy",
       "delves": "Výpravy",
       "rifts": "Trhliny",
@@ -6901,7 +6901,7 @@ export const cs_CZ: EnTranslations = {
       "talents": "Talenty",
       "arena": "Aréna a PvP",
       "thornhollow": "Thornhollowská pole",
-      "worldPvp": "World PvP",
+      "worldPvp": "Světové PvP",
       "deeds": "Kniha skutků",
       "reliquary": "Relikviář",
       "glossary": "Glosář",
@@ -7198,7 +7198,7 @@ export const cs_CZ: EnTranslations = {
       "rowBrightness": "Expozice scény, tmavší nebo světlejší. Čistě podle chuti.",
       "rowWeather": "Ambientní déšť a sníh. Jen atmosféra, vypnutí při bouřích trochu ušetří.",
       "rowBrowserEffects": "Jak efektní smí být samotné rozhraní: skleněné rozmazání, záře, animovaná menu. Auto odpovídá prohlížeči; 3D svět zůstává beze změny.",
-      "rowFrameRateCap": "A ceiling on how many images the game draws each second. A computer that cannot keep up with its display lands on an uneven rhythm; a steady 30 looks smoother than that, halves the work, and keeps the computer cooler. Display means no limit.",
+      "rowFrameRateCap": "Strop na to, kolik snímků hra vykreslí za sekundu. Počítač, který nestíhá tempu svého displeje, sklouzne k nerovnoměrnému rytmu; stálých 30 vypadá plynuleji než to, práci to sníží na polovinu a udrží počítač chladnější. Displej znamená bez omezení.",
       "rowTerrainDetail": "Bohaté, míchané textury země oproti jednoduššímu a rychlejšímu terénu.",
       "rowFoliageDensity": "Jak daleko a jak hustě roste tráva kolem postavy.",
       "rowEffectsQuality": "Bloom, ambientní okluze a kolik pochodní a kouzel vrhá skutečné světlo. Největší jednotlivá úspora mezi detailními regulátory a spínač, na kterém ostatní regulátory osvětlení závisí.",
@@ -7262,9 +7262,9 @@ export const cs_CZ: EnTranslations = {
       "ifPartyShowAuras": "Zda se na rámech skupiny zobrazují buffy a debuffy. Odpovídající přepínače pokrývají lišty zdrojů, absorpce, mazlíčky a to, jestli se objevíš ve vlastním seznamu skupiny.",
       "ifAurasOnPlayerFrame": "Přidá tvé buffy a debuffy i na rám hráče, nejen na lištu aur.",
       "ifAuraBarBelowFrame": "Přesune řadu buffů pod rám jednotky místo nad něj. Má význam jen tehdy, když jsou buffy na rámu hráče.",
-      "ifTargetAurasBelowFrame": "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
+      "ifTargetAurasBelowFrame": "Pověsí pruh buffů a debuffů cílového rámu pod rám místo nad něj, klasické rozvržení. Ve výchozím stavu vypnuto, protože běžný cílový rám sedí přímo nad akční lištou; zapni to, až rám přesuneš někam, kde je pod ním místo.",
       "ifAlwaysShowAllBuffs": "Zobrazuje všechna aktivní posílení i při nízkém nastavení grafiky a obchází obvyklý limit ikon posílení.",
-      "ifShowAuraCaster": "Adds a \"Cast by\" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins' Blessings.",
+      "ifShowAuraCaster": "Přidá do každého tooltipu buffu/debuffu řádek \"Seslal(a)\", který jmenuje, kdo ho přivolal. Užitečné pro rozlišení více sesilatelů stejného buffu, například Požehnání od dvou paladinů.",
       "ifTargetOfTarget": "Zobrazí, na koho míří tvůj cíl, klasický způsob, jak poznat, jestli ho tank ještě drží.",
       "ifPetFrame": "Zobrazí rám pro tvého mazlíčka.",
       "ifChatFontScale": "Velikost textu chatu.",
@@ -7315,7 +7315,7 @@ export const cs_CZ: EnTranslations = {
       "allyRezBody": "Nemusíš se vždycky vracet pěšky. Spojenec s vzkřisujícím kouzlem tě může místo toho vzkřísit, a přijde to k tobě jako výzva, kterou přijmeš nebo odmítneš; necháš-li ji ležet, vyprší, tak na ni odpověz, dokud tam je. Přijmi a povstaneš vedle přítele, který tě vzkřísil, s částí zdraví a many zpět. Někteří léčitelé dokážou nabídnout vzkříšení celé padlé skupině najednou, ačkoli každý z vás pak odpovídá na vlastní výzvu. Thornhollowská pole jsou výjimkou: tam k tobě žádné vzkřisující kouzlo nedosáhne a čekáš na další vlnu svého týmu.",
       "unstuckTitle": "Když jsi opravdu zaseknutý(á)",
       "unstuckBody": "Pokud tě svět někam uvězní a nemůžeš se odtamtud dostat, napiš /unstuck. Musíš být mimo boj a stát na místě, nesmíš být držen omráčením ani zakořeněním a nesmíš být v duelu ani v zápase arény: proběhne krátké odpočítávání a pohyb nebo utrpěné zranění ho zruší. Po jeho konci tě to postaví na nejbližší hřbitov. Nikdy tě to nezabije a nezanechá to žádné tělo, a pokud jsi už předtím padl(a), místo toho tě to tam oživí. Cena je Nemoc z vyproštění, dočasné oslabení všeho, čím jsi, které odezní dřív, než bys mohl(a) příkaz použít znovu, a stejně jako Strážcovo mýto se úplně vyhýbá zbrusu novým postavám.",
-      "unstuckBodyWindow": "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The first use in an hour costs you nothing. Use it again within an hour of the last and the price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
+      "unstuckBodyWindow": "Pokud tě svět někam uvězní a nemůžeš se odtamtud dostat, napiš /unstuck. Musíš být mimo boj a stát na místě, nesmíš být držen omráčením ani zakořeněním a nesmíš být v duelu ani v zápase arény: proběhne krátké odpočítávání a pohyb nebo utrpěné zranění ho zruší. Po jeho konci tě to postaví na nejbližší hřbitov. Nikdy tě to nezabije a nezanechá to žádné tělo, a pokud jsi už předtím padl(a), místo toho tě to tam oživí. První použití za hodinu tě nic nestojí. Použiješ-li ho znovu do hodiny od posledního použití, cena je Nemoc z vyproštění, dočasné oslabení všeho, čím jsi, které odezní dřív, než bys mohl(a) příkaz použít znovu, a stejně jako Strážcovo mýtné se úplně vyhýbá zbrusu novým postavám.",
       "climbTitle": "Jak se vytáhnout na okraj",
       "climbBody": "Římsy nejsou zdi. Skoč na něco příliš vysokého na to, aby ses na to jen tak vyšplhal, a tvá postava se blízko vrcholu skoku zachytí okraje a vytáhne se nahoru, aniž bys pro to musel mačkat vlastní klávesu. Cokoli dost nízkého na to, abys to překonal sám, proběhne bez cavyků; celé vytažení je vyhrazeno pro okraje nad hlavou tvé postavy. Je krátké a po dobu, kdy probíhá, přebírá otěže, takže ho v půlce nemůžeš vyrušit. Omráčení tě zastihne uprostřed vytahování a ty pustíš a spadneš, měřeno od místa, kde skok opustil zem, a omráčení nebo zakořenění zabrání vytažení vůbec začít, což stojí za zapamatování, když se snažíš dostat ze špatného místa v boji."
     },
@@ -7341,7 +7341,7 @@ export const cs_CZ: EnTranslations = {
       "framesMoveBodyEditFrames": "Rámeček tvé postavy, rámeček cíle i rámečky skupiny lze přesouvat. Každý má v rohu malé tlačítko přesunu: odemkni ho, přetáhni rámeček na požadované místo a znovu ho zamkni, aby ho náhodný klik neposunul. Upravit rámečky nahoře v kartě Rámečky možností Rozhraní uvolní najednou zbytek rozhraní a s ním tyto tři rámečky: akční lišty, lištu sesílání, lištu švihů, lištu zkušeností, minimapu, lištu tlačítek, rámeček mazlíčka, lištu postoje, řádky posílení a záporných účinků a štítek Připomínka přání. Když skončí někde, kde je nechceš, Obnovit výchozí nastavení dole ve stejné kartě Rámečky je všechny vrátí na původní místa.",
       "framesGovernedExtra": "Upravit rámečky uvolní také zásobník trackerů pod nimi, tedy sledované úkoly a jejich cíle, postup skutků, stránky Reliquiáře, recepty, které sis připnul(a) z řemesel, delve, ve kterém jsi, rift, jehož se účastníš, a sledovaný recept či zakázku, dále akční lištu mazlíčka vedle jeho rámečku, rámeček teček cíle pro tvé záporné účinky na blízkých nepřátelích, paladinův medailon Oddanosti, čarodějův Panel trápení, překryv procs kouzel, časovač švihu vedlejší ruky pro bojovníky se dvěma zbraněmi a záložkové okno měřiče poškození. Každý při uvolnění nosí vlastní štítek se jménem.",
       "framesGovernedAuraTracks": "Upravit rámečky po zapnutí v kartě Boj stejných možností Rozhraní uvolní také šest volitelných stop aur: stopu Mých posílení, stopu Obranných obnov, stopu Mých štítů, stopu Útočných obnov, stopu Pohybu a utajení a stopu Mých posílení na spojencích. Každá stopa je ve výchozím stavu vypnutá a po uvolnění nosí vlastní štítek se jménem.",
-      "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
+      "frameGroups": "{trackers} umí sloučit úkoly, skutky, trhliny, výpravy, sběračské cíle a sledování Relikviáře. {auras} umí sloučit tečky na cíli a šest stop aur. Kteroukoli skupinu zapneš v Nastavení rámů, nebo ji necháš vypnutou, abys mohl(a) přesouvat každý rám zvlášť. {tot} obsahuje i lištu zdroje. {focus} má tři nezávisle přesouvatelné cíle: Shift+F1 až Shift+F3 je přiřadí, Ctrl+F1 až Ctrl+F3 je vybere. Přetažením měřiče poškození nebo hrozby kamkoli mimo jeho tlačítka ho přesuneš, a tažením za jeho okraje ho zvětšíš nebo zmenšíš, i když jsou rámy zamčené. Dokud jsou rámy odemčené, má Zobrazit nebo skrýt rámy vlastní seskupenou nabídku. Klikni pravým tlačítkem na odemčený rám pro Resetovat velikost nebo Možnosti rámu. Rozhraní > Rámy obsahuje i Nastavení rámů a rozbalitelné Možnosti rámů skupiny. Uzamknout Cíl cíle k Cíli udrží tyto rámy pohromadě. Vypni to, abys mohl(a) přesunout Cíl cíle zvlášť; opětovné zapnutí zachová tu oddělenou pozici na později. Přiřazené rámy zaměření skrývají své ovládací prvky nastavení; klikni pravým tlačítkem a zvol Zrušit zaměření, abys je obnovil(a). Najetí myší pro sesílání funguje i na rámech zaměření.",
       "framesGovernedTalkingHead": "Edit Frames také uvolní panel Dialogue, který nese mluvený řádek NPC, když je NPC mimo váš dohled; nosí svůj jmenný čip, zatímco je uvolněný.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Lišty, časovače a bojový text",
@@ -7455,7 +7455,7 @@ export const cs_CZ: EnTranslations = {
       "session": "Co jsi udělal(a) od přihlášení: zabití, smrti, poškození a zkušenosti.",
       "arena": "Tvé postavení v Popelavém koloseu v obou bracketech: hodnocení, výhry, prohry a poměr výher pro 1v1 a pro 2v2.",
       "pvp": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.",
-      "pvpZones": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other on contested ground, sanctuaries allow no world fighting at all, and the free-for-all zones allow it with or without a flag; switching off takes 5 minutes.",
+      "pvpZones": "PvP vlajka ve světě: /pvp ji přepne, /pvp on a /pvp off ji nastaví. Označení hráči proti sobě mohou bojovat na sporném území, svatyně nedovolují žádný světový boj vůbec a zóny volno pro všechny ho dovolují s vlajkou i bez ní; vypnutí trvá 5 minut.",
       "listings": "Tvé vlastní nabídky na Světovém trhu, s požadovanou cenou, časem, který každé zbývá, a kolik místa máš na další.",
       "buyback": "Co jsi nedávno prodal(a) obchodníkovi a co ještě můžeš koupit zpět.",
       "groupState": "Jak na tom právě jsi",
@@ -7493,7 +7493,7 @@ export const cs_CZ: EnTranslations = {
       "dungeonReset": "Opustí tvé vlastní prázdné instance, což uděláš po změně obtížnosti.",
       "groupRecovery": "Zotavení a stav",
       "unstuck": "Cesta ven, když tě svět uvězní. Vydrž stát nehybně po krátké odpočítávání a přemístí tě to na nejbližší hřbitov, a oživí tě tam, pokud jsi už padl(a). Poté tě na chvíli oslabí Nemoc z vyproštění, takže je to poslední záchrana, ne zkratka.",
-      "unstuckWindow": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you weakened by Unstuck Sickness for a while afterwards, so it is a rescue rather than a shortcut.",
+      "unstuckWindow": "Cesta ven, když tě svět uvězní. Vydrž stát nehybně po krátké odpočítávání a přemístí tě to na nejbližší hřbitov, a oživí tě tam, pokud jsi už padl(a). První použití za hodinu je zdarma. Použiješ-li ho znovu do hodiny od posledního použití, na chvíli tě to oslabí Nemocí z vyproštění, takže je to poslední záchrana, ne zkratka.",
       "afk": "Označí tě jako nepřítomného (Pryč), s volitelnou zprávou, kterou dostane jako automatickou odpověď každý, kdo ti pošle šepot. Zopakuj příkaz bez zprávy a stav zrušíš; zruší ho i jakýkoli jiný chat.",
       "dnd": "Nerušit: podobné jako nepřítomnost, jenže šepoty poslané tobě se zadrží místo doručení.",
       "sit": "Sedni si tam, kde stojíš, a zase vstaň. Automaticky vstaneš v okamžiku, kdy se pohneš, sesíláš, nebo dostaneš zásah.",
@@ -7600,7 +7600,7 @@ export const cs_CZ: EnTranslations = {
       "fatigueDef": "Zaplavat si dost daleko na otevřené moře a voda tě začne vysávat: nejdřív přijde varování, pak rostoucí poškození, dokud se nevrátíš zpátky k pevnině.",
       "unstuckTerm": "Nemoc z vyproštění",
       "unstuckDef": "Cena za použití Vyproštění z herního menu. Vydrž stát nehybně po celé odpočítávání, a přemístí tě to na nejbližší hřbitov, kde si pak na čas poneseš dočasné oslabení.",
-      "unstuckDefWindow": "The price of leaning on Unstuck from the game menu more than once in an hour. Stand still through the countdown and it sets you down at the nearest graveyard. The first use in an hour is free, and a repeat within an hour of the last also leaves you carrying a temporary weakness for a while afterwards.",
+      "unstuckDefWindow": "Cena za to, že z herního menu použiješ Vyproštění víckrát než jednou za hodinu. Vydrž stát nehybně po celé odpočítávání, a přemístí tě to na nejbližší hřbitov. První použití za hodinu je zdarma, a opakované použití do hodiny od posledního na tobě navíc na chvíli zanechá dočasné oslabení.",
       "itemLevelTerm": "Úroveň předmětu",
       "itemLevelDef": "Jedno číslo shrnující, jak silný je daný kus výbavy, šikovné, když chceš rychle porovnat dva kusy. V možnostech zapni Zobrazit úroveň předmětu, abys ho viděl v popiscích. Nese ho jen výbava se známým původem, takže prosté základy od obchodníků a startovní výbava neukazují nic, a chybějící číslo je normální, ne chyba.",
       "requiredLevelTerm": "Požadovaná úroveň",
@@ -8057,14 +8057,14 @@ export const cs_CZ: EnTranslations = {
       "sideWardenBody": "Vedle příběhu rozdávají maršálové a strážci údolí i močálu stálý žebřík odměn. Propracuj se jím, protivník po protivníkovi, jako každý lovec odměn před tebou. Je to poctivé levelování a prohlídka nejhorších potížistů každé zóny.",
       "sideCryptTitle": "Zapomenutý král",
       "sideCryptBody": "Vysoko ve štítech běží tišší záhada: staré hroby označené korunou, kterou si žádný záznam nepamatuje. Čti mrtvé, sesbírej, co střežili, a odpečeť hrobku, která měla zůstat zavřená. Je to detektivní stopa otevírající cestu k desetičlennému endgame raidu světa.",
-      "cluesTitle": "Clue Scrolls",
-      "cluesBody": "Out in the far zones, the daily world-quest board hides one more reward for anyone who clears the whole slate: a Clue Scroll, and the treasure hunt written on it.",
-      "cluesEarnTitle": "Earning a scroll",
-      "cluesEarnBody": "Once your character is far enough along, completing every zone slot on the day's world-quest board hands you a Clue Scroll on top of the usual rewards. A rerolled slot counts once it is done; the always-open dailies are not required. You can hold a few scrolls at a time, so there is no need to spend one the day you earn it.",
-      "cluesHuntTitle": "Following the clues",
-      "cluesHuntBody": "Using a scroll starts a hunt: a short chain of riddles that shows in your quest tracker one step at a time. Each riddle points at something real in the world, a landmark to stand at, a person to talk to, an emote to perform somewhere, or a small errand to run, and the last one always asks you to dig. Only one hunt runs at a time, and it keeps your place across the daily reset and between sessions, so take your time.",
-      "cluesCasketTitle": "The casket",
-      "cluesCasketBody": "Solve the last clue and use the scroll on the spot it names to dig up a Treasure Casket; finishing the hunt also earns standing with the faction whose land hid it. Open the casket for coin and a stack of fine gathering materials. Now and then it holds a piece of gear or a few Heroic Marks, and very rarely Grumbol the Lanternback, a mount found nowhere else. Your first casket and your tenth are recorded in the Book of Deeds.",
+      "cluesTitle": "Hádankové svitky",
+      "cluesBody": "Ve vzdálených zónách skrývá denní tabule světových úkolů ještě jednu odměnu pro každého, kdo vyčistí celý seznam: Hádankový svitek a pátrání po pokladu, které je na něm napsané.",
+      "cluesEarnTitle": "Jak získat svitek",
+      "cluesEarnBody": "Jakmile je tvá postava dost daleko, dokončení každého zónového slotu na denní tabuli světových úkolů ti navrch k obvyklým odměnám přidá Hádankový svitek. Přehozený slot se počítá, jakmile je hotový; stále otevřené denní úkoly nejsou potřeba. Můžeš najednou držet pár svitků, takže není nutné jeden utratit v den, kdy ho získáš.",
+      "cluesHuntTitle": "Sledování indicií",
+      "cluesHuntBody": "Použití svitku zahájí pátrání: krátký řetězec hádanek, který se ve tvém sledovači úkolů zobrazuje jedna po druhé. Každá hádanka ukazuje na něco skutečného ve světě: orientační bod, u kterého se máš postavit, osobu, se kterou máš promluvit, gesto, které máš někde předvést, nebo malou pochůzku, kterou máš vyřídit, a ta poslední tě vždy požádá, abys kopal(a). Běží jen jedno pátrání najednou a drží si tvé místo přes denní reset i mezi herními sezeními, takže si dej na čas.",
+      "cluesCasketTitle": "Truhla",
+      "cluesCasketBody": "Vyřeš poslední indicii a použij svitek na místě, které určuje, a vykopeš Truhlu s pokladem; dokončení pátrání také získá postavení u frakce, jejíž území ho ukrývalo. Otevři truhlu pro mince a hromádku jemných sběračských surovin. Čas od času obsahuje kus výbavy nebo pár Hrdinských značek, a velmi vzácně Grumbola Lampáře, jezdecké zvíře, které nenajdeš nikde jinde. Tvá první truhla a tvá desátá jsou zaznamenány v Knize skutků.",
       "sideTempleTitle": "Utopený chrám",
       "sideTempleBody": "Brána bledého světla na vysokém plese ve štítech vede do potopené svatyně, kde utopený kult stále zpívá. Její krátký řetězec stojí stranou hlavního příběhu, samostatná záhada pro každého, kdo vystoupá na břeh, přečte varování vyrytá do skal a sestoupí zjistit, k čemu byla.",
       "availableTitle": "Proč pro tebe NPC nemá nic",
@@ -8217,29 +8217,29 @@ export const cs_CZ: EnTranslations = {
       "warfareBodyStatsStay": "Každý kus Válečnictví nese útočné a obranné hodnocení Válečnictví a tato dvě hodnocení proti nestvůrám nedělají vůbec nic. Platí jen při boji s jiným hráčem, v souboji, aréně nebo na bojišti, kde útok přidává k tvému způsobenému poškození a obrana snižuje poškození, které utržíš, vždy až ke své vlastní hranici. Každá rodina zbroje je také sada a její bonusy jsou rovněž hodnocení Válečnictví nebo účinky fungující jen proti hráčům, takže bonusy celé čestné výbavy se proti bossovi dungeonu nepočítají. Samotné kusy stále nesou běžné statistiky, zbroj a poškození zbraně a ty fungují všude; proti nestvůře mlčí jen hodnocení Válečnictví a bonusy sady.",
       "warfareTradeBody": "To je záměrný kompromis. Válečnická výbava je stavěná na boj proti hráčům, ne jako zkratka kolem dungeonových stupňů: válečnický kus nikdy nenese bojová hodnocení, jaká má epický dungeonový kus na stejném slotu, a všechno, co přináší, je určeno proti ostatním hráčům. Pokud chceš obstát v aréně, kup si ji. Pokud chceš rychleji čistit hrdinské dungeony, vydobuď si výbavu v dungeonech.",
       "warfareTradeBodyRatingSpent": "To je záměrný obchod. Válečnická výbava je stavěná na boj s hráči, ne jako zkratka přes dungeonové stupně: kus Válečnictví nikdy nenese bojová hodnocení, která má epický dungeonový kus ve stejném slotu, a hodnocení Válečnictví i bonusy sady, které nese místo nich, se utrácejí výhradně proti hráčům. Chceš-li obstát v aréně, kup si ji. Chceš-li rychleji čistit hrdinské dungeony, získávej výbavu v dungeonech.",
-      "vanguardHeading": "Vanguard gear: Warfare Season 2",
-      "vanguardBody": "Vanguard gear is the second season of Warfare gear, sold by the same two quartermasters above the original tier, which stays on sale. Every spec has its own Vanguard set of five pieces, for the head, shoulders, chest, legs and hands, and the shop lists only the three sets your class can wear, followed by the Vanguard weapons you can wield. A Vanguard piece carries the same Warfare ratings as the original tier at a higher item level, and each set has two bonuses, at two and four pieces, that change one of your spec's abilities. Unlike the original sets, those bonuses work everywhere, monsters included, but they are built for fighting players, so a raid set stays the better choice inside a raid."
+      "vanguardHeading": "Výbava Předvoje: Válečnictví, sezóna 2",
+      "vanguardBody": "Výbava Předvoje je druhá sezóna válečnické výbavy, prodávaná stejnými dvěma intendanty nad původním stupněm, který zůstává v prodeji. Každá specializace má vlastní sadu Předvoje o pěti kusech, na hlavu, ramena, hruď, nohy a ruce, a obchod nabízí jen tři sady, které tvoje třída může nosit, následované zbraněmi Předvoje, které umíš vládnout. Kus Předvoje nese stejná Válečnická hodnocení jako původní stupeň, jen na vyšší úrovni předmětu, a každá sada má dva bonusy, na dvou a čtyřech kusech, které mění jednu ze schopností tvé specializace. Na rozdíl od původních sad tyto bonusy fungují všude, nestvůry nevyjímaje, ale jsou stavěné na boj proti hráčům, takže raidová sada zůstává lepší volbou uvnitř raidu."
     },
     "worldPvpPage": {
-      "heading": "World PvP",
+      "heading": "Světové PvP",
       "intro": "Open-world player-versus-player is opt-in. Raise your PvP flag and every other flagged player who is not in your party, raid or guild becomes an enemy anywhere in the open world; lower it and, after a short delay, you are a bystander again. Nobody who has not raised the flag can attack or be attacked.",
-      "flagHeading": "Raising and lowering the flag",
+      "flagHeading": "Zvednutí a stažení vlajky",
       "flagBody": "Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing a flagged player who is in a fight raises your own flag.",
-      "stakesHeading": "What a kill is worth",
+      "stakesHeading": "Co vyplácí zabití",
       "stakesBody": "When flagged players defeat a flagged player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
-      "limitsHeading": "Fair play rules",
+      "limitsHeading": "Pravidla fair play",
       "limitsBody": "Defeating the same player again and again pays less each time and soon nothing, and the counter resets with the daily reset. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
-      "introZones": "Open-world player-versus-player is opt-in, and the ground you are standing on decides what that means. Raise your PvP flag and every other flagged player who is not in your party or raid becomes an enemy on contested ground; lower it and, after a short delay, you are a bystander again. Two zones are sanctuaries where no world fighting happens at all, and the three northernmost zones are free-for-all ground where everyone present is fair game, flag or no flag. Party and raid mates are never enemies of yours anywhere; guildmates outside your group are fair game like anyone else.",
-      "zonesHeading": "Where world PvP happens",
-      "zonesBody": "The world has three kinds of ground. The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP happens there at all, flagged or not, so a new character can never be fought before they know what the flag is. Most of the world is contested, where the flag rule above is the whole story. The Drakelands, the Frostveil Reach and the Amberfall, the three northernmost zones, are free-for-all ground: everyone standing in them can attack everyone else standing in them, with or without a flag, and you are told as you cross in and again as you leave. Attacking a player who is not flagged there raises your own flag, so an aggressor always ends up carrying the risk. Hitting a player who is already flagged never raises it, which means defending yourself, or defending somebody who is not flagged, costs you nothing.",
-      "flagBodyAid": "Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing, shielding or buffing a flagged player who is in a fight raises your own flag as well, so nobody sustains a fighter from behind a flag they do not wear; aiding a player who is not flagged raises nothing.",
-      "stakesUnflaggedTake": "Nor does an unflagged fighter take any: gold only changes hands between two flagged players, though everyone who helped still earns the Honor.",
-      "stakesBodyFlagged": "When a flagged player is defeated by another player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. A player who was not flagged pays no gold at all, even when they fall in a free-for-all zone. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
-      "hillHeading": "King of the Hill",
+      "introZones": "Boj hráč proti hráči v otevřeném světě je dobrovolný, a to, na jaké zemi zrovna stojíš, rozhoduje, co to znamená. Zvedni svou PvP vlajku a každý jiný označený hráč, který není v tvé skupině ani výpravě, se na sporném území stane nepřítelem; stáhni ji a po krátkém zpoždění jsi zase jen přihlížející. Dvě zóny jsou svatyně, kde se vůbec neodehrává žádný světový boj, a tři nejsevernější zóny jsou území volno pro všechny, kde je každý přítomný férovým cílem, ať má vlajku, nebo ne. Spoluhráči ze skupiny a výpravy nejsou nikdy nikde tvými nepřáteli; spoluhráči z gildy mimo tvou skupinu jsou férovým cílem jako kdokoli jiný.",
+      "zonesHeading": "Kde se odehrává světové PvP",
+      "zonesBody": "Svět má tři druhy území. Zkušební pobřeží a Eastbrookské údolí jsou svatyně: neodehrává se tam vůbec žádné světové PvP, s vlajkou ani bez ní, takže nová postava nikdy nemůže být napadena dřív, než pozná, co vlajka znamená. Většina světa je sporné území, kde výše popsané pravidlo vlajky je celý příběh. Dračí země, Kraj Mrazivého závoje a Jantarový pád, tři nejsevernější zóny, jsou území volno pro všechny: každý, kdo v nich stojí, může zaútočit na kohokoli jiného, kdo v nich stojí, s vlajkou i bez ní, a je ti to řečeno, jakmile do nich vstoupíš, a znovu, když je opustíš. Útok na hráče, který tam není označen, zvedne tvou vlastní vlajku, takže útočník vždy nakonec nese riziko. Zásah hráče, který je už označen, ji nikdy nezvedne, což znamená, že bránit sebe sama, nebo bránit někoho, kdo není označen, tě nic nestojí.",
+      "flagBodyAid": "Napiš do chatu /pvp, nebo otevři okno PvP na G a použij záložku Světové PvP, která ukazuje i tvou bilanci a co je v sázce. Zvednutí vlajky je okamžité, jakmile jsi za počátečními úrovněmi. Stažení spustí odpočet několika minut a vlajka nespadne, dokud ještě bojuješ, takže vypnutí nikdy není únik z boje, který jsi sám(a) začal(a). Léčení, štítování nebo posilování označeného hráče, který je v boji, zvedne i tvou vlastní vlajku, takže nikdo neudržuje bojovníka naživu zpoza vlajky, kterou sám nenosí; pomoc hráči, který není označen, nezvedne nic.",
+      "stakesUnflaggedTake": "Ani neoznačený bojovník nedostane nic: zlato mění majitele jen mezi dvěma označenými hráči, i když Čest si stále vydělá každý, kdo pomohl.",
+      "stakesBodyFlagged": "Když je označený hráč poražen jiným hráčem, poražený zaplatí malý podíl zlata ze svého měšce, zastropovaný na skromnou částku, a vítězové získají Čest k výbavě Válečnictví. Hráč, který nebyl označen, neplatí žádné zlato, ani když padne v zóně volno pro všechny. O obojí se dělí každý, kdo pomohl: zásah, který zabil, každý, kdo cíl krátce předtím poškodil, a léčitelé, kteří ty bojovníky drželi na nohou. Čistý souboj jednoho na jednoho vyplatí celý balík; skupina si ho rozdělí.",
+      "hillHeading": "Král kopce",
       "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
-      "hillBodyRamp": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
-      "limitsBodyRaids": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor. Raids earn nothing from world kills: a raid member takes no Honor or gold and does not shrink anyone else's share, so fight as a party to be paid."
+      "hillBodyRamp": "Jednou za tři hodiny, v okamžiku, který nikdo nedokáže předvídat, se celé říši oznámí, že za patnáct minut vyroste kopec v jedné ze zón volno pro všechny, a kruh, kde bude stát, je vyznačen na volné zemi. Když vyroste, stojí čtyřicet pět minut, pak padne. O kopec soupeří skupina s nejvíce hráči uvnitř, a po minutě nepřerušené většiny kopec připadne jí; osamělý hráč se počítá jako skupina o jednom, ale členové výpravy se nepočítají vůbec. Dokud skupina drží kopec, každý její člen uvnitř získává každou minutu Čest, a čím déle stejná skupina kopec drží, tím víc každá minuta vyplácí: plná skupina, která drží nesporný kopec po celou dobu jeho stání, vydělá zhruba tolik jako tři výhry na bojišti. Když kopec změní držitele, noví držitelé začnou počítat od začátku. Lišta nad bojištěm ukazuje, kdo kopec drží, tvá čísla proti jejich a čas souboje; /hill v chatu řekne, kde kopec stojí.",
+      "limitsBodyRaids": "Porážení stejného hráče znovu a znovu vyplácí pokaždé méně a brzy nic, a tvůj počet proti tomu hráči se resetuje až zhruba hodinu po prvním z těch zabití, takže čekání na jedné oběti se nikdy nevyplatí. Cíl hluboko pod tvou úrovní nevyplatí vůbec nic. Bojiště a Arény se řídí vlastními pravidly, dokud jsi uvnitř, a vyplácí víc Cti než otevřený svět, takže světové PvP je pomalejší cesta ke stejnému obchodníkovi. Výpravy nezískávají ze světových zabití nic: člen výpravy nedostane žádnou Čest ani zlato a nezmenší podíl nikoho jiného, takže boj jako skupina se vyplatí."
     },
     "thornhollowPage": {
       "heading": "Thornhollowská pole",
@@ -8264,28 +8264,28 @@ export const cs_CZ: EnTranslations = {
       "rewardsBody": "Každý dokončený zápas vyplácí čest: víc za výhru, útěchu za prohru nebo remízu, a navíc drobnou částku za každý smrtící úder, který zasadíš, i za každý, na kterém se podílíš, takže boj mimo vlajky se pořád vyplácí. Tvá první výhra dne navíc vyplácí bonus a panel ti ukazuje, dokud na tebe tento bonus ještě čeká. Tento den patří jen cti a přetáčí se podle vlastních hodin, ne podle resetu instancí říše. Opakované střetnutí se stejným týmem vyplácí za samotný zápas méně po tom prvním, rychle se ustálí na dně místo toho, aby se propadlo k nule, a odstoupený zápas nevyplácí nic. Utrať, co si vyděláš, u kteréhokoli intendanta Válečnictví."
     },
     "factionsPage": {
-      "heading": "Factions and Standing",
-      "intro": "Three allied factions each keep watch over their own corner of the realm, and every world quest you finish in their lands raises your standing with them. Standing climbs through six tiers, each with a title of its own, and opens a quartermaster stock piece by piece along the way.",
-      "whoHeading": "The three factions",
-      "whoBody": "Each faction is tied to a group of zones, so where you are doing world quests decides which faction the credit goes to. You never pick a side: all three keep their own tally, and none of them ever asks you to turn on another.",
-      "riftWatchBody": "The Rift Watch guards the shore and watches the deep tears. Their lands are the coast: the Farshore, the Palmreach, the Galecrest, the Willowfen and the Veiled Hollow. Their hub is Drifthaven, on the Palmreach.",
-      "churchOrderBody": "The Church Order holds the heartland of the realm: Eastbrook Vale, Mirefen Marsh, Thornpeak Heights, the Nightbloom and the Wraithwood. Brother Aldric speaks for them from Eastbrook Vale.",
-      "automatonsBody": "The Automatons keep the forges of the far reaches: the Drakelands, the Frostveil Reach, the Amberfall and the Evergarden. Their hub is Wyrmwatch, in the Drakelands.",
-      "earningHeading": "Earning standing",
-      "earningBody": "Standing comes from world quests. Every world quest counts toward the faction of the zone it is set in, and because the three factions cover different zones, all three progress at once as you work your way across the map. Taskmaster Kaelen in Eastbrook opens the World Quests board on the map, and the board is also where you may replace one world quest each day if the day's assignment does not suit you.",
-      "weeklyBody": "The weekly emissary in Eastbrook Vale adds a second road: finish the week's charge and you may name one faction to receive his commendation of standing, once a week, at the window where you took the charge.",
-      "lowLevelNote": "Standing pauses at a tier for lower-level characters and resumes as you level, so a young character can start earning early without running out of road.",
-      "tiersHeading": "Standing tiers",
-      "tiersBody": "Every faction climbs the same six tiers: Unknown, Recognized, Trusted, Proven, Vanguard and Champion. Each faction gives its own name to each rung, and that name becomes your title with them.",
-      "riftWatchTitles": "With the Rift Watch you are an Outsider, then a Watcher, a Riftwalker, a Warden, a Riftwarden and at last a Champion.",
-      "churchOrderTitles": "With the Church Order you are an Outsider, then an Acolyte, a Keeper, a Templar, a Dawnkeeper and at last a Champion.",
-      "automatonsTitles": "With the Automatons you are an Outsider, then an Operator, a Mechanist, an Artificer, a Forgemaster and at last a Champion.",
-      "quartermastersHeading": "Quartermasters",
-      "quartermastersBody": "Each faction keeps a quartermaster at its hub: Quartermaster Vaelen for the Rift Watch in Drifthaven, Templar Althea for the Church Order at the Eastbrook chapel, and Artificer Tobrin for the Automatons in Wyrmwatch. Each sells a small stock of jewelry, armor, weapons and bags, unlocked tier by tier as your standing with that faction grows, and paid for in ordinary coin.",
-      "readingHeading": "Where to read it",
-      "readingBody": "The Reputation tab of the character sheet (C) shows each faction with its current standing, a bar toward the next tier, and the title that standing has earned you. The chat log reports every standing gain as it lands, and reaching a new tier shows a celebration banner on screen.",
-      "deedsHeading": "Deeds",
-      "deedsBody": "The Book of Deeds keeps score of your standing too: reaching Trusted with a faction and reaching Champion with a faction each record a deed, and reaching Champion with all three is a deed of its own. Like every deed these are cosmetic, never power, and the Champion deeds grant a title you can wear."
+      "heading": "Frakce a postavení",
+      "intro": "Tři spojenecké frakce každá hlídá svůj vlastní kout říše, a každý světový úkol, který dokončíš na jejich území, zvýší tvé postavení u nich. Postavení stoupá přes šest stupňů, každý s vlastním titulem, a postupně cestou odemyká zásoby intendanta.",
+      "whoHeading": "Tři frakce",
+      "whoBody": "Každá frakce je vázaná na skupinu zón, takže o tom, které frakci připadne zásluha, rozhoduje místo, kde plníš světové úkoly. Nikdy si nevybíráš stranu: všechny tři si vedou vlastní účet, a žádná z nich po tobě nikdy nechce, abys se obrátil(a) proti jiné.",
+      "riftWatchBody": "Hlídka trhlin střeží pobřeží a hlídá hluboké trhliny. Jejich území je pobřeží: Vzdálené pobřeží, Palmový kraj, Vichrný hřeben, Vrbová bažina a Zahalená kotlina. Jejich centrem je Drifthaven na Palmovém kraji.",
+      "churchOrderBody": "Církevní řád drží srdce říše: Eastbrookské údolí, Mirefenský močál, Thornpeakské výšiny, Noční květ a Přízračný les. Za ně mluví Bratr Aldric z Eastbrookského údolí.",
+      "automatonsBody": "Automaty střeží výhně vzdálených krajů: Dračí země, Kraj Mrazivého závoje, Jantarový pád a Věčná zahrada. Jejich centrem je Wyrmwatch v Dračích zemích.",
+      "earningHeading": "Jak získat postavení",
+      "earningBody": "Postavení získáváš ze světových úkolů. Každý světový úkol se počítá k frakci zóny, ve které se odehrává, a protože tři frakce pokrývají různé zóny, postupuješ u všech tří najednou, jak procházíš mapou. Dozorce úkolů Kaelen v Eastbrooku otevírá na mapě tabuli světových úkolů, a na té samé tabuli si také můžeš jednou denně vyměnit jeden světový úkol, pokud ti denní zadání nesedí.",
+      "weeklyBody": "Týdenní vyslanec v Eastbrookském údolí přidává druhou cestu: dokonči týdenní úkol a můžeš určit jednu frakci, která od něj jednou týdně dostane doporučení k postavení, u téhož okénka, kde sis úkol vzal(a).",
+      "lowLevelNote": "U nízkoúrovňových postav se postavení na daném stupni zastaví a pokračuje dál, jak stoupáš na úrovni, takže mladá postava může začít získávat postavení brzy, aniž by jí došel prostor k růstu.",
+      "tiersHeading": "Stupně postavení",
+      "tiersBody": "Každá frakce stoupá přes stejných šest stupňů: Neznámý, Uznávaný, Důvěryhodný, Osvědčený, Předvoj a Šampion. Každá frakce dává každému stupni vlastní jméno, a to jméno se stává tvým titulem u ní.",
+      "riftWatchTitles": "U Hlídky trhlin jsi nejprve Cizinec, pak Hlídač, Trhlinochodec, Strážce, Trhlinostrážce a nakonec Šampion.",
+      "churchOrderTitles": "U Církevního řádu jsi nejprve Cizinec, pak Akolyta, Ochránce, Templář, Úsvitostrážce a nakonec Šampion.",
+      "automatonsTitles": "U Automatů jsi nejprve Cizinec, pak Operátor, Mechanik, Konstruktér, Kovmistr a nakonec Šampion.",
+      "quartermastersHeading": "Intendanti",
+      "quartermastersBody": "Každá frakce má u svého centra intendanta: Intendanta Vaelena za Hlídku trhlin v Drifthavenu, Templářku Altheu za Církevní řád v eastbrookské kapli a Konstruktéra Tobrina za Automaty ve Wyrmwatchi. Každý prodává malou zásobu šperků, zbroje, zbraní a tašek, odemykanou stupeň po stupni, jak roste tvé postavení u dané frakce, a vše se platí obyčejnou mincí.",
+      "readingHeading": "Kde to najdeš",
+      "readingBody": "Záložka Pověst na listu postavy (C) ukazuje každou frakci s jejím aktuálním postavením, ukazatelem postupu k dalšímu stupni a titulem, který ti to postavení vyneslo. Chatový záznam hlásí každý zisk postavení, jak přichází, a dosažení nového stupně zobrazí na obrazovce oslavný banner.",
+      "deedsHeading": "Skutky",
+      "deedsBody": "Kniha skutků sleduje i tvé postavení: dosažení Důvěryhodného u frakce a dosažení Šampiona u frakce každé zapíše skutek, a dosažení Šampiona u všech tří je vlastní skutek sám o sobě. Jako každý skutek jsou i tyto jen kosmetické, nikdy ne moc, a skutky za Šampiona udělují titul, který si můžeš nosit."
     },
     "deedsPage": {
       "intro": "Kniha skutků je místo, kde si svět počítá vše, co máš za sebou: od prvních kroků z počátečního údolí až po nejtěžší boje, jaké říše nabízí. Vykonávej skutky při hraní, nos tituly, které ti udělí, a sleduj, jak tvůj věhlas roste.",
@@ -9067,7 +9067,7 @@ export const cs_CZ: EnTranslations = {
       "parryBody": "Odražení je válečníkova vlastní obrana: šance úplně odrazit úder na blízko a neutrpět žádné poškození, a roste se Sílou. Odrazit lze jen útok přicházející zepředu, což je další důvod, proč zůstat čelem k tomu, co tě bije. Ostatní třídy vidí tento řádek na svém panelu sedět na nule.",
       "warfareTitle": "Válečnictví",
       "warfareBody": "Válečnictví je jediná statistika, která se počítá jen proti ostatním hráčům: zvyšuje poškození, které jim způsobíš, a snižuje poškození, které od nich utrpíš, a tvůj panel ukazuje obě poloviny na jednom řádku. Proti nestvůrám nedělá vůbec nic. Pochází z výbavy Válečnictví, kterou kupuješ za čest, takže je to odměna za hraní PvP, ne něco, za čím se honit při levelování.",
-      "warfareBodyPets": "Warfare is the stat honor gear carries for fighting players. In fights between players it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them. It also raises your maximum health everywhere except dungeons, raids, delves and rifts, so a player in honor gear is far harder to kill than one without it. Your sheet shows all of it on one line. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
+      "warfareBodyPets": "Válečnictví je statistika, kterou nese výbava za čest pro boj proti hráčům. V soubojích mezi hráči zvyšuje poškození, které ty i tvůj mazlíček způsobíte jiným hráčům a jejich mazlíčkům, a snižuje poškození, které ty i tvůj mazlíček od nich utrpíte. Zvyšuje také tvé maximální zdraví všude kromě dungeonů, raidů, výprav a trhlin, takže hráč ve výbavě za čest je mnohem těžší zabít než ten bez ní. Tvůj panel ukazuje vše na jednom řádku. Pochází z výbavy Válečnictví, kterou kupuješ za čest, takže je to odměna za hraní PvP, ne něco, za čím se honit při levelování."
     },
     "progression": {
       "intro": "Každý boj, úkol a krok na sever posiluje hrdinu. Takhle funguje levelování a co tě drží v růstu, když dosáhneš vrcholu.",
@@ -10929,9 +10929,9 @@ export const cs_CZ: EnTranslations = {
       "fatalBody": "World of ClaudeCraft narazil na neočekávanou chybu a musí se zavřít."
     },
     "hostDiag": {
-      "saveTitle": "Save system report",
-      "saveButton": "Save",
-      "fileType": "JSON file"
+      "saveTitle": "Uložit systémový report",
+      "saveButton": "Uložit",
+      "fileType": "Soubor JSON"
     },
     "titlebar": {
       "exitGame": "Ukončit hru"
@@ -10983,11 +10983,11 @@ export const cs_CZ: EnTranslations = {
     "inWorld": "ve světě",
     "takeOver": "Převzít",
     "inWorldHint": "Už je ve světě. Odhlas se jinde nebo ji převezmi.",
-    "currentLocation": "Current location: {zone}",
-    "lockouts": "Lockouts ({count})",
-    "lockoutRaids": "Raids",
-    "lockoutDungeons": "Dungeons",
-    "lockoutWorldBosses": "World bosses",
+    "currentLocation": "Aktuální poloha: {zone}",
+    "lockouts": "Zámky ({count})",
+    "lockoutRaids": "Raidy",
+    "lockoutDungeons": "Dungeony",
+    "lockoutWorldBosses": "Světoví bossové",
     "takeOverConfirm": "Tímto odpojíš tuto postavu z jiné relace a přesuneš ji sem. Pokračovat?",
     "renameRequired": "vyžaduje přejmenování",
     "delete": "Smazat",
@@ -11129,16 +11129,16 @@ export const cs_CZ: EnTranslations = {
       "xpGainRested": "Získáváš {amount} zkušeností ({rested} bonus z odpočinku).",
       "deathTitle": "Zemřel(a) jsi.",
       "releaseSpirit": "Uvolnit ducha",
-      "deathRecap": "Recap",
-      "deathRecapTitle": "Death Recap",
-      "deathRecapKiller": "Killing blow: {killer} ({ability})",
-      "deathRecapNoKiller": "Combat events leading to death",
-      "deathRecapLethal": "Killing Blow",
-      "deathRecapClose": "Close",
-      "deathRecapNoEvents": "No combat events recorded.",
-      "deathRecapCrit": "Crit",
-      "deathRecapDamage": "Damage",
-      "deathRecapHeal": "Healing",
+      "deathRecap": "Shrnutí",
+      "deathRecapTitle": "Shrnutí smrti",
+      "deathRecapKiller": "Smrtící úder: {killer} ({ability})",
+      "deathRecapNoKiller": "Bojové události vedoucí ke smrti",
+      "deathRecapLethal": "Smrtící úder",
+      "deathRecapClose": "Zavřít",
+      "deathRecapNoEvents": "Nebyly zaznamenány žádné bojové události.",
+      "deathRecapCrit": "Krit",
+      "deathRecapDamage": "Poškození",
+      "deathRecapHeal": "Léčení",
       "chatTab": "Chat",
       "combatLogTab": "Bojový záznam",
       "chatPlaceholder": "Napiš zprávu... (/s říct, /w jméno šeptat, /r odpověď, /p skupina, /gu cech, /o důstojník, /general obecné, /help)",
@@ -11207,9 +11207,9 @@ export const cs_CZ: EnTranslations = {
         "readyQuest": "Úkol připravený k odevzdání",
         "repeatQuest": "Opakovatelný úkol",
         "cooldownQuest": "Úkol čeká na obnovení",
-        "availableWorldQuest": "Available world quest: {name}",
-        "activeWorldQuest": "Active world quest: {name}",
-        "worldBoss": "World boss: {name}",
+        "availableWorldQuest": "Dostupný světový úkol: {name}",
+        "activeWorldQuest": "Aktivní světový úkol: {name}",
+        "worldBoss": "Světový boss: {name}",
         "questObjective": "Oblast cíle úkolu",
         "readyOre": "Dostupná rudná žíla",
         "readyWood": "Dostupná skupina stromů",
@@ -11412,19 +11412,19 @@ export const cs_CZ: EnTranslations = {
       "threat": "Hrozba",
       "damageShort": "Dmg",
       "healingShort": "Heal",
-      "damageTaken": "Damage Taken",
-      "damageTakenShort": "Taken",
-      "avoidableDmg": "Avoidable Damage",
-      "avoidableDmgShort": "Avoid.",
-      "interrupts": "Interrupts",
-      "interruptsShort": "Int",
-      "dispels": "Dispels",
-      "dispelsShort": "Disp",
-      "deaths": "Deaths",
-      "deathsShort": "Dead",
-      "reset": "Reset meters",
-      "resetHint": "Reset combat data",
-      "groupTotal": "Total: {total} ({rate})",
+      "damageTaken": "Utrpěné poškození",
+      "damageTakenShort": "Utrp.",
+      "avoidableDmg": "Vyhnutelné poškození",
+      "avoidableDmgShort": "Vyhn.",
+      "interrupts": "Přerušení",
+      "interruptsShort": "Přer.",
+      "dispels": "Rozptýlení",
+      "dispelsShort": "Rozp.",
+      "deaths": "Úmrtí",
+      "deathsShort": "Úm.",
+      "reset": "Resetovat měřiče",
+      "resetHint": "Resetovat bojová data",
+      "groupTotal": "Celkem: {total} ({rate})",
       "current": "Aktuální",
       "lastFight": "Poslední boj",
       "fightIndex": "Boj -{index}",
@@ -11436,16 +11436,16 @@ export const cs_CZ: EnTranslations = {
       "segmentSummary": "{label} - {duration}",
       "olderSegment": "Starší segment",
       "newerSegment": "Novější segment",
-      "selectSegment": "Select fight segment",
-      "selectMode": "Select meter mode",
-      "back": "Back",
-      "resetFight": "Reset current fight",
-      "resetAll": "Reset all data",
-      "criticals": "Criticals: {count}",
-      "hits": "Hits: {count}",
-      "topAbility": "Top: {name}",
-      "activity": "Activity: {pct}",
-      "newWindow": "New window",
+      "selectSegment": "Vybrat úsek boje",
+      "selectMode": "Vybrat režim měřiče",
+      "back": "Zpět",
+      "resetFight": "Resetovat aktuální boj",
+      "resetAll": "Resetovat všechna data",
+      "criticals": "Kritické zásahy: {count}",
+      "hits": "Zásahy: {count}",
+      "topAbility": "Nejlepší: {name}",
+      "activity": "Aktivita: {pct}",
+      "newWindow": "Nové okno",
       "close": "Zavřít měřiče"
     },
     "chat": {
@@ -11569,7 +11569,7 @@ export const cs_CZ: EnTranslations = {
       "deathRecapDrowned": "Tvá postava zemřela. Utopila se.",
       "deathRecapCauterized": "Tvá postava zemřela. Přemohl tě žár Vypálení.",
       "respawn": "Cítíš se odpočatě a znovu celý(á).",
-      "respawnKeeperToll": "The Pale Keeper has revived you, but you are weaker for it: the Keeper's Toll drains your attributes until it fades.",
+      "respawnKeeperToll": "Bledý strážce tě oživil, ale je to na tobě znát: Strážcovo mýto ti oslabuje vlastnosti, dokud nevyprchá.",
       "ignoringChat": "Ignoruješ chat od {name}.",
       "noLongerIgnoring": "Už neignoruješ {name}.",
       "playerNotNearby": "Tento hráč není poblíž.",
@@ -11607,7 +11607,7 @@ export const cs_CZ: EnTranslations = {
       "cantInForm": "To nemůžeš dělat v podobě {form}.",
       "bear": "Medvěd",
       "cat": "Kočka",
-      "bearOrCat": "Bruin or Cat",
+      "bearOrCat": "Medvěd nebo kočka",
       "travel": "Rychlost",
       "shapeshifted": "To nemůžeš dělat při změně podoby.",
       "stealthed": "Musíš být v plížení.",
@@ -11928,9 +11928,9 @@ export const cs_CZ: EnTranslations = {
       "anyTarget": "Nepřítel nebo přátelský cíl",
       "selfOnly": "Pouze na sebe",
       "damageRange": "{min} až {max}",
-      "edictExplosion": "While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.",
-      "edictDamage": "Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.",
-      "verdictDamage": "Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.",
+      "edictExplosion": "Dokud je aktivní Vzestup, výbuch způsobí {damage} fyzického poškození v okruhu {radius} m, snížené nad {cap} cílů. Toto poškození roste se silou útoku.",
+      "edictDamage": "Udeříš za {weaponPercent} % poškození zbraně plus {damage} fyzického poškození. Poškození zbraně zahrnuje sílu útoku.",
+      "verdictDamage": "Poslední edikt exploduje za {verdictSingleDamage} svatého poškození. Pád úsvitu exploduje za {verdictAreaDamage} svatého poškození v okruhu {verdictAreaRadius} m, snížené nad {verdictAreaCap} cílů. Ani jedna exploze neškáluje se silou kouzel. Tvé znamení může nést jen jeden nepřítel.",
       "finisherDamage": "{base} plus {perCombo} za combo bod"
     },
     "resources": {
@@ -11943,7 +11943,7 @@ export const cs_CZ: EnTranslations = {
     "forms": {
       "bear": "Medvěd",
       "cat": "Kočka",
-      "bearOrCat": "Bruin or Cat"
+      "bearOrCat": "Medvěd nebo kočka"
     },
     "cast": {
       "fishing": "Rybaření",
@@ -11976,7 +11976,7 @@ export const cs_CZ: EnTranslations = {
   },
   "questUi": {
     "tracker": {
-      "clueHuntTitle": "{title} (clue {step} of {total})",
+      "clueHuntTitle": "{title} (stopa {step} z {total})",
       "title": "Úkoly",
       "complete": "Dokončeno",
       "showOnMap": "Zobrazit {name} na mapě",
@@ -12011,18 +12011,18 @@ export const cs_CZ: EnTranslations = {
       "repeatableQuestAria": "Opakovatelný úkol: {name}",
       "discussQuest": "Promluvit si o {name}.",
       "discussQuestAria": "Promluvit si o úkolu: {name}",
-      "clueTalk": "Ask about the clue.",
-      "clueTalkAria": "Ask about the clue: {name}",
-      "clueDeliver": "Hand over {count} {item}.",
-      "clueDeliverAria": "Hand over {count} {item} to {name}",
+      "clueTalk": "Zeptej se na stopu.",
+      "clueTalkAria": "Zeptat se na stopu: {name}",
+      "clueDeliver": "Odevzdej {count}x {item}.",
+      "clueDeliverAria": "Odevzdat {count}x {item} osobě {name}",
       "profIntroHint": "Viz {name} pro \"{quest}\".",
       "nythraxisDeathlessKingWarning": "Tři relikvie vyprávějí stejný příběh: Aldren bojoval na obranu svého krále, Malric prolomil hranici smrti a Voss se pokusil zastavit to, co následovalo. Pečeť slábne a opuštěná krypta je cestou dolů.",
       "browseGoods": "Ukaž mi své zboží.",
       "browseGoodsAria": "Procházet zboží od {name}",
       "worldMarket": "Ukaž mi Světový trh.",
       "worldMarketAria": "Otevřít Světový trh",
-      "worldQuestBoard": "Show me the world quest board.",
-      "worldQuestBoardAria": "Open the world quest board on the map",
+      "worldQuestBoard": "Ukaž mi nástěnku světových úkolů.",
+      "worldQuestBoardAria": "Otevřít nástěnku světových úkolů na mapě",
       "accept": "Přijmout",
       "decline": "Odmítnout",
       "continue": "Pokračovat",
@@ -12044,361 +12044,361 @@ export const cs_CZ: EnTranslations = {
     },
     "worldQuest": {
       "title": "{zone}: {target}",
-      "unknown": "Unknown world quest ({id})",
-      "itemReward": "Item reward: {name}",
-      "itemRewardWithLevels": "{name} (item level {itemLevel}, equips at level {requiredLevel})",
-      "factionLine": "Faction: {faction}",
-      "standingReward": "+{amount} {faction} standing",
-      "rewardLine": "Rewards: {reward}",
-      "availableStatus": "Available world quest",
-      "activeStatus": "Active world quest",
-      "expiresIn": "Expires in {time}",
-      "mineOre": "Mine copper ore",
-      "recoverObject": "Recover {name}",
-      "redirectLeyBeam": "Redirect the ley beam",
-      "matchConfections": "Match enchanted confections",
-      "loadFreight": "Load freight into the wagon",
-      "escortCaravan": "Escort the caravan: {zone}",
-      "salvageWreckage": "Salvage debris washed along the strand from the wreck northwest of Gullhaven",
+      "unknown": "Neznámý světový úkol ({id})",
+      "itemReward": "Odměna v podobě předmětu: {name}",
+      "itemRewardWithLevels": "{name} (úroveň předmětu {itemLevel}, vybavitelné od úrovně {requiredLevel})",
+      "factionLine": "Frakce: {faction}",
+      "standingReward": "+{amount} postavení u frakce {faction}",
+      "rewardLine": "Odměny: {reward}",
+      "availableStatus": "Dostupný světový úkol",
+      "activeStatus": "Aktivní světový úkol",
+      "expiresIn": "Vyprší za {time}",
+      "mineOre": "Těž měděnou rudu",
+      "recoverObject": "Získej zpět {name}",
+      "redirectLeyBeam": "Přesměruj ley paprsek",
+      "matchConfections": "Spojuj okouzlené cukrovinky",
+      "loadFreight": "Nalož náklad do vozu",
+      "escortCaravan": "Doprovoď karavanu: {zone}",
+      "salvageWreckage": "Zachraňuj trosky vyplavené na pobřeží z vraku severozápadně od Gullhavenu",
       "banner": {
-        "riftOpens": "A rift tears open on the strand! Raiders are coming for the salvage.",
-        "captainSteps": "The raider captain steps through the rift!",
-        "riftRouted": "The raiders are routed. The strand is yours again.",
-        "championRises": "Extra loot! A champion rises at the site. Bring it down together.",
-        "championFallen": "Extra loot! The champion falls: a bonus purse for everyone who fought it.",
-        "endlessBegins": "The line holds! Endless waves begin, each one harder. Leave the cannon whenever you like."
+        "riftOpens": "Na pobřeží se otevírá trhlina! Nájezdníci jdou pro trosky.",
+        "captainSteps": "Kapitán nájezdníků prochází trhlinou!",
+        "riftRouted": "Nájezdníci jsou na útěku. Pobřeží je znovu tvé.",
+        "championRises": "Kořist navíc! Na místě povstává šampion. Srazte ho společně k zemi.",
+        "championFallen": "Kořist navíc! Šampion padá: bonusový měšec pro každého, kdo s ním bojoval.",
+        "endlessBegins": "Linie drží! Začínají nekonečné vlny, každá těžší než ta předchozí. Dělo můžeš opustit, kdykoli chceš."
       },
       "shadow": {
-        "title": "Under Cover of Shadow",
-        "objective": "Steal four sealed orders without being caught",
-        "cloak": "Duskweave Cloak",
-        "pickpocket": "Pick Pocket",
-        "leave": "Remove Cloak",
-        "stealTip": "Approach from behind and remain still while taking the orders. Stay out of the lantern beams.",
-        "leaveTip": "Remove the cloak. Your recovered orders are kept.",
-        "documents": "Orders recovered: {count}/4",
-        "suspicion": "Suspicion: {value}",
-        "safe": "Steal from behind. Lantern guards sweep wide beams that see through the cloak; wait for a clear opening.",
-        "behind": "Move behind the guard before stealing.",
-        "danger": "You are being spotted! Get out of sight!",
-        "channel": "Stealing... {seconds}s",
-        "noTarget": "Move close to a guard carrying orders.",
-        "start": "Speak with Scout Valerie to borrow her cloak.",
-        "caught": "Caught! Return to Scout Valerie for another cloak. Your orders are safe.",
-        "complete": "All four orders recovered."
+        "title": "V plášti stínu",
+        "objective": "Ukradni čtyři zapečetěné rozkazy, aniž bys byl(a) přistižen(a)",
+        "cloak": "Soumrakový plášť",
+        "pickpocket": "Prohledat kapsu",
+        "leave": "Sundat plášť",
+        "stealTip": "Přistup zezadu a při braní rozkazů zůstaň nehybný/á. Vyhýbej se kuželům světla z luceren.",
+        "leaveTip": "Sundej plášť. Získané rozkazy si ponecháš.",
+        "documents": "Získané rozkazy: {count}/4",
+        "suspicion": "Podezření: {value}",
+        "safe": "Kraď zezadu. Strážní s lucernami švihají širokými kužely světla, které vidí skrz plášť; počkej na volnou příležitost.",
+        "behind": "Než začneš krást, dostaň se strážnému za záda.",
+        "danger": "Jsi spatřen(a)! Zmiz z dohledu!",
+        "channel": "Kradeš... {seconds} s",
+        "noTarget": "Přibliž se ke strážnému, který nese rozkazy.",
+        "start": "Promluv se zvědkou Valerií a půjč si její plášť.",
+        "caught": "Přistižen(a)! Vrať se ke zvědce Valerii pro další plášť. Tvé rozkazy jsou v bezpečí.",
+        "complete": "Všechny čtyři rozkazy získány zpět."
       },
       "investigation": {
-        "title": "A Borrowed Face",
-        "objective": "Unmask and defeat the infiltrator",
-        "briefing": "A creature has stolen a soldier's face. Read the standing orders and the watch ledger, question all four guards, then come back and name the one whose story contradicts our records.",
-        "instructions": "Read the standing orders and watch ledger, then question all four guards. Compare their stories with the records.",
-        "confront": "Report to Sergeant Alric and name the guard whose story contradicts the records.",
-        "name": "Which of my guards is wearing a borrowed face?",
-        "accuseOption": "Accuse {name}",
-        "cleared": "Sergeant Alric: That soldier is accounted for. Compare the other stories with our records and try again.",
-        "guardCleared": "Sergeant Alric has already accounted for this soldier.",
-        "revealed": "The creature has shed this face. Defeat it.",
-        "defeat": "Defeat the revealed infiltrator.",
-        "heard": "Guards questioned: {count}/4",
-        "clues": "Records examined: {count}/2",
+        "title": "Vypůjčená tvář",
+        "objective": "Odhal a poraz vetřelce",
+        "briefing": "Nějaké stvoření ukradlo tvář vojáka. Přečti si stálé rozkazy a strážní knihu, vyslechni všechny čtyři strážné a pak se vrať a označ toho, jehož výpověď odporuje našim záznamům.",
+        "instructions": "Přečti si stálé rozkazy a strážní knihu, pak vyslechni všechny čtyři strážné. Porovnej jejich výpovědi se záznamy.",
+        "confront": "Ohlaš se seržantu Alricovi a označ strážného, jehož výpověď odporuje záznamům.",
+        "name": "Který z mých strážných nosí vypůjčenou tvář?",
+        "accuseOption": "Obvinit {name}",
+        "cleared": "Seržant Alric: Tento voják je zúčtovaný. Porovnej ostatní výpovědi se záznamy a zkus to znovu.",
+        "guardCleared": "Seržant Alric už tohoto vojáka zúčtoval.",
+        "revealed": "Stvoření odhodilo tuto tvář. Poraz ho.",
+        "defeat": "Poraz odhaleného vetřelce.",
+        "heard": "Vyslechnutí strážní: {count}/4",
+        "clues": "Prozkoumané záznamy: {count}/2",
         "clueNames": {
-          "c0": "Standing Orders",
-          "c1": "Watch Ledger"
+          "c0": "Stálé rozkazy",
+          "c1": "Strážní kniha"
         },
         "variants": {
           "v0": {
-            "clue0": "The south bridge has been closed since dawn. All patrols must use the western road.",
-            "clue1": "Orin was assigned to gate duty. Nella, Bram and Tessa patrolled the western road.",
-            "guard0": "My patrol took the western road this morning.",
-            "guard1": "I crossed the south bridge on my morning patrol.",
-            "guard2": "I patrolled the western road with Nella and Tessa.",
-            "guard3": "The south bridge is closed. We used the western road."
+            "clue0": "Jižní most je od úsvitu uzavřený. Všechny hlídky musí použít západní cestu.",
+            "clue1": "Orin byl přidělen ke strážení brány. Nella, Bram a Tessa hlídkovali na západní cestě.",
+            "guard0": "Moje hlídka šla dnes ráno po západní cestě.",
+            "guard1": "Při ranní hlídce jsem přešel(a) jižní most.",
+            "guard2": "Hlídkoval(a) jsem na západní cestě s Nellou a Tessou.",
+            "guard3": "Jižní most je uzavřený. Použili jsme západní cestu."
           },
           "v1": {
-            "clue0": "Today's password is Reedwatch. Yesterday's password, Lantern, is no longer valid.",
-            "clue1": "All four guards were briefed on the new password at dawn.",
-            "guard0": "Reedwatch. I learned the new password at dawn.",
-            "guard1": "Lantern was yesterday's password. Today we use Reedwatch.",
-            "guard2": "All four of us attended the dawn briefing.",
-            "guard3": "Today's password is Lantern. I heard it at the dawn briefing."
+            "clue0": "Dnešní heslo je Reedwatch. Včerejší heslo, Lantern, už neplatí.",
+            "clue1": "Všichni čtyři strážní byli o novém hesle informováni za úsvitu.",
+            "guard0": "Reedwatch. Nové heslo jsem se dozvěděl(a) za úsvitu.",
+            "guard1": "Lantern bylo včerejší heslo. Dnes používáme Reedwatch.",
+            "guard2": "Všichni čtyři jsme byli na ranní poradě za úsvitu.",
+            "guard3": "Dnešní heslo je Lantern. Slyšel(a) jsem ho na ranní poradě za úsvitu."
           },
           "v2": {
-            "clue0": "All garrison supply crates must carry blue wax seals. Reject any crate with a red seal.",
-            "clue1": "Today's delivery was inspected: every crate had an intact blue wax seal.",
-            "guard0": "I inspected today's delivery. Every crate had a red wax seal.",
-            "guard1": "We only accept crates sealed with blue wax.",
-            "guard2": "The ledger records blue seals on today's delivery.",
-            "guard3": "No crates with red seals were accepted today."
+            "clue0": "Všechny zásobovací bedny posádky musí mít modré voskové pečetě. Odmítni každou bednu s červenou pečetí.",
+            "clue1": "Dnešní dodávka byla zkontrolována: každá bedna měla neporušenou modrou voskovou pečeť.",
+            "guard0": "Zkontroloval(a) jsem dnešní dodávku. Každá bedna měla červenou voskovou pečeť.",
+            "guard1": "Přijímáme jen bedny zapečetěné modrým voskem.",
+            "guard2": "Kniha zaznamenává modré pečetě na dnešní dodávce.",
+            "guard3": "Dnes nebyla přijata žádná bedna s červenou pečetí."
           },
           "v3": {
-            "clue0": "The night watch relights the east beacon at dusk. The west beacon stays dark until the ferry signals.",
-            "clue1": "Nella and Orin held the gate through the night. Bram and Tessa walked the causeway and relit the east beacon at dusk.",
-            "guard0": "Orin and I had the gate all night. Nothing came through but the fog.",
-            "guard1": "Gate duty with Nella. We watched the east beacon come alight at dusk, as ordered.",
-            "guard2": "Tessa and I walked the causeway. We lit the west beacon at dusk so the ferry could see us.",
-            "guard3": "Causeway patrol with Bram. We relit the east beacon the moment the sun went down."
+            "clue0": "Noční hlídka znovu zapaluje východní maják za soumraku. Západní maják zůstává tmavý, dokud nedá signál přívoz.",
+            "clue1": "Nella a Orin drželi bránu celou noc. Bram a Tessa obcházeli hráz a za soumraku znovu zapálili východní maják.",
+            "guard0": "Orin a já jsme měli bránu celou noc. Neprošlo nic než mlha.",
+            "guard1": "Služba u brány s Nellou. Sledovali jsme, jak se za soumraku podle rozkazu rozsvítil východní maják.",
+            "guard2": "S Tessou jsme obcházeli hráz. Za soumraku jsme zapálili západní maják, aby nás přívoz viděl.",
+            "guard3": "Hlídka na hrázi s Bramem. Znovu jsme zapálili východní maják ve chvíli, kdy zapadlo slunce."
           },
           "v4": {
-            "clue0": "The quartermaster's cart arrives at noon by the north road. No supplies come by water while the marsh is flooded.",
-            "clue1": "Noon delivery received from the north road. Tessa signed for it; Bram and Nella unloaded; Orin was at the well.",
-            "guard0": "I helped Bram unload the cart at noon. Salt pork and lamp oil, the usual.",
-            "guard1": "I unloaded the noon delivery myself, straight off the supply barge.",
-            "guard2": "Nella and I carried the crates in. Tessa signed the ledger.",
-            "guard3": "The cart came up the north road at noon. I signed for it."
+            "clue0": "Vůz intendanta přijíždí v poledne po severní cestě. Dokud je bažina zaplavená, žádné zásoby nepřicházejí po vodě.",
+            "clue1": "Polední dodávka přijata ze severní cesty. Tessa ji podepsala; Bram a Nella vykládali; Orin byl u studny.",
+            "guard0": "V poledne jsem pomáhal(a) Bramovi vyložit vůz. Solené vepřové a lampový olej, jako obvykle.",
+            "guard1": "Polední dodávku jsem vyložil(a) sám/sama, přímo ze zásobovací bárky.",
+            "guard2": "S Nellou jsme nosili bedny dovnitř. Tessa podepsala knihu.",
+            "guard3": "Vůz přijel v poledne po severní cestě. Podepsal(a) jsem ho."
           },
           "v5": {
-            "clue0": "The fallen from the last raid lie in the chapel crypt. Nobody enters the crypt without the sergeant's key.",
-            "clue1": "The sergeant's key has not left his belt since the raid. Nella, Orin and Bram stood the wall; Tessa kept the yard.",
-            "guard0": "I stood the wall. The crypt has stayed locked since the raid; only the sergeant holds the key.",
-            "guard1": "Wall duty with Nella and Bram. Quiet, except for the frogs.",
-            "guard2": "The wall, all day. Nobody has been near the crypt.",
-            "guard3": "I kept the yard and looked in on the crypt this morning. The fallen are resting."
+            "clue0": "Padlí z posledního nájezdu leží v kapli krypty. Nikdo nevstoupí do krypty bez seržantova klíče.",
+            "clue1": "Seržantův klíč od nájezdu neopustil jeho opasek. Nella, Orin a Bram hlídali hradbu; Tessa hlídala nádvoří.",
+            "guard0": "Hlídal(a) jsem hradbu. Krypta zůstala od nájezdu zamčená; klíč má jen seržant.",
+            "guard1": "Služba na hradbě s Nellou a Bramem. Klid, až na žáby.",
+            "guard2": "Hradba, celý den. K kryptě se nikdo nepřiblížil.",
+            "guard3": "Hlídal(a) jsem nádvoří a dnes ráno jsem se podíval(a) do krypty. Padlí odpočívají."
           }
         }
       },
       "horde": {
-        "title": "The Last Barricade",
-        "objective": "Defend the barricade and defeat the horde commander",
-        "ready": "Speak to the barricade captain to begin.",
-        "countdown": "Horde incoming in {seconds}s!",
-        "status": "{seconds}s left. Kills: {kills}. Barricade: {barrier}%.",
-        "upgrade": "Weapon: {weapon}",
-        "loadout": "Shots: {count} | +{speed}% speed | {weapon}",
-        "exit": "Leave defense",
-        "gained": "Upgrade: {upgrade}",
-        "killBurst": "+{count} defeated!",
+        "title": "Poslední barikáda",
+        "objective": "Braň barikádu a poraz velitele hordy",
+        "ready": "Promluv si s kapitánem barikády, ať začneš.",
+        "countdown": "Horda dorazí za {seconds} s!",
+        "status": "Zbývá {seconds} s. Zabití: {kills}. Barikáda: {barrier} %.",
+        "upgrade": "Zbraň: {weapon}",
+        "loadout": "Výstřely: {count} | +{speed} % rychlost | {weapon}",
+        "exit": "Opustit obranu",
+        "gained": "Vylepšení: {upgrade}",
+        "killBurst": "+{count} poraženo!",
         "choices": {
-          "projectile": "+1 shot",
-          "haste": "+25% fire rate",
-          "pierce": "Piercing shots",
-          "explosive": "Explosive shots",
-          "double": "x2 shots"
+          "projectile": "+1 výstřel",
+          "haste": "+25 % rychlost střelby",
+          "pierce": "Průbojné výstřely",
+          "explosive": "Výbušné výstřely",
+          "double": "x2 výstřely"
         },
         "weapons": {
-          "0": "Repeater",
-          "1": "Twin Shot",
-          "2": "Piercing Shot",
-          "3": "Explosive Shot"
+          "0": "Opakovačka",
+          "1": "Dvojitý výstřel",
+          "2": "Průbojný výstřel",
+          "3": "Výbušný výstřel"
         },
-        "controls": "Auto-fire. A/D, arrows or joystick. Backward: leave.",
-        "supplies": "Break one crate to choose. The other disappears!",
-        "result": "{rating}! Score: {score}.",
-        "resultStats": "Kills: {kills}. Barricade: {barrier}%.",
-        "failed": "Defense failed. Try again!",
-        "replay": "Speak to the captain to retry. Rewards once per rotation.",
+        "controls": "Automatická palba. A/D, šipky nebo joystick. Dozadu: odejít.",
+        "supplies": "Rozbij jednu bednu, ať si vybereš. Druhá zmizí!",
+        "result": "{rating}! Skóre: {score}.",
+        "resultStats": "Zabití: {kills}. Barikáda: {barrier} %.",
+        "failed": "Obrana selhala. Zkus to znovu!",
+        "replay": "Promluv si s kapitánem a zkus to znovu. Odměny jednou za rotaci.",
         "medals": {
-          "gold": "Gold",
-          "silver": "Silver",
-          "bronze": "Bronze"
+          "gold": "Zlato",
+          "silver": "Stříbro",
+          "bronze": "Bronz"
         }
       },
       "wispMaze": {
-        "leave": "Leave maze",
-        "title": "Wispwood Maze",
-        "objective": "Recover every stolen coin purse from the maze",
-        "ready": "Speak to the maze keeper to begin.",
-        "controls": "Move through the maze to pick up the coin purses. Avoid the shadows. Radiant wisps let you banish shadows for a short time.",
-        "collected": "Coin purses: {count}/{total}",
-        "lives": "Lives: {count}/3",
-        "power": "Wisp power: {seconds}s",
-        "countdown": "Starting in {seconds}s",
-        "collect": "Pick up the coin purses. Avoid shadows.",
-        "powered": "Power surge! Touch shadows to banish them.",
-        "finished": "Every coin purse is recovered!",
-        "retry": "Three lives restored. Try the maze again.",
-        "startNormal": "Enter the maze: Normal ({shadows} shadows)",
-        "startHard": "Enter the maze: Hard ({shadows} shadows)"
+        "leave": "Opustit bludiště",
+        "title": "Wispwoodské bludiště",
+        "objective": "Získej z bludiště zpět všechny ukradené váčky s mincemi",
+        "ready": "Promluv si se strážcem bludiště, ať začneš.",
+        "controls": "Procházej bludištěm a sbírej váčky s mincemi. Vyhýbej se stínům. Zářivá světýlka ti na krátkou chvíli umožní stíny zahnat.",
+        "collected": "Váčky s mincemi: {count}/{total}",
+        "lives": "Životy: {count}/3",
+        "power": "Síla světýlka: {seconds} s",
+        "countdown": "Začíná za {seconds} s",
+        "collect": "Seber váčky s mincemi. Vyhýbej se stínům.",
+        "powered": "Nárůst síly! Dotykem zaháněj stíny.",
+        "finished": "Všechny váčky s mincemi jsou získány zpět!",
+        "retry": "Obnoveny tři životy. Zkus bludiště znovu.",
+        "startNormal": "Vstoupit do bludiště: Normální ({shadows} stínů)",
+        "startHard": "Vstoupit do bludiště: Těžké ({shadows} stínů)"
       },
       "forge": {
-        "title": "A Helping Hammer",
-        "objective": "Help Smith Mara forge a shield",
-        "ready": "Speak to Smith Mara to begin.",
-        "countdown": "Ready your hands! Starting in {seconds}s.",
-        "preparing": "Nicely done! Next request...",
-        "fuel": "Woodpile",
-        "metal": "Ingot Crate",
-        "water": "Well",
-        "tools": "Anvil",
+        "title": "Pomocné kladivo",
+        "objective": "Pomoz kovářce Maře ukovat štít",
+        "ready": "Promluv si s kovářkou Marou, ať začneš.",
+        "countdown": "Připrav si ruce! Začínáme za {seconds} s.",
+        "preparing": "Pěkně zvládnuto! Další požadavek...",
+        "fuel": "Hromada dřeva",
+        "metal": "Bedna ingotů",
+        "water": "Studna",
+        "tools": "Kovadlina",
         "request": {
-          "fuel": "Stoke the fire! Add some wood!",
-          "metal": "More metal! Open the ingot crate!",
-          "water": "Cool it down! Water from the well!",
-          "tools": "Hammer it into shape! Use the anvil!"
+          "fuel": "Rozdmýchej oheň! Přidej dřevo!",
+          "metal": "Víc kovu! Otevři bednu ingotů!",
+          "water": "Zchlaď to! Vodu ze studny!",
+          "tools": "Vykuj to do tvaru! Použij kovadlinu!"
         },
-        "sequence": "{instruction} Then click the {next}.",
-        "round": "Request {round}/{total}: step {step}/{steps}",
-        "thresholds": "Gold: {gold}s or less. Silver: {silver}s or less.",
-        "starting": "Getting ready...",
-        "finished": "Fine work! A shield fit for the garrison!",
-        "failed": "Too many mistakes! The metal cracked. Speak to Mara to try again.",
-        "wrong": "Wrong tool! +{penalty}s. Try the requested object.",
-        "correct": "That is it! Keep going.",
-        "result": "{rating}! {seconds}s. Mistakes: {mistakes}.",
-        "replay": "Speak to Mara to try again. Rewards are earned once per rotation.",
+        "sequence": "{instruction} Pak klikni na {next}.",
+        "round": "Požadavek {round}/{total}: krok {step}/{steps}",
+        "thresholds": "Zlato: {gold} s nebo méně. Stříbro: {silver} s nebo méně.",
+        "starting": "Připravuje se...",
+        "finished": "Skvělá práce! Štít hodný posádky!",
+        "failed": "Příliš mnoho chyb! Kov popraskal. Promluv si s Marou a zkus to znovu.",
+        "wrong": "Špatný nástroj! +{penalty} s. Zkus požadovaný předmět.",
+        "correct": "Přesně tak! Pokračuj.",
+        "result": "{rating}! {seconds} s. Chyby: {mistakes}.",
+        "replay": "Promluv si s Marou a zkus to znovu. Odměny získáš jednou za rotaci.",
         "medals": {
-          "gold": "Gold",
-          "silver": "Silver",
-          "bronze": "Bronze"
+          "gold": "Zlato",
+          "silver": "Stříbro",
+          "bronze": "Bronz"
         },
-        "strike": "Strike",
-        "strikeTip": "Hammer the piece. Press when the needle crosses the dark band; the band narrows and the needle quickens with every good blow. A blow outside the band, or on a cold forge, costs three seconds.",
-        "stoke": "Stoke",
-        "stokeTip": "Throw wood on the fire. The forge cools all the time; keep its heat above {floor} or your blows land cold.",
-        "strikes": "Strikes: {count}/{total}",
-        "heat": "Forge heat: {value} (keep above {floor})",
-        "mistakes": "Mistakes: {count}",
-        "meterAria": "Hammer timing meter",
-        "hintStrike": "Watch the needle. Strike inside the dark band!",
-        "hintStoke": "The forge is cooling! Stoke the fire before you strike.",
-        "hit": "Clean blow! The band narrows.",
-        "miss": "Missed the band! +{penalty}s.",
-        "cold": "Cold strike! Stoke the fire first. +{penalty}s."
+        "strike": "Udeřit",
+        "strikeTip": "Vykovávej kus. Stiskni, když ručička projíždí tmavým pásem; pás se zužuje a ručička se s každou dobrou ranou zrychluje. Rána mimo pás nebo na studené výhni tě stojí tři sekundy.",
+        "stoke": "Rozdmýchat",
+        "stokeTip": "Přiháněj dřevo do ohně. Výheň pořád chladne; udržuj její žár nad {floor}, jinak tvé rány dopadnou studené.",
+        "strikes": "Rány: {count}/{total}",
+        "heat": "Žár výhně: {value} (udržuj nad {floor})",
+        "mistakes": "Chyby: {count}",
+        "meterAria": "Měřič načasování kladiva",
+        "hintStrike": "Sleduj ručičku. Udeř uvnitř tmavého pásu!",
+        "hintStoke": "Výheň chladne! Než udeříš, rozdmýchej oheň.",
+        "hit": "Čistá rána! Pás se zužuje.",
+        "miss": "Netrefil(a) jsi pás! +{penalty} s.",
+        "cold": "Studená rána! Nejdřív rozdmýchej oheň. +{penalty} s."
       },
       "glider": {
-        "title": "Windrider Slalom",
-        "boost": "Extra Speed",
-        "boostTip": "Increase your flight speed by {speed} yd/s, up to {maximum} yd/s. Available while flying. Recharges in {seconds} seconds.",
-        "objective": "Soar through the wind rings and land in the marked zone",
-        "ready": "Speak to Flightmaster Zephyr to launch.",
-        "replay": "Fly again",
-        "practiceRewards": "Practice flight: improve your time without earning more coins, experience or reputation.",
-        "countdown": "Launch in {count}... Hold tight!",
-        "flying": "Rings: {rings}/{total} | Time: {time}s | Speed: {speed} yd/s",
-        "climb": "Climb",
-        "climbTip": "Hold to pull the nose up and trade speed for height. Tap for a short nudge. Slow flight loses lift.",
-        "dive": "Dive",
-        "diveTip": "Hold to point the nose down and gain speed. Tap for a short nudge.",
-        "controls": "Hold right mouse and look up to climb at the cost of speed; look down to dive and gain speed. Slow flight loses lift. Left/right steer; backward brakes. Jump or swim up/down also control pitch. Fly forward through wind tunnels for a speed boost, once per tunnel per attempt.",
-        "landed": "{rating}! Passed {rings}/{total} rings in {time}s.",
-        "failed": "Descent failed! Landed off course or missed too many rings.",
-        "retry": "Talk to Zephyr to retry, or to Skye by the landing zone to return to the launch point.",
-        "nextRing": "Aim through the next wind ring along the canyon. Clear at least {minimum} rings, then land in the marked zone.",
-        "landing": "All rings cleared! Steer onto the landing zone ahead.",
-        "complete": "Landing complete!",
-        "score": "Score: {score}.",
+        "title": "Slalom větroplavce",
+        "boost": "Extra rychlost",
+        "boostTip": "Zvýší tvou rychlost letu o {speed} yd/s, až na {maximum} yd/s. Dostupné za letu. Nabije se za {seconds} sekund.",
+        "objective": "Prolétni větrnými kruhy a přistaň ve vyznačené zóně",
+        "ready": "Promluv si s letmistrem Zephyrem, ať odstartuješ.",
+        "replay": "Letět znovu",
+        "practiceRewards": "Tréninkový let: zlepšuj svůj čas bez zisku dalších mincí, zkušeností nebo pověsti.",
+        "countdown": "Start za {count}... Drž se!",
+        "flying": "Kruhy: {rings}/{total} | Čas: {time} s | Rychlost: {speed} yd/s",
+        "climb": "Stoupání",
+        "climbTip": "Podrž, ať zvedneš příď a vyměníš rychlost za výšku. Ťukni pro krátký impuls. Pomalý let ztrácí vztlak.",
+        "dive": "Klesání",
+        "diveTip": "Podrž, ať sklopíš příď a nabereš rychlost. Ťukni pro krátký impuls.",
+        "controls": "Podrž pravé tlačítko myši a dívej se nahoru pro stoupání na úkor rychlosti; dívej se dolů pro klesání a nabrání rychlosti. Pomalý let ztrácí vztlak. Vlevo/vpravo zatáčíš; dozadu brzdíš. Sklon ovládá i skok nebo plavání nahoru/dolů. Proleť dopředu větrnými tunely pro zrychlení, jednou na tunel za pokus.",
+        "landed": "{rating}! Proletěl(a) jsi {rings}/{total} kruhy za {time} s.",
+        "failed": "Sestup se nezdařil! Přistání mimo trať nebo příliš mnoho zmeškaných kruhů.",
+        "retry": "Promluv si se Zephyrem, ať to zkusíš znovu, nebo se Skye u přistávací zóny, ať se vrátíš na start.",
+        "nextRing": "Miř na další větrný kruh podél kaňonu. Prolet aspoň {minimum} kruhy, pak přistaň ve vyznačené zóně.",
+        "landing": "Všechny kruhy zdolány! Zaměř přistávací zónu před sebou.",
+        "complete": "Přistání dokončeno!",
+        "score": "Skóre: {score}.",
         "medals": {
-          "gold": "Gold",
-          "silver": "Silver",
-          "bronze": "Bronze"
+          "gold": "Zlato",
+          "silver": "Stříbro",
+          "bronze": "Bronz"
         }
       },
-      "calligraphyTitle": "Arcane Calligraphy",
-      "traceOutline": "Trace the outline with your footsteps",
-      "traceRoundInstruction": "Round {round} of {total}: {shape}. {instruction}",
+      "calligraphyTitle": "Arkánová kaligrafie",
+      "traceOutline": "Vyšlápni obrys svými kroky",
+      "traceRoundInstruction": "Kolo {round} z {total}: {shape}. {instruction}",
       "traceShape": {
-        "triangle": "Triangle",
-        "square": "Square",
-        "star": "Star",
-        "hourglass": "Hourglass",
-        "lightning": "Lightning Rune",
-        "spiral": "Angular Spiral",
-        "double-triangle": "Twin-Triangle Sigil",
-        "diamond": "Diamond",
-        "pentagon": "Pentagon",
-        "arrow": "Arrow Rune",
-        "zigzag": "Zigzag Sigil",
-        "cross": "Cross Rune"
+        "triangle": "Trojúhelník",
+        "square": "Čtverec",
+        "star": "Hvězda",
+        "hourglass": "Přesýpací hodiny",
+        "lightning": "Runa blesku",
+        "spiral": "Hranatá spirála",
+        "double-triangle": "Znak dvojitého trojúhelníku",
+        "diamond": "Kosočtverec",
+        "pentagon": "Pětiúhelník",
+        "arrow": "Runa šípu",
+        "zigzag": "Znak klikatice",
+        "cross": "Runa kříže"
       },
       "traceRating": {
-        "bronze": "Bronze",
-        "silver": "Silver",
-        "gold": "Gold"
+        "bronze": "Bronz",
+        "silver": "Stříbro",
+        "gold": "Zlato"
       },
-      "traceScoreResult": "Complete! {rating}: {score}/{total}. Base reward unchanged. Gold: deed, title, +10 Renown.",
+      "traceScoreResult": "Dokončeno! {rating}: {score}/{total}. Základní odměna beze změny. Zlato: skutek, titul, +10 Věhlasu.",
       "traceCompletionLog": "{completion} {result}",
-      "traceUnavailable": "This rune needs a newer game version.",
+      "traceUnavailable": "Tato runa vyžaduje novější verzi hry.",
       "traceReaction": {
-        "tessaTriangle": "Three corners, and every one in its place!",
-        "pipSquare": "Four sides! I think I can do that too!",
-        "elianFinal": "Final rune. A line may cross or revisit a point; follow the bright marker to the next corner.",
-        "elianGold": "Beautifully traced! Your steps have earned their place in gold.",
-        "elianComplete": "A complete rune! Care and practice will make your next one even finer."
+        "tessaTriangle": "Tři rohy, a každý na svém místě!",
+        "pipSquare": "Čtyři strany! Myslím, že to taky zvládnu!",
+        "elianFinal": "Poslední runa. Čára může protnout nebo znovu navštívit bod; sleduj jasný ukazatel k dalšímu rohu.",
+        "elianGold": "Nádherně vyšlápnuto! Tvé kroky si vysloužily místo ve zlatě.",
+        "elianComplete": "Kompletní runa! Péče a cvik udělají tu příští ještě jemnější."
       },
-      "traceReady": "Speak to the instructor to begin.",
-      "tracePreview": "Watch the outline. Golden sparkles will guide you.",
-      "traceStart": "Move to the start marker. Trace either way.",
-      "traceDrawing": "Follow golden sparkles to the bright corner. Blue marks your trail.",
-      "traceSuccess": "Outline complete!",
-      "traceRetry": "Speak to the instructor to try again.",
-      "traceOffPath": "You left the outline. Speak to the instructor to retry.",
-      "traceMovement": "Stay on foot and on the ground. Speak to the instructor to retry.",
-      "traceTimeout": "Time ran out. Speak to the instructor to retry.",
-      "traceCombat": "Leave combat, then speak to the instructor to retry.",
-      "puzzleTitle": "Ley Beam Alignment",
-      "puzzleBeamReach": "Crystals reached: {count}",
-      "puzzleVictoryTitle": "Perfect alignment",
-      "puzzleVictoryDetail": "The ley beam has reached its destination.",
-      "puzzleDefeatTitle": "Alignment lost",
-      "puzzleDefeatDetail": "The current has faded. The ritual is unfinished.",
-      "puzzleReturn": "Return to realm",
+      "traceReady": "Promluv si s instruktorem, ať začneš.",
+      "tracePreview": "Sleduj obrys. Zlaté jiskry tě povedou.",
+      "traceStart": "Přejdi ke startovní značce. Vyšlápni kterýmkoli směrem.",
+      "traceDrawing": "Sleduj zlaté jiskry k jasnému rohu. Modrá značí tvou stopu.",
+      "traceSuccess": "Obrys dokončen!",
+      "traceRetry": "Promluv si s instruktorem, ať to zkusíš znovu.",
+      "traceOffPath": "Opustil(a) jsi obrys. Promluv si s instruktorem, ať to zkusíš znovu.",
+      "traceMovement": "Zůstaň pěšky a na zemi. Promluv si s instruktorem, ať to zkusíš znovu.",
+      "traceTimeout": "Čas vypršel. Promluv si s instruktorem, ať to zkusíš znovu.",
+      "traceCombat": "Opusť boj a pak si promluv s instruktorem, ať to zkusíš znovu.",
+      "puzzleTitle": "Zarovnání ley paprsku",
+      "puzzleBeamReach": "Dosažené krystaly: {count}",
+      "puzzleVictoryTitle": "Dokonalé zarovnání",
+      "puzzleVictoryDetail": "Ley paprsek dosáhl svého cíle.",
+      "puzzleDefeatTitle": "Zarovnání ztraceno",
+      "puzzleDefeatDetail": "Proud vyprchal. Rituál zůstal nedokončen.",
+      "puzzleReturn": "Vrátit se do říše",
       "puzzleResultAnnouncement": "{title}. {detail} {reach}.",
-      "puzzleLevel": "Daily level {level}",
-      "puzzleBonusLevel": "Bonus level {level} of {total}",
-      "puzzleBonusCharged": "Practice level {level} of {total} awaits. Touch the Ley Cache again. Further rounds give no rewards.",
-      "puzzleBonusPaid": "Practice level cleared!",
-      "puzzleBonusDone": "Every practice level cleared. Touch the Ley Cache to play again.",
-      "puzzleInstructions": "Rotate the tiles to carry the beam from the source to the destination.",
-      "puzzleRotateTile": "Rotate tile {tile}",
-      "puzzleConnectors": "Connectors: {connectors}.",
-      "puzzlePowered": "The beam reaches this tile.",
-      "puzzleUnpowered": "The beam does not reach this tile.",
-      "puzzleClose": "Close ley beam puzzle",
-      "puzzleSource": "Source",
-      "puzzleTarget": "Destination",
-      "puzzleSourceEndpoint": "Source: {direction}.",
-      "puzzleTargetEndpoint": "Destination: {direction}.",
+      "puzzleLevel": "Denní úroveň {level}",
+      "puzzleBonusLevel": "Bonusová úroveň {level} z {total}",
+      "puzzleBonusCharged": "Čeká tréninková úroveň {level} z {total}. Znovu se dotkni Ley skrýše. Další kola nedávají žádné odměny.",
+      "puzzleBonusPaid": "Tréninková úroveň zdolána!",
+      "puzzleBonusDone": "Všechny tréninkové úrovně zdolány. Dotkni se Ley skrýše a hraj znovu.",
+      "puzzleInstructions": "Otáčej dílky, ať dovedeš paprsek ze zdroje do cíle.",
+      "puzzleRotateTile": "Otočit dílek {tile}",
+      "puzzleConnectors": "Spoje: {connectors}.",
+      "puzzlePowered": "Paprsek dosahuje na tento dílek.",
+      "puzzleUnpowered": "Paprsek na tento dílek nedosahuje.",
+      "puzzleClose": "Zavřít hádanku s ley paprskem",
+      "puzzleSource": "Zdroj",
+      "puzzleTarget": "Cíl",
+      "puzzleSourceEndpoint": "Zdroj: {direction}.",
+      "puzzleTargetEndpoint": "Cíl: {direction}.",
       "puzzleTileAria": "{rotation} {connectors} {power} {source} {target}",
-      "puzzleRetry": "Try again",
-      "puzzleTimer": "{seconds}s",
-      "puzzleTimerAria": "Time remaining: {seconds} seconds",
-      "startQuest": "Start World Quest",
-      "startEscort": "Start Escort",
-      "escortTitle": "Caravan",
-      "alreadyCompleted": "You have already completed this World Quest for this cycle.",
-      "replay": "Play again",
-      "practiceRewards": "Practice: play again without earning more coins, experience or reputation.",
-      "inProgress": "This World Quest is already underway.",
-      "match3Title": "Confection Cascade",
-      "match3Instructions": "Select two adjacent confections. A swap only counts when it creates a line of three or more.",
-      "match3Moves": "Moves: {current}/{total}",
-      "match3Cleared": "Confections cleared: {current}/{total}",
+      "puzzleRetry": "Zkusit znovu",
+      "puzzleTimer": "{seconds} s",
+      "puzzleTimerAria": "Zbývající čas: {seconds} sekund",
+      "startQuest": "Zahájit světový úkol",
+      "startEscort": "Zahájit doprovod",
+      "escortTitle": "Karavana",
+      "alreadyCompleted": "Tento světový úkol jsi už v tomto cyklu splnil(a).",
+      "replay": "Hrát znovu",
+      "practiceRewards": "Trénink: hraj znovu bez zisku dalších mincí, zkušeností nebo pověsti.",
+      "inProgress": "Tento světový úkol už probíhá.",
+      "match3Title": "Kaskáda cukrovinek",
+      "match3Instructions": "Vyber dvě sousední cukrovinky. Prohození se počítá jen tehdy, když vytvoří řadu tří nebo více.",
+      "match3Moves": "Tahy: {current}/{total}",
+      "match3Cleared": "Odstraněné cukrovinky: {current}/{total}",
       "match3Announcement": "{moves}. {cleared}.",
-      "match3Cell": "Row {row}, column {column}: {candy}",
-      "match3Selected": "Selected",
-      "match3Reset": "Restart level",
-      "match3Close": "Close confection puzzle",
-      "match3OutOfMoves": "No moves remain. Restart the level to try again.",
-      "match3VictoryTitle": "Sweet victory",
-      "match3VictoryDetail": "The enchanted collection is complete.",
-      "match3DefeatTitle": "Bitter defeat",
-      "match3DefeatDetail": "Your moves are spent. A fresh collection awaits.",
-      "match3TryAgain": "Try again",
+      "match3Cell": "Řádek {row}, sloupec {column}: {candy}",
+      "match3Selected": "Vybráno",
+      "match3Reset": "Restartovat úroveň",
+      "match3Close": "Zavřít hádanku s cukrovinkami",
+      "match3OutOfMoves": "Nezbývají žádné tahy. Restartuj úroveň a zkus to znovu.",
+      "match3VictoryTitle": "Sladké vítězství",
+      "match3VictoryDetail": "Okouzlená sbírka je kompletní.",
+      "match3DefeatTitle": "Hořká porážka",
+      "match3DefeatDetail": "Tahy jsou vyčerpané. Čeká tě nová sbírka.",
+      "match3TryAgain": "Zkusit znovu",
       "match3ResultAnnouncement": "{title}. {detail} {moves}. {cleared}.",
       "match3ResultSummary": "{title}. {detail} {cleared}.",
       "semanticSummary": "{name}. {progress}. {reward}.",
       "semanticSummaryTimed": "{name}. {progress}. {reward}. {time}.",
       "match3Candy": {
-        "berry": "berry crystal",
-        "citrus": "citrus orb",
-        "mint": "mint triangle",
-        "grape": "grape square",
-        "star": "sugar star"
+        "berry": "bobulový krystal",
+        "citrus": "citrusová koule",
+        "mint": "mátový trojúhelník",
+        "grape": "hroznový čtverec",
+        "star": "cukrová hvězda"
       }
     },
     "logs": {
       "accepted": "Úkol přijat: {name}",
-      "worldQuestStarted": "World quest started: {name}",
+      "worldQuestStarted": "Světový úkol zahájen: {name}",
       "abandoned": "Úkol opuštěn: {name}",
       "completed": "Úkol dokončen: {name}",
       "ready": "{name} ({status})",
       "progress": "{label}: {current}/{total}",
-      "clueScrollEarned": "Every world quest of the day is done: a Clue Scroll is yours.",
-      "clueScrollLost": "Every world quest of the day is done, but you cannot hold another Clue Scroll.",
-      "clueHuntStarted": "Treasure hunt begun: {title}",
-      "clueHuntStep": "Clue {step} of {total} solved: {title}",
-      "clueHuntDone": "Treasure hunt complete: {title}. The casket is yours.",
-      "clueHuntAbandoned": "Treasure hunt abandoned: {title}",
-      "clueCasketOpened": "The casket holds {money} and {items}."
+      "clueScrollEarned": "Všechny dnešní světové úkoly jsou hotové: svitek se stopou je tvůj.",
+      "clueScrollLost": "Všechny dnešní světové úkoly jsou hotové, ale další svitek se stopou už nemůžeš mít.",
+      "clueHuntStarted": "Hon za pokladem zahájen: {title}",
+      "clueHuntStep": "Vyřešena stopa {step} z {total}: {title}",
+      "clueHuntDone": "Hon za pokladem dokončen: {title}. Truhlička je tvá.",
+      "clueHuntAbandoned": "Hon za pokladem opuštěn: {title}",
+      "clueCasketOpened": "Truhlička obsahuje {money} a {items}."
     },
     "errors": {
       "unavailable": "Tento úkol není dostupný.",
@@ -12642,12 +12642,12 @@ export const cs_CZ: EnTranslations = {
       "reclaim": "Získat zpět",
       "buyAria": "Koupit {item} za {price}",
       "reclaimAria": "Získat zpět {item}",
-      "buyQuantityAria": "How many {item} to buy (of {total})",
-      "buyQuantityBtnAria": "Buy this many {item}",
+      "buyQuantityAria": "Kolik kusů {item} koupit (z {total})",
+      "buyQuantityBtnAria": "Koupit tolik kusů {item}",
       "buyConfirmTitle": "Potvrdit nákup",
       "buyConfirmBody": "Koupit {item} za {price}?",
       "buyConfirmBodyStack": "Koupit {item} x{count} za {price} (každý {each})?",
-      "buyConfirmBodyPartial": "Buy {count} of {item} (of {total} listed) for {price} ({each} each)?",
+      "buyConfirmBodyPartial": "Koupit {count}x {item} (z {total} nabízených) za {price} ({each} za kus)?",
       "buyConfirmAccept": "Koupit",
       "buyConfirmCancel": "Zrušit",
       "buyChanged": "Tato nabídka se před potvrzením změnila. Zkontroluj cenu a zkus to znovu.",
@@ -12677,44 +12677,44 @@ export const cs_CZ: EnTranslations = {
       "collectNote": "Výdělky a vrácené zboží, které pro tebe drží Obchodník.",
       "saleProceeds": "Výnosy z prodeje",
       "collectAll": "Vyzvednout vše",
-      "history": "History",
-      "historyEmpty": "No sales yet. Items you sell on the World Market show up here.",
-      "historyNote": "Your recent sales on the World Market.",
+      "history": "Historie",
+      "historyEmpty": "Zatím žádné prodeje. Předměty, které prodáš na Světovém trhu, se objeví tady.",
+      "historyNote": "Tvé nedávné prodeje na Světovém trhu.",
       "saleBuyer": "Prodáno hráči {buyer}",
       "saleOlder": "Plus {count} dřívějších prodejů, zahrnuto v součtu.",
-      "ordersTab": "Wanted",
-      "ordersNote": "Post what you want and the gold is held at the Merchant. Listings at or under your price fill at once; the rest waits for a seller. The Merchant takes a {cut}% cut from whoever delivers. You have {used}/{max} orders open.",
-      "ordersListAria": "Open buy orders",
-      "ordersEmpty": "No open orders yet. Post one and gatherers will see what you need.",
-      "orderCardTitle": "Place an order",
-      "orderPickLabel": "Item wanted",
-      "orderPickEmpty": "Search for an item below, or pick one from the strip at the bottom.",
-      "orderSearchPlaceholder": "Search items...",
-      "orderSearchAria": "Search for an item to order",
-      "orderPickNone": "No item matches.",
-      "orderQuantity": "Units wanted",
-      "orderPriceEach": "Price each",
-      "orderEscrowLine": "Gold held at the Merchant: {total}",
-      "orderCannotAfford": "You cannot afford {total} for this order.",
-      "orderAtCap": "You have no free order slots. Withdraw one first.",
-      "orderPlaceButton": "Place Order",
-      "orderConfirmTitle": "Confirm Order",
-      "orderConfirmBody": "Order {item} x{count} at {each} each? {total} is held at the Merchant until the order is filled or withdrawn.",
-      "orderWanted": "x{count} wanted",
-      "orderBy": "Wanted by {buyer}",
-      "orderMine": "Your order",
-      "orderEach": "each",
-      "orderDeliver": "Deliver",
-      "orderDeliverAria": "Deliver {item} to {buyer}",
-      "orderDeliverNone": "None of this item in your bags.",
-      "orderWithdraw": "Withdraw",
-      "orderWithdrawAria": "Withdraw your order for {item}",
-      "orderDeliverConfirmTitle": "Confirm Delivery",
-      "orderDeliverConfirmBody": "Deliver {item} x{count} to {buyer} for {total} ({each} each)? You collect {proceeds} after the Merchant's cut.",
-      "unlistedTitle": "Not on the market",
-      "unlistedNote": "Materials with no listing at all. Post an order for one, or gather and list it.",
-      "unlistedNone": "Every material has at least one listing right now.",
-      "unlistedStageAria": "Order {item}"
+      "ordersTab": "Poptávka",
+      "ordersNote": "Zadej, co chceš, a zlato se uloží u Kupce. Nabídky na tvé ceně nebo pod ní se splní okamžitě; ostatní čekají na prodejce. Kupec si strhne {cut}% od toho, kdo doručí. Máš otevřeno {used}/{max} objednávek.",
+      "ordersListAria": "Otevřené nákupní objednávky",
+      "ordersEmpty": "Zatím žádné otevřené objednávky. Zadej jednu a sběrači uvidí, co potřebuješ.",
+      "orderCardTitle": "Zadat objednávku",
+      "orderPickLabel": "Poptávaný předmět",
+      "orderPickEmpty": "Vyhledej předmět níže, nebo vyber jeden z pruhu dole.",
+      "orderSearchPlaceholder": "Hledat předměty...",
+      "orderSearchAria": "Vyhledat předmět k objednání",
+      "orderPickNone": "Žádný předmět neodpovídá.",
+      "orderQuantity": "Poptávaný počet kusů",
+      "orderPriceEach": "Cena za kus",
+      "orderEscrowLine": "Zlato uložené u Kupce: {total}",
+      "orderCannotAfford": "Na tuto objednávku nemáš dost na {total}.",
+      "orderAtCap": "Nemáš žádné volné sloty pro objednávky. Nejdřív jednu stáhni.",
+      "orderPlaceButton": "Zadat objednávku",
+      "orderConfirmTitle": "Potvrdit objednávku",
+      "orderConfirmBody": "Objednat {item} x{count} po {each} za kus? {total} zůstane uloženo u Kupce, dokud objednávka nebude splněna nebo stažena.",
+      "orderWanted": "poptáváno x{count}",
+      "orderBy": "Poptává {buyer}",
+      "orderMine": "Tvá objednávka",
+      "orderEach": "za kus",
+      "orderDeliver": "Doručit",
+      "orderDeliverAria": "Doručit {item} hráči {buyer}",
+      "orderDeliverNone": "Tento předmět nemáš v brašnách.",
+      "orderWithdraw": "Stáhnout",
+      "orderWithdrawAria": "Stáhnout svou objednávku na {item}",
+      "orderDeliverConfirmTitle": "Potvrdit doručení",
+      "orderDeliverConfirmBody": "Doručit {item} x{count} hráči {buyer} za {total} ({each} za kus)? Po srážce Kupce si vyzvedneš {proceeds}.",
+      "unlistedTitle": "Není na trhu",
+      "unlistedNote": "Materiály zcela bez nabídky. Zadej na některý objednávku, nebo ho nasbírej a nabídni sám.",
+      "unlistedNone": "Každý materiál má teď aspoň jednu nabídku.",
+      "unlistedStageAria": "Objednat {item}"
     },
     "logs": {
       "listedItem": "{item} nabídnut na Světovém trhu za {money}.",
@@ -12723,11 +12723,11 @@ export const cs_CZ: EnTranslations = {
       "collectedMoney": "Vyzvedáváš si od Obchodníka {money}.",
       "reclaimedItem": "{item} získán zpět z trhu.",
       "expiredListing": "Tvá tržní nabídka {item} vypršela a čeká u Obchodníka.",
-      "orderPlaced": "Placed an order for {item} x{count} at {each} each.",
-      "orderDelivered": "Delivered {item} x{count} to {buyer} for {money}. Collect {proceeds} from the Merchant.",
-      "orderReceived": "{seller} delivered {item} x{count} to your order. Collect it from the Merchant.",
-      "orderWithdrawn": "Withdrew your order for {item}; {money} returned.",
-      "orderExpired": "Your order for {item} expired; {money} waits at the Merchant.",
+      "orderPlaced": "Zadal(a) jsi objednávku na {item} x{count} po {each} za kus.",
+      "orderDelivered": "Doručil(a) jsi {item} x{count} hráči {buyer} za {money}. Vyzvedni si {proceeds} u Kupce.",
+      "orderReceived": "{seller} doručil(a) {item} x{count} na tvou objednávku. Vyzvedni si to u Kupce.",
+      "orderWithdrawn": "Stáhl(a) jsi svou objednávku na {item}; {money} se vrátilo.",
+      "orderExpired": "Tvá objednávka na {item} vypršela; {money} čeká u Kupce.",
       "boughtBackItem": "Odkoupeno zpět: {item} za {money}."
     },
     "errors": {
@@ -12747,11 +12747,11 @@ export const cs_CZ: EnTranslations = {
       "nothingToCollect": "Nemáš nic k vyzvednutí.",
       "sweepNoListings": "Nejsou k dispozici žádné záznamy této položky, které by bylo možné zamést.",
       "sweepPriceChanged": "Ceny se změnily, než váš sweep přistál. Zkontrolujte nabídku a zkuste to znovu.",
-      "orderCountNeeded": "Name how many you want.",
-      "tooManyOrders": "You may keep at most {count} orders open at once.",
-      "orderClosed": "That order is no longer open.",
-      "orderOwn": "That is your own order. Cancel it to withdraw it.",
-      "orderNotYours": "That is not your order."
+      "orderCountNeeded": "Uveď, kolik jich chceš.",
+      "tooManyOrders": "Najednou můžeš mít otevřených nejvýše {count} objednávek.",
+      "orderClosed": "Tato objednávka už není otevřená.",
+      "orderOwn": "To je tvoje vlastní objednávka. Zrušením ji stáhneš.",
+      "orderNotYours": "To není tvoje objednávka."
     },
     "loot": {
       "takeAll": "Vzít vše",
@@ -13485,15 +13485,15 @@ export const cs_CZ: EnTranslations = {
       },
       "lightning_overload": {
         "name": "Arc Overload",
-        "description": "Passive: Arc Bolt and Skybranch have a 20% chance to Overload, striking their first target again for 50% of the damage dealt and granting 1 Thunder. (Thundercall)"
+        "description": "Pasivní: Bleskový šíp a Rozvětvený blesk mají 20% šanci na Přetížení, čímž znovu zasáhnou svůj první cíl za 50 % způsobeného poškození a udělí 1 Hrom. (Volání hromu)"
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
+        "description": "Způsobí {damage} ohnivého poškození. Vždy kriticky zasáhne cíl hořící tvým Škvárovým otřesem. Nával magmatu: každý tik Škvárového otřesu má 20% šanci obnovit tento čas obnovy a udělat tvůj příští Magmatový výbuch během 10 s okamžitým. Poškození roste se silou kouzel. (Volání hromu)"
       },
       "thunderstorm": {
         "name": "Stormbreak",
-        "description": "Call down a thunderclap, dealing {damage} Nature damage to enemies within 10 yards and slowing them by 50% for 5 sec. Restores 8% of your maximum Mana. Damage increases with Spell Power. (Thundercall)"
+        "description": "Přivolá úder hromu, který způsobí {damage} přírodního poškození nepřátelům do 10 yardů a zpomalí je o 50 % na 5 s. Obnoví 8 % tvé maximální many. Poškození roste se silou kouzel. (Volání hromu)"
       },
       "rockbiter_weapon": {
         "name": "Zbraň spoutaná kamenem",
@@ -15843,16 +15843,16 @@ export const cs_CZ: EnTranslations = {
         "name": "Spuštěná bažinná past"
       },
       "leyline_cache": {
-        "name": "Miniature Ley Cache"
+        "name": "Miniaturní skrýš siločar"
       },
       "confection_game_box": {
-        "name": "Confectioner's Game Box"
+        "name": "Cukrářova herní skříňka"
       },
       "eastbrook_freight_crate": {
-        "name": "Eastbrook Freight Crate"
+        "name": "Eastbrookská nákladní bedna"
       },
       "eastbrook_freight_wagon": {
-        "name": "Eastbrook Freight Wagon"
+        "name": "Eastbrookský nákladní vůz"
       },
       "hearthlined_treads": {
         "name": "Boty podšité ohništěm"
@@ -16020,7 +16020,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Startovací klíč: Drtivák Děsivé jiskry"
       },
       "reins_avian_strider": {
-        "name": "Reins of the Viridian Valestrider"
+        "name": "Otěže Smaragdového údolochodce"
       },
       "reins_goblin_rocket_sled": {
         "name": "Klíček zapalování: Gobliní raketové saně"
@@ -17394,421 +17394,421 @@ export const cs_CZ: EnTranslations = {
         "name": "Kroužkové boty Písně bouře"
       },
       "vanguard_warrior_arms_helmet": {
-        "name": "Bladewake Greathelm"
+        "name": "Velká přilba Čepelostopy"
       },
       "vanguard_warrior_arms_shoulder": {
-        "name": "Bladewake Pauldrons"
+        "name": "Nárameníky Čepelostopy"
       },
       "vanguard_warrior_arms_chest": {
-        "name": "Bladewake Hauberk"
+        "name": "Kroužková košile Čepelostopy"
       },
       "vanguard_warrior_arms_legs": {
-        "name": "Bladewake Legplates"
+        "name": "Plátové nohavice Čepelostopy"
       },
       "vanguard_warrior_arms_gloves": {
-        "name": "Bladewake Crushers"
+        "name": "Drtiče Čepelostopy"
       },
       "vanguard_warrior_fury_helmet": {
-        "name": "Bloodmarch Visage"
+        "name": "Maska Krvopochodu"
       },
       "vanguard_warrior_fury_shoulder": {
-        "name": "Bloodmarch Shoulderguards"
+        "name": "Chrániče ramen Krvopochodu"
       },
       "vanguard_warrior_fury_chest": {
-        "name": "Bloodmarch Chainmail"
+        "name": "Drátěná košile Krvopochodu"
       },
       "vanguard_warrior_fury_legs": {
-        "name": "Bloodmarch Leggings"
+        "name": "Kalhoty Krvopochodu"
       },
       "vanguard_warrior_fury_gloves": {
-        "name": "Bloodmarch Grips"
+        "name": "Rukavice Krvopochodu"
       },
       "vanguard_warrior_prot_helmet": {
-        "name": "Ironmarch Helm"
+        "name": "Přilba Železopochodu"
       },
       "vanguard_warrior_prot_shoulder": {
-        "name": "Ironmarch Spaulders"
+        "name": "Nárameníky Železopochodu"
       },
       "vanguard_warrior_prot_chest": {
-        "name": "Ironmarch Chestguard"
+        "name": "Chránič hrudi Železopochodu"
       },
       "vanguard_warrior_prot_legs": {
-        "name": "Ironmarch Legguards"
+        "name": "Nohavice Železopochodu"
       },
       "vanguard_warrior_prot_gloves": {
-        "name": "Ironmarch Handguards"
+        "name": "Chrániče rukou Železopochodu"
       },
       "vanguard_paladin_holy_helmet": {
-        "name": "Sunvigil Circlet"
+        "name": "Čelenka Slunostráže"
       },
       "vanguard_paladin_holy_shoulder": {
-        "name": "Sunvigil Mantle"
+        "name": "Plášť Slunostráže"
       },
       "vanguard_paladin_holy_chest": {
-        "name": "Sunvigil Hauberk"
+        "name": "Kroužková košile Slunostráže"
       },
       "vanguard_paladin_holy_legs": {
-        "name": "Sunvigil Legmail"
+        "name": "Kroužkové nohavice Slunostráže"
       },
       "vanguard_paladin_holy_gloves": {
-        "name": "Sunvigil Gloves"
+        "name": "Rukavice Slunostráže"
       },
       "vanguard_paladin_protection_helmet": {
-        "name": "Shieldvow Helm"
+        "name": "Přilba Štítopřísahy"
       },
       "vanguard_paladin_protection_shoulder": {
-        "name": "Shieldvow Pauldrons"
+        "name": "Nárameníky Štítopřísahy"
       },
       "vanguard_paladin_protection_chest": {
-        "name": "Shieldvow Breastplate"
+        "name": "Kyrys Štítopřísahy"
       },
       "vanguard_paladin_protection_legs": {
-        "name": "Shieldvow Legplates"
+        "name": "Plátové nohavice Štítopřísahy"
       },
       "vanguard_paladin_protection_gloves": {
-        "name": "Shieldvow Gauntlets"
+        "name": "Rukavice Štítopřísahy"
       },
       "vanguard_paladin_retribution_helmet": {
-        "name": "Lightbrand Crown"
+        "name": "Koruna Světlocejchu"
       },
       "vanguard_paladin_retribution_shoulder": {
-        "name": "Lightbrand Spaulders"
+        "name": "Nárameníky Světlocejchu"
       },
       "vanguard_paladin_retribution_chest": {
-        "name": "Lightbrand Cuirass"
+        "name": "Kyrys Světlocejchu"
       },
       "vanguard_paladin_retribution_legs": {
-        "name": "Lightbrand Legguards"
+        "name": "Nohavice Světlocejchu"
       },
       "vanguard_paladin_retribution_gloves": {
-        "name": "Lightbrand Gauntlets"
+        "name": "Rukavice Světlocejchu"
       },
       "vanguard_hunter_beast_mastery_helmet": {
-        "name": "Packwarden Coif"
+        "name": "Kukla Smečkostrážce"
       },
       "vanguard_hunter_beast_mastery_shoulder": {
-        "name": "Packwarden Spaulders"
+        "name": "Nárameníky Smečkostrážce"
       },
       "vanguard_hunter_beast_mastery_chest": {
-        "name": "Packwarden Jerkin"
+        "name": "Kazajka Smečkostrážce"
       },
       "vanguard_hunter_beast_mastery_legs": {
-        "name": "Packwarden Legguards"
+        "name": "Nohavice Smečkostrážce"
       },
       "vanguard_hunter_beast_mastery_gloves": {
-        "name": "Packwarden Gauntlets"
+        "name": "Rukavice Smečkostrážce"
       },
       "vanguard_hunter_marksmanship_helmet": {
-        "name": "Farsight Coif"
+        "name": "Kukla Dálnozraku"
       },
       "vanguard_hunter_marksmanship_shoulder": {
-        "name": "Farsight Spaulders"
+        "name": "Nárameníky Dálnozraku"
       },
       "vanguard_hunter_marksmanship_chest": {
-        "name": "Farsight Jerkin"
+        "name": "Kazajka Dálnozraku"
       },
       "vanguard_hunter_marksmanship_legs": {
-        "name": "Farsight Legguards"
+        "name": "Nohavice Dálnozraku"
       },
       "vanguard_hunter_marksmanship_gloves": {
-        "name": "Farsight Gauntlets"
+        "name": "Rukavice Dálnozraku"
       },
       "vanguard_hunter_survival_helmet": {
-        "name": "Snaretooth Coif"
+        "name": "Kukla Osidlozubu"
       },
       "vanguard_hunter_survival_shoulder": {
-        "name": "Snaretooth Spaulders"
+        "name": "Nárameníky Osidlozubu"
       },
       "vanguard_hunter_survival_chest": {
-        "name": "Snaretooth Jerkin"
+        "name": "Kazajka Osidlozubu"
       },
       "vanguard_hunter_survival_legs": {
-        "name": "Snaretooth Legguards"
+        "name": "Nohavice Osidlozubu"
       },
       "vanguard_hunter_survival_gloves": {
-        "name": "Snaretooth Gauntlets"
+        "name": "Rukavice Osidlozubu"
       },
       "vanguard_rogue_assassination_helmet": {
-        "name": "Nightcut Hood"
+        "name": "Kápě Nočnořezu"
       },
       "vanguard_rogue_assassination_shoulder": {
-        "name": "Nightcut Shoulderpads"
+        "name": "Nárameníky Nočnořezu"
       },
       "vanguard_rogue_assassination_chest": {
-        "name": "Nightcut Tunic"
+        "name": "Tunika Nočnořezu"
       },
       "vanguard_rogue_assassination_legs": {
-        "name": "Nightcut Breeches"
+        "name": "Kalhoty Nočnořezu"
       },
       "vanguard_rogue_assassination_gloves": {
-        "name": "Nightcut Gloves"
+        "name": "Rukavice Nočnořezu"
       },
       "vanguard_rogue_combat_helmet": {
-        "name": "Brawlmark Hood"
+        "name": "Kápě Rvačkocejchu"
       },
       "vanguard_rogue_combat_shoulder": {
-        "name": "Brawlmark Shoulderpads"
+        "name": "Nárameníky Rvačkocejchu"
       },
       "vanguard_rogue_combat_chest": {
-        "name": "Brawlmark Tunic"
+        "name": "Tunika Rvačkocejchu"
       },
       "vanguard_rogue_combat_legs": {
-        "name": "Brawlmark Breeches"
+        "name": "Kalhoty Rvačkocejchu"
       },
       "vanguard_rogue_combat_gloves": {
-        "name": "Brawlmark Gloves"
+        "name": "Rukavice Rvačkocejchu"
       },
       "vanguard_rogue_subtlety_helmet": {
-        "name": "Shadewalk Hood"
+        "name": "Kápě Stínochodu"
       },
       "vanguard_rogue_subtlety_shoulder": {
-        "name": "Shadewalk Shoulderpads"
+        "name": "Nárameníky Stínochodu"
       },
       "vanguard_rogue_subtlety_chest": {
-        "name": "Shadewalk Tunic"
+        "name": "Tunika Stínochodu"
       },
       "vanguard_rogue_subtlety_legs": {
-        "name": "Shadewalk Breeches"
+        "name": "Kalhoty Stínochodu"
       },
       "vanguard_rogue_subtlety_gloves": {
-        "name": "Shadewalk Gloves"
+        "name": "Rukavice Stínochodu"
       },
       "vanguard_priest_discipline_helmet": {
-        "name": "Veilpsalm Cowl"
+        "name": "Kápě Závojožalmu"
       },
       "vanguard_priest_discipline_shoulder": {
-        "name": "Veilpsalm Mantle"
+        "name": "Plášť Závojožalmu"
       },
       "vanguard_priest_discipline_chest": {
-        "name": "Veilpsalm Robe"
+        "name": "Roucho Závojožalmu"
       },
       "vanguard_priest_discipline_legs": {
-        "name": "Veilpsalm Leggings"
+        "name": "Kalhoty Závojožalmu"
       },
       "vanguard_priest_discipline_gloves": {
-        "name": "Veilpsalm Handwraps"
+        "name": "Omotávky Závojožalmu"
       },
       "vanguard_priest_holy_helmet": {
-        "name": "Gracewing Cowl"
+        "name": "Kápě Milokřídla"
       },
       "vanguard_priest_holy_shoulder": {
-        "name": "Gracewing Mantle"
+        "name": "Plášť Milokřídla"
       },
       "vanguard_priest_holy_chest": {
-        "name": "Gracewing Robe"
+        "name": "Roucho Milokřídla"
       },
       "vanguard_priest_holy_legs": {
-        "name": "Gracewing Leggings"
+        "name": "Kalhoty Milokřídla"
       },
       "vanguard_priest_holy_gloves": {
-        "name": "Gracewing Handwraps"
+        "name": "Omotávky Milokřídla"
       },
       "vanguard_priest_shadow_helmet": {
-        "name": "Duskhymn Cowl"
+        "name": "Kápě Soumrakohymny"
       },
       "vanguard_priest_shadow_shoulder": {
-        "name": "Duskhymn Mantle"
+        "name": "Plášť Soumrakohymny"
       },
       "vanguard_priest_shadow_chest": {
-        "name": "Duskhymn Robe"
+        "name": "Roucho Soumrakohymny"
       },
       "vanguard_priest_shadow_legs": {
-        "name": "Duskhymn Leggings"
+        "name": "Kalhoty Soumrakohymny"
       },
       "vanguard_priest_shadow_gloves": {
-        "name": "Duskhymn Handwraps"
+        "name": "Omotávky Soumrakohymny"
       },
       "vanguard_shaman_elemental_helmet": {
-        "name": "Tempestwrit Coif"
+        "name": "Kukla Bouřeznaku"
       },
       "vanguard_shaman_elemental_shoulder": {
-        "name": "Tempestwrit Pauldrons"
+        "name": "Nárameníky Bouřeznaku"
       },
       "vanguard_shaman_elemental_chest": {
-        "name": "Tempestwrit Hauberk"
+        "name": "Kroužková košile Bouřeznaku"
       },
       "vanguard_shaman_elemental_legs": {
-        "name": "Tempestwrit Legmail"
+        "name": "Kroužkové nohavice Bouřeznaku"
       },
       "vanguard_shaman_elemental_gloves": {
-        "name": "Tempestwrit Gauntlets"
+        "name": "Rukavice Bouřeznaku"
       },
       "vanguard_shaman_enhancement_helmet": {
-        "name": "Galeborn Helm"
+        "name": "Vichrozrozená přilba"
       },
       "vanguard_shaman_enhancement_shoulder": {
-        "name": "Galeborn Spaulders"
+        "name": "Vichrozrozené nárameníky"
       },
       "vanguard_shaman_enhancement_chest": {
-        "name": "Galeborn Chainmail"
+        "name": "Vichrozrozená drátěná košile"
       },
       "vanguard_shaman_enhancement_legs": {
-        "name": "Galeborn Legguards"
+        "name": "Vichrozrozené nohavice"
       },
       "vanguard_shaman_enhancement_gloves": {
-        "name": "Galeborn Grips"
+        "name": "Vichrozrozené rukavice"
       },
       "vanguard_shaman_restoration_helmet": {
-        "name": "Brineward Circlet"
+        "name": "Čelenka Solankostráže"
       },
       "vanguard_shaman_restoration_shoulder": {
-        "name": "Brineward Mantle"
+        "name": "Plášť Solankostráže"
       },
       "vanguard_shaman_restoration_chest": {
-        "name": "Brineward Hauberk"
+        "name": "Kroužková košile Solankostráže"
       },
       "vanguard_shaman_restoration_legs": {
-        "name": "Brineward Kilt"
+        "name": "Kilt Solankostráže"
       },
       "vanguard_shaman_restoration_gloves": {
-        "name": "Brineward Handwraps"
+        "name": "Omotávky Solankostráže"
       },
       "vanguard_mage_arcane_helmet": {
-        "name": "Hourbinder's Hood"
+        "name": "Kápě Časovazače"
       },
       "vanguard_mage_arcane_shoulder": {
-        "name": "Hourbinder's Amice"
+        "name": "Nárameník Časovazače"
       },
       "vanguard_mage_arcane_chest": {
-        "name": "Hourbinder's Robe"
+        "name": "Roucho Časovazače"
       },
       "vanguard_mage_arcane_legs": {
-        "name": "Hourbinder's Trousers"
+        "name": "Kalhoty Časovazače"
       },
       "vanguard_mage_arcane_gloves": {
-        "name": "Hourbinder's Gloves"
+        "name": "Rukavice Časovazače"
       },
       "vanguard_mage_fire_helmet": {
-        "name": "Emberlash Cowl"
+        "name": "Kápě Žhavobiče"
       },
       "vanguard_mage_fire_shoulder": {
-        "name": "Emberlash Mantle"
+        "name": "Plášť Žhavobiče"
       },
       "vanguard_mage_fire_chest": {
-        "name": "Emberlash Robes"
+        "name": "Roucho Žhavobiče"
       },
       "vanguard_mage_fire_legs": {
-        "name": "Emberlash Leggings"
+        "name": "Kalhoty Žhavobiče"
       },
       "vanguard_mage_fire_gloves": {
-        "name": "Emberlash Gloves"
+        "name": "Rukavice Žhavobiče"
       },
       "vanguard_mage_frost_helmet": {
-        "name": "Rimewarden Hood"
+        "name": "Kapuce Jinovatkostrážce"
       },
       "vanguard_mage_frost_shoulder": {
-        "name": "Rimewarden Shoulderpads"
+        "name": "Nárameníky Jinovatkostrážce"
       },
       "vanguard_mage_frost_chest": {
-        "name": "Rimewarden Vestment"
+        "name": "Roucho Jinovatkostrážce"
       },
       "vanguard_mage_frost_legs": {
-        "name": "Rimewarden Legwraps"
+        "name": "Omotávky Jinovatkostrážce"
       },
       "vanguard_mage_frost_gloves": {
-        "name": "Rimewarden Mitts"
+        "name": "Palčáky Jinovatkostrážce"
       },
       "vanguard_warlock_affliction_helmet": {
-        "name": "Dreadquill Hood"
+        "name": "Kápě Děsopera"
       },
       "vanguard_warlock_affliction_shoulder": {
-        "name": "Dreadquill Mantle"
+        "name": "Plášť Děsopera"
       },
       "vanguard_warlock_affliction_chest": {
-        "name": "Dreadquill Robe"
+        "name": "Roucho Děsopera"
       },
       "vanguard_warlock_affliction_legs": {
-        "name": "Dreadquill Leggings"
+        "name": "Kalhoty Děsopera"
       },
       "vanguard_warlock_affliction_gloves": {
-        "name": "Dreadquill Handwraps"
+        "name": "Omotávky Děsopera"
       },
       "vanguard_warlock_demonology_helmet": {
-        "name": "Marrowbound Cowl"
+        "name": "Kápě Dřeňopouta"
       },
       "vanguard_warlock_demonology_shoulder": {
-        "name": "Marrowbound Spaulders"
+        "name": "Nárameníky Dřeňopouta"
       },
       "vanguard_warlock_demonology_chest": {
-        "name": "Marrowbound Robe"
+        "name": "Roucho Dřeňopouta"
       },
       "vanguard_warlock_demonology_legs": {
-        "name": "Marrowbound Leggings"
+        "name": "Kalhoty Dřeňopouta"
       },
       "vanguard_warlock_demonology_gloves": {
-        "name": "Marrowbound Grips"
+        "name": "Rukavice Dřeňopouta"
       },
       "vanguard_warlock_destruction_helmet": {
-        "name": "Slagcrown Hood"
+        "name": "Kápě Struskokoruny"
       },
       "vanguard_warlock_destruction_shoulder": {
-        "name": "Slagcrown Mantle"
+        "name": "Plášť Struskokoruny"
       },
       "vanguard_warlock_destruction_chest": {
-        "name": "Slagcrown Robes"
+        "name": "Roucho Struskokoruny"
       },
       "vanguard_warlock_destruction_legs": {
-        "name": "Slagcrown Leggings"
+        "name": "Kalhoty Struskokoruny"
       },
       "vanguard_warlock_destruction_gloves": {
-        "name": "Slagcrown Gloves"
+        "name": "Rukavice Struskokoruny"
       },
       "vanguard_druid_balance_helmet": {
-        "name": "Starwarden Headdress"
+        "name": "Čelenka Hvězdostrážce"
       },
       "vanguard_druid_balance_shoulder": {
-        "name": "Starwarden Spaulders"
+        "name": "Nárameníky Hvězdostrážce"
       },
       "vanguard_druid_balance_chest": {
-        "name": "Starwarden Vest"
+        "name": "Vesta Hvězdostrážce"
       },
       "vanguard_druid_balance_legs": {
-        "name": "Starwarden Breeches"
+        "name": "Kalhoty Hvězdostrážce"
       },
       "vanguard_druid_balance_gloves": {
-        "name": "Starwarden Gloves"
+        "name": "Rukavice Hvězdostrážce"
       },
       "vanguard_druid_feral_helmet": {
-        "name": "Bloodmane Helm"
+        "name": "Krvohřívová přilba"
       },
       "vanguard_druid_feral_shoulder": {
-        "name": "Bloodmane Shoulderpads"
+        "name": "Krvohřívové nárameníky"
       },
       "vanguard_druid_feral_chest": {
-        "name": "Bloodmane Tunic"
+        "name": "Krvohřívová tunika"
       },
       "vanguard_druid_feral_legs": {
-        "name": "Bloodmane Legguards"
+        "name": "Krvohřívové nohavice"
       },
       "vanguard_druid_feral_gloves": {
-        "name": "Bloodmane Grips"
+        "name": "Krvohřívové rukavice"
       },
       "vanguard_druid_restoration_helmet": {
-        "name": "Thistlebloom Crown"
+        "name": "Koruna Bodlákokvětu"
       },
       "vanguard_druid_restoration_shoulder": {
-        "name": "Thistlebloom Mantle"
+        "name": "Plášť Bodlákokvětu"
       },
       "vanguard_druid_restoration_chest": {
-        "name": "Thistlebloom Vest"
+        "name": "Vesta Bodlákokvětu"
       },
       "vanguard_druid_restoration_legs": {
-        "name": "Thistlebloom Leggings"
+        "name": "Kalhoty Bodlákokvětu"
       },
       "vanguard_druid_restoration_gloves": {
-        "name": "Thistlebloom Gloves"
+        "name": "Rukavice Bodlákokvětu"
       },
       "vanguard_verdict_greatsword": {
-        "name": "Vanguard's Verdict"
+        "name": "Ortel Předvoje"
       },
       "vanguard_oath_blade": {
-        "name": "Vanguard's Oath"
+        "name": "Přísaha Předvoje"
       },
       "vanguard_fang_dagger": {
-        "name": "Vanguard's Fang"
+        "name": "Tesák Předvoje"
       },
       "vanguard_warstaff": {
-        "name": "Vanguard's Warstaff"
+        "name": "Bojová hůl Předvoje"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
@@ -18291,13 +18291,13 @@ export const cs_CZ: EnTranslations = {
         "name": "Tajemná kosmetická skrýš"
       },
       "emissary_cache": {
-        "name": "Emissary's Cache"
+        "name": "Vyslancova skrýš"
       },
       "clue_scroll": {
-        "name": "Clue Scroll"
+        "name": "Hádankový svitek"
       },
       "treasure_casket": {
-        "name": "Treasure Casket"
+        "name": "Truhla s pokladem"
       },
       "heroic_mark": {
         "name": "Hrdinská značka"
@@ -18612,154 +18612,154 @@ export const cs_CZ: EnTranslations = {
         "name": "Žárová stráž, Varkhulův val"
       },
       "bastion_sigil": {
-        "name": "Bastion Sigil"
+        "name": "Znak Bašty"
       },
       "mooring_stone": {
-        "name": "Mooring Stone"
+        "name": "Kotevní kámen"
       },
       "menders_hourglass": {
-        "name": "Mender's Hourglass"
+        "name": "Přesýpací hodiny hojitele"
       },
       "wellspring_seed": {
-        "name": "Wellspring Seed"
+        "name": "Semínko pramene"
       },
       "paired_talons": {
-        "name": "Paired Talons"
+        "name": "Sdružené spáry"
       },
       "hunters_tally": {
-        "name": "Hunter's Tally"
+        "name": "Lovcův výkaz"
       },
       "stormjar": {
-        "name": "Stormjar"
+        "name": "Bouřní sklenice"
       },
       "echoing_lens": {
-        "name": "Echoing Lens"
+        "name": "Ozvěnová čočka"
       },
       "gamblers_die": {
-        "name": "Gambler's Die"
+        "name": "Hazardérova kostka"
       },
       "sundered_prism": {
-        "name": "Sundered Prism"
+        "name": "Rozlomený hranol"
       },
       "wayfarers_lodestone": {
-        "name": "Wayfarer's Lodestone"
+        "name": "Poutníkův magnetovec"
       },
       "medallion_of_defiance": {
-        "name": "Medallion of Defiance"
+        "name": "Medailon vzdoru"
       },
       "duelists_brand": {
-        "name": "Duelist's Brand"
+        "name": "Duelantovo znamení"
       },
       "forgefathers_temper": {
-        "name": "Forgefather's Temper"
+        "name": "Kalení Kovopředka"
       },
       "kindling_orb": {
-        "name": "Kindling Orb"
+        "name": "Podpalová koule"
       },
       "molten_fletching": {
-        "name": "Molten Fletching"
+        "name": "Roztavené opeření"
       },
       "last_flame_lantern": {
-        "name": "Last Flame Lantern"
+        "name": "Lucerna posledního plamene"
       },
       "heart_of_the_crucible": {
-        "name": "Heart of the Crucible"
+        "name": "Srdce tavicího kelímku"
       },
       "rift_watchers_band": {
-        "name": "Rift Watcher's Band"
+        "name": "Trhlinohlídačova obroučka"
       },
       "rift_surveyors_satchel": {
-        "name": "Rift Surveyor's Satchel"
+        "name": "Brašna Trhlinového průzkumníka"
       },
       "riftwalkers_tunic": {
-        "name": "Riftwalker's Tunic"
+        "name": "Tunika Trhlinochodce"
       },
       "riftwarden_voidblade": {
-        "name": "Riftwarden's Voidblade"
+        "name": "Čepel prázdna Trhlinostrážce"
       },
       "champion_rift_band": {
-        "name": "Champion's Rift Band"
+        "name": "Šampionova trhlinová obroučka"
       },
       "order_prayer_beads": {
-        "name": "Order Prayer Beads"
+        "name": "Modlitební korálky Řádu"
       },
       "vestments_of_the_acolyte": {
-        "name": "Vestments of the Acolyte"
+        "name": "Roucho akolyty"
       },
       "templar_dawn_shield": {
-        "name": "Templar's Dawn Shield"
+        "name": "Templářův úsvitní štít"
       },
       "dawnkeeper_consecrated_mace": {
-        "name": "Dawnkeeper's Consecrated Mace"
+        "name": "Úsvitostrážcův posvěcený palcát"
       },
       "champion_dawn_medallion": {
-        "name": "Champion's Dawn Medallion"
+        "name": "Šampionův úsvitní medailon"
       },
       "automaton_cog_ring": {
-        "name": "Automaton Cog Ring"
+        "name": "Ozubený prsten automatu"
       },
       "clockwork_tinkers_pack": {
-        "name": "Clockwork Tinker's Pack"
+        "name": "Vak hodinového mechanika"
       },
       "artificers_welding_cowl": {
-        "name": "Artificer's Welding Cowl"
+        "name": "Konstruktérova svářečská kukla"
       },
       "forgemaster_crag_cleaver": {
-        "name": "Forgemaster's Crag Cleaver"
+        "name": "Kovmistrův skalní sekáč"
       },
       "champion_forged_loop": {
-        "name": "Champion's Forged Loop"
+        "name": "Šampionův kovaný kroužek"
       },
       "tidewatchers_locket": {
-        "name": "Tidewatcher's Locket"
+        "name": "Medailonek Přílivostrážce"
       },
       "riftwalkers_cord": {
-        "name": "Riftwalker's Cord"
+        "name": "Šňůra Trhlinochodce"
       },
       "riftwalkers_treads": {
-        "name": "Riftwalker's Treads"
+        "name": "Boty Trhlinochodce"
       },
       "formula_riftwalkers_grace": {
-        "name": "Formula: Riftwalker's Grace"
+        "name": "Formule: Milost Trhlinochodce"
       },
       "riftwardens_pendant": {
-        "name": "Riftwarden's Pendant"
+        "name": "Přívěsek Trhlinostrážce"
       },
       "acolytes_signet": {
-        "name": "Acolyte's Signet"
+        "name": "Akolytův signet"
       },
       "cord_of_the_dawn": {
-        "name": "Cord of the Dawn"
+        "name": "Šňůra úsvitu"
       },
       "dawnlit_slippers": {
-        "name": "Dawnlit Slippers"
+        "name": "Úsvitem ozářené střevíce"
       },
       "formula_dawnfire_etching": {
-        "name": "Formula: Dawnfire Etching"
+        "name": "Formule: Rytina úsvitného ohně"
       },
       "formula_dawns_benediction": {
-        "name": "Formula: Dawn's Benediction"
+        "name": "Formule: Požehnání úsvitu"
       },
       "champions_dawn_loop": {
-        "name": "Champion's Dawn Loop"
+        "name": "Šampionův úsvitní kroužek"
       },
       "dawnkeepers_circle": {
-        "name": "Dawnkeeper's Circle"
+        "name": "Úsvitostrážcův kruh"
       },
       "cogwork_choker": {
-        "name": "Cogwork Choker"
+        "name": "Ozubený obojek"
       },
       "forgemasters_girdle": {
-        "name": "Forgemaster's Girdle"
+        "name": "Kovmistrův opasek"
       },
       "forgemasters_sabatons": {
-        "name": "Forgemaster's Sabatons"
+        "name": "Kovmistrovy okované boty"
       },
       "formula_piston_drive": {
-        "name": "Formula: Piston Drive"
+        "name": "Formule: Pístový pohon"
       },
       "forgewall_gorget": {
-        "name": "Forgewall Gorget"
+        "name": "Nákrčník kovářské hradby"
       }
     },
     "mobs": {
@@ -18788,13 +18788,13 @@ export const cs_CZ: EnTranslations = {
         "name": "Bandita z údolí"
       },
       "eastbrook_freight_caravan": {
-        "name": "Eastbrook Freight Caravan"
+        "name": "Eastbrookská nákladní karavana"
       },
       "willowfen_remedy_caravan": {
-        "name": "Willowfen Remedy Caravan"
+        "name": "Léčivá karavana Vrbové bažiny"
       },
       "frostveil_supply_caravan": {
-        "name": "Frostveil Supply Caravan"
+        "name": "Zásobovací karavana Mrazivého závoje"
       },
       "restless_bones": {
         "name": "Neklidné kosti"
@@ -18818,7 +18818,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Utopený mrtvý"
       },
       "fenbridge_infiltrator": {
-        "name": "The Borrowed Face"
+        "name": "Vypůjčená tvář"
       },
       "fen_troll": {
         "name": "Troll z Mirefenu"
@@ -19528,114 +19528,114 @@ export const cs_CZ: EnTranslations = {
     },
     "npcs": {
       "glider_instructor": {
-        "name": "Flightmaster Zephyr",
-        "title": "Windrider Instructor",
-        "greeting": "The thermals howling off the cliffs of The Shear are fierce today. Ready to strap into the mechanical glider and test your wings through the slalom course?"
+        "name": "Letmistr Zephyr",
+        "title": "Instruktor vichrojezdectví",
+        "greeting": "Vzestupné proudy vyjící z útesů The Shear jsou dnes divoké. Připraven(a) připoutat se do mechanického kluzáku a vyzkoušet svá křídla na slalomové dráze?"
       },
       "glider_apprentice": {
         "name": "Skye",
-        "title": "Zephyrs Apprentice",
-        "greeting": "Great flight down the canyon. Speak with me whenever you need a magical updraft back to Zephyr at The Shear."
+        "title": "Zephyrova učednice",
+        "greeting": "Skvělý let kaňonem. Promluv se mnou, kdykoli budeš potřebovat kouzelný vzdušný proud zpátky k Zephyrovi na The Shear."
       },
       "shadow_cloak_scout": {
-        "name": "Scout Valerie",
-        "title": "Covert Operations",
-        "greeting": "Borrow my duskweave cloak. Slip in behind each dispatch carrier and lift his orders. Stay out of the lantern beams: a lantern guard sees straight through the enchantment, and a carrier feels you if you brush against him."
+        "name": "Zvědka Valerie",
+        "title": "Tajné operace",
+        "greeting": "Půjč si můj soumračný plášť. Vklouzni za každého kurýra s depešemi a seber mu rozkazy. Drž se mimo paprsky luceren: lucernový strážný vidí přes to kouzlo naskrz a kurýr tě ucítí, když se ho dotkneš."
       },
       "shadow_guard_north": {
-        "name": "Dispatch Guard",
-        "title": "Dispatch Carrier",
-        "greeting": "These sealed orders are for the captain. Keep your distance."
+        "name": "Depešový strážný",
+        "title": "Nosič depeší",
+        "greeting": "Tyto zapečetěné rozkazy jsou pro kapitána. Drž si odstup."
       },
       "shadow_guard_south": {
-        "name": "Dispatch Guard",
-        "title": "Dispatch Carrier",
-        "greeting": "I have a dispatch to deliver. Move along."
+        "name": "Depešový strážný",
+        "title": "Nosič depeší",
+        "greeting": "Mám doručit depeši. Jdi dál."
       },
       "shadow_guard_east": {
-        "name": "Dispatch Guard",
-        "title": "Dispatch Carrier",
-        "greeting": "No delays. The watch is waiting for these orders."
+        "name": "Depešový strážný",
+        "title": "Nosič depeší",
+        "greeting": "Žádné zdržení. Hlídka čeká na tyto rozkazy."
       },
       "shadow_guard_west": {
-        "name": "Dispatch Guard",
-        "title": "Dispatch Carrier",
-        "greeting": "Official business. Keep the path clear."
+        "name": "Depešový strážný",
+        "title": "Nosič depeší",
+        "greeting": "Úřední záležitost. Nechej cestu volnou."
       },
       "shadow_sentry_south": {
-        "name": "Lantern Sentry",
-        "title": "True Sight",
-        "greeting": "My lantern reveals more than shadows. Stay where I can see you."
+        "name": "Lucernová hlídka",
+        "title": "Pravý zrak",
+        "greeting": "Má lucerna odhaluje víc než jen stíny. Zůstaň tam, kde na tebe vidím."
       },
       "shadow_sentry_north": {
-        "name": "Lantern Sentry",
-        "title": "True Sight",
-        "greeting": "Nothing slips past the lantern watch."
+        "name": "Lucernová hlídka",
+        "title": "Pravý zrak",
+        "greeting": "Nic neunikne lucernové hlídce."
       },
       "shadow_watch_west": {
-        "name": "Lantern Watchman",
-        "title": "True Sight",
-        "greeting": "Hold there. The lantern sees what the eye misses."
+        "name": "Lucernový hlídač",
+        "title": "Pravý zrak",
+        "greeting": "Stůj. Lucerna vidí, co oko přehlédne."
       },
       "shadow_watch_east": {
-        "name": "Lantern Watchman",
-        "title": "True Sight",
-        "greeting": "Nobody crosses my light unseen."
+        "name": "Lucernový hlídač",
+        "title": "Pravý zrak",
+        "greeting": "Nikdo nepřejde mým světlem bez povšimnutí."
       },
       "forge_instructor": {
-        "name": "Smith Mara",
-        "title": "Wyrmwatch Smith",
-        "greeting": "Help me finish a shield! Click the supplies I call for. Quick hands earn a better medal."
+        "name": "Kovářka Mara",
+        "title": "Kovářka z Wyrmwatche",
+        "greeting": "Pomoz mi dokončit štít! Klikej na zásoby, které zavolám. Rychlé ruce vydělají lepší medaili."
       },
       "infiltrator_captain": {
-        "name": "Sergeant Alric",
-        "title": "Fenbridge Watch",
-        "greeting": "A creature has stolen a soldier's face. Read the standing orders and the watch ledger, question all four guards, then come back and name the one whose story contradicts our records."
+        "name": "Seržant Alric",
+        "title": "Hlídka Fenbridge",
+        "greeting": "Tvor ukradl vojákovi tvář. Přečti si stálé rozkazy a knihu hlídky, vyslechni všechny čtyři strážné a pak se vrať a označ toho, jehož výpověď odporuje našim záznamům."
       },
       "infiltrator_nella": {
-        "name": "Guard Nella",
-        "title": "Fenbridge Watch",
-        "greeting": "Reporting for duty."
+        "name": "Strážná Nella",
+        "title": "Hlídka Fenbridge",
+        "greeting": "Hlásím se do služby."
       },
       "infiltrator_orin": {
-        "name": "Guard Orin",
-        "title": "Fenbridge Watch",
-        "greeting": "Reporting for duty."
+        "name": "Strážný Orin",
+        "title": "Hlídka Fenbridge",
+        "greeting": "Hlásím se do služby."
       },
       "infiltrator_bram": {
-        "name": "Guard Bram",
-        "title": "Fenbridge Watch",
-        "greeting": "Reporting for duty."
+        "name": "Strážný Bram",
+        "title": "Hlídka Fenbridge",
+        "greeting": "Hlásím se do služby."
       },
       "infiltrator_tessa": {
-        "name": "Guard Tessa",
-        "title": "Fenbridge Watch",
-        "greeting": "Reporting for duty."
+        "name": "Strážná Tessa",
+        "title": "Hlídka Fenbridge",
+        "greeting": "Hlásím se do služby."
       },
       "wisp_maze_keeper": {
-        "name": "Keeper Liora",
-        "title": "Warden of the Hedge Maze",
-        "greeting": "Thieves hid their stolen gold all through my maze, and the shadows guard it now. Recover every coin purse. Avoid the guardians, or take a radiant wisp to banish them. Three lost lives return you to the entrance, but the purses you gathered remain safe."
+        "name": "Hlídačka Liora",
+        "title": "Strážkyně keřového bludiště",
+        "greeting": "Zloději ukryli své kradené zlato po celém mém bludišti a teď ho střeží stíny. Získej zpět každý měšec s mincemi. Vyhýbej se strážcům, nebo seber zářivé světélko a zažeň je jím. Tři ztracené životy tě vrátí ke vchodu, ale měšce, které jsi už posbíral(a), zůstanou v bezpečí."
       },
       "weekly_emissary": {
         "name": "Cham Pete",
-        "title": "Emissary",
-        "greeting": "The Vale keeps a ledger of deeds, and I keep the ledger. Pick one charge for the week, see it through, and the purse is yours."
+        "title": "Vyslanec",
+        "greeting": "Údolí si vede knihu skutků a tu knihu vedu já. Vyber si jeden úkol na tento týden, dotáhni ho do konce a měšec je tvůj."
       },
       "calligraphy_instructor": {
-        "name": "Instructor Elian",
-        "title": "Arcane Calligraphy",
-        "greeting": "A steady step makes a steady line. Teach my apprentices a triangle, a square, and an advanced rune."
+        "name": "Instruktor Elian",
+        "title": "Éterická kaligrafie",
+        "greeting": "Pevný krok dělá pevnou linku. Nauč mé učedníky trojúhelník, čtverec a pokročilou runu."
       },
       "calligraphy_apprentice_1": {
-        "name": "Apprentice Tessa",
-        "title": "Student of Calligraphy",
-        "greeting": "I keep turning too soon. Will you show me where the corners belong?"
+        "name": "Učednice Tessa",
+        "title": "Studentka kaligrafie",
+        "greeting": "Pořád zatáčím moc brzy. Ukážeš mi, kam patří rohy?"
       },
       "calligraphy_apprentice_2": {
-        "name": "Apprentice Pip",
-        "title": "Student of Calligraphy",
-        "greeting": "A triangle first, then a square, then a rune. One steady step at a time!"
+        "name": "Učedník Pip",
+        "title": "Student kaligrafie",
+        "greeting": "Nejdřív trojúhelník, pak čtverec, pak runa. Krok za krokem, pevnou rukou!"
       },
       "the_merchant": {
         "name": "Kupec",
@@ -19763,9 +19763,9 @@ export const cs_CZ: EnTranslations = {
         "greeting": "Vítej v Pozlacené truhlici. Tvé zboží odpočívá v bezpečí za našimi zámky."
       },
       "eastbrook_vault_keeper": {
-        "name": "Vault Keeper",
-        "title": "Weekly Rewards",
-        "greeting": "Your weekly rewards await. Choose one item from your earned choices after the Crucible reset."
+        "name": "Strážce trezoru",
+        "title": "Týdenní odměny",
+        "greeting": "Tvé týdenní odměny čekají. Vyber si jednu věc z možností, které sis vysloužil(a) po resetu Tavicího kelímku."
       },
       "card_master": {
         "name": "Karetní mistr",
@@ -19903,9 +19903,9 @@ export const cs_CZ: EnTranslations = {
         "greeting": "Drž se při zemi. Zvuk se od skla nese podivně, a brána dole má uši."
       },
       "harbormaster_tamsin": {
-        "name": "Harbormaster Tamsin",
-        "title": "Keeper of the Wyrmwatch Quays",
-        "greeting": "Come in off the quay and warm your hands. The ship at our pier sails up the long east coast to Wickharbor and back again. Far to the west, the other ferry runs between Eastbrook and the Nightbloom. The map on the wall shows both crossings. Rest by the fire before the climb to Wyrmwatch."
+        "name": "Přístavní mistryně Tamsin",
+        "title": "Strážkyně mol Wyrmwatche",
+        "greeting": "Pojď z mola dovnitř a zahřej si ruce. Loď u našeho přístaviště pluje podél dlouhého východního pobřeží do Wickharboru a zase zpátky. Daleko na západě jezdí druhý přívoz mezi Eastbrookem a Nočním květem. Mapa na zdi ukazuje obě trasy. Odpočiň si u ohně, než vyrazíš na výstup do Wyrmwatche."
       },
       "reeve_ottoline": {
         "name": "Rychtářka Ottoline",
@@ -20083,24 +20083,24 @@ export const cs_CZ: EnTranslations = {
         "greeting": "Kapela Riftbound si pamatuje přestávku, která ji udělala, {className}. Přines mi kapelu a esenci, která se zbaví, a já ji naučím pamatovat si víc."
       },
       "npc_rift_watch_quartermaster": {
-        "name": "Quartermaster Vaelen",
-        "title": "Rift Watch Provisioner",
-        "greeting": "The Rift Watch protects the shore and watches the deep tears. Our stores are open to those of recognized standing."
+        "name": "Intendant Vaelen",
+        "title": "Zásobovač Hlídky trhlin",
+        "greeting": "Hlídka trhlin chrání pobřeží a hlídá hluboké trhliny. Naše zásoby jsou otevřené těm, kdo dosáhli uznávaného postavení."
       },
       "npc_church_order_quartermaster": {
-        "name": "Templar Althea",
-        "title": "Church Order Quartermaster",
-        "greeting": "Walk in the Light of the Dawn. The Church Order supplies those who stand with us in service."
+        "name": "Templářka Althea",
+        "title": "Intendant Církevního řádu",
+        "greeting": "Kráčej ve Světle úsvitu. Církevní řád zásobuje ty, kdo s námi stojí ve službě."
       },
       "npc_automaton_quartermaster": {
-        "name": "Artificer Tobrin",
-        "title": "Automaton Requisitioner",
-        "greeting": "Precision gears, forged steel, and calibrated power. Authorized operators may draw from our inventory."
+        "name": "Konstruktér Tobrin",
+        "title": "Zásobovač Automatů",
+        "greeting": "Přesná ozubená kola, kovaná ocel a kalibrovaná síla. Autorizovaní operátoři si mohou vzít ze zásob."
       },
       "npc_wq_taskmaster": {
-        "name": "Taskmaster Kaelen",
-        "title": "World Quest Taskmaster",
-        "greeting": "The allied factions post assignments across the realm every day. If an assignment does not suit your skills, you may request one daily reassignment."
+        "name": "Dozorce úkolů Kaelen",
+        "title": "Dozorce světových úkolů",
+        "greeting": "Spojenecké frakce vyvěšují úkoly po celé říši každý den. Pokud ti nějaké zadání nesedí, můžeš jednou denně požádat o jeho výměnu."
       },
       "forgemistress_darva": {
         "name": "Mistryně kovárny Darva",
@@ -22538,7 +22538,7 @@ export const cs_CZ: EnTranslations = {
       "eastbrook_vale": {
         "name": "Eastbrookské údolí",
         "welcome": "Najdi ve městě maršála Redbrooka, má pro tebe práci.",
-        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
+        "welcomeDone": "Maršál Redbrook už pro tebe nemá žádnou práci: půvabné přímořské městečko, kde tvá cesta začala, si díky tomu žije klidněji.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -22584,7 +22584,7 @@ export const cs_CZ: EnTranslations = {
       "mirefen_marsh": {
         "name": "Mirefenský močál",
         "welcome": "Ohlas se u strážce Fenwicka u brány Fenbridge.",
-        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
+        "welcomeDone": "Strážce Fenwick už pro tebe nemá žádné rozkazy: osada hluboko v bažinatých močálech je díky tomu bezpečnější.",
         "pois": {
           "0": {
             "label": "Fenbridge"
@@ -22615,7 +22615,7 @@ export const cs_CZ: EnTranslations = {
       "thornpeak_heights": {
         "name": "Thornpeakské výšiny",
         "welcome": "Kapitánka Thessaly drží zeď u Highwatche, ale sotva.",
-        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
+        "welcomeDone": "Kapitánka Thessaly drží hradby Highwatche: nikdy to není snadné, ale s pomocí dobrodruhů, jako jsi ty, se to teď dá zvládnout.",
         "pois": {
           "0": {
             "label": "Highwatch"
@@ -22942,7 +22942,7 @@ export const cs_CZ: EnTranslations = {
             "label": "Trhlinová pole"
           },
           "5": {
-            "label": "The Wreck"
+            "label": "Vrak"
           }
         }
       },
@@ -23479,139 +23479,139 @@ export const cs_CZ: EnTranslations = {
         "bonus3": "Zvyšuje rychlost útoku a sesílání o 15 %."
       },
       "vanguard_druid_balance": {
-        "name": "Starwarden Raiment",
-        "bonus2": "Gripping Roots' cast time is reduced by 0.5 sec.",
-        "bonus4": "Casting Gripping Roots lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
+        "name": "Roucho Hvězdostrážce",
+        "bonus2": "Sesílání Svazujících kořenů je o 0.5 s kratší.",
+        "bonus4": "Seslání Svazujících kořenů ti dovolí sesílat za pohybu a zvýší tvou rychlost pohybu o 20 % na 4 s."
       },
       "vanguard_druid_feral": {
-        "name": "Bloodmane Hide",
-        "bonus2": "Bruin Rush's cooldown is reduced by 3 sec.",
-        "bonus4": "Bruin Rush shields you for 6 percent of your maximum health for 6 sec."
+        "name": "Krvohřívová kůže",
+        "bonus2": "Čas obnovy Medvědího výpadu je kratší o 3 s.",
+        "bonus4": "Medvědí výpad tě zaštítí a pohltí 6 % tvého maximálního zdraví na 6 s."
       },
       "vanguard_druid_restoration": {
-        "name": "Thistlebloom Vestment",
-        "bonus2": "Fleetmend's cooldown is reduced by 1 sec.",
-        "bonus4": "Fleetmend also increases your movement speed by 30 percent for 3 sec."
+        "name": "Roucho Bodlákokvětu",
+        "bonus2": "Čas obnovy Rychlého zhojení je kratší o 1 s.",
+        "bonus4": "Rychlé zhojení navíc zvýší tvou rychlost pohybu o 30 % na 3 s."
       },
       "vanguard_hunter_beast_mastery": {
-        "name": "Packwarden Harness",
-        "bonus2": "Rattling Shot's cooldown is reduced by 4 sec.",
-        "bonus4": "Rattling Shot reduces Howling Rage's remaining cooldown by 1 sec."
+        "name": "Postroj Smečkostrážce",
+        "bonus2": "Čas obnovy Otřásajícího výstřelu je kratší o 4 s.",
+        "bonus4": "Otřásající výstřel sníží zbývající čas obnovy Vyjícího běsu o 1 s."
       },
       "vanguard_hunter_marksmanship": {
-        "name": "Farsight Harness",
-        "bonus2": "Trailbreak's cooldown is reduced by 4 sec.",
-        "bonus4": "Trailbreak makes your next Long Draw within 6 sec instant. Cannot occur more than once every 15 sec."
+        "name": "Postroj Dálnozraku",
+        "bonus2": "Čas obnovy Zlomu stopy je kratší o 4 s.",
+        "bonus4": "Zlom stopy udělá tvůj příští Dlouhý nátah do 6 s okamžitým. Nemůže nastat víc než jednou za 15 s."
       },
       "vanguard_hunter_survival": {
-        "name": "Snaretooth Harness",
-        "bonus2": "Bloodhook's cooldown is reduced by 3 sec.",
-        "bonus4": "Bloodhook grants 1 Hunting Momentum."
+        "name": "Postroj Osidlozubu",
+        "bonus2": "Čas obnovy Krvavého háku je kratší o 3 s.",
+        "bonus4": "Krvavý hák udělí 1 Lovecký spád."
       },
       "vanguard_mage_arcane": {
-        "name": "Hourbinder's Vestments",
-        "bonus2": "Temporal Barrier's cooldown is reduced by 2 sec.",
-        "bonus4": "Temporal Barrier also increases the shielded target's movement speed by 20 percent for 3 sec."
+        "name": "Šat Časovazače",
+        "bonus2": "Čas obnovy Časové bariéry je kratší o 2 s.",
+        "bonus4": "Časová bariéra navíc zvýší rychlost pohybu chráněného cíle o 20 % na 3 s."
       },
       "vanguard_mage_fire": {
-        "name": "Emberlash Regalia",
-        "bonus2": "Cinderfall recharges 3 sec faster.",
-        "bonus4": "Casting Cinderfall reduces the remaining cooldown of Blazing Barrier by 2 sec."
+        "name": "Regálie Žhavobiče",
+        "bonus2": "Pád škváry se dobíjí o 3 s rychleji.",
+        "bonus4": "Seslání Pádu škváry sníží zbývající čas obnovy Ohnivé bariéry o 2 s."
       },
       "vanguard_mage_frost": {
-        "name": "Rimewarden Garb",
-        "bonus2": "Icebind's cooldown is reduced by 2 sec.",
-        "bonus4": "Casting Icebind reduces the remaining cooldown of Flitstep by 5 sec."
+        "name": "Oděv Jinovatkostrážce",
+        "bonus2": "Čas obnovy Ledového spoutání je kratší o 2 s.",
+        "bonus4": "Seslání Ledového spoutání sníží zbývající čas obnovy Kroku mihotání o 5 s."
       },
       "vanguard_paladin_holy": {
-        "name": "Sunvigil Regalia",
-        "bonus2": "Life Covenant's cooldown is reduced by 30 sec.",
-        "bonus4": "Life Covenant also shields the ally for 8 percent of their maximum health for 6 sec."
+        "name": "Regálie Slunostráže",
+        "bonus2": "Čas obnovy Úmluvy života je kratší o 30 s.",
+        "bonus4": "Úmluva života navíc pohltí spojenci 8 % jeho maximálního zdraví na 6 s."
       },
       "vanguard_paladin_protection": {
-        "name": "Shieldvow Bastion",
-        "bonus2": "Oath Chain's cooldown is reduced by 2 sec.",
-        "bonus4": "Enemies pulled by Oath Chain cast spells 30 percent slower for 4 sec, and Oath Chain grants you Solar Reprisal when it binds an enemy that can be pulled."
+        "name": "Bašta Štítopřísahy",
+        "bonus2": "Čas obnovy Řetězu přísahy je kratší o 2 s.",
+        "bonus4": "Nepřátelé přitažení Řetězem přísahy sesílají kouzla o 30 % pomaleji na 4 s a Řetěz přísahy ti udělí Sluneční odplatu, když spoutá nepřítele, kterého lze přitáhnout."
       },
       "vanguard_paladin_retribution": {
-        "name": "Lightbrand Warplate",
-        "bonus2": "Valkyr's Calling's cooldown is reduced by 15 sec.",
-        "bonus4": "Valkyr's Calling resets Final Edict's cooldown, and your next Final Edict within 6 sec of landing deals 15 percent more damage."
+        "name": "Válečná zbroj Světlocejchu",
+        "bonus2": "Čas obnovy Volání valkýry je kratší o 15 s.",
+        "bonus4": "Volání valkýry obnoví čas obnovy Posledního ediktu a tvůj příští Poslední edikt seslaný do 6 s od dopadu způsobí o 15 % vyšší poškození."
       },
       "vanguard_priest_discipline": {
-        "name": "Veilpsalm Raiment",
-        "bonus2": "Terror Canticle's cooldown is reduced by 3 sec.",
-        "bonus4": "When your Psalm of Warding is fully consumed, the shielded ally gains 20 percent movement speed for 3 sec. Cannot occur more than once every 8 sec."
+        "name": "Háv Závojožalmu",
+        "bonus2": "Čas obnovy Výkřiku hrůzy je kratší o 3 s.",
+        "bonus4": "Když se tvůj Žalm ochrany zcela spotřebuje, chráněný spojenec získá 20 % rychlosti pohybu na 3 s. Nemůže nastat víc než jednou za 8 s."
       },
       "vanguard_priest_holy": {
-        "name": "Gracewing Raiment",
-        "bonus2": "Veilstep's cooldown is reduced by 6 sec.",
-        "bonus4": "Veilstep also shields you for 8 percent of your maximum health for 6 sec."
+        "name": "Háv Milokřídla",
+        "bonus2": "Čas obnovy Kroku závoje je kratší o 6 s.",
+        "bonus4": "Krok závoje tě navíc zaštítí a pohltí 8 % tvého maximálního zdraví na 6 s."
       },
       "vanguard_priest_shadow": {
-        "name": "Duskhymn Regalia",
-        "bonus2": "Litany of Woe also slows the target's movement by 30 percent while you channel it.",
-        "bonus4": "Call Tithefiend also shields you for 10 percent of your maximum health for 8 sec."
+        "name": "Regálie Soumrakohymny",
+        "bonus2": "Litanie běd navíc zpomalí pohyb cíle o 30 %, dokud ji kanáluješ.",
+        "bonus4": "Přivolej desátkového běsa: navíc tě zaštítí a pohltí 10 % tvého maximálního zdraví na 8 s."
       },
       "vanguard_rogue_assassination": {
-        "name": "Nightcut Leathers",
-        "bonus2": "Low Blow costs 10 less Energy.",
-        "bonus4": "Low Blow also makes your next attack within 6 sec a critical strike."
+        "name": "Kůže Nočnořezu",
+        "bonus2": "Podpásovka stojí o 10 méně Energie.",
+        "bonus4": "Podpásovka navíc promění tvůj příští útok do 6 s v kritický zásah."
       },
       "vanguard_rogue_combat": {
-        "name": "Brawlmark Leathers",
-        "bonus2": "Swift Heels' cooldown is reduced by 60 sec.",
-        "bonus4": "While Swift Heels is active, Wicked Slash and Haymaker award 1 additional combo point."
+        "name": "Kůže Rvačkocejchu",
+        "bonus2": "Čas obnovy Rychlých pat je kratší o 60 s.",
+        "bonus4": "Dokud jsou aktivní Rychlé paty, Zlý sek a Úder na tělo udělí o 1 combo bod navíc."
       },
       "vanguard_rogue_subtlety": {
-        "name": "Shadewalk Leathers",
-        "bonus2": "Smokefade's cooldown is reduced by 60 sec.",
-        "bonus4": "Gut Punch awards 2 additional combo points when used from Smokefade."
+        "name": "Kůže Stínochodu",
+        "bonus2": "Čas obnovy Kouřového kroku je kratší o 60 s.",
+        "bonus4": "Rána do břicha udělí o 2 combo body navíc, když je použita z Kouřového kroku."
       },
       "vanguard_shaman_elemental": {
-        "name": "Tempestwrit Battlemail",
-        "bonus2": "Unleash Weapon's cooldown is reduced by 3 sec.",
-        "bonus4": "Unleash Weapon lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
+        "name": "Bojová zbroj Bouřeznaku",
+        "bonus2": "Vypusť zbraň: čas obnovy je kratší o 3 s.",
+        "bonus4": "Vypusť zbraň: dovolí ti sesílat za pohybu a zvýší tvou rychlost pohybu o 20 % na 4 s. Nemůže nastat víc než jednou za 20 s."
       },
       "vanguard_shaman_enhancement": {
-        "name": "Galeborn Warmail",
-        "bonus2": "Ancestral Strike slows the target's movement speed by 30 percent for 4 sec.",
-        "bonus4": "Ancestral Strike reduces the remaining cooldown of Elemental Trance by 4 sec."
+        "name": "Vichrozrozená bojová košile",
+        "bonus2": "Úder předků zpomalí rychlost pohybu cíle o 30 % na 4 s.",
+        "bonus4": "Úder předků sníží zbývající čas obnovy Elemental Trance o 4 s."
       },
       "vanguard_shaman_restoration": {
-        "name": "Brineward Chainmail",
-        "bonus2": "Mending Waters casts 0.5 sec faster on an ally below 50 percent health.",
-        "bonus4": "Tidecall also shields its target for 5 percent of your maximum health for 6 sec."
+        "name": "Drátěná košile Solankostráže",
+        "bonus2": "Léčivé vody se sesílají o 0.5 s rychleji na spojence pod 50 % zdraví.",
+        "bonus4": "Volání přílivu navíc zaštítí svůj cíl a pohltí 5 % tvého maximálního zdraví na 6 s."
       },
       "vanguard_warlock_affliction": {
-        "name": "Dreadquill Vestments",
-        "bonus2": "Harrow's cast time is reduced by 0.3 sec.",
-        "bonus4": "Consume heals you for 30 percent more and can be channeled while moving."
+        "name": "Šat Děsopera",
+        "bonus2": "Sesílání Děsu je o 0.3 s kratší.",
+        "bonus4": "Vysát: uzdraví tě o 30 % více a lze jej kanálovat i za pohybu."
       },
       "vanguard_warlock_demonology": {
-        "name": "Marrowbound Regalia",
-        "bonus2": "Bone Armor's cooldown is reduced by 10 sec.",
-        "bonus4": "Reaping Command reduces the remaining cooldown of Bone Armor by 2 sec."
+        "name": "Regálie Dřeňopouta",
+        "bonus2": "Čas obnovy Bone Armor je kratší o 10 s.",
+        "bonus4": "Reaping Command sníží zbývající čas obnovy Bone Armor o 2 s."
       },
       "vanguard_warlock_destruction": {
-        "name": "Slagcrown Vestments",
-        "bonus2": "Cinderhide's cooldown is reduced by 30 sec.",
-        "bonus4": "Every second Conflagrate makes your next Ruinbolt within 8 sec instant."
+        "name": "Šat Struskokoruny",
+        "bonus2": "Čas obnovy Cinderhide je kratší o 30 s.",
+        "bonus4": "Každé druhé Vzplanutí udělá tvůj příští Zkázný šíp do 8 s okamžitým."
       },
       "vanguard_warrior_arms": {
-        "name": "Bladewake Battlegear",
-        "bonus2": "Maiming Strike reduces Onrush's remaining cooldown by 1 sec.",
-        "bonus4": "Onrush also empowers your next Maiming Strike by 20 percent (one stack of Redhand's empower)."
+        "name": "Bojová výstroj Čepelostopy",
+        "bonus2": "Mrzačící úder sníží zbývající čas obnovy Náporu o 1 s.",
+        "bonus4": "Nápor navíc posílí tvůj příští Mrzačící úder o 20 % (jeden nános posílení Rudé ruky)."
       },
       "vanguard_warrior_fury": {
-        "name": "Bloodmarch Ragegear",
-        "bonus2": "Vaulting Charge's cooldown is reduced by 8 sec.",
-        "bonus4": "Landing Vaulting Charge Enrages you."
+        "name": "Výstroj vzteku Krvopochodu",
+        "bonus2": "Čas obnovy Válečného skoku je kratší o 8 s.",
+        "bonus4": "Dopad Válečného skoku tě rozzuří."
       },
       "vanguard_warrior_prot": {
-        "name": "Ironmarch Bulwark",
-        "bonus2": "Faultline's cooldown is reduced by 5 sec.",
-        "bonus4": "Faultline also reduces damage you take by 10 percent for 6 sec."
+        "name": "Hradba Železopochodu",
+        "bonus2": "Čas obnovy Zlomové linie je kratší o 5 s.",
+        "bonus4": "Zlomová linie navíc sníží poškození, které utrpíš, o 10 % na 6 s."
       },
       "vesperash": {
         "name": "Plášť Večerního popela",

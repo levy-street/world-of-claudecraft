@@ -194,20 +194,20 @@ export const pt_BR: EnTranslations = {
         "description": "Cria um cenário de anúncio de grupo predefinido."
       },
       "hillwarn": {
-        "label": "Hill countdown",
-        "description": "Announce a hill now; it rises after the full warning."
+        "label": "Contagem regressiva da colina",
+        "description": "Anuncia uma colina agora; ela surge após o aviso completo."
       },
       "hillnow": {
-        "label": "Raise hill now",
-        "description": "Raise a hill at once and stand on it."
+        "label": "Erguer colina agora",
+        "description": "Ergue uma colina imediatamente e coloca você sobre ela."
       },
       "hillrise": {
-        "label": "Skip hill countdown",
-        "description": "Raise the announced hill right away."
+        "label": "Pular contagem regressiva da colina",
+        "description": "Ergue a colina anunciada imediatamente."
       },
       "hillend": {
-        "label": "End hill",
-        "description": "Make the current hill fall now."
+        "label": "Encerrar colina",
+        "description": "Faz a colina atual cair agora."
       }
     }
   },
@@ -348,46 +348,46 @@ export const pt_BR: EnTranslations = {
   },
   "hudChrome": {
     "framePresets": {
-      "apply": "Apply",
-      "pickerLabel": "Frame Presets: {name}",
-      "overwrite": "Overwrite Preset",
-      "overwriteBody": "Replace the saved preset \"{name}\" with your current layout?",
-      "current": "Current Layout",
-      "new": "New Preset",
-      "empty": "No saved presets",
-      "deleteNamed": "Delete {name}",
-      "deleteBody": "Delete the frame preset \"{name}\"?",
-      "title": "Frame Presets",
-      "name": "Preset Name",
-      "slot": "Preset {slot}",
-      "remove": "Delete",
-      "saved": "Done.",
-      "failed": "Could not save or load the preset."
+      "apply": "Aplicar",
+      "pickerLabel": "Predefinições de Quadro: {name}",
+      "overwrite": "Substituir Predefinição",
+      "overwriteBody": "Substituir a predefinição salva \"{name}\" pelo seu layout atual?",
+      "current": "Layout Atual",
+      "new": "Nova Predefinição",
+      "empty": "Nenhuma predefinição salva",
+      "deleteNamed": "Excluir {name}",
+      "deleteBody": "Excluir a predefinição de quadro \"{name}\"?",
+      "title": "Predefinições de Quadro",
+      "name": "Nome da Predefinição",
+      "slot": "Predefinição {slot}",
+      "remove": "Excluir",
+      "saved": "Concluído.",
+      "failed": "Não foi possível salvar ou carregar a predefinição."
     },
     "frameMenus": {
-      "hide": "Hide Frame",
-      "units": "Unit Frames",
-      "bars": "Action Bars",
-      "trackers": "Trackers",
+      "hide": "Ocultar Quadro",
+      "units": "Quadros de Unidade",
+      "bars": "Barras de Ação",
+      "trackers": "Rastreadores",
       "auras": "Auras",
-      "combat": "Combat Displays",
-      "other": "Other HUD Elements",
-      "options": "Frame Options",
-      "allOptions": "All Frame Options",
-      "independentTarget": "Lock Target of Target to Target"
+      "combat": "Exibições de Combate",
+      "other": "Outros Elementos da HUD",
+      "options": "Opções do Quadro",
+      "allOptions": "Todas as Opções de Quadro",
+      "independentTarget": "Bloquear Alvo do Alvo ao Alvo"
     },
     "focusTargets": {
-      "showEmpty": "Show Empty Focus Frames",
-      "assignHint": "Select a target. Press {key} or click {button}.",
-      "assignClickHint": "Select a target. Click {button}.",
-      "ally": "Ally",
-      "enemy": "Enemy",
-      "unset": "Unset Focus",
-      "frame1": "Focus 1",
-      "frame2": "Focus 2",
-      "frame3": "Focus 3",
-      "assign": "Set focus {slot}",
-      "target": "Target focus {slot}"
+      "showEmpty": "Mostrar Quadros de Foco Vazios",
+      "assignHint": "Selecione um alvo. Pressione {key} ou clique em {button}.",
+      "assignClickHint": "Selecione um alvo. Clique em {button}.",
+      "ally": "Aliado",
+      "enemy": "Inimigo",
+      "unset": "Remover Foco",
+      "frame1": "Foco 1",
+      "frame2": "Foco 2",
+      "frame3": "Foco 3",
+      "assign": "Definir foco {slot}",
+      "target": "Selecionar foco {slot}"
     },
     "professionTrainers": {
       "blacksmithing": "Instrutor de Ferraria",
@@ -402,153 +402,153 @@ export const pt_BR: EnTranslations = {
       "nameplate": "<{title}>"
     },
     "weeklyRewards": {
-      "title": "The Weekly Vault",
-      "tab": "Weekly Rewards",
-      "intro": "Each completed milestone earns one vault. After the Crucible reset, open each vault to roll its loot, then select one item for the week. Opened rewards are saved and unclaimed weeks stay available.",
-      "approachKeeper": "Stand near the Vault Keeper to view your weekly rewards.",
-      "nextReset": "Crucible weekly reset",
+      "title": "O Cofre Semanal",
+      "tab": "Recompensas Semanais",
+      "intro": "Cada marco concluído rende um cofre. Após a redefinição do Crisol, abra cada cofre para sortear seu saque e então selecione um item para a semana. Recompensas abertas ficam salvas, e semanas não resgatadas continuam disponíveis.",
+      "approachKeeper": "Fique perto do Guardião do Cofre para ver suas recompensas semanais.",
+      "nextReset": "Redefinição semanal do Crisol",
       "countdown": "{days}d {hours}h {minutes}m {seconds}s",
       "progress": "{count} / {max}",
-      "milestone": "1 loot-table roll",
-      "lockedRoll": "Unlocks 1 loot-table roll",
-      "earned": "Vaults available after next reset: {count}",
+      "milestone": "1 sorteio de tabela de saque",
+      "lockedRoll": "Libera 1 sorteio de tabela de saque",
+      "earned": "Cofres disponíveis após a próxima redefinição: {count}",
       "normal": "Normal",
-      "heroic": "Heroic",
-      "mixedClears": "{heroic} Heroic / {normal} Normal",
-      "heroicClears": "{count} Heroic",
+      "heroic": "Heroico",
+      "mixedClears": "{heroic} Heroico / {normal} Normal",
+      "heroicClears": "{count} Heroico",
       "normalClears": "{count} Normal",
-      "viewPossibleLoot": "View possible loot",
-      "chooseTable": "Select which table to roll off",
-      "selectAllTables": "Select all",
-      "selectedTables": "{count} tables selected",
-      "selectedTable": "{count} table selected",
-      "noLevelLoot": "No eligible loot at your current level.",
-      "tableItemCount": "{count} items",
+      "viewPossibleLoot": "Ver possível saque",
+      "chooseTable": "Selecione qual tabela sortear",
+      "selectAllTables": "Selecionar tudo",
+      "selectedTables": "{count} tabelas selecionadas",
+      "selectedTable": "{count} tabela selecionada",
+      "noLevelLoot": "Nenhum saque elegível no seu nível atual.",
+      "tableItemCount": "{count} itens",
       "tableItem": "{count} item",
-      "previouslyRolled": "Previously rolled reward",
-      "noTables": "No eligible equipment from your recorded boss clears at this difficulty.",
-      "tablesExhausted": "All eligible items have already been rolled. Choose a revealed reward.",
-      "heroicUpgradeOne": "{count} more Heroic dungeon clear to upgrade",
-      "heroicUpgradeMany": "{count} more Heroic dungeon clears to upgrade",
+      "previouslyRolled": "Recompensa sorteada anteriormente",
+      "noTables": "Nenhum equipamento elegível a partir dos seus chefes derrotados registrados nesta dificuldade.",
+      "tablesExhausted": "Todos os itens elegíveis já foram sorteados. Escolha uma recompensa revelada.",
+      "heroicUpgradeOne": "Mais {count} conclusão de masmorra Heroica para aprimorar",
+      "heroicUpgradeMany": "Mais {count} conclusões de masmorra Heroica para aprimorar",
       "completedTask": {
-        "raidOne": "{count} Raid Encounter Cleared",
-        "raidMany": "{count} Raid Encounters Cleared",
-        "dungeonOne": "{count} Dungeon Cleared",
-        "dungeonMany": "{count} Dungeons Cleared",
-        "worldOne": "{count} World Quest Completed",
-        "worldMany": "{count} World Quests Completed",
-        "pvpOne": "{count} Rated Match Won",
-        "pvpMany": "{count} Rated Matches Won"
+        "raidOne": "{count} Combate de Raide Concluído",
+        "raidMany": "{count} Combates de Raide Concluídos",
+        "dungeonOne": "{count} Masmorra Concluída",
+        "dungeonMany": "{count} Masmorras Concluídas",
+        "worldOne": "{count} Missão Mundial Concluída",
+        "worldMany": "{count} Missões Mundiais Concluídas",
+        "pvpOne": "{count} Partida Ranqueada Vencida",
+        "pvpMany": "{count} Partidas Ranqueadas Vencidas"
       },
       "requiredTask": {
-        "raidOne": "Clear {count} Raid Encounter",
-        "raidMany": "Clear {count} Raid Encounters",
-        "dungeonOne": "Clear {count} Dungeon",
-        "dungeonMany": "Clear {count} Dungeons",
-        "worldOne": "Complete {count} World Quest",
-        "worldMany": "Complete {count} World Quests",
-        "pvpOne": "Win {count} Rated Match",
-        "pvpMany": "Win {count} Rated Matches"
+        "raidOne": "Conclua {count} Combate de Raide",
+        "raidMany": "Conclua {count} Combates de Raide",
+        "dungeonOne": "Conclua {count} Masmorra",
+        "dungeonMany": "Conclua {count} Masmorras",
+        "worldOne": "Complete {count} Missão Mundial",
+        "worldMany": "Complete {count} Missões Mundiais",
+        "pvpOne": "Vença {count} Partida Ranqueada",
+        "pvpMany": "Vença {count} Partidas Ranqueadas"
       },
-      "readyWeeks": "Unclaimed weeks: {count}. Claim the oldest completed week first.",
-      "claimLastWeek": "Claim last week's reward",
-      "readyTitle": "Your weekly rewards are ready",
-      "readyDescription": "A completed week of rewards is waiting. Open your earned vaults, then choose one item to claim.",
-      "notNow": "Not now",
-      "completedWeek": "Week ended {date}",
-      "currentWeek": "Back to this week's progress",
-      "openRewards": "Open your earned vaults",
-      "openedCount": "{count} of {total} vaults opened. Open them all to choose your reward.",
-      "openingSavedReward": "Opening vault and saving your reward...",
-      "rewardNumber": "Reward {count}",
-      "openVault": "Open vault: {name}",
-      "inspectItem": "Inspect {name}",
-      "selectItem": "Select {name}",
-      "revealed": "Revealed",
-      "revealedItem": "Revealed: {name}",
-      "chooseReward": "Choose one reward",
-      "confirmTitle": "Claim {name}?",
-      "confirmClaim": "Confirm claim",
-      "backToChoices": "Back to choices",
-      "claimRequested": "Claim requested. If your bags are full, make room and choose again.",
-      "waiting": "No rewards ready yet. This week's earned vaults unlock at the next reset.",
-      "chooseOne": "Choose carefully: taking one item gives up every other choice for that week.",
-      "itemLevel": "Item level {level}",
-      "backlogFull": "Your saved weeks are full. Collect rewards to make room for future weeks.",
-      "claim": "Take selected item",
-      "poolSize": "View {count} items",
-      "worldPoolRule": "Normal Nythraxis equipment. No raid clears required.",
-      "poolRule": "Every listed item has an equal chance. Items match your class restrictions. Defeated raids unlock their loot at that difficulty. Legendary items are excluded.",
-      "selectionPoolRule": "For raids and dungeons, select one or more tables before opening. Dungeon tables combine bosses you have cleared at this difficulty. Rolls exclude duplicates, legendary items and equipment requiring more than {maxLevelOffset} levels above your level.",
-      "rare": "Rare",
-      "epic": "Epic",
-      "unavailable": "Not yet available",
-      "worldUnavailable": "World quest rewards will become available when rotating world quests arrive.",
+      "readyWeeks": "Semanas não resgatadas: {count}. Resgate primeiro a semana concluída mais antiga.",
+      "claimLastWeek": "Resgatar a recompensa da semana passada",
+      "readyTitle": "Suas recompensas semanais estão prontas",
+      "readyDescription": "Uma semana completa de recompensas está esperando. Abra seus cofres conquistados e escolha um item para resgatar.",
+      "notNow": "Agora não",
+      "completedWeek": "Semana encerrada em {date}",
+      "currentWeek": "Voltar ao progresso desta semana",
+      "openRewards": "Abra seus cofres conquistados",
+      "openedCount": "{count} de {total} cofres abertos. Abra todos para escolher sua recompensa.",
+      "openingSavedReward": "Abrindo cofre e salvando sua recompensa...",
+      "rewardNumber": "Recompensa {count}",
+      "openVault": "Abrir cofre: {name}",
+      "inspectItem": "Inspecionar {name}",
+      "selectItem": "Selecionar {name}",
+      "revealed": "Revelado",
+      "revealedItem": "Revelado: {name}",
+      "chooseReward": "Escolha uma recompensa",
+      "confirmTitle": "Resgatar {name}?",
+      "confirmClaim": "Confirmar resgate",
+      "backToChoices": "Voltar às escolhas",
+      "claimRequested": "Resgate solicitado. Se suas bolsas estiverem cheias, abra espaço e escolha novamente.",
+      "waiting": "Nenhuma recompensa pronta ainda. Os cofres conquistados nesta semana são liberados na próxima redefinição.",
+      "chooseOne": "Escolha com cuidado: pegar um item abre mão de todas as outras escolhas daquela semana.",
+      "itemLevel": "Nível de item {level}",
+      "backlogFull": "Suas semanas salvas estão cheias. Colete recompensas para abrir espaço para semanas futuras.",
+      "claim": "Pegar item selecionado",
+      "poolSize": "Ver {count} itens",
+      "worldPoolRule": "Equipamento Normal de Nythraxis. Nenhuma conclusão de raide é exigida.",
+      "poolRule": "Todo item listado tem a mesma chance. Os itens respeitam as restrições da sua classe. Raides derrotados liberam seu saque naquela dificuldade. Itens lendários são excluídos.",
+      "selectionPoolRule": "Para raides e masmorras, selecione uma ou mais tabelas antes de abrir. As tabelas de masmorra combinam os chefes que você já derrotou nesta dificuldade. Os sorteios excluem duplicatas, itens lendários e equipamentos que exigem mais de {maxLevelOffset} níveis acima do seu.",
+      "rare": "Raro",
+      "epic": "Épico",
+      "unavailable": "Ainda não disponível",
+      "worldUnavailable": "As recompensas de missão mundial ficarão disponíveis quando as missões mundiais rotativas chegarem.",
       "category": {
-        "raid": "Raids",
-        "dungeon": "Dungeons",
-        "world": "World Quests",
+        "raid": "Raides",
+        "dungeon": "Masmorras",
+        "world": "Missões Mundiais",
         "pvp": "PvP"
       },
       "task": {
-        "raid": "Defeat different raid encounters. Each encounter counts once; a Heroic clear upgrades its credit.",
-        "dungeon": "Complete dungeons. Your best clears determine the reward difficulty at each milestone.",
-        "world": "Complete rotating world quests. Story quests do not count.",
-        "pvp": "Win ranked arena or rated battleground matches. Practice matches and forfeits do not count."
+        "raid": "Derrote diferentes combates de raide. Cada combate conta uma vez; uma conclusão Heroica aprimora seu crédito.",
+        "dungeon": "Complete masmorras. Suas melhores conclusões determinam a dificuldade da recompensa em cada marco.",
+        "world": "Complete missões mundiais rotativas. Missões da história não contam.",
+        "pvp": "Vença partidas ranqueadas de arena ou de campo de batalha. Partidas de prática e desistências não contam."
       },
       "pool": {
-        "raid": "Normal raid loot",
-        "raid_heroic": "Heroic raid loot",
-        "dungeon": "Normal dungeon loot",
-        "dungeon_heroic": "Heroic dungeon loot",
-        "world": "World quest loot",
-        "pvp": "WARFARE equipment"
+        "raid": "Saque de raide Normal",
+        "raid_heroic": "Saque de raide Heroica",
+        "dungeon": "Saque de masmorra Normal",
+        "dungeon_heroic": "Saque de masmorra Heroica",
+        "world": "Saque de missão mundial",
+        "pvp": "Equipamento de GUERRA"
       }
     },
     "ferry": {
-      "regionLabel": "Ferry timetable",
-      "departsIn": "The ferry to {dest} departs in {time}",
-      "castingOff": "The ferry to {dest} is casting off",
-      "boardHint": "Stand on its deck when it sails. The crossing is free.",
-      "sailing": "Sailing to {dest}"
+      "regionLabel": "Horário das balsas",
+      "departsIn": "A balsa para {dest} parte em {time}",
+      "castingOff": "A balsa para {dest} está partindo",
+      "boardHint": "Fique sobre o convés dela quando ela zarpar. A travessia é gratuita.",
+      "sailing": "Navegando para {dest}"
     },
     "materialStackSelectionUnavailable": "Essa seleção de material não está mais disponível.",
     "vehicle": {
-      "title": "North Watch Cannon",
-      "objective": "Defend the north watch",
-      "lastKeepTitle": "The Last Keep Cannon",
-      "lastKeepObjective": "Defend the approach to The Last Keep",
-      "cannonball": "Cannonball",
-      "grapeshot": "Grapeshot",
-      "incendiary": "Incendiary Shot",
-      "integrity": "Cannon integrity",
-      "exit": "Leave cannon",
-      "wave": "Wave {wave}/{total}",
-      "endlessWave": "Endless wave {wave} (round {round})",
-      "resultWaves": "Waves held: {waves}.",
-      "enemies": "Enemies remaining: {count}",
-      "countdown": "Prepare: {seconds}",
-      "hint": "Choose a shot, then click the ground to fire.",
-      "aim": "Click to fire. Right click or Escape cancels aiming.",
-      "sapperWarning": "Sapper incoming! Stop the explosive carrier before it reaches the line.",
-      "chargeWarning": "Commander orders a charge! All surviving enemies move faster.",
-      "armorHint": "Break the silver shields with Cannonball, then use Incendiary Shot.",
-      "exposedHint": "Broken armor: Incendiary Shot deals double damage.",
-      "barrelHint": "Shoot the marked powder barrels when enemies gather around them.",
-      "barrelRules": "Direct hits ignite powder barrels: {damage} damage within {radius} yards, with chain explosions.",
-      "armorRules": "Armored troops take {reduction} less damage until Cannonball breaks their armor. Broken armor takes {bonus} more fire damage.",
-      "shake": "Camera shake",
-      "gold": "Gold medal",
-      "silver": "Silver medal",
-      "bronze": "Bronze medal",
-      "failed": "Defense failed",
-      "result": "{medal}: integrity {integrity}, accuracy {accuracy}.",
-      "medalRules": "Gold: at least {goldIntegrity} integrity and {goldAccuracy} accuracy. Silver: {silverIntegrity} and {silverAccuracy}. Any other victory earns Bronze. Enemy or barrel hits count; each shot counts once. Medals grant no extra money.",
-      "shotDamage": "Deal {damage} damage to each enemy within {radius} yards of the impact.",
-      "shotSlow": "Slow enemies hit by {amount} for {seconds} sec.",
-      "shotBurn": "Leave fire for {seconds} sec, dealing {damage} damage each second to enemies standing in it.",
-      "shotTiming": "Cooldown: {cooldown} sec. Impact after {flight} sec. All shots share {recovery} sec recovery.",
-      "shotRules": "Aim inside the marked field. No mana cost. Damage does not scale with gear or talents."
+      "title": "Canhão da Guarda do Norte",
+      "objective": "Defenda a guarda do norte",
+      "lastKeepTitle": "Canhão do Último Reduto",
+      "lastKeepObjective": "Defenda o acesso ao Último Reduto",
+      "cannonball": "Bala de Canhão",
+      "grapeshot": "Metralha",
+      "incendiary": "Tiro Incendiário",
+      "integrity": "Integridade do canhão",
+      "exit": "Sair do canhão",
+      "wave": "Onda {wave}/{total}",
+      "endlessWave": "Onda infinita {wave} (rodada {round})",
+      "resultWaves": "Ondas resistidas: {waves}.",
+      "enemies": "Inimigos restantes: {count}",
+      "countdown": "Prepare-se: {seconds}",
+      "hint": "Escolha um tiro, depois clique no chão para disparar.",
+      "aim": "Clique para disparar. Clique direito ou Esc cancela a mira.",
+      "sapperWarning": "Sapador chegando! Detenha o portador de explosivos antes que ele alcance a linha.",
+      "chargeWarning": "O comandante ordena uma carga! Todos os inimigos sobreviventes se movem mais rápido.",
+      "armorHint": "Quebre os escudos prateados com Bala de Canhão, depois use Tiro Incendiário.",
+      "exposedHint": "Armadura quebrada: Tiro Incendiário causa o dobro de dano.",
+      "barrelHint": "Atire nos barris de pólvora marcados quando inimigos se reunirem ao redor deles.",
+      "barrelRules": "Acertos diretos incendeiam os barris de pólvora: {damage} de dano num raio de {radius} jardas, com explosões em cadeia.",
+      "armorRules": "Tropas blindadas sofrem {reduction} menos dano até que a Bala de Canhão quebre sua armadura. Armadura quebrada sofre {bonus} mais dano de fogo.",
+      "shake": "Tremor de câmera",
+      "gold": "Medalha de ouro",
+      "silver": "Medalha de prata",
+      "bronze": "Medalha de bronze",
+      "failed": "Defesa fracassada",
+      "result": "{medal}: integridade {integrity}, precisão {accuracy}.",
+      "medalRules": "Ouro: pelo menos {goldIntegrity} de integridade e {goldAccuracy} de precisão. Prata: {silverIntegrity} e {silverAccuracy}. Qualquer outra vitória rende Bronze. Acertos em inimigos ou barris contam; cada tiro conta uma vez. As medalhas não concedem dinheiro extra.",
+      "shotDamage": "Causa {damage} de dano a cada inimigo a até {radius} jardas do impacto.",
+      "shotSlow": "Reduz a velocidade dos inimigos atingidos em {amount} por {seconds} seg.",
+      "shotBurn": "Deixa fogo por {seconds} seg, causando {damage} de dano por segundo aos inimigos que estiverem nele.",
+      "shotTiming": "Recarga: {cooldown} seg. Impacto após {flight} seg. Todos os tiros compartilham {recovery} seg de recuperação.",
+      "shotRules": "Mire dentro da área marcada. Sem custo de mana. O dano não escala com equipamento ou talentos."
     },
     "warlock": {
       "doomLabel": "Condenação",
@@ -594,18 +594,18 @@ export const pt_BR: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Ressuscitar no Cadáver",
       "resurrectAtHealer": "O Guardião Pálido (Tributo do Guardião)",
-      "ghostHint": "Run to the location of your death or talk to the Pale Keeper to revive",
+      "ghostHint": "Corra até o local da sua morte ou fale com o Guardião Pálido para reviver",
       "spiritHealerAlive": "O Guardião Pálido vela pelos mortos. Você ainda está entre os vivos.",
-      "keeperTalkTitle": "The Pale Keeper",
-      "keeperTalkBody": "I can raise you where you stand, but my Toll comes with it: the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to where you fell revives you with no penalty.",
-      "keeperTalkSparedBody": "I can raise you where you stand. My Toll would normally come with it, a weakening of all you are for a time, but you are new to this world, so I will spare you it. Walking your spirit back to where you fell revives you with no penalty either way.",
-      "keeperTalkAccept": "Revive Me",
-      "keeperTalkLeave": "Leave",
+      "keeperTalkTitle": "O Guardião Pálido",
+      "keeperTalkBody": "Posso reerguer você onde estiver, mas meu Tributo vem junto: o Tributo do Guardião reduz todos os seus atributos em 75%, por até 10 minutos nos níveis mais altos. Levar seu espírito de volta até onde você caiu o revive sem penalidade.",
+      "keeperTalkSparedBody": "Posso reerguer você onde estiver. Meu Tributo normalmente viria junto, um enfraquecimento passageiro de tudo o que você é, mas você é novo neste mundo, então vou poupá-lo disso. Levar seu espírito de volta até onde você caiu o revive sem penalidade de qualquer forma.",
+      "keeperTalkAccept": "Reviver-me",
+      "keeperTalkLeave": "Sair",
       "healerConfirmTitle": "Aceitar o Tributo do Guardião?",
       "healerConfirmBody": "O Guardião Pálido irá reanimá-lo aqui, mas o Tributo do Guardião reduz todos os seus atributos em 75%, por até 10 minutos em níveis mais altos. Levar seu espírito de volta ao seu cadáver o revive sem penalidade.",
-      "keeperConfirmBody": "Are you sure? The Pale Keeper will revive you, but you will be weaker for it: the Keeper's Toll reduces all of your attributes by 75% until it fades, up to 10 minutes at higher levels.",
-      "keeperConfirmSparedTitle": "Let the Keeper raise you?",
-      "keeperConfirmSparedBody": "Are you sure? The Pale Keeper will revive you here. You are below level 10, so the Keeper's Toll will not weaken you this time.",
+      "keeperConfirmBody": "Tem certeza? O Guardião Pálido vai reviver você, mas isso tem um preço: o Tributo do Guardião reduz todos os seus atributos em 75% até que se dissipe, por até 10 minutos nos níveis mais altos.",
+      "keeperConfirmSparedTitle": "Deixar o Guardião reerguer você?",
+      "keeperConfirmSparedBody": "Tem certeza? O Guardião Pálido vai reviver você aqui. Como você está abaixo do nível 10, o Tributo do Guardião não vai enfraquecê-lo desta vez.",
       "healerConfirmAccept": "Reviva-me",
       "healerConfirmCancel": "Cancelar"
     },
@@ -620,7 +620,7 @@ export const pt_BR: EnTranslations = {
       "help": "Recuperação: /unstuck inicia uma contagem regressiva parado para movê-lo até um local seguro alcançável nas proximidades.",
       "helpAtGraveyard": "Recuperação: /unstuck inicia uma contagem regressiva parado, depois envia seu espírito ao cemitério mais próximo. Retornar pelo Guardião Pálido exige o Tributo do Guardião.",
       "helpUnstuckSickness": "Recuperação: /unstuck inicia uma contagem regressiva parado, depois leva você ao cemitério mais próximo, reanimando você se havia caído. O Mal do Desbloqueio permanece por até 5 minutos.",
-      "helpUnstuckWindow": "Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.",
+      "helpUnstuckWindow": "Recuperação: /unstuck inicia uma contagem regressiva parado, depois o leva ao cemitério mais próximo, revivendo-o caso tenha caído. O primeiro uso em uma hora é gratuito. Use-o novamente dentro de uma hora do último uso e você ficará com o Mal do Desbloqueio por até 5 minutos.",
       "started": "Desbloqueio em {seconds} segundos. Mover-se, lutar, sofrer dano ou iniciar outra ação o cancela.",
       "countdown": "Desbloqueio: {seconds}",
       "completed": "Movido para o local seguro alcançável mais próximo.",
@@ -628,8 +628,8 @@ export const pt_BR: EnTranslations = {
       "revivedAtGraveyard": "Você foi levado de volta ao cemitério mais próximo e reanimado. O Tributo do Guardião pesa sobre você.",
       "movedToGraveyard": "Você foi levado ao cemitério mais próximo. O Mal do Desbloqueio pesa sobre você.",
       "revivedAtGraveyardUnstuck": "Você foi levado ao cemitério mais próximo e reanimado. O Mal do Desbloqueio pesa sobre você.",
-      "movedToGraveyardFree": "You have been moved to the nearest graveyard. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
-      "revivedAtGraveyardFree": "You have been moved to the nearest graveyard and revived. Using Unstuck again within the hour will leave you with Unstuck Sickness.",
+      "movedToGraveyardFree": "Você foi levado ao cemitério mais próximo. Usar Desbloqueio novamente dentro da hora deixará você com o Mal do Desbloqueio.",
+      "revivedAtGraveyardFree": "Você foi levado ao cemitério mais próximo e revivido. Usar Desbloqueio novamente dentro da hora deixará você com o Mal do Desbloqueio.",
       "cancelledMoved": "Desbloqueio cancelado porque você se moveu.",
       "cancelledDamaged": "Desbloqueio cancelado porque você sofreu dano.",
       "cancelledCombat": "Desbloqueio cancelado porque você entrou em combate.",
@@ -736,15 +736,15 @@ export const pt_BR: EnTranslations = {
     },
     "trade": {
       "windowClosed": "A janela de troca foi fechada.",
-      "offerQuantityHint": "You will be asked how many to offer",
-      "offerQuantityTitle": "Offer {item}",
-      "offerQuantityInput": "Quantity to offer",
-      "offerQuantityConfirm": "Offer",
-      "offerQuantityAll": "Offer all",
-      "offerRemoveTitle": "Remove {item}",
-      "offerRemoveInput": "Quantity to remove",
-      "offerRemove": "Remove",
-      "offerRemoveAll": "Remove all",
+      "offerQuantityHint": "Você será perguntado quantos oferecer",
+      "offerQuantityTitle": "Oferecer {item}",
+      "offerQuantityInput": "Quantidade a oferecer",
+      "offerQuantityConfirm": "Oferecer",
+      "offerQuantityAll": "Oferecer tudo",
+      "offerRemoveTitle": "Remover {item}",
+      "offerRemoveInput": "Quantidade a remover",
+      "offerRemove": "Remover",
+      "offerRemoveAll": "Remover tudo",
       "woc": {
         "tabGold": "Dinheiro",
         "tabWoc": "$WOC",
@@ -1488,56 +1488,56 @@ export const pt_BR: EnTranslations = {
       "devTierCol": "Insígnia",
       "mergedPrs": "PRs integrados",
       "devEmpty": "Nenhum colaborador classificado ainda.",
-      "tabWorldQuests": "World Quests",
-      "wqBoardsLabel": "World quest scoreboards",
-      "wqMedal": "Medal",
-      "wqWaves": "Waves held",
-      "wqTime": "Time",
+      "tabWorldQuests": "Missões Mundiais",
+      "wqBoardsLabel": "Placares de missões mundiais",
+      "wqMedal": "Medalha",
+      "wqWaves": "Ondas resistidas",
+      "wqTime": "Tempo",
       "gliderCourseNames": {
-        "downs": "Coastal Circuit",
-        "valleys": "Valley Circuit",
-        "switchbacks": "Ridge Switchbacks"
+        "downs": "Circuito Costeiro",
+        "valleys": "Circuito do Vale",
+        "switchbacks": "Zigue-zague da Crista"
       },
-      "gliderDaily": "{course}: Today",
-      "gliderLifetime": "{course}: All time",
-      "gliderStart": "Fly this course",
-      "gliderRankings": "Glider course records",
-      "gliderPersonalRules": "Your offline records, saved with this character. Pass every ring in order. Daily records reset each day.",
-      "gliderRules": "Fastest complete flight wins. Pass every ring. Daily records reset with the realm. Records refresh within 30 seconds.",
-      "wqPoints": "Score",
+      "gliderDaily": "{course}: Hoje",
+      "gliderLifetime": "{course}: Geral",
+      "gliderStart": "Voar neste circuito",
+      "gliderRankings": "Recordes do circuito de planador",
+      "gliderPersonalRules": "Seus recordes offline, salvos com este personagem. Passe por todos os anéis em ordem. Os recordes diários são reiniciados todos os dias.",
+      "gliderRules": "O voo completo mais rápido vence. Passe por todos os anéis. Os recordes diários são reiniciados com o reino. Os recordes são atualizados em até 30 segundos.",
+      "wqPoints": "Pontuação",
       "wqSeconds": "{seconds}s",
-      "wqNoMedal": "None",
+      "wqNoMedal": "Nenhuma",
       "wqMedals": {
-        "gold": "Gold",
-        "silver": "Silver",
+        "gold": "Ouro",
+        "silver": "Prata",
         "bronze": "Bronze"
       },
-      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot.",
+      "wqEmpty": "Ainda não há pontuações neste placar. Conclua a missão mundial para conquistar uma vaga.",
       "podiumLabel": "Os três primeiros",
       "unclaimed": "Não reivindicado",
       "prestigeTitle": "Prestígio {rank}"
     },
     "wqLadder": {
-      "title": "World Quest Rankings",
-      "subtitle": "The best attempt of every hero, one ladder per medal world quest.",
-      "close": "Close World Quest Rankings",
+      "title": "Classificação de Missões Mundiais",
+      "subtitle": "A melhor tentativa de cada herói, uma classificação por missão mundial com medalhas.",
+      "close": "Fechar Classificação de Missões Mundiais",
       "rankedBy": {
-        "waves": "Ranked by waves held",
-        "seconds": "Ranked by fastest time",
-        "points": "Ranked by highest score"
+        "waves": "Classificado por ondas resistidas",
+        "seconds": "Classificado pelo tempo mais rápido",
+        "points": "Classificado pela maior pontuação"
       },
       "rankedByMedal": {
-        "waves": "Ranked by medal, then waves held",
-        "seconds": "Ranked by medal, then fastest time",
-        "points": "Ranked by medal, then highest score"
+        "waves": "Classificado por medalha, depois por ondas resistidas",
+        "seconds": "Classificado por medalha, depois pelo tempo mais rápido",
+        "points": "Classificado por medalha, depois pela maior pontuação"
       },
-      "podiumLabel": "Top three",
-      "unclaimed": "Unclaimed",
-      "totalOne": "One hero ranked",
-      "totalMany": "{count} heroes ranked",
-      "selfLabel": "Your best",
-      "selfRank": "Rank {rank}",
-      "selfNone": "You have no score on this board yet. Finish the world quest to join the ladder."
+      "podiumLabel": "Os três primeiros",
+      "unclaimed": "Não reivindicado",
+      "totalOne": "Um herói classificado",
+      "totalMany": "{count} heróis classificados",
+      "selfLabel": "Seu melhor",
+      "selfRank": "Posição {rank}",
+      "selfNone": "Você ainda não tem pontuação neste quadro. Termine a missão mundial para entrar na classificação."
     },
     "pledge": {
       "open": "Aceitando candidaturas",
@@ -1567,46 +1567,46 @@ export const pt_BR: EnTranslations = {
       "withdraw": "Retirar candidatura"
     },
     "guildRanks": {
-      "tab": "Ranks",
-      "introEdit": "Name your guild ranks and choose what each one may do. Changes apply to everyone holding the rank once you save.",
-      "introView": "Each rank title and what it may do. Only the Guild Master can change them.",
-      "colRank": "Rank",
-      "colTitle": "Title",
-      "colMembers": "Members",
-      "colActions": "Order",
-      "numbered": "Rank {n}",
+      "tab": "Patentes",
+      "introEdit": "Nomeie as patentes da sua guilda e escolha o que cada uma pode fazer. As alterações se aplicam a todos que tiverem a patente assim que você salvar.",
+      "introView": "O título de cada patente e o que ela pode fazer. Somente o Mestre da Guilda pode alterá-las.",
+      "colRank": "Patente",
+      "colTitle": "Título",
+      "colMembers": "Membros",
+      "colActions": "Ordem",
+      "numbered": "Patente {n}",
       "perm": {
-        "invite": "Invite",
-        "remove": "Remove",
-        "promote": "Promote",
-        "bank": "Guild Bank",
-        "officerChat": "Officer Chat",
-        "motd": "Billboard",
-        "events": "Calendar"
+        "invite": "Convidar",
+        "remove": "Remover",
+        "promote": "Promover",
+        "bank": "Banco da Guilda",
+        "officerChat": "Chat de Oficiais",
+        "motd": "Mural",
+        "events": "Calendário"
       },
       "permHint": {
-        "invite": "Invite players to the guild and answer their pledges.",
-        "remove": "Remove members who hold a lower rank.",
-        "promote": "Promote and demote members who hold a lower rank, up to one rank below their own.",
-        "bank": "Deposit and withdraw copper and items in the guild bank. Every member can view it.",
-        "officerChat": "Read and speak in officer chat.",
-        "motd": "Edit the guild billboard.",
-        "events": "Add and remove guild calendar events."
+        "invite": "Convidar jogadores para a guilda e responder aos seus pedidos de entrada.",
+        "remove": "Remover membros que tenham uma patente inferior.",
+        "promote": "Promover e rebaixar membros que tenham uma patente inferior, até uma patente abaixo da sua própria.",
+        "bank": "Depositar e retirar cobre e itens do banco da guilda. Todo membro pode visualizá-lo.",
+        "officerChat": "Ler e falar no chat de oficiais.",
+        "motd": "Editar o mural da guilda.",
+        "events": "Adicionar e remover eventos do calendário da guilda."
       },
-      "titleLabel": "Title for {rank}",
-      "permLabel": "{perm} for {rank}",
-      "leaderLocked": "The Guild Master always holds every permission.",
-      "add": "Add Rank",
-      "save": "Save Ranks",
-      "moveUp": "Move {rank} up",
-      "moveDown": "Move {rank} down",
-      "remove": "Remove {rank}",
-      "full": "A guild can have at most {max} ranks.",
-      "invalidTitle": "Rank titles use letters, numbers, spaces, apostrophes, and hyphens, up to {max} characters.",
-      "removeConfirm": "Members holding {rank} will become {fallback}. Remove this rank?",
-      "removeAccept": "Remove Rank",
-      "promoteTo": "Promote {name} to {rank}",
-      "demoteTo": "Demote {name} to {rank}"
+      "titleLabel": "Título para {rank}",
+      "permLabel": "{perm} para {rank}",
+      "leaderLocked": "O Mestre da Guilda sempre tem todas as permissões.",
+      "add": "Adicionar Patente",
+      "save": "Salvar Patentes",
+      "moveUp": "Mover {rank} para cima",
+      "moveDown": "Mover {rank} para baixo",
+      "remove": "Remover {rank}",
+      "full": "Uma guilda pode ter no máximo {max} patentes.",
+      "invalidTitle": "Títulos de patente usam letras, números, espaços, apóstrofos e hífens, até {max} caracteres.",
+      "removeConfirm": "Membros com a patente {rank} passarão a ser {fallback}. Remover esta patente?",
+      "removeAccept": "Remover Patente",
+      "promoteTo": "Promover {name} para {rank}",
+      "demoteTo": "Rebaixar {name} para {rank}"
     },
     "raidLockout": {
       "title": "Bloqueios de raide",
@@ -1705,7 +1705,7 @@ export const pt_BR: EnTranslations = {
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Outro ({count})",
-      "targetsHeader": "Targets",
+      "targetsHeader": "Alvos",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
       "melee": "Corpo a corpo",
@@ -1714,153 +1714,153 @@ export const pt_BR: EnTranslations = {
       "dock": "Devolver este medidor para a janela de medidores",
       "separate": "Separar {meter}",
       "regroup": "Reagrupar {meter}",
-      "settingsTitle": "Details / Meter Settings",
-      "optionsEngineBadge": "WoC Details! Engine",
-      "resetDefaults": "Reset to Defaults",
-      "closeSettings": "Close",
-      "densityCompact": "Density: Compact (16px)",
-      "densityStandard": "Density: Standard (20px)",
-      "bgGlass": "Background: Glass (76%)",
-      "bgSolid": "Background: Solid (98%)",
-      "bgMinimal": "Background: Minimal (45%)",
-      "numDetailed": "Numbers: Detailed",
-      "numCompact": "Numbers: Abbreviated (k/M)",
-      "raidTotalsOn": "Header group total: Yes",
-      "raidTotalsOff": "Header group total: No",
-      "tabGeneral": "Window & Background",
-      "tabGeneralDesc": "Opacity, scale, lock",
-      "tabBars": "Bars & Textures",
-      "tabBarsDesc": "Height, spacing, animation",
-      "tabText": "Text & Typography",
-      "tabTextDesc": "Fonts, k/M, DPS, rank",
-      "tabHeader": "Header & Title",
-      "tabHeaderDesc": "Group total, title bar",
-      "tabCombat": "Combat & Limits",
-      "tabCombatDesc": "Max rows, shields",
-      "tabPresets": "Quick Themes",
-      "tabPresetsDesc": "One-click presets",
-      "tabProfiles": "Profiles & Import",
-      "tabProfilesDesc": "Export, import, and profiles",
-      "groupWindow": "Window Appearance & Background",
-      "bgMode": "Background Mode",
-      "bgModeDesc": "Visual styling for the meter panel.",
-      "optGlass": "Glass (Blur)",
-      "optGlassDesc": "Frosted blur effect",
-      "optSolid": "Solid",
-      "optSolidDesc": "Dark high-contrast panel",
-      "optMinimal": "Minimal",
-      "optMinimalDesc": "Faint translucent",
-      "optTransparent": "Transparent",
-      "optTransparentDesc": "No background, bars only",
-      "bgOpacity": "Background Opacity",
-      "bgOpacityDesc": "Opacity percentage for the window background.",
-      "windowScale": "Window Scale",
-      "windowScaleDesc": "Increase or decrease the overall meter scale.",
-      "lockPosition": "Lock Position",
-      "lockPositionDesc": "Lock the window to prevent accidental dragging or resizing in combat.",
-      "groupBars": "Bar Geometry & Texture",
-      "barHeight": "Bar Height",
-      "barHeightDesc": "Vertical thickness of each combat row (14px compact to 26px spacious).",
-      "barSpacing": "Bar Spacing",
-      "barSpacingDesc": "Vertical pixel gap between adjacent rows.",
-      "barTexture": "Bar Texture",
-      "barTextureDesc": "Visual finish and shading over the class color.",
-      "texSpecular": "Glossy (Specular)",
-      "texSpecularDesc": "Top highlight reflection with bevel",
-      "texSmooth": "Smooth (Flat)",
-      "texSmoothDesc": "Clean flat class color",
-      "texGradient": "Gradient",
-      "texGradientDesc": "Smooth horizontal color gradient",
-      "barAnimation": "Smooth Bar Animation",
-      "barAnimationDesc": "Fluidly interpolates bar growth and decay in real time.",
-      "alwaysShowMe": "Always Show Me",
-      "alwaysShowMeDesc": "Pins your player bar to the bottom if ranked outside visible rows.",
-      "groupText": "Text Formatting & Telemetry",
-      "numFormat": "Number Format",
-      "numFormatDesc": "Display style for totals.",
-      "optNumCompact": "Abbreviated (k / M)",
-      "optNumCompactDesc": "Example: 145.2k, 1.2M",
-      "optNumDetailed": "Full Detailed",
-      "optNumDetailedDesc": "Example: 145,200, 1,240,500",
-      "optNumDamageDps": "Damage | DPS",
-      "optNumDamageDpsDesc": "Example: 239.2k | 18.4k (clean telemetry bar)",
-      "showDps": "Show Rate per Second (DPS / HPS)",
-      "showDpsDesc": "Shows damage or healing rate per second on each bar.",
-      "showPercent": "Show Percentage (%)",
-      "showPercentDesc": "Shows percent contribution of total group output.",
-      "showRank": "Show Rank (#1, #2...)",
-      "showRankDesc": "Shows ordinal rank number beside the name.",
-      "showClassIcon": "Show Class Icon",
-      "showClassIconDesc": "Displays class or role icon next to each player.",
-      "groupFont": "Combat Typography (Font Family)",
-      "groupHeader": "Header Customization",
-      "showTitleBar": "Show Title Bar",
-      "showTitleBarDesc": "Displays top bar with combat segment name and controls.",
-      "showRaidTotals": "Group Summary in Subtitle",
-      "showRaidTotalsDesc": "Displays cumulative group DPS/HPS in the header subtitle.",
-      "groupCombat": "Combat Rules & Limits",
-      "maxRows": "Maximum Visible Rows",
-      "maxRowsDesc": "Simultaneous bars (0 = unlimited, auto-fit to window height).",
-      "autoRows": " (Auto)",
-      "barsUnit": " bars",
-      "includeShields": "Count Absorbs as Healing",
-      "includeShieldsDesc": "Adds absorbed shield damage (Psalm of Warding, etc.) to Healing meter.",
-      "groupPresets": "One-Click Quick Themes",
-      "applyPreset": "Apply Theme",
-      "presetDetailsName": "Modern Glass",
-      "presetDetailsDesc": "Frosted blur background, specular glossy bars, abbreviated numbers, and full telemetry.",
-      "presetDetailsBadge": "Recommended",
-      "presetClassicName": "Classic Solid",
-      "presetClassicDesc": "Dark high-contrast solid panel, flat class bars, uncompressed detailed numbers in classic layout.",
-      "presetClassicBadge": "Classic",
-      "presetMinimalName": "Pure Minimal",
-      "presetMinimalDesc": "Nearly transparent background, compact 16px bars without gaps, direct text without percentages.",
-      "presetMinimalBadge": "Clean",
-      "presetRaidName": "Raid Focus",
-      "presetRaidDesc": "Designed for raids: compact 18px density, 10-bar limit, visible group total, and pinned player bar.",
-      "presetRaidBadge": "Raid",
-      "presetProGradientName": "Pro Gradient",
-      "presetProGradientDesc": "Floating transparent panel, horizontal gradient bars, spec icons, and Damage | DPS telemetry.",
+      "settingsTitle": "Configurações do Details / Medidor",
+      "optionsEngineBadge": "Motor WoC Details!",
+      "resetDefaults": "Restaurar Padrões",
+      "closeSettings": "Fechar",
+      "densityCompact": "Densidade: Compacta (16px)",
+      "densityStandard": "Densidade: Padrão (20px)",
+      "bgGlass": "Fundo: Vidro (76%)",
+      "bgSolid": "Fundo: Sólido (98%)",
+      "bgMinimal": "Fundo: Mínimo (45%)",
+      "numDetailed": "Números: Detalhados",
+      "numCompact": "Números: Abreviados (k/M)",
+      "raidTotalsOn": "Total do grupo no cabeçalho: Sim",
+      "raidTotalsOff": "Total do grupo no cabeçalho: Não",
+      "tabGeneral": "Janela e Fundo",
+      "tabGeneralDesc": "Opacidade, escala, trava",
+      "tabBars": "Barras e Texturas",
+      "tabBarsDesc": "Altura, espaçamento, animação",
+      "tabText": "Texto e Tipografia",
+      "tabTextDesc": "Fontes, k/M, DPS, classificação",
+      "tabHeader": "Cabeçalho e Título",
+      "tabHeaderDesc": "Total do grupo, barra de título",
+      "tabCombat": "Combate e Limites",
+      "tabCombatDesc": "Máximo de linhas, escudos",
+      "tabPresets": "Temas Rápidos",
+      "tabPresetsDesc": "Temas de um clique",
+      "tabProfiles": "Perfis e Importação",
+      "tabProfilesDesc": "Exportação, importação e perfis",
+      "groupWindow": "Aparência da Janela e Fundo",
+      "bgMode": "Modo de Fundo",
+      "bgModeDesc": "Estilo visual do painel do medidor.",
+      "optGlass": "Vidro (Desfoque)",
+      "optGlassDesc": "Efeito de desfoque fosco",
+      "optSolid": "Sólido",
+      "optSolidDesc": "Painel escuro de alto contraste",
+      "optMinimal": "Mínimo",
+      "optMinimalDesc": "Translúcido sutil",
+      "optTransparent": "Transparente",
+      "optTransparentDesc": "Sem fundo, somente barras",
+      "bgOpacity": "Opacidade do Fundo",
+      "bgOpacityDesc": "Porcentagem de opacidade do fundo da janela.",
+      "windowScale": "Escala da Janela",
+      "windowScaleDesc": "Aumenta ou diminui a escala geral do medidor.",
+      "lockPosition": "Travar Posição",
+      "lockPositionDesc": "Trava a janela para evitar arrastá-la ou redimensioná-la sem querer durante o combate.",
+      "groupBars": "Geometria e Textura das Barras",
+      "barHeight": "Altura da Barra",
+      "barHeightDesc": "Espessura vertical de cada linha de combate (14px compacta a 26px espaçosa).",
+      "barSpacing": "Espaçamento das Barras",
+      "barSpacingDesc": "Espaço vertical em pixels entre linhas adjacentes.",
+      "barTexture": "Textura da Barra",
+      "barTextureDesc": "Acabamento visual e sombreamento sobre a cor da classe.",
+      "texSpecular": "Brilhante (Especular)",
+      "texSpecularDesc": "Reflexo de brilho superior com bisel",
+      "texSmooth": "Suave (Liso)",
+      "texSmoothDesc": "Cor de classe lisa e limpa",
+      "texGradient": "Gradiente",
+      "texGradientDesc": "Gradiente de cor horizontal suave",
+      "barAnimation": "Animação Suave das Barras",
+      "barAnimationDesc": "Interpola suavemente o crescimento e a redução das barras em tempo real.",
+      "alwaysShowMe": "Sempre Me Mostrar",
+      "alwaysShowMeDesc": "Fixa sua barra de jogador na parte inferior caso sua posição fique fora das linhas visíveis.",
+      "groupText": "Formatação de Texto e Telemetria",
+      "numFormat": "Formato de Número",
+      "numFormatDesc": "Estilo de exibição dos totais.",
+      "optNumCompact": "Abreviado (k / M)",
+      "optNumCompactDesc": "Exemplo: 145.2k, 1.2M",
+      "optNumDetailed": "Totalmente Detalhado",
+      "optNumDetailedDesc": "Exemplo: 145.200, 1.240.500",
+      "optNumDamageDps": "Dano | DPS",
+      "optNumDamageDpsDesc": "Exemplo: 239.2k | 18.4k (barra de telemetria limpa)",
+      "showDps": "Mostrar Taxa por Segundo (DPS / HPS)",
+      "showDpsDesc": "Mostra a taxa de dano ou cura por segundo em cada barra.",
+      "showPercent": "Mostrar Porcentagem (%)",
+      "showPercentDesc": "Mostra a porcentagem de contribuição no total do grupo.",
+      "showRank": "Mostrar Classificação (nº1, nº2...)",
+      "showRankDesc": "Mostra o número da classificação ao lado do nome.",
+      "showClassIcon": "Mostrar Ícone de Classe",
+      "showClassIconDesc": "Exibe o ícone de classe ou função ao lado de cada jogador.",
+      "groupFont": "Tipografia de Combate (Família da Fonte)",
+      "groupHeader": "Personalização do Cabeçalho",
+      "showTitleBar": "Mostrar Barra de Título",
+      "showTitleBarDesc": "Exibe a barra superior com o nome do segmento de combate e os controles.",
+      "showRaidTotals": "Resumo do Grupo no Subtítulo",
+      "showRaidTotalsDesc": "Exibe o DPS/HPS acumulado do grupo no subtítulo do cabeçalho.",
+      "groupCombat": "Regras e Limites de Combate",
+      "maxRows": "Máximo de Linhas Visíveis",
+      "maxRowsDesc": "Barras simultâneas (0 = ilimitado, ajuste automático à altura da janela).",
+      "autoRows": " (Automático)",
+      "barsUnit": " barras",
+      "includeShields": "Contar Absorções como Cura",
+      "includeShieldsDesc": "Adiciona o dano absorvido por escudos (Salmo de Proteção, etc.) ao medidor de Cura.",
+      "groupPresets": "Temas Rápidos de Um Clique",
+      "applyPreset": "Aplicar Tema",
+      "presetDetailsName": "Vidro Moderno",
+      "presetDetailsDesc": "Fundo com desfoque fosco, barras brilhantes especulares, números abreviados e telemetria completa.",
+      "presetDetailsBadge": "Recomendado",
+      "presetClassicName": "Clássico Sólido",
+      "presetClassicDesc": "Painel sólido escuro de alto contraste, barras de classe lisas, números detalhados sem abreviação em um layout clássico.",
+      "presetClassicBadge": "Clássico",
+      "presetMinimalName": "Minimalista Puro",
+      "presetMinimalDesc": "Fundo quase transparente, barras compactas de 16px sem espaçamento, texto direto sem porcentagens.",
+      "presetMinimalBadge": "Limpo",
+      "presetRaidName": "Foco de Raide",
+      "presetRaidDesc": "Feito para raides: densidade compacta de 18px, limite de 10 barras, total do grupo visível e barra do jogador fixada.",
+      "presetRaidBadge": "Raide",
+      "presetProGradientName": "Gradiente Pro",
+      "presetProGradientDesc": "Painel flutuante transparente, barras em gradiente horizontal, ícones de especialização e telemetria de Dano | DPS.",
       "presetProGradientBadge": "Pro",
-      "groupManageProfiles": "Profile Management",
-      "activeProfile": "Active Profile",
-      "activeProfileDesc": "Select or manage independent profiles for different gameplay scenarios.",
-      "saveAs": "Save As...",
-      "duplicate": "Duplicate",
-      "deleteProfile": "Delete",
-      "cannotDeleteDefault": "The Default profile cannot be deleted",
-      "promptNewProfile": "Name of the new profile:",
-      "profileCopySuffix": " (Copy)",
-      "groupExport": "Export Current Profile",
-      "exportDesc": "Encoded profile string of your current configuration. Copy it to share or backup.",
-      "copyString": "Copy Profile String",
-      "copiedFeedback": "Copied to clipboard!",
-      "groupImport": "Import Profile",
-      "importDesc": "Paste a profile string (!WoC-Details:... or JSON) to apply and save.",
-      "importPlaceholder": "Paste profile string here (!WoC-Details:...)",
-      "importNamePlaceholder": "Profile name (optional)",
-      "importApply": "Import & Apply",
-      "errEmptyProfile": "Please paste a profile string.",
-      "errInvalidProfile": "Error: Invalid or corrupt profile string.",
-      "importSuccess": "Profile \"{name}\" imported successfully!",
-      "reportSent": "Report copied and sent to chat",
-      "reportNoData": "No data recorded.",
-      "noDetailedData": "No detailed data",
-      "noDeathEvents": "No events logged before death",
-      "killedBy": "Killed by {killer} ({ability})",
-      "lethalHit": "Lethal Hit",
-      "recentCombatEvents": "Last {count} combat events",
-      "backComparison": "Comparison",
-      "comparisonNeedTwo": "At least 2 fights are required to compare",
-      "backTimeline": "Timeline",
-      "timelineCombatEvents": "Combat events: {count}",
-      "backDev": "Balance / Dev",
-      "balanceAbilitiesCount": "Logged abilities: {count}",
-      "targetSubtitle": "Target: {target}",
-      "noTargetData": "No player data for this target"
+      "groupManageProfiles": "Gerenciamento de Perfis",
+      "activeProfile": "Perfil Ativo",
+      "activeProfileDesc": "Selecione ou gerencie perfis independentes para diferentes cenários de jogo.",
+      "saveAs": "Salvar Como...",
+      "duplicate": "Duplicar",
+      "deleteProfile": "Excluir",
+      "cannotDeleteDefault": "O perfil Padrão não pode ser excluído",
+      "promptNewProfile": "Nome do novo perfil:",
+      "profileCopySuffix": " (Cópia)",
+      "groupExport": "Exportar Perfil Atual",
+      "exportDesc": "Texto codificado do perfil da sua configuração atual. Copie-o para compartilhar ou fazer backup.",
+      "copyString": "Copiar Texto do Perfil",
+      "copiedFeedback": "Copiado para a área de transferência!",
+      "groupImport": "Importar Perfil",
+      "importDesc": "Cole o texto de um perfil (!WoC-Details:... ou JSON) para aplicar e salvar.",
+      "importPlaceholder": "Cole aqui o texto do perfil (!WoC-Details:...)",
+      "importNamePlaceholder": "Nome do perfil (opcional)",
+      "importApply": "Importar e Aplicar",
+      "errEmptyProfile": "Cole o texto de um perfil.",
+      "errInvalidProfile": "Erro: texto de perfil inválido ou corrompido.",
+      "importSuccess": "Perfil \"{name}\" importado com sucesso!",
+      "reportSent": "Relatório copiado e enviado ao chat",
+      "reportNoData": "Nenhum dado registrado.",
+      "noDetailedData": "Nenhum dado detalhado",
+      "noDeathEvents": "Nenhum evento registrado antes da morte",
+      "killedBy": "Morto por {killer} ({ability})",
+      "lethalHit": "Golpe Letal",
+      "recentCombatEvents": "Últimos {count} eventos de combate",
+      "backComparison": "Comparação",
+      "comparisonNeedTwo": "São necessárias pelo menos 2 lutas para comparar",
+      "backTimeline": "Linha do Tempo",
+      "timelineCombatEvents": "Eventos de combate: {count}",
+      "backDev": "Balanceamento / Dev",
+      "balanceAbilitiesCount": "Habilidades registradas: {count}",
+      "targetSubtitle": "Alvo: {target}",
+      "noTargetData": "Nenhum dado de jogador para este alvo"
     },
     "auraTooltip": {
-      "caster": "Cast by {name}"
+      "caster": "Conjurado por {name}"
     },
     "auraTracks": {
       "defensives": "Recargas defensivas",
@@ -1887,7 +1887,7 @@ export const pt_BR: EnTranslations = {
       "buffs": "Benefícios",
       "unlock": "Mover a janela de auras do alvo",
       "lock": "Bloquear a janela de auras do alvo",
-      "close": "Close target aura window",
+      "close": "Fechar janela de auras do alvo",
       "configureRows": "Configurar as auras do alvo",
       "fewerRows": "Preferir menos linhas de auras",
       "moreRows": "Preferir mais linhas de auras",
@@ -1981,7 +1981,7 @@ export const pt_BR: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Treme-terra Fagulha do Terror",
       "name_drakemaw_raptor": "Raptor de Drakemaw",
-      "name_avian_strider": "Viridian Valestrider",
+      "name_avian_strider": "Andarilho Viridiano do Vale",
       "name_mech_bird": "Pássaro Mech Cluckwork",
       "name_lanternback_troll": "Grumbol, o Lanterna Dorso",
       "name_chimeglass_tortoise": "Tolliver o Chimeglass",
@@ -1998,7 +1998,7 @@ export const pt_BR: EnTranslations = {
       "desc_rallycart_skin": "Um carrinho de corrida minúsculo com um rugido poderoso.",
       "desc_terrorspark_groundshaker": "Uma máquina blindada compacta com esteiras pesadas, um canhão de grande calibre e uma sela feita para pilotos destemidos.",
       "desc_drakemaw_raptor": "Um raptor da ninhada domado na sela, vindo da Caldeira de Drakemaw, puro músculo e velocidade, ainda com um leve cheiro de cinzas.",
-      "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
+      "desc_avian_strider": "Uma ave de sela imponente, cujas garras pesadas e asas dobradas transformam toda jornada numa investida estrondosa.",
       "desc_mech_bird": "Uma galinha de guerra mecânica construída à mão que corre em servos em movimento, com a chave de corda ainda girando.",
       "desc_lanternback_troll": "Um troll das colinas quebrado no jugo por acendedores de lampiões, carregando um trono de ferro sobre os ombros com uma lanterna de tempestade acesa em cada braço.",
       "desc_chimeglass_tortoise": "Uma tartaruga das salinas que ultrapassou três gerações de caravanas. Os funileiros moeram-lhe óculos de vidro e penduraram um sino de bronze em sua garganta, para que a estrada o ouça muito antes de vê-lo.",
@@ -2115,7 +2115,7 @@ export const pt_BR: EnTranslations = {
       "clickMoveLeft": "Clique esquerdo",
       "clickMoveRight": "Clique direito",
       "version": "v{version} ({build})",
-      "overlays": "Overlays",
+      "overlays": "Sobreposições",
       "browserEffects": "Efeitos do navegador",
       "browserEffectsAuto": "Auto",
       "browserEffectsFull": "Completos",
@@ -2145,9 +2145,9 @@ export const pt_BR: EnTranslations = {
       "gfxBloom": "Brilho",
       "gfxAntiAliasing": "Anti-Aliasing",
       "gfxDynamicLights": "Luzes Dinâmicas",
-      "gfxGhostFade": "Camera Ghost",
-      "gfxGhostFadeDithered": "Dithered",
-      "gfxGhostFadeSmooth": "Smooth",
+      "gfxGhostFade": "Fantasma da Câmera",
+      "gfxGhostFadeDithered": "Pontilhado",
+      "gfxGhostFadeSmooth": "Suave",
       "gfxParticleEffects": "Efeitos de Partículas",
       "gfxHalf": "Metade",
       "gfxCustomNote": "Alterar um controle muda a predefinição de qualidade para Avançado: uma combinação personalizada construída sobre a base de qualidade High, partindo dos níveis mostrados para sua predefinição atual.",
@@ -2172,15 +2172,15 @@ export const pt_BR: EnTranslations = {
       "shaderWarmOff": "Desligado",
       "shaderWarmOn": "Ligado",
       "shaderWarmNote": "Pré-aquece o cache de shaders em segundo plano para evitar engasgos no jogo. Auto: ativado somente quando o sistema gráfico oferece suporte. (Recomendado). Ligado: forçado em todos os lugares. Pode piorar o desempenho em algumas configurações. Desligado: desativado.",
-      "frameRateCap": "Frame Rate Limit",
-      "frameRateCapAuto": "Auto",
-      "frameRateCapDisplay": "Display",
+      "frameRateCap": "Limite de Taxa de Quadros",
+      "frameRateCapAuto": "Automático",
+      "frameRateCapDisplay": "Monitor",
       "frameRateCapSixty": "60",
       "frameRateCapThirty": "30",
-      "frameRateCapNote": "Limits how many images the game draws each second. On a computer that cannot keep up with its display, a lower limit gives a steadier picture and keeps the computer cooler. The limit follows your display, so the real rate can differ a little from the number. Auto lowers the limit only when this computer cannot keep up with its display, then keeps it steady. (Recommended). Display: no limit.",
-      "frameRateCapStatusPaced": "Drawing {fps} images per second on a {hz} Hz display.",
-      "frameRateCapStatusUnpaced": "Limiting to {fps} images per second.",
-      "frameRateCapStatusInert": "This display already runs at or under this limit, so the limit changes nothing.",
+      "frameRateCapNote": "Limita quantas imagens o jogo desenha por segundo. Em um computador que não consegue acompanhar seu monitor, um limite mais baixo garante uma imagem mais estável e mantém o computador mais fresco. O limite acompanha seu monitor, então a taxa real pode diferir um pouco do número mostrado. Automático reduz o limite apenas quando este computador não consegue acompanhar seu monitor, e então o mantém estável. (Recomendado). Monitor: sem limite.",
+      "frameRateCapStatusPaced": "Desenhando {fps} imagens por segundo em um monitor de {hz} Hz.",
+      "frameRateCapStatusUnpaced": "Limitando a {fps} imagens por segundo.",
+      "frameRateCapStatusInert": "Este monitor já funciona nesse limite ou abaixo dele, então o limite não muda nada.",
       "gpuBackend": "Backend gráfico",
       "gpuBackendAuto": "Auto",
       "gpuBackendVulkan": "Vulkan",
@@ -2208,9 +2208,9 @@ export const pt_BR: EnTranslations = {
       "targetHealthText": "Texto de saúde alvo",
       "aurasOnPlayerFrame": "Benefícios no Quadro do Jogador",
       "auraBarBelowFrame": "Benefícios abaixo do quadro do jogador",
-      "targetAurasBelowFrame": "Target Auras Below the Frame",
+      "targetAurasBelowFrame": "Auras do Alvo Abaixo do Quadro",
       "alwaysShowAllBuffs": "Sempre Mostrar Todos os Bônus",
-      "showAuraCaster": "Show Aura Caster in Tooltips",
+      "showAuraCaster": "Mostrar Conjurador da Aura nas Dicas",
       "highContrastBackground": "Fundo de alto contraste",
       "startAttackOnAbility": "Ataque Automático ao Usar Habilidade",
       "stopAutoAttackOnTargetSwitch": "Parar Ataque Automático ao Trocar de Alvo",
@@ -2245,11 +2245,11 @@ export const pt_BR: EnTranslations = {
       "showFriendlyTrack": "Mostrar meus benefícios nos aliados",
       "showShieldTrack": "Mostrar meus escudos",
       "waterRipples": "Ondulações na água (esteiras)",
-      "actionCam": "Action Cam",
-      "actionCamShoulder": "Action Cam Shoulder",
-      "actionCamShoulderLeft": "Left {pct}",
-      "actionCamShoulderRight": "Right {pct}",
-      "actionCamShoulderCenter": "Center",
+      "actionCam": "Câmera de Ação",
+      "actionCamShoulder": "Ombro da Câmera de Ação",
+      "actionCamShoulderLeft": "Esquerda {pct}",
+      "actionCamShoulderRight": "Direita {pct}",
+      "actionCamShoulderCenter": "Centro",
       "showAttackButton": "Exibir Botão de Ataque",
       "showDailyRewardsChest": "Mostrar Baú de Recompensas Diárias",
       "mobileCameraJoystick": "Joystick da câmera",
@@ -2324,7 +2324,7 @@ export const pt_BR: EnTranslations = {
       "crossHotbarEditHelp": "Segure o pára-choque esquerdo e pressione o botão superior para organizar a barra com o controlador."
     },
     "perf": {
-      "title": "Performance",
+      "title": "Desempenho",
       "overlaySection": "Sobreposição de Desempenho",
       "enable": "Mostrar Sobreposição de Desempenho",
       "description": "Escolha quais estatísticas exibir, onde a sobreposição fica e como ela aparece.",
@@ -2568,78 +2568,78 @@ export const pt_BR: EnTranslations = {
       }
     },
     "cooldownManager": {
-      "title": "Cooldown Manager",
-      "intro": "Floating buttons for the spells you pick. They cannot be clicked: each one shows its cooldown, dims while you cannot cast it, and lights up when it is ready.",
-      "generalTitle": "General",
-      "enabled": "Show Cooldown Manager",
-      "idleOpacity": "Opacity While Not Ready",
-      "combatOnly": "Sounds Only in Combat",
-      "dragHint": "While this menu is open, every group shows on screen and you can drag it to move it.",
-      "addSingle": "Add Single Button",
-      "addGrid": "Add Button Group",
-      "addLine": "Add Line of Spells",
-      "groupsFull": "You have the most groups allowed. Delete one to add another.",
-      "noGroups": "Add a single button, a group of buttons or a line of spells to get started.",
-      "groupSingle": "Single Button {index}",
-      "groupGrid": "Button Group {index}",
-      "groupLine": "Line of Spells {index}",
-      "groupName": "Group Name",
-      "spellCount": "{count} / {max} spells",
-      "orientation": "Orientation",
+      "title": "Gerenciador de Recargas",
+      "intro": "Botões flutuantes para as habilidades que você escolher. Eles não podem ser clicados: cada um mostra sua recarga, escurece enquanto você não pode usá-la e se ilumina quando está pronta.",
+      "generalTitle": "Geral",
+      "enabled": "Mostrar Gerenciador de Recargas",
+      "idleOpacity": "Opacidade Quando Não Pronto",
+      "combatOnly": "Sons Apenas em Combate",
+      "dragHint": "Enquanto este menu estiver aberto, todos os grupos aparecem na tela e você pode arrastá-los para movê-los.",
+      "addSingle": "Adicionar Botão Único",
+      "addGrid": "Adicionar Grupo de Botões",
+      "addLine": "Adicionar Linha de Feitiços",
+      "groupsFull": "Você atingiu o número máximo de grupos permitidos. Exclua um para adicionar outro.",
+      "noGroups": "Adicione um botão único, um grupo de botões ou uma linha de feitiços para começar.",
+      "groupSingle": "Botão Único {index}",
+      "groupGrid": "Grupo de Botões {index}",
+      "groupLine": "Linha de Feitiços {index}",
+      "groupName": "Nome do Grupo",
+      "spellCount": "{count} / {max} feitiços",
+      "orientation": "Orientação",
       "horizontal": "Horizontal",
       "vertical": "Vertical",
-      "columns": "# Columns",
-      "rows": "# Rows",
-      "direction": "Icon Direction",
-      "dirRight": "Right",
-      "dirLeft": "Left",
-      "dirDown": "Down",
-      "dirUp": "Up",
-      "iconSize": "Icon Size",
-      "iconPadding": "Icon Padding",
-      "opacity": "Opacity",
-      "visibility": "Visibility",
-      "visAlways": "Always Visible",
-      "visCombat": "In Combat",
-      "visHidden": "Hidden",
-      "visHiddenHint": "A hidden group still plays its sounds and lights your action bar.",
-      "showTimer": "Show Timer",
-      "positionX": "Horizontal Position",
-      "positionY": "Vertical Position",
-      "resetPosition": "Reset to Default Position",
-      "deleteGroup": "Delete Group",
-      "deleteGroupAria": "Delete {group}",
-      "trackedTitle": "Tracked Spells",
-      "trackedHint": "Drag a spell onto a group, or select it to choose its group and alerts. A button follows its spell when it changes into another one, and lights up when it does.",
-      "search": "Search spells",
-      "searchPlaceholder": "Search",
-      "notDisplayed": "Not Displayed",
-      "otherSpells": "Other Spells",
-      "otherSpellsHint": "Spells from your other specializations, talent choices and higher levels. Place one now and its button appears once you know it.",
-      "notKnown": "{spell} (not known yet)",
-      "aurasTitle": "Procs, Engines and Buffs",
-      "aurasHint": "Engine resources and their stacks, procs, and the buffs your spells put on you. Anything else that has been on you shows up here too.",
+      "columns": "Nº de Colunas",
+      "rows": "Nº de Linhas",
+      "direction": "Direção do Ícone",
+      "dirRight": "Direita",
+      "dirLeft": "Esquerda",
+      "dirDown": "Baixo",
+      "dirUp": "Cima",
+      "iconSize": "Tamanho do Ícone",
+      "iconPadding": "Espaçamento do Ícone",
+      "opacity": "Opacidade",
+      "visibility": "Visibilidade",
+      "visAlways": "Sempre Visível",
+      "visCombat": "Em Combate",
+      "visHidden": "Oculto",
+      "visHiddenHint": "Um grupo oculto ainda reproduz seus sons e ilumina sua barra de ação.",
+      "showTimer": "Mostrar Cronômetro",
+      "positionX": "Posição Horizontal",
+      "positionY": "Posição Vertical",
+      "resetPosition": "Redefinir para a Posição Padrão",
+      "deleteGroup": "Excluir Grupo",
+      "deleteGroupAria": "Excluir {group}",
+      "trackedTitle": "Feitiços Rastreados",
+      "trackedHint": "Arraste um feitiço até um grupo, ou selecione-o para escolher seu grupo e alertas. Um botão acompanha seu feitiço quando ele se transforma em outro, e se ilumina quando isso acontece.",
+      "search": "Pesquisar feitiços",
+      "searchPlaceholder": "Pesquisar",
+      "notDisplayed": "Não Exibido",
+      "otherSpells": "Outros Feitiços",
+      "otherSpellsHint": "Feitiços de suas outras especializações, escolhas de talento e níveis mais altos. Posicione um agora e o botão aparecerá assim que você o conhecer.",
+      "notKnown": "{spell} (ainda não conhecido)",
+      "aurasTitle": "Procs, Motores e Benefícios",
+      "aurasHint": "Recursos de motor e suas cargas, procs, e os benefícios que seus feitiços colocam em você. Qualquer outra coisa que estiver em você também aparece aqui.",
       "auraFallback": "Aura",
-      "onlyWhileActive": "Only Show While Active",
-      "alertStacks": "Alert at Stacks",
-      "alertStacksAny": "On gain",
-      "alertStacksHint": "The button lights, pulses and chimes once the aura reaches this many stacks. On gain means as soon as it appears.",
-      "auraSoundHint": "Plays when the aura comes up, or when it reaches your stack goal.",
-      "emptySection": "Drop a spell here.",
-      "spellsEmpty": "You do not know any spells yet.",
-      "selectSpell": "Select {spell}",
-      "group": "Group",
-      "groupFullOption": "{group} (full)",
-      "notInGroupHint": "Put this spell in a group to show its button.",
-      "moveEarlier": "Move {spell} earlier",
-      "moveLater": "Move {spell} later",
-      "glowWhenReady": "Light Up When Ready",
-      "glowWhenReadyHint": "Brightens and outlines the button while the spell can be cast.",
-      "hotbarGlow": "Hotbar Glow",
-      "hotbarGlowHint": "Also lights this spell on your action bar while it is ready.",
-      "onlyWhenReady": "Only Show When Ready",
-      "sound": "Ready Sound",
-      "soundHint": "Plays when the spell becomes ready, or when its button changes into another spell while ready."
+      "onlyWhileActive": "Mostrar Apenas Enquanto Ativo",
+      "alertStacks": "Alertar em Cargas",
+      "alertStacksAny": "Ao ganhar",
+      "alertStacksHint": "O botão se ilumina, pulsa e soa quando a aura atinge esse número de cargas. Ao ganhar significa assim que ela aparece.",
+      "auraSoundHint": "Toca quando a aura surge, ou quando atinge a meta de cargas definida.",
+      "emptySection": "Solte um feitiço aqui.",
+      "spellsEmpty": "Você ainda não conhece nenhum feitiço.",
+      "selectSpell": "Selecionar {spell}",
+      "group": "Grupo",
+      "groupFullOption": "{group} (cheio)",
+      "notInGroupHint": "Coloque este feitiço em um grupo para exibir seu botão.",
+      "moveEarlier": "Mover {spell} para cima",
+      "moveLater": "Mover {spell} para baixo",
+      "glowWhenReady": "Iluminar Quando Pronto",
+      "glowWhenReadyHint": "Clareia e destaca o botão enquanto o feitiço pode ser conjurado.",
+      "hotbarGlow": "Brilho na Barra de Ação",
+      "hotbarGlowHint": "Também ilumina este feitiço na sua barra de ação enquanto estiver pronto.",
+      "onlyWhenReady": "Mostrar Apenas Quando Pronto",
+      "sound": "Som ao Ficar Pronto",
+      "soundHint": "Toca quando o feitiço fica pronto, ou quando seu botão muda para outro feitiço enquanto está pronto."
     },
     "auraOverlay": {
       "title": "Auras",
@@ -2765,79 +2765,79 @@ export const pt_BR: EnTranslations = {
         "battlegroundComplete": "batalha de Campos de Thornhollow disputada",
         "battlegroundKill": "abate honroso",
         "battlegroundAssist": "assistência em abate",
-        "worldKill": "world kill",
-        "worldAssist": "world kill assisted",
-        "hillHold": "holding the hill"
+        "worldKill": "abate no mundo aberto",
+        "worldAssist": "assistência em abate no mundo aberto",
+        "hillHold": "segurando a colina"
       },
       "floatReasons": {
         "kill": "Abate",
         "assist": "Assistência",
         "firstWin": "Primeira Vitória",
-        "hill": "Hill"
+        "hill": "Colina"
       }
     },
     "worldPvp": {
-      "tab": "World PvP",
-      "title": "World PvP",
-      "blurb": "Raise your flag to fight other flagged players anywhere in the open world. Defeat one and take a share of their purse, plus Honor toward Warfare gear. Battlegrounds and Arenas still pay more.",
-      "statusOn": "Your PvP flag is up. Flagged players can attack you.",
-      "statusOff": "Your PvP flag is down. You cannot attack or be attacked in the open world.",
-      "statusOffFfa": "Your PvP flag is down, but on free-for-all ground you can still attack and be attacked.",
-      "statusDisarming": "Your flag drops in {time}, or when your current fight ends.",
-      "zoneSanctuary": "Sanctuary: no world PvP here.",
-      "zoneContested": "Contested ground: only flagged players fight here.",
-      "zoneFfa": "Free-for-all ground: everyone here is fair game.",
-      "realmDisabled": "World PvP is disabled on this realm.",
-      "groundSanctuary": "The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP at all.",
-      "groundContested": "Everywhere else is contested: only two flagged players can fight.",
-      "groundFfa": "The Drakelands, the Frostveil Reach and the Amberfall are free-for-all: everyone there can fight, flag or not.",
-      "groupLine": "Party and raid members are never hostile to each other. Guildmates outside your group can fight.",
-      "markLine": "Attacking an unflagged player there raises your own flag; attacking a flagged one never does.",
-      "aidLine": "Healing, shielding or buffing a flagged player in a world fight raises your flag.",
-      "stakeLine": "The loser pays {cap} or {percent} of their purse, whichever is less.",
-      "noStakeLine": "An unflagged player killed on free-for-all ground loses no gold.",
-      "noTakeLine": "An unflagged fighter takes no gold either: it only moves between two flagged players.",
-      "honorLine": "{honor} Honor per kill, split between everyone who helped.",
-      "splitLine": "A clean 1v1 pays the whole pot; helpers and their healers share it.",
-      "repeatLine": "Repeat kills of one player pay {second}, then {third}, then nothing; the count clears {reset} after the first kill.",
-      "greyLine": "Players more than {levels} levels below you pay nothing.",
-      "disarmLine": "Switching off takes {minutes} minutes and waits for combat to end.",
-      "record": "Record: {kills} kills, {deaths} deaths",
-      "enable": "Enable World PvP",
-      "disable": "Disable World PvP",
-      "keepUp": "Keep Flag Up",
-      "confirmBody": "Other flagged players will be able to attack you anywhere and take up to {cap} from your purse when they win. You can switch off again, but it takes {minutes} minutes.",
-      "confirmAccept": "Raise Flag",
-      "confirmCancel": "Cancel",
-      "levelReq": "Requires level {level}.",
-      "pending": "Waiting for your PvP status from the realm.",
-      "commandHint": "Chat: /pvp toggles the flag, /pvp on and /pvp off set it."
+      "tab": "PvP Mundial",
+      "title": "PvP Mundial",
+      "blurb": "Levante sua bandeira para lutar contra outros jogadores marcados em qualquer lugar do mundo aberto. Derrote um deles e fique com uma parte do dinheiro dele, além de Honra para o equipamento de Guerra. Campos de batalha e Arenas ainda pagam mais.",
+      "statusOn": "Sua bandeira de PvP está levantada. Jogadores marcados podem atacar você.",
+      "statusOff": "Sua bandeira de PvP está abaixada. Você não pode atacar nem ser atacado no mundo aberto.",
+      "statusOffFfa": "Sua bandeira de PvP está abaixada, mas em terreno livre para todos você ainda pode atacar e ser atacado.",
+      "statusDisarming": "Sua bandeira cai em {time}, ou quando seu combate atual terminar.",
+      "zoneSanctuary": "Santuário: nenhum PvP Mundial aqui.",
+      "zoneContested": "Terreno contestado: aqui só lutam jogadores marcados.",
+      "zoneFfa": "Terreno livre para todos: aqui todo mundo é alvo válido.",
+      "realmDisabled": "O PvP Mundial está desativado neste reino.",
+      "groundSanctuary": "A Costa da Provação e o Vale de Eastbrook são santuários: nenhum PvP Mundial ali.",
+      "groundContested": "Todo o restante é contestado: só dois jogadores marcados podem lutar.",
+      "groundFfa": "Drakelands, os Confins de Frostveil e Amberfall são livres para todos: qualquer um lá pode lutar, marcado ou não.",
+      "groupLine": "Membros de grupo e raide nunca são hostis entre si. Colegas de guilda fora do seu grupo podem lutar.",
+      "markLine": "Atacar um jogador não marcado ali levanta sua própria bandeira; atacar um marcado nunca faz isso.",
+      "aidLine": "Curar, proteger ou fortalecer um jogador marcado em um combate no mundo aberto levanta sua bandeira.",
+      "stakeLine": "O perdedor paga {cap} ou {percent} da própria bolsa, o que for menor.",
+      "noStakeLine": "Um jogador não marcado morto em terreno livre para todos não perde ouro.",
+      "noTakeLine": "Um lutador não marcado também não leva ouro: ele só passa de mão entre dois jogadores marcados.",
+      "honorLine": "{honor} de Honra por abate, dividida entre todos que ajudaram.",
+      "splitLine": "Um 1x1 limpo paga o montante inteiro; ajudantes e seus curandeiros o dividem entre si.",
+      "repeatLine": "Abates repetidos do mesmo jogador pagam {second}, depois {third}, depois nada; a contagem zera {reset} após o primeiro abate.",
+      "greyLine": "Jogadores mais de {levels} níveis abaixo de você não pagam nada.",
+      "disarmLine": "Desativar leva {minutes} minutos e espera o combate terminar.",
+      "record": "Histórico: {kills} abates, {deaths} mortes",
+      "enable": "Ativar PvP Mundial",
+      "disable": "Desativar PvP Mundial",
+      "keepUp": "Manter Bandeira Levantada",
+      "confirmBody": "Outros jogadores marcados poderão atacar você em qualquer lugar e levar até {cap} da sua bolsa quando vencerem. Você pode desativar de novo, mas isso leva {minutes} minutos.",
+      "confirmAccept": "Levantar Bandeira",
+      "confirmCancel": "Cancelar",
+      "levelReq": "Requer nível {level}.",
+      "pending": "Aguardando seu status de PvP do reino.",
+      "commandHint": "Chat: /pvp alterna a bandeira; /pvp on e /pvp off a definem."
     },
     "hill": {
-      "title": "King of the Hill",
-      "rising": "The hill has not risen yet",
-      "heldYou": "Your group holds the hill",
-      "heldOther": "Another group holds the hill",
-      "heldNone": "Nobody holds the hill",
-      "counts": "Inside: you {yours}, holder {theirs}",
-      "countsUnheld": "Inside: you {yours}, largest rival {theirs}",
-      "countsHolding": "Inside: you {yours}, rival {theirs}",
-      "contestYou": "Taking the hill: {seconds} of {total}",
-      "contestOther": "Losing the hill: {seconds} of {total}",
-      "contestNone": "Hold a majority inside for {total} to take it",
-      "inside": "You are inside the circle",
-      "distance": "{yards} yd to the circle",
-      "rises": "Rises in {minutes}",
-      "falls": "Falls in {minutes}",
-      "standingRaid": "Raid members do not count: only parties can hold the hill"
+      "title": "Rei da Colina",
+      "rising": "A colina ainda não surgiu",
+      "heldYou": "Seu grupo controla a colina",
+      "heldOther": "Outro grupo controla a colina",
+      "heldNone": "Ninguém controla a colina",
+      "counts": "Dentro: você {yours}, detentor {theirs}",
+      "countsUnheld": "Dentro: você {yours}, maior rival {theirs}",
+      "countsHolding": "Dentro: você {yours}, rival {theirs}",
+      "contestYou": "Tomando a colina: {seconds} de {total}",
+      "contestOther": "Perdendo a colina: {seconds} de {total}",
+      "contestNone": "Mantenha a maioria dentro por {total} para tomá-la",
+      "inside": "Você está dentro do círculo",
+      "distance": "{yards} jardas até o círculo",
+      "rises": "Surge em {minutes}",
+      "falls": "Cai em {minutes}",
+      "standingRaid": "Membros de raide não contam: apenas grupos podem controlar a colina"
     },
     "warfareShop": {
       "gossipOption": "Ver Conjuntos de Guerra",
       "gossipOptionAria": "Ver a loja de conjuntos de Guerra oferecida por {name}",
       "jewelry": "Joalheria",
       "weapons": "Armas",
-      "groupSeason2": "Warfare Season 2: Vanguard",
-      "groupEntry": "Warfare Season 1",
+      "groupSeason2": "Temporada de Guerra 2: Vanguarda",
+      "groupEntry": "Temporada de Guerra 1",
       "owned": "Possuído",
       "buyAria": "Comprar {item} por {honor}",
       "buyOwnedAria": "Comprar {item} por {honor}, já possuído",
@@ -2845,9 +2845,9 @@ export const pt_BR: EnTranslations = {
     },
     "charSheet": {
       "offense": "Ataque",
-      "spell": "Spell",
+      "spell": "Feitiço",
       "defense": "Defesa",
-      "ratings": "Ratings",
+      "ratings": "Índices",
       "playtimeLabel": "Tempo Jogado",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Menos de um minuto",
@@ -2862,94 +2862,94 @@ export const pt_BR: EnTranslations = {
       "stats": "Estatísticas",
       "progression": "Progressão",
       "skills": "Habilidades",
-      "reputation": "Reputation",
-      "currencies": "Currencies",
-      "character": "Character",
-      "professions": "Professions",
+      "reputation": "Reputação",
+      "currencies": "Moedas",
+      "character": "Personagem",
+      "professions": "Profissões",
       "gathering": "Reunião",
       "crafting": "Artesanato",
       "openProfessions": "Profissões abertas"
     },
     "currencies": {
-      "intro": "None of these take bag space. Coin stays in your bag as always.",
-      "activities": "Activities",
-      "factions": "Factions",
-      "honor": "Honor",
-      "delveMark": "Delve Mark",
+      "intro": "Nenhuma delas ocupa espaço na mochila. As moedas continuam na sua mochila como sempre.",
+      "activities": "Atividades",
+      "factions": "Facções",
+      "honor": "Honra",
+      "delveMark": "Marca de Incursão",
       "wocToken": "WoC Token",
-      "heroicMarkNote": "Heroic dungeons . spend at the heroic quartermaster",
-      "honorNote": "Battlegrounds and the arena",
-      "delveMarkNote": "Delves completed",
-      "wocTokenNote": "Linked wallet balance",
-      "walletNotLinked": "No wallet linked",
-      "wocPreview": "Preview balance, not yet verified",
-      "lifetime": "Lifetime {amount}",
-      "factionPending": "Faction currency: pending Stage 2"
+      "heroicMarkNote": "Masmorras heroicas. Use com o intendente heroico",
+      "honorNote": "Campos de batalha e arena",
+      "delveMarkNote": "Incursões concluídas",
+      "wocTokenNote": "Saldo da carteira vinculada",
+      "walletNotLinked": "Nenhuma carteira vinculada",
+      "wocPreview": "Saldo de pré-visualização, ainda não verificado",
+      "lifetime": "Acumulado: {amount}",
+      "factionPending": "Moeda de facção: Estágio 2 pendente"
     },
     "reputation": {
-      "intro": "All three factions progress at once: every world quest counts toward the faction of its zone.",
+      "intro": "As três facções avançam ao mesmo tempo: toda missão mundial conta para a facção da sua zona.",
       "faction": {
-        "rift_watch": "Rift Watch",
-        "church_order": "Church Order",
-        "automatons": "Automatons"
+        "rift_watch": "Vigília das Fendas",
+        "church_order": "Ordem da Igreja",
+        "automatons": "Autômatos"
       },
       "hub": {
         "rift_watch": "Drifthaven",
-        "church_order": "Brother Aldric",
+        "church_order": "Irmão Aldric",
         "automatons": "Wyrmwatch"
       },
       "hubLine": "{hub} . {zone}",
       "tier": {
-        "unknown": "Unknown",
-        "recognized": "Recognized",
-        "trusted": "Trusted",
-        "proven": "Proven",
-        "vanguard": "Vanguard",
-        "champion": "Champion"
+        "unknown": "Desconhecido",
+        "recognized": "Reconhecido",
+        "trusted": "Confiável",
+        "proven": "Comprovado",
+        "vanguard": "Vanguarda",
+        "champion": "Campeão"
       },
       "factionTitle": {
         "rift_watch": {
-          "unknown": "Outsider",
-          "recognized": "Watcher",
-          "trusted": "Riftwalker",
-          "proven": "Warden",
-          "vanguard": "Riftwarden",
-          "champion": "Champion"
+          "unknown": "Forasteiro",
+          "recognized": "Vigia",
+          "trusted": "Caminhante das Fendas",
+          "proven": "Vigilante",
+          "vanguard": "Guardião das Fendas",
+          "champion": "Campeão"
         },
         "church_order": {
-          "unknown": "Outsider",
-          "recognized": "Acolyte",
-          "trusted": "Keeper",
-          "proven": "Templar",
-          "vanguard": "Dawnkeeper",
-          "champion": "Champion"
+          "unknown": "Forasteiro",
+          "recognized": "Acólito",
+          "trusted": "Guardião",
+          "proven": "Templário",
+          "vanguard": "Guardião da Alvorada",
+          "champion": "Campeão"
         },
         "automatons": {
-          "unknown": "Outsider",
-          "recognized": "Operator",
-          "trusted": "Mechanist",
-          "proven": "Artificer",
-          "vanguard": "Forgemaster",
-          "champion": "Champion"
+          "unknown": "Forasteiro",
+          "recognized": "Operador",
+          "trusted": "Mecanista",
+          "proven": "Artífice",
+          "vanguard": "Mestre da Forja",
+          "champion": "Campeão"
         }
       },
       "progress": "{current} / {next}",
-      "next": "Next: {tier}",
-      "maxed": "Highest standing reached",
-      "cappedByLevel": "Standing pauses at {tier} until level 16",
-      "today": "Today",
-      "questsDone": "World quests completed",
+      "next": "Próximo: {tier}",
+      "maxed": "Reputação máxima alcançada",
+      "cappedByLevel": "A reputação para em {tier} até o nível 16",
+      "today": "Hoje",
+      "questsDone": "Missões mundiais concluídas",
       "questsDoneValue": "{done} / {total}",
-      "resetsIn": "Board",
-      "resetsUnknown": "No board today",
-      "title": "Faction title",
+      "resetsIn": "Quadro",
+      "resetsUnknown": "Nenhum quadro hoje",
+      "title": "Título de facção",
       "titleLine": "{faction} . {tier}",
-      "legend": "Standing tiers",
-      "vendorGate": "Requires {tier} with {faction}.",
-      "standingGained": "+{amount} {faction} Standing.",
-      "tierReachedBanner": "Now {tier} with the {faction}",
-      "tierReachedSubtext": "Faction title: {title}",
-      "tierReachedLine": "You are now {tier} with the {faction}. Your faction title is now {title}."
+      "legend": "Níveis de Reputação",
+      "vendorGate": "Requer {tier} com {faction}.",
+      "standingGained": "+{amount} de reputação com {faction}.",
+      "tierReachedBanner": "Agora {tier} com {faction}",
+      "tierReachedSubtext": "Título de facção: {title}",
+      "tierReachedLine": "Você agora é {tier} com {faction}. Seu título de facção agora é {title}."
     },
     "questLog": {
       "completed": "Concluído",
@@ -2961,7 +2961,7 @@ export const pt_BR: EnTranslations = {
       "names": {
         "spellPower": "Poder Mágico",
         "healPower": "Poder de Cura",
-        "spellCrit": "Spell Crit",
+        "spellCrit": "Crítico de Feitiço",
         "critRating": "Índice de crítico",
         "hasteRating": "Índice de aceleração",
         "parry": "Aparar",
@@ -2978,17 +2978,17 @@ export const pt_BR: EnTranslations = {
         "armor": "Suaviza os golpes físicos recebidos. A redução é maior contra atacantes de nível inferior e tem limite de 75%.",
         "attackPower": "Potencializa seus ataques com armas. A cada 14 de poder de ataque, adiciona 1 de dano por segundo.",
         "spellPower": "Aumenta o dano das suas magias e a força das suas curas. Cada ponto de Intelecto concede um pouco de Poder Mágico, além do que vem de equipamentos ou benefícios.",
-        "healPower": "Increases the healing of your heals and heal-over-time effects, and the size of your absorb shields. It is your Spell Power plus the Healing Power from your gear and set bonuses, which adds to healing but never to damage.",
+        "healPower": "Aumenta a cura das suas curas e efeitos de cura ao longo do tempo, além do tamanho dos seus escudos de absorção. É o seu poder de feitiço somado ao poder de cura do seu equipamento e bônus de conjunto, que soma à cura mas nunca ao dano.",
         "dps": "Seu dano por segundo estimado com armas, combinando o dano e a velocidade da sua arma com seu poder de ataque.",
         "critChance": "Sua chance de um ataque atingir criticamente, causando dano dobrado.",
-        "spellCrit": "Your chance for a spell or heal to strike critically, dealing 150% damage or healing. Spells and heals roll this instead of Crit Chance: Intellect raises only this chance, while crit rating, talents, and set bonuses raise both.",
+        "spellCrit": "Sua chance de um feitiço ou cura acertar criticamente, causando 150% de dano ou cura. Feitiços e curas usam essa chance em vez da Chance de Crítico: o Intelecto só aumenta essa chance, enquanto índice de crítico, talentos e bônus de conjunto aumentam ambas.",
         "dodge": "Sua chance de esquivar completamente de um ataque corpo a corpo recebido, sem sofrer dano.",
         "critRating": "Índice de crítico dos seus equipamentos e benefícios de conjunto, elevando sua chance de acerto crítico. Cerca de 10 de índice concede 1% de crítico.",
         "hasteRating": "Índice de aceleração dos seus equipamentos e benefícios de conjunto, acelerando seus ataques e conjurações. Cerca de 10 de índice concede 1% de aceleração.",
         "parry": "Sua chance de aparar completamente um ataque corpo a corpo frontal, sem sofrer dano. Um golpe pelas costas não pode ser aparado.",
         "hitRating": "Classificação de acerto proveniente de seu equipamento e bônus de conjuntos, reduzindo a frequência com que seus ataques erram e suas magias são resistidas, especialmente contra inimigos de nível superior. Cerca de 10 pontos de classificação concedem 1% de acerto.",
         "warfare": "Aumenta o dano causado aos jogadores em {increase}% e reduz o dano recebido dos jogadores em {reduction}%.",
-        "warfareWithHealth": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts."
+        "warfareWithHealth": "Aumenta o dano causado a jogadores em {increase}% e reduz o dano recebido de jogadores em {reduction}%. Também aumenta sua vida máxima em {health}% em qualquer lugar, exceto masmorras, raides, incursões e fendas."
       },
       "effects": {
         "attackPower": "+{value} de Poder de ataque",
@@ -3058,44 +3058,44 @@ export const pt_BR: EnTranslations = {
       "hot": "faz florescer {name}, uma cura contínua restaurando {total} ao longo de {duration} s"
     },
     "trinkets": {
-      "equipLine": "Equip: {effect}",
+      "equipLine": "Equipar: {effect}",
       "scaled": "{base} (+{bonus})",
-      "useLine": "Use: {effect} ({cooldown} cooldown)",
+      "useLine": "Usar: {effect} (recarga de {cooldown})",
       "cooldownMinutes": "{minutes} min",
-      "cooldownSeconds": "{seconds} sec",
+      "cooldownSeconds": "{seconds} s",
       "gambleResult": "{item}: {fortune}!",
-      "snakeEyes": "Snake Eyes",
-      "equippedLine": "Equipped",
-      "equipLockout": "Equipping it starts a {seconds} sec cooldown on its use, or the cooldown left on the trinket it replaces if that is longer.",
+      "snakeEyes": "Olhos de Cobra",
+      "equippedLine": "Equipado",
+      "equipLockout": "Equipá-lo inicia uma recarga de uso de {seconds} s, ou a recarga restante do berloque que ele substitui, se esta for maior.",
       "equip": {
-        "lastStand": "Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage ({absorbPct}% of your maximum health) for {duration} sec. Can occur once every {icd} sec.",
-        "hourglass": "Overhealing from your direct heals is stored in the hourglass, up to {cap} ({capPct}% of your maximum health). Stored healing fades {fade} sec after it last grew.",
-        "twinStrike": "Your auto-attack hits have a {chance}% chance to make an extra main-hand melee swing. Can occur once every {icd} sec.",
-        "tally": "Your auto-attack critical hits and your killing blows each add a tally mark, up to {max}. Marks last {duration} sec, refreshed whenever you gain one.",
-        "storm": "Each spell you cast adds a charge, up to {max}. Charges last {duration} sec, refreshed whenever you gain one.",
-        "heat": "Your melee and ranged weapon hits each add a heat stack, up to {max}. Heat lasts {duration} sec, refreshed whenever you gain a stack.",
-        "ignite": "Your melee and ranged weapon critical hits set the target alight, dealing {tick} Fire damage every {every} sec for {duration} sec. A new critical hit refreshes it. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.",
-        "guardHeat": "Each attack you parry, dodge or block adds a heat stack, up to {max}. Heat lasts {duration} sec, refreshed whenever you gain a stack."
+        "lastStand": "Sofrer dano estando abaixo de {threshold}% de vida concede um escudo que absorve {absorb} de dano ({absorbPct}% da sua vida máxima) por {duration} s. Pode ocorrer uma vez a cada {icd} s.",
+        "hourglass": "A cura excedente das suas curas diretas é armazenada na ampulheta, até {cap} ({capPct}% da sua vida máxima). A cura armazenada se dissipa {fade} s depois da última vez que aumentou.",
+        "twinStrike": "Seus acertos de ataque automático têm {chance}% de chance de causar um golpe extra de mão principal. Pode ocorrer uma vez a cada {icd} s.",
+        "tally": "Seus acertos críticos de ataque automático e seus golpes fatais adicionam uma marca de contagem cada, até {max}. As marcas duram {duration} s, renovadas sempre que você ganha uma.",
+        "storm": "Cada feitiço que você conjura adiciona uma carga, até {max}. As cargas duram {duration} s, renovadas sempre que você ganha uma.",
+        "heat": "Seus acertos de arma corpo a corpo e à distância adicionam uma carga de calor cada, até {max}. O calor dura {duration} s, renovado sempre que você ganha uma carga.",
+        "ignite": "Seus acertos críticos de arma corpo a corpo e à distância incendeiam o alvo, causando {tick} de dano de Fogo a cada {every} s durante {duration} s. Um novo acerto crítico o renova. O dano aumenta com o poder de ataque ou o poder de ataque à distância, o que for maior.",
+        "guardHeat": "Cada ataque que você apara, esquiva ou bloqueia adiciona uma carga de calor, até {max}. O calor dura {duration} s, renovado sempre que você ganha uma carga."
       },
       "use": {
-        "retaliate": "For {duration} sec, an enemy that hits you directly takes Physical damage equal to {pct}% of the health that hit took from you. Periodic damage does not trigger it.",
-        "anchor": "For {duration} sec, take {reduction}% less damage but move at {speed}% speed. Removes stuns, roots, slows, fears, polymorphs, silences, blinds, hexes, disarms and incapacitating effects on you, and you ignore new ones and knockbacks while it lasts.",
-        "hourglass": "Turn all stored healing into a shield on the party member within {range} yd with the lowest health percentage, you included. The shield lasts {duration} sec. Requires stored healing.",
-        "wellspring": "Heal you and party members within {radius} yd for {tick} every {every} sec for {duration} sec. Healing increases with Healing Power.",
-        "bleedEdge": "For {duration} sec, your auto-attack hits apply Talon Wound, which deals {tick} Physical damage per stack every {every} sec for {bleedDuration} sec and stacks up to {stacks} times. Damage increases with Attack Power.",
-        "tallyStrike": "Spend all tally marks to strike your target within {range} yd for {perMark} Physical damage per mark ({max} at {maxMarks} marks). Damage increases with Attack Power. Requires a tally mark.",
-        "stormjar": "Release all charges as a bolt at your target within {range} yd that jumps to up to {extra} more enemies within {jumpRange} yd. Each enemy takes {perCharge} Nature damage per charge ({max} at {maxCharges} charges). Damage increases with Spell Power. Requires a charge.",
-        "echo": "For {duration} sec, your next {casts} direct heals or direct non-Physical damage hits repeat for {pct}% of their amount.",
-        "gamble": "Roll one of four fortunes for {duration} sec: {keenEdge} (deal {keenPct}% more damage), {luckyStreak} (heal {heal} over the duration), {gildedGuard} (a shield that absorbs {absorb} damage), or {snakeEyes} (no effect, but this cooldown is halved).",
-        "blink": "Step {yards} yd forward, then take {reduction}% less damage for {guard} sec.",
-        "sprint": "Increase your movement speed by {speed}% for {duration} sec. Does not stack with other speed increases.",
-        "defiance": "Remove all stuns, roots, slows, fears, polymorphs, silences, blinds, hexes, disarms and incapacitating effects on you. Usable while stunned.",
-        "brand": "Brand an enemy player within {range} yd, reducing the healing they receive by {cut}% for {duration} sec.",
-        "temper": "Spend all heat stacks to temper your weapon for {duration} sec. Your melee and ranged weapon hits deal {damage} extra Fire damage, increased by {perHeat}% for each heat stack spent (up to {maxBonus}% at {maxHeat} stacks). Each killing blow adds {killExtend} sec, up to {maxDuration} sec in total. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.",
-        "kindlingOrb": "Summon an ember orb beside you for {duration} sec. Each spell you cast at an enemy makes it fire a bolt at that enemy for {damage} Fire damage. Damage increases with Spell Power.",
-        "pierce": "For {duration} sec, your auto-attacks, shots and physical abilities (not bleeds) also strike the enemy nearest your target within {reach} yd for {share}% of the damage dealt.",
-        "lantern": "Set a lantern at your feet for {duration} sec. A direct heal from anyone on you or a party member within {radius} yd of it also heals the most wounded other party member in its light for {share}% of the heal.",
-        "heartNova": "Spend all heat stacks on a fire nova that deals {perHeat} Fire damage per stack ({max} at {maxHeat} stacks) to each enemy within {radius} yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack."
+        "retaliate": "Por {duration} s, um inimigo que acerta você diretamente sofre dano Físico igual a {pct}% da vida que esse acerto tirou de você. Dano periódico não ativa esse efeito.",
+        "anchor": "Por {duration} s, sofra {reduction}% menos dano, mas se mova a {speed}% da velocidade. Remove atordoamentos, enraizamentos, lentificações, medos, metamorfoses, silenciamentos, cegamentos, maldições, desarmes e efeitos de incapacitação em você, e você ignora novos desses efeitos e recuos enquanto durar.",
+        "hourglass": "Transforma toda a cura armazenada em um escudo no membro do grupo com a menor porcentagem de vida num raio de {range} jardas, você incluído. O escudo dura {duration} s. Requer cura armazenada.",
+        "wellspring": "Cura você e membros do grupo num raio de {radius} jardas em {tick} a cada {every} s durante {duration} s. A cura aumenta com o poder de cura.",
+        "bleedEdge": "Por {duration} s, seus acertos de ataque automático aplicam Ferida de Garra, que causa {tick} de dano Físico por carga a cada {every} s durante {bleedDuration} s e acumula até {stacks} vezes. O dano aumenta com o poder de ataque.",
+        "tallyStrike": "Gaste todas as marcas de contagem para golpear seu alvo num raio de {range} jardas causando {perMark} de dano Físico por marca ({max} em {maxMarks} marcas). O dano aumenta com o poder de ataque. Requer uma marca de contagem.",
+        "stormjar": "Libera todas as cargas como um raio no seu alvo num raio de {range} jardas que salta para até {extra} inimigos adicionais num raio de {jumpRange} jardas. Cada inimigo sofre {perCharge} de dano de Natureza por carga ({max} em {maxCharges} cargas). O dano aumenta com o poder de feitiço. Requer uma carga.",
+        "echo": "Por {duration} s, suas próximas {casts} curas diretas ou acertos diretos de dano não Físico se repetem por {pct}% do valor original.",
+        "gamble": "Sorteie uma de quatro sortes por {duration} s: {keenEdge} (causa {keenPct}% mais dano), {luckyStreak} (cura {heal} ao longo da duração), {gildedGuard} (um escudo que absorve {absorb} de dano), ou {snakeEyes} (nenhum efeito, mas esta recarga é reduzida à metade).",
+        "blink": "Avance {yards} jardas para frente, então sofra {reduction}% menos dano por {guard} s.",
+        "sprint": "Aumenta sua velocidade de movimento em {speed}% por {duration} s. Não se acumula com outros aumentos de velocidade.",
+        "defiance": "Remove todos os atordoamentos, enraizamentos, lentificações, medos, metamorfoses, silenciamentos, cegamentos, maldições, desarmes e efeitos de incapacitação em você. Pode ser usado enquanto atordoado.",
+        "brand": "Marque um jogador inimigo num raio de {range} jardas, reduzindo a cura que ele recebe em {cut}% por {duration} s.",
+        "temper": "Gaste todas as cargas de calor para temperar sua arma por {duration} s. Seus acertos de arma corpo a corpo e à distância causam {damage} de dano de Fogo extra, aumentado em {perHeat}% para cada carga de calor gasta (até {maxBonus}% em {maxHeat} cargas). Cada golpe fatal adiciona {killExtend} s, até um total de {maxDuration} s. O dano aumenta com o poder de ataque ou o poder de ataque à distância, o que for maior.",
+        "kindlingOrb": "Invoca um orbe de brasas ao seu lado por {duration} s. Cada feitiço que você conjura contra um inimigo faz o orbe disparar um raio contra esse inimigo causando {damage} de dano de Fogo. O dano aumenta com o poder de feitiço.",
+        "pierce": "Por {duration} s, seus ataques automáticos, tiros e habilidades físicas (exceto sangramentos) também atingem o inimigo mais próximo do seu alvo num raio de {reach} jardas por {share}% do dano causado.",
+        "lantern": "Coloca uma lanterna aos seus pés por {duration} s. Uma cura direta de qualquer pessoa em você ou em um membro do grupo num raio de {radius} jardas dela também cura o outro membro do grupo mais ferido dentro de sua luz em {share}% do valor curado.",
+        "heartNova": "Gaste todas as cargas de calor numa nova de fogo que causa {perHeat} de dano de Fogo por carga ({max} em {maxHeat} cargas) a cada inimigo num raio de {radius} jardas e provoca toda criatura atingida. O dano aumenta com o poder de ataque. Requer uma carga de calor."
       }
     },
     "questShare": {
@@ -3267,16 +3267,16 @@ export const pt_BR: EnTranslations = {
       "failed": "Não foi possível enviar o relatório de erro. Tente novamente."
     },
     "hostDiag": {
-      "title": "System Report",
-      "intro": "Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.",
-      "create": "Generate system report",
-      "running": "Collecting system details...",
-      "saved": "Report saved as {fileName}.",
-      "savedNoName": "Report saved.",
-      "failed": "The report could not be created. Please try again."
+      "title": "Relatório do Sistema",
+      "intro": "Reúne detalhes sobre este computador, incluindo os programas que mais usam processador e memória, em um arquivo que ajuda a diagnosticar problemas de desempenho. Nada é enviado: o arquivo permanece no seu computador.",
+      "create": "Gerar relatório do sistema",
+      "running": "Coletando detalhes do sistema...",
+      "saved": "Relatório salvo como {fileName}.",
+      "savedNoName": "Relatório salvo.",
+      "failed": "Não foi possível criar o relatório. Tente novamente."
     },
     "paperdoll": {
-      "trinketSlot": "Trinket",
+      "trinketSlot": "Berloque",
       "unequipAria": "Desequipar {item}",
       "unequipHint": "Clique em ×, clique direito ou arraste para as bolsas para desequipar",
       "hideHelmAria": "Ocultar elmo",
@@ -3448,8 +3448,8 @@ export const pt_BR: EnTranslations = {
       "hint": "Pontos de foco adicionam um bônus sobre o rendimento base de cada componente. Componentes sem foco permanecem no valor base.",
       "tierHint": "Cada {points} pontos em um componente elevam seu nível de coleta um passo, até {steps} passos; menos de {points} pontos ainda aumentam o rendimento.",
       "townOnlyHint": "O foco só pode ser alterado enquanto você estiver na cidade.",
-      "preferenceHint": "Focus raises the grade and amount of what you harvest. To harvest only one material, set a Harvest Preference from your Field Kit or the Professions window.",
-      "pendingLine": "Saved. Your re-spec to this allocation completes in {time}.",
+      "preferenceHint": "O Foco aumenta o grau e a quantidade do que você coleta. Para coletar apenas um material, defina uma Preferência de Coleta pelo seu Kit de Campo ou pela janela de Profissões.",
+      "pendingLine": "Salvo. Sua redistribuição de Foco para esta configuração é concluída em {time}.",
       "budgetLabel": "Pontos restantes: {remaining} / {budget}",
       "saveButton": "Salvar Foco",
       "notInTownHint": "Você precisa estar na cidade para definir seu foco.",
@@ -3859,8 +3859,8 @@ export const pt_BR: EnTranslations = {
         "kingsWrathSummary": "Nythraxis causa {bonusNormal} a mais de dano no normal ou {bonusHeroic} no heroico pelo resto da luta. Erupção sepulcral ocorre a cada {eruptionEveryNormal} s ({eruptionEveryHeroic} no heroico).",
         "kingsWrathResponse": "Use recargas defensivas restantes para dano inevitável. Mantenha todas as mecânicas anteriores limpas enquanto a raide termina a luta.",
         "boneStormName": "Tempestade óssea",
-        "boneStormSummary": "Começando {first} s depois da Ira do rei e a cada {everyNormal} s depois, Nythraxis inicia Tempestade óssea por {duration} s. Ele ignora ameaça, move-se a {speed} vezes a velocidade normal e faz {charges} avanços de {chargeSeconds} s cada. Seu redemoinho causa {whirlNormal} da vida máxima por segundo em até {radius} yd. Cada avanço termina em um Impacto ósseo no mesmo raio, causando {slamNormal} da vida máxima. Quebra-túmulos rearma {rearm} s após ela terminar.",
-        "boneStormHeroicSummary": "Começando {first} s depois da Ira do rei e a cada {everyHeroic} s depois, Nythraxis inicia Tempestade óssea por {duration} s. Ele ignora ameaça, move-se a {speed} vezes a velocidade normal e faz {charges} avanços de {chargeSeconds} s cada. Seu redemoinho causa {whirlHeroic} da vida máxima por segundo em até {radius} yd. Cada avanço termina em um Impacto ósseo no mesmo raio, causando {slamHeroic} da vida máxima. Quebra-túmulos rearma {rearm} s após ela terminar.",
+        "boneStormSummary": "Começando {first} s depois da Ira do rei e a cada {everyNormal} s depois, Nythraxis inicia Tempestade óssea por {duration} s. Ele ignora ameaça, move-se a {speed} vezes a velocidade normal e faz {charges} avanços de {chargeSeconds} s cada. Seu redemoinho causa {whirlNormal} da vida máxima por segundo em até {radius} yd. Cada avanço termina em um Impacto ósseo no mesmo raio, causando {slamNormal} da vida máxima. Qualquer marca ativa de Rasgo de alma é liberada sem resolução no instante em que a tempestade começa, e uma tempestade nunca começa logo após uma detonação de Rasgo de alma. Quebra-túmulos rearma {rearm} s após ela terminar.",
+        "boneStormHeroicSummary": "Começando {first} s depois da Ira do rei e a cada {everyHeroic} s depois, Nythraxis inicia Tempestade óssea por {duration} s. Ele ignora ameaça, move-se a {speed} vezes a velocidade normal e faz {charges} avanços de {chargeSeconds} s cada. Seu redemoinho causa {whirlHeroic} da vida máxima por segundo em até {radius} yd. Cada avanço termina em um Impacto ósseo no mesmo raio, causando {slamHeroic} da vida máxima. Qualquer marca ativa de Rasgo de alma é liberada sem resolução no instante em que a tempestade começa, e uma tempestade nunca começa logo após uma detonação de Rasgo de alma. Quebra-túmulos rearma {rearm} s após ela terminar.",
         "boneStormResponse": "Espalhem-se e continuem correndo de Nythraxis. O raider marcado pelo avanço foge enquanto todos os outros deixam espaço ao redor da trajetória; depois os tanks pegam o chefe quando a tempestade termina.",
         "crownEnduresName": "A Coroa perdura",
         "crownEnduresSummary": "Aos {enrageNormal} s do pull (o relógio pausa enquanto Irmão Aldric entra aos 70%), A Coroa perdura dispara como um enraivecimento rígido. Nythraxis ganha {damage} a mais de dano e ataques {haste} mais rápidos, depois mais {rampStep} de dano a cada {rampEveryNormal} s. Não há barra de temporizador. Os avisos vêm como gritos quando restam {warn60}, {warn30} e {warn10} s.",
@@ -3918,7 +3918,7 @@ export const pt_BR: EnTranslations = {
       "forbiddenReflectionLock": "Reflexo Proibido ainda não pode ser preparado novamente",
       "internalCooldown": "Este efeito não pode ser acionado novamente até o temporizador expirar",
       "carriedFlag": "Você está carregando a bandeira inimiga. Cancele este benefício para soltá-la.",
-      "carryingFreight": "You are carrying freight. Movement speed is reduced by {pct}%.",
+      "carryingFreight": "Você está carregando carga. Sua velocidade de movimento é reduzida em {pct}%.",
       "battleStance": "Postura de Batalha: 10% mais geração de raiva",
       "berserkerStance": "Postura de Berserker: críticos 3% mais frequentes e 3% mais fortes",
       "crit": "Aumenta a chance de acerto crítico em {pct}%",
@@ -3947,8 +3947,8 @@ export const pt_BR: EnTranslations = {
       "iceFloesCasts": "Seus próximos {n} feitiços com tempo de lançamento podem ser lançados em movimento",
       "freeCast": "Seu próximo lançamento não tem custo",
       "instantCast": "Seu próximo feitiço com tempo de lançamento é instantâneo",
-      "benisonPrayers": "Your next Choirmend heals for {pct}% more and consumes all stacks.",
-      "benisonWhisper": "Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.",
+      "benisonPrayers": "Sua próxima Cura do Coro cura {pct}% mais e consome todas as cargas.",
+      "benisonWhisper": "Sua próxima Prece Sussurrada é instantânea e cura {pct}% mais. Use-a antes que esse efeito expire.",
       "cheapCast": "Seu próximo feitiço custa {pct}% menos",
       "radiantResonance": "Sua próxima Luz Restauradora é instantânea, ou seu próximo Abraço da Alvorada custa {pct}% menos mana e é conjurado em {castTime} s",
       "solarReprisal": "Seu próximo Disco Solar não custa mana, ignora a recarga e causa {pct}% mais dano; o Martelo da Graça ignora a recarga e cura você em 100% do dano causado; ou a Luz Restauradora é instantânea",
@@ -3969,38 +3969,38 @@ export const pt_BR: EnTranslations = {
       "nextAttackCrit": "Seu próximo ataque é garantidamente um acerto crítico",
       "healEcho": "Cair abaixo de {threshold}% de vida restaura {value} de vida",
       "trinket": {
-        "lastStandCooldown": "Bastion Sigil's Last Bastion shield was used. Falling below {threshold}% health cannot raise it again until this expires.",
-        "lastBastion": "Absorbs {value} damage. Bastion Sigil raised it when you took damage below {threshold}% health.",
-        "retaliate": "Enemies that hit you directly take Physical damage equal to {pct}% of the health that hit took from you. Periodic damage does not trigger it.",
-        "moored": "You take {reduction}% less damage but move at {speed}% speed. You ignore stuns, roots, slows, fears, polymorphs, silences, blinds, hexes, disarms, incapacitating effects and knockbacks.",
-        "hourglassStored": "Holds {stored} healing stored from your overhealing. Use Mender's Hourglass to turn it into a shield on the party member within {range} yd with the lowest health percentage, you included.",
-        "hourglassShield": "Absorbs {value} damage. Made from the healing a Mender's Hourglass stored.",
-        "wellspring": "Restores {tick} health every {every} sec.",
-        "twinStrikeCooldown": "Paired Talons just made an extra swing. It cannot make another until this expires.",
-        "bleedEdge": "Your auto-attack hits apply Talon Wound: {tick} Physical damage per stack every {every} sec for {duration} sec, stacking up to {max} times.",
-        "bleedEdgeOther": "Auto-attack hits apply Talon Wound, a Physical bleed that stacks up to {max} times. Damage increases with Attack Power.",
-        "talonWound": "Deals {damage} Physical damage every {every} sec ({stacks}/{max} stacks). Each new stack adds damage and refreshes the duration.",
-        "tally": "Tally marks: {stacks}/{max}. Use Hunter's Tally to spend them all on a strike at your target for {damage} Physical damage ({perMark} per mark).",
-        "tallyOther": "Tally marks: {stacks}/{max}. Hunter's Tally spends them all on a Physical strike that deals more damage for each mark.",
-        "storm": "Charges: {stacks}/{max}. Use Stormjar to release them as a bolt that hits your target and up to {extra} more enemies within {jumpRange} yd of each other for {damage} Nature damage each ({perCharge} per charge).",
-        "stormOther": "Charges: {stacks}/{max}. Stormjar releases them as a Nature bolt that hits the target and up to {extra} more enemies, dealing more damage for each charge.",
-        "echo": "Your next {casts} direct heals or direct non-Physical damage hits repeat for {pct}% of their amount.",
-        "keenEdge": "Gambler's Die fortune: you deal {pct}% more damage.",
-        "luckyStreak": "Gambler's Die fortune: restores {tick} health every {every} sec.",
-        "gildedGuard": "Gambler's Die fortune: absorbs {value} damage.",
-        "riftGuard": "You take {pct}% less damage.",
-        "sprint": "Movement speed increased by {pct}%. Does not stack with other speed increases.",
-        "brand": "Healing received is reduced by {pct}%.",
-        "forgeHeat": "Heat: {stacks}/{max}. Using Forgefather's Temper spends it all, and its weapon fire deals {pct}% more damage.",
-        "tempered": "Your melee and ranged weapon hits deal {damage} extra Fire damage ({pct}% more from the heat spent). Each killing blow adds {killExtend} sec, up to {maxDuration} sec in total.",
-        "temperedOther": "Melee and ranged weapon hits deal extra Fire damage, {pct}% more from the heat spent. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.",
-        "kindlingOrb": "Each spell you cast at an enemy makes the orb fire a bolt at that enemy for {damage} Fire damage. It holds its fire at a polymorphed, incapacitated or blinded enemy.",
-        "kindlingOrbOther": "Each spell cast at an enemy makes the orb fire a bolt of Fire damage at that enemy. Damage increases with Spell Power.",
-        "moltenIgnite": "Deals {damage} Fire damage every {every} sec. Another weapon critical hit refreshes it.",
-        "pierce": "Your auto-attacks, shots and physical abilities (not bleeds) also strike the enemy nearest your target within {reach} yd for {pct}% of the damage dealt.",
-        "lantern": "A direct heal from anyone on you or a party member within {radius} yd of the lantern also heals the most wounded other party member in its light for {pct}% of the heal.",
-        "crucibleHeat": "Heat: {stacks}/{max}. Use Heart of the Crucible to spend it all on a fire nova that deals {damage} Fire damage to each enemy within {radius} yd and taunts every creature it hits.",
-        "crucibleHeatOther": "Heat: {stacks}/{max}. Heart of the Crucible spends it all on a fire nova within {radius} yd that deals more Fire damage for each stack and taunts every creature it hits."
+        "lastStandCooldown": "O escudo Último Bastião do Sigilo do Bastião foi usado. Cair abaixo de {threshold}% de vida não pode erguê-lo novamente até que isso expire.",
+        "lastBastion": "Absorve {value} de dano. O Sigilo do Bastião o ergueu quando você sofreu dano abaixo de {threshold}% de vida.",
+        "retaliate": "Inimigos que acertam você diretamente sofrem dano Físico igual a {pct}% da vida que esse acerto tirou de você. Dano periódico não ativa esse efeito.",
+        "moored": "Você sofre {reduction}% menos dano, mas se move a {speed}% da velocidade. Você ignora atordoamentos, enraizamentos, lentificações, medos, metamorfoses, silenciamentos, cegamentos, maldições, desarmes, efeitos de incapacitação e recuos.",
+        "hourglassStored": "Guarda {stored} de cura armazenada da sua cura excedente. Use a Ampulheta do Curador para transformá-la em um escudo no membro do grupo com a menor porcentagem de vida num raio de {range} jardas, você incluído.",
+        "hourglassShield": "Absorve {value} de dano. Feito a partir da cura armazenada por uma Ampulheta do Curador.",
+        "wellspring": "Restaura {tick} de vida a cada {every} s.",
+        "twinStrikeCooldown": "Garras Pareadas: um golpe extra acabou de ser desferido. Não pode ocorrer outro até que isso expire.",
+        "bleedEdge": "Seus acertos de ataque automático aplicam Ferida de Garra: {tick} de dano Físico por carga a cada {every} s durante {duration} s, acumulando até {max} vezes.",
+        "bleedEdgeOther": "Acertos de ataque automático aplicam Ferida de Garra, um sangramento Físico que acumula até {max} vezes. O dano aumenta com o poder de ataque.",
+        "talonWound": "Causa {damage} de dano Físico a cada {every} s ({stacks}/{max} cargas). Cada nova carga aumenta o dano e renova a duração.",
+        "tally": "Marcas de contagem: {stacks}/{max}. Use a Marca do Caçador para gastar todas num golpe no seu alvo causando {damage} de dano Físico ({perMark} por marca).",
+        "tallyOther": "Marcas de contagem: {stacks}/{max}. A Marca do Caçador as gasta todas num golpe Físico que causa mais dano por marca.",
+        "storm": "Cargas: {stacks}/{max}. Use a Jarra da Tempestade para liberá-las como um raio que atinge seu alvo e até {extra} inimigos adicionais num raio de {jumpRange} jardas entre si, causando {damage} de dano de Natureza a cada um ({perCharge} por carga).",
+        "stormOther": "Cargas: {stacks}/{max}. A Jarra da Tempestade as libera como um raio de Natureza que atinge o alvo e até {extra} inimigos adicionais, causando mais dano por carga.",
+        "echo": "Suas próximas {casts} curas diretas ou acertos diretos de dano não Físico se repetem por {pct}% do valor original.",
+        "keenEdge": "Sorte do Dado do Apostador: você causa {pct}% mais dano.",
+        "luckyStreak": "Sorte do Dado do Apostador: restaura {tick} de vida a cada {every} s.",
+        "gildedGuard": "Sorte do Dado do Apostador: absorve {value} de dano.",
+        "riftGuard": "Você sofre {pct}% menos dano.",
+        "sprint": "Velocidade de movimento aumentada em {pct}%. Não se acumula com outros aumentos de velocidade.",
+        "brand": "A cura recebida é reduzida em {pct}%.",
+        "forgeHeat": "Calor: {stacks}/{max}. Usar a Têmpera do Pai da Forja gasta tudo, e seu fogo de arma causa {pct}% mais dano.",
+        "tempered": "Seus acertos de arma corpo a corpo e à distância causam {damage} de dano de Fogo extra ({pct}% mais pelo calor gasto). Cada golpe fatal adiciona {killExtend} s, até um total de {maxDuration} s.",
+        "temperedOther": "Acertos de arma corpo a corpo e à distância causam dano de Fogo extra, {pct}% mais pelo calor gasto. O dano aumenta com o poder de ataque ou o poder de ataque à distância, o que for maior.",
+        "kindlingOrb": "Cada feitiço que você conjura contra um inimigo faz o orbe disparar um raio contra esse inimigo causando {damage} de dano de Fogo. Ele contém seu fogo contra um inimigo metamorfoseado, incapacitado ou cegado.",
+        "kindlingOrbOther": "Cada feitiço conjurado contra um inimigo faz o orbe disparar um raio de dano de Fogo contra esse inimigo. O dano aumenta com o poder de feitiço.",
+        "moltenIgnite": "Causa {damage} de dano de Fogo a cada {every} s. Outro acerto crítico de arma o renova.",
+        "pierce": "Seus ataques automáticos, tiros e habilidades físicas (exceto sangramentos) também atingem o inimigo mais próximo do seu alvo num raio de {reach} jardas por {pct}% do dano causado.",
+        "lantern": "Uma cura direta de qualquer pessoa em você ou em um membro do grupo num raio de {radius} jardas da lanterna também cura o outro membro do grupo mais ferido dentro de sua luz em {pct}% do valor curado.",
+        "crucibleHeat": "Calor: {stacks}/{max}. Use o Coração do Crisol para gastar tudo numa nova de fogo que causa {damage} de dano de Fogo a cada inimigo num raio de {radius} jardas e provoca toda criatura atingida.",
+        "crucibleHeatOther": "Calor: {stacks}/{max}. O Coração do Crisol gasta tudo numa nova de fogo num raio de {radius} jardas que causa mais dano de Fogo por carga e provoca toda criatura atingida."
       },
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
@@ -4133,7 +4133,7 @@ export const pt_BR: EnTranslations = {
       "resetErrInvalid": "Este link de redefinição é inválido ou expirou. Solicite um novo."
     },
     "loot": {
-      "rollWon": "Congratulations! You won {item} with a roll of {roll}",
+      "rollWon": "Parabéns! Você ganhou {item} com uma rolagem de {roll}",
       "chestTitle": "Baú",
       "takeLootButton": "Pegar Saque",
       "takeLootTooltip": "Pega as moedas e os itens largados. Não usa a coleta.",
@@ -4150,7 +4150,7 @@ export const pt_BR: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
-      "pvpTag": "PvP",
+      "pvpTag": "JcJ",
       "cheaterTag": "< Trapaceiro >",
       "pledgeTag": "Promessa a {guild}",
       "npcRoleTag": "<{role}>",
@@ -4233,8 +4233,8 @@ export const pt_BR: EnTranslations = {
       "label": "Redefinir Posições dos Quadros"
     },
     "interfaceUnlock": {
-      "combineTrackers": "Combine Tracker Frames",
-      "combineAuras": "Combine Aura Frames",
+      "combineTrackers": "Combinar Quadros de Rastreador",
+      "combineAuras": "Combinar Quadros de Aura",
       "label": "Editar Quadros",
       "unlock": "Desbloquear interface",
       "lock": "Bloquear interface",
@@ -4245,8 +4245,8 @@ export const pt_BR: EnTranslations = {
       "lockFrame": "Bloquear este quadro",
       "resizeFrame": "Redimensionar este quadro",
       "frameNames": {
-        "trackerGroup": "Trackers",
-        "auraGroup": "Aura trackers",
+        "trackerGroup": "Rastreadores",
+        "auraGroup": "Rastreadores de aura",
         "actionBar1": "Barra de Ação",
         "actionBar2": "Barra de Ação 2",
         "actionBar3": "Barra de Ação 3",
@@ -4379,13 +4379,13 @@ export const pt_BR: EnTranslations = {
       }
     },
     "lootQuality": {
-      "ordinary": "Ordinary",
+      "ordinary": "Comum",
       "superior": "Superior",
-      "exceptional": "Exceptional",
-      "magnificent": "Magnificent",
-      "transcendent": "Transcendent",
+      "exceptional": "Excepcional",
+      "magnificent": "Magnífico",
+      "transcendent": "Transcendente",
       "itemName": "{item}, {quality}",
-      "tooltip": "{quality}: +{levels} item levels. Retained through upgrades."
+      "tooltip": "{quality}: +{levels} níveis de item. Mantido durante melhorias."
     },
     "itemTooltip": {
       "requiresLevel": "Requer Nível {level}",
@@ -4823,8 +4823,8 @@ export const pt_BR: EnTranslations = {
       "vaultTab": "Depósito",
       "vaultCapacityNote": "Cada material comporta até {cap}.",
       "vaultEmpty": "Seu depósito está vazio. Clique em um material nas suas bolsas para depositá-lo.",
-      "vaultSearchAria": "Search vault materials by name",
-      "vaultSearchNoMatch": "No material in your vault matches your search.",
+      "vaultSearchAria": "Pesquisar materiais do cofre por nome",
+      "vaultSearchNoMatch": "Nenhum material do seu cofre corresponde à sua pesquisa.",
       "vaultRowAria": "{item}: {count} de {cap} armazenado",
       "vaultLockedIntro": "Desbloqueie o Depósito de Materiais para estocar materiais de criação ao lado do seu banco. Cada material ganha seu próprio espaço, até {cap} cada.",
       "vaultUnlockButton": "Desbloquear o Depósito de Materiais",
@@ -5293,17 +5293,17 @@ export const pt_BR: EnTranslations = {
       "enchant_chest_lucent_stamina": "Gravura de peito: Vigor Luminoso",
       "enchant_feet_lucent_agility": "Gravura de botas: Agilidade Luminosa",
       "enchant_lucent_infusion": "Infusão Luminosa",
-      "enchant_weapon_riftwalkers_grace": "Riftwalker's Grace",
-      "enchant_weapon_dawnfire_etching": "Weapon Etching: Dawnfire",
-      "enchant_weapon_dawns_benediction": "Weapon Etching: Dawn's Benediction",
-      "enchant_weapon_piston_drive": "Weapon Etching: Piston Drive"
+      "enchant_weapon_riftwalkers_grace": "Graça do Caminhante das Fendas",
+      "enchant_weapon_dawnfire_etching": "Gravura de arma: Fogo da Alvorada",
+      "enchant_weapon_dawns_benediction": "Gravura de arma: Bênção da Alvorada",
+      "enchant_weapon_piston_drive": "Gravura de arma: Impulso de Pistão"
     },
     "enchantDescription": {
       "enchant_weapon_lastflame_zeal": "Seus ataques corpo a corpo que acertarem podem conceder 50 de Força por 15 s e curar 200 de vida. Modificadores de cura se aplicam. Cada golpe tem 1% de chance por 0,6 s da velocidade-base da arma. Não há recarga interna. As duas mãos compartilham um único benefício; qualquer acionamento o renova e ele nunca acumula. Ataques à distância não acionam este efeito. Forma de Lobo usa sua velocidade-base de ataque de 1 s.",
-      "enchant_weapon_riftwalkers_grace": "Your landed melee attacks can grant 60 Agility and 2% faster melee attacks for 15 sec. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
-      "enchant_weapon_dawnfire_etching": "Permanently etches a weapon with 18 Spell Power. Spell Power also counts toward Healing Power. A flat bonus; it does not scale.",
-      "enchant_weapon_dawns_benediction": "Permanently etches a weapon with 34 Healing Power. Healing Power raises heals only, never spell damage. A flat bonus; it does not scale.",
-      "enchant_weapon_piston_drive": "Permanently etches a two-handed weapon with 12 Strength and 25 Critical Strike Rating. Cannot be applied to a one-handed weapon. A flat bonus; it does not scale."
+      "enchant_weapon_riftwalkers_grace": "Seus ataques corpo a corpo bem-sucedidos podem conceder 60 de Agilidade e 2% de velocidade de ataque corpo a corpo por 15 s. Cada acerto tem 1% de chance a cada 0.6 s da velocidade base da arma usada. Sem recarga interna. As duas mãos compartilham um único benefício; qualquer ativação o renova, e ele nunca se acumula. Ataques à distância não ativam este efeito. A Forma de Gato usa sua velocidade base de golpe de 1 s no lugar disso.",
+      "enchant_weapon_dawnfire_etching": "Grava permanentemente uma arma com 18 de poder de feitiço. O poder de feitiço também conta para o poder de cura. Um bônus fixo, que não escala.",
+      "enchant_weapon_dawns_benediction": "Grava permanentemente uma arma com 34 de poder de cura. O poder de cura aumenta apenas curas, nunca dano de feitiço. Um bônus fixo, que não escala.",
+      "enchant_weapon_piston_drive": "Grava permanentemente uma arma de duas mãos com 12 de Força e 25 de índice de crítico. Não pode ser aplicado a uma arma de uma mão. Um bônus fixo, que não escala."
     },
     "professions": {
       "title": "Profissões",
@@ -5495,7 +5495,7 @@ export const pt_BR: EnTranslations = {
         "dormantKnowledge": "O conhecimento de {craft} é retido, mas permanece inativo até que seu par ou passatempo esteja ativo."
       },
       "stationRequired": "Você deve estar no {station} para criar isso.",
-      "mobileStationTitle": "{name}'s {station}",
+      "mobileStationTitle": "{station} de {name}",
       "stationName": {
         "forge": "Forja",
         "kitchens": "Cozinhas",
@@ -6226,30 +6226,30 @@ export const pt_BR: EnTranslations = {
       "untrack": "Cancelar rastreamento",
       "track": "Acompanhar",
       "worldQuests": {
-        "heading": "World quests today",
+        "heading": "Missões mundiais de hoje",
         "count": "{done} / {total}",
-        "empty": "No world quests today",
-        "replacement": "Replacement",
+        "empty": "Nenhuma missão mundial hoje",
+        "replacement": "Substituição",
         "state": {
-          "active": "In progress",
-          "completed": "Done"
+          "active": "Em andamento",
+          "completed": "Concluída"
         },
-        "reroll": "Replace quest",
-        "rerollNote": "One replacement available today",
-        "rerollUsed": "Replacement used today",
+        "reroll": "Substituir missão",
+        "rerollNote": "Uma substituição disponível hoje",
+        "rerollUsed": "Substituição já usada hoje",
         "rerollReason": {
-          "noCycle": "No board today",
-          "usedToday": "Replacement used today",
-          "completed": "A completed quest cannot be replaced",
-          "inProgress": "A quest in progress cannot be replaced",
-          "notActive": "This quest is not on your board",
-          "noAlternative": "No other quest is available in that zone today",
-          "unknown": "This quest cannot be replaced today"
+          "noCycle": "Nenhum ciclo de missões hoje",
+          "usedToday": "Substituição já usada hoje",
+          "completed": "Uma missão concluída não pode ser substituída",
+          "inProgress": "Uma missão em andamento não pode ser substituída",
+          "notActive": "Esta missão não está na sua lista",
+          "noAlternative": "Nenhuma outra missão está disponível nessa zona hoje",
+          "unknown": "Esta missão não pode ser substituída hoje"
         },
-        "confirmTitle": "Replace this world quest?",
-        "confirmBody": "You can replace only one world quest a day, and it cannot be undone. {quest} will be swapped for another quest in its zone.",
-        "confirmOk": "Replace",
-        "confirmCancel": "Cancel"
+        "confirmTitle": "Substituir esta missão mundial?",
+        "confirmBody": "Você pode substituir apenas uma missão mundial por dia, e isso não pode ser desfeito. {quest} será trocada por outra missão da mesma zona.",
+        "confirmOk": "Substituir",
+        "confirmCancel": "Cancelar"
       },
       "legend": {
         "dungeon": "Masmorra",
@@ -6258,8 +6258,8 @@ export const pt_BR: EnTranslations = {
         "mail": "Correspondência",
         "passage": "Passagem"
       },
-      "collapseHint": "Collapse map sidebar",
-      "expandHint": "Expand map sidebar"
+      "collapseHint": "Recolher barra lateral do mapa",
+      "expandHint": "Expandir barra lateral do mapa"
     },
     "arenaGate": {
       "minLevelNote": "Requer nível {level}"
@@ -6495,8 +6495,8 @@ export const pt_BR: EnTranslations = {
       "listingStatusCancelled": "Cancelada",
       "listingStatusSuspended": "Suspensa",
       "listingStatusUnsold": "Não vendida",
-      "charselectWebLink": "Bid, buy, or sell on the $WOC Exchange website",
-      "charselectWebNote": "Enter the game with a character to bid, buy, or sell."
+      "charselectWebLink": "Dê lances, compre ou venda no site do $WOC Exchange",
+      "charselectWebNote": "Entre no jogo com um personagem para dar lances, comprar ou vender."
     },
     "lootExplorer": {
       "title": "Explorador de saques",
@@ -6536,59 +6536,59 @@ export const pt_BR: EnTranslations = {
       "resultCount": "Resultados {count}"
     },
     "weekly": {
-      "title": "Weekly Quests",
-      "close": "Close weekly quests",
-      "subtitle": "Pick one of the four charges. It",
-      "resetsIn": "resets in {time}.",
-      "anyDifficulty": "Any difficulty",
-      "choose": "Choose quest",
-      "inProgress": "In progress ({count}/{required})",
-      "completed": "Completed this week",
-      "lockedThisWeek": "Locked this week",
-      "footerPick": "You may hold one weekly charge at a time. Pick a card to read its terms.",
-      "footerHeld": "Your charge for the week is set. The other three unlock at the reset.",
-      "dialogHeading": "Weekly quest: {category}",
-      "objectives": "Quest objectives",
-      "rewards": "Rewards",
-      "alsoReceive": "You will also receive:",
+      "title": "Missões Semanais",
+      "close": "Fechar missões semanais",
+      "subtitle": "Escolha um dos quatro encargos. Ele",
+      "resetsIn": "é redefinido em {time}.",
+      "anyDifficulty": "Qualquer dificuldade",
+      "choose": "Escolher missão",
+      "inProgress": "Em andamento ({count}/{required})",
+      "completed": "Concluída esta semana",
+      "lockedThisWeek": "Bloqueada esta semana",
+      "footerPick": "Você pode manter um encargo semanal por vez. Escolha uma carta para ler seus termos.",
+      "footerHeld": "Seu encargo da semana está definido. Os outros três desbloqueiam na redefinição.",
+      "dialogHeading": "Missão semanal: {category}",
+      "objectives": "Objetivos da missão",
+      "rewards": "Recompensas",
+      "alsoReceive": "Você também receberá:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Opens into one Normal raid piece for your class (never a tier-set piece), plus {count} x {item}.",
-      "dialogNote": "Only one weekly charge can be active. It {reset}",
-      "accept": "Accept",
-      "decline": "Decline",
+      "cacheDesc": "Abre-se em uma peça de raide Normal para sua classe (nunca uma peça de conjunto), além de {count} x {item}.",
+      "dialogNote": "Apenas um encargo semanal pode estar ativo. Ele {reset}",
+      "accept": "Aceitar",
+      "decline": "Recusar",
       "kinds": {
         "dungeons": {
-          "category": "Dungeons",
-          "lore": "The depths of the realm never rest: the Derelict Mech stirs again and the Hollow Crypt wakes. Gather your allies and cleanse the dungeons of their corruption.",
-          "goal": "Complete {count} dungeons on any difficulty.",
-          "goalLabel": "Dungeons completed"
+          "category": "Masmorras",
+          "lore": "As profundezas do reino nunca descansam: o Mecanismo Abandonado se agita de novo e a Cripta Vazia desperta. Reúna seus aliados e purifique as masmorras de sua corrupção.",
+          "goal": "Complete {count} masmorras em qualquer dificuldade.",
+          "goalLabel": "Masmorras concluídas"
         },
         "raid": {
-          "category": "Raid",
-          "lore": "Ancient powers wake in the Crucible of the Last Flame and on the heights of Thornpeak. Face Ignivar or Nythraxis and bring down the enemy commander.",
-          "goal": "Take part in {count} raid on any difficulty.",
-          "goalLabel": "Raids completed"
+          "category": "Raide",
+          "lore": "Poderes antigos despertam no Crisol da Última Chama e nas alturas de Thornpeak. Enfrente Ignivar ou Nythraxis e derrube o comandante inimigo.",
+          "goal": "Participe de {count} raide em qualquer dificuldade.",
+          "goalLabel": "Raides concluídos"
         },
         "battlegrounds": {
-          "category": "Battlegrounds",
-          "lore": "War banners fly over Thornhollow Fields. Fight beside your faction, hold the flag and prove your worth in battle; every match counts, won or lost.",
-          "goal": "Complete {count} battlegrounds.",
-          "goalLabel": "Battlegrounds completed"
+          "category": "Campos de batalha",
+          "lore": "Estandartes de guerra tremulam sobre os Campos de Thornhollow. Lute ao lado da sua facção, segure a bandeira e prove seu valor na batalha; toda partida conta, vencida ou perdida.",
+          "goal": "Complete {count} campos de batalha.",
+          "goalLabel": "Campos de batalha concluídos"
         },
         "worldboss": {
-          "category": "World boss",
-          "lore": "Mighty foes roam the wild lands, each strong enough to defy whole armies. Join whoever is near and bring down one colossal aberration.",
-          "goal": "Defeat {count} world boss in the wild lands.",
-          "goalLabel": "World bosses defeated"
+          "category": "Chefe mundial",
+          "lore": "Inimigos poderosos vagam pelas terras selvagens, cada um forte o bastante para desafiar exércitos inteiros. Junte-se a quem estiver por perto e derrube uma aberração colossal.",
+          "goal": "Derrote {count} chefe mundial nas terras selvagens.",
+          "goalLabel": "Chefes mundiais derrotados"
         }
       },
-      "commendHeading": "Emissary's commendation",
-      "commendNote": "{amount} standing to one faction of your choice, once a week.",
-      "commendClaimed": "This week's commendation went to the {faction}.",
-      "commendRewardLine": "{amount} standing with a faction of your choice",
-      "chosen": "Weekly quest taken: {category}",
+      "commendHeading": "Recomendação do Emissário",
+      "commendNote": "{amount} de reputação com uma facção à sua escolha, uma vez por semana.",
+      "commendClaimed": "A recomendação desta semana foi para {faction}.",
+      "commendRewardLine": "{amount} de reputação com uma facção à sua escolha",
+      "chosen": "Missão semanal aceita: {category}",
       "progress": "{label}: {count}/{required}",
-      "done": "Weekly quest complete: {category}"
+      "done": "Missão semanal concluída: {category}"
     }
   },
   "gatherEvent": {
@@ -6699,7 +6699,7 @@ export const pt_BR: EnTranslations = {
       "unknown": "Nenhuma guilda com esse nome."
     },
     "world_quests": {
-      "unknown_board": "No scoreboard by that name."
+      "unknown_board": "Nenhum placar com esse nome."
     },
     "steam": {
       "disabled": "A vinculação com o Steam não está disponível no momento.",
@@ -6803,65 +6803,65 @@ export const pt_BR: EnTranslations = {
   "clues": {
     "items": {
       "clue_scroll": {
-        "desc": "A sealed riddle earned by finishing every zone slot of the day. Use it to begin a treasure hunt, and use it again on the hidden spot when the last clue says to dig."
+        "desc": "Uma charada lacrada, ganha ao completar todas as vagas de zona do dia. Use-a para começar uma caça ao tesouro, e use-a de novo no local escondido quando a última pista mandar cavar."
       },
       "treasure_casket": {
-        "desc": "A locked casket dug up at the end of a treasure hunt. Use it to open it and claim what the hunt buried."
+        "desc": "Um baú trancado, desenterrado ao final de uma caça ao tesouro. Use-o para abri-lo e reivindicar o que a caçada enterrou."
       }
     },
     "hunt_drakelands_gate_ashes": {
-      "0": "The road out of Wyrmwatch runs west into a stand of old trees that guards the gate. Stand beneath the Gatewood and the trail begins.",
-      "1": "A far-dune watcher keeps to the eastern sands, north of the garrison. Find Scout Yerrin and ask what the wind carried in.",
-      "2": "The keeper of the garrison stores has not eaten since the last patrol. Bring Quartermaster Sela 2 x Cottage Loaf.",
-      "3": "East and a little south of where the cinders drift into dunes, a scorched patch of ground hides what the ash buried. Use the scroll there and dig.",
-      "title": "Ashes at the Gate"
+      "0": "A estrada que sai de Wyrmwatch segue para oeste, até um conjunto de árvores antigas que guarda o portão. Fique sob o Bosque do Portão e a trilha começa.",
+      "1": "Um vigia das dunas distantes se mantém nas areias do leste, ao norte da guarnição. Encontre o Batedor Yerrin e pergunte o que o vento trouxe.",
+      "2": "O guardião dos suprimentos da guarnição não come desde a última patrulha. Leve 2 x Pão Caseiro para a Intendente Sela.",
+      "3": "A leste e um pouco ao sul de onde as cinzas se acumulam em dunas, uma mancha de terra chamuscada esconde o que as cinzas enterraram. Use o pergaminho ali e cave.",
+      "title": "Cinzas no Portão"
     },
     "hunt_frostveil_aurora_vigil": {
-      "0": "Where the terraces climb toward the lights that dance at night, kneel on the Aurora Steps and let the sky notice you.",
-      "1": "The one who reads the lights waits close by the steps. Speak with Aurorist Veyla about what the sky spelled out.",
-      "2": "East of the howling terraces, a little to the south, the snow lies flatter than it should. Use the scroll there and dig.",
-      "title": "Lights over the Steps"
+      "0": "Onde os terraços sobem em direção às luzes que dançam à noite, ajoelhe-se nos Degraus da Aurora e deixe o céu notar você.",
+      "1": "Quem lê as luzes espera perto dos degraus. Fale com a Auróloga Veyla sobre o que o céu revelou.",
+      "2": "A leste dos terraços uivantes, um pouco ao sul, a neve está mais lisa do que deveria. Use o pergaminho ali e cave.",
+      "title": "Luzes sobre os Degraus"
     },
     "hunt_amberfall_lantern_ferry": {
-      "0": "At the water's edge north of Lanternmere, the keeper of the lantern ferries knows which light went out. Speak with Ferrymaster Caddow.",
-      "1": "A single stone leans against the sky northeast of the great mere, older than the town. Stand at the Leaning Monolith.",
-      "2": "The keeper of the gilded rows waters her orchard by hand and thirsts for it. Bring Orchardist Pomeline 3 x Cold Well Water.",
-      "3": "Northeast of the rise where the cindermaples burn red, the leaves lie in a circle that no wind made. Use the scroll there and dig.",
-      "title": "Lanterns on the Mere"
+      "0": "Na beira da água ao norte de Lanternmere, o guardião das balsas de lanterna sabe qual luz se apagou. Fale com o Mestre da Balsa Caddow.",
+      "1": "Uma única pedra se inclina contra o céu a nordeste do grande lago, mais antiga que a cidade. Fique parado no Monólito Inclinado.",
+      "2": "A guardiã das fileiras douradas rega seu pomar à mão, e ele está sedento por mais. Leve 3 x Água do Poço Frio para a Pomicultora Pomeline.",
+      "3": "A nordeste da elevação onde os bordos ardem em vermelho, as folhas repousam em um círculo que nenhum vento formou. Use o pergaminho ali e cave.",
+      "title": "Lanternas no Lago"
     },
     "hunt_willowfen_fenwitch_salt": {
-      "0": "The fen-witch of Willowweep will not talk to anyone who comes empty-handed. Bring Mother Sedge 1 x Cooking Salt.",
-      "1": "Where the fen goes flat and the air makes everyone drowsy, stand on the Drowsy Flats and sigh, as the witch told you.",
-      "2": "Southeast of the pools that shine in the bog, a hummock of dry ground stays dry all year. Use the scroll there and dig.",
-      "title": "The Fen-Witch's Salt"
+      "0": "A bruxa do pântano de Willowweep não fala com ninguém que chegue de mãos vazias. Leve 1 x Sal de Cozinha para Mãe Sedge.",
+      "1": "Onde o pântano se torna plano e o ar deixa todos sonolentos, fique parado na Planície Sonolenta e suspire, como a bruxa disse.",
+      "2": "A sudeste das poças que brilham no brejo, um montículo de terra seca permanece seco o ano todo. Use o pergaminho ali e cave.",
+      "title": "O Sal da Bruxa do Pântano"
     },
     "hunt_nightbloom_sleepless_vigil": {
-      "0": "Northeast of Moonrest, where the stones keep a watch that never ends, stand at the Standing Vigil.",
-      "1": "The watcher at the vigil counts stars the way others count coins. Speak with Astronomer Cassian about the one that fell.",
-      "2": "North of the town lies a barrow whose sleeper never rests. Salute the Sleepless Barrow so the sleeper knows a friend has come.",
-      "3": "Southeast of the field where the gloam gathers, the moonlight pools on one bare patch of soil. Use the scroll there and dig.",
-      "title": "Vigil of the Sleepless"
+      "0": "A nordeste de Moonrest, onde as pedras mantêm uma vigília que nunca termina, fique parado na Vigília Permanente.",
+      "1": "O vigia na vigília conta estrelas como outros contam moedas. Fale com o Astrônomo Cassian sobre a que caiu.",
+      "2": "Ao norte da cidade fica um túmulo cujo adormecido nunca descansa. Saúde o Túmulo Insone para que o adormecido saiba que um amigo chegou.",
+      "3": "A sudeste do campo onde o gloam se reúne, o luar se acumula em uma mancha de terra nua. Use o pergaminho ali e cave.",
+      "title": "Vigília dos Insones"
     },
     "hunt_wraithwood_mournstone_candles": {
-      "0": "The candlewright of Gibbetmere sells light to people who fear the dark. Speak with Widow Tansy about a candle that was never paid for.",
-      "1": "The last vicar of the Mournstone has been fasting on prayers alone. Bring Vicar Creel 2 x Salted Jerky.",
-      "2": "Northeast of the town, past the crows, a glade hangs its own strange fruit. Stand in the Hanging Glade.",
-      "3": "Southeast of the clearing where the huntsman set his snares, the leaf litter has been turned over recently. Use the scroll there and dig.",
-      "title": "Candles for the Mournstone"
+      "0": "A fabricante de velas de Gibbetmere vende luz para quem teme o escuro. Fale com a Viúva Tansy sobre uma vela que nunca foi paga.",
+      "1": "O último vigário da Pedra Fúnebre está jejuando só com preces. Leve 2 x Carne-seca Salgada para o Vigário Creel.",
+      "2": "A nordeste da cidade, além dos corvos, uma clareira pendura seu próprio fruto estranho. Fique parado na Clareira Suspensa.",
+      "3": "A sudeste da clareira onde o caçador armou suas armadilhas, a serrapilheira foi revirada recentemente. Use o pergaminho ali e cave.",
+      "title": "Velas para a Pedra Fúnebre"
     },
     "hunt_palmreach_sunken_idol": {
-      "0": "Deep in the tangle, northwest of the lagoon, the vines pour down like a waterfall. Stand at the Vinefall.",
-      "1": "A hermit who went into the tangle and came back out lives close to the falling vines. Speak with Okrim about what he saw down there.",
-      "2": "To the east, an idol sits half-drowned and still watching. Cower before the Sunken Idol, the way the hermit said the divers do.",
-      "3": "Northeast of where the tangle opens its mouth to the sea, the sand has been heaped higher than the tide reaches. Use the scroll there and dig.",
-      "title": "The Idol's Secret"
+      "0": "Nas profundezas da mata emaranhada, a noroeste da lagoa, as vinhas descem como uma cachoeira. Fique parado na Cachoeira de Vinhas.",
+      "1": "Um eremita que entrou na mata emaranhada e voltou vive perto das vinhas que caem. Fale com Okrim sobre o que ele viu lá embaixo.",
+      "2": "A leste, um ídolo permanece meio submerso e ainda observando. Encolha-se diante do Ídolo Afundado, do jeito que o eremita disse que os mergulhadores fazem.",
+      "3": "A nordeste de onde a mata emaranhada abre sua boca para o mar, a areia foi empilhada mais alto do que a maré alcança. Use o pergaminho ali e cave.",
+      "title": "O Segredo do Ídolo"
     },
     "hunt_evergarden_beacon_road": {
-      "0": "The parterre gardener along the walk north of Hedgewick swears her beds are starving. Bring Farmer Verbena 2 x Compost.",
-      "1": "In the far southeast corner of the garden, an old mill still turns for no miller. Stand at the Old Mill.",
-      "2": "Follow the road south over the border into the Galecrest and out to the coast. The keeper of the old beacon, Keeper Bram, has the last word.",
-      "3": "Northwest of the old beacon, just off the path down from the light, the turf has been cut and laid back. Use the scroll there and dig.",
-      "title": "Beacon and Bloom"
+      "0": "A jardineira do jardim ornamental ao longo do caminho ao norte de Hedgewick jura que seus canteiros estão morrendo de fome. Leve 2 x Composto para a Fazendeira Verbena.",
+      "1": "No canto mais a sudeste do jardim, um moinho velho ainda gira sem nenhum moleiro. Fique parado no Moinho Velho.",
+      "2": "Siga a estrada para o sul, cruzando a fronteira até Galecrest, e saia até a costa. O guardião do farol antigo, Guardião Bram, tem a última palavra.",
+      "3": "A noroeste do farol antigo, logo fora do caminho que desce da luz, a grama foi cortada e recolocada. Use o pergaminho ali e cave.",
+      "title": "Farol e Flor"
     }
   },
   "guide": {
@@ -6886,7 +6886,7 @@ export const pt_BR: EnTranslations = {
       "progression": "Níveis e Progressão",
       "world": "Mundo",
       "quests": "Missões",
-      "factions": "Factions & Standing",
+      "factions": "Facções e Status",
       "dungeons": "Masmorras e Raides",
       "delves": "Incursões",
       "rifts": "Fendas",
@@ -6901,7 +6901,7 @@ export const pt_BR: EnTranslations = {
       "talents": "Talentos",
       "arena": "Arena e JcJ",
       "thornhollow": "Campos de Thornhollow",
-      "worldPvp": "World PvP",
+      "worldPvp": "JcJ Mundial",
       "deeds": "Livro dos Feitos",
       "reliquary": "O Relicário",
       "glossary": "Glossário",
@@ -7198,7 +7198,7 @@ export const pt_BR: EnTranslations = {
       "rowBrightness": "Exposição da cena, mais escura ou mais clara. Preferência pura.",
       "rowWeather": "Chuva ambiente e neve. Apenas atmosfera, e desligá-lo economiza um pouco durante as tempestades.",
       "rowBrowserEffects": "Quão sofisticada é a própria interface: desfoque de vidro, brilho, menus animados. Corresponde automaticamente ao seu navegador; o mundo 3D permanece intocado de qualquer maneira.",
-      "rowFrameRateCap": "A ceiling on how many images the game draws each second. A computer that cannot keep up with its display lands on an uneven rhythm; a steady 30 looks smoother than that, halves the work, and keeps the computer cooler. Display means no limit.",
+      "rowFrameRateCap": "Um teto para quantas imagens o jogo desenha por segundo. Um computador que não consegue acompanhar sua tela cai em um ritmo irregular; um valor constante de 30 parece mais suave que isso, reduz o trabalho pela metade e mantém o computador mais fresco. Tela significa sem limite.",
       "rowTerrainDetail": "Texturas de solo ricas e combinadas versus uma aparência de terreno mais simples e rápida.",
       "rowFoliageDensity": "Quão longe e quão espessa a grama cresce ao redor do seu personagem.",
       "rowEffectsQuality": "Bloom, oclusão de ambiente e quantas tochas e magias lançam luz de verdade. A maior economia entre os controles de detalhe, e o interruptor do qual os demais controles de iluminação dependem.",
@@ -7262,9 +7262,9 @@ export const pt_BR: EnTranslations = {
       "ifPartyShowAuras": "Se benefícios e penalidades aparecem nos quadros do grupo. Interruptores equivalentes cobrem barras de recurso, absorções, mascotes e se você aparece na sua própria lista de grupo.",
       "ifAurasOnPlayerFrame": "Coloca seus benefícios e penalidades também no seu Quadro do Jogador, além da barra de auras.",
       "ifAuraBarBelowFrame": "Move a fileira de benefícios para baixo do quadro da sua unidade em vez de acima dele. Só faz diferença enquanto os benefícios aparecem no quadro do jogador.",
-      "ifTargetAurasBelowFrame": "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
+      "ifTargetAurasBelowFrame": "Posiciona a fileira de benefícios e penalidades do quadro de alvo abaixo do quadro, em vez de acima, o layout clássico. Desativado por padrão, já que o quadro de alvo padrão fica bem acima da barra de ação; ative depois de mover o quadro para algum lugar com espaço abaixo dele.",
       "ifAlwaysShowAllBuffs": "Mostra todos os benefícios ativos mesmo na predefinição gráfica Baixa, ignorando o limite normal de ícones de benefícios.",
-      "ifShowAuraCaster": "Adds a \"Cast by\" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins' Blessings.",
+      "ifShowAuraCaster": "Adiciona uma linha \"Conjurado por\" a toda dica de benefício ou penalidade, nomeando quem o aplicou. Útil para diferenciar vários conjuradores do mesmo benefício, como as Bênçãos de dois paladinos.",
       "ifTargetOfTarget": "Mostra quem o seu alvo está mirando: a forma clássica de saber se o tanque ainda está com a aggro.",
       "ifPetFrame": "Mostra um quadro para o seu mascote.",
       "ifChatFontScale": "Tamanho do texto do chat.",
@@ -7315,7 +7315,7 @@ export const pt_BR: EnTranslations = {
       "allyRezBody": "Você nem sempre precisa correr de volta a pé. Um aliado com uma magia de ressurreição pode reergué-lo em vez disso, e ela chega como um aviso que você aceita ou recusa; deixe-o parado e ele expira, então responda enquanto ele ainda está lá. Aceite e você se ergue ao lado do amigo que a lançou, com parte da sua vida e mana de volta. Alguns curadores podem oferecer isso ao grupo inteiro derrubado de uma vez, embora cada um ainda responda ao próprio aviso. Campos de Thornhollow é a exceção: nenhuma magia de ressurreição o alcança lá, e você espera pela próxima onda da sua equipe.",
       "unstuckTitle": "Quando você está realmente preso",
       "unstuckBody": "Se o mundo o prender em algum lugar de onde você não consegue sair, digite /unstuck. Você precisa estar fora de combate e parado, sem ser atingido por um atordoamento ou uma imobilização, e não estar em um duelo ou numa partida de arena: uma contagem regressiva curta é executada, e se mover ou sofrer dano a cancela. Quando ela termina, você é colocado no cemitério mais próximo. Isso nunca o mata e não deixa corpo algum, e se você já estava caído, ele o reergue ali mesmo. O preço é o Mal do Desbloqueio, um enfraquecimento temporário de tudo o que você é que já terá passado quando você puder usar o comando de novo, e assim como o Tributo do Guardião, ele poupa por completo os personagens recém-criados.",
-      "unstuckBodyWindow": "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The first use in an hour costs you nothing. Use it again within an hour of the last and the price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
+      "unstuckBodyWindow": "Se o mundo o prender em algum lugar de onde você não consegue sair, digite /unstuck. Você precisa estar fora de combate e parado, sem ser atingido por um atordoamento ou uma imobilização, e não estar em um duelo ou numa partida de arena: uma contagem regressiva curta é executada, e se mover ou sofrer dano a cancela. Quando ela termina, você é colocado no cemitério mais próximo. Isso nunca o mata e não deixa corpo algum, e se você já estava caído, ele o reergue ali mesmo. O primeiro uso em uma hora não custa nada. Use-o de novo dentro de uma hora do último uso e o preço é o Mal do Desbloqueio, um enfraquecimento temporário de tudo o que você é que já terá passado quando você puder usar o comando de novo, e assim como o Tributo do Guardião, ele poupa por completo os personagens recém-criados.",
       "climbTitle": "Subindo em uma saliência",
       "climbBody": "Saliências não são paredes. Pule em direção a algo alto demais para subir de um passo e seu personagem agarra a borda perto do topo do salto e se puxa para cima, sem precisar de uma tecla própria para isso. Qualquer coisa baixa o suficiente para passar por cima sozinho passa sem cerimônia; a escalada completa fica reservada para bordas acima da sua cabeça. Ela é breve, e assume o controle enquanto dura, então você não pode direcioná-la na metade. Um atordoamento o pega no meio da escalada e você solta e cai, medido a partir de onde o salto deixou o chão, e um atordoamento ou uma imobilização impede que a escalada sequer comece, o que vale lembrar quando você está tentando sair de uma situação ruim numa luta."
     },
@@ -7341,7 +7341,7 @@ export const pt_BR: EnTranslations = {
       "framesMoveBodyEditFrames": "Seu quadro, o quadro do alvo e os quadros do grupo podem ser movidos. Cada um traz um pequeno botão de mover no canto: desbloqueie-o, arraste o quadro para onde quiser e bloqueie-o outra vez para que um clique perdido não o desloque. Editar Quadros, no alto da aba Quadros nas opções de Interface, libera o restante da interface de uma vez, junto com esses três quadros: barras de ação, barra de lançamento, barra de golpe, barra de experiência, minimapa, trilho de botões, quadro do mascote, barra de postura, linhas de benefícios e debilitações e chip de Lembrete da Lista de Desejos, cada um usando um chip de nome enquanto está liberado. Se eles acabarem em um lugar que você não queira, Restaurar Padrões, no rodapé da mesma aba Quadros, devolve todos ao ponto inicial.",
       "framesGovernedExtra": "Editar Quadros também libera a pilha de rastreadores abaixo, seus atributos e objetivos de missões rastreadas, seu progresso de feitos, suas páginas do Relicário, as receitas que você fixou na criação, a incursão em que você está, qualquer fenda da qual participa e a receita ou encomenda que rastreia, além da barra de ação do mascote ao lado do quadro dele, o quadro de pontos do Alvo para suas debilitações em inimigos próximos, o medalhão de Devoção do paladino, a Barra de Aflição do bruxo, a sobreposição de ativações de feitiço, o cronômetro do golpe da mão secundária para quem usa duas armas e a janela de medidores de dano com abas, cada um usando seu próprio chip de nome quando está liberado.",
       "framesGovernedAuraTracks": "Editar Quadros também libera as seis trilhas de aura opcionais depois que você as ativa na aba Combate das mesmas opções de Interface: trilha Meus Benefícios, trilha Recargas Defensivas, trilha Meus Escudos, trilha Recargas Ofensivas, trilha Movimento e Furtividade e trilha Meus Benefícios nos Aliados. Todas as trilhas começam desligadas, e cada uma usa seu próprio chip de nome quando está liberada.",
-      "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
+      "frameGroups": "{trackers} podem combinar missões, feitos, fendas, incursões, metas de coleta e o rastreamento do Relicário. {auras} podem combinar os DoTs no alvo e as seis fileiras de auras. Ative qualquer um dos grupos em Configurações de Quadros, ou deixe desativado para mover cada quadro separadamente. {tot} inclui uma barra de recurso. {focus} tem três alvos que se movem de forma independente: Shift+F1 até Shift+F3 os atribui; Ctrl+F1 até Ctrl+F3 os seleciona. Arraste o medidor de dano ou de ameaça para fora dos seus botões para movê-lo, e arraste suas bordas para redimensioná-lo, mesmo com os quadros travados. Enquanto os quadros estão destravados, Mostrar ou Ocultar Quadros tem seu próprio menu agrupado. Clique com o botão direito em um quadro destravado para Redefinir tamanho ou Opções de Quadro. Interface > Quadros também contém Configurações de Quadros e as Opções de Quadros de Grupo, que podem ser recolhidas. Travar Alvo do Alvo ao Alvo mantém esses quadros juntos. Desative para mover o Alvo do Alvo separadamente; reativar preserva a posição separada para depois. Quadros de foco atribuídos escondem seus controles de configuração; clique com o botão direito e escolha Remover Foco para restaurá-los. A conjuração ao apontar também funciona nos quadros de foco.",
       "framesGovernedTalkingHead": "Editar quadros também afrouxa o painel Diálogo, que carrega a linha falada de um NPC enquanto esse NPC está fora de sua vista; ele usa seu chip de nome enquanto está solto.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Barras, temporizadores e texto de combate",
@@ -7455,7 +7455,7 @@ export const pt_BR: EnTranslations = {
       "session": "O que você fez desde que entrou no jogo: abates, mortes, dano e experiência.",
       "arena": "Sua posição no Coliseu das Cinzas em ambas as categorias: classificação, vitórias, derrotas e taxa de vitórias para 1v1 e 2v2.",
       "pvp": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.",
-      "pvpZones": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other on contested ground, sanctuaries allow no world fighting at all, and the free-for-all zones allow it with or without a flag; switching off takes 5 minutes.",
+      "pvpZones": "Bandeira de JcJ Mundial: /pvp alterna; /pvp on e /pvp off a definem diretamente. Jogadores com bandeira podem lutar entre si em terreno contestado; santuários não permitem nenhuma luta mundial; e as zonas de todos contra todos permitem lutar com ou sem bandeira. Desativá-la leva 5 minutos.",
       "listings": "Suas próprias listagens no Mercado Mundial, com o preço pedido, o tempo restante de cada uma, e quanto espaço você ainda tem para mais.",
       "buyback": "O que você vendeu recentemente para um vendedor e ainda pode recomprar.",
       "groupState": "Como você está agora",
@@ -7493,7 +7493,7 @@ export const pt_BR: EnTranslations = {
       "dungeonReset": "Abandona suas próprias instâncias vazias, o que você faz depois de trocar de dificuldade.",
       "groupRecovery": "Recuperação e presença",
       "unstuck": "A saída para quando o mundo o prendeu. Fique parado durante uma contagem regressiva curta e você é levado ao cemitério mais próximo, sendo reerguido ali se já tiver caído. Isso o deixa enfraquecido pelo Mal do Desbloqueio por um tempo depois, então é um último recurso, não um atalho.",
-      "unstuckWindow": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you weakened by Unstuck Sickness for a while afterwards, so it is a rescue rather than a shortcut.",
+      "unstuckWindow": "A saída para quando o mundo o prendeu. Fique parado durante uma contagem regressiva curta e você é levado ao cemitério mais próximo, sendo reerguido ali se já tiver caído. O primeiro uso em uma hora é gratuito. Use-o de novo dentro de uma hora do último uso e ele o deixa enfraquecido pelo Mal do Desbloqueio por um tempo depois, então é um resgate, não um atalho.",
       "afk": "Marca você como Ausente, com uma mensagem opcional que qualquer um que sussurrar para você recebe como resposta automática. Repita sem mensagem para limpá-la; qualquer outro chat também a limpa.",
       "dnd": "Não Perturbe: como ausente, exceto que sussurros enviados a você são retidos em vez de entregues.",
       "sit": "Senta onde você está, e levanta de novo. Você se levanta automaticamente no instante em que se move, conjura ou sofre um golpe.",
@@ -7600,7 +7600,7 @@ export const pt_BR: EnTranslations = {
       "fatigueDef": "Nade longe o bastante mar adentro e a água começa a te esgotar: primeiro vem um aviso, depois dano crescente até você voltar para a terra.",
       "unstuckTerm": "Mal do Desbloqueio",
       "unstuckDef": "O preço de usar Desbloqueio no menu do jogo. Fique parado durante a contagem regressiva e ele o leva até o cemitério mais próximo, e você carrega uma fraqueza passageira por um tempo depois disso.",
-      "unstuckDefWindow": "The price of leaning on Unstuck from the game menu more than once in an hour. Stand still through the countdown and it sets you down at the nearest graveyard. The first use in an hour is free, and a repeat within an hour of the last also leaves you carrying a temporary weakness for a while afterwards.",
+      "unstuckDefWindow": "O preço de recorrer a Desbloqueio pelo menu do jogo mais de uma vez em uma hora. Fique parado durante a contagem regressiva e ele o coloca no cemitério mais próximo. O primeiro uso em uma hora é gratuito, e repetir dentro de uma hora do último também o deixa com um enfraquecimento temporário por um tempo depois.",
       "itemLevelTerm": "Nível do item",
       "itemLevelDef": "Um único número que resume a força de uma peça de equipamento, útil quando você quer comparar duas peças rapidamente. Ative Mostrar nível do item nas opções para vê-lo nas dicas de item. Só o equipamento de origem conhecida carrega um, então itens básicos de vendedor e equipamento inicial não mostram nada, e um número ausente é normal, não uma falha.",
       "requiredLevelTerm": "Nível exigido",
@@ -8057,14 +8057,14 @@ export const pt_BR: EnTranslations = {
       "sideWardenBody": "Ao lado da história, os marechais e guardiões do Vale e do brejo oferecem uma escada de recompensas fixa. Suba por ela, inimigo a inimigo, do jeito que cada caçador de recompensas antes de você conquistou seu lugar. É progressão honesta e um tour pelos piores encrenqueiros de cada zona.",
       "sideCryptTitle": "O rei esquecido",
       "sideCryptBody": "Lá no alto dos cumes corre um mistério mais discreto: sepulturas antigas marcadas com uma coroa que registro algum recorda. Leia os mortos, reúna o que eles guardavam e abra um túmulo que deveria permanecer fechado. É uma trilha de detetive que abre o caminho para o raide de fim de jogo de dez jogadores do reino.",
-      "cluesTitle": "Clue Scrolls",
-      "cluesBody": "Out in the far zones, the daily world-quest board hides one more reward for anyone who clears the whole slate: a Clue Scroll, and the treasure hunt written on it.",
-      "cluesEarnTitle": "Earning a scroll",
-      "cluesEarnBody": "Once your character is far enough along, completing every zone slot on the day's world-quest board hands you a Clue Scroll on top of the usual rewards. A rerolled slot counts once it is done; the always-open dailies are not required. You can hold a few scrolls at a time, so there is no need to spend one the day you earn it.",
-      "cluesHuntTitle": "Following the clues",
-      "cluesHuntBody": "Using a scroll starts a hunt: a short chain of riddles that shows in your quest tracker one step at a time. Each riddle points at something real in the world, a landmark to stand at, a person to talk to, an emote to perform somewhere, or a small errand to run, and the last one always asks you to dig. Only one hunt runs at a time, and it keeps your place across the daily reset and between sessions, so take your time.",
-      "cluesCasketTitle": "The casket",
-      "cluesCasketBody": "Solve the last clue and use the scroll on the spot it names to dig up a Treasure Casket; finishing the hunt also earns standing with the faction whose land hid it. Open the casket for coin and a stack of fine gathering materials. Now and then it holds a piece of gear or a few Heroic Marks, and very rarely Grumbol the Lanternback, a mount found nowhere else. Your first casket and your tenth are recorded in the Book of Deeds.",
+      "cluesTitle": "Pergaminhos de Pista",
+      "cluesBody": "Lá nas zonas distantes, o quadro diário de missões mundiais esconde mais uma recompensa para quem limpa toda a lista: um Pergaminho de Pista, e a caça ao tesouro escrita nele.",
+      "cluesEarnTitle": "Ganhando um pergaminho",
+      "cluesEarnBody": "Quando seu personagem já avançou o bastante, completar todas as vagas de zona no quadro de missões mundiais do dia te entrega um Pergaminho de Pista, além das recompensas de costume. Uma vaga rerrolada conta assim que é concluída; as diárias sempre disponíveis não são obrigatórias. Você pode guardar alguns pergaminhos de cada vez, então não há necessidade de usar um no mesmo dia em que o ganhou.",
+      "cluesHuntTitle": "Seguindo as pistas",
+      "cluesHuntBody": "Usar um pergaminho inicia uma caçada: uma breve sequência de charadas que aparece no seu rastreador de missões, uma etapa de cada vez. Cada charada aponta para algo real no mundo, um marco onde ficar parado, uma pessoa com quem falar, um emote para fazer em algum lugar, ou uma pequena tarefa para cumprir, e a última sempre pede para você cavar. Apenas uma caçada roda por vez, e ela mantém seu progresso mesmo com a reinicialização diária e entre sessões, então não tenha pressa.",
+      "cluesCasketTitle": "O baú",
+      "cluesCasketBody": "Resolva a última pista e use o pergaminho no local que ela indica para desenterrar um Baú de Tesouro; terminar a caçada também rende status com a facção cujas terras o escondiam. Abra o baú para ganhar moedas e uma pilha de bons materiais de coleta. De vez em quando ele guarda uma peça de equipamento ou algumas Marcas Heroicas, e muito raramente Grumbol, o acendedor de lampiões, uma montaria encontrada em nenhum outro lugar. Seu primeiro baú e o décimo são registrados no Livro dos Feitos.",
       "sideTempleTitle": "O Templo Afogado",
       "sideTempleBody": "Um portão de luz pálida sobre um lago alto nos picos abre para um santuário submerso onde um culto afogado ainda canta. Sua cadeia curta de missões fica à parte da história principal, um mistério autônomo para quem subir até a margem, ler os avisos gravados nas rochas e descer para ver para que serviam.",
       "availableTitle": "Por que um NPC não tem nada para você",
@@ -8217,29 +8217,29 @@ export const pt_BR: EnTranslations = {
       "warfareBodyStatsStay": "Cada peça de Guerra traz Classificação de Ofensiva de Guerra e Classificação de Defesa de Guerra, e essas duas classificações não fazem absolutamente nada contra monstros. Elas só se aplicam quando você luta contra outro jogador, em um duelo, na arena ou no campo de batalha, onde a Ofensiva aumenta o dano causado e a Defesa reduz o dano recebido, cada uma até seu próprio limite. Cada família de armadura também é um conjunto, e seus bônus igualmente são classificações de Guerra ou efeitos que só funcionam contra jogadores, então os bônus de conjunto de um traje completo de Honra não contam contra um chefe de masmorra. As próprias peças ainda trazem atributos comuns, armadura e dano de arma, que funcionam em qualquer lugar; são as classificações de Guerra e os bônus de conjunto que ficam inativos contra monstros.",
       "warfareTradeBody": "Essa é a troca deliberada. O equipamento de Guerra é feito para lutar contra jogadores, não como um atalho para pular os níveis de masmorra: uma peça de Guerra nunca carrega os índices de combate que um Épico de masmorra no mesmo encaixe carrega, e tudo o que ela realmente traz é gasto contra outros jogadores. Se você quer se sair bem na arena, compre-o. Se você quer concluir os heroicos mais rápido, conquiste seu equipamento nas masmorras.",
       "warfareTradeBodyRatingSpent": "Essa é a troca deliberada. O equipamento de Guerra foi feito para lutar contra jogadores, não para pular os níveis das masmorras: uma peça de Guerra nunca traz as classificações de combate que um épico de masmorra no mesmo espaço traz, e as classificações de Guerra e os bônus de conjunto que ela traz são gastos inteiramente contra outros jogadores. Se quiser se garantir na arena, compre-o. Se quiser limpar heroicas mais rápido, conquiste seu equipamento nas masmorras.",
-      "vanguardHeading": "Vanguard gear: Warfare Season 2",
-      "vanguardBody": "Vanguard gear is the second season of Warfare gear, sold by the same two quartermasters above the original tier, which stays on sale. Every spec has its own Vanguard set of five pieces, for the head, shoulders, chest, legs and hands, and the shop lists only the three sets your class can wear, followed by the Vanguard weapons you can wield. A Vanguard piece carries the same Warfare ratings as the original tier at a higher item level, and each set has two bonuses, at two and four pieces, that change one of your spec's abilities. Unlike the original sets, those bonuses work everywhere, monsters included, but they are built for fighting players, so a raid set stays the better choice inside a raid."
+      "vanguardHeading": "Equipamento de Guerra da Vanguarda: Temporada 2",
+      "vanguardBody": "O equipamento da Vanguarda é a segunda temporada do equipamento de Guerra, vendido pelos mesmos dois intendentes, acima do nível original, que continua à venda. Cada especialização tem seu próprio conjunto da Vanguarda de cinco peças, para cabeça, ombros, peito, pernas e mãos, e a loja lista apenas os três conjuntos que sua classe pode usar, seguidos das armas da Vanguarda que você pode empunhar. Uma peça da Vanguarda carrega as mesmas classificações de Guerra do nível original, em um nível de item mais alto, e cada conjunto tem dois bônus, em duas e quatro peças, que alteram uma das habilidades da sua especialização. Diferente dos conjuntos originais, esses bônus funcionam em qualquer lugar, incluindo contra monstros, mas foram feitos para lutar contra jogadores, então um conjunto de raide continua sendo a melhor escolha dentro de uma raide."
     },
     "worldPvpPage": {
-      "heading": "World PvP",
+      "heading": "JcJ Mundial",
       "intro": "Open-world player-versus-player is opt-in. Raise your PvP flag and every other flagged player who is not in your party, raid or guild becomes an enemy anywhere in the open world; lower it and, after a short delay, you are a bystander again. Nobody who has not raised the flag can attack or be attacked.",
-      "flagHeading": "Raising and lowering the flag",
+      "flagHeading": "Erguendo e baixando a bandeira",
       "flagBody": "Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing a flagged player who is in a fight raises your own flag.",
-      "stakesHeading": "What a kill is worth",
+      "stakesHeading": "O que uma morte vale",
       "stakesBody": "When flagged players defeat a flagged player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
-      "limitsHeading": "Fair play rules",
+      "limitsHeading": "Regras de jogo justo",
       "limitsBody": "Defeating the same player again and again pays less each time and soon nothing, and the counter resets with the daily reset. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
-      "introZones": "Open-world player-versus-player is opt-in, and the ground you are standing on decides what that means. Raise your PvP flag and every other flagged player who is not in your party or raid becomes an enemy on contested ground; lower it and, after a short delay, you are a bystander again. Two zones are sanctuaries where no world fighting happens at all, and the three northernmost zones are free-for-all ground where everyone present is fair game, flag or no flag. Party and raid mates are never enemies of yours anywhere; guildmates outside your group are fair game like anyone else.",
-      "zonesHeading": "Where world PvP happens",
-      "zonesBody": "The world has three kinds of ground. The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP happens there at all, flagged or not, so a new character can never be fought before they know what the flag is. Most of the world is contested, where the flag rule above is the whole story. The Drakelands, the Frostveil Reach and the Amberfall, the three northernmost zones, are free-for-all ground: everyone standing in them can attack everyone else standing in them, with or without a flag, and you are told as you cross in and again as you leave. Attacking a player who is not flagged there raises your own flag, so an aggressor always ends up carrying the risk. Hitting a player who is already flagged never raises it, which means defending yourself, or defending somebody who is not flagged, costs you nothing.",
-      "flagBodyAid": "Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing, shielding or buffing a flagged player who is in a fight raises your own flag as well, so nobody sustains a fighter from behind a flag they do not wear; aiding a player who is not flagged raises nothing.",
-      "stakesUnflaggedTake": "Nor does an unflagged fighter take any: gold only changes hands between two flagged players, though everyone who helped still earns the Honor.",
-      "stakesBodyFlagged": "When a flagged player is defeated by another player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. A player who was not flagged pays no gold at all, even when they fall in a free-for-all zone. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
-      "hillHeading": "King of the Hill",
+      "introZones": "O JcJ em mundo aberto é opcional, e o terreno onde você está determina o que isso significa. Erga sua bandeira de JcJ e todo outro jogador com bandeira que não esteja no seu grupo ou raide se torna um inimigo em terreno contestado; baixe-a e, depois de um breve atraso, você volta a ser um espectador. Duas zonas são santuários onde nenhuma luta mundial acontece, e as três zonas mais ao norte são terreno de todos contra todos, onde todos os presentes são alvo válido, com ou sem bandeira. Colegas de grupo e de raide nunca são seus inimigos em lugar nenhum; colegas de guilda fora do seu grupo são alvo válido como qualquer outro.",
+      "zonesHeading": "Onde o JcJ mundial acontece",
+      "zonesBody": "O mundo tem três tipos de terreno. A Costa da Provação e o Vale de Eastbrook são santuários: nenhum JcJ mundial acontece ali, com ou sem bandeira, então um personagem novo nunca pode ser atacado antes de saber o que é a bandeira. A maior parte do mundo é contestada, onde a regra da bandeira acima é toda a história. As Drakelands, os Confins de Frostveil e o Amberfall, as três zonas mais ao norte, são terreno de todos contra todos: todos que estão nelas podem atacar todos os outros que também estão nelas, com ou sem bandeira, e você é avisado ao entrar e de novo ao sair. Atacar ali um jogador sem bandeira ergue a sua própria bandeira, então um agressor sempre acaba correndo o risco. Atingir um jogador que já está com bandeira nunca a ergue, o que significa que se defender, ou defender alguém sem bandeira, não custa nada.",
+      "flagBodyAid": "Digite /pvp no chat, ou abra a janela de JcJ em G e use a aba JcJ Mundial, que também mostra seu histórico e as apostas. Erguer a bandeira é instantâneo assim que você passa dos níveis iniciais. Baixá-la inicia uma contagem regressiva de alguns minutos, e a bandeira não cai enquanto você ainda está lutando, então desativá-la nunca é uma forma de escapar de uma luta que você começou. Curar, escudar ou fortalecer um jogador com bandeira que está em uma luta também ergue a sua própria bandeira, então ninguém sustenta um lutador escondido atrás de uma bandeira que não usa; ajudar um jogador sem bandeira não ergue nada.",
+      "stakesUnflaggedTake": "Um lutador sem bandeira também não recebe nada: o ouro só muda de mãos entre dois jogadores com bandeira, embora todos que ajudaram ainda ganhem a Honra.",
+      "stakesBodyFlagged": "Quando um jogador com bandeira é derrotado por outro jogador, o perdedor paga uma pequena parte do ouro da sua bolsa, limitada a uma quantia modesta, e os vencedores ganham Honra para o equipamento de Guerra. Um jogador sem bandeira não paga ouro nenhum, mesmo se cair em uma zona de todos contra todos. Todos que ajudaram compartilham os dois prêmios: o golpe fatal, qualquer um que tenha causado dano ao alvo pouco antes, e os curandeiros que mantiveram esses lutadores de pé. Um confronto limpo de um contra um paga o prêmio inteiro; um grupo o divide.",
+      "hillHeading": "Rei da Colina",
       "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
-      "hillBodyRamp": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
-      "limitsBodyRaids": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor. Raids earn nothing from world kills: a raid member takes no Honor or gold and does not shrink anyone else's share, so fight as a party to be paid."
+      "hillBodyRamp": "Uma vez a cada três horas, em um momento que ninguém pode prever, todo o reino é avisado de que uma colina vai surgir em uma das zonas de todos contra todos dentro de quinze minutos, e o círculo onde ela vai ficar é marcado em terreno aberto. Quando surge, ela permanece por quarenta e cinco minutos, depois desaparece. O grupo com mais jogadores dentro dela disputa a colina, e depois de um minuto de maioria ininterrupta a colina é dele; um jogador sozinho conta como um grupo de um, mas membros de raide não contam de forma alguma. Enquanto um grupo controla a colina, cada um dos seus membros dentro dela ganha Honra a cada minuto, e quanto mais tempo o mesmo grupo a controla, mais cada minuto paga: um grupo completo controlando uma colina sem disputa durante toda a sua duração ganha cerca do mesmo que três vitórias em campo de batalha. Quando a colina muda de mãos, os novos donos recomeçam a contagem do zero. Uma barra sobre o campo mostra quem a controla, seus números contra os deles, e o relógio da disputa; /hill no chat informa onde ela está.",
+      "limitsBodyRaids": "Derrotar o mesmo jogador repetidamente paga cada vez menos e logo nada, e sua contagem contra aquele jogador só recomeça cerca de uma hora depois da primeira dessas mortes, então esperar de tocaia por uma única vítima nunca compensa a espera. Um alvo muito abaixo do seu nível não paga nada. Campos de Batalha e Arenas seguem suas próprias regras enquanto você está dentro deles, e pagam mais Honra que o mundo aberto, então o JcJ mundial é o caminho mais lento até o mesmo vendedor. Raides não ganham nada com mortes no mundo: um membro de raide não recebe Honra nem ouro e não reduz a parte de mais ninguém, então lute em grupo para ser pago."
     },
     "thornhollowPage": {
       "heading": "Campos de Thornhollow",
@@ -8264,28 +8264,28 @@ export const pt_BR: EnTranslations = {
       "rewardsBody": "Toda partida concluída paga Honra: mais por uma vitória, uma consolação por uma derrota ou um empate, além de uma pequena quantia por cada abate que você desfere e por cada um em que presta assistência, então lutar longe das bandeiras ainda vale a pena. Sua primeira vitória de cada dia paga um bônus extra, e o painel avisa enquanto esse bônus ainda está à sua espera. Esse dia pertence só à Honra, e reinicia no seu próprio relógio, não junto com o reinício de instâncias do reino. Enfrentar a mesma equipe repetidamente paga menos pela partida em si depois da primeira vez, estabilizando rápido em um piso em vez de cair a nada, e uma partida abandonada não paga absolutamente nada. Gaste o que você ganhar em qualquer um dos intendentes de Guerra."
     },
     "factionsPage": {
-      "heading": "Factions and Standing",
-      "intro": "Three allied factions each keep watch over their own corner of the realm, and every world quest you finish in their lands raises your standing with them. Standing climbs through six tiers, each with a title of its own, and opens a quartermaster stock piece by piece along the way.",
-      "whoHeading": "The three factions",
-      "whoBody": "Each faction is tied to a group of zones, so where you are doing world quests decides which faction the credit goes to. You never pick a side: all three keep their own tally, and none of them ever asks you to turn on another.",
-      "riftWatchBody": "The Rift Watch guards the shore and watches the deep tears. Their lands are the coast: the Farshore, the Palmreach, the Galecrest, the Willowfen and the Veiled Hollow. Their hub is Drifthaven, on the Palmreach.",
-      "churchOrderBody": "The Church Order holds the heartland of the realm: Eastbrook Vale, Mirefen Marsh, Thornpeak Heights, the Nightbloom and the Wraithwood. Brother Aldric speaks for them from Eastbrook Vale.",
-      "automatonsBody": "The Automatons keep the forges of the far reaches: the Drakelands, the Frostveil Reach, the Amberfall and the Evergarden. Their hub is Wyrmwatch, in the Drakelands.",
-      "earningHeading": "Earning standing",
-      "earningBody": "Standing comes from world quests. Every world quest counts toward the faction of the zone it is set in, and because the three factions cover different zones, all three progress at once as you work your way across the map. Taskmaster Kaelen in Eastbrook opens the World Quests board on the map, and the board is also where you may replace one world quest each day if the day's assignment does not suit you.",
-      "weeklyBody": "The weekly emissary in Eastbrook Vale adds a second road: finish the week's charge and you may name one faction to receive his commendation of standing, once a week, at the window where you took the charge.",
-      "lowLevelNote": "Standing pauses at a tier for lower-level characters and resumes as you level, so a young character can start earning early without running out of road.",
-      "tiersHeading": "Standing tiers",
-      "tiersBody": "Every faction climbs the same six tiers: Unknown, Recognized, Trusted, Proven, Vanguard and Champion. Each faction gives its own name to each rung, and that name becomes your title with them.",
-      "riftWatchTitles": "With the Rift Watch you are an Outsider, then a Watcher, a Riftwalker, a Warden, a Riftwarden and at last a Champion.",
-      "churchOrderTitles": "With the Church Order you are an Outsider, then an Acolyte, a Keeper, a Templar, a Dawnkeeper and at last a Champion.",
-      "automatonsTitles": "With the Automatons you are an Outsider, then an Operator, a Mechanist, an Artificer, a Forgemaster and at last a Champion.",
-      "quartermastersHeading": "Quartermasters",
-      "quartermastersBody": "Each faction keeps a quartermaster at its hub: Quartermaster Vaelen for the Rift Watch in Drifthaven, Templar Althea for the Church Order at the Eastbrook chapel, and Artificer Tobrin for the Automatons in Wyrmwatch. Each sells a small stock of jewelry, armor, weapons and bags, unlocked tier by tier as your standing with that faction grows, and paid for in ordinary coin.",
-      "readingHeading": "Where to read it",
-      "readingBody": "The Reputation tab of the character sheet (C) shows each faction with its current standing, a bar toward the next tier, and the title that standing has earned you. The chat log reports every standing gain as it lands, and reaching a new tier shows a celebration banner on screen.",
-      "deedsHeading": "Deeds",
-      "deedsBody": "The Book of Deeds keeps score of your standing too: reaching Trusted with a faction and reaching Champion with a faction each record a deed, and reaching Champion with all three is a deed of its own. Like every deed these are cosmetic, never power, and the Champion deeds grant a title you can wear."
+      "heading": "Facções e Status",
+      "intro": "Três facções aliadas vigiam, cada uma, seu próprio canto do reino, e toda missão mundial que você termina em suas terras aumenta seu status com elas. O status sobe por seis níveis, cada um com um título próprio, e abre o estoque de um intendente peça por peça ao longo do caminho.",
+      "whoHeading": "As três facções",
+      "whoBody": "Cada facção está ligada a um grupo de zonas, então o lugar onde você está fazendo missões mundiais decide para qual facção o crédito vai. Você nunca escolhe um lado: as três mantêm sua própria contagem, e nenhuma delas jamais pede que você se volte contra outra.",
+      "riftWatchBody": "A Vigília das Fendas protege a costa e observa as fendas profundas. Suas terras são o litoral: o Farshore, o Palmreach, o Galecrest, o Willowfen e o Vale Velado. Sua sede é Drifthaven, no Palmreach.",
+      "churchOrderBody": "A Ordem da Igreja mantém o coração do reino: o Vale de Eastbrook, o Pântano de Mirefen, as Alturas de Thornpeak, o Nightbloom e o Wraithwood. O Irmão Aldric fala por eles a partir do Vale de Eastbrook.",
+      "automatonsBody": "Os Autômatos mantêm as forjas dos confins distantes: as Drakelands, os Confins de Frostveil, o Amberfall e o Evergarden. Sua sede é Wyrmwatch, nas Drakelands.",
+      "earningHeading": "Ganhando status",
+      "earningBody": "O status vem das missões mundiais. Cada missão mundial conta para a facção da zona em que se passa, e como as três facções cobrem zonas diferentes, todas as três avançam ao mesmo tempo enquanto você percorre o mapa. O Encarregado Kaelen, em Eastbrook, abre o quadro de Missões Mundiais no mapa, e é também nesse quadro que você pode substituir uma missão mundial por dia, caso a tarefa do dia não combine com você.",
+      "weeklyBody": "O emissário semanal no Vale de Eastbrook acrescenta um segundo caminho: termine a incumbência da semana e você pode escolher uma facção para receber a recomendação de status dele, uma vez por semana, na mesma janela onde você pegou a incumbência.",
+      "lowLevelNote": "O status pausa em um nível para personagens de nível mais baixo e retoma conforme você sobe de nível, então um personagem novo pode começar a ganhar status cedo sem ficar sem caminho pela frente.",
+      "tiersHeading": "Níveis de status",
+      "tiersBody": "Toda facção sobe pelos mesmos seis níveis: Desconhecido, Reconhecido, Confiável, Comprovado, Vanguarda e Campeão. Cada facção dá seu próprio nome a cada degrau, e esse nome se torna seu título com ela.",
+      "riftWatchTitles": "Com a Vigília das Fendas, você é um Forasteiro, depois um Vigia, um Andarilho das Fendas, um Guardião, um Guardião das Fendas e, por fim, um Campeão.",
+      "churchOrderTitles": "Com a Ordem da Igreja, você é um Forasteiro, depois um Acólito, um Guardião, um Templário, um Guardião da Alvorada e, por fim, um Campeão.",
+      "automatonsTitles": "Com os Autômatos, você é um Forasteiro, depois um Operador, um Mecanista, um Artífice, um Mestre da Forja e, por fim, um Campeão.",
+      "quartermastersHeading": "Intendentes",
+      "quartermastersBody": "Cada facção mantém um intendente em sua sede: o Intendente Vaelen pela Vigília das Fendas, em Drifthaven, a Templária Althea pela Ordem da Igreja, na capela de Eastbrook, e o Artífice Tobrin pelos Autômatos, em Wyrmwatch. Cada um vende um pequeno estoque de joias, armaduras, armas e bolsas, desbloqueado nível por nível conforme seu status com aquela facção cresce, e pago em moeda comum.",
+      "readingHeading": "Onde consultar isso",
+      "readingBody": "A aba Reputação da ficha de personagem (C) mostra cada facção com seu status atual, uma barra até o próximo nível, e o título que aquele status já rendeu a você. O registro do chat relata cada ganho de status assim que ele acontece, e alcançar um novo nível mostra uma faixa de comemoração na tela.",
+      "deedsHeading": "Feitos",
+      "deedsBody": "O Livro dos Feitos também registra o seu status: alcançar Confiável com uma facção e alcançar Campeão com uma facção registram cada um um feito, e alcançar Campeão com as três é um feito à parte. Como todo feito, estes são cosméticos, nunca poder, e os feitos de Campeão concedem um título que você pode usar."
     },
     "deedsPage": {
       "intro": "O Livro dos Feitos é onde o mundo anota tudo o que você já fez, dos primeiros passos fora do vale inicial às lutas mais duras que o reino pode oferecer. Conquiste feitos enquanto joga, ostente os títulos que eles concedem e veja seu Renome subir.",
@@ -9067,7 +9067,7 @@ export const pt_BR: EnTranslations = {
       "parryBody": "Aparar é a defesa própria do guerreiro: a chance de desviar completamente um golpe corpo a corpo e não sofrer dano nenhum, e ela cresce com a Força. Só um ataque vindo de frente pode ser aparado, mais um motivo para manter de frente o que estiver batendo em você. As outras classes veem essa linha zerada na própria ficha.",
       "warfareTitle": "Guerra",
       "warfareBody": "Guerra é o único atributo que só conta contra outros jogadores: ele aumenta o dano que você causa a eles e reduz o dano que você recebe deles, e sua ficha mostra as duas metades numa única linha. Contra criaturas ele não faz nada. Ele vem do equipamento de Guerra que você compra com Honra, então é uma recompensa por jogar JcJ, não algo para perseguir enquanto sobe de nível.",
-      "warfareBodyPets": "Warfare is the stat honor gear carries for fighting players. In fights between players it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them. It also raises your maximum health everywhere except dungeons, raids, delves and rifts, so a player in honor gear is far harder to kill than one without it. Your sheet shows all of it on one line. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
+      "warfareBodyPets": "Guerra é o atributo que o equipamento de honra carrega para lutar contra jogadores. Em lutas entre jogadores, ele aumenta o dano que você e seu mascote causam a outros jogadores e seus mascotes, e reduz o dano que você e seu mascote recebem deles. Ele também aumenta sua vida máxima em todo lugar, exceto em masmorras, raides, incursões e fendas, então um jogador com equipamento de honra é bem mais difícil de matar do que um sem ele. Sua ficha mostra tudo isso em uma única linha. Ele vem do equipamento de Guerra que você compra com honra, então é uma recompensa por jogar JcJ, não algo para perseguir enquanto sobe de nível."
     },
     "progression": {
       "intro": "Toda luta, missão e passo ao norte deixa seu herói mais forte. Veja como a progressão de nível funciona e o que mantém você crescendo depois de chegar ao topo.",
@@ -10929,9 +10929,9 @@ export const pt_BR: EnTranslations = {
       "fatalBody": "O World of ClaudeCraft encontrou um erro inesperado e precisa fechar."
     },
     "hostDiag": {
-      "saveTitle": "Save system report",
-      "saveButton": "Save",
-      "fileType": "JSON file"
+      "saveTitle": "Salvar relatório do sistema",
+      "saveButton": "Salvar",
+      "fileType": "Arquivo JSON"
     },
     "titlebar": {
       "exitGame": "Sair do jogo"
@@ -10983,11 +10983,11 @@ export const pt_BR: EnTranslations = {
     "inWorld": "no mundo",
     "takeOver": "Assumir controle",
     "inWorldHint": "Já está no mundo. Saia em outro lugar ou assuma o controle.",
-    "currentLocation": "Current location: {zone}",
-    "lockouts": "Lockouts ({count})",
-    "lockoutRaids": "Raids",
-    "lockoutDungeons": "Dungeons",
-    "lockoutWorldBosses": "World bosses",
+    "currentLocation": "Localização atual: {zone}",
+    "lockouts": "Bloqueios ({count})",
+    "lockoutRaids": "Raides",
+    "lockoutDungeons": "Masmorras",
+    "lockoutWorldBosses": "Chefes mundiais",
     "takeOverConfirm": "Isto vai desconectar este personagem de outra sessão e trazê-lo para cá. Continuar?",
     "renameRequired": "renomeação necessária",
     "delete": "Excluir",
@@ -11129,16 +11129,16 @@ export const pt_BR: EnTranslations = {
       "xpGainRested": "Você ganha {amount} de experiência (bônus de {rested} por ter descansado).",
       "deathTitle": "Você morreu.",
       "releaseSpirit": "Liberar espírito",
-      "deathRecap": "Recap",
-      "deathRecapTitle": "Death Recap",
-      "deathRecapKiller": "Killing blow: {killer} ({ability})",
-      "deathRecapNoKiller": "Combat events leading to death",
-      "deathRecapLethal": "Killing Blow",
-      "deathRecapClose": "Close",
-      "deathRecapNoEvents": "No combat events recorded.",
-      "deathRecapCrit": "Crit",
-      "deathRecapDamage": "Damage",
-      "deathRecapHeal": "Healing",
+      "deathRecap": "Resumo",
+      "deathRecapTitle": "Resumo da Morte",
+      "deathRecapKiller": "Golpe fatal: {killer} ({ability})",
+      "deathRecapNoKiller": "Eventos de combate que levaram à morte",
+      "deathRecapLethal": "Golpe Fatal",
+      "deathRecapClose": "Fechar",
+      "deathRecapNoEvents": "Nenhum evento de combate registrado.",
+      "deathRecapCrit": "Crítico",
+      "deathRecapDamage": "Dano",
+      "deathRecapHeal": "Cura",
       "chatTab": "Chat",
       "combatLogTab": "Registro de combate",
       "chatPlaceholder": "Diga algo... (/w nome sussurrar, /r responder, /p grupo, /gu guilda, /o oficiais, /general geral)",
@@ -11207,9 +11207,9 @@ export const pt_BR: EnTranslations = {
         "readyQuest": "Missão pronta para entrega",
         "repeatQuest": "Missão repetível",
         "cooldownQuest": "Missão em recarga",
-        "availableWorldQuest": "Available world quest: {name}",
-        "activeWorldQuest": "Active world quest: {name}",
-        "worldBoss": "World boss: {name}",
+        "availableWorldQuest": "Missão mundial disponível: {name}",
+        "activeWorldQuest": "Missão mundial ativa: {name}",
+        "worldBoss": "Chefe mundial: {name}",
         "questObjective": "Área do objetivo da missão",
         "readyOre": "Veio de minério disponível",
         "readyWood": "Arvoredo pronto para corte",
@@ -11412,18 +11412,18 @@ export const pt_BR: EnTranslations = {
       "threat": "Ameaça",
       "damageShort": "Dano",
       "healingShort": "Cura",
-      "damageTaken": "Damage Taken",
-      "damageTakenShort": "Taken",
-      "avoidableDmg": "Avoidable Damage",
-      "avoidableDmgShort": "Avoid.",
-      "interrupts": "Interrupts",
-      "interruptsShort": "Int",
-      "dispels": "Dispels",
-      "dispelsShort": "Disp",
-      "deaths": "Deaths",
-      "deathsShort": "Dead",
-      "reset": "Reset meters",
-      "resetHint": "Reset combat data",
+      "damageTaken": "Dano Recebido",
+      "damageTakenShort": "Recebido",
+      "avoidableDmg": "Dano Evitável",
+      "avoidableDmgShort": "Evit.",
+      "interrupts": "Interrupções",
+      "interruptsShort": "Int.",
+      "dispels": "Dissipações",
+      "dispelsShort": "Dissip.",
+      "deaths": "Mortes",
+      "deathsShort": "Mortes",
+      "reset": "Redefinir medidores",
+      "resetHint": "Redefinir dados de combate",
       "groupTotal": "Total: {total} ({rate})",
       "current": "Atual",
       "lastFight": "Última luta",
@@ -11436,16 +11436,16 @@ export const pt_BR: EnTranslations = {
       "segmentSummary": "{label} - {duration}",
       "olderSegment": "Segmento anterior",
       "newerSegment": "Segmento seguinte",
-      "selectSegment": "Select fight segment",
-      "selectMode": "Select meter mode",
-      "back": "Back",
-      "resetFight": "Reset current fight",
-      "resetAll": "Reset all data",
-      "criticals": "Criticals: {count}",
-      "hits": "Hits: {count}",
-      "topAbility": "Top: {name}",
-      "activity": "Activity: {pct}",
-      "newWindow": "New window",
+      "selectSegment": "Selecionar segmento de luta",
+      "selectMode": "Selecionar modo do medidor",
+      "back": "Voltar",
+      "resetFight": "Redefinir luta atual",
+      "resetAll": "Redefinir todos os dados",
+      "criticals": "Críticos: {count}",
+      "hits": "Acertos: {count}",
+      "topAbility": "Melhor: {name}",
+      "activity": "Atividade: {pct}",
+      "newWindow": "Nova janela",
       "close": "Fechar medidores"
     },
     "chat": {
@@ -11569,7 +11569,7 @@ export const pt_BR: EnTranslations = {
       "deathRecapDrowned": "Você morreu. Você se afogou.",
       "deathRecapCauterized": "Você morreu. A queimadura de Cauterizar dominou você.",
       "respawn": "Você se sente descansado e inteiro novamente.",
-      "respawnKeeperToll": "The Pale Keeper has revived you, but you are weaker for it: the Keeper's Toll drains your attributes until it fades.",
+      "respawnKeeperToll": "O Guardião Pálido reviveu você, mas isso tem um preço: o Tributo do Guardião drena seus atributos até que se dissipe.",
       "ignoringChat": "Ignorando chat de {name}.",
       "noLongerIgnoring": "Você não ignora mais {name}.",
       "playerNotNearby": "Esse jogador não está por perto.",
@@ -11607,7 +11607,7 @@ export const pt_BR: EnTranslations = {
       "cantInForm": "Você não pode fazer isso na Forma de {form}.",
       "bear": "Bruin",
       "cat": "Gato",
-      "bearOrCat": "Bruin or Cat",
+      "bearOrCat": "Bruin ou Gato",
       "travel": "Fleet",
       "shapeshifted": "Você não pode fazer isso transformado.",
       "stealthed": "Você precisa estar furtivo.",
@@ -11928,9 +11928,9 @@ export const pt_BR: EnTranslations = {
       "anyTarget": "Alvo inimigo ou amigo",
       "selfOnly": "Apenas em si mesmo",
       "damageRange": "{min} a {max}",
-      "edictExplosion": "While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.",
-      "edictDamage": "Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.",
-      "verdictDamage": "Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.",
+      "edictExplosion": "Enquanto a Ascensão estiver ativa, a explosão causa {damage} de dano Físico num raio de {radius} m, reduzido acima de {cap} alvos. Esse dano aumenta com o poder de ataque.",
+      "edictDamage": "Golpeia causando {weaponPercent}% de dano da arma mais {damage} de dano Físico. O dano da arma inclui o poder de ataque.",
+      "verdictDamage": "O Édito Final detona causando {verdictSingleDamage} de dano Sagrado. A Queda da Alvorada detona causando {verdictAreaDamage} de dano Sagrado num raio de {verdictAreaRadius} m, reduzido acima de {verdictAreaCap} alvos. Nenhuma das detonações é ampliada pelo poder de feitiço. Apenas um inimigo pode carregar sua marca.",
       "finisherDamage": "{base} mais {perCombo} por ponto de combo"
     },
     "resources": {
@@ -11943,7 +11943,7 @@ export const pt_BR: EnTranslations = {
     "forms": {
       "bear": "urso",
       "cat": "gato",
-      "bearOrCat": "Bruin or Cat"
+      "bearOrCat": "Bruin ou Gato"
     },
     "cast": {
       "fishing": "Pesca",
@@ -11976,7 +11976,7 @@ export const pt_BR: EnTranslations = {
   },
   "questUi": {
     "tracker": {
-      "clueHuntTitle": "{title} (clue {step} of {total})",
+      "clueHuntTitle": "{title} (pista {step} de {total})",
       "title": "Missões",
       "complete": "Concluída",
       "showOnMap": "Mostrar {name} no mapa",
@@ -12011,18 +12011,18 @@ export const pt_BR: EnTranslations = {
       "repeatableQuestAria": "Missão repetível: {name}",
       "discussQuest": "Discutir {name}.",
       "discussQuestAria": "Discutir missão: {name}",
-      "clueTalk": "Ask about the clue.",
-      "clueTalkAria": "Ask about the clue: {name}",
-      "clueDeliver": "Hand over {count} {item}.",
-      "clueDeliverAria": "Hand over {count} {item} to {name}",
+      "clueTalk": "Pergunte sobre a pista.",
+      "clueTalkAria": "Perguntar sobre a pista: {name}",
+      "clueDeliver": "Entregue {count} {item}.",
+      "clueDeliverAria": "Entregar {count} {item} para {name}",
       "profIntroHint": "Fale com {name} para \"{quest}\".",
       "nythraxisDeathlessKingWarning": "As três relíquias contam a mesma história: Aldren lutou para defender seu rei, Malric rompeu a fronteira da morte e Voss tentou impedir o que veio depois. O selo está enfraquecendo, e a cripta abandonada é o caminho para baixo.",
       "browseGoods": "Deixe-me ver suas mercadorias.",
       "browseGoodsAria": "Ver mercadorias de {name}",
       "worldMarket": "Mostre-me o Mercado Mundial.",
       "worldMarketAria": "Abrir o Mercado Mundial",
-      "worldQuestBoard": "Show me the world quest board.",
-      "worldQuestBoardAria": "Open the world quest board on the map",
+      "worldQuestBoard": "Mostre-me o quadro de missões mundiais.",
+      "worldQuestBoardAria": "Abrir o quadro de missões mundiais no mapa",
       "accept": "Aceitar",
       "decline": "Recusar",
       "continue": "Continuar",
@@ -12044,361 +12044,361 @@ export const pt_BR: EnTranslations = {
     },
     "worldQuest": {
       "title": "{zone}: {target}",
-      "unknown": "Unknown world quest ({id})",
-      "itemReward": "Item reward: {name}",
-      "itemRewardWithLevels": "{name} (item level {itemLevel}, equips at level {requiredLevel})",
-      "factionLine": "Faction: {faction}",
-      "standingReward": "+{amount} {faction} standing",
-      "rewardLine": "Rewards: {reward}",
-      "availableStatus": "Available world quest",
-      "activeStatus": "Active world quest",
-      "expiresIn": "Expires in {time}",
-      "mineOre": "Mine copper ore",
-      "recoverObject": "Recover {name}",
-      "redirectLeyBeam": "Redirect the ley beam",
-      "matchConfections": "Match enchanted confections",
-      "loadFreight": "Load freight into the wagon",
-      "escortCaravan": "Escort the caravan: {zone}",
-      "salvageWreckage": "Salvage debris washed along the strand from the wreck northwest of Gullhaven",
+      "unknown": "Missão mundial desconhecida ({id})",
+      "itemReward": "Recompensa de item: {name}",
+      "itemRewardWithLevels": "{name} (nível de item {itemLevel}, equipável no nível {requiredLevel})",
+      "factionLine": "Facção: {faction}",
+      "standingReward": "+{amount} de reputação com {faction}",
+      "rewardLine": "Recompensas: {reward}",
+      "availableStatus": "Missão mundial disponível",
+      "activeStatus": "Missão mundial ativa",
+      "expiresIn": "Expira em {time}",
+      "mineOre": "Minere minério de cobre",
+      "recoverObject": "Recupere {name}",
+      "redirectLeyBeam": "Redirecione o feixe ley",
+      "matchConfections": "Combine confeitos encantados",
+      "loadFreight": "Carregue o frete na carroça",
+      "escortCaravan": "Escolte a caravana: {zone}",
+      "salvageWreckage": "Recolha destroços que a maré trouxe à praia, vindos do naufrágio a noroeste de Gullhaven",
       "banner": {
-        "riftOpens": "A rift tears open on the strand! Raiders are coming for the salvage.",
-        "captainSteps": "The raider captain steps through the rift!",
-        "riftRouted": "The raiders are routed. The strand is yours again.",
-        "championRises": "Extra loot! A champion rises at the site. Bring it down together.",
-        "championFallen": "Extra loot! The champion falls: a bonus purse for everyone who fought it.",
-        "endlessBegins": "The line holds! Endless waves begin, each one harder. Leave the cannon whenever you like."
+        "riftOpens": "Uma fenda se abre na praia! Saqueadores estão vindo atrás dos destroços.",
+        "captainSteps": "O capitão dos saqueadores atravessa a fenda!",
+        "riftRouted": "Os saqueadores são derrotados. A praia é sua novamente.",
+        "championRises": "Saque extra! Um campeão surge no local. Derrubem-no juntos.",
+        "championFallen": "Saque extra! O campeão cai: uma bolsa bônus para todos que lutaram contra ele.",
+        "endlessBegins": "A linha resiste! Ondas infinitas começam, cada uma mais difícil. Deixe o canhão quando quiser."
       },
       "shadow": {
-        "title": "Under Cover of Shadow",
-        "objective": "Steal four sealed orders without being caught",
-        "cloak": "Duskweave Cloak",
-        "pickpocket": "Pick Pocket",
-        "leave": "Remove Cloak",
-        "stealTip": "Approach from behind and remain still while taking the orders. Stay out of the lantern beams.",
-        "leaveTip": "Remove the cloak. Your recovered orders are kept.",
-        "documents": "Orders recovered: {count}/4",
-        "suspicion": "Suspicion: {value}",
-        "safe": "Steal from behind. Lantern guards sweep wide beams that see through the cloak; wait for a clear opening.",
-        "behind": "Move behind the guard before stealing.",
-        "danger": "You are being spotted! Get out of sight!",
-        "channel": "Stealing... {seconds}s",
-        "noTarget": "Move close to a guard carrying orders.",
-        "start": "Speak with Scout Valerie to borrow her cloak.",
-        "caught": "Caught! Return to Scout Valerie for another cloak. Your orders are safe.",
-        "complete": "All four orders recovered."
+        "title": "Sob o Manto das Sombras",
+        "objective": "Roube quatro ordens lacradas sem ser pego",
+        "cloak": "Manto da Trama do Crepúsculo",
+        "pickpocket": "Bater Carteira",
+        "leave": "Remover Manto",
+        "stealTip": "Aproxime-se por trás e fique parado enquanto pega as ordens. Fique fora dos feixes das lanternas.",
+        "leaveTip": "Remova o manto. Suas ordens recuperadas são mantidas.",
+        "documents": "Ordens recuperadas: {count}/4",
+        "suspicion": "Suspeita: {value}",
+        "safe": "Roube por trás. Guardas com lanterna varrem feixes largos que enxergam através do manto; espere uma brecha livre.",
+        "behind": "Mova-se para trás do guarda antes de roubar.",
+        "danger": "Você está sendo avistado! Saia de vista!",
+        "channel": "Roubando... {seconds}s",
+        "noTarget": "Aproxime-se de um guarda carregando ordens.",
+        "start": "Fale com a Batedora Valerie para pegar emprestado o manto dela.",
+        "caught": "Pego! Volte à Batedora Valerie para outro manto. Suas ordens estão seguras.",
+        "complete": "As quatro ordens foram recuperadas."
       },
       "investigation": {
-        "title": "A Borrowed Face",
-        "objective": "Unmask and defeat the infiltrator",
-        "briefing": "A creature has stolen a soldier's face. Read the standing orders and the watch ledger, question all four guards, then come back and name the one whose story contradicts our records.",
-        "instructions": "Read the standing orders and watch ledger, then question all four guards. Compare their stories with the records.",
-        "confront": "Report to Sergeant Alric and name the guard whose story contradicts the records.",
-        "name": "Which of my guards is wearing a borrowed face?",
-        "accuseOption": "Accuse {name}",
-        "cleared": "Sergeant Alric: That soldier is accounted for. Compare the other stories with our records and try again.",
-        "guardCleared": "Sergeant Alric has already accounted for this soldier.",
-        "revealed": "The creature has shed this face. Defeat it.",
-        "defeat": "Defeat the revealed infiltrator.",
-        "heard": "Guards questioned: {count}/4",
-        "clues": "Records examined: {count}/2",
+        "title": "Um Rosto Emprestado",
+        "objective": "Desmascare e derrote o infiltrado",
+        "briefing": "Uma criatura roubou o rosto de um soldado. Leia as ordens permanentes e o registro de vigia, interrogue os quatro guardas e depois volte para apontar aquele cuja história contradiz nossos registros.",
+        "instructions": "Leia as ordens permanentes e o registro de vigia, depois interrogue os quatro guardas. Compare as histórias deles com os registros.",
+        "confront": "Reporte-se ao Sargento Alric e aponte o guarda cuja história contradiz os registros.",
+        "name": "Qual dos meus guardas está usando um rosto emprestado?",
+        "accuseOption": "Acusar {name}",
+        "cleared": "Sargento Alric: Esse soldado está contabilizado. Compare as outras histórias com nossos registros e tente de novo.",
+        "guardCleared": "O Sargento Alric já contabilizou esse soldado.",
+        "revealed": "A criatura descartou esse rosto. Derrote-a.",
+        "defeat": "Derrote o infiltrado revelado.",
+        "heard": "Guardas interrogados: {count}/4",
+        "clues": "Registros examinados: {count}/2",
         "clueNames": {
-          "c0": "Standing Orders",
-          "c1": "Watch Ledger"
+          "c0": "Ordens Permanentes",
+          "c1": "Registro de Vigia"
         },
         "variants": {
           "v0": {
-            "clue0": "The south bridge has been closed since dawn. All patrols must use the western road.",
-            "clue1": "Orin was assigned to gate duty. Nella, Bram and Tessa patrolled the western road.",
-            "guard0": "My patrol took the western road this morning.",
-            "guard1": "I crossed the south bridge on my morning patrol.",
-            "guard2": "I patrolled the western road with Nella and Tessa.",
-            "guard3": "The south bridge is closed. We used the western road."
+            "clue0": "A ponte sul está fechada desde o amanhecer. Todas as patrulhas devem usar a estrada oeste.",
+            "clue1": "Orin foi designado para o serviço no portão. Nella, Bram e Tessa patrulharam a estrada oeste.",
+            "guard0": "Minha patrulha pegou a estrada oeste hoje de manhã.",
+            "guard1": "Atravessei a ponte sul na minha patrulha da manhã.",
+            "guard2": "Patrulhei a estrada oeste com Nella e Tessa.",
+            "guard3": "A ponte sul está fechada. Usamos a estrada oeste."
           },
           "v1": {
-            "clue0": "Today's password is Reedwatch. Yesterday's password, Lantern, is no longer valid.",
-            "clue1": "All four guards were briefed on the new password at dawn.",
-            "guard0": "Reedwatch. I learned the new password at dawn.",
-            "guard1": "Lantern was yesterday's password. Today we use Reedwatch.",
-            "guard2": "All four of us attended the dawn briefing.",
-            "guard3": "Today's password is Lantern. I heard it at the dawn briefing."
+            "clue0": "A senha de hoje é Reedwatch. A senha de ontem, Lanterna, não é mais válida.",
+            "clue1": "Os quatro guardas foram informados da nova senha ao amanhecer.",
+            "guard0": "Reedwatch. Aprendi a nova senha ao amanhecer.",
+            "guard1": "Lanterna era a senha de ontem. Hoje usamos Reedwatch.",
+            "guard2": "Nós quatro comparecemos ao briefing do amanhecer.",
+            "guard3": "A senha de hoje é Lanterna. Ouvi isso no briefing do amanhecer."
           },
           "v2": {
-            "clue0": "All garrison supply crates must carry blue wax seals. Reject any crate with a red seal.",
-            "clue1": "Today's delivery was inspected: every crate had an intact blue wax seal.",
-            "guard0": "I inspected today's delivery. Every crate had a red wax seal.",
-            "guard1": "We only accept crates sealed with blue wax.",
-            "guard2": "The ledger records blue seals on today's delivery.",
-            "guard3": "No crates with red seals were accepted today."
+            "clue0": "Todos os caixotes de suprimentos da guarnição devem ter selos de cera azul. Rejeite qualquer caixote com selo vermelho.",
+            "clue1": "A entrega de hoje foi inspecionada: todo caixote tinha um selo de cera azul intacto.",
+            "guard0": "Inspecionei a entrega de hoje. Todo caixote tinha um selo de cera vermelho.",
+            "guard1": "Só aceitamos caixotes selados com cera azul.",
+            "guard2": "O registro anota selos azuis na entrega de hoje.",
+            "guard3": "Nenhum caixote com selo vermelho foi aceito hoje."
           },
           "v3": {
-            "clue0": "The night watch relights the east beacon at dusk. The west beacon stays dark until the ferry signals.",
-            "clue1": "Nella and Orin held the gate through the night. Bram and Tessa walked the causeway and relit the east beacon at dusk.",
-            "guard0": "Orin and I had the gate all night. Nothing came through but the fog.",
-            "guard1": "Gate duty with Nella. We watched the east beacon come alight at dusk, as ordered.",
-            "guard2": "Tessa and I walked the causeway. We lit the west beacon at dusk so the ferry could see us.",
-            "guard3": "Causeway patrol with Bram. We relit the east beacon the moment the sun went down."
+            "clue0": "A vigia noturna reacende o farol leste ao entardecer. O farol oeste permanece apagado até a balsa sinalizar.",
+            "clue1": "Nella e Orin guardaram o portão durante a noite toda. Bram e Tessa percorreram a calçada e reacenderam o farol leste ao entardecer.",
+            "guard0": "Orin e eu ficamos no portão a noite toda. Nada passou além da neblina.",
+            "guard1": "Serviço no portão com Nella. Vimos o farol leste acender ao entardecer, como ordenado.",
+            "guard2": "Tessa e eu percorremos a calçada. Acendemos o farol oeste ao entardecer para que a balsa nos visse.",
+            "guard3": "Patrulha da calçada com Bram. Reacendemos o farol leste no instante em que o sol se pôs."
           },
           "v4": {
-            "clue0": "The quartermaster's cart arrives at noon by the north road. No supplies come by water while the marsh is flooded.",
-            "clue1": "Noon delivery received from the north road. Tessa signed for it; Bram and Nella unloaded; Orin was at the well.",
-            "guard0": "I helped Bram unload the cart at noon. Salt pork and lamp oil, the usual.",
-            "guard1": "I unloaded the noon delivery myself, straight off the supply barge.",
-            "guard2": "Nella and I carried the crates in. Tessa signed the ledger.",
-            "guard3": "The cart came up the north road at noon. I signed for it."
+            "clue0": "A carroça do intendente chega ao meio-dia pela estrada norte. Nenhum suprimento vem pela água enquanto o pântano estiver inundado.",
+            "clue1": "Entrega do meio-dia recebida pela estrada norte. Tessa assinou o recebimento; Bram e Nella descarregaram; Orin estava no poço.",
+            "guard0": "Ajudei Bram a descarregar a carroça ao meio-dia. Toucinho salgado e óleo de lamparina, o de sempre.",
+            "guard1": "Descarreguei a entrega do meio-dia sozinho, direto da balsa de suprimentos.",
+            "guard2": "Nella e eu carregamos os caixotes para dentro. Tessa assinou o registro.",
+            "guard3": "A carroça veio pela estrada norte ao meio-dia. Eu assinei o recebimento."
           },
           "v5": {
-            "clue0": "The fallen from the last raid lie in the chapel crypt. Nobody enters the crypt without the sergeant's key.",
-            "clue1": "The sergeant's key has not left his belt since the raid. Nella, Orin and Bram stood the wall; Tessa kept the yard.",
-            "guard0": "I stood the wall. The crypt has stayed locked since the raid; only the sergeant holds the key.",
-            "guard1": "Wall duty with Nella and Bram. Quiet, except for the frogs.",
-            "guard2": "The wall, all day. Nobody has been near the crypt.",
-            "guard3": "I kept the yard and looked in on the crypt this morning. The fallen are resting."
+            "clue0": "Os caídos do último ataque jazem na cripta da capela. Ninguém entra na cripta sem a chave do sargento.",
+            "clue1": "A chave do sargento não saiu do cinto dele desde o ataque. Nella, Orin e Bram vigiaram a muralha; Tessa cuidou do pátio.",
+            "guard0": "Vigiei a muralha. A cripta permanece trancada desde o ataque; só o sargento tem a chave.",
+            "guard1": "Serviço na muralha com Nella e Bram. Tudo quieto, exceto pelos sapos.",
+            "guard2": "A muralha, o dia todo. Ninguém chegou perto da cripta.",
+            "guard3": "Cuidei do pátio e dei uma olhada na cripta esta manhã. Os caídos estão descansando."
           }
         }
       },
       "horde": {
-        "title": "The Last Barricade",
-        "objective": "Defend the barricade and defeat the horde commander",
-        "ready": "Speak to the barricade captain to begin.",
-        "countdown": "Horde incoming in {seconds}s!",
-        "status": "{seconds}s left. Kills: {kills}. Barricade: {barrier}%.",
-        "upgrade": "Weapon: {weapon}",
-        "loadout": "Shots: {count} | +{speed}% speed | {weapon}",
-        "exit": "Leave defense",
-        "gained": "Upgrade: {upgrade}",
-        "killBurst": "+{count} defeated!",
+        "title": "A Última Barricada",
+        "objective": "Defenda a barricada e derrote o comandante da horda",
+        "ready": "Fale com o capitão da barricada para começar.",
+        "countdown": "Horda chegando em {seconds}s!",
+        "status": "{seconds}s restantes. Abates: {kills}. Barricada: {barrier}%.",
+        "upgrade": "Arma: {weapon}",
+        "loadout": "Tiros: {count} | +{speed}% de velocidade | {weapon}",
+        "exit": "Sair da defesa",
+        "gained": "Melhoria: {upgrade}",
+        "killBurst": "+{count} derrotados!",
         "choices": {
-          "projectile": "+1 shot",
-          "haste": "+25% fire rate",
-          "pierce": "Piercing shots",
-          "explosive": "Explosive shots",
-          "double": "x2 shots"
+          "projectile": "+1 tiro",
+          "haste": "+25% de cadência de tiro",
+          "pierce": "Tiros perfurantes",
+          "explosive": "Tiros explosivos",
+          "double": "x2 tiros"
         },
         "weapons": {
-          "0": "Repeater",
-          "1": "Twin Shot",
-          "2": "Piercing Shot",
-          "3": "Explosive Shot"
+          "0": "Repetidora",
+          "1": "Tiro Duplo",
+          "2": "Tiro Perfurante",
+          "3": "Tiro Explosivo"
         },
-        "controls": "Auto-fire. A/D, arrows or joystick. Backward: leave.",
-        "supplies": "Break one crate to choose. The other disappears!",
-        "result": "{rating}! Score: {score}.",
-        "resultStats": "Kills: {kills}. Barricade: {barrier}%.",
-        "failed": "Defense failed. Try again!",
-        "replay": "Speak to the captain to retry. Rewards once per rotation.",
+        "controls": "Disparo automático. A/D, setas ou joystick. Para trás: sair.",
+        "supplies": "Quebre um caixote para escolher. O outro desaparece!",
+        "result": "{rating}! Pontuação: {score}.",
+        "resultStats": "Abates: {kills}. Barricada: {barrier}%.",
+        "failed": "Defesa fracassada. Tente de novo!",
+        "replay": "Fale com o capitão para tentar de novo. Recompensas uma vez por rotação.",
         "medals": {
-          "gold": "Gold",
-          "silver": "Silver",
+          "gold": "Ouro",
+          "silver": "Prata",
           "bronze": "Bronze"
         }
       },
       "wispMaze": {
-        "leave": "Leave maze",
-        "title": "Wispwood Maze",
-        "objective": "Recover every stolen coin purse from the maze",
-        "ready": "Speak to the maze keeper to begin.",
-        "controls": "Move through the maze to pick up the coin purses. Avoid the shadows. Radiant wisps let you banish shadows for a short time.",
-        "collected": "Coin purses: {count}/{total}",
-        "lives": "Lives: {count}/3",
-        "power": "Wisp power: {seconds}s",
-        "countdown": "Starting in {seconds}s",
-        "collect": "Pick up the coin purses. Avoid shadows.",
-        "powered": "Power surge! Touch shadows to banish them.",
-        "finished": "Every coin purse is recovered!",
-        "retry": "Three lives restored. Try the maze again.",
-        "startNormal": "Enter the maze: Normal ({shadows} shadows)",
-        "startHard": "Enter the maze: Hard ({shadows} shadows)"
+        "leave": "Sair do labirinto",
+        "title": "Labirinto do Bosque dos Fogos-Fátuos",
+        "objective": "Recupere todas as bolsas de moedas roubadas do labirinto",
+        "ready": "Fale com o guardião do labirinto para começar.",
+        "controls": "Mova-se pelo labirinto para pegar as bolsas de moedas. Evite as sombras. Fogos-fátuos radiantes permitem banir as sombras por um curto período.",
+        "collected": "Bolsas de moedas: {count}/{total}",
+        "lives": "Vidas: {count}/3",
+        "power": "Poder do fogo-fátuo: {seconds}s",
+        "countdown": "Começando em {seconds}s",
+        "collect": "Pegue as bolsas de moedas. Evite as sombras.",
+        "powered": "Surto de poder! Toque as sombras para baní-las.",
+        "finished": "Todas as bolsas de moedas foram recuperadas!",
+        "retry": "Três vidas restauradas. Tente o labirinto de novo.",
+        "startNormal": "Entrar no labirinto: Normal ({shadows} sombras)",
+        "startHard": "Entrar no labirinto: Difícil ({shadows} sombras)"
       },
       "forge": {
-        "title": "A Helping Hammer",
-        "objective": "Help Smith Mara forge a shield",
-        "ready": "Speak to Smith Mara to begin.",
-        "countdown": "Ready your hands! Starting in {seconds}s.",
-        "preparing": "Nicely done! Next request...",
-        "fuel": "Woodpile",
-        "metal": "Ingot Crate",
-        "water": "Well",
-        "tools": "Anvil",
+        "title": "Uma Mão no Martelo",
+        "objective": "Ajude a Ferreira Mara a forjar um escudo",
+        "ready": "Fale com a Ferreira Mara para começar.",
+        "countdown": "Prepare as mãos! Começando em {seconds}s.",
+        "preparing": "Muito bem! Próximo pedido...",
+        "fuel": "Pilha de Lenha",
+        "metal": "Caixote de Lingotes",
+        "water": "Poço",
+        "tools": "Bigorna",
         "request": {
-          "fuel": "Stoke the fire! Add some wood!",
-          "metal": "More metal! Open the ingot crate!",
-          "water": "Cool it down! Water from the well!",
-          "tools": "Hammer it into shape! Use the anvil!"
+          "fuel": "Atice o fogo! Adicione lenha!",
+          "metal": "Mais metal! Abra o caixote de lingotes!",
+          "water": "Resfrie! Água do poço!",
+          "tools": "Martele até dar forma! Use a bigorna!"
         },
-        "sequence": "{instruction} Then click the {next}.",
-        "round": "Request {round}/{total}: step {step}/{steps}",
-        "thresholds": "Gold: {gold}s or less. Silver: {silver}s or less.",
-        "starting": "Getting ready...",
-        "finished": "Fine work! A shield fit for the garrison!",
-        "failed": "Too many mistakes! The metal cracked. Speak to Mara to try again.",
-        "wrong": "Wrong tool! +{penalty}s. Try the requested object.",
-        "correct": "That is it! Keep going.",
-        "result": "{rating}! {seconds}s. Mistakes: {mistakes}.",
-        "replay": "Speak to Mara to try again. Rewards are earned once per rotation.",
+        "sequence": "{instruction} Depois clique em {next}.",
+        "round": "Pedido {round}/{total}: etapa {step}/{steps}",
+        "thresholds": "Ouro: {gold}s ou menos. Prata: {silver}s ou menos.",
+        "starting": "Preparando...",
+        "finished": "Bom trabalho! Um escudo digno da guarnição!",
+        "failed": "Erros demais! O metal rachou. Fale com Mara para tentar de novo.",
+        "wrong": "Ferramenta errada! +{penalty}s. Tente o objeto pedido.",
+        "correct": "Isso mesmo! Continue.",
+        "result": "{rating}! {seconds}s. Erros: {mistakes}.",
+        "replay": "Fale com Mara para tentar de novo. As recompensas são ganhas uma vez por rotação.",
         "medals": {
-          "gold": "Gold",
-          "silver": "Silver",
+          "gold": "Ouro",
+          "silver": "Prata",
           "bronze": "Bronze"
         },
-        "strike": "Strike",
-        "strikeTip": "Hammer the piece. Press when the needle crosses the dark band; the band narrows and the needle quickens with every good blow. A blow outside the band, or on a cold forge, costs three seconds.",
-        "stoke": "Stoke",
-        "stokeTip": "Throw wood on the fire. The forge cools all the time; keep its heat above {floor} or your blows land cold.",
-        "strikes": "Strikes: {count}/{total}",
-        "heat": "Forge heat: {value} (keep above {floor})",
-        "mistakes": "Mistakes: {count}",
-        "meterAria": "Hammer timing meter",
-        "hintStrike": "Watch the needle. Strike inside the dark band!",
-        "hintStoke": "The forge is cooling! Stoke the fire before you strike.",
-        "hit": "Clean blow! The band narrows.",
-        "miss": "Missed the band! +{penalty}s.",
-        "cold": "Cold strike! Stoke the fire first. +{penalty}s."
+        "strike": "Golpear",
+        "strikeTip": "Martele a peça. Pressione quando o ponteiro cruzar a faixa escura; a faixa se estreita e o ponteiro acelera a cada bom golpe. Um golpe fora da faixa, ou numa forja fria, custa três segundos.",
+        "stoke": "Atiçar",
+        "stokeTip": "Jogue lenha no fogo. A forja esfria o tempo todo; mantenha o calor acima de {floor} ou seus golpes caem frios.",
+        "strikes": "Golpes: {count}/{total}",
+        "heat": "Calor da forja: {value} (mantenha acima de {floor})",
+        "mistakes": "Erros: {count}",
+        "meterAria": "Medidor de tempo do martelo",
+        "hintStrike": "Observe o ponteiro. Golpeie dentro da faixa escura!",
+        "hintStoke": "A forja está esfriando! Atice o fogo antes de golpear.",
+        "hit": "Golpe limpo! A faixa se estreita.",
+        "miss": "Errou a faixa! +{penalty}s.",
+        "cold": "Golpe frio! Atice o fogo primeiro. +{penalty}s."
       },
       "glider": {
-        "title": "Windrider Slalom",
-        "boost": "Extra Speed",
-        "boostTip": "Increase your flight speed by {speed} yd/s, up to {maximum} yd/s. Available while flying. Recharges in {seconds} seconds.",
-        "objective": "Soar through the wind rings and land in the marked zone",
-        "ready": "Speak to Flightmaster Zephyr to launch.",
-        "replay": "Fly again",
-        "practiceRewards": "Practice flight: improve your time without earning more coins, experience or reputation.",
-        "countdown": "Launch in {count}... Hold tight!",
-        "flying": "Rings: {rings}/{total} | Time: {time}s | Speed: {speed} yd/s",
-        "climb": "Climb",
-        "climbTip": "Hold to pull the nose up and trade speed for height. Tap for a short nudge. Slow flight loses lift.",
-        "dive": "Dive",
-        "diveTip": "Hold to point the nose down and gain speed. Tap for a short nudge.",
-        "controls": "Hold right mouse and look up to climb at the cost of speed; look down to dive and gain speed. Slow flight loses lift. Left/right steer; backward brakes. Jump or swim up/down also control pitch. Fly forward through wind tunnels for a speed boost, once per tunnel per attempt.",
-        "landed": "{rating}! Passed {rings}/{total} rings in {time}s.",
-        "failed": "Descent failed! Landed off course or missed too many rings.",
-        "retry": "Talk to Zephyr to retry, or to Skye by the landing zone to return to the launch point.",
-        "nextRing": "Aim through the next wind ring along the canyon. Clear at least {minimum} rings, then land in the marked zone.",
-        "landing": "All rings cleared! Steer onto the landing zone ahead.",
-        "complete": "Landing complete!",
-        "score": "Score: {score}.",
+        "title": "Slalom do Cavaleiro do Vento",
+        "boost": "Velocidade Extra",
+        "boostTip": "Aumenta sua velocidade de voo em {speed} jardas/s, até {maximum} jardas/s. Disponível enquanto voa. Recarrega em {seconds} segundos.",
+        "objective": "Voe pelos anéis de vento e pouse na zona marcada",
+        "ready": "Fale com o Mestre de Voo Zéfiro para lançar-se.",
+        "replay": "Voar novamente",
+        "practiceRewards": "Voo de prática: melhore seu tempo sem ganhar mais moedas, experiência ou reputação.",
+        "countdown": "Lançamento em {count}... Segure firme!",
+        "flying": "Anéis: {rings}/{total} | Tempo: {time}s | Velocidade: {speed} jardas/s",
+        "climb": "Subir",
+        "climbTip": "Segure para puxar o nariz para cima e trocar velocidade por altura. Toque rapidamente para um pequeno ajuste. Voo lento perde sustentação.",
+        "dive": "Mergulhar",
+        "diveTip": "Segure para apontar o nariz para baixo e ganhar velocidade. Toque rapidamente para um pequeno ajuste.",
+        "controls": "Segure o botão direito do mouse e olhe para cima para subir ao custo de velocidade; olhe para baixo para mergulhar e ganhar velocidade. Voo lento perde sustentação. Esquerda/direita para guiar; para trás para frear. Pular ou nadar para cima/baixo também controla a inclinação. Voe para frente através dos túneis de vento para um impulso de velocidade, uma vez por túnel a cada tentativa.",
+        "landed": "{rating}! Passou por {rings}/{total} anéis em {time}s.",
+        "failed": "Descida fracassada! Pouso fora da rota ou anéis demais perdidos.",
+        "retry": "Fale com Zéfiro para tentar de novo, ou com Skye perto da zona de pouso para voltar ao ponto de lançamento.",
+        "nextRing": "Mire no próximo anel de vento ao longo do cânion. Passe por pelo menos {minimum} anéis e pouse na zona marcada.",
+        "landing": "Todos os anéis superados! Guie-se até a zona de pouso à frente.",
+        "complete": "Pouso concluído!",
+        "score": "Pontuação: {score}.",
         "medals": {
-          "gold": "Gold",
-          "silver": "Silver",
+          "gold": "Ouro",
+          "silver": "Prata",
           "bronze": "Bronze"
         }
       },
-      "calligraphyTitle": "Arcane Calligraphy",
-      "traceOutline": "Trace the outline with your footsteps",
-      "traceRoundInstruction": "Round {round} of {total}: {shape}. {instruction}",
+      "calligraphyTitle": "Caligrafia Arcana",
+      "traceOutline": "Trace o contorno com seus passos",
+      "traceRoundInstruction": "Rodada {round} de {total}: {shape}. {instruction}",
       "traceShape": {
-        "triangle": "Triangle",
-        "square": "Square",
-        "star": "Star",
-        "hourglass": "Hourglass",
-        "lightning": "Lightning Rune",
-        "spiral": "Angular Spiral",
-        "double-triangle": "Twin-Triangle Sigil",
-        "diamond": "Diamond",
-        "pentagon": "Pentagon",
-        "arrow": "Arrow Rune",
-        "zigzag": "Zigzag Sigil",
-        "cross": "Cross Rune"
+        "triangle": "Triângulo",
+        "square": "Quadrado",
+        "star": "Estrela",
+        "hourglass": "Ampulheta",
+        "lightning": "Runa de Raio",
+        "spiral": "Espiral Angular",
+        "double-triangle": "Sigilo de Triângulo Duplo",
+        "diamond": "Losango",
+        "pentagon": "Pentágono",
+        "arrow": "Runa de Flecha",
+        "zigzag": "Sigilo em Zigue-zague",
+        "cross": "Runa de Cruz"
       },
       "traceRating": {
         "bronze": "Bronze",
-        "silver": "Silver",
-        "gold": "Gold"
+        "silver": "Prata",
+        "gold": "Ouro"
       },
-      "traceScoreResult": "Complete! {rating}: {score}/{total}. Base reward unchanged. Gold: deed, title, +10 Renown.",
+      "traceScoreResult": "Concluído! {rating}: {score}/{total}. Recompensa base inalterada. Ouro: feito, título, +10 de Renome.",
       "traceCompletionLog": "{completion} {result}",
-      "traceUnavailable": "This rune needs a newer game version.",
+      "traceUnavailable": "Esta runa exige uma versão mais recente do jogo.",
       "traceReaction": {
-        "tessaTriangle": "Three corners, and every one in its place!",
-        "pipSquare": "Four sides! I think I can do that too!",
-        "elianFinal": "Final rune. A line may cross or revisit a point; follow the bright marker to the next corner.",
-        "elianGold": "Beautifully traced! Your steps have earned their place in gold.",
-        "elianComplete": "A complete rune! Care and practice will make your next one even finer."
+        "tessaTriangle": "Três cantos, e cada um no seu lugar!",
+        "pipSquare": "Quatro lados! Acho que eu também consigo fazer isso!",
+        "elianFinal": "Runa final. Uma linha pode cruzar ou revisitar um ponto; siga o marcador brilhante até o próximo canto.",
+        "elianGold": "Traçado com beleza! Seus passos conquistaram seu lugar em ouro.",
+        "elianComplete": "Uma runa completa! Cuidado e prática vão deixar a próxima ainda melhor."
       },
-      "traceReady": "Speak to the instructor to begin.",
-      "tracePreview": "Watch the outline. Golden sparkles will guide you.",
-      "traceStart": "Move to the start marker. Trace either way.",
-      "traceDrawing": "Follow golden sparkles to the bright corner. Blue marks your trail.",
-      "traceSuccess": "Outline complete!",
-      "traceRetry": "Speak to the instructor to try again.",
-      "traceOffPath": "You left the outline. Speak to the instructor to retry.",
-      "traceMovement": "Stay on foot and on the ground. Speak to the instructor to retry.",
-      "traceTimeout": "Time ran out. Speak to the instructor to retry.",
-      "traceCombat": "Leave combat, then speak to the instructor to retry.",
-      "puzzleTitle": "Ley Beam Alignment",
-      "puzzleBeamReach": "Crystals reached: {count}",
-      "puzzleVictoryTitle": "Perfect alignment",
-      "puzzleVictoryDetail": "The ley beam has reached its destination.",
-      "puzzleDefeatTitle": "Alignment lost",
-      "puzzleDefeatDetail": "The current has faded. The ritual is unfinished.",
-      "puzzleReturn": "Return to realm",
+      "traceReady": "Fale com o instrutor para começar.",
+      "tracePreview": "Observe o contorno. Fagulhas douradas vão guiar você.",
+      "traceStart": "Vá até o marcador inicial. Trace em qualquer direção.",
+      "traceDrawing": "Siga as fagulhas douradas até o canto brilhante. O azul marca seu rastro.",
+      "traceSuccess": "Contorno concluído!",
+      "traceRetry": "Fale com o instrutor para tentar de novo.",
+      "traceOffPath": "Você saiu do contorno. Fale com o instrutor para tentar de novo.",
+      "traceMovement": "Fique a pé e no chão. Fale com o instrutor para tentar de novo.",
+      "traceTimeout": "O tempo acabou. Fale com o instrutor para tentar de novo.",
+      "traceCombat": "Saia do combate e depois fale com o instrutor para tentar de novo.",
+      "puzzleTitle": "Alinhamento do Feixe Ley",
+      "puzzleBeamReach": "Cristais alcançados: {count}",
+      "puzzleVictoryTitle": "Alinhamento perfeito",
+      "puzzleVictoryDetail": "O feixe ley alcançou seu destino.",
+      "puzzleDefeatTitle": "Alinhamento perdido",
+      "puzzleDefeatDetail": "A corrente se dissipou. O ritual ficou incompleto.",
+      "puzzleReturn": "Retornar ao reino",
       "puzzleResultAnnouncement": "{title}. {detail} {reach}.",
-      "puzzleLevel": "Daily level {level}",
-      "puzzleBonusLevel": "Bonus level {level} of {total}",
-      "puzzleBonusCharged": "Practice level {level} of {total} awaits. Touch the Ley Cache again. Further rounds give no rewards.",
-      "puzzleBonusPaid": "Practice level cleared!",
-      "puzzleBonusDone": "Every practice level cleared. Touch the Ley Cache to play again.",
-      "puzzleInstructions": "Rotate the tiles to carry the beam from the source to the destination.",
-      "puzzleRotateTile": "Rotate tile {tile}",
-      "puzzleConnectors": "Connectors: {connectors}.",
-      "puzzlePowered": "The beam reaches this tile.",
-      "puzzleUnpowered": "The beam does not reach this tile.",
-      "puzzleClose": "Close ley beam puzzle",
-      "puzzleSource": "Source",
-      "puzzleTarget": "Destination",
-      "puzzleSourceEndpoint": "Source: {direction}.",
-      "puzzleTargetEndpoint": "Destination: {direction}.",
+      "puzzleLevel": "Nível diário {level}",
+      "puzzleBonusLevel": "Nível bônus {level} de {total}",
+      "puzzleBonusCharged": "O nível de prática {level} de {total} aguarda. Toque no Esconderijo Ley novamente. Rodadas adicionais não dão recompensas.",
+      "puzzleBonusPaid": "Nível de prática concluído!",
+      "puzzleBonusDone": "Todo nível de prática foi concluído. Toque no Esconderijo Ley para jogar de novo.",
+      "puzzleInstructions": "Gire os blocos para levar o feixe da fonte até o destino.",
+      "puzzleRotateTile": "Girar bloco {tile}",
+      "puzzleConnectors": "Conectores: {connectors}.",
+      "puzzlePowered": "O feixe alcança este bloco.",
+      "puzzleUnpowered": "O feixe não alcança este bloco.",
+      "puzzleClose": "Fechar quebra-cabeça do feixe ley",
+      "puzzleSource": "Fonte",
+      "puzzleTarget": "Destino",
+      "puzzleSourceEndpoint": "Fonte: {direction}.",
+      "puzzleTargetEndpoint": "Destino: {direction}.",
       "puzzleTileAria": "{rotation} {connectors} {power} {source} {target}",
-      "puzzleRetry": "Try again",
+      "puzzleRetry": "Tentar de novo",
       "puzzleTimer": "{seconds}s",
-      "puzzleTimerAria": "Time remaining: {seconds} seconds",
-      "startQuest": "Start World Quest",
-      "startEscort": "Start Escort",
-      "escortTitle": "Caravan",
-      "alreadyCompleted": "You have already completed this World Quest for this cycle.",
-      "replay": "Play again",
-      "practiceRewards": "Practice: play again without earning more coins, experience or reputation.",
-      "inProgress": "This World Quest is already underway.",
-      "match3Title": "Confection Cascade",
-      "match3Instructions": "Select two adjacent confections. A swap only counts when it creates a line of three or more.",
-      "match3Moves": "Moves: {current}/{total}",
-      "match3Cleared": "Confections cleared: {current}/{total}",
+      "puzzleTimerAria": "Tempo restante: {seconds} segundos",
+      "startQuest": "Iniciar Missão Mundial",
+      "startEscort": "Iniciar Escolta",
+      "escortTitle": "Caravana",
+      "alreadyCompleted": "Você já concluiu esta Missão Mundial neste ciclo.",
+      "replay": "Jogar de novo",
+      "practiceRewards": "Prática: jogue de novo sem ganhar mais moedas, experiência ou reputação.",
+      "inProgress": "Esta Missão Mundial já está em andamento.",
+      "match3Title": "Cascata de Confeitos",
+      "match3Instructions": "Selecione dois confeitos adjacentes. Uma troca só conta quando cria uma linha de três ou mais.",
+      "match3Moves": "Movimentos: {current}/{total}",
+      "match3Cleared": "Confeitos eliminados: {current}/{total}",
       "match3Announcement": "{moves}. {cleared}.",
-      "match3Cell": "Row {row}, column {column}: {candy}",
-      "match3Selected": "Selected",
-      "match3Reset": "Restart level",
-      "match3Close": "Close confection puzzle",
-      "match3OutOfMoves": "No moves remain. Restart the level to try again.",
-      "match3VictoryTitle": "Sweet victory",
-      "match3VictoryDetail": "The enchanted collection is complete.",
-      "match3DefeatTitle": "Bitter defeat",
-      "match3DefeatDetail": "Your moves are spent. A fresh collection awaits.",
-      "match3TryAgain": "Try again",
+      "match3Cell": "Linha {row}, coluna {column}: {candy}",
+      "match3Selected": "Selecionado",
+      "match3Reset": "Reiniciar nível",
+      "match3Close": "Fechar quebra-cabeça de confeitos",
+      "match3OutOfMoves": "Não restam movimentos. Reinicie o nível para tentar de novo.",
+      "match3VictoryTitle": "Doce vitória",
+      "match3VictoryDetail": "A coleção encantada está completa.",
+      "match3DefeatTitle": "Derrota amarga",
+      "match3DefeatDetail": "Seus movimentos acabaram. Uma nova coleção aguarda.",
+      "match3TryAgain": "Tentar de novo",
       "match3ResultAnnouncement": "{title}. {detail} {moves}. {cleared}.",
       "match3ResultSummary": "{title}. {detail} {cleared}.",
       "semanticSummary": "{name}. {progress}. {reward}.",
       "semanticSummaryTimed": "{name}. {progress}. {reward}. {time}.",
       "match3Candy": {
-        "berry": "berry crystal",
-        "citrus": "citrus orb",
-        "mint": "mint triangle",
-        "grape": "grape square",
-        "star": "sugar star"
+        "berry": "cristal de amora",
+        "citrus": "orbe cítrico",
+        "mint": "triângulo de menta",
+        "grape": "quadrado de uva",
+        "star": "estrela de açúcar"
       }
     },
     "logs": {
       "accepted": "Missão aceita: {name}",
-      "worldQuestStarted": "World quest started: {name}",
+      "worldQuestStarted": "Missão mundial iniciada: {name}",
       "abandoned": "Missão abandonada: {name}",
       "completed": "Missão concluída: {name}",
       "ready": "{name} ({status})",
       "progress": "{label}: {current}/{total}",
-      "clueScrollEarned": "Every world quest of the day is done: a Clue Scroll is yours.",
-      "clueScrollLost": "Every world quest of the day is done, but you cannot hold another Clue Scroll.",
-      "clueHuntStarted": "Treasure hunt begun: {title}",
-      "clueHuntStep": "Clue {step} of {total} solved: {title}",
-      "clueHuntDone": "Treasure hunt complete: {title}. The casket is yours.",
-      "clueHuntAbandoned": "Treasure hunt abandoned: {title}",
-      "clueCasketOpened": "The casket holds {money} and {items}."
+      "clueScrollEarned": "Todas as missões mundiais do dia estão concluídas: um Pergaminho de Pista é seu.",
+      "clueScrollLost": "Todas as missões mundiais do dia estão concluídas, mas você não pode carregar outro Pergaminho de Pista.",
+      "clueHuntStarted": "Caça ao tesouro iniciada: {title}",
+      "clueHuntStep": "Pista {step} de {total} resolvida: {title}",
+      "clueHuntDone": "Caça ao tesouro concluída: {title}. O baú é seu.",
+      "clueHuntAbandoned": "Caça ao tesouro abandonada: {title}",
+      "clueCasketOpened": "O baú guarda {money} e {items}."
     },
     "errors": {
       "unavailable": "Essa missão não está disponível.",
@@ -12642,12 +12642,12 @@ export const pt_BR: EnTranslations = {
       "reclaim": "Recuperar",
       "buyAria": "Comprar {item} por {price}",
       "reclaimAria": "Recuperar {item}",
-      "buyQuantityAria": "How many {item} to buy (of {total})",
-      "buyQuantityBtnAria": "Buy this many {item}",
+      "buyQuantityAria": "Quantos {item} comprar (de {total})",
+      "buyQuantityBtnAria": "Comprar essa quantidade de {item}",
       "buyConfirmTitle": "Confirmar compra",
       "buyConfirmBody": "Comprar {item} por {price}?",
       "buyConfirmBodyStack": "Comprar {item} x{count} por {price} ({each} cada)?",
-      "buyConfirmBodyPartial": "Buy {count} of {item} (of {total} listed) for {price} ({each} each)?",
+      "buyConfirmBodyPartial": "Comprar {count} de {item} (de {total} listados) por {price} ({each} cada)?",
       "buyConfirmAccept": "Comprar",
       "buyConfirmCancel": "Cancelar",
       "buyChanged": "Esse anúncio mudou antes que você confirmasse. Verifique o preço e tente novamente.",
@@ -12677,44 +12677,44 @@ export const pt_BR: EnTranslations = {
       "collectNote": "Receitas e bens devolvidos que o Mercador guarda para você.",
       "saleProceeds": "Receitas da venda",
       "collectAll": "Coletar tudo",
-      "history": "History",
-      "historyEmpty": "No sales yet. Items you sell on the World Market show up here.",
-      "historyNote": "Your recent sales on the World Market.",
+      "history": "Histórico",
+      "historyEmpty": "Nenhuma venda ainda. Itens que você vender no Mercado Mundial aparecem aqui.",
+      "historyNote": "Suas vendas recentes no Mercado Mundial.",
       "saleBuyer": "Vendido para {buyer}",
       "saleOlder": "Mais {count} vendas anteriores, incluídas no total.",
-      "ordersTab": "Wanted",
-      "ordersNote": "Post what you want and the gold is held at the Merchant. Listings at or under your price fill at once; the rest waits for a seller. The Merchant takes a {cut}% cut from whoever delivers. You have {used}/{max} orders open.",
-      "ordersListAria": "Open buy orders",
-      "ordersEmpty": "No open orders yet. Post one and gatherers will see what you need.",
-      "orderCardTitle": "Place an order",
-      "orderPickLabel": "Item wanted",
-      "orderPickEmpty": "Search for an item below, or pick one from the strip at the bottom.",
-      "orderSearchPlaceholder": "Search items...",
-      "orderSearchAria": "Search for an item to order",
-      "orderPickNone": "No item matches.",
-      "orderQuantity": "Units wanted",
-      "orderPriceEach": "Price each",
-      "orderEscrowLine": "Gold held at the Merchant: {total}",
-      "orderCannotAfford": "You cannot afford {total} for this order.",
-      "orderAtCap": "You have no free order slots. Withdraw one first.",
-      "orderPlaceButton": "Place Order",
-      "orderConfirmTitle": "Confirm Order",
-      "orderConfirmBody": "Order {item} x{count} at {each} each? {total} is held at the Merchant until the order is filled or withdrawn.",
-      "orderWanted": "x{count} wanted",
-      "orderBy": "Wanted by {buyer}",
-      "orderMine": "Your order",
-      "orderEach": "each",
-      "orderDeliver": "Deliver",
-      "orderDeliverAria": "Deliver {item} to {buyer}",
-      "orderDeliverNone": "None of this item in your bags.",
-      "orderWithdraw": "Withdraw",
-      "orderWithdrawAria": "Withdraw your order for {item}",
-      "orderDeliverConfirmTitle": "Confirm Delivery",
-      "orderDeliverConfirmBody": "Deliver {item} x{count} to {buyer} for {total} ({each} each)? You collect {proceeds} after the Merchant's cut.",
-      "unlistedTitle": "Not on the market",
-      "unlistedNote": "Materials with no listing at all. Post an order for one, or gather and list it.",
-      "unlistedNone": "Every material has at least one listing right now.",
-      "unlistedStageAria": "Order {item}"
+      "ordersTab": "Procurados",
+      "ordersNote": "Publique o que você quer e o ouro fica retido com o Mercador. Listagens no seu preço ou abaixo dele são atendidas na hora; o restante espera por um vendedor. O Mercador cobra {cut}% de quem entregar. Você tem {used}/{max} pedidos abertos.",
+      "ordersListAria": "Pedidos de compra abertos",
+      "ordersEmpty": "Nenhum pedido aberto ainda. Publique um e os coletores verão o que você precisa.",
+      "orderCardTitle": "Fazer um pedido",
+      "orderPickLabel": "Item procurado",
+      "orderPickEmpty": "Pesquise um item abaixo, ou escolha um na faixa no rodapé.",
+      "orderSearchPlaceholder": "Pesquisar itens...",
+      "orderSearchAria": "Pesquisar um item para pedir",
+      "orderPickNone": "Nenhum item corresponde.",
+      "orderQuantity": "Unidades desejadas",
+      "orderPriceEach": "Preço unitário",
+      "orderEscrowLine": "Ouro retido com o Mercador: {total}",
+      "orderCannotAfford": "Você não pode pagar {total} por este pedido.",
+      "orderAtCap": "Você não tem espaços livres para pedidos. Retire um primeiro.",
+      "orderPlaceButton": "Fazer Pedido",
+      "orderConfirmTitle": "Confirmar Pedido",
+      "orderConfirmBody": "Pedir {item} x{count} a {each} cada? {total} fica retido com o Mercador até que o pedido seja atendido ou retirado.",
+      "orderWanted": "x{count} procurados",
+      "orderBy": "Procurado por {buyer}",
+      "orderMine": "Seu pedido",
+      "orderEach": "cada",
+      "orderDeliver": "Entregar",
+      "orderDeliverAria": "Entregar {item} para {buyer}",
+      "orderDeliverNone": "Nenhuma unidade deste item nas suas bolsas.",
+      "orderWithdraw": "Retirar",
+      "orderWithdrawAria": "Retirar seu pedido de {item}",
+      "orderDeliverConfirmTitle": "Confirmar Entrega",
+      "orderDeliverConfirmBody": "Entregar {item} x{count} para {buyer} por {total} ({each} cada)? Você recebe {proceeds} após o corte do Mercador.",
+      "unlistedTitle": "Fora do mercado",
+      "unlistedNote": "Materiais sem nenhuma listagem. Publique um pedido para um deles, ou colete e liste-o.",
+      "unlistedNone": "Todo material tem pelo menos uma listagem no momento.",
+      "unlistedStageAria": "Pedir {item}"
     },
     "logs": {
       "listedItem": "{item} listado no Mercado Mundial por {money}.",
@@ -12723,11 +12723,11 @@ export const pt_BR: EnTranslations = {
       "collectedMoney": "Você coleta {money} com o Mercador.",
       "reclaimedItem": "{item} recuperado do mercado.",
       "expiredListing": "Sua listagem de {item} expirou e espera com o Mercador.",
-      "orderPlaced": "Placed an order for {item} x{count} at {each} each.",
-      "orderDelivered": "Delivered {item} x{count} to {buyer} for {money}. Collect {proceeds} from the Merchant.",
-      "orderReceived": "{seller} delivered {item} x{count} to your order. Collect it from the Merchant.",
-      "orderWithdrawn": "Withdrew your order for {item}; {money} returned.",
-      "orderExpired": "Your order for {item} expired; {money} waits at the Merchant.",
+      "orderPlaced": "Fez um pedido de {item} x{count} a {each} cada.",
+      "orderDelivered": "Entregou {item} x{count} para {buyer} por {money}. Colete {proceeds} com o Mercador.",
+      "orderReceived": "{seller} entregou {item} x{count} ao seu pedido. Colete-o com o Mercador.",
+      "orderWithdrawn": "Retirou seu pedido de {item}; {money} foi devolvido.",
+      "orderExpired": "Seu pedido de {item} expirou; {money} espera com o Mercador.",
       "boughtBackItem": "Você recomprou {item} por {money}."
     },
     "errors": {
@@ -12747,11 +12747,11 @@ export const pt_BR: EnTranslations = {
       "nothingToCollect": "Você não tem nada para coletar.",
       "sweepNoListings": "Nenhuma listagem desse item está disponível para varredura.",
       "sweepPriceChanged": "Os preços mudaram antes de sua varredura acontecer. Verifique a cotação e tente novamente.",
-      "orderCountNeeded": "Name how many you want.",
-      "tooManyOrders": "You may keep at most {count} orders open at once.",
-      "orderClosed": "That order is no longer open.",
-      "orderOwn": "That is your own order. Cancel it to withdraw it.",
-      "orderNotYours": "That is not your order."
+      "orderCountNeeded": "Informe quantos você quer.",
+      "tooManyOrders": "Você pode manter no máximo {count} pedidos abertos de uma vez.",
+      "orderClosed": "Esse pedido não está mais aberto.",
+      "orderOwn": "Esse é seu próprio pedido. Cancele-o para retirá-lo.",
+      "orderNotYours": "Esse pedido não é seu."
     },
     "loot": {
       "takeAll": "Pegar tudo",
@@ -13485,15 +13485,15 @@ export const pt_BR: EnTranslations = {
       },
       "lightning_overload": {
         "name": "Arc Overload",
-        "description": "Passive: Arc Bolt and Skybranch have a 20% chance to Overload, striking their first target again for 50% of the damage dealt and granting 1 Thunder. (Thundercall)"
+        "description": "Passiva: Raio em Arco e Relâmpago Bifurcado têm 20% de chance de sofrer Sobrecarga, atingindo o primeiro alvo novamente por 50% do dano causado e concedendo 1 de Trovão. (Distintivo de Chamado do Trovão)"
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
+        "description": "Causa {damage} de dano de Fogo. Sempre acerta criticamente um alvo que estiver queimando com seu Abalo de Brasa. Surto de Magma: cada tique de Abalo de Brasa tem 20% de chance de reiniciar este tempo de recarga e tornar seu próximo Magma Burst instantâneo em até 10 s. O dano aumenta com o Poder Mágico. (Distintivo de Chamado do Trovão)"
       },
       "thunderstorm": {
         "name": "Stormbreak",
-        "description": "Call down a thunderclap, dealing {damage} Nature damage to enemies within 10 yards and slowing them by 50% for 5 sec. Restores 8% of your maximum Mana. Damage increases with Spell Power. (Thundercall)"
+        "description": "Invoca um estrondo de trovão, causando {damage} de dano de Natureza a inimigos em um raio de 10 m e reduzindo a velocidade deles em 50% por 5 s. Restaura 8% da sua Mana máxima. O dano aumenta com o Poder Mágico. (Distintivo de Chamado do Trovão)"
       },
       "rockbiter_weapon": {
         "name": "Arma Pétrea",
@@ -15843,16 +15843,16 @@ export const pt_BR: EnTranslations = {
         "name": "Armadilha do Pântano Disparada"
       },
       "leyline_cache": {
-        "name": "Miniature Ley Cache"
+        "name": "Cofre Ley em Miniatura"
       },
       "confection_game_box": {
-        "name": "Confectioner's Game Box"
+        "name": "Caixa de Jogos do Confeiteiro"
       },
       "eastbrook_freight_crate": {
-        "name": "Eastbrook Freight Crate"
+        "name": "Caixote de Carga de Eastbrook"
       },
       "eastbrook_freight_wagon": {
-        "name": "Eastbrook Freight Wagon"
+        "name": "Carroça de Carga de Eastbrook"
       },
       "hearthlined_treads": {
         "name": "Botas Forradas para a Lareira"
@@ -16020,7 +16020,7 @@ export const pt_BR: EnTranslations = {
         "name": "Rédeas: Quebra-terra Fagulha do Terror"
       },
       "reins_avian_strider": {
-        "name": "Reins of the Viridian Valestrider"
+        "name": "Rédeas do Andarilho do Vale Viridiano"
       },
       "reins_goblin_rocket_sled": {
         "name": "Chave de ignição: Trenó-foguete goblin"
@@ -17394,421 +17394,421 @@ export const pt_BR: EnTranslations = {
         "name": "Botas de malha Hino da tempestade"
       },
       "vanguard_warrior_arms_helmet": {
-        "name": "Bladewake Greathelm"
+        "name": "Elmo Maior do Rastro da Lâmina"
       },
       "vanguard_warrior_arms_shoulder": {
-        "name": "Bladewake Pauldrons"
+        "name": "Espaldeiras do Rastro da Lâmina"
       },
       "vanguard_warrior_arms_chest": {
-        "name": "Bladewake Hauberk"
+        "name": "Cota de Malha do Rastro da Lâmina"
       },
       "vanguard_warrior_arms_legs": {
-        "name": "Bladewake Legplates"
+        "name": "Placas de Perna do Rastro da Lâmina"
       },
       "vanguard_warrior_arms_gloves": {
-        "name": "Bladewake Crushers"
+        "name": "Esmagadeiras do Rastro da Lâmina"
       },
       "vanguard_warrior_fury_helmet": {
-        "name": "Bloodmarch Visage"
+        "name": "Máscara da Marcha de Sangue"
       },
       "vanguard_warrior_fury_shoulder": {
-        "name": "Bloodmarch Shoulderguards"
+        "name": "Protetores de Ombro da Marcha de Sangue"
       },
       "vanguard_warrior_fury_chest": {
-        "name": "Bloodmarch Chainmail"
+        "name": "Malha da Marcha de Sangue"
       },
       "vanguard_warrior_fury_legs": {
-        "name": "Bloodmarch Leggings"
+        "name": "Calças da Marcha de Sangue"
       },
       "vanguard_warrior_fury_gloves": {
-        "name": "Bloodmarch Grips"
+        "name": "Punhos da Marcha de Sangue"
       },
       "vanguard_warrior_prot_helmet": {
-        "name": "Ironmarch Helm"
+        "name": "Elmo da Marcha de Ferro"
       },
       "vanguard_warrior_prot_shoulder": {
-        "name": "Ironmarch Spaulders"
+        "name": "Ombreiras da Marcha de Ferro"
       },
       "vanguard_warrior_prot_chest": {
-        "name": "Ironmarch Chestguard"
+        "name": "Guarda-Peito da Marcha de Ferro"
       },
       "vanguard_warrior_prot_legs": {
-        "name": "Ironmarch Legguards"
+        "name": "Perneiras da Marcha de Ferro"
       },
       "vanguard_warrior_prot_gloves": {
-        "name": "Ironmarch Handguards"
+        "name": "Protetores de Mão da Marcha de Ferro"
       },
       "vanguard_paladin_holy_helmet": {
-        "name": "Sunvigil Circlet"
+        "name": "Diadema da Vigília Solar"
       },
       "vanguard_paladin_holy_shoulder": {
-        "name": "Sunvigil Mantle"
+        "name": "Manto da Vigília Solar"
       },
       "vanguard_paladin_holy_chest": {
-        "name": "Sunvigil Hauberk"
+        "name": "Cota de Malha da Vigília Solar"
       },
       "vanguard_paladin_holy_legs": {
-        "name": "Sunvigil Legmail"
+        "name": "Malha de Perna da Vigília Solar"
       },
       "vanguard_paladin_holy_gloves": {
-        "name": "Sunvigil Gloves"
+        "name": "Luvas da Vigília Solar"
       },
       "vanguard_paladin_protection_helmet": {
-        "name": "Shieldvow Helm"
+        "name": "Elmo do Voto do Escudo"
       },
       "vanguard_paladin_protection_shoulder": {
-        "name": "Shieldvow Pauldrons"
+        "name": "Espaldeiras do Voto do Escudo"
       },
       "vanguard_paladin_protection_chest": {
-        "name": "Shieldvow Breastplate"
+        "name": "Peitoral do Voto do Escudo"
       },
       "vanguard_paladin_protection_legs": {
-        "name": "Shieldvow Legplates"
+        "name": "Placas de Perna do Voto do Escudo"
       },
       "vanguard_paladin_protection_gloves": {
-        "name": "Shieldvow Gauntlets"
+        "name": "Manoplas do Voto do Escudo"
       },
       "vanguard_paladin_retribution_helmet": {
-        "name": "Lightbrand Crown"
+        "name": "Coroa da Marca da Luz"
       },
       "vanguard_paladin_retribution_shoulder": {
-        "name": "Lightbrand Spaulders"
+        "name": "Ombreiras da Marca da Luz"
       },
       "vanguard_paladin_retribution_chest": {
-        "name": "Lightbrand Cuirass"
+        "name": "Couraça da Marca da Luz"
       },
       "vanguard_paladin_retribution_legs": {
-        "name": "Lightbrand Legguards"
+        "name": "Perneiras da Marca da Luz"
       },
       "vanguard_paladin_retribution_gloves": {
-        "name": "Lightbrand Gauntlets"
+        "name": "Manoplas da Marca da Luz"
       },
       "vanguard_hunter_beast_mastery_helmet": {
-        "name": "Packwarden Coif"
+        "name": "Coifa do Guarda da Matilha"
       },
       "vanguard_hunter_beast_mastery_shoulder": {
-        "name": "Packwarden Spaulders"
+        "name": "Ombreiras do Guarda da Matilha"
       },
       "vanguard_hunter_beast_mastery_chest": {
-        "name": "Packwarden Jerkin"
+        "name": "Gibão do Guarda da Matilha"
       },
       "vanguard_hunter_beast_mastery_legs": {
-        "name": "Packwarden Legguards"
+        "name": "Perneiras do Guarda da Matilha"
       },
       "vanguard_hunter_beast_mastery_gloves": {
-        "name": "Packwarden Gauntlets"
+        "name": "Manoplas do Guarda da Matilha"
       },
       "vanguard_hunter_marksmanship_helmet": {
-        "name": "Farsight Coif"
+        "name": "Coifa da Vista Longínqua"
       },
       "vanguard_hunter_marksmanship_shoulder": {
-        "name": "Farsight Spaulders"
+        "name": "Ombreiras da Vista Longínqua"
       },
       "vanguard_hunter_marksmanship_chest": {
-        "name": "Farsight Jerkin"
+        "name": "Gibão da Vista Longínqua"
       },
       "vanguard_hunter_marksmanship_legs": {
-        "name": "Farsight Legguards"
+        "name": "Perneiras da Vista Longínqua"
       },
       "vanguard_hunter_marksmanship_gloves": {
-        "name": "Farsight Gauntlets"
+        "name": "Manoplas da Vista Longínqua"
       },
       "vanguard_hunter_survival_helmet": {
-        "name": "Snaretooth Coif"
+        "name": "Coifa do Dente de Armadilha"
       },
       "vanguard_hunter_survival_shoulder": {
-        "name": "Snaretooth Spaulders"
+        "name": "Ombreiras do Dente de Armadilha"
       },
       "vanguard_hunter_survival_chest": {
-        "name": "Snaretooth Jerkin"
+        "name": "Gibão do Dente de Armadilha"
       },
       "vanguard_hunter_survival_legs": {
-        "name": "Snaretooth Legguards"
+        "name": "Perneiras do Dente de Armadilha"
       },
       "vanguard_hunter_survival_gloves": {
-        "name": "Snaretooth Gauntlets"
+        "name": "Manoplas do Dente de Armadilha"
       },
       "vanguard_rogue_assassination_helmet": {
-        "name": "Nightcut Hood"
+        "name": "Capuz do Corte Noturno"
       },
       "vanguard_rogue_assassination_shoulder": {
-        "name": "Nightcut Shoulderpads"
+        "name": "Protetores de Ombro do Corte Noturno"
       },
       "vanguard_rogue_assassination_chest": {
-        "name": "Nightcut Tunic"
+        "name": "Túnica do Corte Noturno"
       },
       "vanguard_rogue_assassination_legs": {
-        "name": "Nightcut Breeches"
+        "name": "Calções do Corte Noturno"
       },
       "vanguard_rogue_assassination_gloves": {
-        "name": "Nightcut Gloves"
+        "name": "Luvas do Corte Noturno"
       },
       "vanguard_rogue_combat_helmet": {
-        "name": "Brawlmark Hood"
+        "name": "Capuz da Marca da Briga"
       },
       "vanguard_rogue_combat_shoulder": {
-        "name": "Brawlmark Shoulderpads"
+        "name": "Protetores de Ombro da Marca da Briga"
       },
       "vanguard_rogue_combat_chest": {
-        "name": "Brawlmark Tunic"
+        "name": "Túnica da Marca da Briga"
       },
       "vanguard_rogue_combat_legs": {
-        "name": "Brawlmark Breeches"
+        "name": "Calções da Marca da Briga"
       },
       "vanguard_rogue_combat_gloves": {
-        "name": "Brawlmark Gloves"
+        "name": "Luvas da Marca da Briga"
       },
       "vanguard_rogue_subtlety_helmet": {
-        "name": "Shadewalk Hood"
+        "name": "Capuz do Passo Sombrio"
       },
       "vanguard_rogue_subtlety_shoulder": {
-        "name": "Shadewalk Shoulderpads"
+        "name": "Protetores de Ombro do Passo Sombrio"
       },
       "vanguard_rogue_subtlety_chest": {
-        "name": "Shadewalk Tunic"
+        "name": "Túnica do Passo Sombrio"
       },
       "vanguard_rogue_subtlety_legs": {
-        "name": "Shadewalk Breeches"
+        "name": "Calções do Passo Sombrio"
       },
       "vanguard_rogue_subtlety_gloves": {
-        "name": "Shadewalk Gloves"
+        "name": "Luvas do Passo Sombrio"
       },
       "vanguard_priest_discipline_helmet": {
-        "name": "Veilpsalm Cowl"
+        "name": "Cogula do Salmo do Véu"
       },
       "vanguard_priest_discipline_shoulder": {
-        "name": "Veilpsalm Mantle"
+        "name": "Manto do Salmo do Véu"
       },
       "vanguard_priest_discipline_chest": {
-        "name": "Veilpsalm Robe"
+        "name": "Veste do Salmo do Véu"
       },
       "vanguard_priest_discipline_legs": {
-        "name": "Veilpsalm Leggings"
+        "name": "Calças do Salmo do Véu"
       },
       "vanguard_priest_discipline_gloves": {
-        "name": "Veilpsalm Handwraps"
+        "name": "Ataduras do Salmo do Véu"
       },
       "vanguard_priest_holy_helmet": {
-        "name": "Gracewing Cowl"
+        "name": "Cogula da Asa da Graça"
       },
       "vanguard_priest_holy_shoulder": {
-        "name": "Gracewing Mantle"
+        "name": "Manto da Asa da Graça"
       },
       "vanguard_priest_holy_chest": {
-        "name": "Gracewing Robe"
+        "name": "Veste da Asa da Graça"
       },
       "vanguard_priest_holy_legs": {
-        "name": "Gracewing Leggings"
+        "name": "Calças da Asa da Graça"
       },
       "vanguard_priest_holy_gloves": {
-        "name": "Gracewing Handwraps"
+        "name": "Ataduras da Asa da Graça"
       },
       "vanguard_priest_shadow_helmet": {
-        "name": "Duskhymn Cowl"
+        "name": "Cogula do Hino do Crepúsculo"
       },
       "vanguard_priest_shadow_shoulder": {
-        "name": "Duskhymn Mantle"
+        "name": "Manto do Hino do Crepúsculo"
       },
       "vanguard_priest_shadow_chest": {
-        "name": "Duskhymn Robe"
+        "name": "Veste do Hino do Crepúsculo"
       },
       "vanguard_priest_shadow_legs": {
-        "name": "Duskhymn Leggings"
+        "name": "Calças do Hino do Crepúsculo"
       },
       "vanguard_priest_shadow_gloves": {
-        "name": "Duskhymn Handwraps"
+        "name": "Ataduras do Hino do Crepúsculo"
       },
       "vanguard_shaman_elemental_helmet": {
-        "name": "Tempestwrit Coif"
+        "name": "Coifa do Desígnio da Tempestade"
       },
       "vanguard_shaman_elemental_shoulder": {
-        "name": "Tempestwrit Pauldrons"
+        "name": "Espaldeiras do Desígnio da Tempestade"
       },
       "vanguard_shaman_elemental_chest": {
-        "name": "Tempestwrit Hauberk"
+        "name": "Cota de Malha do Desígnio da Tempestade"
       },
       "vanguard_shaman_elemental_legs": {
-        "name": "Tempestwrit Legmail"
+        "name": "Malha de Perna do Desígnio da Tempestade"
       },
       "vanguard_shaman_elemental_gloves": {
-        "name": "Tempestwrit Gauntlets"
+        "name": "Manoplas do Desígnio da Tempestade"
       },
       "vanguard_shaman_enhancement_helmet": {
-        "name": "Galeborn Helm"
+        "name": "Elmo do Filho do Vendaval"
       },
       "vanguard_shaman_enhancement_shoulder": {
-        "name": "Galeborn Spaulders"
+        "name": "Ombreiras do Filho do Vendaval"
       },
       "vanguard_shaman_enhancement_chest": {
-        "name": "Galeborn Chainmail"
+        "name": "Malha do Filho do Vendaval"
       },
       "vanguard_shaman_enhancement_legs": {
-        "name": "Galeborn Legguards"
+        "name": "Perneiras do Filho do Vendaval"
       },
       "vanguard_shaman_enhancement_gloves": {
-        "name": "Galeborn Grips"
+        "name": "Punhos do Filho do Vendaval"
       },
       "vanguard_shaman_restoration_helmet": {
-        "name": "Brineward Circlet"
+        "name": "Diadema do Guarda da Salmoura"
       },
       "vanguard_shaman_restoration_shoulder": {
-        "name": "Brineward Mantle"
+        "name": "Manto do Guarda da Salmoura"
       },
       "vanguard_shaman_restoration_chest": {
-        "name": "Brineward Hauberk"
+        "name": "Cota de Malha do Guarda da Salmoura"
       },
       "vanguard_shaman_restoration_legs": {
-        "name": "Brineward Kilt"
+        "name": "Saiote do Guarda da Salmoura"
       },
       "vanguard_shaman_restoration_gloves": {
-        "name": "Brineward Handwraps"
+        "name": "Ataduras do Guarda da Salmoura"
       },
       "vanguard_mage_arcane_helmet": {
-        "name": "Hourbinder's Hood"
+        "name": "Capuz do Vínculo das Horas"
       },
       "vanguard_mage_arcane_shoulder": {
-        "name": "Hourbinder's Amice"
+        "name": "Amito do Vínculo das Horas"
       },
       "vanguard_mage_arcane_chest": {
-        "name": "Hourbinder's Robe"
+        "name": "Veste do Vínculo das Horas"
       },
       "vanguard_mage_arcane_legs": {
-        "name": "Hourbinder's Trousers"
+        "name": "Calças do Vínculo das Horas"
       },
       "vanguard_mage_arcane_gloves": {
-        "name": "Hourbinder's Gloves"
+        "name": "Luvas do Vínculo das Horas"
       },
       "vanguard_mage_fire_helmet": {
-        "name": "Emberlash Cowl"
+        "name": "Cogula do Chicote de Brasa"
       },
       "vanguard_mage_fire_shoulder": {
-        "name": "Emberlash Mantle"
+        "name": "Manto do Chicote de Brasa"
       },
       "vanguard_mage_fire_chest": {
-        "name": "Emberlash Robes"
+        "name": "Vestes do Chicote de Brasa"
       },
       "vanguard_mage_fire_legs": {
-        "name": "Emberlash Leggings"
+        "name": "Calças do Chicote de Brasa"
       },
       "vanguard_mage_fire_gloves": {
-        "name": "Emberlash Gloves"
+        "name": "Luvas do Chicote de Brasa"
       },
       "vanguard_mage_frost_helmet": {
-        "name": "Rimewarden Hood"
+        "name": "Capuz do Guarda da Geada"
       },
       "vanguard_mage_frost_shoulder": {
-        "name": "Rimewarden Shoulderpads"
+        "name": "Protetores de Ombro do Guarda da Geada"
       },
       "vanguard_mage_frost_chest": {
-        "name": "Rimewarden Vestment"
+        "name": "Vestimenta do Guarda da Geada"
       },
       "vanguard_mage_frost_legs": {
-        "name": "Rimewarden Legwraps"
+        "name": "Ataduras de Perna do Guarda da Geada"
       },
       "vanguard_mage_frost_gloves": {
-        "name": "Rimewarden Mitts"
+        "name": "Luvas Curtas do Guarda da Geada"
       },
       "vanguard_warlock_affliction_helmet": {
-        "name": "Dreadquill Hood"
+        "name": "Capuz da Pena do Pavor"
       },
       "vanguard_warlock_affliction_shoulder": {
-        "name": "Dreadquill Mantle"
+        "name": "Manto da Pena do Pavor"
       },
       "vanguard_warlock_affliction_chest": {
-        "name": "Dreadquill Robe"
+        "name": "Veste da Pena do Pavor"
       },
       "vanguard_warlock_affliction_legs": {
-        "name": "Dreadquill Leggings"
+        "name": "Calças da Pena do Pavor"
       },
       "vanguard_warlock_affliction_gloves": {
-        "name": "Dreadquill Handwraps"
+        "name": "Ataduras da Pena do Pavor"
       },
       "vanguard_warlock_demonology_helmet": {
-        "name": "Marrowbound Cowl"
+        "name": "Cogula do Vínculo da Medula"
       },
       "vanguard_warlock_demonology_shoulder": {
-        "name": "Marrowbound Spaulders"
+        "name": "Ombreiras do Vínculo da Medula"
       },
       "vanguard_warlock_demonology_chest": {
-        "name": "Marrowbound Robe"
+        "name": "Veste do Vínculo da Medula"
       },
       "vanguard_warlock_demonology_legs": {
-        "name": "Marrowbound Leggings"
+        "name": "Calças do Vínculo da Medula"
       },
       "vanguard_warlock_demonology_gloves": {
-        "name": "Marrowbound Grips"
+        "name": "Punhos do Vínculo da Medula"
       },
       "vanguard_warlock_destruction_helmet": {
-        "name": "Slagcrown Hood"
+        "name": "Capuz da Coroa de Escória"
       },
       "vanguard_warlock_destruction_shoulder": {
-        "name": "Slagcrown Mantle"
+        "name": "Manto da Coroa de Escória"
       },
       "vanguard_warlock_destruction_chest": {
-        "name": "Slagcrown Robes"
+        "name": "Vestes da Coroa de Escória"
       },
       "vanguard_warlock_destruction_legs": {
-        "name": "Slagcrown Leggings"
+        "name": "Calças da Coroa de Escória"
       },
       "vanguard_warlock_destruction_gloves": {
-        "name": "Slagcrown Gloves"
+        "name": "Luvas da Coroa de Escória"
       },
       "vanguard_druid_balance_helmet": {
-        "name": "Starwarden Headdress"
+        "name": "Toucado do Guarda-Estelar"
       },
       "vanguard_druid_balance_shoulder": {
-        "name": "Starwarden Spaulders"
+        "name": "Ombreiras do Guarda-Estelar"
       },
       "vanguard_druid_balance_chest": {
-        "name": "Starwarden Vest"
+        "name": "Colete do Guarda-Estelar"
       },
       "vanguard_druid_balance_legs": {
-        "name": "Starwarden Breeches"
+        "name": "Calções do Guarda-Estelar"
       },
       "vanguard_druid_balance_gloves": {
-        "name": "Starwarden Gloves"
+        "name": "Luvas do Guarda-Estelar"
       },
       "vanguard_druid_feral_helmet": {
-        "name": "Bloodmane Helm"
+        "name": "Elmo da Juba de Sangue"
       },
       "vanguard_druid_feral_shoulder": {
-        "name": "Bloodmane Shoulderpads"
+        "name": "Protetores de Ombro da Juba de Sangue"
       },
       "vanguard_druid_feral_chest": {
-        "name": "Bloodmane Tunic"
+        "name": "Túnica da Juba de Sangue"
       },
       "vanguard_druid_feral_legs": {
-        "name": "Bloodmane Legguards"
+        "name": "Perneiras da Juba de Sangue"
       },
       "vanguard_druid_feral_gloves": {
-        "name": "Bloodmane Grips"
+        "name": "Punhos da Juba de Sangue"
       },
       "vanguard_druid_restoration_helmet": {
-        "name": "Thistlebloom Crown"
+        "name": "Coroa da Flor de Cardo"
       },
       "vanguard_druid_restoration_shoulder": {
-        "name": "Thistlebloom Mantle"
+        "name": "Manto da Flor de Cardo"
       },
       "vanguard_druid_restoration_chest": {
-        "name": "Thistlebloom Vest"
+        "name": "Colete da Flor de Cardo"
       },
       "vanguard_druid_restoration_legs": {
-        "name": "Thistlebloom Leggings"
+        "name": "Calças da Flor de Cardo"
       },
       "vanguard_druid_restoration_gloves": {
-        "name": "Thistlebloom Gloves"
+        "name": "Luvas da Flor de Cardo"
       },
       "vanguard_verdict_greatsword": {
-        "name": "Vanguard's Verdict"
+        "name": "Veredito da Vanguarda"
       },
       "vanguard_oath_blade": {
-        "name": "Vanguard's Oath"
+        "name": "Voto da Vanguarda"
       },
       "vanguard_fang_dagger": {
-        "name": "Vanguard's Fang"
+        "name": "Presa da Vanguarda"
       },
       "vanguard_warstaff": {
-        "name": "Vanguard's Warstaff"
+        "name": "Cajado de Guerra da Vanguarda"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"
@@ -18291,13 +18291,13 @@ export const pt_BR: EnTranslations = {
         "name": "Baú cosmético misterioso"
       },
       "emissary_cache": {
-        "name": "Emissary's Cache"
+        "name": "Cofre do Emissário"
       },
       "clue_scroll": {
-        "name": "Clue Scroll"
+        "name": "Pergaminho de Pista"
       },
       "treasure_casket": {
-        "name": "Treasure Casket"
+        "name": "Baú de Tesouro"
       },
       "heroic_mark": {
         "name": "Marca Heroica"
@@ -18612,154 +18612,154 @@ export const pt_BR: EnTranslations = {
         "name": "Guarda da Brasa, Baluarte de Varkhul"
       },
       "bastion_sigil": {
-        "name": "Bastion Sigil"
+        "name": "Sigilo do Bastião"
       },
       "mooring_stone": {
-        "name": "Mooring Stone"
+        "name": "Pedra de Amarração"
       },
       "menders_hourglass": {
-        "name": "Mender's Hourglass"
+        "name": "Ampulheta do Curador"
       },
       "wellspring_seed": {
-        "name": "Wellspring Seed"
+        "name": "Semente da Nascente"
       },
       "paired_talons": {
-        "name": "Paired Talons"
+        "name": "Garras Pareadas"
       },
       "hunters_tally": {
-        "name": "Hunter's Tally"
+        "name": "Marca do Caçador"
       },
       "stormjar": {
-        "name": "Stormjar"
+        "name": "Jarra da Tempestade"
       },
       "echoing_lens": {
-        "name": "Echoing Lens"
+        "name": "Lente do Eco"
       },
       "gamblers_die": {
-        "name": "Gambler's Die"
+        "name": "Dado do Apostador"
       },
       "sundered_prism": {
-        "name": "Sundered Prism"
+        "name": "Prisma Partido"
       },
       "wayfarers_lodestone": {
-        "name": "Wayfarer's Lodestone"
+        "name": "Pedra-guia do Viajante"
       },
       "medallion_of_defiance": {
-        "name": "Medallion of Defiance"
+        "name": "Medalhão do Desafio"
       },
       "duelists_brand": {
-        "name": "Duelist's Brand"
+        "name": "Marca do Duelista"
       },
       "forgefathers_temper": {
-        "name": "Forgefather's Temper"
+        "name": "Têmpera do Ancestral da Forja"
       },
       "kindling_orb": {
-        "name": "Kindling Orb"
+        "name": "Orbe de Isca"
       },
       "molten_fletching": {
-        "name": "Molten Fletching"
+        "name": "Emplumação Incandescente"
       },
       "last_flame_lantern": {
-        "name": "Last Flame Lantern"
+        "name": "Lanterna da Última Chama"
       },
       "heart_of_the_crucible": {
-        "name": "Heart of the Crucible"
+        "name": "Coração do Crisol"
       },
       "rift_watchers_band": {
-        "name": "Rift Watcher's Band"
+        "name": "Anel do Vigia das Fendas"
       },
       "rift_surveyors_satchel": {
-        "name": "Rift Surveyor's Satchel"
+        "name": "Alforje do Agrimensor das Fendas"
       },
       "riftwalkers_tunic": {
-        "name": "Riftwalker's Tunic"
+        "name": "Túnica do Andarilho das Fendas"
       },
       "riftwarden_voidblade": {
-        "name": "Riftwarden's Voidblade"
+        "name": "Lâmina do Vazio do Guardião das Fendas"
       },
       "champion_rift_band": {
-        "name": "Champion's Rift Band"
+        "name": "Anel da Fenda do Campeão"
       },
       "order_prayer_beads": {
-        "name": "Order Prayer Beads"
+        "name": "Contas de Oração da Ordem"
       },
       "vestments_of_the_acolyte": {
-        "name": "Vestments of the Acolyte"
+        "name": "Vestes do Acólito"
       },
       "templar_dawn_shield": {
-        "name": "Templar's Dawn Shield"
+        "name": "Escudo da Alvorada do Templário"
       },
       "dawnkeeper_consecrated_mace": {
-        "name": "Dawnkeeper's Consecrated Mace"
+        "name": "Maça Consagrada do Guardião da Alvorada"
       },
       "champion_dawn_medallion": {
-        "name": "Champion's Dawn Medallion"
+        "name": "Medalhão da Alvorada do Campeão"
       },
       "automaton_cog_ring": {
-        "name": "Automaton Cog Ring"
+        "name": "Anel de Engrenagem de Autômato"
       },
       "clockwork_tinkers_pack": {
-        "name": "Clockwork Tinker's Pack"
+        "name": "Alforje do Consertador Mecânico"
       },
       "artificers_welding_cowl": {
-        "name": "Artificer's Welding Cowl"
+        "name": "Capuz de Solda do Artífice"
       },
       "forgemaster_crag_cleaver": {
-        "name": "Forgemaster's Crag Cleaver"
+        "name": "Fendedor de Rochedo do Mestre da Forja"
       },
       "champion_forged_loop": {
-        "name": "Champion's Forged Loop"
+        "name": "Argola Forjada do Campeão"
       },
       "tidewatchers_locket": {
-        "name": "Tidewatcher's Locket"
+        "name": "Medalhão do Vigia da Maré"
       },
       "riftwalkers_cord": {
-        "name": "Riftwalker's Cord"
+        "name": "Cordão do Andarilho das Fendas"
       },
       "riftwalkers_treads": {
-        "name": "Riftwalker's Treads"
+        "name": "Botas do Andarilho das Fendas"
       },
       "formula_riftwalkers_grace": {
-        "name": "Formula: Riftwalker's Grace"
+        "name": "Fórmula: Graça do Andarilho das Fendas"
       },
       "riftwardens_pendant": {
-        "name": "Riftwarden's Pendant"
+        "name": "Pingente do Guardião das Fendas"
       },
       "acolytes_signet": {
-        "name": "Acolyte's Signet"
+        "name": "Sinete do Acólito"
       },
       "cord_of_the_dawn": {
-        "name": "Cord of the Dawn"
+        "name": "Cordão da Alvorada"
       },
       "dawnlit_slippers": {
-        "name": "Dawnlit Slippers"
+        "name": "Chinelos Iluminados pela Alvorada"
       },
       "formula_dawnfire_etching": {
-        "name": "Formula: Dawnfire Etching"
+        "name": "Fórmula: Gravação de Fogo da Alvorada"
       },
       "formula_dawns_benediction": {
-        "name": "Formula: Dawn's Benediction"
+        "name": "Fórmula: Bênção da Alvorada"
       },
       "champions_dawn_loop": {
-        "name": "Champion's Dawn Loop"
+        "name": "Argola da Alvorada do Campeão"
       },
       "dawnkeepers_circle": {
-        "name": "Dawnkeeper's Circle"
+        "name": "Círculo do Guardião da Alvorada"
       },
       "cogwork_choker": {
-        "name": "Cogwork Choker"
+        "name": "Gargantilha de Engrenagens"
       },
       "forgemasters_girdle": {
-        "name": "Forgemaster's Girdle"
+        "name": "Cinturão do Mestre da Forja"
       },
       "forgemasters_sabatons": {
-        "name": "Forgemaster's Sabatons"
+        "name": "Sabatões do Mestre da Forja"
       },
       "formula_piston_drive": {
-        "name": "Formula: Piston Drive"
+        "name": "Fórmula: Acionamento a Pistão"
       },
       "forgewall_gorget": {
-        "name": "Forgewall Gorget"
+        "name": "Gorjeira da Muralha da Forja"
       }
     },
     "mobs": {
@@ -18788,13 +18788,13 @@ export const pt_BR: EnTranslations = {
         "name": "Bandido do Vale"
       },
       "eastbrook_freight_caravan": {
-        "name": "Eastbrook Freight Caravan"
+        "name": "Caravana de Carga de Eastbrook"
       },
       "willowfen_remedy_caravan": {
-        "name": "Willowfen Remedy Caravan"
+        "name": "Caravana de Remédios de Willowfen"
       },
       "frostveil_supply_caravan": {
-        "name": "Frostveil Supply Caravan"
+        "name": "Caravana de Suprimentos de Frostveil"
       },
       "restless_bones": {
         "name": "Ossos inquietos"
@@ -18818,7 +18818,7 @@ export const pt_BR: EnTranslations = {
         "name": "Morto afogado"
       },
       "fenbridge_infiltrator": {
-        "name": "The Borrowed Face"
+        "name": "O Rosto Emprestado"
       },
       "fen_troll": {
         "name": "Troll de Mirefen"
@@ -19528,114 +19528,114 @@ export const pt_BR: EnTranslations = {
     },
     "npcs": {
       "glider_instructor": {
-        "name": "Flightmaster Zephyr",
-        "title": "Windrider Instructor",
-        "greeting": "The thermals howling off the cliffs of The Shear are fierce today. Ready to strap into the mechanical glider and test your wings through the slalom course?"
+        "name": "Mestre de Voo Zéfiro",
+        "title": "Instrutor de Planadores do Vento",
+        "greeting": "As correntes térmicas uivando dos penhascos da Escarpa estão ferozes hoje. Pronto para se prender ao planador mecânico e testar suas asas no percurso de slalom?"
       },
       "glider_apprentice": {
         "name": "Skye",
-        "title": "Zephyrs Apprentice",
-        "greeting": "Great flight down the canyon. Speak with me whenever you need a magical updraft back to Zephyr at The Shear."
+        "title": "Aprendiz de Zéfiro",
+        "greeting": "Ótimo voo pelo desfiladeiro. Fale comigo sempre que precisar de uma corrente ascendente mágica de volta a Zéfiro, na Escarpa."
       },
       "shadow_cloak_scout": {
-        "name": "Scout Valerie",
-        "title": "Covert Operations",
-        "greeting": "Borrow my duskweave cloak. Slip in behind each dispatch carrier and lift his orders. Stay out of the lantern beams: a lantern guard sees straight through the enchantment, and a carrier feels you if you brush against him."
+        "name": "Batedora Valerie",
+        "title": "Operações Secretas",
+        "greeting": "Pegue emprestado meu manto de tecido crepuscular. Deslize-se por trás de cada carregador de mensagens e retire as ordens dele. Fique fora dos feixes das lanternas: um guarda-lanterna enxerga direto através do encantamento, e um carregador te sente se você esbarrar nele."
       },
       "shadow_guard_north": {
-        "name": "Dispatch Guard",
-        "title": "Dispatch Carrier",
-        "greeting": "These sealed orders are for the captain. Keep your distance."
+        "name": "Guarda de Mensagens",
+        "title": "Carregador de Mensagens",
+        "greeting": "Estas ordens lacradas são para o capitão. Mantenha distância."
       },
       "shadow_guard_south": {
-        "name": "Dispatch Guard",
-        "title": "Dispatch Carrier",
-        "greeting": "I have a dispatch to deliver. Move along."
+        "name": "Guarda de Mensagens",
+        "title": "Carregador de Mensagens",
+        "greeting": "Tenho uma mensagem para entregar. Circulando."
       },
       "shadow_guard_east": {
-        "name": "Dispatch Guard",
-        "title": "Dispatch Carrier",
-        "greeting": "No delays. The watch is waiting for these orders."
+        "name": "Guarda de Mensagens",
+        "title": "Carregador de Mensagens",
+        "greeting": "Sem atrasos. A guarda está esperando por estas ordens."
       },
       "shadow_guard_west": {
-        "name": "Dispatch Guard",
-        "title": "Dispatch Carrier",
-        "greeting": "Official business. Keep the path clear."
+        "name": "Guarda de Mensagens",
+        "title": "Carregador de Mensagens",
+        "greeting": "Assunto oficial. Mantenha o caminho livre."
       },
       "shadow_sentry_south": {
-        "name": "Lantern Sentry",
-        "title": "True Sight",
-        "greeting": "My lantern reveals more than shadows. Stay where I can see you."
+        "name": "Sentinela da Lanterna",
+        "title": "Visão Verdadeira",
+        "greeting": "Minha lanterna revela mais que sombras. Fique onde eu possa te ver."
       },
       "shadow_sentry_north": {
-        "name": "Lantern Sentry",
-        "title": "True Sight",
-        "greeting": "Nothing slips past the lantern watch."
+        "name": "Sentinela da Lanterna",
+        "title": "Visão Verdadeira",
+        "greeting": "Nada escapa à vigília da lanterna."
       },
       "shadow_watch_west": {
-        "name": "Lantern Watchman",
-        "title": "True Sight",
-        "greeting": "Hold there. The lantern sees what the eye misses."
+        "name": "Vigia da Lanterna",
+        "title": "Visão Verdadeira",
+        "greeting": "Pare aí. A lanterna vê o que o olho não vê."
       },
       "shadow_watch_east": {
-        "name": "Lantern Watchman",
-        "title": "True Sight",
-        "greeting": "Nobody crosses my light unseen."
+        "name": "Vigia da Lanterna",
+        "title": "Visão Verdadeira",
+        "greeting": "Ninguém cruza minha luz sem ser visto."
       },
       "forge_instructor": {
-        "name": "Smith Mara",
-        "title": "Wyrmwatch Smith",
-        "greeting": "Help me finish a shield! Click the supplies I call for. Quick hands earn a better medal."
+        "name": "Ferreira Mara",
+        "title": "Ferreira de Wyrmwatch",
+        "greeting": "Me ajude a terminar um escudo! Clique nos suprimentos que eu pedir. Mãos rápidas ganham uma medalha melhor."
       },
       "infiltrator_captain": {
-        "name": "Sergeant Alric",
-        "title": "Fenbridge Watch",
-        "greeting": "A creature has stolen a soldier's face. Read the standing orders and the watch ledger, question all four guards, then come back and name the one whose story contradicts our records."
+        "name": "Sargento Alric",
+        "title": "Guarda de Fenbridge",
+        "greeting": "Uma criatura roubou o rosto de um soldado. Leia as ordens permanentes e o registro da guarda, interrogue os quatro guardas e depois volte para apontar aquele cuja história contradiz nossos registros."
       },
       "infiltrator_nella": {
-        "name": "Guard Nella",
-        "title": "Fenbridge Watch",
-        "greeting": "Reporting for duty."
+        "name": "Guarda Nella",
+        "title": "Guarda de Fenbridge",
+        "greeting": "Apresentando-me para o serviço."
       },
       "infiltrator_orin": {
-        "name": "Guard Orin",
-        "title": "Fenbridge Watch",
-        "greeting": "Reporting for duty."
+        "name": "Guarda Orin",
+        "title": "Guarda de Fenbridge",
+        "greeting": "Apresentando-me para o serviço."
       },
       "infiltrator_bram": {
-        "name": "Guard Bram",
-        "title": "Fenbridge Watch",
-        "greeting": "Reporting for duty."
+        "name": "Guarda Bram",
+        "title": "Guarda de Fenbridge",
+        "greeting": "Apresentando-me para o serviço."
       },
       "infiltrator_tessa": {
-        "name": "Guard Tessa",
-        "title": "Fenbridge Watch",
-        "greeting": "Reporting for duty."
+        "name": "Guarda Tessa",
+        "title": "Guarda de Fenbridge",
+        "greeting": "Apresentando-me para o serviço."
       },
       "wisp_maze_keeper": {
-        "name": "Keeper Liora",
-        "title": "Warden of the Hedge Maze",
-        "greeting": "Thieves hid their stolen gold all through my maze, and the shadows guard it now. Recover every coin purse. Avoid the guardians, or take a radiant wisp to banish them. Three lost lives return you to the entrance, but the purses you gathered remain safe."
+        "name": "Guardiã Liora",
+        "title": "Guardiã do Labirinto de Sebes",
+        "greeting": "Ladrões esconderam seu ouro roubado por todo o meu labirinto, e agora as sombras o protegem. Recupere todas as bolsas de moedas. Evite os guardiões, ou pegue um lampejo radiante para bani-los. Perder três vidas te devolve à entrada, mas as bolsas que você já recolheu permanecem seguras."
       },
       "weekly_emissary": {
         "name": "Cham Pete",
-        "title": "Emissary",
-        "greeting": "The Vale keeps a ledger of deeds, and I keep the ledger. Pick one charge for the week, see it through, and the purse is yours."
+        "title": "Emissário",
+        "greeting": "O Vale mantém um registro de feitos, e eu cuido do registro. Escolha uma incumbência para a semana, cumpra-a, e a bolsa de moedas é sua."
       },
       "calligraphy_instructor": {
-        "name": "Instructor Elian",
-        "title": "Arcane Calligraphy",
-        "greeting": "A steady step makes a steady line. Teach my apprentices a triangle, a square, and an advanced rune."
+        "name": "Instrutor Elian",
+        "title": "Caligrafia Arcana",
+        "greeting": "Um passo firme faz uma linha firme. Ensine aos meus aprendizes um triângulo, um quadrado e uma runa avançada."
       },
       "calligraphy_apprentice_1": {
-        "name": "Apprentice Tessa",
-        "title": "Student of Calligraphy",
-        "greeting": "I keep turning too soon. Will you show me where the corners belong?"
+        "name": "Aprendiz Tessa",
+        "title": "Estudante de Caligrafia",
+        "greeting": "Eu sempre viro cedo demais. Você pode me mostrar onde ficam os cantos?"
       },
       "calligraphy_apprentice_2": {
-        "name": "Apprentice Pip",
-        "title": "Student of Calligraphy",
-        "greeting": "A triangle first, then a square, then a rune. One steady step at a time!"
+        "name": "Aprendiz Pip",
+        "title": "Estudante de Caligrafia",
+        "greeting": "Primeiro um triângulo, depois um quadrado, depois uma runa. Um passo firme de cada vez!"
       },
       "the_merchant": {
         "name": "O Mercador",
@@ -19763,9 +19763,9 @@ export const pt_BR: EnTranslations = {
         "greeting": "Bem-vindo à Arca Dourada. Seus bens descansam seguros atrás das nossas fechaduras."
       },
       "eastbrook_vault_keeper": {
-        "name": "Vault Keeper",
-        "title": "Weekly Rewards",
-        "greeting": "Your weekly rewards await. Choose one item from your earned choices after the Crucible reset."
+        "name": "Guardião do Cofre",
+        "title": "Recompensas Semanais",
+        "greeting": "Suas recompensas semanais esperam por você. Escolha um item entre as opções conquistadas após a reinicialização do Crisol."
       },
       "card_master": {
         "name": "Mestre das Cartas",
@@ -19903,9 +19903,9 @@ export const pt_BR: EnTranslations = {
         "greeting": "Fique abaixado. O som se propaga de forma estranha no vidro, e o portão lá embaixo tem ouvidos."
       },
       "harbormaster_tamsin": {
-        "name": "Harbormaster Tamsin",
-        "title": "Keeper of the Wyrmwatch Quays",
-        "greeting": "Come in off the quay and warm your hands. The ship at our pier sails up the long east coast to Wickharbor and back again. Far to the west, the other ferry runs between Eastbrook and the Nightbloom. The map on the wall shows both crossings. Rest by the fire before the climb to Wyrmwatch."
+        "name": "Mestra do Porto Tamsin",
+        "title": "Guardiã dos Cais de Wyrmwatch",
+        "greeting": "Saia do cais e esquente as mãos. O navio do nosso ancoradouro navega pela longa costa leste até Wickharbor e depois volta. Bem a oeste, a outra balsa faz a travessia entre Eastbrook e Nightbloom. O mapa na parede mostra as duas travessias. Descanse junto ao fogo antes da subida até Wyrmwatch."
       },
       "reeve_ottoline": {
         "name": "Prefeita Ottoline",
@@ -20083,24 +20083,24 @@ export const pt_BR: EnTranslations = {
         "greeting": "Uma banda Riftbound se lembra do rompimento que surgiu, {className}. Traga-me a banda e a essência que os breaks derramam, e eu o ensinarei a lembrar mais."
       },
       "npc_rift_watch_quartermaster": {
-        "name": "Quartermaster Vaelen",
-        "title": "Rift Watch Provisioner",
-        "greeting": "The Rift Watch protects the shore and watches the deep tears. Our stores are open to those of recognized standing."
+        "name": "Intendente Vaelen",
+        "title": "Provedor da Vigília das Fendas",
+        "greeting": "A Vigília das Fendas protege a costa e observa as fendas profundas. Nosso estoque está aberto a quem tem status reconhecido."
       },
       "npc_church_order_quartermaster": {
-        "name": "Templar Althea",
-        "title": "Church Order Quartermaster",
-        "greeting": "Walk in the Light of the Dawn. The Church Order supplies those who stand with us in service."
+        "name": "Templária Althea",
+        "title": "Intendente da Ordem da Igreja",
+        "greeting": "Caminhe na Luz da Alvorada. A Ordem da Igreja provê aqueles que estão ao nosso lado em serviço."
       },
       "npc_automaton_quartermaster": {
-        "name": "Artificer Tobrin",
-        "title": "Automaton Requisitioner",
-        "greeting": "Precision gears, forged steel, and calibrated power. Authorized operators may draw from our inventory."
+        "name": "Artífice Tobrin",
+        "title": "Requisitante dos Autômatos",
+        "greeting": "Engrenagens de precisão, aço forjado e energia calibrada. Operadores autorizados podem retirar itens do nosso estoque."
       },
       "npc_wq_taskmaster": {
-        "name": "Taskmaster Kaelen",
-        "title": "World Quest Taskmaster",
-        "greeting": "The allied factions post assignments across the realm every day. If an assignment does not suit your skills, you may request one daily reassignment."
+        "name": "Encarregado Kaelen",
+        "title": "Encarregado de Missões Mundiais",
+        "greeting": "As facções aliadas publicam tarefas por todo o reino todos os dias. Se uma tarefa não combinar com suas habilidades, você pode pedir uma reatribuição diária."
       },
       "forgemistress_darva": {
         "name": "Forjadora Darva",
@@ -22538,7 +22538,7 @@ export const pt_BR: EnTranslations = {
       "eastbrook_vale": {
         "name": "Vale de Eastbrook",
         "welcome": "Procure o marechal Redbrook na cidade: ele tem trabalho para você.",
-        "welcomeDone": "Marshal Redbrook has no more work for you - the quaint seaside town where your journey began rests easier for it.",
+        "welcomeDone": "Marechal Redbrook não tem mais trabalho para você: a pitoresca cidade litorânea onde sua jornada começou descansa mais tranquila por isso.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -22584,7 +22584,7 @@ export const pt_BR: EnTranslations = {
       "mirefen_marsh": {
         "name": "Pântano de Mirefen",
         "welcome": "Apresente-se ao guardião Fenwick no portão de Fenbridge.",
-        "welcomeDone": "Warden Fenwick has no more orders for you - the settlement deep within the marshy swamplands stands safer for it.",
+        "welcomeDone": "Guardião Fenwick não tem mais ordens para você: o povoado nas profundezas do pântano lamacento está mais seguro por isso.",
         "pois": {
           "0": {
             "label": "Fenbridge"
@@ -22615,7 +22615,7 @@ export const pt_BR: EnTranslations = {
       "thornpeak_heights": {
         "name": "Alturas de Thornpeak",
         "welcome": "A capitã Thessaly mal segura o muro de Highwatch.",
-        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
+        "welcomeDone": "Capitã Thessaly mantém a muralha em Highwatch: nunca é fácil, mas com a ajuda de aventureiros como você, agora é administrável.",
         "pois": {
           "0": {
             "label": "Highwatch"
@@ -22942,7 +22942,7 @@ export const pt_BR: EnTranslations = {
             "label": "Os Campos das Fendas"
           },
           "5": {
-            "label": "The Wreck"
+            "label": "O Naufrágio"
           }
         }
       },
@@ -23479,139 +23479,139 @@ export const pt_BR: EnTranslations = {
         "bonus3": "Aumenta a velocidade de ataque e de lançamento em 15%."
       },
       "vanguard_druid_balance": {
-        "name": "Starwarden Raiment",
-        "bonus2": "Gripping Roots' cast time is reduced by 0.5 sec.",
-        "bonus4": "Casting Gripping Roots lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
+        "name": "Vestimenta do Guarda-Estelar",
+        "bonus2": "O tempo de conjuração de Raízes Agarradoras é reduzido em 0,5 s.",
+        "bonus4": "Conjurar Raízes Agarradoras permite conjurar em movimento e aumenta sua velocidade de movimento em 20% por 4 s. Não pode ocorrer mais de uma vez a cada 20 s."
       },
       "vanguard_druid_feral": {
-        "name": "Bloodmane Hide",
-        "bonus2": "Bruin Rush's cooldown is reduced by 3 sec.",
-        "bonus4": "Bruin Rush shields you for 6 percent of your maximum health for 6 sec."
+        "name": "Pelagem da Juba de Sangue",
+        "bonus2": "O tempo de recarga de Investida de Bruin é reduzido em 3 s.",
+        "bonus4": "Investida de Bruin te escuda em 6% da sua vida máxima por 6 s."
       },
       "vanguard_druid_restoration": {
-        "name": "Thistlebloom Vestment",
-        "bonus2": "Fleetmend's cooldown is reduced by 1 sec.",
-        "bonus4": "Fleetmend also increases your movement speed by 30 percent for 3 sec."
+        "name": "Veste da Flor de Cardo",
+        "bonus2": "O tempo de recarga de Recuperação Rápida é reduzido em 1 s.",
+        "bonus4": "Recuperação Rápida também aumenta sua velocidade de movimento em 30% por 3 s."
       },
       "vanguard_hunter_beast_mastery": {
-        "name": "Packwarden Harness",
-        "bonus2": "Rattling Shot's cooldown is reduced by 4 sec.",
-        "bonus4": "Rattling Shot reduces Howling Rage's remaining cooldown by 1 sec."
+        "name": "Arreios do Guarda da Matilha",
+        "bonus2": "O tempo de recarga de Tiro Desnorteante é reduzido em 4 s.",
+        "bonus4": "Tiro Desnorteante reduz em 1 s o tempo de recarga restante de Ira Bestial."
       },
       "vanguard_hunter_marksmanship": {
-        "name": "Farsight Harness",
-        "bonus2": "Trailbreak's cooldown is reduced by 4 sec.",
-        "bonus4": "Trailbreak makes your next Long Draw within 6 sec instant. Cannot occur more than once every 15 sec."
+        "name": "Arreios da Vista Longínqua",
+        "bonus2": "O tempo de recarga de Quebra-Trilha é reduzido em 4 s.",
+        "bonus4": "Quebra-Trilha torna sua próxima Puxada Longa em até 6 s instantânea. Não pode ocorrer mais de uma vez a cada 15 s."
       },
       "vanguard_hunter_survival": {
-        "name": "Snaretooth Harness",
-        "bonus2": "Bloodhook's cooldown is reduced by 3 sec.",
-        "bonus4": "Bloodhook grants 1 Hunting Momentum."
+        "name": "Arreios do Dente de Armadilha",
+        "bonus2": "O tempo de recarga de Gancho Sangrento é reduzido em 3 s.",
+        "bonus4": "Gancho Sangrento concede 1 de Ímpeto de Caça."
       },
       "vanguard_mage_arcane": {
-        "name": "Hourbinder's Vestments",
-        "bonus2": "Temporal Barrier's cooldown is reduced by 2 sec.",
-        "bonus4": "Temporal Barrier also increases the shielded target's movement speed by 20 percent for 3 sec."
+        "name": "Vestes do Vínculo das Horas",
+        "bonus2": "O tempo de recarga de Barreira Temporal é reduzido em 2 s.",
+        "bonus4": "Barreira Temporal também aumenta a velocidade de movimento do alvo escudado em 20% por 3 s."
       },
       "vanguard_mage_fire": {
-        "name": "Emberlash Regalia",
-        "bonus2": "Cinderfall recharges 3 sec faster.",
-        "bonus4": "Casting Cinderfall reduces the remaining cooldown of Blazing Barrier by 2 sec."
+        "name": "Regália do Chicote de Brasa",
+        "bonus2": "O tempo de recarga de Chuva de Brasas é reduzido em 3 s.",
+        "bonus4": "Conjurar Chuva de Brasas reduz o tempo de recarga restante de Barreira Flamejante em 2 s."
       },
       "vanguard_mage_frost": {
-        "name": "Rimewarden Garb",
-        "bonus2": "Icebind's cooldown is reduced by 2 sec.",
-        "bonus4": "Casting Icebind reduces the remaining cooldown of Flitstep by 5 sec."
+        "name": "Traje do Guarda da Geada",
+        "bonus2": "O tempo de recarga de Grilhão de Gelo é reduzido em 2 s.",
+        "bonus4": "Conjurar Grilhão de Gelo reduz em 5 s o tempo de recarga restante de Passo Ligeiro."
       },
       "vanguard_paladin_holy": {
-        "name": "Sunvigil Regalia",
-        "bonus2": "Life Covenant's cooldown is reduced by 30 sec.",
-        "bonus4": "Life Covenant also shields the ally for 8 percent of their maximum health for 6 sec."
+        "name": "Regália da Vigília Solar",
+        "bonus2": "O tempo de recarga de Pacto da Vida é reduzido em 30 s.",
+        "bonus4": "Pacto da Vida também escuda o aliado em 8% da vida máxima dele por 6 s."
       },
       "vanguard_paladin_protection": {
-        "name": "Shieldvow Bastion",
-        "bonus2": "Oath Chain's cooldown is reduced by 2 sec.",
-        "bonus4": "Enemies pulled by Oath Chain cast spells 30 percent slower for 4 sec, and Oath Chain grants you Solar Reprisal when it binds an enemy that can be pulled."
+        "name": "Bastião do Voto do Escudo",
+        "bonus2": "O tempo de recarga de Corrente do Juramento é reduzido em 2 s.",
+        "bonus4": "Inimigos puxados por Corrente do Juramento conjuram magias 30% mais devagar por 4 s, e Corrente do Juramento concede Represália Solar quando prende um inimigo que pode ser puxado."
       },
       "vanguard_paladin_retribution": {
-        "name": "Lightbrand Warplate",
-        "bonus2": "Valkyr's Calling's cooldown is reduced by 15 sec.",
-        "bonus4": "Valkyr's Calling resets Final Edict's cooldown, and your next Final Edict within 6 sec of landing deals 15 percent more damage."
+        "name": "Placas de Guerra da Marca da Luz",
+        "bonus2": "O tempo de recarga de Chamado da Valquíria é reduzido em 15 s.",
+        "bonus4": "Chamado da Valquíria reinicia o tempo de recarga de Édito Final, e seu próximo Édito Final conjurado em até 6 s causa 15% mais dano."
       },
       "vanguard_priest_discipline": {
-        "name": "Veilpsalm Raiment",
-        "bonus2": "Terror Canticle's cooldown is reduced by 3 sec.",
-        "bonus4": "When your Psalm of Warding is fully consumed, the shielded ally gains 20 percent movement speed for 3 sec. Cannot occur more than once every 8 sec."
+        "name": "Vestimenta do Salmo do Véu",
+        "bonus2": "O tempo de recarga de Grito Psíquico é reduzido em 3 s.",
+        "bonus4": "Quando seu Salmo de Proteção é totalmente consumido, o aliado escudado ganha 20% de velocidade de movimento por 3 s. Não pode ocorrer mais de uma vez a cada 8 s."
       },
       "vanguard_priest_holy": {
-        "name": "Gracewing Raiment",
-        "bonus2": "Veilstep's cooldown is reduced by 6 sec.",
-        "bonus4": "Veilstep also shields you for 8 percent of your maximum health for 6 sec."
+        "name": "Vestimenta da Asa da Graça",
+        "bonus2": "O tempo de recarga de Passo do Véu é reduzido em 6 s.",
+        "bonus4": "Passo do Véu também te escuda em 8% da sua vida máxima por 6 s."
       },
       "vanguard_priest_shadow": {
-        "name": "Duskhymn Regalia",
-        "bonus2": "Litany of Woe also slows the target's movement by 30 percent while you channel it.",
-        "bonus4": "Call Tithefiend also shields you for 10 percent of your maximum health for 8 sec."
+        "name": "Regália do Hino do Crepúsculo",
+        "bonus2": "Litania da Aflição também reduz a velocidade de movimento do alvo em 30% enquanto você a canaliza.",
+        "bonus4": "Invocar Demônio do Dízimo também te escuda em 10% da sua vida máxima por 8 s."
       },
       "vanguard_rogue_assassination": {
-        "name": "Nightcut Leathers",
-        "bonus2": "Low Blow costs 10 less Energy.",
-        "bonus4": "Low Blow also makes your next attack within 6 sec a critical strike."
+        "name": "Couros do Corte Noturno",
+        "bonus2": "Golpe Baixo custa 10 a menos de Energia.",
+        "bonus4": "Golpe Baixo também torna seu próximo ataque em até 6 s um acerto crítico."
       },
       "vanguard_rogue_combat": {
-        "name": "Brawlmark Leathers",
-        "bonus2": "Swift Heels' cooldown is reduced by 60 sec.",
-        "bonus4": "While Swift Heels is active, Wicked Slash and Haymaker award 1 additional combo point."
+        "name": "Couros da Marca da Briga",
+        "bonus2": "O tempo de recarga de Pés Ligeiros é reduzido em 60 s.",
+        "bonus4": "Enquanto Pés Ligeiros está ativo, Talho Perverso e Golpe no Corpo concedem 1 ponto de combo adicional."
       },
       "vanguard_rogue_subtlety": {
-        "name": "Shadewalk Leathers",
-        "bonus2": "Smokefade's cooldown is reduced by 60 sec.",
-        "bonus4": "Gut Punch awards 2 additional combo points when used from Smokefade."
+        "name": "Couros do Passo Sombrio",
+        "bonus2": "O tempo de recarga de Fumaça Dissipante é reduzido em 60 s.",
+        "bonus4": "Soco no Estômago concede 2 pontos de combo adicionais quando usado a partir de Fumaça Dissipante."
       },
       "vanguard_shaman_elemental": {
-        "name": "Tempestwrit Battlemail",
-        "bonus2": "Unleash Weapon's cooldown is reduced by 3 sec.",
-        "bonus4": "Unleash Weapon lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
+        "name": "Malha de Batalha do Desígnio da Tempestade",
+        "bonus2": "O tempo de recarga de Desencadear Arma é reduzido em 3 s.",
+        "bonus4": "Desencadear Arma permite conjurar em movimento e aumenta sua velocidade de movimento em 20% por 4 s. Não pode ocorrer mais de uma vez a cada 20 s."
       },
       "vanguard_shaman_enhancement": {
-        "name": "Galeborn Warmail",
-        "bonus2": "Ancestral Strike slows the target's movement speed by 30 percent for 4 sec.",
-        "bonus4": "Ancestral Strike reduces the remaining cooldown of Elemental Trance by 4 sec."
+        "name": "Malha de Guerra do Filho do Vendaval",
+        "bonus2": "Golpe Ancestral reduz a velocidade de movimento do alvo em 30% por 4 s.",
+        "bonus4": "Golpe Ancestral reduz em 4 s o tempo de recarga restante de Elemental Trance."
       },
       "vanguard_shaman_restoration": {
-        "name": "Brineward Chainmail",
-        "bonus2": "Mending Waters casts 0.5 sec faster on an ally below 50 percent health.",
-        "bonus4": "Tidecall also shields its target for 5 percent of your maximum health for 6 sec."
+        "name": "Cota de Malha do Guarda da Salmoura",
+        "bonus2": "Águas Restauradoras é conjurada 0,5 s mais rápido em um aliado abaixo de 50% de vida.",
+        "bonus4": "Chamado da Maré também escuda seu alvo em 5% da sua vida máxima por 6 s."
       },
       "vanguard_warlock_affliction": {
-        "name": "Dreadquill Vestments",
-        "bonus2": "Harrow's cast time is reduced by 0.3 sec.",
-        "bonus4": "Consume heals you for 30 percent more and can be channeled while moving."
+        "name": "Vestes da Pena do Pavor",
+        "bonus2": "O tempo de conjuração de Atormentar é reduzido em 0,3 s.",
+        "bonus4": "Consumir cura 30% a mais e pode ser canalizado em movimento."
       },
       "vanguard_warlock_demonology": {
-        "name": "Marrowbound Regalia",
-        "bonus2": "Bone Armor's cooldown is reduced by 10 sec.",
-        "bonus4": "Reaping Command reduces the remaining cooldown of Bone Armor by 2 sec."
+        "name": "Regália do Vínculo da Medula",
+        "bonus2": "O tempo de recarga de Bone Armor é reduzido em 10 s.",
+        "bonus4": "Reaping Command reduz em 2 s o tempo de recarga restante de Bone Armor."
       },
       "vanguard_warlock_destruction": {
-        "name": "Slagcrown Vestments",
-        "bonus2": "Cinderhide's cooldown is reduced by 30 sec.",
-        "bonus4": "Every second Conflagrate makes your next Ruinbolt within 8 sec instant."
+        "name": "Vestes da Coroa de Escória",
+        "bonus2": "O tempo de recarga de Cinderhide é reduzido em 30 s.",
+        "bonus4": "A cada segunda conjuração de Conflagrar, sua próxima Seta da Ruína em até 8 s se torna instantânea."
       },
       "vanguard_warrior_arms": {
-        "name": "Bladewake Battlegear",
-        "bonus2": "Maiming Strike reduces Onrush's remaining cooldown by 1 sec.",
-        "bonus4": "Onrush also empowers your next Maiming Strike by 20 percent (one stack of Redhand's empower)."
+        "name": "Equipamento de Batalha do Rastro da Lâmina",
+        "bonus2": "Golpe Mutilador reduz em 1 s o tempo de recarga restante de Arremetida.",
+        "bonus4": "Arremetida também fortalece seu próximo Golpe Mutilador em 20% (uma carga do fortalecimento de Mão Vermelha)."
       },
       "vanguard_warrior_fury": {
-        "name": "Bloodmarch Ragegear",
-        "bonus2": "Vaulting Charge's cooldown is reduced by 8 sec.",
-        "bonus4": "Landing Vaulting Charge Enrages you."
+        "name": "Equipamento da Fúria da Marcha de Sangue",
+        "bonus2": "O tempo de recarga de Salto de Guerra é reduzido em 8 s.",
+        "bonus4": "Pousar de Salto de Guerra te deixa Enfurecido."
       },
       "vanguard_warrior_prot": {
-        "name": "Ironmarch Bulwark",
-        "bonus2": "Faultline's cooldown is reduced by 5 sec.",
-        "bonus4": "Faultline also reduces damage you take by 10 percent for 6 sec."
+        "name": "Baluarte da Marcha de Ferro",
+        "bonus2": "O tempo de recarga de Linha de Falha é reduzido em 5 s.",
+        "bonus4": "Linha de Falha também reduz o dano que você recebe em 10% por 6 s."
       },
       "vesperash": {
         "name": "Sudário Vesperash",

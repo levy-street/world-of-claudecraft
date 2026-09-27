@@ -1171,4 +1171,81 @@ export const table: DeedLocaleTable = {
 
     name: 'Suối Nguồn Thoát Xiềng',
   },
+  exp_arcane_calligraphy: {
+    name: 'Bàn Tay Ổn Định',
+    desc: 'Hoàn thành Thư Pháp Bí Thuật ở Thung Lũng Eastbrook.',
+  },
+  exp_arcane_calligraphy_gold: {
+    name: 'Viết Trong Ánh Sáng Sao',
+    desc: 'Kiếm được xếp hạng Vàng trong Thư Pháp Bí Thuật.',
+    title: 'Người Gọi Runes',
+  },
+  exp_forge_helper: {
+    name: 'Búa Giúp Đỡ',
+    desc: 'Giúp đỡ Thợ Rèn Mara hoàn thành một chiếc khiên tại Wyrmwatch.',
+  },
+  exp_last_barricade: {
+    name: 'Hàng Rào Cuối Cùng',
+    desc: 'Giữ vững lối vào rừng chống lại đoàn quân tử thần.',
+  },
+  exp_borrowed_face: {
+    name: 'Khuôn Mặt Mượn Của Mình',
+    desc: 'Phơi bày và đánh bại kẻ ngoại tình trong canh kỵ Fenbridge.',
+  },
+  exp_windrider_slalom: {
+    name: 'Slalom Người Cưỡi Gió',
+    desc: 'Hoàn thành cuộc đường dốc máy lượn cơ học qua hẻm núi Galecrest.',
+  },
+  exp_duskweave_dispatches: {
+    name: 'Công Văn Duskweave',
+    desc: 'Lấy lại công văn kẻ cướp đường trong khi mặc áo choàng phù phép của Valerie.',
+  },
+  exp_wisp_maze: {
+    name: 'Ánh Sáng Trong Mê Cung',
+    desc: 'Lấy lại túi tiền bị đánh cắp và thoát khỏi mê cung Evergarden.',
+  },
+  prog_rift_watch_trusted: {
+    name: 'Được Tin Tưởng Bởi Rìa Nứt',
+    desc: 'Đạt được danh tiếng Được Tin Tưởng với Rìa Nứt.',
+  },
+  prog_church_order_trusted: {
+    name: 'Được Tin Tưởng Bởi Tông Đồ Nhà Thờ',
+    desc: 'Đạt được danh tiếng Được Tin Tưởng với Tông Đồ Nhà Thờ.',
+  },
+  prog_automatons_trusted: {
+    name: 'Được Tin Tưởng Bởi Tự Động Hóa',
+    desc: 'Đạt được danh tiếng Được Tin Tưởng với Tự Động Hóa.',
+  },
+  prog_rift_watch_champion: {
+    name: 'Nhà Vô Địch Của Rìa Nứt',
+    desc: 'Đạt được danh tiếng Nhà Vô Địch với Rìa Nứt.',
+    title: 'Người Bảo Vệ Rìa Nứt',
+  },
+  prog_church_order_champion: {
+    name: 'Nhà Vô Địch Của Tông Đồ Nhà Thờ',
+    desc: 'Đạt được danh tiếng Nhà Vô Địch với Tông Đồ Nhà Thờ.',
+    title: 'Người Giữ Bình Minh',
+  },
+  prog_automatons_champion: {
+    name: 'Nhà Vô Địch Của Tự Động Hóa',
+    desc: 'Đạt được danh tiếng Nhà Vô Địch với Tự Động Hóa.',
+    title: 'Chủ Lò Rèn',
+  },
+  prog_faction_champion_all: {
+    name: 'Nhà Vô Địch Của Mọi Biểu Ngữ',
+    desc: 'Đạt được danh tiếng Nhà Vô Địch với Rìa Nứt, Tông Đồ Nhà Thờ và Tự Động Hóa.',
+  },
+  exp_clue_first_casket: {
+    name: 'Kho Bạu Tìm Thấy',
+    desc: 'Mở một Rương Kho Bạu khai quật ở cuối cuộc thám hiểm câu đố gợi ý.',
+  },
+  exp_clue_ten_caskets: {
+    name: 'Thợ Săn Kho Bạu',
+    desc: 'Mở 10 Rương Kho Bạu khai quật ở cuối những cuộc thám hiểm câu đố gợi ý.',
+    title: 'Thợ Săn Kho Bạu',
+  },
+  exp_harbor_to_harbor: {
+    name: 'Cảng Tới Cảng',
+    desc: 'Chạy cả hai phà qua lại: Eastbrook đến Moonrest, và Wickharbor đến Wyrmwatch.',
+  },
 };
