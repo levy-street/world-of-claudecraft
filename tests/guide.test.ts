@@ -80,7 +80,7 @@ import {
   STATION_TYPE_BY_CRAFT,
   STATIONS,
 } from '../src/sim/content/professions';
-import { WARFARE_ITEMS } from '../src/sim/content/pvp_honor';
+import { WARFARE_ITEMS, WARFARE_TRINKET_STOCK } from '../src/sim/content/pvp_honor';
 import { SEASON2_STOCK } from '../src/sim/content/pvp_honor_season2';
 import {
   ALL_RECIPES,
@@ -3471,7 +3471,18 @@ describe('Guide professions enchanting and economy accuracy', () => {
     expect(e.enchants.filter((row) => row.tier === 'greater' && !row.requiresFormula)).toHaveLength(
       6,
     );
-    expect(e.enchants.filter((row) => row.tier === 'greater')).toHaveLength(7);
+    // 7 with Zeal; 11 with the four learned faction formulas
+    // (content/faction_vendors.ts), shard-derived and formula-gated like Zeal.
+    expect(e.enchants.filter((row) => row.tier === 'greater')).toHaveLength(11);
+    expect(
+      e.enchants.filter((row) => row.tier === 'greater' && row.requiresFormula).map((r) => r.id),
+    ).toEqual([
+      'enchant_weapon_lastflame_zeal',
+      'enchant_weapon_riftwalkers_grace',
+      'enchant_weapon_dawnfire_etching',
+      'enchant_weapon_dawns_benediction',
+      'enchant_weapon_piston_drive',
+    ]);
     // The five Lucent (apex) enchants: the phase 10 quartet plus the weapon
     // int twin the phase 10 QA D10-D1 ruling added at the head of phase 11.
     expect(
@@ -5906,9 +5917,15 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     const stocked = new Set(Object.values(NPCS).flatMap((n) => n.vendorItems ?? []));
     const honorRows = [...stocked].filter((id) => (ITEMS[id].priceHonor ?? 0) > 0);
     expect(honorRows.length).toBeGreaterThan(0);
+    // The two honor trinkets (WARFARE_TRINKET_STOCK) carry Warfare but live
+    // outside WARFARE_ITEMS (defs in content/trinkets.ts), with the same
+    // soulbound, no-sell-value shape.
     for (const id of honorRows) {
-      // The Warfare tier: the entry tier plus Warfare Season 2.
-      expect(id in WARFARE_ITEMS || SEASON2_STOCK.includes(id), id).toBe(true);
+      // The Warfare tier: the entry tier, the two honor trinkets and Warfare Season 2.
+      expect(
+        id in WARFARE_ITEMS || WARFARE_TRINKET_STOCK.includes(id) || SEASON2_STOCK.includes(id),
+        id,
+      ).toBe(true);
       expect(ITEMS[id].soulbound, id).toBe(true);
       expect(ITEMS[id].sellValue, id).toBe(0);
     }
@@ -6188,10 +6205,14 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       expect(item.hasteRating ?? 0, item.id).toBe(0);
       expect(primaryStatSum(item), item.id).toBeGreaterThan(0);
     }
+    // Trinkets carry no combat rating at any tier (one attribute plus a use
+    // effect; pinned in tests/combat_rating.test.ts), so they are not the
+    // rated PvE epics this comparison is about.
     const pveEpics = Object.values(ITEMS).filter(
       (i) =>
         i.quality === 'epic' &&
         i.slot !== undefined &&
+        i.slot !== 'trinket' &&
         !(i.id in WARFARE_ITEMS) &&
         itemLevel(i) === tier,
     );
@@ -6614,6 +6635,10 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       castles: null,
       navigation: null,
       allies: null,
+      // The world-quest and world-boss pins: live-rotation layers the interface
+      // page does not describe yet, on the same recorded-follow-up footing.
+      worldQuests: null,
+      worldBosses: null,
       player: 'with your own arrow on it',
       pois: 'the points of interest around you',
       npcs: 'the quest givers with their marks',

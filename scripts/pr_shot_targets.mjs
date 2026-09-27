@@ -1222,6 +1222,181 @@ async function stageWheelBinds(page) {
 }
 
 export const TARGETS = [
+  // World quests round 2: the forge workshop panel moved off the bottom-pinned
+  // vehicle-bar family into the centred window family, so it no longer covers
+  // the unit frames and the action bar. /dev forge arms the quest beside Smith
+  // Mara; talking to her starts the workshop and the panel appears.
+  {
+    key: 'forge-workshop-window',
+    label: 'The forge workshop panel (A Helping Hammer) over the HUD',
+    when: ['ui/hud/vehicle/forge_action_bar_controller'],
+    variants: [
+      { key: 'desktop', beforeLoad: lowGraphicsSeed },
+      { key: 'compact', mobile: true, tier: 'compact', beforeLoad: lowGraphicsSeed },
+    ],
+    async capture(page, variant) {
+      await awaitWorldPainted(page);
+      await dismissArrivalGreeting(page);
+      if (variant.mobile) await enterTouchTier(page, variant.tier);
+      const staged = await page.evaluate(async () => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const world = game?.world;
+        if (!game || !sim || !world) return { ok: false, reason: 'offline world is unavailable' };
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+        world.chat('/dev forge');
+        await sleep(600);
+        let smith = null;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'npc' && e.templateId === 'forge_instructor') smith = e;
+        }
+        if (!smith) return { ok: false, reason: 'Smith Mara is not in the roster' };
+        const player = sim.player;
+        // The dev arm parks the player four yards south of the smith's authored
+        // spot, and the workshop only starts while the smith stands ON that spot
+        // (world_quest_forging.ts startForgeWorkshop), so snap him back before
+        // the talk in case he has drifted, and talk again until the session
+        // exists (the countdown is what the frame shows).
+        smith.pos = sim.groundPos(player.pos.x, player.pos.z - 4);
+        smith.prevPos = { ...smith.pos };
+        player.pos = sim.groundPos(smith.pos.x + 1, smith.pos.z);
+        player.prevPos = { ...player.pos };
+        sim.rebucket?.(player);
+        for (let attempt = 0; attempt < 6; attempt++) {
+          world.targetEntity(smith.id);
+          world.interact();
+          await sleep(400);
+          if (world.worldQuestLog?.get('wq_evergarden_forging')?.forging) break;
+        }
+        game.hud.closeAll?.();
+        return {
+          ok: !!world.worldQuestLog?.get('wq_evergarden_forging')?.forging,
+          reason: 'the forge workshop never started after six talks',
+        };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      await awaitWorldPainted(page);
+      await sweepOverlays(page, 4);
+      // The smith's countdown chat and the window shell arrive a beat apart on
+      // the touch tier; give the panel a full twenty seconds before giving up.
+      if (!(await pollForSize(page, '#forge-action-bar', 40, 500))) {
+        const diag = await page.evaluate(() => {
+          const el = document.getElementById('forge-action-bar');
+          const game = window.__game;
+          const progress = game?.world?.worldQuestLog?.get('wq_evergarden_forging');
+          return JSON.stringify({
+            present: !!el,
+            display: el ? getComputedStyle(el).display : null,
+            rect: el ? el.getBoundingClientRect().toJSON() : null,
+            hidden: el?.hidden ?? null,
+            body: document.body.className,
+            forging: progress?.forging ?? null,
+            state: progress?.state ?? null,
+          });
+        });
+        throw new Error(`the forge workshop panel never appeared: ${diag}`);
+      }
+      await wait(1500);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#ui' };
+    },
+  },
+  // Existing western mountain: the approach trail and the east-facing launch wharf.
+  {
+    key: 'shear-launch-wharf',
+    label: 'Mountain trail and glider launch wharf',
+    when: ['sim/glider_approach_path', 'sim/glider_wharf_layout', 'render/gale_features'],
+    variants: [
+      {
+        key: 'from-the-road',
+        beforeLoad: lowGraphicsSeed,
+        spot: { x: 222, z: 605, facing: Math.atan2(183 - 222, 610 - 605), pitch: 0.25, dist: 18 },
+      },
+      {
+        key: 'on-the-planks',
+        beforeLoad: lowGraphicsSeed,
+        spot: { x: 194, z: 557, facing: Math.PI / 2, pitch: 0.3, dist: 12 },
+      },
+    ],
+    async capture(page, variant) {
+      await awaitWorldPainted(page);
+      await dismissArrivalGreeting(page);
+      const staged = await page.evaluate(async (spot) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const world = game?.world;
+        if (!game || !sim || !world) return { ok: false, reason: 'offline world is unavailable' };
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+        world.chat('/dev level 20');
+        await sleep(300);
+        world.chat(`/dev tp ${spot.x} ${spot.z}`);
+        await sleep(600);
+        const player = sim.player;
+        player.pos = sim.groundPos(spot.x, spot.z);
+        player.prevPos = { ...player.pos };
+        player.facing = spot.facing;
+        game.input.camYaw = spot.facing;
+        game.input.camPitch = spot.pitch;
+        game.input.camDist = spot.dist;
+        sim.rebucket?.(player);
+        game.hud.closeAll?.();
+        return { ok: true };
+      }, variant.spot);
+      if (!staged.ok) throw new Error(staged.reason);
+      await wait(1500);
+      await awaitWorldPainted(page);
+      await sweepOverlays(page, 8);
+      await wait(8000);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#ui' };
+    },
+  },
+  // World quests round 2: the airborne glider is a built GLB now. /dev glider
+  // start launches at once; three seconds of countdown, then the pilot is in
+  // the air with the apparatus overhead and the chase camera behind.
+  {
+    key: 'windrider-glider-in-flight',
+    label: 'The Windrider glider apparatus in flight',
+    when: ['render/glider_course_visual'],
+    variants: [{ key: 'desktop', beforeLoad: lowGraphicsSeed }],
+    async capture(page) {
+      await awaitWorldPainted(page);
+      await dismissArrivalGreeting(page);
+      // Stand on the wharf first (the arm without `start` only teleports), let
+      // the crossing's veil and the overlays settle, THEN launch: an unsteered
+      // glide leaves the course corridor a few seconds after the countdown,
+      // so the frame has to be taken about a second into the flight.
+      const parked = await page.evaluate(async () => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const world = game?.world;
+        if (!game || !sim || !world) return { ok: false, reason: 'offline world is unavailable' };
+        world.chat('/dev glider');
+        game.hud.closeAll?.();
+        return { ok: true };
+      });
+      if (!parked.ok) throw new Error(parked.reason);
+      await wait(1500);
+      await awaitWorldPainted(page);
+      await sweepOverlays(page, 6);
+      await page.evaluate(() => {
+        const game = window.__game;
+        game.world.chat('/dev glider start');
+        game.input.camPitch = 0.25;
+        game.input.camDist = 11;
+      });
+      // Three seconds of countdown, then a second and a bit of glide.
+      await wait(4300);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#ui' };
+    },
+  },
   {
     key: 'fen-features-cull',
     label:
@@ -1439,6 +1614,103 @@ export const TARGETS = [
       }, pick);
       await wait(400);
       return { clip: '#reliquary-window' };
+    },
+  },
+  {
+    key: 'weekly-vault',
+    label: 'Eastbrook stone vault and weekly reward choices',
+    when: ['weekly_rewards', 'eastbrook_weekly_vault'],
+    variants: [
+      { key: 'desktop' },
+      { key: 'mobile', mobile: true },
+      { key: 'frontage', frontage: true },
+    ].map((variant) => ({
+      ...variant,
+      navigationWaitUntil: 'domcontentloaded',
+      async beforeLoad(page) {
+        await page.evaluateOnNewDocument(() =>
+          localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1 })),
+        );
+      },
+    })),
+    async capture(page, variant) {
+      await page.evaluate(async () => {
+        const game = window.__game;
+        const sim = game.sim;
+        const keeper = [...sim.entities.values()].find(
+          (e) => e.templateId === 'eastbrook_vault_keeper',
+        );
+        if (!keeper) throw new Error('Weekly Vault keeper is missing');
+        sim.player.pos = { ...keeper.pos, x: keeper.pos.x - 1, z: keeper.pos.z - 1 };
+        sim.player.prevPos = { ...sim.player.pos };
+        sim.rebucket(sim.player);
+        const { prepareWeeklyVaultPlaytest } = await import(
+          '/src/sim/dev/weekly_vault_playtest.ts'
+        );
+        prepareWeeklyVaultPlaytest(sim.ctx, sim.playerId);
+      });
+      await awaitWorldPainted(page);
+      // Consume the fixture's opening first, then independently exercise Talk.
+      await page.evaluate(() => {
+        const game = window.__game;
+        const keeper = [...game.sim.entities.values()].find(
+          (e) => e.templateId === 'eastbrook_vault_keeper',
+        );
+        game.hud.closeBank();
+        if (getComputedStyle(document.querySelector('#bags')).display === 'none')
+          game.hud.toggleBags();
+        game.sim.talkToNpc(keeper.id);
+      });
+      await awaitWorldPainted(page);
+      if (!(await pollForSize(page, '#weekly-rewards-panel')))
+        throw new Error('Weekly reward panel did not open');
+      const headings = await page.$$eval('.weekly-track h3', (nodes) =>
+        nodes.map((n) => n.textContent),
+      );
+      if (headings.join('|') !== 'Raids|Dungeons|World Quests|PvP')
+        throw new Error(`Missing reward tracks: ${headings}`);
+      await dismissEntryOverlays(page);
+      // Dismiss the stock tutorial strip and GPU notice through their existing buttons.
+      await page.evaluate(() => {
+        for (const button of document.querySelectorAll('button')) {
+          if (button.textContent?.trim() === 'Dismiss' || button.classList.contains('tut-skip'))
+            button.click();
+        }
+      });
+      if (variant?.frontage) {
+        await page.evaluate(() => {
+          const game = window.__game;
+          game.hud.closeBank();
+          game.sim.player.pos = game.sim.ctx.groundPos(9, -121);
+          game.sim.player.prevPos = { ...game.sim.player.pos };
+          game.sim.rebucket(game.sim.player);
+          game.input.camYaw = Math.PI / 2 - 0.22;
+          game.input.camPitch = 0.26;
+          game.input.camDist = 18;
+        });
+        await awaitWorldPainted(page);
+        await wait(1200);
+        return;
+      }
+      if (await page.$('.bank-tab')) throw new Error('Weekly vault exposed banking tabs');
+      await page.waitForFunction(() => {
+        const rect = document.querySelector('#bank-window').getBoundingClientRect();
+        return (
+          getComputedStyle(document.querySelector('#bags')).display === 'none' &&
+          rect.width >= innerWidth * 0.85 &&
+          rect.height >= innerHeight * 0.85
+        );
+      });
+      await page.waitForFunction(() =>
+        [...document.querySelectorAll('.weekly-choice img')].every(
+          (img) => img.complete && img.naturalWidth > 0,
+        ),
+      );
+      await page.click('.weekly-choice');
+      // Capture the fixed candidates before collection, then separately verify the claim.
+      await page.evaluate(() => (document.querySelector('#weekly-rewards-panel').scrollTop = 0));
+      await wait(300);
+      await awaitWorldPainted(page);
     },
   },
   ...masterwroughtReviewTargets({
@@ -4684,6 +4956,63 @@ export const TARGETS = [
         cell?.click();
       });
       await wait(400);
+      return {};
+    },
+  },
+  {
+    key: 'faction-quartermaster-ladder',
+    label: 'Faction quartermaster: the standing ladder at Vanguard (Champion rows still gated)',
+    when: ['sim/content/faction_vendors'],
+    // The Church Order quartermaster in Eastbrook Vale with the buyer at
+    // Vanguard standing: every row through the Vanguard weapon and shield is
+    // open, the Champion jewels still show their gate line. On a base
+    // checkout the same recipe shoots the old five-row stock.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const vendor = [...sim.entities.values()].find(
+          (e) => e.templateId === 'npc_church_order_quartermaster',
+        );
+        if (!vendor) return { ok: false, reason: 'no quartermaster entity' };
+        const p = sim.player;
+        if (!p?.pos) return { ok: false, reason: 'no player' };
+        const meta = sim.players.get(p.id);
+        if (!meta) return { ok: false, reason: 'no player meta' };
+        meta.factions = { ...meta.factions, church_order: 13_000 };
+        meta.copper = 1_000_000;
+        p.pos.x = vendor.pos.x + 2;
+        p.pos.z = vendor.pos.z;
+        p.prevPos = { ...p.pos };
+        const el = document.querySelector('#vendor-window');
+        if (el) el.style.display = 'none';
+        game.hud.openVendor(vendor.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`faction-quartermaster-ladder setup failed: ${setup.reason}`);
+      if (!(await pollForSize(page, '#vendor-window'))) {
+        throw new Error('vendor window did not open');
+      }
+      // The lowest-preset first boot can keep the loading curtain up past the
+      // entry settle (main.ts hideLoadingScreen fades it on the first painted
+      // frame); shoot only once it has cleared, or the curtain is the shot.
+      for (let i = 0; i < 60; i++) {
+        const curtainUp = await page.evaluate(() =>
+          document.querySelector('#loading-screen')?.classList.contains('visible'),
+        );
+        if (!curtainUp) break;
+        await wait(500);
+      }
+      await wait(600);
       return {};
     },
   },

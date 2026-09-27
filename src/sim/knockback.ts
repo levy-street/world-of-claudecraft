@@ -9,6 +9,7 @@
 
 import { seatGroundedAt } from './colliders';
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
+import { isMoored } from './combat/trinkets';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
 import { SKIN_WIDTH } from './physics';
 import { rideSteepnessAt, stepWaterLevel } from './ride_height';
@@ -28,6 +29,8 @@ export function applyKnockback(
 ): number {
   if (source.id !== target.id && ctx.isIceBlocked(target)) return 0;
   if (source.id !== target.id && isVeilboundMarchActive(target)) return 0;
+  // The Mooring Stone holds its wearer where they stand (combat/trinkets.ts).
+  if (source.id !== target.id && isMoored(target)) return 0;
   if (ctx.cfg.devCommands && ctx.players.get(target.id)?.devAnchored) return 0;
   // Knockback resistance (the caster tier-set 2-piece grants 100%) is applied
   // centrally here so no caller can bypass it: a fully-resisted shove moves 0 yards

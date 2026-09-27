@@ -1,0 +1,54 @@
+{
+  "rows": [
+    {
+      "target": 3,
+      "cleared": 3,
+      "count": 3,
+      "moves": 1,
+      "effects": 23,
+      "stars": 15,
+      "rings": 0,
+      "rays": 0,
+      "outcome": "playing"
+    },
+    {
+      "target": 5,
+      "cleared": 5,
+      "count": 5,
+      "moves": 1,
+      "effects": 69,
+      "stars": 50,
+      "rings": 1,
+      "rays": 6,
+      "outcome": "playing"
+    },
+    {
+      "target": 8,
+      "cleared": 9,
+      "count": 9,
+      "moves": 1,
+      "effects": 105,
+      "stars": 72,
+      "rings": 2,
+      "rays": 12,
+      "outcome": "playing"
+    },
+    {
+      "case": "victory still celebrating after 3 seconds",
+      "passed": true
+    },
+    {
+      "case": "victory completes within 6 seconds",
+      "passed": true
+    },
+    {
+      "case": "defeat finishes earlier",
+      "passed": true
+    },
+    {
+      "case": "Continue immediately cancels long celebration",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

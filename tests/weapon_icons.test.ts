@@ -58,9 +58,12 @@ describe('painted weapon inventory icons', () => {
     // `npx vitest run tests/weapon_icons.test.ts` run on the merged tree:
     // this assertion, and the 19-heroic-copy count in the next test, both
     // pass as-is.
-    // 138 -> 142: the four Warfare Season 2 honor weapons, painted in
-    // warfare-season2-weapons-2026-09-25.
-    expect(baseWeapons).toHaveLength(142);
+    // 141 with the three faction quartermaster epics (riftwarden_voidblade,
+    // dawnkeeper_consecrated_mace, forgemaster_crag_cleaver; batch
+    // faction-vendor-icons-2026-09-16), landed by the wq-reputation merge.
+    // 141 -> 145: the four Warfare Season 2 honor weapons, painted in
+    // warfare-season2-weapons-2026-09-25 (second release/v0.44.0 base merge).
+    expect(baseWeapons).toHaveLength(145);
     expect([...WEAPON_IMAGE_IDS].sort()).toEqual(baseWeapons);
     expect(Object.keys(ITEM_WEAPON_VARIANTS).sort()).toEqual(baseWeapons);
     for (const id of baseWeapons) {
@@ -101,8 +104,10 @@ describe('painted weapon inventory icons', () => {
     // this release-branch merge, the Nythraxis gap-fill one-handers
     // (nythraxis-gap-weapon-renders-2026-09-04, asserted below as
     // `gapBatch`).
-    // Eight with the Warfare Season 2 weapons (warfare-season2-weapons-2026-09-25).
-    expect(weaponBatches).toHaveLength(8);
+    // Eight with the faction quartermaster epics' batch
+    // (faction-vendor-icons-2026-09-16, asserted below as `factionBatch`), nine
+    // with the Warfare Season 2 weapons (warfare-season2-weapons-2026-09-25).
+    expect(weaponBatches).toHaveLength(9);
     const historicalBatch = weaponBatches.find(
       ({ batchId }) => batchId === 'placeholder-art-completion-weapons-2026-08-09',
     );
@@ -209,6 +214,20 @@ describe('painted weapon inventory icons', () => {
       .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
       .sort();
     expect(gapWeaponIds).toEqual(['courtiers_bonefang', 'gravecourt_hewer', 'thornpeak_wardblade']);
+    // The faction quartermaster epics ship deterministic SVG compositions
+    // (scripts/generate_faction_vendor_icons.mjs) in their own batch.
+    const factionBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'faction-vendor-icons-2026-09-16',
+    );
+    expect(factionBatch).toBeDefined();
+    const factionWeaponIds = (factionBatch?.itemIds ?? [])
+      .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
+      .sort();
+    expect(factionWeaponIds).toEqual([
+      'dawnkeeper_consecrated_mace',
+      'forgemaster_crag_cleaver',
+      'riftwarden_voidblade',
+    ]);
     // The Warfare Season 2 honor weapons ship paintings in their own batch
     // (warfare-season2-weapons-2026-09-25).
     const season2Batch = weaponBatches.find(
@@ -233,6 +252,7 @@ describe('painted weapon inventory icons', () => {
           !crucibleWeaponIds.includes(id) &&
           !varkhulWeaponIds.includes(id) &&
           !gapWeaponIds.includes(id) &&
+          !factionWeaponIds.includes(id) &&
           !season2WeaponIds.includes(id),
       ),
     );
@@ -284,6 +304,7 @@ describe('painted weapon inventory icons', () => {
         !crucibleWeaponIds.includes(id) &&
         !varkhulWeaponIds.includes(id) &&
         !gapWeaponIds.includes(id) &&
+        !factionWeaponIds.includes(id) &&
         !season2WeaponIds.includes(id),
     );
     expect(chunkA.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(0, 40));

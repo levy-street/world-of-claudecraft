@@ -65,6 +65,7 @@ export * from './professions_view';
 export * from './professions_window';
 export * from './reagent_suffix_view';
 export * from './recipe_pattern_tooltip_view';
+export * from './skill_level_toast_painter';
 export * from './skill_level_toast_view';
 export * from './station_name_view';
 export * from './tool_effect_result_view';

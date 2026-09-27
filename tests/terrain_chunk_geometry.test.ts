@@ -381,12 +381,25 @@ describe('generated chunk geometry is stable', () => {
     // pads into spaced town-square positions; the terrain generator is unchanged.
     // Desktop/mobile captures and the rendered wolf-route collision checks
     // were reviewed before refreshing this intentional layout fingerprint.
-    // Re-minted for the Eastbrook ferry: its Phase 1 berth moved the cove's
-    // floating-prop calm pads (the retired and moved hulls, the ferry's own
-    // pad), which reshapes seabed vertices under the ferry pier; Phase 2 keeps
-    // that seabed byte-identical (the route berth carries the same pad).
-    // Measured on the Phase 1 commit and again on Phase 2: the same digest.
-    expect(digestOf(inRect)).toBe('bb7ae116e2805c586658643204e84c7a');
+    // Second release/v0.43.0 merge into feature/world-quests: the handoff's
+    // spaced givers compose with the branch's calm pads (shadow guards, freight
+    // crate and wagon). Measured on the merged tree, twice in separate processes.
+    // Re-minted for the weekly emissary (Cham Pete at (-52, -108), a calm-anchor
+    // NPC like every other). Localization checked against the dense height
+    // atlas re-minted in the same commit: 7 points move (both lanes), all within
+    // 6.3 yd of the emissary, by at most 0.053 yd.
+    // Re-minted for the Weekly Vault (PR 4052) landing on the quests integration
+    // branch: the stone hall's late terrain pad at (21, -119) and the coast road
+    // re-threaded around its western entrance regrade the harbour-quarter
+    // chunks. Probed on both trees with a 4 yd lattice: every moved height sits
+    // inside x 0..64, z -148..-20 (up to 1.7 yd at the hall footprint, under
+    // 0.02 yd along the re-threaded road), nothing moves outside the town.
+    // Measured on the merged tree; CI shard 1 read the same digest.
+    // Re-minted at the fourth release/v0.44.0 base merge: the release's Eastbrook
+    // ferry berth moved the cove's floating-prop calm pads (the retired and moved
+    // hulls, the ferry's own pad) under the seabed this rectangle covers, composed
+    // with the branch's vault hall and emissary pads. Measured on the merged tree.
+    expect(digestOf(inRect)).toBe('7872140edd9ed66524f2d242aaf823a5');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

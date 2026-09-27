@@ -1,0 +1,10 @@
+{
+  "note": "The Crucible raid trinket relics (Kindling Orb, Last Flame Lantern, Forgefather's hammer): one texture-free GLB, three root nodes, authored headless in Blender by scripts/assets/trinket_relics/build_trinket_relics.py (raw output in tmp/asset_src/trinket_relics, gitignored). type:static, meshopt only; COLOR_0 carries every colour, so there is nothing for the KTX2 step to convert.",
+  "items": [
+    {
+      "src": "tmp/asset_src/trinket_relics/trinket_relics-raw.glb",
+      "out": "models/vfx/trinket_relics.glb",
+      "type": "static"
+    }
+  ]
+}

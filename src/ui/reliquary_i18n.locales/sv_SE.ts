@@ -160,7 +160,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: 'Heroisk: Degeln vid Sistakällan',
-    desc: 'Vapen enbart från heroiskt läge, från Ignivar, den sista lågans härold.',
+    desc: 'Vapen enbart från heroiskt läge samt raidens trinkets, från Ignivar, den sista lågans härold.',
   },
   conquerors_varkhul: {
     name: 'Den inre Smältdegeln',
@@ -168,7 +168,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: 'Heroisk: Den inre Smältdegeln',
-    desc: 'Sköldar och vapen enbart från heroiskt läge, från Varkhul, den sista lågans smedjefader.',
+    desc: 'Sköldar och vapen enbart från heroiskt läge samt raidens trinkets, från Varkhul, den sista lågans smedjefader.',
   },
   conquerors_set_bramblehide: {
     name: "Roots' Törnehud",

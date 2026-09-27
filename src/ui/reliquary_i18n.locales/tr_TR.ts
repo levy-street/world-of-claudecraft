@@ -160,7 +160,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: 'Kahramanca: Son Pınar Potası',
-    desc: 'Ignivar, Son Alevin Habercisi’nden yalnızca kahramanca modda düşen silahlar.',
+    desc: 'Ignivar, Son Alevin Habercisi’nden yalnızca kahramanca modda düşen silahlar ve baskın tılsımları.',
   },
   conquerors_varkhul: {
     name: 'İç Pota',
@@ -168,7 +168,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: 'Kahramanca: İç Pota',
-    desc: 'Varkhul, Son Alevin Demirhane Babası’ndan yalnızca kahramanca modda düşen kalkanlar ve silahlar.',
+    desc: 'Varkhul, Son Alevin Demirhane Babası’ndan yalnızca kahramanca modda düşen kalkanlar, silahlar ve baskın tılsımları.',
   },
   conquerors_set_bramblehide: {
     name: "Roots'un Dikenli Postu",

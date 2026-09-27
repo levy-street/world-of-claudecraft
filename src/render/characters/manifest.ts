@@ -1208,6 +1208,7 @@ export const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
   bulwark_of_the_inner_crucible: 'shield_square',
   ember_wardens_barrier: 'shield_round',
   votive_ward_of_the_deathless_court: 'shield_round', // Nythraxis gap-fill healer shield
+  templar_dawn_shield: 'shield_square', // Church Order quartermaster's mail shield (faction_vendors.ts)
   varkhul_emberward: 'varkhul_emberward', // Ignivar raid legendary (Varkhul drop)
 };
 
@@ -4140,6 +4141,14 @@ const FAMILY_KEYS: Record<string, string> = {
 };
 
 const NPC_KEYS: Record<string, string> = {
+  infiltrator_captain: 'npc_knight',
+  infiltrator_nella: 'npc_knight',
+  infiltrator_orin: 'npc_knight',
+  infiltrator_bram: 'npc_knight',
+  infiltrator_tessa: 'npc_knight',
+  calligraphy_instructor: 'npc_villager_robed',
+  calligraphy_apprentice_1: 'npc_villager',
+  calligraphy_apprentice_2: 'npc_villager',
   bursar_fernando: 'npc_fernando',
   card_master: 'npc_villager_robed',
   marshal_redbrook: 'npc_knight',

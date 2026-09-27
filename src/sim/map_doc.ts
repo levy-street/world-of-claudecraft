@@ -13,6 +13,7 @@ import type {
   BlockerDef,
   CampDef,
   GroundObjectDef,
+  GroundObjectPosition,
   HeightStamp,
   NpcDef,
   ZoneDef,
@@ -328,11 +329,15 @@ function sanitizeGroundObject(v: unknown): GroundObjectDef | null {
   const o = v as Record<string, unknown>;
   const itemId = idStr(o.itemId);
   if (!itemId) return null;
-  const positions: { x: number; z: number }[] = [];
+  const positions: GroundObjectPosition[] = [];
   for (const p of arr(o.positions).slice(0, MAX_OBJECT_POSITIONS)) {
     const pt = p as Record<string, unknown> | null;
     if (pt && typeof pt === 'object' && finiteNum(pt.x) && finiteNum(pt.z)) {
-      positions.push({ x: coord(pt.x), z: coord(pt.z) });
+      const position: GroundObjectPosition = { x: coord(pt.x), z: coord(pt.z) };
+      if (finiteNum(pt.y)) position.y = coord(pt.y);
+      if (finiteNum(pt.facing)) position.facing = pt.facing % (2 * Math.PI);
+      if (finiteNum(pt.scale)) position.scale = clamp(pt.scale || 1, 0.05, 40);
+      positions.push(position);
     }
   }
   return { itemId, name: str(o.name, '').slice(0, MAX_NAME_LENGTH), positions };

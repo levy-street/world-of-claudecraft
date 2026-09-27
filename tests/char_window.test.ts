@@ -119,7 +119,6 @@ describe('char_window: paperdoll helm-visibility eye', () => {
       slotName: (slot) => slot,
       statCellHtml: () => '',
       statTooltipHtml: () => '',
-      talentSummaryHtml: () => '',
       progressionHtml: () => '',
       unequip: vi.fn(),
       beginUnequipDrag: vi.fn(),
@@ -228,7 +227,6 @@ describe('char_window: profession art placements', () => {
       slotName: (slot) => slot,
       statCellHtml: () => '',
       statTooltipHtml: () => '',
-      talentSummaryHtml: () => '',
       progressionHtml: () => '<div data-progression-test>Progression fixture</div>',
       unequip: vi.fn(),
       beginUnequipDrag: vi.fn(),
@@ -255,9 +253,16 @@ describe('char_window: profession art placements', () => {
     });
 
     win.render();
+    // The Character tab's rail seats the Specialization board after the stat
+    // boards (a fresh warrior reads the no-spec line there).
+    const specPanel = root.querySelector('.char-stats-rail .char-rail-panels > .char-spec-panel');
+    expect(specPanel?.querySelector('.sp-title')?.textContent).toBe('Specialization');
+    expect(specPanel?.querySelector('.stat-cell b')?.textContent).toBe('No specialization chosen');
     const tabs = [...root.querySelectorAll<HTMLElement>('.char-sidebar-tab')];
     expect(tabs.map((tab) => [tab.dataset.tab, tab.getAttribute('aria-selected')])).toEqual([
       ['stats', 'true'],
+      ['reputation', 'false'],
+      ['currencies', 'false'],
       ['progression', 'false'],
       ['skills', 'false'],
     ]);
@@ -403,7 +408,6 @@ describe('char_window: profession art placements', () => {
       slotName: (slot) => slot,
       statCellHtml: () => '',
       statTooltipHtml: () => '',
-      talentSummaryHtml: () => '',
       progressionHtml: () => '',
       unequip: vi.fn(),
       beginUnequipDrag: vi.fn(),
@@ -504,7 +508,7 @@ describe('char_window: paperdoll core + HUD-owned preview boundary', () => {
 
   it('preserves the unequip / drag / context-menu dispatch', () => {
     expect(painter).toContain('this.deps.unequip(slot)');
-    expect(painter).toContain('this.deps.beginUnequipDrag(slot)');
+    expect(painter).toContain('this.deps.beginUnequipDrag(slot, hotbarAction)');
     expect(painter).toContain('this.deps.endUnequipDrag()');
     expect(painter).toContain("row.addEventListener('contextmenu'");
   });
@@ -559,7 +563,6 @@ describe('char_window: focus carried across the 2 Hz rebuild', () => {
       slotName: (slot) => slot,
       statCellHtml: () => '',
       statTooltipHtml: () => '',
-      talentSummaryHtml: () => '',
       progressionHtml: () => '',
       unequip: vi.fn(),
       beginUnequipDrag: vi.fn(),
@@ -982,7 +985,6 @@ describe('char_window: lifetime Time Played line (issue: character-sheet playtim
       slotName: (slot) => slot,
       statCellHtml: () => '',
       statTooltipHtml: () => '',
-      talentSummaryHtml: () => '',
       progressionHtml: () => '',
       unequip: vi.fn(),
       beginUnequipDrag: vi.fn(),
@@ -1008,6 +1010,8 @@ describe('char_window: lifetime Time Played line (issue: character-sheet playtim
       attachTooltip,
     });
     win.render();
+    // Playtime lives on the Progression tab now; the sheet opens on Stats.
+    root.querySelector<HTMLButtonElement>('#char-sidebar-tab-progression')?.click();
     return { root, togglePlaytimeVisible, restoreFocus, attachTooltip };
   }
 
@@ -1175,7 +1179,6 @@ describe('char_window: the Masterwrought cap visibility family (phase 14)', () =
       slotName: (slot) => slot,
       statCellHtml: () => '',
       statTooltipHtml: () => '',
-      talentSummaryHtml: () => '',
       progressionHtml: () => '',
       unequip: vi.fn(),
       beginUnequipDrag: vi.fn(),
@@ -1347,5 +1350,91 @@ describe('char_window: the model is the stage and the sockets overlay it (W24)',
     // and the 21px numeral rendered above the tile, over the sidebar tabs.
     expect(css).toMatch(/\.attrs-tiles \.stat-cell \{[^}]*min-height: 56px;/);
     expect(css).toMatch(/\.attrs-tiles \.stat-cell \{[^}]*justify-content: center;/);
+  });
+});
+
+describe('char_window: the worn trinket drags onto the action bar', () => {
+  // A usable trinket is used where it is worn, so the paperdoll drag carries the
+  // hotbar payload (the bar reads it on drop) alongside the unequip; every other
+  // worn piece keeps the plain move-only unequip drag.
+  function dragFrom(equipment: Record<string, string>, slot: string) {
+    const root = document.createElement('div');
+    const beginUnequipDrag = vi.fn();
+    const world = {
+      cfg: { playerClass: 'warrior' },
+      player: { name: 'Aurelia', level: 60, skin: 0 },
+      equipment,
+      equipmentInstances: {},
+      honor: 0,
+      archetypeTitle: null,
+      hobbyCraft: null,
+      professionsState: { skills: [] },
+    };
+    const win = new CharWindow({
+      openCosmetics: vi.fn(),
+      root: () => root,
+      world: () => world as never,
+      closeOthers: vi.fn(),
+      hideTooltip: vi.fn(),
+      captureFocus: () => null,
+      restoreFocus: vi.fn(),
+      slotName: (s) => s,
+      statCellHtml: () => '',
+      statTooltipHtml: () => '',
+      progressionHtml: () => '',
+      unequip: vi.fn(),
+      beginUnequipDrag,
+      endUnequipDrag: vi.fn(),
+      renderPreview: vi.fn(),
+      renderSkinPicker: vi.fn(),
+      openPlayerCard: vi.fn(),
+      openPrestige: vi.fn(),
+      openDeeds: vi.fn(),
+      openReliquary: vi.fn(),
+      dragState: new ItemDragState(),
+      renderBags: vi.fn(),
+      showError: vi.fn(),
+      helmSlotAvailable: () => true,
+      helmHidden: () => false,
+      toggleHelm: vi.fn(),
+      playtimeVisible: () => true,
+      togglePlaytimeVisible: vi.fn(),
+      itemIcon: () => '',
+      moneyHtml: () => '',
+      wornItemTooltip: () => '',
+      attachTooltip: vi.fn(),
+    });
+    win.render();
+    const row = root.querySelector(`#equip-slot-${slot}`);
+    expect(row).not.toBeNull();
+    const data = new Map<string, string>();
+    const dataTransfer = {
+      effectAllowed: 'none',
+      setData: (k: string, v: string) => void data.set(k, v),
+      getData: (k: string) => data.get(k) ?? '',
+    };
+    const ev = new Event('dragstart');
+    Object.defineProperty(ev, 'dataTransfer', { value: dataTransfer });
+    row?.dispatchEvent(ev);
+    return { beginUnequipDrag, data, dataTransfer };
+  }
+
+  it('hands the bar a payload for a worn usable trinket', () => {
+    const { beginUnequipDrag, data, dataTransfer } = dragFrom({ trinket: 'stormjar' }, 'trinket');
+    expect(beginUnequipDrag).toHaveBeenCalledWith('trinket', { type: 'item', id: 'stormjar' });
+    expect(data.get('application/x-woc-hotbar-action')).toBe(
+      JSON.stringify({ type: 'item', id: 'stormjar' }),
+    );
+    expect(dataTransfer.effectAllowed).toBe('copyMove');
+  });
+
+  it('keeps any other worn piece a move-only unequip drag', () => {
+    const { beginUnequipDrag, data, dataTransfer } = dragFrom(
+      { mainhand: 'duskforged_warblade' },
+      'mainhand',
+    );
+    expect(beginUnequipDrag).toHaveBeenCalledWith('mainhand', null);
+    expect(data.size).toBe(0);
+    expect(dataTransfer.effectAllowed).toBe('move');
   });
 });

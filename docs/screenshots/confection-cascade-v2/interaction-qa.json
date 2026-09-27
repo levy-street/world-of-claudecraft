@@ -1,0 +1,68 @@
+{
+  "results": [
+    {
+      "case": "confirmed move",
+      "moves": 1,
+      "before": 0,
+      "effects": 23,
+      "stable": true,
+      "count": 3,
+      "boardMatches": true,
+      "pointerInert": true
+    },
+    {
+      "case": "natural cleanup",
+      "passed": true
+    },
+    {
+      "case": "live reset",
+      "passed": true
+    },
+    {
+      "case": "live close",
+      "passed": true
+    },
+    {
+      "case": "live nextMove",
+      "passed": true
+    },
+    {
+      "case": "live system",
+      "passed": true
+    },
+    {
+      "case": "live setting",
+      "passed": true
+    },
+    {
+      "case": "live low",
+      "passed": true
+    },
+    {
+      "case": "initial system",
+      "passed": true
+    },
+    {
+      "case": "initial setting",
+      "passed": true
+    },
+    {
+      "case": "initial low",
+      "passed": true
+    },
+    {
+      "case": "Parchment keyboard focus",
+      "visible": true,
+      "outline": "rgb(255, 230, 166)"
+    },
+    {
+      "case": "forced colors glyphs visible",
+      "passed": true
+    },
+    {
+      "case": "failed atlas glyph fallback",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

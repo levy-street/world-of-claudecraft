@@ -566,6 +566,13 @@ interface ScannedPainter {
 // the float animation on a recycled node.
 const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'micro_menu_state_painter.ts', allow: {}, reflowAllow: {} },
+  // Sixteen construction-only class assignments; all update writes use the shared facet.
+  {
+    file: 'hud/vehicle/vehicle_action_bar_controller.ts',
+    // Constructor-only count label now composes ui-socket-count with the shared icon skin.
+    allow: { '.className': 16 },
+    reflowAllow: {},
+  },
   // Both writes are build-time. The .className is the base class stamped on a tick
   // as it is MINTED into the pool (the pool only grows to the high-water tick
   // count), and the .setAttribute is the one aria-hidden on the ring root in
@@ -584,6 +591,11 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'cast_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'unit_frame_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'paladin_devotion_painter.ts', allow: {}, reflowAllow: {} },
+  // Event-time celebration painters (a skill level-up, a faction standing
+  // tier): they draw only through the CelebrationHost seam (log, banner
+  // slot, announcer), so they make no raw DOM write at all.
+  { file: 'hud/professions/skill_level_toast_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/reputation/faction_tier_celebration_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/action_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/mobile_action_ring_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/radial_petal_painter.ts', allow: {}, reflowAllow: {} },
@@ -893,6 +905,15 @@ interface ColdPainter {
 }
 
 const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
+  // Only an open vault dropdown measures its anchor and clipping rectangles,
+  // on open/scroll/resize. Ancestor style classification is cached until resize;
+  // no clock or ordinary HUD repaint drives positioning. Nested scrollers can
+  // move clipping rectangles, so those bounded reads remain event-driven.
+  {
+    file: 'weekly_reward_table_picker_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 2, getComputedStyle: 1 },
+    driverAllow: {},
+  },
   // One app-viewport rect when the player starts dragging an aura in setup mode. The cached
   // rect converts pointer moves to persisted normalized X/Y values; the controller owns no
   // clock and performs no layout read during ordinary combat painting.
@@ -980,6 +1001,24 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
             'the SAME paint every pointer-driven repaint takes, whose writes and both forced reads elide whole when the rendered HTML did not change; the tick adds nothing of its own on the way there.',
         },
         writeAllow: {},
+        queryAllow: {},
+        idlAllow: {},
+        reflowAllow: {},
+      },
+    ],
+  },
+  // The Ley-alignment clock updates its whole-second text only while an attempt is open.
+  // Element refs are captured when the board is built, and the urgent class changes once.
+  {
+    file: 'world_quest_ley_window.ts',
+    reflowAllow: {},
+    driverAllow: { setInterval: 1 },
+    drivers: [
+      {
+        driver: 'setInterval',
+        everyMs: 1000,
+        why: 'the open Ley attempt countdown: paint the cached timer once per second and stop at zero, on defeat, completion, close, or rebuild.',
+        writeAllow: { '.textContent': 1, '.classList': 1, '.setAttribute': 1 },
         queryAllow: {},
         idlAllow: {},
         reflowAllow: {},
@@ -1862,6 +1901,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     // over zero callbacks and reads as a pass.
     expect(sweep.scanned).toEqual([
       'gather_node_tooltip_controller.ts#0',
+      'world_quest_ley_window.ts#0',
       'daily_rewards_window.ts#0',
       'daily_rewards_window.ts#1',
       'hud/professions/harvest_journal_window.ts#0',

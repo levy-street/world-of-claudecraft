@@ -23,6 +23,7 @@ import {
 import { buildDungeonPropMesh } from './dungeon';
 import { GFX, surfaceMat } from './gfx';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
+import { isWorldQuestPlacerSourceHidden } from './world_quest_placer_mask';
 
 // Small standalone GLB props (not part of the shared dungeon-kit pack): load
 // once, clone per placement, and normalize to a target height like the reward
@@ -885,6 +886,7 @@ export function syncDelveInteractableVisibility(
 ): boolean {
   const visible =
     !compilePending &&
+    !isWorldQuestPlacerSourceHidden(group) &&
     delveInteractableVisible(entity.templateId ?? null, entity.lootable) &&
     withinPortalRange &&
     !isObjectOpenedByViewer(entity, questLog);

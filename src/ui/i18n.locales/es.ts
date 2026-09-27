@@ -13,6 +13,116 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.paperdoll.trinketSlot': 'Abalorio',
+  'hud.errors.cannotCastWhileMoving': 'No puedes lanzar hechizos mientras te mueves.',
+  'hudChrome.auraEffect.wolfForm':
+    'Forma de gato: daño cuerpo a cuerpo y energía; velocidad de movimiento aumentada un {pct}%',
+  'hudChrome.auraOverlay.cues.anvilStrike': 'Golpe de yunque',
+  'hudChrome.auraOverlay.cues.blaringHorn': 'Bocina estridente',
+  'hudChrome.auraOverlay.cues.bubblePop': 'Estallido de burbuja',
+  'hudChrome.auraOverlay.cues.carKlaxon': 'Claxon de coche',
+  'hudChrome.auraOverlay.cues.catMeow': 'Maullido de gato',
+  'hudChrome.auraOverlay.cues.coinDrop': 'Caída de moneda',
+  'hudChrome.auraOverlay.cues.electricZap': 'Chispazo eléctrico',
+  'hudChrome.auraOverlay.cues.frogCroak': 'Croar de rana',
+  'hudChrome.auraOverlay.cues.glassPing': 'Tintineo de cristal',
+  'hudChrome.auraOverlay.cues.hardBell': 'Campana fuerte',
+  'hudChrome.auraOverlay.cues.musicBox': 'Caja de música',
+  'hudChrome.auraOverlay.cues.owlHoot': 'Ululato de lechuza',
+  'hudChrome.auraOverlay.cues.softChime': 'Campanilla suave',
+  'hudChrome.auraOverlay.cues.sonarPing': 'Pitido de sonar',
+  'hudChrome.auraOverlay.cues.steamHiss': 'Silbido de vapor',
+  'hudChrome.auraOverlay.cues.swordDraw': 'Desenvainar espada',
+  'hudChrome.auraOverlay.cues.templeGong': 'Gong de templo',
+  'hudChrome.auraOverlay.cues.waterDrop': 'Gota de agua',
+  'hudChrome.auraOverlay.cues.windWhoosh': 'Ráfaga de viento',
+  'hudChrome.auraOverlay.cues.wolfHowl': 'Aullido de lobo',
+  'hudChrome.auraOverlay.haptic': 'Vibración',
+  'hudChrome.auraOverlay.hapticHint':
+    'Hace vibrar un mando conectado, o tu teléfono. Se ignora en dispositivos sin vibración.',
+  'hudChrome.auraOverlay.hapticNone': 'Desactivado',
+  'hudChrome.auraOverlay.haptics.double': 'Doble',
+  'hudChrome.auraOverlay.haptics.long': 'Larga',
+  'hudChrome.auraOverlay.haptics.tap': 'Toque',
+  'hudChrome.auraOverlay.readyGlow': 'Brillo de la barra de acceso rápido',
+  'hudChrome.auraOverlay.readyGlowHint':
+    'Ilumina este hechizo en tu barra de acceso rápido mientras su beneficio esté activo.',
+  'hudChrome.auraOverlay.reticleTick': 'Marca en la retícula',
+  'hudChrome.auraOverlay.reticleTickHint':
+    'Añade una marca cerca del centro de la pantalla que se ilumina cuando este hechizo se activa.',
+  'hudChrome.auraOverlay.sound': 'Sonido de alerta',
+  'hudChrome.auraOverlay.soundHint':
+    'Se reproduce un sonido cada vez que este hechizo se activa. Desactiva el icono, las medialunas y el anillo en el suelo para que solo el sonido lo anuncie.',
+  'hudChrome.auraOverlay.soundNone': 'Sin sonido',
+  'hudChrome.auraOverlay.soundPreview': 'Reproducir',
+  'hudChrome.auraOverlay.soundPreviewAria':
+    'Escuchar una vista previa del sonido de alerta {sound}',
+  'hudChrome.auraOverlay.soundVolume': 'Volumen del sonido',
+  'hudChrome.auraOverlay.watchlist': 'Hechizos seguidos',
+  'hudChrome.auraOverlay.watchlistCount': '{count} seguidos',
+  'hudChrome.auraOverlay.watchlistEmpty':
+    'Ningún otro hechizo de tu libro de hechizos te otorga un beneficio.',
+  'hudChrome.auraOverlay.watchlistHint':
+    'Elige cualquier hechizo que te otorgue un beneficio para darle su propia aura. Los hechizos elegidos obtienen una tarjeta completa más abajo, con su propio icono, color, posición y anillo en el suelo.',
+  'hudChrome.auraOverlay.watchlistUnwatch': 'Dejar de seguir {spell}',
+  'hudChrome.auraOverlay.watchlistWatch': 'Seguir {spell}',
+  'hudChrome.bank.quantityStepDownAria': 'Reducir la cantidad en {count}',
+  'hudChrome.bank.quantityStepUpAria': 'Aumentar la cantidad en {count}',
+  'hudChrome.deeds.accountScopeHint':
+    'Una gesta que logre cualquier personaje de tu cuenta también se considera conseguida aquí, y el Libro indica quién la logró.',
+  'hudChrome.deeds.accountScopeNote': 'Compartido por todos los personajes de tu cuenta',
+  'hudChrome.deeds.earnedBy': 'Conseguida por {names}',
+  'hudChrome.deeds.earnerWithDate': '{name} ({date})',
+  'hudChrome.finder.lootHeroicChance':
+    'Bonificación heroica, objetos con posibilidad adicional de caer:',
+  'hudChrome.finder.lootHeroicMaybe':
+    'Bonificación heroica, como máximo puede caer uno de estos objetos:',
+  'hudChrome.keybinds.friendlyNameplates': 'Alternar placas de nombre de aliados',
+  'hudChrome.leaderboard.podiumLabel': 'Los tres primeros',
+  'hudChrome.leaderboard.prestigeTitle': 'Prestigio {rank}',
+  'hudChrome.leaderboard.unclaimed': 'Sin reclamar',
+  'hudChrome.materialSources.decreaseByAria': 'Reducir en {count} las unidades de {source}',
+  'hudChrome.materialSources.fits': 'Caben hasta {units} ahora mismo',
+  'hudChrome.materialSources.increaseByAria': 'Aumentar en {count} las unidades de {source}',
+  'hudChrome.materialSources.moveAll': 'Mover todas las unidades',
+  'hudChrome.noticeboard.filterEmpty':
+    'Ninguna hermandad ha abierto aún sus puertas a nuevos jugadores.',
+  'hudChrome.noticeboard.filterNewPlayersTitle':
+    'Mostrar solo hermandades que acogen a nuevos jugadores',
+  'hudChrome.noticeboard.filters': 'Filtros del tablón',
+  'hudChrome.noticeboard.newPlayerFriendly': 'Apta para nuevos jugadores',
+  'hudChrome.noticeboard.newPlayerFriendlyTitle': 'Esta hermandad acoge a nuevos jugadores',
+  'hudChrome.noticeboard.officerEntry': '{name} ({rank})',
+  'hudChrome.noticeboard.officersOnline': 'Oficiales en línea',
+  'hudChrome.noticeboard.officersOnlineLabel': 'Oficiales en línea: {names}',
+  'hudChrome.noticeboard.showAll': 'Mostrar todas las hermandades',
+  'hudChrome.pledge.newPlayerFriendlyHint':
+    'Se muestra en el tablón de reclutas del cartel de la Costa de la Prueba.',
+  'hudChrome.pledge.newPlayerFriendlyLabel': 'Apta para nuevos jugadores',
+  'hudChrome.plurals.guildBoardShown.few': '{count} hermandades mostradas',
+  'hudChrome.plurals.guildBoardShown.many': '{count} hermandades mostradas',
+  'hudChrome.plurals.guildBoardShown.one': '{count} hermandad mostrada',
+  'hudChrome.plurals.guildBoardShown.other': '{count} hermandades mostradas',
+  'hudChrome.professionTrainers.alchemy': 'Instructor de Alquimia',
+  'hudChrome.professionTrainers.blacksmithing': 'Instructor de Herrería',
+  'hudChrome.professionTrainers.cooking': 'Instructor de Cocina',
+  'hudChrome.professionTrainers.engineering': 'Instructor de Ingeniería',
+  'hudChrome.professionTrainers.farming': 'Instructor de Agricultura',
+  'hudChrome.professionTrainers.hobby': 'Instructor de Aficiones',
+  'hudChrome.professionTrainers.leatherworking': 'Instructor de Peletería',
+  'hudChrome.professionTrainers.mining': 'Instructor de Minería',
+  'hudChrome.professionTrainers.nameplate': '<{title}>',
+  'hudChrome.professionTrainers.tailoring': 'Instructor de Sastrería',
+  'hudChrome.reliquary.finderWithDate': '{name} ({date})',
+  'hudChrome.reliquary.foundBy': 'Encontrada por {names}',
+  'hudChrome.reliquary.sharedScopeHint':
+    'Una reliquia que encuentre cualquier personaje de tu cuenta también rellena la página aquí.',
+  'hudChrome.reliquary.sharedScopeNote': 'Compartido por todos los personajes de tu cuenta',
+  'hudChrome.tutorialGreeting.eastbrookGuidanceNote':
+    '¡Bienvenido a Eastbrook! El mariscal Redbrook tiene trabajo para ti en la plaza del pueblo. Activa la guía dorada para encontrarlo y seguir Lobos a las puertas, o explora por tu cuenta. Puedes cambiar esto más tarde en Opciones, Interfaz, Combate.',
+  'hudChrome.tutorialGreeting.guidanceOff': 'Desactivar la guía',
+  'hudChrome.tutorialGreeting.guidanceOn': 'Activar la guía',
+  'hudChrome.tutorialGreeting.guidanceSetting': 'Guía dorada de Eastbrook',
   'hudChrome.barEditor.armed': 'Toca una ranura para colocar {name}.',
   'hudChrome.barEditor.buttonHeader': 'Botón {button}',
   'hudChrome.barEditor.cellAria': 'Botón {button}, {direction}: {action}',
@@ -6483,11 +6593,60 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'questUi.detail.itemReward': 'Recompensa de objeto:',
   'questUi.detail.objectiveProgress': '{label}: {current}/{total}',
   'questUi.detail.requiresLevel': 'Requiere nivel {level}',
+  'questUi.worldQuest.title': '{zone}: {target}',
+  'questUi.worldQuest.unknown': 'Misión de mundo desconocida ({id})',
+  'questUi.worldQuest.itemReward': 'Recompensa de objeto: {name}',
+  'questUi.worldQuest.rewardLine': 'Recompensas: {reward}',
+  'questUi.worldQuest.availableStatus': 'Misión de mundo disponible',
+  'questUi.worldQuest.activeStatus': 'Misión de mundo activa',
+  'questUi.worldQuest.expiresIn': 'Caduca en {time}',
+  'questUi.worldQuest.mineOre': 'Extrae mineral de cobre',
+  'questUi.worldQuest.recoverObject': 'Recupera {name}',
+  'questUi.worldQuest.redirectLeyBeam': 'Redirige el rayo ley',
+  'questUi.worldQuest.puzzleTitle': 'Alineación del rayo ley',
+  'questUi.worldQuest.puzzleInstructions':
+    'Gira las fichas para llevar el rayo desde el origen hasta el destino.',
+  'questUi.worldQuest.puzzleRotateTile': 'Girar ficha {tile}',
+  'questUi.worldQuest.puzzleConnectors': 'Conexiones: {connectors}.',
+  'questUi.worldQuest.puzzlePowered': 'El rayo llega a esta ficha.',
+  'questUi.worldQuest.puzzleUnpowered': 'El rayo no llega a esta ficha.',
+  'questUi.worldQuest.puzzleClose': 'Cerrar puzle del rayo ley',
+  'questUi.worldQuest.puzzleSource': 'Origen',
+  'questUi.worldQuest.puzzleTarget': 'Destino',
+  'questUi.worldQuest.puzzleRetry': 'Reintentar',
+  'questUi.worldQuest.puzzleTimer': '{seconds}s',
+  'questUi.worldQuest.puzzleTimerAria': 'Tiempo restante: {seconds} segundos',
+  'questUi.worldQuest.startQuest': 'Iniciar World Quest',
+  'questUi.worldQuest.startEscort': 'Iniciar escolta',
+  'questUi.worldQuest.escortTitle': 'Caravana',
+  'questUi.worldQuest.alreadyCompleted': 'Ya has completado esta World Quest en este ciclo.',
+  'questUi.worldQuest.inProgress': 'Esta World Quest ya está en curso.',
+  'questUi.worldQuest.matchConfections': 'Combina dulces encantados',
+  'questUi.worldQuest.escortCaravan': 'Escolta la caravana: {zone}',
+  'questUi.worldQuest.salvageWreckage': 'Recupera restos del naufragio',
+  'questUi.worldQuest.puzzleLevel': 'Nivel diario {level}',
+  'questUi.worldQuest.match3Title': 'Cascada de dulces',
+  'questUi.worldQuest.match3Instructions':
+    'Selecciona dos dulces adyacentes. El movimiento solo cuenta si forma una línea de tres o más.',
+  'questUi.worldQuest.match3Moves': 'Movimientos: {current}/{total}',
+  'questUi.worldQuest.match3Cleared': 'Dulces eliminados: {current}/{total}',
+  'questUi.worldQuest.match3Cell': 'Fila {row}, columna {column}: {candy}',
+  'questUi.worldQuest.match3Selected': 'Seleccionado',
+  'questUi.worldQuest.match3Reset': 'Reiniciar nivel',
+  'questUi.worldQuest.match3Close': 'Cerrar puzle de dulces',
+  'questUi.worldQuest.match3OutOfMoves':
+    'No quedan movimientos. Reinicia el nivel para intentarlo de nuevo.',
+  'questUi.worldQuest.match3Candy.berry': 'cristal de frutos rojos',
+  'questUi.worldQuest.match3Candy.citrus': 'orbe cítrico',
+  'questUi.worldQuest.match3Candy.mint': 'triángulo de menta',
+  'questUi.worldQuest.match3Candy.grape': 'cuadrado de uva',
+  'questUi.worldQuest.match3Candy.star': 'estrella de azúcar',
   'questUi.logs.accepted': 'Misión aceptada: {name}',
   'questUi.logs.abandoned': 'Misión abandonada: {name}',
   'questUi.logs.completed': 'Misión completada: {name}',
   'questUi.logs.ready': '{name} ({status})',
   'questUi.logs.progress': '{label}: {current}/{total}',
+  'questUi.logs.worldQuestStarted': 'Misión de mundo iniciada: {name}',
   'questUi.errors.unavailable': 'Esa misión no está disponible.',
   'questUi.errors.notInLog': 'Esa misión no está en tu diario.',
   'questUi.errors.incomplete': 'Esa misión no está completada.',
@@ -7481,6 +7640,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.mudfin_murloc.name': 'Merodeador Aletabarro',
   'entities.mobs.tunnel_rat.name': 'Excavador de Deeprock',
   'entities.mobs.vale_bandit.name': 'Bandido del Valle',
+  'entities.mobs.eastbrook_freight_caravan.name': 'Caravana de mercancías de Eastbrook',
+  'entities.mobs.willowfen_remedy_caravan.name': 'Caravana de remedios del Pantano de los Sauces',
+  'entities.mobs.frostveil_supply_caravan.name': 'Caravana de suministros del Velo de Escarcha',
   'entities.mobs.restless_bones.name': 'Huesos inquietos',
   'entities.mobs.gorrak.name': 'Gorrak el Despiadado',
   'entities.mobs.mire_prowler.name': 'Merodeador del lodazal',
@@ -10566,6 +10728,24 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.leaderboard.topLevel': 'Top',
   'hudChrome.leaderboard.guildXp': 'XP total',
   'hudChrome.leaderboard.guildEmpty': 'Aún no hay hermandades clasificadas.',
+  'hudChrome.wqLadder.title': 'Clasificación de misiones de mundo',
+  'hudChrome.wqLadder.subtitle':
+    'El mejor intento de cada héroe, una clasificación por cada misión de mundo con medalla.',
+  'hudChrome.wqLadder.close': 'Cerrar la clasificación de misiones de mundo',
+  'hudChrome.wqLadder.rankedBy.waves': 'Por oleadas resistidas',
+  'hudChrome.wqLadder.rankedBy.seconds': 'Por el tiempo más rápido',
+  'hudChrome.wqLadder.rankedBy.points': 'Por la puntuación más alta',
+  'hudChrome.wqLadder.rankedByMedal.waves': 'Por medalla y luego oleadas resistidas',
+  'hudChrome.wqLadder.rankedByMedal.seconds': 'Por medalla y luego el tiempo más rápido',
+  'hudChrome.wqLadder.rankedByMedal.points': 'Por medalla y luego la puntuación más alta',
+  'hudChrome.wqLadder.podiumLabel': 'Los tres mejores',
+  'hudChrome.wqLadder.unclaimed': 'Sin reclamar',
+  'hudChrome.wqLadder.totalOne': 'Un héroe clasificado',
+  'hudChrome.wqLadder.totalMany': '{count} héroes clasificados',
+  'hudChrome.wqLadder.selfLabel': 'Tu mejor marca',
+  'hudChrome.wqLadder.selfRank': 'Puesto {rank}',
+  'hudChrome.wqLadder.selfNone':
+    'Aún no tienes puntuación en esta tabla. Completa la misión de mundo para entrar en la clasificación.',
   'hudChrome.discord.title': 'Discord',
   'hudChrome.discord.panelTitle': 'World of ClaudeCraft',
   'hudChrome.discord.open': 'Discord',
@@ -13126,6 +13306,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.shearkeeper_gloves.name': 'Guantes Guardatijeras',
   'entities.items.silkbound_remains.name': 'Restos Envueltos en Seda',
   'entities.items.sprung_trap.name': 'Trampa de Ciénaga Disparada',
+  'entities.items.leyline_cache.name': 'Alijo de Línea Ley en Miniatura',
+  'entities.items.confection_game_box.name': 'Caja de Juego del Confitero',
   'entities.items.stormscale_treads.name': 'Botas Escamatormenta',
   'entities.items.stormsunder_hood.name': 'Capucha Quiebratormentas',
   'entities.items.sunken_idol_mantle.name': 'Manto del Ídolo Sumergido',
@@ -17432,6 +17614,380 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'guide.worldPage.peaksPlaceNotes':
     'Highwatch sostiene la muralla. Stalker Ridge y las Madrigueras de Roca Profunda pertenecen a felinos y excavadores; las Estribaciones de Ogro y el Campamento de guerra de Drogmar a mercenarios. Stormcrag chisporrotea de elementales y bajo él brilla Glimmermere, cuya orilla guarda la puerta de luz pálida al Templo Ahogado. Las Tiendas de los Juramentados y los Campos de los Renacidos rodean las alturas del culto, con el Santuario del Gravewyrm en la cima.',
   'worldContent.farmPatchName': 'Bancales de jardín',
+  'hud.chat.templates.raidWarning': '[Advertencia de incursión] {name}: {message}',
+  'hudChrome.bugReport.online': 'En línea',
+  'hudChrome.charSidebar.crafting': 'Elaboración',
+  'hudChrome.charSidebar.gathering': 'Reunión',
+  'hudChrome.charSidebar.label': 'Detalles del personaje',
+  'hudChrome.charSidebar.openProfessions': 'Profesiones abiertas',
+  'hudChrome.charSidebar.progression': 'Progresión',
+  'hudChrome.charSidebar.skills': 'Habilidades',
+  'hudChrome.charSidebar.stats': 'Estadísticas',
+  'hudChrome.charSidebar.subtitle': 'Nivel {level} {className}. {archetype}. Pasatiempo: {hobby}',
+  'hudChrome.charSidebar.subtitleNoHobby': 'Nivel {level} {className}. {archetype}',
+  'hudChrome.controller.device': 'Dispositivo conectado',
+  'hudChrome.controller.deviceConnected': 'Conectado',
+  'hudChrome.controller.deviceDisconnected': 'No se detectó ningún controlador',
+  'hudChrome.cosmetics.preview': 'Avance',
+  'hudChrome.cosmetics.previewAria': 'Vista previa {name}',
+  'hudChrome.crafting.materialsFooter':
+    'Los materiales en su bóveda se extraen automáticamente. Conoce más recetas en la estación.',
+  'hudChrome.crafting.reagentOrdinaryHeld':
+    '({name} retenido: {count}, pero aquí solo cuenta la calificación fina)',
+  'hudChrome.finder.lockoutWeekly': 'Bloqueo semanal de cada jefe',
+  'hudChrome.finder.mech.ancestral_sap': 'Savia Ancestral (cura a sus aliados)',
+  'hudChrome.finder.mech.anvils_decree':
+    'Decreto del Yunque (tres golpes de martillo en toda la banda, curación completa)',
+  'hudChrome.finder.mech.apocalypse_add':
+    'Ignivar Ashcaller (prioridad agrega lanzar Apocalipsis, mátalo rápido)',
+  'hudChrome.finder.mech.beast_pit_quake': 'Beast Pit Quake (daño de área)',
+  'hudChrome.finder.mech.bloodmane_rend':
+    'Bloodmane Rend (sangrado, atento a los cambios de objetivos)',
+  'hudChrome.finder.mech.brand_of_the_pyre':
+    'Brand of the Pyre (marca de fuego apilable, lávela con agua corriente)',
+  'hudChrome.finder.mech.call_of_the_hunt': 'Call of the Hunt (acelera a los aliados cercanos)',
+  'hudChrome.finder.mech.chains_of_the_forge':
+    'Chains of the Forge (solo heroico, mantente cerca de tu compañero vinculado)',
+  'hudChrome.finder.mech.cinder_orbs':
+    'Orbes de ceniza (los jugadores marcados se extienden hasta los bordes de la habitación)',
+  'hudChrome.finder.mech.falling_cinders':
+    'Falling Cinders (círculos de meteoritos sobre los jugadores, muévete)',
+  'hudChrome.finder.mech.forge_strike':
+    'Forge Strike (desventaja acumulable de intercambio de tanques)',
+  'hudChrome.finder.mech.forge_wave':
+    'Forge Wave (muro cortafuegos en expansión, use los dos carriles seguros)',
+  'hudChrome.finder.mech.forgefathers_sweep': "Forgefather's Sweep (cono frontal ancho sin tanque)",
+  'hudChrome.finder.mech.forgestorm': 'Forgestorm (círculos de meteoritos que caen, muévete)',
+  'hudChrome.finder.mech.jaguar_roar': 'Rugido de jaguar (retroceso)',
+  'hudChrome.finder.mech.judgment_of_the_forge':
+    'Juicio de la Forja (intermedio, compartir el único refugio seguro)',
+  'hudChrome.finder.mech.last_inferno':
+    'Last Inferno (quemadura de 45 segundos con un 20% de salud)',
+  'hudChrome.finder.mech.makers_brand':
+    "Maker's Brand (desventaja de intercambio de tanques acumulable)",
+  'hudChrome.finder.mech.masters_assembly':
+    'La Asamblea del Maestro (bloquear las vigas de forja, rotar los bloqueadores)',
+  'hudChrome.finder.mech.rain_of_cinders':
+    'Lluvia de cenizas (tres conos de fuego, párate entre ellos)',
+  'hudChrome.finder.mech.revolving_inferno':
+    'Infierno giratorio (rayos de fuego giratorios que se mueven a través de los huecos)',
+  'hudChrome.finder.mech.shared_pyre': 'Pira compartida (círculo de reunión, divide el daño)',
+  'hudChrome.finder.mech.tempering_ray':
+    'Tempering Ray (línea a un jugador marcado, interceptarlo)',
+  'hudChrome.finder.mech.thickhide_ward': 'Thickhide Ward (protege a los aliados cercanos)',
+  'hudChrome.finder.mech.tusk_sweep': 'Barrido de colmillo (hendidura frontal)',
+  'hudChrome.finder.mech.wildheart_pulse': 'Wildheart Pulse (daño en el área pulsante)',
+  'hudChrome.gathering.toolTooltip.wieldDegrade':
+    'Por debajo de esa habilidad, todavía funciona como una herramienta de nivel inferior.',
+  'hudChrome.keybinds.hideInterface': 'Ocultar interfaz',
+  'hudChrome.keybinds.targetParty1': 'Miembro del grupo objetivo 1',
+  'hudChrome.keybinds.targetParty2': 'Miembro del grupo objetivo 2',
+  'hudChrome.keybinds.targetParty3': 'Miembro del grupo objetivo 3',
+  'hudChrome.keybinds.targetParty4': 'Miembro del grupo objetivo 4',
+  'hudChrome.keybinds.targetParty5': 'Miembro del grupo objetivo 5',
+  'hudChrome.keybinds.targetParty6': 'Miembro del grupo objetivo 6',
+  'hudChrome.keybinds.targetParty7': 'Miembro del grupo objetivo 7',
+  'hudChrome.keybinds.targetParty8': 'Miembro del grupo objetivo 8',
+  'hudChrome.keybinds.targetParty9': 'Miembro del grupo objetivo 9',
+  'hudChrome.keybinds.targetSelf': 'Yo objetivo',
+  'hudChrome.keybinds.wheelHeldRefused':
+    'Una muesca de rueda no puede impulsar una acción retenida como el movimiento. Elija una tecla o un botón del mouse.',
+  'hudChrome.keybinds.wheelHint':
+    'La rueda del mouse también se vincula: gírela hacia arriba o hacia abajo mientras se vincula, manteniendo presionadas las teclas Ctrl, Alt o Shift si lo desea. Zoom Camera In y Out se ubican en el volante desnudo de forma predeterminada; muévalos a un acorde como Ctrl+rueda para liberar la rueda para habilidades.',
+  'hudChrome.keybinds.zoomIn': 'Acercar la cámara',
+  'hudChrome.keybinds.zoomOut': 'Alejar la cámara',
+  'hudChrome.mapAtlas.availableNearby': 'Disponible cerca',
+  'hudChrome.mapAtlas.distance': '{distance} yardas',
+  'hudChrome.mapAtlas.filters.dungeons': 'Mazmorras',
+  'hudChrome.mapAtlas.filters.gather': 'Recolectar',
+  'hudChrome.mapAtlas.filters.players': 'Jugadores',
+  'hudChrome.mapAtlas.filters.quests': 'Misiones',
+  'hudChrome.mapAtlas.filters.services': 'Servicios',
+  'hudChrome.mapAtlas.filtersAria': 'Capas de mapa',
+  'hudChrome.mapAtlas.landmarkCount': '{count} puntos de referencia',
+  'hudChrome.mapAtlas.legend.dungeon': 'Mazmorra',
+  'hudChrome.mapAtlas.legend.herb': 'Hierba',
+  'hudChrome.mapAtlas.legend.mail': 'Correo',
+  'hudChrome.mapAtlas.legend.ore': 'Mineral',
+  'hudChrome.mapAtlas.legend.passage': 'Paso',
+  'hudChrome.mapAtlas.level': 'Nivel {level}',
+  'hudChrome.mapAtlas.noNearbyQuests': 'No hay misiones cercanas',
+  'hudChrome.mapAtlas.noTrackedQuests': 'No hay misiones rastreadas',
+  'hudChrome.mapAtlas.showRoute': 'Mostrar ruta',
+  'hudChrome.mapAtlas.track': 'Pista',
+  'hudChrome.mapAtlas.trackedQuests': 'Misiones rastreadas',
+  'hudChrome.mapAtlas.untrack': 'Dejar de rastrear',
+  'hudChrome.marketWindow.mixedListingsFooter':
+    'El Mercader reabastece los bienes comunes; Los listados de jugadores se encuentran junto a ellos al precio de venta.',
+  'hudChrome.materialHint.fineFarmGrade':
+    'Buen grado. Algunas selecciones de una cosecha salen bien, más a menudo con una habilidad agrícola superior o con un ojo de artesano cargado. Los productos comunes nunca cuentan cuando se requiere la calidad fina.',
+  'hudChrome.nameplate.npcRole.alchemyTrainer': 'Entrenador de alquimia',
+  'hudChrome.nameplate.npcRole.armorVendor': 'Vendedor de armaduras',
+  'hudChrome.nameplate.npcRole.armsDealer': 'Traficante de armas',
+  'hudChrome.nameplate.npcRole.auctioneer': 'Subastador',
+  'hudChrome.nameplate.npcRole.banker': 'Banquero',
+  'hudChrome.nameplate.npcRole.cardMaster': 'Maestro de cartas',
+  'hudChrome.nameplate.npcRole.cookingTrainer': 'Entrenador de cocina',
+  'hudChrome.nameplate.npcRole.crucibleQuartermaster': 'Intendente del Crisol',
+  'hudChrome.nameplate.npcRole.engineeringTrainer': 'Formador de ingeniería',
+  'hudChrome.nameplate.npcRole.foodVendor': 'Vendedor de comida y bebida',
+  'hudChrome.nameplate.npcRole.generalGoods': 'Bienes Generales',
+  'hudChrome.nameplate.npcRole.heroicQuartermaster': 'Intendente heroico',
+  'hudChrome.nameplate.npcRole.leatherworkingTrainer': 'Entrenador de peletería',
+  'hudChrome.nameplate.npcRole.potionVendor': 'Vendedor de pociones',
+  'hudChrome.nameplate.npcRole.pvpVendor': 'Vendedor PvP',
+  'hudChrome.nameplate.npcRole.riftForgemaster': 'Maestro de falsificación de la grieta',
+  'hudChrome.nameplate.npcRole.stableMaster': 'Maestro estable',
+  'hudChrome.nameplate.npcRole.tailoringTrainer': 'Entrenador de sastrería',
+  'hudChrome.nameplate.npcRole.weaponVendor': 'vendedor de armas',
+  'hudChrome.nameplate.npcRole.weaponsmithTrainer': 'Entrenador de herrería',
+  'hudChrome.nameplate.npcRoleTag': '<{role}>',
+  'hudChrome.options.confirmVendorSellMinQuality': 'Confirmar ventas de calidad',
+  'hudChrome.options.confirmVendorSellMinQualityNote':
+    'Los artículos por debajo de esta calidad se venden con un solo clic; un artículo mal vendido aún se puede volver a comprar al vendedor.',
+  'hudChrome.partyFrames.header': 'Fiesta',
+  'hudChrome.professions.retentionFooter':
+    'Devoluciones según respeto: se mantiene el 60% de la habilidad.',
+  'hudChrome.professions.tutorialLink': 'tutorial de profesion',
+  'hudChrome.pullTimer.cancel': 'Tirada cancelada.',
+  'hudChrome.pullTimer.countdown': '{seconds}',
+  'hudChrome.pullTimer.pull': '¡JALAR!',
+  'hudChrome.pullTimer.start': '¡Detén {seconds} segundos!',
+  'hudChrome.questLog.completed': 'Terminado',
+  'hudChrome.questLog.shiftHint':
+    'Presione Mayús y haga clic en una misión para vincularla en el chat.',
+  'hudChrome.questLog.zoneSummary': '{count} ({ready} listo)',
+  'hudChrome.questTracker.objectiveValue': '{current} / {total}',
+  'hudChrome.readyCheck.close': 'Cerca',
+  'hudChrome.readyCheck.memberNotReady': '{name} no está listo.',
+  'hudChrome.readyCheck.memberPending': '{name} aún no ha respondido.',
+  'hudChrome.readyCheck.memberReady': '{name} está listo.',
+  'hudChrome.readyCheck.status': 'Listo: {ready}/{total}',
+  'hudChrome.readyCheck.title': 'Listo cheque',
+  'hudChrome.readyCheck.waiting': 'Esperando respuestas...',
+  'hudChrome.recipeTracker.collapseHint': 'Contraer rastreador de recetas',
+  'hudChrome.recipeTracker.expandHint': 'Ampliar el rastreador de recetas',
+  'hudChrome.recipeTracker.haveNeed': '{have}/{need}',
+  'hudChrome.recipeTracker.pin': 'Alfiler',
+  'hudChrome.recipeTracker.pinAria': 'Fija {name} al rastreador HUD',
+  'hudChrome.recipeTracker.pinFull': 'El rastreador de recetas está lleno (hasta {cap} recetas)',
+  'hudChrome.recipeTracker.resultCount': '{name} x{count}',
+  'hudChrome.recipeTracker.trackerLabel': 'Recetas',
+  'hudChrome.recipeTracker.unpin': 'Desprender',
+  'hudChrome.recipeTracker.unpinAria': 'Desanclar {name} del rastreador HUD',
+  'hudChrome.social.who.allClasses': 'Todas las clases',
+  'hudChrome.social.who.capped':
+    'Mostrando el primer {delivered}. Limita la búsqueda para ver el resto.',
+  'hudChrome.social.who.classFilter': 'Filtrar por clase',
+  'hudChrome.social.who.colClass': 'Clase',
+  'hudChrome.social.who.colGuild': 'Gremio',
+  'hudChrome.social.who.colLevel': 'Nivel',
+  'hudChrome.social.who.colName': 'Nombre',
+  'hudChrome.social.who.colStatus': 'Estado',
+  'hudChrome.social.who.colZone': 'Zona',
+  'hudChrome.social.who.count': '{total} en línea',
+  'hudChrome.social.who.countFiltered': '{shown} de {total} en línea',
+  'hudChrome.social.who.empty': 'Ningún jugador coincide.',
+  'hudChrome.social.who.loading': 'Preguntando al reino quién está en línea...',
+  'hudChrome.social.who.search': 'Buscar',
+  'hudChrome.social.who.searchPlaceholder': 'Nombre, zona o gremio',
+  'hudChrome.social.who.sortTitle': 'Ordenar por {column}',
+  'hudChrome.social.who.tab': 'OMS',
+  'hudChrome.talkingHead.label': 'Diálogo',
+  'hudChrome.wocMarket.colBuyer': 'Comprador',
+  'hudChrome.wocMarket.colSalePrice': 'Precio de venta',
+  'hudChrome.wocMarket.colSaleType': 'Tipo',
+  'hudChrome.wocMarket.colSoldAt': 'Vendido',
+  'hudChrome.wocMarket.historyEmpty': 'Aún no se han registrado ventas.',
+  'hudChrome.wocMarket.historyError': 'No se pudo cargar el historial de ventas.',
+  'hudChrome.wocMarket.saleTypeAuction': 'Subasta',
+  'hudChrome.wocMarket.saleTypeBuyNow': 'Comprar ahora',
+  'hudChrome.wocMarket.saleTypeDirected': 'Dirigido',
+  'hudChrome.wocMarket.saleTypeUnknown': 'Desconocido',
+  'hudChrome.wocMarket.tabHistory': 'Historial de ventas',
+  'hudChrome.wocStore.mountBuy': 'Comprar diseño de montura',
+  'hudChrome.wocStore.mountInspectAria': 'Vista previa {item}',
+  'hudChrome.wocStore.mountOnly': 'Sólo montaje',
+  'hudChrome.wocStore.mountRideIt': 'montarlo',
+  'hudChrome.wocStore.mountScopeLine':
+    'Aspecto para toda la cuenta. Usado por un personaje a la vez.',
+  'itemUi.errors.sweepNoListings': 'No hay listados de ese artículo disponibles para barrer.',
+  'itemUi.errors.sweepPriceChanged':
+    'Los precios cambiaron antes de que llegara su barrido. Consulta la cotización y vuelve a intentarlo.',
+  'itemUi.market.sweep': 'Barrer',
+  'itemUi.market.sweepAria': 'Barrer el mercado para {item}',
+  'itemUi.market.sweepButton': 'Barrer',
+  'itemUi.market.sweepChanged':
+    'La cotización del barrido cambió antes de que usted confirmara. Verifica el total y vuelve a intentarlo.',
+  'itemUi.market.sweepClose': 'Cerca',
+  'itemUi.market.sweepConfirmBody':
+    '¿Comprar {item} x{units} en {listings} listados por {total} ({each} cada uno)?',
+  'itemUi.market.sweepConfirmTitle': 'Confirmar barrido de mercado',
+  'itemUi.market.sweepNote':
+    'Compra listados completos de otros vendedores, primero el más barato por unidad, hasta cubrir el total. Es posible que recibas algunos más de los que pediste.',
+  'itemUi.market.sweepQuantity': 'Se buscan unidades',
+  'itemUi.market.sweepQuoteLine':
+    '{units} unidades en {listings} listados para {total} ({each} cada uno)',
+  'itemUi.market.sweepQuoteNone': 'No hay listados de este artículo para barrer.',
+  'itemUi.market.sweepQuoteShort':
+    'Solo están disponibles {units} unidades en {listings} listados, para {total} ({each} cada una)',
+  'itemUi.market.sweepTitle': 'Barrido de mercado: {item}',
+  'devCommand.actions.town.description': 'Teletransportarse al centro de una ciudad por su nombre.',
+  'devCommand.actions.town.label': 'Centro de la ciudad',
+  'devCommand.fields.town': 'Ciudad',
+  'entities.mobs.healing_dummy_caster.name': 'Maniquí de lanzador de conjuros herido',
+  'entities.mobs.healing_dummy_ranger.name': 'Muñeco de guardabosques maltratado',
+  'entities.mobs.healing_dummy_scout.name': 'Maniquí de exploración crítica',
+  'entities.mobs.healing_dummy_soldier.name': 'Maniquí de soldado herido',
+  'entities.mobs.healing_dummy_tank.name': 'Maniquí de vanguardia herido',
+  'guide.controls.hideInterface': 'Ocultar la interfaz (capturas de pantalla y vídeos)',
+  'guide.controls.targetParty':
+    'Apunte a los miembros del grupo del 1 al 9, de arriba a abajo como los muestran los marcos del grupo.',
+  'guide.controls.targetSelf': 'Apunta a ti mismo',
+  'guide.interfacePage.framesGovernedTalkingHead':
+    'Editar fotogramas también afloja el panel de Diálogo, que lleva la línea hablada de un NPC mientras ese NPC está fuera de tu vista; lleva su chip con nombre mientras está suelto.',
+  'guide.settingsPage.keybindsWheelBody':
+    'La rueda misma también se atasca. Zoom Camera In y Zoom Camera Out son enlaces comunes que se ubican en la rueda desnuda de forma predeterminada, por lo que puedes moverlos a Ctrl más la rueda, o a las teclas, y luego girar la rueda liberada para activar las ranuras de la barra de acción. Una muesca de rueda no tiene liberación, por lo que no puede impulsar una acción retenida como avanzar.',
+  'entities.items.bastion_sigil.name': 'Sello del Bastión',
+  'entities.items.mooring_stone.name': 'Piedra de amarre',
+  'entities.items.menders_hourglass.name': 'Reloj de arena del sanador',
+  'entities.items.wellspring_seed.name': 'Semilla de manantial',
+  'entities.items.paired_talons.name': 'Garras gemelas',
+  'entities.items.hunters_tally.name': 'Cuenta del cazador',
+  'entities.items.stormjar.name': 'Jarra de tormenta',
+  'entities.items.echoing_lens.name': 'Lente resonante',
+  'entities.items.gamblers_die.name': 'Dado del apostador',
+  'entities.items.sundered_prism.name': 'Prisma fracturado',
+  'entities.items.wayfarers_lodestone.name': 'Piedra imán del caminante',
+  'entities.items.medallion_of_defiance.name': 'Medallón de desafío',
+  'entities.items.duelists_brand.name': 'Marca del duelista',
+  'entities.items.forgefathers_temper.name': 'Temple del Padre de la Forja',
+  'entities.items.kindling_orb.name': 'Orbe de brasas',
+  'entities.items.molten_fletching.name': 'Emplumado fundido',
+  'entities.items.last_flame_lantern.name': 'Farol de la última llama',
+  'entities.items.heart_of_the_crucible.name': 'Corazón del Crisol',
+  'hudChrome.trinkets.equipLine': 'Equipar: {effect}',
+  'hudChrome.trinkets.useLine': 'Uso: {effect} (reutilización de {cooldown})',
+  'hudChrome.trinkets.cooldownMinutes': '{minutes} min',
+  'hudChrome.trinkets.cooldownSeconds': '{seconds} s',
+  'hudChrome.trinkets.gambleResult': '{item}: ¡{fortune}!',
+  'hudChrome.trinkets.snakeEyes': 'Ojos de serpiente',
+  'hudChrome.trinkets.equippedLine': 'Equipado',
+  'hudChrome.trinkets.equipLockout':
+    'Al equiparlo, su uso entra en un tiempo de reutilización de {seconds} s, o el que le quede al abalorio que sustituye si es mayor.',
+  'hudChrome.trinkets.equip.lastStand':
+    'Recibir daño con menos del {threshold}% de salud te otorga un escudo que absorbe {absorb} de daño ({absorbPct}% de tu salud máxima) durante {duration} s. Puede ocurrir una vez cada {icd} s.',
+  'hudChrome.trinkets.equip.hourglass':
+    'La sanación excesiva de tus sanaciones directas se almacena en el reloj de arena, hasta {cap} ({capPct}% de tu salud máxima). La sanación almacenada se desvanece {fade} s después de su último aumento.',
+  'hudChrome.trinkets.equip.twinStrike':
+    'Tus golpes de ataque automático tienen un {chance}% de probabilidad de realizar un golpe cuerpo a cuerpo adicional con la mano principal. Puede ocurrir una vez cada {icd} s.',
+  'hudChrome.trinkets.equip.tally':
+    'Tus golpes críticos de ataque automático y tus golpes de gracia añaden una marca de cuenta cada uno, hasta {max}. Las marcas duran {duration} s y se renuevan cada vez que ganas una.',
+  'hudChrome.trinkets.equip.storm':
+    'Cada hechizo que lanzas añade una carga, hasta {max}. Las cargas duran {duration} s y se renuevan cada vez que ganas una.',
+  'hudChrome.trinkets.equip.heat':
+    'Tus golpes de arma cuerpo a cuerpo y a distancia añaden una acumulación de calor cada uno, hasta {max}. El calor dura {duration} s y se renueva cada vez que ganas una acumulación.',
+  'hudChrome.trinkets.equip.ignite':
+    'Tus golpes críticos de arma cuerpo a cuerpo y a distancia prenden fuego al objetivo, infligiendo {tick} de daño de fuego cada {every} s durante {duration} s. Un nuevo golpe crítico lo renueva. El daño aumenta con el poder de ataque o el poder de ataque a distancia, el que sea mayor.',
+  'hudChrome.trinkets.equip.guardHeat':
+    'Cada ataque que paras, esquivas o bloqueas añade una acumulación de calor, hasta {max}. El calor dura {duration} s y se renueva cada vez que ganas una acumulación.',
+  'hudChrome.trinkets.use.retaliate':
+    'Durante {duration} s, un enemigo que te golpee directamente recibe daño físico igual al {pct}% de la salud que te quitó ese golpe. El daño periódico no lo activa.',
+  'hudChrome.trinkets.use.anchor':
+    'Durante {duration} s, recibes un {reduction}% menos de daño pero te mueves al {speed}% de velocidad. Elimina los aturdimientos, enraizamientos, ralentizaciones, miedos, polimorfias, silencios, cegueras, maleficios, desarmes y efectos incapacitantes que tengas, e ignoras los nuevos y los derribos mientras dura.',
+  'hudChrome.trinkets.use.hourglass':
+    'Convierte toda la sanación almacenada en un escudo sobre el miembro del grupo a {range} m o menos con el menor porcentaje de salud, tú incluido. El escudo dura {duration} s. Requiere sanación almacenada.',
+  'hudChrome.trinkets.use.wellspring':
+    'Te sana a ti y a los miembros del grupo a {radius} m o menos {tick} cada {every} s durante {duration} s. La sanación aumenta con el poder de sanación.',
+  'hudChrome.trinkets.use.bleedEdge':
+    'Durante {duration} s, tus golpes de ataque automático aplican Herida de garra, que inflige {tick} de daño físico por acumulación cada {every} s durante {bleedDuration} s y se acumula hasta {stacks} veces. El daño aumenta con el poder de ataque.',
+  'hudChrome.trinkets.use.tallyStrike':
+    'Gasta todas las marcas de cuenta para golpear a tu objetivo a {range} m o menos, infligiendo {perMark} de daño físico por marca ({max} con {maxMarks} marcas). El daño aumenta con el poder de ataque. Requiere una marca de cuenta.',
+  'hudChrome.trinkets.use.stormjar':
+    'Libera todas las cargas como un rayo sobre tu objetivo a {range} m o menos que salta hasta {extra} enemigos más a {jumpRange} m o menos. Cada enemigo recibe {perCharge} de daño de naturaleza por carga ({max} con {maxCharges} cargas). El daño aumenta con el poder con hechizos. Requiere una carga.',
+  'hudChrome.trinkets.use.echo':
+    'Durante {duration} s, tus siguientes {casts} sanaciones directas o golpes directos de daño no físico se repiten por el {pct}% de su cantidad.',
+  'hudChrome.trinkets.use.gamble':
+    'Tira una de cuatro fortunas durante {duration} s: {keenEdge} (infliges un {keenPct}% más de daño), {luckyStreak} (te sana {heal} a lo largo de la duración), {gildedGuard} (un escudo que absorbe {absorb} de daño) o {snakeEyes} (sin efecto, pero esta reutilización se reduce a la mitad).',
+  'hudChrome.trinkets.use.blink':
+    'Avanza {yards} m y luego recibe un {reduction}% menos de daño durante {guard} s.',
+  'hudChrome.trinkets.use.sprint':
+    'Aumenta tu velocidad de movimiento un {speed}% durante {duration} s. No se acumula con otros aumentos de velocidad.',
+  'hudChrome.trinkets.use.defiance':
+    'Elimina todos los aturdimientos, enraizamientos, ralentizaciones, miedos, polimorfias, silencios, cegueras, maleficios, desarmes y efectos incapacitantes que tengas. Se puede usar mientras estás aturdido.',
+  'hudChrome.trinkets.use.brand':
+    'Marca a un jugador enemigo a {range} m o menos, reduciendo la sanación que recibe un {cut}% durante {duration} s.',
+  'hudChrome.trinkets.use.temper':
+    'Gasta todas las acumulaciones de calor para templar tu arma durante {duration} s. Tus golpes de arma cuerpo a cuerpo y a distancia infligen {damage} de daño de fuego adicional, aumentado un {perHeat}% por cada acumulación de calor gastada (hasta un {maxBonus}% con {maxHeat} acumulaciones). Cada golpe de gracia añade {killExtend} s, hasta {maxDuration} s en total. El daño aumenta con el poder de ataque o el poder de ataque a distancia, el que sea mayor.',
+  'hudChrome.trinkets.use.kindlingOrb':
+    'Invoca un orbe de brasas a tu lado durante {duration} s. Cada hechizo que lanzas a un enemigo le hace disparar un proyectil a ese enemigo que inflige {damage} de daño de fuego. El daño aumenta con el poder con hechizos.',
+  'hudChrome.trinkets.use.pierce':
+    'Durante {duration} s, tus ataques automáticos, disparos y habilidades físicas (no sangrados) también golpean al enemigo más cercano a tu objetivo a {reach} m o menos por el {share}% del daño infligido.',
+  'hudChrome.trinkets.use.lantern':
+    'Coloca un farol a tus pies durante {duration} s. Una sanación directa de cualquiera sobre ti o un miembro del grupo a {radius} m o menos de él también sana al otro miembro del grupo más herido bajo su luz por el {share}% de la sanación.',
+  'hudChrome.trinkets.use.heartNova':
+    'Gasta todas las acumulaciones de calor en una nova de fuego que inflige {perHeat} de daño de fuego por acumulación ({max} con {maxHeat} acumulaciones) a cada enemigo a {radius} m o menos y provoca a cada criatura que alcanza. El daño aumenta con el poder de ataque. Requiere una acumulación de calor.',
+  'hudChrome.auraEffect.trinket.lastStandCooldown':
+    'El escudo Último bastión del Sello del Bastión ya se usó. Bajar del {threshold}% de salud no puede volver a levantarlo hasta que esto expire.',
+  'hudChrome.auraEffect.trinket.lastBastion':
+    'Absorbe {value} de daño. El Sello del Bastión lo levantó cuando recibiste daño por debajo del {threshold}% de salud.',
+  'hudChrome.auraEffect.trinket.retaliate':
+    'Los enemigos que te golpean directamente reciben daño físico igual al {pct}% de la salud que te quitó ese golpe. El daño periódico no lo activa.',
+  'hudChrome.auraEffect.trinket.moored':
+    'Recibes un {reduction}% menos de daño pero te mueves al {speed}% de velocidad. Ignoras aturdimientos, enraizamientos, ralentizaciones, miedos, polimorfias, silencios, cegueras, maleficios, desarmes, efectos incapacitantes y derribos.',
+  'hudChrome.auraEffect.trinket.hourglassStored':
+    'Guarda {stored} de sanación almacenada de tu sobresanación. Usa el Reloj de arena del sanador para convertirla en un escudo sobre el miembro del grupo a {range} m o menos con el menor porcentaje de salud, tú incluido.',
+  'hudChrome.auraEffect.trinket.hourglassShield':
+    'Absorbe {value} de daño. Hecho con la sanación que almacenó un Reloj de arena del sanador.',
+  'hudChrome.auraEffect.trinket.wellspring': 'Restaura {tick} de salud cada {every} s.',
+  'hudChrome.auraEffect.trinket.twinStrikeCooldown':
+    'Garras gemelas acaba de dar un golpe extra. No puede dar otro hasta que esto expire.',
+  'hudChrome.auraEffect.trinket.bleedEdge':
+    'Tus golpes de ataque automático aplican Herida de garra: {tick} de daño físico por acumulación cada {every} s durante {duration} s, acumulable hasta {max} veces.',
+  'hudChrome.auraEffect.trinket.bleedEdgeOther':
+    'Los golpes de ataque automático aplican Herida de garra, un sangrado físico acumulable hasta {max} veces. El daño aumenta con el poder de ataque.',
+  'hudChrome.auraEffect.trinket.talonWound':
+    'Inflige {damage} de daño físico cada {every} s ({stacks}/{max} acumulaciones). Cada nueva acumulación añade daño y reinicia la duración.',
+  'hudChrome.auraEffect.trinket.tally':
+    'Marcas de cuenta: {stacks}/{max}. Usa la Cuenta del cazador para gastarlas todas en un golpe a tu objetivo que inflige {damage} de daño físico ({perMark} por marca).',
+  'hudChrome.auraEffect.trinket.tallyOther':
+    'Marcas de cuenta: {stacks}/{max}. La Cuenta del cazador las gasta todas en un golpe físico que inflige más daño por cada marca.',
+  'hudChrome.auraEffect.trinket.storm':
+    'Cargas: {stacks}/{max}. Usa la Jarra de tormenta para liberarlas como un rayo que alcanza a tu objetivo y hasta {extra} enemigos más a {jumpRange} m o menos entre sí, infligiendo {damage} de daño de naturaleza a cada uno ({perCharge} por carga).',
+  'hudChrome.auraEffect.trinket.stormOther':
+    'Cargas: {stacks}/{max}. La Jarra de tormenta las libera como un rayo de naturaleza que alcanza al objetivo y hasta {extra} enemigos más, con más daño por cada carga.',
+  'hudChrome.auraEffect.trinket.echo':
+    'Tus siguientes {casts} sanaciones directas o golpes directos de daño no físico se repiten por el {pct}% de su cantidad.',
+  'hudChrome.auraEffect.trinket.keenEdge':
+    'Fortuna del Dado del apostador: infliges un {pct}% más de daño.',
+  'hudChrome.auraEffect.trinket.luckyStreak':
+    'Fortuna del Dado del apostador: restaura {tick} de salud cada {every} s.',
+  'hudChrome.auraEffect.trinket.gildedGuard':
+    'Fortuna del Dado del apostador: absorbe {value} de daño.',
+  'hudChrome.auraEffect.trinket.riftGuard': 'Recibes un {pct}% menos de daño.',
+  'hudChrome.auraEffect.trinket.sprint':
+    'Velocidad de movimiento aumentada un {pct}%. No se acumula con otros aumentos de velocidad.',
+  'hudChrome.auraEffect.trinket.brand': 'La sanación recibida se reduce un {pct}%.',
+  'hudChrome.auraEffect.trinket.forgeHeat':
+    'Calor: {stacks}/{max}. Usar el Temple del Padre de la Forja lo gasta todo, y su fuego de arma inflige un {pct}% más de daño.',
+  'hudChrome.auraEffect.trinket.tempered':
+    'Tus golpes de arma cuerpo a cuerpo y a distancia infligen {damage} de daño de fuego adicional (un {pct}% más por el calor gastado). Cada golpe de gracia añade {killExtend} s, hasta {maxDuration} s en total.',
+  'hudChrome.auraEffect.trinket.temperedOther':
+    'Los golpes de arma cuerpo a cuerpo y a distancia infligen daño de fuego adicional, un {pct}% más por el calor gastado. El daño aumenta con el poder de ataque o el poder de ataque a distancia, el que sea mayor.',
+  'hudChrome.auraEffect.trinket.kindlingOrb':
+    'Cada hechizo que lanzas a un enemigo hace que el orbe dispare un proyectil a ese enemigo que inflige {damage} de daño de fuego. No dispara a un enemigo polimorfado, incapacitado o cegado.',
+  'hudChrome.auraEffect.trinket.kindlingOrbOther':
+    'Cada hechizo lanzado a un enemigo hace que el orbe dispare un proyectil de daño de fuego a ese enemigo. El daño aumenta con el poder con hechizos.',
+  'hudChrome.auraEffect.trinket.moltenIgnite':
+    'Inflige {damage} de daño de fuego cada {every} s. Otro golpe crítico de arma lo reinicia.',
+  'hudChrome.auraEffect.trinket.pierce':
+    'Tus ataques automáticos, disparos y habilidades físicas (no sangrados) también golpean al enemigo más cercano a tu objetivo a {reach} m o menos por el {pct}% del daño infligido.',
+  'hudChrome.auraEffect.trinket.lantern':
+    'Una sanación directa de cualquiera sobre ti o un miembro del grupo a {radius} m o menos del farol también sana al otro miembro del grupo más herido bajo su luz por el {pct}% de la sanación.',
+  'hudChrome.auraEffect.trinket.crucibleHeat':
+    'Calor: {stacks}/{max}. Usa el Corazón del Crisol para gastarlo todo en una nova de fuego que inflige {damage} de daño de fuego a cada enemigo a {radius} m o menos y provoca a cada criatura que alcanza.',
+  'hudChrome.auraEffect.trinket.crucibleHeatOther':
+    'Calor: {stacks}/{max}. El Corazón del Crisol lo gasta todo en una nova de fuego a {radius} m o menos que inflige más daño de fuego por cada acumulación y provoca a cada criatura que alcanza.',
   'hud.meters.damageTaken': 'Daño Recibido',
   'hud.meters.damageTakenShort': 'Recib.',
   'hud.meters.interrupts': 'Cortes',

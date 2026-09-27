@@ -7,11 +7,13 @@
 import type { HarborRouteMarkerDestination } from '../sim/content/harbor_route_markers';
 import { IGNIVAR_LORE_OBJECTS } from '../sim/content/ignivar_raid_lore';
 import { type Entity, REALM_BUILDER_MONUMENT_TEMPLATE_ID } from '../sim/types';
+import { investigationObjectLabel } from '../ui/entity_display_core';
 import { dungeonDisplayName, poiMarkLabel, tEntity, zoneDisplayName } from '../ui/entity_i18n';
 import { feastTitleFor } from '../ui/hud/professions/feast_title';
 import { mobileStationTitleFor } from '../ui/hud/professions/mobile_station_title';
 import { t } from '../ui/i18n';
 import { localizeSimText } from '../ui/sim_i18n';
+import { forgeObjectLabel } from '../ui/world_quest_forge_view';
 
 export function mobDisplayName(mobId: string): string {
   return tEntity({ kind: 'mob', id: mobId, field: 'name' });
@@ -29,6 +31,10 @@ export function harborDestinationLabel(dest: HarborRouteMarkerDestination): stri
 }
 
 export function objectDisplayName(entity: Entity): string {
+  const investigationLabel = investigationObjectLabel(entity.objectItemId ?? entity.templateId);
+  if (investigationLabel) return investigationLabel;
+  const forgeLabel = forgeObjectLabel(entity.objectItemId ?? entity.templateId);
+  if (forgeLabel) return forgeLabel;
   if (entity.templateId === 'mailbox') {
     return t('worldContent.mailboxName');
   }

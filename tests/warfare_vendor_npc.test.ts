@@ -17,6 +17,7 @@ import {
   FURY_NPC_ID,
   FURY_STOCK,
   HONOR_QUARTERMASTER_STOCK,
+  WARFARE_TRINKET_STOCK,
 } from '../src/sim/content/pvp_honor';
 import { ZONE3_NPCS, ZONE3_ZONE } from '../src/sim/content/zone3';
 import { BUILTIN_WORLD, ITEMS, NPCS, PROPS, setActiveWorldContent } from '../src/sim/data';
@@ -61,6 +62,12 @@ describe('Warmarshal Draven Kole: the definition', () => {
     expect(KOLE.vendorItems).toEqual([...HONOR_QUARTERMASTER_STOCK]);
     expect(NPCS[FURY_NPC_ID].vendorItems).toEqual([...HONOR_QUARTERMASTER_STOCK]);
     expect(HONOR_QUARTERMASTER_STOCK.slice(0, FURY_STOCK.length)).toEqual([...FURY_STOCK]);
+    expect(
+      HONOR_QUARTERMASTER_STOCK.slice(
+        FURY_STOCK.length,
+        FURY_STOCK.length + WARFARE_TRINKET_STOCK.length,
+      ),
+    ).toEqual([...WARFARE_TRINKET_STOCK]);
     expect(FURY_STOCK.length).toBeGreaterThan(0);
   });
 

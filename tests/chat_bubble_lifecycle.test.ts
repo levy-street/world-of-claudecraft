@@ -22,14 +22,14 @@ function bubbleHarness(
   };
   const renderer = Object.create(Renderer.prototype) as BubbleHarness & {
     chatBubbles: Map<number, { el: HTMLDivElement; until: number }>;
-    sim: { entities: Map<number, unknown> };
+    sim: { entities: Map<number, unknown>; worldQuestLog: Map<string, unknown> };
     views: Map<number, unknown>;
     viewport: { width: number; height: number };
   };
   renderer.chatBubbles = new Map([
     [7, { el: el as unknown as HTMLDivElement, until: bubbleUntil }],
   ]);
-  renderer.sim = { entities: new Map() };
+  renderer.sim = { entities: new Map(), worldQuestLog: new Map() };
   renderer.views = new Map();
   renderer.viewport = { width: 800, height: 600 };
   return { harness: renderer, el };

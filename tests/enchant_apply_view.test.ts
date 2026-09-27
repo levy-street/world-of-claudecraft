@@ -154,9 +154,17 @@ describe('enchant_apply_view: effect facts on the pick row', () => {
           expect(descriptions[row.enchantId], `${row.enchantId} proc description`).toBe(
             enchant.description,
           );
-          expect(descriptions[row.enchantId]).toContain(String(enchant.weaponProc.strength));
-          expect(descriptions[row.enchantId]).toContain(String(enchant.weaponProc.duration));
-          expect(descriptions[row.enchantId]).toContain(String(enchant.weaponProc.heal));
+          const proc = enchant.weaponProc;
+          expect(descriptions[row.enchantId]).toContain(String(proc.strength ?? proc.agility));
+          expect(descriptions[row.enchantId]).toContain(String(proc.duration));
+          if (proc.heal !== undefined) {
+            expect(descriptions[row.enchantId]).toContain(String(proc.heal));
+          }
+          if (proc.hasteMult !== undefined) {
+            expect(descriptions[row.enchantId]).toContain(
+              `${Math.round((proc.hasteMult - 1) * 100)}%`,
+            );
+          }
         } else expect(row.effects.length, `${row.enchantId} effects`).toBeGreaterThan(0);
         expect(Object.fromEntries(row.effects.map((e) => [e.stat, e.value]))).toEqual(bonus);
       }

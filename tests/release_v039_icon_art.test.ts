@@ -514,11 +514,13 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     // inventory. The production set is broader than the sealed historical
     // second-pass record because it also includes later pending-art families.
     // The Viridian Valestrider's reins ship painted art the same way: 102.
-    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(102);
+    // The trinket slot (PR 4173) admits its 18 usable trinkets to the hotbar
+    // (isHotbarItemId), each with committed painted art: 120.
+    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(120);
     expect(
       artSubjectHotbarItemIds,
       'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
-    ).toHaveLength(102);
+    ).toHaveLength(120);
     expect(pendingHotbarItemIds, 'ITEM_ART_PENDING hotbar items').toHaveLength(0);
     expect(
       pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),

@@ -63,6 +63,7 @@ import {
   MAX_LEVEL,
   NYTHRAXIS_ROOM_RADIUS,
 } from './types';
+import { onDungeonClearedForWeeklyQuests } from './weekly_quests';
 
 // ---------------------------------------------------------------------------
 // Pinned site data. These literals are deliberately NOT read live from the
@@ -922,6 +923,18 @@ export const METER_DIRTY_KEYS: Record<DeedMeterId, readonly string[]> = {
   // accepted rather than fixed: adding a mark to the per-kill path would put deed
   // work on a combat hot path to make a title appear slightly sooner.
   lifetimeHonor: [],
+  // Faction standing reads PlayerMeta.factions directly, never a deedStats
+  // ledger, so no narrow key could name it. The two award sites (the world
+  // quest turn-in in world_quests.ts and /dev rep in dev_commands.ts) mark a
+  // full pass right after awardFactionReputation, so a tier crossing grants
+  // on the tick it happens.
+  standingRiftWatch: [],
+  standingChurchOrder: [],
+  standingAutomatons: [],
+  // Reads the top-level PlayerMeta.clueCasketsOpened count, never a deedStats
+  // ledger, so no narrow key could name it; the one writer (the casket open
+  // site in clue_casket.ts) marks a full pass right after the increment.
+  clueCasketsOpened: [],
   vcupWins: [],
   vcupGuildWins: [],
   bankPurchasedSlots: [],
@@ -1033,6 +1046,14 @@ const METERS: Record<DeedMeterId, (meta: PlayerMeta) => number> = {
   // LIFETIME honor, never the spendable balance: a rank once earned survives
   // every purchase at the WARFARE quartermaster.
   lifetimeHonor: (m) => m.lifetimeHonor,
+  // Faction standing per allied faction (awardFactionReputation only adds).
+  // Optional chaining: a legacy save restores without the block until the
+  // first award seeds it.
+  standingRiftWatch: (m) => m.factions?.rift_watch ?? 0,
+  standingChurchOrder: (m) => m.factions?.church_order ?? 0,
+  standingAutomatons: (m) => m.factions?.automatons ?? 0,
+  // Lifetime Treasure Caskets opened. Tolerates a missing field the same way.
+  clueCasketsOpened: (m) => m.clueCasketsOpened ?? 0,
   vcupWins: (m) => m.vcupWins,
   vcupGuildWins: (m) => m.vcupGuildWins,
   bankPurchasedSlots: (m) => m.bank.purchasedSlots,
@@ -1834,6 +1855,7 @@ export function onMobKillCreditForDeeds(
   const inst = instanceForMob(ctx, mob);
   if (FINAL_BOSS_DUNGEONS[mob.templateId] && mob.templateId !== 'nythraxis_scourge_of_thornpeak') {
     onDungeonFinalBossKilledForDeeds(ctx, mob, inst, eligible);
+    onDungeonClearedForWeeklyQuests(ctx, FINAL_BOSS_DUNGEONS[mob.templateId], eligible);
   }
 
   // Encounter skill tasks resolve at the tracked boss's death; recipients are
@@ -1893,6 +1915,7 @@ export function onNythraxisKillForDeeds(
   roomMetas: PlayerMeta[],
 ): void {
   onDungeonFinalBossKilledForDeeds(ctx, boss, instanceForMob(ctx, boss), roomMetas);
+  onDungeonClearedForWeeklyQuests(ctx, FINAL_BOSS_DUNGEONS[boss.templateId], roomMetas);
 }
 
 /** World-boss credit: the loot-roster snapshot (never pruned by dying). */

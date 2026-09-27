@@ -26,6 +26,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   maldrecs_soulbinder: 'sword_g',
   highwatch_warblade: 'adv_sword_1handed',
   duskforged_warblade: 'adv_sword_1handed', // crafted apex 1H (masterwrought); warblades share adv_sword_1handed
+  riftwarden_voidblade: 'adv_sword_1handed', // Faction vendor epic 1H sword
   eastbrook_greatsword: 'adv_sword_2handed',
   highwatch_greatsword: 'adv_sword_2handed',
   verlans_oathblade: 'adv_sword_2handed',
@@ -120,6 +121,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   crag_warden_cudgel: 'hammer_b',
   voss_sanctified_mace: 'hammer_c',
   bogiron_mace: 'hammer_c',
+  dawnkeeper_consecrated_mace: 'hammer_c', // Faction vendor epic mace
   bristleback_maul: 'hammer_d',
   brutoks_maul: 'hammer_d',
   drownedmoon_maul: 'hammer_d',
@@ -141,6 +143,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   arcanite_war_axe: 'axe_d', // crafted (weaponcrafting tier 3)
   gorraks_cleaver: 'adv_axe_1handed',
   tradesman_hatchet: 'adv_axe_1handed',
+  forgemaster_crag_cleaver: 'adv_axe_2handed', // Faction vendor epic two-handed axe
   gravewyrm_cleaver: 'adv_axe_1handed', // EPIC: Heroic Korzul axe
   // Nythraxis gap-fill one-handers (content/zone3.ts): the violet-gem KayKit
   // set, the Deathless Court's bone-and-violet palette in hand (purple_dagger

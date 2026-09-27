@@ -1219,6 +1219,10 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/combat/casting_lifecycle.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/combat/effect_dispatch.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/combat/auto_attack.ts'), 'utf8'),
+    // The worn trinket's use refusals (useWornTrinket's ctx.error lines: the
+    // hourglass, tally, jar and enemy-player gates), matched by the sim_i18n
+    // EXACT map through src/ui/trinket_sim_i18n.ts.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/combat/trinkets.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/progression/talents.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/progression/xp.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/mob_swing.ts'), 'utf8'),
@@ -1500,6 +1504,13 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // scan below catches sim.ctx.error), keeping a reword of the emit or
     // the matcher from drifting apart silently.
     fs.readFileSync(path.resolve(process.cwd(), 'server/bank_wire.ts'), 'utf8'),
+    // Clue Scrolls (world quests, Stage 3): the hunt engine's refusals (the
+    // dig-spot, already-following, empty-pool and short-delivery ctx.error
+    // lines) and the casket module (text-free today: every reward line is
+    // ids on clueCasketOpened plus addItem's own receipt). Scanned so the
+    // refusals sit under the drift guard from day one.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/clue_scrolls.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/clue_casket.ts'), 'utf8'),
   ].join('\n');
   // Hardened S3: also scan the authoritative server's player-facing emits. The
   // server (server/game.ts) is language-agnostic like the sim and re-localized

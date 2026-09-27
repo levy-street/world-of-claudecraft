@@ -137,6 +137,7 @@ const EXPECTED_CODES = [
   'deeds.invalid_input',
   'guilds.invalid_roster_name',
   'guilds.unknown',
+  'world_quests.unknown_board',
   'steam.disabled',
   'steam.invalid_ticket',
   'steam.banned',
@@ -179,7 +180,14 @@ describe('ERROR_CODES catalog', () => {
     const keys = [...literal.matchAll(/^\s{2}'([a-z0-9_.]+)': \{/gm)].map((m) => m[1]);
     expect(keys.length).toBe(Object.keys(ERROR_CODES).length);
     const seen = new Set<string>();
-    const dupes = keys.filter((k) => (seen.has(k) ? true : (seen.add(k), false)));
+    const dupes: string[] = [];
+    for (const k of keys) {
+      if (seen.has(k)) {
+        dupes.push(k);
+      } else {
+        seen.add(k);
+      }
+    }
     expect(dupes).toEqual([]);
   });
 

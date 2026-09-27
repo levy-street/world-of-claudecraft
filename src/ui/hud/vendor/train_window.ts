@@ -12,7 +12,6 @@
 // render (grayed, with their named requirement): the visible ladder is a
 // deliberate decision, never hidden.
 
-import { craftNameText } from '../../char_window';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
@@ -23,6 +22,7 @@ import { itemNameColor } from '../../item_name_color';
 import type { PainterHostPresentation } from '../../painter_host';
 import { qualityGlowShadow } from '../../quality_glow';
 import { svgIcon } from '../../ui_icons';
+import { craftNameText } from '../professions/craft_name_view';
 import type { TrainRow, TrainView } from './train_view';
 
 export interface TrainWindowDeps extends PainterHostPresentation {

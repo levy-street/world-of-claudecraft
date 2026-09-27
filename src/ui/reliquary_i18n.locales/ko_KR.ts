@@ -190,7 +190,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: '영웅: 마지막 샘의 도가니',
-    desc: '이그니바르, 마지막 불꽃의 전령에게서 영웅 난이도에서만 나오는 무기.',
+    desc: '이그니바르, 마지막 불꽃의 전령에게서 영웅 난이도에서만 나오는 무기와 공격대 장신구.',
   },
   conquerors_varkhul: {
     name: '내부 용광로',

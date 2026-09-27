@@ -19,6 +19,77 @@
    here, so neither leaks across entries. The shared #start-screen/#mobile-preflight
    game-active hide and the base/styling of #rotate-device stay here. */
 @layer hud-mobile {
+  body.mobile-touch .wisp-maze-hud {
+    left: max(12px, env(safe-area-inset-left));
+    top: calc(max(8px, env(safe-area-inset-top)) + 220px);
+    transform: none;
+    width: min(250px, calc(100% - 24px));
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  @media (orientation: landscape) and (max-height: 600px) {
+    body.mobile-touch .wisp-maze-hud {
+      top: calc(max(6px, env(safe-area-inset-top)) + 74px);
+    }
+  }
+  /* ---------- vehicle action bar ---------- */
+  body.mobile-touch .vehicle-bar {
+    bottom: max(12px, env(safe-area-inset-bottom));
+    grid-template-columns: 38px 1fr 90px;
+    gap: 6px;
+    padding: 10px;
+  }
+  body.mobile-touch .vehicle-action-slots {
+    gap: 6px;
+  }
+  /* The forge workshop panel (a centred .panel overlay, neither a vehicle bar
+     nor a .window: hud.css): on touch it sits at the top like the puzzle
+     window, clear of the action ring and the move zone, with tighter padding
+     and gap. */
+  body.mobile-touch #forge-action-bar {
+    padding: 10px;
+    top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
+    gap: 6px 10px;
+    width: min(440px, calc(100% - 20px));
+  }
+  body.mobile-touch .vehicle-bar.glider-action-bar {
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 8px 12px;
+  }
+  body.mobile-touch .vehicle-integrity {
+    min-height: 48px;
+  }
+  body.mobile-touch .vehicle-bar-title {
+    font-size: 14px;
+  }
+  body.mobile-touch .vehicle-bar-status,
+  body.mobile-touch .vehicle-bar-hint {
+    font-size: 12px;
+  }
+  body.mobile-touch.operating-vehicle #player-frame:not(.pf-detached) {
+    top: calc(var(--app-vh, 100dvh) - 230px);
+    bottom: auto;
+    margin-bottom: 0;
+  }
+  body.mobile-touch .vehicle-action {
+    width: 48px;
+    height: 48px;
+    flex-basis: 48px;
+  }
+  body.mobile-touch .vehicle-bar.shadow-action-bar {
+    bottom: calc(100px + env(safe-area-inset-bottom));
+    grid-template-columns: 1fr;
+    width: min(360px, calc(100% - 24px));
+    gap: 4px;
+    padding: 8px;
+  }
+  body.mobile-touch .shadow-action-bar .vehicle-integrity {
+    min-height: 20px;
+    height: 20px;
+  }
+  body.mobile-touch .shadow-action-bar .vehicle-bar-hint {
+    grid-column: 1 / -1;
+  }
   /* Endfield-inspired glass chrome tokens: dark-fantasy gold-brown palette kept,
      but permanent chrome (action row, quick-access rail, the More tray) reads as
      translucent glass over the world instead of solid opaque wood/stone panels.
@@ -2037,6 +2108,24 @@
   }
   body.mobile-touch .quest-strip-obj.done {
     color: var(--color-text-success);
+  }
+  /* The movement lesson has one actionable instruction, never an ellipsis.
+     Wrapping reuses the existing bounded objective band and fixed anchor. */
+  body.mobile-touch .quest-strip-obj.instruction {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+    flex-shrink: 0;
+  }
+  /* An instruction lesson tracks ONE objective, so the band's four-line budget
+     (sized for a quest list) is what clips it: the longest calligraphy round
+     instructions need five lines at the minimum strip width, six in Cyrillic
+     under Linux fallback fonts. Two extra lines of room, scoped to the lesson
+     so an ordinary quest list keeps its budget; the strip sits between the
+     move zone and the action ring, so the extra height meets neither.
+     Pinned by tests/browser/quest_strip.browser.test.ts. */
+  body.mobile-touch .quest-strip-objs:has(.quest-strip-obj.instruction) {
+    max-height: calc(var(--quest-strip-objs-max-height) + 2.6em);
   }
   body.mobile-touch .quest-strip-more {
     opacity: 0.75;
@@ -4632,6 +4721,7 @@
   body.mobile-touch #market-window,
   body.mobile-touch #quest-dialog,
   body.mobile-touch #calendar-window,
+  body.mobile-touch #weekly-quests-window,
   body.mobile-touch #crafting-window,
   body.mobile-touch #mailbox-window,
   body.mobile-touch #emote-editor,
@@ -4640,6 +4730,7 @@
   body.mobile-touch #card-duel-window,
   body.mobile-touch #delve-board,
   body.mobile-touch #leaderboard-window,
+  body.mobile-touch #world-quest-leaderboard-window,
   body.mobile-touch #guild-board-window,
   body.mobile-touch #loot-settings-window,
   body.mobile-touch #town-focus-window,
@@ -4653,6 +4744,125 @@
     transform: none;
     box-sizing: border-box;
     overflow-y: auto;
+  }
+  body.mobile-touch #world-quest-puzzle-window {
+    left: calc(max(10px, env(safe-area-inset-left)) / var(--ui-scale, 1));
+    right: calc(max(10px, env(safe-area-inset-right)) / var(--ui-scale, 1));
+    top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
+    width: auto;
+    max-height: calc(
+      var(--app-vh) /
+      var(--ui-scale, 1) -
+      (max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1)) -
+      (max(10px, env(safe-area-inset-bottom)) / var(--ui-scale, 1))
+    );
+    transform: none;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+  body.mobile-touch #world-quest-puzzle-window .wqp-grid {
+    --wqp-tile-size: clamp(
+      calc(40px / var(--ui-scale, 1)),
+      calc(17 * var(--app-vw) / 100 / var(--ui-scale, 1)),
+      calc(68px / var(--ui-scale, 1))
+    );
+  }
+  body.mobile-touch #world-quest-puzzle-window .wqm-grid {
+    --wqm-cell-size: clamp(
+      calc(40px / var(--ui-scale, 1)),
+      calc(12 * var(--app-vw) / 100 / var(--ui-scale, 1)),
+      calc(48px / var(--ui-scale, 1))
+    );
+  }
+  body.mobile-touch #world-quest-puzzle-window .wqm-cell {
+    min-width: calc(40px / var(--ui-scale, 1));
+    min-height: calc(40px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade {
+    --window-pad: calc(12px / var(--ui-scale, 1));
+    --confection-frame-pad: calc(17px / var(--ui-scale, 1));
+    --confection-frame-rail: calc(14px / var(--ui-scale, 1));
+    --confection-header-height: calc(84px / var(--ui-scale, 1));
+    --confection-footer-height: calc(104px / var(--ui-scale, 1));
+    --confection-cell-gap: calc(4px / var(--ui-scale, 1));
+    --confection-box-depth: calc(10px / var(--ui-scale, 1));
+    --confection-grid-pad: calc(8px / var(--ui-scale, 1));
+    --confection-cell-size: clamp(
+      calc(40px / var(--ui-scale, 1)),
+      calc((var(--app-vw) - 134px) / var(--wqm-columns, 6) / var(--ui-scale, 1)),
+      calc(60px / var(--ui-scale, 1))
+    );
+    max-width: none;
+    gap: calc(8px / var(--ui-scale, 1));
+    padding-bottom: calc(16px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade > .panel-title {
+    padding: calc(16px / var(--ui-scale, 1)) calc(42px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade > .panel-title > span {
+    font-size: clamp(19px, calc(27px / var(--ui-scale, 1)), 27px);
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-lid {
+    margin: 0 0 calc(16px / var(--ui-scale, 1));
+    padding: calc(18px / var(--ui-scale, 1)) calc(20px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-lid::before {
+    border-width: calc(24px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqp-level {
+    font-size: 11px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqp-instructions {
+    margin: 6px var(--spacing-xs) 10px;
+    font-size: 15px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-status {
+    font-size: 13px;
+    gap: var(--spacing-xs);
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-status > span {
+    padding: 5px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-grid {
+    --wqm-cell-size: var(--confection-cell-size);
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-box-hinge {
+    top: calc(-34px / var(--ui-scale, 1));
+    height: calc(44px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-box-hinge::before,
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-box-hinge::after {
+    width: calc(64px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-box-front {
+    width: calc(184px / var(--ui-scale, 1));
+    height: calc(82px / var(--ui-scale, 1));
+    left: calc(50% - 92px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-frame-crest {
+    width: calc(208px / var(--ui-scale, 1));
+    height: calc(62px / var(--ui-scale, 1));
+    left: calc(50% - 104px / var(--ui-scale, 1));
+    top: calc(16px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-result {
+    --wqm-result-frame-outset: 12px;
+    padding: 18px 12px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-result-frame {
+    border-width: 24px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-result-emblem {
+    width: 58px;
+    height: 58px;
+    margin-bottom: 8px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-result-title {
+    margin-inline: -4px;
+    font-size: 27px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-result-detail {
+    font-size: 16px;
   }
   body.mobile-touch #dev-command-window {
     height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
@@ -5314,6 +5524,18 @@
     height: auto;
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
     overflow: hidden;
+  }
+  /* The weekly window: two cards per row on a phone, the sheet scrolls. */
+  body.mobile-touch #weekly-quests-window {
+    /* The sheet takes its content's height (the desktop rule pins a fixed one)
+       so the cards never paint over the footer or the commendation strip. */
+    height: auto;
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
+    overflow-y: auto;
+  }
+  body.mobile-touch #weekly-quests-window .wk-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    flex: 0 0 auto;
   }
   /* The leaderboard body (.lb-body) has its own 56vh scroll; cap the whole sheet to
      the viewport so a long board never runs the window past the bottom edge. */
@@ -6387,6 +6609,24 @@
     box-sizing: border-box;
     overflow: hidden;
     z-index: 95;
+  }
+  body.mobile-touch.weekly-vault-open #bank-window {
+    left: calc(max(10px, env(safe-area-inset-left)) / var(--window-scale, 1));
+    right: calc(max(10px, env(safe-area-inset-right)) / var(--window-scale, 1));
+    top: calc(max(10px, env(safe-area-inset-top)) / var(--window-scale, 1));
+    bottom: calc(max(10px, env(safe-area-inset-bottom)) / var(--window-scale, 1));
+    width: auto;
+    height: auto;
+    transform: none;
+  }
+  body.mobile-touch.weekly-vault-open .weekly-rewards {
+    padding: 10px;
+  }
+  body.mobile-touch.weekly-vault-open .weekly-rewards h2 {
+    font-size: 20px;
+  }
+  body.mobile-touch.weekly-vault-open .weekly-reset {
+    padding: 8px 12px;
   }
   /* The paired-geometry box the bank AND market clusters share on touch (the
      market copied the bank's desktop dock, body.market-open in components.css,
@@ -8015,6 +8255,103 @@
   body.mobile-touch #leaderboard-window .lbp-plinth-3 {
     height: 20px;
   }
+  /* World Quest rankings on a phone: the sheet fills the screen as the same
+     flex column as desktop (cards, then the board whose ladder list scrolls,
+     then the self bar in flow), so nothing ever draws over the podium or the
+     rows. The cards become one horizontally scrolling strip of compact chips,
+     and the podium shrinks; card and pager buttons keep the touch floor. */
+  body.mobile-touch #world-quest-leaderboard-window {
+    height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
+    overflow: hidden;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-sub {
+    display: none;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-cards {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding-bottom: 2px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-card {
+    flex: 0 0 132px;
+    gap: 2px;
+    padding: 4px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-card-art {
+    aspect-ratio: auto;
+    height: 20px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-card-name {
+    font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-card-metric {
+    display: none;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-card,
+  body.mobile-touch #world-quest-leaderboard-window .wql-page-btn {
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-board {
+    margin-top: 6px;
+    padding: 4px 8px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-board-title {
+    font-size: 14px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-board-rule,
+  body.mobile-touch #world-quest-leaderboard-window .wql-total {
+    font-size: 11px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .lbp-podium {
+    max-width: 520px;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .lbp-slot-medal {
+    width: 26px;
+    height: 26px;
+    margin-bottom: -13px;
+    border-width: 1px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .lbp-slot-card {
+    padding: 15px 4px 2px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .lbp-slot-name,
+  body.mobile-touch #world-quest-leaderboard-window .lbp-slot-metric {
+    font-size: 12px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .lbp-slot-detail {
+    font-size: 10px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .lbp-plinth-rank {
+    font-size: 13px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .lbp-plinth-1 {
+    height: 26px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .lbp-plinth-2 {
+    height: 23px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .lbp-plinth-3 {
+    height: 20px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-row {
+    grid-template-columns: 36px minmax(0, 1fr) 96px 88px;
+    padding: 3px 8px;
+    font-size: 12px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-self {
+    margin-top: 6px;
+    padding: 4px 22px;
+    font-size: 12px;
+  }
   /* Loot Settings: the loot-mode / threshold selects (40px + 16px iOS no-zoom). */
   body.mobile-touch #loot-settings-window select {
     min-height: 40px;
@@ -9569,5 +9906,111 @@
   body.mobile-touch #death-recap-dialog {
     width: min(520px, calc(var(--app-vw, 100vw) / var(--ui-scale, 1) - 20px));
     max-height: 85vh;
+  }
+}
+
+@layer hud-mobile {
+  body.mobile-touch #world-quest-puzzle-window.ley-beam {
+    --ley-window-width: calc(
+      (
+        var(--app-vw) -
+        max(10px, env(safe-area-inset-left)) -
+        max(10px, env(safe-area-inset-right)) -
+        12px
+      ) /
+      var(--ui-scale, 1)
+    );
+    --ley-frame-pad: calc(24px / var(--ui-scale, 1));
+    --ley-grid-pad: calc(10px / var(--ui-scale, 1));
+    --ley-gap: calc(8px / var(--ui-scale, 1));
+    --ley-tile-size: clamp(
+      calc(40px / var(--ui-scale, 1)),
+      calc(
+        (
+          var(--ley-window-width) -
+          36px /
+          var(--ui-scale, 1) -
+          var(--ley-frame-pad) *
+          2 -
+          var(--ley-grid-pad) *
+          2 -
+          (var(--wql-columns, 3) - 1) *
+          var(--ley-gap) -
+          2px
+        ) /
+        var(--wql-columns, 3)
+      ),
+      calc(92px / var(--ui-scale, 1))
+    );
+    width: auto;
+    top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
+    max-height: calc(
+      (
+        var(--app-vh) -
+        max(10px, env(safe-area-inset-top)) -
+        max(10px, env(safe-area-inset-bottom))
+      ) /
+      var(--ui-scale, 1)
+    );
+    gap: calc(10px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam > .panel-title {
+    padding: 16px 44px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam > .panel-title > span {
+    font-size: 21px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-heading {
+    padding-top: 4px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-heading-sigil {
+    width: calc(54px / var(--ui-scale, 1));
+    height: calc(54px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-heading::before,
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-heading::after {
+    top: calc(31px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wqp-grid {
+    --wqp-tile-size: var(--ley-tile-size);
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-status {
+    grid-template-columns: 1fr 1fr;
+    font-size: 12px;
+    padding: 9px 5px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-source-label {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-target-label {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-reach {
+    grid-column: 1;
+    grid-row: 2;
+    padding-top: 6px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-timer {
+    grid-column: 2;
+    grid-row: 2;
+    margin-top: 6px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-result {
+    padding: 24px 20px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-result-frame {
+    border-width: 20px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-result-title {
+    font-size: 20px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-result-seal {
+    width: 60px;
+    height: 60px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-result-detail {
+    font-size: 16px;
   }
 }

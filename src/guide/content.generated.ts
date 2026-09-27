@@ -2462,7 +2462,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Landing",
       "The Watch Meadow",
       "The Sundered Cliffs",
-      "The Riftfields"
+      "The Riftfields",
+      "The Wreck"
     ],
     "welcome": "Cross the sandbar and Gullhaven's bell will find you before the town does. The breaks tear open without warning, and the redoubt holds its shore against whatever pours through. They have been waiting a long while for someone like you.",
     "families": [
@@ -5867,6 +5868,130 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "crest": "/ui/deeds/col_set_bramblehide.webp"
   },
   {
+    "id": "exp_arcane_calligraphy",
+    "name": "A Steady Hand",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_arcane_calligraphy_gold",
+    "name": "Written in Starlight",
+    "category": "exploration",
+    "renown": 10,
+    "feat": false,
+    "rewardTitle": "the Runecaller"
+  },
+  {
+    "id": "exp_forge_helper",
+    "name": "A Helping Hammer",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_last_barricade",
+    "name": "The Last Barricade",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_borrowed_face",
+    "name": "A Borrowed Face",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_windrider_slalom",
+    "name": "Windrider Slalom",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_duskweave_dispatches",
+    "name": "Duskweave Dispatches",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_wisp_maze",
+    "name": "A Light in the Maze",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "prog_rift_watch_trusted",
+    "name": "Trusted by the Rift Watch",
+    "category": "progression",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "prog_church_order_trusted",
+    "name": "Trusted by the Church Order",
+    "category": "progression",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "prog_automatons_trusted",
+    "name": "Trusted by the Automatons",
+    "category": "progression",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "prog_rift_watch_champion",
+    "name": "Champion of the Rift Watch",
+    "category": "progression",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Riftwarden"
+  },
+  {
+    "id": "prog_church_order_champion",
+    "name": "Champion of the Church Order",
+    "category": "progression",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Dawnkeeper"
+  },
+  {
+    "id": "prog_automatons_champion",
+    "name": "Champion of the Automatons",
+    "category": "progression",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Forgemaster"
+  },
+  {
+    "id": "prog_faction_champion_all",
+    "name": "Champion of Every Banner",
+    "category": "progression",
+    "renown": 50,
+    "feat": false
+  },
+  {
+    "id": "exp_clue_first_casket",
+    "name": "Treasure Found",
+    "category": "exploration",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "exp_clue_ten_caskets",
+    "name": "Treasure Hunter",
+    "category": "exploration",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Treasure Hunter"
+  },
+  {
     "id": "exp_harbor_to_harbor",
     "name": "Harbor to Harbor",
     "category": "exploration",
@@ -5935,6 +6060,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Bonechill Cord"
+      },
+      {
+        "kind": "item",
+        "name": "Bastion Sigil"
       }
     ]
   },
@@ -6009,6 +6138,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Dreamroot Boots"
+      },
+      {
+        "kind": "item",
+        "name": "Stormjar"
       }
     ]
   },
@@ -6071,6 +6204,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Tideworn Warboots"
+      },
+      {
+        "kind": "item",
+        "name": "Mender's Hourglass"
       }
     ]
   },
@@ -6299,6 +6436,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Bloodmane War-Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Paired Talons"
       }
     ]
   },
@@ -6445,6 +6586,22 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Stormcaller's Focus"
+      },
+      {
+        "kind": "item",
+        "name": "Mooring Stone"
+      },
+      {
+        "kind": "item",
+        "name": "Wellspring Seed"
+      },
+      {
+        "kind": "item",
+        "name": "Hunter's Tally"
+      },
+      {
+        "kind": "item",
+        "name": "Echoing Lens"
       }
     ]
   },
@@ -7180,7 +7337,27 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "title",
+        "name": "the Runecaller"
+      },
+      {
+        "kind": "title",
         "name": "the Unscorched"
+      },
+      {
+        "kind": "title",
+        "name": "Riftwarden"
+      },
+      {
+        "kind": "title",
+        "name": "Dawnkeeper"
+      },
+      {
+        "kind": "title",
+        "name": "Forgemaster"
+      },
+      {
+        "kind": "title",
+        "name": "Treasure Hunter"
       }
     ]
   },
@@ -7248,6 +7425,14 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Rimefang"
+      },
+      {
+        "kind": "item",
+        "name": "Sundered Prism"
+      },
+      {
+        "kind": "item",
+        "name": "Gambler's Die"
       },
       {
         "kind": "item",
@@ -7680,6 +7865,14 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Emberglass Warstaff"
+      },
+      {
+        "kind": "item",
+        "name": "Medallion of Defiance"
+      },
+      {
+        "kind": "item",
+        "name": "Duelist's Brand"
       }
     ]
   },
@@ -20206,6 +20399,113 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
         {
           "stat": "sta",
           "value": 13
+        }
+      ]
+    },
+    {
+      "id": "enchant_weapon_riftwalkers_grace",
+      "slot": "mainhand",
+      "tier": "greater",
+      "skillReq": 100,
+      "perfectedOnly": false,
+      "requiresFormula": true,
+      "hasDescription": true,
+      "reagents": [
+        {
+          "itemId": "arcane_shard",
+          "name": "Chime Shard",
+          "count": 2
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 4
+        }
+      ],
+      "bonus": []
+    },
+    {
+      "id": "enchant_weapon_dawnfire_etching",
+      "slot": "mainhand",
+      "tier": "greater",
+      "skillReq": 100,
+      "perfectedOnly": false,
+      "requiresFormula": true,
+      "hasDescription": true,
+      "reagents": [
+        {
+          "itemId": "arcane_shard",
+          "name": "Chime Shard",
+          "count": 2
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 4
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "spellPower",
+          "value": 18
+        }
+      ]
+    },
+    {
+      "id": "enchant_weapon_dawns_benediction",
+      "slot": "mainhand",
+      "tier": "greater",
+      "skillReq": 100,
+      "perfectedOnly": false,
+      "requiresFormula": true,
+      "hasDescription": true,
+      "reagents": [
+        {
+          "itemId": "arcane_shard",
+          "name": "Chime Shard",
+          "count": 2
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 4
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "healingPower",
+          "value": 34
+        }
+      ]
+    },
+    {
+      "id": "enchant_weapon_piston_drive",
+      "slot": "mainhand",
+      "tier": "greater",
+      "skillReq": 100,
+      "perfectedOnly": false,
+      "requiresFormula": true,
+      "hasDescription": true,
+      "reagents": [
+        {
+          "itemId": "arcane_shard",
+          "name": "Chime Shard",
+          "count": 2
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 4
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "str",
+          "value": 12
+        },
+        {
+          "stat": "critRating",
+          "value": 25
         }
       ]
     }

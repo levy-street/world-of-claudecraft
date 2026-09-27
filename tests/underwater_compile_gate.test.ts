@@ -428,7 +428,9 @@ describe('renderer wiring', () => {
       /this\.underwaterView\.setCompileGate\(this\.worldCompileGate\(\) \?\? null, \(\) => this\.waterView\)/,
     );
     expect(source).toMatch(
-      /private worldCompileGate\(\)[^{]*\{\s*return this\.asyncCompileSupported \? \(target\) => this\.compileGate\(target\) : undefined;/,
+      // The world-quests branch made the gate public for the shipwreck salvage
+      // placements (3977aa1fe2f), so the weld admits either visibility.
+      /(?:private )?worldCompileGate\(\)[^{]*\{\s*return this\.asyncCompileSupported \? \(target\) => this\.compileGate\(target\) : undefined;/,
     );
   });
 

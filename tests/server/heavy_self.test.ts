@@ -164,11 +164,13 @@ describe('heavy-self policy sets', () => {
     // too, one per path, and tests/heavy_self_arm_marks.test.ts holds the other
     // end (that the predicates are really answering out of HEAVY_SELF_CMDS).
     const game = readFileSync(new URL('../../server/game.ts', import.meta.url), 'utf8');
+    // The EVENTS set is read behind isHeavySelfEvent (server/heavy_self.ts) since the
+    // world-quest prefix rule joined it, so its call site is pinned as well.
     expect(game).toContain(
-      "import { HEAVY_SELF_EVENTS, heavySelfMarkOnAccept, heavySelfMarkOnReceipt } from './heavy_self';",
+      "import { heavySelfMarkOnAccept, heavySelfMarkOnReceipt, isHeavySelfEvent } from './heavy_self';",
     );
+    expect(game).toContain('if (isHeavySelfEvent(ev.type)) session.selfHeavyDirty = true;');
     expect(game).toContain('heavySelfMarkOnReceipt(msg.cmd)');
     expect(game).toContain('heavySelfMarkOnAccept(command)');
-    expect(game).toContain('if (HEAVY_SELF_EVENTS.has(ev.type)) session.selfHeavyDirty = true;');
   });
 });

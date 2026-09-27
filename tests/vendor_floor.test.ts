@@ -822,11 +822,18 @@ describe('stock rows: the phase 11n pulls', () => {
       farmer_verbena: 6,
       provisioner_fenna: 7,
       armorer_hode: 5,
-      // 47 entry-tier Warfare rows plus 139 Warfare Season 2 rows.
-      warmarshal_draven_kole: 186,
-      fury: 186,
+      // The two honor trinkets (WARFARE_TRINKET_STOCK) joined both honor
+      // counters: 47 to 49 each.
+      // Plus the 139 Warfare Season 2 rows (second release/v0.44.0 base merge): 188.
+      warmarshal_draven_kole: 188,
+      fury: 188,
       stablemaster_marla: 2,
       wardsmith_orun: 3,
+      // The three faction quartermasters (faction_vendors.ts): the standing
+      // ladder, ten to twelve rows each (FACTION_VENDOR_STOCK).
+      npc_rift_watch_quartermaster: 11,
+      npc_church_order_quartermaster: 12,
+      npc_automaton_quartermaster: 10,
     });
   });
 });

@@ -157,8 +157,9 @@ describe('mob aura icon art', () => {
 
     expect(LIVE_MOB_AURA_FAMILIES).toHaveLength(44);
     expect(census.populatedFamilyCount).toBe(44);
-    expect(census.carrierCount).toBe(108);
-    expect(census.identities.size).toBe(89);
+    // The Fenbridge infiltrator reuses the drowned dead's existing aura art.
+    expect(census.carrierCount).toBe(109);
+    expect(census.identities.size).toBe(90);
     expect([...MOB_AURA_IMAGE_IDS].sort()).toEqual([...new Set(census.identities.values())].sort());
     expect(MOB_AURA_IMAGE_IDS.size).toBe(44);
     for (const [runtimeId, artIdentity] of census.identities) {

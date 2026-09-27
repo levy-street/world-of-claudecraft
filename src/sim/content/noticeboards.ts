@@ -3,6 +3,7 @@
 
 import { EASTBROOK_LAYOUT } from '../eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from '../fenbridge_layout';
+import { GLIDER_RANKINGS_BOARD_ID } from '../glider_scoreboards';
 import {
   assertCanonicalEastbrookNoticeboardDef,
   type MusterBoardDef,
@@ -157,6 +158,7 @@ export const NOTICEBOARDS: readonly NoticeboardDef[] = Object.freeze([
   hubBoard('hedgewick_noticeboard', 2_000_000_013, EVERGARDEN_ZONE, 5),
   hubBoard('wickharbor_noticeboard', 2_000_000_014, GALECREST_ZONE, -5),
   hubBoard('gullhaven_noticeboard', 2_000_000_015, FARSHORE_ZONE, 5),
+  townBoard(GLIDER_RANKINGS_BOARD_ID, 2_000_000_016, 201, 560, Math.PI, { x: 201, z: 558.5 }),
 ]);
 
 const fenbridgeMusterBoard = FENBRIDGE_LAYOUT.civic.musterBoard;

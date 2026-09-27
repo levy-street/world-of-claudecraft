@@ -1,7 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
 import { type NearbyGatherOptions, tryNearbyInteraction } from '../src/game/nearby_interaction';
+import {
+  INVESTIGATION_NPC_IDS,
+  INVESTIGATION_VARIANTS,
+} from '../src/sim/content/world_quest_investigation';
 import { ITEMS } from '../src/sim/data';
-import type { Entity, GatherNodeDef, QuestProgress } from '../src/sim/types';
+import { interactObjectCreditKey } from '../src/sim/quests/interact_object_credit';
+import type { Entity, GatherNodeDef, QuestProgress, WorldQuestProgress } from '../src/sim/types';
+import { worldQuestPuzzleVariantForCycle } from '../src/sim/world_quest_rotation';
+import { worldQuestCycleForResetDay } from '../src/sim/world_quests';
 import type { FarmPatchDef, FarmPlotStatus, FarmPlotView } from '../src/world_api/farming';
 
 function entity(overrides: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entity {
@@ -55,6 +62,8 @@ function rig(targets: Entity[] = []) {
       ...targets.map((target): [number, Entity] => [target.id, target]),
     ]),
     questLog: new Map<string, QuestProgress>(),
+    worldQuestCycle: '',
+    worldQuestLog: new Map<string, WorldQuestProgress>(),
     targetEntity: (id: number | null) => {
       calls.push(`target:${id}`);
     },
@@ -137,6 +146,60 @@ function interact(r: ReturnType<typeof rig>, gather?: NearbyGatherOptions) {
 }
 
 describe('tryNearbyInteraction', () => {
+  it('admits the nearest authored piece beyond the previous eight-piece layout', () => {
+    const nearest = entity({
+      id: 2_147_100_108,
+      kind: 'object',
+      templateId: 'ground_wreckfield_flotsam_crate',
+      objectItemId: 'wreckfield_flotsam_crate',
+      lootable: true,
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const farther = entity({
+      id: 2_147_100_101,
+      kind: 'object',
+      templateId: 'ground_wreckfield_flotsam_crate',
+      objectItemId: 'wreckfield_flotsam_crate',
+      lootable: true,
+      pos: { x: 2, y: 0, z: 0 },
+    });
+    const r = rig([nearest, farther]);
+    r.world.worldQuestCycle = worldQuestCycleForResetDay('2026-09-04');
+
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toContain(`pickup:${nearest.id}`);
+    expect(r.calls).not.toContain(`pickup:${farther.id}`);
+  });
+
+  it('skips a personally recovered shipwreck piece in favor of the next one', () => {
+    const recovered = entity({
+      id: 2_147_100_101,
+      kind: 'object',
+      templateId: 'ground_wreckfield_flotsam_crate',
+      objectItemId: 'wreckfield_flotsam_crate',
+      lootable: true,
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const visible = entity({
+      ...recovered,
+      id: 2_147_100_102,
+      pos: { x: 2, y: 0, z: 0 },
+    });
+    const r = rig([recovered, visible]);
+    r.world.worldQuestCycle = worldQuestCycleForResetDay('2026-09-04');
+    r.world.worldQuestLog.set('wq_farshore_salvage', {
+      questId: 'wq_farshore_salvage',
+      count: 1,
+      state: 'active',
+      puzzleVariant: 0,
+      creditedObjects: [interactObjectCreditKey(0, recovered.pos)],
+    });
+
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toContain(`pickup:${visible.id}`);
+    expect(r.calls).not.toContain(`pickup:${recovered.id}`);
+  });
+
   it('dispatches the nearest visible corpse loot', () => {
     const fartherCorpse = entity({
       id: 2,
@@ -716,6 +779,62 @@ describe('tryNearbyInteraction npc reach', () => {
     expect(interactPreferring(r, 3)).toBe(true);
     expect(r.calls).toEqual(['quest:3']);
   });
+});
+
+it('does not interact with a revealed disguise through the nearby key', () => {
+  // The culprit follows the cycle's story variant; the other guard stays selectable.
+  const variant = worldQuestPuzzleVariantForCycle('wq3_9', INVESTIGATION_VARIANTS.length);
+  const culprit = INVESTIGATION_NPC_IDS[INVESTIGATION_VARIANTS[variant].culprit + 1];
+  const honest = INVESTIGATION_NPC_IDS.slice(1).find((id) => id !== culprit)!;
+  const r = rig([
+    entity({ id: culprit, kind: 'npc', pos: { x: 1, y: 0, z: 0 }, questIds: [] }),
+    entity({ id: honest, kind: 'npc', pos: { x: 2, y: 0, z: 0 }, questIds: [] }),
+  ]);
+  r.world.worldQuestCycle = 'wq3_9';
+  r.world.worldQuestLog.set('wq_mirefen_infiltrator', {
+    questId: 'wq_mirefen_infiltrator',
+    state: 'active',
+    count: 0,
+    investigation: { heard: 15, clues: 3, cleared: 0, mobId: 90 },
+  });
+  interact(r);
+  expect(r.calls).toContain('quest:' + honest);
+  expect(r.calls).not.toContain('quest:' + culprit);
+});
+
+it('the scout leaves the glade for a viewer who finished the dispatch run', () => {
+  const r = rig([entity({ id: 2146900040, kind: 'npc', templateId: 'shadow_scout_valerie' })]);
+  expect(interact(r)).toBe(true);
+  r.calls.length = 0;
+  r.world.worldQuestLog.set('wq_eastbrook_shadow', {
+    questId: 'wq_eastbrook_shadow',
+    state: 'completed',
+    count: 4,
+  });
+  expect(interact(r)).toBe(false);
+  expect(r.calls).toEqual(['error:nothing']);
+});
+
+it('shadow sentries and guards are selected without opening dialogue or stealing on interact', () => {
+  const r = rig([entity({ id: 2146900041, kind: 'npc', templateId: 'shadow_guard_north' })]);
+  // The guards exist only for a cloaked infiltrator: an uncloaked viewer cannot
+  // see or select them (the renderer withholds the body, the scan must agree).
+  expect(interact(r)).toBe(false);
+  expect(r.calls).toEqual(['error:nothing']);
+  r.calls.length = 0;
+  r.world.worldQuestLog.set('wq_eastbrook_shadow', {
+    questId: 'wq_eastbrook_shadow',
+    state: 'active',
+    count: 0,
+    shadow: { phase: 'cloaked', suspicion: 0, cooldown: 0 },
+  });
+  expect(interact(r)).toBe(true);
+  expect(r.calls).toEqual(['target:2146900041']);
+});
+it('shadow instructor opens a briefing before the authoritative interaction', () => {
+  const r = rig([entity({ id: 2146900040, kind: 'npc', templateId: 'shadow_cloak_scout' })]);
+  expect(interact(r)).toBe(true);
+  expect(r.calls).toEqual(['quest:2146900040']);
 });
 
 describe('the garden-bed arm (Phase 9b)', () => {

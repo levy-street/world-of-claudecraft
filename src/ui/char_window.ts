@@ -29,6 +29,7 @@ import {
   type CharacterSidebarTab,
   type PaperdollSlot,
 } from './char_view';
+import { specializationPanelHtml } from './character_progression_view';
 import { currencyIconHtml } from './currency_art';
 import { DeferredDragRender } from './deferred_drag_render';
 import { markDialogRoot } from './dialog_root';
@@ -36,10 +37,14 @@ import { classDisplayName, itemDisplayName } from './entity_i18n';
 import { draggedCopySlotIndex, dropRequiredLevel, paperdollDropAction } from './equip_drop_core';
 import { esc } from './esc';
 import { focusedWithin, restoreFirstEnabled } from './focus_restore';
-import { craftNameText } from './hud/professions/craft_name_view';
+import { writeHotbarDragData } from './hud/action_bar/hotbar';
+import { isUsableTrinketId } from './hud/action_bar/trinket_slot_core';
+import { currenciesTabHtml } from './hud/currencies';
+import { archetypeTitleText, craftNameText } from './hud/professions/craft_name_view';
 import { gatheringProfessionNameKey } from './hud/professions/gathering_profession_name';
 import { buildGatheringProficiencyRows } from './hud/professions/gathering_view';
 import { archetypeImageUrl } from './hud/professions/profession_art';
+import { reputationTabHtml } from './hud/reputation';
 import { formatNumber, type TranslationKey, t, tPlural } from './i18n';
 import { iconDataUrl, professionIconUrl, professionImageUrl } from './icons';
 import type { ItemDragState } from './item_drag_state';
@@ -69,28 +74,12 @@ import { wornItemCellParts } from './worn_item_cell_view';
 const SLOT_EMPTY_TEXT_COLOR = 'var(--color-slot-empty-text)';
 const SLOT_EMPTY_BORDER_COLOR = 'var(--color-slot-empty-border)';
 
-// The ten pair-archetype title keys (issue 1130, pair-named under Professions
-// 2.0), one per canonical pair id (see src/sim/professions/archetype.ts
-// ARCHETYPE_PAIR_TARGETS and getArchetypeTitle: the title identifier IS the
-// pair id). Every player-visible string is a t() key, so this is a literal
-// id-to-key table, never a built string.
-const ARCHETYPE_PAIR_TITLE_KEYS: Record<string, TranslationKey> = {
-  'engineering+alchemy': 'hudChrome.archetypePair.engineering+alchemy',
-  'alchemy+cooking': 'hudChrome.archetypePair.alchemy+cooking',
-  'cooking+leatherworking': 'hudChrome.archetypePair.cooking+leatherworking',
-  'leatherworking+tailoring': 'hudChrome.archetypePair.leatherworking+tailoring',
-  'tailoring+inscription': 'hudChrome.archetypePair.tailoring+inscription',
-  'inscription+enchanting': 'hudChrome.archetypePair.inscription+enchanting',
-  'enchanting+jewelcrafting': 'hudChrome.archetypePair.enchanting+jewelcrafting',
-  'jewelcrafting+weaponcrafting': 'hudChrome.archetypePair.jewelcrafting+weaponcrafting',
-  'weaponcrafting+armorcrafting': 'hudChrome.archetypePair.weaponcrafting+armorcrafting',
-  'armorcrafting+engineering': 'hudChrome.archetypePair.armorcrafting+engineering',
-};
-
 const CHARACTER_SIDEBAR_LABEL_KEYS: Record<CharacterSidebarTab, TranslationKey> = {
-  stats: 'hudChrome.charSidebar.stats',
+  stats: 'hudChrome.charSidebar.character',
   progression: 'hudChrome.charSidebar.progression',
-  skills: 'hudChrome.charSidebar.skills',
+  skills: 'hudChrome.charSidebar.professions',
+  reputation: 'hudChrome.charSidebar.reputation',
+  currencies: 'hudChrome.charSidebar.currencies',
 };
 
 const charSidebarTabId = (id: CharacterSidebarTab): string => `char-sidebar-tab-${id}`;
@@ -100,16 +89,7 @@ const charSidebarTabId = (id: CharacterSidebarTab): string => `char-sidebar-tab-
 // a pure core may not import a *_window module). Re-exported here so the
 // historical import sites (crafting window, identity card, quest dialog,
 // train window, professions window, hud) keep resolving unchanged.
-export { craftNameText };
-
-/** Localized text for the granted pair-archetype title (the input is the
- *  canonical pair id from IWorld `archetypeTitle`), or the "no title yet" copy
- *  when the player has not completed the zone-1 acceptance quest (or the id is
- *  somehow unrecognized). Exported for the view-model test. */
-export function archetypeTitleText(pairId: string | null): string {
-  const key = pairId !== null ? ARCHETYPE_PAIR_TITLE_KEYS[pairId] : undefined;
-  return t(key ?? 'hudChrome.archetypeTitle.none');
-}
+export { archetypeTitleText, craftNameText };
 
 /** Localized text for the hobby craft (issue 1294): a hobby id IS a craft id
  *  on the ring, so this renders the per-craft display name, or the "no hobby
@@ -169,12 +149,13 @@ export interface CharWindowDeps extends Omit<PainterHostPresentation, 'itemToolt
   slotName(slot: EquipSlot): string;
   statCellHtml(stat: StatId): string;
   statTooltipHtml(stat: StatId): string;
-  talentSummaryHtml(): string;
   progressionHtml(level: number): string;
   /** Remove the equipped piece in `slot` to bags and repaint bags + the sheet. */
   unequip(slot: EquipSlot): void;
-  /** Stage a drag-to-unequip: record the slot HUD-side and reveal the bags drop. */
-  beginUnequipDrag(slot: EquipSlot): void;
+  /** Stage a drag-to-unequip: record the slot HUD-side and reveal the bags drop.
+   *  `hotbarAction` is set when the worn piece is also placeable on the action
+   *  bar (a usable trinket), so the same drag can drop onto a bar slot. */
+  beginUnequipDrag(slot: EquipSlot, hotbarAction: { type: 'item'; id: string } | null): void;
   /** End a drag-to-unequip: clear the HUD slot and the bags drop-target hint. */
   endUnequipDrag(): void;
   /** Mount the shared 3D turntable into the model panel (HUD-owned lifecycle). */
@@ -329,7 +310,8 @@ export class CharWindow {
             hobby: hobbyCraft,
           });
     let html = `<div class="panel-title char-title-portrait ui-win-head">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'sm', catalog: p.skinCatalog, look: isMechWearer(world.player) ? null : modularLookFor(world.player) })}<span class="char-title-text ui-win-title" id="char-title">${esc(p.name)}<span class="ui-win-sub char-title-sub">${archetypeCrest}${esc(subtitle)}</span></span><span class="char-honor-balance">${currencyIconHtml('honor')}${esc(t('hudChrome.warfare.balance', { amount: formatNumber(world.honor, { maximumFractionDigits: 0 }) }))}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
-    html += `<div class="char-body"><section class="char-equipment-pane"><div class="paperdoll">
+    const panelLabel = `aria-labelledby="${esc(charSidebarTabId(sidebar.selected))}"`;
+    const paperdoll = `<section class="char-equipment-pane"><div class="paperdoll">
         <div class="equip-col" id="equip-col-left"></div>
         <div class="char-model-panel ui-card">
           <div id="char-model-preview" class="char-model-preview" role="img" aria-label="${esc(t('hudChrome.character.modelPreview'))}"></div>
@@ -337,8 +319,19 @@ export class CharWindow {
         </div>
         <div class="equip-col equip-col-right" id="equip-col-right"></div>
         <div class="equip-row-weapons" id="equip-row-weapons"></div>
-      </div>${this.masterwroughtSlotsHtml(world)}<div class="ui-divider char-footer-divider"></div><footer class="char-footer">${this.playtimeHtml(world)}<div class="pc-share-row"><button type="button" class="btn ui-btn char-cosmetics-btn" data-act="open-cosmetics">${esc(t('hudChrome.cosmetics.title'))}</button><button type="button" class="pc-share-btn ui-btn ui-btn--red" data-act="share-card">${SHARE_GLYPH}<span>${esc(t('playerCard.shareButton'))}</span></button></div></footer></section>`;
-    html += `<section class="char-sidebar">${tabStripHtml(
+      </div>${this.masterwroughtSlotsHtml(world)}</section>`;
+    // The Character tab keeps the paperdoll and adds the stats rail beside it
+    // (Offense and Defense, scrolling), with the primary attributes in a row
+    // beneath; every other tab takes the whole body. The one tabpanel keeps
+    // its id, tab stop and name in both shapes (the WAI-ARIA tabs pattern,
+    // axe's scrollable-region-focusable).
+    html += '<div class="char-sheet">';
+    if (sidebar.selected === 'stats') {
+      html += `<div class="char-body char-body--sheet">${paperdoll}<aside id="char-sidebar-panel" class="char-sidebar-panel char-stats-rail" role="tabpanel" tabindex="0" ${panelLabel}>${this.statsRailHtml(world)}</aside></div><div class="char-attr-row stat-panel attrs-tiles">${this.attributeTilesHtml()}</div>`;
+    } else {
+      html += `<div class="char-body char-body--tab"><div id="char-sidebar-panel" class="char-sidebar-panel char-tab-panel" role="tabpanel" tabindex="0" ${panelLabel}>${this.sidebarHtml(world, sidebar.selected)}</div></div>`;
+    }
+    html += `<footer class="char-footer">${tabStripHtml(
       tabStripModel({
         ariaLabel: t('hudChrome.charSidebar.label'),
         panelId: 'char-sidebar-panel',
@@ -352,11 +345,7 @@ export class CharWindow {
         })),
         selected: sidebar.selected,
       }),
-      // The panel scrolls (overflow-y: auto) and the Stats tab holds no
-      // focusable content, so it needs its own tab stop plus the selected
-      // tab's label as its name: the WAI-ARIA tabs pattern, and what
-      // axe's scrollable-region-focusable asks for.
-    )}<div id="char-sidebar-panel" class="char-sidebar-panel" role="tabpanel" tabindex="0" aria-labelledby="${esc(charSidebarTabId(sidebar.selected))}">${this.sidebarHtml(world, sidebar.selected)}</div></section></div>`;
+    )}<div class="pc-share-row"><button type="button" class="btn ui-btn char-cosmetics-btn" data-act="open-cosmetics">${esc(t('hudChrome.cosmetics.title'))}</button><button type="button" class="pc-share-btn ui-btn ui-btn--red" data-act="share-card">${SHARE_GLYPH}<span>${esc(t('playerCard.shareButton'))}</span></button></div></footer></div>`;
     el.innerHTML = html;
     hydratePortraits(el);
     wireTabStrip(el, 'char-sidebar-tab', (id, focusFollow) => {
@@ -462,24 +451,46 @@ export class CharWindow {
   }
 
   private sidebarHtml(world: IWorld, selected: CharacterSidebarTab): string {
-    if (selected === 'progression') return this.deps.progressionHtml(world.player.level);
+    // Playtime lives with the rest of the character's progression readouts
+    // (the footer keeps only the share and cosmetics actions).
+    if (selected === 'progression')
+      return this.deps.progressionHtml(world.player.level) + this.playtimeHtml(world);
     if (selected === 'skills') return this.skillsHtml(world);
-    const stats = `<div class="stat-panels">${STAT_PANELS.map((panel) => {
-      const cellClasses = panel.kind === 'tiles' ? 'ui-stat-row ui-card' : 'ui-stat-row';
-      const cells = panel.stats
-        .map((stat) =>
-          this.deps
-            .statCellHtml(stat)
-            .replace('class="stat-cell"', `class="stat-cell ${cellClasses}"`),
-        )
-        .join('');
-      const title = panel.titleKey
-        ? `<div class="sp-title">${esc(t(panel.titleKey as TranslationKey))}</div>`
-        : '';
-      const cls = panel.kind === 'tiles' ? 'stat-panel attrs-tiles' : 'stat-panel ui-card';
-      return `<div class="${cls}">${title}${cells}</div>`;
-    }).join('')}</div>`;
-    return stats + this.deps.talentSummaryHtml();
+    if (selected === 'reputation') return reputationTabHtml(world, Date.now());
+    if (selected === 'currencies') return currenciesTabHtml(world);
+    return this.statsRailHtml(world);
+  }
+
+  /** The titled stat boards (Offense, Defense, then Specialization): the
+   *  Character tab's rail. */
+  private statsRailHtml(world: IWorld): string {
+    return `<div class="char-rail-panels">${STAT_PANELS.filter((panel) => panel.kind !== 'tiles')
+      .map((panel) => {
+        const cells = panel.stats
+          .map((stat) =>
+            this.deps
+              .statCellHtml(stat)
+              .replace('class="stat-cell"', 'class="stat-cell ui-stat-row"'),
+          )
+          .join('');
+        const title = panel.titleKey
+          ? `<div class="sp-title">${esc(t(panel.titleKey as TranslationKey))}</div>`
+          : '';
+        return `<div class="stat-panel ui-card">${title}${cells}</div>`;
+      })
+      .join('')}${specializationPanelHtml(world)}</div>`;
+  }
+
+  /** The five primary attributes as tiles: the row under the paperdoll. */
+  private attributeTilesHtml(): string {
+    return STAT_PANELS.filter((panel) => panel.kind === 'tiles')
+      .flatMap((panel) => panel.stats)
+      .map((stat) =>
+        this.deps
+          .statCellHtml(stat)
+          .replace('class="stat-cell"', 'class="stat-cell ui-stat-row ui-card"'),
+      )
+      .join('');
   }
 
   private skillsHtml(world: IWorld): string {
@@ -685,8 +696,14 @@ export class CharWindow {
       row.draggable = true;
       row.addEventListener('dragstart', (e) => {
         this.unequipDragActive = true;
-        this.deps.beginUnequipDrag(slot);
-        if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
+        // A usable trinket also drags onto the action bar (it is used where it
+        // is worn): the bar reads the payload, the bags still take the unequip.
+        const hotbarAction = isUsableTrinketId(item.id)
+          ? { type: 'item' as const, id: item.id }
+          : null;
+        this.deps.beginUnequipDrag(slot, hotbarAction);
+        if (hotbarAction) writeHotbarDragData(e.dataTransfer, hotbarAction);
+        if (e.dataTransfer) e.dataTransfer.effectAllowed = hotbarAction ? 'copyMove' : 'move';
         this.deps.hideTooltip();
       });
       row.addEventListener('dragend', () => {

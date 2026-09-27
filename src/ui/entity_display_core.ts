@@ -24,6 +24,7 @@ import { mobileStationTitleFor } from './hud/professions/mobile_station_title';
 import { formatNumber, t } from './i18n';
 import { professionTrainerLabel } from './profession_trainer_label_core';
 import { localizeSimAuraName } from './sim_i18n';
+import { forgeObjectLabel } from './world_quest_forge_view';
 
 export function itemDisplayNameFromSource(name: string): string {
   const item = Object.values(ITEMS).find((candidate) => candidate.name === name);
@@ -132,7 +133,38 @@ export function delveDisplayName(delveId: string): string {
 //    Feast" title around the PLACER'S raw name (the wire carries the name as
 //    a value; sim and server stay language-agnostic);
 //  - every other entity (players, plain objects) shows its wire name as is.
+// The world-quest cannon stations name themselves by the emplacement they man,
+// read by the vehicle bar and the world-quest view as well as the live name.
+export function vehicleStationDisplayName(stationId: string): string {
+  return t(
+    stationId === 'last_keep_cannon'
+      ? 'hudChrome.vehicle.lastKeepTitle'
+      : 'hudChrome.vehicle.title',
+  );
+}
+
+// The infiltrator investigation's two clue objects (the carried item or the
+// dropped ground copy) show their clue name, not the raw item name.
+export function investigationObjectLabel(itemId: string | null | undefined): string | null {
+  if (itemId === 'wq_infiltrator_orders' || itemId === 'ground_wq_infiltrator_orders')
+    return t('questUi.worldQuest.investigation.clueNames.c0');
+  if (itemId === 'wq_infiltrator_ledger' || itemId === 'ground_wq_infiltrator_ledger')
+    return t('questUi.worldQuest.investigation.clueNames.c1');
+  return null;
+}
+
 export function entityDisplayName(entity: Entity): string {
+  if (entity.kind === 'object') {
+    // World-quest objects first: an investigation clue, a forge station, and
+    // the two cannon emplacements carry their own localized names.
+    const questObjectId = entity.objectItemId ?? entity.templateId;
+    const investigationLabel = investigationObjectLabel(questObjectId);
+    if (investigationLabel) return investigationLabel;
+    const forgeLabel = forgeObjectLabel(questObjectId);
+    if (forgeLabel) return forgeLabel;
+    if (entity.templateId === 'north_watch_cannon' || entity.templateId === 'last_keep_cannon')
+      return vehicleStationDisplayName(entity.templateId);
+  }
   if (entity.kind === 'mob') {
     return entity.ownerId !== null && !isNecromancyUndead(entity)
       ? (localizeSimAuraName(entity.name) ?? entity.name)

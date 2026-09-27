@@ -86,6 +86,7 @@ const EXCLUDED: Record<string, string> = {
  *  auditing, and pinned equal to the sources' own `module` fields: a row added
  *  here to silence a hit, with no factory behind it, fails that pin. */
 const REGISTERED_MODULES = [
+  'world_quest_trace_materials.ts',
   'frost_nova_root_visual.ts',
   'ice_block_visual.ts',
   'temporal_hourglass_visual.ts',
@@ -251,9 +252,10 @@ describe('the lazy-material sweep', () => {
     // stand-ins: Ring of Frost, Divine Ascension, Frostglobe, the mage and
     // the warlock meteor rocks, plus the two rig-adornment stand-ins), the
     // two excluded scenery bakes, and the rocket-sled plume pair. The
-    // battleground caches are the remaining non-bundle hit.
-    expect(hits.length).toBeGreaterThanOrEqual(17);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(16);
+    // battleground caches are the remaining non-bundle hit. Plus the World
+    // Quests branch's calligraphy guidance bundle: 18 / 17.
+    expect(hits.length).toBeGreaterThanOrEqual(18);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(17);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

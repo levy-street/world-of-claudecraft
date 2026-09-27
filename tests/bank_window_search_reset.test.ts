@@ -129,6 +129,21 @@ beforeEach(() => {
 });
 
 describe('bank window search reset on close', () => {
+  it('returns to the personal bank after a closed Weekly Vault visit', () => {
+    const { root, w } = harness();
+    w.open('rewards');
+    expect(root.querySelector('#weekly-rewards-panel')).not.toBeNull();
+    w.close();
+    w.open();
+    expect(root.querySelector('#weekly-rewards-panel')).toBeNull();
+    expect(searchInput(root).value).toBe('');
+    expect(occupiedCells(root)).toBe(2);
+    w.close();
+    w.open('rewards');
+    expect(root.querySelector('#weekly-rewards-panel')).not.toBeNull();
+    w.close();
+  });
+
   it('clears the search when the window closes, so a reopen starts unfiltered', () => {
     const { root, w } = harness();
     w.open();

@@ -632,6 +632,12 @@ jobs:
             /docs/screenshots/bank-storage-charters/
             /docs/screenshots/bank-vault-tab/
             /docs/screenshots/cosmetics-window/
+            /docs/screenshots/confection-cascade/
+            /docs/screenshots/confection-cascade-v3/
+            /docs/screenshots/confection-cascade-v4/
+            /docs/screenshots/confection-cascade-v5/
+            /docs/screenshots/confection-cascade-v6/
+            /docs/screenshots/confection-cascade-v7/
             /docs/screenshots/deed-border-cartouche/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
@@ -648,6 +654,7 @@ jobs:
             /docs/screenshots/intentional-gathering-pr2/
             /docs/screenshots/interface-redesign/
             /docs/screenshots/item-art-consistency-2026-08-09/
+            /docs/screenshots/ley-beam-v1/
             /docs/screenshots/market-house-redesign/
             /docs/screenshots/masterwrought-art-completion-2026-09-02/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
@@ -659,6 +666,10 @@ jobs:
             /docs/screenshots/vault-fine-mark/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
+            /docs/screenshots/world-quest-cannon/
+            /docs/screenshots/world-quest-horde/
+            /docs/screenshots/world-quest-investigation/
+            /docs/screenshots/world-quest-puzzle-polish/
           sparse-checkout-cone-mode: false
           # Explicit for the reader; the sparse-checkout input
           # already implies it (matching the changes job's step).
@@ -861,6 +872,12 @@ jobs:
             /docs/screenshots/bank-storage-charters/
             /docs/screenshots/bank-vault-tab/
             /docs/screenshots/cosmetics-window/
+            /docs/screenshots/confection-cascade/
+            /docs/screenshots/confection-cascade-v3/
+            /docs/screenshots/confection-cascade-v4/
+            /docs/screenshots/confection-cascade-v5/
+            /docs/screenshots/confection-cascade-v6/
+            /docs/screenshots/confection-cascade-v7/
             /docs/screenshots/deed-border-cartouche/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
@@ -877,6 +894,7 @@ jobs:
             /docs/screenshots/intentional-gathering-pr2/
             /docs/screenshots/interface-redesign/
             /docs/screenshots/item-art-consistency-2026-08-09/
+            /docs/screenshots/ley-beam-v1/
             /docs/screenshots/market-house-redesign/
             /docs/screenshots/masterwrought-art-completion-2026-09-02/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
@@ -888,6 +906,10 @@ jobs:
             /docs/screenshots/vault-fine-mark/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
+            /docs/screenshots/world-quest-cannon/
+            /docs/screenshots/world-quest-horde/
+            /docs/screenshots/world-quest-investigation/
+            /docs/screenshots/world-quest-puzzle-polish/
           sparse-checkout-cone-mode: false
           # Explicit for the reader; the sparse-checkout input
           # already implies it (matching the changes job's step).
@@ -972,6 +994,12 @@ jobs:
             /docs/screenshots/bank-storage-charters/
             /docs/screenshots/bank-vault-tab/
             /docs/screenshots/cosmetics-window/
+            /docs/screenshots/confection-cascade/
+            /docs/screenshots/confection-cascade-v3/
+            /docs/screenshots/confection-cascade-v4/
+            /docs/screenshots/confection-cascade-v5/
+            /docs/screenshots/confection-cascade-v6/
+            /docs/screenshots/confection-cascade-v7/
             /docs/screenshots/deed-border-cartouche/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
@@ -988,6 +1016,7 @@ jobs:
             /docs/screenshots/intentional-gathering-pr2/
             /docs/screenshots/interface-redesign/
             /docs/screenshots/item-art-consistency-2026-08-09/
+            /docs/screenshots/ley-beam-v1/
             /docs/screenshots/market-house-redesign/
             /docs/screenshots/masterwrought-art-completion-2026-09-02/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
@@ -999,6 +1028,10 @@ jobs:
             /docs/screenshots/vault-fine-mark/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
+            /docs/screenshots/world-quest-cannon/
+            /docs/screenshots/world-quest-horde/
+            /docs/screenshots/world-quest-investigation/
+            /docs/screenshots/world-quest-puzzle-polish/
           sparse-checkout-cone-mode: false
           # Explicit for the reader; the sparse-checkout input
           # already implies it (matching the changes job's step).
@@ -1273,6 +1306,12 @@ jobs:
             /docs/screenshots/bank-storage-charters/
             /docs/screenshots/bank-vault-tab/
             /docs/screenshots/cosmetics-window/
+            /docs/screenshots/confection-cascade/
+            /docs/screenshots/confection-cascade-v3/
+            /docs/screenshots/confection-cascade-v4/
+            /docs/screenshots/confection-cascade-v5/
+            /docs/screenshots/confection-cascade-v6/
+            /docs/screenshots/confection-cascade-v7/
             /docs/screenshots/deed-border-cartouche/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
@@ -1289,6 +1328,7 @@ jobs:
             /docs/screenshots/intentional-gathering-pr2/
             /docs/screenshots/interface-redesign/
             /docs/screenshots/item-art-consistency-2026-08-09/
+            /docs/screenshots/ley-beam-v1/
             /docs/screenshots/market-house-redesign/
             /docs/screenshots/masterwrought-art-completion-2026-09-02/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
@@ -1300,6 +1340,10 @@ jobs:
             /docs/screenshots/vault-fine-mark/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
+            /docs/screenshots/world-quest-cannon/
+            /docs/screenshots/world-quest-horde/
+            /docs/screenshots/world-quest-investigation/
+            /docs/screenshots/world-quest-puzzle-polish/
           sparse-checkout-cone-mode: false
           # Explicit for the reader; the sparse-checkout input
           # already implies it (matching the changes job's step).
@@ -1382,6 +1426,12 @@ jobs:
             /docs/screenshots/bank-storage-charters/
             /docs/screenshots/bank-vault-tab/
             /docs/screenshots/cosmetics-window/
+            /docs/screenshots/confection-cascade/
+            /docs/screenshots/confection-cascade-v3/
+            /docs/screenshots/confection-cascade-v4/
+            /docs/screenshots/confection-cascade-v5/
+            /docs/screenshots/confection-cascade-v6/
+            /docs/screenshots/confection-cascade-v7/
             /docs/screenshots/deed-border-cartouche/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
@@ -1398,6 +1448,7 @@ jobs:
             /docs/screenshots/intentional-gathering-pr2/
             /docs/screenshots/interface-redesign/
             /docs/screenshots/item-art-consistency-2026-08-09/
+            /docs/screenshots/ley-beam-v1/
             /docs/screenshots/market-house-redesign/
             /docs/screenshots/masterwrought-art-completion-2026-09-02/
             /docs/screenshots/placeholder-art-completion-2026-08-09/
@@ -1409,6 +1460,10 @@ jobs:
             /docs/screenshots/vault-fine-mark/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
+            /docs/screenshots/world-quest-cannon/
+            /docs/screenshots/world-quest-horde/
+            /docs/screenshots/world-quest-investigation/
+            /docs/screenshots/world-quest-puzzle-polish/
           sparse-checkout-cone-mode: false
           filter: blob:none
 

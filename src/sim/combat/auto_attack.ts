@@ -1,3 +1,5 @@
+import { gliderActionsLocked } from '../glider_action_lock';
+import { shadowActionsLocked } from '../shadow_action_lock';
 // Player auto-attack + the melee/ranged white-hit table, extracted from the Sim
 // monolith (C5). This module owns:
 //   - startAutoAttack / stopAutoAttack: the public auto-attack toggle (validate
@@ -55,6 +57,7 @@ import {
   type WeaponInfo,
 } from '../types';
 import { drawWeapon } from '../weapon_stow';
+import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import { applyRageSpendCooldownRefund, spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isInStasis, isStunned } from './cc';
 import { druidEngineOnLandedStrike } from './druid_engines';
@@ -83,6 +86,7 @@ import { advanceWarspiritCadence, stoneboundThreatMultiplier } from './shaman_wa
 import { blockedMeleeDamage } from './shield_block';
 import { onCastCompleted, onMeleeSwing } from './talent_procs';
 import { applyThornsReaction } from './thorns_charge';
+import { onTrinketAvoidance } from './trinkets';
 import { warriorMeleeDefense } from './warrior_hit_table';
 
 // Fraction of the mainhand weapon's damage a hunter's Auto Shot deals. There is no
@@ -129,6 +133,13 @@ function autoAttackWeaponDamageMult(hand: AutoAttackHand): number {
 export function startAutoAttack(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
+  if (
+    r.meta.vehicle ||
+    wispMazeActionsLocked(r.meta.worldQuestLog) ||
+    shadowActionsLocked(r.meta.worldQuestLog) ||
+    gliderActionsLocked(r.meta.worldQuestLog)
+  )
+    return;
   const p = r.e;
   if (p.dead) return;
   if (isInStasis(p)) return;
@@ -579,6 +590,7 @@ export function meleeSwing(
       ...(opts.attackAnimationStarted ? { attackAnimationStarted: true as const } : {}),
     });
     ctx.enterCombat(attacker, target);
+    onTrinketAvoidance(ctx, target);
     if (attacker.kind === 'player') attacker.overpowerUntil = ctx.time + 5;
     return false;
   }
@@ -595,6 +607,7 @@ export function meleeSwing(
       ...(opts.attackAnimationStarted ? { attackAnimationStarted: true as const } : {}),
     });
     ctx.enterCombat(attacker, target);
+    onTrinketAvoidance(ctx, target);
     return false;
   }
   const mult = opts.weaponMult ?? 1;
@@ -663,6 +676,7 @@ export function meleeSwing(
       grantDevotionFromBlock(target);
       tryGrantSolarReprisal(ctx, target, 'block');
     }
+    onTrinketAvoidance(ctx, target);
   }
   const dealtAmount = Math.max(1, Math.round(dmg * (opts.primaryDamageMult ?? 1)));
   const hpBefore = target.hp;

@@ -108,6 +108,7 @@ export function mapSidebarSignature(
     shownRouteQuestId: string | null;
     i18nRevision: number;
     trackingRevision: number;
+    worldQuests?: unknown;
     /** The player's own collapse choice: folded in because it changes the
      *  toggle button's aria-expanded and title text, which the view itself
      *  carries no field for. */

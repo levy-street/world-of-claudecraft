@@ -1428,6 +1428,26 @@ describe('ActionBarController per-spec action bar memory and talent choice swaps
   });
 });
 
+describe('isHotbarItemId: usable trinkets are placeable', () => {
+  // A trinket is pressed through the same useItem dispatch a potion rides, which
+  // uses the WORN copy (src/sim/items.ts -> combat/trinkets.ts useWornTrinket), so
+  // every trinket with a use effect must be placeable from the bags and the paperdoll.
+  it('admits every trinket in the shipped catalog and routes it through the drop gate', () => {
+    const { controller } = makeHarness('warrior', [], []);
+    const trinkets = Object.keys(ITEMS).filter((id) => ITEMS[id]?.slot === 'trinket');
+    // Guard the guard: an empty catalog must fail loudly, not pass vacuously.
+    expect(trinkets.length).toBeGreaterThanOrEqual(13);
+    for (const id of trinkets) {
+      expect(controller.isHotbarItemId(id), `${id} should be hotbar placeable`).toBe(true);
+      expect(controller.isAssignableAction({ type: 'item', id })).toBe(true);
+    }
+    // Other worn gear stays off the bar.
+    const helm = Object.keys(ITEMS).find((id) => ITEMS[id]?.slot === 'helmet');
+    expect(helm).toBeDefined();
+    if (helm) expect(controller.isHotbarItemId(helm)).toBe(false);
+  });
+});
+
 describe('ActionBarController while spectating (/spectate, /unspectate)', () => {
   // A moderator's IWorld deps (spec, level, known abilities) follow the
   // SPECTATED character for the whole spectate window, so every per-frame sync

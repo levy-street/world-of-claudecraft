@@ -15,6 +15,7 @@ import { delves } from './delves';
 import { dungeons } from './dungeons';
 import { economy } from './economy';
 import { editor } from './editor';
+import { factions } from './factions';
 import { faq } from './faq';
 import { gear } from './gear';
 import { glossary } from './glossary';
@@ -53,6 +54,7 @@ const PAGES: Record<string, GuidePage> = {
   professions,
   economy,
   quests,
+  factions,
   dungeons,
   delves,
   rifts,

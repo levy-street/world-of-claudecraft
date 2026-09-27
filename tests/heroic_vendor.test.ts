@@ -70,10 +70,15 @@ describe('heroic vendor stock: item-level and budget pins', () => {
   // exclusion is extended BY KIND, never by a growing id list: gear on this
   // counter is kind 'armor' and nothing else, so the loop now says what it
   // means instead of naming the rows it happens not to want.
+  // The trinket slot re-cut it 39 -> 40: Wayfarer's Lodestone (content/
+  // trinkets.ts) joined as the one non-jewelry gear row, at the neck point.
   it('every gear offer is a real epic level-20 jewelry item at item level 26', () => {
-    expect(HEROIC_VENDOR_STOCK.length).toBe(39);
+    expect(HEROIC_VENDOR_STOCK.length).toBe(40);
     const gearOffers = HEROIC_VENDOR_STOCK.filter((o) => ITEMS[o.itemId]?.kind === 'armor');
-    expect(gearOffers.length).toBe(10);
+    expect(gearOffers.length).toBe(11);
+    expect(gearOffers.filter((o) => ITEMS[o.itemId].slot === 'trinket')).toEqual([
+      { itemId: 'wayfarers_lodestone', marks: 16 },
+    ]);
     // The partition is exhaustive: every row is gear, the one material, a
     // pattern, or a seed. Without this, a row of some FOURTH kind would simply
     // fall out of every sweep in this file and be pinned by nothing.
@@ -90,14 +95,15 @@ describe('heroic vendor stock: item-level and budget pins', () => {
       expect(item, offer.itemId).toBeTruthy();
       expect(item.quality, offer.itemId).toBe('epic');
       expect(item.requiredLevel, offer.itemId).toBe(20);
-      expect(['ring', 'neck']).toContain(item.slot);
+      expect(['ring', 'neck', 'trinket']).toContain(item.slot);
       expect(offer.marks).toBeGreaterThan(0);
       expect(itemLevel(item), offer.itemId).toBe(26);
       // Deliberately tradeable (maintainer ruling 2026-08-28): the Crucible
       // tier binds its vendor gear, but this jewelry shipped tradeable and
       // the live economy is built around that; the pin keeps a future
-      // vendor-gear-binds sweep from silently rebinding it.
-      expect(item.soulbound, offer.itemId).toBeUndefined();
+      // vendor-gear-binds sweep from silently rebinding it. The trinket is
+      // new, not shipped jewelry, and binds like every trinket does.
+      expect(item.soulbound, offer.itemId).toBe(item.slot === 'trinket' ? true : undefined);
     }
   });
 
@@ -463,7 +469,7 @@ describe('heroic vendor shop view (pure)', () => {
     // The literal, not HEROIC_VENDOR_STOCK.length: both sides of that compare
     // move together, so a vanished row would pass it (the unknown-id drop is
     // what this fixture proves; the row census literal is pinned above).
-    expect(view.rows.length).toBe(39);
+    expect(view.rows.length).toBe(40);
     expect(view.balance).toBe(12);
     const ring = view.rows.find((r) => r.itemId === 'seal_of_the_nine_oaths');
     const neck = view.rows.find((r) => r.itemId === 'yumis_keepsake_locket');

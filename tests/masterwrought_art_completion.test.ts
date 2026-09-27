@@ -813,11 +813,18 @@ describe('Masterwrought art completion evidence', () => {
     // both later release-merge waves, already machine-checked and owner-review
     // pending per item_art_consistency.test.ts / item_icons.test.ts /
     // weapon_icons.test.ts, so their mapping owners are genuine, not fabricated.
-    // OSSBrain adds the Goblin Rocket Sled and Rallycart RXT reins owners, and
-    // the Viridian Valestrider adds its own; none of the three alter the dated
-    // completion/approval universe below. Warfare Season 2's four painted
-    // weapons (warfare-season2-weapons-2026-09-25) make 1,288, likewise outside it.
-    expect(currentOwnerIds).toHaveLength(1288);
+    // OSSBrain adds the Goblin Rocket Sled and Rallycart RXT reins owners;
+    // these do not alter the dated completion/approval universe below.
+    // The world-quest branch adds its two batches (four quest-object icons) at
+    // the release/v0.43.0 merge: 1,287.
+    // The wq-reputation merge adds the 15 faction quartermaster icons
+    // (faction-vendor-icons-2026-09-16): 1,302. 1303 with the weekly emissary's
+    // cache chest (feature/weekly-quests). The Clue Scroll items add their two
+    // (clue-scroll-icons-2026-09-17): 1,305. The faction ladder rework adds its
+    // 17 (faction-ladder-icons-2026-09-23): 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323.
+    // + the trinket slot's 18 (trinket-slot-icons-2026-09-23, PR 4173): 1,341. Warfare Season 2's four painted
+    // weapons (warfare-season2-weapons-2026-09-25): 1,345, likewise outside it.
+    expect(currentOwnerIds).toHaveLength(1345);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -868,6 +875,55 @@ describe('Masterwrought art completion evidence', () => {
     expect(completionDatedIds).toHaveLength(1209);
 
     const ossBrainMountIds = new Set(['reins_goblin_rocket_sled', 'reins_rallycart_rxt']);
+    // The world-quest branch's two quest-object batches (release/v0.43.0 merge).
+    const worldQuestObjectIds = new Set([
+      'confection_game_box',
+      'leyline_cache',
+      'eastbrook_freight_crate',
+      'eastbrook_freight_wagon',
+    ]);
+    expect(datedIds.filter((id) => worldQuestObjectIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => worldQuestObjectIds.has(id))).toHaveLength(4);
+    // The wq-reputation merge's faction quartermaster stock, one SVG batch
+    // (faction-vendor-icons-2026-09-16): 15 ids, additive the same way.
+    const factionVendorIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => batchId === 'faction-vendor-icons-2026-09-16')
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(factionVendorIds.size).toBe(15);
+    expect(datedIds.filter((id) => factionVendorIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => factionVendorIds.has(id))).toHaveLength(15);
+    // The faction ladder rework's periphery rows and formulas, one SVG batch
+    // (faction-ladder-icons-2026-09-23): 17 ids, additive the same way.
+    const factionLadderIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => batchId === 'faction-ladder-icons-2026-09-23')
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(factionLadderIds.size).toBe(17);
+    expect(datedIds.filter((id) => factionLadderIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => factionLadderIds.has(id))).toHaveLength(17);
+    // The Clue Scroll items, one SVG batch (clue-scroll-icons-2026-09-17): 2
+    // ids, additive the same way.
+    const clueScrollIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => batchId === 'clue-scroll-icons-2026-09-17')
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(clueScrollIds.size).toBe(2);
+    expect(datedIds.filter((id) => clueScrollIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => clueScrollIds.has(id))).toHaveLength(2);
+    // The trinket slot's icons, one batch (trinket-slot-icons-2026-09-23, PR
+    // 4173): 18 ids, additive the same way.
+    const trinketIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => batchId === 'trinket-slot-icons-2026-09-23')
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(trinketIds.size).toBe(18);
+    expect(datedIds.filter((id) => trinketIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => trinketIds.has(id))).toHaveLength(18);
     expect(datedIds.filter((id) => ossBrainMountIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => ossBrainMountIds.has(id))).toHaveLength(2);
 
@@ -900,6 +956,14 @@ describe('Masterwrought art completion evidence', () => {
         id !== 'field_kit' &&
         !laterGapFillIds.has(id) &&
         !ossBrainMountIds.has(id) &&
+        !worldQuestObjectIds.has(id) &&
+        !factionVendorIds.has(id) &&
+        !factionLadderIds.has(id) &&
+        !clueScrollIds.has(id) &&
+        !trinketIds.has(id) &&
+        // The weekly emissary's cache chest (feature/weekly-quests) is additive
+        // beyond the dated completion union, like the Field Kit.
+        id !== 'emissary_cache' &&
         id !== 'reins_avian_strider' &&
         !season2WeaponIds.has(id),
     );

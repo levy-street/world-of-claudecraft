@@ -933,11 +933,25 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the Start/Cancel Race button and the 3..2..1..GO countdown; each painter returns early on an unchanged mode',
   },
   {
+    call: 'this.vehicleControls.update',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'vehicle integrity, aiming and cooldowns use the shared eliding writer facet',
+  },
+  {
     call: 'this.showSubzone',
     band: 'medium',
     gate: 'subzone !== this.lastSubzone && subzone',
     surface: 'chrome',
     why: 'the subzone banner on a landmark crossing',
+  },
+  {
+    call: 'syncMinigameMusic',
+    band: 'medium',
+    gate: '',
+    surface: 'none',
+    why: 'the world-quest minigame track override (minigame_music_sync.ts) the music machine reads next; audio only, so it rides above the hidden-frame cut',
   },
   {
     call: 'this.instanceMusic.update',
@@ -1282,7 +1296,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.marketWindow.close',
     band: 'slow',
-    gate: 'this.marketWindow.isOpen && !this.nearbyMarketNpc()',
+    gate: "this.marketWindow.isOpen && !nearbyServiceNpc(this.sim, 'market')",
     surface: 'window',
     guard: { kind: 'callsite' },
     why: 'closes the market window when the player leaves the auctioneer',
@@ -1298,10 +1312,18 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.marketWindow.refreshIfChanged',
     band: 'slow',
-    gate: 'this.marketWindow.isOpen && !(!this.nearbyMarketNpc())',
+    gate: "this.marketWindow.isOpen && !(!nearbyServiceNpc(this.sim, 'market'))",
     surface: 'window',
     guard: { kind: 'module', module: 'market_window.ts', proof: SIG_RETURN },
     why: 'the market window',
+  },
+  {
+    call: 'this.weeklyQuestsWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.weeklyQuestsWindow.isOpen',
+    surface: 'window',
+    guard: { kind: 'module', module: 'weekly_quests_window.ts', proof: SIG_RETURN },
+    why: 'the weekly emissary window (charge progress and the reset clock, minute-granular)',
   },
   {
     call: 'this.wocMarketWindow.refreshIfChanged',
@@ -1448,9 +1470,9 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
       kind: 'module',
       module: 'hud/quest/quest_dialog_controller.ts',
       proof:
-        'if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig) { this.refresh(); }',
+        'if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig || clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !== this.lastClueRowSig) { this.refresh(); }',
     },
-    why: "the gossip dialog's intro hint row plus the offerable-row set (phase 23: a cadence lapse re-offers a work order), both edges no quest event fires for",
+    why: "the gossip dialog's intro hint row plus the offerable-row set (phase 23: a cadence lapse re-offers a work order) plus the Clue Scroll step row (world quests round 2: the hunt step advances on a sim log line), three edges no quest event fires for",
   },
   {
     call: 'this.updateDeedTracker',
@@ -1671,6 +1693,7 @@ describe('the hidden-frame paint cut', () => {
       'this.chatAnnouncer.flush',
       'this.questDialog.updateVoice',
       'this.lootRolls.update',
+      'syncMinigameMusic',
       // Music keeps playing on hidden frames, so its state machine must keep
       // transitioning there too (phase 4 QA F1: a minimized player heard the
       // stale track until restore while this sat below the cut).
@@ -1842,12 +1865,14 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 90 -> 91: the always-on pinned-recipe tracker
       // (recipe_tracker_view.ts + recipe_tracker_painter.ts), the Reliquary
       // tracker's exact slow-band row shape.
-      // chrome 93 -> 94: the Cooldown Manager's per-frame paint
-      // (src/ui/hud/cooldown_manager/), facet-routed chrome. King of the Hill: the
-      // hill bar strip (hud/hill/) is one more chrome surface, 95.
-      // The Eastbrook ferry's countdown panel (hud ferryHud) is one more
-      // chrome surface, composed at the release/v0.44.0 merge: 96.
-    ).toEqual({ window: 50, chrome: 96, none: 17 });
+      // chrome 91 -> 92 and none 17 -> 18 on the World Quests branch: its
+      // vehicle bar chrome row and its minigame music override. Then the
+      // release's Cooldown Manager per-frame paint and King of the Hill's hill
+      // bar strip (chrome 92 -> 96), and the release batch's one more window
+      // surface (51 / 96 measured on the merged tree). The release's Eastbrook
+      // ferry countdown panel (hud ferryHud) is one more chrome surface at the
+      // fourth release/v0.44.0 base merge (97 measured on the merged tree).
+    ).toEqual({ window: 51, chrome: 97, none: 18 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1870,7 +1895,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // loot window's corpse arm moved OUT of the `none` bucket below into
       // this one: it gained a corpseSig latch when the popup started
       // refreshing instead of only closing.
-      module: 27,
+      module: 28,
       // Phase 20's refreshCharSheetIfChanged and its siblings. Their latches are
       // HUD fields (lastCharSheetSig et al) because the cold char_window painter
       // holds no signature of its own to diff. The release's trade row left this
@@ -1938,7 +1963,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         // cannot move, so the flag is part of the line the pin looks for.
         'hud/loot/loot_window_controller.ts: const unchanged = sig === this.corpseSig && harvestSig === this.harvestStatusSig; if (!force && unchanged) return availability;',
         'hud/professions/farming_plant_sheet_window.ts: if (view.status !== this.paintedStatus) this.paint();',
-        'hud/quest/quest_dialog_controller.ts: if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig) { this.refresh(); }',
+        'hud/quest/quest_dialog_controller.ts: if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig || clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !== this.lastClueRowSig) { this.refresh(); }',
         'mailbox_window.ts: if (sig === this.lastSig) return;',
         'market_window.ts: if (sig === this.lastSig) return;',
         'meters.ts: if (!this.isOpen || now - this.lastRender < 250) return;',
@@ -1955,6 +1980,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         // per-frame allocation.
         'spellbook_window.ts: if (this.knownChanged(this.deps.world().known)) {',
         'target_auras_window.ts: if (this.cleared) return;',
+        'weekly_quests_window.ts: if (sig === this.lastSig) return;',
         'woc_market_window.ts: if (sig === this.lastSig && !this.walletRepaintDue) return;',
       ].sort(),
     );

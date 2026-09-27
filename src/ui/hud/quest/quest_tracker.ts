@@ -14,6 +14,8 @@ export interface TrackedObjective {
   label: string;
   current: number;
   total: number;
+  /** A movement lesson instruction, shown in full without a numeric suffix. */
+  instruction?: boolean;
 }
 
 export interface TrackedQuest {

@@ -6,12 +6,14 @@ import { resumeActiveAbilityKit } from './ability_vfx/active_kit_prewarm';
 import type { AbilityVfxDeps } from './ability_vfx/painter';
 import { isLivingWarriorAttentionSource } from './ability_vfx/warrior_attention_core';
 import { preparedAbilityAudio, type SpatialAudioSink } from './audio_sink';
+import { CAST_VFX_ENGINE } from './cast_vfx_family';
 import type { CastVfxReadiness } from './cast_vfx_readiness_core';
 import type { CharacterVisual } from './characters/visual';
 import { createOnrushArrivalHandler } from './characters/warrior_rush_pose';
 import { impactContact } from './impact_contact';
 import type { LightPulses } from './light_pulses';
 import type { EntityView } from './renderer';
+import { TrinketRelics } from './trinket_relics';
 import type { Vfx } from './vfx';
 import type { VfxAnchorResolver } from './vfx_anchor';
 import { sampleWarriorPowerBone } from './warrior_power_anchor';
@@ -82,9 +84,24 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
   fx.setWorldLightDelegate((at, school, intensity, duration, range) =>
     h.light.pulse(at, school, intensity, duration, range),
   );
+  // The raid trinket relics' pooled scene objects, built hidden here so the
+  // cast-VFX prewarm links them with the rest of the 'vfx' programs.
+  const trinketRelics = new TrinketRelics({
+    scene: h.scene,
+    world: () => h.world(),
+    views: h.views,
+    anchor: h.anchor,
+    ground: (x, z) => h.ground(x, z),
+    vfx: h.vfx,
+    time: () => h.time(),
+    // The relics are engine-family programs: ready once the cast gate has
+    // linked that family (the release's per-family cast admission).
+    ready: () => h.castGate.ready(CAST_VFX_ENGINE),
+  });
   const painter = new AbilityVfx(
     {
       ...h.painter,
+      trinketRelics,
       castVfxAdmit: (mask) => h.castGate.admit(mask),
       castVfxReady: (mask) => h.castGate.ready(mask),
       vfx: h.vfx,
