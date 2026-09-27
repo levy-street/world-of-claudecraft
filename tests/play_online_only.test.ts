@@ -119,3 +119,19 @@ describe('/play solo console styling stays per-entry', () => {
     expect(indexHtml).not.toContain('play.extra.css');
   });
 });
+
+describe('/play website styling', () => {
+  it('uses the same browser-only website chrome as the homepage', () => {
+    for (const html of [indexHtml, playHtml]) {
+      for (const marker of [
+        'data-website-redesign',
+        'class="website-story"',
+        'class="website-cinematic-art"',
+        'class="website-card-heading"',
+        'class="website-footer-brand"',
+      ]) {
+        expect(html).toContain(marker);
+      }
+    }
+  });
+});

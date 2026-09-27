@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   clearOpenStoreResult,
+  MODAL_PROMPT_SELECTOR,
   STORE_RESULT_EXPIRY_MS,
   StoreDecisionPrompts,
 } from '../src/ui/store_decision_prompt';
@@ -161,9 +162,67 @@ describe('StoreDecisionPrompts', () => {
       closeText: 'Close',
       onConfirm: vi.fn(),
     });
+    // With an inspector present this is the body-level host path, so the
+    // was-already-inert arm of the restore is exercised THROUGH that host.
+    expect(document.querySelector('#store-prompt-stack #confirm-dialog')).not.toBeNull();
     prompts.dismiss(false);
 
     expect(inspector.inert).toBe(true);
+    expect(document.getElementById('store-prompt-stack')).toBeNull();
+  });
+
+  it('refuses to open over the HUD confirm dialog without minting a body-level host', () => {
+    const root = document.getElementById('store') as HTMLElement;
+    const inspector = document.createElement('div');
+    inspector.className = 'armory-inspect-overlay';
+    document.body.appendChild(inspector);
+    const hudDialog = document.createElement('div');
+    hudDialog.id = 'confirm-dialog';
+    document.body.appendChild(hudDialog);
+    const cancelled = vi.fn();
+    const prompts = makePrompts(() => root);
+
+    const opened = prompts.open({
+      title: 'Confirm purchase',
+      body: 'Buy the skin?',
+      confirmText: 'Purchase',
+      cancelText: 'Cancel',
+      closeText: 'Close',
+      onConfirm: vi.fn(),
+      onCancel: cancelled,
+    });
+
+    expect(opened).toBe(false);
+    // The refusal runs BEFORE the host is resolved: a host minted on this path
+    // has no prompt to release it and would sit on <body> for the session.
+    expect(document.getElementById('store-prompt-stack')).toBeNull();
+    expect(document.querySelectorAll('#confirm-dialog')).toHaveLength(1);
+    expect(inspector.inert).toBe(false);
+    expect(root.inert).toBe(false);
+    expect(cancelled).not.toHaveBeenCalled();
+  });
+
+  it('publishes a nonmodal result above an open inspect overlay and releases the host with it', () => {
+    const root = document.getElementById('store') as HTMLElement;
+    const inspector = document.createElement('div');
+    inspector.className = 'armory-inspect-overlay';
+    document.body.appendChild(inspector);
+    const prompts = makePrompts(() => root, manualTimers().timers);
+
+    prompts.showResult({ text: 'Purchase complete', tone: 'success', closeText: 'Close' });
+
+    const host = document.getElementById('store-prompt-stack') as HTMLElement;
+    expect(host, 'the result takes the body-level host over an inspector').not.toBeNull();
+    expect(host.querySelector('.woc-store-global-result')).not.toBeNull();
+    expect(host.classList.contains('store-result-active')).toBe(true);
+    expect(document.querySelector('#prompt-stack .woc-store-global-result')).toBeNull();
+    // A nonmodal status never blocks the inspector or the store.
+    expect(inspector.inert).toBe(false);
+    expect(root.inert).toBe(false);
+
+    expect(prompts.clearResult()).toBe(true);
+    expect(document.getElementById('store-prompt-stack')).toBeNull();
+    expect(document.querySelector('.woc-store-global-result')).toBeNull();
   });
 
   it('cancels a replaced decision once and exposes stale async results nonmodally', async () => {
@@ -298,7 +357,89 @@ describe('StoreDecisionPrompts', () => {
   it('keeps the nonmodal result dismissible through the mobile prompt-stack hit shield', () => {
     const css = readFileSync(resolve(process.cwd(), 'src/styles/components.css'), 'utf8');
     expect(css).toMatch(
-      /body\.mobile-touch #prompt-stack \.woc-store-global-result\s*\{[^}]*pointer-events:\s*auto;/s,
+      /body\.mobile-touch :is\(#prompt-stack, #store-prompt-stack\) \.woc-store-global-result\s*\{[^}]*pointer-events:\s*auto;/s,
     );
+  });
+
+  // The inspect overlays mount on document.body above the whole #ui stacking
+  // context, so a decision raised from one must leave #prompt-stack (inside
+  // #ui) for the body-level host, or it paints under the inspector: the "click
+  // does nothing, click then Enter buys it" report (store_prompt_host.ts).
+  it('mounts above an open inspect overlay in a body-level host and drops the host on close', () => {
+    const root = document.getElementById('store') as HTMLElement;
+    const opener = document.getElementById('buy') as HTMLButtonElement;
+    const inspector = document.createElement('div');
+    inspector.className = 'armory-inspect-overlay mount-inspect-overlay open';
+    document.body.appendChild(inspector);
+    opener.focus();
+    const prompts = makePrompts(() => root);
+
+    prompts.open({
+      title: 'Confirm purchase',
+      body: 'Buy the skin?',
+      confirmText: 'Purchase',
+      cancelText: 'Cancel',
+      closeText: 'Close',
+      onConfirm: vi.fn(),
+    });
+
+    const host = document.getElementById('store-prompt-stack') as HTMLElement;
+    expect(host, 'the body-level host must be minted').not.toBeNull();
+    expect(host.parentElement).toBe(document.body);
+    expect(host.classList.contains('store-decision-active')).toBe(true);
+    expect(host.querySelector('#confirm-dialog.woc-store-prompt')).not.toBeNull();
+    // Not in #prompt-stack: that stack sits inside #ui and cannot clear the overlay.
+    expect(document.querySelector('#prompt-stack #confirm-dialog')).toBeNull();
+    expect(
+      document.getElementById('prompt-stack')?.classList.contains('store-decision-active'),
+    ).toBe(false);
+    expect(inspector.inert).toBe(true);
+    expect(root.inert).toBe(true);
+
+    prompts.dismiss(true);
+
+    expect(document.getElementById('store-prompt-stack')).toBeNull();
+    expect(document.getElementById('confirm-dialog')).toBeNull();
+    expect(inspector.inert).toBe(false);
+    expect(root.inert).toBe(false);
+    expect(document.activeElement).toBe(opener);
+  });
+
+  it('stays in #prompt-stack when no inspect overlay is open', () => {
+    const root = document.getElementById('store') as HTMLElement;
+    const prompts = makePrompts(() => root);
+    prompts.open({
+      title: 'Confirm purchase',
+      body: 'Buy the charter?',
+      confirmText: 'Purchase',
+      cancelText: 'Cancel',
+      closeText: 'Close',
+      onConfirm: vi.fn(),
+    });
+    expect(document.querySelector('#prompt-stack #confirm-dialog')).not.toBeNull();
+    expect(document.getElementById('store-prompt-stack')).toBeNull();
+    prompts.dismiss(false);
+  });
+
+  it('is still a game-key-gating modal from the body-level host (Hud.promptModalOpen)', () => {
+    const root = document.getElementById('store') as HTMLElement;
+    const inspector = document.createElement('div');
+    inspector.className = 'armory-inspect-overlay';
+    document.body.appendChild(inspector);
+    const prompts = makePrompts(() => root);
+    expect(document.querySelector(MODAL_PROMPT_SELECTOR)).toBeNull();
+    prompts.open({
+      title: 'Confirm purchase',
+      body: 'Buy the skin?',
+      confirmText: 'Purchase',
+      cancelText: 'Cancel',
+      closeText: 'Close',
+      onConfirm: vi.fn(),
+    });
+    expect(document.querySelector(MODAL_PROMPT_SELECTOR)).not.toBeNull();
+    prompts.dismiss(false);
+    expect(document.querySelector(MODAL_PROMPT_SELECTOR)).toBeNull();
+    // Hud.promptModalOpen reads this same selector; tests/bank_window.test.ts
+    // owns that source pin (the WCAG 2.4.3 focus-return case it was written for).
   });
 });

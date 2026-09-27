@@ -3859,8 +3859,8 @@ export const pl_PL: EnTranslations = {
         "kingsWrathSummary": "Nythraxis zadaje o {bonusNormal} więcej obrażeń na Normal albo o {bonusHeroic} na Heroic do końca walki. Grobowa Erupcja następuje co {eruptionEveryNormal} sek. ({eruptionEveryHeroic} na Heroic).",
         "kingsWrathResponse": "Użyjcie pozostałych defensywnych cooldownów na nieuniknione obrażenia. Utrzymujcie każdą wcześniejszą mechanikę czysto, gdy rajd kończy walkę.",
         "boneStormName": "Kościana Burza",
-        "boneStormSummary": "Zaczynając {first} sek. po wejściu Gniewu Króla, a potem co {everyNormal} sek., Nythraxis rozpoczyna Kościaną Burzę na {duration} sek. Ignoruje zagrożenie, porusza się {speed} razy szybciej niż normalnie i wykonuje {charges} szarż trwających po {chargeSeconds} sek. Jego wir zadaje {whirlNormal} maksymalnego zdrowia co sekundę w promieniu {radius} jardów. Każda szarża kończy się Kościanym Uderzeniem w tym samym promieniu za {slamNormal} maksymalnego zdrowia. Pierwsze uderzenie każdej burzy zadaje zamiast tego {openingSlamNormal}. Grobołamacz uzbraja się ponownie {rearm} sek. po jej końcu.",
-        "boneStormHeroicSummary": "Zaczynając {first} sek. po wejściu Gniewu Króla, a potem co {everyHeroic} sek., Nythraxis rozpoczyna Kościaną Burzę na {duration} sek. Ignoruje zagrożenie, porusza się {speed} razy szybciej niż normalnie i wykonuje {charges} szarż trwających po {chargeSeconds} sek. Jego wir zadaje {whirlHeroic} maksymalnego zdrowia co sekundę w promieniu {radius} jardów. Każda szarża kończy się Kościanym Uderzeniem w tym samym promieniu za {slamHeroic} maksymalnego zdrowia. Pierwsze uderzenie każdej burzy zadaje zamiast tego {openingSlamHeroic}. Grobołamacz uzbraja się ponownie {rearm} sek. po jej końcu.",
+        "boneStormSummary": "Zaczynając {first} sek. po wejściu Gniewu Króla, a potem co {everyNormal} sek., Nythraxis rozpoczyna Kościaną Burzę na {duration} sek. Ignoruje zagrożenie, porusza się {speed} razy szybciej niż normalnie i wykonuje {charges} szarż trwających po {chargeSeconds} sek. Jego wir zadaje {whirlNormal} maksymalnego zdrowia co sekundę w promieniu {radius} jardów. Każda szarża kończy się Kościanym Uderzeniem w tym samym promieniu za {slamNormal} maksymalnego zdrowia. Grobołamacz uzbraja się ponownie {rearm} sek. po jej końcu.",
+        "boneStormHeroicSummary": "Zaczynając {first} sek. po wejściu Gniewu Króla, a potem co {everyHeroic} sek., Nythraxis rozpoczyna Kościaną Burzę na {duration} sek. Ignoruje zagrożenie, porusza się {speed} razy szybciej niż normalnie i wykonuje {charges} szarż trwających po {chargeSeconds} sek. Jego wir zadaje {whirlHeroic} maksymalnego zdrowia co sekundę w promieniu {radius} jardów. Każda szarża kończy się Kościanym Uderzeniem w tym samym promieniu za {slamHeroic} maksymalnego zdrowia. Grobołamacz uzbraja się ponownie {rearm} sek. po jej końcu.",
         "boneStormResponse": "Rozproszcie się i stale uciekajcie przed Nythraxis. Szarżowany rajder ucieka, a wszyscy inni zostawiają miejsce wokół trasy szarży; potem tankowie przejmują go, gdy burza się skończy.",
         "crownEnduresName": "Korona Trwa",
         "crownEnduresSummary": "Po {enrageNormal} sek. od rozpoczęcia walki (zegar zatrzymuje się, gdy brat Aldric wchodzi przy 70%) Korona Trwa uruchamia twardy enrage. Nythraxis zyskuje o {damage} więcej obrażeń i o {haste} szybsze ataki, a potem kolejne {rampStep} obrażeń co {rampEveryNormal} sek. Nie ma paska czasu. Ostrzeżenia przychodzą jako okrzyki przy {warn60}, {warn30} i {warn10} sek. do końca.",
@@ -6969,7 +6969,7 @@ export const pl_PL: EnTranslations = {
     "home": {
       "eyebrow": "Klasyczne MMO w przeglądarce",
       "title": "World of ClaudeCraft",
-      "subtitle": "Wykonuj zadania, zbieraj drużynę i odkrywaj ręcznie tworzony świat, za darmo w przeglądarce.",
+      "subtitle": "Odkrywaj świat, wykonuj zadania i pokonuj lochy razem z przyjaciółmi.",
       "ctaPlay": "Zagraj teraz",
       "ctaLearn": "Jak grać",
       "what": {
@@ -9610,8 +9610,8 @@ export const pl_PL: EnTranslations = {
     "viewAll": "Zobacz wszystkie aktualizacje na GitHubie"
   },
   "download": {
-    "title": "Pobierz launcher na komputer",
-    "desc": "Pobierz samodzielny launcher dla zoptymalizowanej wydajności i gry na pełnym ekranie.",
+    "title": "Pobierz aplikację na komputer",
+    "desc": "Graj na Windowsie, macOS lub Linuksie z tym samym kontem i tymi samymi postaciami.",
     "macCta": "Pobierz dla macOS",
     "windowsCta": "Pobierz dla Windows",
     "linuxCta": "Pobierz dla Linuksa",
@@ -9630,7 +9630,7 @@ export const pl_PL: EnTranslations = {
     "offlineDesc": "Natychmiastowy świat jednoosobowy w twojej przeglądarce. Nic nie jest zapisywane: idealny na szybką potyczkę lub testy.",
     "offlineAria": "Graj offline: rozpocznij natychmiastową lokalną sesję jednoosobową",
     "tipTitle": "WSKAZÓWKA:",
-    "tipText": "Aby zapewnić najpłynniejszą rozgrywkę, wyłącz rozszerzenia blokujące reklamy na tej stronie. Według zgłoszeń społeczności niektóre blokery mogą powodować opóźnienia.",
+    "tipText": "Gra działa wolno? Spróbuj wyłączyć blokowanie reklam na tej stronie.",
     "serverOnline": "Online",
     "serverOffline": "Offline",
     "play": "Graj",
@@ -10798,15 +10798,23 @@ export const pl_PL: EnTranslations = {
       "dodge": "UNIK!"
     }
   },
+  "landing": {
+    "headline": "Przygoda z przyjaciółmi.",
+    "contribute": "Współtwórz grę",
+    "tools": "Narzędzia",
+    "records": "WoC Rekordy",
+    "scout": "WoC Zwiadowca",
+    "parseService": "Serwis parsów WoC"
+  },
   "seo": {
     "title": "World of ClaudeCraft: klasyczne przeglądarkowe MMO",
-    "description": "Wyrusz na epicką przygodę w World of ClaudeCraft, klasycznym mikro-MMO grywalnym bezpośrednio w przeglądarce. Dołącz do trwałego wspólnego świata, rozwijaj klasy postaci i pokonuj wrogów!",
+    "description": "Graj w World of ClaudeCraft, darmowe MMO w przeglądarce. Odkrywaj świat, wykonuj zadania i przemierzaj lochy z przyjaciółmi. Bez pobierania.",
     "genre": "MMORPG",
     "playMode": "Wieloosobowy",
     "applicationCategory": "Gra",
     "operatingSystem": "Przeglądarka internetowa",
     "officialLabel": "Oficjalna strona World of ClaudeCraft",
-    "officialBody": "worldofclaudecraft.com to oficjalne, darmowe przeglądarkowe MMO dla świata Claudemoon. Graj online z trwałą postacią, eksploruj solo w trybie offline, czytaj wiki i śledź zweryfikowane linki społeczności z tej strony."
+    "officialBody": "Oficjalna strona World of ClaudeCraft. Graj online, czytaj wiki i znajdź tu linki społeczności."
   },
   "a11y": {
     "goHome": "Przejdź do strony głównej",

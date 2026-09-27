@@ -12,6 +12,7 @@ import { createMountPreview } from '../src/render/mount_preview';
 import { MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MountInspect } from '../src/ui/mount_inspect_controller';
 import { type MountInspectRow, mountInspectRow } from '../src/ui/mount_inspect_view';
+import { INSPECT_OVERLAY_SELECTOR } from '../src/ui/store_prompt_host';
 
 const previews: FakePreview[] = [];
 
@@ -96,6 +97,18 @@ beforeEach(() => {
 });
 
 describe('MountInspect', () => {
+  it('wears the shared inspect-overlay class the Store prompt host keys on', () => {
+    // The Store's purchase confirm leaves #prompt-stack for a body-level host
+    // only while an element matches INSPECT_OVERLAY_SELECTOR. The mount panel
+    // has its own class for its own styling and tests, but it MUST also carry
+    // the shared one, or a mount-skin purchase confirm paints under this panel
+    // (the original field report was a mount skin).
+    const { inspect } = makeInspect();
+    inspect.open(REINS);
+    expect(overlay()?.matches(INSPECT_OVERLAY_SELECTOR)).toBe(true);
+    expect(document.querySelector(INSPECT_OVERLAY_SELECTOR)).toBe(overlay());
+  });
+
   it('opens one overlay, builds one preview staged on the skin, and focuses close', () => {
     const { inspect, deps } = makeInspect();
     inspect.open(REINS);

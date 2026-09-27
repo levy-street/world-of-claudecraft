@@ -2124,9 +2124,13 @@
     flex: 1 1 auto;
     min-height: 0;
   }
+  /* z-index 0 makes the stage its own stacking context: the preview inside it
+     carries z-index 1, which otherwise ties with the overlays and lets DOM order
+     paint it over the left column, the one overlay that precedes the stage. */
   body:not(.mobile-touch) #char-window .char-model-panel {
     position: absolute;
     inset: 0;
+    z-index: 0;
     flex: none;
     min-height: 0;
   }
@@ -7177,11 +7181,12 @@
     }
   }
 
-  /* Store-owned decision prompt: mounted in #prompt-stack, above the Armory
-     inspector, while the Store root is inert. The generic #confirm-dialog
-     geometry assumes a body-level window, so this scoped rule resets it to a
-     normal stack child. */
-  #prompt-stack .woc-store-prompt {
+  /* Store-owned decision prompt: mounted in #prompt-stack, or in the body-level
+     #store-prompt-stack while an inspect overlay is up (hud.css, the host that
+     can actually clear the inspector), while the Store root is inert. The
+     generic #confirm-dialog geometry assumes a body-level window, so this
+     scoped rule resets it to a normal stack child in either host. */
+  :is(#prompt-stack, #store-prompt-stack) .woc-store-prompt {
     position: relative;
     left: auto;
     top: auto;
@@ -7256,7 +7261,7 @@
   /* The mobile HUD deliberately makes #prompt-stack click-through and restores
      hits only on `.prompt`; this nonmodal status is not a dialog, so opt its
      own dismiss action back into pointer input without misrepresenting it. */
-  body.mobile-touch #prompt-stack .woc-store-global-result {
+  body.mobile-touch :is(#prompt-stack, #store-prompt-stack) .woc-store-global-result {
     pointer-events: auto;
   }
   .woc-store-global-result.success {

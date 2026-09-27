@@ -90,6 +90,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.ferry.sailing': '{dest}へ航行中',
   'hudChrome.noticeboard.officerEntry': '{name}（{rank}）',
   'hudChrome.professionTrainers.nameplate': '＜{title}＞',
+  'landing.contribute': 'ゲーム開発に参加する',
+  'landing.headline': '仲間と冒険しよう。',
+  'landing.tools': 'ツール',
+  'landing.records': 'WoC 記録',
+  'landing.scout': 'WoC スカウト',
+  'landing.parseService': 'WoC 戦闘ログ',
   'guide.professions.endgameBodyRaidCollections':
     '名匠鍛造は「装備数制限：名匠鍛造」の印を持つ共通の装備群です。従来の最高位製作ルートでは、発見する型紙、1日ごとに制限される中間素材の製作、共通の終盤素材を引き続き使います。坩堝のセットはレイド素材を使う別ルートであり、従来のルートに追加費用を積み重ねるものではありません。どちらも同じ2部位までの装備上限を共有するため、ビルド内の同じ二つの枠を競います。完成品は完全化や依頼製作によってその個体が帰属するまでは自由に取引できます。',
   'guide.professions.endgamePatternsBodyCollections':
@@ -1283,7 +1289,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.targetLabel': 'あなたのターゲット',
   'seo.officialLabel': 'World of ClaudeCraft 公式サイト',
   'seo.officialBody':
-    'worldofclaudecraft.com は Claudemoon ワールドの公式無料ブラウザMMOです。永続キャラクターでオンラインプレイし、オフラインでソロ探索し、wikiを読み、このサイトから確認済みのコミュニティリンクをたどれます。',
+    'World of ClaudeCraft の公式サイト。オンラインでプレイし、wiki を読み、コミュニティリンクを見つけよう。',
   'hudChrome.questShare.notShareable': 'このクエストは共有できません。',
   'hudChrome.questShare.notInSharerParty':
     '{name} のパーティに参加していないと、このクエストを受諾できません。',
@@ -2264,15 +2270,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'wiki.desc': 'レルムの秘密、クラスガイド、戦略を確認しましょう。',
   'news.title': 'ニュース & アップデート',
   'news.desc': '最新のパッチノート、イベント、コミュニティの更新情報を確認しましょう。',
-  'download.title': 'デスクトップランチャーのダウンロード',
+  'download.title': 'デスクトップアプリをダウンロード',
   'download.macCta': 'macOS版をダウンロード',
   'download.linuxCta': 'Linux版をダウンロード',
   'download.linuxHint':
     'AppImage形式です。実行権限を付けてそのまま起動でき、インストールは不要です。',
   'download.windowsCta': 'Windows版をダウンロード',
   'download.windowsPending': 'Windows版は準備中です。',
-  'download.desc':
-    '最適化されたパフォーマンスと全画面表示でのプレイのために、スタンドアロン版ランチャーを入手してください。',
+  'download.desc': '同じアカウントとキャラクターで、Windows、macOS、Linux でプレイできます。',
   'comingSoon.placeholder': '近日公開...',
   'comingSoon.featureComingSoon': 'この機能はまもなくワールドに実装されます。',
   'mode.onlineTitle': 'オンラインでプレイ',
@@ -2284,8 +2289,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ブラウザ上で即座にシングルプレイヤーの世界を起動します。保存は一切されず、小規模な対戦やテストに最適です。',
   'mode.offlineAria': 'オフラインでプレイ：即座にローカルシングルプレイヤーセッションを開始します',
   'mode.tipTitle': 'ヒント：',
-  'mode.tipText':
-    'よりスムーズな体験のために、本サイトでの広告ブロック拡張機能を無効にしてください。コミュニティの報告によると、一部のブロック機能がラグの原因になる場合があります。',
+  'mode.tipText': 'ゲームの動作が重いですか？このサイトで広告ブロッカーを無効にしてみてください。',
   'auth.enterRealm': 'ワールドに入る',
   'auth.username': 'ユーザー名',
   'auth.usernameError': 'ユーザー名を入力してください。',
@@ -2569,7 +2573,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'controls.chat': 'チャットを開く',
   'seo.title': 'World of ClaudeCraft: クラシック風Web MMO',
   'seo.description':
-    'ブラウザで直接遊べるクラシック風マイクロMMO、World of ClaudeCraft で壮大な冒険に出ましょう。永続的な共有ワールドに参加し、クラスを育て、敵を倒してください。',
+    '無料のブラウザMMO、World of ClaudeCraft をプレイしよう。世界を探索し、クエストをこなし、仲間とダンジョンに挑もう。ダウンロード不要。',
   'seo.genre': 'MMORPG',
   'seo.playMode': 'マルチプレイヤー',
   'seo.applicationCategory': 'ゲーム',
@@ -7234,8 +7238,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.language.select': '言語を選択',
   'guide.home.eyebrow': 'クラシックスタイルのブラウザMMO',
   'guide.home.title': 'World of ClaudeCraft',
-  'guide.home.subtitle':
-    'クエストをこなし、仲間と組み、手作りのワールドを冒険しよう。ブラウザで無料。',
+  'guide.home.subtitle': '世界を探索し、クエストに挑み、仲間とダンジョンを攻略しよう。',
   'guide.home.ctaPlay': '今すぐプレイ',
   'guide.home.ctaLearn': '遊び方',
   'guide.home.what.heading': '気軽に始められる、クラシックMMO',
@@ -9006,9 +9009,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '回避できないダメージには残っている防御クールダウンを使う。戦闘を終えるまで、それまでのメカニクスを引き続き丁寧に処理する。',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': '骨の嵐',
   'hudChrome.raidBossGuide.nythraxis.boneStormSummary':
-    '王の怒りの開始から{first}秒後、以降{everyNormal}秒ごとに、ナイスラクシスは{duration}秒間骨の嵐を始める。彼はヘイトを無視し、通常の{speed}倍の速度で移動し、それぞれ{chargeSeconds}秒続く突進を{charges}回行う。彼の旋風は{radius}ヤード以内へ毎秒最大体力の{whirlNormal}を与える。各突進の終わりには同じ範囲内で骨の一撃が発生し、最大体力の{slamNormal}を与える。各嵐の最初の一撃は代わりに{openingSlamNormal}を与える。嵐が終わってから{rearm}秒後にグレイブブレイカーが再び使用可能になる。',
+    '王の怒りの開始から{first}秒後、以降{everyNormal}秒ごとに、ナイスラクシスは{duration}秒間骨の嵐を始める。彼はヘイトを無視し、通常の{speed}倍の速度で移動し、それぞれ{chargeSeconds}秒続く突進を{charges}回行う。彼の旋風は{radius}ヤード以内へ毎秒最大体力の{whirlNormal}を与える。各突進の終わりには同じ範囲内で骨の一撃が発生し、最大体力の{slamNormal}を与える。嵐が終わってから{rearm}秒後にグレイブブレイカーが再び使用可能になる。',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
-    '王の怒りの開始から{first}秒後、以降{everyHeroic}秒ごとに、ナイスラクシスは{duration}秒間骨の嵐を始める。彼はヘイトを無視し、通常の{speed}倍の速度で移動し、それぞれ{chargeSeconds}秒続く突進を{charges}回行う。彼の旋風は{radius}ヤード以内へ毎秒最大体力の{whirlHeroic}を与える。各突進の終わりには同じ範囲内で骨の一撃が発生し、最大体力の{slamHeroic}を与える。各嵐の最初の一撃は代わりに{openingSlamHeroic}を与える。嵐が終わってから{rearm}秒後にグレイブブレイカーが再び使用可能になる。',
+    '王の怒りの開始から{first}秒後、以降{everyHeroic}秒ごとに、ナイスラクシスは{duration}秒間骨の嵐を始める。彼はヘイトを無視し、通常の{speed}倍の速度で移動し、それぞれ{chargeSeconds}秒続く突進を{charges}回行う。彼の旋風は{radius}ヤード以内へ毎秒最大体力の{whirlHeroic}を与える。各突進の終わりには同じ範囲内で骨の一撃が発生し、最大体力の{slamHeroic}を与える。嵐が終わってから{rearm}秒後にグレイブブレイカーが再び使用可能になる。',
   'hudChrome.raidBossGuide.nythraxis.boneStormResponse':
     '散開し、ナイスラクシスから走って逃げ続ける。突進の対象になったレイドメンバーは走って逃げ、他の全員は突進経路の周囲に空間を空ける。嵐が終わったらタンクが確保する。',
   'hudChrome.raidBossGuide.nythraxis.crownEnduresName': '王冠不滅',

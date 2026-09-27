@@ -3859,8 +3859,8 @@ export const cs_CZ: EnTranslations = {
         "kingsWrathSummary": "Nythraxis způsobuje o {bonusNormal} vyšší poškození na Normal nebo o {bonusHeroic} na Heroic po zbytek boje. Hrobová erupce nastává každých {eruptionEveryNormal} s ({eruptionEveryHeroic} na Heroic).",
         "kingsWrathResponse": "Použijte zbývající obranné cooldowny na nevyhnutelné poškození. Udržte všechny dřívější mechaniky čisté, zatímco raid dokončuje boj.",
         "boneStormName": "Kostěná bouře",
-        "boneStormSummary": "Počínaje {first} s po začátku Králova hněvu a pak každých {everyNormal} s Nythraxis zahájí Kostěnou bouři na {duration} s. Ignoruje hrozbu, pohybuje se {speed}násobkem běžné rychlosti a provede {charges} výpadů, každý v trvání {chargeSeconds} s. Jeho vír způsobí každou sekundu v dosahu {radius} yardů {whirlNormal} maximálního zdraví. Každý výpad končí Kostěným úderem ve stejném dosahu za {slamNormal} maximálního zdraví. První úder každé bouře místo toho zasáhne za {openingSlamNormal}. Hrobobijec se znovu připraví {rearm} s po jejím konci.",
-        "boneStormHeroicSummary": "Počínaje {first} s po začátku Králova hněvu a pak každých {everyHeroic} s Nythraxis zahájí Kostěnou bouři na {duration} s. Ignoruje hrozbu, pohybuje se {speed}násobkem běžné rychlosti a provede {charges} výpadů, každý v trvání {chargeSeconds} s. Jeho vír způsobí každou sekundu v dosahu {radius} yardů {whirlHeroic} maximálního zdraví. Každý výpad končí Kostěným úderem ve stejném dosahu za {slamHeroic} maximálního zdraví. První úder každé bouře místo toho zasáhne za {openingSlamHeroic}. Hrobobijec se znovu připraví {rearm} s po jejím konci.",
+        "boneStormSummary": "Počínaje {first} s po začátku Králova hněvu a pak každých {everyNormal} s Nythraxis zahájí Kostěnou bouři na {duration} s. Ignoruje hrozbu, pohybuje se {speed}násobkem běžné rychlosti a provede {charges} výpadů, každý v trvání {chargeSeconds} s. Jeho vír způsobí každou sekundu v dosahu {radius} yardů {whirlNormal} maximálního zdraví. Každý výpad končí Kostěným úderem ve stejném dosahu za {slamNormal} maximálního zdraví. Hrobobijec se znovu připraví {rearm} s po jejím konci.",
+        "boneStormHeroicSummary": "Počínaje {first} s po začátku Králova hněvu a pak každých {everyHeroic} s Nythraxis zahájí Kostěnou bouři na {duration} s. Ignoruje hrozbu, pohybuje se {speed}násobkem běžné rychlosti a provede {charges} výpadů, každý v trvání {chargeSeconds} s. Jeho vír způsobí každou sekundu v dosahu {radius} yardů {whirlHeroic} maximálního zdraví. Každý výpad končí Kostěným úderem ve stejném dosahu za {slamHeroic} maximálního zdraví. Hrobobijec se znovu připraví {rearm} s po jejím konci.",
         "boneStormResponse": "Rozestupte se a nepřestávejte před Nythraxisem utíkat. Označený raider běží pryč, zatímco všichni ostatní nechají kolem trasy výpadu místo; tankové ho po konci bouře znovu převezmou.",
         "crownEnduresName": "Koruna vytrvá",
         "crownEnduresSummary": "V {enrageNormal} s od začátku boje (hodiny se zastaví, když bratr Aldric vstoupí při 70%) se Koruna vytrvá spustí jako tvrdé rozzuření. Nythraxis získá o {damage} vyšší poškození a o {haste} rychlejší útoky, poté každých {rampEveryNormal} s další {rampStep} poškození. Není zde žádná časová lišta. Varování přicházejí jako výkřiky při {warn60}, {warn30} a {warn10} s do konce.",
@@ -6969,7 +6969,7 @@ export const cs_CZ: EnTranslations = {
     "home": {
       "eyebrow": "Prohlížečové MMO v klasickém stylu",
       "title": "World of ClaudeCraft",
-      "subtitle": "Plň úkoly, hraj ve skupině a objevuj ručně vystavěný svět zdarma v prohlížeči.",
+      "subtitle": "Prozkoumej svět, plň úkoly a zdolávej dungeony s přáteli.",
       "ctaPlay": "Hrát teď",
       "ctaLearn": "Jak hrát",
       "what": {
@@ -9610,8 +9610,8 @@ export const cs_CZ: EnTranslations = {
     "viewAll": "Zobrazit všechny aktualizace na GitHubu"
   },
   "download": {
-    "title": "Stáhnout desktopový launcher",
-    "desc": "Získej samostatný launcher pro optimalizovaný výkon a hraní na celé obrazovce.",
+    "title": "Stáhnout desktopovou aplikaci",
+    "desc": "Hraj na Windows, macOS nebo Linuxu se stejným účtem a stejnými postavami.",
     "macCta": "Stáhnout pro macOS",
     "windowsCta": "Stáhnout pro Windows",
     "linuxCta": "Stáhnout pro Linux",
@@ -9630,7 +9630,7 @@ export const cs_CZ: EnTranslations = {
     "offlineDesc": "Okamžitý svět pro jednoho hráče v prohlížeči. Nic se neukládá: ideální pro rychlou bitku nebo testování.",
     "offlineAria": "Hrát offline: spustit okamžitou lokální hru pro jednoho hráče",
     "tipTitle": "TIP:",
-    "tipText": "Pro co nejplynulejší zážitek vypni na tomto webu rozšíření pro blokování reklam. Podle hlášení komunity mohou některé blokátory způsobovat lagy.",
+    "tipText": "Běží hra pomalu? Zkus na tomto webu vypnout blokování reklam.",
     "serverOnline": "Online",
     "serverOffline": "Offline",
     "play": "Hrát",
@@ -10798,15 +10798,23 @@ export const cs_CZ: EnTranslations = {
       "dodge": "VYHNUTÍ!"
     }
   },
+  "landing": {
+    "headline": "Dobrodružství s přáteli.",
+    "contribute": "Přispěj do hry",
+    "tools": "Nástroje",
+    "records": "WoC Rekordy",
+    "scout": "WoC Průzkumník",
+    "parseService": "WoC parsovací služba"
+  },
   "seo": {
     "title": "World of ClaudeCraft: webové MMO v klasickém stylu",
-    "description": "Vydej se na epické dobrodružství ve World of ClaudeCraft, klasicky laděném micro-MMO hratelném přímo v prohlížeči. Připoj se k trvalému sdílenému světu, zvyšuj úrovně tříd a porážej nepřátele!",
+    "description": "Hraj World of ClaudeCraft, bezplatné MMO v prohlížeči. Prozkoumávej svět, plň úkoly a procházej dungeony s přáteli. Bez stahování.",
     "genre": "MMORPG",
     "playMode": "Multiplayer",
     "applicationCategory": "Hra",
     "operatingSystem": "Webový prohlížeč",
     "officialLabel": "Oficiální web World of ClaudeCraft",
-    "officialBody": "worldofclaudecraft.com je oficiální bezplatné prohlížečové MMO pro svět Claudemoon. Hraj online s trvalou postavou, prozkoumávej sólo offline, čti wiki a používej ověřené komunitní odkazy z tohoto webu."
+    "officialBody": "Oficiální web World of ClaudeCraft. Hraj online, čti wiki a najdi tu odkazy na komunitu."
   },
   "a11y": {
     "goHome": "Přejít na domovskou stránku",

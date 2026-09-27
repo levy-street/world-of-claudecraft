@@ -3859,8 +3859,8 @@ export const da_DK: EnTranslations = {
         "kingsWrathSummary": "Nythraxis giver {bonusNormal} mere skade på Normal eller {bonusHeroic} på Heroic resten af kampen. Gravudbrud sker hvert {eruptionEveryNormal} sek ({eruptionEveryHeroic} på Heroic).",
         "kingsWrathResponse": "Brug resterende defensive nedkølinger til uundgåelig skade. Hold alle tidligere mekanikker rene, mens raidet afslutter kampen.",
         "boneStormName": "Knoglestorm",
-        "boneStormSummary": "Fra {first} sek inde i Kongens vrede og hvert {everyNormal} sek derefter begynder Nythraxis Knoglestorm i {duration} sek. Han ignorerer trussel, bevæger sig {speed} gange normal hastighed og laver {charges} stormløb, der varer {chargeSeconds} sek hver. Hans hvirvel giver {whirlNormal} af maksimal sundhed hvert sekund inden for {radius} yd. Hvert stormløb ender i et Knogleslag inden for samme radius for {slamNormal} af maksimal sundhed. Det første slag i hver storm rammer i stedet for {openingSlamNormal}. Gravbryder genaktiveres {rearm} sek efter den slutter.",
-        "boneStormHeroicSummary": "Fra {first} sek inde i Kongens vrede og hvert {everyHeroic} sek derefter begynder Nythraxis Knoglestorm i {duration} sek. Han ignorerer trussel, bevæger sig {speed} gange normal hastighed og laver {charges} stormløb, der varer {chargeSeconds} sek hver. Hans hvirvel giver {whirlHeroic} af maksimal sundhed hvert sekund inden for {radius} yd. Hvert stormløb ender i et Knogleslag inden for samme radius for {slamHeroic} af maksimal sundhed. Det første slag i hver storm rammer i stedet for {openingSlamHeroic}. Gravbryder genaktiveres {rearm} sek efter den slutter.",
+        "boneStormSummary": "Fra {first} sek inde i Kongens vrede og hvert {everyNormal} sek derefter begynder Nythraxis Knoglestorm i {duration} sek. Han ignorerer trussel, bevæger sig {speed} gange normal hastighed og laver {charges} stormløb, der varer {chargeSeconds} sek hver. Hans hvirvel giver {whirlNormal} af maksimal sundhed hvert sekund inden for {radius} yd. Hvert stormløb ender i et Knogleslag inden for samme radius for {slamNormal} af maksimal sundhed. Gravbryder genaktiveres {rearm} sek efter den slutter.",
+        "boneStormHeroicSummary": "Fra {first} sek inde i Kongens vrede og hvert {everyHeroic} sek derefter begynder Nythraxis Knoglestorm i {duration} sek. Han ignorerer trussel, bevæger sig {speed} gange normal hastighed og laver {charges} stormløb, der varer {chargeSeconds} sek hver. Hans hvirvel giver {whirlHeroic} af maksimal sundhed hvert sekund inden for {radius} yd. Hvert stormløb ender i et Knogleslag inden for samme radius for {slamHeroic} af maksimal sundhed. Gravbryder genaktiveres {rearm} sek efter den slutter.",
         "boneStormResponse": "Spred jer og bliv ved med at løbe fra Nythraxis. Den jagede raiddeltager løber væk, mens alle andre giver plads omkring stormløbsvejen, og tanks samler ham op, når stormen slutter.",
         "crownEnduresName": "Kronen holder stand",
         "crownEnduresSummary": "Ved {enrageNormal} sek fra pullen (uret holder pause, mens Broder Aldric træder ind ved 70%) udløser Kronen holder stand som en hård rasen. Nythraxis får {damage} mere skade og {haste} hurtigere angreb, derefter yderligere {rampStep} skade hvert {rampEveryNormal} sek. Der er ingen timerbjælke. Advarsler kommer som råb ved {warn60}, {warn30} og {warn10} sek tilbage.",
@@ -6969,7 +6969,7 @@ export const da_DK: EnTranslations = {
     "home": {
       "eyebrow": "Klassisk browser-MMO",
       "title": "World of ClaudeCraft",
-      "subtitle": "Tag på quest, slå jer sammen, og udforsk en håndbygget verden, gratis i din browser.",
+      "subtitle": "Udforsk verdenen, tag på quests, og kæmp dig gennem dungeons med venner.",
       "ctaPlay": "Spil nu",
       "ctaLearn": "Sådan spiller du",
       "what": {
@@ -9610,8 +9610,8 @@ export const da_DK: EnTranslations = {
     "viewAll": "Se alle opdateringer på GitHub"
   },
   "download": {
-    "title": "Download Desktop-launcher",
-    "desc": "Hent den selvstændige launcher for optimeret ydeevne og fuldskærmsspil.",
+    "title": "Download desktop-appen",
+    "desc": "Spil på Windows, macOS eller Linux med samme konto og samme karakterer.",
     "macCta": "Download til macOS",
     "windowsCta": "Download til Windows",
     "linuxCta": "Download til Linux",
@@ -9630,7 +9630,7 @@ export const da_DK: EnTranslations = {
     "offlineDesc": "Øjeblikkelig singleplayer-verden i din browser. Intet gemmes: perfekt til en hurtig dyst eller test.",
     "offlineAria": "Spil offline: start en øjeblikkelig lokal singleplayer-session",
     "tipTitle": "TIP:",
-    "tipText": "For den jævneste oplevelse bør du slå annonceblokerings-udvidelser fra på denne side. Fællesskabet har rapporteret, at nogle blokerere kan forårsage hak.",
+    "tipText": "Kører spillet langsomt? Prøv at slå din annonceblokering fra for denne side.",
     "serverOnline": "Online",
     "serverOffline": "Offline",
     "play": "Spil",
@@ -10798,15 +10798,23 @@ export const da_DK: EnTranslations = {
       "dodge": "UNDVEG!"
     }
   },
+  "landing": {
+    "headline": "Eventyr med venner.",
+    "contribute": "Bidrag til spillet",
+    "tools": "Værktøjer",
+    "records": "WoC Rekorder",
+    "scout": "WoC Spejder",
+    "parseService": "WoC Parse-tjeneste"
+  },
   "seo": {
     "title": "World of ClaudeCraft: Klassisk-inspireret web-MMO",
-    "description": "Begiv dig ud på et episk eventyr i World of ClaudeCraft, en klassisk-inspireret micro-MMO, der kan spilles direkte i din browser. Slut dig til en vedvarende delt verden, lev op dine klasser, og besejr fjender!",
+    "description": "Spil World of ClaudeCraft, en gratis browser-MMO. Udforsk, løs quests, og gå i dungeons med venner. Ingen download nødvendig.",
     "genre": "MMORPG",
     "playMode": "Flerspiller",
     "applicationCategory": "Spil",
     "operatingSystem": "Webbrowser",
     "officialLabel": "Officiel World of ClaudeCraft-hjemmeside",
-    "officialBody": "worldofclaudecraft.com er den officielle gratis browser-MMO for Claudemoon-verdenen. Spil online med en vedvarende karakter, udforsk solo offline, læs wikien, og følg verificerede fællesskabslinks fra denne side."
+    "officialBody": "Den officielle side for World of ClaudeCraft. Spil online, læs wikien, og find fællesskabslinks her."
   },
   "a11y": {
     "goHome": "Gå til forsiden",

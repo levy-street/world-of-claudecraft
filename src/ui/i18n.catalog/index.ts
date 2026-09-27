@@ -341,8 +341,8 @@ export const en = {
     viewAll: 'View all updates on GitHub',
   },
   download: {
-    title: 'Download Desktop Launcher',
-    desc: 'Get the standalone launcher for optimized performance and full-screen play.',
+    title: 'Download the desktop app',
+    desc: 'Play on Windows, macOS, or Linux with the same account and characters.',
     macCta: 'Download for macOS',
     windowsCta: 'Download for Windows',
     linuxCta: 'Download for Linux',
@@ -363,8 +363,7 @@ export const en = {
       'Instant single-player world in your browser. Nothing is saved: perfect for a quick brawl or testing.',
     offlineAria: 'Play Offline: start an instant local single-player session',
     tipTitle: 'TIP:',
-    tipText:
-      'For the smoothest experience, turn off ad blocker extensions on this site. Community reports found some blockers can cause lag.',
+    tipText: 'Game running slowly? Try disabling your ad blocker for this site.',
     serverOnline: 'Online',
     serverOffline: 'Offline',
     play: 'Play',

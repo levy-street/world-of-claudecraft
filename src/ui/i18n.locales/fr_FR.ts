@@ -13,6 +13,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_FR: Partial<Record<TranslationKey, string>> = {
+  'landing.headline': "Partez à l'aventure entre amis.",
+  'landing.contribute': 'Contribuer au jeu',
+  'landing.tools': 'Outils',
+  'landing.records': 'Records WoC',
+  'landing.scout': 'WoC Éclaireur',
+  'landing.parseService': 'Service de parses WoC',
   'hud.errors.cannotCastWhileMoving': 'Vous ne pouvez pas lancer de sort en vous déplaçant.',
   'hudChrome.auraEffect.wolfForm':
     'Forme de chat : dégâts de mêlée et énergie ; vitesse de déplacement augmentée de {pct}%',
@@ -5683,7 +5689,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.targetLabel': 'Votre cible',
   'seo.officialLabel': 'Site officiel de World of ClaudeCraft',
   'seo.officialBody':
-    'worldofclaudecraft.com est le MMO gratuit officiel sur navigateur du monde Claudemoon. Jouez en ligne avec un personnage persistant, explorez en solo hors ligne, lisez le wiki et suivez les liens communautaires vérifiés depuis ce site.',
+    'Le site officiel de World of ClaudeCraft. Jouez en ligne, lisez le wiki et retrouvez ici les liens de la communauté.',
   'hudChrome.questShare.notShareable': 'Cette quête ne peut pas être partagée.',
   'hudChrome.questShare.notInSharerParty':
     'Vous devez être dans le groupe de {name} pour accepter cette quête.',
@@ -6063,11 +6069,11 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'news.title': 'Actualités et mises à jour',
   'news.desc':
     'Lisez les dernières notes de mise à jour, les événements et les nouvelles de la communauté.',
-  'download.title': 'Télécharger le lanceur de bureau',
+  'download.title': "Télécharger l'application de bureau",
   'download.macCta': 'Telecharger pour macOS',
   'download.windowsPending': 'Build Windows en attente.',
   'download.desc':
-    'Obtenez le lanceur autonome pour des performances optimisées et un jeu en plein écran.',
+    'Jouez sur Windows, macOS ou Linux avec le même compte et les mêmes personnages.',
   'comingSoon.placeholder': 'Bientôt disponible...',
   'comingSoon.featureComingSoon': 'Cette fonctionnalité sera bientôt disponible dans le monde.',
   'mode.onlineTitle': 'Jouer en ligne',
@@ -6080,7 +6086,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'mode.offlineAria': 'Jouer hors ligne: démarrer une session solo locale instantanée',
   'mode.tipTitle': 'CONSEIL:',
   'mode.tipText':
-    'Pour une expérience optimale, désactivez les extensions de blocage de publicité sur ce site. Certains bloqueurs peuvent causer des latences.',
+    'Le jeu est lent ? Essayez de désactiver votre bloqueur de publicités sur ce site.',
   'auth.enterRealm': 'Entrer dans le monde',
   'auth.username': "Nom d'utilisateur",
   'auth.usernameError': "Veuillez saisir votre nom d'utilisateur.",
@@ -6317,7 +6323,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'controls.chat': 'Ouvrir le chat',
   'seo.title': 'World of ClaudeCraft: MMO web de style classique',
   'seo.description':
-    'Partez pour une aventure épique dans World of ClaudeCraft, un micro-MMO au style classique jouable directement dans votre navigateur. Rejoignez un monde persistant, progressez en classe et terrassez vos ennemis.',
+    'Jouez à World of ClaudeCraft, un MMO gratuit sur navigateur. Explorez, accomplissez des quêtes et parcourez des donjons entre amis. Aucun téléchargement requis.',
   'seo.genre': 'MMORPG',
   'seo.playMode': 'Multijoueur',
   'seo.applicationCategory': 'Jeu',
@@ -9740,7 +9746,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.home.group.sub':
     'Le monde se parcourt en solo, mais le meilleur butin attend derrière un bon groupe.',
   'guide.home.subtitle':
-    'Partez en quête, formez un groupe et explorez un monde façonné à la main, gratuitement dans votre navigateur.',
+    'Explorez le monde, accomplissez des quêtes et affrontez des donjons entre amis.',
   'guide.home.title': 'World of ClaudeCraft',
   'guide.home.what.heading': 'Un MMO classique, conçu pour être pris en main',
   'guide.home.what.pillarClassesBody':
@@ -16171,12 +16177,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
     "Toutes les {everyNormal} s, Nythraxis empale {victimsNormal} membres du raid autres que sa cible actuelle sur des Pointes d'os. Un membre empalé ne peut pas agir et perd {drainNormal} de ses points de vie maximum chaque seconde jusqu'à la destruction de sa pointe. Une pointe se brise après {hitsNormal} coups portés par n'importe qui, quels que soient leurs dégâts. Un joueur déjà empalé ne peut pas être choisi de nouveau pendant {cooldown} s, de sorte que les pointes se répartissent sur tout le raid.",
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
-    "À partir de {first} s après le Courroux du roi, puis toutes les {everyHeroic} s, Nythraxis commence Tempête d'os pendant {duration} s. Il ignore la menace, se déplace à {speed} fois la vitesse normale, et effectue {charges} charges de {chargeSeconds} s chacune. Son tourbillon inflige {whirlHeroic} des points de vie maximum chaque seconde dans un rayon de {radius} yd. Chaque charge se termine par un Heurt d'os dans le même rayon, infligeant {slamHeroic} des points de vie maximum. Le premier heurt de chaque tempête inflige {openingSlamHeroic} à la place. Brise-tombe se réarme {rearm} s après la fin.",
+    "À partir de {first} s après le Courroux du roi, puis toutes les {everyHeroic} s, Nythraxis commence Tempête d'os pendant {duration} s. Il ignore la menace, se déplace à {speed} fois la vitesse normale, et effectue {charges} charges de {chargeSeconds} s chacune. Son tourbillon inflige {whirlHeroic} des points de vie maximum chaque seconde dans un rayon de {radius} yd. Chaque charge se termine par un Heurt d'os dans le même rayon, infligeant {slamHeroic} des points de vie maximum. Brise-tombe se réarme {rearm} s après la fin.",
   'hudChrome.raidBossGuide.nythraxis.boneStormName': "Tempête d'os",
   'hudChrome.raidBossGuide.nythraxis.boneStormResponse':
     'Dispersez-vous et continuez à courir pour vous éloigner de Nythraxis. Le membre chargé fuit pendant que les autres laissent de l espace autour de la trajectoire, puis les tanks le reprennent quand la tempête se termine.',
   'hudChrome.raidBossGuide.nythraxis.boneStormSummary':
-    "À partir de {first} s après le Courroux du roi, puis toutes les {everyNormal} s, Nythraxis commence Tempête d'os pendant {duration} s. Il ignore la menace, se déplace à {speed} fois la vitesse normale, et effectue {charges} charges de {chargeSeconds} s chacune. Son tourbillon inflige {whirlNormal} des points de vie maximum chaque seconde dans un rayon de {radius} yd. Chaque charge se termine par un Heurt d'os dans le même rayon, infligeant {slamNormal} des points de vie maximum. Le premier heurt de chaque tempête inflige {openingSlamNormal} à la place. Brise-tombe se réarme {rearm} s après la fin.",
+    "À partir de {first} s après le Courroux du roi, puis toutes les {everyNormal} s, Nythraxis commence Tempête d'os pendant {duration} s. Il ignore la menace, se déplace à {speed} fois la vitesse normale, et effectue {charges} charges de {chargeSeconds} s chacune. Son tourbillon inflige {whirlNormal} des points de vie maximum chaque seconde dans un rayon de {radius} yd. Chaque charge se termine par un Heurt d'os dans le même rayon, infligeant {slamNormal} des points de vie maximum. Brise-tombe se réarme {rearm} s après la fin.",
   'hudChrome.raidBossGuide.nythraxis.courtName': 'La Cour immortelle',
   'hudChrome.raidBossGuide.nythraxis.courtResponse':
     "Les tanks récupèrent Aldren et tournent son cleave loin du raid. Étourdissez ou réduisez Malric au silence dès que Guérison de Malric commence, et tuez-le d'abord ; puis immobilisez ou étourdissez Voss loin des soigneurs, puisqu'il ne peut pas être provoqué, et achevez-le ensuite.",

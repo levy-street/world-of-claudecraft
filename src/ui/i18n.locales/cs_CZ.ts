@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const cs_CZ: Partial<Record<TranslationKey, string>> = {
+  'landing.headline': 'Dobrodružství s přáteli.',
+  'landing.contribute': 'Přispěj do hry',
+  'landing.tools': 'Nástroje',
+  'landing.records': 'WoC Rekordy',
+  'landing.scout': 'WoC Průzkumník',
+  'landing.parseService': 'WoC parsovací služba',
   'hud.errors.cannotCastWhileMoving': 'Během pohybu nemůžeš sesílat kouzla.',
   'hudChrome.auraEffect.wolfForm':
     'Kočičí podoba: poškození na blízko a energie; rychlost pohybu zvýšena o {pct} %',
@@ -4104,10 +4110,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'footer.whitepaper': 'Whitepaper',
   'seo.applicationCategory': 'Hra',
   'seo.description':
-    'Vydej se na epické dobrodružství ve World of ClaudeCraft, klasicky laděném micro-MMO hratelném přímo v prohlížeči. Připoj se k trvalému sdílenému světu, zvyšuj úrovně tříd a porážej nepřátele!',
+    'Hraj World of ClaudeCraft, bezplatné MMO v prohlížeči. Prozkoumávej svět, plň úkoly a procházej dungeony s přáteli. Bez stahování.',
   'seo.genre': 'MMORPG',
   'seo.officialBody':
-    'worldofclaudecraft.com je oficiální bezplatné prohlížečové MMO pro svět Claudemoon. Hraj online s trvalou postavou, prozkoumávej sólo offline, čti wiki a používej ověřené komunitní odkazy z tohoto webu.',
+    'Oficiální web World of ClaudeCraft. Hraj online, čti wiki a najdi tu odkazy na komunitu.',
   'seo.officialLabel': 'Oficiální web World of ClaudeCraft',
   'seo.operatingSystem': 'Webový prohlížeč',
   'seo.playMode': 'Multiplayer',
@@ -4120,13 +4126,13 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'a11y.languageSelection': 'Výběr jazyka',
   'a11y.mainNavigation': 'Hlavní navigace',
   'a11y.toggleMenu': 'Přepnout menu',
-  'download.desc': 'Získej samostatný launcher pro optimalizovaný výkon a hraní na celé obrazovce.',
+  'download.desc': 'Hraj na Windows, macOS nebo Linuxu se stejným účtem a stejnými postavami.',
   'download.linuxCta': 'Stáhnout pro Linux',
   'download.windowsCta': 'Stáhnout pro Windows',
   'download.linuxHint':
     'AppImage: nastav soubor jako spustitelný a spusť ho. Instalace není potřeba.',
   'download.macCta': 'Stáhnout pro macOS',
-  'download.title': 'Stáhnout desktopový launcher',
+  'download.title': 'Stáhnout desktopovou aplikaci',
   'download.windowsPending': 'Sestavení pro Windows se připravuje.',
   'serverUnavailable.body':
     'Restartujeme herní službu a očekáváme, že se Claudemoon brzy vrátí. Tato stránka bude stav automaticky kontrolovat.',
@@ -4223,8 +4229,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'mode.serverOffline': 'Offline',
   'mode.serverOfflineSub': 'Okamžitý lokální svět',
   'mode.serverOnline': 'Online',
-  'mode.tipText':
-    'Pro co nejplynulejší zážitek vypni na tomto webu rozšíření pro blokování reklam. Podle hlášení komunity mohou některé blokátory způsobovat lagy.',
+  'mode.tipText': 'Běží hra pomalu? Zkus na tomto webu vypnout blokování reklam.',
   'mode.tipTitle': 'TIP:',
   'realm.characterCountOne': '{count} postava',
   'realm.characterCountOther': '{count} postav',
@@ -9517,8 +9522,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.search.typeTerm': 'Termín',
   'guide.home.eyebrow': 'Prohlížečové MMO v klasickém stylu',
   'guide.home.title': 'World of ClaudeCraft',
-  'guide.home.subtitle':
-    'Plň úkoly, hraj ve skupině a objevuj ručně vystavěný svět zdarma v prohlížeči.',
+  'guide.home.subtitle': 'Prozkoumej svět, plň úkoly a zdolávej dungeony s přáteli.',
   'guide.home.ctaPlay': 'Hrát teď',
   'guide.home.ctaLearn': 'Jak hrát',
   'guide.home.what.heading': 'Klasické MMO, do kterého se snadno naskočí',
@@ -15617,12 +15621,12 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
     'Každých {everyNormal} s Nythraxis nabodne {victimsNormal} raiderů mimo svůj aktuální cíl na kostěné bodce. Nabodnutý raider nemůže jednat a každou sekundu ztrácí {drainNormal} maximálního zdraví, dokud není jeho bodec zničen. Bodec se roztříští po {hitsNormal} zásazích od kohokoli, bez ohledu na způsobené poškození. Hráč, který už byl nabodnut, nemůže být znovu vybrán po dobu {cooldown} s, takže se bodce rozloží po celé skupině.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
-    'Počínaje {first} s po začátku Králova hněvu a pak každých {everyHeroic} s Nythraxis zahájí Kostěnou bouři na {duration} s. Ignoruje hrozbu, pohybuje se {speed}násobkem běžné rychlosti a provede {charges} výpadů, každý v trvání {chargeSeconds} s. Jeho vír způsobí každou sekundu v dosahu {radius} yardů {whirlHeroic} maximálního zdraví. Každý výpad končí Kostěným úderem ve stejném dosahu za {slamHeroic} maximálního zdraví. První úder každé bouře místo toho zasáhne za {openingSlamHeroic}. Hrobobijec se znovu připraví {rearm} s po jejím konci.',
+    'Počínaje {first} s po začátku Králova hněvu a pak každých {everyHeroic} s Nythraxis zahájí Kostěnou bouři na {duration} s. Ignoruje hrozbu, pohybuje se {speed}násobkem běžné rychlosti a provede {charges} výpadů, každý v trvání {chargeSeconds} s. Jeho vír způsobí každou sekundu v dosahu {radius} yardů {whirlHeroic} maximálního zdraví. Každý výpad končí Kostěným úderem ve stejném dosahu za {slamHeroic} maximálního zdraví. Hrobobijec se znovu připraví {rearm} s po jejím konci.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Kostěná bouře',
   'hudChrome.raidBossGuide.nythraxis.boneStormResponse':
     'Rozestupte se a nepřestávejte před Nythraxisem utíkat. Označený raider běží pryč, zatímco všichni ostatní nechají kolem trasy výpadu místo; tankové ho po konci bouře znovu převezmou.',
   'hudChrome.raidBossGuide.nythraxis.boneStormSummary':
-    'Počínaje {first} s po začátku Králova hněvu a pak každých {everyNormal} s Nythraxis zahájí Kostěnou bouři na {duration} s. Ignoruje hrozbu, pohybuje se {speed}násobkem běžné rychlosti a provede {charges} výpadů, každý v trvání {chargeSeconds} s. Jeho vír způsobí každou sekundu v dosahu {radius} yardů {whirlNormal} maximálního zdraví. Každý výpad končí Kostěným úderem ve stejném dosahu za {slamNormal} maximálního zdraví. První úder každé bouře místo toho zasáhne za {openingSlamNormal}. Hrobobijec se znovu připraví {rearm} s po jejím konci.',
+    'Počínaje {first} s po začátku Králova hněvu a pak každých {everyNormal} s Nythraxis zahájí Kostěnou bouři na {duration} s. Ignoruje hrozbu, pohybuje se {speed}násobkem běžné rychlosti a provede {charges} výpadů, každý v trvání {chargeSeconds} s. Jeho vír způsobí každou sekundu v dosahu {radius} yardů {whirlNormal} maximálního zdraví. Každý výpad končí Kostěným úderem ve stejném dosahu za {slamNormal} maximálního zdraví. Hrobobijec se znovu připraví {rearm} s po jejím konci.',
   'hudChrome.raidBossGuide.nythraxis.courtName': 'Nesmrtelný dvůr',
   'hudChrome.raidBossGuide.nythraxis.courtResponse':
     'Tankové převezmou Aldrena a otočí jeho štěpný útok pryč od raidu. Omračte nebo umlčte Malrica hned, jak začne Malricovo léčení, a zabijte ho jako prvního; potom zakořeňte nebo omračte Vosse mimo léčitele, protože se nedá vyprovokovat, a dorazte ho jako dalšího.',

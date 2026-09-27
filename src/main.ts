@@ -228,6 +228,7 @@ import {
   spawnCinematicPose,
 } from './game/spawn_cinematic';
 import { markSpawnIntroSeen, readSpawnIntroSeen } from './game/spawn_intro_seen';
+import { createStartPanelNavigation } from './game/start_panel_navigation';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
 import { dispatchTargetingAction, targetingInputCallbacks } from './game/targeting_actions';
@@ -246,6 +247,8 @@ import {
 import { loadingCurtainFadeMs, resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { feedSimCalendar } from './game/utc_day';
 import { voice } from './game/voice';
+import { openHeaderWiki } from './game/website_navigation';
+import { createWebsiteViewNavigation } from './game/website_view_navigation';
 import { attachWocMarketExchange } from './game/woc_market_wiring';
 import { telemetryZoneId } from './game/world_telemetry';
 import { zoneWarmupMode } from './game/zone_transition';
@@ -5247,8 +5250,7 @@ const RESET_TOKEN = (() => {
   return /^[a-f0-9]{64}$/.test(raw.trim()) ? raw.trim() : '';
 })();
 
-let activeTransitionTimeout: number | null = null;
-let activeTransitionCleanup: (() => void) | null = null;
+const showStartPanel = createStartPanelNavigation();
 let characterPreview: CharacterPreview | null = null;
 let authModeApply: ((mode: 'login' | 'register') => void) | null = null;
 let offlineSkin = 0; // chosen appearance skin for the offline quick-start character
@@ -5662,88 +5664,7 @@ const hoverTimeouts: Record<string, number | null> = {
   'charcreate-class-details': null,
 };
 
-function switchMainView(targetId: string): void {
-  const views = ['#hero-view', '#highscores-view', '#news-view', '#download-view', '#account-view'];
-  const currentViewId = views.find((id) => {
-    const el = $(id);
-    return el && !el.hasAttribute('hidden');
-  });
-
-  if (currentViewId === targetId) return;
-
-  const navMap: Record<string, string> = {
-    '#hero-view': 'nav-btn-play',
-    '#highscores-view': 'nav-btn-highscores',
-    '#news-view': 'nav-btn-news',
-    '#download-view': 'nav-btn-download',
-    '#account-view': 'nav-btn-account',
-  };
-
-  const activeNavId = navMap[targetId];
-  document.querySelectorAll('.nav-link').forEach((link) => {
-    const isActive = link.id === activeNavId;
-    link.classList.toggle('active', isActive);
-    link.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-  });
-
-  const fromView = currentViewId ? $(currentViewId) : null;
-  const toView = $(targetId);
-
-  if (!toView) return;
-
-  const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  const performSwitch = () => {
-    views.forEach((id) => {
-      const el = $(id);
-      if (el) {
-        const isTarget = id === targetId;
-        el.toggleAttribute('hidden', !isTarget);
-        el.setAttribute('aria-hidden', isTarget ? 'false' : 'true');
-      }
-    });
-
-    // The key-art backdrop is for the Play page only; hide it on other views.
-    const onPlayPage = targetId === '#hero-view';
-    const backdrop = document.getElementById('start-screen-backdrop');
-    if (backdrop) backdrop.classList.toggle('trailer-off', !onPlayPage);
-
-    if (targetId === '#hero-view') {
-      const activePlayPanel = ['#charselect-panel', '#charcreate-panel', '#offline-select'].find(
-        (id) => {
-          const el = $(id);
-          return el && !el.hasAttribute('hidden');
-        },
-      );
-      if (activePlayPanel) {
-        updatePreviewContainer(activePlayPanel);
-      }
-    }
-  };
-
-  if (isReducedMotion || !fromView) {
-    performSwitch();
-    return;
-  }
-
-  // Visual cross-fade and slide
-  fromView.style.opacity = '0';
-  fromView.style.transform = 'translateY(-8px)';
-
-  const handleTransitionEnd = () => {
-    performSwitch();
-
-    toView.style.opacity = '0';
-    toView.style.transform = 'translateY(8px)';
-
-    void toView.offsetHeight; // force reflow
-
-    toView.style.opacity = '1';
-    toView.style.transform = 'translateY(0)';
-  };
-
-  window.setTimeout(handleTransitionEnd, 150);
-}
+const switchMainView = createWebsiteViewNavigation(updatePreviewContainer);
 
 function show(el: string): void {
   // Ensure the main view is switched to hero-view so play sub-panels are visible
@@ -5790,96 +5711,9 @@ function show(el: string): void {
     }
   }
 
-  const panels = [
-    '#mode-select',
-    '#login-panel',
-    '#forgot-panel',
-    '#reset-panel',
-    '#discord-choice-panel',
-    '#realm-panel',
-    '#charselect-panel',
-    '#charcreate-panel',
-    '#offline-select',
-  ];
-  document.body.dataset.startPanel = el.slice(1);
-
-  // Find currently visible panel. Not every entry carries every panel: play.html omits
-  // #discord-choice-panel (the chooser is an index.html-only flow), so resolve each id
-  // defensively and skip a missing one rather than dereferencing null.
-  const currentActiveId = panels.find((id) => {
-    const panel = document.querySelector(id);
-    return panel !== null && !panel.hasAttribute('hidden');
+  showStartPanel(el, () => {
+    if (isPlayPanel) updatePreviewContainer(el);
   });
-
-  if (!currentActiveId || currentActiveId === el) {
-    // Show instantly on initial load or same panel
-    for (const id of panels) {
-      document.querySelector(id)?.toggleAttribute('hidden', id !== el);
-    }
-    if (isPlayPanel) updatePreviewContainer(el);
-    return;
-  }
-
-  // Clear active transition
-  if (activeTransitionTimeout !== null) {
-    window.clearTimeout(activeTransitionTimeout);
-    activeTransitionTimeout = null;
-  }
-  if (activeTransitionCleanup) {
-    activeTransitionCleanup();
-    activeTransitionCleanup = null;
-  }
-
-  const fromPanel = $(currentActiveId);
-  const toPanel = $(el);
-
-  const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (isReducedMotion) {
-    fromPanel.toggleAttribute('hidden', true);
-    toPanel.toggleAttribute('hidden', false);
-    if (isPlayPanel) updatePreviewContainer(el);
-    return;
-  }
-
-  // Fade out using CSS classes
-  fromPanel.classList.add('panel-transition', 'panel-fade-out');
-
-  const cleanupFrom = () => {
-    fromPanel.toggleAttribute('hidden', true);
-    fromPanel.classList.remove('panel-transition', 'panel-fade-out');
-  };
-
-  activeTransitionCleanup = cleanupFrom;
-
-  activeTransitionTimeout = window.setTimeout(() => {
-    cleanupFrom();
-    activeTransitionCleanup = null;
-    activeTransitionTimeout = null;
-
-    // Set initial state for fade-in
-    toPanel.classList.add('panel-transition', 'panel-fade-in-start');
-    toPanel.toggleAttribute('hidden', false);
-    if (isPlayPanel) updatePreviewContainer(el);
-
-    // Force layout reflow
-    void toPanel.offsetHeight;
-
-    // Trigger fade-in
-    toPanel.classList.remove('panel-fade-in-start');
-    toPanel.classList.add('panel-fade-in');
-
-    const cleanupTo = () => {
-      toPanel.classList.remove('panel-transition', 'panel-fade-in');
-    };
-
-    activeTransitionCleanup = cleanupTo;
-
-    activeTransitionTimeout = window.setTimeout(() => {
-      cleanupTo();
-      activeTransitionCleanup = null;
-      activeTransitionTimeout = null;
-    }, 150);
-  }, 150);
 }
 
 function loginError(text: string): void {
@@ -9212,7 +9046,7 @@ function applyLandingBackdrop(highContrast: boolean): void {
   backdrop.classList.toggle('backdrop-static', useStatic);
 
   if (!video) return;
-  if (useStatic) {
+  if (useStatic || (!NATIVE_APP && !DESKTOP_APP && 'websiteRedesign' in document.body.dataset)) {
     // Keep the poster only; tear down any playing trailer and release the buffer.
     backdrop.classList.remove('trailer-ready', 'trailer-playing');
     if (video.src) {
@@ -10341,10 +10175,8 @@ function wireStartScreens(): void {
     void loadHighscores();
   });
   // The wiki is the curated guide SPA at /wiki (its own page), so this nav item
-  // navigates there rather than switching an in-page view.
-  setupNavBtn(navBtnWiki, '', () => {
-    window.location.href = '/wiki';
-  });
+  // opens separately so the player's login state remains in this tab.
+  setupNavBtn(navBtnWiki, '', () => openHeaderWiki(NATIVE_APP || DESKTOP_APP));
   setupNavBtn(navBtnNews, '#news-view', () => {
     switchMainView('#news-view');
     void loadNews();

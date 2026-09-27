@@ -2848,6 +2848,10 @@ const UI_DOM_MODULES = [
   'src/ui/steam_link.ts',
   'src/ui/steam_wishlist.ts',
   'src/ui/store_decision_prompt.ts',
+  // Resolves and mints the body-level host a Store decision takes while an
+  // inspect overlay is up (document lookups and a body append; the rule is in
+  // its header).
+  'src/ui/store_prompt_host.ts',
   'src/ui/store_stack_diag.ts',
   'src/ui/swing_timer_bars.ts',
   'src/ui/talents_window.ts',

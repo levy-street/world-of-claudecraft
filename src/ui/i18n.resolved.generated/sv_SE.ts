@@ -3859,8 +3859,8 @@ export const sv_SE: EnTranslations = {
         "kingsWrathSummary": "Nythraxis orsakar {bonusNormal} mer skada på Normal eller {bonusHeroic} på Heroic resten av striden. Gravutbrott sker var {eruptionEveryNormal} sek ({eruptionEveryHeroic} på Heroic).",
         "kingsWrathResponse": "Använd återstående defensiva nedkylningar för oundviklig skada. Håll varje tidigare mekanik ren medan raiden avslutar striden.",
         "boneStormName": "Benstorm",
-        "boneStormSummary": "Från {first} sek in i Kungens Vrede och var {everyNormal} sek därefter börjar Nythraxis Benstorm i {duration} sek. Han ignorerar hot, rör sig {speed} gånger normal hastighet och gör {charges} rusningar som varar {chargeSeconds} sek var. Hans virvel orsakar {whirlNormal} av maximal hälsa varje sekund inom {radius} yd. Varje rusning slutar i en Bensmäll inom samma radie för {slamNormal} av maximal hälsa. Det första slaget i varje storm träffar i stället för {openingSlamNormal}. Gravbrytare återaktiveras {rearm} sek efter att den slutar.",
-        "boneStormHeroicSummary": "Från {first} sek in i Kungens Vrede och var {everyHeroic} sek därefter börjar Nythraxis Benstorm i {duration} sek. Han ignorerar hot, rör sig {speed} gånger normal hastighet och gör {charges} rusningar som varar {chargeSeconds} sek var. Hans virvel orsakar {whirlHeroic} av maximal hälsa varje sekund inom {radius} yd. Varje rusning slutar i en Bensmäll inom samma radie för {slamHeroic} av maximal hälsa. Det första slaget i varje storm träffar i stället för {openingSlamHeroic}. Gravbrytare återaktiveras {rearm} sek efter att den slutar.",
+        "boneStormSummary": "Från {first} sek in i Kungens Vrede och var {everyNormal} sek därefter börjar Nythraxis Benstorm i {duration} sek. Han ignorerar hot, rör sig {speed} gånger normal hastighet och gör {charges} rusningar som varar {chargeSeconds} sek var. Hans virvel orsakar {whirlNormal} av maximal hälsa varje sekund inom {radius} yd. Varje rusning slutar i en Bensmäll inom samma radie för {slamNormal} av maximal hälsa. Gravbrytare återaktiveras {rearm} sek efter att den slutar.",
+        "boneStormHeroicSummary": "Från {first} sek in i Kungens Vrede och var {everyHeroic} sek därefter börjar Nythraxis Benstorm i {duration} sek. Han ignorerar hot, rör sig {speed} gånger normal hastighet och gör {charges} rusningar som varar {chargeSeconds} sek var. Hans virvel orsakar {whirlHeroic} av maximal hälsa varje sekund inom {radius} yd. Varje rusning slutar i en Bensmäll inom samma radie för {slamHeroic} av maximal hälsa. Gravbrytare återaktiveras {rearm} sek efter att den slutar.",
         "boneStormResponse": "Sprid ut er och fortsätt springa från Nythraxis. Den jagade raiddeltagaren springer bort medan alla andra lämnar utrymme runt rusningsvägen, sedan tar tankarna upp honom när stormen slutar.",
         "crownEnduresName": "Kronan består",
         "crownEnduresSummary": "Vid {enrageNormal} sek från stridsstarten (klockan pausar medan Broder Aldric kommer in vid 70%) utlöser Kronan består en hård raseri. Nythraxis får {damage} mer skada och {haste} snabbare anfall, sedan ytterligare {rampStep} skada var {rampEveryNormal} sek. Det finns ingen timerstapel. Varningar kommer som rop vid {warn60}, {warn30} och {warn10} sek kvar.",
@@ -6969,7 +6969,7 @@ export const sv_SE: EnTranslations = {
     "home": {
       "eyebrow": "Klassiskt MMO i webbläsaren",
       "title": "World of ClaudeCraft",
-      "subtitle": "Lös uppdrag, slå er samman och utforska en handbyggd värld, gratis i din webbläsare.",
+      "subtitle": "Utforska världen, ta dig an uppdrag och kämpa dig igenom dungeons med vänner.",
       "ctaPlay": "Spela nu",
       "ctaLearn": "Så spelar du",
       "what": {
@@ -9610,8 +9610,8 @@ export const sv_SE: EnTranslations = {
     "viewAll": "Se alla uppdateringar på GitHub"
   },
   "download": {
-    "title": "Ladda ner skrivbordsstartaren",
-    "desc": "Hämta den fristående startaren för optimerad prestanda och spel i helskärm.",
+    "title": "Ladda ner skrivbordsappen",
+    "desc": "Spela på Windows, macOS eller Linux med samma konto och samma karaktärer.",
     "macCta": "Ladda ner för macOS",
     "windowsCta": "Ladda ner för Windows",
     "linuxCta": "Ladda ner för Linux",
@@ -9630,7 +9630,7 @@ export const sv_SE: EnTranslations = {
     "offlineDesc": "Omedelbar enspelarvärld i din webbläsare. Inget sparas: perfekt för en snabb drabbning eller testning.",
     "offlineAria": "Spela offline: starta en omedelbar lokal enspelarsession",
     "tipTitle": "TIPS:",
-    "tipText": "För den smidigaste upplevelsen, stäng av annonsblockerartillägg på den här sidan. Användarrapporter har visat att vissa blockerare kan orsaka fördröjning.",
+    "tipText": "Går spelet långsamt? Prova att stänga av din annonsblockerare för den här sidan.",
     "serverOnline": "Online",
     "serverOffline": "Offline",
     "play": "Spela",
@@ -10798,15 +10798,23 @@ export const sv_SE: EnTranslations = {
       "dodge": "UNDVEK!"
     }
   },
+  "landing": {
+    "headline": "Äventyr med vänner.",
+    "contribute": "Bidra till spelet",
+    "tools": "Verktyg",
+    "records": "WoC Rekord",
+    "scout": "WoC Spejare",
+    "parseService": "WoC Parse-tjänst"
+  },
   "seo": {
     "title": "World of ClaudeCraft: Klassiskt inspirerad webb-MMO",
-    "description": "Ge dig ut på ett episkt äventyr i World of ClaudeCraft, en klassiskt inspirerad mikro-MMO som du spelar direkt i din webbläsare. Anslut till en beständig delad värld, höj nivå på klasser och besegra fiender!",
+    "description": "Spela World of ClaudeCraft, en gratis MMO i webbläsaren. Utforska, gör uppdrag och ta dig igenom dungeons med vänner. Ingen nedladdning krävs.",
     "genre": "MMORPG",
     "playMode": "Flerspelarläge",
     "applicationCategory": "Spel",
     "operatingSystem": "Webbläsare",
     "officialLabel": "Officiell webbplats för World of ClaudeCraft",
-    "officialBody": "worldofclaudecraft.com är den officiella gratis webbläsar-MMO:n för Claudemoon-världen. Spela online med en beständig karaktär, utforska solo offline, läs wikin och följ verifierade gemenskapslänkar från den här webbplatsen."
+    "officialBody": "Den officiella webbplatsen för World of ClaudeCraft. Spela online, läs wikin och hitta gemenskapslänkarna här."
   },
   "a11y": {
     "goHome": "Gå till startsidan",

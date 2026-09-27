@@ -863,7 +863,7 @@ import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
 import { stackSizeTooltipLine } from './stack_size_tooltip_view';
 import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tooltip_view';
-import { clearOpenStoreResult } from './store_decision_prompt';
+import { clearOpenStoreResult, MODAL_PROMPT_SELECTOR } from './store_decision_prompt';
 import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
 import { nearestSubzone } from './subzone';
 import { SwingTimerBars } from './swing_timer_bars';
@@ -17950,7 +17950,7 @@ export class Hud {
   // party/trade/duel prompts (no aria-modal) stay non-blocking. Called from
   // keydown paths only, never per frame.
   promptModalOpen(): boolean {
-    return $('#prompt-stack').querySelector('.prompt[aria-modal="true"]') !== null;
+    return document.querySelector(MODAL_PROMPT_SELECTOR) !== null;
   }
 
   // True when any interactive HUD surface is open: a modal OR a managed window

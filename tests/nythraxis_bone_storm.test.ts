@@ -19,9 +19,7 @@ import {
   nythraxisBoneStormChargeIndex,
   nythraxisBoneStormChargeTarget,
   nythraxisBoneStormDone,
-  nythraxisBoneStormOpeningSlamMaxHp,
   nythraxisBoneStormReached,
-  nythraxisBoneStormSlamMaxHp,
   nythraxisBoneStormWhirlTickMaxHp,
   pointInNythraxisBoneStorm,
 } from '../src/sim/nythraxis_bone_storm';
@@ -47,25 +45,13 @@ describe('Nythraxis Bone Storm', () => {
       nythraxisBoneStormWhirlTickMaxHp('normal'),
       nythraxisBoneStormWhirlTickMaxHp('heroic'),
     ]).toEqual([0.1, 0.2]);
+    // Every slam of a storm, whichever window lands it, deals the same
+    // fraction: v0.43.1 flattened the former full slam (35% / 55%) to the
+    // value the opening slam had carried since v0.43.0.
     expect([
       nythraxisBoneSlamDamageMaxHp('normal'),
       nythraxisBoneSlamDamageMaxHp('heroic'),
-    ]).toEqual([0.35, 0.55]);
-    // The storm's first slam lands on a raid that has not spread yet: about a
-    // third softer than the full slam. Every later window slams for the full
-    // fraction.
-    expect([
-      nythraxisBoneStormOpeningSlamMaxHp('normal'),
-      nythraxisBoneStormOpeningSlamMaxHp('heroic'),
     ]).toEqual([0.23, 0.37]);
-    expect([
-      nythraxisBoneStormSlamMaxHp('normal', true),
-      nythraxisBoneStormSlamMaxHp('heroic', true),
-    ]).toEqual([0.23, 0.37]);
-    expect([
-      nythraxisBoneStormSlamMaxHp('normal', false),
-      nythraxisBoneStormSlamMaxHp('heroic', false),
-    ]).toEqual([0.35, 0.55]);
     expect(NYTHRAXIS_BONE_STORM_ARRIVE_DIST).toBe(3);
     expect(NYTHRAXIS_BONE_STORM_GRAVEBREAKER_REARM_SECONDS).toBe(3);
   });
@@ -119,14 +105,13 @@ describe('Nythraxis Bone Storm', () => {
     expect(pointInNythraxisBoneStorm(boss, { x: 10, z: 19.01 })).toBe(false);
   });
 
-  it('begins a storm with the first window open and nothing spent', () => {
+  it('begins a storm with the first window open and nothing slammed', () => {
     expect(beginNythraxisBoneStorm(9)).toEqual({
       castKey: 9,
       elapsed: 0,
       chargeIndex: 0,
       chargeTargetId: null,
       slammed: false,
-      openingSlamSpent: false,
       whirlTickTimer: 1,
       chargedIds: [],
     });

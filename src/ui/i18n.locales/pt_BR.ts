@@ -13,6 +13,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pt_BR: Partial<Record<TranslationKey, string>> = {
+  'landing.headline': 'Aventure-se com amigos.',
+  'landing.contribute': 'Contribua com o jogo',
+  'landing.tools': 'Ferramentas',
+  'landing.records': 'WoC Recordes',
+  'landing.scout': 'WoC Batedor',
+  'landing.parseService': 'Serviço de parses WoC',
   'hud.errors.cannotCastWhileMoving': 'Você não pode conjurar enquanto se move.',
   'hudChrome.auraEffect.wolfForm':
     'Forma de Gato: dano corpo a corpo e energia; velocidade de movimento aumentada em {pct}%',
@@ -5087,7 +5093,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.targetLabel': 'Seu alvo',
   'seo.officialLabel': 'Site oficial de World of ClaudeCraft',
   'seo.officialBody':
-    'worldofclaudecraft.com é o MMO de navegador gratuito oficial do mundo Claudemoon. Jogue online com um personagem persistente, explore solo offline, leia a wiki e siga os links verificados da comunidade a partir deste site.',
+    'O site oficial de World of ClaudeCraft. Jogue online, leia a wiki e encontre aqui os links da comunidade.',
   'hudChrome.questShare.notShareable': 'Esta missão não pode ser compartilhada.',
   'hudChrome.questShare.notInSharerParty':
     'Você precisa estar no grupo de {name} para aceitar essa missão.',
@@ -5458,11 +5464,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'wiki.desc': 'Descubra os segredos do reino, guias de classes e estratégias.',
   'news.title': 'Notícias e atualizações',
   'news.desc': 'Leia as últimas notas do patch, eventos e atualizações da comunidade.',
-  'download.title': 'Baixar launcher para desktop',
+  'download.title': 'Baixe o app para desktop',
   'download.macCta': 'Baixar para macOS',
   'download.windowsPending': 'Build para Windows pendente.',
-  'download.desc':
-    'Obtenha o launcher independente para desempenho otimizado e jogo em tela cheia.',
+  'download.desc': 'Jogue no Windows, macOS ou Linux com a mesma conta e os mesmos personagens.',
   'comingSoon.placeholder': 'Em breve...',
   'comingSoon.featureComingSoon': 'Este recurso estará disponível no mundo em breve.',
   'mode.onlineTitle': 'Jogar online',
@@ -5474,8 +5479,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Mundo solo instantâneo no seu navegador. Nada é salvo: perfeito para uma luta rápida ou testes.',
   'mode.offlineAria': 'Jogar offline: inicie uma sessão local de um jogador instantânea',
   'mode.tipTitle': 'DICA:',
-  'mode.tipText':
-    'Para uma experiência mais suave, desative os bloqueadores de anúncios neste site. Relatos da comunidade indicam que alguns bloqueadores podem causar lag.',
+  'mode.tipText': 'O jogo está lento? Tente desativar o bloqueador de anúncios neste site.',
   'auth.enterRealm': 'Entrar no mundo',
   'auth.username': 'Nome de usuário',
   'auth.usernameError': 'Por favor, insira seu nome de usuário.',
@@ -5709,7 +5713,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'controls.chat': 'Abrir chat',
   'seo.title': 'World of ClaudeCraft: MMO web em estilo clássico',
   'seo.description':
-    'Embarque em uma aventura épica em World of ClaudeCraft, um micro-MMO de estilo clássico jogável diretamente no navegador. Entre em um mundo compartilhado persistente, evolua classes e derrote inimigos!',
+    'Jogue World of ClaudeCraft, um MMO de navegador gratuito. Explore, complete missões e encare masmorras com amigos. Sem precisar baixar nada.',
   'seo.genre': 'MMORPG',
   'seo.playMode': 'Multijogador',
   'seo.applicationCategory': 'Jogo',
@@ -8958,8 +8962,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.home.group.raidTitle': 'O raide',
   'guide.home.group.sub':
     'O mundo é jogável sozinho, mas o melhor saque aguarda atrás de um bom grupo.',
-  'guide.home.subtitle':
-    'Cumpra missões, forme grupo e explore um mundo feito à mão, de graça no seu navegador.',
+  'guide.home.subtitle': 'Explore o mundo, cumpra missões e encare masmorras com amigos.',
   'guide.home.title': 'World of ClaudeCraft',
   'guide.home.what.heading': 'Um MMO clássico, feito para ser pego e jogado',
   'guide.home.what.pillarClassesBody':
@@ -16525,12 +16528,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
     'A cada {everyNormal} s, Nythraxis empala {victimsNormal} raiders que não sejam seu alvo atual em Espinhos ósseos. Um raider empalado não pode agir e perde {drainNormal} da vida máxima a cada segundo até que seu espinho seja destruído. Um espinho se despedaça após {hitsNormal} acertos de qualquer um, não importa o dano causado. Um jogador que já foi empalado não pode ser escolhido de novo por {cooldown} s, então os espinhos se espalham por toda a raide.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
-    'Começando {first} s depois da Ira do rei e a cada {everyHeroic} s depois, Nythraxis inicia Tempestade óssea por {duration} s. Ele ignora ameaça, move-se a {speed} vezes a velocidade normal e faz {charges} avanços de {chargeSeconds} s cada. Seu redemoinho causa {whirlHeroic} da vida máxima por segundo em até {radius} yd. Cada avanço termina em um Impacto ósseo no mesmo raio, causando {slamHeroic} da vida máxima. O primeiro impacto de cada tempestade causa {openingSlamHeroic} em vez disso. Quebra-túmulos rearma {rearm} s após ela terminar.',
+    'Começando {first} s depois da Ira do rei e a cada {everyHeroic} s depois, Nythraxis inicia Tempestade óssea por {duration} s. Ele ignora ameaça, move-se a {speed} vezes a velocidade normal e faz {charges} avanços de {chargeSeconds} s cada. Seu redemoinho causa {whirlHeroic} da vida máxima por segundo em até {radius} yd. Cada avanço termina em um Impacto ósseo no mesmo raio, causando {slamHeroic} da vida máxima. Quebra-túmulos rearma {rearm} s após ela terminar.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Tempestade óssea',
   'hudChrome.raidBossGuide.nythraxis.boneStormResponse':
     'Espalhem-se e continuem correndo de Nythraxis. O raider marcado pelo avanço foge enquanto todos os outros deixam espaço ao redor da trajetória; depois os tanks pegam o chefe quando a tempestade termina.',
   'hudChrome.raidBossGuide.nythraxis.boneStormSummary':
-    'Começando {first} s depois da Ira do rei e a cada {everyNormal} s depois, Nythraxis inicia Tempestade óssea por {duration} s. Ele ignora ameaça, move-se a {speed} vezes a velocidade normal e faz {charges} avanços de {chargeSeconds} s cada. Seu redemoinho causa {whirlNormal} da vida máxima por segundo em até {radius} yd. Cada avanço termina em um Impacto ósseo no mesmo raio, causando {slamNormal} da vida máxima. O primeiro impacto de cada tempestade causa {openingSlamNormal} em vez disso. Quebra-túmulos rearma {rearm} s após ela terminar.',
+    'Começando {first} s depois da Ira do rei e a cada {everyNormal} s depois, Nythraxis inicia Tempestade óssea por {duration} s. Ele ignora ameaça, move-se a {speed} vezes a velocidade normal e faz {charges} avanços de {chargeSeconds} s cada. Seu redemoinho causa {whirlNormal} da vida máxima por segundo em até {radius} yd. Cada avanço termina em um Impacto ósseo no mesmo raio, causando {slamNormal} da vida máxima. Quebra-túmulos rearma {rearm} s após ela terminar.',
   'hudChrome.raidBossGuide.nythraxis.courtName': 'A Corte imortal',
   'hudChrome.raidBossGuide.nythraxis.courtResponse':
     'Os tanks pegam Aldren e viram seu cleave para longe da raide. Atordoe ou silencie Malric assim que Cura de Malric começar e mate-o primeiro; depois enraíze ou atordoe Voss longe dos curadores, já que ele não pode ser provocado, e acabe com ele em seguida.',

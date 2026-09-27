@@ -90,6 +90,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.trackerGroup': 'Отслеживание задач',
   'hudChrome.interfaceUnlock.frameNames.auraGroup': 'Ауры и эффекты цели',
   'hudChrome.professionTrainers.nameplate': '<{title}>',
+  'landing.contribute': 'Участвовать в разработке игры',
+  'landing.headline': 'Приключения вместе с друзьями.',
+  'landing.tools': 'Инструменты',
+  'landing.records': 'WoC Рекорды',
+  'landing.scout': 'WoC Разведка',
+  'landing.parseService': 'WoC Боевые отчёты',
   'guide.professions.endgameBodyRaidCollections':
     'Ковка мастера объединяет вещи с меткой «Уникальный (экипируется): Ковка мастера». Прежняя вершина ремесла по-прежнему использует найденные схемы, промежуточные изделия с суточным ограничением и общие материалы финального этапа. Комплекты Горнила представляют отдельный путь с рейдовыми материалами, а не дополнительные расходы поверх прежней цепочки. Обе группы делят один предел ношения в две вещи, поэтому конкурируют за одни и те же два места в вашей сборке. Готовые вещи свободно продаются, пока доведение до совершенства или заказное изготовление не привяжет конкретный экземпляр.',
   'guide.professions.endgamePatternsBodyCollections':
@@ -1286,7 +1292,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.targetLabel': 'Ваша цель',
   'seo.officialLabel': 'Официальный сайт World of ClaudeCraft',
   'seo.officialBody':
-    'worldofclaudecraft.com - официальная бесплатная браузерная MMO для мира Claudemoon. Играйте онлайн с постоянным персонажем, исследуйте мир в одиночку офлайн, читайте wiki и переходите по проверенным ссылкам сообщества с этого сайта.',
+    'Официальный сайт World of ClaudeCraft. Играйте онлайн, читайте wiki и находите здесь ссылки сообщества.',
   'hudChrome.questShare.notShareable': 'Этим заданием нельзя поделиться.',
   'hudChrome.questShare.notInSharerParty':
     'Вы должны состоять в группе игрока {name}, чтобы принять это задание.',
@@ -2285,7 +2291,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'wiki.desc': 'Откройте секреты игрового мира, руководства по классам и стратегии.',
   'news.title': 'Новости и обновления',
   'news.desc': 'Читайте описание последних обновлений, информацию о событиях и новости сообщества.',
-  'download.title': 'Скачать загрузчик для ПК',
+  'download.title': 'Скачать приложение для ПК',
   'download.macCta': 'Скачать для macOS',
   'download.linuxCta': 'Скачать для Linux',
   'download.linuxHint':
@@ -2293,7 +2299,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'download.windowsCta': 'Скачать для Windows',
   'download.windowsPending': 'Сборка для Windows готовится.',
   'download.desc':
-    'Загрузите отдельный клиент для оптимальной производительности и игры на весь экран.',
+    'Играйте на Windows, macOS или Linux с той же учётной записью и теми же персонажами.',
   'comingSoon.placeholder': 'Скоро...',
   'comingSoon.featureComingSoon': 'Эта функция скоро появится в игре.',
   'mode.onlineTitle': 'Играть по сети',
@@ -2306,7 +2312,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'mode.offlineAria': 'Играть вне сети: запуск мгновенного локального одиночного сеанса',
   'mode.tipTitle': 'СОВЕТ:',
   'mode.tipText':
-    'Для максимально плавной игры отключите блокировщики рекламы на этом сайте. По отзывам сообщества, некоторые блокировщики могут вызывать задержки.',
+    'Игра работает медленно? Попробуйте отключить блокировщик рекламы для этого сайта.',
   'auth.enterRealm': 'Войти в игровой мир',
   'auth.username': 'Имя пользователя',
   'auth.usernameError': 'Пожалуйста, введите имя пользователя.',
@@ -2593,7 +2599,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'controls.chat': 'Открыть чат',
   'seo.title': 'World of ClaudeCraft: веб-MMO в классическом стиле',
   'seo.description':
-    'Отправьтесь в эпическое приключение в World of ClaudeCraft, микро-MMO в классическом стиле прямо в браузере. Присоединяйтесь к постоянному общему миру, развивайте классы и побеждайте врагов.',
+    'Играйте в World of ClaudeCraft, бесплатную браузерную MMO. Исследуйте мир, выполняйте задания и проходите подземелья с друзьями. Без скачивания.',
   'seo.genre': 'MMORPG',
   'seo.playMode': 'Многопользовательская игра',
   'seo.applicationCategory': 'Игра',
@@ -7357,8 +7363,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.language.select': 'Выберите язык',
   'guide.home.eyebrow': 'Классическая браузерная MMO',
   'guide.home.title': 'World of ClaudeCraft',
-  'guide.home.subtitle':
-    'Выполняйте задания, объединяйтесь в группы и исследуйте созданный вручную мир бесплатно прямо в браузере.',
+  'guide.home.subtitle': 'Исследуйте мир, выполняйте задания и проходите подземелья с друзьями.',
   'guide.home.ctaPlay': 'Играть',
   'guide.home.ctaLearn': 'Как играть',
   'guide.home.what.heading': 'Классическая MMO, в которую легко погрузиться',
@@ -9187,9 +9192,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Используйте оставшиеся защитные способности от неизбежного урона. Продолжайте чисто выполнять все прежние механики, пока рейд не закончит бой.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Костяная буря',
   'hudChrome.raidBossGuide.nythraxis.boneStormSummary':
-    'Начиная с {first} сек. после начала Королевского гнева и затем каждые {everyNormal} сек., Нитраксис начинает Костяную бурю на {duration} сек. Он игнорирует угрозу, двигается в {speed} раза быстрее обычного и совершает {charges} рывков по {chargeSeconds} сек. каждый. Его вихрь наносит {whirlNormal} максимального здоровья каждую секунду в радиусе {radius} м. Каждый рывок завершается Костяным ударом в том же радиусе на {slamNormal} максимального здоровья. Первый удар каждой бури наносит вместо этого {openingSlamNormal}. Гробокрушитель снова активируется через {rearm} сек. после её окончания.',
+    'Начиная с {first} сек. после начала Королевского гнева и затем каждые {everyNormal} сек., Нитраксис начинает Костяную бурю на {duration} сек. Он игнорирует угрозу, двигается в {speed} раза быстрее обычного и совершает {charges} рывков по {chargeSeconds} сек. каждый. Его вихрь наносит {whirlNormal} максимального здоровья каждую секунду в радиусе {radius} м. Каждый рывок завершается Костяным ударом в том же радиусе на {slamNormal} максимального здоровья. Гробокрушитель снова активируется через {rearm} сек. после её окончания.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
-    'Начиная с {first} сек. после начала Королевского гнева и затем каждые {everyHeroic} сек., Нитраксис начинает Костяную бурю на {duration} сек. Он игнорирует угрозу, двигается в {speed} раза быстрее обычного и совершает {charges} рывков по {chargeSeconds} сек. каждый. Его вихрь наносит {whirlHeroic} максимального здоровья каждую секунду в радиусе {radius} м. Каждый рывок завершается Костяным ударом в том же радиусе на {slamHeroic} максимального здоровья. Первый удар каждой бури наносит вместо этого {openingSlamHeroic}. Гробокрушитель снова активируется через {rearm} сек. после её окончания.',
+    'Начиная с {first} сек. после начала Королевского гнева и затем каждые {everyHeroic} сек., Нитраксис начинает Костяную бурю на {duration} сек. Он игнорирует угрозу, двигается в {speed} раза быстрее обычного и совершает {charges} рывков по {chargeSeconds} сек. каждый. Его вихрь наносит {whirlHeroic} максимального здоровья каждую секунду в радиусе {radius} м. Каждый рывок завершается Костяным ударом в том же радиусе на {slamHeroic} максимального здоровья. Гробокрушитель снова активируется через {rearm} сек. после её окончания.',
   'hudChrome.raidBossGuide.nythraxis.boneStormResponse':
     'Рассредоточьтесь и продолжайте убегать от Нитраксиса. Рейдер, которого он преследует рывком, убегает, а все остальные освобождают место вокруг пути рывка, затем танки принимают его на себя, когда буря заканчивается.',
   'hudChrome.raidBossGuide.nythraxis.crownEnduresName': 'Корона выстоит',
