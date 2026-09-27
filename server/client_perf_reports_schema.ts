@@ -120,4 +120,47 @@ ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS shader_warm_refusal TEX
 -- honest answer for every row older than the desktop shell itself. No index:
 -- the reads that split on it aggregate over a created_at window.
 ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS desktop_shell BOOLEAN NOT NULL DEFAULT FALSE;
+-- The frame rate ceiling the player chose: a session that renders at about 30
+-- fps ON PURPOSE must stay separable from a struggling machine, and the
+-- raw_summary.cadence block that also says so is shed under a size squeeze.
+-- frame_cap_intent is 0 (none), 30 or 60; cadence_divisor is how many display
+-- refresh slots one rendered frame spans (1 = ceiling inert); refresh_hz is
+-- the client's estimate of the display rate in WHOLE Hz (an INT on purpose:
+-- a finer reading would fingerprint the display) (0 = unknown, which with an intent
+-- set is the unpaced limiter). target_fps is the effective target from the
+-- same release on. Pre-column rows read as no ceiling, which is what they had.
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS frame_cap_intent INT NOT NULL DEFAULT 0;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS cadence_divisor INT NOT NULL DEFAULT 1;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS refresh_hz INT NOT NULL DEFAULT 0;
+-- "Host essentials": the host facts only the Electron desktop shell can see,
+-- which the browser sandbox cannot (electron/host_essentials.cjs). Web and
+-- mobile rows carry none of them, and the ingest IGNORES the whole block unless
+-- desktop_shell is true for the same report. The memory figures are rounded BY
+-- THE SHELL (256 MB total, 64 MB free, electron/host_essentials.cjs) because an
+-- exact installed-RAM byte count is a fingerprint on an endpoint that accepts
+-- anonymous posts. The shell owns that rounding: the ingest floors to whole MB
+-- and clamps (hostMbIn), it does not re-snap to those steps, so the guarantee
+-- holds for our shell and not for a hand-crafted post. The
+-- two power settings are CLOSED VOCABULARIES folded in the shell: the raw
+-- Windows power-scheme GUID is never sent or stored, since a custom plan's GUID
+-- identifies one machine (the same reason refresh_hz is rounded to whole Hz).
+-- host_power_plan is '' | balanced | high_performance | power_saver | ultimate |
+-- other; host_power_mode is '' | best_efficiency | balanced | better_performance
+-- | best_performance | other; both are TEXT NOT NULL DEFAULT '' so a future
+-- grouped read keeps the GROUPING-bits contract, and '' is "no evidence", which
+-- is also what every pre-column row reads. The booleans are NULLABLE because
+-- "could not be read" is a real and common answer that must stay apart from
+-- "off". NO new index: the reads that split on these aggregate over a created_at
+-- window, and a big live table's indexes go through server/client_perf_indexes.ts
+-- (CONCURRENTLY), never boot DDL.
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS host_mem_total_mb INT;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS host_mem_free_mb INT;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS app_working_set_mb INT;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS app_renderer_ws_mb INT;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS app_gpu_ws_mb INT;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS host_on_battery BOOLEAN;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS host_power_plan TEXT NOT NULL DEFAULT '';
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS host_power_mode TEXT NOT NULL DEFAULT '';
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS host_hags BOOLEAN;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS host_game_mode BOOLEAN;
 `;

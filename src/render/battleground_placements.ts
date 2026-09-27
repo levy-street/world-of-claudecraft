@@ -16,12 +16,16 @@ import * as THREE from 'three';
 import { targetHeightFor } from './asset_scale';
 import { loadGltf } from './assets/loader';
 import type { BgAssetGroup, ThFieldPlacement } from './battleground_core';
-import { type InstancedGhostHandle, InstancedOccluderGhosts } from './instanced_occluder_ghosts';
+import { disposeGhostHideGeometry, ghostHideGeometry } from './instanced_dither_fade';
+import {
+  ghostFadeBatchMaterial,
+  type InstancedGhostHide,
+  InstancedOccluderGhosts,
+} from './instanced_occluder_ghosts';
 import {
   occluderFadeSettled,
   occluderKeepsInstances,
   occluderSegmentHitsBox,
-  stepOccluderFade,
 } from './occluder_fade_core';
 import { markSharedMaterial } from './shared_resource';
 
@@ -104,13 +108,12 @@ const OCCLUDER_MIN_HEIGHT = 2.5;
 const OCCLUDER_SLOT_REACH_X = 260;
 const OCCLUDER_SLOT_REACH_Z = 320;
 
-/** One sub-mesh instance a fading structure has to swap for a ghost. */
+/** One sub-mesh instance a fading structure has to ghost. */
 interface OccluderPart {
   mesh: THREE.InstancedMesh;
   index: number;
   visible: THREE.Matrix4;
-  hidden: THREE.Matrix4;
-  ghost: InstancedGhostHandle | null;
+  ghost: InstancedGhostHide | null;
 }
 
 /** One authored structure, in FIELD-LOCAL coordinates, with every sub-mesh
@@ -126,8 +129,6 @@ interface Occluder {
   alpha: number;
   parts: OccluderPart[];
 }
-
-const ZERO_SCALE = new THREE.Vector3(0, 0, 0);
 
 /**
  * The world-axis-aligned footprint of one placement, or null when the piece is
@@ -260,22 +261,25 @@ export async function buildBattlegroundPlacements(
     const fadeable: (Occluder | null)[] = isBattlegroundOccluderAsset(g.assetId)
       ? g.placements.map((p) => occluderFor(p, t))
       : [];
+    const count = g.placements.length;
     for (const sub of t.subs) {
-      const mesh = new THREE.InstancedMesh(sub.geometry, sub.material, g.placements.length);
+      // Only a batch that can ghost pays for the per-instance fade (its own
+      // geometry shell and the decorated material, instanced_dither_fade.ts).
+      const mesh =
+        fadeable.length > 0
+          ? new THREE.InstancedMesh(
+              ghostHideGeometry(sub.geometry, count),
+              ghostFadeBatchMaterial(sub.material),
+              count,
+            )
+          : new THREE.InstancedMesh(sub.geometry, sub.material, count);
       for (let i = 0; i < g.placements.length; i++) {
         rootMatrix(g.placements[i], t, root);
         full.multiplyMatrices(root, sub.local);
         mesh.setMatrixAt(i, full);
         const fade = fadeable[i];
         if (fade) {
-          const visible = full.clone();
-          fade.parts.push({
-            mesh,
-            index: i,
-            visible,
-            hidden: visible.clone().scale(ZERO_SCALE),
-            ghost: null,
-          });
+          fade.parts.push({ mesh, index: i, visible: full.clone(), ghost: null });
         }
       }
       mesh.instanceMatrix.needsUpdate = true;
@@ -293,12 +297,8 @@ export async function buildBattlegroundPlacements(
   const ghosts = new InstancedOccluderGhosts();
   const showParts = (o: Occluder): void => {
     for (const part of o.parts) {
-      part.mesh.setMatrixAt(part.index, part.visible);
-      part.mesh.instanceMatrix.needsUpdate = true;
-      if (part.ghost) {
-        ghosts.release(part.ghost);
-        part.ghost = null;
-      }
+      if (part.ghost) ghosts.show(part.ghost);
+      part.ghost = null;
     }
   };
 
@@ -336,14 +336,10 @@ export async function buildBattlegroundPlacements(
           continue;
         }
         if (o.parts[0].ghost === null) {
-          for (const part of o.parts) {
-            part.mesh.setMatrixAt(part.index, part.hidden);
-            part.mesh.instanceMatrix.needsUpdate = true;
-            part.ghost = ghosts.acquire(part.mesh, part.index, part.visible);
-          }
+          for (const part of o.parts) part.ghost = ghosts.hide(part.mesh, part.index, part.visible);
         }
-        o.alpha = stepOccluderFade(o.alpha, hide, dt, reducedMotion);
-        for (const part of o.parts) if (part.ghost) ghosts.setAlpha(part.ghost, o.alpha);
+        o.alpha = ghosts.step(o.alpha, hide, dt, reducedMotion);
+        for (const part of o.parts) if (part.ghost) ghosts.fade(part.ghost, o.alpha);
         if (!hide && occluderFadeSettled(o.alpha, false)) showParts(o);
       }
     },
@@ -351,8 +347,12 @@ export async function buildBattlegroundPlacements(
       liveViews.delete(view);
       for (const o of occluders) showParts(o);
       // Geometry and materials belong to the shared GLB cache: dispose only
-      // the instance buffers this view created.
-      for (const m of meshes) m.dispose();
+      // the instance buffers this view created, and each ghost-hide shell's own
+      // buffer (never the shell whole: it carries the cache's attributes).
+      for (const m of meshes) {
+        m.dispose();
+        disposeGhostHideGeometry(m.geometry);
+      }
       group.clear();
     },
   };

@@ -277,7 +277,15 @@ describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/
         e.itemId && isGearEntry(e.itemId) ? [e.itemId] : [],
       ),
     );
-    expect(raidIds.size).toBe(3); // the three heroic-only raid weapons
+    // The three heroic-only raid weapons plus the four raid trinkets
+    // (content/trinkets.ts), all in the one heroic-exclusive group.
+    expect(raidIds.size).toBe(7);
+    expect([...raidIds].filter((id) => ITEMS[id].slot === 'trinket').sort()).toEqual([
+      'echoing_lens',
+      'hunters_tally',
+      'mooring_stone',
+      'wellspring_seed',
+    ]);
     // The Ignivar raid bosses' heroic-only appends live in this table too but
     // read the Crucible tier (source 26, ilvl 35, sigil tokens with no item
     // level at all); their pins live in tests/ignivar_loot.test.ts, so this
@@ -448,11 +456,13 @@ describe('item level: rift gear is budget-exact (rares ilvl 26, epics ilvl 31, l
       expect(item.quality, `${id} quality`).toBe('epic');
       expect(itemLevel(item), `${id} ilvl`).toBe(31);
       expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(expectedStatBudget(item));
-      // Every rift epic must carry exactly one combat rating.
+      // Every rift epic must carry exactly one combat rating, except the rift
+      // trinkets: a trinket's use effect is its differentiator and it carries
+      // no rating at all.
       const ratingCount = [item.hitRating, item.critRating, item.hasteRating].filter(
         (r) => r !== undefined && r > 0,
       ).length;
-      expect(ratingCount, `${id} carries one combat rating`).toBe(1);
+      expect(ratingCount, `${id} carries one combat rating`).toBe(item.slot === 'trinket' ? 0 : 1);
     }
   });
 

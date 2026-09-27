@@ -40,6 +40,9 @@ export function shouldDeliverCombatEventToViewer(
     return isViewerCombatParticipant(ev.sourceId, ev.targetId, viewerPid, viewerParty, ownerOf);
   if (ev.type === 'heal2')
     return isViewerCombatParticipant(ev.sourceId, ev.targetId, viewerPid, viewerParty, ownerOf);
+  // An absorb credit is healing-shaped (shielder -> shielded): same scope.
+  if (ev.type === 'absorb')
+    return isViewerCombatParticipant(ev.sourceId, ev.targetId, viewerPid, viewerParty, ownerOf);
   return true;
 }
 

@@ -192,6 +192,22 @@ export const es: EnTranslations = {
       "lfgboard": {
         "label": "Preparar tablón de grupos",
         "description": "Crea un escenario de anuncio de grupo organizado."
+      },
+      "hillwarn": {
+        "label": "Anunciar colina",
+        "description": "Anuncia una colina ahora; se alza tras el aviso completo."
+      },
+      "hillnow": {
+        "label": "Alzar colina ahora",
+        "description": "Alza una colina al instante y te sitúa sobre ella."
+      },
+      "hillrise": {
+        "label": "Saltar cuenta atrás de colina",
+        "description": "Alza de inmediato la colina anunciada."
+      },
+      "hillend": {
+        "label": "Terminar colina",
+        "description": "Hace caer la colina actual de inmediato."
       }
     }
   },
@@ -331,6 +347,48 @@ export const es: EnTranslations = {
     }
   },
   "hudChrome": {
+    "framePresets": {
+      "apply": "Aplicar",
+      "pickerLabel": "Ajustes preestablecidos de marco: {name}",
+      "overwrite": "Sobrescribir ajuste preestablecido",
+      "overwriteBody": "¿Reemplazar el ajuste preestablecido guardado \"{name}\" con tu diseño actual?",
+      "current": "Diseño actual",
+      "new": "Nuevo ajuste preestablecido",
+      "empty": "No hay ajustes preestablecidos guardados",
+      "deleteNamed": "Eliminar {name}",
+      "deleteBody": "¿Eliminar el ajuste preestablecido de marco \"{name}\"?",
+      "title": "Ajustes preestablecidos de marco",
+      "name": "Nombre del ajuste preestablecido",
+      "slot": "Ajuste preestablecido {slot}",
+      "remove": "Eliminar",
+      "saved": "Hecho.",
+      "failed": "No se pudo guardar ni cargar el ajuste preestablecido."
+    },
+    "frameMenus": {
+      "hide": "Ocultar marco",
+      "units": "Marcos de unidad",
+      "bars": "Barras de acción",
+      "trackers": "Rastreadores",
+      "auras": "Auras",
+      "combat": "Indicadores de combate",
+      "other": "Otros elementos de la interfaz",
+      "options": "Opciones de marco",
+      "allOptions": "Todas las opciones de marco",
+      "independentTarget": "Fijar el objetivo del objetivo en tu objetivo"
+    },
+    "focusTargets": {
+      "showEmpty": "Mostrar marcos de enfoque vacíos",
+      "assignHint": "Selecciona un objetivo. Pulsa {key} o haz clic en {button}.",
+      "assignClickHint": "Selecciona un objetivo. Haz clic en {button}.",
+      "ally": "Aliado",
+      "enemy": "Enemigo",
+      "unset": "Quitar enfoque",
+      "frame1": "Enfoque 1",
+      "frame2": "Enfoque 2",
+      "frame3": "Enfoque 3",
+      "assign": "Fijar enfoque {slot}",
+      "target": "Seleccionar como objetivo el enfoque {slot}"
+    },
     "professionTrainers": {
       "blacksmithing": "Instructor de Herrería",
       "cooking": "Instructor de Cocina",
@@ -343,7 +401,155 @@ export const es: EnTranslations = {
       "hobby": "Instructor de Aficiones",
       "nameplate": "<{title}>"
     },
+    "weeklyRewards": {
+      "title": "La Bóveda Semanal",
+      "tab": "Recompensas semanales",
+      "intro": "Cada hito completado gana una bóveda. Después del reinicio del Crisol, abre cada bóveda para tirar su botín y luego elige un objeto para la semana. Las recompensas abiertas se guardan, y las semanas sin reclamar siguen disponibles.",
+      "approachKeeper": "Ponte cerca del Guardián de la Bóveda para ver tus recompensas semanales.",
+      "nextReset": "Reinicio semanal del Crisol",
+      "countdown": "{days}d {hours}h {minutes}m {seconds}s",
+      "progress": "{count} / {max}",
+      "milestone": "1 tirada de tabla de botín",
+      "lockedRoll": "Desbloquea 1 tirada de tabla de botín",
+      "earned": "Bóvedas disponibles tras el próximo reinicio: {count}",
+      "normal": "Normal",
+      "heroic": "Heroico",
+      "mixedClears": "{heroic} Heroico / {normal} Normal",
+      "heroicClears": "{count} Heroico",
+      "normalClears": "{count} Normal",
+      "viewPossibleLoot": "Ver el botín posible",
+      "chooseTable": "Elegir en qué tabla tirar",
+      "selectAllTables": "Seleccionar todo",
+      "selectedTables": "{count} tablas seleccionadas",
+      "selectedTable": "{count} tabla seleccionada",
+      "noLevelLoot": "No hay botín disponible para tu nivel actual.",
+      "tableItemCount": "{count} objetos",
+      "tableItem": "{count} objeto",
+      "previouslyRolled": "Recompensa obtenida anteriormente",
+      "noTables": "No hay equipo disponible de tus jefes superados registrados en esta dificultad.",
+      "tablesExhausted": "Ya se han tirado todos los objetos disponibles. Elige una recompensa revelada.",
+      "heroicUpgradeOne": "{count} superación más de mazmorra Heroica para mejorar",
+      "heroicUpgradeMany": "{count} superaciones más de mazmorra Heroica para mejorar",
+      "completedTask": {
+        "raidOne": "{count} encuentro de banda superado",
+        "raidMany": "{count} encuentros de banda superados",
+        "dungeonOne": "{count} mazmorra superada",
+        "dungeonMany": "{count} mazmorras superadas",
+        "worldOne": "{count} misión de mundo completada",
+        "worldMany": "{count} misiones de mundo completadas",
+        "pvpOne": "{count} combate clasificatorio ganado",
+        "pvpMany": "{count} combates clasificatorios ganados"
+      },
+      "requiredTask": {
+        "raidOne": "Supera {count} encuentro de banda",
+        "raidMany": "Supera {count} encuentros de banda",
+        "dungeonOne": "Supera {count} mazmorra",
+        "dungeonMany": "Supera {count} mazmorras",
+        "worldOne": "Completa {count} misión de mundo",
+        "worldMany": "Completa {count} misiones de mundo",
+        "pvpOne": "Gana {count} combate clasificatorio",
+        "pvpMany": "Gana {count} combates clasificatorios"
+      },
+      "readyWeeks": "Semanas sin reclamar: {count}. Reclama primero la semana completada más antigua.",
+      "claimLastWeek": "Reclamar la recompensa de la semana pasada",
+      "readyTitle": "Tus recompensas semanales están listas",
+      "readyDescription": "Te espera una semana completa de recompensas. Abre tus bóvedas ganadas y luego elige un objeto para reclamar.",
+      "notNow": "Ahora no",
+      "completedWeek": "Semana terminada el {date}",
+      "currentWeek": "Volver al progreso de esta semana",
+      "openRewards": "Abrir tus bóvedas ganadas",
+      "openedCount": "{count} de {total} bóvedas abiertas. Ábrelas todas para elegir tu recompensa.",
+      "openingSavedReward": "Abriendo la bóveda y guardando tu recompensa...",
+      "rewardNumber": "Recompensa {count}",
+      "openVault": "Abrir bóveda: {name}",
+      "inspectItem": "Inspeccionar {name}",
+      "selectItem": "Seleccionar {name}",
+      "revealed": "Revelado",
+      "revealedItem": "Revelado: {name}",
+      "chooseReward": "Elegir una recompensa",
+      "confirmTitle": "¿Reclamar {name}?",
+      "confirmClaim": "Confirmar reclamación",
+      "backToChoices": "Volver a las opciones",
+      "claimRequested": "Reclamación solicitada. Si tus bolsas están llenas, haz sitio y vuelve a elegir.",
+      "waiting": "Todavía no hay recompensas listas. Las bóvedas ganadas esta semana se desbloquean en el próximo reinicio.",
+      "chooseOne": "Elige con cuidado: tomar un objeto renuncia a cualquier otra opción de esa semana.",
+      "itemLevel": "Nivel de objeto {level}",
+      "backlogFull": "Tus semanas guardadas están al completo. Recoge las recompensas para hacer sitio a las semanas futuras.",
+      "claim": "Tomar el objeto seleccionado",
+      "poolSize": "Ver {count} objetos",
+      "worldPoolRule": "Equipo Normal de Nythraxis. No requiere haber superado la banda.",
+      "poolRule": "Todos los objetos listados tienen la misma probabilidad. Los objetos respetan las restricciones de tu clase. Las bandas derrotadas desbloquean su botín en esa dificultad. Los objetos legendarios quedan excluidos.",
+      "selectionPoolRule": "Para bandas y mazmorras, selecciona una o más tablas antes de abrir. Las tablas de mazmorra combinan los jefes que has superado en esa dificultad. Las tiradas excluyen duplicados, objetos legendarios y equipo que exija más de {maxLevelOffset} niveles por encima del tuyo.",
+      "rare": "Raro",
+      "epic": "Épico",
+      "unavailable": "Todavía no disponible",
+      "worldUnavailable": "Las recompensas de misión de mundo estarán disponibles cuando lleguen las misiones de mundo rotativas.",
+      "category": {
+        "raid": "Bandas",
+        "dungeon": "Mazmorras",
+        "world": "Misiones de mundo",
+        "pvp": "JcJ"
+      },
+      "task": {
+        "raid": "Derrota distintos encuentros de banda. Cada encuentro cuenta una vez; una superación Heroica mejora su crédito.",
+        "dungeon": "Completa mazmorras. Tus mejores superaciones determinan la dificultad de la recompensa en cada hito.",
+        "world": "Completa misiones de mundo rotativas. Las misiones de historia no cuentan.",
+        "pvp": "Gana combates clasificatorios de arena o de campo de batalla. Las partidas de práctica y los abandonos no cuentan."
+      },
+      "pool": {
+        "raid": "Botín de banda Normal",
+        "raid_heroic": "Botín de banda Heroica",
+        "dungeon": "Botín de mazmorra Normal",
+        "dungeon_heroic": "Botín de mazmorra Heroica",
+        "world": "Botín de misión de mundo",
+        "pvp": "Equipo de guerra"
+      }
+    },
+    "ferry": {
+      "regionLabel": "Horario del transbordador",
+      "departsIn": "El transbordador a {dest} sale en {time}",
+      "castingOff": "El transbordador a {dest} está zarpando",
+      "boardHint": "Súbete a su cubierta cuando zarpe. La travesía es gratis.",
+      "sailing": "Navegando hacia {dest}"
+    },
     "materialStackSelectionUnavailable": "Esa selección de materiales ya no está disponible.",
+    "vehicle": {
+      "title": "El cañón de La Guardia del Norte",
+      "objective": "Defiende La Guardia del Norte",
+      "lastKeepTitle": "El cañón de La Última Fortaleza",
+      "lastKeepObjective": "Defiende el acceso a La Última Fortaleza",
+      "cannonball": "Bala de cañón",
+      "grapeshot": "Metralla",
+      "incendiary": "Disparo incendiario",
+      "integrity": "Integridad del cañón",
+      "exit": "Abandonar el cañón",
+      "wave": "Oleada {wave}/{total}",
+      "endlessWave": "Oleada infinita {wave} (ronda {round})",
+      "resultWaves": "Oleadas resistidas: {waves}.",
+      "enemies": "Enemigos restantes: {count}",
+      "countdown": "Prepárate: {seconds}",
+      "hint": "Elige un disparo y luego haz clic en el suelo para disparar.",
+      "aim": "Haz clic para disparar. El clic derecho o Escape cancela la puntería.",
+      "sapperWarning": "¡Zapador en camino! Detén al portador explosivo antes de que llegue a la línea.",
+      "chargeWarning": "¡El comandante ordena una carga! Todos los enemigos supervivientes se mueven más rápido.",
+      "armorHint": "Rompe los escudos plateados con Bala de cañón y luego usa Disparo incendiario.",
+      "exposedHint": "Armadura rota: Disparo incendiario inflige el doble de daño.",
+      "barrelHint": "Dispara a los barriles de pólvora marcados cuando los enemigos se agrupen alrededor de ellos.",
+      "barrelRules": "Los impactos directos encienden los barriles de pólvora: {damage} de daño en un radio de {radius} yardas, con explosiones en cadena.",
+      "armorRules": "Las tropas blindadas reciben {reduction} menos de daño hasta que Bala de cañón rompe su armadura. La armadura rota recibe {bonus} más de daño de fuego.",
+      "shake": "Vibración de cámara",
+      "gold": "Medalla de oro",
+      "silver": "Medalla de plata",
+      "bronze": "Medalla de bronce",
+      "failed": "Defensa fallida",
+      "result": "{medal}: integridad {integrity}, precisión {accuracy}.",
+      "medalRules": "Oro: al menos {goldIntegrity} de integridad y {goldAccuracy} de precisión. Plata: {silverIntegrity} y {silverAccuracy}. Cualquier otra victoria gana Bronce. Cuentan los impactos a enemigos o barriles; cada disparo cuenta una vez. Las medallas no otorgan dinero extra.",
+      "shotDamage": "Inflige {damage} de daño a cada enemigo a {radius} yardas o menos del impacto.",
+      "shotSlow": "Ralentiza a los enemigos alcanzados un {amount} durante {seconds} s.",
+      "shotBurn": "Deja fuego durante {seconds} s, que inflige {damage} de daño cada segundo a los enemigos que estén dentro.",
+      "shotTiming": "Reutilización: {cooldown} s. Impacto tras {flight} s. Todos los disparos comparten {recovery} s de recuperación.",
+      "shotRules": "Apunta dentro del área marcada. Sin coste de maná. El daño no escala con el equipo ni los talentos."
+    },
     "warlock": {
       "doomLabel": "Condena",
       "fateThreadsLabel": "Hilos del destino",
@@ -388,9 +594,18 @@ export const es: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Resucitar en el cadáver",
       "resurrectAtHealer": "El Guardián Pálido (Tañido del Guardián)",
+      "ghostHint": "Corre hasta el lugar de tu muerte o habla con el Guardián Pálido para revivir",
       "spiritHealerAlive": "El Guardián Pálido vela por los muertos. Tú aún estás entre los vivos.",
+      "keeperTalkTitle": "El Guardián Pálido",
+      "keeperTalkBody": "Puedo alzarte donde estás, pero mi Tañido viene con ello: el Tañido del Guardián reduce todos tus atributos un 75%, hasta 10 minutos en los niveles más altos. Llevar tu espíritu de vuelta a donde caíste te revive sin penalización.",
+      "keeperTalkSparedBody": "Puedo alzarte donde estás. Normalmente mi Tañido vendría con ello, un debilitamiento temporal de cuanto eres, pero eres nuevo en este mundo, así que te lo perdonaré. Llevar tu espíritu de vuelta a donde caíste te revive sin penalización de todos modos.",
+      "keeperTalkAccept": "Revívame",
+      "keeperTalkLeave": "Marcharse",
       "healerConfirmTitle": "¿Aceptar el Tañido del Guardián?",
       "healerConfirmBody": "El Guardián Pálido te revivirá aquí, pero el Tañido del Guardián reduce todos tus atributos un 75% durante un máximo de 10 minutos en los niveles más altos. Llevar tu espíritu de vuelta al cadáver te revive sin penalización.",
+      "keeperConfirmBody": "¿Estás seguro? El Guardián Pálido te revivirá, pero saldrás debilitado: el Tañido del Guardián reduce todos tus atributos un 75% hasta que se desvanece, hasta 10 minutos en los niveles más altos.",
+      "keeperConfirmSparedTitle": "¿Dejar que el Guardián te resucite?",
+      "keeperConfirmSparedBody": "¿Estás seguro? El Guardián Pálido te revivirá aquí. Estás por debajo del nivel 10, así que el Tañido del Guardián no te debilitará esta vez.",
       "healerConfirmAccept": "Revívame",
       "healerConfirmCancel": "Cancelar"
     },
@@ -405,6 +620,7 @@ export const es: EnTranslations = {
       "help": "Recuperación: /unstuck inicia una cuenta regresiva estacionaria para llevarte a un punto seguro accesible cercano.",
       "helpAtGraveyard": "Recuperación: /unstuck inicia una cuenta regresiva estacionaria y luego envía tu espíritu al cementerio más cercano. Volver a través del Guardián Pálido requiere el Tañido del Guardián.",
       "helpUnstuckSickness": "Recuperación: /unstuck inicia una cuenta regresiva estacionaria y luego te traslada al cementerio más cercano, reviviéndote si habías caído. Te deja con el Mal de desatasco durante un máximo de 5 minutos.",
+      "helpUnstuckWindow": "Recuperación: /unstuck inicia una cuenta atrás estacionaria y luego te traslada al cementerio más cercano, reviviéndote si habías caído. El primer uso en una hora es gratuito. Si lo usas de nuevo antes de que pase una hora desde el último, te deja con el Mal de desatasco hasta 5 minutos.",
       "started": "Desatascar en {seconds} segundos. Moverte, luchar, recibir daño o iniciar otra acción lo cancela.",
       "countdown": "Desatascar: {seconds}",
       "completed": "Trasladado al punto seguro accesible más cercano.",
@@ -412,6 +628,8 @@ export const es: EnTranslations = {
       "revivedAtGraveyard": "Has sido devuelto al cementerio más cercano y revivido. El Tañido del Guardián pesa sobre ti.",
       "movedToGraveyard": "Has sido trasladado al cementerio más cercano. El Mal de desatasco pesa sobre ti.",
       "revivedAtGraveyardUnstuck": "Has sido trasladado al cementerio más cercano y revivido. El Mal de desatasco pesa sobre ti.",
+      "movedToGraveyardFree": "Te hemos trasladado al cementerio más cercano. Si usas Desatascar de nuevo dentro de la hora, quedarás con el Mal de desatasco.",
+      "revivedAtGraveyardFree": "Te hemos trasladado al cementerio más cercano y te hemos revivido. Si usas Desatascar de nuevo dentro de la hora, quedarás con el Mal de desatasco.",
       "cancelledMoved": "Desatascar se canceló porque te moviste.",
       "cancelledDamaged": "Desatascar se canceló porque recibiste daño.",
       "cancelledCombat": "Desatascar se canceló porque entraste en combate.",
@@ -518,6 +736,15 @@ export const es: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Ventana de comercio cerrada.",
+      "offerQuantityHint": "Se te preguntará cuántos quieres ofrecer",
+      "offerQuantityTitle": "Ofrecer {item}",
+      "offerQuantityInput": "Cantidad a ofrecer",
+      "offerQuantityConfirm": "Ofrecer",
+      "offerQuantityAll": "Ofrecer todo",
+      "offerRemoveTitle": "Quitar {item}",
+      "offerRemoveInput": "Cantidad a quitar",
+      "offerRemove": "Quitar",
+      "offerRemoveAll": "Quitar todo",
       "woc": {
         "tabGold": "Oro",
         "tabWoc": "$WOC",
@@ -1261,9 +1488,56 @@ export const es: EnTranslations = {
       "devTierCol": "Insignia",
       "mergedPrs": "PR fusionadas",
       "devEmpty": "Aún no hay colaboradores clasificados.",
+      "tabWorldQuests": "Misiones mundiales",
+      "wqBoardsLabel": "Tablas de puntuación de misiones mundiales",
+      "wqMedal": "Medalla",
+      "wqWaves": "Oleadas resistidas",
+      "wqTime": "Tiempo",
+      "gliderCourseNames": {
+        "downs": "Circuito Costero",
+        "valleys": "Circuito del Valle",
+        "switchbacks": "Curvas de la Cresta"
+      },
+      "gliderDaily": "{course}: Hoy",
+      "gliderLifetime": "{course}: Histórico",
+      "gliderStart": "Volar este circuito",
+      "gliderRankings": "Récords de circuitos de planeador",
+      "gliderPersonalRules": "Tus récords sin conexión, guardados con este personaje. Pasa por todos los aros en orden. Los récords diarios se reinician cada día.",
+      "gliderRules": "Gana el vuelo completo más rápido. Pasa por todos los aros. Los récords diarios se reinician con el reino. Los récords se actualizan en un plazo de 30 segundos.",
+      "wqPoints": "Puntuación",
+      "wqSeconds": "{seconds} s",
+      "wqNoMedal": "Ninguna",
+      "wqMedals": {
+        "gold": "Oro",
+        "silver": "Plata",
+        "bronze": "Bronce"
+      },
+      "wqEmpty": "Todavía no hay puntuaciones en este tablón. Completa la misión mundial para conseguir un puesto.",
       "podiumLabel": "Los tres primeros",
       "unclaimed": "Sin reclamar",
       "prestigeTitle": "Prestigio {rank}"
+    },
+    "wqLadder": {
+      "title": "Clasificación de misiones de mundo",
+      "subtitle": "El mejor intento de cada héroe, una clasificación por cada misión de mundo con medalla.",
+      "close": "Cerrar la clasificación de misiones de mundo",
+      "rankedBy": {
+        "waves": "Por oleadas resistidas",
+        "seconds": "Por el tiempo más rápido",
+        "points": "Por la puntuación más alta"
+      },
+      "rankedByMedal": {
+        "waves": "Por medalla y luego oleadas resistidas",
+        "seconds": "Por medalla y luego el tiempo más rápido",
+        "points": "Por medalla y luego la puntuación más alta"
+      },
+      "podiumLabel": "Los tres mejores",
+      "unclaimed": "Sin reclamar",
+      "totalOne": "Un héroe clasificado",
+      "totalMany": "{count} héroes clasificados",
+      "selfLabel": "Tu mejor marca",
+      "selfRank": "Puesto {rank}",
+      "selfNone": "Aún no tienes puntuación en esta tabla. Completa la misión de mundo para entrar en la clasificación."
     },
     "pledge": {
       "open": "Acepta compromisos",
@@ -1291,6 +1565,48 @@ export const es: EnTranslations = {
       "yourPledge": "Tu compromiso: {guild}",
       "since": "Comprometido el {date}",
       "withdraw": "Retirar compromiso"
+    },
+    "guildRanks": {
+      "tab": "Rangos",
+      "introEdit": "Nombra los rangos de tu hermandad y elige qué puede hacer cada uno. Los cambios se aplican a todos los que tengan ese rango en cuanto guardes.",
+      "introView": "El título de cada rango y lo que puede hacer. Solo el Maestro de hermandad puede cambiarlos.",
+      "colRank": "Rango",
+      "colTitle": "Título",
+      "colMembers": "Miembros",
+      "colActions": "Orden",
+      "numbered": "Rango {n}",
+      "perm": {
+        "invite": "Invitar",
+        "remove": "Expulsar",
+        "promote": "Ascender",
+        "bank": "Banco de la hermandad",
+        "officerChat": "Chat de oficiales",
+        "motd": "Mensaje del día",
+        "events": "Calendario"
+      },
+      "permHint": {
+        "invite": "Invitar jugadores a la hermandad y responder a sus compromisos.",
+        "remove": "Expulsar a miembros con un rango inferior.",
+        "promote": "Ascender y degradar a miembros con un rango inferior, hasta un rango por debajo del propio.",
+        "bank": "Depositar y retirar cobre y objetos del banco de la hermandad. Cualquier miembro puede consultarlo.",
+        "officerChat": "Leer y hablar en el chat de oficiales.",
+        "motd": "Editar el mensaje del día de la hermandad.",
+        "events": "Añadir y quitar eventos del calendario de la hermandad."
+      },
+      "titleLabel": "Título para {rank}",
+      "permLabel": "{perm} para {rank}",
+      "leaderLocked": "El Maestro de hermandad siempre tiene todos los permisos.",
+      "add": "Añadir rango",
+      "save": "Guardar rangos",
+      "moveUp": "Subir {rank}",
+      "moveDown": "Bajar {rank}",
+      "remove": "Eliminar {rank}",
+      "full": "Una hermandad puede tener como máximo {max} rangos.",
+      "invalidTitle": "Los títulos de rango usan letras, números, espacios, apóstrofos y guiones, hasta {max} caracteres.",
+      "removeConfirm": "Los miembros con el rango {rank} pasarán a ser {fallback}. ¿Eliminar este rango?",
+      "removeAccept": "Eliminar rango",
+      "promoteTo": "Ascender a {name} a {rank}",
+      "demoteTo": "Degradar a {name} a {rank}"
     },
     "raidLockout": {
       "title": "Bloqueos de banda",
@@ -1389,6 +1705,7 @@ export const es: EnTranslations = {
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Otros ({count})",
+      "targetsHeader": "Objetivos",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
       "melee": "Cuerpo a cuerpo",
@@ -1396,7 +1713,154 @@ export const es: EnTranslations = {
       "resize": "Arrastra para cambiar el tamaño de este medidor",
       "dock": "Devuelve este medidor a la ventana de medidores",
       "separate": "Separar {meter}",
-      "regroup": "Reagrupar {meter}"
+      "regroup": "Reagrupar {meter}",
+      "settingsTitle": "Ajustes de Details / Medidores",
+      "optionsEngineBadge": "WoC Details! Engine",
+      "resetDefaults": "Restablecer por defecto",
+      "closeSettings": "Cerrar",
+      "densityCompact": "Densidad: Compacta (16px)",
+      "densityStandard": "Densidad: Estandar (20px)",
+      "bgGlass": "Fondo: Cristal (76%)",
+      "bgSolid": "Fondo: Solido (98%)",
+      "bgMinimal": "Fondo: Minimo (45%)",
+      "numDetailed": "Numeros: Detallados",
+      "numCompact": "Numeros: Abreviados (k/M)",
+      "raidTotalsOn": "Total de grupo en cabecera: Si",
+      "raidTotalsOff": "Total de grupo en cabecera: No",
+      "tabGeneral": "Ventana y Fondo",
+      "tabGeneralDesc": "Opacidad, escala, bloqueo",
+      "tabBars": "Barras y Texturas",
+      "tabBarsDesc": "Altura, espaciado, animacion",
+      "tabText": "Texto y Tipografia",
+      "tabTextDesc": "Fuentes, k/M, DPS, clasif.",
+      "tabHeader": "Cabecera y Titulo",
+      "tabHeaderDesc": "Total de grupo, botones",
+      "tabCombat": "Combate y Limites",
+      "tabCombatDesc": "Filas maximas, escudos",
+      "tabPresets": "Temas Rapidos",
+      "tabPresetsDesc": "Presets de 1 clic",
+      "tabProfiles": "Perfiles e Importar",
+      "tabProfilesDesc": "Exportar, importar y perfiles",
+      "groupWindow": "Fondo y Apariencia de Ventana",
+      "bgMode": "Modo de Fondo",
+      "bgModeDesc": "Estilo visual del panel del medidor.",
+      "optGlass": "Cristal (Blur)",
+      "optGlassDesc": "Efecto esmerilado con desenfoque",
+      "optSolid": "Solido",
+      "optSolidDesc": "Panel oscuro de alto contraste",
+      "optMinimal": "Minimo",
+      "optMinimalDesc": "Translucido tenue",
+      "optTransparent": "Transparente",
+      "optTransparentDesc": "Sin fondo, solo barras",
+      "bgOpacity": "Opacidad de Fondo",
+      "bgOpacityDesc": "Porcentaje de opacidad del fondo de la ventana.",
+      "windowScale": "Escala de la Ventana",
+      "windowScaleDesc": "Aumenta o reduce el tamaño de escala general del medidor.",
+      "lockPosition": "Bloquear Posicion",
+      "lockPositionDesc": "Fija la ventana para evitar moverla o redimensionarla accidentalmente en combate.",
+      "groupBars": "Geometria y Textura de las Barras",
+      "barHeight": "Altura de Barra",
+      "barHeightDesc": "Grosor vertical de cada fila de daño/sanacion (14px compacto a 26px amplio).",
+      "barSpacing": "Espaciado entre Barras",
+      "barSpacingDesc": "Separacion vertical en pixeles entre filas contiguas.",
+      "barTexture": "Textura de las Barras",
+      "barTextureDesc": "Acabado visual y sombreado sobre el color de clase.",
+      "texSpecular": "Especular (Glossy)",
+      "texSpecularDesc": "Reflejo superior de luz con bisel",
+      "texSmooth": "Plano (Smooth)",
+      "texSmoothDesc": "Color limpio plano de clase",
+      "texGradient": "Degradado",
+      "texGradientDesc": "Gradiente horizontal suave",
+      "barAnimation": "Animacion Suave de Barras",
+      "barAnimationDesc": "Interpola fluidamente el crecimiento y descenso de barras en tiempo real.",
+      "alwaysShowMe": "Mostrarme Siempre (Always Show Me)",
+      "alwaysShowMeDesc": "Fija siempre la barra de tu personaje abajo si quedas fuera de las filas visibles.",
+      "groupText": "Formato de Texto y Telemetria",
+      "numFormat": "Formato Numerico",
+      "numFormatDesc": "Estilo de visualizacion de los totales.",
+      "optNumCompact": "Abreviado (k / M)",
+      "optNumCompactDesc": "Ejemplo: 145.2k, 1.2M",
+      "optNumDetailed": "Detallado Completo",
+      "optNumDetailedDesc": "Ejemplo: 145,200, 1,240,500",
+      "optNumDamageDps": "Daño | DPS",
+      "optNumDamageDpsDesc": "Ejemplo: 239.2k | 18.4k (telemetria limpia)",
+      "showDps": "Mostrar Tasa por Segundo (DPS / HPS)",
+      "showDpsDesc": "Muestra la tasa de daño o sanacion por segundo en cada barra.",
+      "showPercent": "Mostrar Porcentaje (%)",
+      "showPercentDesc": "Muestra la proporcion porcentual de contribucion sobre el total de la banda.",
+      "showRank": "Mostrar Posicion (#1, #2...)",
+      "showRankDesc": "Muestra el numero ordinal de clasificacion a la izquierda del nombre.",
+      "showClassIcon": "Mostrar Icono de Clase",
+      "showClassIconDesc": "Muestra el icono de la clase o rol del jugador junto a su nombre.",
+      "groupFont": "Tipografia de Combate (Fuente de Letra)",
+      "groupHeader": "Personalizacion de la Cabecera",
+      "showTitleBar": "Mostrar Barra de Titulo",
+      "showTitleBarDesc": "Muestra la barra superior con el nombre del combate y controles.",
+      "showRaidTotals": "Resumen de Grupo en Subtitulo",
+      "showRaidTotalsDesc": "Muestra el total acumulado de DPS y HPS del grupo entero en el subtitulo.",
+      "groupCombat": "Reglas de Combate y Limites",
+      "maxRows": "Filas Maximas Visibles",
+      "maxRowsDesc": "Numero de barras simultaneas (0 = ilimitadas, ajustadas al alto de ventana).",
+      "autoRows": " (Auto)",
+      "barsUnit": " barras",
+      "includeShields": "Contabilizar Escudos como Sanacion",
+      "includeShieldsDesc": "Suma el daño absorbido por escudos a la columna de Sanacion.",
+      "groupPresets": "Temas Rapidos de 1 Clic",
+      "applyPreset": "Aplicar Tema",
+      "presetDetailsName": "Cristal Moderno",
+      "presetDetailsDesc": "Fondo de cristal esmerilado con desenfoque, barras especulares con brillo, numeros abreviados y telemetria completa.",
+      "presetDetailsBadge": "Recomendado",
+      "presetClassicName": "Sólido Clásico",
+      "presetClassicDesc": "Panel solido oscuro de alto contraste, barras planas de clase, numeros detallados sin abreviar estilo clasico.",
+      "presetClassicBadge": "Clásico",
+      "presetMinimalName": "Minimalista Puro",
+      "presetMinimalDesc": "Fondo casi transparente, barras compactas de 16px sin espaciado, texto directo sin porcentajes.",
+      "presetMinimalBadge": "Limpio",
+      "presetRaidName": "Raid Focus",
+      "presetRaidDesc": "Diseñado para bandas: densidad compacta de 18px, limite de 10 barras, total de grupo visible y fijado personal.",
+      "presetRaidBadge": "Banda",
+      "presetProGradientName": "Degradado Pro",
+      "presetProGradientDesc": "Panel transparente flotante, barras con degradado horizontal, iconos de especializacion y telemetria Daño | DPS.",
+      "presetProGradientBadge": "Pro",
+      "groupManageProfiles": "Gestion de Perfiles",
+      "activeProfile": "Perfil Activo",
+      "activeProfileDesc": "Selecciona o administra perfiles independientes para cada situacion de juego.",
+      "saveAs": "Guardar Como...",
+      "duplicate": "Duplicar",
+      "deleteProfile": "Eliminar",
+      "cannotDeleteDefault": "No se puede eliminar el perfil Default",
+      "promptNewProfile": "Nombre del nuevo perfil:",
+      "profileCopySuffix": " (Copia)",
+      "groupExport": "Exportar Perfil Actual",
+      "exportDesc": "Cadena codificada de tu configuracion actual. Copiala para compartirla o guardarla de respaldo.",
+      "copyString": "Copiar Cadena de Perfil",
+      "copiedFeedback": "Copiado al portapapeles!",
+      "groupImport": "Importar Perfil",
+      "importDesc": "Pega aqui una cadena de perfil (!WoC-Details:... o JSON) para aplicar y guardar la configuracion.",
+      "importPlaceholder": "Pega la cadena de perfil aqui (!WoC-Details:...)",
+      "importNamePlaceholder": "Nombre para guardar (opcional)",
+      "importApply": "Importar y Aplicar",
+      "errEmptyProfile": "Por favor, pega una cadena de perfil.",
+      "errInvalidProfile": "Error: Cadena de perfil no valida o corrupta.",
+      "importSuccess": "Perfil \"{name}\" importado con exito!",
+      "reportSent": "Reporte copiado y enviado al chat",
+      "reportNoData": "Sin datos registrados.",
+      "noDetailedData": "Sin datos detallados",
+      "noDeathEvents": "Sin eventos registrados antes de la muerte",
+      "killedBy": "Asesinado por {killer} ({ability})",
+      "lethalHit": "Golpe Letal",
+      "recentCombatEvents": "Ultimos {count} eventos de combate",
+      "backComparison": "Comparativa",
+      "comparisonNeedTwo": "Se necesitan al menos 2 combates para comparar",
+      "backTimeline": "Cronologia",
+      "timelineCombatEvents": "Eventos del combate: {count}",
+      "backDev": "Balance / Dev",
+      "balanceAbilitiesCount": "Habilidades registradas: {count}",
+      "targetSubtitle": "Objetivo: {target}",
+      "noTargetData": "Sin datos de jugadores para este objetivo"
+    },
+    "auraTooltip": {
+      "caster": "Lanzado por {name}"
     },
     "auraTracks": {
       "defensives": "Enfriamientos defensivos",
@@ -1423,6 +1887,7 @@ export const es: EnTranslations = {
       "buffs": "Beneficios",
       "unlock": "Mover la ventana de auras del objetivo",
       "lock": "Bloquear la ventana de auras del objetivo",
+      "close": "Cerrar la ventana de auras del objetivo",
       "configureRows": "Configurar las auras del objetivo",
       "fewerRows": "Preferir menos filas de auras",
       "moreRows": "Preferir más filas de auras",
@@ -1516,6 +1981,7 @@ export const es: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Sacudetierra Chispa de Terror",
       "name_drakemaw_raptor": "Raptor de Drakemaw",
+      "name_avian_strider": "Zancudo Viridiano del Valle",
       "name_mech_bird": "Cluckwork Pájaro mecánico",
       "name_lanternback_troll": "Grumbol el lomo de linterna",
       "name_chimeglass_tortoise": "Tolliver el timbre de cristal",
@@ -1532,6 +1998,7 @@ export const es: EnTranslations = {
       "desc_rallycart_skin": "Un pequeño coche de carreras con un rugido enorme.",
       "desc_terrorspark_groundshaker": "Una máquina blindada y compacta con orugas pesadas, un cañón de gran calibre y una silla hecha para pilotos intrépidos.",
       "desc_drakemaw_raptor": "Un raptor de cría domado para la silla, procedente de la Caldera de Drakemaw, puro tendón y arranque, que aún huele ligeramente a ceniza.",
+      "desc_avian_strider": "Un ave de monta imponente cuyas pesadas garras y alas plegadas convierten cada viaje en una carrera atronadora.",
       "desc_mech_bird": "Un pollo de guerra mecánico hecho a mano que corre con servos chasqueantes y la llave de cuerda sigue girando.",
       "desc_lanternback_troll": "Un troll de las colinas sometido al yugo de los faroleros, que lleva un trono de hierro sobre los hombros y una linterna de tormenta encendida en cada brazo.",
       "desc_chimeglass_tortoise": "Una tortuga salada que ha dejado atrás a tres generaciones de caravanas. Los caldereros le quitaron las gafas de cristal de tormenta y le colgaron una campana de bronce en el cuello, de modo que la carretera le oye mucho antes de verlo.",
@@ -1648,6 +2115,7 @@ export const es: EnTranslations = {
       "clickMoveLeft": "Clic izquierdo",
       "clickMoveRight": "Clic derecho",
       "version": "v{version} ({build})",
+      "overlays": "Superposiciones",
       "browserEffects": "Efectos del navegador",
       "browserEffectsAuto": "Auto",
       "browserEffectsFull": "Completos",
@@ -1677,6 +2145,9 @@ export const es: EnTranslations = {
       "gfxBloom": "Resplandor",
       "gfxAntiAliasing": "Suavizado de bordes",
       "gfxDynamicLights": "Luces dinámicas",
+      "gfxGhostFade": "Estela de cámara",
+      "gfxGhostFadeDithered": "Tramado",
+      "gfxGhostFadeSmooth": "Suave",
       "gfxParticleEffects": "Efectos de partículas",
       "gfxHalf": "Mitad",
       "gfxCustomNote": "Cambiar un ajuste pasa el preset de calidad a Avanzada: una mezcla personalizada basada en el nivel Alto, partiendo de los valores mostrados para tu preset actual.",
@@ -1701,6 +2172,15 @@ export const es: EnTranslations = {
       "shaderWarmOff": "Desactivado",
       "shaderWarmOn": "Activado",
       "shaderWarmNote": "Precalienta la caché de sombreadores en segundo plano para evitar tirones durante el juego. Auto: activado solo cuando tu sistema gráfico lo admite. (Recomendado). Activado: forzado en todas partes. Puede empeorar el rendimiento en algunas configuraciones. Desactivado: deshabilitado.",
+      "frameRateCap": "Límite de fotogramas",
+      "frameRateCapAuto": "Auto",
+      "frameRateCapDisplay": "Pantalla",
+      "frameRateCapSixty": "60",
+      "frameRateCapThirty": "30",
+      "frameRateCapNote": "Limita cuántas imágenes dibuja el juego cada segundo. En un equipo que no da abasto con su pantalla, un límite más bajo ofrece una imagen más estable y mantiene el equipo más fresco. El límite sigue a tu pantalla, así que la tasa real puede diferir un poco del número. Auto baja el límite solo cuando este equipo no da abasto con su pantalla, y luego lo mantiene estable. (Recomendado). Pantalla: sin límite.",
+      "frameRateCapStatusPaced": "Dibujando {fps} FPS en una pantalla de {hz} Hz.",
+      "frameRateCapStatusUnpaced": "Limitando a {fps} FPS.",
+      "frameRateCapStatusInert": "Esta pantalla ya funciona en este límite o por debajo de él, así que el límite no cambia nada.",
       "gpuBackend": "Motor gráfico",
       "gpuBackendAuto": "Auto",
       "gpuBackendVulkan": "Vulkan",
@@ -1728,7 +2208,9 @@ export const es: EnTranslations = {
       "targetHealthText": "Texto de salud objetivo",
       "aurasOnPlayerFrame": "Beneficios en el marco del jugador",
       "auraBarBelowFrame": "Beneficios debajo del marco del jugador",
+      "targetAurasBelowFrame": "Auras del objetivo debajo del marco",
       "alwaysShowAllBuffs": "Mostrar siempre todos los beneficios",
+      "showAuraCaster": "Mostrar el lanzador del aura en la información emergente",
       "highContrastBackground": "Fondo de alto contraste",
       "startAttackOnAbility": "Ataque automático al usar habilidad",
       "stopAutoAttackOnTargetSwitch": "Detener ataque automático al cambiar de objetivo",
@@ -1763,6 +2245,11 @@ export const es: EnTranslations = {
       "showFriendlyTrack": "Mostrar mis beneficios sobre aliados",
       "showShieldTrack": "Mostrar mis escudos",
       "waterRipples": "Ondas en el agua (estelas)",
+      "actionCam": "Cámara de acción",
+      "actionCamShoulder": "Hombro de la cámara de acción",
+      "actionCamShoulderLeft": "Izquierda {pct}",
+      "actionCamShoulderRight": "Derecha {pct}",
+      "actionCamShoulderCenter": "Centro",
       "showAttackButton": "Mostrar boton de ataque",
       "showDailyRewardsChest": "Mostrar cofre de recompensas diarias",
       "mobileCameraJoystick": "Palanca de mando de la cámara",
@@ -1822,7 +2309,7 @@ export const es: EnTranslations = {
       "crossHotbarHelp": "Mantenga presionado un gatillo para iluminar ocho ranuras de la barra de acción en el d-pad y los botones frontales. Toque el otro disparador para cambiar al segundo conjunto.",
       "crossHotbarResetLayout": "Restablecer barra de acceso rápido cruzada",
       "crossHotbarPosition": "{trigger} + {button}",
-      "crossHotbarOwnsButtons": "Los disparadores modifican la barra de acceso rápido cruzada mientras está activada. Las direcciones del d-pad siguen siendo editables aquí para los menús y el movimiento.",
+      "crossHotbarOwnsButtons": "Los disparadores y el d-pad pertenecen a la barra de acceso rápido cruzada mientras está encendida, por lo que están configurados debajo en lugar de aquí.",
       "cancelAction": "Cancelar / Atrás",
       "subcommandsAction": "Subcomandos / Mapa",
       "cycleHudAction": "Interfaz de ciclo",
@@ -1833,11 +2320,12 @@ export const es: EnTranslations = {
       "crossHotbarDisplayMinimal": "Sólo mientras se mantiene",
       "crossHotbarArrangeChord": "{bumper} + {button}",
       "crossHotbarCarrying": "Llevar {action}: confirmar en una celda para colocarlo, cancelar para volver a colocarlo.",
-      "crossHotbarEditHint": "Organizando · el d-pad mueve · confirmar recoge y coloca · cancelar borra una celda",
+      "crossHotbarEditHint": "Organizar: confirmar recoge de una celda o del libro de hechizos y deja caer en una celda, cancelar borra una.",
       "crossHotbarEditHelp": "Sostenga el parachoques izquierdo y presione el botón de la cara superior para organizar la barra con el controlador."
     },
     "perf": {
       "title": "Superposición de rendimiento",
+      "overlaySection": "Superposición de rendimiento",
       "enable": "Mostrar superposición de rendimiento",
       "description": "Elige qué estadísticas mostrar, dónde se ubica la superposición y cómo se ve.",
       "sectionPosition": "Posición",
@@ -2079,6 +2567,80 @@ export const es: EnTranslations = {
         }
       }
     },
+    "cooldownManager": {
+      "title": "Gestor de reutilización",
+      "intro": "Botones flotantes para los hechizos que elijas. No se pueden pulsar: cada uno muestra su reutilización, se atenúa mientras no puedas lanzarlo y se ilumina cuando está listo.",
+      "generalTitle": "General",
+      "enabled": "Mostrar el gestor de reutilización",
+      "idleOpacity": "Opacidad mientras no está listo",
+      "combatOnly": "Sonidos solo en combate",
+      "dragHint": "Mientras este menú esté abierto, todos los grupos se muestran en pantalla y puedes arrastrarlos para moverlos.",
+      "addSingle": "Añadir botón individual",
+      "addGrid": "Añadir grupo de botones",
+      "addLine": "Añadir línea de hechizos",
+      "groupsFull": "Tienes el máximo de grupos permitidos. Elimina uno para añadir otro.",
+      "noGroups": "Añade un botón individual, un grupo de botones o una línea de hechizos para empezar.",
+      "groupSingle": "Botón individual {index}",
+      "groupGrid": "Grupo de botones {index}",
+      "groupLine": "Línea de hechizos {index}",
+      "groupName": "Nombre del grupo",
+      "spellCount": "{count} / {max} hechizos",
+      "orientation": "Orientación",
+      "horizontal": "Horizontal",
+      "vertical": "Vertical",
+      "columns": "N.º de columnas",
+      "rows": "N.º de filas",
+      "direction": "Dirección del icono",
+      "dirRight": "Derecha",
+      "dirLeft": "Izquierda",
+      "dirDown": "Abajo",
+      "dirUp": "Arriba",
+      "iconSize": "Tamaño del icono",
+      "iconPadding": "Espaciado del icono",
+      "opacity": "Opacidad",
+      "visibility": "Visibilidad",
+      "visAlways": "Siempre visible",
+      "visCombat": "En combate",
+      "visHidden": "Oculto",
+      "visHiddenHint": "Un grupo oculto sigue reproduciendo sus sonidos e iluminando tu barra de acción.",
+      "showTimer": "Mostrar temporizador",
+      "positionX": "Posición horizontal",
+      "positionY": "Posición vertical",
+      "resetPosition": "Restablecer a la posición predeterminada",
+      "deleteGroup": "Eliminar grupo",
+      "deleteGroupAria": "Eliminar {group}",
+      "trackedTitle": "Hechizos seguidos",
+      "trackedHint": "Arrastra un hechizo a un grupo, o selecciónalo para elegir su grupo y sus avisos. Un botón sigue a su hechizo cuando cambia a otro, y se ilumina al hacerlo.",
+      "search": "Buscar hechizos",
+      "searchPlaceholder": "Buscar",
+      "notDisplayed": "No mostrado",
+      "otherSpells": "Otros hechizos",
+      "otherSpellsHint": "Hechizos de tus otras especializaciones, elecciones de talento y niveles superiores. Colócalo ahora y su botón aparecerá en cuanto lo aprendas.",
+      "notKnown": "{spell} (aún no aprendido)",
+      "aurasTitle": "Activaciones, motores y beneficios",
+      "aurasHint": "Recursos de motor y sus acumulaciones, activaciones, y los beneficios que tus hechizos te otorgan. Cualquier otra cosa que hayas tenido también aparece aquí.",
+      "auraFallback": "Aura",
+      "onlyWhileActive": "Mostrar solo mientras esté activo",
+      "alertStacks": "Avisar en acumulaciones",
+      "alertStacksAny": "Al obtenerla",
+      "alertStacksHint": "El botón se ilumina, pulsa y suena en cuanto el aura alcanza esta cantidad de acumulaciones. Al obtenerla significa en cuanto aparece.",
+      "auraSoundHint": "Suena cuando aparece el aura, o cuando alcanza tu objetivo de acumulaciones.",
+      "emptySection": "Suelta un hechizo aquí.",
+      "spellsEmpty": "Todavía no conoces ningún hechizo.",
+      "selectSpell": "Seleccionar {spell}",
+      "group": "Grupo",
+      "groupFullOption": "{group} (lleno)",
+      "notInGroupHint": "Pon este hechizo en un grupo para mostrar su botón.",
+      "moveEarlier": "Mover {spell} antes",
+      "moveLater": "Mover {spell} después",
+      "glowWhenReady": "Iluminar cuando esté listo",
+      "glowWhenReadyHint": "Aclara y resalta el borde del botón mientras el hechizo se puede lanzar.",
+      "hotbarGlow": "Brillo en la barra de acción",
+      "hotbarGlowHint": "También ilumina este hechizo en tu barra de acción mientras esté listo.",
+      "onlyWhenReady": "Mostrar solo cuando esté listo",
+      "sound": "Sonido de listo",
+      "soundHint": "Suena cuando el hechizo queda listo, o cuando su botón cambia a otro hechizo mientras está listo."
+    },
     "auraOverlay": {
       "title": "Auras",
       "currentClass": "Clase actual: {class}",
@@ -2202,19 +2764,80 @@ export const es: EnTranslations = {
         "battlegroundFirstWin": "primera victoria del día en Thornhollow Fields",
         "battlegroundComplete": "batalla de Thornhollow Fields disputada",
         "battlegroundKill": "muerte honorable",
-        "battlegroundAssist": "golpe de gracia asistido"
+        "battlegroundAssist": "golpe de gracia asistido",
+        "worldKill": "muerte en el mundo abierto",
+        "worldAssist": "muerte en el mundo abierto asistida",
+        "hillHold": "manteniendo la colina"
       },
       "floatReasons": {
         "kill": "Baja",
         "assist": "Asistencia",
-        "firstWin": "Primera victoria"
+        "firstWin": "Primera victoria",
+        "hill": "Colina"
       }
+    },
+    "worldPvp": {
+      "tab": "JcJ mundial",
+      "title": "JcJ mundial",
+      "blurb": "Alza tu bandera para luchar contra otros jugadores marcados en cualquier lugar del mundo abierto. Derrota a uno y llévate parte de su bolsa, más Honor hacia el equipo de guerra. Los campos de batalla y las arenas siguen pagando más.",
+      "statusOn": "Tu bandera de JcJ está alzada. Los jugadores marcados pueden atacarte.",
+      "statusOff": "Tu bandera de JcJ está bajada. No puedes atacar ni ser atacado en el mundo abierto.",
+      "statusOffFfa": "Tu bandera de JcJ está bajada, pero en terreno de todos contra todos aún puedes atacar y ser atacado.",
+      "statusDisarming": "Tu bandera baja en {time}, o cuando termine tu combate actual.",
+      "zoneSanctuary": "Santuario: aquí no hay JcJ mundial.",
+      "zoneContested": "Terreno disputado: aquí solo luchan los jugadores marcados.",
+      "zoneFfa": "Terreno de todos contra todos: aquí cualquiera es blanco legítimo.",
+      "realmDisabled": "El JcJ mundial está desactivado en este reino.",
+      "groundSanctuary": "La Costa de la Prueba y el Valle de Eastbrook son santuarios: allí no hay JcJ mundial de ningún tipo.",
+      "groundContested": "En cualquier otro lugar, el terreno está disputado: solo pueden luchar dos jugadores marcados.",
+      "groundFfa": "Las Tierras del Dragón, el Velo de Escarcha y la Cascada de Ámbar son de todos contra todos: allí puede luchar cualquiera, tenga la bandera alzada o no.",
+      "groupLine": "Los miembros de grupo y de banda nunca son hostiles entre sí. Los compañeros de hermandad que no estén en tu grupo sí pueden luchar.",
+      "markLine": "Atacar allí a un jugador sin marcar alza tu propia bandera; atacar a uno marcado nunca lo hace.",
+      "aidLine": "Curar, proteger con un escudo o mejorar a un jugador marcado en un combate mundial alza tu bandera.",
+      "stakeLine": "El perdedor paga {cap} o el {percent} de su bolsa, lo que sea menor.",
+      "noStakeLine": "Un jugador sin marcar que muere en terreno de todos contra todos no pierde oro.",
+      "noTakeLine": "Un combatiente sin marcar tampoco se lleva oro: este solo se mueve entre dos jugadores marcados.",
+      "honorLine": "{honor} de Honor por baja, repartido entre todos los que ayudaron.",
+      "splitLine": "Un 1c1 limpio paga el bote entero; quienes ayudan y sus sanadores lo reparten.",
+      "repeatLine": "Las bajas repetidas sobre un mismo jugador pagan {second}, luego {third}, y después nada; el contador se reinicia {reset} después de la primera baja.",
+      "greyLine": "Los jugadores con más de {levels} niveles por debajo del tuyo no pagan nada.",
+      "disarmLine": "Desactivarla tarda {minutes} minutos y espera a que termine el combate.",
+      "record": "Historial: {kills} bajas, {deaths} muertes",
+      "enable": "Activar el JcJ mundial",
+      "disable": "Desactivar el JcJ mundial",
+      "keepUp": "Mantener la bandera alzada",
+      "confirmBody": "Otros jugadores marcados podrán atacarte en cualquier lugar y llevarse hasta {cap} de tu bolsa si ganan. Puedes desactivarla de nuevo, pero tarda {minutes} minutos.",
+      "confirmAccept": "Alzar bandera",
+      "confirmCancel": "Cancelar",
+      "levelReq": "Requiere nivel {level}.",
+      "pending": "Esperando tu estado de JcJ del reino.",
+      "commandHint": "Chat: /pvp alterna la bandera; /pvp on y /pvp off la fijan."
+    },
+    "hill": {
+      "title": "El Rey de la Colina",
+      "rising": "La colina aún no se ha alzado",
+      "heldYou": "Tu grupo controla la colina",
+      "heldOther": "Otro grupo controla la colina",
+      "heldNone": "Nadie controla la colina",
+      "counts": "Dentro: tú {yours}, poseedor {theirs}",
+      "countsUnheld": "Dentro: tú {yours}, mayor rival {theirs}",
+      "countsHolding": "Dentro: tú {yours}, rival {theirs}",
+      "contestYou": "Tomando la colina: {seconds} de {total}",
+      "contestOther": "Perdiendo la colina: {seconds} de {total}",
+      "contestNone": "Mantén la mayoría dentro durante {total} para tomarla",
+      "inside": "Estás dentro del círculo",
+      "distance": "{yards} yd hasta el círculo",
+      "rises": "Se alza en {minutes}",
+      "falls": "Cae en {minutes}",
+      "standingRaid": "Los miembros de banda no cuentan: solo los grupos pueden controlar la colina"
     },
     "warfareShop": {
       "gossipOption": "Explorar conjuntos de guerra",
       "gossipOptionAria": "Explorar la tienda de conjuntos de guerra de {name}",
       "jewelry": "Joyería",
       "weapons": "Armas",
+      "groupSeason2": "Temporada de Guerra 2: Vanguardia",
+      "groupEntry": "Temporada de Guerra 1",
       "owned": "Adquirido",
       "buyAria": "Comprar {item} por {honor}",
       "buyOwnedAria": "Comprar {item} por {honor}, ya adquirido",
@@ -2222,7 +2845,9 @@ export const es: EnTranslations = {
     },
     "charSheet": {
       "offense": "Ofensiva",
+      "spell": "Hechizo",
       "defense": "Defensa",
+      "ratings": "Índices",
       "playtimeLabel": "Tiempo jugado",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Menos de un minuto",
@@ -2237,9 +2862,94 @@ export const es: EnTranslations = {
       "stats": "Estadísticas",
       "progression": "Progresión",
       "skills": "Habilidades",
+      "reputation": "Reputación",
+      "currencies": "Monedas",
+      "character": "Personaje",
+      "professions": "Profesiones",
       "gathering": "Reunión",
       "crafting": "Elaboración",
       "openProfessions": "Profesiones abiertas"
+    },
+    "currencies": {
+      "intro": "Ninguna de estas ocupa espacio en las bolsas. Las monedas siguen en tu bolsa como siempre.",
+      "activities": "Actividades",
+      "factions": "Facciones",
+      "honor": "Honor",
+      "delveMark": "Marca de expedición",
+      "wocToken": "WoC Token",
+      "heroicMarkNote": "Mazmorras heroicas . gástala con el intendente heroico",
+      "honorNote": "Campos de batalla y la arena",
+      "delveMarkNote": "Expediciones completadas",
+      "wocTokenNote": "Saldo de la cartera vinculada",
+      "walletNotLinked": "Ninguna cartera vinculada",
+      "wocPreview": "Saldo provisional, aún no verificado",
+      "lifetime": "Total histórico {amount}",
+      "factionPending": "Moneda de facción: pendiente para la Fase 2"
+    },
+    "reputation": {
+      "intro": "Las tres facciones avanzan a la vez: cada misión mundial cuenta para la facción de su zona.",
+      "faction": {
+        "rift_watch": "Guardia de la Brecha",
+        "church_order": "Orden de la Iglesia",
+        "automatons": "Autómatas"
+      },
+      "hub": {
+        "rift_watch": "Drifthaven",
+        "church_order": "Hermano Aldric",
+        "automatons": "Wyrmwatch"
+      },
+      "hubLine": "{hub} . {zone}",
+      "tier": {
+        "unknown": "Desconocido",
+        "recognized": "Reconocido",
+        "trusted": "Confiable",
+        "proven": "Consagrado",
+        "vanguard": "Vanguardia",
+        "champion": "Campeón"
+      },
+      "factionTitle": {
+        "rift_watch": {
+          "unknown": "Forastero",
+          "recognized": "Vigía",
+          "trusted": "Caminante de la Brecha",
+          "proven": "Guardián",
+          "vanguard": "Guardián de la Brecha",
+          "champion": "Campeón"
+        },
+        "church_order": {
+          "unknown": "Forastero",
+          "recognized": "Acólito",
+          "trusted": "Guardián",
+          "proven": "Templario",
+          "vanguard": "Guardián del Alba",
+          "champion": "Campeón"
+        },
+        "automatons": {
+          "unknown": "Forastero",
+          "recognized": "Operador",
+          "trusted": "Mecanista",
+          "proven": "Artífice",
+          "vanguard": "Maestro Forjador",
+          "champion": "Campeón"
+        }
+      },
+      "progress": "{current} / {next}",
+      "next": "Siguiente: {tier}",
+      "maxed": "Reputación máxima alcanzada",
+      "cappedByLevel": "La reputación se detiene en {tier} hasta el nivel 16",
+      "today": "Hoy",
+      "questsDone": "Misiones mundiales completadas",
+      "questsDoneValue": "{done} / {total}",
+      "resetsIn": "Tablón",
+      "resetsUnknown": "Hoy no hay tablón",
+      "title": "Título de facción",
+      "titleLine": "{faction} . {tier}",
+      "legend": "Rangos de reputación",
+      "vendorGate": "Requiere {tier} con {faction}.",
+      "standingGained": "+{amount} de reputación con {faction}.",
+      "tierReachedBanner": "Ahora eres {tier} con {faction}",
+      "tierReachedSubtext": "Título de facción: {title}",
+      "tierReachedLine": "Ahora eres {tier} con {faction}. Tu título de facción ahora es {title}."
     },
     "questLog": {
       "completed": "Terminado",
@@ -2251,6 +2961,7 @@ export const es: EnTranslations = {
       "names": {
         "spellPower": "Poder con hechizos",
         "healPower": "Poder de sanación",
+        "spellCrit": "Crítico con hechizos",
         "critRating": "Índice de golpe crítico",
         "hasteRating": "Índice de celeridad",
         "parry": "Parada",
@@ -2267,14 +2978,17 @@ export const es: EnTranslations = {
         "armor": "Amortigua los golpes físicos que recibes. La reducción es mayor contra atacantes de menor nivel y tiene un tope del 75%.",
         "attackPower": "Potencia tus ataques con el arma. Cada 14 de poder de ataque añade 1 de daño por segundo.",
         "spellPower": "Aumenta el daño de tus hechizos y la potencia de tus sanaciones. Cada punto de Intelecto otorga un poco de Poder con hechizos, además del que provenga del equipo o los beneficios.",
+        "healPower": "Aumenta la curación de tus sanaciones y efectos de curación a lo largo del tiempo, y el tamaño de tus escudos de absorción. Es tu poder con hechizos más el poder de curación de tu equipo y bonificaciones de conjunto, que se suma a la curación pero nunca al daño.",
         "dps": "El daño por segundo estimado de tu arma, combinando el daño y la velocidad de tu arma con tu poder de ataque.",
         "critChance": "Tu probabilidad de que un ataque aseste un golpe crítico, infligiendo el doble de daño.",
+        "spellCrit": "Tu probabilidad de que un hechizo o sanación golpee críticamente, infligiendo o curando un 150%. Los hechizos y sanaciones usan esta probabilidad en vez de la probabilidad de golpe crítico: el Intelecto solo aumenta esta, mientras que el índice de golpe crítico, los talentos y las bonificaciones de conjunto aumentan ambas.",
         "dodge": "Tu probabilidad de evitar por completo un ataque cuerpo a cuerpo entrante, sin recibir daño.",
         "critRating": "Índice de golpe crítico de tu equipo y bonificaciones de conjunto, que aumenta tu probabilidad de golpe crítico. Unos 10 de índice otorgan un 1% de crítico.",
         "hasteRating": "Índice de celeridad de tu equipo y bonificaciones de conjunto, que acelera tus ataques y lanzamientos de hechizos. Unos 10 de índice otorgan un 1% de celeridad.",
         "parry": "Tu probabilidad de parar por completo un ataque cuerpo a cuerpo frontal, sin recibir daño. Un golpe por la espalda no se puede parar.",
         "hitRating": "Puntuacion de impacto proveniente de tu equipo y bonificaciones de conjunto, que reduce la frecuencia con que tus ataques fallan y tus hechizos son resistidos, especialmente contra enemigos de nivel superior. Aproximadamente 10 puntos de puntuacion otorgan un 1% de impacto.",
-        "warfare": "Aumenta un {increase}% el daño infligido a jugadores y reduce un {reduction}% el daño recibido de jugadores."
+        "warfare": "Aumenta un {increase}% el daño infligido a jugadores y reduce un {reduction}% el daño recibido de jugadores.",
+        "warfareWithHealth": "Aumenta el daño infligido a jugadores un {increase}% y reduce el daño recibido de jugadores un {reduction}%. También aumenta tu salud máxima un {health}% en todas partes excepto en mazmorras, bandas, expediciones y brechas."
       },
       "effects": {
         "attackPower": "+{value} de poder de ataque",
@@ -2342,6 +3056,47 @@ export const es: EnTranslations = {
       "attackSlow": "y ralentiza la velocidad de ataque del objetivo un {pct}% durante {duration} s",
       "dot": "provoca {name}, un daño en el tiempo de {school} que inflige {total} durante {duration} s",
       "hot": "florece {name}, una sanación en el tiempo que restaura {total} durante {duration} s"
+    },
+    "trinkets": {
+      "equipLine": "Equipar: {effect}",
+      "scaled": "{base} (+{bonus})",
+      "useLine": "Uso: {effect} (reutilización de {cooldown})",
+      "cooldownMinutes": "{minutes} min",
+      "cooldownSeconds": "{seconds} s",
+      "gambleResult": "{item}: ¡{fortune}!",
+      "snakeEyes": "Ojos de serpiente",
+      "equippedLine": "Equipado",
+      "equipLockout": "Al equiparlo, su uso entra en un tiempo de reutilización de {seconds} s, o el que le quede al abalorio que sustituye si es mayor.",
+      "equip": {
+        "lastStand": "Recibir daño con menos del {threshold}% de salud te otorga un escudo que absorbe {absorb} de daño ({absorbPct}% de tu salud máxima) durante {duration} s. Puede ocurrir una vez cada {icd} s.",
+        "hourglass": "La sanación excesiva de tus sanaciones directas se almacena en el reloj de arena, hasta {cap} ({capPct}% de tu salud máxima). La sanación almacenada se desvanece {fade} s después de su último aumento.",
+        "twinStrike": "Tus golpes de ataque automático tienen un {chance}% de probabilidad de realizar un golpe cuerpo a cuerpo adicional con la mano principal. Puede ocurrir una vez cada {icd} s.",
+        "tally": "Tus golpes críticos de ataque automático y tus golpes de gracia añaden una marca de cuenta cada uno, hasta {max}. Las marcas duran {duration} s y se renuevan cada vez que ganas una.",
+        "storm": "Cada hechizo que lanzas añade una carga, hasta {max}. Las cargas duran {duration} s y se renuevan cada vez que ganas una.",
+        "heat": "Tus golpes de arma cuerpo a cuerpo y a distancia añaden una acumulación de calor cada uno, hasta {max}. El calor dura {duration} s y se renueva cada vez que ganas una acumulación.",
+        "ignite": "Tus golpes críticos de arma cuerpo a cuerpo y a distancia prenden fuego al objetivo, infligiendo {tick} de daño de fuego cada {every} s durante {duration} s. Un nuevo golpe crítico lo renueva. El daño aumenta con el poder de ataque o el poder de ataque a distancia, el que sea mayor.",
+        "guardHeat": "Cada ataque que paras, esquivas o bloqueas añade una acumulación de calor, hasta {max}. El calor dura {duration} s y se renueva cada vez que ganas una acumulación."
+      },
+      "use": {
+        "retaliate": "Durante {duration} s, un enemigo que te golpee directamente recibe daño físico igual al {pct}% de la salud que te quitó ese golpe. El daño periódico no lo activa.",
+        "anchor": "Durante {duration} s, recibes un {reduction}% menos de daño pero te mueves al {speed}% de velocidad. Elimina los aturdimientos, enraizamientos, ralentizaciones, miedos, polimorfias, silencios, cegueras, maleficios, desarmes y efectos incapacitantes que tengas, e ignoras los nuevos y los derribos mientras dura.",
+        "hourglass": "Convierte toda la sanación almacenada en un escudo sobre el miembro del grupo a {range} m o menos con el menor porcentaje de salud, tú incluido. El escudo dura {duration} s. Requiere sanación almacenada.",
+        "wellspring": "Te sana a ti y a los miembros del grupo a {radius} m o menos {tick} cada {every} s durante {duration} s. La sanación aumenta con el poder de sanación.",
+        "bleedEdge": "Durante {duration} s, tus golpes de ataque automático aplican Herida de garra, que inflige {tick} de daño físico por acumulación cada {every} s durante {bleedDuration} s y se acumula hasta {stacks} veces. El daño aumenta con el poder de ataque.",
+        "tallyStrike": "Gasta todas las marcas de cuenta para golpear a tu objetivo a {range} m o menos, infligiendo {perMark} de daño físico por marca ({max} con {maxMarks} marcas). El daño aumenta con el poder de ataque. Requiere una marca de cuenta.",
+        "stormjar": "Libera todas las cargas como un rayo sobre tu objetivo a {range} m o menos que salta hasta {extra} enemigos más a {jumpRange} m o menos. Cada enemigo recibe {perCharge} de daño de naturaleza por carga ({max} con {maxCharges} cargas). El daño aumenta con el poder con hechizos. Requiere una carga.",
+        "echo": "Durante {duration} s, tus siguientes {casts} sanaciones directas o golpes directos de daño no físico se repiten por el {pct}% de su cantidad.",
+        "gamble": "Tira una de cuatro fortunas durante {duration} s: {keenEdge} (infliges un {keenPct}% más de daño), {luckyStreak} (te sana {heal} a lo largo de la duración), {gildedGuard} (un escudo que absorbe {absorb} de daño) o {snakeEyes} (sin efecto, pero esta reutilización se reduce a la mitad).",
+        "blink": "Avanza {yards} m y luego recibe un {reduction}% menos de daño durante {guard} s.",
+        "sprint": "Aumenta tu velocidad de movimiento un {speed}% durante {duration} s. No se acumula con otros aumentos de velocidad.",
+        "defiance": "Elimina todos los aturdimientos, enraizamientos, ralentizaciones, miedos, polimorfias, silencios, cegueras, maleficios, desarmes y efectos incapacitantes que tengas. Se puede usar mientras estás aturdido.",
+        "brand": "Marca a un jugador enemigo a {range} m o menos, reduciendo la sanación que recibe un {cut}% durante {duration} s.",
+        "temper": "Gasta todas las acumulaciones de calor para templar tu arma durante {duration} s. Tus golpes de arma cuerpo a cuerpo y a distancia infligen {damage} de daño de fuego adicional, aumentado un {perHeat}% por cada acumulación de calor gastada (hasta un {maxBonus}% con {maxHeat} acumulaciones). Cada golpe de gracia añade {killExtend} s, hasta {maxDuration} s en total. El daño aumenta con el poder de ataque o el poder de ataque a distancia, el que sea mayor.",
+        "kindlingOrb": "Invoca un orbe de brasas a tu lado durante {duration} s. Cada hechizo que lanzas a un enemigo le hace disparar un proyectil a ese enemigo que inflige {damage} de daño de fuego. El daño aumenta con el poder con hechizos.",
+        "pierce": "Durante {duration} s, tus ataques automáticos, disparos y habilidades físicas (no sangrados) también golpean al enemigo más cercano a tu objetivo a {reach} m o menos por el {share}% del daño infligido.",
+        "lantern": "Coloca un farol a tus pies durante {duration} s. Una sanación directa de cualquiera sobre ti o un miembro del grupo a {radius} m o menos de él también sana al otro miembro del grupo más herido bajo su luz por el {share}% de la sanación.",
+        "heartNova": "Gasta todas las acumulaciones de calor en una nova de fuego que inflige {perHeat} de daño de fuego por acumulación ({max} con {maxHeat} acumulaciones) a cada enemigo a {radius} m o menos y provoca a cada criatura que alcanza. El daño aumenta con el poder de ataque. Requiere una acumulación de calor."
+      }
     },
     "questShare": {
       "notShareable": "Esta misión no se puede compartir.",
@@ -2511,7 +3266,17 @@ export const es: EnTranslations = {
       "rateLimited": "Has enviado varios reportes hace poco. Espera un momento antes de enviar otro.",
       "failed": "No se pudo enviar el reporte de error. Inténtalo de nuevo."
     },
+    "hostDiag": {
+      "title": "Informe del sistema",
+      "intro": "Recopila datos sobre este equipo, incluidos los programas que más procesador y memoria usan, en un archivo que ayuda a diagnosticar problemas de rendimiento. No se envía nada: el archivo se queda en tu equipo.",
+      "create": "Generar informe del sistema",
+      "running": "Recopilando datos del sistema...",
+      "saved": "Informe guardado como {fileName}.",
+      "savedNoName": "Informe guardado.",
+      "failed": "No se pudo crear el informe. Inténtalo de nuevo."
+    },
     "paperdoll": {
+      "trinketSlot": "Abalorio",
       "unequipAria": "Desequipar {item}",
       "unequipHint": "Haz clic en ×, clic derecho o arrastra a las bolsas para desequipar",
       "hideHelmAria": "Ocultar casco",
@@ -2683,6 +3448,8 @@ export const es: EnTranslations = {
       "hint": "Los puntos de enfoque añaden una bonificación sobre el rendimiento base de cada componente. Los componentes sin enfoque se mantienen en el nivel base.",
       "tierHint": "Cada {points} puntos en un componente suben su nivel de recolección un paso, hasta {steps} pasos; menos de {points} puntos aún mejoran el rendimiento.",
       "townOnlyHint": "El enfoque solo puede cambiarse mientras estés en el pueblo.",
+      "preferenceHint": "El enfoque mejora el grado y la cantidad de lo que recolectas. Para recolectar un solo material, establece una preferencia de recolección desde tu Kit de campo o la ventana de Profesiones.",
+      "pendingLine": "Guardado. Tu reasignación a esta distribución se completa en {time}.",
       "budgetLabel": "Puntos restantes: {remaining} / {budget}",
       "saveButton": "Guardar enfoque",
       "notInTownHint": "Debes estar en el pueblo para fijar tu enfoque.",
@@ -3054,7 +3821,7 @@ export const es: EnTranslations = {
         "phaseWardstonesName": "Las piedras de resguardo",
         "phaseWardstonesSummary": "Al {health} de salud, Pisotón estremecedor inmoviliza a la banda mientras el hermano Aldric llega y enciende las piedras de resguardo. Todas las púas se rompen y el suelo deja de arder; luego Desgarro de alma y Rabia inmortal se suman a las mecánicas del Trono.",
         "phaseKingsWrathName": "La Ira del rey",
-        "phaseKingsWrathSummary": "Al {health} de salud, Nythraxis ruge en la Ira del rey y gana {bonusNormal} de daño en normal o {bonusHeroic} en heroico durante el resto del combate. Erupción sepulcral se acelera a cada {eruptionEveryNormal} s ({eruptionEveryHeroic} en heroico). Todas las demás mecánicas mantienen su ritmo.",
+        "phaseKingsWrathSummary": "At {health} health, Nythraxis roars in The King's Wrath and gains {bonusNormal} damage on Normal or {bonusHeroic} on Heroic for the rest of the fight. Grave Eruption tightens to every {eruptionEveryNormal} sec ({eruptionEveryHeroic} on Heroic). Every other mechanic keeps its cadence.",
         "gravebreakerName": "Quebrantatumbas",
         "gravebreakerSummary": "Cada {seconds} s, Nythraxis carga su siguiente golpe que conecte. Su objetivo solo recibe el golpe, pero todos los demás dentro de {range} yd en el cono frontal de {arc} grados reciben {splash} de ese golpe como daño físico, reducido por su propia armadura.",
         "gravebreakerResponse": "Los tanques mantienen a Nythraxis mirando lejos de la banda. Todos los demás se quedan detrás o a su lado y nunca cruzan el cono.",
@@ -3063,16 +3830,16 @@ export const es: EnTranslations = {
         "dreadCurseHeroicSummary": "Cada {every} s, Nythraxis golpea a su tanque actual con {hitHeroic} de la salud máxima como daño de las Sombras y añade una acumulación de Maldición pavorosa. Durante {duration} s, cada acumulación aumenta el daño que ese tanque recibe de Nythraxis en {perStackHeroic}, hasta {max} acumulaciones.",
         "dreadCurseResponse": "Los tanques cambian a {stacks} acumulaciones: el otro tanque provoca y el tanque maldito permanece fuera del cono de Quebrantatumbas mientras se desvanecen las acumulaciones. Los sanadores preparan al tanque entrante antes del cambio.",
         "boneSpikeName": "Púa ósea",
-        "boneSpikeSummary": "Cada {everyNormal} s, Nythraxis empala en Púas óseas a {victimsNormal} miembros de la banda que no sean su objetivo actual. Un miembro empalado no puede actuar y pierde {drainNormal} de su salud máxima cada segundo hasta que se destruye su púa. Una púa se rompe tras {hitsNormal} golpes de cualquiera, sin importar el daño que hagan. Un jugador que ya ha sido empalado no puede volver a ser elegido durante {cooldown} s, de modo que las púas se reparten por toda la banda.",
-        "boneSpikeHeroicSummary": "Cada {everyHeroic} s, Nythraxis empala en Púas óseas a {victimsHeroic} miembros de la banda que no sean su objetivo actual. Un miembro empalado no puede actuar y pierde {drainHeroic} de su salud máxima cada segundo hasta que se destruye su púa. Una púa se rompe tras {hitsHeroic} golpes de cualquiera, sin importar el daño que hagan. Un jugador que ya ha sido empalado no puede volver a ser elegido durante {cooldown} s, de modo que las púas se reparten por toda la banda.",
-        "boneSpikeResponse": "Quien esté más cerca golpea la Púa ósea: unos pocos golpes de cualquiera la rompen, sin importar el daño. Los sanadores mantienen con vida a los empalados mientras caen las púas.",
+        "boneSpikeSummary": "Every {everyNormal} sec, Nythraxis impales {victimsNormal} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainNormal} of maximum health every second until their spike is shattered. A spike shatters after {hitsNormal} hits from anyone, whatever the hits deal. A raider who has been impaled cannot be chosen again for {cooldown} sec, so the spikes spread across the raid.",
+        "boneSpikeHeroicSummary": "Every {everyHeroic} sec, Nythraxis impales {victimsHeroic} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainHeroic} of maximum health every second until their spike is shattered. A spike shatters after {hitsHeroic} hits from anyone, whatever the hits deal. A raider who has been impaled cannot be chosen again for {cooldown} sec, so the spikes spread across the raid.",
+        "boneSpikeResponse": "Los combatientes de daño cambian a las Púas óseas de inmediato y las destruyen para liberar a los empalados. Los sanadores mantienen vivos a los empalados mientras caen las púas.",
         "graveEruptionName": "Erupción sepulcral",
         "graveEruptionSummary": "Cada {everyNormal} s, manos esqueléticas marcan {countNormal} círculos de {radius} yd bajo miembros de la banda. Tras {warning} s, cada círculo erupciona e inflige {burstNormal} de la salud máxima como daño de las Sombras; luego arde como Llama sepulcral durante {flameNormal} s e inflige {tickNormal} de la salud máxima cada segundo a cualquiera que permanezca dentro.",
         "graveEruptionHeroicSummary": "Cada {everyHeroic} s, manos esqueléticas marcan {countHeroic} círculos de {radius} yd bajo miembros de la banda. Tras {warning} s, cada círculo erupciona e inflige {burstHeroic} de la salud máxima como daño de las Sombras; luego arde como Llama sepulcral durante {flameHeroic} s e inflige {tickHeroic} de la salud máxima cada segundo a cualquiera que permanezca dentro.",
         "graveEruptionResponse": "Sal de cada círculo de aviso antes de que erupcione y mantente fuera del suelo ardiente. Los tanques apartan a Nythraxis de las llamas para que los cuerpo a cuerpo tengan espacio.",
         "bindingSigilName": "Sigilo vinculante",
-        "bindingSigilSummary": "Cada {everyNormal} s, un sigilo de los antiguos resguardos brilla en una de las dos plataformas que flanquean el trono, a {sideOffset} yd a la izquierda o a la derecha (desde la banda) de donde estaba Nythraxis al iniciar el combate, alternando de lado en cada lanzamiento, y él inicia Ascensión inmortal, ganando {ascensionNormal} de daño y velocidad de ataque cada {ascensionEvery} s. Si se coloca sobre el sigilo en menos de {bindNormal} s, queda Vinculado: se purga la Ascensión, queda aturdido durante {stunNormal} s y recibe {vulnerability} más de daño durante {boundNormal} s. Si no, cada miembro de la banda recibe {unboundHitNormal} de la salud máxima como daño de las Sombras y él conserva {unboundBonusNormal} más de daño hasta la siguiente vinculación.",
-        "bindingSigilHeroicSummary": "Cada {everyHeroic} s, un sigilo de los antiguos resguardos brilla en una de las dos plataformas que flanquean el trono, a {sideOffset} yd a la izquierda o a la derecha (desde la banda) de donde estaba Nythraxis al iniciar el combate, alternando de lado en cada lanzamiento, y él inicia Ascensión inmortal, ganando {ascensionHeroic} de daño y velocidad de ataque cada {ascensionEvery} s. Si se coloca sobre el sigilo en menos de {bindHeroic} s, queda Vinculado: se purga la Ascensión, queda aturdido durante {stunHeroic} s y recibe {vulnerability} más de daño durante {boundHeroic} s. Si no, cada miembro de la banda recibe {unboundHitHeroic} de la salud máxima como daño de las Sombras y él conserva {unboundBonusHeroic} más de daño hasta la siguiente vinculación.",
+        "bindingSigilSummary": "Every {everyNormal} sec, a sigil of the old wards flares on one of the two platforms flanking the throne, {sideOffset} yd to the raid's left or right of where Nythraxis stood at the pull, switching sides every cast, and he begins Deathless Ascension, gaining {ascensionNormal} damage and attack speed every {ascensionEvery} sec. If he stands on the sigil within {bindNormal} sec he is Bound: the Ascension is purged, he is stunned for {stunNormal} sec, and he takes {vulnerability} more damage for {boundNormal} sec. Otherwise every raider takes {unboundHitNormal} of maximum health as Shadow damage and he keeps {unboundBonusNormal} more damage until the next binding.",
+        "bindingSigilHeroicSummary": "Every {everyHeroic} sec, a sigil of the old wards flares on one of the two platforms flanking the throne, {sideOffset} yd to the raid's left or right of where Nythraxis stood at the pull, switching sides every cast, and he begins Deathless Ascension, gaining {ascensionHeroic} damage and attack speed every {ascensionEvery} sec. If he stands on the sigil within {bindHeroic} sec he is Bound: the Ascension is purged, he is stunned for {stunHeroic} sec, and he takes {vulnerability} more damage for {boundHeroic} sec. Otherwise every raider takes {unboundHitHeroic} of maximum health as Shadow damage and he keeps {unboundBonusHeroic} more damage until the next binding.",
         "bindingSigilResponse": "El tanque arrastra a Nythraxis hasta el sigilo de inmediato, atravesando cualquier fuego que haya dejado la banda. Los cuerpo a cuerpo siguen el arrastre y los de distancia se mantienen fuera del nuevo cono de Quebrantatumbas. Todos lo queman mientras está Vinculado.",
         "raiseFallenName": "Alzar caídos",
         "raiseFallenSummary": "Cada {every} s durante el Trono, Nythraxis alza Guardias reales resucitados detrás de él. Corren hacia su objetivo actual y luchan hasta ser destruidos.",
@@ -3089,11 +3856,11 @@ export const es: EnTranslations = {
         "courtSummary": "En heroico, Nythraxis alza a su corte después de cada Rabia inmortal, interrumpida o no, una vez que haya caído la corte anterior. El Espíritu de Aldren hiende todo lo cercano a su objetivo con Hendidura real. El Espíritu de Malric canaliza Alivio de Malric, sanando cada vez más a Nythraxis con cada lanzamiento. El Espíritu de Voss ignora las provocaciones y caza a la banda.",
         "courtResponse": "Los tanques recogen a Aldren y giran su hendidura lejos de la banda. Aturde o silencia a Malric en cuanto empiece Alivio de Malric y mátalo primero; luego enraíza o aturde a Voss lejos de los sanadores, ya que no se le puede provocar, y acábalo después.",
         "kingsWrathName": "Ira del rey",
-        "kingsWrathSummary": "Nythraxis inflige {bonusNormal} más de daño en normal o {bonusHeroic} en heroico durante el resto del combate. Erupción sepulcral ocurre cada {eruptionEveryNormal} s ({eruptionEveryHeroic} en heroico).",
+        "kingsWrathSummary": "Nythraxis deals {bonusNormal} more damage on Normal or {bonusHeroic} on Heroic for the rest of the fight. Grave Eruption occurs every {eruptionEveryNormal} sec ({eruptionEveryHeroic} on Heroic).",
         "kingsWrathResponse": "Usa los tiempos de reutilización defensivos restantes para el daño inevitable. Mantén limpias todas las mecánicas anteriores mientras la banda termina el combate.",
         "boneStormName": "Tormenta ósea",
-        "boneStormSummary": "A partir de {first} s tras la Ira del rey y cada {everyNormal} s después, Nythraxis inicia Tormenta ósea durante {duration} s. Ignora la amenaza, se mueve a {speed} veces la velocidad normal y realiza {charges} cargas de {chargeSeconds} s cada una. Su remolino inflige {whirlNormal} de la salud máxima cada segundo en un radio de {radius} yd. Cada carga termina con un Golpe óseo en el mismo radio que inflige {slamNormal} de la salud máxima. Quebrantatumbas vuelve a activarse {rearm} s después de que termine.",
-        "boneStormHeroicSummary": "A partir de {first} s tras la Ira del rey y cada {everyHeroic} s después, Nythraxis inicia Tormenta ósea durante {duration} s. Ignora la amenaza, se mueve a {speed} veces la velocidad normal y realiza {charges} cargas de {chargeSeconds} s cada una. Su remolino inflige {whirlHeroic} de la salud máxima cada segundo en un radio de {radius} yd. Cada carga termina con un Golpe óseo en el mismo radio que inflige {slamHeroic} de la salud máxima. Quebrantatumbas vuelve a activarse {rearm} s después de que termine.",
+        "boneStormSummary": "Comenzando {first} seg en la Ira del Rey y cada {everyNormal} seg después, Nythraxis comienza Tormenta ósea por {duration} seg. Ignora la amenaza, se mueve a {speed} veces la velocidad normal e realiza {charges} cargas de {chargeSeconds} seg cada una. Su torbellino inflige {whirlNormal} de la salud máxima cada segundo dentro de {radius} yd. Cada carga termina en un Golpe óseo dentro del mismo radio por {slamNormal} de la salud máxima. Cualquier marca de Desgarro de alma activa se libera sin resolver en el instante en que comienza la tormenta, y una tormenta nunca comienza justo después de una detonación de Desgarro de alma. Quebrantatumbas se reactiva {rearm} seg después de que la tormenta termina.",
+        "boneStormHeroicSummary": "Comenzando {first} seg en la Ira del Rey y cada {everyHeroic} seg después, Nythraxis comienza Tormenta ósea por {duration} seg. Ignora la amenaza, se mueve a {speed} veces la velocidad normal e realiza {charges} cargas de {chargeSeconds} seg cada una. Su torbellino inflige {whirlHeroic} de la salud máxima cada segundo dentro de {radius} yd. Cada carga termina en un Golpe óseo dentro del mismo radio por {slamHeroic} de la salud máxima. Cualquier marca de Desgarro de alma activa se libera sin resolver en el instante en que comienza la tormenta, y una tormenta nunca comienza justo después de una detonación de Desgarro de alma. Quebrantatumbas se reactiva {rearm} seg después de que la tormenta termina.",
         "boneStormResponse": "Dispersaos y seguid corriendo para alejaros de Nythraxis. El miembro cargado huye mientras los demás dejan espacio alrededor de la trayectoria de la carga; luego los tanques lo recogen cuando termina la tormenta.",
         "crownEnduresName": "La Corona perdura",
         "crownEnduresSummary": "A los {enrageNormal} s desde el pull (el reloj se pausa mientras el hermano Aldric entra al 70%), La Corona perdura se activa como un enfurecimiento rígido. Nythraxis gana {damage} más de daño y ataques {haste} más rápidos, y luego otro {rampStep} de daño cada {rampEveryNormal} s. No hay barra de temporizador. Los avisos llegan como gritos cuando quedan {warn60}, {warn30} y {warn10} s.",
@@ -3144,13 +3911,14 @@ export const es: EnTranslations = {
       "elementalConvergencePrimed": "Tu próximo hechizo de la otra escuela elemental otorga Convergencia Elemental",
       "hunterFerocity": "{stacks} de Ferocidad de Manada: tu mascota inflige un {pct}% más de daño",
       "cooldownCap": "Has usado {used} de {cap} s de reducción de reutilización en esta ventana",
-      "bruinRushWindow": "La Forma de lobo no cuesta maná y sujeta al objetivo de tu Embestida de Bruin, ralentizándolo un {pct}% durante {sec} s",
+      "bruinRushWindow": "Forma de lobo no cuesta maná e Inmoviliza a tu objetivo de Embestida de Bruin, ralentizándolo un {pct}% durante {sec} s",
       "funeralHarvestLock": "Cosecha funeraria aún no puede crear otro fragmento de alma",
       "leadenHexLock": "Maleficio plomizo aún no puede volver a inmovilizar a este objetivo",
       "forbiddenReflectionReady": "Puedes volver a usar tu próxima facultad de brujo con reutilización que cumpla los requisitos",
       "forbiddenReflectionLock": "Reflejo prohibido aún no puede volver a prepararse",
       "internalCooldown": "Este efecto no puede volver a activarse hasta que termine el temporizador",
       "carriedFlag": "Llevas la bandera enemiga. Cancela este beneficio para soltarla.",
+      "carryingFreight": "Llevas carga. Tu velocidad de movimiento se reduce un {pct}%.",
       "battleStance": "Actitud de Batalla: un 10% más de generación de ira",
       "berserkerStance": "Actitud Rabiosa: los críticos aciertan un 3% más a menudo y golpean un 3% más fuerte",
       "crit": "Aumenta la probabilidad de golpe crítico un {pct}%",
@@ -3179,6 +3947,8 @@ export const es: EnTranslations = {
       "iceFloesCasts": "Tus próximos {n} hechizos con tiempo de lanzamiento pueden lanzarse en movimiento",
       "freeCast": "Tu siguiente lanzamiento no cuesta nada",
       "instantCast": "Tu siguiente hechizo con tiempo de lanzamiento es instantáneo",
+      "benisonPrayers": "Tu próximo Coro Sanador cura un {pct}% más y consume todas las acumulaciones.",
+      "benisonWhisper": "Tu próxima Plegaria Susurrada es instantánea y cura un {pct}% más. Úsala antes de que este efecto expire.",
       "cheapCast": "Tu siguiente hechizo cuesta un {pct}% menos",
       "radiantResonance": "Tu próxima Luz Reparadora es instantánea, o tu próximo Abrazo del Alba cuesta un {pct}% menos de maná y se lanza en {castTime} s",
       "solarReprisal": "Tu próximo Disco Solar no cuesta maná, ignora su tiempo de reutilización e inflige un {pct}% más de daño; el Martillo de Gracia ignora su tiempo de reutilización y te sana por el 100% del daño infligido; o la Luz Reparadora es instantánea",
@@ -3192,12 +3962,46 @@ export const es: EnTranslations = {
       "coldsightRead": "Tu siguiente Tiro largo inflige un {longDrawPct}% más de daño, o tu siguiente Tiro aciago inflige un {fellShotPct}% más",
       "duskEconomy": "Las habilidades cuestan un {pct}% menos de energía",
       "moontide": "Marea Lunar: fase {stacks} de {max}. Los lanzamientos de Descarga Silvestre, Caída Celeste y Semilla Lunar la llenan en Forma de lechúcico lunar; con {max}, Semilla Lunar se convierte en Oleada Lunar y Caída Celeste en Estela Solar, y cualquiera de las dos la gasta",
-      "oldBlood": "Sangre Antigua: fase {stacks} de {max}. Los golpes conectados de gato y Bruin comparten este banco; con {max}, Mordisco Sangriento o Rompehuesos se transforma",
+      "oldBlood": "Sangre Antigua: fase {stacks} de {max}. Los golpes conectados de lobo y Bruin comparten este banco; con {max}, Mordisco Sangriento o Rompehuesos se transforma",
       "verdance": "Verdor {stacks}/{max}. Cada Floración Silvestre o Segundo Florecer NUEVO que plantes añade 1. Con {max}, Alivio presto se convierte en Sobrefloración",
       "freeExecute": "Tu próxima facultad de ejecución válida no cuesta recursos",
       "resourceSap": "Restaura {value} de tu recurso actual cada {interval} s",
       "nextAttackCrit": "Tu próximo ataque tiene golpe crítico garantizado",
       "healEcho": "Al bajar del {threshold}% de salud, restaura {value} de salud",
+      "trinket": {
+        "lastStandCooldown": "El escudo Último bastión del Sello del Bastión ya se usó. Bajar del {threshold}% de salud no puede volver a levantarlo hasta que esto expire.",
+        "lastBastion": "Absorbe {value} de daño. El Sello del Bastión lo levantó cuando recibiste daño por debajo del {threshold}% de salud.",
+        "retaliate": "Los enemigos que te golpean directamente reciben daño físico igual al {pct}% de la salud que te quitó ese golpe. El daño periódico no lo activa.",
+        "moored": "Recibes un {reduction}% menos de daño pero te mueves al {speed}% de velocidad. Ignoras aturdimientos, enraizamientos, ralentizaciones, miedos, polimorfias, silencios, cegueras, maleficios, desarmes, efectos incapacitantes y derribos.",
+        "hourglassStored": "Guarda {stored} de sanación almacenada de tu sobresanación. Usa el Reloj de arena del sanador para convertirla en un escudo sobre el miembro del grupo a {range} m o menos con el menor porcentaje de salud, tú incluido.",
+        "hourglassShield": "Absorbe {value} de daño. Hecho con la sanación que almacenó un Reloj de arena del sanador.",
+        "wellspring": "Restaura {tick} de salud cada {every} s.",
+        "twinStrikeCooldown": "Garras gemelas acaba de dar un golpe extra. No puede dar otro hasta que esto expire.",
+        "bleedEdge": "Tus golpes de ataque automático aplican Herida de garra: {tick} de daño físico por acumulación cada {every} s durante {duration} s, acumulable hasta {max} veces.",
+        "bleedEdgeOther": "Los golpes de ataque automático aplican Herida de garra, un sangrado físico acumulable hasta {max} veces. El daño aumenta con el poder de ataque.",
+        "talonWound": "Inflige {damage} de daño físico cada {every} s ({stacks}/{max} acumulaciones). Cada nueva acumulación añade daño y reinicia la duración.",
+        "tally": "Marcas de cuenta: {stacks}/{max}. Usa la Cuenta del cazador para gastarlas todas en un golpe a tu objetivo que inflige {damage} de daño físico ({perMark} por marca).",
+        "tallyOther": "Marcas de cuenta: {stacks}/{max}. La Cuenta del cazador las gasta todas en un golpe físico que inflige más daño por cada marca.",
+        "storm": "Cargas: {stacks}/{max}. Usa la Jarra de tormenta para liberarlas como un rayo que alcanza a tu objetivo y hasta {extra} enemigos más a {jumpRange} m o menos entre sí, infligiendo {damage} de daño de naturaleza a cada uno ({perCharge} por carga).",
+        "stormOther": "Cargas: {stacks}/{max}. La Jarra de tormenta las libera como un rayo de naturaleza que alcanza al objetivo y hasta {extra} enemigos más, con más daño por cada carga.",
+        "echo": "Tus siguientes {casts} sanaciones directas o golpes directos de daño no físico se repiten por el {pct}% de su cantidad.",
+        "keenEdge": "Fortuna del Dado del apostador: infliges un {pct}% más de daño.",
+        "luckyStreak": "Fortuna del Dado del apostador: restaura {tick} de salud cada {every} s.",
+        "gildedGuard": "Fortuna del Dado del apostador: absorbe {value} de daño.",
+        "riftGuard": "Recibes un {pct}% menos de daño.",
+        "sprint": "Velocidad de movimiento aumentada un {pct}%. No se acumula con otros aumentos de velocidad.",
+        "brand": "La sanación recibida se reduce un {pct}%.",
+        "forgeHeat": "Calor: {stacks}/{max}. Usar el Temple del Padre de la Forja lo gasta todo, y su fuego de arma inflige un {pct}% más de daño.",
+        "tempered": "Tus golpes de arma cuerpo a cuerpo y a distancia infligen {damage} de daño de fuego adicional (un {pct}% más por el calor gastado). Cada golpe de gracia añade {killExtend} s, hasta {maxDuration} s en total.",
+        "temperedOther": "Los golpes de arma cuerpo a cuerpo y a distancia infligen daño de fuego adicional, un {pct}% más por el calor gastado. El daño aumenta con el poder de ataque o el poder de ataque a distancia, el que sea mayor.",
+        "kindlingOrb": "Cada hechizo que lanzas a un enemigo hace que el orbe dispare un proyectil a ese enemigo que inflige {damage} de daño de fuego. No dispara a un enemigo polimorfado, incapacitado o cegado.",
+        "kindlingOrbOther": "Cada hechizo lanzado a un enemigo hace que el orbe dispare un proyectil de daño de fuego a ese enemigo. El daño aumenta con el poder con hechizos.",
+        "moltenIgnite": "Inflige {damage} de daño de fuego cada {every} s. Otro golpe crítico de arma lo reinicia.",
+        "pierce": "Tus ataques automáticos, disparos y habilidades físicas (no sangrados) también golpean al enemigo más cercano a tu objetivo a {reach} m o menos por el {pct}% del daño infligido.",
+        "lantern": "Una sanación directa de cualquiera sobre ti o un miembro del grupo a {radius} m o menos del farol también sana al otro miembro del grupo más herido bajo su luz por el {pct}% de la sanación.",
+        "crucibleHeat": "Calor: {stacks}/{max}. Usa el Corazón del Crisol para gastarlo todo en una nova de fuego que inflige {damage} de daño de fuego a cada enemigo a {radius} m o menos y provoca a cada criatura que alcanza.",
+        "crucibleHeatOther": "Calor: {stacks}/{max}. El Corazón del Crisol lo gasta todo en una nova de fuego a {radius} m o menos que inflige más daño de fuego por cada acumulación y provoca a cada criatura que alcanza."
+      },
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
         "str": "Aumenta la Fuerza en {value}",
@@ -3329,6 +4133,7 @@ export const es: EnTranslations = {
       "resetErrInvalid": "Este enlace de restablecimiento no es válido o ha caducado. Solicita uno nuevo."
     },
     "loot": {
+      "rollWon": "¡Felicidades! Ganaste {item} con una tirada de {roll}",
       "chestTitle": "Cofre",
       "takeLootButton": "Tomar botín",
       "takeLootTooltip": "Toma las monedas y los objetos caídos. No consume la recolección.",
@@ -3345,6 +4150,7 @@ export const es: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
+      "pvpTag": "JcJ",
       "cheaterTag": "< Tramposo >",
       "pledgeTag": "Juramento a {guild}",
       "npcRoleTag": "<{role}>",
@@ -3378,6 +4184,10 @@ export const es: EnTranslations = {
       "friendly": "Amistoso",
       "elite": "Élite",
       "boss": "Jefe"
+    },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
     },
     "targetFrame": {
       "unlock": "Mover el marco del objetivo",
@@ -3423,6 +4233,8 @@ export const es: EnTranslations = {
       "label": "Restablecer posición de los marcos"
     },
     "interfaceUnlock": {
+      "combineTrackers": "Combinar marcos de rastreadores",
+      "combineAuras": "Combinar marcos de auras",
       "label": "Editar marcos",
       "unlock": "Desbloquear interfaz",
       "lock": "Bloquear interfaz",
@@ -3433,6 +4245,8 @@ export const es: EnTranslations = {
       "lockFrame": "Bloquear este marco",
       "resizeFrame": "Redimensionar este marco",
       "frameNames": {
+        "trackerGroup": "Rastreadores",
+        "auraGroup": "Rastreadores de auras",
         "actionBar1": "Barra de acción",
         "actionBar2": "Barra de acción 2",
         "actionBar3": "Barra de acción 3",
@@ -3457,7 +4271,8 @@ export const es: EnTranslations = {
         "deedTracker": "Seguimiento de hazañas",
         "delveTracker": "Seguimiento de exploraciones",
         "riftTracker": "Seguimiento de fallas",
-        "swingBarOffhand": "Mano izquierda"
+        "swingBarOffhand": "Mano izquierda",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Ajustes de marcos",
       "framesMenuTitle": "Muestra u oculta marcos individuales. Un marco sin marcar permanece oculto hasta que vuelvas a marcarlo o restablezcas los valores predeterminados.",
@@ -3562,6 +4377,15 @@ export const es: EnTranslations = {
         "socket": "Engarzó una gema en {name}.",
         "socketReplaced": "Engarzó una gema en {name}; {gem} fue destruido."
       }
+    },
+    "lootQuality": {
+      "ordinary": "Ordinario",
+      "superior": "Superior",
+      "exceptional": "Excepcional",
+      "magnificent": "Magnífico",
+      "transcendent": "Trascendente",
+      "itemName": "{item}, {quality}",
+      "tooltip": "{quality}: +{levels} niveles de objeto. Se conserva al mejorar el objeto."
     },
     "itemTooltip": {
       "requiresLevel": "Requiere nivel {level}",
@@ -3999,6 +4823,8 @@ export const es: EnTranslations = {
       "vaultTab": "Bóveda",
       "vaultCapacityNote": "Cada material admite hasta {cap}.",
       "vaultEmpty": "Tu bóveda está vacía. Haz clic en un material de tus bolsas para depositarlo.",
+      "vaultSearchAria": "Buscar materiales de la bóveda por nombre",
+      "vaultSearchNoMatch": "Ningún material de tu bóveda coincide con tu búsqueda.",
       "vaultRowAria": "{item}: {count} de {cap} almacenados",
       "vaultLockedIntro": "Desbloquea la Bóveda de Materiales para acumular materiales de elaboración junto a tu banco. Cada material tiene su propio espacio, hasta {cap} de cada uno.",
       "vaultUnlockButton": "Desbloquear la Bóveda de Materiales",
@@ -4466,10 +5292,18 @@ export const es: EnTranslations = {
       "enchant_weapon_lucent_spellpower": "Grabado de arma: Poder con hechizos luminoso",
       "enchant_chest_lucent_stamina": "Grabado de pecho: Aguante luminoso",
       "enchant_feet_lucent_agility": "Grabado de botas: Agilidad luminosa",
-      "enchant_lucent_infusion": "Infusión luminosa"
+      "enchant_lucent_infusion": "Infusión luminosa",
+      "enchant_weapon_riftwalkers_grace": "Gracia del Caminante de la Brecha",
+      "enchant_weapon_dawnfire_etching": "Grabado de arma: Fuego del Alba",
+      "enchant_weapon_dawns_benediction": "Grabado de arma: Bendición del Alba",
+      "enchant_weapon_piston_drive": "Grabado de arma: Impulso de pistón"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Tus ataques cuerpo a cuerpo que impactan pueden otorgar 50 de Fuerza durante 15 s y curarte 200 de salud. Se aplican los modificadores de curación. Cada golpe tiene una probabilidad del 1 % por cada 0,6 s de velocidad base del arma atacante. No tiene enfriamiento interno. Ambas manos comparten un solo beneficio; cualquier activación lo renueva y nunca se acumula. Los ataques a distancia no activan este efecto. Forma de lobo usa en su lugar su velocidad de golpe base de 1 s."
+      "enchant_weapon_lastflame_zeal": "Tus ataques cuerpo a cuerpo que impactan pueden otorgar 50 de Fuerza durante 15 s y curarte 200 de salud. Se aplican los modificadores de curación. Cada golpe tiene una probabilidad del 1 % por cada 0,6 s de velocidad base del arma atacante. No tiene enfriamiento interno. Cada mano tiene su propio beneficio; los activadores repetidos renuevan el de esa mano. Los ataques a distancia no activan este efecto. Forma de lobo usa en su lugar su velocidad de golpe base de 1 s.",
+      "enchant_weapon_riftwalkers_grace": "Tus ataques cuerpo a cuerpo que impactan pueden otorgar 60 de Agilidad y un 2% más de velocidad de ataque cuerpo a cuerpo durante 15 s. Cada golpe tiene una probabilidad del 1% por cada 0,6 s de velocidad base del arma atacante. No tiene enfriamiento interno. Ambas manos comparten un único beneficio; cualquier activación lo renueva, y nunca se acumula. Los ataques a distancia no activan este efecto. Forma de lobo usa en su lugar su velocidad de golpe base de 1 s.",
+      "enchant_weapon_dawnfire_etching": "Graba permanentemente un arma con 18 de poder con hechizos. El poder con hechizos también cuenta para el poder de curación. Es una bonificación fija; no escala.",
+      "enchant_weapon_dawns_benediction": "Graba permanentemente un arma con 34 de poder de curación. El poder de curación solo aumenta las curaciones, nunca el daño de hechizos. Es una bonificación fija; no escala.",
+      "enchant_weapon_piston_drive": "Graba permanentemente un arma a dos manos con 12 de Fuerza y 25 de índice de golpe crítico. No se puede aplicar a un arma a una mano. Es una bonificación fija; no escala."
     },
     "professions": {
       "title": "Profesiones",
@@ -4661,6 +5495,7 @@ export const es: EnTranslations = {
         "dormantKnowledge": "El conocimiento de {craft} se conserva pero está inactivo hasta que su par o afición estén activos."
       },
       "stationRequired": "Debes estar en {station} para crearlo.",
+      "mobileStationTitle": "{station} de {name}",
       "stationName": {
         "forge": "Forja",
         "kitchens": "Cocinas",
@@ -4702,8 +5537,8 @@ export const es: EnTranslations = {
       "attunedBanner": "Sintonizado: {title}",
       "tierTutorial": {
         "title": "Tu primer nivel",
-        "tierCap": "Una nave alcanza su primer nivel con la habilidad {skill} y cada nivel mejora lo que puede hacer. Pero un oficio sólo supera los trabajos raros una vez que es una de tus dos especialidades.",
-        "radar": "Tus profesiones forman una rueda. Sintonícese con un par adyacente y esos dos oficios se convierten en especialidades sin límites, un oficio al otro lado de la rueda se convierte en un pasatiempo poco común y el resto permanece inactivo: sus conocimientos se mantienen, pero limitados en común hasta que los retome nuevamente.",
+        "tierCap": "Un oficio alcanza su primer nivel con {skill} de habilidad, y cada nivel mejora lo que puede producir.",
+        "radar": "Tus profesiones forman una rueda. Sintonízate con un par adyacente y esos dos oficios podrán superar el trabajo raro.",
         "masters": "Los maestros artesanos de los pueblos ofrecen misiones de sintonización. Visita uno para elegir tu camino.",
         "dismiss": "Entendido"
       },
@@ -5074,11 +5909,11 @@ export const es: EnTranslations = {
         "sealbreak_shockwave": "Onda Rompesello (explosion de area)",
         "gravebreaker": "Rompatumbas (cono frontal, alejarlo de la banda)",
         "raise_fallen": "Despertar a los Caidos (oleadas periodicas de refuerzos)",
-        "soul_rend": "Desgarro de alma (los jugadores marcados se agrupan para repartir el daño)",
+        "soul_rend": "Desgarro de alma (los jugadores marcados se agrupan y luego salen del fuego)",
         "deathless_rage": "Furia Inmortal (se interrumpe en las piedras de guardia)",
         "wardstones": "Canalizacion de piedras de guardia (transicion de fase)",
         "dread_curse": "Maldición pavorosa (perjuicio acumulativo para cambiar de tanque, cambia con 2 acumulaciones)",
-        "bone_spike": "Púa ósea (los jugadores empalados pierden vida hasta que alguien rompe la púa con unos pocos golpes)",
+        "bone_spike": "Púa ósea (los miembros empalados se desangran hasta que se destruye la púa)",
         "grave_eruption": "Erupción sepulcral (círculos de aviso que dejan suelo ardiente)",
         "binding_sigil": "Sigilo vinculante (arrastra al jefe hasta el sigilo o la banda lo pagará)",
         "kings_wrath": "Ira del rey (30%: bonificación de daño permanente, peligros del suelo más rápidos)",
@@ -5390,13 +6225,41 @@ export const es: EnTranslations = {
       "showRoute": "Mostrar ruta",
       "untrack": "Dejar de rastrear",
       "track": "Pista",
+      "worldQuests": {
+        "heading": "Misiones mundiales de hoy",
+        "count": "{done} / {total}",
+        "empty": "Hoy no hay misiones mundiales",
+        "replacement": "Reemplazo",
+        "state": {
+          "active": "En curso",
+          "completed": "Completada"
+        },
+        "reroll": "Reemplazar misión",
+        "rerollNote": "Un reemplazo disponible hoy",
+        "rerollUsed": "Reemplazo ya usado hoy",
+        "rerollReason": {
+          "noCycle": "Hoy no hay tablón",
+          "usedToday": "Reemplazo ya usado hoy",
+          "completed": "Una misión completada no se puede reemplazar",
+          "inProgress": "Una misión en curso no se puede reemplazar",
+          "notActive": "Esta misión no está en tu tablón",
+          "noAlternative": "Hoy no hay otra misión disponible en esa zona",
+          "unknown": "Hoy esta misión no se puede reemplazar"
+        },
+        "confirmTitle": "¿Reemplazar esta misión mundial?",
+        "confirmBody": "Solo puedes reemplazar una misión mundial al día, y no se puede deshacer. {quest} se cambiará por otra misión de su zona.",
+        "confirmOk": "Reemplazar",
+        "confirmCancel": "Cancelar"
+      },
       "legend": {
         "dungeon": "Mazmorra",
         "ore": "Mineral",
         "herb": "Hierba",
         "mail": "Correo",
         "passage": "Paso"
-      }
+      },
+      "collapseHint": "Contraer la barra lateral del mapa",
+      "expandHint": "Expandir la barra lateral del mapa"
     },
     "arenaGate": {
       "minLevelNote": "Requiere nivel {level}"
@@ -5631,7 +6494,9 @@ export const es: EnTranslations = {
       "listingStatusReturned": "Devuelto",
       "listingStatusCancelled": "Cancelado",
       "listingStatusSuspended": "Suspendido",
-      "listingStatusUnsold": "Sin vender"
+      "listingStatusUnsold": "Sin vender",
+      "charselectWebLink": "Puja, compra o vende en la web de la Bolsa de $WOC",
+      "charselectWebNote": "Entra en el juego con un personaje para pujar, comprar o vender."
     },
     "lootExplorer": {
       "title": "Explorador de botín",
@@ -5669,6 +6534,61 @@ export const es: EnTranslations = {
       "gatedByQuest": "Mientras busca: {quest}",
       "empty": "Ningún botín coincide con estos filtros.",
       "resultCount": "{count} resultados"
+    },
+    "weekly": {
+      "title": "Misiones semanales",
+      "close": "Cerrar misiones semanales",
+      "subtitle": "Elige una de las cuatro cargas. Se",
+      "resetsIn": "reinicia en {time}.",
+      "anyDifficulty": "Cualquier dificultad",
+      "choose": "Elegir misión",
+      "inProgress": "En curso ({count}/{required})",
+      "completed": "Completado esta semana",
+      "lockedThisWeek": "Bloqueado esta semana",
+      "footerPick": "Puedes llevar una carga semanal a la vez. Elige una carta para leer sus condiciones.",
+      "footerHeld": "Tu carga de la semana ya está fijada. Las otras tres se desbloquean en el reinicio.",
+      "dialogHeading": "Misión semanal: {category}",
+      "objectives": "Objetivos de la misión",
+      "rewards": "Recompensas",
+      "alsoReceive": "También recibirás:",
+      "tally": "{count} / {required}",
+      "cacheDesc": "Se abre en una pieza de incursión Normal para tu clase (nunca una pieza de un conjunto de rango), más {count} x {item}.",
+      "dialogNote": "Solo puede haber una carga semanal activa. Se {reset}",
+      "accept": "Aceptar",
+      "decline": "Rechazar",
+      "kinds": {
+        "dungeons": {
+          "category": "Mazmorras",
+          "lore": "Las profundidades del reino nunca descansan: el Mecanismo Abandonado se agita de nuevo y la Cripta Hueca despierta. Reúne a tus aliados y limpia las mazmorras de su corrupción.",
+          "goal": "Completa {count} mazmorras en cualquier dificultad.",
+          "goalLabel": "Mazmorras completadas"
+        },
+        "raid": {
+          "category": "Banda",
+          "lore": "Poderes antiguos despiertan en el Crisol de la Última Llama y en las alturas de Thornpeak. Enfréntate a Ignivar o Nythraxis y derriba al comandante enemigo.",
+          "goal": "Participa en {count} banda en cualquier dificultad.",
+          "goalLabel": "Bandas completadas"
+        },
+        "battlegrounds": {
+          "category": "Campos de batalla",
+          "lore": "Los estandartes de guerra ondean sobre Thornhollow Fields. Lucha junto a tu facción, sostén la bandera y demuestra tu valía en la batalla; cada partida cuenta, se gane o se pierda.",
+          "goal": "Completa {count} campos de batalla.",
+          "goalLabel": "Campos de batalla completados"
+        },
+        "worldboss": {
+          "category": "Jefe del mundo",
+          "lore": "Enemigos poderosos vagan por las tierras salvajes, cada uno lo bastante fuerte para desafiar a ejércitos enteros. Únete a quien esté cerca y derriba a una aberración colosal.",
+          "goal": "Derrota a {count} jefe del mundo en las tierras salvajes.",
+          "goalLabel": "Jefes del mundo derrotados"
+        }
+      },
+      "commendHeading": "Condecoración del emisario",
+      "commendNote": "{amount} de reputación con la facción que elijas, una vez por semana.",
+      "commendClaimed": "La condecoración de esta semana fue para {faction}.",
+      "commendRewardLine": "{amount} de reputación con la facción que elijas",
+      "chosen": "Misión semanal aceptada: {category}",
+      "progress": "{label}: {count}/{required}",
+      "done": "Misión semanal completada: {category}"
     }
   },
   "gatherEvent": {
@@ -5778,6 +6698,9 @@ export const es: EnTranslations = {
       "invalid_roster_name": "Nombre de hermandad no válido.",
       "unknown": "No existe ninguna hermandad con ese nombre."
     },
+    "world_quests": {
+      "unknown_board": "No hay ningún marcador con ese nombre."
+    },
     "steam": {
       "disabled": "La vinculación con Steam no está disponible en este momento.",
       "invalid_ticket": "Steam no pudo verificar esta solicitud de vinculación. Inténtalo de nuevo desde la aplicación de escritorio.",
@@ -5877,6 +6800,70 @@ export const es: EnTranslations = {
       "stepup_signature_invalid": "La firma de la cartera no se pudo verificar. Vuelve a iniciar la venta."
     }
   },
+  "clues": {
+    "items": {
+      "clue_scroll": {
+        "desc": "Un acertijo sellado que se consigue al terminar cada hueco de zona del día. Úsalo para empezar una búsqueda del tesoro, y vuelve a usarlo en el lugar oculto cuando la última pista te diga que caves."
+      },
+      "treasure_casket": {
+        "desc": "Un cofre cerrado que se desentierra al final de una búsqueda del tesoro. Úsalo para abrirlo y reclamar lo que la búsqueda enterró."
+      }
+    },
+    "hunt_drakelands_gate_ashes": {
+      "0": "El camino que sale de Wyrmwatch corre hacia el oeste, hacia un grupo de árboles viejos que custodia la puerta. Ponte bajo el Gatewood y el rastro comienza.",
+      "1": "Un vigía de las dunas lejanas se mantiene en las arenas del este, al norte de la guarnición. Encuentra al Explorador Yerrin y pregúntale qué trajo el viento.",
+      "2": "La encargada de los almacenes de la guarnición no ha comido desde la última patrulla. Llévale a la Intendenta Sela 2 x Hogaza casera.",
+      "3": "Al este, y un poco al sur de donde las cenizas se acumulan en dunas, un terreno chamuscado esconde lo que la ceniza enterró. Usa el pergamino allí y cava.",
+      "title": "Cenizas en la Puerta"
+    },
+    "hunt_frostveil_aurora_vigil": {
+      "0": "Donde las terrazas ascienden hacia las luces que danzan de noche, arrodíllate en los Escalones de la Aurora y deja que el cielo repare en ti.",
+      "1": "Quien lee las luces espera cerca de los escalones. Habla con la Aurorista Veyla sobre lo que el cielo deletreó.",
+      "2": "Al este de las terrazas aulladoras, un poco al sur, la nieve yace más plana de lo que debería. Usa el pergamino allí y cava.",
+      "title": "Luces sobre los Escalones"
+    },
+    "hunt_amberfall_lantern_ferry": {
+      "0": "En la orilla del agua al norte de Lanternmere, el guardián de los transbordadores de farol sabe qué luz se apagó. Habla con el Barquero Caddow.",
+      "1": "Una sola piedra se inclina contra el cielo al noreste del gran mere, más vieja que el pueblo. Ponte de pie en el Monolito Inclinado.",
+      "2": "La guardiana de las hileras doradas riega su huerto a mano y se muere de sed por ello. Llévale a la Hortelana Pomeline 3 x Agua fría de pozo.",
+      "3": "Al noreste del alto donde los arces de ascua arden en rojo, las hojas forman un círculo que ningún viento hizo. Usa el pergamino allí y cava.",
+      "title": "Faroles en el Mere"
+    },
+    "hunt_willowfen_fenwitch_salt": {
+      "0": "La bruja del pantano de Willowweep no habla con nadie que llegue con las manos vacías. Llévale a la Madre Sedge 1 x Sal para cocinar.",
+      "1": "Donde el pantano se aplana y el aire adormece a todos, ponte de pie en las Llanuras Somnolientas y suspira, tal como te dijo la bruja.",
+      "2": "Al sureste de las charcas que brillan en la ciénaga, un montículo de tierra seca se mantiene seco todo el año. Usa el pergamino allí y cava.",
+      "title": "La Sal de la Bruja del Pantano"
+    },
+    "hunt_nightbloom_sleepless_vigil": {
+      "0": "Al noreste de Moonrest, donde las piedras mantienen una vigilancia que nunca termina, ponte de pie en la Vela Permanente.",
+      "1": "El vigía de la vela cuenta estrellas como otros cuentan monedas. Habla con el Astrónomo Cassian sobre la que cayó.",
+      "2": "Al norte del pueblo yace un túmulo cuyo durmiente jamás descansa. Saluda al Túmulo Insomne para que el durmiente sepa que ha llegado un amigo.",
+      "3": "Al sureste del campo donde se reúne la penumbra, la luz de la luna se acumula sobre un trozo de tierra desnuda. Usa el pergamino allí y cava.",
+      "title": "Vela de los Insomnes"
+    },
+    "hunt_wraithwood_mournstone_candles": {
+      "0": "El velero de Gibbetmere vende luz a la gente que teme la oscuridad. Habla con la Viuda Tansy sobre una vela que nunca se pagó.",
+      "1": "El último vicario del Mournstone ha estado ayunando solo con oraciones. Llévale al Vicario Creel 2 x Cecina salada.",
+      "2": "Al noreste del pueblo, más allá de los cuervos, un claro cuelga su propio y extraño fruto. Ponte de pie en el Claro Colgante.",
+      "3": "Al sureste del claro donde el cazador puso sus trampas, la hojarasca ha sido removida recientemente. Usa el pergamino allí y cava.",
+      "title": "Velas para el Mournstone"
+    },
+    "hunt_palmreach_sunken_idol": {
+      "0": "En lo profundo de la maraña, al noroeste de la laguna, las lianas caen como una cascada. Ponte de pie en el Vinefall.",
+      "1": "Un ermitaño que entró en la maraña y volvió a salir vive cerca de las lianas que caen. Habla con Okrim sobre lo que vio allá abajo.",
+      "2": "Al este, un ídolo yace medio hundido y sigue vigilando. Encógete de miedo ante el Ídolo Sumergido, tal como el ermitaño dijo que hacen los buceadores.",
+      "3": "Al noreste de donde la maraña abre su boca hacia el mar, la arena se ha amontonado más alto de lo que alcanza la marea. Usa el pergamino allí y cava.",
+      "title": "El Secreto del Ídolo"
+    },
+    "hunt_evergarden_beacon_road": {
+      "0": "La jardinera del parterre, junto al paseo al norte de Hedgewick, jura que sus parterres se mueren de hambre. Llévale a la Granjera Verbena 2 x Abono.",
+      "1": "En el rincón más al sureste del jardín, un viejo molino sigue girando sin molinero. Ponte de pie en el Viejo Molino.",
+      "2": "Sigue el camino hacia el sur, cruza la frontera hacia la Cresta del Vendaval y sal a la costa. El guardián del viejo faro, el Guardián Bram, tiene la última palabra.",
+      "3": "Al noroeste del viejo faro, justo al lado del sendero que baja desde la luz, el césped ha sido cortado y repuesto. Usa el pergamino allí y cava.",
+      "title": "Faro y Flor"
+    }
+  },
   "guide": {
     "brand": "World of ClaudeCraft",
     "brandShort": "ClaudeCraft",
@@ -5899,6 +6886,7 @@ export const es: EnTranslations = {
       "progression": "Subir de nivel y progresión",
       "world": "Mundo",
       "quests": "Misiones",
+      "factions": "Facciones y Reputación",
       "dungeons": "Mazmorras y bandas",
       "delves": "Expediciones",
       "rifts": "Brechas",
@@ -5913,6 +6901,7 @@ export const es: EnTranslations = {
       "talents": "Talentos",
       "arena": "Arena y JcJ",
       "thornhollow": "Campos Espinosos",
+      "worldPvp": "JcJ Mundial",
       "deeds": "Libro de Gestas",
       "reliquary": "El Relicario",
       "glossary": "Glosario",
@@ -6209,6 +7198,7 @@ export const es: EnTranslations = {
       "rowBrightness": "Exposición de la escena, más oscura o más brillante. Pura preferencia.",
       "rowWeather": "Ambiente de lluvia y nieve. Sólo la atmósfera, y apagarlo ahorra un poco durante las tormentas.",
       "rowBrowserEffects": "Qué elegante puede ser la interfaz en sí: cristal borroso, brillo, menús animados. Auto coincide con su navegador; el mundo 3D permanece intacto de cualquier manera.",
+      "rowFrameRateCap": "Un tope de cuántas imágenes dibuja el juego cada segundo. Un ordenador que no da abasto con su pantalla cae en un ritmo irregular; un 30 constante se ve más fluido que eso, reduce el trabajo a la mitad, y mantiene el ordenador más fresco. Pantalla significa sin límite.",
       "rowTerrainDetail": "Texturas de terreno ricas y combinadas frente a una apariencia de terreno más simple y rápida.",
       "rowFoliageDensity": "Qué tan lejos y qué tan espesa crece la hierba alrededor de tu personaje.",
       "rowEffectsQuality": "El bloom, la oclusión ambiental y cuántas antorchas y hechizos proyectan luz real. El mayor ahorro de todos los controles de detalle, y el interruptor del que dependen los demás controles de iluminación.",
@@ -6252,6 +7242,7 @@ export const es: EnTranslations = {
       "ifHudOpacity": "Qué tan sólidos son los paneles de la interfaz sobre el mundo que hay detrás.",
       "ifTooltipScale": "El tamaño del texto de la información emergente, útil en una pantalla pequeña o en una muy grande.",
       "ifHighContrastText": "Texto de interfaz más grueso y de mayor contraste. Principalmente una opción de accesibilidad, y también útil en una pantalla muy iluminada.",
+      "ifColorblindMode": "Vuelve a colorear los peligros de suelo de Nythraxis (el anillo de impacto de la Erupción sepulcral, las charcas de Llama de tumba y Fuego del alma, la línea de fuego sepulcral, y las marcas de Desgarro de alma) con una paleta segura para daltónicos, con matices y brillos distintos, para que los círculos superpuestos conserven sus bordes. Los tamaños, los temporizadores y las posiciones nunca cambian.",
       "ifHighContrastBackground": "Un fondo más sencillo y de mayor contraste detrás de las pantallas de inicio y de personaje.",
       "ifInvertLookY": "Invierte la dirección vertical de la vista con el ratón.",
       "ifShowItemLevel": "Añade una línea de nivel de objeto a la información emergente de cada objeto. Desactivado de forma predeterminada, lo que conserva la clásica información emergente de solo estadísticas.",
@@ -6271,7 +7262,9 @@ export const es: EnTranslations = {
       "ifPartyShowAuras": "Si los beneficios y perjuicios se muestran en los marcos de grupo. Interruptores equivalentes cubren las barras de recursos, los escudos de absorción, las mascotas y si apareces en tu propia lista de grupo.",
       "ifAurasOnPlayerFrame": "Muestra tus beneficios y perjuicios en tu propio marco de unidad, además de en la barra de auras.",
       "ifAuraBarBelowFrame": "Mueve la fila de beneficios debajo de tu marco de unidad en vez de encima. Solo importa mientras los beneficios estén en el marco del jugador.",
+      "ifTargetAurasBelowFrame": "Cuelga la franja de beneficios y perjuicios del marco de objetivo debajo del marco en lugar de encima, el diseño clásico. Desactivado de forma predeterminada, ya que el marco de objetivo estándar se sitúa justo encima de la barra de acción; actívalo una vez que hayas movido el marco a un lugar con espacio debajo.",
       "ifAlwaysShowAllBuffs": "Muestra todos los beneficios activos incluso con el preajuste gráfico Bajo, ignorando su límite habitual de iconos de beneficios.",
+      "ifShowAuraCaster": "Añade una línea de \"Lanzado por\" a la información de cada beneficio o perjuicio, indicando quién lo aplicó. Útil para distinguir a varios lanzadores del mismo beneficio, como los Juramentos de dos paladines.",
       "ifTargetOfTarget": "Muestra a quién tiene como objetivo tu objetivo, la forma clásica de saber si el tanque todavía lo controla.",
       "ifPetFrame": "Muestra un marco para tu mascota.",
       "ifChatFontScale": "Tamaño del texto del chat.",
@@ -6314,7 +7307,7 @@ export const es: EnTranslations = {
       "deathTitle": "Cuando caes",
       "deathBody": "Si tu salud llega a cero, caes donde estás y tu cuerpo se queda allí. Libera tu espíritu y te alzas como espíritu en el cementerio más cercano: más veloz que los vivos, fuera del alcance de tus enemigos, pero incapaz de luchar, saquear o hablar con nadie salvo con el Guardián Pálido que flota sobre las lápidas. Desde ahí eliges. Lleva tu espíritu de vuelta a tu cuerpo y revives en el sitio, con parte de tu salud y tu maná restaurados y sin penalización alguna. O acepta del Guardián Pálido un alzamiento instantáneo donde estás, al precio del Tañido del Guardián: un debilitamiento temporal de cuanto eres que dura más cuanto más veterano seas, y que perdona por completo a los personajes recién creados. Cae dentro de una mazmorra y tu espíritu aguarda en el cementerio de fuera; lleva tu espíritu de vuelta a través de la puerta y revives en la entrada. Las expediciones son la excepción: si caes allí, simplemente vuelves a ponerte en pie en la entrada de la expedición, aunque una segunda caída termina la incursión. Por cualquiera de los dos caminos, no pierdes experiencia, equipo ni dinero. Entre combates, siéntate a comer y beber para empezar el siguiente con toda tu fuerza.",
       "threatTitle": "A quién golpea el enemigo",
-      "threatBody": "Cada enemigo lleva su propia cuenta privada de quién le ha molestado más. El daño se suma a ella, y también la curación: sanar añade amenaza sobre los enemigos que ya luchan contra la persona curada, repartida entre ellos, así que la curación más segura es la que recae sobre alguien que el tanque ya tiene sujeto. Los tanques activan una actitud en guardia o una forma protectora que multiplica cuanto generan, mientras que la Forma de gato del druida hace justo lo contrario y descarta amenaza, y una provocación eleva al lanzador directo a la cima de la lista y le fija al enemigo encima durante unos segundos. Los enemigos no cambian en el instante en que alguien supera al tanque: hace falta una ventaja clara para arrebatarle uno, y una ventaja mayor a distancia que cuerpo a cuerpo, así que un poco de paciencia al empezar a atraer a un grupo mantiene el combate donde debe estar.",
+      "threatBody": "Cada enemigo lleva su propia cuenta privada de quién le ha molestado más. El daño se suma a ella, y también la curación: sanar añade amenaza sobre los enemigos que ya luchan contra la persona curada, repartida entre ellos, así que la curación más segura es la que recae sobre alguien que el tanque ya tiene sujeto. Los tanques activan una actitud en guardia o una forma protectora que multiplica cuanto generan, mientras que la Forma de lobo del druida hace justo lo contrario y descarta amenaza, y una provocación eleva al lanzador directo a la cima de la lista y le fija al enemigo encima durante unos segundos. Los enemigos no cambian en el instante en que alguien supera al tanque: hace falta una ventaja clara para arrebatarle uno, y una ventaja mayor a distancia que cuerpo a cuerpo, así que un poco de paciencia al empezar a atraer a un grupo mantiene el combate donde debe estar.",
       "hazardsTitle": "El agua puede matarte",
       "breathBody": "El agua profunda se puede nadar, y puedes bucear bajo ella. Mientras tienes la cabeza sumergida, aparece una barra de Aliento azul cerca de la parte superior de la pantalla y se va vaciando; sal a la superficie y se rellena mucho más rápido de lo que se vació. Deja que se agote por completo mientras sigues sumergido y empiezas a ahogarte, perdiendo un buen trozo de salud cada segundo hasta que llegues al aire, así que vigila la barra en una inmersión larga. La muerte la restablece, de modo que una carrera del cadáver siempre empieza con los pulmones llenos.",
       "fatigueBody": "El mar no tiene muro. Los cruces que el mundo espera que nades, los estrechos y las lagunas entre un tramo de tierra y el siguiente, y los lagos del interior, son seguros de cruzar por mucho que tarden. Aventúrate más allá de la orilla, en aguas verdaderamente abiertas, y empieza a minar tus fuerzas: aparece un aviso, tienes una ventana real para dar la vuelta, y después de eso el mar inflige un daño cada vez mayor que nada puede evitar hasta que regreses hacia tierra. Ahógate o agótate tan lejos de la orilla y liberas tu espíritu como en cualquier otra muerte, así que trata el horizonte como paisaje, no como destino.",
@@ -6322,6 +7315,7 @@ export const es: EnTranslations = {
       "allyRezBody": "No siempre tienes que volver caminando. Un aliado con un hechizo de resurrección puede alzarte en su lugar, y te llega como un aviso que aceptas o rechazas; si lo dejas sin responder, caduca, así que respóndelo mientras esté ahí. Acéptalo y te levantas junto al amigo que lo lanzó, con parte de tu salud y tu maná recuperados. Algunos sanadores pueden devolver a la vida de golpe a cuantos miembros del grupo hayan caído, aunque cada uno de vosotros sigue respondiendo a su propio aviso. Los Campos Espinosos son la excepción: ningún hechizo de resurrección te alcanza allí, y esperas a la siguiente oleada de tu equipo.",
       "unstuckTitle": "Cuando estás realmente atascado",
       "unstuckBody": "Si el mundo te atrapa en algún sitio del que no puedes salir, escribe /unstuck. Necesitas estar fuera de combate y quieto, sin un aturdimiento ni una raíz encima, y no estar en un duelo ni en un combate de arena: se inicia una breve cuenta atrás, y moverte o recibir daño la cancela. Cuando termina, te deja en el cementerio más cercano. Nunca te mata y no deja cadáver, y si ya habías caído, te revive allí en su lugar. El precio es el Mal de desatasco, un debilitamiento temporal de cuanto eres que ya se ha disipado para cuando puedas volver a usar el comando, y al igual que el Tañido del Guardián, perdona por completo a los personajes recién creados.",
+      "unstuckBodyWindow": "Si el mundo te atrapa en algún sitio del que no puedes salir, escribe /unstuck. Necesitas estar fuera de combate y quieto, sin un aturdimiento ni una raíz encima, y no estar en un duelo ni en un combate de arena: se inicia una breve cuenta atrás, y moverte o recibir daño la cancela. Cuando termina, te deja en el cementerio más cercano. Nunca te mata y no deja cadáver, y si ya habías caído, te revive allí en su lugar. El primer uso en una hora no te cuesta nada. Si lo usas de nuevo dentro de la hora siguiente al último, el precio es el Mal de desatasco, un debilitamiento temporal de cuanto eres que se ha disipado para cuando puedas volver a usar el comando, y al igual que el Tañido del Guardián, perdona por completo a los personajes recién creados.",
       "climbTitle": "Subir a un saliente",
       "climbBody": "Los salientes no son muros. Salta hacia algo demasiado alto para subir de un paso y tu personaje se agarra al borde cerca de la cima del salto y se impulsa hasta arriba, sin ninguna tecla propia que pulsar. Cualquier cosa lo bastante baja como para salvarla por ti mismo pasa sin más ceremonia; el impulso completo se reserva para bordes por encima de tu cabeza. Es breve, y toma las riendas mientras dura, así que no puedes salir de él a medio camino. Un aturdimiento te sorprende a mitad del impulso y sueltas y caes, calculado desde el punto donde el salto dejó el suelo, y un aturdimiento o una raíz impiden que la subida llegue siquiera a empezar, algo que conviene recordar cuando intentas escapar de un mal trance en pleno combate."
     },
@@ -6345,9 +7339,11 @@ export const es: EnTranslations = {
       "framePetBody": "Los cazadores, los brujos y cualquier otro que tenga una mascota fuera obtienen un pequeño marco para ella junto al suyo propio, con su nombre, nivel y salud. Hacer clic en ese marco selecciona a tu mascota, y Ctrl+6 hace lo mismo desde el teclado.",
       "framesMoveBody": "Tu marco, tu marco de objetivo y tus marcos de grupo se pueden mover todos. Cada uno lleva un pequeño botón de mover en su esquina: desbloquéalo, arrastra el marco adonde quieras y vuelve a bloquearlo para que un clic accidental no pueda desplazarlo. Si terminan en un sitio del que te arrepientes, Restablecer posiciones de marco en las opciones los devuelve a todos a donde empezaron.",
       "framesMoveBodyEditFrames": "Puedes mover tu marco, el marco de objetivo y los marcos de grupo. Cada uno tiene un pequeño botón de mover en una esquina: desbloquéalo, arrastra el marco donde quieras y vuelve a bloquearlo para que un clic perdido no lo desplace. Editar marcos, arriba de la pestaña Marcos en las opciones de Interfaz, libera el resto de la interfaz de una vez junto con esos tres: barras de acción, barra de lanzamiento, barra de golpes, barra de experiencia, minimapa, raíl de botones, marco de mascota, barra de postura, filas de beneficios y perjuicios y etiqueta de recordatorio de deseos. Si algo queda en un lugar que no quieres, Restablecer valores predeterminados, al pie de esa pestaña, devuelve todo a su posición inicial.",
-      "framesGovernedExtra": "Editar marcos también libera la pila de rastreadores inferior, con tus misiones y objetivos seguidos, progreso de gestas, páginas del Relicario, las recetas que hayas fijado desde la fabricación, la Profundidad actual, cualquier Brecha en la que participes y la receta o comisión que sigas; además de la barra de acción de mascota, los puntos de objetivo para tus perjuicios en enemigos cercanos, el medallón Devoción del paladín, la Barra de aflicción del brujo, la superposición de activaciones de hechizos, el temporizador de mano izquierda para quienes empuñan dos armas y la ventana de medidores de daño con pestañas. Cada elemento lleva su propia etiqueta cuando está libre.",
+      "framesGovernedExtra": "Editar marcos también libera la pila de rastreadores inferior, con tus misiones y objetivos seguidos, progreso de gestas, páginas del Relicario, la Profundidad actual, cualquier Brecha en la que participes y la receta o comisión que sigas; además de la barra de acción de mascota, los puntos de objetivo para tus perjuicios en enemigos cercanos, el medallón Devoción del paladín, la Barra de aflicción del brujo, la superposición de activaciones de hechizos, el temporizador de mano izquierda para quienes empuñan dos armas y la ventana de medidores de daño con pestañas. Cada elemento lleva su propia etiqueta cuando está libre.",
       "framesGovernedAuraTracks": "Editar marcos también libera las seis pistas de auras opcionales cuando las activas en la pestaña Combate de las mismas opciones de Interfaz: Mis beneficios, Enfriamientos defensivos, Mis escudos, Enfriamientos ofensivos, Movimiento y sigilo, y Mis beneficios sobre aliados. Todas están desactivadas de forma predeterminada y cada una muestra su propia etiqueta cuando está libre.",
+      "frameGroups": "{trackers} puede combinar misiones, gestas, brechas, expediciones, objetivos de recolección y el seguimiento del Relicario. {auras} puede combinar los dots de objetivo y las seis franjas de auras. Activa cualquiera de los dos grupos en Configuración de marcos, o déjalo desactivado para mover cada marco por separado. {tot} incluye una barra de recurso. {focus} tiene tres objetivos que se mueven de forma independiente: Shift+F1 a Shift+F3 los asigna; Ctrl+F1 a Ctrl+F3 los selecciona. Arrastra el medidor de daño o de amenaza en cualquier punto fuera de sus botones para moverlo, y arrastra sus bordes para redimensionarlo, incluso con los marcos bloqueados. Mientras los marcos están desbloqueados, Mostrar u Ocultar Marcos tiene su propio menú agrupado. Haz clic derecho en un marco desbloqueado para Restablecer tamaño u Opciones de marco. Interfaz > Marcos también contiene Configuración de marcos y las Opciones de marco de grupo, que se pueden contraer. Vincular el objetivo de tu objetivo al objetivo mantiene esos marcos juntos. Desactívalo para mover el objetivo de tu objetivo por separado; volver a activarlo conserva esa posición aparte para más tarde. Los marcos de foco asignados ocultan sus controles de configuración; haz clic derecho y elige Quitar foco para restaurarlos. El lanzamiento al pasar el cursor también funciona en los marcos de foco.",
       "framesGovernedTalkingHead": "Editar fotogramas también afloja el panel de Diálogo, que lleva la línea hablada de un NPC mientras ese NPC está fuera de tu vista; lleva su chip con nombre mientras está suelto.",
+      "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Barras, temporizadores y texto de combate",
       "barsBody": "Tu barra de lanzamiento aparece en el centro de la pantalla, justo encima de tus barras de acción, cada vez que lanzas o canalizas, y muestra el nombre del hechizo y el tiempo restante. Tu objetivo tiene su propia barra de lanzamiento en su marco, para que puedas ver lo que viene y responder a ello.\n\nUna fina barra de golpe se sitúa bajo tu barra de lanzamiento y se llena entre los golpes de tu arma, para que un atacante cuerpo a cuerpo o a distancia pueda ver cuándo llega el próximo golpe automático.\n\nTu barra de experiencia ocupa el ancho completo bajo tus barras de acción, dividida en segmentos, con un tramo más claro que muestra la experiencia de descanso que tienes acumulada.\n\nNada bajo el agua y aparecerá una barra de aliento azul en la parte superior de la pantalla. Se vacía mientras tienes la cabeza sumergida, parpadea en rojo en cuanto se agota y empiezas a ahogarte, y se rellena rápido en cuanto sales a la superficie. Space te hace nadar hacia arriba, y la tecla Nadar hacia abajo, Ctrl de forma predeterminada, te lleva más profundo.\n\nEl daño y la sanación flotan hacia arriba sobre aquello que los recibió en forma de pequeños números, para que puedas leer un combate sin leer texto. La pestaña Combate de tu caja de chat conserva el registro escrito completo.",
       "aurasTitle": "Beneficios y perjuicios",
@@ -6358,7 +7354,7 @@ export const es: EnTranslations = {
       "minimapBody": "Arriba a la derecha: un minimapa redondo con el nombre de la zona encima y tus coordenadas debajo, rodeado por un dial que pinta la hora del día.\n\nEl disco muestra más que el terreno. Tu propia flecha se sitúa en el centro, apuntando hacia donde miras, con tu grupo a tu alrededor como puntos con el color de su clase y una flecha de borde para quien se haya alejado de él. Los que dan misiones llevan las mismas marcas ahí que en el mundo, y también distinguirás nodos de recolección y estaciones de artesanía, portales de viaje, cadáveres y contenedores saqueables, cualquier hostil que se haya fijado en ti, amigos y compañeros de hermandad que estén cerca, y tu propio cuerpo mientras corres de vuelta como fantasma.\n\nPequeños indicadores aparecen en él cuando tienen algo que decir: un sobre mientras te esperan cartas sin leer, una moneda mientras te esperan en el Mercader ganancias de venta o mercancías devueltas, y un botón con la lista de tus bloqueos de banda.",
       "mapTitle": "El mapa del mundo y tus rastreadores",
       "mapBody": "M abre el mapa del mundo: el continente dibujado, con tu propia flecha en él, las zonas y sus nombres, los puntos de interés a tu alrededor, los portales de viaje y los nodos de recolección que has encontrado. Tu grupo también aparece en él. Dentro de una expedición, el mapa cambia a un esquema de las salas que has explorado hasta el momento.\n\nEn el lado derecho, bajo el minimapa, una pila de rastreadores mantiene a la vista tus asuntos actuales sin necesidad de abrir nada: tus misiones en seguimiento y sus objetivos, tu progreso de gestas, la expedición en la que estás y cualquier brecha en la que participes. El rastreador de misiones se contrae cuando quieres recuperar la pantalla.",
-      "mapBodyZoneFirst": "M abre el mapa del mundo en la zona donde estás, con tu propia flecha, los puntos de interés cercanos, los emisores de misiones con sus marcas y las áreas de tus objetivos, estaciones de fabricación, buzones, tablones y bancales, entradas de mazmorra y todos los nodos de recolección de la zona, apagados mientras reaparecen y marcados cuando tus herramientas no bastan. Tu grupo también aparece. Haz clic derecho en el mapa o pulsa su botón Mapa del mundo para alejarlo hasta el continente, con cada zona dibujada y nombrada; al hacer clic en una zona se abre su mapa. Entra en una Profundidad, mazmorra, Brecha o fortaleza y el mapa cambia al plano del lugar; el campo de batalla de Campos Espinosos tiene su propio mapa.\n\nA la derecha, bajo el minimapa, una pila de rastreadores mantiene a la vista tus asuntos actuales: misiones y objetivos seguidos, progreso de gestas, páginas del Relicario, las recetas que hayas fijado desde la fabricación, la Profundidad actual y cualquier Brecha en la que participes. El rastreador de misiones se contrae cuando quieres recuperar espacio en pantalla.",
+      "mapBodyZoneFirst": "M abre el mapa del mundo en la zona donde estás, con tu propia flecha, los puntos de interés cercanos, los emisores de misiones con sus marcas y las áreas de tus objetivos, estaciones de fabricación, buzones, tablones y bancales, entradas de mazmorra y todos los nodos de recolección de la zona, apagados mientras reaparecen y marcados cuando tus herramientas no bastan. Tu grupo también aparece. Haz clic derecho en el mapa o pulsa su botón Mapa del mundo para alejarlo hasta el continente, con cada zona dibujada y nombrada; al hacer clic en una zona se abre su mapa. Entra en una Profundidad, mazmorra, Brecha o fortaleza y el mapa cambia al plano del lugar; el campo de batalla de Campos Espinosos tiene su propio mapa.\n\nA la derecha, bajo el minimapa, una pila de rastreadores mantiene a la vista tus asuntos actuales: misiones y objetivos seguidos, progreso de gestas, páginas del Relicario, la Profundidad actual y cualquier Brecha en la que participes. El rastreador de misiones se contrae cuando quieres recuperar espacio en pantalla.",
       "gatheringGoalTrackerBody": "Un rastreador de objetivos de recolección se une a la pila cuando sigues una receta en la ventana de fabricación o una comisión en el tablón: indica la receta o comisión, cuánto estás reuniendo y cuánto aportan tus materiales guardados y almacenados. Seguir reemplaza el objetivo actual y Borrar lo elimina explícitamente; ninguno cambia tu preferencia de cosecha.",
       "hubPracticeTrackerBody": "Cerca del centro de Eastbrook se une un rastreador de práctica cuando aceptas allí las lecciones guiadas: mantiene visibles tus mejores intentos contra los muñecos de práctica. Mientras una lección está activa, una franja de entrenamiento te guía por el paso actual, desde abrir los medidores de daño hasta comparar un segundo intento.",
       "chatTitle": "La caja de chat",
@@ -6458,6 +7454,8 @@ export const es: EnTranslations = {
       "completed": "Las misiones que ya has entregado, en el orden en que las terminaste.",
       "session": "Lo que has hecho desde que iniciaste sesión: bajas, muertes, daño y experiencia.",
       "arena": "Tu posición en el Coliseo Ceniciento en ambas categorías: índice, victorias, derrotas y porcentaje de victorias para 1c1 y para 2c2.",
+      "pvp": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.",
+      "pvpZones": "Bandera de JcJ mundial: /pvp la alterna, /pvp on y /pvp off la fijan. Los jugadores marcados pueden luchar entre sí en terreno disputado, los santuarios no permiten ningún combate mundial en absoluto, y las zonas de todos contra todos lo permiten con o sin bandera; desactivarla tarda 5 minutos.",
       "listings": "Tus propios anuncios en el Mercado Mundial, con el precio pedido, el tiempo que le queda a cada uno, y cuánto espacio te queda para publicar más.",
       "buyback": "Lo que has vendido recientemente a un vendedor y todavía puedes recomprar.",
       "groupState": "Cómo estás ahora mismo",
@@ -6495,6 +7493,7 @@ export const es: EnTranslations = {
       "dungeonReset": "Abandona tus propias instancias vacías, que es lo que haces después de cambiar de dificultad.",
       "groupRecovery": "Recuperación y presencia",
       "unstuck": "La salida cuando el mundo te ha atrapado. Quédate quieto durante una breve cuenta atrás y te trasladas al cementerio más cercano, revivido allí si ya habías caído. Después te deja debilitado con el Mal de desatasco durante un tiempo, así que es un último recurso y no un atajo.",
+      "unstuckWindow": "La salida cuando el mundo te ha atrapado. Quédate quieto durante una breve cuenta atrás y te trasladan al cementerio más cercano, y te revive allí si ya habías caído. El primer uso en una hora es gratis. Si lo usas de nuevo dentro de la hora siguiente al último, te deja debilitado con el Mal de desatasco durante un tiempo después, así que es un rescate, no un atajo.",
       "afk": "Márcate como Ausente, con un mensaje opcional que recibe como respuesta automática cualquiera que te susurre. Repite el comando sin mensaje para desactivarlo; cualquier otro mensaje de chat también lo desactiva.",
       "dnd": "No Molestar: como estar ausente, salvo que los susurros que te envían se retienen en lugar de entregarse.",
       "sit": "Siéntate donde estás, y vuelve a levantarte. Te levantas automáticamente en cuanto te mueves, lanzas un hechizo o recibes un golpe.",
@@ -6601,6 +7600,7 @@ export const es: EnTranslations = {
       "fatigueDef": "Nada lo bastante mar adentro en aguas abiertas y el agua empieza a debilitarte: primero llega un aviso, y luego un daño creciente hasta que regreses hacia tierra.",
       "unstuckTerm": "Mal de desatasco",
       "unstuckDef": "El precio de usar Desatascar desde el menú del juego. Quédate quieto durante toda la cuenta atrás y te deposita en el cementerio más cercano, y cargas con una debilidad temporal durante un tiempo después.",
+      "unstuckDefWindow": "El precio de recurrir a Desatascar desde el menú del juego más de una vez por hora. Quédate quieto durante la cuenta atrás y te deposita en el cementerio más cercano. El primer uso en una hora es gratis, y repetirlo dentro de la hora siguiente al último también te deja con una debilidad temporal durante un tiempo después.",
       "itemLevelTerm": "Nivel de objeto",
       "itemLevelDef": "Un único número que resume la fuerza de una pieza de equipo, útil cuando quieres comparar dos piezas con rapidez. Activa Mostrar nivel de objeto en las opciones para verlo en la información emergente. Solo el equipo de origen conocido lleva uno, así que los básicos comunes de vendedor y el equipo inicial no muestran nada, y que falte la cifra es normal, no un fallo.",
       "requiredLevelTerm": "Nivel requerido",
@@ -6705,7 +7705,7 @@ export const es: EnTranslations = {
       "formsNote": "Un druida lucha cambiando de forma. La mayoría de las habilidades de druida pertenecen a una forma concreta, así que la forma en la que estás decide lo que puedes lanzar, y cambiar de forma cuesta un poco de maná. Puedes cambiar de forma dentro o fuera de combate, tantas veces como quieras.",
       "formsAutoUnshift": "Una sanación o un hechizo de daño lanzado en forma te saca de ella por ti. Salir de una forma así es gratis y no gasta tu tiempo de reutilización global, de modo que un hechizo instantáneo sale en el momento en que lo pulsas. Volver a la forma es una habilidad normal y sigue costando maná y tu tiempo de reutilización global.",
       "formsMoonwing": "Un druida de Equilibrio gana una forma más, la Forma de lechúcico lunar, la forma de conjurador en la que lucha un druida de Equilibrio. Es la única forma animal que conserva tus hechizos, y tu varita solo funciona en ella o en tu forma de conjurador normal.",
-      "formsWolfEngage": "Un lobo abre el combate con Embestida de Bruin, cambia enseguida a Forma de lobo para sujetar al objetivo, cierra la distancia con Embate cuando no está en sigilo y frena a un enemigo con Derribo.",
+      "formsWolfEngage": "Un Gato abre el combate con Embestida de Bruin, se transforma directamente en Forma de lobo para inmovilizar al objetivo, cierra la distancia con Embestida felina cuando no está al acecho, y mantiene quieto a un enemigo con Takedown.",
       "formLine": {
         "form_bear": "La forma de tanque: una piel gruesa, ira en lugar de maná, y amenaza extra para que los enemigos sigan golpeándote a ti.",
         "form_cat": "La forma de daño cuerpo a cuerpo: energía y puntos de combo, como un pícaro, y mucha menos amenaza.",
@@ -6714,7 +7714,7 @@ export const es: EnTranslations = {
       "mageEleSummon": "Un hechizo de Escarcha que llama al elemental a tu lado y lo lanza contra tu objetivo.",
       "formName": {
         "form_bear": "Forma de Bruin",
-        "form_cat": "Forma de gato",
+        "form_cat": "Forma de lobo",
         "form_travel": "Forma Fleet"
       }
     },
@@ -7057,6 +8057,14 @@ export const es: EnTranslations = {
       "sideWardenBody": "Junto a la historia, los mariscales y guardianes del Valle y de la ciénaga reparten una escala permanente de recompensas. Asciende por ella, enemigo a enemigo, como se ganó su puesto cada cazarrecompensas antes que tú. Es subir de nivel con honradez y un recorrido por los peores alborotadores de cada zona.",
       "sideCryptTitle": "El rey olvidado",
       "sideCryptBody": "En lo alto de los picos discurre un misterio más callado: viejas tumbas marcadas con una corona que ningún registro recuerda. Lee a los muertos, reúne lo que custodiaban y abre un sepulcro que debía permanecer cerrado. Es un rastro de detective que abre el paso a la banda de fin del juego para diez jugadores del reino.",
+      "cluesTitle": "Pergaminos de Pistas",
+      "cluesBody": "En las zonas lejanas, el tablón diario de misiones mundiales esconde una recompensa más para quien complete toda la lista: un Pergamino de Pistas, y la búsqueda del tesoro escrita en él.",
+      "cluesEarnTitle": "Cómo conseguir un pergamino",
+      "cluesEarnBody": "Una vez que tu personaje ha avanzado lo suficiente, completar cada hueco de zona en el tablón diario de misiones mundiales te entrega un Pergamino de Pistas además de las recompensas habituales. Un hueco vuelto a tirar cuenta en cuanto se completa; las misiones diarias siempre disponibles no son necesarias. Puedes tener varios pergaminos a la vez, así que no hace falta gastar uno el mismo día en que lo consigues.",
+      "cluesHuntTitle": "Siguiendo las pistas",
+      "cluesHuntBody": "Usar un pergamino inicia una búsqueda: una breve cadena de acertijos que se muestra en tu rastreador de misiones un paso a la vez. Cada acertijo señala algo real en el mundo, un punto de referencia donde ponerte de pie, una persona con quien hablar, un emote que realizar en algún sitio, o un pequeño recado que hacer, y el último siempre te pide que caves. Solo hay una búsqueda activa a la vez, y conserva tu progreso a través del reinicio diario y entre sesiones, así que tómate tu tiempo.",
+      "cluesCasketTitle": "El cofre",
+      "cluesCasketBody": "Resuelve la última pista y usa el pergamino en el lugar que indica para desenterrar un Cofre del Tesoro; terminar la búsqueda también gana reputación con la facción en cuyas tierras estaba escondido. Abre el cofre para conseguir monedas y un lote de materiales de recolección finos. De vez en cuando contiene una pieza de equipo o unas Marcas Heroicas, y muy rara vez a Grumbol el Farolero, una montura que no se encuentra en ningún otro sitio. Tu primer cofre y tu décimo quedan registrados en el Libro de Gestas.",
       "sideTempleTitle": "El Templo Ahogado",
       "sideTempleBody": "Una puerta de luz pálida sobre un lago de montaña en las cumbres se abre a un santuario hundido donde un culto ahogado aún canta. Su breve cadena de misiones queda aparte de la historia principal, un misterio autónomo para quien suba hasta la orilla, lea las advertencias talladas en las rocas y baje a ver para qué servían.",
       "availableTitle": "Por qué un PNJ no tiene nada para ti",
@@ -7208,7 +8216,30 @@ export const es: EnTranslations = {
       "warfareBody": "Toda pieza de equipo de guerra lleva Índice de Ofensiva y de Defensa de Pericia Bélica, y esos dos índices no sirven de nada contra monstruos. Solo se aplican cuando luchas contra otro jugador, en un duelo, en la arena o en el campo de batalla, donde la Ofensiva se suma al daño que infliges y la Defensa reduce el daño que recibes, cada una hasta su propio tope. Cada familia de armadura es también un conjunto, y sus bonificaciones de conjunto son igualmente índice de Pericia Bélica o efectos que solo funcionan contra jugadores, así que un equipo de honor completo no vale nada contra un jefe de mazmorra.",
       "warfareBodyStatsStay": "Cada pieza de Guerra lleva índice de Ofensiva de Guerra e índice de Defensa de Guerra, y esos índices no hacen nada contra monstruos. Solo se aplican al luchar contra otro jugador, en duelo, arena o campo de batalla: la Ofensiva aumenta el daño que infliges y la Defensa reduce el daño que recibes, cada una hasta su propio límite. Cada familia de armadura también es un conjunto, y sus bonificaciones son índices o efectos de Guerra que solo funcionan contra jugadores, así que las bonificaciones de un conjunto completo de Honor no sirven contra un jefe de mazmorra. Las piezas mantienen sus estadísticas normales, armadura y daño de arma, que sí funcionan en todas partes; contra monstruos solo se apagan los índices de Guerra y sus bonificaciones.",
       "warfareTradeBody": "Ese es el intercambio deliberado. El equipo de guerra está pensado para luchar contra jugadores, no como atajo para saltarte los niveles de mazmorra: una pieza de guerra nunca lleva los índices de combate que sí lleva un objeto épico de mazmorra en el mismo hueco, y cuanto aporta se gasta en otros jugadores. Si quieres defenderte bien en la arena, cómpralo. Si quieres superar las heroicas más rápido, gánate tu equipo en las mazmorras.",
-      "warfareTradeBodyRatingSpent": "Ese es el intercambio deliberado. El equipo de Guerra está hecho para combatir jugadores, no para saltarse los niveles de mazmorra: una pieza de Guerra nunca lleva los índices de combate que tendría un épico de mazmorra en el mismo hueco, y los índices y bonificaciones de Guerra que sí lleva se gastan por completo contra otros jugadores. Si quieres competir en arena, cómpralo. Si quieres limpiar heroicas más rápido, consigue tu equipo en las mazmorras."
+      "warfareTradeBodyRatingSpent": "Ese es el intercambio deliberado. El equipo de Guerra está hecho para combatir jugadores, no para saltarse los niveles de mazmorra: una pieza de Guerra nunca lleva los índices de combate que tendría un épico de mazmorra en el mismo hueco, y los índices y bonificaciones de Guerra que sí lleva se gastan por completo contra otros jugadores. Si quieres competir en arena, cómpralo. Si quieres limpiar heroicas más rápido, consigue tu equipo en las mazmorras.",
+      "vanguardHeading": "Equipo de Vanguardia: Guerra, temporada 2",
+      "vanguardBody": "El equipo de Vanguardia es la segunda temporada del equipo de Guerra, vendido por los mismos dos intendentes, por encima del nivel original, que sigue a la venta. Cada especialización tiene su propio conjunto de Vanguardia de cinco piezas, para la cabeza, los hombros, el pecho, las piernas y las manos, y la tienda solo lista los tres conjuntos que tu clase puede vestir, seguidos de las armas de Vanguardia que puedes empuñar. Una pieza de Vanguardia lleva las mismas características de Guerra que el nivel original a un nivel de objeto más alto, y cada conjunto tiene dos bonificaciones, a dos y cuatro piezas, que cambian una de las habilidades de tu especialización. A diferencia de los conjuntos originales, esas bonificaciones funcionan en todas partes, monstruos incluidos, pero están pensadas para luchar contra jugadores, así que un conjunto de banda sigue siendo la mejor opción dentro de una banda."
+    },
+    "worldPvpPage": {
+      "heading": "JcJ Mundial",
+      "intro": "Open-world player-versus-player is opt-in. Raise your PvP flag and every other flagged player who is not in your party, raid or guild becomes an enemy anywhere in the open world; lower it and, after a short delay, you are a bystander again. Nobody who has not raised the flag can attack or be attacked.",
+      "flagHeading": "Levantar y bajar la bandera",
+      "flagBody": "Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing a flagged player who is in a fight raises your own flag.",
+      "stakesHeading": "Cuánto vale una muerte",
+      "stakesBody": "When flagged players defeat a flagged player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
+      "limitsHeading": "Reglas de juego limpio",
+      "limitsBody": "Defeating the same player again and again pays less each time and soon nothing, and the counter resets with the daily reset. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
+      "introZones": "El combate entre jugadores en el mundo abierto es voluntario, y el terreno donde te encuentras decide lo que eso significa. Levanta tu bandera de JcJ y todo jugador marcado que no esté en tu grupo o banda se convierte en enemigo en terreno disputado; bájala y, tras una breve demora, vuelves a ser un espectador. Dos zonas son santuarios donde no ocurre ningún combate mundial en absoluto, y las tres zonas más al norte son terreno de todos contra todos, donde cualquiera presente es blanco legítimo, con bandera o sin ella. Los compañeros de grupo y de banda nunca son enemigos tuyos en ningún sitio; los compañeros de hermandad fuera de tu grupo son blanco legítimo como cualquier otro.",
+      "zonesHeading": "Dónde ocurre el JcJ mundial",
+      "zonesBody": "El mundo tiene tres tipos de terreno. La Costa de la Prueba y el Valle de Eastbrook son santuarios: allí no ocurre ningún JcJ mundial, con bandera o sin ella, así que un personaje nuevo jamás puede ser atacado antes de saber qué es la bandera. La mayor parte del mundo es terreno disputado, donde la regla de la bandera de arriba es toda la historia. Las Tierras del Dragón, El Velo de Escarcha y la Cascada de Ámbar, las tres zonas más al norte, son terreno de todos contra todos: todo el que se encuentra en ellas puede atacar a todos los demás que estén allí, con bandera o sin ella, y se te avisa tanto al entrar como al salir. Atacar a un jugador que no está marcado allí levanta tu propia bandera, así que un agresor siempre acaba cargando con el riesgo. Golpear a un jugador que ya está marcado nunca la levanta, lo que significa que defenderte a ti mismo, o defender a alguien que no está marcado, no te cuesta nada.",
+      "flagBodyAid": "Escribe /pvp en el chat, o abre la ventana de JcJ con G y usa la pestaña JcJ Mundial, que además muestra tu historial y lo que está en juego. Levantar la bandera es instantáneo una vez que superas los niveles iniciales. Bajarla inicia una cuenta atrás de unos minutos, y la bandera no caerá mientras sigas luchando, así que desactivarla nunca es una forma de escapar de una pelea que tú mismo empezaste. Sanar, proteger con un escudo o mejorar a un jugador marcado que está en combate también levanta tu propia bandera, así que nadie sostiene a un luchador desde detrás de una bandera que no lleva puesta; ayudar a un jugador que no está marcado no levanta nada.",
+      "stakesUnflaggedTake": "Tampoco un luchador sin marcar recibe nada: el oro solo cambia de manos entre dos jugadores marcados, aunque todos los que ayudaron sí ganan el Honor.",
+      "stakesBodyFlagged": "Cuando un jugador marcado es derrotado por otro jugador, el perdedor paga una pequeña parte del oro de su bolsa, con un tope modesto, y los ganadores obtienen Honor hacia el equipo de guerra. Un jugador que no estaba marcado no paga oro alguno, incluso si cae en una zona de todos contra todos. Todos los que ayudaron comparten ambas cosas: el golpe de gracia, cualquiera que dañara al objetivo poco antes, y los sanadores que mantuvieron en pie a esos luchadores. Un mano a mano limpio paga el bote entero; un grupo lo reparte.",
+      "hillHeading": "El Rey de la Colina",
+      "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
+      "hillBodyRamp": "Una vez cada tres horas, en un momento que nadie puede predecir, se avisa a todo el reino de que una colina se alzará en una de las zonas de todos contra todos dentro de quince minutos, y el círculo donde se alzará queda marcado sobre terreno abierto. Al alzarse, permanece cuarenta y cinco minutos, y luego cae. El grupo con más jugadores dentro disputa la colina, y tras un minuto de mayoría ininterrumpida la colina es suya; un jugador solo cuenta como un grupo de uno, pero los miembros de banda no cuentan en absoluto. Mientras un grupo controla la colina, cada uno de sus miembros que esté dentro gana Honor cada minuto, y cuanto más tiempo la controle el mismo grupo, más paga cada minuto: un grupo completo que controle una colina sin disputa durante toda su duración gana aproximadamente lo mismo que tres victorias en Campos Espinosos. Cuando la colina cambia de manos, los nuevos controladores empiezan la cuenta desde el principio. Una barra sobre el campo muestra quién la controla, tus números frente a los suyos, y el reloj de la disputa; /hill en el chat indica dónde se encuentra.",
+      "limitsBodyRaids": "Derrotar al mismo jugador una y otra vez paga cada vez menos y pronto no paga nada, y tu cuenta contra ese jugador solo se reinicia alrededor de una hora después de la primera de esas muertes, así que acechar a una sola víctima nunca vale la espera. Un objetivo muy por debajo de tu nivel no paga absolutamente nada. Los Campos Espinosos y las Arenas siguen sus propias reglas mientras estás dentro, y pagan más Honor que el mundo abierto, así que el JcJ mundial es el camino más lento hacia el mismo vendedor. Las bandas no ganan nada con las muertes en el mundo: un miembro de banda no recibe Honor ni oro y no reduce la parte de nadie más, así que lucha en grupo para que te paguen."
     },
     "thornhollowPage": {
       "heading": "Campos Espinosos",
@@ -7232,10 +8263,34 @@ export const es: EnTranslations = {
       "rewardsHeading": "Lo que paga una partida",
       "rewardsBody": "Cada partida terminada paga Honor: más por una victoria, una compensación menor por una derrota o un empate, además de una pequeña cantidad por cada golpe de gracia que asestes y cada uno en el que ayudes, así que luchar lejos de las banderas también merece la pena. Tu primera victoria de cada día paga una bonificación adicional, y el panel te avisa mientras esa bonificación sigue esperándote. Ese día es propio del Honor, y se reinicia según su propio reloj en vez de con el restablecimiento de instancias del reino. Enfrentarte al mismo equipo una y otra vez paga menos por la partida en sí a partir de la segunda vez, asentándose pronto en un mínimo en lugar de caer hasta cero, y una partida abandonada no paga nada en absoluto. Gasta lo que ganes con cualquiera de los dos intendentes de Pericia Bélica."
     },
+    "factionsPage": {
+      "heading": "Facciones y Reputación",
+      "intro": "Tres facciones aliadas vigilan cada una su propio rincón del reino, y cada misión mundial que termines en sus tierras aumenta tu reputación con ellas. La reputación asciende a través de seis niveles, cada uno con su propio título, y va abriendo poco a poco el surtido de un intendente por el camino.",
+      "whoHeading": "Las tres facciones",
+      "whoBody": "Cada facción está ligada a un grupo de zonas, así que el lugar donde haces misiones mundiales decide a qué facción va el mérito. Nunca eliges un bando: las tres llevan su propia cuenta, y ninguna te pide jamás que te vuelvas contra otra.",
+      "riftWatchBody": "La Guardia de la Brecha vigila la costa y observa las grietas profundas. Sus tierras son el litoral: La Costa Lejana, la Bahía de las Palmeras, la Cresta del Vendaval, el Pantano de los Sauces y la Hondonada Velada. Su centro está en Drifthaven, en la Bahía de las Palmeras.",
+      "churchOrderBody": "La Orden de la Iglesia ocupa el corazón del reino: el Valle de Eastbrook, la Ciénaga de Mirefen, las Alturas de Thornpeak, la Flor Nocturna y el Bosque de los Espectros. El Hermano Aldric habla en su nombre desde el Valle de Eastbrook.",
+      "automatonsBody": "Los Autómatas custodian las forjas de los confines lejanos: Las Tierras del Dragón, El Velo de Escarcha, la Cascada de Ámbar y el Jardín Eterno. Su centro está en Wyrmwatch, en Las Tierras del Dragón.",
+      "earningHeading": "Cómo ganar reputación",
+      "earningBody": "La reputación se consigue con misiones mundiales. Cada misión mundial cuenta para la facción de la zona en la que transcurre, y como las tres facciones cubren zonas distintas, las tres avanzan a la vez mientras recorres el mapa. El Capataz Kaelen, en Eastbrook, abre el tablón de Misiones Mundiales en el mapa, y ese mismo tablón es donde puedes cambiar una misión mundial cada día si el encargo del día no te conviene.",
+      "weeklyBody": "El emisario semanal del Valle de Eastbrook añade un segundo camino: termina el encargo de la semana y podrás elegir una facción para que reciba su mención de reputación, una vez por semana, en la misma ventanilla donde aceptaste el encargo.",
+      "lowLevelNote": "La reputación se detiene en un nivel para los personajes de nivel más bajo y se reanuda a medida que subes de nivel, así que un personaje joven puede empezar a ganarla pronto sin quedarse sin margen.",
+      "tiersHeading": "Niveles de reputación",
+      "tiersBody": "Cada facción asciende por los mismos seis niveles: Desconocido, Reconocido, Confiable, Probado, Vanguardia y Campeón. Cada facción da su propio nombre a cada peldaño, y ese nombre se convierte en tu título con ella.",
+      "riftWatchTitles": "Con la Guardia de la Brecha eres un Forastero, luego un Vigía, un Caminante de la Brecha, un Guardián, un Guardián de la Brecha y por último un Campeón.",
+      "churchOrderTitles": "Con la Orden de la Iglesia eres un Forastero, luego un Acólito, un Guardián, un Templario, un Guardián del Alba y por último un Campeón.",
+      "automatonsTitles": "Con los Autómatas eres un Forastero, luego un Operador, un Mecánico, un Artífice, un Maestro Forjador y por último un Campeón.",
+      "quartermastersHeading": "Intendentes",
+      "quartermastersBody": "Cada facción mantiene un intendente en su centro: el Intendente Vaelen por la Guardia de la Brecha en Drifthaven, la Templaria Althea por la Orden de la Iglesia en la capilla de Eastbrook, y el Artífice Tobrin por los Autómatas en Wyrmwatch. Cada uno vende un pequeño surtido de joyería, armadura, armas y bolsas, que se desbloquea nivel a nivel a medida que crece tu reputación con esa facción, y se paga con monedas corrientes.",
+      "readingHeading": "Dónde consultarla",
+      "readingBody": "La pestaña Reputación de la hoja de personaje (C) muestra cada facción con su reputación actual, una barra hacia el siguiente nivel, y el título que esa reputación te ha otorgado. El registro de chat informa de cada ganancia de reputación en cuanto ocurre, y alcanzar un nuevo nivel muestra un estandarte de celebración en pantalla.",
+      "deedsHeading": "Gestas",
+      "deedsBody": "El Libro de Gestas también lleva la cuenta de tu reputación: alcanzar Confiable con una facción y alcanzar Campeón con una facción registran cada uno una gesta, y alcanzar Campeón con las tres es una gesta aparte. Como toda gesta, son cosméticas, nunca poder, y las gestas de Campeón otorgan un título que puedes lucir."
+    },
     "deedsPage": {
       "intro": "El Libro de Gestas es donde el mundo lleva la cuenta de todos tus hechos, desde tus primeros pasos fuera del valle inicial hasta los combates más duros que el reino puede ofrecer. Consigue gestas mientras juegas, luce los títulos que otorgan y mira cómo asciende tu Renombre.",
       "howHeading": "Cómo funcionan las gestas",
-      "howBody": "Las gestas se consiguen personaje a personaje, pero el Libro de Gestas se comparte entre todos los personajes de tu cuenta: una gesta que logre cualquiera de ellos queda conseguida para todos, el Libro indica quién la logró y cuándo, y el título o el borde que otorgue puede lucirlo cualquiera de tus personajes. La Tabla de Clasificación del reino reúne tu Renombre del mismo modo, contando cada gesta una sola vez. Cada gesta explica con claridad lo que te pide, allí mismo, en el Libro de Gestas dentro del juego, de modo que siempre sabes qué perseguir, y puedes poner en seguimiento las que buscas para tenerlas a la vista mientras juegas. Unas pocas permanecen secretas y solo se revelan cuando las has conseguido. El Libro también se mantiene honesto consigo mismo: cuanto tu historial pasado pueda demostrar te lo acredita al instante, así que un veterano nunca lo abre en una página en blanco; solo las gestas de recuento empiezan su cuenta desde cero.",
+      "howBody": "Las gestas se consiguen y se guardan personaje a personaje, así que cada héroe que juegues forma su propio Libro; solo la Tabla de Clasificación del reino reúne tu Renombre a lo largo de todos los personajes que juegas, y cuenta cada gesta una sola vez. Cada gesta explica con claridad lo que te pide, allí mismo, en el Libro de Gestas dentro del juego, de modo que siempre sabes qué perseguir, y puedes poner en seguimiento las que buscas para tenerlas a la vista mientras juegas. Unas pocas permanecen secretas y solo se revelan cuando las has conseguido. El Libro también se mantiene honesto consigo mismo: cuanto tu historial pasado pueda demostrar te lo acredita al instante, así que un veterano nunca lo abre en una página en blanco; solo las gestas de recuento empiezan su cuenta desde cero.",
       "renownHeading": "Renombre",
       "renownBody": "El Renombre es la puntuación tras el Libro. Cada gesta que consigues vale una cantidad fija, y tu total solo sube, así que una semana tranquila nunca te cuesta terreno. Un puñado dependen de la suerte más que de la habilidad, otras gestas de colección son su propia recompensa, y las Hazañas son un honor aparte, así que ninguna de esas vale Renombre alguno. Las gestas sin Renombre siguen contando para completar tu Libro; simplemente nunca puntúan. Las Hazañas son la única excepción, mantenidas por completo fuera del recuento.",
       "rewardsHeading": "Títulos y bordes",
@@ -7273,7 +8328,7 @@ export const es: EnTranslations = {
     "reliquaryPage": {
       "intro": "El Relicario es el museo de botines únicos que has catalogado: las piezas más codiciadas de las mazmorras, trofeos de profesión, monturas, aspectos de arma y títulos. Acompaña al Libro de Gestas igual que una sala de trofeos acompaña a un libro de logros.",
       "howHeading": "Cómo funciona la colección",
-      "howBody": "Abre El Relicario en el juego (Mayús+X por defecto). Cada estante contiene páginas de reliquias únicas. Una silueta se rellena cuando cualquier personaje de tu cuenta obtiene esa pieza por primera vez, y una página se ilumina cuando todas sus reliquias están rellenas. Unas pocas páginas se marcan como Retirada o Personal: quedan fuera de la compleción, así que nunca bloquean un estante ni el catálogo entero. Los hallazgos en vivo lanzan un aviso y refrescan la ventana abierta; el progreso lo comparten todos los personajes de la cuenta, de modo que una reliquia que encuentra un personaje rellena la página para todos.",
+      "howBody": "Abre El Relicario en el juego (Shift+X por defecto). Cada estante guarda páginas de reliquias únicas. Rellena una silueta cuando obtengas esa pieza por primera vez con el personaje, e ilumina una página cuando todas sus reliquias estén rellenas. Algunas páginas llevan la etiqueta Retirada o Personal: quedan fuera de la finalización, así que nunca bloquean un estante ni el catálogo entero. Los hallazgos en directo lanzan un aviso y refrescan la ventana abierta; el progreso es propio de cada personaje, salvo los aspectos de arma, que son cosméticos de la cuenta.",
       "ranksHeading": "Rangos de Curador",
       "ranksBody": "Los rangos de Curador suben con cada reliquia única catalogada y solo otorgan títulos y bordes cosméticos. Nunca dan poder de combate, probabilidad de botín ni compensación por mala suerte. Los aspectos de arma de cuenta no puntúan para el rango de Curador, de modo que el prestigio sigue siendo propio del personaje, y las reliquias de páginas Retiradas o Personales tampoco puntúan para él.",
       "retiredTag": "Retirada",
@@ -7359,7 +8414,7 @@ export const es: EnTranslations = {
       "groupClasses": "Clases",
       "groupForms": "Formas de druida",
       "formBear": "Forma de Bruin",
-      "formCat": "Forma de gato",
+      "formCat": "Forma de lobo",
       "formTravel": "Forma Fleet",
       "groupCreatures": "Criaturas",
       "groupPets": "Demonios de brujo",
@@ -7683,7 +8738,7 @@ export const es: EnTranslations = {
         "bonusFmt": "+{value} {stat}",
         "enchantsNoteOffhand": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected, and no piece can be yet: it is authored ahead of the Perfecting work it waits on.",
         "enchantsNoteInfusionLive": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.",
-        "enchantsNoteRaidFormula": "Los encantamientos tienen cuatro niveles. El nivel base usa Polvo de Campanilla, con algo de Esencia en la parte alta, y cubre el arma, la mano secundaria y cada ranura de armadura. Hay suficientes ejes de estadísticas para que cada configuración encuentre una opción por ranura; los escudos y las manos secundarias de lanzadores llevan su propio encantamiento de Aguante, así que ninguna ranura equipada queda sin uso. El nivel Superior cuesta un Fragmento de Campanilla y Esencia y ofrece bonificaciones más fuertes en las ranuras de mayor impacto. Los fragmentos también alimentan otros tres consumos: las dos recetas de talismán, a uno cada una (el resto del coste de un talismán es esencia y polvo), la recarga superior de efectos de herramienta y el nivel Luminoso, donde arma y pecho usan uno cada uno y la Infusión usa dos. Guarda algunos antes de gastar.\n\nEntre ambos están los cinco encantamientos Rúnicos, uno para cada estadística secundaria, para que nada que muelas sea un callejón sin salida: Filo Rúnico para arma y Fuerza, Sigilo Rúnico para arma e Intelecto, Tejido Rúnico para pecho y Espíritu, Piel Rúnica para piernas y Agilidad y Vínculos Rúnicos para casco y Aguante. Cada uno usa además dos Esencias de Campanilla. Cuando una ranura y estadística tienen encantamiento base y Superior, la bonificación Rúnica cae entre ambos; Tejido Rúnico es directamente el encantamiento de Espíritu de pecho más fuerte y Piel Rúnica es el único de Agilidad para piernas. La tabla siguiente contiene las bonificaciones exactas.\n\nPor encima de los niveles bajos normales está el nivel Luminoso, el trabajo cumbre normal del oficio: Encantamiento 100 para los cuatro primeros y 125 para la Infusión, como muestra la columna Habilidad. Cada uno usa un Reactivo Luminoso y añade otro paso a su ranura: el arma, con opción de Poderío o Poder de Hechizo, el pecho y las botas. La última, Infusión Luminosa, solo se aplica a una pieza Perfeccionada. Perfeccionar es trabajo del portador, no del encantador; la página Profesiones explica cómo gana una pieza ese estado.\n\nEl Fervor de la Última Llama es una fórmula de incursión separada, no un encantamiento normal gratuito. Aprende su fórmula comerciable a Encantamiento 100 antes de aplicarla. Cada aplicación usa 3 Núcleos de la Última Llama y 2 Fragmentos de Campanilla; la fórmula puede caer en el Crisol o comprarse al intendente por un núcleo. Sus reglas de velocidad de arma y activación cuerpo a cuerpo aparecen completas más abajo.",
+        "enchantsNoteRaidFormula": "Los encantamientos tienen cuatro niveles. El nivel base usa Polvo de Campanilla, con algo de Esencia en la parte alta, y cubre el arma, la mano secundaria y cada ranura de armadura. Hay suficientes ejes de estadísticas para que cada configuración encuentre una opción por ranura; los escudos y las manos secundarias de lanzadores llevan su propio encantamiento de Aguante, así que ninguna ranura equipada queda sin uso. El nivel Superior cuesta un Fragmento de Campanilla y Esencia y ofrece bonificaciones más fuertes en las ranuras de mayor impacto. Los fragmentos también alimentan otros tres consumos: las dos recetas de talismán, a cinco cada una, la recarga superior de efectos de herramienta y el nivel Luminoso, donde arma y pecho usan uno cada uno y la Infusión usa dos. Guarda algunos antes de gastar.\n\nEntre ambos están los cinco encantamientos Rúnicos, uno para cada estadística secundaria, para que nada que muelas sea un callejón sin salida: Filo Rúnico para arma y Fuerza, Sigilo Rúnico para arma e Intelecto, Tejido Rúnico para pecho y Espíritu, Piel Rúnica para piernas y Agilidad y Vínculos Rúnicos para casco y Aguante. Cada uno usa además dos Esencias de Campanilla. Cuando una ranura y estadística tienen encantamiento base y Superior, la bonificación Rúnica cae entre ambos; Tejido Rúnico es directamente el encantamiento de Espíritu de pecho más fuerte y Piel Rúnica es el único de Agilidad para piernas. La tabla siguiente contiene las bonificaciones exactas.\n\nPor encima de los niveles bajos normales está el nivel Luminoso, el trabajo cumbre normal del oficio: Encantamiento 100 para los cuatro primeros y 125 para la Infusión, como muestra la columna Habilidad. Cada uno usa un Reactivo Luminoso y añade otro paso a su ranura: el arma, con opción de Poderío o Poder de Hechizo, el pecho y las botas. La última, Infusión Luminosa, solo se aplica a una pieza Perfeccionada. Perfeccionar es trabajo del portador, no del encantador; la página Profesiones explica cómo gana una pieza ese estado.\n\nEl Fervor de la Última Llama es una fórmula de incursión separada, no un encantamiento normal gratuito. Aprende su fórmula comerciable a Encantamiento 100 antes de aplicarla. Cada aplicación usa 3 Núcleos de la Última Llama y 2 Fragmentos de Campanilla; la fórmula puede caer en el Crisol o comprarse al intendente por un núcleo. Sus reglas de velocidad de arma y activación cuerpo a cuerpo aparecen completas más abajo.",
         "charmsHeading": "Amuletos para las herramientas de un recolector",
         "formulaRequired": "Requiere fórmula",
         "charmsBody": "El Encantamiento es también de donde salen los amuletos de un recolector. Manitas Gizzel enseña ambos en el taller de herramientas de Eastbrook en cuanto tu Encantamiento llega a 25: el Alijo del Recolector, que añade una unidad a una cosecha, y el Ojo del Artesano, que sube el grado de lo que sale. Cada uno se fabrica una sola vez, y luego se coloca en un pico, un hacha o una hoz, donde gasta una carga solo en las cosechas que realmente mejora.\n\nLa recarga es donde el oficio sigue ganando. Las cargas las restablece quien sea dueño de la herramienta, no un encantador de paso, y la recarga cuesta la mitad de los materiales cuando ese dueño es el encantador que firmó el amuleto, y menos aún con una especialización en Encantamiento. Así que un amuleto vendido en el mostrador es una venta única, mientras que los amuletos que llevan tus propias herramientas son los baratos de mantener en marcha. La escalera completa de cargas y materiales está en cualquier página de oficio de recolección, bajo Efectos de herramienta."
@@ -7752,7 +8807,7 @@ export const es: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "El ritmo de la agricultura",
-        "rhythmBody": "Plantar es instantáneo, porque la azada abre la tierra en vez de comprar velocidad: no hay lanzamiento que esperar, así que un agricultor que se aleja ha plantado igualmente. Extraer un cultivo maduro también es instantáneo. No hay lanzamiento que interrumpir ni comprobación de bolsas que lo rechace, y un bancal listo espera todo el tiempo que tardes en volver, así que una bolsa llena solo le cuesta al agricultor el paseo para vaciarla.\n\nUna cosecha paga productos y competencia de Agricultura. A diferencia de una veta, no concede experiencia de personaje, así que los bancales son un oficio para trabajar y no una forma de subir de nivel.",
+        "rhythmBody": "Plantar es instantáneo: la azada abre la tierra en vez de comprar velocidad. Extraer un cultivo maduro también es instantáneo. No hay lanzamiento que interrumpir ni comprobación de bolsas que lo rechace, y un bancal listo espera todo el tiempo que tardes en volver, así que una bolsa llena solo le cuesta al agricultor el paseo para vaciarla.\n\nUna cosecha paga productos y competencia de Agricultura. A diferencia de una veta, no concede experiencia de personaje, así que los bancales son un oficio para trabajar y no una forma de subir de nivel.",
         "gainHeading": "Qué enseña una cosecha",
         "gainBody": "La ganancia es determinista y depende de tu propio contador, no del cultivo: {g1} de competencia por una cosecha inferior a {p1}, {g2} por debajo de {p2}, {g3} por debajo de {p3} y {g4} durante el resto del camino hasta el límite de {cap}. Nunca hay una tirada de subida, así que la duración de la progresión es exactamente la que dicta la aritmética.\n\nLo que decide el nivel del cultivo es hasta dónde puede llevarte un bancal. Un cultivo de nivel 1 enseña hasta {c1} y se vuelve gris allí; uno de nivel 2 hasta {c2}; y el nivel 3 o superior llega hasta el límite. Subir a bancales mejores es lo que mantiene avanzando el contador.",
         "yieldsHeading": "Qué produce una cosecha",
@@ -7795,7 +8850,7 @@ export const es: EnTranslations = {
         "commissionsBody": "Un encargo es una creación hecha para alguien. Al crear un arma, una pieza de armadura u objeto de mano izquierda (una poción no puede llevar un vínculo), el artesano puede marcar la creación como encargo: la pieza terminada se comporta normalmente en manos del creador, pero en el momento en que cambia de manos en un intercambio queda vinculada a quien la recibió. Ese es el Vínculo del Artesano: el comprador obtiene su pieza, y la pieza no puede pasarse ni revenderse.\n\nLos vínculos no son para siempre, solo son costosos. Cualquier maestro de estación puede desvincular una pieza vinculada mientras estás en su estación (una estación móvil nunca ofrece el servicio), por una tarifa fijada por la calidad del objeto: 25 de plata para poco común, 1 de oro para raro, 4 de oro para épico, con un legendario pagando la tarifa épica y una pieza común de encargo la poco común.\n\nLa tarifa compra un estado limpio, no una cura: la pieza sigue siendo un encargo, así que se vuelve a vincular a quien la reciba en el siguiente intercambio, y todo lo demás sobre ella, firma, obra maestra y encantamientos, permanece intacto.",
         "provenanceHeading": "Trabajo firmado",
         "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
-        "provenanceBodyUndiscounted": "Algunos objetos llevan un nombre. Las líneas de origen de un material dicen quién recogió cada grupo de unidades, mientras que una marca independiente de firmante identifica al artesano premium cuando existe. Son datos independientes: el material recolectado normal registra al recolector sin ganar firma, y las existencias antiguas firmadas pueden nombrar a su firmante diciendo honestamente que no se registró recolector. Una pieza terminada dice quién la fabricó. Estos registros viajan con el objeto por intercambios, banco, correo, Mercado Mundial e incluso recompra de vendedor, y nunca desaparecen.\n\nLa recolección firma automáticamente su mejor trabajo: toda cosecha que resulte rara o superior llega firmada, y los hallazgos raros firman su ganancia completa de cinco unidades. Una tirada afortunada de cosecha de cadáver firma el rendimiento cuando esa familia no tiene espécimen que entregar; cuando sí lo tiene, mantiene el rendimiento normal y crea junto a él el espécimen prístino firmado. La fabricación firma del mismo modo: cada copia de una salida rara o superior crea una versión firmada, y una obra maestra siempre firma cualquiera que sea su calidad. Así, la versión más fina de cada pieza nombra siempre a su creador. La firma de un material normal viaja con las unidades y no se pierde solo porque una acumulación compatible ya contenga otro recolector o firmante. Un espécimen prístino es un objeto separado y necesita espacio; si no cabe, queda el rendimiento normal del cadáver pero se pierde el espécimen.\n\nLos objetos terminados conservan una identidad estricta: dos copias solo se fusionan cuando coinciden exactamente el objeto, el firmante, las estadísticas de obra maestra, el encantamiento y el vínculo. Los materiales compatibles comparten espacio entre recolectores y firmantes mientras conservan un recuento por origen. La ayuda emergente resume los orígenes; haz clic derecho en la pila para ver la lista completa (en pantalla táctil, usa su botón Orígenes). Separar por recolector mantiene esas acumulaciones aparte en las bolsas y la ordenación respeta la elección. El material transferido puede acumularse normalmente con el del receptor.\n\nLas firmas devuelven algo a los artesanos: si sostienes en el banco una copia firmada de un reactivo necesario, quien la firmó añade 2 puntos porcentuales a la probabilidad de obra maestra. Si el reactivo está firmado por ti, reduce en uno la cantidad exigida, nunca por debajo de uno, salvo que ese reactivo esté marcado como no descontable. Los núcleos de incursión conservan siempre su coste completo. Tu propia obra rara o superior firmada también puede seguir enseñándote, hoy solo mediante pociones fabricadas: beber un brebaje raro que preparaste y firmaste devuelve un pequeño goteo de habilidad al oficio que lo creó, si ese oficio es una de tus profesiones principales activas. Solo funciona con la rama de pociones: un elixir, un pergamino o un frasco cumbre no enseña nada aunque lleve una firma excelente.",
+        "provenanceBodyUndiscounted": "Algunos objetos llevan un nombre. Las líneas de origen de un material dicen quién recogió cada grupo de unidades, mientras que una marca independiente de firmante identifica al artesano premium cuando existe. Son datos independientes: el material recolectado normal registra al recolector sin ganar firma, y las existencias antiguas firmadas pueden nombrar a su firmante diciendo honestamente que no se registró recolector. Una pieza terminada dice quién la fabricó. Estos registros viajan con el objeto por intercambios, banco, correo, Mercado Mundial e incluso recompra de vendedor, y nunca desaparecen.\n\nLa recolección firma automáticamente su mejor trabajo: toda cosecha que resulte rara o superior llega firmada, y los hallazgos raros firman su ganancia completa de cinco unidades. Una tirada afortunada de cosecha de cadáver firma el rendimiento cuando esa familia no tiene espécimen que entregar; cuando sí lo tiene, mantiene el rendimiento normal y crea junto a él el espécimen prístino firmado. La fabricación firma del mismo modo: cada copia de una salida rara o superior crea una versión firmada, y una obra maestra siempre firma cualquiera que sea su calidad. Así, la versión más fina de cada pieza nombra siempre a su creador. La firma de un material normal viaja con las unidades y no se pierde solo porque una acumulación compatible ya contenga otro recolector o firmante. Un espécimen prístino es un objeto separado y necesita espacio; si no cabe, queda el rendimiento normal del cadáver pero se pierde el espécimen.\n\nLos objetos terminados conservan una identidad estricta: dos copias solo se fusionan cuando coinciden exactamente el objeto, el firmante, las estadísticas de obra maestra, el encantamiento y el vínculo. Los materiales compatibles comparten espacio entre recolectores y firmantes mientras conservan un recuento por origen. La ayuda emergente resume los orígenes; abre Orígenes para la lista completa. Separar por recolector mantiene esas acumulaciones aparte en las bolsas y la ordenación respeta la elección. El material transferido puede acumularse normalmente con el del receptor.\n\nLas firmas devuelven algo a los artesanos: si sostienes en el banco una copia firmada de un reactivo necesario, quien la firmó añade 2 puntos porcentuales a la probabilidad de obra maestra. Si el reactivo está firmado por ti, reduce en uno la cantidad exigida, nunca por debajo de uno, salvo cuando el reactivo sea indiscountable. Los núcleos de incursión conservan siempre su coste completo. Tu propia obra rara o superior firmada también puede seguir enseñándote, hoy solo mediante pociones fabricadas: beber un brebaje raro que preparaste y firmaste devuelve un pequeño goteo de habilidad al oficio que lo creó, si ese oficio es una de tus profesiones principales activas. Solo funciona con la rama de pociones: un elixir, un pergamino o un frasco cumbre no enseña nada aunque lleve una firma excelente.",
         "collectorsHeading": "Coleccionistas, trofeos y el precio de una historia",
         "collectorsBody": "Los vendedores son ciegos a la procedencia: un objeto firmado se vende a un PNJ exactamente por su precio base. La prima de una firma existe solo entre jugadores, que es precisamente lo que la hace interesante: una pila de mineral inesperado firmada por un recolector famoso, un Corte Primo de una cosecha afortunada, una hoja de obra maestra que nombra a un artesano que ya se retiró; todo vale lo que la memoria de alguien diga que vale.\n\nEl Libro de Gestas se inclina hacia el mismo instinto: Veta Prístina, Duramen Antiguo, Flor Iluminada por la Luna, Espécimen Perfecto y Destello de Esperanza son marcas de coleccionista con Renombre cero que existen únicamente para demostrar que un momento te sucedió a ti. Conserva el objeto que ganó la gesta y tienes el recibo. Nada de esto da poder; la procedencia no compra estadísticas ni gana combates, es el rastro en papel del juego de los buenos días.",
         "castPaceHeading": "El tiempo de lanzamiento y el drenaje de oro",
@@ -7838,7 +8893,7 @@ export const es: EnTranslations = {
         "title": "Preguntas frecuentes sobre Oficios",
         "intro": "Respuestas rápidas a las preguntas que más hacen los artesanos.",
         "q1": "¿Por qué no se apilan mis objetos firmados?",
-        "a1": "Los objetos terminados siguen la regla estricta de instancia: dos copias se fusionan solo cuando coinciden exactamente su firmante, sus propiedades aleatorias, sus estadísticas de obra maestra, su encantamiento, su vínculo y cualquier otro dato de identidad. Una hoja firmada, por tanto, permanece separada de una hoja normal.\n\nLos materiales son la excepción. Las acumulaciones compatibles del mismo material pueden fusionarse aunque difieran sus recolectores o firmantes, porque la acumulación conserva un recuento de cada origen. La ayuda emergente resume los orígenes; haz clic derecho en la pila para ver la lista completa (en pantalla táctil, usa su botón Orígenes). Separar por recolector mantiene esas acumulaciones apartadas en tus bolsas y la ordenación respeta esa decisión. El material transferido puede acumularse normalmente con los materiales del receptor.",
+        "a1": "Los objetos terminados siguen la regla estricta de instancia: dos copias se fusionan solo cuando coinciden exactamente su firmante, sus propiedades aleatorias, sus estadísticas de obra maestra, su encantamiento, su vínculo y cualquier otro dato de identidad. Una hoja firmada, por tanto, permanece separada de una hoja normal.\n\nLos materiales son la excepción. Las acumulaciones compatibles del mismo material pueden fusionarse aunque difieran sus recolectores o firmantes, porque la acumulación conserva un recuento de cada origen. La ayuda emergente resume los orígenes; abre Orígenes para ver la lista completa. Separar por recolector mantiene esas acumulaciones apartadas en tus bolsas y la ordenación respeta esa decisión. El material transferido puede acumularse normalmente con los materiales del receptor.",
         "q2": "¿Las recetas comunes suben mi habilidad para siempre?",
         "a2": "No. Cada receta se puntúa por cuánto queda bajo tu tramo, con los colores clásicos naranja, amarillo, verde y gris: ganancia completa en el actual o superior, mitad un nivel abajo, cuarto dos niveles abajo y nada tres o más abajo. Los tramos son cada 25 puntos, así que las recetas gratuitas de habilidad 0 dejan de enseñar a 75.\n\nLos límites son menores que los 300 clásicos: cada una de las diez profesiones fabricables llega a 125, Minería, Tala y Herboristería llegan a 100 y Pesca llega a 200. Subir significa pasar a recetas de tu propio tramo, no repetir la más barata.",
         "q3": "¿Cuál es la diferencia entre saquear y recolectar un cadáver?",
@@ -8011,7 +9066,8 @@ export const es: EnTranslations = {
       "parryTitle": "Parada",
       "parryBody": "La parada es la defensa propia del guerrero: la probabilidad de desviar por completo un golpe cuerpo a cuerpo y no recibir ningún daño, y crece con la Fuerza. Solo se puede parar un ataque que llega de frente, una razón más para mantenerte encarando a lo que te golpea. Las demás clases ven esta fila de su hoja fija en cero.",
       "warfareTitle": "Pericia bélica",
-      "warfareBody": "La pericia bélica es la única característica que solo cuenta contra otros jugadores: aumenta el daño que les infliges y reduce el daño que recibes de ellos, y tu hoja muestra ambas mitades en una sola línea. Contra criaturas no hace absolutamente nada. Proviene del equipo de guerra que compras con honor, así que es una recompensa por jugar JcJ y no algo que perseguir mientras subes de nivel."
+      "warfareBody": "La pericia bélica es la única característica que solo cuenta contra otros jugadores: aumenta el daño que les infliges y reduce el daño que recibes de ellos, y tu hoja muestra ambas mitades en una sola línea. Contra criaturas no hace absolutamente nada. Proviene del equipo de guerra que compras con honor, así que es una recompensa por jugar JcJ y no algo que perseguir mientras subes de nivel.",
+      "warfareBodyPets": "La pericia bélica es la característica que lleva el equipo de honor para luchar contra jugadores. En los combates entre jugadores, aumenta el daño que tú y tu mascota infligís a otros jugadores y sus mascotas, y reduce el daño que tú y tu mascota recibís de ellos. También aumenta tu salud máxima en todas partes salvo en mazmorras, bandas, expediciones y brechas, así que un jugador con equipo de honor es mucho más difícil de matar que uno sin él. Tu hoja de personaje lo muestra todo en una sola línea. Proviene del equipo de guerra que compras con honor, así que es una recompensa por jugar JcJ y no algo que perseguir mientras subes de nivel."
     },
     "progression": {
       "intro": "Cada combate, misión y paso hacia el norte hace más fuerte a tu héroe. Aquí tienes cómo funciona subir de nivel y qué te mantiene creciendo una vez que llegas a la cima.",
@@ -9872,6 +10928,11 @@ export const es: EnTranslations = {
       "quit": "Salir",
       "fatalBody": "World of ClaudeCraft tuvo un error inesperado y debe cerrarse."
     },
+    "hostDiag": {
+      "saveTitle": "Guardar informe del sistema",
+      "saveButton": "Guardar",
+      "fileType": "Archivo JSON"
+    },
     "titlebar": {
       "exitGame": "Salir del juego"
     }
@@ -9922,6 +10983,11 @@ export const es: EnTranslations = {
     "inWorld": "en el mundo",
     "takeOver": "Tomar control",
     "inWorldHint": "Ya está en el mundo. Cierra la sesión en otro lugar, o toma el control.",
+    "currentLocation": "Ubicación actual: {zone}",
+    "lockouts": "Bloqueos ({count})",
+    "lockoutRaids": "Bandas",
+    "lockoutDungeons": "Mazmorras",
+    "lockoutWorldBosses": "Jefes del mundo",
     "takeOverConfirm": "Esto desconectará a este personaje de otra sesión y lo traerá aquí. ¿Continuar?",
     "renameRequired": "cambio de nombre requerido",
     "delete": "Eliminar",
@@ -10063,6 +11129,16 @@ export const es: EnTranslations = {
       "xpGainRested": "Ganas {amount} de experiencia ({rested} de bonificación por descansar).",
       "deathTitle": "Has muerto.",
       "releaseSpirit": "Liberar espíritu",
+      "deathRecap": "Resumen",
+      "deathRecapTitle": "Resumen de la muerte",
+      "deathRecapKiller": "Golpe de gracia: {killer} ({ability})",
+      "deathRecapNoKiller": "Eventos de combate previos a la muerte",
+      "deathRecapLethal": "Golpe de gracia",
+      "deathRecapClose": "Cerrar",
+      "deathRecapNoEvents": "No se registraron eventos de combate.",
+      "deathRecapCrit": "Crítico",
+      "deathRecapDamage": "Daño",
+      "deathRecapHeal": "Curación",
       "chatTab": "Chat",
       "combatLogTab": "Registro de combate",
       "chatPlaceholder": "Di algo... (/w nombre susurro, /r responder, /p grupo, /gu hermandad, /o oficiales, /general general)",
@@ -10131,6 +11207,9 @@ export const es: EnTranslations = {
         "readyQuest": "Misión lista para entregar",
         "repeatQuest": "Misión repetible",
         "cooldownQuest": "Misión en espera",
+        "availableWorldQuest": "Misión mundial disponible: {name}",
+        "activeWorldQuest": "Misión mundial activa: {name}",
+        "worldBoss": "Jefe del mundo: {name}",
         "questObjective": "Área de objetivo de misión",
         "readyOre": "Veta de mineral lista",
         "readyWood": "Rodal de madera listo",
@@ -10271,6 +11350,7 @@ export const es: EnTranslations = {
       "compactChat": "Chat compacto",
       "frostedPanels": "Paneles esmerilados",
       "highContrastText": "Texto de alto contraste",
+      "colorblindMode": "Modo daltónico",
       "reduceMotion": "Reducir movimiento",
       "showFps": "Mostrar FPS",
       "invertLookY": "Invertir vista (Y)",
@@ -10332,6 +11412,19 @@ export const es: EnTranslations = {
       "threat": "Amenaza",
       "damageShort": "Daño",
       "healingShort": "Sanar",
+      "damageTaken": "Daño Recibido",
+      "damageTakenShort": "Recib.",
+      "avoidableDmg": "Daño evitable",
+      "avoidableDmgShort": "Evit.",
+      "interrupts": "Cortes",
+      "interruptsShort": "Cortes",
+      "dispels": "Disipaciones",
+      "dispelsShort": "Disip.",
+      "deaths": "Muertes",
+      "deathsShort": "Bajas",
+      "reset": "Reiniciar medidores",
+      "resetHint": "Reiniciar datos de combate",
+      "groupTotal": "Total: {total} ({rate})",
       "current": "Actual",
       "lastFight": "Último combate",
       "fightIndex": "Combate -{index}",
@@ -10343,6 +11436,16 @@ export const es: EnTranslations = {
       "segmentSummary": "{label} - {duration}",
       "olderSegment": "Segmento anterior",
       "newerSegment": "Segmento siguiente",
+      "selectSegment": "Seleccionar segmento de combate",
+      "selectMode": "Seleccionar modo del medidor",
+      "back": "Atrás",
+      "resetFight": "Restablecer combate actual",
+      "resetAll": "Restablecer todos los datos",
+      "criticals": "Críticos: {count}",
+      "hits": "Golpes: {count}",
+      "topAbility": "Mejor: {name}",
+      "activity": "Actividad: {pct}",
+      "newWindow": "Nueva ventana",
       "close": "Cerrar medidores"
     },
     "chat": {
@@ -10466,6 +11569,7 @@ export const es: EnTranslations = {
       "deathRecapDrowned": "Has muerto. Te ahogaste.",
       "deathRecapCauterized": "Has muerto. La quemadura de Cauterizar acabó contigo.",
       "respawn": "Te sientes descansado y completo de nuevo.",
+      "respawnKeeperToll": "El Guardián Pálido te ha revivido, pero has salido debilitado: el Tañido del Guardián drena tus atributos hasta que se desvanece.",
       "ignoringChat": "Ignorando el chat de {name}.",
       "noLongerIgnoring": "Ya no ignoras a {name}.",
       "playerNotNearby": "Ese jugador no está cerca.",
@@ -10502,7 +11606,8 @@ export const es: EnTranslations = {
       "requiresForm": "Debes estar en forma de {form}.",
       "cantInForm": "No puedes hacer eso en forma de {form}.",
       "bear": "Bruin",
-      "cat": "gato",
+      "cat": "lobo",
+      "bearOrCat": "Bruin o lobo",
       "travel": "Fleet",
       "shapeshifted": "No puedes hacer eso transformado.",
       "stealthed": "Debes estar en sigilo.",
@@ -10823,6 +11928,9 @@ export const es: EnTranslations = {
       "anyTarget": "Objetivo enemigo o amigo",
       "selfOnly": "Solo en ti mismo",
       "damageRange": "{min} a {max}",
+      "edictExplosion": "Mientras Ascensión esté activa, la explosión inflige {damage} de daño Físico en un radio de {radius} m, reducido más allá de {cap} objetivos. Este daño aumenta con el poder de ataque.",
+      "edictDamage": "Golpea infligiendo un {weaponPercent}% del daño del arma más {damage} de daño Físico. El daño del arma incluye el poder de ataque.",
+      "verdictDamage": "Edicto Final detona infligiendo {verdictSingleDamage} de daño Sagrado. Caída del Alba detona infligiendo {verdictAreaDamage} de daño Sagrado en un radio de {verdictAreaRadius} m, reducido más allá de {verdictAreaCap} objetivos. Ninguna de las dos detonaciones escala con el poder con hechizos. Solo un enemigo puede llevar tu marca.",
       "finisherDamage": "{base} más {perCombo} por punto de combo"
     },
     "resources": {
@@ -10833,8 +11941,9 @@ export const es: EnTranslations = {
       "devotion": "Devoción"
     },
     "forms": {
-      "bear": "Bruin",
-      "cat": "gato"
+      "bear": "oso",
+      "cat": "lobo",
+      "bearOrCat": "oso o lobo"
     },
     "cast": {
       "fishing": "Pesca",
@@ -10867,6 +11976,7 @@ export const es: EnTranslations = {
   },
   "questUi": {
     "tracker": {
+      "clueHuntTitle": "{title} (pista {step} de {total})",
       "title": "Misiones",
       "complete": "Completada",
       "showOnMap": "Mostrar {name} en el mapa",
@@ -10901,12 +12011,18 @@ export const es: EnTranslations = {
       "repeatableQuestAria": "Misión repetible: {name}",
       "discussQuest": "Hablar sobre {name}.",
       "discussQuestAria": "Hablar sobre la misión: {name}",
+      "clueTalk": "Pregunta sobre la pista.",
+      "clueTalkAria": "Preguntar sobre la pista: {name}",
+      "clueDeliver": "Entrega {count} {item}.",
+      "clueDeliverAria": "Entregar {count} {item} a {name}",
       "profIntroHint": "Habla con {name} para \"{quest}\".",
       "nythraxisDeathlessKingWarning": "Las tres reliquias cuentan la misma historia: Aldren luchó para defender a su rey, Malric rompió el límite de la muerte y Voss intentó detener lo que vino después. El sello se debilita, y la cripta abandonada es el camino hacia abajo.",
       "browseGoods": "Déjame ver tus mercancías.",
       "browseGoodsAria": "Ver mercancías de {name}",
       "worldMarket": "Muéstrame el Mercado Mundial.",
       "worldMarketAria": "Abrir el Mercado Mundial",
+      "worldQuestBoard": "Muéstrame el tablón de misiones de mundo.",
+      "worldQuestBoardAria": "Abrir el tablón de misiones de mundo en el mapa",
       "accept": "Aceptar",
       "decline": "Rechazar",
       "continue": "Continuar",
@@ -10926,12 +12042,363 @@ export const es: EnTranslations = {
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Requiere nivel {level}"
     },
+    "worldQuest": {
+      "title": "{zone}: {target}",
+      "unknown": "Misión de mundo desconocida ({id})",
+      "itemReward": "Recompensa de objeto: {name}",
+      "itemRewardWithLevels": "{name} (nivel de objeto {itemLevel}, se equipa en nivel {requiredLevel})",
+      "factionLine": "Facción: {faction}",
+      "standingReward": "+{amount} de reputación con {faction}",
+      "rewardLine": "Recompensas: {reward}",
+      "availableStatus": "Misión de mundo disponible",
+      "activeStatus": "Misión de mundo activa",
+      "expiresIn": "Caduca en {time}",
+      "mineOre": "Extrae mineral de cobre",
+      "recoverObject": "Recupera {name}",
+      "redirectLeyBeam": "Redirige el rayo ley",
+      "matchConfections": "Combina dulces encantados",
+      "loadFreight": "Sube la carga al carro",
+      "escortCaravan": "Escolta la caravana: {zone}",
+      "salvageWreckage": "Recupera restos del naufragio",
+      "banner": {
+        "riftOpens": "¡Una grieta se abre en la playa! Los saqueadores vienen a por los restos.",
+        "captainSteps": "¡El capitán saqueador cruza la grieta!",
+        "riftRouted": "Los saqueadores han sido derrotados. La playa vuelve a ser tuya.",
+        "championRises": "¡Botín extra! Un campeón se alza en el lugar. ¡Derríbenlo entre todos!",
+        "championFallen": "¡Botín extra! El campeón cae: una bolsa adicional para todos los que lucharon contra él.",
+        "endlessBegins": "¡La línea aguanta! Comienzan oleadas infinitas, cada una más dura. Deja el cañón cuando quieras."
+      },
+      "shadow": {
+        "title": "Bajo el Manto de la Sombra",
+        "objective": "Roba cuatro órdenes selladas sin que te atrapen",
+        "cloak": "Capa Crepuscular",
+        "pickpocket": "Robar Bolsillo",
+        "leave": "Quitar Capa",
+        "stealTip": "Acércate por detrás y quédate quieto mientras tomas las órdenes. Mantente fuera de los haces de las linternas.",
+        "leaveTip": "Quítate la capa. Tus órdenes recuperadas se conservan.",
+        "documents": "Órdenes recuperadas: {count}/4",
+        "suspicion": "Sospecha: {value}",
+        "safe": "Roba por detrás. Los guardias con linterna barren con haces amplios que ven a través de la capa; espera una abertura clara.",
+        "behind": "Ponte detrás del guardia antes de robar.",
+        "danger": "¡Te están viendo! ¡Ponte fuera de la vista!",
+        "channel": "Robando... {seconds}s",
+        "noTarget": "Acércate a un guardia que lleve órdenes.",
+        "start": "Habla con la Exploradora Valerie para pedirle prestada su capa.",
+        "caught": "¡Atrapado! Vuelve con la Exploradora Valerie por otra capa. Tus órdenes están a salvo.",
+        "complete": "Las cuatro órdenes recuperadas."
+      },
+      "investigation": {
+        "title": "Un Rostro Prestado",
+        "objective": "Desenmascara y derrota al infiltrado",
+        "briefing": "Una criatura ha robado el rostro de un soldado. Lee las órdenes permanentes y el registro de guardia, interroga a los cuatro guardias y luego vuelve y nombra a aquel cuya historia contradiga nuestros registros.",
+        "instructions": "Lee las órdenes permanentes y el registro de guardia, luego interroga a los cuatro guardias. Compara sus historias con los registros.",
+        "confront": "Preséntate ante el Sargento Alric y nombra al guardia cuya historia contradiga los registros.",
+        "name": "¿Cuál de mis guardias lleva un rostro prestado?",
+        "accuseOption": "Acusar a {name}",
+        "cleared": "Sargento Alric: Ese soldado está localizado. Compara las demás historias con nuestros registros e inténtalo de nuevo.",
+        "guardCleared": "El Sargento Alric ya ha localizado a este soldado.",
+        "revealed": "La criatura ha desechado este rostro. Derrótala.",
+        "defeat": "Derrota al infiltrado revelado.",
+        "heard": "Guardias interrogados: {count}/4",
+        "clues": "Registros examinados: {count}/2",
+        "clueNames": {
+          "c0": "Órdenes Permanentes",
+          "c1": "Registro de Guardia"
+        },
+        "variants": {
+          "v0": {
+            "clue0": "El puente sur está cerrado desde el amanecer. Todas las patrullas deben usar el camino del oeste.",
+            "clue1": "A Orin se le asignó guardia de puerta. Nella, Bram y Tessa patrullaron el camino del oeste.",
+            "guard0": "Mi patrulla tomó el camino del oeste esta mañana.",
+            "guard1": "Crucé el puente sur en mi patrulla matutina.",
+            "guard2": "Patrullé el camino del oeste con Nella y Tessa.",
+            "guard3": "El puente sur está cerrado. Usamos el camino del oeste."
+          },
+          "v1": {
+            "clue0": "La contraseña de hoy es Reedwatch. La de ayer, Linterna, ya no es válida.",
+            "clue1": "Los cuatro guardias fueron informados de la nueva contraseña al amanecer.",
+            "guard0": "Reedwatch. Me enteré de la nueva contraseña al amanecer.",
+            "guard1": "Linterna era la contraseña de ayer. Hoy usamos Reedwatch.",
+            "guard2": "Los cuatro asistimos a la reunión informativa del amanecer.",
+            "guard3": "La contraseña de hoy es Linterna. La escuché en la reunión informativa del amanecer."
+          },
+          "v2": {
+            "clue0": "Todos los cajones de suministros de la guarnición deben llevar sellos de cera azul. Rechaza cualquier cajón con sello rojo.",
+            "clue1": "Se inspeccionó la entrega de hoy: todos los cajones tenían un sello de cera azul intacto.",
+            "guard0": "Inspeccioné la entrega de hoy. Todos los cajones tenían un sello de cera rojo.",
+            "guard1": "Solo aceptamos cajones sellados con cera azul.",
+            "guard2": "El registro anota sellos azules en la entrega de hoy.",
+            "guard3": "Hoy no se aceptó ningún cajón con sello rojo."
+          },
+          "v3": {
+            "clue0": "La guardia nocturna reenciende el faro este al atardecer. El faro oeste permanece apagado hasta que el ferry hace señales.",
+            "clue1": "Nella y Orin mantuvieron la puerta durante toda la noche. Bram y Tessa recorrieron la calzada y reencendieron el faro este al atardecer.",
+            "guard0": "Orin y yo tuvimos la puerta toda la noche. No pasó nada más que la niebla.",
+            "guard1": "Guardia de puerta con Nella. Vimos encenderse el faro este al atardecer, tal como se ordenó.",
+            "guard2": "Tessa y yo recorrimos la calzada. Encendimos el faro oeste al atardecer para que el ferry pudiera vernos.",
+            "guard3": "Patrulla de la calzada con Bram. Reencendimos el faro este en cuanto se puso el sol."
+          },
+          "v4": {
+            "clue0": "El carro del intendente llega al mediodía por el camino del norte. No llegan suministros por agua mientras la ciénaga está inundada.",
+            "clue1": "Entrega del mediodía recibida por el camino del norte. Tessa la firmó; Bram y Nella descargaron; Orin estaba en el pozo.",
+            "guard0": "Ayudé a Bram a descargar el carro al mediodía. Cerdo salado y aceite de lámpara, lo de siempre.",
+            "guard1": "Descargué yo mismo la entrega del mediodía, directo de la barcaza de suministros.",
+            "guard2": "Nella y yo llevamos los cajones adentro. Tessa firmó el registro.",
+            "guard3": "El carro llegó por el camino del norte al mediodía. Yo lo firmé."
+          },
+          "v5": {
+            "clue0": "Los caídos de la última incursión yacen en la cripta de la capilla. Nadie entra en la cripta sin la llave del sargento.",
+            "clue1": "La llave del sargento no se ha apartado de su cinturón desde la incursión. Nella, Orin y Bram vigilaron la muralla; Tessa se quedó en el patio.",
+            "guard0": "Vigilé la muralla. La cripta ha permanecido cerrada desde la incursión; solo el sargento tiene la llave.",
+            "guard1": "Guardia de muralla con Nella y Bram. Tranquilo, salvo por las ranas.",
+            "guard2": "La muralla, todo el día. Nadie se ha acercado a la cripta.",
+            "guard3": "Me quedé en el patio y eché un vistazo a la cripta esta mañana. Los caídos descansan."
+          }
+        }
+      },
+      "horde": {
+        "title": "La Última Barricada",
+        "objective": "Defiende la barricada y derrota al comandante de la horda",
+        "ready": "Habla con el capitán de la barricada para empezar.",
+        "countdown": "¡La horda llega en {seconds}s!",
+        "status": "{seconds}s restantes. Bajas: {kills}. Barricada: {barrier}%.",
+        "upgrade": "Arma: {weapon}",
+        "loadout": "Disparos: {count} | +{speed}% de velocidad | {weapon}",
+        "exit": "Abandonar la defensa",
+        "gained": "Mejora: {upgrade}",
+        "killBurst": "¡+{count} derrotados!",
+        "choices": {
+          "projectile": "+1 disparo",
+          "haste": "+25% de cadencia de disparo",
+          "pierce": "Disparos perforantes",
+          "explosive": "Disparos explosivos",
+          "double": "x2 disparos"
+        },
+        "weapons": {
+          "0": "Repetidora",
+          "1": "Disparo Doble",
+          "2": "Disparo Perforante",
+          "3": "Disparo Explosivo"
+        },
+        "controls": "Disparo automático. A/D, flechas o joystick. Atrás: salir.",
+        "supplies": "¡Rompe un cajón para elegir. El otro desaparece!",
+        "result": "¡{rating}! Puntuación: {score}.",
+        "resultStats": "Bajas: {kills}. Barricada: {barrier}%.",
+        "failed": "Defensa fallida. ¡Inténtalo de nuevo!",
+        "replay": "Habla con el capitán para reintentarlo. Recompensas una vez por rotación.",
+        "medals": {
+          "gold": "Oro",
+          "silver": "Plata",
+          "bronze": "Bronce"
+        }
+      },
+      "wispMaze": {
+        "leave": "Abandonar el laberinto",
+        "title": "Laberinto del Bosque de Fuegos Fatuos",
+        "objective": "Recupera todas las bolsas de monedas robadas del laberinto",
+        "ready": "Habla con el guardián del laberinto para empezar.",
+        "controls": "Muévete por el laberinto para recoger las bolsas de monedas. Evita las sombras. Los fuegos fatuos radiantes te permiten desterrar las sombras durante un breve tiempo.",
+        "collected": "Bolsas de monedas: {count}/{total}",
+        "lives": "Vidas: {count}/3",
+        "power": "Poder de fuego fatuo: {seconds}s",
+        "countdown": "Empieza en {seconds}s",
+        "collect": "Recoge las bolsas de monedas. Evita las sombras.",
+        "powered": "¡Subida de poder! Toca las sombras para desterrarlas.",
+        "finished": "¡Todas las bolsas de monedas recuperadas!",
+        "retry": "Tres vidas restauradas. Intenta el laberinto de nuevo.",
+        "startNormal": "Entrar en el laberinto: Normal ({shadows} sombras)",
+        "startHard": "Entrar en el laberinto: Difícil ({shadows} sombras)"
+      },
+      "forge": {
+        "title": "Una Mano con el Martillo",
+        "objective": "Ayuda a la Herrera Mara a forjar un escudo",
+        "ready": "Habla con la Herrera Mara para empezar.",
+        "countdown": "¡Prepara las manos! Empieza en {seconds}s.",
+        "preparing": "¡Bien hecho! Siguiente petición...",
+        "fuel": "Pila de Leña",
+        "metal": "Cajón de Lingotes",
+        "water": "Pozo",
+        "tools": "Yunque",
+        "request": {
+          "fuel": "¡Aviva el fuego! ¡Añade algo de leña!",
+          "metal": "¡Más metal! ¡Abre el cajón de lingotes!",
+          "water": "¡Enfríalo! ¡Agua del pozo!",
+          "tools": "¡Dale forma a martillazos! ¡Usa el yunque!"
+        },
+        "sequence": "{instruction} Luego haz clic en {next}.",
+        "round": "Petición {round}/{total}: paso {step}/{steps}",
+        "thresholds": "Oro: {gold}s o menos. Plata: {silver}s o menos.",
+        "starting": "Preparándose...",
+        "finished": "¡Buen trabajo! ¡Un escudo digno de la guarnición!",
+        "failed": "¡Demasiados errores! El metal se agrietó. Habla con Mara para intentarlo de nuevo.",
+        "wrong": "¡Herramienta equivocada! +{penalty}s. Prueba con el objeto solicitado.",
+        "correct": "¡Eso es! Sigue así.",
+        "result": "¡{rating}! {seconds}s. Errores: {mistakes}.",
+        "replay": "Habla con Mara para intentarlo de nuevo. Las recompensas se ganan una vez por rotación.",
+        "medals": {
+          "gold": "Oro",
+          "silver": "Plata",
+          "bronze": "Bronce"
+        },
+        "strike": "Golpear",
+        "strikeTip": "Martillea la pieza. Pulsa cuando la aguja cruce la franja oscura; la franja se estrecha y la aguja se acelera con cada buen golpe. Un golpe fuera de la franja, o con la fragua fría, cuesta tres segundos.",
+        "stoke": "Avivar",
+        "stokeTip": "Echa leña al fuego. La fragua se enfría todo el tiempo; mantén su calor por encima de {floor} o tus golpes caerán en frío.",
+        "strikes": "Golpes: {count}/{total}",
+        "heat": "Calor de la fragua: {value} (mantenlo por encima de {floor})",
+        "mistakes": "Errores: {count}",
+        "meterAria": "Medidor de tiempo del martillo",
+        "hintStrike": "Vigila la aguja. ¡Golpea dentro de la franja oscura!",
+        "hintStoke": "¡La fragua se enfría! Aviva el fuego antes de golpear.",
+        "hit": "¡Golpe limpio! La franja se estrecha.",
+        "miss": "¡Fallaste la franja! +{penalty}s.",
+        "cold": "¡Golpe en frío! Aviva el fuego primero. +{penalty}s."
+      },
+      "glider": {
+        "title": "Eslalon del Jinete del Viento",
+        "boost": "Velocidad Extra",
+        "boostTip": "Aumenta tu velocidad de vuelo en {speed} yd/s, hasta {maximum} yd/s. Disponible mientras vuelas. Se recarga en {seconds} segundos.",
+        "objective": "Vuela a través de los aros de viento y aterriza en la zona marcada",
+        "ready": "Habla con el Maestro de Vuelo Zephyr para lanzarte.",
+        "replay": "Volar de nuevo",
+        "practiceRewards": "Vuelo de práctica: mejora tu tiempo sin ganar más monedas, experiencia ni reputación.",
+        "countdown": "Lanzamiento en {count}... ¡Agárrate fuerte!",
+        "flying": "Aros: {rings}/{total} | Tiempo: {time}s | Velocidad: {speed} yd/s",
+        "climb": "Subir",
+        "climbTip": "Mantén pulsado para levantar el morro y cambiar velocidad por altura. Toca para un pequeño impulso. Volar despacio pierde sustentación.",
+        "dive": "Bajar",
+        "diveTip": "Mantén pulsado para apuntar el morro hacia abajo y ganar velocidad. Toca para un pequeño impulso.",
+        "controls": "Mantén pulsado el botón derecho del ratón y mira hacia arriba para subir a costa de velocidad; mira hacia abajo para descender y ganar velocidad. Volar despacio pierde sustentación. Izquierda/derecha para girar; atrás para frenar. Saltar o nadar hacia arriba/abajo también controla el cabeceo. Vuela hacia adelante a través de los túneles de viento para un impulso de velocidad, una vez por túnel y por intento.",
+        "landed": "¡{rating}! Pasaste {rings}/{total} aros en {time}s.",
+        "failed": "¡Descenso fallido! Aterrizaste fuera de curso o fallaste demasiados aros.",
+        "retry": "Habla con Zephyr para reintentarlo, o con Skye junto a la zona de aterrizaje para volver al punto de lanzamiento.",
+        "nextRing": "Apunta al siguiente aro de viento a lo largo del cañón. Supera al menos {minimum} aros y luego aterriza en la zona marcada.",
+        "landing": "¡Todos los aros superados! Dirígete a la zona de aterrizaje de delante.",
+        "complete": "¡Aterrizaje completado!",
+        "score": "Puntuación: {score}.",
+        "medals": {
+          "gold": "Oro",
+          "silver": "Plata",
+          "bronze": "Bronce"
+        }
+      },
+      "calligraphyTitle": "Caligrafía Arcana",
+      "traceOutline": "Traza el contorno con tus pasos",
+      "traceRoundInstruction": "Ronda {round} de {total}: {shape}. {instruction}",
+      "traceShape": {
+        "triangle": "Triángulo",
+        "square": "Cuadrado",
+        "star": "Estrella",
+        "hourglass": "Reloj de Arena",
+        "lightning": "Runa de Rayo",
+        "spiral": "Espiral Angular",
+        "double-triangle": "Sigilo de Triángulos Gemelos",
+        "diamond": "Diamante",
+        "pentagon": "Pentágono",
+        "arrow": "Runa de Flecha",
+        "zigzag": "Sigilo en Zigzag",
+        "cross": "Runa de Cruz"
+      },
+      "traceRating": {
+        "bronze": "Bronce",
+        "silver": "Plata",
+        "gold": "Oro"
+      },
+      "traceScoreResult": "¡Completo! {rating}: {score}/{total}. La recompensa base no cambia. Oro: gesta, título, +10 de Renombre.",
+      "traceCompletionLog": "{completion} {result}",
+      "traceUnavailable": "Esta runa necesita una versión más reciente del juego.",
+      "traceReaction": {
+        "tessaTriangle": "¡Tres esquinas, y cada una en su lugar!",
+        "pipSquare": "¡Cuatro lados! ¡Creo que yo también puedo hacer eso!",
+        "elianFinal": "Runa final. Una línea puede cruzar o volver a pasar por un punto; sigue el marcador brillante hasta la siguiente esquina.",
+        "elianGold": "¡Trazado precioso! Tus pasos se han ganado su lugar en oro.",
+        "elianComplete": "¡Una runa completa! El cuidado y la práctica harán la siguiente aún más fina."
+      },
+      "traceReady": "Habla con el instructor para empezar.",
+      "tracePreview": "Observa el contorno. Las chispas doradas te guiarán.",
+      "traceStart": "Ve al marcador de inicio. Traza en cualquier dirección.",
+      "traceDrawing": "Sigue las chispas doradas hasta la esquina brillante. El azul marca tu rastro.",
+      "traceSuccess": "¡Contorno completo!",
+      "traceRetry": "Habla con el instructor para intentarlo de nuevo.",
+      "traceOffPath": "Te saliste del contorno. Habla con el instructor para reintentarlo.",
+      "traceMovement": "Permanece a pie y en el suelo. Habla con el instructor para reintentarlo.",
+      "traceTimeout": "Se acabó el tiempo. Habla con el instructor para reintentarlo.",
+      "traceCombat": "Sal de combate y luego habla con el instructor para reintentarlo.",
+      "puzzleTitle": "Alineación del rayo ley",
+      "puzzleBeamReach": "Cristales alcanzados: {count}",
+      "puzzleVictoryTitle": "Alineación perfecta",
+      "puzzleVictoryDetail": "El rayo ley ha llegado a su destino.",
+      "puzzleDefeatTitle": "Alineación perdida",
+      "puzzleDefeatDetail": "La corriente se ha desvanecido. El ritual quedó sin terminar.",
+      "puzzleReturn": "Volver al reino",
+      "puzzleResultAnnouncement": "{title}. {detail} {reach}.",
+      "puzzleLevel": "Nivel diario {level}",
+      "puzzleBonusLevel": "Nivel de bonificación {level} de {total}",
+      "puzzleBonusCharged": "Te espera el nivel de práctica {level} de {total}. Toca de nuevo el Alijo de Línea Ley. Las siguientes rondas no dan recompensas.",
+      "puzzleBonusPaid": "¡Nivel de práctica superado!",
+      "puzzleBonusDone": "Todos los niveles de práctica superados. Toca el Alijo de Línea Ley para jugar de nuevo.",
+      "puzzleInstructions": "Gira las fichas para llevar el rayo desde el origen hasta el destino.",
+      "puzzleRotateTile": "Girar ficha {tile}",
+      "puzzleConnectors": "Conexiones: {connectors}.",
+      "puzzlePowered": "El rayo llega a esta ficha.",
+      "puzzleUnpowered": "El rayo no llega a esta ficha.",
+      "puzzleClose": "Cerrar puzle del rayo ley",
+      "puzzleSource": "Origen",
+      "puzzleTarget": "Destino",
+      "puzzleSourceEndpoint": "Origen: {direction}.",
+      "puzzleTargetEndpoint": "Destino: {direction}.",
+      "puzzleTileAria": "{rotation} {connectors} {power} {source} {target}",
+      "puzzleRetry": "Reintentar",
+      "puzzleTimer": "{seconds}s",
+      "puzzleTimerAria": "Tiempo restante: {seconds} segundos",
+      "startQuest": "Iniciar World Quest",
+      "startEscort": "Iniciar escolta",
+      "escortTitle": "Caravana",
+      "alreadyCompleted": "Ya has completado esta World Quest en este ciclo.",
+      "replay": "Jugar de nuevo",
+      "practiceRewards": "Práctica: juega de nuevo sin ganar más monedas, experiencia ni reputación.",
+      "inProgress": "Esta World Quest ya está en curso.",
+      "match3Title": "Cascada de dulces",
+      "match3Instructions": "Selecciona dos dulces adyacentes. El movimiento solo cuenta si forma una línea de tres o más.",
+      "match3Moves": "Movimientos: {current}/{total}",
+      "match3Cleared": "Dulces eliminados: {current}/{total}",
+      "match3Announcement": "{moves}. {cleared}.",
+      "match3Cell": "Fila {row}, columna {column}: {candy}",
+      "match3Selected": "Seleccionado",
+      "match3Reset": "Reiniciar nivel",
+      "match3Close": "Cerrar puzle de dulces",
+      "match3OutOfMoves": "No quedan movimientos. Reinicia el nivel para intentarlo de nuevo.",
+      "match3VictoryTitle": "Dulce victoria",
+      "match3VictoryDetail": "La colección encantada está completa.",
+      "match3DefeatTitle": "Derrota amarga",
+      "match3DefeatDetail": "Tus movimientos se han agotado. Una colección nueva te espera.",
+      "match3TryAgain": "Intentar de nuevo",
+      "match3ResultAnnouncement": "{title}. {detail} {moves}. {cleared}.",
+      "match3ResultSummary": "{title}. {detail} {cleared}.",
+      "semanticSummary": "{name}. {progress}. {reward}.",
+      "semanticSummaryTimed": "{name}. {progress}. {reward}. {time}.",
+      "match3Candy": {
+        "berry": "cristal de frutos rojos",
+        "citrus": "orbe cítrico",
+        "mint": "triángulo de menta",
+        "grape": "cuadrado de uva",
+        "star": "estrella de azúcar"
+      }
+    },
     "logs": {
       "accepted": "Misión aceptada: {name}",
+      "worldQuestStarted": "Misión de mundo iniciada: {name}",
       "abandoned": "Misión abandonada: {name}",
       "completed": "Misión completada: {name}",
       "ready": "{name} ({status})",
-      "progress": "{label}: {current}/{total}"
+      "progress": "{label}: {current}/{total}",
+      "clueScrollEarned": "Todas las misiones de mundo del día están completadas: un Pergamino de Pistas es tuyo.",
+      "clueScrollLost": "Todas las misiones de mundo del día están completadas, pero no puedes llevar otro Pergamino de Pistas.",
+      "clueHuntStarted": "Búsqueda del tesoro iniciada: {title}",
+      "clueHuntStep": "Pista {step} de {total} resuelta: {title}",
+      "clueHuntDone": "Búsqueda del tesoro completada: {title}. El cofre es tuyo.",
+      "clueHuntAbandoned": "Búsqueda del tesoro abandonada: {title}",
+      "clueCasketOpened": "El cofre contiene {money} y {items}."
     },
     "errors": {
       "unavailable": "Esa misión no está disponible.",
@@ -11175,9 +12642,12 @@ export const es: EnTranslations = {
       "reclaim": "Recuperar",
       "buyAria": "Comprar {item} por {price}",
       "reclaimAria": "Recuperar {item}",
+      "buyQuantityAria": "Cuántos {item} comprar (de {total})",
+      "buyQuantityBtnAria": "Comprar esta cantidad de {item}",
       "buyConfirmTitle": "Confirmar compra",
       "buyConfirmBody": "¿Comprar {item} por {price}?",
       "buyConfirmBodyStack": "¿Comprar {item} x{count} por {price} ({each} cada uno)?",
+      "buyConfirmBodyPartial": "¿Comprar {count} de {item} (de {total} publicados) por {price} ({each} cada uno)?",
       "buyConfirmAccept": "Comprar",
       "buyConfirmCancel": "Cancelar",
       "buyChanged": "Esa publicación cambió antes de que confirmaras. Revisa el precio e inténtalo de nuevo.",
@@ -11206,9 +12676,45 @@ export const es: EnTranslations = {
       "collectEmpty": "No hay nada esperando. Las ganancias y publicaciones vencidas se recogen aquí.",
       "collectNote": "Ganancias y bienes devueltos que el Mercader guarda para ti.",
       "saleProceeds": "Ganancias de venta",
+      "collectAll": "Recoger lote completo",
+      "history": "Historial",
+      "historyEmpty": "Todavía no hay ventas. Los objetos que vendas en el Mercado Mundial aparecerán aquí.",
+      "historyNote": "Tus ventas recientes en el Mercado Mundial.",
       "saleBuyer": "Vendido a {buyer}",
       "saleOlder": "Más {count} ventas anteriores, incluidas en el total.",
-      "collectAll": "Recoger lote completo"
+      "ordersTab": "Solicitados",
+      "ordersNote": "Publica lo que quieres y el oro queda retenido en el Mercader. Las publicaciones a tu precio o por debajo se completan al instante; el resto espera un vendedor. El Mercader se queda con una comisión del {cut}% de quien entregue. Tienes {used}/{max} pedidos abiertos.",
+      "ordersListAria": "Pedidos de compra abiertos",
+      "ordersEmpty": "Todavía no hay pedidos abiertos. Publica uno y los recolectores verán lo que necesitas.",
+      "orderCardTitle": "Hacer un pedido",
+      "orderPickLabel": "Objeto solicitado",
+      "orderPickEmpty": "Busca un objeto abajo, o elige uno de la franja inferior.",
+      "orderSearchPlaceholder": "Buscar objetos...",
+      "orderSearchAria": "Buscar un objeto para pedir",
+      "orderPickNone": "Ningún objeto coincide.",
+      "orderQuantity": "Unidades solicitadas",
+      "orderPriceEach": "Precio por unidad",
+      "orderEscrowLine": "Oro retenido en el Mercader: {total}",
+      "orderCannotAfford": "No puedes pagar {total} por este pedido.",
+      "orderAtCap": "No tienes espacios de pedido libres. Retira uno primero.",
+      "orderPlaceButton": "Hacer pedido",
+      "orderConfirmTitle": "Confirmar pedido",
+      "orderConfirmBody": "¿Pedir {item} x{count} a {each} cada uno? {total} quedará retenido en el Mercader hasta que se complete o se retire el pedido.",
+      "orderWanted": "x{count} solicitados",
+      "orderBy": "Solicitado por {buyer}",
+      "orderMine": "Tu pedido",
+      "orderEach": "cada uno",
+      "orderDeliver": "Entregar",
+      "orderDeliverAria": "Entregar {item} a {buyer}",
+      "orderDeliverNone": "No tienes ninguno de este objeto en tus bolsas.",
+      "orderWithdraw": "Retirar",
+      "orderWithdrawAria": "Retirar tu pedido de {item}",
+      "orderDeliverConfirmTitle": "Confirmar entrega",
+      "orderDeliverConfirmBody": "¿Entregar {item} x{count} a {buyer} por {total} ({each} cada uno)? Recibirás {proceeds} tras la comisión del Mercader.",
+      "unlistedTitle": "No está en el mercado",
+      "unlistedNote": "Materiales sin ninguna publicación. Haz un pedido de uno, o recoléctalo y publícalo.",
+      "unlistedNone": "Todos los materiales tienen al menos una publicación ahora mismo.",
+      "unlistedStageAria": "Pedir {item}"
     },
     "logs": {
       "listedItem": "{item} publicado en el Mercado Mundial por {money}.",
@@ -11217,6 +12723,11 @@ export const es: EnTranslations = {
       "collectedMoney": "Recoges {money} del Mercader.",
       "reclaimedItem": "Recuperaste {item} del mercado.",
       "expiredListing": "Tu publicación de {item} venció y espera en el Mercader.",
+      "orderPlaced": "Hiciste un pedido de {item} x{count} a {each} cada uno.",
+      "orderDelivered": "Entregaste {item} x{count} a {buyer} por {money}. Recoge {proceeds} del Mercader.",
+      "orderReceived": "{seller} entregó {item} x{count} a tu pedido. Recógelo del Mercader.",
+      "orderWithdrawn": "Retiraste tu pedido de {item}; se devolvió {money}.",
+      "orderExpired": "Tu pedido de {item} caducó; {money} te espera en el Mercader.",
       "boughtBackItem": "Recompraste {item} por {money}."
     },
     "errors": {
@@ -11235,7 +12746,12 @@ export const es: EnTranslations = {
       "notYourListing": "Esa publicación no es tuya.",
       "nothingToCollect": "No tienes nada que recoger.",
       "sweepNoListings": "No hay listados de ese artículo disponibles para barrer.",
-      "sweepPriceChanged": "Los precios cambiaron antes de que llegara su barrido. Consulta la cotización y vuelve a intentarlo."
+      "sweepPriceChanged": "Los precios cambiaron antes de que llegara su barrido. Consulta la cotización y vuelve a intentarlo.",
+      "orderCountNeeded": "Indica cuántos quieres.",
+      "tooManyOrders": "Puedes mantener como máximo {count} pedidos abiertos a la vez.",
+      "orderClosed": "Ese pedido ya no está abierto.",
+      "orderOwn": "Ese es tu propio pedido. Cancélalo para retirarlo.",
+      "orderNotYours": "Ese pedido no es tuyo."
     },
     "loot": {
       "takeAll": "Recoger botín",
@@ -11967,6 +13483,18 @@ export const es: EnTranslations = {
         "name": "Reserva de Truenos",
         "description": "Pasiva: el Arco Eléctrico y el Relámpago Bifurcado otorgan Trueno, hasta 5. Con 5 de Trueno, la Sacudida Terrestre inflige un 125% más de daño o el Terremoto un 100% más, y luego consume todo el Trueno. (Llamatruenos)"
       },
+      "lightning_overload": {
+        "name": "Arc Overload",
+        "description": "Pasiva: Arco Eléctrico y Relámpago Bifurcado tienen un 20% de probabilidad de sufrir una Sobrecarga, golpeando de nuevo a su primer objetivo por el 50% del daño infligido y otorgando 1 de Trueno. (Thundercall)"
+      },
+      "lava_burst": {
+        "name": "Magma Burst",
+        "description": "Inflige {damage} de daño de Fuego. Siempre asesta golpe crítico a un objetivo que arda con tu Sacudida de Ascuas. Oleada de Magma: cada tic de Sacudida de Ascuas tiene un 20% de probabilidad de reiniciar este tiempo de reutilización y hacer que tu próximo Magma Burst en los 10 s siguientes sea instantáneo. El daño aumenta con el poder con hechizos. (Thundercall)"
+      },
+      "thunderstorm": {
+        "name": "Stormbreak",
+        "description": "Invoca un trueno, infligiendo {damage} de daño de Naturaleza a los enemigos en 10 m y ralentizándolos un 50% durante 5 s. Restaura el 8% de tu maná máximo. El daño aumenta con el poder con hechizos. (Thundercall)"
+      },
       "rockbiter_weapon": {
         "name": "Arma Pétrea",
         "description": "Imbuye tu arma durante 30 min. Cada golpe inflige {damage} de daño adicional. Mejora gana además un 40% de armadura y un 20% de Aguante, sufre un 15% menos de daño y es inmune a los golpes críticos de las criaturas y genera 2,75 veces más amenaza. Sacudida Terrestre obliga a su objetivo a atacarte durante 3 s, y Égida de Truenos otorga un 10% de reducción de daño durante 3 s."
@@ -12073,7 +13601,7 @@ export const es: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Maleficio de violencia",
-        "description": "Maldice al enemigo durante 8 s, infligiendo daño de las Sombras y generando 2 de Condena cada 2 s. Sus siguientes 3 acciones dañinas generan 7 de Condena cada una y le infligen 17 de daño de las Sombras."
+        "description": "Maldice al enemigo durante 8 s. Sus siguientes 3 acciones dañinas generan 7 de Condena cada una y le infligen 17 de daño de las Sombras."
       },
       "cruel_pact": {
         "name": "Pacto cruel",
@@ -12109,7 +13637,7 @@ export const es: EnTranslations = {
       },
       "ruinous_brand": {
         "name": "Marca Ruinosa",
-        "description": "Marca a un enemigo durante 15 s. Tus siguientes 3 hechizos directos resuenan por un 25% de daño contra el enemigo marcado, o copian un 50% del daño hacia él cuando los lanzas contra otro objetivo. Los ecos de Descarga de Ruina también cuentan como golpes críticos, sin aplicar otro multiplicador de daño crítico."
+        "description": "Marca a un enemigo durante 15 s. Tus siguientes 3 hechizos directos resuenan por un 25% de daño contra el enemigo marcado, o copian un 50% del daño hacia él cuando los lanzas contra otro objetivo."
       },
       "wrath": {
         "name": "Descarga Silvestre",
@@ -12148,7 +13676,7 @@ export const es: EnTranslations = {
       },
       "bear_form": {
         "name": "Forma de Bruin",
-        "description": "Cambias a forma de oso: armadura +110%, salud máxima +30%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Transformarte en cualquier forma otorga Zancada Trotona, un breve impulso de velocidad de movimiento. Lánzala de nuevo para volver a forma de taumaturgo."
+        "description": "Cambias a forma de oso: armadura +110%, salud máxima +30%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Lánzala de nuevo para volver a forma de taumaturgo."
       },
       "maul": {
         "name": "Rompehuesos",
@@ -12164,17 +13692,17 @@ export const es: EnTranslations = {
         "description": "Un rugido funesto: todos los enemigos en un radio de 10 m son provocados, su amenaza hacia ti sube hasta igualar la de su enemigo más odiado, y quedan obligados a atacarte durante 3 s. Solo en Forma de Bruin."
       },
       "cat_form": {
-        "name": "Forma de gato",
-        "description": "Te transforma en lobo: la agilidad sube con tu nivel, poder de ataque +8 más 2 por nivel, tus ataques usan energía y puntos de combo, y generas un 29% menos de amenaza. Cambiar a cualquier forma otorga Paso ligero: un 60% de velocidad de movimiento durante 3 s, una vez cada 20 s. Lánzalo de nuevo para volver a la forma de lanzador."
+        "name": "Forma de lobo",
+        "description": "Te transforma en lobo: la agilidad sube con tu nivel, poder de ataque +8 más 2 por nivel, tus ataques usan energía y puntos de combo, y generas un 29% menos de amenaza. Lánzalo de nuevo para volver a la forma de lanzador."
       },
       "claw": {
         "name": "Garra Desgarradora",
-        "description": "Araña al enemigo por daño de arma más {damage}. Otorga 1 punto de combo. Solo en Forma de gato.",
+        "description": "Araña al enemigo por daño de arma más {damage}. Otorga 1 punto de combo. Solo en Forma de lobo.",
         "specNote_feral": "Cada golpe conectado añade 1 de Sangre Antigua (máx. 3)."
       },
       "ferocious_bite": {
         "name": "Mordisco Sangriento",
-        "description": "Movimiento final que causa {damage}. Solo en Forma de gato.",
+        "description": "Movimiento final que causa {damage}. Solo en Forma de lobo.",
         "specNote_feral": "Cada golpe conectado añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Cosecha Roja, que consume la Sangre Antigua para un golpe más fuerte que también inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, y restaura energía."
       },
       "swipe": {
@@ -12206,7 +13734,7 @@ export const es: EnTranslations = {
       },
       "travel_form": {
         "name": "Forma Fleet",
-        "description": "Adopta al instante una veloz forma Fleet, aumentando la velocidad de movimiento un 40% y eliminando las raíces y ralentizaciones que se puedan romper. No puedes usar otras habilidades mientras estás transformado, pero puedes transformarte dentro o fuera del combate, ideal para escapar. Transformarte en cualquier forma otorga Zancada Trotona, un breve impulso de velocidad de movimiento."
+        "description": "Adopta al instante una veloz forma Fleet, aumentando la velocidad de movimiento un 40%. No puedes usar otras habilidades mientras estás transformado, pero puedes transformarte dentro o fuera del combate, ideal para escapar."
       },
       "enrage": {
         "name": "Avivar",
@@ -12226,18 +13754,18 @@ export const es: EnTranslations = {
       },
       "dash": {
         "name": "Carrera",
-        "description": "Esprinta hacia delante, aumentando la velocidad de movimiento un 50% durante 15 s. Solo en Forma de gato."
+        "description": "Esprinta hacia delante, aumentando la velocidad de movimiento un 50% durante 15 s. Solo en Forma de lobo."
       },
       "pounce": {
         "name": "Golpe Sigiloso",
-        "description": "Apertura desde el sigilo que aturde al objetivo durante 2 s. Otorga 1 punto de combo. Solo en Forma de lobo. Fuera del sigilo, este botón es Embate."
+        "description": "Apertura desde el sigilo que aturde al objetivo durante 2 s. Otorga 1 punto de combo. Solo en Forma de lobo."
       },
       "lunge": {
-        "name": "Embate",
-        "description": "Te abalanzas sobre un enemigo a hasta 12 m, infligiendo un 60% del daño de arma y otorgando 1 punto de combo. Solo en Forma de lobo."
+        "name": "Embestida felina",
+        "description": "Cambias a Forma felina si aún no lo estás y te lanzas contra un enemigo a un máximo de 25 m. Al llegar, inflige un 60% de daño de arma, otorga 1 punto de combo y, como Colmillo salvaje, añade 1 Sangre antigua (máx. 3); si la embestida se interrumpe antes de llegar, recupera su reutilización. Utilizable en cualquier forma."
       },
       "hamstring_bite": {
-        "name": "Derribo",
+        "name": "Takedown",
         "description": "Movimiento final que aturde al objetivo durante 1 s más 1 s por punto de combo (5 puntos de combo: 6 s). Solo en Forma de lobo."
       },
       "insect_swarm": {
@@ -12245,12 +13773,12 @@ export const es: EnTranslations = {
         "description": "Un enjambre de insectos acosa al enemigo, causando {damage} de daño de Naturaleza durante 12 s."
       },
       "tigers_fury": {
-        "name": "Sangre de Lince",
-        "description": "Genera {rage} de energía y aumenta el poder de ataque en {buff} durante {duration} s. Solo en Forma de gato."
+        "name": "Sangre de Lobo",
+        "description": "Genera {rage} de energía y aumenta el poder de ataque en {buff} durante {duration} s. Solo en Forma de lobo."
       },
       "rip": {
         "name": "Grieta Sangrienta",
-        "description": "Movimiento final que hace sangrar al objetivo cada 2 s durante 24 s: 36 de daño más 24 por punto de combo gastado (5 puntos de combo: {damage} en total). Solo en Forma de gato.",
+        "description": "Movimiento final que hace sangrar al objetivo cada 2 s durante 24 s: 36 de daño más 24 por punto de combo gastado (5 puntos de combo: {damage} en total). Solo en Forma de lobo.",
         "specNote_feral": "El golpe conectado añade 1 de Sangre Antigua (máx. 3)."
       },
       "mortal_strike": {
@@ -12447,11 +13975,11 @@ export const es: EnTranslations = {
       },
       "moonkin_form": {
         "name": "Forma de lechúcico lunar",
-        "description": "Adopta Forma de lechúcico lunar, potenciando el lanzamiento de hechizos hasta que vuelvas a cambiar. Transformarte en cualquier forma otorga Zancada Trotona, un breve impulso de velocidad de movimiento. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Equilibrio)"
+        "description": "Adopta Forma de lechúcico lunar, potenciando el lanzamiento de hechizos hasta que vuelvas a cambiar. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Equilibrio)"
       },
       "feral_charge": {
         "name": "Oleada primigenia",
-        "description": "Desata una oleada primigenia. En Forma de gato, aumenta la regeneración de energía un 100% durante 10 s. En Forma de Bruin, genera 50 p. de ira al instante. (habilidad distintiva de Feral)"
+        "description": "Desata una oleada primigenia. En Forma de lobo, aumenta la regeneración de energía un 100% durante 10 s. En Forma de Bruin, genera 50 p. de ira al instante. (habilidad distintiva de Feral)"
       },
       "swiftmend": {
         "name": "Alivio presto",
@@ -12671,7 +14199,7 @@ export const es: EnTranslations = {
       },
       "chaos_bolt": {
         "name": "Descarga de Ruina",
-        "description": "Gasta 3 de Devastación para lanzar un pesado proyectil de fuego caótico que inflige {damage} de daño de Fuego antes de aplicar el daño crítico. Siempre golpea críticamente al impactar. Ruina acorta su lanzamiento un 30%."
+        "description": "Gasta 3 de Devastación para lanzar un pesado proyectil de fuego caótico que inflige {damage} de daño de Fuego. Ruina acorta su lanzamiento un 30%."
       },
       "dark_pact": {
         "name": "Pacto de Sangre",
@@ -12815,7 +14343,7 @@ export const es: EnTranslations = {
       },
       "perfect_moment": {
         "name": "Momento perfecto",
-        "description": "Obtienes al instante 4 cargas Arcanas y durante 10 s los Dardos de éter no las consumen e infligen un 20% más de daño. (Cronomancia)"
+        "description": "Obtienes al instante 4 cargas Arcanas y durante 10 s los Dardos de éter no las consumen. (Cronomancia)"
       },
       "arcane_surge": {
         "name": "Impulso de Éter",
@@ -12952,7 +14480,7 @@ export const es: EnTranslations = {
       },
       "bear_charge": {
         "name": "Embestida de Bruin",
-        "description": "Embiste a un enemigo, generando 9 de furia y aturdiéndolo durante 1 s. Durante los 3 s siguientes, la Forma de lobo es gratuita y sujeta al objetivo, ralentizándolo un 50% durante 4 s. Alcance de 7 a 23 m. Solo en forma de Bruin."
+        "description": "Embiste a un enemigo, generando 9 de furia y aturdiéndolo durante 1 s. Alcance de 7 a 23 m. Solo en forma de Bruin."
       },
       "demoralizing_roar": {
         "name": "Rugido Cobarde",
@@ -12960,11 +14488,11 @@ export const es: EnTranslations = {
       },
       "prowl": {
         "name": "Acechar",
-        "description": "Entra en sigilo mientras estás en Forma de lobo. No puede usarse en combate."
+        "description": "Entra en sigilo mientras estás en Forma de lobo y te mueves un 5% más lento. No puede usarse en combate."
       },
       "rake": {
         "name": "Desollar",
-        "description": "Desuella al enemigo por daño de arma más {damage} y causa daño de sangrado durante 18 s. Otorga 1 punto de combo. Solo en Forma de gato.",
+        "description": "Desuella al enemigo por daño de arma más {damage} y causa daño de sangrado durante 18 s. Otorga 1 punto de combo. Solo en Forma de lobo.",
         "specNote_feral": "Cada golpe conectado añade 1 de Sangre Antigua (máx. 3)."
       },
       "revive_pet": {
@@ -14314,6 +15842,18 @@ export const es: EnTranslations = {
       "sprung_trap": {
         "name": "Trampa de Ciénaga Disparada"
       },
+      "leyline_cache": {
+        "name": "Alijo de Línea Ley en Miniatura"
+      },
+      "confection_game_box": {
+        "name": "Caja de Juego del Confitero"
+      },
+      "eastbrook_freight_crate": {
+        "name": "Caja de Carga de Eastbrook"
+      },
+      "eastbrook_freight_wagon": {
+        "name": "Carromato de Carga de Eastbrook"
+      },
       "hearthlined_treads": {
         "name": "Botas Forradas de Hogar"
       },
@@ -14478,6 +16018,9 @@ export const es: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Llave de ignición: Triturador Chispa de Terror"
+      },
+      "reins_avian_strider": {
+        "name": "Riendas del Corcel Esmeralda del Valle"
       },
       "reins_goblin_rocket_sled": {
         "name": "Llave de encendido: Trineo cohete goblin"
@@ -15850,6 +17393,423 @@ export const es: EnTranslations = {
       "stormhymn_chain_treads": {
         "name": "Botas de malla Himno de tormenta"
       },
+      "vanguard_warrior_arms_helmet": {
+        "name": "Gran Yelmo Estelahoja"
+      },
+      "vanguard_warrior_arms_shoulder": {
+        "name": "Hombreras Estelahoja"
+      },
+      "vanguard_warrior_arms_chest": {
+        "name": "Cota Estelahoja"
+      },
+      "vanguard_warrior_arms_legs": {
+        "name": "Quijotes Estelahoja"
+      },
+      "vanguard_warrior_arms_gloves": {
+        "name": "Machacadores Estelahoja"
+      },
+      "vanguard_warrior_fury_helmet": {
+        "name": "Máscara Marchasangre"
+      },
+      "vanguard_warrior_fury_shoulder": {
+        "name": "Hombreras Marchasangre"
+      },
+      "vanguard_warrior_fury_chest": {
+        "name": "Malla Marchasangre"
+      },
+      "vanguard_warrior_fury_legs": {
+        "name": "Perneras Marchasangre"
+      },
+      "vanguard_warrior_fury_gloves": {
+        "name": "Manoplas Marchasangre"
+      },
+      "vanguard_warrior_prot_helmet": {
+        "name": "Yelmo Marchahierro"
+      },
+      "vanguard_warrior_prot_shoulder": {
+        "name": "Hombreras Marchahierro"
+      },
+      "vanguard_warrior_prot_chest": {
+        "name": "Peto Marchahierro"
+      },
+      "vanguard_warrior_prot_legs": {
+        "name": "Grebas Marchahierro"
+      },
+      "vanguard_warrior_prot_gloves": {
+        "name": "Guardamanos Marchahierro"
+      },
+      "vanguard_paladin_holy_helmet": {
+        "name": "Diadema Velasol"
+      },
+      "vanguard_paladin_holy_shoulder": {
+        "name": "Manto Velasol"
+      },
+      "vanguard_paladin_holy_chest": {
+        "name": "Cota Velasol"
+      },
+      "vanguard_paladin_holy_legs": {
+        "name": "Perneras Velasol"
+      },
+      "vanguard_paladin_holy_gloves": {
+        "name": "Guantes Velasol"
+      },
+      "vanguard_paladin_protection_helmet": {
+        "name": "Yelmo Votoescudo"
+      },
+      "vanguard_paladin_protection_shoulder": {
+        "name": "Hombreras Votoescudo"
+      },
+      "vanguard_paladin_protection_chest": {
+        "name": "Peto Votoescudo"
+      },
+      "vanguard_paladin_protection_legs": {
+        "name": "Quijotes Votoescudo"
+      },
+      "vanguard_paladin_protection_gloves": {
+        "name": "Guanteletes Votoescudo"
+      },
+      "vanguard_paladin_retribution_helmet": {
+        "name": "Corona Marcaluz"
+      },
+      "vanguard_paladin_retribution_shoulder": {
+        "name": "Hombreras Marcaluz"
+      },
+      "vanguard_paladin_retribution_chest": {
+        "name": "Coraza Marcaluz"
+      },
+      "vanguard_paladin_retribution_legs": {
+        "name": "Grebas Marcaluz"
+      },
+      "vanguard_paladin_retribution_gloves": {
+        "name": "Guanteletes Marcaluz"
+      },
+      "vanguard_hunter_beast_mastery_helmet": {
+        "name": "Capuz Guardamanada"
+      },
+      "vanguard_hunter_beast_mastery_shoulder": {
+        "name": "Hombreras Guardamanada"
+      },
+      "vanguard_hunter_beast_mastery_chest": {
+        "name": "Jubón Guardamanada"
+      },
+      "vanguard_hunter_beast_mastery_legs": {
+        "name": "Grebas Guardamanada"
+      },
+      "vanguard_hunter_beast_mastery_gloves": {
+        "name": "Guanteletes Guardamanada"
+      },
+      "vanguard_hunter_marksmanship_helmet": {
+        "name": "Capuz Vistalarga"
+      },
+      "vanguard_hunter_marksmanship_shoulder": {
+        "name": "Hombreras Vistalarga"
+      },
+      "vanguard_hunter_marksmanship_chest": {
+        "name": "Jubón Vistalarga"
+      },
+      "vanguard_hunter_marksmanship_legs": {
+        "name": "Grebas Vistalarga"
+      },
+      "vanguard_hunter_marksmanship_gloves": {
+        "name": "Guanteletes Vistalarga"
+      },
+      "vanguard_hunter_survival_helmet": {
+        "name": "Capuz Colmillotrampa"
+      },
+      "vanguard_hunter_survival_shoulder": {
+        "name": "Hombreras Colmillotrampa"
+      },
+      "vanguard_hunter_survival_chest": {
+        "name": "Jubón Colmillotrampa"
+      },
+      "vanguard_hunter_survival_legs": {
+        "name": "Grebas Colmillotrampa"
+      },
+      "vanguard_hunter_survival_gloves": {
+        "name": "Guanteletes Colmillotrampa"
+      },
+      "vanguard_rogue_assassination_helmet": {
+        "name": "Capucha Cortenoche"
+      },
+      "vanguard_rogue_assassination_shoulder": {
+        "name": "Hombreras Cortenoche"
+      },
+      "vanguard_rogue_assassination_chest": {
+        "name": "Túnica Cortenoche"
+      },
+      "vanguard_rogue_assassination_legs": {
+        "name": "Calzas Cortenoche"
+      },
+      "vanguard_rogue_assassination_gloves": {
+        "name": "Guantes Cortenoche"
+      },
+      "vanguard_rogue_combat_helmet": {
+        "name": "Capucha Marcariña"
+      },
+      "vanguard_rogue_combat_shoulder": {
+        "name": "Hombreras Marcariña"
+      },
+      "vanguard_rogue_combat_chest": {
+        "name": "Túnica Marcariña"
+      },
+      "vanguard_rogue_combat_legs": {
+        "name": "Calzas Marcariña"
+      },
+      "vanguard_rogue_combat_gloves": {
+        "name": "Guantes Marcariña"
+      },
+      "vanguard_rogue_subtlety_helmet": {
+        "name": "Capucha Pasosombra"
+      },
+      "vanguard_rogue_subtlety_shoulder": {
+        "name": "Hombreras Pasosombra"
+      },
+      "vanguard_rogue_subtlety_chest": {
+        "name": "Túnica Pasosombra"
+      },
+      "vanguard_rogue_subtlety_legs": {
+        "name": "Calzas Pasosombra"
+      },
+      "vanguard_rogue_subtlety_gloves": {
+        "name": "Guantes Pasosombra"
+      },
+      "vanguard_priest_discipline_helmet": {
+        "name": "Capucha Salmovelo"
+      },
+      "vanguard_priest_discipline_shoulder": {
+        "name": "Manto Salmovelo"
+      },
+      "vanguard_priest_discipline_chest": {
+        "name": "Vestidura Salmovelo"
+      },
+      "vanguard_priest_discipline_legs": {
+        "name": "Perneras Salmovelo"
+      },
+      "vanguard_priest_discipline_gloves": {
+        "name": "Vendas Salmovelo"
+      },
+      "vanguard_priest_holy_helmet": {
+        "name": "Capucha Alagracia"
+      },
+      "vanguard_priest_holy_shoulder": {
+        "name": "Manto Alagracia"
+      },
+      "vanguard_priest_holy_chest": {
+        "name": "Vestidura Alagracia"
+      },
+      "vanguard_priest_holy_legs": {
+        "name": "Perneras Alagracia"
+      },
+      "vanguard_priest_holy_gloves": {
+        "name": "Vendas Alagracia"
+      },
+      "vanguard_priest_shadow_helmet": {
+        "name": "Capucha Himnocaso"
+      },
+      "vanguard_priest_shadow_shoulder": {
+        "name": "Manto Himnocaso"
+      },
+      "vanguard_priest_shadow_chest": {
+        "name": "Vestidura Himnocaso"
+      },
+      "vanguard_priest_shadow_legs": {
+        "name": "Perneras Himnocaso"
+      },
+      "vanguard_priest_shadow_gloves": {
+        "name": "Vendas Himnocaso"
+      },
+      "vanguard_shaman_elemental_helmet": {
+        "name": "Capuz Escritormenta"
+      },
+      "vanguard_shaman_elemental_shoulder": {
+        "name": "Hombreras Escritormenta"
+      },
+      "vanguard_shaman_elemental_chest": {
+        "name": "Cota Escritormenta"
+      },
+      "vanguard_shaman_elemental_legs": {
+        "name": "Perneras Escritormenta"
+      },
+      "vanguard_shaman_elemental_gloves": {
+        "name": "Guanteletes Escritormenta"
+      },
+      "vanguard_shaman_enhancement_helmet": {
+        "name": "Yelmo Vendavalnato"
+      },
+      "vanguard_shaman_enhancement_shoulder": {
+        "name": "Hombreras Vendavalnato"
+      },
+      "vanguard_shaman_enhancement_chest": {
+        "name": "Malla Vendavalnato"
+      },
+      "vanguard_shaman_enhancement_legs": {
+        "name": "Grebas Vendavalnato"
+      },
+      "vanguard_shaman_enhancement_gloves": {
+        "name": "Manoplas Vendavalnato"
+      },
+      "vanguard_shaman_restoration_helmet": {
+        "name": "Diadema Guardamar"
+      },
+      "vanguard_shaman_restoration_shoulder": {
+        "name": "Manto Guardamar"
+      },
+      "vanguard_shaman_restoration_chest": {
+        "name": "Cota Guardamar"
+      },
+      "vanguard_shaman_restoration_legs": {
+        "name": "Falda Guardamar"
+      },
+      "vanguard_shaman_restoration_gloves": {
+        "name": "Vendas Guardamar"
+      },
+      "vanguard_mage_arcane_helmet": {
+        "name": "Capucha Atahoras"
+      },
+      "vanguard_mage_arcane_shoulder": {
+        "name": "Amito Atahoras"
+      },
+      "vanguard_mage_arcane_chest": {
+        "name": "Vestidura Atahoras"
+      },
+      "vanguard_mage_arcane_legs": {
+        "name": "Pantalones Atahoras"
+      },
+      "vanguard_mage_arcane_gloves": {
+        "name": "Guantes Atahoras"
+      },
+      "vanguard_mage_fire_helmet": {
+        "name": "Capucha Azoteascuas"
+      },
+      "vanguard_mage_fire_shoulder": {
+        "name": "Manto Azoteascuas"
+      },
+      "vanguard_mage_fire_chest": {
+        "name": "Vestiduras Azoteascuas"
+      },
+      "vanguard_mage_fire_legs": {
+        "name": "Perneras Azoteascuas"
+      },
+      "vanguard_mage_fire_gloves": {
+        "name": "Guantes Azoteascuas"
+      },
+      "vanguard_mage_frost_helmet": {
+        "name": "Capucha Guardaescarcha"
+      },
+      "vanguard_mage_frost_shoulder": {
+        "name": "Hombreras Guardaescarcha"
+      },
+      "vanguard_mage_frost_chest": {
+        "name": "Vestimenta Guardaescarcha"
+      },
+      "vanguard_mage_frost_legs": {
+        "name": "Polainas Guardaescarcha"
+      },
+      "vanguard_mage_frost_gloves": {
+        "name": "Mitones Guardaescarcha"
+      },
+      "vanguard_warlock_affliction_helmet": {
+        "name": "Capucha Plumapavor"
+      },
+      "vanguard_warlock_affliction_shoulder": {
+        "name": "Manto Plumapavor"
+      },
+      "vanguard_warlock_affliction_chest": {
+        "name": "Vestidura Plumapavor"
+      },
+      "vanguard_warlock_affliction_legs": {
+        "name": "Perneras Plumapavor"
+      },
+      "vanguard_warlock_affliction_gloves": {
+        "name": "Vendas Plumapavor"
+      },
+      "vanguard_warlock_demonology_helmet": {
+        "name": "Capucha Atamédula"
+      },
+      "vanguard_warlock_demonology_shoulder": {
+        "name": "Hombreras Atamédula"
+      },
+      "vanguard_warlock_demonology_chest": {
+        "name": "Vestidura Atamédula"
+      },
+      "vanguard_warlock_demonology_legs": {
+        "name": "Perneras Atamédula"
+      },
+      "vanguard_warlock_demonology_gloves": {
+        "name": "Manoplas Atamédula"
+      },
+      "vanguard_warlock_destruction_helmet": {
+        "name": "Capucha Coronaescoria"
+      },
+      "vanguard_warlock_destruction_shoulder": {
+        "name": "Manto Coronaescoria"
+      },
+      "vanguard_warlock_destruction_chest": {
+        "name": "Vestiduras Coronaescoria"
+      },
+      "vanguard_warlock_destruction_legs": {
+        "name": "Perneras Coronaescoria"
+      },
+      "vanguard_warlock_destruction_gloves": {
+        "name": "Guantes Coronaescoria"
+      },
+      "vanguard_druid_balance_helmet": {
+        "name": "Tocado Guardaestrellas"
+      },
+      "vanguard_druid_balance_shoulder": {
+        "name": "Hombreras Guardaestrellas"
+      },
+      "vanguard_druid_balance_chest": {
+        "name": "Chaleco Guardaestrellas"
+      },
+      "vanguard_druid_balance_legs": {
+        "name": "Calzas Guardaestrellas"
+      },
+      "vanguard_druid_balance_gloves": {
+        "name": "Guantes Guardaestrellas"
+      },
+      "vanguard_druid_feral_helmet": {
+        "name": "Yelmo Crinsangre"
+      },
+      "vanguard_druid_feral_shoulder": {
+        "name": "Hombreras Crinsangre"
+      },
+      "vanguard_druid_feral_chest": {
+        "name": "Túnica Crinsangre"
+      },
+      "vanguard_druid_feral_legs": {
+        "name": "Grebas Crinsangre"
+      },
+      "vanguard_druid_feral_gloves": {
+        "name": "Manoplas Crinsangre"
+      },
+      "vanguard_druid_restoration_helmet": {
+        "name": "Corona Florcardo"
+      },
+      "vanguard_druid_restoration_shoulder": {
+        "name": "Manto Florcardo"
+      },
+      "vanguard_druid_restoration_chest": {
+        "name": "Chaleco Florcardo"
+      },
+      "vanguard_druid_restoration_legs": {
+        "name": "Perneras Florcardo"
+      },
+      "vanguard_druid_restoration_gloves": {
+        "name": "Guantes Florcardo"
+      },
+      "vanguard_verdict_greatsword": {
+        "name": "Veredicto de la Vanguardia"
+      },
+      "vanguard_oath_blade": {
+        "name": "Juramento de la Vanguardia"
+      },
+      "vanguard_fang_dagger": {
+        "name": "Colmillo de la Vanguardia"
+      },
+      "vanguard_warstaff": {
+        "name": "Bastón de Guerra de la Vanguardia"
+      },
       "conjured_water4": {
         "name": "Agua de Manantial Conjurada"
       },
@@ -16330,6 +18290,15 @@ export const es: EnTranslations = {
       "event_skin_token": {
         "name": "Alijo cosmético misterioso"
       },
+      "emissary_cache": {
+        "name": "Alijo del Emisario"
+      },
+      "clue_scroll": {
+        "name": "Pergamino de Pistas"
+      },
+      "treasure_casket": {
+        "name": "Cofre del Tesoro"
+      },
       "heroic_mark": {
         "name": "Marca Heroica"
       },
@@ -16641,6 +18610,156 @@ export const es: EnTranslations = {
       },
       "varkhul_emberward": {
         "name": "Guardia de Brasas, Baluarte de Varkhul"
+      },
+      "bastion_sigil": {
+        "name": "Sello del Bastión"
+      },
+      "mooring_stone": {
+        "name": "Piedra de amarre"
+      },
+      "menders_hourglass": {
+        "name": "Reloj de arena del sanador"
+      },
+      "wellspring_seed": {
+        "name": "Semilla de manantial"
+      },
+      "paired_talons": {
+        "name": "Garras gemelas"
+      },
+      "hunters_tally": {
+        "name": "Cuenta del cazador"
+      },
+      "stormjar": {
+        "name": "Jarra de tormenta"
+      },
+      "echoing_lens": {
+        "name": "Lente resonante"
+      },
+      "gamblers_die": {
+        "name": "Dado del apostador"
+      },
+      "sundered_prism": {
+        "name": "Prisma fracturado"
+      },
+      "wayfarers_lodestone": {
+        "name": "Piedra imán del caminante"
+      },
+      "medallion_of_defiance": {
+        "name": "Medallón de desafío"
+      },
+      "duelists_brand": {
+        "name": "Marca del duelista"
+      },
+      "forgefathers_temper": {
+        "name": "Temple del Padre de la Forja"
+      },
+      "kindling_orb": {
+        "name": "Orbe de brasas"
+      },
+      "molten_fletching": {
+        "name": "Emplumado fundido"
+      },
+      "last_flame_lantern": {
+        "name": "Farol de la última llama"
+      },
+      "heart_of_the_crucible": {
+        "name": "Corazón del Crisol"
+      },
+      "rift_watchers_band": {
+        "name": "Anillo del Vigía de la Brecha"
+      },
+      "rift_surveyors_satchel": {
+        "name": "Zurrón del Topógrafo de la Brecha"
+      },
+      "riftwalkers_tunic": {
+        "name": "Túnica del Caminante de la Brecha"
+      },
+      "riftwarden_voidblade": {
+        "name": "Hoja del Vacío del Guardián de la Brecha"
+      },
+      "champion_rift_band": {
+        "name": "Anillo de la Brecha del Campeón"
+      },
+      "order_prayer_beads": {
+        "name": "Rosario de la Orden"
+      },
+      "vestments_of_the_acolyte": {
+        "name": "Vestiduras del Acólito"
+      },
+      "templar_dawn_shield": {
+        "name": "Escudo del Alba del Templario"
+      },
+      "dawnkeeper_consecrated_mace": {
+        "name": "Maza Consagrada del Guardián del Alba"
+      },
+      "champion_dawn_medallion": {
+        "name": "Medallón del Alba del Campeón"
+      },
+      "automaton_cog_ring": {
+        "name": "Anillo de Engranaje de Autómata"
+      },
+      "clockwork_tinkers_pack": {
+        "name": "Mochila del Manitas de Relojería"
+      },
+      "artificers_welding_cowl": {
+        "name": "Capucha de Soldadura del Artífice"
+      },
+      "forgemaster_crag_cleaver": {
+        "name": "Hendedor de Peñascos del Maestro Forjador"
+      },
+      "champion_forged_loop": {
+        "name": "Anillo Forjado del Campeón"
+      },
+      "tidewatchers_locket": {
+        "name": "Medallón del Vigía de la Marea"
+      },
+      "riftwalkers_cord": {
+        "name": "Cordón del Caminante de la Brecha"
+      },
+      "riftwalkers_treads": {
+        "name": "Botas del Caminante de la Brecha"
+      },
+      "formula_riftwalkers_grace": {
+        "name": "Fórmula: Gracia del Caminante de la Brecha"
+      },
+      "riftwardens_pendant": {
+        "name": "Colgante del Guardián de la Brecha"
+      },
+      "acolytes_signet": {
+        "name": "Sello del Acólito"
+      },
+      "cord_of_the_dawn": {
+        "name": "Cordón del Alba"
+      },
+      "dawnlit_slippers": {
+        "name": "Zapatillas Iluminadas por el Alba"
+      },
+      "formula_dawnfire_etching": {
+        "name": "Fórmula: Grabado de Fuego del Alba"
+      },
+      "formula_dawns_benediction": {
+        "name": "Fórmula: Bendición del Alba"
+      },
+      "champions_dawn_loop": {
+        "name": "Argolla del Alba del Campeón"
+      },
+      "dawnkeepers_circle": {
+        "name": "Círculo del Guardián del Alba"
+      },
+      "cogwork_choker": {
+        "name": "Gargantilla de Engranajes"
+      },
+      "forgemasters_girdle": {
+        "name": "Cinturón del Maestro Forjador"
+      },
+      "forgemasters_sabatons": {
+        "name": "Escarpes del Maestro Forjador"
+      },
+      "formula_piston_drive": {
+        "name": "Fórmula: Impulso de Pistón"
+      },
+      "forgewall_gorget": {
+        "name": "Gorguera Forjamuro"
       }
     },
     "mobs": {
@@ -16668,6 +18787,15 @@ export const es: EnTranslations = {
       "vale_bandit": {
         "name": "Bandido del Valle"
       },
+      "eastbrook_freight_caravan": {
+        "name": "Caravana de mercancías de Eastbrook"
+      },
+      "willowfen_remedy_caravan": {
+        "name": "Caravana de remedios del Pantano de los Sauces"
+      },
+      "frostveil_supply_caravan": {
+        "name": "Caravana de suministros del Velo de Escarcha"
+      },
       "restless_bones": {
         "name": "Huesos inquietos"
       },
@@ -16688,6 +18816,9 @@ export const es: EnTranslations = {
       },
       "drowned_dead": {
         "name": "Muerto ahogado"
+      },
+      "fenbridge_infiltrator": {
+        "name": "El Rostro Prestado"
       },
       "fen_troll": {
         "name": "Trol de Mirefen"
@@ -17396,6 +19527,116 @@ export const es: EnTranslations = {
       }
     },
     "npcs": {
+      "glider_instructor": {
+        "name": "Maestro de Vuelo Zephyr",
+        "title": "Instructor de Jinetes del Viento",
+        "greeting": "Las térmicas que rugen desde los acantilados de El Shear están feroces hoy. ¿Listo para atarte al planeador mecánico y poner a prueba tus alas en el circuito de eslalon?"
+      },
+      "glider_apprentice": {
+        "name": "Skye",
+        "title": "Aprendiz de Zephyr",
+        "greeting": "Buen vuelo cañón abajo. Habla conmigo cuando necesites una corriente ascendente mágica de vuelta hasta Zephyr en El Shear."
+      },
+      "shadow_cloak_scout": {
+        "name": "Exploradora Valerie",
+        "title": "Operaciones Encubiertas",
+        "greeting": "Toma prestada mi capa de tejido crepuscular. Cuélate detrás de cada portador de despachos y quítale sus órdenes. Mantente fuera de los haces de los faroles: un guardia farolero ve directamente a través del encantamiento, y un portador te siente si lo rozas."
+      },
+      "shadow_guard_north": {
+        "name": "Guardia de Despachos",
+        "title": "Portador de Despachos",
+        "greeting": "Estas órdenes selladas son para el capitán. Mantén las distancias."
+      },
+      "shadow_guard_south": {
+        "name": "Guardia de Despachos",
+        "title": "Portador de Despachos",
+        "greeting": "Tengo un despacho que entregar. Circula."
+      },
+      "shadow_guard_east": {
+        "name": "Guardia de Despachos",
+        "title": "Portador de Despachos",
+        "greeting": "Nada de retrasos. La guardia está esperando estas órdenes."
+      },
+      "shadow_guard_west": {
+        "name": "Guardia de Despachos",
+        "title": "Portador de Despachos",
+        "greeting": "Asuntos oficiales. Deja el camino despejado."
+      },
+      "shadow_sentry_south": {
+        "name": "Centinela del Farol",
+        "title": "Visión Verdadera",
+        "greeting": "Mi farol revela más que sombras. Quédate donde pueda verte."
+      },
+      "shadow_sentry_north": {
+        "name": "Centinela del Farol",
+        "title": "Visión Verdadera",
+        "greeting": "Nada se escapa de la vigilancia del farol."
+      },
+      "shadow_watch_west": {
+        "name": "Vigilante del Farol",
+        "title": "Visión Verdadera",
+        "greeting": "Alto ahí. El farol ve lo que el ojo pasa por alto."
+      },
+      "shadow_watch_east": {
+        "name": "Vigilante del Farol",
+        "title": "Visión Verdadera",
+        "greeting": "Nadie cruza mi luz sin ser visto."
+      },
+      "forge_instructor": {
+        "name": "Herrera Mara",
+        "title": "Herrera de Wyrmwatch",
+        "greeting": "¡Ayúdame a terminar un escudo! Haz clic en los suministros que te pida. Unas manos rápidas ganan una medalla mejor."
+      },
+      "infiltrator_captain": {
+        "name": "Sargento Alric",
+        "title": "Guardia de Fenbridge",
+        "greeting": "Una criatura ha robado el rostro de un soldado. Lee las órdenes vigentes y el registro de guardia, interroga a los cuatro guardias, y luego vuelve y señala a aquel cuya historia contradiga nuestros registros."
+      },
+      "infiltrator_nella": {
+        "name": "Guardia Nella",
+        "title": "Guardia de Fenbridge",
+        "greeting": "Reportándome de servicio."
+      },
+      "infiltrator_orin": {
+        "name": "Guardia Orin",
+        "title": "Guardia de Fenbridge",
+        "greeting": "Reportándome de servicio."
+      },
+      "infiltrator_bram": {
+        "name": "Guardia Bram",
+        "title": "Guardia de Fenbridge",
+        "greeting": "Reportándome de servicio."
+      },
+      "infiltrator_tessa": {
+        "name": "Guardia Tessa",
+        "title": "Guardia de Fenbridge",
+        "greeting": "Reportándome de servicio."
+      },
+      "wisp_maze_keeper": {
+        "name": "Guardiana Liora",
+        "title": "Guardiana del Laberinto de Setos",
+        "greeting": "Unos ladrones escondieron su oro robado por todo mi laberinto, y ahora las sombras lo custodian. Recupera cada bolsa de monedas. Evita a los guardianes, o toma un espíritu radiante para desterrarlos. Perder tres vidas te devuelve a la entrada, pero las bolsas que hayas recogido permanecen a salvo."
+      },
+      "weekly_emissary": {
+        "name": "Cham Pete",
+        "title": "Emisario",
+        "greeting": "El Valle lleva un registro de gestas, y yo llevo el registro. Elige un encargo para la semana, llévalo a término, y la bolsa de monedas es tuya."
+      },
+      "calligraphy_instructor": {
+        "name": "Instructor Elian",
+        "title": "Caligrafía Arcana",
+        "greeting": "Un paso firme traza una línea firme. Enséñales a mis aprendices un triángulo, un cuadrado y una runa avanzada."
+      },
+      "calligraphy_apprentice_1": {
+        "name": "Aprendiz Tessa",
+        "title": "Estudiante de Caligrafía",
+        "greeting": "Sigo girando demasiado pronto. ¿Me enseñas dónde van las esquinas?"
+      },
+      "calligraphy_apprentice_2": {
+        "name": "Aprendiz Pip",
+        "title": "Estudiante de Caligrafía",
+        "greeting": "Un triángulo primero, luego un cuadrado, luego una runa. ¡Un paso firme a la vez!"
+      },
       "the_merchant": {
         "name": "El Mercader",
         "title": "Guardián del Mercado Mundial",
@@ -17520,6 +19761,11 @@ export const es: EnTranslations = {
         "name": "Tesorero Fernando",
         "title": "El Arca Dorada",
         "greeting": "Te damos la bienvenida al Arca Dorada. Tus bienes descansan seguros tras nuestras cerraduras."
+      },
+      "eastbrook_vault_keeper": {
+        "name": "Guardián de la Bóveda",
+        "title": "Recompensas Semanales",
+        "greeting": "Tus recompensas semanales te esperan. Elige un objeto entre tus opciones ganadas tras el reinicio del Crisol."
       },
       "card_master": {
         "name": "Maestro de Cartas",
@@ -17655,6 +19901,11 @@ export const es: EnTranslations = {
         "name": "Explorador Yerrin",
         "title": "Vigía de las Dunas Lejanas",
         "greeting": "Mantente agachado. El sonido viaja extraño sobre el cristal, y la puerta de abajo tiene oídos."
+      },
+      "harbormaster_tamsin": {
+        "name": "Capitana del Puerto Tamsin",
+        "title": "Guardiana de los Muelles de Wyrmwatch",
+        "greeting": "Ven, aléjate del muelle y caliéntate las manos. El barco de nuestro embarcadero navega por la larga costa este hasta Wickharbor y de vuelta. Muy al oeste, el otro transbordador va entre Eastbrook y la Flor Nocturna. El mapa de la pared muestra ambas travesías. Descansa junto al fuego antes de la subida a Wyrmwatch."
       },
       "reeve_ottoline": {
         "name": "Alguacila Ottoline",
@@ -17830,6 +20081,26 @@ export const es: EnTranslations = {
         "name": "Constructor de grietas Maelis",
         "title": "Maestro de falsificación de la grieta",
         "greeting": "Una banda de Riftbound recuerda la ruptura que lo logró, {className}. Tráeme la banda, y la esencia que arrojan las rupturas, y le enseñaré a recordar más."
+      },
+      "npc_rift_watch_quartermaster": {
+        "name": "Intendente Vaelen",
+        "title": "Proveedor de la Guardia de la Brecha",
+        "greeting": "La Guardia de la Brecha protege la costa y vigila las grietas profundas. Nuestras reservas están abiertas para quienes gozan de reconocimiento."
+      },
+      "npc_church_order_quartermaster": {
+        "name": "Templaria Althea",
+        "title": "Intendenta de la Orden de la Iglesia",
+        "greeting": "Camina en la Luz del Alba. La Orden de la Iglesia abastece a quienes se mantienen a nuestro servicio."
+      },
+      "npc_automaton_quartermaster": {
+        "name": "Artífice Tobrin",
+        "title": "Proveedor de los Autómatas",
+        "greeting": "Engranajes de precisión, acero forjado y potencia calibrada. Los operadores autorizados pueden abastecerse de nuestro inventario."
+      },
+      "npc_wq_taskmaster": {
+        "name": "Capataz Kaelen",
+        "title": "Capataz de Misiones Mundiales",
+        "greeting": "Las facciones aliadas publican tareas por todo el reino cada día. Si una tarea no se ajusta a tus habilidades, puedes solicitar una reasignación diaria."
       },
       "forgemistress_darva": {
         "name": "Maestra Forjadora Darva",
@@ -20267,6 +22538,7 @@ export const es: EnTranslations = {
       "eastbrook_vale": {
         "name": "Valle de Eastbrook",
         "welcome": "Busca al mariscal Redbrook en la ciudad: tiene trabajo para ti.",
+        "welcomeDone": "El Mariscal Redbrook ya no tiene más trabajo para ti: el pintoresco pueblo costero donde comenzó tu viaje descansa más tranquilo gracias a ello.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -20312,6 +22584,7 @@ export const es: EnTranslations = {
       "mirefen_marsh": {
         "name": "Ciénaga de Mirefen",
         "welcome": "Preséntate ante el guardián Fenwick en la puerta de Fenbridge.",
+        "welcomeDone": "El Guardián Fenwick ya no tiene más órdenes para ti: el asentamiento en lo profundo de las tierras pantanosas está más seguro gracias a ello.",
         "pois": {
           "0": {
             "label": "Fenbridge"
@@ -20342,6 +22615,7 @@ export const es: EnTranslations = {
       "thornpeak_heights": {
         "name": "Alturas de Thornpeak",
         "welcome": "La capitana Thessaly sostiene el muro de Highwatch a duras penas.",
+        "welcomeDone": "La Capitana Thessaly sostiene la muralla en Highwatch: nunca es fácil, pero con la ayuda de aventureros como tú ahora es manejable.",
         "pois": {
           "0": {
             "label": "Highwatch"
@@ -20666,6 +22940,9 @@ export const es: EnTranslations = {
           },
           "4": {
             "label": "Los Campos de la Brecha"
+          },
+          "5": {
+            "label": "El Naufragio"
           }
         }
       },
@@ -20985,8 +23262,8 @@ export const es: EnTranslations = {
       },
       "benison_dawnweave": {
         "name": "Trama del Alba Benévola",
-        "bonus2": "El rescate de Vigilancia Seráfica cura 270, en lugar de 180. El daño recibido ya no retrasa tus hechizos.",
-        "bonus4": "Cuando se activa Vigilancia Seráfica, su aliado también recupera un 15% de su salud máxima durante 10 s."
+        "bonus2": "Restaurar salud con Rezo Susurrado, Rezo Solemne o Rezo Urgente aumenta la sanación de tu siguiente Coromendar un 10%, acumulándose hasta 3 veces. Cada lanzamiento otorga como máximo una acumulación. Coromendar consume todas las acumulaciones al terminar de lanzarse. El daño recibido ya no retrasa tus hechizos.",
+        "bonus4": "Terminar Coromendar con 3 acumulaciones hace que tu siguiente Rezo Susurrado en 60 s sea instantáneo y aumenta su sanación un 100%. Este beneficio no se acumula; obtenerlo de nuevo actualiza su duración."
       },
       "boundstone_vanguard": {
         "name": "Vanguardia Piedravínculo",
@@ -21200,6 +23477,141 @@ export const es: EnTranslations = {
       "vale_arcanist": {
         "name": "Vestiduras del Arcanista del Valle",
         "bonus3": "Aumenta la velocidad de ataque y de lanzamiento en 15%."
+      },
+      "vanguard_druid_balance": {
+        "name": "Vestimenta Guardaestrellas",
+        "bonus2": "El tiempo de lanzamiento de Raíces Aferradoras se reduce 0,5 s.",
+        "bonus4": "Lanzar Raíces Aferradoras te permite lanzar hechizos en movimiento y aumenta tu velocidad de movimiento un 20% durante 4 s. No puede ocurrir más de una vez cada 20 s."
+      },
+      "vanguard_druid_feral": {
+        "name": "Piel Crinsangre",
+        "bonus2": "El tiempo de reutilización de Embestida de Bruin se reduce 3 s.",
+        "bonus4": "Embestida de Bruin te otorga un escudo por el 6% de tu salud máxima durante 6 s."
+      },
+      "vanguard_druid_restoration": {
+        "name": "Vestimenta Florcardo",
+        "bonus2": "El tiempo de reutilización de Alivio Presto se reduce 1 s.",
+        "bonus4": "Alivio Presto también aumenta tu velocidad de movimiento un 30% durante 3 s."
+      },
+      "vanguard_hunter_beast_mastery": {
+        "name": "Arnés Guardamanada",
+        "bonus2": "El tiempo de reutilización de Disparo Aturdidor se reduce 4 s.",
+        "bonus4": "Disparo Aturdidor reduce 1 s el tiempo de reutilización restante de Cólera de las Bestias."
+      },
+      "vanguard_hunter_marksmanship": {
+        "name": "Arnés Vistalarga",
+        "bonus2": "El tiempo de reutilización de Quiebrasendas se reduce 4 s.",
+        "bonus4": "Quiebrasendas hace que tu próximo Tensado Largo en los siguientes 6 s sea instantáneo. No puede ocurrir más de una vez cada 15 s."
+      },
+      "vanguard_hunter_survival": {
+        "name": "Arnés Colmillotrampa",
+        "bonus2": "El tiempo de reutilización de Garfio Sangriento se reduce 3 s.",
+        "bonus4": "Garfio Sangriento otorga 1 de Ímpetu de Caza."
+      },
+      "vanguard_mage_arcane": {
+        "name": "Vestiduras Atahoras",
+        "bonus2": "El tiempo de reutilización de Barrera Temporal se reduce 2 s.",
+        "bonus4": "Barrera Temporal también aumenta la velocidad de movimiento del objetivo protegido un 20% durante 3 s."
+      },
+      "vanguard_mage_fire": {
+        "name": "Galas Azoteascuas",
+        "bonus2": "Lluvia de Ascuas se recarga 3 s más rápido.",
+        "bonus4": "Lanzar Lluvia de Ascuas reduce 2 s el tiempo de reutilización restante de Barrera Llameante."
+      },
+      "vanguard_mage_frost": {
+        "name": "Atuendo Guardaescarcha",
+        "bonus2": "El tiempo de reutilización de Atadura de Hielo se reduce 2 s.",
+        "bonus4": "Lanzar Atadura de Hielo reduce 5 s el tiempo de reutilización restante de Paso Fugaz."
+      },
+      "vanguard_paladin_holy": {
+        "name": "Galas Velasol",
+        "bonus2": "El tiempo de reutilización de Pacto de Vida se reduce 30 s.",
+        "bonus4": "Pacto de Vida también otorga a tu aliado un escudo por el 8% de su salud máxima durante 6 s."
+      },
+      "vanguard_paladin_protection": {
+        "name": "Bastión Votoescudo",
+        "bonus2": "El tiempo de reutilización de Cadena de Juramento se reduce 2 s.",
+        "bonus4": "Los enemigos arrastrados por Cadena de Juramento lanzan hechizos un 30% más lento durante 4 s, y Cadena de Juramento te otorga Represalia Solar cuando ata a un enemigo que puede ser arrastrado."
+      },
+      "vanguard_paladin_retribution": {
+        "name": "Placas de Guerra Marcaluz",
+        "bonus2": "El tiempo de reutilización de Llamada de la Valquiria se reduce 15 s.",
+        "bonus4": "Llamada de la Valquiria reinicia el tiempo de reutilización de Edicto Final, y tu próximo Edicto Final en los 6 s siguientes a impactar inflige un 15% más de daño."
+      },
+      "vanguard_priest_discipline": {
+        "name": "Vestimenta Salmovelo",
+        "bonus2": "El tiempo de reutilización de Alarido Psíquico se reduce 3 s.",
+        "bonus4": "Cuando tu Salmo de Protección se consume por completo, el aliado protegido gana un 20% de velocidad de movimiento durante 3 s. No puede ocurrir más de una vez cada 8 s."
+      },
+      "vanguard_priest_holy": {
+        "name": "Vestimenta Alagracia",
+        "bonus2": "El tiempo de reutilización de Paso del Velo se reduce 6 s.",
+        "bonus4": "Paso del Velo también te otorga un escudo por el 8% de tu salud máxima durante 6 s."
+      },
+      "vanguard_priest_shadow": {
+        "name": "Galas Himnocaso",
+        "bonus2": "Letanía de Aflicción también ralentiza el movimiento del objetivo un 30% mientras la canalizas.",
+        "bonus4": "Invocar Diezmademonio también te otorga un escudo por el 10% de tu salud máxima durante 8 s."
+      },
+      "vanguard_rogue_assassination": {
+        "name": "Cueros Cortenoche",
+        "bonus2": "Golpe Bajo cuesta 10 de Energía menos.",
+        "bonus4": "Golpe Bajo también convierte tu próximo ataque en los 6 s siguientes en un golpe crítico."
+      },
+      "vanguard_rogue_combat": {
+        "name": "Cueros Marcariña",
+        "bonus2": "El tiempo de reutilización de Talones Veloces se reduce 60 s.",
+        "bonus4": "Mientras Talones Veloces está activo, Tajo Perverso y Golpe al Cuerpo otorgan 1 punto de combo adicional."
+      },
+      "vanguard_rogue_subtlety": {
+        "name": "Cueros Pasosombra",
+        "bonus2": "El tiempo de reutilización de Fuga de Humo se reduce 60 s.",
+        "bonus4": "Golpe al Vientre otorga 2 puntos de combo adicionales cuando se usa desde Fuga de Humo."
+      },
+      "vanguard_shaman_elemental": {
+        "name": "Cota de Batalla Escritormenta",
+        "bonus2": "El tiempo de reutilización de Desatar Arma se reduce 3 s.",
+        "bonus4": "Desatar Arma te permite lanzar hechizos en movimiento y aumenta tu velocidad de movimiento un 20% durante 4 s. No puede ocurrir más de una vez cada 20 s."
+      },
+      "vanguard_shaman_enhancement": {
+        "name": "Cota de Guerra Vendavalnato",
+        "bonus2": "Golpe Ancestral ralentiza la velocidad de movimiento del objetivo un 30% durante 4 s.",
+        "bonus4": "Golpe Ancestral reduce 4 s el tiempo de reutilización restante de Trance Elemental."
+      },
+      "vanguard_shaman_restoration": {
+        "name": "Malla Guardamar",
+        "bonus2": "Aguas Reparadoras se lanza 0,5 s más rápido sobre un aliado por debajo del 50% de salud.",
+        "bonus4": "Llamada de la Marea también otorga a su objetivo un escudo por el 5% de tu salud máxima durante 6 s."
+      },
+      "vanguard_warlock_affliction": {
+        "name": "Vestiduras Plumapavor",
+        "bonus2": "El tiempo de lanzamiento de Espanto se reduce 0,3 s.",
+        "bonus4": "Consumir te sana un 30% más y puede canalizarse en movimiento."
+      },
+      "vanguard_warlock_demonology": {
+        "name": "Galas Atamédula",
+        "bonus2": "El tiempo de reutilización de Armadura de Huesos se reduce 10 s.",
+        "bonus4": "Mandato: siega reduce 2 s el tiempo de reutilización restante de Armadura de Huesos."
+      },
+      "vanguard_warlock_destruction": {
+        "name": "Vestiduras Coronaescoria",
+        "bonus2": "El tiempo de reutilización de Piel de Escoria se reduce 30 s.",
+        "bonus4": "Cada segundo lanzamiento de Conflagrar hace que tu próxima Descarga de Ruina en los 8 s siguientes sea instantánea."
+      },
+      "vanguard_warrior_arms": {
+        "name": "Equipo de Batalla Estelahoja",
+        "bonus2": "Golpe Mutilador reduce 1 s el tiempo de reutilización restante de Arremetida.",
+        "bonus4": "Arremetida también potencia tu próximo Golpe Mutilador un 20% (una carga de la potenciación de Mano Roja)."
+      },
+      "vanguard_warrior_fury": {
+        "name": "Equipo de Furia Marchasangre",
+        "bonus2": "El tiempo de reutilización de Salto de Guerra se reduce 8 s.",
+        "bonus4": "Aterrizar tras Salto de Guerra siempre te Enfurece."
+      },
+      "vanguard_warrior_prot": {
+        "name": "Baluarte Marchahierro",
+        "bonus2": "El tiempo de reutilización de Falla se reduce 5 s.",
+        "bonus4": "Falla también reduce el daño que recibes un 10% durante 6 s."
       },
       "vesperash": {
         "name": "Sudario de Ceniza Vespertina",

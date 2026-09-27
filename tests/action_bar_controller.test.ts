@@ -1427,3 +1427,167 @@ describe('ActionBarController per-spec action bar memory and talent choice swaps
     expect(controller.attackAction).toEqual({ type: 'ability', id: 'frostbolt' });
   });
 });
+
+describe('isHotbarItemId: usable trinkets are placeable', () => {
+  // A trinket is pressed through the same useItem dispatch a potion rides, which
+  // uses the WORN copy (src/sim/items.ts -> combat/trinkets.ts useWornTrinket), so
+  // every trinket with a use effect must be placeable from the bags and the paperdoll.
+  it('admits every trinket in the shipped catalog and routes it through the drop gate', () => {
+    const { controller } = makeHarness('warrior', [], []);
+    const trinkets = Object.keys(ITEMS).filter((id) => ITEMS[id]?.slot === 'trinket');
+    // Guard the guard: an empty catalog must fail loudly, not pass vacuously.
+    expect(trinkets.length).toBeGreaterThanOrEqual(13);
+    for (const id of trinkets) {
+      expect(controller.isHotbarItemId(id), `${id} should be hotbar placeable`).toBe(true);
+      expect(controller.isAssignableAction({ type: 'item', id })).toBe(true);
+    }
+    // Other worn gear stays off the bar.
+    const helm = Object.keys(ITEMS).find((id) => ITEMS[id]?.slot === 'helmet');
+    expect(helm).toBeDefined();
+    if (helm) expect(controller.isHotbarItemId(helm)).toBe(false);
+  });
+});
+
+describe('ActionBarController while spectating (/spectate, /unspectate)', () => {
+  // A moderator's IWorld deps (spec, level, known abilities) follow the
+  // SPECTATED character for the whole spectate window, so every per-frame sync
+  // sees a foreign kit. The controller must freeze until the view returns.
+  function spectateHarness(): {
+    controller: ActionBarController;
+    storage: MemoryStorage;
+    persisted: ActionBarLayoutSave[];
+    state: { spec: string | null; known: string[]; spectating: string | null };
+  } {
+    const storage = new MemoryStorage();
+    const persisted: ActionBarLayoutSave[] = [];
+    const state = {
+      spec: 'arms' as string | null,
+      known: ['heroic_strike', 'sunder_armor', 'charge'],
+      spectating: null as string | null,
+    };
+    const controller = new ActionBarController({
+      storage,
+      playerClass: 'warrior',
+      playerName: 'ActionbarTester',
+      playerLevel: () => 20,
+      talentSpec: () => state.spec,
+      knownAbilityIds: () => state.known,
+      hasAura: () => false,
+      showAttackButton: () => true,
+      spectating: () => state.spectating !== null,
+      persistLayout: (profile, layout) => persisted.push({ profile, layout }),
+    });
+    return { controller, storage, persisted, state };
+  }
+
+  function frame(controller: ActionBarController): void {
+    controller.syncProfile();
+    controller.syncSpec();
+    controller.syncActiveForm();
+    controller.syncKnownAbilities();
+  }
+
+  it('keeps the moderator bar intact through a spectate of another class and back', () => {
+    const { controller, persisted, state } = spectateHarness();
+    controller.init();
+    frame(controller);
+    const own = bar('charge', 'heroic_strike', 'sunder_armor');
+    controller.replaceActions(own);
+    controller.saveActions();
+    persisted.length = 0;
+
+    // /spectate: the self view becomes a mage's spec and kit.
+    state.spectating = 'Watched';
+    state.spec = 'fire';
+    state.known = ['fireball', 'frostbolt'];
+    for (let i = 0; i < 3; i++) frame(controller);
+
+    expect(controller.actions).toEqual(own);
+    expect(persisted).toEqual([]);
+
+    // /unspectate: the moderator's own kit returns unchanged.
+    state.spectating = null;
+    state.spec = 'arms';
+    state.known = ['heroic_strike', 'sunder_armor', 'charge'];
+    for (let i = 0; i < 3; i++) frame(controller);
+
+    expect(controller.actions).toEqual(own);
+    expect(persisted).toEqual([]);
+  });
+
+  it('still picks up an ability learned after /unspectate', () => {
+    const { controller, state } = spectateHarness();
+    controller.init();
+    frame(controller);
+    controller.replaceActions(bar('charge'));
+    controller.saveActions();
+
+    state.spectating = 'Watched';
+    state.known = ['fireball'];
+    frame(controller);
+    state.spectating = null;
+    state.known = ['heroic_strike', 'sunder_armor', 'charge', 'rend'];
+    frame(controller);
+
+    expect(controller.actions[0]).toEqual({ type: 'ability', id: 'charge' });
+    expect(controller.actions.some((action) => action?.id === 'rend')).toBe(true);
+    expect(controller.actions.some((action) => action?.id === 'fireball')).toBe(false);
+  });
+});
+
+describe('ActionBarController mutators while spectating', () => {
+  function frozenHarness(): {
+    controller: ActionBarController;
+    persisted: ActionBarLayoutSave[];
+    state: { known: string[]; spectating: boolean };
+  } {
+    const persisted: ActionBarLayoutSave[] = [];
+    const state = { known: ['heroic_strike', 'sunder_armor', 'charge'], spectating: false };
+    const controller = new ActionBarController({
+      storage: new MemoryStorage(),
+      playerClass: 'warrior',
+      playerName: 'ActionbarTester',
+      playerLevel: () => 20,
+      talentSpec: () => null,
+      knownAbilityIds: () => state.known,
+      hasAura: () => false,
+      showAttackButton: () => true,
+      spectating: () => state.spectating,
+      persistLayout: (profile, layout) => persisted.push({ profile, layout }),
+    });
+    controller.init();
+    controller.replaceActions(bar('charge', 'heroic_strike'));
+    controller.replaceAttackAction({ type: 'ability', id: 'sunder_armor' });
+    controller.saveActions();
+    controller.saveAttackAction();
+    persisted.length = 0;
+    return { controller, persisted, state };
+  }
+
+  it('refuses every write path (spellbook, drop, reset, loadout, attack slot) under a foreign kit', () => {
+    const { controller, persisted, state } = frozenHarness();
+    const own = controller.actions;
+    state.spectating = true;
+    state.known = ['fireball', 'frostbolt'];
+
+    expect(controller.addAbility('fireball')).toBe(false);
+    expect(controller.removeAbility('charge')).toBe(false);
+    controller.replaceActions(bar('fireball'));
+    controller.replaceActionsForLoadout(bar('frostbolt'), new Set(['frostbolt']));
+    controller.replaceAttackAction({ type: 'ability', id: 'fireball' });
+    controller.resetActiveBar();
+    controller.saveActions();
+    controller.saveAttackAction();
+
+    expect(controller.actions).toEqual(own);
+    expect(controller.attackAction).toEqual({ type: 'ability', id: 'sunder_armor' });
+    expect(persisted).toEqual([]);
+
+    // Back in the own view, the same writes work again.
+    state.spectating = false;
+    state.known = ['heroic_strike', 'sunder_armor', 'charge'];
+    expect(controller.removeAbility('charge')).toBe(true);
+    expect(controller.actions.some((action) => action?.id === 'charge')).toBe(false);
+    expect(persisted.length).toBeGreaterThan(0);
+  });
+});

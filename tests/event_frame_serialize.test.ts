@@ -555,6 +555,44 @@ describe('routeEvents bot-detector observation and serialize-once shape', () => 
     }
   });
 
+  it('prefilters the server-only craftRoll audit event: never stringified, never delivered', () => {
+    // craft_roll_events (server/craft_roll_events.ts) is the only consumer of
+    // craftRoll; the roll values it carries must never reach a client frame,
+    // its own recipient included.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const crafter = joinServer(server, fc, 1, 'Roller');
+    fc.sent.length = 0;
+    const batch: SimEvent[] = [
+      {
+        type: 'craftRoll',
+        kind: 'perfecting',
+        recipeId: 'recipe_wyrmfall_pendant',
+        itemId: 'wyrmfall_pendant',
+        roll: 0.91,
+        chance: 0.8,
+        success: false,
+        rankBefore: 0,
+        rankAfter: 0,
+        pid: crafter.pid,
+      },
+      {
+        type: 'chat',
+        fromPid: crafter.pid,
+        from: 'Roller',
+        channel: 'general',
+        text: 'after',
+      },
+    ];
+    const stringifySpy = vi.spyOn(JSON, 'stringify');
+    stringifySpy.mockClear();
+    routeRaw(server, batch);
+    expect(stringifySpy).toHaveBeenCalledTimes(1);
+    stringifySpy.mockRestore();
+    for (const frame of fc.sent) expect(frame).not.toContain('craftRoll');
+    expect(fc.sent.some((frame) => frame.includes('after'))).toBe(true);
+  });
+
   it('serializes each event exactly once for the whole batch, not once per session', () => {
     const server = new GameServer();
     const sessions: ClientSession[] = [];
@@ -599,6 +637,20 @@ describe('event_frame pure assembly', () => {
     ] as unknown as SimEvent[];
     expect(filterRoutableEvents(events)).toBe(events);
     expect(filterRoutableEvents([])).toEqual([]);
+  });
+
+  it('filterRoutableEvents drops the server-only lootRollAwarded (its consumer is the Discord card, never a client)', () => {
+    const award = {
+      type: 'lootRollAwarded',
+      rollId: 3,
+      itemId: 'greyjaw_hide_boots',
+      itemName: 'Greyjaw Hide Boots',
+      quality: 'uncommon',
+      pid: 7,
+    };
+    const loot = { type: 'loot', text: 'Aaa wins [[i:greyjaw_hide_boots]] (88)', pid: 7 };
+    const events = [loot, award] as unknown as SimEvent[];
+    expect(filterRoutableEvents(events)).toEqual([loot]);
   });
 
   it('serializeEventFragments stringifies each event once, index-aligned', () => {

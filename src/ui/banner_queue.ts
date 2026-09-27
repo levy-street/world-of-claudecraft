@@ -4,7 +4,7 @@
 // First Steps deed banner landing on the same tick.
 //
 // The policy, exactly (docs/design/banner-queue.md):
-//   - Celebration banners ('levelup' / 'deed') QUEUE: while one banner is
+//   - Celebration banners ('levelup' / 'deed' / 'loot') QUEUE: while one banner is
 //     live, they wait their turn, FIFO, except that a 'levelup' arrival
 //     files ahead of every queued 'deed' (never preempting the live one):
 //     the ruling's "level-up first, then deeds".
@@ -24,7 +24,7 @@
 // what shows next; the Hud owns the element, the timers, and the fade. Same
 // input, same output; no DOM, no clock.
 
-export type BannerClass = 'levelup' | 'deed' | 'ambient';
+export type BannerClass = 'levelup' | 'deed' | 'loot' | 'ambient';
 
 /** A full celebration queue drops the incoming banner (the log line already
  *  landed); deep celebration bursts only occur on retro catch-up paths that

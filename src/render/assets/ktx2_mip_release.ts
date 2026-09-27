@@ -183,6 +183,7 @@ export const KTX2_MIP_RELEASABLE_MODEL_ROOTS: readonly string[] = [
   'props',
   'quest',
   'resources',
+  'world_quests',
 ];
 
 /** Model roots a SECOND renderer can upload (character-creation preview,
@@ -194,6 +195,10 @@ export const KTX2_MIP_EXEMPT_MODEL_ROOTS: readonly string[] = [
   'creatures',
   'mounts',
   'tools',
+  // Reusable VFX libraries must remain safe for independent preview contexts.
+  // The current production fragment GLB has no textures; future textured VFX
+  // need an explicit world-only audit before their CPU mips can be discarded.
+  'vfx',
   'weapons',
 ];
 

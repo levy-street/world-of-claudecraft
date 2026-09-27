@@ -63,7 +63,26 @@ export function withGraphicsDraft<K extends string>(
 // choice an enumerated set.
 
 /** How a slider's readout is formatted; the painter maps this to a formatter. */
-export type SliderFmt = 'percent' | 'degrees' | 'oneDecimal';
+// 'shoulder' reads a -1..1 offset as "Left 60%" / "Center" / "Right 100%"
+// (actionCamShoulderReadout below resolves which key and percent).
+export type SliderFmt = 'percent' | 'degrees' | 'oneDecimal' | 'shoulder';
+
+/** The Action Cam shoulder slider's readout: which label key, and the
+ *  magnitude as a 0..1 fraction for the percent formatter. */
+export function actionCamShoulderReadout(v: number): {
+  key: TranslationKey;
+  pct: number;
+} {
+  const pct = Math.min(1, Math.abs(v));
+  if (pct < 0.025) return { key: 'hudChrome.options.actionCamShoulderCenter', pct: 0 };
+  return {
+    key:
+      v < 0
+        ? 'hudChrome.options.actionCamShoulderLeft'
+        : 'hudChrome.options.actionCamShoulderRight',
+    pct,
+  };
+}
 
 /** Which Interface-panel tab a control belongs to. The Interface panel is split
  *  into four tabs (the interface list grew to ~40 rows in one scroll); every
@@ -139,6 +158,9 @@ export interface ChoiceControl {
    *  cell. Placeholders are KEYS the painter resolves, like NoteControl's. */
   statusKey?: TranslationKey;
   statusValueKeys?: Record<string, TranslationKey>;
+  /** Numeric placeholders of the same line; the painter formats them for the
+   *  active locale (formatNumber), so the view stays string-free. */
+  statusNumbers?: Record<string, number>;
   /** Render that line as an ASSERTIVE live region (role="alert") rather than a
    *  polite one: the reading is a verdict a player has to act on (their choice
    *  did not take), and it arrives long after the panel was built, so assistive
@@ -245,12 +267,19 @@ export interface OptionsEnv {
    *  launch keeps it. Outranks the reading above: a player must not leave the
    *  panel believing a pick took when the shell never stored it. */
   desktopGpuBackendWriteFailed?: boolean;
-  /** Whether the shader warm-up worker is a real choice on this host. False on
-   *  iOS, where shaderWarmModeFor() forces the worker off whatever the setting
-   *  (a second WebGL2 context is a per-process memory ceiling risk on
-   *  phone-class WebKit), so the row and its note would both be lies. Absent
-   *  means yes, which is what every non-iOS caller wants. */
+  /** Whether the shader warm-up worker is a real choice on this host
+   *  (shaderWarmChoiceAvailable). False everywhere while the row is withdrawn
+   *  (SHADER_WARM_OPTION_OFFERED), and always on iOS, where shaderWarmModeFor()
+   *  forces the worker off whatever the setting (a second WebGL2 context is a
+   *  per-process memory ceiling risk on phone-class WebKit), so the row and its
+   *  note would both be lies. Absent means yes. */
   shaderWarmChoice?: boolean;
+  /** What a stored frame rate ceiling does on the display as it reads right
+   *  now (src/game/frame_rate_cap_setting.ts frameRateCapReading): the rate is
+   *  a divisor of the measured refresh, so "about 30" is 36 on a 144 Hz display
+   *  and nothing at all on a 30 Hz one, and the row owes the player that
+   *  number. Absent (the offline callers, tests) means no reading line. */
+  frameRateCapReadingFor?: (storedValue: number) => FrameRateCapRowReading;
   /** desktopDisplayModeSupported(): the shell owns the window, so the Display
    *  card shows a windowed/borderless picker INSTEAD of the browser Fullscreen
    *  toggle (asking the browser for fullscreen inside an already-fullscreen
@@ -360,9 +389,26 @@ function gpuBackendActiveNameKey(active: string): TranslationKey {
     : 'hudChrome.options.gpuBackendActiveNameOpenGL';
 }
 
-// The shader warm-up worker: auto follows the GPU backend (on where the
-// compile runs off the presenting thread, off on OpenGL); the stored numbers
-// are src/game/shader_warm_setting.ts SHADER_WARM_SETTING_VALUES.
+/** The options row's copy of the game-side reading, so the view imports no
+ *  game module (the shape is structural on purpose). */
+export type FrameRateCapRowReading =
+  | { kind: 'none' }
+  | { kind: 'inert' }
+  | { kind: 'paced'; fps: number; refreshHz: number }
+  | { kind: 'unpaced'; fps: number };
+
+// The frame rate ceiling; the stored numbers are
+// src/game/frame_rate_cap_setting.ts FRAME_RATE_CAP_VALUES.
+const frameRateCapOptions: ChoiceOption[] = [
+  { value: 0, labelKey: 'hudChrome.options.frameRateCapAuto' },
+  { value: 1, labelKey: 'hudChrome.options.frameRateCapDisplay' },
+  { value: 2, labelKey: 'hudChrome.options.frameRateCapSixty' },
+  { value: 3, labelKey: 'hudChrome.options.frameRateCapThirty' },
+];
+
+// The shader warm-up worker row, withdrawn everywhere today (the caller passes
+// shaderWarmChoice false, shader_warm_client_core.ts SHADER_WARM_OPTION_OFFERED);
+// the stored numbers are src/game/shader_warm_setting.ts SHADER_WARM_SETTING_VALUES.
 const shaderWarmOptions: ChoiceOption[] = [
   { value: 0, labelKey: 'hudChrome.options.shaderWarmAuto' },
   { value: 1, labelKey: 'hudChrome.options.shaderWarmOff' },
@@ -445,7 +491,9 @@ export type OptionsPanelId =
   | 'controller'
   | 'graphics'
   | 'interface'
+  | 'overlays'
   | 'auras'
+  | 'cooldowns'
   | 'audio'
   | 'performance'
   | 'transfer'
@@ -497,9 +545,10 @@ export function buildOptionsMenu(opts: OptionsMenuOpts): OptionsMenuEntry[] {
     { labelKey: 'hudChrome.controller.title', action: { kind: 'goto', view: 'controller' } },
     { labelKey: 'hud.options.graphics', action: { kind: 'goto', view: 'graphics' } },
     { labelKey: 'hud.options.interface', action: { kind: 'goto', view: 'interface' } },
-    { labelKey: 'hudChrome.auraOverlay.title', action: { kind: 'goto', view: 'auras' } },
+    // Auras, Cooldown Manager and Performance Overlay share one row: each is a
+    // floating on-screen overlay, so they sit together one level down.
+    { labelKey: 'hudChrome.options.overlays', action: { kind: 'goto', view: 'overlays' } },
     { labelKey: 'hud.options.audio', action: { kind: 'goto', view: 'audio' } },
-    { labelKey: 'hudChrome.perf.title', action: { kind: 'goto', view: 'performance' } },
     // Full settings export/import: its own sub-panel, since the code it carries
     // spans every family (the Interface tab's rows carry only their own).
     { labelKey: 'hudChrome.fullTransfer.menu', action: { kind: 'goto', view: 'transfer' } },
@@ -516,6 +565,30 @@ export function buildOptionsMenu(opts: OptionsMenuOpts): OptionsMenuEntry[] {
   entries.push({ labelKey: 'hud.options.logout', action: { kind: 'logout' } });
   entries.push({ labelKey: 'hud.options.returnToGame', action: { kind: 'close' } });
   return entries;
+}
+
+/** The sub-views the Overlays row opens onto, in menu order. */
+export const OVERLAY_PANEL_IDS = ['auras', 'cooldowns', 'performance'] as const;
+export type OverlayPanelId = (typeof OVERLAY_PANEL_IDS)[number];
+
+const OVERLAY_LABEL_KEYS: Readonly<Record<OverlayPanelId, TranslationKey>> = {
+  auras: 'hudChrome.auraOverlay.title',
+  cooldowns: 'hudChrome.cooldownManager.title',
+  performance: 'hudChrome.perf.title',
+};
+
+/** The Overlays sub-view's button list: one routing row per overlay panel. */
+export function buildOverlaysMenu(): OptionsMenuEntry[] {
+  return OVERLAY_PANEL_IDS.map((view) => ({
+    labelKey: OVERLAY_LABEL_KEYS[view],
+    action: { kind: 'goto', view },
+  }));
+}
+
+/** Where a sub-view's Back control lands: an overlay panel returns to the
+ *  Overlays list it was opened from, everything else to the Game Menu root. */
+export function optionsParentView(view: 'main' | OptionsPanelId): 'main' | 'overlays' {
+  return (OVERLAY_PANEL_IDS as readonly string[]).includes(view) ? 'overlays' : 'main';
 }
 
 // ---------------------------------------------------------------------------
@@ -535,6 +608,11 @@ export interface GraphicsSection {
   controls: OptionsControl[];
 }
 
+// Camera Ghost: how a structure in front of the camera is seen through.
+const ghostFadeOptions: ChoiceOption[] = [
+  { value: 0, labelKey: 'hudChrome.options.gfxGhostFadeDithered' },
+  { value: 1, labelKey: 'hudChrome.options.gfxGhostFadeSmooth' },
+];
 // The two-option Off/On ladder the per-effect binaries render with.
 const offOnOptions: ChoiceOption[] = [
   { value: 0, labelKey: 'hud.options.off' },
@@ -599,6 +677,7 @@ export function buildGraphicsSections(
     choice(s, 'viewDistance', 'hudChrome.options.gfxViewDistance', qualityLadderOptions, true),
     choice(s, 'waterQuality', 'hudChrome.options.gfxWaterQuality', qualityLadderOptions, true),
     choice(s, 'characterDetail', 'hudChrome.options.gfxCharacterDetail', lowHighOptions, true),
+    choice(s, 'ghostFade', 'hudChrome.options.gfxGhostFade', ghostFadeOptions, true),
   ];
   const lighting: OptionsControl[] = [
     choice(s, 'effectsQuality', 'hud.options.effectsQuality', highCapLadderOptions, true),
@@ -630,6 +709,12 @@ export function buildGraphicsSections(
   const camera: OptionsControl[] = [slider(s, 'cameraSpeed', 'hud.options.cameraSpeed')];
   // Camera Speed only scales mouselook; touch gets a dedicated look-rate slider.
   if (env.touch) camera.push(slider(s, 'touchLookSpeed', 'hud.options.touchLookSpeed'));
+  // Action Cam: the opt-in over-the-shoulder framing. The shoulder slider only
+  // shows while it is on, so the toggle re-renders the card.
+  camera.push(boolToggle(s, 'actionCam', 'hudChrome.options.actionCam', { rerender: true }));
+  if (s.bool('actionCam')) {
+    camera.push(slider(s, 'actionCamShoulder', 'hudChrome.options.actionCamShoulder', 'shoulder'));
+  }
 
   const display: OptionsControl[] = [
     slider(s, 'renderScale', 'hud.options.renderQuality'),
@@ -661,9 +746,29 @@ export function buildGraphicsSections(
     ]),
     note('hudChrome.options.browserEffectsNote'),
   ];
-  // iOS forces the worker off whatever the setting says, so the row would be a
-  // control that changes nothing under a note promising On is forced
-  // everywhere. Absent means yes: every other host keeps the pair byte for byte.
+  // Re-renders on a pick: the reading under the buttons belongs to the value.
+  const capRow = choice(
+    s,
+    'frameRateCap',
+    'hudChrome.options.frameRateCap',
+    frameRateCapOptions,
+    true,
+  );
+  const capReading = env.frameRateCapReadingFor?.(capRow.current);
+  if (capReading?.kind === 'paced') {
+    capRow.statusKey = 'hudChrome.options.frameRateCapStatusPaced';
+    capRow.statusNumbers = { fps: capReading.fps, hz: capReading.refreshHz };
+  } else if (capReading?.kind === 'unpaced') {
+    capRow.statusKey = 'hudChrome.options.frameRateCapStatusUnpaced';
+    capRow.statusNumbers = { fps: capReading.fps };
+  } else if (capReading?.kind === 'inert') {
+    capRow.statusKey = 'hudChrome.options.frameRateCapStatusInert';
+  }
+  system.push(capRow, note('hudChrome.options.frameRateCapNote'));
+  // The caller says whether the row is a real choice (withdrawn everywhere
+  // today; never on iOS, which forces the worker off whatever the setting). A
+  // row that changes nothing under a note promising otherwise is left out.
+  // Absent means yes, for a caller that owns no such rule.
   if (env.shaderWarmChoice !== false) {
     system.push(
       choice(s, 'shaderWarm', 'hudChrome.options.shaderWarm', shaderWarmOptions),
@@ -868,13 +973,14 @@ export function buildInterfaceControls(
   env?: OptionsEnv,
 ): OptionsControl[] {
   const general: OptionsControl[] = [
-    // The UI Scale slider deliberately has NO menu row (owner request): the
-    // stored uiScale setting stays applied and the General tab's Reset to
-    // Defaults still clears a saved value (renderInterface's footer).
+    choice(s, 'playerFrameHealthText', 'hudChrome.options.playerHealthText', HEALTH_TEXT_CHOICES),
+    choice(s, 'targetFrameHealthText', 'hudChrome.options.targetHealthText', HEALTH_TEXT_CHOICES),
+    { ...slider(s, 'uiScale', 'hudChrome.options.uiScale'), commitOnChange: true },
     slider(s, 'hudOpacity', 'hud.options.hudOpacity'),
     slider(s, 'tooltipScale', 'hud.options.tooltipScale'),
     boolToggle(s, 'frostedPanels', 'hud.options.frostedPanels'),
     boolToggle(s, 'highContrastText', 'hud.options.highContrastText'),
+    boolToggle(s, 'colorblindMode', 'hud.options.colorblindMode'),
     boolToggle(s, 'reduceMotion', 'hud.options.reduceMotion'),
     // Camera comfort (mouse-look direction), so it sits with the comfort
     // toggles rather than the Combat tab's attack/action-bar cluster.
@@ -924,21 +1030,23 @@ export function buildInterfaceControls(
   return [
     ...tag('general', general),
     ...tag('frames', [
+      // Keep the cast-target override visible beside the frame options. A
+      // hovered party frame takes priority over the selected target, so hiding
+      // this switch inside Edit Frames made missed-target heals hard to explain.
+      boolToggle(s, 'mouseoverCast', 'hudChrome.options.mouseoverCast'),
       // The player/target/party frame scale sliders deliberately have NO menu
       // rows: Edit Frames (the unlock mode) resizes each frame directly, and a
       // slider row beside it would fight that gesture. The settings keys stay
       // (saved values still apply; the Frames tab's Reset to Defaults clears
       // them, see renderInterface's footer).
+      // Dimensions are adjusted directly in Edit Frames. Party columns and spacing
+      // are rendered by the separate Party Frame Options section.
       choice(s, 'partyFrameStyle', 'hudChrome.partyFrames.style', [
         { value: 0, labelKey: 'hudChrome.partyFrames.styleAutomatic' },
         { value: 1, labelKey: 'hudChrome.partyFrames.styleClassic' },
         { value: 2, labelKey: 'hudChrome.partyFrames.styleRaid' },
       ]),
-      // partyFrameWidth/partyFrameHeight likewise have NO rows here (Edit
-      // Frames drags them directly), and partyFrameColumns +
-      // partyFrameSpacing moved into the in-editor Frames Settings dropdown
-      // beside the other frame knobs; the keys stay live and this tab's
-      // Reset to Defaults still clears them.
+      boolToggle(s, 'showPetFrame', 'hudChrome.options.showPetFrame'),
       choice(s, 'partyFrameHealthText', 'hudChrome.partyFrames.healthText', HEALTH_TEXT_CHOICES),
       choice(s, 'partyFrameSort', 'hudChrome.partyFrames.sort', [
         { value: 0, labelKey: 'hudChrome.partyFrames.sortGroup' },
@@ -950,18 +1058,17 @@ export function buildInterfaceControls(
       boolToggle(s, 'partyFrameShowAuras', 'hudChrome.partyFrames.showAuras'),
       boolToggle(s, 'partyFrameShowPets', 'hudChrome.partyFrames.showPets'),
       boolToggle(s, 'partyFrameShowSelf', 'hudChrome.partyFrames.showSelf'),
-      choice(s, 'playerFrameHealthText', 'hudChrome.options.playerHealthText', HEALTH_TEXT_CHOICES),
-      choice(s, 'targetFrameHealthText', 'hudChrome.options.targetHealthText', HEALTH_TEXT_CHOICES),
       boolToggle(s, 'aurasOnPlayerFrame', 'hudChrome.options.aurasOnPlayerFrame', {
         rerender: true,
       }),
       boolToggle(s, 'auraBarBelowFrame', 'hudChrome.options.auraBarBelowFrame', {
         disabled: !s.bool('aurasOnPlayerFrame'),
       }),
+      boolToggle(s, 'targetAurasBelowFrame', 'hudChrome.options.targetAurasBelowFrame'),
       boolToggle(s, 'alwaysShowAllBuffs', 'hudChrome.options.alwaysShowAllBuffs'),
+      boolToggle(s, 'showAuraCaster', 'hudChrome.options.showAuraCaster'),
       boolToggle(s, 'showTargetOfTarget', 'hudChrome.options.showTargetOfTarget'),
       boolToggle(s, 'showTargetSwingTimer', 'hudChrome.options.showTargetSwingTimer'),
-      boolToggle(s, 'showPetFrame', 'hudChrome.options.showPetFrame'),
     ]),
     ...tag('chat', [
       slider(s, 'chatFontScale', 'hud.options.chatFontScale'),
@@ -1005,10 +1112,9 @@ export function buildInterfaceControls(
       // plus/minus buttons on the primary action bar are the one control for
       // adding and removing the optional rows (the settings and the central
       // resolver in main.ts are unchanged; only the duplicate UI is gone).
-      // Likewise combineActionBars / hideUnusedActionSlots / mouseoverCast /
-      // lockActionBars: the edit mode's Frames Settings dropdown owns their
-      // rows now (interface_unlock.ts settingToggles), so a duplicate here
-      // would drift out of sync with it.
+      // Likewise combineActionBars / hideUnusedActionSlots / lockActionBars:
+      // the edit mode's Frames Settings dropdown owns their rows now
+      // (interface_unlock.ts settingToggles).
     ]),
   ];
 }

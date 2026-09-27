@@ -69,6 +69,24 @@ import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 const desc = (a: AuraEffectInput) => auraEffectDescriptor(a);
 
 describe('auraEffectDescriptor', () => {
+  it('explains the specific heal strengthened by each Dawnweave bonus', () => {
+    expect(desc({ kind: 'benison_prayers', value: 0.3, stacks: 3 })).toEqual({
+      key: 'hudChrome.auraEffect.benisonPrayers',
+      nums: { pct: 30 },
+    });
+    expect(desc({ id: 'priest_benison_whisper', kind: 'next_cast_instant', value: 1 })).toEqual({
+      key: 'hudChrome.auraEffect.benisonWhisper',
+      nums: { pct: 100 },
+    });
+    expect(hudChromeStrings.auraEffect.benisonPrayers).toContain('consumes all stacks');
+    expect(hudChromeStrings.auraEffect.benisonWhisper).toContain('Whispered Prayer is instant');
+    expect(hudChromeStrings.auraEffect.benisonWhisper).toContain('before this effect expires');
+    expect(desc({ id: 'other_instant', kind: 'next_cast_instant', value: 1 })).toEqual({
+      key: 'hudChrome.auraEffect.instantCast',
+      nums: {},
+    });
+  });
+
   it('explains that Ignivar Shared Pyre splits damage inside its circle', () => {
     expect(desc({ id: 'ignivar_shared_pyre', kind: 'vulnerability', value: 0 })).toEqual({
       key: 'hudChrome.auraEffect.sharedPyre',

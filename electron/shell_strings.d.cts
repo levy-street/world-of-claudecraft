@@ -9,6 +9,9 @@ export interface ShellStrings {
   crashQuit: string;
   fatalTitle: string;
   fatalBody: string;
+  hostDiagSaveTitle: string;
+  hostDiagSaveButton: string;
+  hostDiagFileType: string;
 }
 
 export const DEFAULT_SHELL_STRINGS: ShellStrings;

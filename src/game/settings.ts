@@ -62,6 +62,10 @@ export const SETTING_RANGES = {
   // The shader warm-up worker (src/game/shader_warm_setting.ts): 0 auto
   // (follows the GPU backend), 1 off, 2 on. Read at the next start.
   shaderWarm: { min: 0, max: 2, def: 0 },
+  // The frame rate ceiling (src/game/frame_rate_cap_setting.ts): 0 auto,
+  // 1 display (no ceiling), 2 about 60, 3 about 30. An intent, never a display
+  // rate: the divisor is re-derived from the measured display every session.
+  frameRateCap: { min: 0, max: 3, def: 0 },
   // The desktop shell's graphics backend on Linux
   // (src/game/desktop_gpu_backend_sync.ts): 0 auto (one Vulkan trial),
   // 1 Vulkan, 2 OpenGL. Mirrors the shell prefs store; next launch.
@@ -88,10 +92,18 @@ export const SETTING_RANGES = {
   characterDetail: { min: 0, max: 1, def: 1 },
   dynamicLights: { min: 0, max: 1, def: 1 },
   particleEffects: { min: 0, max: 1, def: 1 },
+  // How a structure between the camera and the player is seen through: 0 drops
+  // pixels on a fixed pattern (the material stays opaque, so it needs no second
+  // shader program), 1 blends it translucent. Both show the same 20 percent.
+  ghostFade: { min: 0, max: 1, def: 1 },
   // vertical camera field of view in degrees. def 60 keeps the shipped look;
   // a wider FOV shows more of the world (good for situational awareness) while
   // a narrower one zooms in. Purely a comfort/visibility preference.
   cameraFov: { min: 55, max: 100, def: 60 },
+  // Action Cam shoulder offset (render/action_cam_core.ts): -1 = full left,
+  // 0 = centered behind the avatar, 1 = full right. Only read while the
+  // actionCam boolean is on; remembered across toggles.
+  actionCamShoulder: { min: -1, max: 1, def: 1 },
   // Camera zoom distance (Input.camDist), remembered across sessions like the other
   // camera settings. Range mirrors Input.zoomBy's clamp; def 12 is the shipped starting
   // distance. Set by the wheel/pinch zoom (persisted debounced from main.ts), applied back
@@ -193,7 +205,7 @@ export const SETTING_RANGES = {
   // Scales the ENTIRE in-game HUD layer (#ui) up or down via CSS zoom, so every
   // fixed-px frame/label/button grows together — the global "fonts too small"
   // remedy that the per-element tooltip/chat/fct scales can't cover. 1.0 = stock.
-  uiScale: { min: 0.85, max: 1.4, def: 1 },
+  uiScale: { min: 0.75, max: 2, def: 1 },
   // Scales just the player unit frame (portrait, name, hp/resource bars, combo
   // pips) via --player-frame-scale, so it can shrink toward the target frame's
   // compact read without touching the rest of the HUD. Pairs with the frame's
@@ -217,6 +229,14 @@ export const SETTING_RANGES = {
   playerFrameHeight: { min: 8, max: 30, def: 15 },
   targetFrameWidth: { min: 200, max: 460, def: UNIT_FRAME_STOCK_WIDTH },
   targetFrameHeight: { min: 8, max: 30, def: 15 },
+  petFrameWidth: { min: 200, max: 460, def: UNIT_FRAME_STOCK_WIDTH },
+  petFrameHeight: { min: 8, max: 30, def: 15 },
+  focusTarget1Width: { min: 120, max: 460, def: 240 },
+  focusTarget1Height: { min: 8, max: 30, def: 15 },
+  focusTarget2Width: { min: 120, max: 460, def: 240 },
+  focusTarget2Height: { min: 8, max: 30, def: 15 },
+  focusTarget3Width: { min: 120, max: 460, def: 240 },
+  focusTarget3Height: { min: 8, max: 30, def: 15 },
   // Health text on the player frame and on the target (plus target-of-target)
   // frame, same mode table as partyFrameHealthText below; both default to the
   // historical always-on "current / max".
@@ -375,6 +395,14 @@ export const BOOL_SETTINGS = {
   // silently and permanently relocated the buffs with no way back short of a
   // full frame reset. See hud.css #player-frame > #buff-bar.
   auraBarBelowFrame: { def: false },
+  // off by default (the target's aura strip sits above the frame, since the
+  // stock target seat is directly over the action bar): hangs the strip below
+  // the frame instead, the classic layout, for a frame the player has moved
+  // somewhere with room beneath it. Purely presentational (main.ts toggles
+  // body.target-auras-below-frame via src/ui/aura_bar_side.ts; hud.css keys
+  // off it) and a deliberate player choice, never inferred from the frame's
+  // move state. See hud.css #target-frame > #tf-debuffs.
+  targetAurasBelowFrame: { def: false },
   // off by default: bypass the low graphics preset's buff-icon cap
   // (AURA_VISIBLE_CAP_LOW, src/game/ui_tier_knobs.ts) so every active buff
   // always renders in #buff-bar, at the cap's per-frame cost. The cap itself
@@ -384,6 +412,15 @@ export const BOOL_SETTINGS = {
   // AurasPainter's getFxTier closure (hud.ts), never by ui_tier_knobs.ts
   // itself, so no OTHER low-tier knob is affected.
   alwaysShowAllBuffs: { def: false },
+  // off by default: append a "cast by <name>" line to every buff/debuff tooltip
+  // (buff bar, debuff bar, target strip), resolved from the aura's sourceId (read
+  // live by aura_tooltip.ts's auraTooltipFooterHtml, wired from Hud's
+  // auraTooltipFooterDeps). Player
+  // feature request: tell apart several casters' copies of the same buff (e.g.
+  // which paladin's Blessing or druid's Briarguard is on you) without opening the
+  // separate detailed target-aura panel. Off by default so the tooltip stays
+  // uncluttered until a player opts in.
+  showAuraCaster: { def: false },
   // on by default: Clique-style mouseover casting. Pressing an action-bar key
   // for a friendly (heal/buff) ability while the cursor is over a party frame
   // casts it on the hovered member without touching the current target (read
@@ -411,6 +448,14 @@ export const BOOL_SETTINGS = {
   // off by default: thicken the dark outline behind HUD text so labels stay
   // legible against bright terrain (a low-vision / high-glare aid).
   highContrastText: { def: false },
+  // off by default: Colorblind Mode. Recolours the Nythraxis floor hazards (the
+  // Grave Eruption strike ring, the Grave Flame and Soulfire pools, the Gravefire
+  // line, the Soul Rend marks) onto a colourblind-safe palette with distinct hues
+  // AND brightness, so overlapping circles keep their edges for a player with a
+  // colour-vision deficiency. Geometry, timing and opacity floors never change:
+  // an accessibility choice, never a graphics-tier knob. Read live by the
+  // renderer (setHazardPaletteMode) plus a body class hook (interface_body_classes.ts).
+  colorblindMode: { def: false },
   // off by default: an opt-in frosted-glass blur behind HUD panels & windows.
   // Off keeps the classic crisp look (and zero GPU cost); on softens the world
   // showing through translucent frames.
@@ -515,6 +560,9 @@ export const BOOL_SETTINGS = {
   // to just its "Quests (N)" header. Toggled by clicking the tracker header; kept
   // here so the choice persists across sessions like the other HUD preferences.
   questTrackerCollapsed: { def: false },
+  // off by default (shown): when on, the map window's side rail (tracked
+  // quests, the world-quest board, the layer filters) is folded away and the
+  // map takes the whole window. Toggled by the map's Side panel button
   // off by default (expanded): when on, the on-screen Book of Deeds watchlist
   // tracker is collapsed to just its header. Toggled by clicking the tracker
   // header (the quest-tracker convention); kept here so the choice persists.
@@ -527,6 +575,12 @@ export const BOOL_SETTINGS = {
   // collapsed to just its header. Toggled by clicking the tracker header (the
   // quest-tracker convention); kept here so the choice persists.
   recipeTrackerCollapsed: { def: false },
+  // off by default (expanded): when on, the World Map window's left atlas rail
+  // (zone name, level range, layer filters, tracked/nearby quests) collapses to
+  // a slim toggle strip and the window shrinks to match. Toggled by clicking
+  // the rail's own collapse button (map_sidebar_controller.ts); kept here so
+  // the choice persists across sessions like the tracker collapses above.
+  mapAtlasSidebarCollapsed: { def: false },
   // on by default: the on-screen Reliquary tracker (pinned pages, or the
   // nearly-complete default before any pin) is shown at all. The master
   // switch above the collapse: off removes the strip entirely. Flipped from
@@ -551,6 +605,8 @@ export const BOOL_SETTINGS = {
   // block is placed as a single piece under the "Unlock interface" option.
   // Purely a layout preference; every slot keeps its keybind either way.
   combineActionBars: { def: false },
+  combineTrackerFrames: { def: false },
+  combineAuraFrames: { def: false },
   // off by default (the classic look, unchanged out of the box): strips the black
   // background, border, and keybind label from desktop action-bar slots that hold
   // no ability or item, via a body class main.ts toggles (issue 2429). The fixed
@@ -566,12 +622,17 @@ export const BOOL_SETTINGS = {
   // passes per frame, so the player who wants the quietest water gets it as
   // an opt-in rather than an opt-out.
   waterRipples: { def: false },
+  // off by default: the over-the-shoulder Action Cam (render/action_cam_core.ts).
+  // A camera framing preference like the FOV slider; it never changes zoom or
+  // hides anything, and the side lives in actionCamShoulder.
+  actionCam: { def: false },
   // off by default: the classic "target of target" mini-frame. When on, and you have
   // a target, a small unit frame under the target frame shows who YOUR target is
   // targeting (a mob's aggro target, a player's selected target). Purely a display
   // preference read by the HUD's target-frame update; the id it reads already rides
   // the wire, and the frame hides itself when the target-of-target is unknown.
   showTargetOfTarget: { def: false },
+  moveTargetOfTargetIndependently: { def: false },
   // off by default: the target and target-of-target's own melee/ranged swing
   // timer bars, under the target frame. Purely a display preference read by
   // the HUD's per-frame update; the swingTimer/autoAttack data already rides
@@ -584,6 +645,7 @@ export const BOOL_SETTINGS = {
   // preference read by the HUD's pet-frame update; the pet already rides the wire
   // as an ordinary owned mob entity.
   showPetFrame: { def: true },
+  showEmptyFocusFrames: { def: false },
   // on by default: keep the Daily Rewards chest launcher visible on the HUD. Hiding
   // it only removes the shortcut; rewards, eligibility, and the panel remain available.
   showDailyRewardsChest: { def: true },

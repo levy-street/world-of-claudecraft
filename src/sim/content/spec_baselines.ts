@@ -12,6 +12,9 @@
 import type { PlayerClass } from '../types';
 import type { TalentEffect } from './talents';
 
+// Classic Lightning Mastery at 5/5: 1.0 sec off a 3.0 sec cast.
+export const LIGHTNING_MASTERY_CAST_PCT = -1 / 3;
+
 export type SpecBaselineTable = Partial<Record<PlayerClass, Record<string, TalentEffect>>>;
 
 export const SPEC_BASELINES: SpecBaselineTable = {
@@ -138,7 +141,15 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       // the melee (Enhancement) and healer (Restoration) shaman specs.
       stats: { int: 8 },
       ability: [
-        { ability: 'lightning_bolt', dmgPct: 0.18, costPct: -0.35, castPct: -0.2 },
+        // v0.44 rework: classic 5/5 Lightning Mastery, 1.0 sec off the rank-4
+        // 3.0 sec Arc Bolt (castPct -1/3) and the same share off Skybranch.
+        {
+          ability: 'lightning_bolt',
+          dmgPct: 0.18,
+          costPct: -0.35,
+          castPct: LIGHTNING_MASTERY_CAST_PCT,
+        },
+        { ability: 'chain_lightning', castPct: LIGHTNING_MASTERY_CAST_PCT },
         { ability: 'earth_shock', dmgPct: 0.18, costPct: -0.15 },
         { ability: 'flame_shock', costPct: -0.2 },
       ],

@@ -142,6 +142,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Gudang Senjata Peperangan',
     desc: 'Perhiasan dan senjata Peperangan yang dibeli dengan kehormatan hasil jerih payah.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Galeri Garda Depan',
+    desc: 'Set spesialisasi dan senjata Peperangan Musim 2, dibeli dengan kehormatan.',
+  },
   horizons_vault_of_ages: {
     name: 'Ruang Simpan Zaman',
     desc: 'Pusaka yang ditarik dari zaman yang telah lewat. Relik ini tidak bisa lagi diraih; ruang simpan ini menghormati para veteran yang menyimpannya.',
@@ -156,7 +160,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: 'Heroik: Tungku Mata Air Terakhir',
-    desc: 'Senjata khusus mode heroik dari Ignivar, Utusan Api Terakhir.',
+    desc: 'Senjata khusus mode heroik dan trinket raid dari Ignivar, Utusan Api Terakhir.',
   },
   conquerors_varkhul: {
     name: 'Tungku Dalam',
@@ -164,7 +168,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: 'Heroik: Tungku Dalam',
-    desc: 'Perisai dan senjata khusus mode heroik dari Varkhul, Bapak Penempa Api Terakhir.',
+    desc: 'Perisai dan senjata khusus mode heroik serta trinket raid dari Varkhul, Bapak Penempa Api Terakhir.',
   },
   conquerors_set_bramblehide: {
     name: 'Kulit Semak Duri',

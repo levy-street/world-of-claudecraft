@@ -9,6 +9,7 @@ import {
   consumeHealCue,
   dispatchVarkhulCalloutSfx,
   groundTickAbilityCue,
+  healAudioPlan,
   impactCueForDamage,
   MOB_VOICE_CUES,
   mobVoiceActionForDamage,
@@ -315,6 +316,18 @@ describe('combat SFX policy', () => {
         ability: 'arcane_explosion',
       }),
     ).toEqual({ key: 'spell_nova', anchorId: 10 });
+  });
+
+  it('gives Piercing Howl one voiced nova without a duplicate shout sound', () => {
+    const ev = {
+      type: 'spellfx' as const,
+      sourceId: 10,
+      targetId: 20,
+      school: 'physical' as const,
+      ability: 'piercing_howl',
+    };
+    expect(spellFxCue({ ...ev, fx: 'nova' })).toEqual({ key: 'piercing_howl', anchorId: 10 });
+    expect(spellFxCue({ ...ev, fx: 'shout' })).toBeNull();
   });
 
   it('gives Intimidating Shout its own distinct nova cue, not the shared fear_shout', () => {
@@ -1057,5 +1070,20 @@ describe('playerVoiceCue', () => {
     ]) {
       expect(SFX_CLIPS, key).toHaveProperty(key);
     }
+  });
+});
+
+describe('extracted heal audio ownership', () => {
+  it.each([
+    ['frenzied_regeneration', true, true],
+    ['frenzied_regeneration', false, false],
+    ['rejuvenation', true, false],
+    ['healing_touch', false, true],
+  ])('%s hot=%s preserves its established playback', (abilityId, hot, audible) => {
+    const ev = { type: 'heal2', targetId: 2, sourceId: 1, amount: 10, abilityId, hot } as Extract<
+      SimEvent,
+      { type: 'heal2' }
+    >;
+    expect(healAudioPlan(ev)).toEqual(audible ? { cue: 'heal_impact', gain: 1 } : null);
   });
 });

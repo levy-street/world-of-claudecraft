@@ -654,10 +654,18 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
     ctx.emit({ type: 'fishingGotAway', pid: p.id, zoneId, band });
     return;
   }
+  // Koi-specific flourish, deliberately NOT a general "rare catch!" claim
+  // (feature request #woc-koi-salmon-parity): that phrasing reads as a
+  // statement about DROP RARITY, and the band-4/5 catches below the koi in
+  // FISHING_TABLES_BY_BAND (raw_hollowgill_sturgeon, raw_stillmere_salmon)
+  // carry a LOWER weight in their band than the koi does in its own, so a
+  // generic "rare" claim would be false advertising for exactly the two fish
+  // that never earn this line. Wording it as the koi's own golden shimmer
+  // keeps the flourish, and its FISHING_RARE_ID exclusivity, honest.
   if (caught === FISHING_RARE_ID) {
     ctx.emit({
       type: 'log',
-      text: 'A rare catch! Something gleams on your line.',
+      text: 'Something golden flashes beneath the surface!',
       color: '#1eff00',
       pid: p.id,
     });

@@ -549,6 +549,69 @@ describe('package.json build block: per-arch NSIS installer + media dedup (issue
   });
 });
 
+describe('package.json build block: the host diagnostic ships beside the asar', () => {
+  type Resource = { from: string; to: string };
+  type WithResources = { extraResources?: Resource[]; files?: string[] };
+
+  it('copies HostDiag.ps1 to resources/host-diag, outside the asar', () => {
+    // PowerShell cannot read a file inside an asar archive, so the script must
+    // ship as a real file on disk; electron/host_diag.cjs resolves exactly this
+    // path from app resourcesPath.
+    const resources = (realBuild as WithResources).extraResources ?? [];
+    expect(resources).toEqual(
+      expect.arrayContaining([
+        { from: 'electron/host_diag/dist/HostDiag.ps1', to: 'host-diag/HostDiag.ps1' },
+      ]),
+    );
+  });
+
+  it('keeps the sources and the second script copy OUT of the asar, but the manifest IN', () => {
+    // The manifest is the pin the shell hash-checks the outside-the-asar script
+    // against, so it must stay inside the asar (where embedded-asar integrity
+    // validation protects it). The win/ sources and a duplicate of the script
+    // would only be dead weight, and the .md files are developer docs.
+    const files = realBuild.files as string[];
+    expect(files).toContain('!electron/host_diag/win/**');
+    expect(files).toContain('!electron/host_diag/dist/HostDiag.ps1');
+    expect(files).toContain('!electron/host_diag/*.md');
+    // Nothing may exclude the manifest, directly or by sweeping the dist dir.
+    expect(files.some((f: string) => f.startsWith('!electron/host_diag/dist/**'))).toBe(false);
+    expect(files.some((f: string) => f.includes('manifest.json'))).toBe(false);
+  });
+
+  it('the host-diag resource and exclusions survive derivation for all three channels', () => {
+    // Every channel derives from this same base block (structuredClone), and
+    // steam/epic layer their own files overrides on top by APPENDING: the
+    // diagnostic must not fall out of a store build, or a Steam player's report
+    // would silently lose its Windows half.
+    const website = desktopBuilderConfig({ base: realBuild, distribution: 'website' });
+    const steam = desktopBuilderConfig({
+      base: realBuild,
+      distribution: 'steam',
+      steamAppId: '480',
+    });
+    const epic = desktopBuilderConfig({
+      base: realBuild,
+      distribution: 'epic',
+      epicProductId: 'epic-product-id',
+      epicDeploymentId: 'epic-deployment-id',
+      epicClientId: 'epic-client-id',
+    });
+    for (const config of [website, steam, epic]) {
+      expect((config as unknown as WithResources).extraResources).toEqual([
+        { from: 'electron/host_diag/dist/HostDiag.ps1', to: 'host-diag/HostDiag.ps1' },
+      ]);
+      for (const exclude of [
+        '!electron/host_diag/win/**',
+        '!electron/host_diag/dist/HostDiag.ps1',
+        '!electron/host_diag/*.md',
+      ]) {
+        expect(config.files).toContain(exclude);
+      }
+    }
+  });
+});
+
 describe('isChannelFeedFile', () => {
   it('matches only the channel feed files electron-builder emits', () => {
     expect(isChannelFeedFile('latest-mac.yml', 'latest')).toBe(true);

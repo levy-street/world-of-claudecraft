@@ -1234,4 +1234,81 @@ export const table: DeedLocaleTable = {
     desc: 'Smid Forgebrytaren själv och återvänd till Maelin med den färdiga hammaren.',
     name: 'En källa i frihet',
   },
+  exp_arcane_calligraphy: {
+    name: 'En stadig hand',
+    desc: 'Slutför Arcane Calligraphy i Eastbrook Vale.',
+  },
+  exp_arcane_calligraphy_gold: {
+    name: 'Skrivet i stjärnljus',
+    desc: 'Tjäna en guldbetyg i Arcane Calligraphy.',
+    title: 'Runekallaren',
+  },
+  exp_forge_helper: {
+    name: 'En hjälpande hammare',
+    desc: 'Hjälp Smith Mara att slutföra en skjold vid Drakväxtningen.',
+  },
+  exp_last_barricade: {
+    name: 'Den sista barrikaden',
+    desc: 'Håll skogvägen mot den odöda horden.',
+  },
+  exp_borrowed_face: {
+    name: 'Ett lånat ansikte',
+    desc: 'Avslöja och besegra infiltratören bland Fenbridge väktare.',
+  },
+  exp_windrider_slalom: {
+    name: 'Vindridares slalom',
+    desc: 'Slutför mekanisk glidflygare nedstigningen genom Galecrest kanjonen.',
+  },
+  exp_duskweave_dispatches: {
+    name: 'Skymningens expres',
+    desc: 'Återvinn banditexpreserna medan du bär Valeries förtrollad mantel.',
+  },
+  exp_wisp_maze: {
+    name: 'Ett ljus i labyrinten',
+    desc: 'Återvinn de stulna pengarpungarna och fly från Evergarden labyrinten.',
+  },
+  prog_rift_watch_trusted: {
+    name: 'Betrodd av Rift Watch',
+    desc: 'Nå Betrodd status hos Rift Watch.',
+  },
+  prog_church_order_trusted: {
+    name: 'Betrodd av kyrkoorden',
+    desc: 'Nå Betrodd status hos kyrkoorden.',
+  },
+  prog_automatons_trusted: {
+    name: 'Betrodd av automaterna',
+    desc: 'Nå Betrodd status hos automaterna.',
+  },
+  prog_rift_watch_champion: {
+    name: 'Rift Watchs mästare',
+    desc: 'Nå Mästare status hos Rift Watch.',
+    title: 'Klyftvakt',
+  },
+  prog_church_order_champion: {
+    name: 'Kyrkoorderns mästare',
+    desc: 'Nå Mästare status hos kyrkoorden.',
+    title: 'Gryningsvakt',
+  },
+  prog_automatons_champion: {
+    name: 'Automaternas mästare',
+    desc: 'Nå Mästare status hos automaterna.',
+    title: 'Smidesmästare',
+  },
+  prog_faction_champion_all: {
+    name: 'Mästare av varje banner',
+    desc: 'Nå Mästare status hos Rift Watch, kyrkoorden och automaterna.',
+  },
+  exp_clue_first_casket: {
+    name: 'Skatt funnen',
+    desc: 'Öppna en skattkista som grävts upp på slutet av en ledtrådsjakts jakt.',
+  },
+  exp_clue_ten_caskets: {
+    name: 'Skattjäger',
+    desc: 'Öppna 10 skattkistor som grävts upp på slutet av ledtrådsjakts jakter.',
+    title: 'Skattjäger',
+  },
+  exp_harbor_to_harbor: {
+    name: 'Hamn till hamn',
+    desc: 'Seglat båda färjorna fram och tillbaka: Östbäck till Månvila, och Wickharbor till Drakväxtningen.',
+  },
 };

@@ -8,11 +8,12 @@
 import * as THREE from 'three';
 import { CLASSES, MOBS, NPCS } from '../sim/data';
 import { ALL_CLASSES, type Entity, type ZoneDef } from '../sim/types';
+import { buildAfflictionFamiliarPrewarmStandIn } from './affliction_familiar';
 import { type CharacterVisual, createCharacterVisual } from './characters';
 import { skinCount, visualKeyFor } from './characters/manifest';
 import { characterVisualPoolKey } from './characters/visual_pool';
 import type { PooledObjectView } from './ground_object_pool';
-import { buildGroundQuestObject } from './quest_objects';
+import { buildGroundQuestObject, prewarmFarshoreSalvageObjects } from './quest_objects';
 import { setRenderCategory } from './renderer_diagnostics';
 
 const PREWARM_MOB_TEMPLATE_IDS = [
@@ -63,7 +64,10 @@ export function prewarmPlayerSkinVariantCount(): number {
  *  private members, so call sites pass `this` as a bare object and each builder
  *  casts internally. */
 export interface ZonePrewarmGroupHost {
-  sim: { player: { pos: { x: number; y: number; z: number } } };
+  sim: {
+    player: { pos: { x: number; y: number; z: number } };
+    cfg: { playerClass: string };
+  };
   prewarmEntity(
     kind: 'player' | 'mob' | 'npc',
     templateId: string,
@@ -225,6 +229,15 @@ export function buildPlayerPrewarmGroup(
     place(metamorph.root);
     visuals.push(metamorph);
   }
+  // The Affliction familiar rides only the LOCAL warlock, whatever its spec at
+  // entry (a talent switch shows it mid-session). Not a rig, so it takes no
+  // grid slot and no visual count; before its deferred model loads there is
+  // nothing to stage, and its gated first attach covers that case.
+  const familiar = buildAfflictionFamiliarPrewarmStandIn(h.sim.cfg.playerClass);
+  if (familiar) {
+    familiar.position.set(0, 1.72, -2.8);
+    group.add(familiar);
+  }
   for (const cls of ALL_CLASSES) {
     const variants = skinCount(`player_${cls}`);
     for (let skin = 0; skin < variants; skin++) {
@@ -296,6 +309,15 @@ export function buildObjectPrewarmGroup(host: object): THREE.Group {
       });
       place(built.group);
     }
+  }
+  // The Farshore salvage world quest's rotating wreckage props share the object
+  // pool, so their first appearance in a cycle does not compile or build live.
+  for (const { group: object } of prewarmFarshoreSalvageObjects(
+    buildGroundQuestObject,
+    (poolKey, built) => h.storePooledObject(poolKey, built),
+  )) {
+    object.visible = true;
+    place(object);
   }
   return group;
 }

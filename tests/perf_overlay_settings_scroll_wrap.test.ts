@@ -34,6 +34,12 @@ function makeHost(): PerfSettingsHost {
     onBack: () => {},
     closeIconHtml: '<svg data-icon="close"></svg>',
     backIconHtml: '<svg data-icon="prev"></svg>',
+    // The System Report section reads these only on a desktop shell; there is no
+    // bridge here, so it renders nothing and never touches them.
+    hostDiag: {
+      world: () => ({ player: { pos: { x: 0, z: 0 } } }),
+      options: () => null,
+    },
   };
 }
 

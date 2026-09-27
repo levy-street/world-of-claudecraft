@@ -49,6 +49,7 @@ export const arena: GuidePage = {
           p('guide.arenaPage.warfareBodyStatsStay') +
             p('guide.arenaPage.warfareTradeBodyRatingSpent'),
         )}
+        ${section('guide.arenaPage.vanguardHeading', p('guide.arenaPage.vanguardBody'))}
         ${related([
           { href: hrefFor('thornhollow-fields'), key: 'guide.nav.thornhollow' },
           { href: hrefFor('gear'), key: 'guide.nav.gear' },

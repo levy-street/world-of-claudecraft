@@ -21,6 +21,7 @@ import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
 import type { Entity, WeaponProc, WeaponProcEffect, WeaponProcTrigger } from '../types';
 import { baseSwingSpeed, isCatForm } from './form_swing';
+import { runTrinketTrigger } from './trinkets';
 
 // Roll every proc on the wielder's equipped mainhand that matches `trigger`, and
 // apply the effects of each that fires. `target` is the primary target of the
@@ -33,6 +34,8 @@ export function runWeaponProcs(
   weaponItemId?: string | null,
   meleeHand?: 'mainhand' | 'offhand',
 ): void {
+  // A worn trinket's on-hit passives ride every weapon hit (combat/trinkets.ts).
+  if (trigger === 'weaponHit') runTrinketTrigger(ctx, wielder, target, 'weaponHit');
   // Which hand's weapon rolled procs. `undefined` = not specified: fall back to
   // the mainhand (back-compat for the spell/heal/ranged call sites and every
   // existing golden). An explicit id rolls THAT hand's weapon; an explicit
@@ -88,17 +91,38 @@ export function runWeaponProcs(
   // per-hand id suffix let the two hands grant 100 Strength together). Either
   // hand's trigger lands on the same id, which applyAura treats as a REFRESH
   // (timer back to full, no second application, `refresh: true` on the event).
+  // The stat the buff grants is the proc's own axis: Zeal's Strength, or a
+  // faction formula's Agility (Riftwalker's Grace). A haste term rides a
+  // SIBLING aura keyed off the same id so it refreshes with the stat buff and
+  // obeys the same never-stacks rule; buff_haste is a swing multiplier
+  // (sim.ts swingIntervalMult), which is what "2% faster melee attacks" means.
+  const statKind = enchantProc.agility !== undefined ? 'buff_agi' : 'buff_str';
+  const statValue = enchantProc.agility ?? enchantProc.strength ?? 0;
   ctx.applyAura(wielder, {
     id: enchant.id,
     name: enchant.name,
-    kind: 'buff_str',
-    value: enchantProc.strength,
+    kind: statKind,
+    value: statValue,
     remaining: enchantProc.duration,
     duration: enchantProc.duration,
     sourceId: wielder.id,
     school: 'holy',
   });
-  ctx.applyHeal(wielder, wielder, enchantProc.heal, enchant.name, enchant.id, false, false);
+  if (enchantProc.hasteMult !== undefined) {
+    ctx.applyAura(wielder, {
+      id: `${enchant.id}_haste`,
+      name: enchant.name,
+      kind: 'buff_haste',
+      value: enchantProc.hasteMult,
+      remaining: enchantProc.duration,
+      duration: enchantProc.duration,
+      sourceId: wielder.id,
+      school: 'holy',
+    });
+  }
+  if (enchantProc.heal !== undefined && enchantProc.heal > 0) {
+    ctx.applyHeal(wielder, wielder, enchantProc.heal, enchant.name, enchant.id, false, false);
+  }
 }
 
 function fireEffect(

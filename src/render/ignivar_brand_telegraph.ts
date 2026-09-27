@@ -3,6 +3,7 @@
 
 import * as THREE from 'three';
 import { IGNIVAR_BRAND_RADIUS } from '../sim/encounters/ignivar';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 
 export const IGNIVAR_BRAND_VISUAL_NAME = 'ignivarBrandCircle';
 export const IGNIVAR_BRAND_FILL_NAME = 'ignivarBrandFill';
@@ -220,7 +221,7 @@ function overheadFlame(): THREE.InstancedMesh {
     flames.setMatrixAt(index, dummy.matrix);
   }
   flames.instanceMatrix.needsUpdate = true;
-  flames.renderOrder = 8;
+  flames.renderOrder = floorVfxRenderOrder('encounter', 7);
   const ring = new THREE.Mesh(
     new THREE.TorusGeometry(0.52, 0.055, 6, 24),
     material(0xff5624, 0.58),
@@ -228,7 +229,7 @@ function overheadFlame(): THREE.InstancedMesh {
   ring.name = IGNIVAR_BRAND_OVERHEAD_RING_NAME;
   ring.position.y = 2.18;
   ring.rotation.x = Math.PI / 2;
-  ring.renderOrder = 7;
+  ring.renderOrder = floorVfxRenderOrder('encounter', 6);
   flames.add(ring);
   return flames;
 }
@@ -258,7 +259,7 @@ function overheadEmbers(): THREE.Points {
     }),
   );
   embers.name = IGNIVAR_BRAND_EMBERS_NAME;
-  embers.renderOrder = 9;
+  embers.renderOrder = floorVfxRenderOrder('encounter', 8);
   return embers;
 }
 
@@ -272,30 +273,30 @@ export function buildIgnivarBrandTelegraph(): THREE.Group {
     material(0x3a0006, 0.4),
   );
   fill.name = IGNIVAR_BRAND_FILL_NAME;
-  fill.renderOrder = 2;
+  fill.renderOrder = floorVfxRenderOrder('encounter', 1);
 
   const rim = new THREE.Mesh(
     radialBandGeometry(IGNIVAR_BRAND_RADIUS - 0.2, IGNIVAR_BRAND_RADIUS, 64, 0.066),
     material(0xd52a18, 0.74),
   );
   rim.name = IGNIVAR_BRAND_RIM_NAME;
-  rim.renderOrder = 4;
+  rim.renderOrder = floorVfxRenderOrder('encounter', 3);
 
   const cracks = new THREE.Mesh(
     moltenCracksGeometry(),
     material(0xff3a0a, 0.48, THREE.AdditiveBlending),
   );
   cracks.name = IGNIVAR_BRAND_CRACKS_NAME;
-  cracks.renderOrder = 3;
+  cracks.renderOrder = floorVfxRenderOrder('encounter', 2);
 
   const runes = new THREE.Mesh(runeGeometry(), material(0xb71a0f, 0.46));
   runes.name = IGNIVAR_BRAND_RUNES_NAME;
-  runes.renderOrder = 4;
+  runes.renderOrder = floorVfxRenderOrder('encounter', 3);
   fill.add(cracks, runes);
 
   const spikes = new THREE.Mesh(spreadSpikesGeometry(), material(0xe13b19, 0.56));
   spikes.name = IGNIVAR_BRAND_SPIKES_NAME;
-  spikes.renderOrder = 5;
+  spikes.renderOrder = floorVfxRenderOrder('encounter', 4);
 
   root.add(fill, rim, spikes, overheadFlame(), overheadEmbers());
   root.visible = false;

@@ -17,7 +17,7 @@
 // deps at the identical call site, so the Sim's global draw order is unchanged
 // by the extraction.
 
-import { isInstancedRegion, MANTLE_REACH, slopeGlueHeight } from './colliders';
+import { type Collider, isInstancedRegion, MANTLE_REACH, slopeGlueHeight } from './colliders';
 import { abilityCastSurvivesMovement, movementInputWouldMove } from './combat/cast_move_gate';
 import { isRooted, isStunned } from './combat/cc';
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
@@ -30,6 +30,7 @@ import {
   floorHeightAt,
   MAX_STEP_HEIGHT,
   moveCharacter,
+  platformGlueAt,
 } from './physics';
 import { PLATFORM_CARRY_CLEARANCE } from './physics/character';
 import {
@@ -58,6 +59,10 @@ import {
   terrainWallStandoff,
   waterLevelAt,
 } from './world';
+import {
+  WORLD_QUEST_DELIVERY_AURA_ID,
+  WORLD_QUEST_DELIVERY_SPEED_MULT,
+} from './world_quest_delivery';
 
 export const BACKPEDAL_MULT = 0.65;
 export const GRAVITY = 16;
@@ -84,7 +89,13 @@ const moveParams: CharacterMoveParams = {
   swimming: false,
   ignoreFences: false,
 };
-const moveOut: CharacterMoveResult = { x: 0, y: 0, z: 0, blocked: false, stepped: 0 };
+const moveOut: CharacterMoveResult = {
+  x: 0,
+  y: 0,
+  z: 0,
+  blocked: false,
+  stepped: 0,
+};
 // Coyote time: seconds after WALKING off a ledge (never after a jump) during
 // which a jump still fires. Stateless on purpose: a walk-off starts at vy = 0,
 // so "recently left the ledge" is exactly vy > -GRAVITY * COYOTE_TIME.
@@ -201,14 +212,22 @@ export function swimSurfaceY(x: number, z: number, seed: number): number {
 
 /** Swimmable depth at a point, sampling the terrain ONCE (the mount water-walls
  *  ask about a destination they have no height for yet). */
-function isDeepFor(x: number, z: number, seed: number, feetY: number): boolean {
+function isDeepFor(
+  x: number,
+  z: number,
+  seed: number,
+  feetY: number,
+  platform: readonly Collider[] | null,
+): boolean {
   const wl = waterLevelAt(x, z, seed);
   if (groundHeight(x, z, seed) >= wl - SWIM_DEPTH) return false;
   // A standable deck within a step of the hooves is dry footing, not deep
   // water: the strait bridge crosses the deep channel on plates well above
-  // the waterline, and gating the ride on the DROWNED seabed under them
-  // walled every mounted crossing at the bridge mouth.
-  return floorHeightAt(seed, x, z, BODY_RADIUS, feetY + MAX_STEP_HEIGHT) < wl - SWIM_DEPTH;
+  // the waterline (and a sailing ship's deck crosses the open sea), and
+  // gating the ride on the DROWNED seabed under them walled every mounted
+  // crossing at the bridge mouth.
+  const floor = floorHeightAt(seed, x, z, BODY_RADIUS, feetY + MAX_STEP_HEIGHT, platform);
+  return floor < wl - SWIM_DEPTH;
 }
 
 const SWIM_DEPTH = PLAYER_SWIM_DEPTH; // ground this far under the water line = deep water
@@ -224,29 +243,43 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
   // cannot be slowed): short-circuit the aura scan with the ghost-run multiplier.
   if (e.ghost) return GHOST_RUN_MULT;
   let slow = 1,
-    speed = 1;
+    speed = 1,
+    cargo = 1,
+    formPassive = 1;
   const slowImmune =
     isVeilboundMarchActive(e) || e.auras.some((aura) => aura.kind === 'slow_immunity');
   for (const a of e.auras) {
     if ((!slowImmune && a.kind === 'slow') || a.kind === 'stealth') slow = Math.min(slow, a.value);
     // Speed buffs and travel forms carry a 1+fraction multiplier (1.4 = +40%).
+    // Temporary speed buffs never stack with each other: the strongest applies
+    // (Dash over Loping Stride, never Dash times Loping Stride).
     if (a.kind === 'buff_speed' || a.kind === 'form_travel' || a.kind === 'form_fireball') {
       speed = Math.max(speed, a.value);
     }
     // Fury Enrage: +10% move speed (non-stacking with other speed buffs).
     if (a.kind === 'enrage') speed = Math.max(speed, ENRAGE_MOVE_MULT);
     // Druid Cat Form: +15% passive move speed. form_cat's value is the threat
-    // multiplier, not a speed, so the constant is what rides the max.
-    if (a.kind === 'form_cat') speed = Math.max(speed, CAT_FORM_MOVE_MULT);
+    // multiplier, not a speed, so the constant is what rides here. The form
+    // passive is its own layer that MULTIPLIES the strongest buff (a Cat that
+    // Dashes runs at 1.15 x 1.5), so a Cat-only sprint is never a downgrade
+    // of the form's own bonus.
+    if (a.kind === 'form_cat') formPassive = CAT_FORM_MOVE_MULT;
+    if (a.id === WORLD_QUEST_DELIVERY_AURA_ID && a.kind === 'world_quest_cargo') {
+      cargo = Math.min(cargo, WORLD_QUEST_DELIVERY_SPEED_MULT);
+    }
   }
+  speed *= formPassive;
   // Mounted travel: the active ground mount rides the entity mirror (mountKey,
   // synced over the wire like skin), so the online self-extrapolator predicts
-  // mounted speed in lockstep with the server. Additive with buff_speed like
-  // the Fiesta augment below; slows still bite multiplicatively.
+  // mounted speed in lockstep with the server. Additive on top of the buff
+  // times form-passive product, like the Fiesta augment below (mounting strips
+  // every form, so in play the passive is 1 here). The whole expression is
+  // slow * (max(buffs) * formPassive + mountPct + extraSpeedPct); slows still
+  // bite multiplicatively.
   if (e.mountKey) speed += mountMoveSpeedPct(e.mountKey);
   // Fiesta move-speed augments (only ever non-zero inside a Fiesta bout).
   if (extraSpeedPct) speed += extraSpeedPct;
-  return slow * speed;
+  return slow * speed * cargo;
 }
 
 // Fiesta "Moon Boots" power-up: a buff_jump aura multiplies jump height.
@@ -301,11 +334,20 @@ export interface PlayerMotionDeps {
    * was holding. Absent: the throttled dev-channel warning (warnNonFinitePose).
    */
   onNonFinitePose?(p: Entity, inp: MoveInput | undefined): void;
+  /**
+   * The kinematic platform under or beside this body, already placed at this
+   * tick's pose (a sailing ship's deck: src/sim/transport_deck.ts), or null.
+   * Its colliders are solved, stood on and glued to exactly like the static
+   * grid's; carrying the body with the platform happened before the step.
+   * Absent (or null) everywhere else, so off a ship the step is unchanged.
+   */
+  platform?(p: Entity): readonly Collider[] | null;
 }
 
 export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInput): void {
   const stepStartX = p.pos.x;
   const stepStartZ = p.pos.z;
+  const platform = deps.platform?.(p) ?? null;
   // Convention: facing f points along (sin f, cos f); the camera sits behind
   // the player, so screen-right is the world vector (-cos f, sin f).
   // Turning right therefore DECREASES facing.
@@ -479,6 +521,7 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
       moveParams.grounded = p.onGround && !swimming;
       moveParams.swimming = swimming;
       moveParams.ignoreFences = clearFences;
+      moveParams.platform = platform;
       moveCharacter(moveParams, p.pos.x, p.pos.y, p.pos.z, stepX * DT, stepZ * DT, moveOut);
       // While mounted the deep-water line is a wall: a ground mount will not
       // step off dry land into swimming depth. Wading stays allowed (the gate
@@ -489,7 +532,7 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
       // into the water; horizontal velocity dies with it while airborne,
       // matching the steep-wall airborne gate.
       const mountBlockedByWater =
-        !!p.mountKey && !swimming && isDeepFor(moveOut.x, moveOut.z, deps.seed, p.pos.y);
+        !!p.mountKey && !swimming && isDeepFor(moveOut.x, moveOut.z, deps.seed, p.pos.y, platform);
       if (mountBlockedByWater) {
         if (!p.onGround) {
           p.vx = 0;
@@ -511,8 +554,8 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
     }
   }
 
-  verticalPass(deps, p, inp, wishX, wishZ, wishSpeed, swimming, steepGround, mountLocked);
-  standoffPass(deps, p, stepStartX, stepStartZ, wishX, wishZ, wishSpeed, movingOnGround);
+  verticalPass(deps, p, inp, wishX, wishZ, wishSpeed, swimming, steepGround, mountLocked, platform);
+  standoffPass(deps, p, stepStartX, stepStartZ, wishX, wishZ, wishSpeed, movingOnGround, platform);
   // Backstop for the NaN freeze class (finite_pose_guard.ts): whatever the
   // step did, the pose it hands to the rest of the tick is finite.
   guardAndReportPose(deps, p, inp, deps.onNonFinitePose);
@@ -606,7 +649,7 @@ function stepInstancedRegion(
     // from land. Reset the candidate to the current pose (and kill horizontal
     // velocity when airborne, matching the steep-wall airborne gate) so the body
     // stops at the shore instead of clipping into the water.
-    if (p.mountKey && !swimming && isDeepFor(nx, nz, deps.seed, p.pos.y)) {
+    if (p.mountKey && !swimming && isDeepFor(nx, nz, deps.seed, p.pos.y, null)) {
       nx = p.pos.x;
       nz = p.pos.z;
       if (!p.onGround) {
@@ -640,6 +683,7 @@ function verticalPass(
   // here as well as the horizontal wish above (one rule, threaded rather than
   // recomputed, so the two can never drift).
   mountLocked: boolean,
+  platform: readonly Collider[] | null,
 ): void {
   const ground = groundHeight(p.pos.x, p.pos.z, deps.seed);
   // The surface the body rests on: the terrain, or a standable prop top
@@ -653,6 +697,7 @@ function verticalPass(
     p.pos.z,
     BODY_RADIUS,
     p.pos.y + (p.onGround ? 0 : MANTLE_REACH),
+    platform,
   );
   // `ground` is already sampled above: reuse it rather than paying for the
   // terrain again on every vertical step.
@@ -751,14 +796,9 @@ function verticalPass(
     // it still overlapping the prop's face, and the following depenetration
     // would convert that overlap into free forward distance every crossing
     // (the kerb speed exploit tests/parkour.test.ts pins away).
-    const glue = slopeGlueHeight(
-      deps.seed,
-      p.prevPos.x,
-      p.prevPos.z,
-      p.pos.x,
-      p.pos.z,
-      BODY_RADIUS,
-      p.pos.y,
+    const glue = Math.max(
+      slopeGlueHeight(deps.seed, p.prevPos.x, p.prevPos.z, p.pos.x, p.pos.z, BODY_RADIUS, p.pos.y),
+      platformGlueAt(platform, p.prevPos.x, p.prevPos.z, p.pos.x, p.pos.z, BODY_RADIUS, p.pos.y),
     );
     // The terrain is always the floor. A glued top that has dipped BELOW the
     // ground (a bridge deck or a rock whose far end the hillside buries)
@@ -895,6 +935,7 @@ function standoffPass(
   wishZ: number,
   wishSpeed: number,
   movingOnGround: boolean,
+  platform: readonly Collider[] | null,
 ): void {
   const ground = groundHeight(p.pos.x, p.pos.z, deps.seed);
   if (p.onGround && p.pos.y <= ground + 1e-3 && !isSubmergedAt(p.pos.x, p.pos.z, deps.seed)) {
@@ -962,7 +1003,7 @@ function standoffPass(
       // for this tick rather than silently dismounting them into the pit.
       const standSteep = rideSteepnessAt(standX, standZ, deps.seed);
       if (
-        !(p.mountKey && isDeepFor(standX, standZ, deps.seed, p.pos.y)) &&
+        !(p.mountKey && isDeepFor(standX, standZ, deps.seed, p.pos.y, platform)) &&
         (standSteep <= MAX_CLIMB_SLOPE ||
           standSteep <= rideSteepnessAt(p.pos.x, p.pos.z, deps.seed))
       ) {

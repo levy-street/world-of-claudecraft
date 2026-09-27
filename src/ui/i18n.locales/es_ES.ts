@@ -11,6 +11,14 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es_ES: Partial<Record<TranslationKey, string>> = {
+  'questUi.worldQuest.forge.failed':
+    '¡Demasiados errores! El metal se agrietó. Habla con Mara para volver a intentarlo.',
+  'questUi.worldQuest.forge.replay':
+    'Habla con Mara para volver a intentarlo. Las recompensas se ganan una vez por rotación.',
+  'questUi.worldQuest.horde.failed': 'Defensa fallida. ¡Vuelve a intentarlo!',
+  'questUi.worldQuest.investigation.cleared':
+    'Sargento Alric: Ese soldado está localizado. Compara las demás historias con nuestros registros e vuelve a intentarlo.',
+  'questUi.worldQuest.traceRetry': 'Habla con el instructor para volver a intentarlo.',
   'hud.errors.tradeAlreadyTrading': 'Ese jugador ya está tradeando.',
   'hudChrome.emotes.question': '¿Tío?',
   'hudChrome.professions.ctaRaiseSpecialized':

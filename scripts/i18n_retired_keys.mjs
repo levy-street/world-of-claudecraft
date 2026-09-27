@@ -52,6 +52,19 @@ export const RETIRED_KEYS = [
   'guide.professions.harvestBodyChoice', // folded into the harvest section's body copy
   // -> guide.profPages.gatherDeeds.farmingSown (farming gained its own deeds at D13)
   'guide.profPages.gatherDeeds.farming',
+  // The World PvP zone layer (src/sim/pvp/world_pvp_zones.ts): the flag is no
+  // longer the whole story, so each of these states a rule the game has stopped
+  // following. Sanctuaries allow no world fighting at all, the free-for-all
+  // zones need no flag and mark whoever opens on an unflagged player, an
+  // unflagged victim stakes no gold, and the repeat-kill counter runs on its own
+  // hour rather than the daily reset.
+  'guide.worldPvpPage.intro', // -> guide.worldPvpPage.introZones
+  'guide.worldPvpPage.flagBody', // -> guide.worldPvpPage.flagBodyAid (shields and buffs are aid)
+  'guide.worldPvpPage.stakesBody', // -> guide.worldPvpPage.stakesBodyFlagged
+  'guide.worldPvpPage.limitsBody', // -> guide.worldPvpPage.limitsBodyHour
+  'guide.worldPvpPage.limitsBodyHour', // -> guide.worldPvpPage.limitsBodyRaids (the raid rule)
+  'guide.worldPvpPage.hillBody', // -> guide.worldPvpPage.hillBodyRamp (the hold ramp)
+  'guide.commandsPage.pvp', // -> guide.commandsPage.pvpZones
 
   // -- Content the game no longer has, so the wiki must not define it.
   // The glossary defined Augment as a draft pick in a two-on-two Fiesta match.
@@ -61,6 +74,9 @@ export const RETIRED_KEYS = [
   'guide.glossary.augmentDef',
   'guide.bestiary.flavor.mirejaw_frenzy', // summon-only encounter add, filtered from the bestiary
   'guide.footer.communityWiki', // the standalone MediaWiki redirect this SPA replaced
+  // Warfare now covers pets (they fight with their owner's Warfare), so the old stats
+  // body's "does nothing against creatures" became false. Successor: warfareBodyPets.
+  'guide.stats.warfareBody',
 
   // -- Superseded by generated content. These were hand-written dungeon facts before
   // GUIDE_DUNGEONS carried the roster; the page now renders names and level bands from
@@ -281,6 +297,14 @@ export const RETIRED_KEYS = [
   // carry the market flag; the successor worldWindowsBodyStationMaster says
   // what the game does, and its five non-Latin fills rode the same change.
   'guide.interfacePage.worldWindowsBody',
+  // -- v0.44.0 Unstuck Sickness window. The first /unstuck in an hour is free and only a
+  // repeat inside the window charges the sickness, so these three rows (which promise a
+  // price on every use) were superseded by the *Window keys rather than reworded: every
+  // overlay's reviewed translation of the old rule would otherwise keep rendering the
+  // wrong fact (docs/i18n-scaling/translation-workflow.md, reword staleness).
+  'guide.combat.unstuckBody',
+  'guide.commandsPage.unstuck',
+  'guide.glossary.unstuckDef',
 ];
 
 export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);

@@ -118,6 +118,15 @@ export interface FctEvent {
    * kind ignores it.
    */
   readonly isSelf: boolean;
+  /**
+   * Seconds to HOLD this floater before it appears, so a number can land with an authored
+   * blade contact instead of on the cast tick that resolved it (fct_stage_core.ts owns the
+   * decision, the painter owns the holding). Absent or 0 spawns at once, which is every
+   * floater but Red Harvest's three strikes. describeFct ignores it entirely: the delay is
+   * a SCHEDULING fact, and the descriptor stays the resolved spawn-instant model, so a held
+   * floater is described and projected when it is finally released, not when it was queued.
+   */
+  readonly delaySec?: number;
 }
 
 /** Output: the resolved, world-space-plus-screen-offset spawn descriptor the painter draws. */

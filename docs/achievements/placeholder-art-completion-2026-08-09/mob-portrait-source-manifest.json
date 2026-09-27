@@ -6,17 +6,17 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "dddd242fe3f5a95440f018b9c3d111c1cc55c0484e3775cdb6c0ac5c6a676f06",
+  "rendererFingerprint": "a743144dd25c63fe21855e28874be604d9d6c8ea6bbb10a6c1f519636250291f",
   "renderEnv": {
     "schemaVersion": 1,
-    "platform": "darwin",
-    "arch": "arm64",
+    "platform": "win32",
+    "arch": "x64",
     "gpuVendor": "Google Inc. (Google)",
-    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
-    "browserMajor": "152",
-    "browserVersion": "Chrome/152.0.7977.84",
+    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "browserMajor": "153",
+    "browserVersion": "Edg/153.0.4234.32",
     "requestedBackend": "swiftshader",
-    "fingerprint": "538069c40c2b7b61ee2b450a871b7bdaa6fa79a2a3a8c4eea900e335ef25949d"
+    "fingerprint": "1e20b2b6d2d59cc8f4b804141fdbe6a011e07e40a953c202402d3b2e19cd108d"
   },
   "renderer": {
     "trackedFiles": [
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4910366,
-      "sha256": "f11524a7390cb8b858c582a6025275f16f547cc669e2e8f5d9b335391fd8e10e",
+      "bytes": 4955840,
+      "sha256": "9e2c3461bda09731ca8420b7a0c48dafe157d5a3a3aad3f36f5a50b274cc20c5",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 250,
+  "portraitCount": 254,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -1784,6 +1784,65 @@
       }
     },
     {
+      "id": "eastbrook_freight_caravan",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_bandit",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/rogue_hooded.glb",
+          "path": "public/models/chars/players/rogue_hooded.glb",
+          "bytes": 448736,
+          "sha256": "876d60366dc2105a801b2fb65da49a9cdee061f267cddb97ff8a27c95395c40a"
+        },
+        "idle": "Idle",
+        "height": 2.6,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/dagger.glb",
+              "path": "public/models/weapons/dagger.glb",
+              "bytes": 35340,
+              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/dagger.glb",
+              "path": "public/models/weapons/dagger.glb",
+              "bytes": 35340,
+              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.3
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#6b3a32",
+        "resolved": "#6b3a32",
+        "strength": 0.3
+      },
+      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "output": {
+        "path": "public/ui/mobs/eastbrook_freight_caravan.webp",
+        "bytes": 2244,
+        "sha256": "93191d607c3b2574c87a7c1dd582c8f64c9193837f33020e1bf6cf57a513db9c"
+      }
+    },
+    {
       "id": "edda_reedhand",
       "family": "humanoid",
       "finderEncounter": false,
@@ -2001,6 +2060,40 @@
       }
     },
     {
+      "id": "fenbridge_infiltrator",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "skel_minion",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_minion.glb",
+          "path": "public/models/chars/enemies/skeleton_minion.glb",
+          "bytes": 815932,
+          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+        },
+        "idle": "Idle_Combat",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#7fb3d5",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "6060337f7d2493f368665655645a66b5ef77111dcb9a75ef903e9f3b91a178a2",
+      "output": {
+        "path": "public/ui/mobs/fenbridge_infiltrator.webp",
+        "bytes": 2782,
+        "sha256": "8e3f45c995cb35d720c9f604756ce221ae889391e68b965e1eda1685c8f45a09"
+      }
+    },
+    {
       "id": "fisher_bram",
       "family": "humanoid",
       "finderEncounter": false,
@@ -2134,6 +2227,65 @@
         "path": "public/ui/mobs/frostmane_yeti.webp",
         "bytes": 2006,
         "sha256": "8bba2c34209a8c27cba78b254039802f161c9a08ce81d67aa74f64d40e1e19ea"
+      }
+    },
+    {
+      "id": "frostveil_supply_caravan",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_bandit",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/rogue_hooded.glb",
+          "path": "public/models/chars/players/rogue_hooded.glb",
+          "bytes": 448736,
+          "sha256": "876d60366dc2105a801b2fb65da49a9cdee061f267cddb97ff8a27c95395c40a"
+        },
+        "idle": "Idle",
+        "height": 2.6,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/dagger.glb",
+              "path": "public/models/weapons/dagger.glb",
+              "bytes": 35340,
+              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/dagger.glb",
+              "path": "public/models/weapons/dagger.glb",
+              "bytes": 35340,
+              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.3
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#6b3a32",
+        "resolved": "#6b3a32",
+        "strength": 0.3
+      },
+      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "output": {
+        "path": "public/ui/mobs/frostveil_supply_caravan.webp",
+        "bytes": 2244,
+        "sha256": "93191d607c3b2574c87a7c1dd582c8f64c9193837f33020e1bf6cf57a513db9c"
       }
     },
     {
@@ -9017,6 +9169,65 @@
         "path": "public/ui/mobs/willow_sprite.webp",
         "bytes": 1708,
         "sha256": "c1dc29dbb2a2f33a65306af3f7747a6f431d2af9961075fcb6d63a8bdcdebaa3"
+      }
+    },
+    {
+      "id": "willowfen_remedy_caravan",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_bandit",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/rogue_hooded.glb",
+          "path": "public/models/chars/players/rogue_hooded.glb",
+          "bytes": 448736,
+          "sha256": "876d60366dc2105a801b2fb65da49a9cdee061f267cddb97ff8a27c95395c40a"
+        },
+        "idle": "Idle",
+        "height": 2.6,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/dagger.glb",
+              "path": "public/models/weapons/dagger.glb",
+              "bytes": 35340,
+              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/dagger.glb",
+              "path": "public/models/weapons/dagger.glb",
+              "bytes": 35340,
+              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.3
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#6b3a32",
+        "resolved": "#6b3a32",
+        "strength": 0.3
+      },
+      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "output": {
+        "path": "public/ui/mobs/willowfen_remedy_caravan.webp",
+        "bytes": 2244,
+        "sha256": "93191d607c3b2574c87a7c1dd582c8f64c9193837f33020e1bf6cf57a513db9c"
       }
     },
     {

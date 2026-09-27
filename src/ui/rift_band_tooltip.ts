@@ -7,7 +7,9 @@
 // player what a bag gem will do before they walk it to the forge.
 import type { RiftGemId } from '../sim/content/rift/items';
 import { PRIMARY_STATS } from '../sim/item_budget';
-import { itemLevel, itemScore } from '../sim/item_level';
+import { activeItemInstanceStats } from '../sim/item_instance_stats';
+import { itemInstanceLevel, itemScore } from '../sim/item_level';
+import { lootQualityBonuses, lootQualityWeapon } from '../sim/loot_quality';
 import { RIFT_GEM_RATING, RIFT_GEM_RATING_STAT, riftBandItemLevel } from '../sim/rift/band_ladder';
 import type { ItemDef, ItemInstancePayload } from '../sim/types';
 import { esc } from './esc';
@@ -31,13 +33,25 @@ export function itemLevelReadout(
 ): ItemLevelReadout | undefined {
   const rift = instance?.rift;
   if (rift) {
-    const rolled = instance?.rolled?.stats ?? {};
+    const rolled = activeItemInstanceStats(instance, item) ?? {};
     let score = itemScore(item);
     for (const stat of PRIMARY_STATS) score += rolled[stat] ?? 0;
-    return { level: riftBandItemLevel(rift.tier, rift.upgradeLevel), score };
+    return {
+      level: itemInstanceLevel(item, instance) ?? riftBandItemLevel(rift.tier, rift.upgradeLevel),
+      score,
+    };
   }
-  const level = itemLevel(item);
-  return level === undefined ? undefined : { level, score: itemScore(item) };
+  const level = itemInstanceLevel(item, instance);
+  if (level === undefined) return undefined;
+  const bonus = lootQualityBonuses(item, instance);
+  const stats = { ...item.stats };
+  for (const key of ['str', 'agi', 'sta', 'int', 'spi', 'armor'] as const) {
+    if (bonus[key]) stats[key] = (stats[key] ?? 0) + bonus[key];
+  }
+  const weapon = lootQualityWeapon(item, instance);
+  const resolved =
+    item.kind === 'weapon' && weapon ? { ...item, stats, weapon } : { ...item, stats };
+  return { level, score: itemScore(resolved) };
 }
 
 function subLine(text: string): string {

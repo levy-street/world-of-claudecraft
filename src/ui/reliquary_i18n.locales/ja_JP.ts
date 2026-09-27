@@ -167,6 +167,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'ウォーフェア武器庫',
     desc: '苦労して得た名誉で購入する戦争の装飾品と武器。',
   },
+  conquerors_vanguard_gallery: {
+    name: 'ヴァンガードギャラリー',
+    desc: 'ウォーフェア・シーズン2の専門化セットと武器。名誉で購入します。',
+  },
   // Vault of Ages (Phase 21): composed from the shipped vault noun (the
   // col_reliquary_complete title reads 宝物庫のキュレーター).
   horizons_vault_of_ages: {
@@ -186,7 +190,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: '英雄: 最後の泉のるつぼ',
-    desc: 'イグニヴァル、最後の炎の先触れからヒロイックでのみ得られる武器。',
+    desc: 'イグニヴァル、最後の炎の先触れからヒロイックでのみ得られる武器と、レイドのトリンケット。',
   },
   conquerors_varkhul: {
     name: '内部るつぼ',
@@ -194,7 +198,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: '英雄: 内部るつぼ',
-    desc: '最後の炎の鍛造父、ヴァルクルからヒロイックでのみ得られる盾と武器。',
+    desc: '最後の炎の鍛造父、ヴァルクルからヒロイックでのみ得られる盾、オフハンド、武器。',
   },
   professions_forgebreaker: {
     name: 'フォージブレイカー',

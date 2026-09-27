@@ -20,6 +20,7 @@
 
 import { type AccountEarner, accountEarnedDays } from '../sim/account_ledger';
 import { countsTowardCompletion } from '../sim/deeds_completion';
+import { wearableDevBadgeTitles } from '../sim/dev_badge_titles';
 import type { DeedDef, DeedStats, DeedTrigger } from '../sim/types';
 import type { DeedsRarity } from '../world_api';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
@@ -260,6 +261,10 @@ export interface DeedsViewInput {
   // recent-strip jump). The core echoes it back only when the deed produced
   // an entry, so the painter never scrolls to a card that is not in the DOM.
   focusDeedId?: string | null;
+  // The viewer's resolved developer-badge tier (Entity.devTier, 0/absent for
+  // none). Its rungs join the title picker AFTER the deed titles; they are not
+  // deeds (src/sim/dev_badge_titles.ts), so they never touch entries or counts.
+  devTier?: number;
 }
 
 export interface DeedRecentModel {
@@ -423,6 +428,9 @@ export function buildDeedsView(input: DeedsViewInput): DeedsViewModel {
       crestId: deedCrestId(id, def.category),
       missingPoiMarkIds: earned ? [] : missingPoiVisits(def.trigger, input.deedStats),
     });
+  }
+  for (const id of wearableDevBadgeTitles(input.devTier)) {
+    titles.push({ id, active: input.activeTitle === id });
   }
 
   const focus = input.focusDeedId ?? null;
@@ -737,6 +745,9 @@ export interface DeedsRefreshSigParts {
   category: DeedDisplayCategory | 'titles';
   watchRev: number;
   statsDigest: number;
+  // The resolved developer-badge tier: a rung landing after join (or a
+  // removed link) repaints the picker. Optional so older callers sign as before.
+  devTier?: number;
 }
 
 /** Compact repaint signature (JSON keeps '' vs null and cross-type values
@@ -753,6 +764,7 @@ export function deedsRefreshSig(parts: DeedsRefreshSigParts): string {
     parts.category,
     parts.watchRev,
     parts.statsDigest,
+    parts.devTier ?? 0,
   ]);
 }
 

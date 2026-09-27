@@ -1081,4 +1081,81 @@ export const table: DeedLocaleTable = {
 
     name: 'En kilde ubundet',
   },
+  exp_arcane_calligraphy: {
+    name: 'Et Fast Hånd',
+    desc: 'Fuldføre Arkan Kalligrafi i Eastbrook Vale.',
+  },
+  exp_arcane_calligraphy_gold: {
+    name: 'Skrevet i Stjernelys',
+    desc: 'Få et Guldvurdering i Arkan Kalligrafi.',
+    title: 'Runekalderer',
+  },
+  exp_forge_helper: {
+    name: 'En Hjalp Hammer',
+    desc: 'Hjælp Smed Mara med at fuldføre et skjold ved Wyrmwatch.',
+  },
+  exp_last_barricade: {
+    name: 'Den Sidste Barrikade',
+    desc: 'Hold skovpas imod udødes hord.',
+  },
+  exp_borrowed_face: {
+    name: 'En Lånt Ansigt',
+    desc: 'Blotstill og besejr infiltratøren blandt Fenbridge vagtmen.',
+  },
+  exp_windrider_slalom: {
+    name: 'Vindridder Slalom',
+    desc: 'Fuldføre mekanisk glidefly faldnedstigningen gennem Galecrests kløft.',
+  },
+  exp_duskweave_dispatches: {
+    name: 'Tusmørke Vævnedslag',
+    desc: 'Indhent banditdispatcher mens du bærer Valeries fortryllede kappe.',
+  },
+  exp_wisp_maze: {
+    name: 'Et Lys i Labyrinten',
+    desc: 'Indhent det stjålne møntpugger og undslippe Evergarden labyrinten.',
+  },
+  prog_rift_watch_trusted: {
+    name: 'Betroet af Revne Vagt',
+    desc: 'Nå Betroet status med Revne Vagt.',
+  },
+  prog_church_order_trusted: {
+    name: 'Betroet af Kirke Orden',
+    desc: 'Nå Betroet status med Kirke Orden.',
+  },
+  prog_automatons_trusted: {
+    name: 'Betroet af Automaterne',
+    desc: 'Nå Betroet status med Automaterne.',
+  },
+  prog_rift_watch_champion: {
+    name: 'Mester af Revne Vagt',
+    desc: 'Nå Mester status med Revne Vagt.',
+    title: 'Revnivogter',
+  },
+  prog_church_order_champion: {
+    name: 'Mester af Kirke Orden',
+    desc: 'Nå Mester status med Kirke Orden.',
+    title: 'Daggryvokt',
+  },
+  prog_automatons_champion: {
+    name: 'Mester af Automaterne',
+    desc: 'Nå Mester status med Automaterne.',
+    title: 'Smedemester',
+  },
+  prog_faction_champion_all: {
+    name: 'Mester af alle Bannere',
+    desc: 'Nå Mester status med Revne Vagt, Kirke Orden og Automaterne.',
+  },
+  exp_clue_first_casket: {
+    name: 'Skat Fundet',
+    desc: 'Åbne en Skattkiste gravet op ved enden af en vejledningsrullejagt.',
+  },
+  exp_clue_ten_caskets: {
+    name: 'Skathunter',
+    desc: 'Åbne 10 Skatkister gravet op ved enden af vejledningsrullejagter.',
+    title: 'Skathunter',
+  },
+  exp_harbor_to_harbor: {
+    name: 'Havn til Havn',
+    desc: 'Sejl begge færger der og tilbage: Eastbrook til Månehvile, og Wickhavn til Wyrmwatch.',
+  },
 };

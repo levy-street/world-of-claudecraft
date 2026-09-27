@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/data';
 import type { AbilityEffect, Entity } from '../src/sim/types';
@@ -7,6 +8,7 @@ import {
   deferAutoAttackUntilCastEnd,
   hasAutoAttackTarget,
   isPvpHostileTarget,
+  pressStartsAutoAttack,
 } from '../src/ui/hud/action_bar/attack_on_ability';
 import type { BgInfo, BgMatchInfo } from '../src/world_api/battleground';
 import type { ArenaInfo, DuelInfo } from '../src/world_api/duel_arena';
@@ -18,6 +20,30 @@ const effectsOf = (id: string): AbilityEffect[] => {
   if (!def) throw new Error(`unknown ability for test: ${id}`);
   return def.effects;
 };
+
+describe('pressStartsAutoAttack', () => {
+  it('never engages the current target on a press redirected onto a party frame', () => {
+    // A dual-purpose heal carries directDamage for its enemy arm, so the bare
+    // effect test reads it as an attack. Redirected onto a hovered ally it is a
+    // heal, and engaging would start swinging at the selected enemy.
+    for (const id of ['solar_invocation', 'scouring_mercy']) {
+      expect(abilityStartsAutoAttack(effectsOf(id)), id).toBe(true);
+      expect(pressStartsAutoAttack(effectsOf(id), false), id).toBe(true);
+      expect(pressStartsAutoAttack(effectsOf(id), true), id).toBe(false);
+    }
+    // An unredirected press is exactly the effect test.
+    expect(pressStartsAutoAttack(effectsOf('sinister_strike'), false)).toBe(true);
+    expect(pressStartsAutoAttack(effectsOf('battle_shout'), false)).toBe(false);
+  });
+
+  it('is the predicate the HUD press path engages through, fed the redirect', () => {
+    // castSlot has no unit seam: pin the call site so the redirect flag cannot be
+    // dropped while the predicate above stays green.
+    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    expect(hud).toContain('pressStartsAutoAttack(resolved.effects, mouseoverPid !== null)');
+    expect(hud).not.toContain('abilityStartsAutoAttack(resolved.effects)');
+  });
+});
 
 describe('abilityStartsAutoAttack', () => {
   it('engages on damaging attacks', () => {

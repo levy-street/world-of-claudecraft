@@ -220,12 +220,46 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'dgn_varkhul_flawless',
       // The personal hammer quest ships with the explicit category-crest fallback.
       'hid_forgebreaker',
+      'exp_arcane_calligraphy',
+      'exp_arcane_calligraphy_gold',
+      'exp_forge_helper',
+      'exp_last_barricade',
+      'exp_borrowed_face',
+      'exp_windrider_slalom',
+      'exp_duskweave_dispatches',
+      'exp_wisp_maze',
+      // The faction standing ladder (feature/world-quests, wq-reputation merge):
+      // the three Trusted and three Champion deeds plus the all-factions
+      // Champion ride their category crest until commissioned art lands
+      // (docs/achievements/icon-brief.md). RE-PINNED on the quests integration
+      // branch; the source branch had appended them to DEED_ART_PENDING
+      // without extending this ledger.
+      'prog_rift_watch_trusted',
+      'prog_church_order_trusted',
+      'prog_automatons_trusted',
+      'prog_rift_watch_champion',
+      'prog_church_order_champion',
+      'prog_automatons_champion',
+      'prog_faction_champion_all',
+      // The Clue Scroll casket deeds (feature/clue-scrolls) ride their
+      // category crest the same way.
+      'exp_clue_first_casket',
+      'exp_clue_ten_caskets',
+      // The release's Eastbrook ferry round trip rides the deed_cat_exploration crest
+      // until its commissioned art lands (docs/design/deeds.md, Icons).
+      'exp_harbor_to_harbor',
     ]);
     // RE-PINNED at this merge of release/v0.42.0 into feature/masterwrought:
     // 300 live (counted directly off the resolved src/sim/content/deeds.ts
     // DEEDS table, matching the same pin in tests/deed_icons.test.ts and
     // tests/deed_i18n.test.ts) - 11 explicitly pending = 289 painted.
-    expect(DEED_ORDER).toHaveLength(300);
+    // 308 at the release/v0.43.0 merge: plus the eight world-quest deeds.
+    // 317 on the quests integration branch: plus the seven faction standing
+    // deeds and the two Clue Scroll casket deeds, all nine on the pending
+    // ledger above, so the painted count holds at 289.
+    // 318 with the release's ferry round trip, the pending ledger's last row,
+    // so the painted count still holds at 289.
+    expect(DEED_ORDER).toHaveLength(318);
     expect(DEED_IMAGE_IDS.size).toBe(289);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

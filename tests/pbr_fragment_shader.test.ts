@@ -19,7 +19,7 @@ describe('PBR point-light fragment pruning', () => {
     const changedChunks = { lights_fragment_begin: 'void main() {}' };
 
     expect(() => installPbrPointLightShaderPruning(changedChunks)).toThrow(
-      /Three r165 point-light chunk/,
+      /pinned three point-light chunk/,
     );
     expect(changedChunks.lights_fragment_begin).toBe('void main() {}');
   });

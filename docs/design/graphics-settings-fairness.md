@@ -53,7 +53,10 @@ COSMETIC (may be tiered down on lower presets):
   every frame; shadows are never removed, and a one-frame-stale shadow (50 ms at 20 FPS)
   conveys nothing a player acts on. This is a GOVERNOR-driven shed by design, like the
   weapon-VFX `vfx` bucket arm below: a perf-governor output, not a UI tier knob, so the
-  static-preset rule at the bottom of this doc does not apply to it.
+  static-preset rule at the bottom of this doc does not apply to it. One hold overrides it:
+  while a ship under way is close by (`src/render/ship_shadow_hold.ts`) every frame renders,
+  because a stale map shows the moving ship's own shadows a frame behind its hull on
+  alternate frames, a flicker across its sails and deck.
 - Sun-shadow ortho EXTENT under the same pressure (`src/render/shadow_extent_core.ts`), the
   deeper step below that cadence. The one orthographic box the sun renders shrinks from its
   105 yd half-extent to 78.75 and then 67 (the third step's 0.6 multiplier would give 63, and
@@ -525,6 +528,73 @@ reed, mushroom or log cell goes at 224 to 287 yd against a 340 yd fog) the objec
 already 48 to 76 percent blended into it, so the pop is fainter there than on the vista
 tiers, where it happens in clear air.
 
+### The Frame Rate Limit is a pacing choice, not a tier knob (2026-09-18)
+
+The Frame Rate Limit (`src/game/frame_cadence_core.ts`, the System card's `frameRateCap`
+option) renders on a divisor of the display's measured refresh rate: about 30 on a 60 Hz
+display is every second refresh. It is a new class in this document. It is not a tier knob
+(no ceiling is ever decided from the preset, and the preset never reads the limit; the
+preset only SCOPES what the automatic mode remembers, in
+`src/game/frame_cadence_auto_memory.ts`, because a verdict learned on Ultra must not be
+reused on Low) and it is not a governor bucket (it removes no richness itself; while the
+automatic mode is still forming a verdict it does hold the governor's RECOVERY, so
+richness the governor already shed stays shed a little longer, cosmetic only and bounded:
+a provisional hold ends within 300 s of readable play, a probe within 90 frames, a
+probation within 120 s of readable play); it changes how often the whole picture is
+redrawn, exactly as a slower display would.
+
+Why it is fair. Nothing a player reads is hidden, thinned or delayed relative to the
+picture: the cast bar, the debuff strips, target and party health are all painted on
+every rendered frame, so they are as current as the world they sit on. The price is
+presentation latency, and it is bounded and stated: at most one chosen interval, 33 ms
+at a ceiling of 30 on a 60 Hz display, which is what a 30 Hz display costs and well
+inside the redraw tolerance above (about 200 ms). The limit never paces under 24 images
+per second (`MIN_CEILING_FPS`), which also keeps a rendered interval under the 50 ms
+input tick. Most of what a player DOES is not frame-paced at all: keyboard and mouse
+ability presses fire from the key event, and movement reaches the server as 50 ms wall-clock input ticks whatever the
+frame rate, so movement speed is identical on every machine and at every limit; only
+how soon a change of movement intent is noticed follows the rendered frame, which is
+the same one-interval bound. A gamepad is the exception: it has no events, its buttons
+are polled once per rendered frame (`gamepad.poll` in `frame()`), so a pad press is also
+noticed up to one chosen interval later, again what a slower display costs. A machine the limit is meant for already runs at that
+rhythm, unevenly; the limit makes it even.
+
+The automatic mode is measurement-driven by design, like the governor's sheds: it
+lowers the limit only on a machine that demonstrably misses its display's slots, and a
+player's explicit choice always wins over it. Once it has settled it holds: the limit
+then changes only on something the player did (a preset, the render scale, the display,
+the window's size class, choosing Auto again), downward when the rhythm in force is
+demonstrably missed, or through a small per-session budget of probes that last a few
+frames. The one gameplay reading it takes, `player.inCombat`, only ever POSTPONES or
+ABORTS a probe: a fight never changes what is drawn or when, it only keeps the automatic mode
+from spending frames during one (`src/game/frame_cadence_calm_core.ts`). The static-preset rule still holds in
+full for the HUD: the limit is never an input of `src/game/ui_effects_profile.ts` or
+`src/game/ui_tier_knobs.ts`, so no HUD knob can ever move with it.
+
+### The camera ghost is dithered on low and medium (2026-09-22)
+
+A structure or a tree that stands between the chase camera and the player turns into a
+see-through ghost. On the high tiers the ghost is a smooth blend: the material flips
+`transparent`, which three keys as a second program per hideable material, and those twin
+programs are a large share of the cold shader compile cost on Windows. On low and medium
+(`GFX.ditheredGhostFade`, the Advanced "Camera Ghost" dial `ghostFade`) the ghost is a
+screen-door stipple instead: the material stays opaque and drops fragments on a 4x4 ordered
+pattern (`src/render/occluder_dither_fade.ts` for structures,
+`src/render/instanced_dither_fade.ts` for one instance of a batch: trees, the Yumi maze
+walls, the battleground placements), so no second program exists.
+
+Why it is fair: both styles ghost the SAME occluders on the same frame test, at the same
+rest level, so what a player can see through a wall or a trunk is the same information on
+every tier. Two cosmetic things differ: the look of the ghost, and its shadow (a dithered
+instance stays in its batch and keeps casting, where the blended stand-in casts none). The dithered style never waits on a fade
+gate (there is no program to link), so its ghost is never later than the blended one, and
+it moves in one step both ways where the blended one eases over a few frames (a partly
+dense stipple reads as noise, so the dithered style takes the reduced-motion path). The
+blended tiers therefore reach the full see-through a few frames after the dithered ones:
+a cosmetic ease on the tiers that chose it, the same one the reduced-motion setting
+already removes, and never a hidden entity.
+The choice reads the static preset or the player's own dial, never the FPS governor.
+
 ## Enforcing guards
 
 - `tests/auras_painter.test.ts`: a debuff past the buff cap still renders; an all-debuff bar
@@ -707,6 +777,12 @@ tiers, where it happens in clear air.
   burst's length. Each band is also separated from the others on two axes at once, colour and
   motion signature (ring position, sprite shape, and the fear band's vertical bob), so the
   distinction survives for a colourblind player rather than resting on hue alone.
+
+- `tests/frame_cadence.test.ts`: the divisor tables, the 24 images per second floor and the
+  one-input-tick bound on every display rate, and that the limit yields to a loading cover,
+  a held world draw and a hidden desktop shell. `tests/frame_cadence_fairness.test.ts`: the
+  limit is never an input of the HUD tier resolvers, and the tier resolvers are never an
+  input of the limit.
 
 ## Resolved: negative-value stat-sap auras now classify as debuffs in both worlds
 

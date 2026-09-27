@@ -31,7 +31,7 @@ const SECONDARY = [
   ['guide.stats.armorTitle', 'guide.stats.armorBody'],
   ['guide.stats.dodgeTitle', 'guide.stats.dodgeBody'],
   ['guide.stats.parryTitle', 'guide.stats.parryBody'],
-  ['guide.stats.warfareTitle', 'guide.stats.warfareBody'],
+  ['guide.stats.warfareTitle', 'guide.stats.warfareBodyPets'],
 ] as const;
 
 export const stats: GuidePage = {

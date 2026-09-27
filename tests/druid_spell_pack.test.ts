@@ -431,6 +431,7 @@ describe('druid spell pack — casting applies effects', () => {
     const buff = e.auras.find((au) => au.kind === 'buff_speed');
     expect(buff, 'dash should apply a buff_speed aura').toBeTruthy();
     expect(buff!.value).toBeCloseTo(1.5);
-    expect((sim as any).moveSpeedMult(e)).toBeCloseTo(1.5);
+    // Dash multiplies the Cat Form passive (+15%): 1.15 x 1.5, never a flat 1.5.
+    expect((sim as any).moveSpeedMult(e)).toBeCloseTo(1.15 * 1.5);
   });
 });

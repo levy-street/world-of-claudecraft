@@ -5,7 +5,8 @@
 // core stays deterministic (no wall-clock reads). Registered in UI_PURE_CORES;
 // tested in tests/calendar_view.test.ts.
 
-import type { GuildEventInfo } from '../world_api';
+import type { GuildEventInfo, GuildInfo } from '../world_api';
+import { viewerGuildCan } from './guild_ranks_view';
 
 // Recurring system events (display-only: each points the player at a real
 // activity; none changes gameplay). Every id here must name something a player
@@ -131,7 +132,11 @@ export function nextOccurrence(def: SystemEventDef, todayIso: string): string {
   return todayIso;
 }
 
-// Whether the viewer may manage guild events (mirrors the server's rule).
-export function canManageGuildEvents(rank: string | null | undefined): boolean {
-  return rank === 'leader' || rank === 'officer';
+// Whether the viewer may manage guild events: their rank holds the 'events'
+// permission on the guild's ladder (mirrors the server's rule; the Guild
+// Master and officers on the default ladder). False guildless.
+export function canManageGuildEvents(
+  guild: Pick<GuildInfo, 'rank' | 'ranks'> | null | undefined,
+): boolean {
+  return viewerGuildCan(guild, 'events');
 }

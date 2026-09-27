@@ -315,6 +315,12 @@ export interface RiftInstance {
   orbActive: boolean;
   /** Overworld position to return the player to when they leave. */
   returnPos: { x: number; z: number };
+  /** Predefined facing to return the player with: away from the portal along
+   *  the line they approached it on (0 for a dev run with no portal entity, or
+   *  a still-free pool slot; enterRift always sets it once a run is claimed,
+   *  same lifecycle as returnPos). Optional only so the pool's placeholder
+   *  literal (sim.ts) does not need to carry it. */
+  returnFacing?: number;
   emptyFor: number;
   /** Rank of the world-spawned portal this run came through (null for dev
    * portals): drives the Heroic Mark payout and the sealed announcement. */

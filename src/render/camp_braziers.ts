@@ -28,6 +28,7 @@ import {
   type CampFireKind,
   planCampBrazierSites,
 } from './camp_brazier_placement_core';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { EMISSIVE_LIGHT, GFX } from './gfx';
 import { buildDrapedGlowGeometry, type GlowPatchSite } from './ground_glow_patch';
 import { hasNightLightField, registerStaticNightLights } from './night_light_field';
@@ -382,7 +383,7 @@ export function buildCampBraziers(seed = 0): CampBraziersView {
         poolMat,
       );
       pools.geometry.computeBoundingSphere();
-      pools.renderOrder = 1; // over the ground it drapes on
+      pools.renderOrder = floorVfxRenderOrder('ground', 0); // over the ground it drapes on
       pools.visible = false; // no pool until dark
       poolMeshes.push(pools);
       zoneGroup.add(pools);

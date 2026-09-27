@@ -32,6 +32,7 @@ import { FARM_CROP_IDS } from './content/farm_crops';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { pointsSpent } from './content/talents';
 import { ITEMS, MOBS, zoneAt } from './data';
+import { canWearDevBadgeTitle, devBadgeTitleTier } from './dev_badge_titles';
 import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
 import {
   accountReliquaryOwnership,
@@ -62,6 +63,7 @@ import {
   MAX_LEVEL,
   NYTHRAXIS_ROOM_RADIUS,
 } from './types';
+import { onDungeonClearedForWeeklyQuests } from './weekly_quests';
 
 // ---------------------------------------------------------------------------
 // Pinned site data. These literals are deliberately NOT read live from the
@@ -823,13 +825,28 @@ export function grantDeed(
 /** Select (or clear, with null) the displayed title: the ONE validator both
  *  worlds reach (the Sim method offline, the server dispatch online). A
  *  non-null id is accepted only when the player has EARNED the deed and its
- *  reward is a title; invalid input is a SILENT no-op (defensive against
- *  stale clients: no error event, no player text). On accept the meta field
- *  and the entity wire field are written together, so both read paths agree
- *  within the same tick. */
-export function setActiveTitle(meta: PlayerMeta, e: Entity, deedId: string | null): void {
+ *  reward is a title, or when it is a developer-badge rung title
+ *  (src/sim/dev_badge_titles.ts, not a deed) the entity's resolved badge tier
+ *  reaches; invalid input is a SILENT no-op (defensive against stale clients:
+ *  no error event, no player text). On accept the meta field and the entity
+ *  wire field are written together, so both read paths agree within the same
+ *  tick. `restore` is the join path only: the badge tier resolves AFTER join,
+ *  so a persisted rung title is taken as saved and re-checked by the server
+ *  once the tier lands (reconcileDevBadgeTitle). */
+export function setActiveTitle(
+  meta: PlayerMeta,
+  e: Entity,
+  deedId: string | null,
+  opts?: Readonly<{ restore?: boolean }>,
+): void {
   if (deedId !== null) {
     if (typeof deedId !== 'string') return;
+    if (devBadgeTitleTier(deedId) !== undefined) {
+      if (!opts?.restore && !canWearDevBadgeTitle(deedId, e.devTier)) return;
+      meta.activeTitle = deedId;
+      e.title = deedId;
+      return;
+    }
     // Account-wide: a deed earned by ANY character on the account unlocks its
     // cosmetic for every character (the ledger's display lane).
     if (!meta.deedsEarned.has(deedId) && !meta.accountLedger.deeds.has(deedId)) return;
@@ -906,6 +923,18 @@ export const METER_DIRTY_KEYS: Record<DeedMeterId, readonly string[]> = {
   // accepted rather than fixed: adding a mark to the per-kill path would put deed
   // work on a combat hot path to make a title appear slightly sooner.
   lifetimeHonor: [],
+  // Faction standing reads PlayerMeta.factions directly, never a deedStats
+  // ledger, so no narrow key could name it. The two award sites (the world
+  // quest turn-in in world_quests.ts and /dev rep in dev_commands.ts) mark a
+  // full pass right after awardFactionReputation, so a tier crossing grants
+  // on the tick it happens.
+  standingRiftWatch: [],
+  standingChurchOrder: [],
+  standingAutomatons: [],
+  // Reads the top-level PlayerMeta.clueCasketsOpened count, never a deedStats
+  // ledger, so no narrow key could name it; the one writer (the casket open
+  // site in clue_casket.ts) marks a full pass right after the increment.
+  clueCasketsOpened: [],
   vcupWins: [],
   vcupGuildWins: [],
   bankPurchasedSlots: [],
@@ -1017,6 +1046,14 @@ const METERS: Record<DeedMeterId, (meta: PlayerMeta) => number> = {
   // LIFETIME honor, never the spendable balance: a rank once earned survives
   // every purchase at the WARFARE quartermaster.
   lifetimeHonor: (m) => m.lifetimeHonor,
+  // Faction standing per allied faction (awardFactionReputation only adds).
+  // Optional chaining: a legacy save restores without the block until the
+  // first award seeds it.
+  standingRiftWatch: (m) => m.factions?.rift_watch ?? 0,
+  standingChurchOrder: (m) => m.factions?.church_order ?? 0,
+  standingAutomatons: (m) => m.factions?.automatons ?? 0,
+  // Lifetime Treasure Caskets opened. Tolerates a missing field the same way.
+  clueCasketsOpened: (m) => m.clueCasketsOpened ?? 0,
   vcupWins: (m) => m.vcupWins,
   vcupGuildWins: (m) => m.vcupGuildWins,
   bankPurchasedSlots: (m) => m.bank.purchasedSlots,
@@ -1818,6 +1855,7 @@ export function onMobKillCreditForDeeds(
   const inst = instanceForMob(ctx, mob);
   if (FINAL_BOSS_DUNGEONS[mob.templateId] && mob.templateId !== 'nythraxis_scourge_of_thornpeak') {
     onDungeonFinalBossKilledForDeeds(ctx, mob, inst, eligible);
+    onDungeonClearedForWeeklyQuests(ctx, FINAL_BOSS_DUNGEONS[mob.templateId], eligible);
   }
 
   // Encounter skill tasks resolve at the tracked boss's death; recipients are
@@ -1877,6 +1915,7 @@ export function onNythraxisKillForDeeds(
   roomMetas: PlayerMeta[],
 ): void {
   onDungeonFinalBossKilledForDeeds(ctx, boss, instanceForMob(ctx, boss), roomMetas);
+  onDungeonClearedForWeeklyQuests(ctx, FINAL_BOSS_DUNGEONS[boss.templateId], roomMetas);
 }
 
 /** World-boss credit: the loot-roster snapshot (never pruned by dying). */
@@ -2215,4 +2254,9 @@ export const VISITED_MARK_NAMESPACES = [
   // logs out after the craft. tests/deeds_content.test.ts pins the round trip
   // rather than trusting this comment.
   'apex_feast',
+  // Scheduled ferry crossings (transport_ferry.ts), one mark per direction,
+  // ferry:<from berth>_<to berth>, written when a living passenger steps off
+  // at the destination. Registered so a save keeps a one-way crossing until
+  // the return trip completes the deed.
+  'ferry',
 ] as const;

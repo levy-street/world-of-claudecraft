@@ -102,6 +102,38 @@ describe('resolvePlayerSocialFlags online (the server graph is the source of tru
     });
     expect(resolvePlayerSocialFlags('Bob', asOfficer, new Set()).canGuildInvite).toBe(true);
   });
+
+  it('follows the guild rank ladder: a custom recruiter may invite, a revoked officer may not', () => {
+    const withLadder = (rank: string) =>
+      social({
+        guild: {
+          id: 1,
+          name: 'G',
+          rank,
+          ranks: [
+            { id: 'leader', name: '', perms: [] },
+            { id: 'officer', name: '', perms: ['bank'] },
+            { id: 'r1', name: 'Recruiter', perms: ['invite'] },
+            { id: 'member', name: '', perms: [] },
+          ],
+          motd: '',
+          motdSetBy: '',
+          members: [],
+          events: [],
+          pledgeSettings: { enabled: true, minLevel: 1, note: '', newPlayerFriendly: false },
+          pledges: [],
+          tier: 0,
+        },
+      });
+    const invite = (rank: string) =>
+      resolvePlayerSocialFlags('Bob', withLadder(rank), new Set()).canGuildInvite;
+    expect([invite('leader'), invite('officer'), invite('r1'), invite('member')]).toEqual([
+      true,
+      false,
+      true,
+      false,
+    ]);
+  });
 });
 
 describe('resolvePlayerSocialFlags offline (no account, no server graph)', () => {

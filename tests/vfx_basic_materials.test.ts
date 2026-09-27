@@ -38,9 +38,15 @@ describe('the generic basic stand-ins', () => {
     const group = buildCastVfxBasicStandIns();
     expect(group.visible).toBe(false);
     const meshes = group.children as THREE.Mesh[];
+    // The weapon-aura stand-ins have their own parity walk
+    // (tests/weapon_aura_prewarm_parity.test.ts).
     expect(meshes.map((mesh) => mesh.name)).toEqual([
       'cast-vfx-basic:bubble-beam',
       'cast-vfx-basic:corpse-beacon',
+      'cast-vfx-basic:weapon-imbue',
+      'cast-vfx-basic:weapon-imbue-tip',
+      'cast-vfx-basic:weapon-stonebound-shell',
+      'cast-vfx-basic:weapon-stonebound-shard',
     ]);
     for (const mesh of meshes) {
       expect(mesh.visible).toBe(false);
@@ -62,11 +68,19 @@ describe('the generic basic stand-ins', () => {
     expect(corpseBeaconMaterialOptions().side).toBe(THREE.DoubleSide);
   });
 
-  it('is collected with the pooled cast VFX as two compile targets and two link units', () => {
+  it('is collected with the pooled cast VFX as one compile target and link unit per program', () => {
     const scene = new THREE.Scene();
     scene.add(buildCastVfxBasicStandIns());
     const targets = collectAbilityVfxCompileTargets(scene);
-    expect(targets).toHaveLength(2);
+    // Six stand-ins, five programs: the full-blade weapon imbue shares the
+    // beacon's (colour and opacity are uniforms), so it is not a unit of its own.
+    expect(targets.map((target) => target.object.name)).toEqual([
+      'cast-vfx-basic:bubble-beam',
+      'cast-vfx-basic:corpse-beacon',
+      'cast-vfx-basic:weapon-imbue-tip',
+      'cast-vfx-basic:weapon-stonebound-shell',
+      'cast-vfx-basic:weapon-stonebound-shard',
+    ]);
     const compiled: string[] = [];
     const units = castVfxProgramUnits(scene, null, noArms, unprovedPrograms, async (root) => {
       compiled.push(root.name);
@@ -75,20 +89,24 @@ describe('the generic basic stand-ins', () => {
     // The root rides on the unit, so the resume lane warms it ahead of the link.
     expect(units.map((unit) => unit.roots)).toEqual(targets.map((target) => [target.object]));
     for (const unit of units) unit.run();
-    expect(compiled).toEqual(['cast-vfx-basic:bubble-beam', 'cast-vfx-basic:corpse-beacon']);
+    expect(compiled).toEqual(targets.map((target) => target.object.name));
   });
 
-  it('links the staged lazy stand-ins first, as one unit, once they exist', () => {
+  it('links the staged lazy stand-ins last, as one unit, once they exist', () => {
+    // They never hold a cast, so the pooled programs the gate waits on go first.
     const scene = new THREE.Scene();
+    scene.add(buildCastVfxBasicStandIns());
     const standIns = new THREE.Group();
     standIns.name = 'ability-material-prewarm';
+    const targets = collectAbilityVfxCompileTargets(scene);
     const compiled: string[] = [];
     const units = castVfxProgramUnits(scene, standIns, noArms, unprovedPrograms, async (root) => {
       compiled.push(root.name);
     });
-    expect(units.map((unit) => unit.id)).toEqual(['ability-materials:compile']);
-    expect(units[0]?.roots).toEqual([standIns]);
+    expect(units.map((unit) => unit.id).at(-1)).toBe('ability-materials:compile');
+    expect(units).toHaveLength(targets.length + 1);
+    expect(units.at(-1)?.roots).toEqual([standIns]);
     for (const unit of units) unit.run();
-    expect(compiled).toEqual(['ability-material-prewarm']);
+    expect(compiled).toEqual([...targets.map((target) => target.object.name), standIns.name]);
   });
 });

@@ -5,6 +5,7 @@
 
 import * as THREE from 'three';
 import type { ActiveNythraxisBindingSigil } from '../sim/nythraxis_binding_sigil';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import {
   NYTHRAXIS_SIGIL_GROUND_LIFT,
   NYTHRAXIS_SIGIL_PALETTE,
@@ -166,7 +167,7 @@ export function buildNythraxisBindingSigil(
     fillMaterial,
   );
   fill.name = NYTHRAXIS_SIGIL_FILL_NAME;
-  fill.renderOrder = 10;
+  fill.renderOrder = floorVfxRenderOrder('encounter', 9);
   group.add(fill);
 
   const rimMaterial = sigilMaterial(NYTHRAXIS_SIGIL_PALETTE.rim, 0.86, THREE.AdditiveBlending);
@@ -176,13 +177,13 @@ export function buildNythraxisBindingSigil(
   );
   rim.name = NYTHRAXIS_SIGIL_RIM_NAME;
   rim.position.y = 0.01;
-  rim.renderOrder = 11;
+  rim.renderOrder = floorVfxRenderOrder('encounter', 10);
   group.add(rim);
 
   const spokes = new THREE.InstancedMesh(SPOKE_GEOMETRY, rimMaterial, NYTHRAXIS_SIGIL_SPOKE_COUNT);
   spokes.name = NYTHRAXIS_SIGIL_SPOKES_NAME;
   spokes.position.y = 0.015;
-  spokes.renderOrder = 12;
+  spokes.renderOrder = floorVfxRenderOrder('encounter', 11);
   poseSpokes(spokes, row.radius);
   group.add(spokes);
 
@@ -192,7 +193,7 @@ export function buildNythraxisBindingSigil(
   const sweep = new THREE.Mesh(sweepGeometry, sweepMaterial);
   sweep.name = NYTHRAXIS_SIGIL_SWEEP_NAME;
   sweep.position.y = 0.025;
-  sweep.renderOrder = 13;
+  sweep.renderOrder = floorVfxRenderOrder('encounter', 12);
   group.add(sweep);
 
   group.userData.fill = fill;

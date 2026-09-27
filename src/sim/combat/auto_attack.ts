@@ -1,3 +1,5 @@
+import { gliderActionsLocked } from '../glider_action_lock';
+import { shadowActionsLocked } from '../shadow_action_lock';
 // Player auto-attack + the melee/ranged white-hit table, extracted from the Sim
 // monolith (C5). This module owns:
 //   - startAutoAttack / stopAutoAttack: the public auto-attack toggle (validate
@@ -55,11 +57,14 @@ import {
   type WeaponInfo,
 } from '../types';
 import { drawWeapon } from '../weapon_stow';
+import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import { applyRageSpendCooldownRefund, spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isInStasis, isStunned } from './cc';
 import { druidEngineOnLandedStrike } from './druid_engines';
+import { naturesBoonOnAutoAttack } from './druid_natures_boon';
 import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
+import { meleeReachActor } from './feral_reach';
 import {
   baseSwingSpeed,
   catAutoWeaponRollMult,
@@ -81,6 +86,7 @@ import { advanceWarspiritCadence, stoneboundThreatMultiplier } from './shaman_wa
 import { blockedMeleeDamage } from './shield_block';
 import { onCastCompleted, onMeleeSwing } from './talent_procs';
 import { applyThornsReaction } from './thorns_charge';
+import { onTrinketAvoidance } from './trinkets';
 import { warriorMeleeDefense } from './warrior_hit_table';
 
 // Fraction of the mainhand weapon's damage a hunter's Auto Shot deals. There is no
@@ -127,6 +133,13 @@ function autoAttackWeaponDamageMult(hand: AutoAttackHand): number {
 export function startAutoAttack(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
+  if (
+    r.meta.vehicle ||
+    wispMazeActionsLocked(r.meta.worldQuestLog) ||
+    shadowActionsLocked(r.meta.worldQuestLog) ||
+    gliderActionsLocked(r.meta.worldQuestLog)
+  )
+    return;
   const p = r.e;
   if (p.dead) return;
   if (isInStasis(p)) return;
@@ -167,7 +180,7 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   // bug, #1324). The toggle still arms autoAttack above; once the cast resolves, the
   // first landed swing (or the spell's own damage) aggros the target legitimately.
   if (
-    d <= effectivePlayerAttackRange(t, MELEE_RANGE) &&
+    d <= effectivePlayerAttackRange(t, MELEE_RANGE, meleeReachActor(ctx, p)) &&
     !p.castingAbility &&
     t.kind === 'mob' &&
     t.hostile &&
@@ -265,7 +278,7 @@ export function tryPlayerSwing(ctx: SimContext, p: Entity, meta: PlayerMeta): vo
     p.swingTimer = shot.speed * ctx.swingIntervalMult(p, 'ranged');
     return;
   }
-  if (d > effectivePlayerAttackRange(t, MELEE_RANGE)) return;
+  if (d > effectivePlayerAttackRange(t, MELEE_RANGE, meleeReachActor(ctx, p))) return;
   // Melee normally skips line of sight (it's always point-blank), but the
   // arena's thin enclosing walls sit inside MELEE_RANGE: without this a
   // combatant pressed against a wall could swing through it. See sibling
@@ -506,6 +519,8 @@ export function meleeSwing(
     cannotBeDodged?: boolean;
     weapon?: WeaponInfo;
     weaponMult?: number;
+    /** Scales the complete primary hit before callbacks snapshot copied damage. */
+    primaryDamageMult?: number;
     autoAttackHand?: AutoAttackHand;
     apSwingSpeed?: number;
     threatFlat?: number;
@@ -527,6 +542,8 @@ export function meleeSwing(
     // #2861: this is what left Ambush/Backstab/Sinister Strike's dedicated
     // impact cues unreachable).
     abilityId?: string | null;
+    /** An explicit cast-start cue already began this ability's performance. */
+    attackAnimationStarted?: boolean;
     // Classic instant-attack normalization (weaponStrike effect `normalized`):
     // scale the weapon-damage portion to a fixed normalized speed by weapon
     // class instead of the weapon's real speed. Only meaningful for an ability
@@ -555,6 +572,7 @@ export function meleeSwing(
       school: 'physical',
       ability: abilityName,
       kind: 'miss',
+      ...(opts.attackAnimationStarted ? { attackAnimationStarted: true as const } : {}),
     });
     ctx.enterCombat(attacker, target);
     return false;
@@ -569,8 +587,10 @@ export function meleeSwing(
       school: 'physical',
       ability: abilityName,
       kind: 'dodge',
+      ...(opts.attackAnimationStarted ? { attackAnimationStarted: true as const } : {}),
     });
     ctx.enterCombat(attacker, target);
+    onTrinketAvoidance(ctx, target);
     if (attacker.kind === 'player') attacker.overpowerUntil = ctx.time + 5;
     return false;
   }
@@ -584,8 +604,10 @@ export function meleeSwing(
       school: 'physical',
       ability: abilityName,
       kind: 'parry',
+      ...(opts.attackAnimationStarted ? { attackAnimationStarted: true as const } : {}),
     });
     ctx.enterCombat(attacker, target);
+    onTrinketAvoidance(ctx, target);
     return false;
   }
   const mult = opts.weaponMult ?? 1;
@@ -654,8 +676,9 @@ export function meleeSwing(
       grantDevotionFromBlock(target);
       tryGrantSolarReprisal(ctx, target, 'block');
     }
+    onTrinketAvoidance(ctx, target);
   }
-  const dealtAmount = Math.max(1, Math.round(dmg));
+  const dealtAmount = Math.max(1, Math.round(dmg * (opts.primaryDamageMult ?? 1)));
   const hpBefore = target.hp;
   const resolvedAmount = ctx.dealDamage(
     attacker,
@@ -671,7 +694,7 @@ export function meleeSwing(
       mult: (opts.threatMult ?? 1) * stoneboundThreatMultiplier(ctx, attacker),
     },
     true,
-    false,
+    opts.attackAnimationStarted ?? false,
     false,
     // Cue-presentation only on this path: onSpellCrit skips the physical
     // school, so the id can never newly arm an ability-filtered proc here.
@@ -706,6 +729,12 @@ export function meleeSwing(
       triggerWardCycle(ctx, attacker);
     }
     onMeleeSwing(ctx, attacker);
+    // Nature's Boon (combat/druid_natures_boon.ts): a landed AUTO-attack, and
+    // only an auto-attack, can arm the Wildfang free-spell window. The
+    // opts.autoAttack gate is what keeps a weaponStrike ability (which
+    // resolves through this same shell) from rolling it. Feral-gated inside,
+    // so no other player draws rng here.
+    if (opts.autoAttack) naturesBoonOnAutoAttack(ctx, attacker);
     // Weapon coats (the rogue poisons) land their rider on the struck target
     // here, on the LANDED arm only: a miss, dodge or parry returned above, so
     // a whiffed swing carries no poison. Draws no rng.

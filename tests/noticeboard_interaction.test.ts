@@ -230,8 +230,10 @@ describe('active-world noticeboard service', () => {
     expect(noticeboardCaseAt).toBeGreaterThan(handleEventsAt);
     expect(nextCaseAt).toBeGreaterThan(noticeboardCaseAt);
     const branch = source.slice(noticeboardCaseAt, nextCaseAt);
-    expect(branch).toContain('this.noticeboardPopup.show(ev.listings);');
-    expect(branch).toContain('this.openGuildBoard(ev.boardId);');
+    expect(branch).toContain(
+      'presentNoticeboardEvent(ev, this.noticeboardPopup, this.leaderboardWindow, (id) =>',
+    );
+    expect(branch).toContain('this.openGuildBoard(id)');
     expect(branch).not.toContain('showBanner');
     expect(branch).not.toContain('Nothing seems posted.');
   });

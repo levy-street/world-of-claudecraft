@@ -166,6 +166,10 @@ export const table: ReliquaryLocaleTable = {
     name: '戰爭兵器庫',
     desc: '以來之不易的榮譽購得的戰爭飾品與武器。',
   },
+  conquerors_vanguard_gallery: {
+    name: '先鋒展廳',
+    desc: '戰爭第二賽季的專精套裝與武器，用榮譽購買。',
+  },
   // Vault of Ages (Phase 21): composed from the shipped vault noun (the
   // col_reliquary_complete title reads 寶庫策展人).
   horizons_vault_of_ages: {
@@ -185,7 +189,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: '英雄：最後泉源熔爐',
-    desc: '伊格尼瓦，末焰使者身上僅限英雄難度掉落的武器。',
+    desc: '伊格尼瓦，末焰使者身上僅限英雄難度掉落的武器，以及團隊副本飾品。',
   },
   conquerors_varkhul: {
     name: '內環熔爐',
@@ -193,7 +197,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: '英雄：內環熔爐',
-    desc: '末焰鍛父瓦爾庫爾身上僅限英雄難度掉落的盾牌與武器。',
+    desc: '末焰鍛父瓦爾庫爾身上僅限英雄難度掉落的盾牌、副手聖物與武器。',
   },
   professions_forgebreaker: {
     name: '碎爐者',

@@ -310,6 +310,15 @@ describe('v0.36 placeholder-art completion evidence', () => {
       'courtiers_bonefang',
       'thornpeak_wardblade',
       'gravecourt_hewer',
+      // The three faction quartermaster epics (faction-vendor-icons-2026-09-16).
+      'riftwarden_voidblade',
+      'dawnkeeper_consecrated_mace',
+      'forgemaster_crag_cleaver',
+      // Warfare Season 2 (warfare-season2-weapons-2026-09-25).
+      'vanguard_verdict_greatsword',
+      'vanguard_oath_blade',
+      'vanguard_fang_dagger',
+      'vanguard_warstaff',
     ];
     expect(targets.weaponItems).toEqual(
       sorted(

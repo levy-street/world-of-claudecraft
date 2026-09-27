@@ -15,12 +15,12 @@ import {
   readShaderWarmQuery,
   readShaderWarmReadyDeadline,
   readShaderWarmSetting,
-  SHADER_WARM_AB_REFUSAL,
   SHADER_WARM_EVIDENCE_LINKS,
   SHADER_WARM_EXPIRED_SHARE_BREAKER,
   SHADER_WARM_FAILED_PROGRAMS_KEPT,
   SHADER_WARM_FRAME_PERIOD_MS,
   SHADER_WARM_HOLD_WINDOW,
+  SHADER_WARM_OPTION_OFFERED,
   SHADER_WARM_PAUSE_ABOVE_MS,
   SHADER_WARM_RELEASE_BREAKER,
   SHADER_WARM_RESUME_BELOW_MS,
@@ -30,11 +30,11 @@ import {
   type ShaderWarmCannotServeInputs,
   type ShaderWarmPolicyInputs,
   type ShaderWarmRequestSource,
-  shaderWarmAbArmFor,
   shaderWarmCannotServe,
   shaderWarmDecision,
   shaderWarmLinkEvidence,
   shaderWarmModeFor,
+  shaderWarmStoredForWorker,
 } from '../src/render/shader_warm_client_core';
 
 /** The queue's floors, as the host hands them in (GPU_WORK_PRIORITY
@@ -178,19 +178,15 @@ describe('readShaderWarmSetting', () => {
 });
 
 describe('shaderWarmModeFor', () => {
-  it('resolves auto by the backend: the full policy where the worker is worth its cost', () => {
-    // Measured 2026-08-28: D3D11 passed, every OpenGL cell (Linux NVIDIA,
-    // Linux Intel, Android Mali) only relocated the stall into the GPU
-    // process. Measured 2026-08-30 on Vulkan (RTX 3060, RTX 3090, Intel
-    // iGPU): a cold link costs 8 to 25 ms and the first draw 0 ms, while the
-    // worker's own links cost three to six times more, so there is nothing
-    // to warm and the worker is a net cost: off. The full policy holds the
-    // live view too: its stand-in already shows what is there, so a longer
-    // stand-in beats a frozen frame (settled 2026-08-28).
-    expect(shaderWarmModeFor('auto', 'd3d11')).toBe('all');
+  it('resolves auto to off on every backend: no backend is measured worth the worker', () => {
+    // D3D11 passed on a bench (2026-08-28) and the 0.43 fleet experiment found
+    // no gain it could detect there; every OpenGL cell only relocated the stall
+    // into the GPU process; on Vulkan (2026-08-30) a cold link costs 8 to 25 ms
+    // while the worker's own links cost three to six times more; Metal has the
+    // Vulkan profile on its one datapoint. The explicit setting is how any of
+    // them gets the worker.
+    expect(shaderWarmModeFor('auto', 'd3d11')).toBe('off');
     expect(shaderWarmModeFor('auto', 'vulkan')).toBe('off');
-    // Metal: the Vulkan profile on its one datapoint (11 ms cold) and no
-    // in-game measurement; the explicit arm is how it gets one.
     expect(shaderWarmModeFor('auto', 'metal')).toBe('off');
     expect(shaderWarmModeFor('auto', 'opengl')).toBe('off');
     expect(shaderWarmModeFor('auto', 'software')).toBe('off');
@@ -212,7 +208,29 @@ describe('shaderWarmModeFor', () => {
     expect(shaderWarmModeFor('reveal', 'metal', 'ios')).toBe('off');
     expect(shaderWarmModeFor('auto', 'metal', 'ios')).toBe('off');
     expect(shaderWarmModeFor('all', 'metal', 'other')).toBe('all');
-    expect(shaderWarmModeFor('auto', 'd3d11', 'other')).toBe('all');
+    expect(shaderWarmModeFor('all', 'd3d11', 'other')).toBe('all');
+  });
+});
+
+describe('shaderWarmStoredForWorker', () => {
+  it('ships with the options row withdrawn', () => {
+    expect(SHADER_WARM_OPTION_OFFERED).toBe(false);
+  });
+
+  it('reads any stored value as auto while the row is withdrawn, and keeps none as none', () => {
+    for (const stored of ['all', 'off', 'auto', 'reveal', 'garbage']) {
+      expect(shaderWarmStoredForWorker(stored)).toBe('auto');
+      expect(shaderWarmStoredForWorker(stored, false)).toBe('auto');
+    }
+    // An entry that registered no store reads OFF downstream, never auto.
+    expect(shaderWarmStoredForWorker(null)).toBeNull();
+    expect(readShaderWarmSetting('', shaderWarmStoredForWorker(null))).toBe('off');
+  });
+
+  it('hands the stored value through once the row is offered', () => {
+    expect(shaderWarmStoredForWorker('all', true)).toBe('all');
+    expect(shaderWarmStoredForWorker('off', true)).toBe('off');
+    expect(shaderWarmStoredForWorker(null, true)).toBeNull();
   });
 });
 
@@ -479,75 +497,6 @@ describe('the breaker the client retires a worker on', () => {
     // A release ends the held gates of one burst and keeps the worker; the
     // same count as the wedged rule turns repeated bursts into a retirement.
     expect(SHADER_WARM_RELEASE_BREAKER).toBe(3);
-  });
-});
-
-describe('the A/B arm (the D3D11 experiment)', () => {
-  const D3D11 = { setting: 'auto', backend: 'd3d11', platform: 'other' } as const;
-
-  it('draws only where auto would start the worker, and stores what it drew', () => {
-    expect(shaderWarmAbArmFor({ ...D3D11, stored: null, random: () => 0.2 })).toEqual({
-      arm: 'off',
-      store: 'off',
-    });
-    expect(shaderWarmAbArmFor({ ...D3D11, stored: null, random: () => 0.7 })).toEqual({
-      arm: 'on',
-      store: 'on',
-    });
-    // The boundary belongs to the on arm: half open below one half.
-    expect(shaderWarmAbArmFor({ ...D3D11, stored: null, random: () => 0.5 }).arm).toBe('on');
-    expect(SHADER_WARM_AB_REFUSAL).toBe('ab:off');
-  });
-
-  it('reads a stored arm back without drawing again', () => {
-    let draws = 0;
-    const random = () => {
-      draws++;
-      return 0.2;
-    };
-    expect(shaderWarmAbArmFor({ ...D3D11, stored: 'on', random })).toEqual({
-      arm: 'on',
-      store: null,
-    });
-    expect(shaderWarmAbArmFor({ ...D3D11, stored: 'off', random })).toEqual({
-      arm: 'off',
-      store: null,
-    });
-    expect(draws).toBe(0);
-    // A stored value the experiment never wrote is drawn over.
-    expect(shaderWarmAbArmFor({ ...D3D11, stored: 'maybe', random })).toEqual({
-      arm: 'off',
-      store: 'off',
-    });
-  });
-
-  it('never draws for an explicit setting, another backend, an unknown one, or iOS', () => {
-    const random = () => 0.2;
-    for (const setting of ['off', 'reveal', 'all'] as const) {
-      expect(shaderWarmAbArmFor({ ...D3D11, setting, stored: 'off', random })).toEqual({
-        arm: null,
-        store: null,
-      });
-    }
-    for (const backend of ['vulkan', 'metal', 'opengl', 'software', 'unknown', null] as const) {
-      expect(shaderWarmAbArmFor({ ...D3D11, backend, stored: null, random })).toEqual({
-        arm: null,
-        store: null,
-      });
-    }
-    expect(shaderWarmAbArmFor({ ...D3D11, platform: 'ios', stored: null, random })).toEqual({
-      arm: null,
-      store: null,
-    });
-  });
-
-  it('reads a random source that answers garbage as the on arm, the shipped behavior', () => {
-    for (const garbage of [Number.NaN, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY]) {
-      expect(shaderWarmAbArmFor({ ...D3D11, stored: null, random: () => garbage })).toEqual({
-        arm: 'on',
-        store: 'on',
-      });
-    }
   });
 });
 

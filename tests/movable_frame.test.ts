@@ -145,9 +145,8 @@ class FakeEl {
     return { ...r, right: r.left + r.width, bottom: r.top + r.height, x: r.left, y: r.top };
   }
   setPointerCapture(): void {}
-  closest(): null {
-    // event targets in these tests are never inside a button
-    return null;
+  closest(selector: string): FakeEl | null {
+    return selector === '.panel-title' && this.className === 'panel-title' ? this : null;
   }
 }
 
@@ -293,6 +292,58 @@ function pointer(overrides: Record<string, unknown> = {}) {
 }
 
 describe('MovableFrame', () => {
+  it('resizes an always-interactive meter box in both axes without scaling its text', () => {
+    const frame = new FakeEl();
+    const mover = new MovableFrame({
+      frame,
+      storageKey: KEY,
+      unlockLabelKey: 'hudChrome.interfaceUnlock.unlockFrame',
+      lockLabelKey: 'hudChrome.interfaceUnlock.lockFrame',
+      resizeLabelKey: 'hudChrome.interfaceUnlock.resizeFrame',
+      draggingBodyClass: 'hud-frame-dragging',
+      fallbackSize: { w: 612, h: 84 },
+      isMobileLayout: () => false,
+      scalable: true,
+      resizeMode: 'box',
+      moveHandle: '.panel-title',
+      buttonOnlyWhenUnlocked: true,
+      onPositioned: (active: boolean) => {
+        // Detaching the meter normally gives it a taller stylesheet default.
+        if (active && !frame.style.height) frame.rect.height = 320;
+      },
+    });
+    const grip = frame.children.find((child) => child.className.includes('mf-resize-grip'));
+    expect(grip?.hidden).toBe(true);
+    grip?.dispatch('pointerdown', pointer({ clientX: 652, clientY: 584 }));
+    fakeDocument.body.dispatch('pointermove', pointer({ clientX: 752, clientY: 634 }));
+    fakeDocument.body.dispatch('pointerup', pointer());
+    grip?.dispatch('keydown', key('ArrowRight'));
+    expect(store.has(KEY)).toBe(false);
+    const heading = new FakeEl();
+    heading.className = 'panel-title';
+    frame.dispatch('pointerdown', pointer({ target: heading, clientX: 100, clientY: 520 }));
+    fakeDocument.body.dispatch('pointermove', pointer({ clientX: 130, clientY: 540 }));
+    fakeDocument.body.dispatch('pointerup', pointer());
+    expect(JSON.parse(store.get(KEY) ?? '{}')).toMatchObject({ left: 70, top: 520, w: 612, h: 84 });
+    frame.dispatch('pointerdown', pointer({ clientX: 652, clientY: 584 }));
+    fakeDocument.body.dispatch('pointermove', pointer({ clientX: 752, clientY: 634 }));
+    fakeDocument.body.dispatch('pointerup', pointer());
+    expect(JSON.parse(store.get(KEY) ?? '{}')).toMatchObject({ w: 612, h: 84 });
+    mover.setUnlocked(true);
+    expect(grip?.hidden).toBe(false);
+    grip?.dispatch('pointerdown', pointer({ clientX: 652, clientY: 584 }));
+    fakeDocument.body.dispatch('pointermove', pointer({ clientX: 752, clientY: 634 }));
+    fakeDocument.body.dispatch('pointerup', pointer());
+    expect(JSON.parse(store.get(KEY) ?? '{}')).toMatchObject({ w: 712, h: 134 });
+    expect(scaleOf(frame)).toBe(1);
+    frame.rect = { ...frame.rect, width: 712, height: 134 };
+    grip?.dispatch('keydown', key('ArrowRight'));
+    expect(JSON.parse(store.get(KEY) ?? '{}')).toMatchObject({ w: 722, h: 134 });
+    grip?.dispatch('keydown', key('ArrowDown'));
+    expect(JSON.parse(store.get(KEY) ?? '{}')).toMatchObject({ w: 722, h: 144 });
+    expect(scaleOf(frame)).toBe(1);
+    mover.setUnlocked(false);
+  });
   it('builds the corner button locked, and a click toggles unlock + aria-pressed', () => {
     const { frame, btn } = makeFrame();
     expect(btn.className).toBe('tf-move-btn');
@@ -1373,5 +1424,73 @@ describe('MovableFrame dimensions resize', () => {
       vw: 1600,
       vh: 900,
     });
+  });
+});
+
+// A governed frame that ACCEPTS a drag must not let the pointerdown reach an
+// ancestor frame's mover. Governed frames are siblings on #ui with one
+// exception, the target-of-target mini inside #target-frame: without this,
+// grabbing the mini armed both movers and dragged the target frame along with
+// it (caught while re-shooting the PR screenshots, hence the pins).
+describe('MovableFrame nested inside another movable frame', () => {
+  it('stops the pointerdown once it takes the gesture', () => {
+    const { frame, btn } = makeFrame();
+    btn.dispatch('click', { preventDefault() {}, stopPropagation() {} });
+    let stopped = 0;
+    frame.dispatch(
+      'pointerdown',
+      pointer({
+        clientX: 100,
+        clientY: 520,
+        stopPropagation() {
+          stopped++;
+        },
+      }),
+    );
+    expect(stopped).toBe(1);
+  });
+
+  it('leaves the pointerdown alone when it REFUSES the gesture', () => {
+    // A locked frame, the mobile layout and a press on the frame's own button
+    // all bail before the frame owns anything, so an ancestor (or the world
+    // underneath) must still see the event.
+    const locked = makeFrame();
+    let lockedStops = 0;
+    locked.frame.dispatch(
+      'pointerdown',
+      pointer({
+        stopPropagation() {
+          lockedStops++;
+        },
+      }),
+    );
+    expect(lockedStops).toBe(0);
+
+    const mobile = makeFrame({ mobile: true });
+    mobile.btn.dispatch('click', { preventDefault() {}, stopPropagation() {} });
+    let mobileStops = 0;
+    mobile.frame.dispatch(
+      'pointerdown',
+      pointer({
+        stopPropagation() {
+          mobileStops++;
+        },
+      }),
+    );
+    expect(mobileStops).toBe(0);
+
+    const secondary = makeFrame();
+    secondary.btn.dispatch('click', { preventDefault() {}, stopPropagation() {} });
+    let secondaryStops = 0;
+    secondary.frame.dispatch(
+      'pointerdown',
+      pointer({
+        button: 2,
+        stopPropagation() {
+          secondaryStops++;
+        },
+      }),
+    );
+    expect(secondaryStops).toBe(0);
   });
 });

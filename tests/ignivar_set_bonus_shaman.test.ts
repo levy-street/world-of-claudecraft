@@ -12,7 +12,7 @@
 // chain-scoped 150 percent harvest. Non-wearer rng stays byte-identical
 // everywhere; the one wearer-only draw (the fourth hop's heal-crit roll) is
 // the set doc's disclosed extra hop.
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   consumeMendingCurrent,
   MENDING_CURRENT_ID,
@@ -26,6 +26,7 @@ import {
   thunderCharges,
   thundercallDamageMultiplier,
 } from '../src/sim/combat/shaman_thundercall';
+import { ARC_OVERLOAD_CHANCE, rollArcOverload } from '../src/sim/combat/shaman_thundercall_kit';
 import { PYREBRAND_UNLEASH_THUNDER } from '../src/sim/combat/shaman_unleash_weapon';
 import {
   advanceWarspiritCadence,
@@ -42,8 +43,9 @@ import {
   SPRINGMENDER_4PC_CHAIN_HARVEST_MULT,
   STONEHEARTH_2PC_MENDING_HEAL_BONUS,
   STONEHEARTH_4PC_CADENCE_HEAL_PCT_MAX,
-  STORMKINDLED_2PC_UNLEASH_THUNDER,
+  STORMKINDLED_2PC_ARC_OVERLOAD_CHANCE,
   STORMKINDLED_4PC_EARTHEN_JOLT_BONUS_PER_CHARGE,
+  STORMKINDLED_4PC_MAGMA_BURST_DMG_PCT,
   setBonusFlag,
   WARSPIRIT_EMBERSCALE_2PC_CADENCE_STEPS,
   WARSPIRIT_EMBERSCALE_4PC_STORMSTRIKE_DMG_PCT,
@@ -164,7 +166,30 @@ describe('shaman Crucible sets: the resolver registration', () => {
   });
 });
 
-describe('Stormkindled 2pc: Unleash Weapon on Pyrebrand grants 3 Thunder', () => {
+describe('Stormkindled 2pc: Arc Overload triggers 30 percent of the time', () => {
+  function overloadThreshold(wearer: boolean): number {
+    const sim = liveShaman(735, 'elemental');
+    if (wearer) equipSet(sim, 'stormkindled', 2);
+    const mob = addHostileMob(sim);
+    const thresholds: number[] = [];
+    vi.spyOn(sim.rng, 'chance').mockImplementation((p: number) => {
+      thresholds.push(p);
+      return false;
+    });
+    rollArcOverload(sim.ctx, sim.player, mob, 'lightning_bolt', 100, 100);
+    vi.restoreAllMocks();
+    // Exactly one draw either way: only the threshold moves.
+    expect(thresholds).toHaveLength(1);
+    return thresholds[0];
+  }
+
+  it('raises the one roll threshold for wearers (control 20 percent)', () => {
+    expect(overloadThreshold(true)).toBe(STORMKINDLED_2PC_ARC_OVERLOAD_CHANCE);
+    expect(overloadThreshold(false)).toBe(ARC_OVERLOAD_CHANCE);
+  });
+});
+
+describe('Stormkindled 2pc retired its Unleash Weapon bend', () => {
   function unleashThunder(wearer: boolean, banked = 0): number {
     const sim = liveShaman(733, 'elemental');
     if (wearer) equipSet(sim, 'stormkindled', 2);
@@ -179,13 +204,40 @@ describe('Stormkindled 2pc: Unleash Weapon on Pyrebrand grants 3 Thunder', () =>
     return thunderCharges(sim.player);
   }
 
-  it('grants 3 at the live grant site for wearers (control 2)', () => {
-    expect(unleashThunder(true)).toBe(STORMKINDLED_2PC_UNLEASH_THUNDER);
+  it('grants the base 2 Thunder to wearers and non-wearers alike', () => {
+    expect(unleashThunder(true)).toBe(PYREBRAND_UNLEASH_THUNDER);
     expect(unleashThunder(false)).toBe(PYREBRAND_UNLEASH_THUNDER);
   });
 
-  it('overcaps partially at the 5-charge bank (the disclosed waste)', () => {
+  it('still caps at the 5-charge bank', () => {
     expect(unleashThunder(true, 4)).toBe(THUNDER_CHARGE_CAP);
+  });
+});
+
+describe('Stormkindled 4pc: Magma Burst deals 20 percent more damage, delivered', () => {
+  it('derives 0.24 from the REAL 1.2 additive baseline (0.15 mastery + 0.05 offense)', () => {
+    const control = shamanMods('elemental', {});
+    const wearer = shamanMods('elemental', worn('stormkindled', 4));
+    const def = expectDefined(
+      abilitiesKnownAt('shaman', 25, control).find((known) => known.def.id === 'lava_burst'),
+    ).def;
+    const base = resolveTalentHitMult(def, control).dmgMult;
+    const bent = resolveTalentHitMult(def, wearer).dmgMult;
+    expect(base).toBeCloseTo(1.2, 10);
+    expect(bent).toBeCloseTo(1.2 + STORMKINDLED_4PC_MAGMA_BURST_DMG_PCT, 10);
+    expect(bent / base).toBeCloseTo(1.2, 10);
+  });
+
+  it('leaves Magma Burst untouched one piece short of the 4pc', () => {
+    const control = shamanMods('elemental', {});
+    const threePiece = shamanMods('elemental', worn('stormkindled', 3));
+    const def = expectDefined(
+      abilitiesKnownAt('shaman', 25, control).find((known) => known.def.id === 'lava_burst'),
+    ).def;
+    expect(resolveTalentHitMult(def, threePiece).dmgMult).toBeCloseTo(
+      resolveTalentHitMult(def, control).dmgMult,
+      10,
+    );
   });
 });
 
@@ -520,8 +572,9 @@ describe('Springmender 4pc: a fourth ally and the 150 percent chain harvest', ()
 
 describe('the wearer literals against the authored copy', () => {
   it('pins every audited shaman constant', () => {
-    expect(STORMKINDLED_2PC_UNLEASH_THUNDER).toBe(3);
+    expect(STORMKINDLED_2PC_ARC_OVERLOAD_CHANCE).toBeCloseTo(0.3, 10);
     expect(STORMKINDLED_4PC_EARTHEN_JOLT_BONUS_PER_CHARGE).toBeCloseTo(0.3, 10);
+    expect(STORMKINDLED_4PC_MAGMA_BURST_DMG_PCT).toBeCloseTo(0.24, 10);
     expect(WARSPIRIT_EMBERSCALE_2PC_CADENCE_STEPS).toBe(3);
     expect(STONEHEARTH_2PC_MENDING_HEAL_BONUS).toBeCloseTo(0.25, 10);
     expect(STONEHEARTH_4PC_CADENCE_HEAL_PCT_MAX).toBeCloseTo(0.03, 10);

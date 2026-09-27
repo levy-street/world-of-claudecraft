@@ -67,19 +67,12 @@ import { fineSubText, ordinaryHeldText, vaultDrawText } from './reagent_suffix_v
 // localized station name, same id-to-key table shape as craftNameText
 // (char_window.ts) so the deny toast (hud.ts) and the window rows below
 // never drift. Full literal keys on purpose (the key scanner reads them).
-const STATION_NAME_KEY: Record<StationType, TranslationKey> = {
-  forge: 'hudChrome.crafting.stationName.forge',
-  kitchens: 'hudChrome.crafting.stationName.kitchens',
-  apothecary: 'hudChrome.crafting.stationName.apothecary',
-  tannery: 'hudChrome.crafting.stationName.tannery',
-  loom: 'hudChrome.crafting.stationName.loom',
-  toolworks: 'hudChrome.crafting.stationName.toolworks',
-};
+// The station noun table moved to station_name_view.ts (the placed
+// mobile-station title needed it DOM-free); re-exported so every consumer
+// of this window keeps its import.
+import { stationNameText } from './station_name_view';
 
-/** The localized display name of one station type. */
-export function stationNameText(type: StationType): string {
-  return t(STATION_NAME_KEY[type]);
-}
+export { stationNameText };
 export interface CraftingWindowDeps
   extends PainterHostPresentation,
     TrackRowDeps,

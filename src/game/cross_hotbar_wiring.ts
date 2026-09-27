@@ -44,6 +44,8 @@ export interface CrossHotbarOverlayHost {
    *  abilities a pad needs that the bar does not carry (a stance is known at
    *  level one yet unbound, so a pad player could never otherwise reach it). */
   crossHotbarSeed(): { bar: readonly CrossHotbarAction[]; extras: readonly string[] };
+  /** The owner's ability list is not ready yet, including a reconnect hold. */
+  crossHotbarReadOnly?(): boolean;
   /** The bar's arrange surface, or null before the overlay exists. */
   crossHotbarEdit(): CrossHotbarEditSurface | null;
 }
@@ -306,7 +308,7 @@ export function createCrossHotbar(
     // loaded by then, and seeding earlier would fill from an empty one.
     if (on) {
       const seed = ui.crossHotbarSeed();
-      bindings.seedOnce(seed.bar, seed.extras);
+      bindings.seedOnce(seed.bar, ui.crossHotbarReadOnly?.() ? [] : seed.extras);
     }
     ui.setCrossHotbar(on ? crossHotbarResting(bindings, pad.getKind(), layout.entries()) : null);
     if (on) {

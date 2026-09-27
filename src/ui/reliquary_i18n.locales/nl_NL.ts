@@ -142,6 +142,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Oorlogsvoeringwapenkamer',
     desc: 'Sieraden en wapens van Oorlogsvoering, gekocht met zwaarbevochten eer.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Voorhoedegalerij',
+    desc: 'De specialisatiesets en wapens van Oorlogsvoering seizoen 2, gekocht met eer.',
+  },
   horizons_vault_of_ages: {
     name: 'Schatkamer der Eeuwen',
     desc: 'Vervallen schatten uit een vervlogen tijd. Deze relieken zijn niet langer te winnen; de schatkamer eert de veteranen die ze bewaren.',
@@ -156,7 +160,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: 'Heroïsch: Smeltkroes van de Laatste Bron',
-    desc: 'Alleen heroïsche wapens van Ignivar, Heraut van de Laatste Vlam.',
+    desc: 'Alleen heroïsche wapens en de raidtrinkets van Ignivar, Heraut van de Laatste Vlam.',
   },
   conquerors_varkhul: {
     name: 'De Binnenste Smeltkroes',
@@ -164,7 +168,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: 'Heroïsch: De Binnenste Smeltkroes',
-    desc: 'Alleen heroïsche schilden en wapens van Varkhul, Smidvader van de Laatste Vlam.',
+    desc: 'Alleen heroïsche schilden en wapens en de raidtrinkets van Varkhul, Smidvader van de Laatste Vlam.',
   },
   conquerors_set_bramblehide: {
     name: "Roots' Doornhuid",

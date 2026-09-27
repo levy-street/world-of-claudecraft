@@ -84,7 +84,7 @@ describe('willAutoUnshift', () => {
     expect(ABILITIES.maul.requiresForm).toBe('bear'); // form-locked
     expect(willAutoUnshift(wearing('form_bear'), ABILITIES.maul)).toBe(false);
 
-    expect(ABILITIES.frenzied_regeneration.requiresForm).toBe('bear');
+    expect(ABILITIES.frenzied_regeneration.requiresForm).toEqual(['bear', 'cat']);
     expect(willAutoUnshift(wearing('form_bear'), ABILITIES.frenzied_regeneration)).toBe(false);
 
     expect(ABILITIES.feral_charge.usableInForm).toBe(true); // form-usable

@@ -34,11 +34,10 @@ import {
   noteShaderWarmFrame,
   readShaderWarmReadyDeadline,
   readShaderWarmSetting,
-  SHADER_WARM_AB_REFUSAL,
   SHADER_WARM_EXPIRED_SHARE_BREAKER,
+  SHADER_WARM_OPTION_OFFERED,
   SHADER_WARM_RELEASE_BREAKER,
   SHADER_WARM_TIMEOUT_BREAKER,
-  type ShaderWarmAbArm,
   type ShaderWarmBypass,
   type ShaderWarmDecision,
   type ShaderWarmMode,
@@ -48,11 +47,11 @@ import {
   type ShaderWarmRequestStats,
   type ShaderWarmRequests,
   type ShaderWarmSetting,
-  shaderWarmAbArmFor,
   shaderWarmCannotServe,
   shaderWarmDecision,
   shaderWarmLinkEvidence,
   shaderWarmModeFor,
+  shaderWarmStoredForWorker,
 } from './shader_warm_client_core';
 import type { ShaderWarmSource, ShaderWarmWorkerMessage } from './shader_warm_protocol';
 import {
@@ -92,8 +91,6 @@ export interface ShaderWarmSnapshot extends ShaderWarmRequestStats {
   releases: number;
   /** A release happened and the worker still owes requests: no gate holds. */
   standingDown: boolean;
-  /** The D3D11 experiment's arm for this profile; null where no draw ran. */
-  abArm: ShaderWarmAbArm | null;
   /** The worker's last stats message. */
   workerStats: {
     pending: number;
@@ -130,20 +127,10 @@ export interface ShaderWarmClientDeps {
   schedule?: (callback: () => void, ms: number) => () => void;
   /** Injectable clock, for the breaker's progress check. */
   now?: () => number;
-  /** Where the profile's A/B arm is kept; the page default is localStorage. */
-  abStore?: ShaderWarmAbStore;
-  /** The draw for a profile with no arm yet. */
-  random?: () => number;
+  /** Whether the options row is offered (SHADER_WARM_OPTION_OFFERED): a suite
+   *  passes true to exercise the live row while it is withdrawn. */
+  optionOffered?: boolean;
 }
-
-/** The browser profile's slot for the A/B arm. Either call may throw (storage
- *  blocked, private mode): the client then draws once per page load. */
-export interface ShaderWarmAbStore {
-  get(): string | null;
-  set(value: string): void;
-}
-
-const SHADER_WARM_AB_STORAGE_KEY = 'woc.shaderWarm.abArm';
 
 /** How long a worker the gates stand down for may stay silent before it is
  *  retired. Not a tuned timer: the worker answers every link it runs by its
@@ -185,6 +172,7 @@ const state = {
   spawn: null as (() => WorkerLike | null) | null,
   schedule: null as ShaderWarmClientDeps['schedule'] | null,
   now: null as (() => number) | null,
+  optionOffered: SHADER_WARM_OPTION_OFFERED as boolean,
   readyDeadlineMs: SHADER_WARM_READY_DEADLINE_MS,
   /** The query string configure resolved against; a later re-read of the
    *  stored option has to honour the same `?shaderwarm=` pin. */
@@ -221,12 +209,6 @@ const state = {
    *  cover the page like the long-task total they are weighed against. */
   carriedHoldWallMs: 0,
   carriedReleases: 0,
-  abArm: null as ShaderWarmAbArm | null,
-  /** The arm this page load drew, kept for the page's life: a profile whose
-   *  storage refuses must not draw again at every renderer rebuild. */
-  pageArm: null as ShaderWarmAbArm | null,
-  abStore: null as ShaderWarmAbStore | null,
-  random: null as (() => number) | null,
   /** Why the worker was retired FOR CAUSE, if it was. Sticky across a setting
    *  round trip; only a renderer swap clears it (retireAndForgetWorker). */
   retiredCause: null as { worker: 'dead' | 'refused'; reason: string | null } | null,
@@ -259,68 +241,13 @@ function defaultSchedule(callback: () => void, ms: number): () => void {
   return () => clearTimeout(handle);
 }
 
-function defaultAbStore(): ShaderWarmAbStore {
-  // The property access itself throws where site data is blocked, so it is
-  // made inside the calls resolveMode already guards.
-  const storage = (): Storage | undefined =>
-    (globalThis as { localStorage?: Storage }).localStorage;
-  return {
-    get: () => storage()?.getItem(SHADER_WARM_AB_STORAGE_KEY) ?? null,
-    set: (value) => storage()?.setItem(SHADER_WARM_AB_STORAGE_KEY, value),
-  };
-}
-
 function clock(): number {
   return (state.now ?? defaultNow)();
 }
 
-/** The mode in force for the setting and backend known now, through the A/B
- *  draw: a profile in the `off` arm resolves `auto` to off and names the arm
- *  on the refusal, unless a real cause already owns it. */
+/** The mode in force for the setting and backend known now. */
 function resolveMode(): void {
-  // Storage is read only where a draw can happen: a masked renderer string
-  // reads as unknown at every policy call, and that is every gate.
-  const drawable =
-    state.setting === 'auto' && shaderWarmModeFor('auto', state.backend, state.platform) !== 'off';
-  let stored: string | null = null;
-  if (drawable) {
-    try {
-      stored = state.abStore?.get() ?? null;
-    } catch {
-      stored = null;
-    }
-    if (stored !== 'on' && stored !== 'off') stored = state.pageArm;
-  }
-  const draw = shaderWarmAbArmFor({
-    setting: state.setting,
-    backend: state.backend,
-    platform: state.platform,
-    stored,
-    random: state.random ?? Math.random,
-  });
-  if (draw.store) {
-    try {
-      state.abStore?.set(draw.store);
-    } catch {
-      // Blocked storage: this page load keeps its draw, the next one draws again.
-    }
-  }
-  state.abArm = draw.arm;
-  if (draw.arm) state.pageArm = draw.arm;
-  state.mode =
-    draw.arm === 'off' ? 'off' : shaderWarmModeFor(state.setting, state.backend, state.platform);
-  // Between a renderer's dispose and the next context read the backend is
-  // unknown and no draw applies, but the page's off arm still names the
-  // session on the typed refusal column.
-  const backendPending = state.backend === null || state.backend === 'unknown';
-  const offArm =
-    draw.arm === 'off' ||
-    (draw.arm === null && backendPending && state.setting === 'auto' && state.pageArm === 'off');
-  if (offArm) {
-    if (!state.retiredCause) state.refusal = SHADER_WARM_AB_REFUSAL;
-  } else if (state.refusal === SHADER_WARM_AB_REFUSAL) {
-    state.refusal = null;
-  }
+  state.mode = shaderWarmModeFor(state.setting, state.backend, state.platform);
 }
 
 function currentSearch(): string {
@@ -335,8 +262,13 @@ export function setShaderWarmStoredSettingSource(source: () => string | null): v
   storedSettingSource = source;
 }
 
+function workerStoredSetting(): string | null {
+  return shaderWarmStoredForWorker(storedSettingSource(), state.optionOffered);
+}
+
 /** The stored option as registered, for the character-select corpus
- *  (src/game/shader_cache_warmup.ts), which honours the same Off. */
+ *  (src/game/shader_cache_warmup.ts), which honours a stored Off even while
+ *  the options row is withdrawn and the worker reads the value as `auto`. */
 export function storedShaderWarmSetting(): string | null {
   return storedSettingSource();
 }
@@ -347,15 +279,14 @@ export function storedShaderWarmSetting(): string | null {
 export function configureShaderWarm(deps: ShaderWarmClientDeps = {}): void {
   const search = deps.search ?? currentSearch();
   state.search = search;
+  state.optionOffered = deps.optionOffered ?? SHADER_WARM_OPTION_OFFERED;
   state.setting = readShaderWarmSetting(
     search,
-    deps.stored !== undefined ? deps.stored : storedSettingSource(),
+    deps.stored !== undefined ? deps.stored : workerStoredSetting(),
   );
   state.readyDeadlineMs = readShaderWarmReadyDeadline(search, SHADER_WARM_READY_DEADLINE_MS);
   state.backend = null;
   state.platform = deps.platform ?? defaultPlatform();
-  state.abStore = deps.abStore ?? defaultAbStore();
-  state.random = deps.random ?? Math.random;
   resolveMode();
   // The one refusal decided before any context: named so the readout says
   // why an explicit setting did nothing on a phone.
@@ -377,8 +308,9 @@ function defaultPlatform(): ShaderWarmPlatform {
  *  than re-deriving the platform rule of its own: one rule, one place. */
 export function shaderWarmChoiceAvailable(
   platform: ShaderWarmPlatform = defaultPlatform(),
+  offered: boolean = SHADER_WARM_OPTION_OFFERED,
 ): boolean {
-  return shaderWarmModeFor('all', null, platform) !== 'off';
+  return offered && shaderWarmModeFor('all', null, platform) !== 'off';
 }
 
 function onWorkerMessage(event: MessageEvent<ShaderWarmWorkerMessage>): void {
@@ -878,9 +810,10 @@ export function noteShaderWarmHold(
  *  the readout names the extension that did it, which is also the fix (add it
  *  to RENDERER_CONTEXT_EXTENSIONS so both contexts enable it up front). */
 export function noteShaderWarmExtensionDrift(name: string): void {
-  // The off arm never ran a worker: there is nothing to retire, and the arm
-  // token must survive to the report that carries it.
-  if (state.workerState === 'dead' || state.abArm === 'off') return;
+  // With the mode off no worker exists and none can start: a cause named here
+  // would report a dead worker on a session that never ran one, and would
+  // outlive a later switch to On.
+  if (state.mode === 'off' || state.workerState === 'dead') return;
   retireForCause('dead', `extension-drift:${name}`);
   retireWorker();
 }
@@ -943,7 +876,7 @@ export function noteShaderWarmSettingChanged(): void {
   // Before the first policy call there is nothing to change: configure reads
   // the store itself.
   if (!state.spawn) return;
-  const setting = readShaderWarmSetting(state.search, storedSettingSource());
+  const setting = readShaderWarmSetting(state.search, workerStoredSetting());
   if (setting === state.setting) return;
   state.setting = setting;
   resolveMode();
@@ -959,7 +892,6 @@ export function noteShaderWarmSettingChanged(): void {
     state.retiredCause = cause;
     return;
   }
-  if (state.abArm === 'off') state.refusal = SHADER_WARM_AB_REFUSAL;
   if (state.platform === 'ios' && setting !== 'off') state.refusal = 'ios-webkit';
 }
 
@@ -990,13 +922,6 @@ export function shaderWarmSnapshot(): ShaderWarmSnapshot {
     holdWallMs: state.carriedHoldWallMs + state.outstanding.wallMs(clock()),
     releases: state.carriedReleases + state.releases,
     standingDown: state.standingDown,
-    // Between a renderer's dispose and the next context read the backend is
-    // unknown and no draw applies; the page's arm still names the session.
-    abArm:
-      state.abArm ??
-      (state.setting === 'auto' && (state.backend === null || state.backend === 'unknown')
-        ? state.pageArm
-        : null),
     workerStats: state.workerStats ? { ...state.workerStats } : null,
   };
 }
@@ -1005,26 +930,10 @@ export function resetShaderWarmForTest(deps: ShaderWarmClientDeps = {}): void {
   disposeShaderWarm();
   state.carriedHoldWallMs = 0;
   state.carriedReleases = 0;
-  state.pageArm = null;
   state.pause = createShaderWarmPauseState();
   state.spawn = null;
   state.schedule = null;
   state.now = null;
   state.pagehideHooked = false;
-  // Tests get a profile store of their own and the `on` arm unless they ask:
-  // a suite must never share a real storage slot, nor draw at random.
-  let testArm: string | null = null;
-  configureShaderWarm({
-    search: '',
-    mobile: false,
-    platform: 'other',
-    abStore: {
-      get: () => testArm,
-      set: (value) => {
-        testArm = value;
-      },
-    },
-    random: () => 0.75,
-    ...deps,
-  });
+  configureShaderWarm({ search: '', mobile: false, platform: 'other', ...deps });
 }

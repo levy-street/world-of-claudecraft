@@ -5,9 +5,11 @@
 // westPassZ). Salt-silvered downs roll to grey sea cliffs; the fishing town
 // of Wickharbor keeps its boats in the lee of the harbor cove; the Old
 // Beacon burns on the highest head, and the Wreckfields beach their bones
-// in the north. Terrain: the GALE_* tables in world.ts; the lighthouse,
-// harbor decks, and wreck ribs live in render/gale_features.ts.
+// in the north. Terrain: the GALE_* tables in world.ts; the lighthouse and
+// the wreck ribs live in render/gale_features.ts; the wooden harbor is
+// content/wickharbor_harbor.ts and content/wickharbor_wharf.ts.
 
+import { GLIDER_APPROACH_PATH } from '../glider_approach_path';
 import type {
   CampDef,
   GroundObjectDef,
@@ -68,13 +70,28 @@ export const GALECREST_ROADS: { x: number; z: number }[][] = [
   ], // Wickharbor -> the Old Beacon
   [
     { x: 420, z: 360 },
+    // The extra point on the shelf keeps the smoothed line straight past the
+    // cove-side ore vein at (430, 379), which the band pin in
+    // tests/gather_node_placement.test.ts keeps off the road.
+    { x: 424, z: 400 },
     { x: 432, z: 440 },
-    { x: 446, z: 512 },
-    { x: 438, z: 552 },
+    // Around the coastal hollows and along
+    // the paddock's north fence, back onto the old line east of the stables.
+    { x: 418, z: 446 },
+    { x: 372, z: 488 },
+    // South of the wet hollow at (390, 536) (tests/galecrest.test.ts keeps
+    // every road above the water line), as a lane along the paddock's north
+    // fence.
+    { x: 360, z: 520 },
+    { x: 368, z: 542 },
+    { x: 400, z: 543 },
+    { x: 420, z: 541 },
+    { x: 438, z: 556 },
     { x: 434, z: 610 },
     { x: 390, z: 634 },
     { x: 352, z: 636 },
-  ], // Wickharbor -> above the Shear -> past the stables' east fence -> the Wreckfields
+  ], // Wickharbor -> around the Shear -> past the stables' east fence -> the Wreckfields
+  GLIDER_APPROACH_PATH.map(({ x, z }) => ({ x, z })), // western mountain launch trail
   [
     { x: 420, z: 360 },
     { x: 352, z: 342 },
@@ -693,7 +710,8 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { x: 365, z: 627, rot: 1.9, scale: 1 }, // Edda's storm-lashed tent
   ],
   // (no pirate-kit mini docks here: Wickharbor's piers are the walkable
-  // stilt decks in sim/gale_harbor.ts, drawn by render/gale_features.ts)
+  // harbor decks of content/wickharbor_harbor.ts, drawn by
+  // render/wickharbor_harbor.ts)
   docks: [],
   fences: [
     // Wickharbor's stone garden walls (the KayKit scalloped fence): the
@@ -751,19 +769,31 @@ export const GALECREST_PROPS: ZonePropsDef = {
     { key: 'shipMonument', x: 447, z: 321, rot: 2.2, scale: 7, r: 3.4, h: 7 },
     { key: 'hexAnchor', x: 452, z: 326, rot: -0.6, scale: 7 },
     // the fleet, moored on the piers' open sides only (berths verified
-    // against the deck rectangles in sim/gale_harbor.ts; the r4 collider
+    // against the harbor decks, content/wickharbor_harbor.ts; the r4 collider
     // stays clear of every walkway so nobody wedges between hull and rail)
     { key: 'hexShipBlue', x: 492.9, z: 350.2, rot: -1.84, scale: 6, r: 4, h: 9, float: 0.55 },
-    { key: 'hexShipBlue', x: 475.1, z: 368.7, rot: 1.45, scale: 6, r: 4, h: 9, float: 0.55 },
-    { key: 'hexShipBlue', x: 487, z: 370.1, rot: -1.69, scale: 6, r: 4, h: 9, float: 0.55 },
-    { key: 'hexShipBlue', x: 456.6, z: 382.8, rot: 1.3, scale: 6, r: 4, h: 9, float: 0.55 },
-    { key: 'hexShipBlue', x: 468.1, z: 386, rot: -1.84, scale: 6, r: 4, h: 9, float: 0.55 },
-    // the Beacon dock's pair, alongside the lighthouse pier
+    // (a second hull lay at x 475.1, z 368.7, off the middle pier's south side: its
+    // stern was jammed against the boardwalk's crossing with the old deepwater pier.
+    // It went with that crossing when the ferry wharf was built there,
+    // content/wickharbor_wharf.ts, owner-approved)
+    // (this hull lay at x 487, z 370.1, inside the Eastbrook ferry's berth off
+    // the deepwater pier's end; it rides at anchor out in the bay since the
+    // ferry's Phase 2 timetable, clear of its sailing paths)
+    { key: 'hexShipBlue', x: 515, z: 392, rot: -1.69, scale: 6, r: 4, h: 9, float: 0.55 },
+    // the Beacon dock's four, alongside the lighthouse pier. Two of them lay
+    // off the deepwater pier's south side (456.6, 382.8 and 468.1, 386) and hid
+    // the ferry's harbor route marker (content/harbor_route_markers.ts); they
+    // moor here now, clear of the ferry's lanes, owner-approved.
     { key: 'hexShipBlue', x: 519.2, z: 329.6, rot: 0.79, scale: 6, r: 4, h: 9, float: 0.55 },
     { key: 'hexShipBlue', x: 515.9, z: 345.5, rot: -2.36, scale: 6, r: 4, h: 9, float: 0.55 },
-    // dinghies: two on the water, one hauled out by the rack on the shingle
-    { key: 'hexBoat', x: 474, z: 354, rot: 0.7, scale: 6, float: 0.1 },
-    { key: 'hexBoat', x: 479, z: 357.5, rot: -1.8, scale: 6, float: 0.1 },
+    { key: 'hexShipBlue', x: 507, z: 339, rot: -2.36, scale: 6, r: 4, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 530, z: 338, rot: 0.79, scale: 6, r: 4, h: 9, float: 0.55 },
+    // dinghies: two on the water, one hauled out by the rack on the shingle. The two afloat
+    // rode where the great quay now stands (the first at x 474, z 354, then x 473.9, z 355.5;
+    // the second at x 479, z 357.5); they lie in the slip between the north pier and the
+    // middle pier now, out past the quay's sea face (content/wickharbor_harbor.ts)
+    { key: 'hexBoat', x: 486.7, z: 359.1, rot: 1.3, scale: 6, float: 0.1 },
+    { key: 'hexBoat', x: 490.4, z: 360.1, rot: 1.3 + Math.PI, scale: 6, float: 0.1 },
     { key: 'hexBoat', x: 484, z: 346, rot: 2.3, scale: 6 },
     { key: 'hexBoatrack', x: 486, z: 340, rot: 0.9, scale: 6 },
     // harbor cargo around the office and the stalls

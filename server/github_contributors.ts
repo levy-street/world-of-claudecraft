@@ -261,6 +261,16 @@ export async function topContributors(limit = LEADERBOARD_MAX): Promise<DevLeade
 }
 
 /** Test-only: clear the cache so each case starts cold. */
+/**
+ * Whether a real contributor snapshot has loaded since boot. Before the first
+ * successful fetch (or while a cold failure is cooling down) every login reads
+ * as 0 merged PRs, which is "unknown", not "zero": consumers that act on a
+ * zero (clearing a worn rung title) must wait for this.
+ */
+export function contributorsSnapshotLoaded(): boolean {
+  return contributorsCache !== null;
+}
+
 export function resetContributorsCache(): void {
   contributorsCache = null;
   refreshing = null;

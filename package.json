@@ -1,6 +1,6 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.43.3",
+  "version": "0.44.0",
   "private": true,
   "license": "MIT",
   "author": {
@@ -33,6 +33,7 @@
     "electron:build": "node scripts/electron-build.mjs build",
     "electron:build:steam": "node scripts/electron-build.mjs build steam",
     "electron:build:epic": "node scripts/electron-build.mjs build epic",
+    "host-diag:build": "node scripts/host_diag_build.mjs",
     "epic:bpt-upload": "node scripts/epic-bpt-upload.mjs",
     "preview": "vite preview",
     "format": "biome format --write .",
@@ -194,7 +195,16 @@
       "!dist/merch.html",
       "!dist/links.html",
       "!dist/CLAUDE.md",
-      "!dist/guide-stills/**"
+      "!dist/guide-stills/**",
+      "!electron/host_diag/win/**",
+      "!electron/host_diag/dist/HostDiag.ps1",
+      "!electron/host_diag/*.md"
+    ],
+    "extraResources": [
+      {
+        "from": "electron/host_diag/dist/HostDiag.ps1",
+        "to": "host-diag/HostDiag.ps1"
+      }
     ],
     "directories": {
       "buildResources": "build",
@@ -300,6 +310,7 @@
       "brace-expansion@1": "^1.1.18",
       "brace-expansion@2": "^2.1.4",
       "brace-expansion@5": "^5.0.9",
+      "devalue@5": "^5.9.2",
       "@xmldom/xmldom@0.8": "^0.8.15",
       "@xmldom/xmldom@0.9": "^0.9.12",
       "fast-uri@3": "^3.1.6",

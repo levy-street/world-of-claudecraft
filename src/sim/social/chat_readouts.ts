@@ -56,7 +56,7 @@ import {
   TOOL_RECHARGE_CAST_ID,
   xpForLevel,
 } from '../types';
-import { UNSTUCK_COOLDOWN_ID } from '../unstuck_cooldown';
+import { isUnstuckSystemCooldown } from '../unstuck_cooldown';
 import { groundHeight } from '../world';
 
 const NEARBY_RANGE = 40; // /nearby scan radius — wider than say, tighter than yell
@@ -435,7 +435,7 @@ function auraLabel(a: Aura): string {
 //
 export function cooldownsReadout(e: Entity): string {
   const parts = [...e.cooldowns]
-    .filter(([id]) => id !== UNSTUCK_COOLDOWN_ID)
+    .filter(([id]) => !isUnstuckSystemCooldown(id))
     .sort((a, b) => a[1] - b[1])
     .map(([id, remaining]) => `${ABILITIES[id]?.name ?? id} (${Math.ceil(remaining)}s)`);
   if (parts.length === 0) return 'No abilities are on cooldown.';

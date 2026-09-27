@@ -399,7 +399,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     expect(listing).toBeDefined();
     expect(listing?.craftedRecipeId).toBe(CRAFTED_COMMON_ARMOR_RECIPE);
 
-    sim.marketBuy(listing!.id, buyer);
+    sim.marketBuy(listing!.id, undefined, buyer);
     expect(sim.countItem(CRAFTED_COMMON_ARMOR, buyer)).toBe(1);
     const buyerSlotIndex = craftedVestSlotIndex(sim, buyer);
     expect(buyerSlotIndex).toBeGreaterThanOrEqual(0);

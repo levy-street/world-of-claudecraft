@@ -165,6 +165,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Арсенал Боевой мощи',
     desc: 'Украшения и оружие Войны, купленные за тяжело добытую честь.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Галерея Авангарда',
+    desc: 'Комплекты специализаций и оружие второго сезона Боевой мощи, покупаются за честь.',
+  },
   // Vault of Ages (Phase 21): composed from the shipped vault noun (the
   // col_reliquary_complete title reads Хранитель Сокровищницы).
   horizons_vault_of_ages: {
@@ -184,7 +188,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: 'Героизм: Горнило Последнего Источника',
-    desc: 'Оружие, которое падает только в героическом режиме с Игнивара, Вестника Последнего Пламени.',
+    desc: 'Оружие, которое падает только в героическом режиме, и аксессуары рейда с Игнивара, Вестника Последнего Пламени.',
   },
   conquerors_varkhul: {
     name: 'Внутреннее Горнило',
@@ -192,7 +196,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: 'Героизм: Внутреннее Горнило',
-    desc: 'Щиты и оружие, которые падают только в героическом режиме с Варкхула, отца ковки Последнего Пламени.',
+    desc: 'Щиты, предметы для левой руки и оружие, которые падают только в героическом режиме с Варкхула, отца ковки Последнего Пламени.',
   },
   professions_forgebreaker: {
     name: 'Горнолом',

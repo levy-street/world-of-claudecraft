@@ -25,12 +25,18 @@ import { loadGltf, loadKtx2Texture, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
 import { recordBuildSpan, timeBuildSpan } from '../build_spans';
 import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
-import { applySurfaceDetail, riggedWornFamilyFor } from '../worn_stone';
+import { applyRiggedWornDetail, applySurfaceDetail } from '../worn_stone';
 import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { coalesceFarBakeGroups, farBakeGroupRanges } from './far_bake_groups_core';
-import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
+import { padMissingUv } from './far_bake_uv_pad';
+import {
+  type HandGrip,
+  KAYKIT_ONE_HAND_SWORD_GRIP,
+  KAYKIT_SHIELD_ACCESSORIES,
+  KAYKIT_SHIELD_GRIPS,
+} from './held_item_grips';
 import { pruneHeldPropIdles, registerHeldPropIdle } from './held_prop_idle';
 import { composedLookReady } from './look_pieces';
 import { buildMakeupDecal } from './makeup';
@@ -100,6 +106,8 @@ import { optimizeSkinGpuLayout } from './skin_gpu_layout';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
 import { buildStubbleDecal, headNodeName } from './stubble';
 import { TINTED_MATERIAL_IDLE_CACHE_MAX, TintedMaterialCache } from './tinted_material_cache_core';
+import { prepareWarriorAbilityClips } from './warrior_ability_clips';
+import { prepareWarriorActionFallbacks } from './warrior_action_fallbacks';
 import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
 import { markOwnedWeaponSkinMaterials } from './weapon_skin_materials';
 
@@ -275,10 +283,7 @@ const KAYKIT_HAND_GRIPS: Record<string, { r: HandGrip; l?: HandGrip }> = {
       scale: 0.7204,
     },
   },
-  '1H_Sword': {
-    r: { position: [0, 0.555174, 0], quaternion: [0, 1, 0, 0], scale: 0.8876 },
-    l: { position: [0, 0.555174, 0], quaternion: [0, 0, 0, 1], scale: 0.8876 },
-  },
+  '1H_Sword': KAYKIT_ONE_HAND_SWORD_GRIP,
   '2H_Sword': {
     r: { position: [0, 0.8148, 0], quaternion: [0, 1, 0, 0], scale: 1.1829 },
   },
@@ -1959,6 +1964,11 @@ function applyLowReadabilityLift(
     // polish (and its cream lift) is skipped outright: deliberate, the tiers
     // trade colour accuracy for readability in different places.
     if (authored && lambert.map) lambert.emissiveMap = lambert.map;
+    // An authored VERTEX-coloured held prop (the harbormaster's gear) has no map to scale
+    // the floor through, and three never multiplies emissive by vertex colour: the uniform
+    // floor would film its dark felt grey. Its albedo lives in the vertices, so it takes no
+    // floor. Held props only: an authoredAtlas body keeps the floor it always had.
+    else if (authored && role === 'weapon' && lambert.vertexColors) lambert.emissive.setScalar(0);
   }
 }
 
@@ -2159,8 +2169,7 @@ function buildTintedClone(
     // the shared surface-detail layer at LOW strength in OBJECT space (rigs
     // animate; a world projection swims). Class-body/skin atlases and 'Glow'
     // materials never match (riggedWornFamilyFor's allowlist has no fallback).
-    const worn = riggedWornFamilyFor(mat.name);
-    if (worn) applySurfaceDetail(mat, worn.family, { strength: worn.strength, objectSpace: true });
+    applyRiggedWornDetail(mat);
   } else {
     if ((src as THREE.MeshBasicMaterial).isMeshBasicMaterial) {
       // Armour materials are always MeshStandardMaterial (the KayKit atlases),
@@ -2468,6 +2477,8 @@ export function prepareVisual(key: string): PreparedVisual {
     clips.set(PALADIN_BASTION_SWEEP_CLIP, createPaladinBastionSweepClip(sweepBase));
   }
 
+  prepareWarriorAbilityClips(key, clips, def.clips.attackByAbility);
+  prepareWarriorActionFallbacks(key, clips, gltf.scene);
   // Pose a throwaway clone mid-idle, measure it, and bake the static mesh. No
   // face decals on a modular throwaway: the flatten drops them (farBakeMeshes),
   // and the default look's scalp decal would otherwise be minted and thrown
@@ -2892,9 +2903,15 @@ function bakeStaticPose(
   }
 
   if (geos.length === 0) return { geo: null, mats: [], isBody: [], slots: [] };
-  // uv presence must agree for merging — drop uvs entirely if any geo lacks them
-  const allHaveUv = geos.every((g) => g.getAttribute('uv'));
-  if (!allHaveUv) for (const g of geos) g.deleteAttribute('uv');
+  // uv presence must agree for merging. PAD the parts that lack one rather
+  // than dropping it everywhere: a composed body always carries colour-only
+  // face parts (head, ears, eyes, mouth, brows) with no uv at all, and the old
+  // "delete uv from every geo" arm stripped the atlas-mapped kit beside them
+  // too, so the frozen far mesh drew the whole robe and hat from the single
+  // texel at uv (0,0), a flat untextured body the moment a peer or NPC
+  // crossed into the static band (the "NPCs lose their textures" report).
+  // A zero uv on a part that never samples a map costs nothing.
+  padMissingUv(geos);
 
   // One group per distinct key, fed to the merge in grouped order so each
   // group's members land CONTIGUOUSLY (one addGroup can only cover a run).

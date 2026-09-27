@@ -263,6 +263,13 @@ const CALLBACK_KEYS = [
   // this list's append-only rule.
   // Thornhollow Fields battleground hooks (social/battleground.ts).
   'bgOnPlayerDeath',
+  // World-quest callbacks are append-only at the end of the established seam.
+  'onMobKilledForWorldQuests',
+  'onNodeGatheredForWorldQuests',
+  'onObjectInteractedForWorldQuests',
+  'currentWorldQuestRotation',
+  'hasActiveWorldQuest',
+  'completeWorldQuestEscort',
 ] as const;
 
 // A fully-spied fake host. `clock` is mutable so a test can prove the context reads
@@ -285,6 +292,7 @@ function makeFakeHost() {
     riftEvents: [],
     nextRiftInstanceId: 1,
     riftPortalNextAt: 120,
+    transportClockOffset: 0,
     riftPortalSpawnCount: 0,
     get rng() {
       return rng;
@@ -341,6 +349,19 @@ function makeFakeHost() {
     nextArenaMatchId: 1,
     bgQueue: [],
     bgMatches: new Map(),
+    worldPvpDisabled: false,
+    hillState: { active: null, window: 0, plan: null, attempts: 0, retryAt: 0, passTick: 0 },
+    hillProbe: { wet: () => false, steep: () => false, blocked: () => false, zoneIdAt: () => null },
+    worldPvpBooks: {
+      recentDamage: new Map(),
+      recentSupport: new Map(),
+      paidDeaths: new Set(),
+      killsByPair: new Map(),
+      zoneOf: new Map(),
+      nextDisarmAt: Number.POSITIVE_INFINITY,
+      zonePassTick: Number.NEGATIVE_INFINITY,
+      sweptAtTick: 0,
+    },
     bgBusySlots: new Set(),
     bgOutcomes: [],
     bgProposals: [],
@@ -441,9 +462,15 @@ function makeFakeHost() {
     dropPartyMarkers: vi.fn(),
     formDungeonFinderGroup: vi.fn(() => null),
     onMobKilledForQuests: vi.fn(),
+    onMobKilledForWorldQuests: vi.fn(),
     onRecipeCraftedForQuests: vi.fn(),
     onNodeGatheredForQuests: vi.fn(),
     onCropFarmedForQuests: vi.fn(),
+    onNodeGatheredForWorldQuests: vi.fn(),
+    onObjectInteractedForWorldQuests: vi.fn(() => false),
+    currentWorldQuestRotation: vi.fn(() => ({ cycle: '', quests: [] })),
+    hasActiveWorldQuest: vi.fn(() => false),
+    completeWorldQuestEscort: vi.fn(),
     onInventoryChangedForQuests: vi.fn(),
     checkQuestReady: vi.fn(),
     countItem: vi.fn(() => 0),

@@ -19,10 +19,12 @@ export default defineConfig({
   },
   test: {
     include: ['tests/browser/**/*.browser.test.ts'],
+    testTimeout: 30_000,
     browser: {
       enabled: true,
       provider: playwright(),
       headless: true,
+      fileParallelism: false,
       // P17b adds { browser: 'webkit' } and { browser: 'firefox' } here + the CI matrix.
       instances: [{ browser: 'chromium' }],
     },

@@ -12,6 +12,8 @@ import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import { ambientNpcQuestMarkerKind } from '../sim/quests/ambient_quest_marker';
 import { type QuestMarkerKind, strongerQuestMarker } from '../sim/quests/quest_marker_kind';
 import { type Entity, GATHER_CAST_ID } from '../sim/types';
+import { investigationDisguiseHidden } from '../sim/world_quest_investigation_visibility';
+import { shadowGuardHidden } from '../sim/world_quest_shadow_visibility';
 import { abilityDisplayNameFromSource } from '../ui/ability_display_name';
 import { resolveHudAuraIconId } from '../ui/aura_icon_runtime';
 import { cheaterTagLabel } from '../ui/cheater_tag';
@@ -61,6 +63,7 @@ import { type NameplatePlan, nameplatePlanInto, newNameplatePlan } from './namep
 import { npcRoleLabel, npcRoleLineCarriesTrainerTitle } from './npc_role_label';
 import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
+import { WorldQuestTraceLabels } from './world_quest_trace_labels';
 
 const NAMEPLATE_LEVEL_NUMBER_OPTIONS = { maximumFractionDigits: 0 } as const;
 // The dot countdown's two shapes, hoisted for the same reason the level options
@@ -182,6 +185,7 @@ export class NameplatePainter {
   private readonly isHostilePlayer: (e: Entity) => boolean;
   private readonly surface: NameplateCanvasSurface;
   private readonly states = new Map<number, NameplateCanvasState>();
+  private readonly traceLabels = new WorldQuestTraceLabels();
   private readonly tmpV = new THREE.Vector3();
   private readonly tmpV2 = new THREE.Vector3();
   private readonly plan: NameplatePlan = newNameplatePlan();
@@ -273,6 +277,9 @@ export class NameplatePainter {
       // The canvas pass draws only what it reaches, so skipping the entity is the
       // whole hide (the removed DOM-era hideNameplate had to clear styles instead).
       if (isQuestGatedEntityHidden(entity, world.questLog)) continue;
+      // The courier guards exist only for a cloaked infiltrator (their bodies are
+      // withheld by the renderer gate; the plate must not outlive the body).
+      if (shadowGuardHidden(entity, world) || investigationDisguiseHidden(entity, world)) continue;
       // A compile gate can leave this entity with no body at all (the arrival
       // gate hides the whole group). Its plate is then the only thing that says
       // an enemy is there, so it is forced on over the nameplate toggles for
@@ -329,7 +336,10 @@ export class NameplatePainter {
         this.states.set(id, state);
       }
       this.updateDynamicState(state, entity, player, plan, languageChanged);
-      if (!state.initialized || fullPass || plan.urgent || languageChanged) {
+      // The /pvp flag is the one content input read every pass: a flip
+      // re-resolves the row THIS frame (state.pvpFlag), never on the tier cadence.
+      const pvpFlipped = state.pvpFlag !== (entity.pvpFlag === true);
+      if (!state.initialized || fullPass || plan.urgent || languageChanged || pvpFlipped) {
         this.resolveContent(state, entity, player, plan, showOwnNameplate, showDevBadges);
       }
 
@@ -403,6 +413,7 @@ export class NameplatePainter {
       const state = this.states.get(anchor.id);
       if (state) this.surface.drawBase(state, anchor.sx, anchor.sy);
     }
+    this.traceLabels.draw(world, this.surface, this.camera, width, height);
     // Emotes paint last on the same canvas so they remain legible over other
     // nameplates without restoring a per-entity compositor layer.
     for (let i = 0; i < this.anchorCount; i++) {
@@ -589,7 +600,13 @@ export class NameplatePainter {
       const roleColor = specialRoleColor(entity.discordRole);
       const roleTag = discordRoleTagLabel(entity.discordRole);
       const baseName = roleTag ? `[${roleTag}] ${entity.name}` : entity.name;
-      state.name = entity.afk ? `<${t('hudChrome.nameplate.afkTag')}> ${baseName}` : baseName;
+      // The /pvp flag tag is shown to EVERY viewer, flagged or not (a colour-blind
+      // player and an unflagged one both need to read it); the red colour below
+      // is the hostile-to-me verdict on top of it.
+      state.pvpFlag = entity.pvpFlag === true;
+      const pvpTag = state.pvpFlag ? `<${t('hudChrome.nameplate.pvpTag')}> ` : '';
+      const afkTag = entity.afk ? `<${t('hudChrome.nameplate.afkTag')}> ` : '';
+      state.name = `${pvpTag}${afkTag}${baseName}`;
       state.nameColor = roleColor ?? '#7fb8ff';
       // A member's line is their guild; a PLEDGE (docs/prd/guild-pledge-board.md)
       // borrows the same line with the localized pledge wording, so an

@@ -7,6 +7,7 @@
 // missing performance.memory => null, etc.). It owns no state — createMetricsSampler
 // returns a sample() closure.
 
+import { chosenCadenceIntervalMs } from '../render/chosen_cadence';
 import type { MetricsSample } from './perf_overlay_model';
 
 /** The renderer fields the overlay surfaces (a narrow view of renderer.perfStats). */
@@ -61,6 +62,8 @@ export interface SamplerDeps {
   readMemory?: () => { usedMb: number; limitMb: number | null } | null;
   readConnectionType?: () => string | null;
   isBackgrounded?: () => boolean;
+  /** The interval a chosen Frame Rate Limit aims at, 0 with none. */
+  readChosenFrameMs?: () => number;
 }
 
 function defaultReadMemory(): { usedMb: number; limitMb: number | null } | null {
@@ -90,6 +93,7 @@ export function createMetricsSampler(deps: SamplerDeps): () => MetricsSample {
   const readMemory = deps.readMemory ?? defaultReadMemory;
   const readConnectionType = deps.readConnectionType ?? defaultReadConnectionType;
   const isBackgrounded = deps.isBackgrounded ?? defaultIsBackgrounded;
+  const readChosenFrameMs = deps.readChosenFrameMs ?? chosenCadenceIntervalMs;
 
   return (): MetricsSample => {
     const r = (deps.getRenderer?.() ?? deps.renderer).perfStats();
@@ -102,6 +106,7 @@ export function createMetricsSampler(deps: SamplerDeps): () => MetricsSample {
       frameTimeMs: deps.meter.frameTimeMs(),
       fps1Low: deps.meter.lowFps(1),
       fps01Low: deps.meter.lowFps(0.1),
+      chosenFrameMs: readChosenFrameMs(),
       frameSamples: deps.meter.graphSamples(),
       online: isOnline,
       connected: isOnline ? online.connected : true,

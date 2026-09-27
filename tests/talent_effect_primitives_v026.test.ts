@@ -353,11 +353,14 @@ describe('Talents V2 movement and control primitives', () => {
     rogue.player.cooldowns.set('vanish', 50);
     rogue.player.cooldowns.set('kick', 10);
     rogue.player.abilityCharges = {
-      sprint: { charges: 1, maxCharges: 3, recharge: 30, rechargeLength: 30 },
+      // Two spent charges, each with its own running parallel recharge timer.
+      sprint: { charges: 1, maxCharges: 3, recharge: 12, rechargeLength: 30, recharges: [12, 30] },
     };
     runAbilityEffect(rogue, null, 'preparation');
     expect([...rogue.player.cooldowns.keys()]).toEqual(['kick']);
-    // Preparation resets the charge pool to full alongside the plain cooldowns.
+    // Preparation resets the charge pool to full alongside the plain cooldowns,
+    // exactly a fresh pool: the spent charges' timers go too, or each would pay
+    // out another charge on top of the refill.
     expect(rogue.player.abilityCharges.sprint).toEqual({
       charges: 3,
       maxCharges: 3,

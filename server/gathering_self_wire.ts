@@ -19,10 +19,12 @@ import {
   type HarvestPreference,
   savedHarvestPreference,
 } from '../src/sim/professions/harvest_preference';
+import type { TownFocusPendingView } from '../src/sim/professions/town_focus_pending';
 import type { ToolEffectSlotView } from '../src/world_api/professions';
 
 export interface GatheringSelfReaders {
   townFocusFor(pid: number): Record<string, number>;
+  townFocusPendingFor(pid: number): TownFocusPendingView | null;
   gatheringProficiencyFor(pid: number): Record<string, number>;
   toolEffectSlotsFor(pid: number): readonly ToolEffectSlotView[];
   harvestPreferenceFor(pid: number): HarvestPreference | null;
@@ -49,6 +51,14 @@ export function appendGatheringSelfWire(
   maybeSerialized: (key: string, serialized: string) => void,
 ): void {
   maybe('tfocus', sim.townFocusFor(pid));
+  // The queued re-spec (IWorld `townFocusPending`, #1144). Wire key `tfpend`;
+  // see TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts. Null for
+  // every player with nothing waiting, so it delta-elides away after the
+  // first snapshot; while a re-spec IS waiting the whole-seconds countdown
+  // moves the value once a second, one small object per player, and only
+  // for the few players mid-re-spec. Shipped as the view itself so the
+  // online mirror re-parses it through the same strict leaf the save uses.
+  maybe('tfpend', sim.townFocusPendingFor(pid));
   // Raw gathering-profession proficiency map (IWorld `gatheringProficiency`,
   // #1119), a second small read alongside `prof` for the ORIGINAL flat-map
   // shape used by the `/dev gather` chat cheat and existing consumers. Wire

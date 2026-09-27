@@ -162,6 +162,15 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   staff_of_the_last_spring: 'staff',
   forgefire_spire: 'staff',
   wand_of_quenched_sparks: 'wand',
+  // Faction quartermaster epics (content/faction_vendors.ts).
+  riftwarden_voidblade: 'sword',
+  dawnkeeper_consecrated_mace: 'mace',
+  forgemaster_crag_cleaver: 'axe',
+  // Warfare Season 2 honor weapons (content/pvp_honor_season2.ts).
+  vanguard_verdict_greatsword: 'sword',
+  vanguard_oath_blade: 'sword',
+  vanguard_fang_dagger: 'dagger',
+  vanguard_warstaff: 'staff',
 };
 
 /**

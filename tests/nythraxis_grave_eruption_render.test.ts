@@ -8,6 +8,7 @@ import {
   abilityVfxFullSpecFor,
   abilityVfxSpecFor,
 } from '../src/render/ability_vfx/encounter_specs';
+import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
 import {
   handleMageGroundSpellfxEvent,
   MageGroundFx,
@@ -17,7 +18,9 @@ import { meteorLandingBurst } from '../src/render/meteor_landing_burst';
 import {
   isNythraxisGraveEruption,
   NYTHRAXIS_GRAVE_ERUPTION_PALETTE,
+  NYTHRAXIS_GRAVE_ERUPTION_RIM_MIN_THICKNESS,
   NYTHRAXIS_GRAVE_SHARD_RISE_SECONDS,
+  nythraxisGraveEruptionRimThickness,
   nythraxisGraveShardFade,
   nythraxisGraveShardPoseInto,
   nythraxisGraveShardRise,
@@ -154,6 +157,71 @@ describe('Grave Eruption warning rings', () => {
     expect(fire.getObjectByName('mage-meteor-body')?.visible).toBe(true);
     expect(fire.getObjectByName('mage-meteor-trail')?.visible).toBe(true);
     expect(scene.getObjectByName('ground_fire_aoe')).toBeDefined();
+  });
+
+  it('thickens the warning ring with a real rim band, brighter than the boundary line, fire meteors excepted', () => {
+    // Player feedback (Discord, "Nythraxis Meteor Colour Change"): the
+    // telegraph's outline was a 1px WebGL line, unreadable at melee range
+    // against the crypt's own purple torchlight and purple player buffs. The
+    // fix is a real ring MESH straddling the exact actionable radius; the
+    // actionable `boundary` line itself must stay untouched.
+    const scene = new THREE.Scene();
+    const fx = new MageGroundFx(scene, () => 0, vi.fn());
+    fx.syncWorldMeteorWarnings({
+      activeIgnivarMeteors: [FIRE_WARNING],
+      activeVarkhulAnvilMeteors: [],
+      activeVarkhulForgestormWarnings: [],
+      activeNythraxisGraveEruptions: [ERUPTION],
+    });
+    const grave = meteorRoot(scene, ERUPTION.id);
+    const fire = meteorRoot(scene, FIRE_WARNING.id);
+    // Only the Nythraxis flavour gets the thickened rim; the shared fire
+    // meteor system (Ignivar/Varkhul) is untouched by this change.
+    expect(fire.getObjectByName('mage-meteor-telegraph-rim')).toBeUndefined();
+
+    const rim = grave.getObjectByName('mage-meteor-telegraph-rim') as THREE.Mesh;
+    expect(rim).toBeDefined();
+    expect(rim.renderOrder).toBe(floorVfxRenderOrder('encounter', 9));
+    const rimMaterial = rim.material as THREE.MeshBasicMaterial;
+    // Brighter than the plain boundary color (additive contrast against the
+    // hall's own ambient purple), while staying the same purple-danger hue.
+    const boundaryColor = new THREE.Color(NYTHRAXIS_GRAVE_ERUPTION_PALETTE.boundary);
+    expect(rimMaterial.color.r).toBeGreaterThan(boundaryColor.r);
+    expect(rimMaterial.opacity).toBeGreaterThan(0.5);
+
+    // The actionable boundary line is exactly unchanged: still the authored
+    // radius, on every vertex.
+    const boundary = grave.getObjectByName('mage-meteor-telegraph-boundary') as THREE.LineLoop;
+    const boundaryPositions = boundary.geometry.getAttribute('position');
+    for (let index = 0; index < boundaryPositions.count; index++) {
+      expect(
+        Math.hypot(
+          boundaryPositions.getX(index) - ERUPTION.x,
+          boundaryPositions.getZ(index) - ERUPTION.z,
+        ),
+      ).toBeCloseTo(ERUPTION.radius, 5);
+    }
+
+    // The rim band straddles that same radius with real width: its inner
+    // edge sits inside the actionable circle, its outer edge outside it, by
+    // the pure-core thickness function.
+    const thickness = nythraxisGraveEruptionRimThickness(ERUPTION.radius);
+    expect(thickness).toBeGreaterThanOrEqual(NYTHRAXIS_GRAVE_ERUPTION_RIM_MIN_THICKNESS);
+    const rimPositions = rim.geometry.getAttribute('position');
+    const rimRadii: number[] = [];
+    for (let index = 0; index < rimPositions.count; index++) {
+      rimRadii.push(
+        Math.hypot(rimPositions.getX(index) - ERUPTION.x, rimPositions.getZ(index) - ERUPTION.z),
+      );
+    }
+    expect(Math.min(...rimRadii)).toBeCloseTo(ERUPTION.radius - thickness / 2, 5);
+    expect(Math.max(...rimRadii)).toBeCloseTo(ERUPTION.radius + thickness / 2, 5);
+
+    // The rim fades out with the boundary at impact, and disposes cleanly.
+    fx.impactMeteor(ERUPTION.id, ERUPTION.x, ERUPTION.z);
+    expect(rimMaterial.opacity).toBe(0);
+    fx.update(3);
+    expect(meteorRoot(scene, ERUPTION.id)).toBeUndefined();
   });
 
   it('erupts a rising bone-shard cluster at the authoritative impact, then fades it', () => {

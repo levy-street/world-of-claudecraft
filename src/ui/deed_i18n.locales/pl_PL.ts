@@ -1140,4 +1140,81 @@ export const table: DeedLocaleTable = {
 
     name: 'Źródło bez kajdan',
   },
+  exp_arcane_calligraphy: {
+    name: 'Pewna Ręka',
+    desc: 'Ukończ Arkanową Kaligrafię w Dolinie Eastbrook.',
+  },
+  exp_arcane_calligraphy_gold: {
+    name: 'Pisane Gwiazdami',
+    desc: 'Zdobądź ocenę Złotą w Arkanowej Kaligrafii.',
+    title: 'Zwoławca Ruin',
+  },
+  exp_forge_helper: {
+    name: 'Pomocniczy Młotek',
+    desc: 'Pomóż Kowi Marze ukończyć tarczę w Varkhul.',
+  },
+  exp_last_barricade: {
+    name: 'Ostatnia Barykada',
+    desc: 'Utrzymuj przełęcz leśną przed hordą nieumarłych.',
+  },
+  exp_borrowed_face: {
+    name: 'Pożyczona Twarz',
+    desc: 'Wyjaw i pokonaj infiltratora wśród straży Fenbridge.',
+  },
+  exp_windrider_slalom: {
+    name: 'Slalom Jeźdźca Wichru',
+    desc: 'Ukończ zjazd szybowca mechanicznego przez kanion Wichrowego Grzbietu.',
+  },
+  exp_duskweave_dispatches: {
+    name: 'Depeszyce Tkactwa Zmroku',
+    desc: 'Odzyskaj depesze bandytów, noszą zaklęty płaszcz Valeriego.',
+  },
+  exp_wisp_maze: {
+    name: 'Światło w Labiryncie',
+    desc: 'Odzyskaj skradzione portmonetki i ucieknij z labiryntu Ogrodu Wiecznego.',
+  },
+  prog_rift_watch_trusted: {
+    name: 'Zaufany Strażnikom Rozdarcia',
+    desc: 'Osiągnij status Zaufanego u Strażników Rozdarcia.',
+  },
+  prog_church_order_trusted: {
+    name: 'Zaufany Zakonowi Kościoła',
+    desc: 'Osiągnij status Zaufanego u Zakonu Kościoła.',
+  },
+  prog_automatons_trusted: {
+    name: 'Zaufany Automatom',
+    desc: 'Osiągnij status Zaufanego u Automatów.',
+  },
+  prog_rift_watch_champion: {
+    name: 'Mistrz Strażników Rozdarcia',
+    desc: 'Osiągnij status Mistrza u Strażników Rozdarcia.',
+    title: 'Strażnik Rozdarcia',
+  },
+  prog_church_order_champion: {
+    name: 'Mistrz Zakonu Kościoła',
+    desc: 'Osiągnij status Mistrza u Zakonu Kościoła.',
+    title: 'Strażnik Świtu',
+  },
+  prog_automatons_champion: {
+    name: 'Mistrz Automatów',
+    desc: 'Osiągnij status Mistrza u Automatów.',
+    title: 'Mistrz Kuźni',
+  },
+  prog_faction_champion_all: {
+    name: 'Mistrz Każdego Sztandaru',
+    desc: 'Osiągnij status Mistrza u Strażników Rozdarcia, Zakonu Kościoła i Automatów.',
+  },
+  exp_clue_first_casket: {
+    name: 'Skarb Znaleziony',
+    desc: 'Otwórz Skrzynię Skarbu wykopananą na końcu poszukiwania wskazówek.',
+  },
+  exp_clue_ten_caskets: {
+    name: 'Poszukiwacz Skarbu',
+    desc: 'Otwórz 10 Skrzyn Skarbu wykopanych na końcu poszukiwań wskazówek.',
+    title: 'Poszukiwacz Skarbu',
+  },
+  exp_harbor_to_harbor: {
+    name: 'Port do Portu',
+    desc: 'Żegluj obiema promami tam i z powrotem: Eastbrook do Spokoju Księżyca i Wickharbor do Varkhul.',
+  },
 };

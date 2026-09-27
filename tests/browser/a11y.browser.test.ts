@@ -343,12 +343,24 @@ describe('axe: options menu', () => {
     await expectClean(root);
   });
 
+  it('Overlays sub-view is clean (labelled title that resolves)', async () => {
+    const { root, win } = optionsWindow();
+    win.toggle();
+    root.querySelector<HTMLElement>('.opt-btn[data-menu-action="overlays"]')?.click();
+    expect(root.querySelector('#options-title')?.textContent).toBe(t('hudChrome.options.overlays'));
+    expect(root.getAttribute('aria-labelledby')).toBe('options-title');
+    await expectClean(root);
+  });
+
   it('Performance sub-view names the dialog with aria-label, no dangling idref', async () => {
     const { root, win } = optionsWindow();
     win.toggle(); // main menu first
-    // Navigate to the Performance sub-view the real way: click its menu entry. Its title
-    // comes from the self-contained perf panel (no id=options-title), so the dialog must
-    // name itself via aria-label, NOT keep the now-dangling aria-labelledby.
+    // Navigate to the Performance sub-view the real way: Overlays, then its entry. Its
+    // title comes from the self-contained perf panel (no id=options-title), so the dialog
+    // must name itself via aria-label, NOT keep the now-dangling aria-labelledby.
+    const overlaysBtn = root.querySelector<HTMLElement>('.opt-btn[data-menu-action="overlays"]');
+    expect(overlaysBtn, 'overlays menu entry present').toBeTruthy();
+    overlaysBtn?.click();
     const perfBtn = Array.from(root.querySelectorAll<HTMLElement>('.opt-btn')).find(
       (b) => b.textContent === t('hudChrome.perf.title'),
     );
@@ -720,7 +732,6 @@ describe('axe: character window', () => {
           }) as never,
         statCellHtml: () => '',
         statTooltipHtml: () => '',
-        talentSummaryHtml: () => '',
         progressionHtml: () => '',
         slotName: (s: string) => s,
         // The 3D turntable + skin picker are HUD-owned (rendered by callback). The skin
@@ -799,6 +810,10 @@ function marketInfo(shape: WorldShape): MarketInfo {
     sellPriceItemId: null,
     sellLowestPrice: null,
     sweepQuote: null,
+    orders: [],
+    myOrderCount: 0,
+    maxOrders: 6,
+    unlistedMaterials: [],
   };
   // The sim shape may carry extra server-only fields the view ignores; the client mirror
   // carries only the decoded fields (the offline-only-shape trap catches).
@@ -896,6 +911,10 @@ describe('axe: market window (Sim + ClientWorld shapes)', () => {
                 sellPriceItemId: 'worn_sword',
                 sellLowestPrice: null,
                 sweepQuote: null,
+                orders: [],
+                myOrderCount: 0,
+                maxOrders: 6,
+                unlistedMaterials: [],
               },
               inventory: [{ itemId: 'worn_sword', count: 3 }],
               copper: 0,

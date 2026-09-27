@@ -18,18 +18,22 @@ function makeHarness() {
       endCast: typeof endCast;
     };
     vfx: { projectile: typeof genericProjectile };
-    abilityVfx: { handleSpellfx: ReturnType<typeof vi.fn> };
+    abilityVfx: {
+      handleSpellfx: ReturnType<typeof vi.fn>;
+      castInterrupted: ReturnType<typeof vi.fn>;
+    };
     sim: { entities: Map<number, never> };
     views: Map<number, never>;
     triggerAttack: ReturnType<typeof vi.fn>;
   };
   renderer.needleOfFateVfx = { spawn: needleSpawn, beginCast, endCast };
   renderer.vfx = { projectile: genericProjectile };
-  renderer.abilityVfx = { handleSpellfx: vi.fn(() => false) };
+  const castInterrupted = vi.fn();
+  renderer.abilityVfx = { handleSpellfx: vi.fn(() => false), castInterrupted };
   renderer.sim = { entities: new Map<number, never>() };
   renderer.views = new Map<number, never>();
   renderer.triggerAttack = vi.fn();
-  return { renderer, needleSpawn, beginCast, endCast, genericProjectile };
+  return { renderer, needleSpawn, beginCast, endCast, genericProjectile, castInterrupted };
 }
 
 describe('Needle of Fate renderer routing', () => {
@@ -71,10 +75,13 @@ describe('Needle of Fate renderer routing', () => {
 
     harness.renderer.handleEvent({ type: 'castStop', entityId: 11, success: true });
     expect(harness.endCast).toHaveBeenCalledWith(11);
+    // A completed bar keeps its cast gate verdict for the release that follows.
+    expect(harness.castInterrupted).not.toHaveBeenCalled();
 
     const interrupted = makeHarness();
     interrupted.renderer.handleEvent({ type: 'castStop', entityId: 11, success: false });
     expect(interrupted.endCast).toHaveBeenCalledWith(11);
+    expect(interrupted.castInterrupted).toHaveBeenCalledWith(11);
 
     const other = makeHarness();
     other.renderer.handleEvent({

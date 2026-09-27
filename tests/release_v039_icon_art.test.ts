@@ -83,7 +83,7 @@ const SECOND_PASS_RECORD_SHA256 =
   // by hand again, never a JSON round trip. No capture or asset was retaken.
   // PR #3898 adds the four painted elixirs to the hotbar-eligible set, advancing
   // the sealed hotbarItems census 81 -> 85 without retaking any captures.
-  '1cc5c0af72c78bf0fe048c052861dc10008cb55925b013441a19730f9a83c581';
+  'd1cbf7c3318b57e56869206c2d4ae1edefa13fa8edc8338d88e5b601c1f123eb';
 const EVIDENCE = {
   'icon-art-before-after-desktop.png': {
     sha256: '61d19fb321f2b30eb3749e0966f26efea0fa4df53edae4b253cfd70edb82cd7a',
@@ -381,7 +381,7 @@ describe('release v0.39 icon-art second-pass lineage', () => {
         // the release arm's two new abilities riding the v0.40.0 sync merge.
         // The hotbar census stays at this branch's 75 (the release's own arm
         // read 72 without the three role foods).
-        abilities: { live: 405, painted: 405 },
+        abilities: { live: 408, painted: 408 },
         // 76 at the first v0.42.0 sync: the release's one new hotbar item, the
         // Bonebound Rickshaw reins (reins_rickshaw_mount, kind 'mount'), joins
         // the census and ships committed painted art, so painted moves with
@@ -488,7 +488,7 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     expect(new Set(liveAbilityIds).size, 'live ability ids remain unique').toBe(
       liveAbilityIds.length,
     );
-    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(405);
+    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(408);
     expect(
       liveAbilityIds.filter((id) => !paintedAbilityIds.has(id)),
       'every live ability resolves through production to committed painted art',
@@ -513,11 +513,14 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     // PR #3898 admits the four painted elixirs to the production hotbar item
     // inventory. The production set is broader than the sealed historical
     // second-pass record because it also includes later pending-art families.
-    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(101);
+    // The Viridian Valestrider's reins ship painted art the same way: 102.
+    // The trinket slot (PR 4173) admits its 18 usable trinkets to the hotbar
+    // (isHotbarItemId), each with committed painted art: 120.
+    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(120);
     expect(
       artSubjectHotbarItemIds,
       'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
-    ).toHaveLength(101);
+    ).toHaveLength(120);
     expect(pendingHotbarItemIds, 'ITEM_ART_PENDING hotbar items').toHaveLength(0);
     expect(
       pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),

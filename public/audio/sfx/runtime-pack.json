@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "25f1e98d41749404d47f80110cb3f5d3af3689689d3f30b04c348d62cb18bf11",
-  "catalogHash": "77475257efebc1f4fb73a47d810c561da4f01be17a790982bc80b5ff5e06789b",
+  "bundleId": "3fe70c74da407892fc94c9b36146148e8fd05f983f314e6d1ac76285af13a7c0",
+  "catalogHash": "7e8fbe8ae171f27554cc0ca5076c0926e67e6ac37ef4ab5de3c5eb3065a3fa6e",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -982,6 +982,18 @@
       "gain": 1.819701,
       "playbackRate": 1
     },
+    "impact_masterwork_execution": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/impact_masterwork_execution.mp3?v=aac729b724d5",
+          "bytes": 47064,
+          "sha256": "aac729b724d51745e8f984d6361bb64d9ef622926e9ba1a548ade0ce254abe31"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "impact_metal": {
       "variants": [
         {
@@ -1034,6 +1046,582 @@
         }
       ],
       "gain": 1.678804,
+      "playbackRate": 1
+    },
+    "impact_warrior_avatar_rise": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_avatar_rise_1.mp3?v=3c1e2a2610cf",
+          "bytes": 11955,
+          "sha256": "3c1e2a2610cfab8939c43b2a173157ef9092529e6ea3533267fdfaa76313ac55"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_avatar_rise_2.mp3?v=93eb1ae7909a",
+          "bytes": 11955,
+          "sha256": "93eb1ae7909a0a5451945d1d6d7744863b5383c73b6a90231a32be73df963f14"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_blood_recovery": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_blood_recovery_1.mp3?v=dc62b6c8c76f",
+          "bytes": 6940,
+          "sha256": "dc62b6c8c76ff11b2c999bf16473a4087b4d38c676f2e42a2d21a81e114cbf35"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_blood_recovery_2.mp3?v=fbd947e7382e",
+          "bytes": 6940,
+          "sha256": "fbd947e7382e9e31a5f04d5cf462c0b11ff7904c45a754507a56c08501d75e3f"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_bloodletting": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_bloodletting_1.mp3?v=0ef2ddb807a4",
+          "bytes": 6940,
+          "sha256": "0ef2ddb807a47f973ae9a05c53d9e97f24fe24b88dd0c0bd2a7b0c2f66dca5ce"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_bloodletting_2.mp3?v=a48fdff820f5",
+          "bytes": 6940,
+          "sha256": "a48fdff820f54f112712af1531fcea715524ceb4f050cae7995a4cf11017e7eb"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_breachmaker": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_breachmaker_1.mp3?v=d0cbacbc3ef2",
+          "bytes": 8821,
+          "sha256": "d0cbacbc3ef23fa6b036a96861d3b1aecf0aef57f3cad6685d3d1ce27c8dd1c0"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_breachmaker_2.mp3?v=d7a9413f8a3d",
+          "bytes": 8821,
+          "sha256": "d7a9413f8a3d10c33745426699d55afe7a22d027419f54f0ea8c2ec24422246c"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_brute": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_brute_1.mp3?v=82473d1d1faa",
+          "bytes": 6940,
+          "sha256": "82473d1d1faada17da2d42636fa07a057b5ecc92823adc31114c1f55d52a1683"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_brute_2.mp3?v=fe69127dc27a",
+          "bytes": 6940,
+          "sha256": "fe69127dc27a2a40eabab296468cc578ad6cb6153cc9973eeae04cd0ae5d9421"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_early_grave": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_early_grave_1.mp3?v=f1fe520491cd",
+          "bytes": 8821,
+          "sha256": "f1fe520491cd7f37045d2e73fbd6a40d77c776961f211411def4754e0f5d3505"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_early_grave_2.mp3?v=9b53700e2758",
+          "bytes": 8821,
+          "sha256": "9b53700e2758b6fcf7f8f1bef05455a85aafdc34cff7cc2ee60e7312e0304ce2"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_faultline": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_faultline_1.mp3?v=0d925cf14998",
+          "bytes": 11955,
+          "sha256": "0d925cf1499849dd42f5d0a8ac685377dbfb1bb249ed460bf638b918a1a7a24e"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_faultline_2.mp3?v=bf672826adef",
+          "bytes": 11955,
+          "sha256": "bf672826adefa4f10ced5cf3a5633a8a96c89c3f28e7e4061eda89bd8ab229c1"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_goad_bark": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_goad_bark_1.mp3?v=b0cefd0e05f3",
+          "bytes": 9448,
+          "sha256": "b0cefd0e05f3424aa31e674d3480255f500d5e2af9f37662edb787cba54a722b"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_goad_bark_2.mp3?v=9a38609dde19",
+          "bytes": 9448,
+          "sha256": "9a38609dde1979feb7de8cc4d85307f0e98691b602d1bd413679d0191476f865"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_guard_lock": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_guard_lock_1.mp3?v=b526c46e022b",
+          "bytes": 7567,
+          "sha256": "b526c46e022b2bee8bc55003fc7e0341c8fecfcf7f2a5c95a246cb1e78f0fa1f"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_guard_lock_2.mp3?v=df0aec28e05e",
+          "bytes": 7567,
+          "sha256": "df0aec28e05eb8ed7b6588c0adc66067cb77eb5acf209fe3ab1998ba6cf9fc09"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_gyre_sweep": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_gyre_sweep_1.mp3?v=c12cfc9d82e4",
+          "bytes": 10075,
+          "sha256": "c12cfc9d82e4987c30e9484e259e3ff964a7e150f112b158126855d6db0f4f5a"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_gyre_sweep_2.mp3?v=fcabf79f889a",
+          "bytes": 10075,
+          "sha256": "fcabf79f889ab5eabc43779f13a5f40d41d1441b66ab60d74e4f94dbddf44404"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_hammer_land": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_hammer_land_1.mp3?v=898cb89c1564",
+          "bytes": 9448,
+          "sha256": "898cb89c156467a18b3b8841f859149837f22ba7cf8bd14d1e57061cc9ab8da0"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_hammer_land_2.mp3?v=3749af23e57e",
+          "bytes": 9448,
+          "sha256": "3749af23e57edb52646e38f338cfd41a3c859a5f184fa1c551cb19739c86d41f"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_hobble_cut": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_hobble_cut_1.mp3?v=55f52281062f",
+          "bytes": 6940,
+          "sha256": "55f52281062fe1ee751737bbb40b7e2d2b145e6397e7a31974c3c365f52542b8"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_hobble_cut_2.mp3?v=c43598f77f3a",
+          "bytes": 6940,
+          "sha256": "c43598f77f3a85baf4126b23c1fbff64d308aa73f48d334ec1bc0403bd16039a"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_jawcrack_break": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_jawcrack_break_1.mp3?v=596aa386cf8f",
+          "bytes": 6940,
+          "sha256": "596aa386cf8f9d598479df627ced7ab52c9d6d7b84b749b13ce66db3fc32576f"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_jawcrack_break_2.mp3?v=77ce9df155c3",
+          "bytes": 6940,
+          "sha256": "77ce9df155c3d759967b8f72d33447c777e50a98d6c4f96040bd28c0d64b4d04"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_maiming": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_maiming_1.mp3?v=c8247a731f1c",
+          "bytes": 6940,
+          "sha256": "c8247a731f1c47b7ee9d9373e081425259f996ea35ffe7399e8ce1e83410350f"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_maiming_2.mp3?v=741fdce59e74",
+          "bytes": 6940,
+          "sha256": "741fdce59e741d95349399062081b29c569b5cd0cfb6e588f864b748e85958aa"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_mending_lock": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_mending_lock_1.mp3?v=d507fd265e9c",
+          "bytes": 9448,
+          "sha256": "d507fd265e9c3cc3e749e34ce0b0c1158ff3892b33643a85f54194c9cc44ab80"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_mending_lock_2.mp3?v=dc10fc0a39e8",
+          "bytes": 9448,
+          "sha256": "dc10fc0a39e8f6bd1aee2bcf0013a1957b98392d38def947c2df248a555ff357"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_quake": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_quake_1.mp3?v=ac7ca9bca34d",
+          "bytes": 10075,
+          "sha256": "ac7ca9bca34deb16b943f668e7488d09e60d4393996b6a3ce14289f3022450e3"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_quake_2.mp3?v=eef720bb38e2",
+          "bytes": 10075,
+          "sha256": "eef720bb38e299344fcdcf31ec3e12f2825b9c022ae59adb474cc92d60cf4e51"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_reaver": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_reaver_1.mp3?v=a000652b85eb",
+          "bytes": 6940,
+          "sha256": "a000652b85ebb917ba484b849d51a6366795ec3a572726394a3070fe4d2c2ac0"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_reaver_2.mp3?v=b20993a271ef",
+          "bytes": 6940,
+          "sha256": "b20993a271ef93a48d328a03d1b30364c964a2ed1a649beb9569aa3bcecde71f"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_reckless_tear": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_reckless_tear_1.mp3?v=4a72c7eaed7d",
+          "bytes": 10075,
+          "sha256": "4a72c7eaed7de06a52ac295d85107699b2177a149968db3d34ba7c9f2cf773cb"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_reckless_tear_2.mp3?v=c49fb3dd5be9",
+          "bytes": 10075,
+          "sha256": "c49fb3dd5be9bd61f48265e12399bd81e0ccb26676ec6ea88753d5a59bbae8cc"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_red_harvest_finish": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_red_harvest_finish_1.mp3?v=5d4841e1a12b",
+          "bytes": 7567,
+          "sha256": "5d4841e1a12b35a37bc1c945d15e4f27233840de6a7da3c7bb83484db3c9b494"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_red_harvest_finish_2.mp3?v=4668eabe990c",
+          "bytes": 7567,
+          "sha256": "4668eabe990c46f799e74a6513066081838e34e3efe4b92f8e60e5d960f31690"
+        }
+      ],
+      "gain": 1.230269,
+      "playbackRate": 0.96
+    },
+    "impact_warrior_red_harvest_first": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_red_harvest_first_1.mp3?v=b294de3b9ce0",
+          "bytes": 5686,
+          "sha256": "b294de3b9ce05d36868f32b2844e43657059772da1699b63caf82c5ecd92354f"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_red_harvest_first_2.mp3?v=27280593d526",
+          "bytes": 5686,
+          "sha256": "27280593d5265904d562bf53331dbff0011d193cf9b99b11a516275804766e6a"
+        }
+      ],
+      "gain": 1.047129,
+      "playbackRate": 1
+    },
+    "impact_warrior_red_harvest_second": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_red_harvest_second_1.mp3?v=2dd774cf6cb4",
+          "bytes": 5686,
+          "sha256": "2dd774cf6cb4c68707991a5e62b8bb27450933bb9dfc76a6112a8240f62a993e"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_red_harvest_second_2.mp3?v=288458e5f2b0",
+          "bytes": 5686,
+          "sha256": "288458e5f2b0930d6d13b6f7a47517d57f6124d893df0aa4838b6454d6232e1d"
+        }
+      ],
+      "gain": 1.109175,
+      "playbackRate": 1
+    },
+    "impact_warrior_redhand": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_redhand_1.mp3?v=dfc35196a9cf",
+          "bytes": 6940,
+          "sha256": "dfc35196a9cfda7fe6ecdf68b240b83a3b2e918a4460a854542a67e8a697b823"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_redhand_2.mp3?v=f4ed2b4250c3",
+          "bytes": 6940,
+          "sha256": "f4ed2b4250c3e1f737e4c7cc2a40f74dd653d73d77a06ac75f153518be311f20"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_resolve_lock": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_resolve_lock_1.mp3?v=0c1b7f486fd4",
+          "bytes": 9448,
+          "sha256": "0c1b7f486fd41dce1369e3c59d861b97fe7adc5a5be387529b844b3fefee9d45"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_resolve_lock_2.mp3?v=a3c6d003861e",
+          "bytes": 9448,
+          "sha256": "a3c6d003861e15d13fd8b495b8f2fcede6157c350f6ef27889facd68aad4294a"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_revenge": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_revenge_1.mp3?v=72acaf5b1d9f",
+          "bytes": 8194,
+          "sha256": "72acaf5b1d9fa4e3f4231f6e553a105ea8ad4499f90efb845dd51eaa99933af6"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_revenge_2.mp3?v=a19dea0a0a96",
+          "bytes": 8194,
+          "sha256": "a19dea0a0a96d71dd725785d22f4515adfbb7f37cdc5eed692ab9257c77cf4e7"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_seething_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_seething_release_1.mp3?v=1999d374926e",
+          "bytes": 8821,
+          "sha256": "1999d374926ef0d7669e9085d8f8982c0608bdb8da522da1516ef2a0673548c3"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_seething_release_2.mp3?v=08ac6faebe4e",
+          "bytes": 8821,
+          "sha256": "08ac6faebe4e36f2b66a9565480ce013b19d39f96ef15dc82a570db66e557d01"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_shear_peel": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_shear_peel_1.mp3?v=7b25738b4023",
+          "bytes": 9448,
+          "sha256": "7b25738b402374f85d00bfae37f287b679a2eb7689fc7bc8f9359086091089f2"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_shear_peel_2.mp3?v=2cb965d290f4",
+          "bytes": 9448,
+          "sha256": "2cb965d290f4e1454b199afd5a4d7066751196e1ef1899699b9033c4405ce4b9"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_shieldcrack": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_shieldcrack_1.mp3?v=84284eb1dfac",
+          "bytes": 7567,
+          "sha256": "84284eb1dfac17396737445ee363d23f346cee735bd38a1413db79079470a570"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_shieldcrack_2.mp3?v=424a414e652e",
+          "bytes": 7567,
+          "sha256": "424a414e652e0429a1e595add098d562a9ba3b1a91b363f78f5948eb2c27192e"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_sword_guard_lock": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_sword_guard_lock_1.mp3?v=668bed6dbd69",
+          "bytes": 7567,
+          "sha256": "668bed6dbd698a1a49acb8d4e3c4d63a543872f068b4cf276e0aa3ea6d821fba"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_sword_guard_lock_2.mp3?v=aee0cd1e7e41",
+          "bytes": 7567,
+          "sha256": "aee0cd1e7e41ec6f07974d82533b29818176daf0e655eeb387fbbb60ff7d472b"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_toll_clench": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_toll_clench_1.mp3?v=d2409eeea8bb",
+          "bytes": 7567,
+          "sha256": "d2409eeea8bb8882dcf45d93328be72c65449e0e6fa4233b8f4aac40b9c3cea7"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_toll_clench_2.mp3?v=f0b9f9e8fcde",
+          "bytes": 7567,
+          "sha256": "f0b9f9e8fcde2b9e585197f231bf48b834a58b07093329f7f296d1b824095ce9"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_twinstrike_first": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_twinstrike_first_1.mp3?v=93304be6c998",
+          "bytes": 5686,
+          "sha256": "93304be6c99896d6d587f35ddc5265fa47cc40ecc82d98fa1e5f9ff86c1aeb98"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_twinstrike_first_2.mp3?v=4d0926556fee",
+          "bytes": 5686,
+          "sha256": "4d0926556feeb067c352200bc4c9d128b142a4a101b36d4f4e33a5bb54e9f97c"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_twinstrike_second": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_twinstrike_second_1.mp3?v=67d67f1a4447",
+          "bytes": 6940,
+          "sha256": "67d67f1a444724867fa1db29cd9c063a2ebfc81f6a4a1e5f8a577a2af1d7aafd"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_twinstrike_second_2.mp3?v=82c15d0074c0",
+          "bytes": 6940,
+          "sha256": "82c15d0074c00b77f057f775b814946cdfc2acb971029395656e044753a269f6"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_victory": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_victory_1.mp3?v=e024c06920f4",
+          "bytes": 7567,
+          "sha256": "e024c06920f471ecf970d334b47b5933fbaedad734d06ced31556def1baf7207"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_victory_2.mp3?v=a878e841c0e7",
+          "bytes": 7567,
+          "sha256": "a878e841c0e7225af916260e206158d381918094267c02480b2564dbca5859b5"
+        }
+      ],
+      "gain": 1,
       "playbackRate": 1
     },
     "intimidating_shout": {
@@ -1442,6 +2030,510 @@
         }
       ],
       "gain": 1.819701,
+      "playbackRate": 1
+    },
+    "melee_warrior_avatar_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_avatar_release_1.mp3?v=fb135c66fab8",
+          "bytes": 5059,
+          "sha256": "fb135c66fab862d6c0f20de43f0cc1192fddd59f024db5d91ed78b23f2c5a5a5"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_avatar_release_2.mp3?v=5e8e1a5e94b4",
+          "bytes": 5059,
+          "sha256": "5e8e1a5e94b4ef5e7752c80895ce2b30d1a76dfce2d7b6d91c2d1b83df7a36f4"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_bloodletting_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_bloodletting_release_1.mp3?v=85fa118df086",
+          "bytes": 4432,
+          "sha256": "85fa118df0868c5aacec9f7cae040877f588420cec4348d6f2ce5a41d2c520b6"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_bloodletting_release_2.mp3?v=d6c3f17b044d",
+          "bytes": 4432,
+          "sha256": "d6c3f17b044dfb90f1f8d43a4405cbcf97014ab914456aba796c5afd82c3787a"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_breachmaker_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_breachmaker_release_1.mp3?v=01837521d430",
+          "bytes": 4432,
+          "sha256": "01837521d430516b1f60cf28796b6ce3209e538f406420523f78f69c118c9280"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_breachmaker_release_2.mp3?v=5a2992b4e959",
+          "bytes": 4432,
+          "sha256": "5a2992b4e959c3f84f874990e4e12ee7fdd996d5b8dec3b4202224979f4b0ae6"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_brute_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_brute_release_1.mp3?v=cb27437013c5",
+          "bytes": 4432,
+          "sha256": "cb27437013c5e5b21db392e20f21538dbf2537de6303fd857020ea713df2f652"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_brute_release_2.mp3?v=cbe623d76b58",
+          "bytes": 4432,
+          "sha256": "cbe623d76b58b627a658b3b4485777ec241030ce0d5e17eb1c643747be0c084f"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_early_grave_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_early_grave_release_1.mp3?v=19485f3d4fd9",
+          "bytes": 5059,
+          "sha256": "19485f3d4fd942643e14701aae0937ddd105d69155377f5befde7684e71ee13d"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_early_grave_release_2.mp3?v=db9f797aaa37",
+          "bytes": 5059,
+          "sha256": "db9f797aaa37e471c722aed8bdf2b97b46a9c5f468246bb45e8101ec51e196be"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_faultline_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_faultline_release_1.mp3?v=62d36486a649",
+          "bytes": 5059,
+          "sha256": "62d36486a649c68cb301c4a4c52b0683993ab4aa4e4b11a4719e919a1344eb5a"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_faultline_release_2.mp3?v=cabfc74d62d6",
+          "bytes": 5059,
+          "sha256": "cabfc74d62d6145de01836fd75cd265dac06c572228369c18f7aa4661fa99ad7"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_goad_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_goad_release_1.mp3?v=d7a4c836f242",
+          "bytes": 4432,
+          "sha256": "d7a4c836f2424422e4673a3f27c7ce8b73758ed9f1768a498dbce1dfce939803"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_goad_release_2.mp3?v=40b3848280d0",
+          "bytes": 4432,
+          "sha256": "40b3848280d061d7015d406b009d3591a58d3033c4c004db81a6a7d7cdd77390"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_guard_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_guard_release_1.mp3?v=dd9b21ffc769",
+          "bytes": 4432,
+          "sha256": "dd9b21ffc76935c49644e8c1fd28832e05d2106f6d6cd00ec396b20d1b796680"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_guard_release_2.mp3?v=34605a24893b",
+          "bytes": 4432,
+          "sha256": "34605a24893be428d844b38ec1f29ad95c06222ee3f7f6e6caa28392a52099ad"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_gyre_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_gyre_release_1.mp3?v=81aec3f67e56",
+          "bytes": 4432,
+          "sha256": "81aec3f67e5676ef533c62763f7c8599f9908cf1769787b71a7c942aec440aca"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_gyre_release_2.mp3?v=353743c35145",
+          "bytes": 4432,
+          "sha256": "353743c3514574c392c5293a87f72f276e3d8fee23613a1747597382ef03f8e4"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_hammer_throw": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_hammer_throw_1.mp3?v=f54ff3ebeaa8",
+          "bytes": 5686,
+          "sha256": "f54ff3ebeaa8aeddccabbb71a93bb95816e18e00e5844e43a4274d5faaaa953e"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_hammer_throw_2.mp3?v=7fa73d6dd941",
+          "bytes": 5686,
+          "sha256": "7fa73d6dd941d180c840227e04ebb1c42ec81106c1c3ddd12d53f4bcfefecee6"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_hobble_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_hobble_release_1.mp3?v=0c10b66add36",
+          "bytes": 4432,
+          "sha256": "0c10b66add3649a4849e958d0d6e9ca47b147c42aa741623e04c12b05fe24d21"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_hobble_release_2.mp3?v=4bc535c2ea02",
+          "bytes": 4432,
+          "sha256": "4bc535c2ea02eeb6345304ed50ddade74b5e447e91d6c64149102d7cc0986e93"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_jawcrack_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_jawcrack_release_1.mp3?v=55bf5174d529",
+          "bytes": 4432,
+          "sha256": "55bf5174d5294b50f3219316361d5fe3dc6da2c7ad4212bf804802312bfd84a1"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_jawcrack_release_2.mp3?v=f21c90c0131f",
+          "bytes": 4432,
+          "sha256": "f21c90c0131fe94b2ab181c4c2395bcc9e780b140772d5d35e03f1708347e7b1"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_maiming_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_maiming_release_1.mp3?v=85ff35c147d3",
+          "bytes": 4432,
+          "sha256": "85ff35c147d3b22a5c2a0a5c43c0130e1fa767bbac3ed1c57dac8755f393902b"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_maiming_release_2.mp3?v=350545b74577",
+          "bytes": 4432,
+          "sha256": "350545b745776601091f6d328c7624faa887006fde9ac20f8817e71e73c10b4d"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_mending_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_mending_release_1.mp3?v=2c5c66166759",
+          "bytes": 5059,
+          "sha256": "2c5c661667596df144e0d4e56a5c30dc9ac0ce478f3dd80ce97feb67c47a2162"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_mending_release_2.mp3?v=17de380e63ab",
+          "bytes": 5059,
+          "sha256": "17de380e63abeee7d3a81789b6e6cb2a9588a6519224ddeb4192711476a39fdc"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_quake_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_quake_release_1.mp3?v=a3bd8c941833",
+          "bytes": 4432,
+          "sha256": "a3bd8c941833e1c0b52ed2abeef6616c8fda19d7586ee24c49a993316d0e30c8"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_quake_release_2.mp3?v=20cb97926a40",
+          "bytes": 4432,
+          "sha256": "20cb97926a40b74175efcc1cdde5cb6c19dd7ddac0b1f0257b7ecf19687e52f4"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_reaver_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_reaver_release_1.mp3?v=632913dda310",
+          "bytes": 4432,
+          "sha256": "632913dda3106e11a81a9736dc704439fa03223bc520f45e663c5a7138cb01ef"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_reaver_release_2.mp3?v=f1b1900bb920",
+          "bytes": 4432,
+          "sha256": "f1b1900bb9200b3289d2f0121d7df393228e6857210e35909a86fdf3cdccdae1"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_reckless_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_reckless_release_1.mp3?v=5756dfec13e0",
+          "bytes": 5059,
+          "sha256": "5756dfec13e026f78e4cfc834a1095dfc6e988aebedfe635b8e77996e287bb16"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_reckless_release_2.mp3?v=cb379914f6a1",
+          "bytes": 5059,
+          "sha256": "cb379914f6a1f82816d461c35f64e929f51ae09adc21ea4db3adf8f1b7b4175d"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_red_harvest_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_red_harvest_release_1.mp3?v=680d31bdce1d",
+          "bytes": 5059,
+          "sha256": "680d31bdce1d98cecd20554038687b87e2e82cc3d80b0dda4b424201938c2096"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_red_harvest_release_2.mp3?v=e110a89fe078",
+          "bytes": 5059,
+          "sha256": "e110a89fe07846a1f76a3aa0ca22512412b47fa4f3e6fc0d45f8bfde4dc6e661"
+        }
+      ],
+      "gain": 0.870964,
+      "playbackRate": 1
+    },
+    "melee_warrior_redhand_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_redhand_release_1.mp3?v=1e319d395276",
+          "bytes": 4432,
+          "sha256": "1e319d395276e679dd2cafe1207168781ed8f75388f6a10f9e186f541e2f6af6"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_redhand_release_2.mp3?v=63f80784a19c",
+          "bytes": 4432,
+          "sha256": "63f80784a19ccee8b78b1dac79e6284b4ac5e6d14dc6fa7e7a2e632f0e549a88"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_resolve_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_resolve_release_1.mp3?v=4982396b4234",
+          "bytes": 5686,
+          "sha256": "4982396b42349bbc1c78c1a3faacc14b24360f602b717bf085a36ffa32a7e58a"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_resolve_release_2.mp3?v=33312178760e",
+          "bytes": 5686,
+          "sha256": "33312178760ebc31094c2c8a5e915eab9f489d0ba5d9fd750d6cff98618bef02"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_revenge_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_revenge_release_1.mp3?v=556fd9f1974c",
+          "bytes": 4432,
+          "sha256": "556fd9f1974cde1db6113941fc7e7f7c1d6aceca3d075a921a00d2aaa015b75d"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_revenge_release_2.mp3?v=10dbea89dec1",
+          "bytes": 4432,
+          "sha256": "10dbea89dec1831b172566b29487e0e277b54e0b026a81771ea4fd2538d5b271"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_seething_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_seething_release_1.mp3?v=a29705caa1e6",
+          "bytes": 4432,
+          "sha256": "a29705caa1e61367a8ac65cff00798d10c764be6ca39556b003f783395a05deb"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_seething_release_2.mp3?v=5f75f0bb3d21",
+          "bytes": 4432,
+          "sha256": "5f75f0bb3d218ad9cb4f337b4d72725f6725c66200ac0a01494d453607fac578"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_shear_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_shear_release_1.mp3?v=ea3b7f644981",
+          "bytes": 5059,
+          "sha256": "ea3b7f6449815e7965f85e91099edc7e3b1d01f58fae8f977e93cb1e68600dff"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_shear_release_2.mp3?v=92147a1d53a1",
+          "bytes": 5059,
+          "sha256": "92147a1d53a1c973b05a282abcb65a829e988105ce68ed2e4b390a070ac5c70c"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_shieldcrack_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_shieldcrack_release_1.mp3?v=ec779c26def3",
+          "bytes": 4432,
+          "sha256": "ec779c26def3fe3fae736dc863bdab033a8c359466151982d3975b50d16c6dc7"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_shieldcrack_release_2.mp3?v=ffb9e8061d17",
+          "bytes": 4432,
+          "sha256": "ffb9e8061d172a88240e7bcba8bab863b587f5e7fc0ab516a32b69c4389c3305"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_sword_guard_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_sword_guard_release_1.mp3?v=485b3d63847a",
+          "bytes": 4432,
+          "sha256": "485b3d63847ae243dc556aa01a214c2a81a7039ab3f6e5828501a2f61d5b103a"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_sword_guard_release_2.mp3?v=a7627920ef31",
+          "bytes": 4432,
+          "sha256": "a7627920ef31a5b75c62fce17f6e25e506ca0c145080aa6caf7ec7008600187c"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_toll_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_toll_release_1.mp3?v=354ea4e840e6",
+          "bytes": 4432,
+          "sha256": "354ea4e840e6c15b6125b3b90c314a93b9012f0a81211615d504cfcace245ed9"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_toll_release_2.mp3?v=8302230e9db1",
+          "bytes": 4432,
+          "sha256": "8302230e9db1914dda030fe2a9dff03d663d35c9c3e3de624eb6f25a02b75d20"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_twinstrike_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_twinstrike_release_1.mp3?v=4356b09cea1e",
+          "bytes": 5059,
+          "sha256": "4356b09cea1eaff78e8d0fa6605c7091c23a5ae731543710dc48ebb29eacac7e"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_twinstrike_release_2.mp3?v=5730ac489a65",
+          "bytes": 5059,
+          "sha256": "5730ac489a65060d9fa04bf9fc08da117c13b482b67716c79867dbc9334f7b46"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_victory_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_victory_release_1.mp3?v=e9e9f080ebf2",
+          "bytes": 4432,
+          "sha256": "e9e9f080ebf202de7c57d968ef2f7db8016ab8da6ec483abffbd319817345f07"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_victory_release_2.mp3?v=5003b0c4567e",
+          "bytes": 4432,
+          "sha256": "5003b0c4567e97fb58d36c3eeba550babc88a51759a26f95f8eb63c85a841079"
+        }
+      ],
+      "gain": 1,
       "playbackRate": 1
     },
     "meteor": {
@@ -3070,6 +4162,30 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "mount_flap_avian_strider": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/mount_flap_avian_strider_1.mp3?v=37611b813849",
+          "bytes": 15089,
+          "sha256": "37611b813849c4a0df26dd24639a53ba6fe1b5705061c499c59566188f725f23"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/mount_flap_avian_strider_2.mp3?v=2685e4142d09",
+          "bytes": 14462,
+          "sha256": "2685e4142d0966b8f6ae8f12e07585309450d1e8e82e7d9335792d1022446984"
+        },
+        {
+          "id": "3",
+          "url": "/audio/sfx/mount_flap_avian_strider_3.mp3?v=c5618a77a924",
+          "bytes": 16343,
+          "sha256": "c5618a77a9243fc4be3c6151680292cd52a2df7dca72bfd72be8b3613b21fbb0"
+        }
+      ],
+      "gain": 1.678804,
+      "playbackRate": 1
+    },
     "mount_idle_mech_bird": {
       "variants": [
         {
@@ -3080,6 +4196,18 @@
         }
       ],
       "gain": 1.202264,
+      "playbackRate": 1
+    },
+    "mount_jump_avian_strider": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_jump_avian_strider.mp3?v=926cbef0c529",
+          "bytes": 12581,
+          "sha256": "926cbef0c529b02b8d31c135579f8c6658d68047a7839e17a2581b52570e0fbd"
+        }
+      ],
+      "gain": 1,
       "playbackRate": 1
     },
     "mount_jump_mech_bird": {
@@ -3128,6 +4256,18 @@
         }
       ],
       "gain": 1.318257,
+      "playbackRate": 1
+    },
+    "mount_land_avian_strider": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_land_avian_strider.mp3?v=94218ba01507",
+          "bytes": 6939,
+          "sha256": "94218ba01507857ad6673f7623b2534b177267282e4f52e8e1a01c70dcf1c4e8"
+        }
+      ],
+      "gain": 1,
       "playbackRate": 1
     },
     "mount_land_mech_bird": {
@@ -3191,6 +4331,48 @@
           "url": "/audio/sfx/mount_run_aether_hover_cycle.mp3?v=355a7b665113",
           "bytes": 17102,
           "sha256": "355a7b6651139d8737500829ebd23ae3d0dba02fb2d3ccb8b3506864346b8c3c"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_avian_strider": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/mount_run_avian_strider_1.mp3?v=588a0c0404b8",
+          "bytes": 7566,
+          "sha256": "588a0c0404b84511083ff13ca168c2da016503cead7b53e89a92d6c04fda88fc"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/mount_run_avian_strider_2.mp3?v=6a43d6916cd1",
+          "bytes": 7566,
+          "sha256": "6a43d6916cd19e7c9c4eb85563e4db6d24e16e9b0d7f5c94f77fb8894ff6f933"
+        },
+        {
+          "id": "3",
+          "url": "/audio/sfx/mount_run_avian_strider_3.mp3?v=4ed021635fe3",
+          "bytes": 7566,
+          "sha256": "4ed021635fe3eb80ee0120ca6619ae16c37f6a915c418f0689d1f24166a5d652"
+        },
+        {
+          "id": "4",
+          "url": "/audio/sfx/mount_run_avian_strider_4.mp3?v=b9313677189b",
+          "bytes": 7566,
+          "sha256": "b9313677189bd5650173b67646ba15d7a34afc1d286cdd0d5f65c4fdd01c0b34"
+        },
+        {
+          "id": "5",
+          "url": "/audio/sfx/mount_run_avian_strider_5.mp3?v=bb318c7fe250",
+          "bytes": 7566,
+          "sha256": "bb318c7fe250a29f738e1b898ce761653d06f9778f1f93f47a5dbc272df61837"
+        },
+        {
+          "id": "6",
+          "url": "/audio/sfx/mount_run_avian_strider_6.mp3?v=b26934b064db",
+          "bytes": 7566,
+          "sha256": "b26934b064dbc7b9c9a12d55ee8168f0f19d988de3eec6dac95c660df03dc683"
         }
       ],
       "gain": 1,
@@ -3484,6 +4666,42 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "mount_squawk_avian_strider": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/mount_squawk_avian_strider_1.mp3?v=bc1983640c5d",
+          "bytes": 19478,
+          "sha256": "bc1983640c5df72caee098220a05237cc437af6b00f912cc1d5ccbf59650913a"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/mount_squawk_avian_strider_2.mp3?v=9cd1462856a5",
+          "bytes": 16970,
+          "sha256": "9cd1462856a58c5c118f69a7c20577b7abc7f2cd76505ad761e336efa5f91704"
+        },
+        {
+          "id": "3",
+          "url": "/audio/sfx/mount_squawk_avian_strider_3.mp3?v=5956564938de",
+          "bytes": 15716,
+          "sha256": "5956564938deb7582de0d8af2673e400c238b27d6868f0b10931058db2c06ef4"
+        }
+      ],
+      "gain": 1.678804,
+      "playbackRate": 1
+    },
+    "mount_summon_avian_strider": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_summon_avian_strider.mp3?v=027e86bcf442",
+          "bytes": 30763,
+          "sha256": "027e86bcf442e89459c2e0a0b9d39c2f4febe4053df6173ebfb9c9d46ceb2d51"
+        }
+      ],
+      "gain": 2.238721,
+      "playbackRate": 1
+    },
     "mount_summon_goblin_rocket_sled": {
       "variants": [
         {
@@ -3644,6 +4862,24 @@
         }
       ],
       "gain": 2.018366,
+      "playbackRate": 1
+    },
+    "piercing_howl": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/piercing_howl_1.mp3?v=64e8edef3de9",
+          "bytes": 12582,
+          "sha256": "64e8edef3de9634d6b5718d5dba6176da79eb425c2431913ce032b9adf033c41"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/piercing_howl_2.mp3?v=00d77394ee99",
+          "bytes": 12582,
+          "sha256": "00d77394ee9996070587605af035e4b9ce61033d79a0f86a88b2e3d1b27f0566"
+        }
+      ],
+      "gain": 1,
       "playbackRate": 1
     },
     "player_death": {

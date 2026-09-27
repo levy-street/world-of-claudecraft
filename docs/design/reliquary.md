@@ -18,7 +18,7 @@ standard at `DESIGN.md`.
 | Shelf | Top-level category: Conquerors, Professions, Horizons (and Overview). |
 | Page | One boss, dungeon, delve, raid wing, profession gallery, or horizon group. |
 | Relic | One unique slot on a page (item id, profession mark, mount, skin, title). |
-| Clear count | Lifetime clears / kills credited for that page's source. |
+| Clear count | Lifetime clears / kills credited for that page's source. A dungeon page's meter counts every difficulty that pays the page: the five-man base pages and the Nythraxis base page read Normal plus Heroic (`difficulty: 'any'`), because their Heroic claim drops every relic on them; a heroic-only epic page reads Heroic alone, and a base page whose Normal table holds relics Heroic never pays (the Crucible raid pages) reads Normal alone. Derived from the live loot tables and pinned by `tests/reliquary_content.test.ts` ("count every difficulty that pays the page"). |
 | Illumination | Completing every relic on a page (first-time celebration). |
 | Curator rank | Cosmetic completion tiers over catalogued fills (items, marks, mounts, titles). Account weapon skins never score rank. Five ranks at 1 / 10 / 25 / 50 / 100 owned (`apprentice`, `keeper`, `master`, `grand`, `eternal`, in `src/sim/reliquary.ts`). The thresholds are deliberately NOT rescaled as the catalog grows: rank 5 stays at 100 owned. Both DISPLAY and the rank-bridge GRANTS read the account-wide union with the account ledger (below): every character on the account earns a bridge the account qualifies for, and each is recorded as an earner. |
 | Account ledger | The account-wide record behind both books (`src/sim/account_ledger.ts`): which characters on the account found each relic (`IWorldReliquary.reliquaryAccountFinds`, keys `item:<id>` / `mark:<id>` / `mount:<key>`) and earned each deed. Every ownership read the window, tracker, character sheet, and inspect card make is the union of the character's own surfaces and the ledger, and so is the grant read behind the rank bridges and the completion ladder (every character on the account earns them, each recorded); an owned cell names its finders (`hudChrome.reliquary.foundBy`). Persisted in `account_relic_finds` (the `character_deeds` sibling, minus the character FK plus a name snapshot, so a find outlives its character), loaded per join, fanned out live to the account's other sessions, written and decoded catalog-bounded, and read by the public character sheet through an ids-only TTL cache (`server/account_ledger_keys_cache.ts`). The deletion survival, catalog bounding, public-sheet read, scope tooltip, and the reworded guide sentence follow jgyy's PR #3933. Full model: `docs/design/deeds.md`, "The account ledger". |
@@ -140,8 +140,9 @@ repo's anchor rule):
   its primary, so The Rift shows lifetime clears and S-rank clears together.
 - **Kill-proof mark pages.** The realm-rares page fills from `slain:*` marks
   rather than item ids, one mark per authored rare.
-- **Honor-stock pages.** The warfare pages list purchasable honor gear, which
-  has no class gate and no drop roll.
+- **Honor-stock pages.** The warfare pages list purchasable honor gear with no
+  drop roll. The entry-tier Warfare stock has no class gate; the Warfare Season 2
+  Vanguard Gallery is class-locked, so it sits outside completion ('personal').
 - **Outside-completion pages.** Rule 7's `excludeFromCompletion` pages
   (retired and personal) render their own local pair and drop out of both
   sides of every completion pair.
@@ -151,6 +152,14 @@ lowers the live read for players who had finished it, so a completed page
 shows as incomplete again until they find the new relic. This is inherent to
 a growing catalog (earned deeds stay sticky, live page reads do not) and will
 repeat at every growth. It owes a release-note line whenever a growth ships.
+The trinket wave (`src/sim/content/trinkets.ts`) is one such growth: every
+dropped or honor-sold trinket is catalogued on the page of the place it comes
+from (its five-man heroic boss page, the Heroic Nythraxis page, The Rift, the
+Warfare Armory, or for the raid trinkets both the Normal and the Heroic page
+of their Crucible boss, since they drop on both difficulties and rule 5 fills
+every page that lists an id), pinned in `tests/reliquary_content.test.ts`. The
+one marks-priced trinket (the Heroic Quartermaster's Wayfarer's Lodestone) has
+no page, like the rest of that vendor's stock.
 
 ## Adding a page (the recipe)
 
@@ -654,8 +663,9 @@ None of these is a defect. Each is a product decision with no ruling yet.
 - **The Conquerors capstone grew a long tail**, and the Book completion feat
   behind it with it: the honor stock, the realm-rare drops, and the two
   S-rank-only Rift legendaries at a very low roll per clear. Everything is
-  verified reachable (the heroic pool draws class-agnostically and the honor
-  stock has no class gate), so this is a difficulty escalation to accept or
+  verified reachable (the heroic pool draws class-agnostically and the
+  entry-tier honor stock has no class gate; the class-locked Season 2 Vanguard
+  Gallery sits outside completion), so this is a difficulty escalation to accept or
   soften deliberately, not a defect.
 - **The unfillable-slot nudge.** Because the two pages holding the three
   unfillable slots are not `excludeFromCompletion`, they permanently satisfy the

@@ -22,6 +22,7 @@
 import { isMaterialsOnlyBag } from './bag_pools';
 import { BAG_SOCKETS } from './bags';
 import { type DevKitRole, devKitRole } from './content/dev_kit_roles';
+import { FACTION_VENDOR_GATES } from './content/faction_vendors';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from './content/heroic_loot';
 import { HEROIC_VENDOR_ITEMS } from './content/heroic_vendor';
 import { WARFARE_ITEMS } from './content/pvp_honor';
@@ -148,6 +149,11 @@ export function isFreshTwentyItem(cls: PlayerClass, item: ItemDef): boolean {
   // obtainable in game. Table membership is exactly the question being asked, so it
   // is what gets asked.
   if (ABOVE_TIER_ITEM_IDS.has(item.id)) return false;
+  // A fresh 20 has no faction standing, so the quartermasters' gated ladder
+  // (content/faction_vendors.ts) is not in reach on day one regardless of
+  // quality: the Recognized neck is rare-quality but three days of world
+  // quests away.
+  if (Object.hasOwn(FACTION_VENDOR_GATES, item.id)) return false;
   // Belt and braces for anything carrying PvP ratings that a table sweep missed.
   if (
     item.pvpOffenseRating !== undefined ||

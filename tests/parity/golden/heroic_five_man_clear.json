@@ -10,13 +10,13 @@
     "awardHeroicMarks on a five-man heroic kill: marksPerParticipant to every participant, plus the gravewyrm_sanctum:heroic daily lockout",
     "class:warrior"
   ],
-  "draws": 62,
-  "drawDigest": "86e69dc4",
+  "draws": 63,
+  "drawDigest": "2cb65480",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1006,
+      "nextId": 1010,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -30,9 +30,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1033,
-      "state": "4d9dff60",
-      "events": "42cdc878",
+      "nextId": 1037,
+      "state": "b90c4813",
+      "events": "d25cd5af",
       "rng": {
         "draws": 21,
         "digest": "7cbdb21a"
@@ -79,14 +79,16 @@
           "delveClears": {},
           "delveDaily": {},
           "dungeonDifficulty": "heroic",
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -113,6 +115,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -154,13 +157,15 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -190,6 +195,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -231,13 +237,15 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1008,
+          "entityId": 1012,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -267,6 +275,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -308,13 +317,15 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1009,
+          "entityId": 1013,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -344,6 +355,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -385,13 +397,15 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1014,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -421,6 +435,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -436,7 +451,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -450,7 +465,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1062,
-          "id": 1006,
+          "id": 1010,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -501,7 +516,7 @@
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 665,
-          "id": 1007,
+          "id": 1011,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -552,7 +567,7 @@
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 665,
-          "id": 1008,
+          "id": 1012,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -603,7 +618,7 @@
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 665,
-          "id": 1009,
+          "id": 1013,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -654,7 +669,7 @@
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 665,
-          "id": 1010,
+          "id": 1014,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -706,7 +721,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 13138,
-          "id": 1029,
+          "id": 1033,
           "infernoTimer": 30,
           "kind": "mob",
           "level": 22,
@@ -745,12 +760,12 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 1033,
-      "state": "a90ebe73",
-      "events": "5fce258b",
+      "nextId": 1037,
+      "state": "2a9994ff",
+      "events": "cf99e425",
       "rng": {
-        "draws": 62,
-        "digest": "86e69dc4"
+        "draws": 63,
+        "digest": "2cb65480"
       },
       "label": "death",
       "players": [
@@ -871,14 +886,16 @@
           "delveClears": {},
           "delveDaily": {},
           "dungeonDifficulty": "heroic",
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -898,11 +915,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -931,6 +948,26 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
+            "dungeons": [
+              2
+            ],
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
+          },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
               "gravewyrm_sanctum:heroic"
@@ -960,7 +997,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 1542,
+            "damageTaken": 1771,
             "deaths": 1,
             "xpGained": 98
           },
@@ -1053,13 +1090,15 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -1083,11 +1122,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1115,6 +1154,26 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
+            "dungeons": [
+              2
+            ],
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
+          },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
               "gravewyrm_sanctum:heroic"
@@ -1230,13 +1289,15 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1008,
+          "entityId": 1012,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -1260,11 +1321,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1292,6 +1353,26 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
+            "dungeons": [
+              2
+            ],
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
+          },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
               "gravewyrm_sanctum:heroic"
@@ -1407,13 +1488,15 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1009,
+          "entityId": 1013,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -1437,11 +1520,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1469,6 +1552,26 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
+            "dungeons": [
+              2
+            ],
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
+          },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
               "gravewyrm_sanctum:heroic"
@@ -1584,13 +1687,15 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1014,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -1614,11 +1719,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -1646,6 +1751,26 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
+            "dungeons": [
+              2
+            ],
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
+          },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
               "gravewyrm_sanctum:heroic"
@@ -1665,7 +1790,7 @@
               "name": "Battle Stance",
               "remaining": 3599.95,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -1679,7 +1804,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 5,
           "hp": 1062,
-          "id": 1006,
+          "id": 1010,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1729,7 +1854,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.05,
           "healPower": 41,
-          "id": 1007,
+          "id": 1011,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1779,7 +1904,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1008,
+          "id": 1012,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1828,7 +1953,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1009,
+          "id": 1013,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1877,7 +2002,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1010,
+          "id": 1014,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1922,11 +2047,11 @@
           "corpseHarvestState": {
             "priorityEndsAt": 10,
             "priorityMemberKeys": [
-              "entity:1006",
-              "entity:1007",
-              "entity:1008",
-              "entity:1009",
-              "entity:1010"
+              "entity:1010",
+              "entity:1011",
+              "entity:1012",
+              "entity:1013",
+              "entity:1014"
             ],
             "token": {}
           },
@@ -1939,7 +2064,7 @@
           "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1029,
+          "id": 1033,
           "inCombat": true,
           "infernoTimer": 30,
           "kind": "mob",
@@ -1960,11 +2085,11 @@
           },
           "lootFfaTimer": 59.95,
           "lootRecipientIds": [
-            1006,
-            1007,
-            1008,
-            1009,
-            1010
+            1010,
+            1011,
+            1012,
+            1013,
+            1014
           ],
           "lootable": true,
           "maxHp": 13138,
@@ -1990,7 +2115,7 @@
           "stats": {
             "armor": 857
           },
-          "tappedById": 1006,
+          "tappedById": 1010,
           "templateId": "korzul_the_gravewyrm",
           "weapon": {
             "max": 2779,
@@ -2003,12 +2128,12 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 1033,
-      "state": "a90ebe73",
+      "nextId": 1037,
+      "state": "2a9994ff",
       "events": "741638a5",
       "rng": {
-        "draws": 62,
-        "digest": "86e69dc4"
+        "draws": 63,
+        "digest": "2cb65480"
       },
       "label": "final",
       "players": [
@@ -2129,14 +2254,16 @@
           "delveClears": {},
           "delveDaily": {},
           "dungeonDifficulty": "heroic",
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -2156,11 +2283,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2189,6 +2316,26 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
+            "dungeons": [
+              2
+            ],
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
+          },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
               "gravewyrm_sanctum:heroic"
@@ -2218,7 +2365,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 1542,
+            "damageTaken": 1771,
             "deaths": 1,
             "xpGained": 98
           },
@@ -2311,13 +2458,15 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -2341,11 +2490,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2373,6 +2522,26 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
+            "dungeons": [
+              2
+            ],
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
+          },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
               "gravewyrm_sanctum:heroic"
@@ -2488,13 +2657,15 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1008,
+          "entityId": 1012,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -2518,11 +2689,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2550,6 +2721,26 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
+            "dungeons": [
+              2
+            ],
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
+          },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
               "gravewyrm_sanctum:heroic"
@@ -2665,13 +2856,15 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1009,
+          "entityId": 1013,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -2695,11 +2888,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2727,6 +2920,26 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
+            "dungeons": [
+              2
+            ],
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
+          },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
               "gravewyrm_sanctum:heroic"
@@ -2842,13 +3055,15 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1014,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -2872,11 +3087,11 @@
               "itemId": "heroic_mark"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wyrmfall_core",
               "materialSources": [
                 {
-                  "count": 1,
+                  "count": 2,
                   "source": {}
                 }
               ]
@@ -2904,6 +3119,26 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "bossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            },
+            "dungeons": [
+              2
+            ],
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
+          },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
               "gravewyrm_sanctum:heroic"
@@ -2923,7 +3158,7 @@
               "name": "Battle Stance",
               "remaining": 3599.95,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -2937,7 +3172,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 5,
           "hp": 1062,
-          "id": 1006,
+          "id": 1010,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -2987,7 +3222,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.05,
           "healPower": 41,
-          "id": 1007,
+          "id": 1011,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -3037,7 +3272,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1008,
+          "id": 1012,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3086,7 +3321,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1009,
+          "id": 1013,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3135,7 +3370,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1010,
+          "id": 1014,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3180,11 +3415,11 @@
           "corpseHarvestState": {
             "priorityEndsAt": 10,
             "priorityMemberKeys": [
-              "entity:1006",
-              "entity:1007",
-              "entity:1008",
-              "entity:1009",
-              "entity:1010"
+              "entity:1010",
+              "entity:1011",
+              "entity:1012",
+              "entity:1013",
+              "entity:1014"
             ],
             "token": {}
           },
@@ -3197,7 +3432,7 @@
           "fallStartY": 0.6,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1029,
+          "id": 1033,
           "inCombat": true,
           "infernoTimer": 30,
           "kind": "mob",
@@ -3218,11 +3453,11 @@
           },
           "lootFfaTimer": 59.95,
           "lootRecipientIds": [
-            1006,
-            1007,
-            1008,
-            1009,
-            1010
+            1010,
+            1011,
+            1012,
+            1013,
+            1014
           ],
           "lootable": true,
           "maxHp": 13138,
@@ -3248,7 +3483,7 @@
           "stats": {
             "armor": 857
           },
-          "tappedById": 1006,
+          "tappedById": 1010,
           "templateId": "korzul_the_gravewyrm",
           "weapon": {
             "max": 2779,

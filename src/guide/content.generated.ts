@@ -1326,6 +1326,18 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Thunder Reservoir"
       },
       {
+        "id": "lightning_overload",
+        "name": "Arc Overload"
+      },
+      {
+        "id": "lava_burst",
+        "name": "Magma Burst"
+      },
+      {
+        "id": "thunderstorm",
+        "name": "Stormbreak"
+      },
+      {
         "id": "chain_lightning",
         "name": "Skybranch"
       },
@@ -2450,7 +2462,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Landing",
       "The Watch Meadow",
       "The Sundered Cliffs",
-      "The Riftfields"
+      "The Riftfields",
+      "The Wreck"
     ],
     "welcome": "Cross the sandbar and Gullhaven's bell will find you before the town does. The breaks tear open without warning, and the redoubt holds its shore against whatever pours through. They have been waiting a long while for someone like you.",
     "families": [
@@ -5853,6 +5866,137 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 0,
     "feat": false,
     "crest": "/ui/deeds/col_set_bramblehide.webp"
+  },
+  {
+    "id": "exp_arcane_calligraphy",
+    "name": "A Steady Hand",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_arcane_calligraphy_gold",
+    "name": "Written in Starlight",
+    "category": "exploration",
+    "renown": 10,
+    "feat": false,
+    "rewardTitle": "the Runecaller"
+  },
+  {
+    "id": "exp_forge_helper",
+    "name": "A Helping Hammer",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_last_barricade",
+    "name": "The Last Barricade",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_borrowed_face",
+    "name": "A Borrowed Face",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_windrider_slalom",
+    "name": "Windrider Slalom",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_duskweave_dispatches",
+    "name": "Duskweave Dispatches",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_wisp_maze",
+    "name": "A Light in the Maze",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "prog_rift_watch_trusted",
+    "name": "Trusted by the Rift Watch",
+    "category": "progression",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "prog_church_order_trusted",
+    "name": "Trusted by the Church Order",
+    "category": "progression",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "prog_automatons_trusted",
+    "name": "Trusted by the Automatons",
+    "category": "progression",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "prog_rift_watch_champion",
+    "name": "Champion of the Rift Watch",
+    "category": "progression",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Riftwarden"
+  },
+  {
+    "id": "prog_church_order_champion",
+    "name": "Champion of the Church Order",
+    "category": "progression",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Dawnkeeper"
+  },
+  {
+    "id": "prog_automatons_champion",
+    "name": "Champion of the Automatons",
+    "category": "progression",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Forgemaster"
+  },
+  {
+    "id": "prog_faction_champion_all",
+    "name": "Champion of Every Banner",
+    "category": "progression",
+    "renown": 50,
+    "feat": false
+  },
+  {
+    "id": "exp_clue_first_casket",
+    "name": "Treasure Found",
+    "category": "exploration",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "exp_clue_ten_caskets",
+    "name": "Treasure Hunter",
+    "category": "exploration",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Treasure Hunter"
+  },
+  {
+    "id": "exp_harbor_to_harbor",
+    "name": "Harbor to Harbor",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
   }
 ];
 
@@ -5916,6 +6060,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Bonechill Cord"
+      },
+      {
+        "kind": "item",
+        "name": "Bastion Sigil"
       }
     ]
   },
@@ -5990,6 +6138,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Dreamroot Boots"
+      },
+      {
+        "kind": "item",
+        "name": "Stormjar"
       }
     ]
   },
@@ -6052,6 +6204,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Tideworn Warboots"
+      },
+      {
+        "kind": "item",
+        "name": "Mender's Hourglass"
       }
     ]
   },
@@ -6280,6 +6436,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Bloodmane War-Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Paired Talons"
       }
     ]
   },
@@ -6426,6 +6586,22 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Stormcaller's Focus"
+      },
+      {
+        "kind": "item",
+        "name": "Mooring Stone"
+      },
+      {
+        "kind": "item",
+        "name": "Wellspring Seed"
+      },
+      {
+        "kind": "item",
+        "name": "Hunter's Tally"
+      },
+      {
+        "kind": "item",
+        "name": "Echoing Lens"
       }
     ]
   },
@@ -6847,6 +7023,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
+        "name": "Viridian Valestrider"
+      },
+      {
+        "kind": "mount",
         "name": "Grumbol the Lanternback"
       },
       {
@@ -7157,7 +7337,27 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "title",
+        "name": "the Runecaller"
+      },
+      {
+        "kind": "title",
         "name": "the Unscorched"
+      },
+      {
+        "kind": "title",
+        "name": "Riftwarden"
+      },
+      {
+        "kind": "title",
+        "name": "Dawnkeeper"
+      },
+      {
+        "kind": "title",
+        "name": "Forgemaster"
+      },
+      {
+        "kind": "title",
+        "name": "Treasure Hunter"
       }
     ]
   },
@@ -7225,6 +7425,14 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Rimefang"
+      },
+      {
+        "kind": "item",
+        "name": "Sundered Prism"
+      },
+      {
+        "kind": "item",
+        "name": "Gambler's Die"
       },
       {
         "kind": "item",
@@ -7657,6 +7865,14 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Emberglass Warstaff"
+      },
+      {
+        "kind": "item",
+        "name": "Medallion of Defiance"
+      },
+      {
+        "kind": "item",
+        "name": "Duelist's Brand"
       }
     ]
   },
@@ -7887,6 +8103,570 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Forgebreaker, Engine of Varkhul"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_vanguard_gallery",
+    "shelf": "conquerors",
+    "name": "Vanguard Gallery",
+    "excludeFromCompletion": "personal",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Bladewake Greathelm"
+      },
+      {
+        "kind": "item",
+        "name": "Bladewake Pauldrons"
+      },
+      {
+        "kind": "item",
+        "name": "Bladewake Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Bladewake Legplates"
+      },
+      {
+        "kind": "item",
+        "name": "Bladewake Crushers"
+      },
+      {
+        "kind": "item",
+        "name": "Bloodmarch Visage"
+      },
+      {
+        "kind": "item",
+        "name": "Bloodmarch Shoulderguards"
+      },
+      {
+        "kind": "item",
+        "name": "Bloodmarch Chainmail"
+      },
+      {
+        "kind": "item",
+        "name": "Bloodmarch Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Bloodmarch Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Ironmarch Helm"
+      },
+      {
+        "kind": "item",
+        "name": "Ironmarch Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Ironmarch Chestguard"
+      },
+      {
+        "kind": "item",
+        "name": "Ironmarch Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Ironmarch Handguards"
+      },
+      {
+        "kind": "item",
+        "name": "Sunvigil Circlet"
+      },
+      {
+        "kind": "item",
+        "name": "Sunvigil Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Sunvigil Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Sunvigil Legmail"
+      },
+      {
+        "kind": "item",
+        "name": "Sunvigil Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Shieldvow Helm"
+      },
+      {
+        "kind": "item",
+        "name": "Shieldvow Pauldrons"
+      },
+      {
+        "kind": "item",
+        "name": "Shieldvow Breastplate"
+      },
+      {
+        "kind": "item",
+        "name": "Shieldvow Legplates"
+      },
+      {
+        "kind": "item",
+        "name": "Shieldvow Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Lightbrand Crown"
+      },
+      {
+        "kind": "item",
+        "name": "Lightbrand Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Lightbrand Cuirass"
+      },
+      {
+        "kind": "item",
+        "name": "Lightbrand Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Lightbrand Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Packwarden Coif"
+      },
+      {
+        "kind": "item",
+        "name": "Packwarden Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Packwarden Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Packwarden Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Packwarden Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Farsight Coif"
+      },
+      {
+        "kind": "item",
+        "name": "Farsight Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Farsight Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Farsight Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Farsight Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Snaretooth Coif"
+      },
+      {
+        "kind": "item",
+        "name": "Snaretooth Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Snaretooth Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Snaretooth Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Snaretooth Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Nightcut Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Nightcut Shoulderpads"
+      },
+      {
+        "kind": "item",
+        "name": "Nightcut Tunic"
+      },
+      {
+        "kind": "item",
+        "name": "Nightcut Breeches"
+      },
+      {
+        "kind": "item",
+        "name": "Nightcut Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Brawlmark Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Brawlmark Shoulderpads"
+      },
+      {
+        "kind": "item",
+        "name": "Brawlmark Tunic"
+      },
+      {
+        "kind": "item",
+        "name": "Brawlmark Breeches"
+      },
+      {
+        "kind": "item",
+        "name": "Brawlmark Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Shadewalk Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Shadewalk Shoulderpads"
+      },
+      {
+        "kind": "item",
+        "name": "Shadewalk Tunic"
+      },
+      {
+        "kind": "item",
+        "name": "Shadewalk Breeches"
+      },
+      {
+        "kind": "item",
+        "name": "Shadewalk Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Veilpsalm Cowl"
+      },
+      {
+        "kind": "item",
+        "name": "Veilpsalm Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Veilpsalm Robe"
+      },
+      {
+        "kind": "item",
+        "name": "Veilpsalm Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Veilpsalm Handwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Gracewing Cowl"
+      },
+      {
+        "kind": "item",
+        "name": "Gracewing Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Gracewing Robe"
+      },
+      {
+        "kind": "item",
+        "name": "Gracewing Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Gracewing Handwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Duskhymn Cowl"
+      },
+      {
+        "kind": "item",
+        "name": "Duskhymn Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Duskhymn Robe"
+      },
+      {
+        "kind": "item",
+        "name": "Duskhymn Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Duskhymn Handwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Tempestwrit Coif"
+      },
+      {
+        "kind": "item",
+        "name": "Tempestwrit Pauldrons"
+      },
+      {
+        "kind": "item",
+        "name": "Tempestwrit Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Tempestwrit Legmail"
+      },
+      {
+        "kind": "item",
+        "name": "Tempestwrit Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Galeborn Helm"
+      },
+      {
+        "kind": "item",
+        "name": "Galeborn Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Galeborn Chainmail"
+      },
+      {
+        "kind": "item",
+        "name": "Galeborn Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Galeborn Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Brineward Circlet"
+      },
+      {
+        "kind": "item",
+        "name": "Brineward Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Brineward Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Brineward Kilt"
+      },
+      {
+        "kind": "item",
+        "name": "Brineward Handwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Hourbinder's Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Hourbinder's Amice"
+      },
+      {
+        "kind": "item",
+        "name": "Hourbinder's Robe"
+      },
+      {
+        "kind": "item",
+        "name": "Hourbinder's Trousers"
+      },
+      {
+        "kind": "item",
+        "name": "Hourbinder's Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Emberlash Cowl"
+      },
+      {
+        "kind": "item",
+        "name": "Emberlash Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Emberlash Robes"
+      },
+      {
+        "kind": "item",
+        "name": "Emberlash Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Emberlash Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Rimewarden Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Rimewarden Shoulderpads"
+      },
+      {
+        "kind": "item",
+        "name": "Rimewarden Vestment"
+      },
+      {
+        "kind": "item",
+        "name": "Rimewarden Legwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Rimewarden Mitts"
+      },
+      {
+        "kind": "item",
+        "name": "Dreadquill Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Dreadquill Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Dreadquill Robe"
+      },
+      {
+        "kind": "item",
+        "name": "Dreadquill Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Dreadquill Handwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Marrowbound Cowl"
+      },
+      {
+        "kind": "item",
+        "name": "Marrowbound Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Marrowbound Robe"
+      },
+      {
+        "kind": "item",
+        "name": "Marrowbound Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Marrowbound Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Slagcrown Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Slagcrown Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Slagcrown Robes"
+      },
+      {
+        "kind": "item",
+        "name": "Slagcrown Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Slagcrown Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Starwarden Headdress"
+      },
+      {
+        "kind": "item",
+        "name": "Starwarden Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Starwarden Vest"
+      },
+      {
+        "kind": "item",
+        "name": "Starwarden Breeches"
+      },
+      {
+        "kind": "item",
+        "name": "Starwarden Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Bloodmane Helm"
+      },
+      {
+        "kind": "item",
+        "name": "Bloodmane Shoulderpads"
+      },
+      {
+        "kind": "item",
+        "name": "Bloodmane Tunic"
+      },
+      {
+        "kind": "item",
+        "name": "Bloodmane Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Bloodmane Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Thistlebloom Crown"
+      },
+      {
+        "kind": "item",
+        "name": "Thistlebloom Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Thistlebloom Vest"
+      },
+      {
+        "kind": "item",
+        "name": "Thistlebloom Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Thistlebloom Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Vanguard's Verdict"
+      },
+      {
+        "kind": "item",
+        "name": "Vanguard's Oath"
+      },
+      {
+        "kind": "item",
+        "name": "Vanguard's Fang"
+      },
+      {
+        "kind": "item",
+        "name": "Vanguard's Warstaff"
       }
     ]
   }
@@ -19619,6 +20399,113 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
         {
           "stat": "sta",
           "value": 13
+        }
+      ]
+    },
+    {
+      "id": "enchant_weapon_riftwalkers_grace",
+      "slot": "mainhand",
+      "tier": "greater",
+      "skillReq": 100,
+      "perfectedOnly": false,
+      "requiresFormula": true,
+      "hasDescription": true,
+      "reagents": [
+        {
+          "itemId": "arcane_shard",
+          "name": "Chime Shard",
+          "count": 2
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 4
+        }
+      ],
+      "bonus": []
+    },
+    {
+      "id": "enchant_weapon_dawnfire_etching",
+      "slot": "mainhand",
+      "tier": "greater",
+      "skillReq": 100,
+      "perfectedOnly": false,
+      "requiresFormula": true,
+      "hasDescription": true,
+      "reagents": [
+        {
+          "itemId": "arcane_shard",
+          "name": "Chime Shard",
+          "count": 2
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 4
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "spellPower",
+          "value": 18
+        }
+      ]
+    },
+    {
+      "id": "enchant_weapon_dawns_benediction",
+      "slot": "mainhand",
+      "tier": "greater",
+      "skillReq": 100,
+      "perfectedOnly": false,
+      "requiresFormula": true,
+      "hasDescription": true,
+      "reagents": [
+        {
+          "itemId": "arcane_shard",
+          "name": "Chime Shard",
+          "count": 2
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 4
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "healingPower",
+          "value": 34
+        }
+      ]
+    },
+    {
+      "id": "enchant_weapon_piston_drive",
+      "slot": "mainhand",
+      "tier": "greater",
+      "skillReq": 100,
+      "perfectedOnly": false,
+      "requiresFormula": true,
+      "hasDescription": true,
+      "reagents": [
+        {
+          "itemId": "arcane_shard",
+          "name": "Chime Shard",
+          "count": 2
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 4
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "str",
+          "value": 12
+        },
+        {
+          "stat": "critRating",
+          "value": 25
         }
       ]
     }

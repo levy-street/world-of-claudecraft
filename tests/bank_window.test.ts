@@ -91,7 +91,9 @@ describe('bank_window: load-bearing behaviors preserved', () => {
   });
 
   it('open() is idempotent while already open (a re-interact must not re-capture focus)', () => {
-    expect(painter).toMatch(/open\(\): void \{\s*if \(this\.opened\) return;/);
+    expect(painter).toMatch(/open\(initialTab\?: 'rewards'\): void \{\s*if \(this\.opened\) \{/);
+    const openBody = painter.slice(painter.indexOf("open(initialTab?: 'rewards'): void {"));
+    expect(openBody.indexOf('return;')).toBeLessThan(openBody.indexOf('this.deps.captureFocus()'));
   });
 
   it('a rebuild under an open prompt tears the prompt down and re-lands focus', () => {
@@ -238,8 +240,8 @@ describe('bank_window: modal prompt a11y contract', () => {
     // else reds when a cleanup pass deletes it, so the pin is a source
     // scrape on the open() region (the first-derive walk over the content
     // tables must land on the open path, not inside a click handler).
-    const openBody = painter.slice(painter.indexOf('open(): void {'));
-    expect(openBody.slice(0, 900)).toContain('vaultMaterialIds();');
+    const openBody = painter.slice(painter.indexOf("open(initialTab?: 'rewards'): void {"));
+    expect(openBody.slice(0, 1200)).toContain('vaultMaterialIds();');
   });
 
   it('buy-slots confirm calls bankBuySlots and withdraw-partial calls bankWithdraw with a count', () => {
@@ -303,7 +305,7 @@ describe('bank_window: the bag-socket row (phase 07 source pins)', () => {
 describe('bank_window: hud.ts wiring', () => {
   it('opens the bank on the bank SimEvent', () => {
     expect(hud).toContain("case 'bank':");
-    expect(hud).toContain('this.openBank();');
+    expect(hud).toContain("this.openBank(ev.type === 'weekly_rewards' ? 'rewards' : undefined);");
   });
 
   it('routes the managed-window close through the painter (focus return)', () => {
@@ -323,11 +325,11 @@ describe('bank_window: hud.ts wiring', () => {
     );
   });
 
-  it('wires the painter deps: the onClosed teardown and the NON-trapping focus pair', () => {
+  it('wires teardown and the mode-aware focus bridge', () => {
     // Gutting onClosed leaves body.bank-open stuck and the bags companion docked
     // forever; windowFocus would install the Tab trap the non-modal cluster forbids.
     expect(hud).toContain('onClosed: () => this.onBankClosed(),');
-    expect(hud).toContain('captureFocus: () => this.focusManager.activeFocusable(),');
+    expect(hud).toContain("...makeBankWindowFocus(this.focusManager, () => $('#bank-window'))");
     expect(hud).not.toMatch(/this\.windowFocus\('#bank-window'\)/);
   });
 
@@ -338,7 +340,7 @@ describe('bank_window: hud.ts wiring', () => {
     // precedence (vendor first) strands the bank at half-width with its x-btn
     // hidden and no touch close affordance.
     expect(hud).toMatch(
-      /openBank\(\): void \{[\s\S]{0,600}?if \(this\.vendorOpen\) this\.closeVendor\(\);[\s\S]{0,600}?classList\.add\('bank-open'\)/,
+      /openBank\(tab\?: 'rewards'\): void \{[\s\S]{0,600}?if \(this\.vendorOpen\) this\.closeVendor\(\);[\s\S]{0,600}?classList\.toggle\('bank-open', tab !== 'rewards'\)/,
     );
     expect(hud).toMatch(
       /openVendor\(npcId: number, opener\?: HTMLElement \| null\): void \{[\s\S]{0,600}?if \(this\.bankWindowOpen\) this\.closeBank\(\);/,
@@ -355,7 +357,7 @@ describe('bank_window: hud.ts wiring', () => {
       /openHeroicVendor\(npcId: number, opener\?: HTMLElement \| null\): void \{[\s\S]{0,600}?if \(this\.bankWindowOpen\) this\.closeBank\(\);/,
     );
     expect(hud).toMatch(
-      /openBank\(\): void \{[\s\S]{0,600}?if \(this\.openHeroicVendorNpcId !== null\) this\.closeHeroicVendor\(\);[\s\S]{0,600}?classList\.add\('bank-open'\)/,
+      /openBank\(tab\?: 'rewards'\): void \{[\s\S]{0,600}?if \(this\.openHeroicVendorNpcId !== null\) this\.closeHeroicVendor\(\);[\s\S]{0,600}?classList\.toggle\('bank-open', tab !== 'rewards'\)/,
     );
   });
 
@@ -603,9 +605,10 @@ describe('bank_window: search / sort / deposit-all', () => {
     );
     // The carry itself lives in bank_search_focus.ts (captureSearchCaret /
     // restoreSearchCaret, unit-tested there); render() must capture before the
-    // wipe and restore on BOTH pane arms (the guild history has a search box too).
+    // wipe and restore on EVERY pane arm (the guild history and the vault have
+    // search boxes too).
     expect(body).toContain('const searchFocus = captureSearchCaret(el, active);');
-    expect(body.split('restoreSearchCaret(el, searchFocus)').length).toBe(3);
+    expect(body.split('restoreSearchCaret(el, searchFocus)').length).toBe(4);
     // Non-search focus re-lands via the key ladder (the focused control by its
     // data-focus-key, else [data-close]), never a blanket close-button yank.
     expect(body).toContain('} else if (hadFocus) {');
@@ -1065,5 +1068,23 @@ describe('the gilded tokens and the forced-colors fill pin (phase 08 QA)', () =>
     const fill = blocks.find((b) => b.includes('.bank-meter-fill'));
     expect(fill).toBeDefined();
     expect(fill).toMatch(/\.bank-meter-fill\s*\{[^}]*background: Highlight !important/);
+  });
+});
+
+describe('standalone weekly vault host', () => {
+  it('closes bags on entry and closes the vault before a bags toggle', () => {
+    const open = hud.slice(
+      hud.indexOf("  openBank(tab?: 'rewards')"),
+      hud.indexOf('  closeBank():'),
+    );
+    expect(open).toContain("if (tab === 'rewards') this.bagsWindow.close();");
+    expect(open).toContain("classList.toggle('bank-open', tab !== 'rewards')");
+    expect(open.indexOf("if (tab === 'rewards') return;")).toBeLessThan(
+      open.indexOf('this.renderBags()'),
+    );
+    expect(hud).toContain(
+      "if (document.body.classList.contains('weekly-vault-open')) this.closeBank();",
+    );
+    expect(hud).toContain("classList.remove('bank-open', 'weekly-vault-open')");
   });
 });

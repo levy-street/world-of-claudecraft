@@ -445,7 +445,7 @@ export function syncStandalonePadFocus(): boolean {
   }
 
   // The player may remain in the ghost-prompt root while its available action
-  // changes (corpse left range, healer still nearby). Rehome only when the pad
+  // changes (its corpse button hid or reappeared). Rehome only when the pad
   // still owns the now-hidden control; a deliberately cleared mark stays clear.
   if (marked && !controls.includes(marked)) {
     const allControls = [...root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)];

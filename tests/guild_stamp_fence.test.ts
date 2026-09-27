@@ -20,7 +20,8 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
-import type { SocialSnapshot } from '../server/social';
+import { guildStampRankOf, type SocialSnapshot } from '../server/social';
+import { defaultGuildRankLadder } from '../src/sim/guild_ranks';
 
 function fakeWs(): { sent: unknown[]; ws: unknown } {
   const sent: unknown[] = [];
@@ -47,6 +48,7 @@ const guildSnap = (rank: 'leader' | 'officer' | 'member'): SocialSnapshot => ({
     id: 7,
     name: 'Iron Vanguard',
     rank,
+    ranks: defaultGuildRankLadder(),
     motd: '',
     motdSetBy: '',
     pledgeSettings: { enabled: true, minLevel: 1, note: '', newPlayerFriendly: false },
@@ -269,5 +271,40 @@ describe('the guild membership stamp fence (guildStampSeq)', () => {
     await priv(server).sendSocialSnapshot(3);
     expect(sim.players.get(session.pid)?.guildMembership).toBeNull();
     expect(sim.entities.get(session.pid)?.guild).toBe('');
+  });
+});
+
+describe('guildStampRankOf (the snapshot chokepoint stamp, guild custom ranks)', () => {
+  const ranks = [
+    { id: 'leader', name: '', perms: [] },
+    { id: 'officer', name: '', perms: ['invite' as const] },
+    { id: 'r1', name: 'Quartermaster', perms: ['bank' as const] },
+    { id: 'member', name: '', perms: [] },
+  ];
+
+  it('collapses a ladder rank to the built-in tier the bank gate reads', () => {
+    expect(guildStampRankOf({ rank: 'leader', ranks })).toBe('leader');
+    expect(guildStampRankOf({ rank: 'r1', ranks })).toBe('officer'); // holds the bank
+    expect(guildStampRankOf({ rank: 'officer', ranks })).toBe('member'); // bank revoked
+    expect(guildStampRankOf({ rank: 'r9', ranks })).toBe('member'); // unknown: fail closed
+  });
+
+  it('a snapshot without a ladder stamps the pre-ladder tiers unchanged', () => {
+    for (const rank of ['leader', 'officer', 'member'] as const) {
+      expect(guildStampRankOf({ rank })).toBe(rank);
+    }
+  });
+
+  it('the join-time snapshot stamps a custom bank rank with officer vault access', async () => {
+    const server = new GameServer();
+    const session = joinServer(server, 1, 'Quar');
+    const snap = guildSnap('member');
+    snap.guild = { ...snap.guild!, rank: 'r1', ranks };
+    priv(server).social.snapshot = vi.fn(async () => snap);
+    await priv(server).sendSocialSnapshot(1);
+    expect(server.sim.players.get(session.pid)?.guildMembership).toEqual({
+      guildId: 7,
+      rank: 'officer',
+    });
   });
 });

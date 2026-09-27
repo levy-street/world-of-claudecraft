@@ -1,4 +1,54 @@
 export {
+  type ActiveHill,
+  endHillNow,
+  HILL_LOST_LINE,
+  HILL_READOUT_NONE_LINE,
+  HILL_TAKEN_LINE,
+  type HillPhase,
+  type HillState,
+  hillFallenLine,
+  hillInfoFor,
+  hillPlanFor,
+  hillReadoutLine,
+  hillRiseLine,
+  hillWarningLine,
+  newHillState,
+  pickHillSpot,
+  riseHillNow,
+  spawnHill,
+  spawnHillNow,
+  updateHill,
+  warnNextHillNow,
+} from './hill';
+export {
+  HILL_ACCRUAL_SECONDS,
+  HILL_CAPTURE_SECONDS,
+  HILL_DURATION_SECONDS,
+  HILL_FIRST_WINDOW_AT_SECONDS,
+  HILL_LATEST_WARN_OFFSET_SECONDS,
+  HILL_RADIUS,
+  HILL_RAMP_MAX_HONOR,
+  HILL_RAMP_STEP_HONOR,
+  HILL_RAMP_STEP_SECONDS,
+  HILL_WARNING_SECONDS,
+  HILL_WINDOW_SECONDS,
+  type HillSpotProbe,
+  type HillStanding,
+  type HillTimes,
+  hillChallengeStands,
+  hillContains,
+  hillContestStep,
+  hillGroupKey,
+  hillHonorPerPayout,
+  hillLeader,
+  hillMinutesUntil,
+  hillSpotIsOpen,
+  hillStanding,
+  hillTimes,
+  hillTimesFrom,
+  hillWindowAt,
+} from './hill_rules';
+export {
   ARENA_DAILY_TAPER_FLOOR_START,
   ARENA_DAILY_TAPER_START,
   ARENA_LOSS_HONOR_SHARE,
@@ -40,14 +90,6 @@ export {
   honorEventMultiplier,
   weekdayOfDayKey,
 } from './honor_event';
-export {
-  PVP_DEFENSE_CAP,
-  PVP_OFFENSE_CAP,
-  PVP_RATING_PER_PCT,
-  type PvpCaps,
-  pvpDamageMultiplier,
-  pvpFractionsFromRatings,
-} from './power';
 // warfare_quartermaster.ts is DELIBERATELY not re-exported here. It needs
 // createNpc from '../entity' at runtime, and entity.ts imports this barrel for
 // pvpFractionsFromRatings, so re-exporting it would close a value-level ESM
@@ -59,3 +101,59 @@ export {
 //
 // Its single consumer is the Sim coordinator during world init, so it is not
 // public API in any meaningful sense: import it by path.
+export { loadHonorState, savedHonorState } from './honor_persist';
+export {
+  PVP_DEFENSE_CAP,
+  PVP_OFFENSE_CAP,
+  PVP_RATING_PER_PCT,
+  PVP_VITALITY_CAP,
+  PVP_VITALITY_RATING_PER_PCT,
+  type PvpCaps,
+  pvpDamageMultiplier,
+  pvpFractionsFromRatings,
+  pvpVitalityFromRating,
+} from './power';
+export { pvpVitalityAppliesTo, updatePvpVitality } from './vitality';
+export {
+  isWorldPvpFlagged,
+  isWorldPvpHostile,
+  loadWorldPvpState,
+  newWorldPvpBooks,
+  savedWorldPvpFields,
+  savedWorldPvpState,
+  setWorldPvpFlag,
+  toggleWorldPvpFlag,
+  updateWorldPvp,
+  WORLD_PVP_DISARM_MINUTES,
+  type WorldPvpBooks,
+  type WorldPvpMetaState,
+  type WorldPvpSavedState,
+  worldPvpDefeatLine,
+  worldPvpDisarmRemaining,
+  worldPvpInfoFor,
+  worldPvpKillLine,
+  worldPvpOnOwnedPetDamaged,
+  worldPvpOnPlayerAided,
+  worldPvpOnPlayerDamaged,
+  worldPvpOnPlayerDeath,
+  worldPvpPairRepeats,
+} from './world_pvp';
+export {
+  WORLD_PVP_ASSIST_WINDOW,
+  WORLD_PVP_DISARM_SECONDS,
+  WORLD_PVP_DR_WINDOW_SECONDS,
+  WORLD_PVP_GREY_LEVEL_GAP,
+  WORLD_PVP_KILL_HONOR,
+  WORLD_PVP_MIN_LEVEL,
+  WORLD_PVP_STAKE_CAP_COPPER,
+  WORLD_PVP_STAKE_FRACTION,
+  type WorldPvpZonePolicy,
+  worldPvpHitMarksAttacker,
+  worldPvpPairExempt,
+  worldPvpPairHostile,
+  worldPvpPairMultiplier,
+  worldPvpSplit,
+  worldPvpStake,
+  worldPvpVictimIsGrey,
+} from './world_pvp_rules';
+export { worldPvpFfaZones, worldPvpZonePolicyAt, worldPvpZonePolicyOf } from './world_pvp_zones';

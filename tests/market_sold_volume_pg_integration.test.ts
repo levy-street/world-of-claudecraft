@@ -261,7 +261,7 @@ describeDb('market_sold_volume against real Postgres', () => {
         if (idx >= 0) book.splice(idx, 1);
       },
     };
-    buyWithSoldVolume(sim, 1, 42);
+    buyWithSoldVolume(sim, 1, undefined, 42);
     await soldVolumeWriterIdle();
     resetMarketSoldVolumeForTests();
     const rows = await readMarketSoldVolumeSince(pool, 'eastbrook', 7);

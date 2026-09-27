@@ -2,6 +2,2112 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const sv_SE: Partial<Record<TranslationKey, string>> = {
+  'abilityUi.forms.bearOrCat': 'Björn eller Katt',
+  'abilityUi.tooltip.edictDamage':
+    'Slå för {weaponPercent}% vapenskada plus {damage} fysisk skada. Vapenskada inkluderar Attackkraft.',
+  'abilityUi.tooltip.edictExplosion':
+    'Medan Upphöjelse är aktiv, explosionen orsakar {damage} fysisk skada inom {radius} m, reducerad bortom {cap} mål. Denna skada ökar med Attackkraft.',
+  'abilityUi.tooltip.verdictDamage':
+    'Final Edikt detonerar för {verdictSingleDamage} helig skada. Gryningsfall detonerar för {verdictAreaDamage} helig skada inom {verdictAreaRadius} m, reducerad bortom {verdictAreaCap} mål. Ingen detonation skalas med Trollformkraft. Endast en fiende kan bära ditt märke.',
+  'character.currentLocation': 'Nuvarande plats: {zone}',
+  'character.lockoutDungeons': 'Fängelser',
+  'character.lockoutRaids': 'Räder',
+  'character.lockoutWorldBosses': 'Världsbossar',
+  'character.lockouts': 'Låsningar ({count})',
+  'hud.core.deathRecap': 'Sammanfattning',
+  'hud.core.deathRecapClose': 'Stäng',
+  'hud.core.deathRecapCrit': 'Kritisk',
+  'hud.core.deathRecapDamage': 'Skada',
+  'hud.core.deathRecapHeal': 'Läkning',
+  'hud.core.deathRecapKiller': 'Dödsslag: {killer} ({ability})',
+  'hud.core.deathRecapLethal': 'Dödsslag',
+  'hud.core.deathRecapNoEvents': 'Inga stridshandelser registrerade.',
+  'hud.core.deathRecapNoKiller': 'Stridshandelser som ledde till döden',
+  'hud.core.deathRecapTitle': 'Dödssammanfattning',
+  'hud.core.mapMarkerLabels.activeWorldQuest': 'Aktiv världsuppdrag: {name}',
+  'hud.core.mapMarkerLabels.availableWorldQuest': 'Tillgängligt världsuppdrag: {name}',
+  'hud.core.mapMarkerLabels.worldBoss': 'Världsboss: {name}',
+  'hud.errors.bearOrCat': 'Björn eller Katt',
+  'hud.meters.activity': 'Aktivitet: {pct}',
+  'hud.meters.avoidableDmg': 'Undvikbar skada',
+  'hud.meters.avoidableDmgShort': 'Und.',
+  'hud.meters.back': 'Tillbaka',
+  'hud.meters.criticals': 'Kritiska: {count}',
+  'hud.meters.damageTaken': 'Mottagen skada',
+  'hud.meters.damageTakenShort': 'Mottag.',
+  'hud.meters.deaths': 'Dödsfall',
+  'hud.meters.deathsShort': 'Död',
+  'hud.meters.dispels': 'Motgörningar',
+  'hud.meters.dispelsShort': 'Mot.',
+  'hud.meters.groupTotal': 'Totalt: {total} ({rate})',
+  'hud.meters.hits': 'Träffar: {count}',
+  'hud.meters.interrupts': 'Avbrytningar',
+  'hud.meters.interruptsShort': 'Avb.',
+  'hud.meters.newWindow': 'Nytt fönster',
+  'hud.meters.reset': 'Nollställ mätare',
+  'hud.meters.resetAll': 'Nollställ all data',
+  'hud.meters.resetFight': 'Nollställ nuvarande strid',
+  'hud.meters.resetHint': 'Nollställ stridsdata',
+  'hud.meters.selectMode': 'Välj mätarläge',
+  'hud.meters.selectSegment': 'Välj stridfragment',
+  'hud.meters.topAbility': 'Topp: {name}',
+  'hud.system.respawnKeeperToll':
+    'Den bleka väktaren har återupplivat dig, men du är svagare för det: väktarens avgift dränerar dina attribut tills det försvinner.',
+  'hudChrome.auraEffect.benisonPrayers':
+    'Din nästa Körläkning läker för {pct}% mer och förbrukar alla stackar.',
+  'hudChrome.auraEffect.benisonWhisper':
+    'Din nästa Viskad bön är omedelbar och läker för {pct}% mer. Använd den innan denna effekt försvinner.',
+  'hudChrome.auraEffect.carryingFreight':
+    'Du bär frakt. Förflyttningshastigheten är reducerad med {pct}%.',
+  'hudChrome.auraEffect.trinket.bleedEdge':
+    'Dina autoattackträffar tillämpar Talongår: {tick} fysisk skada per stack var {every} sekund i {duration} sekunder, stackar upp till {max} gånger.',
+  'hudChrome.auraEffect.trinket.bleedEdgeOther':
+    'Autoattackträffar tillämpar Talongår, en fysisk blödning som stackar upp till {max} gånger. Skadan ökar med Attackkraft.',
+  'hudChrome.auraEffect.trinket.brand': 'Läkning mottagen är reducerad med {pct}%.',
+  'hudChrome.auraEffect.trinket.crucibleHeat':
+    'Värme: {stacks}/{max}. Använd Smältegrytans hjärta för att spendera det på en eldnova som orsakar {damage} eldskada inom {radius} yd och provocerar varje varelse den träffar.',
+  'hudChrome.auraEffect.trinket.crucibleHeatOther':
+    'Värme: {stacks}/{max}. Smältegrytans hjärta spendera det på en eldnova inom {radius} yd som orsakar mer eldskada för varje stack och provocerar varje varelse den träffar.',
+  'hudChrome.auraEffect.trinket.echo':
+    'Dina nästa {casts} direkta läkningar eller direkta icke-fysisk skadträffar upprepas för {pct}% av deras belopp.',
+  'hudChrome.auraEffect.trinket.forgeHeat':
+    'Värme: {stacks}/{max}. Användning av Smärtagets temperament spendera det, och dess vapenbrand orsakar {pct}% mer skada.',
+  'hudChrome.auraEffect.trinket.gildedGuard': 'Spelsmanens tur tur: absorberar {value} skada.',
+  'hudChrome.auraEffect.trinket.hourglassShield':
+    'Absorberar {value} skada. Gjord från läkningen som en Mänarens timglas lagrade.',
+  'hudChrome.auraEffect.trinket.hourglassStored':
+    'Innehåller {stored} läkning lagrad från din överläkning. Använd Mänarens timglas för att omvandla det till en sköld på gruppmedlemmen inom {range} yd med den lägsta hälsoprocenten, dig inkluderad.',
+  'hudChrome.auraEffect.trinket.keenEdge': 'Spelsmanens tur tur: du orsakar {pct}% mer skada.',
+  'hudChrome.auraEffect.trinket.kindlingOrb':
+    'Varje trollformel du kastar på en fiende gör att sfären skjuter en bult på den fienden för {damage} eldskada. Den håller sin eld på en polymorford, kampunfähig eller blind fiende.',
+  'hudChrome.auraEffect.trinket.kindlingOrbOther':
+    'Varje trollformel kastad på en fiende gör att sfären skjuter en eldskadebult på den fienden. Skadan ökar med Trollformkraft.',
+  'hudChrome.auraEffect.trinket.lantern':
+    'En direktläkning från vem som helst på dig eller en gruppmedlem inom {radius} yd från lyktan läker också alla gruppmedlemmar inom 10 yd av den läkta målpersonen med {pct}% av läkningbeloppet.',
+  'hudChrome.auraEffect.trinket.lastBastion':
+    'Absorberar {value} skada. Bastionens sigill höjde det när du tog skada under {threshold}% hälsa.',
+  'hudChrome.auraEffect.trinket.lastStandCooldown':
+    'Bastionens sista bastion-sköld användes. Att falla under {threshold}% hälsa kan inte höja den igen innan detta försvinner.',
+  'hudChrome.auraEffect.trinket.luckyStreak':
+    'Spelsmanens tur tur: återställer {tick} hälsa var {every} sekund.',
+  'hudChrome.auraEffect.trinket.moltenIgnite':
+    'Orsakar {damage} eldskada var {every} sekund. En annan vapenkritisk träff förnyar det.',
+  'hudChrome.auraEffect.trinket.moored':
+    'Du tar {reduction}% mindre skada men rör dig med {speed}% hastighet. Du ignorerar bedövning, rotar, saktar, rädslor, förvirring och polymorfi.',
+  'hudChrome.auraEffect.trinket.pierce':
+    'Dina autoattacker, skott och fysiska förmågor (inte blödningar) träffar också fienden närmast ditt mål inom {reach} yd och orsakar {pct}% av huvudskadan till varje sådan fiende.',
+  'hudChrome.auraEffect.trinket.retaliate':
+    'Fiender som träffar dig direkt tar fysisk skada motsvarande {pct}% av hälsan som träffen tog från dig.',
+  'hudChrome.auraEffect.trinket.riftGuard': 'Du tar {pct}% mindre skada.',
+  'hudChrome.auraEffect.trinket.sprint':
+    'Förflyttningshastigheten ökas med {pct}%. Staplas inte med andra hastighetshöjningar.',
+  'hudChrome.auraEffect.trinket.storm':
+    'Laddningar: {stacks}/{max}. Använd Stormkruka för att släppa dem som en bult som träffar ditt mål och upp till {extra} fiender inom {jumpRange} yd från mål till mål för {damage} naturskada plus {perCharge} per laddning.',
+  'hudChrome.auraEffect.trinket.stormOther':
+    'Laddningar: {stacks}/{max}. Stormkruka släpper dem som en naturskadebult som träffar målet och upp till {extra} närliggande fiender för naturskada per laddning.',
+  'hudChrome.auraEffect.trinket.tally':
+    'Tallymarkeringar: {stacks}/{max}. Använd Jägarens markering för att spendera dem alla på en träff på ditt mål för {damage} fysisk skada plus {perMark} per markering.',
+  'hudChrome.auraEffect.trinket.tallyOther':
+    'Tallymarkeringar: {stacks}/{max}. Jägarens markering spendera dem alla på en fysisk träff som orsakar mer skada för varje markering.',
+  'hudChrome.auraEffect.trinket.talonWound':
+    'Orsakar {damage} fysisk skada var {every} sekund ({stacks}/{max} stackar). Varje ny stack lägger till skada motsvarande 5% av huvudskadan.',
+  'hudChrome.auraEffect.trinket.tempered':
+    'Dina närstrid- och distansvapensträffar orsakar {damage} extra eldskada ({pct}% mer från den spenderade värmen). Effekten varar tills denna buff försvinner eller i {maxDuration} sekunder, och kan förlängas genom att döda, längsta {killExtend} sekunder.',
+  'hudChrome.auraEffect.trinket.temperedOther':
+    'Närstrid- och distansvapensträffar orsakar extra eldskada, {pct}% mer från den spenderade värmen. Skadan ökar med vapenskada.',
+  'hudChrome.auraEffect.trinket.twinStrikeCooldown':
+    'Parade klor gjorde just en extra swing. Det kan inte göra en annan innan detta försvinner.',
+  'hudChrome.auraEffect.trinket.wellspring': 'Återställer {tick} hälsa var {every} sekund.',
+  'hudChrome.auraTooltip.caster': 'Kastjad av {name}',
+  'hudChrome.bank.vaultSearchAria': 'Sök efter lagersmaterial efter namn',
+  'hudChrome.bank.vaultSearchNoMatch': 'Inget material i ditt lager matchar din sökning.',
+  'hudChrome.charSheet.ratings': 'Betyg',
+  'hudChrome.charSheet.spell': 'Trollformel',
+  'hudChrome.charSidebar.character': 'Karaktär',
+  'hudChrome.charSidebar.currencies': 'Valutor',
+  'hudChrome.charSidebar.professions': 'Yrken',
+  'hudChrome.charSidebar.reputation': 'Ryktbarhet',
+  'hudChrome.cooldownManager.addGrid': 'Lägg till knappgrupp',
+  'hudChrome.cooldownManager.addLine': 'Lägg till rad med trollformler',
+  'hudChrome.cooldownManager.addSingle': 'Lägg till enskild knapp',
+  'hudChrome.cooldownManager.alertStacks': 'Varning vid stackar',
+  'hudChrome.cooldownManager.alertStacksAny': 'Vid förvärv',
+  'hudChrome.cooldownManager.alertStacksHint':
+    'Knappen lyser, pulsar och pinglar när aurorn når det här många stackar. Vid förvärv betyder så snart den erhålls.',
+  'hudChrome.cooldownManager.auraFallback': 'Aura',
+  'hudChrome.cooldownManager.auraSoundHint':
+    'Spelar när aurorn kommer upp, eller när den når ditt stackmål.',
+  'hudChrome.cooldownManager.aurasHint':
+    'Motorresurser och deras stackar, proccar och buffar som dina trollformler lägger på dig. Allt annat som inte är en trollformel själv.',
+  'hudChrome.cooldownManager.aurasTitle': 'Proccar, motorer och buffa',
+  'hudChrome.cooldownManager.columns': '# Kolumner',
+  'hudChrome.cooldownManager.combatOnly': 'Endast ljud i strid',
+  'hudChrome.cooldownManager.deleteGroup': 'Ta bort grupp',
+  'hudChrome.cooldownManager.deleteGroupAria': 'Ta bort {group}',
+  'hudChrome.cooldownManager.dirDown': 'Ned',
+  'hudChrome.cooldownManager.dirLeft': 'Vänster',
+  'hudChrome.cooldownManager.dirRight': 'Höger',
+  'hudChrome.cooldownManager.dirUp': 'Upp',
+  'hudChrome.cooldownManager.direction': 'Ikongångriktning',
+  'hudChrome.cooldownManager.dragHint':
+    'Medan den här menyn är öppen, visar varje grupp på skärmen och du kan dra den för att flytta den.',
+  'hudChrome.cooldownManager.emptySection': 'Släpp en trollformel här.',
+  'hudChrome.cooldownManager.enabled': 'Visa nedräknarhållare',
+  'hudChrome.cooldownManager.generalTitle': 'Allmänt',
+  'hudChrome.cooldownManager.glowWhenReady': 'Ljus när det är klart',
+  'hudChrome.cooldownManager.glowWhenReadyHint':
+    'Ljusar upp och framhäver knappen medan trollformeln kan kastacas.',
+  'hudChrome.cooldownManager.group': 'Grupp',
+  'hudChrome.cooldownManager.groupFullOption': '{group} (full)',
+  'hudChrome.cooldownManager.groupGrid': 'Knappgrupp {index}',
+  'hudChrome.cooldownManager.groupLine': 'Rad med trollformler {index}',
+  'hudChrome.cooldownManager.groupName': 'Gruppnamn',
+  'hudChrome.cooldownManager.groupSingle': 'Enskild knapp {index}',
+  'hudChrome.cooldownManager.groupsFull':
+    'Du har de flesta tillåtna grupper. Ta bort en för att lägga till en annan.',
+  'hudChrome.cooldownManager.horizontal': 'Horisontell',
+  'hudChrome.cooldownManager.hotbarGlow': 'Handlingsfältglöd',
+  'hudChrome.cooldownManager.hotbarGlowHint':
+    'Lyser också denna trollformel på ditt handlingsfält medan den är klar.',
+  'hudChrome.cooldownManager.iconPadding': 'Ikonutfyllnad',
+  'hudChrome.cooldownManager.iconSize': 'Ikonstorlek',
+  'hudChrome.cooldownManager.idleOpacity': 'Opacitet medan inte klar',
+  'hudChrome.cooldownManager.intro':
+    'Flytande knappar för trollformlerna du väljer. De kan inte klickas: varje visar sin nedräkning, dimmas när det inte är klart och ljusas upp när det är klart.',
+  'hudChrome.cooldownManager.moveEarlier': 'Flytta {spell} tidigare',
+  'hudChrome.cooldownManager.moveLater': 'Flytta {spell} senare',
+  'hudChrome.cooldownManager.noGroups':
+    'Lägg till en enskild knapp, en grupp knappar eller en rad trollformler för att komma igång.',
+  'hudChrome.cooldownManager.notDisplayed': 'Inte visad',
+  'hudChrome.cooldownManager.notInGroupHint':
+    'Lägg denna trollformel i en grupp för att visa dess knapp.',
+  'hudChrome.cooldownManager.notKnown': '{spell} (inte känd än)',
+  'hudChrome.cooldownManager.onlyWhenReady': 'Visa endast när klar',
+  'hudChrome.cooldownManager.onlyWhileActive': 'Visa endast medan aktiv',
+  'hudChrome.cooldownManager.opacity': 'Opacitet',
+  'hudChrome.cooldownManager.orientation': 'Orientering',
+  'hudChrome.cooldownManager.otherSpells': 'Andra trollformler',
+  'hudChrome.cooldownManager.otherSpellsHint':
+    'Trollformler från dina andra specialiseringar, talangval och högre nivåer. Lägg en nu och dess knapp visas automatiskt när du väljer eller uppgraderar till den.',
+  'hudChrome.cooldownManager.positionX': 'Horisontell position',
+  'hudChrome.cooldownManager.positionY': 'Vertikal position',
+  'hudChrome.cooldownManager.resetPosition': 'Återställ till standardposition',
+  'hudChrome.cooldownManager.rows': '# Rader',
+  'hudChrome.cooldownManager.search': 'Sök trollformler',
+  'hudChrome.cooldownManager.searchPlaceholder': 'Sök',
+  'hudChrome.cooldownManager.selectSpell': 'Välj {spell}',
+  'hudChrome.cooldownManager.showTimer': 'Visa timer',
+  'hudChrome.cooldownManager.sound': 'Klart ljud',
+  'hudChrome.cooldownManager.soundHint':
+    'Spelar när trollformeln blir klar, eller när dess knapp ändras till en annan trollformel medan den är klar.',
+  'hudChrome.cooldownManager.spellCount': '{count} / {max} trollformler',
+  'hudChrome.cooldownManager.spellsEmpty': 'Du känner inte till några trollformler än.',
+  'hudChrome.cooldownManager.title': 'Nedräknarhållare',
+  'hudChrome.cooldownManager.trackedHint':
+    'Dra en trollformel på en grupp, eller välj den för att välja dess grupp och varningar. En knapp följer sin trollformel även om du byter specialisering eller nivå.',
+  'hudChrome.cooldownManager.trackedTitle': 'Spårade trollformler',
+  'hudChrome.cooldownManager.vertical': 'Vertikal',
+  'hudChrome.cooldownManager.visAlways': 'Alltid synlig',
+  'hudChrome.cooldownManager.visCombat': 'I strid',
+  'hudChrome.cooldownManager.visHidden': 'Dold',
+  'hudChrome.cooldownManager.visHiddenHint':
+    'En dold grupp spelar fortfarande ljud och tänder upp på ditt handlingsfält.',
+  'hudChrome.cooldownManager.visibility': 'Synlighet',
+  'hudChrome.crafting.mobileStationTitle': '{name}:s {station}',
+  'hudChrome.currencies.activities': 'Aktiviteter',
+  'hudChrome.currencies.delveMark': 'Delve-märke',
+  'hudChrome.currencies.delveMarkNote': 'Genomförda grottvandringar',
+  'hudChrome.currencies.factionPending': 'Fraktionsvaluta: väntar på steg 2',
+  'hudChrome.currencies.factions': 'Fraktioner',
+  'hudChrome.currencies.heroicMarkNote': 'Heroiska dungeons . spenderas på heroisk kvartermästare',
+  'hudChrome.currencies.honor': 'Heder',
+  'hudChrome.currencies.honorNote': 'Slagfält och arena',
+  'hudChrome.currencies.intro':
+    'Ingen av dessa tar upp väskeutrymme. Mynt stannar i din väska som vanligt.',
+  'hudChrome.currencies.lifetime': 'Livstid {amount}',
+  'hudChrome.currencies.walletNotLinked': 'Ingen ansluten plånbok',
+  'hudChrome.currencies.wocPreview': 'Förhandsvisning av saldo, ännu ej verifierat',
+  'hudChrome.currencies.wocToken': 'WoC-token',
+  'hudChrome.currencies.wocTokenNote': 'Kopplat plånbokssaldo',
+  'hudChrome.death.ghostHint':
+    'Springa till platsen för din död eller tala med Den bleka väktaren för att återupplivas',
+  'hudChrome.death.keeperConfirmBody':
+    'Är du säker? Den bleka väktaren återupplivar dig, men du blir svagare för det: Väktartullen minskar alla dina egenskaper med 75% tills den försvinner, upp till 10 minuter på högre nivåer.',
+  'hudChrome.death.keeperConfirmSparedBody':
+    'Är du säker? Den bleka väktaren återupplivar dig här. Du är under nivå 10, så Väktartullen kommer inte att försvaga dig den här gången.',
+  'hudChrome.death.keeperConfirmSparedTitle': 'Låta väktaren höja dig?',
+  'hudChrome.death.keeperTalkAccept': 'Återuppliva mig',
+  'hudChrome.death.keeperTalkBody':
+    'Jag kan höja dig där du står, men min Väktartull kommer med det: Väktartullen minskar alla dina egenskaper med 75%, i upp till 10 minuter på högre nivåer. Att gå med din ande tillbaka till där du föll återupplivar dig utan straff.',
+  'hudChrome.death.keeperTalkLeave': 'Lämna',
+  'hudChrome.death.keeperTalkSparedBody':
+    'Jag kan höja dig där du står. Min Väktartull skulle normalt komma med det, en försvagning av allt du är under en tid, men du är ny i denna värld, så jag skall spara dig det. Att gå med din ande tillbaka till där du föll återupplivar dig lika väl utan straff.',
+  'hudChrome.death.keeperTalkTitle': 'Den bleka väktaren',
+  'hudChrome.enchantDescription.enchant_weapon_dawnfire_etching':
+    'Märker permanent ett vapen med 18 spellkraft. Spellkraft räknas också mot läkningskraft. En platt bonus; den skalas inte.',
+  'hudChrome.enchantDescription.enchant_weapon_dawns_benediction':
+    'Märker permanent ett vapen med 34 läkningskraft. Läkningskraft ökar endast helande, aldrig spellskada. En platt bonus; den skalas inte.',
+  'hudChrome.enchantDescription.enchant_weapon_piston_drive':
+    'Märker permanent ett tvåhandsvapen med 12 styrka och 25 kritiska slag. Kan inte tillämpas på ett enhandsväpen. En platt bonus; den skalas inte.',
+  'hudChrome.enchantDescription.enchant_weapon_riftwalkers_grace':
+    'Dina landade närstridattacker kan ge 60 smidighet och 2% snabbare närstridattacker i 15 sekunder. Varje träff rullar 1% per 0,6 sekunder av vapnets basvapenhastighet. Ingen intern cooldown. Båda händerna delar en buff; vilken trigger som helst förnyar den, och den staplas aldrig. Distansattacker löser inte denna effekt. Kattform använder istället dess 1 sekunds basvapenhastighet.',
+  'hudChrome.enchantName.enchant_weapon_dawnfire_etching': 'Vapen Etching: Gryningeld',
+  'hudChrome.enchantName.enchant_weapon_dawns_benediction': 'Vapen Etching: Gryningens välsignelse',
+  'hudChrome.enchantName.enchant_weapon_piston_drive': 'Vapen Etching: Kolvdrift',
+  'hudChrome.enchantName.enchant_weapon_riftwalkers_grace': 'Riftvandrares nåd',
+  'hudChrome.ferry.boardHint': 'Stå på däcket när det seglar. Passagen är gratis.',
+  'hudChrome.ferry.castingOff': 'Färjan till {dest} lämnar nu',
+  'hudChrome.ferry.departsIn': 'Färjan till {dest} avgår om {time}',
+  'hudChrome.ferry.regionLabel': 'Färjschema',
+  'hudChrome.ferry.sailing': 'Seglande till {dest}',
+  'hudChrome.focusTargets.ally': 'Allierad',
+  'hudChrome.focusTargets.assign': 'Sätt fokus {slot}',
+  'hudChrome.focusTargets.assignClickHint': 'Välj ett mål. Klicka på {button}.',
+  'hudChrome.focusTargets.assignHint': 'Välj ett mål. Tryck på {key} eller klicka på {button}.',
+  'hudChrome.focusTargets.enemy': 'Fiende',
+  'hudChrome.focusTargets.frame1': 'Fokus 1',
+  'hudChrome.focusTargets.frame2': 'Fokus 2',
+  'hudChrome.focusTargets.frame3': 'Fokus 3',
+  'hudChrome.focusTargets.showEmpty': 'Visa tomma fokusramar',
+  'hudChrome.focusTargets.target': 'Fokusera på mål {slot}',
+  'hudChrome.focusTargets.unset': 'Avsluta fokus',
+  'hudChrome.frameMenus.allOptions': 'Alla ramöversikter',
+  'hudChrome.frameMenus.auras': 'Auraer',
+  'hudChrome.frameMenus.bars': 'Handlingsfält',
+  'hudChrome.frameMenus.combat': 'Stridsvisningar',
+  'hudChrome.frameMenus.hide': 'Dölj ram',
+  'hudChrome.frameMenus.independentTarget': 'Lås målmål till mål',
+  'hudChrome.frameMenus.options': 'Raminställningar',
+  'hudChrome.frameMenus.other': 'Övriga HUD-element',
+  'hudChrome.frameMenus.trackers': 'Spårare',
+  'hudChrome.frameMenus.units': 'Enhetens ramar',
+  'hudChrome.framePresets.apply': 'Tillämpa',
+  'hudChrome.framePresets.current': 'Aktuell layout',
+  'hudChrome.framePresets.deleteBody': 'Ta bort ramförinställningen "{name}"?',
+  'hudChrome.framePresets.deleteNamed': 'Ta bort {name}',
+  'hudChrome.framePresets.empty': 'Inga sparade förinställningar',
+  'hudChrome.framePresets.failed': 'Det gick inte att spara eller läsa in förinställningen.',
+  'hudChrome.framePresets.name': 'Förinställningens namn',
+  'hudChrome.framePresets.new': 'Ny förinställning',
+  'hudChrome.framePresets.overwrite': 'Skriv över förinställning',
+  'hudChrome.framePresets.overwriteBody':
+    'Ersätt den sparade förinställningen "{name}" med din nuvarande layout?',
+  'hudChrome.framePresets.pickerLabel': 'Ramförinställningar: {name}',
+  'hudChrome.framePresets.remove': 'Ta bort',
+  'hudChrome.framePresets.saved': 'Klart.',
+  'hudChrome.framePresets.slot': 'Förinställning {slot}',
+  'hudChrome.framePresets.title': 'Ramförinställningar',
+  'hudChrome.guildRanks.add': 'Lägg till rang',
+  'hudChrome.guildRanks.colActions': 'Ordning',
+  'hudChrome.guildRanks.colMembers': 'Medlemmar',
+  'hudChrome.guildRanks.colRank': 'Rang',
+  'hudChrome.guildRanks.colTitle': 'Titel',
+  'hudChrome.guildRanks.demoteTo': 'Degradera {name} till {rank}',
+  'hudChrome.guildRanks.full': 'Ett gille kan ha högst {max} ringar.',
+  'hudChrome.guildRanks.introEdit':
+    'Namnge dina gillrangar och välj vad varje kan göra. Ändringar gäller alla som innehar rangen när du sparar.',
+  'hudChrome.guildRanks.introView':
+    'Varje rangstitel och vad den kan göra. Bara gillemästaren kan ändra dem.',
+  'hudChrome.guildRanks.invalidTitle':
+    'Rangstitlar använder bokstäver, siffror, mellanslag, apostrofer och bindestreck, upp till {max} tecken.',
+  'hudChrome.guildRanks.leaderLocked': 'Gillemästaren innehar alltid alla rättigheter.',
+  'hudChrome.guildRanks.moveDown': 'Flytta {rank} ner',
+  'hudChrome.guildRanks.moveUp': 'Flytta {rank} upp',
+  'hudChrome.guildRanks.numbered': 'Rang {n}',
+  'hudChrome.guildRanks.perm.bank': 'Gillbank',
+  'hudChrome.guildRanks.perm.events': 'Kalender',
+  'hudChrome.guildRanks.perm.invite': 'Bjud in',
+  'hudChrome.guildRanks.perm.motd': 'Anslagstavla',
+  'hudChrome.guildRanks.perm.officerChat': 'Officerchatt',
+  'hudChrome.guildRanks.perm.promote': 'Befordra',
+  'hudChrome.guildRanks.perm.remove': 'Ta bort',
+  'hudChrome.guildRanks.permHint.bank':
+    'Sätta in och ta ut koppar och föremål i gillbanken. Varje medlem kan se den.',
+  'hudChrome.guildRanks.permHint.events': 'Lägg till och ta bort gillekalenderhändelser.',
+  'hudChrome.guildRanks.permHint.invite': 'Bjud in spelare till gillen och besvara deras löften.',
+  'hudChrome.guildRanks.permHint.motd': 'Redigera gillens anslagstavla.',
+  'hudChrome.guildRanks.permHint.officerChat': 'Läs och tala i officerchatt.',
+  'hudChrome.guildRanks.permHint.promote':
+    'Befordra och degradera medlemmar som innehar en lägre rang, upp till en rang under deras egen.',
+  'hudChrome.guildRanks.permHint.remove': 'Ta bort medlemmar som innehar en lägre rang.',
+  'hudChrome.guildRanks.permLabel': '{perm} för {rank}',
+  'hudChrome.guildRanks.promoteTo': 'Befordra {name} till {rank}',
+  'hudChrome.guildRanks.remove': 'Ta bort {rank}',
+  'hudChrome.guildRanks.removeAccept': 'Ta bort rang',
+  'hudChrome.guildRanks.removeConfirm':
+    'Medlemmar som innehar {rank} blir {fallback}. Ta bort denna rang?',
+  'hudChrome.guildRanks.save': 'Spara ranger',
+  'hudChrome.guildRanks.tab': 'Ranger',
+  'hudChrome.guildRanks.titleLabel': 'Titel för {rank}',
+  'hudChrome.hill.contestNone': 'Håll en majoritet innanför för {total} för att ta den',
+  'hudChrome.hill.contestOther': 'Förlorar kullen: {seconds} av {total}',
+  'hudChrome.hill.contestYou': 'Tar kullen: {seconds} av {total}',
+  'hudChrome.hill.counts': 'Innanför: du {yours}, innehavare {theirs}',
+  'hudChrome.hill.countsHolding': 'Innanför: du {yours}, rival {theirs}',
+  'hudChrome.hill.countsUnheld': 'Innanför: du {yours}, största rival {theirs}',
+  'hudChrome.hill.distance': '{yards} yd till cirkeln',
+  'hudChrome.hill.falls': 'Faller om {minutes}',
+  'hudChrome.hill.heldNone': 'Ingen innehar kullen',
+  'hudChrome.hill.heldOther': 'En annan grupp innehar kullen',
+  'hudChrome.hill.heldYou': 'Din grupp innehar kullen',
+  'hudChrome.hill.inside': 'Du är inom cirkeln',
+  'hudChrome.hill.rises': 'Stiger om {minutes}',
+  'hudChrome.hill.rising': 'Kullen har ännu inte stigit',
+  'hudChrome.hill.standingRaid': 'Rajdmedlemmar räknas inte: bara partier kan inneha kullen',
+  'hudChrome.hill.title': 'Kungens på kullen',
+  'hudChrome.hostDiag.create': 'Generera systemrapport',
+  'hudChrome.hostDiag.failed': 'Rapporten kunde inte skapas. Försök igen.',
+  'hudChrome.hostDiag.intro':
+    'Samlar detaljer om denna dator, inklusive program som använder mest processor och minne, i en fil som hjälper till att diagnostisera prestandaproblem. Ingenting skickas: filen stannar på din dator.',
+  'hudChrome.hostDiag.running': 'Samlar systemdetaljer...',
+  'hudChrome.hostDiag.saved': 'Rapport sparad som {fileName}.',
+  'hudChrome.hostDiag.savedNoName': 'Rapport sparad.',
+  'hudChrome.hostDiag.title': 'Systemrapport',
+  'hudChrome.interfaceUnlock.combineAuras': 'Kombinera aurarammer',
+  'hudChrome.interfaceUnlock.combineTrackers': 'Kombinera spårare',
+  'hudChrome.interfaceUnlock.frameNames.auraGroup': 'Auraspårare',
+  'hudChrome.interfaceUnlock.frameNames.trackerGroup': 'Spårare',
+  'hudChrome.leaderboard.gliderCourseNames.downs': 'Kustkrets',
+  'hudChrome.leaderboard.gliderCourseNames.switchbacks': 'Bergsslingor',
+  'hudChrome.leaderboard.gliderCourseNames.valleys': 'Dalkrets',
+  'hudChrome.leaderboard.gliderDaily': '{course}: Idag',
+  'hudChrome.leaderboard.gliderLifetime': '{course}: Hela tiden',
+  'hudChrome.leaderboard.gliderPersonalRules':
+    'Dina offlinerekord, sparade med denna karaktär. Passera varje ring i ordning. Dagliga rekord återställs varje dag.',
+  'hudChrome.leaderboard.gliderRankings': 'Glidkursrekord',
+  'hudChrome.leaderboard.gliderRules':
+    'Snabbaste kompletta flygning vinner. Passera varje ring. Dagliga rekord återställs med området. Rekord uppdateras inom 30 sekunder.',
+  'hudChrome.leaderboard.gliderStart': 'Flyga denna kurs',
+  'hudChrome.leaderboard.tabWorldQuests': 'Världsäventyr',
+  'hudChrome.leaderboard.wqBoardsLabel': 'Världsäventyrsscoretavlor',
+  'hudChrome.leaderboard.wqEmpty':
+    'Inga poäng på denna tavla ännu. Avsluta världsäventyret för att göra anspråk på en plats.',
+  'hudChrome.leaderboard.wqMedal': 'Medalj',
+  'hudChrome.leaderboard.wqMedals.bronze': 'Brons',
+  'hudChrome.leaderboard.wqMedals.gold': 'Guld',
+  'hudChrome.leaderboard.wqMedals.silver': 'Silver',
+  'hudChrome.leaderboard.wqNoMedal': 'Ingen',
+  'hudChrome.leaderboard.wqPoints': 'Poäng',
+  'hudChrome.leaderboard.wqSeconds': '{seconds}s',
+  'hudChrome.leaderboard.wqTime': 'Tid',
+  'hudChrome.leaderboard.wqWaves': 'Vågor hållna',
+  'hudChrome.loot.rollWon': 'Grattis! Du vann {item} med en tärningskast på {roll}',
+  'hudChrome.lootQuality.exceptional': 'Exceptionell',
+  'hudChrome.lootQuality.itemName': '{item}, {quality}',
+  'hudChrome.lootQuality.magnificent': 'Magnifik',
+  'hudChrome.lootQuality.ordinary': 'Vanlig',
+  'hudChrome.lootQuality.superior': 'Överordnad',
+  'hudChrome.lootQuality.tooltip':
+    '{quality}: +{levels} föremålsnivåer. Bevaras genom uppgraderingar.',
+  'hudChrome.lootQuality.transcendent': 'Transcendent',
+  'hudChrome.mapAtlas.collapseHint': 'Minimera kartsidobalken',
+  'hudChrome.mapAtlas.expandHint': 'Expandera kartsidobalken',
+  'hudChrome.mapAtlas.worldQuests.confirmBody':
+    'Du kan bara byta en världsuppdrag per dag och det kan inte ångras. {quest} kommer att bytas mot ett annat uppdrag i dess zon.',
+  'hudChrome.mapAtlas.worldQuests.confirmCancel': 'Avbryt',
+  'hudChrome.mapAtlas.worldQuests.confirmOk': 'Byt',
+  'hudChrome.mapAtlas.worldQuests.confirmTitle': 'Byta detta världsuppdrag?',
+  'hudChrome.mapAtlas.worldQuests.count': '{done} / {total}',
+  'hudChrome.mapAtlas.worldQuests.empty': 'Inga världsuppdrag idag',
+  'hudChrome.mapAtlas.worldQuests.heading': 'Världsuppdrag idag',
+  'hudChrome.mapAtlas.worldQuests.replacement': 'Ersättning',
+  'hudChrome.mapAtlas.worldQuests.reroll': 'Byt uppdrag',
+  'hudChrome.mapAtlas.worldQuests.rerollNote': 'En ersättning är tillgänglig idag',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.completed': 'Ett färdigt uppdrag kan inte bytas',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.inProgress': 'Ett uppdrag som pågår kan inte bytas',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.noAlternative':
+    'Inget annat uppdrag är tillgängligt i den zonen idag',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.noCycle': 'Ingen tavla idag',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.notActive': 'Detta uppdrag finns inte på din tavla',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.unknown': 'Detta uppdrag kan inte bytas idag',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.usedToday': 'Ersättning använd idag',
+  'hudChrome.mapAtlas.worldQuests.rerollUsed': 'Ersättning använd idag',
+  'hudChrome.mapAtlas.worldQuests.state.active': 'Pågår',
+  'hudChrome.mapAtlas.worldQuests.state.completed': 'Färdig',
+  'hudChrome.meters.activeProfile': 'Aktivt profil',
+  'hudChrome.meters.activeProfileDesc':
+    'Välj eller hantera oberoende profiler för olika spelscenarier.',
+  'hudChrome.meters.alwaysShowMe': 'Visa alltid mig',
+  'hudChrome.meters.alwaysShowMeDesc':
+    'Fäster din spelarrad längst ned om du rankas utanför synliga rader.',
+  'hudChrome.meters.applyPreset': 'Använd tema',
+  'hudChrome.meters.autoRows': ' (Automatisk)',
+  'hudChrome.meters.backComparison': 'Jämförelse',
+  'hudChrome.meters.backDev': 'Balans / Utveckling',
+  'hudChrome.meters.backTimeline': 'Tidslinje',
+  'hudChrome.meters.balanceAbilitiesCount': 'Loggade förmågor: {count}',
+  'hudChrome.meters.barAnimation': 'Mjuk staplingsanimation',
+  'hudChrome.meters.barAnimationDesc':
+    'Interpolerar staplingstillväxt och förfall flytande i realtid.',
+  'hudChrome.meters.barHeight': 'Stapelhöjd',
+  'hudChrome.meters.barHeightDesc':
+    'Lodrät tjocklek för varje kamprads (14px kompakt till 26px rymlig).',
+  'hudChrome.meters.barSpacing': 'Stapelmellanrum',
+  'hudChrome.meters.barSpacingDesc': 'Lodrät pixelavståndet mellan angränsande rader.',
+  'hudChrome.meters.barTexture': 'Stapeltextur',
+  'hudChrome.meters.barTextureDesc': 'Visuell finish och skuggning över klassens färg.',
+  'hudChrome.meters.barsUnit': ' staplar',
+  'hudChrome.meters.bgGlass': 'Bakgrund: Glas (76%)',
+  'hudChrome.meters.bgMinimal': 'Bakgrund: Minimal (45%)',
+  'hudChrome.meters.bgMode': 'Bakgrundsläge',
+  'hudChrome.meters.bgModeDesc': 'Visuell stil för mätarpanelen.',
+  'hudChrome.meters.bgOpacity': 'Bakgrundsopacitet',
+  'hudChrome.meters.bgOpacityDesc': 'Opacitetsprocent för fönsterbakgrunden.',
+  'hudChrome.meters.bgSolid': 'Bakgrund: Solid (98%)',
+  'hudChrome.meters.cannotDeleteDefault': 'Standardprofilen kan inte tas bort',
+  'hudChrome.meters.closeSettings': 'Stäng',
+  'hudChrome.meters.comparisonNeedTwo': 'Minst 2 strider krävs för att jämföra',
+  'hudChrome.meters.copiedFeedback': 'Kopierat till urklipp!',
+  'hudChrome.meters.copyString': 'Kopiera profilsträng',
+  'hudChrome.meters.deleteProfile': 'Ta bort',
+  'hudChrome.meters.densityCompact': 'Densitet: Kompakt (16px)',
+  'hudChrome.meters.densityStandard': 'Densitet: Standard (20px)',
+  'hudChrome.meters.duplicate': 'Duplicera',
+  'hudChrome.meters.errEmptyProfile': 'Vänligen klistra in en profilsträng.',
+  'hudChrome.meters.errInvalidProfile': 'Fel: Ogiltig eller skadad profilsträng.',
+  'hudChrome.meters.exportDesc':
+    'Kodad profilsträng av din nuvarande konfiguration. Kopiera den för att dela eller säkerhetskopiera.',
+  'hudChrome.meters.groupBars': 'Staplgeometri och textur',
+  'hudChrome.meters.groupCombat': 'Kampregler och gränser',
+  'hudChrome.meters.groupExport': 'Exportera nuvarande profil',
+  'hudChrome.meters.groupFont': 'Kamptypsografi (teckensnittsfamilj)',
+  'hudChrome.meters.groupHeader': 'Anpassning av rubrik',
+  'hudChrome.meters.groupImport': 'Importera profil',
+  'hudChrome.meters.groupManageProfiles': 'Profilhantering',
+  'hudChrome.meters.groupPresets': 'One-Click snabbmotiv',
+  'hudChrome.meters.groupText': 'Textformatering och telemetri',
+  'hudChrome.meters.groupWindow': 'Fönsterutseende och bakgrund',
+  'hudChrome.meters.importApply': 'Importera och använd',
+  'hudChrome.meters.importDesc':
+    'Klistra in en profilsträng (!WoC-Details:... eller JSON) för att tillämpa och spara.',
+  'hudChrome.meters.importNamePlaceholder': 'Profilnamn (valfritt)',
+  'hudChrome.meters.importPlaceholder': 'Klistra in profilsträng här (!WoC-Details:...)',
+  'hudChrome.meters.importSuccess': 'Profil "{name}" importerad framgångsrikt!',
+  'hudChrome.meters.includeShields': 'Räkna absorberingar som läkning',
+  'hudChrome.meters.includeShieldsDesc':
+    'Lägger till absorberad skadeskyddssdamage (Värnpsalm osv.) till läkningsmätaren.',
+  'hudChrome.meters.killedBy': 'Dödad av {killer} ({ability})',
+  'hudChrome.meters.lethalHit': 'Dödande träff',
+  'hudChrome.meters.lockPosition': 'Lås position',
+  'hudChrome.meters.lockPositionDesc':
+    'Låser fönstret för att förhindra oavsiktlig dragning eller storleksändring i kamp.',
+  'hudChrome.meters.maxRows': 'Maximalt synliga rader',
+  'hudChrome.meters.maxRowsDesc':
+    'Samtidiga staplar (0 = obegränsad, anpassas automatiskt till fönsterhöjd).',
+  'hudChrome.meters.noDeathEvents': 'Inga händelser loggade före död',
+  'hudChrome.meters.noDetailedData': 'Ingen detaljerad data',
+  'hudChrome.meters.noTargetData': 'Ingen spelardata för detta mål',
+  'hudChrome.meters.numCompact': 'Siffror: Förkortade (k/M)',
+  'hudChrome.meters.numDetailed': 'Siffror: Detaljerad',
+  'hudChrome.meters.numFormat': 'Talformat',
+  'hudChrome.meters.numFormatDesc': 'Visningsstil för totaler.',
+  'hudChrome.meters.optGlass': 'Glas (Suddigt)',
+  'hudChrome.meters.optGlassDesc': 'Frostad suddig effekt',
+  'hudChrome.meters.optMinimal': 'Minimal',
+  'hudChrome.meters.optMinimalDesc': 'Svag genomskinlig',
+  'hudChrome.meters.optNumCompact': 'Förkortad (k / M)',
+  'hudChrome.meters.optNumCompactDesc': 'Exempel: 145,2k, 1,2M',
+  'hudChrome.meters.optNumDamageDps': 'Skada | DPS',
+  'hudChrome.meters.optNumDamageDpsDesc': 'Exempel: 239,2k | 18,4k (ren telemetrirad)',
+  'hudChrome.meters.optNumDetailed': 'Fullt detaljerad',
+  'hudChrome.meters.optNumDetailedDesc': 'Exempel: 145 200, 1 240 500',
+  'hudChrome.meters.optSolid': 'Solid',
+  'hudChrome.meters.optSolidDesc': 'Mörk högkontrast panel',
+  'hudChrome.meters.optTransparent': 'Transparent',
+  'hudChrome.meters.optTransparentDesc': 'Ingen bakgrund, endast staplar',
+  'hudChrome.meters.optionsEngineBadge': 'WoC Details! Motor',
+  'hudChrome.meters.presetClassicBadge': 'Klassisk',
+  'hudChrome.meters.presetClassicDesc':
+    'Mörk högkontrast solid panel, platt klassstapar, okomprimerad detaljerad siffror i klassisk layout.',
+  'hudChrome.meters.presetClassicName': 'Klassisk solid',
+  'hudChrome.meters.presetDetailsBadge': 'Rekommenderad',
+  'hudChrome.meters.presetDetailsDesc':
+    'Frostad suddlig bakgrund, speglade glansiga staplar, förkortade siffror och full telemetri.',
+  'hudChrome.meters.presetDetailsName': 'Modern glas',
+  'hudChrome.meters.presetMinimalBadge': 'Ren',
+  'hudChrome.meters.presetMinimalDesc':
+    'Nästan transparent bakgrund, kompakt 16px staplar utan luckor, direkt text utan procentsatser.',
+  'hudChrome.meters.presetMinimalName': 'Ren minimal',
+  'hudChrome.meters.presetProGradientBadge': 'Pro',
+  'hudChrome.meters.presetProGradientDesc':
+    'Flytande transparent panel, horisontell gradientstapar, spektikoner och Skada | DPS telemetri.',
+  'hudChrome.meters.presetProGradientName': 'Pro gradient',
+  'hudChrome.meters.presetRaidBadge': 'Raid',
+  'hudChrome.meters.presetRaidDesc':
+    'Designad för raids: kompakt 18px densitet, 10-staplgräns, synlig grupptotal och fäst spelarrad.',
+  'hudChrome.meters.presetRaidName': 'Raid fokus',
+  'hudChrome.meters.profileCopySuffix': ' (Kopia)',
+  'hudChrome.meters.promptNewProfile': 'Namn på den nya profilen:',
+  'hudChrome.meters.raidTotalsOff': 'Huvudgrupps total: Nej',
+  'hudChrome.meters.raidTotalsOn': 'Huvudgrupps total: Ja',
+  'hudChrome.meters.recentCombatEvents': 'Senaste {count} kampsevenemang',
+  'hudChrome.meters.reportNoData': 'Ingen data registrerad.',
+  'hudChrome.meters.reportSent': 'Rapport kopierad och skickad till chat',
+  'hudChrome.meters.resetDefaults': 'Återställ till standard',
+  'hudChrome.meters.saveAs': 'Spara som...',
+  'hudChrome.meters.settingsTitle': 'Detaljer / Mäterinställningar',
+  'hudChrome.meters.showClassIcon': 'Visa klassikon',
+  'hudChrome.meters.showClassIconDesc': 'Visar klassens eller rollens ikon bredvid varje spelare.',
+  'hudChrome.meters.showDps': 'Visa hastighet per sekund (DPS / HPS)',
+  'hudChrome.meters.showDpsDesc': 'Visar skada eller läkningshastighet per sekund på varje rad.',
+  'hudChrome.meters.showPercent': 'Visa procent (%)',
+  'hudChrome.meters.showPercentDesc': 'Visar procent bidrag till totalt gruppoutput.',
+  'hudChrome.meters.showRaidTotals': 'Gruppsammanfattning i underrubrik',
+  'hudChrome.meters.showRaidTotalsDesc': 'Visar kumulativ grupp DPS/HPS i rubrikunderrubrik.',
+  'hudChrome.meters.showRank': 'Visa rankning (#1, #2...)',
+  'hudChrome.meters.showRankDesc': 'Visar ordningstalsnummer bredvid namnet.',
+  'hudChrome.meters.showTitleBar': 'Visa titelrad',
+  'hudChrome.meters.showTitleBarDesc': 'Visar övre rad med kampsegmentsnamn och kontroller.',
+  'hudChrome.meters.tabBars': 'Staplar och texturer',
+  'hudChrome.meters.tabBarsDesc': 'Höjd, mellanrum, animation',
+  'hudChrome.meters.tabCombat': 'Kamp och gränser',
+  'hudChrome.meters.tabCombatDesc': 'Max rader, sköldar',
+  'hudChrome.meters.tabGeneral': 'Fönster och bakgrund',
+  'hudChrome.meters.tabGeneralDesc': 'Opacitet, skala, lås',
+  'hudChrome.meters.tabHeader': 'Rubrik och titel',
+  'hudChrome.meters.tabHeaderDesc': 'Grupptotal, titelrad',
+  'hudChrome.meters.tabPresets': 'Snabbmotiv',
+  'hudChrome.meters.tabPresetsDesc': 'One-click förinställningar',
+  'hudChrome.meters.texSmooth': 'Slät (Platt)',
+  'hudChrome.options.frameRateCapThirty': '30',
+  'hudChrome.trinkets.cooldownMinutes': '{minutes} min',
+  'hudChrome.meters.tabText': 'Text & Typografi',
+  'hudChrome.trinkets.equip.ignite':
+    'Dina närkamps- och fjärrattacker kritiska slag sätter målet i brand, som orsakar {tick} Eldskada var {every} sek i {duration} sek. Ett nytt kritiskt slag uppdaterar den. Skadan ökar med Attackkraft eller Fjärrattackkraft, vilken som är högre.',
+  'hudChrome.vehicle.bronze': 'Bronspmedalj',
+  'hudChrome.meters.texSmoothDesc': 'Ren platt klassifärg',
+  'hudChrome.vehicle.failed': 'Försvar misslyckades',
+  'hudChrome.trade.offerRemoveInput': 'Antal att ta bort',
+  'hudChrome.vehicle.chargeWarning':
+    'Befälhavaren beordrar en laddning! Alla överlevande fiender rör sig snabbare.',
+  'hudChrome.reputation.cappedByLevel': 'Anseende pausas på {tier} tills nivå 16',
+  'hudChrome.reputation.hub.rift_watch': 'Varyn Twilight',
+  'hudChrome.trinkets.equip.twinStrike':
+    'Dina auto-attacker har en {chance}% chans att göra ett extra närkampsslag med huvudhand. Kan inträffa en gång var {icd} sek.',
+  'hudChrome.vehicle.grapeshot': 'Druvskott',
+  'hudChrome.reputation.intro':
+    'Alla tre fraktioner fortskrider samtidigt: varje världskupong räknas mot fraktionen av dess zon.',
+  'hudChrome.options.overlays': 'Överlägg',
+  'hudChrome.trinkets.use.anchor':
+    'I {duration} sek tar du {reduction}% mindre skada men rör dig på {speed}% hastighet. Tar bort stunar, rötter, långsamningar, rädslor, polymorfar, tyststöt, blinds, hex, nedrustande och incapaciterad effekter på dig, och du ignorerar nya och knockback när det varar.',
+  'hudChrome.reputation.legend': 'Anseendetieringar',
+  'hudChrome.trinkets.equipLockout':
+    'Att utrusta det startar en {seconds} sek avkylningstid på dess användning, eller avkylningstiden kvar på talismanen det ersätter om det är längre.',
+  'hudChrome.reputation.factionTitle.church_order.vanguard': 'Gryningsväktare',
+  'hudChrome.reputation.hubLine': '{hub} . {zone}',
+  'hudChrome.reputation.maxed': 'Högsta anseende uppnått',
+  'hudChrome.reputation.faction.rift_watch': 'Riftvakt',
+  'hudChrome.reputation.factionTitle.rift_watch.champion': 'Högvakt',
+  'hudChrome.townFocus.pendingLine':
+    'Sparad. Din omspecning till denna allokeringskompletteras i {time}.',
+  'hudChrome.townFocus.preferenceHint':
+    'Focus höjer graden och mängden av vad du skördar. För att skörda endast ett material ställer du en Harvest Preference från ditt Field Kit eller Professions-fönstret.',
+  'hudChrome.unstuck.revivedAtGraveyardFree':
+    'Du har flyttats till närmaste kyrkogård och uppvaknad. Att använda Unstuck igen inom timmen lämnar dig med Unstuck Sjukdom.',
+  'hudChrome.unstuck.helpUnstuckWindow':
+    'Återhämtning: /unstuck startar en stationär nedräkning, sedan flyttar den dig till närmaste kyrkogård, uppväcker dig om du hade fallit. Den första användningen per timme är gratis. Använd den igen inom en timme från den senaste och den lämnar dig med Unstuck Sjukdom i upp till 5 minuter.',
+  'hudChrome.reputation.resetsUnknown': 'Ingen tavla idag',
+  'hudChrome.options.actionCamShoulderCenter': 'Centrum',
+  'hudChrome.vehicle.barrelHint': 'Skjut på de märkta krutkrukorna när fiender samlas omkring dem.',
+  'hudChrome.perf.title': 'Prestanda',
+  'hudChrome.options.gfxGhostFadeSmooth': 'Slät',
+  'hudChrome.reputation.next': 'Nästa: {tier}',
+  'hudChrome.options.frameRateCapStatusPaced': 'Ritar {fps} bilder per sekund på en {hz} Hz-skärm.',
+  'hudChrome.options.gfxGhostFadeDithered': 'Dithrad',
+  'hudChrome.trinkets.use.stormjar':
+    'Släpp alla laddningar som en bult på ditt mål inom {range} yd som hoppar till upp till {extra} fler fiender inom {jumpRange} yd. Varje fiende tar {perCharge} Naturskada per laddning ({max} på {maxCharges} laddningar). Skadan ökar med Besvärjelsekraft. Kräver en laddning.',
+  'hudChrome.options.actionCamShoulderRight': 'Höger {pct}',
+  'hudChrome.trinkets.use.gamble':
+    'Rulla ett av fyra öden i {duration} sek: {keenEdge} (gör {keenPct}% mer skada), {luckyStreak} (läka {heal} under varaktigheten), {gildedGuard} (ett sköld som absorberar {absorb} skada), eller {snakeEyes} (ingen effekt, men denna avkylningstid halveras).',
+  'hudChrome.reputation.factionTitle.automatons.recognized': 'Operatör',
+  'hudChrome.trinkets.use.pierce':
+    'I {duration} sek träffar dina auto-attacker, skott och fysiska förmågor (inte blödningar) också fienden närmast ditt mål inom {reach} yd för {share}% av skadan tilldelad.',
+  'hudChrome.trinkets.equippedLine': 'Utrustad',
+  'hudChrome.vehicle.hint': 'Välj ett skott, klicka sedan på marken för att avfyra.',
+  'hudChrome.reputation.factionTitle.automatons.champion': 'Högvakt',
+  'hudChrome.vehicle.cannonball': 'Kanonkula',
+  'hudChrome.meters.texGradient': 'Gradient',
+  'hudChrome.trinkets.use.brand':
+    'Märk en fiendesspelare inom {range} yd, reducera läkningen de får med {cut}% i {duration} sek.',
+  'hudChrome.reputation.factionTitle.rift_watch.trusted': 'Riftgångare',
+  'hudChrome.options.frameRateCapStatusUnpaced': 'Begränsar till {fps} bilder per sekund.',
+  'hudChrome.options.frameRateCapNote':
+    'Begränsar hur många bilder spelet ritar varje sekund. På en dator som inte kan hålla jämna steg med sin skärm ger en lägre gräns en jämnare bild och håller datorn svalare. Gränsen följer din skärm, så den faktiska hastigheten kan skilja sig något från siffran. Automatisk sänker gränsen endast när denna dator inte kan hålla jämna steg med sin skärm, och håller den sedan stabil. (Rekommenderas). Skärm: ingen gräns.',
+  'hudChrome.vehicle.armorRules':
+    'Beväpnade trupper tar {reduction} mindre skada tills Kanonkula bryter deras rustning. Bruten rustning tar {bonus} mer eldskada.',
+  'hudChrome.trade.offerRemoveTitle': 'Ta bort {item}',
+  'hudChrome.reputation.factionTitle.automatons.trusted': 'Mekaniker',
+  'hudChrome.reputation.tierReachedSubtext': 'Fraktionstittel: {title}',
+  'hudChrome.trinkets.equip.storm':
+    'Varje besvärjelse du kastar lägger till en laddning, upp till {max}. Laddningar varar {duration} sek, uppdaterad när du får en.',
+  'hudChrome.reputation.factionTitle.automatons.vanguard': 'Smidsämne',
+  'hudChrome.trinkets.use.hourglass':
+    'Förvandla all lagrad läkning till ett sköld på lagspelaren inom {range} yd med den lägsta hälsoprocentandelen, du inkluderad. Sköldet varar {duration} sek. Kräver lagrad läkning.',
+  'hudChrome.vehicle.exposedHint': 'Bruten rustning: Brandskott gör dubbel skada.',
+  'hudChrome.statInfo.desc.healPower':
+    'Ökar läkningseffekten från dina läkningar och läkningsövertidseffekter, och storleken på dina absorbsköldar. Det är din Besvärjelsekraft plus Läkningskraften från din utrustning och setbonusar, som lägger till läkning men aldrig till skada.',
+  'hudChrome.trinkets.use.bleedEdge':
+    'I {duration} sek applicerar dina auto-attacker Talon Wound, som orsakar {tick} Fysisk skada per stapel var {every} sek i {bleedDuration} sek och stackas upp till {stacks} gånger. Skadan ökar med Attackkraft.',
+  'hudChrome.trinkets.gambleResult': '{item}: {fortune}!',
+  'hudChrome.reputation.tier.proven': 'Beprövad',
+  'hudChrome.trade.offerQuantityTitle': 'Erbjud {item}',
+  'hudChrome.reputation.standingGained': '+{amount} {faction} Anseende.',
+  'hudChrome.reputation.today': 'Idag',
+  'hudChrome.trinkets.use.tallyStrike':
+    'Använd alla teckenmärken för att träffa ditt mål inom {range} yd för {perMark} Fysisk skada per märke ({max} på {maxMarks} märken). Skadan ökar med Attackkraft. Kräver ett teckenmärke.',
+  'hudChrome.trinkets.use.defiance':
+    'Ta bort alla stunar, rötter, långsamningar, rädslor, polymorfar, tyststöt, blinds, hex, nedrustande och incapaciterad effekter på dig. Kan användas medan du är stunad.',
+  'hudChrome.mounts.desc_avian_strider':
+    'En höga sadelbåge vars tunga klor och veckade vingar förvandlar varje färd till en dunderande sprint.',
+  'hudChrome.nameplate.pvpTag': 'PvP',
+  'hudChrome.reputation.titleLine': '{faction} . {tier}',
+  'hudChrome.trade.offerRemove': 'Ta bort',
+  'hudChrome.reputation.tier.vanguard': 'Förtrupp',
+  'hudChrome.options.frameRateCapDisplay': 'Skärm',
+  'hudChrome.reputation.factionTitle.rift_watch.recognized': 'Bevakare',
+  'hudChrome.trinkets.useLine': 'Använd: {effect} ({cooldown} avkylningstid)',
+  'hudChrome.reputation.progress': '{current} / {next}',
+  'hudChrome.trinkets.use.sprint':
+    'Öka din rörelse hastighet med {speed}% i {duration} sek. Stackas inte med andra hastighetshöjningar.',
+  'hudChrome.trinkets.use.temper':
+    'Använd all värmestapel för att härda ditt vapen i {duration} sek. Dina närkamps- och fjärrattacker orsakar {damage} extra Eldskada, ökat av {perHeat}% för varje värmestapel som användes (upp till {maxBonus}% på {maxHeat} staplar). Varje dödsblow lägger till {killExtend} sek, upp till {maxDuration} sek totalt. Skadan ökar med Attackkraft eller Fjärrattackkraft, vilken som är högre.',
+  'hudChrome.statInfo.names.spellCrit': 'Besvärjelsekritisk',
+  'hudChrome.reputation.title': 'Fraktionstittel',
+  'hudChrome.trinkets.equip.guardHeat':
+    'Varje attacker du parera, undviker eller blockar lägger till en värmestapel, upp till {max}. Värme varar {duration} sek, uppdaterad när du får en stapel.',
+  'hudChrome.trade.offerRemoveAll': 'Ta bort allt',
+  'hudChrome.options.frameRateCapSixty': '60',
+  'hudChrome.meters.tabProfiles': 'Profiler & Import',
+  'hudChrome.reputation.factionTitle.automatons.proven': 'Konstruktör',
+  'hudChrome.meters.windowScale': 'Fönsterskalering',
+  'hudChrome.options.actionCamShoulderLeft': 'Vänster {pct}',
+  'hudChrome.trinkets.use.kindlingOrb':
+    'Framkalla en glödorb bredvid dig i {duration} sek. Varje besvärjelse du kastar på en fiende får den att skjuta en bult på fienden för {damage} Eldskada. Skadan ökar med Besvärjelsekraft.',
+  'hudChrome.options.targetAurasBelowFrame': 'Målauror under ramen',
+  'hudChrome.meters.targetsHeader': 'Mål',
+  'hudChrome.reputation.factionTitle.rift_watch.proven': 'Fånge',
+  'hudChrome.reputation.factionTitle.church_order.champion': 'Högvakt',
+  'hudChrome.reputation.tierReachedLine':
+    'Du är nu {tier} med {faction}. Din fraktionstittel är nu {title}.',
+  'hudChrome.reputation.resetsIn': 'Tavla',
+  'hudChrome.trinkets.equip.lastStand':
+    'Att ta skada när du är under {threshold}% hälsa ger ett sköld som absorberar {absorb} skada ({absorbPct}% av ditt maximala hälsa) i {duration} sek. Kan inträffa en gång var {icd} sek.',
+  'hudChrome.trinkets.equip.tally':
+    'Dina auto-attacker kritiska slag och dina dödsblow lägger var och en till ett teckenmärke, upp till {max}. Märken varar {duration} sek, uppdaterad när du får ett.',
+  'hudChrome.vehicle.exit': 'Lämna kanon',
+  'hudChrome.reputation.questsDone': 'Världskupong slutförda',
+  'hudChrome.trinkets.cooldownSeconds': '{seconds} sek',
+  'hudChrome.trinkets.equip.hourglass':
+    'Överläkning från dina direkta läkningar lagras i timglasset, upp till {cap} ({capPct}% av ditt maximala hälsa). Lagrad läkning försvinner {fade} sek efter att den sist växte.',
+  'hudChrome.mounts.name_avian_strider': 'Viridian Valestrider',
+  'hudChrome.options.actionCam': 'Actionkamera',
+  'hudChrome.meters.texSpecular': 'Glansig (Spekulär)',
+  'hudChrome.options.frameRateCapStatusInert':
+    'Denna skärm kör redan på eller under denna gräns, så gränsen ändrar ingenting.',
+  'hudChrome.targetAuras.close': 'Stäng målaurafönstret',
+  'hudChrome.reputation.factionTitle.church_order.trusted': 'Väktare',
+  'hudChrome.reputation.faction.automatons': 'Automater',
+  'hudChrome.trinkets.use.echo':
+    'I {duration} sek upprepas din nästa {casts} direkta läkningar eller direkta icke-fysiska skadaträffar för {pct}% av deras belopp.',
+  'hudChrome.statInfo.desc.warfareWithHealth':
+    'Ökar skada som gjorts mot spelare med {increase}% och reducerar skada från spelare med {reduction}%. Höjer också ditt maximala hälsa med {health}% överallt utom dungeons, raids, delves och rifts.',
+  'hudChrome.vehicle.aim': 'Klicka för att avfyra. Högerklicka eller Escape avbryter sikting.',
+  'hudChrome.trinkets.use.blink':
+    'Steg {yards} yd framåt, ta sedan {reduction}% mindre skada i {guard} sek.',
+  'hudChrome.trade.offerQuantityAll': 'Erbjud allt',
+  'hudChrome.reputation.factionTitle.church_order.recognized': 'Akolyt',
+  'hudChrome.reputation.vendorGate': 'Kräver {tier} med {faction}.',
+  'hudChrome.meters.tabTextDesc': 'Teckensnitt, k/M, DPS, rang',
+  'hudChrome.meters.windowScaleDesc': 'Öka eller minska den övergripande meterskalningen.',
+  'hudChrome.options.frameRateCap': 'Bildhastighets gräns',
+  'hudChrome.statInfo.desc.spellCrit':
+    'Din chans för en besvärjelse eller läkning att träffa kritiskt, vilket gör 150% skada eller läkning. Besvärjelser och läkningar slår detta istället för Kritisk chans: Intellekt höjer endast denna chans, medan kritisk rating, talanger och setbonusar höjer båda.',
+  'hudChrome.trade.offerQuantityConfirm': 'Erbjud',
+  'hudChrome.unstuck.movedToGraveyardFree':
+    'Du har flyttats till närmaste kyrkogård. Att använda Unstuck igen inom timmen lämnar dig med Unstuck Sjukdom.',
+  'hudChrome.options.gfxGhostFade': 'Kamerafantom',
+  'hudChrome.vehicle.armorHint': 'Bryt de silversköldar med Kanonkula, använd sedan Brandskott.',
+  'hudChrome.trinkets.use.lantern':
+    'Sätt en lykta vid dina fötter i {duration} sek. En direktläkning från någon på dig eller en lagspelare inom {radius} yd från den läkar också den mest sårade andra lagspelaren i sitt ljus för {share}% av läkningen.',
+  'hudChrome.meters.targetSubtitle': 'Mål: {target}',
+  'hudChrome.trinkets.scaled': '{base} (+{bonus})',
+  'hudChrome.meters.timelineCombatEvents': 'Stridshändelser: {count}',
+  'hudChrome.paperdoll.trinketSlot': 'Talisman',
+  'hudChrome.trinkets.use.heartNova':
+    'Använd all värmestapel på en eldnova som orsakar {perHeat} Eldskada per stapel ({max} på {maxHeat} staplar) till varje fiende inom {radius} yd och förnarrar varje varelse den träffar. Skadan ökar med Attackkraft. Kräver en värmestapel.',
+  'hudChrome.trinkets.use.wellspring':
+    'Läka dig och lagspelaren inom {radius} yd för {tick} varje {every} sek i {duration} sek. Läkningen ökar med Läkningskraft.',
+  'hudChrome.trinkets.snakeEyes': 'Ormögon',
+  'hudChrome.reputation.tierReachedBanner': 'Nu {tier} med {faction}',
+  'hudChrome.trinkets.use.retaliate':
+    'I {duration} sek tar en fiende som träffar dig direkt Fysisk skada lika med {pct}% av hälsan som träffen tog från dig. Periodisk skada utlöser det inte.',
+  'hudChrome.options.frameRateCapAuto': 'Automatisk',
+  'hudChrome.reputation.questsDoneValue': '{done} / {total}',
+  'hudChrome.meters.texGradientDesc': 'Jämn horisontell färggradient',
+  'hudChrome.reputation.factionTitle.church_order.unknown': 'Främling',
+  'hudChrome.vehicle.countdown': 'Förbered: {seconds}',
+  'hudChrome.options.showAuraCaster': 'Visa Aura Caster i verktygstips',
+  'hudChrome.reputation.factionTitle.rift_watch.unknown': 'Främling',
+  'hudChrome.reputation.hub.automatons': 'Wyrmwatch',
+  'hudChrome.reputation.tier.recognized': 'Erkänd',
+  'hudChrome.reputation.tier.trusted': 'Betrodd',
+  'hudChrome.reputation.tier.unknown': 'Okänd',
+  'hudChrome.reputation.factionTitle.rift_watch.vanguard': 'Riftväktare',
+  'hudChrome.trade.offerQuantityInput': 'Antal att erbjuda',
+  'hudChrome.trinkets.equip.heat':
+    'Dina närkamps- och fjärrattacker lägger var och en till en värmestapel, upp till {max}. Värme varar {duration} sek, uppdaterad när du får en stapel.',
+  'hudChrome.trade.offerQuantityHint': 'Du kommer att bli tillfrågad hur många du vill erbjuda',
+  'hudChrome.reputation.tier.champion': 'Högvakt',
+  'hudChrome.vehicle.enemies': 'Fiender kvar: {count}',
+  'hudChrome.meters.texSpecularDesc': 'Topphöjdpunkts reflektion med fasning',
+  'hudChrome.meters.tabProfilesDesc': 'Exportera, importera och profiler',
+  'hudChrome.trinkets.equipLine': 'Utrustad: {effect}',
+  'hudChrome.options.actionCamShoulder': 'Actionkamera Axel',
+  'hudChrome.vehicle.barrelRules':
+    'Direkta träffar tänder krutkrukorna: {damage} skada inom {radius} meter, med kedjexplosioner.',
+  'hudChrome.reputation.factionTitle.automatons.unknown': 'Främling',
+  'hudChrome.reputation.factionTitle.church_order.proven': 'Tempelborg',
+  'hudChrome.reputation.faction.church_order': 'Kyrkoorden',
+  'hudChrome.vehicle.endlessWave': 'Oändlig våg {wave} (runda {round})',
+  'hudChrome.vehicle.gold': 'Guldmedalj',
+  'hudChrome.reputation.hub.church_order': 'Broder Aldric',
+  'hudChrome.vehicle.incendiary': 'Eldskott',
+  'hudChrome.vehicle.integrity': 'Kanonens integritet',
+  'hudChrome.vehicle.lastKeepObjective': 'Försvara vägen till Den sista vakten',
+  'hudChrome.vehicle.lastKeepTitle': 'Den sista vaktens kanon',
+  'hudChrome.vehicle.medalRules':
+    'Guld: minst {goldIntegrity} integritet och {goldAccuracy} träffsäkerhet. Silver: {silverIntegrity} och {silverAccuracy}. All annan seger ger Brons. Träffar på fiender eller fat räknas; varje skott räknas en gång. Medaljer ger ingen extra pengar.',
+  'hudChrome.vehicle.objective': 'Försvara nordväktplatsen',
+  'hudChrome.vehicle.result': '{medal}: integritet {integrity}, träffsäkerhet {accuracy}.',
+  'hudChrome.vehicle.resultWaves': 'Vågor hålla: {waves}.',
+  'hudChrome.vehicle.sapperWarning':
+    'Bombman inkommande! Stoppa den explosiva bäraren innan den når linjen.',
+  'hudChrome.vehicle.shake': 'Kameraskak',
+  'hudChrome.vehicle.shotBurn':
+    'Lämna eld i {seconds} sek, som gör {damage} skada per sekund till fiender som står i den.',
+  'hudChrome.vehicle.shotDamage':
+    'Gör {damage} skada till varje fiende inom {radius} yards från påverkan.',
+  'hudChrome.vehicle.shotRules':
+    'Sikta innanför det markerade området. Ingen manakostnad. Skada skalas inte med utrustning eller talanger.',
+  'hudChrome.vehicle.shotSlow': 'Sakta ner träffade fiender med {amount} i {seconds} sek.',
+  'hudChrome.vehicle.shotTiming':
+    'Cooldown: {cooldown} sek. Påverkan efter {flight} sek. Alla skott delar {recovery} sek återhämtning.',
+  'hudChrome.vehicle.silver': 'Silverbrons',
+  'hudChrome.vehicle.title': 'Nordväktens kanon',
+  'hudChrome.vehicle.wave': 'Våg {wave}/{total}',
+  'hudChrome.warfare.floatReasons.hill': 'Berg',
+  'hudChrome.warfare.reasons.hillHold': 'håller berget',
+  'hudChrome.warfare.reasons.worldAssist': 'världsdodade assisterad',
+  'hudChrome.warfare.reasons.worldKill': 'världsdödande',
+  'hudChrome.warfareShop.groupEntry': 'Krigsföring Säsong 1',
+  'hudChrome.warfareShop.groupSeason2': 'Krigsföring Säsong 2: Framfart',
+  'hudChrome.weekly.accept': 'Acceptera',
+  'hudChrome.weekly.alsoReceive': 'Du får också:',
+  'hudChrome.weekly.anyDifficulty': 'Vilken svårighetsgrad som helst',
+  'hudChrome.weekly.cacheDesc':
+    'Öppnas till en Normal raidkläder för din klass (aldrig en setkläder), plus {count} x {item}.',
+  'hudChrome.weekly.choose': 'Välj uppdrag',
+  'hudChrome.weekly.chosen': 'Veckouppdrag taget: {category}',
+  'hudChrome.weekly.close': 'Stäng veckoupdrag',
+  'hudChrome.weekly.commendClaimed': 'Den här veckan kommendation gick till {faction}.',
+  'hudChrome.weekly.commendHeading': 'Utsändingens kommendation',
+  'hudChrome.weekly.commendNote':
+    '{amount} anseende till en välkommen jakt av ditt val, en gång i veckan.',
+  'hudChrome.weekly.commendRewardLine': '{amount} anseende med en valbar välkommen jakt',
+  'hudChrome.weekly.completed': 'Slutfört den här veckan',
+  'hudChrome.weekly.decline': 'Avslå',
+  'hudChrome.weekly.dialogHeading': 'Veckouppdrag: {category}',
+  'hudChrome.weekly.dialogNote': 'Endast en veckouppgift kan vara aktiv. Det {reset}',
+  'hudChrome.weekly.done': 'Veckouppdrag slutfört: {category}',
+  'hudChrome.weekly.footerHeld':
+    'Din veckouppgift är inställd. De övriga tre låses upp vid omstarten.',
+  'hudChrome.weekly.footerPick':
+    'Du kan hålla ett veckouppdrag åt gången. Klicka på ett kort för att läsa villkoren.',
+  'hudChrome.weekly.inProgress': 'Pågår ({count}/{required})',
+  'hudChrome.weekly.kinds.battlegrounds.category': 'Stridsplatser',
+  'hudChrome.weekly.kinds.battlegrounds.goal': 'Slutför {count} stridsplatser.',
+  'hudChrome.weekly.kinds.battlegrounds.goalLabel': 'Stridsplatser slutförda',
+  'hudChrome.weekly.kinds.battlegrounds.lore':
+    'Stridsbannrar flyger över Törnhålefälten. Slå dig i ledet med din välkommen jakt, håll flaggan och bevisa ditt värde i strid; varje match räknas, vunnen eller förlorad.',
+  'hudChrome.weekly.kinds.dungeons.category': 'Fängelser',
+  'hudChrome.weekly.kinds.dungeons.goal':
+    'Slutför {count} fängelser på vilken svårighetsgrad som helst.',
+  'hudChrome.weekly.kinds.dungeons.goalLabel': 'Fängelser slutförda',
+  'hudChrome.weekly.kinds.dungeons.lore':
+    'Rikets djup vilar aldrig: Den övergivna mekanismen väcktes igen och Den ihåliga graften vaknades. Samla dina allierade och rensa fängelserna från deras korrumption.',
+  'hudChrome.weekly.rewards': 'Belöningar',
+  'hudChrome.weekly.kinds.raid.category': 'Raid',
+  'hudChrome.weekly.kinds.raid.goal': 'Delta i {count} raid på vilken svårighetsgrad som helst.',
+  'hudChrome.weekly.kinds.raid.goalLabel': 'Raids slutförda',
+  'hudChrome.weekly.kinds.raid.lore':
+    'Gamla krafter väcker sig i Eldsmältningsögat och på Tornspetsens höjder. Möt Ignivar eller Nythraxis och fäll fiendefältherre.',
+  'hudChrome.weekly.kinds.worldboss.category': 'Världsboss',
+  'hudChrome.weekly.kinds.worldboss.goal': 'Besegra {count} världsboss i vildmarken.',
+  'hudChrome.weekly.kinds.worldboss.goalLabel': 'Världsbossar besegrada',
+  'hudChrome.weekly.kinds.worldboss.lore':
+    'Mäktiga fiender strör vildmarken, varje stark nog att trotsa hela arméer. Förena dig med alla i närheten och slå ner en kolossal avvikelse.',
+  'hudChrome.weekly.lockedThisWeek': 'Låst den här veckan',
+  'hudChrome.weekly.objectives': 'Uppdrags mål',
+  'hudChrome.weekly.progress': '{label}: {count}/{required}',
+  'hudChrome.weekly.resetsIn': 'återställs om {time}.',
+  'hudChrome.weekly.subtitle': 'Välj en av fyra sändningar. Det',
+  'hudChrome.weekly.tally': '{count} / {required}',
+  'hudChrome.weekly.title': 'Veckouppdrag',
+  'hudChrome.weeklyRewards.approachKeeper':
+    'Stå nära Valvväktaren för att se dina veckovisa belöningar.',
+  'hudChrome.weeklyRewards.backToChoices': 'Tillbaka till val',
+  'hudChrome.weeklyRewards.backlogFull':
+    'Dina sparade veckor är fulla. Samla in belöningar för att göra plats för framtida veckor.',
+  'hudChrome.weeklyRewards.category.dungeon': 'Fängelser',
+  'hudChrome.weeklyRewards.category.pvp': 'PvP',
+  'hudChrome.weeklyRewards.category.raid': 'Raids',
+  'hudChrome.weeklyRewards.category.world': 'Världsuppdrag',
+  'hudChrome.weeklyRewards.chooseOne':
+    'Välj noggrant: att ta ett föremål ger upp varje annat val för den veckan.',
+  'hudChrome.weeklyRewards.chooseReward': 'Välj en belöning',
+  'hudChrome.weeklyRewards.chooseTable': 'Välj vilken tabell som ska rullas från',
+  'hudChrome.weeklyRewards.claim': 'Ta valt föremål',
+  'hudChrome.weeklyRewards.claimLastWeek': 'Hävda förra veckans belöning',
+  'hudChrome.weeklyRewards.claimRequested':
+    'Hävdande begärd. Om dina väskor är fulla, gör plats och välj igen.',
+  'hudChrome.weeklyRewards.completedTask.dungeonMany': '{count} Fängelser rensade',
+  'hudChrome.weeklyRewards.completedTask.dungeonOne': '{count} Fängelse rensat',
+  'hudChrome.weeklyRewards.completedTask.pvpMany': '{count} bedömda matcher vunna',
+  'hudChrome.weeklyRewards.completedTask.pvpOne': '{count} bedömd match vunnen',
+  'hudChrome.weeklyRewards.completedTask.raidMany': '{count} Raid-möten rensade',
+  'hudChrome.weeklyRewards.completedTask.raidOne': '{count} Raid-möte rensat',
+  'hudChrome.weeklyRewards.completedTask.worldMany': '{count} världsuppdrag slutförda',
+  'hudChrome.weeklyRewards.completedTask.worldOne': '{count} världsuppdrag slutfört',
+  'hudChrome.weeklyRewards.completedWeek': 'Veckan slutade {date}',
+  'hudChrome.weeklyRewards.confirmClaim': 'Bekräfta hävdande',
+  'hudChrome.weeklyRewards.confirmTitle': 'Hävda {name}?',
+  'hudChrome.weeklyRewards.countdown': '{days}d {hours}h {minutes}m {seconds}s',
+  'hudChrome.weeklyRewards.currentWeek': 'Tillbaka till den här veckans framsteg',
+  'hudChrome.weeklyRewards.earned': 'Valv tillgängliga efter nästa omstart: {count}',
+  'hudChrome.weeklyRewards.epic': 'Epos',
+  'hudChrome.weeklyRewards.heroic': 'Heroisk',
+  'hudChrome.weeklyRewards.heroicClears': '{count} Heroisk',
+  'hudChrome.weeklyRewards.heroicUpgradeMany':
+    '{count} fler Heroiska fängelsesopportering för uppgradering',
+  'hudChrome.weeklyRewards.heroicUpgradeOne':
+    '{count} fler Heroisk fängelserensning för uppgradering',
+  'hudChrome.weeklyRewards.inspectItem': 'Inspektera {name}',
+  'hudChrome.weeklyRewards.intro':
+    'Varje slutförd milstolpe tjänar ett valv. Efter Eldsmältningen återställs, öppna varje valv för att rulla sin byt, välj sedan ett föremål för veckan. Öppnade belöningar sparas och oinsamlade veckor förblir tillgängliga.',
+  'hudChrome.weeklyRewards.itemLevel': 'Föremålsnivå {level}',
+  'hudChrome.weeklyRewards.lockedRoll': 'Låser upp 1 bytbordskulturtabell',
+  'hudChrome.weeklyRewards.milestone': '1 bytbordskulturtabell',
+  'hudChrome.weeklyRewards.mixedClears': '{heroic} Heroisk / {normal} Normal',
+  'hudChrome.weeklyRewards.nextReset': 'Eldsmältnings veckovisa återställning',
+  'hudChrome.weeklyRewards.noLevelLoot': 'Inget berättigat byte på din nuvarande nivå.',
+  'hudChrome.weeklyRewards.noTables':
+    'Ingen berättigad utrustning från dina registrerade bossgodkännanden på denna svårighetsgrad.',
+  'hudChrome.weeklyRewards.normal': 'Normal',
+  'hudChrome.weeklyRewards.normalClears': '{count} Normal',
+  'hudChrome.weeklyRewards.notNow': 'Inte nu',
+  'hudChrome.weeklyRewards.openRewards': 'Öppna dina intjänade valv',
+  'hudChrome.weeklyRewards.openVault': 'Öppna valv: {name}',
+  'hudChrome.weeklyRewards.openedCount':
+    '{count} av {total} valv öppnade. Öppna dem alla för att välja din belöning.',
+  'hudChrome.weeklyRewards.openingSavedReward': 'Öppnar valv och sparar din belöning...',
+  'hudChrome.weeklyRewards.pool.dungeon': 'Normal fängelsebyte',
+  'hudChrome.weeklyRewards.pool.dungeon_heroic': 'Heroiskt fängelsebyte',
+  'hudChrome.weeklyRewards.pool.pvp': 'KRIGSFÖRING-utrustning',
+  'hudChrome.weeklyRewards.pool.raid': 'Normal raidbyte',
+  'hudChrome.weeklyRewards.pool.raid_heroic': 'Heroiskt raidbyte',
+  'hudChrome.weeklyRewards.pool.world': 'Världsuppdragsbyte',
+  'hudChrome.weeklyRewards.poolRule':
+    'Varje listat föremål har en lika chans. Föremål matchar dina klassrestriktioner. Besegrada raids låser upp sitt byte på denna svårighetsgrad. Legendariska föremål är uteslutna.',
+  'hudChrome.weeklyRewards.poolSize': 'Visa {count} föremål',
+  'hudChrome.weeklyRewards.previouslyRolled': 'Tidigare rulltad belöning',
+  'hudChrome.weeklyRewards.progress': '{count} / {max}',
+  'hudChrome.weeklyRewards.rare': 'Sällsynt',
+  'hudChrome.weeklyRewards.readyDescription':
+    'En slutförd vecka av belöningar väntar. Öppna dina intjänade valv, välj sedan ett föremål att hävda.',
+  'hudChrome.weeklyRewards.readyTitle': 'Dina veckovisa belöningar är klara',
+  'hudChrome.weeklyRewards.readyWeeks':
+    'Oinsamlade veckor: {count}. Hävda den äldsta slutförda veckan först.',
+  'hudChrome.weeklyRewards.requiredTask.dungeonMany': 'Rensa {count} fängelser',
+  'hudChrome.weeklyRewards.requiredTask.dungeonOne': 'Rensa {count} fängelse',
+  'hudChrome.weeklyRewards.requiredTask.pvpMany': 'Vinna {count} bedömda matcher',
+  'hudChrome.weeklyRewards.requiredTask.pvpOne': 'Vinna {count} bedömd match',
+  'hudChrome.weeklyRewards.requiredTask.raidMany': 'Rensa {count} raid-möten',
+  'hudChrome.weeklyRewards.requiredTask.raidOne': 'Rensa {count} raid-möte',
+  'hudChrome.weeklyRewards.requiredTask.worldMany': 'Slutför {count} världsuppdrag',
+  'hudChrome.weeklyRewards.requiredTask.worldOne': 'Slutför {count} världsuppdrag',
+  'hudChrome.weeklyRewards.revealed': 'Avslöjad',
+  'hudChrome.weeklyRewards.revealedItem': 'Avslöjad: {name}',
+  'hudChrome.weeklyRewards.rewardNumber': 'Belöning {count}',
+  'hudChrome.weeklyRewards.selectAllTables': 'Välj alla',
+  'hudChrome.weeklyRewards.selectItem': 'Välj {name}',
+  'hudChrome.weeklyRewards.selectedTable': '{count} tabell vald',
+  'hudChrome.weeklyRewards.selectedTables': '{count} tabeller valda',
+  'hudChrome.weeklyRewards.selectionPoolRule':
+    'För raids och fängelser, välj en eller flera tabeller innan du öppnar. Fängelsebord kombinerar bossar du har rensat på denna svårighetsgrad. Rullar exkluderar dubbletter, legendariska föremål och utrustning som kräver mer än {maxLevelOffset} nivåer över din nivå.',
+  'hudChrome.weeklyRewards.tab': 'Veckovisa belöningar',
+  'hudChrome.weeklyRewards.tableItem': '{count} föremål',
+  'hudChrome.weeklyRewards.tableItemCount': '{count} föremål',
+  'hudChrome.weeklyRewards.tablesExhausted':
+    'Alla berättigade föremål har redan rulltats. Välj en avslöjad belöning.',
+  'hudChrome.weeklyRewards.task.dungeon':
+    'Slutför fängelser. Dina bästa rensningar bestämmer belöningssvårighetsgraden vid varje milstolpe.',
+  'hudChrome.weeklyRewards.task.pvp':
+    'Vinna bedömda arena- eller bedömda stridsplatssmatcher. Övningsmatches och bortförklaringar räknas inte.',
+  'hudChrome.weeklyRewards.task.raid':
+    'Besegra olika raid-möten. Varje möte räknas en gång; ett Heroiskt rensmaskinen uppgraderar dess kredit.',
+  'hudChrome.weeklyRewards.task.world':
+    'Slutför roterande världsuppdrag. Storyuppdrag räknas inte.',
+  'hudChrome.weeklyRewards.title': 'Det veckovisa valvet',
+  'hudChrome.weeklyRewards.unavailable': 'Inte tillgänglig ännu',
+  'hudChrome.weeklyRewards.viewPossibleLoot': 'Visa möjligt byte',
+  'hudChrome.weeklyRewards.waiting':
+    'Inga belöningar klara ännu. Den här veckan intjänade valv låses upp vid nästa omstart.',
+  'hudChrome.weeklyRewards.worldPoolRule':
+    'Normal Nythraxis-utrustning. Inga raidrensmaskiner krävs.',
+  'hudChrome.weeklyRewards.worldUnavailable':
+    'Världsuppdragsbelöningar blir tillgängliga när roterande världsuppdrag anländer.',
+  'hudChrome.wocMarket.charselectWebLink': 'Bud, köp eller sälj på $WOC Exchange-webbplatsen',
+  'hudChrome.wocMarket.charselectWebNote':
+    'Gå in i spelet med en karaktär för att lägga bud, köpa eller sälja.',
+  'hudChrome.worldPvp.aidLine':
+    'Att läka, skydda eller buffa en flaggad spelare i en världskamp höjer din flagga.',
+  'hudChrome.worldPvp.blurb':
+    'Höj din flagga för att slåss med andra flaggade spelare var som helst i den öppna världen. Besegra en och ta del av deras börse, plus Heder mot Krigsförskap. Slagfälten och Arenorna betalar fortfarande mer.',
+  'hudChrome.worldPvp.commandHint': 'Chat: /pvp byter flagga, /pvp on och /pvp off ställer den.',
+  'hudChrome.worldPvp.confirmAccept': 'Höj flagga',
+  'hudChrome.worldPvp.confirmBody':
+    'Andra flaggade spelare kan attackera dig var som helst och ta upp till {cap} från din börse när de vinner. Du kan slå av det igen, men det tar {minutes} minuter.',
+  'hudChrome.worldPvp.confirmCancel': 'Avbryt',
+  'hudChrome.worldPvp.disable': 'Inaktivera världskamp',
+  'hudChrome.worldPvp.disarmLine':
+    'Att slå av tar {minutes} minuter och väntar på att kampen slutar.',
+  'hudChrome.worldPvp.enable': 'Aktivera världskamp',
+  'hudChrome.worldPvp.greyLine': 'Spelare mer än {levels} nivåer under dig betalar ingenting.',
+  'hudChrome.worldPvp.groundContested':
+    'Överallt annars är omstritt: endast två flaggade spelare kan slåss.',
+  'hudChrome.worldPvp.groundFfa':
+    'Draklandet, Frostslöjans räckvidd och Glödskogen är free-for-all: alla där kan slåss, flaggade eller inte.',
+  'hudChrome.worldPvp.groundSanctuary':
+    'Provstranden och Östbrooks dal är helgedomar: ingen världskamp alls.',
+  'hudChrome.worldPvp.groupLine':
+    'Grupp- och raidmedlemmar är aldrig fientliga mot varandra. Gildekamrater utanför din grupp kan slåss.',
+  'hudChrome.worldPvp.honorLine': '{honor} Heder per seger, delad mellan alla som hjälpte.',
+  'hudChrome.worldPvp.keepUp': 'Håll flaggan uppe',
+  'hudChrome.worldPvp.levelReq': 'Kräver nivå {level}.',
+  'hudChrome.worldPvp.markLine':
+    'Att attackera en ej flaggad spelare där höjer din egen flagga; att attackera en flaggad gör det aldrig.',
+  'hudChrome.worldPvp.noStakeLine':
+    'En ej flaggad spelare som dödas på free-for-all marken förlorar inget guld.',
+  'hudChrome.worldPvp.noTakeLine':
+    'En ej flaggad fighter tar inget guld heller: det flyttas bara mellan två flaggade spelare.',
+  'hudChrome.worldPvp.pending': 'Väntar på din PvP-status från riket.',
+  'hudChrome.worldPvp.realmDisabled': 'Världskamp är inaktiverat på detta rike.',
+  'hudChrome.worldPvp.record': 'Rekord: {kills} segrar, {deaths} dödsfall',
+  'hudChrome.worldPvp.repeatLine':
+    'Upprepad seger mot en spelare betalar {second}, sedan {third}, sedan ingenting; räkningen rensas {reset} efter första segern.',
+  'hudChrome.worldPvp.splitLine':
+    'En ren 1v1 betalar hela potten; hjälpare och deras läkare delar den.',
+  'hudChrome.worldPvp.stakeLine':
+    'Förloraren betalar {cap} eller {percent} av sin börse, vilket är minst.',
+  'hudChrome.worldPvp.statusDisarming':
+    'Din flagga faller om {time}, eller när din nuvarande kamp slutar.',
+  'hudChrome.worldPvp.statusOff':
+    'Din PvP-flagga är nere. Du kan inte attackera eller bli attackerad i den öppna världen.',
+  'hudChrome.worldPvp.statusOffFfa':
+    'Din PvP-flagga är nere, men på free-for-all marken kan du fortfarande attackera och bli attackerad.',
+  'hudChrome.worldPvp.statusOn': 'Din PvP-flagga är uppe. Flaggade spelare kan attackera dig.',
+  'hudChrome.worldPvp.tab': 'Världskamp',
+  'hudChrome.worldPvp.title': 'Världskamp',
+  'hudChrome.worldPvp.zoneContested': 'Omstritt område: endast flaggade spelare slåss här.',
+  'hudChrome.worldPvp.zoneFfa': 'Free-for-all område: alla här är tillgängliga.',
+  'hudChrome.worldPvp.zoneSanctuary': 'Helgedom: ingen världskamp här.',
+  'hudChrome.wqLadder.close': 'Stäng världsuppdragsranking',
+  'hudChrome.wqLadder.podiumLabel': 'Topp tre',
+  'hudChrome.wqLadder.rankedBy.points': 'Rankat efter högsta poäng',
+  'hudChrome.wqLadder.rankedBy.seconds': 'Rankat efter snabbaste tid',
+  'hudChrome.wqLadder.rankedBy.waves': 'Rankat efter vågorna höll',
+  'hudChrome.wqLadder.rankedByMedal.points': 'Rankat efter medalj, sedan högsta poäng',
+  'hudChrome.wqLadder.rankedByMedal.seconds': 'Rankat efter medalj, sedan snabbaste tid',
+  'hudChrome.wqLadder.rankedByMedal.waves': 'Rankat efter medalj, sedan vågorna höll',
+  'hudChrome.wqLadder.selfLabel': 'Ditt bästa',
+  'hudChrome.wqLadder.selfNone':
+    'Du har inte någon poäng på denna tavla än. Slutför världsuppdraget för att gå med i rankningen.',
+  'hudChrome.wqLadder.selfRank': 'Rang {rank}',
+  'hudChrome.wqLadder.subtitle':
+    'Det bästa försöket från varje hjälte, en rankning per medalj världsuppdrag.',
+  'hudChrome.wqLadder.title': 'Världsuppdragsranking',
+  'hudChrome.wqLadder.totalMany': '{count} hjältar rankade',
+  'hudChrome.wqLadder.totalOne': 'En hjälte rankad',
+  'hudChrome.wqLadder.unclaimed': 'Ohämtad',
+  'itemUi.errors.orderClosed': 'Den ordningen är inte längre öppen.',
+  'itemUi.errors.orderCountNeeded': 'Namnge hur många du vill.',
+  'itemUi.errors.orderNotYours': 'Det är inte din order.',
+  'itemUi.errors.orderOwn': 'Det är din egen order. Avbryt den för att dra tillbaka den.',
+  'itemUi.errors.tooManyOrders': 'Du kan ha högst {count} ordrar öppna på samma gång.',
+  'itemUi.logs.orderDelivered':
+    'Levererat {item} x{count} till {buyer} för {money}. Hämta {proceeds} från köpmannen.',
+  'itemUi.logs.orderExpired': 'Din order för {item} upphörde; {money} väntar på köpmannen.',
+  'itemUi.logs.orderPlaced': 'Lagde en order för {item} x{count} på {each} vardera.',
+  'itemUi.logs.orderReceived':
+    '{seller} levererade {item} x{count} till din order. Hämta det från köpmannen.',
+  'itemUi.logs.orderWithdrawn': 'Drog tillbaka din order för {item}; {money} återlämnade.',
+  'itemUi.market.buyConfirmBodyPartial':
+    'Köp {count} av {item} (av {total} listade) för {price} ({each} vardera)?',
+  'itemUi.market.buyQuantityAria': 'Hur många {item} att köpa (av {total})',
+  'itemUi.market.buyQuantityBtnAria': 'Köp denna många {item}',
+  'itemUi.market.history': 'Historia',
+  'itemUi.market.historyEmpty':
+    'Ingen försäljning ännu. Föremål du säljer på världsmarknaden visas här.',
+  'itemUi.market.historyNote': 'Din senaste försäljning på världsmarknaden.',
+  'itemUi.market.orderAtCap': 'Du har ingen fri order-plats. Dra tillbaka en först.',
+  'itemUi.market.orderBy': 'Önskad av {buyer}',
+  'itemUi.market.orderCannotAfford': 'Du har inte råd {total} för denna order.',
+  'itemUi.market.orderCardTitle': 'Lägg en order',
+  'itemUi.market.orderConfirmBody':
+    'Order {item} x{count} på {each} vardera? {total} hålls hos köpmannen tills ordningen är fylld eller dragen tillbaka.',
+  'itemUi.market.orderConfirmTitle': 'Bekräfta order',
+  'itemUi.market.orderDeliver': 'Leverera',
+  'itemUi.market.orderDeliverAria': 'Leverera {item} till {buyer}',
+  'itemUi.market.orderDeliverConfirmBody':
+    'Leverera {item} x{count} till {buyer} för {total} ({each} vardera)? Du samlar {proceeds} efter köpmannens avgift.',
+  'itemUi.market.orderDeliverConfirmTitle': 'Bekräfta leverans',
+  'itemUi.market.orderDeliverNone': 'Ingen av denna artikel i dina väskor.',
+  'itemUi.market.orderEach': 'vardera',
+  'itemUi.market.orderEscrowLine': 'Guld som hålls hos köpmannen: {total}',
+  'itemUi.market.orderMine': 'Din order',
+  'itemUi.market.orderPickEmpty':
+    'Sök efter ett föremål nedan, eller välj ett från remsan längst ned.',
+  'itemUi.market.orderPickLabel': 'Önskat föremål',
+  'itemUi.market.orderPickNone': 'Ingen artikel matchar.',
+  'itemUi.market.orderPlaceButton': 'Lägg order',
+  'itemUi.market.orderPriceEach': 'Pris vardera',
+  'itemUi.market.orderQuantity': 'Önskade enheter',
+  'itemUi.market.orderSearchAria': 'Sök efter ett föremål att beställa',
+  'itemUi.market.orderSearchPlaceholder': 'Sök föremål...',
+  'itemUi.market.orderWanted': 'x{count} önskad',
+  'itemUi.market.orderWithdraw': 'Dra tillbaka',
+  'itemUi.market.orderWithdrawAria': 'Dra tillbaka din order för {item}',
+  'itemUi.market.ordersEmpty':
+    'Inga öppna ordrar än. Lägg en och samlare kommer se vad du behöver.',
+  'itemUi.market.ordersListAria': 'Öppna köpordrar',
+  'itemUi.market.ordersNote':
+    'Lägg upp vad du vill och guldet hålls hos köpmannen. Listor på eller under ditt pris fylls omedelbar; resten väntar på en säljare. Köpmannen tar en {cut}% avgift från den som levererar. Du har {used}/{max} ordrar öppna.',
+  'itemUi.market.ordersTab': 'Önskat',
+  'itemUi.market.unlistedNone': 'Varje material har minst en lista just nu.',
+  'itemUi.market.unlistedNote':
+    'Material utan någon lista alls. Lägg en order för en, eller samla och lista den.',
+  'itemUi.market.unlistedStageAria': 'Order {item}',
+  'itemUi.market.unlistedTitle': 'Inte på marknaden',
+  'questUi.dialog.clueDeliver': 'Överlämna {count} {item}.',
+  'questUi.dialog.clueDeliverAria': 'Överlämna {count} {item} till {name}',
+  'questUi.dialog.clueTalk': 'Fråga om ledtråden.',
+  'questUi.dialog.clueTalkAria': 'Fråga om ledtråden: {name}',
+  'questUi.dialog.worldQuestBoard': 'Visa mig världsuppdragstavlan.',
+  'questUi.dialog.worldQuestBoardAria': 'Öppna världsuppdragstavlan på kartan',
+  'questUi.logs.clueCasketOpened': 'Kissan innehåller {money} och {items}.',
+  'questUi.logs.clueHuntAbandoned': 'Skattkarta abandonerad: {title}',
+  'questUi.logs.clueHuntDone': 'Skattkarta slutförd: {title}. Kissan är din.',
+  'questUi.logs.clueHuntStarted': 'Skattkarta startad: {title}',
+  'questUi.logs.clueHuntStep': 'Ledtråd {step} av {total} löst: {title}',
+  'questUi.logs.clueScrollEarned':
+    'Varje världsuppdrag för dagen är gjort: en ledtrådsrulle är din.',
+  'questUi.logs.clueScrollLost':
+    'Varje världsuppdrag för dagen är gjort, men du kan inte hålla en annan ledtrådsrulle.',
+  'questUi.logs.worldQuestStarted': 'Världsuppdrag startat: {name}',
+  'questUi.tracker.clueHuntTitle': '{title} (ledtråd {step} av {total})',
+  'questUi.worldQuest.activeStatus': 'Aktivt världsuppdrag',
+  'questUi.worldQuest.alreadyCompleted':
+    'Du har redan slutfört detta världsuppdrag för denna cykel.',
+  'questUi.worldQuest.availableStatus': 'Tillgängligt världsuppdrag',
+  'questUi.worldQuest.banner.captainSteps': 'Räddarchefen stegar genom spriekan!',
+  'questUi.worldQuest.banner.championFallen':
+    'Extra byte! Mästaren faller: en bonusbörse för alla som slogs mot den.',
+  'questUi.worldQuest.banner.championRises':
+    'Extra byte! En mästare uppstår på platsen. Slå ned den tillsammans.',
+  'questUi.worldQuest.banner.endlessBegins':
+    'Linjen håller! Oändliga vågor börjar, varje en hårdare. Lämna kanonen när som helst.',
+  'questUi.worldQuest.banner.riftOpens':
+    'En spriek slits upp på stranden! Rånadörer kommer för salvaget.',
+  'questUi.worldQuest.banner.riftRouted': 'Rånadörerna är utflykta. Stranden är din igen.',
+  'questUi.worldQuest.calligraphyTitle': 'Arkan kalligrafi',
+  'questUi.worldQuest.escortCaravan': 'Eskortera karavanen: {zone}',
+  'questUi.worldQuest.escortTitle': 'Karavan',
+  'questUi.worldQuest.expiresIn': 'Upphör om {time}',
+  'questUi.worldQuest.factionLine': 'Fraktion: {faction}',
+  'questUi.worldQuest.forge.cold': 'Kallt slag! Elda på elden först. +{penalty}s.',
+  'questUi.worldQuest.forge.correct': 'Det är det! Fortsätt.',
+  'questUi.worldQuest.forge.countdown': 'Förbered dina händer! Börjar om {seconds}s.',
+  'questUi.worldQuest.forge.failed':
+    'För många misstag! Metallen sprack. Tala med Mara för att försöka igen.',
+  'questUi.worldQuest.forge.finished': 'Fint arbete! En sköld värd för garnisonalen!',
+  'questUi.worldQuest.forge.fuel': 'Vedgård',
+  'questUi.worldQuest.forge.heat': 'Smedja värme: {value} (håll ovan {floor})',
+  'questUi.worldQuest.forge.hintStoke': 'Smeden kyls! Elda på elden innan du slår.',
+  'questUi.worldQuest.forge.hintStrike': 'Titta på målaren. Slå inuti det mörka bandet!',
+  'questUi.worldQuest.forge.hit': 'Rent slag! Bandet minskar.',
+  'questUi.worldQuest.forge.medals.bronze': 'Brons',
+  'questUi.worldQuest.forge.medals.gold': 'Guld',
+  'questUi.worldQuest.forge.medals.silver': 'Silver',
+  'questUi.worldQuest.forge.metal': 'Göt låda',
+  'questUi.worldQuest.forge.meterAria': 'Hammare timing meter',
+  'questUi.worldQuest.forge.miss': 'Missade bandet! +{penalty}s.',
+  'questUi.worldQuest.forge.mistakes': 'Misstag: {count}',
+  'questUi.worldQuest.forge.objective': 'Hjälp till smed Mara att smida en sköld',
+  'questUi.worldQuest.forge.preparing': 'Snyggt gjort! Nästa förfrågan...',
+  'questUi.worldQuest.forge.ready': 'Tala med smed Mara för att börja.',
+  'questUi.worldQuest.forge.replay':
+    'Tala med Mara för att försöka igen. Belöningar tjänas in en gång per rotation.',
+  'questUi.worldQuest.forge.request.fuel': 'Elda på elden! Lägg till lite ved!',
+  'questUi.worldQuest.forge.request.metal': 'Mer metall! Öppna göt lådan!',
+  'questUi.worldQuest.forge.request.tools': 'Hammra det till form! Använd städet!',
+  'questUi.worldQuest.forge.request.water': 'Kyl det! Vatten från brunnen!',
+  'questUi.worldQuest.forge.result': '{rating}! {seconds}s. Misstag: {mistakes}.',
+  'questUi.worldQuest.forge.round': 'Förfrågan {round}/{total}: steg {step}/{steps}',
+  'questUi.worldQuest.forge.sequence': '{instruction} Klicka sedan på {next}.',
+  'questUi.worldQuest.forge.starting': 'Gör klart...',
+  'questUi.worldQuest.forge.stoke': 'Elda på',
+  'questUi.worldQuest.forge.stokeTip':
+    'Kasta ved på elden. Smeden kyls ständigt; håll värmen över {floor} eller dina slag hamnar kalla.',
+  'questUi.worldQuest.forge.strike': 'Slag',
+  'questUi.worldQuest.forge.strikeTip':
+    'Hammra arbetsstycket. Tryck när nålen korsar det mörka bandet; bandet blir smalare och nålen snabbar på med varje bra slag. Ett slag utanför bandet, eller på en kall smed, kostar tre sekunder.',
+  'questUi.worldQuest.forge.strikes': 'Slag: {count}/{total}',
+  'questUi.worldQuest.forge.thresholds':
+    'Guld: {gold}s eller mindre. Silver: {silver}s eller mindre.',
+  'questUi.worldQuest.forge.title': 'En hjälpsam hammare',
+  'questUi.worldQuest.forge.tools': 'Städ',
+  'questUi.worldQuest.forge.water': 'Brunn',
+  'questUi.worldQuest.forge.wrong': 'Fel verktyg! +{penalty}s. Försök med det begärda föremålet.',
+  'questUi.worldQuest.glider.boost': 'Extrahastighet',
+  'questUi.worldQuest.glider.boostTip':
+    'Öka din flygningshastighet med {speed} yd/s, upp till {maximum} yd/s. Tillgängligt under flygning. Laddas om på {seconds} sekunder.',
+  'questUi.worldQuest.glider.climb': 'Klättra',
+  'questUi.worldQuest.glider.climbTip':
+    'Håll för att dra upp näsan och byta hastighet mot höjd. Tryck för ett kort stöt. Långsam flygning förlorar lyftkraft.',
+  'questUi.worldQuest.glider.complete': 'Landning slutförd!',
+  'questUi.worldQuest.glider.controls':
+    'Håll höger musknapp och titta upp för att klättra på bekostnad av hastighet; titta ned för att dyka och vinna hastighet. Långsam flygning förlorar lyftkraft. Vänster/höger styr; bakåt bromsar. Hoppa eller simma upp/ned styr också tonhöjd. Flyg framåt genom vindtunnlar för en hastighetsbuff, en gång per tunnel per försök.',
+  'questUi.worldQuest.glider.countdown': 'Start om {count}... Håll hårt!',
+  'questUi.worldQuest.glider.dive': 'Dyk',
+  'questUi.worldQuest.glider.diveTip':
+    'Håll för att peka näsan ned och vinna hastighet. Tryck för ett kort stöt.',
+  'questUi.worldQuest.glider.failed':
+    'Nedstigning misslyckades! Landade off course eller missade för många ringar.',
+  'questUi.worldQuest.glider.flying':
+    'Ringar: {rings}/{total} | Tid: {time}s | Hastighet: {speed} yd/s',
+  'questUi.worldQuest.glider.landed': '{rating}! Passerade {rings}/{total} ringar på {time}s.',
+  'questUi.worldQuest.glider.landing': 'Alla ringar klara! Styra mot landningszonen framåt.',
+  'questUi.worldQuest.glider.medals.bronze': 'Brons',
+  'questUi.worldQuest.glider.medals.gold': 'Guld',
+  'questUi.worldQuest.glider.medals.silver': 'Silver',
+  'questUi.worldQuest.glider.nextRing':
+    'Sikta genom nästa vindering längs kanjonen. Klara åtminstone {minimum} ringar, landar sedan i den markerade zonen.',
+  'questUi.worldQuest.glider.objective':
+    'Sväva genom vindelringarna och landa i den markerade zonen',
+  'questUi.worldQuest.glider.practiceRewards':
+    'Träningsflygning: förbättra din tid utan att tjäna mer mynt, erfarenhet eller rykte.',
+  'questUi.worldQuest.glider.ready': 'Prata med flygmästare Zephyr för att starta.',
+  'questUi.worldQuest.glider.replay': 'Flyg igen',
+  'questUi.worldQuest.glider.retry':
+    'Prata med Zephyr för att försöka igen, eller med Skye vid landningszonen för att återvända till startpunkten.',
+  'questUi.worldQuest.glider.score': 'Poäng: {score}.',
+  'questUi.worldQuest.glider.title': 'Vindridarens slalom',
+  'questUi.worldQuest.horde.choices.double': 'x2 skott',
+  'questUi.worldQuest.horde.choices.explosive': 'Explosiva skott',
+  'questUi.worldQuest.horde.choices.haste': '+25% eldtakt',
+  'questUi.worldQuest.horde.choices.pierce': 'Genomträngande skott',
+  'questUi.worldQuest.horde.choices.projectile': '+1 skott',
+  'questUi.worldQuest.horde.controls':
+    'Automatisk eldgivning. A/D, pilar eller joystick. Bakåt: lämna.',
+  'questUi.worldQuest.horde.countdown': 'Hord inkommande om {seconds}s!',
+  'questUi.worldQuest.horde.exit': 'Lämna försvar',
+  'questUi.worldQuest.horde.failed': 'Försvar misslyckades. Försök igen!',
+  'questUi.worldQuest.horde.gained': 'Uppgradering: {upgrade}',
+  'questUi.worldQuest.horde.killBurst': '+{count} besegrad!',
+  'questUi.worldQuest.horde.loadout': 'Skott: {count} | +{speed}% hastighet | {weapon}',
+  'questUi.worldQuest.horde.medals.bronze': 'Brons',
+  'questUi.worldQuest.horde.medals.gold': 'Guld',
+  'questUi.worldQuest.horde.medals.silver': 'Silver',
+  'questUi.worldQuest.horde.objective': 'Försvara barrikaden och besegra hordledaren',
+  'questUi.worldQuest.horde.ready': 'Prata med barrikadkaptenen för att börja.',
+  'questUi.worldQuest.horde.replay':
+    'Prata med kaptenen för att försöka igen. Belöningar en gång per rotation.',
+  'questUi.worldQuest.horde.result': '{rating}! Poäng: {score}.',
+  'questUi.worldQuest.horde.resultStats': 'Besegringar: {kills}. Barrikad: {barrier}%.',
+  'questUi.worldQuest.horde.status':
+    '{seconds}s återstår. Besegringar: {kills}. Barrikad: {barrier}%.',
+  'questUi.worldQuest.horde.supplies': 'Bryt en låda för att välja. Den andra försvinner!',
+  'questUi.worldQuest.horde.title': 'Den sista barrikaden',
+  'questUi.worldQuest.horde.upgrade': 'Vapen: {weapon}',
+  'questUi.worldQuest.horde.weapons.0': 'Repeterbös',
+  'questUi.worldQuest.horde.weapons.1': 'Tvillingskytte',
+  'questUi.worldQuest.horde.weapons.2': 'Genomträngande skytte',
+  'questUi.worldQuest.horde.weapons.3': 'Explosiv skytte',
+  'questUi.worldQuest.inProgress': 'Denna världsuppdrag pågår redan.',
+  'questUi.worldQuest.investigation.accuseOption': 'Anklaga {name}',
+  'questUi.worldQuest.investigation.briefing':
+    'En varelse har stulit en soldats ansikte. Läs de stående ordererna och vakten loggen, fråga alla fyra vakter, sedan återvänd och namnge den vars historia motsäger våra register.',
+  'questUi.worldQuest.investigation.cleared':
+    'Sergeant Alric: Den soldaten är bokförd. Jämför de andra historierna med våra register och försök igen.',
+  'questUi.worldQuest.investigation.clueNames.c0': 'Stående order',
+  'questUi.worldQuest.investigation.clueNames.c1': 'Vaktslogg',
+  'questUi.worldQuest.investigation.clues': 'Register granskade: {count}/2',
+  'questUi.worldQuest.investigation.confront':
+    'Rapportera till sergeant Alric och namnge vakten vars historia motsäger registren.',
+  'questUi.worldQuest.investigation.defeat': 'Besegra den avslöjade infiltratören.',
+  'questUi.worldQuest.investigation.guardCleared': 'Sergeant Alric har redan bokfört denna soldat.',
+  'questUi.worldQuest.investigation.heard': 'Vakter utfrågade: {count}/4',
+  'questUi.worldQuest.investigation.instructions':
+    'Läs de stående ordererna och vaktsloggen, sedan fråga alla fyra vakter. Jämför deras historier med registren.',
+  'questUi.worldQuest.investigation.name': 'Vilken av mina vakter bär ett lånat ansikte?',
+  'questUi.worldQuest.investigation.objective': 'Avslöja och besegra infiltratören',
+  'questUi.worldQuest.investigation.revealed': 'Varelsen har släppt detta ansikte. Besegra den.',
+  'questUi.worldQuest.investigation.title': 'Ett lånat ansikte',
+  'questUi.worldQuest.investigation.variants.v0.clue0':
+    'Sönderbron har varit stängd sedan gryningen. Alla patrulllar måste använda västra vägen.',
+  'questUi.worldQuest.investigation.variants.v0.clue1':
+    'Orin var tilldelad grindtjänst. Nella, Bram och Tessa patrullerade västra vägen.',
+  'questUi.worldQuest.investigation.variants.v0.guard0':
+    'Min patrull tog västra vägen denna morgon.',
+  'questUi.worldQuest.investigation.variants.v0.guard1':
+    'Jag korsade sönderbron på min morgonpatrull.',
+  'questUi.worldQuest.investigation.variants.v0.guard2':
+    'Jag patrullerade västra vägen med Nella och Tessa.',
+  'questUi.worldQuest.investigation.variants.v0.guard3':
+    'Sönderbron är stängd. Vi använde västra vägen.',
+  'questUi.worldQuest.investigation.variants.v1.clue0':
+    'Dagens lösenord är Reedwatch. Gårdagens lösenord, Lantern, är inte längre giltigt.',
+  'questUi.worldQuest.investigation.variants.v1.clue1':
+    'Alla fyra vakter instruerades om det nya lösenordet vid gryningen.',
+  'questUi.worldQuest.investigation.variants.v1.guard0':
+    'Reedwatch. Jag lärde mig det nya lösenordet vid gryningen.',
+  'questUi.worldQuest.investigation.variants.v1.guard1':
+    'Lantern var gårdagens lösenord. Idag använder vi Reedwatch.',
+  'questUi.worldQuest.investigation.variants.v1.guard2':
+    'Alla fyra av oss närvarade vid gryninglektionen.',
+  'questUi.worldQuest.investigation.variants.v1.guard3':
+    'Dagens lösenord är Lantern. Jag hörde det på gryninglektionen.',
+  'questUi.worldQuest.investigation.variants.v2.clue0':
+    'Alla garnisonsförrådslådor måste bära blå vaxsigill. Avvisa alla lådor med rödt sigill.',
+  'questUi.worldQuest.investigation.variants.v2.clue1':
+    'Dagens leverans inspekterades: varje låda hade ett intakt blått vaxsigill.',
+  'questUi.worldQuest.investigation.variants.v2.guard0':
+    'Jag inspekterade dagens leverans. Varje låda hade ett rött vaxsigill.',
+  'questUi.worldQuest.investigation.variants.v2.guard1':
+    'Vi accepterar endast lådor förseglade med blått vax.',
+  'questUi.worldQuest.investigation.variants.v2.guard2':
+    'Loggen registrerar blå sigill på dagens leverans.',
+  'questUi.worldQuest.investigation.variants.v2.guard3':
+    'Inga lådor med röda sigill accepterades idag.',
+  'questUi.worldQuest.investigation.variants.v3.clue0':
+    'Nattväkten antänder öst fyren vid skymningen. Väst fyren förblir mörk tills färjan signalerar.',
+  'questUi.worldQuest.investigation.variants.v3.clue1':
+    'Nella och Orin höll grinden genom natten. Bram och Tessa gick längs vägen och antände öst fyren vid skymningen.',
+  'questUi.worldQuest.investigation.variants.v3.guard0':
+    'Orin och jag hade grinden hela natten. Ingenting kom igenom än dimman.',
+  'questUi.worldQuest.investigation.variants.v3.guard1':
+    'Grindtjänst med Nella. Vi såg öst fyren antändas vid skymningen, som beordrat.',
+  'questUi.worldQuest.investigation.variants.v3.guard2':
+    'Tessa och jag gick längs vägen. Vi antände väst fyren vid skymningen så att färjan kunde se oss.',
+  'questUi.worldQuest.investigation.variants.v3.guard3':
+    'Vägen patrull med Bram. Vi antände öst fyren den sekund solen gick ned.',
+  'questUi.worldQuest.investigation.variants.v4.clue0':
+    'Kvartermästarens vagn anländer vid middagstid via vägnorden. Inga förnödenheter kommer via vatten medan träskmarken är översvammad.',
+  'questUi.worldQuest.investigation.variants.v4.clue1':
+    'Leverans vid middagstid mottagen från vägnorden. Tessa skrev under den; Bram och Nella lossade; Orin var vid brunnen.',
+  'questUi.worldQuest.investigation.variants.v4.guard0':
+    'Jag hjälpte Bram att lossa vagnen vid middagstid. Saltfläsk och lampolia, det vanliga.',
+  'questUi.worldQuest.investigation.variants.v4.guard1':
+    'Jag lossade själv leveransen vid middagstid, rakt av leveranspråmen.',
+  'questUi.worldQuest.investigation.variants.v4.guard2':
+    'Nella och jag bar in lådorna. Tessa skrev under loggen.',
+  'questUi.worldQuest.investigation.variants.v4.guard3':
+    'Vagnen kom upp vägnorden vid middagstid. Jag skrev under för den.',
+  'questUi.worldQuest.investigation.variants.v5.clue0':
+    'De fallna från det senaste överfallet ligger i kapellets krypta. Ingen går in i kryptan utan sergeantens nyckel.',
+  'questUi.worldQuest.investigation.variants.v5.clue1':
+    'Sergeantens nyckel har inte lämnat hans bälte sedan överfallet. Nella, Orin och Bram höll muren; Tessa väktade gården.',
+  'questUi.worldQuest.investigation.variants.v5.guard0':
+    'Jag höll muren. Kryptan har varit låst sedan överfallet; bara sergeanten har nyckeln.',
+  'questUi.worldQuest.investigation.variants.v5.guard1':
+    'Murvakt med Nella och Bram. Lugnt, förutom grodorna.',
+  'questUi.worldQuest.investigation.variants.v5.guard2':
+    'Muren, hela dagen. Ingen har varit nära kryptan.',
+  'questUi.worldQuest.investigation.variants.v5.guard3':
+    'Jag väktade gården och tittade in på kryptan denna morgon. De fallna vilar.',
+  'questUi.worldQuest.itemReward': 'Föremålsbelöning: {name}',
+  'questUi.worldQuest.itemRewardWithLevels':
+    '{name} (föremålsnivå {itemLevel}, utrustas vid nivå {requiredLevel})',
+  'questUi.worldQuest.loadFreight': 'Ladda frakt in i vagnen',
+  'questUi.worldQuest.match3Announcement': '{moves}. {cleared}.',
+  'questUi.worldQuest.match3Candy.berry': 'bärkristall',
+  'questUi.worldQuest.match3Candy.citrus': 'citrussfär',
+  'questUi.worldQuest.match3Candy.grape': 'druvekvadrat',
+  'questUi.worldQuest.match3Candy.mint': 'mynttriangel',
+  'questUi.worldQuest.match3Candy.star': 'sockerstjärna',
+  'questUi.worldQuest.match3Cell': 'Rad {row}, kolumn {column}: {candy}',
+  'questUi.worldQuest.match3Cleared': 'Godis renat: {current}/{total}',
+  'questUi.worldQuest.match3Close': 'Stäng godisgåta',
+  'questUi.worldQuest.match3DefeatDetail': 'Dina drag är slut. En ny samling väntar.',
+  'questUi.worldQuest.match3DefeatTitle': 'Bitter nederlag',
+  'questUi.worldQuest.match3Instructions':
+    'Välj två angränsande godisbitar. Ett byte räknas endast när det skapar en rad med tre eller fler.',
+  'questUi.worldQuest.match3Moves': 'Drag: {current}/{total}',
+  'questUi.worldQuest.match3OutOfMoves':
+    'Inga drag återstår. Börja om på nivån för att försöka igen.',
+  'questUi.worldQuest.match3Reset': 'Börja om nivå',
+  'questUi.worldQuest.match3ResultAnnouncement': '{title}. {detail} {moves}. {cleared}.',
+  'questUi.worldQuest.match3ResultSummary': '{title}. {detail} {cleared}.',
+  'questUi.worldQuest.match3Selected': 'Vald',
+  'questUi.worldQuest.match3Title': 'Godiskaskad',
+  'questUi.worldQuest.match3TryAgain': 'Försök igen',
+  'questUi.worldQuest.match3VictoryDetail': 'Den förtrollad samlingen är komplett.',
+  'questUi.worldQuest.match3VictoryTitle': 'Söt seger',
+  'questUi.worldQuest.matchConfections': 'Matcha förtrollad godis',
+  'questUi.worldQuest.mineOre': 'Bryta kopparmalm',
+  'questUi.worldQuest.practiceRewards':
+    'Träning: spela igen utan att tjäna mer mynt, erfarenhet eller rykte.',
+  'questUi.worldQuest.puzzleBeamReach': 'Kristaller nådd: {count}',
+  'questUi.worldQuest.puzzleBonusCharged':
+    'Träningsnivå {level} av {total} väntar. Röra vid Ley Cache igen. Ytterligare rundor ger ingen belöning.',
+  'questUi.worldQuest.puzzleBonusDone':
+    'Varje träningsnivå klarad. Röra vid Ley Cache för att spela igen.',
+  'questUi.worldQuest.puzzleBonusLevel': 'Bonusnivå {level} av {total}',
+  'questUi.worldQuest.puzzleBonusPaid': 'Träningsnivå klarad!',
+  'questUi.worldQuest.puzzleClose': 'Stäng ley-strålgåta',
+  'questUi.worldQuest.puzzleConnectors': 'Kopplingar: {connectors}.',
+  'questUi.worldQuest.puzzleDefeatDetail': 'Strömmen har bleknat. Ritualen är oavslutad.',
+  'questUi.worldQuest.puzzleDefeatTitle': 'Inriktning förlorad',
+  'questUi.worldQuest.puzzleInstructions':
+    'Rotera platsen för att bära strålen från källan till destinationen.',
+  'questUi.worldQuest.puzzleLevel': 'Daglig nivå {level}',
+  'questUi.worldQuest.puzzlePowered': 'Strålen når denna plats.',
+  'questUi.worldQuest.puzzleResultAnnouncement': '{title}. {detail} {reach}.',
+  'questUi.worldQuest.puzzleRetry': 'Försök igen',
+  'questUi.worldQuest.puzzleReturn': 'Återvänd till rike',
+  'questUi.worldQuest.puzzleRotateTile': 'Rotera plats {tile}',
+  'questUi.worldQuest.puzzleSource': 'Källa',
+  'questUi.worldQuest.puzzleSourceEndpoint': 'Källa: {direction}.',
+  'questUi.worldQuest.puzzleTarget': 'Destination',
+  'questUi.worldQuest.puzzleTargetEndpoint': 'Destination: {direction}.',
+  'questUi.worldQuest.puzzleTileAria': '{rotation} {connectors} {power} {source} {target}',
+  'questUi.worldQuest.puzzleTimer': '{seconds}s',
+  'questUi.worldQuest.puzzleTimerAria': 'Återstående tid: {seconds} sekunder',
+  'questUi.worldQuest.puzzleTitle': 'Ljusstralens justering',
+  'questUi.worldQuest.puzzleUnpowered': 'Ljusstralens når inte denna ruta.',
+  'questUi.worldQuest.puzzleVictoryDetail': 'Ljusstralens har nått sin destination.',
+  'questUi.worldQuest.puzzleVictoryTitle': 'Perfekt justering',
+  'questUi.worldQuest.recoverObject': 'Återhämta {name}',
+  'questUi.worldQuest.redirectLeyBeam': 'Omdirigera ljusstralens',
+  'questUi.worldQuest.replay': 'Spela igen',
+  'questUi.worldQuest.rewardLine': 'Belöningar: {reward}',
+  'questUi.worldQuest.salvageWreckage':
+    'Rädda vraket som spolades upp längs stranden från vraket nordväst om Gullhaven',
+  'questUi.worldQuest.semanticSummary': '{name}. {progress}. {reward}.',
+  'questUi.worldQuest.semanticSummaryTimed': '{name}. {progress}. {reward}. {time}.',
+  'questUi.worldQuest.shadow.behind': 'Flytta dig bakom väktaren innan du stjäl.',
+  'questUi.worldQuest.shadow.caught':
+    'Upptäckt! Återgå till Spejare Valerie för en annan kappa. Dina order är säkra.',
+  'questUi.worldQuest.shadow.channel': 'Stjäl... {seconds}s',
+  'questUi.worldQuest.shadow.cloak': 'Skymningsvävsskap',
+  'questUi.worldQuest.shadow.complete': 'Alla fyra order återhämtade.',
+  'questUi.worldQuest.shadow.danger': 'Du blir upptäckt! Gå i gömsle!',
+  'questUi.worldQuest.shadow.documents': 'Order återhämtade: {count}/4',
+  'questUi.worldQuest.shadow.leave': 'Ta bort kappa',
+  'questUi.worldQuest.shadow.leaveTip': 'Ta bort kappan. Dina återhämtade order bevaras.',
+  'questUi.worldQuest.shadow.noTarget': 'Flytta dig nära en väkt som bär order.',
+  'questUi.worldQuest.shadow.objective': 'Stjäl fyra förseglade order utan att bli upptäckt',
+  'questUi.worldQuest.shadow.pickpocket': 'Fickstöld',
+  'questUi.worldQuest.shadow.safe':
+    'Stjäl från baksidan. Lyktvakter sveper breda strålar som genomträr kappan; vänta på en klar öppning.',
+  'questUi.worldQuest.shadow.start': 'Tala med Spejare Valerie för att låna hennes kappa.',
+  'questUi.worldQuest.shadow.stealTip':
+    'Närma dig från baksidan och stå still medan du tar order. Stanna borta från lyktorna.',
+  'questUi.worldQuest.shadow.suspicion': 'Misstanke: {value}',
+  'questUi.worldQuest.shadow.title': 'Under skuggans täcke',
+  'questUi.worldQuest.standingReward': '+{amount} {faction} anseende',
+  'questUi.worldQuest.startEscort': 'Starta eskortering',
+  'questUi.worldQuest.startQuest': 'Starta världsbeskattning',
+  'questUi.worldQuest.title': '{zone}: {target}',
+  'questUi.worldQuest.traceCombat':
+    'Lämna strid, tala sedan med instruktören för att försöka igen.',
+  'questUi.worldQuest.traceCompletionLog': '{completion} {result}',
+  'questUi.worldQuest.traceDrawing':
+    'Följ gyllene gnistor till det ljusa hörnet. Blått markerar din väg.',
+  'questUi.worldQuest.traceMovement':
+    'Stanna till fots och på marken. Tala med instruktören för att försöka igen.',
+  'questUi.worldQuest.traceOffPath':
+    'Du lämnade konturen. Tala med instruktören för att försöka igen.',
+  'questUi.worldQuest.traceOutline': 'Spåra konturen med dina fotsteg',
+  'questUi.worldQuest.tracePreview': 'Se konturen. Gyllene gnistor vägleder dig.',
+  'questUi.worldQuest.traceRating.bronze': 'Brons',
+  'questUi.worldQuest.traceRating.gold': 'Guld',
+  'questUi.worldQuest.traceRating.silver': 'Silver',
+  'questUi.worldQuest.traceReaction.elianComplete':
+    'En fullständig runa! Omsorg och övning gör din nästa ännu finare.',
+  'questUi.worldQuest.traceReaction.elianFinal':
+    'Sista runan. En linje kan korsa eller besöka en punkt igen; följ den ljusa markören till nästa hörn.',
+  'questUi.worldQuest.traceReaction.elianGold':
+    'Vackert ritad! Dina steg har förtjänat sin plats i guld.',
+  'questUi.worldQuest.traceReaction.pipSquare': 'Fyra sidor! Jag tror jag kan göra det också!',
+  'questUi.worldQuest.traceReaction.tessaTriangle': 'Tre hörn, och varje ett på sin plats!',
+  'questUi.worldQuest.traceReady': 'Tala med instruktören för att börja.',
+  'questUi.worldQuest.traceRetry': 'Tala med instruktören för att försöka igen.',
+  'questUi.worldQuest.traceRoundInstruction': 'Omgång {round} av {total}: {shape}. {instruction}',
+  'questUi.worldQuest.traceScoreResult':
+    'Klarat! {rating}: {score}/{total}. Basbelöning oförändrad. Guld: skatt, titel, +10 Anseende.',
+  'questUi.worldQuest.traceShape.arrow': 'Pilruna',
+  'questUi.worldQuest.traceShape.cross': 'Korsruna',
+  'questUi.worldQuest.traceShape.diamond': 'Diamant',
+  'questUi.worldQuest.traceShape.double-triangle': 'Tvillingtriangel-sigill',
+  'questUi.worldQuest.traceShape.hourglass': 'Timglas',
+  'questUi.worldQuest.traceShape.lightning': 'Blixtruna',
+  'questUi.worldQuest.traceShape.pentagon': 'Pentagon',
+  'questUi.worldQuest.traceShape.spiral': 'Vinklad spiral',
+  'questUi.worldQuest.traceShape.square': 'Kvadrat',
+  'questUi.worldQuest.traceShape.star': 'Stjärna',
+  'questUi.worldQuest.traceShape.triangle': 'Triangel',
+  'questUi.worldQuest.traceShape.zigzag': 'Sicksack-sigill',
+  'questUi.worldQuest.traceStart': 'Flytta dig till startmarkören. Spåra åt något håll.',
+  'questUi.worldQuest.traceSuccess': 'Konturen är fullständig!',
+  'questUi.worldQuest.traceTimeout': 'Tiden tog slut. Tala med instruktören för att försöka igen.',
+  'questUi.worldQuest.traceUnavailable': 'Denna runa kräver en nyare spelversion.',
+  'questUi.worldQuest.unknown': 'Okänd världsbeskattning ({id})',
+  'questUi.worldQuest.wispMaze.collect': 'Plocka upp myntpungarna. Undvik skuggor.',
+  'questUi.worldQuest.wispMaze.collected': 'Myntpungar: {count}/{total}',
+  'questUi.worldQuest.wispMaze.controls':
+    'Flytta genom labyrinten för att plocka upp myntpungarna. Undvik skuggorna. Strålande spöken låter dig förbjuda skuggor för en kort tid.',
+  'questUi.worldQuest.wispMaze.countdown': 'Startar om {seconds}s',
+  'questUi.worldQuest.wispMaze.finished': 'Varje myntpung är återhämtad!',
+  'questUi.worldQuest.wispMaze.leave': 'Lämna labyrint',
+  'questUi.worldQuest.wispMaze.lives': 'Liv: {count}/3',
+  'questUi.worldQuest.wispMaze.objective': 'Återhämta varje stulen myntpung från labyrinten',
+  'questUi.worldQuest.wispMaze.power': 'Spökkraft: {seconds}s',
+  'questUi.worldQuest.wispMaze.powered': 'Kraftövergifte! Rör vid skuggor för att förbjuda dem.',
+  'questUi.worldQuest.wispMaze.ready': 'Tala med labyrinti för att börja.',
+  'questUi.worldQuest.wispMaze.retry': 'Tre liv återställda. Försök labyrinten igen.',
+  'questUi.worldQuest.wispMaze.startHard': 'Gå in i labyrinten: Svår ({shadows} skuggor)',
+  'questUi.worldQuest.wispMaze.startNormal': 'Gå in i labyrinten: Normal ({shadows} skuggor)',
+  'questUi.worldQuest.wispMaze.title': 'Spökskogens labyrinter',
+  'apiError.world_quests.unknown_board': 'Ingen resultattavla med det namnet.',
+  'clues.hunt_amberfall_lantern_ferry.0':
+    'Vid vattnets kant norr om Ljusmeren vet färjmästaren vilka som håller i lyssstocken vilken lampa som gick ut. Tala med färjmästare Caddow.',
+  'clues.hunt_amberfall_lantern_ferry.1':
+    'En ensam sten lutar sig mot himlen nordöst om den stora meren, äldre än själva staden. Stå vid Lutande Stenmonnumentet.',
+  'clues.hunt_amberfall_lantern_ferry.2':
+    'Vårdarinnan av de förgyllda raderna vattnar sin fruktträdgård för hand och längtar efter vatten. Hämta 3 x Kallt brunnsvatten till Fruktträdgårdsmästare Pomeline.',
+  'clues.hunt_amberfall_lantern_ferry.3':
+    'Nordöst om höjden där eldlönarna brinner röda ligger löven i en cirkel som ingen vind gjorde. Använd rollen där och gräv.',
+  'clues.hunt_amberfall_lantern_ferry.title': 'Lyktor på meren',
+  'clues.hunt_drakelands_gate_ashes.0':
+    'Vägen från Drakväxtningen löper västerut in i ett bestånd av gamla träd som vaktar porten. Stå under Portskogen och stigar börjar.',
+  'clues.hunt_drakelands_gate_ashes.1':
+    'En väktare vid fjärrkullorna håller till på de östra sanden, norr om garnisonern. Hitta Scout Yerrin och fråga vad vinden förde med sig.',
+  'clues.hunt_drakelands_gate_ashes.2':
+    'Förmannen på garnisonskällaren har inte ätit sedan sista patrullen. Hämta 2 x Hemgjord brödlimpa till Förmedlare Sela.',
+  'clues.hunt_drakelands_gate_ashes.3':
+    'Öst och lite söder om där glöden driver in i dyvorna, döljer en bränd lapp av jord vad askan begravde. Använd rollen där och gräv.',
+  'clues.hunt_drakelands_gate_ashes.title': 'Aska vid porten',
+  'clues.hunt_evergarden_beacon_road.0':
+    'Blomsterträdgårdsmästaren längs vägen norr om Häckeviken svär att hennes sängar svälter. Hämta 2 x Kompost till Bonde Verbena.',
+  'clues.hunt_evergarden_beacon_road.1':
+    'I det långtbort sydöstra hörnet av trädgården vänder en gammal kvarn fortfarande för ingen mjöltillverkare. Stå vid den Gamla Kvarnen.',
+  'clues.hunt_evergarden_beacon_road.2':
+    'Följ vägen söderut över gränsen in i Stormkam och ut till kusten. Fyrväktaren från gamla tiden, Fyrväktare Bram, har det sista ordet.',
+  'clues.hunt_evergarden_beacon_road.3':
+    'Nordväst om den gamla fyren, strax bort från vägen ned från ljuset, har torven blivit skuren och lagd tillbaka. Använd rollen där och gräv.',
+  'clues.hunt_evergarden_beacon_road.title': 'Båk och blomning',
+  'clues.hunt_frostveil_aurora_vigil.0':
+    'Där terrasser klättrar mot de ljus som dansar om natten, knäl på Dager vid Aurora och låt himlen märka dig.',
+  'clues.hunt_frostveil_aurora_vigil.1':
+    'Den som läser ljusen väntar nära trappan. Tala med Auroraforskare Veyla om vad himlen stavade ut.',
+  'clues.hunt_frostveil_aurora_vigil.2':
+    'Öst om brölande terrasser, lite åt söder, ligger snön plattare än den borde. Använd rollen där och gräv.',
+  'clues.hunt_frostveil_aurora_vigil.title': 'Ljus över trapporna',
+  'clues.hunt_nightbloom_sleepless_vigil.0':
+    'Nordöst om Månvila, där stenarna håller en vakt som aldrig slutar, stå vid Den Stående Vaken.',
+  'clues.hunt_nightbloom_sleepless_vigil.1':
+    'Väktaren vid vaken räknar stjärnor på samma sätt som andra räknar mynt. Tala med Astronom Cassian om den som föll.',
+  'clues.hunt_nightbloom_sleepless_vigil.2':
+    'Norr om staden ligger en gravhög vars sovare aldrig vilar. Hälsa Den Vakenlösa Gravhögen så att sovaren vet att en vän har kommit.',
+  'clues.hunt_nightbloom_sleepless_vigil.3':
+    'Sydöst om fältet där skymningen samlas, samlar månljuset på en bar jordlapp. Använd rollen där och gräv.',
+  'clues.hunt_nightbloom_sleepless_vigil.title': 'Vaken för de vakenlösa',
+  'clues.hunt_palmreach_sunken_idol.0':
+    'Långt inne i vildvinglingen, nordväst om lagunen, strömmar rankorna ned som en vattenfalls. Stå vid Rankhösten.',
+  'clues.hunt_palmreach_sunken_idol.1':
+    'En eremit som gick in i vildvinglingen och kom ut igen bor nära fallande rankor. Tala med Okrim om vad han såg där nere.',
+  'clues.hunt_palmreach_sunken_idol.2':
+    'Österut sitter en gudabild halvt drunken och ser fortfarande. Skälva framför Den Nedsänkta Gudabilden, på det sätt som eremiten sa att dykarna gör.',
+  'clues.hunt_palmreach_sunken_idol.3':
+    'Nordöst om där vildvinglingen öppnar sin mun mot havet, är sanden högt uppsamlad högre än tidvattnet når. Använd rollen där och gräv.',
+  'clues.hunt_palmreach_sunken_idol.title': 'Gudabildens hemlighet',
+  'clues.hunt_willowfen_fenwitch_salt.0':
+    'Källanhäxan från Vårglänningen vill inte tala med någon som kommer tomhänt. Hämta 1 x Matlagningssalt till Moder Säv.',
+  'clues.hunt_willowfen_fenwitch_salt.1':
+    'Där källan blir platt och luften gör alla dåsiga, stå på De Dåsiga Slätten och sucka, som häxan sa.',
+  'clues.hunt_willowfen_fenwitch_salt.2':
+    'Sydöst om de pooler som glänser i sumpen, en torr kulle förblir torr året runt. Använd rollen där och gräv.',
+  'clues.hunt_willowfen_fenwitch_salt.title': 'Källanhäxans salt',
+  'clues.hunt_wraithwood_mournstone_candles.0':
+    'Ljusmakaren från Galgebränningen säljer ljus till människor som fruktar mörkret. Tala med Änka Tansy om ett ljus som aldrig betalades för.',
+  'clues.hunt_wraithwood_mournstone_candles.1':
+    'Den siste prästen vid Sorgestenen har fastat endast på böner. Hämta 2 x Saltad torr fisk till Präst Creel.',
+  'clues.hunt_wraithwood_mournstone_candles.2':
+    'Nordöst om staden, förbi kråkorna, hänger en klar glasad frukt. Stå i Den Hängande Gläntan.',
+  'clues.hunt_wraithwood_mournstone_candles.3':
+    'Sydöst om klippan där jägaren ställde sina snäror, har löverblandningen nyligen väldts. Använd rollen där och gräv.',
+  'clues.hunt_wraithwood_mournstone_candles.title': 'Ljus för Sorgestenen',
+  'clues.items.clue_scroll.desc':
+    'En förseglad gåta tjänad genom att slutföra varje zonplats för dagen. Använd den för att börja en skattjakt, och använd den igen på den dolda platsen när sista ledtråden säger att gräva.',
+  'clues.items.treasure_casket.desc':
+    'En låst låda grävd upp i slutet av en skattjakt. Använd den för att öppna den och kräva det som jakten begravde.',
+  'desktop.hostDiag.fileType': 'JSON-fil',
+  'desktop.hostDiag.saveButton': 'Spara',
+  'desktop.hostDiag.saveTitle': 'Spara systemrapport',
+  'devCommand.actions.hillend.description': 'Gör att den nuvarande kullen faller nu.',
+  'devCommand.actions.hillend.label': 'Sluta kullstriden',
+  'devCommand.actions.hillnow.description': 'Res en kulle omedelbar och stå på den.',
+  'devCommand.actions.hillnow.label': 'Res kulle nu',
+  'devCommand.actions.hillrise.description': 'Res den tillkännagivna kullen direkt.',
+  'devCommand.actions.hillrise.label': 'Hoppa över kullnedräkning',
+  'devCommand.actions.hillwarn.description':
+    'Tillkännage en kulle nu; den reser efter den fullständiga varningen.',
+  'devCommand.actions.hillwarn.label': 'Kullnedräkning',
+  'entities.abilities.lava_burst.description':
+    'Orsakar {damage} eldskada. Träffar alltid kritiskt ett mål som brinner av din Glödstöt. Magma Surge: varje Glödstöt-tick har 20% chans att återställa denna nedräkning och göra din nästa Magma Burst inom 10 sec omedelbar. Skada ökar med Spellkraft. (Thundercall)',
+  'entities.abilities.lava_burst.name': 'Magma Burst',
+  'entities.abilities.lightning_overload.description':
+    'Passiv: Bågblixt och Gaffelblixt har 20% chans att överbelasta, träffa sitt första mål igen för 50% av skadan som orsakades och ge 1 Åska. (Thundercall)',
+  'entities.abilities.lightning_overload.name': 'Arc Overload',
+  'entities.abilities.thunderstorm.description':
+    'Kalla ned ett åskknall som orsakar {damage} naturskada till fiender inom 10 yards och saktar dem ned med 50% i 5 sec. Återställer 8% av din maximala mana. Skada ökar med Spellkraft. (Thundercall)',
+  'entities.abilities.thunderstorm.name': 'Stormbreak',
+  'entities.itemSets.vanguard_druid_balance.bonus2':
+    'Gripande rotters kastningstid minskas med 0,5 sec.',
+  'entities.itemSets.vanguard_druid_balance.bonus4':
+    'Att kasta Gripande rötter låter dig kasta medan du rör dig och ökar din rörelse med 20 procent i 4 sec. Kan inte inträffa mer än en gång var 20 sec.',
+  'entities.itemSets.vanguard_druid_balance.name': 'Starwarden Raiment',
+  'entities.itemSets.vanguard_druid_feral.bonus2': 'Bruinrusningens nedräkning minskas med 3 sec.',
+  'entities.itemSets.vanguard_druid_feral.bonus4':
+    'Bruinrusning skyddar dig för 6 procent av din maximala hälsa i 6 sec.',
+  'entities.itemSets.vanguard_druid_feral.name': 'Bloodmane Hide',
+  'entities.itemSets.vanguard_druid_restoration.bonus2': 'Fleetmends nedräkning minskas med 1 sec.',
+  'entities.itemSets.vanguard_druid_restoration.bonus4':
+    'Fleetmend ökar också din rörelse med 30 procent i 3 sec.',
+  'entities.itemSets.vanguard_druid_restoration.name': 'Thistlebloom Vestment',
+  'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
+    'Skakande skotts nedräkning minskas med 4 sec.',
+  'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
+    'Skakande skott minskar Howling Rage återstående nedräkning med 1 sec.',
+  'entities.itemSets.vanguard_hunter_beast_mastery.name': 'Packwarden Harness',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
+    'Trailbreaks nedräkning minskas med 4 sec.',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
+    'Trailbreak gör din nästa Långt drag inom 6 sec omedelbar. Kan inte inträffa mer än en gång var 15 sec.',
+  'entities.itemSets.vanguard_hunter_marksmanship.name': 'Farsight Harness',
+  'entities.itemSets.vanguard_hunter_survival.bonus2': 'Blodkroks nedräkning minskas med 3 sec.',
+  'entities.itemSets.vanguard_hunter_survival.bonus4': 'Blodkrok ger 1 Jaktfart.',
+  'entities.itemSets.vanguard_hunter_survival.name': 'Snaretooth Harness',
+  'entities.itemSets.vanguard_mage_arcane.bonus2':
+    'Temporal Barriers nedräkning minskas med 2 sec.',
+  'entities.itemSets.vanguard_mage_arcane.bonus4':
+    'Temporal Barrier ökar också den skyddade målgruppen rörelse med 20 procent i 3 sec.',
+  'entities.itemSets.vanguard_mage_arcane.name': "Hourbinder's Vestments",
+  'entities.itemSets.vanguard_mage_fire.bonus2': 'Cinderfall laddas om 3 sec snabbare.',
+  'entities.itemSets.vanguard_mage_fire.bonus4':
+    'Att kasta Cinderfall minskar återstående nedräkning för Flammande barriär med 2 sec.',
+  'entities.itemSets.vanguard_mage_fire.name': 'Emberlash Regalia',
+  'entities.itemSets.vanguard_mage_frost.bonus2': 'Isbindningens nedräkning minskas med 2 sec.',
+  'entities.itemSets.vanguard_mage_frost.bonus4':
+    'Att kasta Isbindning minskar återstående nedräkning för Fladdersteg med 5 sec.',
+  'entities.itemSets.vanguard_mage_frost.name': 'Rimewarden Garb',
+  'entities.itemSets.vanguard_paladin_holy.bonus2': 'Life Covenants nedräkning minskas med 30 sec.',
+  'entities.itemSets.vanguard_paladin_holy.bonus4':
+    'Life Covenant skyddar också alliansen för 8 procent av deras maximala hälsa i 6 sec.',
+  'entities.itemSets.vanguard_paladin_holy.name': 'Sunvigil Regalia',
+  'entities.itemSets.vanguard_paladin_protection.bonus2':
+    'Oath Chains nedräkning minskas med 2 sec.',
+  'entities.itemSets.vanguard_paladin_protection.bonus4':
+    'Fiender dragna av Oath Chain kastar besvärjelser 30 procent långsammare i 4 sec, och Oath Chain ger dig Solar Reprisal när det binder en fiende som kan dras.',
+  'entities.itemSets.vanguard_paladin_protection.name': 'Shieldvow Bastion',
+  'entities.itemSets.vanguard_paladin_retribution.bonus2':
+    "Valkyr's Callings nedräkning minskas med 15 sec.",
+  'entities.itemSets.vanguard_paladin_retribution.bonus4':
+    "Valkyr's Calling återställer Final Edicts nedräkning, och din nästa Final Edict inom 6 sec från träff orsakar 15 procent mer skada.",
+  'entities.itemSets.vanguard_paladin_retribution.name': 'Lightbrand Warplate',
+  'entities.itemSets.vanguard_priest_discipline.bonus2':
+    'Terror Canticles nedräkning minskas med 3 sec.',
+  'entities.itemSets.vanguard_priest_discipline.bonus4':
+    'När din Psalm of Warding är fullt konsumerad, får den skyddade alliansen 20 procent rörelse i 3 sec. Kan inte inträffa mer än en gång var 8 sec.',
+  'entities.itemSets.vanguard_priest_discipline.name': 'Veilpsalm Raiment',
+  'entities.itemSets.vanguard_priest_holy.bonus2': 'Veilsteps nedräkning minskas med 6 sec.',
+  'entities.itemSets.vanguard_priest_holy.bonus4':
+    'Veilstep skyddar också dig för 8 procent av din maximala hälsa i 6 sec.',
+  'entities.itemSets.vanguard_priest_holy.name': 'Gracewing Raiment',
+  'entities.itemSets.vanguard_priest_shadow.bonus2':
+    'Sorgens litania saktar också målsökningens rörelse ned med 30 procent medan du kanaliserar den.',
+  'entities.itemSets.vanguard_priest_shadow.bonus4':
+    'Kalla Tithefiend skyddar också dig för 10 procent av din maximala hälsa i 8 sec.',
+  'entities.itemSets.vanguard_priest_shadow.name': 'Duskhymn Regalia',
+  'entities.itemSets.vanguard_rogue_assassination.bonus2': 'Lågt slag kostar 10 mindre energi.',
+  'entities.itemSets.vanguard_rogue_assassination.bonus4':
+    'Lågt slag gör också din nästa attack inom 6 sec en kritisk träff.',
+  'entities.itemSets.vanguard_rogue_assassination.name': 'Nightcut Leathers',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': 'Swift Heels nedräkning minskas med 60 sec.',
+  'entities.itemSets.vanguard_rogue_combat.bonus4':
+    'Medan Swift Heels är aktiv, Wicked Slash och Haymaker ger 1 ytterligare combo-poäng.',
+  'entities.itemSets.vanguard_rogue_combat.name': 'Brawlmark Leathers',
+  'entities.itemSets.vanguard_rogue_subtlety.bonus2': 'Smokefades nedräkning minskas med 60 sec.',
+  'entities.itemSets.vanguard_rogue_subtlety.bonus4':
+    'Magslag ger 2 ytterligare combo-poäng när det används från Smokefade.',
+  'entities.itemSets.vanguard_rogue_subtlety.name': 'Shadewalk Leathers',
+  'entities.itemSets.vanguard_shaman_elemental.bonus2':
+    'Unleash Weapons nedräkning minskas med 3 sec.',
+  'entities.itemSets.vanguard_shaman_elemental.bonus4':
+    'Unleash Weapon låter dig kasta medan du rör dig och ökar din rörelse med 20 procent i 4 sec. Kan inte inträffa mer än en gång var 20 sec.',
+  'entities.itemSets.vanguard_shaman_elemental.name': 'Tempestwrit Battlemail',
+  'entities.itemSets.vanguard_shaman_enhancement.bonus2':
+    'Ancestral Strike saktar ned målsökningens rörelse med 30 procent i 4 sec.',
+  'entities.itemSets.vanguard_shaman_enhancement.bonus4':
+    'Ancestral Strike minskar återstående nedräkning för Elemental Trance med 4 sec.',
+  'entities.itemSets.vanguard_shaman_enhancement.name': 'Galeborn Warmail',
+  'entities.itemSets.vanguard_shaman_restoration.bonus2':
+    'Lagande vatten kastar 0,5 sec snabbare på en allierad under 50 procent hälsa.',
+  'entities.itemSets.vanguard_shaman_restoration.bonus4':
+    'Tidecall skyddar också sitt mål för 5 procent av din maximala hälsa i 6 sec.',
+  'entities.itemSets.vanguard_shaman_restoration.name': 'Brineward Chainmail',
+  'entities.itemSets.vanguard_warlock_affliction.bonus2':
+    'Harrows kastningstid minskas med 0,3 sec.',
+  'entities.itemSets.vanguard_warlock_affliction.bonus4':
+    'Förtär läker dig för 30 procent mer och kan kanaliseras medan du rör dig.',
+  'entities.itemSets.vanguard_warlock_affliction.name': 'Dreadquill Vestments',
+  'entities.itemSets.vanguard_warlock_demonology.bonus2':
+    'Bone Armors nedräkning minskas med 10 sec.',
+  'entities.itemSets.vanguard_warlock_demonology.bonus4':
+    'Reaping Command minskar återstående nedräkning för Bone Armor med 2 sec.',
+  'entities.itemSets.vanguard_warlock_demonology.name': 'Marrowbound Regalia',
+  'entities.itemSets.vanguard_warlock_destruction.bonus2':
+    'Cinderhides nedräkning minskas med 30 sec.',
+  'entities.itemSets.vanguard_warlock_destruction.bonus4':
+    'Var andra Conflagrate gör din nästa Fördärvsbult inom 8 sec omedelbar.',
+  'entities.itemSets.vanguard_warlock_destruction.name': 'Slagcrown Vestments',
+  'entities.itemSets.vanguard_warrior_arms.bonus2':
+    'Stympande hugg minskar Anstormningens återstående nedräkning med 1 sec.',
+  'entities.itemSets.vanguard_warrior_arms.bonus4':
+    'Anstormning mäktiga också din nästa Stympande hugg med 20 procent (en stack av Redhands empowerment).',
+  'entities.itemSets.vanguard_warrior_arms.name': 'Bladewake Battlegear',
+  'entities.itemSets.vanguard_warrior_fury.bonus2': 'Krigssprångs nedräkning minskas med 8 sec.',
+  'entities.itemSets.vanguard_warrior_fury.bonus4': 'Landning Krigssprång ger dig Enrage.',
+  'entities.itemSets.vanguard_warrior_fury.name': 'Bloodmarch Ragegear',
+  'entities.itemSets.vanguard_warrior_prot.bonus2':
+    'Förkastningslinjes nedräkning minskas med 5 sec.',
+  'entities.itemSets.vanguard_warrior_prot.bonus4':
+    'Förkastningslinje minskar också skada du tar med 10 procent i 6 sec.',
+  'entities.itemSets.vanguard_warrior_prot.name': 'Ironmarch Bulwark',
+  'entities.items.acolytes_signet.name': 'Akolitens sigill',
+  'entities.items.artificers_welding_cowl.name': 'Hantverkarens svetshuva',
+  'entities.items.automaton_cog_ring.name': 'Automatons kuggring',
+  'entities.items.bastion_sigil.name': 'Bastionens sigill',
+  'entities.items.champion_dawn_medallion.name': 'Mästares gryningsmedalj',
+  'entities.items.champion_forged_loop.name': 'Mästares smidda ring',
+  'entities.items.champion_rift_band.name': 'Mästares klyfta band',
+  'entities.items.champions_dawn_loop.name': 'Mästares gryningsring',
+  'entities.items.clockwork_tinkers_pack.name': 'Urmakares verktygspaket',
+  'entities.items.clue_scroll.name': 'Ledtrådsrull',
+  'entities.items.cogwork_choker.name': 'Kogwork halsketting',
+  'entities.items.confection_game_box.name': 'Konfektörs spellåda',
+  'entities.items.cord_of_the_dawn.name': 'Gryningens sträng',
+  'entities.items.dawnkeeper_consecrated_mace.name': 'Gryningens väktares vigde stridsklubba',
+  'entities.items.dawnkeepers_circle.name': 'Gryningens väktares cirkel',
+  'entities.items.dawnlit_slippers.name': 'Gryningslysta tofflor',
+  'entities.items.duelists_brand.name': 'Duellantens märke',
+  'entities.items.eastbrook_freight_crate.name': 'Östbäcks lastlåda',
+  'entities.items.eastbrook_freight_wagon.name': 'Östbäcks lastvagn',
+  'entities.items.echoing_lens.name': 'Ekande lins',
+  'entities.items.emissary_cache.name': 'Sändebudets gömsle',
+  'entities.items.forgefathers_temper.name': 'Smältarfaderns temperament',
+  'entities.items.forgemaster_crag_cleaver.name': 'Bergsarbetets klyvare',
+  'entities.items.forgemasters_girdle.name': 'Smältarmestrens livrem',
+  'entities.items.forgemasters_sabatons.name': 'Smältarmestrens stålkängor',
+  'entities.items.forgewall_gorget.name': 'Smedmurens struthals',
+  'entities.items.formula_dawnfire_etching.name': 'Formel: Gryningseldskrapning',
+  'entities.items.formula_dawns_benediction.name': 'Formel: Gryningens välsignelse',
+  'entities.items.formula_piston_drive.name': 'Formel: Kolven',
+  'entities.items.formula_riftwalkers_grace.name': 'Formel: Spaltvandraren nåd',
+  'entities.items.gamblers_die.name': 'Speltäningens tärning',
+  'entities.items.heart_of_the_crucible.name': 'Smältugnarnas hjärta',
+  'entities.items.hunters_tally.name': 'Jägarens räkning',
+  'entities.items.kindling_orb.name': 'Tändkula',
+  'entities.items.last_flame_lantern.name': 'Sista flammans lykta',
+  'entities.items.leyline_cache.name': 'Liten kraftlinjekistа',
+  'entities.items.medallion_of_defiance.name': 'Trotsets medalj',
+  'entities.items.menders_hourglass.name': 'Läkarens timglas',
+  'entities.items.molten_fletching.name': 'Smält fjädring',
+  'entities.items.mooring_stone.name': 'Förankringssten',
+  'entities.items.order_prayer_beads.name': 'Ordningens bönekulor',
+  'entities.items.paired_talons.name': 'Parade kloar',
+  'entities.items.reins_avian_strider.name': 'Tyglar till den gröna fågelsprångaren',
+  'entities.items.rift_surveyors_satchel.name': 'Spaltutredskans väska',
+  'entities.items.rift_watchers_band.name': 'Spaltvaktarens ring',
+  'entities.items.riftwalkers_cord.name': 'Spaltvandraren snöre',
+  'entities.items.riftwalkers_treads.name': 'Spaltvandrarens steg',
+  'entities.items.riftwalkers_tunic.name': 'Spaltvandrarens tunika',
+  'entities.items.riftwarden_voidblade.name': 'Spaltväktarens tomhetssvärd',
+  'entities.items.riftwardens_pendant.name': 'Spaltväktarens hängsmycke',
+  'entities.items.stormjar.name': 'Åskkärl',
+  'entities.items.sundered_prism.name': 'Sprickat prisma',
+  'entities.items.templar_dawn_shield.name': 'Tempelriddares gryningssköld',
+  'entities.items.tidewatchers_locket.name': 'Tidvattnets väktares medaljong',
+  'entities.items.treasure_casket.name': 'Skattekistа',
+  'entities.items.vanguard_druid_balance_chest.name': 'Stjärnvaktens väst',
+  'entities.items.vanguard_druid_balance_gloves.name': 'Stjärnvaktens handskar',
+  'entities.items.vanguard_druid_balance_helmet.name': 'Stjärnvaktens huvudbonad',
+  'entities.items.vanguard_druid_balance_legs.name': 'Stjärnvaktens benklädnader',
+  'entities.items.vanguard_druid_balance_shoulder.name': 'Stjärnvaktens axelskydd',
+  'entities.items.vanguard_druid_feral_chest.name': 'Blodmanens tunika',
+  'entities.items.vanguard_druid_feral_gloves.name': 'Blodmanens grepp',
+  'entities.items.vanguard_druid_feral_helmet.name': 'Blodmanens hjälm',
+  'entities.items.vanguard_druid_feral_legs.name': 'Blodmanens skyddsben',
+  'entities.items.vanguard_druid_feral_shoulder.name': 'Blodmanens skuldror',
+  'entities.items.vanguard_druid_restoration_chest.name': 'Tistelblomsväst',
+  'entities.items.vanguard_druid_restoration_gloves.name': 'Tistelblomshandskar',
+  'entities.items.vanguard_druid_restoration_helmet.name': 'Tistelblomskylla',
+  'entities.items.vanguard_druid_restoration_legs.name': 'Tistelblomsbenklädnader',
+  'entities.items.vanguard_druid_restoration_shoulder.name': 'Tistelblomsmantel',
+  'entities.items.vanguard_fang_dagger.name': 'Förtruppens tandknivar',
+  'entities.items.vanguard_hunter_beast_mastery_chest.name': 'Flockväktens jacka',
+  'entities.items.vanguard_hunter_beast_mastery_gloves.name': 'Flockväktens stridshandskar',
+  'entities.items.vanguard_hunter_beast_mastery_helmet.name': 'Flockväktens mössa',
+  'entities.items.vanguard_hunter_beast_mastery_legs.name': 'Flockväktens skyddsben',
+  'entities.items.vanguard_hunter_beast_mastery_shoulder.name': 'Flockväktens axelskydd',
+  'entities.items.vanguard_hunter_marksmanship_chest.name': 'Långsynens jacka',
+  'entities.items.vanguard_hunter_marksmanship_gloves.name': 'Långsynens stridshandskar',
+  'entities.items.vanguard_hunter_marksmanship_helmet.name': 'Långsynens mössa',
+  'entities.items.vanguard_hunter_marksmanship_legs.name': 'Långsynens skyddsben',
+  'entities.items.vanguard_hunter_marksmanship_shoulder.name': 'Långsynens axelskydd',
+  'entities.items.vanguard_hunter_survival_chest.name': 'Snörstål jacka',
+  'entities.items.vanguard_hunter_survival_gloves.name': 'Snörstål stridshandskar',
+  'entities.items.vanguard_hunter_survival_helmet.name': 'Snörstål mössa',
+  'entities.items.vanguard_hunter_survival_legs.name': 'Snörstål skyddsben',
+  'entities.items.vanguard_hunter_survival_shoulder.name': 'Snörstål axelskydd',
+  'entities.items.vanguard_mage_arcane_chest.name': 'Timmarbinderns skrud',
+  'entities.items.vanguard_mage_arcane_gloves.name': 'Timmarbinderns handskar',
+  'entities.items.vanguard_mage_arcane_helmet.name': 'Timmarbinderns huva',
+  'entities.items.vanguard_mage_arcane_legs.name': 'Timmarbinderns byxor',
+  'entities.items.vanguard_mage_arcane_shoulder.name': 'Timmarbinderns skuldror',
+  'entities.items.vanguard_mage_fire_chest.name': 'Glödpisks skrud',
+  'entities.items.vanguard_mage_fire_gloves.name': 'Glödpisks handskar',
+  'entities.items.vanguard_mage_fire_helmet.name': 'Glödpisks huva',
+  'entities.items.vanguard_mage_fire_legs.name': 'Glödpisks benklädnader',
+  'entities.items.vanguard_mage_fire_shoulder.name': 'Glödpisks mantel',
+  'entities.items.vanguard_mage_frost_chest.name': 'Rimväktarens plagg',
+  'entities.items.vanguard_mage_frost_gloves.name': 'Rimväktarens vantar',
+  'entities.items.vanguard_mage_frost_helmet.name': 'Rimväktarens huva',
+  'entities.items.vanguard_mage_frost_legs.name': 'Rimväktarens lindade byxor',
+  'entities.items.vanguard_mage_frost_shoulder.name': 'Rimväktarens skuldror',
+  'entities.items.vanguard_oath_blade.name': 'Förtruppens ed',
+  'entities.items.vanguard_paladin_holy_chest.name': 'Solväktarens ringbrynja',
+  'entities.items.vanguard_paladin_holy_gloves.name': 'Solväktarens handskar',
+  'entities.items.vanguard_paladin_holy_helmet.name': 'Solväktarens rundel',
+  'entities.items.vanguard_paladin_holy_legs.name': 'Solväktarens ringbenklädnader',
+  'entities.items.vanguard_paladin_holy_shoulder.name': 'Solväktarens mantel',
+  'entities.items.vanguard_paladin_protection_chest.name': 'Värnvaktarens ringbrynja',
+  'entities.items.vanguard_paladin_protection_gloves.name': 'Värnvaktarens handskar',
+  'entities.items.vanguard_paladin_protection_helmet.name': 'Värnvaktarens hjälm',
+  'entities.items.vanguard_paladin_protection_legs.name': 'Värnvaktarens ringbenklädnader',
+  'entities.items.vanguard_paladin_protection_shoulder.name': 'Värnvaktarens axelskydd',
+  'entities.items.vanguard_paladin_retribution_chest.name': 'Vedergällelsens ringbrynja',
+  'entities.items.vanguard_paladin_retribution_gloves.name': 'Vedergällelsens handskar',
+  'entities.items.vanguard_paladin_retribution_helmet.name': 'Vedergällelsens hjälm',
+  'entities.items.vanguard_paladin_retribution_legs.name': 'Vedergällelsens ringbenklädnader',
+  'entities.items.vanguard_paladin_retribution_shoulder.name': 'Vedergällelsens mantel',
+  'entities.items.vanguard_priest_discipline_chest.name': 'Strängen väst',
+  'entities.items.vanguard_priest_discipline_gloves.name': 'Strängen handskar',
+  'entities.items.vanguard_priest_discipline_helmet.name': 'Strängen huvudbonad',
+  'entities.items.vanguard_priest_discipline_legs.name': 'Strängen benklädnader',
+  'entities.items.vanguard_priest_discipline_shoulder.name': 'Strängen mantel',
+  'entities.items.vanguard_priest_holy_chest.name': 'Försoning väst',
+  'entities.items.vanguard_priest_holy_gloves.name': 'Försonings handskar',
+  'entities.items.vanguard_priest_holy_helmet.name': 'Försoning huvudbonad',
+  'entities.items.vanguard_priest_holy_legs.name': 'Försonings benklädnader',
+  'entities.items.vanguard_priest_holy_shoulder.name': 'Försoning mantel',
+  'entities.items.vanguard_priest_shadow_chest.name': 'Skuggprästens väst',
+  'entities.items.vanguard_priest_shadow_gloves.name': 'Skuggprästens handskar',
+  'entities.items.vanguard_priest_shadow_helmet.name': 'Skuggprästens huvudbonad',
+  'entities.items.vanguard_priest_shadow_legs.name': 'Skuggprästens benklädnader',
+  'entities.items.vanguard_priest_shadow_shoulder.name': 'Skuggprästens mantel',
+  'entities.items.vanguard_rogue_assassination_chest.name': 'Mördarens förtäck',
+  'entities.items.vanguard_rogue_assassination_gloves.name': 'Mördarens handskar',
+  'entities.items.vanguard_rogue_assassination_helmet.name': 'Mördarens mask',
+  'entities.items.vanguard_rogue_assassination_legs.name': 'Mördarens byxor',
+  'entities.items.vanguard_rogue_assassination_shoulder.name': 'Mördarens mantel',
+  'entities.items.vanguard_rogue_combat_chest.name': 'Stridsmannaens förtäck',
+  'entities.items.vanguard_rogue_combat_gloves.name': 'Stridsmanna handskar',
+  'entities.items.vanguard_rogue_combat_helmet.name': 'Stridsmanna mask',
+  'entities.items.vanguard_rogue_combat_legs.name': 'Stridsmanna byxor',
+  'entities.items.vanguard_rogue_combat_shoulder.name': 'Stridsmanna mantel',
+  'entities.items.vanguard_rogue_subtlety_chest.name': 'Fälskinnets förtäck',
+  'entities.items.vanguard_rogue_subtlety_gloves.name': 'Fälskinnet handskar',
+  'entities.items.vanguard_rogue_subtlety_helmet.name': 'Fälskinnet mask',
+  'entities.items.vanguard_rogue_subtlety_legs.name': 'Fälskinnet byxor',
+  'entities.items.vanguard_rogue_subtlety_shoulder.name': 'Fälskinnet mantel',
+  'entities.items.vanguard_shaman_elemental_chest.name': 'Elementärväktarens ringbrynja',
+  'entities.items.vanguard_shaman_elemental_gloves.name': 'Elementärväktarens handlingar',
+  'entities.items.vanguard_shaman_elemental_helmet.name': 'Elementärväktarens hjälm',
+  'entities.items.vanguard_shaman_elemental_legs.name': 'Elementärväktarens benförtäckning',
+  'entities.items.vanguard_shaman_elemental_shoulder.name': 'Elementärväktarens skuldror',
+  'entities.items.vanguard_shaman_enhancement_chest.name': 'Förbättringsväktarens ringbrynja',
+  'entities.items.vanguard_shaman_enhancement_gloves.name': 'Förbättringsväktarens grepp',
+  'entities.items.vanguard_shaman_enhancement_helmet.name': 'Förbättringsväktarens hjälm',
+  'entities.items.vanguard_shaman_enhancement_legs.name': 'Förbättringsväktarens benförtäckning',
+  'entities.items.vanguard_shaman_enhancement_shoulder.name': 'Förbättringsväktarens skuldror',
+  'entities.items.vanguard_shaman_restoration_chest.name': 'Saltväktarens ringbrynja',
+  'entities.items.vanguard_shaman_restoration_gloves.name': 'Saltväktarens lindningar',
+  'entities.items.vanguard_shaman_restoration_helmet.name': 'Saltväktarens rundel',
+  'entities.items.vanguard_shaman_restoration_legs.name': 'Saltväktarens kilt',
+  'entities.items.vanguard_shaman_restoration_shoulder.name': 'Saltväktarens mantel',
+  'entities.items.vanguard_verdict_greatsword.name': 'Förtruppens dömobeslut',
+  'entities.items.vanguard_warlock_affliction_chest.name': 'Dreadfjäderns skrud',
+  'entities.items.vanguard_warlock_affliction_gloves.name': 'Dreadfjäderns lindningar',
+  'entities.items.vanguard_warlock_affliction_helmet.name': 'Dreadfjäderns huva',
+  'entities.items.vanguard_warlock_affliction_legs.name': 'Dreadfjäderns benklädnader',
+  'entities.items.vanguard_warlock_affliction_shoulder.name': 'Dreadfjäderns mantel',
+  'entities.items.vanguard_warlock_demonology_chest.name': 'Märgbundna skrud',
+  'entities.items.vanguard_warlock_demonology_gloves.name': 'Märgbundna grepp',
+  'entities.items.vanguard_warlock_demonology_helmet.name': 'Märgbundna huva',
+  'entities.items.vanguard_warlock_demonology_legs.name': 'Märgbundna benklädnader',
+  'entities.items.vanguard_warlock_demonology_shoulder.name': 'Märgbundna axelskydd',
+  'entities.items.vanguard_warlock_destruction_chest.name': 'Slaggkrona skrud',
+  'entities.items.vanguard_warlock_destruction_gloves.name': 'Slaggkrona handskar',
+  'entities.items.vanguard_warlock_destruction_helmet.name': 'Slaggkrona huva',
+  'entities.items.vanguard_warlock_destruction_legs.name': 'Slaggkrona benklädnader',
+  'entities.items.vanguard_warlock_destruction_shoulder.name': 'Slaggkrona mantel',
+  'entities.items.vanguard_warrior_arms_chest.name': 'KlingSväckens ringbrynja',
+  'entities.items.vanguard_warrior_arms_gloves.name': 'KlingSväckens krossare',
+  'entities.items.vanguard_warrior_arms_helmet.name': 'KlingSväckens storrhjälm',
+  'entities.items.vanguard_warrior_arms_legs.name': 'Bladvakens benpansar',
+  'entities.items.vanguard_warrior_arms_shoulder.name': 'Bladvakens skuldror',
+  'entities.items.vanguard_warrior_fury_chest.name': 'Blodmarschen ringbrynja',
+  'entities.items.vanguard_warrior_fury_gloves.name': 'Blodmarschen greppklo',
+  'entities.items.vanguard_warrior_fury_helmet.name': 'Blodmarschen ansikte',
+  'entities.items.vanguard_warrior_fury_legs.name': 'Blodmarschen benklädnader',
+  'entities.items.vanguard_warrior_fury_shoulder.name': 'Blodmarschen skuldrorskydd',
+  'entities.items.vanguard_warrior_prot_chest.name': 'Järnmarschen bröstskydd',
+  'entities.items.vanguard_warrior_prot_gloves.name': 'Järnmarschen handskydd',
+  'entities.items.vanguard_warrior_prot_helmet.name': 'Järnmarschen hjälm',
+  'entities.items.vanguard_warrior_prot_legs.name': 'Järnmarschen benskydd',
+  'entities.items.vanguard_warrior_prot_shoulder.name': 'Järnmarschen skulderplattor',
+  'entities.items.vanguard_warstaff.name': 'Förtroppen krigsstaff',
+  'entities.items.vestments_of_the_acolyte.name': 'Akolytkläder',
+  'entities.items.wayfarers_lodestone.name': 'Vandrares magnetsten',
+  'entities.items.wellspring_seed.name': 'Källsäd',
+  'entities.mobs.eastbrook_freight_caravan.name': 'Eastbrook godsvagn',
+  'entities.mobs.fenbridge_infiltrator.name': 'Det lånade ansiktet',
+  'entities.mobs.frostveil_supply_caravan.name': 'Frostslöjans försörjningsvagn',
+  'entities.mobs.willowfen_remedy_caravan.name': 'Salixträskens läkevagn',
+  'entities.npcs.calligraphy_apprentice_1.greeting':
+    'Jag vänder för tidigt. Visar du mig var hörnen hör till?',
+  'entities.npcs.calligraphy_apprentice_1.name': 'Lärling Tessa',
+  'entities.npcs.calligraphy_apprentice_1.title': 'Skrivkonst-elev',
+  'entities.npcs.calligraphy_apprentice_2.greeting':
+    'En triangel först, sedan en kvadrat, sedan en runa. Ett stadigt steg i taget!',
+  'entities.npcs.calligraphy_apprentice_2.name': 'Lärling Pip',
+  'entities.npcs.calligraphy_apprentice_2.title': 'Skrivkonst-elev',
+  'entities.npcs.calligraphy_instructor.greeting':
+    'Ett stadigt steg gör en stadig linje. Lär mina lärlingar en triangel, en kvadrat och en avancerad runa.',
+  'entities.npcs.calligraphy_instructor.name': 'Instruktör Elian',
+  'entities.npcs.calligraphy_instructor.title': 'Arkan skrivkonst',
+  'entities.npcs.eastbrook_vault_keeper.greeting':
+    'Dina veckorewards väntar. Välj ett föremål från dina tjänade val efter Crucible-återställningen.',
+  'entities.npcs.eastbrook_vault_keeper.name': 'Valvförvaltare',
+  'entities.npcs.eastbrook_vault_keeper.title': 'Veckorewards',
+  'entities.npcs.forge_instructor.greeting':
+    'Hjälp mig att slutföra en sköld! Klicka på de förnödenheter jag kallar på. Snabba händer tjänar ett bättre märke.',
+  'entities.npcs.forge_instructor.name': 'Smed Mara',
+  'entities.npcs.forge_instructor.title': 'Wyrmwatch smed',
+  'entities.npcs.glider_apprentice.greeting':
+    'Underbar flygning nerför kanjonen. Tala med mig när du än behöver en magisk uppvänd tillbaka till Zephyr vid The Shear.',
+  'entities.npcs.glider_apprentice.name': 'Skye',
+  'entities.npcs.glider_apprentice.title': 'Zephyrs lärling',
+  'entities.npcs.glider_instructor.greeting':
+    'De värmeavsnöppningar som heular från The Shears klippor är våldsamma idag. Är du redo att spänna på den mekaniska segelflygaren och testa dina vingar genom slalomkursen?',
+  'entities.npcs.glider_instructor.name': 'Flygmästare Zephyr',
+  'entities.npcs.glider_instructor.title': 'Vindförare instruktör',
+  'entities.npcs.harbormaster_tamsin.greeting':
+    'Kom in från delen och värm dina händer. Skeppet vid vår pir seglar upp den långa östkusten till Wickharbor och tillbaka igen. Långt västerut kör den andra färjan mellan Eastbrook och Nightbloom. Kartan på väggen visar båda korsningarna. Vila vid elden innan klättringen till Wyrmwatch.',
+  'entities.npcs.harbormaster_tamsin.name': 'Hamnmästare Tamsin',
+  'entities.npcs.harbormaster_tamsin.title': 'Väktare av Wyrmwatch kajer',
+  'entities.npcs.infiltrator_bram.greeting': 'Meldande tjänstgöring.',
+  'entities.npcs.infiltrator_bram.name': 'Soldat Bram',
+  'entities.npcs.infiltrator_bram.title': 'Fenbridge väktare',
+  'entities.npcs.infiltrator_captain.greeting':
+    'En varelse har stulit en soldats ansikte. Läs de ständiga orderna och väktjournalen, ifrågasätt alla fyra soldater, kom sedan tillbaka och namnge den vars historia motsäger våra register.',
+  'entities.npcs.infiltrator_captain.name': 'Sergeant Alric',
+  'entities.npcs.infiltrator_captain.title': 'Fenbridge väktare',
+  'entities.npcs.infiltrator_nella.greeting': 'Meldande tjänstgöring.',
+  'entities.npcs.infiltrator_nella.name': 'Soldat Nella',
+  'entities.npcs.infiltrator_nella.title': 'Fenbridge väktare',
+  'entities.npcs.infiltrator_orin.greeting': 'Meldande tjänstgöring.',
+  'entities.npcs.infiltrator_orin.name': 'Soldat Orin',
+  'entities.npcs.infiltrator_orin.title': 'Fenbridge väktare',
+  'entities.npcs.infiltrator_tessa.greeting': 'Meldande tjänstgöring.',
+  'entities.npcs.infiltrator_tessa.name': 'Soldat Tessa',
+  'entities.npcs.infiltrator_tessa.title': 'Fenbridge väktare',
+  'entities.npcs.npc_automaton_quartermaster.greeting':
+    'Precisionskugghjul, smidesmål och kalibrerad kraft. Godkända operatörer kan ta från vårt lager.',
+  'entities.npcs.npc_automaton_quartermaster.name': 'Kunstner Tobrin',
+  'entities.npcs.npc_automaton_quartermaster.title': 'Automat försörjare',
+  'entities.npcs.npc_church_order_quartermaster.greeting':
+    'Vandra i Gryningens ljus. Kyrkoorden försörjer dem som står med oss i tjänstgöring.',
+  'entities.npcs.npc_church_order_quartermaster.name': 'Templar Althea',
+  'entities.npcs.npc_church_order_quartermaster.title': 'Kyrkoorden fördelningsintendent',
+  'entities.npcs.npc_rift_watch_quartermaster.greeting':
+    'Riftväktarna skyddar kusten och bevakar de djupa bristerna. Våra lager är öppna för dem med erkänt anseende.',
+  'entities.npcs.npc_rift_watch_quartermaster.name': 'Fördelningsintendent Vaelen',
+  'entities.npcs.npc_rift_watch_quartermaster.title': 'Riftväktare försörjare',
+  'entities.npcs.npc_wq_taskmaster.greeting':
+    'De allierade fraktionerna bokför uppdrag över riket varje dag. Om ett uppdrag inte passar dina färdigheter kan du begära en daglig omfördelning.',
+  'entities.npcs.npc_wq_taskmaster.name': 'Uppgiftsmästare Kaelen',
+  'entities.npcs.npc_wq_taskmaster.title': 'Världsquestmästare',
+  'entities.npcs.shadow_cloak_scout.greeting':
+    'Låna min skumringsvävekappa. Smyga bakom varje dispatchbärare och lyfta hans ordrar. Stanna bort från ljusstrålarnas vägar: en ljusväktare ser rakt igenom besvärjelsen, och en bärare känner dig om du svarar mot honom.',
+  'entities.npcs.shadow_cloak_scout.name': 'Scout Valerie',
+  'entities.npcs.shadow_cloak_scout.title': 'Hemlig verksamhet',
+  'entities.npcs.shadow_guard_east.greeting':
+    'Inga förseningar. Väktarposten väntar på dessa ordrar.',
+  'entities.npcs.shadow_guard_east.name': 'Dispatchväktare',
+  'entities.npcs.shadow_guard_east.title': 'Dispatchbärare',
+  'entities.npcs.shadow_guard_north.greeting':
+    'Dessa förseglade ordrar är för kaptenen. Håll ditt avstånd.',
+  'entities.npcs.shadow_guard_north.name': 'Dispatchväktare',
+  'entities.npcs.shadow_guard_north.title': 'Dispatchbärare',
+  'entities.npcs.shadow_guard_south.greeting': 'Jag har ett dispatch att leverera. Gå vidare.',
+  'entities.npcs.shadow_guard_south.name': 'Dispatchväktare',
+  'entities.npcs.shadow_guard_south.title': 'Dispatchbärare',
+  'entities.npcs.shadow_guard_west.greeting': 'Officiell verksamhet. Håll vägen fri.',
+  'entities.npcs.shadow_guard_west.name': 'Dispatchväktare',
+  'entities.npcs.shadow_guard_west.title': 'Dispatchbärare',
+  'entities.npcs.shadow_sentry_north.greeting': 'Ingenting smiter förbi ljusvakten.',
+  'entities.npcs.shadow_sentry_north.name': 'Ljussentinel',
+  'entities.npcs.shadow_sentry_north.title': 'Verklig syn',
+  'entities.npcs.shadow_sentry_south.greeting':
+    'Min lanterna avslöjar mer än skuggor. Stanna där jag kan se dig.',
+  'entities.npcs.shadow_sentry_south.name': 'Ljussentinel',
+  'entities.npcs.shadow_sentry_south.title': 'Verklig syn',
+  'entities.npcs.shadow_watch_east.greeting': 'Ingen korserar mitt ljus osedd.',
+  'entities.npcs.shadow_watch_east.name': 'Ljusvaktare',
+  'entities.npcs.shadow_watch_east.title': 'Verklig syn',
+  'entities.npcs.shadow_watch_west.greeting': 'Stanna där. Ljuset ser vad ögat missar.',
+  'entities.npcs.shadow_watch_west.name': 'Ljusvaktare',
+  'entities.npcs.shadow_watch_west.title': 'Verklig syn',
+  'entities.npcs.weekly_emissary.greeting':
+    'Valen håller en redogörelse för gärningar, och jag håller redogörelsen. Plocka ett åtal för veckan, se det igenom, och kassan är din.',
+  'entities.npcs.weekly_emissary.name': 'Cham Pete',
+  'entities.npcs.weekly_emissary.title': 'Utsände',
+  'entities.npcs.wisp_maze_keeper.greeting':
+    'Tjuvar gömde sin stulna guld överallt i min labyrint, och skuggorna vaktar det nu. Återhämta alla mynt-börsar. Undvik väktarnas vägar, eller ta en strålande visp för att fördriva dem. Tre förlorade liv återför dig till ingången, men börsorna du samlade kvarstår säkra.',
+  'entities.npcs.wisp_maze_keeper.name': 'Väktare Liora',
+  'entities.npcs.wisp_maze_keeper.title': 'Väktare av häcklabyrinten',
+  'entities.zones.eastbrook_vale.welcomeDone':
+    'Marshal Redbrook har ingen fler arbete för dig - den pittoreska kustbyn där din resa började vilar lugnare för det.',
+  'entities.zones.farshore_isle.pois.5.label': 'Vrakplatsen',
+  'entities.zones.mirefen_marsh.welcomeDone':
+    'Väktare Fenwick har ingen fler ordrar för dig - bosättningen djupt inom de sumpskogar står säkrare för det.',
+  'entities.zones.thornpeak_heights.welcomeDone':
+    'Kapten Thessaly håller vallen vid Highwatch - det är aldrig lätt, men med hjälp av äventyrare som du är det nu hanterbart.',
+  'guide.arenaPage.vanguardBody':
+    'Vanguard-utrustning är andra säsongen Warfare-utrustning, såld av samma två intendenter över den ursprungliga nivån, som stannar till försäljning. Varje specialisering har sin egen Vanguard-uppsättning av fem delar, för huvudet, skuldror, bröstkorg, ben och händer, och butiken listar bara de tre uppsättningarna din klass kan bära, följt av de Vanguard-vapen du kan använda. En Vanguard-del bär samma Warfare-värderingar som den ursprungliga nivån på en högre föremålsnivå, och varje uppsättning har två bonusar, vid två och fyra delar, som ändrar en av din specialiserings förmågor. Till skillnad från de ursprungliga uppsättningarna fungerar dessa bonusar överallt, monster inkluderade, men de är byggda för att slåss mot spelare, så en raid-uppsättning förblir det bättre valet inne i en raid.',
+  'guide.arenaPage.vanguardHeading': 'Vanguard-utrustning: Warfare säsong 2',
+  'guide.combat.unstuckBodyWindow':
+    'Om världen fångar dig någonstans du inte kan ta dig ut, skriv /unstuck. Du måste vara utanför strid och stå stille, inte hålld av en bedövning eller en rot, och inte i en tvekamp eller en arenomatch: en kort nedräkning körs, och att röra dig eller ta skada avbryter det. När det slutförs är du placerad vid närmaste kyrkogård. Det dödar aldrig dig och det lämnar ingen lik, och om du redan var nere höjer det upp dig där istället. Den första användningen på en timme kostar dig ingenting. Använd det igen inom en timme från senast och priset är Unstuck sjukdom, en tillfällig försvagning av allt du är som har slitit av innan du kunde använda kommandot igen, och som Vaktarens tull sparar helt nya karaktärer.',
+  'guide.commandsPage.pvpZones':
+    'Världens PvP-flagga: /pvp växlar den, /pvp on och /pvp off ställer in den. Flaggade spelare kan slåss med varandra på omstridigt område, helgedomar tillåter ingen världsstrid alls, och fritt-för-allt-zonerna tillåter det med eller utan flagga; att stänga av tar 5 minuter.',
+  'guide.commandsPage.unstuckWindow':
+    'Vägen ut när världen har fångat dig. Stå stille genom en kort nedräkning och du flytas till närmaste kyrkogård, och höjd där om du redan hade fallit. Den första användningen på en timme är gratis. Använd det igen inom en timme från senast och det lämnar dig försvagad av Unstuck sjukdom ett tag efteråt, så det är en räddning snarare än en genväg.',
+  'guide.factionsPage.automatonsBody':
+    'Automaterna håller smidena i de långt nå områdena: Drakmarkerna, Frostslöjans räcka, Amberinfall och Evergården. Deras nav är Wyrmwatch, i Drakmarkerna.',
+  'guide.factionsPage.automatonsTitles':
+    'Med Automaterna är du en Utomstående, sedan en Operatör, en Mekaniker, en Kunstner, en Smidemaster och slutligen en Champion.',
+  'guide.factionsPage.churchOrderBody':
+    'Kyrkoorden håller hjärtlandet i riket: Eastbrook Vale, Mirefen Marsh, Thornpeak Heights, Nightbloom och Wraithwood. Brother Aldric talar för dem från Eastbrook Vale.',
+  'guide.factionsPage.churchOrderTitles':
+    'Med Kyrkoorden är du en Utomstående, sedan en Akolyt, en Väktare, en Templar, en Gryningsvaktare och slutligen en Champion.',
+  'guide.factionsPage.deedsBody':
+    'Boken över gärningar håller också räkningen av ditt anseende: att nå Betrodd med en fraktion och nå Champion med en fraktion registrerar varje gärning, och att nå Champion med alla tre är en gärning i sig själv. Liksom varje gärning är dessa kosmetiska, aldrig kraft, och Champion gärningsmålen ger en titel du kan bära.',
+  'guide.factionsPage.deedsHeading': 'Gärningar',
+  'guide.factionsPage.earningBody':
+    'Anseende kommer från världsuppdrag. Varje världsuppdrag räknas mot fraktionen i zonen det är inställt i, och eftersom de tre fraktionerna täcker olika zoner, utvecklas alla tre samtidigt när du arbetar dig över kartan. Uppgiftsmästare Kaelen i Eastbrook öppnar Världsquest-tavlan på kartan, och tavlan är också där du kan byta en världsquesta varje dag om dagens uppdrag inte passar dig.',
+  'guide.factionsPage.earningHeading': 'Att tjäna anseende',
+  'guide.factionsPage.heading': 'Fraktioner och anseende',
+  'guide.factionsPage.intro':
+    'Tre allierade fraktioner hver håller vägen över sitt eget hörn av riket, och varje världsquesta du avslutar i deras länder höjer ditt anseende med dem. Anseende klättrar genom sex nivåer, var och en med sin egen titel, och öppnar en intendents lager bit för bit längs vägen.',
+  'guide.factionsPage.lowLevelNote':
+    'Anseende pausar vid en nivå för unga karaktärer och återupptas när du nivåklar, så en ung karaktär kan börja tjäna tidigare utan att slut på vägen.',
+  'guide.factionsPage.quartermastersBody':
+    'Varje fraktion håller en intendent vid sitt nav: Fördelningsintendent Vaelen för Riftväktarna i Drifthaven, Templar Althea för Kyrkoorden vid Eastbrook kapell, och Kunstner Tobrin för Automaterna i Wyrmwatch. Var och en säljer ett litet lager av smycken, rustning, vapen och väskor, upplåsta nivå för nivå när ditt anseende med den fraktionen växer, och betalas för i vanligt mynt.',
+  'guide.factionsPage.quartermastersHeading': 'Intendenter',
+  'guide.factionsPage.readingBody':
+    'Anseende-fliken på karaktärbladet (C) visar varje fraktion med sitt nuvarande anseende, en stapel mot nästa nivå, och den titel som anseendet har tjänat du. Chattloggen rapporterar varje anseeendvikande när det landar, och att nå en ny nivå visar en celebrationbanner på skärmen.',
+  'guide.factionsPage.readingHeading': 'Där du läser det',
+  'guide.factionsPage.riftWatchBody':
+    'Riftväktarna vaktar kusten och bevakar de djupa bristerna. Deras länder är kusten: Fernshore, Palmreach, Galecrest, Willowfen och Veiled Hollow. Deras nav är Drifthaven, på Palmreach.',
+  'guide.factionsPage.riftWatchTitles':
+    'Med Riftväktarna är du en Utomstående, sedan en Väktare, en Riftvandrare, en Väktare, en Riftväktare och slutligen en Champion.',
+  'guide.factionsPage.tiersBody':
+    'Varje fraktion klättrar samma sex nivåer: Okänd, Känd, Betrodd, Bevisad, Vanguard och Champion. Varje fraktion ger sitt eget namn till varje språng, och det namnet blir din titel med dem.',
+  'guide.factionsPage.tiersHeading': 'Anseeende-nivåer',
+  'guide.factionsPage.weeklyBody':
+    'Den veckovisa utsänden i Eastbrook Vale lägger till en andra väg: avsluta veckans uppdrag och du kan namnge en fraktion för att få hans rekommendation av anseende, en gång i veckan, vid fönstret där du tog uppdraget.',
+  'guide.factionsPage.whoBody':
+    'Varje fraktion är kopplad till en grupp zoner, så var du gör världsuppdrag avgör vilken fraktion krediten går till. Du plockar aldrig en sida: alla tre håller sina egna räkning, och ingen av dem frågar dig någonsin att vända sig mot en annan.',
+  'guide.factionsPage.whoHeading': 'De tre fraktionerna',
+  'guide.glossary.unstuckDefWindow':
+    'Priset för att förlita sig på Unstuck från spelmeny mer än en gång på en timme. Stå stille genom nedräkningen och det sätter dig ner vid närmaste kyrkogård. Den första användningen på en timme är gratis, och en upprepning inom en timme från senast lämnar också dig bar på en tillfällig svaghet ett tag efteråt.',
+  'guide.interfacePage.frameGroups':
+    '{trackers} kan kombinera uppdrag, gärningar, spruckar, utgrävningar, insamlingsmål och Reliquary-spårning. {auras} kan kombinera Mål-prickar och sex auranspår. Aktivera endera grupp i Frames-inställningar, eller lämna det av för att flytta varje ram separat. {tot} inkluderar en resursstav. {focus} har tre oberoende förflyttbara mål: Shift+F1 genom Shift+F3 tilldelar dem; Ctrl+F1 genom Ctrl+F3 väljer dem. Dra skadans eller hotmätaren någonstans utanför dess knappar för att flytta det, och dra dess kanter för att ändra storleken på den, även medan ramar är låsta. Medan ramar är olåsta, Visa eller Dölj ramar har sin egen grupperade meny. Högerklicka en olåst ram för Återställ storlek eller Raminställningar. Interface > Ramar innehåller också Raminställningar och sammanfattningsbar Party Frame-alternativ. Lås Target of Target till Target håller dessa ramar tillsammans. Stäng av det för att flytta Target of Target separat; slå på det igen för att behålla det separata läget för senare. Tilldelade fokusramar döljer sina ställningskontroller; högerklicka och välj Unset Focus för att återställa dem. Mouseover-casting fungerar också på fokusramar.',
+  'guide.nav.factions': 'Fraktioner & anseende',
+  'guide.nav.worldPvp': 'Världens PvP',
+  'guide.questsPage.cluesBody':
+    'Långt borta i de långt nå zonerna, döljer den dagliga världsquest-tavlan än en belöning för den som rensar hela skiffran: en Ledtrådsvarp och skattjagten skriven på den.',
+  'guide.questsPage.cluesCasketBody':
+    'Lösa den sista ledtråden och använd varpen på platsen den namnger för att gräva upp en skattkista; att slutföra jagten tjänar också anseende med fraktionen vars land gömde den. Öppna kistan för mynt och en stapel fin insamlingsmaterial. Då och då innehåller den ett stycke av utrustning eller några heroiska märken, och mycket sällan Grumbol Lanternback, ett fäste som inte finns någon annanstans. Din första kista och din tionde registreras i Boken över gärningar.',
+  'guide.questsPage.cluesCasketTitle': 'Kistan',
+  'guide.questsPage.cluesEarnBody':
+    'När din karaktär är långt borta, kompletterar du varje zonplats på dagens världsquest-tavla ger dig en Ledtrådsvarp ovanpå de vanliga belöningarna. En omfördelad plats räknas när den är klar; de alltid öppna dagliga är inte obligatoriska. Du kan hålla några varpsrullar åt gången, så det finns ingen anledning att använda en den dag du tjänar den.',
+  'guide.questsPage.cluesEarnTitle': 'Att tjäna en varp',
+  'guide.questsPage.cluesHuntBody':
+    'Att använda en varp startar en jakt: en kort kedja av gåtor som visar i din questtrajektör ett steg i taget. Varje gåta pekar på något verkligt i världen, ett landmärke att stå vid, en person att tala med, en rörelse att utföra någonstans, eller ett litet ärende att köra, och den sista frågar alltid dig att gräva. Endast en jakt körs åt gången, och det håller din plats över den dagliga återställningen och mellan sessioner, så ta din tid.',
+  'guide.questsPage.cluesHuntTitle': 'Att följa spåren',
+  'guide.questsPage.cluesTitle': 'Ledtrådsvarp',
+  'guide.settingsPage.ifShowAuraCaster':
+    "Lägger till en Cast by-rad till varje buff/debuff-verktygstips, namngivning vem som tillämpade det. Praktiskt för att skilja flera trollformelskastarar av samma buff, som två paladiner's välsignelser.",
+  'guide.settingsPage.ifTargetAurasBelowFrame':
+    'Hänger målramens buff- och debuff-band under ramen istället för ovanför den, den klassiska layouten. Av som standard, eftersom standardtargetgramen sitter direkt ovanför handlingsfältet; slå på det när du har flyttat ramen någonstans med plats under den.',
+  'guide.settingsPage.rowFrameRateCap':
+    'Ett tak på hur många bilder spelet drar varje sekund. En dator som inte kan hålla jämna steg med skärmen landet på en ojämn rytm; en stadig 30 ser mjukare ut än det, halverar arbetet, och håller datorn svalare. Visa betyder ingen gräns.',
+  'guide.stats.warfareBodyPets':
+    'Kriget är det stat heder-utrustning bär för att slåss mot spelare. I strider mellan spelare höjer det skadan du och ditt husdjur tar mot andra spelare och deras husdjur, och sänker skadan du och ditt husdjur tar från dem. Det höjer också din maximala hälsa överallt förutom i dragsvinklar, raid, utgravningar och sprickor, så en spelare i hederskläder är långt svårare att döda än en utan det. Ditt blad visar allt det på en rad. Det kommer från Kriget-utrustningen du köper med ära, så det är en belöning för att spela PvP snarare än något att jaga medan du nivåklar.',
+  'guide.worldPvpPage.flagBodyAid':
+    'Skriv /pvp i chatten, eller öppna PvP-fönstret på G och använd fliken World PvP, som också visar ditt rekord och insatserna. Att höja flaggan är omedelbar när du är förbi startmisstillståndet. Att sänka det startar en nedräkning på några minuter, och flaggan kommer inte att falla medan du ännu slåss, så att växla av är aldrig en flykt från en strid du startade. Läkning, sköldning eller buffering av en flaggad spelare som är i en strid höjer din egen flagga också, så ingen upprätthåller en fighter från bakom en flagga de inte bär; att stödja en spelare som inte är flaggad höjer ingenting.',
+  'guide.worldPvpPage.flagHeading': 'Att höja och sänka flaggan',
+  'guide.worldPvpPage.heading': 'Världens PvP',
+  'guide.worldPvpPage.hillBodyRamp':
+    'En gång var tredje timme, vid ett tillfälle ingen kan förutsäga, blir hela riket berättat att en kulle kommer att stiga i en av fritt-för-allt-zonerna om femton minuter, och cirkeln där det kommer att stå markeras på öppen mark. När den stiger står den i fyrtiofem minuter, sedan faller. Partiet med mest spelare som står innanför bestrid kullen, och efter en minut av obruten majoritet är kullen deras; en ensamspelare räknas som ett parti av en, men raid-medlemmar räknas inte alls. Medan ett parti håller kullen, tjänar var och en av dess medlemmar som står innanför Ära varje minut, och ju längre samma parti håller det, desto mer varje minut betalar: ett fullt parti som håller en omtvistet kulle för hela sin tid tjänar ungefär lika mycket som tre slagfält-segrar. När kullen byter händer startar de nya innehavarna räkningen från början. En stapel över fältet visar vem som håller det, dina nummer mot deras, och tävlingsklockan; /hill i chatten säger var den står.',
+  'guide.worldPvpPage.hillHeading': 'Kullens kung',
+  'guide.worldPvpPage.introZones':
+    'Öppen världsspeler-mot-spelare är val-in, och marken du står på bestämmer vad det betyder. Höj din PvP-flagga och varje annan flaggad spelare som inte är i ditt parti eller raid blir en fiende på omstridigt område; sänk den och, efter en kort fördröjning, är du en åskådare igen. Två zoner är helgedomar där ingen världsstrid händer alls, och de tre nordligaste zonerna är fritt-för-allt-område där alla närvarande är rättvis spel, flagga eller ingen flagga. Parti- och raid-kamrater är aldrig dina fiender någonstans; skickekamrater utanför din grupp är rättvis spel som vilken som helst.',
+  'guide.worldPvpPage.limitsBodyRaids':
+    'Att besegra samma spelare igen och igen betalar mindre varje gång och snart ingenting, och din räkning mot den spelaren börjar bara igen ungefär en timme efter den första av dessa dödningar, så att läger en offer är aldrig värt väntan. Ett mål långt under din nivå betalar ingenting alls. Slagfält och Arenor kör sina egna regler medan du är inne i dem, och de betalar mer Ära än den öppna världen, så världens PvP är den långsammare vägen till samma leverantör. Raid tjänar ingenting från världsdödningar: en raid-medlem tar ingen Ära eller guld och krymper inte någon annans andel, så slå som ett parti för att bli betald.',
+  'guide.worldPvpPage.limitsHeading': 'Fair play-regler',
+  'guide.worldPvpPage.stakesBodyFlagged':
+    'När en flaggad spelare besegras av en annan spelare, betalar förloraren en liten andel av guldet i sin börs, begränsad till ett blygsamt belopp, och vinnarna tjänar Ära mot Kriget-utrustning. En spelare som inte var flaggad betalar inget guld alls, även när de faller i en fritt-för-allt-zon. Alla som hjälpte delar båda: slaggöringen, någon som skadade målet strax innan, och helarna som höll dessa brottare stående. En ren en-mot-en-betalar hela potten; en grupp delar det.',
+  'guide.worldPvpPage.stakesHeading': 'Vad en dödning är värd',
+  'guide.worldPvpPage.stakesUnflaggedTake':
+    'En oflaggrad kämpare får inte heller någon: guld byter endast ägare mellan två flaggade spelare, men alla som hjälpte tjänar fortfarande Heder.',
+  'guide.worldPvpPage.zonesBody':
+    'Världen är uppdelad i tre sorters mark. Prövostranden och Östbäcksdalen är fredade områden: ingen världs-PvP förekommer där överhuvudtaget, flaggad eller inte, så en ny karaktär kan aldrig anfallas innan de förstår vad flaggan betyder. Det mesta av världen är omstritt, där flaggreglerna ovan är hela berättelsen. Drakländerna, Frostslöjans vidder och Bärnstensfallet, de tre nordligaste zonerna, är fri-för-allmark: alla som står där kan anfalla alla andra som står där, med eller utan flagga, och du underrättas när du går in och igen när du går ut. Att anfalla en spelare som inte är flaggad där höjer din egen flagga, så en angripare slutar alltid med att bära risken. Att slå en spelare som redan är flaggad höjer aldrig den, vilket betyder att försvara dig själv eller försvara någon som inte är flaggad inte kostar dig något.',
+  'guide.worldPvpPage.zonesHeading': 'Var världs-PvP förekommer',
   'landing.headline': 'Äventyr med vänner.',
   'landing.contribute': 'Bidra till spelet',
   'landing.tools': 'Verktyg',
@@ -9153,7 +11259,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.themes.jade': 'Jade',
   'hudChrome.perf.themes.mono': 'Mono',
   'hudChrome.perf.thresholds': 'Färgkodade varningar',
-  'hudChrome.perf.title': 'Prestandaöverlägg',
+  'hudChrome.perf.overlaySection': 'Prestandaöverlägg',
   'hudChrome.perf.units.hz': '{value} Hz',
   'hudChrome.perf.units.mb': '{value} MB',
   'hudChrome.perf.units.memPair': '{used} / {limit} MB',
@@ -10521,7 +12627,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.rowWeather':
     'Omgivande regn och snö. Endast atmosfär, och att stänga av den sparar lite under stormar.',
   'guide.settingsPage.tableFoot':
-    'Letar du efter ett FPS-tak? Det finns inget att leta efter: bildtakten följer din skärm. Ritavståndet är en egen ratt, Siktavstånd, i kortet Världsdetaljer, och varje förinställning ställer den åt dig tills du flyttar den själv.',
+    'Ritavståndet är en egen ratt, Siktavstånd, i kortet Världsdetaljer, och varje förinställning ställer den åt dig tills du flyttar den själv.',
   'guide.settingsPage.tableHeading': 'Varje grafikalternativ, förklarat',
   'guide.settingsPage.tagReload': 'tryck Tillämpa',
   'guide.settingsPage.value100': '100 %',
@@ -13384,7 +15490,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     'I 8 sek besvaras nästa fiendeträff mot dig: upp till {buff} skada nekas och återförs till angriparen som helig skada, och du får 1 hängivenhet. Endast ett slag besvaras. Upphöjelse höjer mängden den kan besvara med 50%.',
   'entities.abilities.final_edict.description':
-    'Levererar ett krossande vapenslag och genererar 1 hängivenhet när det gör skada. En lyckad träff minskar Gryningsfalls återstående nedkylning med 2 sek. Lyckade autoattacker och träffar med Sista påbudet har 15% chans att ge Gryningens vrede i 8 sek. Upphöjelse frigör dessutom en helig explosion runt dig.',
+    'Levererar ett krossande vapenslag och genererar 1 hängivenhet när det gör skada. En lyckad träff minskar Gryningsfalls återstående nedkylning med 2 sek. Lyckade autoattacker och träffar med Sista påbudet har 15% chans att ge Gryningens vrede i 8 sek. Upphöjelse frigör dessutom en explosion runt dig som gör fysisk skada.',
   'entities.abilities.grace_devotion.description':
     'Du och gruppmedlemmarna återfår 15 mana var 5:e sek och betalar 3% mindre mana i 30 min. Ersätter din egen Strålande eller Gryningens hängivenhet, men samexisterar med hängivenheter från andra paladiner.',
   'entities.abilities.guardian_covenant.description':
@@ -15020,9 +17126,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ditt Slöjade egg träffar tre gånger så hårt i stället för dubbelt.',
   'entities.itemSets.ashveil.name': 'Askslöjans dräkt',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'Serafisk vaksamhets räddning helar 270 i stället för 180. Skada du tar fördröjer inte längre dina besvärjelser.',
+    'När Viskad bön, Högtidlig bön eller Brådskande bön återställer hälsa ökar läkningen från nästa Körläkning med 10 %, upp till 3 staplar. Varje kast ger högst en stapel. Körläkning förbrukar alla staplar när kastet slutförs. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'När Serafisk vaksamhet utlöses helas dess allierade också med 15 procent av sin maximala hälsa under 10 sek.',
+    'Om Körläkning slutförs med 3 staplar blir nästa Viskad bön som används inom 60 sek. omedelbar och läker 100 % mer. Effekten staplas inte; om du får den igen förnyas varaktigheten.',
   'entities.itemSets.benison_dawnweave.name': 'Välsignelsens gryningsväv',
   'entities.itemSets.chronoweave.bonus2':
     'Tidsmässigt eko omvandlar 50 procent av din mystiska skada mot ett mål till läkning. Skada du tar fördröjer inte längre dina besvärjelser.',
@@ -15718,12 +17824,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
     'Var {everyNormal} sek spetsar Nythraxis {victimsNormal} raiddeltagare utom sitt nuvarande mål på Benspett. En spetsad raiddeltagare kan inte agera och förlorar {drainNormal} av maximal hälsa varje sekund tills spettet förstörs. Ett spett splittras efter {hitsNormal} träffar från vem som helst, oavsett hur mycket skada de gör. En spelare som redan har spetsats kan inte väljas igen på {cooldown} sek, så spetten fördelas över hela raiden.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
-    'Från {first} sek in i Kungens Vrede och var {everyHeroic} sek därefter börjar Nythraxis Benstorm i {duration} sek. Han ignorerar hot, rör sig {speed} gånger normal hastighet och gör {charges} rusningar som varar {chargeSeconds} sek var. Hans virvel orsakar {whirlHeroic} av maximal hälsa varje sekund inom {radius} yd. Varje rusning slutar i en Bensmäll inom samma radie för {slamHeroic} av maximal hälsa. Gravbrytare återaktiveras {rearm} sek efter att den slutar.',
+    'Från {first} sek in i Kungens Vrede och var {everyHeroic} sek därefter börjar Nythraxis Benstorm i {duration} sek. Han ignorerar hot, rör sig {speed} gånger normal hastighet och gör {charges} rusningar som varar {chargeSeconds} sek var. Hans virvel orsakar {whirlHeroic} av maximal hälsa varje sekund inom {radius} yd. Varje rusning slutar i en Bensmäll inom samma radie för {slamHeroic} av maximal hälsa. Alla aktiva Själsrift-märken frigörs olösta i det ögonblick stormen börjar, och stormen börjar aldrig direkt efter en Själsrift-detonation. Gravbrytare återaktiveras {rearm} sek efter att den slutar.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Benstorm',
   'hudChrome.raidBossGuide.nythraxis.boneStormResponse':
     'Sprid ut er och fortsätt springa från Nythraxis. Den jagade raiddeltagaren springer bort medan alla andra lämnar utrymme runt rusningsvägen, sedan tar tankarna upp honom när stormen slutar.',
   'hudChrome.raidBossGuide.nythraxis.boneStormSummary':
-    'Från {first} sek in i Kungens Vrede och var {everyNormal} sek därefter börjar Nythraxis Benstorm i {duration} sek. Han ignorerar hot, rör sig {speed} gånger normal hastighet och gör {charges} rusningar som varar {chargeSeconds} sek var. Hans virvel orsakar {whirlNormal} av maximal hälsa varje sekund inom {radius} yd. Varje rusning slutar i en Bensmäll inom samma radie för {slamNormal} av maximal hälsa. Gravbrytare återaktiveras {rearm} sek efter att den slutar.',
+    'Från {first} sek in i Kungens Vrede och var {everyNormal} sek därefter börjar Nythraxis Benstorm i {duration} sek. Han ignorerar hot, rör sig {speed} gånger normal hastighet och gör {charges} rusningar som varar {chargeSeconds} sek var. Hans virvel orsakar {whirlNormal} av maximal hälsa varje sekund inom {radius} yd. Varje rusning slutar i en Bensmäll inom samma radie för {slamNormal} av maximal hälsa. Alla aktiva Själsrift-märken frigörs olösta i det ögonblick stormen börjar, och stormen börjar aldrig direkt efter en Själsrift-detonation. Gravbrytare återaktiveras {rearm} sek efter att den slutar.',
   'hudChrome.raidBossGuide.nythraxis.courtName': 'Det Dödslösa Hovet',
   'hudChrome.raidBossGuide.nythraxis.courtResponse':
     'Tankar tar upp Aldren och vänder hans klyvning bort från raiden. Bedöva eller tysta Malric i samma ögonblick som Malrics Läkning börjar och döda honom först, rota eller bedöva sedan Voss bort från helarna, eftersom han inte kan hånas, och avsluta honom därefter.',
@@ -17254,4 +19360,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Redigera ramar lossar också dialogpanelen, som bär en NPC: s talade linje medan den NPC är utom synhåll; den bär sitt namnchip medan den är lös.',
   'guide.settingsPage.keybindsWheelBody':
     'Själva hjulet binder också. Zoom Camera In och Zoom Camera Out är vanliga bindningar som sitter på det nakna hjulet som standard, så att du kan flytta dem till Ctrl plus hjulet, eller till tangenterna, och sedan rulla det frigjorda hjulet för att skjuta action bar slots. Ett hjulspår har ingen frigöring, så det kan inte driva en hållen åtgärd som att gå framåt.',
+  'guide.settingsPage.ifColorblindMode':
+    'Färgar om Nythraxis golvfaror (träffringen från Gravutbrott, pölarna av Gravflamma och Själseld, Graveldslinjen och Själsklyvningsmärkena) till en färgblindvänlig palett med tydliga nyanser och ljusstyrkor, så att överlappande cirklar behåller synliga kanter. Storlekar, timers och positioner ändras inte.',
+  'hud.options.colorblindMode': 'Färgblindläge',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip':
+    'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

@@ -1,6 +1,7 @@
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
 import type { Aura, AuraKind, Entity, SetProc } from '../types';
+import { runTrinketTrigger } from './trinkets';
 
 export function applySetProcs(
   ctx: SimContext,
@@ -8,6 +9,8 @@ export function applySetProcs(
   target: Entity | null,
   trigger: SetProc['trigger'],
 ): void {
+  // The worn trinket's passives ride the same moments (combat/trinkets.ts).
+  if (trigger !== 'spellCrit') runTrinketTrigger(ctx, source, target, trigger);
   const matching = source.setProcs.filter((proc) => proc.trigger === trigger);
   if (matching.length === 0) return;
   source.procReadyAt ??= {};
@@ -32,11 +35,14 @@ export function applySetProcs(
     if (proc.applyTo === 'target' && duelJustEndedBetween(ctx, recipient, source)) continue;
     // WARFARE gating, checked BEFORE the chance roll so a gated proc draws no
     // rng outside hostile player-versus-player combat and every PvE run stays
-    // byte-identical. isHostileTo comes off the SimContext seam rather than
-    // being reimplemented here.
+    // byte-identical. WARFARE covers ALL PvP combat (owner rule), so the target
+    // resolves to the player who controls it: a hostile player's pet counts, a
+    // wild mob or the wearer's own pet never does. isHostileTo comes off the
+    // SimContext seam rather than being reimplemented here.
     if (proc.pvpOnly) {
-      if (source.kind !== 'player' || !target || target.kind !== 'player') continue;
-      if (source.id === target.id || !ctx.isHostileTo(source, target)) continue;
+      const targetPlayer = ctx.pvpController(target);
+      if (source.kind !== 'player' || !target || !targetPlayer) continue;
+      if (targetPlayer.id === source.id || !ctx.isHostileTo(source, target)) continue;
     }
     if (!ctx.rng.chance(proc.chance)) continue;
 

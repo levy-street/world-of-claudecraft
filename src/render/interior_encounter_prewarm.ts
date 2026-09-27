@@ -22,12 +22,71 @@ export interface InteriorEncounterPrewarmSpec {
   nythraxisGraveVisuals?: boolean;
 }
 
+/** The staged sets a spec can build: every flag but the live arm, which warms
+ *  per body. Each is claimed once per session, not once per interior: the
+ *  Ignivar raid reaches the same sets from several rooms, and programs are per
+ *  GL context, so what one room linked every later room keeps. */
+export type EncounterPrewarmSet = Exclude<
+  keyof InteriorEncounterPrewarmSpec,
+  'soulRendLivePlayerVisuals'
+>;
+
+// A Record, so a new spec flag fails to compile until it is listed here.
+const ENCOUNTER_PREWARM_SET_FLAGS: Record<EncounterPrewarmSet, true> = {
+  soulRendPlayerClasses: true,
+  soulRendVfxWeaponSkins: true,
+  varkhulVisuals: true,
+  ignivarVisuals: true,
+  nythraxisGraveVisuals: true,
+};
+
+export const ENCOUNTER_PREWARM_SETS = Object.keys(
+  ENCOUNTER_PREWARM_SET_FLAGS,
+) as readonly EncounterPrewarmSet[];
+
+export function unclaimedEncounterPrewarmSets(
+  spec: InteriorEncounterPrewarmSpec,
+  claimed: ReadonlySet<EncounterPrewarmSet>,
+): EncounterPrewarmSet[] {
+  return ENCOUNTER_PREWARM_SETS.filter((set) => spec[set] === true && !claimed.has(set));
+}
+
+/** The spec narrowed to `sets`, so a pass builds only what its interior claimed. */
+export function encounterPrewarmSpecForSets(
+  spec: InteriorEncounterPrewarmSpec,
+  sets: readonly EncounterPrewarmSet[],
+): InteriorEncounterPrewarmSpec {
+  const narrowed = { ...spec };
+  for (const set of ENCOUNTER_PREWARM_SETS) narrowed[set] = sets.includes(set);
+  return narrowed;
+}
+
 export const INTERIOR_ENCOUNTER_PREWARM: Record<string, InteriorEncounterPrewarmSpec> = {
   nythraxis: {
     soulRendPlayerClasses: true,
     soulRendVfxWeaponSkins: true,
     soulRendLivePlayerVisuals: true,
     nythraxisGraveVisuals: true,
+  },
+  // The Forge-Lift is the raid's first room and a sealed ride
+  // (IGNIVAR_LIFT_RIDE_SECONDS) with nothing to react to: both raid sets link
+  // there, rooms before either boss is pulled, instead of racing the pull in
+  // the boss's own room.
+  ignivar_lift: {
+    soulRendPlayerClasses: false,
+    soulRendVfxWeaponSkins: false,
+    soulRendLivePlayerVisuals: false,
+    varkhulVisuals: true,
+    ignivarVisuals: true,
+  },
+  // The Halls, whose interior the Molten Assembly shares: a raider who joins
+  // past the lift still warms both sets before the Crucible.
+  ignivar_approach: {
+    soulRendPlayerClasses: false,
+    soulRendVfxWeaponSkins: false,
+    soulRendLivePlayerVisuals: false,
+    varkhulVisuals: true,
+    ignivarVisuals: true,
   },
   ignivar_depths: {
     soulRendPlayerClasses: false,

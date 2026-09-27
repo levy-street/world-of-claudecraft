@@ -154,6 +154,8 @@ import {
 } from './claudium';
 import { claudiumSpendDetailed } from './claudium_proxy';
 import { configureCommunityTestAccounts } from './community_test_accounts';
+import { craftRollEventsIdle } from './craft_roll_events';
+import { pruneCraftRollEventsBatch } from './craft_roll_events_db';
 import {
   bustDailyRewardBoardCache,
   bustDailyRewardWinnersCache,
@@ -503,6 +505,8 @@ import { registerWocMarketReadCacheForBusts, WocMarketReadCache } from './woc_ma
 import { configureWocMarketRuntime, wocMarketConfig } from './woc_market_routes';
 import { createWocMarketSweep } from './woc_market_sweep';
 import { createWocMarketSweepWatchdog } from './woc_market_sweep_watchdog';
+import { bustWorldQuestLeaderboardCaches, worldQuestScoresIdle } from './world_quest_leaderboard';
+import { pruneWorldQuestScoresBatch } from './world_quest_scores_db';
 import { createWsAuth } from './ws_auth';
 import { bufferHandshakeMessages } from './ws_buffer';
 
@@ -693,7 +697,7 @@ async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<Leaderboar
     virtualLevel: virtualLevel(r.lifetimeXp),
     lifetimeXp: r.lifetimeXp,
     prestigeRank: r.prestigeRank,
-    // a deed id (never display text); the client localizes via deed_i18n
+    // a title id (deed or 'dev:<rung>', never display text); localized via deed_i18n
     title: r.activeTitle,
     // The guild tag shown beside the name. Omitted (not null) for an unguilded
     // character, the `realm` treatment below, so an unguilded row is byte-unchanged
@@ -1006,6 +1010,7 @@ function bustBoardCaches(): void {
   // officer's name must leave the presence tooltip as fast as the boards.
   guildBoardPresence.bust();
   bustDailyRewardBoardCache();
+  bustWorldQuestLeaderboardCaches();
   // Not a board, but the same delisting-must-be-immediate reasoning: the
   // per-character lifetime-XP rank cache (server/character_rank_cache.ts).
   // A ban/unban changes every OTHER eligible character's ahead/total counts
@@ -4091,6 +4096,20 @@ export async function startServer(): Promise<http.Server> {
         pruneBatch: (n) => pruneFtueEventsBatch(pool, config.ftueEventsRetentionDays, n),
       },
       {
+        // World-quest scoreboard rows nobody has improved in a year: the
+        // ladder should never show a character last seen that long ago.
+        name: 'world_quest_scores',
+        pruneBatch: (n) =>
+          pruneWorldQuestScoresBatch(pool, config.worldQuestScoresRetentionDays, n),
+      },
+      {
+        // The chance-based crafting outcome audit (one row per masterwork
+        // proc draw or Perfecting attempt); append-only, observer-written
+        // (server/craft_roll_events.ts).
+        name: 'craft_roll_events',
+        pruneBatch: (n) => pruneCraftRollEventsBatch(pool, config.craftRollEventsRetentionDays, n),
+      },
+      {
         // The buy-now abandon ledger (claim-cooldown evidence): dead once
         // outside every cooldown window; kept a month for tuning forensics.
         name: 'woc_market_buy_now_abandons',
@@ -4282,6 +4301,9 @@ export async function startServer(): Promise<http.Server> {
     // unlike deeds these rows have no reconcile heal path, so a row dropped by
     // pool.end() is gone. Rejections log inside the writer; never throws.
     await progressEventsIdle();
+    // The craft_roll_events FIFO drains on the same reasoning: an audit row
+    // has no reconcile heal path, so a row rejected by pool.end() is gone.
+    await craftRollEventsIdle();
     // Drain the market sold-volume FIFO too (qr-19-sold-volume-four-seam-wiring):
     // each queued accumulator entry stands for many coalesced sales, and an entry
     // still on the tail would be rejected by pool.end() with a burst of failure
@@ -4290,6 +4312,9 @@ export async function startServer(): Promise<http.Server> {
     // to skip that sweep. A dropped observation on a hard shutdown is acceptable.
     const soldVolumeDrained = await soldVolumeWriterIdle(MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS);
     if (!soldVolumeDrained) console.warn('market sold-volume drain deadline reached');
+    // Same for the world-quest scoreboard FIFO: a best-row upsert cut by
+    // pool.end() is re-earned only by a better attempt.
+    await worldQuestScoresIdle();
     // Stop accepted /unstuck report intake and drain only to a finite deadline.
     // Per-query timeouts bound an active write; deadline expiry aborts retry
     // delays and drops queued telemetry before the shared pool closes.

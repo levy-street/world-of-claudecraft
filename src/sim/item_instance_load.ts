@@ -36,6 +36,7 @@
 // inside a character load.
 
 import { isLoadablePartyTradeMarker } from './loot/bop_trade_window';
+import { isValidLootQuality } from './loot_quality/types';
 import { PERFECTING_RANKS } from './professions/perfecting';
 import { isValidPerfectingBonus } from './professions/perfecting_bonus';
 import { isLegalCrafterName } from './professions/tools';
@@ -246,6 +247,13 @@ export function sanitizeItemInstancePayloadOnLoad(payload: unknown): SanitizedIt
   const dropped: string[] = [];
   for (const key of keys) {
     const value = record[key];
+    if (key === 'lootQuality') {
+      if (!isValidLootQuality(value)) {
+        delete record[key];
+        dropped.push(key);
+      }
+      continue;
+    }
     // Key-name bound BEFORE any value rule: the key count arm alone would
     // pass one megabyte-long key carrying a short value. Reported under a
     // fixed label because echoing a corrupt key into the log is the same

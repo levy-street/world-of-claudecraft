@@ -14,6 +14,7 @@ vi.mock('../server/admin_guilds_read', () => ({
 }));
 
 import { PgSocialDb, SOCIAL_SCHEMA } from '../server/social_db';
+import { defaultGuildRankLadder } from '../src/sim/guild_ranks';
 import { GUILD_ROSTER_MAX_PAGES, GUILD_ROSTER_PAGE_PRICES } from '../src/sim/guild_roster';
 
 function harness() {
@@ -47,6 +48,8 @@ describe('PgSocialDb guild roster expansion', () => {
       guildName: 'Knights',
       rank: 'leader',
       rosterPages: 3,
+      // guilds.ranks is NULL (absent) on this row: the default ladder.
+      ranks: defaultGuildRankLadder(),
     });
     expect(String(pool.query.mock.calls[0][0])).toContain('g.roster_pages');
     expect(pool.query.mock.calls[0][1]).toEqual([8]);

@@ -5,10 +5,11 @@
 // when railAll is set, along every deck edge: the bridge-and-pier look).
 // Rails stop short where two decks of the batch join (deckRailRuns), so a
 // walkway the decks share never ends up fenced off across its mouth.
-// Callers merge the returned arrays with their own materials, so the
-// harbor and the jungle walkways each keep their own wood tones. Extracted
-// from render/gale_features.ts when the Palmreach walkways became the
-// second consumer.
+// Callers merge the returned arrays with their own materials, so each
+// walkway family keeps its own wood tones. Extracted from
+// render/gale_features.ts when the Palmreach walkways became the second
+// consumer (Wickharbor's own harbor is a Blender model now,
+// render/wickharbor_harbor.ts).
 import * as THREE from 'three';
 import { type GaleDeckDef, galeDeckSurfaceAt } from '../sim/gale_harbor';
 
@@ -106,7 +107,10 @@ export function buildDeckWood(
   decks: readonly GaleDeckDef[],
   terrain: (x: number, z: number) => number,
   waterLevel: number,
-  opts: { railAll?: boolean; bollards?: boolean } = {},
+  opts: {
+    railAll?: boolean;
+    bollards?: boolean;
+  } = {},
 ): DeckWood {
   const planks: THREE.BufferGeometry[] = [];
   const posts: THREE.BufferGeometry[] = [];
@@ -152,7 +156,7 @@ export function buildDeckWood(
       }
       // stairs always get a handrail; railAll rails the level runs too. Runs
       // break where another deck of the batch joins, so no rail fences off a
-      // shared walkway (the lagoon T, the pool stair, the harbor stair feet).
+      // shared walkway (the lagoon T, the pool stair).
       if (stair || opts.railAll) {
         for (const run of deckRailRuns(d, side, decks)) {
           const railPts = run.map((p) => new THREE.Vector3(p.x, yAt(p.along), p.z));
@@ -175,8 +179,9 @@ export function buildDeckWood(
         }
       }
     }
-    // mooring bollards on the two tip corners of each pier
-    if (opts.bollards) {
+    // mooring bollards on the two tip corners of each pier (never on the
+    // ferry's boarding stage, whose tip is where the gangplank lands)
+    if (opts.bollards && d.farAboveWater === undefined) {
       for (const side of [1, -1]) {
         const bx = d.x + dirx * (d.hl - 0.5) + pxu * (d.hw - 0.35) * side;
         const bz = d.z + dirz * (d.hl - 0.5) + pzu * (d.hw - 0.35) * side;

@@ -11,8 +11,9 @@
 // reveal lane does (a queued link can sit for seconds), so the held re-show
 // while both links are pending is exercised against the real driver too.
 import * as THREE from 'three';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { updateWallOcclusion, type WallHideable } from '../../src/render/dungeon_wall_occlusion';
+import { setDitherFadeEnabledForTest } from '../../src/render/occluder_dither_fade';
 import { occluderFadeMat, occluderFadeReady } from '../../src/render/occluder_fade';
 import {
   installOccluderFadeGate,
@@ -37,7 +38,11 @@ const flush = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 
 
 let dispose: (() => void) | null = null;
 
+// The staged twin is the blended ghost's program; the dithered style has none.
+beforeEach(() => setDitherFadeEnabledForTest(false));
+
 afterEach(() => {
+  setDitherFadeEnabledForTest(null);
   resetOccluderFadeGateForTest();
   dispose?.();
   dispose = null;

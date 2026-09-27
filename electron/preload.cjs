@@ -19,6 +19,25 @@ const { contextBridge, ipcRenderer } = require('electron');
 // rendererErrorLogEntry), which never trusts this side's counting.
 const MAX_FORWARDED_ERRORS = 30;
 const MAX_TEXT = 4000;
+
+// The game context the host diagnostic may carry, duplicated from
+// GAME_INFO_KEYS in electron/host_diag.cjs rather than imported: this preload
+// runs sandboxed, where require() reaches a handful of built-ins and no local
+// module. Main re-applies the real whitelist, so this copy is a pre-cap, not the
+// trust boundary; tests/electron_host_diag.test.ts pins the two lists equal.
+const HOST_DIAG_GAME_KEYS = [
+  'sessionId',
+  'releaseVersion',
+  'buildId',
+  'graphicsPreset',
+  'gfxTier',
+  'glRenderer',
+  'glVendor',
+  'renderScale',
+  'targetFps',
+  'zone',
+  'locale',
+];
 let forwardedErrors = 0;
 
 const clampString = (value, max) => (typeof value === 'string' ? value.slice(0, max) : '');
@@ -232,6 +251,29 @@ contextBridge.exposeInMainWorld('wocDesktop', {
   setDisplayMode: (mode) => {
     if (mode !== 'borderless' && mode !== 'windowed') return Promise.resolve(false);
     return ipcRenderer.invoke('desktop-set-display-mode', mode);
+  },
+  // The host facts the automatic perf report carries (memory, this app's own
+  // working sets, battery, and the Windows power/GPU-scheduling settings the
+  // browser sandbox cannot see). Argument-free, and everything it answers is
+  // already a plain scalar folded to a closed vocabulary on the main side.
+  getHostEssentials: () => ipcRenderer.invoke('desktop-host-essentials'),
+  // The host diagnostic: the shell collects the machine's configuration and the
+  // player saves ONE JSON file to send to support. The game's own context comes
+  // along, pre-sanitized HERE to the same key whitelist main accepts (a fresh
+  // object, so no renderer prototype or getter crosses the bridge, and strings
+  // pre-capped so a hostile page cannot ship an unbounded payload across the
+  // IPC; main re-clamps without trusting these caps). Answers
+  // { status, nativeStatus, fileName? }: the base name only, never a path.
+  runHostDiag: (game) => {
+    const clean = {};
+    if (game && typeof game === 'object') {
+      for (const key of HOST_DIAG_GAME_KEYS) {
+        const value = game[key];
+        if (typeof value === 'string') clean[key] = value.slice(0, 128);
+        else if (typeof value === 'number' && Number.isFinite(value)) clean[key] = value;
+      }
+    }
+    return ipcRenderer.invoke('desktop-host-diag-run', clean);
   },
   // One argument-free application exit capability. Main re-checks the sender
   // and live window before accepting the normal app.quit lifecycle request.

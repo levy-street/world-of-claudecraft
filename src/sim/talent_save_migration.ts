@@ -1,3 +1,4 @@
+import { hasFormRequirement } from './combat/form_requirement';
 import { ABILITIES, abilitiesKnownAt } from './content/classes';
 import {
   computeTalentModifiers,
@@ -59,8 +60,9 @@ function canSeedOnMainBar(cls: PlayerClass, abilityId: string): boolean {
   const ability = ABILITIES[abilityId];
   return (
     isMainBarAbility(cls, abilityId) &&
-    ability?.requiresForm === undefined &&
-    ability?.requiresStealth !== true
+    ability !== undefined &&
+    !hasFormRequirement(ability) &&
+    ability.requiresStealth !== true
   );
 }
 

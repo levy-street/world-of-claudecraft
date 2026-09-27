@@ -1,0 +1,626 @@
+{
+  "warrior": {
+    "chest": [
+      "boneguard_breastplate (ilvl 23, req 20, rare)",
+      "boneplate_vest (ilvl 21, req 1, uncommon)",
+      "deathlord_warplate (ilvl 26, req 20, epic)",
+      "gravewyrm_scale_hauberk (ilvl 23, req 20, rare)",
+      "moonshroud_breastplate (ilvl 21, req 18, rare)",
+      "stormvotive_hauberk (ilvl 22, req 19, rare)"
+    ],
+    "feet": [
+      "deathlord_sabatons (ilvl 22, req 16, epic)",
+      "drownstep_sabatons (ilvl 21, req 18, rare)",
+      "gravewyrm_sabatons (ilvl 23, req 20, rare)",
+      "marrowlord_boneboots (ilvl 20, req 1, uncommon)"
+    ],
+    "gloves": [
+      "crownforged_gauntlets (ilvl 26, req 20, epic)",
+      "emberforge_gauntlets (ilvl 26, req 20, rare)",
+      "gravewyrm_gauntlets (ilvl 23, req 20, rare)"
+    ],
+    "helmet": [
+      "boundstone_helm (ilvl 23, req 20, rare)",
+      "deathlords_dread_visage (ilvl 26, req 20, epic)"
+    ],
+    "legs": [
+      "bloodmane_warleggings (ilvl 21, req 1, uncommon)",
+      "deathlord_legguards (ilvl 26, req 20, epic)",
+      "emberwing_legguards (ilvl 22, req 19, rare)",
+      "thunderward_legguards (ilvl 20, req 17, rare)",
+      "ysols_pearl_greaves (ilvl 21, req 18, rare)"
+    ],
+    "mainhand": [
+      "brutoks_maul (ilvl 20, req 17, rare)",
+      "drogmars_skullcleaver (ilvl 20, req 17, rare)",
+      "drownedmoon_maul (ilvl 21, req 18, rare)",
+      "emberfang_warblade (ilvl 22, req 19, rare)",
+      "fanglords_beastspear (ilvl 23, req 20, rare)",
+      "hoarfrost_edge (ilvl 26, req 20, rare)",
+      "pitlords_cleaver (ilvl 26, req 20, rare)",
+      "wildheart_tuskblade (ilvl 26, req 20, epic)",
+      "wyrmfang_greatblade (ilvl 26, req 20, epic)",
+      "zealotsbane_blade (ilvl 21, req 1, uncommon)"
+    ],
+    "neck": [
+      "medallion_of_endless_profit (ilvl 26, req 20, epic)",
+      "swiftfang_talisman (ilvl 26, req 20, epic)",
+      "yumis_keepsake_locket (ilvl 26, req 20, epic)",
+      "zense_meridian (ilvl 26, req 20, epic)"
+    ],
+    "offhand": [],
+    "ring": [
+      "abyssal_loop (ilvl 26, req 20, rare)",
+      "architects_cornerstone (ilvl 26, req 20, epic)",
+      "nielas_coldlight_band (ilvl 26, req 20, epic)",
+      "oath_of_the_round_table (ilvl 26, req 20, epic)",
+      "seal_of_the_nine_oaths (ilvl 26, req 20, epic)",
+      "sutils_gambit (ilvl 26, req 20, epic)",
+      "zyzzs_deathless_signet (ilvl 26, req 20, epic)"
+    ],
+    "shoulder": [
+      "gravewyrm_mantle (ilvl 23, req 20, rare)",
+      "sootscale_mantle (ilvl 20, req 17, rare)"
+    ],
+    "waist": [
+      "boundstone_girdle (ilvl 23, req 20, rare)",
+      "crownforged_girdle (ilvl 26, req 20, epic)",
+      "graskbreaker_girdle (ilvl 26, req 20, rare)"
+    ]
+  },
+  "paladin": {
+    "chest": [
+      "boneguard_breastplate (ilvl 23, req 20, rare)",
+      "boneplate_vest (ilvl 21, req 1, uncommon)",
+      "deathlord_warplate (ilvl 26, req 20, epic)",
+      "gravewyrm_scale_hauberk (ilvl 23, req 20, rare)",
+      "moonshroud_breastplate (ilvl 21, req 18, rare)",
+      "stormvotive_hauberk (ilvl 22, req 19, rare)"
+    ],
+    "feet": [
+      "deathlord_sabatons (ilvl 22, req 16, epic)",
+      "drownstep_sabatons (ilvl 21, req 18, rare)",
+      "gravewyrm_sabatons (ilvl 23, req 20, rare)",
+      "marrowlord_boneboots (ilvl 20, req 1, uncommon)"
+    ],
+    "gloves": [
+      "crownforged_gauntlets (ilvl 26, req 20, epic)",
+      "emberforge_gauntlets (ilvl 26, req 20, rare)",
+      "gravewyrm_gauntlets (ilvl 23, req 20, rare)"
+    ],
+    "helmet": [
+      "boundstone_helm (ilvl 23, req 20, rare)",
+      "deathlords_dread_visage (ilvl 26, req 20, epic)"
+    ],
+    "legs": [
+      "bloodmane_warleggings (ilvl 21, req 1, uncommon)",
+      "deathlord_legguards (ilvl 26, req 20, epic)",
+      "emberwing_legguards (ilvl 22, req 19, rare)",
+      "thunderward_legguards (ilvl 20, req 17, rare)",
+      "ysols_pearl_greaves (ilvl 21, req 18, rare)"
+    ],
+    "mainhand": [
+      "brutoks_maul (ilvl 20, req 17, rare)",
+      "crag_warden_cudgel (ilvl 20, req 17, rare)",
+      "drogmars_skullcleaver (ilvl 20, req 17, rare)",
+      "drownedmoon_maul (ilvl 21, req 18, rare)",
+      "emberfang_warblade (ilvl 22, req 19, rare)",
+      "emberwood_staff (ilvl 21, req 1, uncommon)",
+      "fanglords_beastspear (ilvl 23, req 20, rare)",
+      "hoarfrost_edge (ilvl 26, req 20, rare)",
+      "ogre_bonecharm_staff (ilvl 20, req 17, rare)",
+      "pitlords_cleaver (ilvl 26, req 20, rare)",
+      "staff_of_the_gravewyrm (ilvl 26, req 20, epic)",
+      "staff_of_velkhar (ilvl 23, req 20, rare)",
+      "wildheart_hexwood_staff (ilvl 26, req 20, epic)",
+      "wildheart_tuskblade (ilvl 26, req 20, epic)",
+      "wyrmfang_greatblade (ilvl 26, req 20, epic)",
+      "zealotsbane_blade (ilvl 21, req 1, uncommon)"
+    ],
+    "neck": [
+      "medallion_of_endless_profit (ilvl 26, req 20, epic)",
+      "swiftfang_talisman (ilvl 26, req 20, epic)",
+      "yumis_keepsake_locket (ilvl 26, req 20, epic)",
+      "zense_meridian (ilvl 26, req 20, epic)"
+    ],
+    "offhand": [],
+    "ring": [
+      "abyssal_loop (ilvl 26, req 20, rare)",
+      "architects_cornerstone (ilvl 26, req 20, epic)",
+      "nielas_coldlight_band (ilvl 26, req 20, epic)",
+      "oath_of_the_round_table (ilvl 26, req 20, epic)",
+      "seal_of_the_nine_oaths (ilvl 26, req 20, epic)",
+      "sutils_gambit (ilvl 26, req 20, epic)",
+      "zyzzs_deathless_signet (ilvl 26, req 20, epic)"
+    ],
+    "shoulder": [
+      "gravewyrm_mantle (ilvl 23, req 20, rare)",
+      "sootscale_mantle (ilvl 20, req 17, rare)"
+    ],
+    "waist": [
+      "boundstone_girdle (ilvl 23, req 20, rare)",
+      "crownforged_girdle (ilvl 26, req 20, epic)",
+      "graskbreaker_girdle (ilvl 26, req 20, rare)"
+    ]
+  },
+  "hunter": {
+    "chest": [
+      "broodmother_carapace (ilvl 26, req 20, rare)",
+      "moonshroud_tunic (ilvl 21, req 18, rare)",
+      "nightwalk_jerkin (ilvl 21, req 1, uncommon)",
+      "shadowmeld_tunic (ilvl 23, req 20, rare)",
+      "vestments_of_the_waking_grove (ilvl 26, req 20, epic)",
+      "wyrmscale_jerkin (ilvl 23, req 20, rare)",
+      "wyrmshadow_harness (ilvl 26, req 20, epic)"
+    ],
+    "feet": [
+      "drownstep_treads (ilvl 21, req 18, rare)",
+      "gravewyrm_stalkers_treads (ilvl 23, req 20, rare)",
+      "revenantstep_treads (ilvl 20, req 17, rare)",
+      "selthes_seastriders (ilvl 21, req 18, rare)",
+      "stormscale_treads (ilvl 26, req 20, rare)",
+      "verdant_walkers (ilvl 26, req 20, epic)",
+      "wyrmshadow_treads (ilvl 26, req 20, epic)"
+    ],
+    "gloves": [
+      "grovewardens_grips (ilvl 26, req 20, epic)",
+      "nighttalon_grips (ilvl 26, req 20, epic)",
+      "shardfang_grips (ilvl 21, req 18, rare)",
+      "wyrmshadow_talongrips (ilvl 26, req 20, epic)"
+    ],
+    "helmet": ["stormroot_cowl (ilvl 20, req 17, rare)"],
+    "legs": [
+      "thornpeak_wildwraps (ilvl 22, req 19, rare)",
+      "vineclaw_stalking_breeches (ilvl 21, req 1, uncommon)",
+      "wildgrowth_leggings (ilvl 26, req 20, epic)",
+      "wyrmshadow_legguards (ilvl 26, req 20, epic)"
+    ],
+    "mainhand": [
+      "boneglass_shiv (ilvl 21, req 14, rare)",
+      "brutoks_maul (ilvl 20, req 17, rare)",
+      "cultist_flayer (ilvl 21, req 1, uncommon)",
+      "drogmars_skullcleaver (ilvl 20, req 17, rare)",
+      "drownedmoon_kris (ilvl 21, req 18, rare)",
+      "emberfang_warblade (ilvl 22, req 19, rare)",
+      "fang_of_korzul (ilvl 26, req 20, epic)",
+      "fanglords_beastspear (ilvl 23, req 20, rare)",
+      "gutripper_shiv (ilvl 20, req 17, rare)",
+      "skullsplitter_dirk (ilvl 20, req 17, rare)",
+      "wildheart_fangknife (ilvl 26, req 20, epic)",
+      "wildheart_tuskblade (ilvl 26, req 20, epic)",
+      "wyrmfang_greatblade (ilvl 26, req 20, epic)",
+      "zealotsbane_blade (ilvl 21, req 1, uncommon)"
+    ],
+    "neck": [
+      "medallion_of_endless_profit (ilvl 26, req 20, epic)",
+      "swiftfang_talisman (ilvl 26, req 20, epic)",
+      "yumis_keepsake_locket (ilvl 26, req 20, epic)",
+      "zense_meridian (ilvl 26, req 20, epic)"
+    ],
+    "offhand": ["gravewyrm_bone_quiver (ilvl 23, req 20, rare)"],
+    "ring": [
+      "abyssal_loop (ilvl 26, req 20, rare)",
+      "architects_cornerstone (ilvl 26, req 20, epic)",
+      "nielas_coldlight_band (ilvl 26, req 20, epic)",
+      "oath_of_the_round_table (ilvl 26, req 20, epic)",
+      "seal_of_the_nine_oaths (ilvl 26, req 20, epic)",
+      "sutils_gambit (ilvl 26, req 20, epic)",
+      "zyzzs_deathless_signet (ilvl 26, req 20, epic)"
+    ],
+    "shoulder": ["cryptbloom_shoulderguards (ilvl 23, req 20, rare)"],
+    "waist": ["nighttalon_waistband (ilvl 26, req 20, epic)"]
+  },
+  "rogue": {
+    "chest": [
+      "broodmother_carapace (ilvl 26, req 20, rare)",
+      "moonshroud_tunic (ilvl 21, req 18, rare)",
+      "nightwalk_jerkin (ilvl 21, req 1, uncommon)",
+      "shadowmeld_tunic (ilvl 23, req 20, rare)",
+      "vestments_of_the_waking_grove (ilvl 26, req 20, epic)",
+      "wyrmscale_jerkin (ilvl 23, req 20, rare)",
+      "wyrmshadow_harness (ilvl 26, req 20, epic)"
+    ],
+    "feet": [
+      "drownstep_treads (ilvl 21, req 18, rare)",
+      "gravewyrm_stalkers_treads (ilvl 23, req 20, rare)",
+      "revenantstep_treads (ilvl 20, req 17, rare)",
+      "selthes_seastriders (ilvl 21, req 18, rare)",
+      "stormscale_treads (ilvl 26, req 20, rare)",
+      "verdant_walkers (ilvl 26, req 20, epic)",
+      "wyrmshadow_treads (ilvl 26, req 20, epic)"
+    ],
+    "gloves": [
+      "grovewardens_grips (ilvl 26, req 20, epic)",
+      "nighttalon_grips (ilvl 26, req 20, epic)",
+      "shardfang_grips (ilvl 21, req 18, rare)",
+      "wyrmshadow_talongrips (ilvl 26, req 20, epic)"
+    ],
+    "helmet": ["stormroot_cowl (ilvl 20, req 17, rare)"],
+    "legs": [
+      "thornpeak_wildwraps (ilvl 22, req 19, rare)",
+      "vineclaw_stalking_breeches (ilvl 21, req 1, uncommon)",
+      "wildgrowth_leggings (ilvl 26, req 20, epic)",
+      "wyrmshadow_legguards (ilvl 26, req 20, epic)"
+    ],
+    "mainhand": [
+      "boneglass_shiv (ilvl 21, req 14, rare)",
+      "brutoks_maul (ilvl 20, req 17, rare)",
+      "cultist_flayer (ilvl 21, req 1, uncommon)",
+      "drogmars_skullcleaver (ilvl 20, req 17, rare)",
+      "drownedmoon_kris (ilvl 21, req 18, rare)",
+      "emberfang_warblade (ilvl 22, req 19, rare)",
+      "fang_of_korzul (ilvl 26, req 20, epic)",
+      "gutripper_shiv (ilvl 20, req 17, rare)",
+      "skullsplitter_dirk (ilvl 20, req 17, rare)",
+      "wildheart_fangknife (ilvl 26, req 20, epic)",
+      "zealotsbane_blade (ilvl 21, req 1, uncommon)"
+    ],
+    "neck": [
+      "medallion_of_endless_profit (ilvl 26, req 20, epic)",
+      "swiftfang_talisman (ilvl 26, req 20, epic)",
+      "yumis_keepsake_locket (ilvl 26, req 20, epic)",
+      "zense_meridian (ilvl 26, req 20, epic)"
+    ],
+    "offhand": [],
+    "ring": [
+      "abyssal_loop (ilvl 26, req 20, rare)",
+      "architects_cornerstone (ilvl 26, req 20, epic)",
+      "nielas_coldlight_band (ilvl 26, req 20, epic)",
+      "oath_of_the_round_table (ilvl 26, req 20, epic)",
+      "seal_of_the_nine_oaths (ilvl 26, req 20, epic)",
+      "sutils_gambit (ilvl 26, req 20, epic)",
+      "zyzzs_deathless_signet (ilvl 26, req 20, epic)"
+    ],
+    "shoulder": ["cryptbloom_shoulderguards (ilvl 23, req 20, rare)"],
+    "waist": ["nighttalon_waistband (ilvl 26, req 20, epic)"]
+  },
+  "priest": {
+    "chest": [
+      "moonshroud_robe (ilvl 21, req 18, rare)",
+      "necromancers_starshroud (ilvl 26, req 20, epic)",
+      "pactbound_vestments (ilvl 26, req 20, rare)",
+      "revenant_silk_robe (ilvl 21, req 1, uncommon)",
+      "wyrmcult_grand_robe (ilvl 23, req 20, rare)"
+    ],
+    "feet": [
+      "drownstep_slippers (ilvl 21, req 18, rare)",
+      "eelskin_mudwaders (ilvl 21, req 1, uncommon)",
+      "necromancers_soulsteps (ilvl 26, req 20, epic)",
+      "saltwalker_sandals (ilvl 21, req 1, uncommon)",
+      "wickspun_treads (ilvl 21, req 1, uncommon)",
+      "wyrmcult_soulsteps (ilvl 23, req 20, rare)"
+    ],
+    "gloves": [
+      "gravebound_silk_wraps (ilvl 21, req 1, uncommon)",
+      "moonfleece_mitts (ilvl 21, req 1, uncommon)",
+      "orchard_sapbinder_grips (ilvl 20, req 1, uncommon)",
+      "shearkeeper_gloves (ilvl 21, req 1, uncommon)",
+      "soulflame_gloves (ilvl 26, req 20, epic)",
+      "voidscar_handwraps (ilvl 26, req 20, rare)",
+      "wardens_oathband (ilvl 21, req 18, rare)",
+      "wyrmcult_spellgrips (ilvl 22, req 19, rare)"
+    ],
+    "helmet": ["wardweave_cowl (ilvl 20, req 17, rare)"],
+    "legs": [
+      "korgaths_chainwraps (ilvl 23, req 20, rare)",
+      "necromancers_legwraps (ilvl 25, req 19, epic)",
+      "stormshard_leggings (ilvl 21, req 18, rare)",
+      "sunbone_ritual_sarong (ilvl 21, req 1, uncommon)"
+    ],
+    "mainhand": [
+      "crag_warden_cudgel (ilvl 20, req 17, rare)",
+      "drownedmoon_scepter (ilvl 21, req 18, rare)",
+      "emberwood_staff (ilvl 21, req 1, uncommon)",
+      "ogre_bonecharm_staff (ilvl 20, req 17, rare)",
+      "staff_of_the_gravewyrm (ilvl 26, req 20, epic)",
+      "staff_of_velkhar (ilvl 23, req 20, rare)",
+      "wildheart_hexwood_staff (ilvl 26, req 20, epic)"
+    ],
+    "neck": [
+      "medallion_of_endless_profit (ilvl 26, req 20, epic)",
+      "swiftfang_talisman (ilvl 26, req 20, epic)",
+      "yumis_keepsake_locket (ilvl 26, req 20, epic)",
+      "zense_meridian (ilvl 26, req 20, epic)"
+    ],
+    "offhand": [],
+    "ring": [
+      "abyssal_loop (ilvl 26, req 20, rare)",
+      "architects_cornerstone (ilvl 26, req 20, epic)",
+      "nielas_coldlight_band (ilvl 26, req 20, epic)",
+      "oath_of_the_round_table (ilvl 26, req 20, epic)",
+      "seal_of_the_nine_oaths (ilvl 26, req 20, epic)",
+      "sutils_gambit (ilvl 26, req 20, epic)",
+      "zyzzs_deathless_signet (ilvl 26, req 20, epic)"
+    ],
+    "shoulder": [
+      "barrowshade_mantle (ilvl 23, req 20, rare)",
+      "bonelord_mantle (ilvl 26, req 20, rare)",
+      "fountain_court_mantle (ilvl 23, req 20, rare)",
+      "frostmane_mantle (ilvl 23, req 20, rare)",
+      "lilybed_mantle (ilvl 23, req 20, rare)",
+      "mantle_of_the_meredark (ilvl 23, req 20, rare)",
+      "mantle_of_the_unhorsed (ilvl 23, req 20, rare)",
+      "mawscale_pauldrons (ilvl 23, req 20, rare)",
+      "necromancers_soulspire_mantle (ilvl 26, req 20, epic)",
+      "shardsong_mantle (ilvl 22, req 19, rare)",
+      "sunken_idol_mantle (ilvl 23, req 20, rare)",
+      "wreck_wardens_mantle (ilvl 23, req 20, rare)"
+    ],
+    "waist": ["soulflame_cord (ilvl 26, req 20, epic)"]
+  },
+  "shaman": {
+    "chest": [
+      "boneguard_breastplate (ilvl 23, req 20, rare)",
+      "boneplate_vest (ilvl 21, req 1, uncommon)",
+      "deathlord_warplate (ilvl 26, req 20, epic)",
+      "gravewyrm_scale_hauberk (ilvl 23, req 20, rare)",
+      "moonshroud_breastplate (ilvl 21, req 18, rare)",
+      "stormvotive_hauberk (ilvl 22, req 19, rare)"
+    ],
+    "feet": [
+      "deathlord_sabatons (ilvl 22, req 16, epic)",
+      "drownstep_sabatons (ilvl 21, req 18, rare)",
+      "gravewyrm_sabatons (ilvl 23, req 20, rare)",
+      "marrowlord_boneboots (ilvl 20, req 1, uncommon)"
+    ],
+    "gloves": [
+      "crownforged_gauntlets (ilvl 26, req 20, epic)",
+      "emberforge_gauntlets (ilvl 26, req 20, rare)",
+      "gravewyrm_gauntlets (ilvl 23, req 20, rare)",
+      "stormcallers_handguards (ilvl 26, req 20, epic)"
+    ],
+    "helmet": [
+      "boundstone_helm (ilvl 23, req 20, rare)",
+      "deathlords_dread_visage (ilvl 26, req 20, epic)"
+    ],
+    "legs": [
+      "bloodmane_warleggings (ilvl 21, req 1, uncommon)",
+      "deathlord_legguards (ilvl 26, req 20, epic)",
+      "emberwing_legguards (ilvl 22, req 19, rare)",
+      "thunderward_legguards (ilvl 20, req 17, rare)",
+      "ysols_pearl_greaves (ilvl 21, req 18, rare)"
+    ],
+    "mainhand": [
+      "brutoks_maul (ilvl 20, req 17, rare)",
+      "crag_warden_cudgel (ilvl 20, req 17, rare)",
+      "drogmars_skullcleaver (ilvl 20, req 17, rare)",
+      "drownedmoon_maul (ilvl 21, req 18, rare)",
+      "emberfang_warblade (ilvl 22, req 19, rare)",
+      "emberwood_staff (ilvl 21, req 1, uncommon)",
+      "fanglords_beastspear (ilvl 23, req 20, rare)",
+      "hoarfrost_edge (ilvl 26, req 20, rare)",
+      "ogre_bonecharm_staff (ilvl 20, req 17, rare)",
+      "pitlords_cleaver (ilvl 26, req 20, rare)",
+      "staff_of_the_gravewyrm (ilvl 26, req 20, epic)",
+      "staff_of_velkhar (ilvl 23, req 20, rare)",
+      "wildheart_hexwood_staff (ilvl 26, req 20, epic)",
+      "wildheart_tuskblade (ilvl 26, req 20, epic)",
+      "wyrmfang_greatblade (ilvl 26, req 20, epic)",
+      "zealotsbane_blade (ilvl 21, req 1, uncommon)"
+    ],
+    "neck": [
+      "medallion_of_endless_profit (ilvl 26, req 20, epic)",
+      "swiftfang_talisman (ilvl 26, req 20, epic)",
+      "yumis_keepsake_locket (ilvl 26, req 20, epic)",
+      "zense_meridian (ilvl 26, req 20, epic)"
+    ],
+    "offhand": [],
+    "ring": [
+      "abyssal_loop (ilvl 26, req 20, rare)",
+      "architects_cornerstone (ilvl 26, req 20, epic)",
+      "nielas_coldlight_band (ilvl 26, req 20, epic)",
+      "oath_of_the_round_table (ilvl 26, req 20, epic)",
+      "seal_of_the_nine_oaths (ilvl 26, req 20, epic)",
+      "sutils_gambit (ilvl 26, req 20, epic)",
+      "zyzzs_deathless_signet (ilvl 26, req 20, epic)"
+    ],
+    "shoulder": [
+      "gravewyrm_mantle (ilvl 23, req 20, rare)",
+      "sootscale_mantle (ilvl 20, req 17, rare)"
+    ],
+    "waist": [
+      "boundstone_girdle (ilvl 23, req 20, rare)",
+      "crownforged_girdle (ilvl 26, req 20, epic)",
+      "graskbreaker_girdle (ilvl 26, req 20, rare)",
+      "stormcallers_waistguard (ilvl 26, req 20, epic)"
+    ]
+  },
+  "mage": {
+    "chest": [
+      "moonshroud_robe (ilvl 21, req 18, rare)",
+      "necromancers_starshroud (ilvl 26, req 20, epic)",
+      "pactbound_vestments (ilvl 26, req 20, rare)",
+      "revenant_silk_robe (ilvl 21, req 1, uncommon)",
+      "wyrmcult_grand_robe (ilvl 23, req 20, rare)"
+    ],
+    "feet": [
+      "drownstep_slippers (ilvl 21, req 18, rare)",
+      "eelskin_mudwaders (ilvl 21, req 1, uncommon)",
+      "necromancers_soulsteps (ilvl 26, req 20, epic)",
+      "saltwalker_sandals (ilvl 21, req 1, uncommon)",
+      "wickspun_treads (ilvl 21, req 1, uncommon)",
+      "wyrmcult_soulsteps (ilvl 23, req 20, rare)"
+    ],
+    "gloves": [
+      "gravebound_silk_wraps (ilvl 21, req 1, uncommon)",
+      "moonfleece_mitts (ilvl 21, req 1, uncommon)",
+      "orchard_sapbinder_grips (ilvl 20, req 1, uncommon)",
+      "shearkeeper_gloves (ilvl 21, req 1, uncommon)",
+      "soulflame_gloves (ilvl 26, req 20, epic)",
+      "voidscar_handwraps (ilvl 26, req 20, rare)",
+      "wardens_oathband (ilvl 21, req 18, rare)",
+      "wyrmcult_spellgrips (ilvl 22, req 19, rare)"
+    ],
+    "helmet": ["wardweave_cowl (ilvl 20, req 17, rare)"],
+    "legs": [
+      "korgaths_chainwraps (ilvl 23, req 20, rare)",
+      "necromancers_legwraps (ilvl 25, req 19, epic)",
+      "stormshard_leggings (ilvl 21, req 18, rare)",
+      "sunbone_ritual_sarong (ilvl 21, req 1, uncommon)"
+    ],
+    "mainhand": [
+      "crag_warden_cudgel (ilvl 20, req 17, rare)",
+      "drownedmoon_scepter (ilvl 21, req 18, rare)",
+      "emberwood_staff (ilvl 21, req 1, uncommon)",
+      "ogre_bonecharm_staff (ilvl 20, req 17, rare)",
+      "staff_of_the_gravewyrm (ilvl 26, req 20, epic)",
+      "staff_of_velkhar (ilvl 23, req 20, rare)",
+      "wildheart_hexwood_staff (ilvl 26, req 20, epic)"
+    ],
+    "neck": [
+      "medallion_of_endless_profit (ilvl 26, req 20, epic)",
+      "swiftfang_talisman (ilvl 26, req 20, epic)",
+      "yumis_keepsake_locket (ilvl 26, req 20, epic)",
+      "zense_meridian (ilvl 26, req 20, epic)"
+    ],
+    "offhand": [],
+    "ring": [
+      "abyssal_loop (ilvl 26, req 20, rare)",
+      "architects_cornerstone (ilvl 26, req 20, epic)",
+      "nielas_coldlight_band (ilvl 26, req 20, epic)",
+      "oath_of_the_round_table (ilvl 26, req 20, epic)",
+      "seal_of_the_nine_oaths (ilvl 26, req 20, epic)",
+      "sutils_gambit (ilvl 26, req 20, epic)",
+      "zyzzs_deathless_signet (ilvl 26, req 20, epic)"
+    ],
+    "shoulder": [
+      "barrowshade_mantle (ilvl 23, req 20, rare)",
+      "bonelord_mantle (ilvl 26, req 20, rare)",
+      "fountain_court_mantle (ilvl 23, req 20, rare)",
+      "frostmane_mantle (ilvl 23, req 20, rare)",
+      "lilybed_mantle (ilvl 23, req 20, rare)",
+      "mantle_of_the_meredark (ilvl 23, req 20, rare)",
+      "mantle_of_the_unhorsed (ilvl 23, req 20, rare)",
+      "mawscale_pauldrons (ilvl 23, req 20, rare)",
+      "necromancers_soulspire_mantle (ilvl 26, req 20, epic)",
+      "shardsong_mantle (ilvl 22, req 19, rare)",
+      "sunken_idol_mantle (ilvl 23, req 20, rare)",
+      "wreck_wardens_mantle (ilvl 23, req 20, rare)"
+    ],
+    "waist": ["soulflame_cord (ilvl 26, req 20, epic)"]
+  },
+  "warlock": {
+    "chest": [
+      "moonshroud_robe (ilvl 21, req 18, rare)",
+      "necromancers_starshroud (ilvl 26, req 20, epic)",
+      "pactbound_vestments (ilvl 26, req 20, rare)",
+      "revenant_silk_robe (ilvl 21, req 1, uncommon)",
+      "wyrmcult_grand_robe (ilvl 23, req 20, rare)"
+    ],
+    "feet": [
+      "drownstep_slippers (ilvl 21, req 18, rare)",
+      "eelskin_mudwaders (ilvl 21, req 1, uncommon)",
+      "necromancers_soulsteps (ilvl 26, req 20, epic)",
+      "saltwalker_sandals (ilvl 21, req 1, uncommon)",
+      "wickspun_treads (ilvl 21, req 1, uncommon)",
+      "wyrmcult_soulsteps (ilvl 23, req 20, rare)"
+    ],
+    "gloves": [
+      "gravebound_silk_wraps (ilvl 21, req 1, uncommon)",
+      "moonfleece_mitts (ilvl 21, req 1, uncommon)",
+      "orchard_sapbinder_grips (ilvl 20, req 1, uncommon)",
+      "shearkeeper_gloves (ilvl 21, req 1, uncommon)",
+      "soulflame_gloves (ilvl 26, req 20, epic)",
+      "voidscar_handwraps (ilvl 26, req 20, rare)",
+      "wardens_oathband (ilvl 21, req 18, rare)",
+      "wyrmcult_spellgrips (ilvl 22, req 19, rare)"
+    ],
+    "helmet": ["wardweave_cowl (ilvl 20, req 17, rare)"],
+    "legs": [
+      "korgaths_chainwraps (ilvl 23, req 20, rare)",
+      "necromancers_legwraps (ilvl 25, req 19, epic)",
+      "stormshard_leggings (ilvl 21, req 18, rare)",
+      "sunbone_ritual_sarong (ilvl 21, req 1, uncommon)"
+    ],
+    "mainhand": [
+      "crag_warden_cudgel (ilvl 20, req 17, rare)",
+      "drownedmoon_scepter (ilvl 21, req 18, rare)",
+      "emberwood_staff (ilvl 21, req 1, uncommon)",
+      "ogre_bonecharm_staff (ilvl 20, req 17, rare)",
+      "staff_of_the_gravewyrm (ilvl 26, req 20, epic)",
+      "staff_of_velkhar (ilvl 23, req 20, rare)",
+      "wildheart_hexwood_staff (ilvl 26, req 20, epic)"
+    ],
+    "neck": [
+      "medallion_of_endless_profit (ilvl 26, req 20, epic)",
+      "swiftfang_talisman (ilvl 26, req 20, epic)",
+      "yumis_keepsake_locket (ilvl 26, req 20, epic)",
+      "zense_meridian (ilvl 26, req 20, epic)"
+    ],
+    "offhand": [],
+    "ring": [
+      "abyssal_loop (ilvl 26, req 20, rare)",
+      "architects_cornerstone (ilvl 26, req 20, epic)",
+      "nielas_coldlight_band (ilvl 26, req 20, epic)",
+      "oath_of_the_round_table (ilvl 26, req 20, epic)",
+      "seal_of_the_nine_oaths (ilvl 26, req 20, epic)",
+      "sutils_gambit (ilvl 26, req 20, epic)",
+      "zyzzs_deathless_signet (ilvl 26, req 20, epic)"
+    ],
+    "shoulder": [
+      "barrowshade_mantle (ilvl 23, req 20, rare)",
+      "bonelord_mantle (ilvl 26, req 20, rare)",
+      "fountain_court_mantle (ilvl 23, req 20, rare)",
+      "frostmane_mantle (ilvl 23, req 20, rare)",
+      "lilybed_mantle (ilvl 23, req 20, rare)",
+      "mantle_of_the_meredark (ilvl 23, req 20, rare)",
+      "mantle_of_the_unhorsed (ilvl 23, req 20, rare)",
+      "mawscale_pauldrons (ilvl 23, req 20, rare)",
+      "necromancers_soulspire_mantle (ilvl 26, req 20, epic)",
+      "shardsong_mantle (ilvl 22, req 19, rare)",
+      "sunken_idol_mantle (ilvl 23, req 20, rare)",
+      "wreck_wardens_mantle (ilvl 23, req 20, rare)"
+    ],
+    "waist": ["soulflame_cord (ilvl 26, req 20, epic)"]
+  },
+  "druid": {
+    "chest": [
+      "broodmother_carapace (ilvl 26, req 20, rare)",
+      "vestments_of_the_waking_grove (ilvl 26, req 20, epic)"
+    ],
+    "feet": [
+      "revenantstep_treads (ilvl 20, req 17, rare)",
+      "selthes_seastriders (ilvl 21, req 18, rare)",
+      "verdant_walkers (ilvl 26, req 20, epic)"
+    ],
+    "gloves": [
+      "grovewardens_grips (ilvl 26, req 20, epic)",
+      "nighttalon_grips (ilvl 26, req 20, epic)",
+      "shardfang_grips (ilvl 21, req 18, rare)"
+    ],
+    "helmet": ["stormroot_cowl (ilvl 20, req 17, rare)"],
+    "legs": [
+      "thornpeak_wildwraps (ilvl 22, req 19, rare)",
+      "wildgrowth_leggings (ilvl 26, req 20, epic)"
+    ],
+    "mainhand": [
+      "crag_warden_cudgel (ilvl 20, req 17, rare)",
+      "drownedmoon_scepter (ilvl 21, req 18, rare)",
+      "emberwood_staff (ilvl 21, req 1, uncommon)",
+      "gravewyrm_thornmaul (ilvl 23, req 20, rare)",
+      "nightfangs_greatstaff (ilvl 26, req 20, epic)",
+      "ogre_bonecharm_staff (ilvl 20, req 17, rare)",
+      "staff_of_the_gravewyrm (ilvl 26, req 20, epic)",
+      "staff_of_velkhar (ilvl 23, req 20, rare)",
+      "wildheart_hexwood_staff (ilvl 26, req 20, epic)"
+    ],
+    "neck": [
+      "medallion_of_endless_profit (ilvl 26, req 20, epic)",
+      "swiftfang_talisman (ilvl 26, req 20, epic)",
+      "yumis_keepsake_locket (ilvl 26, req 20, epic)",
+      "zense_meridian (ilvl 26, req 20, epic)"
+    ],
+    "offhand": [],
+    "ring": [
+      "abyssal_loop (ilvl 26, req 20, rare)",
+      "architects_cornerstone (ilvl 26, req 20, epic)",
+      "nielas_coldlight_band (ilvl 26, req 20, epic)",
+      "oath_of_the_round_table (ilvl 26, req 20, epic)",
+      "seal_of_the_nine_oaths (ilvl 26, req 20, epic)",
+      "sutils_gambit (ilvl 26, req 20, epic)",
+      "zyzzs_deathless_signet (ilvl 26, req 20, epic)"
+    ],
+    "shoulder": ["cryptbloom_shoulderguards (ilvl 23, req 20, rare)"],
+    "waist": ["nighttalon_waistband (ilvl 26, req 20, epic)"]
+  }
+}

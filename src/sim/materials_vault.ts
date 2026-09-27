@@ -341,12 +341,15 @@ function applyVaultDeposit(
   );
   if (plan === null) return false;
   const itemId = inventory[slotIndex].itemId;
-  // The identity rows are packed at the VAULT's row size (vault_slot_ops.ts
-  // VAULT_ROW_STACK_SIZE), never the bag stack size: one material identity is
-  // one row however many units it holds. Both adds are decided on a copy
-  // before anything is written, so a refusal leaves the live store untouched;
-  // the packing core deep-clones every payload and composition it places, so
-  // the vault never aliases the removed carried row.
+  // Mergeable identity rows are packed at the VAULT's row size
+  // (vault_slot_ops.ts VAULT_ROW_STACK_SIZE), never the bag stack size: one
+  // material identity is one row however many units it holds. Whole-move
+  // payloads keep the item's normal fresh-row cap, so a tolerated over-cap
+  // locked stack splits into capped rows without allowing partial deposit.
+  // Both adds are decided on a copy before anything is written, so a refusal
+  // leaves the live store untouched; the packing core deep-clones every
+  // payload and composition it places, so the vault never aliases the removed
+  // carried row.
   let rows: readonly InvSlot[] = vault.special;
   if (plan.foldUnits > 0) {
     const fold = planVaultRowAdd(rows, { itemId, count: plan.foldUnits }, vaultMaterialIds());

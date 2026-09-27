@@ -53,6 +53,19 @@ schema change.
 
 - `LEVEL_UP_EVENTS_RETENTION_DAYS` / `FTUE_EVENTS_RETENTION_DAYS` (default
   365; 0 keeps forever) ride the nightly retention sweep.
+- `CRAFT_ROLL_EVENTS_RETENTION_DAYS` (default 365; 0 keeps forever) bounds
+  `craft_roll_events`, the chance-based crafting outcome audit
+  (`server/craft_roll_events_db.ts`): one row per masterwork proc draw and per
+  Perfecting attempt with the roll, the effective chance, the verdict, and the
+  rank walked. The real success rate of a system is
+  `SELECT kind, count(*), avg(success::int), avg(chance) FROM craft_roll_events GROUP BY kind`,
+  and a player's report of a streak is `WHERE character_id = ... ORDER BY rolled_at`.
+  Read the masterwork kind with care: a craft whose effect gate was shut (an
+  archetype ceiling, a worse Jack variance) still writes a row at `chance = 0`
+  and `success = false`, so observed and expected stay comparable but both are
+  diluted by crafts that could never proc. The rate "when the effect could fire",
+  which is what a player asking about their proc luck means, adds
+  `WHERE chance > 0`.
 - `PERF_REPORT_RETENTION_DAYS`: production should run at least 90 (the
   device/FPS versus early-retention correlation needs a month or more of
   history; the old 14-day suggestion silently discarded it).

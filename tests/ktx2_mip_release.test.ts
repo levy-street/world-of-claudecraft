@@ -815,12 +815,14 @@ describe('category policy', () => {
       'props',
       'quest',
       'resources',
+      'world_quests',
     ]);
     expect([...KTX2_MIP_EXEMPT_MODEL_ROOTS]).toEqual([
       'chars',
       'creatures',
       'mounts',
       'tools',
+      'vfx',
       'weapons',
     ]);
   });
@@ -854,29 +856,32 @@ describe('category policy', () => {
     expect(classified).toEqual(roots);
   });
 
-  it('arms releasable-category GLB textures and dismisses exempt ones', () => {
-    enableKtx2MipRelease(() => false);
-    const releasableTex = makeTexture(3);
-    stashKtx2TranscodeSource(releasableTex, makeSource());
-    const gltfLike = (
-      tex: unknown,
-    ): { scene: { traverse: (cb: (o: unknown) => void) => void } } => ({
-      scene: {
-        traverse: (cb) => cb({ isMesh: true, material: [{ map: tex, normalMap: null }] }),
-      },
-    });
-    classifyGltfKtx2Textures(gltfLike(releasableTex), 'models/props/barrel.glb');
-    simulateUpload(releasableTex);
-    expect(mipsOf(releasableTex)[0]?.data.byteLength).toBe(0);
+  it.each(['models/chars/mage_classic.glb', 'models/vfx/production_fragments.glb'])(
+    'arms world-only textures and retains CPU mips for exempt %s',
+    (exemptUrl) => {
+      enableKtx2MipRelease(() => false);
+      const releasableTex = makeTexture(3);
+      stashKtx2TranscodeSource(releasableTex, makeSource());
+      const gltfLike = (
+        tex: unknown,
+      ): { scene: { traverse: (cb: (o: unknown) => void) => void } } => ({
+        scene: {
+          traverse: (cb) => cb({ isMesh: true, material: [{ map: tex, normalMap: null }] }),
+        },
+      });
+      classifyGltfKtx2Textures(gltfLike(releasableTex), 'models/props/barrel.glb');
+      simulateUpload(releasableTex);
+      expect(mipsOf(releasableTex)[0]?.data.byteLength).toBe(0);
 
-    const exemptTex = makeTexture(3);
-    stashKtx2TranscodeSource(exemptTex, makeSource());
-    classifyGltfKtx2Textures(gltfLike(exemptTex), 'models/chars/mage_classic.glb');
-    simulateUpload(exemptTex);
-    expect(mipsOf(exemptTex)[0]?.data.byteLength).toBeGreaterThan(0);
-    // Exempt classification drops the stashed source instead of leaking it.
-    expect(ktx2MipReleaseInternalsForTest.pendingCount()).toBe(0);
-  });
+      const exemptTex = makeTexture(3);
+      stashKtx2TranscodeSource(exemptTex, makeSource());
+      classifyGltfKtx2Textures(gltfLike(exemptTex), exemptUrl);
+      simulateUpload(exemptTex);
+      expect(mipsOf(exemptTex)[0]?.data.byteLength).toBeGreaterThan(0);
+      // Exempt classification drops the stashed source instead of leaking it.
+      expect(ktx2MipReleaseInternalsForTest.pendingCount()).toBe(0);
+    },
+  );
 
   it('classifies every material map slot, on array and single materials alike', () => {
     enableKtx2MipRelease(() => false);

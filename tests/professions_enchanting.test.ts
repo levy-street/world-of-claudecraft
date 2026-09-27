@@ -986,7 +986,20 @@ describe('ENCHANTS table integrity', () => {
     'feet',
     'ring',
   ]);
-  const VALID_STAT_KEYS = new Set(['str', 'agi', 'sta', 'int', 'spi', 'armor']);
+  const VALID_STAT_KEYS = new Set([
+    'str',
+    'agi',
+    'sta',
+    'int',
+    'spi',
+    'armor',
+    // The learned faction formulas' axes (content/enchants.ts EnchantStatAxis);
+    // recalcPlayerStats reads all four from a copy's rolled stats.
+    'spellPower',
+    'healingPower',
+    'critRating',
+    'hasteRating',
+  ]);
 
   it('every enchant is well-formed: id matches its key, a valid slot, real reagents, a real bonus', () => {
     for (const [key, e] of Object.entries(ENCHANTS)) {
@@ -997,13 +1010,25 @@ describe('ENCHANTS table integrity', () => {
       const bonusKeys = Object.keys(e.statBonus);
       if (e.weaponProc) {
         expect(['mainhand', 'offhand']).toContain(e.itemSlot);
-        expect(Object.keys(e.weaponProc).sort()).toEqual(['duration', 'heal', 'ppm', 'strength']);
+        // Exactly one primary-stat axis (Zeal's strength or Grace's agility);
+        // heal and hasteMult are optional riders, everything present is a
+        // finite positive number, and the stat and heal amounts are integers.
+        const keys = Object.keys(e.weaponProc).sort();
+        expect(keys).toContain('ppm');
+        expect(keys).toContain('duration');
+        expect(keys.filter((k) => k === 'strength' || k === 'agility')).toHaveLength(1);
+        for (const key of keys) {
+          expect(['agility', 'duration', 'hasteMult', 'heal', 'ppm', 'strength']).toContain(key);
+        }
         for (const value of Object.values(e.weaponProc)) {
           expect(Number.isFinite(value)).toBe(true);
           expect(value).toBeGreaterThan(0);
         }
-        expect(Number.isInteger(e.weaponProc.strength)).toBe(true);
-        expect(Number.isInteger(e.weaponProc.heal)).toBe(true);
+        expect(Number.isInteger(e.weaponProc.strength ?? e.weaponProc.agility)).toBe(true);
+        if (e.weaponProc.heal !== undefined) expect(Number.isInteger(e.weaponProc.heal)).toBe(true);
+        if (e.weaponProc.hasteMult !== undefined) {
+          expect(e.weaponProc.hasteMult).toBeGreaterThan(1);
+        }
         expect(e.description?.trim().length ?? 0).toBeGreaterThan(0);
       } else {
         expect(bonusKeys.length).toBeGreaterThan(0);

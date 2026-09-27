@@ -1132,4 +1132,81 @@ export const table: DeedLocaleTable = {
     desc: 'Forme Schmiedebrecher selbst und kehre mit dem fertigen Hammer zu Maelin zurück.',
     name: 'Eine entfesselte Quelle',
   },
+  exp_arcane_calligraphy: {
+    name: 'Eine ruhige Hand',
+    desc: 'Schließe Arkane Kalligraphie im Eastbrook-Tal ab.',
+  },
+  exp_arcane_calligraphy_gold: {
+    name: 'In Sternenlicht geschrieben',
+    desc: 'Erziele eine Goldwertung in Arkane Kalligraphie.',
+    title: 'der Runenrufer',
+  },
+  exp_forge_helper: {
+    name: 'Ein helfender Hammer',
+    desc: 'Hilf Schmiedin Mara, in Wyrmwatch einen Schild fertigzustellen.',
+  },
+  exp_last_barricade: {
+    name: 'Die letzte Barrikade',
+    desc: 'Halte den Waldpass gegen die Horde der Untoten.',
+  },
+  exp_borrowed_face: {
+    name: 'Ein geliehenes Gesicht',
+    desc: 'Entlarve und besiege den Eindringling in der Fenbridge-Wache.',
+  },
+  exp_windrider_slalom: {
+    name: 'Windreiter-Slalom',
+    desc: 'Schließe den mechanischen Gleitflug durch den Canyon des Windkamms ab.',
+  },
+  exp_duskweave_dispatches: {
+    name: 'Depeschen aus Dämmergewebe',
+    desc: 'Birg die Banditendepeschen, während du Valeries verzauberten Umhang trägst.',
+  },
+  exp_wisp_maze: {
+    name: 'Ein Licht im Labyrinth',
+    desc: 'Birg die gestohlenen Geldbeutel und entkomme dem Labyrinth des Immergartens.',
+  },
+  prog_rift_watch_trusted: {
+    name: 'Das Vertrauen der Risswacht',
+    desc: 'Erreiche den Rang Vertraut bei der Risswacht.',
+  },
+  prog_church_order_trusted: {
+    name: 'Das Vertrauen des Kirchenordens',
+    desc: 'Erreiche den Rang Vertraut beim Kirchenorden.',
+  },
+  prog_automatons_trusted: {
+    name: 'Das Vertrauen der Automaten',
+    desc: 'Erreiche den Rang Vertraut bei den Automaten.',
+  },
+  prog_rift_watch_champion: {
+    name: 'Champion der Risswacht',
+    desc: 'Erreiche den Rang Champion bei der Risswacht.',
+    title: 'Risswächter',
+  },
+  prog_church_order_champion: {
+    name: 'Champion des Kirchenordens',
+    desc: 'Erreiche den Rang Champion beim Kirchenorden.',
+    title: 'Morgenhüter',
+  },
+  prog_automatons_champion: {
+    name: 'Champion der Automaten',
+    desc: 'Erreiche den Rang Champion bei den Automaten.',
+    title: 'Schmiedemeister',
+  },
+  prog_faction_champion_all: {
+    name: 'Champion jedes Banners',
+    desc: 'Erreiche den Rang Champion bei der Risswacht, dem Kirchenorden und den Automaten.',
+  },
+  exp_clue_first_casket: {
+    name: 'Schatz gefunden',
+    desc: 'Öffne ein Schatzkästchen, das am Ende einer Hinweisschriftrollen-Suche ausgegraben wurde.',
+  },
+  exp_clue_ten_caskets: {
+    name: 'Schatzjäger',
+    desc: 'Öffne 10 Schatzkästchen, die am Ende von Hinweisschriftrollen-Suchen ausgegraben wurden.',
+    title: 'Schatzjäger',
+  },
+  exp_harbor_to_harbor: {
+    name: 'Von Hafen zu Hafen',
+    desc: 'Segle mit beiden Fähren hin und zurück: von Eastbrook nach Moonrest und von Wickharbor nach Wyrmwatch.',
+  },
 };

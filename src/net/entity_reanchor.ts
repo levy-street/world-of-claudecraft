@@ -29,7 +29,12 @@
 // margin below this threshold is 0.9 yd/s, not the 3 yd/s a Charge-only
 // comparison implies. Still under 24, so only an actual server-side teleport
 // (portal, graveyard release) can exceed the plausibility window below, but a
-// future speed buff should check its worst case against 23.1, not 21.
+// future speed buff should check its worst case against 23.1, not 21. The full
+// expression is (max buff * form passive + mount pct + Fiesta pct) * RUN_SPEED:
+// the Cat Form passive (1.15) multiplies the strongest buff, but the 2.5 buff
+// is a paladin self-buff that never coexists with a form, mounting strips
+// forms, and the best a Cat can wear is the 1.7 Fiesta augment (1.955 total,
+// 13.7 yd/s), so the form layer does not move the worst case.
 export const MAX_PLAUSIBLE_ENTITY_SPEED = 24;
 
 // Caps how far the plausibility window grows for a very long gap, so a

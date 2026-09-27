@@ -43,6 +43,7 @@ const CLASS_QUEUED = 'queued';
 const CLASS_AIMING = 'aiming';
 const CLASS_PROC = 'proc';
 const CLASS_EMPOWERED = 'empowered';
+const CLASS_NATURES_BOON = 'natures-boon';
 const CLASS_ASCENSION_SPENDER = 'ascension-spender';
 const ASCENSION_COST_ATTR = 'data-ascension-cost';
 const CLASS_FATE_CONSUME_READY = 'fate-consume-ready';
@@ -117,6 +118,7 @@ export class ActionBarPainter {
       this.writers.toggleClass(el.btn, CLASS_AIMING, s.aiming);
       this.writers.toggleClass(el.btn, CLASS_PROC, s.procGlow);
       this.writers.toggleClass(el.btn, CLASS_EMPOWERED, s.empowered);
+      this.writers.toggleClass(el.btn, CLASS_NATURES_BOON, s.naturesBoonGlow);
       this.writers.toggleClass(el.btn, CLASS_ASCENSION_SPENDER, s.ascensionSpender);
       this.writers.toggleClass(el.btn, CLASS_FATE_CONSUME_READY, s.fateConsumeReady);
       this.writers.toggleClass(el.btn, CLASS_FATE_SENTENCE_READY, s.fateSentenceReady);

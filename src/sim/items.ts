@@ -1,3 +1,5 @@
+import { gliderActionsLocked } from './glider_action_lock';
+import { shadowActionsLocked } from './shadow_action_lock';
 // Inventory items + vendor: the player-facing equip/use/discard and buy/sell/buyback
 // command bodies. Extracted from sim.ts (session W2) as a pure MOVE behind SimContext,
 // exactly as PR #943 did for market.ts / loot/loot_roll.ts, and aligned to the
@@ -25,10 +27,15 @@ import {
   equipBag as equipBagCmd,
   stackSizeOf,
 } from './bags';
+import { openTreasureCasket } from './clue_casket';
+import { useClueScroll } from './clue_scrolls';
+import { isWornTrinket, onTrinketEquipped, useWornTrinket } from './combat/trinkets';
 import { buildConsuming } from './consuming';
+import { resolveFactionVendorRowGate } from './content/faction_vendors';
 import { isRawCookingCatch } from './content/items';
 import { ITEMS, NPCS } from './data';
 import { markItemDiscovered } from './deeds';
+import { openEmissaryCache } from './emissary_cache';
 import { recalcPlayerStats } from './entity';
 import {
   canDualWield,
@@ -46,6 +53,7 @@ import {
   uniqueEquipFamily,
   weaponHand,
 } from './equipment_rules';
+import { factionDisplayName, STANDING_TIER_LABELS } from './factions';
 import { formatMoney } from './format_money';
 import { useBrinyLure } from './interactions/crab_summon';
 import { throwFirebottleAtNearestHut } from './interactions/firebottle_hut';
@@ -103,6 +111,7 @@ import {
   type VendorBuyOptions,
   vendorCountForced,
 } from './vendor_buy_stack';
+import { wispMazeActionsLocked } from './wisp_maze_action_lock';
 
 const VENDOR_BUYBACK_LIMIT = 12;
 
@@ -177,7 +186,10 @@ function canReturnEquippedItemToBags(
   return countFit(meta.inventory, bagPools(meta.bags), itemId, 1, instance, craftedRecipeId) >= 1;
 }
 
-function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | null {
+/** The hand (or slot) an unaimed equip lands in: rings empty-first, weapons
+ *  routed between hands from the committed spec. Exported so auto_equip.ts
+ *  compares a grant against the copy this resolver would actually displace. */
+export function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | null {
   const def = ITEMS[itemId];
   if (!def?.slot) return null;
   if (def.kind !== 'weapon') return resolveEquipSlot(def, meta.equipment);
@@ -686,6 +698,7 @@ export function equipItem(
     returnEquippedItemToBags(meta, displacedId, displacedInstance);
   }
   meta.equipment[slot] = itemId;
+  if (slot === 'trinket') onTrinketEquipped(p, itemId, old);
   const equippedPayload = equipmentPayloadFor(consumed);
   if (equippedPayload) {
     meta.equipmentInstance ??= {};
@@ -814,6 +827,13 @@ export function useItem(
   if (!r) return;
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
+  if (
+    meta.vehicle ||
+    wispMazeActionsLocked(meta.worldQuestLog) ||
+    shadowActionsLocked(meta.worldQuestLog) ||
+    gliderActionsLocked(meta.worldQuestLog)
+  )
+    return;
   // Every consumable use branch (food/drink, potion, and the shared
   // elixir/scroll arm) consumes one unit, so the selection is honored here
   // once instead of at each arm. Returns the consumed
@@ -833,6 +853,11 @@ export function useItem(
     return taken.instance;
   };
   if (!def) return;
+  // The worn trinket is used where it sits, not from the bags (combat/trinkets.ts).
+  if (isWornTrinket(meta, itemId)) {
+    useWornTrinket(ctx, meta, p, itemId);
+    return;
+  }
   if (ctx.countItem(itemId, meta.entityId) <= 0) {
     ctx.error(meta.entityId, "You don't have that item.");
     return;
@@ -903,7 +928,7 @@ export function useItem(
   // ONLY that the item is a permanent tool, never spent, so no consumeOneUnit
   // here; it says nothing about gate order.
   if (def.use?.type === 'placeMobileStation') {
-    placeMobileStationFromItem(ctx, def.use.stationCraftId, def.name, meta.entityId);
+    placeMobileStationFromItem(ctx, def.use.stationCraftId, def.name, meta.entityId, def.id);
     return;
   }
   // The placeable shared feast (ItemDef.feast, Farming Phase 12): using the
@@ -942,6 +967,10 @@ export function useItem(
     return;
   }
   if (p.dead) return;
+  if (def.use?.type === 'container') {
+    openEmissaryCache(ctx, meta, consumeOneUnit);
+    return;
+  }
   if (def.use?.type === 'throw') {
     throwFirebottleAtNearestHut(ctx, p, meta);
     return;
@@ -956,6 +985,17 @@ export function useItem(
   }
   if (def.use?.type === 'passingStone') {
     usePassingStone(ctx, p, meta);
+    return;
+  }
+  // Clue Scrolls: the module owns every rule (start / dig / refuse) and decides
+  // whether the scroll is spent; the arm's consumeOneUnit is threaded so the
+  // clicked copy is the one spent, like every consumable arm here.
+  if (def.use?.type === 'clueScroll') {
+    useClueScroll(ctx, meta, p, consumeOneUnit);
+    return;
+  }
+  if (def.use?.type === 'clueCasket') {
+    openTreasureCasket(ctx, meta, p, consumeOneUnit);
     return;
   }
   // Buff dishes mint their Well Fed aura at COMPLETION of the sit-restore,
@@ -1232,6 +1272,15 @@ export function buyItem(
   const gateQuest = NPCS[npc.templateId ?? '']?.vendorQuestGates?.[itemId];
   if (gateQuest && !meta.questLog.has(gateQuest) && !meta.questsDone.has(gateQuest)) {
     ctx.error(meta.entityId, 'That item is not for sale to you yet.');
+    return;
+  }
+  // Faction standing gate (FACTION_VENDOR_GATES): the row is sold only once
+  // the buyer's standing with the faction meets or exceeds the required threshold.
+  const factionGate = resolveFactionVendorRowGate(itemId, meta.factions);
+  if (factionGate.locked && factionGate.requirement) {
+    const title = STANDING_TIER_LABELS[factionGate.requirement.standingTier];
+    const factionName = factionDisplayName(factionGate.requirement.factionId);
+    ctx.error(meta.entityId, `Requires ${title} with ${factionName}.`);
     return;
   }
   // Dev free-epic vendor: on a dev-command realm this vendor sells its whole

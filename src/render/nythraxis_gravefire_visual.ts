@@ -15,18 +15,19 @@ import {
   type ActiveNythraxisGravefire,
   NYTHRAXIS_GRAVEFIRE_LENGTH,
 } from '../sim/nythraxis_gravefire';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import {
   NYTHRAXIS_GRAVEFIRE_EDGE_WIDTH,
   NYTHRAXIS_GRAVEFIRE_GLOW_FRACTION,
   NYTHRAXIS_GRAVEFIRE_GROUND_LIFT,
   NYTHRAXIS_GRAVEFIRE_HEAD_TONGUE_BOOST,
   NYTHRAXIS_GRAVEFIRE_LAYER_OPACITY,
-  NYTHRAXIS_GRAVEFIRE_PALETTE,
   type NythraxisGravefirePlan,
   type NythraxisGravefirePulse,
   nythraxisGravefirePlanInto,
   nythraxisGravefirePulseInto,
 } from './nythraxis_gravefire_core';
+import { type HazardPaletteMode, nythraxisGravefirePalette } from './nythraxis_hazard_palette_core';
 import { NythraxisSoftFire } from './nythraxis_soft_fire';
 import {
   NYTHRAXIS_SOFT_FIRE_SHAPES,
@@ -362,6 +363,7 @@ function visualFromGroup(
 export function buildNythraxisGravefireStrip(
   row: ActiveNythraxisGravefire,
   groundY: (x: number, z: number) => number,
+  paletteMode: HazardPaletteMode = 'classic',
 ): THREE.Group {
   const group = new THREE.Group();
   group.name = NYTHRAXIS_GRAVEFIRE_VISUAL_NAME;
@@ -372,7 +374,7 @@ export function buildNythraxisGravefireStrip(
   group.userData.halfWidth = row.halfWidth;
 
   const opacity = NYTHRAXIS_GRAVEFIRE_LAYER_OPACITY;
-  const palette = NYTHRAXIS_GRAVEFIRE_PALETTE;
+  const palette = nythraxisGravefirePalette(paletteMode);
   const underlayMaterial = stripMaterial(palette.underlay, opacity.underlay, THREE.NormalBlending);
   const glowMaterial = stripMaterial(palette.glow, opacity.glow, THREE.AdditiveBlending);
   const edgeMaterial = stripMaterial(palette.edge, opacity.edge, THREE.AdditiveBlending);
@@ -385,7 +387,7 @@ export function buildNythraxisGravefireStrip(
     headMaterial,
   ]);
   mesh.name = NYTHRAXIS_GRAVEFIRE_STRIP_NAME;
-  mesh.renderOrder = 14;
+  mesh.renderOrder = floorVfxRenderOrder('encounter', 13);
   mesh.userData.renderCategory = 'ui3d';
   mesh.userData.actionable = true;
   group.add(mesh);
@@ -394,7 +396,8 @@ export function buildNythraxisGravefireStrip(
     'gravefire',
     nythraxisGravefireSpriteCount(),
     NYTHRAXIS_GRAVEFIRE_FIRE_NAME,
-    15,
+    floorVfxRenderOrder('encounter', 14),
+    paletteMode,
   );
   fire.setOpacity(opacity.tongue);
   group.add(fire.mesh);
@@ -458,6 +461,7 @@ export class NythraxisGravefireVisuals {
   constructor(
     private readonly scene: THREE.Scene,
     private readonly groundY: (x: number, z: number) => number,
+    private readonly paletteMode: HazardPaletteMode = 'classic',
   ) {}
 
   sync(rows: readonly ActiveNythraxisGravefire[]): void {
@@ -472,7 +476,7 @@ export class NythraxisGravefireVisuals {
         applyRow(existing, row);
         continue;
       }
-      const group = buildNythraxisGravefireStrip(row, this.groundY);
+      const group = buildNythraxisGravefireStrip(row, this.groundY, this.paletteMode);
       this.scene.add(group);
       this.visuals.set(row.id, group.userData.visual as GravefireVisual);
     }

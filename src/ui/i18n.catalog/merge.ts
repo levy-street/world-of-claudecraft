@@ -696,7 +696,7 @@ const mergeStringsEn = {
       emptyTheirs: 'Nothing offered yet',
       money: 'Money',
       copper: 'copper',
-      hint: 'Click an offered item to remove it. Both sides must press Accept Trade.',
+      hint: 'Click an offered item to remove some or all of it. Both sides must press Accept Trade.',
       accept: 'Accept Trade',
       waiting: 'Waiting...',
       cancel: 'Cancel',
@@ -3926,14 +3926,18 @@ const mergeExtraEn = {
     [
       'bear_charge',
       'Bruin Rush',
-      'Rush an enemy, generating 9 rage and stunning it for 1 sec. For 3 sec afterwards, or until you leave combat, Cat Form is free and Pins that target (the one you Rushed), slowing it by 50% for 4 sec. 8-25 yd range. Bruin Form only.',
+      'Shift into Bruin Form if you are not already, then rush an enemy, generating 9 rage and stunning it for 1 sec. For 3 sec afterwards, or until you leave combat, Cat Form is free and Pins that target (the one you Rushed), slowing it by 50% for 4 sec. 8-25 yd range. Usable in any form.',
     ],
     [
       'demoralizing_roar',
       'Craven Roar',
       'Demoralizes nearby enemies, reducing their attack power by 20 for 20 sec. Bruin Form only.',
     ],
-    ['prowl', 'Stalk', 'Enter stealth while in Cat Form. Cannot be used in combat.'],
+    [
+      'prowl',
+      'Stalk',
+      'Shift into Cat Form if you are not already, and enter stealth. Usable in any form. Cannot be used in combat.',
+    ],
     [
       'rake',
       'Flense',

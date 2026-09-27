@@ -6,6 +6,7 @@ import {
   IGNIVAR_SKYFIRE_RANGE,
 } from '../sim/encounters/ignivar';
 import { IGNIVAR_BOSS_ID } from '../sim/types';
+import { applyFloorVfxLayer } from './floor_vfx_layer';
 import {
   buildIgnivarBrandTelegraph,
   IGNIVAR_BRAND_VISUAL_NAME,
@@ -133,6 +134,9 @@ export function buildIgnivarSkyfireTelegraph(): THREE.Group {
     );
   }
   group.userData.renderCategory = 'ui3d';
+  // The cones and rims shipped with no order: the encounter band floor, per
+  // legacy minus one (all additive, so their mutual order is colour-invariant).
+  applyFloorVfxLayer(group, 'encounter', 0);
   group.visible = false;
   return group;
 }

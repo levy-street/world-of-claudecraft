@@ -431,7 +431,7 @@ describe('the World Market: the Merchant', () => {
     );
     sim.events.length = 0;
 
-    sim.marketBuy(listing.id, buyer);
+    sim.marketBuy(listing.id, undefined, buyer);
 
     expect(errorsSince(sim)).toEqual([]);
     expect(copperOf(sim, buyer)).toBe(900);
@@ -453,6 +453,7 @@ describe('the World Market: the Merchant', () => {
     sim.marketList('wolf_fang', 1, 200, seller);
     sim.marketBuy(
       listingBy(sim, (l) => l.sellerKey === marketSellerKey(seller), 'seller listing').id,
+      undefined,
       buyer,
     );
     expect(copperOf(sim, seller)).toBe(0);
@@ -484,6 +485,7 @@ describe('the World Market: the Merchant', () => {
           (l) => l.sellerKey === marketSellerKey(seller) && l.itemId === itemId,
           `${itemId} listing`,
         ).id,
+        undefined,
         buyer,
       );
       return marketInfo(sim, seller);
@@ -526,6 +528,7 @@ describe('the World Market: the Merchant', () => {
           (l) => l.sellerKey === marketSellerKey(seller) && l.itemId === 'wolf_fang',
           'named wolf_fang listing',
         ).id,
+        undefined,
         buyer,
       );
       expect(marketInfo(sim, seller).collectionSales[0]).toMatchObject({
@@ -688,6 +691,7 @@ describe('the World Market: the Merchant', () => {
           (l) => l.sellerKey === marketSellerKey(seller) && l.itemId === 'wolf_fang',
           'named wolf_fang listing',
         ).id,
+        undefined,
         buyer,
       );
       expect(marketInfo(sim, seller).collectionSales[0].itemName).toBe('Dawn Oath');
@@ -743,7 +747,7 @@ describe('the World Market: the Merchant', () => {
     );
     sim.events.length = 0;
 
-    sim.marketBuy(listing.id, seller);
+    sim.marketBuy(listing.id, undefined, seller);
     expect(errorsSince(sim).join(' ')).toMatch(/your own listing/i);
     expect(copperOf(sim, seller)).toBe(10000); // unchanged
 
@@ -772,7 +776,7 @@ describe('the World Market: the Merchant', () => {
     expect(info.listings.find((l) => l.id === listing.id)?.mine).toBe(true);
 
     sim.events.length = 0;
-    sim.marketBuy(listing.id, seller);
+    sim.marketBuy(listing.id, undefined, seller);
     expect(errorsSince(sim).join(' ')).toMatch(/your own listing/i);
     expect(copperOf(sim, seller)).toBe(10000);
 
@@ -796,7 +800,7 @@ describe('the World Market: the Merchant', () => {
     );
 
     renameLiveCharacter(sim, seller, 'Renamed');
-    sim.marketBuy(listing.id, buyer);
+    sim.marketBuy(listing.id, undefined, buyer);
     expect(sim.marketInfoFor(seller)?.collectionCopper).toBe(190);
 
     sim.marketCollect(seller);
@@ -896,7 +900,7 @@ describe('the World Market: the Merchant', () => {
     );
     sim.events.length = 0;
 
-    sim.marketBuy(listing.id, buyer);
+    sim.marketBuy(listing.id, undefined, buyer);
     expect(errorsSince(sim).join(' ')).toMatch(/afford/i);
     expect(copperOf(sim, buyer)).toBe(50);
     expect(sim.marketListings.some((l) => l.id === listing.id)).toBe(true);
@@ -908,7 +912,7 @@ describe('the World Market: the Merchant', () => {
     standAtMerchant(sim, buyer);
     const house = listingBy(sim, (l) => l.house, 'house listing');
     playerOf(sim, buyer).copper = house.price + 1000;
-    sim.marketBuy(house.id, buyer);
+    sim.marketBuy(house.id, undefined, buyer);
     // the listing is still on the board and the buyer received the goods
     expect(sim.marketListings.some((l) => l.id === house.id)).toBe(true);
     expect(sim.countItem(house.itemId, buyer)).toBeGreaterThanOrEqual(house.count);
@@ -1058,6 +1062,7 @@ describe('the World Market: the Merchant', () => {
         (l) => l.sellerKey === marketSellerKey(seller) && l.count === 1,
         'single-count seller listing',
       ).id,
+      undefined,
       buyer,
     );
 
@@ -1254,7 +1259,7 @@ describe('the World Market: the Merchant', () => {
 
     // buying the player row hands over the player's goods, consumes the row, and
     // pays the seller (the house arm paid no one and never depleted)
-    sim.marketBuy(mine.id, buyer);
+    sim.marketBuy(mine.id, undefined, buyer);
     expect(sim.countItem('wolf_fang', buyer)).toBe(2);
     expect(copperOf(sim, buyer)).toBe(700);
     expect(sim.marketListings.some((l) => l.id === mine.id)).toBe(false);
@@ -1413,6 +1418,205 @@ describe('the World Market: the Merchant', () => {
     expect(mineWired).toBe(info.myListingCount);
     // The wire cap is still respected overall.
     expect(info.listings.length).toBeLessThanOrEqual(120);
+  });
+});
+
+// A buyer may take fewer than the whole stack of a bulk listing instead of
+// being forced to buy the entire bundle: `sim.marketBuy`'s optional `count`.
+describe('partial buys: taking fewer than the whole stack', () => {
+  it('peels units off a plain bulk listing, leaving the rest listed', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, buyer);
+    sim.addItem('roasted_boar', 5, seller);
+    playerOf(sim, buyer).copper = 1000;
+    sim.marketList('roasted_boar', 5, 100, seller); // 20 copper each
+
+    const listing = listingBy(sim, (l) => l.sellerKey === marketSellerKey(seller), 'seller stack');
+    sim.marketBuy(listing.id, 2, buyer);
+
+    // The buyer's proportional share: ceil(100 * 2 / 5) = 40.
+    expect(sim.countItem('roasted_boar', buyer)).toBe(2);
+    expect(copperOf(sim, buyer)).toBe(960);
+    // The row stays listed, shrunk by exactly what was bought.
+    expect(sim.marketListings.some((l) => l.id === listing.id)).toBe(true);
+    expect(listing.count).toBe(3);
+    expect(listing.price).toBe(60);
+
+    sim.marketCollect(seller);
+    expect(copperOf(sim, seller)).toBe(38); // floor(40 * 0.95)
+  });
+
+  it('requesting the whole count (or more) buys it whole, the pre-partial-buy shape', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, buyer);
+    sim.addItem('roasted_boar', 5, seller);
+    playerOf(sim, buyer).copper = 1000;
+    sim.marketList('roasted_boar', 5, 100, seller);
+    const listing = listingBy(sim, (l) => l.sellerKey === marketSellerKey(seller), 'seller stack');
+    const listingId = listing.id;
+
+    sim.marketBuy(listingId, 5, buyer);
+
+    expect(sim.countItem('roasted_boar', buyer)).toBe(5);
+    expect(copperOf(sim, buyer)).toBe(900);
+    expect(sim.marketListings.some((l) => l.id === listingId)).toBe(false);
+
+    // Asking for MORE than the stack holds clamps to a whole-stack buy rather
+    // than refusing or overselling.
+    sim.addItem('roasted_boar', 3, seller);
+    sim.marketList('roasted_boar', 3, 60, seller);
+    const second = listingBy(sim, (l) => l.sellerKey === marketSellerKey(seller), 'second stack');
+    const secondId = second.id;
+    sim.marketBuy(secondId, 999, buyer);
+    expect(sim.countItem('roasted_boar', buyer)).toBe(8);
+    expect(sim.marketListings.some((l) => l.id === secondId)).toBe(false);
+  });
+
+  it('never depletes house stock, and prices a partial buy of it proportionally', () => {
+    const sim = makeWorld();
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, buyer);
+    const house = listingBy(sim, (l) => l.house && l.itemId === 'roasted_boar', 'house boar stock');
+    playerOf(sim, buyer).copper = 1000;
+    const before = copperOf(sim, buyer);
+
+    sim.marketBuy(house.id, 2, buyer); // house.count is 5 for 700 total: 2/5 = ceil(280) = 280
+
+    expect(sim.countItem('roasted_boar', buyer)).toBe(2);
+    expect(before - copperOf(sim, buyer)).toBe(280);
+    // The house row is untouched: still the same bundle, forever.
+    expect(house.count).toBe(5);
+    expect(house.price).toBe(700);
+    expect(sim.marketListings.some((l) => l.id === house.id)).toBe(true);
+  });
+
+  it("refuses a partial buy of the buyer's own listing, same as a whole-stack buy", () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    standAtMerchant(sim, seller);
+    sim.addItem('roasted_boar', 5, seller);
+    playerOf(sim, seller).copper = 10000;
+    sim.marketList('roasted_boar', 5, 100, seller);
+    const listing = listingBy(sim, (l) => l.sellerKey === marketSellerKey(seller), 'seller stack');
+
+    sim.events.length = 0;
+    sim.marketBuy(listing.id, 1, seller);
+
+    expect(errorsSince(sim).join(' ')).toMatch(/your own listing/i);
+    expect(listing.count).toBe(5); // unchanged
+  });
+
+  it('refuses a partial buy the buyer cannot afford, leaving the stack untouched', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, buyer);
+    sim.addItem('roasted_boar', 5, seller);
+    playerOf(sim, buyer).copper = 10; // less than even a 1-unit share (20 copper)
+    sim.marketList('roasted_boar', 5, 100, seller);
+    const listing = listingBy(sim, (l) => l.sellerKey === marketSellerKey(seller), 'seller stack');
+
+    sim.marketBuy(listing.id, 1, buyer);
+
+    expect(errorsSince(sim).join(' ')).toMatch(/afford/i);
+    expect(copperOf(sim, buyer)).toBe(10);
+    expect(listing.count).toBe(5);
+    expect(sim.countItem('roasted_boar', buyer)).toBe(0);
+  });
+
+  it('rounds the buyer share up, never pricing the remainder below 1 copper', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, buyer);
+    sim.addItem('roasted_boar', 5, seller);
+    playerOf(sim, buyer).copper = 1000;
+    sim.marketList('roasted_boar', 5, 7, seller); // 7 copper over 5 units
+    const listing = listingBy(sim, (l) => l.sellerKey === marketSellerKey(seller), 'seller stack');
+
+    sim.marketBuy(listing.id, 4, buyer); // naive ceil(7*4/5) = 6, remainder would be 1
+
+    expect(copperOf(sim, buyer)).toBe(994); // charged 6
+    expect(listing.count).toBe(1);
+    expect(listing.price).toBe(1); // never dropped to 0
+  });
+
+  it("splits a material listing's composition between the buyer and the shrunk row", () => {
+    // wolf_fang is a material item id, so its listings carry a materialSources
+    // composition (market.ts marketList's material path); a partial buy must
+    // split it (material_sources.ts takeMaterialCount) rather than granting or
+    // leaving behind a composition whose total no longer matches its count.
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, buyer);
+    sim.addItem('wolf_fang', 5, seller);
+    playerOf(sim, buyer).copper = 10000;
+    sim.marketList('wolf_fang', 5, 500, seller);
+    const listing = listingBy(
+      sim,
+      (l) => l.sellerKey === marketSellerKey(seller),
+      'material stack',
+    );
+    expect(listing.materialSources).toBeDefined();
+    const totalBefore = listing.materialSources!.reduce((n, s) => n + s.count, 0);
+    expect(totalBefore).toBe(5);
+
+    sim.marketBuy(listing.id, 2, buyer);
+
+    expect(sim.countItem('wolf_fang', buyer)).toBe(2);
+    expect(listing.count).toBe(3);
+    // The remaining row's composition still sums to exactly its own count: no
+    // unit was invented or lost across the split.
+    const totalAfter = listing.materialSources!.reduce((n, s) => n + s.count, 0);
+    expect(totalAfter).toBe(3);
+  });
+
+  it('itemizes a partial sale on the seller ledger with the partial count and price', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, buyer);
+    sim.addItem('roasted_boar', 5, seller);
+    playerOf(sim, buyer).copper = 1000;
+    sim.marketList('roasted_boar', 5, 100, seller);
+    const listing = listingBy(sim, (l) => l.sellerKey === marketSellerKey(seller), 'seller stack');
+
+    sim.marketBuy(listing.id, 2, buyer);
+
+    const info = marketInfo(sim, seller);
+    expect(info.collectionSales).toEqual([
+      { itemId: 'roasted_boar', count: 2, price: 40, proceeds: 38, buyerName: 'Buyer' },
+    ]);
+  });
+
+  it('bumps the browse revision so a partial buy is not silently invisible to viewers', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, buyer);
+    sim.addItem('roasted_boar', 5, seller);
+    playerOf(sim, buyer).copper = 1000;
+    sim.marketList('roasted_boar', 5, 100, seller);
+    const listing = listingBy(sim, (l) => l.sellerKey === marketSellerKey(seller), 'seller stack');
+
+    const revBefore = sim.marketBrowseRevFor(buyer);
+    sim.marketBuy(listing.id, 2, buyer);
+    const revAfter = sim.marketBrowseRevFor(buyer);
+
+    expect(revAfter).not.toBeNull();
+    expect(revAfter).not.toBe(revBefore);
   });
 });
 
@@ -1798,6 +2002,7 @@ describe('marketCollectPendingFor - the collect-indicator bit', () => {
 
     sim.marketBuy(
       listingBy(sim, (l) => l.sellerKey === marketSellerKey(seller), 'seller listing').id,
+      undefined,
       buyer,
     );
     expect(sim.marketCollectPendingFor(seller)).toBe(true);

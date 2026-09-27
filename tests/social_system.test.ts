@@ -17,6 +17,11 @@ import {
 } from '../server/social';
 import type { ChatSenderFlair } from '../src/sim/account_flair';
 import {
+  defaultGuildRankLadder,
+  type GuildRankDef,
+  resolveGuildRankLadder,
+} from '../src/sim/guild_ranks';
+import {
   GUILD_ROSTER_BASE_MEMBERS,
   GUILD_ROSTER_MAX_MEMBERS,
   GUILD_ROSTER_MAX_PAGES,
@@ -41,6 +46,33 @@ class FakeDb implements SocialDb {
   guildXpTotals = new Map<number, number>();
   // guild roster expansion (docs/prd/guild-roster-expansion.md): pages bought
   rosterPages = new Map<number, number>();
+  // guild custom ranks (docs/prd/guild-custom-ranks.md): the stored ladder
+  // (absent = NULL = the default ladder, like the guilds.ranks column)
+  ladders = new Map<number, GuildRankDef[]>();
+
+  async guildRanks(guildId: number): Promise<GuildRankDef[]> {
+    return resolveGuildRankLadder(this.ladders.get(guildId) ?? null);
+  }
+  async setGuildRankLadder(
+    guildId: number,
+    leaderCharId: number,
+    ladder: readonly GuildRankDef[],
+  ): Promise<boolean> {
+    // Mirrors the real compare-and-set: the caller must STILL lead this guild,
+    // and holders of a dropped rank fall back to the joining rank in the same
+    // write.
+    const leader = this.members.get(leaderCharId);
+    if (!leader || leader.guildId !== guildId || leader.rank !== 'leader') return false;
+    this.ladders.set(
+      guildId,
+      ladder.map((r) => ({ ...r, perms: [...r.perms] })),
+    );
+    const kept = new Set(ladder.map((r) => r.id));
+    for (const m of this.members.values()) {
+      if (m.guildId === guildId && !kept.has(m.rank)) m.rank = 'member';
+    }
+    return true;
+  }
 
   async guildByName(name: string): Promise<{ id: number; name: string } | null> {
     for (const [id, gname] of this.guilds) {
@@ -120,7 +152,7 @@ class FakeDb implements SocialDb {
   blocks = new Map<number, Set<number>>();
   ignores = new Map<number, Set<number>>();
   private guilds = new Map<number, string>();
-  private members = new Map<number, { guildId: number; rank: GuildRank }>();
+  private members = new Map<number, { guildId: number; rank: string }>();
   private nextGuildId = 1;
 
   addChar(id: number, name: string, cls = 'warrior', level = 10, realm = 'Claudemoon'): void {
@@ -210,9 +242,13 @@ class FakeDb implements SocialDb {
     this.guilds.delete(id);
     for (const [cid, m] of [...this.members]) if (m.guildId === id) this.members.delete(cid);
   }
-  async guildMembership(
-    c: number,
-  ): Promise<{ guildId: number; guildName: string; rank: GuildRank; rosterPages: number } | null> {
+  async guildMembership(c: number): Promise<{
+    guildId: number;
+    guildName: string;
+    rank: string;
+    rosterPages: number;
+    ranks: GuildRankDef[];
+  } | null> {
     const m = this.members.get(c);
     return m
       ? {
@@ -220,8 +256,14 @@ class FakeDb implements SocialDb {
           guildName: this.guilds.get(m.guildId)!,
           rank: m.rank,
           rosterPages: this.rosterPages.get(m.guildId) ?? 0,
+          ranks: await this.guildRanks(m.guildId),
         }
       : null;
+  }
+  /** Test helper: seat a character at an arbitrary rank id. */
+  setRankRaw(c: number, rank: string): void {
+    const m = this.members.get(c);
+    if (m) m.rank = rank;
   }
   async buyGuildRosterPage(
     guildId: number,
@@ -241,7 +283,7 @@ class FakeDb implements SocialDb {
   async addGuildMemberAtomic(
     guildId: number,
     c: number,
-    rank: GuildRank,
+    rank: string,
     requirePledge = false,
   ): Promise<'ok' | 'full' | 'already_member' | 'no_guild' | 'no_pledge'> {
     if (!this.guilds.has(guildId)) return 'no_guild';
@@ -263,7 +305,7 @@ class FakeDb implements SocialDb {
   async removeGuildMember(c: number): Promise<void> {
     this.members.delete(c);
   }
-  async setGuildRank(c: number, guildId: number, rank: GuildRank): Promise<boolean> {
+  async setGuildRank(c: number, guildId: number, rank: string): Promise<boolean> {
     // Mirrors the real predicate: character AND guild must both match, and the
     // caller learns whether a row actually moved (false = refused, stamp nothing).
     const m = this.members.get(c);
@@ -275,6 +317,7 @@ class FakeDb implements SocialDb {
     guildId: number,
     fromCharId: number,
     toCharId: number,
+    stepDownRank: string,
   ): Promise<'ok' | 'not_leader' | 'not_member' | 'no_guild'> {
     if (!this.guilds.has(guildId)) return 'no_guild';
     const fromM = this.members.get(fromCharId);
@@ -282,7 +325,7 @@ class FakeDb implements SocialDb {
     const toM = this.members.get(toCharId);
     if (!toM || toM.guildId !== guildId) return 'not_member';
     toM.rank = 'leader';
-    fromM.rank = 'officer';
+    fromM.rank = stepDownRank;
     return 'ok';
   }
   private lastLogins = new Map<number, string>();
@@ -297,7 +340,7 @@ class FakeDb implements SocialDb {
   }
   async guildMembers(guildId: number): Promise<
     (CharInfo & {
-      rank: GuildRank;
+      rank: string;
       lastLogin: string | null;
       activeTitle: string | null;
       joinedAt: number | null;
@@ -1274,7 +1317,7 @@ describe('guilds', () => {
     await h.svc.guildCreate(h.actor(1), 'Knights');
     await h.svc.guildInvite(h.actor(1), 'Bet');
     await h.svc.guildAccept(h.actor(2));
-    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    await h.svc.guildPromote(h.actor(1), 'Bet');
     expect((await h.svc.snapshot(2)).guild?.rank).toBe('officer');
     await h.svc.guildInvite(h.actor(2), 'Gimel');
     expect(h.tx.eventsFor(3).some((e) => e.type === 'guildInvite')).toBe(true);
@@ -1286,7 +1329,7 @@ describe('guilds', () => {
     await h.svc.guildAccept(h.actor(2));
     h.tx.clear();
     // Force the member lookup that broadcastGuild/pushGuild depend on to resolve
-    // on a later macrotask. If guildSetRank fails to await the broadcast, the
+    // on a later macrotask. If the rank step fails to await the broadcast, the
     // promote notice will not have been delivered by the time the call resolves.
     const realMembers = h.db.guildMembers.bind(h.db);
     h.db.guildMembers = (guildId: number) =>
@@ -1295,7 +1338,7 @@ describe('guilds', () => {
           void realMembers(guildId).then(resolve);
         }, 0);
       });
-    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    await h.svc.guildPromote(h.actor(1), 'Bet');
     expect(h.tx.textFor(2).join()).toMatch(/Bet is now Officer/);
   });
 
@@ -1419,7 +1462,7 @@ describe('guilds', () => {
     const plain = h.tx.eventsFor(2).find((e) => e.type === 'chat')!;
     expect('fromTitle' in plain).toBe(false);
     // officer chat stamps the same way, and omits the key untitled
-    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    await h.svc.guildPromote(h.actor(1), 'Bet');
     h.tx.clear();
     expect(await h.svc.officerChat(titled, 'ranks')).toBe(true);
     const officer = h.tx.eventsFor(2).find((e) => e.type === 'chat')!;
@@ -1460,7 +1503,7 @@ describe('guilds', () => {
     expect(await h.svc.guildChat(h.actor(1), 'no live meta')).toBe(true);
     const noMeta = h.tx.eventsFor(2).find((e) => e.type === 'chat')!;
     expect('classId' in noMeta).toBe(false);
-    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    await h.svc.guildPromote(h.actor(1), 'Bet');
     h.tx.clear();
     expect(await h.svc.officerChat(withClass, 'ranks')).toBe(true);
     const officer = h.tx.eventsFor(2).find((e) => e.type === 'chat')!;
@@ -1489,7 +1532,7 @@ describe('guilds', () => {
     await h.svc.guildCreate(h.actor(1), 'Knights');
     await h.svc.guildInvite(h.actor(1), 'Bet');
     await h.svc.guildAccept(h.actor(2));
-    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    await h.svc.guildPromote(h.actor(1), 'Bet');
     // Bet ignores the Guild Master Aleph
     await h.svc.blockAdd(h.actor(2), 'Aleph');
     h.tx.clear();
@@ -1526,7 +1569,7 @@ describe('guilds', () => {
     await h.svc.guildCreate(h.actor(1), 'Knights');
     await h.svc.guildInvite(h.actor(1), 'Bet');
     await h.svc.guildAccept(h.actor(2));
-    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    await h.svc.guildPromote(h.actor(1), 'Bet');
     await h.svc.ignoreAdd(h.actor(2), 'Aleph');
     h.tx.clear();
 
@@ -1579,7 +1622,7 @@ describe('guilds', () => {
     await h.svc.guildCreate(h.actor(1), 'Knights');
     await h.svc.guildInvite(h.actor(1), 'Bet');
     await h.svc.guildAccept(h.actor(2));
-    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    await h.svc.guildPromote(h.actor(1), 'Bet');
     h.tx.flair.set(1, { ...SPEAKER_FLAIR });
     h.tx.clear();
 
@@ -1594,7 +1637,7 @@ describe('guilds', () => {
     await h.svc.guildCreate(h.actor(1), 'Knights');
     await h.svc.guildInvite(h.actor(1), 'Bet');
     await h.svc.guildAccept(h.actor(2));
-    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    await h.svc.guildPromote(h.actor(1), 'Bet');
     // No h.tx.flair entry for Aleph: an ordinary player.
     h.tx.clear();
 
@@ -1659,7 +1702,7 @@ describe('guilds', () => {
     expect(await h.svc.officerChat(h.actor(2), 'secret')).toBe(false);
     expect(h.tx.errorsFor(2).join()).toMatch(/officers and the Guild Master/i);
     // promote Bet, then officer chat reaches both officers/leader
-    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    await h.svc.guildPromote(h.actor(1), 'Bet');
     h.tx.clear();
     expect(await h.svc.officerChat(h.actor(1), 'officers only')).toBe(true);
     expect(
@@ -1752,21 +1795,21 @@ describe('guild membership stamps (onGuildMembershipChanged)', () => {
     await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
     await joinBet();
     h.tx.membershipStamps = [];
-    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    await h.svc.guildPromote(h.actor(1), 'Bet');
     expect(h.tx.membershipStamps).toEqual([{ id: 2, membership: { ...G, rank: 'officer' } }]);
     h.tx.membershipStamps = [];
-    await h.svc.guildSetRank(h.actor(1), 'Bet', 'member');
+    await h.svc.guildDemote(h.actor(1), 'Bet');
     expect(h.tx.membershipStamps).toEqual([{ id: 2, membership: { ...G, rank: 'member' } }]);
     h.tx.membershipStamps = [];
-    await h.svc.guildSetRank(h.actor(2), 'Aleph', 'member'); // not the leader: refused
-    await h.svc.guildSetRank(h.actor(1), 'Gimel', 'officer'); // not in the guild: refused
-    await h.svc.guildSetRank(h.actor(1), 'Bet', 'member'); // already member: refused
+    await h.svc.guildDemote(h.actor(2), 'Aleph'); // not the leader: refused
+    await h.svc.guildPromote(h.actor(1), 'Gimel'); // not in the guild: refused
+    await h.svc.guildDemote(h.actor(1), 'Bet'); // already member: refused
     expect(h.tx.membershipStamps).toEqual([]);
   });
 
   it('a promote whose UPDATE matched no row (target left mid-flight) stamps NOTHING', async () => {
     // The privilege-escalation race the predicated setGuildRank closes: the
-    // leader promotes Bet, but Bet's guildLeave commits between guildSetRank's
+    // leader promotes Bet, but Bet's guildLeave commits between the rank step's
     // membership read and its UPDATE. The write matches zero rows, so the
     // service must refuse and never stamp the officer rank the DB refused
     // (the guild bank's officer gate honors the stamp, and a removed
@@ -1779,7 +1822,7 @@ describe('guild membership stamps (onGuildMembershipChanged)', () => {
       return realSetGuildRank(c, guildId, rank);
     };
     h.tx.membershipStamps = [];
-    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    await h.svc.guildPromote(h.actor(1), 'Bet');
     // Only the leave's own null stamp: no officer stamp may follow it.
     expect(h.tx.membershipStamps).toEqual([{ id: 2, membership: null }]);
     expect(await h.db.guildMembership(2)).toBeNull();
@@ -1798,7 +1841,7 @@ describe('guild membership stamps (onGuildMembershipChanged)', () => {
       return realSetGuildRank(c, guildId, rank);
     };
     h.tx.membershipStamps = [];
-    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    await h.svc.guildPromote(h.actor(1), 'Bet');
     // The leave's null stamp and the create's leader stamp for guild B, and
     // nothing else: no officer-in-A stamp, and B's row keeps its leader rank.
     expect(h.tx.membershipStamps).toEqual([
@@ -1984,7 +2027,7 @@ describe('guild calendar events', () => {
     await h.svc.guildAccept(h.actor(2));
     await h.svc.guildInvite(h.actor(1), 'Member');
     await h.svc.guildAccept(h.actor(3));
-    await h.svc.guildSetRank(h.actor(1), 'Officer', 'officer');
+    await h.svc.guildPromote(h.actor(1), 'Officer');
     h.tx.clear();
     return h;
   }
@@ -2105,7 +2148,7 @@ describe('guild billboard (motd)', () => {
     await h.svc.guildAccept(h.actor(2));
     await h.svc.guildInvite(h.actor(1), 'Member');
     await h.svc.guildAccept(h.actor(3));
-    await h.svc.guildSetRank(h.actor(1), 'Officer', 'officer');
+    await h.svc.guildPromote(h.actor(1), 'Officer');
     h.tx.clear();
     return h;
   }
@@ -3186,7 +3229,7 @@ describe('guild roster expansion', () => {
     h.db.buyGuildRosterPage = async (guildId, expectedPages, leaderCharId) => {
       // The leadership hand-off lands after the service's membership read
       // but before its compare-and-set: the seat of consent is gone.
-      await h.db.transferGuildLeader(guildId, 1, 2);
+      await h.db.transferGuildLeader(guildId, 1, 2, 'officer');
       return realBuy(guildId, expectedPages, leaderCharId);
     };
     h.tx.purse.set(1, 50 * GOLD);
@@ -3218,5 +3261,289 @@ describe('guild roster expansion', () => {
     await h.svc.guildInvite(h.actor(1), 'Aspirant');
     expect(h.tx.errorsFor(1)).toEqual([]);
     expect(h.tx.eventsFor(4).some((e) => e.type === 'guildInvite')).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Guild custom ranks (docs/prd/guild-custom-ranks.md): the Guild Master's rank
+// ladder drives EVERY rank gate (invite, remove, promote/demote, the bank
+// stamp, officer chat, billboard, calendar, pledge notifications), the save is
+// Guild-Master-only and validated whole, and every member's live bank stamp
+// follows a ladder edit immediately.
+// ---------------------------------------------------------------------------
+
+describe('guild custom ranks', () => {
+  const G = { guildId: 1, guildName: 'Iron Vanguard' };
+  const ALL = [
+    'invite',
+    'remove',
+    'promote',
+    'bank',
+    'officerChat',
+    'motd',
+    'events',
+  ] as GuildRankDef['perms'];
+  // Leader Lead (1), officer Offi (2), members Vet (3) and Rook (4), all
+  // online; Out (5) is online and unguilded.
+  async function seated(cfg: Parameters<typeof setup>[0] = {}) {
+    const h = setup(cfg);
+    for (const [id, name] of [
+      [1, 'Lead'],
+      [2, 'Offi'],
+      [3, 'Vet'],
+      [4, 'Rook'],
+      [5, 'Out'],
+    ] as const) {
+      h.add(id, name);
+      h.tx.setOnline(id);
+    }
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    for (const name of ['Offi', 'Vet', 'Rook']) {
+      await h.svc.guildInvite(h.actor(1), name);
+      const id = name === 'Offi' ? 2 : name === 'Vet' ? 3 : 4;
+      await h.svc.guildAccept(h.actor(id));
+    }
+    await h.svc.guildPromote(h.actor(1), 'Offi');
+    h.tx.clear();
+    h.tx.membershipStamps = [];
+    return h;
+  }
+  // A ladder with a bank-holding Veteran rank between the officer and the
+  // joining rank, and an untitled custom rank below it.
+  const ladder = (officerPerms: GuildRankDef['perms'] = ['invite', 'remove', 'promote']) => [
+    { id: 'leader', name: '', perms: ALL },
+    { id: 'officer', name: '', perms: officerPerms },
+    { id: 'r1', name: 'Veteran', perms: ['bank', 'officerChat'] as GuildRankDef['perms'] },
+    { id: 'r2', name: '', perms: [] as GuildRankDef['perms'] },
+    { id: 'member', name: '', perms: [] as GuildRankDef['perms'] },
+  ];
+
+  it('the snapshot carries the default ladder until the Guild Master edits it', async () => {
+    const h = await seated();
+    const snap = await h.svc.snapshot(3);
+    expect(snap.guild?.ranks).toEqual(defaultGuildRankLadder());
+    expect(snap.guild?.members.map((m) => [m.name, m.rank])).toEqual([
+      ['Lead', 'leader'],
+      ['Offi', 'officer'],
+      ['Rook', 'member'],
+      ['Vet', 'member'],
+    ]);
+  });
+
+  it('only the Guild Master may save ranks; an officer is refused and nothing changes', async () => {
+    const h = await seated();
+    await h.svc.guildSetRanks(h.actor(2), ladder());
+    expect(h.tx.errorsFor(2)).toEqual(['Only the Guild Master may change ranks.']);
+    expect(await h.db.guildRanks(1)).toEqual(defaultGuildRankLadder());
+    expect(h.tx.membershipStamps).toEqual([]);
+  });
+
+  it('a malformed ladder is dropped silently (the client validates first)', async () => {
+    const h = await seated();
+    await h.svc.guildSetRanks(h.actor(1), [{ id: 'member', name: '', perms: [] }]);
+    await h.svc.guildSetRanks(h.actor(1), 'not a ladder');
+    expect(h.tx.eventsFor(1)).toEqual([]);
+    expect(await h.db.guildRanks(1)).toEqual(defaultGuildRankLadder());
+  });
+
+  it('a title that trips the hard-word screen is refused before any write', async () => {
+    const h = await seated({ findHardHit: (t) => (t.includes('Vile') ? 'vile' : null) });
+    const bad = ladder();
+    bad[2].name = 'Vile Rank';
+    await h.svc.guildSetRanks(h.actor(1), bad);
+    expect(h.tx.errorsFor(1)).toEqual(['That rank title is not allowed.']);
+    expect(await h.db.guildRanks(1)).toEqual(defaultGuildRankLadder());
+  });
+
+  it('a saved ladder is announced, lands in every snapshot, and restamps every member', async () => {
+    const h = await seated();
+    await h.svc.guildSetRanks(h.actor(1), ladder());
+    for (const id of [1, 2, 3, 4]) {
+      expect(h.tx.textFor(id)).toContain('The guild ranks have been updated.');
+    }
+    expect(h.tx.textFor(5)).toEqual([]);
+    expect((await h.svc.snapshot(4)).guild?.ranks.map((r) => r.id)).toEqual([
+      'leader',
+      'officer',
+      'r1',
+      'r2',
+      'member',
+    ]);
+    // The officer lost the default ladder's bank permission: its live stamp
+    // drops to the read-only tier in the same call (never a stale officer).
+    expect(h.tx.membershipStamps).toContainEqual({ id: 2, membership: { ...G, rank: 'member' } });
+    expect(h.tx.membershipStamps).toContainEqual({ id: 1, membership: { ...G, rank: 'leader' } });
+  });
+
+  it('a Guild Master who lost leadership mid-save is refused by the compare-and-set', async () => {
+    const h = await seated();
+    const real = h.db.setGuildRankLadder.bind(h.db);
+    h.db.setGuildRankLadder = async (guildId, leaderId, next) => {
+      await h.db.transferGuildLeader(guildId, 1, 2, 'officer');
+      return real(guildId, leaderId, next);
+    };
+    await h.svc.guildSetRanks(h.actor(1), ladder());
+    expect(h.tx.errorsFor(1)).toEqual(['Only the Guild Master may change ranks.']);
+    expect(await h.db.guildRanks(1)).toEqual(defaultGuildRankLadder());
+    expect(h.tx.membershipStamps).toEqual([]);
+  });
+
+  it('promoting onto a bank-holding custom rank stamps the officer tier and names the title', async () => {
+    const h = await seated();
+    await h.svc.guildSetRanks(h.actor(1), ladder());
+    h.tx.clear();
+    h.tx.membershipStamps = [];
+    await h.svc.guildPromote(h.actor(1), 'Vet'); // member -> r2 (untitled)
+    expect(h.tx.textFor(4)).toContain('Vet is now [Rank 3].');
+    await h.svc.guildPromote(h.actor(1), 'Vet'); // r2 -> r1 (Veteran, holds the bank)
+    expect(h.tx.textFor(4)).toContain('Vet is now [Veteran].');
+    expect(h.tx.membershipStamps).toEqual([
+      { id: 3, membership: { ...G, rank: 'member' } },
+      { id: 3, membership: { ...G, rank: 'officer' } },
+    ]);
+    expect((await h.db.guildMembership(3))?.rank).toBe('r1');
+  });
+
+  it('an officer granted Promote lifts members up to one rank below its own, never beside it', async () => {
+    const h = await seated();
+    await h.svc.guildSetRanks(h.actor(1), ladder());
+    h.tx.clear();
+    await h.svc.guildPromote(h.actor(2), 'Vet'); // member -> r2
+    await h.svc.guildPromote(h.actor(2), 'Vet'); // r2 -> r1
+    expect((await h.db.guildMembership(3))?.rank).toBe('r1');
+    await h.svc.guildPromote(h.actor(2), 'Vet'); // r1 -> officer would be its own rank
+    expect(h.tx.errorsFor(2)).toEqual(['You can only do that to members below your own rank.']);
+    expect((await h.db.guildMembership(3))?.rank).toBe('r1');
+    h.tx.clear();
+    await h.svc.guildDemote(h.actor(2), 'Lead'); // the Guild Master is out of reach
+    expect(h.tx.errorsFor(2)).toEqual(['You can only do that to members below your own rank.']);
+  });
+
+  it('the default ladder keeps the pre-ladder rank-change refusals word for word', async () => {
+    const h = await seated();
+    await h.svc.guildPromote(h.actor(2), 'Rook'); // officers cannot change ranks
+    expect(h.tx.errorsFor(2)).toEqual(['Only the Guild Master may change ranks.']);
+    await h.svc.guildPromote(h.actor(1), 'Offi'); // only a transfer goes higher
+    await h.svc.guildDemote(h.actor(1), 'Rook'); // already at the bottom
+    expect(h.tx.errorsFor(1)).toEqual(['Offi is already Officer.', 'Rook is already Member.']);
+  });
+
+  it('deleting a held rank drops its holders to the joining rank and restamps them', async () => {
+    const h = await seated();
+    await h.svc.guildSetRanks(h.actor(1), ladder());
+    await h.svc.guildPromote(h.actor(1), 'Vet');
+    await h.svc.guildPromote(h.actor(1), 'Vet'); // Vet -> r1 (bank)
+    h.tx.membershipStamps = [];
+    const without = ladder().filter((r) => r.id !== 'r1');
+    await h.svc.guildSetRanks(h.actor(1), without);
+    expect((await h.db.guildMembership(3))?.rank).toBe('member');
+    expect(h.tx.membershipStamps).toContainEqual({ id: 3, membership: { ...G, rank: 'member' } });
+  });
+
+  it('invite follows the ladder: a granted custom rank may, a revoked officer may not', async () => {
+    const h = await seated();
+    const next = ladder([]);
+    next[3].perms = ['invite']; // the untitled r2 may recruit
+    await h.svc.guildSetRanks(h.actor(1), next);
+    await h.svc.guildPromote(h.actor(1), 'Vet'); // Vet -> r2
+    h.tx.clear();
+    await h.svc.guildInvite(h.actor(2), 'Out');
+    expect(h.tx.errorsFor(2)).toEqual(['Only officers and the Guild Master may invite.']);
+    expect(await h.svc.guildInvite(h.actor(3), 'Out')).toBe('sent');
+  });
+
+  it('remove follows the ladder and reaches strictly lower ranks only', async () => {
+    const h = await seated();
+    const next = ladder(['remove']);
+    await h.svc.guildSetRanks(h.actor(1), next);
+    await h.svc.guildPromote(h.actor(1), 'Vet');
+    await h.svc.guildPromote(h.actor(1), 'Vet'); // Vet -> r1 (no remove)
+    h.tx.clear();
+    await h.svc.guildKick(h.actor(3), 'Rook');
+    expect(h.tx.errorsFor(3)).toEqual(['Only officers and the Guild Master may remove members.']);
+    await h.svc.guildKick(h.actor(2), 'Vet'); // officer (remove) over r1
+    expect(await h.db.guildMembership(3)).toBeNull();
+  });
+
+  it('officer chat follows the ladder for speakers AND listeners', async () => {
+    const h = await seated();
+    await h.svc.guildSetRanks(h.actor(1), ladder(['invite']));
+    await h.svc.guildPromote(h.actor(1), 'Vet');
+    await h.svc.guildPromote(h.actor(1), 'Vet'); // Vet -> r1 (officerChat)
+    h.tx.clear();
+    expect(await h.svc.officerChat(h.actor(2), 'hello')).toBe(false);
+    expect(h.tx.errorsFor(2)).toEqual(['Only officers and the Guild Master can use officer chat.']);
+    expect(await h.svc.officerChat(h.actor(3), 'veterans only')).toBe(true);
+    const heard = (id: number) =>
+      h.tx.eventsFor(id).some((e) => e.type === 'chat' && e.text === 'veterans only');
+    expect([1, 2, 3, 4].map(heard)).toEqual([true, false, true, false]);
+  });
+
+  it('the billboard and calendar follow their own permissions', async () => {
+    const h = await seated();
+    const next = ladder(['motd']);
+    next[4].perms = ['events']; // every joining member may book events
+    await h.svc.guildSetRanks(h.actor(1), next);
+    h.tx.clear();
+    await h.svc.guildSetMotd(h.actor(2), 'Raid at eight');
+    await h.svc.guildSetMotd(h.actor(4), 'nope');
+    await h.svc.guildEventCreate(h.actor(4), {
+      day: new Date(h.now()).toISOString().slice(0, 10),
+      hour: 20,
+      title: 'Raid',
+      note: '',
+    });
+    await h.svc.guildEventCreate(h.actor(2), {
+      day: new Date(h.now()).toISOString().slice(0, 10),
+      hour: 21,
+      title: 'Officers',
+      note: '',
+    });
+    const codes = (id: number, type: string) =>
+      h.tx
+        .eventsFor(id)
+        .filter((e) => e.type === type)
+        .map((e: any) => e.code);
+    expect(codes(2, 'motdResult')).toEqual(['set']);
+    expect(codes(4, 'motdResult')).toEqual(['notOfficer']);
+    expect(codes(4, 'calendarResult')).toEqual(['created']);
+    expect(codes(2, 'calendarResult')).toEqual(['notOfficer']);
+  });
+
+  it('pledge notifications reach the ranks that may invite', async () => {
+    const h = await seated();
+    const next = ladder([]);
+    next[2].perms = ['invite']; // Veteran recruits; the officer no longer does
+    await h.svc.guildSetRanks(h.actor(1), next);
+    await h.svc.guildPromote(h.actor(1), 'Vet');
+    await h.svc.guildPromote(h.actor(1), 'Vet'); // Vet -> r1
+    h.tx.clear();
+    await h.svc.guildPledge(h.actor(5), 'Iron Vanguard');
+    const told = (id: number) => h.tx.textFor(id).includes('Out has pledged to your guild.');
+    expect([1, 2, 3, 4].map(told)).toEqual([true, false, true, false]);
+    // The officer dashboard follows the same permission.
+    expect((await h.svc.snapshot(3)).guild?.pledges.map((p) => p.name)).toEqual(['Out']);
+    expect((await h.svc.snapshot(2)).guild?.pledges).toEqual([]);
+  });
+
+  it('a transfer steps the old leader down to the most senior remaining rank', async () => {
+    const h = await seated();
+    const next = ladder().filter((r) => r.id !== 'officer');
+    await h.svc.guildSetRanks(h.actor(1), next); // Offi falls back to member
+    h.tx.membershipStamps = [];
+    await h.svc.guildTransferLeader(h.actor(1), 'Rook');
+    expect((await h.db.guildMembership(1))?.rank).toBe('r1');
+    // r1 holds the bank, so the stepped-down leader keeps vault access.
+    expect(h.tx.membershipStamps).toContainEqual({ id: 1, membership: { ...G, rank: 'officer' } });
+  });
+
+  it('an id the ladder does not know reads as the joining rank everywhere', async () => {
+    const h = await seated();
+    h.db.setRankRaw(2, 'r42'); // a rank deleted under a racing write
+    const snap = await h.svc.snapshot(2);
+    expect(snap.guild?.rank).toBe('member');
+    expect(snap.guild?.members.find((m) => m.name === 'Offi')?.rank).toBe('member');
+    await h.svc.guildInvite(h.actor(2), 'Out');
+    expect(h.tx.errorsFor(2)).toEqual(['Only officers and the Guild Master may invite.']);
   });
 });

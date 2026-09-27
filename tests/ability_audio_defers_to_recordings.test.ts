@@ -156,6 +156,26 @@ describe('moments a recording already sounds are skipped, not doubled', () => {
       ),
     ).toBe(0);
   });
+
+  it('stays silent on a Warrior contact release now carried by its own recording', () => {
+    // mortal_strike is authored in fury_audio_core.ts's MELEE_AUDIO
+    // (WARRIOR_CONTACT_AUDIO): abilityAudio's isMeleeAudioId gate returns
+    // before ever allocating a gain node for it, because the retained
+    // presentation-clock path (warrior contact ownership) is the one that
+    // supplies opts.sample and actually plays the recording; a generic
+    // sequencer 'release' call like this one, with no sample, must stay
+    // silent rather than double it. Same moment/school/archetype shape as
+    // the backstab case above, which stays procedural because backstab has
+    // no MELEE_AUDIO entry: the ability id is what now decides this.
+    expect(
+      nodesFor(() =>
+        sfx.abilityAudio('release', 'physical', 1, 0, 0, 0, {
+          archetype: 'strike',
+          abilityId: 'mortal_strike',
+        }),
+      ),
+    ).toBe(0);
+  });
 });
 
 describe('moments no recording covers keep their procedural voice', () => {
@@ -164,7 +184,7 @@ describe('moments no recording covers keep their procedural voice', () => {
       nodesFor(() =>
         sfx.abilityAudio('release', 'physical', 1, 0, 0, 0, {
           archetype: 'strike',
-          abilityId: 'mortal_strike',
+          abilityId: 'backstab',
         }),
       ),
     ).toBeGreaterThan(0);

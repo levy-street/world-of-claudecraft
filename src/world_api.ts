@@ -46,12 +46,15 @@
 //                                            with canEdit marking officer-plus EDITS,
 //                                            proximity-gated info + gold/item/buy-slots commands)
 //   mounts.ts           IWorldMounts         rideable ground mounts: pick + mount/dismount
+//   vehicles.ts         IWorldVehicles       personal vehicle session + enter/action/leave
 //   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
 //   deeds.ts            IWorldDeeds          earned deeds, lifetime stats, renown, active title,
 //                                            rarity + the account-Renown leaderboard reads
 //   farming.ts          IWorldFarming        the static garden-bed geography + the caller's own
 //                                            plot rows (reads only in the patches-and-plots phase)
 //   reliquary.ts        IWorldReliquary      sparse firstFind / marks / recent + pure completion
+//   transport.ts        IWorldTransport      the scheduled ferry's phase, ship pose, passenger bit
+//   world_pvp.ts        IWorldWorldPvp       the /pvp flag: self readout + raise/lower command
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
 // pinned THERE and re-stale here, so this prose stays count-free):
@@ -91,12 +94,18 @@ import type { IWorldPet } from './world_api/pet';
 import type { IWorldProfessions } from './world_api/professions';
 import type { IWorldProgressionXp } from './world_api/progression_xp';
 import type { IWorldQuests } from './world_api/quests';
+
+export type { WorldQuestLeaderboardEntry, WorldQuestLeaderboardPage } from './world_api/quests';
+
 import type { IWorldReliquary } from './world_api/reliquary';
 import type { IWorldSocialGraph } from './world_api/social_graph';
 import type { IWorldTalents } from './world_api/talents';
 import type { IWorldTargeting } from './world_api/targeting';
 import type { IWorldTelemetry } from './world_api/telemetry';
 import type { IWorldTrade } from './world_api/trade';
+import type { IWorldTransport } from './world_api/transport';
+import type { IWorldVehicles } from './world_api/vehicles';
+import type { IWorldWorldPvp } from './world_api/world_pvp';
 
 // --- pass-through sim re-exports: downstream imports these FROM world_api ---
 // Account flair is defined in the host-agnostic sim core (src/sim/account_flair.ts)
@@ -116,6 +125,7 @@ export type {
   DeedStats,
   OverheadEmoteId,
 } from './sim/types';
+export type { VehicleSession } from './world_api/vehicles';
 
 // Online world and required-snapshot compatibility is encoded in the first
 // WebSocket frame's discriminator. Changing the authoritative town layout or
@@ -176,6 +186,31 @@ export type {
 // 25 = Ignivar's compiled Rain of Cinders cone length grew from 24 to 30 yards.
 // Epoch 24 clients would display a dangerously shorter warning than the
 // authoritative server damage.
+// 26 = World Quests add server-authoritative automatic rewards plus the
+// rotating owner snapshot. Older clients cannot present their availability,
+// progress, or expiry, so they must be rejected before gameplay admission.
+// 27 = World Quests add an authoritative rotating-tile beam puzzle. Older
+// clients cannot send its tile-turn action or present its persisted board.
+// 28 = World Quests add physical minigame activators and authoritative match-three
+// swap/reset commands plus the persisted board, move and refill snapshot fields.
+// 29 = World Quests add an authoritative freight-delivery objective and a public
+// carried-cargo aura. Older clients cannot render or predict its movement state.
+// 30 = World Quests add personal rotating shipwreck-salvage props. Older clients
+// cannot gate, render, or select their stable object ids without leaking normal quest credit.
+// 31 = World Quests add a moving, interactable public caravan escort. Older clients
+// cannot identify its objective or render and start the authoritative escort entity.
+// 32 = World Quests add owner-only, session-bound movement tracing readouts.
+// Older clients cannot present the memorized outline or authoritative drawing trail.
+// 33 = Nearby calligraphy blue trails and final ratings are a public snapshot surface.
+// 34 = Ley Beam Alignment adds an authoritative attempt deadline and retry command.
+// Older clients cannot render the remaining time or request a validated retry.
+// 36 = Daily procedural minigames carry a generation day in personal progress.
+// Older clients would display authored boards instead of the authoritative daily board.
+// 37 = Ley cache relocates and Ley/Glider are both offered every day.
+// 38 = Daily Ley boards use 32 distinct routes with varied perimeter endpoints.
+// Older clients would rotate a different board for the same generation day.
+// 39 = Glider camera pitch intent and authoritative wind-tunnel boosts.
+// 40 = Glider recovery lift and the server-authoritative emergency boost command.
 // (12 is deliberately unassigned: 13 through 25 were numbered 11 through 23 on
 // the pre-merge raid branch, which forked before the Bank Storage and Materials
 // Vault bumps above; that branch's 11 through 20 were in turn 9 through 18
@@ -210,7 +245,27 @@ export type {
 // there. A bump moves this constant, scripts/lib/world_auth.mjs and its
 // .d.mts, tests/bank_wire_epoch.test.ts, and tests/world_auth_scripts.test.ts
 // together.
-export const ONLINE_WORLD_LAYOUT_VERSION = 29 as const;
+// 42 = The World Quests branch merged onto epoch 29 (the release/v0.43.0
+// sync). The branch had numbered its own compiled bumps 26 to 41 pre-merge off
+// the epoch-25 base (automatic rewards, the beam, match-three and freight
+// objectives, salvage props, the caravan escort, calligraphy tracing, the
+// cannon vehicles and their commands, daily procedural boards, the glider
+// boosts and the wisp maze session), so the merged wire sits above both: an
+// epoch-29 client cannot decode the world-quest snapshot surfaces or send their
+// commands, and an epoch-41 client lacks every release-side family above.
+// 43 = The approved Farshore shipwreck replaces three eight-piece layouts with
+// twelve authored pickups, new models and a moved work area. Older clients must
+// not interpret the new stable IDs through the previous visual/layout tables.
+// 44 = The hull is permanent scenery, not pickup 2147100100. Older clients
+// would omit it with a new server; older servers would spawn a duplicate pickup.
+// 45 = The fourth release/v0.44.0 base merge into integration/world-quests-v0440
+// brings the release's epoch 30 (the scheduled Eastbrook ferry: its deck exists
+// only at the berth where it lies docked, a second berth and boarding stage at
+// Wickharbor, the ferry passenger bit in the snapshot) onto the branch's 44.
+// Above both parents: an epoch-44 client would draw the ship moored and predict
+// a deck the server has sailed away; an epoch-30 client lacks the world-quest
+// wire. Both must fail closed.
+export const ONLINE_WORLD_LAYOUT_VERSION = 45 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -386,6 +441,7 @@ export type {
   GuildPledgeInfo,
   GuildPledgeSettings,
   GuildRank,
+  GuildRankDef,
   MyPledgeInfo,
   PresenceStatus,
   SocialInfo,
@@ -393,6 +449,15 @@ export type {
   WhoRosterInfo,
 } from './world_api/social_graph';
 export type { TradeInfo, TradeOffer } from './world_api/trade';
+export type { TransportFerryView } from './world_api/transport';
+export type {
+  HillInfo,
+  HillPhaseInfo,
+  HillSide,
+  HillStandingInfo,
+  WorldPvpInfo,
+  WorldPvpZone,
+} from './world_api/world_pvp';
 
 // The aggregate seam. Empty body: every member lives on exactly one facet above,
 // so `IWorld` is byte-identical to the pre-split flat interface and both the
@@ -430,7 +495,10 @@ export interface IWorld
     IWorldDeeds,
     IWorldReliquary,
     IWorldMounts,
-    IWorldFarming {}
+    IWorldFarming,
+    IWorldVehicles,
+    IWorldTransport,
+    IWorldWorldPvp {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -572,6 +640,9 @@ export const COMMAND_NAMES = [
   'market_sweep',
   'market_cancel',
   'market_collect',
+  'market_order_place',
+  'market_order_fill',
+  'market_order_cancel',
   'dev_level',
   'dev_teleport',
   'dev_give',
@@ -840,6 +911,32 @@ export const COMMAND_NAMES = [
   // The Social window's Who tab: ask for the realm roster (answered by the
   // `who` frame, mirrored as IWorldSocialGraph.whoInfo).
   'who',
+  // World-quest beam puzzle: rotate one bounded tile on the authoritative
+  // board. Appended because wire tokens are never reordered.
+  'world_quest_puzzle_rotate',
+  'world_quest_match3_swap',
+  'world_quest_match3_reset',
+  'vehicle_enter',
+  'vehicle_action',
+  'vehicle_leave',
+  'world_quest_accuse',
+  'world_quest_shadow',
+  'world_quest_puzzle_reset',
+  'world_quest_glider_boost',
+  'world_quest_start',
+  'world_quest_reroll',
+  'world_quest_weekly_choose',
+  'world_quest_weekly_commend',
+  // Clue Scrolls: drop the active treasure hunt (IWorldQuests.abandonClueHunt).
+  'clue_hunt_abandon',
+  'weekly_reward_claim',
+  'weekly_reward_open',
+  // World PvP: raise or lower the /pvp flag (IWorldWorldPvp.setWorldPvpFlag;
+  // the bare /pvp chat line toggles through the sim's own chat router).
+  'pvp_flag',
+  // Guild custom ranks (docs/prd/guild-custom-ranks.md): the Guild Master
+  // replaces the guild's rank ladder (titles, order, permissions).
+  'guild_set_ranks',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -928,9 +1025,13 @@ export type WorldFacet =
   | 'IWorldDeeds'
   | 'IWorldReliquary'
   | 'IWorldMounts'
-  | 'IWorldFarming';
+  | 'IWorldFarming'
+  | 'IWorldVehicles'
+  | 'IWorldWorldPvp';
 
 export const COMMAND_FACETS = {
+  weekly_reward_claim: 'IWorldBank',
+  weekly_reward_open: 'IWorldBank',
   // IWorldCombat: ability casts, auto-attack, spirit release.
   cast: 'IWorldCombat',
   castSlot: 'IWorldCombat',
@@ -941,6 +1042,16 @@ export const COMMAND_FACETS = {
   stopattack: 'IWorldCombat',
   release: 'IWorldCombat',
   unstuck: 'IWorldCombat',
+  world_quest_puzzle_rotate: 'IWorldQuests',
+  world_quest_match3_swap: 'IWorldQuests',
+  world_quest_match3_reset: 'IWorldQuests',
+  world_quest_accuse: 'IWorldQuests',
+  world_quest_shadow: 'IWorldQuests',
+  world_quest_puzzle_reset: 'IWorldQuests',
+  world_quest_glider_boost: 'IWorldQuests',
+  world_quest_start: 'IWorldQuests',
+  world_quest_reroll: 'IWorldQuests',
+  clue_hunt_abandon: 'IWorldQuests',
   // Ghost resurrection: run the spirit to its corpse, or accept the Spirit Healer's
   // resurrection (with Resurrection Sickness). Wire strings are snake_case by design.
   resurrect_corpse: 'IWorldCombat',
@@ -1083,6 +1194,7 @@ export const COMMAND_FACETS = {
   guild_set_motd: 'IWorldSocialGraph',
   guild_buy_roster_page: 'IWorldSocialGraph',
   who: 'IWorldSocialGraph',
+  guild_set_ranks: 'IWorldSocialGraph',
   // IWorldMarket: World Market browse/list/buy/cancel/collect (snake_case wire
   // strings, by design). marketInfo is a snapshot read (no send, untagged).
   market_search: 'IWorldMarket',
@@ -1095,6 +1207,9 @@ export const COMMAND_FACETS = {
   market_sweep: 'IWorldMarket',
   market_cancel: 'IWorldMarket',
   market_collect: 'IWorldMarket',
+  market_order_place: 'IWorldMarket',
+  market_order_fill: 'IWorldMarket',
+  market_order_cancel: 'IWorldMarket',
   // IWorldMail: Ravenpost letters (snake_case wire strings, by design). mailInfo /
   // mailUnread are snapshot reads (no send, untagged).
   mail_send: 'IWorldMail',
@@ -1195,4 +1310,10 @@ export const COMMAND_FACETS = {
   convert_husks: 'IWorldFarming',
   place_feast: 'IWorldFarming',
   consume_feast: 'IWorldFarming',
+  vehicle_enter: 'IWorldVehicles',
+  vehicle_action: 'IWorldVehicles',
+  vehicle_leave: 'IWorldVehicles',
+  // IWorldWorldPvp: the /pvp flag raise/lower. worldPvpInfo (the `wpvp`
+  // self-delta mirror) carries no wire command and stays untagged.
+  pvp_flag: 'IWorldWorldPvp',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

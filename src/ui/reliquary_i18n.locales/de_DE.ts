@@ -142,6 +142,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Kriegsführungsarsenal',
     desc: 'Kriegsführungsschmuck und -waffen, gekauft mit hart erkämpfter Ehre.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Vorhutgalerie',
+    desc: 'Die Spezialisierungssets und Waffen der Kriegsführung, Saison 2, mit Ehre erworben.',
+  },
   horizons_vault_of_ages: {
     name: 'Gewölbe der Zeitalter',
     desc: 'Ausgemusterte Schätze einer vergangenen Zeit. Diese Reliquien lassen sich nicht mehr erringen; das Gewölbe ehrt die Veteranen, die sie bewahren.',
@@ -156,7 +160,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: 'Heroisch: Schmelztiegel der Letzten Quelle',
-    desc: 'Nur heroisch erhältliche Waffen von Ignivar, Herold der Letzten Flamme.',
+    desc: 'Nur heroisch erhältliche Waffen und die Schmuckstücke des Schlachtzugs von Ignivar, Herold der Letzten Flamme.',
   },
   conquerors_varkhul: {
     name: 'Der Innere Schmelztiegel',
@@ -164,7 +168,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: 'Heroisch: Der Innere Schmelztiegel',
-    desc: 'Nur heroisch erhältliche Schilde und Waffen von Varkhul, Schmiedevater der Letzten Flamme.',
+    desc: 'Nur heroisch erhältliche Schilde und Waffen sowie die Schmuckstücke des Schlachtzugs von Varkhul, Schmiedevater der Letzten Flamme.',
   },
   conquerors_set_bramblehide: {
     name: "Roots' Dornenhaut",

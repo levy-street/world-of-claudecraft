@@ -3,7 +3,9 @@
 // resolution logic lives in ../professions/enchanting.ts behind the
 // SimContext seam.
 //
-// Scope: ordinary always-known stat tiers and a learned Crucible weapon proc.
+// Scope: ordinary always-known stat tiers, a learned Crucible weapon proc
+// (Zeal), and the four learned faction formulas at the end of the table
+// (world-quest reputation, docs/design/factions.md).
 // The free-floor rule in ../professions/enchanting.ts applies to base/Greater:
 //   1. Base enchants (arcane_dust, some arcane_essence): the per-slot basics.
 //      They cover the weapon and offhand slots plus every armor slot (helmet
@@ -88,9 +90,43 @@
 // every other slot names its EquipSlot directly, exactly as items do.
 import type { ItemSlot } from '../types';
 
+/** Every axis an enchant may bake into a copy's rolled stats. The six
+ *  classic axes are the static tier ladder (content/enchants.ts header); the
+ *  four rating and power axes belong to the LEARNED faction formulas only
+ *  (world-quest reputation, docs/design/factions.md) and never join a static
+ *  tier: recalcPlayerStats (../entity.ts) reads all ten from the instance.
+ *  Healing power is spelled `healingPower` on an INSTANCE (the key the
+ *  permanent loot quality core bakes, loot_quality/core.ts), against the item
+ *  definition's `healPower`; the tooltips label both. */
+export type EnchantStatAxis =
+  | 'str'
+  | 'agi'
+  | 'sta'
+  | 'int'
+  | 'spi'
+  | 'armor'
+  | 'spellPower'
+  | 'healingPower'
+  | 'critRating'
+  | 'hasteRating';
+
 export interface EnchantReagent {
   itemId: string;
   count: number;
+}
+
+/** A learned weapon enchant's melee proc. Exactly one of `strength` /
+ *  `agility` names the primary stat the shared buff grants; `hasteMult` is an
+ *  optional swing-speed multiplier (1.02 = 2% faster) applied as a sibling
+ *  aura keyed `<id>_haste`, refreshed together with the stat buff; `heal` is a
+ *  self-heal on every trigger, 0 or absent for none. */
+export interface EnchantWeaponProc {
+  ppm: number;
+  duration: number;
+  strength?: number;
+  agility?: number;
+  hasteMult?: number;
+  heal?: number;
 }
 
 export interface EnchantDef {
@@ -98,7 +134,12 @@ export interface EnchantDef {
   name: string;
   itemSlot: ItemSlot;
   reagents: readonly EnchantReagent[];
-  statBonus: Partial<Record<'str' | 'agi' | 'sta' | 'int' | 'spi' | 'armor', number>>;
+  statBonus: Partial<Record<EnchantStatAxis, number>>;
+  /** Restrict a weapon enchant to one weapon hand. `'twohand'` admits only a
+   *  `hand: 'twohand'` weapon (a faction formula whose magnitude is sized for
+   *  the single hand a two-hander occupies, so it must never land on one half
+   *  of a dual-wield pair). Absent means any weapon of the enchant's slot. */
+  weaponHand?: 'twohand';
   /** Flat `enchanting` craft skill the APPLIER must have to use this enchant
    *  (../professions/wheel.ts CraftSkills). ABSENT on every enchant shipped
    *  before the Lucent tier, and absent means the historical free floor
@@ -119,7 +160,7 @@ export interface EnchantDef {
   /** Melee proc rolled per hand (chance uses the striking weapon's unmodified
    *  speed) that feeds ONE shared buff: a second trigger from either hand
    *  refreshes it, never stacks a second copy (combat/equip_procs.ts). */
-  weaponProc?: { ppm: number; strength: number; duration: number; heal: number };
+  weaponProc?: EnchantWeaponProc;
 }
 
 export const ENCHANTS: Record<string, EnchantDef> = {
@@ -644,5 +685,83 @@ export const ENCHANTS: Record<string, EnchantDef> = {
     statBonus: { sta: 13 },
     skillReq: 125,
     requiresPerfected: true,
+  },
+
+  // --- Faction formulas (world-quest reputation, docs/design/factions.md). ---
+  // The second LEARNED class after Zeal: each formula is a bind-on-pickup
+  // recipe the faction quartermaster sells at Proven standing
+  // (content/faction_vendors.ts), learned at Enchanting 100 like Zeal, and the
+  // enchant itself is tradeable labour the way a classic faction formula was.
+  // None of the four is a static tier row: they sit outside the 15-to-25 band
+  // ladder above and are sized against the LEVEL-20 raid budgets instead
+  // (tests/faction_enchants.test.ts pins every figure and its derivation):
+  //   Riftwalker's Grace: the Agility sibling of Zeal at the classic
+  //     Mongoose-to-Crusader ratio (120 Agility to 100 Strength = 1.2), so
+  //     50 Strength becomes 60 Agility, plus the classic 2% haste; no heal.
+  //   Dawnfire Etching / Dawn's Benediction: flat Spell Power and Healing
+  //     Power at about one fifth of the raid caster (86) and healer (172)
+  //     lane totals (item_budget.ts casterLaneSpTotal / healerLaneHpTotal),
+  //     the same last-fifth share the static tiers hold per axis.
+  //   Piston Drive: a two-hander-only Strength line at twice the Lucent
+  //     weapon rung (the rung is halved for dual-wielders, see the Lucent
+  //     block; a two-hander has no second hand) plus one jewelry-sized
+  //     rating (25, the raid jewel's unit).
+  enchant_weapon_riftwalkers_grace: {
+    id: 'enchant_weapon_riftwalkers_grace',
+    name: "Riftwalker's Grace",
+    itemSlot: 'mainhand',
+    skillReq: 100,
+    acquisition: 'drop',
+    reagents: [
+      { itemId: 'arcane_shard', count: 2 },
+      { itemId: 'arcane_essence', count: 4 },
+    ],
+    statBonus: {},
+    weaponProc: { ppm: 1, agility: 60, hasteMult: 1.02, duration: 15 },
+    description:
+      "Your landed melee attacks can grant 60 Agility and 2% faster melee attacks for 15 sec. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
+  },
+  enchant_weapon_dawnfire_etching: {
+    id: 'enchant_weapon_dawnfire_etching',
+    name: 'Weapon Etching: Dawnfire',
+    itemSlot: 'mainhand',
+    skillReq: 100,
+    acquisition: 'drop',
+    reagents: [
+      { itemId: 'arcane_shard', count: 2 },
+      { itemId: 'arcane_essence', count: 4 },
+    ],
+    statBonus: { spellPower: 18 },
+    description:
+      'Permanently etches a weapon with 18 Spell Power. Spell Power also counts toward Healing Power. A flat bonus; it does not scale.',
+  },
+  enchant_weapon_dawns_benediction: {
+    id: 'enchant_weapon_dawns_benediction',
+    name: "Weapon Etching: Dawn's Benediction",
+    itemSlot: 'mainhand',
+    skillReq: 100,
+    acquisition: 'drop',
+    reagents: [
+      { itemId: 'arcane_shard', count: 2 },
+      { itemId: 'arcane_essence', count: 4 },
+    ],
+    statBonus: { healingPower: 34 },
+    description:
+      'Permanently etches a weapon with 34 Healing Power. Healing Power raises heals only, never spell damage. A flat bonus; it does not scale.',
+  },
+  enchant_weapon_piston_drive: {
+    id: 'enchant_weapon_piston_drive',
+    name: 'Weapon Etching: Piston Drive',
+    itemSlot: 'mainhand',
+    weaponHand: 'twohand',
+    skillReq: 100,
+    acquisition: 'drop',
+    reagents: [
+      { itemId: 'arcane_shard', count: 2 },
+      { itemId: 'arcane_essence', count: 4 },
+    ],
+    statBonus: { str: 12, critRating: 25 },
+    description:
+      'Permanently etches a two-handed weapon with 12 Strength and 25 Critical Strike Rating. Cannot be applied to a one-handed weapon. A flat bonus; it does not scale.',
   },
 };

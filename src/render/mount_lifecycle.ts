@@ -17,6 +17,7 @@ import * as THREE from 'three';
 import type { CharacterVisual } from './characters';
 import { createMountVisual } from './characters';
 import { mountAssetsReady, preloadMountAssets } from './characters/assets';
+import { GoblinRocketSledFx } from './goblin_rocket_sled_fx';
 import { attachMountGlows, disposeMountGlows, type MountGlows } from './mount_glow';
 import { attachMountLamps, disposeMountLamps, type MountLamps } from './mount_lamps';
 import type { MountVisualSpec } from './mount_visuals';
@@ -41,6 +42,7 @@ export interface MountViewState extends RickshawMountViewState {
    *  Unlike the lamps these are pure draw cost, so they never touch the
    *  renderer's light budget and need no reconcile. */
   mountGlows: MountGlows | null;
+  goblinRocketSledFx: GoblinRocketSledFx | null;
   mountCompilePending: boolean;
   /** Resolved seat bone, cached across frames (cleared on a mount swap). */
   mountSeatBone: THREE.Object3D | null;
@@ -62,9 +64,15 @@ export interface MountViewHost {
   recordBuild(ms: number, startedAt: number): void;
 }
 
+function releaseSledFx(v: MountViewState): void {
+  v.goblinRocketSledFx?.dispose();
+  v.goblinRocketSledFx = null;
+}
+
 function teardown(v: MountViewState, host: MountViewHost): void {
   v.mountSeatBone = null;
   v.mountCompilePending = false;
+  releaseSledFx(v);
   // The puller is parented under the cart's root and the wheel cache points
   // into it, so both go before the visual they hang off (no-op for every
   // other mount).
@@ -139,6 +147,11 @@ export function syncMountVisual(
   v.mountLamps = attachMountLamps(v.mountVisual.root, spec);
   if (v.mountLamps) host.reconcileViewLights(v);
   v.mountGlows = attachMountGlows(v.mountVisual.root, spec);
+  // Built before the gate lists the rig's pieces, so the shared plume program
+  // links behind it at the first sighting instead of in the first moving frame.
+  if (spec.visualKey === 'mount_goblin_rocket_sled') {
+    v.goblinRocketSledFx = GoblinRocketSledFx.create(v.mountVisual.root);
+  }
   gateMountSwapOnCompile(v, v.mountVisual.root, host.gateSwapFlagOnCompile);
 }
 
@@ -233,6 +246,7 @@ export function placeRider(
  *  has already pulled this view's lights out of the renderer-wide pool, so
  *  this does not reconcile. */
 export function disposeMountView(v: MountViewState): void {
+  releaseSledFx(v);
   releaseRickshawMountState(v, true);
   if (v.mountGlows) {
     disposeMountGlows(v.mountGlows);

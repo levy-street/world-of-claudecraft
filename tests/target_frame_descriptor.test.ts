@@ -8,7 +8,11 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import type { Entity } from '../src/sim/types';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
-import { fillTargetFrameDescriptor } from '../src/ui/target_frame_descriptor';
+import {
+  fillTargetFrameDescriptor,
+  fillTargetOfTargetDescriptor,
+  targetPortraitKey,
+} from '../src/ui/target_frame_descriptor';
 import { type UnitFrameDescriptor, unitFrameView } from '../src/ui/unit_frame';
 
 function entity(over: Partial<Entity> & { id: number }): Entity {
@@ -66,6 +70,44 @@ const NO_TITLE = { pre: '', post: '' };
 beforeAll(async () => {
   await ensureLocaleLoaded('en');
   setLanguage('en');
+});
+
+describe('targetPortraitKey', () => {
+  it.each(['mana', 'rage', 'energy'] as const)(
+    'paints the compact target resource: %s',
+    (resourceType) => {
+      const d = fillTargetOfTargetDescriptor(
+        blank(),
+        entity({ id: 9, resourceType, resource: 25, maxResource: 100 }),
+        3,
+      );
+      expect(d.resourceKind).toBe(resourceType);
+      expect(d.resFrac).toBe(0.25);
+      expect(d.resText).toBe('25 / 100');
+      expect(d.levelText).toBeNull();
+      expect(d.absorb).toBeNull();
+      fillTargetOfTargetDescriptor(d, entity({ id: 9, resourceType, dead: true }), 3);
+      expect(d.resourceKind).toBe('none');
+      expect(d.resFrac).toBe(0);
+      expect(d.resText).toBe('');
+      fillTargetOfTargetDescriptor(d, entity({ id: 10 }), 3);
+      expect(d.resourceKind).toBe('none');
+      expect(d.hpText).toBe('300 / 600');
+    },
+  );
+  it('is the bare id for a mob, helm bit or not', () => {
+    expect(targetPortraitKey(entity({ id: 7 }))).toBe('7');
+    expect(targetPortraitKey(entity({ id: 7, helmHidden: true }))).toBe('7');
+  });
+
+  it('folds a player helm toggle into the gate so the composed face follows it', () => {
+    const shown = entity({ id: 7, kind: 'player', helmHidden: false });
+    const hidden = entity({ id: 7, kind: 'player', helmHidden: true });
+    expect(targetPortraitKey(shown)).toBe('7');
+    expect(targetPortraitKey(hidden)).toBe('7:helm');
+    const d = fillTargetFrameDescriptor(blank(), hidden, NO_TITLE, null);
+    expect(d.portraitKey).toBe('7:helm');
+  });
 });
 
 describe('fillTargetFrameDescriptor', () => {

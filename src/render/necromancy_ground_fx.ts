@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 
 const MAX_ZONES = 8;
 const SEGMENTS = 56;
@@ -110,7 +111,7 @@ export class NecromancyGroundFx {
     const seal = new THREE.Mesh(sealGeometry, sealMaterial);
     seal.name = 'necromancy-death-echo-seal';
     seal.rotation.x = -Math.PI / 2;
-    seal.renderOrder = 7;
+    seal.renderOrder = floorVfxRenderOrder('player', 1);
 
     const runeVertices: number[] = [];
     for (let segment = 0; segment < 18; segment++) {
@@ -158,7 +159,7 @@ export class NecromancyGroundFx {
     });
     const runes = new THREE.LineSegments(runeGeometry, runeMaterial);
     runes.name = 'necromancy-death-echo-runes';
-    runes.renderOrder = 8;
+    runes.renderOrder = floorVfxRenderOrder('player', 2);
 
     const soulGeometry = new THREE.ConeGeometry(0.3, 1.9, 7, 1, true);
     soulGeometry.translate(0, 1, 0);
@@ -172,7 +173,7 @@ export class NecromancyGroundFx {
     });
     const soul = new THREE.Mesh(soulGeometry, soulMaterial);
     soul.name = 'necromancy-death-echo-soul';
-    soul.renderOrder = 8;
+    soul.renderOrder = floorVfxRenderOrder('player', 2);
 
     const wispPositions = new Float32Array(ECHO_WISP_COUNT * 3);
     for (let i = 0; i < ECHO_WISP_COUNT; i++) {
@@ -198,7 +199,7 @@ export class NecromancyGroundFx {
     const wisps = new THREE.Points(wispGeometry, wispMaterial);
     wisps.name = 'necromancy-death-echo-wisps';
     wisps.frustumCulled = false;
-    wisps.renderOrder = 8;
+    wisps.renderOrder = floorVfxRenderOrder('player', 2);
 
     group.add(seal, runes, soul, wisps);
     const materials = [sealMaterial, runeMaterial, soulMaterial, wispMaterial];
@@ -278,7 +279,7 @@ export class NecromancyGroundFx {
     });
     const ring = new THREE.Mesh(geometry, material);
     ring.name = 'necromancy-desecration-ring';
-    ring.renderOrder = 7;
+    ring.renderOrder = floorVfxRenderOrder('player', 1);
     return ring;
   }
 
@@ -307,7 +308,7 @@ export class NecromancyGroundFx {
     });
     const glow = new THREE.Mesh(geometry, material);
     glow.name = 'necromancy-desecration-glow';
-    glow.renderOrder = 6;
+    glow.renderOrder = floorVfxRenderOrder('player', 0);
     return glow;
   }
 
@@ -351,7 +352,7 @@ export class NecromancyGroundFx {
     const runes = new THREE.LineSegments(geometry, material);
     runes.name = 'necromancy-desecration-runes';
     runes.position.set(opts.x, 0, opts.z);
-    runes.renderOrder = 8;
+    runes.renderOrder = floorVfxRenderOrder('player', 2);
     return runes;
   }
 
@@ -387,7 +388,7 @@ export class NecromancyGroundFx {
     const points = new THREE.Points(geometry, material);
     points.name = 'necromancy-desecration-wisps';
     points.frustumCulled = false;
-    points.renderOrder = 8;
+    points.renderOrder = floorVfxRenderOrder('player', 2);
     return { points, positions, origins };
   }
 

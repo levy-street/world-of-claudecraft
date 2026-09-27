@@ -52,6 +52,10 @@ export interface MetricsSample {
   frameTimeMs: number;
   fps1Low: number | null;
   fps01Low: number | null;
+  /** The interval a chosen Frame Rate Limit aims at (ms); null or 0 with none.
+   *  The frame rows are coloured against it: a held 30 under a limit of 30 is
+   *  the goal, not a warning. */
+  chosenFrameMs?: number | null;
   /** Recent frame times (ms), oldest→newest, for the sparkline. */
   frameSamples: readonly number[];
   // network (online client only)
@@ -241,6 +245,15 @@ interface MetricDef {
   severity(s: MetricsSample): PerfSeverity;
 }
 
+const NOMINAL_FRAME_MS = 1000 / 60;
+
+/** How much slower than 60 the session is AIMING to run: 1 with no limit (the
+ *  thresholds below are then exactly the historical ones), 2 under a limit of
+ *  30 on a 60 Hz display. */
+function aimScale(s: MetricsSample): number {
+  return Math.max(1, (s.chosenFrameMs ?? 0) / NOMINAL_FRAME_MS);
+}
+
 export const METRIC_REGISTRY: readonly MetricDef[] = [
   // --- Frame & timing ---
   {
@@ -249,7 +262,7 @@ export const METRIC_REGISTRY: readonly MetricDef[] = [
     group: 'frame',
     defaultOn: true,
     read: (s) => ({ kind: 'fps', v: s.fps }),
-    severity: (s) => higherBetter(s.fps, 55, 30),
+    severity: (s) => higherBetter(s.fps * aimScale(s), 55, 30),
   },
   {
     key: 'frameTime',
@@ -257,7 +270,7 @@ export const METRIC_REGISTRY: readonly MetricDef[] = [
     group: 'frame',
     defaultOn: true,
     read: (s) => ({ kind: 'ms', v: s.frameTimeMs, digits: 1 }),
-    severity: (s) => lowerBetter(s.frameTimeMs, 18, 33),
+    severity: (s) => lowerBetter(s.frameTimeMs / aimScale(s), 18, 33),
   },
   {
     key: 'fps1Low',
@@ -265,7 +278,7 @@ export const METRIC_REGISTRY: readonly MetricDef[] = [
     group: 'frame',
     defaultOn: false,
     read: (s) => (s.fps1Low == null ? null : { kind: 'fps', v: s.fps1Low }),
-    severity: (s) => (s.fps1Low == null ? NONE : higherBetter(s.fps1Low, 50, 25)),
+    severity: (s) => (s.fps1Low == null ? NONE : higherBetter(s.fps1Low * aimScale(s), 50, 25)),
   },
   {
     key: 'fps01Low',
@@ -273,7 +286,7 @@ export const METRIC_REGISTRY: readonly MetricDef[] = [
     group: 'frame',
     defaultOn: false,
     read: (s) => (s.fps01Low == null ? null : { kind: 'fps', v: s.fps01Low }),
-    severity: (s) => (s.fps01Low == null ? NONE : higherBetter(s.fps01Low, 45, 20)),
+    severity: (s) => (s.fps01Low == null ? NONE : higherBetter(s.fps01Low * aimScale(s), 45, 20)),
   },
   {
     key: 'hitches',

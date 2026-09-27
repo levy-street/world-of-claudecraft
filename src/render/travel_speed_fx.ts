@@ -59,6 +59,41 @@ export function targetIntensity(i: TravelSpeedFxInputs): number {
   return targetIntensityFromValues(i.inTravelForm, i.speed, i.reducedMotion);
 }
 
+/** A remembered horizontal position; the renderer keeps one across frames. */
+export interface LocalPosSample {
+  x: number;
+  z: number;
+}
+
+/** Ground speed (yd/s) from the last remembered position to this frame's, or
+ *  0 on the first frame or a non-positive dt. */
+export function groundSpeedFromFrame(
+  last: LocalPosSample | null,
+  x: number,
+  z: number,
+  dt: number,
+): number {
+  if (!last || dt <= 0) return 0;
+  return Math.hypot(x - last.x, z - last.z) / dt;
+}
+
+/** Remembers this frame's position, reusing the sample object once it exists
+ *  (the per-frame path allocates nothing after the first frame). */
+export function trackLocalPos(last: LocalPosSample | null, x: number, z: number): LocalPosSample {
+  if (last) {
+    last.x = x;
+    last.z = z;
+    return last;
+  }
+  return { x, z };
+}
+
+/** True when any aura is the travel-form shapeshift. */
+export function hasTravelFormAura(auras: readonly { kind: string }[]): boolean {
+  for (const aura of auras) if (aura.kind === 'form_travel') return true;
+  return false;
+}
+
 /** Scalar hot-path form used by the renderer without a transient input object. */
 export function targetIntensityFromValues(
   inTravelForm: boolean,

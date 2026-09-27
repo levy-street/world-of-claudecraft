@@ -192,8 +192,8 @@ describe('threat from damage', () => {
     const wolf = nearestMob(sim, 'forest_wolf');
     beefUp(wolf);
     hit(sim, sim.player, wolf, 100, 'holy');
-    // Oathward threatPct 0.4 scaled by the level-16 mastery ramp (16/20).
-    const protectionMasteryThreat = 1.32;
+    // Oathward threatPct 1.0 scaled by the level-16 mastery ramp (16/20).
+    const protectionMasteryThreat = 1.8;
     expect(wolf.threat.get(sim.playerId)).toBeCloseTo(
       100 * protectionMasteryThreat * RIGHTEOUS_FURY_THREAT_MULT + 1,
       5,
@@ -265,9 +265,9 @@ describe('threat from damage', () => {
     sim.dealDamage(sim.player, wolf, 100, false, 'physical', 'Shieldcrack', 'hit', true, slamOpts);
     const primed = wolf.threat.get(sim.playerId) ?? 0;
     sim.dealDamage(sim.player, wolf, 100, false, 'physical', 'Shieldcrack', 'hit', true, slamOpts);
-    // Recompense grants +80% threat, at full value once the level-20 mastery
+    // Recompense grants +110% threat, at full value once the level-20 mastery
     // ramp (min(1, level / 20)) is complete.
-    const recompense = 1.8;
+    const recompense = 2.1;
     expect((wolf.threat.get(sim.playerId) ?? 0) - primed).toBeCloseTo(
       (100 * 3.5 + 110) * recompense,
       5,
@@ -1554,7 +1554,12 @@ describe('druid forms', () => {
     expect(sim.player.resource).toBeCloseTo(1, 5);
   });
 
-  it('bear charge is learned with Bruin Form and only works while shifted', () => {
+  // v0.43: Bruin Rush no longer REFUSES out of form, it ENTERS Bruin Form as
+  // part of the press (combat/druid_form_entry.ts). The old arm of this test
+  // asserted the refusal, which is the behavior the change deliberately
+  // removed; what still has to hold is that the rush itself is unchanged once
+  // the druid is a bear, by either route.
+  it('bear charge is learned with Bruin Form and enters it on use', () => {
     const sim = makeSim('druid');
     sim.setPlayerLevel(10);
     expect(abilitiesKnownAt('druid', 10).some((a) => a.def.id === 'bear_charge')).toBe(true);
@@ -1562,10 +1567,27 @@ describe('druid forms', () => {
     beefUp(wolf);
     teleport(sim, sim.player, wolf.pos.x + 12, wolf.pos.z);
     sim.targetEntity(wolf.id);
+    expect(sim.player.auras.some((a) => a.kind === 'form_bear')).toBe(false);
 
     sim.castAbility('bear_charge');
-    expect(sim.tick().some((e) => e.type === 'error' && /Bruin Form/.test(e.text))).toBe(true);
-    expect(sim.player.chargeTargetId).toBe(null);
+    expect(sim.tick().some((e) => e.type === 'error' && /Bruin Form/.test(e.text))).toBe(false);
+
+    // The press shifted the druid AND ran the rush.
+    expect(sim.player.auras.some((a) => a.kind === 'form_bear')).toBe(true);
+    expect(sim.player.resourceType).toBe('rage');
+    expect(sim.player.chargeTargetId).toBe(wolf.id);
+    expect(sim.player.resource).toBe(9);
+    expect(sim.player.cooldowns.get('bear_charge') ?? 0).toBeGreaterThan(0);
+    expect(wolf.auras.some((a) => a.kind === 'stun')).toBe(true);
+  });
+
+  it('bear charge from inside Bruin Form is unchanged', () => {
+    const sim = makeSim('druid');
+    sim.setPlayerLevel(10);
+    const wolf = nearestMob(sim, 'forest_wolf');
+    beefUp(wolf);
+    teleport(sim, sim.player, wolf.pos.x + 12, wolf.pos.z);
+    sim.targetEntity(wolf.id);
 
     sim.castAbility('bear_form');
     sim.tick();
@@ -1574,6 +1596,7 @@ describe('druid forms', () => {
     sim.player.gcdRemaining = 0;
     sim.castAbility('bear_charge');
 
+    expect(sim.player.auras.filter((a) => a.kind === 'form_bear')).toHaveLength(1);
     expect(sim.player.chargeTargetId).toBe(wolf.id);
     expect(sim.player.resource).toBe(9);
     expect(sim.player.cooldowns.get('bear_charge') ?? 0).toBeGreaterThan(0);

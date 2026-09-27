@@ -7,6 +7,15 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  exp_arcane_calligraphy: {
+    name: '稳健的笔触',
+    desc: '在东溪谷完成奥术书法。',
+  },
+  exp_arcane_calligraphy_gold: {
+    name: '星光写就',
+    desc: '在“奥术书法”中获得黄金评级。',
+    title: '符文召唤者',
+  },
   exp_dawnhold_castle: {
     name: '花园中敞开的门',
     desc: '造访晨曦堡，漫步于它洒满阳光的花园厅堂。',
@@ -857,5 +866,73 @@ export const table: DeedLocaleTable = {
     desc: '用造物契据将一件臻至完美的作品提升为传奇，并为它取一个独一无二的名字。',
 
     name: '传奇缔造者',
+  },
+  exp_harbor_to_harbor: {
+    name: '港口到港口',
+    desc: '乘坐两条渡船各往返一次：东溪至月栖镇，烛港至望龙哨。',
+  },
+  exp_forge_helper: {
+    name: '助一臂之锤',
+    desc: '在望龙哨帮助铁匠玛拉打造一面盾牌。',
+  },
+  exp_last_barricade: {
+    name: '最后的壁垒',
+    desc: '守住林间隘口，抵御亡灵大军。',
+  },
+  exp_borrowed_face: {
+    name: '借来的面孔',
+    desc: '揭穿并击败潜伏在芬桥守卫中的内奸。',
+  },
+  exp_windrider_slalom: {
+    name: '御风回旋赛',
+    desc: '完成穿越疾风崖峡谷的机械滑翔翼滑降。',
+  },
+  exp_duskweave_dispatches: {
+    name: '暮织军令',
+    desc: '身穿瓦莱丽的附魔斗篷，夺回强盗的军令。',
+  },
+  exp_wisp_maze: {
+    name: '迷宫中的光',
+    desc: '找回被盗的钱袋，逃出常青园的迷宫。',
+  },
+  prog_rift_watch_trusted: {
+    name: '获得裂隙守望的信任',
+    desc: '与裂隙守望的声望达到信任等级。',
+  },
+  prog_church_order_trusted: {
+    name: '获得教会修会的信任',
+    desc: '与教会修会的声望达到信任等级。',
+  },
+  prog_automatons_trusted: {
+    name: '获得机械造物的信任',
+    desc: '与机械造物的声望达到信任等级。',
+  },
+  prog_rift_watch_champion: {
+    name: '裂隙守望的冠军',
+    desc: '与裂隙守望的声望达到冠军等级。',
+    title: '裂隙守卫',
+  },
+  prog_church_order_champion: {
+    name: '教会修会的冠军',
+    desc: '与教会修会的声望达到冠军等级。',
+    title: '晨曦守护者',
+  },
+  prog_automatons_champion: {
+    name: '机械造物的冠军',
+    desc: '与机械造物的声望达到冠军等级。',
+    title: '锻造大师',
+  },
+  prog_faction_champion_all: {
+    name: '三旗冠军',
+    desc: '与裂隙守望、教会修会和机械造物的声望都达到冠军等级。',
+  },
+  exp_clue_first_casket: {
+    name: '寻得珍宝',
+    desc: '打开一只在寻宝之旅结束时挖出的宝匣。',
+  },
+  exp_clue_ten_caskets: {
+    name: '寻宝猎人',
+    desc: '打开10只在寻宝之旅结束时挖出的宝匣。',
+    title: '寻宝猎人',
   },
 };

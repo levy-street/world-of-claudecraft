@@ -3,16 +3,20 @@ import {
   FURY_ENTITY_ID,
   FURY_NPC,
   FURY_STOCK,
+  HONOR_QUARTERMASTER_STOCK,
   WARFARE_ITEMS,
   WARFARE_JEWELRY_STAT_FRACTION,
+  WARFARE_RATING_FRACTION,
   WARFARE_SOURCE_LEVEL,
   WARFARE_STAT_FRACTION,
+  WARFARE_TRINKET_STOCK,
 } from '../src/sim/content/pvp_honor';
 import { ITEMS, NPCS } from '../src/sim/data';
 import { createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import { canEquipItem } from '../src/sim/equipment_rules';
 import { weaponDpsBudget } from '../src/sim/item_budget';
 import {
+  expectedLineBudget,
   itemLevel,
   itemScore,
   itemSourceLevel,
@@ -22,6 +26,7 @@ import {
 import { LAUNCH_PAPERDOLL_SLOTS } from '../src/sim/launch_paperdoll_slots';
 import { pvpFractionsFromRatings } from '../src/sim/pvp';
 import type { EquipSlot, PlayerClass } from '../src/sim/types';
+import { expectedWarfareStamina } from './helpers/warfare_stamina';
 
 /** The item level the whole WARFARE catalog sits at after the retune. */
 const WARFARE_ILVL = 31;
@@ -201,7 +206,16 @@ describe('FURY WARFARE stock', () => {
     expect(NPCS.fury.pos).toEqual({ x: 16, z: -78 });
     expect(NPCS.fury.facing).toBe(-2.2455372690184494);
     expect(NPCS.fury.dynamic).toBe(true);
-    expect(NPCS.fury.vendorItems).toEqual(FURY_STOCK);
+    // The entry tier first, then the two honor trinkets, then Warfare Season 2
+    // (pinned as the tail in warfare_season2.test.ts).
+    expect(NPCS.fury.vendorItems).toEqual(HONOR_QUARTERMASTER_STOCK);
+    expect(HONOR_QUARTERMASTER_STOCK.slice(0, FURY_STOCK.length)).toEqual(FURY_STOCK);
+    expect(
+      HONOR_QUARTERMASTER_STOCK.slice(
+        FURY_STOCK.length,
+        FURY_STOCK.length + WARFARE_TRINKET_STOCK.length,
+      ),
+    ).toEqual([...WARFARE_TRINKET_STOCK]);
   });
 
   it('covers every supported item slot with two distinct rings per role profile', () => {
@@ -230,13 +244,13 @@ const WARFARE_LINES: Record<string, [number, number]> = {
   furyforged_legguards: [8, 10],
   furyforged_gauntlets: [5, 9],
   furyforged_sabatons: [7, 6],
-  stormbound_crown: [11, 6],
-  stormbound_spaulders: [9, 5],
-  stormbound_hauberk: [13, 7],
-  stormbound_waistguard: [9, 5],
-  stormbound_legmail: [11, 7],
-  stormbound_handguards: [9, 5],
-  stormbound_greaves: [10, 5],
+  stormbound_crown: [11, 8],
+  stormbound_spaulders: [9, 7],
+  stormbound_hauberk: [13, 10],
+  stormbound_waistguard: [9, 7],
+  stormbound_legmail: [11, 9],
+  stormbound_handguards: [9, 7],
+  stormbound_greaves: [10, 6],
   ashstalker_cowl: [8, 8],
   ashstalker_shoulderguards: [6, 8],
   ashstalker_harness: [8, 12],
@@ -244,20 +258,20 @@ const WARFARE_LINES: Record<string, [number, number]> = {
   ashstalker_legguards: [8, 10],
   ashstalker_grips: [5, 9],
   ashstalker_treads: [7, 6],
-  cinderweave_cowl: [11, 6],
-  cinderweave_mantle: [9, 5],
-  cinderweave_raiment: [13, 7],
-  cinderweave_cord: [9, 5],
-  cinderweave_legwraps: [11, 7],
-  cinderweave_handwraps: [9, 5],
-  cinderweave_slippers: [10, 5],
-  thornhide_headdress: [11, 6],
-  thornhide_mantle: [9, 5],
-  thornhide_vestment: [13, 7],
-  thornhide_cinch: [9, 5],
-  thornhide_leggings: [11, 7],
-  thornhide_gloves: [9, 5],
-  thornhide_boots: [10, 5],
+  cinderweave_cowl: [11, 8],
+  cinderweave_mantle: [9, 7],
+  cinderweave_raiment: [13, 10],
+  cinderweave_cord: [9, 7],
+  cinderweave_legwraps: [11, 9],
+  cinderweave_handwraps: [9, 7],
+  cinderweave_slippers: [10, 6],
+  thornhide_headdress: [11, 8],
+  thornhide_mantle: [9, 7],
+  thornhide_vestment: [13, 10],
+  thornhide_cinch: [9, 7],
+  thornhide_leggings: [11, 9],
+  thornhide_gloves: [9, 7],
+  thornhide_boots: [10, 6],
   final_oath_medallion: [6, 5],
   razorwind_torque: [6, 5],
   cinder_sigil_pendant: [7, 5],
@@ -269,7 +283,7 @@ const WARFARE_LINES: Record<string, [number, number]> = {
   spellbreakers_seal: [7, 4],
   final_argument_greatblade: [8, 12],
   first_blood_razor: [8, 12],
-  emberglass_warstaff: [13, 7],
+  emberglass_warstaff: [13, 10],
 };
 
 describe('FURY WARFARE item budgets', () => {
@@ -319,7 +333,7 @@ describe('FURY WARFARE item budgets', () => {
       expect(line, `${id} line within the WARFARE fraction`).toBeLessThanOrEqual(fractionTotal);
       expect(line, `${id} carries an offense line`).toBeGreaterThan(0);
       expect([line, model?.sta ?? 0], `${id} line and stamina`).toEqual(WARFARE_LINES[id]);
-      expect(primaryStatSum(item), id).toBe(line + Math.max(impliedSta, floor));
+      expect(primaryStatSum(item), id).toBe(line + expectedWarfareStamina(item, impliedSta, floor));
       // Every piece's WARFARE ratings still mirror its FULL slot budget (drives 18.2%).
       // This pair is deliberately NOT rewritten as a fraction multiplication: the
       // rating fraction is 1.0 and unchanged, so a diff here means it drifted.
@@ -447,6 +461,46 @@ describe('FURY WARFARE class and role coverage', () => {
           );
         }
       }
+    }
+  });
+});
+
+describe('honor trinkets sold beside the WARFARE kit', () => {
+  it('sells exactly the two PvP trinkets, outside the WARFARE kit', () => {
+    expect([...WARFARE_TRINKET_STOCK]).toEqual(['medallion_of_defiance', 'duelists_brand']);
+    for (const id of WARFARE_TRINKET_STOCK) {
+      expect(FURY_STOCK, id).not.toContain(id);
+      expect(WARFARE_ITEMS[id], id).toBeUndefined();
+    }
+  });
+
+  it('prices each at 800 honor, soulbound, no gold value, on the WARFARE jewelry rule', () => {
+    for (const id of WARFARE_TRINKET_STOCK) {
+      const item = ITEMS[id];
+      expect(item.slot, id).toBe('trinket');
+      expect(item.quality, id).toBe('epic');
+      // The crowd-control break is the key PvP purchase: priced like a helmet
+      // band, not like jewelry (owner call).
+      expect(item.priceHonor, id).toBe(800);
+      expect(item.soulbound, id).toBe(true);
+      expect(item.sellValue, id).toBe(0);
+      expect(item.buyValue, id).toBeUndefined();
+      expect(itemSourceLevel(id), id).toBe(WARFARE_SOURCE_LEVEL);
+      expect(itemLevel(item), id).toBe(WARFARE_ILVL);
+      // WARFARE like the rest of the honor gear, on the jewelry rule: exactly
+      // ONE attribute at the jewelry fraction of the trinket line (no stamina
+      // top-up: the trinket slot is exempt from the stamina model), and the
+      // full line as WARFARE Offense and Defense Rating. No set tag.
+      const line = expectedLineBudget(item) ?? 0;
+      expect(line, id).toBe(13);
+      const attrs = Object.entries(item.stats ?? {}).filter(([, v]) => (v ?? 0) > 0);
+      expect(attrs, `${id} one attribute`).toHaveLength(1);
+      expect(primaryStatSum(item), id).toBe(Math.round(line * WARFARE_JEWELRY_STAT_FRACTION));
+      expect(primaryStatSum(item), id).toBe(10);
+      expect(item.pvpOffenseRating, id).toBe(Math.round(line * WARFARE_RATING_FRACTION));
+      expect(item.pvpDefenseRating, id).toBe(Math.round(line * WARFARE_RATING_FRACTION));
+      expect(item.pvpOffenseRating, id).toBe(13);
+      expect(item.set, id).toBeUndefined();
     }
   });
 });

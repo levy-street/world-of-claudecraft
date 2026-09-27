@@ -1,0 +1,46 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/shipwreck_quest/shipwreck.glb",
+      "out": "models/world_quests/shipwreck/shipwreck.glb",
+      "type": "static",
+      "maxTex": 1024
+    },
+    {
+      "src": "tmp/asset_src/shipwreck_quest/Broken+planks.glb",
+      "out": "models/world_quests/shipwreck/broken_planks.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/shipwreck_quest/broken+barrel.glb",
+      "out": "models/world_quests/shipwreck/waterlogged_barrel.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/shipwreck_quest/wooden+crate.glb",
+      "out": "models/world_quests/shipwreck/damaged_crate.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/shipwreck_quest/anchor.glb",
+      "out": "models/world_quests/shipwreck/fallen_anchor.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/shipwreck_quest/wooden+ship+hull.glb",
+      "out": "models/world_quests/shipwreck/hull_fragment.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/shipwreck_quest/rowboat.glb",
+      "out": "models/world_quests/shipwreck/capsized_rowboat.glb",
+      "type": "static",
+      "maxTex": 512
+    }
+  ]
+}

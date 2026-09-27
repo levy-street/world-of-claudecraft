@@ -14,6 +14,7 @@
 // at the emit site (the S3 i18n guard scans this file + chat_readouts.ts).
 
 import { type AssistCandidate, resolveAssist } from '../assist';
+import { onEmoteForClueHunt } from '../clue_scrolls';
 import { isHeldInCombat } from '../combat/engaged_combat';
 import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { CLASSES, zoneAt } from '../data';
@@ -21,6 +22,7 @@ import * as deedsMod from '../deeds';
 import { handleDevChat } from '../dev_commands';
 import { graveyardReadout } from '../entity_roster';
 import { livePlaytimeSeconds } from '../playtime';
+import { hillReadoutLine, setWorldPvpFlag, toggleWorldPvpFlag } from '../pvp';
 import {
   type AwayStatus,
   JOINABLE_CHANNELS,
@@ -41,8 +43,8 @@ const CHAT_BURST = 8; // messages a player may send back-to-back...
 const CHAT_REFILL = 2; // ...then this many more per second (caps spam amplifiers)
 const OVERHEAD_EMOTE_DURATION = 3.2;
 
-// The speaker's selected Book of Deeds title, spread into every PLAYER-sourced
-// chat emit as the optional `fromTitle` field: a deed id the client localizes
+// The speaker's selected title, spread into every PLAYER-sourced chat emit as
+// the optional `fromTitle` field: a title id (deed or 'dev:<rung>') localized
 // through deed_i18n, never display text. Untitled players omit the key
 // entirely (the event stays byte-identical to the pre-title shape), and the
 // mob/boss yell emitters (mob/yells.ts, encounters/*) never call this.
@@ -571,7 +573,25 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     ctx.error(r.meta.entityId, readouts.nearbyReadout(ctx, r.e));
     return null;
   }
-  if (/^\/(?:arena|pvp|rating)(?:\s|$)/i.test(raw)) {
+  // World PvP: the bare /pvp toggles the flag (the classic command), /pvp on
+  // and /pvp off are explicit. It used to alias the arena readout, which keeps
+  // /arena and /rating. Every outcome answers through the sim's own notices
+  // (pvp/world_pvp.ts), so a mistyped argument gets the usage line, not silence.
+  const pvpArm = /^\/pvp(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (pvpArm) {
+    const arg = (pvpArm[1] ?? '').toLowerCase();
+    if (arg === '') toggleWorldPvpFlag(ctx, r.meta.entityId);
+    else if (arg === 'on' || arg === 'enable') setWorldPvpFlag(ctx, r.meta.entityId, true);
+    else if (arg === 'off' || arg === 'disable') setWorldPvpFlag(ctx, r.meta.entityId, false);
+    else ctx.error(r.meta.entityId, 'Usage: /pvp, /pvp on, or /pvp off.');
+    return null;
+  }
+  // King of the Hill: where the hill stands, who holds it, when it moves.
+  if (/^\/hill\s*$/i.test(raw)) {
+    ctx.error(r.meta.entityId, hillReadoutLine(ctx, r.meta.entityId));
+    return null;
+  }
+  if (/^\/(?:arena|rating)(?:\s|$)/i.test(raw)) {
     ctx.error(r.meta.entityId, readouts.arenaReadout(r.meta));
     return null;
   }
@@ -966,6 +986,9 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       broadcastEmote(ctx, r.meta, r.e, text);
       // A cheer with a live Yumi in earshot counts; range matches the /say emote.
       if (key === 'cheer') deedsMod.onCheerForDeeds(ctx, r.meta, r.e, YUMI_TEMPLATE_ID, SAY_RANGE);
+      // Clue Scrolls: an emote step resolves on the canonical key (aliases
+      // already folded above) when the player stands at the step's landmark.
+      onEmoteForClueHunt(ctx, r.meta, r.e, key);
       return null;
     }
   }
@@ -1118,7 +1141,9 @@ export function helpLines(): string[] {
     'Chat channels: /s say, /y yell, /general, /p party, /bg battleground, /rw raid warning, /world, /lfg.',
     'Whisper a player with /w <name> <message>, reply with /r.',
     'Other commands: /join <world|lfg>, /roll, /invite <name>, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /ready, /pull <sec>, /afk, /dnd, /who.',
-    'Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. It leaves you with Unstuck Sickness for up to 5 minutes.',
+    'World PvP: /pvp toggles your PvP flag (/pvp on, /pvp off). Flagged players can fight each other anywhere; switching off takes 5 minutes.',
+    'King of the Hill: /hill says where the hill stands or will rise, and who holds it. A party that keeps a majority inside its circle for 60 seconds takes it (raids do not count); holders inside earn Honor every minute.',
+    'Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.',
     'Hide a player: /ignore <name> hides their public chat only. /block <name> also stops their whispers, invites and mail. Also /unignore, /unblock, /ignorelist, /blocklist.',
     'Character readouts: /played, /playtime, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
     'World readouts: /where, /zones, /nearby, /pois, /graveyard, /dungeons, /arena, /session, /listings, /buyback.',

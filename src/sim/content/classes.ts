@@ -457,6 +457,9 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     abilities: [
       'lightning_bolt',
       'thunder_reservoir',
+      'lightning_overload',
+      'lava_burst',
+      'thunderstorm',
       'chain_lightning',
       'rockbiter_weapon',
       'galeheart_weapon',
@@ -2324,7 +2327,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Shake an 8-yard area for 6 sec, dealing $d Nature damage every 1.5 sec. Damage increases with Spell Power. Thundercall: at 5 Thunder, deal 100% more damage and consume all Thunder.',
+      'Shake an 8-yard area for 6 sec, dealing $d Nature damage every 1.5 sec. Damage increases with Spell Power. Thundercall: consume all Thunder, dealing 20% more damage per Thunder (100% at 5).',
   },
   scorch: {
     id: 'scorch',
@@ -4655,7 +4658,76 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Passive: Arc Bolt and Skybranch grant Thunder, up to 5. At 5 Thunder, Earthen Jolt deals 125% more damage or Faultwake deals 100% more damage, then consumes all Thunder. (Thundercall)',
+      'Passive: Arc Bolt and Skybranch grant Thunder, up to 5. Earthen Jolt consumes all Thunder and deals 25% more damage per Thunder (125% at 5). Faultwake consumes all Thunder and deals 20% more damage per Thunder (100% at 5). (Thundercall)',
+  },
+  // Thundercall v0.44 rework (docs/prd/shaman-thundercall-elemental-v028.md,
+  // "v0.44.0 rework"): the classic Lightning Overload talent at its 5/5 value,
+  // baseline for the spec. Runtime: combat/shaman_thundercall_kit.ts.
+  lightning_overload: {
+    id: 'lightning_overload',
+    name: 'Arc Overload',
+    class: 'shaman',
+    specs: ['elemental'],
+    learnLevel: 10,
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [],
+    description:
+      'Passive: Arc Bolt and Skybranch have a 20% chance to Overload, striking their first target again for 50% of the damage dealt and granting 1 Thunder. (Thundercall)',
+  },
+  // The Wrath-era Lava Burst: a fire nuke that always crits on a target
+  // burning with the caster's own Cinder Jolt, reset by Magma Surge.
+  lava_burst: {
+    id: 'lava_burst',
+    name: 'Magma Burst',
+    class: 'shaman',
+    specs: ['elemental'],
+    learnLevel: 12,
+    cost: 45,
+    castTime: 2.0,
+    cooldown: 8,
+    range: 30,
+    school: 'fire',
+    requiresTarget: true,
+    projectileFx: 'heavyBolt',
+    effects: [{ type: 'directDamage', min: 63, max: 71 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 20,
+        cost: 70,
+        effects: [{ type: 'directDamage', min: 105, max: 119 }],
+      },
+    ],
+    description:
+      'Deal $d Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)',
+  },
+  // The Wrath-era Thunderstorm: the spec's panic button. The 8% mana return
+  // is applied by combat/shaman_thundercall_kit.ts; the knockback is not
+  // modelled (no mob displacement primitive), so it slows instead.
+  thunderstorm: {
+    id: 'thunderstorm',
+    name: 'Stormbreak',
+    class: 'shaman',
+    specs: ['elemental'],
+    learnLevel: 16,
+    cost: 0,
+    castTime: 0,
+    cooldown: 45,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [
+      { type: 'aoeDamage', min: 55, max: 63, radius: 10 },
+      { type: 'aoeSlow', mult: 0.5, duration: 5, radius: 10 },
+    ],
+    description:
+      'Call down a thunderclap, dealing $d Nature damage to enemies within 10 yards and slowing them by 50% for 5 sec. Restores 8% of your maximum Mana. Damage increases with Spell Power. (Thundercall)',
   },
   rockbiter_weapon: {
     id: 'rockbiter_weapon',
@@ -4918,7 +4990,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Deal $d Nature damage. Damage increases with Spell Power. Thundercall: at 5 Thunder, deal 125% more damage and consume all Thunder. Stonebound: force the target to attack you for 3 sec.',
+      'Deal $d Nature damage. Damage increases with Spell Power. Thundercall: consume all Thunder, dealing 25% more damage per Thunder (125% at 5). Stonebound: force the target to attack you for 3 sec.',
   },
   lightning_shield: {
     id: 'lightning_shield',
@@ -6434,10 +6506,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     offGcd: true,
-    requiresForm: 'bear',
+    // No form requirement since v0.43: Bruin Rush is pressable from ANY form
+    // and from caster form, and shifts the druid into Bruin Form on the way in
+    // (combat/druid_form_entry.ts). usableInForm keeps the shapeshift lock from
+    // refusing the press while wearing Cat, Fleet or Moonwing.
+    usableInForm: true,
     effects: [{ type: 'charge' }, { type: 'stun', duration: 1 }],
     description:
-      'Rush an enemy, generating 9 rage and stunning it for 1 sec. For 3 sec afterwards, or until you leave combat, Cat Form is free and Pins that target (the one you Rushed), slowing it by 50% for 4 sec. 8-25 yd range. Bruin Form only.',
+      'Shift into Bruin Form if you are not already, then rush an enemy, generating 9 rage and stunning it for 1 sec. For 3 sec afterwards, or until you leave combat, Cat Form is free and Pins that target (the one you Rushed), slowing it by 50% for 4 sec. 8-25 yd range. Usable in any form.',
   },
   maul: {
     id: 'maul',
@@ -6566,13 +6642,20 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'physical',
     requiresTarget: false,
-    requiresForm: 'cat',
+    // No form requirement since v0.43: Stalk is pressable from ANY form and
+    // from caster form, and shifts the druid into Cat Form on the way in
+    // (combat/druid_stalk.ts). usableInForm keeps the shapeshift lock from
+    // refusing the press while wearing Bruin, Fleet or Moonwing, and keeps the
+    // auto-unshift rule from stripping the form instead. It stays ON the
+    // global cooldown (no offGcd), so the shift costs a GCD like any shift.
+    usableInForm: true,
     requiresOutOfCombat: true,
     // 1.0: feral stealth moves at full speed (Wildfang kit pass 2; it was a
     // 0.95 near-full crawl before), the feral scouting identity. The rogue
     // Duskveil family deliberately keeps its slower 0.5 crawl.
     effects: [{ type: 'selfBuff', kind: 'stealth', value: 1.0, duration: 3600 }],
-    description: 'Enter stealth while in Cat Form. Cannot be used in combat.',
+    description:
+      'Shift into Cat Form if you are not already, and enter stealth. Usable in any form. Cannot be used in combat.',
   },
   rake: {
     id: 'rake',
@@ -6719,8 +6802,18 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // A tank cooldown, so it must fire mid-fight in Bruin Form (or Cat Form)
     // like Primal Reflexes/Primal Surge below, not just pre-cast in caster form.
     usableInForm: true,
-    effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 150, duration: 15 }],
-    description: 'Your skin hardens like bark, increasing armor by 150 for 15 sec.',
+    // A PERCENTAGE since v0.43, not the old flat 150. buff_armor_pct carries
+    // integer percentage POINTS (25 = +25%) and recalcPlayerStats folds it last
+    // (entity.ts), after the form multiplier and the armor masteries, so a bear
+    // tank's Oakhide scales with the armor it actually has instead of decaying
+    // into noise as gear grows. The flat arm was worth about 4% of a geared
+    // bear pool.
+    effects: [{ type: 'selfBuff', kind: 'buff_armor_pct', value: 20, duration: 15 }],
+    // Literal, not the $b resolved-value placeholder: introducing a token into
+    // this row breaks the en-vs-locale interpolation-parity guard
+    // (tests/i18n_completeness.test.ts) for all 20 overlays, whose translations
+    // carry no token. Same shape the flat 150 shipped with.
+    description: 'Your skin hardens like bark, increasing armor by 20% for 15 sec.',
   },
   // Druid tank cooldown: a dodge-based defensive (distinct from Oakhide's armor
   // boost). Usable while shapeshifted so a bear tank pops it mid-fight; buff_dodge
@@ -6882,7 +6975,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // pounce id; Lunge is never learned as a second action.
     actionReplacement: { abilityId: 'lunge', absentAuraKind: 'stealth' },
     description:
-      'A stealth opener that stuns the target for 2 sec. Awards 1 combo point. Cat Form only. Out of stealth this button is Lunge.',
+      'A stealth opener that stuns the target for 2 sec. Awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3). Cat Form only. Out of stealth this button is Lunge.',
   },
   lunge: {
     id: 'lunge',
@@ -6894,19 +6987,32 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 40,
     castTime: 0,
     cooldown: 12,
-    range: 12,
+    // 25 yd since v0.43, matching Bruin Rush's outer reach. minRange stays 0,
+    // so unlike Bruin Rush (which needs 8 yd of runway) Lunge is pressable at
+    // any distance inside its range.
+    range: 25,
     minRange: 0,
     school: 'physical',
     requiresTarget: true,
     awardsCombo: 1,
-    requiresForm: 'cat',
+    // Off the global cooldown, like Bruin Rush: a gap closer that ate a GCD on
+    // arrival left the druid standing in melee unable to strike for the rest of
+    // it, which is the opposite of what a gap closer is for. The 12 sec
+    // cooldown is what paces it, not the GCD.
+    offGcd: true,
+    // No form requirement since v0.43: Lunge is pressable from ANY form and
+    // from caster form, and shifts the druid into Cat Form on the way in
+    // (combat/druid_form_entry.ts). The press that shifts is billed against
+    // the energy the shift hands over: a full bar out of combat, the parked
+    // Cat pool mid-fight (combat/cat_form_energy.ts).
+    usableInForm: true,
     // The cast only starts the charge route; the 60% weapon strike and the
     // combo point land on ARRIVAL through combat/druid_lunge.ts (the
     // Bloodhook shape), so a route that ends short strikes nothing and hands
     // the cooldown back. LUNGE_WEAPON_MULT there owns the 60.
     effects: [{ type: 'charge' }],
     description:
-      'Lunge at an enemy up to 12 yd away. On arrival, deals 60% weapon damage and awards 1 combo point; a lunge cut short refunds its cooldown. Cat Form only.',
+      'Shift into Cat Form if you are not already, then lunge at an enemy up to 25 yd away. On arrival, deals 60% weapon damage, awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3); a lunge cut short refunds its cooldown. Usable in any form.',
   },
   hamstring_bite: {
     id: 'hamstring_bite',
@@ -9203,7 +9309,13 @@ export function abilitiesKnownAt(
     // on the abilityCharges recharge model. Resolved HERE (the shared known-list
     // builder) so BOTH worlds see it: the offline Sim's meta.known and the
     // ClientWorld's locally recomputed list, which is what the action bar badges.
-    if (id === 'ice_block' && mods?.spec === 'frost') entry.bonusCharges = 1;
+    // Sets the resolved cap (`charges`) with the bonus, like the maxCharges arm
+    // above: normalizeAbilityCharges and the legacy-save caps read `charges`, so a
+    // bonus-only stamp collapsed the pool on every equip swap (refunding a use).
+    if (id === 'ice_block' && mods?.spec === 'frost') {
+      entry.charges = 2;
+      entry.bonusCharges = 1;
+    }
     if (mods) applyTalentMods(entry, mods);
     out.push(entry);
   }

@@ -182,7 +182,8 @@ describe('the ledger producers and the arrival mark are wired in the renderer (s
     expect(source).toContain(
       '      const sample = this.hitchAligner.atEnd(\n' +
         '        afterSubmit,\n' +
-        '        Math.min(250, Math.max(0, dt * 1000)),\n' +
+        // Read as load: under a chosen frame rate limit the interval is a choice.
+        '        frameLoadMs(Math.min(250, Math.max(0, dt * 1000))),\n' +
         '        framePhaseMs.submit,\n' +
         '        createdViews,\n' +
         '        framePhaseMs.total,\n' +

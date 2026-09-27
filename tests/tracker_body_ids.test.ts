@@ -18,6 +18,7 @@ const TRACKER_BODIES = [
   { rootId: 'quest-tracker', bodyId: 'qt-body' },
   { rootId: 'delve-tracker', bodyId: 'delve-body' },
   { rootId: 'rift-tracker', bodyId: 'rift-body' },
+  { rootId: 'practice-tracker', bodyId: 'practice-body' },
 ] as const;
 
 const read = (...parts: string[]) =>
@@ -40,6 +41,12 @@ describe('tracker inner-body ids', () => {
   it('hud.ts hands each controller the body element, never the frame root', () => {
     const hud = read('src', 'ui', 'hud.ts');
     for (const { rootId, bodyId } of TRACKER_BODIES) {
+      if (bodyId === 'practice-body') {
+        expect(read('src', 'ui', 'meters.ts')).toContain(
+          "document.getElementById('practice-body')",
+        );
+        continue;
+      }
       expect(hud, `#${bodyId} wiring`).toContain(`$('#${bodyId}')`);
       expect(hud, `#${rootId} must not be a paint target`).not.toContain(
         `element: $('#${rootId}')`,

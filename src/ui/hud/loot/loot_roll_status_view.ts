@@ -6,7 +6,7 @@
 // a cheap fingerprint so the thin controller consumer re-renders only when membership,
 // prompt-ness, or a vote actually changes. Follows the pure-core + thin-consumer
 // pattern (see unit_portrait.ts) next to its sibling loot_roll_reconcile.ts.
-import type { LootRollChoice, LootRollGroupStatus } from '../../../sim/types';
+import type { ItemInstancePayload, LootRollChoice, LootRollGroupStatus } from '../../../sim/types';
 
 export interface LootRollStripEntry {
   pid: number;
@@ -19,6 +19,7 @@ export interface LootRollStatusRow {
   rollId: number;
   itemId: string;
   itemName: string;
+  instance?: ItemInstancePayload;
   quality: LootRollGroupStatus['quality'];
   expiresAt: number;
   // true while the local player's need/greed/pass prompt for this roll is still
@@ -46,6 +47,7 @@ export function computeLootRollStatusRows(
     rollId: status.rollId,
     itemId: status.itemId,
     itemName: status.itemName,
+    ...(status.instance ? { instance: status.instance } : {}),
     quality: status.quality,
     expiresAt: status.expiresAt,
     hasPrompt: shown.has(status.rollId),

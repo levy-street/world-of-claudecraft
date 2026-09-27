@@ -116,6 +116,7 @@ import {
 } from '../nythraxis_bone_storm';
 import {
   castNythraxisDreadCurse,
+  clearNythraxisDreadCurse,
   NYTHRAXIS_DREAD_CURSE_AURA_ID,
   NYTHRAXIS_DREAD_CURSE_EVERY,
   nythraxisDreadCurseStacks,
@@ -173,6 +174,11 @@ import {
   nythraxisWrathGraveEruptionEvery,
 } from '../nythraxis_kings_wrath';
 import {
+  NYTHRAXIS_SOUL_REND_AURA_ID,
+  NYTHRAXIS_SOUL_REND_SETTLE_SECONDS,
+  releaseNythraxisSoulRendMarks,
+} from '../nythraxis_soul_rend';
+import {
   hasInteractObjectCredit,
   interactObjectCreditKey,
   recordInteractObjectCredit,
@@ -226,6 +232,7 @@ type NythraxisMechanicField =
   | 'sigil'
   | 'sigilSide'
   | 'majorGapTimer'
+  | 'soulRendSettleTimer'
   | 'enrageElapsed'
   | 'enrageStacks'
   | 'boneStormTimer'
@@ -263,6 +270,7 @@ export function nythraxisMechanicState(st: NythraxisState): NythraxisMechanicSta
   st.sigil ??= null;
   st.sigilSide ??= null;
   st.majorGapTimer ??= 0;
+  st.soulRendSettleTimer ??= 0;
   st.enrageElapsed ??= 0;
   st.enrageStacks ??= 0;
   st.boneStormTimer ??= NYTHRAXIS_BONE_STORM_FIRST_SECONDS;
@@ -308,7 +316,7 @@ const NYTHRAXIS_DIALOGUE_LINE_SECONDS = 2.6;
 // raid must answer all fight.
 export const NYTHRAXIS_RAISE_FALLEN_EVERY = 30;
 export const NYTHRAXIS_PHASE_TWO_HP = 0.7;
-const NYTHRAXIS_SOUL_REND_EVERY = 30;
+export const NYTHRAXIS_SOUL_REND_EVERY = 30;
 export const NYTHRAXIS_SOUL_REND_DURATION = 8;
 export const NYTHRAXIS_SOUL_REND_STACK_RANGE = 5;
 // Soul Rend mark counts. Heroic doubles the marked players (6 of the raid must
@@ -508,6 +516,7 @@ export function initNythraxisEncounter(boss: Entity): NonNullable<Entity['nythra
       sigil: null,
       sigilSide: null,
       majorGapTimer: 0,
+      soulRendSettleTimer: 0,
       enrageElapsed: 0,
       enrageStacks: 0,
       boneStormTimer: NYTHRAXIS_BONE_STORM_FIRST_SECONDS,
@@ -529,7 +538,7 @@ export function resetNythraxisEncounter(ctx: SimContext, boss: Entity): void {
   for (const p of playersInNythraxisRoom(ctx, boss)) {
     p.auras = p.auras.filter(
       (a) =>
-        a.id !== 'nythraxis_soul_rend' &&
+        a.id !== NYTHRAXIS_SOUL_REND_AURA_ID &&
         a.id !== 'nythraxis_transition_stun' &&
         a.id !== NYTHRAXIS_DREAD_CURSE_AURA_ID &&
         a.id !== NYTHRAXIS_IMPALED_AURA_ID,
@@ -641,6 +650,8 @@ export function updateNythraxisEncounter(ctx: SimContext, boss: Entity): void {
     // resolution sets later this tick keeps its full length.
     const ms = nythraxisMechanicState(st);
     if (ms.majorGapTimer > 0) ms.majorGapTimer = Math.max(0, ms.majorGapTimer - DT);
+    if (ms.soulRendSettleTimer > 0)
+      ms.soulRendSettleTimer = Math.max(0, ms.soulRendSettleTimer - DT);
     // The spike/fire settle windows count down here too, for the same reason.
     if (ms.eruptionSettleTimer > 0)
       ms.eruptionSettleTimer = Math.max(0, ms.eruptionSettleTimer - DT);
@@ -1984,7 +1995,14 @@ export function updateNythraxisBoneStormCast(
   const ms = nythraxisMechanicState(st);
   ms.boneStormTimer -= DT;
   if (ms.boneStormTimer > 0) return;
-  if (nythraxisAnyMajorInFlight(nythraxisMajorsInFlight(st)) || ms.majorGapTimer > 0) {
+  if (
+    nythraxisAnyMajorInFlight(nythraxisMajorsInFlight(st)) ||
+    ms.majorGapTimer > 0 ||
+    // A Soul Rend detonation leaves the raid huddled: give them the settle
+    // before the storm asks them to spread (live marks are released instead,
+    // see startNythraxisBoneStorm).
+    ms.soulRendSettleTimer > 0
+  ) {
     ms.boneStormTimer = 1;
     return;
   }
@@ -2015,11 +2033,23 @@ export function startNythraxisBoneStorm(
   const ms = nythraxisMechanicState(st);
   const castKey = (Math.imul(ctx.tickCount, 0x9e3779b1) ^ boss.id ^ 0xb04e) >>> 0;
   ms.boneStorm = beginNythraxisBoneStorm(castKey);
+  // Soul Rend says stack, the storm says spread: any live marks are released
+  // unresolved so the raid never has to answer both at once.
+  releaseNythraxisSoulRendMarks(ctx.entities, st.soulRendMarks);
+  st.soulRendMarks = [];
   st.gravebreakerCharged = false;
   boss.castingAbility = null;
   boss.castRemaining = 0;
   boss.castTotal = 0;
   boss.castTargetId = null;
+  // The storm already holds new Dread Curse applications for as long as it
+  // runs; a stack landed just before it began must not ride along either, or
+  // its vuln_source amplifier doubles onto the storm's own whirl/slam
+  // damage (the "Curse and Bone Storm land together" wipes players cannot
+  // heal through or play around). Clearing it here, not merely pausing the
+  // cadence, is what makes the two majors independent instead of stacking.
+  clearNythraxisDreadCurse(ctx, boss, playersInNythraxisRoom(ctx, boss));
+  ms.dreadCurseHolderId = null;
   ctx.applyAura(boss, {
     id: NYTHRAXIS_BONE_STORM_AURA_ID,
     name: NYTHRAXIS_BONE_STORM_AURA_NAME,
@@ -2610,7 +2640,7 @@ export function castNythraxisSoulRend(
   nythraxisSay(ctx, boss, 'nythraxis', 'Your spirit belongs to me', true);
   for (const p of picked) {
     ctx.applyAura(p, {
-      id: 'nythraxis_soul_rend',
+      id: NYTHRAXIS_SOUL_REND_AURA_ID,
       name: 'Soul Rend',
       kind: 'vulnerability',
       remaining: NYTHRAXIS_SOUL_REND_DURATION,
@@ -2667,7 +2697,7 @@ export function updateNythraxisSoulRend(
       // always did.
       rendMult / share > 1,
     );
-    p.auras = p.auras.filter((a) => a.id !== 'nythraxis_soul_rend');
+    p.auras = p.auras.filter((a) => a.id !== NYTHRAXIS_SOUL_REND_AURA_ID);
     ctx.emit({
       type: 'spellfx',
       sourceId: boss.id,
@@ -2679,6 +2709,8 @@ export function updateNythraxisSoulRend(
   // A detonation leaves nothing behind (owner call, 2026-09-11: the Soulfire
   // pools it used to drop made the fight too hard and are retired from play).
   st.soulRendMarks = [];
+  // The raid is still huddled on the stack point: hold the storm off.
+  nythraxisMechanicState(st).soulRendSettleTimer = NYTHRAXIS_SOUL_REND_SETTLE_SECONDS;
 }
 
 // ----- phase-two mechanics: Deathless Rage + wardstone channels --------------------

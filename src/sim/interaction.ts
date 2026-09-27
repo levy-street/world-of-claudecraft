@@ -1,3 +1,5 @@
+import { vehicleStationByEntityId } from './vehicle_stations';
+import { enterVehicle } from './vehicles';
 // Interaction: looting, quest NPCs, ground objects. The three IWorldInteraction
 // command bodies (lootCorpse / pickUpObject / interact) extracted from sim.ts
 // (session W3) as a pure MOVE behind SimContext, exactly as PR #943 did for
@@ -6,9 +8,9 @@
 // Sim keeps thin same-named delegates so the IWorld surface, server/game.ts, and
 // the tests resolve unchanged (the widened `pid?` overload stays on the delegates).
 //
-// The quest-NPC dispatch these bodies fan into (talkToNpc) plus the shared
-// quest-interaction predicate (isQuestInteractionEntity) STAY on Sim (W4's
-// quest-NPC surface) and are reached through two append-only SimContext callbacks.
+// Quest-NPC dispatch (talkToNpc) stays on Sim. The shared eligibility predicate
+// lives here; Sim retains its replaceable reference for the existing late-bound
+// SimContext callbacks and test seams.
 // The corpse-loot helpers (distributeLootCopper / awardSharedLootItem /
 // lootSlotVisibleTo / pruneCorpseLoot) are imported from loot/loot_roll.ts (L1/W6)
 // and the encounter interaction hooks from encounters/nythraxis.ts and
@@ -26,6 +28,7 @@ import { bagPools, canGrantItemInstance } from './bags';
 import { NOTICEBOARD_LISTINGS } from './content/noticeboard_listings';
 import { type NoticeboardDef, noticeboardDefByEntityId } from './content/noticeboards';
 import { currentRealmBuilder, pastRealmBuilders } from './content/realm_builders';
+import { FORGE_INTERACT_RANGE } from './content/world_quest_forging';
 import { corpseInteractionAvailability } from './corpse_interaction';
 import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
 import * as deedsMod from './deeds';
@@ -64,9 +67,17 @@ import {
   REALM_BUILDER_MONUMENT_INTERACT_RADIUS,
   REALM_BUILDER_MONUMENT_TEMPLATE_ID,
 } from './types';
+import { talkToWeeklyKeeper } from './weekly_rewards';
 import { markWorldBossLooted } from './world_boss';
+import { forgeStationForEntity } from './world_quest_forging';
+import { isFarshoreSalvageEntity } from './world_quest_salvage';
 
 const LOCKPICK_OFFER_COOLDOWN = 4; // seconds between repeated rift_locked_chest offer emits per player
+
+export function isQuestInteractionEntity(e: Entity): boolean {
+  if (e.kind === 'npc') return true;
+  return e.kind === 'mob' && !e.hostile && !e.dead && e.questIds.length > 0;
+}
 
 // Shared corpse loot-rights snapshot for both the manual `lootCorpse` and the passive
 // walk-by `autoLootForParty`. The caller passes `ffaUnlocked` so the two paths can
@@ -140,18 +151,19 @@ export function lootCorpse(
   for (const s of [...mob.loot.items]) {
     if (!lootSlotVisibleTo(s, meta.entityId)) continue;
     if (s.openToAll) {
-      while (s.count > 0 && ctx.canAddItem(s.itemId, 1, meta.entityId)) {
-        if (s.instance) {
-          ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId);
-        } else {
-          // Through the shared award grant, NOT a bare addItem: an openToAll
-          // slot is how an everyone-passed (or winner-offline) roll returns a
-          // drop to the corpse, and a soulbound item picked up from it must
-          // carry the same bind-on-pickup party trade window a roll win
-          // would; a bare add minted a permanently untradeable copy from the
-          // most common raid outcome (everyone passes to sort it out later).
-          grantAwardedLootItem(ctx, s.itemId, meta.entityId, killSnapshotEligibility(ctx, mob));
-        }
+      while (
+        s.count > 0 &&
+        (s.instance
+          ? canGrantItemInstance(meta.inventory, bagPools(meta.bags), s.itemId, s.instance)
+          : ctx.canAddItem(s.itemId, 1, meta.entityId))
+      ) {
+        grantAwardedLootItem(
+          ctx,
+          s.itemId,
+          meta.entityId,
+          killSnapshotEligibility(ctx, mob),
+          s.instance,
+        );
         s.count--;
         didLoot = true;
       }
@@ -161,16 +173,22 @@ export function lootCorpse(
     if (s.personalFor) {
       if (
         s.instance
-          ? !canGrantItemInstance(meta.inventory, bagPools(meta.bags), s.itemId, s.instance)
-          : !ctx.canAddItem(s.itemId, 1, meta.entityId)
+          ? !canGrantItemInstance(
+              meta.inventory,
+              bagPools(meta.bags),
+              s.itemId,
+              s.instance,
+              s.count,
+            )
+          : !ctx.canAddItem(s.itemId, s.count, meta.entityId)
       ) {
         bagsFull = true;
         continue;
       }
       if (s.instance) {
-        ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId);
+        ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId, s.count);
       } else {
-        ctx.addItem(s.itemId, 1, meta.entityId);
+        ctx.addItem(s.itemId, s.count, meta.entityId);
       }
       s.personalFor = s.personalFor.filter((id) => id !== meta.entityId);
       tookPersonal = true;
@@ -179,15 +197,8 @@ export function lootCorpse(
     }
     if (!rights.shared) continue;
     while (s.count > 0) {
-      if (s.instance) {
-        if (!canGrantItemInstance(meta.inventory, bagPools(meta.bags), s.itemId, s.instance)) break;
-        ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId);
-        s.count--;
-      } else if (awardSharedLootItem(ctx, s.itemId, mob, meta, ffaUnlocked)) {
-        s.count--;
-      } else {
-        break;
-      }
+      if (!awardSharedLootItem(ctx, s.itemId, mob, meta, ffaUnlocked, s.instance)) break;
+      s.count--;
       didLoot = true;
     }
     if (s.count > 0) bagsFull = true;
@@ -272,13 +283,17 @@ export function pickUpObject(
   }
   const obj = ctx.entities.get(objId);
   if (obj?.kind !== 'object' || !obj.lootable) return false;
+  const vehicleStation = vehicleStationByEntityId(obj.id);
+  if (vehicleStation) return enterVehicle(ctx, vehicleStation.id, p.id);
   const noticeboardDef = noticeboardDefByEntityId(noticeboardDefinitions, obj.id);
   const isRealmBuilderMonument = obj.templateId === REALM_BUILDER_MONUMENT_TEMPLATE_ID;
   // Preserve the historical no-op for malformed/non-pickup objects. The board
   // and the monument are the intentional lootable objects without an item
   // payload: both are read, never taken.
   if (!noticeboardDef && !isRealmBuilderMonument && !obj.objectItemId) return false;
-  const interactionRange = noticeboardDef?.interactionRadius ?? INTERACT_RANGE;
+  const interactionRange =
+    noticeboardDef?.interactionRadius ??
+    (forgeStationForEntity(obj) ? FORGE_INTERACT_RANGE : INTERACT_RANGE);
   if (isRealmBuilderMonument && dist2d(p.pos, obj.pos) > REALM_BUILDER_MONUMENT_INTERACT_RADIUS) {
     ctx.error(meta.entityId, 'Too far away.');
     return false;
@@ -356,13 +371,16 @@ export function pickUpObject(
   if (!ignivarLore.allowQuestCredit) return ignivarLore.handled;
   const beforeQuestProgress = meta.counters.questProgress;
   const beforeQuestNextId = ctx.nextId;
-  if (interactObjectForQuests(ctx, obj, meta)) {
+  const worldQuestHandled = ctx.onObjectInteractedForWorldQuests(obj, meta);
+  if (!isFarshoreSalvageEntity(obj) && interactObjectForQuests(ctx, obj, meta)) {
     return (
       ignivarLore.handled ||
+      worldQuestHandled ||
       meta.counters.questProgress !== beforeQuestProgress ||
       ctx.nextId !== beforeQuestNextId
     );
   }
+  if (worldQuestHandled) return true;
   if (ignivarLore.handled) return true;
   const def = ITEMS[objectItemId];
   if (def?.questId) {
@@ -433,7 +451,11 @@ export function interact(
   }
   if (p.targetId !== null) {
     const target = ctx.entities.get(p.targetId);
-    if (target && dist2d(p.pos, target.pos) <= INTERACT_RANGE + 2) {
+    if (
+      target &&
+      dist2d(p.pos, target.pos) <=
+        (forgeStationForEntity(target) ? FORGE_INTERACT_RANGE : INTERACT_RANGE + 2)
+    ) {
       if (target.kind === 'mob' && target.lootable) {
         const availability = corpseInteractionAvailability(ctx, target, p.id, true);
         if (availability.hasLoot) {
@@ -480,10 +502,14 @@ export function interact(
         pickUpObject(ctx, target.id, p.id, noticeboardDefinitions);
         return;
       }
+      if (talkToWeeklyKeeper(ctx, target, p)) return;
       if (target.kind === 'npc' && ctx.bankerIds.includes(target.id)) {
         // Opening the bank window counts as banker business for the NPC ledger.
         deedsMod.onBankerBusinessForDeeds(ctx, r.meta, target.templateId);
-        ctx.emit({ type: 'bank', pid: p.id });
+        ctx.emit({
+          type: 'bank',
+          pid: p.id,
+        });
         return;
       }
       if (target.kind === 'npc' && isRiftForgeNpc(target)) {
@@ -591,10 +617,14 @@ export function interact(
     pickUpObject(ctx, obj.id, p.id, noticeboardDefinitions);
     return;
   }
+  if (questEntity && talkToWeeklyKeeper(ctx, questEntity, p)) return;
   if (questEntity && ctx.bankerIds.includes(questEntity.id)) {
     // Opening the bank window counts as banker business for the NPC ledger.
     deedsMod.onBankerBusinessForDeeds(ctx, r.meta, questEntity.templateId);
-    ctx.emit({ type: 'bank', pid: p.id });
+    ctx.emit({
+      type: 'bank',
+      pid: p.id,
+    });
     return;
   }
   if (questEntity && isRiftForgeNpc(questEntity)) {

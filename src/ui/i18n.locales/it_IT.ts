@@ -13,6 +13,2155 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const it_IT: Partial<Record<TranslationKey, string>> = {
+  'abilityUi.forms.bearOrCat': 'orso o gatto',
+  'abilityUi.tooltip.edictDamage':
+    "Colpisce per il {weaponPercent}% del danno dell'arma più {damage} danni Fisici. Il danno dell'arma include la potenza d'attacco.",
+  'abilityUi.tooltip.edictExplosion':
+    "Mentre Ascensione è attiva, l'esplosione infligge {damage} danni Fisici entro {radius} m, ridotti oltre {cap} bersagli. Questo danno aumenta con la potenza d'attacco.",
+  'abilityUi.tooltip.verdictDamage':
+    "Editto Finale detona infliggendo {verdictSingleDamage} danni Sacri. Caduta dell'Alba detona infliggendo {verdictAreaDamage} danni Sacri entro {verdictAreaRadius} m, ridotti oltre {verdictAreaCap} bersagli. Nessuna delle due detonazioni aumenta con il Potere Magico. Solo un nemico alla volta può portare il tuo marchio.",
+  'character.currentLocation': 'Posizione attuale: {zone}',
+  'character.lockoutDungeons': 'Dungeon',
+  'character.lockoutRaids': 'Incursioni',
+  'character.lockoutWorldBosses': 'Boss del mondo',
+  'character.lockouts': 'Blocchi ({count})',
+  'hud.core.deathRecap': 'Riepilogo',
+  'hud.core.deathRecapClose': 'Chiudi',
+  'hud.core.deathRecapCrit': 'Critico',
+  'hud.core.deathRecapDamage': 'Danni',
+  'hud.core.deathRecapHeal': 'Cure',
+  'hud.core.deathRecapKiller': 'Colpo mortale: {killer} ({ability})',
+  'hud.core.deathRecapLethal': 'Colpo Mortale',
+  'hud.core.deathRecapNoEvents': 'Nessun evento di combattimento registrato.',
+  'hud.core.deathRecapNoKiller': 'Eventi di combattimento che hanno portato alla morte',
+  'hud.core.deathRecapTitle': 'Riepilogo Morte',
+  'hud.core.mapMarkerLabels.activeWorldQuest': 'Missione mondiale attiva: {name}',
+  'hud.core.mapMarkerLabels.availableWorldQuest': 'Missione mondiale disponibile: {name}',
+  'hud.core.mapMarkerLabels.worldBoss': 'Boss del mondo: {name}',
+  'hud.errors.bearOrCat': 'Bruin o Gatto',
+  'hud.meters.activity': 'Attività: {pct}',
+  'hud.meters.avoidableDmg': 'Danni evitabili',
+  'hud.meters.avoidableDmgShort': 'Evit.',
+  'hud.meters.back': 'Indietro',
+  'hud.meters.criticals': 'Critici: {count}',
+  'hud.meters.damageTaken': 'Danni subiti',
+  'hud.meters.damageTakenShort': 'Subiti',
+  'hud.meters.deaths': 'Morti',
+  'hud.meters.deathsShort': 'Morti',
+  'hud.meters.dispels': 'Rimozioni',
+  'hud.meters.dispelsShort': 'Rim.',
+  'hud.meters.groupTotal': 'Totale: {total} ({rate})',
+  'hud.meters.hits': 'Colpi: {count}',
+  'hud.meters.interrupts': 'Interruzioni',
+  'hud.meters.interruptsShort': 'Int.',
+  'hud.meters.newWindow': 'Nuova finestra',
+  'hud.meters.reset': 'Ripristina misuratori',
+  'hud.meters.resetAll': 'Ripristina tutti i dati',
+  'hud.meters.resetFight': 'Ripristina lo scontro attuale',
+  'hud.meters.resetHint': 'Ripristina i dati di combattimento',
+  'hud.meters.selectMode': 'Seleziona modalità misuratore',
+  'hud.meters.selectSegment': 'Seleziona segmento di scontro',
+  'hud.meters.topAbility': 'Migliore: {name}',
+  'hud.system.respawnKeeperToll':
+    'Il Custode Pallido ti ha fatto rivivere, ma ne esci indebolito: il Mal di resurrezione drena i tuoi attributi finché non svanisce.',
+  'hudChrome.auraEffect.benisonPrayers':
+    'La tua prossima Cura del Coro guarisce del {pct}% in più e consuma tutti gli accumuli.',
+  'hudChrome.auraEffect.benisonWhisper':
+    'La tua prossima Preghiera Sussurrata è istantanea e guarisce del {pct}% in più. Usala prima che questo effetto scada.',
+  'hudChrome.auraEffect.carryingFreight':
+    'Stai trasportando un carico. La velocità di movimento è ridotta del {pct}%.',
+  'hudChrome.auraEffect.trinket.bleedEdge':
+    "I tuoi colpi di attacco automatico applicano Ferita d'Artiglio: {tick} danni Fisici per accumulo ogni {every} sec per {duration} sec, fino a un massimo di {max} accumuli.",
+  'hudChrome.auraEffect.trinket.bleedEdgeOther':
+    "I colpi di attacco automatico applicano Ferita d'Artiglio, un sanguinamento Fisico che si accumula fino a {max} volte. Il danno aumenta con la potenza d'attacco.",
+  'hudChrome.auraEffect.trinket.brand': 'Le cure ricevute sono ridotte del {pct}%.',
+  'hudChrome.auraEffect.trinket.crucibleHeat':
+    'Calore: {stacks}/{max}. Usa Cuore del Crogiolo per spenderlo tutto in una nova di fuoco che infligge {damage} danni da Fuoco a ogni nemico entro {radius} m e provoca ogni creatura che colpisce.',
+  'hudChrome.auraEffect.trinket.crucibleHeatOther':
+    'Calore: {stacks}/{max}. Cuore del Crogiolo lo spende tutto in una nova di fuoco entro {radius} m che infligge più danni da Fuoco per ogni accumulo e provoca ogni creatura che colpisce.',
+  'hudChrome.auraEffect.trinket.echo':
+    'Le tue prossime {casts} cure dirette o i colpi di danno diretto non Fisico si ripetono per il {pct}% del loro ammontare.',
+  'hudChrome.auraEffect.trinket.forgeHeat':
+    "Calore: {stacks}/{max}. Usare Tempra del Padre della Forgia lo spende tutto, e il suo fuoco d'arma infligge il {pct}% di danno in più.",
+  'hudChrome.auraEffect.trinket.gildedGuard':
+    'Fortuna del Dado del Giocatore: assorbe {value} danni.',
+  'hudChrome.auraEffect.trinket.hourglassShield':
+    'Assorbe {value} danni. Creato dalla cura che una Clessidra del Guaritore ha immagazzinato.',
+  'hudChrome.auraEffect.trinket.hourglassStored':
+    'Contiene {stored} cura immagazzinata dalle tue cure in eccesso. Usa Clessidra del Guaritore per trasformarla in uno scudo sul membro del gruppo entro {range} m con la percentuale di salute più bassa, te incluso.',
+  'hudChrome.auraEffect.trinket.keenEdge':
+    'Fortuna del Dado del Giocatore: infliggi il {pct}% di danno in più.',
+  'hudChrome.auraEffect.trinket.kindlingOrb':
+    'Ogni incantesimo che lanci contro un nemico fa sì che la sfera scagli un dardo contro quel nemico per {damage} danni da Fuoco. Trattiene il fuoco contro un nemico trasformato, incapacitato o accecato.',
+  'hudChrome.auraEffect.trinket.kindlingOrbOther':
+    'Ogni incantesimo lanciato contro un nemico fa sì che la sfera scagli un dardo di danno da Fuoco contro quel nemico. Il danno aumenta con il Potere Magico.',
+  'hudChrome.auraEffect.trinket.lantern':
+    'Una cura diretta ricevuta da te o da un membro del gruppo entro {radius} m dalla lanterna cura anche il membro del gruppo più ferito nella sua luce per il {pct}% della cura.',
+  'hudChrome.auraEffect.trinket.lastBastion':
+    'Assorbe {value} danni. Sigillo del Bastione lo ha alzato quando hai subito danno sotto il {threshold}% di salute.',
+  'hudChrome.auraEffect.trinket.lastStandCooldown':
+    'Lo scudo Ultimo Bastione di Sigillo del Bastione è stato usato. Scendere sotto il {threshold}% di salute non può rialzarlo finché questo effetto non scade.',
+  'hudChrome.auraEffect.trinket.luckyStreak':
+    'Fortuna del Dado del Giocatore: ripristina {tick} salute ogni {every} sec.',
+  'hudChrome.auraEffect.trinket.moltenIgnite':
+    "Infligge {damage} danni da Fuoco ogni {every} sec. Un altro colpo critico con l'arma lo rinnova.",
+  'hudChrome.auraEffect.trinket.moored':
+    'Subisci il {reduction}% di danno in meno ma ti muovi al {speed}% della velocità. Ignori storditori, radicamenti, rallentamenti, paure, trasformazioni, silenzi, accecamenti, maledizioni, disarmi, effetti incapacitanti e respingimenti.',
+  'hudChrome.auraEffect.trinket.pierce':
+    'I tuoi attacchi automatici, colpi a distanza e abilità fisiche (non i sanguinamenti) colpiscono anche il nemico più vicino al tuo bersaglio entro {reach} m per il {pct}% del danno inflitto.',
+  'hudChrome.auraEffect.trinket.retaliate':
+    'I nemici che ti colpiscono direttamente subiscono danni Fisici pari al {pct}% della salute che quel colpo ti ha tolto. Il danno periodico non lo attiva.',
+  'hudChrome.auraEffect.trinket.riftGuard': 'Subisci il {pct}% di danno in meno.',
+  'hudChrome.auraEffect.trinket.sprint':
+    'Velocità di movimento aumentata del {pct}%. Non si somma con altri aumenti di velocità.',
+  'hudChrome.auraEffect.trinket.storm':
+    "Cariche: {stacks}/{max}. Usa Vaso della Tempesta per rilasciarle come un dardo che colpisce il tuo bersaglio e fino a {extra} nemici in più entro {jumpRange} m l'uno dall'altro per {damage} danni da Natura ciascuno ({perCharge} per carica).",
+  'hudChrome.auraEffect.trinket.stormOther':
+    'Cariche: {stacks}/{max}. Vaso della Tempesta le rilascia come un dardo di Natura che colpisce il bersaglio e fino a {extra} nemici in più, infliggendo più danno per ogni carica.',
+  'hudChrome.auraEffect.trinket.tally':
+    'Tacche: {stacks}/{max}. Usa Tacche del Cacciatore per spenderle tutte in un colpo contro il tuo bersaglio per {damage} danni Fisici ({perMark} per tacca).',
+  'hudChrome.auraEffect.trinket.tallyOther':
+    'Tacche: {stacks}/{max}. Tacche del Cacciatore le spende tutte in un colpo Fisico che infligge più danno per ogni tacca.',
+  'hudChrome.auraEffect.trinket.talonWound':
+    'Infligge {damage} danni Fisici ogni {every} sec ({stacks}/{max} accumuli). Ogni nuovo accumulo aggiunge danno e rinnova la durata.',
+  'hudChrome.auraEffect.trinket.tempered':
+    'I tuoi colpi con armi da mischia e a distanza infliggono {damage} danni da Fuoco extra ({pct}% in più dal calore speso). Ogni colpo mortale aggiunge {killExtend} sec, fino a un totale di {maxDuration} sec.',
+  'hudChrome.auraEffect.trinket.temperedOther':
+    "I colpi con armi da mischia e a distanza infliggono danni da Fuoco extra, il {pct}% in più dal calore speso. Il danno aumenta con la potenza d'attacco o con la potenza d'attacco a distanza, a seconda di quale sia maggiore.",
+  'hudChrome.auraEffect.trinket.twinStrikeCooldown':
+    'Artigli Gemelli ha appena effettuato un fendente extra. Non può farne un altro finché questo effetto non scade.',
+  'hudChrome.auraEffect.trinket.wellspring': 'Ripristina {tick} salute ogni {every} sec.',
+  'hudChrome.auraTooltip.caster': 'Lanciato da {name}',
+  'hudChrome.bank.vaultSearchAria': 'Cerca i materiali del caveau per nome',
+  'hudChrome.bank.vaultSearchNoMatch':
+    'Nessun materiale nel tuo caveau corrisponde alla tua ricerca.',
+  'hudChrome.charSheet.ratings': 'Valutazioni',
+  'hudChrome.charSheet.spell': 'Magia',
+  'hudChrome.charSidebar.character': 'Personaggio',
+  'hudChrome.charSidebar.currencies': 'Valute',
+  'hudChrome.charSidebar.professions': 'Professioni',
+  'hudChrome.charSidebar.reputation': 'Reputazione',
+  'hudChrome.cooldownManager.addGrid': 'Aggiungi gruppo di pulsanti',
+  'hudChrome.cooldownManager.addLine': 'Aggiungi riga di incantesimi',
+  'hudChrome.cooldownManager.addSingle': 'Aggiungi pulsante singolo',
+  'hudChrome.cooldownManager.alertStacks': 'Avvisa agli accumuli',
+  'hudChrome.cooldownManager.alertStacksAny': 'Alla comparsa',
+  'hudChrome.cooldownManager.alertStacksHint':
+    'Il pulsante si illumina, pulsa ed emette un suono quando l\'aura raggiunge questo numero di accumuli. "Alla comparsa" significa non appena appare.',
+  'hudChrome.cooldownManager.auraFallback': 'Aura',
+  'hudChrome.cooldownManager.auraSoundHint':
+    "Suona quando l'aura compare, o quando raggiunge il tuo obiettivo di accumuli.",
+  'hudChrome.cooldownManager.aurasHint':
+    'Risorse di classe e i loro accumuli, i proc, e i potenziamenti che i tuoi incantesimi applicano su di te. Anche qualsiasi altra cosa sia stata applicata su di te compare qui.',
+  'hudChrome.cooldownManager.aurasTitle': 'Proc, Risorse e Potenziamenti',
+  'hudChrome.cooldownManager.columns': 'N. colonne',
+  'hudChrome.cooldownManager.combatOnly': 'Suoni solo in combattimento',
+  'hudChrome.cooldownManager.deleteGroup': 'Elimina gruppo',
+  'hudChrome.cooldownManager.deleteGroupAria': 'Elimina {group}',
+  'hudChrome.cooldownManager.dirDown': 'Giù',
+  'hudChrome.cooldownManager.dirLeft': 'Sinistra',
+  'hudChrome.cooldownManager.dirRight': 'Destra',
+  'hudChrome.cooldownManager.dirUp': 'Su',
+  'hudChrome.cooldownManager.direction': 'Direzione icone',
+  'hudChrome.cooldownManager.dragHint':
+    'Mentre questo menu è aperto, ogni gruppo viene mostrato a schermo e puoi trascinarlo per spostarlo.',
+  'hudChrome.cooldownManager.emptySection': 'Trascina qui un incantesimo.',
+  'hudChrome.cooldownManager.enabled': 'Mostra Gestore Tempi di Recupero',
+  'hudChrome.cooldownManager.generalTitle': 'Generale',
+  'hudChrome.cooldownManager.glowWhenReady': 'Si illumina quando pronto',
+  'hudChrome.cooldownManager.glowWhenReadyHint':
+    "Illumina e delinea il pulsante mentre l'incantesimo può essere lanciato.",
+  'hudChrome.cooldownManager.group': 'Gruppo',
+  'hudChrome.cooldownManager.groupFullOption': '{group} (pieno)',
+  'hudChrome.cooldownManager.groupGrid': 'Gruppo di pulsanti {index}',
+  'hudChrome.cooldownManager.groupLine': 'Riga di incantesimi {index}',
+  'hudChrome.cooldownManager.groupName': 'Nome del gruppo',
+  'hudChrome.cooldownManager.groupSingle': 'Pulsante singolo {index}',
+  'hudChrome.cooldownManager.groupsFull':
+    'Hai raggiunto il numero massimo di gruppi consentiti. Eliminane uno per aggiungerne un altro.',
+  'hudChrome.cooldownManager.horizontal': 'Orizzontale',
+  'hudChrome.cooldownManager.hotbarGlow': 'Bagliore sulla barra azioni',
+  'hudChrome.cooldownManager.hotbarGlowHint':
+    'Illumina anche questo incantesimo sulla tua barra delle azioni mentre è pronto.',
+  'hudChrome.cooldownManager.iconPadding': 'Spaziatura interna icone',
+  'hudChrome.cooldownManager.iconSize': 'Dimensione icone',
+  'hudChrome.cooldownManager.idleOpacity': 'Opacità quando non pronto',
+  'hudChrome.cooldownManager.intro':
+    'Pulsanti fluttuanti per gli incantesimi che scegli. Non possono essere cliccati: ciascuno mostra il proprio tempo di recupero, si affievolisce quando non puoi lanciarlo e si illumina quando è pronto.',
+  'hudChrome.cooldownManager.moveEarlier': 'Sposta {spell} prima',
+  'hudChrome.cooldownManager.moveLater': 'Sposta {spell} dopo',
+  'hudChrome.cooldownManager.noGroups':
+    'Aggiungi un pulsante singolo, un gruppo di pulsanti o una riga di incantesimi per iniziare.',
+  'hudChrome.cooldownManager.notDisplayed': 'Non visualizzato',
+  'hudChrome.cooldownManager.notInGroupHint':
+    'Metti questo incantesimo in un gruppo per mostrarne il pulsante.',
+  'hudChrome.cooldownManager.notKnown': '{spell} (non ancora appreso)',
+  'hudChrome.cooldownManager.onlyWhenReady': 'Mostra solo quando pronto',
+  'hudChrome.cooldownManager.onlyWhileActive': 'Mostra solo quando attivo',
+  'hudChrome.cooldownManager.opacity': 'Opacità',
+  'hudChrome.cooldownManager.orientation': 'Orientamento',
+  'hudChrome.cooldownManager.otherSpells': 'Altri incantesimi',
+  'hudChrome.cooldownManager.otherSpellsHint':
+    'Incantesimi dalle tue altre specializzazioni, scelte dei talenti e livelli superiori. Posizionane uno ora e il suo pulsante apparirà non appena lo apprendi.',
+  'hudChrome.cooldownManager.positionX': 'Posizione orizzontale',
+  'hudChrome.cooldownManager.positionY': 'Posizione verticale',
+  'hudChrome.cooldownManager.resetPosition': 'Ripristina posizione predefinita',
+  'hudChrome.cooldownManager.rows': 'N. righe',
+  'hudChrome.cooldownManager.search': 'Cerca incantesimi',
+  'hudChrome.cooldownManager.searchPlaceholder': 'Cerca',
+  'hudChrome.cooldownManager.selectSpell': 'Seleziona {spell}',
+  'hudChrome.cooldownManager.showTimer': 'Mostra timer',
+  'hudChrome.cooldownManager.sound': 'Suono di pronto',
+  'hudChrome.cooldownManager.soundHint':
+    "Suona quando l'incantesimo diventa pronto, o quando il suo pulsante cambia in un altro incantesimo mentre è pronto.",
+  'hudChrome.cooldownManager.spellCount': '{count} / {max} incantesimi',
+  'hudChrome.cooldownManager.spellsEmpty': 'Non conosci ancora nessun incantesimo.',
+  'hudChrome.cooldownManager.title': 'Gestore Tempi di Recupero',
+  'hudChrome.cooldownManager.trackedHint':
+    'Trascina un incantesimo su un gruppo, oppure selezionalo per sceglierne il gruppo e gli avvisi. Un pulsante segue il proprio incantesimo quando questo cambia in un altro, e si illumina quando lo fa.',
+  'hudChrome.cooldownManager.trackedTitle': 'Incantesimi monitorati',
+  'hudChrome.cooldownManager.vertical': 'Verticale',
+  'hudChrome.cooldownManager.visAlways': 'Sempre visibile',
+  'hudChrome.cooldownManager.visCombat': 'In combattimento',
+  'hudChrome.cooldownManager.visHidden': 'Nascosta',
+  'hudChrome.cooldownManager.visHiddenHint':
+    'Un gruppo nascosto continua comunque a riprodurre i suoi suoni e a illuminare la tua barra delle azioni.',
+  'hudChrome.cooldownManager.visibility': 'Visibilità',
+  'hudChrome.crafting.mobileStationTitle': '{station} di {name}',
+  'hudChrome.currencies.activities': 'Attività',
+  'hudChrome.currencies.delveMark': "Marchio dell'Incursione",
+  'hudChrome.currencies.delveMarkNote': 'Incursioni completate',
+  'hudChrome.currencies.factionPending': 'Valuta di fazione: in attesa della Fase 2',
+  'hudChrome.currencies.factions': 'Fazioni',
+  'hudChrome.currencies.heroicMarkNote': 'Dungeon eroici . spendi dal quartiermastro eroico',
+  'hudChrome.currencies.honor': 'Onore',
+  'hudChrome.currencies.honorNote': 'Campi di battaglia e arena',
+  'hudChrome.currencies.intro':
+    'Nessuna di queste occupa spazio nelle borse. Il denaro resta nella tua borsa come sempre.',
+  'hudChrome.currencies.lifetime': 'Cumulativo: {amount}',
+  'hudChrome.currencies.walletNotLinked': 'Nessun portafoglio collegato',
+  'hudChrome.currencies.wocPreview': 'Saldo di anteprima, non ancora verificato',
+  'hudChrome.currencies.wocToken': 'WoC Token',
+  'hudChrome.currencies.wocTokenNote': 'Saldo del portafoglio collegato',
+  'hudChrome.death.ghostHint':
+    'Corri fino al luogo della tua morte oppure parla con il Custode Pallido per rivivere',
+  'hudChrome.death.keeperConfirmBody':
+    'Sei sicuro? Il Custode Pallido ti farà rivivere, ma ne uscirai indebolito: il Mal di resurrezione riduce tutti i tuoi attributi del 75% finché non svanisce, fino a 10 minuti ai livelli più alti.',
+  'hudChrome.death.keeperConfirmSparedBody':
+    'Sei sicuro? Il Custode Pallido ti farà rivivere qui. Sei sotto il livello 10, quindi il Mal di resurrezione non ti indebolirà questa volta.',
+  'hudChrome.death.keeperConfirmSparedTitle': 'Lasciare che il Custode ti risvegli?',
+  'hudChrome.death.keeperTalkAccept': 'Fammi rivivere',
+  'hudChrome.death.keeperTalkBody':
+    'Posso farti risorgere dove ti trovi, ma il mio prezzo lo accompagna: il Mal di resurrezione riduce tutti i tuoi attributi del 75%, fino a 10 minuti ai livelli più alti. Riportare il tuo spirito fino al luogo della tua caduta ti fa rivivere senza alcuna penalità.',
+  'hudChrome.death.keeperTalkLeave': 'Vai via',
+  'hudChrome.death.keeperTalkSparedBody':
+    'Posso farti risorgere dove ti trovi. Il mio prezzo normalmente lo accompagnerebbe, un indebolimento temporaneo di tutto ciò che sei, ma sei nuovo in questo mondo, quindi te ne risparmierò. Riportare il tuo spirito fino al luogo della tua caduta ti fa rivivere senza alcuna penalità in ogni caso.',
+  'hudChrome.death.keeperTalkTitle': 'Il Custode Pallido',
+  'hudChrome.enchantDescription.enchant_weapon_dawnfire_etching':
+    "Incide permanentemente un'arma con 18 Potere Magico. Il Potere Magico conta anche ai fini del Potere di Guarigione. Un bonus fisso: non scala.",
+  'hudChrome.enchantDescription.enchant_weapon_dawns_benediction':
+    "Incide permanentemente un'arma con 34 Potere di Guarigione. Il Potere di Guarigione aumenta solo le cure, mai il danno degli incantesimi. Un bonus fisso: non scala.",
+  'hudChrome.enchantDescription.enchant_weapon_piston_drive':
+    "Incide permanentemente un'arma a due mani con 12 Forza e 25 Indice di Critico. Non può essere applicato a un'arma a una mano. Un bonus fisso: non scala.",
+  'hudChrome.enchantDescription.enchant_weapon_riftwalkers_grace':
+    "I tuoi attacchi in mischia che colpiscono possono concedere 60 Agilità e il 2% di velocità d'attacco in mischia in più per 15 s. Ogni colpo ha una probabilità dell'1% per ogni 0,6 s della velocità base dell'arma che colpisce. Nessun tempo di recupero interno. Entrambe le mani condividono un unico beneficio; ogni attivazione lo rinnova e non si accumula mai. Gli attacchi a distanza non attivano questo effetto. Forma del Gatto usa invece la sua velocità base di attacco di 1 s.",
+  'hudChrome.enchantName.enchant_weapon_dawnfire_etching': "Incisione dell'arma: Fuoco dell'Alba",
+  'hudChrome.enchantName.enchant_weapon_dawns_benediction':
+    "Incisione dell'arma: Benedizione dell'Alba",
+  'hudChrome.enchantName.enchant_weapon_piston_drive': "Incisione dell'arma: Propulsione a Pistone",
+  'hudChrome.enchantName.enchant_weapon_riftwalkers_grace': 'Grazia del Percorritore degli Squarci',
+  'hudChrome.ferry.boardHint': 'Sali sul suo ponte quando salpa. La traversata è gratuita.',
+  'hudChrome.ferry.castingOff': 'Il traghetto per {dest} sta salpando',
+  'hudChrome.ferry.departsIn': 'Il traghetto per {dest} parte tra {time}',
+  'hudChrome.ferry.regionLabel': 'Orario dei traghetti',
+  'hudChrome.ferry.sailing': 'In navigazione verso {dest}',
+  'hudChrome.focusTargets.ally': 'Alleato',
+  'hudChrome.focusTargets.assign': 'Imposta il focus {slot}',
+  'hudChrome.focusTargets.assignClickHint': 'Seleziona un bersaglio. Clicca {button}.',
+  'hudChrome.focusTargets.assignHint': 'Seleziona un bersaglio. Premi {key} o clicca {button}.',
+  'hudChrome.focusTargets.enemy': 'Nemico',
+  'hudChrome.focusTargets.frame1': 'Focus 1',
+  'hudChrome.focusTargets.frame2': 'Focus 2',
+  'hudChrome.focusTargets.frame3': 'Focus 3',
+  'hudChrome.focusTargets.showEmpty': 'Mostra riquadri focus vuoti',
+  'hudChrome.focusTargets.target': 'Bersaglia focus {slot}',
+  'hudChrome.focusTargets.unset': 'Rimuovi focus',
+  'hudChrome.frameMenus.allOptions': 'Tutte le opzioni dei riquadri',
+  'hudChrome.frameMenus.auras': 'Aure',
+  'hudChrome.frameMenus.bars': 'Barre delle azioni',
+  'hudChrome.frameMenus.combat': 'Visualizzazioni di combattimento',
+  'hudChrome.frameMenus.hide': 'Nascondi riquadro',
+  'hudChrome.frameMenus.independentTarget': 'Blocca il bersaglio del bersaglio sul bersaglio',
+  'hudChrome.frameMenus.options': 'Opzioni del riquadro',
+  'hudChrome.frameMenus.other': "Altri elementi dell'HUD",
+  'hudChrome.frameMenus.trackers': 'Indicatori',
+  'hudChrome.frameMenus.units': 'Riquadri unità',
+  'hudChrome.framePresets.apply': 'Applica',
+  'hudChrome.framePresets.current': 'Disposizione attuale',
+  'hudChrome.framePresets.deleteBody': 'Eliminare il preset di riquadri «{name}»?',
+  'hudChrome.framePresets.deleteNamed': 'Elimina {name}',
+  'hudChrome.framePresets.empty': 'Nessun preset salvato',
+  'hudChrome.framePresets.failed': 'Non è stato possibile salvare o caricare il preset.',
+  'hudChrome.framePresets.name': 'Nome del preset',
+  'hudChrome.framePresets.new': 'Nuovo preset',
+  'hudChrome.framePresets.overwrite': 'Sovrascrivi preset',
+  'hudChrome.framePresets.overwriteBody':
+    'Sostituire il preset salvato «{name}» con la tua disposizione attuale?',
+  'hudChrome.framePresets.pickerLabel': 'Preset di riquadri: {name}',
+  'hudChrome.framePresets.remove': 'Elimina',
+  'hudChrome.framePresets.saved': 'Fatto.',
+  'hudChrome.framePresets.slot': 'Preset {slot}',
+  'hudChrome.framePresets.title': 'Preset di riquadri',
+  'hudChrome.guildRanks.add': 'Aggiungi grado',
+  'hudChrome.guildRanks.colActions': 'Ordine',
+  'hudChrome.guildRanks.colMembers': 'Membri',
+  'hudChrome.guildRanks.colRank': 'Grado',
+  'hudChrome.guildRanks.colTitle': 'Titolo',
+  'hudChrome.guildRanks.demoteTo': 'Retrocedi {name} a {rank}',
+  'hudChrome.guildRanks.full': 'Una gilda può avere al massimo {max} gradi.',
+  'hudChrome.guildRanks.introEdit':
+    'Assegna un nome ai gradi della tua gilda e scegli cosa ciascuno può fare. Le modifiche si applicano a tutti coloro che detengono quel grado non appena salvi.',
+  'hudChrome.guildRanks.introView':
+    'Il titolo di ciascun grado e cosa può fare. Solo il Maestro della Gilda può modificarli.',
+  'hudChrome.guildRanks.invalidTitle':
+    'I titoli dei gradi possono contenere lettere, numeri, spazi, apostrofi e trattini, fino a {max} caratteri.',
+  'hudChrome.guildRanks.leaderLocked': 'Il Maestro della Gilda detiene sempre tutti i permessi.',
+  'hudChrome.guildRanks.moveDown': 'Sposta {rank} in basso',
+  'hudChrome.guildRanks.moveUp': 'Sposta {rank} in alto',
+  'hudChrome.guildRanks.numbered': 'Grado {n}',
+  'hudChrome.guildRanks.perm.bank': 'Banca della Gilda',
+  'hudChrome.guildRanks.perm.events': 'Calendario',
+  'hudChrome.guildRanks.perm.invite': 'Invita',
+  'hudChrome.guildRanks.perm.motd': 'Bacheca',
+  'hudChrome.guildRanks.perm.officerChat': 'Chat degli ufficiali',
+  'hudChrome.guildRanks.perm.promote': 'Promuovi',
+  'hudChrome.guildRanks.perm.remove': 'Rimuovi',
+  'hudChrome.guildRanks.permHint.bank':
+    'Deposita e preleva rame e oggetti dalla banca della gilda. Ogni membro può visualizzarla.',
+  'hudChrome.guildRanks.permHint.events': 'Aggiungi e rimuovi eventi dal calendario della gilda.',
+  'hudChrome.guildRanks.permHint.invite':
+    'Invita giocatori nella gilda e rispondi ai loro giuramenti.',
+  'hudChrome.guildRanks.permHint.motd': 'Modifica la bacheca della gilda.',
+  'hudChrome.guildRanks.permHint.officerChat': 'Leggi e parla nella chat degli ufficiali.',
+  'hudChrome.guildRanks.permHint.promote':
+    'Promuovi e retrocedi i membri che detengono un grado inferiore, fino a un grado sotto il proprio.',
+  'hudChrome.guildRanks.permHint.remove': 'Rimuovi i membri che detengono un grado inferiore.',
+  'hudChrome.guildRanks.permLabel': '{perm} per {rank}',
+  'hudChrome.guildRanks.promoteTo': 'Promuovi {name} a {rank}',
+  'hudChrome.guildRanks.remove': 'Rimuovi {rank}',
+  'hudChrome.guildRanks.removeAccept': 'Rimuovi grado',
+  'hudChrome.guildRanks.removeConfirm':
+    'I membri con il grado {rank} diventeranno {fallback}. Rimuovere questo grado?',
+  'hudChrome.guildRanks.save': 'Salva gradi',
+  'hudChrome.guildRanks.tab': 'Gradi',
+  'hudChrome.guildRanks.titleLabel': 'Titolo per {rank}',
+  'hudChrome.hill.contestNone': "Mantieni la maggioranza all'interno per {total} per conquistarla",
+  'hudChrome.hill.contestOther': 'Stai perdendo la collina: {seconds} di {total}',
+  'hudChrome.hill.contestYou': 'Stai conquistando la collina: {seconds} di {total}',
+  'hudChrome.hill.counts': 'Dentro: tu {yours}, detentore {theirs}',
+  'hudChrome.hill.countsHolding': 'Dentro: tu {yours}, rivale {theirs}',
+  'hudChrome.hill.countsUnheld': 'Dentro: tu {yours}, rivale più numeroso {theirs}',
+  'hudChrome.hill.distance': '{yards} m al cerchio',
+  'hudChrome.hill.falls': 'Cade tra {minutes}',
+  'hudChrome.hill.heldNone': 'Nessuno detiene la collina',
+  'hudChrome.hill.heldOther': 'Un altro gruppo detiene la collina',
+  'hudChrome.hill.heldYou': 'Il tuo gruppo detiene la collina',
+  'hudChrome.hill.inside': 'Sei dentro il cerchio',
+  'hudChrome.hill.rises': 'Sorge tra {minutes}',
+  'hudChrome.hill.rising': 'La collina non è ancora sorta',
+  'hudChrome.hill.standingRaid':
+    "I membri di un'incursione non contano: solo i gruppi possono detenere la collina",
+  'hudChrome.hill.title': 'Il Re della Collina',
+  'hudChrome.hostDiag.create': 'Genera rapporto di sistema',
+  'hudChrome.hostDiag.failed': 'Non è stato possibile creare il rapporto. Riprova.',
+  'hudChrome.hostDiag.intro':
+    'Raccoglie dettagli su questo computer, inclusi i programmi che usano più processore e memoria, in un file che aiuta a diagnosticare problemi di prestazioni. Non viene inviato nulla: il file resta sul tuo computer.',
+  'hudChrome.hostDiag.running': 'Raccolta dei dettagli di sistema in corso...',
+  'hudChrome.hostDiag.saved': 'Rapporto salvato come {fileName}.',
+  'hudChrome.hostDiag.savedNoName': 'Rapporto salvato.',
+  'hudChrome.hostDiag.title': 'Rapporto di sistema',
+  'hudChrome.interfaceUnlock.combineAuras': 'Combina i riquadri delle aure',
+  'hudChrome.interfaceUnlock.combineTrackers': 'Combina i riquadri degli indicatori',
+  'hudChrome.interfaceUnlock.frameNames.auraGroup': 'Indicatori delle aure',
+  'hudChrome.interfaceUnlock.frameNames.trackerGroup': 'Indicatori',
+  'hudChrome.leaderboard.gliderCourseNames.downs': 'Circuito Costiero',
+  'hudChrome.leaderboard.gliderCourseNames.switchbacks': 'Tornanti della Cresta',
+  'hudChrome.leaderboard.gliderCourseNames.valleys': 'Circuito della Valle',
+  'hudChrome.leaderboard.gliderDaily': '{course}: Oggi',
+  'hudChrome.leaderboard.gliderLifetime': '{course}: Di sempre',
+  'hudChrome.leaderboard.gliderPersonalRules':
+    'I tuoi record offline, salvati con questo personaggio. Attraversa ogni anello in ordine. I record giornalieri si azzerano ogni giorno.',
+  'hudChrome.leaderboard.gliderRankings': "Record dei percorsi con l'aliante",
+  'hudChrome.leaderboard.gliderRules':
+    'Vince il volo completo più veloce. Attraversa ogni anello. I record giornalieri si azzerano con il reame. I record si aggiornano entro 30 secondi.',
+  'hudChrome.leaderboard.gliderStart': 'Vola questo percorso',
+  'hudChrome.leaderboard.tabWorldQuests': 'Missioni mondiali',
+  'hudChrome.leaderboard.wqBoardsLabel': 'Classifiche delle missioni mondiali',
+  'hudChrome.leaderboard.wqEmpty':
+    'Ancora nessun punteggio su questo tabellone. Completa la missione mondiale per conquistare un posto.',
+  'hudChrome.leaderboard.wqMedal': 'Medaglia',
+  'hudChrome.leaderboard.wqMedals.bronze': 'Bronzo',
+  'hudChrome.leaderboard.wqMedals.gold': 'Oro',
+  'hudChrome.leaderboard.wqMedals.silver': 'Argento',
+  'hudChrome.leaderboard.wqNoMedal': 'Nessuna',
+  'hudChrome.leaderboard.wqPoints': 'Punteggio',
+  'hudChrome.leaderboard.wqSeconds': '{seconds}s',
+  'hudChrome.leaderboard.wqTime': 'Tempo',
+  'hudChrome.leaderboard.wqWaves': 'Ondate resistite',
+  'hudChrome.loot.rollWon': 'Congratulazioni! Hai vinto {item} con un tiro di {roll}',
+  'hudChrome.lootQuality.exceptional': 'Eccezionale',
+  'hudChrome.lootQuality.itemName': '{item}, {quality}',
+  'hudChrome.lootQuality.magnificent': 'Magnifico',
+  'hudChrome.lootQuality.ordinary': 'Ordinario',
+  'hudChrome.lootQuality.superior': 'Superiore',
+  'hudChrome.lootQuality.tooltip':
+    '{quality}: +{levels} livelli oggetto. Mantenuto attraverso i miglioramenti.',
+  'hudChrome.lootQuality.transcendent': 'Trascendente',
+  'hudChrome.mapAtlas.collapseHint': 'Comprimi la barra laterale della mappa',
+  'hudChrome.mapAtlas.expandHint': 'Espandi la barra laterale della mappa',
+  'hudChrome.mapAtlas.worldQuests.confirmBody':
+    "Puoi sostituire solo una missione mondiale al giorno, e non può essere annullato. {quest} verrà scambiata con un'altra missione nella sua zona.",
+  'hudChrome.mapAtlas.worldQuests.confirmCancel': 'Annulla',
+  'hudChrome.mapAtlas.worldQuests.confirmOk': 'Sostituisci',
+  'hudChrome.mapAtlas.worldQuests.confirmTitle': 'Sostituire questa missione mondiale?',
+  'hudChrome.mapAtlas.worldQuests.count': '{done} / {total}',
+  'hudChrome.mapAtlas.worldQuests.empty': 'Nessuna missione mondiale oggi',
+  'hudChrome.mapAtlas.worldQuests.heading': 'Missioni mondiali di oggi',
+  'hudChrome.mapAtlas.worldQuests.replacement': 'Sostituzione',
+  'hudChrome.mapAtlas.worldQuests.reroll': 'Sostituisci missione',
+  'hudChrome.mapAtlas.worldQuests.rerollNote': 'Una sostituzione disponibile oggi',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.completed':
+    'Una missione completata non può essere sostituita',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.inProgress':
+    'Una missione in corso non può essere sostituita',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.noAlternative':
+    "Nessun'altra missione è disponibile in quella zona oggi",
+  'hudChrome.mapAtlas.worldQuests.rerollReason.noCycle': 'Nessun tabellone oggi',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.notActive':
+    'Questa missione non è sul tuo tabellone',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.unknown':
+    'Questa missione non può essere sostituita oggi',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.usedToday': 'Sostituzione già usata oggi',
+  'hudChrome.mapAtlas.worldQuests.rerollUsed': 'Sostituzione già usata oggi',
+  'hudChrome.mapAtlas.worldQuests.state.active': 'In corso',
+  'hudChrome.mapAtlas.worldQuests.state.completed': 'Completata',
+  'hudChrome.meters.activeProfile': 'Profilo attivo',
+  'hudChrome.meters.activeProfileDesc':
+    'Seleziona o gestisci profili indipendenti per diversi scenari di gioco.',
+  'hudChrome.meters.alwaysShowMe': 'Mostrami sempre',
+  'hudChrome.meters.alwaysShowMeDesc':
+    'Fissa la tua barra in fondo se la tua posizione è fuori dalle righe visibili.',
+  'hudChrome.meters.applyPreset': 'Applica tema',
+  'hudChrome.meters.autoRows': ' (Auto)',
+  'hudChrome.meters.backComparison': 'Confronto',
+  'hudChrome.meters.backDev': 'Bilanciamento / Sviluppo',
+  'hudChrome.meters.backTimeline': 'Cronologia',
+  'hudChrome.meters.balanceAbilitiesCount': 'Abilità registrate: {count}',
+  'hudChrome.meters.barAnimation': 'Animazione fluida delle barre',
+  'hudChrome.meters.barAnimationDesc':
+    'Interpola in modo fluido la crescita e la diminuzione delle barre in tempo reale.',
+  'hudChrome.meters.barHeight': 'Altezza barre',
+  'hudChrome.meters.barHeightDesc':
+    'Spessore verticale di ogni riga di combattimento (da 14px compatto a 26px spazioso).',
+  'hudChrome.meters.barSpacing': 'Spaziatura barre',
+  'hudChrome.meters.barSpacingDesc': 'Spazio verticale in pixel tra righe adiacenti.',
+  'hudChrome.meters.barTexture': 'Texture barre',
+  'hudChrome.meters.barTextureDesc': 'Finitura visiva e ombreggiatura sopra il colore di classe.',
+  'hudChrome.meters.barsUnit': ' barre',
+  'hudChrome.meters.bgGlass': 'Sfondo: Vetro (76%)',
+  'hudChrome.meters.bgMinimal': 'Sfondo: Minimo (45%)',
+  'hudChrome.meters.bgMode': 'Modalità sfondo',
+  'hudChrome.meters.bgModeDesc': 'Stile visivo per il pannello del misuratore.',
+  'hudChrome.meters.bgOpacity': 'Opacità sfondo',
+  'hudChrome.meters.bgOpacityDesc': 'Percentuale di opacità per lo sfondo della finestra.',
+  'hudChrome.meters.bgSolid': 'Sfondo: Solido (98%)',
+  'hudChrome.meters.cannotDeleteDefault': 'Il profilo Predefinito non può essere eliminato',
+  'hudChrome.meters.closeSettings': 'Chiudi',
+  'hudChrome.meters.comparisonNeedTwo': 'Sono necessari almeno 2 scontri per confrontare',
+  'hudChrome.meters.copiedFeedback': 'Copiato negli appunti!',
+  'hudChrome.meters.copyString': 'Copia stringa del profilo',
+  'hudChrome.meters.deleteProfile': 'Elimina',
+  'hudChrome.meters.densityCompact': 'Densità: Compatta (16px)',
+  'hudChrome.meters.densityStandard': 'Densità: Standard (20px)',
+  'hudChrome.meters.duplicate': 'Duplica',
+  'hudChrome.meters.errEmptyProfile': 'Incolla una stringa di profilo.',
+  'hudChrome.meters.errInvalidProfile': 'Errore: stringa di profilo non valida o danneggiata.',
+  'hudChrome.meters.exportDesc':
+    'Stringa codificata della tua configurazione attuale. Copiala per condividerla o come backup.',
+  'hudChrome.meters.groupBars': 'Geometria e texture delle barre',
+  'hudChrome.meters.groupCombat': 'Regole e limiti di combattimento',
+  'hudChrome.meters.groupExport': 'Esporta profilo attuale',
+  'hudChrome.meters.groupFont': 'Tipografia di combattimento (famiglia di caratteri)',
+  'hudChrome.meters.groupHeader': "Personalizzazione dell'intestazione",
+  'hudChrome.meters.groupImport': 'Importa profilo',
+  'hudChrome.meters.groupManageProfiles': 'Gestione profili',
+  'hudChrome.meters.groupPresets': 'Temi rapidi con un clic',
+  'hudChrome.meters.groupText': 'Formattazione testo e telemetria',
+  'hudChrome.meters.groupWindow': 'Aspetto e sfondo della finestra',
+  'hudChrome.meters.importApply': 'Importa e applica',
+  'hudChrome.meters.importDesc':
+    'Incolla una stringa di profilo (!WoC-Details:... o JSON) per applicarla e salvarla.',
+  'hudChrome.meters.importNamePlaceholder': 'Nome del profilo (opzionale)',
+  'hudChrome.meters.importPlaceholder': 'Incolla qui la stringa di profilo (!WoC-Details:...)',
+  'hudChrome.meters.importSuccess': 'Profilo «{name}» importato con successo!',
+  'hudChrome.meters.includeShields': 'Conta gli assorbimenti come cure',
+  'hudChrome.meters.includeShieldsDesc':
+    'Aggiunge il danno assorbito dagli scudi (Salmo di Protezione, ecc.) al misuratore delle cure.',
+  'hudChrome.meters.killedBy': 'Ucciso da {killer} ({ability})',
+  'hudChrome.meters.lethalHit': 'Colpo letale',
+  'hudChrome.meters.lockPosition': 'Blocca posizione',
+  'hudChrome.meters.lockPositionDesc':
+    'Blocca la finestra per evitare trascinamenti o ridimensionamenti accidentali in combattimento.',
+  'hudChrome.meters.maxRows': 'Righe visibili massime',
+  'hudChrome.meters.maxRowsDesc':
+    "Barre simultanee (0 = illimitate, adattamento automatico all'altezza della finestra).",
+  'hudChrome.meters.noDeathEvents': 'Nessun evento registrato prima della morte',
+  'hudChrome.meters.noDetailedData': 'Nessun dato dettagliato',
+  'hudChrome.meters.noTargetData': 'Nessun dato giocatore per questo bersaglio',
+  'hudChrome.meters.numCompact': 'Numeri: Abbreviati (k/M)',
+  'hudChrome.meters.numDetailed': 'Numeri: Dettagliati',
+  'hudChrome.meters.numFormat': 'Formato numeri',
+  'hudChrome.meters.numFormatDesc': 'Stile di visualizzazione per i totali.',
+  'hudChrome.meters.optGlass': 'Vetro (Sfocatura)',
+  'hudChrome.meters.optGlassDesc': 'Effetto sfocatura smerigliata',
+  'hudChrome.meters.optMinimal': 'Minimo',
+  'hudChrome.meters.optMinimalDesc': 'Leggermente traslucido',
+  'hudChrome.meters.optNumCompact': 'Abbreviato (k / M)',
+  'hudChrome.meters.optNumCompactDesc': 'Esempio: 145,2k, 1,2M',
+  'hudChrome.meters.optNumDamageDps': 'Danni | DPS',
+  'hudChrome.meters.optNumDamageDpsDesc': 'Esempio: 239,2k | 18,4k (barra di telemetria pulita)',
+  'hudChrome.meters.optNumDetailed': 'Completamente dettagliato',
+  'hudChrome.meters.optNumDetailedDesc': 'Esempio: 145.200, 1.240.500',
+  'hudChrome.meters.optSolid': 'Solido',
+  'hudChrome.meters.optSolidDesc': 'Pannello scuro ad alto contrasto',
+  'hudChrome.meters.optTransparent': 'Trasparente',
+  'hudChrome.meters.optTransparentDesc': 'Nessuno sfondo, solo barre',
+  'hudChrome.meters.optionsEngineBadge': 'WoC Details! Engine',
+  'hudChrome.meters.presetClassicBadge': 'Classico',
+  'hudChrome.meters.presetClassicDesc':
+    'Pannello solido scuro ad alto contrasto, barre di classe piatte, numeri dettagliati non compressi in una disposizione classica.',
+  'hudChrome.meters.presetClassicName': 'Classico Solido',
+  'hudChrome.meters.presetDetailsBadge': 'Consigliato',
+  'hudChrome.meters.presetDetailsDesc':
+    'Sfondo sfocato smerigliato, barre lucide speculari, numeri abbreviati e telemetria completa.',
+  'hudChrome.meters.presetDetailsName': 'Vetro Moderno',
+  'hudChrome.meters.presetMinimalBadge': 'Pulito',
+  'hudChrome.meters.presetMinimalDesc':
+    'Sfondo quasi trasparente, barre compatte da 16px senza spazi, testo diretto senza percentuali.',
+  'hudChrome.meters.presetMinimalName': 'Minimalismo Puro',
+  'hudChrome.meters.presetProGradientBadge': 'Pro',
+  'hudChrome.meters.presetProGradientDesc':
+    'Pannello trasparente fluttuante, barre con gradiente orizzontale, icone di specializzazione e telemetria Danni | DPS.',
+  'hudChrome.meters.presetProGradientName': 'Gradiente Pro',
+  'hudChrome.meters.presetRaidBadge': 'Incursione',
+  'hudChrome.meters.presetRaidDesc':
+    'Progettato per le incursioni: densità compatta da 18px, limite di 10 barre, totale di gruppo visibile e barra del giocatore fissata.',
+  'hudChrome.meters.presetRaidName': 'Focus Incursione',
+  'hudChrome.meters.profileCopySuffix': ' (Copia)',
+  'hudChrome.meters.promptNewProfile': 'Nome del nuovo profilo:',
+  'hudChrome.meters.raidTotalsOff': "Totale di gruppo nell'intestazione: No",
+  'hudChrome.meters.raidTotalsOn': "Totale di gruppo nell'intestazione: Sì",
+  'hudChrome.meters.recentCombatEvents': 'Ultimi {count} eventi di combattimento',
+  'hudChrome.meters.reportNoData': 'Nessun dato registrato.',
+  'hudChrome.meters.reportSent': 'Rapporto copiato e inviato in chat',
+  'hudChrome.meters.resetDefaults': 'Ripristina predefiniti',
+  'hudChrome.meters.saveAs': 'Salva come...',
+  'hudChrome.meters.settingsTitle': 'Impostazioni Details / Misuratore',
+  'hudChrome.meters.showClassIcon': 'Mostra icona di classe',
+  'hudChrome.meters.showClassIconDesc':
+    "Mostra l'icona di classe o ruolo accanto a ogni giocatore.",
+  'hudChrome.meters.showDps': 'Mostra il tasso al secondo (DPS / HPS)',
+  'hudChrome.meters.showDpsDesc': 'Mostra il tasso di danno o cura al secondo su ogni barra.',
+  'hudChrome.meters.showPercent': 'Mostra percentuale (%)',
+  'hudChrome.meters.showPercentDesc': 'Mostra il contributo percentuale sul totale del gruppo.',
+  'hudChrome.meters.showRaidTotals': 'Riepilogo di gruppo nel sottotitolo',
+  'hudChrome.meters.showRaidTotalsDesc':
+    "Mostra il DPS/HPS cumulativo di gruppo nel sottotitolo dell'intestazione.",
+  'hudChrome.meters.showRank': 'Mostra posizione (#1, #2...)',
+  'hudChrome.meters.showRankDesc': 'Mostra il numero di posizione accanto al nome.',
+  'hudChrome.meters.showTitleBar': 'Mostra barra del titolo',
+  'hudChrome.meters.showTitleBarDesc':
+    'Mostra la barra superiore con il nome del segmento di combattimento e i controlli.',
+  'hudChrome.meters.tabBars': 'Barre e texture',
+  'hudChrome.meters.tabBarsDesc': 'Altezza, spaziatura, animazione',
+  'hudChrome.meters.tabCombat': 'Combattimento e limiti',
+  'hudChrome.meters.tabCombatDesc': 'Righe massime, scudi',
+  'hudChrome.meters.tabGeneral': 'Finestra e sfondo',
+  'hudChrome.meters.tabGeneralDesc': 'Opacità, scala, blocco',
+  'hudChrome.meters.tabHeader': 'Intestazione e titolo',
+  'hudChrome.meters.tabHeaderDesc': 'Totale di gruppo, barra del titolo',
+  'hudChrome.meters.tabPresets': 'Temi rapidi',
+  'hudChrome.meters.tabPresetsDesc': 'Preset con un clic',
+  'hudChrome.meters.tabProfiles': 'Profili e importazione',
+  'hudChrome.meters.tabProfilesDesc': 'Esportazione, importazione e profili',
+  'hudChrome.meters.tabText': 'Testo e tipografia',
+  'hudChrome.meters.tabTextDesc': 'Font, k/M, DPS, posizione',
+  'hudChrome.meters.targetSubtitle': 'Bersaglio: {target}',
+  'hudChrome.meters.targetsHeader': 'Bersagli',
+  'hudChrome.meters.texGradient': 'Gradiente',
+  'hudChrome.meters.texGradientDesc': 'Gradiente di colore orizzontale fluido',
+  'hudChrome.meters.texSmooth': 'Liscio (Piatto)',
+  'hudChrome.meters.texSmoothDesc': 'Colore di classe piatto e pulito',
+  'hudChrome.meters.texSpecular': 'Lucido (Speculare)',
+  'hudChrome.meters.texSpecularDesc': 'Riflesso in evidenza superiore con smusso',
+  'hudChrome.meters.timelineCombatEvents': 'Eventi di combattimento: {count}',
+  'hudChrome.meters.windowScale': 'Scala della finestra',
+  'hudChrome.meters.windowScaleDesc': 'Aumenta o diminuisci la scala complessiva del misuratore.',
+  'hudChrome.mounts.desc_avian_strider':
+    'Un imponente uccello da sella i cui possenti artigli e ali ripiegate trasformano ogni viaggio in una corsa fragorosa.',
+  'hudChrome.mounts.name_avian_strider': 'Passovalle Verdeggiante',
+  'hudChrome.nameplate.pvpTag': 'PvP',
+  'hudChrome.options.actionCam': "Telecamera d'Azione",
+  'hudChrome.options.actionCamShoulder': "Spalla della Telecamera d'Azione",
+  'hudChrome.options.actionCamShoulderCenter': 'Centro',
+  'hudChrome.options.actionCamShoulderLeft': 'Sinistra {pct}',
+  'hudChrome.options.actionCamShoulderRight': 'Destra {pct}',
+  'hudChrome.options.frameRateCap': 'Limite frequenza fotogrammi',
+  'hudChrome.options.frameRateCapAuto': 'Automatico',
+  'hudChrome.options.frameRateCapDisplay': 'Schermo',
+  'hudChrome.options.frameRateCapNote':
+    "Limita quante immagini il gioco disegna ogni secondo. Su un computer che non riesce a stare al passo con il proprio schermo, un limite più basso offre un'immagine più stabile e mantiene il computer più fresco. Il limite segue il tuo schermo, quindi la frequenza reale può differire leggermente dal numero indicato. Automatico abbassa il limite solo quando questo computer non riesce a stare al passo con il proprio schermo, poi lo mantiene stabile. (Consigliato). Schermo: nessun limite.",
+  'hudChrome.options.frameRateCapSixty': '60',
+  'hudChrome.options.frameRateCapStatusInert':
+    'Questo schermo funziona già a questo limite o al di sotto di esso, quindi il limite non cambia nulla.',
+  'hudChrome.options.frameRateCapStatusPaced':
+    'Disegna {fps} immagini al secondo su uno schermo a {hz} Hz.',
+  'hudChrome.options.frameRateCapStatusUnpaced': 'Limitato a {fps} immagini al secondo.',
+  'hudChrome.options.frameRateCapThirty': '30',
+  'hudChrome.options.gfxGhostFade': 'Fantasma della Telecamera',
+  'hudChrome.options.gfxGhostFadeDithered': 'Retinato',
+  'hudChrome.options.gfxGhostFadeSmooth': 'Fluido',
+  'hudChrome.options.overlays': 'Sovrapposizioni',
+  'hudChrome.options.showAuraCaster': "Mostra il lanciatore dell'aura nei suggerimenti",
+  'hudChrome.options.targetAurasBelowFrame': 'Aure del bersaglio sotto il riquadro',
+  'hudChrome.paperdoll.trinketSlot': 'Ninnolo',
+  'hudChrome.perf.title': 'Prestazioni',
+  'hudChrome.reputation.cappedByLevel': 'La posizione si ferma a {tier} fino al livello 16',
+  'hudChrome.reputation.faction.automatons': 'Automi',
+  'hudChrome.reputation.faction.church_order': 'Ordine della Chiesa',
+  'hudChrome.reputation.faction.rift_watch': 'Guardia degli Squarci',
+  'hudChrome.reputation.factionTitle.automatons.champion': 'Campione',
+  'hudChrome.reputation.factionTitle.automatons.proven': 'Artefice',
+  'hudChrome.reputation.factionTitle.automatons.recognized': 'Operatore',
+  'hudChrome.reputation.factionTitle.automatons.trusted': 'Meccanista',
+  'hudChrome.reputation.factionTitle.automatons.unknown': 'Estraneo',
+  'hudChrome.reputation.factionTitle.automatons.vanguard': 'Maestro della Forgia',
+  'hudChrome.reputation.factionTitle.church_order.champion': 'Campione',
+  'hudChrome.reputation.factionTitle.church_order.proven': 'Templare',
+  'hudChrome.reputation.factionTitle.church_order.recognized': 'Accolito',
+  'hudChrome.reputation.factionTitle.church_order.trusted': 'Custode',
+  'hudChrome.reputation.factionTitle.church_order.unknown': 'Estraneo',
+  'hudChrome.reputation.factionTitle.church_order.vanguard': "Custode dell'Alba",
+  'hudChrome.reputation.factionTitle.rift_watch.champion': 'Campione',
+  'hudChrome.reputation.factionTitle.rift_watch.proven': 'Guardiano',
+  'hudChrome.reputation.factionTitle.rift_watch.recognized': 'Sentinella',
+  'hudChrome.reputation.factionTitle.rift_watch.trusted': 'Percorritore degli Squarci',
+  'hudChrome.reputation.factionTitle.rift_watch.unknown': 'Estraneo',
+  'hudChrome.reputation.factionTitle.rift_watch.vanguard': 'Guardiano degli Squarci',
+  'hudChrome.reputation.hub.automatons': 'Wyrmwatch',
+  'hudChrome.reputation.hub.church_order': 'Fratello Aldric',
+  'hudChrome.reputation.hub.rift_watch': 'Drifthaven',
+  'hudChrome.reputation.hubLine': '{hub} . {zone}',
+  'hudChrome.reputation.intro':
+    'Tutte e tre le fazioni progrediscono insieme: ogni missione mondiale conta per la fazione della sua zona.',
+  'hudChrome.reputation.legend': 'Livelli di posizione',
+  'hudChrome.reputation.maxed': 'Posizione più alta raggiunta',
+  'hudChrome.reputation.next': 'Successivo: {tier}',
+  'hudChrome.reputation.progress': '{current} / {next}',
+  'hudChrome.reputation.questsDone': 'Missioni mondiali completate',
+  'hudChrome.reputation.questsDoneValue': '{done} / {total}',
+  'hudChrome.reputation.resetsIn': 'Tabellone',
+  'hudChrome.reputation.resetsUnknown': 'Nessun tabellone oggi',
+  'hudChrome.reputation.standingGained': '+{amount} posizione con {faction}.',
+  'hudChrome.reputation.tier.champion': 'Campione',
+  'hudChrome.reputation.tier.proven': 'Comprovato',
+  'hudChrome.reputation.tier.recognized': 'Riconosciuto',
+  'hudChrome.reputation.tier.trusted': 'Fidato',
+  'hudChrome.reputation.tier.unknown': 'Sconosciuto',
+  'hudChrome.reputation.tier.vanguard': 'Avanguardia',
+  'hudChrome.reputation.tierReachedBanner': 'Ora {tier} con {faction}',
+  'hudChrome.reputation.tierReachedLine':
+    'Ora sei {tier} con {faction}. Il tuo titolo di fazione è ora {title}.',
+  'hudChrome.reputation.tierReachedSubtext': 'Titolo di fazione: {title}',
+  'hudChrome.reputation.title': 'Titolo di fazione',
+  'hudChrome.reputation.titleLine': '{faction} . {tier}',
+  'hudChrome.reputation.today': 'Oggi',
+  'hudChrome.reputation.vendorGate': 'Richiede {tier} con {faction}.',
+  'hudChrome.statInfo.desc.healPower':
+    'Aumenta la cura delle tue guarigioni e degli effetti di cura nel tempo, e le dimensioni dei tuoi scudi assorbenti. È il tuo Potere Magico più il Potere di Guarigione ottenuto da equipaggiamento e bonus di set, che si aggiunge alle cure ma mai ai danni.',
+  'hudChrome.statInfo.desc.spellCrit':
+    "La tua probabilità di critico magico, che infligge il 150% di danno o cura quando un incantesimo o una cura colpisce criticamente. Gli incantesimi e le cure usano questa probabilità al posto della probabilità di colpo critico: l'Intelletto aumenta solo questa probabilità, mentre l'indice di critico, i talenti e i bonus di set aumentano entrambe.",
+  'hudChrome.statInfo.desc.warfareWithHealth':
+    'Aumenta i danni inflitti ai giocatori del {increase}% e riduce i danni subiti dai giocatori del {reduction}%. Aumenta anche la tua salute massima del {health}% ovunque tranne che nei dungeon, nelle incursioni, nelle spedizioni e negli squarci.',
+  'hudChrome.statInfo.names.spellCrit': 'Critico Magico',
+  'hudChrome.targetAuras.close': 'Chiudi la finestra delle aure del bersaglio',
+  'hudChrome.townFocus.pendingLine':
+    'Salvato. La tua redistribuzione a questa allocazione si completa tra {time}.',
+  'hudChrome.townFocus.preferenceHint':
+    'Il Focus aumenta il grado e la quantità di ciò che raccogli. Per raccogliere un solo materiale, imposta una Preferenza di Raccolta dal tuo Kit da Campo o dalla finestra Professioni.',
+  'hudChrome.trade.offerQuantityAll': 'Offri tutto',
+  'hudChrome.trade.offerQuantityConfirm': 'Offri',
+  'hudChrome.trade.offerQuantityHint': 'Ti verrà chiesto quanti offrirne',
+  'hudChrome.trade.offerQuantityInput': 'Quantità da offrire',
+  'hudChrome.trade.offerQuantityTitle': 'Offri {item}',
+  'hudChrome.trade.offerRemove': 'Rimuovi',
+  'hudChrome.trade.offerRemoveAll': 'Rimuovi tutto',
+  'hudChrome.trade.offerRemoveInput': 'Quantità da rimuovere',
+  'hudChrome.trade.offerRemoveTitle': 'Rimuovi {item}',
+  'hudChrome.trinkets.cooldownMinutes': '{minutes} min',
+  'hudChrome.trinkets.cooldownSeconds': '{seconds} sec',
+  'hudChrome.trinkets.equip.guardHeat':
+    'Ogni attacco che paravi, schivi o blocchi aggiunge un accumulo di calore, fino a {max}. Il calore dura {duration} sec, e si rinnova ogni volta che ottieni un accumulo.',
+  'hudChrome.trinkets.equip.heat':
+    'Ogni tuo colpo con arma da mischia o a distanza aggiunge un accumulo di calore, fino a {max}. Il calore dura {duration} sec, e si rinnova ogni volta che ottieni un accumulo.',
+  'hudChrome.trinkets.equip.hourglass':
+    "Le cure in eccesso dalle tue cure dirette vengono immagazzinate nella clessidra, fino a {cap} ({capPct}% della tua salute massima). La cura immagazzinata svanisce {fade} sec dopo l'ultimo aumento.",
+  'hudChrome.trinkets.equip.ignite':
+    "I tuoi colpi critici con armi da mischia o a distanza incendiano il bersaglio, infliggendo {tick} danni da Fuoco ogni {every} sec per {duration} sec. Un nuovo colpo critico lo rinnova. Il danno aumenta con la potenza d'attacco o con la potenza d'attacco a distanza, a seconda di quale sia maggiore.",
+  'hudChrome.trinkets.equip.lastStand':
+    'Subire danno mentre sei sotto il {threshold}% di salute concede uno scudo che assorbe {absorb} danni ({absorbPct}% della tua salute massima) per {duration} sec. Può verificarsi una volta ogni {icd} sec.',
+  'hudChrome.trinkets.equip.storm':
+    'Ogni incantesimo che lanci aggiunge una carica, fino a {max}. Le cariche durano {duration} sec, e si rinnovano ogni volta che ne ottieni una.',
+  'hudChrome.trinkets.equip.tally':
+    'I tuoi colpi critici di attacco automatico e i tuoi colpi mortali aggiungono ciascuno una tacca, fino a {max}. Le tacche durano {duration} sec, e si rinnovano ogni volta che ne ottieni una.',
+  'hudChrome.trinkets.equip.twinStrike':
+    "I tuoi colpi di attacco automatico hanno il {chance}% di probabilità di effettuare un fendente extra con l'arma principale. Può verificarsi una volta ogni {icd} sec.",
+  'hudChrome.trinkets.equipLine': 'Equipaggia: {effect}',
+  'hudChrome.trinkets.equipLockout':
+    'Equipaggiarlo avvia un tempo di recupero di {seconds} sec sul suo utilizzo, oppure il tempo di recupero rimasto sul ninnolo che sostituisce, se più lungo.',
+  'hudChrome.trinkets.equippedLine': 'Equipaggiato',
+  'hudChrome.trinkets.gambleResult': '{item}: {fortune}!',
+  'hudChrome.trinkets.scaled': '{base} (+{bonus})',
+  'hudChrome.trinkets.snakeEyes': 'Occhi di Serpente',
+  'hudChrome.trinkets.use.anchor':
+    'Per {duration} sec, subisci il {reduction}% di danno in meno ma ti muovi al {speed}% della velocità. Rimuove storditori, radicamenti, rallentamenti, paure, trasformazioni, silenzi, accecamenti, maledizioni, disarmi ed effetti incapacitanti su di te, e ne ignori di nuovi e i respingimenti finché dura.',
+  'hudChrome.trinkets.use.bleedEdge':
+    "Per {duration} sec, i tuoi colpi di attacco automatico applicano Ferita d'Artiglio, che infligge {tick} danni Fisici per accumulo ogni {every} sec per {bleedDuration} sec e si accumula fino a {stacks} volte. Il danno aumenta con la potenza d'attacco.",
+  'hudChrome.trinkets.use.blink':
+    'Fai un passo di {yards} m in avanti, poi subisci il {reduction}% di danno in meno per {guard} sec.',
+  'hudChrome.trinkets.use.brand':
+    'Marchia un giocatore nemico entro {range} m, riducendo le cure che riceve del {cut}% per {duration} sec.',
+  'hudChrome.trinkets.use.defiance':
+    'Rimuove tutti gli storditori, i radicamenti, i rallentamenti, le paure, le trasformazioni, i silenzi, gli accecamenti, le maledizioni, i disarmi e gli effetti incapacitanti su di te. Utilizzabile mentre sei stordito.',
+  'hudChrome.trinkets.use.echo':
+    'Per {duration} sec, le tue prossime {casts} cure dirette o i colpi di danno diretto non Fisico si ripetono per il {pct}% del loro ammontare.',
+  'hudChrome.trinkets.use.gamble':
+    'Tira una di quattro fortune per {duration} sec: {keenEdge} (infliggi il {keenPct}% di danno in più), {luckyStreak} (cura {heal} nel corso della durata), {gildedGuard} (uno scudo che assorbe {absorb} danni), oppure {snakeEyes} (nessun effetto, ma questo tempo di recupero è dimezzato).',
+  'hudChrome.trinkets.use.heartNova':
+    "Spendi tutti gli accumuli di calore in una nova di fuoco che infligge {perHeat} danni da Fuoco per accumulo ({max} a {maxHeat} accumuli) a ogni nemico entro {radius} m e provoca ogni creatura che colpisce. Il danno aumenta con la potenza d'attacco. Richiede un accumulo di calore.",
+  'hudChrome.trinkets.use.hourglass':
+    'Trasforma tutta la cura immagazzinata in uno scudo sul membro del gruppo entro {range} m con la percentuale di salute più bassa, te incluso. Lo scudo dura {duration} sec. Richiede cura immagazzinata.',
+  'hudChrome.trinkets.use.kindlingOrb':
+    'Evoca una sfera di braci accanto a te per {duration} sec. Ogni incantesimo che lanci contro un nemico la fa scagliare un dardo contro quel nemico per {damage} danni da Fuoco. Il danno aumenta con il Potere Magico.',
+  'hudChrome.trinkets.use.lantern':
+    'Posiziona una lanterna ai tuoi piedi per {duration} sec. Una cura diretta ricevuta da te o da un membro del gruppo entro {radius} m da essa cura anche il membro del gruppo più ferito nella sua luce per il {share}% della cura.',
+  'hudChrome.trinkets.use.pierce':
+    'Per {duration} sec, i tuoi attacchi automatici, colpi a distanza e abilità fisiche (non i sanguinamenti) colpiscono anche il nemico più vicino al tuo bersaglio entro {reach} m per il {share}% del danno inflitto.',
+  'hudChrome.trinkets.use.retaliate':
+    'Per {duration} sec, un nemico che ti colpisce direttamente subisce danni Fisici pari al {pct}% della salute che quel colpo ti ha tolto. Il danno periodico non lo attiva.',
+  'hudChrome.trinkets.use.sprint':
+    'Aumenta la tua velocità di movimento del {speed}% per {duration} sec. Non si somma con altri aumenti di velocità.',
+  'hudChrome.trinkets.use.stormjar':
+    'Rilascia tutte le cariche come un dardo verso il tuo bersaglio entro {range} m che rimbalza su fino a {extra} nemici in più entro {jumpRange} m. Ogni nemico subisce {perCharge} danni da Natura per carica ({max} a {maxCharges} cariche). Il danno aumenta con il Potere Magico. Richiede una carica.',
+  'hudChrome.trinkets.use.tallyStrike':
+    "Spendi tutte le tacche per colpire il tuo bersaglio entro {range} m per {perMark} danni Fisici per tacca ({max} a {maxMarks} tacche). Il danno aumenta con la potenza d'attacco. Richiede una tacca.",
+  'hudChrome.trinkets.use.temper':
+    "Spendi tutti gli accumuli di calore per temprare la tua arma per {duration} sec. I tuoi colpi con armi da mischia e a distanza infliggono {damage} danni da Fuoco extra, aumentati del {perHeat}% per ogni accumulo di calore speso (fino al {maxBonus}% a {maxHeat} accumuli). Ogni colpo mortale aggiunge {killExtend} sec, fino a un totale di {maxDuration} sec. Il danno aumenta con la potenza d'attacco o con la potenza d'attacco a distanza, a seconda di quale sia maggiore.",
+  'hudChrome.trinkets.use.wellspring':
+    'Cura te e i membri del gruppo entro {radius} m di {tick} ogni {every} sec per {duration} sec. La cura aumenta con il Potere di Guarigione.',
+  'hudChrome.trinkets.useLine': 'Uso: {effect} (tempo di recupero {cooldown})',
+  'hudChrome.unstuck.helpUnstuckWindow':
+    "Recupero: /unstuck avvia un conto alla rovescia da fermo, poi ti sposta al cimitero più vicino, facendoti rivivere se eri caduto. Il primo utilizzo in un'ora è gratuito. Usarlo di nuovo entro un'ora dall'ultimo ti lascia con il Mal dello Sblocco per un massimo di 5 minuti.",
+  'hudChrome.unstuck.movedToGraveyardFree':
+    "Sei stato spostato al cimitero più vicino. Usare di nuovo Sblocco entro l'ora ti lascerà con il Mal dello Sblocco.",
+  'hudChrome.unstuck.revivedAtGraveyardFree':
+    "Sei stato spostato al cimitero più vicino e fatto rivivere. Usare di nuovo Sblocco entro l'ora ti lascerà con il Mal dello Sblocco.",
+  'hudChrome.vehicle.aim': 'Clicca per fare fuoco. Il clic destro o Esc annulla la mira.',
+  'hudChrome.vehicle.armorHint':
+    "Rompi gli scudi d'argento con Palla di Cannone, poi usa Colpo Incendiario.",
+  'hudChrome.vehicle.armorRules':
+    "Le truppe corazzate subiscono {reduction} danni in meno finché Palla di Cannone non ne rompe l'armatura. L'armatura rotta subisce {bonus} danni da Fuoco in più.",
+  'hudChrome.vehicle.barrelHint':
+    'Spara ai barili di polvere contrassegnati quando i nemici si radunano intorno a essi.',
+  'hudChrome.vehicle.barrelRules':
+    'I colpi diretti incendiano i barili di polvere: {damage} danni entro {radius} m, con esplosioni a catena.',
+  'hudChrome.vehicle.bronze': 'Medaglia di bronzo',
+  'hudChrome.vehicle.cannonball': 'Palla di Cannone',
+  'hudChrome.vehicle.chargeWarning':
+    'Il comandante ordina una carica! Tutti i nemici superstiti si muovono più velocemente.',
+  'hudChrome.vehicle.countdown': 'Preparati: {seconds}',
+  'hudChrome.vehicle.endlessWave': 'Ondata infinita {wave} (turno {round})',
+  'hudChrome.vehicle.enemies': 'Nemici rimanenti: {count}',
+  'hudChrome.vehicle.exit': 'Lascia il cannone',
+  'hudChrome.vehicle.exposedHint': 'Armatura rotta: Colpo Incendiario infligge danno doppio.',
+  'hudChrome.vehicle.failed': 'Difesa fallita',
+  'hudChrome.vehicle.gold': "Medaglia d'oro",
+  'hudChrome.vehicle.grapeshot': 'Mitraglia',
+  'hudChrome.vehicle.hint': 'Scegli un colpo, poi clicca a terra per sparare.',
+  'hudChrome.vehicle.incendiary': 'Colpo Incendiario',
+  'questUi.tracker.clueHuntTitle': '{title} (indizio {step} di {total})',
+  'questUi.dialog.clueDeliver': 'Consegna {count} {item}.',
+  'questUi.dialog.clueDeliverAria': 'Consegna {count} {item} a {name}',
+  'questUi.dialog.clueTalk': "Chiedi dell'indizio.",
+  'questUi.dialog.clueTalkAria': "Chiedi dell'indizio: {name}",
+  'questUi.dialog.worldQuestBoard': 'Mostrami la bacheca delle missioni mondiali.',
+  'questUi.dialog.worldQuestBoardAria': 'Apri la bacheca delle missioni mondiali sulla mappa',
+  'questUi.logs.clueCasketOpened': 'Il cofanetto contiene {money} e {items}.',
+  'questUi.logs.clueHuntAbandoned': 'Caccia al tesoro abbandonata: {title}',
+  'questUi.logs.clueHuntDone': 'Caccia al tesoro completata: {title}. Il cofanetto è tuo.',
+  'questUi.logs.clueHuntStarted': 'Caccia al tesoro iniziata: {title}',
+  'questUi.logs.clueHuntStep': 'Indizio {step} di {total} risolto: {title}',
+  'questUi.logs.clueScrollEarned':
+    'Tutte le missioni mondiali del giorno sono completate: una Pergamena Indizio è tua.',
+  'questUi.logs.clueScrollLost':
+    "Tutte le missioni mondiali del giorno sono completate, ma non puoi tenere un'altra Pergamena Indizio.",
+  'questUi.logs.worldQuestStarted': 'Missione mondiale iniziata: {name}',
+  'itemUi.errors.orderClosed': "Quell'ordine non è più aperto.",
+  'itemUi.errors.orderCountNeeded': 'Indica quanti ne vuoi.',
+  'itemUi.errors.orderNotYours': 'Non è il tuo ordine.',
+  'itemUi.errors.orderOwn': 'È il tuo stesso ordine. Annullalo per ritirarlo.',
+  'itemUi.errors.tooManyOrders': 'Puoi tenere aperti al massimo {count} ordini alla volta.',
+  'itemUi.logs.orderDelivered':
+    'Consegnato {item} x{count} a {buyer} per {money}. Ritira {proceeds} dal Mercante.',
+  'itemUi.logs.orderExpired':
+    'Il tuo ordine per {item} è scaduto; {money} ti aspetta dal Mercante.',
+  'itemUi.logs.orderPlaced': 'Ordine piazzato per {item} x{count} a {each} ciascuno.',
+  'itemUi.logs.orderReceived':
+    '{seller} ha consegnato {item} x{count} al tuo ordine. Ritiralo dal Mercante.',
+  'itemUi.logs.orderWithdrawn': 'Hai ritirato il tuo ordine per {item}; {money} restituiti.',
+  'hudChrome.warfare.floatReasons.hill': 'Collina',
+  'hudChrome.warfare.reasons.hillHold': 'controllo della collina',
+  'hudChrome.warfare.reasons.worldAssist': "assistenza a un'uccisione in PvP Mondiale",
+  'hudChrome.warfare.reasons.worldKill': 'uccisione in PvP Mondiale',
+  'hudChrome.warfareShop.groupEntry': 'Stagione di Guerra 1',
+  'hudChrome.warfareShop.groupSeason2': 'Stagione di Guerra 2: Avanguardia',
+  'hudChrome.wocMarket.charselectWebLink': 'Fai offerte, compra o vendi sul sito della Borsa $WOC',
+  'hudChrome.wocMarket.charselectWebNote':
+    'Entra in gioco con un personaggio per fare offerte, comprare o vendere.',
+  'hudChrome.wqLadder.close': 'Chiudi le classifiche delle missioni mondiali',
+  'hudChrome.wqLadder.podiumLabel': 'Primi tre',
+  'hudChrome.wqLadder.rankedBy.points': 'Classificato per punteggio più alto',
+  'hudChrome.wqLadder.rankedBy.seconds': 'Classificato per tempo più veloce',
+  'hudChrome.wqLadder.rankedBy.waves': 'Classificato per ondate resistite',
+  'hudChrome.wqLadder.rankedByMedal.points':
+    'Classificato per medaglia, poi per punteggio più alto',
+  'hudChrome.wqLadder.rankedByMedal.seconds': 'Classificato per medaglia, poi per tempo più veloce',
+  'hudChrome.wqLadder.rankedByMedal.waves': 'Classificato per medaglia, poi per ondate resistite',
+  'hudChrome.wqLadder.selfLabel': 'Il tuo migliore',
+  'hudChrome.wqLadder.selfNone':
+    'Non hai ancora un punteggio in questa classifica. Completa la missione mondiale per unirti alla classifica.',
+  'hudChrome.wqLadder.selfRank': 'Posizione {rank}',
+  'hudChrome.wqLadder.subtitle':
+    'Il miglior tentativo di ogni eroe, una classifica per ogni missione mondiale a medaglie.',
+  'hudChrome.wqLadder.title': 'Classifiche delle missioni mondiali',
+  'hudChrome.wqLadder.totalMany': '{count} eroi in classifica',
+  'hudChrome.wqLadder.totalOne': 'Un eroe in classifica',
+  'hudChrome.wqLadder.unclaimed': 'Non riscattato',
+  'hudChrome.vehicle.integrity': 'Integrità del cannone',
+  'hudChrome.vehicle.lastKeepObjective': "Difendi l'accesso all'Ultima Rocca",
+  'hudChrome.vehicle.lastKeepTitle': "Il Cannone dell'Ultima Rocca",
+  'hudChrome.vehicle.medalRules':
+    'Oro: almeno {goldIntegrity} di integrità e {goldAccuracy} di precisione. Argento: {silverIntegrity} e {silverAccuracy}. Ogni altra vittoria vale Bronzo. Contano i colpi su nemici o barili; ogni sparo conta una sola volta. Le medaglie non danno denaro extra.',
+  'hudChrome.vehicle.objective': 'Difendi la vedetta del nord',
+  'hudChrome.vehicle.result': '{medal}: integrità {integrity}, precisione {accuracy}.',
+  'hudChrome.vehicle.resultWaves': 'Ondate resistite: {waves}.',
+  'hudChrome.vehicle.sapperWarning':
+    'Guastatore in arrivo! Ferma il portatore di esplosivo prima che raggiunga la linea.',
+  'hudChrome.vehicle.shake': 'Tremolio della telecamera',
+  'hudChrome.vehicle.shotBurn':
+    'Lascia fuoco per {seconds} sec, infliggendo {damage} danni al secondo ai nemici che vi si trovano.',
+  'hudChrome.vehicle.shotDamage':
+    "Infligge {damage} danni a ogni nemico entro {radius} iarde dall'impatto.",
+  'hudChrome.vehicle.shotRules':
+    'Mira dentro il campo segnato. Nessun costo in mana. I danni non scalano con equipaggiamento o talenti.',
+  'hudChrome.vehicle.shotSlow': 'Rallenta i nemici colpiti del {amount} per {seconds} sec.',
+  'hudChrome.vehicle.shotTiming':
+    'Ricarica: {cooldown} sec. Impatto dopo {flight} sec. Tutti i colpi condividono {recovery} sec di recupero.',
+  'hudChrome.vehicle.silver': "Medaglia d'argento",
+  'hudChrome.vehicle.title': 'Cannone della Vedetta del Nord',
+  'hudChrome.vehicle.wave': 'Ondata {wave}/{total}',
+  'itemUi.market.buyConfirmBodyPartial':
+    'Comprare {count} di {item} (di {total} in vendita) per {price} ({each} ciascuno)?',
+  'itemUi.market.buyQuantityAria': 'Quanti {item} comprare (di {total})',
+  'itemUi.market.buyQuantityBtnAria': 'Compra questa quantità di {item}',
+  'itemUi.market.history': 'Cronologia',
+  'itemUi.market.historyEmpty':
+    'Ancora nessuna vendita. Gli oggetti che vendi sul Mercato Mondiale compaiono qui.',
+  'itemUi.market.historyNote': 'Le tue vendite recenti sul Mercato Mondiale.',
+  'itemUi.market.orderAtCap': 'Non hai slot ordine liberi. Ritirane uno prima.',
+  'itemUi.market.orderBy': 'Richiesto da {buyer}',
+  'itemUi.market.orderCannotAfford': 'Non puoi permetterti {total} per questo ordine.',
+  'itemUi.market.orderCardTitle': 'Piazza un ordine',
+  'itemUi.market.orderConfirmBody':
+    "Ordinare {item} x{count} a {each} ciascuno? {total} viene trattenuto dal Mercante finché l'ordine non viene evaso o ritirato.",
+  'itemUi.market.orderConfirmTitle': 'Conferma Ordine',
+  'itemUi.market.orderDeliver': 'Consegna',
+  'itemUi.market.orderDeliverAria': 'Consegna {item} a {buyer}',
+  'itemUi.market.orderDeliverConfirmBody':
+    'Consegnare {item} x{count} a {buyer} per {total} ({each} ciascuno)? Riceverai {proceeds} dopo la percentuale del Mercante.',
+  'itemUi.market.orderDeliverConfirmTitle': 'Conferma Consegna',
+  'itemUi.market.orderDeliverNone': 'Nessuno di questo oggetto nelle tue borse.',
+  'itemUi.market.orderEach': 'ciascuno',
+  'itemUi.market.orderEscrowLine': 'Oro trattenuto dal Mercante: {total}',
+  'itemUi.market.orderMine': 'Il tuo ordine',
+  'itemUi.market.orderPickEmpty':
+    'Cerca un oggetto qui sotto, oppure scegline uno dalla striscia in fondo.',
+  'itemUi.market.orderPickLabel': 'Oggetto richiesto',
+  'itemUi.market.orderPickNone': 'Nessun oggetto corrisponde.',
+  'itemUi.market.orderPlaceButton': 'Piazza Ordine',
+  'itemUi.market.orderPriceEach': 'Prezzo unitario',
+  'itemUi.market.orderQuantity': 'Unità richieste',
+  'itemUi.market.orderSearchAria': 'Cerca un oggetto da ordinare',
+  'itemUi.market.orderSearchPlaceholder': 'Cerca oggetti...',
+  'itemUi.market.orderWanted': 'x{count} richiesti',
+  'itemUi.market.orderWithdraw': 'Ritira',
+  'itemUi.market.orderWithdrawAria': 'Ritira il tuo ordine per {item}',
+  'itemUi.market.ordersEmpty':
+    'Ancora nessun ordine aperto. Pubblicane uno e i raccoglitori vedranno cosa ti serve.',
+  'itemUi.market.ordersListAria': 'Ordini di acquisto aperti',
+  'itemUi.market.ordersNote':
+    "Pubblica ciò che vuoi e l'oro viene trattenuto dal Mercante. Le inserzioni al tuo prezzo o sotto vengono evase subito; il resto attende un venditore. Il Mercante trattiene una percentuale del {cut}% da chi consegna. Hai {used}/{max} ordini aperti.",
+  'itemUi.market.ordersTab': 'Richiesti',
+  'itemUi.market.unlistedNone': "Ogni materiale ha almeno un'inserzione al momento.",
+  'itemUi.market.unlistedNote':
+    'Materiali senza alcuna inserzione. Pubblica un ordine per uno di essi, oppure raccoglilo e mettilo in vendita.',
+  'itemUi.market.unlistedStageAria': 'Ordina {item}',
+  'itemUi.market.unlistedTitle': 'Non sul mercato',
+  'hudChrome.worldPvp.aidLine':
+    'Curare, proteggere o potenziare un giocatore contrassegnato in uno scontro nel mondo alza la tua bandiera.',
+  'hudChrome.worldPvp.blurb':
+    "Alza la tua bandiera per combattere altri giocatori contrassegnati ovunque nel mondo aperto. Sconfiggine uno e prendi una quota della sua borsa, più Onore per l'equipaggiamento da Guerra. I campi di battaglia e le arene pagano comunque di più.",
+  'hudChrome.worldPvp.commandHint':
+    'Chat: /pvp alterna la bandiera, /pvp on e /pvp off la impostano.',
+  'hudChrome.worldPvp.confirmAccept': 'Alza Bandiera',
+  'hudChrome.worldPvp.confirmBody':
+    'Gli altri giocatori contrassegnati potranno attaccarti ovunque e prendere fino a {cap} dalla tua borsa quando vincono. Puoi disattivarla di nuovo, ma richiede {minutes} minuti.',
+  'hudChrome.worldPvp.confirmCancel': 'Annulla',
+  'hudChrome.worldPvp.disable': 'Disattiva PvP Mondiale',
+  'hudChrome.worldPvp.disarmLine':
+    'La disattivazione richiede {minutes} minuti e attende la fine del combattimento.',
+  'hudChrome.worldPvp.enable': 'Attiva PvP Mondiale',
+  'hudChrome.worldPvp.greyLine':
+    'I giocatori più di {levels} livelli sotto di te non pagano nulla.',
+  'hudChrome.worldPvp.groundContested':
+    'Ovunque altrove è terreno conteso: possono combattere solo due giocatori contrassegnati.',
+  'hudChrome.worldPvp.groundFfa':
+    'Drakelands, La Distesa di Frostveil e Amberfall sono a tutti contro tutti: chiunque lì può combattere, con o senza bandiera.',
+  'hudChrome.worldPvp.groundSanctuary':
+    'La Riva della Prova e la Valle di Eastbrook sono santuari: nessun PvP Mondiale in assoluto.',
+  'hudChrome.worldPvp.groupLine':
+    "I membri del gruppo e dell'incursione non sono mai ostili tra loro. I compagni di gilda fuori dal tuo gruppo possono combattere.",
+  'hudChrome.worldPvp.honorLine': '{honor} Onore per uccisione, diviso tra chiunque abbia aiutato.',
+  'hudChrome.worldPvp.keepUp': 'Mantieni la Bandiera Alzata',
+  'hudChrome.worldPvp.levelReq': 'Richiede livello {level}.',
+  'hudChrome.worldPvp.markLine':
+    'Attaccare lì un giocatore senza bandiera alza la tua; attaccarne uno contrassegnato non lo fa mai.',
+  'hudChrome.worldPvp.noStakeLine':
+    'Un giocatore senza bandiera ucciso in terreno a tutti contro tutti non perde oro.',
+  'hudChrome.worldPvp.noTakeLine':
+    'Anche un combattente senza bandiera non prende oro: si sposta solo tra due giocatori contrassegnati.',
+  'hudChrome.worldPvp.pending': 'In attesa dello stato PvP dal reame.',
+  'hudChrome.worldPvp.realmDisabled': 'Il PvP Mondiale è disattivato su questo reame.',
+  'hudChrome.worldPvp.record': 'Record: {kills} uccisioni, {deaths} morti',
+  'hudChrome.worldPvp.repeatLine':
+    'Le uccisioni ripetute dello stesso giocatore pagano {second}, poi {third}, poi nulla; il conteggio si azzera {reset} dopo la prima uccisione.',
+  'hudChrome.worldPvp.splitLine':
+    "Un 1 contro 1 pulito paga l'intero piatto; chi aiuta e i suoi guaritori lo condividono.",
+  'hudChrome.worldPvp.stakeLine':
+    'Il perdente paga {cap} o il {percent} della sua borsa, qualunque sia minore.',
+  'hudChrome.worldPvp.statusDisarming':
+    'La tua bandiera si abbassa tra {time}, o quando finisce il tuo combattimento attuale.',
+  'hudChrome.worldPvp.statusOff':
+    'La tua bandiera PvP è abbassata. Non puoi attaccare né essere attaccato nel mondo aperto.',
+  'hudChrome.worldPvp.statusOffFfa':
+    'La tua bandiera PvP è abbassata, ma in terreno a tutti contro tutti puoi comunque attaccare ed essere attaccato.',
+  'hudChrome.worldPvp.statusOn':
+    'La tua bandiera PvP è alzata. I giocatori contrassegnati possono attaccarti.',
+  'hudChrome.worldPvp.tab': 'PvP Mondiale',
+  'hudChrome.worldPvp.title': 'PvP Mondiale',
+  'hudChrome.worldPvp.zoneContested':
+    'Terreno conteso: qui combattono solo i giocatori contrassegnati.',
+  'hudChrome.worldPvp.zoneFfa': 'Terreno a tutti contro tutti: qui chiunque è bersaglio legittimo.',
+  'hudChrome.worldPvp.zoneSanctuary': 'Santuario: qui niente PvP Mondiale.',
+  'hudChrome.weekly.accept': 'Accetta',
+  'hudChrome.weekly.alsoReceive': 'Riceverai anche:',
+  'hudChrome.weekly.anyDifficulty': 'Qualsiasi difficoltà',
+  'hudChrome.weekly.cacheDesc':
+    "Si apre in un pezzo d'incursione Normale per la tua classe (mai un pezzo di set), più {count} x {item}.",
+  'hudChrome.weekly.choose': 'Scegli missione',
+  'hudChrome.weekly.chosen': 'Missione settimanale presa: {category}',
+  'hudChrome.weekly.close': 'Chiudi le missioni settimanali',
+  'hudChrome.weekly.commendClaimed':
+    "L'elogio di questa settimana è andato alla fazione: {faction}.",
+  'hudChrome.weekly.commendHeading': "Elogio dell'Emissario",
+  'hudChrome.weekly.commendNote':
+    '{amount} di reputazione con una fazione a tua scelta, una volta a settimana.',
+  'hudChrome.weekly.commendRewardLine': '{amount} di reputazione con una fazione a tua scelta',
+  'hudChrome.weekly.completed': 'Completata questa settimana',
+  'hudChrome.weekly.decline': 'Rifiuta',
+  'hudChrome.weekly.dialogHeading': 'Missione settimanale: {category}',
+  'hudChrome.weekly.dialogNote': 'Solo un incarico settimanale può essere attivo. {reset}',
+  'hudChrome.weekly.done': 'Missione settimanale completata: {category}',
+  'hudChrome.weekly.footerHeld':
+    'Il tuo incarico per la settimana è impostato. Gli altri tre si sbloccano al ripristino.',
+  'hudChrome.weekly.footerPick':
+    'Puoi tenere un solo incarico settimanale alla volta. Scegli una carta per leggerne i termini.',
+  'hudChrome.weekly.inProgress': 'In corso ({count}/{required})',
+  'hudChrome.weekly.kinds.battlegrounds.category': 'Campi di battaglia',
+  'hudChrome.weekly.kinds.battlegrounds.goal': 'Completa {count} campi di battaglia.',
+  'hudChrome.weekly.kinds.battlegrounds.goalLabel': 'Campi di battaglia completati',
+  'hudChrome.weekly.kinds.battlegrounds.lore':
+    'Vessilli di guerra sventolano sui Campi di Thornhollow. Combatti al fianco della tua fazione, tieni la bandiera e dimostra il tuo valore in battaglia; ogni partita conta, vinta o persa.',
+  'hudChrome.weekly.kinds.dungeons.category': 'Spedizioni',
+  'hudChrome.weekly.kinds.dungeons.goal': 'Completa {count} spedizioni a qualsiasi difficoltà.',
+  'hudChrome.weekly.kinds.dungeons.goalLabel': 'Spedizioni completate',
+  'hudChrome.weekly.kinds.dungeons.lore':
+    'Le profondità del reame non riposano mai: il Mech Relitto si risveglia di nuovo e la Cripta Vuota si desta. Raduna i tuoi alleati e purifica le spedizioni dalla loro corruzione.',
+  'hudChrome.weekly.kinds.raid.category': 'Incursione',
+  'hudChrome.weekly.kinds.raid.goal': 'Prendi parte a {count} incursione a qualsiasi difficoltà.',
+  'hudChrome.weekly.kinds.raid.goalLabel': 'Incursioni completate',
+  'hudChrome.weekly.kinds.raid.lore':
+    "Antichi poteri si risvegliano nel Crogiolo dell'Ultima Fiamma e sulle alture di Thornpeak. Affronta Ignivar o Nythraxis e abbatti il comandante nemico.",
+  'hudChrome.weekly.kinds.worldboss.category': 'Boss mondiale',
+  'hudChrome.weekly.kinds.worldboss.goal': 'Sconfiggi {count} boss mondiale nelle terre selvagge.',
+  'hudChrome.weekly.kinds.worldboss.goalLabel': 'Boss mondiali sconfitti',
+  'hudChrome.weekly.kinds.worldboss.lore':
+    "Nemici potenti vagano per le terre selvagge, ognuno abbastanza forte da sfidare eserciti interi. Unisciti a chiunque sia nei paraggi e abbatti un'aberrazione colossale.",
+  'hudChrome.weekly.lockedThisWeek': 'Bloccato questa settimana',
+  'hudChrome.weekly.objectives': 'Obiettivi della missione',
+  'hudChrome.weekly.progress': '{label}: {count}/{required}',
+  'hudChrome.weekly.resetsIn': 'Si ripristina tra {time}.',
+  'hudChrome.weekly.rewards': 'Ricompense',
+  'hudChrome.weekly.subtitle': 'Scegli uno dei quattro incarichi.',
+  'hudChrome.weekly.tally': '{count} / {required}',
+  'hudChrome.weekly.title': 'Missioni Settimanali',
+  'hudChrome.weeklyRewards.approachKeeper':
+    'Avvicinati al Custode del Forziere per vedere le tue ricompense settimanali.',
+  'hudChrome.weeklyRewards.backToChoices': 'Torna alle scelte',
+  'hudChrome.weeklyRewards.backlogFull':
+    'Le tue settimane salvate sono piene. Ritira le ricompense per fare spazio alle settimane future.',
+  'hudChrome.weeklyRewards.category.dungeon': 'Spedizioni',
+  'hudChrome.weeklyRewards.category.pvp': 'PvP',
+  'hudChrome.weeklyRewards.category.raid': 'Incursioni',
+  'hudChrome.weeklyRewards.category.world': 'Missioni Mondiali',
+  'hudChrome.weeklyRewards.chooseOne':
+    'Scegli con attenzione: prendere un oggetto rinuncia a ogni altra scelta per quella settimana.',
+  'hudChrome.weeklyRewards.chooseReward': 'Scegli una ricompensa',
+  'hudChrome.weeklyRewards.chooseTable': 'Seleziona da quale tabella estrarre',
+  'hudChrome.weeklyRewards.claim': "Prendi l'oggetto selezionato",
+  'hudChrome.weeklyRewards.claimLastWeek': 'Ritira la ricompensa della settimana scorsa',
+  'hudChrome.weeklyRewards.claimRequested':
+    'Ritiro richiesto. Se le tue borse sono piene, fai spazio e scegli di nuovo.',
+  'hudChrome.weeklyRewards.completedTask.dungeonMany': '{count} spedizioni completate',
+  'hudChrome.weeklyRewards.completedTask.dungeonOne': '{count} spedizione completata',
+  'hudChrome.weeklyRewards.completedTask.pvpMany': '{count} incontri classificati vinti',
+  'hudChrome.weeklyRewards.completedTask.pvpOne': '{count} incontro classificato vinto',
+  'hudChrome.weeklyRewards.completedTask.raidMany': "{count} scontri d'incursione superati",
+  'hudChrome.weeklyRewards.completedTask.raidOne': "{count} scontro d'incursione superato",
+  'hudChrome.weeklyRewards.completedTask.worldMany': '{count} missioni mondiali completate',
+  'hudChrome.weeklyRewards.completedTask.worldOne': '{count} missione mondiale completata',
+  'hudChrome.weeklyRewards.completedWeek': 'Settimana terminata il {date}',
+  'hudChrome.weeklyRewards.confirmClaim': 'Conferma ritiro',
+  'hudChrome.weeklyRewards.confirmTitle': 'Ritirare {name}?',
+  'hudChrome.weeklyRewards.countdown': '{days}g {hours}h {minutes}m {seconds}s',
+  'hudChrome.weeklyRewards.currentWeek': 'Torna al progresso di questa settimana',
+  'hudChrome.weeklyRewards.earned': 'Forzieri disponibili dopo il prossimo ripristino: {count}',
+  'hudChrome.weeklyRewards.epic': 'Epico',
+  'hudChrome.weeklyRewards.heroic': 'Eroico',
+  'hudChrome.weeklyRewards.heroicClears': '{count} Eroico',
+  'hudChrome.weeklyRewards.heroicUpgradeMany':
+    '{count} altre spedizioni eroiche completate per migliorare',
+  'hudChrome.weeklyRewards.heroicUpgradeOne':
+    '{count} altra spedizione eroica completata per migliorare',
+  'hudChrome.weeklyRewards.inspectItem': 'Ispeziona {name}',
+  'hudChrome.weeklyRewards.intro':
+    'Ogni traguardo completato guadagna un forziere. Dopo il ripristino del Crogiolo, apri ogni forziere per estrarne il bottino, poi seleziona un oggetto per la settimana. Le ricompense aperte vengono salvate e le settimane non ritirate restano disponibili.',
+  'hudChrome.weeklyRewards.itemLevel': 'Livello oggetto {level}',
+  'hudChrome.weeklyRewards.lockedRoll': 'Sblocca 1 estrazione dalla tabella di bottino',
+  'hudChrome.weeklyRewards.milestone': '1 estrazione dalla tabella di bottino',
+  'hudChrome.weeklyRewards.mixedClears': '{heroic} Eroico / {normal} Normale',
+  'hudChrome.weeklyRewards.nextReset': 'Ripristino settimanale del Crogiolo',
+  'hudChrome.weeklyRewards.noLevelLoot': 'Nessun bottino idoneo al tuo livello attuale.',
+  'hudChrome.weeklyRewards.noTables':
+    'Nessun equipaggiamento idoneo dai boss superati registrati a questa difficoltà.',
+  'hudChrome.weeklyRewards.normal': 'Normale',
+  'hudChrome.weeklyRewards.normalClears': '{count} Normale',
+  'hudChrome.weeklyRewards.notNow': 'Non ora',
+  'hudChrome.weeklyRewards.openRewards': 'Apri i forzieri guadagnati',
+  'hudChrome.weeklyRewards.openVault': 'Apri forziere: {name}',
+  'hudChrome.weeklyRewards.openedCount':
+    '{count} di {total} forzieri aperti. Aprili tutti per scegliere la tua ricompensa.',
+  'hudChrome.weeklyRewards.openingSavedReward':
+    'Apertura del forziere e salvataggio della ricompensa in corso...',
+  'hudChrome.weeklyRewards.pool.dungeon': 'Bottino di spedizione normale',
+  'hudChrome.weeklyRewards.pool.dungeon_heroic': 'Bottino di spedizione eroica',
+  'hudChrome.weeklyRewards.pool.pvp': 'Equipaggiamento da Guerra',
+  'hudChrome.weeklyRewards.pool.raid': "Bottino d'incursione normale",
+  'hudChrome.weeklyRewards.pool.raid_heroic': "Bottino d'incursione eroica",
+  'hudChrome.weeklyRewards.pool.world': 'Bottino da missione mondiale',
+  'hudChrome.weeklyRewards.poolRule':
+    'Ogni oggetto elencato ha la stessa probabilità. Gli oggetti rispettano le restrizioni della tua classe. Le incursioni superate sbloccano il loro bottino a quella difficoltà. Gli oggetti leggendari sono esclusi.',
+  'hudChrome.weeklyRewards.poolSize': 'Visualizza {count} oggetti',
+  'hudChrome.weeklyRewards.previouslyRolled': 'Ricompensa già estratta',
+  'hudChrome.weeklyRewards.progress': '{count} / {max}',
+  'hudChrome.weeklyRewards.rare': 'Raro',
+  'hudChrome.weeklyRewards.readyDescription':
+    'Una settimana di ricompense completata ti aspetta. Apri i forzieri guadagnati, poi scegli un oggetto da ritirare.',
+  'hudChrome.weeklyRewards.readyTitle': 'Le tue ricompense settimanali sono pronte',
+  'hudChrome.weeklyRewards.readyWeeks':
+    'Settimane non ritirate: {count}. Ritira prima la settimana completata più vecchia.',
+  'hudChrome.weeklyRewards.requiredTask.dungeonMany': 'Completa {count} spedizioni',
+  'hudChrome.weeklyRewards.requiredTask.dungeonOne': 'Completa {count} spedizione',
+  'hudChrome.weeklyRewards.requiredTask.pvpMany': 'Vinci {count} incontri classificati',
+  'hudChrome.weeklyRewards.requiredTask.pvpOne': 'Vinci {count} incontro classificato',
+  'hudChrome.weeklyRewards.requiredTask.raidMany': "Supera {count} scontri d'incursione",
+  'hudChrome.weeklyRewards.requiredTask.raidOne': "Supera {count} scontro d'incursione",
+  'hudChrome.weeklyRewards.requiredTask.worldMany': 'Completa {count} missioni mondiali',
+  'hudChrome.weeklyRewards.requiredTask.worldOne': 'Completa {count} missione mondiale',
+  'hudChrome.weeklyRewards.revealed': 'Rivelato',
+  'hudChrome.weeklyRewards.revealedItem': 'Rivelato: {name}',
+  'hudChrome.weeklyRewards.rewardNumber': 'Ricompensa {count}',
+  'hudChrome.weeklyRewards.selectAllTables': 'Seleziona tutto',
+  'hudChrome.weeklyRewards.selectItem': 'Seleziona {name}',
+  'hudChrome.weeklyRewards.selectedTable': '{count} tabella selezionata',
+  'hudChrome.weeklyRewards.selectedTables': '{count} tabelle selezionate',
+  'hudChrome.weeklyRewards.selectionPoolRule':
+    "Per incursioni e spedizioni, seleziona una o più tabelle prima di aprire. Le tabelle di spedizione combinano i boss che hai superato a questa difficoltà. Le estrazioni escludono i duplicati, gli oggetti leggendari e l'equipaggiamento che richiede più di {maxLevelOffset} livelli sopra il tuo.",
+  'hudChrome.weeklyRewards.tab': 'Ricompense Settimanali',
+  'hudChrome.weeklyRewards.tableItem': '{count} oggetto',
+  'hudChrome.weeklyRewards.tableItemCount': '{count} oggetti',
+  'hudChrome.weeklyRewards.tablesExhausted':
+    'Tutti gli oggetti idonei sono già stati estratti. Scegli una ricompensa rivelata.',
+  'hudChrome.weeklyRewards.task.dungeon':
+    'Completa spedizioni. I tuoi migliori risultati determinano la difficoltà della ricompensa a ogni traguardo.',
+  'hudChrome.weeklyRewards.task.pvp':
+    "Vinci incontri d'arena classificata o partite classificate al campo di battaglia. Le partite di prova e gli abbandoni non contano.",
+  'hudChrome.weeklyRewards.task.raid':
+    "Sconfiggi scontri d'incursione diversi. Ogni scontro conta una sola volta; un completamento in Eroico migliora il suo credito.",
+  'hudChrome.weeklyRewards.task.world':
+    'Completa le missioni mondiali a rotazione. Le missioni di trama non contano.',
+  'hudChrome.weeklyRewards.title': 'Il Forziere Settimanale',
+  'hudChrome.weeklyRewards.unavailable': 'Non ancora disponibile',
+  'hudChrome.weeklyRewards.viewPossibleLoot': 'Visualizza il bottino possibile',
+  'hudChrome.weeklyRewards.waiting':
+    'Nessuna ricompensa ancora pronta. I forzieri guadagnati questa settimana si sbloccano al prossimo ripristino.',
+  'hudChrome.weeklyRewards.worldPoolRule':
+    "Equipaggiamento normale di Nythraxis. Nessun completamento d'incursione richiesto.",
+  'hudChrome.weeklyRewards.worldUnavailable':
+    'Le ricompense da missione mondiale saranno disponibili quando arriveranno le missioni mondiali a rotazione.',
+  'questUi.worldQuest.activeStatus': 'Missione mondiale attiva',
+  'questUi.worldQuest.alreadyCompleted':
+    'Hai già completato questa Missione Mondiale per questo ciclo.',
+  'questUi.worldQuest.availableStatus': 'Missione mondiale disponibile',
+  'questUi.worldQuest.banner.captainSteps': 'Il capitano dei predoni varca lo squarcio!',
+  'questUi.worldQuest.banner.championFallen':
+    'Bottino extra! Il campione cade: una borsa bonus per chiunque lo abbia combattuto.',
+  'questUi.worldQuest.banner.championRises':
+    'Bottino extra! Un campione sorge sul luogo. Abbattetelo insieme.',
+  'questUi.worldQuest.banner.endlessBegins':
+    'La linea regge! Iniziano ondate infinite, ognuna più dura della precedente. Lascia il cannone quando vuoi.',
+  'questUi.worldQuest.banner.riftOpens':
+    'Uno squarcio si apre sulla riva! I predoni arrivano per razziare il relitto.',
+  'questUi.worldQuest.banner.riftRouted':
+    'I predoni sono stati messi in fuga. La riva è di nuovo tua.',
+  'questUi.worldQuest.calligraphyTitle': 'Calligrafia Arcana',
+  'questUi.worldQuest.escortCaravan': 'Scorta la carovana: {zone}',
+  'questUi.worldQuest.escortTitle': 'Carovana',
+  'questUi.worldQuest.expiresIn': 'Scade tra {time}',
+  'questUi.worldQuest.factionLine': 'Fazione: {faction}',
+  'questUi.worldQuest.forge.cold': 'Colpo a freddo! Attizza prima il fuoco. +{penalty}s.',
+  'questUi.worldQuest.forge.correct': 'Esatto! Continua così.',
+  'questUi.worldQuest.forge.countdown': 'Preparati! Si inizia tra {seconds}s.',
+  'questUi.worldQuest.forge.failed':
+    'Troppi errori! Il metallo si è incrinato. Parla con Mara per riprovare.',
+  'questUi.worldQuest.forge.finished': 'Ottimo lavoro! Uno scudo degno della guarnigione!',
+  'questUi.worldQuest.forge.fuel': 'Catasta di legna',
+  'questUi.worldQuest.forge.heat': 'Calore della fucina: {value} (mantienilo sopra {floor})',
+  'questUi.worldQuest.forge.hintStoke':
+    'La fucina si sta raffreddando! Attizza il fuoco prima di colpire.',
+  'questUi.worldQuest.forge.hintStrike': "Osserva l'ago. Colpisci dentro la fascia scura!",
+  'questUi.worldQuest.forge.hit': 'Colpo netto! La fascia si restringe.',
+  'questUi.worldQuest.forge.medals.bronze': 'Bronzo',
+  'questUi.worldQuest.forge.medals.gold': 'Oro',
+  'questUi.worldQuest.forge.medals.silver': 'Argento',
+  'questUi.worldQuest.forge.metal': 'Cassa di Lingotti',
+  'questUi.worldQuest.forge.meterAria': 'Misuratore del tempismo del martello',
+  'questUi.worldQuest.forge.miss': 'Fascia mancata! +{penalty}s.',
+  'questUi.worldQuest.forge.mistakes': 'Errori: {count}',
+  'questUi.worldQuest.forge.objective': 'Aiuta la Fabbra Mara a forgiare uno scudo',
+  'questUi.worldQuest.forge.preparing': 'Ben fatto! Prossima richiesta...',
+  'questUi.worldQuest.forge.ready': 'Parla con la Fabbra Mara per iniziare.',
+  'questUi.worldQuest.forge.replay':
+    'Parla con Mara per riprovare. Le ricompense si ottengono una volta per rotazione.',
+  'questUi.worldQuest.forge.request.fuel': 'Attizza il fuoco! Aggiungi legna!',
+  'questUi.worldQuest.forge.request.metal': 'Più metallo! Apri la cassa di lingotti!',
+  'questUi.worldQuest.forge.request.tools': "Martellalo per dargli forma! Usa l'incudine!",
+  'questUi.worldQuest.forge.request.water': 'Raffreddalo! Acqua dal pozzo!',
+  'questUi.worldQuest.forge.result': '{rating}! {seconds}s. Errori: {mistakes}.',
+  'questUi.worldQuest.forge.round': 'Richiesta {round}/{total}: passo {step}/{steps}',
+  'questUi.worldQuest.forge.sequence': '{instruction} Poi clicca su {next}.',
+  'questUi.worldQuest.forge.starting': 'Preparazione in corso...',
+  'questUi.worldQuest.forge.stoke': 'Attizza',
+  'questUi.worldQuest.forge.stokeTip':
+    'Getta legna sul fuoco. La fucina si raffredda di continuo; mantieni il suo calore sopra {floor} o i tuoi colpi cadranno a freddo.',
+  'questUi.worldQuest.forge.strike': 'Colpisci',
+  'questUi.worldQuest.forge.strikeTip':
+    "Martella il pezzo. Premi quando l'ago attraversa la fascia scura; la fascia si restringe e l'ago accelera a ogni buon colpo. Un colpo fuori dalla fascia, o su una fucina fredda, costa tre secondi.",
+  'questUi.worldQuest.forge.strikes': 'Colpi: {count}/{total}',
+  'questUi.worldQuest.forge.thresholds': 'Oro: {gold}s o meno. Argento: {silver}s o meno.',
+  'questUi.worldQuest.forge.title': 'Un Martello Amico',
+  'questUi.worldQuest.forge.tools': 'Incudine',
+  'questUi.worldQuest.forge.water': 'Pozzo',
+  'questUi.worldQuest.forge.wrong': "Strumento sbagliato! +{penalty}s. Prova l'oggetto richiesto.",
+  'questUi.worldQuest.glider.boost': 'Velocità Extra',
+  'questUi.worldQuest.glider.boostTip':
+    'Aumenta la tua velocità di volo di {speed} iarde/s, fino a {maximum} iarde/s. Disponibile durante il volo. Si ricarica in {seconds} secondi.',
+  'questUi.worldQuest.glider.climb': 'Sali',
+  'questUi.worldQuest.glider.climbTip':
+    'Tieni premuto per sollevare il muso e scambiare velocità con quota. Tocca per una breve spinta. Un volo lento perde portanza.',
+  'questUi.worldQuest.glider.complete': 'Atterraggio completato!',
+  'questUi.worldQuest.glider.controls':
+    'Tieni premuto il tasto destro del mouse e guarda in alto per salire a costo di velocità; guarda in basso per scendere in picchiata e guadagnare velocità. Un volo lento perde portanza. Sinistra/destra sterzano; indietro frena. Anche saltare o nuotare su/giù controlla il beccheggio. Vola in avanti attraverso i tunnel di vento per un aumento di velocità, una volta per tunnel per tentativo.',
+  'questUi.worldQuest.glider.countdown': 'Lancio tra {count}... Tieniti forte!',
+  'questUi.worldQuest.glider.dive': 'Scendi',
+  'questUi.worldQuest.glider.diveTip':
+    'Tieni premuto per puntare il muso in basso e guadagnare velocità. Tocca per una breve spinta.',
+  'questUi.worldQuest.glider.failed':
+    'Discesa fallita! Atterraggio fuori rotta o troppi anelli mancati.',
+  'questUi.worldQuest.glider.flying':
+    'Anelli: {rings}/{total} | Tempo: {time}s | Velocità: {speed} iarde/s',
+  'questUi.worldQuest.glider.landed': '{rating}! Superati {rings}/{total} anelli in {time}s.',
+  'questUi.worldQuest.glider.landing':
+    'Tutti gli anelli superati! Dirigiti verso la zona di atterraggio davanti a te.',
+  'questUi.worldQuest.glider.medals.bronze': 'Bronzo',
+  'questUi.worldQuest.glider.medals.gold': 'Oro',
+  'questUi.worldQuest.glider.medals.silver': 'Argento',
+  'questUi.worldQuest.glider.nextRing':
+    'Punta verso il prossimo anello di vento lungo il canyon. Supera almeno {minimum} anelli, poi atterra nella zona segnata.',
+  'questUi.worldQuest.glider.objective':
+    'Vola attraverso gli anelli di vento e atterra nella zona segnata',
+  'questUi.worldQuest.glider.practiceRewards':
+    'Volo di prova: migliora il tuo tempo senza guadagnare altre monete, esperienza o reputazione.',
+  'questUi.worldQuest.glider.ready': 'Parla con il Maestro di Volo Zephyr per lanciarti.',
+  'questUi.worldQuest.glider.replay': 'Vola di nuovo',
+  'questUi.worldQuest.glider.retry':
+    'Parla con Zephyr per riprovare, o con Skye vicino alla zona di atterraggio per tornare al punto di lancio.',
+  'questUi.worldQuest.glider.score': 'Punteggio: {score}.',
+  'questUi.worldQuest.glider.title': 'Slalom Cavalcavento',
+  'questUi.worldQuest.horde.choices.double': 'x2 colpi',
+  'questUi.worldQuest.horde.choices.explosive': 'Colpi esplosivi',
+  'questUi.worldQuest.horde.choices.haste': '+25% cadenza di fuoco',
+  'questUi.worldQuest.horde.choices.pierce': 'Colpi perforanti',
+  'questUi.worldQuest.horde.choices.projectile': '+1 colpo',
+  'questUi.worldQuest.horde.controls': 'Fuoco automatico. A/D, frecce o joystick. Indietro: esci.',
+  'questUi.worldQuest.horde.countdown': 'Orda in arrivo tra {seconds}s!',
+  'questUi.worldQuest.horde.exit': 'Abbandona la difesa',
+  'questUi.worldQuest.horde.failed': 'Difesa fallita. Riprova!',
+  'questUi.worldQuest.horde.gained': 'Potenziamento: {upgrade}',
+  'questUi.worldQuest.horde.killBurst': '+{count} sconfitti!',
+  'questUi.worldQuest.horde.loadout': 'Colpi: {count} | +{speed}% velocità | {weapon}',
+  'questUi.worldQuest.horde.medals.bronze': 'Bronzo',
+  'questUi.worldQuest.horde.medals.gold': 'Oro',
+  'questUi.worldQuest.horde.medals.silver': 'Argento',
+  'questUi.worldQuest.horde.objective': "Difendi la barricata e sconfiggi il comandante dell'orda",
+  'questUi.worldQuest.horde.ready': 'Parla con il capitano della barricata per iniziare.',
+  'questUi.worldQuest.horde.replay':
+    'Parla con il capitano per riprovare. Ricompense una volta per rotazione.',
+  'questUi.worldQuest.horde.result': '{rating}! Punteggio: {score}.',
+  'questUi.worldQuest.horde.resultStats': 'Uccisioni: {kills}. Barricata: {barrier}%.',
+  'questUi.worldQuest.horde.status':
+    '{seconds}s rimasti. Uccisioni: {kills}. Barricata: {barrier}%.',
+  'questUi.worldQuest.horde.supplies': "Rompi una cassa per scegliere. L'altra scompare!",
+  'questUi.worldQuest.horde.title': "L'Ultima Barricata",
+  'questUi.worldQuest.horde.upgrade': 'Arma: {weapon}',
+  'questUi.worldQuest.horde.weapons.0': 'Ripetitore',
+  'questUi.worldQuest.horde.weapons.1': 'Doppio Colpo',
+  'questUi.worldQuest.horde.weapons.2': 'Colpo Perforante',
+  'questUi.worldQuest.horde.weapons.3': 'Colpo Esplosivo',
+  'questUi.worldQuest.inProgress': 'Questa Missione Mondiale è già in corso.',
+  'questUi.worldQuest.investigation.accuseOption': 'Accusa {name}',
+  'questUi.worldQuest.investigation.briefing':
+    'Una creatura ha rubato il volto di un soldato. Leggi gli ordini permanenti e il registro di guardia, interroga tutte e quattro le guardie, poi torna e fai il nome di quella la cui storia contraddice i nostri registri.',
+  'questUi.worldQuest.investigation.cleared':
+    'Sergente Alric: Quel soldato è stato verificato. Confronta le altre storie con i nostri registri e riprova.',
+  'questUi.worldQuest.investigation.clueNames.c0': 'Ordini Permanenti',
+  'questUi.worldQuest.investigation.clueNames.c1': 'Registro di Guardia',
+  'questUi.worldQuest.investigation.clues': 'Registri esaminati: {count}/2',
+  'questUi.worldQuest.investigation.confront':
+    'Riferisci al Sergente Alric e fai il nome della guardia la cui storia contraddice i registri.',
+  'questUi.worldQuest.investigation.defeat': "Sconfiggi l'infiltrato smascherato.",
+  'questUi.worldQuest.investigation.guardCleared':
+    'Il Sergente Alric ha già verificato questo soldato.',
+  'questUi.worldQuest.investigation.heard': 'Guardie interrogate: {count}/4',
+  'questUi.worldQuest.investigation.instructions':
+    'Leggi gli ordini permanenti e il registro di guardia, poi interroga tutte e quattro le guardie. Confronta le loro storie con i registri.',
+  'questUi.worldQuest.investigation.name':
+    'Quale delle mie guardie indossa un volto preso in prestito?',
+  'questUi.worldQuest.investigation.objective': "Smaschera e sconfiggi l'infiltrato",
+  'questUi.worldQuest.investigation.revealed':
+    'La creatura ha abbandonato questo volto. Sconfiggila.',
+  'questUi.worldQuest.investigation.title': 'Un Volto Preso in Prestito',
+  'questUi.worldQuest.investigation.variants.v0.clue0':
+    "Il ponte meridionale è chiuso dall'alba. Tutte le pattuglie devono usare la strada occidentale.",
+  'questUi.worldQuest.investigation.variants.v0.clue1':
+    'Orin è stato assegnato al servizio al cancello. Nella, Bram e Tessa hanno pattugliato la strada occidentale.',
+  'questUi.worldQuest.investigation.variants.v0.guard0':
+    'La mia pattuglia ha preso la strada occidentale stamattina.',
+  'questUi.worldQuest.investigation.variants.v0.guard1':
+    'Ho attraversato il ponte meridionale durante la pattuglia mattutina.',
+  'questUi.worldQuest.investigation.variants.v0.guard2':
+    'Ho pattugliato la strada occidentale con Nella e Tessa.',
+  'questUi.worldQuest.investigation.variants.v0.guard3':
+    'Il ponte meridionale è chiuso. Abbiamo usato la strada occidentale.',
+  'questUi.worldQuest.investigation.variants.v1.clue0':
+    "La parola d'ordine di oggi è Reedwatch. La parola d'ordine di ieri, Lantern, non è più valida.",
+  'questUi.worldQuest.investigation.variants.v1.clue1':
+    "Tutte e quattro le guardie sono state informate della nuova parola d'ordine all'alba.",
+  'questUi.worldQuest.investigation.variants.v1.guard0':
+    "Reedwatch. Ho imparato la nuova parola d'ordine all'alba.",
+  'questUi.worldQuest.investigation.variants.v1.guard1':
+    "Lantern era la parola d'ordine di ieri. Oggi usiamo Reedwatch.",
+  'questUi.worldQuest.investigation.variants.v1.guard2':
+    "Tutti e quattro abbiamo partecipato al briefing dell'alba.",
+  'questUi.worldQuest.investigation.variants.v1.guard3':
+    "La parola d'ordine di oggi è Lantern. L'ho sentita al briefing dell'alba.",
+  'questUi.worldQuest.investigation.variants.v2.clue0':
+    'Tutte le casse di rifornimento della guarnigione devono avere sigilli di ceralacca blu. Rifiuta ogni cassa con un sigillo rosso.',
+  'questUi.worldQuest.investigation.variants.v2.clue1':
+    'La consegna di oggi è stata ispezionata: ogni cassa aveva un sigillo di ceralacca blu intatto.',
+  'questUi.worldQuest.investigation.variants.v2.guard0':
+    'Ho ispezionato la consegna di oggi. Ogni cassa aveva un sigillo di ceralacca rosso.',
+  'questUi.worldQuest.investigation.variants.v2.guard1':
+    'Accettiamo solo casse sigillate con ceralacca blu.',
+  'questUi.worldQuest.investigation.variants.v2.guard2':
+    'Il registro riporta sigilli blu sulla consegna di oggi.',
+  'questUi.worldQuest.investigation.variants.v2.guard3':
+    'Nessuna cassa con sigilli rossi è stata accettata oggi.',
+  'questUi.worldQuest.investigation.variants.v3.clue0':
+    'La guardia notturna riaccende il faro orientale al crepuscolo. Il faro occidentale resta spento finché il traghetto non segnala.',
+  'questUi.worldQuest.investigation.variants.v3.clue1':
+    'Nella e Orin hanno presidiato il cancello per tutta la notte. Bram e Tessa hanno percorso la strada rialzata e riacceso il faro orientale al crepuscolo.',
+  'questUi.worldQuest.investigation.variants.v3.guard0':
+    'Io e Orin abbiamo tenuto il cancello tutta la notte. Non è passato nulla tranne la nebbia.',
+  'questUi.worldQuest.investigation.variants.v3.guard1':
+    'Servizio al cancello con Nella. Abbiamo visto il faro orientale accendersi al crepuscolo, come ordinato.',
+  'questUi.worldQuest.investigation.variants.v3.guard2':
+    'Io e Tessa abbiamo percorso la strada rialzata. Abbiamo acceso il faro occidentale al crepuscolo perché il traghetto potesse vederci.',
+  'questUi.worldQuest.investigation.variants.v3.guard3':
+    'Pattuglia della strada rialzata con Bram. Abbiamo riacceso il faro orientale nel momento in cui il sole è tramontato.',
+  'questUi.worldQuest.investigation.variants.v4.clue0':
+    "Il carro del quartiermastro arriva a mezzogiorno dalla strada del nord. Nessun rifornimento arriva per via d'acqua finché la palude è allagata.",
+  'questUi.worldQuest.investigation.variants.v4.clue1':
+    'Consegna di mezzogiorno ricevuta dalla strada del nord. Tessa ha firmato la ricevuta; Bram e Nella hanno scaricato; Orin era al pozzo.',
+  'questUi.worldQuest.investigation.variants.v4.guard0':
+    'Ho aiutato Bram a scaricare il carro a mezzogiorno. Carne di maiale salata e olio da lampada, il solito.',
+  'questUi.worldQuest.investigation.variants.v4.guard1':
+    'Ho scaricato io stesso la consegna di mezzogiorno, direttamente dalla chiatta di rifornimento.',
+  'questUi.worldQuest.investigation.variants.v4.guard2':
+    'Io e Nella abbiamo portato dentro le casse. Tessa ha firmato il registro.',
+  'questUi.worldQuest.investigation.variants.v4.guard3':
+    'Il carro è arrivato dalla strada del nord a mezzogiorno. Ho firmato io la ricevuta.',
+  'questUi.worldQuest.investigation.variants.v5.clue0':
+    "I caduti dell'ultima incursione giacciono nella cripta della cappella. Nessuno entra nella cripta senza la chiave del sergente.",
+  'questUi.worldQuest.investigation.variants.v5.clue1':
+    "La chiave del sergente non ha lasciato la sua cintura dall'incursione. Nella, Orin e Bram hanno presidiato le mura; Tessa ha tenuto il cortile.",
+  'questUi.worldQuest.investigation.variants.v5.guard0':
+    "Ho presidiato le mura. La cripta è rimasta chiusa dall'incursione; solo il sergente ha la chiave.",
+  'questUi.worldQuest.investigation.variants.v5.guard1':
+    'Servizio alle mura con Nella e Bram. Tranquillo, a parte le rane.',
+  'questUi.worldQuest.investigation.variants.v5.guard2':
+    'Le mura, tutto il giorno. Nessuno si è avvicinato alla cripta.',
+  'questUi.worldQuest.investigation.variants.v5.guard3':
+    "Ho tenuto il cortile e ho dato un'occhiata alla cripta stamattina. I caduti riposano.",
+  'questUi.worldQuest.itemReward': 'Ricompensa oggetto: {name}',
+  'questUi.worldQuest.itemRewardWithLevels':
+    '{name} (livello oggetto {itemLevel}, equipaggiabile al livello {requiredLevel})',
+  'questUi.worldQuest.loadFreight': 'Carica il carico sul carro',
+  'questUi.worldQuest.match3Announcement': '{moves}. {cleared}.',
+  'questUi.worldQuest.match3Candy.berry': 'cristallo di bacca',
+  'questUi.worldQuest.match3Candy.citrus': 'sfera di agrumi',
+  'questUi.worldQuest.match3Candy.grape': "quadrato d'uva",
+  'questUi.worldQuest.match3Candy.mint': 'triangolo di menta',
+  'questUi.worldQuest.match3Candy.star': 'stella di zucchero',
+  'questUi.worldQuest.match3Cell': 'Riga {row}, colonna {column}: {candy}',
+  'questUi.worldQuest.match3Cleared': 'Dolciumi eliminati: {current}/{total}',
+  'questUi.worldQuest.match3Close': 'Chiudi il puzzle dei dolciumi',
+  'questUi.worldQuest.match3DefeatDetail':
+    'Le tue mosse sono esaurite. Una nuova raccolta ti aspetta.',
+  'questUi.worldQuest.match3DefeatTitle': 'Amara sconfitta',
+  'questUi.worldQuest.match3Instructions':
+    'Seleziona due dolciumi adiacenti. Uno scambio conta solo se crea una linea di tre o più.',
+  'questUi.worldQuest.match3Moves': 'Mosse: {current}/{total}',
+  'questUi.worldQuest.match3OutOfMoves': 'Non restano mosse. Riavvia il livello per riprovare.',
+  'questUi.worldQuest.match3Reset': 'Riavvia livello',
+  'questUi.worldQuest.match3ResultAnnouncement': '{title}. {detail} {moves}. {cleared}.',
+  'questUi.worldQuest.match3ResultSummary': '{title}. {detail} {cleared}.',
+  'questUi.worldQuest.match3Selected': 'Selezionato',
+  'questUi.worldQuest.match3Title': 'Cascata di Dolciumi',
+  'questUi.worldQuest.match3TryAgain': 'Riprova',
+  'questUi.worldQuest.match3VictoryDetail': 'La raccolta incantata è completa.',
+  'questUi.worldQuest.match3VictoryTitle': 'Dolce vittoria',
+  'questUi.worldQuest.matchConfections': 'Abbina i dolciumi incantati',
+  'questUi.worldQuest.mineOre': 'Estrai minerale di rame',
+  'questUi.worldQuest.practiceRewards':
+    'Prova: gioca di nuovo senza guadagnare altre monete, esperienza o reputazione.',
+  'questUi.worldQuest.puzzleBeamReach': 'Cristalli raggiunti: {count}',
+  'questUi.worldQuest.puzzleBonusCharged':
+    'Il livello di prova {level} di {total} ti attende. Tocca di nuovo la Riserva Ley. Ulteriori turni non danno ricompense.',
+  'questUi.worldQuest.puzzleBonusDone':
+    'Ogni livello di prova è stato completato. Tocca la Riserva Ley per giocare di nuovo.',
+  'questUi.worldQuest.puzzleBonusLevel': 'Livello bonus {level} di {total}',
+  'questUi.worldQuest.puzzleBonusPaid': 'Livello di prova completato!',
+  'questUi.worldQuest.puzzleClose': 'Chiudi il puzzle del fascio ley',
+  'questUi.worldQuest.puzzleConnectors': 'Connettori: {connectors}.',
+  'questUi.worldQuest.puzzleDefeatDetail': 'La corrente è svanita. Il rituale è incompiuto.',
+  'questUi.worldQuest.puzzleDefeatTitle': 'Allineamento perso',
+  'questUi.worldQuest.puzzleInstructions':
+    'Ruota le piastrelle per condurre il fascio dalla sorgente alla destinazione.',
+  'questUi.worldQuest.puzzleLevel': 'Livello giornaliero {level}',
+  'questUi.worldQuest.puzzlePowered': 'Il fascio raggiunge questa piastrella.',
+  'questUi.worldQuest.puzzleResultAnnouncement': '{title}. {detail} {reach}.',
+  'questUi.worldQuest.puzzleRetry': 'Riprova',
+  'questUi.worldQuest.puzzleReturn': 'Torna al reame',
+  'questUi.worldQuest.puzzleRotateTile': 'Ruota la piastrella {tile}',
+  'questUi.worldQuest.puzzleSource': 'Sorgente',
+  'questUi.worldQuest.puzzleSourceEndpoint': 'Sorgente: {direction}.',
+  'questUi.worldQuest.puzzleTarget': 'Destinazione',
+  'questUi.worldQuest.puzzleTargetEndpoint': 'Destinazione: {direction}.',
+  'questUi.worldQuest.puzzleTileAria': '{rotation} {connectors} {power} {source} {target}',
+  'questUi.worldQuest.puzzleTimer': '{seconds}s',
+  'questUi.worldQuest.puzzleTimerAria': 'Tempo rimanente: {seconds} secondi',
+  'questUi.worldQuest.puzzleTitle': 'Allineamento del Fascio Ley',
+  'questUi.worldQuest.puzzleUnpowered': 'Il fascio non raggiunge questa piastrella.',
+  'questUi.worldQuest.puzzleVictoryDetail': 'Il fascio ley ha raggiunto la sua destinazione.',
+  'questUi.worldQuest.puzzleVictoryTitle': 'Allineamento perfetto',
+  'questUi.worldQuest.recoverObject': 'Recupera {name}',
+  'questUi.worldQuest.redirectLeyBeam': 'Reindirizza il fascio ley',
+  'questUi.worldQuest.replay': 'Gioca di nuovo',
+  'questUi.worldQuest.rewardLine': 'Ricompense: {reward}',
+  'questUi.worldQuest.salvageWreckage':
+    'Recupera i detriti arenati sulla riva dal relitto a nordovest di Gullhaven',
+  'questUi.worldQuest.semanticSummary': '{name}. {progress}. {reward}.',
+  'questUi.worldQuest.semanticSummaryTimed': '{name}. {progress}. {reward}. {time}.',
+  'questUi.worldQuest.shadow.behind': 'Mettiti dietro la guardia prima di rubare.',
+  'questUi.worldQuest.shadow.caught':
+    "Scoperto! Torna dall'Esploratrice Valerie per un altro mantello. I tuoi ordini sono al sicuro.",
+  'questUi.worldQuest.shadow.channel': 'Furto in corso... {seconds}s',
+  'questUi.worldQuest.shadow.cloak': 'Manto di Duskweave',
+  'questUi.worldQuest.shadow.complete': 'Tutti e quattro gli ordini recuperati.',
+  'questUi.worldQuest.shadow.danger': 'Sei stato avvistato! Nasconditi alla vista!',
+  'questUi.worldQuest.shadow.documents': 'Ordini recuperati: {count}/4',
+  'questUi.worldQuest.shadow.leave': 'Rimuovi Mantello',
+  'questUi.worldQuest.shadow.leaveTip':
+    'Rimuovi il mantello. I tuoi ordini recuperati vengono conservati.',
+  'questUi.worldQuest.shadow.noTarget': 'Avvicinati a una guardia che porta degli ordini.',
+  'questUi.worldQuest.shadow.objective': 'Ruba quattro ordini sigillati senza essere scoperto',
+  'questUi.worldQuest.shadow.pickpocket': 'Borseggia',
+  'questUi.worldQuest.shadow.safe':
+    'Ruba da dietro. Le guardie con lanterna spazzano ampi fasci di luce che vedono attraverso il mantello; aspetta un varco libero.',
+  'questUi.worldQuest.shadow.start':
+    "Parla con l'Esploratrice Valerie per farti prestare il suo mantello.",
+  'questUi.worldQuest.shadow.stealTip':
+    'Avvicinati da dietro e resta immobile mentre prendi gli ordini. Stai fuori dai fasci delle lanterne.',
+  'questUi.worldQuest.shadow.suspicion': 'Sospetto: {value}',
+  'questUi.worldQuest.shadow.title': "Al Riparo dell'Ombra",
+  'questUi.worldQuest.standingReward': '+{amount} di reputazione con i {faction}',
+  'questUi.worldQuest.startEscort': 'Inizia Scorta',
+  'questUi.worldQuest.startQuest': 'Inizia Missione Mondiale',
+  'questUi.worldQuest.title': '{zone}: {target}',
+  'questUi.worldQuest.traceCombat':
+    "Esci dal combattimento, poi parla con l'istruttore per riprovare.",
+  'questUi.worldQuest.traceCompletionLog': '{completion} {result}',
+  'questUi.worldQuest.traceDrawing':
+    "Segui le scintille dorate fino all'angolo luminoso. Il blu segna il tuo percorso.",
+  'questUi.worldQuest.traceMovement':
+    "Resta a piedi e per terra. Parla con l'istruttore per riprovare.",
+  'questUi.worldQuest.traceOffPath':
+    "Hai lasciato il contorno. Parla con l'istruttore per riprovare.",
+  'questUi.worldQuest.traceOutline': 'Traccia il contorno con i tuoi passi',
+  'questUi.worldQuest.tracePreview': 'Osserva il contorno. Le scintille dorate ti guideranno.',
+  'questUi.worldQuest.traceRating.bronze': 'Bronzo',
+  'questUi.worldQuest.traceRating.gold': 'Oro',
+  'questUi.worldQuest.traceRating.silver': 'Argento',
+  'questUi.worldQuest.traceReaction.elianComplete':
+    'Una runa completa! Cura e pratica renderanno la prossima ancora più bella.',
+  'questUi.worldQuest.traceReaction.elianFinal':
+    'Runa finale. Una linea può incrociare o rivisitare un punto; segui il marcatore luminoso fino al prossimo angolo.',
+  'questUi.worldQuest.traceReaction.elianGold':
+    "Tracciato splendidamente! I tuoi passi si sono guadagnati un posto nell'oro.",
+  'questUi.worldQuest.traceReaction.pipSquare': "Quattro lati! Penso di poterlo fare anch'io!",
+  'questUi.worldQuest.traceReaction.tessaTriangle': 'Tre angoli, e ognuno al suo posto!',
+  'questUi.worldQuest.traceReady': "Parla con l'istruttore per iniziare.",
+  'questUi.worldQuest.traceRetry': "Parla con l'istruttore per riprovare.",
+  'questUi.worldQuest.traceRoundInstruction': 'Turno {round} di {total}: {shape}. {instruction}',
+  'questUi.worldQuest.traceScoreResult':
+    'Completato! {rating}: {score}/{total}. Ricompensa base invariata. Oro: impresa, titolo, +10 Fama.',
+  'questUi.worldQuest.traceShape.arrow': 'Runa Freccia',
+  'questUi.worldQuest.traceShape.cross': 'Runa Croce',
+  'questUi.worldQuest.traceShape.diamond': 'Rombo',
+  'questUi.worldQuest.traceShape.double-triangle': 'Sigillo dei Due Triangoli',
+  'questUi.worldQuest.traceShape.hourglass': 'Clessidra',
+  'questUi.worldQuest.traceShape.lightning': 'Runa Fulmine',
+  'questUi.worldQuest.traceShape.pentagon': 'Pentagono',
+  'questUi.worldQuest.traceShape.spiral': 'Spirale Angolare',
+  'questUi.worldQuest.traceShape.square': 'Quadrato',
+  'questUi.worldQuest.traceShape.star': 'Stella',
+  'questUi.worldQuest.traceShape.triangle': 'Triangolo',
+  'questUi.worldQuest.traceShape.zigzag': 'Sigillo a Zigzag',
+  'questUi.worldQuest.traceStart':
+    'Spostati sul marcatore di partenza. Traccia in entrambi i sensi.',
+  'questUi.worldQuest.traceSuccess': 'Contorno completato!',
+  'questUi.worldQuest.traceTimeout': "Il tempo è scaduto. Parla con l'istruttore per riprovare.",
+  'questUi.worldQuest.traceUnavailable': 'Questa runa richiede una versione più recente del gioco.',
+  'questUi.worldQuest.unknown': 'Missione mondiale sconosciuta ({id})',
+  'questUi.worldQuest.wispMaze.collect': 'Raccogli le borse di monete. Evita le ombre.',
+  'questUi.worldQuest.wispMaze.collected': 'Borse di monete: {count}/{total}',
+  'questUi.worldQuest.wispMaze.controls':
+    'Muoviti nel labirinto per raccogliere le borse di monete. Evita le ombre. I fuochi fatui radiosi ti permettono di bandire le ombre per un breve periodo.',
+  'questUi.worldQuest.wispMaze.countdown': 'Inizio tra {seconds}s',
+  'questUi.worldQuest.wispMaze.finished': 'Ogni borsa di monete è stata recuperata!',
+  'questUi.worldQuest.wispMaze.leave': 'Esci dal labirinto',
+  'questUi.worldQuest.wispMaze.lives': 'Vite: {count}/3',
+  'questUi.worldQuest.wispMaze.objective': 'Recupera ogni borsa di monete rubata dal labirinto',
+  'questUi.worldQuest.wispMaze.power': 'Potere dei fuochi fatui: {seconds}s',
+  'questUi.worldQuest.wispMaze.powered': 'Impulso di potere! Tocca le ombre per bandirle.',
+  'questUi.worldQuest.wispMaze.ready': 'Parla con il custode del labirinto per iniziare.',
+  'questUi.worldQuest.wispMaze.retry': 'Tre vite ripristinate. Prova di nuovo il labirinto.',
+  'questUi.worldQuest.wispMaze.startHard': 'Entra nel labirinto: Difficile ({shadows} ombre)',
+  'questUi.worldQuest.wispMaze.startNormal': 'Entra nel labirinto: Normale ({shadows} ombre)',
+  'questUi.worldQuest.wispMaze.title': 'Labirinto di Wispwood',
+  'entities.itemSets.vanguard_druid_balance.bonus2':
+    'Il tempo di lancio di Radici Avvinghianti è ridotto di 0,5 sec.',
+  'entities.itemSets.vanguard_druid_balance.bonus4':
+    'Lanciare Radici Avvinghianti ti permette di lanciare incantesimi in movimento e aumenta la tua velocità di movimento del 20 percento per 4 sec. Non può verificarsi più di una volta ogni 20 sec.',
+  'entities.itemSets.vanguard_druid_balance.name': 'Paramenti Guardiastelle',
+  'entities.itemSets.vanguard_druid_feral.bonus2':
+    'Il tempo di recupero di Carica di Bruin è ridotto di 3 sec.',
+  'entities.itemSets.vanguard_druid_feral.bonus4':
+    'Carica di Bruin ti protegge con uno scudo pari al 6 percento della tua salute massima per 6 sec.',
+  'entities.itemSets.vanguard_druid_feral.name': 'Pelle Sanguicriniera',
+  'entities.itemSets.vanguard_druid_restoration.bonus2':
+    'Il tempo di recupero di Rapidità di Guarigione è ridotto di 1 sec.',
+  'entities.itemSets.vanguard_druid_restoration.bonus4':
+    'Rapidità di Guarigione aumenta inoltre la tua velocità di movimento del 30 percento per 3 sec.',
+  'entities.itemSets.vanguard_druid_restoration.name': 'Veste Cardofiore',
+  'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
+    'Il tempo di recupero di Tiro Scuotente è ridotto di 4 sec.',
+  'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
+    'Tiro Scuotente riduce di 1 sec il tempo di recupero rimanente di Ira Bestiale.',
+  'entities.itemSets.vanguard_hunter_beast_mastery.name': 'Finimenti Guardiabranco',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
+    'Il tempo di recupero di Rompipista è ridotto di 4 sec.',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
+    'Rompipista rende istantaneo il tuo prossimo Tiro Teso lanciato entro 6 sec. Non può verificarsi più di una volta ogni 15 sec.',
+  'entities.itemSets.vanguard_hunter_marksmanship.name': 'Finimenti Vistalontana',
+  'entities.itemSets.vanguard_hunter_survival.bonus2':
+    'Il tempo di recupero di Uncino Sanguinario è ridotto di 3 sec.',
+  'entities.itemSets.vanguard_hunter_survival.bonus4':
+    'Uncino Sanguinario concede 1 Slancio di Caccia.',
+  'entities.itemSets.vanguard_hunter_survival.name': 'Finimenti Dentetrappola',
+  'entities.itemSets.vanguard_mage_arcane.bonus2':
+    'Il tempo di recupero di Barriera Temporale è ridotto di 2 sec.',
+  'entities.itemSets.vanguard_mage_arcane.bonus4':
+    'Barriera Temporale aumenta inoltre del 20 percento la velocità di movimento del bersaglio protetto per 3 sec.',
+  'entities.itemSets.vanguard_mage_arcane.name': 'Vesti Legatempo',
+  'entities.itemSets.vanguard_mage_fire.bonus2':
+    'Pioggia di Braci si ricarica 3 sec più in fretta.',
+  'entities.itemSets.vanguard_mage_fire.bonus4':
+    'Lanciare Pioggia di Braci riduce di 2 sec il tempo di recupero rimanente di Barriera Ardente.',
+  'entities.itemSets.vanguard_mage_fire.name': 'Paramenti Sferzabraci',
+  'entities.itemSets.vanguard_mage_frost.bonus2':
+    'Il tempo di recupero di Vincolo di Ghiaccio è ridotto di 2 sec.',
+  'entities.itemSets.vanguard_mage_frost.bonus4':
+    'Lanciare Vincolo di Ghiaccio riduce di 5 sec il tempo di recupero rimanente di Passo Furtivo.',
+  'entities.itemSets.vanguard_mage_frost.name': 'Tenuta Guardiabrina',
+  'entities.itemSets.vanguard_paladin_holy.bonus2':
+    'Il tempo di recupero di Patto della Vita è ridotto di 30 sec.',
+  'entities.itemSets.vanguard_paladin_holy.bonus4':
+    "Patto della Vita protegge inoltre l'alleato con uno scudo pari all'8 percento della sua salute massima per 6 sec.",
+  'entities.itemSets.vanguard_paladin_holy.name': 'Paramenti Vegliasole',
+  'entities.itemSets.vanguard_paladin_protection.bonus2':
+    'Il tempo di recupero di Catena del Giuramento è ridotto di 2 sec.',
+  'entities.itemSets.vanguard_paladin_protection.bonus4':
+    'I nemici trascinati da Catena del Giuramento lanciano incantesimi il 30 percento più lentamente per 4 sec, e Catena del Giuramento ti concede Rappresaglia Solare quando vincola un nemico che può essere trascinato.',
+  'entities.itemSets.vanguard_paladin_protection.name': 'Baluardo Giuroscudo',
+  'entities.itemSets.vanguard_paladin_retribution.bonus2':
+    'Il tempo di recupero di Richiamo della Valchiria è ridotto di 15 sec.',
+  'entities.itemSets.vanguard_paladin_retribution.bonus4':
+    'Richiamo della Valchiria azzera il tempo di recupero di Editto Finale, e il tuo prossimo Editto Finale lanciato entro 6 sec dal colpo infligge il 15 percento di danni in più.',
+  'entities.itemSets.vanguard_paladin_retribution.name': 'Piastre di Guerra Marchioluce',
+  'entities.itemSets.vanguard_priest_discipline.bonus2':
+    'Il tempo di recupero di Urlo Psichico è ridotto di 3 sec.',
+  'entities.itemSets.vanguard_priest_discipline.bonus4':
+    "Quando il tuo Salmo di Protezione viene consumato del tutto, l'alleato protetto ottiene il 20 percento di velocità di movimento in più per 3 sec. Non può verificarsi più di una volta ogni 8 sec.",
+  'entities.itemSets.vanguard_priest_discipline.name': 'Paramenti Salmovelo',
+  'entities.itemSets.vanguard_priest_holy.bonus2':
+    'Il tempo di recupero di Passo del Velo è ridotto di 6 sec.',
+  'entities.itemSets.vanguard_priest_holy.bonus4':
+    "Passo del Velo ti protegge inoltre con uno scudo pari all'8 percento della tua salute massima per 6 sec.",
+  'entities.itemSets.vanguard_priest_holy.name': 'Paramenti Alagrazia',
+  'entities.itemSets.vanguard_priest_shadow.bonus2':
+    'Litania della Sventura rallenta inoltre il movimento del bersaglio del 30 percento mentre la canalizzi.',
+  'entities.itemSets.vanguard_priest_shadow.bonus4':
+    'Evoca Demone della Decima ti protegge inoltre con uno scudo pari al 10 percento della tua salute massima per 8 sec.',
+  'entities.itemSets.vanguard_priest_shadow.name': 'Paramenti Innocrepuscolo',
+  'entities.itemSets.vanguard_rogue_assassination.bonus2': 'Colpo Basso costa 10 Energia in meno.',
+  'entities.itemSets.vanguard_rogue_assassination.bonus4':
+    'Colpo Basso rende inoltre critico il tuo prossimo attacco sferrato entro 6 sec.',
+  'entities.itemSets.vanguard_rogue_assassination.name': 'Cuoio Taglianotte',
+  'entities.itemSets.vanguard_rogue_combat.bonus2':
+    'Il tempo di recupero di Calcagni Veloci è ridotto di 60 sec.',
+  'entities.itemSets.vanguard_rogue_combat.bonus4':
+    'Mentre Calcagni Veloci è attivo, Fendente Malvagio e Colpo al Corpo concedono 1 punto combo aggiuntivo.',
+  'entities.itemSets.vanguard_rogue_combat.name': 'Cuoio Marchiorissa',
+  'entities.itemSets.vanguard_rogue_subtlety.bonus2':
+    'Il tempo di recupero di Foschia Evanescente è ridotto di 60 sec.',
+  'entities.itemSets.vanguard_rogue_subtlety.bonus4':
+    'Pugno allo Stomaco concede 2 punti combo aggiuntivi se usato durante Foschia Evanescente.',
+  'entities.itemSets.vanguard_rogue_subtlety.name': 'Cuoio Ombrapasso',
+  'entities.itemSets.vanguard_shaman_elemental.bonus2':
+    "Il tempo di recupero di Scatena l'Arma è ridotto di 3 sec.",
+  'entities.itemSets.vanguard_shaman_elemental.bonus4':
+    "Scatena l'Arma ti permette di lanciare incantesimi in movimento e aumenta la tua velocità di movimento del 20 percento per 4 sec. Non può verificarsi più di una volta ogni 20 sec.",
+  'entities.itemSets.vanguard_shaman_elemental.name': 'Maglia da Battaglia Editempesta',
+  'entities.itemSets.vanguard_shaman_enhancement.bonus2':
+    'Colpo Ancestrale rallenta la velocità di movimento del bersaglio del 30 percento per 4 sec.',
+  'entities.itemSets.vanguard_shaman_enhancement.bonus4':
+    'Colpo Ancestrale riduce di 4 sec il tempo di recupero rimanente di Elemental Trance.',
+  'entities.itemSets.vanguard_shaman_enhancement.name': 'Maglia di Guerra Ventonato',
+  'entities.itemSets.vanguard_shaman_restoration.bonus2':
+    'Acque Risananti si lancia 0,5 sec più in fretta su un alleato sotto il 50 percento di salute.',
+  'entities.itemSets.vanguard_shaman_restoration.bonus4':
+    'Richiamo della Marea protegge inoltre il suo bersaglio con uno scudo pari al 5 percento della tua salute massima per 6 sec.',
+  'entities.itemSets.vanguard_shaman_restoration.name': 'Cotta di Maglia Guardiasalmastra',
+  'entities.itemSets.vanguard_warlock_affliction.bonus2':
+    'Il tempo di lancio di Tormento è ridotto di 0,3 sec.',
+  'entities.itemSets.vanguard_warlock_affliction.bonus4':
+    'Divorare ti cura il 30 percento in più e può essere canalizzato in movimento.',
+  'entities.itemSets.vanguard_warlock_affliction.name': 'Vesti Pennaterrore',
+  'entities.itemSets.vanguard_warlock_demonology.bonus2':
+    'Il tempo di recupero di Bone Armor è ridotto di 10 sec.',
+  'entities.itemSets.vanguard_warlock_demonology.bonus4':
+    'Reaping Command riduce di 2 sec il tempo di recupero rimanente di Bone Armor.',
+  'entities.itemSets.vanguard_warlock_demonology.name': 'Paramenti Legamidollo',
+  'entities.itemSets.vanguard_warlock_destruction.bonus2':
+    'Il tempo di recupero di Cinderhide è ridotto di 30 sec.',
+  'entities.itemSets.vanguard_warlock_destruction.bonus4':
+    'Ogni secondo lancio di Conflagrazione rende istantaneo il tuo prossimo Dardo della Rovina lanciato entro 8 sec.',
+  'entities.itemSets.vanguard_warlock_destruction.name': 'Vesti Coronascoria',
+  'entities.itemSets.vanguard_warrior_arms.bonus2':
+    'Colpo Mutilante riduce di 1 sec il tempo di recupero rimanente di Irruzione.',
+  'entities.itemSets.vanguard_warrior_arms.bonus4':
+    'Irruzione potenzia inoltre il tuo prossimo Colpo Mutilante del 20 percento (una carica del potenziamento di Mano Rossa).',
+  'entities.itemSets.vanguard_warrior_arms.name': 'Tenuta da Battaglia Scialama',
+  'entities.itemSets.vanguard_warrior_fury.bonus2':
+    'Il tempo di recupero di Balzo di Guerra è ridotto di 8 sec.',
+  'entities.itemSets.vanguard_warrior_fury.bonus4':
+    'Colpire con Balzo di Guerra ti rende Infuriato.',
+  'entities.itemSets.vanguard_warrior_fury.name': 'Tenuta della Furia Marciasangue',
+  'entities.itemSets.vanguard_warrior_prot.bonus2':
+    'Il tempo di recupero di Faglia è ridotto di 5 sec.',
+  'entities.itemSets.vanguard_warrior_prot.bonus4':
+    'Faglia riduce inoltre del 10 percento i danni che subisci per 6 sec.',
+  'entities.itemSets.vanguard_warrior_prot.name': 'Baluardo Marciaferro',
+  'entities.items.vanguard_druid_balance_chest.name': 'Veste Guardiastelle',
+  'entities.items.vanguard_druid_balance_gloves.name': 'Guanti Guardiastelle',
+  'entities.items.vanguard_druid_balance_helmet.name': 'Copricapo Guardiastelle',
+  'entities.items.vanguard_druid_balance_legs.name': 'Brache Guardiastelle',
+  'entities.items.vanguard_druid_balance_shoulder.name': 'Spallacci Guardiastelle',
+  'entities.items.vanguard_druid_feral_chest.name': 'Tunica Sanguicriniera',
+  'entities.items.vanguard_druid_feral_gloves.name': 'Manopole Sanguicriniera',
+  'entities.items.vanguard_druid_feral_helmet.name': 'Elmo Sanguicriniera',
+  'entities.items.vanguard_druid_feral_legs.name': 'Gambali Sanguicriniera',
+  'entities.items.vanguard_druid_feral_shoulder.name': 'Spallacci Sanguicriniera',
+  'entities.items.vanguard_druid_restoration_chest.name': 'Veste Cardofiore',
+  'entities.items.vanguard_druid_restoration_gloves.name': 'Guanti Cardofiore',
+  'entities.items.vanguard_druid_restoration_helmet.name': 'Corona Cardofiore',
+  'entities.items.vanguard_druid_restoration_legs.name': 'Gambali Cardofiore',
+  'entities.items.vanguard_druid_restoration_shoulder.name': 'Manto Cardofiore',
+  'entities.items.vanguard_hunter_beast_mastery_chest.name': 'Giaco Guardiabranco',
+  'entities.items.vanguard_hunter_beast_mastery_gloves.name': 'Manopole Guardiabranco',
+  'entities.items.vanguard_hunter_beast_mastery_helmet.name': 'Cuffia Guardiabranco',
+  'entities.items.vanguard_hunter_beast_mastery_legs.name': 'Gambali Guardiabranco',
+  'entities.items.vanguard_hunter_beast_mastery_shoulder.name': 'Spallacci Guardiabranco',
+  'entities.items.vanguard_hunter_marksmanship_chest.name': 'Giaco Vistalontana',
+  'entities.items.vanguard_hunter_marksmanship_gloves.name': 'Manopole Vistalontana',
+  'entities.items.vanguard_hunter_marksmanship_helmet.name': 'Cuffia Vistalontana',
+  'entities.items.vanguard_hunter_marksmanship_legs.name': 'Gambali Vistalontana',
+  'entities.items.vanguard_hunter_marksmanship_shoulder.name': 'Spallacci Vistalontana',
+  'entities.items.vanguard_hunter_survival_chest.name': 'Giaco Dentetrappola',
+  'entities.items.vanguard_hunter_survival_gloves.name': 'Manopole Dentetrappola',
+  'entities.items.vanguard_hunter_survival_helmet.name': 'Cuffia Dentetrappola',
+  'entities.items.vanguard_hunter_survival_legs.name': 'Gambali Dentetrappola',
+  'entities.items.vanguard_hunter_survival_shoulder.name': 'Spallacci Dentetrappola',
+  'entities.items.vanguard_mage_arcane_chest.name': 'Veste Legatempo',
+  'entities.items.vanguard_mage_arcane_gloves.name': 'Guanti Legatempo',
+  'entities.items.vanguard_mage_arcane_helmet.name': 'Cappuccio Legatempo',
+  'entities.items.vanguard_mage_arcane_legs.name': 'Calzoni Legatempo',
+  'entities.items.vanguard_mage_arcane_shoulder.name': 'Amitto Legatempo',
+  'entities.items.vanguard_mage_fire_chest.name': 'Vesti Sferzabraci',
+  'entities.items.vanguard_mage_fire_gloves.name': 'Guanti Sferzabraci',
+  'entities.items.vanguard_mage_fire_helmet.name': 'Cappuccio Sferzabraci',
+  'entities.items.vanguard_mage_fire_legs.name': 'Gambali Sferzabraci',
+  'entities.items.vanguard_mage_fire_shoulder.name': 'Manto Sferzabraci',
+  'entities.items.vanguard_mage_frost_chest.name': 'Veste Guardiabrina',
+  'entities.items.vanguard_mage_frost_gloves.name': 'Muffole Guardiabrina',
+  'entities.items.vanguard_mage_frost_helmet.name': 'Cappuccio Guardiabrina',
+  'entities.items.vanguard_mage_frost_legs.name': 'Fasce Guardiabrina',
+  'entities.items.vanguard_mage_frost_shoulder.name': 'Spallacci Guardiabrina',
+  'entities.items.vanguard_paladin_holy_chest.name': 'Usbergo Vegliasole',
+  'entities.items.vanguard_paladin_holy_gloves.name': 'Guanti Vegliasole',
+  'entities.items.vanguard_paladin_holy_helmet.name': 'Diadema Vegliasole',
+  'entities.items.vanguard_paladin_holy_legs.name': 'Gambali di Maglia Vegliasole',
+  'entities.items.vanguard_paladin_holy_shoulder.name': 'Manto Vegliasole',
+  'entities.items.vanguard_paladin_protection_chest.name': 'Corazza Giuroscudo',
+  'entities.items.vanguard_paladin_protection_gloves.name': 'Manopole Giuroscudo',
+  'entities.items.vanguard_paladin_protection_helmet.name': 'Elmo Giuroscudo',
+  'entities.items.vanguard_paladin_protection_legs.name': 'Gambali di Piastra Giuroscudo',
+  'entities.items.vanguard_paladin_protection_shoulder.name': 'Spallacci Giuroscudo',
+  'entities.items.vanguard_paladin_retribution_chest.name': 'Corazza Marchioluce',
+  'entities.items.vanguard_paladin_retribution_gloves.name': 'Manopole Marchioluce',
+  'entities.items.vanguard_paladin_retribution_helmet.name': 'Corona Marchioluce',
+  'entities.items.vanguard_paladin_retribution_legs.name': 'Gambali Marchioluce',
+  'entities.items.vanguard_paladin_retribution_shoulder.name': 'Spallacci Marchioluce',
+  'entities.items.vanguard_priest_discipline_chest.name': 'Veste Salmovelo',
+  'entities.items.vanguard_priest_discipline_gloves.name': 'Fasce Salmovelo',
+  'entities.items.vanguard_priest_discipline_helmet.name': 'Cappuccio Salmovelo',
+  'entities.items.vanguard_priest_discipline_legs.name': 'Gambali Salmovelo',
+  'entities.items.vanguard_priest_discipline_shoulder.name': 'Manto Salmovelo',
+  'entities.items.vanguard_priest_holy_chest.name': 'Veste Alagrazia',
+  'entities.items.vanguard_priest_holy_gloves.name': 'Fasce Alagrazia',
+  'entities.items.vanguard_priest_holy_helmet.name': 'Cappuccio Alagrazia',
+  'entities.items.vanguard_priest_holy_legs.name': 'Gambali Alagrazia',
+  'entities.items.vanguard_priest_holy_shoulder.name': 'Manto Alagrazia',
+  'entities.items.vanguard_priest_shadow_chest.name': 'Veste Innocrepuscolo',
+  'entities.items.vanguard_priest_shadow_gloves.name': 'Fasce Innocrepuscolo',
+  'entities.items.vanguard_priest_shadow_helmet.name': 'Cappuccio Innocrepuscolo',
+  'entities.items.vanguard_priest_shadow_legs.name': 'Gambali Innocrepuscolo',
+  'entities.items.vanguard_priest_shadow_shoulder.name': 'Manto Innocrepuscolo',
+  'entities.items.vanguard_rogue_assassination_chest.name': 'Tunica Taglianotte',
+  'entities.items.vanguard_rogue_assassination_gloves.name': 'Guanti Taglianotte',
+  'entities.items.vanguard_rogue_assassination_helmet.name': 'Cappuccio Taglianotte',
+  'entities.items.vanguard_rogue_assassination_legs.name': 'Brache Taglianotte',
+  'entities.items.vanguard_rogue_assassination_shoulder.name': 'Spallacci Taglianotte',
+  'entities.items.vanguard_rogue_combat_chest.name': 'Tunica Marchiorissa',
+  'entities.items.vanguard_rogue_combat_gloves.name': 'Guanti Marchiorissa',
+  'entities.items.vanguard_rogue_combat_helmet.name': 'Cappuccio Marchiorissa',
+  'entities.items.vanguard_rogue_combat_legs.name': 'Brache Marchiorissa',
+  'entities.items.vanguard_rogue_combat_shoulder.name': 'Spallacci Marchiorissa',
+  'entities.items.vanguard_rogue_subtlety_chest.name': 'Tunica Ombrapasso',
+  'entities.items.vanguard_rogue_subtlety_gloves.name': 'Guanti Ombrapasso',
+  'entities.items.vanguard_rogue_subtlety_helmet.name': 'Cappuccio Ombrapasso',
+  'entities.items.vanguard_rogue_subtlety_legs.name': 'Brache Ombrapasso',
+  'entities.items.vanguard_rogue_subtlety_shoulder.name': 'Spallacci Ombrapasso',
+  'entities.items.vanguard_shaman_elemental_chest.name': 'Usbergo Editempesta',
+  'entities.items.vanguard_shaman_elemental_gloves.name': 'Manopole Editempesta',
+  'entities.items.vanguard_shaman_elemental_helmet.name': 'Cuffia Editempesta',
+  'entities.items.vanguard_shaman_elemental_legs.name': 'Gambali di Maglia Editempesta',
+  'entities.items.vanguard_shaman_elemental_shoulder.name': 'Spallacci Editempesta',
+  'entities.items.vanguard_shaman_enhancement_chest.name': 'Cotta di Maglia Ventonato',
+  'entities.items.vanguard_shaman_enhancement_gloves.name': 'Manopole Ventonato',
+  'entities.items.vanguard_shaman_enhancement_helmet.name': 'Elmo Ventonato',
+  'entities.items.vanguard_shaman_enhancement_legs.name': 'Gambali Ventonato',
+  'entities.items.vanguard_shaman_enhancement_shoulder.name': 'Spallacci Ventonato',
+  'entities.items.vanguard_shaman_restoration_chest.name': 'Usbergo Guardiasalmastra',
+  'entities.items.vanguard_shaman_restoration_gloves.name': 'Fasce Guardiasalmastra',
+  'entities.items.vanguard_shaman_restoration_helmet.name': 'Diadema Guardiasalmastra',
+  'entities.items.vanguard_shaman_restoration_legs.name': 'Gonnellino Guardiasalmastra',
+  'entities.items.vanguard_shaman_restoration_shoulder.name': 'Manto Guardiasalmastra',
+  'entities.items.vanguard_warlock_affliction_chest.name': 'Veste Pennaterrore',
+  'entities.items.vanguard_warlock_affliction_gloves.name': 'Fasce Pennaterrore',
+  'entities.items.vanguard_warlock_affliction_helmet.name': 'Cappuccio Pennaterrore',
+  'entities.items.vanguard_warlock_affliction_legs.name': 'Gambali Pennaterrore',
+  'entities.items.vanguard_warlock_affliction_shoulder.name': 'Manto Pennaterrore',
+  'entities.items.vanguard_warlock_demonology_chest.name': 'Veste Legamidollo',
+  'entities.items.vanguard_warlock_demonology_gloves.name': 'Manopole Legamidollo',
+  'entities.items.vanguard_warlock_demonology_helmet.name': 'Cappuccio Legamidollo',
+  'entities.items.vanguard_warlock_demonology_legs.name': 'Gambali Legamidollo',
+  'entities.items.vanguard_warlock_demonology_shoulder.name': 'Spallacci Legamidollo',
+  'entities.items.vanguard_warlock_destruction_chest.name': 'Vesti Coronascoria',
+  'entities.items.vanguard_warlock_destruction_gloves.name': 'Guanti Coronascoria',
+  'entities.items.vanguard_warlock_destruction_helmet.name': 'Cappuccio Coronascoria',
+  'entities.items.vanguard_warlock_destruction_legs.name': 'Gambali Coronascoria',
+  'entities.items.vanguard_warlock_destruction_shoulder.name': 'Manto Coronascoria',
+  'entities.items.vanguard_warrior_arms_chest.name': 'Usbergo Scialama',
+  'entities.items.vanguard_warrior_arms_gloves.name': 'Frantumatori Scialama',
+  'entities.items.vanguard_warrior_arms_helmet.name': 'Elmo Imponente Scialama',
+  'entities.items.vanguard_warrior_arms_legs.name': 'Gambali di Piastra Scialama',
+  'entities.items.vanguard_warrior_arms_shoulder.name': 'Spallacci Scialama',
+  'entities.items.vanguard_warrior_fury_chest.name': 'Cotta di Maglia Marciasangue',
+  'entities.items.vanguard_warrior_fury_gloves.name': 'Manopole Marciasangue',
+  'entities.items.vanguard_warrior_fury_helmet.name': 'Maschera Marciasangue',
+  'entities.items.vanguard_warrior_fury_legs.name': 'Gambali Marciasangue',
+  'entities.items.vanguard_warrior_fury_shoulder.name': 'Spallacci Marciasangue',
+  'entities.items.vanguard_warrior_prot_chest.name': 'Corazza Marciaferro',
+  'entities.items.vanguard_warrior_prot_gloves.name': 'Manopole Marciaferro',
+  'entities.items.vanguard_warrior_prot_helmet.name': 'Elmo Marciaferro',
+  'entities.items.vanguard_warrior_prot_legs.name': 'Gambali Marciaferro',
+  'entities.items.vanguard_warrior_prot_shoulder.name': 'Spallacci Marciaferro',
+  'entities.items.vanguard_fang_dagger.name': "Zanna dell'Avanguardia",
+  'entities.items.vanguard_oath_blade.name': "Giuramento dell'Avanguardia",
+  'entities.items.vanguard_verdict_greatsword.name': "Verdetto dell'Avanguardia",
+  'entities.items.vanguard_warstaff.name': "Bastone da Guerra dell'Avanguardia",
+  'entities.items.acolytes_signet.name': "Sigillo dell'Accolito",
+  'entities.items.artificers_welding_cowl.name': "Cappuccio da Saldatura dell'Artificiere",
+  'entities.items.automaton_cog_ring.name': "Anello a Ingranaggi dell'Automa",
+  'entities.items.bastion_sigil.name': 'Sigillo del Baluardo',
+  'entities.items.champion_dawn_medallion.name': "Medaglione dell'Alba del Campione",
+  'entities.items.champion_forged_loop.name': 'Anello Forgiato del Campione',
+  'entities.items.champion_rift_band.name': 'Anello degli Squarci del Campione',
+  'entities.items.champions_dawn_loop.name': "Anello dell'Alba del Campione",
+  'entities.items.clockwork_tinkers_pack.name': "Zaino dell'Artigiano a Orologeria",
+  'entities.items.clue_scroll.name': 'Pergamena Indizio',
+  'entities.items.cogwork_choker.name': 'Collare a Ingranaggi',
+  'entities.items.confection_game_box.name': 'Scatola di Giochi del Pasticciere',
+  'entities.items.cord_of_the_dawn.name': "Cordone dell'Alba",
+  'entities.items.dawnkeeper_consecrated_mace.name': "Mazza Consacrata del Custode dell'Alba",
+  'entities.items.dawnkeepers_circle.name': "Cerchio del Custode dell'Alba",
+  'entities.items.dawnlit_slippers.name': "Pantofole Illuminate dall'Alba",
+  'entities.items.duelists_brand.name': 'Marchio del Duellante',
+  'entities.items.eastbrook_freight_crate.name': 'Cassa da Trasporto di Eastbrook',
+  'entities.items.eastbrook_freight_wagon.name': 'Carro da Trasporto di Eastbrook',
+  'entities.items.echoing_lens.name': 'Lente Risonante',
+  'entities.items.emissary_cache.name': "Riserva dell'Emissario",
+  'entities.items.forgefathers_temper.name': 'Tempra del Padre della Forgia',
+  'entities.items.forgemaster_crag_cleaver.name': 'Mannaia della Rupe del Mastro Forgiatore',
+  'entities.items.forgemasters_girdle.name': 'Cintura del Mastro Forgiatore',
+  'entities.items.forgemasters_sabatons.name': 'Sabatoni del Mastro Forgiatore',
+  'entities.items.forgewall_gorget.name': 'Gorgiera di Forgiamuro',
+  'entities.items.formula_dawnfire_etching.name': "Formula: Incisione Fuoco dell'Alba",
+  'entities.items.formula_dawns_benediction.name': "Formula: Benedizione dell'Alba",
+  'entities.items.formula_piston_drive.name': 'Formula: Propulsione a Pistoni',
+  'entities.items.formula_riftwalkers_grace.name': 'Formula: Grazia del Percorritore degli Squarci',
+  'entities.items.gamblers_die.name': 'Dado dello Scommettitore',
+  'entities.items.heart_of_the_crucible.name': 'Cuore del Crogiolo',
+  'entities.items.hunters_tally.name': 'Registro del Cacciatore',
+  'entities.items.kindling_orb.name': "Sfera d'Innesco",
+  'entities.items.last_flame_lantern.name': "Lanterna dell'Ultima Fiamma",
+  'entities.items.leyline_cache.name': 'Piccola Riserva delle Linee Ley',
+  'entities.items.medallion_of_defiance.name': 'Medaglione della Sfida',
+  'entities.items.menders_hourglass.name': 'Clessidra del Guaritore',
+  'entities.items.molten_fletching.name': 'Impennaggio Fuso',
+  'entities.items.mooring_stone.name': "Pietra d'Ormeggio",
+  'entities.items.order_prayer_beads.name': "Rosario dell'Ordine",
+  'entities.items.paired_talons.name': 'Artigli Gemelli',
+  'entities.items.reins_avian_strider.name': 'Redini del Valestrider Verdeggiante',
+  'entities.items.rift_surveyors_satchel.name': 'Bisaccia del Rilevatore degli Squarci',
+  'entities.items.rift_watchers_band.name': 'Anello della Vedetta degli Squarci',
+  'entities.items.riftwalkers_cord.name': 'Cordone del Percorritore degli Squarci',
+  'entities.items.riftwalkers_treads.name': 'Calzari del Percorritore degli Squarci',
+  'entities.items.riftwalkers_tunic.name': 'Tunica del Percorritore degli Squarci',
+  'entities.items.riftwarden_voidblade.name': 'Lama del Vuoto del Guardiano degli Squarci',
+  'entities.items.riftwardens_pendant.name': 'Ciondolo del Guardiano degli Squarci',
+  'entities.items.stormjar.name': 'Vaso della Tempesta',
+  'entities.items.sundered_prism.name': 'Prisma Spezzato',
+  'entities.items.templar_dawn_shield.name': "Scudo dell'Alba del Templare",
+  'entities.items.tidewatchers_locket.name': 'Medaglione del Guardiamarea',
+  'entities.items.treasure_casket.name': 'Cofanetto del Tesoro',
+  'entities.items.vestments_of_the_acolyte.name': "Paramenti dell'Accolito",
+  'entities.items.wayfarers_lodestone.name': 'Calamita del Viandante',
+  'entities.items.wellspring_seed.name': 'Seme della Sorgente',
+  'entities.npcs.calligraphy_apprentice_1.name': 'Apprendista Tessa',
+  'entities.npcs.calligraphy_apprentice_1.title': 'Studentessa di Calligrafia',
+  'entities.npcs.calligraphy_apprentice_1.greeting':
+    'Giro sempre troppo presto. Puoi mostrarmi dove vanno gli angoli?',
+  'entities.npcs.calligraphy_apprentice_2.name': 'Apprendista Pip',
+  'entities.npcs.calligraphy_apprentice_2.title': 'Studente di Calligrafia',
+  'entities.npcs.calligraphy_apprentice_2.greeting':
+    'Prima un triangolo, poi un quadrato, poi una runa. Un passo alla volta, con calma!',
+  'entities.npcs.calligraphy_instructor.name': 'Istruttore Elian',
+  'entities.npcs.calligraphy_instructor.title': 'Calligrafia Arcana',
+  'entities.npcs.calligraphy_instructor.greeting':
+    'Un passo fermo fa una linea ferma. Insegna ai miei apprendisti un triangolo, un quadrato e una runa avanzata.',
+  'entities.npcs.eastbrook_vault_keeper.name': 'Custode del Caveau',
+  'entities.npcs.eastbrook_vault_keeper.title': 'Ricompense Settimanali',
+  'entities.npcs.eastbrook_vault_keeper.greeting':
+    'Le tue ricompense settimanali ti attendono. Scegli un oggetto tra quelli guadagnati dopo il reset del Crogiolo.',
+  'entities.npcs.forge_instructor.name': 'Fabbro Mara',
+  'entities.npcs.forge_instructor.title': 'Fabbro di Wyrmwatch',
+  'entities.npcs.forge_instructor.greeting':
+    'Aiutami a finire uno scudo! Clicca sui materiali che ti chiedo. Mani veloci guadagnano una medaglia migliore.',
+  'entities.npcs.glider_apprentice.name': 'Skye',
+  'entities.npcs.glider_apprentice.title': 'Apprendista di Zephyr',
+  'entities.npcs.glider_apprentice.greeting':
+    'Gran bel volo giù per il canyon. Parlami ogni volta che ti serve una corrente ascensionale magica per tornare da Zephyr a Lo Strappo.',
+  'entities.npcs.glider_instructor.name': 'Maestro di Volo Zephyr',
+  'entities.npcs.glider_instructor.title': 'Istruttore dei Cavalcavento',
+  'entities.npcs.glider_instructor.greeting':
+    "Le correnti termiche che ululano dalle scogliere de Lo Strappo sono furiose oggi. Pronto ad allacciarti all'aliante meccanico e mettere alla prova le tue ali nel percorso a slalom?",
+  'entities.npcs.harbormaster_tamsin.name': 'Capitano di Porto Tamsin',
+  'entities.npcs.harbormaster_tamsin.title': 'Custode delle Banchine di Wyrmwatch',
+  'entities.npcs.harbormaster_tamsin.greeting':
+    "Vieni via dalla banchina e scaldati le mani. La nave al nostro molo risale la lunga costa orientale fino a Wickharbor e ritorna. Molto più a ovest, l'altro traghetto fa la spola tra Eastbrook e Nightbloom. La mappa sulla parete mostra entrambe le traversate. Riposati vicino al fuoco prima della salita a Wyrmwatch.",
+  'entities.npcs.infiltrator_bram.name': 'Guardia Bram',
+  'entities.npcs.infiltrator_bram.title': 'Guardia di Fenbridge',
+  'entities.npcs.infiltrator_bram.greeting': 'Pronto al servizio.',
+  'entities.npcs.infiltrator_captain.name': 'Sergente Alric',
+  'entities.npcs.infiltrator_captain.title': 'Guardia di Fenbridge',
+  'entities.npcs.infiltrator_captain.greeting':
+    'Una creatura ha rubato il volto di un soldato. Leggi gli ordini permanenti e il registro di guardia, interroga tutte e quattro le guardie, poi torna e indicami quella la cui storia contraddice i nostri registri.',
+  'entities.npcs.infiltrator_nella.name': 'Guardia Nella',
+  'entities.npcs.infiltrator_nella.title': 'Guardia di Fenbridge',
+  'entities.npcs.infiltrator_nella.greeting': 'Pronto al servizio.',
+  'entities.npcs.infiltrator_orin.name': 'Guardia Orin',
+  'entities.npcs.infiltrator_orin.title': 'Guardia di Fenbridge',
+  'entities.npcs.infiltrator_orin.greeting': 'Pronto al servizio.',
+  'entities.npcs.infiltrator_tessa.name': 'Guardia Tessa',
+  'entities.npcs.infiltrator_tessa.title': 'Guardia di Fenbridge',
+  'entities.npcs.infiltrator_tessa.greeting': 'Pronto al servizio.',
+  'entities.npcs.npc_automaton_quartermaster.name': 'Artificiere Tobrin',
+  'entities.npcs.npc_automaton_quartermaster.title': 'Fornitore degli Automi',
+  'entities.npcs.npc_automaton_quartermaster.greeting':
+    'Ingranaggi di precisione, acciaio forgiato ed energia calibrata. Gli operatori autorizzati possono attingere alle nostre scorte.',
+  'entities.npcs.npc_church_order_quartermaster.name': 'Templare Althea',
+  'entities.npcs.npc_church_order_quartermaster.title': "Quartiermastro dell'Ordine della Chiesa",
+  'entities.npcs.npc_church_order_quartermaster.greeting':
+    "Cammina nella Luce dell'Alba. L'Ordine della Chiesa rifornisce chi sta al nostro fianco nel servizio.",
+  'entities.npcs.npc_rift_watch_quartermaster.name': 'Quartiermastro Vaelen',
+  'entities.npcs.npc_rift_watch_quartermaster.title': 'Fornitore della Guardia degli Squarci',
+  'entities.npcs.npc_rift_watch_quartermaster.greeting':
+    'La Guardia degli Squarci protegge la costa e veglia sui profondi squarci. Le nostre scorte sono aperte a chi ha una reputazione riconosciuta.',
+  'entities.npcs.npc_wq_taskmaster.name': 'Sovrintendente Kaelen',
+  'entities.npcs.npc_wq_taskmaster.title': 'Sovrintendente delle Missioni Mondiali',
+  'entities.npcs.npc_wq_taskmaster.greeting':
+    'Le fazioni alleate affiggono incarichi in tutto il reame ogni giorno. Se un incarico non si addice alle tue abilità, puoi richiedere una riassegnazione al giorno.',
+  'entities.npcs.shadow_cloak_scout.name': 'Esploratrice Valerie',
+  'entities.npcs.shadow_cloak_scout.title': 'Operazioni Coperte',
+  'entities.npcs.shadow_cloak_scout.greeting':
+    "Prendi in prestito il mio mantello crepuscolotessuto. Intrufolati alle spalle di ogni corriere e sottraigli gli ordini. Resta fuori dai fasci delle lanterne: una guardia con lanterna vede dritto attraverso l'incantesimo, e un corriere ti sente se lo sfiori.",
+  'entities.npcs.shadow_guard_east.name': 'Guardia Corriere',
+  'entities.npcs.shadow_guard_east.title': 'Corriere di Dispacci',
+  'entities.npcs.shadow_guard_east.greeting':
+    'Niente ritardi. Il picchetto di guardia aspetta questi ordini.',
+  'entities.npcs.shadow_guard_north.name': 'Guardia Corriere',
+  'entities.npcs.shadow_guard_north.title': 'Corriere di Dispacci',
+  'entities.npcs.shadow_guard_north.greeting':
+    'Questi ordini sigillati sono per il capitano. Tieniti a distanza.',
+  'entities.npcs.shadow_guard_south.name': 'Guardia Corriere',
+  'entities.npcs.shadow_guard_south.title': 'Corriere di Dispacci',
+  'entities.npcs.shadow_guard_south.greeting': 'Ho un dispaccio da consegnare. Circolare.',
+  'entities.npcs.shadow_guard_west.name': 'Guardia Corriere',
+  'entities.npcs.shadow_guard_west.title': 'Corriere di Dispacci',
+  'entities.npcs.shadow_guard_west.greeting': 'Affari ufficiali. Tieni libero il sentiero.',
+  'entities.npcs.shadow_sentry_north.name': 'Sentinella con Lanterna',
+  'entities.npcs.shadow_sentry_north.title': 'Vista Vera',
+  'entities.npcs.shadow_sentry_north.greeting': 'Niente sfugge alla veglia della lanterna.',
+  'entities.npcs.shadow_sentry_south.name': 'Sentinella con Lanterna',
+  'entities.npcs.shadow_sentry_south.title': 'Vista Vera',
+  'entities.npcs.shadow_sentry_south.greeting':
+    'La mia lanterna rivela più delle ombre. Resta dove posso vederti.',
+  'entities.npcs.shadow_watch_east.name': 'Guardiano della Lanterna',
+  'entities.npcs.shadow_watch_east.title': 'Vista Vera',
+  'entities.npcs.shadow_watch_east.greeting': 'Nessuno attraversa la mia luce senza farsi vedere.',
+  'entities.npcs.shadow_watch_west.name': 'Guardiano della Lanterna',
+  'entities.npcs.shadow_watch_west.title': 'Vista Vera',
+  'entities.npcs.shadow_watch_west.greeting':
+    "Fermo lì. La lanterna vede ciò che l'occhio si perde.",
+  'entities.npcs.weekly_emissary.name': 'Cham Pete',
+  'entities.npcs.weekly_emissary.title': 'Emissario',
+  'entities.npcs.weekly_emissary.greeting':
+    'La Valle tiene un registro di imprese, e io tengo il registro. Scegli un incarico per la settimana, portalo a termine, e la borsa è tua.',
+  'entities.npcs.wisp_maze_keeper.name': 'Custode Liora',
+  'entities.npcs.wisp_maze_keeper.title': 'Guardiana del Labirinto di Siepi',
+  'entities.npcs.wisp_maze_keeper.greeting':
+    "I ladri hanno nascosto il loro oro rubato per tutto il mio labirinto, e ora le ombre lo custodiscono. Recupera ogni borsa di monete. Evita i guardiani, oppure prendi una fiammella radiosa per bandirli. Tre vite perse ti riportano all'ingresso, ma le borse che hai raccolto restano al sicuro.",
+  'entities.abilities.lava_burst.name': 'Scoppio di Magma',
+  'entities.abilities.lava_burst.description':
+    'Infligge {damage} danni da Fuoco. Va sempre a segno come colpo critico su un bersaglio che sta bruciando per la tua Scossa di Braci. Ondata di Magma: ogni tick di Scossa di Braci ha il 20% di probabilità di azzerare questo tempo di recupero e rendere istantaneo il tuo prossimo Scoppio di Magma entro 10 sec. Il danno aumenta con il Potere Magico. (Richiamo del Tuono)',
+  'entities.abilities.lightning_overload.name': 'Sovraccarico Folgorante',
+  'entities.abilities.lightning_overload.description':
+    'Passiva: Dardo Folgorante e Fulmine Biforcuto hanno il 20% di probabilità di andare in Sovraccarico, colpendo di nuovo il primo bersaglio per il 50% dei danni inflitti e concedendo 1 Tuono. (Richiamo del Tuono)',
+  'entities.abilities.thunderstorm.name': 'Frangitempesta',
+  'entities.abilities.thunderstorm.description':
+    "Scatena un tuono, infliggendo {damage} danni da Natura ai nemici entro 10 metri e rallentandoli del 50% per 5 sec. Ripristina l'8% del tuo Mana massimo. Il danno aumenta con il Potere Magico. (Richiamo del Tuono)",
+  'entities.mobs.eastbrook_freight_caravan.name': 'Carovana da Trasporto di Eastbrook',
+  'entities.mobs.fenbridge_infiltrator.name': 'Il Volto in Prestito',
+  'entities.mobs.frostveil_supply_caravan.name': 'Carovana di Rifornimenti di Frostveil',
+  'entities.mobs.willowfen_remedy_caravan.name': 'Carovana di Rimedi di Willowfen',
+  'entities.zones.eastbrook_vale.welcomeDone':
+    'Il Maresciallo Redbrook non ha più lavoro per te: la pittoresca cittadina costiera dove è iniziato il tuo viaggio riposa più tranquilla per questo.',
+  'entities.zones.farshore_isle.pois.5.label': 'Il Relitto',
+  'entities.zones.mirefen_marsh.welcomeDone':
+    "Il Guardiano Fenwick non ha più ordini per te: l'insediamento nel profondo delle paludi acquitrinose è più sicuro per questo.",
+  'entities.zones.thornpeak_heights.welcomeDone':
+    "La Capitana Thessaly tiene le mura di Highwatch: non è mai facile, ma con l'aiuto di avventurieri come te ora è gestibile.",
+  'clues.hunt_amberfall_lantern_ferry.0':
+    "Sulla riva dell'acqua a nord di Lanternmere, il custode dei traghetti con lanterna sa quale luce si è spenta. Parla con il Capotraghetto Caddow.",
+  'clues.hunt_amberfall_lantern_ferry.1':
+    "Un'unica pietra si china contro il cielo a nordest del grande stagno, più antica della città. Fermati al Monolite Pendente.",
+  'clues.hunt_amberfall_lantern_ferry.2':
+    'La custode dei filari dorati innaffia il suo frutteto a mano e ne ha sete. Porta a Frutticoltrice Pomeline 3 x Acqua di Pozzo Fredda.',
+  'clues.hunt_amberfall_lantern_ferry.3':
+    'A nordest del rialzo dove gli aceri di cenere ardono di rosso, le foglie giacciono in un cerchio che nessun vento ha creato. Usa la pergamena lì e scava.',
+  'clues.hunt_amberfall_lantern_ferry.title': 'Lanterne sullo Stagno',
+  'clues.hunt_drakelands_gate_ashes.0':
+    'La strada che esce da Wyrmwatch corre a ovest in un boschetto di alberi antichi che sorveglia il cancello. Fermati sotto il Boscocancello e la pista avrà inizio.',
+  'clues.hunt_drakelands_gate_ashes.1':
+    "Una vedetta delle dune lontane resta sulle sabbie orientali, a nord della guarnigione. Trova l'Esploratore Yerrin e chiedigli cosa ha portato il vento.",
+  'clues.hunt_drakelands_gate_ashes.2':
+    "La custode delle scorte della guarnigione non mangia dall'ultima pattuglia. Porta a Quartiermastro Sela 2 x Pagnotta Casereccia.",
+  'clues.hunt_drakelands_gate_ashes.3':
+    "A est e un po' a sud di dove le ceneri si spostano tra le dune, una chiazza di terreno bruciacchiato nasconde ciò che la cenere ha sepolto. Usa la pergamena lì e scava.",
+  'clues.hunt_drakelands_gate_ashes.title': 'Cenere al Cancello',
+  'clues.hunt_evergarden_beacon_road.0':
+    'La giardiniera delle aiuole lungo il viale a nord di Hedgewick giura che le sue aiuole muoiono di fame. Porta a Contadina Verbena 2 x Compost.',
+  'clues.hunt_evergarden_beacon_road.1':
+    "Nell'angolo più a sudest del giardino, un vecchio mulino gira ancora senza mugnaio. Fermati al Vecchio Mulino.",
+  'clues.hunt_evergarden_beacon_road.2':
+    "Segui la strada a sud oltre il confine nel Galecrest e fino alla costa. Il custode del vecchio faro, Custode Bram, ha l'ultima parola.",
+  'clues.hunt_evergarden_beacon_road.3':
+    'A nordovest del vecchio faro, appena fuori dal sentiero che scende dalla luce, la zolla è stata tagliata e rimessa a posto. Usa la pergamena lì e scava.',
+  'clues.hunt_evergarden_beacon_road.title': 'Faro e Fiore',
+  'clues.hunt_frostveil_aurora_vigil.0':
+    "Dove le terrazze salgono verso le luci che danzano di notte, inginocchiati sui Gradini dell'Aurora e lascia che il cielo ti noti.",
+  'clues.hunt_frostveil_aurora_vigil.1':
+    "Chi legge le luci aspetta vicino ai gradini. Parla con l'Aurorista Veyla di ciò che il cielo ha scritto.",
+  'clues.hunt_frostveil_aurora_vigil.2':
+    "A est delle terrazze ululanti, un po' a sud, la neve giace più piatta del dovuto. Usa la pergamena lì e scava.",
+  'clues.hunt_frostveil_aurora_vigil.title': 'Luci sopra i Gradini',
+  'clues.hunt_nightbloom_sleepless_vigil.0':
+    'A nordest di Moonrest, dove le pietre mantengono una veglia senza fine, fermati alla Veglia Eretta.',
+  'clues.hunt_nightbloom_sleepless_vigil.1':
+    "La vedetta della veglia conta le stelle come altri contano le monete. Parla con l'Astronomo Cassian di quella che è caduta.",
+  'clues.hunt_nightbloom_sleepless_vigil.2':
+    'A nord della città giace un tumulo il cui dormiente non riposa mai. Saluta il Tumulo Insonne affinché il dormiente sappia che è arrivato un amico.',
+  'clues.hunt_nightbloom_sleepless_vigil.3':
+    'A sudest del campo dove si raccoglie la penombra, il chiaro di luna si raccoglie su una chiazza di terra nuda. Usa la pergamena lì e scava.',
+  'clues.hunt_nightbloom_sleepless_vigil.title': 'Veglia degli Insonni',
+  'clues.hunt_palmreach_sunken_idol.0':
+    'Nel profondo del groviglio, a nordovest della laguna, le liane scendono come una cascata. Fermati alla Cascata di Liane.',
+  'clues.hunt_palmreach_sunken_idol.1':
+    'Un eremita che è entrato nel groviglio ed è tornato fuori vive vicino alle liane cadenti. Parla con Okrim di ciò che ha visto laggiù.',
+  'clues.hunt_palmreach_sunken_idol.2':
+    "A est, un idolo siede mezzo sommerso e ancora vigile. Inchinati intimorito davanti all'Idolo Sommerso, come l'eremita ha detto che fanno i sub.",
+  'clues.hunt_palmreach_sunken_idol.3':
+    'A nordest di dove il groviglio apre la sua bocca verso il mare, la sabbia è stata ammucchiata più in alto di quanto arrivi la marea. Usa la pergamena lì e scava.',
+  'clues.hunt_palmreach_sunken_idol.title': "Il Segreto dell'Idolo",
+  'clues.hunt_willowfen_fenwitch_salt.0':
+    'La strega della palude di Willowweep non parla con chi si presenta a mani vuote. Porta a Madre Sedge 1 x Sale da Cucina.',
+  'clues.hunt_willowfen_fenwitch_salt.1':
+    "Dove la palude si fa piatta e l'aria rende tutti assonnati, fermati sulle Piane Assonnate e sospira, come ti ha detto la strega.",
+  'clues.hunt_willowfen_fenwitch_salt.2':
+    "A sudest delle pozze che brillano nella torbiera, un dosso di terra asciutta resta secco tutto l'anno. Usa la pergamena lì e scava.",
+  'clues.hunt_willowfen_fenwitch_salt.title': 'Il Sale della Strega della Palude',
+  'clues.hunt_wraithwood_mournstone_candles.0':
+    'La candelaia di Gibbetmere vende luce a chi teme il buio. Parla con Vedova Tansy di una candela mai pagata.',
+  'clues.hunt_wraithwood_mournstone_candles.1':
+    "L'ultimo vicario di Mournstone digiuna nutrendosi solo di preghiere. Porta a Vicario Creel 2 x Carne Essiccata Salata.",
+  'clues.hunt_wraithwood_mournstone_candles.2':
+    'A nordest della città, oltre i corvi, una radura porta i propri strani frutti. Fermati nella Radura degli Impiccati.',
+  'clues.hunt_wraithwood_mournstone_candles.3':
+    'A sudest della radura dove il cacciatore ha teso le sue trappole, la lettiera di foglie è stata smossa di recente. Usa la pergamena lì e scava.',
+  'clues.hunt_wraithwood_mournstone_candles.title': 'Candele per Mournstone',
+  'clues.items.clue_scroll.desc':
+    "Un indovinello sigillato ottenuto completando ogni incarico di zona della giornata. Usalo per iniziare una caccia al tesoro, e usalo di nuovo nel luogo nascosto quando l'ultimo indizio dice di scavare.",
+  'clues.items.treasure_casket.desc':
+    'Un cofanetto chiuso a chiave dissotterrato alla fine di una caccia al tesoro. Usalo per aprirlo e reclamare ciò che la caccia ha sepolto.',
+  'apiError.world_quests.unknown_board': 'Nessuna bacheca con questo nome.',
+  'desktop.hostDiag.fileType': 'File JSON',
+  'desktop.hostDiag.saveButton': 'Salva',
+  'desktop.hostDiag.saveTitle': 'Salva rapporto di sistema',
+  'devCommand.actions.hillend.description': 'Fai cadere subito la collina attuale.',
+  'devCommand.actions.hillend.label': 'Termina collina',
+  'devCommand.actions.hillnow.description': 'Solleva subito una collina e mettiti sopra.',
+  'devCommand.actions.hillnow.label': 'Solleva collina ora',
+  'devCommand.actions.hillrise.description': 'Solleva subito la collina annunciata.',
+  'devCommand.actions.hillrise.label': 'Salta conto alla rovescia della collina',
+  'devCommand.actions.hillwarn.description':
+    'Annuncia subito una collina; sorgerà dopo il pieno preavviso.',
+  'devCommand.actions.hillwarn.label': 'Conto alla rovescia della collina',
+  'guide.arenaPage.vanguardBody':
+    "L'equipaggiamento dell'Avanguardia è la seconda stagione dell'equipaggiamento da Guerra, venduto dagli stessi due quartiermastri al di sopra del livello originale, che resta comunque in vendita. Ogni specializzazione ha il proprio set dell'Avanguardia di cinque pezzi, per testa, spalle, petto, gambe e mani, e il negozio elenca solo i tre set che la tua classe può indossare, seguiti dalle armi dell'Avanguardia che puoi impugnare. Un pezzo dell'Avanguardia porta gli stessi indici di Guerra del livello originale a un livello oggetto superiore, e ogni set ha due bonus, a due e quattro pezzi, che modificano una delle abilità della tua specializzazione. A differenza dei set originali, questi bonus funzionano ovunque, mostri inclusi, ma sono pensati per combattere altri giocatori, quindi un set da incursione resta la scelta migliore all'interno di un'incursione.",
+  'guide.arenaPage.vanguardHeading': "Equipaggiamento dell'Avanguardia: Guerra Stagione 2",
+  'guide.combat.unstuckBodyWindow':
+    "Se il mondo ti intrappola in un punto da cui non riesci a uscire, digita /unstuck. Devi essere fuori dal combattimento e fermo, non immobilizzato da uno stordimento o da un radicamento, e non in un duello o in un incontro d'arena: parte un breve conto alla rovescia, e muoverti o subire danni lo annulla. Al termine vieni depositato al cimitero più vicino. Non ti uccide mai e non lascia alcun corpo, e se eri già caduto ti rianima lì. Il primo utilizzo in un'ora non ti costa nulla. Usalo di nuovo entro un'ora dall'ultima volta e il prezzo è il Mal di sblocco, un indebolimento temporaneo di tutto ciò che sei che si sarà esaurito per quando potrai usare di nuovo il comando, e come il Pedaggio del Custode risparmia del tutto i personaggi appena creati.",
+  'guide.commandsPage.pvpZones':
+    'Bandiera PvP Mondiale: /pvp la attiva o disattiva, /pvp on e /pvp off la impostano direttamente. I giocatori contrassegnati possono combattersi a vicenda in territorio conteso, i santuari non permettono alcun combattimento nel mondo, e le zone a tutti contro tutti lo permettono con o senza bandiera; disattivarla richiede 5 minuti.',
+  'guide.commandsPage.unstuckWindow':
+    "La via d'uscita quando il mondo ti ha intrappolato. Resta fermo per un breve conto alla rovescia e verrai spostato al cimitero più vicino, rianimato lì se eri già caduto. Il primo utilizzo in un'ora è gratuito. Usalo di nuovo entro un'ora dall'ultima volta e ti lascia indebolito dal Mal di sblocco per un po' di tempo dopo, quindi è un'ultima risorsa, non una scorciatoia.",
+  'guide.factionsPage.automatonsBody':
+    'Gli Automi custodiscono le fucine delle terre remote: Drakelands, la Distesa di Frostveil, Amberfall ed Evergarden. Il loro fulcro è Wyrmwatch, nelle Drakelands.',
+  'guide.factionsPage.automatonsTitles':
+    'Con gli Automi sei prima un Estraneo, poi un Operatore, un Meccanico, un Artificiere, un Mastro Forgiatore e infine un Campione.',
+  'guide.factionsPage.churchOrderBody':
+    "L'Ordine della Chiesa tiene il cuore del reame: la Valle di Eastbrook, la Palude di Mirefen, le Alture di Thornpeak, Nightbloom e Wraithwood. Fratello Aldric parla per loro dalla Valle di Eastbrook.",
+  'guide.factionsPage.churchOrderTitles':
+    "Con l'Ordine della Chiesa sei prima un Estraneo, poi un Accolito, un Custode, un Templare, un Custode dell'Alba e infine un Campione.",
+  'guide.factionsPage.deedsBody':
+    "Anche il Libro delle Imprese tiene il conto della tua reputazione: raggiungere Fidata con una fazione e raggiungere Campione con una fazione registrano ciascuna un'impresa, e raggiungere Campione con tutte e tre è un'impresa a sé. Come ogni impresa, sono puramente estetiche, mai potere, e le imprese da Campione concedono un titolo che puoi indossare.",
+  'guide.factionsPage.deedsHeading': 'Imprese',
+  'guide.factionsPage.earningBody':
+    "La reputazione si guadagna con le missioni mondiali. Ogni missione mondiale conta per la fazione della zona in cui si svolge, e poiché le tre fazioni coprono zone diverse, tutte e tre progrediscono insieme mentre attraversi la mappa. Il Sovrintendente Kaelen a Eastbrook apre la bacheca delle Missioni Mondiali sulla mappa, ed è anche lì che puoi sostituire una missione mondiale al giorno se l'incarico del giorno non ti si addice.",
+  'guide.factionsPage.earningHeading': 'Guadagnare reputazione',
+  'guide.factionsPage.heading': 'Fazioni e Reputazione',
+  'guide.factionsPage.intro':
+    "Tre fazioni alleate vegliano ciascuna sul proprio angolo del reame, e ogni missione mondiale che completi nelle loro terre aumenta la tua reputazione presso di loro. La reputazione sale attraverso sei livelli, ciascuno con un proprio titolo, e sblocca l'assortimento di un quartiermastro pezzo per pezzo lungo il percorso.",
+  'guide.factionsPage.lowLevelNote':
+    'La reputazione si ferma a un livello per i personaggi di livello più basso e riprende man mano che sali di livello, così un personaggio giovane può iniziare a guadagnarla presto senza esaurire la strada.',
+  'guide.factionsPage.quartermastersBody':
+    "Ogni fazione tiene un quartiermastro nel proprio fulcro: Quartiermastro Vaelen per la Guardia degli Squarci a Drifthaven, Templare Althea per l'Ordine della Chiesa nella cappella di Eastbrook, e Artificiere Tobrin per gli Automi a Wyrmwatch. Ognuno vende un piccolo assortimento di gioielli, armature, armi e borse, sbloccato livello dopo livello man mano che cresce la tua reputazione con quella fazione, e pagato in monete comuni.",
+  'guide.factionsPage.quartermastersHeading': 'Quartiermastri',
+  'guide.factionsPage.readingBody':
+    'La scheda Reputazione della scheda del personaggio (C) mostra ogni fazione con la sua reputazione attuale, una barra verso il livello successivo, e il titolo che quella reputazione ti ha guadagnato. Il registro chat segnala ogni guadagno di reputazione non appena arriva, e raggiungere un nuovo livello mostra uno striscione di festeggiamento sullo schermo.',
+  'guide.factionsPage.readingHeading': 'Dove consultarla',
+  'guide.factionsPage.riftWatchBody':
+    'La Guardia degli Squarci protegge la costa e veglia sui profondi squarci. Le loro terre sono la costa: Farshore, Palmreach, Galecrest, Willowfen e la Valletta Velata. Il loro fulcro è Drifthaven, sul Palmreach.',
+  'guide.factionsPage.riftWatchTitles':
+    'Con la Guardia degli Squarci sei prima un Estraneo, poi una Vedetta, un Percorritore degli Squarci, un Guardiano, un Guardiano degli Squarci e infine un Campione.',
+  'guide.factionsPage.tiersBody':
+    'Ogni fazione sale attraverso gli stessi sei livelli: Sconosciuta, Riconosciuta, Fidata, Comprovata, Avanguardia e Campione. Ogni fazione dà un proprio nome a ciascun gradino, e quel nome diventa il tuo titolo presso di essa.',
+  'guide.factionsPage.tiersHeading': 'Livelli di reputazione',
+  'guide.factionsPage.weeklyBody':
+    "L'emissario settimanale nella Valle di Eastbrook aggiunge una seconda strada: porta a termine l'incarico della settimana e potrai scegliere una fazione a cui destinare la sua commendazione di reputazione, una volta a settimana, allo sportello dove hai preso l'incarico.",
+  'guide.factionsPage.whoBody':
+    "Ogni fazione è legata a un gruppo di zone, quindi il luogo in cui svolgi le missioni mondiali decide a quale fazione va il merito. Non devi mai scegliere una parte: tutte e tre tengono il proprio conteggio, e nessuna ti chiede mai di rivoltarti contro un'altra.",
+  'guide.factionsPage.whoHeading': 'Le tre fazioni',
+  'guide.glossary.unstuckDefWindow':
+    "Il prezzo di affidarsi a Sblocco dal menu di gioco più di una volta in un'ora. Resta fermo per tutto il conto alla rovescia e ti deposita al cimitero più vicino. Il primo utilizzo in un'ora è gratuito, e un ulteriore utilizzo entro un'ora dall'ultimo ti lascia anche con una debolezza temporanea per un po' di tempo dopo.",
+  'guide.interfacePage.frameGroups':
+    "{trackers} può unire missioni, imprese, squarci, esplorazioni, obiettivi di raccolta e il tracciamento del Reliquiario. {auras} può unire i tic sul bersaglio e le sei tracce delle aure. Attiva l'uno o l'altro gruppo in Impostazioni Riquadri, oppure lascialo disattivato per spostare ogni riquadro separatamente. {tot} include una barra delle risorse. {focus} ha tre bersagli spostabili in modo indipendente: da Maiusc+F1 a Maiusc+F3 li assegna; da Ctrl+F1 a Ctrl+F3 li seleziona. Trascina il misuratore di danno o minaccia in un punto qualsiasi al di fuori dei suoi pulsanti per spostarlo, e trascina i suoi bordi per ridimensionarlo, anche mentre i riquadri sono bloccati. Mentre i riquadri sono sbloccati, Mostra o Nascondi Riquadri ha un proprio menu raggruppato. Fai clic destro su un riquadro sbloccato per Ripristina dimensione o Opzioni Riquadro. Interfaccia > Riquadri contiene anche Impostazioni Riquadri e le Opzioni Riquadro Gruppo a comparsa. Blocca Bersaglio del Bersaglio al Bersaglio mantiene uniti quei riquadri. Disattivalo per spostare Bersaglio del Bersaglio separatamente; riattivarlo conserva la posizione separata per dopo. I riquadri focus assegnati nascondono i loro controlli di impostazione; fai clic destro e scegli Rimuovi Focus per ripristinarli. Il lancio al passaggio del mouse funziona anche sui riquadri focus.",
+  'guide.nav.factions': 'Fazioni e Reputazione',
+  'guide.nav.worldPvp': 'PvP Mondiale',
+  'guide.questsPage.cluesBody':
+    "Nelle zone remote, la bacheca giornaliera delle missioni mondiali nasconde un'altra ricompensa per chi completa l'intera lista: una Pergamena Indizio, e la caccia al tesoro scritta su di essa.",
+  'guide.questsPage.cluesCasketBody':
+    "Risolvi l'ultimo indizio e usa la pergamena nel luogo che indica per dissotterrare un Cofanetto del Tesoro; completare la caccia guadagna anche reputazione con la fazione nelle cui terre era nascosto. Apri il cofanetto per monete e una scorta di materiali da raccolta pregiati. Di tanto in tanto contiene un pezzo di equipaggiamento o alcuni Marchi Eroici, e molto raramente Grumbol il Lampionaio, una cavalcatura che non si trova in nessun altro luogo. Il tuo primo cofanetto e il tuo decimo vengono registrati nel Libro delle Imprese.",
+  'guide.questsPage.cluesCasketTitle': 'Il cofanetto',
+  'guide.questsPage.cluesEarnBody':
+    'Una volta che il tuo personaggio è abbastanza avanti, completare ogni incarico di zona sulla bacheca giornaliera delle missioni mondiali ti consegna una Pergamena Indizio oltre alle solite ricompense. Un incarico riassegnato conta una volta completato; le giornaliere sempre disponibili non sono richieste. Puoi tenere alcune pergamene alla volta, quindi non serve usarne una il giorno stesso in cui la guadagni.',
+  'guide.questsPage.cluesEarnTitle': 'Guadagnare una pergamena',
+  'guide.questsPage.cluesHuntBody':
+    "Usare una pergamena avvia una caccia: una breve catena di indovinelli che appare nel tuo registro missioni un passo alla volta. Ogni indovinello indica qualcosa di reale nel mondo, un punto di riferimento dove fermarsi, una persona con cui parlare, un'emote da eseguire in un certo luogo, o una piccola commissione da svolgere, e l'ultimo chiede sempre di scavare. Una sola caccia è attiva alla volta, e mantiene il tuo progresso oltre il reset giornaliero e tra una sessione e l'altra, quindi prenditi tutto il tempo che vuoi.",
+  'guide.questsPage.cluesHuntTitle': 'Seguire gli indizi',
+  'guide.questsPage.cluesTitle': 'Pergamene Indizio',
+  'guide.settingsPage.ifShowAuraCaster':
+    'Aggiunge una riga "Lanciato da" a ogni descrizione di potenziamento/indebolimento, indicando chi lo ha applicato. Utile per distinguere più lanciatori dello stesso potenziamento, come le Benedizioni di due paladini.',
+  'guide.settingsPage.ifTargetAurasBelowFrame':
+    'Colloca la striscia di potenziamenti e indebolimenti del riquadro bersaglio sotto il riquadro invece che sopra, la disposizione classica. Disattivata di default, poiché il riquadro bersaglio predefinito si trova appena sopra la barra delle azioni; attivala una volta spostato il riquadro in un punto con spazio sottostante.',
+  'guide.settingsPage.rowFrameRateCap':
+    'Un tetto massimo a quante immagini il gioco disegna ogni secondo. Un computer che non riesce a stare al passo con il proprio schermo cade in un ritmo irregolare; un valore costante di 30 sembra più fluido, dimezza il lavoro e mantiene il computer più fresco. Schermo indica nessun limite.',
+  'guide.stats.warfareBodyPets':
+    "Guerra è la statistica che l'equipaggiamento d'onore porta per combattere altri giocatori. Negli scontri tra giocatori aumenta i danni che tu e il tuo famiglio infliggete ad altri giocatori e ai loro famigli, e riduce i danni che tu e il tuo famiglio subite da loro. Aumenta anche la tua salute massima ovunque tranne che nei dungeon, nelle incursioni, nelle esplorazioni e negli squarci, quindi un giocatore in equipaggiamento d'onore è molto più difficile da uccidere di uno che non lo indossa. La tua scheda ne mostra il totale su un'unica riga. Deriva dall'equipaggiamento da Guerra che acquisti con l'Onore, quindi è una ricompensa per chi gioca PvP piuttosto che qualcosa da inseguire durante la crescita di livello.",
+  'guide.worldPvpPage.flagBodyAid':
+    'Digita /pvp in chat, oppure apri la finestra PvP con G e usa la scheda PvP Mondiale, che mostra anche il tuo bilancio e la posta in gioco. Alzare la bandiera è istantaneo una volta superati i livelli iniziali. Abbassarla avvia un conto alla rovescia di alcuni minuti, e la bandiera non cadrà finché sei ancora in combattimento, quindi disattivarla non è mai una via di fuga da uno scontro che hai iniziato tu. Curare, proteggere con uno scudo o potenziare un giocatore contrassegnato che è in combattimento alza anche la tua bandiera, così nessuno sostiene un combattente restando al riparo di una bandiera che non porta; aiutare un giocatore non contrassegnato non alza nulla.',
+  'guide.worldPvpPage.flagHeading': 'Alzare e abbassare la bandiera',
+  'guide.worldPvpPage.heading': 'PvP Mondiale',
+  'guide.worldPvpPage.hillBodyRamp':
+    "Una volta ogni tre ore, in un momento che nessuno può prevedere, l'intero reame viene avvisato che una collina sorgerà in una delle zone a tutti contro tutti tra quindici minuti, e il cerchio dove si ergerà è segnato su terreno aperto. Quando sorge resta in piedi per quarantacinque minuti, poi cade. Il gruppo con più giocatori al suo interno contende la collina, e dopo un minuto di maggioranza ininterrotta la collina è sua; un giocatore solitario conta come un gruppo di uno, ma i membri di un'incursione non contano affatto. Mentre un gruppo tiene la collina, ciascuno dei suoi membri al suo interno guadagna Onore ogni minuto, e più a lungo lo stesso gruppo la tiene, più paga ogni minuto: un gruppo completo che tiene una collina incontrastata per l'intera durata guadagna quanto circa tre vittorie in campo di battaglia. Quando la collina cambia mano, i nuovi detentori ricominciano il conteggio da capo. Una barra sopra il campo mostra chi la controlla, i tuoi numeri contro i loro, e il tempo della contesa; /hill in chat indica dove si trova.",
+  'guide.worldPvpPage.hillHeading': 'Il Re della Collina',
+  'guide.worldPvpPage.introZones':
+    'Il PvP a mondo aperto è facoltativo, e il terreno su cui ti trovi decide cosa questo significhi. Alza la tua bandiera PvP e ogni altro giocatore contrassegnato che non è nel tuo gruppo o nella tua incursione diventa un nemico in territorio conteso; abbassala e, dopo un breve ritardo, torni a essere uno spettatore. Due zone sono santuari dove non avviene mai alcun combattimento nel mondo, e le tre zone più a nord sono terreno a tutti contro tutti dove chiunque sia presente è bersaglio legittimo, con o senza bandiera. I compagni di gruppo e di incursione non sono mai tuoi nemici in nessun luogo; i compagni di gilda al di fuori del tuo gruppo sono bersaglio legittimo come chiunque altro.',
+  'guide.worldPvpPage.limitsBodyRaids':
+    "Sconfiggere lo stesso giocatore più e più volte paga sempre meno e presto nulla, e il tuo conteggio contro quel giocatore riparte da capo solo circa un'ora dopo la prima di quelle uccisioni, quindi appostarsi su una singola vittima non vale mai l'attesa. Un bersaglio molto al di sotto del tuo livello non paga assolutamente nulla. I Campi di Battaglia e i Colossei seguono le proprie regole mentre sei al loro interno, e pagano più Onore del mondo aperto, quindi il PvP mondiale è la strada più lenta verso lo stesso mercante. Le incursioni non guadagnano nulla dalle uccisioni nel mondo: un membro di un'incursione non riceve Onore né monete e non riduce la quota di nessun altro, quindi combatti in gruppo per essere pagato.",
+  'guide.worldPvpPage.limitsHeading': 'Regole di gioco leale',
+  'guide.worldPvpPage.stakesBodyFlagged':
+    "Quando un giocatore contrassegnato viene sconfitto da un altro giocatore, il perdente paga una piccola parte delle monete nella sua borsa, limitata a un importo modesto, e i vincitori guadagnano Onore verso l'equipaggiamento da Guerra. Un giocatore non contrassegnato non paga alcuna moneta, anche se cade in una zona a tutti contro tutti. Chiunque abbia contribuito condivide entrambe le cose: il colpo di grazia, chiunque abbia danneggiato il bersaglio poco prima, e i guaritori che hanno tenuto in piedi quei combattenti. Un pulito uno contro uno paga l'intero bottino; un gruppo lo divide.",
+  'guide.worldPvpPage.stakesHeading': "Quanto vale un'uccisione",
+  'guide.worldPvpPage.stakesUnflaggedTake':
+    "Né un combattente non contrassegnato ne prende: le monete cambiano mano solo tra due giocatori contrassegnati, anche se chiunque abbia contribuito guadagna comunque l'Onore.",
+  'guide.worldPvpPage.zonesBody':
+    'Il mondo ha tre tipi di terreno. La Riva della Prova e la Valle di Eastbrook sono santuari: lì non avviene mai alcun PvP mondiale, contrassegnati o no, quindi un personaggio nuovo non può mai essere attaccato prima di sapere cosa sia la bandiera. Gran parte del mondo è terreno conteso, dove la regola della bandiera descritta sopra è tutta la storia. Drakelands, la Distesa di Frostveil e Amberfall, le tre zone più a nord, sono terreno a tutti contro tutti: chiunque vi si trovi può attaccare chiunque altro vi si trovi, con o senza bandiera, e te ne viene data notizia sia quando entri sia quando esci. Attaccare lì un giocatore non contrassegnato alza la tua bandiera, quindi un aggressore finisce sempre per portare il rischio. Colpire un giocatore già contrassegnato non la alza mai, il che significa che difendere te stesso, o difendere qualcuno che non è contrassegnato, non ti costa nulla.',
+  'guide.worldPvpPage.zonesHeading': 'Dove avviene il PvP mondiale',
   'landing.headline': "All'avventura con gli amici.",
   'landing.contribute': 'Contribuisci al gioco',
   'landing.tools': 'Strumenti',
@@ -5289,7 +7438,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Include una probabilità di base del 5% condivisa da tutti gli avventurieri.',
   'hudChrome.statInfo.notes.dpsApprox':
     'Una stima, esclude i colpi critici e i danni delle abilità.',
-  'hudChrome.perf.title': 'Pannello prestazioni',
+  'hudChrome.perf.overlaySection': 'Pannello prestazioni',
   'hudChrome.perf.enable': 'Mostra pannello prestazioni',
   'hudChrome.perf.description':
     'Scegli quali statistiche mostrare, dove posizionare il pannello e il suo aspetto.',
@@ -10804,7 +12953,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.rowWeather':
     "Pioggia ambientale e neve. Solo atmosfera e spegnendolo si risparmia un po' durante i temporali.",
   'guide.settingsPage.tableFoot':
-    "Cerchi un limite di FPS? Non c'è nulla da cercare: la cadenza dei fotogrammi segue il tuo schermo. La distanza di disegno è una manopola a sé, Distanza visiva, nella scheda Dettaglio del mondo, e ogni preset la imposta per te finché non la sposti tu.",
+    'La distanza di disegno è una manopola a sé, Distanza visiva, nella scheda Dettaglio del mondo, e ogni preset la imposta per te finché non la sposti tu.',
   'guide.settingsPage.tableHeading': 'Ogni opzione grafica, spiegata',
   'guide.settingsPage.tagReload': 'premi Applica',
   'guide.settingsPage.value100': '100%',
@@ -13676,7 +15825,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     "Per 8 s il prossimo colpo nemico contro di te riceve risposta: fino a {buff} danni vengono negati e restituiti all'attaccante come danni Sacri, e ottieni 1 Devozione. Viene risposto a un solo colpo. L'Ascensione aumenta del 50% la quantità a cui può rispondere.",
   'entities.abilities.final_edict.description':
-    "Assesta un colpo d'arma devastante e genera 1 Devozione quando infligge danni. Un colpo riuscito riduce di 2 s il tempo di recupero rimanente della Caduta dell'Alba. Gli attacchi automatici riusciti e i colpi dell'Editto Finale hanno il 15% di probabilità di concedere Ira dell'Alba per 8 s. L'Ascensione libera inoltre un'esplosione Sacra attorno a te.",
+    "Assesta un colpo d'arma devastante e genera 1 Devozione quando infligge danni. Un colpo riuscito riduce di 2 s il tempo di recupero rimanente della Caduta dell'Alba. Gli attacchi automatici riusciti e i colpi dell'Editto Finale hanno il 15% di probabilità di concedere Ira dell'Alba per 8 s. L'Ascensione libera inoltre un'esplosione attorno a te che infligge danni fisici.",
   'entities.abilities.grace_devotion.description':
     "Tu e i membri del gruppo recuperate 15 mana ogni 5 s e pagate il 3% di mana in meno per 30 min. Sostituisce la tua Devozione Radiante o dell'Alba, ma coesiste con le Devozioni di altri paladini.",
   'entities.abilities.guardian_covenant.description':
@@ -15866,9 +18015,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Il colpo del tuo Bordo Velato infligge il triplo dei danni, invece del doppio.',
   'entities.itemSets.ashveil.name': 'Vesti del Velo Cinereo',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'La cura salvifica della Vigilanza Serafica sale a 270, da 180. I danni subiti non ritardano più il lancio degli incantesimi.',
+    'Ripristinare salute con Preghiera Sussurrata, Preghiera Solenne o Preghiera Urgente aumenta del 10% le cure della tua prossima Cura del Coro, fino a 3 accumuli. Ogni lancio conferisce al massimo un accumulo. Cura del Coro consuma tutti gli accumuli al termine del lancio. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Quando si attiva la Vigilanza Serafica, l’alleato viene curato anche del 15 percento della salute massima in 10 s.',
+    'Completare Cura del Coro con 3 accumuli rende istantanea la tua prossima Preghiera Sussurrata usata entro 60 s e ne aumenta le cure del 100%. Questo beneficio non si accumula; ottenerlo di nuovo ne rinnova la durata.',
   'entities.itemSets.benison_dawnweave.name': 'Benedizione della Tessitura dell’Alba',
   'entities.itemSets.chronoweave.bonus2':
     'L’Eco Temporale converte il 50 percento dei danni arcani a bersaglio singolo in cure. I danni subiti non ritardano più il lancio degli incantesimi.',
@@ -16639,12 +18788,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
     "Ogni {everyNormal} s, Nythraxis impala {victimsNormal} membri dell'incursione diversi dal suo bersaglio attuale su Spine ossee. Un membro impalato non può agire e perde {drainNormal} della salute massima ogni secondo finché la sua spina non viene distrutta. Una spina si frantuma dopo {hitsNormal} colpi da chiunque, a prescindere dal danno inflitto. Un giocatore già impalato non può essere scelto di nuovo per {cooldown} s, così le spine si distribuiscono su tutta l'incursione.",
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
-    "A partire da {first} s dopo l'Ira del re e poi ogni {everyHeroic} s, Nythraxis inizia Tempesta d'ossa per {duration} s. Ignora la minaccia, si muove a {speed} volte la velocità normale ed effettua {charges} cariche da {chargeSeconds} s ciascuna. Il suo vortice infligge {whirlHeroic} della salute massima ogni secondo entro {radius} yd. Ogni carica termina con uno Schianto d'ossa nello stesso raggio per {slamHeroic} della salute massima. Spezzatombe si riattiva {rearm} s dopo la fine.",
+    "A partire da {first} s dopo l'Ira del re e poi ogni {everyHeroic} s, Nythraxis inizia Tempesta d'ossa per {duration} s. Ignora la minaccia, si muove a {speed} volte la velocità normale ed effettua {charges} cariche da {chargeSeconds} s ciascuna. Il suo vortice infligge {whirlHeroic} della salute massima ogni secondo entro {radius} yd. Ogni carica termina con uno Schianto d'ossa nello stesso raggio per {slamHeroic} della salute massima. Tutti i marchi di Squarcio d'anima attivi vengono liberati irrisolti l'istante in cui la tempesta inizia, e una tempesta non inizia mai subito dopo una detonazione di Squarcio d'anima. Spezzatombe si riattiva {rearm} s dopo la fine.",
   'hudChrome.raidBossGuide.nythraxis.boneStormName': "Tempesta d'ossa",
   'hudChrome.raidBossGuide.nythraxis.boneStormResponse':
     'Disperdetevi e continuate a correre lontano da Nythraxis. Il membro caricato scappa mentre tutti gli altri lasciano spazio lungo la traiettoria della carica, poi i tank lo riprendono quando la tempesta finisce.',
   'hudChrome.raidBossGuide.nythraxis.boneStormSummary':
-    "A partire da {first} s dopo l'Ira del re e poi ogni {everyNormal} s, Nythraxis inizia Tempesta d'ossa per {duration} s. Ignora la minaccia, si muove a {speed} volte la velocità normale ed effettua {charges} cariche da {chargeSeconds} s ciascuna. Il suo vortice infligge {whirlNormal} della salute massima ogni secondo entro {radius} yd. Ogni carica termina con uno Schianto d'ossa nello stesso raggio per {slamNormal} della salute massima. Spezzatombe si riattiva {rearm} s dopo la fine.",
+    "A partire da {first} s dopo l'Ira del re e poi ogni {everyNormal} s, Nythraxis inizia Tempesta d'ossa per {duration} s. Ignora la minaccia, si muove a {speed} volte la velocità normale ed effettua {charges} cariche da {chargeSeconds} s ciascuna. Il suo vortice infligge {whirlNormal} della salute massima ogni secondo entro {radius} yd. Ogni carica termina con uno Schianto d'ossa nello stesso raggio per {slamNormal} della salute massima. Tutti i marchi di Squarcio d'anima attivi vengono liberati irrisolti l'istante in cui la tempesta inizia, e una tempesta non inizia mai subito dopo una detonazione di Squarcio d'anima. Spezzatombe si riattiva {rearm} s dopo la fine.",
   'hudChrome.raidBossGuide.nythraxis.courtName': 'La Corte immortale',
   'hudChrome.raidBossGuide.nythraxis.courtResponse':
     "I tank raccolgono Aldren e girano il suo fendente lontano dall'incursione. Stordisci o silenzia Malric appena inizia Cura di Malric e uccidilo per primo; poi immobilizza o stordisci Voss lontano dai guaritori, dato che non può essere provocato, e finiscilo dopo.",
@@ -17598,4 +19747,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Modifica fotogrammi allenta anche il pannello Dialogo, che trasporta la linea parlata di un NPC mentre quell'NPC è fuori dalla tua vista; indossa il chip con il nome mentre è sciolto.",
   'guide.settingsPage.keybindsWheelBody':
     "Anche la ruota stessa si lega. Zoom telecamera avanti e Zoom telecamera indietro sono normali collegamenti che si trovano sulla ruota nuda per impostazione predefinita, quindi puoi spostarli su Ctrl più la ruota o sui tasti, quindi ruotare la ruota liberata per attivare gli slot della barra delle azioni. Una tacca della ruota non ha rilascio, quindi non può eseguire un'azione trattenuta come andare avanti.",
+  'guide.settingsPage.ifColorblindMode':
+    "Ricolora i pericoli a terra di Nythraxis (l'anello d'impatto di Eruzione tombale, le pozze di Fiamma tombale e Fuoco dell'anima, la linea di Fuoco tombale e i marchi di Lacerazione dell'anima) con una tavolozza adatta al daltonismo, con tonalità e luminosità distinte, così i cerchi sovrapposti mantengono bordi leggibili. Dimensioni, timer e posizioni non cambiano.",
+  'hud.options.colorblindMode': 'Modalità daltonismo',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip':
+    'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

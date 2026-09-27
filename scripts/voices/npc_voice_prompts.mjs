@@ -1073,10 +1073,67 @@ export const VOICE_PROMPTS = [
 // Recurring NPC records → the base voice that speaks for them. gen_npc_lines.mjs
 // consults this so every Aldric/Maren/Halven zone variant reuses one designed voice.
 export const VOICE_ALIAS = {
+  glider_instructor: 'trader_wilkes',
+  glider_apprentice: 'apprentice_wren',
+  // Valerie borrows the existing scout performance for this covert operation.
+  shadow_cloak_scout: 'scout_maren',
+  // The shadow infiltration's own watch, cast by ROLE the way the tutorial cast
+  // below is (docs/design/npc_voices.md): the four Dispatch Guards carry sealed
+  // orders and warn you off in clipped soldier's lines, so they borrow the
+  // Marshal's weathered parade register; the four lantern sentries and watchmen
+  // keep a light against what the eye misses, which is the lamplighter's own
+  // trade and his lantern gold. Promote either group to its own VOICE_PROMPTS
+  // entry once an ElevenLabs key is available to design and render it.
+  shadow_guard_north: 'marshal_redbrook',
+  shadow_guard_south: 'marshal_redbrook',
+  shadow_guard_east: 'marshal_redbrook',
+  shadow_guard_west: 'marshal_redbrook',
+  shadow_sentry_north: 'lampman_cobb',
+  shadow_sentry_south: 'lampman_cobb',
+  shadow_watch_east: 'lampman_cobb',
+  shadow_watch_west: 'lampman_cobb',
+  // Keeper Liora wardens a hedge maze of wisps and speaks her instructions with
+  // the same unhurried, luminous calm as the keeper of the sealed hollow.
+  wisp_maze_keeper: 'keeper_saelwyn',
+  // World-quest role casting, following the tutorial cast below. These are
+  // distinct people borrowing established performances, not recurring identities.
+  // The scholar teaches calmly; his adult apprentices sound tentative and eager.
+  calligraphy_instructor: 'loremaster_caddis',
+  calligraphy_apprentice_1: 'apprentice_wren',
+  calligraphy_apprentice_2: 'trader_wilkes',
+  // A working forgemistress.
+  forge_instructor: 'forgemistress_darva',
+  // Keep suspects vocally distinct without making any voice signal guilt.
+  infiltrator_captain: 'warden_fenwick',
+  infiltrator_nella: 'scout_maren',
+  infiltrator_orin: 'marshal_redbrook',
+  infiltrator_bram: 'gatecaptain_brannoc',
+  infiltrator_tessa: 'watcher_maren',
+  // Tobin keeps a promise to a lost friend; Mira carries remedies; Orin keeps
+  // the snowbound settlements supplied. Each uses the matching human register.
+  eastbrook_freight_caravan: 'mender_saul',
+  willowfen_remedy_caravan: 'apothecary_lin',
+  frostveil_supply_caravan: 'lampman_cobb',
   // Riftwright Maelis, the Rift Forgemaster in the Watch Meadow on the Farshore, borrows Quartermaster
   // Edda's steel-and-salt Redoubt register (the same forge-and-anvil trade, the
   // same shore) until the forge receives its own designed voice.
   riftwright_maelis: 'quartermaster_edda',
+  // The faction quartermasters and the World Quest taskmaster, cast by ROLE
+  // until an ElevenLabs key designs their own voices: Vaelen keeps stores for
+  // the same Rift Watch Ollun serves; Templar Althea speaks with the aurorist's
+  // hushed, luminous calm; Artificer Tobrin is another smith of exacting work;
+  // Taskmaster Kaelen hands out the day's work the way the foreman does.
+  npc_rift_watch_quartermaster: 'riftwatch_ollun',
+  npc_church_order_quartermaster: 'aurorist_veyla',
+  npc_automaton_quartermaster: 'wardsmith_orun',
+  npc_wq_taskmaster: 'foreman_odell',
+  // The weekly emissary keeps the Vale's ledger of deeds: the same civic,
+  // matter-of-fact register as the foreman until a voice of his own is cast.
+  weekly_emissary: 'foreman_odell',
+  // The Weekly Vault keeper (PR 4052) guards a bank-gold strongroom by the
+  // harbour road: the Gilded Strongbox bursar's discreet baritone is the
+  // register, until a voice of his own is cast.
+  eastbrook_vault_keeper: 'bursar_fernando',
   brother_aldric_fen: 'brother_aldric',
   brother_aldric_highwatch: 'brother_aldric',
   brother_aldric_raid: 'brother_aldric',
@@ -1114,6 +1171,12 @@ export const VOICE_ALIAS = {
   // precedent above). Promote him to his own VOICE_PROMPTS entry, with the
   // forge-warden weight his greeting carries, when a key is available.
   crucible_quartermaster: 'heroic_quartermaster',
+  // Harbormaster Tamsin, who keeps the Harbormaster's House at the Wyrmwatch cliff
+  // harbor: the same trade as Harbormaster Odile at the far end of her route, so she
+  // borrows Odile's designed voice as a ROLE match (the Draven Kole precedent above).
+  // Promote her to her own VOICE_PROMPTS entry, warmer and more weathered than
+  // Odile's, once an ElevenLabs key is available to design and render it.
+  harbormaster_tamsin: 'harbormaster_odile',
   // The Proving Shore four (src/sim/content/proving_shore.ts, the tutorial
   // island). Like Warmarshal Draven Kole above, these are ROLE matches rather
   // than the same character recurring under a suffixed id: each borrows the

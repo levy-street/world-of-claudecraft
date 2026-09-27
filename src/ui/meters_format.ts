@@ -24,10 +24,29 @@ export function fmtPerSecond(v: number): string {
   return t('hudChrome.meters.perSecond', { value: fmtNum(v) });
 }
 
-// "{total} ({rate}/s)" cell, e.g. "12.3k (1.2k/s)". Defined at module scope so
-// the imported t() is in view (the render loop shadows `t` with a tally row).
-export function fmtPerSecondRow(total: number, rate: number): string {
+export function fmtPercent(pct: number): string {
+  const p = Math.round(pct * 100);
+  return t('hudChrome.meters.percent', {
+    value: formatNumber(p, { maximumFractionDigits: 0, useGrouping: false }),
+  });
+}
+
+// "{total} ({rate}/s)" or "{total} ({rate}/s, {pct}%)" cell.
+export function fmtPerSecondRow(total: number, rate: number, percent?: number): string {
+  if (percent !== undefined && percent > 0) {
+    const pctStr = fmtPercent(percent);
+    return `${fmtNum(total)} (${fmtPerSecond(rate)}, ${pctStr})`;
+  }
   return t('hudChrome.meters.perSecondRow', { total: fmtNum(total), rate: fmtPerSecond(rate) });
+}
+
+// Count cell with optional percent, e.g. "4 (25%)" for interrupts/deaths.
+export function fmtCountRow(count: number, percent?: number): string {
+  if (percent !== undefined && percent > 0) {
+    const pctStr = fmtPercent(percent);
+    return `${fmtNum(count)} (${pctStr})`;
+  }
+  return fmtNum(count);
 }
 
 // "Xm Ys" / "Ys" duration; the m/s units come from localizable keys, digits via

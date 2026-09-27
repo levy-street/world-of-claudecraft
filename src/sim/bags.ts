@@ -58,7 +58,7 @@ import {
   newestMatchingSlot,
   selectedInventorySlot,
 } from './item_copy_ref';
-import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
+import { canStackInstancePayloads, isChargeBearingPayload } from './item_instance_merge';
 import { isMaterialItemId, materialItemIds } from './material_ids';
 import {
   applyMaterialInventoryTake,
@@ -115,7 +115,7 @@ export function instancedCountCap(
   instance: ItemInstancePayload | undefined,
 ): number {
   if (!instance) return Number.POSITIVE_INFINITY;
-  if (instance.charges !== undefined) return 1;
+  if (isChargeBearingPayload(instance)) return 1;
   return def ? stackSizeOf(def) : Number.POSITIVE_INFINITY;
 }
 
@@ -228,9 +228,11 @@ export function countFit(
       room += stack - s.count;
     }
   }
-  // A non-mergeable payload (charges) keeps one-per-slot semantics, so each
-  // fresh slot absorbs exactly one copy instead of a full stack.
-  const perFreshSlot = instance && !isMergeableInstancePayload(instance) ? 1 : stack;
+  // Only a charge-bearing payload keeps one-per-slot semantics (see
+  // isChargeBearingPayload): a locked-but-uncharged payload still packs a
+  // fresh slot up to the normal cap, since locking is one flag over the
+  // WHOLE stack, not a per-unit identity.
+  const perFreshSlot = instance && isChargeBearingPayload(instance) ? 1 : stack;
   room += freeSlots * perFreshSlot;
   return Math.min(count, room);
 }
@@ -383,11 +385,12 @@ export function addStacked(
     s.count += take;
     remaining -= take;
   }
-  const mergeable = isMergeableInstancePayload(instance);
+  const oneUnitPerFreshSlot = isChargeBearingPayload(instance);
   while (remaining > 0) {
-    // A charge-bearing payload stays one-per-slot; every fresh instanced slot
-    // carries its own deep clone so two slots never alias one mutable payload.
-    const take = instance && !mergeable ? 1 : Math.min(stack, remaining);
+    // Only a charge-bearing payload stays one-per-slot (isChargeBearingPayload);
+    // every fresh instanced slot carries its own deep clone so two slots never
+    // alias one mutable payload.
+    const take = instance && oneUnitPerFreshSlot ? 1 : Math.min(stack, remaining);
     const slot: InvSlot = instance
       ? { itemId, count: take, instance: cloneItemInstancePayload(instance) }
       : { itemId, count: take };

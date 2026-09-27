@@ -1159,6 +1159,83 @@ export const table: DeedLocaleTable = {
     name: 'Una fuente sin cadenas',
     desc: 'Forja tú mismo Rompeforjas y vuelve junto a Maelin con el martillo terminado.',
   },
+  exp_arcane_calligraphy: {
+    name: 'Una Mano Firme',
+    desc: 'Completa la Caligrafía Arcana en el Valle de Eastbrook.',
+  },
+  exp_arcane_calligraphy_gold: {
+    name: 'Escrito en Luz de Estrellas',
+    desc: 'Consigue una calificación de Oro en Caligrafía Arcana.',
+    title: 'Invocador de Runas',
+  },
+  exp_forge_helper: {
+    name: 'Un Martillo Servicial',
+    desc: 'Ayuda a la Herrera Mara a terminar un escudo en Wyrmwatch.',
+  },
+  exp_last_barricade: {
+    name: 'La Última Barricada',
+    desc: 'Resiste en el paso del bosque contra la horda de no muertos.',
+  },
+  exp_borrowed_face: {
+    name: 'Un Rostro Prestado',
+    desc: 'Desenmascara y derrota al infiltrado entre la guardia de Fenbridge.',
+  },
+  exp_windrider_slalom: {
+    name: 'Eslalon del Jinete del Viento',
+    desc: 'Completa el descenso en planeador mecánico por el cañón de la Cresta del Vendaval.',
+  },
+  exp_duskweave_dispatches: {
+    name: 'Despachos de Tejido Crepuscular',
+    desc: 'Recupera los despachos de los bandidos mientras llevas puesta la capa encantada de Valerie.',
+  },
+  exp_wisp_maze: {
+    name: 'Una Luz en el Laberinto',
+    desc: 'Recupera las bolsas de monedas robadas y escapa del laberinto del Jardín Eterno.',
+  },
+  prog_rift_watch_trusted: {
+    name: 'De Confianza para la Guardia de la Brecha',
+    desc: 'Alcanza reputación Confiable con la Guardia de la Brecha.',
+  },
+  prog_church_order_trusted: {
+    name: 'De Confianza para la Orden de la Iglesia',
+    desc: 'Alcanza reputación Confiable con la Orden de la Iglesia.',
+  },
+  prog_automatons_trusted: {
+    name: 'De Confianza para los Autómatas',
+    desc: 'Alcanza reputación Confiable con los Autómatas.',
+  },
+  prog_rift_watch_champion: {
+    name: 'Campeón de la Guardia de la Brecha',
+    desc: 'Alcanza reputación de Campeón con la Guardia de la Brecha.',
+    title: 'Guardián de la Brecha',
+  },
+  prog_church_order_champion: {
+    name: 'Campeón de la Orden de la Iglesia',
+    desc: 'Alcanza reputación de Campeón con la Orden de la Iglesia.',
+    title: 'Guardián del Alba',
+  },
+  prog_automatons_champion: {
+    name: 'Campeón de los Autómatas',
+    desc: 'Alcanza reputación de Campeón con los Autómatas.',
+    title: 'Maestro Forjador',
+  },
+  prog_faction_champion_all: {
+    name: 'Campeón de Todos los Estandartes',
+    desc: 'Alcanza reputación de Campeón con la Guardia de la Brecha, la Orden de la Iglesia y los Autómatas.',
+  },
+  exp_clue_first_casket: {
+    name: 'Tesoro Encontrado',
+    desc: 'Abre un Cofre del Tesoro desenterrado al final de una búsqueda de pergamino de pistas.',
+  },
+  exp_clue_ten_caskets: {
+    name: 'Cazador de Tesoros',
+    desc: 'Abre 10 Cofres del Tesoro desenterrados al final de búsquedas de pergamino de pistas.',
+    title: 'Cazatesoros',
+  },
+  exp_harbor_to_harbor: {
+    name: 'De Puerto a Puerto',
+    desc: 'Navega en ambos transbordadores de ida y vuelta: de Eastbrook a Moonrest, y de Wickharbor a Wyrmwatch.',
+  },
 };
 
 // es_ES rides this base table plus the delve-vocabulary override layer

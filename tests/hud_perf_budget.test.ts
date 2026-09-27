@@ -566,6 +566,13 @@ interface ScannedPainter {
 // the float animation on a recycled node.
 const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'micro_menu_state_painter.ts', allow: {}, reflowAllow: {} },
+  // Sixteen construction-only class assignments; all update writes use the shared facet.
+  {
+    file: 'hud/vehicle/vehicle_action_bar_controller.ts',
+    // Constructor-only count label now composes ui-socket-count with the shared icon skin.
+    allow: { '.className': 16 },
+    reflowAllow: {},
+  },
   // Both writes are build-time. The .className is the base class stamped on a tick
   // as it is MINTED into the pool (the pool only grows to the high-water tick
   // count), and the .setAttribute is the one aria-hidden on the ring root in
@@ -580,9 +587,15 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'swing_timer_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'proc_overlay_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'aura_overlay_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/cooldown_manager/cooldown_manager_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'cast_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'unit_frame_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'paladin_devotion_painter.ts', allow: {}, reflowAllow: {} },
+  // Event-time celebration painters (a skill level-up, a faction standing
+  // tier): they draw only through the CelebrationHost seam (log, banner
+  // slot, announcer), so they make no raw DOM write at all.
+  { file: 'hud/professions/skill_level_toast_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/reputation/faction_tier_celebration_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/action_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/mobile_action_ring_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/radial_petal_painter.ts', allow: {}, reflowAllow: {} },
@@ -688,6 +701,13 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.className': 14, '.setAttribute': 3 },
     reflowAllow: {},
   },
+  // the ferry panel is built once in ensureEls (three class names and the
+  // panel's status role); every update write is facet-routed.
+  {
+    file: 'hud/transport/ferry_hud_painter.ts',
+    allow: { '.className': 3, '.setAttribute': 1 },
+    reflowAllow: {},
+  },
   // 3 one-time pooled-node builds (createNode's .buff/.dur/.stacks) + the overflow
   // badge span built once in the constructor.
   { file: 'auras_painter.ts', allow: { '.className': 4 }, reflowAllow: {} },
@@ -734,6 +754,15 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     // what is left is the four build-time role/aria-live attributes on the two
     // self-mounted roots plus the one skeleton innerHTML.
     allow: { '.innerHTML': 1, '.setAttribute': 4 },
+    reflowAllow: {},
+  },
+  // The King of the Hill bar (hud/hill/) rebuilds its skeleton in ONE innerHTML
+  // write when the STRUCTURAL sig changes (a new hill, a holder or challenger
+  // change, crossing the circle); every per-second value rides the elided
+  // writers. The two setAttribute calls are the build-time role + aria-live.
+  {
+    file: 'hud/hill/hill_bar_painter.ts',
+    allow: { '.innerHTML': 1, '.setAttribute': 2 },
     reflowAllow: {},
   },
   // The bg kill feed rebuilds its tiny stack in ONE innerHTML write, on a
@@ -876,11 +905,28 @@ interface ColdPainter {
 }
 
 const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
+  // Only an open vault dropdown measures its anchor and clipping rectangles,
+  // on open/scroll/resize. Ancestor style classification is cached until resize;
+  // no clock or ordinary HUD repaint drives positioning. Nested scrollers can
+  // move clipping rectangles, so those bounded reads remain event-driven.
+  {
+    file: 'weekly_reward_table_picker_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 2, getComputedStyle: 1 },
+    driverAllow: {},
+  },
   // One app-viewport rect when the player starts dragging an aura in setup mode. The cached
   // rect converts pointer moves to persisted normalized X/Y values; the controller owns no
   // clock and performs no layout read during ordinary combat painting.
   {
     file: 'aura_overlay_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1 },
+    driverAllow: {},
+  },
+  // The Cooldown Manager's twin of the above: one app-viewport rect when the player
+  // starts dragging the row while its Options sub-view is open. Pointer moves reuse
+  // it; the per-frame paint path makes no layout read.
+  {
+    file: 'hud/cooldown_manager/cooldown_manager_controller.ts',
     reflowAllow: { '.getBoundingClientRect': 1 },
     driverAllow: {},
   },
@@ -955,6 +1001,24 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
             'the SAME paint every pointer-driven repaint takes, whose writes and both forced reads elide whole when the rendered HTML did not change; the tick adds nothing of its own on the way there.',
         },
         writeAllow: {},
+        queryAllow: {},
+        idlAllow: {},
+        reflowAllow: {},
+      },
+    ],
+  },
+  // The Ley-alignment clock updates its whole-second text only while an attempt is open.
+  // Element refs are captured when the board is built, and the urgent class changes once.
+  {
+    file: 'world_quest_ley_window.ts',
+    reflowAllow: {},
+    driverAllow: { setInterval: 1 },
+    drivers: [
+      {
+        driver: 'setInterval',
+        everyMs: 1000,
+        why: 'the open Ley attempt countdown: paint the cached timer once per second and stop at zero, on defeat, completion, close, or rebuild.',
+        writeAllow: { '.textContent': 1, '.classList': 1, '.setAttribute': 1 },
         queryAllow: {},
         idlAllow: {},
         reflowAllow: {},
@@ -1170,10 +1234,11 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // The arrange-mode border hit test (edgeAt) reads a CACHED wrap box derived
   // from the applied placement (refilled by apply()/ensureGeometry, nulled on
   // viewport resize), so hovering the unlocked chat box costs no layout read
-  // per pointermove; the five reads are the drag/resize measures.
+  // per pointermove; five reads are drag/resize measures. Two more measure the
+  // CSS default box once after the explicit Reset Size action clears custom dimensions.
   {
     file: 'hud/chat/chat_geometry_controller.ts',
-    reflowAllow: { '.getBoundingClientRect': 5 },
+    reflowAllow: { '.getBoundingClientRect': 7 },
     driverAllow: {},
   },
   {
@@ -1836,6 +1901,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     // over zero callbacks and reads as a pass.
     expect(sweep.scanned).toEqual([
       'gather_node_tooltip_controller.ts#0',
+      'world_quest_ley_window.ts#0',
       'daily_rewards_window.ts#0',
       'daily_rewards_window.ts#1',
       'hud/professions/harvest_journal_window.ts#0',
@@ -2945,6 +3011,7 @@ function buildHarnesses(shape: WorldShape, facet: PainterHostWriters): PainterHa
           aiming: false,
           procGlow: false,
           empowered: false,
+          naturesBoonGlow: false,
           ascensionSpender: false,
           ascensionCostLabel: '',
           fateConsumeReady: false,

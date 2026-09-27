@@ -33,8 +33,6 @@ export interface ShaderWarmBeaconInput {
   holdWallMs: number;
   /** Cannot-serve releases in this renderer's life. */
   releases: number;
-  /** The A/B arm drawn, null when no draw ran. */
-  abArm: 'on' | 'off' | null;
 }
 
 export interface ShaderWarmBeaconSummary {
@@ -53,7 +51,6 @@ export interface ShaderWarmBeaconSummary {
   holdMs: number;
   holdWallMs: number;
   releases: number;
-  abArm: 'on' | 'off' | null;
 }
 
 /** The longest any string in the block: every one of them is a short enum-like
@@ -79,10 +76,6 @@ function millis(value: number): number {
   return Number.isFinite(value) ? Math.max(0, Math.round(value)) : 0;
 }
 
-function arm(value: unknown): 'on' | 'off' | null {
-  return value === 'on' || value === 'off' ? value : null;
-}
-
 export function shaderWarmBeaconSummary(snapshot: ShaderWarmBeaconInput): ShaderWarmBeaconSummary {
   return {
     active: snapshot.worker === 'ready',
@@ -97,6 +90,5 @@ export function shaderWarmBeaconSummary(snapshot: ShaderWarmBeaconInput): Shader
     holdMs: millis(snapshot.holdMs),
     holdWallMs: millis(snapshot.holdWallMs),
     releases: count(snapshot.releases),
-    abArm: arm(snapshot.abArm),
   };
 }

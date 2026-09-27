@@ -12,6 +12,17 @@
 // gesture on the mobile layout and the stylesheet hides the chrome there, so an
 // unlocked interface on a phone is inert rather than half-working.
 
+import { captureFocusKey, findFocusKey } from './focus_restore';
+import {
+  type FrameContextAction,
+  FrameContextMenu,
+  type FrameContextTarget,
+} from './frame_context_menu';
+import {
+  frameCheckRow,
+  renderFrameSettingsRows,
+  renderFrameVisibilityRows,
+} from './frame_menu_rows';
 import {
   framesToLock,
   HUD_FRAME_SPECS,
@@ -31,6 +42,7 @@ export interface UnlockEntry {
   mover: MovableFrame;
   /** Live for this character right now (a pet is out, the bar is enabled). */
   isActive(): boolean;
+  geometryActive?(): boolean;
   /** Optional show/hide-row override: when present the row is listed while
    *  `listed()` says so (whatever isActive answers) and its checkbox reads and
    *  writes THIS state instead of the mover's hidden flag. The optional action
@@ -45,6 +57,9 @@ export interface UnlockEntry {
 }
 
 export interface InterfaceUnlockDeps {
+  openFrameOptions?(id: string): void;
+  frameActions?(id: string): readonly FrameContextAction[];
+  contextTargets?(): readonly FrameContextTarget[];
   document: Document;
   /** Localized label for the floating lock button (t is resolved by the host so
    *  this module stays free of the i18n import, like the rest of the seam). */
@@ -115,16 +130,43 @@ export class InterfaceUnlock {
     lockBtn: HTMLButtonElement;
     framesBtn: HTMLButtonElement;
     menu: HTMLElement;
+    visibilityBtn: HTMLButtonElement;
+    visibilityMenu: HTMLElement;
   } | null = null;
   /** The 16px alignment grid shown while arranging with Snap to Grid on
    *  (FRAME_SNAP_GRID; the stylesheet draws the lines). Minted with the edit
    *  controls, refreshed on every unlock flip and snap-toggle change. */
   private gridOverlay: HTMLElement | null = null;
   private menuOpen = false;
-  private submenuOpen = false;
+  private visibilityOpen = false;
+  private readonly openGroups = new Map<string, boolean>();
+  private contextMenu: FrameContextMenu | null = null;
   private readonly entries: UnlockEntry[] = [];
 
-  constructor(private readonly deps: InterfaceUnlockDeps) {}
+  constructor(private readonly deps: InterfaceUnlockDeps) {
+    if (this.deps.openFrameOptions && !this.contextMenu)
+      this.contextMenu = new FrameContextMenu({
+        document: this.deps.document,
+        targets: () => [
+          ...this.entries.map((entry) => ({
+            id: entry.id,
+            element: entry.mover.frameElement,
+            label: () => entry.mover.labelText(),
+            isActive: entry.isActive,
+            resetSize: () => this.resetEntrySize(entry),
+            hide: () => {
+              if (entry.rowOverride) entry.rowOverride.set(false);
+              else entry.mover.setUserHidden(true);
+              this.rebuildVisibilityMenu();
+            },
+            actions: () => this.deps.frameActions?.(entry.id) ?? [],
+          })),
+          ...(this.deps.contextTargets?.() ?? []),
+        ],
+        unlocked: () => this.unlocked,
+        options: this.deps.openFrameOptions,
+      });
+  }
 
   /** Join a frame to the global toggle. Order is the registration order, which
    *  is the frame-table order for the HUD frames and then the unit frames. */
@@ -177,6 +219,19 @@ export class InterfaceUnlock {
     menu.className = 'panel';
     menu.hidden = true;
     bar.appendChild(menu);
+    const visibilityBtn = doc.createElement('button');
+    visibilityBtn.type = 'button';
+    visibilityBtn.id = 'interface-visibility-toggle';
+    visibilityBtn.className = 'btn';
+    visibilityBtn.setAttribute('aria-expanded', 'false');
+    visibilityBtn.setAttribute('aria-controls', 'interface-visibility-menu');
+    visibilityBtn.addEventListener('click', () => this.setVisibilityMenuOpen(!this.visibilityOpen));
+    bar.appendChild(visibilityBtn);
+    const visibilityMenu = doc.createElement('div');
+    visibilityMenu.id = 'interface-visibility-menu';
+    visibilityMenu.className = 'panel';
+    visibilityMenu.hidden = true;
+    bar.appendChild(visibilityMenu);
     host.appendChild(bar);
     // The alignment grid sits FIRST in the host at z-index 0, so it paints
     // over the world but under every HUD element being arranged.
@@ -186,7 +241,16 @@ export class InterfaceUnlock {
     grid.hidden = true;
     host.insertBefore(grid, host.firstChild);
     this.gridOverlay = grid;
-    this.controls = { bar, lockBtn, framesBtn, menu };
+    this.controls = { bar, lockBtn, framesBtn, menu, visibilityBtn, visibilityMenu };
+    bar.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || (!this.menuOpen && !this.visibilityOpen)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const button = this.visibilityOpen ? visibilityBtn : framesBtn;
+      this.setFramesMenuOpen(false);
+      this.setVisibilityMenuOpen(false);
+      button.focus();
+    });
     return this.controls;
   }
 
@@ -195,160 +259,73 @@ export class InterfaceUnlock {
   private setFramesMenuOpen(open: boolean): void {
     if (!this.controls) return;
     this.menuOpen = open;
+    if (open) this.setVisibilityMenuOpen(false);
     if (open) this.rebuildFramesMenu();
     this.controls.menu.hidden = !open;
     this.controls.framesBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
   }
 
-  /** One checkbox row: the shared shape for both the show/hide list and the
-   *  settings toggles below it. */
-  private checkRow(
-    label: string,
-    checked: boolean,
-    onChange: (checked: boolean) => void,
-  ): HTMLElement {
-    const doc = this.deps.document;
-    const row = doc.createElement('label');
-    row.className = 'frames-menu-row';
-    const box = doc.createElement('input');
-    box.type = 'checkbox';
-    box.checked = checked;
-    box.addEventListener('change', () => onChange(box.checked));
-    row.appendChild(box);
-    const text = doc.createElement('span');
-    text.textContent = label;
-    row.appendChild(text);
-    return row;
-  }
-
-  /** One label + select row (the discrete numeric settings). A <label> like
-   *  checkRow, so clicking the text focuses the control and the row needs no
-   *  separate aria wiring: the label element names the select it wraps. */
-  private selectRow(select: FramesMenuSelect): HTMLElement {
-    const doc = this.deps.document;
-    const row = doc.createElement('label');
-    row.className = 'frames-menu-row frames-menu-select';
-    const text = doc.createElement('span');
-    text.textContent = select.label;
-    row.appendChild(text);
-    const picker = doc.createElement('select');
-    for (const option of select.options) {
-      const el = doc.createElement('option');
-      el.value = String(option.value);
-      el.textContent = option.label;
-      if (option.value === select.value) el.selected = true;
-      picker.appendChild(el);
+  private setVisibilityMenuOpen(open: boolean): void {
+    if (!this.controls) return;
+    this.visibilityOpen = open;
+    if (open) {
+      this.setFramesMenuOpen(false);
+      this.rebuildVisibilityMenu();
     }
-    picker.addEventListener('change', () => select.set(Number(picker.value)));
-    row.appendChild(picker);
-    return row;
+    this.controls.visibilityMenu.hidden = !open;
+    this.controls.visibilityBtn.setAttribute('aria-expanded', String(open));
   }
 
-  /** The dropdown body: a show/hide SUB-MENU (one ticked row per LIVE frame; a
-   *  hidden-by-choice frame stays listed, since the menu is the way back), then
-   *  the frame-behavior setting toggles. Rebuilt on open / refresh /
-   *  relocalize rather than patched: the list is cold UI and a dozen-odd rows.
-   *  The sub-menu's expanded state survives the rebuild via `submenuOpen`, so
-   *  flipping a setting does not fold the list a player just opened. */
+  private resetEntrySize(entry: UnlockEntry): void {
+    entry.mover.resetSize();
+    this.deps.onSizeReset?.(entry.id);
+    if (this.visibilityOpen) this.rebuildVisibilityMenu();
+  }
+
+  private rebuildVisibilityMenu(): void {
+    if (this.controls) {
+      renderFrameVisibilityRows(
+        this.deps.document,
+        this.controls.visibilityMenu,
+        this.entries,
+        this.openGroups,
+        (entry) => this.resetEntrySize(entry),
+      );
+      for (const target of this.deps.contextTargets?.() ?? []) {
+        const visibility = target.visibility;
+        if (visibility && target.isActive())
+          this.controls.visibilityMenu.appendChild(
+            frameCheckRow(
+              this.deps.document,
+              target.label(),
+              visibility.value(),
+              visibility.set,
+              target.id,
+            ),
+          );
+      }
+    }
+  }
+
   private rebuildFramesMenu(): void {
     if (!this.controls) return;
-    const doc = this.deps.document;
     const menu = this.controls.menu;
-    if (this.deps.framesMenuTitle) menu.setAttribute('aria-label', this.deps.framesMenuTitle());
-    while (menu.firstChild) menu.removeChild(menu.firstChild);
-    const sub = doc.createElement('details');
-    sub.className = 'frames-menu-sub';
-    sub.open = this.submenuOpen;
-    sub.addEventListener('toggle', () => {
-      this.submenuOpen = sub.open;
-    });
-    const summary = doc.createElement('summary');
-    summary.textContent = this.deps.framesSubmenuLabel ? this.deps.framesSubmenuLabel() : '';
-    sub.appendChild(summary);
-    const rows = doc.createElement('div');
-    rows.className = 'frames-menu-rows';
-    // Each show/hide row is a WRAP holding the checkbox label plus the
-    // per-frame size-reset button (owner request: reset lives per frame, not
-    // as one global action). The button sits OUTSIDE the label on purpose: a
-    // button inside a <label> would also activate the checkbox it labels.
-    const frameRow = (
-      name: string,
-      checked: boolean,
-      onCheck: (on: boolean) => void,
-      id: string,
-      mover: MovableFrame,
-    ) => {
-      const wrap = doc.createElement('div');
-      wrap.className = 'frames-menu-row-wrap';
-      wrap.appendChild(this.checkRow(name, checked, onCheck));
-      if (this.deps.resetSizeLabel) {
-        const reset = doc.createElement('button');
-        reset.type = 'button';
-        reset.className = 'frames-menu-reset';
-        const label = this.deps.resetSizeLabel();
-        reset.textContent = label;
-        // The visible text is the shared action word; the accessible name
-        // carries WHICH frame it resets.
-        const accessibleName = this.deps.resetSizeLabelFor?.(name) ?? label;
-        reset.setAttribute('aria-label', accessibleName);
-        reset.title = accessibleName;
-        reset.addEventListener('click', () => {
-          mover.resetSize();
-          this.deps.onSizeReset?.(id);
-          this.rebuildFramesMenu();
-        });
-        wrap.appendChild(reset);
-      }
-      return wrap;
-    };
-    for (const entry of this.entries) {
-      const name = entry.mover.labelText();
-      if (!name) continue;
-      const override = entry.rowOverride;
-      if (override) {
-        if (!override.listed()) continue;
-        rows.appendChild(
-          frameRow(
-            name,
-            override.value(),
-            (checked) => override.set(checked),
-            entry.id,
-            entry.mover,
-          ),
-        );
-        continue;
-      }
-      if (!entry.isActive() && !entry.mover.isUserHidden) continue;
-      rows.appendChild(
-        frameRow(
-          name,
-          !entry.mover.isUserHidden,
-          (checked) => entry.mover.setUserHidden(!checked),
-          entry.id,
-          entry.mover,
-        ),
-      );
-    }
-    sub.appendChild(rows);
-    menu.appendChild(sub);
-    const toggles = this.deps.settingToggles ? this.deps.settingToggles() : [];
-    const selects = this.deps.settingSelects ? this.deps.settingSelects() : [];
-    if (toggles.length > 0 || selects.length > 0) {
-      const settings = doc.createElement('div');
-      settings.className = 'frames-menu-settings';
-      for (const toggle of toggles) {
-        settings.appendChild(
-          this.checkRow(toggle.label, toggle.value, (v) => {
-            toggle.set(v);
-            // Snap to Grid (or any future toggle that feeds it) can change
-            // whether the alignment grid should show.
-            this.refreshGridOverlay();
-          }),
-        );
-      }
-      for (const select of selects) settings.appendChild(this.selectRow(select));
-      menu.appendChild(settings);
-    }
+    const focus = captureFocusKey(menu);
+    const scrollTop = menu.scrollTop;
+    menu.replaceChildren();
+    renderFrameSettingsRows(
+      this.deps.document,
+      menu,
+      this.deps.settingToggles?.() ?? [],
+      this.deps.settingSelects?.() ?? [],
+      () => {
+        this.refreshGridOverlay();
+        this.rebuildFramesMenu();
+      },
+      'checkbox',
+    );
+    if (focus) findFocusKey(menu, focus)?.focus({ preventScroll: true });
+    menu.scrollTop = scrollTop;
   }
 
   setUnlocked(unlocked: boolean): void {
@@ -359,12 +336,18 @@ export class InterfaceUnlock {
       if (this.deps.lockAllTitle) controls.lockBtn.title = this.deps.lockAllTitle();
       if (this.deps.framesMenuLabel) controls.framesBtn.textContent = this.deps.framesMenuLabel();
       if (this.deps.framesMenuTitle) controls.framesBtn.title = this.deps.framesMenuTitle();
+      controls.visibilityBtn.textContent = this.deps.framesSubmenuLabel?.() ?? '';
       controls.bar.hidden = !unlocked;
       // Leaving edit mode folds the dropdown too, so re-entering starts clean.
       if (!unlocked && this.menuOpen) this.setFramesMenuOpen(false);
+      if (!unlocked) {
+        this.setVisibilityMenuOpen(false);
+        this.contextMenu?.close();
+      }
       // A refresh while the menu is open re-lists against the new active set
       // (a bar enabled mid-unlock appears, a folded one drops out).
       if (unlocked && this.menuOpen) this.rebuildFramesMenu();
+      if (unlocked && this.visibilityOpen) this.rebuildVisibilityMenu();
     }
     const candidates: UnlockCandidate[] = this.entries.map((e) => ({
       id: e.id,
@@ -391,6 +374,16 @@ export class InterfaceUnlock {
    *  its chrome immediately, and one that went inactive loses it. */
   refresh(): void {
     if (this.unlocked) this.setUnlocked(true);
+  }
+
+  /** Settings and frame-menu rows share one immediate visibility decision. */
+  refreshSettings(): void {
+    for (const entry of this.entries) {
+      if (!entry.rowOverride) continue;
+      const hidden = !entry.rowOverride.value();
+      if (entry.mover.isUserHidden !== hidden) entry.mover.setUserHidden(hidden);
+    }
+    this.refresh();
   }
 
   /** Put one registered frame's bottom edge back where it was (the combined
@@ -435,6 +428,13 @@ export class InterfaceUnlock {
     for (const entry of [...this.entries].reverse()) entry.mover.reset();
   }
 
+  /** Preset replacement clears obsolete inline boxes before restoring any parent/child. */
+  restoreSavedLayout(): void {
+    for (const entry of [...this.entries].reverse()) entry.mover.clearAppliedGeometry();
+    for (const entry of this.entries)
+      entry.mover.restoreSavedState(entry.geometryActive?.() ?? true);
+  }
+
   /** Repaint every saved visual-space box after a live UI Scale change. */
   reapplyAll(): void {
     for (const entry of this.entries) entry.mover.reapplyPosition();
@@ -451,8 +451,11 @@ export class InterfaceUnlock {
     if (this.deps.lockAllTitle) controls.lockBtn.title = this.deps.lockAllTitle();
     if (this.deps.framesMenuLabel) controls.framesBtn.textContent = this.deps.framesMenuLabel();
     if (this.deps.framesMenuTitle) controls.framesBtn.title = this.deps.framesMenuTitle();
+    controls.visibilityBtn.textContent = this.deps.framesSubmenuLabel?.() ?? '';
+    this.contextMenu?.close();
     // The dropdown rows are plain resolved text, so an open menu rebuilds once.
     if (this.menuOpen) this.rebuildFramesMenu();
+    if (this.visibilityOpen) this.rebuildVisibilityMenu();
     // The preview samples carry t() text too; the hook rebuilds them in place.
     this.deps.onUnlockedChanged?.(this.unlocked);
   }

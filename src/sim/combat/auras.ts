@@ -46,6 +46,7 @@ import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { applyWellFedOnMealComplete } from '../wellfed';
 import { tickAfflictionAura, tickHexOfViolence, tickMaledictGaze } from './affliction';
+import { regenParkedCatEnergy } from './cat_form_energy';
 import { isStunned } from './cc';
 import {
   cleanupCraftedCollectionAuras,
@@ -62,10 +63,12 @@ import {
   regenerateSoulFragmentsOutOfCombat,
 } from './necromancy';
 import { tickPaladinOathChainPull } from './paladin_control';
+import { periodicHarmStands } from './periodic_harm';
 import { priestOnAuraEnded } from './priest/talents';
 import { preservesGloomtithe, vespersOnDotTick } from './priest/vespers';
 import { tickMendingCurrent } from './shaman_spiritmend';
 import { tickShamanTalentAura } from './shaman_talents';
+import { thundercallOnDotTick } from './shaman_thundercall_kit';
 import { stoneboundThreatMultiplier } from './shaman_warspirit';
 import { onHotExpired, tickProcState } from './talent_procs';
 import { temporalHourglassCooldownDelta, tickTemporalHourglassHealing } from './temporal_hourglass';
@@ -115,6 +118,9 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
       }
     }
   }
+  // A druid out of Cat Form keeps regenerating the energy parked on the way out,
+  // at the base tick, so shifting back returns what staying in Cat would have.
+  if (p.resourceType !== 'energy') regenParkedCatEnergy(p);
   if (p.resourceType === 'mana') {
     // Spirit regen: the FULL amount out of combat (past the five-second rule),
     // and COMBAT_SPIRIT_REGEN_FRACTION of it while the rule is active, so Spirit
@@ -325,6 +331,15 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           tickTemporalHourglassHealing(ctx, e, a);
         } else if (a.id === 'sacrilegious_march' && a.kind === 'buff_speed') {
           tickSacrilegiousMarch(ctx, e, a);
+        } else if (
+          (a.kind === 'dot' || a.kind === 'affliction_eye' || a.kind === 'affliction_violence') &&
+          !periodicHarmStands(ctx, ctx.entities.get(a.sourceId) ?? null, e)
+        ) {
+          // The verdict lapsed since the aura landed (the victim left the
+          // free-for-all ground, entered a sanctuary, or the duel ended): no
+          // tick, and the expiry below prunes the aura this pass
+          // (periodic_harm.ts).
+          a.remaining = 0;
         } else if (a.kind === 'affliction_eye') {
           tickMaledictGaze(ctx, e, a);
         } else if (a.kind === 'affliction_violence') {
@@ -346,7 +361,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             school: a.school,
             fx: 'tick',
           });
-          ctx.dealDamage(
+          const tickLanded = ctx.dealDamage(
             dotSource,
             e,
             tickDamage,
@@ -379,6 +394,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             a.finalDamage === true,
           );
           vespersOnDotTick(ctx, e, a);
+          thundercallOnDotTick(ctx, dotSource, a, tickLanded);
           druidEngineOnBleedTick(ctx, dotSource, a);
           if (a.leechPct !== undefined) {
             const src = dotSource;

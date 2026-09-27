@@ -616,8 +616,9 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(source).toContain('const resume = orderPrewarmResumeEntries(droppedEntries);');
     expect(source).toContain('dropEntry(entry, entry.resumeUnits?.() ?? []);');
     expect(source).toContain('droppedEntries.push({ id: entry.id, units })');
-    expect(source).toContain("if (status === 'partial' || status === 'failed') {");
-    expect(source).toContain('const partialUnits = entry.resumePartialUnits?.() ?? [];');
+    // A started entry's partial remainder comes from the fail-soft runner
+    // (prewarm_entry.ts, behavior in tests/prewarm_entry.test.ts).
+    expect(source).toContain('await runStartedPrewarmEntry(entry, () =>');
     expect(source).toContain(
       'if (partialUnits.length > 0) droppedEntries.push({ id: entry.id, units: partialUnits });',
     );

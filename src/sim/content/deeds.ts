@@ -8,6 +8,7 @@
 // persisted in character saves and, later, on Steam, where API names are
 // stable forever).
 
+import { STANDING_THRESHOLDS } from '../factions';
 import type { DeedDef } from '../types';
 import { FARM_CROP_IDS } from './farm_crops';
 
@@ -3392,6 +3393,198 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 0,
     trigger: { kind: 'quest', questId: 'q_requiem_at_the_forge' },
     hidden: true,
+  },
+  exp_arcane_calligraphy: {
+    id: 'exp_arcane_calligraphy',
+    name: 'A Steady Hand',
+    desc: 'Complete Arcane Calligraphy in Eastbrook Vale.',
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'manual' },
+  },
+  exp_arcane_calligraphy_gold: {
+    id: 'exp_arcane_calligraphy_gold',
+    name: 'Written in Starlight',
+    desc: 'Earn a Gold rating in Arcane Calligraphy.',
+    category: 'exploration',
+    renown: 10,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'the Runecaller' },
+  },
+  exp_forge_helper: {
+    id: 'exp_forge_helper',
+    name: 'A Helping Hammer',
+    desc: 'Help Smith Mara complete a shield at Wyrmwatch.',
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'manual' },
+  },
+  exp_last_barricade: {
+    id: 'exp_last_barricade',
+    name: 'The Last Barricade',
+    desc: 'Hold the forest pass against the undead horde.',
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'manual' },
+  },
+  exp_borrowed_face: {
+    id: 'exp_borrowed_face',
+    name: 'A Borrowed Face',
+    desc: 'Expose and defeat the infiltrator among the Fenbridge watch.',
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'manual' },
+  },
+  exp_windrider_slalom: {
+    id: 'exp_windrider_slalom',
+    name: 'Windrider Slalom',
+    desc: 'Complete the mechanical glider descent through the Galecrest canyon.',
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'manual' },
+  },
+  exp_duskweave_dispatches: {
+    id: 'exp_duskweave_dispatches',
+    name: 'Duskweave Dispatches',
+    desc: "Recover the bandit dispatches while wearing Valerie's enchanted cloak.",
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'manual' },
+  },
+  exp_wisp_maze: {
+    id: 'exp_wisp_maze',
+    name: 'A Light in the Maze',
+    desc: 'Recover the stolen coin purses and escape the Evergarden maze.',
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'manual' },
+  },
+  // Faction standing (world quests): one Trusted and one Champion deed per
+  // allied faction, the exact shape of the WARFARE lifetime-honor ladder
+  // above. Each meter reads PlayerMeta.factions, which awardFactionReputation
+  // only ever grows, so a tier once reached is never lost and a veteran who
+  // reached it before these deeds shipped is credited by the join-time retro
+  // pass. Amounts are the live STANDING_THRESHOLDS, so the deed can never
+  // drift from the quartermasters' standing gates. The Champion titles are
+  // the factions' vanguard flavor titles (FACTION_TIER_TITLES): the top of
+  // each standing ladder is the one place a player can wear them.
+  prog_rift_watch_trusted: {
+    id: 'prog_rift_watch_trusted',
+    name: 'Trusted by the Rift Watch',
+    desc: 'Reach Trusted standing with the Rift Watch.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'meter', meter: 'standingRiftWatch', amount: STANDING_THRESHOLDS.trusted },
+  },
+  prog_church_order_trusted: {
+    id: 'prog_church_order_trusted',
+    name: 'Trusted by the Church Order',
+    desc: 'Reach Trusted standing with the Church Order.',
+    category: 'progression',
+    renown: 5,
+    trigger: {
+      kind: 'meter',
+      meter: 'standingChurchOrder',
+      amount: STANDING_THRESHOLDS.trusted,
+    },
+  },
+  prog_automatons_trusted: {
+    id: 'prog_automatons_trusted',
+    name: 'Trusted by the Automatons',
+    desc: 'Reach Trusted standing with the Automatons.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'meter', meter: 'standingAutomatons', amount: STANDING_THRESHOLDS.trusted },
+  },
+  prog_rift_watch_champion: {
+    id: 'prog_rift_watch_champion',
+    name: 'Champion of the Rift Watch',
+    desc: 'Reach Champion standing with the Rift Watch.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'meter', meter: 'standingRiftWatch', amount: STANDING_THRESHOLDS.champion },
+    reward: { kind: 'title', text: 'Riftwarden' },
+  },
+  prog_church_order_champion: {
+    id: 'prog_church_order_champion',
+    name: 'Champion of the Church Order',
+    desc: 'Reach Champion standing with the Church Order.',
+    category: 'progression',
+    renown: 25,
+    trigger: {
+      kind: 'meter',
+      meter: 'standingChurchOrder',
+      amount: STANDING_THRESHOLDS.champion,
+    },
+    reward: { kind: 'title', text: 'Dawnkeeper' },
+  },
+  prog_automatons_champion: {
+    id: 'prog_automatons_champion',
+    name: 'Champion of the Automatons',
+    desc: 'Reach Champion standing with the Automatons.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'meter', meter: 'standingAutomatons', amount: STANDING_THRESHOLDS.champion },
+    reward: { kind: 'title', text: 'Forgemaster' },
+  },
+  prog_faction_champion_all: {
+    id: 'prog_faction_champion_all',
+    name: 'Champion of Every Banner',
+    desc: 'Reach Champion standing with the Rift Watch, the Church Order and the Automatons.',
+    category: 'progression',
+    renown: 50,
+    trigger: {
+      kind: 'meta',
+      deedIds: [
+        'prog_rift_watch_champion',
+        'prog_church_order_champion',
+        'prog_automatons_champion',
+      ],
+    },
+  },
+  // Clue Scrolls (world quests, Stage 3; docs/design/clue-scrolls.md): the
+  // first Treasure Casket opened and the tenth. The clueCasketsOpened meter
+  // is a persisted lifetime counter the casket-opening site bumps
+  // (src/sim/clue_casket.ts), so a veteran's caskets are credited by the
+  // join-time retro pass. The tenth grants the Treasure Hunter title, which
+  // pages on the Reliquary titles page like every non-hidden title deed.
+  exp_clue_first_casket: {
+    id: 'exp_clue_first_casket',
+    name: 'Treasure Found',
+    desc: 'Open a Treasure Casket dug up at the end of a clue scroll hunt.',
+    category: 'exploration',
+    renown: 10,
+    trigger: { kind: 'meter', meter: 'clueCasketsOpened', amount: 1 },
+  },
+  exp_clue_ten_caskets: {
+    id: 'exp_clue_ten_caskets',
+    name: 'Treasure Hunter',
+    desc: 'Open 10 Treasure Caskets dug up at the end of clue scroll hunts.',
+    category: 'exploration',
+    renown: 25,
+    trigger: { kind: 'meter', meter: 'clueCasketsOpened', amount: 10 },
+    reward: { kind: 'title', text: 'Treasure Hunter' },
+  },
+  // The scheduled ferries (sim/transport_ferry.ts): one crossing in each
+  // direction on every route, the visit marks written when a living passenger
+  // steps off at the far pier. Cosmetic exploration at the castle-visit value
+  // (renown 5); appended at the END per the append-only contract, after
+  // the branch's Clue Scroll casket pair at the release/v0.44.0 base merge.
+  exp_harbor_to_harbor: {
+    id: 'exp_harbor_to_harbor',
+    name: 'Harbor to Harbor',
+    desc: 'Sail both ferries there and back: Eastbrook to Moonrest, and Wickharbor to Wyrmwatch.',
+    category: 'exploration',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: [
+        'ferry:eastbrook_nightbloom',
+        'ferry:nightbloom_eastbrook',
+        'ferry:wickharbor_drakelands',
+        'ferry:drakelands_wickharbor',
+      ],
+    },
   },
 };
 

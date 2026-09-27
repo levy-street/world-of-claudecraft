@@ -15,7 +15,13 @@ import type { OverheadEmoteId } from '../../world_api';
 import { recordBuildSpan, timeBuildSpan } from '../build_spans';
 import { GFX } from '../gfx';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
+import type { MeleeImpactProfile } from '../melee_impact_core';
 import type { MountRideSpec } from '../mount_visuals';
+import {
+  stoneboundShardMaterialOptions,
+  stoneboundShellMaterialOptions,
+  weaponImbueAuraMaterialOptions,
+} from '../vfx_basic_materials';
 import {
   createWeaponVfx,
   DEFAULT_TUNING,
@@ -34,6 +40,7 @@ import {
   castHoldStep,
   desiredBaseState,
   drivesPose,
+  gaitWindDownTimeScale,
   locomotionTimeScale,
   pickProxyHeight,
   SUBMERGED_HEAD_FRACTION,
@@ -73,8 +80,10 @@ import {
   ghostEffectOpacity,
 } from './effect_materials';
 import { farMeshShown, shadowProxyShown } from './far_lod_reveal_core';
+import { FormAdornments } from './form_adornments';
 import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
+import { HarvestRecoil } from './harvest_recoil';
 import { disposeHeldPropIdles, updateHeldPropIdles } from './held_prop_idle';
 import { noteLookAttached } from './look_pieces';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
@@ -90,6 +99,7 @@ import {
   PALADIN_TEMPLARS_VERDICT_DURATION,
 } from './paladin_templars_verdict_clip';
 import { PaladinTemplarsVerdictFx } from './paladin_templars_verdict_fx';
+import { SanguineWeaponSheath } from './sanguine_weapon_sheath';
 import { attachSharedDepthMaterials } from './shadow_depth_materials';
 import { characterMeshCastsShadow } from './shadow_policy';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
@@ -105,7 +115,12 @@ import { configureTightBoneTextures } from './skin_gpu_layout';
 import { applySkinnedCullBounds } from './skinned_cull_bounds';
 import { applySoulRendOverlay } from './soul_rend_overlay';
 import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
+import { stoneboundShellStyle } from './stonebound_shell_core';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
+import { CharacterSurfaceResponse, SURFACE_RESPONSE_PROGRAM } from './surface_response';
+import { warriorActionBlend } from './warrior_action_blend';
+import { WarriorActionProps } from './warrior_action_props';
+import { WarriorBodyEffects } from './warrior_body_effects';
 import { SPIN_ATTACK_VISUAL_DURATION, weaponAttackStyle } from './weapon_attack_style_core';
 import {
   disposeOwnedWeaponSkinMaterials,
@@ -116,9 +131,9 @@ export type { AnimState, BaseState } from './anim_state';
 
 /** The renderer's live compile gate for a far LOD minted (or re-skinned) after
  *  the view's own creation gate ran: compile `target` hidden, off-thread, and
- *  call `onSettled` once its programs are linked (or immediately when async
- *  compile is unsupported). Mirrors renderer `gateSwapFlagOnCompile`. */
-export type FarBakeGate = (target: THREE.Object3D, onSettled: () => void) => void;
+ *  call `settle` (a lazy `ready` proof) once its programs are linked, or
+ *  immediately when async compile is unsupported. Mirrors `gateSwapFlagOnCompile`. */
+export type FarBakeGate = (target: THREE.Object3D, settle: (ready?: () => boolean) => void) => void;
 
 // Current canvas height in device pixels, pushed by the renderer on resolution
 // changes so newly created weapon-skin VFX rigs size their point sprites right.
@@ -635,6 +650,8 @@ export class CharacterVisual {
   private weaponAuraMeshes: THREE.Mesh[] = [];
   private weaponAuraColor: number | null = null;
   private weaponAuraTip = false;
+  private weaponAuraSanguine = false;
+  private readonly sanguineSheath = new SanguineWeaponSheath();
   private weaponAuraMode: WeaponAuraMode = 'none';
   private bastionSweepFx: PaladinBastionSweepFx | null = null;
   private bastionSweepAction: THREE.AnimationAction | null = null;
@@ -670,6 +687,8 @@ export class CharacterVisual {
   // once per original because base materials are SHARED per-asset caches;
   // writing emissive on those would leak the glow across every same-skin rig.
   private auraGlowMaterials = new Map<THREE.Material, THREE.Material>();
+  private readonly surfaceResponse = new CharacterSurfaceResponse();
+  private readonly harvestRecoil = new HarvestRecoil();
   private auraGlowColor = 0xffffff;
   private auraGlowIntensity = 0;
 
@@ -699,6 +718,8 @@ export class CharacterVisual {
   /** The ability driving the cast base state, mirrored from AnimState so the
    *  aim pin can tell a drawn shot from a pet utility cast. */
   private castingAbility: string | null = null;
+  private readonly warriorBody: WarriorBodyEffects;
+  private actionProps: WarriorActionProps | null = null;
   /** which ability's cast clip the current cast-state base action was chosen
    *  for; lets chained casts refresh their per-ability override */
   private castClipAbility: string | null = null;
@@ -715,6 +736,8 @@ export class CharacterVisual {
   private wasDead = false;
   /** previous frame's airborne flag, for the touchdown edge (see ClipMap.land) */
   private wasAirborne = false;
+  /** Was the body moving at takeoff? See the ClipMap's jumpMoving. */
+  private jumpWhileMoving = false;
   private initialized = false;
   private attackIdx = 0;
   private hitCooldown = 0;
@@ -765,6 +788,9 @@ export class CharacterVisual {
   private soulRend = false;
   private shadowform = false;
   private moonkin = false;
+  /** Moonwing's antlers, crescent and wings; Gloamveil's veil (form_adornments.ts).
+   *  Built on the first form edge, so a rig that never shifts pays nothing. */
+  private formAdornments: FormAdornments | null = null;
   private ferocityStage = 0;
   private presentationScale = 1;
   private ascended = false;
@@ -805,6 +831,7 @@ export class CharacterVisual {
         }
       : prep.def;
     this.key = key;
+    this.warriorBody = WarriorBodyEffects.forKey(key);
     this.entityColor = entityColor;
     this.skinIndex = skinIndex;
     this.weaponItemId = weaponItemId;
@@ -832,6 +859,8 @@ export class CharacterVisual {
     // No-op for a fixed rig.
     try {
       configureTightBoneTextures(this.model);
+      if (key === 'player_warrior' || key === 'player_warrior_modular')
+        this.actionProps = new WarriorActionProps(this.model);
       timeBuildSpan('view-part:materials', () =>
         applyMaterials(
           this.model,
@@ -946,7 +975,11 @@ export class CharacterVisual {
       const mixerStarted = performance.now();
       this.mixer = new THREE.AnimationMixer(this.model);
       this.skeletonUpdates = new SkeletonUpdateCache(this.model);
-      for (const name of [...clipNamesOf(prep.def), ...SKIN_ATTACK_CLIP_NAMES]) {
+      const isWarriorRig = key === 'player_warrior' || key === 'player_warrior_modular';
+      const signatureClips = isWarriorRig
+        ? Array.from(prep.clips.keys()).filter((n) => n.startsWith('Signature_'))
+        : [];
+      for (const name of [...clipNamesOf(prep.def), ...SKIN_ATTACK_CLIP_NAMES, ...signatureClips]) {
         const clip = prep.clips.get(name);
         if (clip) this.actions.set(name, this.mixer.clipAction(clip));
       }
@@ -999,6 +1032,7 @@ export class CharacterVisual {
   /** `animate=false` skips mixer integration (distance throttling); state
    *  edges still latch so the pose catches up when the entity nears. */
   update(dt: number, s: AnimState, animate: boolean, reducedMotion = false): void {
+    if (this.surfaceResponse.update(dt, this.root, this.height)) this.applyVisualMaterials();
     // A transparent effect whose clones finished linking: swap them in HERE,
     // on the per-frame path, never in the gate callback (see effectSwapSettled).
     if (this.effectSwapSettled) this.commitPendingEffectSwap();
@@ -1010,6 +1044,13 @@ export class CharacterVisual {
     }
     this.hitCooldown = Math.max(0, this.hitCooldown - dt);
     this.updateMetamorphWings(dt, s, reducedMotion);
+    this.formAdornments?.update(
+      dt,
+      s.moving,
+      s.casting,
+      reducedMotion,
+      this.root.visible && !farMeshShown(this.far, this.farMesh !== null, this.farCompilePending),
+    );
     if (this.holdCooldown > 0) this.holdCooldown = Math.max(0, this.holdCooldown - dt);
     // Deferred sheathe swap: lands at the gesture's windup peak (see
     // setWeaponStowed), where the clip is also cut so the chop's downswing never
@@ -1037,14 +1078,29 @@ export class CharacterVisual {
       this.playOneShot(landClip, 1);
       this.currentOneShotIsLanding = true;
     }
+    // Latch WHY we are airborne, on the takeoff edge. It cannot be read later:
+    // a moving jump keeps `moving` true the whole time it is in the air, so by
+    // the time the pose is chosen the takeoff is no longer observable.
+    if (!this.wasAirborne && s.airborne) this.jumpWhileMoving = s.moving;
     this.wasAirborne = s.airborne;
 
     this.castingAbility = s.casting ? (s.castingAbility ?? null) : null;
+    const rushChanged = this.warriorBody.updateRush(dt, s);
     if (!this.deadLock) {
       const desired = this.desiredBase(s);
       const baseChanged = desired !== this.baseState;
       const previousBase = this.baseState;
       if (baseChanged) this.baseState = desired;
+      if (this.warriorBody.rushArrivalStarted && this.def.clips.rushArrival) {
+        this.playOneShot(this.def.clips.rushArrival, 1);
+      } else if (
+        this.currentIsOneShot &&
+        this.current?.getClip().name === this.def.clips.rushArrival &&
+        !this.warriorBody.rushRecovering
+      ) {
+        this.currentIsOneShot = false;
+        this.fadeTo(this.baseAction(), 0.06, false);
+      }
       if (this.currentOneShotIsEmote && this.shouldInterruptEmote(s)) {
         this.currentIsOneShot = false;
         this.currentOneShotIsEmote = false;
@@ -1079,7 +1135,7 @@ export class CharacterVisual {
         this.currentIsOneShot = false;
         this.currentOneShotIsCastExit = false;
         this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
-      } else if (baseChanged && !this.currentIsOneShot) {
+      } else if ((baseChanged || rushChanged) && !this.currentIsOneShot) {
         // a cast clip frozen at its hold point must never stay paused through
         // the exit, whichever exit path runs below
         if (previousBase === 'cast' && this.current?.paused) this.current.paused = false;
@@ -1109,13 +1165,18 @@ export class CharacterVisual {
           this.def.prowlRef,
           this.def.walkBackRef,
           this.def.runTimeScaleMin,
+          this.def.walkTimeScaleMax,
+          this.def.runTimeScaleMax,
         );
         if (timeScale !== null) {
           if (timeScale < 0 && this.current.time <= 1e-3)
             this.current.time = Math.max(0, this.current.getClip().duration - 1e-3);
           this.current.timeScale = timeScale;
         }
-        if (this.baseState === 'spin') this.current.timeScale = SPIN_ATTACK_TIMESCALE;
+        if (this.baseState === 'spin')
+          this.current.timeScale =
+            (this.castingAbility && this.def.clips.castTimeScaleByAbility?.[this.castingAbility]) ||
+            SPIN_ATTACK_TIMESCALE;
         if (this.baseState === 'cast') {
           // per-frame on purpose: actions are cached per clip, so a clip that
           // doubles as an attackByAbility one-shot would otherwise leak that
@@ -1158,6 +1219,7 @@ export class CharacterVisual {
         }
       }
     }
+    this.advanceGaitWindDown(dt);
 
     // Zero-weight watchdog. The fades above only run on a base-state EDGE, so
     // any transient that leaves NO action driving the rig keeps it in bind pose
@@ -1173,7 +1235,10 @@ export class CharacterVisual {
     }
 
     if (s.spinning && !s.dead) {
-      this.spinAngle = (this.spinAngle + dt * SPIN_RATE) % (Math.PI * 2);
+      this.spinAngle =
+        !this.currentIsOneShot && this.current?.getClip().name === 'Warrior_Bladestorm_Loop'
+          ? 0
+          : (this.spinAngle + dt * SPIN_RATE) % (Math.PI * 2);
       this.spinOnceTimer = 0;
     } else if (this.spinOnceTimer > 0 && !s.dead) {
       this.spinOnceTimer = Math.max(0, this.spinOnceTimer - dt);
@@ -1208,15 +1273,17 @@ export class CharacterVisual {
     // windup lean/recoil spring: while fed (setWindupLean each ceremony frame)
     // the body eases back toward the target; when feeding stops (the release)
     // it snaps forward through a small recoil, then settles to neutral
-    if (this.leanFeed > 0) {
+    if (reducedMotion || s.dead) {
+      this.lean = this.leanFeed = this.leanRecoil = this.leanTarget = this.holdT = 0;
+    } else if (this.leanFeed > 0) {
       this.leanFeed -= dt;
-      this.lean += (this.leanTarget - this.lean) * Math.min(1, dt * 10);
+      this.lean += (this.leanTarget - this.lean) * (1 - Math.exp(-Math.max(0, dt) * 10));
       if (this.leanFeed <= 0) this.leanRecoil = LEAN_RECOIL_S;
     } else if (this.leanRecoil > 0) {
       this.leanRecoil -= dt;
-      this.lean += (-this.leanTarget * 0.45 - this.lean) * Math.min(1, dt * 22);
+      this.lean += (-this.leanTarget * 0.45 - this.lean) * (1 - Math.exp(-Math.max(0, dt) * 22));
     } else if (this.lean !== 0) {
-      this.lean += -this.lean * Math.min(1, dt * 9);
+      this.lean += -this.lean * (1 - Math.exp(-Math.max(0, dt) * 9));
       if (Math.abs(this.lean) < 1e-3) this.lean = 0;
     }
     // Ledge climb rides the SAME pose channels rather than fighting them:
@@ -1245,6 +1312,8 @@ export class CharacterVisual {
       this.swimBlend * (swimRise + Math.sin(this.swimBobTime * 2 + this.bobPhase) * 0.08) +
       // Compress at the start of the pull, back to neutral as the body rises.
       CLIMB_BODY_DUCK * climb * (1 - env01(this.climbPhase, 0.1, 0.55));
+    this.harvestRecoil.apply(this.poseWrap, dt, reducedMotion || s.dead);
+    this.warriorBody.applyContactRecoil(this.poseWrap, dt, reducedMotion || s.dead);
 
     // distant corpses show the static idle far mesh, tip it over
     if (this.farMesh?.visible) {
@@ -1697,12 +1766,25 @@ export class CharacterVisual {
    *  cast gestures on this, so a heal/blessing cue can never fall back to a
    *  weapon swing on a rig without the authored clip. */
   hasAttackClipOverride(abilityId: string): boolean {
+    if (this.action(`Signature_${abilityId}`)) return true;
     const override = this.def.clips.attackByAbility?.[abilityId];
     return override !== undefined && this.action(override) !== null;
   }
 
   playAttack(abilityId?: string): void {
     if (this.deadLock) return;
+    if ((abilityId === 'charge' || abilityId === 'intervene') && this.action(this.def.clips.rush)) {
+      this.warriorBody.beginRush(abilityId);
+      return;
+    }
+    if (!abilityId && this.warriorBody.rushOwnsBody) return;
+    if (abilityId) this.warriorBody.cancelRush();
+    const signature = abilityId ? `Signature_${abilityId}` : null;
+    if (signature && this.action(signature)) {
+      this.playOneShot(signature, 1);
+      this.currentOneShotIsAttack = true;
+      return;
+    }
     // Resolved against THIS rig's bound clips: a rig without the substitute
     // (every body but the hunter) keeps its own authored attack instead of
     // swinging with no animation at all.
@@ -1755,13 +1837,35 @@ export class CharacterVisual {
 
   /** Bladed Gyre is instant, so it uses one short body spin instead of the
    *  held Bladestorm channel pose. Repeated AoE hits only refresh the timer. */
-  playWhirl(): void {
+  playWhirl(abilityId?: string): void {
     if (this.deadLock) return;
+    this.warriorBody.cancelRush();
+    if (
+      (abilityId === 'cleave' || abilityId === 'whirlwind') &&
+      this.action(`Signature_${abilityId}`)
+    ) {
+      this.spinOnceTimer = 0;
+      this.playOneShot(`Signature_${abilityId}`, 1);
+      this.currentOneShotIsAttack = true;
+      return;
+    }
     this.spinOnceTimer = SPIN_ATTACK_VISUAL_DURATION;
     const clips = this.def.clips.attack;
     if (clips.length > 0) {
       this.playOneShot(clips[this.attackIdx++ % clips.length], SPIN_ATTACK_TIMESCALE);
     }
+  }
+
+  /** Successful Onrush arrival, validated by its travelled contact cue. */
+  arriveFromOnrush(): boolean {
+    return !this.deadLock && !!this.action(this.def.clips.rushArrival) && this.warriorBody.arrive();
+  }
+
+  get isPerformingAbility(): boolean {
+    return (
+      this.warriorBody.rushOwnsBody ||
+      (this.currentIsOneShot && this.current?.getClip().name.startsWith('Signature_') === true)
+    );
   }
 
   playHit(): void {
@@ -1778,7 +1882,8 @@ export class CharacterVisual {
    *  post-hold refractory swallows rapid re-triggers, so stacking strikes can
    *  never chain the rig into visible slow motion. */
   holdFrame(scale: number, dur: number): void {
-    if (this.deadLock || dur <= 0) return;
+    if (this.deadLock || !Number.isFinite(scale) || !Number.isFinite(dur) || dur <= 0) return;
+    dur = Math.min(0.16, dur);
     if (this.holdT > 0) {
       this.holdT = Math.max(this.holdT, dur);
       this.holdScale = Math.min(this.holdScale, Math.max(0.02, scale));
@@ -1794,7 +1899,7 @@ export class CharacterVisual {
    *  stops (the release moment) the spring snaps through a small forward
    *  recoil back to neutral. Rig-group rotation only, no bone surgery. */
   setWindupLean(amount: number): void {
-    if (this.deadLock) return;
+    if (this.deadLock || !Number.isFinite(amount)) return;
     this.leanTarget = -Math.min(LEAN_MAX_RAD, Math.max(0, amount));
     this.leanFeed = LEAN_FEED_S;
   }
@@ -1975,6 +2080,8 @@ export class CharacterVisual {
    *  keep a superseded far set's tinted lease. */
   setFarBakeGate(gate: FarBakeGate | null): void {
     this.farBakeGate = gate;
+    this.sanguineSheath.setGate(gate);
+    if (this.weaponAuraSanguine) this.rebuildWeaponAura();
     this.dropPendingFarMaterials();
     this.farCompilePending = false;
     // Same reason as the far arm: a settle the old renderer generation dropped
@@ -2086,6 +2193,11 @@ export class CharacterVisual {
     this.gateFarMint();
   }
 
+  /** Actual shown body, after the far-mesh compile/reveal gate has settled. */
+  get displayedFarBody(): THREE.Object3D | null {
+    return this.farMesh?.visible ? this.farMesh : null;
+  }
+
   get isFar(): boolean {
     return this.far;
   }
@@ -2094,6 +2206,7 @@ export class CharacterVisual {
     if (on === this.ghosted && style === this.ghostStyle) return;
     this.ghosted = on;
     this.ghostStyle = style;
+    this.syncFormAdornments();
     this.applyVisualMaterials();
   }
 
@@ -2110,6 +2223,26 @@ export class CharacterVisual {
     if (on !== wasOn) this.applyVisualMaterials();
     if (!on) return;
     for (const glow of this.auraGlowMaterials.values()) this.writeAuraGlow(glow);
+  }
+  respondToElement(school: string, strength = 0.75, contact?: MeleeImpactProfile): void {
+    if (this.disposed || this.deadLock) return;
+    if (this.surfaceResponse.trigger(school, strength, contact)) this.applyVisualMaterials();
+  }
+  clearElementResponse(): void {
+    this.harvestRecoil.clear();
+    this.warriorBody.clearContactRecoil();
+    const active = this.surfaceResponse.active;
+    this.surfaceResponse.clear();
+    if (active && !this.disposed) this.applyVisualMaterials();
+  }
+  receiveHarvestImpact(beat: number, source?: { x: number; z: number }): void {
+    if (!this.disposed && !this.deadLock)
+      this.harvestRecoil.trigger(beat, this.height, this.root, source);
+  }
+
+  receiveWarriorImpact(id: string, beat: number, source?: { x: number; z: number }): void {
+    if (!this.disposed && !this.deadLock)
+      this.warriorBody.triggerContactRecoil(id, beat, this.height, this.root, source);
   }
 
   private writeAuraGlow(material: THREE.Material): void {
@@ -2184,13 +2317,25 @@ export class CharacterVisual {
   setShadowform(on: boolean): void {
     if (on === this.shadowform) return;
     this.shadowform = on;
+    this.syncFormAdornments();
     this.applyVisualMaterials();
   }
 
   setMoonkin(on: boolean): void {
     if (on === this.moonkin) return;
     this.moonkin = on;
+    this.syncFormAdornments();
     this.applyVisualMaterials();
+  }
+
+  private syncFormAdornments(): void {
+    if (this.disposed || (!this.formAdornments && !this.moonkin && !this.shadowform)) return;
+    this.formAdornments ??= new FormAdornments(
+      this.model,
+      this.look ? 'composed' : this.key === 'player_mech' ? 'replacement' : 'classRig',
+      () => this.farBakeGate,
+    );
+    this.formAdornments.sync(this.moonkin, this.shadowform, this.ghosted);
   }
 
   pulseMetamorphosis(strength = 1): void {
@@ -2272,8 +2417,8 @@ export class CharacterVisual {
 
   /**
    * The clone/source-mesh pairs this effect state would mount whose program is
-   * not known linked yet. Only clones that flip `transparent` qualify: every
-   * other overlay (ferocity, ascension, rune tint, aura glow) keeps the source's
+   * not known linked yet. Transparency and the marked surface-response shader
+   * qualify. The other overlays (ferocity, ascension, rune tint, aura glow) keep the source's
    * program cache key through cloneMaterialWithHooks, so it costs no link and
    * must not be delayed. Empty without a gate, which keeps previews, tests and
    * hosts with no async compile on the immediate path.
@@ -2294,7 +2439,11 @@ export class CharacterVisual {
     const consider = (mesh: THREE.Mesh | null, source: THREE.Material): void => {
       if (!mesh?.geometry) return;
       const next = this.effectSingleMaterial(source);
-      if (next === source || next.transparent === source.transparent) return;
+      if (
+        next === source ||
+        (next.transparent === source.transparent && !next.userData[SURFACE_RESPONSE_PROGRAM])
+      )
+        return;
       if (this.linkedEffectMaterials.has(next)) return;
       staged.push({ source: mesh, material: next });
     };
@@ -2617,6 +2766,7 @@ export class CharacterVisual {
     }
     this.rebuildCasters();
     this.applyVisualMaterials();
+    if (this.weaponAuraSanguine) this.rebuildWeaponAura();
     return payloads;
   }
 
@@ -2699,6 +2849,7 @@ export class CharacterVisual {
    *  re-pin skin orientation, re-run the material pass, re-snapshot originals,
    *  and rebuild the skin VFX on the payloads that now exist. */
   private finishWeaponAttach(payloads: THREE.Object3D[]): void {
+    this.actionProps?.refresh();
     for (const payload of payloads) configureTightBoneTextures(payload);
     // Ranged skins take a root-relative orientation pin (position always rides
     // the hand): a bow aims upright WHILE the shot one-shot plays (the string
@@ -2779,8 +2930,14 @@ export class CharacterVisual {
    *  (Sanguine Blade's blood red, Pyrebrand's flame lick, Rimebound's rime).
    *  `tip` scopes the overlay to the blade's far end (Adder's Bite's green
    *  tip against Festering Venom's full-blade wash). */
-  setWeaponAura(colorHex: number | null, tip = false): void {
-    if (colorHex === this.weaponAuraColor && tip === this.weaponAuraTip) return;
+  setWeaponAura(colorHex: number | null, tip = false, sanguine = false): void {
+    if (
+      colorHex === this.weaponAuraColor &&
+      tip === this.weaponAuraTip &&
+      sanguine === this.weaponAuraSanguine
+    )
+      return;
+    this.weaponAuraSanguine = sanguine;
     this.weaponAuraColor = colorHex;
     this.weaponAuraTip = tip;
     this.rebuildWeaponAura();
@@ -2805,25 +2962,25 @@ export class CharacterVisual {
       if (o.userData.swapWeaponHolder) weaponHolders.push(o);
     });
 
-    // Structural channel: Stonebound sheathes EVERY held weapon in a wireframe
-    // stone shell and plates the body with shards. Independent of the imbue
-    // color below, which only ever soaks the mainhand.
+    // Structural channel: Stonebound sheathes EVERY held weapon in a stone
+    // shell and plates the body with shards. Independent of the imbue color
+    // channel below; Sanguine may also coat an equipped second weapon. The
+    // shell is a wireframe on an antialiased frame and a solid translucent
+    // sheath when no AA pass runs (stonebound_shell_core.ts).
     if (stonebound) {
+      const style = stoneboundShellStyle(GFX);
       for (const holder of weaponHolders) {
         holder?.traverse((o) => {
           const mesh = o as THREE.Mesh;
           if (!mesh.isMesh || !mesh.userData.weaponMesh || !mesh.parent) return;
           const aura = new THREE.Mesh(
             mesh.geometry,
-            new THREE.MeshBasicMaterial({
-              color: 0x9a9384,
-              transparent: true,
-              opacity: 0.72,
-              depthWrite: false,
-              blending: THREE.NormalBlending,
-              side: THREE.DoubleSide,
-              wireframe: true,
-            }),
+            new THREE.MeshBasicMaterial(
+              stoneboundShellMaterialOptions({
+                opacity: style.shellOpacity,
+                wireframe: style.wireframe,
+              }),
+            ),
           );
           aura.position.copy(mesh.position);
           aura.quaternion.copy(mesh.quaternion);
@@ -2834,44 +2991,48 @@ export class CharacterVisual {
           this.weaponAuraMeshes.push(aura);
         });
       }
-      this.buildStoneboundArmorShards();
+      this.buildStoneboundArmorShards(style.wireframe, style.shardOpacity);
     }
 
     if (this.weaponAuraColor === null) return;
     const auraColor = this.weaponAuraColor;
     const mainhand = weaponHolders.find((o) => o.userData.heldSlot === 0) ?? weaponHolders[0];
     if (!mainhand) return;
-    mainhand.traverse((o) => {
-      const mesh = o as THREE.Mesh;
-      if (!mesh.isMesh || !mesh.userData.weaponMesh || !mesh.parent) return;
-      const tipGeometry = this.weaponAuraTip ? tipFadedWeaponGeometry(mesh, mainhand) : null;
-      const aura = new THREE.Mesh(
-        tipGeometry ?? mesh.geometry,
-        new THREE.MeshBasicMaterial({
-          // Additive translucent clone of the weapon mesh in the spec-authored
-          // soak color. Brightness class is fixed here; only the hue is data.
-          // Tip scope rides a vertex-alpha ramp baked into the cloned geometry.
-          color: auraColor,
-          transparent: true,
-          opacity: 0.42,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending,
-          side: THREE.DoubleSide,
-          vertexColors: tipGeometry !== null,
-        }),
-      );
-      aura.position.copy(mesh.position);
-      aura.quaternion.copy(mesh.quaternion);
-      aura.scale.copy(mesh.scale).multiplyScalar(1.08);
-      aura.renderOrder = 3;
-      aura.userData.weaponVfxMesh = true;
-      if (tipGeometry) aura.userData.ownsAuraGeometry = true;
-      mesh.parent.add(aura);
-      this.weaponAuraMeshes.push(aura);
-    });
+    const imbuedHolders = [mainhand];
+    if (
+      this.weaponAuraSanguine &&
+      weaponAttackStyle(this.weaponItemId, this.offhandItemId) === 'dualwield'
+    ) {
+      this.model.traverse((o) => {
+        if (o.userData.heldPropHolder && o.userData.heldSlot === 1) imbuedHolders.push(o);
+      });
+    }
+    for (const holder of imbuedHolders)
+      holder.traverse((o) => {
+        const mesh = o as THREE.Mesh;
+        if (!mesh.isMesh || !mesh.userData.weaponMesh || !mesh.parent) return;
+        const tipGeometry = this.weaponAuraTip ? tipFadedWeaponGeometry(mesh, holder) : null;
+        // The option tables are shared with the never-disposed boot stand-ins
+        // (vfx_basic_materials.ts), which hold these programs between rebuilds.
+        const aura = new THREE.Mesh(
+          tipGeometry ?? mesh.geometry,
+          new THREE.MeshBasicMaterial(
+            weaponImbueAuraMaterialOptions(auraColor, tipGeometry !== null),
+          ),
+        );
+        aura.position.copy(mesh.position);
+        aura.quaternion.copy(mesh.quaternion);
+        aura.scale.copy(mesh.scale).multiplyScalar(1.08);
+        aura.renderOrder = 3;
+        aura.userData.weaponVfxMesh = true;
+        if (tipGeometry) aura.userData.ownsAuraGeometry = true;
+        mesh.parent.add(aura);
+        this.weaponAuraMeshes.push(aura);
+        if (this.weaponAuraSanguine && !this.weaponAuraTip) this.sanguineSheath.stage(aura);
+      });
   }
 
-  private buildStoneboundArmorShards(): void {
+  private buildStoneboundArmorShards(wireframe: boolean, opacity: number): void {
     const placements = [
       { x: -0.42, y: this.height * 0.7, z: 0, sx: 0.2, sy: 0.13, rz: -0.35 },
       { x: 0.42, y: this.height * 0.7, z: 0, sx: 0.2, sy: 0.13, rz: 0.35 },
@@ -2880,13 +3041,7 @@ export class CharacterVisual {
     for (const placement of placements) {
       const shard = new THREE.Mesh(
         STONEBOUND_SHARD_GEOMETRY,
-        new THREE.MeshBasicMaterial({
-          color: 0x777065,
-          transparent: true,
-          opacity: 0.82,
-          wireframe: true,
-          depthWrite: false,
-        }),
+        new THREE.MeshBasicMaterial(stoneboundShardMaterialOptions({ opacity, wireframe })),
       );
       shard.position.set(placement.x, placement.y, placement.z);
       shard.rotation.z = placement.rz;
@@ -2899,6 +3054,7 @@ export class CharacterVisual {
   }
 
   private disposeWeaponAura(): void {
+    this.sanguineSheath.clear();
     for (const mesh of this.weaponAuraMeshes) {
       mesh.removeFromParent();
       (mesh.material as THREE.Material).dispose();
@@ -3089,6 +3245,7 @@ export class CharacterVisual {
       this.moonkinMaterials,
       this.runeTintMaterials,
       this.auraGlowMaterials,
+      this.surfaceResponse.materials,
     ]);
   }
 
@@ -3105,6 +3262,7 @@ export class CharacterVisual {
       ...this.ascensionMaterials.values(),
       ...this.runeTintMaterials.values(),
       ...this.auraGlowMaterials.values(),
+      ...this.surfaceResponse.materials.values(),
     ]);
     for (const material of materials) material.dispose();
     this.ghostMaterials.clear();
@@ -3115,6 +3273,7 @@ export class CharacterVisual {
     this.ascensionMaterials.clear();
     this.runeTintMaterials.clear();
     this.auraGlowMaterials.clear();
+    this.surfaceResponse.materials.clear();
   }
 
   /** Move every held prop between the hands and the sheathed on-back pose (the
@@ -3217,6 +3376,7 @@ export class CharacterVisual {
   }
 
   dispose(): void {
+    this.actionProps?.restore();
     this.disposed = true;
     disposeHeldPropIdles(this.model);
     this.bastionSweepFx?.dispose();
@@ -3225,6 +3385,7 @@ export class CharacterVisual {
     this.templarsVerdictFx?.dispose();
     this.templarsVerdictFx = null;
     this.templarsVerdictAction = null;
+    this.formAdornments?.dispose();
     this.disposeWeaponAura();
     this.disposeWeaponVfx();
     this.disposeWeaponSkinMaterials();
@@ -3335,6 +3496,23 @@ export class CharacterVisual {
     this.fadeTo(this.baseAction(), FADE, false);
   }
 
+  /**
+   * Normalized phase of the base locomotion clip, 0..1, or null when no base
+   * action is running.
+   *
+   * Exposed so audio can be pinned to events INSIDE the animation (a foot
+   * meeting the ground) rather than to distance travelled. A distance
+   * accumulator drifts against the clip whenever playback rate and ground speed
+   * disagree, and then footfalls land between the visible steps.
+   */
+  baseClipPhase(): number | null {
+    const a = this.current ?? this.baseAction();
+    const clip = a?.getClip?.();
+    if (!a || !clip || clip.duration <= 0) return null;
+    const t = a.time % clip.duration;
+    return (t < 0 ? t + clip.duration : t) / clip.duration;
+  }
+
   private baseTransitionFade(next: BaseState): number {
     // A winged form without an authored Jump clip must leave its locomotion
     // stride almost immediately. The normal crossfade preserves too much of a
@@ -3368,6 +3546,7 @@ export class CharacterVisual {
     if (this.ferocityStage > 0) return this.ferocityMaterial(material, this.ferocityStage);
     if (this.ascended) return this.ascensionMaterial(material);
     if (this.runeTint !== null) return this.runeTintMaterial(material, this.runeTint);
+    if (this.surfaceResponse.active) return this.surfaceResponse.material(material);
     // lowest priority: the ability VFX buff/cast body glow
     if (this.auraGlowIntensity > 0.01) return this.auraGlowMaterial(material);
     return material;
@@ -3504,7 +3683,11 @@ export class CharacterVisual {
       case 'walkBack':
         return this.action(c.walkBack) ?? this.action(c.walk);
       case 'run':
-        return this.action(c.run) ?? this.action(c.walk);
+        return (
+          (this.warriorBody.rushActive ? this.action(c.rush) : null) ??
+          this.action(c.run) ??
+          this.action(c.walk)
+        );
       case 'cast':
         // A displayed bow holds its draw here instead of the shared caster
         // gesture; a per-ability authored cast clip beats the generic channel;
@@ -3516,7 +3699,11 @@ export class CharacterVisual {
           this.action(c.idle)
         );
       case 'spin':
-        return this.action(c.attack[0]) ?? this.action(c.idle);
+        return (
+          this.action(this.castingAbility ? c.castByAbility?.[this.castingAbility] : undefined) ??
+          this.action(c.attack[0]) ??
+          this.action(c.idle)
+        );
       case 'swim':
         return this.action(c.swim) ?? this.action(c.idle);
       case 'swimSurface':
@@ -3536,8 +3723,10 @@ export class CharacterVisual {
         return this.action(c.wade) ?? this.action(c.walk) ?? this.action(c.idle);
       case 'sit':
         return this.action(c.sitDown) ?? this.action(c.sitIdle) ?? this.action(c.idle);
-      case 'jump':
-        return this.action(c.jump) ?? this.action(c.idle);
+      case 'jump': {
+        const moving = this.jumpWhileMoving ? this.action(c.jumpMoving) : null;
+        return moving ?? this.action(c.jump) ?? this.action(c.idle);
+      }
       case 'fall':
         // Rigs without the authored flail (mobs, creatures) hold the jump
         // pose for the whole fall, which is what every rig did before it.
@@ -3549,6 +3738,35 @@ export class CharacterVisual {
 
   private shouldInterruptEmote(s: AnimState): boolean {
     return s.moving || s.airborne || s.swimming || s.casting || !!s.spinning || s.sitting || s.dead;
+  }
+
+  /** The outgoing gait currently winding down, if this rig opted in. Cleared
+   *  when the fade completes, or the moment the action is re-driven. */
+  private windDown: {
+    action: THREE.AnimationAction;
+    from: number;
+    fade: number;
+    elapsed: number;
+  } | null = null;
+
+  /** Decay the outgoing gait's cadence alongside its crossfade, so a stop
+   *  settles instead of sprinting out under a dissolving pose. A no-op for a
+   *  rig that has not opted in, and for the whole of the rest of the game. */
+  private advanceGaitWindDown(dt: number): void {
+    const w = this.windDown;
+    if (!w) return;
+    // Re-driven as the live pose (a stop that immediately becomes a start), or
+    // stopped out from under us: hand it back, the per-frame speed matching
+    // owns its cadence again. isScheduled(), NOT isRunning(): three reports a
+    // timeScale-0 action as not running, so isRunning would call the freeze
+    // this very function just applied a reason to stop tracking it.
+    if (w.action === this.current || !w.action.isScheduled()) {
+      this.windDown = null;
+      return;
+    }
+    w.elapsed += dt;
+    w.action.timeScale = gaitWindDownTimeScale(w.from, w.elapsed, w.fade);
+    if (w.elapsed >= w.fade) this.windDown = null;
   }
 
   /** The cast just ended mid-clip: let a listed cast clip FINISH as a one-shot
@@ -3602,6 +3820,7 @@ export class CharacterVisual {
     prev: THREE.AnimationAction | null,
     fade: number,
   ): void {
+    this.actionProps?.action(next.getClip().name);
     // A transition can interrupt a crossfade still in flight (the stow gesture
     // racing the waterline's base-state edge is the common case: auto-sheathe
     // fires the moment the swim latch flips). The action that was FADING IN at
@@ -3628,9 +3847,20 @@ export class CharacterVisual {
     }
     if (prev && prev !== next && drivesPose(readActionWeight(prev))) {
       prev.fadeOut(fade);
+      // Arm the cadence wind-down on the SAME action the mixer is fading, and
+      // only for a gait that was actually running forward: a reversed
+      // backpedal (negative scale) or an already-idle clip has nothing to wind
+      // down, and one-shots own their own timing.
+      this.windDown =
+        this.def.gaitWindDown && !this.currentIsOneShot && prev.timeScale > 0
+          ? { action: prev, from: prev.timeScale, fade, elapsed: 0 }
+          : null;
       next.fadeIn(fade).play();
       return;
     }
+    // The snap path stops `prev` outright, so there is no outgoing cadence left
+    // to decay; drop any wind-down still pointing at it.
+    this.windDown = null;
     // A prev below the pose-drive threshold still needs its scheduled fades
     // cancelled: it is excluded from the sweep above (as prev) and from the
     // crossfade (below threshold), so a fade-in it was carrying would
@@ -3758,7 +3988,11 @@ export class CharacterVisual {
     // whole 0.18s hand-off fade (a visible T-pose pop after every swing)
     a.clampWhenFinished = true;
     a.timeScale = timeScale;
-    this.beginAction(a, prev, ONESHOT_FADE);
+    this.beginAction(
+      a,
+      prev,
+      name === this.def.clips.rushArrival ? 0.04 : warriorActionBlend(this.key, name, ONESHOT_FADE),
+    );
     this.current = a;
     this.currentIsOneShot = true;
     this.currentOneShotIsEmote = emoteId !== null;
@@ -3899,6 +4133,7 @@ function clipNamesOf(def: VisualDef): string[] {
     c.prowlWalk,
     c.walk,
     c.run,
+    c.rushArrival,
     c.death,
     ...(c.attack ?? []),
     ...Object.values(c.attackByAbility ?? {}),
@@ -3913,6 +4148,7 @@ function clipNamesOf(def: VisualDef): string[] {
     c.swimIdle,
     c.wade,
     c.jump,
+    c.jumpMoving,
     c.fall,
     c.land,
     c.walkBack,

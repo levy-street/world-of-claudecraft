@@ -143,8 +143,21 @@ describe('coach trail materials', () => {
 
   it('the renderer hands the guidance its compile gate (source pin)', () => {
     const renderer = read('src/render/renderer.ts');
-    expect(renderer).toContain(
-      'new IslandGuidance(this.scene, this.groundSample, (t) => this.compileGate(t), options.isQuestTracked, options.isEastbrookGuidanceEnabled)',
-    );
+    // The branch routes the island guidance through WorldGuidance; both hops
+    // must hand the gate and the guidance options down unchanged.
+    expect(renderer).toContain(`new WorldGuidance(
+      this.scene,
+      this.groundSample,
+      (t, e) => this.compileGate(t, e),
+      options.isQuestTracked,
+      options.isEastbrookGuidanceEnabled,
+    )`);
+    expect(read('src/render/world_guidance.ts')).toContain(`new IslandGuidance(
+      scene,
+      groundAt,
+      compileGate,
+      isQuestTracked,
+      isEastbrookGuidanceEnabled,
+    )`);
   });
 });

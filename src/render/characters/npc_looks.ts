@@ -18,12 +18,19 @@
 //   point (FURY's closed visor, the chroniclers' scholar hat, Brosk's fur cap).
 // - `props` picks a fixed held-prop def (manifest.ts NPC_MODULAR_PROP_SETS):
 //   NPC gear never changes, so props are authored attaches, never weapon swaps.
+//   An attach is not only a held item: the `harbormaster` set is WORN gear (a
+//   tricorne and pipe on the head bone, a spyglass on the hips bone),
+//   Blender-authored in each bone's bind frame (scripts/assets/harbormaster_gear/).
+// - `outfit` may name an NPC-only colorway (modular.ts NPC_MATERIAL_COLORWAY_IDS,
+//   Tamsin's navy-and-brass `admiralty`): normalizeNpcAppearance keeps it where
+//   the player normalizer would clamp it, so no player can ever wear one.
 //
 // tests/npc_looks.test.ts pins: every NpcDef id resolves to a look EXCEPT
 // Brother Aldric (see aldricKeepsHisRig), every authored value survives
-// normalizeAppearance unchanged (a typo'd style id would silently clamp to the
+// normalizeNpcAppearance unchanged (a typo'd style id would silently clamp to the
 // default), and no two NPCs share an appearance.
 
+import { SHADOW_GUARDS } from '../../sim/content/world_quest_shadow';
 import type { EntityKind } from '../../sim/types';
 import {
   type ArmorLoadout,
@@ -35,6 +42,7 @@ import {
   type ModularLook,
   NEUTRAL_BODY,
   NEUTRAL_FACE,
+  NPC_MATERIAL_COLORWAY_IDS,
   normalizeAppearance,
 } from './modular';
 
@@ -54,7 +62,8 @@ export type NpcPropSet =
   | 'sword'
   | 'scythe'
   | 'knife'
-  | 'spear';
+  | 'spear'
+  | 'harbormaster';
 
 export const NPC_PROP_SET_IDS: readonly NpcPropSet[] = [
   'none',
@@ -70,6 +79,7 @@ export const NPC_PROP_SET_IDS: readonly NpcPropSet[] = [
   'scythe',
   'knife',
   'spear',
+  'harbormaster',
 ];
 
 export interface NpcLookDef {
@@ -106,6 +116,86 @@ const kit = (set: ArmorSetId, over: Partial<ArmorLoadout> = {}): ArmorLoadout =>
 // --- the roster --------------------------------------------------------------
 
 export const NPC_LOOKS: Record<string, NpcLookDef> = {
+  glider_instructor: {
+    app: {
+      gender: 'male',
+      hair: 'crew',
+      brows: 'thick',
+      eyeShape: 'almond',
+      ...hair(31, 0.25, 0.25),
+      ...skin(29, 0.4, 0.5),
+      ...eyes(194, 0.48, 0.43),
+      face: face({ cheeks: 0.12, chin: 0.15 }),
+      outfit: 'azure',
+    },
+    worn: kit('ranger'),
+    props: 'none',
+  },
+  glider_apprentice: {
+    app: {
+      gender: 'female',
+      hair: 'warriorbraid',
+      brows: 'angled',
+      eyeShape: 'almond',
+      ...hair(34, 0.65, 0.4),
+      ...skin(24, 0.35, 0.65),
+      ...eyes(180, 0.4, 0.48),
+      face: face({ cheeks: -0.1, chin: -0.12 }),
+      outfit: 'teal',
+    },
+    worn: kit('ranger'),
+    props: 'none',
+  },
+  // Keeper Liora: the Evergarden maze warden, mossy and unhurried.
+  wisp_maze_keeper: {
+    app: {
+      gender: 'female',
+      hair: 'warriorbraid',
+      brows: 'angled',
+      eyeShape: 'almond',
+      ...hair(96, 0.35, 0.3),
+      ...skin(26, 0.38, 0.6),
+      ...eyes(150, 0.45, 0.45),
+      face: face({ cheeks: 0.05, chin: -0.05 }),
+      outfit: 'teal',
+    },
+    worn: kit('ranger'),
+    props: 'none',
+  },
+  shadow_cloak_scout: {
+    app: {
+      gender: 'female',
+      hair: 'warriorbraid',
+      brows: 'angled',
+      eyeShape: 'almond',
+      ...hair(23, 0.45, 0.17),
+      ...skin(27, 0.42, 0.53),
+      ...eyes(165, 0.4, 0.4),
+      face: face({ cheeks: -0.12, chin: 0.1 }),
+      outfit: 'violet',
+    },
+    worn: kit('rogue'),
+    props: 'knife',
+  },
+  ...Object.fromEntries(
+    SHADOW_GUARDS.map((guard, index): [string, NpcLookDef] => [
+      guard.npc.id,
+      {
+        app: {
+          gender: 'male',
+          hair: 'crew',
+          brows: 'thick',
+          eyeShape: 'narrow',
+          ...hair(21 + index * 3, 0.3, 0.23),
+          ...skin(25, 0.4, 0.43 + index * 0.025),
+          ...eyes(30 + index * 15, 0.3, 0.35),
+          outfit: guard.sentry ? 'gold' : 'onyx',
+        },
+        worn: kit(guard.sentry ? 'knight' : 'rogue', guard.sentry ? { head: 'knight' } : {}),
+        props: guard.sentry ? 'spear' : 'sword',
+      },
+    ]),
+  ),
   // === Eastbrook Vale: the starter valley, warm and rustic =================
   // The Merchant: gold on black, a man who owns the market and dresses like it.
   the_merchant: {
@@ -1752,6 +1842,29 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     worn: kit('ranger'),
     props: 'crossbow',
   },
+  // Harbormaster Tamsin of the Wyrmwatch quays: an old sea wolf ashore. A salt-grey
+  // braid under a navy tricorne, a pipe in the corner of her mouth, a squint and
+  // wind-burnt cheeks from forty years of weather, the long buttoned coat (the mage's,
+  // dyed the NPC-only `admiralty` navy with brass buttons and cuffs) over dark leather
+  // gloves, and a spyglass on her hip. The ferry's palette.
+  harbormaster_tamsin: {
+    app: {
+      gender: 'female',
+      hair: 'warriorbraid',
+      ...hair(30, 0.1, 0.64),
+      brows: 'thick',
+      eyeShape: 'narrow',
+      ...eyes(200, 0.4, 0.4),
+      ...skin(22, 0.42, 0.4),
+      mouth: 'smile',
+      blush: 'warm',
+      face: face({ jaw: 0.15, brow: 0.3, cheeks: -0.15, smirk: 0.2 }),
+      body: body({ shoulders: 0.2 }),
+      outfit: 'admiralty',
+    },
+    worn: kit('mage', { hands: 'rogue' }),
+    props: 'harbormaster',
+  },
   // Reeve Ottoline of Lanternmere: the harvest never ends; neither do ledgers.
   reeve_ottoline: {
     app: {
@@ -1883,6 +1996,86 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     props: 'tome',
   },
 
+  // === Faction quartermasters and the World Quest taskmaster ==============
+  // Quartermaster Vaelen (Rift Watch, Drifthaven): salt-grey braid, sea-glass
+  // eyes, ranger leathers over Palmreach sun-dark skin; a spear for the shore.
+  npc_rift_watch_quartermaster: {
+    app: {
+      gender: 'male',
+      hair: 'warriorbraid',
+      ...hair(200, 0.12, 0.55),
+      beard: 'shortbox',
+      brows: 'flat',
+      eyeShape: 'sharp',
+      ...eyes(185, 0.5, 0.45),
+      ...skin(23, 0.55, 0.36),
+      mouth: 'neutral',
+      face: face({ jaw: 0.2, cheeks: -0.1 }),
+      body: body({ shoulders: 0.15 }),
+      outfit: 'teal',
+    },
+    worn: kit('ranger'),
+    props: 'spear',
+  },
+  // Templar Althea (Church Order, the Eastbrook chapel): gilded paladin plate,
+  // braided crown, a calm smile; sword and shield of the Dawn.
+  npc_church_order_quartermaster: {
+    app: {
+      gender: 'female',
+      hair: 'braidcrown',
+      ...hair(38, 0.55, 0.62),
+      brows: 'arched',
+      eyeShape: 'almond',
+      ...eyes(42, 0.5, 0.45),
+      ...skin(27, 0.42, 0.62),
+      mouth: 'smile',
+      face: face({ chin: 0.1 }),
+      body: body({ shoulders: 0.15 }),
+      outfit: 'gold',
+    },
+    worn: kit('paladin'),
+    props: 'sword_shield',
+  },
+  // Artificer Tobrin (Automatons, Wyrmwatch): soot-dark hair swept back, a
+  // verdigris smith's kit with the sleeves rolled, hammer in hand.
+  npc_automaton_quartermaster: {
+    app: {
+      gender: 'male',
+      hair: 'sweptback',
+      ...hair(20, 0.3, 0.2),
+      beard: 'goatee',
+      brows: 'thick',
+      eyeShape: 'wide',
+      ...eyes(35, 0.55, 0.4),
+      ...skin(24, 0.45, 0.45),
+      mouth: 'grin',
+      face: face({ nose: 0.15, brow: 0.1 }),
+      body: body({ shoulders: 0.2, hands: 0.25 }),
+      outfit: 'verdigris',
+    },
+    worn: kit('barbarian', { arms: null }),
+    props: 'hammer',
+  },
+  // Taskmaster Kaelen (Eastbrook square): a clerk of assignments, crimson
+  // rogue leathers, a ledger under the arm and a pencil-line moustache.
+  npc_wq_taskmaster: {
+    app: {
+      gender: 'male',
+      hair: 'sidepart',
+      ...hair(28, 0.35, 0.28),
+      beard: 'stache',
+      brows: 'angled',
+      eyeShape: 'droopy',
+      ...eyes(28, 0.4, 0.3),
+      ...skin(26, 0.42, 0.55),
+      mouth: 'frown',
+      face: face({ chin: -0.1, cheeks: -0.15 }),
+      body: body({ chest: -0.1 }),
+      outfit: 'crimson',
+    },
+    worn: kit('rogue'),
+    props: 'tome',
+  },
   // === Palmreach and the far shores ========================================
   // Castaway Navigator: sun-bleached, half-dressed, still reading the stars.
   castaway_navigator: {
@@ -2128,6 +2321,194 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     worn: kit('knight'),
     props: 'hammer',
   },
+  // === World quests: instructors and the Fenbridge watch ==================
+  // Elian: a silver-haired scholar whose open face stays visible above his book.
+  // The Vault Keeper (PR 4052): the Weekly Vault's custodian at the stone hall
+  // by the harbour road, a clean-shaven steward in bank gold with a clerk's
+  // ledger, deliberately plainer than the Gilded Strongbox's bursar.
+  eastbrook_vault_keeper: {
+    app: {
+      gender: 'male',
+      hair: 'sweptback',
+      ...hair(34, 0.18, 0.62),
+      brows: 'arched',
+      eyeShape: 'almond',
+      ...eyes(205, 0.4, 0.45),
+      ...skin(24, 0.42, 0.52),
+      face: face({ cheeks: 0.05, chin: -0.05 }),
+      outfit: 'gold',
+    },
+    worn: kit('rogue'),
+    props: 'tome',
+  },
+  // Cham Pete: the weekly emissary on the Eastbrook green, a
+  // hooded ledger-keeper in the town's violet.
+  weekly_emissary: {
+    app: {
+      gender: 'male',
+      hair: 'sweptback',
+      ...hair(22, 0.12, 0.28),
+      beard: 'goatee',
+      brows: 'soft',
+      eyeShape: 'almond',
+      ...eyes(262, 0.55, 0.5),
+      ...skin(28, 0.35, 0.55),
+      face: face({ cheeks: -0.1, chin: 0.1 }),
+      outfit: 'violet',
+    },
+    worn: kit('mage'),
+    props: 'tome',
+  },
+  calligraphy_instructor: {
+    app: {
+      gender: 'male',
+      hair: 'sweptback',
+      ...hair(28, 0.08, 0.67),
+      beard: 'goatee',
+      brows: 'soft',
+      eyeShape: 'almond',
+      ...eyes(220, 0.35, 0.4),
+      ...skin(28, 0.38, 0.58),
+      face: face({ cheeks: -0.15, chin: 0.15 }),
+      outfit: 'violet',
+    },
+    worn: kit('mage'),
+    props: 'tome',
+  },
+  // Apprentice Tessa is a different person from Guard Tessa below.
+  calligraphy_apprentice_1: {
+    app: {
+      gender: 'female',
+      hair: 'lowbun',
+      ...hair(24, 0.48, 0.22),
+      brows: 'thin',
+      eyeShape: 'doe',
+      ...eyes(194, 0.44, 0.45),
+      ...skin(30, 0.42, 0.64),
+      face: face({ cheeks: 0.2 }),
+      body: body({ shoulders: -0.12 }),
+      outfit: 'azure',
+    },
+    worn: kit('mage', { arms: null, back: null }),
+    props: 'none',
+  },
+  calligraphy_apprentice_2: {
+    app: {
+      gender: 'male',
+      hair: 'messy',
+      ...hair(34, 0.6, 0.42),
+      brows: 'soft',
+      eyeShape: 'round',
+      ...eyes(105, 0.4, 0.35),
+      ...skin(27, 0.46, 0.6),
+      mouth: 'smile',
+      face: face({ cheeks: 0.25, smirk: 0.15 }),
+      outfit: 'gold',
+    },
+    worn: kit('mage', { arms: null, back: null }),
+    props: 'tome',
+  },
+  // Mara: tied-back hair, bare working arms, and the smith's hammer.
+  forge_instructor: {
+    app: {
+      gender: 'female',
+      hair: 'warriorbraid',
+      ...hair(18, 0.5, 0.2),
+      brows: 'thick',
+      eyeShape: 'sharp',
+      ...eyes(34, 0.48, 0.32),
+      ...skin(25, 0.48, 0.48),
+      face: face({ jaw: 0.25, cheeks: 0.1 }),
+      body: body({ shoulders: 0.3, chest: 0.2, hands: 0.15 }),
+      outfit: 'ember',
+    },
+    worn: kit('barbarian', { arms: null, back: null }),
+    props: 'hammer',
+  },
+  // Shared watch colours and equipment, distinct faces for questioning.
+  infiltrator_captain: {
+    app: {
+      gender: 'male',
+      hair: 'crewcut',
+      ...hair(24, 0.12, 0.42),
+      beard: 'shortbox',
+      brows: 'flat',
+      eyeShape: 'sharp',
+      ...eyes(165, 0.3, 0.32),
+      ...skin(26, 0.4, 0.52),
+      face: face({ brow: 0.3, chin: 0.2 }),
+      body: body({ shoulders: 0.2 }),
+      outfit: 'verdigris',
+    },
+    worn: kit('knight'),
+    props: 'sword_shield',
+  },
+  infiltrator_nella: {
+    app: {
+      gender: 'female',
+      hair: 'warriorbraid',
+      ...hair(22, 0.35, 0.1),
+      brows: 'angled',
+      eyeShape: 'almond',
+      ...eyes(125, 0.35, 0.36),
+      ...skin(27, 0.48, 0.4),
+      face: face({ jaw: 0.15, cheeks: -0.1 }),
+      body: body({ shoulders: 0.1 }),
+      outfit: 'verdigris',
+    },
+    worn: kit('knight'),
+    props: 'sword',
+  },
+  infiltrator_orin: {
+    app: {
+      gender: 'male',
+      hair: 'sidepart',
+      ...hair(30, 0.25, 0.3),
+      beard: 'scruff',
+      brows: 'thick',
+      eyeShape: 'narrow',
+      ...eyes(215, 0.3, 0.38),
+      ...skin(24, 0.43, 0.6),
+      face: face({ nose: 0.2, jaw: 0.25 }),
+      body: body({ chest: 0.15 }),
+      outfit: 'verdigris',
+    },
+    worn: kit('knight'),
+    props: 'sword',
+  },
+  infiltrator_bram: {
+    app: {
+      gender: 'male',
+      hair: 'crew',
+      ...hair(25, 0.1, 0.55),
+      beard: 'horseshoe',
+      brows: 'bushy',
+      eyeShape: 'wideset',
+      ...eyes(38, 0.35, 0.3),
+      ...skin(26, 0.46, 0.5),
+      face: face({ jaw: 0.3, cheeks: 0.15 }),
+      body: body({ shoulders: 0.3, chest: 0.2 }),
+      outfit: 'verdigris',
+    },
+    worn: kit('knight'),
+    props: 'sword',
+  },
+  infiltrator_tessa: {
+    app: {
+      gender: 'female',
+      hair: 'chinbob',
+      ...hair(15, 0.5, 0.32),
+      brows: 'flat',
+      eyeShape: 'sharp',
+      ...eyes(185, 0.4, 0.42),
+      ...skin(28, 0.38, 0.57),
+      face: face({ chin: 0.15, cheeks: -0.2 }),
+      body: body({ shoulders: 0.15 }),
+      outfit: 'verdigris',
+    },
+    worn: kit('knight'),
+    props: 'sword',
+  },
 };
 
 /**
@@ -2144,6 +2525,18 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
  */
 export function aldricKeepsHisRig(templateId: string): boolean {
   return templateId.startsWith('brother_aldric');
+}
+
+/** normalizeAppearance for an authored NPC look: the same clamps, except that an
+ *  NPC-only outfit colorway (modular.ts NPC_MATERIAL_COLORWAY_IDS) survives where
+ *  the player normalizer would clamp it back to the default. */
+export function normalizeNpcAppearance(app: Partial<ModularAppearance>): ModularAppearance {
+  const out = normalizeAppearance(app);
+  const outfit = app.outfit as string | undefined;
+  if (outfit && (NPC_MATERIAL_COLORWAY_IDS as readonly string[]).includes(outfit)) {
+    out.outfit = outfit as ModularAppearance['outfit'];
+  }
+  return out;
 }
 
 /** Suffixed hub ids that share one person's look (the same character recurs
@@ -2168,7 +2561,7 @@ export function npcLookFor(templateId: string, kind: EntityKind = 'npc'): Modula
   let look = resolved.get(id);
   if (look === undefined) {
     const def = NPC_LOOKS[id];
-    look = def ? { app: normalizeAppearance(def.app), worn: def.worn } : null;
+    look = def ? { app: normalizeNpcAppearance(def.app), worn: def.worn } : null;
     resolved.set(id, look);
   }
   return look;

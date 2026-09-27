@@ -100,8 +100,15 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.activeLoadout = -1;
   c.questLog = new Map();
   c.questsDone = new Set();
+  c.worldQuestCycle = '';
+  c.worldQuestExpiresAtMs = 0;
+  c.worldQuestLog = new Map();
+  c.nearbyWorldQuestTraces = [];
+  c.clueHunt = null;
+  c.activeWorldBossIds = new Set();
   c.pendingQuestCommands = new Map();
   c.partyInfo = null;
+  c.townFocusPending = null;
   c.selectedDungeonDifficulty = 'normal';
   c.tradeInfo = null;
   c.duelInfo = null;
@@ -111,6 +118,8 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.dungeonFinderBoard = null;
   c.honor = 0;
   c.lifetimeHonor = 0;
+  c.worldPvpInfo = null;
+  c.hillInfo = null;
   c.cardMinigameInfo = { queued: false, available: true, match: null };
   c.socialInfo = null;
   c.whoInfo = null;
@@ -121,6 +130,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.bankInfo = null;
   c.bankPurchasedSlots = null;
   c.vaultInfo = null;
+  c.weeklyRewardInfo = null;
   c.craftVaultStock = null;
   c.deedsEarned = new Map();
   c.deedStats = freshDeedStats();
@@ -227,6 +237,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.ackedInputSeq = 0;
   c.inputEchoSamples = [];
   c.spectateFacingPending = false;
+  c.spectateExitPending = false;
   c.pendingSpectateFacing = null;
   c.dungeonEntrySeq = null;
   c.pendingDungeonEntryFacing = null;
@@ -261,6 +272,10 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.actionBarRestore = undefined;
   c.actionBarRestoreResolved = false;
   c.actionBarUploader = new ActionBarLayoutUploader((command) => c.cmd(command));
+  // The constructor binds the world-quest command transport and REST origin the
+  // same way (QuestWorldWireState.bindQuestWorldWire), resolving cmd per call so
+  // a suite that stamps its own cmd spy still sees every send.
+  c.bindQuestWorldWire('', (command: unknown) => c.cmd(command));
   c.profanityDirty = false;
   c.pendingTargetEcho = null;
   // The lazy WorldInteractionRequests holder (src/net/world_interaction_requests.ts):

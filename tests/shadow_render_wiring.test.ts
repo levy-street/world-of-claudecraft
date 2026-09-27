@@ -161,10 +161,14 @@ describe('shadow feature renderer wiring', () => {
     // application (which is what makes the prewarm/census save-restore
     // self-healing).
     expect(rendererSource).toContain(
-      'updateShadowCadence(this.shadowCadence, dt, state.pressure, state.enabled)',
+      'updateShadowCadence(this.shadowCadence, dt, state.pressure, state.enabled, held)',
     );
+    expect(rendererSource).toContain('const held = shipShadowHold(this.sim, this.sun);');
     const apply = methodBody('private applyShadowShed');
     expect(apply).toContain('const autoUpdate = !this.shadowCadence.halfRate');
+    // ...except around a ship under way (ship_shadow_hold.ts): a stale map
+    // every other frame flickers the moving ship's own shadows
+    expect(apply).toContain('!this.shadowCadence.halfRate || this.shadowCadence.held');
     expect(apply).toContain(
       'if (!autoUpdate && this.shadowCadence.renderThisFrame) shadowMap.needsUpdate = true',
     );

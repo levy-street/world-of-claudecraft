@@ -38,3 +38,17 @@ offer expires, and the accept returns them at the caster's side with no
 resurrection sickness. Reach (range plus line of sight, 40 yd ceiling) comes
 from `src/sim/combat/resurrection_reach.ts`; mass revives sweep the authoritative
 group or raid roster (`src/sim/combat/mass_resurrection.ts`).
+
+## Who a single revive is begun over
+
+- The combat revives (Temporal Reversal, Wildwake) need an explicit dead
+  group member, through a party-frame mouseover or the current target. In a
+  fight, which body gets the one combat revive is the decision.
+- Recall the Fallen is the out-of-combat single revive, and it needs no
+  selected body, so it works like the group revives. When the press names no
+  fallen ally, the rite begins over the current target if that is a fallen
+  member (even one out of reach, so a deliberate choice is never swapped),
+  and otherwise over the nearest fallen member whose body is within reach
+  (`src/sim/combat/fallen_ally_target.ts`, pinned by
+  `tests/fallen_ally_target.test.ts`). With nobody to raise, it refuses with
+  the group revive wording.

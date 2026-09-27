@@ -150,6 +150,7 @@ function slotState(iconKey: string): ActionBarSlotState {
     aiming: false,
     procGlow: false,
     empowered: false,
+    naturesBoonGlow: false,
     ascensionSpender: false,
     ascensionCostLabel: '',
     fateConsumeReady: false,

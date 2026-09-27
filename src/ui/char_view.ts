@@ -40,10 +40,12 @@ export interface PaperdollView {
   weapons: PaperdollSlot[];
 }
 
-export type CharacterSidebarTab = 'stats' | 'progression' | 'skills';
+export type CharacterSidebarTab = 'stats' | 'progression' | 'skills' | 'reputation' | 'currencies';
 
 export const CHARACTER_SIDEBAR_TABS: readonly CharacterSidebarTab[] = [
   'stats',
+  'reputation',
+  'currencies',
   'progression',
   'skills',
 ];
@@ -64,7 +66,7 @@ export function buildCharacterSidebarView(selected: string | null): CharacterSid
 }
 
 // Two balanced 5/5 armor columns flank the model and the two weapon hands sit in
-// their own row under it (mainhand then offhand), like the classic character
+// their own row under it (mainhand, offhand, then trinket), like the classic character
 // sheet: the left column runs head to hands, the right column waist to rings.
 // The inspect window inherits the split via buildPaperdollView.
 export const PAPERDOLL_LEFT_SLOTS: readonly EquipSlot[] = [
@@ -81,7 +83,7 @@ export const PAPERDOLL_RIGHT_SLOTS: readonly EquipSlot[] = [
   'ring1',
   'ring2',
 ];
-export const PAPERDOLL_WEAPON_SLOTS: readonly EquipSlot[] = ['mainhand', 'offhand'];
+export const PAPERDOLL_WEAPON_SLOTS: readonly EquipSlot[] = ['mainhand', 'offhand', 'trinket'];
 
 /**
  * Build the paperdoll view from the player's equipment and the item table. A

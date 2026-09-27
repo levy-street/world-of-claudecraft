@@ -129,9 +129,13 @@ const FANOUT_ARMS: readonly string[] = [
   // what replaced the blanket hud.ts exemption: every memo it clears carries
   // its own row below (masterwrought qr-19-hud-coordinator-fanout-exemption).
   'this.relocalizeCoordinatorMemos|',
+  'this.focusTargets.relocalize|',
+  'refreshHudFrameGroupLabels|',
   'this.bgScoreboard.relocalize|',
+  'this.hillBar.relocalize|',
   'this.syncDailyRewardsSurfaceLabels|',
   'this.wocMarketWindow.relocalize|',
+  'this.weeklyQuestsWindow.relocalize|',
   'this.storePromoCard.relocalize|',
   'this.refreshKeybindLabels|',
   'this.questTracker.relocalize|',
@@ -167,6 +171,7 @@ const FANOUT_ARMS: readonly string[] = [
   // (KeyboardMapWindow), which can stay open across a language switch and
   // repaints its title, option captions, legends and hint on this arm.
   'this.optionsWindow.relocalize|',
+  'this.meters.relocalize|',
   // The Target dots frame: only its aria-label is constructor-written, so this
   // arm is what keeps that one string from sticking in the previous locale.
   'this.targetDotsPainter.relocalize|',
@@ -253,6 +258,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.mobileActionRingPainter.relocalize|',
   'this.mountRaceStrip.relocalize|',
   'this.mountRaceControls.relocalize|',
+  'this.worldQuestPuzzleWindow.relocalize|',
 ];
 
 const observedArms = scan.sites.map((s) => `${s.call}|${s.conditions.join(' && ')}`);
@@ -341,6 +347,18 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['corpseSig', 'harvestStatusSig'],
     answer: 'this.lootWindow.relocalize',
     why: 'the corpse signature holds action availability and loot quantities, and the harvest-status signature holds the deliberate timed-harvest cast/reservation state (Intentional Gathering PR3); locale changes rebuild once while preserving explicit choices and focus',
+  },
+  {
+    file: 'world_quest_puzzle_window.ts',
+    memos: ['lastSignature'],
+    answer: 'this.worldQuestPuzzleWindow.relocalize',
+    why: 'the active puzzle id and its progress payload, neither of which changes when the locale does, so the open puzzle prompt and status text otherwise remain in the previous language',
+  },
+  {
+    file: 'hud/hill/hill_bar_painter.ts',
+    memos: ['lastSig'],
+    answer: 'this.hillBar.relocalize',
+    why: 'one structural signature over the King of the Hill strip (zone, holder, challenger, inside), so the localized held/zone labels would sit in the old locale until a holder change moved it',
   },
   {
     file: 'hud/battleground/battleground_scoreboard_painter.ts',
@@ -457,9 +475,9 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'hud/quest/quest_dialog_controller.ts',
-    memos: ['lastGossipRowSig', 'lastIntroHintVisible'],
+    memos: ['investigationSig', 'lastClueRowSig', 'lastGossipRowSig', 'lastIntroHintVisible'],
     answer: 'this.questDialog.relocalize',
-    why: 'the profession intro hint visibility latch, and the offerable-row signature (quest ids and marker kinds, text-independent by design; the phase 23 cadence-lapse watch)',
+    why: 'the profession intro hint visibility latch, and the offerable-row signature (quest ids and marker kinds, text-independent by design; the phase 23 cadence-lapse watch), and the world-quest investigation signature (clue ids and accusation state, never text), and the Clue Scroll row signature (step kind, item id and count from clue_step_row.ts, never text; relocalize re-renders the gossip list past it)',
   },
   {
     file: 'hud/rift/rift_floor_tracker_controller.ts',
@@ -480,10 +498,28 @@ const ANSWERED: readonly AnsweredSurface[] = [
     why: 'the Market Sweep card is rebuilt by the Browse list repaint (MarketSweepPanel.mount, reached from the market window render via renderContent), which resets lastQuoteSig and paints the quote line with the CURRENT language; the memo only elides same-language re-paints of an unchanged quote between list repaints',
   },
   {
+    file: 'market_orders_panel.ts',
+    memos: ['lastCardSig'],
+    answer: 'this.marketWindow.render',
+    why: 'the Wanted tab place card is rebuilt by the tab repaint (MarketOrdersPanel.mount, reached from the market window render via renderContent), and mount() resets lastCardSig before syncCard() repaints the total line and pick with the CURRENT language; the memo only elides same-language re-patches of an unchanged stage between repaints',
+  },
+  {
     file: 'market_window.ts',
     memos: ['lastSig', 'lastSellPriceRefSig', 'searchEcho'],
     answer: 'this.marketWindow.render',
     why: 'the listing ids, prices and the active tab; render() carries no self-gate. lastSellPriceRefSig (issue 3043) is the Sell tab price reference: render() rebuilds it via renderSell -> sellPriceRefHtml with the CURRENT language, the same full-rebuild path that already answers lastSig. searchEcho is answered DIFFERENTLY and deliberately: it memoizes the typed-to-sent Browse search translation, whose resolution reads localized item names, so it keys the active language into the memo itself (LANGUAGE_KEYED below verifies that structurally) rather than riding this arm. A repaint cannot fix it: the stale value is the string the client SENDS to the server, so it has to be re-resolved rather than re-painted',
+  },
+  {
+    file: 'weekly_rewards_window.ts',
+    memos: ['lastSignature'],
+    answer: 'this.bankWindow.render',
+    why: 'the Weekly Vault pane (PR 4052) is a TAB of the bank window, not a window of its own: lastSignature digests the vault ledger, the ready weeks, the claim flag and the reset edge, none of them text. bankWindow.render() rebuilds the rewards tab through WeeklyRewardsTab.renderInto, which re-reads every t() label and re-latches the signature in the current language, so the bank arm answers it',
+  },
+  {
+    file: 'weekly_quests_window.ts',
+    memos: ['lastSig'],
+    answer: 'this.weeklyQuestsWindow.relocalize',
+    why: 'the held pick, the reset instant, the dialog and the standing map digest into lastSig, none of them text; relocalize() self-gates on the open sheet, clears the latch and rebuilds once, and render() re-latches the signature in the current language',
   },
   {
     file: 'woc_market_window.ts',
@@ -642,6 +678,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
   readonly memos: readonly string[];
   readonly reason: string;
 }> = [
+  {
+    file: 'hud/vehicle/forge_action_bar_controller.ts',
+    memos: ['lastClock'],
+    reason:
+      'lastClock is the authoritative world-quest clock in seconds, compared so the bar can re-anchor its wall-clock extrapolation of the forge timer between snapshots. It is a number that never holds text, and the bar repaints its localized labels on every update through the shared action bar painter, so a locale switch lands on the next frame.',
+  },
   {
     file: 'movable_frame.ts',
     memos: ['lastBottom', 'lastHoverCursor', 'lastHoverEdge'],
@@ -1632,7 +1674,9 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // OSSBrain integration: authored freed-slot ability cache and the health-mode
       // arm sharing the already-cleared HP gate add two explicit classifications.
       // 37 on the merged tree: both pairs above are present.
-    ).toBe(37);
+      // 38 at the release/v0.43.0 merge into feature/world-quests: the forge
+      // action bar's numeric world-quest clock memo.
+    ).toBe(38);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {

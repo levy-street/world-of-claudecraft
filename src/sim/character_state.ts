@@ -15,6 +15,8 @@ import type { ArchetypeState } from './professions/archetype';
 import type { PersistedFarmPlot } from './professions/farm_persist';
 import type { SavedGatheringGoal } from './professions/gathering_goal_persist';
 import type { ToolEffectSlot } from './professions/tools';
+import type { SavedPendingTownFocus } from './professions/town_focus_pending';
+import type { WorldPvpSavedState } from './pvp/world_pvp';
 import type { SavedReliquaryState } from './reliquary';
 import type {
   EquipSlot,
@@ -25,7 +27,10 @@ import type {
   QuestProgress,
   SkinCatalog,
   SkinRank,
+  WeeklyQuestProgress,
+  WorldQuestProgress,
 } from './types';
+import type { WeeklyRewardState } from './weekly_rewards';
 
 // Persistable character state (stored as JSONB server-side). The arena fields
 // are optional so characters saved before the Ashen Coliseum existed load
@@ -44,6 +49,10 @@ export interface CharacterState {
   honor?: number;
   lifetimeHonor?: number;
   honorArenaDaily?: HonorArenaDailyState;
+  // World PvP (/pvp flag, src/sim/pvp/world_pvp.ts): the flag, a disarm
+  // countdown stored as remaining seconds, and the career kill/death tally.
+  // Absent for every character who never raised the flag.
+  worldPvp?: WorldPvpSavedState;
   prestigeRank?: number;
   unlockedMilestones?: string[];
   // Rested XP pool. Optional so pre-rested-XP saves load cleanly (defaults to 0).
@@ -94,9 +103,33 @@ export interface CharacterState {
   // defaulting to the empty locked vault). sanitizeVaultState is the one load path
   // (never destroys stock; tolerates an over-capacity count).
   vault?: SavedMaterialsVaultState;
+  // Forward-only persistence: pre-feature binaries drop this field on save.
+  weeklyRewards?: WeeklyRewardState;
   vendorBuyback?: InvSlot[];
   questLog: QuestProgress[];
   questsDone: string[];
+  // Daily world-quest state. Optional so every pre-feature save loads as an
+  // untouched empty cycle; available quests are implicit and are not stored.
+  worldQuests?: {
+    gliderRecords?: import('./glider_personal_records').PersonalGliderRecords;
+    cycle: string;
+    progress: WorldQuestProgress[];
+    factions?: Partial<Record<string, number>>;
+    rerollCycle?: string;
+    replacements?: Record<string, string>;
+    // Clue Scrolls (src/sim/clue_scrolls.ts). Each is optional and written
+    // only when set (a hunt in progress, a cycle that paid, a count above
+    // zero), so a character the feature never touched serializes
+    // byte-identically to a pre-feature save.
+    clueHunt?: { huntId: string; step: number };
+    clueScrollCycle?: string;
+    clueCasketsOpened?: number;
+  };
+  // Faction standing (JSONB; optional so pre-reputation saves load cleanly).
+  factions?: Partial<Record<string, number>>;
+  // The weekly emissary's pick. Optional and omitted while there is none, so
+  // every pre-feature save loads with no charge taken.
+  weeklyQuest?: WeeklyQuestProgress;
   // Legacy arenaRating/Wins/Losses are treated as 1v1 data. The explicit
   // 1v1 fields are written by new saves, while old saves fall back cleanly.
   arenaRating?: number;
@@ -303,6 +336,10 @@ export interface CharacterState {
   // re-fire on the floored post-fix display.
   proficiencyDisplayHealApplied?: boolean;
   townFocus?: Record<string, number>;
+  // #1144: a queued 'time'/'timeAndPartial' re-spec (JSONB, sparse: absent
+  // while nothing is waiting). Remaining seconds, never an absolute sim time;
+  // encoding and the strict load live in professions/town_focus_pending.ts.
+  pendingTownFocus?: SavedPendingTownFocus;
   // Active-archetype state (#1129, superseded scope; JSONB, back-compat: absent on
   // older saves loads as emptyArchetypeState, see normalizeArchetypeState).
   archetype?: Partial<ArchetypeState>;

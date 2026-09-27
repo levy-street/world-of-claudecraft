@@ -14,12 +14,16 @@ import type { IWorld } from '../world_api';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { EMISSIVE_LIGHT, surfaceMat } from './gfx';
-import { type InstancedGhostHandle, InstancedOccluderGhosts } from './instanced_occluder_ghosts';
+import { disposeGhostHideGeometry, ghostHideGeometry } from './instanced_dither_fade';
+import {
+  ghostFadeBatchMaterial,
+  type InstancedGhostHide,
+  InstancedOccluderGhosts,
+} from './instanced_occluder_ghosts';
 import {
   occluderFadeSettled,
   occluderKeepsInstances,
   occluderSegmentHitsBox,
-  stepOccluderFade,
 } from './occluder_fade_core';
 import type { FireLightSink } from './point_light_budget';
 import { stoneTexture } from './textures';
@@ -97,12 +101,11 @@ interface MazeWallHideable {
   hd: number;
   index: number;
   visibleMatrix: THREE.Matrix4;
-  hiddenMatrix: THREE.Matrix4;
   /** Ghosted (the fade applied), NOT "occluding": a wall that occludes the
    *  camera while its fade program is still gate-held reads false. */
   hidden: boolean;
   alpha: number;
-  ghost: InstancedGhostHandle | null;
+  ghost: InstancedGhostHide | null;
 }
 
 export interface YumiMazeView {
@@ -147,13 +150,15 @@ export function buildYumiMaze(
   // Walls: every stub (interior + shell) is one instance of a unit box,
   // scaled to its rect, so the whole maze is a single draw call.
   const stubs = [...layout.shell, ...layout.walls];
-  const wallMat = surfaceMat({ color: WALL_COLOR, map: stoneTexture(), roughness: 0.9 });
-  const walls = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), wallMat, stubs.length);
+  const wallMat = ghostFadeBatchMaterial(
+    surfaceMat({ color: WALL_COLOR, map: stoneTexture(), roughness: 0.9 }),
+  );
+  const wallGeo = ghostHideGeometry(new THREE.BoxGeometry(1, 1, 1), stubs.length);
+  const walls = new THREE.InstancedMesh(wallGeo, wallMat, stubs.length);
   const m = new THREE.Matrix4();
   const q = new THREE.Quaternion();
   const pos = new THREE.Vector3();
   const scl = new THREE.Vector3();
-  const zeroScale = new THREE.Vector3(0, 0, 0);
   const wallHideables: MazeWallHideable[] = [];
   for (let i = 0; i < stubs.length; i++) {
     const s = stubs[i];
@@ -168,7 +173,6 @@ export function buildYumiMaze(
       hd: s.hd,
       index: i,
       visibleMatrix: m.clone(),
-      hiddenMatrix: m.clone().scale(zeroScale),
       hidden: false,
       alpha: 1,
       ghost: null,
@@ -183,8 +187,8 @@ export function buildYumiMaze(
   // once so the per-frame consult allocates nothing.
   const wallParts = [{ mesh: walls }];
 
-  // Occluder fade over the shared wall batch: an occluding stub swaps its
-  // instance for a pooled ghost mesh at the fade alpha (the tree pattern).
+  // Occluder fade over the shared wall batch: an occluding stub ghosts through
+  // the pool at the fade alpha (the tree pattern).
   // Stub footprints are maze-local, so world XZ shifts by the group origin;
   // heights compare in world space against the walls' world top.
   const updateWallFades = (
@@ -211,17 +215,11 @@ export function buildYumiMaze(
         continue;
       }
       h.hidden = hide;
-      if (h.ghost === null) {
-        walls.setMatrixAt(h.index, h.hiddenMatrix);
-        walls.instanceMatrix.needsUpdate = true;
-        h.ghost = wallGhosts.acquire(walls, h.index, h.visibleMatrix);
-      }
-      h.alpha = stepOccluderFade(h.alpha, hide, dt, reducedMotion);
-      wallGhosts.setAlpha(h.ghost, h.alpha);
+      h.ghost ??= wallGhosts.hide(walls, h.index, h.visibleMatrix);
+      h.alpha = wallGhosts.step(h.alpha, hide, dt, reducedMotion);
+      wallGhosts.fade(h.ghost, h.alpha);
       if (!hide && occluderFadeSettled(h.alpha, false)) {
-        walls.setMatrixAt(h.index, h.visibleMatrix);
-        walls.instanceMatrix.needsUpdate = true;
-        wallGhosts.release(h.ghost);
+        wallGhosts.show(h.ghost);
         h.ghost = null;
       }
     }
@@ -453,6 +451,7 @@ export function buildYumiMaze(
     dispose(): void {
       group.removeFromParent();
       walls.dispose();
+      disposeGhostHideGeometry(wallGeo);
     },
   };
 }

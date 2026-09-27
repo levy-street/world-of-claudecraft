@@ -209,6 +209,40 @@ describe('dungeons: door-trigger entry/exit', () => {
     }
   });
 
+  // Predefined gate/portal direction (feature request): leaving a dungeon
+  // door used to leave the player facing whatever way they last walked
+  // inside the instance (e.g. deeper in, away from the exit) instead of a
+  // predictable outward direction. leaveDungeon now points the player away
+  // from the door along its own authored leaveOffset (detachFromDungeon),
+  // the same vector that already places the drop point, so every door's
+  // exit facing agrees with its real-world orientation without a second
+  // authored field.
+  it('sets a predefined facing on exit, derived from the door, never the last interior facing', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Leaver');
+    const player = sim.entities.get(pid) as AnyEntity;
+
+    // hollow_crypt has no authored leaveOffset: the default south drop
+    // (0, -DUNGEON_DOOR_RETURN_INSET) faces the player back at Math.PI.
+    expect(enterDungeon(sim.ctx, 'hollow_crypt', pid)).toBe(true);
+    player.facing = 0.6; // an arbitrary interior facing, unrelated to the door
+    player.prevFacing = 0.6;
+    expect(leaveDungeon(sim.ctx, pid)).toBe(true);
+    expect(player.facing).toBeCloseTo(Math.PI, 10);
+    expect(player.prevFacing).toBeCloseTo(Math.PI, 10);
+
+    // the_last_keep's facade drops the player forward (-x) onto the
+    // terrace: leaveOffset { x: -3.5, z: 0 } faces sideways, -Math.PI / 2,
+    // proving the facing tracks the door's own authored offset rather than
+    // a single hardcoded direction.
+    expect(enterDungeon(sim.ctx, 'the_last_keep', pid, true)).toBe(true);
+    player.facing = -2.9;
+    player.prevFacing = -2.9;
+    expect(leaveDungeon(sim.ctx, pid)).toBe(true);
+    expect(player.facing).toBeCloseTo(-Math.PI / 2, 10);
+    expect(player.prevFacing).toBeCloseTo(-Math.PI / 2, 10);
+  });
+
   // Bug repro: jumping into a dungeon door mid-air (the reported "jump into the
   // outer entrance" crypt repro) carries the overworld jump's airborne state
   // across the teleport. Every other sim teleport (portals.ts, sim.ts charge/
@@ -1604,14 +1638,31 @@ describe('dungeons: heroic boss drops', () => {
     // The table now also carries the two blue mount reins as independent
     // sub-1% draws (the mount drop matrix); the weapon contract applies to the
     // roll-grouped entries only.
-    const weaponEntries = heroicTable.filter((e) => e.rollGroup !== undefined);
+    // The trinket slot added the four raid trinkets (content/trinkets.ts) to
+    // the same group: weapons share half the group, trinkets the other half,
+    // and a kill still pays exactly one heroic-only exclusive.
+    const exclusiveEntries = heroicTable.filter((e) => e.rollGroup !== undefined);
     const mountEntries = heroicTable.filter((e) => e.rollGroup === undefined);
-    const weaponIds = weaponEntries.flatMap((e) => (e.itemId ? [e.itemId] : []));
-    const groups = new Set(weaponEntries.map((e) => e.rollGroup));
+    const exclusiveIds = exclusiveEntries.flatMap((e) => (e.itemId ? [e.itemId] : []));
+    const weaponIds = exclusiveIds.filter((id) => ITEMS[id]?.kind === 'weapon');
+    const trinketIds = exclusiveIds.filter((id) => ITEMS[id]?.slot === 'trinket');
+    const groups = new Set(exclusiveEntries.map((e) => e.rollGroup));
     expect(groups.size).toBe(1);
+    expect(new Set(exclusiveIds).size).toBe(7);
     expect(new Set(weaponIds).size).toBe(3);
-    expect(weaponEntries.reduce((sum, e) => sum + e.chance, 0)).toBeCloseTo(1, 10);
-    for (const id of weaponIds) expect(ITEMS[id]?.kind, id).toBe('weapon');
+    expect(trinketIds.sort()).toEqual([
+      'echoing_lens',
+      'hunters_tally',
+      'mooring_stone',
+      'wellspring_seed',
+    ]);
+    expect(exclusiveEntries.reduce((sum, e) => sum + e.chance, 0)).toBeCloseTo(1, 10);
+    const groupShare = (ids: string[]) =>
+      exclusiveEntries
+        .filter((e) => e.itemId && ids.includes(e.itemId))
+        .reduce((sum, e) => sum + e.chance, 0);
+    expect(groupShare(weaponIds)).toBeCloseTo(0.5, 10);
+    expect(groupShare(trinketIds)).toBeCloseTo(0.5, 10);
     // The heroic raid carries the two RARE mounts and the two UNCOMMON ones. The
     // hover-cycle is deliberately absent: it is epic now, and epic mounts are rift
     // S-clear exclusive, so the raid must not be a back door to one.
@@ -1628,7 +1679,7 @@ describe('dungeons: heroic boss drops', () => {
       expect(e.chance, `${e.itemId} (${quality}) chance`).toBe(quality === 'rare' ? 0.001 : 0.005);
     }
 
-    const droppedWeapons = new Set<string>();
+    const droppedExclusives = new Set<string>();
     const droppedVariants = new Set<string>();
     for (let seed = 1; seed <= 8; seed++) {
       const sim = makeSim(seed);
@@ -1654,16 +1705,17 @@ describe('dungeons: heroic boss drops', () => {
         'hit',
       );
       const items = (boss.loot?.items ?? []) as any[];
-      // Exactly one heroic-only weapon per kill (one roll group summing to 1.0).
-      const weapons = items.filter((s) => weaponIds.includes(s.itemId));
-      expect(weapons.length, `seed ${seed} weapons`).toBe(1);
-      for (const s of weapons) droppedWeapons.add(s.itemId);
+      // Exactly one heroic-only exclusive per kill (one roll group summing to 1.0).
+      const exclusives = items.filter((s) => exclusiveIds.includes(s.itemId));
+      expect(exclusives.length, `seed ${seed} exclusives`).toBe(1);
+      for (const s of exclusives) droppedExclusives.add(s.itemId);
       // The set-piece / legendary drops are upgraded to their heroic variants.
       for (const s of items)
         if (String(s.itemId).startsWith('heroic_')) droppedVariants.add(s.itemId);
     }
-    // Over eight kills all three weapons show up, and the set-piece swap is live.
-    expect(droppedWeapons.size).toBe(3);
+    // Over eight kills both halves of the group show up, and the set-piece swap is live.
+    expect([...droppedExclusives].some((id) => weaponIds.includes(id))).toBe(true);
+    expect([...droppedExclusives].some((id) => trinketIds.includes(id))).toBe(true);
     expect(droppedVariants.size).toBeGreaterThan(2);
   });
 });
@@ -2260,7 +2312,7 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     );
   });
 
-  it('mails the marks to a raider locked from far back, so lockout never outruns reward', () => {
+  it('pays marks to a raider locked from far back, so lockout never outruns reward', () => {
     const { sim, raiders, inst } = raidSetup('heroic');
     const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
     // The melee stack takes the kill at the boss; the back-line healer holds
@@ -2285,16 +2337,19 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
 
     // The whole raid takes the daily lockout, the far healer included...
     expect(sim.players.get(healer)!.raidLockouts.has('nythraxis_boss_arena:heroic')).toBe(true);
-    // ...so the marks must reach them too. Not present at the corpse to loot, so
-    // they ride the Ravenpost instead of dropping into a distant player's bags.
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID, healer)).toBe(0);
+    // ...so the marks must reach them too. Inside a claimed instance the whole
+    // claim footprint is in the death-time participation snapshot, so the
+    // back-line healer gets the direct heroic-mark pay instead of the fallback
+    // Ravenpost arm reserved for lockout recipients outside that snapshot.
+    expect(boss.lootRecipientIds).toContain(healer);
+    expect(sim.countItem(HEROIC_MARK_ITEM_ID, healer)).toBe(3);
     const healerName = sim.players.get(healer)!.name;
     const mailedMarks = ((sim.postOffice as any).mail as any[])
       .filter((m) => m.recipientName === healerName)
       .flatMap((m) => m.items as { itemId: string; count: number }[])
       .filter((s) => s.itemId === HEROIC_MARK_ITEM_ID)
       .reduce((n, s) => n + s.count, 0);
-    expect(mailedMarks).toBe(3);
+    expect(mailedMarks).toBe(0);
   });
 
   it('lets a locked ghost return to its defeated heroic raid instance for loot', () => {
@@ -2457,7 +2512,7 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     ).toBe(true);
   });
 
-  it('resurrects an ineligible locked ghost in the crypt and keeps it out of the arena', () => {
+  it('keeps a same-claim locked ghost released through the crypt and resurrects at the arena', () => {
     const { sim, tank, raiders, inst } = raidSetup('heroic');
     const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
     raiders.slice(1).forEach((pid, i) => {
@@ -2477,25 +2532,24 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
       'hit',
     );
     expect(sim.players.get(tank)!.raidLockouts.has('nythraxis_boss_arena:heroic')).toBe(true);
-    expect(boss.lootRecipientIds).not.toContain(tank);
+    // The dead tank's corpse is inside the same claimed instance; #4143 widened
+    // kill participation to the whole claim footprint so the lockout and loot
+    // rights travel together even beyond the overworld party range.
+    expect(boss.lootRecipientIds).toContain(tank);
 
     sim.releaseSpirit(tank);
     enterDungeon(sim.ctx, 'nythraxis_crypt', tank);
 
-    expect(tankEntity.dead).toBe(false);
-    expect(tankEntity.ghost).toBe(false);
+    expect(tankEntity.dead).toBe(true);
+    expect(tankEntity.ghost).toBe(true);
     expect(sim.instanceInfoAt(tankEntity.pos)?.dungeonId).toBe('nythraxis_crypt');
     sim.drainEvents();
 
     enterDungeon(sim.ctx, 'nythraxis_boss_arena', tank);
 
-    expect(sim.instanceInfoAt(tankEntity.pos)?.dungeonId).toBe('nythraxis_crypt');
-    expect(
-      (sim.drainEvents() as any[]).some(
-        (event) =>
-          event.type === 'error' && event.text === 'You are locked to Heroic Nythraxis Raid Arena.',
-      ),
-    ).toBe(true);
+    expect(tankEntity.dead).toBe(false);
+    expect(tankEntity.ghost).toBe(false);
+    expect(sim.instanceInfoAt(tankEntity.pos)?.dungeonId).toBe('nythraxis_boss_arena');
   });
 
   it('keeps a locked ghost out after its defeated heroic claim is freed', () => {
@@ -2964,7 +3018,59 @@ describe('dungeons: raid lockout gate', () => {
     ).toBe(true);
   });
 
-  it('blocks the disband-and-reform bypass: an active reset lock still bars a fresh raid slot under a brand-new party id', () => {
+  it('a raid can switch difficulty again right after a reset: no five-minute cooldown rides a raid claim, the raid lockout is its rate limit', () => {
+    const sim = makeSim();
+    const leader = attunedRaid(sim);
+    const members = sim.partyOf(leader)!.members as number[];
+    for (const m of members) {
+      sim.players.get(m)!.characterId = 700 + m;
+      sim.players.get(m)!.questsDone.add('q_nythraxis_bound_guardian');
+      enterDungeon(sim.ctx, 'nythraxis_boss_arena', m);
+    }
+    for (const m of members) teleport(sim, sim.entities.get(m) as AnyEntity, 0, 0);
+    sim.setDungeonDifficulty('heroic', leader);
+    sim.resetDungeonInstances(leader);
+    const inst = claimedDungeon(sim, 'nythraxis_boss_arena', 'heroic');
+    expect(inst).toBeDefined();
+    // The reported bug: the Normal to Heroic switch stamped the five-minute
+    // reset cooldown on the claim AND on every raid member, so a raid that
+    // bounced off Heroic could not drop back to Normal (or correct a wrong
+    // pick) for five minutes. Raid rooms carry their own daily/weekly
+    // lockout at both tiers (checked above), so the cooldown guarded
+    // nothing there and only stranded the group.
+    expect(inst.resetAvailableAt).toBeLessThanOrEqual(sim.time);
+    for (const m of members) {
+      expect(sim.dungeonResetLocks.has(`char:${700 + m}:nythraxis_boss_arena`)).toBe(false);
+    }
+    expect(sim.dungeonResetLocks.size).toBe(0);
+    sim.setDungeonDifficulty('normal', leader);
+    sim.drainEvents();
+
+    sim.resetDungeonInstances(leader);
+
+    expect(inst.difficulty).toBe('normal');
+    expect(inst.partyKey).not.toBeNull();
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (event) =>
+          event.type === 'error' &&
+          event.pid === leader &&
+          event.text === 'All instances have been reset.',
+      ),
+    ).toBe(true);
+    // Every member walks straight into the fresh Normal claim.
+    for (const m of members) {
+      sim.drainEvents();
+      expect(enterDungeon(sim.ctx, 'nythraxis_boss_arena', m)).toBe(true);
+      expect(
+        (sim.drainEvents() as any[]).some(
+          (event) => event.text === 'Instances can only be reset once every 5 minutes.',
+        ),
+      ).toBe(false);
+    }
+  });
+
+  it('a raid reformed under a fresh party id claims a fresh slot at once, exactly what Reset All now gives it; the daily lockout is what still bars it', () => {
     const sim = makeSim();
     const leader = attunedRaid(sim);
     enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
@@ -2972,12 +3078,6 @@ describe('dungeons: raid lockout gate', () => {
     sim.setDungeonDifficulty('heroic', leader);
     sim.resetDungeonInstances(leader);
 
-    // Every other member leaves, dissolving the raid entirely (down to a
-    // solo leader); re-inviting the same four and reconverting to a raid
-    // reforms under a genuinely fresh (ephemeral) party id. Before this fix
-    // that reform was the ONLY way a raid group could switch difficulty at
-    // all, because a fresh party key claims a brand-new slot with none of
-    // the checks Reset All enforces (issue #3784).
     const others = (sim.partyOf(leader)!.members as number[]).filter((m) => m !== leader);
     for (const m of others) sim.partyLeave(m);
     for (const m of others) {
@@ -2988,20 +3088,33 @@ describe('dungeons: raid lockout gate', () => {
     sim.setDungeonDifficulty('normal', leader);
     sim.drainEvents();
 
-    enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
+    expect(enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader)).toBe(true);
+    expect(claimedDungeon(sim, 'nythraxis_boss_arena', 'normal').partyKey).toBe(
+      instanceKeyFor(sim.ctx, leader),
+    );
 
+    // The reform was never the exploit; a kill's lockout is. With the arena
+    // cleared on Normal today, neither the door nor a reset opens another
+    // Normal claim.
+    teleport(sim, sim.entities.get(leader) as AnyEntity, 0, 0);
+    sim.players.get(leader)!.raidLockouts.set('nythraxis_boss_arena', 999999999);
+    sim.setDungeonDifficulty('heroic', leader);
+    sim.resetDungeonInstances(leader);
+    sim.setDungeonDifficulty('normal', leader);
+    sim.drainEvents();
+    sim.resetDungeonInstances(leader);
+    expect(claimedDungeon(sim, 'nythraxis_boss_arena', 'heroic')).toBeDefined();
     expect(
       (sim.drainEvents() as any[]).some(
         (event) =>
           event.type === 'error' &&
           event.pid === leader &&
-          event.text === 'Instances can only be reset once every 5 minutes.',
+          event.text === 'You are locked to Nythraxis Raid Arena.',
       ),
     ).toBe(true);
-    expect(sim.instanceSlotAt((sim.entities.get(leader) as AnyEntity).pos)).toBeNull();
   });
 
-  it('a fresh recruit inherits the raid claim reset lock on party join, the same way a standard claim already did', () => {
+  it('a fresh recruit joining a raid after a reset inherits no reset lock (there is none to inherit), while a standard-dungeon recruit still inherits one', () => {
     const sim = makeSim();
     const leader = attunedRaid(sim);
     enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
@@ -3013,7 +3126,87 @@ describe('dungeons: raid lockout gate', () => {
     sim.partyInvite(recruit, leader);
     sim.partyAccept(recruit);
 
-    expect(sim.dungeonResetLocks.has('char:601:nythraxis_boss_arena')).toBe(true);
+    expect(sim.dungeonResetLocks.has('char:601:nythraxis_boss_arena')).toBe(false);
+    expect(sim.dungeonResetLocks.size).toBe(0);
+
+    // The standard-dungeon arm is untouched: a solo runner's Hollow Crypt reset
+    // still stamps the lock, and a recruit joining them still inherits it.
+    const solo = sim.addPlayer('mage', 'CryptRunner', { characterId: 602 });
+    enterDungeon(sim.ctx, 'hollow_crypt', solo);
+    teleport(sim, sim.entities.get(solo) as AnyEntity, 0, 0);
+    sim.setDungeonDifficulty('heroic', solo);
+    sim.resetDungeonInstances(solo);
+    expect(sim.dungeonResetLocks.has('char:602:hollow_crypt')).toBe(true);
+    const cryptRecruit = sim.addPlayer('mage', 'CryptJoiner', { characterId: 603 });
+    sim.partyInvite(cryptRecruit, solo);
+    sim.partyAccept(cryptRecruit);
+    expect(sim.dungeonResetLocks.has('char:603:hollow_crypt')).toBe(true);
+    expect(sim.dungeonResetLocks.size).toBe(2);
+  });
+
+  it('one Reset All over a standard claim and a raid claim stamps the cooldown per claim: the crypt pays it, the arena does not', () => {
+    const sim = makeSim();
+    const leader = sim.addPlayer('warrior', 'Lead', { characterId: 650 });
+    while ((sim.partyOf(leader)?.members.length ?? 1) < 5) {
+      const pid = sim.addPlayer('priest', `Fill${sim.players.size}`);
+      sim.partyInvite(pid, leader);
+      sim.partyAccept(pid);
+    }
+    enterDungeon(sim.ctx, 'hollow_crypt', leader);
+    const cryptInst = claimedDungeon(sim, 'hollow_crypt', 'normal');
+    leaveDungeon(sim.ctx, leader);
+    sim.convertPartyToRaid(leader);
+    sim.players.get(leader)!.questsDone.add('q_nythraxis_bound_guardian');
+    enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
+    const arenaInst = claimedDungeon(sim, 'nythraxis_boss_arena', 'normal');
+    teleport(sim, sim.entities.get(leader) as AnyEntity, 0, 0);
+    sim.setDungeonDifficulty('heroic', leader);
+    sim.drainEvents();
+
+    sim.resetDungeonInstances(leader);
+
+    expect(cryptInst.difficulty).toBe('heroic');
+    expect(arenaInst.difficulty).toBe('heroic');
+    // Same call, two verdicts: the five-man claim keeps its five-minute
+    // cooldown and member locks (the free-boss-respawn guard it exists for),
+    // the raid claim carries none.
+    expect(cryptInst.resetAvailableAt).toBeGreaterThan(sim.time);
+    expect(arenaInst.resetAvailableAt).toBeLessThanOrEqual(sim.time);
+    expect(sim.dungeonResetLocks.has('char:650:hollow_crypt')).toBe(true);
+    expect(sim.dungeonResetLocks.has('char:650:nythraxis_boss_arena')).toBe(false);
+    expect([...sim.dungeonResetLocks.keys()].every((key) => key.endsWith(':hollow_crypt'))).toBe(
+      true,
+    );
+  });
+
+  it('the Ignivar chain switches tier and back without the five-minute cooldown (the lift, its one reclaimed room, carries none)', () => {
+    const sim = makeSim();
+    const leader = attunedRaid(sim);
+    const members = sim.partyOf(leader)!.members as number[];
+    for (const m of members) {
+      sim.players.get(m)!.characterId = 800 + m;
+      expect(enterDungeon(sim.ctx, 'ignivar_forge_lift', m)).toBe(true);
+    }
+    for (const m of members) teleport(sim, sim.entities.get(m) as AnyEntity, 0, 0);
+    sim.setDungeonDifficulty('heroic', leader);
+    sim.resetDungeonInstances(leader);
+    const lift = claimedDungeon(sim, 'ignivar_forge_lift', 'heroic');
+    expect(lift).toBeDefined();
+    expect(lift.resetAvailableAt).toBeLessThanOrEqual(sim.time);
+    expect(sim.dungeonResetLocks.size).toBe(0);
+    sim.setDungeonDifficulty('normal', leader);
+    sim.drainEvents();
+
+    sim.resetDungeonInstances(leader);
+
+    expect(lift.difficulty).toBe('normal');
+    expect(lift.partyKey).toBe(instanceKeyFor(sim.ctx, leader));
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (event) => event.pid === leader && event.text === 'All instances have been reset.',
+      ),
+    ).toBe(true);
+    for (const m of members) expect(enterDungeon(sim.ctx, 'ignivar_forge_lift', m)).toBe(true);
   });
 
   it('Reset All Instances is atomic across everything the key owns: a raid claim can block resetting an unrelated standard dungeon claim held under the same party', () => {

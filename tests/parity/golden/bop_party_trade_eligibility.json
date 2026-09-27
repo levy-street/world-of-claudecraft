@@ -9,13 +9,13 @@
     "class:warrior",
     "class:mage"
   ],
-  "draws": 7,
-  "drawDigest": "284731db",
+  "draws": 8,
+  "drawDigest": "5b236bae",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1006,
+      "nextId": 1010,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -29,12 +29,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1009,
-      "state": "69a38adb",
+      "nextId": 1013,
+      "state": "2774bab6",
       "events": "741638a5",
       "rng": {
-        "draws": 7,
-        "digest": "284731db"
+        "draws": 8,
+        "digest": "5b236bae"
       },
       "label": "loot-identity-captured",
       "players": [
@@ -75,18 +75,20 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gathererIdentity": {
             "id": 101,
             "kind": "character"
           },
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -111,6 +113,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -150,17 +153,19 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gathererIdentity": {
             "id": 102,
             "kind": "character"
           },
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -189,6 +194,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -204,7 +210,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -218,7 +224,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1006,
+          "id": 1010,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -269,7 +275,7 @@
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 54,
-          "id": 1007,
+          "id": 1011,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -319,7 +325,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 120000,
-          "id": 1008,
+          "id": 1012,
           "kind": "mob",
           "level": 20,
           "loot": {
@@ -331,7 +337,7 @@
               },
               {
                 "count": 1,
-                "itemId": "cinderfang_kris"
+                "itemId": "molten_fletching"
               },
               {
                 "count": 1,
@@ -359,8 +365,8 @@
             ]
           },
           "lootRecipientIds": [
-            1006,
-            1007
+            1010,
+            1011
           ],
           "lootable": true,
           "maxHp": 120000,
@@ -394,12 +400,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1009,
-      "state": "9174a945",
-      "events": "397551ea",
+      "nextId": 1013,
+      "state": "3c58254e",
+      "events": "31e5d163",
       "rng": {
-        "draws": 7,
-        "digest": "284731db"
+        "draws": 8,
+        "digest": "5b236bae"
       },
       "label": "leaver-remains-eligible",
       "players": [
@@ -444,18 +450,20 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gathererIdentity": {
             "id": 101,
             "kind": "character"
           },
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -497,6 +505,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -536,17 +545,19 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gathererIdentity": {
             "id": 102,
             "kind": "character"
           },
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -576,6 +587,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -591,7 +603,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -605,7 +617,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1006,
+          "id": 1010,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -656,7 +668,7 @@
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 54,
-          "id": 1007,
+          "id": 1011,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -706,7 +718,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 120000,
-          "id": 1008,
+          "id": 1012,
           "kind": "mob",
           "level": 20,
           "loot": {
@@ -718,7 +730,7 @@
               },
               {
                 "count": 1,
-                "itemId": "cinderfang_kris"
+                "itemId": "molten_fletching"
               },
               {
                 "count": 1,
@@ -746,8 +758,8 @@
             ]
           },
           "lootRecipientIds": [
-            1006,
-            1007
+            1010,
+            1011
           ],
           "lootable": true,
           "maxHp": 120000,
@@ -781,12 +793,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1009,
-      "state": "9174a945",
+      "nextId": 1013,
+      "state": "3c58254e",
       "events": "741638a5",
       "rng": {
-        "draws": 7,
-        "digest": "284731db"
+        "draws": 8,
+        "digest": "5b236bae"
       },
       "label": "final",
       "players": [
@@ -831,18 +843,20 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gathererIdentity": {
             "id": 101,
             "kind": "character"
           },
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -884,6 +898,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -923,17 +938,19 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gathererIdentity": {
             "id": 102,
             "kind": "character"
           },
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -963,6 +980,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -978,7 +996,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -992,7 +1010,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1006,
+          "id": 1010,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1043,7 +1061,7 @@
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 54,
-          "id": 1007,
+          "id": 1011,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1093,7 +1111,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 120000,
-          "id": 1008,
+          "id": 1012,
           "kind": "mob",
           "level": 20,
           "loot": {
@@ -1105,7 +1123,7 @@
               },
               {
                 "count": 1,
-                "itemId": "cinderfang_kris"
+                "itemId": "molten_fletching"
               },
               {
                 "count": 1,
@@ -1133,8 +1151,8 @@
             ]
           },
           "lootRecipientIds": [
-            1006,
-            1007
+            1010,
+            1011
           ],
           "lootable": true,
           "maxHp": 120000,

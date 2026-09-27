@@ -26,6 +26,7 @@
 // (enforced by tests/architecture.test.ts).
 
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
+import { worldPvpOnPlayerAided } from '../pvp';
 import type { SimContext } from '../sim_context';
 import { addThreat, HEAL_THREAT_FACTOR } from '../threat';
 import type { Entity } from '../types';
@@ -38,6 +39,7 @@ import {
 } from './paladin_beacon';
 import { paladinHealingDoneMultiplier } from './paladin_support';
 import { onSpellCrit } from './talent_procs';
+import { onTrinketHeal } from './trinkets';
 
 // Combined incoming-healing multiplier from Mortal Wound debuffs (classic
 // Mortal Strike): each reduces healing the target receives; multiple stack
@@ -152,6 +154,8 @@ export function applyHeal(
   if (abilityId !== 'enchant_weapon_lastflame_zeal') {
     onCraftedCollectionHeal(ctx, source, target, overheal);
   }
+  if (!alreadyResolved)
+    onTrinketHeal(ctx, source, target, healed, overheal, ability, canTriggerWeaponProcs);
   ctx.emit({
     type: 'heal2',
     sourceId: source.id,
@@ -167,7 +171,13 @@ export function applyHeal(
   // ally helps land pays the healer an assist. Only healing that actually
   // landed counts (a fully overhealed or absorbed cast is not support), and the
   // battleground module owns every other rule.
-  if (healed > 0 && target.kind === 'player') ctx.bgOnPlayerHealed(target, source);
+  if (healed > 0 && target.kind === 'player') {
+    ctx.bgOnPlayerHealed(target, source);
+    // World PvP: healing a flagged ally is aid, support for the kills they land
+    // and a flag on an unflagged healer mid-fight (src/sim/pvp/world_pvp.ts
+    // owns the flag and window rules; shields and buffs take the same hook).
+    worldPvpOnPlayerAided(ctx, target, source);
+  }
   // Talent procs listening for critical heals (deterministic, no rng draw).
   if (crit && source.kind === 'player') onSpellCrit(ctx, source, abilityId, target);
   // Legendary on-heal weapon procs (e.g. Deathless Heartwood's Lifebloom). No-op

@@ -48,6 +48,22 @@ const CUSTOM_STRIDE_MOUNTS = MOUNT_AUDIO_KEYS.filter(
 // legitimately absent cannot index it directly. Widen it for the lookups that
 // are allowed to miss.
 const CLIPS_BY_KEY: Partial<Record<string, SfxEntry>> = SFX_CLIPS;
+/** Mounts whose gait beat is a VARIANT POOL rather than a single take, so the
+ *  clip rotates per stride instead of repeating like a metronome. The manifest
+ *  entry for one of these points at its FIRST take, so the shipped filename
+ *  carries a _1 suffix and the pool numbers up from there. */
+const MOUNT_GAIT_VARIANTS: Partial<Record<string, number>> = { avian_strider: 6 };
+/** Mirrors sfx.ts's private assetCacheKey: take 1 is cached under the bare
+ *  key, the rest of the pool under `key:N`. */
+function assetCacheKey(key: string, variantIndex: number): string {
+  return variantIndex === 0 ? key : `${key}:${variantIndex}`;
+}
+/** Every gait file a mount ships: the one take, or its whole numbered pool. */
+function gaitTakeNames(mountKey: string): string[] {
+  const variants = MOUNT_GAIT_VARIANTS[mountKey];
+  if (!variants) return [`mount_run_${mountKey}.mp3`];
+  return Array.from({ length: variants }, (_, i) => `mount_run_${mountKey}_${i + 1}.mp3`);
+}
 
 const sources: FakeSource[] = [];
 let nowT = 0;
@@ -180,7 +196,15 @@ beforeEach(() => {
   const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
   buffers.set('foot_grass', { duration: 0.48 });
   for (const [index, mountKey] of CUSTOM_STRIDE_MOUNTS.entries()) {
-    buffers.set(`mount_run_${mountKey}`, { duration: 0.5 + index / 100 });
+    // Seed the WHOLE pool for a variant-gait mount: the rotation may answer
+    // with any take, and an unseeded one plays nothing at all rather than
+    // failing loudly, which reads downstream as the previous mount's source.
+    const variants = MOUNT_GAIT_VARIANTS[mountKey] ?? 1;
+    for (let take = 0; take < variants; take++) {
+      buffers.set(assetCacheKey(`mount_run_${mountKey}`, take), {
+        duration: 0.5 + index / 100 + take / 1000,
+      });
+    }
   }
   buffers.set('foot_wood', WOOD_BUFFER);
   buffers.set('impact_shadow', { duration: 0.7 });
@@ -478,8 +502,11 @@ describe('mount running audio', () => {
         loop: ENGINE_LOOP_MOUNTS.has(mountKey),
         spatial: true,
       });
+      // A variant-pool mount's entry points at its first take, so the
+      // filename carries the _1 suffix.
+      const suffix = MOUNT_GAIT_VARIANTS[mountKey] ? '_1' : '';
       expect(entry?.url).toMatch(
-        new RegExp(`^/audio/sfx/mount_run_${mountKey}\\.mp3\\?v=[0-9a-f]{12}$`),
+        new RegExp(`^/audio/sfx/mount_run_${mountKey}${suffix}\\.mp3\\?v=[0-9a-f]{12}$`),
       );
     }
   });
@@ -511,7 +538,7 @@ describe('mount running audio', () => {
     // with the RETIRED_MOUNT_SKIN_IDS entry.
     const expected = [...CUSTOM_STRIDE_MOUNTS, ...RETIRED_MOUNT_SKIN_IDS]
       .flatMap((mountKey) => [
-        `mount_run_${mountKey}.mp3`,
+        ...gaitTakeNames(mountKey),
         ...(ENGINE_MOUNT_EXTRA_SUFFIXES[mountKey] ?? []).map(
           (suffix) => `mount_run_${mountKey}${suffix}.mp3`,
         ),
@@ -538,7 +565,17 @@ describe('mount running audio', () => {
       nowT += 0.5;
       sfx.mountRun(0, 0, 0, mountKey, 'grass', true);
       const src = sources.at(-1)!;
-      expect(src.buffer).toBe(buffers.get(`mount_run_${mountKey}`));
+      // A variant-pool mount answers with ONE OF its takes (which one is the
+      // rotation's business), so the pin is membership, not a single buffer.
+      const variants = MOUNT_GAIT_VARIANTS[mountKey];
+      if (variants) {
+        const pool = Array.from({ length: variants }, (_, i) =>
+          buffers.get(assetCacheKey(`mount_run_${mountKey}`, i)),
+        );
+        expect(pool).toContain(src.buffer);
+      } else {
+        expect(src.buffer).toBe(buffers.get(`mount_run_${mountKey}`));
+      }
       played.add(src.buffer);
     }
 

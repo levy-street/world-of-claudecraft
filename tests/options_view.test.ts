@@ -1,11 +1,15 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   GRAPHICS_REBUILD_KEYS,
   normalizeGraphicsSettingsSnapshot,
 } from '../src/game/graphics_rebuild_core';
 import { BOOL_SETTINGS, SETTING_RANGES } from '../src/game/settings';
+import { shaderWarmChoiceAvailable } from '../src/render/shader_warm_client';
 import { AURA_TRACKS } from '../src/ui/hud/aura_tracks';
 import {
+  actionCamShoulderReadout,
   boolToggleNextValue,
   buildAudioControls,
   buildBugReportInfo,
@@ -14,6 +18,7 @@ import {
   buildGraphicsSections,
   buildInterfaceControls,
   buildOptionsMenu,
+  buildOverlaysMenu,
   copyGraphicsDraft,
   flattenGraphicsSections,
   graphicsDraftDirty,
@@ -25,6 +30,7 @@ import {
   type OptionsEnv,
   type OptionsSettingsSource,
   optionsControlKeys,
+  optionsParentView,
   sliderDispatchValue,
   toggleIsOn,
   toggleNextValue,
@@ -88,6 +94,47 @@ describe('options_view: control primitive dispatch (cluster 1)', () => {
     expect(boolToggleNextValue(false)).toBe(true);
   });
 
+  it('Action Cam shows its shoulder slider only while it is on', () => {
+    const env: OptionsEnv = { touch: false, nativeShell: false };
+    const off = buildGraphicsControls(makeSource(), env);
+    expect(find(off, 'actionCam')).toMatchObject({
+      control: 'boolToggle',
+      on: false,
+      rerender: true,
+    });
+    expect(find(off, 'actionCamShoulder')).toBeUndefined();
+
+    const src = makeSource({ actionCamShoulder: -0.4 }, { actionCam: true });
+    const on = keysOf(buildGraphicsControls(src, env));
+    expect(on[on.indexOf('actionCam') + 1]).toBe('actionCamShoulder');
+    // Full left through center to full right, on the shoulder readout.
+    expect(find(buildGraphicsControls(src, env), 'actionCamShoulder')).toMatchObject({
+      control: 'slider',
+      min: -1,
+      max: 1,
+      value: -0.4,
+      fmt: 'shoulder',
+    });
+    expect(SETTING_RANGES.actionCamShoulder).toMatchObject({ min: -1, max: 1, def: 1 });
+    expect(BOOL_SETTINGS.actionCam.def).toBe(false);
+  });
+
+  it('the shoulder readout names the side and its strength, or Center', () => {
+    expect(actionCamShoulderReadout(-1)).toEqual({
+      key: 'hudChrome.options.actionCamShoulderLeft',
+      pct: 1,
+    });
+    expect(actionCamShoulderReadout(0.6)).toEqual({
+      key: 'hudChrome.options.actionCamShoulderRight',
+      pct: 0.6,
+    });
+    expect(actionCamShoulderReadout(0)).toEqual({
+      key: 'hudChrome.options.actionCamShoulderCenter',
+      pct: 0,
+    });
+    expect(actionCamShoulderReadout(0.01).key).toBe('hudChrome.options.actionCamShoulderCenter');
+  });
+
   it('a slider descriptor carries the live value, range, step and format', () => {
     const controls = buildGraphicsControls(makeSource({ cameraSpeed: 0.9, cameraFov: 75 }), {
       touch: false,
@@ -109,7 +156,7 @@ describe('options_view: control primitive dispatch (cluster 1)', () => {
 // native-shell gating preserved; the preset + interfaceMode choices re-render.
 // ---------------------------------------------------------------------------
 describe('options_view: graphics dispatch matrix (cluster 3)', () => {
-  it('stages exactly the twelve renderer-bound settings over the live projection', () => {
+  it('stages exactly the renderer-bound settings over the live projection', () => {
     expect(GRAPHICS_REBUILD_KEYS).toEqual([
       'graphicsPreset',
       'terrainDetail',
@@ -125,6 +172,7 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       'characterDetail',
       'dynamicLights',
       'particleEffects',
+      'ghostFade',
     ]);
     const live = makeSource({ graphicsPreset: 2, terrainDetail: 0, renderScale: 0.75 });
     const draft = normalizeGraphicsSettingsSnapshot({ graphicsPreset: 5, terrainDetail: 2 });
@@ -176,6 +224,7 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       'viewDistance',
       'waterQuality',
       'characterDetail',
+      'ghostFade',
       // Lighting & Effects card: the light and post passes.
       'effectsQuality',
       'shadowQuality',
@@ -185,8 +234,10 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       'dynamicLights',
       'particleEffects',
       'note:hudChrome.options.gfxEffectsNote',
-      // Camera card (column 2 under Lighting).
+      // Camera card (column 2 under Lighting). The Action Cam shoulder picker
+      // only joins while Action Cam is on (off in this source).
       'cameraSpeed',
+      'actionCam',
       // Display card (full width).
       'renderScale',
       'brightness',
@@ -200,10 +251,48 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       // System card (full width).
       'browserEffects',
       'note:hudChrome.options.browserEffectsNote',
+      'frameRateCap',
+      'note:hudChrome.options.frameRateCapNote',
       'shaderWarm',
       'note:hudChrome.options.shaderWarmNote',
       'interfaceMode',
       'note:hudChrome.options.interfaceModeNote',
+    ]);
+  });
+
+  it('states under the frame rate limit what it really does on this display', () => {
+    const capRow = (reading: ReturnType<NonNullable<OptionsEnv['frameRateCapReadingFor']>>) => {
+      const seen: number[] = [];
+      const row = flattenGraphicsSections(
+        buildGraphicsSections(makeSource({ graphicsPreset: 4, frameRateCap: 3 }), {
+          ...WEB_ENV,
+          frameRateCapReadingFor: (value) => {
+            seen.push(value);
+            return reading;
+          },
+        }),
+      ).find((c) => c.control === 'choice' && c.key === 'frameRateCap');
+      expect(seen).toEqual([3]);
+      if (row?.control !== 'choice') throw new Error('no frame rate limit row');
+      return row;
+    };
+    const paced = capRow({ kind: 'paced', fps: 36, refreshHz: 144 });
+    expect(paced.statusKey).toBe('hudChrome.options.frameRateCapStatusPaced');
+    expect(paced.statusNumbers).toEqual({ fps: 36, hz: 144 });
+    expect(paced.rerender).toBe(true);
+    const unpaced = capRow({ kind: 'unpaced', fps: 30 });
+    expect(unpaced.statusKey).toBe('hudChrome.options.frameRateCapStatusUnpaced');
+    expect(unpaced.statusNumbers).toEqual({ fps: 30 });
+    expect(capRow({ kind: 'inert' }).statusKey).toBe('hudChrome.options.frameRateCapStatusInert');
+    expect(capRow({ kind: 'none' }).statusKey).toBeUndefined();
+    // The stored value each label stands for is what the game resolves
+    // (src/game/frame_rate_cap_setting.ts FRAME_RATE_CAP_VALUES): a swap here
+    // would make the 60 button ask for 30.
+    expect(capRow({ kind: 'none' }).options).toEqual([
+      { value: 0, labelKey: 'hudChrome.options.frameRateCapAuto' },
+      { value: 1, labelKey: 'hudChrome.options.frameRateCapDisplay' },
+      { value: 2, labelKey: 'hudChrome.options.frameRateCapSixty' },
+      { value: 3, labelKey: 'hudChrome.options.frameRateCapThirty' },
     ]);
   });
 
@@ -466,6 +555,16 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       'hudChrome.options.gpuBackendActive',
     );
     expect(settled?.control === 'choice' && settled.statusAlert).toBeUndefined();
+  });
+
+  it('asks the worker client whether the row is offered, at the one place the window builds it', () => {
+    // The view shows the row when the flag is absent, so the window's call
+    // site is what withdraws it: a dropped or hard-coded prop would bring the
+    // row back with every other suite green.
+    const source = readFileSync(join(__dirname, '../src/ui/options_window.ts'), 'utf8');
+    expect(source.match(/shaderWarmChoice:/g)).toHaveLength(1);
+    expect(source).toContain('shaderWarmChoice: shaderWarmChoiceAvailable(),');
+    expect(shaderWarmChoiceAvailable()).toBe(false);
   });
 
   it('drops the shader warm-up worker row and its note where the worker is forced off', () => {
@@ -759,10 +858,14 @@ describe('options_view: optionsControlKeys (issue 2341 scoped reset)', () => {
 // interfaceControlsForTab(all, tab) must return exactly these, in order; the
 // concatenation (in INTERFACE_TAB_ORDER) is the whole deduped list.
 const GENERAL_KEYS = [
+  'playerFrameHealthText',
+  'targetFrameHealthText',
+  'uiScale',
   'hudOpacity',
   'tooltipScale',
   'frostedPanels',
   'highContrastText',
+  'colorblindMode',
   'reduceMotion',
   'invertLookY',
   'landingHighContrast',
@@ -781,7 +884,9 @@ const GENERAL_KEYS = [
   'note:hudChrome.options.confirmVendorSellMinQualityNote',
 ];
 const FRAMES_KEYS = [
+  'mouseoverCast',
   'partyFrameStyle',
+  'showPetFrame',
   // partyFrameWidth/Height have no rows (Edit Frames drags them directly);
   // partyFrameColumns and partyFrameSpacing moved into the in-editor Frames
   // Settings dropdown.
@@ -792,14 +897,13 @@ const FRAMES_KEYS = [
   'partyFrameShowAuras',
   'partyFrameShowPets',
   'partyFrameShowSelf',
-  'playerFrameHealthText',
-  'targetFrameHealthText',
   'aurasOnPlayerFrame',
   'auraBarBelowFrame',
+  'targetAurasBelowFrame',
   'alwaysShowAllBuffs',
+  'showAuraCaster',
   'showTargetOfTarget',
   'showTargetSwingTimer',
-  'showPetFrame',
 ];
 const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat', 'filterProfanity'];
 const COMBAT_KEYS = [
@@ -862,14 +966,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     ]);
     // the redundant partyFrames.section note is gone now that Frames is its own tab
     expect(keysOf(controls)).not.toContain('note:hudChrome.partyFrames.section');
-    expect(find(controls, 'partyFrameStyle')).toMatchObject({
-      control: 'choice',
-      options: [
-        { value: 0, labelKey: 'hudChrome.partyFrames.styleAutomatic' },
-        { value: 1, labelKey: 'hudChrome.partyFrames.styleClassic' },
-        { value: 2, labelKey: 'hudChrome.partyFrames.styleRaid' },
-      ],
-    });
+    expect(keysOf(controls)).toContain('partyFrameStyle');
     expect(find(controls, 'reduceMotion')).toMatchObject({ control: 'boolToggle' });
     // The sticky-target opt-in renders in the Combat tab with its label key, so
     // the toggle cannot silently drop out of the options window.
@@ -901,6 +998,28 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       });
     }
     expect(BOOL_SETTINGS.showUtilityModes).toEqual({ def: true });
+  });
+
+  it('shows the live mouseover-cast switch in Interface > Frames', () => {
+    const controls = buildInterfaceControls(makeSource({}, { mouseoverCast: true }));
+    const frames = interfaceControlsForTab(controls, 'frames');
+    expect(find(frames, 'mouseoverCast')).toMatchObject({
+      control: 'boolToggle',
+      category: 'frames',
+      labelKey: 'hudChrome.options.mouseoverCast',
+      on: true,
+    });
+    expect(optionsControlKeys(frames)).toContain('mouseoverCast');
+    expect(
+      find(
+        interfaceControlsForTab(
+          buildInterfaceControls(makeSource({}, { mouseoverCast: false })),
+          'frames',
+        ),
+        'mouseoverCast',
+      ),
+    ).toMatchObject({ control: 'boolToggle', on: false });
+    expect(find(interfaceControlsForTab(controls, 'combat'), 'mouseoverCast')).toBeUndefined();
   });
 
   it('renders NO menu rows for the optional action bars (the on-bar toggle owns them)', () => {
@@ -1118,12 +1237,29 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     expect(find(off, 'auraBarBelowFrame')).toMatchObject({ control: 'boolToggle', on: false });
   });
 
-  it('renders NO uiScale row (owner request); the comfort sliders stay live', () => {
+  // The target strip's side is the player's own choice, ungated (the strip is
+  // always anchored to the target frame, unlike the player buff row).
+  it('offers the target-auras-below toggle ungated and reads the stored choice through', () => {
+    expect(find(buildInterfaceControls(makeSource()), 'targetAurasBelowFrame')).toMatchObject({
+      control: 'boolToggle',
+      on: false,
+    });
+    expect(find(buildInterfaceControls(makeSource()), 'targetAurasBelowFrame')).not.toHaveProperty(
+      'disabled',
+      true,
+    );
+    const on = buildInterfaceControls(makeSource({}, { targetAurasBelowFrame: true }));
+    expect(find(on, 'targetAurasBelowFrame')).toMatchObject({ control: 'boolToggle', on: true });
+  });
+
+  it('offers global scale from 75 to 200 percent, committing on release', () => {
     const controls = buildInterfaceControls(makeSource());
-    // The UI Scale slider is retired from the menu: the stored setting still
-    // applies at boot and the General tab's Reset to Defaults still clears it
-    // (renderInterface's off-menu key list).
-    expect(find(controls, 'uiScale')).toBeUndefined();
+    expect(find(controls, 'uiScale')).toMatchObject({
+      control: 'slider',
+      min: 0.75,
+      max: 2,
+      commitOnChange: true,
+    });
     // Sibling sliders keep their live preview (no commitOnChange flag).
     expect(find(controls, 'chatFontScale')).not.toHaveProperty('commitOnChange');
     expect(find(controls, 'tooltipScale')).not.toHaveProperty('commitOnChange');
@@ -1219,8 +1355,8 @@ describe('options_view: interface tab taxonomy', () => {
   });
 
   it('renders NO menu rows for the settings the Frames Settings dropdown owns', () => {
-    // combineActionBars / hideUnusedActionSlots / mouseoverCast /
-    // lockActionBars moved into the edit mode's Frames Settings dropdown
+    // combineActionBars / hideUnusedActionSlots / lockActionBars
+    // live in the edit mode's Frames Settings dropdown
     // (interface_unlock.ts settingToggles); a duplicate row here would drift
     // out of sync with it. The frame-scale sliders are likewise gone: Edit
     // Frames resizes each frame directly. The settings keys all remain.
@@ -1228,7 +1364,6 @@ describe('options_view: interface tab taxonomy', () => {
     for (const key of [
       'combineActionBars',
       'hideUnusedActionSlots',
-      'mouseoverCast',
       'lockActionBars',
       'playerFrameScale',
       'targetFrameScale',
@@ -1260,9 +1395,8 @@ describe('options_view: main menu routing', () => {
       'hudChrome.controller.title',
       'hud.options.graphics',
       'hud.options.interface',
-      'hudChrome.auraOverlay.title',
+      'hudChrome.options.overlays',
       'hud.options.audio',
-      'hudChrome.perf.title',
       'hudChrome.fullTransfer.menu',
       'nav.wiki',
       'hudChrome.unstuck.menuButton',
@@ -1276,10 +1410,14 @@ describe('options_view: main menu routing', () => {
     const interfaceRows = offline.filter((e) => e.labelKey === 'hud.options.interface');
     expect(interfaceRows).toHaveLength(1);
     expect(interfaceRows[0].action).toEqual({ kind: 'goto', view: 'interface' });
-    expect(offline.find((e) => e.labelKey === 'hudChrome.auraOverlay.title')?.action).toEqual({
+    // The three on-screen overlay panels sit one level down, behind one row.
+    expect(offline.find((e) => e.labelKey === 'hudChrome.options.overlays')?.action).toEqual({
       kind: 'goto',
-      view: 'auras',
+      view: 'overlays',
     });
+    for (const view of ['auras', 'cooldowns', 'performance']) {
+      expect(offline.some((e) => e.action.kind === 'goto' && e.action.view === view)).toBe(false);
+    }
     // The Wiki row is unconditional (offline play has a wiki too) and routes to
     // the confirm-first external hop, never a sub-view.
     const wikiRows = offline.filter((e) => e.labelKey === 'nav.wiki');
@@ -1290,6 +1428,24 @@ describe('options_view: main menu routing', () => {
       kind: 'goto',
       view: 'transfer',
     });
+  });
+
+  it('the Overlays list routes to Auras, Cooldown Manager and Performance, in that order', () => {
+    expect(buildOverlaysMenu()).toEqual([
+      { labelKey: 'hudChrome.auraOverlay.title', action: { kind: 'goto', view: 'auras' } },
+      { labelKey: 'hudChrome.cooldownManager.title', action: { kind: 'goto', view: 'cooldowns' } },
+      { labelKey: 'hudChrome.perf.title', action: { kind: 'goto', view: 'performance' } },
+    ]);
+  });
+
+  it('Back from an overlay panel lands on Overlays; from anything else, the Game Menu', () => {
+    for (const view of ['auras', 'cooldowns', 'performance'] as const) {
+      expect(optionsParentView(view)).toBe('overlays');
+    }
+    for (const view of ['overlays', 'interface', 'graphics', 'keybinds', 'transfer'] as const) {
+      expect(optionsParentView(view)).toBe('main');
+    }
+    expect(optionsParentView('main')).toBe('main');
   });
 
   it('leads with Unlock Interface, relabelled Lock Interface while the frames are loose', () => {
@@ -1326,6 +1482,22 @@ describe('options_view: main menu routing', () => {
       expect(touch[0]?.labelKey).toBe('hud.options.keyBindings');
       expect(touch).toEqual(locked.slice(1));
     }
+  });
+
+  it('carries NO System Report row: it is a section inside the Performance view', () => {
+    // The owner's decision: the feature was a whole menu row and a whole
+    // sub-panel, which was more room than it deserves. Performance now sits
+    // under Overlays, as that list's last row, with nothing after it; and the
+    // Game Menu root carries no System Report row either.
+    const rows = buildOptionsMenu({ ...DESKTOP_MENU, bugReportAvailable: true });
+    const overlays = buildOverlaysMenu();
+    for (const list of [rows, overlays]) {
+      expect(list.some((e) => e.labelKey === 'hudChrome.hostDiag.title')).toBe(false);
+    }
+    expect(overlays.at(-1)).toEqual({
+      labelKey: 'hudChrome.perf.title',
+      action: { kind: 'goto', view: 'performance' },
+    });
   });
 
   it('adds the online-only Report a Bug row when bug reporting is available', () => {

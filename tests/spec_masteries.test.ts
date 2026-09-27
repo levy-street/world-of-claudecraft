@@ -117,7 +117,7 @@ describe('spec masteries', () => {
     // on the warrior), and without a stamina multiplier Faithwarden sat at 76% of
     // the prot warrior's effective HP.
     expect(TALENTS.paladin?.specs.find((s) => s.id === 'protection')?.mastery.effect).toEqual({
-      global: { threatPct: 0.4 },
+      global: { threatPct: 1.0 },
       stats: { armorPct: 0.2, staPct: 0.35 },
     });
     expect(TALENTS.paladin?.specs.find((s) => s.id === 'retribution')?.mastery.effect).toEqual({
@@ -485,11 +485,11 @@ describe('spec masteries', () => {
       warrior: {
         arms: { global: 'masteryTwoHandDmgPct', value: 0.1 },
         fury: { stat: 'crit', value: 0.05 },
-        prot: { global: 'threatPct', value: 0.8 },
+        prot: { global: 'threatPct', value: 1.1 },
       },
       paladin: {
         holy: { global: 'critDmgHealPct', value: 0.5 },
-        protection: { global: 'threatPct', value: 0.4 },
+        protection: { global: 'threatPct', value: 1.0 },
         retribution: { global: 'meleeDmgPct', value: 0.2 },
       },
       hunter: {

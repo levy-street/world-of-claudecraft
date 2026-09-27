@@ -162,12 +162,16 @@ export function applyCooldowns(
           rechargeLength: state.rechargeLength,
           // Parallel per-charge timers survive the relog whole; a legacy save
           // without them converts on the first recharge tick (combat/auras.ts).
+          // At most one timer per missing charge: a save taken while a reset
+          // left extras running (the pre-fix Winter's Recall) sheds them here,
+          // keeping the soonest.
           ...(state.recharges
             ? {
                 recharges: state.recharges
                   .filter((t) => positive(t))
                   .map((t) => Math.min(t, state.rechargeLength))
-                  .sort((a, b) => a - b),
+                  .sort((a, b) => a - b)
+                  .slice(0, state.maxCharges - state.charges),
               }
             : {}),
         };

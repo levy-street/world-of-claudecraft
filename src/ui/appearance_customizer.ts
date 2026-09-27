@@ -49,8 +49,8 @@ import {
   type MouthStyle,
   normalizeAppearance,
   OUTFIT_COLORWAY_IDS,
-  type OutfitColorway,
   outfitSwatchHexes,
+  type PlayerOutfitColorway,
   randomizeAppearance,
   SHADOW_SHADES,
   type ShadowShade,
@@ -100,7 +100,7 @@ const HAIR_LABEL: Record<HairStyle, TranslationKey> = {
   fantasybraid: 'auth.hairFantasybraid',
 };
 
-const OUTFIT_LABEL: Record<OutfitColorway, TranslationKey> = {
+const OUTFIT_LABEL: Record<PlayerOutfitColorway, TranslationKey> = {
   classic: 'auth.outfitClassic',
   crimson: 'auth.outfitCrimson',
   ember: 'auth.outfitEmber',
@@ -1203,13 +1203,15 @@ export function mountAppearanceCustomizer(
   // in creation), so the same "crimson" chip leans knight-red on a knight and
   // dyes through the druid's leaf band on a druid.
   const armorSetNow = () => opts.armorSet?.() ?? 'knight';
-  swatches<OutfitColorway>(
+  swatches<PlayerOutfitColorway>(
     pStyle,
     'auth.outfit',
     OUTFIT_COLORWAY_IDS,
     (c) => outfitSwatchHexes(armorSetNow(), c),
     (c) => OUTFIT_LABEL[c],
-    () => value.outfit,
+    // a player look is normalized against OUTFIT_COLORWAY_IDS, so it never holds an
+    // NPC-only colorway
+    () => value.outfit as PlayerOutfitColorway,
     (c) => {
       value = { ...value, outfit: c };
     },

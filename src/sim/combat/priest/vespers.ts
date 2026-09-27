@@ -1,4 +1,5 @@
 import { VESPERASH_4PC_MANA_RETURN_MULT } from '../../content/ignivar_set_bonuses';
+import { VANGUARD_SHADOW_2PC_SLOW_MULT } from '../../content/vanguard_set_bonuses_a';
 import type { PlayerMeta, ResolvedAbility } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { type Aura, dist2d, type Entity } from '../../types';
@@ -385,4 +386,48 @@ export function cleanupVespers(ctx: SimContext, priestId: number): void {
     }
   }
   dismissOwnedGuardians(ctx, priestId);
+}
+
+/** Duskhymn Regalia 2pc (Warfare Season 2): Litany of Woe slows its target
+ *  while the priest channels it. The single-target channel path resolves
+ *  only its tick rows (casting_lifecycle applyChannelTick), so the slow is
+ *  applied here at the channel start for the channel's full length and
+ *  stripped at the channel's end (completion or cancel), which also covers a
+ *  pushback-shortened channel. Draws no rng. */
+export const DUSKHYMN_SLOW_AURA_ID = 'vanguard_duskhymn_slow';
+const LITANY_OF_WOE_ID = 'mind_flay';
+
+export function duskhymnChannelStart(
+  ctx: SimContext,
+  priest: Entity,
+  abilityId: string,
+  target: Entity | null,
+  channelDuration: number,
+): void {
+  if (abilityId !== LITANY_OF_WOE_ID || !target || target.dead) return;
+  if (!wearsSetBonus(ctx, priest, 'vanguard_priest_shadow', 2)) return;
+  ctx.applyAura(target, {
+    id: DUSKHYMN_SLOW_AURA_ID,
+    name: 'Litany of Woe',
+    kind: 'slow',
+    remaining: channelDuration,
+    duration: channelDuration,
+    value: VANGUARD_SHADOW_2PC_SLOW_MULT,
+    sourceId: priest.id,
+    school: 'shadow',
+  });
+}
+
+/** Strips the channel slow when the priest's Litany of Woe stops. Reads the
+ *  cast state BEFORE the caller clears it. */
+export function duskhymnChannelStopped(ctx: SimContext, priest: Entity): void {
+  if (priest.castingAbility !== LITANY_OF_WOE_ID || priest.castTargetId === null) return;
+  const target = ctx.entities.get(priest.castTargetId);
+  if (!target) return;
+  const index = target.auras.findIndex(
+    (aura) => aura.id === DUSKHYMN_SLOW_AURA_ID && aura.sourceId === priest.id,
+  );
+  if (index < 0) return;
+  const [aura] = target.auras.splice(index, 1);
+  ctx.emit({ type: 'aura', targetId: target.id, name: aura.name, gained: false });
 }

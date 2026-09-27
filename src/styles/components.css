@@ -1002,6 +1002,12 @@
   .town-focus-budget {
     margin-bottom: 8px;
   }
+  /* The queued re-spec line (#1144): the one line on the panel that says
+     Save took, in the same gold the chat notice for it uses. */
+  .town-focus-pending {
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
   .town-focus-row {
     display: flex;
     align-items: center;
@@ -1727,20 +1733,369 @@
     display: inline-flex;
     align-items: center;
     gap: var(--spacing-xs);
-    margin-inline: auto var(--spacing-lg);
+    /* The inline-end margin clears the close button, which layout.css pins
+       absolutely at the head's inline end (8px inset + 26px wide) outside the
+       flex flow; the library head padding cannot be raised from this layer. */
+    margin-inline: auto calc(var(--spacing-lg) + 26px);
     color: var(--color-text-secondary);
     white-space: nowrap;
   }
+  /* The sheet stacks under the 64px head: body, (attribute row), footer with
+     the tab strip. Character keeps the paperdoll with the stats rail beside it
+     (Offense and Defense scroll on the wheel); every other tab takes the whole
+     body. The stack is a wrapper, not the window: the HUD shows the window with
+     an inline display:block, which would override a flex on the window itself. */
+  #char-window .char-sheet {
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 64px);
+    min-height: 0;
+  }
   #char-window .char-body {
     display: grid;
-    grid-template-columns: minmax(0, 520px) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(200px, 240px);
     gap: var(--spacing-md);
-    height: calc(100% - 60px);
+    flex: 1 1 auto;
     min-height: 0;
+  }
+  #char-window .char-body--tab {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #char-window .char-stats-rail {
+    border-left: 1px solid var(--color-border-showcase);
+    padding-left: var(--spacing-md);
+  }
+  #char-window .char-rail-panels {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  #char-window .char-tab-panel {
+    padding-right: var(--spacing-xs);
+  }
+  /* The Specialization board's mastery line: name in gold, the description in
+     the muted note tone, under a hairline like the board title's. */
+  #char-window .char-spec-mastery {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--color-border-showcase);
+    font-size: 12px;
+  }
+  #char-window .char-spec-mastery b {
+    color: var(--gold);
+    font-weight: normal;
+  }
+  #char-window .char-attr-row {
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+  }
+  #char-window .char-footer {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--color-border-showcase);
+  }
+  #char-window .char-footer .char-sidebar-tabs {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  #char-window .char-footer .pc-share-row {
+    margin-top: 0;
+    flex: 0 0 auto;
+    gap: var(--spacing-sm);
+  }
+  body.mobile-touch #char-window .char-sheet {
+    height: auto;
+  }
+  body.mobile-touch #char-window .char-body,
+  body.mobile-touch #char-window .char-attr-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body.mobile-touch #char-window .char-stats-rail {
+    border-left: 0;
+    padding-left: 0;
+  }
+  body.mobile-touch #char-window .char-footer {
+    flex-wrap: wrap;
   }
   #char-window .char-equipment-pane,
   #char-window .char-sidebar {
     min-height: 0;
+  }
+  /* The Reputation tab (src/ui/hud/reputation/): one card per faction with the
+     standing pill and the tier bar. Tier colours ride the quality ramp tokens so
+     the ladder reads like item quality; the pill paints keyline text over the
+     tier colour, which stays readable on every preset because the ramp is static. */
+  .char-rep {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    min-height: 0;
+  }
+  .char-rep-intro {
+    margin: 0;
+    font-size: 12px;
+    line-height: 15px;
+    color: var(--color-text-muted);
+  }
+  .char-rep-row {
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    --char-rep-tier: var(--color-quality-poor);
+  }
+  .char-rep-tier-unknown {
+    --char-rep-tier: var(--color-quality-poor);
+  }
+  .char-rep-tier-recognized {
+    --char-rep-tier: var(--color-quality-common);
+  }
+  .char-rep-tier-trusted {
+    --char-rep-tier: var(--color-quality-uncommon);
+  }
+  .char-rep-tier-proven {
+    --char-rep-tier: var(--color-quality-rare);
+  }
+  .char-rep-tier-vanguard {
+    --char-rep-tier: var(--color-quality-epic);
+  }
+  .char-rep-tier-champion {
+    --char-rep-tier: var(--color-quality-legendary);
+  }
+  .char-rep-head {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  .char-rep-crest {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 32px;
+    border: 2px solid var(--char-rep-tier);
+    border-radius: 4px 4px 14px 14px;
+    background: var(--socket-fill);
+    box-shadow: inset 0 0 8px color-mix(in srgb, var(--color-keyline) 60%, transparent);
+  }
+  .char-rep-copy {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .char-rep-name {
+    font-family: var(--font-display);
+    font-size: 13px;
+    line-height: 16px;
+    letter-spacing: 0.5px;
+    text-shadow: var(--title-shadow);
+    color: var(--color-text-light);
+  }
+  .char-rep-hub,
+  .char-rep-next,
+  .char-rep-progress {
+    font-size: 12px;
+    line-height: 15px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+  }
+  .char-rep-progress {
+    color: var(--color-text-light);
+  }
+  .char-rep-pill {
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+    padding: 0 8px;
+    border-radius: var(--radius-xs);
+    border: 1px solid color-mix(in srgb, var(--color-keyline) 50%, transparent);
+    background: var(--char-rep-tier);
+    color: var(--color-keyline);
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  .char-rep-bar {
+    position: relative;
+    height: 12px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: var(--radius-xs);
+    background: linear-gradient(var(--color-bar-well-hi), var(--color-bar-well-lo));
+    overflow: hidden;
+  }
+  .char-rep-bar > span {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--char-rep-pct, 0%);
+    background: linear-gradient(
+      180deg,
+      var(--char-rep-tier),
+      color-mix(in srgb, var(--char-rep-tier) 65%, var(--color-keyline))
+    );
+  }
+  .char-rep-foot {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+  }
+  .char-rep-today,
+  .char-rep-title {
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .char-rep-today h3,
+  .char-rep-title h3 {
+    margin: 0 0 2px;
+    font-family: var(--font-display);
+    font-size: 13px;
+    line-height: 18px;
+    letter-spacing: 0.5px;
+    text-shadow: var(--title-shadow);
+    color: var(--color-accent);
+  }
+  .char-rep-kv {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    font-size: 13px;
+    line-height: 18px;
+  }
+  .char-rep-kv > span {
+    color: var(--color-text-muted);
+  }
+  .char-rep-kv > b {
+    font-weight: 500;
+    color: var(--color-text-light);
+  }
+  .char-rep-title > b {
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    text-shadow: var(--title-shadow);
+    color: var(--char-rep-tier, var(--color-text-light));
+  }
+  .char-rep-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-xs) var(--spacing-sm);
+    margin-top: auto;
+  }
+  .char-rep-legend-pill {
+    height: 18px;
+    padding: 0 6px;
+    font-size: 10px;
+  }
+  /* The Currencies tab (src/ui/hud/currencies/): grouped rows, icon, name and
+     note on the left, the amount (and a lifetime or preview line) on the right.
+     Pending faction rows keep the same row shape at muted strength. */
+  .char-cur {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    min-height: 0;
+  }
+  .char-cur-intro {
+    margin: 0;
+    font-size: 12px;
+    line-height: 15px;
+    color: var(--color-text-muted);
+  }
+  .char-cur-group {
+    overflow: hidden;
+  }
+  .char-cur-group h3 {
+    margin: 0;
+    padding: 7px 12px;
+    font-family: var(--font-display);
+    font-size: 13px;
+    line-height: 18px;
+    letter-spacing: 0.5px;
+    text-shadow: var(--title-shadow);
+    color: var(--color-accent);
+    border-bottom: 1px solid var(--color-border-showcase);
+    background: color-mix(in srgb, var(--color-keyline) 20%, transparent);
+  }
+  .char-cur-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: 8px 12px;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-border-showcase) 60%, transparent);
+  }
+  .char-cur-row:last-child {
+    border-bottom: 0;
+  }
+  .char-cur-row.is-pending {
+    color: var(--color-text-muted);
+  }
+  .char-cur-icon {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .char-cur-icon .currency-inline {
+    width: 28px;
+    height: 28px;
+  }
+  .char-cur-icon-empty {
+    box-sizing: border-box;
+    border: 1px dashed var(--color-control-border);
+    border-radius: var(--radius-socket);
+    opacity: 0.6;
+  }
+  .char-cur-copy {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .char-cur-copy > b {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 18px;
+  }
+  .char-cur-note,
+  .char-cur-lifetime {
+    font-size: 12px;
+    line-height: 15px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+  }
+  .char-cur-value {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    text-align: right;
+  }
+  .char-cur-amount {
+    font-family: var(--font-display);
+    font-size: 16px;
+    line-height: 20px;
+    color: var(--color-quality-default);
+  }
+  .char-cur-amount.is-muted {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    color: var(--color-text-muted);
   }
   #char-window .char-equipment-pane {
     display: flex;
@@ -1988,7 +2343,7 @@
     flex: 1;
   }
   .spell-row[draggable="true"] {
-    cursor: grab;
+    cursor: var(--cursor-grab, grab);
   }
   .spell-row .spell-name {
     font-size: 13px;
@@ -4107,6 +4462,554 @@
   .lb-row.lb-daily {
     grid-template-columns: 44px 1fr 96px;
   }
+  /* World Quests board: rank, name, medal, the board's number. */
+  .lb-row.lb-wq {
+    grid-template-columns: 44px 1fr 72px 96px;
+  }
+  .lb-medal {
+    text-align: center;
+    color: var(--color-text-muted);
+  }
+  .lb-medal-gold {
+    color: var(--gold);
+  }
+  .lb-medal-silver {
+    color: var(--color-ranking-place-second);
+  }
+  .lb-medal-bronze {
+    color: var(--color-ranking-place-third);
+  }
+  /* The scoreboard chips inside the World Quests tab (a pressed-state group,
+     not a second tablist: the tab strip above already owns the tab role). */
+  .lb-wq-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 2px 0 8px;
+  }
+  .lb-wq-chip {
+    padding: 3px 8px;
+    font-size: 11px;
+    color: var(--color-wq-chip-text);
+    background: color-mix(in srgb, var(--color-white) 3.1%, transparent);
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .lb-wq-chip:hover {
+    background: color-mix(in srgb, var(--color-white) 7.1%, transparent);
+  }
+  .lb-wq-chip-active {
+    color: var(--gold);
+    background: color-mix(in srgb, var(--color-wq-chip-active) 13.3%, transparent);
+    border-color: var(--color-wq-chip-active-edge);
+  }
+  /* The World Quest rankings window (world_quest_leaderboard_window.ts): the
+     weekly ledger chrome (violet gradients, gold rules, clipped corners) over
+     six board cards, the top-three podium, the rest of the ladder, and the
+     viewer's best pinned at the bottom. A flex column: the board takes the
+     leftover height and scrolls, the self bar stays put. Every art slot
+     layers its image over a gradient, so a missing file still reads as chrome. */
+  #world-quest-leaderboard-window {
+    width: min(1280px, calc(100vw - 32px));
+    /* The generic .window clamp (top 10vh, 85% of the app viewport) is the
+       ceiling; the window fills it up to a comfortable 860px. */
+    height: min(860px, calc(var(--app-vh, 100vh) * 0.85 / var(--window-scale) - 24px));
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+    background:
+      radial-gradient(
+        ellipse 60% 40% at 50% 0%,
+        color-mix(in srgb, var(--color-ranking-ground-glow) 18%, transparent),
+        transparent 60%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-ranking-ground-top) 96%, transparent),
+        color-mix(in srgb, var(--color-ranking-ground) 96%, transparent) 40%,
+        color-mix(in srgb, var(--color-ranking-ground-deep) 97.3%, transparent)
+      );
+    border-color: var(--color-wq-ranking-edge);
+    container-type: inline-size;
+    padding: clamp(10px, 1.2cqw, 20px) clamp(12px, 1.6cqw, 26px);
+  }
+  #world-quest-leaderboard-window .wql-title span:first-child {
+    font-size: clamp(18px, 2.2cqw, 32px);
+    letter-spacing: 0.03em;
+    color: var(--color-ranking-text);
+    text-shadow:
+      0 1px 0 var(--color-keyline),
+      0 0 18px color-mix(in srgb, var(--color-ranking-emphasis) 33.3%, transparent);
+  }
+  #world-quest-leaderboard-window .wql-sub {
+    text-align: center;
+    color: var(--color-ranking-emphasis);
+    font-family: var(--font-serif);
+    font-size: clamp(12px, 1.05cqw, 16px);
+    margin: -4px 0 clamp(6px, 0.7cqw, 10px);
+  }
+  #world-quest-leaderboard-window .wql-cards {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: clamp(6px, 1cqw, 16px);
+    flex: none;
+  }
+  #world-quest-leaderboard-window .wql-card {
+    display: grid;
+    grid-template-rows: auto auto auto;
+    gap: 4px;
+    min-width: 0;
+    padding: clamp(5px, 0.6cqw, 9px);
+    font: inherit;
+    text-align: center;
+    color: var(--color-wq-ranking-text-bright);
+    cursor: pointer;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-ranking-ground-top) 95%, transparent),
+      color-mix(in srgb, var(--color-ranking-ground) 95%, transparent) 40%,
+      color-mix(in srgb, var(--color-ranking-ground-deep) 96%, transparent)
+    );
+    border: 1px solid var(--color-wq-ranking-edge);
+    box-shadow:
+      inset 0 0 0 1px var(--color-keyline),
+      inset 0 0 0 2px color-mix(in srgb, var(--color-wq-ranking-gilt) 13.3%, transparent),
+      0 8px 18px color-mix(in srgb, var(--color-keyline) 66.7%, transparent);
+    clip-path: polygon(
+      0 7px,
+      7px 0,
+      calc(100% - 7px) 0,
+      100% 7px,
+      100% calc(100% - 7px),
+      calc(100% - 7px) 100%,
+      7px 100%,
+      0 calc(100% - 7px)
+    );
+  }
+  #world-quest-leaderboard-window .wql-card:hover {
+    border-color: var(--color-ranking-emphasis);
+  }
+  #world-quest-leaderboard-window .wql-card-active {
+    border-color: var(--color-ranking-selected);
+    box-shadow:
+      inset 0 0 0 1px var(--color-keyline),
+      inset 0 0 0 2px color-mix(in srgb, var(--color-ranking-selected) 33.3%, transparent),
+      0 8px 18px color-mix(in srgb, var(--color-keyline) 66.7%, transparent),
+      0 0 22px color-mix(in srgb, var(--color-ranking-selected) 40%, transparent);
+  }
+  #world-quest-leaderboard-window .wql-card:not(.wql-card-active) .wql-card-art {
+    filter: saturate(0.7) brightness(0.8);
+  }
+  #world-quest-leaderboard-window .wql-card-art {
+    display: block;
+    aspect-ratio: 21 / 9;
+    background-color: var(--color-wq-ranking-art-ground);
+    background-image:
+      var(--wql-art, none),
+      radial-gradient(
+        ellipse at 50% 35%,
+        color-mix(in srgb, var(--color-ranking-ground-glow) 33.3%, transparent),
+        transparent 70%
+      ),
+      linear-gradient(
+        160deg,
+        var(--color-wq-ranking-art-violet),
+        var(--color-ranking-ground) 60%,
+        var(--color-wq-ranking-art-bronze)
+      );
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    border: 1px solid var(--color-wq-ranking-edge);
+    box-shadow: inset 0 0 0 1px var(--color-keyline);
+  }
+  #world-quest-leaderboard-window .wql-card-name {
+    font-family: var(--title-font);
+    font-size: clamp(11px, 1.15cqw, 17px);
+    line-height: 1.15;
+    color: var(--color-ranking-text);
+    text-shadow: 0 1px 0 var(--color-keyline);
+    overflow-wrap: anywhere;
+  }
+  #world-quest-leaderboard-window .wql-card-active .wql-card-name {
+    color: var(--color-wq-ranking-heading);
+  }
+  #world-quest-leaderboard-window .wql-card-metric {
+    font-size: clamp(10px, 0.9cqw, 13px);
+    color: var(--color-ranking-text-muted);
+  }
+  /* The selected board is itself a flex column: the header, podium and pager
+     keep their natural height and the rest of the ladder takes what is left,
+     scrolling on its own, so the pinned self bar below never covers a row. */
+  #world-quest-leaderboard-window .wql-board {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin-top: clamp(6px, 0.8cqw, 12px);
+    padding: clamp(6px, 0.8cqw, 12px) clamp(8px, 1cqw, 16px);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-ranking-well) 90.2%, transparent),
+      color-mix(in srgb, var(--color-ranking-ground-deep) 94%, transparent)
+    );
+    border: 1px solid var(--color-wq-ranking-edge);
+    box-shadow:
+      inset 0 0 0 1px var(--color-keyline),
+      inset 0 0 0 2px color-mix(in srgb, var(--color-wq-ranking-gilt) 9.4%, transparent);
+  }
+  #world-quest-leaderboard-window .wql-board-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 4px 14px;
+    flex: none;
+    text-align: center;
+    margin-bottom: clamp(4px, 0.5cqw, 8px);
+  }
+  #world-quest-leaderboard-window .wql-board-title {
+    font-family: var(--title-font);
+    font-size: clamp(15px, 1.6cqw, 24px);
+    color: var(--color-wq-ranking-heading);
+    text-shadow: 0 1px 0 var(--color-keyline);
+  }
+  #world-quest-leaderboard-window .wql-board-rule,
+  #world-quest-leaderboard-window .wql-total {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(12px, 1.1cqw, 16px);
+    color: var(--color-ranking-text-soft);
+  }
+  #world-quest-leaderboard-window .wql-state {
+    padding: clamp(24px, 4cqw, 60px) 12px;
+    text-align: center;
+    font-family: var(--font-serif);
+    font-size: clamp(13px, 1.3cqw, 19px);
+    color: var(--color-ranking-text-soft);
+  }
+  #world-quest-leaderboard-window .wql-error {
+    color: var(--color-wq-ranking-error);
+  }
+  #world-quest-leaderboard-window .lbp-podium {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: end;
+    gap: clamp(6px, 1cqw, 16px);
+    flex: none;
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto clamp(6px, 0.7cqw, 10px);
+    padding: 0;
+    list-style: none;
+  }
+  #world-quest-leaderboard-window .lbp-slot {
+    --lbp-tint: var(--color-wq-ranking-gilt);
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    text-align: center;
+  }
+  /* The podium markup lists first place first (leaderboard_podium_html.ts), so
+     the grid stands it silver left, gold centre, bronze right, and each place
+     carries its own medal disc. */
+  #world-quest-leaderboard-window .lbp-slot-1 {
+    --lbp-medal: url("/ui/world-quests/leaderboard/medal_gold.webp");
+    grid-column: 2;
+  }
+  #world-quest-leaderboard-window .lbp-slot-2 {
+    --lbp-tint: var(--color-ranking-place-second);
+    --lbp-medal: url("/ui/world-quests/leaderboard/medal_silver.webp");
+    grid-column: 1;
+  }
+  #world-quest-leaderboard-window .lbp-slot-3 {
+    --lbp-tint: var(--color-ranking-place-third);
+    --lbp-medal: url("/ui/world-quests/leaderboard/medal_bronze.webp");
+    grid-column: 3;
+  }
+  #world-quest-leaderboard-window .lbp-slot-medal {
+    position: relative;
+    z-index: 1;
+    width: clamp(36px, 3.6cqw, 50px);
+    height: clamp(36px, 3.6cqw, 50px);
+    margin-bottom: calc(clamp(36px, 3.6cqw, 50px) / -2);
+    border-radius: 50%;
+    background-color: var(--color-wq-ranking-art-ground);
+    background-image:
+      var(--lbp-medal, none),
+      radial-gradient(
+        circle at 35% 30%,
+        color-mix(in srgb, var(--color-white) 20%, transparent),
+        transparent 55%
+      ),
+      linear-gradient(160deg, var(--lbp-tint), var(--color-wq-ranking-art-violet));
+    background-position: center;
+    background-size: cover;
+    border: 2px solid var(--lbp-tint);
+    box-shadow:
+      0 0 0 2px var(--color-wq-ranking-medal-ring),
+      0 6px 14px color-mix(in srgb, var(--color-keyline) 80%, transparent),
+      0 0 16px color-mix(in srgb, var(--color-keyline) 50.2%, transparent);
+  }
+  #world-quest-leaderboard-window .lbp-slot-empty .lbp-slot-medal {
+    filter: grayscale(0.7) brightness(0.7);
+    opacity: 0.7;
+  }
+  #world-quest-leaderboard-window .lbp-slot-detail .wql-medal {
+    justify-content: center;
+  }
+  /* The name card the medal disc overlaps; every place shares its height, so
+     the stepped plinth under it is what lifts gold above silver and bronze. */
+  #world-quest-leaderboard-window .lbp-slot-card {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding: calc(clamp(36px, 3.6cqw, 50px) / 2 + 3px) 8px 5px;
+    box-sizing: border-box;
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--lbp-tint) 22%, transparent), transparent 75%),
+      linear-gradient(180deg, var(--color-ranking-control), var(--color-wq-ranking-card-deep));
+    border: 1px solid var(--lbp-tint);
+    border-bottom: 0;
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-white) 10.2%, transparent);
+    clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%, 0 10px);
+  }
+  #world-quest-leaderboard-window .lbp-plinth {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--lbp-tint) 34%, var(--color-wq-ranking-card-deep)),
+      var(--color-ranking-ground) 85%
+    );
+    border: 1px solid var(--lbp-tint);
+    border-bottom-width: 3px;
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--color-white) 15%, transparent),
+      0 8px 20px color-mix(in srgb, var(--color-keyline) 73.3%, transparent);
+  }
+  #world-quest-leaderboard-window .lbp-plinth-1 {
+    height: clamp(40px, 4.2cqw, 58px);
+  }
+  #world-quest-leaderboard-window .lbp-plinth-2 {
+    height: clamp(33px, 3.4cqw, 47px);
+  }
+  #world-quest-leaderboard-window .lbp-plinth-3 {
+    height: clamp(27px, 2.7cqw, 38px);
+  }
+  #world-quest-leaderboard-window .lbp-slot-name {
+    flex: none;
+    max-width: 100%;
+    line-height: 1.25;
+    font-family: var(--title-font);
+    font-size: clamp(12px, 1.2cqw, 17px);
+    color: var(--color-ranking-text);
+    text-shadow: 0 1px 0 var(--color-keyline);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #world-quest-leaderboard-window .lbp-slot-empty .lbp-slot-name {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--color-wq-ranking-text-faint);
+  }
+  #world-quest-leaderboard-window .lbp-slot-metric {
+    font-size: clamp(13px, 1.3cqw, 19px);
+    font-weight: 700;
+    color: var(--lbp-tint);
+    text-shadow: 0 1px 0 var(--color-keyline);
+  }
+  #world-quest-leaderboard-window .lbp-slot-detail {
+    font-size: clamp(11px, 1cqw, 14px);
+    color: var(--color-ranking-text-soft);
+  }
+  #world-quest-leaderboard-window .lbp-slot-metric,
+  #world-quest-leaderboard-window .lbp-slot-detail {
+    flex: none;
+    line-height: 1.25;
+  }
+  #world-quest-leaderboard-window .lbp-plinth-rank {
+    font-family: var(--title-font);
+    font-size: clamp(17px, 1.8cqw, 26px);
+    line-height: 1;
+    color: var(--lbp-tint);
+    opacity: 0.9;
+    text-shadow: 0 2px 0 var(--color-keyline);
+  }
+  #world-quest-leaderboard-window .lbp-mine .lbp-slot-card {
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--color-white) 10.2%, transparent),
+      inset 0 0 18px color-mix(in srgb, var(--color-ranking-selected) 40%, transparent);
+  }
+  #world-quest-leaderboard-window .wql-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  #world-quest-leaderboard-window .wql-row {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) minmax(90px, 140px) minmax(80px, 120px);
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+    font-size: clamp(12px, 1.15cqw, 16px);
+    color: var(--color-wq-ranking-text-bright);
+  }
+  #world-quest-leaderboard-window .wql-row:nth-child(even) {
+    background: color-mix(in srgb, var(--color-white) 2.7%, transparent);
+  }
+  #world-quest-leaderboard-window .wql-row.wql-head {
+    font-family: var(--title-font);
+    font-size: clamp(11px, 1cqw, 14px);
+    color: var(--color-wq-ranking-heading);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--color-wq-ranking-head-ground);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-wq-ranking-gilt) 26.7%, transparent);
+  }
+  #world-quest-leaderboard-window .wql-row.wql-mine {
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-ranking-selected) 20%, transparent),
+      color-mix(in srgb, var(--color-ranking-selected) 5.9%, transparent) 70%
+    );
+    box-shadow: inset 2px 0 0 var(--color-ranking-selected);
+  }
+  #world-quest-leaderboard-window .wql-rank {
+    font-weight: 700;
+    color: var(--color-ranking-emphasis);
+  }
+  #world-quest-leaderboard-window .wql-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #world-quest-leaderboard-window .wql-you {
+    color: var(--color-ranking-emphasis);
+  }
+  #world-quest-leaderboard-window .wql-medal {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-wq-ranking-text-faint);
+  }
+  #world-quest-leaderboard-window .wql-medal-gold {
+    --wql-tint: var(--color-wq-ranking-gilt);
+    color: var(--color-wq-ranking-heading);
+  }
+  #world-quest-leaderboard-window .wql-medal-silver {
+    --wql-tint: var(--color-ranking-place-second);
+    color: var(--color-wq-ranking-silver-text);
+  }
+  #world-quest-leaderboard-window .wql-medal-bronze {
+    --wql-tint: var(--color-ranking-place-third);
+    color: var(--color-wq-ranking-bronze-text);
+  }
+  #world-quest-leaderboard-window .wql-medal-icon {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: var(--color-wq-ranking-art-ground);
+    background-image:
+      var(--wql-medal, none),
+      linear-gradient(
+        160deg,
+        var(--wql-tint, var(--color-ranking-control-border)),
+        var(--color-wq-ranking-art-violet)
+      );
+    background-position: center;
+    background-size: cover;
+    border: 1px solid var(--wql-tint, var(--color-ranking-control-border));
+  }
+  #world-quest-leaderboard-window .wql-metric {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+  }
+  #world-quest-leaderboard-window .wql-pager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex: none;
+    margin-top: 6px;
+    color: var(--color-ranking-text-soft);
+  }
+  #world-quest-leaderboard-window .wql-page-btn {
+    font-family: var(--title-font);
+    color: var(--color-wq-ranking-text-bright);
+    padding: 6px 14px;
+    cursor: pointer;
+    background: linear-gradient(
+      180deg,
+      var(--color-ranking-control),
+      var(--color-wq-ranking-card-deep)
+    );
+    border: 1px solid var(--color-ranking-control-border);
+  }
+  #world-quest-leaderboard-window .wql-page-btn:hover:not(:disabled) {
+    border-color: var(--color-ranking-emphasis);
+  }
+  #world-quest-leaderboard-window .wql-page-btn:disabled {
+    cursor: default;
+    opacity: 0.45;
+  }
+  #world-quest-leaderboard-window .wql-self {
+    flex: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px 16px;
+    margin: clamp(6px, 0.8cqw, 12px) auto 0;
+    padding: clamp(6px, 0.7cqw, 11px) clamp(18px, 2.4cqw, 40px);
+    max-width: 90cqw;
+    font-size: clamp(12px, 1.2cqw, 18px);
+    color: var(--color-wq-ranking-text-bright);
+    border: 1px solid var(--color-wq-ranking-edge);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-ranking-control) 94%, transparent),
+      color-mix(in srgb, var(--color-wq-ranking-self-deep) 94%, transparent)
+    );
+    clip-path: polygon(
+      14px 0,
+      calc(100% - 14px) 0,
+      100% 50%,
+      calc(100% - 14px) 100%,
+      14px 100%,
+      0 50%
+    );
+  }
+  #world-quest-leaderboard-window .wql-self-label {
+    font-family: var(--title-font);
+    color: var(--color-wq-ranking-heading);
+  }
+  #world-quest-leaderboard-window .wql-self-rank {
+    font-weight: 700;
+    color: var(--color-ranking-emphasis);
+  }
+  #world-quest-leaderboard-window .wql-self-none {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--color-ranking-text-soft);
+  }
   /* .lb-scope-note is the Renown tab's account-scope teaching line, visible
      on every deeds-board state (never a title-attr tooltip: touch has none). */
   .lb-total,
@@ -4354,7 +5257,6 @@
     opacity: 0.45;
     cursor: var(--cursor-arrow);
   }
-
   /* ---------- mount picker (character sheet) ---------- */
   .mount-picker .mp-cards {
     display: grid;
@@ -7536,6 +8438,25 @@
   .vendor-item.warfare-owned .vi-sub {
     color: var(--gold);
   }
+  /* A group heading (Warfare Season 2 above the entry tier) reads a level
+     above the set titles under it: larger, spaced caps, and a heavier rule,
+     so the Season 2 banner never reads as one more set. */
+  #warfare-window .warfare-group-title {
+    margin-top: 14px;
+    padding-top: 9px;
+    border-top: 2px solid var(--gold);
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  /* The spec a Season 2 set is built for, beside its name. */
+  #warfare-window .warfare-set-spec {
+    margin-left: 8px;
+    color: var(--color-text-light);
+    font-family: inherit;
+    font-size: 11px;
+    opacity: 0.85;
+  }
 
   /* ---------- tutorial and ferry notes ---------- */
   /* The once-ever explainer modal (profession_tutorial_window.ts), reusing the
@@ -8160,6 +9081,71 @@
      specificity, and the bag reset is above while the bank reset is far
      below. Order against the cell focus rings is not load-bearing (they are
      outline-based). */
+  /* The permanent loot-quality tier mark (loot_quality_view.ts). Owns its
+     WHOLE look here rather than composing the ui-badge primitive: a later
+     layer silently beats the library on every property both declare
+     (src/styles/CLAUDE.md), so the markup carries this class alone. An
+     all-surfaces item mark like the glyph family below, minted beside it
+     (not in item_instance_glyph_mark.ts) because it is a text tier mark
+     that composes WITH the corner marks and also paints where the family
+     never does: worn slots, loot rows, roll prompts, the Exchange. */
+  .loot-quality-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 10px;
+    color: var(--gold);
+    border: 1px solid currentColor;
+    border-radius: 3px;
+    background: var(--color-bg-dark);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+    padding: 2px 3px;
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+  .bag-item > .loot-quality-badge,
+  .bank-item > .loot-quality-badge,
+  .mkt-ico > .loot-quality-badge,
+  .ui-socket > .loot-quality-badge {
+    position: absolute;
+    right: 1px;
+    top: 1px;
+  }
+  /* The Materials Vault row strip (the fourth owned-stack surface): the row is
+     a wide flex button, so the mark sits over the leading 28px icon's top-right
+     corner (7px row padding + 28px icon, minus the mark's own box), the corner
+     every cell surface above uses. */
+  .vault-row > .loot-quality-badge {
+    position: absolute;
+    top: 3px;
+    left: 20px;
+  }
+  .equip-quality-socket {
+    display: inline-flex;
+    position: relative;
+    flex: 0 0 auto;
+  }
+  .equip-quality-socket > .loot-quality-badge {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+  }
+  .equip-col-right .equip-quality-socket > .loot-quality-badge {
+    right: auto;
+    left: 1px;
+  }
+  .loot-quality-line {
+    color: var(--gold);
+  }
+  @media (forced-colors: active) {
+    .loot-quality-badge {
+      color: CanvasText;
+      background: Canvas;
+      border-color: CanvasText;
+    }
+  }
   .bag-item .bi-count {
     position: absolute;
     right: 2px;
@@ -9495,6 +10481,15 @@
   }
   .vault-cap-note {
     text-align: left;
+  }
+  /* The vault's name search (vault_window.ts): one `.bag-search` input in the
+     shared .bag-tools row, the personal bank's toolbar shape minus chips and
+     sort, so the family CSS above (and #bank-window's revert-layer rules) carry
+     its look, and BankWindow's search focus carry reaches it. Sits between the
+     cap note and the scroller as a rigid band; the list still scrolls. */
+  .vault-tools {
+    flex: none;
+    margin-bottom: 6px;
   }
   .vault-list {
     display: flex;
@@ -12983,6 +13978,85 @@
   .soc-pledge-accept {
     color: var(--color-text-success);
   }
+  /* Guild custom ranks (docs/prd/guild-custom-ranks.md): the Ranks tab's
+     guild-control table (the .soc-billboard family card), one row per rank and
+     one checkbox column per permission. It spans both .soc-body grid columns,
+     and on a narrow window the TABLE scrolls sideways inside its own box
+     rather than widening the window. */
+  .soc-ranks {
+    grid-column: 1 / -1;
+    margin: 0 4px 6px;
+    padding: 7px 9px;
+  }
+  .soc-ranks-intro {
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .soc-ranks-scroll {
+    overflow-x: auto;
+  }
+  .soc-ranks-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    color: var(--color-text-light);
+  }
+  .soc-ranks-table th,
+  .soc-ranks-table td {
+    padding: 3px 4px;
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--color-border-showcase);
+    white-space: nowrap;
+  }
+  .soc-ranks-table thead th {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    white-space: normal;
+    vertical-align: bottom;
+  }
+  .soc-ranks-table thead th.soc-ranks-perm {
+    cursor: help;
+  }
+  .soc-ranks-table .soc-ranks-title {
+    min-width: 132px;
+    text-align: left;
+    font-weight: 400;
+  }
+  .soc-ranks-title input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .soc-ranks-name {
+    color: var(--color-text-light);
+  }
+  .soc-ranks-idx,
+  .soc-ranks-count {
+    color: var(--color-text-muted);
+  }
+  .soc-ranks-table td.soc-ranks-order {
+    text-align: right;
+  }
+  .soc-ranks-order .soc-x {
+    margin-left: 2px;
+  }
+  .soc-ranks-perm .ui-check:disabled {
+    cursor: default;
+  }
+  .soc-ranks-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .soc-ranks-actions .btn {
+    margin: 0;
+    padding: 5px 12px;
+    font-size: 11px;
+  }
   .soc-my-pledge {
     grid-column: 1 / -1;
     display: flex;
@@ -13191,6 +14265,25 @@
     gap: 10px;
     overflow: hidden;
   }
+  /* The player's own collapse toggle stays outside the body it hides, so its
+     aria-controls names something real (the deed-tracker disclosure
+     convention). It sits at the rail's own top-right corner. */
+  .map-atlas-sidebar-toggle {
+    align-self: flex-end;
+    flex: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .map-atlas-sidebar-toggle .ui-icon {
+      transition: transform 0.15s ease;
+    }
+  }
+  .map-atlas-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
+    flex: 1 1 auto;
+  }
   .map-atlas-stage {
     position: absolute;
     inset: var(--window-pad) var(--window-pad) var(--window-pad)
@@ -13211,6 +14304,31 @@
   }
   body:not(.mobile-touch) #map-window:has(> .map-atlas-sidebar:empty) .map-atlas-stage {
     inset: var(--window-pad);
+  }
+  /* The player's OWN collapse choice (mapAtlasSidebarCollapsed), distinct from
+     the :empty auto-collapse above (an unfed rail before Hud wiring runs): the
+     toggle button stays put, the rest of the rail hides behind it, and the
+     window shrinks to the slim rail plus the stage. */
+  body:not(.mobile-touch) #map-window:has(> .map-atlas-sidebar.is-collapsed) {
+    width: 652px;
+  }
+  .map-atlas-sidebar.is-collapsed {
+    width: 44px;
+    padding: 14px 8px;
+    align-items: center;
+  }
+  .map-atlas-sidebar.is-collapsed .map-atlas-sidebar-toggle {
+    align-self: center;
+  }
+  .map-atlas-sidebar.is-collapsed .map-atlas-sidebar-toggle .ui-icon {
+    transform: rotate(180deg);
+  }
+  .map-atlas-sidebar.is-collapsed .map-atlas-body {
+    display: none;
+  }
+  body:not(.mobile-touch) #map-window:has(> .map-atlas-sidebar.is-collapsed) .map-atlas-stage {
+    inset: var(--window-pad) var(--window-pad) var(--window-pad)
+      calc(var(--window-pad) + 44px + 12px);
   }
   /* Touch keeps the shipped single-pane map: the rail and the map-face chrome
      the atlas adds have no room on a 330px sheet (W13 owns the touch rail). */
@@ -13352,6 +14470,91 @@
     flex: 0 1 auto;
     max-height: 148px;
     overflow-y: auto;
+  }
+  /* The world-quest section (src/ui/hud/map/world_quest_rail_section.ts): the
+     same card rows as the tracked list, a state chip, and the faction name in
+     the standing colour the Reputation tab uses. The reroll button is the gold
+     primary because it is the section's one deliberate action; it stays
+     disabled until a replaceable row is selected. */
+  .map-atlas-wq-section {
+    flex: 1 1 auto;
+  }
+  .map-atlas-wq-count {
+    font-variant: normal;
+    letter-spacing: 0;
+    color: var(--color-text-muted);
+  }
+  .map-atlas-wq-expiry {
+    margin: -4px 0 6px;
+  }
+  .map-atlas-wq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-height: 0;
+    overflow: auto;
+  }
+  .map-atlas-wq {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 7px;
+    text-align: left;
+    cursor: var(--cursor-point);
+  }
+  .map-atlas-wq.is-selected {
+    border-color: var(--gold-dim);
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--gold) 12%, transparent),
+      transparent
+    );
+    box-shadow: inset 3px 0 0 var(--gold);
+  }
+  .map-atlas-wq.is-completed,
+  .map-atlas-wq.is-below-level {
+    opacity: 0.6;
+  }
+  .map-atlas-wq-copy {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .map-atlas-wq-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .map-atlas-wq-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .map-atlas-wq-state {
+    flex: none;
+  }
+  .map-atlas-wq-replaced {
+    flex: none;
+    font-size: 10px;
+    color: var(--gold-dim);
+  }
+  .map-atlas-wq-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 6px;
+  }
+  .map-atlas-wq-actions .ui-btn {
+    width: 100%;
+  }
+  .map-atlas-wq-note {
+    margin: 0;
+    text-align: center;
   }
   .map-atlas-nearby-row {
     width: 100%;
@@ -14804,6 +16007,146 @@
     transform: none;
   }
 
+  /* ---------- World PvP (the merged PvP window's flag tab) ---------- */
+  /* src/ui/hud/world_pvp/: the flag status card and the stakes list. Same
+     card / note families as the Thornhollow Fields panel above. */
+  .wpvp-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+    padding: 8px 10px;
+    border-left: 3px solid var(--color-border-showcase);
+  }
+  .wpvp-status.is-on {
+    border-left-color: var(--color-hostile);
+  }
+  .wpvp-status.is-disarming {
+    border-left-color: var(--color-warning);
+  }
+  .wpvp-status.is-off {
+    border-left-color: var(--color-friendly);
+  }
+  /* The card carries two lines beside its icon: the flag sentence and the
+     ground under the player. Grid so a long localized line wraps inside the
+     card instead of pushing the icon around. */
+  .wpvp-status-text {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+  }
+  /* The ground line. Free-for-all is the one state that reads hostile: the
+     flag is not what decides a fight there, so it must not read as calm. */
+  .wpvp-zone {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .wpvp-zone.is-ffa {
+    color: var(--color-hostile);
+  }
+  /* Two cards (record, honor), so the shared three-column stat grid would leave
+     a hole; the tab's own column count keeps the cards full width. */
+  .wpvp-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .wpvp-stakes {
+    margin: 6px 0 0;
+    padding-left: 18px;
+    display: grid;
+    gap: 6px;
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  /* ---------- King of the Hill (the in-zone bar over the standing hill) ---------- */
+  /* Self-mounted by src/ui/hud/hill/hill_bar_painter.ts, top centre below the
+     Thornhollow Fields scoreboard's slot; shown only while the player stands in
+     the hill's zone. The tone classes are chosen by the painter from the
+     readout's union; the state is carried by text too, so colour is never the
+     only channel. */
+  #hill-bar {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    z-index: 17;
+    min-width: 280px;
+    max-width: min(360px, calc(100vw - 24px));
+    pointer-events: none;
+    text-align: center;
+    background: var(--panel-bg-strong);
+    border: 1px solid var(--color-bg-field-edge);
+    border-radius: 9px;
+    padding: 6px 14px 8px;
+    box-shadow: 0 2px 16px color-mix(in srgb, var(--color-keyline) 63%, transparent);
+    font-size: 12px;
+    color: var(--color-text);
+  }
+  #hill-bar .hill-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 13px;
+  }
+  #hill-bar .hill-title {
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #hill-bar .hill-zone {
+    color: var(--color-text-muted);
+  }
+  #hill-bar .hill-held {
+    margin-top: 2px;
+    font-weight: 600;
+  }
+  #hill-bar.is-you .hill-held {
+    color: var(--color-friendly);
+  }
+  #hill-bar.is-other .hill-held {
+    color: var(--color-hostile);
+  }
+  #hill-bar .hill-note {
+    margin-top: 2px;
+    color: var(--color-warning);
+  }
+  #hill-bar .hill-counts {
+    color: var(--color-text-muted);
+  }
+  #hill-bar .hill-track {
+    position: relative;
+    margin-top: 4px;
+    height: 14px;
+    border-radius: 7px;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--color-keyline) 40%, transparent);
+  }
+  #hill-bar .hill-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0;
+    background: var(--color-gold);
+  }
+  #hill-bar.is-contested .hill-fill {
+    background: var(--color-hostile);
+  }
+  #hill-bar.is-you-contesting .hill-fill {
+    background: var(--color-friendly);
+  }
+  #hill-bar .hill-contest {
+    position: relative;
+    line-height: 14px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+  #hill-bar .hill-foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 3px;
+    color: var(--color-text-muted);
+  }
   /* ---------- The Vale Cup pre-match briefing overlay ---------- */
   /* Full-screen festival card (rules + role kit + team sheet + Ready button)
      shown while phase === 'briefing'. Self-mounted into #ui by the painter,
@@ -15369,6 +16712,33 @@
   .mkt-row:has(.mkt-sweep-btn) {
     grid-template-columns: 40px minmax(0, 1fr) auto auto auto;
   }
+  /* The per-row partial-buy control (a bulk stack need not be bought whole):
+     a narrow quantity field plus its own Buy trigger, so the main Buy button
+     keeps its plain whole-stack meaning. */
+  .mkt-buy-partial {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .mkt-buy-partial-qty {
+    width: 40px;
+    padding: 4px 2px;
+    font-size: 12px;
+    text-align: center;
+  }
+  .mkt-buy-partial-btn {
+    cursor: var(--cursor-point);
+    padding: 4px 10px;
+    white-space: nowrap;
+  }
+  /* Same fifth-cell need as Sweep above; a plain bulk stack can be BOTH
+     partial-buyable and sweep-eligible at once, needing a sixth. */
+  .mkt-row:has(.mkt-buy-partial) {
+    grid-template-columns: 40px minmax(0, 1fr) auto auto auto;
+  }
+  .mkt-row:has(.mkt-buy-partial):has(.mkt-sweep-btn) {
+    grid-template-columns: 40px minmax(0, 1fr) auto auto auto auto;
+  }
   .mkt-sell-pick {
     display: flex;
     gap: 10px;
@@ -15381,6 +16751,102 @@
     font-size: 12px;
     justify-content: center;
     font-style: italic;
+  }
+  /* The Wanted tab (market_orders_panel.ts): the place-order card at the head,
+     the open-order rows (the .mkt-row grid), and the not-on-the-market strip. */
+  .mkt-order-card {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    margin-bottom: 8px;
+  }
+  .mkt-order-head,
+  .mkt-unlisted-head {
+    font-family: var(--font-serif);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .mkt-order-card .mkt-sell-pick {
+    margin-bottom: 0;
+  }
+  .mkt-order-search-row .mkt-search {
+    flex: 1 1 auto;
+    max-width: none;
+  }
+  .mkt-order-matches {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .mkt-order-matches:empty {
+    display: none;
+  }
+  .mkt-order-match {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-start;
+    text-align: left;
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  .mkt-order-match .item-icon,
+  .mkt-order-match img {
+    width: 22px;
+    height: 22px;
+  }
+  .mkt-order-match-none,
+  .mkt-order-total,
+  .mkt-unlisted-none {
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--color-text-muted);
+    font-family: var(--font-ui);
+  }
+  .mkt-order-total:empty {
+    display: none;
+  }
+  .mkt-order-go {
+    align-self: flex-start;
+    padding: 4px 14px;
+  }
+  .mkt-order-list {
+    margin-bottom: 10px;
+  }
+  .mkt-order-row .mkt-each {
+    font-size: 10.5px;
+    color: var(--color-text-muted);
+    margin-left: 4px;
+  }
+  .mkt-order-row.mine {
+    box-shadow: inset 2px 0 0 var(--gold-dim);
+  }
+  .mkt-unlisted {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .mkt-unlisted-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .mkt-unlisted-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px 3px 4px;
+    font-size: 11.5px;
+    cursor: var(--cursor-point);
+    min-height: 28px;
+  }
+  .mkt-unlisted-chip .item-icon,
+  .mkt-unlisted-chip img {
+    width: 20px;
+    height: 20px;
   }
   /* Serif name, matching the Browse row headline. */
   .mkt-sell-pick .ps-name {
@@ -16979,6 +18445,112 @@
       grid-template-columns: 1fr;
     }
   }
+  /* Options > Cooldown Manager (src/ui/hud/cooldown_manager/cooldown_manager_settings.ts):
+     reuses the Auras panel's cards and grid above, plus the Tracked Spells
+     sorter (search, one drop section per group, Not Displayed). */
+  .cdm-add-bar {
+    flex-wrap: wrap;
+  }
+  .cdm-group-card:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .cdm-capacity {
+    margin: 0 0 6px;
+  }
+  .cdm-select {
+    min-height: 32px;
+  }
+  .cdm-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 220px;
+    min-height: 32px;
+  }
+  .cdm-group-actions,
+  .cdm-order-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .cdm-group-actions > .btn,
+  .cdm-order-row > .btn {
+    flex: 1 1 0;
+    width: auto;
+    min-height: 40px;
+    margin-top: 0;
+  }
+  .cdm-tracked {
+    margin-top: 14px;
+  }
+  .cdm-search {
+    width: 100%;
+    max-width: 320px;
+    min-height: 32px;
+    margin: 0 0 10px;
+  }
+  .cdm-detail-card {
+    margin: 0 0 10px;
+  }
+  .cdm-spell-section {
+    margin: 0 0 10px;
+    padding: 6px 8px 8px;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-cell);
+  }
+  .cdm-spell-section.drop-target {
+    border-color: var(--gold);
+    box-shadow: var(--glow-gold);
+  }
+  .cdm-spell-section-title {
+    margin-bottom: 6px;
+    color: var(--gold);
+    font-weight: 700;
+  }
+  .cdm-spell-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--socket-gap);
+    min-height: 40px;
+  }
+  .cdm-spell-chip {
+    --ui-socket-size: 40px;
+    flex: none;
+    padding: 0;
+    cursor: grab;
+  }
+  .cdm-spell-chip.is-unknown img {
+    filter: grayscale(0.85) brightness(0.6);
+  }
+  .cdm-other-hint {
+    margin: 0 0 6px;
+  }
+  .cdm-spell-chip[aria-pressed="true"] {
+    border-color: var(--gold);
+    box-shadow: var(--glow-gold);
+  }
+  .cdm-spell-chip:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .cdm-spell-list .cdm-empty {
+    margin: 0;
+    align-self: center;
+  }
+  /* Touch: the selects, the name boxes and the search box meet the 40px target floor. */
+  @media (pointer: coarse) {
+    .cdm-select,
+    .cdm-name,
+    .cdm-search {
+      min-height: 40px;
+    }
+  }
+  body.mobile-touch .cdm-select,
+  body.mobile-touch .cdm-name,
+  body.mobile-touch .cdm-search {
+    min-height: 40px;
+  }
   /* Streamlined title bar for the perf panel (less bulky than the default chrome). */
   #options-menu.perf-wide > .panel-title {
     font-size: 14px;
@@ -18194,6 +19766,417 @@
   }
 
   /* ---------- event calendar ---------- */
+  /* The weekly emissary's window (weekly_quests_window.ts): four offer cards
+     over the town's violet-and-gold ledger chrome, plus the inner confirm
+     dialog (.wk-backdrop / .wk-dialog). A flex column so the card grid can
+     take the leftover height once the user resizes the window. */
+  #weekly-quests-window {
+    width: min(1500px, calc(100vw - 32px));
+    /* The window sits at the base 10vh offset, so its height is the room UNDER
+       that offset (the old 100vh clamp pushed the footer below the viewport on
+       a 900px screen). Container-relative sizes inside scale with it. */
+    max-height: calc(var(--app-vh, 100vh) * 0.9 - 16px);
+    display: none;
+    flex-direction: column;
+    overflow: hidden auto;
+    min-height: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, var(--wk-violet-9-a2e), transparent 60%),
+      linear-gradient(180deg, var(--wk-sheet-top), var(--wk-sheet-mid) 40%, var(--wk-sheet-bottom));
+    border-color: var(--wk-edge-gold);
+    container-type: inline-size;
+    height: min(960px, calc(var(--app-vh, 100vh) * 0.9 - 16px));
+    padding: clamp(10px, 1.2cqw, 22px) clamp(12px, 1.6cqw, 28px);
+  }
+  #weekly-quests-window .wk-title span:first-child {
+    font-size: clamp(18px, 2.2cqw, 36px);
+    letter-spacing: 0.03em;
+    color: var(--wk-text-brightest);
+    text-shadow:
+      0 1px 0 var(--wk-black),
+      0 0 18px var(--wk-violet-13-a55);
+  }
+  #weekly-quests-window .wk-sub {
+    text-align: center;
+    color: var(--wk-violet-text);
+    font-size: clamp(12px, 1.25cqw, 20px);
+    margin: -2px 0 clamp(8px, 1.2cqw, 20px);
+  }
+  #weekly-quests-window .wk-sub b {
+    color: var(--wk-gilt-text);
+    font-weight: 600;
+  }
+  #weekly-quests-window .wk-cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(10px, 1.5cqw, 28px);
+    padding: 0 2px;
+    flex: 1 1 auto;
+    min-height: 0;
+    align-content: start;
+  }
+  #weekly-quests-window .wk-card {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto auto auto 1fr auto auto;
+    gap: clamp(6px, 0.8cqw, 14px);
+    min-width: 0;
+    padding: clamp(8px, 0.9cqw, 16px) clamp(8px, 0.9cqw, 16px) clamp(10px, 1cqw, 18px);
+    background: linear-gradient(
+      180deg,
+      var(--wk-violet-2-af2),
+      var(--wk-night-13-af2) 40%,
+      var(--wk-night-7-af5)
+    );
+    border: 1px solid var(--wk-edge-gold);
+    box-shadow:
+      inset 0 0 0 1px var(--wk-black),
+      inset 0 0 0 2px var(--wk-gold-3-a22),
+      0 10px 24px var(--wk-night-1-acc);
+    clip-path: polygon(
+      0 8px,
+      8px 0,
+      calc(100% - 8px) 0,
+      100% 8px,
+      100% calc(100% - 8px),
+      calc(100% - 8px) 100%,
+      8px 100%,
+      0 calc(100% - 8px)
+    );
+  }
+  #weekly-quests-window .wk-card-active {
+    border-color: var(--wk-violet);
+    box-shadow:
+      inset 0 0 0 1px var(--wk-black),
+      inset 0 0 0 2px var(--wk-violet-1-a55),
+      0 10px 24px var(--wk-night-1-acc),
+      0 0 22px var(--wk-violet-1-a55);
+  }
+  #weekly-quests-window .wk-card-locked {
+    filter: saturate(0.45) brightness(0.72);
+  }
+  #weekly-quests-window .wk-cat {
+    text-align: center;
+    font-family: var(--title-font);
+    font-size: clamp(15px, 1.6cqw, 26px);
+    color: var(--wk-text-brightest);
+    text-shadow: 0 1px 0 var(--wk-black);
+    padding-top: 2px;
+  }
+  #weekly-quests-window .wk-art {
+    position: relative;
+    aspect-ratio: 312 / 184;
+    background: var(--wk-black) center / cover no-repeat;
+    border: 1px solid var(--wk-edge-gold);
+    box-shadow:
+      inset 0 0 0 1px var(--wk-black),
+      0 4px 12px var(--wk-night-2-aaa);
+    margin-bottom: clamp(24px, 3.2cqw, 48px);
+  }
+  #weekly-quests-window .wk-medal {
+    position: absolute;
+    left: 50%;
+    bottom: calc(clamp(48px, 6.4cqw, 96px) / -2);
+    width: clamp(48px, 6.4cqw, 96px);
+    height: clamp(48px, 6.4cqw, 96px);
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: center / cover no-repeat;
+    box-shadow: 0 6px 14px var(--wk-night-1-acc);
+  }
+  #weekly-quests-window .wk-pill {
+    justify-self: center;
+    font-size: clamp(11px, 1cqw, 16px);
+    font-weight: 700;
+    color: var(--wk-text-soft);
+    padding: clamp(4px, 0.45cqw, 8px) clamp(14px, 1.8cqw, 30px);
+    background: linear-gradient(180deg, var(--wk-violet-7), var(--wk-night-16));
+    border: 1px solid var(--wk-violet-deep);
+    clip-path: polygon(7px 0, calc(100% - 7px) 0, 100% 50%, calc(100% - 7px) 100%, 7px 100%, 0 50%);
+  }
+  #weekly-quests-window .wk-lore {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: clamp(13px, 1.3cqw, 21px);
+    line-height: 1.45;
+    color: var(--wk-text-bright);
+    text-align: center;
+  }
+  #weekly-quests-window .wk-goal {
+    margin: 0;
+    align-self: start;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(12px, 1.15cqw, 19px);
+    color: var(--wk-ink);
+    text-align: center;
+  }
+  #weekly-quests-window .wk-btn {
+    font-family: var(--title-font);
+    font-size: clamp(13px, 1.25cqw, 20px);
+    letter-spacing: 0.03em;
+    color: var(--wk-text-bright);
+    background: linear-gradient(180deg, var(--wk-violet-5), var(--wk-night-15));
+    border: 1px solid var(--wk-violet-deep);
+    box-shadow:
+      inset 0 1px 0 var(--wk-grey-2-a14),
+      0 4px 12px var(--wk-night-3-a99);
+    padding: clamp(9px, 0.9cqw, 16px) clamp(8px, 0.9cqw, 16px);
+    cursor: pointer;
+    text-align: center;
+  }
+  #weekly-quests-window .wk-btn:hover:not(:disabled) {
+    color: var(--wk-white);
+    border-color: var(--wk-violet-text);
+    background: linear-gradient(180deg, var(--wk-violet-8), var(--wk-violet-3));
+    box-shadow:
+      inset 0 1px 0 var(--wk-grey-3-a1a),
+      0 0 16px var(--wk-violet-1-a55);
+  }
+  #weekly-quests-window .wk-btn:disabled {
+    cursor: default;
+  }
+  #weekly-quests-window .wk-btn-active {
+    color: var(--wk-green-bright);
+    border-color: var(--wk-green);
+    background: linear-gradient(180deg, var(--wk-green-2), var(--wk-night-11));
+    box-shadow:
+      inset 0 1px 0 var(--wk-grey-1-a12),
+      0 0 16px var(--wk-green-4-a44);
+  }
+  #weekly-quests-window .wk-btn-done {
+    color: var(--wk-gilt-text);
+    border-color: var(--wk-edge-gold);
+    background: linear-gradient(180deg, var(--wk-gold-2), var(--wk-night-18));
+  }
+  #weekly-quests-window .wk-btn-locked {
+    color: var(--wk-muted);
+    border-color: var(--wk-violet-6);
+    background: linear-gradient(180deg, var(--wk-night-17), var(--wk-night-9));
+    box-shadow: none;
+  }
+  #weekly-quests-window .wk-btn-accept {
+    color: var(--wk-gilt-text);
+    border-color: var(--wk-green);
+    background: linear-gradient(180deg, var(--wk-green-3), var(--wk-green-1));
+  }
+  /* The commendation strip takes the footer's slot once the charge is done:
+     the heading and note on the left, one faction button each on the right,
+     on the footer's plate so the window keeps its height. */
+  #weekly-quests-window .wk-commend {
+    margin: clamp(8px, 0.8cqw, 12px) auto 0;
+    padding: clamp(4px, 0.5cqw, 8px) clamp(12px, 1.6cqw, 28px);
+    max-width: 92cqw;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm) var(--spacing-lg);
+    border: 1px solid var(--wk-edge-gold);
+    background: linear-gradient(180deg, var(--wk-plate-top), var(--wk-plate-bottom));
+  }
+  #weekly-quests-window .wk-commend-copy {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: var(--spacing-sm);
+    min-width: 0;
+    text-align: left;
+  }
+  #weekly-quests-window .wk-commend-heading {
+    font-family: var(--font-display);
+    font-size: clamp(12px, 1.1cqw, 17px);
+    letter-spacing: 0.5px;
+    color: var(--color-accent);
+  }
+  #weekly-quests-window .wk-commend-note {
+    font-family: var(--font-serif);
+    font-size: clamp(11px, 1cqw, 15px);
+    color: var(--wk-ink);
+  }
+  #weekly-quests-window .wk-commend-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-sm);
+  }
+  #weekly-quests-window .wk-commend-options .wk-btn {
+    width: auto;
+    min-width: 0;
+    padding: clamp(4px, 0.5cqw, 8px) clamp(10px, 1.2cqw, 20px);
+    font-size: clamp(11px, 1cqw, 15px);
+  }
+  #weekly-quests-window .wk-foot {
+    margin: clamp(10px, 1.2cqw, 20px) auto 0;
+    padding: clamp(6px, 0.7cqw, 12px) clamp(12px, 1.6cqw, 28px);
+    max-width: 70cqw;
+    text-align: center;
+    font-family: var(--font-serif);
+    font-size: clamp(12px, 1.2cqw, 19px);
+    color: var(--wk-ink);
+    border: 1px solid var(--wk-edge-gold);
+    background: linear-gradient(180deg, var(--wk-plate-top), var(--wk-plate-bottom));
+    clip-path: polygon(
+      12px 0,
+      calc(100% - 12px) 0,
+      100% 50%,
+      calc(100% - 12px) 100%,
+      12px 100%,
+      0 50%
+    );
+  }
+  #weekly-quests-window .wk-backdrop {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: var(--wk-night-6-acc);
+    z-index: 2;
+  }
+  #weekly-quests-window .wk-dialog {
+    width: min(clamp(420px, 44cqw, 720px), 100%);
+    max-height: 100%;
+    overflow: auto;
+    padding: clamp(12px, 1.3cqw, 22px) clamp(14px, 1.5cqw, 26px);
+    background: linear-gradient(
+      180deg,
+      var(--wk-violet-4-afa),
+      var(--wk-night-14-afa) 40%,
+      var(--wk-night-8-afc)
+    );
+    border: 1px solid var(--wk-edge-gold);
+    box-shadow:
+      inset 0 0 0 1px var(--wk-black),
+      inset 0 0 0 2px var(--wk-gold-1-a33),
+      0 24px 60px var(--wk-night-4-aee),
+      0 0 40px var(--wk-violet-12-a2a);
+  }
+  #weekly-quests-window .wk-dialog-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--wk-gold-1-a33);
+    margin-bottom: 10px;
+  }
+  #weekly-quests-window .wk-portrait {
+    flex: none;
+    width: clamp(48px, 5cqw, 80px);
+    height: clamp(48px, 5cqw, 80px);
+    border-radius: 50%;
+    background: center / cover no-repeat;
+    border: 2px solid var(--wk-gold);
+    box-shadow:
+      0 0 0 2px var(--wk-night-5),
+      0 0 12px var(--wk-gold-4-a55);
+  }
+  #weekly-quests-window .wk-who {
+    flex: 1;
+    min-width: 0;
+    display: grid;
+  }
+  #weekly-quests-window .wk-who-name {
+    font-family: var(--title-font);
+    font-size: clamp(15px, 1.5cqw, 24px);
+    color: var(--wk-text-brightest);
+  }
+  #weekly-quests-window .wk-who-title {
+    font-size: clamp(12px, 1.1cqw, 17px);
+    color: var(--wk-violet-text);
+  }
+  #weekly-quests-window .wk-dialog-art {
+    aspect-ratio: 458 / 160;
+    background: var(--wk-black) center / cover no-repeat;
+    border: 1px solid var(--wk-edge-gold);
+    box-shadow:
+      inset 0 0 0 1px var(--wk-black),
+      0 6px 16px var(--wk-night-2-aaa);
+    margin-bottom: 10px;
+  }
+  #weekly-quests-window .wk-dialog-title {
+    font-family: var(--title-font);
+    font-size: clamp(17px, 1.8cqw, 28px);
+    color: var(--wk-gilt-text);
+    margin-bottom: 6px;
+  }
+  #weekly-quests-window .wk-dialog-lore {
+    margin: 0 0 8px;
+    font-family: var(--font-serif);
+    font-size: clamp(13.5px, 1.3cqw, 21px);
+    line-height: 1.5;
+    color: var(--wk-text-bright);
+  }
+  #weekly-quests-window .wk-dialog-sub {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--title-font);
+    font-size: clamp(13px, 1.3cqw, 20px);
+    color: var(--wk-gilt-text);
+    margin: 8px 0 4px;
+  }
+  #weekly-quests-window .wk-dialog-sub::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--wk-gold-5-a66), transparent);
+  }
+  #weekly-quests-window .wk-dialog-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: clamp(13px, 1.2cqw, 19px);
+    color: var(--wk-ink);
+  }
+  #weekly-quests-window .wk-dialog-row b {
+    color: var(--wk-text-bright);
+  }
+  #weekly-quests-window .wk-reward {
+    display: grid;
+    grid-template-columns: clamp(44px, 4.6cqw, 72px) 1fr;
+    gap: 10px;
+    align-items: center;
+    margin-top: 8px;
+    padding: 8px 10px 8px 8px;
+    border: 1px solid var(--wk-violet);
+    background:
+      linear-gradient(90deg, var(--wk-violet-11-a1f), var(--wk-violet-10-a08) 60%),
+      var(--wk-night-10);
+  }
+  #weekly-quests-window .wk-reward-icon {
+    width: clamp(44px, 4.6cqw, 72px);
+    height: clamp(44px, 4.6cqw, 72px);
+    background: var(--wk-night-12) center / cover no-repeat;
+    border: 1px solid var(--wk-violet-accent);
+  }
+  #weekly-quests-window .wk-reward-name {
+    display: block;
+    color: var(--wk-violet-accent);
+    font-weight: 700;
+    font-size: clamp(13.5px, 1.3cqw, 21px);
+  }
+  #weekly-quests-window .wk-reward-desc {
+    display: block;
+    color: var(--wk-ink);
+    font-size: clamp(12px, 1.1cqw, 17px);
+    margin-top: 2px;
+  }
+  #weekly-quests-window .wk-note {
+    margin-top: 8px;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(12px, 1.1cqw, 17px);
+    color: var(--wk-muted);
+  }
+  #weekly-quests-window .wk-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  #weekly-quests-window .wk-actions .wk-btn {
+    flex: 1;
+  }
   #calendar-window {
     width: 520px;
     height: min(620px, calc(85vh - 24px));
@@ -18693,6 +20676,23 @@
   }
   .dc-btn-ghost {
     background: transparent;
+  }
+  /* Forces a fresh link pass while already linked (avatar/username resync). */
+  .dc-relink {
+    width: 100%;
+    text-align: center;
+  }
+  /* A link/relink attempt just failed. Shown in the panel itself (never the
+     pre-game #login-error line, which is hidden once the player is in-game). */
+  .dc-link-error {
+    margin: 0 0 4px;
+    padding: 8px 10px;
+    border: 1px solid var(--color-border-invalid);
+    border-radius: 5px;
+    background: color-mix(in srgb, var(--color-text-error) 12%, transparent);
+    color: var(--color-text-error);
+    font-size: 12px;
+    line-height: 1.35;
   }
   .dc-account {
     display: flex;
@@ -20572,5 +22572,3602 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  /* ---------- weekly rewards ---------- */
+  body.weekly-vault-open #bank-window {
+    left: calc(var(--app-vw, 100vw) * 0.04 / var(--window-scale));
+    top: calc(var(--app-vh, 100vh) * 0.04 / var(--window-scale));
+    right: auto;
+    bottom: auto;
+    width: calc(var(--app-vw, 100vw) * 0.92 / var(--window-scale));
+    height: calc(var(--app-vh, 100vh) * 0.9 / var(--window-scale));
+    max-width: none;
+    max-height: none;
+    transform: none;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  .weekly-rewards {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    min-height: 0;
+    padding: var(--spacing-sm) var(--spacing-lg) var(--spacing-lg);
+    overflow: auto;
+  }
+  .weekly-rewards h2,
+  .weekly-rewards h3,
+  .weekly-rewards p {
+    margin: 0;
+  }
+  .weekly-rewards p {
+    line-height: 1.4;
+    color: var(--color-text-secondary);
+  }
+  .weekly-rewards-header {
+    position: relative;
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 20px;
+    padding: 4px 0 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .weekly-rewards-header::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    width: 7px;
+    height: 7px;
+    transform: rotate(45deg);
+    background: var(--color-accent);
+  }
+  .weekly-vault-crest {
+    display: grid;
+    place-items: center;
+  }
+  .weekly-vault-crest img {
+    width: 76px;
+    height: 76px;
+    object-fit: contain;
+  }
+  .weekly-rewards h2 {
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2.2vw, 32px);
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--color-accent);
+    margin-bottom: 6px;
+  }
+  .weekly-vault-intro p {
+    max-width: 650px;
+    font-size: 14px;
+  }
+  .weekly-reset {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-left: 20px;
+    border-left: 1px solid var(--color-border-showcase);
+    text-align: right;
+    color: var(--color-text-muted);
+    font-size: 12px;
+  }
+  .weekly-reset strong {
+    font-size: 18px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-accent);
+  }
+  .weekly-choice-status {
+    font-size: 13px;
+  }
+  .weekly-tracks {
+    display: flex;
+    flex-direction: column;
+    flex: none;
+  }
+  .weekly-track {
+    position: relative;
+    padding: var(--spacing-md) 0 10px;
+    border-bottom: 1px solid var(--color-border-showcase);
+  }
+  .weekly-track:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+  .weekly-track-overview {
+    display: grid;
+    grid-template-columns: minmax(180px, 0.9fr) minmax(0, 2.3fr);
+    gap: 20px;
+    align-items: stretch;
+  }
+  .weekly-track-heading {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-md);
+    min-height: 130px;
+    box-sizing: border-box;
+    overflow: hidden;
+    background: var(--color-ink-deep);
+  }
+  .weekly-track-heading::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.5;
+    mask-image: linear-gradient(90deg, transparent, var(--color-ink) 40%, transparent);
+  }
+  .weekly-track-raid .weekly-track-heading::before {
+    background-image: url("/textures/loading/drakemaw-caldera.webp");
+  }
+  .weekly-track-dungeon .weekly-track-heading::before {
+    background-image: url("/textures/loading/hollow-crypt-party.webp");
+  }
+  .weekly-track-world .weekly-track-heading::before {
+    background-image: url("/textures/loading/eastbrook-square.webp");
+  }
+  .weekly-track-pvp .weekly-track-heading::before {
+    background-image: url("/textures/loading/eastbrook-mine-duel.webp");
+  }
+  .weekly-track-heading h3 {
+    font-family: var(--font-display);
+    font-size: 21px;
+    letter-spacing: 1px;
+    color: var(--color-text-on-medal);
+    text-shadow: var(--outline-shadow);
+  }
+  .weekly-milestones {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    min-width: 0;
+    align-items: stretch;
+  }
+  .weekly-milestone {
+    position: relative;
+    isolation: isolate;
+    background: var(--panel-bg-strong);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm);
+    min-width: 0;
+    min-height: 220px;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+  }
+  .weekly-vault-illustration {
+    position: relative;
+    isolation: isolate;
+    flex: none;
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    /* The opening's motion vocabulary lives on the STAGE so the trigger's
+       light layers and the loot (a trigger sibling) both inherit it: one
+       fast-out, long-settle curve for everything that leaves the door (it
+       bursts, then it fades) and one gentle curve for what lands or dims. The
+       timeline (--vault-t-*) and every per-element start, life, reach and
+       drift (--vault-ray-* / -star-* / -streak-* / -ring-*) are stamped inline
+       by the reveal controller from src/ui/weekly_vault_burst_core.ts; this
+       sheet never retypes a number (tests/weekly_vault_reveal_styles.test.ts
+       pins the contract). */
+    --vault-ease-burst: cubic-bezier(0.08, 0.82, 0.17, 1);
+    --vault-ease-settle: cubic-bezier(0.22, 0.61, 0.36, 1);
+    /* How far into the show this stage was mounted (the reveal controller
+       stamps it on a mid-show repaint); every open-state delay subtracts it,
+       so a rebuilt tile resumes where the torn-down one was. */
+    --vault-elapsed: 0ms;
+    /* The white-hot core of every light element, warmed toward the vault's
+       rarity glow so silver and heroic gold keep their own colour. */
+    --vault-light-core: color-mix(in srgb, var(--color-white) 78%, var(--weekly-vault-glow));
+  }
+  .weekly-vault-art {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    pointer-events: none;
+  }
+  .weekly-vault-normal {
+    --weekly-vault-glow: var(--color-map-marker-semantic-silver);
+  }
+  .weekly-vault-heroic {
+    --weekly-vault-glow: var(--color-proc-glow);
+  }
+  .weekly-earned .weekly-vault-illustration::after {
+    content: "";
+    position: absolute;
+    inset: 14%;
+    border-radius: 9%;
+    border: 2px solid var(--weekly-vault-glow);
+    box-shadow:
+      0 0 calc(15px * var(--fx-shadow)) 4px var(--weekly-vault-glow),
+      inset 0 0 calc(13px * var(--fx-shadow)) 3px var(--weekly-vault-glow);
+    opacity: 0.45;
+    pointer-events: none;
+  }
+  @keyframes weekly-vault-glow-pulse {
+    0%,
+    100% {
+      opacity: 0.2;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .weekly-earned .weekly-vault-illustration::after {
+      animation: weekly-vault-glow-pulse 3.2s ease-in-out infinite;
+      animation-play-state: var(--fx-ambient-anim);
+    }
+  }
+  .weekly-milestone-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--color-ink-deep) 90%, transparent);
+  }
+  .weekly-milestone-label {
+    color: var(--color-text-on-ink);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+  .weekly-difficulty {
+    justify-self: end;
+    padding: 2px var(--spacing-sm);
+    border: 1px solid var(--color-control-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
+    background: var(--socket-fill);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .weekly-difficulty-heroic {
+    color: var(--color-text-on-medal);
+    background: var(--medal-fill);
+    border-color: var(--color-socket-rim);
+  }
+  .weekly-clear-mix {
+    font-size: 12px;
+    color: var(--color-text-on-ink-soft);
+  }
+  .weekly-milestone-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    margin-top: auto;
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--color-ink-deep) 90%, transparent);
+  }
+  .weekly-roll-label {
+    font-size: 12px;
+    color: var(--color-text-on-ink);
+  }
+  .weekly-milestone-count {
+    color: var(--color-text-on-ink-soft);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .weekly-earned .weekly-roll-label {
+    color: var(--color-text-on-medal);
+  }
+  .weekly-heroic-upgrade {
+    flex-basis: 100%;
+    color: var(--color-text-on-ink);
+    font-size: 12px;
+    line-height: 1.4;
+    margin-bottom: var(--spacing-xs);
+  }
+  .weekly-track-unavailable .weekly-track-heading::before {
+    filter: grayscale(1);
+    opacity: 0.25;
+  }
+  .weekly-vault-toolbar {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .weekly-possible-loot-button {
+    min-height: 44px;
+    height: auto;
+    white-space: normal;
+  }
+  .weekly-possible-loot-button[aria-expanded="true"] {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: -2px;
+  }
+  .weekly-possible-loot {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    gap: var(--spacing-sm);
+  }
+  .weekly-possible-loot[hidden] {
+    display: none;
+  }
+  .weekly-pool {
+    min-width: 0;
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-md);
+    background: var(--panel-bg-strong);
+  }
+  .weekly-pool[hidden] {
+    display: none;
+  }
+  .weekly-pool h4 {
+    margin: 0 0 var(--spacing-sm);
+    color: var(--color-accent);
+  }
+  .weekly-saved-rewards summary:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .weekly-pool > p,
+  .weekly-pool-actions {
+    font-size: 12px;
+    padding-bottom: 8px;
+  }
+  .weekly-pool-actions {
+    padding-top: 8px;
+    color: var(--color-accent);
+  }
+  .weekly-unavailable {
+    font-size: 12px;
+    margin-top: 8px !important;
+    font-style: italic;
+  }
+  .weekly-loot-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .weekly-loot {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    text-align: left;
+    min-height: 44px;
+    white-space: normal;
+    height: auto;
+  }
+  .weekly-loot img,
+  .weekly-loot .item-icon {
+    width: 32px;
+    height: 32px;
+    flex: none;
+  }
+  .weekly-loot.quality-rare {
+    border-left: 3px solid var(--color-quality-rare);
+  }
+  .weekly-loot.quality-epic {
+    border-left: 3px solid var(--color-quality-epic);
+  }
+  .vault-reveal-trigger {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-on-ink);
+    cursor: pointer;
+    perspective: 470px;
+    perspective-origin: 55% 38%;
+    isolation: isolate;
+  }
+  .vault-reveal-trigger:focus-visible {
+    outline: 3px solid var(--color-border-focus);
+    outline-offset: -3px;
+  }
+  .vault-reveal-frame,
+  .vault-reveal-door {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+  }
+  .vault-reveal-frame {
+    z-index: 6;
+    clip-path: polygon(
+      evenodd,
+      0 0,
+      100% 0,
+      100% 100%,
+      0 100%,
+      0 0,
+      18% 15%,
+      82% 15%,
+      87% 21%,
+      87% 79%,
+      82% 85%,
+      18% 85%,
+      13% 79%,
+      13% 21%,
+      18% 15%
+    );
+  }
+  .vault-reveal-door {
+    z-index: 8;
+    transform-origin: 13% 50%;
+    transform-style: preserve-3d;
+    transition: transform 0.65s cubic-bezier(0.4, 0, 0.6, 1);
+  }
+  .vault-door-front,
+  .vault-door-latch,
+  .vault-door-back {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    backface-visibility: hidden;
+  }
+  .vault-door-front {
+    clip-path: polygon(18% 15%, 82% 15%, 87% 21%, 87% 79%, 82% 85%, 18% 85%, 13% 79%, 13% 21%);
+    transform: translateZ(12px);
+  }
+  .vault-door-latch {
+    clip-path: circle(17% at 50% 50%);
+    transform: translateZ(13px);
+  }
+  .vault-door-back {
+    clip-path: polygon(18% 15%, 82% 15%, 87% 21%, 87% 79%, 82% 85%, 18% 85%, 13% 79%, 13% 21%);
+    filter: brightness(0.82);
+    transform: translateZ(-12px) rotateY(180deg);
+  }
+  .vault-door-edge {
+    position: absolute;
+    top: 21%;
+    bottom: 21%;
+    left: 87%;
+    width: 24px;
+    background: linear-gradient(
+      90deg,
+      var(--color-chrome-plate-ink),
+      var(--color-ink-deep) 25%,
+      var(--color-chrome-plate-ink) 65%,
+      var(--color-ink-deep)
+    );
+    border: 2px solid var(--color-gold-600);
+    transform-origin: left center;
+    transform: translateZ(12px) rotateY(90deg);
+  }
+  .vault-door-top {
+    position: absolute;
+    left: 18%;
+    right: 18%;
+    top: 15%;
+    height: 24px;
+    background: linear-gradient(var(--color-chrome-plate-ink), var(--color-ink-deep));
+    transform-origin: center top;
+    transform: translateZ(12px) rotateX(-90deg);
+  }
+  .vault-door-bottom {
+    position: absolute;
+    left: 18%;
+    right: 18%;
+    top: 85%;
+    height: 24px;
+    background: linear-gradient(var(--color-ink-deep), var(--color-chrome-plate-ink));
+    transform-origin: center top;
+    transform: translateZ(12px) rotateX(-90deg);
+  }
+  .vault-door-edge::after {
+    content: "";
+    position: absolute;
+    inset: 12% 3px;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent 0 28px,
+      var(--color-gold-600) 29px 32px,
+      var(--color-ink-deep) 33px 39px
+    );
+  }
+  .vault-door-shading {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    clip-path: polygon(18% 15%, 82% 15%, 87% 21%, 87% 79%, 82% 85%, 18% 85%, 13% 79%, 13% 21%);
+    background: linear-gradient(100deg, transparent 25%, var(--color-ink-deep));
+    opacity: 0;
+    transform: translateZ(12.5px);
+    backface-visibility: hidden;
+  }
+  .weekly-earned .weekly-vault-illustration {
+    overflow: visible;
+  }
+  .weekly-earned .weekly-milestone-heading,
+  .weekly-earned .weekly-milestone-footer {
+    position: relative;
+    z-index: 20;
+  }
+  /* The light stays inside the card: the tile's own overflow clip masks the
+     burst at the card edge exactly as it masks the swinging door, so no light
+     ever crosses into a neighbouring card or the sheet's scroll area. */
+  /* Every light layer lives in this container, above the frame art (z 6) and
+     under the door (z 8): the shut door hides the middle, so only what escapes
+     the seam shows. The clip removes everything left of the doorway's inner
+     edge (13% between the chamfers, 18% at them) and nothing else: on the
+     hinge side the light ends at the frame instead of running behind the open
+     door, while it still leaves the tile on the other three sides (the card
+     clips it there). */
+  .vault-light {
+    position: absolute;
+    inset: 0;
+    z-index: 7;
+    pointer-events: none;
+    clip-path: polygon(
+      13% 21%,
+      18% 15%,
+      18% -300%,
+      400% -300%,
+      400% 400%,
+      18% 400%,
+      18% 85%,
+      13% 79%
+    );
+  }
+  .vault-seam-glow,
+  .vault-seam-line,
+  .vault-opening-flash,
+  .vault-light-spill,
+  .vault-opening-rings,
+  .vault-burst-streaks,
+  .vault-burst-stars {
+    position: absolute;
+    pointer-events: none;
+  }
+  .vault-light-spill,
+  .vault-opening-rings,
+  .vault-burst-streaks,
+  .vault-burst-stars {
+    inset: 0;
+  }
+  /* The halo: a true circle centred on the doorway, sized to the tile
+     (closest-side, so its fade reaches transparent at the tile's edges and the
+     corners stay dark); its own gradient is the softness, the tier-scaled
+     box-shadow is the bloom that bleeds over the frame around the door. Never
+     a rounded box: a box's straight sides read as a square glow. */
+  .vault-seam-glow {
+    inset: 0;
+    border-radius: 50%;
+    opacity: 0;
+    background: radial-gradient(
+      circle closest-side at 50% 50%,
+      var(--vault-light-core),
+      var(--weekly-vault-glow) 26%,
+      color-mix(in srgb, var(--weekly-vault-glow) 60%, transparent) 50%,
+      color-mix(in srgb, var(--weekly-vault-glow) 28%, transparent) 74%,
+      transparent 100%
+    );
+    box-shadow:
+      0 0 calc(18px * var(--fx-shadow)) calc(6px * var(--fx-shadow))
+      color-mix(in srgb, var(--weekly-vault-glow) 45%, transparent),
+      0 0 calc(44px * var(--fx-shadow)) calc(14px * var(--fx-shadow))
+      color-mix(in srgb, var(--weekly-vault-glow) 25%, transparent);
+    transform: scale(0.96);
+  }
+  /* The seam itself igniting: a thin ring straddling the door edge (evenodd,
+     so the middle stays clear); the door hides the inner half. */
+  .vault-seam-line {
+    inset: 0;
+    opacity: 0;
+    background: var(--vault-light-core);
+    clip-path: polygon(
+      evenodd,
+      17.4% 13.6%,
+      82.6% 13.6%,
+      88.4% 20.4%,
+      88.4% 79.6%,
+      82.6% 86.4%,
+      17.4% 86.4%,
+      11.6% 79.6%,
+      11.6% 20.4%,
+      17.4% 13.6%,
+      18.4% 15.6%,
+      81.6% 15.6%,
+      86.4% 21.4%,
+      86.4% 78.6%,
+      81.6% 84.4%,
+      18.4% 84.4%,
+      13.6% 78.6%,
+      13.6% 21.4%,
+      18.4% 15.6%
+    );
+  }
+  /* Awaiting the host's saved opening: the seam already glows on the click.
+     Cosmetic (aria-busy and the status line carry the state); the loop rides
+     the ambient play-state token and paused still shows its resting glow. */
+  .vault-is-charging:not(.vault-is-open) .vault-seam-glow {
+    opacity: 0.55;
+    animation: vault-seam-throb 1.1s ease-in-out infinite alternate;
+    animation-play-state: var(--fx-ambient-anim, running);
+  }
+  .vault-is-charging:not(.vault-is-open) .vault-seam-line {
+    opacity: 0.5;
+  }
+  /* The core bloom inside the doorway once it swings clear: a circle whose
+     fade ends at the door's edge, so it reads round, not as a lit square. */
+  .vault-opening-flash {
+    inset: 6%;
+    opacity: 0;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle closest-side at 50% 50%,
+      var(--vault-light-core),
+      var(--weekly-vault-glow) 12%,
+      color-mix(in srgb, var(--weekly-vault-glow) 55%, transparent) 34%,
+      color-mix(in srgb, var(--weekly-vault-glow) 22%, transparent) 60%,
+      transparent 86%
+    );
+    transform: scale(0.25);
+  }
+  .vault-door-shadow {
+    position: absolute;
+    inset: 14% 13%;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    background: linear-gradient(90deg, var(--color-ink-deep) 10%, transparent 90%);
+    transform-origin: left center;
+  }
+  /* Rays: one element each, aimed from its own origin, sized and timed by its
+     own vars, so no two fire or leave together. The ::before is the static
+     beam; the outer <i> aims it, slowly fans it, and TRIMS it with a sliding
+     soft-edged mask window (twice the beam long, feathered at both ends): the
+     window slides in from the centre so the head shoots out with a feathered
+     edge, then slides on so the tail follows it out, feathered too, until the
+     stroke has left the doorway. The mask rides the ray's own axis whatever
+     its rotation. At rest the window sits wholly behind the centre (nothing
+     shows). */
+  .vault-light-spill i {
+    position: absolute;
+    left: var(--vault-ray-x);
+    top: var(--vault-ray-y);
+    width: var(--vault-ray-length);
+    height: var(--vault-ray-width);
+    transform-origin: 0 50%;
+    transform: translateY(-50%) rotate(var(--vault-ray-angle));
+    mask-image: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-white) 15%,
+      var(--color-white) 85%,
+      transparent
+    );
+    mask-size: 200% 100%;
+    mask-repeat: no-repeat;
+    mask-position: 200% 0;
+  }
+  .vault-light-spill i::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: var(--vault-ray-peak);
+    clip-path: polygon(0 46%, 62% 0, 100% 50%, 62% 100%, 0 54%);
+    background: linear-gradient(
+      90deg,
+      var(--vault-light-core),
+      var(--weekly-vault-glow) 30%,
+      var(--weekly-vault-glow) 72%,
+      color-mix(in srgb, var(--weekly-vault-glow) 55%, transparent)
+    );
+  }
+  .vault-ray-wide::before {
+    clip-path: polygon(0 40%, 55% 0, 100% 50%, 55% 100%, 0 60%);
+    filter: drop-shadow(0 0 calc(2px * var(--fx-shadow)) var(--weekly-vault-glow));
+  }
+  .vault-ray-thin::before {
+    background: linear-gradient(
+      90deg,
+      var(--vault-light-core),
+      var(--vault-light-core) 40%,
+      var(--weekly-vault-glow) 80%,
+      color-mix(in srgb, var(--weekly-vault-glow) 60%, transparent)
+    );
+  }
+  /* Shockwaves: two rings, the second later, slower and wider. */
+  .vault-opening-rings i {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 46%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 2px solid var(--vault-light-core);
+    box-shadow:
+      0 0 calc(10px * var(--fx-shadow)) var(--weekly-vault-glow),
+      inset 0 0 calc(8px * var(--fx-shadow)) var(--weekly-vault-glow);
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.12);
+  }
+  /* Particles travel in multiples of their own box (VAULT_PARTICLE_BOX, 10% of
+     the illustration), so the core's illustration-percent offsets scale with
+     the tile on every viewport. */
+  .vault-burst-streaks i,
+  .vault-burst-stars i {
+    position: absolute;
+    left: 45%;
+    top: 45%;
+    width: 10%;
+    height: 10%;
+    opacity: 0;
+  }
+  /* Highlight streaks: short bright lines that shoot from the centre, then
+     sparkle in place before they go. The bright head leads. */
+  .vault-burst-streaks i::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--vault-streak-length);
+    height: 2px;
+    border-radius: 1px;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--weekly-vault-glow) 35%,
+      var(--vault-light-core) 72%,
+      var(--vault-light-core)
+    );
+    box-shadow: 0 0 calc(4px * var(--fx-shadow)) var(--weekly-vault-glow);
+  }
+  /* Stylised four-point stars: they burst out, spin, twinkle for the longest
+     and are the last thing to fade. */
+  .vault-burst-stars i::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--vault-star-size);
+    height: var(--vault-star-size);
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(0.55);
+    clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+    background: radial-gradient(
+      circle at 50% 50%,
+      var(--color-white),
+      var(--vault-light-core) 30%,
+      var(--weekly-vault-glow) 70%
+    );
+    filter: drop-shadow(0 0 calc(3px * var(--fx-shadow)) var(--weekly-vault-glow));
+  }
+  .vault-reveal-interior {
+    position: absolute;
+    inset: 13%;
+    background: radial-gradient(
+      ellipse at center,
+      color-mix(in srgb, var(--weekly-vault-glow) 25%, var(--color-ink-deep)),
+      var(--color-ink-deep) 75%
+    );
+    box-shadow: inset 0 0 22px var(--weekly-vault-glow);
+  }
+  /* The loot: hidden until its keyframe reveal, which starts only after the
+     door is fully open. A keyframe with a backwards fill, never a transition:
+     the open class can land before the element's first style pass, and a
+     transition then has no start value and never runs, which is how the item
+     name once appeared over a shut door (the regression this pins). */
+  .vault-reveal-loot {
+    position: absolute;
+    z-index: 12;
+    inset: 21% 20%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 4px;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-on-ink);
+    font: inherit;
+    cursor: help;
+    visibility: hidden;
+    opacity: 0;
+    transform: scale(0.35);
+    pointer-events: none;
+  }
+  .vault-is-open :where(.vault-reveal-loot) {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    animation: vault-loot-reveal var(--vault-t-loot-fade) var(--vault-ease-settle)
+      calc(var(--vault-t-loot) - var(--vault-elapsed)) both;
+  }
+  .vault-reveal-loot:disabled {
+    pointer-events: none;
+  }
+  .vault-reveal-loot:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  .vault-reveal-loot > :first-child {
+    width: 58px;
+    height: 58px;
+    flex: none;
+  }
+  .vault-reveal-loot img,
+  .vault-reveal-loot svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .vault-reveal-loot strong {
+    font-size: 13px;
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+  .vault-reveal-loot small {
+    font-size: 11px;
+    color: var(--weekly-vault-glow);
+  }
+  .vault-is-open :where(.vault-reveal-door) {
+    transform: translateX(-10px) rotateY(-94deg);
+    animation: vault-heavy-swing 2s linear calc(0ms - var(--vault-elapsed)) both;
+  }
+  .vault-is-open :where(.vault-door-shading) {
+    animation: vault-door-depth 2s calc(0ms - var(--vault-elapsed)) both;
+  }
+  .vault-is-open :where(.vault-door-shadow) {
+    animation: vault-cast-shadow 1.7s calc(0.25s - var(--vault-elapsed)) both;
+  }
+  .vault-is-open :where(.vault-door-latch) {
+    animation: vault-latch-release 0.48s ease-in-out calc(0ms - var(--vault-elapsed)) both;
+  }
+  .vault-is-open :where(.vault-reveal-frame) {
+    animation: vault-unlock-jolt 0.48s ease-out calc(0ms - var(--vault-elapsed));
+  }
+  .vault-is-open :where(.vault-reveal-loot > :first-child) {
+    animation: vault-loot-arrival calc(var(--vault-t-loot-fade) + 180ms) var(--vault-ease-settle)
+      calc(var(--vault-t-loot) - var(--vault-elapsed)) both;
+  }
+  /* Every open-state rule uses :where() so the blanket suppressions below
+     (revealed, reduced motion) always outrank them whatever a selector's
+     type-count is; the styles test pins that no open-state rule escapes it. */
+  .vault-is-open :where(.vault-seam-glow) {
+    animation: vault-seam-charge calc(var(--vault-t-open) + 260ms) var(--vault-ease-settle)
+      calc(var(--vault-t-charge) - var(--vault-elapsed)) both;
+  }
+  .vault-is-open :where(.vault-seam-line) {
+    animation: vault-seam-ignite calc(var(--vault-t-open) + 100ms) linear
+      calc(var(--vault-t-charge) - var(--vault-elapsed)) both;
+  }
+  .vault-is-open :where(.vault-opening-flash) {
+    animation: vault-core-flash 1.5s var(--vault-ease-settle)
+      calc(var(--vault-t-burst) - 60ms - var(--vault-elapsed)) both;
+  }
+  .vault-is-open :where(.vault-light-spill i) {
+    animation:
+      vault-ray-drift var(--vault-ray-duration) linear
+      calc(var(--vault-ray-delay) - var(--vault-elapsed)) both,
+      vault-ray-sweep var(--vault-ray-duration) calc(var(--vault-ray-delay) - var(--vault-elapsed))
+      both;
+  }
+  .vault-is-open :where(.vault-opening-rings i) {
+    animation: vault-light-shockwave var(--vault-ring-duration) var(--vault-ease-burst)
+      calc(var(--vault-ring-delay) - var(--vault-elapsed)) both;
+  }
+  .vault-is-open :where(.vault-burst-streaks i) {
+    animation: vault-streak-burst var(--vault-streak-duration)
+      calc(var(--vault-streak-delay) - var(--vault-elapsed)) both;
+  }
+  .vault-is-open :where(.vault-burst-stars i) {
+    animation: vault-star-burst var(--vault-star-duration)
+      calc(var(--vault-star-delay) - var(--vault-elapsed)) both;
+  }
+  .vault-is-open :where(.vault-burst-stars i)::before {
+    animation: vault-star-twinkle var(--vault-star-twinkle) ease-in-out
+      calc(var(--vault-star-delay) - var(--vault-elapsed)) var(--vault-star-twinkles) alternate both;
+  }
+  @keyframes vault-heavy-swing {
+    0%,
+    16% {
+      transform: rotateY(0);
+    }
+    20% {
+      transform: translateZ(3px) rotateY(2deg);
+    }
+    28% {
+      transform: translateZ(5px) rotateY(-9deg);
+      animation-timing-function: cubic-bezier(0.32, 0.05, 0.18, 1);
+    }
+    88% {
+      transform: translateX(-10px) rotateY(-98deg);
+    }
+    100% {
+      transform: translateX(-10px) rotateY(-94deg);
+    }
+  }
+  @keyframes vault-door-depth {
+    0%,
+    22% {
+      opacity: 0;
+    }
+    60% {
+      opacity: 0.75;
+    }
+    100% {
+      opacity: 0.35;
+    }
+  }
+  @keyframes vault-cast-shadow {
+    0% {
+      opacity: 0.85;
+      transform: scaleX(1);
+    }
+    60% {
+      opacity: 0.6;
+      transform: scaleX(0.4) skewY(-8deg);
+    }
+    100% {
+      opacity: 0;
+      transform: scaleX(0.06);
+    }
+  }
+  @keyframes vault-seam-throb {
+    0% {
+      opacity: 0.35;
+      transform: scale(0.98);
+    }
+    100% {
+      opacity: 0.8;
+      transform: scale(1.01);
+    }
+  }
+  /* Halo: rushes up to full by the burst, breathes while the door swings,
+     then dims once the doorway is the light source. */
+  @keyframes vault-seam-charge {
+    0% {
+      opacity: 0.45;
+      transform: scale(0.96);
+      animation-timing-function: var(--vault-ease-burst);
+    }
+    28% {
+      opacity: 1;
+      transform: scale(1.02);
+      animation-timing-function: ease-in-out;
+    }
+    46% {
+      opacity: 0.8;
+    }
+    64% {
+      opacity: 1;
+      transform: scale(1.05);
+      animation-timing-function: var(--vault-ease-settle);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.1);
+    }
+  }
+  /* Seam line: a light igniting, two stutters then full. */
+  @keyframes vault-seam-ignite {
+    0% {
+      opacity: 0;
+    }
+    6% {
+      opacity: 0.45;
+    }
+    10% {
+      opacity: 0.15;
+    }
+    17% {
+      opacity: 0.8;
+    }
+    22% {
+      opacity: 0.5;
+    }
+    30% {
+      opacity: 1;
+    }
+    60% {
+      opacity: 0.9;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes vault-core-flash {
+    0% {
+      opacity: 0;
+      transform: scale(0.25);
+      animation-timing-function: var(--vault-ease-burst);
+    }
+    14% {
+      opacity: 0.85;
+      transform: scale(1);
+      animation-timing-function: var(--vault-ease-settle);
+    }
+    40% {
+      opacity: 0.45;
+      transform: scale(1.08);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.22);
+    }
+  }
+  @keyframes vault-ray-drift {
+    from {
+      transform: translateY(-50%) rotate(var(--vault-ray-angle));
+    }
+    to {
+      transform: translateY(-50%) rotate(calc(var(--vault-ray-angle) + var(--vault-ray-drift)));
+    }
+  }
+  /* Stroke window: the head shoots out on the burst curve (the window slides
+     in from the centre), then the tail follows it out on the settle curve (the
+     window slides on past the tip) until nothing of the stroke remains. */
+  @keyframes vault-ray-sweep {
+    0% {
+      mask-position: 200% 0;
+      animation-timing-function: var(--vault-ease-burst);
+    }
+    34% {
+      mask-position: 40% 0;
+      animation-timing-function: var(--vault-ease-settle);
+    }
+    100% {
+      mask-position: -100% 0;
+    }
+  }
+  @keyframes vault-light-shockwave {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.12);
+    }
+    12% {
+      opacity: 0.9;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(var(--vault-ring-scale));
+    }
+  }
+  /* Streak: shoots to its mark on the burst curve, flickers there, then goes. */
+  @keyframes vault-streak-burst {
+    0% {
+      opacity: 0;
+      transform: translate(0, 0) rotate(var(--vault-streak-angle)) scale(0.3);
+      animation-timing-function: var(--vault-ease-burst);
+    }
+    8% {
+      opacity: 1;
+      animation-timing-function: linear;
+    }
+    36% {
+      transform: translate(var(--vault-streak-x), var(--vault-streak-y))
+        rotate(var(--vault-streak-angle)) scale(1);
+      animation-timing-function: linear;
+    }
+    48% {
+      opacity: 0.55;
+    }
+    58% {
+      opacity: 0.95;
+    }
+    70% {
+      opacity: 0.4;
+    }
+    80% {
+      opacity: 0.8;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(calc(var(--vault-streak-x) * 1.12), calc(var(--vault-streak-y) * 1.12))
+        rotate(var(--vault-streak-angle)) scale(0.85);
+    }
+  }
+  /* Star: bursts to its mark, keeps drifting outward and up, holds bright
+     for most of its life, then fades last. */
+  @keyframes vault-star-burst {
+    0% {
+      opacity: 0;
+      transform: translate(0, 0) rotate(0deg);
+      animation-timing-function: var(--vault-ease-burst);
+    }
+    7% {
+      opacity: 1;
+      animation-timing-function: linear;
+    }
+    34% {
+      transform: translate(var(--vault-star-x), var(--vault-star-y)) rotate(var(--vault-star-spin));
+      animation-timing-function: linear;
+    }
+    72% {
+      opacity: 0.9;
+      animation-timing-function: var(--vault-ease-settle);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(calc(var(--vault-star-x) * 1.08), calc(var(--vault-star-y) * 1.08 - 60%))
+        rotate(calc(var(--vault-star-spin) * 1.5));
+    }
+  }
+  @keyframes vault-star-twinkle {
+    0% {
+      opacity: 0.7;
+      transform: translate(-50%, -50%) scale(0.55) rotate(0deg);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.15) rotate(18deg);
+    }
+  }
+  @keyframes vault-latch-release {
+    0%,
+    18% {
+      transform: translateZ(13px) rotate(0);
+    }
+    35% {
+      transform: translateZ(15px) rotate(9deg);
+    }
+    80%,
+    100% {
+      transform: translateZ(13px) rotate(-45deg);
+    }
+  }
+  @keyframes vault-unlock-jolt {
+    0%,
+    28%,
+    100% {
+      transform: translate(0);
+    }
+    40% {
+      transform: translate(1.5px, 1px);
+    }
+    55% {
+      transform: translate(-1.5px, -0.5px);
+    }
+    72% {
+      transform: translate(0.8px, 0.5px);
+    }
+  }
+  /* The loot pops from the middle of the doorway: it grows from the centre
+     (covering the strokes there) with a small overshoot, never a slide up. */
+  @keyframes vault-loot-reveal {
+    0% {
+      visibility: hidden;
+      opacity: 0;
+      transform: scale(0.35);
+      animation-timing-function: var(--vault-ease-burst);
+    }
+    1% {
+      visibility: visible;
+      opacity: 0;
+    }
+    45% {
+      opacity: 1;
+    }
+    70% {
+      transform: scale(1.06);
+      animation-timing-function: var(--vault-ease-settle);
+    }
+    100% {
+      visibility: visible;
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes vault-loot-arrival {
+    0% {
+      opacity: 0;
+      transform: scale(0.6);
+    }
+    60% {
+      opacity: 1;
+      transform: scale(1.14);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  .weekly-earned .vault-is-open::after {
+    animation: none;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+  }
+  .vault-reveal-announcement {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  /* Reduced motion: the host completes the reveal at once, so the open state
+     is the resting state; every layer under the trigger and the loot stay
+     still (the blanket selectors cover any layer added later). */
+  @media (prefers-reduced-motion: reduce) {
+    .vault-reveal-door,
+    .weekly-earned .vault-is-open::after {
+      transition: none;
+    }
+    .vault-is-open .vault-reveal-trigger,
+    .vault-is-open .vault-reveal-trigger *,
+    .vault-is-open .vault-reveal-trigger *::before,
+    .vault-is-open .vault-reveal-trigger *::after,
+    .vault-is-charging .vault-reveal-trigger *,
+    .vault-is-open .vault-reveal-loot,
+    .vault-is-open .vault-reveal-loot > :first-child {
+      animation: none;
+    }
+  }
+  /* Revealed (the host's timer, or a repaint of an already opened vault): no
+     layer replays, and the light layers rest at their invisible base. Both
+     classes in the selector so this outranks every open-state rule. */
+  .vault-is-open.vault-is-revealed .vault-reveal-trigger,
+  .vault-is-open.vault-is-revealed .vault-reveal-trigger *,
+  .vault-is-open.vault-is-revealed .vault-reveal-trigger *::before,
+  .vault-is-open.vault-is-revealed .vault-reveal-trigger *::after,
+  .vault-is-open.vault-is-revealed .vault-reveal-loot,
+  .vault-is-open.vault-is-revealed .vault-reveal-loot > :first-child {
+    animation: none;
+    transition: none;
+  }
+
+  .weekly-claim-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .weekly-claim-flow[hidden],
+  .weekly-tracks[hidden] {
+    display: none;
+  }
+  .weekly-claim-active {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+  }
+  .weekly-claim-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .weekly-claim-header .weekly-return-progress {
+    margin-left: auto;
+  }
+  .weekly-claim-date {
+    font-size: 12px;
+  }
+  .weekly-claim-flow .ui-btn {
+    min-height: 44px;
+    white-space: normal;
+    height: auto;
+  }
+  .weekly-start-claim {
+    align-self: flex-start;
+    padding: 10px 22px;
+  }
+  .weekly-claim-tracks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .weekly-claim-tiles {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    padding: 8px;
+  }
+  .weekly-claim-tracks .weekly-track {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    min-width: 0;
+  }
+  .weekly-claim-tracks .weekly-track-heading {
+    min-height: 32px;
+    padding: 6px 10px;
+  }
+  body.mobile-touch .weekly-claim-active {
+    flex: none;
+    min-height: auto;
+    overflow: visible;
+  }
+  .weekly-claim-tiles .weekly-milestone {
+    display: flex;
+    flex-direction: column;
+    padding: 6px;
+  }
+  .weekly-claim-flow .weekly-vault-illustration {
+    width: min(100%, 250px);
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 1;
+    align-self: center;
+  }
+  .weekly-claim-flow .weekly-milestone-heading {
+    min-height: 36px;
+  }
+  .weekly-claim-flow .weekly-milestone-footer {
+    margin-top: 8px;
+    font-size: 12px;
+  }
+  .weekly-table-picker {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    text-align: left;
+  }
+  .weekly-table-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    text-align: left;
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    white-space: normal;
+    cursor: pointer;
+  }
+  .weekly-table-summary::after {
+    content: "";
+    flex: 0 0 auto;
+    width: 7px;
+    height: 7px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+  }
+  .weekly-table-picker[open] > .weekly-table-summary::after {
+    transform: rotate(225deg);
+  }
+  .weekly-table-summary::marker {
+    content: "";
+  }
+  .weekly-table-summary::-webkit-details-marker {
+    display: none;
+  }
+  .weekly-milestone.weekly-table-expanded {
+    overflow: visible;
+    z-index: 10;
+  }
+  .weekly-table-options {
+    position: absolute;
+    inset: calc(100% + 4px) 0 auto;
+    z-index: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 4px;
+    box-sizing: border-box;
+  }
+  .weekly-table-opens-up > .weekly-table-options {
+    top: auto;
+    bottom: calc(100% + 4px);
+  }
+  .weekly-table-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 4px 8px;
+    cursor: pointer;
+  }
+  .weekly-table-option input {
+    flex: 0 0 auto;
+  }
+  .weekly-loot-category {
+    min-width: 0;
+    padding: 12px;
+  }
+  .weekly-loot-table {
+    margin-top: 8px;
+  }
+  .weekly-loot-table > summary {
+    display: flex;
+    height: auto;
+    white-space: normal;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+  .weekly-loot-table > summary::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    flex: 0 0 auto;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(-45deg);
+  }
+  .weekly-loot-table[open] > summary::before {
+    transform: rotate(45deg);
+  }
+  .weekly-loot-table > summary > span:first-of-type {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    text-align: left;
+  }
+  .weekly-loot-table > summary > .ui-num {
+    flex: 0 0 auto;
+  }
+  .weekly-loot-table .weekly-loot-list {
+    padding: 8px;
+  }
+  .weekly-table-exhausted .weekly-vault-illustration {
+    opacity: 0.45;
+  }
+  .weekly-claim-flow h3 {
+    color: var(--color-accent);
+  }
+  #prompt-stack .weekly-ready-prompt {
+    box-sizing: border-box;
+    width: min(480px, calc(100vw - 32px));
+    min-width: 0;
+    padding: 24px;
+    pointer-events: auto;
+  }
+  .weekly-ready-prompt .prompt-text {
+    font-size: 20px;
+    color: var(--color-gold);
+    margin: 0 0 12px;
+  }
+  .weekly-ready-description {
+    color: var(--color-text-light);
+    line-height: 1.5;
+    margin: 0 0 20px;
+  }
+  .weekly-ready-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  .weekly-ready-actions .ui-btn {
+    min-height: 40px;
+  }
+  .weekly-confirm-panel {
+    padding: 24px;
+    margin: auto;
+    width: min(100%, 600px);
+    box-sizing: border-box;
+  }
+  .weekly-confirm-panel > p {
+    margin-top: 14px;
+  }
+  .weekly-claim-flow .weekly-choices {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+  .weekly-claim-flow .weekly-choice {
+    min-height: 170px;
+  }
+  .weekly-claim-flow .weekly-confirm-item {
+    width: 100%;
+    min-height: 0;
+    margin-top: 18px;
+    padding: 16px;
+  }
+  .weekly-claim-flow .weekly-claim-footer {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  @media (min-width: 1100px) and (min-height: 700px) {
+    body.weekly-vault-open #bank-window {
+      left: 2vw;
+      top: max(2vh, calc((100vh - 1080px) / 2));
+      width: 96vw;
+      height: min(96vh, 1080px);
+    }
+    #weekly-rewards-panel {
+      flex: 1;
+      padding: 8px 16px 12px;
+      gap: 6px;
+      overflow: auto;
+    }
+    .weekly-rewards-header {
+      grid-template-columns: 44px minmax(0, 1fr) auto;
+      gap: 12px;
+      padding: 0 0 8px;
+      flex: none;
+    }
+    .weekly-vault-crest img {
+      width: 44px;
+      height: 44px;
+    }
+    .weekly-rewards h2 {
+      font-size: 24px;
+      margin-bottom: 2px;
+    }
+    .weekly-vault-intro p {
+      max-width: 850px;
+      font-size: 12px;
+    }
+    .weekly-reset {
+      gap: 3px;
+    }
+    .weekly-reset strong {
+      font-size: 16px;
+    }
+    .weekly-vault-toolbar {
+      position: absolute;
+      right: 18px;
+      top: 118px;
+      z-index: 2;
+    }
+    .weekly-possible-loot-button {
+      min-height: 30px;
+      padding: 4px 12px;
+      font-size: 12px;
+    }
+    .weekly-choice-status {
+      padding: 3px 165px 3px 0;
+      font-size: 12px;
+      min-height: 30px;
+    }
+    .weekly-saved-rewards {
+      flex: none;
+    }
+    .weekly-saved-rewards > summary {
+      padding: 7px 12px;
+      min-height: 32px;
+    }
+    .weekly-tracks {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      container-type: size;
+    }
+    .weekly-track,
+    .weekly-track:last-child {
+      min-height: 0;
+      padding: 0;
+      border: 1px solid var(--color-border-showcase);
+      border-radius: var(--radius-sm);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .weekly-track-overview {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .weekly-track-heading {
+      min-height: 32px;
+      padding: 5px 10px;
+      flex: none;
+    }
+    .weekly-track-heading h3 {
+      font-size: 18px;
+    }
+    .weekly-track-heading::before {
+      opacity: 0.5;
+      mask-image: none;
+      background-position: center 48%;
+    }
+    .weekly-milestones {
+      flex: 1;
+      min-height: 0;
+      gap: 6px;
+      padding: 0 6px 6px;
+    }
+    .weekly-milestone {
+      min-height: 0;
+      padding: 5px;
+      gap: 4px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      justify-content: stretch;
+    }
+    .weekly-milestone-heading {
+      gap: 4px;
+      padding: 2px;
+    }
+    .weekly-milestone-label {
+      font-size: 12px;
+    }
+    .weekly-difficulty {
+      font-size: 11px;
+      padding: 1px 5px;
+    }
+    .weekly-vault-illustration {
+      min-height: 0;
+      width: min(100%, max(0px, calc((100cqh - 250px) / 2)));
+      height: auto;
+      aspect-ratio: 1;
+      place-self: start center;
+    }
+    .weekly-milestone-footer {
+      padding: 2px;
+      gap: 3px;
+      margin-top: 0;
+    }
+    .weekly-heroic-upgrade,
+    .weekly-clear-mix,
+    .weekly-roll-label,
+    .weekly-milestone-count {
+      font-size: 11px;
+    }
+    .weekly-heroic-upgrade {
+      line-height: 1.25;
+      margin-bottom: 0;
+    }
+    .weekly-rewards .weekly-unavailable {
+      flex: none;
+      font-size: 11px;
+      padding: 0 10px 5px;
+      margin: 0;
+    }
+    #weekly-rewards-panel:has(.weekly-saved-rewards[open]) .weekly-tracks,
+    #weekly-rewards-panel:has(.weekly-possible-loot:not([hidden])) .weekly-tracks {
+      flex: none;
+      height: 680px;
+    }
+    @media (max-height: 800px) {
+      .weekly-vault-intro p {
+        font-size: 11px;
+        max-width: 720px;
+      }
+      .weekly-rewards h2 {
+        font-size: 21px;
+      }
+      .weekly-tracks {
+        gap: 8px;
+      }
+    }
+  }
+  @media (max-height: 600px) {
+    .weekly-claim-active {
+      flex: none;
+      min-height: auto;
+      overflow: visible;
+    }
+  }
+  @media (max-width: 1000px) {
+    .weekly-claim-tracks {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 600px) {
+    .weekly-claim-tiles {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .weekly-claim-header {
+      align-items: stretch;
+      flex-direction: column;
+    }
+    .weekly-claim-header .weekly-return-progress {
+      margin-left: 0;
+    }
+    .weekly-confirm-panel {
+      padding: 16px;
+    }
+    .weekly-claim-flow .weekly-claim-footer {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  .weekly-saved-rewards {
+    background: var(--panel-bg-strong);
+    padding: 0 14px;
+    flex: none;
+  }
+  .weekly-saved-rewards > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 44px;
+    padding: 6px 0;
+    color: var(--color-accent);
+    cursor: pointer;
+  }
+  .weekly-saved-rewards > summary > span:first-child {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+  }
+  .weekly-saved-rewards > summary > span:last-child {
+    font-size: 13px;
+  }
+  .weekly-saved-rewards > summary::after {
+    content: "+";
+  }
+  .weekly-saved-rewards[open] > summary::after {
+    content: "-";
+  }
+  .weekly-choices {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 8px;
+    margin: 8px 0;
+  }
+  .weekly-choice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px;
+    white-space: normal;
+    min-height: 140px;
+    height: auto;
+  }
+  .weekly-choice img,
+  .weekly-choice .item-icon {
+    width: 40px;
+    height: 40px;
+  }
+  .weekly-choice span {
+    font-size: 12px;
+  }
+  .weekly-choice[aria-pressed="true"] {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: -2px;
+  }
+  .weekly-choice.quality-epic {
+    border-top: 3px solid var(--color-quality-epic);
+  }
+  .weekly-choice.quality-rare {
+    border-top: 3px solid var(--color-quality-rare);
+  }
+  .weekly-claim-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 0;
+  }
+  .weekly-claim-footer p {
+    font-size: 13px;
+  }
+  .weekly-confirm {
+    min-height: 44px;
+    height: auto;
+    white-space: normal;
+    flex: none;
+  }
+  @media (max-width: 900px) {
+    .weekly-rewards {
+      padding: 12px;
+    }
+    .weekly-rewards-header {
+      grid-template-columns: 56px minmax(0, 1fr);
+      gap: 12px;
+    }
+    .weekly-vault-crest img {
+      width: 56px;
+      height: 56px;
+    }
+    .weekly-reset {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      justify-content: center;
+      border: 0;
+      padding: 0;
+      text-align: center;
+      gap: 12px;
+      align-items: center;
+    }
+    .weekly-track-overview {
+      grid-template-columns: minmax(150px, 0.9fr) minmax(0, 2.3fr);
+      gap: 12px;
+    }
+    .weekly-milestones {
+      gap: 8px;
+    }
+    .weekly-milestone {
+      padding: 10px;
+      gap: 8px;
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .weekly-milestone-count {
+      justify-self: end;
+    }
+    .weekly-seal {
+      width: 38px;
+      height: 38px;
+    }
+    .weekly-track-heading {
+      padding: 12px;
+    }
+    .weekly-track-heading h3 {
+      font-size: 18px;
+    }
+    .weekly-track-pools {
+      padding-left: 0;
+    }
+  }
+  @media (max-width: 600px) {
+    .weekly-track-overview {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .weekly-track-heading {
+      min-height: 100px;
+    }
+    .weekly-milestone {
+      min-height: 220px;
+      grid-template-columns: 1fr;
+    }
+    .weekly-milestone-count {
+      justify-self: end;
+    }
+    .weekly-track-pools {
+      flex-direction: column;
+      gap: 0;
+    }
+    .weekly-claim-footer {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+}
+/* ---------- world quest: weekly minigames ---------- */
+@layer components {
+  #world-quest-puzzle-window {
+    width: 410px;
+    max-width: calc(var(--app-vw, 100vw) / var(--ui-scale, 1) - 24px);
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 18px;
+  }
+
+  .wqp-instructions {
+    margin: 2px 18px 4px;
+    color: var(--color-text-muted);
+    line-height: 1.45;
+  }
+
+  .wqp-level {
+    align-self: center;
+    color: var(--color-accent);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .wqp-grid {
+    --wqp-tile-size: 72px;
+    display: grid;
+    grid-template-columns: repeat(var(--wqp-columns), var(--wqp-tile-size));
+    grid-template-rows: repeat(var(--wqp-rows), var(--wqp-tile-size));
+    gap: 8px;
+    align-self: center;
+    padding: 14px;
+    border: 1px solid var(--color-border-default);
+    border-radius: 8px;
+    background: var(--color-bg-dark);
+  }
+
+  .wqm-status {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 18px;
+    color: var(--color-text-light);
+    font-size: 13px;
+  }
+
+  .wqm-grid {
+    --wqm-cell-size: 48px;
+    display: grid;
+    grid-template-columns: repeat(var(--wqm-columns), var(--wqm-cell-size));
+    grid-template-rows: repeat(var(--wqm-rows), var(--wqm-cell-size));
+    gap: 6px;
+    align-self: center;
+    padding: 12px;
+    border: 1px solid var(--color-border-default);
+    border-radius: 8px;
+    background: var(--color-bg-dark);
+  }
+
+  .wqm-cell {
+    min-width: 44px;
+    min-height: 44px;
+    border: 2px solid var(--color-border-default);
+    border-radius: 12px;
+    color: var(--color-bg-dark);
+    cursor: pointer;
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1;
+    text-shadow: 0 1px 0 var(--color-text-overlay);
+  }
+
+  .wqm-cell.candy-0 {
+    background: var(--color-candy-berry);
+  }
+  .wqm-cell.candy-1 {
+    background: var(--color-candy-citrus);
+  }
+  .wqm-cell.candy-2 {
+    background: var(--color-candy-mint);
+  }
+  .wqm-cell.candy-3 {
+    background: var(--color-candy-grape);
+  }
+  .wqm-cell.candy-4 {
+    background: var(--color-candy-star);
+  }
+
+  .wqm-cell:hover,
+  .wqm-cell:focus-visible,
+  .wqm-cell.selected {
+    border-color: var(--color-accent);
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .wqm-cell:disabled {
+    cursor: default;
+    filter: grayscale(0.45);
+    opacity: 0.72;
+  }
+
+  .wqm-out {
+    margin: 0 18px;
+    color: var(--color-text-error);
+    text-align: center;
+  }
+
+  .wqm-reset {
+    align-self: center;
+  }
+
+  .wqp-tile {
+    position: relative;
+    min-width: 44px;
+    min-height: 44px;
+    border: 1px solid var(--color-border-default);
+    border-radius: 8px;
+    background: var(--color-bg-input);
+    cursor: pointer;
+    overflow: visible;
+  }
+
+  .wqp-tile:hover {
+    border-color: var(--color-accent);
+  }
+
+  .wqp-tile:focus-visible {
+    border-color: var(--color-accent);
+    outline: 3px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+
+  .wqp-node,
+  .wqp-arm {
+    position: absolute;
+    display: block;
+    background: var(--color-text-muted);
+    pointer-events: none;
+  }
+
+  .wqp-node {
+    width: 18px;
+    height: 18px;
+    left: 50%;
+    top: 50%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .wqp-arm.north,
+  .wqp-arm.south {
+    width: 8px;
+    height: 50%;
+    left: calc(50% - 4px);
+  }
+
+  .wqp-arm.north {
+    top: 0;
+  }
+  .wqp-arm.south {
+    bottom: 0;
+  }
+
+  .wqp-arm.east,
+  .wqp-arm.west {
+    width: 50%;
+    height: 8px;
+    top: calc(50% - 4px);
+  }
+
+  .wqp-arm.east {
+    right: 0;
+  }
+  .wqp-arm.west {
+    left: 0;
+  }
+
+  .wqp-tile.powered .wqp-node,
+  .wqp-tile.powered .wqp-arm {
+    background: var(--color-accent);
+    box-shadow: 0 0 10px var(--color-accent);
+  }
+
+  .wqp-edge {
+    position: absolute;
+    z-index: 2;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    top: calc(50% - 7px);
+    pointer-events: none;
+  }
+
+  .wqp-edge.west {
+    left: -12px;
+  }
+  .wqp-edge.east {
+    right: -12px;
+  }
+  .wqp-edge.north {
+    top: -12px;
+    left: calc(50% - 7px);
+  }
+  .wqp-edge.south {
+    top: auto;
+    bottom: -12px;
+    left: calc(50% - 7px);
+  }
+  .wqp-edge.source {
+    background: var(--color-aura-rpg-electric);
+  }
+  .wqp-edge.source {
+    border-radius: 2px;
+    transform: rotate(45deg);
+  }
+  .wqp-edge.target {
+    background: var(--color-text-success);
+    border: 3px double var(--color-bg-dark);
+  }
+
+  @media (forced-colors: active) {
+    .wqp-tile:focus-visible {
+      outline-color: Highlight;
+    }
+    .wqp-tile.powered {
+      border: 3px double Highlight;
+    }
+    .wqp-tile.powered .wqp-node,
+    .wqp-tile.powered .wqp-arm {
+      background: Highlight;
+      box-shadow: none;
+    }
+    .wqp-edge.source {
+      background: CanvasText;
+    }
+    .wqp-edge.target {
+      background: Canvas;
+      border-color: CanvasText;
+    }
+    .wqm-cell,
+    .wqm-cell.selected {
+      border-color: ButtonText;
+      color: ButtonText;
+      forced-color-adjust: auto;
+    }
+    .wqm-cell.selected {
+      outline: 3px solid Highlight;
+    }
+  }
+
+  /* ---------- world quest: enchanted confectioner's coffer ---------- */
+  #world-quest-puzzle-window.confection-cascade {
+    --confection-grid-pad: 8px;
+    --confection-board-width: calc(
+      var(--wqm-columns, 6) *
+      var(--confection-cell-size) +
+      (var(--wqm-columns, 6) - 1) *
+      var(--confection-cell-gap) +
+      var(--confection-grid-pad) *
+      2 +
+      var(--confection-frame-pad) *
+      2 +
+      4px /
+      var(--ui-scale, 1)
+    );
+    --color-border-focus: var(--color-confection-focus);
+    width: var(--confection-window-width);
+    top: max(var(--spacing-md), calc(var(--app-vh) * 0.025 / var(--ui-scale, 1)));
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - var(--spacing-lg) * 2);
+    gap: var(--spacing-sm);
+    padding-bottom: var(--spacing-lg);
+    border: 1px solid var(--color-confection-brass);
+    border-radius: 12px;
+    background:
+      radial-gradient(
+        ellipse at 50% 15%,
+        color-mix(in srgb, var(--color-confection-velvet-light) 35%, transparent),
+        transparent 75%
+      ),
+      linear-gradient(
+        90deg,
+        var(--color-confection-shadow),
+        transparent 12% 88%,
+        var(--color-confection-shadow)
+      ),
+      var(--confection-damask) center / 120px 120px repeat,
+      var(--color-confection-backing);
+    box-shadow:
+      inset 0 0 0 3px var(--color-confection-wood-shadow),
+      inset 0 0 0 4px var(--color-confection-brass-dark),
+      0 20px 65px var(--color-confection-shadow);
+  }
+
+  .confection-cascade > .panel-title {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 14px 52px;
+    margin-bottom: 0;
+    border-bottom: 3px double var(--color-confection-brass);
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-confection-wood-light) 35%, transparent),
+        var(--color-confection-wood-shadow)
+      ),
+      var(--wqm-wood-texture, none) center / 320px repeat,
+      var(--color-confection-wood);
+    box-shadow:
+      inset 0 3px 0 var(--color-confection-brass-dark),
+      0 4px 12px var(--color-confection-shadow);
+  }
+  .confection-cascade > .panel-title > span {
+    color: var(--color-confection-ivory);
+    font-family: var(--font-serif);
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: 0.025em;
+    text-align: center;
+    text-shadow: 0 2px 2px var(--color-confection-shadow);
+  }
+  .confection-cascade > .panel-title > .x-btn {
+    position: absolute;
+    right: var(--spacing-sm);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-confection-brass-light);
+    border-color: var(--color-confection-brass-dark);
+    background: var(--color-confection-wood-shadow);
+  }
+  .confection-cascade .wqm-lid {
+    position: relative;
+    align-self: center;
+    box-sizing: border-box;
+    width: var(--confection-board-width);
+    margin: 4px 0 16px;
+    padding: 20px 28px;
+    border: 1px solid var(--color-confection-brass-dark);
+    border-width: calc(1px / var(--ui-scale, 1));
+    border-radius: 3px;
+    background:
+      radial-gradient(
+        ellipse at 50% 45%,
+        color-mix(in srgb, var(--color-confection-wood-shadow) 75%, transparent),
+        transparent 85%
+      ),
+      var(--confection-damask) center / 96px 96px repeat,
+      linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--color-confection-wood-light) 30%, transparent),
+        color-mix(in srgb, var(--color-confection-wood-shadow) 65%, transparent)
+      ),
+      var(--wqm-wood-texture, none) center / 360px repeat,
+      var(--color-confection-wood);
+    box-shadow:
+      inset 0 0 18px var(--color-confection-shadow),
+      0 5px 0 var(--color-confection-wood-shadow),
+      0 9px 14px var(--color-confection-shadow);
+  }
+  .confection-cascade .wqm-lid::before,
+  .confection-cascade .wqm-frame::before,
+  .confection-cascade .wqm-result-frame {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 28px solid transparent;
+    border-image-source: var(--wqm-frame-art, none);
+    border-image-slice: 22%;
+    border-image-repeat: stretch;
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+  .confection-cascade .wqm-lid::before {
+    z-index: 1;
+  }
+  .confection-cascade .wqp-level {
+    position: relative;
+    text-align: center;
+    color: var(--color-confection-brass-light);
+    font-family: var(--font-serif);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+  }
+  .confection-cascade .wqp-instructions {
+    margin: 7px 14px 10px;
+    font-family: var(--font-serif);
+    font-size: 16px;
+    font-style: italic;
+    line-height: 1.35;
+    text-align: center;
+    color: var(--color-confection-ivory);
+  }
+  .confection-cascade .wqm-status {
+    align-items: center;
+    margin: 0;
+    gap: 12px;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-confection-ivory);
+  }
+  .confection-cascade .wqm-moves[hidden] + .wqm-cleared {
+    margin-inline: auto;
+  }
+  .confection-cascade .wqm-status > span[hidden] {
+    display: none;
+  }
+  .confection-cascade .wqm-status > span {
+    padding: 7px 10px;
+    border-block: 1px solid var(--color-confection-brass-dark);
+    border-radius: 5px;
+    background: color-mix(in srgb, var(--color-confection-wood-shadow) 55%, transparent);
+    box-shadow: inset 0 2px 5px var(--color-confection-shadow);
+  }
+  .confection-cascade .wqm-progress {
+    height: 7px;
+    margin: 12px 2px 0;
+    border: 1px solid var(--color-confection-brass-dark);
+    border-radius: 8px;
+    background: var(--color-confection-wood-shadow);
+    box-shadow: 0 1px 0 var(--color-confection-grain);
+    overflow: hidden;
+  }
+  .confection-cascade .wqm-progress-fill {
+    display: block;
+    width: calc(var(--wqm-progress, 0) * 100%);
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(
+      90deg,
+      var(--color-confection-brass),
+      var(--color-confection-brass-light),
+      var(--color-confection-win)
+    );
+    box-shadow: 0 0 10px var(--color-confection-brass-light);
+  }
+
+  .confection-cascade .wqm-frame {
+    position: relative;
+    align-self: center;
+    flex-shrink: 0;
+    padding: var(--confection-header-height) var(--confection-frame-pad)
+      var(--confection-footer-height);
+    margin: 0 0 calc(var(--confection-box-depth) + 16px);
+    border: 1px solid transparent;
+    border-width: calc(1px / var(--ui-scale, 1));
+    border-radius: 3px;
+  }
+  .confection-cascade .wqm-frame::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0 0 calc(-1 * var(--confection-box-depth)) 0;
+    border-radius: 4px;
+    background:
+      linear-gradient(
+        130deg,
+        color-mix(in srgb, var(--color-confection-brass-light) 16%, transparent),
+        transparent 35%,
+        color-mix(in srgb, var(--color-confection-wood-shadow) 65%, transparent)
+      ),
+      var(--wqm-wood-texture, none) center / 290px repeat,
+      var(--color-confection-wood);
+    box-shadow:
+      inset 0 0 14px var(--color-confection-shadow),
+      0 7px 0 var(--color-confection-wood-shadow),
+      0 22px 32px var(--color-confection-shadow);
+    pointer-events: none;
+  }
+  .confection-cascade .wqm-frame::before {
+    z-index: 3;
+    inset: 0 0 calc(-1 * var(--confection-box-depth)) 0;
+    border-width: var(--confection-frame-rail);
+  }
+  .confection-cascade .wqm-box-hinge {
+    position: absolute;
+    z-index: 4;
+    top: -34px;
+    left: 16%;
+    right: 16%;
+    height: 44px;
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+  .confection-cascade .wqm-box-hinge::before,
+  .confection-cascade .wqm-box-hinge::after {
+    content: "";
+    position: absolute;
+    width: 70px;
+    height: 100%;
+    background: var(--wqm-hinge-art, none) center / 120% auto no-repeat;
+  }
+  .confection-cascade .wqm-box-hinge::after {
+    right: 0;
+  }
+  .confection-cascade .wqm-box-front {
+    position: absolute;
+    z-index: 4;
+    left: calc(50% - 112px);
+    bottom: var(--confection-frame-rail);
+    width: 224px;
+    height: 98px;
+    pointer-events: none;
+  }
+  .confection-cascade .wqm-box-front::before {
+    content: "";
+    position: absolute;
+    z-index: 4;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--wqm-clasp-art, none) center / 100% auto no-repeat;
+  }
+  .confection-cascade .wqm-frame-crest {
+    position: absolute;
+    z-index: 4;
+    width: 240px;
+    height: 74px;
+    top: var(--confection-frame-rail);
+    left: calc(50% - 120px);
+    background: var(--wqm-crest-art, none) center / 100% auto no-repeat;
+    pointer-events: none;
+  }
+  .confection-cascade .wqm-frame-crest,
+  .confection-cascade .wqm-box-front {
+    /* Opaque polished gold supports the generated hardware. Screen blending
+       would let the wood wash out dark emerald facets and engraved recesses. */
+    background-color: var(--color-confection-brass);
+    border: 1px solid var(--color-confection-brass-dark);
+    border-radius: 50%;
+    box-shadow:
+      0 -1px 0 var(--color-confection-brass-light),
+      0 2px 0 var(--color-confection-wood-shadow),
+      0 4px 6px var(--color-confection-shadow);
+    overflow: hidden;
+  }
+
+  .confection-cascade .wqm-grid {
+    /* The shared keyboard outline also reads this token. Keep it legible on
+       the fixed dark tray even when the surrounding panel uses a light theme. */
+    --color-border-focus: var(--color-confection-focus);
+    --wqm-cell-size: var(--confection-cell-size);
+    position: relative;
+    gap: var(--confection-cell-gap);
+    padding: var(--confection-grid-pad);
+    border: 1px solid var(--color-gold-800);
+    border-width: calc(1px / var(--ui-scale, 1));
+    border-radius: var(--radius-sm);
+    background:
+      radial-gradient(
+        ellipse at 50% 0,
+        color-mix(in srgb, var(--color-confection-velvet-light) 75%, transparent),
+        transparent 75%
+      ),
+      repeating-linear-gradient(0deg, var(--color-confection-grain) 0 0.5px, transparent 0.5px 3px),
+      repeating-linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--color-confection-velvet-light) 40%, transparent) 0 0.5px,
+        transparent 0.5px 3px
+      ),
+      var(--color-confection-velvet);
+    box-shadow:
+      inset 0 3px 12px var(--color-confection-shadow),
+      0 1px 0 var(--color-gold-500);
+  }
+  .confection-cascade .wqm-cell {
+    position: relative;
+    overflow: visible;
+    padding: 0;
+    border: 1px solid color-mix(in srgb, var(--color-gold-700) 38%, var(--color-confection-velvet));
+    border-radius: 18%;
+    background:
+      radial-gradient(
+        ellipse at 50% 82%,
+        color-mix(in srgb, var(--wqm-candy-tint) 12%, transparent),
+        transparent 70%
+      ),
+      var(--color-confection-velvet);
+    box-shadow:
+      inset 0 3px 7px var(--color-confection-shadow),
+      0 1px 0 color-mix(in srgb, var(--color-gold-600) 18%, transparent);
+    color: var(--wqm-candy-tint);
+    text-shadow: none;
+    transition:
+      border-color var(--confection-feedback-duration) ease-out,
+      background-color var(--confection-feedback-duration) ease-out;
+  }
+  .confection-cascade .candy-0 {
+    --wqm-candy-tint: var(--color-candy-berry);
+  }
+  .confection-cascade .candy-1 {
+    --wqm-candy-tint: var(--color-candy-citrus);
+  }
+  .confection-cascade .candy-2 {
+    --wqm-candy-tint: var(--color-candy-mint);
+  }
+  .confection-cascade .candy-3 {
+    --wqm-candy-tint: var(--color-candy-grape);
+  }
+  .confection-cascade .candy-4 {
+    --wqm-candy-tint: var(--color-candy-star);
+  }
+  .confection-cascade .wqm-cell:hover:not(:disabled) {
+    border-color: var(--color-confection-focus);
+    outline: none;
+  }
+  .confection-cascade .wqm-cell:focus-visible {
+    outline: 2px solid var(--color-confection-focus);
+    outline-offset: 2px;
+  }
+  .confection-cascade .wqm-cell.selected {
+    border-color: var(--color-confection-focus);
+    outline: 2px solid var(--color-confection-focus);
+    outline-offset: 2px;
+    box-shadow:
+      inset 0 0 14px color-mix(in srgb, var(--wqm-candy-tint) 25%, transparent),
+      0 0 12px color-mix(in srgb, var(--wqm-candy-tint) 25%, transparent);
+  }
+  .confection-cascade .wqm-cell-inlay {
+    position: absolute;
+    inset: 4px;
+    border: 1px solid color-mix(in srgb, var(--color-gold-700) 20%, transparent);
+    border-radius: 18%;
+    pointer-events: none;
+  }
+  .confection-cascade .wqm-candy {
+    position: absolute;
+    inset: -4%;
+    pointer-events: none;
+    display: grid;
+    place-items: center;
+    background-repeat: no-repeat;
+    background-size: 300% 200%;
+    border-radius: 16%;
+  }
+  .confection-cascade[data-candy-art="ready"] .wqm-candy {
+    background-image: var(--wqm-candy-atlas);
+    mix-blend-mode: screen;
+  }
+  .confection-cascade .wqm-candy.candy-0 {
+    background-position: 0% 0%;
+    transform: translate(-6.6%, -6.2%);
+  }
+  .confection-cascade .wqm-candy.candy-1 {
+    background-position: 50% 0%;
+    transform: translateY(-4.3%);
+  }
+  .confection-cascade .wqm-candy.candy-2 {
+    background-position: 100% 0%;
+    transform: translate(9%, -3.1%);
+  }
+  .confection-cascade .wqm-candy.candy-3 {
+    background-position: 0% 100%;
+    transform: translate(-6.6%, 4.7%) scale(1.08);
+  }
+  .confection-cascade .wqm-candy.candy-4 {
+    background-position: 50% 100%;
+    transform: translateY(9.2%);
+  }
+  .confection-cascade .wqm-candy-symbol {
+    color: var(--wqm-candy-tint);
+    font-size: 32px;
+    filter: drop-shadow(0 2px 1px var(--color-confection-shadow));
+  }
+  .confection-cascade[data-candy-art="ready"] .wqm-candy-symbol {
+    visibility: hidden;
+  }
+  .confection-cascade .wqm-cell:disabled {
+    filter: none;
+    opacity: 1;
+  }
+  .confection-cascade[data-outcome="lost"] .wqm-candy {
+    opacity: 0.55;
+  }
+  .confection-cascade .wqm-fx-layer {
+    position: absolute;
+    inset: 0;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .confection-cascade .wqm-effect {
+    z-index: 6;
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+    color: var(--color-confection-brass-light);
+  }
+  .confection-cascade .wqm-spark,
+  .confection-cascade .wqm-effect-settle {
+    width: var(--wqm-spark-size, 18px);
+    height: var(--wqm-spark-size, 18px);
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      var(--color-confection-spark) 0 5%,
+      color-mix(in srgb, currentColor 35%, transparent) 20%,
+      transparent 70%
+    );
+    filter: drop-shadow(0 0 3px currentColor);
+  }
+  .confection-cascade .wqm-spark::before,
+  .confection-cascade .wqm-effect-settle::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle,
+      var(--color-confection-spark) 0 14%,
+      currentColor 48%,
+      transparent
+    );
+    clip-path: polygon(50% 0, 57% 40%, 100% 50%, 57% 57%, 50% 100%, 43% 57%, 0 50%, 43% 40%);
+  }
+  .confection-cascade .wqm-spark {
+    z-index: 12;
+  }
+  .confection-cascade .wqm-spark-gold,
+  .confection-cascade .wqm-effect-settle {
+    color: var(--color-confection-spark);
+  }
+  .confection-cascade .wqm-spark-mint {
+    color: var(--color-confection-win);
+  }
+  .confection-cascade .wqm-effect-trail {
+    width: 42px;
+    height: 12px;
+    border-radius: 50%;
+    background:
+      radial-gradient(ellipse, var(--color-confection-spark), transparent 60%) center / 100% 24%
+      no-repeat,
+      radial-gradient(ellipse, var(--color-confection-brass-light), transparent 72%);
+  }
+  .confection-cascade .wqm-effect-burst {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background:
+      radial-gradient(
+        circle,
+        transparent 30%,
+        color-mix(in srgb, var(--color-confection-brass-light) 45%, transparent) 33%,
+        transparent 36%
+      ),
+      radial-gradient(
+        circle,
+        var(--color-confection-spark) 0 3%,
+        var(--color-confection-brass-light) 7%,
+        color-mix(in srgb, var(--color-confection-win) 25%, transparent) 23%,
+        transparent 62%
+      );
+  }
+  .confection-cascade .wqm-match-ring {
+    width: 38%;
+    aspect-ratio: 1;
+    border: 1px solid var(--color-confection-spark);
+    border-radius: 50%;
+    box-shadow:
+      0 0 15px var(--color-confection-brass-light),
+      inset 0 0 15px var(--color-confection-brass);
+  }
+  .confection-cascade .wqm-match-ring::before,
+  .confection-cascade .wqm-outcome-ring::before {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    border: 1px solid color-mix(in srgb, var(--color-confection-brass-light) 50%, transparent);
+    border-radius: inherit;
+  }
+  .confection-cascade .wqm-match-ray {
+    width: 12px;
+    height: 25%;
+    transform-origin: center bottom;
+    background:
+      linear-gradient(90deg, transparent, var(--color-confection-spark) 50%, transparent),
+      linear-gradient(transparent, var(--color-confection-brass-light));
+    filter: drop-shadow(0 0 5px var(--color-confection-brass-light));
+    clip-path: polygon(0 0, 100% 0, 55% 100%, 45% 100%);
+  }
+  .confection-cascade .wqm-victory-confetti {
+    z-index: 12;
+    width: 6px;
+    height: 10px;
+    border: 1px solid var(--color-confection-brass-light);
+    background: linear-gradient(
+      115deg,
+      var(--color-confection-spark),
+      var(--color-confection-brass) 45%,
+      var(--color-confection-brass-light) 65%,
+      var(--color-confection-brass-dark)
+    );
+    box-shadow: 0 0 5px color-mix(in srgb, var(--color-confection-brass) 50%, transparent);
+  }
+  .confection-cascade .wqm-outcome-ring {
+    width: 82%;
+    aspect-ratio: 1;
+    border: 1px solid var(--color-confection-brass-light);
+    border-radius: 50%;
+    box-shadow:
+      0 0 5px var(--color-confection-spark),
+      0 0 24px var(--color-confection-brass),
+      inset 0 0 24px color-mix(in srgb, var(--color-confection-win) 50%, transparent);
+  }
+  .confection-cascade .wqm-outcome-ray {
+    width: 18px;
+    height: 58%;
+    filter: drop-shadow(0 0 8px var(--color-confection-brass-light));
+    transform-origin: center bottom;
+    background: linear-gradient(
+      transparent,
+      color-mix(in srgb, var(--color-confection-brass-light) 50%, transparent),
+      var(--color-confection-spark)
+    );
+    clip-path: polygon(0 0, 100% 0, 58% 100%, 42% 100%);
+  }
+  .confection-cascade .wqm-outcome-wave {
+    width: 125%;
+    height: 38%;
+    background: radial-gradient(
+      ellipse,
+      var(--color-confection-spark),
+      color-mix(in srgb, var(--color-confection-brass-light) 45%, transparent) 25%,
+      transparent 70%
+    );
+  }
+  .confection-cascade .wqm-outcome-ember {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at 35% 30%,
+      var(--color-confection-loss),
+      var(--color-confection-brass-dark) 70%
+    );
+    box-shadow: 0 0 5px var(--color-confection-brass-dark);
+  }
+  .confection-cascade .wqm-outcome-veil {
+    width: 110%;
+    height: 110%;
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse,
+      transparent 32%,
+      color-mix(in srgb, var(--color-confection-loss) 40%, transparent) 62%,
+      transparent 72%
+    );
+  }
+  .confection-cascade .wqm-result {
+    --wqm-result-frame-outset: 16px;
+    --wqm-result-backdrop: var(--color-confection-velvet);
+    scroll-margin-block: 48px;
+    position: absolute;
+    z-index: 10;
+    top: 50%;
+    left: 50%;
+    width: calc(100% - var(--confection-frame-pad) * 2 - 24px);
+    max-width: 340px;
+    transform: translate(-50%, -50%);
+    padding: 22px 20px;
+    border: 1px solid var(--color-confection-brass-dark);
+    border-radius: 2px;
+    text-align: center;
+    color: var(--color-confection-ivory);
+    background:
+      radial-gradient(ellipse at 50% 10%, var(--color-confection-velvet-light), transparent 75%),
+      var(--confection-damask) center / 90px 90px repeat,
+      var(--color-confection-velvet);
+    box-shadow:
+      inset 0 0 35px var(--color-confection-shadow),
+      0 0 0 var(--wqm-result-frame-outset) var(--wqm-result-backdrop),
+      0 14px 45px var(--color-confection-shadow);
+  }
+  .confection-cascade .wqm-result-frame {
+    display: block;
+    inset: calc(-1 * var(--wqm-result-frame-outset));
+    border-width: 30px;
+  }
+  .confection-cascade[data-outcome="lost"] .wqm-result-frame {
+    filter: brightness(0.78) saturate(0.7);
+  }
+  .confection-cascade .wqm-result:focus-visible {
+    outline: 2px solid var(--color-confection-focus);
+    outline-offset: -2px;
+  }
+  .confection-cascade[data-outcome="won"] .wqm-result {
+    animation: confection-victory-reveal 720ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .confection-cascade[data-outcome="lost"] .wqm-result {
+    animation: confection-loss-reveal 900ms ease-out;
+  }
+  @keyframes confection-victory-reveal {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -40%) scale(0.82);
+    }
+    65% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.03);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+  @keyframes confection-loss-reveal {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -56%) scale(0.97);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+  .confection-cascade .wqm-result[hidden] {
+    display: none;
+  }
+  .confection-cascade .wqm-result-emblem {
+    display: grid;
+    place-items: center;
+    width: 82px;
+    height: 82px;
+    margin: 0 auto 8px;
+    border-radius: 50%;
+    background: var(--wqm-victory-seal-art, none) center / contain no-repeat;
+    mix-blend-mode: screen;
+  }
+  .confection-cascade .wqm-result-emblem svg {
+    visibility: hidden;
+  }
+  .confection-cascade .wqm-result-title,
+  .confection-cascade .wqm-result-detail {
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+  .confection-cascade .wqm-result-title {
+    margin: 0 0 8px;
+    font-family: var(--font-serif);
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--color-confection-ivory);
+  }
+  .confection-cascade .wqm-result-detail {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 18px;
+    line-height: 1.35;
+    color: var(--color-confection-ivory);
+  }
+  .confection-cascade[data-outcome="lost"] .wqm-result {
+    --wqm-result-backdrop: var(--color-confection-loss-velvet);
+    background:
+      radial-gradient(
+        ellipse at 50% 0,
+        color-mix(in srgb, var(--color-confection-wood-light) 22%, transparent),
+        transparent 80%
+      ),
+      var(--confection-damask) center / 90px 90px repeat,
+      var(--color-confection-loss-velvet);
+  }
+  .confection-cascade[data-outcome="lost"] .wqm-result-emblem {
+    background-image: var(--wqm-defeat-seal-art, none);
+  }
+  .confection-cascade .wqm-reset {
+    position: relative;
+    min-height: 44px;
+    padding: 9px 34px;
+    margin-top: var(--spacing-xs);
+    border: 1px solid var(--color-confection-brass-dark);
+    border-radius: 3px;
+    background:
+      linear-gradient(
+        color-mix(in srgb, var(--color-confection-wood-light) 40%, transparent),
+        var(--color-confection-wood-shadow)
+      ),
+      var(--wqm-wood-texture, none) center / 200px repeat,
+      var(--color-confection-wood);
+    color: var(--color-confection-ivory);
+    font-family: var(--font-serif);
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: 0.025em;
+    box-shadow:
+      inset 0 1px 0 var(--color-confection-brass-light),
+      0 3px 0 var(--color-confection-wood-shadow);
+  }
+  .confection-cascade .wqm-reset::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 14px solid transparent;
+    border-image-source: var(--wqm-frame-art, none);
+    border-image-slice: 22%;
+    border-image-repeat: stretch;
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+  .confection-cascade .wqm-reset:hover {
+    filter: brightness(1.12);
+  }
+  :root[data-fx-level="low"] .confection-cascade .wqm-effect,
+  body.reduce-motion .confection-cascade .wqm-effect {
+    display: none;
+  }
+  :root[data-fx-level="low"] .confection-cascade .wqm-result,
+  body.reduce-motion .confection-cascade .wqm-result {
+    animation: none;
+  }
+  body.reduce-motion .confection-cascade .wqm-cell {
+    transition: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .confection-cascade[data-outcome] .wqm-result {
+      animation: none;
+    }
+    .confection-cascade .wqm-effect {
+      display: none;
+    }
+    .confection-cascade .wqm-cell {
+      transition: none;
+    }
+  }
+  @media (forced-colors: active) {
+    #world-quest-puzzle-window.confection-cascade,
+    .confection-cascade > .panel-title,
+    .confection-cascade .wqm-lid,
+    .confection-cascade .wqm-frame,
+    .confection-cascade .wqm-grid,
+    .confection-cascade .wqm-cell,
+    .confection-cascade[data-outcome] .wqm-result,
+    .confection-cascade[data-outcome] .wqm-result-emblem,
+    .confection-cascade .wqm-result,
+    .confection-cascade .wqm-result-emblem,
+    .confection-cascade .wqm-reset {
+      background: Canvas;
+      border-color: ButtonText;
+      box-shadow: none;
+      color: CanvasText;
+    }
+    .confection-cascade > .panel-title > span,
+    .confection-cascade .wqm-lid *,
+    .confection-cascade .wqm-result * {
+      color: CanvasText;
+    }
+    .confection-cascade .wqm-result-frame,
+    .confection-cascade .wqm-reset::before,
+    .confection-cascade .wqm-frame-crest,
+    .confection-cascade .wqm-frame::before,
+    .confection-cascade .wqm-frame::after,
+    .confection-cascade .wqm-lid::before,
+    .confection-cascade .wqm-box-front,
+    .confection-cascade .wqm-box-hinge,
+    .confection-cascade .wqm-effect,
+    .confection-cascade .wqm-cell-inlay {
+      display: none;
+    }
+    .confection-cascade[data-candy-art="ready"] .wqm-candy {
+      background-image: none;
+      mix-blend-mode: normal;
+      opacity: 1;
+    }
+    .confection-cascade[data-candy-art="ready"] .wqm-candy-symbol,
+    .confection-cascade .wqm-candy-symbol {
+      visibility: visible;
+      color: ButtonText;
+      filter: none;
+    }
+    .confection-cascade .wqm-result-emblem {
+      mix-blend-mode: normal;
+    }
+    .confection-cascade .wqm-result-emblem svg {
+      visibility: visible;
+      width: 34px;
+      height: 34px;
+    }
+    .confection-cascade .wqm-cell:focus-visible,
+    .confection-cascade .wqm-cell.selected {
+      outline-color: Highlight;
+    }
+    .confection-cascade .wqm-result:focus {
+      outline-color: Highlight;
+    }
+    .confection-cascade .wqm-progress {
+      border: 1px solid ButtonText;
+    }
+    .confection-cascade .wqm-progress-fill {
+      background: Highlight;
+    }
+  }
+}
+
+/* ---------- world quest: celestial ley instrument ---------- */
+@layer components {
+  #world-quest-puzzle-window.ley-beam {
+    --ley-tile-size: min(
+      92px,
+      calc(
+        (
+          var(--ley-window-width) -
+          64px -
+          var(--ley-frame-pad) *
+          2 -
+          var(--ley-grid-pad) *
+          2 -
+          (var(--wql-columns, 3) - 1) *
+          var(--ley-gap) -
+          2px
+        ) /
+        var(--wql-columns, 3)
+      )
+    );
+    --ley-board-width: calc(
+      var(--wql-columns, 3) *
+      var(--ley-tile-size) +
+      (var(--wql-columns, 3) - 1) *
+      var(--ley-gap) +
+      var(--ley-grid-pad) *
+      2 +
+      var(--ley-frame-pad) *
+      2 +
+      2px
+    );
+    --color-border-focus: var(--color-ley-light);
+    width: var(--ley-window-width);
+    top: max(12px, calc(var(--app-vh) * 0.025 / var(--ui-scale, 1)));
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 32px);
+    overflow-y: auto;
+    box-sizing: border-box;
+    gap: 14px;
+    padding-bottom: 22px;
+    border: 1px solid var(--color-ley-gold);
+    border-radius: 12px;
+    color: var(--color-ley-ivory);
+    background:
+      radial-gradient(
+        ellipse at 50% 38%,
+        color-mix(in srgb, var(--color-ley-blue) 16%, transparent),
+        transparent 65%
+      ),
+      repeating-linear-gradient(135deg, var(--color-ley-grain) 0 0.5px, transparent 0.5px 5px),
+      var(--color-ley-night);
+    box-shadow:
+      inset 0 0 0 3px var(--color-ley-night),
+      inset 0 0 0 4px var(--color-ley-bronze),
+      0 24px 60px var(--color-ley-shadow);
+  }
+  .ley-beam > .panel-title {
+    flex-shrink: 0;
+    height: auto;
+    position: relative;
+    display: block;
+    padding: 22px 46px 18px;
+    border-bottom: 3px double var(--color-ley-bronze);
+    background: linear-gradient(180deg, var(--color-ley-slate), var(--color-ley-night));
+    box-shadow:
+      inset 0 2px 0 var(--color-ley-gold),
+      0 3px 12px var(--color-ley-shadow);
+  }
+  .ley-beam > .panel-title > span {
+    display: block;
+    font: 700 26px / 1.25 var(--font-display);
+    letter-spacing: 0.035em;
+    text-align: center;
+    color: var(--color-ley-ivory);
+    text-shadow: 0 2px 2px var(--color-ley-shadow);
+  }
+  .ley-beam .x-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    min-width: 40px;
+    min-height: 40px;
+    color: var(--color-ley-gold);
+  }
+  .ley-beam .wql-heading,
+  .ley-beam .wql-status {
+    align-self: center;
+    width: var(--ley-board-width);
+    max-width: calc(100% - 32px);
+    box-sizing: border-box;
+  }
+  .ley-beam .wql-heading {
+    position: relative;
+    text-align: center;
+    padding: 10px 12px 4px;
+    background: radial-gradient(
+      ellipse at 50% 20%,
+      color-mix(in srgb, var(--color-ley-blue) 10%, transparent),
+      transparent 70%
+    );
+  }
+  .ley-beam .wql-heading::before,
+  .ley-beam .wql-heading::after {
+    content: "";
+    position: absolute;
+    width: 27%;
+    height: 3px;
+    top: 45px;
+    border-block: 1px solid var(--color-ley-bronze);
+    background: var(--color-ley-night);
+  }
+  .ley-beam .wql-heading::before {
+    left: 10%;
+  }
+  .ley-beam .wql-heading::after {
+    right: 10%;
+  }
+  .ley-beam .wql-heading-sigil,
+  .ley-beam .wql-result-seal {
+    display: block;
+    margin: 0 auto 12px;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background:
+      var(--wql-heart-art, none) center / cover no-repeat,
+      var(--color-ley-slate);
+    box-shadow:
+      0 5px 9px var(--color-ley-shadow),
+      0 0 22px color-mix(in srgb, var(--color-ley-blue) 18%, transparent);
+  }
+  .ley-beam .wqp-level {
+    color: var(--color-ley-gold);
+    font: 700 12px / 1.4 var(--font-display);
+    letter-spacing: 0.12em;
+  }
+  .ley-beam .wqp-instructions {
+    margin: 9px 0 0;
+    color: var(--color-ley-ivory);
+    font: 500 17px / 1.4 var(--font-serif);
+  }
+  .ley-beam .wql-status {
+    display: grid;
+    grid-template-columns: 1fr auto auto 1fr;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 12px;
+    border-block: 1px solid var(--color-ley-bronze);
+    background: linear-gradient(90deg, transparent, var(--color-ley-slate), transparent);
+    font: 500 13px / 1.3 var(--font-ui);
+  }
+  .ley-beam .wql-timer {
+    color: var(--color-ley-gold);
+    font: 700 13px / 1.3 var(--font-ui);
+    text-align: center;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: var(--color-ley-night);
+    border: 1px solid var(--color-ley-bronze);
+  }
+  .ley-beam .wql-timer.urgent {
+    color: var(--color-ley-loss);
+    border-color: var(--color-ley-loss);
+  }
+  .ley-beam .wql-source-label,
+  .ley-beam .wql-target-label {
+    display: flex;
+    gap: 7px;
+    align-items: center;
+    color: var(--color-ley-muted);
+  }
+  .ley-beam .wql-target-label {
+    justify-content: end;
+  }
+  .ley-beam .wql-source-label::before,
+  .ley-beam .wql-target-label::after {
+    content: "";
+    width: 9px;
+    height: 9px;
+    flex-shrink: 0;
+    border: 1px solid var(--color-ley-gold);
+    background: var(--color-ley-blue);
+    transform: rotate(45deg);
+    box-shadow: 0 0 8px var(--color-ley-blue);
+  }
+  .ley-beam .wql-target-label::after {
+    border: 3px double var(--color-ley-gold);
+    border-radius: 50%;
+    transform: none;
+    background: var(--color-ley-night);
+    box-shadow: none;
+  }
+  .ley-beam .wql-target-label.connected::after {
+    background: var(--color-ley-blue);
+    box-shadow: 0 0 8px var(--color-ley-blue);
+  }
+  .ley-beam .wql-reach {
+    color: var(--color-ley-ivory);
+    text-align: center;
+    font-weight: 700;
+  }
+  .ley-beam .wql-frame {
+    width: var(--ley-board-width);
+    position: relative;
+    flex-shrink: 0;
+    align-self: center;
+    padding: var(--ley-frame-pad);
+    min-height: 250px;
+    background:
+      repeating-conic-gradient(
+        from 45deg at 50% 50%,
+        var(--color-ley-grain) 0deg 0.3deg,
+        transparent 0.3deg 15deg
+      ),
+      radial-gradient(ellipse at center, var(--color-ley-slate), var(--color-ley-night) 75%);
+    box-shadow:
+      0 8px 0 var(--color-ley-shadow),
+      0 18px 26px var(--color-ley-shadow);
+  }
+  .ley-beam .wql-frame-art,
+  .ley-beam .wql-result-frame {
+    position: absolute;
+    z-index: 3;
+    inset: 0;
+    border: var(--ley-frame-pad) solid var(--color-ley-bronze);
+    border-image: var(--wql-frame-art) 25% / 1 / 0 stretch;
+    pointer-events: none;
+  }
+  .ley-beam .wqp-grid {
+    --wqp-tile-size: var(--ley-tile-size);
+    position: relative;
+    gap: var(--ley-gap);
+    padding: var(--ley-grid-pad);
+    border: 1px solid var(--color-ley-bronze);
+    border-radius: 3px;
+    background:
+      repeating-linear-gradient(0deg, var(--color-ley-grain) 0 0.5px, transparent 0.5px 4px),
+      var(--color-ley-tray);
+    box-shadow:
+      inset 0 0 12px var(--color-ley-shadow),
+      0 1px 0 var(--color-ley-gold);
+  }
+  .ley-beam .wqp-grid[hidden],
+  .ley-beam .wqp-arm[hidden],
+  .ley-beam .wql-result[hidden] {
+    display: none;
+  }
+  .ley-beam .wqp-tile {
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0;
+    border: 1px solid var(--color-ley-bronze);
+    border-radius: 14%;
+    background: radial-gradient(circle, var(--color-ley-slate) 0 45%, var(--color-ley-tray) 72%);
+    box-shadow:
+      inset 0 2px 1px color-mix(in srgb, var(--color-ley-gold) 22%, transparent),
+      inset 0 -4px 5px var(--color-ley-shadow),
+      0 3px 2px var(--color-ley-shadow);
+  }
+  .ley-beam .wqp-tile::before {
+    content: "";
+    position: absolute;
+    inset: 9%;
+    border-radius: 50%;
+    border: 3px double color-mix(in srgb, var(--color-ley-gold) 32%, transparent);
+    background: repeating-conic-gradient(var(--color-ley-grain) 0deg 1deg, transparent 1deg 30deg);
+    pointer-events: none;
+  }
+  .ley-beam .wql-rotor {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .ley-beam .wqp-arm {
+    z-index: 1;
+    background: linear-gradient(
+      90deg,
+      var(--color-ley-bronze),
+      var(--color-ley-channel),
+      var(--color-ley-bronze)
+    );
+    box-shadow: inset 0 0 0 1px var(--color-ley-bronze);
+  }
+  .ley-beam .wqp-arm.north,
+  .ley-beam .wqp-arm.south {
+    width: 10px;
+    left: calc(50% - 5px);
+    height: calc(50% + var(--ley-gap) / 2 + 1px);
+  }
+  .ley-beam .wqp-arm.north {
+    top: calc(-1 * var(--ley-gap) / 2 - 1px);
+  }
+  .ley-beam .wqp-arm.south {
+    bottom: calc(-1 * var(--ley-gap) / 2 - 1px);
+  }
+  .ley-beam .wqp-arm.east,
+  .ley-beam .wqp-arm.west {
+    height: 10px;
+    top: calc(50% - 5px);
+    width: calc(50% + var(--ley-gap) / 2 + 1px);
+    background: linear-gradient(
+      0deg,
+      var(--color-ley-bronze),
+      var(--color-ley-channel),
+      var(--color-ley-bronze)
+    );
+  }
+  .ley-beam .wqp-arm.east {
+    right: calc(-1 * var(--ley-gap) / 2 - 1px);
+  }
+  .ley-beam .wqp-arm.west {
+    left: calc(-1 * var(--ley-gap) / 2 - 1px);
+  }
+  .ley-beam .wqp-tile.powered .wqp-arm {
+    background: var(--color-ley-blue);
+    box-shadow:
+      0 0 8px var(--color-ley-blue),
+      inset 0 0 0 2px var(--color-ley-channel);
+  }
+  .ley-beam .wqp-tile.powered .wqp-arm::after {
+    content: "";
+    position: absolute;
+    inset: 35% 2px;
+    background: var(--color-ley-light);
+    box-shadow: 0 0 4px var(--color-ley-light);
+  }
+  .ley-beam .wqp-tile.powered .wqp-arm.north::after,
+  .ley-beam .wqp-tile.powered .wqp-arm.south::after {
+    inset: 2px 35%;
+  }
+  .ley-beam .wql-core {
+    position: absolute;
+    z-index: 2;
+    left: 50%;
+    top: 50%;
+    width: 50%;
+    height: 50%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background:
+      var(--wql-heart-art, none) center / cover no-repeat,
+      radial-gradient(circle, var(--color-ley-blue), var(--color-ley-bronze));
+    box-shadow: 0 2px 5px var(--color-ley-shadow);
+    filter: saturate(0.6) brightness(0.75);
+  }
+  .ley-beam .powered .wql-core {
+    filter: none;
+    box-shadow:
+      0 0 12px var(--color-ley-blue),
+      0 2px 5px var(--color-ley-shadow);
+  }
+  .ley-beam .wqp-tile:hover:not(:disabled) {
+    border-color: var(--color-ley-gold);
+    background-color: var(--color-ley-slate);
+  }
+  .ley-beam .wqp-tile:focus-visible {
+    outline: 3px solid var(--color-ley-light);
+    outline-offset: 2px;
+  }
+  .ley-beam .wqp-tile:disabled {
+    cursor: default;
+    opacity: 1;
+  }
+  .ley-beam .wqp-edge {
+    z-index: 4;
+    width: 18px;
+    height: 18px;
+    top: calc(50% - 9px);
+    border: 2px solid var(--color-ley-gold);
+    box-shadow:
+      0 0 12px var(--color-ley-blue),
+      inset 0 0 0 2px var(--color-ley-slate);
+  }
+  .ley-beam .wqp-edge.source {
+    background: var(--color-ley-blue);
+  }
+  .ley-beam .wqp-edge.target {
+    background: var(--color-ley-night);
+    border: 4px double var(--color-ley-gold);
+    box-shadow: inset 0 0 0 2px var(--color-ley-slate);
+  }
+  .ley-beam .wqp-edge.west {
+    left: -20px;
+  }
+  .ley-beam .wqp-edge.east {
+    right: -20px;
+  }
+  .ley-beam .wqp-edge.north {
+    top: -20px;
+    left: calc(50% - 9px);
+  }
+  .ley-beam .wqp-edge.south {
+    bottom: -20px;
+    top: auto;
+    left: calc(50% - 9px);
+  }
+  .ley-beam[data-ley-outcome="won"] .wqp-edge.target {
+    background: var(--color-ley-blue);
+    box-shadow: 0 0 15px var(--color-ley-blue);
+  }
+  .ley-beam .wql-result {
+    position: absolute;
+    z-index: 5;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100% - var(--ley-frame-pad) * 2 + 10px);
+    box-sizing: border-box;
+    padding: 30px 26px 28px;
+    text-align: center;
+    color: var(--color-ley-ivory);
+    background: radial-gradient(
+      ellipse at 50% 5%,
+      var(--color-ley-slate),
+      var(--color-ley-night) 75%
+    );
+    box-shadow:
+      0 18px 38px var(--color-ley-shadow),
+      0 0 30px color-mix(in srgb, var(--color-ley-blue) 25%, transparent);
+  }
+  .ley-beam .wql-result-frame {
+    border-width: 24px;
+  }
+  .ley-beam .wql-result-seal {
+    width: 76px;
+    height: 76px;
+    margin-bottom: 14px;
+  }
+  .ley-beam .wql-result-title {
+    margin: 0 0 10px;
+    font: 700 25px / 1.25 var(--font-display);
+    color: var(--color-ley-ivory);
+    overflow-wrap: anywhere;
+  }
+  .ley-beam .wql-result-detail {
+    margin: 0;
+    font: 500 17px / 1.4 var(--font-serif);
+    color: var(--color-ley-muted);
+  }
+  .ley-beam .wql-result:focus-visible {
+    outline: 3px solid var(--color-ley-light);
+    outline-offset: 3px;
+  }
+  .ley-beam .wql-retry {
+    display: inline-block;
+    min-height: 40px;
+    margin-top: 14px;
+    padding: 8px 24px;
+    color: var(--color-ley-ivory);
+    font: 700 14px / 1.3 var(--font-display);
+    border: 2px solid var(--color-ley-gold);
+    border-radius: 4px;
+    background: linear-gradient(180deg, var(--color-ley-slate), var(--color-ley-night));
+    cursor: pointer;
+  }
+  .ley-beam .wql-retry:hover {
+    background: var(--color-ley-slate);
+    border-color: var(--color-ley-ivory);
+  }
+  .ley-beam .wql-retry[hidden] {
+    display: none;
+  }
+  .ley-beam[data-ley-outcome="lost"] .wql-result {
+    background: radial-gradient(ellipse at top, var(--color-ley-loss), var(--color-ley-night));
+    box-shadow: 0 18px 38px var(--color-ley-shadow);
+  }
+  .ley-beam[data-ley-outcome="lost"] .wql-result-seal {
+    filter: saturate(0.4) brightness(0.8);
+    box-shadow: 0 4px 12px var(--color-ley-shadow);
+  }
+  .ley-beam .wql-return {
+    align-self: center;
+    min-height: 44px;
+    max-width: calc(100% - 40px);
+    padding: 12px 30px;
+    color: var(--color-ley-ivory);
+    font: 700 15px / 1.3 var(--font-display);
+    border: 3px double var(--color-ley-gold);
+    border-radius: 4px;
+    background: linear-gradient(180deg, var(--color-ley-slate), var(--color-ley-night));
+    box-shadow:
+      inset 0 0 0 2px var(--color-ley-bronze),
+      0 4px 7px var(--color-ley-shadow);
+  }
+  .ley-beam .wql-return:hover {
+    background: var(--color-ley-slate);
+    border-color: var(--color-ley-ivory);
+  }
+  .ley-beam .wql-return:focus-visible {
+    outline: 3px solid var(--color-ley-light);
+    outline-offset: 3px;
+  }
+  .ley-beam .wql-fx-layer {
+    position: absolute;
+    z-index: 6;
+    inset: 0;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .ley-beam .wql-effect {
+    position: absolute;
+    z-index: 7;
+    width: var(--wql-effect-size, 8px);
+    height: var(--wql-effect-size, 8px);
+    pointer-events: none;
+    transform-origin: center;
+  }
+  .ley-beam .wql-effect-star {
+    background: var(--color-ley-light);
+    clip-path: polygon(50% 0, 60% 38%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+    filter: drop-shadow(0 0 4px var(--color-ley-blue));
+  }
+  .ley-beam .wql-effect-star:nth-child(3n) {
+    background: var(--color-ley-ivory);
+    filter: drop-shadow(0 0 4px var(--color-ley-gold));
+  }
+  .ley-beam .wql-effect-ring,
+  .ley-beam .wql-effect-pulse {
+    border: 2px solid var(--color-ley-light);
+    border-radius: 50%;
+    box-shadow:
+      0 0 12px var(--color-ley-blue),
+      inset 0 0 8px var(--color-ley-blue);
+  }
+  .ley-beam .wql-effect-ring {
+    border: 3px double var(--color-ley-gold);
+    background: repeating-conic-gradient(var(--color-ley-grain) 0deg 2deg, transparent 2deg 30deg);
+  }
+  .ley-beam .wql-effect-ray {
+    width: 18px;
+    transform-origin: center bottom;
+    background: linear-gradient(0deg, var(--color-ley-blue), transparent);
+    clip-path: polygon(45% 100%, 0 0, 100% 0, 55% 100%);
+  }
+  .ley-beam .wql-effect-ember {
+    border-radius: 50%;
+    background: var(--color-ley-gold);
+    box-shadow: 0 0 5px var(--color-ley-loss);
+  }
+  @media (forced-colors: active) {
+    #world-quest-puzzle-window.ley-beam,
+    .ley-beam .wql-heading,
+    .ley-beam .wql-status,
+    .ley-beam .wql-frame,
+    .ley-beam .wqp-grid,
+    .ley-beam .wql-result,
+    .ley-beam[data-ley-outcome="lost"] .wql-result {
+      color: CanvasText;
+      background: Canvas;
+      border-color: CanvasText;
+      box-shadow: none;
+    }
+    .ley-beam .wql-frame-art,
+    .ley-beam .wql-result-frame,
+    .ley-beam .wql-heading-sigil,
+    .ley-beam .wql-result-seal,
+    .ley-beam .wql-fx-layer,
+    .ley-beam .wqp-tile::before,
+    .ley-beam .wql-core {
+      display: none;
+    }
+    .ley-beam .wqp-tile {
+      background: ButtonFace;
+      border: 1px solid ButtonText;
+      box-shadow: none;
+    }
+    .ley-beam .wqp-tile.powered {
+      border: 3px double Highlight;
+    }
+    .ley-beam .wqp-arm {
+      background: CanvasText;
+      box-shadow: none;
+    }
+    .ley-beam .wqp-tile.powered .wqp-arm {
+      background: Highlight;
+      box-shadow: none;
+    }
+    .ley-beam .wqp-tile.powered .wqp-arm::after {
+      display: none;
+    }
+    .ley-beam .wqp-edge.source {
+      background: Highlight;
+      border-color: CanvasText;
+      box-shadow: none;
+    }
+    .ley-beam .wqp-edge.target {
+      background: Canvas;
+      border-color: CanvasText;
+      box-shadow: none;
+    }
+    .ley-beam .wql-result-title,
+    .ley-beam .wql-result-detail,
+    .ley-beam .wql-reach,
+    .ley-beam .wqp-instructions {
+      color: CanvasText;
+    }
+    .ley-beam .wqp-tile:focus-visible,
+    .ley-beam .wql-result:focus-visible,
+    .ley-beam .wql-return:focus-visible {
+      outline-color: Highlight;
+    }
+  }
+}
+
+@layer components {
+  .frame-preset-loadouts .tal-foot {
+    flex-wrap: wrap;
+  }
+  .frame-preset-picker {
+    position: relative;
+    flex: 1 1 160px;
+    min-width: 0;
+  }
+  .frame-preset-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-xs);
+    max-width: 100%;
+  }
+  .frame-preset-actions > button.ui-btn,
+  #options-menu .frame-preset-actions > button.ui-btn {
+    min-height: 40px;
+    padding: 6px 8px;
+  }
+  .frame-preset-loadouts .tal-loadout-menu {
+    bottom: auto;
+    top: calc(100% + 6px);
+    width: min(320px, 100%);
+    min-width: 0;
+    max-height: calc(var(--app-vh, 100vh) * 0.35 / var(--ui-scale, 1));
+    overflow-y: auto;
+  }
+  .frame-preset-loadouts .tal-loadout-caret {
+    transform: rotate(180deg);
+  }
+  .frame-preset-loadouts .tal-lo-item {
+    min-height: 40px;
   }
 }

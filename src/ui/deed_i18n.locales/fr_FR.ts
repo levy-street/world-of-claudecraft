@@ -1169,6 +1169,83 @@ export const table: DeedLocaleTable = {
     name: 'Une source déchaînée',
     desc: 'Façonnez vous-même Brise-forge et rapportez le marteau terminé à Maelin.',
   },
+  exp_arcane_calligraphy: {
+    name: 'Une main sûre',
+    desc: "Terminez la Calligraphie arcanique dans le Val d'Eastbrook.",
+  },
+  exp_arcane_calligraphy_gold: {
+    name: 'Écrit dans la lumière des étoiles',
+    desc: 'Obtenez une note Or en Calligraphie arcanique.',
+    title: 'Appelle-rune',
+  },
+  exp_forge_helper: {
+    name: 'Un coup de main à la forge',
+    desc: 'Aidez la forgeronne Mara à terminer un bouclier à Wyrmwatch.',
+  },
+  exp_last_barricade: {
+    name: 'La dernière barricade',
+    desc: 'Tenez le col forestier contre la horde de morts-vivants.',
+  },
+  exp_borrowed_face: {
+    name: 'Un visage emprunté',
+    desc: "Démasquez et vainquez l'infiltré parmi la garde de Fenbridge.",
+  },
+  exp_windrider_slalom: {
+    name: 'Le slalom du vent',
+    desc: 'Terminez la descente en planeur mécanique à travers le canyon de la Crête du Vent.',
+  },
+  exp_duskweave_dispatches: {
+    name: 'Les dépêches de tissenuit',
+    desc: 'Récupérez les dépêches des bandits en portant la cape enchantée de Valerie.',
+  },
+  exp_wisp_maze: {
+    name: 'Une lumière dans le labyrinthe',
+    desc: 'Récupérez les bourses volées et échappez-vous du labyrinthe du Jardin Éternel.',
+  },
+  prog_rift_watch_trusted: {
+    name: 'Digne de confiance auprès de la Vigie des Failles',
+    desc: 'Atteignez le rang Digne de confiance auprès de la Vigie des Failles.',
+  },
+  prog_church_order_trusted: {
+    name: "Digne de confiance auprès de l'Ordre de l'Église",
+    desc: "Atteignez le rang Digne de confiance auprès de l'Ordre de l'Église.",
+  },
+  prog_automatons_trusted: {
+    name: 'Digne de confiance auprès des Automates',
+    desc: 'Atteignez le rang Digne de confiance auprès des Automates.',
+  },
+  prog_rift_watch_champion: {
+    name: 'Champion de la Vigie des Failles',
+    desc: 'Atteignez le rang Champion auprès de la Vigie des Failles.',
+    title: 'Gardien des Failles',
+  },
+  prog_church_order_champion: {
+    name: "Champion de l'Ordre de l'Église",
+    desc: "Atteignez le rang Champion auprès de l'Ordre de l'Église.",
+    title: "Gardien de l'Aube",
+  },
+  prog_automatons_champion: {
+    name: 'Champion des Automates',
+    desc: 'Atteignez le rang Champion auprès des Automates.',
+    title: 'Maître de forge',
+  },
+  prog_faction_champion_all: {
+    name: 'Champion de chaque bannière',
+    desc: "Atteignez le rang Champion auprès de la Vigie des Failles, de l'Ordre de l'Église et des Automates.",
+  },
+  exp_clue_first_casket: {
+    name: 'Trésor trouvé',
+    desc: "Ouvrez un Coffret au trésor déterré à la fin d'une chasse au parchemin d'indice.",
+  },
+  exp_clue_ten_caskets: {
+    name: 'Chasseur de trésor',
+    desc: "Ouvrez 10 Coffrets au trésor déterrés à la fin de chasses au parchemin d'indice.",
+    title: 'Chasseur de trésor',
+  },
+  exp_harbor_to_harbor: {
+    name: 'De port en port',
+    desc: "Naviguez sur les deux bacs aller-retour : d'Eastbrook à Moonrest, et de Wickharbor à Wyrmwatch.",
+  },
 };
 
 // fr_CA rides this base table plus the delve-vocabulary override layer

@@ -2,6 +2,13 @@ import { apiUrl } from '../client_origin';
 import { graphicsPresetLabel } from '../render/gfx';
 import { isSoftwareRendererName } from '../render/software_renderer';
 import { crowdBucketLabel } from './crowd_bucket';
+import {
+  createHostEssentialsProbe,
+  type HostEssentials,
+  type HostEssentialsProbe,
+  hostEssentialsPayloadFields,
+} from './desktop_host_essentials';
+import { frameCadenceBeaconBlock, frameCadenceBeaconFields } from './frame_cadence_wiring';
 import { createGpuAdapterProbe } from './gpu_adapter_probe';
 import { collectLoadSpans } from './load_profiler';
 import { localDevPerfTraceEnabled, type PerfMonitor, type PerfSnapshot } from './perf';
@@ -55,6 +62,12 @@ export interface PerfReporterOptions {
   // session keeps beaconing reports whose frames were never rendered, diluting
   // the fleet fps average with zeros. Absent means never shell-hidden.
   shellHidden?: () => boolean;
+  // The host-essentials probe constructor, for tests. It exists so the three
+  // claims about this probe (never constructed for a non-desktop session,
+  // stopped in teardown, read from the CACHE on the unload path) can be
+  // asserted from BEHAVIOR rather than from a grep of this file's source.
+  // Absent means the real one; production never passes it.
+  hostEssentialsProbeFactory?: () => HostEssentialsProbe;
 }
 
 export type PerfReporterSkipReason = 'disabled' | 'hidden' | 'not-ready' | 'no-renderer';
@@ -136,6 +149,24 @@ function errorText(err: unknown): string {
 function devTraceLog(status: PerfReporterStatus, level: 'debug' | 'warn', message: string): void {
   if (!status.devTrace) return;
   console[level](`[perf-report] ${message}`);
+}
+
+/**
+ * The perf-report session id this session is already tagging its reports with,
+ * or null when none has been minted (the reporter is disabled, or has not
+ * started yet). READ-ONLY on purpose: it never mints one, so asking cannot
+ * create an id that no report will ever carry.
+ *
+ * The smallest seam the System Report panel needed: that panel copies the id
+ * into the saved diagnostic file, which is what lets a support engineer join
+ * one player's file to the automatic performance reports from the same session.
+ */
+export function perfReportSessionId(): string | null {
+  try {
+    return sessionStorage.getItem(SESSION_KEY) || null;
+  } catch {
+    return null;
+  }
 }
 
 function storedSessionId(): string {
@@ -550,6 +581,9 @@ function payloadFromSnapshot(
   // is still in flight or on any browser that has no WebGPU to ask.
   gpuHpAdapter: string | null = null,
   bootPhases: BootPhaseDurations | null = null,
+  // The desktop shell's host facts, or null on web/mobile and until the
+  // shell probe first settles (src/game/desktop_host_essentials.ts).
+  hostEssentials: HostEssentials | null = null,
 ): Record<string, unknown> | null {
   const renderer = snapshot.renderer;
   if (!renderer) return null;
@@ -581,6 +615,7 @@ function payloadFromSnapshot(
   // beside it) stays local: this is the fleet's answer to "did the worker run
   // on this backend, and what retired it when it did not".
   const shaderWarm = shaderWarmBeaconSummary(snapshot.shaderWarm);
+  const cadence = frameCadenceBeaconFields(renderer.budget.targetFps);
   return {
     schemaVersion: PERF_REPORT_SCHEMA_VERSION,
     releaseVersion: __APP_VERSION__,
@@ -596,7 +631,12 @@ function payloadFromSnapshot(
     // refused it", which a NOT NULL column can hold and a null cannot.
     shaderWarmWorkerActive: shaderWarm.active,
     shaderWarmRefusal: shaderWarm.refusal ?? '',
-    targetFps: renderer.budget.targetFps,
+    // Typed for the same reason: a session that renders slowly on purpose has
+    // to stay separable from a struggling one after raw_summary is shed.
+    targetFps: cadence.targetFps,
+    frameCapIntent: cadence.frameCapIntent,
+    cadenceDivisor: cadence.cadenceDivisor,
+    refreshHz: cadence.refreshHz,
     renderScale: renderer.renderScale,
     effectiveRenderScale: renderer.effectiveRenderScale,
     fpsAvg: snapshot.fps,
@@ -641,6 +681,12 @@ function payloadFromSnapshot(
     crowdBucket: crowdBucketLabel(activeViews),
     worst10sFrameP95Ms: snapshot.windows.worst10s?.frameMs.p95 ?? null,
     suggestionIds,
+    // The desktop shell's host essentials, as TOP-LEVEL scalars and never
+    // inside rawSummary: that block is already over its byte budget and its
+    // lower rungs get shed server-side, and these are stored as columns. Each
+    // absent field is OMITTED rather than sent as null, so a web payload is
+    // byte-identical to what it was before this dimension existed.
+    ...hostEssentialsPayloadFields(hostEssentials),
     rawSummary: {
       graphicsConfigVersion: renderer.graphicsConfigVersion,
       seconds: snapshot.seconds,
@@ -661,6 +707,7 @@ function payloadFromSnapshot(
       rendererPhaseMs: renderer.phaseMs,
       rendererFoliage: renderer.foliage,
       rendererBudget: renderer.renderBudget,
+      cadence: frameCadenceBeaconBlock(),
       rendererQualityBuckets: renderer.qualityBuckets,
       // The resolution the 3D scene is drawn at. The columns above cannot say
       // it: `dpr` is the raw window.devicePixelRatio, never the renderer's
@@ -743,6 +790,16 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
   // report built before it settles just carries null.
   const gpuAdapterProbe = createGpuAdapterProbe();
   gpuAdapterProbe.start();
+  // Owned HERE rather than in main.ts (which is a firewall pinned at its exact
+  // line count): the probe only exists to feed this payload. It is a no-op
+  // without the shell bridge, its first fetch is seconds out, and its refresh
+  // cadence is shorter than the report cadence so every beacon sees a reading
+  // from its own interval. The final keepalive flush reads the cache only.
+  const hostEssentialsProbe =
+    options.desktopShell === true
+      ? (options.hostEssentialsProbeFactory ?? createHostEssentialsProbe)()
+      : null;
+  hostEssentialsProbe?.start();
   let stopped = false;
   let timer: number | null = null;
   let lastFinalFlushAt = 0;
@@ -792,6 +849,7 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
       options.desktopShell ?? false,
       gpuAdapterProbe.value(),
       currentBootPhases(),
+      hostEssentialsProbe?.value() ?? null,
     );
     if (!body) {
       skip('no-renderer', sendOptions.final ? null : cadenceDelay(REPEAT_REPORT_MS));
@@ -883,6 +941,7 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
     status.enabled = false;
     status.nextSendAt = null;
     if (timer !== null) window.clearTimeout(timer);
+    hostEssentialsProbe?.stop();
     window.removeEventListener('pagehide', flushFinal);
     document.removeEventListener('visibilitychange', handleVisibilityChange);
     cleanupDebug();

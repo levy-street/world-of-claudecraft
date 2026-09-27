@@ -8,6 +8,8 @@
 // English (clean English is preferable to a broken guess).
 
 import { DEEDS } from '../sim/content/deeds';
+import { devBadgeTitleTier } from '../sim/dev_badge_titles';
+import { devTierByIndex, devTierDisplayName } from './dev_tier';
 import { getLanguage, type SupportedLanguage, t } from './i18n';
 import { maybePseudoString, pseudoLocaleString } from './i18n_pseudo_port';
 import { makeLazyLocaleChannel } from './lazy_locale_channel';
@@ -189,9 +191,18 @@ export function deedDesc(id: string): string {
   return maybePseudoString(localeEntry(id)?.desc ?? def.desc);
 }
 
-/** The localized display title for a title-reward deed; '' when the deed is
- *  unknown or carries no title reward (callers hide the surface entirely). */
+/** The localized display text for a selected title id: a title-reward deed,
+ *  or a developer-badge rung title ('dev:<rung>', src/sim/dev_badge_titles.ts,
+ *  not a deed), which reads the badge's own rung name so the title always
+ *  matches the badge. '' when the id is unknown or carries no title (callers
+ *  hide the surface entirely). Every title surface (nameplate, target frame,
+ *  inspect, chat, social, boards, player card, picker) resolves through here. */
 export function deedTitleText(id: string): string {
+  const rung = devBadgeTitleTier(id);
+  if (rung) {
+    const tier = devTierByIndex(rung.index);
+    return tier ? devTierDisplayName(tier) : '';
+  }
   const def = deedDef(id);
   if (def?.reward?.kind !== 'title') return '';
   return maybePseudoString(localeEntry(id)?.title ?? def.reward.text);

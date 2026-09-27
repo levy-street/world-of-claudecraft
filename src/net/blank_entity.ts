@@ -59,6 +59,7 @@ export function blankEntity(id: number): Entity {
       armor: 0,
       pvpOffense: 0,
       pvpDefense: 0,
+      pvpVitality: 0,
     },
     weapon: { min: 1, max: 2, speed: 2 },
     offhandWeapon: null,
@@ -234,5 +235,6 @@ export function blankEntity(id: number): Entity {
     guildTier: 0,
     title: null,
     border: null,
+    specId: null,
   };
 }

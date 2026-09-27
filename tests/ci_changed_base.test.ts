@@ -173,6 +173,7 @@ describe('buildBiomeArgs', () => {
       'ci',
       '--changed',
       '--since=origin/release/v0.36.0',
+      '--max-diagnostics=none',
       '--no-errors-on-unmatched',
     ]);
     // Regression guard: a hardcoded `@x.y.z` suffix here is a second, unguarded

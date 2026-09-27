@@ -23,15 +23,29 @@ import {
   dungeonDisplayNameFromSource,
   dungeonText,
   itemDisplayNameFromSource,
+  parseSimMoney,
   questTitleFromSource,
 } from './entity_display_core';
-import { formatNumber, t } from './i18n';
+import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
 import type { TranslationKey } from './i18n.catalog';
 import { localizeServerText } from './server_i18n';
 import { localizeSimText } from './sim_i18n';
 
 /** English system text in, the player's language out. Returns the input
  *  unchanged when nothing matches, so an unlocalized message still shows. */
+/** The sim's formatMoney English ("1g 2s 3c") back into the player's locale. */
+function localizeSimMoney(text: string): string {
+  const copper = parseSimMoney(text);
+  return copper === null ? text : formatLocalizedMoney(copper);
+}
+
+/** A sim-emitted integer count re-formatted for the locale; non-numeric text
+ *  (the drift guard's placeholder) passes through untouched. */
+function localizeSimCount(text: string): string {
+  const n = Number(text);
+  return Number.isInteger(n) ? formatNumber(n, { maximumFractionDigits: 0 }) : text;
+}
+
 export function localizeSystemText(text: string): string {
   const exact: Record<string, TranslationKey> = {
     'You stand up.': 'hud.logs.standUp',
@@ -148,6 +162,46 @@ export function localizeSystemText(text: string): string {
   if (match)
     return t('itemUi.logs.expiredListing', {
       item: itemDisplayNameFromSource(match[1]),
+    });
+  // The buy-order board's notices (src/sim/market_orders.ts): 'log' events, so
+  // they land here rather than in the Hud's loot-text arms. The money captures
+  // are the sim's formatMoney English and re-localize through localizeSimMoney.
+  // The unit count is captured as a token, not \d+: the S3 drift guard
+  // substitutes a word for every template expression, and the count is one.
+  match = /^Placed an order for (.+) x(\S+) at (.+) each\.$/.exec(text);
+  if (match)
+    return t('itemUi.logs.orderPlaced', {
+      item: itemDisplayNameFromSource(match[1]),
+      count: localizeSimCount(match[2]),
+      each: localizeSimMoney(match[3]),
+    });
+  match = /^Delivered (.+) x(\S+) to (.+) for (.+?) - collect (.+) from the Merchant\.$/.exec(text);
+  if (match)
+    return t('itemUi.logs.orderDelivered', {
+      item: itemDisplayNameFromSource(match[1]),
+      count: localizeSimCount(match[2]),
+      buyer: match[3],
+      money: localizeSimMoney(match[4]),
+      proceeds: localizeSimMoney(match[5]),
+    });
+  match = /^(.+) delivered (.+) x(\S+) to your order - collect it from the Merchant\.$/.exec(text);
+  if (match)
+    return t('itemUi.logs.orderReceived', {
+      seller: match[1],
+      item: itemDisplayNameFromSource(match[2]),
+      count: localizeSimCount(match[3]),
+    });
+  match = /^Your order for (.+) expired; (.+) waits at the Merchant\.$/.exec(text);
+  if (match)
+    return t('itemUi.logs.orderExpired', {
+      item: itemDisplayNameFromSource(match[1]),
+      money: localizeSimMoney(match[2]),
+    });
+  match = /^Withdrew your order for (.+); (.+) returned\.$/.exec(text);
+  if (match)
+    return t('itemUi.logs.orderWithdrawn', {
+      item: itemDisplayNameFromSource(match[1]),
+      money: localizeSimMoney(match[2]),
     });
   // The dungeon party-size warning is emitted as a 'log' event (sim.ts), so it must be
   // matched on this path, not in localizeLootText.

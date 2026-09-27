@@ -28,6 +28,7 @@
 import type * as THREE from 'three';
 import { type FoliageDrawPath, foliageAttributeList } from './foliage_prewarm_twins_core';
 import { createInstancedGhostMaterial, ghostSourceMaterial } from './instanced_occluder_ghosts';
+import { ditherFadeEnabled } from './occluder_dither_fade';
 
 /** One ghost twin: the geometry and material to draw it with, plus the draw
  *  path that identifies its program. */
@@ -41,13 +42,15 @@ export interface FoliageGhostPrewarmDraw {
  * The ghost twins for a set of hideable source meshes. `sources` may repeat
  * freely (callers walk a per-tree part list); the result carries one entry per
  * distinct (source material, geometry attribute set), each already shaped as
- * the plain-Mesh, uninstanced, shadowless draw the live ghost is.
+ * the plain-Mesh, uninstanced, shadowless draw the live ghost is. Empty on the
+ * dithered style, which draws no stand-in (instanced_dither_fade.ts).
  */
 export function foliageGhostPrewarmDraws(
   sources: Iterable<THREE.InstancedMesh>,
 ): FoliageGhostPrewarmDraw[] {
-  const seen = new Set<string>();
   const draws: FoliageGhostPrewarmDraw[] = [];
+  if (ditherFadeEnabled()) return draws;
+  const seen = new Set<string>();
   for (const source of sources) {
     const src = ghostSourceMaterial(source);
     const attributes = foliageAttributeList(source.geometry.attributes);

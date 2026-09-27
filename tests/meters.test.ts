@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import type { SimEvent } from '../src/sim/types';
 import { MeterData } from '../src/ui/meters';
+import { breakdownKey } from '../src/ui/meters_breakdown_view';
+import { buildMeterRows } from '../src/ui/meters_rows_view';
 import type { IWorld } from '../src/world_api';
 
 // minimal IWorld stand-in: entity map + player + party
@@ -74,6 +76,29 @@ describe('combat meters', () => {
     // label follows the beefiest mob fought
     expect(m.current!.label).toBe('Gorrak');
     expect(m.current!.mainMobId).toBe(51);
+  });
+
+  it('credits an absorb (a shield soaking a hit) to the shielder as healing, under the shield name', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    const absorb = {
+      type: 'absorb',
+      sourceId: 2,
+      targetId: 1,
+      amount: 45,
+      ability: 'Temporal Aegis',
+      abilityId: 'temporal_aegis',
+    } as SimEvent;
+    m.onEvent(absorb, w, party, 1000);
+    expect(m.current).not.toBeNull();
+    const t = m.current!.tallies.get(2)!;
+    expect(t.heal).toBe(45);
+    expect(t.healByAbility.get(breakdownKey(null, 'Temporal Aegis'))?.amount).toBe(45);
+    expect(m.allTime.tallies.get(2)!.heal).toBe(45);
+    // A mob's own shield (source outside the party) is not party healing.
+    m.onEvent({ ...(absorb as object), sourceId: 50, targetId: 50 } as SimEvent, w, party, 1500);
+    expect(m.current!.tallies.get(50)).toBeUndefined();
   });
 
   it('ignores a cueOnly heal2 (the HoT-application sound cue): no encounter opens, no tally, no lastActivity bump', () => {
@@ -162,7 +187,18 @@ describe('combat meters', () => {
     const m = new MeterData(0);
     m.onEvent(dmg(50, 1, 12), w, party, 1000); // wolf bites the tank
     expect(m.current).not.toBeNull();
-    expect(m.current!.tallies.size).toBe(0);
+    expect(m.current!.tallies.get(1)?.dmg ?? 0).toBe(0);
+    expect(m.current!.tallies.get(1)?.dmgTaken).toBe(12);
+    expect(
+      buildMeterRows({
+        tallies: m.current!.tallies.values(),
+        tab: 'dmg',
+        liveThreat: null,
+        petsByOwner: null,
+        mainMobId: null,
+        aggroPid: null,
+      }),
+    ).toEqual([]);
   });
 
   it('folds controlled pet damage into its owner row instead of giving the pet its own', () => {
@@ -533,5 +569,81 @@ describe('combat meters', () => {
       expect(m.current!.tallies.get(1)!.dmg).toBe(60);
       expect(m.current!.label).toBe('Rival');
     });
+  });
+
+  it('tallies damage taken and absorbed per ability and mob', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    const biteEvent: SimEvent = {
+      type: 'damage',
+      sourceId: 50,
+      targetId: 1,
+      amount: 150,
+      absorbed: 50,
+      crit: false,
+      school: 'physical',
+      ability: 'Bite',
+      kind: 'hit',
+    };
+    m.onEvent(biteEvent, w, party, 1000);
+    const tank = m.current!.tallies.get(1)!;
+    expect(tank.dmgTaken).toBe(150);
+    expect(tank.absorbed).toBe(50);
+    expect([...tank.dmgTakenByAbility.values()]).toEqual([
+      { ability: 'Bite', petName: null, amount: 150 },
+    ]);
+    expect(tank.dmgTakenByMob.get(50)).toBe(150);
+  });
+
+  it('tallies interrupts when party applies a lockout aura', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    const interruptEvent: SimEvent = {
+      type: 'aura',
+      gained: true,
+      auraKind: 'lockout',
+      sourceId: 1,
+      targetId: 50,
+      name: 'Pummel',
+    };
+    m.onEvent(interruptEvent, w, party, 1000);
+    const warrior = m.current!.tallies.get(1)!;
+    expect(warrior.interrupts).toBe(1);
+    expect([...warrior.interruptsByAbility.values()]).toEqual([
+      { ability: 'Pummel', petName: null, amount: 1 },
+    ]);
+  });
+
+  it('tallies deaths when a party member dies', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    const deathEvent: SimEvent = {
+      type: 'playerDeath',
+      pid: 2,
+    };
+    m.onEvent(deathEvent, w, party, 1000);
+    const priest = m.current!.tallies.get(2)!;
+    expect(priest.deaths).toBe(1);
+  });
+
+  it('resets current fight and all history/session data', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    m.onEvent(dmg(1, 50, 100), w, party, 1000);
+    expect(m.current).not.toBeNull();
+    expect(m.allTime.tallies.get(1)!.dmg).toBe(100);
+
+    m.resetCurrent();
+    expect(m.current).toBeNull();
+    expect(m.allTime.tallies.get(1)!.dmg).toBe(100);
+
+    m.resetAll(2000);
+    expect(m.current).toBeNull();
+    expect(m.history.length).toBe(0);
+    expect(m.allTime.tallies.size).toBe(0);
   });
 });

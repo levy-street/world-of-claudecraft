@@ -851,6 +851,12 @@ describe('escrow snapshot consistency across the serial-writer wait', () => {
     // item in the bags snapshot (T0) AND the book snapshot (T1): a dupe on
     // crash. Both halves are now captured in one synchronous step inside the
     // thunk.
+    // withMarket: true (the leave flush) on purpose: it is the one save shape
+    // still queued on the shared writer (server/game.ts saveCharacter), so it
+    // is the one shape that can still have a real queue wait for an op to
+    // land inside. A guild-book-only autosave no longer queues there at all
+    // (see "does not queue behind the shared market writer" below), so it no
+    // longer has this window to test.
     const server = new GameServer();
     const { session } = joinServer(server, 1, 'MidWait');
     officerSetup(server, session);
@@ -863,7 +869,7 @@ describe('escrow snapshot consistency across the serial-writer wait', () => {
       releaseWriter = resolve;
     });
     void priv(server).enqueueMarketWrite(() => blocker);
-    const savePromise = priv(server).saveCharacter(session);
+    const savePromise = priv(server).saveCharacter(session, { withMarket: true });
     // While the save waits on the queue, the officer deposits the item.
     const meta = server.sim.players.get(session.pid);
     if (!meta) throw new Error('missing meta');
@@ -871,7 +877,7 @@ describe('escrow snapshot consistency across the serial-writer wait', () => {
     dispatch(server, session, { cmd: 'guild_bank_deposit', slot: idx });
     releaseWriter?.();
     await savePromise;
-    const [, , state] = dbMock.saveCharacterAndGuildBankState.mock.calls[0] as unknown as [
+    const [, , state] = dbMock.saveCharacterAndMarketState.mock.calls[0] as unknown as [
       number,
       number,
       { inventory: { itemId: string }[] },
@@ -897,6 +903,9 @@ describe('escrow snapshot consistency across the serial-writer wait', () => {
     // setPlayerLevel (dev_level / GM join / PBE boost) for this save, and
     // forever when this save was the leave flush (the next join re-seeds
     // lastPersistedLevel from the newer blob).
+    // withMarket: true, same reason as the test above: only the leave flush
+    // still queues on the shared writer, so only it still has a real window
+    // for a mid-wait level move to land in.
     drainLinkChanges();
     const server = new GameServer();
     const { session } = joinServer(server, 1, 'MidLevel');
@@ -907,13 +916,13 @@ describe('escrow snapshot consistency across the serial-writer wait', () => {
       releaseWriter = resolve;
     });
     void priv(server).enqueueMarketWrite(() => blocker);
-    const savePromise = priv(server).saveCharacter(session);
+    const savePromise = priv(server).saveCharacter(session, { withMarket: true });
     // While the save waits on the queue, a silent level set lands.
     server.sim.setPlayerLevel(7, session.pid);
     releaseWriter?.();
     await savePromise;
     // The escrow row carried the NEW level...
-    const [, savedLevel] = dbMock.saveCharacterAndGuildBankState.mock.calls[0] as unknown as [
+    const [, savedLevel] = dbMock.saveCharacterAndMarketState.mock.calls[0] as unknown as [
       number,
       number,
     ];
@@ -921,6 +930,31 @@ describe('escrow snapshot consistency across the serial-writer wait', () => {
     // ...and the feed gate tracked the PERSISTED level and fired exactly once.
     expect(session.lastPersistedLevel).toBe(7);
     expect(drainLinkChanges()).toEqual([{ accountId: session.accountId, kinds: ['flex'] }]);
+  });
+
+  it('a guild-book-only autosave does not queue behind the shared market writer', async () => {
+    // Direction B (docs/guild-bank/escrow-fix-plan.md section 3.6): book writes
+    // are now a read-modify-write under a per-guild row lock, commutative and
+    // order-independent, so they no longer need the shared writer's
+    // commit-order guarantee. server/game.ts saveCharacter now takes the
+    // guild-book-only save (opts.withMarket false, the ordinary 30 s autosave
+    // shape) off that writer entirely; only the leave flush (withMarket true,
+    // which bundles market and mail) still queues there. Before this fix, one
+    // guild's dirty-book autosave queued behind EVERY other write already
+    // waiting on the shared writer (a market/mail autosave, or another
+    // guild's autosave), which is exactly the compounding stall this test
+    // guards against: occupy the writer with a promise that never resolves,
+    // and prove the autosave still lands.
+    const server = new GameServer();
+    const { session } = joinServer(server, 1, 'NoQueue');
+    officerSetup(server, session);
+    dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 1_000 });
+    void priv(server).enqueueMarketWrite(() => new Promise<void>(() => {}));
+    const saved = await priv(server).saveCharacter(session);
+    expect(saved).toBe(true);
+    expect(dbMock.saveCharacterAndGuildBankState).toHaveBeenCalledTimes(1);
+    expect(dbMock.saveCharacterAndMarketState).not.toHaveBeenCalled();
+    expect(durableBook()).toEqual({ treasury: 101_000, inventory: [], purchasedSlots: 24 });
   });
 });
 

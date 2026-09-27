@@ -12,6 +12,9 @@ import { beaconSpiralLift } from './beacon_spiral';
 import { forgefatherStairSurface } from './content/ember_coast';
 import { dawnholdLift } from './dawnhold_layout';
 
+// (The glider flight tower's deck used to fold in here as an absolute surface;
+// the launch now uses the existing mountain and a plank wharf on the
+// deck_surfaces.ts arm, like the harbor piers.)
 export function overworldWalkSurface(x: number, z: number, terrain: number): number {
   const lifted = terrain + beaconSpiralLift(x, z) + dawnholdLift(x, z);
   return Math.max(lifted, forgefatherStairSurface(x, z));

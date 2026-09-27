@@ -1,6 +1,13 @@
 import * as THREE from 'three';
+import {
+  CAST_VFX_ENGINE,
+  type CastVfxSpawnGate,
+  OPEN_CAST_VFX_SPAWN_GATE,
+  tagCastVfxEngine,
+} from '../cast_vfx_family';
 import { drapeFanLocalY, drapeStrideFor, fanVertexSpacing } from '../drape_lod_core';
 import { drapedBoundingSphere, drapeExtent } from '../draped_bounds_core';
+import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { DRAPE_AXIS_Y, DRAPED_VERTEX_SHADER } from './draped_shader';
 import type { AbilityVfxTextures } from './fx_textures';
 
@@ -33,7 +40,7 @@ const DECAL_SLOTS = 12;
 const DECAL_SEGMENTS = 24;
 const DRAPE_LIFT = 0.06; // yards above the sampled ground, against z-fighting
 
-export type DecalStyle = 'ember' | 'rime' | 'rune' | 'crack' | 'char';
+export type DecalStyle = 'ember' | 'rime' | 'rune' | 'crack' | 'char' | 'leap_fracture';
 
 interface DecalSlot {
   mesh: THREE.Mesh;
@@ -41,6 +48,7 @@ interface DecalSlot {
   dur: number;
   spin: number;
   active: boolean;
+  immediate: boolean;
   // Per-slot shader state, pushed into the SHARED material by onBeforeRender.
   map: THREE.Texture;
   color: THREE.Color;
@@ -53,6 +61,8 @@ interface DecalSlot {
 }
 
 export class GroundDecals {
+  /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
+  spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
   private slots: DecalSlot[] = [];
   private next = 0;
   private disposed = false;
@@ -61,6 +71,7 @@ export class GroundDecals {
   private localXZ: Float32Array;
   private readonly baseGeometry: THREE.CircleGeometry;
   private readonly material: THREE.ShaderMaterial;
+  private readonly stoneMaterial: THREE.ShaderMaterial;
   // Latest camera position (pushed once a frame from the fx engine) and whether
   // one has ever arrived: before the first frame every drape stays exact.
   private camX = 0;
@@ -78,6 +89,7 @@ export class GroundDecals {
       rune: tex.rune,
       crack: tex.crack,
       char: tex.char,
+      leap_fracture: tex.leapFracture,
     };
     // Rotation baked into the geometry (instead of mesh.rotation.x) so the
     // local Y IS the up-axis the drape attribute displaces along.
@@ -130,6 +142,18 @@ export class GroundDecals {
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
+    this.stoneMaterial = this.material.clone();
+    this.stoneMaterial.blending = THREE.NormalBlending;
+    this.stoneMaterial.fragmentShader = `
+      uniform sampler2D uMap;
+      uniform float uDissolve;
+      varying vec2 vUv;
+      void main() {
+        vec4 tex = texture2D(uMap, vUv);
+        float alpha = tex.a * (1.0 - smoothstep(0.0, 1.0, uDissolve));
+        if (alpha < 0.004) discard;
+        gl_FragColor = vec4(tex.rgb, alpha);
+      }`;
     const baseUv = geo.getAttribute('uv');
     for (let i = 0; i < DECAL_SLOTS; i++) {
       // The slot geometry SHARES the base disc's position, uv and index buffers
@@ -148,6 +172,7 @@ export class GroundDecals {
         dur: 3,
         spin: 0,
         active: false,
+        immediate: false,
         map: tex.rune,
         color: new THREE.Color(),
         dissolve: 1,
@@ -157,8 +182,8 @@ export class GroundDecals {
       };
       const mesh = slot.mesh;
       mesh.visible = false;
-      mesh.renderOrder = 3; // over terrain decals, under the shock rings
-      mesh.userData.renderCategory = 'vfx';
+      mesh.renderOrder = floorVfxRenderOrder('player', 0); // over terrain decals, under the shock rings
+      tagCastVfxEngine(mesh);
       // Culled again: the flat disc is permanent now, and the sphere is
       // refreshed from the drape extent at every spawn (see spawn).
       mesh.frustumCulled = true;
@@ -166,16 +191,26 @@ export class GroundDecals {
       // whenever uniformsNeedUpdate is set, whatever its material-change check
       // decided, so each slot writes its own state here right before its draw.
       mesh.onBeforeRender = () => {
-        const uniforms = this.material.uniforms;
+        const material = mesh.material as THREE.ShaderMaterial;
+        const uniforms = material.uniforms;
         uniforms.uMap.value = slot.map;
         (uniforms.uColor.value as THREE.Color).copy(slot.color);
         uniforms.uDissolve.value = slot.dissolve;
         uniforms.uSpin.value = slot.spinPhase;
-        this.material.uniformsNeedUpdate = true;
+        material.uniformsNeedUpdate = true;
       };
       scene.add(mesh);
       this.slots.push(slot);
     }
+    // Both shared programs must be discoverable before the first leap, even
+    // if the loading deadline skips visible primitive spawns. This carrier
+    // borrows an existing slot geometry and never submits a visible draw.
+    const stoneCarrier = new THREE.Mesh(this.slots[0].mesh.geometry, this.stoneMaterial);
+    stoneCarrier.name = 'warrior-leap-fracture-prewarm';
+    stoneCarrier.visible = false;
+    stoneCarrier.renderOrder = floorVfxRenderOrder('player', 0); // the slots' rung
+    tagCastVfxEngine(stoneCarrier);
+    this.slots[0].mesh.add(stoneCarrier);
   }
 
   /** Where the camera is this frame, for the drape distance LOD. */
@@ -194,16 +229,18 @@ export class GroundDecals {
     style: DecalStyle,
     dur: number,
   ): void {
-    if (this.disposed) return;
+    if (this.disposed || !this.spawnGate.allows(CAST_VFX_ENGINE)) return;
     const slot = this.slots[this.next];
     this.next = (this.next + 1) % DECAL_SLOTS;
     slot.active = true;
     slot.age = 0;
     slot.dur = dur;
     slot.spin = style === 'rune' ? 0.35 : 0;
+    slot.immediate = style === 'leap_fracture';
+    slot.mesh.material = slot.immediate ? this.stoneMaterial : this.material;
     slot.map = this.maps[style];
     slot.color.setHex(colorHex);
-    slot.dissolve = 1;
+    slot.dissolve = slot.immediate ? 0 : 1;
     slot.spinPhase = 0;
     slot.mesh.position.set(x, y, z);
     slot.mesh.scale.setScalar(radius);
@@ -253,7 +290,7 @@ export class GroundDecals {
       // etch in over the first 18%, hold, then dissolve away over the last 45%
       const dissolve =
         t < 0.18 ? 1 - (t / 0.18) * 0.85 : t < 0.55 ? 0.15 : 0.15 + ((t - 0.55) / 0.45) * 0.85;
-      slot.dissolve = dissolve;
+      slot.dissolve = slot.immediate ? Math.max(0, (t - 0.35) / 0.65) : dissolve;
       if (slot.spin > 0) slot.spinPhase = slot.age * slot.spin;
     }
   }
@@ -278,5 +315,6 @@ export class GroundDecals {
     // release; the family shares one material, so it is disposed once.
     this.baseGeometry.dispose();
     this.material.dispose();
+    this.stoneMaterial.dispose();
   }
 }

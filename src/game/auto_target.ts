@@ -11,6 +11,8 @@
 // Pure: the caller supplies the attackable predicate (the client already owns one)
 // and the entity list, so no world handle and no DOM.
 
+import { isDualPurposeHeal } from '../sim/combat/dual_purpose_target';
+
 /** The little the picker reads off an entity. */
 export interface AutoTargetEntity {
   id: number;
@@ -21,6 +23,7 @@ export interface AutoTargetEntity {
 export interface AutoTargetAbility {
   requiresTarget?: boolean;
   targetType?: string;
+  effects?: readonly { readonly type: string }[];
 }
 
 /** How far out to look, in yards. Matches the client's own attack-nearest reach,
@@ -32,14 +35,18 @@ export const AUTO_TARGET_RANGE = 40;
  *
  * Only for abilities that actually need a hostile target: a heal or a buff would
  * otherwise yank the player off the ally they meant, and an untargeted AoE is
- * already legal and must stay that way.
+ * already legal and must stay that way. A dual-purpose heal (Solar Invocation,
+ * Scouring Mercy) casts on either side, so it is a heal whenever an ally is held:
+ * only an empty or hostile-less selection still picks an enemy for it.
  */
 export function shouldAutoTarget(
   ability: AutoTargetAbility | null | undefined,
   hasLiveHostileTarget: boolean,
+  hasLiveFriendlyTarget = false,
 ): boolean {
   if (!ability?.requiresTarget) return false;
   if (ability.targetType === 'friendly') return false;
+  if (hasLiveFriendlyTarget && isDualPurposeHeal(ability)) return false;
   return !hasLiveHostileTarget;
 }
 

@@ -38,7 +38,7 @@ const OFFENSIVE_SPEC_TUNING: Partial<Record<PlayerClass, Record<string, Offensiv
     // resolve as normal AbilityDefs, so they pick this up through the shared
     // resolveTalentHitMult seam; the Earthen Jolt vent multiplier
     // (shaman_thundercall.ts) stacks on top of the already-scaled hit.
-    elemental: { spell: 0.13 },
+    elemental: { spell: 0.05 },
   },
   warlock: {
     // Ruination: destruction owner spell bonus. The paired pet bonus is a

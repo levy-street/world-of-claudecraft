@@ -55,6 +55,12 @@ const abilityStringsEn = {
       anyTarget: 'Enemy or friendly target',
       selfOnly: 'Self only',
       damageRange: '{min} to {max}',
+      edictExplosion:
+        'While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.',
+      edictDamage:
+        'Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.',
+      verdictDamage:
+        'Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.',
       finisherDamage: '{base} plus {perCombo} per combo point',
     },
     resources: {
@@ -67,6 +73,7 @@ const abilityStringsEn = {
     forms: {
       bear: 'Bruin',
       cat: 'Cat',
+      bearOrCat: 'Bruin or Cat',
     },
   },
 };
@@ -229,7 +236,7 @@ const classAbilityNamesEn = {
       [
         'earthquake',
         'Faultwake',
-        'Shake an 8-yard area for 6 sec, dealing {damage} Nature damage every 1.5 sec. Damage increases with Spell Power. Thundercall: at 5 Thunder, deal 100% more damage and consume all Thunder.',
+        'Shake an 8-yard area for 6 sec, dealing {damage} Nature damage every 1.5 sec. Damage increases with Spell Power. Thundercall: consume all Thunder, dealing 20% more damage per Thunder (100% at 5).',
       ],
       [
         'heroic_strike',
@@ -680,7 +687,7 @@ const classAbilityNamesEn = {
       [
         'final_edict',
         'Final Edict',
-        "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Holy explosion around you.",
+        "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Physical explosion around you.",
       ],
       [
         'dawnfall',
@@ -956,7 +963,22 @@ const classAbilityNamesEn = {
       [
         'thunder_reservoir',
         'Thunder Reservoir',
-        'Passive: Arc Bolt and Skybranch grant Thunder, up to 5. At 5 Thunder, Earthen Jolt deals 125% more damage or Faultwake deals 100% more damage, then consumes all Thunder. (Thundercall)',
+        'Passive: Arc Bolt and Skybranch grant Thunder, up to 5. Earthen Jolt consumes all Thunder and deals 25% more damage per Thunder (125% at 5). Faultwake consumes all Thunder and deals 20% more damage per Thunder (100% at 5). (Thundercall)',
+      ],
+      [
+        'lightning_overload',
+        'Arc Overload',
+        'Passive: Arc Bolt and Skybranch have a 20% chance to Overload, striking their first target again for 50% of the damage dealt and granting 1 Thunder. (Thundercall)',
+      ],
+      [
+        'lava_burst',
+        'Magma Burst',
+        'Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)',
+      ],
+      [
+        'thunderstorm',
+        'Stormbreak',
+        'Call down a thunderclap, dealing {damage} Nature damage to enemies within 10 yards and slowing them by 50% for 5 sec. Restores 8% of your maximum Mana. Damage increases with Spell Power. (Thundercall)',
       ],
       [
         'rockbiter_weapon',
@@ -971,7 +993,7 @@ const classAbilityNamesEn = {
       [
         'earth_shock',
         'Earthen Jolt',
-        'Deal {damage} Nature damage. Damage increases with Spell Power. Thundercall: at 5 Thunder, deal 125% more damage and consume all Thunder. Stonebound: force the target to attack you for 3 sec.',
+        'Deal {damage} Nature damage. Damage increases with Spell Power. Thundercall: consume all Thunder, dealing 25% more damage per Thunder (125% at 5). Stonebound: force the target to attack you for 3 sec.',
       ],
       [
         'lightning_shield',
@@ -1231,7 +1253,7 @@ const classAbilityNamesEn = {
         'Heals a friendly target for {damage} and an additional amount over 21 sec.',
         { restoration: 'Planting a NEW bloom adds 1 Verdance (max 5).' },
       ],
-      ['barkskin', 'Oakhide', 'Your skin hardens like bark, increasing armor by 150 for 15 sec.'],
+      ['barkskin', 'Oakhide', 'Your skin hardens like bark, increasing armor by 20% for 15 sec.'],
       // Tank defensive cooldowns (paladin / druid), one distinct mechanic each.
       [
         'sacred_bulwark',
@@ -1273,12 +1295,12 @@ const classAbilityNamesEn = {
       [
         'pounce',
         'Slinkstrike',
-        'A stealth opener that stuns the target for 2 sec. Awards 1 combo point. Cat Form only. Out of stealth this button is Lunge.',
+        'A stealth opener that stuns the target for 2 sec. Awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3). Cat Form only. Out of stealth this button is Lunge.',
       ],
       [
         'lunge',
         'Lunge',
-        'Lunge at an enemy up to 12 yd away. On arrival, deals 60% weapon damage and awards 1 combo point; a lunge cut short refunds its cooldown. Cat Form only.',
+        'Shift into Cat Form if you are not already, then lunge at an enemy up to 25 yd away. On arrival, deals 60% weapon damage, awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3); a lunge cut short refunds its cooldown. Usable in any form.',
       ],
       [
         'hamstring_bite',
@@ -1877,7 +1899,7 @@ const classAbilityNamesEn = {
       [
         'frenzied_regeneration',
         'Savage Mending',
-        'Restores 40% of your maximum health over 10 sec. Bruin Form only.',
+        'Restores 40% of your maximum health over 10 sec. Bruin or Cat Form only.',
       ],
       [
         'frost_trap',

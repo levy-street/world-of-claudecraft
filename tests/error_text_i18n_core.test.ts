@@ -135,11 +135,14 @@ describe('localizeErrorText', () => {
 describe('localizeErrorText: the form gate off a real cast', () => {
   afterEach(() => setLanguage('en'));
 
-  function formRefusal(abilityId: string): string {
+  function formRefusal(abilityId: string, spec?: string): string {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('druid', 'Fern');
     sim.tick();
     sim.setPlayerLevel(20, pid);
+    // Savage Mending is spec-gated (specs: ['feral']), so the refusal it owes
+    // is only reachable once the spec is committed.
+    if (spec) sim.applyTalents({ spec, rows: {} }, pid);
     const e = sim.entities.get(pid)!;
     e.resource = e.maxResource;
     sim.castAbility(abilityId, pid);
@@ -152,12 +155,17 @@ describe('localizeErrorText: the form gate off a real cast', () => {
   }
 
   it.each([
-    ['prowl', 'You must be in Cat Form.', 'hud.errors.cat'],
-    ['enrage', 'You must be in Bruin Form.', 'hud.errors.bear'],
+    // 'prowl' used to sit in this table; since v0.43 Stalk carries no form
+    // requirement at all (it SHIFTS you into Cat Form), so a cat-only strike
+    // stands in for the single-form arm.
+    ['claw', 'You must be in Cat Form.', 'hud.errors.cat', undefined],
+    ['enrage', 'You must be in Bruin Form.', 'hud.errors.bear', undefined],
+    // Savage Mending is the shared-form arm (v0.43): Bruin AND Cat.
+    ['frenzied_regeneration', 'You must be in Bruin or Cat Form.', 'hud.errors.bearOrCat', 'feral'],
   ] as const)(
     'localizes the %s refusal through the requiresForm key under zh_CN',
-    async (abilityId, literal, formKey) => {
-      const input = formRefusal(abilityId);
+    async (abilityId, literal, formKey, spec) => {
+      const input = formRefusal(abilityId, spec);
       expect(input).toBe(literal);
       await ensureLocaleLoaded('zh_CN');
       setLanguage('zh_CN');

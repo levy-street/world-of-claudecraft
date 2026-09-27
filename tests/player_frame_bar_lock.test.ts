@@ -50,14 +50,19 @@ describe('lockPlayerFrameToActionBar wiring', () => {
     // a drag move, a re-dock, and a resolution re-anchor all carry the frame
     // (the registration loop hands the same closure to every row; the group
     // arm is the one that re-evaluates the ride).
-    const start = hudTs.indexOf('const onPositioned = (active: boolean) =>');
+    const registry = stripComments(
+      readFileSync(new URL('../src/ui/hud_frame_registry.ts', import.meta.url), 'utf8'),
+    );
+    const start = registry.indexOf('onPositioned: (active) =>');
     expect(start).toBeGreaterThan(-1);
-    const wrap = hudTs.slice(start, start + 300);
+    const wrap = registry.slice(start, start + 220);
     expect(wrap).toContain('detach(active);');
-    expect(wrap).toContain("if (spec.id === 'actionBarGroup') this.applyPlayerFrameBarLock();");
-    // The same closure carries the damage meter's framed-layout arm; pin it
-    // here too so deleting it cannot pass the suite.
-    expect(wrap).toContain("if (spec.id === 'damageMeter') this.meters.mainFramed(active);");
+    expect(wrap).toContain('deps.onPositioned(spec.id, active);');
+    const callbackStart = hudTs.indexOf('onPositioned: (id, active) =>');
+    expect(callbackStart).toBeGreaterThan(-1);
+    const callback = hudTs.slice(callbackStart, callbackStart + 250);
+    expect(callback).toContain("if (id === 'actionBarGroup') this.applyPlayerFrameBarLock();");
+    expect(callback).toContain("if (id === 'damageMeter') this.meters.mainFramed(active);");
   });
 
   it('turning the lock on drops the applied spot (save kept); off restores it', () => {

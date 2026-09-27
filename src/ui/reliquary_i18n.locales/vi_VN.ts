@@ -142,6 +142,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Kho Vũ Khí Chiến Tranh',
     desc: 'Trang sức và vũ khí Chiến Tranh mua bằng danh dự khó nhọc mới có.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Phòng Trưng Bày Tiên Phong',
+    desc: 'Các bộ trang bị chuyên môn và vũ khí Chiến Tranh mùa 2, mua bằng danh dự.',
+  },
   horizons_vault_of_ages: {
     name: 'Kho Báu Ngàn Năm',
     desc: 'Những báu vật đã ngừng lưu hành của một thời đã qua. Các kỳ trân này không còn giành được nữa; kho báu tôn vinh các kỳ cựu còn giữ chúng.',
@@ -156,7 +160,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: 'Anh Hùng: Lò Luyện Suối Nguồn Cuối Cùng',
-    desc: 'Vũ khí chỉ rơi ở chế độ anh hùng từ Ignivar, Sứ Giả Ngọn Lửa Cuối Cùng.',
+    desc: 'Vũ khí chỉ rơi ở chế độ anh hùng và các bùa hộ mệnh của đột kích từ Ignivar, Sứ Giả Ngọn Lửa Cuối Cùng.',
   },
   conquerors_varkhul: {
     name: 'Lò Luyện Bên Trong',
@@ -164,7 +168,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: 'Anh Hùng: Lò Luyện Bên Trong',
-    desc: 'Khiên và vũ khí chỉ rơi ở chế độ anh hùng từ Varkhul, Tổ Phụ Lò Rèn của Ngọn Lửa Cuối Cùng.',
+    desc: 'Khiên và vũ khí chỉ rơi ở chế độ anh hùng cùng các bùa hộ mệnh của đột kích từ Varkhul, Tổ Phụ Lò Rèn của Ngọn Lửa Cuối Cùng.',
   },
   conquerors_set_bramblehide: {
     name: 'Da Gai Của Roots',

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 
 export const PALADIN_AEGIS_DOME_RADIUS = 10;
 const TAU = Math.PI * 2;
@@ -74,20 +75,20 @@ export class PaladinAegisVisual {
 
     this.dome = new THREE.Mesh(DOME_GEOMETRY, additiveMaterial(0xfff1b0, 0.13, THREE.BackSide));
     this.dome.name = 'paladin-aegis-dome';
-    this.dome.renderOrder = 6;
+    this.dome.renderOrder = floorVfxRenderOrder('player', 0);
     this.group.add(this.dome);
 
     this.groundRing = new THREE.Mesh(GROUND_RING_GEOMETRY, additiveMaterial(0xffd86a, 0.72));
     this.groundRing.name = 'paladin-aegis-ground-ring';
     this.groundRing.rotation.x = Math.PI / 2;
     this.groundRing.position.y = 0.06;
-    this.groundRing.renderOrder = 8;
+    this.groundRing.renderOrder = floorVfxRenderOrder('player', 2);
     this.group.add(this.groundRing);
 
     this.sun = new THREE.Mesh(SUN_GEOMETRY, additiveMaterial(0xfff7d0, 0.92));
     this.sun.name = 'paladin-aegis-sun';
     this.sun.position.y = 5.8;
-    this.sun.renderOrder = 9;
+    this.sun.renderOrder = floorVfxRenderOrder('player', 3);
     this.group.add(this.sun);
 
     this.sunHalo = new THREE.Sprite(
@@ -103,7 +104,7 @@ export class PaladinAegisVisual {
     this.sunHalo.name = 'paladin-aegis-sun-halo';
     this.sunHalo.position.y = 5.8;
     this.sunHalo.scale.setScalar(2.4);
-    this.sunHalo.renderOrder = 10;
+    this.sunHalo.renderOrder = floorVfxRenderOrder('player', 4);
     this.group.add(this.sunHalo);
 
     const blade = new THREE.Mesh(BLADE_GEOMETRY, additiveMaterial(0xfff4bd, 0.9));
@@ -127,7 +128,7 @@ export class PaladinAegisVisual {
       );
       rune.name = `paladin-aegis-rune-${index + 1}`;
       rune.scale.setScalar(1.3);
-      rune.renderOrder = 9;
+      rune.renderOrder = floorVfxRenderOrder('player', 3);
       this.runes.push(rune);
       this.group.add(rune);
     }

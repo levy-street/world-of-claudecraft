@@ -82,6 +82,7 @@ function renderBagsHarness(
     closeBank: noop,
     onClosed: noop,
     addItemToTrade: noop,
+    tradeOfferHeadroom: () => 0,
     stageMarketSell: noop,
     stageMailParcel: noop,
     insertItemChatLink: noop,
@@ -393,8 +394,9 @@ describe('bags_window: bank-deposit mode wiring', () => {
 
   it('registers the deposit prompt class so close() tears it down (no orphaned modal)', () => {
     expect(painter).toContain('.bank-deposit-prompt');
+    // The trade offer-quantity prompt rides the same teardown selector.
     expect(painter).toContain(
-      "'.discard-item-prompt, .sell-quantity-prompt, .sell-confirm-prompt, .bank-deposit-prompt'",
+      "'.discard-item-prompt, .sell-quantity-prompt, .sell-confirm-prompt, .bank-deposit-prompt, .trade-offer-prompt'",
     );
   });
 
@@ -530,7 +532,11 @@ describe('bags_window: touch peek + bank-cluster close', () => {
     // right-click without a live DOM harness.
     const start = painter.indexOf('private runBagAction(');
     const body = painter.slice(start, painter.indexOf('\n  }\n', start));
-    expect(body).toMatch(/case 'trade':\s*this\.deps\.addItemToTrade\(s\.itemId\);/);
+    // The trade arm now guards a shift-click offer-quantity prompt first (the
+    // bank withdraw prompt's trade twin); the plain-click stage still follows.
+    expect(body).toMatch(
+      /case 'trade': \{[\s\S]*?this\.showTradeQuantityPrompt\(s\.itemId, headroom\);[\s\S]*?this\.deps\.addItemToTrade\(s\.itemId\);/,
+    );
     expect(body).toMatch(
       /case 'mailAttach':\s*this\.deps\.stageMailParcel\(s\.itemId, s\.instance\);/,
     );

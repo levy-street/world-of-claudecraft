@@ -1,3 +1,8 @@
+import { frameSettingRelated } from './frame_menu_core';
+import type { FramePresetControlsDeps } from './frame_presets_controls';
+import { interfaceResetKeys } from './interface_reset_keys';
+import { OptionsFrameSections } from './options_frame_settings';
+import { OptionsWindowLayout } from './options_window_layout';
 // Options window painter: owns the #options-menu DOM, the window-local view-state
 // (which sub-panel is open, the key-capture buffer, the keybind note, the lazily
 // built performance panel), and the open/close lifecycle. It renders the nine
@@ -37,6 +42,7 @@ import {
   requestDesktopRestart,
 } from '../game/desktop_next_launch_settings';
 import { desktopDiscordPresenceSupported } from '../game/discord_presence';
+import { frameRateCapRowReading } from '../game/frame_cadence_wiring';
 import {
   GAMEPAD_CANCEL,
   GAMEPAD_CONFIRM,
@@ -76,7 +82,8 @@ import { shaderWarmChoiceAvailable } from '../render/shader_warm_client';
 import { desktopBridge } from '../runtime';
 import type { IWorld } from '../world_api';
 import { appVersionInfo } from './app_version';
-import { type AuraOverlayHooks, AuraOverlaySettingsPanel } from './aura_overlay_settings';
+import type { AuraOverlayHooks } from './aura_overlay_settings';
+import { bugReportErrorText } from './bug_report_error_text';
 import { controllerDeviceStatusView } from './controller_options_view';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
@@ -84,6 +91,7 @@ import type { FocusTrapHandle } from './focus_manager';
 import { captureFocusKey, findFocusKey, restoreFirstEnabled } from './focus_restore';
 import type { BugReportHooks, GraphicsApplyOutcome, OptionsHooks } from './hud';
 import type { ChatClock } from './hud/chat/chat_timestamp';
+import type { CooldownManagerHooks } from './hud/cooldown_manager';
 import {
   formatNumber,
   getLanguage,
@@ -110,6 +118,9 @@ import {
   buildInterfaceUnlockRow,
 } from './options_interface_rows';
 import { buildOptionsMenuList, type OptionsMenuRoutedAction } from './options_main_menu_controller';
+import { OptionsOverlayPanels } from './options_overlay_panels';
+import { sliderFormatter } from './options_slider_format';
+import { optionsText } from './options_text_values';
 import {
   type BoolToggleControl,
   boolToggleNextValue,
@@ -133,7 +144,6 @@ import {
   type OptionsSettingsSource,
   optionsControlKeys,
   type SliderControl,
-  type SliderFmt,
   sliderDispatchValue,
   type ToggleControl,
   toggleIsOn,
@@ -144,7 +154,7 @@ import { mountViewShell } from './options_window_shell';
 import { PerfOverlaySettingsPanel, type PerfSettingsHost } from './perf_overlay_settings';
 import { type RestartRequestPhase, restartStripState } from './restart_strip_core';
 import { buildRestartStrip, paintRestartStrip } from './restart_strip_painter';
-import { settingsCard, subhead } from './settings_controls';
+import { settingsCard } from './settings_controls';
 import { exportTransferCode, importTransferCode } from './settings_transfer';
 import type { TransferKind } from './settings_transfer_core';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
@@ -228,7 +238,7 @@ const LANGUAGE_ENDONYMS: Record<SupportedLanguage, string> = {
  * seam, the keybind store, the shared dropdown builder, focus management, and the
  * chat-timestamp/window state through these closures.
  */
-export interface OptionsWindowDeps {
+export interface OptionsWindowDeps extends FramePresetControlsDeps {
   /** The #options-menu root (Hud owns the id; the painter stays instance-parameterized). */
   root(): HTMLElement;
   /** The live world (offline Sim or online ClientWorld mirror); reads bug-report info and dispatches recovery. */
@@ -237,6 +247,8 @@ export interface OptionsWindowDeps {
   options(): OptionsHooks | null;
   /** Player-specific proc overlay editor, owned by Hud (null until wired). */
   auraOverlays?: () => AuraOverlayHooks;
+  /** Options > Cooldown Manager, owned by Hud like the aura editor. */
+  cooldownManager?: () => CooldownManagerHooks;
   /** The bug-report seam (online only; its presence gates the Report a Bug row). */
   bugReport(): BugReportHooks | null;
   /** The Wiki row: Hud's confirm-first external hop (src/ui/wiki_link.ts). The
@@ -407,6 +419,9 @@ export class OptionsWindow {
   // controller, not a persisted setting): reopening the panel returns to the
   // last tab, but a fresh session starts on General. Not reset on close/open.
   private interfaceTab: InterfaceTab = 'general';
+  private readonly layout = new OptionsWindowLayout();
+  private frameOptionsId: string | null = null;
+  private readonly frameSections: OptionsFrameSections;
   private capturingKey: { action: string; index: number } | null = null; // binding awaiting a key
   private conflictingKey: { action: string; index: number } | null = null;
   private keybindNote = '';
@@ -422,7 +437,16 @@ export class OptionsWindow {
   // The Options > Performance panel, lazily built and reused (it caches the live
   // position-slider handles so a drag-to-move can update them in place).
   private perfSettings: PerfOverlaySettingsPanel | null = null;
-  private auraSettings: AuraOverlaySettingsPanel | null = null;
+  // Options > Auras and > Cooldown Manager (options_overlay_panels.ts).
+  private readonly overlayPanels = new OptionsOverlayPanels({
+    root: () => this.deps.root(),
+    viewShell: (title, bodyClass) => this.viewShell(title, bodyClass),
+    auras: () => this.deps.auraOverlays?.(),
+    cooldowns: () => this.deps.cooldownManager?.(),
+    openFocusTrap: (root, returnFocusTo) => this.deps.openFocusTrap(root, returnFocusTo),
+    close: () => this.close(),
+    route: (action) => this.routeMenuAction(action),
+  });
   // The element to refocus when the window closes (WCAG 2.2 AA focus return).
   private returnFocus: HTMLElement | null = null;
   // Tracked separately from the root's inline `display` (rather than reading
@@ -452,7 +476,9 @@ export class OptionsWindow {
   // write, which arrives one round trip after the click that caused it.
   private gpuBackendWriteWatch: (() => void) | null = null;
 
-  constructor(private readonly deps: OptionsWindowDeps) {}
+  constructor(private readonly deps: OptionsWindowDeps) {
+    this.frameSections = new OptionsFrameSections(deps, () => this.render());
+  }
 
   get isOpen(): boolean {
     return this.opened;
@@ -472,6 +498,7 @@ export class OptionsWindow {
     this.returnFocus = this.deps.captureFocus();
     this.deps.closeOthers();
     this.view = 'main';
+    this.frameOptionsId = null;
     this.capturingKey = null;
     this.conflictingKey = null;
     this.keybindNote = '';
@@ -479,6 +506,16 @@ export class OptionsWindow {
     this.render();
     music.pauseForMenu();
     audio.click();
+  }
+
+  openFrameOptions(id: string): void {
+    if (!this.isOpen) this.toggle();
+    this.frameOptionsId = id;
+    this.interfaceTab = id === 'chat' ? 'chat' : 'frames';
+    if (id === 'chat') this.frameOptionsId = null;
+    this.view = 'interface';
+    this.render();
+    this.deps.focusFirstInteractive(this.deps.root());
   }
 
   // Close path (Esc/X close + the window-manager's closeManagedWindow case): hide
@@ -494,7 +531,9 @@ export class OptionsWindow {
     this.graphicsApplied = null;
     this.graphicsBusy = false;
     this.graphicsOutcome = null;
+    this.layout.begin(this.deps.root(), this.view, this.interfaceTab, this.frameOptionsId);
     this.opened = false;
+    this.frameSections.dispose();
     this.syncGpuBackendWatch();
     this.deps.root().removeAttribute('aria-busy');
     this.deps.root().style.display = 'none';
@@ -506,8 +545,7 @@ export class OptionsWindow {
     this.keyboardBoard?.dispose();
     this.keyboardBoard = null;
     this.deps.options()?.perfOverlay.setPlacement(false);
-    this.auraSettings?.closePlacement();
-    this.deps.auraOverlays?.().setPlacement(false);
+    this.overlayPanels.close();
     this.deps.hideTooltip();
     music.resumeFromMenu();
     const target = this.returnFocus;
@@ -533,6 +571,7 @@ export class OptionsWindow {
   // -------------------------------------------------------------------------
 
   private render(): void {
+    this.frameSections.dispose();
     const el = this.deps.root();
     if (this.view !== 'graphics') el.removeAttribute('aria-busy');
     // WCAG 2.2 AA: the Esc/options menu is a focus-trapped window, so name the
@@ -550,15 +589,10 @@ export class OptionsWindow {
         ? { label: t('hudChrome.perf.title') }
         : { labelledBy: 'options-title' },
     );
-    // The wide multi-column layouts belong to their own sub-views; clear each when
-    // leaving it so the other sub-views (and the main menu) keep their default width.
-    if (this.view !== 'keybinds') el.classList.remove('kb-wide');
-    if (this.view !== 'graphics') el.classList.remove('gfx-wide');
-    if (this.view !== 'performance') el.classList.remove('perf-wide');
-    if (this.view !== 'auras') el.classList.remove('aura-wide');
+    const centre = this.layout.begin(el, this.view, this.interfaceTab, this.frameOptionsId);
     // The overlay is draggable only while the Performance sub-view is open.
     this.deps.options()?.perfOverlay.setPlacement(this.view === 'performance');
-    this.deps.auraOverlays?.().setPlacement(this.view === 'auras');
+    this.overlayPanels.sync(this.view);
     this.syncGpuBackendWatch();
     switch (this.view) {
       case 'keybinds':
@@ -573,8 +607,10 @@ export class OptionsWindow {
       case 'interface':
         this.renderInterface();
         break;
+      case 'overlays':
       case 'auras':
-        this.renderAuras();
+      case 'cooldowns':
+        this.overlayPanels.render(this.view);
         break;
       case 'controller':
         this.renderController();
@@ -603,6 +639,7 @@ export class OptionsWindow {
     // column comes from here. render() re-runs on every navigation, so a control's
     // own self-rerender never has to restate it.
     if (this.opened) el.style.display = 'flex';
+    this.layout.finish(el, centre);
   }
 
   // The desktop shell's backend verdict lands on its own schedule, so the
@@ -627,14 +664,13 @@ export class OptionsWindow {
     this.gpuBackendWriteWatch = onDesktopGpuBackendWriteFailed(() => this.render());
   }
 
-  // Return to the Game Menu root without closing the window. The title-bar back
-  // control and every footer Back button route here: on mobile especially,
-  // close-then-reopen (More, Menu, sub-panel again) was three taps for what this
-  // does in one. Focus moves to the menu's first entry because the control that
-  // had focus is destroyed by the re-render.
+  // Go up one level (an overlay panel to Overlays, the rest to the Game Menu)
+  // without closing the window; the title-bar and footer Back controls route here.
+  // Focus moves to the first entry: the focused control died in the re-render.
   private goBack(): void {
+    this.frameOptionsId = null;
     audio.click();
-    this.view = 'main';
+    this.view = this.overlayPanels.parentView(this.view);
     this.capturingKey = null;
     this.conflictingKey = null;
     this.keybindNote = '';
@@ -721,13 +757,6 @@ export class OptionsWindow {
     return dropdown;
   }
 
-  private sliderFormatter(fmt: SliderFmt): (v: number) => string {
-    if (fmt === 'degrees')
-      return (v) => `${formatNumber(Math.round(v), { maximumFractionDigits: 0 })}°`;
-    if (fmt === 'oneDecimal') return (v) => formatNumber(v, { maximumFractionDigits: 1 });
-    return (v) => formatNumber(v, { style: 'percent', maximumFractionDigits: 0 });
-  }
-
   private applyControls(
     parent: HTMLElement,
     controls: OptionsControl[],
@@ -783,7 +812,7 @@ export class OptionsWindow {
     slider.dataset.focusKey = key;
     const val = document.createElement('span');
     val.className = 'set-val';
-    const fmt = this.sliderFormatter(c.fmt);
+    const fmt = sliderFormatter(c.fmt);
     // Mirror the formatted readout into the visible value AND aria-valuetext, so a
     // screen reader announces the human-meaningful value (50%, 90 degrees) instead
     // of the raw stored number. The native range already exposes role=slider plus
@@ -986,9 +1015,7 @@ export class OptionsWindow {
       // not take, polite for the one that just reports what is running.
       status.setAttribute('role', c.statusAlert ? 'alert' : 'status');
       if (!c.statusAlert) status.setAttribute('aria-live', 'polite');
-      const values: Record<string, string> = {};
-      for (const [name_, key_] of Object.entries(c.statusValueKeys ?? {})) values[name_] = t(key_);
-      status.textContent = c.statusValueKeys ? t(c.statusKey, values) : t(c.statusKey);
+      status.textContent = optionsText(c.statusKey, c.statusValueKeys, c.statusNumbers);
       row.appendChild(status);
     }
     parent.appendChild(row);
@@ -1004,9 +1031,7 @@ export class OptionsWindow {
     note.className = 'set-note';
     // The view names its placeholders as keys and this resolves them, so the
     // whole sentence including the value stays one translatable string.
-    const values: Record<string, string> = {};
-    for (const [name, key] of Object.entries(valueKeys ?? {})) values[name] = t(key);
-    note.textContent = valueKeys ? t(textKey, values) : t(textKey);
+    note.textContent = optionsText(textKey, valueKeys);
     parent.appendChild(note);
   }
 
@@ -1372,10 +1397,11 @@ export class OptionsWindow {
               // The shell refused the last write: the row says what the next
               // start will really use, over the rung this one is on.
               desktopGpuBackendWriteFailed: desktopGpuBackendWriteFailed(),
-              // The shader warm-up worker is forced off on iOS whatever the
-              // setting, so that host gets no row. The client's resolver owns
-              // that rule; asking it is what keeps the two from drifting.
+              // The row is withdrawn on every host today, and refused on iOS
+              // whenever it is offered. The client's resolver owns both rules;
+              // asking it is what keeps the two from drifting.
               shaderWarmChoice: shaderWarmChoiceAvailable(),
+              frameRateCapReadingFor: frameRateCapRowReading,
             },
           )
         : [];
@@ -1652,6 +1678,7 @@ export class OptionsWindow {
     // used to leave Back dead for the rest of the visit).
     wireTabStrip(el, 'opt-tab', (id, focusFollow) => {
       this.interfaceTab = id as InterfaceTab;
+      this.frameOptionsId = null;
       this.render();
       if (focusFollow) focusActiveTab(this.deps.root(), 'opt-tab', 'on');
     });
@@ -1662,12 +1689,7 @@ export class OptionsWindow {
       this.renderThemeControls(body);
     }
 
-    // Frames leads with the Edit Frames action (the unlock mode): arranging
-    // and sizing frames is what this tab is about, so its entry row sits at
-    // the top, with the layout export/import right under it (owner request:
-    // above the party section). The declarative rows below the subhead all
-    // tune the party frames (owner request: one labelled subsection), since
-    // every non-party knob moved into the editor's Frames Settings menu.
+    // Layout actions precede the separate frame and party disclosures.
     if (tab === 'frames') {
       // Frame editing is desktop-only (every gesture refuses touch layouts), so
       // the touch HUD offers neither the entry row nor the layout code rows that
@@ -1675,18 +1697,31 @@ export class OptionsWindow {
       // The native shell forces the touch HUD whatever the Interface Mode override
       // says, so it is gated too (the same union as the Esc menu's row).
       if (!env.touch && !env.nativeShell) buildInterfaceUnlockRow(body, this.deps);
-      if (!env.touch && !env.nativeShell) this.transferRows(body, 'frames');
-      subhead(body, t('hudChrome.partyFrames.optionsSection'), 'set-subhead');
     }
 
-    if (hooks)
-      this.applyControls(body, interfaceControlsForTab(controls, tab), hooks, (focusKey) => {
-        // Through render(), not renderInterface(): the dispatcher re-wires the
-        // title-bar [data-back] control the rebuild just destroyed.
-        this.render();
-        if (focusKey)
-          this.deps.root().querySelector<HTMLElement>(`[data-setting-key="${focusKey}"]`)?.focus();
-      });
+    const shownControls = this.frameOptionsId
+      ? controls.filter(
+          (control) => 'key' in control && frameSettingRelated(this.frameOptionsId!, control.key),
+        )
+      : interfaceControlsForTab(controls, tab);
+    if (hooks) {
+      const apply = (root: HTMLElement, rows: OptionsControl[]) =>
+        this.applyControls(root, rows, hooks, (focusKey) => {
+          this.render();
+          if (focusKey)
+            this.deps
+              .root()
+              .querySelector<HTMLElement>(`[data-setting-key="${focusKey}"]`)
+              ?.focus({ preventScroll: true });
+        });
+      if (tab === 'frames')
+        this.frameSections.render(body, shownControls, hooks, this.frameOptionsId, apply, () => {
+          this.frameOptionsId = null;
+          this.render();
+          this.deps.focusFirstInteractive(this.deps.root());
+        });
+      else apply(body, shownControls);
+    }
 
     // (The frames tab's Reset Frame Positions row was retired, owner
     // request: the per-frame size resets live in the editor's Frames
@@ -1724,54 +1759,22 @@ export class OptionsWindow {
     // and must stay resettable, or a player who set one before the rows moved
     // would be stranded on it. General owns the retired UI Scale slider;
     // Frames owns the retired frame-scale sliders and the Frames Settings
-    // dropdown's toggles, and its reset also restores the whole stock LAYOUT
+    // dropdown's toggles (the visible mouseover switch is covered by the
+    // rendered controls), and its reset also restores the whole stock LAYOUT
     // (every movable frame, the chat box, the meter panels, the target-aura
     // panel): arranging frames is what that tab is about, and a reset that
     // left them strewn about read as a broken button.
-    const offMenuTabKeys: Record<InterfaceTab, readonly (keyof GameSettings)[]> = {
-      general: ['uiScale'],
-      frames: [
-        'playerFrameScale',
-        'targetFrameScale',
-        'partyFrameScale',
-        // The interface editor's dimension drags (movable_frame.ts,
-        // resizeMode 'dimensions') write these; no slider shows them, so the
-        // Frames reset must name them explicitly.
-        'playerFrameWidth',
-        'playerFrameHeight',
-        'targetFrameWidth',
-        'targetFrameHeight',
-        'partyFrameWidth',
-        'partyFrameHeight',
-        'partyFrameColumns',
-        'partyFrameSpacing',
-        'buffsLeftToRight',
-        'debuffsLeftToRight',
-        'lockPlayerFrameToActionBar',
-        'actionBar1Vertical',
-        'actionBar2Vertical',
-        'actionBar3Vertical',
-        'menuRailHorizontal',
-        'frameSnapToGrid',
-        'combineActionBars',
-        'hideUnusedActionSlots',
-        'mouseoverCast',
-        'lockActionBars',
-      ],
-      chat: [],
-      combat: [],
-    };
     // The dedicated-GPU row lives on General: that tab hosts the strip (the
     // others have no next-launch row to stand it beside).
     if (tab === 'general') {
       const restartStrip = this.restartStrip(false, false);
       if (restartStrip) body.appendChild(restartStrip);
     }
-    this.settingsViewFooter(interfaceControlsForTab(controls, tab), (hooks, keys) => {
-      const allKeys = [...keys, ...offMenuTabKeys[tab]];
+    this.settingsViewFooter(shownControls, (hooks, keys) => {
+      const allKeys = interfaceResetKeys(tab, this.frameOptionsId, keys);
       hooks.settings.reset(allKeys);
       for (const k of allKeys) hooks.onSettingChange(k, hooks.settings.get(k));
-      if (tab === 'frames') this.deps.resetUnitFrames();
+      if (tab === 'frames' && !this.frameOptionsId) this.deps.resetUnitFrames();
       this.render();
     });
   }
@@ -1940,23 +1943,6 @@ export class OptionsWindow {
     this.perfSettings.render(this.deps.root());
   }
 
-  private renderAuras(): void {
-    const hooks = this.deps.auraOverlays?.();
-    if (!hooks) return;
-    this.deps.root().classList.add('aura-wide');
-    const body = this.viewShell(t('hudChrome.auraOverlay.title'), 'set-rows');
-    this.auraSettings ??= new AuraOverlaySettingsPanel({
-      auras: hooks,
-      click: () => audio.click(),
-      openFocusTrap: this.deps.openFocusTrap,
-    });
-    this.auraSettings.render(body);
-    this.deps
-      .root()
-      .querySelector('[data-close]')
-      ?.addEventListener('click', () => this.close());
-  }
-
   private perfSettingsHost(hooks: OptionsHooks): PerfSettingsHost {
     return {
       perf: hooks.perfOverlay,
@@ -1967,6 +1953,7 @@ export class OptionsWindow {
       onBack: () => this.goBack(),
       closeIconHtml: svgIcon('close'),
       backIconHtml: svgIcon('prev'),
+      hostDiag: { world: () => this.deps.world(), options: () => this.deps.options() },
     };
   }
 
@@ -2119,7 +2106,7 @@ export class OptionsWindow {
           })
           .catch((err: unknown) => {
             submit.disabled = false;
-            error.textContent = this.localizeBugReportError(err);
+            error.textContent = bugReportErrorText(err);
           });
       });
     });
@@ -2130,17 +2117,6 @@ export class OptionsWindow {
       ?.addEventListener('click', () => this.close());
     // Focus the description so a keyboard/screen-reader user lands in the field.
     window.setTimeout(() => desc.focus(), 0);
-  }
-
-  private localizeBugReportError(err: unknown): string {
-    const text = err instanceof Error ? err.message : '';
-    const keyByMessage: Record<string, TranslationKey> = {
-      'describe the bug': 'hudChrome.bugReport.describeFirst',
-      'bug report too large': 'hudChrome.bugReport.tooLarge',
-      'too many bug reports, try again later': 'hudChrome.bugReport.rateLimited',
-    };
-    const key = keyByMessage[text.toLowerCase()];
-    return key ? t(key) : t('hudChrome.bugReport.failed');
   }
 
   // -------------------------------------------------------------------------

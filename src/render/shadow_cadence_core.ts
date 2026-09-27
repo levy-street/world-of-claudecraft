@@ -16,6 +16,12 @@
  * at or below the exit threshold, and the dead band in between holds the
  * current plan while resetting both dwell clocks, so a pressure reading that
  * hovers around either boundary cannot flap the cadence.
+ *
+ * The one exemption is a HOLD (the renderer passes ship_shadow_hold.ts): while a
+ * ship under way is close by, every frame renders even under a half-rate plan,
+ * because the ship is the one large caster moving every frame and a stale map
+ * shows its own mast and rigging shadows a frame behind the hull on alternate
+ * frames, a visible flicker. The plan and its dwell clocks run on untouched.
  */
 
 /** Pressure at or above this accumulates toward half rate (the governor's own
@@ -41,10 +47,19 @@ export interface ShadowCadenceState {
   calmSeconds: number;
   /** Half-rate frame parity; 0 renders, 1 skips. */
   phase: 0 | 1;
+  /** A hold renders every frame this frame despite a half-rate plan. */
+  held: boolean;
 }
 
 export function createShadowCadenceState(): ShadowCadenceState {
-  return { halfRate: false, renderThisFrame: true, overSeconds: 0, calmSeconds: 0, phase: 0 };
+  return {
+    halfRate: false,
+    renderThisFrame: true,
+    overSeconds: 0,
+    calmSeconds: 0,
+    phase: 0,
+    held: false,
+  };
 }
 
 /** Back to full rate with cleared dwell clocks (renderer reset paths). */
@@ -54,18 +69,21 @@ export function resetShadowCadence(state: ShadowCadenceState): void {
   state.overSeconds = 0;
   state.calmSeconds = 0;
   state.phase = 0;
+  state.held = false;
 }
 
 /**
  * Advance the cadence one frame. Mutates and returns the caller-owned state
  * (per-frame path: no allocation). `budgetEnabled` mirrors the governor's
- * enabled flag: a disabled governor never sheds shadow cadence.
+ * enabled flag: a disabled governor never sheds shadow cadence. `held` renders
+ * this frame whatever the plan (see the header); the plan itself is unchanged.
  */
 export function updateShadowCadence(
   state: ShadowCadenceState,
   dt: number,
   pressure: number,
   budgetEnabled: boolean,
+  held = false,
 ): ShadowCadenceState {
   if (!budgetEnabled) {
     resetShadowCadence(state);
@@ -95,7 +113,12 @@ export function updateShadowCadence(
     state.overSeconds = 0;
     state.calmSeconds = 0;
   }
-  if (state.halfRate) {
+  state.held = held && state.halfRate;
+  if (state.held) {
+    // every frame renders; the parity restarts so the release renders first
+    state.renderThisFrame = true;
+    state.phase = 0;
+  } else if (state.halfRate) {
     state.renderThisFrame = state.phase === 0;
     state.phase = state.phase === 0 ? 1 : 0;
   } else {

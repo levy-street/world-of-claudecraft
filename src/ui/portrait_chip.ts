@@ -9,6 +9,9 @@
 import { modularVisualKey } from '../render/characters/manifest';
 import type { ModularLook } from '../render/characters/modular';
 import {
+  cachedPortraitByKey,
+  composedPortraitKey,
+  isComposedPortraitKey,
   modularPortraitDataUrl,
   onPortraitsReady,
   onPortraitUpdate,
@@ -32,6 +35,9 @@ import { iconDataUrl } from './icons';
 // layer (char_window's paperdoll boundary test) get it without their own
 // render import.
 export { modularLookFor } from '../render/characters';
+// The look TYPE crosses here too, for a painter that carries one through its
+// deps (inspect_window's turntable mount) without a render import of its own.
+export type { ModularLook } from '../render/characters/modular';
 // The composed-capture signal rides the same crossing: a composed chip is a
 // full HTML rebuild rather than a src swap (hydratePortraits skips it below),
 // so its builder listens for the capture landing and re-renders itself.
@@ -57,9 +63,10 @@ export interface PortraitChipOpts {
    *  create multi-megabyte innerHTML strings. Assets must already be ready. */
   deferSource?: boolean;
   /** Draw this chip as the COMPOSED character rather than the stock art for
-   *  `cls`. Only the local player has an authored look (it is presentation
-   *  state and is not on the wire), so this is set on the player's own chips,
-   *  their Character sheet, and left off for everyone else's. */
+   *  `cls`. The look rides the identity wire, so any player with a live
+   *  entity can be composed: the viewer's own chips (the Character sheet) and
+   *  a peer's (the player menu). Left off where no look is known, such as a
+   *  remote profile fetched for someone out of range. */
   look?: ModularLook | null;
   /** Which skin catalog `skin` indexes. Under `'mech'` the chip draws the
    *  Combat Mech body in that chroma, `skin` is a chroma index there, not a
@@ -114,11 +121,17 @@ export function portraitChipHtml(opts: PortraitChipOpts): string {
   const portraitFallbackAttrs = !portrait && !deferSource ? ` ${fallbackAttrs}` : '';
   const pending = portrait && !deferSource ? '' : ' data-portrait-pending="1"';
   const fallbackCls = portrait && !deferSource ? '' : ' is-fallback';
-  // A composed chip built before assets were ready holds the crest, and
+  // A composed chip built before its capture landed holds the crest, and
   // hydratePortraits must NOT upgrade it (it would re-derive the LEGACY
-  // portrait from the data attributes: a look does not fit in one). The
-  // builder re-renders such chips itself via onPortraitsReady.
-  const composed = !mech && look && !portrait ? ' data-portrait-composed="1"' : '';
+  // portrait from the data attributes: a look does not fit in one). It carries
+  // the capture's cache KEY instead, so hydrateComposedChips can swap in the
+  // exact portrait filed under it when that key lands; builders that rebuild
+  // themselves (the sheet, the roster row) do so as well.
+  const composedKey =
+    !mech && look && !portrait ? composedPortraitKey(modularVisualKey(cls), look, framing) : null;
+  const composed = composedKey
+    ? ` data-portrait-composed="1" data-portrait-key="${esc(composedKey)}"`
+    : '';
   const alt = esc(t('character.portraitAlt', { name }));
   const badgeHtml = badge
     ? `<img class="portrait-badge" src="${crestUrl(cls)}" ${fallbackAttrs} alt="" aria-hidden="true" draggable="false">`
@@ -166,8 +179,34 @@ export function hydratePortraits(
   });
 }
 
+/** Swap the composed portrait filed under `key` into every chip under `root`
+ *  still waiting on exactly that key. No look is re-derived (the doctrine
+ *  hydratePortraits keeps): the URL is the one the key names, so the body is
+ *  always the right one. A chip whose key differs, or one the builder already
+ *  rebuilt (no pending marker), is left alone. A no-op while the key has no
+ *  portrait, which the peek answers without starting a capture. */
+export function hydrateComposedChips(root: ParentNode, key: string): void {
+  const url = cachedPortraitByKey(key);
+  if (!url) return;
+  root.querySelectorAll<HTMLElement>('.portrait-chip[data-portrait-pending]').forEach((chip) => {
+    if (chip.dataset.portraitKey !== key) return;
+    const img = chip.querySelector<HTMLImageElement>('.portrait-img');
+    if (img) {
+      clearCrestImageFallback(img);
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.src = url;
+    }
+    chip.classList.remove('is-fallback');
+    chip.removeAttribute('data-portrait-pending');
+  });
+}
+
 // Once the GLBs finish loading, upgrade every placeholder currently on screen.
 onPortraitsReady(() => hydratePortraits(document));
+onPortraitUpdate((_visualKey, _skin, key) => {
+  if (key !== undefined && isComposedPortraitKey(key)) hydrateComposedChips(document, key);
+});
 onPortraitUpdate((visualKey, skin) => {
   if (!visualKey.startsWith('player_')) return;
   // A mech chip carries the WEARER's class in data-cls and the chroma in

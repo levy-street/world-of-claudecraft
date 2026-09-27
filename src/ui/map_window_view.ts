@@ -17,6 +17,7 @@
 // the painter needs to resolve their localized text, never the resolved string.
 
 import type { GatheringProfessionId } from '../sim/content/professions';
+import { GLIDER_NPC_DEF } from '../sim/content/world_quest_glider';
 import {
   DUNGEON_LIST,
   GATHER_NODES,
@@ -43,17 +44,25 @@ import type {
   ZonePropsDef,
 } from '../sim/types';
 import type { Decoration } from '../sim/world';
+import { WORLD_BOSSES, worldBossLockoutId } from '../sim/world_boss';
+import { playerActiveWorldQuests } from '../sim/world_quest_reroll';
+import { activeWorldQuestsForCycle } from '../sim/world_quest_rotation';
 import type { FriendInfo, IWorld } from '../world_api';
 import { buildCastlePlanMarkers, type CastlePlanMarker } from './castle_plan_core';
 import { dungeonMapActive } from './dungeon_map_view';
 import { viewerUsableToolTier } from './hud/professions/gathering_view';
 import { dawnholdMapActive, lastKeepMapActive } from './lastkeep_map_view';
 import { overworldDungeonPortals } from './map_dungeon_portals';
+import { MAP_MARKER_SIZES } from './map_marker_icon_art';
 import type { MapMarkerProfile } from './map_marker_profile_core';
 import {
   isNearbyLiveRiftZoneMapEntity,
   STABLE_MAP_NAVIGATION_LANDMARKS,
 } from './map_navigation_landmarks_core';
+import {
+  clearPoiLabelsOffBadges,
+  MAP_POI_LABEL_HEIGHT_BY_PROFILE,
+} from './map_poi_label_clearance_core';
 import { questNumbersByLog } from './map_quest_list_view';
 import {
   DEFAULT_MAP_ATLAS_FILTERS,
@@ -118,7 +127,11 @@ export interface MapViewRect {
 /** A zone POI label: canvas position + the identity the painter localizes. */
 export interface MapPoiMarker {
   mx: number;
+  /** The authored projection: hit-testing and the screen-reader summary read it. */
   my: number;
+  /** The baseline the painter draws the label at: `my`, unless a navigation
+   *  badge on the same spot pushed the text clear (map_poi_label_clearance_core). */
+  labelMy: number;
   zoneId: string;
   poiIndex: number;
 }
@@ -591,6 +604,67 @@ export interface MapQuestAreaMarker {
   numbers: number[];
 }
 
+/** A self-starting world objective. The area ring and its center emblem share
+ * this marker so paint, pointer, touch, and accessibility use one projection. */
+export interface MapWorldQuestMarker {
+  questId: string;
+  mx: number;
+  my: number;
+  radius: number;
+  state: 'available' | 'active';
+  /** The objective ring is disclosure-on-select; the emblem always remains visible. */
+  areaVisible?: boolean;
+}
+
+/** A fixed-position world boss that still offers personal loot to this player.
+ * Unlike a world quest, it owns no disclosure area: its authored spawn point is
+ * the whole objective. */
+export interface MapWorldBossMarker {
+  bossId: string;
+  mx: number;
+  my: number;
+}
+
+export function worldQuestMarkerAt(
+  markers: readonly MapWorldQuestMarker[],
+  mx: number,
+  my: number,
+  hitRadius: number,
+): MapWorldQuestMarker | null {
+  const radius2 = Math.max(0, hitRadius) ** 2;
+  let best: MapWorldQuestMarker | null = null;
+  let bestDistance2 = Number.POSITIVE_INFINITY;
+  for (const marker of markers) {
+    const dx = mx - marker.mx;
+    const dy = my - marker.my;
+    const distance2 = dx * dx + dy * dy;
+    if (distance2 > radius2 || distance2 >= bestDistance2) continue;
+    best = marker;
+    bestDistance2 = distance2;
+  }
+  return best;
+}
+
+export function worldBossMarkerAt(
+  markers: readonly MapWorldBossMarker[],
+  mx: number,
+  my: number,
+  hitRadius: number,
+): MapWorldBossMarker | null {
+  const radius2 = Math.max(0, hitRadius) ** 2;
+  let best: MapWorldBossMarker | null = null;
+  let bestDistance2 = Number.POSITIVE_INFINITY;
+  for (const marker of markers) {
+    const dx = mx - marker.mx;
+    const dy = my - marker.my;
+    const distance2 = dx * dx + dy * dy;
+    if (distance2 > radius2 || distance2 >= bestDistance2) continue;
+    best = marker;
+    bestDistance2 = distance2;
+  }
+  return best;
+}
+
 /** The distinct objectives under a canvas point, across every quest area that
  *  contains it (overlapping blobs merge into one tooltip). Pure hit-test the
  *  hover handler calls with the last painted model's areas. */
@@ -766,6 +840,8 @@ export interface OverworldMapModel {
   castles: CastlePlanMarker[];
   npcs: MapNpcMarker[];
   questAreas: MapQuestAreaMarker[];
+  worldQuests: MapWorldQuestMarker[];
+  worldBosses: MapWorldBossMarker[];
   /** Gather nodes in the committed zone (all zoom levels). Empty only when
    *  the zone has no authored nodes in view. */
   gatherNodes: MapGatherNodeMarker[];
@@ -824,6 +900,8 @@ export interface OverworldMapInput {
    *  badges leave the map, exactly as their rows leave the atlas rail and the HUD
    *  tracker. The quest itself stays accepted and keeps its acceptance number. */
   untrackedQuestIds?: ReadonlySet<string>;
+  /** Session-only icon selection that reveals one world-quest objective area. */
+  selectedWorldQuestId?: string | null;
 }
 
 /** Which world-map surface the player's POSITION selects: rift, delve, battleground,
@@ -940,7 +1018,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
 
   // Only the committed zone contributes POIs, even where a rectangular zone's
   // square frame contains ocean beside its terrain plate.
-  const pois: MapPoiMarker[] = [];
+  const pois: Omit<MapPoiMarker, 'labelMy'>[] = [];
   if (labels) {
     for (let poiIndex = 0; poiIndex < zone.pois.length; poiIndex++) {
       const poi = zone.pois[poiIndex];
@@ -980,6 +1058,52 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     numbers.sort((a, b) => a - b);
     const { mx, my } = toMap(area.center.x, area.center.z);
     questAreas.push({ mx, my, radius: (area.radius / spanX) * S, objectives, numbers });
+  }
+
+  // World quests exist independently from the accepted quest log. Eligible
+  // objectives show before discovery, switch state when the player enters the
+  // area, and disappear for the rest of the realm-reset cycle after completion.
+  // An empty cycle is also the negotiated-capability fallback: an older server
+  // never sends wqday, so a newer client must not advertise phantom objectives.
+  const worldQuests: MapWorldQuestMarker[] = [];
+  const playerLevel = Number.isFinite(p.level) ? p.level : 0;
+  // The character's board, not the bare rotation: a rerolled slot shows its
+  // replacement here exactly as the rail and the sim's credit path see it.
+  for (const quest of playerActiveWorldQuests({
+    worldQuestCycle: world.worldQuestCycle,
+    worldQuestReplacements: { ...(world.worldQuestReplacements ?? {}) },
+  })) {
+    if (quest.zoneId !== zone.id || playerLevel < quest.minLevel) continue;
+    const progress = world.worldQuestLog?.get(quest.id);
+    if (progress?.state === 'completed') continue;
+    const isGlider = quest.objective.type === 'glider';
+    const position = isGlider ? GLIDER_NPC_DEF.pos : quest.area;
+    if (!inView(position.x, position.z)) continue;
+    const { mx, my } = toMap(position.x, position.z);
+    worldQuests.push({
+      questId: quest.id,
+      mx,
+      my,
+      radius: isGlider ? 0 : (quest.area.radius / spanX) * S,
+      state: progress?.state === 'active' ? 'active' : 'available',
+      areaVisible: !isGlider && input.selectedWorldQuestId === quest.id,
+    });
+  }
+
+  // World bosses use the same raid-lockout record for reward eligibility and
+  // the HUD countdown. A missing lockout means the boss is still incomplete for
+  // this player. Its authored spawn point is fixed, so there is deliberately no
+  // objective radius or selection disclosure attached to this marker.
+  const worldBosses: MapWorldBossMarker[] = [];
+  let raidLockouts: ReturnType<IWorld['raidLockouts']> | null = null;
+  for (const boss of WORLD_BOSSES) {
+    if (!world.worldBossActive?.(boss.templateId)) continue;
+    raidLockouts ??= world.raidLockouts();
+    if (raidLockouts.some((lockout) => lockout.id === worldBossLockoutId(boss.templateId)))
+      continue;
+    if (!inZone(boss.pos.x, boss.pos.z) || !inView(boss.pos.x, boss.pos.z)) continue;
+    const { mx, my } = toMap(boss.pos.x, boss.pos.z);
+    worldBosses.push({ bossId: boss.templateId, mx, my });
   }
 
   // Dungeon portals owned by the current zone (shown at every zoom).
@@ -1251,16 +1375,30 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     if (social.guild) for (const m of social.guild.members) plotAlly(m, 'guild');
   }
 
+  // A navigation badge authored on a named place (a delve door on its hill)
+  // paints after and centered on the POI label baseline; the badge allocator's
+  // 4-yard cap can never clear a label, so the drawn baseline yields instead
+  // (labelMy); `my` stays the authored projection for the a11y summary.
+  const markerProfile = input.markerProfile ?? 'standard';
+  const clearedPois: MapPoiMarker[] = clearPoiLabelsOffBadges(
+    pois,
+    navigation,
+    MAP_MARKER_SIZES[markerProfile === 'compact' ? 'mapNavigationCompact' : 'mapNavigation'],
+    MAP_POI_LABEL_HEIGHT_BY_PROFILE[markerProfile],
+  );
+
   return {
     view: { spanX, spanZ, minX: full.minX, maxX: full.maxX, minZ: full.minZ, maxZ: full.maxZ },
     cursor: zoom > 1 ? 'grab' : 'default',
     region: { minX: region.minX, maxX: region.maxX, minZ: region.minZ, maxZ: region.maxZ },
     zoneId: zone.id,
-    pois,
+    pois: clearedPois,
     portals,
     castles,
     npcs,
     questAreas,
+    worldQuests,
+    worldBosses,
     gatherNodes,
     stations,
     services,

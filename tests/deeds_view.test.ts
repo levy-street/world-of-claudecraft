@@ -870,11 +870,16 @@ describe('real catalog integration', () => {
     // buildDeedsView + countsTowardCompletion directly (tsx, no full
     // compile), since the tree does not compile yet:
     // 300 deeds - 22 feats - 10 hidden = 268 visible to a fresh character.
-    expect(view.summary.visibleTotal).toBe(268);
+    // 276 with the eight world-quest deeds, 283 with the seven faction
+    // standing deeds, 285 with the two Clue Scroll casket deeds (all visible,
+    // none feat or hidden).
+    // 286 with the release's ferry round trip (exp_harbor_to_harbor).
+    expect(view.summary.visibleTotal).toBe(286);
     // The bucket sum adds the feat-flagged rows back on top (hidden-unearned
     // deeds never enter a bucket at all, so only the 22 feats separate this
-    // from visibleTotal): 268 + 22 = 290.
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(290);
+    // from visibleTotal): 268 + 22 = 290, then 298, 305, 307 and 308 by the same
+    // four appends.
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(308);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

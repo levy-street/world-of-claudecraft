@@ -142,6 +142,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Zbrojnice Válčení',
     desc: 'Šperky a zbraně Válčení koupené za tvrdě vydobytou čest.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Galerie Předvoje',
+    desc: 'Sady specializací a zbraně Války z 2. sezóny, koupené za čest.',
+  },
   horizons_vault_of_ages: {
     name: 'Klenotnice věků',
     desc: 'Vyřazené poklady dávné doby. Tyto relikvie už nelze získat; klenotnice ctí veterány, kteří si je uchovali.',
@@ -156,7 +160,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: 'Hrdinská: Tavicí kelímek Posledního pramene',
-    desc: 'Zbraně dostupné pouze v hrdinské verzi od Ignivara, hlasatele Posledního plamene.',
+    desc: 'Zbraně dostupné pouze v hrdinské verzi a trinkety raidu od Ignivara, hlasatele Posledního plamene.',
   },
   conquerors_varkhul: {
     name: 'Vnitřní tavicí kelímek',
@@ -164,7 +168,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: 'Hrdinská: Vnitřní tavicí kelímek',
-    desc: 'Štíty a zbraně dostupné pouze v hrdinské verzi od Varkhula, otce kovárny Posledního plamene.',
+    desc: 'Štíty a zbraně dostupné pouze v hrdinské verzi a trinkety raidu od Varkhula, otce kovárny Posledního plamene.',
   },
   conquerors_set_bramblehide: {
     name: 'Rootsova ostružinová kůže',

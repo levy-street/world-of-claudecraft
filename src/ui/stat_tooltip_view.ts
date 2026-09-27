@@ -70,21 +70,25 @@ export function statEffectText(e: StatEffect, deps: StatTooltipI18n): string {
   }
 }
 
-// Crit, dodge, and parry are shown as percents (one decimal); every other
-// stat's source values are whole numbers.
+// Crit (both pools), dodge, and parry are shown as percents (one decimal);
+// every other stat's source values are whole numbers.
 const isPercentStat = (model: StatTooltipModel) =>
   model.stat === 'critChance' ||
+  model.stat === 'spellCrit' ||
   model.stat === 'dodge' ||
   model.stat === 'parry' ||
   model.stat === 'warfare';
 
 /** The catalog key for a stat's display name. Most reuse the shared
- *  itemUi.stats.* labels; Spell Power is a character-sheet-only stat whose label
- *  lives in the English-only HUD-chrome domain instead. */
+ *  itemUi.stats.* labels; Spell Power, Healing Power and Spell Crit are
+ *  character-sheet-only stats whose labels live in the English-only HUD-chrome
+ *  domain instead. */
 export function statNameKey(stat: StatTooltipModel['stat']): string {
   // Character-sheet rating labels live in the HUD-chrome domain instead of the
   // core item-stats catalog (WARFARE items author ratings, not final percentages).
   return stat === 'spellPower' ||
+    stat === 'healPower' ||
+    stat === 'spellCrit' ||
     stat === 'critRating' ||
     stat === 'hasteRating' ||
     stat === 'hitRating' ||
@@ -95,10 +99,18 @@ export function statNameKey(stat: StatTooltipModel['stat']): string {
 
 function statDescriptionText(model: StatTooltipModel, deps: StatTooltipI18n): string {
   if (model.stat !== 'warfare') return deps.t(`hudChrome.statInfo.desc.${model.stat}`);
-  return deps.t('hudChrome.statInfo.desc.warfare', {
-    increase: dec1(deps, model.warfareDamageIncrease ?? model.statValue),
-    reduction: dec1(deps, model.warfareDamageReduction ?? model.statValue),
-  });
+  const increase = dec1(deps, model.warfareDamageIncrease ?? model.statValue);
+  const reduction = dec1(deps, model.warfareDamageReduction ?? model.statValue);
+  // With honor gear worn, the description also states the WARFARE Vitality
+  // health bonus and where it stops applying (pvp/vitality.ts).
+  if ((model.warfareHealthIncrease ?? 0) > 0) {
+    return deps.t('hudChrome.statInfo.desc.warfareWithHealth', {
+      increase,
+      reduction,
+      health: dec1(deps, model.warfareHealthIncrease ?? 0),
+    });
+  }
+  return deps.t('hudChrome.statInfo.desc.warfare', { increase, reduction });
 }
 
 /** The localized text of one upstream source line: "Base: 40", "From Agility:
@@ -120,7 +132,7 @@ export function statSourceText(
     case 'attributes':
       return source.fromStat
         ? deps.t('hudChrome.statInfo.sources.fromAttribute', {
-            stat: deps.t(`itemUi.stats.${source.fromStat}`),
+            stat: deps.t(statNameKey(source.fromStat)),
             value: signed(source.value),
           })
         : deps.t('hudChrome.statInfo.sources.attributes', { value: signed(source.value) });
@@ -203,7 +215,7 @@ export function statTooltipAria(model: StatTooltipModel, deps: StatTooltipI18n):
 }
 
 /** The stat cell's displayed value text: a one-decimal percent for
- *  crit/dodge/parry, a one-decimal number for the dps estimate, otherwise a
+ *  crit/spell crit/dodge/parry, a one-decimal number for the dps estimate, otherwise a
  *  whole number. Sourced from model.statValue so the cell and the tooltip it
  *  opens cannot disagree. */
 export function statValueText(model: StatTooltipModel, deps: StatTooltipI18n): string {
@@ -213,8 +225,7 @@ export function statValueText(model: StatTooltipModel, deps: StatTooltipI18n): s
       reduction: dec1(deps, model.warfareDamageReduction ?? model.statValue),
     });
   }
-  if (model.stat === 'critChance' || model.stat === 'dodge' || model.stat === 'parry')
-    return `${dec1(deps, model.statValue)}%`;
+  if (isPercentStat(model)) return `${dec1(deps, model.statValue)}%`;
   if (model.stat === 'dps') return dec1(deps, model.statValue);
   return int0(deps, model.statValue);
 }

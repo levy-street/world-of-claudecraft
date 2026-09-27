@@ -147,6 +147,17 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   `registerWeapon` returns the held-model decision as a follow-up action);
   `tests/authored_surfaces.test.ts` scans the shipped GLBs and fails any
   authored atlas that is neither flagged nor on its explicit legacy list.
+- Worn NPC gear: an `NPC_MODULAR_PROP_ATTACH` entry need not be a hand prop. The
+  `harbormaster` set parents GLBs to the `head` and `hips` bones with an identity
+  transform, so each is authored in that bone's BIND frame
+  (`scripts/assets/harbormaster_gear/`, fitted with its `extract_reference.mjs`); it rides
+  the authored arm (`AUTHORED_HELD_MODELS`) and, like every prop, is left out of the
+  composed far bake. Pinned by `tests/harbormaster_gear_asset.test.ts`.
+- `stonebound_shell_core.ts`: the Stonebound weapon-shell style. Wireframe on any
+  antialiased frame; a solid translucent sheath when NO AA pass runs (Low, and the
+  memory-constrained WebKit profiles), because a one-pixel GPU wireframe crawls
+  over the dense weapon mesh without AA. Keyed on the `GfxSettings` AA facts
+  (`smaa`/`fxaa`/`msaaSamples`), never on a tier name; cosmetic only.
 - Perf cores: `skeleton_update_cache.ts`/`skeleton_update_core.ts` (skeleton
   palette update elision), `skin_gpu_layout.ts` (bone-texture compaction
   without changing weights, matrices, draws, or shader math),
@@ -178,6 +189,18 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   `paladin_templars_verdict_fx.ts` twins): procedural `AnimationClip`s built in
   code and registered per ability; the template future ability-animation work
   follows.
+- Form adornments: `form_adornments.ts`, the per-rig owner `CharacterVisual`
+  holds and drives from the `setMoonkin`/`setShadowform` edges the renderer
+  already sends, over the pure `form_adornment_core.ts` (what a rig wears, the
+  pose math) and two painters, `moonwing_adornment.ts` (antlers, crescent,
+  wings) and `gloamveil_veil.ts` (the face veil), with their canvas art in
+  `form_adornment_textures.ts` and the shared marker and glow recipe in
+  `rig_fx.ts`. Pieces ride the rig's `head`/`chest` bones, carry the
+  `weaponVfxMesh` marker so no overlay swap, prewarm twin or caster sweep
+  touches them, hide under a ghost or stealth body, and their shared kits are
+  prewarmed through `ABILITY_MATERIAL_SOURCES`; a rig's first mount of a set
+  still waits hidden behind the injected compile gate
+  (`tests/form_adornments.test.ts`, `tests/character_form_adornments.test.ts`).
 - Pure selection cores: `modular.ts` (composed bodies, below),
   `player_look_core.ts`, `form_visual_selection_core.ts`,
   `far_lod_reveal_core.ts` (the rig/far-mesh/shadow-proxy handoff rule: the
@@ -363,7 +386,11 @@ per part.
     composed body. Composed bodies bake their own (`modularFarBake`), keyed by
     part set and minted on the first crossing into the far band; the colours are
     resolved per character from their own materials. Face/body sliders are not
-    in that silhouette, deliberately.
+    in that silhouette, deliberately. The bake merges atlas-mapped kit pieces
+    with colour-only face parts that ship NO uv: `far_bake_uv_pad.ts` gives those
+    an inert zero uv so the merge keeps the kit's real uv (dropping uv from every
+    part instead made the frozen mesh sample one atlas texel, a flat untextured
+    body at distance; `tests/far_bake_uv_pad.test.ts`).
     The bake hands back geometry GROUPS and each character resolves group N
     against its own captured `userData.farMaterials[N]`, so the two walks have to
     be one list: both go through `composedFarMeshes`, which drops held props for

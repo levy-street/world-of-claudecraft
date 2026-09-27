@@ -6,6 +6,22 @@ import { resolveReportTarget } from '../server/report_target';
 import { DICT as adminDICT, classLabel, setAdminLanguage } from '../src/admin/i18n';
 import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
 import { ABILITIES, DUNGEON_LIST, ITEMS } from '../src/sim/data';
+import {
+  HILL_LOST_LINE,
+  HILL_READOUT_NONE_LINE,
+  HILL_TAKEN_LINE,
+  hillRiseLine,
+} from '../src/sim/pvp/hill';
+import {
+  WORLD_PVP_AID_REFUSED_LINE,
+  WORLD_PVP_AIDED_LINE,
+  WORLD_PVP_FFA_ENTER_LINE,
+  WORLD_PVP_FFA_LEAVE_LINE,
+  WORLD_PVP_MARKED_LINE,
+  WORLD_PVP_SANCTUARY_LINE,
+  worldPvpDefeatLine,
+  worldPvpKillLine,
+} from '../src/sim/pvp/world_pvp';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import { auraDisplayNameForHud } from '../src/ui/aura_display_name';
@@ -619,6 +635,41 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     setLanguage('en');
   });
 
+  it('binds the World PvP and hill notice constants and line builders to the matcher (a reword must move its row)', () => {
+    // The sim emits these through exported constants and builders
+    // (src/sim/pvp/world_pvp.ts), so the emit scanner never sees the literal:
+    // the pin reads the constants themselves, and a reworded constant whose
+    // matcher row did not move fails here as "not recognized".
+    const lines = [
+      WORLD_PVP_MARKED_LINE,
+      WORLD_PVP_AIDED_LINE,
+      WORLD_PVP_FFA_ENTER_LINE,
+      WORLD_PVP_FFA_LEAVE_LINE,
+      WORLD_PVP_SANCTUARY_LINE,
+      WORLD_PVP_AID_REFUSED_LINE,
+      worldPvpKillLine('Aki', 0, 1),
+      worldPvpKillLine('Aki', 1_234, 1),
+      worldPvpKillLine('Aki', 1_234, 3),
+      worldPvpDefeatLine('Aki', 0, 1),
+      worldPvpDefeatLine('Aki', 1_234, 1),
+      worldPvpDefeatLine('Aki', 1_234, 2),
+      worldPvpDefeatLine('Aki', 1_234, 4),
+      // King of the Hill (src/sim/pvp/hill.ts): the rise announce and the
+      // hold notices, emitted through the same constant-and-builder shape.
+      hillRiseLine('Wraithwood'),
+      HILL_TAKEN_LINE,
+      HILL_LOST_LINE,
+      HILL_READOUT_NONE_LINE,
+    ];
+    for (const lang of supportedLanguages) {
+      setLanguage(lang);
+      for (const s of lines) {
+        expect(localizeSimText(s), `${lang}: World PvP line "${s}" not recognized`).not.toBeNull();
+      }
+    }
+    setLanguage('en');
+  });
+
   it('localizes embedded item and mob names inside sim text', () => {
     setLanguage('de_DE');
     expect(localizeSimText('Equipped Pitted Shortsword.')).not.toContain('Pitted Shortsword');
@@ -838,11 +889,11 @@ describe("R1: report-target errors map to the server's exact emitted bytes", () 
 
 // --- R2: bug-report error matcher keys MUST byte-match the server's actual
 // emissions. Same drift class as R1, for the /api/bug-reports lane: the server
-// emits lowercase / no trailing period and the hud localizeBugReportError
+// emits lowercase / no trailing period and the ui bugReportErrorText
 // keyByMessage must contain those exact bytes or every failure falls to the
 // generic hudChrome.bugReport.failed. ---
 describe("R2: bug-report errors map to the server's exact emitted bytes", () => {
-  it('server bug-report error strings appear verbatim as localizeBugReportError keys', () => {
+  it('server bug-report error strings appear verbatim as bugReportErrorText keys', () => {
     const serverErrors = [
       'describe the bug', // 400, empty description (server/main.ts)
       'bug report too large', // 413, body cap (server/main.ts)
@@ -859,11 +910,15 @@ describe("R2: bug-report errors map to the server's exact emitted bytes", () => 
       expect(serverSrc.includes(`'${e}'`), `server no longer emits "${e}"`).toBe(true);
     }
 
-    // localizeBugReportError moved to the options window painter.
-    const hudSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/ui/options_window.ts'), 'utf8');
-    const fnStart = hudSrc.indexOf('localizeBugReportError(err: unknown)');
-    expect(fnStart, 'localizeBugReportError not found in options_window.ts').toBeGreaterThan(-1);
-    const start = hudSrc.indexOf('keyByMessage: Record<string, TranslationKey> = {', fnStart);
+    // The ladder moved out of the options window painter into its own module
+    // (the *_reason_text.ts family): src/ui/bug_report_error_text.ts.
+    const hudSrc = fs.readFileSync(
+      path.resolve(process.cwd(), 'src/ui/bug_report_error_text.ts'),
+      'utf8',
+    );
+    const fnStart = hudSrc.indexOf('bugReportErrorText(err: unknown)');
+    expect(fnStart, 'bugReportErrorText not found in bug_report_error_text.ts').toBeGreaterThan(-1);
+    const start = hudSrc.indexOf('KEY_BY_MESSAGE: Readonly<Record<string, TranslationKey>> = {');
     const body = hudSrc.slice(start, hudSrc.indexOf('};', start));
     const keys = new Set(
       [...body.matchAll(/(^|\n)\s*('(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*")\s*:/g)].map((m) =>
@@ -874,7 +929,7 @@ describe("R2: bug-report errors map to the server's exact emitted bytes", () => 
     for (const err of serverErrors) {
       expect(
         keys.has(err),
-        `bug error "${err}" is not a localizeBugReportError key (would fall to hudChrome.bugReport.failed)`,
+        `bug error "${err}" is not a bugReportErrorText key (would fall to hudChrome.bugReport.failed)`,
       ).toBe(true);
     }
   });
@@ -1159,10 +1214,15 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
   const socialSrc = socialSourceUnder(socialDir);
   const simSrc = [
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/sim.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/inventory_receipt.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/combat/damage.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/combat/casting_lifecycle.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/combat/effect_dispatch.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/combat/auto_attack.ts'), 'utf8'),
+    // The worn trinket's use refusals (useWornTrinket's ctx.error lines: the
+    // hourglass, tally, jar and enemy-player gates), matched by the sim_i18n
+    // EXACT map through src/ui/trinket_sim_i18n.ts.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/combat/trinkets.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/progression/talents.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/progression/xp.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/mob_swing.ts'), 'utf8'),
@@ -1213,6 +1273,9 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/drowned_litany_rite.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/drowned_litany_rooms.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/market.ts'), 'utf8'),
+    // The buy-order board (Wanted tab): place / deliver / withdraw errors and
+    // loot lines, matched by error_text_i18n_core + sim_i18n RULES.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/market_orders.ts'), 'utf8'),
     // Card Duel minigame (Card Master NPC): the queue/match log + error emits.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/social/card_duel.ts'), 'utf8'),
     // W2: the inventory/vendor command bodies (equip/use/discard + buy/sell/buyback).
@@ -1269,7 +1332,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/locomotion.ts'), 'utf8'),
     // Professions 2.0: the fishing command bodies moved out of sim.ts.
     // Three literals have their ONLY emitter occurrences here ("No fish are
-    // biting.", "A rare catch! Something gleams on your line.", "You need to
+    // biting.", "Something golden flashes beneath the surface!", "You need to
     // face fishable water."); they are byte-identical after the move so their
     // matchers are unchanged, but a rewording of THIS file's sites was
     // invisible to the guard before this entry. The file's other emits
@@ -1441,6 +1504,13 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // scan below catches sim.ctx.error), keeping a reword of the emit or
     // the matcher from drifting apart silently.
     fs.readFileSync(path.resolve(process.cwd(), 'server/bank_wire.ts'), 'utf8'),
+    // Clue Scrolls (world quests, Stage 3): the hunt engine's refusals (the
+    // dig-spot, already-following, empty-pool and short-delivery ctx.error
+    // lines) and the casket module (text-free today: every reward line is
+    // ids on clueCasketOpened plus addItem's own receipt). Scanned so the
+    // refusals sit under the drift guard from day one.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/clue_scrolls.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/clue_casket.ts'), 'utf8'),
   ].join('\n');
   // Hardened S3: also scan the authoritative server's player-facing emits. The
   // server (server/game.ts) is language-agnostic like the sim and re-localized
@@ -1530,10 +1600,12 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     const tern = expr.match(/\?\s*'([^']*)'\s*:\s*'([^']*)'/);
     if (tern) return tern[1] || tern[2];
     if (/\?[^:]*:/.test(expr)) return '';
-    // server/social.ts's guild-rank lines interpolate RANK_LABEL[rank], and their
-    // server_i18n rows accept only the three real labels, so the probe value is
-    // one of them (the numeric class below would otherwise read `rank` as 5).
-    if (/RANK_LABEL/.test(expr)) return 'Officer';
+    // server/social.ts's guild-rank lines interpolate rankLabel(ladder, id)
+    // (formerly RANK_LABEL[rank]): a built-in rank's bare label, or a guild
+    // title in [brackets]. The probe takes the bare built-in arm (the numeric
+    // class below would otherwise read `rank` as 5); the bracketed arm has its
+    // own matcher cases in tests/server_i18n.test.ts.
+    if (/RANK_LABEL|rankLabel\(/.test(expr)) return 'Officer';
     if (
       // The three ready-check tallies are counts whose names say so in words
       // rather than in any of the stems below, so they read as a NAME and the

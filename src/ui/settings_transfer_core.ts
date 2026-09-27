@@ -61,12 +61,14 @@ const SETTINGS_KEYS = [
 ] as const;
 
 /** The extra families only the FULL code carries: the per-character key
- *  binding profiles and cross-hotbar pages, the aura overlay configs, the
- *  emote wheel / deed watch / reliquary pin lists, and the spawn-intro latch. */
+ *  binding profiles and cross-hotbar pages, the aura overlay and cooldown
+ *  manager configs, the emote wheel / deed watch / reliquary pin lists, and
+ *  the spawn-intro latch. */
 const FULL_KEY_PREFIXES = [
   'woc_keybinds:',
   'woc_gamepad_xhb:',
   'woc_aura_overlays:',
+  'woc_cooldown_manager:',
   'woc_emote_wheel_',
   'woc_deed_watch_',
   'woc_reliquary_pins_',

@@ -1,3 +1,4 @@
+import type { PhysicalChoreography } from './ability_vfx/physical_choreography_core';
 // Pure planning core for the per-ability spell VFX system: turns an authored
 // AbilityVfxSpec (src/render/ability_vfx_specs.ts) plus the render-budget vfx
 // quality dial into a concrete draw plan the thin painter (ability_vfx.ts)
@@ -136,6 +137,7 @@ export interface AbilityVfxImpactSpec {
 }
 
 export interface AbilityVfxBuffSpec {
+  ceremony?: 'spiritCoils' | 'ascend';
   style?: 'raise' | 'morph' | 'veil';
   orbit?: string;
   // While the buff aura (aura id == ability id) is worn, the held mainhand
@@ -176,6 +178,7 @@ export interface AbilityVfxBuffSpec {
 }
 
 export interface AbilityVfxFullSpec {
+  physical?: PhysicalChoreography;
   archetype: AbilityVfxArchetype;
   palette: string;
   power?: number;
@@ -195,6 +198,7 @@ export interface AbilityVfxFullSpec {
     headScale?: number;
     style?:
       | 'rock'
+      | 'warHammer'
       | 'shard'
       | 'comet'
       | 'arrow'

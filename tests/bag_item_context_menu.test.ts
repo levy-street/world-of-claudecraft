@@ -162,6 +162,21 @@ describe('bag_item_context_menu: menu row ordering', () => {
     expect(reagent[0]).toEqual({ id: 'default', labelKey: 'hudChrome.itemMenu.use' });
     expect(reagent.map((r) => r.id)).toEqual(['default', 'applyEnchant', 'lock']);
   });
+
+  it('appends Destroy last only when the caller includes it (the touch HUD route)', () => {
+    const plain = bagItemContextActions(def('material'), 'linen_scrap');
+    expect(plain.map((r) => r.id)).not.toContain('destroy');
+    const touch = bagItemContextActions(
+      def('material'),
+      'linen_scrap',
+      undefined,
+      undefined,
+      false,
+      true,
+    );
+    expect(touch.at(-1)).toEqual({ id: 'destroy', labelKey: 'itemUi.bags.destroyConfirm' });
+    expect(touch.map((r) => r.id)).toEqual(['default', 'lock', 'destroy']);
+  });
 });
 
 describe('bag_item_context_menu: special-copy classification', () => {

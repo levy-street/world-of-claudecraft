@@ -1155,4 +1155,81 @@ export const table: DeedLocaleTable = {
 
     name: 'Mata Air Terbelenggu',
   },
+  exp_arcane_calligraphy: {
+    name: 'Tangan yang Stabil',
+    desc: 'Selesaikan Kaligrafi Arkan di Lembah Eastbrook.',
+  },
+  exp_arcane_calligraphy_gold: {
+    name: 'Ditulis di Cahaya Bintang',
+    desc: 'Raih peringkat Emas di Kaligrafi Arkan.',
+    title: 'Pemanggil Rune',
+  },
+  exp_forge_helper: {
+    name: 'Palu Pembantu',
+    desc: 'Bantu Pandai Smith Mara menyelesaikan perisai di Wyrmwatch.',
+  },
+  exp_last_barricade: {
+    name: 'Barrikade Terakhir',
+    desc: 'Bertahan di jalur hutan melawan gerombolan mayat hidup.',
+  },
+  exp_borrowed_face: {
+    name: 'Wajah yang Dipinjam',
+    desc: 'Ungkap dan mengalahkan penyusup di antara pengawas Fenbridge.',
+  },
+  exp_windrider_slalom: {
+    name: 'Slalom Angin Naik',
+    desc: 'Selesaikan keturunan peluncur mekanisme melalui ngarai Galecrest.',
+  },
+  exp_duskweave_dispatches: {
+    name: 'Pengiriman Anyaman Senja',
+    desc: 'Pulihkan pengiriman bandit sambil memakai jubah bersinisme Valerie.',
+  },
+  exp_wisp_maze: {
+    name: 'Cahaya di Labirin',
+    desc: 'Pulihkan kantong koin yang dicuri dan keluar dari labirin Evergarden.',
+  },
+  prog_rift_watch_trusted: {
+    name: 'Dipercaya oleh Pengawas Celah',
+    desc: 'Capai status Dipercaya dengan Pengawas Celah.',
+  },
+  prog_church_order_trusted: {
+    name: 'Dipercaya oleh Ordo Gereja',
+    desc: 'Capai status Dipercaya dengan Ordo Gereja.',
+  },
+  prog_automatons_trusted: {
+    name: 'Dipercaya oleh Automaton',
+    desc: 'Capai status Dipercaya dengan Automaton.',
+  },
+  prog_rift_watch_champion: {
+    name: 'Juara Pengawas Celah',
+    desc: 'Capai status Juara dengan Pengawas Celah.',
+    title: 'Penjaga Celah',
+  },
+  prog_church_order_champion: {
+    name: 'Juara Ordo Gereja',
+    desc: 'Capai status Juara dengan Ordo Gereja.',
+    title: 'Penjaga Fajar',
+  },
+  prog_automatons_champion: {
+    name: 'Juara Automaton',
+    desc: 'Capai status Juara dengan Automaton.',
+    title: 'Maestro Pengrajin',
+  },
+  prog_faction_champion_all: {
+    name: 'Juara Setiap Bendera',
+    desc: 'Capai status Juara dengan Pengawas Celah, Ordo Gereja dan Automaton.',
+  },
+  exp_clue_first_casket: {
+    name: 'Harta Ditemukan',
+    desc: 'Buka Peti Harta yang digali di akhir perburuan gulir petunjuk.',
+  },
+  exp_clue_ten_caskets: {
+    name: 'Pemburu Harta',
+    desc: 'Buka 10 Peti Harta yang digali di akhir perburuan gulir petunjuk.',
+    title: 'Pemburu Harta',
+  },
+  exp_harbor_to_harbor: {
+    name: 'Pelabuhan ke Pelabuhan',
+    desc: 'Berlayar dengan kedua feri bolak-balik: Eastbrook ke Moonrest, dan Wickharbor ke Wyrmwatch.',
+  },
 };

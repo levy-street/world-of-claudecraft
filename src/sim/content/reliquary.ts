@@ -18,7 +18,8 @@
 // catalogued: markItemDiscovered already credits the base id, so listing both
 // would double-count completion.
 
-import { FURY_STOCK, WARFARE_ITEMS } from './pvp_honor';
+import { FURY_STOCK, WARFARE_ITEMS, WARFARE_TRINKET_STOCK } from './pvp_honor';
+import { SEASON2_STOCK } from './pvp_honor_season2';
 import {
   RIFT_EPIC_ITEM_IDS,
   RIFT_GEAR_ITEM_IDS,
@@ -266,6 +267,7 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'aether_hover_cycle',
   'thunderstrut_gobbler',
   'drakemaw_raptor',
+  'avian_strider',
   'lanternback_troll',
   'terrorspark_groundshaker',
 ] as const;
@@ -284,7 +286,9 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 // out nothing.
 //
 // Drakemaw Raptor, Lanternback Troll and Dreadspark Groundshaker have no
-// player acquisition path. Paid mount skins are deliberately absent here.
+// player acquisition path. The Viridian Valestrider is the Rift Watch
+// quartermaster's Champion row (content/faction_vendors.ts). Paid mount skins
+// are deliberately absent here.
 //
 // Keys are typed against the live mount ladder so a misspelled or renamed key
 // fails tsc at the authoring site instead of falling through to the pending
@@ -296,6 +300,7 @@ const MOUNT_SOURCES: Readonly<
   // convention (a one-element list would mean the same thing; the catalog
   // never encodes meaning in the shape).
   valorsteed: fromVendor('stablemaster_marla'),
+  avian_strider: fromVendor('npc_rift_watch_quartermaster'),
   stormfeather_griffin: [
     fromBoss('morthen'),
     fromBoss('nythraxis_scourge_of_thornpeak'),
@@ -431,10 +436,21 @@ export const RELIQUARY_HORIZON_TITLES = [
   // The farming capstone (the celebrations phase): Harvestmaster pages here
   // per the locked titles-page rule like every non-hidden title deed.
   'prog_farming_100',
+  // The Arcane Calligraphy gold rating (world quests): its Runecaller title
+  // pages here per the locked titles-page rule.
+  'exp_arcane_calligraphy_gold',
   // The Crucible raid's flawless title (the obligations closeout,
   // docs/prd/ignivar-raid-loot.md): every non-hidden title deed pages here
   // per the locked titles-page rule.
   'dgn_varkhul_flawless',
+  // The faction standing Champion titles (world quests): the three vanguard
+  // flavor titles page here per the locked titles-page rule.
+  'prog_rift_watch_champion',
+  'prog_church_order_champion',
+  'prog_automatons_champion',
+  // The Clue Scroll tenth-casket title (world quests, Stage 3): Treasure
+  // Hunter pages here per the locked titles-page rule.
+  'exp_clue_ten_caskets',
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces
@@ -734,6 +750,7 @@ export const RELIQUARY_HEROIC_GEAR = {
     'cryptplate_helm',
     'shadowpulse_slippers',
     'bonechill_cord',
+    'bastion_sigil',
   ],
   vael_the_mistcaller: [
     'mistcallers_fang',
@@ -743,6 +760,7 @@ export const RELIQUARY_HEROIC_GEAR = {
     'tideguard_faceguard',
     'sunken_court_mantle',
     'dreamroot_boots',
+    'stormjar',
   ],
   ysolei: [
     'lunar_tide_greatstaff',
@@ -752,6 +770,7 @@ export const RELIQUARY_HEROIC_GEAR = {
     'lunar_choir_leggings',
     'choir_blessed_spaulders',
     'tideworn_warboots',
+    'menders_hourglass',
   ],
   korzul_the_gravewyrm: [
     'gravewyrm_cleaver',
@@ -769,13 +788,19 @@ export const RELIQUARY_HEROIC_GEAR = {
     'greatfang_of_the_basin',
     'sunbone_oracles_crown',
     'bloodmane_war_legguards',
+    'paired_talons',
   ],
   nythraxis_scourge_of_thornpeak: [
     'deathless_greatblade',
     'scepter_of_the_deathless_court',
     'stormcallers_focus',
+    'mooring_stone',
+    'wellspring_seed',
+    'hunters_tally',
+    'echoing_lens',
   ],
-  // Crucible of the Last Spring: the heroic-only weapon and shield appends.
+  // Crucible of the Last Spring: the heroic-only weapon, shield and trinket
+  // appends.
   // The sigil redemption tokens that share both bosses' heroic tables are
   // NOT catalogued (kind 'tool'): they are per-slot redemption currency the
   // Crucible Quartermaster consumes, not unique spoils, the same carve-out
@@ -784,6 +809,12 @@ export const RELIQUARY_HEROIC_GEAR = {
     'forgefathers_warhammer',
     'anvilguard_blade',
     'springtouched_crozier',
+    'wand_of_quenched_sparks',
+    // The raid trinkets (content/trinkets.ts), heroic exclusives here and
+    // Normal off-set drops too, so also on the Normal page.
+    'kindling_orb',
+    'molten_fletching',
+    'last_flame_lantern',
   ],
   varkhul_forgefather_of_the_last_flame: [
     'bulwark_of_the_inner_crucible',
@@ -792,6 +823,12 @@ export const RELIQUARY_HEROIC_GEAR = {
     'heart_of_the_end_greatblade',
     'forgefire_spire',
     'staff_of_the_last_spring',
+    'orb_of_the_last_spring',
+    'cinder_of_the_first_design',
+    // The raid trinkets (content/trinkets.ts), heroic exclusives here and
+    // Normal off-set drops too, so also on the Normal page.
+    'forgefathers_temper',
+    'heart_of_the_crucible',
   ],
 } as const;
 
@@ -898,7 +935,7 @@ const REALM_RARE_ZONES = [
 // Both quartermasters front the SAME canonical honor stock: FURY at the
 // Eastbrook arena (FURY_NPC in content/pvp_honor.ts) and Warmarshal Draven
 // Kole at the Highwatch hub (content/zone3.ts, spawned under a reserved id by
-// src/sim/pvp/warfare_quartermaster.ts), each with vendorItems = FURY_STOCK.
+// src/sim/pvp/warfare_quartermaster.ts), each with vendorItems = HONOR_QUARTERMASTER_STOCK.
 // Every slot therefore names both counters through one shared tuple. Honor
 // purchases flow through the ordinary buyItem discovery path
 // (markItemDiscovered + noteRelicObtain), so ownership needs no new state.
@@ -911,8 +948,18 @@ const WARFARE_VENDOR_HINTS = [fromVendor('fury'), fromVendor('warmarshal_draven_
 // concern), and the set-less jewelry and weapons fill the armory. Deriving
 // from FURY_STOCK keeps membership and order from ever trailing the content;
 // the partition and both floors are pinned in tests/reliquary_content.test.ts.
+// The two honor trinkets (WARFARE_TRINKET_STOCK) are set-less honor purchases
+// from the same two counters, so they close the armory after the kit's
+// jewelry and weapons.
 const WARFARE_GALLERY_ITEM_IDS = FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set !== undefined);
-const WARFARE_ARMORY_ITEM_IDS = FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set === undefined);
+const WARFARE_ARMORY_ITEM_IDS = [
+  ...FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set === undefined),
+  ...WARFARE_TRINKET_STOCK,
+];
+// Warfare Season 2 ("Vanguard", content/pvp_honor_season2.ts) is sold by the same
+// two quartermasters: its 27 spec sets and four weapons fill one page, in stock
+// order (class, then spec, each helmet to gloves, then the weapons).
+const VANGUARD_GALLERY_ITEM_IDS = [...SEASON2_STOCK];
 
 /**
  * Freeze the whole page table at its one construction site: the top-level
@@ -945,12 +992,19 @@ function freezePageTable(pages: ReliquaryPageDef[]): readonly ReliquaryPageDef[]
 
 export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
   // ---- Five-man dungeons: normal chase uniques ----
+  // Clear meters on these pages read BOTH difficulties ('any'): every relic
+  // below also drops on the Heroic claim (HEROIC_BOSS_LOOT pays the base id or
+  // a heroic_<base> variant that folds back to it), so a Heroic run is a run
+  // at the page's spoils and counts. The heroic-only epic pages keep their
+  // 'heroic' filter, and the Crucible raid pages keep 'normal' because their
+  // Normal tables hold normalOnly rows Heroic never pays. Derived and pinned by
+  // tests/reliquary_content.test.ts ("count every difficulty that pays").
   {
     id: 'conquerors_hollow_crypt',
     shelf: 'conquerors',
     name: 'The Hollow Crypt',
     desc: 'Signature spoils claimed from Morthen and the Hollow Crypt.',
-    clearSource: { kind: 'dungeon', dungeonId: 'hollow_crypt', difficulty: 'normal' },
+    clearSource: { kind: 'dungeon', dungeonId: 'hollow_crypt', difficulty: 'any' },
     // Morthen is the only Crypt mob that drops any of these five.
     sourceDefault: fromBoss('morthen'),
     relics: items(
@@ -975,7 +1029,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     shelf: 'conquerors',
     name: 'The Sunken Bastion',
     desc: 'Rare and epic spoils from Olen and Vael the Fogbinder.',
-    clearSource: { kind: 'dungeon', dungeonId: 'sunken_bastion', difficulty: 'normal' },
+    clearSource: { kind: 'dungeon', dungeonId: 'sunken_bastion', difficulty: 'any' },
     // Two bosses, and every relic drops from exactly one of them, so the page
     // takes no default: each row names its own.
     relics: items(
@@ -1005,7 +1059,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     shelf: 'conquerors',
     name: 'The Drowned Temple',
     desc: 'Rare spoils from Choirmother Selthe and Ysolei, Avatar of the Drowned Moon.',
-    clearSource: { kind: 'dungeon', dungeonId: 'drowned_temple', difficulty: 'normal' },
+    clearSource: { kind: 'dungeon', dungeonId: 'drowned_temple', difficulty: 'any' },
     relics: items(
       ['ysols_pearl_greaves', fromBoss('ysolei')],
       ['moonshroud_breastplate', fromBoss('ysolei')],
@@ -1028,7 +1082,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     shelf: 'conquerors',
     name: 'Gravewyrm Sanctum',
     desc: 'Rare and epic spoils from the Sanctum bosses and Korzul the Gravewyrm.',
-    clearSource: { kind: 'dungeon', dungeonId: 'gravewyrm_sanctum', difficulty: 'normal' },
+    clearSource: { kind: 'dungeon', dungeonId: 'gravewyrm_sanctum', difficulty: 'any' },
     // FIVE live LOOT TABLES drop this page's relics (sanctum_boneguard and
     // sanctum_drakonid elite trash plus the three bosses), and all five are
     // authored here; recipes and quests add further non-loot routes.
@@ -1129,7 +1183,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     shelf: 'conquerors',
     name: 'The Wildheart Basin',
     desc: 'Signature weapons from Zulgar and the Fanglord.',
-    clearSource: { kind: 'dungeon', dungeonId: 'wildheart_basin', difficulty: 'normal' },
+    clearSource: { kind: 'dungeon', dungeonId: 'wildheart_basin', difficulty: 'any' },
     relics: items(
       ['fanglords_beastspear', fromBoss('wildheart_beastmaster')],
       ['duskwhisper', fromBoss('wildheart_beastmaster')],
@@ -1153,7 +1207,11 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     shelf: 'conquerors',
     name: 'Nythraxis Raid',
     desc: 'Epic and legendary spoils from Nythraxis, Scourge of Thornpeak.',
-    clearSource: { kind: 'dungeon', dungeonId: 'nythraxis_boss_arena', difficulty: 'normal' },
+    // 'any', like the five-mans above: both difficulties share the first
+    // Nythraxis pool (content/nythraxis_loot.ts), so a Heroic clear pays every
+    // relic on this page and counts on its meter. The Crucible raid pages keep
+    // 'normal' (Heroic replaces their slots with exclusives).
+    clearSource: { kind: 'dungeon', dungeonId: 'nythraxis_boss_arena', difficulty: 'any' },
     // The raid's one boss drops every relic on the page.
     sourceDefault: fromBoss('nythraxis_scourge_of_thornpeak'),
     relics: items(
@@ -1715,7 +1773,6 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     relics: items(
       'cinderfang_kris',
       'slagrender_cleaver',
-      'wand_of_quenched_sparks',
       'pendant_of_the_first_tempering',
       'ignivars_ember_choker',
       'locket_of_the_last_flame',
@@ -1730,13 +1787,18 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       'warforged_waistguard',
       'stormkindled_chain',
       'tidebinder_links',
+      // The raid trinkets (content/trinkets.ts) drop on both difficulties, so
+      // they fill this page and the heroic page (rule 5, multi-page fill).
+      'kindling_orb',
+      'molten_fletching',
+      'last_flame_lantern',
     ),
   },
   {
     id: 'conquerors_ignivar_heroic',
     shelf: 'conquerors',
     name: 'Heroic Crucible of the Last Spring',
-    desc: 'Heroic-only weapons from Ignivar, Herald of the Last Flame.',
+    desc: 'Heroic-only weapons and the raid trinkets from Ignivar, Herald of the Last Flame.',
     clearSource: { kind: 'dungeon', dungeonId: 'ignivar_raid_arena', difficulty: 'heroic' },
     sourceDefault: fromBoss('ignivar_herald_of_the_last_flame'),
     relics: items(...RELIQUARY_HEROIC_GEAR.ignivar_herald_of_the_last_flame),
@@ -1752,8 +1814,6 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // its personal professions page because the quest craft is not boss loot.
     sourceDefault: fromBoss('varkhul_forgefather_of_the_last_flame'),
     relics: items(
-      'orb_of_the_last_spring',
-      'cinder_of_the_first_design',
       'seal_of_the_forgewall',
       'band_of_marked_strikes',
       'circle_of_cinders',
@@ -1768,13 +1828,17 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       'furnace_march_greaves',
       'thundershock_treads',
       'springwarden_sabatons',
+      // The raid trinkets (content/trinkets.ts) drop on both difficulties, so
+      // they fill this page and the heroic page (rule 5, multi-page fill).
+      'forgefathers_temper',
+      'heart_of_the_crucible',
     ),
   },
   {
     id: 'conquerors_varkhul_heroic',
     shelf: 'conquerors',
     name: 'Heroic Inner Crucible',
-    desc: 'Heroic-only shields and weapons from Varkhul, Forgefather of the Last Flame.',
+    desc: 'Heroic-only shields, held offhands and weapons, and the raid trinkets, from Varkhul, Forgefather of the Last Flame.',
     clearSource: { kind: 'dungeon', dungeonId: 'ignivar_inner_crucible', difficulty: 'heroic' },
     sourceDefault: fromBoss('varkhul_forgefather_of_the_last_flame'),
     relics: items(...RELIQUARY_HEROIC_GEAR.varkhul_forgefather_of_the_last_flame),
@@ -1847,6 +1911,21 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     excludeFromCompletion: 'personal',
     sourceDefault: fromProfession('weaponcrafting'),
     relics: items('varkhul_forgebreaker'),
+  },
+  // Warfare Season 2 (content/pvp_honor_season2.ts): appended per the
+  // append-only page table; it files under the Conquerors shelf by its shelf id.
+  {
+    id: 'conquerors_vanguard_gallery',
+    shelf: 'conquerors',
+    name: 'Vanguard Gallery',
+    desc: 'The Warfare Season 2 spec sets and weapons, bought with honor.',
+    clearSource: { kind: 'none' },
+    // Class-personal stock (each set is class-locked and the shop lists only the
+    // viewer's own class), so no single character can fill it: outside both
+    // completion pairs, the Riftbound precedent, so the Conquerors capstone never
+    // needs a character of every class.
+    excludeFromCompletion: 'personal',
+    relics: items(...VANGUARD_GALLERY_ITEM_IDS.map((id) => [id, WARFARE_VENDOR_HINTS] as const)),
   },
 ]);
 

@@ -1,10 +1,15 @@
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
   RENDER_DIAGNOSTICS_SAMPLE_MS,
   RenderDiagnostics,
   type RenderDiagnosticsHost,
 } from '../src/render/render_diagnostics';
-import { collectRenderDiagnostics } from '../src/render/renderer_diagnostics';
+import {
+  collectRenderDiagnostics,
+  setRenderCategory,
+  tagVfxSubtree,
+} from '../src/render/renderer_diagnostics';
 
 interface FakeObject {
   visible: boolean;
@@ -235,5 +240,39 @@ describe('render diagnostics sampling', () => {
     second.shutdown.value = true;
     second.idleRuns[0]();
     expect(second.diagnostics.current().totalObjects).toBe(0);
+  });
+});
+
+describe('render category tags', () => {
+  function pool(): { parent: THREE.Group; root: THREE.Group; drawables: THREE.Object3D[] } {
+    const parent = new THREE.Group();
+    const root = new THREE.Group();
+    root.visible = false;
+    const layer = new THREE.Group();
+    layer.visible = false;
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial());
+    const points = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial());
+    const sprite = new THREE.Sprite(new THREE.SpriteMaterial());
+    layer.add(mesh, points);
+    root.add(layer, sprite);
+    parent.add(root);
+    return { parent, root, drawables: [layer, mesh, points, sprite] };
+  }
+
+  it('setRenderCategory stamps the one object it is given', () => {
+    const { root, drawables } = pool();
+    setRenderCategory(root, 'vfx');
+    expect(root.userData.renderCategory).toBe('vfx');
+    for (const object of drawables) expect(object.userData.renderCategory).toBeUndefined();
+  });
+
+  it('tagVfxSubtree stamps vfx on the root and every descendant, hidden ones included', () => {
+    const { parent, root, drawables } = pool();
+    tagVfxSubtree(root);
+    expect(root.userData.renderCategory).toBe('vfx');
+    for (const object of drawables) expect(object.userData.renderCategory).toBe('vfx');
+    expect(parent.userData.renderCategory).toBeUndefined();
+    expect(root.visible).toBe(false);
+    expect(drawables[0].visible).toBe(false);
   });
 });

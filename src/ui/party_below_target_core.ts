@@ -25,8 +25,9 @@ export interface PartyBelowTargetInputs {
   /** The target frame's box, or null when the frame is hidden (no target). */
   frame: MeasuredBox | null;
   /** The #tf-debuffs strip box, or null when the strip is empty. The strip is
-   *  absolutely positioned below the frame, so the frame's own box never
-   *  includes it; the union of the two is the full target stack. */
+   *  absolutely positioned off the frame (above by default, below on touch or
+   *  with targetAurasBelowFrame), so the frame's own box never includes it;
+   *  the union of the two is the full target stack either way. */
   debuffs: MeasuredBox | null;
   /** The party frames container's horizontal span, in visual px. */
   party: { left: number; right: number } | null;

@@ -142,6 +142,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Arsenal de Guerra',
     desc: 'Joias e armas de Guerra compradas com honra suada.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Galeria da Vanguarda',
+    desc: 'Os conjuntos de especialização e as armas da temporada 2 de Guerra, comprados com honra.',
+  },
   horizons_vault_of_ages: {
     name: 'Câmara das Eras',
     desc: 'Tesouros retirados de uma era passada. Estas relíquias não podem mais ser conquistadas; a câmara honra os veteranos que as guardam.',
@@ -156,7 +160,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: 'Heroico: Crisol da Última Chama',
-    desc: 'Armas exclusivas do modo heroico de Ignivar, Arauto da Última Chama.',
+    desc: 'Armas exclusivas do modo heroico e berloques da raide de Ignivar, Arauto da Última Chama.',
   },
   conquerors_varkhul: {
     name: 'O Crisol Interior',
@@ -164,7 +168,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: 'Heroico: Crisol Interior',
-    desc: 'Escudos e armas exclusivos do modo heroico de Varkhul, Pai da Forja da Última Chama.',
+    desc: 'Escudos e armas exclusivos do modo heroico e berloques da raide de Varkhul, Pai da Forja da Última Chama.',
   },
   conquerors_set_bramblehide: {
     name: 'Couro de Sarça de Roots',

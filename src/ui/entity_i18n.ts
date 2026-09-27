@@ -71,6 +71,7 @@ export type EntityTranslationField =
   | 'greeting'
   | 'label'
   | 'welcome'
+  | 'welcomeDone'
   | 'enterText'
   | 'leaveText'
   | ItemSetBonusField
@@ -120,7 +121,12 @@ export type EntityTranslationRequest =
       field: 'label';
       values?: InterpolationValues;
     }
-  | { kind: 'zone'; id: string; field: 'name' | 'welcome'; values?: InterpolationValues }
+  | {
+      kind: 'zone';
+      id: string;
+      field: 'name' | 'welcome' | 'welcomeDone';
+      values?: InterpolationValues;
+    }
   | {
       kind: 'zonePoi';
       zoneId: string;
@@ -318,7 +324,9 @@ function canonicalEntityText(request: EntityTranslationRequest): string {
     case 'zone': {
       const zone = ZONES.find((candidate) => candidate.id === request.id);
       if (!zone) return request.id;
-      return request.field === 'welcome' ? zone.welcome : zone.name;
+      if (request.field === 'welcome') return zone.welcome;
+      if (request.field === 'welcomeDone') return zone.welcomeDone ?? request.id;
+      return zone.name;
     }
     case 'zonePoi': {
       const zone = ZONES.find((candidate) => candidate.id === request.zoneId);
@@ -750,6 +758,18 @@ export function entityTranslationManifest(): EntityTranslationManifestEntry[] {
         entityTranslationKey({ kind: 'zone', id: zone.id, field: 'welcome' }),
       ),
     );
+    if (zone.welcomeDone !== undefined) {
+      entries.push(
+        entry(
+          'zone',
+          zone.id,
+          'welcomeDone',
+          zone.welcomeDone,
+          'world',
+          entityTranslationKey({ kind: 'zone', id: zone.id, field: 'welcomeDone' }),
+        ),
+      );
+    }
     zone.pois.forEach((poi, poiIndex) => {
       entries.push(
         entry(

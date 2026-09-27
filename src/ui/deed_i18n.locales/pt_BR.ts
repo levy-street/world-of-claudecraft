@@ -1241,4 +1241,81 @@ export const table: DeedLocaleTable = {
     name: 'Uma Fonte Liberta',
     desc: 'Molde Quebra-forja você mesmo e volte até Maelin com o martelo pronto.',
   },
+  exp_arcane_calligraphy: {
+    name: 'Uma Mão Firme',
+    desc: 'Complete a Caligrafia Arcana no Vale de Eastbrook.',
+  },
+  exp_arcane_calligraphy_gold: {
+    name: 'Escrito à Luz das Estrelas',
+    desc: 'Conquiste a avaliação Ouro na Caligrafia Arcana.',
+    title: 'o Conjurador de Runas',
+  },
+  exp_forge_helper: {
+    name: 'Um Martelo que Ajuda',
+    desc: 'Ajude a Ferreira Mara a completar um escudo em Wyrmwatch.',
+  },
+  exp_last_barricade: {
+    name: 'A Última Barricada',
+    desc: 'Segure a passagem da floresta contra a horda de mortos-vivos.',
+  },
+  exp_borrowed_face: {
+    name: 'Um Rosto Emprestado',
+    desc: 'Exponha e derrote o infiltrado entre a guarda de Fenbridge.',
+  },
+  exp_windrider_slalom: {
+    name: 'Slalom do Cavaleiro do Vento',
+    desc: 'Complete a descida de planador mecânico pelo desfiladeiro de Galecrest.',
+  },
+  exp_duskweave_dispatches: {
+    name: 'Mensagens de Tecido Crepuscular',
+    desc: 'Recupere as mensagens dos bandidos enquanto veste o manto encantado de Valerie.',
+  },
+  exp_wisp_maze: {
+    name: 'Uma Luz no Labirinto',
+    desc: 'Recupere as bolsas de moedas roubadas e escape do labirinto de Evergarden.',
+  },
+  prog_rift_watch_trusted: {
+    name: 'Confiável para a Vigília das Fendas',
+    desc: 'Alcance o status Confiável com a Vigília das Fendas.',
+  },
+  prog_church_order_trusted: {
+    name: 'Confiável para a Ordem da Igreja',
+    desc: 'Alcance o status Confiável com a Ordem da Igreja.',
+  },
+  prog_automatons_trusted: {
+    name: 'Confiável para os Autômatos',
+    desc: 'Alcance o status Confiável com os Autômatos.',
+  },
+  prog_rift_watch_champion: {
+    name: 'Campeão da Vigília das Fendas',
+    desc: 'Alcance o status Campeão com a Vigília das Fendas.',
+    title: 'Guardião das Fendas',
+  },
+  prog_church_order_champion: {
+    name: 'Campeão da Ordem da Igreja',
+    desc: 'Alcance o status Campeão com a Ordem da Igreja.',
+    title: 'Guardião da Alvorada',
+  },
+  prog_automatons_champion: {
+    name: 'Campeão dos Autômatos',
+    desc: 'Alcance o status Campeão com os Autômatos.',
+    title: 'Mestre da Forja',
+  },
+  prog_faction_champion_all: {
+    name: 'Campeão de Todos os Estandartes',
+    desc: 'Alcance o status Campeão com a Vigília das Fendas, a Ordem da Igreja e os Autômatos.',
+  },
+  exp_clue_first_casket: {
+    name: 'Tesouro Encontrado',
+    desc: 'Abra um Baú de Tesouro desenterrado ao final de uma caçada de pergaminho de pista.',
+  },
+  exp_clue_ten_caskets: {
+    name: 'Caçador de Tesouros',
+    desc: 'Abra 10 Baús de Tesouro desenterrados ao final de caçadas de pergaminho de pista.',
+    title: 'Caçador de Tesouros',
+  },
+  exp_harbor_to_harbor: {
+    name: 'De Porto a Porto',
+    desc: 'Navegue nas duas balsas de ida e volta: de Eastbrook a Moonrest, e de Wickharbor a Wyrmwatch.',
+  },
 };

@@ -84,7 +84,9 @@ export function auraOverlayProcIsActive(
 
 const has = (ids: ReadonlySet<string>, id: string): boolean => ids.has(id);
 
-function talentAuraKind(response: ProcResponse): string | null {
+/** The aura kind a talent proc lands on the player, or null for a response
+ *  that lands none. Shared with the Cooldown Manager's aura catalog. */
+export function talentAuraKind(response: ProcResponse): string | null {
   switch (response.kind) {
     case 'empowerNext':
       return response.aura;

@@ -502,12 +502,11 @@ describe("Zealfire 4pc: Dawn's Wrath bakes the wearer mult into the aura", () =>
       for (let tick = 0; tick < 200 && target.hp === hpBefore; tick++) sim.tick();
       return hpBefore - target.hp;
     }
-    const wearerBase = castDamage(true, false);
-    expect(wearerBase).toBeGreaterThan(0);
-    expect(castDamage(true, true)).toBe(
-      Math.round(wearerBase * ZEALFIRE_4PC_DAWNS_WRATH_DAMAGE_MULT),
-    );
-    const controlBase = castDamage(false, false);
-    expect(castDamage(false, true)).toBe(Math.round(controlBase * DAWNS_WRATH_DAMAGE_MULT));
+    // Dawnreaver and Wrath multiply the unrounded hit before the final round.
+    // Multiplying the rounded base again would overstate each empowered hit.
+    expect(castDamage(true, false)).toBe(410);
+    expect(castDamage(true, true)).toBe(573);
+    expect(castDamage(false, false)).toBe(410);
+    expect(castDamage(false, true)).toBe(491);
   });
 });

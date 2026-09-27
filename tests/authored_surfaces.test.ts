@@ -140,12 +140,27 @@ const AUTHORED_ATLAS_DEFS = [
   'mob_dragon_egg',
   'mount_goblin_rocket_sled',
   'mount_rallycart_rxt',
+  'mount_avian_strider',
 ];
 
 describe('authored surfaces', () => {
   it('routes both Varkhul drops through the authored held-model arm', () => {
     expect(isAuthoredHeldModelUrl(itemWeaponModelUrl('varkhul_forgebreaker') ?? '')).toBe(true);
     expect(isAuthoredHeldModelUrl(itemOffhandModelUrl('varkhul_emberward') ?? '')).toBe(true);
+  });
+
+  it('routes the harbormaster gear through the authored arm, from its own directory', () => {
+    // vertex-coloured felt, brass and leather: the weapon polish would glaze them to one sheen
+    for (const key of ['harbormaster_tricorne', 'harbormaster_spyglass']) {
+      expect(AUTHORED_HELD_MODELS.has(key), key).toBe(true);
+      expect(isAuthoredHeldModelUrl(`models/chars/npc_gear/${key}.glb`), key).toBe(true);
+    }
+    for (const att of VISUALS.npc_modular_harbormaster.attach ?? []) {
+      expect(isAuthoredHeldModelUrl(att.url), att.url).toBe(true);
+    }
+    // the directory alone opts nothing in, and no other models/chars path matches
+    expect(isAuthoredHeldModelUrl('models/chars/npc_gear/some_other_hat.glb')).toBe(false);
+    expect(isAuthoredHeldModelUrl('models/chars/modular/harbormaster_tricorne.glb')).toBe(false);
   });
 
   it('leaves every other held model on the polish', () => {
@@ -160,7 +175,7 @@ describe('authored surfaces', () => {
     // a creature or player GLB can never match the held-model set
     expect(isAuthoredHeldModelUrl('models/creatures/ogre.glb')).toBe(false);
     expect(isAuthoredHeldModelUrl('')).toBe(false);
-    expect(AUTHORED_HELD_MODELS.size).toBe(2);
+    expect(AUTHORED_HELD_MODELS.size).toBe(4);
   });
 
   it('flags exactly the replaced creature and mount rigs, never a player body', () => {

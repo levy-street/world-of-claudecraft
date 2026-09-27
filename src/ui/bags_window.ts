@@ -18,7 +18,7 @@
 // (not a literal white hex).
 
 import { audio } from '../game/audio';
-import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
+import { BACKPACK_SLOTS, bagSlotsOf, stackSizeOf } from '../sim/bags';
 import { ITEMS, QUESTS } from '../sim/data';
 import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
 import { baggedCopyAnchor } from '../sim/item_copy_anchor';
@@ -69,9 +69,11 @@ import {
   carriedPools,
   materialsOnlyEmptyCells,
   resolveDepositSubmit,
+  tradeOfferOpensPrompt,
 } from './bags_view';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { hasOpenBankSocket } from './bank_view';
+import { DeferredDragRender } from './deferred_drag_render';
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import {
@@ -111,11 +113,13 @@ import { materialSourcesForDisplay } from './material_sources_view';
 import type { PainterHostPresentation } from './painter_host';
 import { BAG_ITEM_ROW_ATTR } from './panel_key_guard';
 import {
+  dismissInstalledPrompt,
   installPromptDialog as installModalPromptDialog,
   type PromptDialogHandle,
 } from './prompt_dialog';
 import { tSim } from './sim_i18n';
 import { bindTouchItemDrag } from './touch_item_drag';
+import { resolveTradeOfferSubmit } from './trade_view';
 import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
 import { type VendorSellConfirmPolicy, vendorSaleNeedsConfirm } from './vendor_sell_confirm_policy';
@@ -137,7 +141,7 @@ const SORT_SETTLE_STAGGER_CAP = 20;
 // an orphaned aria-modal dialog floating over the closed window (the show* paths
 // already clear a prior same-type prompt with these classes).
 const BAG_PROMPT_SELECTOR =
-  '.discard-item-prompt, .sell-quantity-prompt, .sell-confirm-prompt, .bank-deposit-prompt';
+  '.discard-item-prompt, .sell-quantity-prompt, .sell-confirm-prompt, .bank-deposit-prompt, .trade-offer-prompt';
 // Exported for the HUD's mobile cluster-close paths (closeVendor / onBankClosed),
 // which hide #bags without running close(): they must not strand a still-visible
 // prompt in #prompt-stack (promptModalOpen() would keep gating game keys on it).
@@ -145,7 +149,11 @@ export function dismissBagPrompts(
   owner: HTMLElement | null = document.getElementById('bags'),
 ): void {
   if (owner) closeMaterialSourcesDialogForOwner(owner);
-  for (const p of document.querySelectorAll(BAG_PROMPT_SELECTOR)) p.remove();
+  // Through each prompt's own dismiss() (prompt_dialog.ts registry), so the
+  // root a prompt made inert is cleared by the sweep, never left behind. The
+  // selector names only prompts THIS window owns: the trade window's remove
+  // prompt carries its own class and is never swept from here.
+  for (const p of document.querySelectorAll(BAG_PROMPT_SELECTOR)) dismissInstalledPrompt(p);
 }
 
 // An item row runs a GAME action (use / summon / equip / sell / deposit), so it
@@ -265,7 +273,14 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  closing the bank; dropping the docking class lets the mobile standalone
    *  full-screen rule take over instead of leaving a half-width orphan). */
   onClosed(): void;
-  addItemToTrade(itemId: string): void;
+  /** Stage `count` (default 1) units of a bag item into the open trade's
+   *  offer; the HUD clamps to tradeOfferHeadroom and skips a no-op. */
+  addItemToTrade(itemId: string, count?: number): void;
+  /** How many more units of the item the open trade can still take (the live
+   *  held total minus what is already staged; 0 when no trade is open or a
+   *  new line would exceed the offer's line cap). The shift-click quantity
+   *  prompt's ceiling AND its submit-time stale guard. */
+  tradeOfferHeadroom(itemId: string): number;
   /** Stage a bag item for a Market listing (selects it + repaints the market).
    *  `instance` is the clicked slot's payload (issue 1165): an instanced copy stages
    *  as ITSELF (single-copy listing), a plain stack stages fungibly. */
@@ -319,7 +334,8 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  `runDefault` runs the exact classic left-click action for the clicked
    *  slot, so the menu's first row stays byte-identical to a plain click.
    *  `vendorSellCount` is every copy of this item held across the bags,
-   *  supplied only when it should show the vendor row set instead. */
+   *  supplied only when it should show the vendor row set instead.
+   *  `runDestroy` (touch HUD only) adds the Destroy row. */
   openItemActionMenu(
     def: ItemDef,
     itemId: string,
@@ -331,6 +347,7 @@ export interface BagsWindowDeps extends PainterHostPresentation {
     vendorSellCount?: number,
     runSellAll?: () => void,
     materialSources?: MaterialComposition,
+    runDestroy?: () => void,
   ): void;
 }
 
@@ -363,8 +380,9 @@ export class BagsWindow {
   // Set when render() or refreshGrid() skipped a rebuild because a bag row was
   // mid-drag (see render()'s own comment). Flushed by flushDeferredRender(),
   // called from the dragged row's own end-of-drag handlers once the drag
-  // concludes.
-  private renderDeferredForDrag = false;
+  // concludes. Shared shape (also used by spellbook_window.ts and
+  // char_window.ts): see deferred_drag_render.ts.
+  private readonly dragRenderGate = new DeferredDragRender();
 
   // Native HTML5 drop fires before dragend. A bag-cell drop consumes dragState
   // in the drop handler, but the source row still needs to survive until its
@@ -500,7 +518,7 @@ export class BagsWindow {
     // instead of tearing the dragged row out from under it; the row's own dragend
     // (or the touch drag's onEnd) flushes it once the drag actually concludes.
     const drag = this.deps.dragState.get();
-    if (drag || this.nativeBagCellDropAwaitingDragEnd) {
+    if (this.dragRenderGate.shouldDefer(!!drag || this.nativeBagCellDropAwaitingDragEnd)) {
       // Inventory snapshots still have one small paint obligation while the
       // grid rebuild is deferred: keep the paperdoll promise tied to the exact
       // dragged copy. This covers desktop and touch alike without polling from
@@ -510,7 +528,6 @@ export class BagsWindow {
         if (named === null) this.deps.markEquipDropTargets(null);
         else this.deps.markEquipDropTargets(drag.itemId, named);
       }
-      this.renderDeferredForDrag = true;
       return;
     }
     // Rebuild tears down hovered cells without mouseleave; drop any tracker glow.
@@ -604,10 +621,10 @@ export class BagsWindow {
    *  dragend/onEnd teardown runs first), so this only needs to check the latch,
    *  not the live drag state again. */
   private flushDeferredRender(): void {
-    if (!this.renderDeferredForDrag) return;
-    this.renderDeferredForDrag = false;
-    this.nativeBagCellDropAwaitingDragEnd = false;
-    this.render();
+    this.dragRenderGate.flush(() => {
+      this.nativeBagCellDropAwaitingDragEnd = false;
+      this.render();
+    });
   }
 
   // The classic bag bar: the implicit backpack, the 4 equip sockets, and the
@@ -1091,7 +1108,7 @@ export class BagsWindow {
       row.setAttribute(
         'aria-label',
         t(itemAriaKey, {
-          item: itemName,
+          item: parts.ariaName,
           count: formatNumber(s.count, { maximumFractionDigits: 0 }),
         }),
       );
@@ -1106,7 +1123,7 @@ export class BagsWindow {
       // .bi-quest-seal-ready (static; optional pulse is CSS-only).
       const cornerSeal = cornerMarkHtml(cornerMark, { questReady });
       const lockSeal = lockMarkHtml(locked);
-      row.innerHTML = `${this.deps.itemIcon(item, parts.quality)}${cornerSeal}${lockSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      row.innerHTML = `${this.deps.itemIcon(item, parts.quality)}${parts.qualityBadge}${cornerSeal}${lockSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
       // A firebottle mid-throw-cooldown paints a draining curtain on its slot so the
       // 5s throw pacing is visible in the bag. The bag is a cold window with no
       // per-frame driver, so the sweep is a self-contained CSS animation seeded from
@@ -1166,7 +1183,8 @@ export class BagsWindow {
         // is unavailable (itemMenuAvailable excludes it, same as every other
         // special mode), so a sellable item falls into the vendor row set
         // instead: touch has no shift-click either, so this is its only way
-        // to reach Sell all.
+        // to reach Sell all. The touch menu also ends in Destroy (the drag out
+        // to the world has almost no world to land on under the bags sheet).
         if (this.deps.isTouchHud()) {
           if (this.itemMenuAvailable(item, s.itemId, s.instance, materialSourcesForDisplay(s))) {
             this.openItemMenuFor(item, s, ev);
@@ -1254,8 +1272,9 @@ export class BagsWindow {
         }
         ev.preventDefault();
         // The action menu opens, whose FIRST row is the classic left-click
-        // action so that binding survives (right-click never destroys;
-        // destroying is the drag-out-to-world gesture). Every item now offers
+        // action so that binding survives (right-click never destroys; on the
+        // desktop HUD destroying is the drag-out-to-world gesture, while the
+        // touch HUD's menu adds a Destroy row). Every item now offers
         // at least Lock/Unlock (issue 3042), so this always opens the menu;
         // left-click is unchanged (still runs the classic action instantly).
         if (this.itemMenuAvailable(item, s.itemId, s.instance, materialSourcesForDisplay(s))) {
@@ -1644,7 +1663,7 @@ export class BagsWindow {
       const from = drag.index;
       this.deps.dragState.end();
       this.nativeBagCellDropAwaitingDragEnd = true;
-      this.renderDeferredForDrag = true;
+      this.dragRenderGate.arm();
       this.dropOnBagCell(from, cell);
     });
   }
@@ -1745,9 +1764,18 @@ export class BagsWindow {
       case 'transferBlockedSoulbound':
         this.deps.showError(t('hudChrome.itemSoulbound'));
         return;
-      case 'trade':
+      case 'trade': {
+        // A click on a splittable stack opens the offer-quantity prompt (the
+        // bank withdraw prompt's trade twin) instead of staging one unit per
+        // click; a single unit or an instanced copy stages directly.
+        const headroom = this.deps.tradeOfferHeadroom(s.itemId);
+        if (tradeOfferOpensPrompt(s, headroom)) {
+          this.showTradeQuantityPrompt(s.itemId, headroom);
+          break;
+        }
         this.deps.addItemToTrade(s.itemId);
         break;
+      }
       case 'mailAttachBlocked':
         this.deps.showError(t('hudChrome.mailbox.cannotMail'));
         return;
@@ -1969,6 +1997,14 @@ export class BagsWindow {
       const link = bagShiftLinks(mode)
         ? `<div class="tt-sub">${esc(t('hudChrome.itemShare.linkHint'))}</div>`
         : '';
+      // Say that the click will ask for a quantity, on the trade-offer hint
+      // arm only (a blocked soulbound copy never shows it) and only when the
+      // prompt would actually open (a splittable stack with room left).
+      const tradePartial =
+        key === 'itemUi.tooltip.clickTradeOffer' &&
+        tradeOfferOpensPrompt(s, this.deps.tradeOfferHeadroom(s.itemId))
+          ? `<div class="tt-sub">${esc(t('hudChrome.trade.offerQuantityHint'))}</div>`
+          : '';
       // The stack's own per-unit provenance travels with it: the card lists
       // each contributor and how many of their units are in THIS stack. Through
       // the shared projection, so a LEGACY signed material stack reads as
@@ -1979,7 +2015,8 @@ export class BagsWindow {
         partial +
         equipDrag +
         destroy +
-        link
+        link +
+        tradePartial
       );
     });
   }
@@ -2023,8 +2060,11 @@ export class BagsWindow {
     // Same hazard as render() (see its comment): an innerHTML wipe here would tear a
     // mid-drag row out of the document just as easily. Defer to the same latch; the
     // eventual flush runs a full render(), a strict superset of a grid-only refresh.
-    if (this.deps.dragState.get() || this.nativeBagCellDropAwaitingDragEnd) {
-      this.renderDeferredForDrag = true;
+    if (
+      this.dragRenderGate.shouldDefer(
+        !!this.deps.dragState.get() || this.nativeBagCellDropAwaitingDragEnd,
+      )
+    ) {
       return;
     }
     // Grid rebuild tears down hovered cells without mouseleave.
@@ -2138,6 +2178,30 @@ export class BagsWindow {
     const x = ev.clientX || rect?.left || 0;
     const y = ev.clientY || rect?.top || 0;
     const index = bagStackIndex(this.deps.world().inventory, s);
+    // Touch has no world to drop a stack on while the bags sheet covers the
+    // screen, so the menu carries the destroy prompt the drag opens on desktop,
+    // behind the same gate. The menu can stay open across a bag change, so the
+    // tapped copy is re-resolved (and its live count read) when the row runs,
+    // refusing like the Lock row when it is gone; focus goes back to the cell
+    // first so the prompt's Cancel returns there, not to the hidden menu row.
+    const opener = ev.currentTarget as HTMLElement | null;
+    const runDestroy =
+      vendorSellCount === undefined &&
+      this.deps.isTouchHud() &&
+      this.destroyAction(s.itemId) === 'discard'
+        ? () => {
+            const at = bagStackIndex(this.deps.world().inventory, s);
+            if (at < 0) {
+              this.deps.showError(tSim('error.noItem'));
+              return;
+            }
+            opener?.focus({ preventScroll: true });
+            this.promptDestroy(s.itemId, Math.max(1, Math.floor(s.count)), {
+              index: at,
+              copyPin: itemCopyPin(s),
+            });
+          }
+        : undefined;
     this.deps.openItemActionMenu(
       item,
       s.itemId,
@@ -2159,6 +2223,7 @@ export class BagsWindow {
         ? undefined
         : () => this.sellAllBagItem(item, s, vendorSellCount),
       materialSourcesForDisplay(s),
+      runDestroy,
     );
   }
 
@@ -2607,6 +2672,69 @@ export class BagsWindow {
           // Land focus on the always-present close button rather than letting
           // it drop to <body> (the opener slot is gone on both arms).
           (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+        },
+      },
+    );
+  }
+
+  // The offer-quantity prompt (click a splittable stack while a trade is
+  // open): the bank withdraw prompt's trade twin, with the vault's whole-stack
+  // step pair around the unit pair. The shared builder (bank_quantity_prompt.ts)
+  // owns the chrome; this owns the trade closures:
+  // the ceiling is the LIVE headroom the HUD reports (held total minus what the
+  // offer already carries), the submit re-resolves that headroom so a prompt
+  // left open across a closed trade or a spent stack refuses instead of staging
+  // a phantom, and the send is the same addItemToTrade a plain click uses.
+  private showTradeQuantityPrompt(itemId: string, maxCount: number): void {
+    // knownItemDef, not a raw ITEMS index: the release's stale-client sweep
+    // made every bags item read tolerate an id this client does not know.
+    const item = knownItemDef(ITEMS, itemId);
+    const itemName = item ? itemDisplayName(item) : itemId;
+    // The clicked row SURVIVES a stage (nothing rebuilds the grid), so focus
+    // can go back to it after a submit; the always-present close button is
+    // the fallback for a row that left the bags under the prompt. (The dialog
+    // recipe captures its own opener for the Cancel / Escape return.)
+    const clickedRow = document.activeElement as HTMLElement | null;
+    // One big press moves a whole bag stack (the item's stack size), the
+    // vault withdraw prompt's rule, so 45 held is two presses and a nudge.
+    const stepSize = stackSizeOf(item);
+    const stepCount = formatNumber(stepSize, { maximumFractionDigits: 0 });
+    const unitCount = formatNumber(1, { maximumFractionDigits: 0 });
+    showQuantityPrompt(
+      {
+        installPromptDialog: (prompt, opener, close) =>
+          this.installPromptDialog(prompt, opener, close),
+        dismissSiblings: dismissBagPrompts,
+      },
+      {
+        className: 'trade-offer-prompt',
+        step: {
+          size: stepSize,
+          downAriaText: t('hudChrome.bank.quantityStepDownAria', { count: stepCount }),
+          upAriaText: t('hudChrome.bank.quantityStepUpAria', { count: stepCount }),
+          unitDownAriaText: t('hudChrome.bank.quantityStepDownAria', { count: unitCount }),
+          unitUpAriaText: t('hudChrome.bank.quantityStepUpAria', { count: unitCount }),
+        },
+        titleText: t('hudChrome.trade.offerQuantityTitle', { item: itemName }),
+        inputAriaText: t('hudChrome.trade.offerQuantityInput'),
+        confirmText: t('hudChrome.trade.offerQuantityConfirm'),
+        // One press stages every unit the offer can take (the prompt's own
+        // ceiling, clamped again to the live headroom at submit).
+        confirmAllText: t('hudChrome.trade.offerQuantityAll'),
+        cancelText: t('itemUi.vendor.sellQuantityCancel'),
+        maxCount,
+        resolveCount: (requested) =>
+          resolveTradeOfferSubmit(this.deps.tradeOfferHeadroom(itemId), requested),
+        send: (count) => {
+          this.deps.addItemToTrade(itemId, count);
+          this.deps.hideTooltip();
+        },
+        afterClose: () => {
+          const landing =
+            clickedRow?.isConnected && this.deps.root().contains(clickedRow)
+              ? clickedRow
+              : (this.deps.root().querySelector('[data-close]') as HTMLElement | null);
+          landing?.focus();
         },
       },
     );

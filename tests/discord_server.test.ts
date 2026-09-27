@@ -1765,7 +1765,7 @@ describe('link and unlink change-feed enqueues', () => {
     ]);
   });
 
-  it('reports an OAuth-callback repoint the same way as the chooser', async () => {
+  it('blocks an OAuth-callback relink to a different Discord id', async () => {
     stateRows = [
       { state: 's', code_verifier: 'v', mode: 'link', account_id: 1, redirect_to: null },
     ];
@@ -1779,10 +1779,11 @@ describe('link and unlink change-feed enqueues', () => {
       res,
     );
 
-    expect(res.body).toContain('"ok":true');
-    expect(drainLinkChanges()).toEqual([
-      { accountId: 1, discordId: OLD_DISCORD_ID, kinds: ['unlink', 'link', 'points'] },
-    ]);
+    expect(res.body).toContain('already_linked');
+    expect(
+      dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO discord_links')),
+    ).toBe(false);
+    expect(drainLinkChanges()).toEqual([]);
   });
 
   it('does NOT report an unlink when the OAuth callback re-links the SAME id', async () => {

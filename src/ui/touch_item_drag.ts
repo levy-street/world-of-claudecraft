@@ -145,6 +145,26 @@ export function bindTouchItemDrag(el: HTMLElement, deps: TouchItemDragDeps): voi
     };
   });
 
+  // Touch scrolling cannot be stopped from pointermove (the window_resize.ts
+  // lesson): #ui is touch-action pan-x pan-y on the touch HUD so its windows
+  // scroll, and the body.touch-item-dragging override lands after the browser
+  // has latched touch-action at touchstart. So the first move of an armed drag
+  // was claimed as a pan and answered with pointercancel, which tears the drag
+  // down without a drop (the "cannot drag an item out of the bag on mobile"
+  // report). A non-passive touchmove on the row itself, bound up front so the
+  // browser knows it can block before the touch starts, cancels the scroll for
+  // an ARMED drag only; an unarmed flick still scrolls the grid. Touch HUD only
+  // (rows rebuild on every render), so the desktop grid keeps passive scrolling.
+  if (deps.isTouchHud()) {
+    el.addEventListener(
+      'touchmove',
+      (e) => {
+        if (drag?.armed && e.cancelable) e.preventDefault();
+      },
+      { passive: false },
+    );
+  }
+
   el.addEventListener('pointermove', (e) => {
     if (!drag || drag.pointerId !== e.pointerId) return;
     if (!drag.armed) {

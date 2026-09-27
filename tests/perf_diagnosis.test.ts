@@ -17,6 +17,7 @@ function baseSnapshot(): PerfSnapshot {
     visibleSeconds: 20,
     frames: 1200,
     hiddenPresentSkips: 0,
+    cadence: null,
     fps: 60,
     frameMs: { avg: 16, p50: 16, p95: 16, p99: 18, max: 22, long50: 0 },
     windows: {
@@ -135,7 +136,14 @@ function baseSnapshot(): PerfSnapshot {
       renderDiagnostics: {} as never,
       nightAmount: 0,
       prewarm: null,
-      castVfx: { ready: true, refused: 0, pending: 0, forced: false },
+      castVfx: {
+        ready: true,
+        refused: 0,
+        pending: 0,
+        forced: false,
+        requirementMiss: 0,
+        families: [],
+      },
       entryDetailHorizon: {
         active: false,
         cap: 700,

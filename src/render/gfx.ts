@@ -144,6 +144,7 @@ export interface GfxRuntimeHints {
   characterDetail?: number;
   dynamicLights?: number;
   particleEffects?: number;
+  ghostFade?: number;
 }
 
 export interface GfxCapabilities {
@@ -200,6 +201,14 @@ export interface GfxSettings {
   // the full layers start at Ultra), and the Advanced preset's sub-settings
   // remap the same knobs level by level (see the PRESET_ADVANCED branch).
   // -------------------------------------------------------------------------
+  /**
+   * Camera-ghost style. True: a structure between the camera and the player
+   * stays OPAQUE and drops pixels on an ordered pattern (occluder_dither_fade.ts),
+   * so it owns one shader program. False: it blends translucent, which three
+   * keys as a second program per material, each one a cold link on Windows.
+   * Either way the player sees through the same share of the wall.
+   */
+  readonly ditheredGhostFade: boolean;
   /** worn_stone.ts triplanar surface-detail family layer (fetches + application) */
   readonly surfaceDetail: boolean;
   /** worn-layer parallax refinement taps per fragment (0 = no parallax walk) */
@@ -1233,8 +1242,10 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     standardMaterials: !iosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
     // Round-10 detail-knob defaults (see the interface comment): High takes the
     // existing Advanced-Medium profile to bound its steady cost (basic worn
-    // surface, reduced carpet, cavity-only relief). Ultra retains the full
-    // 3-tap layers; Insane remains the 4-tap everything-on showcase.
+    // surface, reduced carpet, cavity-only relief). Ultra and Insane request
+    // the parallax walk (worn_stone.ts compiles the same two-read walk for
+    // both; the request sets the clamp share and feeds the live shed).
+    ditheredGhostFade: !gfxTierAtLeast(tier, 'high'),
     surfaceDetail: !iosMemoryProfile && gfxTierAtLeast(tier, 'high'),
     surfaceDetailTaps: tier === 'insane' ? 4 : gfxTierAtLeast(tier, 'ultra') ? 3 : 0,
     surfaceDetailClampK: tier === 'insane' ? 1 : tier === 'ultra' ? 0.85 : 0,
@@ -1437,8 +1448,8 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
       };
     // Surface Detail (the town-cost dial): Off sheds the whole worn layer;
     // Basic keeps the detail normals + AO grime without the parallax walk;
-    // Full runs the ultra execution (3 taps, 0.85 clamp); Insane the
-    // everything-on 4-tap full-clamp walk.
+    // Full runs the ultra execution (the two-read walk at the 0.85 clamp);
+    // Insane the same walk at the full clamp.
     const surfaceLevel = levelOf(hints.surfaceDetail ?? 1);
     if (surfaceLevel === 0)
       settings = {
@@ -1564,6 +1575,9 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     // mesh; On keeps the base profile's animated far band (never raised above
     // the profile ceiling, so constrained devices stay collapsed either way).
     if ((hints.characterDetail ?? 1) < 0.5) settings = { ...settings, farCharacterAnimScale: 1 };
+    // Camera Ghost: the dial picks the style outright, in both directions.
+    if (hints.ghostFade !== undefined)
+      settings = { ...settings, ditheredGhostFade: hints.ghostFade < 0.5 };
     // Dynamic Lights: Low keeps the constrained-device point-light pool
     // (fewer live torches and night lights), never raised above the base.
     if ((hints.dynamicLights ?? 1) < 0.5)
@@ -1737,6 +1751,7 @@ function runtimeHints(): GfxRuntimeHints {
     characterDetail: storedNumericSetting('characterDetail'),
     dynamicLights: storedNumericSetting('dynamicLights'),
     particleEffects: storedNumericSetting('particleEffects'),
+    ghostFade: storedNumericSetting('ghostFade'),
   };
 }
 

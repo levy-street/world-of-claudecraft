@@ -3,6 +3,7 @@
 
 import * as THREE from 'three';
 import { VARKHUL_FRONTAL_HALF_ANGLE, VARKHUL_FRONTAL_RANGE } from '../sim/varkhul_frontal';
+import { applyFloorVfxLayer } from './floor_vfx_layer';
 
 export const VARKHUL_FRONTAL_VISUAL_NAME = 'varkhulForgefatherSweepTelegraph';
 
@@ -91,6 +92,11 @@ export function buildVarkhulFrontalVisual(): THREE.Group {
     wall.add(flame);
   }
   root.add(wall);
+  // Every piece of the sweep (fill, rim, edges, heat bands, flame wall) is
+  // additive and shipped with no renderOrder, so the whole telegraph rides the
+  // encounter band floor: the rung the legacy-minus-one rule gives a piece that
+  // had no order, and the order among the pieces is colour-invariant.
+  applyFloorVfxLayer(root, 'encounter', 0);
   root.visible = false;
   return root;
 }

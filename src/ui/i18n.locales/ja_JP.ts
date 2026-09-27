@@ -13,6 +13,711 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'abilityUi.tooltip.edictDamage':
+    '武器ダメージの{weaponPercent}%に{damage}の物理ダメージを加えて打ちます。武器ダメージには攻撃力が含まれます。',
+  'abilityUi.tooltip.edictExplosion':
+    '昇天が発動中、爆発は半径{radius}メートル以内に{damage}の物理ダメージを与え、対象が{cap}体を超えるとダメージが減少します。このダメージは攻撃力に応じて増加します。',
+  'abilityUi.tooltip.verdictDamage':
+    '最後の勅令は{verdictSingleDamage}の神聖ダメージで爆発します。暁落としは半径{verdictAreaRadius}メートル以内に{verdictAreaDamage}の神聖ダメージで爆発し、対象が{verdictAreaCap}体を超えるとダメージが減少します。どちらの爆発もスペルパワーでは上昇しません。あなたの印を受けられる敵は同時に1体のみです。',
+  'hud.core.deathRecap': 'リキャップ',
+  'hud.core.deathRecapClose': '閉じる',
+  'hud.core.deathRecapCrit': 'クリティカル',
+  'hud.core.deathRecapDamage': 'ダメージ',
+  'hud.core.deathRecapHeal': '回復',
+  'hud.core.deathRecapKiller': '致命の一撃：{killer}（{ability}）',
+  'hud.core.deathRecapLethal': '致命の一撃',
+  'hud.core.deathRecapNoEvents': '記録された戦闘イベントはありません。',
+  'hud.core.deathRecapNoKiller': '死亡に至るまでの戦闘イベント',
+  'hud.core.deathRecapTitle': 'デスリキャップ',
+  'hud.meters.activity': '活動率：{pct}',
+  'hud.meters.avoidableDmg': '回避可能ダメージ',
+  'hud.meters.avoidableDmgShort': '回避',
+  'hud.meters.back': '戻る',
+  'hud.meters.criticals': 'クリティカル：{count}',
+  'hud.meters.damageTaken': '被ダメージ',
+  'hud.meters.damageTakenShort': '被弾',
+  'hud.meters.deaths': '死亡数',
+  'hud.meters.deathsShort': '死亡',
+  'hud.meters.dispels': '解呪',
+  'hud.meters.dispelsShort': '解呪',
+  'hud.meters.groupTotal': '合計：{total}（{rate}）',
+  'hud.meters.hits': 'ヒット数：{count}',
+  'hud.meters.interrupts': '妨害',
+  'hud.meters.interruptsShort': '妨害',
+  'hud.meters.newWindow': '新しいウィンドウ',
+  'hud.meters.reset': 'メーターをリセット',
+  'hud.meters.resetAll': 'すべてのデータをリセット',
+  'hud.meters.resetFight': '現在の戦闘をリセット',
+  'hud.meters.resetHint': '戦闘データをリセット',
+  'hud.meters.selectMode': 'メーターモードを選択',
+  'hud.meters.selectSegment': '戦闘区間を選択',
+  'hud.meters.topAbility': 'トップ：{name}',
+  'hud.options.colorblindMode': '色覚サポートモード',
+  'hudChrome.auraEffect.benisonPrayers':
+    '次の聖歌の癒しの回復量が{pct}%増加し、スタックをすべて消費します。',
+  'hudChrome.auraEffect.benisonWhisper':
+    '次の囁きの祈りが即座に発動し、回復量が{pct}%増加します。この効果が切れる前に使用してください。',
+  'hudChrome.bank.vaultSearchAria': '名前で金庫の素材を検索',
+  'hudChrome.bank.vaultSearchNoMatch': '検索条件に一致する素材が金庫にありません。',
+  'hudChrome.cooldownManager.addGrid': 'ボタングループを追加',
+  'hudChrome.cooldownManager.addLine': 'スペルの列を追加',
+  'hudChrome.cooldownManager.addSingle': '単一ボタンを追加',
+  'hudChrome.cooldownManager.alertStacks': 'スタック数で通知',
+  'hudChrome.cooldownManager.alertStacksAny': '獲得時',
+  'hudChrome.cooldownManager.alertStacksHint':
+    'オーラがこのスタック数に達すると、ボタンが光り、脈動し、音が鳴ります。「獲得時」は出現した瞬間を意味します。',
+  'hudChrome.cooldownManager.auraFallback': 'オーラ',
+  'hudChrome.cooldownManager.auraSoundHint':
+    'オーラが発生したとき、または目標のスタック数に達したときに再生されます。',
+  'hudChrome.cooldownManager.aurasHint':
+    'エンジンリソースとそのスタック数、発動効果、そしてあなたのスペルが付与するバフです。それ以外であなたに付与されたものもここに表示されます。',
+  'hudChrome.cooldownManager.aurasTitle': '発動効果・エンジン・バフ',
+  'hudChrome.cooldownManager.columns': '列数',
+  'hudChrome.cooldownManager.combatOnly': '戦闘中のみ音を鳴らす',
+  'hudChrome.cooldownManager.deleteGroup': 'グループを削除',
+  'hudChrome.cooldownManager.deleteGroupAria': '{group}を削除',
+  'hudChrome.cooldownManager.dirDown': '下',
+  'hudChrome.cooldownManager.dirLeft': '左',
+  'hudChrome.cooldownManager.dirRight': '右',
+  'hudChrome.cooldownManager.dirUp': '上',
+  'hudChrome.cooldownManager.direction': 'アイコンの向き',
+  'hudChrome.cooldownManager.dragHint':
+    'このメニューが開いている間、すべてのグループが画面に表示され、ドラッグして移動できます。',
+  'hudChrome.cooldownManager.emptySection': 'ここにスペルをドロップしてください。',
+  'hudChrome.cooldownManager.enabled': 'クールダウンマネージャーを表示',
+  'hudChrome.cooldownManager.generalTitle': '全般',
+  'hudChrome.cooldownManager.glowWhenReady': '準備完了時に発光',
+  'hudChrome.cooldownManager.glowWhenReadyHint':
+    'スペルを詠唱できる間、ボタンを明るくして輪郭を強調します。',
+  'hudChrome.cooldownManager.group': 'グループ',
+  'hudChrome.cooldownManager.groupFullOption': '{group}（満杯）',
+  'hudChrome.cooldownManager.groupGrid': 'ボタングループ{index}',
+  'hudChrome.cooldownManager.groupLine': 'スペルの列{index}',
+  'hudChrome.cooldownManager.groupName': 'グループ名',
+  'hudChrome.cooldownManager.groupSingle': '単一ボタン{index}',
+  'hudChrome.cooldownManager.groupsFull':
+    '許可された最大数のグループに達しています。追加するには1つ削除してください。',
+  'hudChrome.cooldownManager.horizontal': '横',
+  'hudChrome.cooldownManager.hotbarGlow': 'ホットバーの発光',
+  'hudChrome.cooldownManager.hotbarGlowHint':
+    '準備完了中は、アクションバー上のこのスペルも光らせます。',
+  'hudChrome.cooldownManager.iconPadding': 'アイコンの余白',
+  'hudChrome.cooldownManager.iconSize': 'アイコンサイズ',
+  'hudChrome.cooldownManager.idleOpacity': '未準備時の不透明度',
+  'hudChrome.cooldownManager.intro':
+    '選んだスペルのためのフローティングボタンです。クリックはできません。それぞれがクールダウンを表示し、詠唱できない間は暗くなり、準備が整うと光ります。',
+  'hudChrome.cooldownManager.moveEarlier': '{spell}を前へ移動',
+  'hudChrome.cooldownManager.moveLater': '{spell}を後ろへ移動',
+  'hudChrome.cooldownManager.noGroups':
+    '単一ボタン、ボタングループ、またはスペルの列を追加して始めましょう。',
+  'hudChrome.cooldownManager.notDisplayed': '非表示',
+  'hudChrome.cooldownManager.notInGroupHint':
+    'このスペルをグループに入れるとボタンが表示されます。',
+  'hudChrome.cooldownManager.notKnown': '{spell}（未習得）',
+  'hudChrome.cooldownManager.onlyWhenReady': '準備完了時のみ表示',
+  'hudChrome.cooldownManager.onlyWhileActive': '有効時のみ表示',
+  'hudChrome.cooldownManager.opacity': '不透明度',
+  'hudChrome.cooldownManager.orientation': '向き',
+  'hudChrome.cooldownManager.otherSpells': 'その他のスペル',
+  'hudChrome.cooldownManager.otherSpellsHint':
+    '他のスペシャライゼーション、タレント選択、より高いレベルのスペルです。今のうちに配置しておくと、習得した時点でボタンが表示されます。',
+  'hudChrome.cooldownManager.positionX': '横方向の位置',
+  'hudChrome.cooldownManager.positionY': '縦方向の位置',
+  'hudChrome.cooldownManager.resetPosition': '初期位置にリセット',
+  'hudChrome.cooldownManager.rows': '行数',
+  'hudChrome.cooldownManager.search': 'スペルを検索',
+  'hudChrome.cooldownManager.searchPlaceholder': '検索',
+  'hudChrome.cooldownManager.selectSpell': '{spell}を選択',
+  'hudChrome.cooldownManager.showTimer': 'タイマーを表示',
+  'hudChrome.cooldownManager.sound': '準備完了音',
+  'hudChrome.cooldownManager.soundHint':
+    'スペルが準備完了になったとき、または準備完了のままボタンが別のスペルに変わったときに再生されます。',
+  'hudChrome.cooldownManager.spellCount': '{count} / {max} スペル',
+  'hudChrome.cooldownManager.spellsEmpty': 'まだ習得しているスペルがありません。',
+  'hudChrome.cooldownManager.title': 'クールダウンマネージャー',
+  'hudChrome.cooldownManager.trackedHint':
+    'スペルをグループへドラッグするか、選択してグループと通知を設定します。ボタンはスペルが別のものに変わるとそれに追従し、変わった際には光ります。',
+  'hudChrome.cooldownManager.trackedTitle': '追跡中のスペル',
+  'hudChrome.cooldownManager.vertical': '縦',
+  'hudChrome.cooldownManager.visAlways': '常に表示',
+  'hudChrome.cooldownManager.visCombat': '戦闘中',
+  'hudChrome.cooldownManager.visHidden': '非表示',
+  'hudChrome.cooldownManager.visHiddenHint':
+    '非表示のグループでも、音は再生され、アクションバーは光ります。',
+  'hudChrome.cooldownManager.visibility': '表示設定',
+  'hudChrome.crafting.mobileStationTitle': '{name}の{station}',
+  'hudChrome.hill.contestNone': '{total}の間、内部で過半数を維持すると占拠できます',
+  'hudChrome.hill.contestOther': '丘を失いつつあります：{seconds} / {total}',
+  'hudChrome.hill.contestYou': '丘を占拠中：{seconds} / {total}',
+  'hudChrome.hill.counts': '内部：自分 {yours}、保持者 {theirs}',
+  'hudChrome.hill.countsHolding': '内部：自分 {yours}、対抗勢力 {theirs}',
+  'hudChrome.hill.countsUnheld': '内部：自分 {yours}、最大の対抗勢力 {theirs}',
+  'hudChrome.hill.distance': '円まで{yards}ヤード',
+  'hudChrome.hill.falls': '{minutes}後に消滅',
+  'hudChrome.hill.heldNone': '誰も丘を保持していません',
+  'hudChrome.hill.heldOther': '別のグループが丘を保持しています',
+  'hudChrome.hill.heldYou': 'あなたのグループが丘を保持しています',
+  'hudChrome.hill.inside': 'あなたは円の内側にいます',
+  'hudChrome.hill.rises': '{minutes}後に出現',
+  'hudChrome.hill.rising': '丘はまだ出現していません',
+  'hudChrome.hill.standingRaid':
+    'レイドメンバーはカウントされません：丘を保持できるのはパーティのみです',
+  'hudChrome.hill.title': '丘の王',
+  'hudChrome.leaderboard.wqMedals.gold': '金',
+  'hudChrome.leaderboard.wqNoMedal': 'なし',
+  'hudChrome.leaderboard.wqSeconds': '{seconds}秒',
+  'hudChrome.leaderboard.wqTime': 'タイム',
+  'hudChrome.lootQuality.itemName': '{item}、{quality}',
+  'hudChrome.mapAtlas.collapseHint': 'マップサイドバーを折りたたむ',
+  'hudChrome.mapAtlas.expandHint': 'マップサイドバーを展開',
+  'hudChrome.mapAtlas.worldQuests.count': '{done} / {total}',
+  'hudChrome.meters.activeProfile': 'アクティブなプロファイル',
+  'hudChrome.meters.activeProfileDesc':
+    'プレイ状況ごとに独立したプロファイルを選択または管理します。',
+  'hudChrome.meters.alwaysShowMe': '自分を常に表示',
+  'hudChrome.meters.alwaysShowMeDesc':
+    '表示範囲外の順位の場合、自分のバーを最下部に固定表示します。',
+  'hudChrome.meters.applyPreset': 'テーマを適用',
+  'hudChrome.meters.autoRows': ' （自動）',
+  'hudChrome.meters.backComparison': '比較',
+  'hudChrome.meters.backDev': 'バランス／開発',
+  'hudChrome.meters.backTimeline': 'タイムライン',
+  'hudChrome.meters.balanceAbilitiesCount': '記録されたアビリティ：{count}',
+  'hudChrome.meters.barAnimation': 'バーのアニメーションを滑らかに',
+  'hudChrome.meters.barAnimationDesc': 'バーの伸縮をリアルタイムで滑らかに補間します。',
+  'hudChrome.meters.barHeight': 'バーの高さ',
+  'hudChrome.meters.barHeightDesc':
+    '各戦闘行の縦の太さです（コンパクトな14pxからゆったりした26pxまで）。',
+  'hudChrome.meters.barSpacing': 'バーの間隔',
+  'hudChrome.meters.barSpacingDesc': '隣接する行の縦方向のピクセル間隔です。',
+  'hudChrome.meters.barTexture': 'バーのテクスチャ',
+  'hudChrome.meters.barTextureDesc': 'クラスカラーに重ねる質感と陰影です。',
+  'hudChrome.meters.barsUnit': ' バー',
+  'hudChrome.meters.bgGlass': '背景：ガラス（76%）',
+  'hudChrome.meters.bgMinimal': '背景：ミニマル（45%）',
+  'hudChrome.meters.bgMode': '背景モード',
+  'hudChrome.meters.bgModeDesc': 'メーターパネルの見た目のスタイルです。',
+  'hudChrome.meters.bgOpacity': '背景の不透明度',
+  'hudChrome.meters.bgOpacityDesc': 'ウィンドウ背景の不透明度（%）です。',
+  'hudChrome.meters.bgSolid': '背景：ソリッド（98%）',
+  'hudChrome.meters.cannotDeleteDefault': 'デフォルトプロファイルは削除できません',
+  'hudChrome.meters.closeSettings': '閉じる',
+  'hudChrome.meters.comparisonNeedTwo': '比較するには少なくとも2つの戦闘が必要です',
+  'hudChrome.meters.copiedFeedback': 'クリップボードにコピーしました！',
+  'hudChrome.meters.copyString': 'プロファイル文字列をコピー',
+  'hudChrome.meters.deleteProfile': '削除',
+  'hudChrome.meters.densityCompact': '密度：コンパクト（16px）',
+  'hudChrome.meters.densityStandard': '密度：標準（20px）',
+  'hudChrome.meters.duplicate': '複製',
+  'hudChrome.meters.errEmptyProfile': 'プロファイル文字列を貼り付けてください。',
+  'hudChrome.meters.errInvalidProfile': 'エラー：プロファイル文字列が無効か破損しています。',
+  'hudChrome.meters.exportDesc':
+    '現在の設定をエンコードしたプロファイル文字列です。共有やバックアップにコピーしてください。',
+  'hudChrome.meters.groupBars': 'バーの形状とテクスチャ',
+  'hudChrome.meters.groupCombat': '戦闘ルールと制限',
+  'hudChrome.meters.groupExport': '現在のプロファイルをエクスポート',
+  'hudChrome.meters.groupFont': '戦闘表示のフォント（フォントファミリー）',
+  'hudChrome.meters.groupHeader': 'ヘッダーのカスタマイズ',
+  'hudChrome.meters.groupImport': 'プロファイルをインポート',
+  'hudChrome.meters.groupManageProfiles': 'プロファイル管理',
+  'hudChrome.meters.groupPresets': 'ワンクリックのクイックテーマ',
+  'hudChrome.meters.groupText': 'テキスト書式とテレメトリ',
+  'hudChrome.meters.groupWindow': 'ウィンドウの外観と背景',
+  'hudChrome.meters.importApply': 'インポートして適用',
+  'hudChrome.meters.importDesc':
+    'プロファイル文字列（!WoC-Details:... またはJSON）を貼り付けると適用して保存します。',
+  'hudChrome.meters.importNamePlaceholder': 'プロファイル名（任意）',
+  'hudChrome.meters.importPlaceholder': 'ここにプロファイル文字列を貼り付け（!WoC-Details:...）',
+  'hudChrome.meters.importSuccess': 'プロファイル「{name}」をインポートしました！',
+  'hudChrome.meters.includeShields': '吸収を回復としてカウント',
+  'hudChrome.meters.includeShieldsDesc':
+    '吸収シールドのダメージ（守りの聖歌など）を回復メーターに加算します。',
+  'hudChrome.meters.killedBy': '{killer}（{ability}）に倒された',
+  'hudChrome.meters.lethalHit': '致死の一撃',
+  'hudChrome.meters.lockPosition': '位置を固定',
+  'hudChrome.meters.lockPositionDesc':
+    '戦闘中に誤ってドラッグやサイズ変更をしないよう、ウィンドウを固定します。',
+  'hudChrome.meters.maxRows': '表示行数の上限',
+  'hudChrome.meters.maxRowsDesc':
+    '同時に表示するバーの数です（0＝無制限、ウィンドウの高さに自動調整）。',
+  'hudChrome.meters.noDeathEvents': '死亡前に記録されたイベントはありません',
+  'hudChrome.meters.noDetailedData': '詳細データがありません',
+  'hudChrome.meters.noTargetData': 'この対象のプレイヤーデータがありません',
+  'hudChrome.meters.numCompact': '数値：省略表記（k/M）',
+  'hudChrome.meters.numDetailed': '数値：詳細表記',
+  'hudChrome.meters.numFormat': '数値の表示形式',
+  'hudChrome.meters.numFormatDesc': '合計値の表示スタイルです。',
+  'hudChrome.meters.optGlass': 'ガラス（ぼかし）',
+  'hudChrome.meters.optGlassDesc': 'すりガラス風のぼかし効果',
+  'hudChrome.meters.optMinimal': 'ミニマル',
+  'hudChrome.meters.optMinimalDesc': 'かすかな半透明',
+  'hudChrome.meters.optNumCompact': '省略表記（k / M）',
+  'hudChrome.meters.optNumCompactDesc': '例：145.2k、1.2M',
+  'hudChrome.meters.optNumDamageDps': 'ダメージ｜DPS',
+  'hudChrome.meters.optNumDamageDpsDesc': '例：239.2k｜18.4k（すっきりしたテレメトリバー）',
+  'hudChrome.meters.optNumDetailed': '完全詳細表記',
+  'hudChrome.meters.optNumDetailedDesc': '例：145,200、1,240,500',
+  'hudChrome.meters.optSolid': 'ソリッド',
+  'hudChrome.meters.optSolidDesc': '暗く高コントラストなパネル',
+  'hudChrome.meters.optTransparent': '透明',
+  'hudChrome.meters.optTransparentDesc': '背景なし、バーのみ',
+  'hudChrome.meters.optionsEngineBadge': 'WoC Details! エンジン',
+  'hudChrome.meters.presetClassicBadge': 'クラシック',
+  'hudChrome.meters.presetClassicDesc':
+    '暗く高コントラストなソリッドパネル、フラットなクラスカラーバー、クラシックレイアウトでの詳細な数値表記。',
+  'hudChrome.meters.presetClassicName': 'クラシックソリッド',
+  'hudChrome.meters.presetDetailsBadge': 'おすすめ',
+  'hudChrome.meters.presetDetailsDesc':
+    'すりガラス風のぼかし背景、光沢のあるグロッシーバー、省略数値表記、フルテレメトリ。',
+  'hudChrome.meters.presetDetailsName': 'モダングラス',
+  'hudChrome.meters.presetMinimalBadge': 'クリーン',
+  'hudChrome.meters.presetMinimalDesc':
+    'ほぼ透明な背景、隙間のないコンパクトな16pxバー、パーセントなしの直接的なテキスト表記。',
+  'hudChrome.meters.presetMinimalName': 'ピュアミニマル',
+  'hudChrome.meters.presetProGradientBadge': 'プロ',
+  'hudChrome.meters.presetProGradientDesc':
+    '浮遊する透明パネル、水平グラデーションバー、スペシャライゼーションアイコン、ダメージ｜DPSのテレメトリ。',
+  'hudChrome.meters.presetProGradientName': 'プログラデーション',
+  'hudChrome.meters.presetRaidBadge': 'レイド',
+  'hudChrome.meters.presetRaidDesc':
+    'レイド向けに設計：コンパクトな18px密度、10バー制限、グループ合計の表示、自分のバーの固定表示。',
+  'hudChrome.meters.presetRaidName': 'レイドフォーカス',
+  'hudChrome.meters.profileCopySuffix': ' （コピー）',
+  'hudChrome.meters.promptNewProfile': '新しいプロファイルの名前：',
+  'hudChrome.meters.raidTotalsOff': 'ヘッダーのグループ合計：オフ',
+  'hudChrome.meters.raidTotalsOn': 'ヘッダーのグループ合計：オン',
+  'hudChrome.meters.recentCombatEvents': '直近{count}件の戦闘イベント',
+  'hudChrome.meters.reportNoData': '記録されたデータがありません。',
+  'hudChrome.meters.reportSent': 'レポートをコピーしてチャットに送信しました',
+  'hudChrome.meters.resetDefaults': '初期設定にリセット',
+  'hudChrome.meters.saveAs': '名前を付けて保存…',
+  'hudChrome.meters.settingsTitle': 'Details／メーター設定',
+  'hudChrome.meters.showClassIcon': 'クラスアイコンを表示',
+  'hudChrome.meters.showClassIconDesc':
+    '各プレイヤーの隣にクラスまたはロールのアイコンを表示します。',
+  'hudChrome.meters.showDps': '秒間レートを表示（DPS／HPS）',
+  'hudChrome.meters.showDpsDesc': '各バーにダメージまたは回復の秒間レートを表示します。',
+  'hudChrome.meters.showPercent': 'パーセンテージを表示（%）',
+  'hudChrome.meters.showPercentDesc': 'グループ合計に対する貢献割合（%）を表示します。',
+  'hudChrome.meters.showRaidTotals': 'サブタイトルにグループ概要を表示',
+  'hudChrome.meters.showRaidTotalsDesc':
+    'ヘッダーのサブタイトルにグループ累計のDPS／HPSを表示します。',
+  'hudChrome.meters.showRank': '順位を表示（#1、#2…）',
+  'hudChrome.meters.showRankDesc': '名前の横に順位番号を表示します。',
+  'hudChrome.meters.showTitleBar': 'タイトルバーを表示',
+  'hudChrome.meters.showTitleBarDesc': '戦闘区間名と操作ボタンを含む上部バーを表示します。',
+  'hudChrome.meters.tabBars': 'バーとテクスチャ',
+  'hudChrome.meters.tabBarsDesc': '高さ、間隔、アニメーション',
+  'hudChrome.meters.tabCombat': '戦闘と制限',
+  'hudChrome.meters.tabCombatDesc': '最大行数、シールド',
+  'hudChrome.meters.tabGeneral': 'ウィンドウと背景',
+  'hudChrome.meters.tabGeneralDesc': '不透明度、スケール、固定',
+  'hudChrome.meters.tabHeader': 'ヘッダーとタイトル',
+  'hudChrome.meters.tabHeaderDesc': 'グループ合計、タイトルバー',
+  'hudChrome.meters.tabPresets': 'クイックテーマ',
+  'hudChrome.meters.tabPresetsDesc': 'ワンクリックプリセット',
+  'hudChrome.meters.tabProfiles': 'プロファイルとインポート',
+  'hudChrome.meters.tabProfilesDesc': 'エクスポート、インポート、プロファイル',
+  'hudChrome.meters.tabText': 'テキストとタイポグラフィ',
+  'hudChrome.meters.tabTextDesc': 'フォント、k/M、DPS、順位',
+  'hudChrome.meters.targetSubtitle': '対象：{target}',
+  'hudChrome.meters.targetsHeader': '対象',
+  'hudChrome.meters.texGradient': 'グラデーション',
+  'hudChrome.meters.texGradientDesc': '滑らかな水平カラーグラデーション',
+  'hudChrome.meters.texSmooth': 'スムース（フラット）',
+  'hudChrome.meters.texSmoothDesc': 'すっきりしたフラットなクラスカラー',
+  'hudChrome.meters.texSpecular': 'グロッシー（スペキュラー）',
+  'hudChrome.meters.texSpecularDesc': 'ベベル付きの上部ハイライト反射',
+  'hudChrome.meters.timelineCombatEvents': '戦闘イベント：{count}',
+  'hudChrome.meters.windowScale': 'ウィンドウのスケール',
+  'hudChrome.meters.windowScaleDesc': 'メーター全体のスケールを拡大・縮小します。',
+  'hudChrome.nameplate.pvpTag': 'PvP',
+  'hudChrome.options.frameRateCapSixty': '60',
+  'hudChrome.options.frameRateCapThirty': '30',
+  'hudChrome.options.gfxGhostFade': 'カメラゴースト',
+  'hudChrome.options.gfxGhostFadeDithered': 'ディザリング',
+  'hudChrome.options.gfxGhostFadeSmooth': 'スムーズ',
+  'hudChrome.options.overlays': 'オーバーレイ',
+  'hudChrome.options.targetAurasBelowFrame': 'ターゲットオーラをフレームの下に表示',
+  'hudChrome.reputation.hubLine': '{hub}。{zone}',
+  'hudChrome.reputation.progress': '{current} / {next}',
+  'hudChrome.reputation.questsDoneValue': '{done} / {total}',
+  'hudChrome.reputation.titleLine': '{faction}。{tier}',
+  'hudChrome.statInfo.desc.healPower':
+    'あなたの回復魔法と継続回復効果の効き目、および吸収シールドの量を高めます。これは呪文威力に、装備やセットボーナスによる治癒力を加えたもので、回復のみに作用し、ダメージには影響しません。',
+  'hudChrome.statInfo.desc.spellCrit':
+    '呪文や回復魔法がクリティカルとなり、150%のダメージまたは回復量となる確率です。呪文と回復魔法はクリティカル率の代わりにこの確率を用います。知力はこの確率のみを高め、クリティカルレーティング、タレント、セットボーナスは両方を高めます。',
+  'hudChrome.statInfo.desc.warfareWithHealth':
+    'プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。さらに、ダンジョン、レイド、デルヴ、リフトを除くあらゆる場所で最大体力が {health}% 上昇します。',
+  'hudChrome.statInfo.names.spellCrit': '呪文クリティカル',
+  'hudChrome.townFocus.pendingLine': '保存しました。この配分への再割り振りは{time}後に完了します。',
+  'hudChrome.townFocus.preferenceHint':
+    'フォーカスは採取物のグレードと量を高めます。特定の素材だけを採取したい場合は、フィールドキットまたは専門技能ウィンドウから採取設定を設定してください。',
+  'hudChrome.trinkets.scaled': '{base}（+{bonus}）',
+  'hudChrome.vehicle.wave': 'ウェーブ {wave}/{total}',
+  'hudChrome.warfare.floatReasons.hill': '丘',
+  'hudChrome.warfare.reasons.hillHold': '丘の保持',
+  'hudChrome.warfare.reasons.worldAssist': 'ワールドPvP撃破のアシスト',
+  'hudChrome.warfare.reasons.worldKill': 'ワールドPvP撃破',
+  'hudChrome.warfareShop.groupEntry': 'ウォーフェア シーズン1',
+  'hudChrome.warfareShop.groupSeason2': 'ウォーフェア シーズン2：ヴァンガード',
+  'hudChrome.worldPvp.aidLine':
+    'フラグを立てたプレイヤーを戦闘中に回復、シールド、強化すると、自分のフラグも立ちます。',
+  'hudChrome.worldPvp.blurb':
+    'フラグを立てると、オープンワールドのどこでも他のフラグを立てたプレイヤーと戦えます。倒せば所持金の一部を奪い、ウォーフェア装備につながる名誉も得られます。バトルグラウンドとアリーナはそれ以上の見返りがあります。',
+  'hudChrome.worldPvp.commandHint':
+    'チャット：/pvp でフラグを切り替え、/pvp on と /pvp off で直接設定します。',
+  'hudChrome.worldPvp.confirmAccept': 'フラグを立てる',
+  'hudChrome.worldPvp.confirmBody':
+    '他のフラグを立てたプレイヤーがどこでもあなたを攻撃できるようになり、勝てば所持金から最大{cap}を奪われます。再びフラグを下ろすこともできますが、{minutes}分かかります。',
+  'hudChrome.worldPvp.confirmCancel': 'キャンセル',
+  'hudChrome.worldPvp.disable': 'ワールドPvPを無効化',
+  'hudChrome.worldPvp.disarmLine': 'フラグを下ろすには{minutes}分かかり、戦闘の終了を待ちます。',
+  'hudChrome.worldPvp.enable': 'ワールドPvPを有効化',
+  'hudChrome.worldPvp.greyLine': '自分より{levels}レベル以上低いプレイヤーからは何も得られません。',
+  'hudChrome.worldPvp.groundContested':
+    'それ以外の場所はすべて係争地です。フラグを立てたプレイヤー同士のみが戦えます。',
+  'hudChrome.worldPvp.groundFfa':
+    'ドレイクランド、フロストヴェイルの果て、アンバーフォールは無差別戦闘地帯です。そこではフラグの有無に関わらず、誰もが戦えます。',
+  'hudChrome.worldPvp.groundSanctuary':
+    '修練の浜とイーストブルック渓谷は聖域です。ワールドPvPは一切起こりません。',
+  'hudChrome.worldPvp.groupLine':
+    'パーティとレイドの仲間同士は決して敵対しません。グループ外のギルドメンバーとは戦うことができます。',
+  'hudChrome.worldPvp.honorLine': '撃破ごとに名誉{honor}、貢献した全員で分配。',
+  'hudChrome.worldPvp.keepUp': 'フラグを維持',
+  'hudChrome.worldPvp.levelReq': 'レベル{level}が必要です。',
+  'hudChrome.worldPvp.markLine':
+    'そこでフラグを立てていないプレイヤーを攻撃すると自分のフラグが立ちますが、フラグを立てた相手を攻撃しても立ちません。',
+  'hudChrome.worldPvp.noStakeLine':
+    '無差別戦闘地帯でフラグを立てていないプレイヤーが倒されても、金貨を一切支払いません。',
+  'hudChrome.worldPvp.noTakeLine':
+    'フラグを立てていない戦闘者もゴールドは得られません。ゴールドが動くのはフラグを立てた2人のプレイヤーの間だけです。',
+  'hudChrome.worldPvp.pending': 'レルムからのPvP状態を待っています。',
+  'hudChrome.worldPvp.realmDisabled': 'このレルムではワールドPvPが無効になっています。',
+  'hudChrome.worldPvp.record': '戦績：撃破{kills}、死亡{deaths}',
+  'hudChrome.worldPvp.repeatLine':
+    '同じプレイヤーを繰り返し倒すと、2回目は{second}、3回目は{third}、以降は何も得られません。カウントは最初の撃破から{reset}後にリセットされます。',
+  'hudChrome.worldPvp.splitLine':
+    '純粋な1対1なら報酬を独占できます。加勢した仲間とそのヒーラーは分配します。',
+  'hudChrome.worldPvp.stakeLine': '敗者は所持金の{percent}か{cap}のうち、少ない方を支払います。',
+  'hudChrome.worldPvp.statusDisarming':
+    'フラグは{time}後、または現在の戦闘が終わり次第下がります。',
+  'hudChrome.worldPvp.statusOff':
+    'PvPフラグは下がっています。オープンワールドで攻撃することも、攻撃されることもありません。',
+  'hudChrome.worldPvp.statusOffFfa':
+    'PvPフラグは下がっていますが、無差別戦闘地帯では引き続き攻撃することも、攻撃されることもあります。',
+  'hudChrome.worldPvp.statusOn':
+    'PvPフラグは立っています。フラグを立てたプレイヤーから攻撃を受ける可能性があります。',
+  'hudChrome.worldPvp.tab': 'ワールドPvP',
+  'hudChrome.worldPvp.title': 'ワールドPvP',
+  'hudChrome.worldPvp.zoneContested': '係争地：ここで戦えるのはフラグを立てたプレイヤーのみです。',
+  'hudChrome.worldPvp.zoneFfa': '無差別戦闘地帯：ここにいる全員が戦闘対象です。',
+  'hudChrome.worldPvp.zoneSanctuary': '聖域：ここではワールドPvPが起こりません。',
+  'itemUi.errors.orderClosed': 'その注文はもう受け付けていません。',
+  'itemUi.errors.orderCountNeeded': '欲しい数量を指定してください。',
+  'itemUi.errors.orderNotYours': 'それはあなたの注文ではありません。',
+  'itemUi.errors.orderOwn': 'それは自分の注文です。キャンセルすると回収できます。',
+  'itemUi.errors.tooManyOrders': '同時に出せる注文は最大{count}件です。',
+  'itemUi.logs.orderDelivered':
+    '{buyer}に{item}を{count}個、{money}で納品しました。商人から{proceeds}を受け取れます。',
+  'itemUi.logs.orderExpired': '{item}の注文が期限切れになり、{money}が商人のもとで待機しています。',
+  'itemUi.logs.orderPlaced': '{item}を{count}個、単価{each}で注文しました。',
+  'itemUi.logs.orderReceived':
+    '{seller}があなたの注文に{item}を{count}個納品しました。商人から受け取れます。',
+  'itemUi.logs.orderWithdrawn': '{item}の注文を取り消し、{money}が返却されました。',
+  'itemUi.market.orderAtCap': '空いている注文枠がありません。先に1件取り消してください。',
+  'itemUi.market.orderBy': '希望者：{buyer}',
+  'itemUi.market.orderCannotAfford': 'この注文の{total}を支払う余裕がありません。',
+  'itemUi.market.orderCardTitle': '注文する',
+  'itemUi.market.orderConfirmBody':
+    '{item}を{count}個、単価{each}で注文しますか？注文が成立または取り消されるまで、{total}が商人のもとで預かられます。',
+  'itemUi.market.orderConfirmTitle': '注文の確認',
+  'itemUi.market.orderDeliver': '納品',
+  'itemUi.market.orderDeliverAria': '{item}を{buyer}に納品',
+  'itemUi.market.orderDeliverConfirmBody':
+    '{item}を{count}個、{buyer}に{total}（単価{each}）で納品しますか？商人の手数料を差し引いた{proceeds}を受け取れます。',
+  'itemUi.market.orderDeliverConfirmTitle': '納品の確認',
+  'itemUi.market.orderDeliverNone': 'このアイテムをバッグに持っていません。',
+  'itemUi.market.orderEach': '個あたり',
+  'itemUi.market.orderEscrowLine': '商人が預かっているゴールド：{total}',
+  'itemUi.market.orderMine': '自分の注文',
+  'itemUi.market.orderPickEmpty': '下でアイテムを検索するか、下部のリストから選択してください。',
+  'itemUi.market.orderPickLabel': '欲しいアイテム',
+  'itemUi.market.orderPickNone': '一致するアイテムがありません。',
+  'itemUi.market.orderPlaceButton': '注文する',
+  'itemUi.market.orderPriceEach': '単価',
+  'itemUi.market.orderQuantity': '希望数量',
+  'itemUi.market.orderSearchAria': '注文するアイテムを検索',
+  'itemUi.market.orderSearchPlaceholder': 'アイテムを検索...',
+  'itemUi.market.orderWanted': 'x{count} 希望',
+  'itemUi.market.orderWithdraw': '取り消し',
+  'itemUi.market.orderWithdrawAria': '{item}の注文を取り消し',
+  'itemUi.market.ordersEmpty':
+    'まだ注文はありません。注文を出せば、採取者があなたの必要なものを目にします。',
+  'itemUi.market.ordersListAria': '受付中の買い注文',
+  'itemUi.market.ordersNote':
+    '欲しいものを注文すると、ゴールドは商人が預かります。指定した価格以下の出品はすぐに成立し、それ以外は売り手を待ちます。納品した側から商人が{cut}%を受け取ります。注文枠 {used}/{max} を使用中です。',
+  'itemUi.market.ordersTab': '募集',
+  'itemUi.market.unlistedNone': '現在、すべての素材に出品があります。',
+  'itemUi.market.unlistedNote':
+    '出品が一つもない素材です。注文を出すか、自分で採取して出品しましょう。',
+  'itemUi.market.unlistedStageAria': '{item}を注文',
+  'itemUi.market.unlistedTitle': '市場にありません',
+  'questUi.worldQuest.forge.medals.gold': '金',
+  'questUi.worldQuest.forge.water': '井戸',
+  'questUi.worldQuest.glider.dive': '降下',
+  'questUi.worldQuest.glider.medals.gold': '金',
+  'questUi.worldQuest.horde.medals.gold': '金',
+  'questUi.worldQuest.horde.weapons.1': '二連射撃',
+  'questUi.worldQuest.match3Announcement': '{moves}。{cleared}。',
+  'questUi.worldQuest.match3ResultAnnouncement': '{title}。{detail} {moves}。{cleared}。',
+  'questUi.worldQuest.match3ResultSummary': '{title}。{detail} {cleared}。',
+  'questUi.worldQuest.puzzleTileAria': '{rotation}、{connectors}、{power}、{source}、{target}',
+  'questUi.worldQuest.puzzleTimer': '{seconds}秒',
+  'questUi.worldQuest.semanticSummary': '{name}。{progress}。{reward}。',
+  'questUi.worldQuest.semanticSummaryTimed': '{name}。{progress}。{reward}。{time}。',
+  'devCommand.actions.hillend.description': '現在の丘を今すぐ消します。',
+  'devCommand.actions.hillend.label': '丘を終了',
+  'devCommand.actions.hillnow.description': '丘を即座に発生させ、その上に立ちます。',
+  'devCommand.actions.hillnow.label': '丘を即時発生',
+  'devCommand.actions.hillrise.description': '予告済みの丘をすぐに出現させます。',
+  'devCommand.actions.hillrise.label': '丘の予告を飛ばす',
+  'devCommand.actions.hillwarn.description':
+    '丘を今すぐ告知します。丘は予告期間が終わると出現します。',
+  'devCommand.actions.hillwarn.label': '丘を予告',
+  'entities.abilities.lava_burst.description':
+    '{damage}の火炎ダメージを与えます。灰燼の衝撃で燃えている対象には必ずクリティカルヒットします。マグマの奔流：灰燼の衝撃がダメージを与えるたびに20%の確率でこのクールダウンをリセットし、10秒以内に使用する次のマグマバーストを即座の詠唱にします。ダメージは呪文威力とともに上がります。（サンダーコール）',
+  'entities.abilities.lava_burst.name': 'マグマバースト',
+  'entities.abilities.lightning_overload.description':
+    'パッシブ：電弧の矢とスカイブランチには20%の確率でオーバーロードする効果があり、最初の対象に与えたダメージの50%で再度攻撃し、雷鳴を1得ます。（サンダーコール）',
+  'entities.abilities.lightning_overload.name': '電弧のオーバーロード',
+  'entities.abilities.thunderstorm.description':
+    '雷鳴を呼び下ろし、10ヤード以内の敵に{damage}の自然ダメージを与え、5秒間50%減速させます。最大マナの8%を回復します。ダメージは呪文威力とともに上がります。（サンダーコール）',
+  'entities.abilities.thunderstorm.name': '嵐砕き',
+  'entities.items.vanguard_druid_balance_chest.name': '星守りのチュニック',
+  'entities.items.vanguard_druid_balance_gloves.name': '星守りのグリップ',
+  'entities.items.vanguard_druid_balance_helmet.name': '星守りの頭巾',
+  'entities.items.vanguard_druid_balance_legs.name': '星守りのブリーチズ',
+  'entities.items.vanguard_druid_balance_shoulder.name': '星守りの肩当て',
+  'entities.items.vanguard_druid_feral_chest.name': '血たてがみのチュニック',
+  'entities.items.vanguard_druid_feral_gloves.name': '血たてがみのグリップ',
+  'entities.items.vanguard_druid_feral_helmet.name': '血たてがみの頭巾',
+  'entities.items.vanguard_druid_feral_legs.name': '血たてがみのブリーチズ',
+  'entities.items.vanguard_druid_feral_shoulder.name': '血たてがみの肩当て',
+  'entities.items.vanguard_druid_restoration_chest.name': 'アザミ花のチュニック',
+  'entities.items.vanguard_druid_restoration_gloves.name': 'アザミ花のグリップ',
+  'entities.items.vanguard_druid_restoration_helmet.name': 'アザミ花の頭巾',
+  'entities.items.vanguard_druid_restoration_legs.name': 'アザミ花のブリーチズ',
+  'entities.items.vanguard_druid_restoration_shoulder.name': 'アザミ花の肩当て',
+  'entities.items.vanguard_fang_dagger.name': 'ヴァンガードの牙',
+  'entities.items.vanguard_hunter_beast_mastery_chest.name': '群れ守りのチュニック',
+  'entities.items.vanguard_hunter_beast_mastery_gloves.name': '群れ守りのグリップ',
+  'entities.items.vanguard_hunter_beast_mastery_helmet.name': '群れ守りの頭巾',
+  'entities.items.vanguard_hunter_beast_mastery_legs.name': '群れ守りのブリーチズ',
+  'entities.items.vanguard_hunter_beast_mastery_shoulder.name': '群れ守りの肩当て',
+  'entities.items.vanguard_hunter_marksmanship_chest.name': '遠見のチュニック',
+  'entities.items.vanguard_hunter_marksmanship_gloves.name': '遠見のグリップ',
+  'entities.items.vanguard_hunter_marksmanship_helmet.name': '遠見の頭巾',
+  'entities.items.vanguard_hunter_marksmanship_legs.name': '遠見のブリーチズ',
+  'entities.items.vanguard_hunter_marksmanship_shoulder.name': '遠見の肩当て',
+  'entities.items.vanguard_hunter_survival_chest.name': '罠牙のチュニック',
+  'entities.items.vanguard_hunter_survival_gloves.name': '罠牙のグリップ',
+  'entities.items.vanguard_hunter_survival_helmet.name': '罠牙の頭巾',
+  'entities.items.vanguard_hunter_survival_legs.name': '罠牙のブリーチズ',
+  'entities.items.vanguard_hunter_survival_shoulder.name': '罠牙の肩当て',
+  'entities.items.vanguard_mage_arcane_chest.name': '刻縛りのローブ',
+  'entities.items.vanguard_mage_arcane_gloves.name': '刻縛りのハンドラップ',
+  'entities.items.vanguard_mage_arcane_helmet.name': '刻縛りのフード',
+  'entities.items.vanguard_mage_arcane_legs.name': '刻縛りのレギンス',
+  'entities.items.vanguard_mage_arcane_shoulder.name': '刻縛りの肩掛け',
+  'entities.items.vanguard_mage_fire_chest.name': '燼鞭のローブ',
+  'entities.items.vanguard_mage_fire_gloves.name': '燼鞭のハンドラップ',
+  'entities.items.vanguard_mage_fire_helmet.name': '燼鞭のフード',
+  'entities.items.vanguard_mage_fire_legs.name': '燼鞭のレギンス',
+  'entities.items.vanguard_mage_fire_shoulder.name': '燼鞭の肩掛け',
+  'entities.items.vanguard_mage_frost_chest.name': '霧氷守りのローブ',
+  'entities.items.vanguard_mage_frost_gloves.name': '霧氷守りのハンドラップ',
+  'entities.items.vanguard_mage_frost_helmet.name': '霧氷守りのフード',
+  'entities.items.vanguard_mage_frost_legs.name': '霧氷守りのレギンス',
+  'entities.items.vanguard_mage_frost_shoulder.name': '霧氷守りの肩掛け',
+  'entities.items.vanguard_oath_blade.name': 'ヴァンガードの誓い',
+  'entities.items.vanguard_paladin_holy_chest.name': '陽守りの鎖帷子',
+  'entities.items.vanguard_paladin_holy_gloves.name': '陽守りのガントレット',
+  'entities.items.vanguard_paladin_holy_helmet.name': '陽守りの兜',
+  'entities.items.vanguard_paladin_holy_legs.name': '陽守りの脚甲',
+  'entities.items.vanguard_paladin_holy_shoulder.name': '陽守りの肩鎧',
+  'entities.items.vanguard_paladin_protection_chest.name': '盾誓いの鎖帷子',
+  'entities.items.vanguard_paladin_protection_gloves.name': '盾誓いのガントレット',
+  'entities.items.vanguard_paladin_protection_helmet.name': '盾誓いの兜',
+  'entities.items.vanguard_paladin_protection_legs.name': '盾誓いの脚甲',
+  'entities.items.vanguard_paladin_protection_shoulder.name': '盾誓いの肩鎧',
+  'entities.items.vanguard_paladin_retribution_chest.name': '光印の鎖帷子',
+  'entities.items.vanguard_paladin_retribution_gloves.name': '光印のガントレット',
+  'entities.items.vanguard_paladin_retribution_helmet.name': '光印の兜',
+  'entities.items.vanguard_paladin_retribution_legs.name': '光印の脚甲',
+  'entities.items.vanguard_paladin_retribution_shoulder.name': '光印の肩鎧',
+  'entities.items.vanguard_priest_discipline_chest.name': '帳唱のローブ',
+  'entities.items.vanguard_priest_discipline_gloves.name': '帳唱のハンドラップ',
+  'entities.items.vanguard_priest_discipline_helmet.name': '帳唱のフード',
+  'entities.items.vanguard_priest_discipline_legs.name': '帳唱のレギンス',
+  'entities.items.vanguard_priest_discipline_shoulder.name': '帳唱の肩掛け',
+  'entities.items.vanguard_priest_holy_chest.name': '恩翼のローブ',
+  'entities.items.vanguard_priest_holy_gloves.name': '恩翼のハンドラップ',
+  'entities.items.vanguard_priest_holy_helmet.name': '恩翼のフード',
+  'entities.items.vanguard_priest_holy_legs.name': '恩翼のレギンス',
+  'entities.items.vanguard_priest_holy_shoulder.name': '恩翼の肩掛け',
+  'entities.items.vanguard_priest_shadow_chest.name': '黄昏賛歌のローブ',
+  'entities.items.vanguard_priest_shadow_gloves.name': '黄昏賛歌のハンドラップ',
+  'entities.items.vanguard_priest_shadow_helmet.name': '黄昏賛歌のフード',
+  'entities.items.vanguard_priest_shadow_legs.name': '黄昏賛歌のレギンス',
+  'entities.items.vanguard_priest_shadow_shoulder.name': '黄昏賛歌の肩掛け',
+  'entities.items.vanguard_rogue_assassination_chest.name': '夜斬りのチュニック',
+  'entities.items.vanguard_rogue_assassination_gloves.name': '夜斬りのグリップ',
+  'entities.items.vanguard_rogue_assassination_helmet.name': '夜斬りの頭巾',
+  'entities.items.vanguard_rogue_assassination_legs.name': '夜斬りのブリーチズ',
+  'entities.items.vanguard_rogue_assassination_shoulder.name': '夜斬りの肩当て',
+  'entities.items.vanguard_rogue_combat_chest.name': '乱闘痕のチュニック',
+  'entities.items.vanguard_rogue_combat_gloves.name': '乱闘痕のグリップ',
+  'entities.items.vanguard_rogue_combat_helmet.name': '乱闘痕の頭巾',
+  'entities.items.vanguard_rogue_combat_legs.name': '乱闘痕のブリーチズ',
+  'entities.items.vanguard_rogue_combat_shoulder.name': '乱闘痕の肩当て',
+  'entities.items.vanguard_rogue_subtlety_chest.name': '陰歩きのチュニック',
+  'entities.items.vanguard_rogue_subtlety_gloves.name': '陰歩きのグリップ',
+  'entities.items.vanguard_rogue_subtlety_helmet.name': '陰歩きの頭巾',
+  'entities.items.vanguard_rogue_subtlety_legs.name': '陰歩きのブリーチズ',
+  'entities.items.vanguard_rogue_subtlety_shoulder.name': '陰歩きの肩当て',
+  'entities.items.vanguard_shaman_elemental_chest.name': '嵐銘の鎖帷子',
+  'entities.items.vanguard_shaman_elemental_gloves.name': '嵐銘のガントレット',
+  'entities.items.vanguard_shaman_elemental_helmet.name': '嵐銘の兜',
+  'entities.items.vanguard_shaman_elemental_legs.name': '嵐銘の脚甲',
+  'entities.items.vanguard_shaman_elemental_shoulder.name': '嵐銘の肩鎧',
+  'entities.items.vanguard_shaman_enhancement_chest.name': '疾風生まれの鎖帷子',
+  'entities.items.vanguard_shaman_enhancement_gloves.name': '疾風生まれのガントレット',
+  'entities.items.vanguard_shaman_enhancement_helmet.name': '疾風生まれの兜',
+  'entities.items.vanguard_shaman_enhancement_legs.name': '疾風生まれの脚甲',
+  'entities.items.vanguard_shaman_enhancement_shoulder.name': '疾風生まれの肩鎧',
+  'entities.items.vanguard_shaman_restoration_chest.name': '潮守りの鎖帷子',
+  'entities.items.vanguard_shaman_restoration_gloves.name': '潮守りのガントレット',
+  'entities.items.vanguard_shaman_restoration_helmet.name': '潮守りの兜',
+  'entities.items.vanguard_shaman_restoration_legs.name': '潮守りの脚甲',
+  'entities.items.vanguard_shaman_restoration_shoulder.name': '潮守りの肩鎧',
+  'entities.items.vanguard_verdict_greatsword.name': 'ヴァンガードの裁定',
+  'entities.items.vanguard_warlock_affliction_chest.name': '戦慄筆のローブ',
+  'entities.items.vanguard_warlock_affliction_gloves.name': '戦慄筆のハンドラップ',
+  'entities.items.vanguard_warlock_affliction_helmet.name': '戦慄筆のフード',
+  'entities.items.vanguard_warlock_affliction_legs.name': '戦慄筆のレギンス',
+  'entities.items.vanguard_warlock_affliction_shoulder.name': '戦慄筆の肩掛け',
+  'entities.items.vanguard_warlock_demonology_chest.name': '骨髄縛りのローブ',
+  'entities.items.vanguard_warlock_demonology_gloves.name': '骨髄縛りのハンドラップ',
+  'entities.items.vanguard_warlock_demonology_helmet.name': '骨髄縛りのフード',
+  'entities.items.vanguard_warlock_demonology_legs.name': '骨髄縛りのレギンス',
+  'entities.items.vanguard_warlock_demonology_shoulder.name': '骨髄縛りの肩掛け',
+  'entities.items.vanguard_warlock_destruction_chest.name': '鉱滓冠のローブ',
+  'entities.items.vanguard_warlock_destruction_gloves.name': '鉱滓冠のハンドラップ',
+  'entities.items.vanguard_warlock_destruction_helmet.name': '鉱滓冠のフード',
+  'entities.items.vanguard_warlock_destruction_legs.name': '鉱滓冠のレギンス',
+  'entities.items.vanguard_warlock_destruction_shoulder.name': '鉱滓冠の肩掛け',
+  'entities.items.vanguard_warrior_arms_chest.name': '刃波の鎖帷子',
+  'entities.items.vanguard_warrior_arms_gloves.name': '刃波のガントレット',
+  'entities.items.vanguard_warrior_arms_helmet.name': '刃波の兜',
+  'entities.items.vanguard_warrior_arms_legs.name': '刃波の脚甲',
+  'entities.items.vanguard_warrior_arms_shoulder.name': '刃波の肩鎧',
+  'entities.items.vanguard_warrior_fury_chest.name': '血潮進撃の鎖帷子',
+  'entities.items.vanguard_warrior_fury_gloves.name': '血潮進撃のガントレット',
+  'entities.items.vanguard_warrior_fury_helmet.name': '血潮進撃の兜',
+  'entities.items.vanguard_warrior_fury_legs.name': '血潮進撃の脚甲',
+  'entities.items.vanguard_warrior_fury_shoulder.name': '血潮進撃の肩鎧',
+  'entities.items.vanguard_warrior_prot_chest.name': '鉄壁進撃の鎖帷子',
+  'entities.items.vanguard_warrior_prot_gloves.name': '鉄壁進撃のガントレット',
+  'entities.items.vanguard_warrior_prot_helmet.name': '鉄壁進撃の兜',
+  'entities.items.vanguard_warrior_prot_legs.name': '鉄壁進撃の脚甲',
+  'entities.items.vanguard_warrior_prot_shoulder.name': '鉄壁進撃の肩鎧',
+  'entities.items.vanguard_warstaff.name': 'ヴァンガードの戦杖',
+  'entities.npcs.glider_apprentice.name': 'スカイ',
+  'guide.arenaPage.vanguardBody':
+    'ヴァンガード装備はウォーフェア装備の第2シーズンで、同じ二人の補給官が元の階層に加えて販売し続けます。元の階層も販売終了にはなりません。どのスペックにも頭、肩、胸、脚、手の五部位からなる専用のヴァンガードセットがあり、ショップにはあなたのクラスが装備できる三つのセットだけが並び、続けて装備できるヴァンガードの武器が並びます。ヴァンガードの部位は元の階層と同じウォーフェアレーティングを、より高いアイテムレベルで備えており、各セットには2点と4点でスペックのアビリティの一つを変化させる二つのボーナスがあります。元のセットと違い、それらのボーナスはモンスター相手を含めどこでも機能しますが、対プレイヤー戦向けに作られているため、レイド内ではレイドセットの方が依然として優れた選択です。',
+  'guide.arenaPage.vanguardHeading': 'ヴァンガード装備：ウォーフェアシーズン2',
+  'guide.settingsPage.ifColorblindMode':
+    'Nythraxisの床の危険地帯（墓所の噴出の警告円、墓炎と魂炎の溜まり、紫炎の直線、魂の裂傷の印）を、色覚異常でも見分けやすい配色に変更します。色相と明るさをはっきり分けているので、重なった円でも境界が見分けられます。大きさ、タイマー、位置は一切変わりません。',
+  'guide.settingsPage.ifTargetAurasBelowFrame':
+    'ターゲットフレームのバフとデバフの並びを、フレームの上ではなく下に表示する、クラシックなレイアウトです。既定のターゲットフレームはアクションバーのすぐ上にあるため、初期状態ではオフになっています。フレームを下に余白のある場所へ移動した後にオンにしてください。',
+  'guide.stats.warfareBodyPets':
+    'ウォーフェアは、名誉の防具が備える、他のプレイヤーと戦うためのステータスです。プレイヤー同士の戦いでは、あなたとペットが他のプレイヤーやそのペットに与えるダメージを高め、あなたとペットが彼らから受けるダメージを下げます。さらに、ダンジョン、レイド、デルヴ、リフトを除くあらゆる場面で最大体力を高めるため、名誉の防具をまとったプレイヤーは、まとっていない相手よりもはるかに倒しにくくなります。これらすべてがキャラクターシートに一行で表示されます。名誉で購入するウォーフェアのギアから得られるので、レベリング中に追いかけるものというより、PvPを遊んだことへの報酬です。',
+  'hudChrome.paperdoll.trinketSlot': '装飾品',
+  'questUi.worldQuest.practiceRewards':
+    '練習：何度でも遊べますが、通貨、経験値、評判は追加で獲得できません。',
+  'questUi.worldQuest.replay': 'もう一度遊ぶ',
+  'questUi.worldQuest.glider.replay': 'もう一度飛ぶ',
+  'questUi.worldQuest.glider.practiceRewards':
+    '練習飛行：タイムを更新できますが、通貨、経験値、評判は追加で獲得できません。',
+  'hudChrome.leaderboard.gliderPersonalRules':
+    'このキャラクターに保存されたオフライン記録です。すべてのリングを順番に通過してください。日別記録は毎日リセットされます。',
+  'hudChrome.weeklyRewards.chooseTable': '報酬を抽選する戦利品テーブルを選択',
+  'hudChrome.weeklyRewards.selectAllTables': 'すべて選択',
+  'hudChrome.weeklyRewards.selectedTable': 'テーブルを{count}件選択中',
+  'hudChrome.weeklyRewards.selectedTables': 'テーブルを{count}件選択中',
+  'hudChrome.weeklyRewards.noLevelLoot': '現在のレベルで対象となる戦利品はありません。',
+  'hudChrome.weeklyRewards.tableItem': 'アイテム{count}個',
+  'hudChrome.weeklyRewards.tableItemCount': 'アイテム{count}個',
+  'hudChrome.weeklyRewards.previouslyRolled': '抽選済みの報酬',
+  'hudChrome.weeklyRewards.noTables':
+    'この難易度で記録されたボス撃破から得られる対象装備はありません。',
+  'hudChrome.weeklyRewards.tablesExhausted':
+    '対象アイテムはすべて抽選済みです。公開済みの報酬を選んでください。',
+  'hudChrome.weeklyRewards.worldPoolRule':
+    'ノーマル難易度のNythraxis装備。レイドのクリアは不要です。',
+  'hudChrome.weeklyRewards.selectionPoolRule':
+    'レイドとダンジョンの報酬は、開ける前にテーブルを1つ以上選んでください。ダンジョンのテーブルには、この難易度で撃破したボスの戦利品がまとめられています。重複アイテム、レジェンダリーアイテム、必要レベルが自分のレベルより{maxLevelOffset}を超えて高い装備は抽選から除外されます。',
+  'questUi.worldQuest.puzzleRetry': 'もう一度',
+  'questUi.worldQuest.puzzleTimerAria': '残り時間：{seconds}秒',
+  'questUi.worldQuest.startQuest': 'ワールドクエストを開始',
+  'questUi.worldQuest.startEscort': '護衛を開始',
+  'questUi.worldQuest.escortTitle': 'キャラバン',
+  'questUi.worldQuest.alreadyCompleted': 'このサイクルのワールドクエストは完了済みです。',
+  'questUi.worldQuest.inProgress': 'このワールドクエストは進行中です。',
+  'hudChrome.framePresets.pickerLabel': 'フレームプリセット：{name}',
+  'hudChrome.framePresets.overwrite': 'プリセットを上書き',
+  'hudChrome.framePresets.overwriteBody':
+    '保存済みプリセット「{name}」を現在のレイアウトで上書きしますか？',
+  'hudChrome.framePresets.current': '現在のレイアウト',
+  'hudChrome.framePresets.new': '新規プリセット',
+  'hudChrome.framePresets.empty': '保存済みプリセットはありません',
+  'hudChrome.framePresets.deleteNamed': '{name} を削除',
+  'hudChrome.framePresets.deleteBody': 'フレームプリセット「{name}」を削除しますか？',
+  'hudChrome.framePresets.title': 'フレームプリセット',
+  'hudChrome.framePresets.name': 'プリセット名',
+  'hudChrome.framePresets.slot': 'プリセット {slot}',
+  'hudChrome.framePresets.remove': '削除',
+  'hudChrome.framePresets.saved': '完了。',
+  'hudChrome.framePresets.failed': 'プリセットを保存または読み込めませんでした。',
+  'hudChrome.frameMenus.hide': 'フレームを非表示',
+  'hudChrome.focusTargets.unset': 'フォーカスを解除',
+  'hudChrome.frameMenus.units': 'ユニットフレーム',
+  'hudChrome.frameMenus.bars': 'アクションバー',
+  'hudChrome.frameMenus.trackers': 'トラッカー',
+  'hudChrome.frameMenus.auras': 'オーラ',
+  'hudChrome.frameMenus.combat': '戦闘表示',
+  'hudChrome.frameMenus.other': 'その他のHUD要素',
+  'hudChrome.frameMenus.options': 'フレーム設定',
+  'hudChrome.frameMenus.allOptions': 'すべてのフレーム設定',
+  'hudChrome.frameMenus.independentTarget': 'ターゲットのターゲットをターゲットに固定',
+
+  'hudChrome.focusTargets.frame1': 'フォーカス 1',
+  'hudChrome.focusTargets.frame2': 'フォーカス 2',
+  'hudChrome.focusTargets.frame3': 'フォーカス 3',
+  'hudChrome.interfaceUnlock.combineTrackers': '追跡フレームをまとめる',
+  'hudChrome.interfaceUnlock.combineAuras': 'オーラフレームをまとめる',
+  'guide.interfacePage.frameGroups':
+    '{trackers} はクエスト、功績、リフト、地下探索、採集目標、聖遺物の追跡をまとめられます。{auras} は対象の継続ダメージと6種のオーラ追跡をまとめられます。フレーム設定で有効にするとまとめて移動でき、無効なら個別に移動できます。{tot} にはリソースバーがあります。{focus} の3つの対象は個別に移動できます。Shift+F1～F3で設定し、Ctrl+F1～F3で選択します。ダメージと脅威メーターはロック中でも、ボタン以外をドラッグして移動し、端をドラッグしてサイズ変更できます。ロック解除中は専用のグループ別メニューで表示を切り替えられます。フレームを右クリックするとサイズのリセットや関連設定を開けます。インターフェースのフレームタブには共通設定と折りたたみ可能なパーティ設定があります。「ターゲットのターゲットをターゲットに固定」をオフにすると個別に移動でき、オンに戻しても個別の位置は保存されます。フォーカスを設定すると設定ボタンと説明が隠れます。右クリックして「フォーカスを解除」を選ぶと元に戻ります。マウスオーバーキャストはフォーカスフレームでも使えます。',
+  'hudChrome.focusTargets.assign': 'フォーカス {slot} を設定',
+  'hudChrome.focusTargets.target': 'フォーカス {slot} を選択',
+  'hudChrome.interfaceUnlock.frameNames.trackerGroup': '進行状況トラッカー',
+  'hudChrome.interfaceUnlock.frameNames.auraGroup': 'オーラとターゲット効果',
+  'hudChrome.ferry.regionLabel': '渡し船の時刻表',
+  'hudChrome.ferry.departsIn': '{dest}行きの渡し船は{time}後に出航します',
+  'hudChrome.ferry.castingOff': '{dest}行きの渡し船が出航します',
+  'hudChrome.ferry.boardHint': '出航の時に甲板に立っていれば一緒に出発できます。運賃は無料です。',
+  'hudChrome.ferry.sailing': '{dest}へ航行中',
   'hudChrome.noticeboard.officerEntry': '{name}（{rank}）',
   'hudChrome.professionTrainers.nameplate': '＜{title}＞',
   'landing.contribute': 'ゲーム開発に参加する',
@@ -119,9 +824,25 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.crucible_healer_cloth.bonus2':
     '戦闘中の味方を回復すると、超過回復量の20%を、その味方を6秒間守るシールドに変換する。継続回復とダメージから変換された回復も対象となる。戦闘中に自分を回復した場合も有効。全装備者が与えるこのシールドの合計は、保護対象の最大体力の5%まで。追加の超過回復はシールドを補充するが、持続時間は延長しない。このシールドは他の回復効果を発動させない。保護された味方が戦闘を離れるか、自分が死亡するか、このセットを2部位以上装備しなくなると、自分が与えたシールドは消える。',
   'entities.items.formula_lastflame_zeal.name': '製法書：最後の炎の熱情',
+  'entities.items.formula_riftwalkers_grace.name': '製法書：裂け目歩きの優雅',
+  'entities.items.formula_dawnfire_etching.name': '製法書：暁火の銘刻',
+  'entities.items.formula_dawns_benediction.name': '製法書：暁の祝福',
+  'entities.items.formula_piston_drive.name': '製法書：ピストン駆動',
   'hudChrome.enchantName.enchant_weapon_lastflame_zeal': '最後の炎の熱情',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
     '命中した近接攻撃は、確率で15秒間筋力を50増加させ、自分の体力を200回復する。回復量の補正が適用される。命中ごとの発動率は、攻撃した武器の基本速度0.6秒につき1%。内部クールダウンはない。強化は両手で共有され、どちらの手で発動しても持続時間が更新される。重複して積み重なることはない。遠隔攻撃では発動しない。狼形態では代わりに1秒の基本攻撃速度を使う。',
+  'hudChrome.enchantName.enchant_weapon_riftwalkers_grace': '裂け目歩きの優雅',
+  'hudChrome.enchantDescription.enchant_weapon_riftwalkers_grace':
+    '命中した近接攻撃は、確率で15秒間敏捷性を60増加させ、近接攻撃速度を2%上昇させる。命中ごとの発動率は、攻撃した武器の基本速度0.6秒につき1%。内部クールダウンはない。強化は両手で共有され、どちらの手で発動しても持続時間が更新される。重複して積み重なることはない。遠隔攻撃では発動しない。キャットフォームでは代わりに1秒の基本攻撃速度を使う。',
+  'hudChrome.enchantName.enchant_weapon_dawnfire_etching': '武器銘刻：暁火',
+  'hudChrome.enchantDescription.enchant_weapon_dawnfire_etching':
+    '武器に呪文威力18を永続的に銘刻する。呪文威力は治癒力にも加算される。固定値のボーナスで、他の能力値によって増減しない。',
+  'hudChrome.enchantName.enchant_weapon_dawns_benediction': '武器銘刻：暁の祝福',
+  'hudChrome.enchantDescription.enchant_weapon_dawns_benediction':
+    '武器に治癒力34を永続的に銘刻する。治癒力は回復のみを高め、呪文ダメージは高めない。固定値のボーナスで、他の能力値によって増減しない。',
+  'hudChrome.enchantName.enchant_weapon_piston_drive': '武器銘刻：ピストン駆動',
+  'hudChrome.enchantDescription.enchant_weapon_piston_drive':
+    '両手武器に筋力12とクリティカルレーティング25を永続的に銘刻する。片手武器には施せない。固定値のボーナスで、他の能力値によって増減しない。',
   'hudChrome.enchanting.recipeNotLearned': 'この付呪を施すには、先に製法書で習得してください。',
   'hudChrome.pattern.teachesEnchant': '使用：{enchant}の付与方法を習得する。',
   'hudChrome.barEditor.pageTab': 'ページ{page}',
@@ -921,6 +1642,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.bindConfirmTitle': '拾うと魂縛される',
   'hudChrome.loot.bindConfirmBody':
     'この戦利品には、取得すると自分に魂縛されるアイテムが含まれています。魂縛されたアイテムは、同じドロップを分かち合ったプレイヤーとの間でのみ、限られた時間だけ取引できます。',
+  'hudChrome.lootQuality.ordinary': '通常',
+  'hudChrome.lootQuality.superior': '上質',
+  'hudChrome.lootQuality.exceptional': '卓越',
+  'hudChrome.lootQuality.magnificent': '壮麗',
+  'hudChrome.lootQuality.transcendent': '超越',
+  'hudChrome.lootQuality.tooltip': '{quality}：アイテムレベル +{levels}。強化後も維持されます。',
   'hudChrome.itemTooltip.requiresLevel': '必要レベル {level}',
   'hudChrome.spellbook.addToBarAria': '{name}をアクションバーに追加',
   'hudChrome.spellbook.removeFromBarAria': '{name}をアクションバーから削除',
@@ -1067,6 +1794,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.targetFrameScale': 'ターゲットフレームの大きさ',
   'hudChrome.options.aurasOnPlayerFrame': 'バフをプレイヤーフレームに表示',
   'hudChrome.options.alwaysShowAllBuffs': 'すべてのバフを常に表示',
+  'hudChrome.options.showAuraCaster': 'ツールチップに効果の使用者を表示',
+  'hudChrome.auraTooltip.caster': '使用者：{name}',
   'hud.core.mapCanvasLabel': 'マップ',
   'hud.core.mapSummary': '{zone}のマップ。',
   'hud.core.mapMarkerDescription': '{area}。{markers}',
@@ -1088,6 +1817,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapMarkerDistances.far': '遠く',
   'hud.core.mapMarkerLabels.you': '自分',
   'hud.core.mapMarkerLabels.availableQuest': '受注可能なクエスト',
+  'hud.core.mapMarkerLabels.availableWorldQuest': '利用可能なワールドクエスト: {name}',
+  'hud.core.mapMarkerLabels.activeWorldQuest': '進行中のワールドクエスト: {name}',
+  'hud.core.mapMarkerLabels.worldBoss': 'ワールドボス: {name}',
   'hud.core.mapMarkerLabels.readyQuest': '報告可能なクエスト',
   'hud.core.mapMarkerLabels.repeatQuest': '繰り返し可能なクエスト',
   'hud.core.mapMarkerLabels.cooldownQuest': '再受注待ちのクエスト',
@@ -1234,6 +1966,48 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lastkeepMap.story.tower': '見張り塔',
   'hudChrome.dawnholdMap.story.ground': '庭園の階',
   'hudChrome.dawnholdMap.story.solar': '日だまりの間',
+  'hudChrome.guildRanks.tab': 'ランク',
+  'hudChrome.guildRanks.introEdit':
+    'ギルドランクに名前を付け、それぞれが何をできるか選びます。保存すると、そのランクの全員に変更が適用されます。',
+  'hudChrome.guildRanks.introView':
+    '各ランクの名称と権限です。変更できるのはギルドマスターだけです。',
+  'hudChrome.guildRanks.colRank': 'ランク',
+  'hudChrome.guildRanks.colTitle': '名称',
+  'hudChrome.guildRanks.colMembers': 'メンバー',
+  'hudChrome.guildRanks.colActions': '順序',
+  'hudChrome.guildRanks.numbered': 'ランク {n}',
+  'hudChrome.guildRanks.perm.invite': '招待',
+  'hudChrome.guildRanks.perm.remove': '除名',
+  'hudChrome.guildRanks.perm.promote': '昇格',
+  'hudChrome.guildRanks.perm.bank': 'ギルド銀行',
+  'hudChrome.guildRanks.perm.officerChat': '役員チャット',
+  'hudChrome.guildRanks.perm.motd': '掲示板',
+  'hudChrome.guildRanks.perm.events': 'カレンダー',
+  'hudChrome.guildRanks.permHint.invite': 'プレイヤーをギルドに招待し、申請に応答できます。',
+  'hudChrome.guildRanks.permHint.remove': '自分より低いランクのメンバーを除名できます。',
+  'hudChrome.guildRanks.permHint.promote':
+    '自分より低いランクのメンバーを昇格または降格できます。ただし自分の一つ下のランクまでです。',
+  'hudChrome.guildRanks.permHint.bank':
+    'ギルド銀行に銅貨やアイテムを預け入れ、引き出せます。全メンバーが閲覧できます。',
+  'hudChrome.guildRanks.permHint.officerChat': '役員チャットを読み、発言できます。',
+  'hudChrome.guildRanks.permHint.motd': 'ギルド掲示板を編集できます。',
+  'hudChrome.guildRanks.permHint.events': 'ギルドカレンダーの予定を追加、削除できます。',
+  'hudChrome.guildRanks.titleLabel': '{rank} の名称',
+  'hudChrome.guildRanks.permLabel': '{rank} の{perm}',
+  'hudChrome.guildRanks.leaderLocked': 'ギルドマスターは常にすべての権限を持ちます。',
+  'hudChrome.guildRanks.add': 'ランクを追加',
+  'hudChrome.guildRanks.save': 'ランクを保存',
+  'hudChrome.guildRanks.moveUp': '{rank} を上へ',
+  'hudChrome.guildRanks.moveDown': '{rank} を下へ',
+  'hudChrome.guildRanks.remove': '{rank} を削除',
+  'hudChrome.guildRanks.full': 'ギルドのランクは最大 {max} 個です。',
+  'hudChrome.guildRanks.invalidTitle':
+    'ランク名には文字、数字、空白、アポストロフィ、ハイフンを使用でき、最大 {max} 文字です。',
+  'hudChrome.guildRanks.removeConfirm':
+    '{rank} のメンバーは {fallback} になります。このランクを削除しますか？',
+  'hudChrome.guildRanks.removeAccept': 'ランクを削除',
+  'hudChrome.guildRanks.promoteTo': '{name} を {rank} に昇格',
+  'hudChrome.guildRanks.demoteTo': '{name} を {rank} に降格',
   'hudChrome.raidLockout.title': 'レイドロックアウト',
   'hudChrome.raidLockout.allReady': 'すべてのレイドが利用可能',
   'hudChrome.raidLockout.daysHours': '{d}日{h}時間',
@@ -1570,6 +2344,81 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.map.ruinCourtyard': '廃墟の中庭',
   'hudChrome.bg.map.graveyard': '墓地',
   'guide.nav.thornhollow': 'ソーンホロウ平原',
+  'guide.nav.factions': '勢力と評判',
+  'guide.factionsPage.heading': '勢力と評判',
+  'guide.factionsPage.intro':
+    '三つの同盟勢力がそれぞれ王国の一角を見守っており、彼らの土地でワールドクエストを終えるたびに、その勢力からの評判が上がります。評判は六つの段階を昇り、段階ごとに固有の称号があり、補給係の品揃えを一つずつ開いていきます。',
+  'guide.factionsPage.whoHeading': '三つの勢力',
+  'guide.factionsPage.whoBody':
+    '各勢力は一群のゾーンに結びついており、どこでワールドクエストをこなすかで、どの勢力に評判が入るかが決まります。陣営を選ぶ必要はありません。三勢力はそれぞれ独自に集計し、他の勢力と敵対するよう求めることもありません。',
+  'guide.factionsPage.riftWatchBody':
+    '裂け目の監視団は岸を守り、深い裂け目を見張っています。彼らの土地は沿岸部です。ファーショア、パームリーチ、ゲイルクレスト、ウィローフェン、ヴェールド・ホロウ。拠点はパームリーチのドリフトヘイヴンです。',
+  'guide.factionsPage.churchOrderBody':
+    '教団は王国の中心地を治めています。イーストブルック渓谷、マイアフェン湿地、ソーンピーク高地、ナイトブルーム、レイスウッド。ブラザー・アルドリックがイーストブルック渓谷から彼らを代表して語ります。',
+  'guide.factionsPage.automatonsBody':
+    'オートマトンは辺境の炉を守っています。ドレイクランド、フロストヴェイル、アンバーフォール、エヴァーガーデン。拠点はドレイクランドのワームウォッチです。',
+  'guide.factionsPage.earningHeading': '評判を得る',
+  'guide.factionsPage.weeklyBody':
+    'イーストブルック渓谷の週間の使者がもう一つの道を開きます。今週の任務を終えると、任務を受けた窓口で勢力を一つ指名し、週に一度、彼の評判の推挙を受け取れます。',
+  'guide.factionsPage.earningBody':
+    '評判はワールドクエストから得られます。各ワールドクエストは、それが置かれたゾーンの勢力に加算され、三勢力は異なるゾーンを担当しているので、地図を渡り歩くうちに三つの評判が同時に進みます。イーストブルックの現場監督ケイレンが地図上のワールドクエスト掲示板を開いてくれ、その日の割り当てが気に入らなければ、掲示板で一日に一つだけワールドクエストを差し替えることもできます。',
+  'guide.factionsPage.lowLevelNote':
+    '低レベルのキャラクターは評判がある段階で一時停止し、レベルが上がると再開します。若いキャラクターでも早くから稼ぎ始められ、すぐに行き止まりになることはありません。',
+  'guide.factionsPage.tiersHeading': '評判の段階',
+  'guide.factionsPage.tiersBody':
+    'どの勢力も同じ六つの段階を昇ります。未知、承認、信頼、実証、先鋒、そしてチャンピオンです。各勢力はそれぞれの段階に独自の名を与え、その名がその勢力におけるあなたの称号になります。',
+  'guide.factionsPage.riftWatchTitles':
+    '裂け目の監視団では、部外者から始まり、監視者、裂け目歩き、守護者、裂け目の番人、そして最後にチャンピオンとなります。',
+  'guide.factionsPage.churchOrderTitles':
+    '教団では、部外者から始まり、侍祭、守り手、テンプラー、暁の番人、そして最後にチャンピオンとなります。',
+  'guide.factionsPage.automatonsTitles':
+    'オートマトンでは、部外者から始まり、操作者、機械技師、工匠、鍛冶長、そして最後にチャンピオンとなります。',
+  'guide.factionsPage.quartermastersHeading': '補給係',
+  'guide.factionsPage.quartermastersBody':
+    '各勢力は拠点に補給係を置いています。ドリフトヘイヴンの裂け目の監視団の補給係ヴェイレン、イーストブルック礼拝堂の教団のテンプラー・アルセア、ワームウォッチのオートマトンの工匠トブリンです。それぞれが装飾品、防具、武器、バッグの小さな品揃えを持ち、その勢力での評判が上がるにつれて段階ごとに解放され、通常の硬貨で買えます。',
+  'guide.factionsPage.readingHeading': 'どこで確認するか',
+  'guide.factionsPage.readingBody':
+    'キャラクターシート（C）の評判タブに、各勢力の現在の評判、次の段階までのバー、評判で得た称号が表示されます。チャットログは評判を得るたびに報告し、新しい段階に達すると画面に祝いのバナーが出ます。',
+  'guide.factionsPage.deedsHeading': '偉業',
+  'guide.factionsPage.deedsBody':
+    '偉業の書も評判を記録します。ある勢力で信頼に達すること、ある勢力でチャンピオンに達することがそれぞれ偉業として記録され、三勢力すべてでチャンピオンに達することは独自の偉業です。他の偉業と同じく、これらは見た目だけで力にはならず、チャンピオンの偉業は身に着けられる称号を授けます。',
+  'guide.commandsPage.pvp':
+    'ワールドPvPフラグ: /pvp で切り替え、/pvp on と /pvp off で直接設定します。フラグを立てたプレイヤー同士はどこでも戦えます。解除には5分かかります。',
+  'guide.commandsPage.pvpZones':
+    'ワールドPvPフラグ: /pvp で切り替え、/pvp on と /pvp off で直接設定します。フラグを立てたプレイヤー同士は係争地で戦え、聖域ではワールドの戦闘は一切行われず、無差別戦闘地帯ではフラグの有無に関わらず戦えます。解除には5分かかります。',
+  'guide.nav.worldPvp': 'ワールドPvP',
+  'guide.worldPvpPage.heading': 'ワールドPvP',
+  'guide.worldPvpPage.intro':
+    'オープンワールドの対人戦は任意参加です。PvPフラグを立てると、パーティ、レイド、ギルドに属さないフラグを立てた全プレイヤーがオープンワールドのどこでも敵になります。フラグを下ろすと、少し経てば再び傍観者に戻ります。フラグを立てていない人は攻撃することも攻撃されることもありません。',
+  'guide.worldPvpPage.flagHeading': 'フラグの上げ下げ',
+  'guide.worldPvpPage.flagBody':
+    'チャットで /pvp と入力するか、G キーで PvP ウィンドウを開いてワールドPvPタブを使います。タブには戦績と賭け金も表示されます。序盤のレベルを過ぎればフラグは即座に立ちます。下ろすと数分のカウントダウンが始まり、戦闘中はフラグが下りないので、自分から始めた戦いから逃げる手段にはなりません。戦闘中のフラグを立てたプレイヤーを回復すると、自分のフラグも立ちます。',
+  'guide.worldPvpPage.stakesHeading': '撃破の価値',
+  'guide.worldPvpPage.stakesBody':
+    'フラグを立てたプレイヤーがフラグを立てた相手を倒すと、敗者は所持金のわずかな割合（上限あり）を支払い、勝者は PvP 装備につながる名誉を得ます。貢献した全員が両方を分け合います。とどめを刺した人、直前にダメージを与えた人、そしてその戦士たちを支えたヒーラーです。純粋な1対1なら独占、集団なら分配です。',
+  'guide.worldPvpPage.limitsHeading': 'フェアプレイのルール',
+  'guide.worldPvpPage.limitsBody':
+    '同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。カウントは日次リセットで元に戻ります。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。',
+  'guide.worldPvpPage.introZones':
+    'オープンワールドの対人戦は任意参加で、その意味は足元の土地が決めます。PvPフラグを立てると、パーティやレイドに属さないフラグを立てた全プレイヤーが係争地で敵になります。フラグを下ろすと、少し経てば再び傍観者に戻ります。2つのゾーンはワールドの戦闘が一切起こらない聖域で、最北の3つのゾーンは、フラグの有無に関わらずその場の全員が攻撃対象となる無差別戦闘地帯です。パーティとレイドの仲間はどこでも敵になりませんが、グループ外のギルドメンバーは他の誰とも同じく攻撃対象です。',
+  'guide.worldPvpPage.zonesHeading': 'ワールドPvPが起こる場所',
+  'guide.worldPvpPage.zonesBody':
+    '世界の土地は3種類に分かれます。修練の浜とイーストブルック渓谷は聖域で、フラグの有無に関わらずワールドPvPは一切起こらないため、新しいキャラクターがフラグとは何かを知る前に戦いを挑まれることはありません。世界の大半は係争地で、そこでは上記のフラグの規則がすべてです。ドレイクランド、フロストヴェイルの果て、アンバーフォールは無差別戦闘地帯で、そこにいる全員がフラグの有無に関わらず、そこにいる他の全員を攻撃できます。境界を越えて入るときにも、出るときにも通知されます。そこでフラグを立てていないプレイヤーを攻撃すると自分のフラグが立つので、仕掛けた側が必ずリスクを背負います。すでにフラグを立てている相手を攻撃しても自分のフラグは立たないため、自衛や、フラグを立てていない誰かを守ることには何の代償もありません。',
+  'guide.worldPvpPage.flagBodyAid':
+    'チャットで /pvp と入力するか、G キーで PvP ウィンドウを開いてワールドPvPタブを使います。タブには戦績と賭け金も表示されます。序盤のレベルを過ぎればフラグは即座に立ちます。下ろすと数分のカウントダウンが始まり、戦闘中はフラグが下りないので、自分から始めた戦いから逃げる手段にはなりません。戦闘中のフラグを立てたプレイヤーを回復、シールド、強化した場合も自分のフラグが立つため、自分はフラグを立てないまま戦う者を背後から支え続けることはできません。フラグを立てていないプレイヤーを支援しても、フラグは立ちません。',
+  'guide.worldPvpPage.stakesBodyFlagged':
+    'フラグを立てたプレイヤーが他のプレイヤーに倒されると、敗者は所持金のわずかな割合（上限あり）を支払い、勝者は PvP 装備につながる名誉を得ます。フラグを立てていなかったプレイヤーは、無差別戦闘地帯で倒れても金貨を一切支払いません。貢献した全員が両方を分け合います。とどめを刺した人、直前にダメージを与えた人、そしてその戦士たちを支えたヒーラーです。純粋な1対1なら独占、集団なら分配です。',
+  'guide.worldPvpPage.stakesUnflaggedTake':
+    'フラグを立てていない戦闘者もゴールドは得られません。ゴールドはフラグを立てた二人のプレイヤーの間でのみ動きますが、貢献した全員が名誉は得られます。',
+  'guide.worldPvpPage.limitsBodyHour':
+    '同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。そのプレイヤーに対するカウントは最初の撃破からおよそ1時間後にようやく元に戻るため、一人を狙い続けて待つ価値はありません。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。',
+  'guide.worldPvpPage.hillBodyRamp':
+    '3時間に1度、予測できない時刻に、無差別戦闘地帯のいずれかに15分後に丘が現れることがレルム全体に告知され、丘が立つ円が開けた土地に示されます。丘は現れてから45分間立ち続け、その後消えます。円の中に立つプレイヤーが最も多いパーティが丘を争い、1分間途切れずに多数を保てば丘はそのパーティのものになります。単独のプレイヤーは一人のパーティとして数えますが、レイドのメンバーは一切数えられません。パーティが丘を占拠している間、円の中に立つそのメンバーは毎分名誉を得て、同じパーティが占拠し続けるほど1分ごとの名誉は増えていきます。満員のパーティが誰にも争われずに丘が立っている間ずっと占拠し続けると、バトルグラウンドの勝利およそ3回分の名誉になります。丘の持ち主が変わると、新しい持ち主の積み上げは最初から始まります。フィールド上部のバーが、誰が占拠しているか、あなた側と相手の人数、そして争奪の時計を表示します。チャットで /hill と入力すると丘の場所が分かります。',
+  'guide.worldPvpPage.limitsBodyRaids':
+    '同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。そのプレイヤーに対するカウントは最初の撃破からおよそ1時間後にようやく元に戻るため、一人を狙い続けて待つ価値はありません。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。レイドはワールドでの撃破から何も得られません。レイドのメンバーは名誉もゴールドも受け取らず、他の人の取り分も減らさないため、報酬を得るにはパーティで戦いましょう。',
+  'guide.worldPvpPage.hillHeading': '丘の王',
+  'guide.worldPvpPage.hillBody':
+    '3時間に1度、予測できない時刻に、無差別戦闘地帯のいずれかに15分後に丘が現れることがレルム全体に告知され、丘が立つ円が開けた土地に示されます。丘は現れてから45分間立ち続け、その後消えます。円の中に立つプレイヤーが最も多いパーティが丘を争い、1分間途切れずに多数を保てば丘はそのパーティのものになります。単独のプレイヤーは一人のパーティとして数えますが、レイドのメンバーは一切数えられません。パーティが丘を占拠している間、円の中に立つそのメンバーは毎分わずかな名誉を得ます。そのため満員のパーティが誰にも争われずに丘が立っている間ずっと占拠し続けると、バトルグラウンドの勝利1回分より少し少ない名誉になります。フィールド上部のバーが、誰が占拠しているか、あなた側と相手の人数、そして争奪の時計を表示します。チャットで /hill と入力すると丘の場所が分かります。',
   'guide.thornhollowPage.heading': 'ソーンホロウ平原',
   'guide.thornhollowPage.intro':
     'ソーンピークの下、古い森に抱かれた壁に囲まれた窪地で戦うランク制5対5の旗奪取戦場。峡谷の両端で二つの廃城が向かい合い、その間にはどちらの手にも落ちたことのない、より古い中庭が横たわる。五人ずつ、城は二つ、目的は一つ。相手の旗を奪い、こちらの旗を奪われる前に持ち帰れ。',
@@ -1595,6 +2444,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'どの試合も、キャラクターに結び付いた戦場レートを勝敗にかかわらず動かし、歴代の表がワールドの勇者たちを順に並べます。',
   'hudChrome.charSheet.offense': '攻撃',
   'hudChrome.charSheet.defense': '防御',
+  'hudChrome.charSheet.spell': '呪文',
+  'hudChrome.charSheet.ratings': 'レーティング',
   'hudChrome.charSheet.playtimeLabel': 'プレイ時間',
   'hudChrome.charSheet.playtimeParts': '{major}{minor}',
   'hudChrome.charSheet.playtimeUnderMinute': '1分未満',
@@ -1660,7 +2511,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.notes.baseChance': '全ての冒険者が共有する5%の基本確率を含みます。',
   'hudChrome.statInfo.notes.dpsApprox':
     '推定値であり、クリティカルやアビリティによるダメージは含みません。',
-  'hudChrome.perf.title': 'パフォーマンスオーバーレイ',
+  'hudChrome.perf.title': 'パフォーマンス',
+  'hudChrome.perf.overlaySection': 'パフォーマンスオーバーレイ',
   'hudChrome.perf.enable': 'パフォーマンスオーバーレイを表示',
   'hudChrome.perf.description': '表示する統計、オーバーレイの位置、外観を設定します。',
   'hudChrome.perf.sectionPosition': '位置',
@@ -1739,6 +2591,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.rateLimited':
     '最近、報告を複数回送信しています。しばらく待ってから送信してください。',
   'hudChrome.bugReport.failed': 'バグ報告を送信できませんでした。もう一度お試しください。',
+  'hudChrome.hostDiag.title': 'システムレポート',
+  'hudChrome.hostDiag.intro':
+    'このコンピューターの詳細情報(プロセッサとメモリを最も多く使用しているプログラムを含む)をファイルにまとめ、パフォーマンスの問題の診断に役立てます。送信は一切行われません。ファイルはお使いのコンピューターに保存されるだけです。',
+  'hudChrome.hostDiag.create': 'システムレポートを作成',
+  'hudChrome.hostDiag.running': 'システム情報を収集しています...',
+  'hudChrome.hostDiag.saved': 'レポートを {fileName} として保存しました。',
+  'hudChrome.hostDiag.savedNoName': 'レポートを保存しました。',
+  'hudChrome.hostDiag.failed': 'レポートを作成できませんでした。もう一度お試しください。',
   'hudChrome.keybinds.emoteWheel': 'エモートホイール',
   'hudChrome.keybinds.sheathe': '武器を納刀/抜刀',
   'hudChrome.keybinds.hideInterface': 'インターフェースを隠す',
@@ -1803,6 +2663,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.forceHighPerfGpu': '専用ゲーミングGPUを使用',
   'hudChrome.options.forceHighPerfGpuNote':
     '既定でオン：デスクトップ版はこのコンピューターの専用ゲーミングGPUを要求します。ゲームが起動しない、起動後に画面が真っ暗になる、またはノートパソコンの画面が映らない場合はオフにしてください。この設定は次回ゲームを起動したときに反映されます。',
+  'hudChrome.options.frameRateCap': 'フレームレート制限',
+  'hudChrome.options.frameRateCapAuto': '自動',
+  'hudChrome.options.frameRateCapDisplay': 'ディスプレイ',
+  'hudChrome.options.frameRateCapNote':
+    'ゲームが1秒間に描画する画像の数を制限します。ディスプレイの速度に追いつけないコンピューターでは、低い制限にすると映像がより安定し、本体の発熱も抑えられます。制限はディスプレイに合わせて決まるため、実際の値は数値と少し異なる場合があります。自動：このコンピューターがディスプレイに追いつけないときだけ制限を下げ、その後は安定して維持します（推奨）。ディスプレイ：制限なし。',
+  'hudChrome.options.frameRateCapStatusPaced':
+    '{hz} Hz のディスプレイで毎秒 {fps} 枚を描画しています。',
+  'hudChrome.options.frameRateCapStatusUnpaced': '毎秒 {fps} 枚に制限しています。',
+  'hudChrome.options.frameRateCapStatusInert':
+    'このディスプレイはすでにこの制限以下で動作しているため、制限による変化はありません。',
   'hudChrome.options.shaderWarm': 'シェーダー事前ウォームアップ ワーカー',
   'hudChrome.options.shaderWarmAuto': '自動',
   'hudChrome.options.shaderWarmOff': 'オフ',
@@ -2439,6 +3309,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'character.inWorld': '世界にいます',
   'character.takeOver': '引き継ぐ',
   'character.inWorldHint': 'すでに世界にいます。別の場所からログアウトするか、引き継いでください。',
+  'character.currentLocation': '現在地: {zone}',
+  'character.lockouts': 'ロックアウト（{count}）',
+  'character.lockoutRaids': 'レイド',
+  'character.lockoutDungeons': 'ダンジョン',
+  'character.lockoutWorldBosses': 'ワールドボス',
   'character.takeOverConfirm':
     'このキャラクターを別のセッションから切断し、こちらに移します。続けますか？',
   'character.renameRequired': '名前変更が必要',
@@ -2805,6 +3680,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.system.deathRecapDrowned': '死亡しました。溺死しました。',
   'hud.system.deathRecapCauterized': '死亡しました。焼灼の炎に飲み込まれました。',
   'hud.system.respawn': '再び休まり、完全な状態になりました。',
+  'hud.system.respawnKeeperToll':
+    '霊魂の癒し手があなたを復活させたが、その代償として弱っている。復活の後遺症が消えるまで、すべての能力値が下がる。',
   'hud.system.ignoringChat': '{name}のチャットを無視します。',
   'hud.system.noLongerIgnoring': '{name}の無視を解除しました。',
   'hud.system.playerNotNearby': 'そのプレイヤーは近くにいません。',
@@ -2840,6 +3717,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.errors.requiresForm': '{form}フォームである必要があります。',
   'hud.errors.bear': 'ブルーイン',
   'hud.errors.cat': '猫',
+  'hud.errors.bearOrCat': 'ブルーインまたは猫',
   'hud.errors.travel': 'フリート',
   'hud.errors.cantInForm': '{form}フォーム中は実行できません。',
   'hud.errors.shapeshifted': '変身中は実行できません。',
@@ -3102,6 +3980,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.resources.energy': 'エネルギー',
   'abilityUi.forms.bear': '熊',
   'abilityUi.forms.cat': '猫',
+  'abilityUi.forms.bearOrCat': '熊または猫',
   'abilityUi.cast.fishing': '釣り',
   'abilityUi.cast.gathering': '採集',
   'abilityUi.cast.thunzharrStormcall': '嵐の呼び声',
@@ -3170,7 +4049,72 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.detail.itemReward': 'アイテム報酬:',
   'questUi.detail.objectiveProgress': '{label}: {current}/{total}',
   'questUi.detail.requiresLevel': 'レベル{level}が必要',
+  'questUi.worldQuest.title': '{zone}: {target}',
+  'questUi.worldQuest.unknown': '不明なワールドクエスト（{id}）',
+  'questUi.worldQuest.itemReward': 'アイテム報酬: {name}',
+  'questUi.worldQuest.rewardLine': '報酬: {reward}',
+  'questUi.worldQuest.availableStatus': '利用可能なワールドクエスト',
+  'questUi.worldQuest.activeStatus': '進行中のワールドクエスト',
+  'questUi.worldQuest.expiresIn': '終了まで{time}',
+  'questUi.worldQuest.mineOre': '銅鉱石を採掘',
+  'questUi.worldQuest.recoverObject': '{name}を回収',
+  'questUi.worldQuest.redirectLeyBeam': 'レイビームを目的地へ導く',
+  'questUi.worldQuest.puzzleTitle': 'レイビームの調整',
+  'questUi.worldQuest.puzzleBeamReach': '接続した水晶：{count}',
+  'questUi.worldQuest.puzzleVictoryTitle': '調整完了',
+  'questUi.worldQuest.puzzleVictoryDetail': 'レイビームが目的地に到達しました。',
+  'questUi.worldQuest.puzzleDefeatTitle': '調整失敗',
+  'questUi.worldQuest.puzzleDefeatDetail': '力が消え、儀式は未完のままです。',
+  'questUi.worldQuest.puzzleReturn': '世界に戻る',
+  'questUi.worldQuest.puzzleResultAnnouncement': '{title}。{detail} {reach}。',
+  'questUi.worldQuest.puzzleInstructions':
+    'タイルを回転させ、光線を始点から目的地までつなげてください。',
+  'questUi.worldQuest.puzzleRotateTile': 'タイル{tile}を回転',
+  'questUi.worldQuest.puzzleConnectors': '接続方向: {connectors}。',
+  'questUi.worldQuest.puzzlePowered': 'このタイルまで光線が届いています。',
+  'questUi.worldQuest.puzzleUnpowered': 'このタイルには光線が届いていません。',
+  'questUi.worldQuest.puzzleClose': 'レイビームパズルを閉じる',
+  'questUi.worldQuest.puzzleSource': '始点',
+  'questUi.worldQuest.puzzleTarget': '目的地',
+  'questUi.worldQuest.puzzleSourceEndpoint': '始点: {direction}。',
+  'questUi.worldQuest.puzzleTargetEndpoint': '目的地: {direction}。',
+  'questUi.worldQuest.matchConfections': '魔法のお菓子を揃える',
+  'questUi.worldQuest.loadFreight': '荷物を荷馬車に積み込む',
+  'questUi.worldQuest.escortCaravan': '{zone}の隊商を護衛する',
+  'questUi.worldQuest.salvageWreckage': '難破船の残骸を回収',
+  'questUi.worldQuest.puzzleLevel': 'デイリーレベル {level}',
+  'questUi.worldQuest.match3Title': 'お菓子の連鎖',
+  'questUi.worldQuest.match3Instructions':
+    '隣り合うお菓子を2つ選んでください。3つ以上の列ができる入れ替えだけが手数に数えられます。',
+  'questUi.worldQuest.match3Moves': '手数：{current}/{total}',
+  'questUi.worldQuest.match3Cleared': '消したお菓子：{current}/{total}',
+  'questUi.worldQuest.match3Cell': '{row} 行 {column} 列：{candy}',
+  'questUi.worldQuest.match3Selected': '選択中',
+  'questUi.worldQuest.match3Reset': 'レベルをやり直す',
+  'questUi.worldQuest.match3VictoryTitle': '甘い勝利',
+  'questUi.worldQuest.match3VictoryDetail': '魔法のお菓子がすべて集まりました。',
+  'questUi.worldQuest.match3DefeatTitle': '苦い敗北',
+  'questUi.worldQuest.match3DefeatDetail': '手数を使い切りました。新しいお菓子が待っています。',
+  'questUi.worldQuest.match3TryAgain': 'もう一度挑戦',
+  'questUi.worldQuest.match3Close': 'お菓子パズルを閉じる',
+  'questUi.worldQuest.match3OutOfMoves': '手数が残っていません。レベルをやり直してください。',
+  'questUi.worldQuest.match3Candy.berry': 'ベリークリスタル',
+  'questUi.worldQuest.match3Candy.citrus': 'シトラスオーブ',
+  'questUi.worldQuest.match3Candy.mint': 'ミントトライアングル',
+  'questUi.worldQuest.match3Candy.grape': 'グレープスクエア',
+  'questUi.worldQuest.match3Candy.star': 'シュガースター',
   'questUi.logs.accepted': 'クエスト受諾: {name}',
+  'questUi.logs.worldQuestStarted': 'ワールドクエスト開始: {name}',
+  'questUi.logs.clueScrollEarned':
+    '今日のワールドクエストをすべて達成：手がかりの巻物を手に入れた。',
+  'questUi.logs.clueScrollLost':
+    '今日のワールドクエストをすべて達成したが、手がかりの巻物はこれ以上持てない。',
+  'questUi.logs.clueHuntStarted': '宝探し開始：{title}',
+  'questUi.logs.clueHuntStep': '手がかり{step}/{total}を解いた：{title}',
+  'questUi.logs.clueHuntDone': '宝探し完了：{title}。宝箱は君のものだ。',
+  'questUi.logs.clueHuntAbandoned': '宝探しを放棄：{title}',
+  'questUi.logs.clueCasketOpened': '宝箱には{money}と{items}が入っていた。',
+  'questUi.tracker.clueHuntTitle': '{title}（手がかり {step}/{total}）',
   'questUi.logs.abandoned': 'クエスト破棄: {name}',
   'questUi.logs.completed': 'クエスト完了: {name}',
   'questUi.logs.ready': '{name}（{status}）',
@@ -3417,9 +4361,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.buy': '購入',
   'itemUi.market.reclaim': '回収',
   'itemUi.market.buyAria': '{item}を{price}で購入',
+  'itemUi.market.buyQuantityAria': '{item}を何個購入するか（全{total}個中）',
+  'itemUi.market.buyQuantityBtnAria': 'この数だけ{item}を購入',
   'itemUi.market.buyConfirmTitle': '購入の確認',
   'itemUi.market.buyConfirmBody': '{item}を{price}で購入しますか？',
   'itemUi.market.buyConfirmBodyStack': '{item} x{count}を{price}（各 {each}）で購入しますか？',
+  'itemUi.market.buyConfirmBodyPartial':
+    '{item}を{count}個（全{total}個中）、{price}（各 {each}）で購入しますか？',
   'itemUi.market.buyConfirmAccept': '購入',
   'itemUi.market.buyConfirmCancel': 'キャンセル',
   'itemUi.market.buyChanged':
@@ -3441,6 +4389,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleProceeds': '売上',
   'itemUi.market.saleOlder': 'ほかに {count} 件の以前の売却があり、合計に含まれています。',
   'itemUi.market.collectAll': 'すべて受け取る',
+  'itemUi.market.history': '履歴',
+  'itemUi.market.historyEmpty':
+    'まだ売却はありません。ワールドマーケットで売却したアイテムがここに表示されます。',
+  'itemUi.market.historyNote': 'ワールドマーケットでの最近の売却記録です。',
   'itemUi.logs.listedItem': '{item}を{money}でワールドマーケットに出品しました。',
   'itemUi.logs.sellerSold':
     '{buyer}があなたの{item}を{money}で購入しました。商人から{proceeds}を受け取ってください。',
@@ -4336,6 +5288,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.mudfin_murloc.name': '泥ひれの潜伏者',
   'entities.mobs.tunnel_rat.name': 'ディープロックの掘削者',
   'entities.mobs.vale_bandit.name': '谷の盗賊',
+  'entities.mobs.eastbrook_freight_caravan.name': 'イーストブルック貨物隊',
+  'entities.mobs.willowfen_remedy_caravan.name': 'ウィローフェン薬品隊商',
+  'entities.mobs.frostveil_supply_caravan.name': 'フロストヴェイル補給隊商',
   'entities.mobs.restless_bones.name': '安らがぬ骨',
   'entities.mobs.gorrak.name': '無慈悲なるゴラック',
   'entities.mobs.mire_prowler.name': '沼の徘徊者',
@@ -4427,7 +5382,20 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '霊魂の癒し手はこの場で復活させてくれますが、復活の後遺症により全属性が75%低下します。高レベルでは最長10分間続きます。魂を遺体まで戻せばペナルティなしで復活できます。',
   'hudChrome.death.healerConfirmAccept': '復活する',
   'hudChrome.death.healerConfirmCancel': 'キャンセル',
+  'hudChrome.death.keeperTalkTitle': '霊魂の癒し手',
+  'hudChrome.death.keeperTalkAccept': '復活する',
+  'hudChrome.death.keeperTalkLeave': '立ち去る',
+  'hudChrome.death.keeperConfirmSparedTitle': '霊魂の癒し手に蘇らせてもらうか？',
+  'hudChrome.death.keeperTalkBody':
+    'その場で蘇らせることはできるが、代償が伴う。復活の後遺症により、すべての能力値が75%低下し、レベルが高いほど長く、最大10分間続く。倒れた場所まで魂を走らせて復活すれば、代償は何もない。',
+  'hudChrome.death.keeperTalkSparedBody':
+    'その場で蘇らせることはできる。本来なら復活の後遺症が伴い、しばらくのあいだ力のすべてが弱まるのだが、おまえはこの世界に来たばかりだ。だから今回は免じてやろう。倒れた場所まで魂を走らせて復活すれば、いずれにせよ代償は何もない。',
+  'hudChrome.death.keeperConfirmBody':
+    '本当によいか？霊魂の癒し手はあなたを蘇らせるが、その代償として弱くなる。復活の後遺症が消えるまで、すべての能力値が75%低下し、レベルが高いほど長く、最大10分間続く。',
+  'hudChrome.death.keeperConfirmSparedBody':
+    '本当によいか？霊魂の癒し手はここであなたを蘇らせる。あなたはレベル10未満なので、今回は復活の後遺症で弱ることはない。',
   'hudChrome.death.spiritHealerAlive': '霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。',
+  'hudChrome.death.ghostHint': '死亡した場所まで走るか、霊魂の癒し手に話しかけて復活しよう',
   'entities.npcs.spirit_healer.name': '霊魂の癒し手',
   'entities.npcs.spirit_healer.title': '死者の番人',
   'entities.npcs.spirit_healer.greeting':
@@ -5011,6 +5979,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.name': 'イーストブルック渓谷',
   'entities.zones.eastbrook_vale.welcome':
     '町のレッドブルック元帥を訪ねてください。あなたに頼みたい仕事があります。',
+  'entities.zones.eastbrook_vale.welcomeDone':
+    'レッドブルック元帥からの仕事はもうありません - あなたの旅が始まった趣のある海辺の町は、おかげで安らかです。',
   'entities.zones.eastbrook_vale.pois.0.label': 'イーストブルック',
   'entities.zones.eastbrook_vale.pois.1.label': '狼の道',
   'entities.zones.eastbrook_vale.pois.2.label': '猪の草地',
@@ -5022,6 +5992,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.name': 'マイアフェン湿地',
   'entities.zones.mirefen_marsh.welcome':
     'フェンブリッジの門で番人フェンウィックに報告してください。',
+  'entities.zones.mirefen_marsh.welcomeDone':
+    '番人フェンウィックからの命令はもうありません - 沼地の湿原の奥深くにたたずむ集落は、おかげでより安全になりました。',
   'entities.zones.mirefen_marsh.pois.0.label': 'フェンブリッジ',
   'entities.zones.mirefen_marsh.pois.1.label': '徘徊者の葦原',
   'entities.zones.mirefen_marsh.pois.2.label': 'ディープフェンの浅瀬',
@@ -5033,6 +6005,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.name': 'ソーンピーク高地',
   'entities.zones.thornpeak_heights.welcome':
     'テサリー隊長がかろうじてハイウォッチの壁を保っています。',
+  'entities.zones.thornpeak_heights.welcomeDone':
+    'テサリー隊長がハイウォッチの壁を守っています - 決して楽ではありませんが、あなたのような冒険者たちの助けで今は何とか持ちこたえています。',
   'entities.zones.thornpeak_heights.pois.0.label': 'ハイウォッチ',
   'entities.zones.thornpeak_heights.pois.1.label': '追跡者の尾根',
   'entities.zones.thornpeak_heights.pois.2.label': 'ディープロックの巣穴',
@@ -5396,6 +6370,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gravecaller_mender.name': 'グレイブコーラーの癒し手',
   'questUi.dialog.discussQuest': '{name}について話す。',
   'questUi.dialog.discussQuestAria': 'クエストについて話す: {name}',
+  'questUi.dialog.clueTalk': '手がかりについて尋ねる。',
+  'questUi.dialog.clueTalkAria': '手がかりについて尋ねる：{name}',
+  'questUi.dialog.clueDeliver': '{item}を{count}個渡す。',
+  'questUi.dialog.clueDeliverAria': '{name}に{item}を{count}個渡す',
   'questUi.dialog.nythraxisDeathlessKingWarning':
     '三つの遺物は同じ物語を語っています。オルドレンは王を守るために戦い、マルリックは死の境界を破り、ヴォスはその後に起きたことを止めようとしました。封印は弱まり、廃棄された墓所こそ地下への道です。',
   'entities.items.runed_bone_shard.name': 'ルーン刻みの骨片',
@@ -6469,6 +7447,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.leaderboard.devTierCol': 'バッジ',
   'hudChrome.leaderboard.mergedPrs': 'マージ済みPR',
   'hudChrome.leaderboard.devEmpty': 'ランク入りのコントリビューターはまだいません。',
+  'hudChrome.wqLadder.title': 'ワールドクエストランキング',
+  'hudChrome.wqLadder.subtitle':
+    '各ヒーローの最高記録。メダル付きワールドクエストごとのランキングです。',
+  'hudChrome.wqLadder.close': 'ワールドクエストランキングを閉じる',
+  'hudChrome.wqLadder.rankedBy.waves': '耐えたウェーブ数順',
+  'hudChrome.wqLadder.rankedBy.seconds': '最速タイム順',
+  'hudChrome.wqLadder.rankedBy.points': '最高スコア順',
+  'hudChrome.wqLadder.rankedByMedal.waves': 'メダル順、次に耐えたウェーブ数',
+  'hudChrome.wqLadder.rankedByMedal.seconds': 'メダル順、次に最速タイム',
+  'hudChrome.wqLadder.rankedByMedal.points': 'メダル順、次に最高スコア',
+  'hudChrome.wqLadder.podiumLabel': 'トップ3',
+  'hudChrome.wqLadder.unclaimed': '空席',
+  'hudChrome.wqLadder.totalOne': '1人がランクイン',
+  'hudChrome.wqLadder.totalMany': '{count}人がランクイン',
+  'hudChrome.wqLadder.selfLabel': '自己ベスト',
+  'hudChrome.wqLadder.selfRank': '{rank}位',
+  'hudChrome.wqLadder.selfNone':
+    'このボードにはまだ記録がありません。ワールドクエストをクリアしてランキングに参加しましょう。',
   'hudChrome.leaderboard.podiumLabel': 'トップ3',
   'hudChrome.leaderboard.prestigeTitle': '威信 {rank}',
   'hudChrome.leaderboard.unclaimed': '空席',
@@ -7094,8 +8090,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'インターフェースのアニメーションをなくし、ウィンドウを即座に表示します。第一にはアクセシビリティのためのオプションですが、パフォーマンスもわずかに向上します。',
   'guide.settingsPage.rowPerfOverlay':
     'FPSやフレームタイムなどを画面上に表示します。このページの設定を調整する間だけオンにして、終わったらまた非表示に戻しましょう。',
+  'guide.settingsPage.rowFrameRateCap':
+    'ゲームが1秒間に描画する画像数の上限です。ディスプレイに追いつけないコンピューターは不規則なリズムになりがちですが、安定した30のほうが滑らかに見え、処理量は半分になり、本体の発熱も抑えられます。「ディスプレイ」は制限なしを意味します。',
   'guide.settingsPage.tableFoot':
-    'FPSの上限をお探しですか。探すものはありません。フレームの歩調はあなたのディスプレイに従います。描画距離はワールド詳細カードにある「視界距離」という独立したつまみで、あなたが自分で動かすまでは各プリセットが設定してくれます。',
+    '描画距離はワールド詳細カードにある「視界距離」という独立したつまみで、あなたが自分で動かすまでは各プリセットが設定してくれます。',
   'guide.settingsPage.mobileTitle': 'スマートフォンとタブレットでは',
   'guide.settingsPage.mobileBody':
     'スマートフォンやタブレットでは、ゲームはLowから始めます。タッチ端末はどれも初回起動でそこに着地します。これは意図的で、まず世界に入って遊べるようにするためです。グラフィックパネルからいつでも自分で上げてください。Androidのブラウザでは段のすべてが開かれており、選択もそのまま保たれます。iPhoneとiPadでも最上位のプリセットは選べ、「適用」を押せばすぐに効きますが、次回の起動時にゲームがHighへ戻します。これほど大きな場面を組み立てている最中に、iOSがタブを終了させることがあるためです。ダウンロード版アプリはさらに絞られていて、プリセットの一覧はHighで止まり、個別のシステムつまみは隠されています。アプリがそれらを自分で管理するからです。',
@@ -7760,6 +8758,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.questsPage.sagaValeBody':
     'イーストブルックでは死者が安らがず、その背後の印は、とうに滅んだと思われていた一派のものです。それを礼拝堂の地下墓所で働くグレイブコーラーまでたどれば、彼自身の書き物が北の沼へとあなたを導きます。',
   'guide.questsPage.sagaValeTitle': '渓谷：印に刻まれた名',
+  // The Clue Scrolls section of the Guide quests page (M16 non-Latin fills).
+  'guide.questsPage.cluesTitle': '手がかりの巻物',
+  'guide.questsPage.cluesBody':
+    '遠くの地域では、日替わりのワールドクエスト掲示板が、その日の枠をすべて片づけた者にもう一つの報酬を隠しています。手がかりの巻物と、そこに書かれた宝探しです。',
+  'guide.questsPage.cluesEarnTitle': '巻物を手に入れる',
+  'guide.questsPage.cluesEarnBody':
+    'キャラクターが十分に進んだら、その日のワールドクエスト掲示板の地域枠をすべて完了すると、通常の報酬に加えて手がかりの巻物が手に入ります。振り直した枠も終えれば数に入り、常時開いているデイリーは必要ありません。巻物は数枚まで持てるので、手に入れた日に使う必要はありません。',
+  'guide.questsPage.cluesHuntTitle': '手がかりをたどる',
+  'guide.questsPage.cluesHuntBody':
+    '巻物を使うと宝探しが始まります。短い謎かけの連なりが、クエストトラッカーに一つずつ表示されます。どの謎かけも世界に実在する何かを指しています。立つべきランドマーク、話すべき人物、どこかで行うエモート、あるいはちょっとした用事で、最後の一つは必ず「掘れ」と告げます。宝探しは一度に一つだけ進み、日次リセットをまたいでもセッションの間でも進み具合が保たれるので、ゆっくり取り組めます。',
+  'guide.questsPage.cluesCasketTitle': '小箱',
+  'guide.questsPage.cluesCasketBody':
+    '最後の謎かけを解き、それが示す場所で巻物を使うと、宝の小箱を掘り出せます。宝探しを終えると、その地を治める勢力の評判も得られます。小箱からは硬貨と上質な採集素材がまとまって出ます。時には装備品や英雄の証が入っていることもあり、ごくまれに、ここでしか手に入らない騎乗動物「ランタンバックのグルンボル」が見つかります。最初の小箱と十個目は功績の書に記録されます。',
   'guide.questsPage.sideCryptBody':
     '高地には、より静かな謎が走っています。どんな記録にも残らぬ冠が刻まれた古い墓です。死者を読み解き、彼らが守ってきたものを集め、閉ざされたままであるべき墓を解き放ちましょう。それは探偵の足取りであり、レルムの十人エンドゲームレイドへの道を開きます。',
   'guide.questsPage.sideCryptTitle': '忘れられた王',
@@ -8628,9 +9639,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '回避できないダメージには残っている防御クールダウンを使う。戦闘を終えるまで、それまでのメカニクスを引き続き丁寧に処理する。',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': '骨の嵐',
   'hudChrome.raidBossGuide.nythraxis.boneStormSummary':
-    '王の怒りの開始から{first}秒後、以降{everyNormal}秒ごとに、ナイスラクシスは{duration}秒間骨の嵐を始める。彼はヘイトを無視し、通常の{speed}倍の速度で移動し、それぞれ{chargeSeconds}秒続く突進を{charges}回行う。彼の旋風は{radius}ヤード以内へ毎秒最大体力の{whirlNormal}を与える。各突進の終わりには同じ範囲内で骨の一撃が発生し、最大体力の{slamNormal}を与える。嵐が終わってから{rearm}秒後にグレイブブレイカーが再び使用可能になる。',
+    '王の怒りの開始から{first}秒後、以降{everyNormal}秒ごとに、ナイスラクシスは{duration}秒間骨の嵐を始める。彼はヘイトを無視し、通常の{speed}倍の速度で移動し、それぞれ{chargeSeconds}秒続く突進を{charges}回行う。彼の旋風は{radius}ヤード以内へ毎秒最大体力の{whirlNormal}を与える。各突進の終わりには同じ範囲内で骨の一撃が発生し、最大体力の{slamNormal}を与える。嵐の開始と同時に、生きているソウルレンドマークはすべて解決されないまま放出され、ソウルレンドの爆発直後は嵐が開始されない。嵐が終わってから{rearm}秒後にグレイブブレイカーが再び使用可能になる。',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
-    '王の怒りの開始から{first}秒後、以降{everyHeroic}秒ごとに、ナイスラクシスは{duration}秒間骨の嵐を始める。彼はヘイトを無視し、通常の{speed}倍の速度で移動し、それぞれ{chargeSeconds}秒続く突進を{charges}回行う。彼の旋風は{radius}ヤード以内へ毎秒最大体力の{whirlHeroic}を与える。各突進の終わりには同じ範囲内で骨の一撃が発生し、最大体力の{slamHeroic}を与える。嵐が終わってから{rearm}秒後にグレイブブレイカーが再び使用可能になる。',
+    '王の怒りの開始から{first}秒後、以降{everyHeroic}秒ごとに、ナイスラクシスは{duration}秒間骨の嵐を始める。彼はヘイトを無視し、通常の{speed}倍の速度で移動し、それぞれ{chargeSeconds}秒続く突進を{charges}回行う。彼の旋風は{radius}ヤード以内へ毎秒最大体力の{whirlHeroic}を与える。各突進の終わりには同じ範囲内で骨の一撃が発生し、最大体力の{slamHeroic}を与える。嵐の開始と同時に、生きているソウルレンドマークはすべて解決されないまま放出され、ソウルレンドの爆発直後は嵐が開始されない。嵐が終わってから{rearm}秒後にグレイブブレイカーが再び使用可能になる。',
   'hudChrome.raidBossGuide.nythraxis.boneStormResponse':
     '散開し、ナイスラクシスから走って逃げ続ける。突進の対象になったレイドメンバーは走って逃げ、他の全員は突進経路の周囲に空間を空ける。嵐が終わったらタンクが確保する。',
   'hudChrome.raidBossGuide.nythraxis.crownEnduresName': '王冠不滅',
@@ -8652,6 +9663,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.dmgDone': '与えるダメージを{pct}%上昇させる',
   'hudChrome.auraEffect.dmgDoneReduce': '与えるダメージを{pct}%低下させる',
   'hudChrome.auraEffect.carriedFlag': '敵の旗を運搬中です。このバフを解除すると旗を落とします。',
+  'hudChrome.auraEffect.carryingFreight': '荷物を運搬中です。移動速度が{pct}%低下します。',
   'hudChrome.auraEffect.elementalConvergencePrimed':
     '次に異なる属性の呪文を唱えると、エレメンタル・コンバージェンスが発動します',
   'hudChrome.auraEffect.heatingUp':
@@ -8780,9 +9792,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '守りの聖歌が完全に消費されると、10秒以内の次の浄めの聖歌が即時発動になります。この効果は15秒に1回まで発動します。',
   'entities.itemSets.benison_dawnweave.name': 'ベニソン・ドーンウィーヴの法衣',
   'entities.itemSets.benison_dawnweave.bonus2':
-    '熾天使の見守りの救援回復量が180から270に上昇します。被ダメージで詠唱が遅れなくなります。',
+    '囁きの祈り、厳かな祈り、緊急の祈りで体力を回復すると、次の聖歌の癒やしの回復量が10%増加し、最大3回まで蓄積します。各詠唱で得られる蓄積は最大1回です。聖歌の癒やしは詠唱完了時にすべての蓄積を消費します。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.benison_dawnweave.bonus4':
-    '熾天使の見守りが発動すると、守られた味方はさらに10秒かけて最大体力の15%の回復を得ます。',
+    '3蓄積で聖歌の癒やしを完了すると、60秒以内の次の囁きの祈りが即時発動になり、回復量が100%増加します。この効果は蓄積せず、再度得ると持続時間が更新されます。',
   'entities.itemSets.vesperash.name': 'ヴェスパーアッシュの外套',
   'entities.itemSets.vesperash.bonus2':
     'タイスフィーンド招来のクールダウンが6秒短縮されます。被ダメージで詠唱が遅れなくなります。',
@@ -9209,6 +10221,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': '再読み込み',
   'desktop.crash.quit': '終了',
   'desktop.titlebar.exitGame': 'ゲームを終了',
+  'desktop.hostDiag.saveTitle': 'システムレポートを保存',
+  'desktop.hostDiag.saveButton': '保存',
+  'desktop.hostDiag.fileType': 'JSON ファイル',
   'desktop.crash.fatalBody': 'World of ClaudeCraft で予期しないエラーが発生したため、終了します。',
   'gpuNotice.bodyDesktop':
     'ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。',
@@ -10440,6 +11455,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.listingStatusCancelled': '取り下げ済み',
   'hudChrome.wocMarket.listingStatusSuspended': '停止中',
   'hudChrome.wocMarket.listingStatusUnsold': '未売却',
+  'hudChrome.wocMarket.charselectWebLink': '$WOC 取引所のウェブサイトで入札・購入・出品する',
+  'hudChrome.wocMarket.charselectWebNote':
+    '入札、購入、出品するにはキャラクターでゲームに入ってください。',
   'hudChrome.wocMarket.bidBondPayItemAria': '{item} への入札の保証金 {bond} を支払う',
   'hudChrome.wocMarket.strikesTip':
     '確定した取引の支払いをしなかった場合、そのたびに違反が 1 回記録されます。1 回目以降は、違反のたびに取引所の停止期間が長くなります。3 日、次に 14 日、90 日、そして 1 年です。',
@@ -11669,6 +12687,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': '影跳びのカマカゲ',
   'hudChrome.mounts.name_stormfeather_griffin': 'スカイリーチ・ストームフェザー',
   'hudChrome.mounts.name_drakemaw_raptor': '火口のラプトル',
+  'hudChrome.mounts.name_avian_strider': 'ヴィリジアン・ヴェイルストライダー',
   'hudChrome.mounts.name_lanternback_troll': 'ランタンバックのグルンボル',
   'hudChrome.mounts.name_chimeglass_tortoise': '鐘硝子のトリヴァー',
   'hudChrome.mounts.desc_drakemaw_raptor':
@@ -11676,6 +12695,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_mech_bird': 'ゼンマイ・メカバード',
   'hudChrome.mounts.desc_mech_bird':
     '手作りのゼンマイ仕掛けの戦闘ニワトリ。サーボを軋ませて疾走し、ゼンマイのキーは今も回り続けている。',
+  'hudChrome.mounts.desc_avian_strider':
+    '巨大な騎乗鳥。太い鉤爪と畳んだ翼が、あらゆる旅路を雷鳴のような疾走に変える。',
   'hudChrome.mounts.desc_lanternback_troll':
     '点灯人に軛で馴らされた丘トロル。肩に鉄の玉座を担ぎ、その両の肘掛けには嵐提灯が灯る。',
   'hudChrome.mounts.desc_chimeglass_tortoise':
@@ -11800,6 +12821,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // Unstuck recovery (M16 non-Latin fills).
   'hudChrome.unstuck.helpUnstuckSickness':
     '復帰：/unstuck はその場でカウントダウンを開始し、完了すると最寄りの墓地へ移動します。倒れていた場合は蘇生します。スタック解除の後遺症が最大5分間残ります。',
+  'hudChrome.unstuck.helpUnstuckWindow':
+    '復帰：/unstuck はその場でカウントダウンを開始し、完了すると最寄りの墓地へ移動します。倒れていた場合は蘇生します。1時間以内の初回使用は無償です。前回の使用から1時間以内に再び使うと、スタック解除の後遺症が最大5分間残ります。',
   'hudChrome.unstuck.menuButton': 'スタック解除',
   'hudChrome.unstuck.help':
     '復帰：/unstuck はその場でカウントダウンを開始し、近くの到達可能な安全地点へ移動します。',
@@ -11807,6 +12830,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '復帰：/unstuck はその場でカウントダウンを開始し、完了すると魂を最寄りの墓地へ送ります。生き返るには霊魂の癒し手から番人の代償を受ける必要があります。',
   'hudChrome.unstuck.movedToGraveyard':
     '最寄りの墓地へ移動しました。スタック解除の後遺症があなたにのしかかっています。',
+  'hudChrome.unstuck.movedToGraveyardFree':
+    '最寄りの墓地へ移動しました。1時間以内にもう一度スタック解除を使うと、スタック解除の後遺症が残ります。',
+  'hudChrome.unstuck.revivedAtGraveyardFree':
+    '最寄りの墓地へ移動し、蘇生しました。1時間以内にもう一度スタック解除を使うと、スタック解除の後遺症が残ります。',
   'hudChrome.unstuck.revivedAtGraveyardUnstuck':
     '最寄りの墓地へ移動し、蘇生しました。スタック解除の後遺症があなたにのしかかっています。',
   'hudChrome.unstuck.started':
@@ -12293,6 +13320,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.harbormaster_odile.title': 'ウィックハーバーの港務長',
   'entities.npcs.harbormaster_odile.greeting':
     'この入り江の船はどれも、竜骨ごとオールドビーコンに借りがある。用件は手短にね、潮は待ってくれないよ。',
+  'entities.npcs.harbormaster_tamsin.greeting':
+    '波止場から中へどうぞ、手を温めていきなさい。うちの桟橋の船は長い東の海岸を北へ上ってウィックハーバーへ向かい、また戻ってきます。はるか西では、もう一隻の渡し船がイーストブルックとナイトブルームの間を行き来しています。壁の地図に二つの航路が描いてありますよ。ワームウォッチへ登る前に、火のそばでひと休みしていきなさい。',
+  'entities.npcs.harbormaster_tamsin.name': '港務長タムシン',
+  'entities.npcs.harbormaster_tamsin.title': 'ワームウォッチ波止場の番人',
   'entities.npcs.head_gardener_amaranth.name': '庭園長アマランス',
   'entities.npcs.head_gardener_amaranth.title': 'エバーガーデンの庭園長',
   'entities.npcs.head_gardener_amaranth.greeting':
@@ -12614,6 +13645,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.last_keep_signet.name': '最後の砦の印章',
   'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
   'entities.items.reins_terrorspark_groundshaker.name': 'ドレッドスパークの始動キー',
+  'entities.items.reins_avian_strider.name': 'ヴィリジアン・ヴェイルストライダーの手綱',
   'entities.items.reins_lanternback_troll.name': '点灯人の軛：グルンボル',
   'entities.items.reins_chimeglass_tortoise.name': '道守の鈴帯：トリヴァー',
   'entities.items.reins_rickshaw_mount.name': '縛りの手綱：骨縛りの人力車',
@@ -12675,6 +13707,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.shearkeeper_gloves.name': '鋏守の手袋',
   'entities.items.silkbound_remains.name': '絹に包まれた亡骸',
   'entities.items.sprung_trap.name': '弾かれた沼の罠',
+  'entities.items.leyline_cache.name': 'ミニチュア・レイライン宝箱',
+  'entities.items.confection_game_box.name': '菓子職人のゲーム箱',
+  'entities.items.eastbrook_freight_crate.name': 'イーストブルックの貨物箱',
+  'entities.items.eastbrook_freight_wagon.name': 'イーストブルックの貨物荷馬車',
   'entities.items.sunken_idol_mantle.name': '沈んだ神像のマント',
   'entities.items.sunken_offering_bowl.name': '再び満たされた供物鉢',
   'entities.items.thick_winter_pelt.name': '厚い冬毛皮',
@@ -13871,6 +14907,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.buffs': 'バフ',
   'hudChrome.targetAuras.unlock': 'ターゲットオーラウィンドウを移動',
   'hudChrome.targetAuras.lock': 'ターゲットオーラウィンドウをロック',
+  'hudChrome.targetAuras.close': 'ターゲットオーラウィンドウを閉じる',
   'hudChrome.targetAuras.configureRows': 'ターゲットオーラを設定',
   'hudChrome.targetAuras.fewerRows': 'オーラ行数を少なくする',
   'hudChrome.targetAuras.moreRows': 'オーラ行数を多くする',
@@ -14221,6 +15258,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paperdoll.hideHelmAria': '兜を隠す',
   'hudChrome.paperdoll.showHelmAria': '兜を表示',
   'hudChrome.options.waterRipples': '水面の波紋（航跡）',
+  'hudChrome.options.actionCam': 'アクションカメラ',
+  'hudChrome.options.actionCamShoulder': 'アクションカメラの肩',
+  'hudChrome.options.actionCamShoulderLeft': '左 {pct}',
+  'hudChrome.options.actionCamShoulderRight': '右 {pct}',
+  'hudChrome.options.actionCamShoulderCenter': '中央',
   'hudChrome.breath.label': '息',
   'hudChrome.breath.drowning': '溺れています！',
   'abilityUi.resources.devotion': '献身',
@@ -14702,6 +15744,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.combat.threatTitle': '敵は誰を殴るのか',
   'guide.combat.unstuckBody':
     '世界に閉じ込められて抜け出せなくなったら、/unstuck と入力しましょう。戦闘外で静止していること、スタンや根縛りで拘束されていないこと、決闘中でもアリーナ試合中でもないことが条件です。短いカウントダウンが走り、移動するかダメージを受けると中断されます。終われば最寄りの墓地に下ろされます。これで死ぬことはなく、亡骸も残りません。すでに倒れていた場合は、そこで蘇生されます。代償はスタック解除の後遺症です。あなたのすべてが一時的に弱まる効果ですが、次にこのコマンドを使えるようになる頃には切れています。そして復活の後遺症と同じく、生まれたてのキャラクターは完全に免除されます。',
+  'guide.combat.unstuckBodyWindow':
+    '世界に閉じ込められて抜け出せなくなったら、/unstuck と入力しましょう。戦闘外で静止していること、スタンや根縛りで拘束されていないこと、決闘中でもアリーナ試合中でもないことが条件です。短いカウントダウンが走り、移動するかダメージを受けると中断されます。終われば最寄りの墓地に下ろされます。これで死ぬことはなく、亡骸も残りません。すでに倒れていた場合は、そこで蘇生されます。1時間以内の初回使用には何の代償もありません。前回の使用から1時間以内に再び使うと、代償はスタック解除の後遺症です。あなたのすべてが一時的に弱まる効果ですが、次にこのコマンドを使えるようになる頃には切れています。そして復活の後遺症と同じく、生まれたてのキャラクターは完全に免除されます。',
   'guide.combat.unstuckTitle': '本当に動けなくなったとき',
   'guide.commandsPage.abilities': '習得済みのアビリティを表示します。',
   'guide.commandsPage.afk':
@@ -14853,6 +15897,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.unknownHeading': 'コマンドが働かないとき',
   'guide.commandsPage.unstuck':
     '世界に閉じ込められたときの出口です。短いカウントダウンのあいだ静止していれば最寄りの墓地へ移され、すでに倒れていた場合はそこで蘇生されます。その後しばらくスタック解除の後遺症で弱ったままになるので、近道ではなく最後の手段と考えましょう。',
+  'guide.commandsPage.unstuckWindow':
+    '世界に閉じ込められたときの出口です。短いカウントダウンのあいだ静止していれば最寄りの墓地へ移され、すでに倒れていた場合はそこで蘇生されます。1時間以内の初回使用は無償です。前回の使用から1時間以内に再び使うと、その後しばらくスタック解除の後遺症で弱ったままになるので、近道ではなく救助手段と考えましょう。',
   'guide.commandsPage.where': '今立っている地方、そのレベル帯、そしてあなたの座標を表示します。',
   'guide.commandsPage.whisper':
     'オンラインのプレイヤー1人に非公開のメッセージを送ります。該当する人が1人しかいなければ、名前の大文字小文字は入力したとおりで一致します。',
@@ -15042,6 +16088,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.toolCharmTerm': '道具の護符',
   'guide.glossary.unstuckDef':
     'ゲームメニューのスタック解除を使った代償です。カウントダウンのあいだ動かずにいると最寄りの墓地へ降ろされ、その後しばらく一時的な衰弱を背負います。',
+  'guide.glossary.unstuckDefWindow':
+    'ゲームメニューのスタック解除に1時間のうち二度以上頼った代償です。カウントダウンのあいだ動かずにいると最寄りの墓地へ降ろされます。1時間以内の初回使用は無償ですが、前回の使用から1時間以内に繰り返すと、その後しばらく一時的な衰弱も背負います。',
   'guide.glossary.unstuckTerm': 'スタック解除の後遺症',
   'guide.glossary.warfareDef':
     '対人戦の装備側の仕組みです。需品係が名誉と引き換えにウォーフェアの防具セットを売り、それらが持つウォーフェアレーティングは、ほかのプレイヤーとの戦いでのみ効果があります。',
@@ -15314,6 +16362,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '自分のバフとデバフを、オーラバーだけでなく自分のユニットフレームにも表示します。',
   'guide.settingsPage.ifAlwaysShowAllBuffs':
     '低画質プリセットでも、通常のバフアイコンの上限を無視してすべてのバフを常に表示します。',
+  'guide.settingsPage.ifShowAuraCaster':
+    'すべてのバフ／デバフのツールチップに「使用者」の行を追加し、誰がかけたかを表示します。複数のパラディンのブレッシングなど、同じバフの使用者を見分けるのに便利です。',
   'guide.settingsPage.ifChatFontScale': 'チャットの文字サイズです。',
   'guide.settingsPage.ifChatIntro':
     'チャットウィンドウの読みやすさに関する設定です。チャットウィンドウそのものをリセットする項目もここにあります。',
@@ -16176,6 +17226,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.backfillNote':
     '補充の席は意図的に危険のないものになっています。あなたが飛び込むのは自分が関わっていない戦況なので、勝っても負けてもこの試合があなたの戦場レーティングに触れることはなく、途中で抜けても何も負いません。試合が終わりに近づき、来たところで結果を変えられない頃合いになると誘い自体が届かなくなるので、他人の幕引きに座らされることはありません。',
   'hudChrome.trade.windowClosed': '取引ウィンドウを閉じました。',
+  'hudChrome.trade.offerQuantityHint': '差し出す数量を選べます',
+  'hudChrome.trade.offerQuantityTitle': '{item}を差し出す',
+  'hudChrome.trade.offerQuantityInput': '差し出す数量',
+  'hudChrome.trade.offerQuantityConfirm': '差し出す',
+  'hudChrome.trade.offerQuantityAll': 'すべて差し出す',
+  'hudChrome.trade.offerRemoveTitle': '{item}を取り除く',
+  'hudChrome.trade.offerRemoveInput': '取り除く数量',
+  'hudChrome.trade.offerRemove': '取り除く',
+  'hudChrome.trade.offerRemoveAll': 'すべて取り除く',
   'hudChrome.trade.woc.hintInsufficientBalance': '接続中のウォレットの $WOC 残高を超えています。',
   'hudChrome.trade.woc.priceLabel': '価格（USD）',
   'hudChrome.trade.woc.equivalent': '現在のレートで約 {tokens} $WOC',
@@ -16762,6 +17821,52 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perfecting.nameSubmitBusy': '鍛造中',
   'hudChrome.perfecting.nameCancel': 'キャンセル',
   'crucibleShop.balanceEntry': '{name} x{count}',
+  'questUi.worldQuest.calligraphyTitle': '秘術の書道',
+  'questUi.worldQuest.traceOutline': '足取りで輪郭をなぞる',
+  'questUi.worldQuest.traceRoundInstruction': '{round}/{total}回目：{shape}。{instruction}',
+  'questUi.worldQuest.traceShape.triangle': '三角形',
+  'questUi.worldQuest.traceShape.square': '正方形',
+  'questUi.worldQuest.traceShape.star': '星形',
+  'questUi.worldQuest.traceReady': '先生に話しかけて始めよう。',
+  'questUi.worldQuest.tracePreview': '輪郭を見よう。金色の光が道を示してくれる。',
+  'questUi.worldQuest.traceStart': '開始地点の印へ。どちら向きでもなぞれる。',
+  'questUi.worldQuest.traceDrawing': '金色の光をたどって輝く角へ。青い線が歩いた跡だ。',
+  'questUi.worldQuest.traceSuccess': '輪郭が完成！',
+  'questUi.worldQuest.traceRetry': '先生に話しかけて再挑戦しよう。',
+  'questUi.worldQuest.traceOffPath': '輪郭から外れた。先生に話しかけて再挑戦しよう。',
+  'questUi.worldQuest.traceMovement': '騎乗せず地面を歩こう。先生に話しかけて再挑戦しよう。',
+  'questUi.worldQuest.traceTimeout': '時間切れ。先生に話しかけて再挑戦しよう。',
+  'questUi.worldQuest.traceCombat': '戦闘を離れ、先生に話しかけて再挑戦しよう。',
+  'entities.npcs.calligraphy_instructor.name': 'エリアン先生',
+  'entities.npcs.calligraphy_instructor.title': '秘術の書道',
+  'entities.npcs.calligraphy_instructor.greeting':
+    '安定した足取りは安定した線を生む。弟子たちに三角形、四角形、高度なルーンを教えてくれ。',
+  'entities.npcs.calligraphy_apprentice_1.name': '見習いテッサ',
+  'entities.npcs.calligraphy_apprentice_1.title': '書道の生徒',
+  'entities.npcs.calligraphy_apprentice_1.greeting':
+    'いつも早く曲がりすぎちゃうの。どこが角なのか教えてくれる？',
+  'entities.npcs.calligraphy_apprentice_2.name': '見習いピップ',
+  'entities.npcs.calligraphy_apprentice_2.title': '書道の生徒',
+  'entities.npcs.calligraphy_apprentice_2.greeting':
+    'まず三角形、次は四角形、それからルーン。一歩ずつしっかり歩こう！',
+  'questUi.worldQuest.traceShape.hourglass': '砂時計',
+  'questUi.worldQuest.traceShape.lightning': '稲妻のルーン',
+  'questUi.worldQuest.traceShape.spiral': '角張った渦巻き',
+  'questUi.worldQuest.traceShape.double-triangle': '双三角の印',
+  'questUi.worldQuest.traceRating.bronze': '銅',
+  'questUi.worldQuest.traceRating.silver': '銀',
+  'questUi.worldQuest.traceRating.gold': '金',
+  'questUi.worldQuest.traceScoreResult':
+    '完成！{rating}：{score}/{total}。基本報酬は不変。ゴールド：功績、称号、名声+10。',
+  'questUi.worldQuest.traceCompletionLog': '{completion} {result}',
+  'questUi.worldQuest.traceUnavailable': 'このルーンには新しいゲーム版が必要。',
+  'questUi.worldQuest.traceReaction.tessaTriangle': '三つの角が全部ぴったり！',
+  'questUi.worldQuest.traceReaction.pipSquare': '辺が四つ！私にもできそう！',
+  'questUi.worldQuest.traceReaction.elianFinal':
+    '最後のルーンだ。線が交差したり同じ点を通り直したりすることもある。明るい印をたどって次の角へ進もう。',
+  'questUi.worldQuest.traceReaction.elianGold': '見事な線だ！その足取りは金の評価にふさわしい。',
+  'questUi.worldQuest.traceReaction.elianComplete':
+    'ルーンが完成した！丁寧に練習すれば次はもっと上手くなる。',
   'guide.arenaPage.honorFinalNoteSoldBack':
     '名誉での購入は取り消せません。商人の買い戻し一覧に並ぶのは、自分が売った品だけです。コインでの買い物なら、たいていは売却価格で売り戻せますし、また気が変わればその一覧から取り戻せますが、ウォーフェア装備は買った瞬間に魂縛されるため、取引にも郵送にも売り戻しにも二度と回せません。その一覧にウォーフェア装備が並ぶことは、決してありません。商店がわざわざ確認を求めるのはそのためです。押す前に、その一点をよく読みましょう。',
   'guide.arenaPage.rewardsBodyLossShare':
@@ -16784,6 +17889,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '「フレーム編集」は、その下に積み重なるトラッカー群(追跡中のクエストとその目標、功績の進み具合、聖遺物庫のページ、製作でピン留めしたレシピ、潜っているデルヴ、参加中のリフト、そして追跡中のレシピまたは依頼)、ペットフレーム脇のペットアクションバー、周囲の敵にかけた継続的なデバフをまとめて表示する「ターゲットデバフ」フレーム、パラディンの「献身」の記章、ウォーロックの「苦痛リソースバー」、スペル発動オーバーレイ、二刀流時のオフハンド用スイングバー、そしてタブ式のダメージメーターウィンドウも緩めます。緩んでいる間はそれぞれに名前のチップが付きます。',
   'guide.interfacePage.framesGovernedTalkingHead':
     '「フレームを編集」では会話パネルも動かせるようになります。会話パネルは、話しているNPCが視界の外にいるときにそのセリフを表示するもので、ロック解除中は名前チップを表示します。',
+  'guide.interfacePage.framesGovernedUnitTooltip':
+    '「フレーム編集」ではツールチップフレームも動かせるようになります。マウスを合わせた対象のカードが表示される位置で、クリーチャーならレベルと種類、ほかのプレイヤーなら称号、ギルド、レベルとクラス、そして専門化とその役割が表示されます。好きな場所へドラッグすると、カードはそこから画面の近い端を避ける向きに広がります。「フレーム設定」の「フレームの表示・非表示」でツールチップのチェックを外すと、このカードを完全に非表示にできます。',
   'guide.interfacePage.framesGovernedAuraTracks':
     '「フレーム編集」は、同じ「インターフェース」オプションの「戦闘」タブでオンにした任意の6つのオーラトラック、すなわち「自分のバフ」トラック、「防御クールダウン」トラック、「自分のシールド」トラック、「攻撃クールダウン」トラック、「移動とステルス」トラック、「味方へのバフ」トラックも緩めます。どのトラックも初期状態ではオフで、緩んでいる間はそれぞれに名前のチップが付きます。',
   'guide.interfacePage.mapBodyZoneFirst':
@@ -16912,6 +18019,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'バトルグラウンドまたはアリーナのキューが成立したら Discord のダイレクトメッセージで知らせる（Discord アカウントの連携が必要）',
   'hudChrome.interfaceUnlock.frameNames.petBar': 'ペットバー',
   'hudChrome.interfaceUnlock.frameNames.swingBarOffhand': 'オフハンド',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'ツールチップ',
   'hudChrome.keyboardMap.assignOption': '{category}: {action}',
   'hudChrome.keyboardMap.bindingLine': '{key}: {action}',
   'hudChrome.keyboardMap.form60': '60%',
@@ -16985,9 +18093,253 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSidebar.stats': '能力値',
   'hudChrome.charSidebar.progression': '進行状況',
   'hudChrome.charSidebar.skills': 'スキル',
+  'hudChrome.charSidebar.reputation': '評判',
+  'hudChrome.charSidebar.currencies': '通貨',
+  'hudChrome.charSidebar.character': 'キャラクター',
+  'hudChrome.charSidebar.professions': '専門技能',
+  'questUi.dialog.worldQuestBoard': 'ワールドクエスト掲示板を見せてくれ。',
+  'questUi.dialog.worldQuestBoardAria': '地図でワールドクエスト掲示板を開く',
+  // Faction quartermaster stock and the faction NPCs (M16 non-Latin fills).
+  'entities.items.rift_watchers_band.name': '裂け目の監視者の指輪',
+  'entities.items.rift_surveyors_satchel.name': '裂け目測量士の鞄',
+  'entities.items.emissary_cache.name': '使者の宝箱',
+  'entities.npcs.weekly_emissary.name': 'チャム・ピート',
+  'entities.npcs.weekly_emissary.title': '使者',
+  'entities.npcs.weekly_emissary.greeting':
+    '谷は功績の台帳を持ち、その台帳を預かるのが私だ。今週の任務を一つ選び、やり遂げれば、その財布は君のものだ。',
+  'entities.items.riftwalkers_tunic.name': '裂け目歩きのチュニック',
+  'entities.items.riftwarden_voidblade.name': '裂け目の守護者の虚空剣',
+  'entities.items.champion_rift_band.name': '勇者の裂け目の指輪',
+  'entities.items.order_prayer_beads.name': '教団の祈りの数珠',
+  'entities.items.vestments_of_the_acolyte.name': '侍祭の法衣',
+  'entities.items.templar_dawn_shield.name': 'テンプラーの暁の盾',
+  'entities.items.dawnkeeper_consecrated_mace.name': '暁の守り手の聖別メイス',
+  'entities.items.champion_dawn_medallion.name': '勇者の暁のメダリオン',
+  'entities.items.automaton_cog_ring.name': 'オートマトンの歯車の指輪',
+  'entities.items.clockwork_tinkers_pack.name': 'ぜんまい職人の背嚢',
+  'entities.items.artificers_welding_cowl.name': '工匠の溶接フード',
+  'entities.items.forgemaster_crag_cleaver.name': '鍛冶頭の岩壁の大鉈',
+  'entities.items.champion_forged_loop.name': '勇者の鍛造の指輪',
+  'entities.items.tidewatchers_locket.name': '潮見のロケット',
+  'entities.items.riftwalkers_cord.name': '裂け目歩きの腰紐',
+  'entities.items.riftwalkers_treads.name': '裂け目歩きのブーツ',
+  'entities.items.riftwardens_pendant.name': '裂け目の守護者のペンダント',
+  'entities.items.acolytes_signet.name': '侍祭の印章指輪',
+  'entities.items.cord_of_the_dawn.name': '暁の腰紐',
+  'entities.items.dawnlit_slippers.name': '暁光のスリッパ',
+  'entities.items.champions_dawn_loop.name': '勇者の暁の指輪',
+  'entities.items.dawnkeepers_circle.name': '暁の守り手の環',
+  'entities.items.cogwork_choker.name': '歯車仕掛けのチョーカー',
+  'entities.items.forgemasters_girdle.name': '鍛冶頭の腰帯',
+  'entities.items.forgemasters_sabatons.name': '鍛冶頭のサバトン',
+  'entities.items.forgewall_gorget.name': '鍛冶壁の喉当て',
+  // Clue Scrolls: the scroll and the casket (M16 non-Latin fills).
+  'entities.items.clue_scroll.name': '手がかりの巻物',
+  'entities.items.treasure_casket.name': '宝の小箱',
+  'entities.npcs.npc_rift_watch_quartermaster.name': '需品係ヴェイレン',
+  'entities.npcs.npc_rift_watch_quartermaster.title': '裂け目の監視団の補給係',
+  'entities.npcs.npc_rift_watch_quartermaster.greeting':
+    '裂け目の監視団は岸を守り、深き裂け目を見張っている。我らの物資は、認められた地位を持つ者に開かれている。',
+  'entities.npcs.npc_church_order_quartermaster.name': 'テンプラー・アルセア',
+  'entities.npcs.npc_church_order_quartermaster.title': '教団の需品係',
+  'entities.npcs.npc_church_order_quartermaster.greeting':
+    '暁の光の中を歩め。教団は我らと共に仕える者に物資を供する。',
+  'entities.npcs.npc_automaton_quartermaster.name': '工匠トブリン',
+  'entities.npcs.npc_automaton_quartermaster.title': 'オートマトンの調達官',
+  'entities.npcs.npc_automaton_quartermaster.greeting':
+    '精密な歯車、鍛えた鋼、調整済みの動力。認可された操作者は我らの在庫から受け取れる。',
+  'entities.npcs.npc_wq_taskmaster.name': '監督官ケイレン',
+  'entities.npcs.npc_wq_taskmaster.title': 'ワールドクエスト監督官',
+  'entities.npcs.npc_wq_taskmaster.greeting':
+    '同盟の各勢力は毎日、領土中に任務を掲示する。任務が自分の技能に合わなければ、一日に一度だけ再割り当てを求められる。',
   'hudChrome.charSidebar.gathering': '採集',
   'hudChrome.charSidebar.crafting': '製作',
   'hudChrome.charSidebar.openProfessions': '職業を開く',
+  'hudChrome.currencies.intro':
+    'いずれもバッグの枠を使いません。コインはこれまで通りバッグにあります。',
+  'hudChrome.currencies.activities': 'アクティビティ',
+  'hudChrome.currencies.factions': '勢力',
+  'hudChrome.currencies.honor': '名誉',
+  'hudChrome.currencies.delveMark': 'デルブの印',
+  'hudChrome.currencies.wocToken': 'WoCトークン',
+  'hudChrome.currencies.heroicMarkNote': 'ヒロイックダンジョン . ヒロイック補給官で使用',
+  'hudChrome.currencies.honorNote': '戦場とアリーナ',
+  'hudChrome.currencies.delveMarkNote': '完了したデルブ',
+  'hudChrome.currencies.wocTokenNote': '連携済みウォレットの残高',
+  'hudChrome.currencies.walletNotLinked': 'ウォレット未連携',
+  'hudChrome.currencies.wocPreview': 'プレビュー残高（未検証）',
+  'hudChrome.currencies.lifetime': '累計 {amount}',
+  'hudChrome.currencies.factionPending': '勢力通貨：第2段階で決定',
+  'hudChrome.reputation.intro':
+    '3つの勢力は同時に進行します。各ワールドクエストは、その地域の勢力に加算されます。',
+  'hudChrome.reputation.faction.rift_watch': 'リフトの見張り',
+  'hudChrome.reputation.faction.church_order': '教会修道会',
+  'hudChrome.reputation.faction.automatons': 'オートマトン',
+  'hudChrome.reputation.hub.rift_watch': 'ドリフトヘイヴン',
+  'hudChrome.reputation.hub.church_order': 'アルドリック修士',
+  'hudChrome.reputation.hub.automatons': 'ワームウォッチ',
+  'hudChrome.reputation.tier.unknown': '未知',
+  'hudChrome.reputation.tier.recognized': '認知',
+  'hudChrome.reputation.tier.trusted': '信頼',
+  'hudChrome.reputation.tier.proven': '実証',
+  'hudChrome.reputation.tier.vanguard': '先鋒',
+  'hudChrome.reputation.tier.champion': 'チャンピオン',
+  'hudChrome.reputation.factionTitle.rift_watch.unknown': '部外者',
+  'hudChrome.reputation.factionTitle.rift_watch.recognized': '見張り',
+  'hudChrome.reputation.factionTitle.rift_watch.trusted': 'リフトウォーカー',
+  'hudChrome.reputation.factionTitle.rift_watch.proven': '守護者',
+  'hudChrome.reputation.factionTitle.rift_watch.vanguard': 'リフトの守り手',
+  'hudChrome.reputation.factionTitle.rift_watch.champion': 'チャンピオン',
+  'hudChrome.reputation.factionTitle.church_order.unknown': '部外者',
+  'hudChrome.reputation.factionTitle.church_order.recognized': '侍者',
+  'hudChrome.reputation.factionTitle.church_order.trusted': '守り人',
+  'hudChrome.reputation.factionTitle.church_order.proven': '聖堂騎士',
+  'hudChrome.reputation.factionTitle.church_order.vanguard': '暁の守り手',
+  'hudChrome.reputation.factionTitle.church_order.champion': 'チャンピオン',
+  'hudChrome.reputation.factionTitle.automatons.unknown': '部外者',
+  'hudChrome.reputation.factionTitle.automatons.recognized': '操作者',
+  'hudChrome.reputation.factionTitle.automatons.trusted': '機械技師',
+  'hudChrome.reputation.factionTitle.automatons.proven': '工匠',
+  'hudChrome.reputation.factionTitle.automatons.vanguard': '鍛冶頭',
+  'hudChrome.reputation.factionTitle.automatons.champion': 'チャンピオン',
+  'hudChrome.reputation.next': '次：{tier}',
+  'hudChrome.reputation.maxed': '最高の評判に到達',
+  'hudChrome.reputation.cappedByLevel': 'レベル16まで評判は{tier}で止まります',
+  'hudChrome.reputation.today': '今日',
+  'hudChrome.reputation.questsDone': '完了したワールドクエスト',
+  'hudChrome.reputation.resetsIn': '掲示板',
+  'hudChrome.reputation.resetsUnknown': '今日は掲示板がありません',
+  'hudChrome.reputation.title': '勢力の称号',
+  'hudChrome.reputation.legend': '評判の段階',
+  'hudChrome.reputation.vendorGate': '{faction}との評判が{tier}以上必要です。',
+  'hudChrome.weekly.title': '週間クエスト',
+  'hudChrome.weekly.close': '週間クエストを閉じる',
+  'hudChrome.weekly.subtitle': '四つの任務から一つを選んでください。',
+  'hudChrome.weekly.resetsIn': '{time}後にリセットされます。',
+  'hudChrome.weekly.anyDifficulty': '難易度は問わない',
+  'hudChrome.weekly.choose': 'クエストを選ぶ',
+  'hudChrome.weekly.inProgress': '進行中（{count}/{required}）',
+  'hudChrome.weekly.completed': '今週は完了',
+  'hudChrome.weekly.lockedThisWeek': '今週はロック中',
+  'hudChrome.weekly.footerPick':
+    '週間の任務は一度に一つだけ持てます。カードを選んで条件を読んでください。',
+  'hudChrome.weekly.footerHeld': '今週の任務は決まりました。残りの三つはリセット時に解放されます。',
+  'hudChrome.weekly.dialogHeading': '週間クエスト：{category}',
+  'hudChrome.weekly.objectives': 'クエストの目標',
+  'hudChrome.weekly.rewards': '報酬',
+  'hudChrome.weekly.alsoReceive': 'さらに受け取れるもの：',
+  'hudChrome.weekly.tally': '{count} / {required}',
+  'hudChrome.weekly.cacheDesc':
+    '開けると自分のクラスが装備できるノーマルレイド装備が一つ（ティアセットは除く）と、{item} x {count}が手に入ります。',
+  'hudChrome.weekly.dialogNote': '週間の任務は同時に一つしか受けられません。{reset}',
+  'hudChrome.weekly.accept': '受諾',
+  'hudChrome.weekly.decline': '辞退',
+  'hudChrome.weekly.kinds.dungeons.category': 'ダンジョン',
+  'hudChrome.weekly.kinds.dungeons.lore':
+    '王国の深部は休むことを知らない。廃棄されたメックが再び動き出し、うつろの地下墓所が目を覚ます。仲間を集め、ダンジョンの汚染を清めよ。',
+  'hudChrome.weekly.kinds.dungeons.goal': '任意の難易度でダンジョンを{count}回クリアする。',
+  'hudChrome.weekly.kinds.dungeons.goalLabel': 'クリアしたダンジョン',
+  'hudChrome.weekly.kinds.raid.category': 'レイド',
+  'hudChrome.weekly.kinds.raid.lore':
+    '最後の炎のるつぼとソーンピークの高地で古の力が目覚める。イグニヴァルかニスラクシスに立ち向かい、敵の指揮官を討て。',
+  'hudChrome.weekly.kinds.raid.goal': '任意の難易度でレイドに{count}回参加する。',
+  'hudChrome.weekly.kinds.raid.goalLabel': 'クリアしたレイド',
+  'hudChrome.weekly.kinds.battlegrounds.category': 'バトルグラウンド',
+  'hudChrome.weekly.kinds.battlegrounds.lore':
+    'ソーンホロウの野に軍旗が翻る。勢力と共に戦い、旗を守り、戦場で己の価値を示せ。勝っても負けても、すべての試合が数えられる。',
+  'hudChrome.weekly.kinds.battlegrounds.goal': 'バトルグラウンドを{count}回完了する。',
+  'hudChrome.weekly.kinds.battlegrounds.goalLabel': '完了したバトルグラウンド',
+  'hudChrome.weekly.kinds.worldboss.category': 'ワールドボス',
+  'hudChrome.weekly.kinds.worldboss.lore':
+    '軍勢すら退ける強大な敵が荒野を徘徊している。近くにいる者と力を合わせ、巨大な異形を一体討ち取れ。',
+  'hudChrome.weekly.kinds.worldboss.goal': '荒野でワールドボスを{count}体倒す。',
+  'hudChrome.weekly.kinds.worldboss.goalLabel': '倒したワールドボス',
+  'hudChrome.weekly.chosen': '週間クエストを受注：{category}',
+  'hudChrome.weekly.progress': '{label}：{count}/{required}',
+  'hudChrome.weekly.done': '週間クエスト完了：{category}',
+  'hudChrome.weekly.commendHeading': '使者の推挙',
+  'hudChrome.weekly.commendNote': '選んだ一つの勢力に評判{amount}、週に一度。',
+  'hudChrome.weekly.commendClaimed': '今週の推挙は{faction}に贈られました。',
+  'hudChrome.weekly.commendRewardLine': '選んだ勢力との評判{amount}',
+  'hudChrome.reputation.standingGained': '{faction}の評判 +{amount}',
+  'hudChrome.reputation.tierReachedBanner': '{faction}との評判が{tier}になりました',
+  'hudChrome.reputation.tierReachedSubtext': '勢力の称号：{title}',
+  'hudChrome.reputation.tierReachedLine':
+    '{faction}との評判が{tier}になりました。勢力の称号は{title}になりました。',
+  // Clue Scrolls (world quests, Stage 3): hunt titles, per-step riddles and the two item
+  // descriptions (M16 non-Latin fills; src/ui/i18n.catalog/clues.ts).
+  'clues.items.clue_scroll.desc':
+    'その日の地域枠をすべて終えて得た、封のされた謎かけ。使うと宝探しが始まり、最後の手がかりが「掘れ」と告げたら、隠された場所でもう一度使う。',
+  'clues.items.treasure_casket.desc':
+    '宝探しの最後に掘り出した、鍵のかかった小箱。使って開け、宝探しが埋めていたものを受け取る。',
+  'clues.hunt_drakelands_gate_ashes.title': '門前の灰',
+  'clues.hunt_drakelands_gate_ashes.0':
+    'ワームウォッチを出る道は西へ、門を守る古木の群れへと続く。ゲートウッドの森の下に立てば、道は始まる。',
+  'clues.hunt_drakelands_gate_ashes.1':
+    '遠い砂丘の見張りが、駐屯地の北、東の砂地に居座っている。斥候イェリンを見つけ、風が何を運んできたか尋ねよ。',
+  'clues.hunt_drakelands_gate_ashes.2':
+    '駐屯地の倉庫を守る者は、前の巡回からずっと食べていない。補給将校セラに 2 x 田舎パン を届けよ。',
+  'clues.hunt_drakelands_gate_ashes.3':
+    '燃えかすが砂丘へ流れ込むあたりの東、やや南に、灰が埋めたものを隠す焦げた地面がある。そこで巻物を使い、掘れ。',
+  'clues.hunt_frostveil_aurora_vigil.title': '階段の上の光',
+  'clues.hunt_frostveil_aurora_vigil.0':
+    '夜に踊る光へと段丘が登っていく場所、オーロラの階段にひざまずき、空に気づいてもらえ。',
+  'clues.hunt_frostveil_aurora_vigil.1':
+    '光を読む者が階段のすぐそばで待っている。オーロラ読みヴェイラに、空が綴ったものについて話を聞け。',
+  'clues.hunt_frostveil_aurora_vigil.2':
+    '咆哮のテラスの東、少し南で、雪があるべき以上に平らに積もっている。そこで巻物を使い、掘れ。',
+  'clues.hunt_amberfall_lantern_ferry.title': '湖上のランタン',
+  'clues.hunt_amberfall_lantern_ferry.0':
+    'ランタンミアの北の水際で、ランタンの渡し船を預かる者がどの灯りが消えたかを知っている。渡し守キャドウと話せ。',
+  'clues.hunt_amberfall_lantern_ferry.1':
+    '大いなる湖の北東で、町より古い一本の石が空にもたれている。傾いた石碑のそばに立て。',
+  'clues.hunt_amberfall_lantern_ferry.2':
+    '黄金の果樹園を守る者は手ずから木々に水をやり、自分は喉が渇いている。果樹園主ポメリーヌに 3 x 冷たい井戸水 を届けよ。',
+  'clues.hunt_amberfall_lantern_ferry.3':
+    'シンダーメイプルが赤く燃える丘の北東で、風の仕業ではない輪を落ち葉が描いている。そこで巻物を使い、掘れ。',
+  'clues.hunt_willowfen_fenwitch_salt.title': '沼の魔女の塩',
+  'clues.hunt_willowfen_fenwitch_salt.0':
+    'ウィローウィープの沼の魔女は、手ぶらで来る者とは口をきかない。マザー・セッジに 1 x 調理用の塩 を届けよ。',
+  'clues.hunt_willowfen_fenwitch_salt.1':
+    '沼が平らになり、空気が誰をも眠たくさせる場所、まどろみの浅瀬に立ち、魔女に言われたとおりため息をつけ。',
+  'clues.hunt_willowfen_fenwitch_salt.2':
+    '沼で光る池の南東に、一年じゅう乾いたままの小さな丘がある。そこで巻物を使い、掘れ。',
+  'clues.hunt_nightbloom_sleepless_vigil.title': '眠らぬ者の見張り',
+  'clues.hunt_nightbloom_sleepless_vigil.0':
+    'ムーンレストの北東、石たちが終わらぬ見張りを続ける場所、見張りの石環に立て。',
+  'clues.hunt_nightbloom_sleepless_vigil.1':
+    '見張り場の観測者は、他人が銭を数えるように星を数える。天文学者カシアンに、落ちた一つの星について話を聞け。',
+  'clues.hunt_nightbloom_sleepless_vigil.2':
+    '町の北に、眠る者が決して安らがぬ塚がある。不眠の塚に敬礼し、友が来たと眠る者に知らせよ。',
+  'clues.hunt_nightbloom_sleepless_vigil.3':
+    '宵闇の集まる花野の南東で、月光がむき出しの土の一画に溜まっている。そこで巻物を使い、掘れ。',
+  'clues.hunt_wraithwood_mournstone_candles.title': '哀石の蝋燭',
+  'clues.hunt_wraithwood_mournstone_candles.0':
+    'ギベットミアの蝋燭職人は、闇を恐れる者に光を売っている。寡婦タンジーに、ついに代金の払われなかった蝋燭について話を聞け。',
+  'clues.hunt_wraithwood_mournstone_candles.1':
+    '哀石の最後の司祭は祈りだけで断食を続けている。司祭クリールに 2 x 塩漬けの干し肉 を届けよ。',
+  'clues.hunt_wraithwood_mournstone_candles.2':
+    '町の北東、鴉たちを過ぎた先に、奇妙な実を自ら吊るす林間地がある。吊るしの林間地に立て。',
+  'clues.hunt_wraithwood_mournstone_candles.3':
+    '狩人が罠を仕掛けた広場の南東で、落ち葉が最近掘り返されている。そこで巻物を使い、掘れ。',
+  'clues.hunt_palmreach_sunken_idol.title': '神像の秘密',
+  'clues.hunt_palmreach_sunken_idol.0':
+    '密林の奥、潟の北西で、蔓が滝のように流れ落ちている。蔓垂の森に立て。',
+  'clues.hunt_palmreach_sunken_idol.1':
+    '密林へ入り、そして戻ってきた隠者が、垂れる蔓の近くに住んでいる。オクリムに、あの下で何を見たか話を聞け。',
+  'clues.hunt_palmreach_sunken_idol.2':
+    '東では、半ば沈んだ神像がなお見つめている。沈んだ神像の前でおびえよ、隠者が言った潜り手たちのように。',
+  'clues.hunt_palmreach_sunken_idol.3':
+    '密林が海へ口を開く場所の北東で、砂が潮の届く高さより高く盛られている。そこで巻物を使い、掘れ。',
+  'clues.hunt_evergarden_beacon_road.title': '灯台と花',
+  'clues.hunt_evergarden_beacon_road.0':
+    'ヘッジウィックの北の散歩道の花壇の庭師が、花壇が飢えていると言い張っている。農婦ヴァーベナに 2 x 堆肥 を届けよ。',
+  'clues.hunt_evergarden_beacon_road.1':
+    '庭園のはるか南東の隅で、粉屋のいない古い風車がまだ回っている。古い風車小屋のそばに立て。',
+  'clues.hunt_evergarden_beacon_road.2':
+    '道を南へ、境を越えてゲイルクレストへ入り、海岸まで出よ。古い灯台の番人、灯台守ブラムが最後の言葉を持っている。',
+  'clues.hunt_evergarden_beacon_road.3':
+    'オールドビーコンの北西、灯りから下る小道のすぐ脇で、芝が切り取られて元に戻されている。そこで巻物を使い、掘れ。',
   'hudChrome.questLog.completed': '完了済み',
   'hudChrome.questLog.zoneSummary': '{count}件（{ready}件完了）',
   'hudChrome.questLog.shiftHint':
@@ -17004,6 +18356,28 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.marketWindow.mixedListingsFooter':
     '商人はコモンの商品を補充し、プレイヤーの出品は希望価格でその隣に並びます。',
   'hudChrome.mapAtlas.track': '追跡',
+  'hudChrome.mapAtlas.worldQuests.heading': '今日のワールドクエスト',
+  'hudChrome.mapAtlas.worldQuests.empty': '今日はワールドクエストがありません',
+  'hudChrome.mapAtlas.worldQuests.replacement': '差し替え',
+  'hudChrome.mapAtlas.worldQuests.state.active': '進行中',
+  'hudChrome.mapAtlas.worldQuests.state.completed': '完了',
+  'hudChrome.mapAtlas.worldQuests.reroll': 'クエストを差し替える',
+  'hudChrome.mapAtlas.worldQuests.rerollNote': '今日はあと1回差し替えできます',
+  'hudChrome.mapAtlas.worldQuests.rerollUsed': '今日の差し替えは使用済みです',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.noCycle': '今日は掲示板がありません',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.usedToday': '今日の差し替えは使用済みです',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.completed': '完了したクエストは差し替えできません',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.inProgress': '進行中のクエストは差し替えできません',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.notActive':
+    'このクエストはあなたの掲示板にありません',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.noAlternative':
+    '今日はその地域に他のクエストがありません',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.unknown': 'このクエストは今日は差し替えできません',
+  'hudChrome.mapAtlas.worldQuests.confirmTitle': 'このワールドクエストを差し替えますか？',
+  'hudChrome.mapAtlas.worldQuests.confirmBody':
+    'ワールドクエストの差し替えは1日1回だけで、元に戻せません。{quest}は同じ地域の別のクエストに差し替えられます。',
+  'hudChrome.mapAtlas.worldQuests.confirmOk': '差し替える',
+  'hudChrome.mapAtlas.worldQuests.confirmCancel': 'キャンセル',
   'hudChrome.mapAtlas.level': 'レベル {level}',
   'hudChrome.mapAtlas.landmarkCount': 'ランドマーク {count} 個',
   'hudChrome.mapAtlas.filtersAria': 'マップレイヤー',
@@ -17089,6 +18463,355 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.farmgrow.label': '作物を成熟させる',
   'devCommand.fields.bed': '畝のID（任意）',
   'guide.profPages.oncePerDay': '1日1回',
+  'hudChrome.vehicle.title': '北の見張りの大砲',
+  'hudChrome.vehicle.objective': '北の見張り所を守れ',
+  'hudChrome.vehicle.lastKeepTitle': '最後の砦の大砲',
+  'hudChrome.vehicle.lastKeepObjective': '最後の砦への道を守れ',
+  'hudChrome.vehicle.cannonball': '砲弾',
+  'hudChrome.vehicle.grapeshot': 'ぶどう弾',
+  'hudChrome.vehicle.incendiary': '焼夷弾',
+  'hudChrome.vehicle.integrity': '大砲の耐久度',
+  'hudChrome.vehicle.exit': '大砲を離れる',
+  'hudChrome.vehicle.endlessWave': 'エンドレスウェーブ {wave}（ラウンド{round}）',
+  'hudChrome.vehicle.resultWaves': '耐えたウェーブ数：{waves}。',
+  'hudChrome.vehicle.enemies': '残りの敵：{count}',
+  'hudChrome.vehicle.countdown': '準備：{seconds}',
+  'hudChrome.vehicle.hint': '弾種を選び、地面をクリックして発射。',
+  'hudChrome.vehicle.aim': 'クリックで発射。右クリックかEscで照準を解除。',
+  'hudChrome.vehicle.sapperWarning': '工兵が接近中！爆薬運びが防衛線に届く前に止めろ。',
+  'hudChrome.vehicle.chargeWarning': '指揮官が突撃を命じた！生き残った敵全員の移動が速くなる。',
+  'hudChrome.vehicle.armorHint': '砲弾で銀の盾を砕き、それから焼夷弾を撃て。',
+  'hudChrome.vehicle.exposedHint': '鎧破壊：焼夷弾のダメージが2倍になる。',
+  'hudChrome.vehicle.barrelHint': '印のついた火薬樽の周りに敵が集まったら、樽を撃て。',
+  'hudChrome.vehicle.barrelRules':
+    '直撃すると火薬樽に引火し、{radius}yd以内に{damage}のダメージを与える。爆発は連鎖する。',
+  'hudChrome.vehicle.armorRules':
+    '装甲兵は砲弾で鎧を砕かれるまで、受けるダメージが{reduction}減少する。鎧を砕かれると、受ける火炎ダメージが{bonus}増加する。',
+  'hudChrome.vehicle.shake': '画面の揺れ',
+  'hudChrome.vehicle.gold': '金メダル',
+  'hudChrome.vehicle.silver': '銀メダル',
+  'hudChrome.vehicle.bronze': '銅メダル',
+  'hudChrome.vehicle.failed': '防衛失敗',
+  'hudChrome.vehicle.result': '{medal}：耐久度{integrity}、命中率{accuracy}。',
+  'hudChrome.vehicle.medalRules':
+    '金：耐久度{goldIntegrity}以上かつ命中率{goldAccuracy}以上。銀：耐久度{silverIntegrity}以上かつ命中率{silverAccuracy}以上。それ以外の勝利は銅。敵か樽への命中を数え、1発につき1回だけ数える。メダルによる追加の報酬金はない。',
+  'hudChrome.vehicle.shotDamage': '着弾点から{radius}yd以内の各敵に{damage}のダメージを与える。',
+  'hudChrome.vehicle.shotSlow': '命中した敵の移動速度を{seconds}秒間、{amount}低下させる。',
+  'hudChrome.vehicle.shotBurn':
+    '{seconds}秒間炎を残し、その中にいる敵に毎秒{damage}のダメージを与える。',
+  'hudChrome.vehicle.shotTiming':
+    'クールダウン：{cooldown}秒。{flight}秒後に着弾。全弾種で{recovery}秒の回復時間を共有する。',
+  'hudChrome.vehicle.shotRules':
+    '印のついた範囲内を狙う。マナ消費なし。ダメージは装備やタレントの影響を受けない。',
+  'hudChrome.leaderboard.tabWorldQuests': 'ワールドクエスト',
+  'hudChrome.leaderboard.wqBoardsLabel': 'ワールドクエストのスコアボード',
+  'hudChrome.leaderboard.wqMedal': 'メダル',
+  'hudChrome.leaderboard.wqWaves': '耐えたウェーブ',
+  'hudChrome.leaderboard.wqPoints': 'スコア',
+  'hudChrome.leaderboard.wqMedals.silver': '銀',
+  'hudChrome.leaderboard.wqMedals.bronze': '銅',
+  'hudChrome.leaderboard.wqEmpty':
+    'このボードにはまだスコアがありません。ワールドクエストを完了して、ランクに名を刻もう。',
+  'apiError.world_quests.unknown_board': 'その名前のスコアボードはありません。',
+  'questUi.worldQuest.banner.riftOpens':
+    '浜辺に裂け目が開いた！略奪者たちが引き揚げ品を狙ってくる。',
+  'questUi.worldQuest.banner.captainSteps': '略奪者の頭領が裂け目から現れた！',
+  'questUi.worldQuest.banner.riftRouted': '略奪者たちは敗走した。浜辺は再びあなたのものだ。',
+  'questUi.worldQuest.banner.championRises':
+    '追加の戦利品！現場にチャンピオンが現れた。力を合わせて倒せ。',
+  'questUi.worldQuest.banner.championFallen':
+    '追加の戦利品！チャンピオンが倒れた。戦った全員にボーナスの財布が贈られる。',
+  'questUi.worldQuest.banner.endlessBegins':
+    '防衛線は持ちこたえた！次第に手強くなるエンドレスウェーブが始まる。大砲はいつ離れてもよい。',
+  'questUi.worldQuest.shadow.title': '影に紛れて',
+  'questUi.worldQuest.shadow.objective': '見つからずに封印された命令書を4通盗み出す',
+  'questUi.worldQuest.shadow.cloak': '宵織りのマント',
+  'questUi.worldQuest.shadow.pickpocket': 'スリ',
+  'questUi.worldQuest.shadow.leave': 'マントを脱ぐ',
+  'questUi.worldQuest.shadow.stealTip':
+    '背後から近づき、命令書を取る間は動かずにいること。ランタンの光に入らないように。',
+  'questUi.worldQuest.shadow.leaveTip': 'マントを脱ぐ。回収した命令書は失われない。',
+  'questUi.worldQuest.shadow.documents': '回収した命令書：{count}/4',
+  'questUi.worldQuest.shadow.suspicion': '疑念：{value}',
+  'questUi.worldQuest.shadow.safe':
+    '背後から盗め。ランタンの衛兵はマントを見破る光で広く照らす。隙ができるまで待とう。',
+  'questUi.worldQuest.shadow.behind': '盗む前に衛兵の背後に回れ。',
+  'questUi.worldQuest.shadow.danger': '見つかりかけている！視界から逃れろ！',
+  'questUi.worldQuest.shadow.channel': '盗み取り中… {seconds}秒',
+  'questUi.worldQuest.shadow.noTarget': '命令書を持つ衛兵に近づこう。',
+  'questUi.worldQuest.shadow.start': '斥候ヴァレリーに話しかけてマントを借りよう。',
+  'questUi.worldQuest.shadow.caught':
+    '見つかった！斥候ヴァレリーのもとへ戻り、新しいマントを借りよう。命令書は無事だ。',
+  'questUi.worldQuest.shadow.complete': '命令書を4通すべて回収した。',
+  'questUi.worldQuest.investigation.title': '借り物の顔',
+  'questUi.worldQuest.investigation.objective': '潜入者の正体を暴いて倒す',
+  'questUi.worldQuest.investigation.briefing':
+    '化け物が兵士の顔を奪った。常備命令書と見張り台帳を読み、衛兵4人全員に話を聞いてから戻ってきてくれ。そして、話が記録と食い違う者の名を挙げるのだ。',
+  'questUi.worldQuest.investigation.instructions':
+    '常備命令書と見張り台帳を読み、衛兵4人全員に話を聞こう。彼らの話を記録と照らし合わせること。',
+  'questUi.worldQuest.investigation.confront':
+    '軍曹アルリックに報告し、話が記録と食い違う衛兵の名を挙げよう。',
+  'questUi.worldQuest.investigation.name': '私の衛兵のうち、借り物の顔をしているのは誰だ？',
+  'questUi.worldQuest.investigation.accuseOption': '{name}を告発する',
+  'questUi.worldQuest.investigation.cleared':
+    '軍曹アルリック：その兵士の身元は確かだ。他の者の話を記録と照らし合わせて、もう一度考えてくれ。',
+  'questUi.worldQuest.investigation.guardCleared':
+    '軍曹アルリックはすでにこの兵士の身元を確かめている。',
+  'questUi.worldQuest.investigation.revealed': '化け物はこの顔を脱ぎ捨てた。倒せ。',
+  'questUi.worldQuest.investigation.defeat': '正体を現した潜入者を倒せ。',
+  'questUi.worldQuest.investigation.heard': '話を聞いた衛兵：{count}/4',
+  'questUi.worldQuest.investigation.clues': '調べた記録：{count}/2',
+  'questUi.worldQuest.investigation.clueNames.c0': '常備命令書',
+  'questUi.worldQuest.investigation.clueNames.c1': '見張り台帳',
+  'questUi.worldQuest.investigation.variants.v0.clue0':
+    '南の橋は夜明けから封鎖されている。巡回はすべて西の道を使うこと。',
+  'questUi.worldQuest.investigation.variants.v0.clue1':
+    'オリンは門の当番。ネラ、ブラム、テッサは西の道を巡回した。',
+  'questUi.worldQuest.investigation.variants.v0.guard0': '今朝、私の巡回は西の道を通った。',
+  'questUi.worldQuest.investigation.variants.v0.guard1': '朝の巡回で南の橋を渡った。',
+  'questUi.worldQuest.investigation.variants.v0.guard2': 'ネラとテッサと一緒に西の道を巡回した。',
+  'questUi.worldQuest.investigation.variants.v0.guard3':
+    '南の橋は封鎖されている。私たちは西の道を使った。',
+  'questUi.worldQuest.investigation.variants.v1.clue0':
+    '本日の合言葉は「リードウォッチ」。昨日の合言葉「ランタン」はもう無効である。',
+  'questUi.worldQuest.investigation.variants.v1.clue1':
+    '衛兵4人全員が、夜明けに新しい合言葉の説明を受けた。',
+  'questUi.worldQuest.investigation.variants.v1.guard0':
+    '「リードウォッチ」。夜明けに新しい合言葉を教わった。',
+  'questUi.worldQuest.investigation.variants.v1.guard1':
+    '「ランタン」は昨日の合言葉だ。今日は「リードウォッチ」を使う。',
+  'questUi.worldQuest.investigation.variants.v1.guard2': '夜明けの説明には4人全員が出席した。',
+  'questUi.worldQuest.investigation.variants.v1.guard3':
+    '今日の合言葉は「ランタン」だ。夜明けの説明で聞いた。',
+  'questUi.worldQuest.investigation.variants.v2.clue0':
+    '守備隊の補給箱にはすべて青い封蝋が必要。赤い封蝋の箱は受け取らないこと。',
+  'questUi.worldQuest.investigation.variants.v2.clue1':
+    '本日の搬入品は検査済み。どの箱にも青い封蝋が無傷で付いていた。',
+  'questUi.worldQuest.investigation.variants.v2.guard0':
+    '今日の搬入品を検査した。どの箱にも赤い封蝋が付いていた。',
+  'questUi.worldQuest.investigation.variants.v2.guard1': '受け取るのは青い封蝋の箱だけだ。',
+  'questUi.worldQuest.investigation.variants.v2.guard2':
+    '台帳には、今日の搬入品は青い封蝋だったと記録されている。',
+  'questUi.worldQuest.investigation.variants.v2.guard3':
+    '今日は赤い封蝋の箱は一つも受け取っていない。',
+  'questUi.worldQuest.investigation.variants.v3.clue0':
+    '夜警は日暮れに東のかがり火を灯し直す。西のかがり火は、渡し船の合図があるまで灯さない。',
+  'questUi.worldQuest.investigation.variants.v3.clue1':
+    'ネラとオリンは夜通し門を守った。ブラムとテッサは堤道を歩き、日暮れに東のかがり火を灯し直した。',
+  'questUi.worldQuest.investigation.variants.v3.guard0':
+    'オリンと私は一晩中門にいた。霧のほかは何も通らなかった。',
+  'questUi.worldQuest.investigation.variants.v3.guard1':
+    'ネラと門の当番だ。命令どおり、日暮れに東のかがり火が灯るのを見届けた。',
+  'questUi.worldQuest.investigation.variants.v3.guard2':
+    'テッサと私は堤道を歩いた。渡し船から見えるよう、日暮れに西のかがり火を灯した。',
+  'questUi.worldQuest.investigation.variants.v3.guard3':
+    'ブラムと堤道の巡回だ。日が沈んだ瞬間に東のかがり火を灯し直した。',
+  'questUi.worldQuest.investigation.variants.v4.clue0':
+    '補給係の荷馬車は正午に北の道を通って到着する。湿地が水浸しの間は、水路での補給はない。',
+  'questUi.worldQuest.investigation.variants.v4.clue1':
+    '正午の搬入品を北の道から受領。テッサが署名し、ブラムとネラが荷を降ろし、オリンは井戸にいた。',
+  'questUi.worldQuest.investigation.variants.v4.guard0':
+    '正午にブラムを手伝って荷馬車の荷を降ろした。塩漬け豚肉とランプの油、いつもの品だ。',
+  'questUi.worldQuest.investigation.variants.v4.guard1':
+    '正午の搬入品は、補給船から直接、私が自分で降ろした。',
+  'questUi.worldQuest.investigation.variants.v4.guard2':
+    'ネラと私で箱を運び入れた。台帳にはテッサが署名した。',
+  'questUi.worldQuest.investigation.variants.v4.guard3':
+    '荷馬車は正午に北の道を上ってきた。受領の署名は私がした。',
+  'questUi.worldQuest.investigation.variants.v5.clue0':
+    '先の襲撃で倒れた者たちは、礼拝堂の地下墓所に眠っている。軍曹の鍵なしには誰も地下墓所に入れない。',
+  'questUi.worldQuest.investigation.variants.v5.clue1':
+    '襲撃以来、軍曹の鍵はベルトから一度も離れていない。ネラ、オリン、ブラムは城壁に立ち、テッサは中庭を守った。',
+  'questUi.worldQuest.investigation.variants.v5.guard0':
+    '私は城壁に立っていた。襲撃以来、地下墓所は施錠されたままだ。鍵を持つのは軍曹だけだ。',
+  'questUi.worldQuest.investigation.variants.v5.guard1':
+    'ネラとブラムと城壁の当番だ。カエルの声のほかは静かなものだった。',
+  'questUi.worldQuest.investigation.variants.v5.guard2':
+    '一日中、城壁にいた。地下墓所に近づいた者はいない。',
+  'questUi.worldQuest.investigation.variants.v5.guard3':
+    '私は中庭を守りながら、今朝地下墓所の様子を見に行った。倒れた者たちは安らかに眠っている。',
+  'questUi.worldQuest.horde.title': '最後のバリケード',
+  'questUi.worldQuest.horde.objective': 'バリケードを守り、大群の指揮官を倒す',
+  'questUi.worldQuest.horde.ready': 'バリケードの隊長に話しかけて開始しよう。',
+  'questUi.worldQuest.horde.countdown': '{seconds}秒後に大群が襲来！',
+  'questUi.worldQuest.horde.status': '残り{seconds}秒。撃破数：{kills}。バリケード：{barrier}%。',
+  'questUi.worldQuest.horde.upgrade': '武器：{weapon}',
+  'questUi.worldQuest.horde.loadout': '弾数：{count} | 速度+{speed}% | {weapon}',
+  'questUi.worldQuest.horde.exit': '防衛をやめる',
+  'questUi.worldQuest.horde.gained': '強化：{upgrade}',
+  'questUi.worldQuest.horde.killBurst': '+{count}体撃破！',
+  'questUi.worldQuest.horde.choices.projectile': '弾数+1',
+  'questUi.worldQuest.horde.choices.haste': '連射速度+25%',
+  'questUi.worldQuest.horde.choices.pierce': '貫通弾',
+  'questUi.worldQuest.horde.choices.explosive': '爆裂弾',
+  'questUi.worldQuest.horde.choices.double': '弾数x2',
+  'questUi.worldQuest.horde.weapons.0': '連発銃',
+  'questUi.worldQuest.horde.weapons.2': '貫通射撃',
+  'questUi.worldQuest.horde.weapons.3': '爆裂射撃',
+  'questUi.worldQuest.horde.controls': '自動射撃。A/D、矢印キー、スティックで移動。後退で離脱。',
+  'questUi.worldQuest.horde.supplies': '箱を1つ壊して選ぼう。もう一方は消える！',
+  'questUi.worldQuest.horde.result': '{rating}！スコア：{score}。',
+  'questUi.worldQuest.horde.resultStats': '撃破数：{kills}。バリケード：{barrier}%。',
+  'questUi.worldQuest.horde.failed': '防衛失敗。もう一度挑戦しよう！',
+  'questUi.worldQuest.horde.replay': '隊長に話しかけて再挑戦。報酬はローテーションごとに1回。',
+  'questUi.worldQuest.horde.medals.silver': '銀',
+  'questUi.worldQuest.horde.medals.bronze': '銅',
+  'questUi.worldQuest.wispMaze.leave': '迷宮を出る',
+  'questUi.worldQuest.wispMaze.title': 'ウィスプウッドの迷宮',
+  'questUi.worldQuest.wispMaze.objective': '盗まれた財布を迷宮からすべて取り戻す',
+  'questUi.worldQuest.wispMaze.ready': '迷宮の番人に話しかけて開始しよう。',
+  'questUi.worldQuest.wispMaze.controls':
+    '迷宮を進んで財布を拾おう。影は避けること。輝くウィスプを取ると、短い間だけ影を追い払える。',
+  'questUi.worldQuest.wispMaze.collected': '財布：{count}/{total}',
+  'questUi.worldQuest.wispMaze.lives': 'ライフ：{count}/3',
+  'questUi.worldQuest.wispMaze.power': 'ウィスプの力：{seconds}秒',
+  'questUi.worldQuest.wispMaze.countdown': '{seconds}秒後に開始',
+  'questUi.worldQuest.wispMaze.collect': '財布を拾おう。影は避けること。',
+  'questUi.worldQuest.wispMaze.powered': '力がみなぎる！影に触れて追い払え。',
+  'questUi.worldQuest.wispMaze.finished': '財布をすべて取り戻した！',
+  'questUi.worldQuest.wispMaze.retry': 'ライフが3つに回復した。もう一度迷宮に挑もう。',
+  'questUi.worldQuest.wispMaze.startNormal': '迷宮に入る：ノーマル（影{shadows}体）',
+  'questUi.worldQuest.wispMaze.startHard': '迷宮に入る：ハード（影{shadows}体）',
+  'questUi.worldQuest.forge.title': '手助けのハンマー',
+  'questUi.worldQuest.forge.objective': '鍛冶師マーラの盾作りを手伝う',
+  'questUi.worldQuest.forge.ready': '鍛冶師マーラに話しかけて開始しよう。',
+  'questUi.worldQuest.forge.countdown': '手を構えて！{seconds}秒後に開始。',
+  'questUi.worldQuest.forge.preparing': 'お見事！次の注文は…',
+  'questUi.worldQuest.forge.fuel': '薪の山',
+  'questUi.worldQuest.forge.metal': 'インゴットの箱',
+  'questUi.worldQuest.forge.tools': '金床',
+  'questUi.worldQuest.forge.request.fuel': '火を強めて！薪をくべて！',
+  'questUi.worldQuest.forge.request.metal': '金属が足りない！インゴットの箱を開けて！',
+  'questUi.worldQuest.forge.request.water': '冷やして！井戸の水を！',
+  'questUi.worldQuest.forge.request.tools': '叩いて形を整えて！金床を使って！',
+  'questUi.worldQuest.forge.sequence': '{instruction} 次に{next}をクリック。',
+  'questUi.worldQuest.forge.round': '注文{round}/{total}：工程{step}/{steps}',
+  'questUi.worldQuest.forge.thresholds': '金：{gold}秒以内。銀：{silver}秒以内。',
+  'questUi.worldQuest.forge.starting': '準備中…',
+  'questUi.worldQuest.forge.finished': '見事な仕事だ！守備隊にふさわしい盾ができた！',
+  'questUi.worldQuest.forge.failed':
+    'ミスが多すぎた！金属が割れてしまった。マーラに話しかけて再挑戦しよう。',
+  'questUi.worldQuest.forge.wrong': '道具が違う！+{penalty}秒。頼まれた物を選ぼう。',
+  'questUi.worldQuest.forge.correct': 'それだ！その調子。',
+  'questUi.worldQuest.forge.result': '{rating}！{seconds}秒。ミス：{mistakes}。',
+  'questUi.worldQuest.forge.replay':
+    'マーラに話しかけて再挑戦。報酬はローテーションごとに1回のみ。',
+  'questUi.worldQuest.forge.medals.silver': '銀',
+  'questUi.worldQuest.forge.medals.bronze': '銅',
+  'questUi.worldQuest.forge.strike': '打つ',
+  'questUi.worldQuest.forge.strikeTip':
+    '金属を叩く。針が暗い帯を横切るときに押そう。うまく打つたびに帯は狭まり、針は速くなる。帯の外で打つか、炉が冷えているときに打つと3秒のペナルティ。',
+  'questUi.worldQuest.forge.stoke': 'くべる',
+  'questUi.worldQuest.forge.stokeTip':
+    '火に薪をくべる。炉は常に冷えていく。熱を{floor}より上に保たないと、冷えたまま打つことになる。',
+  'questUi.worldQuest.forge.strikes': '打撃：{count}/{total}',
+  'questUi.worldQuest.forge.heat': '炉の熱：{value}（{floor}より上に保つ）',
+  'questUi.worldQuest.forge.mistakes': 'ミス：{count}',
+  'questUi.worldQuest.forge.meterAria': 'ハンマーのタイミングメーター',
+  'questUi.worldQuest.forge.hintStrike': '針をよく見て、暗い帯の中で打て！',
+  'questUi.worldQuest.forge.hintStoke': '炉が冷えてきた！打つ前に火に薪をくべよう。',
+  'questUi.worldQuest.forge.hit': '会心の一撃！帯が狭まった。',
+  'questUi.worldQuest.forge.miss': '帯を外した！+{penalty}秒。',
+  'questUi.worldQuest.forge.cold': '冷えた一撃！先に火に薪をくべよう。+{penalty}秒。',
+  'questUi.worldQuest.glider.title': 'ウィンドライダー・スラローム',
+  'questUi.worldQuest.glider.boost': '加速',
+  'questUi.worldQuest.glider.boostTip':
+    '飛行速度を{speed}yd/秒上げる（最大{maximum}yd/秒）。飛行中に使用可能。{seconds}秒で再充填される。',
+  'questUi.worldQuest.glider.objective': '風の輪をくぐり抜け、指定の区域に着地する',
+  'questUi.worldQuest.glider.ready': 'フライトマスター・ゼファーに話しかけて飛び立とう。',
+  'questUi.worldQuest.glider.countdown': '発進まで{count}…しっかりつかまれ！',
+  'questUi.worldQuest.glider.flying': '輪：{rings}/{total} | タイム：{time}秒 | 速度：{speed}yd/秒',
+  'questUi.worldQuest.glider.climb': '上昇',
+  'questUi.worldQuest.glider.climbTip':
+    '押し続けると機首を上げ、速度と引き換えに高度を得る。タップで小さく調整。低速で飛ぶと揚力を失う。',
+  'questUi.worldQuest.glider.diveTip': '押し続けると機首を下げ、速度を得る。タップで小さく調整。',
+  'questUi.worldQuest.glider.controls':
+    '右クリックを押したまま上を向くと、速度と引き換えに上昇する。下を向くと降下して加速する。低速で飛ぶと揚力を失う。左右で旋回、後退でブレーキ。ジャンプや水泳の上昇・下降でも機首の角度を操作できる。風のトンネルを前進して通り抜けると加速する（1回の挑戦につきトンネルごとに1回）。',
+  'questUi.worldQuest.glider.landed': '{rating}！{time}秒で輪を{rings}/{total}個通過。',
+  'questUi.worldQuest.glider.failed':
+    '降下失敗！コース外に着地したか、通過できなかった輪が多すぎた。',
+  'questUi.worldQuest.glider.retry':
+    'ゼファーに話しかけて再挑戦するか、着地区域のそばにいるスカイに話しかけて発進地点へ戻ろう。',
+  'questUi.worldQuest.glider.nextRing':
+    '峡谷沿いの次の風の輪を狙おう。少なくとも{minimum}個の輪を通過してから、指定の区域に着地すること。',
+  'questUi.worldQuest.glider.landing': 'すべての輪を通過！前方の着地区域へ向かおう。',
+  'questUi.worldQuest.glider.complete': '着地完了！',
+  'questUi.worldQuest.glider.score': 'スコア：{score}。',
+  'questUi.worldQuest.glider.medals.silver': '銀',
+  'questUi.worldQuest.glider.medals.bronze': '銅',
+  'questUi.worldQuest.traceShape.diamond': 'ひし形',
+  'questUi.worldQuest.traceShape.pentagon': '五角形',
+  'questUi.worldQuest.traceShape.arrow': '矢のルーン',
+  'questUi.worldQuest.traceShape.zigzag': 'ジグザグの印',
+  'questUi.worldQuest.traceShape.cross': '十字のルーン',
+  'questUi.worldQuest.puzzleBonusLevel': 'ボーナスレベル {level}/{total}',
+  'questUi.worldQuest.puzzleBonusCharged':
+    '練習レベル{level}/{total}が待っています。レイの箱にもう一度触れてください。追加の報酬はありません。',
+  'questUi.worldQuest.puzzleBonusPaid': '練習レベルをクリア！',
+  'questUi.worldQuest.puzzleBonusDone':
+    'すべての練習レベルをクリアしました。レイの箱に触れるともう一度遊べます。',
+  'entities.mobs.fenbridge_infiltrator.name': '借り物の顔',
+  'entities.npcs.glider_instructor.name': 'フライトマスター・ゼファー',
+  'entities.npcs.glider_instructor.title': 'ウィンドライダー教官',
+  'entities.npcs.glider_instructor.greeting':
+    '今日はザ・シアーの断崖から吹き上がる上昇気流が猛烈だ。機械仕掛けのグライダーに身を固定して、スラロームコースで翼を試す準備はいいか？',
+  'entities.npcs.glider_apprentice.title': 'ゼファーの弟子',
+  'entities.npcs.glider_apprentice.greeting':
+    '峡谷を下る見事な飛行だった。魔法の上昇気流でザ・シアーのゼファーのもとへ戻りたくなったら、いつでも声をかけてくれ。',
+  'entities.npcs.shadow_cloak_scout.name': '斥候ヴァレリー',
+  'entities.npcs.shadow_cloak_scout.title': '隠密作戦',
+  'entities.npcs.shadow_cloak_scout.greeting':
+    '私の宵織りのマントを貸そう。伝令一人ひとりの背後に忍び寄り、命令書を抜き取るんだ。ランタンの光には入らないこと。ランタンの衛兵にはこの魔法が通じないし、伝令は体が触れれば気づく。',
+  'entities.npcs.shadow_guard_north.name': '伝令の衛兵',
+  'entities.npcs.shadow_guard_north.title': '伝令',
+  'entities.npcs.shadow_guard_north.greeting': 'この封印された命令書は隊長宛てだ。近寄るな。',
+  'entities.npcs.shadow_guard_south.name': '伝令の衛兵',
+  'entities.npcs.shadow_guard_south.title': '伝令',
+  'entities.npcs.shadow_guard_south.greeting': '届けねばならん伝令がある。立ち止まるな。',
+  'entities.npcs.shadow_guard_east.name': '伝令の衛兵',
+  'entities.npcs.shadow_guard_east.title': '伝令',
+  'entities.npcs.shadow_guard_east.greeting': '遅れは許されん。見張りがこの命令書を待っている。',
+  'entities.npcs.shadow_guard_west.name': '伝令の衛兵',
+  'entities.npcs.shadow_guard_west.title': '伝令',
+  'entities.npcs.shadow_guard_west.greeting': '公務だ。道を空けろ。',
+  'entities.npcs.shadow_sentry_south.name': 'ランタンの歩哨',
+  'entities.npcs.shadow_sentry_south.title': '真実の目',
+  'entities.npcs.shadow_sentry_south.greeting':
+    '私のランタンは影以上のものを照らし出す。見える所にいろ。',
+  'entities.npcs.shadow_sentry_north.name': 'ランタンの歩哨',
+  'entities.npcs.shadow_sentry_north.title': '真実の目',
+  'entities.npcs.shadow_sentry_north.greeting': 'ランタンの見張りから逃れられる者はいない。',
+  'entities.npcs.shadow_watch_west.name': 'ランタンの見張り番',
+  'entities.npcs.shadow_watch_west.title': '真実の目',
+  'entities.npcs.shadow_watch_west.greeting': 'そこで止まれ。ランタンは目が見逃すものを見る。',
+  'entities.npcs.shadow_watch_east.name': 'ランタンの見張り番',
+  'entities.npcs.shadow_watch_east.title': '真実の目',
+  'entities.npcs.shadow_watch_east.greeting': '私の光を気づかれずに越えられる者はいない。',
+  'entities.npcs.forge_instructor.name': '鍛冶師マーラ',
+  'entities.npcs.forge_instructor.title': 'ワームウォッチの鍛冶師',
+  'entities.npcs.forge_instructor.greeting':
+    '盾を仕上げるのを手伝って！私が頼む材料をクリックしてね。手早くやれば、もっと良いメダルがもらえるよ。',
+  'entities.npcs.infiltrator_captain.name': '軍曹アルリック',
+  'entities.npcs.infiltrator_captain.title': 'フェンブリッジ守備隊',
+  'entities.npcs.infiltrator_captain.greeting':
+    '化け物が兵士の顔を奪った。常備命令書と見張り台帳を読み、衛兵4人全員に話を聞いてから戻ってきてくれ。そして、話が記録と食い違う者の名を挙げるのだ。',
+  'entities.npcs.infiltrator_nella.name': '衛兵ネラ',
+  'entities.npcs.infiltrator_nella.title': 'フェンブリッジ守備隊',
+  'entities.npcs.infiltrator_nella.greeting': '任務に就いております。',
+  'entities.npcs.infiltrator_orin.name': '衛兵オリン',
+  'entities.npcs.infiltrator_orin.title': 'フェンブリッジ守備隊',
+  'entities.npcs.infiltrator_orin.greeting': '任務に就いております。',
+  'entities.npcs.infiltrator_bram.name': '衛兵ブラム',
+  'entities.npcs.infiltrator_bram.title': 'フェンブリッジ守備隊',
+  'entities.npcs.infiltrator_bram.greeting': '任務に就いております。',
+  'entities.npcs.infiltrator_tessa.name': '衛兵テッサ',
+  'entities.npcs.infiltrator_tessa.title': 'フェンブリッジ守備隊',
+  'entities.npcs.infiltrator_tessa.greeting': '任務に就いております。',
+  'entities.npcs.wisp_maze_keeper.name': '守り手リオラ',
+  'entities.npcs.wisp_maze_keeper.title': '生垣迷宮の番人',
+  'entities.npcs.wisp_maze_keeper.greeting':
+    '盗賊どもが盗んだ金を迷宮のあちこちに隠し、今は影がそれを守っている。財布をすべて取り戻してほしい。守護者は避けるか、輝くウィスプを取って追い払うこと。ライフを3つ失うと入口に戻されるが、集めた財布は無事なままだ。',
+  'entities.zones.farshore_isle.pois.5.label': '難破船',
   'hudChrome.pullTimer.countdown': '{seconds}',
   'hudChrome.pullTimer.pull': '引く！',
   'hudChrome.pullTimer.start': '{seconds} 秒以内に押してください!',
@@ -17101,7 +18824,385 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.colSaleType': 'タイプ',
   'hudChrome.wocMarket.colSoldAt': '販売済み',
   'hudChrome.wocMarket.saleTypeBuyNow': '今すぐ購入',
+  'hudChrome.loot.rollWon': 'おめでとうございます！ {item} をロール {roll} で獲得しました',
   'devCommand.actions.town.description': '名前を指定して町の中心部にテレポートします。',
   'devCommand.actions.town.label': 'タウンハブ',
   'devCommand.fields.town': '町',
+  'entities.items.bastion_sigil.name': '砦の印章',
+  'entities.items.mooring_stone.name': '係留石',
+  'entities.items.menders_hourglass.name': '癒し手の砂時計',
+  'entities.items.wellspring_seed.name': '湧き泉の種',
+  'entities.items.paired_talons.name': '対の鉤爪',
+  'entities.items.hunters_tally.name': '狩人の集計',
+  'entities.items.stormjar.name': '嵐の壺',
+  'entities.items.echoing_lens.name': '反響のレンズ',
+  'entities.items.gamblers_die.name': '博徒のサイコロ',
+  'entities.items.sundered_prism.name': '砕けたプリズム',
+  'entities.items.wayfarers_lodestone.name': '旅人の磁石',
+  'entities.items.medallion_of_defiance.name': '抵抗のメダリオン',
+  'entities.items.duelists_brand.name': '決闘者の烙印',
+  'entities.items.forgefathers_temper.name': '鍛冶父の焼き入れ',
+  'entities.items.kindling_orb.name': '点火のオーブ',
+  'entities.items.molten_fletching.name': '溶岩の矢羽',
+  'entities.items.last_flame_lantern.name': '最後の炎のランタン',
+  'entities.items.heart_of_the_crucible.name': 'るつぼの心臓',
+  'hudChrome.trinkets.equipLine': '装備時: {effect}',
+  'hudChrome.trinkets.useLine': '使用: {effect}（クールダウン{cooldown}）',
+  'hudChrome.trinkets.cooldownMinutes': '{minutes}分',
+  'hudChrome.trinkets.cooldownSeconds': '{seconds}秒',
+  'hudChrome.trinkets.gambleResult': '{item}: {fortune}！',
+  'hudChrome.trinkets.snakeEyes': 'スネークアイズ',
+  'hudChrome.trinkets.equippedLine': '装備中',
+  'hudChrome.trinkets.equipLockout':
+    '装備すると使用効果に{seconds}秒のクールダウンが発生する。置き換えた装飾品の残りクールダウンの方が長い場合はそちらになる。',
+  'hudChrome.trinkets.equip.lastStand':
+    '体力が{threshold}%未満の状態でダメージを受けると、{absorb}ダメージ（最大体力の{absorbPct}%）を吸収するシールドを{duration}秒間得る。{icd}秒に1回まで発動する。',
+  'hudChrome.trinkets.equip.hourglass':
+    '直接回復による過剰回復は砂時計に蓄えられる（最大{cap}、最大体力の{capPct}%）。蓄えた回復量は最後に増えてから{fade}秒後に消える。',
+  'hudChrome.trinkets.equip.twinStrike':
+    '自動攻撃が命中すると、{chance}%の確率でメインハンドの近接攻撃をもう1回行う。{icd}秒に1回まで発動する。',
+  'hudChrome.trinkets.equip.tally':
+    '自動攻撃のクリティカルヒットととどめの一撃ごとに集計の印を1つ得る（最大{max}）。印は{duration}秒持続し、得るたびに更新される。',
+  'hudChrome.trinkets.equip.storm':
+    '呪文を唱えるたびにチャージを1つ得る（最大{max}）。チャージは{duration}秒持続し、得るたびに更新される。',
+  'hudChrome.trinkets.equip.heat':
+    '近接および遠隔武器の命中ごとに熱を1スタック得る（最大{max}）。熱は{duration}秒持続し、スタックを得るたびに更新される。',
+  'hudChrome.trinkets.equip.ignite':
+    '近接および遠隔武器のクリティカルヒットがターゲットに火をつけ、{every}秒ごとに{tick}の火炎ダメージを{duration}秒間与える。新たなクリティカルヒットで更新される。ダメージは攻撃力と遠隔攻撃力の高い方で増加する。',
+  'hudChrome.trinkets.equip.guardHeat':
+    '攻撃を受け流し、回避、またはブロックするたびに熱を1スタック得る（最大{max}）。熱は{duration}秒持続し、スタックを得るたびに更新される。',
+  'hudChrome.trinkets.use.retaliate':
+    '{duration}秒間、あなたに直接攻撃を命中させた敵は、その攻撃で失った体力の{pct}%に等しい物理ダメージを受ける。継続ダメージでは発動しない。',
+  'hudChrome.trinkets.use.anchor':
+    '{duration}秒間、受けるダメージが{reduction}%減少するが、移動速度が{speed}%になる。自身のスタン、移動不能、減速、恐怖、変身、沈黙、盲目、呪術、武装解除、行動不能効果を解除し、効果中は新たなそれらとノックバックを無視する。',
+  'hudChrome.trinkets.use.hourglass':
+    '蓄えた回復量をすべて、{range}ヤード以内で体力の割合が最も低いパーティメンバー（自分を含む）へのシールドに変える。シールドは{duration}秒持続する。蓄えた回復量が必要。',
+  'hudChrome.trinkets.use.wellspring':
+    '{duration}秒間、{every}秒ごとに自分と{radius}ヤード以内のパーティメンバーの体力を{tick}回復する。回復量は回復力で増加する。',
+  'hudChrome.trinkets.use.bleedEdge':
+    '{duration}秒間、自動攻撃の命中が鉤爪の傷を与える。鉤爪の傷はスタックごとに{every}秒ごと{tick}の物理ダメージを{bleedDuration}秒間与え、最大{stacks}回までスタックする。ダメージは攻撃力で増加する。',
+  'hudChrome.trinkets.use.tallyStrike':
+    '集計の印をすべて消費し、{range}ヤード以内のターゲットに印1つにつき{perMark}の物理ダメージを与える（印{maxMarks}つで{max}）。ダメージは攻撃力で増加する。集計の印が必要。',
+  'hudChrome.trinkets.use.stormjar':
+    'すべてのチャージを雷として{range}ヤード以内のターゲットに放つ。雷は{jumpRange}ヤード以内の敵に最大{extra}体まで跳ね移る。各敵はチャージ1つにつき{perCharge}の自然ダメージを受ける（チャージ{maxCharges}つで{max}）。ダメージは呪文力で増加する。チャージが必要。',
+  'hudChrome.trinkets.use.echo':
+    '{duration}秒間、次の{casts}回の直接回復または物理以外の直接ダメージが、その量の{pct}%で繰り返される。',
+  'hudChrome.trinkets.use.gamble':
+    '4つの運勢のうち1つを{duration}秒間引く: {keenEdge}（与えるダメージが{keenPct}%増加）、{luckyStreak}（効果時間中に{heal}回復）、{gildedGuard}（{absorb}ダメージを吸収するシールド）、{snakeEyes}（効果なし、ただしこのクールダウンが半分になる）。',
+  'hudChrome.trinkets.use.blink':
+    '前方に{yards}ヤード移動し、その後{guard}秒間受けるダメージが{reduction}%減少する。',
+  'hudChrome.trinkets.use.sprint':
+    '{duration}秒間、移動速度が{speed}%上昇する。他の速度上昇効果とは重複しない。',
+  'hudChrome.trinkets.use.defiance':
+    '自身のスタン、移動不能、減速、恐怖、変身、沈黙、盲目、呪術、武装解除、行動不能効果をすべて解除する。スタン中でも使用可能。',
+  'hudChrome.trinkets.use.brand':
+    '{range}ヤード以内の敵プレイヤー1人に烙印を押し、受ける回復量を{duration}秒間{cut}%減少させる。',
+  'hudChrome.trinkets.use.temper':
+    '熱をすべて消費し、{duration}秒間武器に焼き入れをする。近接および遠隔武器の命中が追加で{damage}の火炎ダメージを与え、消費した熱1スタックにつき{perHeat}%増加する（{maxHeat}スタックで最大{maxBonus}%）。とどめの一撃ごとに{killExtend}秒延長され、合計で最大{maxDuration}秒。ダメージは攻撃力と遠隔攻撃力の高い方で増加する。',
+  'hudChrome.trinkets.use.kindlingOrb':
+    '{duration}秒間、残り火のオーブを自分のそばに呼び出す。敵に呪文を唱えるたびに、オーブがその敵に火の弾を放ち、{damage}の火炎ダメージを与える。ダメージは呪文力で増加する。',
+  'hudChrome.trinkets.use.pierce':
+    '{duration}秒間、オートアタック、射撃、物理アビリティ（出血を除く）の命中が、ターゲットから{reach}ヤード以内で最も近い敵にも与えたダメージの{share}%を与える。',
+  'hudChrome.trinkets.use.lantern':
+    '{duration}秒間、足元にランタンを置く。ランタンから{radius}ヤード以内の自分またはパーティメンバーに誰かが直接回復を行うと、その光の中で最も傷ついた別のパーティメンバーもその回復量の{share}%回復する。',
+  'hudChrome.trinkets.use.heartNova':
+    '熱をすべて消費して炎のノヴァを放ち、{radius}ヤード以内の各敵に熱1スタックにつき{perHeat}の火炎ダメージを与え（{maxHeat}スタックで{max}）、命中したすべてのクリーチャーを挑発する。ダメージは攻撃力で増加する。熱が必要。',
+  'hudChrome.auraEffect.trinket.lastStandCooldown':
+    '砦の印章の「最後の砦」シールドは使用済み。この効果が切れるまで、体力が{threshold}%を下回っても再び発動しない。',
+  'hudChrome.auraEffect.trinket.lastBastion':
+    '{value}のダメージを吸収する。体力が{threshold}%未満でダメージを受けたときに砦の印章が張ったシールド。',
+  'hudChrome.auraEffect.trinket.retaliate':
+    'あなたに直接攻撃を命中させた敵は、その攻撃で失った体力の{pct}%に等しい物理ダメージを受ける。継続ダメージでは発動しない。',
+  'hudChrome.auraEffect.trinket.moored':
+    '受けるダメージが{reduction}%減少するが、移動速度が{speed}%になる。スタン、移動不能、減速、恐怖、変身、沈黙、盲目、呪術、武装解除、行動不能効果、ノックバックを無視する。',
+  'hudChrome.auraEffect.trinket.hourglassStored':
+    '過剰回復から蓄えた回復量{stored}を保持している。癒し手の砂時計を使うと、{range}ヤード以内で体力の割合が最も低いパーティメンバー（自分を含む）へのシールドに変える。',
+  'hudChrome.auraEffect.trinket.hourglassShield':
+    '{value}のダメージを吸収する。癒し手の砂時計が蓄えた回復量から作られたシールド。',
+  'hudChrome.auraEffect.trinket.wellspring': '{every}秒ごとに体力を{tick}回復する。',
+  'hudChrome.auraEffect.trinket.twinStrikeCooldown':
+    '対の鉤爪が追加の攻撃を行ったばかり。この効果が切れるまで次の追加攻撃は行えない。',
+  'hudChrome.auraEffect.trinket.bleedEdge':
+    'オートアタックの命中が鉤爪の傷を付与する：スタックごとに{every}秒ごとに{tick}の物理ダメージを{duration}秒間与え、最大{max}回までスタックする。',
+  'hudChrome.auraEffect.trinket.bleedEdgeOther':
+    'オートアタックの命中が鉤爪の傷を付与する。最大{max}回までスタックする物理の出血効果。ダメージは攻撃力で増加する。',
+  'hudChrome.auraEffect.trinket.talonWound':
+    '{every}秒ごとに{damage}の物理ダメージを与える（{stacks}/{max}スタック）。新たなスタックごとにダメージが増え、持続時間が更新される。',
+  'hudChrome.auraEffect.trinket.tally':
+    '集計の印：{stacks}/{max}。狩人の集計を使うと印をすべて消費してターゲットを攻撃し、{damage}の物理ダメージを与える（印1つにつき{perMark}）。',
+  'hudChrome.auraEffect.trinket.tallyOther':
+    '集計の印：{stacks}/{max}。狩人の集計は印をすべて消費して物理攻撃を行い、印1つごとにダメージが増える。',
+  'hudChrome.auraEffect.trinket.storm':
+    'チャージ：{stacks}/{max}。嵐の壺を使うとチャージを雷として放ち、ターゲットと、互いに{jumpRange}ヤード以内にいる最大{extra}体の敵に命中して、それぞれに{damage}の自然ダメージを与える（チャージ1つにつき{perCharge}）。',
+  'hudChrome.auraEffect.trinket.stormOther':
+    'チャージ：{stacks}/{max}。嵐の壺はチャージを自然の雷として放ち、ターゲットと最大{extra}体の敵に命中する。チャージ1つごとにダメージが増える。',
+  'hudChrome.auraEffect.trinket.echo':
+    '次の{casts}回の直接回復または物理以外の直接ダメージが、その量の{pct}%で繰り返される。',
+  'hudChrome.auraEffect.trinket.keenEdge': '博徒のサイコロの運勢：与えるダメージが{pct}%増加する。',
+  'hudChrome.auraEffect.trinket.luckyStreak':
+    '博徒のサイコロの運勢：{every}秒ごとに体力を{tick}回復する。',
+  'hudChrome.auraEffect.trinket.gildedGuard': '博徒のサイコロの運勢：{value}のダメージを吸収する。',
+  'hudChrome.auraEffect.trinket.riftGuard': '受けるダメージが{pct}%減少する。',
+  'hudChrome.auraEffect.trinket.sprint':
+    '移動速度が{pct}%増加する。他の移動速度上昇効果とは重複しない。',
+  'hudChrome.auraEffect.trinket.brand': '受ける回復量が{pct}%減少する。',
+  'hudChrome.auraEffect.trinket.forgeHeat':
+    '熱：{stacks}/{max}。鍛冶父の焼き入れを使うと熱をすべて消費し、その武器の炎のダメージが{pct}%増加する。',
+  'hudChrome.auraEffect.trinket.tempered':
+    '近接および遠隔武器の命中が追加で{damage}の火炎ダメージを与える（消費した熱で{pct}%増加）。とどめの一撃ごとに{killExtend}秒延長され、合計で最大{maxDuration}秒。',
+  'hudChrome.auraEffect.trinket.temperedOther':
+    '近接および遠隔武器の命中が追加の火炎ダメージを与え、消費した熱で{pct}%増加する。ダメージは攻撃力と遠隔攻撃力の高い方で増加する。',
+  'hudChrome.auraEffect.trinket.kindlingOrb':
+    '敵に呪文を唱えるたびに、オーブがその敵に火の弾を放ち、{damage}の火炎ダメージを与える。変身、行動不能、盲目状態の敵には撃たない。',
+  'hudChrome.auraEffect.trinket.kindlingOrbOther':
+    '敵に呪文を唱えるたびに、オーブがその敵に火炎ダメージの弾を放つ。ダメージは呪文力で増加する。',
+  'hudChrome.auraEffect.trinket.moltenIgnite':
+    '{every}秒ごとに{damage}の火炎ダメージを与える。新たな武器のクリティカルヒットで更新される。',
+  'hudChrome.auraEffect.trinket.pierce':
+    'オートアタック、射撃、物理アビリティ（出血を除く）の命中が、ターゲットから{reach}ヤード以内で最も近い敵にも与えたダメージの{pct}%を与える。',
+  'hudChrome.auraEffect.trinket.lantern':
+    'ランタンから{radius}ヤード以内の自分またはパーティメンバーに誰かが直接回復を行うと、その光の中で最も傷ついた別のパーティメンバーもその回復量の{pct}%回復する。',
+  'hudChrome.auraEffect.trinket.crucibleHeat':
+    '熱：{stacks}/{max}。るつぼの心臓を使うと熱をすべて消費して炎のノヴァを放ち、{radius}ヤード以内の各敵に{damage}の火炎ダメージを与え、命中したすべてのクリーチャーを挑発する。',
+  'hudChrome.auraEffect.trinket.crucibleHeatOther':
+    '熱：{stacks}/{max}。るつぼの心臓は熱をすべて消費して{radius}ヤード以内に炎のノヴァを放ち、スタックごとに火炎ダメージが増え、命中したすべてのクリーチャーを挑発する。',
+  // The Weekly Vault (PR 4052): the bank's rewards tab, the keeper prompt and the claim flow.
+  'hudChrome.weeklyRewards.title': '週間宝物庫',
+  'hudChrome.weeklyRewards.tab': '週間報酬',
+  'hudChrome.weeklyRewards.intro':
+    '達成したマイルストーンごとに宝物庫を一つ獲得します。るつぼのリセット後、各宝物庫を開けて戦利品を抽選し、その週の一品を選んでください。開けた報酬は保存され、未受領の週もそのまま残ります。',
+  'hudChrome.weeklyRewards.approachKeeper': '宝物庫の番人のそばに立つと週間報酬を確認できます。',
+  'hudChrome.weeklyRewards.nextReset': 'るつぼの週間リセット',
+  'hudChrome.weeklyRewards.countdown': '{days}日 {hours}時間 {minutes}分 {seconds}秒',
+  'hudChrome.weeklyRewards.progress': '{count} / {max}',
+  'hudChrome.weeklyRewards.milestone': '戦利品テーブル抽選1回',
+  'hudChrome.weeklyRewards.lockedRoll': '戦利品テーブル抽選1回を解放',
+  'hudChrome.weeklyRewards.earned': '次回リセット後に開ける宝物庫：{count}',
+  'hudChrome.weeklyRewards.normal': 'ノーマル',
+  'hudChrome.weeklyRewards.heroic': 'ヒロイック',
+  'hudChrome.weeklyRewards.mixedClears': 'ヒロイック{heroic} / ノーマル{normal}',
+  'hudChrome.weeklyRewards.heroicClears': 'ヒロイック{count}',
+  'hudChrome.weeklyRewards.normalClears': 'ノーマル{count}',
+  'hudChrome.weeklyRewards.viewPossibleLoot': '入手可能な戦利品を見る',
+  'hudChrome.weeklyRewards.heroicUpgradeOne': 'ヒロイックダンジョンをあと{count}回クリアで昇格',
+  'hudChrome.weeklyRewards.heroicUpgradeMany': 'ヒロイックダンジョンをあと{count}回クリアで昇格',
+  'hudChrome.weeklyRewards.completedTask.raidOne': 'レイドボス{count}体を撃破',
+  'hudChrome.weeklyRewards.completedTask.raidMany': 'レイドボス{count}体を撃破',
+  'hudChrome.weeklyRewards.completedTask.dungeonOne': 'ダンジョン{count}回クリア',
+  'hudChrome.weeklyRewards.completedTask.dungeonMany': 'ダンジョン{count}回クリア',
+  'hudChrome.weeklyRewards.completedTask.worldOne': 'ワールドクエスト{count}件完了',
+  'hudChrome.weeklyRewards.completedTask.worldMany': 'ワールドクエスト{count}件完了',
+  'hudChrome.weeklyRewards.completedTask.pvpOne': 'レート戦{count}勝',
+  'hudChrome.weeklyRewards.completedTask.pvpMany': 'レート戦{count}勝',
+  'hudChrome.weeklyRewards.requiredTask.raidOne': 'レイドボスを{count}体撃破する',
+  'hudChrome.weeklyRewards.requiredTask.raidMany': 'レイドボスを{count}体撃破する',
+  'hudChrome.weeklyRewards.requiredTask.dungeonOne': 'ダンジョンを{count}回クリアする',
+  'hudChrome.weeklyRewards.requiredTask.dungeonMany': 'ダンジョンを{count}回クリアする',
+  'hudChrome.weeklyRewards.requiredTask.worldOne': 'ワールドクエストを{count}件完了する',
+  'hudChrome.weeklyRewards.requiredTask.worldMany': 'ワールドクエストを{count}件完了する',
+  'hudChrome.weeklyRewards.requiredTask.pvpOne': 'レート戦で{count}勝する',
+  'hudChrome.weeklyRewards.requiredTask.pvpMany': 'レート戦で{count}勝する',
+  'hudChrome.weeklyRewards.readyWeeks':
+    '未受領の週：{count}。完了した最も古い週から受け取ってください。',
+  'hudChrome.weeklyRewards.claimLastWeek': '先週の報酬を受け取る',
+  'hudChrome.weeklyRewards.readyTitle': '週間報酬の準備ができました',
+  'hudChrome.weeklyRewards.readyDescription':
+    '完了した週の報酬が待っています。獲得した宝物庫を開け、受け取る一品を選んでください。',
+  'hudChrome.weeklyRewards.notNow': '後で',
+  'hudChrome.weeklyRewards.completedWeek': '{date}に終了した週',
+  'hudChrome.weeklyRewards.currentWeek': '今週の進捗に戻る',
+  'hudChrome.weeklyRewards.openRewards': '獲得した宝物庫を開ける',
+  'hudChrome.weeklyRewards.openedCount':
+    '宝物庫を{total}個中{count}個開けました。すべて開けると報酬を選べます。',
+  'hudChrome.weeklyRewards.openingSavedReward': '宝物庫を開けて報酬を保存しています...',
+  'hudChrome.weeklyRewards.rewardNumber': '報酬{count}',
+  'hudChrome.weeklyRewards.openVault': '宝物庫を開ける：{name}',
+  'hudChrome.weeklyRewards.inspectItem': '{name}を調べる',
+  'hudChrome.weeklyRewards.selectItem': '{name}を選ぶ',
+  'hudChrome.weeklyRewards.revealed': '公開済み',
+  'hudChrome.weeklyRewards.revealedItem': '公開：{name}',
+  'hudChrome.weeklyRewards.chooseReward': '報酬を一つ選ぶ',
+  'hudChrome.weeklyRewards.confirmTitle': '{name}を受け取りますか？',
+  'hudChrome.weeklyRewards.confirmClaim': '受け取りを確定',
+  'hudChrome.weeklyRewards.backToChoices': '選択肢に戻る',
+  'hudChrome.weeklyRewards.claimRequested':
+    '受け取りを申請しました。バッグが満杯の場合は空きを作って選び直してください。',
+  'hudChrome.weeklyRewards.waiting':
+    'まだ受け取れる報酬はありません。今週獲得した宝物庫は次回リセット時に解放されます。',
+  'hudChrome.weeklyRewards.chooseOne':
+    '慎重に選んでください：一品を受け取ると、その週の他の選択肢はすべて失われます。',
+  'hudChrome.weeklyRewards.itemLevel': 'アイテムレベル{level}',
+  'hudChrome.weeklyRewards.backlogFull':
+    '保存できる週が上限に達しました。報酬を受け取って今後の週の空きを作ってください。',
+  'hudChrome.weeklyRewards.claim': '選んだアイテムを受け取る',
+  'hudChrome.weeklyRewards.poolSize': '{count}個のアイテムを見る',
+  'hudChrome.weeklyRewards.poolRule':
+    '一覧の各アイテムは等確率です。アイテムはクラス制限に合わせて選ばれます。撃破したレイドはその難易度の戦利品を解放します。レジェンダリーは対象外です。',
+  'hudChrome.weeklyRewards.rare': 'レア',
+  'hudChrome.weeklyRewards.epic': 'エピック',
+  'hudChrome.weeklyRewards.unavailable': 'まだ利用できません',
+  'hudChrome.weeklyRewards.worldUnavailable':
+    'ワールドクエストの報酬は、ローテーションするワールドクエストの実装後に利用できるようになります。',
+  'hudChrome.weeklyRewards.category.raid': 'レイド',
+  'hudChrome.weeklyRewards.category.dungeon': 'ダンジョン',
+  'hudChrome.weeklyRewards.category.world': 'ワールドクエスト',
+  'hudChrome.weeklyRewards.category.pvp': 'PvP',
+  'hudChrome.weeklyRewards.task.raid':
+    '異なるレイドボスを撃破する。各ボスは一度だけ数えられ、ヒロイックでの撃破は記録を昇格させる。',
+  'hudChrome.weeklyRewards.task.dungeon':
+    'ダンジョンをクリアする。最良のクリア記録が各マイルストーンの報酬難易度を決める。',
+  'hudChrome.weeklyRewards.task.world':
+    'ローテーションするワールドクエストを完了する。ストーリークエストは数えられない。',
+  'hudChrome.weeklyRewards.task.pvp':
+    'ランクアリーナまたはレートバトルグラウンドで勝利する。練習戦と棄権は数えられない。',
+  'hudChrome.weeklyRewards.pool.raid': 'ノーマルレイドの戦利品',
+  'hudChrome.weeklyRewards.pool.raid_heroic': 'ヒロイックレイドの戦利品',
+  'hudChrome.weeklyRewards.pool.dungeon': 'ノーマルダンジョンの戦利品',
+  'hudChrome.weeklyRewards.pool.dungeon_heroic': 'ヒロイックダンジョンの戦利品',
+  'hudChrome.weeklyRewards.pool.world': 'ワールドクエストの戦利品',
+  'hudChrome.weeklyRewards.pool.pvp': 'ウォーフェア装備',
+  // The Weekly Vault keeper (PR 4052), the NPC record in src/sim/content/zone1.ts.
+  'entities.npcs.eastbrook_vault_keeper.name': '宝物庫の番人',
+  'entities.npcs.eastbrook_vault_keeper.title': '週間報酬',
+  'entities.npcs.eastbrook_vault_keeper.greeting':
+    '週間報酬が待っています。るつぼのリセット後、獲得した選択肢から一品を選んでください。',
+  // World-quest reward line (the daily item slot, the faction line and the standing text).
+  'questUi.worldQuest.itemRewardWithLevels':
+    '{name}（アイテムレベル{itemLevel}、レベル{requiredLevel}で装備可能）',
+  'questUi.worldQuest.factionLine': '勢力：{faction}',
+  'questUi.worldQuest.standingReward': '{faction}の評判 +{amount}',
+  'hudChrome.leaderboard.gliderCourseNames.downs': '海岸周回コース',
+  'hudChrome.leaderboard.gliderCourseNames.valleys': '谷の周回コース',
+  'hudChrome.leaderboard.gliderCourseNames.switchbacks': '尾根の折り返しコース',
+  'hudChrome.leaderboard.gliderDaily': '{course}：今日',
+  'hudChrome.leaderboard.gliderLifetime': '{course}：歴代',
+  'hudChrome.leaderboard.gliderStart': 'このコースを飛ぶ',
+  'hudChrome.leaderboard.gliderRankings': '滑空コース記録',
+  'hudChrome.leaderboard.gliderRules':
+    '全ての輪を通過し、最速で完走した飛行が勝利します。日間記録はサーバーのリセット時に更新されます。記録の反映には最大30秒かかります。',
+  'hudChrome.framePresets.apply': '適用',
+  'hudChrome.focusTargets.showEmpty': '空のフォーカスフレームを表示',
+  'hudChrome.focusTargets.assignHint':
+    '対象を選択してください。{key} を押すか、{button} をクリックしてください。',
+  'hudChrome.focusTargets.assignClickHint': '対象を選択して、{button} をクリックしてください。',
+  'hudChrome.focusTargets.ally': '味方',
+  'hudChrome.focusTargets.enemy': '敵',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'entities.itemSets.vanguard_warrior_arms.name': 'ヴァンガード：Bladewake Battlegear',
+  'entities.itemSets.vanguard_warrior_arms.bonus2':
+    '2点：Maiming StrikeでOnrushの残りクールダウンが1秒短縮。',
+  'entities.itemSets.vanguard_warrior_arms.bonus4': '4点：Onrushが次のMaiming Strikeを20%強化。',
+  'entities.itemSets.vanguard_warrior_fury.name': 'ヴァンガード：Bloodmarch Ragegear',
+  'entities.itemSets.vanguard_warrior_fury.bonus2': '2点：Vaulting Chargeのクールダウンが8秒短縮。',
+  'entities.itemSets.vanguard_warrior_fury.bonus4': '4点：Vaulting Chargeの着地で激怒する。',
+  'entities.itemSets.vanguard_warrior_prot.name': 'ヴァンガード：Ironmarch Bulwark',
+  'entities.itemSets.vanguard_warrior_prot.bonus2': '2点：Faultlineのクールダウンが5秒短縮。',
+  'entities.itemSets.vanguard_warrior_prot.bonus4':
+    '4点：Faultlineで受けるダメージが6秒間10%低下。',
+  'entities.itemSets.vanguard_paladin_holy.name': 'ヴァンガード：Sunvigil Regalia',
+  'entities.itemSets.vanguard_paladin_holy.bonus2': '2点：Life Covenantのクールダウンが30秒短縮。',
+  'entities.itemSets.vanguard_paladin_holy.bonus4':
+    '4点：Life Covenantが対象に最大体力8%のシールドを6秒付与。',
+  'entities.itemSets.vanguard_paladin_protection.name': 'ヴァンガード：Shieldvow Bastion',
+  'entities.itemSets.vanguard_paladin_protection.bonus2':
+    '2点：Oath Chainのクールダウンが2秒短縮。',
+  'entities.itemSets.vanguard_paladin_protection.bonus4':
+    '4点：Oath Chainで引き寄せた敵は4秒間30%遅く詠唱し、条件を満たすとSolar Reprisalを得る。',
+  'entities.itemSets.vanguard_paladin_retribution.name': 'ヴァンガード：Lightbrand Warplate',
+  'entities.itemSets.vanguard_paladin_retribution.bonus2':
+    '2点：Valkyr Callingのクールダウンが15秒短縮。',
+  'entities.itemSets.vanguard_paladin_retribution.bonus4':
+    '4点：Valkyr CallingがFinal Edictをリセットし、着地後6秒以内の次のFinal Edictのダメージを15%上げる。',
+  'entities.itemSets.vanguard_hunter_beast_mastery.name': 'ヴァンガード：Packwarden Harness',
+  'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
+    '2点：Rattling Shotのクールダウンが4秒短縮。',
+  'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
+    '4点：Rattling ShotでHowling Rageの残りクールダウンが1秒短縮。',
+  'entities.itemSets.vanguard_hunter_marksmanship.name': 'ヴァンガード：Farsight Harness',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
+    '2点：Trailbreakのクールダウンが4秒短縮。',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
+    '4点：Trailbreakで6秒以内の次のLong Drawが即時発動。15秒に1回まで。',
+  'entities.itemSets.vanguard_hunter_survival.name': 'ヴァンガード：Snaretooth Harness',
+  'entities.itemSets.vanguard_hunter_survival.bonus2': '2点：Bloodhookのクールダウンが3秒短縮。',
+  'entities.itemSets.vanguard_hunter_survival.bonus4': '4点：BloodhookでHunting Momentumを1得る。',
+  'entities.itemSets.vanguard_rogue_assassination.name': 'ヴァンガード：Nightcut Leathers',
+  'entities.itemSets.vanguard_rogue_assassination.bonus2':
+    '2点：Low Blowの消費エネルギーが10減少。',
+  'entities.itemSets.vanguard_rogue_assassination.bonus4':
+    '4点：Low Blowで6秒以内の次の攻撃がクリティカルになる。',
+  'entities.itemSets.vanguard_rogue_combat.name': 'ヴァンガード：Brawlmark Leathers',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': '2点：Swift Heelsのクールダウンが60秒短縮。',
+  'entities.itemSets.vanguard_rogue_combat.bonus4':
+    '4点：Swift Heels中、Wicked SlashとHaymakerがコンボポイントを追加で1得る。',
+  'entities.itemSets.vanguard_rogue_subtlety.name': 'ヴァンガード：Shadewalk Leathers',
+  'entities.itemSets.vanguard_rogue_subtlety.bonus2': '2点：Smokefadeのクールダウンが60秒短縮。',
+  'entities.itemSets.vanguard_rogue_subtlety.bonus4':
+    '4点：SmokefadeからのGut Punchがコンボポイントを追加で2得る。',
+  'entities.itemSets.vanguard_priest_discipline.name': 'ヴァンガード：Veilpsalm Raiment',
+  'entities.itemSets.vanguard_priest_discipline.bonus2':
+    '2点：Terror Canticleのクールダウンが3秒短縮。',
+  'entities.itemSets.vanguard_priest_discipline.bonus4':
+    '4点：Psalm of Warding消費時、守られた味方の移動速度が3秒間20%上昇。8秒に1回まで。',
+  'entities.itemSets.vanguard_priest_holy.name': 'ヴァンガード：Gracewing Raiment',
+  'entities.itemSets.vanguard_priest_holy.bonus2': '2点：Veilstepのクールダウンが6秒短縮。',
+  'entities.itemSets.vanguard_priest_holy.bonus4': '4点：Veilstepが最大体力8%のシールドを6秒付与。',
+  'entities.itemSets.vanguard_priest_shadow.name': 'ヴァンガード：Duskhymn Regalia',
+  'entities.itemSets.vanguard_priest_shadow.bonus2':
+    '2点：Litany of Woeの詠唱中、対象の移動速度も30%低下。',
+  'entities.itemSets.vanguard_priest_shadow.bonus4':
+    '4点：Call Tithefiendが最大体力10%のシールドを8秒付与。',
+  'entities.itemSets.vanguard_shaman_elemental.name': 'ヴァンガード：Tempestwrit Battlemail',
+  'entities.itemSets.vanguard_shaman_elemental.bonus2':
+    '2点：Unleash Weaponのクールダウンが3秒短縮。',
+  'entities.itemSets.vanguard_shaman_elemental.bonus4':
+    '4点：Unleash Weaponで移動詠唱可能になり、4秒間移動速度20%上昇。20秒に1回まで。',
+  'entities.itemSets.vanguard_shaman_enhancement.name': 'ヴァンガード：Galeborn Warmail',
+  'entities.itemSets.vanguard_shaman_enhancement.bonus2':
+    '2点：Ancestral Strikeで対象の移動速度が4秒間30%低下。',
+  'entities.itemSets.vanguard_shaman_enhancement.bonus4':
+    '4点：Ancestral StrikeでElemental Tranceの残りクールダウンが4秒短縮。',
+  'entities.itemSets.vanguard_shaman_restoration.name': 'ヴァンガード：Brineward Chainmail',
+  'entities.itemSets.vanguard_shaman_restoration.bonus2':
+    '2点：体力50%未満の味方へのMending Watersが0.5秒速くなる。',
+  'entities.itemSets.vanguard_shaman_restoration.bonus4':
+    '4点：Tidecallが対象にあなたの最大体力5%のシールドを6秒付与。',
+  'entities.itemSets.vanguard_mage_arcane.name': 'ヴァンガード：Hourbinder Vestments',
+  'entities.itemSets.vanguard_mage_arcane.bonus2': '2点：Temporal Barrierのクールダウンが2秒短縮。',
+  'entities.itemSets.vanguard_mage_arcane.bonus4':
+    '4点：Temporal Barrierが守った対象の移動速度を3秒間20%上昇。',
+  'entities.itemSets.vanguard_mage_fire.name': 'ヴァンガード：Emberlash Regalia',
+  'entities.itemSets.vanguard_mage_fire.bonus2': '2点：Cinderfallの再使用が3秒速くなる。',
+  'entities.itemSets.vanguard_mage_fire.bonus4':
+    '4点：Cinderfall詠唱でBlazing Barrierの残りクールダウンが2秒短縮。',
+  'entities.itemSets.vanguard_mage_frost.name': 'ヴァンガード：Rimewarden Garb',
+  'entities.itemSets.vanguard_mage_frost.bonus2': '2点：Icebindのクールダウンが2秒短縮。',
+  'entities.itemSets.vanguard_mage_frost.bonus4':
+    '4点：Icebind詠唱でFlitstepの残りクールダウンが5秒短縮。',
+  'entities.itemSets.vanguard_warlock_affliction.name': 'ヴァンガード：Dreadquill Vestments',
+  'entities.itemSets.vanguard_warlock_affliction.bonus2': '2点：Harrowの詠唱時間が0.3秒短縮。',
+  'entities.itemSets.vanguard_warlock_affliction.bonus4':
+    '4点：Consumeの回復量が30%上昇し、移動中にチャネル可能。',
+  'entities.itemSets.vanguard_warlock_demonology.name': 'ヴァンガード：Marrowbound Regalia',
+  'entities.itemSets.vanguard_warlock_demonology.bonus2':
+    '2点：Bone Armorのクールダウンが10秒短縮。',
+  'entities.itemSets.vanguard_warlock_demonology.bonus4':
+    '4点：Reaping CommandでBone Armorの残りクールダウンが2秒短縮。',
+  'entities.itemSets.vanguard_warlock_destruction.name': 'ヴァンガード：Slagcrown Vestments',
+  'entities.itemSets.vanguard_warlock_destruction.bonus2':
+    '2点：Cinderhideのクールダウンが30秒短縮。',
+  'entities.itemSets.vanguard_warlock_destruction.bonus4':
+    '4点：2回ごとのConflagrateで8秒以内の次のRuinboltが即時発動。',
+  'entities.itemSets.vanguard_druid_feral.name': '血たてがみの皮装',
+  'entities.itemSets.vanguard_druid_feral.bonus2': '2点：Bruin Rushのクールダウンが3秒短縮。',
+  'entities.itemSets.vanguard_druid_feral.bonus4':
+    '4点：Bruin Rushが最大体力6%のシールドを6秒付与。',
+  'entities.itemSets.vanguard_druid_restoration.name': 'アザミ花の祭服',
+  'entities.itemSets.vanguard_druid_restoration.bonus2': '2点：Fleetmendのクールダウンが1秒短縮。',
+  'entities.itemSets.vanguard_druid_restoration.bonus4': '4点：Fleetmendで移動速度が3秒間30%上昇。',
+  'entities.itemSets.vanguard_druid_balance.name': '星守りの装束',
+  'entities.itemSets.vanguard_druid_balance.bonus2': '絡み根の詠唱時間が0.5秒短縮される。',
+  'entities.itemSets.vanguard_druid_balance.bonus4':
+    '絡み根を詠唱すると、移動しながら詠唱でき、移動速度が4秒間20%上昇する。20秒に1回しか発生しない。',
 };

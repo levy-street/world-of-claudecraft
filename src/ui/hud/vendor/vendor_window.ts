@@ -7,6 +7,7 @@
 // stays in Hud because it needs Hud's private state; this module only renders
 // one panel and reports clicks back through the injected callbacks.
 
+import { factionDisplayName, STANDING_TIER_LABELS } from '../../../sim/factions';
 import type { ItemInstancePayload } from '../../../sim/types';
 import type { VendorBuyOptions } from '../../../sim/vendor_buy_stack';
 import { currencyIconHtml } from '../../currency_art';
@@ -91,6 +92,11 @@ function goodsPriceText(price: VendorPrice): string {
  *  merchant. Empty string for a profession with no display-name key, matching
  *  every other consumer of that table: no name is printable, so no line is. */
 function requirementText(row: VendorGoodsRow): string {
+  if (row.factionRequirement) {
+    const tier = STANDING_TIER_LABELS[row.factionRequirement.standingTier];
+    const faction = factionDisplayName(row.factionRequirement.factionId);
+    return `Requires ${tier} with ${faction}`;
+  }
   const requirement = row.requirement;
   if (!requirement) return '';
   const nameKey = gatheringProfessionNameKey(requirement.professionId);
@@ -209,7 +215,8 @@ export function renderVendorWindow(
     // gates on the whole-count total; force-1 and custom rows keep the 1x
     // baseline (the custom prompt's typed amount decides the rest).
     const countBuy = goods.countBuy;
-    row.disabled = countBuy ? !countBuy.affordable : !goods.affordable;
+    const lockedByFaction = goods.requirementUnmet && !!goods.factionRequirement;
+    row.disabled = lockedByFaction || (countBuy ? !countBuy.affordable : !goods.affordable);
     const price = countBuy ? formatLocalizedMoney(countBuy.copper) : goodsPriceText(goods.price);
     const itemName = itemDisplayName(item);
     const stack =
@@ -376,8 +383,8 @@ export function renderVendorWindow(
     // reachable, the phase 13 QA round-2 frontend finding).
     const parts = wornItemCellParts(item, instance);
     const itemName = parts.name;
-    row.setAttribute('aria-label', t('itemUi.vendor.buybackAria', { item: itemName, price }));
-    row.innerHTML = `<span class="ui-socket ui-socket--bag">${deps.itemIcon(item, parts.quality)}</span><span class="vi-name" style="color:${itemNameColor({ kind: item.kind, quality: parts.quality })}">${esc(itemName)}${count > 1 ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) }))}` : ''}</span><span class="vi-price ui-money">${deps.moneyHtml(priceCopper)}</span>`;
+    row.setAttribute('aria-label', t('itemUi.vendor.buybackAria', { item: parts.ariaName, price }));
+    row.innerHTML = `<span class="ui-socket ui-socket--bag">${deps.itemIcon(item, parts.quality)}${parts.qualityBadge}</span><span class="vi-name" style="color:${itemNameColor({ kind: item.kind, quality: parts.quality })}">${esc(itemName)}${count > 1 ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) }))}` : ''}</span><span class="vi-price ui-money">${deps.moneyHtml(priceCopper)}</span>`;
     // POSITIONAL by design, unlike the identity-keyed goods rows: after a
     // buyback the list shifts and focus stays at the same SLOT (the next
     // item to reclaim), which is the useful landing for repeated buybacks.

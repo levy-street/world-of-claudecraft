@@ -461,8 +461,26 @@ export function resolvePerfectingAttempt(
   }
   // THE ONE DRAW (see the module header's draw contract).
   const roll = ctx.rng.next();
-  if (roll < PERFECTING_SUCCESS_CHANCE) {
-    const rank = (payload.perfecting ?? 0) + 1;
+  const success = roll < PERFECTING_SUCCESS_CHANCE;
+  // The craft_roll_events audit record (types.ts craftRoll): the roll just
+  // drawn, the chance it met, and the rank it moves from and to, so the real
+  // per-attempt success rate is readable from the database after the fact
+  // (server-side evidence only, never routed to a client). Draws nothing.
+  const rankBefore = payload.perfecting ?? 0;
+  ctx.emit({
+    type: 'craftRoll',
+    kind: 'perfecting',
+    recipeId: recipe?.id ?? null,
+    itemId,
+    roll,
+    chance: PERFECTING_SUCCESS_CHANCE,
+    success,
+    rankBefore,
+    rankAfter: success ? rankBefore + 1 : rankBefore,
+    pid: meta.entityId,
+  });
+  if (success) {
+    const rank = rankBefore + 1;
     // The alias keeps the emit on ONE line under the 100-column width: the S3
     // drift guard scans one call per line (see the materials arm above).
     const ranks = PERFECTING_RANKS;

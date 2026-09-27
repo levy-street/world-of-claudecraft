@@ -282,7 +282,7 @@ export class CalendarWindow {
       return;
     }
     const guild = this.deps.world().socialInfo?.guild ?? null;
-    const manage = canManageGuildEvents(guild?.rank);
+    const manage = canManageGuildEvents(guild);
     const dayLabel = formatDateTime(new Date(`${cell.iso}T00:00:00Z`), {
       dateStyle: 'full',
       timeZone: 'UTC',

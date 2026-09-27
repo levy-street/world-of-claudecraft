@@ -230,6 +230,41 @@ describe('ParseRecorder enrichment', () => {
     expect(ev.x).toMatchObject({ auraSourceId: 5, auraId: 'rend', auraStacks: 3 });
   });
 
+  test('an absorb credit is recorded and rolls up as the shielder healing', () => {
+    const sim = fakeSim();
+    const match = arenaMatch();
+    seedArena(sim, match);
+    const { recorder, records } = makeRecorder(sim);
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+    sim.tickCount = 11;
+    recorder.observe([
+      {
+        type: 'absorb',
+        sourceId: 5,
+        targetId: 6,
+        amount: 45,
+        ability: 'Temporal Aegis',
+        abilityId: 'temporal_aegis',
+      },
+    ]);
+    const ev = records.find((r) => r.t === 'ev') as Record<string, unknown>;
+    expect(ev).toMatchObject({ ev: { type: 'absorb', sourceId: 5, amount: 45 } });
+
+    sim.tickCount = 50;
+    match.defeated.add(7);
+    match.defeated.add(8);
+    (match as { state: string }).state = 'over';
+    recorder.observe([
+      { type: 'death', entityId: 7, killerId: 5 },
+      { type: 'death', entityId: 8, killerId: 6 },
+    ]);
+    const close = records.find((r) => r.t === 'fight_close') as Record<string, unknown>;
+    const rollup = close.rollup as { perParticipant: Record<string, { healing: number }> };
+    expect(rollup.perParticipant['1005']?.healing).toBe(45);
+  });
+
   test('cue-only heal2 events never enter the parse', () => {
     const sim = fakeSim();
     seedArena(sim, arenaMatch());
@@ -274,6 +309,42 @@ describe('ParseRecorder enrichment', () => {
       close.rollup as { perParticipant: Record<string, { taken: number; absorbed: number }> }
     ).perParticipant;
     expect(rollup['1007']).toMatchObject({ taken: 100, absorbed: 40 });
+  });
+
+  test('absorb events accrue to the shielder healing totals and emit event records', () => {
+    const sim = fakeSim();
+    const match = arenaMatch();
+    seedArena(sim, match);
+    const { recorder, records } = makeRecorder(sim);
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+    sim.tickCount = 11;
+    recorder.observe([
+      {
+        type: 'absorb',
+        sourceId: 6,
+        targetId: 5,
+        amount: 350,
+        ability: 'Power Word: Shield',
+        abilityId: 'power_word_shield',
+      },
+    ]);
+    match.defeated.add(7);
+    match.defeated.add(8);
+    (match as { state: string }).state = 'over';
+    sim.tickCount = 12;
+    recorder.observe([]);
+
+    const ev = records.find(
+      (r) => r.t === 'ev' && (r.ev as Record<string, unknown>).type === 'absorb',
+    );
+    expect(ev).toBeDefined();
+
+    const close = records.find((r) => r.t === 'fight_close') as Record<string, unknown>;
+    const rollup = (close.rollup as { perParticipant: Record<string, { healing: number }> })
+      .perParticipant;
+    expect(rollup['1006']).toMatchObject({ healing: 350 });
   });
 });
 

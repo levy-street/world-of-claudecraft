@@ -75,7 +75,9 @@ describe('/arena command', () => {
     );
   });
 
-  it('rounds the win rate and works through the /pvp and /rating aliases', () => {
+  it('rounds the win rate and works through the /arena and /rating aliases', () => {
+    // /pvp is no longer an alias: it toggles the World PvP flag
+    // (src/sim/pvp/world_pvp.ts, tests/world_pvp.test.ts).
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
     const meta = sim.players.get(a)!;
@@ -84,7 +86,7 @@ describe('/arena command', () => {
     meta.arenaLosses = 2; // 33.33% -> 33%
     sim.tick();
 
-    sim.chat('/pvp', a);
+    sim.chat('/arena', a);
     expect(errorText(sim.tick(), a)).toBe(
       'Arena: 1v1 Rating 1602 - 1 wins, 2 losses, 0 draws (33% win rate). 2v2 Rating 1500 - no matches played yet.',
     );

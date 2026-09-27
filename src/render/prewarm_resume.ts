@@ -19,6 +19,9 @@ export interface PrewarmResumeUnitPiece {
 export interface PrewarmResumeUnit {
   id: string;
   run: () => void | Promise<void>;
+  /** Explicitly tail-free upload or reflection work. Unknown units retain the
+   * asynchronous compile-tail cap; this flag never changes queue priority. */
+  synchronous?: boolean;
   /** The same work cut ONE ROOT PER PIECE, for a lane that runs while the
    *  world is live. A batch unit's `run` launches its roots together (the
    *  boot shape: their driver links overlap under the curtain), but live that

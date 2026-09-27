@@ -164,17 +164,29 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the merged catalog, all 34 mount cues, and all 92 UI cues in one 319-key inventory', () => {
+  it('keeps release mount/UI cues and Warrior recordings in one 387-key inventory', () => {
     // Combine the release farming/crafting cues with the candidate mount cues.
-    // Counts measured from SFX: 319 total, 92 UI, 34 mount. A mount may share
+    // Release inventory: 319 total, 92 UI, 34 mount. A mount may share
     // player footfalls or have several cues, so this is not a mount count.
     // 319 = the 299-key release inventory plus the 20 player-selectable aura
     // proc alerts (src/game/aura_cue_catalog.ts), which are all ui_aura_ keys.
+    // 381 adds 62 new keys on top of that 319: 60 whose name contains
+    // "_warrior_" (asserted below), plus two that do not, piercing_howl and
+    // impact_masterwork_execution (also asserted below).
+    // 387 adds the Viridian Valestrider's six mount cues on top of that 381:
+    // its gait pool, summon call, takeoff, touchdown, and the squawk/flap pair
+    // it calls at the apex of a jump. Mount cues 34 -> 40; UI is unchanged.
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(319);
+    expect(keys.size).toBe(387);
+    expect([...keys].filter((key) => key.includes('_warrior_'))).toHaveLength(60);
+    expect([...keys].filter((key) => key.includes('_masterwork_'))).toEqual([
+      'impact_masterwork_execution',
+    ]);
+    expect([...keys].filter((key) => key.startsWith('signature_'))).toHaveLength(0);
+    expect(keys.has('piercing_howl')).toBe(true);
     expect([...keys].filter((key) => key.startsWith('ui_aura_'))).toHaveLength(20);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(92);
-    expect([...keys].filter((key) => key.startsWith('mount_'))).toHaveLength(34);
+    expect([...keys].filter((key) => key.startsWith('mount_'))).toHaveLength(40);
     expect(keys.has('ui_craft_cast')).toBe(true);
     expect(keys.has('ui_farm_plant')).toBe(true);
     expect(keys.has('ui_farm_harvest')).toBe(true);
@@ -267,7 +279,8 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(319);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(387);
+    expect([...SFX_FIXED_CATALOG_KEYS].sort()).toEqual([...keys].sort());
   });
 });
 

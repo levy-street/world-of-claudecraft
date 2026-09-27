@@ -46,6 +46,7 @@ import {
   SET_WARFARE_STORMBOUND,
   SET_WARFARE_THORNHIDE,
 } from './item_sets';
+import { SEASON2_STOCK } from './pvp_honor_season2';
 
 export const FURY_NPC_ID = 'fury';
 // Reserved so adding FURY does not shift the deterministic nextId sequence used
@@ -77,6 +78,15 @@ export const WARFARE_JEWELRY_STAT_FRACTION = 0.75;
 // base 11-slot kit therefore carries 182 of each rating (18.2 percent) and the
 // seven-piece set tops it up to the cap rather than carrying it.
 export const WARFARE_RATING_FRACTION = 1.0;
+// Caster armor and weapons carry this share of the stamina premium the physical
+// WARFARE piece in the same slot carries over them (owner call, 2026-09-24: the
+// PvP gear health study found physical honor pieces authored 2 to 3 stamina per
+// slot above their PvE peers while caster pieces sat on their floor, leaving
+// cloth at 72 to 73 percent of an arms warrior in full honor gear). Half closes
+// most of that gap while cloth stays the squishier armor; rounded half up, it
+// adds 19 stamina to a caster kit. Jewelry is excluded: it stays calibrated
+// below the badge jewelry (WARFARE_JEWELRY_STAT_FRACTION above).
+export const WARFARE_CASTER_STAMINA_PREMIUM_SHARE = 0.5;
 
 export const WARFARE_ITEMS: Record<string, ItemDef> = {
   // Furyforged Battlegear: Strength and Stamina mail.
@@ -203,7 +213,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     slot: 'helmet',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 292, int: 8, sta: 6, spi: 3 },
+    stats: { armor: 292, int: 8, sta: 8, spi: 3 },
     pvpOffenseRating: 18,
     pvpDefenseRating: 18,
     priceHonor: 900,
@@ -219,7 +229,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 240, int: 6, sta: 5, spi: 3 },
+    stats: { armor: 240, int: 6, sta: 7, spi: 3 },
     pvpOffenseRating: 16,
     pvpDefenseRating: 16,
     priceHonor: 700,
@@ -235,7 +245,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     slot: 'chest',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 335, int: 10, sta: 7, spi: 3 },
+    stats: { armor: 335, int: 10, sta: 10, spi: 3 },
     pvpOffenseRating: 22,
     pvpDefenseRating: 22,
     priceHonor: 1200,
@@ -251,7 +261,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     slot: 'waist',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 224, int: 5, sta: 5, spi: 4 },
+    stats: { armor: 224, int: 5, sta: 7, spi: 4 },
     pvpOffenseRating: 15,
     pvpDefenseRating: 15,
     priceHonor: 450,
@@ -267,7 +277,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 315, int: 8, sta: 7, spi: 3 },
+    stats: { armor: 315, int: 8, sta: 9, spi: 3 },
     pvpOffenseRating: 20,
     pvpDefenseRating: 20,
     priceHonor: 1050,
@@ -283,7 +293,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     slot: 'gloves',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 224, int: 5, sta: 5, spi: 4 },
+    stats: { armor: 224, int: 5, sta: 7, spi: 4 },
     pvpOffenseRating: 15,
     pvpDefenseRating: 15,
     priceHonor: 550,
@@ -299,7 +309,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 212, int: 7, sta: 5, spi: 3 },
+    stats: { armor: 212, int: 7, sta: 6, spi: 3 },
     pvpOffenseRating: 14,
     pvpDefenseRating: 14,
     priceHonor: 550,
@@ -431,7 +441,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     slot: 'helmet',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 76, int: 8, sta: 6, spi: 3 },
+    stats: { armor: 76, int: 8, sta: 8, spi: 3 },
     pvpOffenseRating: 18,
     pvpDefenseRating: 18,
     priceHonor: 900,
@@ -447,7 +457,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 56, int: 6, sta: 5, spi: 3 },
+    stats: { armor: 56, int: 6, sta: 7, spi: 3 },
     pvpOffenseRating: 16,
     pvpDefenseRating: 16,
     priceHonor: 700,
@@ -463,7 +473,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     slot: 'chest',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 90, int: 10, sta: 7, spi: 3 },
+    stats: { armor: 90, int: 10, sta: 10, spi: 3 },
     pvpOffenseRating: 22,
     pvpDefenseRating: 22,
     priceHonor: 1200,
@@ -479,7 +489,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     slot: 'waist',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 48, int: 5, sta: 5, spi: 4 },
+    stats: { armor: 48, int: 5, sta: 7, spi: 4 },
     pvpOffenseRating: 15,
     pvpDefenseRating: 15,
     priceHonor: 450,
@@ -495,7 +505,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 72, int: 8, sta: 7, spi: 3 },
+    stats: { armor: 72, int: 8, sta: 9, spi: 3 },
     pvpOffenseRating: 20,
     pvpDefenseRating: 20,
     priceHonor: 1050,
@@ -511,7 +521,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     slot: 'gloves',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 52, int: 5, sta: 5, spi: 4 },
+    stats: { armor: 52, int: 5, sta: 7, spi: 4 },
     pvpOffenseRating: 15,
     pvpDefenseRating: 15,
     priceHonor: 550,
@@ -527,7 +537,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 44, int: 7, sta: 5, spi: 3 },
+    stats: { armor: 44, int: 7, sta: 6, spi: 3 },
     pvpOffenseRating: 14,
     pvpDefenseRating: 14,
     priceHonor: 550,
@@ -558,7 +568,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     slot: 'helmet',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 168, int: 8, sta: 6, spi: 3 },
+    stats: { armor: 168, int: 8, sta: 8, spi: 3 },
     pvpOffenseRating: 18,
     pvpDefenseRating: 18,
     priceHonor: 900,
@@ -574,7 +584,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 148, int: 6, sta: 5, spi: 3 },
+    stats: { armor: 148, int: 6, sta: 7, spi: 3 },
     pvpOffenseRating: 16,
     pvpDefenseRating: 16,
     priceHonor: 700,
@@ -590,7 +600,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     slot: 'chest',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 172, int: 10, sta: 7, spi: 3 },
+    stats: { armor: 172, int: 10, sta: 10, spi: 3 },
     pvpOffenseRating: 22,
     pvpDefenseRating: 22,
     priceHonor: 1200,
@@ -606,7 +616,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     slot: 'waist',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 100, int: 5, sta: 5, spi: 4 },
+    stats: { armor: 100, int: 5, sta: 7, spi: 4 },
     pvpOffenseRating: 15,
     pvpDefenseRating: 15,
     priceHonor: 450,
@@ -622,7 +632,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 132, int: 8, sta: 7, spi: 3 },
+    stats: { armor: 132, int: 8, sta: 9, spi: 3 },
     pvpOffenseRating: 20,
     pvpDefenseRating: 20,
     priceHonor: 1050,
@@ -638,7 +648,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     slot: 'gloves',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 104, int: 5, sta: 5, spi: 4 },
+    stats: { armor: 104, int: 5, sta: 7, spi: 4 },
     pvpOffenseRating: 15,
     pvpDefenseRating: 15,
     priceHonor: 550,
@@ -654,7 +664,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 96, int: 7, sta: 5, spi: 3 },
+    stats: { armor: 96, int: 7, sta: 6, spi: 3 },
     pvpOffenseRating: 14,
     pvpDefenseRating: 14,
     priceHonor: 550,
@@ -838,7 +848,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     weapon: { min: 39, max: 57, speed: 3 },
-    stats: { int: 10, sta: 7, spi: 3 },
+    stats: { int: 10, sta: 10, spi: 3 },
     pvpOffenseRating: 22,
     pvpDefenseRating: 22,
     priceHonor: 1200,
@@ -850,6 +860,31 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
 
 export const FURY_STOCK: readonly string[] = Object.keys(WARFARE_ITEMS);
 
+// The two PvP trinkets (content/trinkets.ts), sold beside the WARFARE kit for
+// 800 honor. They carry WARFARE like the rest of the honor gear, on the jewelry
+// rule: one attribute at WARFARE_JEWELRY_STAT_FRACTION of the item-level-31
+// trinket line (10 of 13, no stamina top-up: the trinket slot is exempt from the
+// stamina model) and WARFARE Offense and Defense Rating at
+// WARFARE_RATING_FRACTION of it (13 each). They have no set tag and their defs
+// live in content/trinkets.ts, so they sit outside FURY_STOCK (and outside the
+// kit and set arithmetic, which counts the eleven kit slots); a full kit plus
+// both trinkets reads 208 of each rating before any set tier, and the set
+// capstone still clamps at the cap. Registered at WARFARE_SOURCE_LEVEL by
+// item_level.buildSourceIndex. Soulbound with no gold sell value, like every
+// honor purchase.
+export const WARFARE_TRINKET_STOCK: readonly string[] = ['medallion_of_defiance', 'duelists_brand'];
+
+// What both honor quartermasters sell: the Warfare entry tier above, then Warfare
+// Season 2 (content/pvp_honor_season2.ts), the item-level-35 spec sets and
+// weapons, with the two honor trinkets between them (the release pins the entry
+// tier as the head of the list and Season 2 as its tail). FURY_STOCK keeps
+// meaning the entry tier everywhere it is read.
+export const HONOR_QUARTERMASTER_STOCK: readonly string[] = [
+  ...FURY_STOCK,
+  ...WARFARE_TRINKET_STOCK,
+  ...SEASON2_STOCK,
+];
+
 export const FURY_NPC: NpcDef = {
   id: FURY_NPC_ID,
   name: 'FURY',
@@ -858,7 +893,7 @@ export const FURY_NPC: NpcDef = {
   facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.fury.facing,
   color: 0xb52a2a,
   questIds: [],
-  vendorItems: [...FURY_STOCK],
+  vendorItems: [...HONOR_QUARTERMASTER_STOCK],
   dynamic: true,
   // The Eastbrook mirror sells the identical stock, so it presents the identical
   // set-divided shop window. One canonical stock, two placements.

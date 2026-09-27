@@ -727,18 +727,24 @@ export function enterRift(
     // rift would drop the player onto the portal and bounce them straight back
     // in. Push the entry position away from the portal to a safe distance.
     let ret = returnPos ?? { x: r.e.pos.x, z: r.e.pos.z };
+    // Predefined exit facing: away from the portal, along the same line the
+    // player approached it on, so leaveRift never leaves them staring back at
+    // whatever they were facing deep inside the floor. Computed once, here at
+    // instance creation, alongside returnPos: every member who later leaves
+    // this run shares the one return spot and the one return facing.
+    let returnFacing = 0;
     if (portal) {
       const dx = ret.x - portal.pos.x;
       const dz = ret.z - portal.pos.z;
       const d = Math.hypot(dx, dz);
       const SAFE = PORTAL_TRIGGER_RADIUS + 2.5;
-      if (d < SAFE) {
-        const ux = d > 1e-3 ? dx / d : 0;
-        const uz = d > 1e-3 ? dz / d : 1;
-        ret = { x: portal.pos.x + ux * SAFE, z: portal.pos.z + uz * SAFE };
-      }
+      const ux = d > 1e-3 ? dx / d : 0;
+      const uz = d > 1e-3 ? dz / d : 1;
+      if (d < SAFE) ret = { x: portal.pos.x + ux * SAFE, z: portal.pos.z + uz * SAFE };
+      returnFacing = Math.atan2(ux, uz);
     }
     inst.returnPos = dryPointNear(ret.x, ret.z);
+    inst.returnFacing = returnFacing;
     // Dev portals keep a cosmetic rank on the gate, but only a persisted natural
     // event is reward-ranked. This keeps the reward guard authoritative for the
     // real /dev portal path instead of paying Marks for a visual-only badge.
@@ -906,6 +912,10 @@ function forceExitRiftPlayer(
   p.pos = ctx.groundPos(dest.x, dest.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
+  // Predefined exit facing (away from the portal; see enterRift), not whatever
+  // direction the player happened to be facing deep inside the floor.
+  p.facing = inst.returnFacing ?? 0;
+  p.prevFacing = inst.returnFacing ?? 0;
   p.targetId = null;
   p.autoAttack = false;
   p.riftSliding = false; // never carry a stale slide pose out to the overworld
@@ -1445,7 +1455,7 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
     // Masterwrought (phase 04): A/S first-clear cores (daily-gated per
     // character, ruling R9) plus the weekly ember check. Deliberately outside
     // the boss guard: the grant pays the CLEAR, not the corpse, and it draws
-    // no rng, honoring addRiftProgressionLoot's draw-free contract above.
+    // no rng; only the eligible equipment rewards above roll loot quality.
     // Rank from baseLevel, the creditRiftClearDeeds precedent above, so the
     // winning and losing ember arms can never disagree on a clear's rank.
     awardRiftFirstClearMaterials(ctx, riftRankForBaseLevel(inst.baseLevel), participants);

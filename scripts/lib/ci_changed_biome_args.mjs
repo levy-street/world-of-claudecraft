@@ -19,6 +19,7 @@ export function buildBiomeArgs(since) {
     'ci',
     '--changed',
     `--since=${since}`,
+    '--max-diagnostics=none',
     '--no-errors-on-unmatched',
   ];
 }

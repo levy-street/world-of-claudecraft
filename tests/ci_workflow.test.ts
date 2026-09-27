@@ -323,6 +323,12 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/bank-storage-charters/',
       '            /docs/screenshots/bank-vault-tab/',
       '            /docs/screenshots/cosmetics-window/',
+      '            /docs/screenshots/confection-cascade/',
+      '            /docs/screenshots/confection-cascade-v3/',
+      '            /docs/screenshots/confection-cascade-v4/',
+      '            /docs/screenshots/confection-cascade-v5/',
+      '            /docs/screenshots/confection-cascade-v6/',
+      '            /docs/screenshots/confection-cascade-v7/',
       '            /docs/screenshots/deed-border-cartouche/',
       '            /docs/screenshots/eastbrook-grand-armoury/',
       '            /docs/screenshots/eastbrook-vale-rebuild/',
@@ -339,6 +345,7 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/intentional-gathering-pr2/',
       '            /docs/screenshots/interface-redesign/',
       '            /docs/screenshots/item-art-consistency-2026-08-09/',
+      '            /docs/screenshots/ley-beam-v1/',
       '            /docs/screenshots/market-house-redesign/',
       '            /docs/screenshots/masterwrought-art-completion-2026-09-02/',
       '            /docs/screenshots/placeholder-art-completion-2026-08-09/',
@@ -350,6 +357,10 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/vault-fine-mark/',
       '            /docs/screenshots/wildheart/',
       '            /docs/screenshots/woc-market/',
+      '            /docs/screenshots/world-quest-cannon/',
+      '            /docs/screenshots/world-quest-horde/',
+      '            /docs/screenshots/world-quest-investigation/',
+      '            /docs/screenshots/world-quest-puzzle-polish/',
       '          sparse-checkout-cone-mode: false',
     ].join('\n');
     // Job-anchored, not a bare workflow-wide count: each sparse job carries
@@ -550,7 +561,11 @@ describe('CI workflow parity', () => {
     // v0.43 release batches cannot update workflow files with their current
     // push credentials. Keep discovering this reference, but do not require
     // the sparse cone to grow until a workflow-scoped follow-up can land it.
-    const workflowScopedFollowup = new Set(['charselect-zone', 'nythraxis-dread-curse-swap']);
+    const workflowScopedFollowup = new Set([
+      'charselect-zone',
+      'dash-speed-stack',
+      'nythraxis-dread-curse-swap',
+    ]);
     for (const dir of workflowScopedFollowup) {
       expect(referenced.has(dir), `${dir} remains a real referenced screenshot subtree`).toBe(true);
       expect(coneDirs.has(dir), `${dir} is intentionally absent from the sparse cone`).toBe(false);

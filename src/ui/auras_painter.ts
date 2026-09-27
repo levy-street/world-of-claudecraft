@@ -108,8 +108,17 @@ export interface AurasPainterDeps {
    *  stealth, Ghost Wolf, the carried flag): the host omits the seconds-remaining
    *  line for it, because the long finite duration the sim backs those with is
    *  scaffolding, not information, and printing it is the same lie the suppressed
-   *  countdown label avoids. */
-  renderTooltip(name: string, remaining: number, effectHtml: string, toggle: boolean): string;
+   *  countdown label avoids. `sourceId` is the caster's entity id (0/undefined when
+   *  unknown); the host resolves it to a name and, gated on the player's own
+   *  "show aura caster" preference, appends a caster line so multiple casters of
+   *  the same buff (e.g. several paladins' blessings) are told apart. */
+  renderTooltip(
+    name: string,
+    remaining: number,
+    effectHtml: string,
+    toggle: boolean,
+    sourceId: number | undefined,
+  ): string;
   /** Attach a lazily-built tooltip to a node (host: Hud.attachTooltip). Called ONCE per
    *  pooled node; the closure reads the live record. */
   attachTooltip(el: HTMLElement, html: () => string): void;
@@ -144,6 +153,9 @@ interface PooledAura {
    *  read live by the tooltip closure so a recycled node never keeps the previous
    *  aura's answer. */
   toggle: boolean;
+  /** The caster's entity id (undefined when the aura carries none), read live by
+   *  the tooltip closure so a recycled node never keeps the previous aura's caster. */
+  sourceId: number | undefined;
   /** The last icon key written, so the expensive data-URL resolve + write fire only on
    *  change. null until the first paint (never equals a real key). */
   lastIconKey: string | null;
@@ -263,6 +275,7 @@ export class AurasPainter {
       rec.cancelable = s.cancelable;
       rec.effectHtml = s.effectHtml;
       rec.toggle = s.toggle;
+      rec.sourceId = s.sourceId;
       rec.seen = this.frame;
       // Cancel affordance: only when this painter has an attachCancel dep (the player buff bar)
       // and the view marked the aura as cancelable. Read live by the contextmenu closure.
@@ -361,11 +374,12 @@ export class AurasPainter {
       remaining: 0,
       effectHtml: '',
       toggle: false,
+      sourceId: undefined,
       lastIconKey: null,
       seen: 0,
     };
     this.deps.attachTooltip(el, () =>
-      this.deps.renderTooltip(rec.name, rec.remaining, rec.effectHtml, rec.toggle),
+      this.deps.renderTooltip(rec.name, rec.remaining, rec.effectHtml, rec.toggle, rec.sourceId),
     );
     // Right-click-cancel: attached ONCE per pooled node via the injected helper (the
     // buff-bar painter only). The closure reads the live record so a recycled node cancels

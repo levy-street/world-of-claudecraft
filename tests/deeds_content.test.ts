@@ -138,8 +138,16 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // MEASURED on the merged tree, which is the value that wins per this
     // file's own convention: the id COUNT stays 300 (a pure append), only the
     // Renown SUM moves.
-    expect(DEED_ORDER.length).toBe(300);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3310);
+    // 308 / 3355 at the release/v0.43.0 merge into feature/world-quests: the
+    // release's 300 plus the branch's eight world-quest exploration deeds.
+    // 315 / 3495 with the seven faction standing deeds (three Trusted at 5,
+    // three Champion at 25, and the all-factions meta at 50: +140).
+    // 317 / 3530 with the two Clue Scroll casket deeds (the first casket at
+    // 10 and the tenth at 25: +35).
+    // 318 / 3535 with the release's Eastbrook ferry round trip
+    // (exp_harbor_to_harbor at renown 5) at the fourth release/v0.44.0 base merge.
+    expect(DEED_ORDER.length).toBe(318);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3535);
   });
 
   it('ships the audited per-category counts', () => {
@@ -155,8 +163,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +1 Phase 11k's cross-packet prog_field_to_feast, then
       // +1 the Proving Shore graduation (prog_ready_for_an_adventure) at the
       // release/v0.41.0 merge (the release's own chain read 58), then
-      // +1 the Phase 13 promotion capstone prog_legendmaker.
-      progression: 68,
+      // +1 the Phase 13 promotion capstone prog_legendmaker, then
+      // +7 the faction standing ladder (a Trusted and a Champion deed per
+      // allied faction plus the all-factions meta).
+      progression: 75,
       combat: 10,
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank), +5 Crucible raid
       // deeds (per-boss clear pairs plus the Varkhul flawless task).
@@ -174,7 +184,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +2 bank socket ladder deeds (soc_strongbox_outfitter,
       // soc_four_bags_deep; Bank Storage phase 06).
       social: 20,
-      exploration: 11,
+      // +2 the Clue Scroll casket pair (exp_clue_first_casket and
+      // exp_clue_ten_caskets, both on the clueCasketsOpened meter).
+      // +1 the release's ferry round trip (exp_harbor_to_harbor).
+      exploration: 22,
       feat: 3,
       hidden: 10,
     });
@@ -369,6 +382,30 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // first here rather than appending it behind the branch's tail).
       'col_set_bramblehide',
       'hid_forgebreaker',
+      'exp_arcane_calligraphy',
+      'exp_arcane_calligraphy_gold',
+      'exp_forge_helper',
+      'exp_last_barricade',
+      'exp_borrowed_face',
+      'exp_windrider_slalom',
+      'exp_duskweave_dispatches',
+      'exp_wisp_maze',
+      // The faction standing ladder: Trusted and Champion per allied faction
+      // (the standing* meters) plus the all-factions meta, appended last.
+      'prog_rift_watch_trusted',
+      'prog_church_order_trusted',
+      'prog_automatons_trusted',
+      'prog_rift_watch_champion',
+      'prog_church_order_champion',
+      'prog_automatons_champion',
+      'prog_faction_champion_all',
+      // The Clue Scroll casket pair: two meter deeds on clueCasketsOpened
+      // (the first casket and the tenth, which grants Treasure Hunter).
+      'exp_clue_first_casket',
+      'exp_clue_ten_caskets',
+      // The release's Eastbrook ferry round trip, appended last at the fourth
+      // release/v0.44.0 base merge.
+      'exp_harbor_to_harbor',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -762,12 +799,15 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // (phase 06) the tenth, closing the family across the whole ring,
     // prog_farming_100's Harvestmaster (the absorbed packet's D13 title
     // mandate), and the Crucible raid's flawless title (dgn_varkhul_flawless,
-    // the 2026-08-30 release/v0.41.0 sync merge) one more.
-    expect(titles.length).toBe(46);
+    // the 2026-08-30 release/v0.41.0 sync merge) one more, and the three
+    // faction standing Champion titles (Riftwarden, Dawnkeeper, Forgemaster)
+    // three more, and the Clue Scroll tenth-casket title (Treasure Hunter)
+    // one more.
+    expect(titles.length).toBe(51);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(46);
+    expect(new Set(titleTexts).size).toBe(51);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -978,7 +1018,24 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // reproduces a prior hash); the frozen literal below is MEASURED directly
   // off the merged DEED_ORDER/DEEDS table instead. No shipped TRIGGER changed
   // on either side; only those eighteen renown values moved.
-  const FROZEN_CATALOG_SHA256 = '931a05935481f4014b21a20357f363bcaf52c4025c0d88512e2d60895b5cb2ef';
+  // Re-baselined for the seven appended faction standing deeds (a Trusted and
+  // a Champion meter deed per allied faction on the new standing* meters,
+  // plus the prog_faction_champion_all meta), re-minted THE AUDITABLE WAY:
+  // the afe535f4... literal rotated down into PRE_APPEND_CATALOG_SHA256 and
+  // the proof below reproduces it exactly. No shipped trigger or renown
+  // value was touched.
+  // Re-baselined for the two appended Clue Scroll casket deeds (the
+  // exp_clue_first_casket / exp_clue_ten_caskets meter pair on the new
+  // clueCasketsOpened meter), re-minted THE AUDITABLE WAY: the 2b8d9d03...
+  // literal rotated down into PRE_APPEND_CATALOG_SHA256 and the proof below
+  // reproduces it exactly. No shipped trigger or renown value was touched.
+  // Re-baselined for the release's appended Eastbrook ferry round trip
+  // (exp_harbor_to_harbor, a visits deed on the four ferry crossings) at the
+  // fourth release/v0.44.0 base merge into integration/world-quests-v0440,
+  // re-minted THE AUDITABLE WAY: the 0d91bc68... literal rotated down into
+  // PRE_APPEND_CATALOG_SHA256 and the proof below reproduces it exactly. No
+  // shipped trigger or renown value was touched.
+  const FROZEN_CATALOG_SHA256 = '8749b988a2135b7b3c0dee2065b54e6491660e86ce51bf7880924ff763ae1a25';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1026,21 +1083,41 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // merged table with the two new ids removed, folding the eighteen-value
   // retune into the new checkpoint; every append AFTER this merge is once
   // again provable the auditable way against it.
+  //
+  // At the release/v0.43.0 merge into feature/world-quests the previous mint is
+  // the release's own 931a0593... literal and the append set is the branch's
+  // eight world-quest deeds, seated after hid_forgebreaker: stripping them
+  // must reproduce the release catalogue exactly.
+  //
+  // The faction standing ladder appends seven deeds after exp_wisp_maze; the
+  // previous mint is that merge's afe535f4... literal, and stripping the
+  // seven reproduced it exactly.
+  //
+  // The Clue Scroll casket pair appends two deeds after
+  // prog_faction_champion_all; the previous mint is the faction ladder's
+  // 2b8d9d03... literal (rotated down here), and stripping the two must
+  // reproduce it exactly.
+  //
+  // The release's Eastbrook ferry round trip appends exp_harbor_to_harbor
+  // after exp_clue_ten_caskets at the fourth release/v0.44.0 base merge; the
+  // previous mint is the clue pair's 0d91bc68... literal (rotated down here),
+  // and stripping the one id must reproduce it exactly.
   const PRE_APPEND_CATALOG_SHA256 =
-    '516adb010bf37c91076b9a16bdf0e4dc22c72506fcb64e237468d1ee197d1358';
-  const APPENDED_SINCE: readonly string[] = ['col_set_bramblehide', 'hid_forgebreaker'];
+    '0d91bc68e18b88a6b0c4dc7088c118d556b3bbec0be1617506b36b8172123eb6';
+  const APPENDED_SINCE: readonly string[] = ['exp_harbor_to_harbor'];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
     for (const id of APPENDED_SINCE) {
       expect(DEED_ORDER.includes(id), `${id} is in the live catalog`).toBe(true);
     }
-    // The new quest celebration sits at the true tail after the raid block.
-    // Pin its two predecessors too: this is an append into a known seat,
-    // never a scattered insert or a retro-edit (the digest below proves it).
+    // The ferry round trip sits at the true tail after the Clue Scroll casket
+    // pair. Pin its two predecessors too: this is an append into a
+    // known seat, never a scattered insert or a retro-edit (the digest below
+    // proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'dgn_varkhul_heroic',
-      'dgn_varkhul_flawless',
+      'exp_clue_first_casket',
+      'exp_clue_ten_caskets',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1257,8 +1334,11 @@ describe('table shape', () => {
     // that (appended behind the branch's rows; the flawless task is its
     // final entry). The Roots' Bramblehide set collection appends behind the
     // raid block (whose flawless task was the previous final entry).
-    // The one-time Forgebreaker quest's hidden celebration appends after it.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('hid_forgebreaker');
+    // The one-time Forgebreaker quest's hidden celebration appends after it,
+    // then the world-quest block, then the faction standing ladder, then the
+    // Clue Scroll casket pair, then the release's ferry round trip as the
+    // final entry.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_harbor_to_harbor');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
@@ -1616,6 +1696,11 @@ describe('trigger references resolve against the real content tables', () => {
     ).toEqual([
       'col_deepest_cast:Clockreel Fishing Rod',
       'col_glimmerfin:Sunglint Koi',
+      // Reviewed at the Clue Scroll casket deeds: the first-casket desc names
+      // the Treasure Casket, and the casket-opening site that bumps the
+      // clueCasketsOpened meter consumes exactly that item
+      // (TREASURE_CASKET_ITEM_ID), so the desc names the RIGHT one.
+      'exp_clue_first_casket:Treasure Casket',
       'feat_brightwood_relic:Bramblehide Jerkin',
       "feat_brightwood_relic:Monarch's Crown",
       'hid_codfather:The Codfather',

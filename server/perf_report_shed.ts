@@ -45,6 +45,7 @@ export const RAW_SUMMARY_KNOWN_KEYS = [
   'postRevealLinks',
   'bootPhases',
   'shaderWarm',
+  'cadence',
   'assets',
   'input',
   'hud',
@@ -262,6 +263,9 @@ const RUNGS: readonly ShedRung[] = [
   dropKey('postRevealLinks'),
   dropKey('bootPhases'),
   dropKey('shaderWarm'),
+  // A handful of scalars, and the one block saying whether a 33 ms session is a
+  // chosen frame rate ceiling or a struggling machine: the last block to go.
+  dropKey('cadence'),
   dropKeys('scalars', RAW_SUMMARY_SCALAR_KEYS),
 ];
 

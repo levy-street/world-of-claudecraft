@@ -112,6 +112,7 @@ import {
   rollGatherRareEvent,
 } from './gather_events';
 import { queueGatheringGrant } from './gathering';
+import { updateMobileStationObjects } from './mobile_station_object';
 import {
   applyToolEffectUse,
   bestOwnedGatherToolFor,
@@ -1369,4 +1370,7 @@ export function updateFarming(ctx: SimContext): void {
   // driver behind the same 1 Hz guard, never a second appended sim.ts sweep;
   // it decides from stored state alone and draws zero rng (feast.ts header).
   updateFarmFeasts(ctx);
+  // The placed mobile station object's expiry and room-teardown reclaim
+  // (mobile_station_object.ts) rides the same 1 Hz guard for the same reason.
+  updateMobileStationObjects(ctx);
 }

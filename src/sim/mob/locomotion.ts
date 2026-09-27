@@ -1,3 +1,5 @@
+import { gliderActionsLocked } from '../glider_action_lock';
+import { hasShadowCloak } from '../shadow_action_lock';
 // Mob locomotion (M2), extracted from the Sim monolith.
 //
 // This module owns the mob-AI locomotion core: the updateMob dispatcher (its
@@ -110,6 +112,7 @@ import { applyBroodBurn } from './dragonkin_brood';
 import { resetDungeonMinibossStomp, updateDungeonMinibossStomp } from './dungeon_miniboss_stomp';
 import { idleRng, wanderPause } from './idle_rng';
 import { resetIgnivarTrashAutomaton, updateIgnivarTrashAutomaton } from './ignivar_trash_automata';
+import { immobileEvadeSnapsHome } from './immobile_evade';
 import {
   claimMechanicSpacing,
   mechanicSlotHeld,
@@ -544,7 +547,12 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         // pad. Ruled acceptable: one 50 ms deferral, uniform across hosts.
         ctx.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, MAX_AGGRO_RADIUS, (e, d2) => {
           counters.aggroScanPlayerVisits++;
-          if (e.dead) return;
+          if (
+            e.dead ||
+            hasShadowCloak(e) ||
+            gliderActionsLocked(ctx.players.get(e.id)?.worldQuestLog)
+          )
+            return;
           const radius = Math.max(
             4,
             Math.min(MAX_AGGRO_RADIUS, template.aggroRadius + (mob.level - e.level) * 1.5),
@@ -565,7 +573,12 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       const counters = ctx.mobScanCounters;
       ctx.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, MAX_AGGRO_RADIUS, (e, d2) => {
         counters.aggroScanPlayerVisits++;
-        if (e.dead) return;
+        if (
+          e.dead ||
+          hasShadowCloak(e) ||
+          gliderActionsLocked(ctx.players.get(e.id)?.worldQuestLog)
+        )
+          return;
         if (isTrivialTo(mob, e)) return;
         let radius = Math.max(
           4,
@@ -730,6 +743,13 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       break;
     }
     case 'evade': {
+      // An immobile mob (moveSpeed 0) cannot walk home and a zero step never
+      // arrives: snap it onto its spawn point instead (mob/immobile_evade.ts)
+      // and run the same reset, so a shoved egg is never immune forever.
+      if (immobileEvadeSnapsHome(mob)) {
+        resetEvadingMob(ctx, mob);
+        break;
+      }
       // moveToward has no pathfinding: a straight line home that crosses a prop
       // (the camp tent/crate/campfire) or deep water makes no progress, so the
       // mob stays evading — and therefore immune — forever. Walk home normally,

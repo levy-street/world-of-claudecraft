@@ -142,6 +142,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Armería de Guerra',
     desc: 'Joyería y armas de Guerra compradas con honor ganado a pulso.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Galería de Vanguardia',
+    desc: 'Los conjuntos de especialización y las armas de la temporada 2 de Guerra, comprados con honor.',
+  },
   horizons_vault_of_ages: {
     name: 'Cámara de las Eras',
     desc: 'Tesoros retirados de una época pasada. Estas reliquias ya no se pueden conseguir; la cámara honra a los veteranos que las conservan.',
@@ -156,7 +160,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: 'Heroico: Crisol de la Última Fuente',
-    desc: 'Armas exclusivas del modo heroico de Ignivar, Heraldo de la Última Llama.',
+    desc: 'Armas exclusivas del modo heroico y los abalorios de la banda de Ignivar, Heraldo de la Última Llama.',
   },
   conquerors_varkhul: {
     name: 'El Crisol Interior',
@@ -164,7 +168,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: 'Heroico: El Crisol Interior',
-    desc: 'Escudos y armas exclusivos del modo heroico de Varkhul, Padre de la Forja de la Última Llama.',
+    desc: 'Escudos y armas exclusivos del modo heroico y los abalorios de la banda de Varkhul, Padre de la Forja de la Última Llama.',
   },
   conquerors_set_bramblehide: {
     name: 'Piel de Zarza de Roots',

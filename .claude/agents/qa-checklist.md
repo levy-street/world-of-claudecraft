@@ -196,8 +196,10 @@ on a visible material (texture slots, `transparent` / `blending` / `alphaToCover
 `alphaHash`, `defines`, `onBeforeCompile` / `customProgramCacheKey`, skinning, instancing,
 `needsUpdate`) rides a gated swap with a stand-in; no directional, hemisphere, spot, or
 rect-area light is added, removed, or hidden after boot (re-grade the constructor pair through
-`interior_light_rig.ts`; point lights ride the pad budget); a new secondary GL context links and
-uploads before its first draw and disables `checkShaderErrors`; and new work rides
+`interior_light_rig.ts`; every world point light is a marked carrier source in a budget
+registry, `point_light_carriers.ts`, pinned by `tests/point_light_carriers.test.ts`); a new
+secondary GL context links and uploads before its first draw and disables
+`checkShaderErrors`; and new work rides
 `background_gpu_queue.ts` at an existing `GPU_WORK_PRIORITY` with a learnable label, never a new
 lane or a wall-clock constant inside a gate. The contract is `src/render/CLAUDE.md` "GPU work:
 every new producer is a client of the scheduler". Gates:

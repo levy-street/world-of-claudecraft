@@ -501,6 +501,9 @@ export interface PerfRawRow {
   gfxTier: string;
   autoGovernor: boolean;
   targetFps: number;
+  frameCapIntent: number;
+  cadenceDivisor: number;
+  refreshHz: number;
   renderScale: number;
   effectiveRenderScale: number;
   fpsAvg: number;
@@ -540,6 +543,18 @@ export interface PerfRawRow {
   worst10sFrameP95Ms: number;
   suggestionIds: string[];
   rawSummary: unknown;
+  // "Host essentials", desktop shell only (server/perf_report_host.ts): null
+  // and '' are "no evidence", which every web and mobile row carries.
+  hostMemTotalMb: number | null;
+  hostMemFreeMb: number | null;
+  appWorkingSetMb: number | null;
+  appRendererWsMb: number | null;
+  appGpuWsMb: number | null;
+  hostOnBattery: boolean | null;
+  hostPowerPlan: string;
+  hostPowerMode: string;
+  hostHags: boolean | null;
+  hostGameMode: boolean | null;
 }
 
 function cleanPerfLimit(limit: number): number {
@@ -744,6 +759,7 @@ export async function clientPerfRaw(
     `SELECT
        id, created_at, release_version, build_id, session_id, account_id, character_id, realm,
        graphics_preset, gfx_tier, auto_governor, target_fps, render_scale, effective_render_scale,
+       frame_cap_intent, cadence_divisor, refresh_hz,
        fps_avg, frame_p95_ms, frame_p99_ms, long_frame_count,
        renderer_calls, renderer_triangles, renderer_textures, renderer_programs, context_lost_count,
        long_task_count, long_task_p95_ms, memory_used_mb, memory_limit_mb,
@@ -751,7 +767,9 @@ export async function clientPerfRaw(
        browser_family, os_family, gl_vendor, gl_renderer_bucket, gl_renderer_raw,
        gl_backend, gl_model, gl_laptop, gpu_hp_adapter, zone_or_scenario, source,
        crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms,
-       suggestion_ids, raw_summary
+       suggestion_ids, raw_summary,
+       host_mem_total_mb, host_mem_free_mb, app_working_set_mb, app_renderer_ws_mb, app_gpu_ws_mb,
+       host_on_battery, host_power_plan, host_power_mode, host_hags, host_game_mode
      FROM client_perf_reports
      WHERE created_at > now() - ($1 || ' hours')::interval
        AND ($3::bigint IS NULL OR id < $3)
@@ -772,6 +790,9 @@ export async function clientPerfRaw(
     gfxTier: r.gfx_tier,
     autoGovernor: r.auto_governor,
     targetFps: r.target_fps,
+    frameCapIntent: r.frame_cap_intent,
+    cadenceDivisor: r.cadence_divisor,
+    refreshHz: r.refresh_hz,
     renderScale: r.render_scale,
     effectiveRenderScale: r.effective_render_scale,
     fpsAvg: r.fps_avg,
@@ -815,6 +836,16 @@ export async function clientPerfRaw(
     worst10sFrameP95Ms: r.worst_10s_frame_p95_ms,
     suggestionIds: r.suggestion_ids,
     rawSummary: r.raw_summary,
+    hostMemTotalMb: r.host_mem_total_mb,
+    hostMemFreeMb: r.host_mem_free_mb,
+    appWorkingSetMb: r.app_working_set_mb,
+    appRendererWsMb: r.app_renderer_ws_mb,
+    appGpuWsMb: r.app_gpu_ws_mb,
+    hostOnBattery: r.host_on_battery,
+    hostPowerPlan: r.host_power_plan,
+    hostPowerMode: r.host_power_mode,
+    hostHags: r.host_hags,
+    hostGameMode: r.host_game_mode,
   }));
 }
 

@@ -1,8 +1,13 @@
+import {
+  VANGUARD_RET_4PC_EDICT_DAMAGE_PCT,
+  VANGUARD_RET_4PC_EDICT_WINDOW_SEC,
+} from '../content/vanguard_set_bonuses_a';
 import { grantAbilityDevotion } from '../paladin_devotion';
 import type { SimContext } from '../sim_context';
 import { type AbilityDef, type AbilityEffect, DT, type Entity, type Vec3 } from '../types';
 import { sweptLanding } from './heroic_leap';
 import { VALKYRS_CALLING_FLIGHT_AURA_ID } from './paladin_valkyrs_calling_state';
+import { wearsSetBonus } from './set_bonus_wearer';
 
 export const VALKYRS_CALLING_ASCENT_DURATION = 0.5;
 export const VALKYRS_CALLING_APPROACH_DURATION = 1;
@@ -123,6 +128,15 @@ export function armValkyrsCalling(
   });
 }
 
+/** End a flight in progress without landing it (its aura cleared): a ferry
+ *  passenger's deck moves under it (src/sim/transport_ferry.ts). */
+export function cancelValkyrsCalling(ctx: SimContext, entity: Entity): void {
+  if (!entity.valkyrsCalling) return;
+  entity.valkyrsCalling = null;
+  entity.jumping = false;
+  clearFlightAura(ctx, entity);
+}
+
 export function advanceValkyrsCalling(ctx: SimContext, entity: Entity): boolean {
   const flight = entity.valkyrsCalling;
   if (!flight) return false;
@@ -201,5 +215,40 @@ export function advanceValkyrsCalling(ctx: SimContext, entity: Entity): boolean 
     if (target.hp < hpBefore) dealtEffectiveDamage = true;
   }
   if (dealtEffectiveDamage) grantAbilityDevotion(entity, VALKYRS_CALLING_DEVOTION_GAIN);
+  armLightbrandEdict(ctx, entity);
   return true;
+}
+
+/** Lightbrand Warplate 4pc (Warfare Season 2): the one-shot Final Edict
+ *  empower armed at the Valkyr's Calling landing. An inert internal_cd
+ *  marker whose value is the damage bonus; the next Final Edict weapon strike
+ *  consumes it (consumeLightbrandEdict). A re-arm refreshes the one aura
+ *  (same id + source). The name reuses the localized ability string. */
+export const LIGHTBRAND_EDICT_AURA_ID = 'vanguard_lightbrand_edict';
+
+function armLightbrandEdict(ctx: SimContext, entity: Entity): void {
+  if (entity.dead || !wearsSetBonus(ctx, entity, 'vanguard_paladin_retribution', 4)) return;
+  ctx.applyAura(entity, {
+    id: LIGHTBRAND_EDICT_AURA_ID,
+    name: "Valkyr's Calling",
+    kind: 'internal_cd',
+    remaining: VANGUARD_RET_4PC_EDICT_WINDOW_SEC,
+    duration: VANGUARD_RET_4PC_EDICT_WINDOW_SEC,
+    value: VANGUARD_RET_4PC_EDICT_DAMAGE_PCT,
+    sourceId: entity.id,
+    school: 'holy',
+  });
+}
+
+/** The damage multiplier the Final Edict weapon strike applies: 1 plus the
+ *  armed bonus when the Lightbrand marker is up (removing it), else 1.
+ *  Consumed by the cast, hit or miss (the Redhand empower's rule). */
+export function consumeLightbrandEdict(ctx: SimContext, entity: Entity): number {
+  const index = entity.auras.findIndex(
+    (aura) => aura.id === LIGHTBRAND_EDICT_AURA_ID && aura.sourceId === entity.id,
+  );
+  if (index < 0) return 1;
+  const [aura] = entity.auras.splice(index, 1);
+  ctx.emit({ type: 'aura', targetId: entity.id, name: aura.name, gained: false });
+  return 1 + aura.value;
 }

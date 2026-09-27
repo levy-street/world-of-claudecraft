@@ -11,6 +11,7 @@ import type {
   ActiveVarkhulCinderOrbProjectile,
 } from '../sim/varkhul_cinder_orbs';
 import { fireballMaterials } from './fireball_travel_visual';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { createGroundFireAoe, type GroundFireAoeHandle } from './ignivar_fire_vfx';
 
 const SEGMENTS = 48;
@@ -67,7 +68,7 @@ export function buildVarkhulCinderFire(
     fillMaterial,
   );
   fill.name = 'varkhul-cinder-fire-fill';
-  fill.renderOrder = 10;
+  fill.renderOrder = floorVfxRenderOrder('encounter', 9);
   const edge = new THREE.Mesh(
     new THREE.RingGeometry(fireState.radius * 0.82, fireState.radius, SEGMENTS).rotateX(
       -Math.PI / 2,
@@ -76,7 +77,7 @@ export function buildVarkhulCinderFire(
   );
   edge.name = 'varkhul-cinder-fire-edge';
   edge.position.y = 0.025;
-  edge.renderOrder = 11;
+  edge.renderOrder = floorVfxRenderOrder('encounter', 10);
   group.add(fill, edge);
 
   const fire = createGroundFireAoe({ radius: fireState.radius, count: 32 });
@@ -114,10 +115,10 @@ export function buildVarkhulCinderOrbProjectile(
 
   const core = new THREE.Mesh(CORE_GEOMETRY, materials.ember);
   core.name = 'varkhul-cinder-orb-core';
-  core.renderOrder = 14;
+  core.renderOrder = floorVfxRenderOrder('encounter', 13);
   const shell = new THREE.Mesh(SHELL_GEOMETRY, materials.flame);
   shell.name = 'varkhul-cinder-orb-shell';
-  shell.renderOrder = 13;
+  shell.renderOrder = floorVfxRenderOrder('encounter', 12);
   group.add(core, shell);
 
   const tail = new THREE.Group();

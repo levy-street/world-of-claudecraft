@@ -148,6 +148,7 @@ const FRAME_EXEMPT: Record<string, string> = {
   'subzone-banner': 'transient subzone name fade',
   'death-overlay': 'death veil with the Release Spirit prompt, modal by design',
   'ghost-prompt': 'transient ghost-state prompt',
+  'ghost-hint': 'ghost-state top-of-screen line naming both ways back, pointer-inert',
   'interact-affordance':
     'transient nearby-interaction press-to-act prompt (farm_press_affordance_controller.ts drives its .is-shown class); positioned near the reticle, never standing chrome',
   'mount-race-strip': 'event-scoped race timer strip, hidden outside a race',
@@ -159,8 +160,6 @@ const FRAME_EXEMPT: Record<string, string> = {
   'raid-warning-banner': 'transient raid warning alert stack, pointer-inert and time-limited',
   'ready-check-leader-window':
     'transient party-leader status popup for an active ready check, hidden outside that check',
-  'practice-tracker':
-    'live DPS readout strip (src/ui/hud/practice/), read-only text: not yet promoted to a movable frame (pre-existing gap, not introduced by this change)',
   'hub-lesson-coach':
     'guided Meters coaching strip beside practice-tracker (src/ui/hud/practice/), read-only text plus its own small ack/replay buttons: same standing-tracker family, not yet promoted to a movable frame',
 };
@@ -171,6 +170,9 @@ const FRAME_EXEMPT: Record<string, string> = {
  *  (register it and, if minted at runtime, list it in RUNTIME_MOUNTED_FRAME_IDS),
  *  self-governed, or transient (extend this table with the reason). */
 const UI_ROOT_TOUCHERS: Record<string, string> = {
+  'src/ui/frame_context_menu.ts': 'transient right-click menu for the frame editor',
+  'src/ui/focus_targets_controller.ts':
+    'mounts the focusTargets frame registered with the shared editor',
   'src/main.ts': 'mounts the breath bar (transient survival meter, exempt for now) into #ui',
   'src/ui/hud.ts': 'the HUD coordinator: mounts the proc overlay, FCT pool, match strips',
   'src/ui/interface_unlock.ts': 'the unlock coordinator: its own edit chrome + the detacher',
@@ -190,11 +192,31 @@ const UI_ROOT_TOUCHERS: Record<string, string> = {
   'src/ui/hud/loot/loot_roll_controller.ts': 'transient loot roll stack',
   'src/ui/hud/practice/hub_lesson_controller.ts':
     'world-anchored "target the dummy" coachmark bubble, transient (the bootcamp.ts pattern)',
+  'src/ui/hud/quest/wisp_maze_hud_controller.ts':
+    'the wisp maze trial HUD, shown only while the player is inside the maze (transient, activity-scoped)',
+  'src/ui/hud/vehicle/forge_action_bar_controller.ts':
+    'the forge minigame action bar, shown only while a forging attempt runs (transient, activity-scoped)',
+  'src/ui/hud/vehicle/shadow_action_bar_controller.ts':
+    'the shadow infiltration action bar, shown only while the cloak is active (transient, activity-scoped)',
+  'src/ui/world_quest_puzzle_window.ts':
+    'the world-quest puzzle window (a .window, window_drag governs it; closeManagedWindow closes it), minted at runtime like perfecting_window.ts',
+  'src/ui/hud/vehicle/vehicle_action_bar_controller.ts':
+    'the cannon vehicle action bar, shown only while the player mans a cannon (transient, activity-scoped)',
 };
 
 /** Registry frames whose elements are minted at runtime rather than written
  *  in the entry documents, so the HTML harvest cannot see them. */
-const RUNTIME_MOUNTED_FRAME_IDS = ['proc-overlay', 'warlock-doom-frame'];
+const RUNTIME_MOUNTED_FRAME_IDS = [
+  'proc-overlay',
+  'warlock-doom-frame',
+  'focus-target-1',
+  'focus-target-2',
+  'focus-target-3',
+  'tracker-group',
+  'aura-track-group',
+];
+// The compact target frame starts nested inside #target-frame and detaches on drag.
+const NESTED_FRAME_IDS = ['totarget-frame'];
 
 interface Harvest {
   ids: string[];
@@ -310,7 +332,10 @@ describe('hud_frame_coverage (standing HUD surfaces are movable frames)', () => 
     // runtime by an allowlisted #ui toucher and listed as such.
     for (const spec of HUD_FRAME_SPECS) {
       const found =
-        harvestedIds.has(spec.elementId) || RUNTIME_MOUNTED_FRAME_IDS.includes(spec.elementId);
+        harvestedIds.has(spec.elementId) ||
+        RUNTIME_MOUNTED_FRAME_IDS.includes(spec.elementId) ||
+        (NESTED_FRAME_IDS.includes(spec.elementId) &&
+          HTML_ENTRIES.every((entry) => read(entry).includes(`id="${spec.elementId}"`)));
       expect(found, `frame row '${spec.id}' points at unknown element #${spec.elementId}`).toBe(
         true,
       );
@@ -340,10 +365,19 @@ describe('hud_frame_coverage (standing HUD surfaces are movable frames)', () => 
     // RUNTIME_MOUNTED_FRAME_IDS is otherwise an unchecked escape hatch from
     // the harvest parity above: tie each id to the module that assigns it
     // (el.id = '<id>'), so a renamed or deleted mount fails here by name.
-    const sources = tsFilesUnder(fileURLToPath(new URL('../src', import.meta.url)));
+    const sources = tsFilesUnder(fileURLToPath(new URL('../src', import.meta.url))).map((source) =>
+      readFileSync(source.full, 'utf8'),
+    );
     for (const id of RUNTIME_MOUNTED_FRAME_IDS) {
       const assignRe = new RegExp(`id\\s*=\\s*'${id}'`);
-      const minted = sources.some((source) => assignRe.test(readFileSync(source.full, 'utf8')));
+      const minted =
+        (/^focus-target-[1-3]$/.test(id) &&
+          read('src/ui/focus_targets_controller.ts').includes(
+            'row.id = `focus-target-${slot + 1}`',
+          )) ||
+        sources.some((source) => assignRe.test(source)) ||
+        (['tracker-group', 'aura-track-group'].includes(id) &&
+          read('src/ui/hud_frame_groups.ts').includes(`elementId: '${id}'`));
       expect(minted, `runtime frame #${id} has no id assignment in src`).toBe(true);
     }
   });

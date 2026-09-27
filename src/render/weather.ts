@@ -234,6 +234,12 @@ export class Weather {
     this.points.visible = false;
   }
 
+  /** The live precipitation draw, for the slot's resume link step: rain and
+   *  snow share its one program, so linking it hidden warms both. */
+  prewarmRoot(): THREE.Object3D {
+    return this.points;
+  }
+
   /**
    * Release the slot. Zeroing the eased intensity is only correct while the
    * material is purely STAGED: 'weather.materials' is deadline-droppable, so a

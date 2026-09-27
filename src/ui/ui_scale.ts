@@ -18,8 +18,8 @@ const STORE_KEY = 'woc_settings';
 // than imported alongside SETTINGS_CHANGE_EVENT) so the RANGE stays readable
 // without pulling the settings store in: the pure resolvers below take their
 // inputs as raw strings and can be unit-tested with no browser at all.
-export const UI_SCALE_MIN = 0.85;
-export const UI_SCALE_MAX = 1.4;
+export const UI_SCALE_MIN = 0.75;
+export const UI_SCALE_MAX = 2;
 export const UI_SCALE_DEFAULT = 1;
 
 /** Clamp + sanitize a raw scale value to the supported range. NaN/∞ → default. */

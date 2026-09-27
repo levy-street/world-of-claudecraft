@@ -1,0 +1,584 @@
+import * as THREE from 'three';
+import { expect, it, vi } from 'vitest';
+import { furyBeat } from '../src/render/ability_vfx/fury_choreography';
+import type { AbilityVfxTextures } from '../src/render/ability_vfx/fx_textures';
+import { HeldWarriorStorm } from '../src/render/ability_vfx/held_warrior_storm';
+import { AbilityVfx, type AbilityVfxDeps } from '../src/render/ability_vfx/painter';
+import { AbilityVfxRibbons, type RibbonAnchor } from '../src/render/ability_vfx/ribbons';
+import type { SeqSlot, SequencerHost } from '../src/render/ability_vfx/sequencer';
+import {
+  WarriorGuardPlates,
+  warriorGuardKind,
+} from '../src/render/ability_vfx/warrior_guard_plates';
+import { WARRIOR_VFX_FULL_SPECS } from '../src/render/warrior_vfx_specs';
+import { weaponTrailAnchor } from '../src/render/weapon_trail_anchor';
+
+function fixture(ready = true) {
+  const scene = new THREE.Scene(),
+    pool = new WarriorGuardPlates(scene);
+  vi.spyOn(pool.preparation, 'ready').mockReturnValue(ready);
+  const lines: THREE.Vector3[][] = [];
+  const ribbons = {
+    appendHeld: vi.fn((points: THREE.Vector3[], count: number) => {
+      lines.push(points.slice(0, count).map((p) => p.clone()));
+    }),
+  } as unknown as AbilityVfxRibbons;
+  const anchor: RibbonAnchor = (id, _f, out = new THREE.Vector3()) => out.set(id * 4, 1, 0);
+  const draw = (frame: number, dt = 0.3, reduced = false) =>
+    pool.draw(frame, dt, reduced, anchor, () => 0, undefined, ribbons);
+  return { pool, scene, lines, ribbons, draw };
+}
+const resolve = (value: number, remaining = 10) => ({
+  id: 'iron_resolve',
+  kind: 'absorb',
+  value,
+  remaining,
+  duration: 10,
+});
+const raised = {
+  id: 'raised_guard_dr',
+  kind: 'buff_dr_phys',
+  remaining: 6,
+  duration: 6,
+  value: 0.5,
+};
+const sword = { id: 'die_by_sword', kind: 'die_by_sword', remaining: 8, duration: 8, value: 0.3 };
+
+it('composes simultaneous protections within one wearer allowance and uploads only the live prefix', () => {
+  const h = fixture();
+  h.pool.hold(1, 0, raised, 0, true);
+  h.pool.hold(1, 1, resolve(160), 0, true);
+  h.pool.hold(1, 2, sword, 0, true);
+  h.draw(0);
+  expect(h.pool.mesh.count).toBe(6);
+  expect(h.pool.mesh.instanceMatrix.updateRanges).toEqual([{ start: 0, count: 96 }]);
+  expect(h.pool.mesh.instanceColor!.updateRanges).toEqual([{ start: 0, count: 18 }]);
+  expect(h.pool.mesh.material.transparent).toBe(false);
+  expect(h.pool.mesh.material.depthTest).toBe(true);
+  expect(h.pool.mesh.material.depthWrite).toBe(true);
+  h.draw(1);
+  expect(h.pool.mesh.count).toBe(0);
+  expect(h.pool.mesh.visible).toBe(false);
+  h.pool.dispose();
+});
+
+it('retains two Iron Resolve shields at every positive reserve and removes both on exhaustion', () => {
+  const h = fixture();
+  h.pool.hold(1, 1, resolve(160), 0, true);
+  h.draw(0);
+  expect(h.pool.mesh.count).toBe(2);
+  h.pool.hold(1, 1, resolve(40, 9.95), 1, true);
+  h.draw(1);
+  expect(h.pool.mesh.count).toBe(2);
+  h.pool.hold(1, 1, resolve(0, 9.9), 2, true);
+  h.draw(2);
+  expect(h.pool.mesh.count).toBe(0);
+  h.pool.dispose();
+});
+
+it('retains paired Iron Resolve and Intervene with all four guards inside six solid instances', () => {
+  const h = fixture();
+  h.pool.hold(1, 0, raised, 0, true);
+  h.pool.hold(1, 1, resolve(1), 0, true);
+  h.pool.hold(1, 2, sword, 0, true);
+  h.pool.hold(1, 3, { id: 'intervene', kind: 'absorb', remaining: 6, value: 1 }, 0, true);
+  h.draw(0);
+  expect(h.pool.mesh.count).toBe(6);
+  expect(h.lines).toHaveLength(5);
+  const first = new THREE.Matrix4(),
+    second = new THREE.Matrix4();
+  h.pool.mesh.getMatrixAt(1, first);
+  h.pool.mesh.getMatrixAt(2, second);
+  expect(first.elements[12] + second.elements[12]).toBeCloseTo(8);
+  expect(first.elements[14] + second.elements[14]).toBeCloseTo(0);
+  h.pool.dispose();
+});
+
+it('orbits two opposing Iron Resolve shields outside the body and below the face', () => {
+  const h = fixture();
+  h.pool.hold(1, 1, resolve(160), 0, true);
+  h.draw(0);
+  const matrix = new THREE.Matrix4();
+  const geometry = h.pool.mesh.geometry;
+  geometry.computeBoundingBox();
+  const centers: THREE.Vector3[] = [];
+  for (let i = 0; i < h.pool.mesh.count; i++) {
+    h.pool.mesh.getMatrixAt(i, matrix);
+    const center = new THREE.Vector3().setFromMatrixPosition(matrix);
+    centers.push(center);
+    const bounds = geometry.boundingBox!.clone().applyMatrix4(matrix);
+    expect(Math.hypot(center.x - 4, center.z)).toBeCloseTo(1.65);
+    expect(bounds.min.y).toBeGreaterThan(0.3);
+    expect(bounds.max.y).toBeLessThan(1.43);
+  }
+  expect(centers[0].x + centers[1].x).toBeCloseTo(8);
+  expect(centers[0].z + centers[1].z).toBeCloseTo(0);
+  expect(centers[0].distanceTo(centers[1])).toBeCloseTo(3.3);
+  h.pool.hold(1, 1, resolve(160, 9.7), 1, true);
+  h.draw(1);
+  h.pool.mesh.getMatrixAt(0, matrix);
+  const moved = new THREE.Vector3().setFromMatrixPosition(matrix);
+  expect(moved.distanceTo(centers[0])).toBeCloseTo(2 * 1.65 * Math.sin((0.3 * 0.65) / 2), 5);
+  expect(h.pool.mesh.count).toBe(2);
+  h.pool.dispose();
+});
+
+it.each(['x', 'y'] as const)(
+  'binds Die by the Sword to the measured native %s blade span',
+  (axis) => {
+    const h = fixture();
+    const sampler = Object.assign(
+      (out: THREE.Vector3) => {
+        out.set(4, 1, 0);
+        out[axis] += 0.6;
+        return true;
+      },
+      {
+        frame: (out: THREE.Matrix4) => {
+          out.identity().setPosition(4, 1, 0);
+          return true;
+        },
+      },
+    );
+    h.pool.hold(1, 2, sword, 0, true);
+    const anchor: RibbonAnchor = (_id, _frac, out = new THREE.Vector3()) => out.set(4, 1, 0);
+    h.pool.draw(
+      0,
+      0.3,
+      false,
+      anchor,
+      () => 0,
+      () => sampler,
+      h.ribbons,
+    );
+    expect(h.pool.mesh.count).toBe(2);
+    const matrix = new THREE.Matrix4();
+    h.pool.mesh.geometry.computeBoundingBox();
+    for (let i = 0; i < 2; i++) {
+      h.pool.mesh.getMatrixAt(i, matrix);
+      const bounds = h.pool.mesh.geometry.boundingBox!.clone().applyMatrix4(matrix);
+      const center = axis === 'x' ? 4 : 1;
+      const other = axis === 'x' ? 'y' : 'x';
+      expect(bounds.min[axis]).toBeGreaterThan(center - 0.6);
+      expect(bounds.max[axis]).toBeLessThan(center + 0.6);
+      expect(bounds.max[other] - bounds.min[other]).toBeLessThan(0.25);
+      expect(bounds.min.z).toBeGreaterThan(-0.04);
+      expect(bounds.max.z).toBeLessThan(0.08);
+    }
+    h.pool.dispose();
+  },
+);
+
+it.each([1, 2] as const)(
+  'keeps guard %s still in reduced motion and preserves its cold outline frame',
+  (kind) => {
+    const warm = fixture(),
+      cold = fixture(false);
+    for (const h of [warm, cold]) {
+      h.pool.hold(1, kind, kind === 1 ? resolve(160) : sword, 0, true);
+      h.draw(0, 0.01, true);
+    }
+    expect(warm.lines[0]).toEqual(cold.lines[0].slice(0, 3));
+    expect(cold.lines[0]).toHaveLength(5);
+    if (kind === 1) {
+      expect(cold.lines).toHaveLength(2);
+      expect(warm.lines[1]).toEqual(cold.lines[1].slice(0, 3));
+    }
+    const settled = new THREE.Matrix4(),
+      initial = new THREE.Matrix4();
+    warm.pool.mesh.getMatrixAt(0, initial);
+    warm.pool.hold(1, kind, kind === 1 ? resolve(160, 9.9) : { ...sword, remaining: 7.9 }, 1, true);
+    warm.draw(1, 0.3, true);
+    warm.pool.mesh.getMatrixAt(0, settled);
+    expect(settled.elements).toEqual(initial.elements);
+    warm.pool.dispose();
+    cold.pool.dispose();
+  },
+);
+
+it('retains real absorb contact compression and warmth without moving reduced-motion shields', () => {
+  for (const reduced of [false, true]) {
+    const h = fixture();
+    h.pool.hold(1, 1, resolve(160), 0, true);
+    h.draw(0, 0.3, reduced);
+    const before = new THREE.Matrix4(),
+      after = new THREE.Matrix4();
+    const base = new THREE.Color(),
+      hit = new THREE.Color();
+    h.pool.mesh.getMatrixAt(0, before);
+    h.pool.mesh.getColorAt(0, base);
+    h.pool.hold(1, 1, resolve(159, 9.95), 1, true);
+    h.draw(1, 0.02, reduced);
+    h.pool.mesh.getMatrixAt(0, after);
+    h.pool.mesh.getColorAt(0, hit);
+    if (reduced) expect(after.elements).toEqual(before.elements);
+    else
+      expect(Math.hypot(after.elements[12] - 4, after.elements[14])).toBeLessThan(
+        Math.hypot(before.elements[12] - 4, before.elements[14]),
+      );
+    expect(hit.equals(base)).toBe(false);
+    h.pool.dispose();
+  }
+});
+
+it('keeps both shields for late or immediate observation at tiny reserve values', () => {
+  const h = fixture();
+  h.pool.hold(1, 1, resolve(40, 5), 0, false);
+  h.draw(0);
+  expect(h.pool.mesh.count).toBe(2);
+  h.pool.hold(1, 1, resolve(1, 4.95), 1, false);
+  h.draw(1);
+  expect(h.pool.mesh.count).toBe(2);
+  h.pool.sleep(1);
+  h.pool.hold(1, 1, resolve(160), 2, false);
+  h.draw(2);
+  h.pool.hold(1, 1, resolve(1, 9.95), 3, false);
+  h.draw(3);
+  expect(h.pool.mesh.count).toBe(2);
+  h.pool.dispose();
+});
+
+it('keeps the local player in the solid pool and outlines the seventeenth defender', () => {
+  const h = fixture();
+  for (let id = 1; id <= 17; id++) h.pool.hold(id, 1, resolve(160), 0, id === 17);
+  h.draw(0);
+  expect(h.pool.mesh.count).toBe(32);
+  const matrix = new THREE.Matrix4();
+  h.pool.mesh.getMatrixAt(0, matrix);
+  expect(matrix.elements[12]).toBeGreaterThan(67);
+  expect(
+    h.lines.some((points) => points.length === 5 && points[0].x > 62 && points[0].x < 66),
+  ).toBe(true);
+  h.pool.dispose();
+});
+
+it('keeps every distinct primary outline while GPU preparation is cold', () => {
+  const h = fixture(false);
+  h.pool.hold(1, 0, raised, 0, true);
+  h.pool.hold(2, 1, resolve(160), 0, false);
+  h.pool.hold(3, 2, sword, 0, false);
+  h.draw(0);
+  expect(h.pool.mesh.count).toBe(0);
+  expect(h.pool.mesh.visible).toBe(false);
+  expect(h.lines).toHaveLength(4);
+  expect(h.lines.every((line) => line.length === 5)).toBe(true);
+  h.pool.clear();
+  h.lines.length = 0;
+  h.draw(1);
+  expect(h.lines).toHaveLength(0);
+  h.pool.dispose();
+});
+
+it('uses actual equipped face orientation with unit axes under nonuniform scale, and rejects hidden or detached equipment', () => {
+  const root = new THREE.Group(),
+    holder = new THREE.Group();
+  holder.userData.heldPropHolder = true;
+  holder.userData.heldSlot = 1;
+  const shield = new THREE.Mesh(new THREE.BoxGeometry(2, 3, 0.3));
+  shield.userData.weaponMesh = true;
+  holder.add(shield);
+  root.add(holder);
+  holder.scale.set(0.3, 0.7, 0.4);
+  holder.rotation.set(0.3, 0.4, 0.2);
+  root.position.set(3, 1, 2);
+  const sample = weaponTrailAnchor(root, 1)!;
+  const frame = new THREE.Matrix4();
+  expect(sample.frame!(frame)).toBe(true);
+  const x = new THREE.Vector3(),
+    y = new THREE.Vector3(),
+    z = new THREE.Vector3();
+  frame.extractBasis(x, y, z);
+  expect(x.length()).toBeCloseTo(1);
+  expect(y.length()).toBeCloseTo(1);
+  expect(z.length()).toBeCloseTo(1);
+  expect(x.dot(y)).toBeCloseTo(0);
+  expect(y.dot(z)).toBeCloseTo(0);
+  const actual = new THREE.Vector3(0, 0, 0.15)
+    .applyMatrix4(shield.matrixWorld)
+    .addScaledVector(z, 0.045);
+  expect(new THREE.Vector3().setFromMatrixPosition(frame).distanceTo(actual)).toBeLessThan(1e-7);
+  const previous = frame.clone();
+  holder.rotation.y += 0.5;
+  expect(sample.frame!(frame)).toBe(true);
+  expect(frame.equals(previous)).toBe(false);
+  holder.visible = false;
+  expect(sample.frame!(frame)).toBe(false);
+  holder.visible = true;
+  root.remove(holder);
+  expect(sample.frame!(frame)).toBe(false);
+  shield.geometry.dispose();
+  (shield.material as THREE.Material).dispose();
+});
+
+it('feeds exact live auras and excludes dead, expired and unrelated defenses from the held guard renderer', () => {
+  const fx = new Proxy(
+    {},
+    {
+      get(target, key) {
+        if (!(key in target)) Reflect.set(target, key, vi.fn());
+        return Reflect.get(target, key);
+      },
+    },
+  ) as AbilityVfxDeps['fx'];
+  const painter = new AbilityVfx(
+    { fx, vfx: {}, localPlayerId: () => 1 } as AbilityVfxDeps,
+    () => 0,
+  );
+  const e = {
+    id: 1,
+    castingAbility: null,
+    castRemaining: 0,
+    castTotal: 0,
+    auras: [raised, resolve(160), sword],
+  };
+  painter.syncEntity(e);
+  expect(fx.holdWarriorGuard).toHaveBeenCalledTimes(3);
+  expect(fx.holdShell).not.toHaveBeenCalled();
+  expect(fx.orbit).not.toHaveBeenCalled();
+  vi.mocked(fx.holdWarriorGuard).mockClear();
+  painter.syncEntity({ ...e, dead: true });
+  expect(fx.holdWarriorGuard).not.toHaveBeenCalled();
+  expect(warriorGuardKind({ id: 'iron_resolve', kind: 'dot' })).toBe(null);
+  expect(warriorGuardKind({ id: 'power_word_shield', kind: 'absorb' })).toBe(null);
+  const h = fixture();
+  h.pool.hold(1, 0, { ...raised, remaining: 0 }, 0, true);
+  h.draw(0);
+  expect(h.pool.mesh.count).toBe(0);
+  h.pool.dispose();
+});
+
+it('leaves real ribbon room for a complete storm and attack even with 64 cold triple-protected wearers', () => {
+  const h = fixture(false),
+    texture = new THREE.Texture();
+  const ribbons = new AbilityVfxRibbons(h.scene, () => null, {
+    ribbon: texture,
+    noise: texture,
+  } as AbilityVfxTextures);
+  for (let id = 1; id <= 64; id++) {
+    h.pool.hold(id, 0, raised, 0, id === 1);
+    h.pool.hold(id, 1, resolve(160), 0, id === 1);
+    h.pool.hold(id, 2, sword, 0, id === 1);
+  }
+  ribbons.spawnPath(
+    0xffffff,
+    0.2,
+    0.3,
+    (points) => {
+      for (let i = 0; i < points.length; i++)
+        points[i].set(-8 + (i * 16) / (points.length - 1), 2, -20);
+      return points.length;
+    },
+    true,
+    null,
+    false,
+    false,
+    1,
+  );
+  const storm = new HeldWarriorStorm();
+  const anchor: RibbonAnchor = (id, _f, out = new THREE.Vector3()) => out.set(id * 4, 1, 0);
+  ribbons.update(0.05, new THREE.Vector3(0, 5, 20), false, undefined, () => {
+    storm.drawPrimary(ribbons, new THREE.Vector3(0, 0, 20), 0.2, false);
+    h.pool.draw(0, 0.05, false, anchor, () => 0, undefined, ribbons);
+  });
+  const geo = (ribbons as unknown as { geo: THREE.BufferGeometry }).geo;
+  const used = Math.max(...Array.from(geo.getIndex()!.array).slice(0, geo.drawRange.count)) + 1;
+  expect(used).toBe(3 * 22 * 2 + 64 * 4 * 5 * 2 + 136);
+  const position = geo.getAttribute('position');
+  const attackX: number[] = [];
+  for (let i = 0; i < used; i++)
+    if (Math.abs(position.getZ(i) + 20) < 0.3) attackX.push(position.getX(i));
+  expect(Math.min(...attackX)).toBeCloseTo(-8);
+  expect(Math.max(...attackX)).toBeCloseTo(8);
+  h.pool.dispose();
+  ribbons.dispose();
+  texture.dispose();
+});
+
+it('retains valid equipment samplers and reacquires only a missing needed hand after a swap', () => {
+  const h = fixture();
+  let valid = true;
+  const sampler = Object.assign(() => true, {
+    frame: (out: THREE.Matrix4) => {
+      if (!valid) return false;
+      out.identity().setPosition(4, 1, 0);
+      return true;
+    },
+  });
+  const equipment = vi.fn((_id: number, _hand: 0 | 1) => sampler);
+  const anchor: RibbonAnchor = (_id, _f, out = new THREE.Vector3()) => out.set(4, 1, 0);
+  for (let frame = 0; frame < 30; frame++) {
+    h.pool.hold(1, 0, raised, frame, true);
+    h.pool.hold(2, 1, resolve(160), frame, false);
+    h.pool.draw(frame, 0.05, false, anchor, () => 0, equipment, h.ribbons);
+  }
+  expect(equipment.mock.calls).toEqual([[1, 1]]);
+  valid = false;
+  for (let frame = 30; frame < 45; frame++) {
+    h.pool.hold(1, 0, raised, frame, true);
+    h.pool.draw(frame, 0.05, false, anchor, () => 0, equipment, h.ribbons);
+  }
+  expect(equipment.mock.calls.length).toBeGreaterThan(1);
+  expect(equipment.mock.calls.length).toBeLessThan(4);
+  expect(equipment.mock.calls.every((call) => call[0] === 1 && call[1] === 1)).toBe(true);
+  h.pool.dispose();
+});
+
+it('cleans every owned resource after a disposal error without touching shared maps', () => {
+  const h = fixture(),
+    texture = new THREE.Texture();
+  h.pool.mesh.material.map = texture;
+  vi.spyOn(h.pool.preparation, 'dispose').mockImplementation(() => {
+    throw Error('detach failure');
+  });
+  const geometry = vi.spyOn(h.pool.mesh.geometry, 'dispose');
+  const material = vi.spyOn(h.pool.mesh.material, 'dispose');
+  const instances = vi.spyOn(h.pool.mesh, 'dispose');
+  const shared = vi.spyOn(texture, 'dispose');
+  expect(() => h.pool.dispose()).toThrow(AggregateError);
+  expect(geometry).toHaveBeenCalledOnce();
+  expect(material).toHaveBeenCalledOnce();
+  expect(instances).toHaveBeenCalledOnce();
+  expect(shared).not.toHaveBeenCalled();
+  expect(() => h.pool.dispose()).not.toThrow();
+  texture.dispose();
+});
+
+it.each([
+  { id: 'raging_gale', beat: 0, ready: true, paths: 2, following: 2 },
+  { id: 'raging_gale', beat: 1, ready: true, paths: 2, following: 2 },
+  { id: 'raging_gale', beat: 0, ready: false, paths: 2, following: 1 },
+  { id: 'raging_gale', beat: 1, ready: false, paths: 2, following: 1 },
+  { id: 'red_harvest', beat: 0, ready: true, paths: 2, following: 2 },
+  { id: 'red_harvest', beat: 1, ready: true, paths: 2, following: 2 },
+  { id: 'red_harvest', beat: 2, ready: true, paths: 2, following: 2 },
+  { id: 'red_harvest', beat: 0, ready: false, paths: 2, following: 2 },
+  { id: 'red_harvest', beat: 1, ready: false, paths: 2, following: 2 },
+  { id: 'red_harvest', beat: 2, ready: false, paths: 4, following: 2 },
+])(
+  'retains every authored $id ribbon for beat $beat (crest ready=$ready) under worst guard load',
+  ({ id, beat, ready, paths, following }) => {
+    function draw(crowded: boolean) {
+      const h = fixture(false),
+        texture = new THREE.Texture();
+      const ribbons = new AbilityVfxRibbons(h.scene, () => null, {
+        ribbon: texture,
+        noise: texture,
+      } as AbilityVfxTextures);
+      const target = { x: 0, y: 0, z: 2, yaw: 0, present: true };
+      const pathRibbon = vi.fn<SequencerHost['pathRibbon']>(
+        (color, width, duration, fill, brushed, motion, preserve, priority, sweep, follow) =>
+          ribbons.spawnPath(
+            color,
+            width,
+            duration,
+            fill,
+            brushed,
+            motion,
+            preserve,
+            follow,
+            priority,
+            sweep,
+          ),
+      );
+      const host = new Proxy(
+        {
+          anchorOf: (entity: number, frac: number, out: { x: number; y: number; z: number }) => {
+            if (entity !== 1 && !target.present) return null;
+            return Object.assign(out, {
+              x: entity === 1 ? 0 : target.x,
+              y: frac * 2 + (entity === 1 ? 0 : target.y),
+              z: entity === 1 ? 0 : target.z,
+            });
+          },
+          facingAt: (entity: number) => (entity === 1 ? 0 : target.yaw),
+          crestAt: vi.fn(() => ready),
+          groundYAt: () => 0,
+          pathRibbon,
+        },
+        {
+          get(target, key) {
+            if (!(key in target)) Reflect.set(target, key, vi.fn());
+            return Reflect.get(target, key);
+          },
+        },
+      ) as unknown as SequencerHost;
+      const slot = {
+        abilityId: id,
+        spec: WARRIOR_VFX_FULL_SPECS[id],
+        casterId: 1,
+        targetId: 2,
+        tier: 0,
+        accent: 0xffc3c5,
+        color: 0xb82235,
+        physicalSecondary: false,
+      } as SeqSlot;
+      expect(furyBeat(host, slot, beat)).toBe(true);
+      expect(pathRibbon).toHaveBeenCalledTimes(paths);
+      expect(
+        pathRibbon.mock.results.every(
+          (result) => result.type === 'return' && result.value === true,
+        ),
+      ).toBe(true);
+      expect(pathRibbon.mock.calls.filter((call) => call[9])).toHaveLength(following);
+      expect(pathRibbon.mock.calls.every((call) => call[7] === 1)).toBe(true);
+      if (crowded)
+        for (let entity = 1; entity <= 64; entity++) {
+          h.pool.hold(entity, 0, raised, 0, entity === 1);
+          h.pool.hold(entity, 1, resolve(160), 0, entity === 1);
+          h.pool.hold(entity, 2, sword, 0, entity === 1);
+          h.pool.hold(
+            entity,
+            3,
+            { id: 'intervene', kind: 'absorb', remaining: 6, value: 40 },
+            0,
+            entity === 1,
+          );
+        }
+      const anchor: RibbonAnchor = (entity, _frac, out = new THREE.Vector3()) =>
+        out.set(entity * 4, 1, 0);
+      const storm = new HeldWarriorStorm();
+      const geo = (ribbons as unknown as { geo: THREE.BufferGeometry }).geo;
+      const prefix = 132 + (crowded ? 3200 : 0);
+      const capture = (dt: number) => {
+        ribbons.update(dt, new THREE.Vector3(0, 5, 20), false, undefined, () => {
+          storm.drawPrimary(ribbons, new THREE.Vector3(0, 0, 20), 0.2, false);
+          if (crowded) h.pool.draw(0, dt, false, anchor, () => 0, undefined, ribbons);
+        });
+        const index = geo.getIndex();
+        if (!index) throw Error('Missing ribbon indices');
+        const used = Math.max(...Array.from(index.array).slice(0, geo.drawRange.count)) + 1;
+        return {
+          vertices: used - prefix,
+          positions: Array.from(geo.getAttribute('position').array).slice(prefix * 3, used * 3),
+        };
+      };
+      // All bright receiving catches are still alive at this shared sample.
+      const initial = capture(0.02);
+      const beforeMovement = capture(0.005);
+      Object.assign(target, { x: 3, y: 0.5, z: 4, yaw: 1.1 });
+      // Hold effect age fixed to distinguish target following from sweep travel.
+      const moved = capture(0);
+      expect(initial.vertices).toBe(paths * 136);
+      expect(moved.vertices).toBe(paths * 136);
+      pathRibbon.mock.calls.forEach((call, i) => {
+        const before = beforeMovement.positions.slice(i * 136 * 3, (i + 1) * 136 * 3);
+        const after = moved.positions.slice(i * 136 * 3, (i + 1) * 136 * 3);
+        if (call[9]) expect(after).not.toEqual(before);
+        else expect(after).toEqual(before);
+      });
+      target.present = false;
+      const removed = capture(0.005);
+      expect(removed.vertices).toBe((paths - following) * 136);
+      const expired = capture(0.3);
+      expect(expired.vertices).toBe(0);
+      const result = { initial, moved, removed, expired };
+      h.pool.dispose();
+      ribbons.dispose();
+      texture.dispose();
+      return result;
+    }
+    const ordinary = draw(false),
+      crowded = draw(true);
+    expect(crowded).toEqual(ordinary);
+  },
+);

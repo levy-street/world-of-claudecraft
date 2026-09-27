@@ -170,9 +170,9 @@ API, while `@typescript/native` provides the `tsc` binary. Things to know:
   `patches/` (regenerated with `pnpm patch three@0.185.1`); a three version
   bump must re-verify every hunk it carries, the compileAsync disposal race, the
   degenerate-normal shader guard, the released-program retention, the count 0
-  instanced-mesh render-list skip, the low-tier NaN output scrub, and the
-  colour-write-free shadow depth pass (the non-VSM shadow map's unread RGBA8
-  colour attachment is still cleared, deliberately, but never written;
+  instanced-mesh render-list skip, and the colour-write-free shadow depth pass
+  (the non-VSM shadow map's unread RGBA8 colour attachment is still cleared,
+  deliberately, but never written;
   re-verify that `colorWrite` is still absent from the program cache key, or
   the prewarm depth twins in `src/render/prewarm_depth_material.ts` have to
   follow), and the GLSL assembly seam (the lifted `assembleProgramGlsl`,

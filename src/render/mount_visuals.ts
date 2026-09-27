@@ -281,6 +281,18 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // The Drakemaw Raptor: authored saddle sits over the hips behind the neck
   // spines (hence the slight rear shift), gait-rigged Walk/Run cycles.
   drakemaw_raptor: spec('mount_drakemaw_raptor', 2.35, true, undefined, -0.1),
+  // The authored saddle is over the hips. The mount ships at 120% of its
+  // initial world fit, so the world-space socket offsets scale with it and
+  // keep the rider on the same authored point of the saddle.
+  //
+  // No `seatBone`: this saddle does not move. Measured across all four clips
+  // (report in E:/avian-rig-diagnostics/animation/saddle-rigidity-report.json)
+  // the rig's saddle bone `bone_52` travels 0.0004 to 0.0007 world units, the
+  // same as the root it hangs off, against 0.092 for `tripo::Spine_0`. The seat
+  // is a fixed point on the body, so the authored lift and forward shift place
+  // the rider exactly; a seat bone here would buy sub-millimetre motion and pay
+  // a per-frame matrix decompose for it.
+  avian_strider: spec('mount_avian_strider', 2.62, true, undefined, 0.2),
   // The Lanternback Troll: the rider sits IN the iron throne strapped across
   // his shoulders, not astride a back, so the seat is high and set BEHIND the
   // model origin. `seat`/`seatFwd` here are only the FALLBACK and the anchor the

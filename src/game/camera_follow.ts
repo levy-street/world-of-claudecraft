@@ -60,8 +60,8 @@ export function cameraFollowShouldSettle(mi: CameraFollowMoveInput, clickMoving:
   );
 }
 
-// A respawn/release-spirit (see src/sim/spirit.ts and entity_roster.ts) forces the
-// player's facing to 0. The sim pairs that with prevFacing so the render-interpolated
+// A release-spirit or a displaced revive (see src/sim/spirit.ts, revive_facing.ts, and
+// entity_roster.ts) forces the player's facing to 0 (an in-place revive keeps it). The sim pairs that with prevFacing so the render-interpolated
 // facing lands cleanly on 0 instead of sweeping from the pre-death heading, but the
 // camera follower keeps its OWN lastInterpFacing across frames (see main.ts), which
 // the sim-side fix does not touch. Left stale, the rigid-follow term above reads the

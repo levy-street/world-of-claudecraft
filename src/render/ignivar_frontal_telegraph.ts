@@ -3,6 +3,7 @@
 
 import * as THREE from 'three';
 import { IGNIVAR_FRONTAL_HALF_ANGLE, IGNIVAR_FRONTAL_RANGE } from '../sim/ignivar_arena';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 
 export const IGNIVAR_FRONTAL_VISUAL_NAME = 'ignivarFrontalTelegraph';
 export const IGNIVAR_FRONTAL_FILL_NAME = 'ignivarFrontalFill';
@@ -162,16 +163,16 @@ export function buildIgnivarFrontalTelegraph(): THREE.Group {
     material(0xd91808, 0.2),
   );
   fill.name = IGNIVAR_FRONTAL_FILL_NAME;
-  fill.renderOrder = 2;
+  fill.renderOrder = floorVfxRenderOrder('encounter', 1);
   const border = new THREE.Mesh(borderGeometry(), material(0xff9b2f, 0.88));
   border.name = IGNIVAR_FRONTAL_BORDER_NAME;
-  border.renderOrder = 4;
+  border.renderOrder = floorVfxRenderOrder('encounter', 3);
   const heatBands = new THREE.Mesh(heatBandsGeometry(), material(0xff4a12, 0.42));
   heatBands.name = IGNIVAR_FRONTAL_HEAT_BANDS_NAME;
-  heatBands.renderOrder = 3;
+  heatBands.renderOrder = floorVfxRenderOrder('encounter', 2);
   const flameCurtains = new THREE.Mesh(flameCurtainsGeometry(), material(0xff6514, 0.58));
   flameCurtains.name = IGNIVAR_FRONTAL_FLAME_CURTAINS_NAME;
-  flameCurtains.renderOrder = 6;
+  flameCurtains.renderOrder = floorVfxRenderOrder('encounter', 5);
 
   root.add(fill, heatBands, border, flameCurtains);
   root.visible = false;

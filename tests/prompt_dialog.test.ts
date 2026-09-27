@@ -6,7 +6,7 @@
 // drive); this suite pins the recipe itself, so a semantic break that keeps
 // the source tokens still fails somewhere.
 import { describe, expect, it } from 'vitest';
-import { installPromptDialog } from '../src/ui/prompt_dialog';
+import { dismissInstalledPrompt, installPromptDialog } from '../src/ui/prompt_dialog';
 
 function rig(withInputAriaLabel = false) {
   const root = document.createElement('div');
@@ -211,5 +211,28 @@ describe('installPromptDialog: the shared modal recipe', () => {
     } finally {
       r.cleanup();
     }
+  });
+});
+
+describe('dismissInstalledPrompt: the element-keyed teardown registry', () => {
+  it('routes a registered prompt through its own dismiss (inert cleared, close run)', () => {
+    const r = rig();
+    try {
+      expect(r.root.inert).toBe(true);
+      dismissInstalledPrompt(r.prompt);
+      expect(r.root.inert).toBe(false);
+      expect(r.closedCount()).toBe(1);
+      expect(r.prompt.isConnected).toBe(false);
+    } finally {
+      r.cleanup();
+    }
+  });
+
+  it('plainly removes an element this recipe never installed', () => {
+    const stray = document.createElement('div');
+    stray.className = 'prompt';
+    document.body.appendChild(stray);
+    dismissInstalledPrompt(stray);
+    expect(stray.isConnected).toBe(false);
   });
 });

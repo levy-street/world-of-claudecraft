@@ -124,12 +124,26 @@ describe('month arithmetic and permissions', () => {
     expect(monthOfIso('2026-07-03')).toEqual({ year: 2026, month: 6 });
   });
 
-  it('lets only officers and the leader manage guild events', () => {
-    expect(canManageGuildEvents('leader')).toBe(true);
-    expect(canManageGuildEvents('officer')).toBe(true);
-    expect(canManageGuildEvents('member')).toBe(false);
+  it('lets only officers and the leader manage guild events (the default ladder)', () => {
+    expect(canManageGuildEvents({ rank: 'leader' })).toBe(true);
+    expect(canManageGuildEvents({ rank: 'officer' })).toBe(true);
+    expect(canManageGuildEvents({ rank: 'member' })).toBe(false);
     expect(canManageGuildEvents(null)).toBe(false);
     expect(canManageGuildEvents(undefined)).toBe(false);
+  });
+
+  it('follows the guild ladder: a custom rank granted Calendar may manage, a revoked officer may not', () => {
+    const ranks = [
+      { id: 'leader', name: '', perms: [] },
+      { id: 'officer', name: 'Council', perms: ['invite' as const] },
+      { id: 'r1', name: 'Scribe', perms: ['events' as const] },
+      { id: 'member', name: '', perms: [] },
+    ];
+    expect(canManageGuildEvents({ rank: 'r1', ranks })).toBe(true);
+    expect(canManageGuildEvents({ rank: 'officer', ranks })).toBe(false);
+    expect(canManageGuildEvents({ rank: 'leader', ranks })).toBe(true);
+    // An id the ladder does not know resolves to the joining rank (fail closed).
+    expect(canManageGuildEvents({ rank: 'r9', ranks })).toBe(false);
   });
 });
 

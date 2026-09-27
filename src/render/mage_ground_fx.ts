@@ -26,17 +26,25 @@
 // cast. Math.random is fine here (render-only).
 
 import * as THREE from 'three';
+import { ABILITIES } from '../sim/data';
 import { NYTHRAXIS_GRAVE_ERUPTION_CAST_ID } from '../sim/nythraxis_grave_eruption';
 import type { SimEvent } from '../sim/types';
+import { type FloorVfxLayer, floorVfxRenderOrder } from './floor_vfx_layer';
 import { createGroundFireAoe, type GroundFireAoeHandle } from './ignivar_fire_vfx';
 import {
   isNythraxisGraveEruption,
-  NYTHRAXIS_GRAVE_ERUPTION_PALETTE,
   type NythraxisGraveShardPose,
+  nythraxisGraveEruptionRimThickness,
   nythraxisGraveShardFade,
   nythraxisGraveShardPoseInto,
   nythraxisGraveShardRise,
 } from './nythraxis_grave_core';
+import {
+  type HazardPaletteMode,
+  hazardPaletteMaterialSuffix,
+  type MeteorTelegraphPalette,
+  nythraxisGraveEruptionPalette,
+} from './nythraxis_hazard_palette_core';
 import { isNythraxisBindingSigil, NYTHRAXIS_SIGIL_PALETTE } from './nythraxis_sigil_core';
 import { SCHOOL_COLORS } from './vfx';
 
@@ -79,14 +87,7 @@ export const METEOR_FLAME_GEOMETRY_HALF_HEIGHT = 0.45;
 /** One colour per telegraph material. The fire set is the meteor's own; the
  *  Grave Eruption maps the grave palette onto the same slots, so the two
  *  flavours share every geometry and differ in tint alone. */
-export interface MeteorTelegraphPalette {
-  footprint: number;
-  boundary: number;
-  countdown: number;
-  vein: number;
-  mote: number;
-  shard: number;
-}
+export type { MeteorTelegraphPalette } from './nythraxis_hazard_palette_core';
 
 const METEOR_FIRE_TELEGRAPH_PALETTE: MeteorTelegraphPalette = {
   footprint: 0x260407,
@@ -175,8 +176,20 @@ export interface RuneCircleSpawn {
    *  rides this same visual and passes the mechanic's real school, so a fire
    *  boss doesn't wind up behind a violet ring that doesn't read as danger. */
   school?: string;
-  /** Encounter identity for an authored palette layered over the school. */
+  /** The cast behind the ring: a player ability id (the mage's own Rune of
+   *  Power) puts it on the player band of the floor ladder; an encounter cast
+   *  id (the Nythraxis binding sigil, which also picks the authored palette) or
+   *  no ability at all (a rift mob windup) puts it on the encounter band. */
   ability?: string;
+}
+
+/**
+ * The floor ladder band a rune circle rides. Only a player ability's own cast
+ * (Rune of Power) is a player effect; every other rune circle the sim emits
+ * is a mechanic windup the raid must read, so it paints over player VFX.
+ */
+export function runeCircleLayer(ability: string | undefined): FloorVfxLayer {
+  return ability !== undefined && ABILITIES[ability] !== undefined ? 'player' : 'encounter';
 }
 
 export interface SnowZoneSpawn {
@@ -204,6 +217,9 @@ interface MeteorFx {
   emberMat: THREE.PointsMaterial;
   footprintMat: THREE.MeshBasicMaterial;
   boundaryMat: THREE.LineBasicMaterial;
+  /** The thickened rim band (Grave Eruption only): real geometry width so the
+   *  telegraph reads at melee range, unlike the 1px boundary line. */
+  rimMat?: THREE.MeshBasicMaterial;
   countdownMat: THREE.MeshBasicMaterial;
   veinMat: THREE.LineBasicMaterial;
   flameMat: THREE.MeshBasicMaterial;
@@ -303,6 +319,7 @@ export class MageGroundFx {
    *  is bounded by name-count x the 7-member Aura['school'] union, not
    *  unbounded: a real ceiling, not a cap this pool enforces itself. */
   private readonly materialPool = new Map<string, THREE.Material[]>();
+  private hazardPaletteMode: HazardPaletteMode = 'classic';
   private disposed = false;
   /** Per-frame scratch for the grave shard poses (the update loop allocates nothing). */
   private readonly shardPose: NythraxisGraveShardPose = {
@@ -390,18 +407,7 @@ export class MageGroundFx {
     const warningLead = Math.min(Math.max(0, opts.warningLead ?? 0), duration - 0.1);
     const initialElapsed = Math.min(duration, Math.max(0, opts.initialElapsed ?? 0));
     body.visible = !grave && warningLead === 0;
-    const rockMat = this.acquireMaterial(
-      'meteor-rock',
-      1,
-      () =>
-        new THREE.MeshStandardMaterial({
-          color: 0x111013,
-          emissive: 0x210600,
-          emissiveIntensity: 0.42,
-          roughness: 0.9,
-          metalness: 0.04,
-        }),
-    );
+    const rockMat = this.acquireMaterial('meteor-rock', 1, createMeteorRockMaterial);
     const rock = new THREE.Mesh(geometry.rock, rockMat);
     rock.name = 'mage-meteor-rock';
     rock.castShadow = true;
@@ -423,7 +429,7 @@ export class MageGroundFx {
     cracks.name = 'mage-meteor-cracks';
     for (const crackGeometry of geometry.cracks) {
       const crack = new THREE.Mesh(crackGeometry, magmaMat);
-      crack.renderOrder = 6;
+      crack.renderOrder = floorVfxRenderOrder('player', 1);
       cracks.add(crack);
     }
     body.add(cracks);
@@ -523,13 +529,16 @@ export class MageGroundFx {
     body.position.set(opts.x, startY, opts.z);
     trail.position.copy(body.position);
 
-    const telegraphKindSuffix = grave ? ':grave' : '';
+    const telegraphKindSuffix = grave
+      ? `:grave${hazardPaletteMaterialSuffix(this.hazardPaletteMode)}`
+      : '';
     const warning = this.buildMeteorTelegraph(
       opts,
       geometry.flame,
       initialElapsed / duration,
-      grave ? NYTHRAXIS_GRAVE_ERUPTION_PALETTE : METEOR_FIRE_TELEGRAPH_PALETTE,
+      grave ? nythraxisGraveEruptionPalette(this.hazardPaletteMode) : METEOR_FIRE_TELEGRAPH_PALETTE,
       telegraphKindSuffix,
+      grave,
     );
     warning.group.visible = opts.showTelegraph !== false;
     // A fire boss's authored warning hands its ground detail to the contributor
@@ -574,6 +583,7 @@ export class MageGroundFx {
       emberMat,
       footprintMat: warning.footprintMat,
       boundaryMat: warning.boundaryMat,
+      rimMat: warning.rimMat,
       countdownMat: warning.countdownMat,
       veinMat: warning.veinMat,
       flameMat: warning.flameMat,
@@ -614,6 +624,21 @@ export class MageGroundFx {
    *  grave read instead of a fire meteor. The fourth source is optional only so
    *  the existing three-source callers keep compiling; the renderer hands the
    *  whole IWorld, which always has it. */
+  /** The player's hazard palette (Options > Interface > Colorblind Mode). A
+   *  telegraph's materials are pooled and tinted at spawn, so a flip drops every
+   *  snapshot-managed Grave Eruption; the next sync respawns each from its
+   *  authoritative row with the new palette (same radius, same countdown). */
+  setHazardPaletteMode(mode: HazardPaletteMode): void {
+    if (mode === this.hazardPaletteMode) return;
+    this.hazardPaletteMode = mode;
+    for (let i = this.meteors.length - 1; i >= 0; i--) {
+      const meteor = this.meteors[i];
+      if (!meteor.grave || !meteor.snapshotManaged) continue;
+      this.disposeMeteor(meteor);
+      this.meteors.splice(i, 1);
+    }
+  }
+
   syncWorldMeteorWarnings(world: {
     activeIgnivarMeteors: readonly MeteorWarningState[];
     activeVarkhulAnvilMeteors: readonly MeteorWarningState[];
@@ -729,6 +754,7 @@ export class MageGroundFx {
     m.body.visible = false;
     m.trail.visible = false;
     m.boundaryMat.opacity = 0;
+    if (m.rimMat) m.rimMat.opacity = 0;
     m.beaconEmberMat.opacity = 0;
     m.beaconEmbers.visible = false;
     m.ignivarFireAoe?.erupt();
@@ -781,6 +807,7 @@ export class MageGroundFx {
     const suffix = meteor.telegraphKindSuffix;
     this.releaseMaterial(`meteor-footprint${suffix}`, meteor.footprintMat);
     this.releaseMaterial(`meteor-boundary${suffix}`, meteor.boundaryMat);
+    if (meteor.rimMat) this.releaseMaterial(`meteor-rim${suffix}`, meteor.rimMat);
     this.releaseMaterial(`meteor-countdown${suffix}`, meteor.countdownMat);
     this.releaseMaterial(`meteor-vein${suffix}`, meteor.veinMat);
     this.releaseMaterial(`meteor-flame${suffix}`, meteor.flameMat);
@@ -926,10 +953,12 @@ export class MageGroundFx {
     initialProgress: number,
     palette: MeteorTelegraphPalette,
     kindSuffix: string,
+    thickRim: boolean,
   ): {
     group: THREE.Group;
     footprintMat: THREE.MeshBasicMaterial;
     boundaryMat: THREE.LineBasicMaterial;
+    rimMat?: THREE.MeshBasicMaterial;
     countdownMat: THREE.MeshBasicMaterial;
     veinMat: THREE.LineBasicMaterial;
     flameMat: THREE.MeshBasicMaterial;
@@ -941,6 +970,15 @@ export class MageGroundFx {
     flameBases: ReadonlyArray<{ x: number; y: number; z: number; phase: number }>;
     ownedGeometries: THREE.BufferGeometry[];
   } {
+    // The same telegraph serves the mage's own Meteor and the sim's world warnings
+    // (Ignivar meteors, Varkhul anvils and forgestorm, Nythraxis grave eruptions),
+    // which arrive with a persistentId: a warning a raid must dodge rides the
+    // encounter band, the player's own cast the player band. Steps are the legacy
+    // order minus one, the encounter band's rule, so the rung reads the same in both.
+    const layer: FloorVfxLayer =
+      opts.persistentId !== undefined || isNythraxisGraveEruption(opts.ability)
+        ? 'encounter'
+        : 'player';
     const group = new THREE.Group();
     group.name = 'mage-meteor-telegraph';
 
@@ -999,7 +1037,7 @@ export class MageGroundFx {
     );
     const footprint = new THREE.Mesh(footprintGeo, footprintMat);
     footprint.name = 'mage-meteor-telegraph-footprint';
-    footprint.renderOrder = 5;
+    footprint.renderOrder = floorVfxRenderOrder(layer, 4);
     group.add(footprint);
 
     const boundaryPositions = new Float32Array(METEOR_TELEGRAPH_SEGMENTS * 3);
@@ -1027,7 +1065,7 @@ export class MageGroundFx {
     );
     const boundary = new THREE.LineLoop(boundaryGeo, boundaryMat);
     boundary.name = 'mage-meteor-telegraph-boundary';
-    boundary.renderOrder = 9;
+    boundary.renderOrder = floorVfxRenderOrder(layer, 8);
     group.add(boundary);
 
     const countdownPositions = new Float32Array(METEOR_TELEGRAPH_SEGMENTS * 2 * 3);
@@ -1060,8 +1098,64 @@ export class MageGroundFx {
     const countdownRing = new THREE.Mesh(countdownGeo, countdownMat);
     countdownRing.name = 'mage-meteor-telegraph-countdown-ring';
     countdownRing.frustumCulled = false;
-    countdownRing.renderOrder = 8;
+    countdownRing.renderOrder = floorVfxRenderOrder(layer, 7);
     group.add(countdownRing);
+
+    // The thickened rim band (Grave Eruption only): a real ring MESH straddling
+    // the exact actionable radius, not a 1px WebGL line. It never moves the
+    // actionable boundary (`boundary` above stays the authoritative, unchanged
+    // radius); it only makes that radius easy to read at melee range, which is
+    // gameplay-neutral (it adds legibility, never hides or delays information).
+    // Reuses `countdownIndices`: any two concentric METEOR_TELEGRAPH_SEGMENTS
+    // rings share the same band topology.
+    let rimMat: THREE.MeshBasicMaterial | undefined;
+    let rimGeo: THREE.BufferGeometry | undefined;
+    if (thickRim) {
+      const rimThickness = nythraxisGraveEruptionRimThickness(opts.radius);
+      const rimOuter = opts.radius + rimThickness * 0.5;
+      const rimInner = Math.max(0, opts.radius - rimThickness * 0.5);
+      const rimPositions = new Float32Array(METEOR_TELEGRAPH_SEGMENTS * 2 * 3);
+      for (let i = 0; i < METEOR_TELEGRAPH_SEGMENTS; i++) {
+        const angle = (i / METEOR_TELEGRAPH_SEGMENTS) * Math.PI * 2;
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
+        const outerX = opts.x + cos * rimOuter;
+        const outerZ = opts.z + sin * rimOuter;
+        const innerX = opts.x + cos * rimInner;
+        const innerZ = opts.z + sin * rimInner;
+        const offset = i * 6;
+        rimPositions[offset] = outerX;
+        rimPositions[offset + 1] = this.groundY(outerX, outerZ) + 0.095;
+        rimPositions[offset + 2] = outerZ;
+        rimPositions[offset + 3] = innerX;
+        rimPositions[offset + 4] = this.groundY(innerX, innerZ) + 0.095;
+        rimPositions[offset + 5] = innerZ;
+      }
+      rimGeo = new THREE.BufferGeometry();
+      rimGeo.setAttribute('position', new THREE.BufferAttribute(rimPositions, 3));
+      rimGeo.setIndex(countdownIndices);
+      rimMat = this.acquireMaterial(
+        `meteor-rim${kindSuffix}`,
+        0.82,
+        () =>
+          new THREE.MeshBasicMaterial({
+            // Brighter than the boundary line itself, under additive blending,
+            // so the band pops against the crypt's own ambient purple torchlight
+            // and any purple player buff/aura standing on the same ground.
+            color: new THREE.Color(palette.boundary).multiplyScalar(1.45),
+            transparent: true,
+            opacity: 0.82,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            side: THREE.DoubleSide,
+          }),
+      );
+      const rim = new THREE.Mesh(rimGeo, rimMat);
+      rim.name = 'mage-meteor-telegraph-rim';
+      rim.frustumCulled = false;
+      rim.renderOrder = floorVfxRenderOrder(layer, 9);
+      group.add(rim);
+    }
 
     const veinVertices: number[] = [];
     const veinBranchCount = 14;
@@ -1119,7 +1213,7 @@ export class MageGroundFx {
     );
     const veins = new THREE.LineSegments(veinGeo, veinMat);
     veins.name = 'mage-meteor-telegraph-veins';
-    veins.renderOrder = 7;
+    veins.renderOrder = floorVfxRenderOrder(layer, 6);
     group.add(veins);
 
     const flameMat = this.acquireMaterial(
@@ -1138,7 +1232,7 @@ export class MageGroundFx {
     const flames = new THREE.InstancedMesh(flameGeometry, flameMat, METEOR_FLAME_COUNT);
     flames.name = 'mage-meteor-telegraph-flames';
     flames.frustumCulled = false;
-    flames.renderOrder = 9;
+    flames.renderOrder = floorVfxRenderOrder(layer, 8);
     const flameBases: Array<{ x: number; y: number; z: number; phase: number }> = [];
     const dummy = new THREE.Object3D();
     for (let i = 0; i < METEOR_FLAME_COUNT; i++) {
@@ -1185,13 +1279,14 @@ export class MageGroundFx {
     const beaconEmbers = new THREE.Points(beaconGeo, beaconEmberMat);
     beaconEmbers.name = 'mage-meteor-telegraph-beacon-embers';
     beaconEmbers.position.set(opts.x, this.groundY(opts.x, opts.z) + 0.1, opts.z);
-    beaconEmbers.renderOrder = 8;
+    beaconEmbers.renderOrder = floorVfxRenderOrder(layer, 7);
     group.add(beaconEmbers);
 
     return {
       group,
       footprintMat,
       boundaryMat,
+      rimMat,
       countdownMat,
       veinMat,
       flameMat,
@@ -1201,7 +1296,9 @@ export class MageGroundFx {
       countdownPositions,
       flames,
       flameBases,
-      ownedGeometries: [footprintGeo, boundaryGeo, countdownGeo, veinGeo, beaconGeo],
+      ownedGeometries: rimGeo
+        ? [footprintGeo, boundaryGeo, rimGeo, countdownGeo, veinGeo, beaconGeo]
+        : [footprintGeo, boundaryGeo, countdownGeo, veinGeo, beaconGeo],
     };
   }
 
@@ -1209,6 +1306,12 @@ export class MageGroundFx {
     if (this.disposed) return;
     const school = opts.school ?? 'arcane';
     const bindingSigil = isNythraxisBindingSigil(opts.ability);
+    // The same inscription serves the mage's own Rune of Power and the sim's
+    // mechanic windups (the Nythraxis sigil flare, a rift mob stomp or pulse
+    // ring): a windup a raid must dodge rides the encounter band, the
+    // player's own cast the player band. Steps are the legacy order minus
+    // one, the encounter band's rule, so the rung reads the same in both.
+    const layer = runeCircleLayer(opts.ability);
     const paletteKey = bindingSigil ? 'binding-sigil' : school;
     const schoolColor = capRingLightness(
       new THREE.Color(
@@ -1251,7 +1354,7 @@ export class MageGroundFx {
       const ringGeo = this.createTerrainRing(opts.x, opts.z, radius * 0.82, radius);
       const ring = new THREE.Mesh(ringGeo, mat);
       ring.name = name;
-      ring.renderOrder = 7;
+      ring.renderOrder = floorVfxRenderOrder(layer, 6);
       group.add(ring);
       mats.push(mat);
       matKinds.push(kind);
@@ -1283,7 +1386,7 @@ export class MageGroundFx {
       );
       const spoke = new THREE.Mesh(spokeGeo, mat);
       spoke.name = `mage-rune-power-spoke-${i}`;
-      spoke.renderOrder = 7;
+      spoke.renderOrder = floorVfxRenderOrder(layer, 6);
       group.add(spoke);
       mats.push(mat);
       matKinds.push(spokeKind);
@@ -1309,7 +1412,7 @@ export class MageGroundFx {
     );
     const glow = new THREE.Mesh(glowGeo, glowMat);
     glow.name = 'mage-rune-power-glow';
-    glow.renderOrder = 6;
+    glow.renderOrder = floorVfxRenderOrder(layer, 5);
     group.add(glow);
     mats.push(glowMat);
     matKinds.push(glowKind);
@@ -1631,6 +1734,7 @@ export class MageGroundFx {
       ]) {
         materials.add(material);
       }
+      if (meteor.rimMat) materials.add(meteor.rimMat);
     }
     for (const rune of this.runes) {
       for (const geometry of rune.ownedGeometries) geometries.add(geometry);
@@ -1768,6 +1872,7 @@ export class MageGroundFx {
 
       const warningPulse = 0.88 + Math.sin(m.elapsed * (5 + t * 7)) * 0.12;
       m.boundaryMat.opacity = (0.58 + t * 0.25) * warningPulse;
+      if (m.rimMat) m.rimMat.opacity = (0.72 + t * 0.24) * warningPulse;
       m.countdownMat.opacity = (0.34 + t * 0.5) * warningPulse;
       if (!m.contributorOwnsGroundDetail) {
         m.footprintMat.opacity = (0.18 + t * 0.07) * (0.96 + Math.sin(m.elapsed * 4) * 0.04);
@@ -1871,6 +1976,53 @@ export interface MageGroundSpellfxEvent {
   ability?: string;
   warningLead?: number;
   persistentId?: string;
+}
+
+/** The basalt rock of the Meteor fall, one config for the live pool and the
+ *  boot stand-in below. */
+function createMeteorRockMaterial(): THREE.MeshStandardMaterial {
+  const material = new THREE.MeshStandardMaterial({
+    color: 0x111013,
+    emissive: 0x210600,
+    emissiveIntensity: 0.42,
+    roughness: 0.9,
+    metalness: 0.04,
+  });
+  material.name = 'mageMeteor:rock';
+  return material;
+}
+
+/**
+ * The boot manifest's stand-in for the Meteor rock: one hidden rock of its
+ * own, never disposed, drawn the way the live fall draws it (an opaque
+ * MeshStandard on a plain Mesh of the icosahedron, casting shadows), so its
+ * program is linked behind the loading cover and held for the session. The
+ * live rock comes from a per-instance pool minted on the first fall; before
+ * this, only an unrelated material sharing the key kept the first fall from
+ * linking it live. Registered in ABILITY_MATERIAL_SOURCES.
+ */
+interface MeteorRockStandIn {
+  root: THREE.Group;
+  materials: THREE.Material[];
+}
+let meteorRockStandIn: MeteorRockStandIn | null = null;
+
+export function buildMeteorRockStandIn(): MeteorRockStandIn {
+  if (!meteorRockStandIn) {
+    const root = new THREE.Group();
+    root.name = 'mage-meteor-rock-stand-in';
+    const material = createMeteorRockMaterial();
+    const rock = new THREE.Mesh(new THREE.IcosahedronGeometry(METEOR_RADIUS, 2), material);
+    rock.name = 'mage-meteor-rock';
+    rock.castShadow = true;
+    root.add(rock);
+    meteorRockStandIn = { root, materials: [material] };
+  }
+  return meteorRockStandIn;
+}
+
+export function meteorRockStandInMaterials(): readonly THREE.Material[] {
+  return buildMeteorRockStandIn().materials;
 }
 
 /**
