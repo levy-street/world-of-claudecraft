@@ -194,9 +194,7 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/ability_vfx/spirits.ts',
   'src/render/vfx.ts',
   // Warrior kit volumes (crest fans, rupture masses, impact volumes): depth-tested
-  // 3D shapes on fixed orders 4 and 5. The one flat kind (the baked shockwave)
-  // rides the same pooled slots on order 5, under every player and encounter
-  // rung, so a boss telegraph still paints over it.
+  // 3D shapes on fixed orders 4 and 5.
   'src/render/ability_vfx/baked_impact_layers.ts',
   'src/render/ability_vfx/signature_crests.ts',
   // vertical or body-anchored class VFX

@@ -29,12 +29,14 @@ vi.mock('../src/render/ability_vfx/production_assets', async (importOriginal) =>
   };
 });
 
+import { ACTIVE_WARRIOR_CRESTS } from '../src/render/ability_vfx/active_kit_prewarm';
 import {
   castVfxRequirement,
   drawsWarriorKit,
   WARRIOR_KIT_REQUIREMENT,
 } from '../src/render/ability_vfx/cast_requirements';
 import type { AbilityVfxEntityState } from '../src/render/ability_vfx/painter';
+import type { CrestKind } from '../src/render/ability_vfx/signature_shapes';
 import { CAST_VFX_ENGINE, CAST_VFX_KIT } from '../src/render/cast_vfx_family';
 import { WARRIOR_VFX_FULL_SPECS } from '../src/render/warrior_vfx_specs';
 import { ABILITIES } from '../src/sim/data';
@@ -310,8 +312,16 @@ function walkRig(mask: number, local = false, askedMask?: (mask: number) => numb
   });
   rig.warriors.add(WARRIOR_CASTER);
   rig.prove(mask);
+  const crests = (rig.fx as unknown as { crests: { spawn(...args: unknown[]): boolean } }).crests;
+  const spawn = crests.spawn.bind(crests);
+  crests.spawn = (...args: unknown[]) => {
+    crestKinds.add(args[7] as CrestKind);
+    return spawn(...args);
+  };
   return rig;
 }
+/** Every crest kind the walk asked the crest pool for. */
+const crestKinds = new Set<CrestKind>();
 
 describe('the requirement walk over the real painter', () => {
   const walked = walkedNone();
@@ -345,6 +355,14 @@ describe('the requirement walk over the real painter', () => {
     for (const id of IDS) walkId(rigFor(castVfxRequirement(id), true), id, 0, local);
     expect(local.failures).toEqual([]);
     expect(local.drewEngine).toBeGreaterThan(IDS.length * 20);
+  });
+
+  it('asks the crests only for kinds the kit prepares', () => {
+    // A crest kind outside the kit recipe is never prepared, so its spawn is
+    // always refused (signature_crests.ts spawn); a caller asking for one
+    // would go dark in a live frame.
+    expect(crestKinds.size).toBeGreaterThan(15);
+    expect([...crestKinds].filter((kind) => !ACTIVE_WARRIOR_CRESTS.includes(kind))).toEqual([]);
   });
 
   it('fails a Warrior id admitted on the engine alone (the walk can see a wrong mask)', () => {

@@ -8,10 +8,12 @@ import {
 import * as contact from '../src/render/ability_vfx/contact_assets';
 import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
 import { GuardPrewarm } from '../src/render/ability_vfx/guard_prewarm';
+import { abilityVfxFamilyMaterials } from '../src/render/ability_vfx/prewarm';
 import * as assets from '../src/render/ability_vfx/production_assets';
 import { SolidImpactFragments } from '../src/render/ability_vfx/solid_impact_fragments';
 import type { BackgroundGpuQueue } from '../src/render/background_gpu_queue';
 import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
+import { inCastVfxKit } from '../src/render/cast_vfx_family';
 import type { PrewarmResumeUnit } from '../src/render/prewarm_resume';
 
 const KINDS = ['ice_shard', 'stone_chip', 'metal_splinter'] as const;
@@ -22,8 +24,10 @@ afterEach(() => {
   assets.productionAssetInternalsForTest.reset();
 });
 
+// The kind batches the kit geometry builds, not the pool's boot stand-in.
 function liveFragments(scene: THREE.Scene) {
-  return scene.children.filter((child) => child.name.startsWith('solidImpact:')) as THREE.Mesh<
+  const names = KINDS.map((kind) => `solidImpact:${kind}`);
+  return scene.children.filter((child) => names.includes(child.name)) as THREE.Mesh<
     THREE.InstancedBufferGeometry,
     THREE.ShaderMaterial
   >[];
@@ -140,6 +144,9 @@ it('builds and prepares the boot-built fragment pool through the Warrior kit onc
   for (const kind of KINDS) expect(burst(pool, kind)).toBeGreaterThan(0);
   const stone = live.find((mesh) => mesh.name === 'solidImpact:stone_chip');
   expect(stone?.visible).toBe(true);
+  // Live bursts and frames never show the boot stand-in.
+  pool.update(0.05, false);
+  expect(scene.getObjectByName('solidImpact:boot-stand-in')?.visible).toBe(false);
   expect(stone?.geometry.getAttribute('position').count).toBe(
     sources.get('stone_chip')?.getAttribute('position').count,
   );
@@ -234,4 +241,28 @@ it('fails a preparation step whose carrier unit no longer exists instead of skip
   expect(compile).toBeDefined();
   await expect(async () => compile?.run()).rejects.toThrow('guard-compile');
   expect(burst(pool, 'stone_chip')).toBe(0);
+});
+
+it('carries its program on a hidden kit stand-in from construction, released with the pool', () => {
+  const scene = new THREE.Scene();
+  const pool = new SolidImpactFragments(scene);
+  const standIn = scene.getObjectByName('solidImpact:boot-stand-in') as THREE.Mesh<
+    THREE.BufferGeometry,
+    THREE.ShaderMaterial
+  >;
+  expect(standIn).toBeDefined();
+  expect(standIn.visible).toBe(false);
+  expect(inCastVfxKit(standIn)).toBe(true);
+  expect(standIn.userData.renderCategory).toBe('vfx');
+  expect(liveFragments(scene)).toHaveLength(0);
+  for (const kind of KINDS) expect(burst(pool, kind)).toBe(0);
+  // The kit gate proves the fragment program on the stand-in's material.
+  expect(abilityVfxFamilyMaterials(scene).get('kit')).toContain(standIn.material);
+  pool.update(0.1, false);
+  pool.clear();
+  expect(standIn.visible).toBe(false);
+  const disposals = [vi.spyOn(standIn.geometry, 'dispose'), vi.spyOn(standIn.material, 'dispose')];
+  pool.dispose();
+  expect(standIn.parent).toBeNull();
+  for (const dispose of disposals) expect(dispose).toHaveBeenCalledOnce();
 });

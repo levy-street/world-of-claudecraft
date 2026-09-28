@@ -46,6 +46,11 @@ export const ACTIVE_WARRIOR_CRESTS: readonly CrestKind[] = [
  *  cover's frames belong to what the camera landed among, and the kit's
  *  uploads froze the entry settle cover for 555 ms under the visible class. */
 export const ACTIVE_KIT_PRIORITY = GPU_WORK_PRIORITY.BOOT_DEBT;
+/** The waits before each new attempt at a failed kit preparation. The painter
+ *  asks for the kit once per renderer, so without these a single failed unit
+ *  (a sheet that did not load, a link the driver rejected) left the kit cold
+ *  until the renderer was rebuilt. Bounded: past the last one it gives up. */
+export const ACTIVE_KIT_RETRY_DELAYS_MS: readonly number[] = [5_000, 30_000, 120_000];
 interface ActiveKitHost {
   queue: Pick<BackgroundGpuQueue, 'run'>;
   /** Start (or join) the kit's demand-loaded assets before any unit runs;
@@ -61,6 +66,8 @@ interface Preparation {
   task: Promise<void> | null;
   done: Set<string>;
   cancelled: boolean;
+  failures: number;
+  retry: ReturnType<typeof setTimeout> | null;
 }
 const preparations = new WeakMap<object, Preparation>();
 
@@ -70,10 +77,9 @@ const preparations = new WeakMap<object, Preparation>();
  *  the signature sheets. They land with the kit's demand load, and this recipe
  *  is their only upload home on each renderer; every drawer waits for its
  *  sheet's upload (a contact binds a procedural sheet meanwhile, smoke and dust
- *  skip), so those five go first to shorten that window. The loaded
- *  `shockwave` sheet is left out on purpose: only the boot-window
- *  `prewarmSpawn` draws it, behind the curtain. A sheet that is absent fails
- *  its unit, so the kit stays cold rather than half-ready. */
+ *  skip), so those five go first to shorten that window. The kit loads no
+ *  sheet this list does not upload. A sheet that is absent fails its unit,
+ *  so the kit stays cold rather than half-ready. */
 const KIT_SHEETS: readonly (readonly [
   id: string,
   name: string,
@@ -125,6 +131,8 @@ export function activeKitPrewarmEntry(scene: object, cls: string, host: ActiveKi
     task: null,
     done: new Set(),
     cancelled: false,
+    failures: 0,
+    retry: null,
   };
   preparations.set(scene, state);
   return {
@@ -185,21 +193,42 @@ export function ensureActiveAbilityKit(scene: object, cls?: string): Promise<voi
 }
 
 /** Start after the manifest, independently of unrelated retained world work.
- * Errors stay observable by Studio; ordinary gameplay keeps its primary fallback. */
+ * Errors stay observable by Studio; ordinary gameplay keeps its primary
+ * fallback, and a failed preparation asks again on ACTIVE_KIT_RETRY_DELAYS_MS.
+ * A request while a retry is pending joins that retry. */
 export function resumeActiveAbilityKit(
   scene: object,
   afterFirstPaint?: Promise<unknown>,
   cls?: string,
 ): void {
+  const state = preparations.get(scene);
+  if (state?.retry) return;
   void Promise.resolve(afterFirstPaint)
     .then(() => ensureActiveAbilityKit(scene, cls))
     .catch((error) => {
-      console.warn('Active ability preparation failed', error);
+      if (!state || state.cancelled || preparations.get(scene) !== state || state.retry) {
+        console.warn('Active ability preparation failed', error);
+        return;
+      }
+      const delay = ACTIVE_KIT_RETRY_DELAYS_MS[state.failures++];
+      if (delay === undefined) {
+        console.warn('Active ability preparation failed and gave up', error);
+        return;
+      }
+      console.warn(`Active ability preparation failed, retrying in ${delay} ms`, error);
+      state.retry = setTimeout(() => {
+        state.retry = null;
+        resumeActiveAbilityKit(scene, undefined, cls);
+      }, delay);
     });
 }
 
 export function cancelActiveAbilityKit(scene: object): void {
   const state = preparations.get(scene);
-  if (state) state.cancelled = true;
+  if (state) {
+    state.cancelled = true;
+    if (state.retry) clearTimeout(state.retry);
+    state.retry = null;
+  }
   preparations.delete(scene);
 }

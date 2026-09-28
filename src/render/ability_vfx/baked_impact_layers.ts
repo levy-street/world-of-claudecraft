@@ -31,7 +31,6 @@ interface Slot {
   age: number;
   duration: number;
   size: number;
-  ground: boolean;
   rise: number;
   y: number;
   authored: boolean;
@@ -78,7 +77,6 @@ export class BakedImpactLayers {
         uHot: { value: new THREE.Color() },
         uHeat: { value: 0 },
         uFloor: { value: 0 },
-        uGround: { value: 0 },
         uMotion: { value: 1 },
         uAuthored: { value: 0 },
         uMaterialTint: { value: 0 },
@@ -89,20 +87,20 @@ export class BakedImpactLayers {
       vertexShader: `uniform vec2 uPivot; varying vec2 vUv; varying float vHeight,vDistance,vViewDepth; void main(){vUv=uv;vec3 p=position;p.xy+=vec2(0.5-uPivot.x,uPivot.y-0.5);vec4 world=modelMatrix*vec4(p,1.);vec4 view=viewMatrix*world;vHeight=world.y;vDistance=length(view.xyz);vViewDepth=-view.z;gl_Position=projectionMatrix*view;}`,
       fragmentShader: `${SCENE_SAMPLE_GLSL}
       uniform sampler2D uNormal,uFlow,uLighting;uniform float uSurface,uSourceScale;uniform vec3 uSunWorld;
-      uniform sampler2D uMap;uniform float uFrame,uOpacity,uHeat,uFloor,uGround,uMotion,uAuthored,uMaterialTint,uGutter,uMirror;uniform vec3 uTint,uHot;varying vec2 vUv;varying float vHeight,vDistance,vViewDepth;
+      uniform sampler2D uMap;uniform float uFrame,uOpacity,uHeat,uFloor,uMotion,uAuthored,uMaterialTint,uGutter,uMirror;uniform vec3 uTint,uHot;varying vec2 vUv;varying float vHeight,vDistance,vViewDepth;
       vec2 cellUv(float f,vec2 local){f=clamp(f,0.,63.);float gutter=uGutter;vec2 content=mix(vec2(gutter),vec2(1.0-gutter),clamp(local,vec2(0.),vec2(1.)));vec2 uv=(content+vec2(mod(f,8.),7.-floor(f/8.)))/8.;return uv;}
       vec4 cell(float f){return texture2D(uMap,cellUv(f,vec2(0.5+(vUv.x-0.5)*uMirror,vUv.y)));}
       void main(){vec4 a=cell(floor(uFrame)),b=cell(floor(uFrame)+1.);float t=fract(uFrame);float alpha=mix(a.a,b.a,t);vec3 premix=mix(a.rgb*a.a,b.rgb*b.a,t);vec3 shade=premix/max(alpha,0.001);
         float surfaceDepth=vViewDepth;
         vec3 normal=vec3(0.,0.,1.);
 
-        float floorFade=mix(smoothstep(uFloor-0.04,uFloor+0.38,vHeight),1.,uGround);float nearFade=smoothstep(0.7,2.3,vDistance);
+        float floorFade=smoothstep(uFloor-0.04,uFloor+0.38,vHeight);float nearFade=smoothstep(0.7,2.3,vDistance);
         vec3 colour=shade*uTint+uHot*pow(max(shade.r,0.),2.)*uHeat;
         colour=mix(colour,shade*mix(vec3(1.),uTint,uMaterialTint)*(1.0+uHeat*0.18),uAuthored);
         vec2 bend=vec2(shade.r-shade.b,shade.g-shade.r)*uHeat*3.0*uMotion;
         bend+=normal.xy*2.5*uSurface*uMotion;
         colour=sceneRefract(colour,bend,surfaceDepth,min(0.22,uHeat*0.08+uSurface*0.12)*uMotion);
-        gl_FragColor=vec4(colour,alpha*uOpacity*floorFade*nearFade*sceneSoftness(surfaceDepth,mix(0.45,0.025,uGround)));
+        gl_FragColor=vec4(colour,alpha*uOpacity*floorFade*nearFade*sceneSoftness(surfaceDepth,0.45));
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
       }`,
@@ -127,7 +125,6 @@ export class BakedImpactLayers {
         age: 0,
         duration: 1,
         size: 1,
-        ground: false,
         rise: 0,
         y: 0,
         authored: false,
@@ -215,7 +212,6 @@ export class BakedImpactLayers {
         : 9,
       size,
     );
-    s.ground = kind === 'shockwave';
     s.authored =
       kind === 'harvest_impact' ||
       kind === 'warrior_bite' ||
@@ -224,7 +220,7 @@ export class BakedImpactLayers {
     s.power = kind === 'warrior_power' || kind === 'warrior_fervor';
     s.reverse = reverse;
     s.roll = roll;
-    s.rise = s.ground || s.authored || s.power || kind === 'shout_dust' ? 0 : 0.18;
+    s.rise = s.authored || s.power || kind === 'shout_dust' ? 0 : 0.18;
     s.y = y;
     s.x = x;
     s.z = z;
@@ -244,21 +240,6 @@ export class BakedImpactLayers {
     s.mesh.position.set(x, y, z);
     s.mesh.scale.set(s.size * Math.min(2, aspect), s.size, s.size);
     s.mesh.quaternion.identity();
-    if (s.ground) s.mesh.rotation.set(-Math.PI / 2, 0, angle);
-    // Prepared per-slot vertices drape once at spawn. Smoke resets the same
-    // surface to a flat billboard; neither path edits buffers during playback.
-    s.mesh.updateMatrixWorld(true);
-    const positions = s.mesh.geometry.getAttribute('position');
-    for (let i = 0; i < positions.count; i++) {
-      let depth = 0;
-      if (s.ground && groundY) {
-        this.point.set(positions.getX(i), positions.getY(i), 0).applyMatrix4(s.mesh.matrixWorld);
-        const height = groundY(this.point.x, this.point.z);
-        depth = ((Number.isFinite(height) ? height : floor) + 0.08 - y) / s.size;
-      }
-      positions.setZ(i, depth);
-    }
-    positions.needsUpdate = true;
     const u = s.mesh.material.uniforms;
     u.uMap.value = bakedTexture(kind);
     u.uMirror.value = s.harvest
@@ -275,7 +256,6 @@ export class BakedImpactLayers {
     u.uHot.value.setHex(hot);
     u.uHeat.value = Math.min(2, Math.max(0, heat));
     u.uFloor.value = floor;
-    u.uGround.value = s.ground ? 1 : 0;
     u.uAuthored.value = s.authored ? 1 : 0;
     u.uMaterialTint.value = kind === 'warrior_crush' ? 0.18 : s.shear ? 1 : 0;
     u.uGutter.value = s.authored || s.power || kind === 'shout_dust' ? 4 / 256 : 0.018;
@@ -302,34 +282,32 @@ export class BakedImpactLayers {
       const phase = s.shear ? warriorShearPhase(p) : p;
       u.uFrame.value = (reducedMotion ? 0.36 : s.reverse ? 1 - phase : phase) * 63;
       u.uOpacity.value =
-        (s.authored ? 0.94 : s.ground || s.power ? 0.75 : 0.64) *
+        (s.authored ? 0.94 : s.power ? 0.75 : 0.64) *
         Math.min(1, p / 0.045) *
         Math.min(1, (1 - p) / 0.25);
       u.uHeat.value = s.mesh.userData.heat * (1 - p) ** 3;
-      if (!s.ground) {
-        s.mesh.quaternion.copy(camera);
-        if (s.harvest) {
-          // Project the world-space blade axis into the camera plane. Rotating
-          // the camera must not reverse the receiving spray's cutting direction.
-          this.point
-            .set(s.dx, Math.sin(s.roll), s.dz)
-            .applyQuaternion(this.cameraInverse.copy(camera).invert());
-          s.mesh.rotateZ(Math.atan2(this.point.y, this.point.x));
-        } else if (s.roll !== 0) s.mesh.rotateZ(s.roll);
-        s.mesh.position.y = s.y + (reducedMotion ? 0 : p * s.rise);
-        if (s.dust) {
-          const advance = reducedMotion ? 0.65 : 1 - (1 - p) * (1 - p);
-          const grid = Math.min(3.9999, advance * 4),
-            i = Math.floor(grid),
-            fraction = grid - i;
-          const floor = s.groundPath[i] * (1 - fraction) + s.groundPath[i + 1] * fraction;
-          s.mesh.position.set(
-            s.x + s.dx * advance,
-            s.y + floor - s.groundPath[0],
-            s.z + s.dz * advance,
-          );
-          u.uFloor.value = floor;
-        }
+      s.mesh.quaternion.copy(camera);
+      if (s.harvest) {
+        // Project the world-space blade axis into the camera plane. Rotating
+        // the camera must not reverse the receiving spray's cutting direction.
+        this.point
+          .set(s.dx, Math.sin(s.roll), s.dz)
+          .applyQuaternion(this.cameraInverse.copy(camera).invert());
+        s.mesh.rotateZ(Math.atan2(this.point.y, this.point.x));
+      } else if (s.roll !== 0) s.mesh.rotateZ(s.roll);
+      s.mesh.position.y = s.y + (reducedMotion ? 0 : p * s.rise);
+      if (s.dust) {
+        const advance = reducedMotion ? 0.65 : 1 - (1 - p) * (1 - p);
+        const grid = Math.min(3.9999, advance * 4),
+          i = Math.floor(grid),
+          fraction = grid - i;
+        const floor = s.groundPath[i] * (1 - fraction) + s.groundPath[i + 1] * fraction;
+        s.mesh.position.set(
+          s.x + s.dx * advance,
+          s.y + floor - s.groundPath[0],
+          s.z + s.dz * advance,
+        );
+        u.uFloor.value = floor;
       }
     }
   }
