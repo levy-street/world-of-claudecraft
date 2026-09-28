@@ -195,6 +195,8 @@ export function buildBladeGrass(
     // culling the back faces read as half the blades missing per cluster
     side: THREE.DoubleSide,
   });
+  const fadeFrom = (RADIUS * FADE_START).toFixed(1);
+  const fadeTo = RADIUS.toFixed(1);
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uTime = sharedUniforms.uTime;
     sh.uniforms.uPlayerPos = uPlayerPos;
@@ -212,7 +214,7 @@ export function buildBladeGrass(
           vec3 bgOrigin = vec3(instanceMatrix[3][0], instanceMatrix[3][1], instanceMatrix[3][2]);
           // outer-ring fade by collapse: alpha would need transparency and a
           // sort; shrinking toward the root is invisible in motion
-          float bgFade = 1.0 - smoothstep(${(RADIUS * FADE_START).toFixed(1)}, ${RADIUS.toFixed(1)}, distance(bgOrigin.xz, uPlayerPos));
+          float bgFade = 1.0 - smoothstep(${fadeFrom}, ${fadeTo}, distance(bgOrigin.xz, uPlayerPos));
           transformed *= bgFade;
           // per-blade sway, weighted by height squared so roots stay planted;
           // phase from the instance origin desynchronises neighbours
@@ -225,6 +227,10 @@ export function buildBladeGrass(
       );
     sh.vertexShader = patchConstantUpNormalVertexShader(sh.vertexShader);
   };
+  // The fade ring is templated into the GLSL as literals, so it keys the
+  // program: three's default key is the hook's source text, which holds the
+  // template and not the value, and two radii would share one program.
+  mat.customProgramCacheKey = () => `blade-grass-carpet|${fadeFrom}|${fadeTo}`;
   const uPlayerPos = { value: new THREE.Vector2(1e9, 1e9) };
 
   // One mesh per sector instead of one uncullable pool mesh: every sector
