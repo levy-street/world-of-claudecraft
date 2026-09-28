@@ -3,6 +3,7 @@
 // (src/sim/minigames/turret_defense_plan.ts) reads the templates from MOBS.
 
 import { DT, type TurretSizeClass, type TurretSizeDef, type TurretWaveDef } from '../types';
+import type { MountKey } from './mounts';
 
 const ticks = (seconds: number): number => Math.round(seconds / DT);
 
@@ -108,6 +109,9 @@ export const TURRET_WEAPON = {
   maxLaunchSpeed: 32,
   maxLaunchLift: 26,
 } as const;
+
+/** Lent as the seated player's mount (never owned, never saved) and restored on leave. */
+export const TURRET_TANK_MOUNT: MountKey = 'terrorspark_groundshaker';
 
 export const TURRET_ARENA = {
   spawnRadius: 46,

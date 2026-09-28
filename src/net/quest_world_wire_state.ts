@@ -1,10 +1,11 @@
 import type { TreasureMapRarity } from '../sim/content/treasure_maps';
 import type { FactionId } from '../sim/factions';
 import { freshFactionCurrencies, freshFactionReputation } from '../sim/factions';
+import type { TurretSessionView } from '../sim/turret_defense_session';
 import type {
-  CannonActionId,
   CannonPoint,
   QuestProgress,
+  VehicleActionId,
   VehicleSession,
   WeeklyQuestProgress,
   WorldQuestProgress,
@@ -21,7 +22,7 @@ import { decodeNearbyWorldQuestTraces } from './world_quest_trace_public_wire';
 
 export type QuestWorldCommand =
   | { cmd: 'vehicle_enter'; station: string }
-  | { cmd: 'vehicle_action'; action: CannonActionId; x: number; z: number }
+  | { cmd: 'vehicle_action'; action: VehicleActionId; x: number; z: number }
   | { cmd: 'vehicle_leave' }
   | { cmd: 'world_quest_puzzle_rotate'; quest: string; tileIndex: number }
   | { cmd: 'world_quest_match3_swap'; quest: string; fromIndex: number; toIndex: number }
@@ -39,6 +40,9 @@ export type QuestWorldCommand =
 /** Cold owner mirrors shared by quest snapshots and world-boss map state. */
 export class QuestWorldWireState {
   vehicleSession: VehicleSession | null = null;
+  /** No turret seat online yet (the server rejects its action): always null here. */
+  turretSession: TurretSessionView | null = null;
+  readonly turretClock: number | null = null;
   questLog = new Map<string, QuestProgress>();
   questsDone = new Set<string>();
   worldQuestCycle = '';
@@ -98,7 +102,7 @@ export class QuestWorldWireState {
     this.sendQuestWorldCommand({ cmd: 'vehicle_enter', station: stationId });
   }
 
-  useVehicleAction(action: CannonActionId, point: CannonPoint): void {
+  useVehicleAction(action: VehicleActionId, point: CannonPoint): void {
     this.sendQuestWorldCommand({ cmd: 'vehicle_action', action, x: point.x, z: point.z });
   }
 
@@ -197,6 +201,7 @@ export class QuestWorldWireState {
 
   resetQuestWorldWireState(): void {
     this.vehicleSession = null;
+    this.turretSession = null;
     this.worldQuestCycle = '';
     this.worldQuestExpiresAtMs = 0;
     this.worldQuestTime = 0;

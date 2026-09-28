@@ -1,10 +1,10 @@
 import { isCannonActionId } from '../src/sim/minigames/cannon_encounter';
-import type { CannonActionId, CannonPoint } from '../src/sim/types';
+import type { CannonPoint, VehicleActionId } from '../src/sim/types';
 import { vehicleStationById } from '../src/sim/vehicle_stations';
 
 interface VehicleCommands {
   enterVehicle(station: string, pid: number): unknown;
-  useVehicleAction(action: CannonActionId, point: CannonPoint, pid: number): unknown;
+  useVehicleAction(action: VehicleActionId, point: CannonPoint, pid: number): unknown;
   leaveVehicle(pid: number): void;
 }
 

@@ -225,6 +225,15 @@ export function turretBreachPoints(breachValue: number, hp: number, maxHp: numbe
   return Math.max(1, Math.ceil((breachValue * hp) / maxHp));
 }
 
+/** What stands between the turret and the end of the current wave: the living
+ *  monsters plus the wave's unspawned ones. */
+export function turretMonstersLeft(state: TurretDefenseState): number {
+  const wave = state.phase === 'wave' ? currentWave(state) : undefined;
+  let left = wave ? wave.spawns.length - state.spawnCursor : 0;
+  for (const m of state.monsters) if (m.hp > 0) left++;
+  return left;
+}
+
 export function turretStrikeDistance(kind: TurretKind): number {
   return TURRET_ARENA.breachRadius + kind.radius;
 }

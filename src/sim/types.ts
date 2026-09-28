@@ -11,6 +11,8 @@ import type { RealmBuilderHonour } from './content/realm_builders';
 import type { TreasureMapRarity } from './content/treasure_maps';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { GliderFlightResult, GliderFlightState } from './minigames/glider_flight';
+import type { TurretDefenseState, TurretEvent } from './minigames/turret_defense';
+import type { TurretFeedback } from './minigames/turret_feedback';
 import type { WispMazeState } from './minigames/wisp_maze';
 import type { FishingCatchBand } from './professions/fishing_bands';
 import type { HarvestYield } from './professions/harvest_yields';
@@ -6926,6 +6928,8 @@ export type SimEvent = { pid?: number } & (
    *  wording under questUi.worldQuest.banner.<banner>). */
   | { type: 'worldQuestBanner'; banner: WorldQuestBannerId }
   | ({ type: 'cannonResult' } & CannonResult)
+  /** One Fire and Fly engine event for the seated owner, as plain data. */
+  | { type: 'turretDefense'; pid: number; event: TurretEvent }
   /** One finished scoreboard attempt (src/sim/world_quest_scoreboards.ts); the
    *  server keeps the character's best row per board. */
   | {
@@ -10247,3 +10251,22 @@ export interface VehicleSession {
   origin: Vec3;
   encounter: CannonEncounterState;
 }
+
+/** The Fire and Fly seat (src/sim/turret_defense_session.ts). Never included in character saves. */
+export interface TurretSession {
+  kind: 'turret';
+  origin: Vec3;
+  defense: TurretDefenseState;
+  /** The tank ridden while seated: lent, never owned, exempt from the mount ownership re-check. */
+  lentMountKey: string;
+  /** The mount ridden before the tank was lent ('' on foot), restored on leave while alive and still held. */
+  priorMountKey: string;
+  /** The newest engine events, oldest first (minigames/turret_feedback.ts). */
+  feedback: TurretFeedback[];
+  nextFeedbackSeq: number;
+}
+
+/** What `PlayerMeta.vehicle` holds: every seat gate keys on its presence, not its kind. */
+export type VehicleSeat = VehicleSession | TurretSession;
+
+export type VehicleActionId = CannonActionId | 'turret_fire';

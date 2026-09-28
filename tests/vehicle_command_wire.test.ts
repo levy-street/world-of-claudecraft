@@ -29,6 +29,12 @@ describe('vehicle command authority boundary', () => {
     expect(sim.leaveVehicle).toHaveBeenCalledWith(7);
   });
 
+  it('does not route the turret action online yet (its seat is offline only)', () => {
+    const sim = { enterVehicle: vi.fn(), useVehicleAction: vi.fn(), leaveVehicle: vi.fn() };
+    dispatchVehicleCommand(sim, 7, { cmd: 'vehicle_action', action: 'turret_fire', x: 1, z: 2 });
+    expect(sim.useVehicleAction).not.toHaveBeenCalled();
+  });
+
   it.each([
     { cmd: 'vehicle_enter', station: '__proto__' },
     { cmd: 'vehicle_action', action: 'constructor', x: 1, z: 2 },

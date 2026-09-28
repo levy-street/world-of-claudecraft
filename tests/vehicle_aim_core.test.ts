@@ -16,6 +16,8 @@ describe('vehicle ground aim', () => {
           origin: { x: station.x, y: 3, z: station.z },
           encounter: createCannonEncounter(),
         },
+        turretSession: null,
+        turretClock: null,
         enterVehicle: vi.fn(),
         leaveVehicle: vi.fn(),
         useVehicleAction: vi.fn(),

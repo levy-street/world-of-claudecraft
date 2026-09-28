@@ -14,10 +14,17 @@ import { forceDismount } from './mounts';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
-  type CannonActionId,
+  endTurretSeat,
+  fireTurretSeat,
+  type TurretSessionView,
+  tickTurretSeat,
+  turretSessionView,
+} from './turret_defense_session';
+import {
   type CannonPoint,
   type Entity,
   INTERACT_RANGE,
+  type VehicleActionId,
   type VehicleSession,
   type VehicleStationDef,
 } from './types';
@@ -112,7 +119,9 @@ export function enterVehicle(ctx: SimContext, stationId: string, pid?: number): 
 
 export function leaveVehicle(ctx: SimContext, pid?: number): void {
   const resolved = ctx.resolve(pid);
-  if (!resolved?.meta.vehicle) return;
+  const session = resolved?.meta.vehicle;
+  if (!resolved || !session) return;
+  if (session.kind === 'turret') endTurretSeat(ctx, resolved.meta, resolved.e, session);
   resolved.meta.vehicle = null;
   resolved.meta.wireRev++;
 }
@@ -126,16 +135,20 @@ function remainsAtStation(player: Entity, session: VehicleSession): boolean {
 
 export function useVehicleAction(
   ctx: SimContext,
-  action: CannonActionId,
+  action: VehicleActionId,
   point: CannonPoint,
   pid?: number,
 ): boolean {
   const resolved = ctx.resolve(pid);
   const session = resolved?.meta.vehicle;
-  const station = session && vehicleStationById(session.stationId);
+  if (!resolved || !session) return false;
+  if (session.kind === 'turret')
+    return (
+      action === 'turret_fire' && fireTurretSeat(ctx, resolved.meta, resolved.e, session, point)
+    );
+  const station = vehicleStationById(session.stationId);
   if (
-    !resolved ||
-    !session ||
+    action === 'turret_fire' ||
     !station ||
     !eligible(ctx, resolved.meta, resolved.e, station) ||
     session.cycle !== resolved.meta.worldQuestCycle ||
@@ -148,6 +161,10 @@ export function useVehicleAction(
 export function tickVehicle(ctx: SimContext, meta: PlayerMeta, player: Entity): void {
   const session = meta.vehicle;
   if (!session) return;
+  if (session.kind === 'turret') {
+    if (!tickTurretSeat(ctx, meta, player, session)) leaveVehicle(ctx, meta.entityId);
+    return;
+  }
   const station = vehicleStationById(session.stationId);
   if (
     !station ||
@@ -191,7 +208,7 @@ export function tickVehicle(ctx: SimContext, meta: PlayerMeta, player: Entity): 
 /** Boundary clone: a UI/host caller cannot mutate authoritative actors. */
 export function vehicleSessionFor(ctx: SimContext, pid?: number): VehicleSession | null {
   const session = ctx.resolve(pid)?.meta.vehicle;
-  if (!session) return null;
+  if (session?.kind !== 'cannon') return null;
   const encounter = session.encounter;
   return {
     ...session,
@@ -206,4 +223,17 @@ export function vehicleSessionFor(ctx: SimContext, pid?: number): VehicleSession
       feedback: encounter.feedback.map((effect) => ({ ...effect })),
     },
   };
+}
+
+export type { TurretSessionView } from './turret_defense_session';
+
+/** The Fire and Fly seat's read-only view (the cannon stays on vehicleSessionFor). */
+export function turretSessionFor(ctx: SimContext, pid?: number): TurretSessionView | null {
+  const session = ctx.resolve(pid)?.meta.vehicle;
+  return session?.kind === 'turret' ? turretSessionView(session) : null;
+}
+
+/** The sim tick while seated in the turret (the clock its segments are sampled on), else null. */
+export function turretClockFor(ctx: SimContext, pid?: number): number | null {
+  return ctx.resolve(pid)?.meta.vehicle?.kind === 'turret' ? ctx.tickCount : null;
 }

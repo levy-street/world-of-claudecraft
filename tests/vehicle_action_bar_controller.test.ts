@@ -26,6 +26,8 @@ it('uses slot 1 for flight boost only, shows cooldown and restores the bar after
   const glider = createGliderFlightState();
   const world = {
     vehicleSession: null as VehicleSession | null,
+    turretSession: null,
+    turretClock: null,
     worldQuestLog: new Map<string, WorldQuestProgress>([
       [
         GLIDER_QUEST_ID,
@@ -133,6 +135,8 @@ it('elides unchanged frames, routes all three buttons, and restores normal contr
   document.body.append(ui);
   const world = {
     vehicleSession: null as VehicleSession | null,
+    turretSession: null,
+    turretClock: null,
     enterVehicle: vi.fn(),
     useVehicleAction: vi.fn(),
     leaveVehicle: vi.fn(() => {
@@ -256,6 +260,8 @@ it('shows the forge workshop panel as a centred overlay outside the managed wind
   };
   const world = {
     vehicleSession: null as VehicleSession | null,
+    turretSession: null,
+    turretClock: null,
     player: { dead: false } as Entity,
     pickUpObject: vi.fn(),
     worldQuestTime: 0,

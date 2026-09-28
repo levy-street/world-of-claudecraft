@@ -46,7 +46,7 @@ import type { TreasureMapProgress } from './content/treasure_maps';
 import type { FactionId } from './factions';
 import type { ItemCopyAnchor } from './item_copy_anchor';
 import * as treasureVaultMod from './treasure_vault';
-import type { CannonActionId, CannonPoint, VehicleSession } from './types';
+import type { CannonPoint, VehicleActionId, VehicleSeat, VehicleSession } from './types';
 import * as vehicleMod from './vehicles';
 
 export type { CharacterState, PetState } from './character_state';
@@ -1357,7 +1357,7 @@ export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
   // persisted: src/sim/mount_race.ts owns the rules. Strictly per-player, so
   // simultaneous racers never share or contend on anything.
   mountRace?: MountRaceSession | null;
-  vehicle?: VehicleSession | null;
+  vehicle?: VehicleSeat | null;
   vehicleRetryAtTick?: number;
   // Optional QoL preference (issue #1358): when true, every target-switch
   // selector in targeting.ts (targetEntity, tabTarget, targetNearestEnemy,
@@ -4208,13 +4208,19 @@ export class Sim {
   get vehicleSession(): VehicleSession | null {
     return this.vehicleSessionFor(this.primaryId);
   }
+  get turretSession(): vehicleMod.TurretSessionView | null {
+    return vehicleMod.turretSessionFor(this.ctx, this.primaryId);
+  }
+  get turretClock(): number | null {
+    return vehicleMod.turretClockFor(this.ctx, this.primaryId);
+  }
   vehicleSessionFor(pid?: number): VehicleSession | null {
     return vehicleMod.vehicleSessionFor(this.ctx, pid);
   }
   enterVehicle(stationId: string, pid?: number): boolean {
     return vehicleMod.enterVehicle(this.ctx, stationId, pid);
   }
-  useVehicleAction(action: CannonActionId, point: CannonPoint, pid?: number): boolean {
+  useVehicleAction(action: VehicleActionId, point: CannonPoint, pid?: number): boolean {
     return vehicleMod.useVehicleAction(this.ctx, action, point, pid);
   }
   leaveVehicle(pid?: number): void {

@@ -10,31 +10,33 @@ import {
   TURRET_WAVES,
 } from '../content/turret_defense';
 import { MOBS } from '../data';
+import { deepFreeze } from '../deep_freeze';
 import { mobMaxHp } from '../entity';
 import type { MobTemplate, TurretSizeClass, TurretWaveDef, TurretWaveEntry } from '../types';
 
 export interface TurretKind {
-  templateId: string;
-  level: number;
-  sizeClass: TurretSizeClass;
-  maxHp: number;
-  marchSpeed: number;
-  mass: number;
-  radius: number;
-  breachValue: number;
+  readonly templateId: string;
+  readonly level: number;
+  readonly sizeClass: TurretSizeClass;
+  readonly maxHp: number;
+  readonly marchSpeed: number;
+  readonly mass: number;
+  readonly radius: number;
+  readonly breachValue: number;
 }
 
 export interface TurretWavePlan {
   /** Kind indices in spawn order. */
-  spawns: number[];
-  coreDamage: number;
-  gapMinTicks: number;
-  gapMaxTicks: number;
+  readonly spawns: readonly number[];
+  readonly coreDamage: number;
+  readonly gapMinTicks: number;
+  readonly gapMaxTicks: number;
 }
 
+/** Deep-frozen when resolved: sessions and their views share one plan by reference. */
 export interface TurretPlan {
-  kinds: TurretKind[];
-  waves: TurretWavePlan[];
+  readonly kinds: readonly TurretKind[];
+  readonly waves: readonly TurretWavePlan[];
 }
 
 /**
@@ -93,5 +95,5 @@ export function resolveTurretPlan(
       gapMaxTicks: wave.gapMaxTicks,
     };
   });
-  return { kinds, waves: planned };
+  return deepFreeze({ kinds, waves: planned });
 }

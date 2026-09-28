@@ -8,11 +8,17 @@ import {
 } from '../src/sim/content/vehicle_stations';
 import { WORLD_QUESTS_BY_ID } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import { type SimEvent, TICK_RATE } from '../src/sim/types';
+import { type SimEvent, TICK_RATE, type VehicleSeat, type VehicleSession } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { worldQuestCycleOfferingQuest } from '../src/sim/world_quest_rotation';
 import { worldQuestCopperReward } from '../src/sim/world_quests';
 import { WORLD_SEED } from '../src/sim/world_seed';
+
+function cannonSeat(meta: { vehicle?: VehicleSeat | null }): VehicleSession {
+  const seat = meta.vehicle;
+  if (seat?.kind !== 'cannon') throw new Error('expected a cannon seat');
+  return seat;
+}
 
 function rig(station = NORTH_WATCH_CANNON) {
   const sim = new Sim({ seed: WORLD_SEED, playerClass: 'mage' });
@@ -99,7 +105,7 @@ describe('authoritative personal vehicles', () => {
   it('uses the outer sim clock for the ten-second failure retry without killing the player', () => {
     const { sim, player, meta } = rig();
     sim.enterVehicle(NORTH_WATCH_CANNON.id);
-    const state = meta.vehicle!.encounter;
+    const state = cannonSeat(meta).encounter;
     state.phase = 'wave';
     // One breach must end the defense: leave exactly the infantry breach cost.
     state.integrity = CANNON_ENEMIES.infantry.breachDamage;
@@ -136,7 +142,7 @@ describe('authoritative personal vehicles', () => {
       expect(sim.enterVehicle(station.id)).toBe(true);
       const health = player.hp;
       const copper = sim.copper;
-      const encounter = meta.vehicle!.encounter;
+      const encounter = cannonSeat(meta).encounter;
       const resultEvents: ReturnType<Sim['tick']> = [];
       let victoryTick = -1;
       for (let tick = 0; tick < 240 * TICK_RATE && meta.vehicle; tick++) {
@@ -178,14 +184,14 @@ describe('authoritative personal vehicles', () => {
       expect(sim.vehicleSession).toBeNull();
       expect(meta.vehicleRetryAtTick ?? 0).toBeLessThanOrEqual(sim.ctx.tickCount);
       expect(sim.enterVehicle(station.id)).toBe(true);
-      expect(meta.vehicle!.encounter.endless ?? false).toBe(false);
-      meta.vehicle!.encounter.phase = 'won';
-      meta.vehicle!.encounter.commanderKilled = true;
+      expect(cannonSeat(meta).encounter.endless ?? false).toBe(false);
+      cannonSeat(meta).encounter.phase = 'won';
+      cannonSeat(meta).encounter.commanderKilled = true;
       const repeated = sim.tick();
       expect(sim.copper).toBe(awarded);
       expect(repeated.filter((e) => e.type === 'cannonResult')).toHaveLength(1);
       expect(sim.tick().filter((e) => e.type === 'cannonResult')).toHaveLength(0);
-      expect(meta.vehicle?.encounter.endless).toBe(true);
+      expect(cannonSeat(meta).encounter.endless).toBe(true);
       sim.leaveVehicle();
     },
     150_000,
@@ -221,7 +227,7 @@ describe('authoritative personal vehicles', () => {
     const view = sim.vehicleSession!;
     expect(decodeVehicleSession(view)).toEqual(view);
     view.encounter.enemies[0].hp = 0;
-    expect(meta.vehicle!.encounter.enemies[0].hp).toBeGreaterThan(0);
+    expect(cannonSeat(meta).encounter.enemies[0].hp).toBeGreaterThan(0);
     const save = sim.serializeCharacter(sim.playerId);
     expect(save).not.toHaveProperty('vehicle');
     expect(save).not.toHaveProperty('vehicleRetryAtTick');

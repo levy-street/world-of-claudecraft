@@ -755,7 +755,7 @@ export function completeWorldQuestVehicle(
   const progress = meta.worldQuestLog.get(station.questId);
   const player = ctx.entities.get(meta.entityId);
   if (
-    !session ||
+    session?.kind !== 'cannon' ||
     session.stationId !== stationId ||
     session.cycle !== meta.worldQuestCycle ||
     session.encounter.phase !== 'won' ||
