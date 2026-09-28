@@ -83,9 +83,22 @@
     gap: 4px;
     padding: 8px;
   }
-  body.mobile-touch .shadow-action-bar .vehicle-integrity {
+  /* The Fire and Fly seat keeps the cannon's bottom anchor (movement is locked, as
+     in the cannon): a lift like the walking shadow bar's would push its result
+     panel off a landscape phone. */
+  body.mobile-touch .vehicle-bar.turret-bar {
+    grid-template-columns: minmax(0, 1fr);
+    width: min(360px, calc(100% - 24px));
+    gap: 4px;
+    padding: 8px;
+  }
+  body.mobile-touch .shadow-action-bar .vehicle-integrity,
+  body.mobile-touch .turret-bar .vehicle-integrity {
     min-height: 20px;
     height: 20px;
+  }
+  body.mobile-touch .turret-result {
+    font-size: 12px;
   }
   body.mobile-touch .shadow-action-bar .vehicle-bar-hint {
     grid-column: 1 / -1;

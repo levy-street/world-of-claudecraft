@@ -218,4 +218,13 @@ export const ENTITY_GATE_STAND_INS: readonly EntityGateStandIn[] = [
     standIn:
       "the station ENTITY itself, whose own view (the invisible click proxy the feast also gets, quest_objects.ts buildGroundQuestObject with no item) and nameplate (nameplate_view.ts feastNear, which admits a mobile-station templateId within INTERACT_RANGE + 1) never ride this gate, so the owner's name and the tool read on approach whatever the link state; the crafting gate itself reads the sim slot, never the prop, so a held cluster delays decoration only, bounded by GATED_ATTACH_WATCHDOG_MS",
   },
+  {
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/turret_defense_visual.ts',
+    callSite: 'void attachSceneGroupGated(',
+    hides:
+      'a Fire and Fly monster rig from its build (once the player is first seen seated: one per frame for the current and next wave, one per idle slot for the others) until its programs link, under the label live-gate:fire-and-fly-rig:<template>; the slot book (turret_defense_pool_core.ts TurretSlotBook) never hands a monster a rig its gate has not revealed',
+    standIn:
+      "the monster's capsule on the calligraphy blue material (world_quest_trace_materials.ts), its geometry stripped of normals so it draws the very program the world-quest-trace prewarm stages, at the monster's exact position and attitude with its health bar and strike ring, on every graphics tier, until a revealed rig of its template is free (the gate settling or its GATED_ATTACH_WATCHDOG_MS reveal)",
+  },
 ];

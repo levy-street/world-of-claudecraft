@@ -202,6 +202,8 @@ const UI_ROOT_TOUCHERS: Record<string, string> = {
     'the world-quest puzzle window (a .window, window_drag governs it; closeManagedWindow closes it), minted at runtime like perfecting_window.ts',
   'src/ui/hud/vehicle/vehicle_action_bar_controller.ts':
     'the cannon vehicle action bar, shown only while the player mans a cannon (transient, activity-scoped)',
+  'src/ui/hud/vehicle/turret_hud_controller.ts':
+    'the Fire and Fly seat HUD, shown only while the player is seated in the turret (transient, activity-scoped)',
 };
 
 /** Registry frames whose elements are minted at runtime rather than written

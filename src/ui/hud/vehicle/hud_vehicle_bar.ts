@@ -22,6 +22,13 @@ interface VehicleBarHost {
   playerGroundAim: VehicleBarDeps['cancelOnEnter'][number];
   empowerHold: VehicleBarDeps['cancelOnEnter'][number];
   attachTooltip(element: HTMLElement, html: () => string): void;
+  showBanner(
+    text: string,
+    motion?: boolean,
+    icon?: string,
+    variant?: 'default',
+    subtext?: string,
+  ): unknown;
 }
 
 export function createHudVehicleBar(hud: object): VehicleActionBarController {
@@ -36,5 +43,6 @@ export function createHudVehicleBar(hud: object): VehicleActionBarController {
     cancelOnEnter: [h.playerGroundAim, h.empowerHold],
     attachTooltip: (element, html) => h.attachTooltip(element, html),
     gliderPitchHold: (value) => h.optionsHooks?.gliderPitchHold?.(value),
+    showBanner: (banner) => h.showBanner(banner.text, true, undefined, 'default', banner.subtext),
   });
 }

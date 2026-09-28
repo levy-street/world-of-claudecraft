@@ -23,10 +23,12 @@ import {
 } from '../src/render/farm_patches';
 import { gpuPrepEventsSnapshot, resetGpuPrepEventsForTest } from '../src/render/gpu_prep_events';
 import { NAMEPLATE_RANGE, nameplatePlanInto, newNameplatePlan } from '../src/render/nameplate_view';
+import { TurretSlotBook } from '../src/render/turret_defense_pool_core';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import type { Entity } from '../src/sim/types';
 import { INTERACT_RANGE } from '../src/sim/types';
 import type { FarmPlotView } from '../src/world_api/farming';
+import { stripComments } from './helpers/strip_comments';
 
 // THE INVERSE INVARIANT of the live compile gates: never leave an entity with
 // no representation. A gate exists so a still-linking program is not drawn; it
@@ -86,6 +88,12 @@ const GATE_CALL_SITES: readonly {
     // The placed mobile-station props: the same helper, its own file.
     gate: 'attachSceneGroupGated',
     file: 'src/render/mobile_stations.ts',
+    marker: 'attachSceneGroupGated(',
+  },
+  {
+    // The Fire and Fly monster rigs: one gated attach per built rig.
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/turret_defense_visual.ts',
     marker: 'attachSceneGroupGated(',
   },
 ];
@@ -543,5 +551,23 @@ describe('entity gate stand-ins actually stand in', () => {
     expect(
       (await import('../src/render/gated_scene_attach')).GATED_ATTACH_WATCHDOG_MS,
     ).toBeGreaterThan(0);
+  });
+
+  it('Fire and Fly rig gate: the capsule draws at the monster until a revealed rig is free', () => {
+    // A monster only ever holds a rig its gate has revealed; until then it keeps
+    // its marker body, whose capsule the painter draws whenever there is no rig.
+    const book = new TurretSlotBook();
+    book.growBodies(1);
+    const rig = book.addRig('forest_wolf');
+    const wolf = [{ id: 7, kind: 0, hp: 40 }];
+    book.assign(wolf, () => 'forest_wolf');
+    expect(book.rigOf(7)).toBe(-1);
+    expect(book.bodyOf(7)).toBe(0);
+    book.setRigReady(rig);
+    book.assign(wolf, () => 'forest_wolf');
+    expect(book.rigOf(7)).toBe(rig);
+    const painter = stripComments(sourceOf('src/render/turret_defense_visual.ts'));
+    expect(painter).toContain('body.standIn.visible = !rig;');
+    expect(painter).toContain('if (!this.book.rigReady[i] && this.rigs[i].gate.visible)');
   });
 });

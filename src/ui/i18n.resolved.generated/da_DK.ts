@@ -550,6 +550,27 @@ export const da_DK: EnTranslations = {
       "shotTiming": "Genopladning: {cooldown} sek. Påvirkning efter {flight} sek. Alle skud deler {recovery} sek. genopretningstid.",
       "shotRules": "Sigte inden for det markerede felt. Ingen manakostnad. Skaden skaleres ikke med udstyr eller talenter."
     },
+    "turret": {
+      "title": "Fire and Fly",
+      "integrity": "Turret integrity",
+      "integrityValue": "{value}/{max}",
+      "wave": "Wave {wave}/{total}",
+      "left": "Monsters left: {count}",
+      "firstWave": "First wave in {seconds} sec",
+      "nextWave": "Wave cleared. Next wave in {seconds} sec",
+      "hint": "Aim with the mouse and click to fire.",
+      "waveBanner": "Wave {wave} of {total}",
+      "finalWave": "Final wave",
+      "clearedBanner": "Wave {wave} cleared",
+      "victory": "Victory!",
+      "defeat": "The turret has fallen",
+      "statKills": "Kills: {count}",
+      "statShots": "Shots fired: {count}",
+      "statAccuracy": "Accuracy: {value}",
+      "statThrow": "Longest throw: {yards} yards",
+      "statAirtime": "Longest airtime: {seconds} sec",
+      "leave": "Leave the tank"
+    },
     "warlock": {
       "doomLabel": "Fordømmelse",
       "fateThreadsLabel": "Skæbnetråde",

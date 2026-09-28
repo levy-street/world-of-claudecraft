@@ -550,6 +550,27 @@ export const ru_RU: EnTranslations = {
       "shotTiming": "Восстановление: {cooldown} сек. Попадание через {flight} сек. Общее восстановление всех выстрелов: {recovery} сек.",
       "shotRules": "Цельтесь внутри отмеченного поля. Не расходует ману. Урон не зависит от снаряжения и талантов."
     },
+    "turret": {
+      "title": "Fire and Fly",
+      "integrity": "Прочность турели",
+      "integrityValue": "{value}/{max}",
+      "wave": "Wave {wave}/{total}",
+      "left": "Осталось монстров: {count}",
+      "firstWave": "Первая волна через {seconds} сек.",
+      "nextWave": "Волна отбита. Следующая волна через {seconds} сек.",
+      "hint": "Цельтесь мышью и щёлкните, чтобы выстрелить.",
+      "waveBanner": "Wave {wave} of {total}",
+      "finalWave": "Последняя волна",
+      "clearedBanner": "Волна {wave} отбита",
+      "victory": "Победа!",
+      "defeat": "Турель пала",
+      "statKills": "Убито: {count}",
+      "statShots": "Выстрелов: {count}",
+      "statAccuracy": "Точность: {value}",
+      "statThrow": "Самый дальний бросок: {yards} м",
+      "statAirtime": "Самый долгий полёт: {seconds} сек.",
+      "leave": "Покинуть танк"
+    },
     "warlock": {
       "doomLabel": "Осуждение",
       "fateThreadsLabel": "Нити судьбы",

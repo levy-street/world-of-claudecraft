@@ -15,6 +15,7 @@ describe('the HUD vehicle bar factory host seam', () => {
       'private readonly empowerHold = new EmpowerHold();',
       '  attachTooltip(el: HTMLElement, html: () => string): void {',
       'this.vehicleBar ??= createHudVehicleBar(this);',
+      "  showBanner(\n    text: string,\n    motion = true,\n    decorativeIconUrl?: string,\n    variant: BannerVariant = 'default',\n    subtext?: string | string[],",
     ]) {
       expect(hudSource, anchor).toContain(anchor);
     }

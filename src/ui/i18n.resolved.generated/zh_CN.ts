@@ -550,6 +550,27 @@ export const zh_CN: EnTranslations = {
       "shotTiming": "冷却时间：{cooldown} 秒。{flight} 秒后命中。所有弹种共享 {recovery} 秒恢复时间。",
       "shotRules": "在标记区域内瞄准。不消耗法力。伤害不受装备或天赋影响。"
     },
+    "turret": {
+      "title": "Fire and Fly",
+      "integrity": "炮塔耐久",
+      "integrityValue": "{value}/{max}",
+      "wave": "Wave {wave}/{total}",
+      "left": "剩余怪物：{count}",
+      "firstWave": "第一波将在 {seconds} 秒后到来",
+      "nextWave": "本波已清除。下一波将在 {seconds} 秒后到来",
+      "hint": "用鼠标瞄准，点击开火。",
+      "waveBanner": "Wave {wave} of {total}",
+      "finalWave": "最后一波",
+      "clearedBanner": "第 {wave} 波已清除",
+      "victory": "胜利！",
+      "defeat": "炮塔已被攻破",
+      "statKills": "击杀：{count}",
+      "statShots": "开火次数：{count}",
+      "statAccuracy": "命中率：{value}",
+      "statThrow": "最远抛飞：{yards} 码",
+      "statAirtime": "最长滞空：{seconds} 秒",
+      "leave": "离开坦克"
+    },
     "warlock": {
       "doomLabel": "谴罪",
       "fateThreadsLabel": "命运丝线",

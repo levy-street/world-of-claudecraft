@@ -52,6 +52,8 @@ export interface ActiveMinigameEntity {
 export interface ActiveMinigameMusicInput {
   worldQuestLog?: ReadonlyMap<string, WorldQuestProgress>;
   vehicleSession?: { stationId?: string } | null;
+  /** The Fire and Fly seat shares the cannon's track. */
+  turretSession?: unknown;
   activePuzzleQuestId?: string | null;
   playerPos?: { x: number; z: number };
   entities?: Iterable<ActiveMinigameEntity>;
@@ -67,8 +69,8 @@ export function resolveActiveMinigameTrack(input: ActiveMinigameMusicInput): Min
     return 'puzzle';
   }
 
-  // 2. Cannon vehicle session
-  if (input.vehicleSession) {
+  // 2. Cannon vehicle session, or the Fire and Fly turret
+  if (input.vehicleSession || input.turretSession) {
     return 'cannon';
   }
 

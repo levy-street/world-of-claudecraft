@@ -550,6 +550,27 @@ export const ko_KR: EnTranslations = {
       "shotTiming": "재사용 대기시간: {cooldown}초. {flight}초 후 착탄. 모든 포격이 {recovery}초의 회복 시간을 공유합니다.",
       "shotRules": "표시된 구역 안을 조준하세요. 마나 소모 없음. 피해는 장비나 특성의 영향을 받지 않습니다."
     },
+    "turret": {
+      "title": "Fire and Fly",
+      "integrity": "포탑 내구도",
+      "integrityValue": "{value}/{max}",
+      "wave": "Wave {wave}/{total}",
+      "left": "남은 몬스터: {count}",
+      "firstWave": "첫 번째 웨이브까지 {seconds}초",
+      "nextWave": "웨이브 격퇴. 다음 웨이브까지 {seconds}초",
+      "hint": "마우스로 조준하고 클릭하여 발사하세요.",
+      "waveBanner": "Wave {wave} of {total}",
+      "finalWave": "마지막 웨이브",
+      "clearedBanner": "{wave}번째 웨이브 격퇴",
+      "victory": "승리!",
+      "defeat": "포탑이 함락되었습니다",
+      "statKills": "처치: {count}",
+      "statShots": "발사 횟수: {count}",
+      "statAccuracy": "명중률: {value}",
+      "statThrow": "최장 날리기 거리: {yards}야드",
+      "statAirtime": "최장 체공 시간: {seconds}초",
+      "leave": "전차에서 내리기"
+    },
     "warlock": {
       "doomLabel": "단죄",
       "fateThreadsLabel": "운명의 실타래",

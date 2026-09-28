@@ -550,6 +550,27 @@ export const nl_NL: EnTranslations = {
       "shotTiming": "Afkoelingstijd: {cooldown} sec. Inslag na {flight} sec. Alle schoten delen {recovery} sec herstelduur.",
       "shotRules": "Richt binnen het gemarkeerde veld. Geen mana-kosten. Schade tegen andere spelers telt niet mee. Niet geblokkeerd. Een Zilveren medaille en beter verslaat alle vijanden automatisch."
     },
+    "turret": {
+      "title": "Fire and Fly",
+      "integrity": "Turret integrity",
+      "integrityValue": "{value}/{max}",
+      "wave": "Wave {wave}/{total}",
+      "left": "Monsters left: {count}",
+      "firstWave": "First wave in {seconds} sec",
+      "nextWave": "Wave cleared. Next wave in {seconds} sec",
+      "hint": "Aim with the mouse and click to fire.",
+      "waveBanner": "Wave {wave} of {total}",
+      "finalWave": "Final wave",
+      "clearedBanner": "Wave {wave} cleared",
+      "victory": "Victory!",
+      "defeat": "The turret has fallen",
+      "statKills": "Kills: {count}",
+      "statShots": "Shots fired: {count}",
+      "statAccuracy": "Accuracy: {value}",
+      "statThrow": "Longest throw: {yards} yards",
+      "statAirtime": "Longest airtime: {seconds} sec",
+      "leave": "Leave the tank"
+    },
     "warlock": {
       "doomLabel": "Verdoemenis",
       "fateThreadsLabel": "Lotsdraden",

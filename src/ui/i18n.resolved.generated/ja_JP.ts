@@ -550,6 +550,27 @@ export const ja_JP: EnTranslations = {
       "shotTiming": "クールダウン：{cooldown}秒。{flight}秒後に着弾。全弾種で{recovery}秒の回復時間を共有する。",
       "shotRules": "印のついた範囲内を狙う。マナ消費なし。ダメージは装備やタレントの影響を受けない。"
     },
+    "turret": {
+      "title": "Fire and Fly",
+      "integrity": "砲台の耐久度",
+      "integrityValue": "{value}/{max}",
+      "wave": "Wave {wave}/{total}",
+      "left": "残りのモンスター：{count}",
+      "firstWave": "最初のウェーブまで {seconds} 秒",
+      "nextWave": "ウェーブ撃退。次のウェーブまで {seconds} 秒",
+      "hint": "マウスで狙い、クリックで発射。",
+      "waveBanner": "Wave {wave} of {total}",
+      "finalWave": "最終ウェーブ",
+      "clearedBanner": "ウェーブ {wave} 撃退",
+      "victory": "勝利！",
+      "defeat": "砲台が陥落した",
+      "statKills": "撃破数：{count}",
+      "statShots": "発射数：{count}",
+      "statAccuracy": "命中率：{value}",
+      "statThrow": "最長の吹き飛ばし：{yards} ヤード",
+      "statAirtime": "最長の滞空時間：{seconds} 秒",
+      "leave": "戦車を降りる"
+    },
     "warlock": {
       "doomLabel": "断罪",
       "fateThreadsLabel": "運命の糸",

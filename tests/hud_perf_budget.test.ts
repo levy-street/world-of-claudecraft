@@ -573,6 +573,13 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.className': 16 },
     reflowAllow: {},
   },
+  // The Fire and Fly seat HUD: ten construction-only class assignments; every update
+  // write, the result panel included, goes through the shared facet.
+  {
+    file: 'hud/vehicle/turret_hud_controller.ts',
+    allow: { '.className': 10 },
+    reflowAllow: {},
+  },
   // Both writes are build-time. The .className is the base class stamped on a tick
   // as it is MINTED into the pool (the pool only grows to the high-water tick
   // count), and the .setAttribute is the one aria-hidden on the ring root in

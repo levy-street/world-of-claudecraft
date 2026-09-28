@@ -7,7 +7,8 @@ import {
   resolveActiveMinigameTrack,
 } from '../src/game/minigame_music';
 import { minigameLayerFor } from '../src/game/minigame_music_layer';
-import { MusicDirector } from '../src/game/music';
+import { syncMinigameMusic } from '../src/game/minigame_music_sync';
+import { MusicDirector, music } from '../src/game/music';
 import type { WorldQuestProgress } from '../src/sim/types';
 
 class FakeParam {
@@ -141,6 +142,13 @@ describe('resolveActiveMinigameTrack', () => {
       vehicleSession: { stationId: 'cannon_01' },
     });
     expect(track).toBe('cannon');
+  });
+
+  it('plays the cannon track while seated in the Fire and Fly turret', () => {
+    expect(
+      resolveActiveMinigameTrack({ vehicleSession: null, turretSession: { waveCount: 6 } }),
+    ).toBe('cannon');
+    expect(resolveActiveMinigameTrack({ vehicleSession: null, turretSession: null })).toBeNull();
   });
 
   it('resolves glider slalom flight to glider track', () => {
@@ -312,6 +320,24 @@ describe('resolveActiveMinigameTrack', () => {
         entities,
       }),
     ).toBeNull();
+  });
+});
+
+describe('syncMinigameMusic', () => {
+  it('hands the Fire and Fly seat to the resolver, which plays the cannon track', () => {
+    const set = vi.spyOn(minigameLayerFor(music), 'set').mockImplementation(() => {});
+    try {
+      const world = {
+        worldQuestLog: new Map<string, WorldQuestProgress>(),
+        vehicleSession: null,
+        turretSession: { waveCount: 6 },
+        entities: new Map(),
+      } as unknown as Parameters<typeof syncMinigameMusic>[0];
+      syncMinigameMusic(world, { x: 0, z: 0 }, null);
+      expect(set).toHaveBeenLastCalledWith('cannon');
+    } finally {
+      set.mockRestore();
+    }
   });
 });
 

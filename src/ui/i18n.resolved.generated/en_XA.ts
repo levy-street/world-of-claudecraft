@@ -550,6 +550,27 @@ export const en_XA: EnTranslations = {
       "shotTiming": "[Çóóļðóŵñ: {cooldown} šéç. Íɱþáçţ áƒţéŕ {flight} šéç. Áļļ šĥóţš šĥáŕé {recovery} šéç ŕéçóʋéŕý.]",
       "shotRules": "[Áíɱ íñšíðé ţĥé ɱáŕķéð ƒíéļð. Ñó ɱáñá çóšţ. Ðáɱáĝé ðóéš ñóţ šçáļé ŵíţĥ ĝéáŕ óŕ ţáļéñţš.]"
     },
+    "turret": {
+      "title": "[Ƒíŕé áñð Ƒļý]",
+      "integrity": "[Ţúŕŕéţ íñţéĝŕíţý]",
+      "integrityValue": "[{value}/{max}]",
+      "wave": "[Ŵáʋé {wave}/{total}]",
+      "left": "[Ɱóñšţéŕš ļéƒţ: {count}]",
+      "firstWave": "[Ƒíŕšţ ŵáʋé íñ {seconds} šéç]",
+      "nextWave": "[Ŵáʋé çļéáŕéð. Ñéẋţ ŵáʋé íñ {seconds} šéç]",
+      "hint": "[Áíɱ ŵíţĥ ţĥé ɱóúšé áñð çļíçķ ţó ƒíŕé.]",
+      "waveBanner": "[Ŵáʋé {wave} óƒ {total}]",
+      "finalWave": "[Ƒíñáļ ŵáʋé]",
+      "clearedBanner": "[Ŵáʋé {wave} çļéáŕéð]",
+      "victory": "[Ʋíçţóŕý!]",
+      "defeat": "[Ţĥé ţúŕŕéţ ĥáš ƒáļļéñ]",
+      "statKills": "[Ķíļļš: {count}]",
+      "statShots": "[Šĥóţš ƒíŕéð: {count}]",
+      "statAccuracy": "[Áççúŕáçý: {value}]",
+      "statThrow": "[Ļóñĝéšţ ţĥŕóŵ: {yards} ýáŕðš]",
+      "statAirtime": "[Ļóñĝéšţ áíŕţíɱé: {seconds} šéç]",
+      "leave": "[Ļéáʋé ţĥé ţáñķ]"
+    },
     "warlock": {
       "doomLabel": "[Çóñðéɱñáţíóñ]",
       "fateThreadsLabel": "[Ƒáţé Ţĥŕéáðš]",

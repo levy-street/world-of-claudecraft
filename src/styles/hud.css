@@ -123,15 +123,18 @@
     grid-template-columns: 1fr;
     width: min(420px, calc(100% - 24px));
   }
-  .vehicle-bar.shadow-action-bar > * {
+  .vehicle-bar.shadow-action-bar > *,
+  .vehicle-bar.turret-bar > * {
     grid-column: 1 / -1;
   }
-  .vehicle-bar.shadow-action-bar .vehicle-integrity {
+  .vehicle-bar.shadow-action-bar .vehicle-integrity,
+  .vehicle-bar.turret-bar .vehicle-integrity {
     min-height: 22px;
     height: 22px;
     border-radius: 4px;
   }
-  .vehicle-bar.shadow-action-bar .vehicle-integrity-fill {
+  .vehicle-bar.shadow-action-bar .vehicle-integrity-fill,
+  .vehicle-bar.turret-bar .vehicle-integrity-fill {
     transform: scaleX(var(--vehicle-integrity));
     transform-origin: left;
   }
@@ -360,6 +363,42 @@
   }
   .vehicle-bar-hint {
     min-height: 2.4em;
+  }
+  /* The Fire and Fly seat: one column, the shadow bar's horizontal integrity bar
+     (shared above), and a result panel that takes the phase line's place once the
+     defense ends. */
+  .vehicle-bar.turret-bar {
+    grid-template-columns: minmax(0, 1fr);
+    width: min(420px, calc(100% - 24px));
+  }
+  .turret-bar-status {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px 16px;
+  }
+  .vehicle-bar.turret-bar .vehicle-bar-hint {
+    min-height: 1.4em;
+  }
+  .vehicle-bar.turret-bar .vehicle-bar-hint:empty {
+    display: none;
+  }
+  .vehicle-bar.turret-bar .vehicle-exit {
+    justify-self: center;
+    padding: 0 18px;
+  }
+  .turret-result {
+    display: grid;
+    gap: 2px;
+    font-size: 14px;
+    text-align: center;
+  }
+  .turret-result-title {
+    font-family: var(--title-font);
+    font-size: 18px;
+  }
+  .turret-result:not(.won) .turret-result-title {
+    color: var(--color-vehicle-text);
   }
   /* ---------- nameplates ---------- */
   .nameplate {

@@ -6,7 +6,7 @@ import { minigameLayerFor } from './minigame_music_layer';
 import { music } from './music';
 
 export function syncMinigameMusic(
-  world: Pick<IWorld, 'worldQuestLog' | 'vehicleSession' | 'entities'>,
+  world: Pick<IWorld, 'worldQuestLog' | 'vehicleSession' | 'turretSession' | 'entities'>,
   playerPos: { x: number; z: number },
   activePuzzleQuestId: string | null,
 ): void {
@@ -14,6 +14,7 @@ export function syncMinigameMusic(
     resolveActiveMinigameTrack({
       worldQuestLog: world.worldQuestLog,
       vehicleSession: world.vehicleSession,
+      turretSession: world.turretSession,
       activePuzzleQuestId,
       playerPos,
       entities: world.entities.values(),

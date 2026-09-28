@@ -9,6 +9,9 @@ const calls = vi.hoisted(() => ({
   traceGate: vi.fn(),
   ready: Promise.resolve(),
   wispReady: Promise.resolve(),
+  turretGate: vi.fn(),
+  turretUpdate: vi.fn(),
+  turretDispose: vi.fn(),
 }));
 vi.mock('../src/render/race_line', () => ({
   RaceLine: class {
@@ -58,6 +61,24 @@ vi.mock('../src/render/cannon_encounter_visual', () => ({
       calls.events.push('cannon');
     }
     dispose() {}
+  },
+}));
+vi.mock('../src/render/turret_defense_visual', () => ({
+  TurretDefenseVisual: class {
+    // Never settles: the turret builds lazily at the seat, so entry must not wait on it.
+    readyForEntry = new Promise(() => {});
+    constructor(
+      scene: THREE.Object3D,
+      _ground: unknown,
+      gate?: (root: THREE.Object3D) => Promise<unknown>,
+    ) {
+      if (gate) calls.turretGate(gate(scene));
+    }
+    update(...args: unknown[]) {
+      calls.events.push('turret');
+      calls.turretUpdate(...args);
+    }
+    dispose = calls.turretDispose;
   },
 }));
 vi.mock('../src/render/wisp_maze_visual', () => ({
@@ -122,10 +143,37 @@ describe('personal world guidance coordinator', () => {
         `mount:${!race}`,
         'trace',
         'cannon',
+        'turret',
         'wisp-maze',
       ]);
     },
   );
+  it('keeps the Fire and Fly turret out of the entry barrier and links it after first paint', async () => {
+    const gate = vi.fn(() => Promise.resolve());
+    const scene = new THREE.Scene();
+    const guidance = new WorldGuidance(scene, () => 0, gate);
+    expect(gate).toHaveBeenCalledWith(scene, false);
+    let ready = false;
+    void guidance.readyForEntry.then(() => {
+      ready = true;
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(ready).toBe(true);
+    const session = { defense: {} };
+    const world = {
+      mountRaceView: () => null,
+      questState: () => 'none',
+      worldQuestLog: new Map(),
+      player: { dead: false },
+      turretSession: session,
+      turretClock: 42,
+    } as unknown as IWorld;
+    guidance.update(world, 10, 0.05, true);
+    expect(calls.turretUpdate).toHaveBeenLastCalledWith(session, 42, 10, 0.05, true);
+    calls.turretDispose.mockClear();
+    guidance.dispose();
+    expect(calls.turretDispose).toHaveBeenCalledTimes(1);
+  });
   it('forwards NPC fizz arguments unchanged and releases the new visual', () => {
     const guidance = new WorldGuidance(new THREE.Scene(), () => 0);
     const args = [

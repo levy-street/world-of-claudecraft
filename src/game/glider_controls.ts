@@ -61,11 +61,16 @@ export function gliderAwareVisualFacing(
   return gliderControlsActive(world) ? null : diagonalMovementVisualFacing(mi, baseFacing);
 }
 
-/** Local movement freezes through a mount race countdown and while a cannon is manned;
- *  the sim enforces both locks independently. */
+/** Local movement freezes through a mount race countdown and while a cannon or the
+ *  turret is manned; the sim enforces every lock independently. */
 export function raceOrVehicleMovementLocked(world: {
   mountRaceView(): { phase: string } | null;
   readonly vehicleSession: unknown;
+  readonly turretSession?: unknown;
 }): boolean {
-  return world.mountRaceView()?.phase === 'countdown' || world.vehicleSession !== null;
+  return (
+    world.mountRaceView()?.phase === 'countdown' ||
+    world.vehicleSession !== null ||
+    (world.turretSession ?? null) !== null
+  );
 }

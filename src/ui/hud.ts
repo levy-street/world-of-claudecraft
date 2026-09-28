@@ -591,7 +591,7 @@ import { closeOpenTouchMenu } from './hud/tap_menu';
 import { createTargetDotsView, type TargetDotsInput, TargetDotsPainter } from './hud/target_dots';
 import { FerryHudPainter } from './hud/transport';
 import { TreasureMapWindow } from './hud/treasure';
-import { createHudVehicleBar, VehicleActionBarController } from './hud/vehicle';
+import { createHudVehicleBar, VehicleActionBarController, vehicleOwnsAim } from './hud/vehicle';
 import { dismissBuyQuantityPrompts } from './hud/vendor/buy_quantity_prompt_window';
 import { buildCrucibleVendorView } from './hud/vendor/crucible_vendor_view';
 import { renderCrucibleVendorWindow } from './hud/vendor/crucible_vendor_window';
@@ -1370,7 +1370,7 @@ export class Hud {
     return this.vehicleBar;
   }
   private get groundAim() {
-    return this.sim.vehicleSession ? this.vehicleControls.aim : this.playerGroundAim;
+    return vehicleOwnsAim(this.sim) ? this.vehicleControls.aim : this.playerGroundAim;
   }
   private readonly playerGroundAim = new GroundAimController({
     player: () => this.sim.player,

@@ -543,6 +543,24 @@ describe('Input autorun', () => {
   });
 });
 
+describe('Input held turn axis', () => {
+  it('reads the turn keys while movement is suspended, and yields them to a surface', () => {
+    const { input, windowListeners, keybinds, setGameKeysAllowed } = makeInput();
+    const [left] = keybinds.codesForAction('turnLeft');
+    const [right] = keybinds.codesForAction('turnRight');
+    input.setSuspendMovement(true);
+    windowListeners.get('keydown')!({ code: left, repeat: false, preventDefault: vi.fn() });
+    expect(input.readMoveInput().turnLeft).toBe(false);
+    expect(input.heldTurnAxis()).toBe(1);
+    windowListeners.get('keyup')!({ code: left });
+    expect(input.heldTurnAxis()).toBe(0);
+    windowListeners.get('keydown')!({ code: right, repeat: false, preventDefault: vi.fn() });
+    expect(input.heldTurnAxis()).toBe(-1);
+    setGameKeysAllowed(false);
+    expect(input.heldTurnAxis()).toBe(0);
+  });
+});
+
 describe('Input pet bar chords', () => {
   it('dispatches onPet for the default Ctrl+Digit pet chords and cancels the browser default', () => {
     const { input, windowListeners, cb } = makeInput();

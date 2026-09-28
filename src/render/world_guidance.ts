@@ -8,6 +8,7 @@ import { IslandGuidance } from './island_guidance';
 import { MountBeacon } from './mount_beacon';
 import { RaceLine } from './race_line';
 import { ShadowInfiltrationVisual } from './shadow_infiltration_visual';
+import { TurretDefenseVisual } from './turret_defense_visual';
 import { WispMazeVisual } from './wisp_maze_visual';
 import { WorldQuestTraceVisual } from './world_quest_trace_visual';
 
@@ -18,6 +19,7 @@ export class WorldGuidance {
   private readonly island: IslandGuidance;
   private readonly trace: WorldQuestTraceVisual;
   private readonly cannon: CannonEncounterVisual;
+  private readonly turret: TurretDefenseVisual;
   private readonly glider: GliderCourseVisual;
   private readonly shadow: ShadowInfiltrationVisual;
   private readonly wispMaze: WispMazeVisual;
@@ -54,6 +56,13 @@ export class WorldGuidance {
       scene,
       groundAt,
       compileGate && ((root) => compileGate(root, true)),
+    );
+    // Built lazily at the seat and linked after first paint: it never joins
+    // readyForEntry, which would hold world entry for every player.
+    this.turret = new TurretDefenseVisual(
+      scene,
+      groundAt,
+      compileGate && ((root) => compileGate(root, false)),
     );
     this.glider = new GliderCourseVisual(
       scene,
@@ -101,6 +110,7 @@ export class WorldGuidance {
     );
     this.trace.update(world);
     this.cannon.update(world.vehicleSession, dt, reducedMotion);
+    this.turret.update(world.turretSession, world.turretClock, time, dt, reducedMotion);
     this.glider.update(world, renderedSelf?.group);
     this.shadow.update(world);
     this.wispMaze.update(world, reducedMotion);
@@ -109,6 +119,7 @@ export class WorldGuidance {
   dispose(): void {
     this.trace.dispose();
     this.cannon.dispose();
+    this.turret.dispose();
     this.glider.dispose();
     this.shadow.dispose();
     this.wispMaze.dispose();
