@@ -246,6 +246,16 @@
   body.operating-vehicle #player-frame:not(.pf-detached) {
     margin-bottom: 250px;
   }
+  /* That lift leaves the stack's box standing empty over the world in front of the seat:
+     let clicks through it so the aim reaches the ground there; its rows stay clickable. */
+  body.operating-vehicle :is(#bottom-bar, #actionbar-row, #actionbar-stack) {
+    pointer-events: none;
+  }
+  body.operating-vehicle
+    :is(#bottom-bar, #actionbar-row, #actionbar-stack)
+    > :not(#actionbar-row, #actionbar-stack) {
+    pointer-events: auto;
+  }
   .vehicle-bar {
     position: absolute;
     bottom: max(24px, env(safe-area-inset-bottom));
