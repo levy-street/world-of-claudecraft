@@ -9,6 +9,7 @@ import {
 } from '../src/sim/content/turret_defense';
 import {
   type MotionSegment,
+  marchSegment,
   planFlight,
   planSkid,
   positionAt,
@@ -365,7 +366,7 @@ describe('the shot', () => {
       (e) => e.type === 'impact' && e.shotId === shot.id,
     );
     expect(impact?.type === 'impact' && impact.hits).toEqual([
-      { id: m.id, falloff: 1, damage: 220 },
+      { id: m.id, falloff: 1, damage: 220, x: 0, y: 0, z: 20 },
     ]);
     expect(m.hp).toBe(480 - 220);
   });
@@ -424,6 +425,31 @@ describe('the shot', () => {
     expect(60 * impact.hits[2].falloff).toBeLessThan(0.5);
     expect(impact.hits.map((h) => h.damage)).toEqual([60, 30, 1]);
     expect(out.hp).toBe(10000);
+  });
+
+  it('places each hit where its body stood at the impact tick, on hills and on the move', () => {
+    const k = kind('large', 10000);
+    const state = createTurretDefense(plan([k], [[0, 0]]), { x: 0, z: 0 }, 5, START);
+    run(state, INTRO_END, hills);
+    spawnAll(state);
+    const [still, marching] = state.monsters;
+    pin(state, still, 1, 20, hills);
+    marching.state = 'march';
+    marching.seg = marchSegment(state.tick, -3, hills.ground(-3, 24), 24, 0, 0, 4, 2);
+    const shot = fireAt(state, 0, 21, hills);
+    const expected = positionAt(marching.seg, shot.impactTick, hills);
+    const events = run(state, shot.impactTick, hills);
+    const impact = events.find((e) => e.type === 'impact');
+    if (impact?.type !== 'impact') throw new Error('no impact');
+    expect(impact.hits.map((h) => h.id)).toEqual([still.id, marching.id]);
+    expect(impact.hits[0]).toMatchObject({ x: 1, y: hills.ground(1, 20), z: 20 });
+    expect(impact.hits[1].x).toBeCloseTo(expected.x, 12);
+    expect(impact.hits[1].y).toBeCloseTo(expected.y, 12);
+    expect(impact.hits[1].z).toBeCloseTo(expected.z, 12);
+    for (const hit of impact.hits) {
+      const launched = events.find((e) => e.type === 'launched' && e.id === hit.id);
+      expect(launched).toMatchObject({ x: hit.x, y: hit.y, z: hit.z });
+    }
   });
 
   it('reports an impact on empty ground with no hits', () => {

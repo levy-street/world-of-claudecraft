@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { TurretEvent } from '../src/sim/minigames/turret_defense';
+import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import {
   recordTurretFeedback,
   TURRET_FEEDBACK_LIMIT,
@@ -22,6 +23,23 @@ describe('the turret feedback ring', () => {
     expect(Object.isFrozen(ring[0].event)).toBe(true);
     expect(recordTurretFeedback(ring, next, 8, [])).toBe(next);
     expect(ring).toHaveLength(2);
+  });
+
+  it('holds the worst single-tick burst the plan can emit, its leading impact included', () => {
+    const widest = Math.max(...resolveTurretPlan().waves.map((w) => w.spawns.length));
+    expect(widest).toBe(16);
+    // The impact, then per body a launch and a kill, and per knock a bowled, launch and kill.
+    const burst = 1 + widest * 2 + widest * 3;
+    expect(TURRET_FEEDBACK_LIMIT).toBeGreaterThanOrEqual(burst);
+    const ring: TurretFeedback[] = [];
+    recordTurretFeedback(
+      ring,
+      1,
+      0,
+      Array.from({ length: burst }, (_, i) => event(i)),
+    );
+    expect(ring[0].seq).toBe(1);
+    expect(ring).toHaveLength(burst);
   });
 
   it('keeps only the newest entries once past the limit', () => {

@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TURRET_TANK_MOUNT, TURRET_TIMING } from '../src/sim/content/turret_defense';
 import { createTurretDefense, type TurretEvent } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
-import { recordTurretFeedback } from '../src/sim/minigames/turret_feedback';
+import { recordTurretFeedback, TURRET_FEEDBACK_LIMIT } from '../src/sim/minigames/turret_feedback';
 import { turretSessionView } from '../src/sim/turret_defense_session';
 import { TICK_RATE, type TurretSession } from '../src/sim/types';
 import { TurretFeedbackCursor, TurretHudView } from '../src/ui/hud/vehicle/turret_hud_view';
@@ -258,9 +258,10 @@ describe('the turret feedback cursor', () => {
   it('still announces what survived when older entries left the ring unseen', () => {
     const session = seat();
     const cursor = new TurretFeedbackCursor();
-    for (let i = 0; i < 40; i++)
+    const overflow = TURRET_FEEDBACK_LIMIT + 8;
+    for (let i = 0; i < overflow; i++)
       push(session, START + i, { type: 'killed', id: i, x: 0, y: 0, z: 0 });
-    push(session, START + 50, { type: 'ended', result: 'lost', stats: { ...stats } });
+    push(session, START + overflow + 10, { type: 'ended', result: 'lost', stats: { ...stats } });
     expect(session.feedback[0].seq).toBeGreaterThan(1);
     expect(cursor.consume(turretSessionView(session))).toEqual({ text: 'The turret has fallen' });
   });

@@ -4,6 +4,7 @@
 // the Hud live, as the inline construction did.
 import type { GamepadKind } from '../../../game/gamepad_map';
 import { keyCapLabel } from '../../../game/keybinds';
+import type { FctPainter } from '../../fct_painter';
 import { VehicleActionBarController } from './vehicle_action_bar_controller';
 
 type VehicleBarDeps = ConstructorParameters<typeof VehicleActionBarController>[0];
@@ -21,6 +22,7 @@ interface VehicleBarHost {
   renderer: VehicleBarDeps['presentation'];
   playerGroundAim: VehicleBarDeps['cancelOnEnter'][number];
   empowerHold: VehicleBarDeps['cancelOnEnter'][number];
+  fctPainter: Pick<FctPainter, 'spawn'>;
   attachTooltip(element: HTMLElement, html: () => string): void;
   showBanner(
     text: string,
@@ -44,5 +46,6 @@ export function createHudVehicleBar(hud: object): VehicleActionBarController {
     attachTooltip: (element, html) => h.attachTooltip(element, html),
     gliderPitchHold: (value) => h.optionsHooks?.gliderPitchHold?.(value),
     showBanner: (banner) => h.showBanner(banner.text, true, undefined, 'default', banner.subtext),
+    spawnFct: (event, now) => h.fctPainter.spawn(event, now),
   });
 }

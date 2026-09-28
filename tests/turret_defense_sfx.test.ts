@@ -8,7 +8,13 @@ import {
   turretBlastSize,
   turretSfxCueInto,
 } from '../src/game/turret_defense_sfx';
-import type { TurretEvent } from '../src/sim/minigames/turret_defense';
+import {
+  TURRET_KNOCK_SFX,
+  TURRET_THUMP_HEAVY_SFX,
+  TURRET_THUMP_LIGHT_SFX,
+} from '../src/game/turret_monster_sfx';
+import type { TurretEvent, TurretHit } from '../src/sim/minigames/turret_defense';
+import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import type { TurretFeedback } from '../src/sim/minigames/turret_feedback';
 import type { TurretSessionView } from '../src/world_api/vehicles';
 
@@ -24,7 +30,15 @@ const fired: TurretEvent = {
   flightTicks: 6,
   impactTick: 16,
 };
-const impact = (hits: { id: number; falloff: number; damage: number }[], z = 230): TurretEvent => ({
+const hit = (id: number, falloff: number, damage: number): TurretHit => ({
+  id,
+  falloff,
+  damage,
+  x: 100,
+  y: 5,
+  z: 230,
+});
+const impact = (hits: TurretHit[], z = 230): TurretEvent => ({
   type: 'impact',
   shotId: 1,
   x: 100,
@@ -37,10 +51,22 @@ function cue(): TurretSfxCue {
   return { key: '', x: 0, y: 0, z: 0, gain: 0, rate: 0, jitter: true };
 }
 
-function session(entries: TurretFeedback[], startTick = 0): TurretSessionView {
+const PLAN = resolveTurretPlan();
+/** Monster 1 is a wolf (kind 0), monster 2 the plan's first huge kind. */
+const HUGE = PLAN.kinds.findIndex((k) => k.sizeClass === 'huge');
+const monsters = [
+  { id: 1, kind: 0 },
+  { id: 2, kind: HUGE },
+];
+
+function session(
+  entries: TurretFeedback[],
+  startTick = 0,
+  bodies: readonly { id: number; kind: number }[] = monsters,
+): TurretSessionView {
   return {
     origin,
-    defense: { startTick } as TurretSessionView['defense'],
+    defense: { startTick, plan: PLAN, monsters: bodies } as unknown as TurretSessionView['defense'],
     waveCount: 6,
     monstersLeft: 0,
     feedback: entries,
@@ -74,7 +100,7 @@ describe('Fire and Fly sound cues', () => {
 
   it('plays the blast louder and deeper-to-brighter with its size, from a pulled-in point', () => {
     const miss = turretSfxCueInto(impact([]), origin, cue());
-    const direct = turretSfxCueInto(impact([{ id: 1, falloff: 1, damage: 10 }]), origin, cue());
+    const direct = turretSfxCueInto(impact([hit(1, 1, 10)]), origin, cue());
     expect(miss?.key).toBe(TURRET_IMPACT_SFX);
     expect(direct?.gain).toBeGreaterThan(miss?.gain ?? 0);
     expect(direct?.rate).toBeGreaterThan(miss?.rate ?? 0);
@@ -102,28 +128,83 @@ describe('Fire and Fly sound cues', () => {
   });
 });
 
+const voices = (templateId: string, action: string) => `${templateId}_${action}`;
+const player = (s: ReturnType<typeof sink>, clock = () => 0) =>
+  new TurretDefenseSfx(s, voices, clock);
+
 describe('Fire and Fly sound player', () => {
-  it('preloads both samples once, at the first seat it sees', () => {
+  it('preloads every clip a seat can play once, at the first seat it sees', () => {
     const s = sink();
-    const sounds = new TurretDefenseSfx(s);
+    const sounds = player(s);
     sounds.update(null);
     expect(s.preload).not.toHaveBeenCalled();
     sounds.update(session([]));
     sounds.update(session([], 40));
+    const templates = [...new Set(PLAN.kinds.map((k) => k.templateId))];
     expect(s.preload.mock.calls.map((c) => c[0]).sort()).toEqual(
-      [TURRET_FIRE_SFX, TURRET_IMPACT_SFX].sort(),
+      [
+        TURRET_FIRE_SFX,
+        TURRET_IMPACT_SFX,
+        TURRET_THUMP_LIGHT_SFX,
+        TURRET_THUMP_HEAVY_SFX,
+        TURRET_KNOCK_SFX,
+        ...templates.flatMap((id) => [`${id}_hurt`, `${id}_death`]),
+      ].sort(),
     );
+  });
+
+  it('resolves the real cries of every planned monster by default', () => {
+    const s = sink();
+    new TurretDefenseSfx(s).update(session([]));
+    const preloaded = s.preload.mock.calls.map((c) => c[0]);
+    expect(preloaded).toContain('mob_beast_wolf_hurt');
+    expect(preloaded).toContain('mob_ogre_death');
+    const clips: Record<string, unknown> = SFX_CLIPS;
+    for (const key of preloaded) expect(clips[key], key).toBeDefined();
+  });
+
+  it('plays the monsters from a point pulled toward the turret, like the blast', () => {
+    const s = sink();
+    const sounds = player(s);
+    sounds.update(session([entry(1, 10, { type: 'landed', id: 2, x: 100, y: 5, z: 230 })]), 10);
+    expect(s.playAt).toHaveBeenCalledTimes(1);
+    const [key, x, y, z] = s.playAt.mock.calls[0];
+    expect(key).toBe(TURRET_THUMP_HEAVY_SFX);
+    expect(x).toBeCloseTo(100, 12);
+    expect(y).toBe(5);
+    expect(z).toBeCloseTo(200 + 15.7, 9);
+  });
+
+  it('keeps the monster gaps on its own clock, read once per batch', () => {
+    const s = sink();
+    let now = 1000;
+    const clock = vi.fn(() => now);
+    const sounds = player(s, clock);
+    const ring = [entry(1, 10, { type: 'landed', id: 1, x: 100, y: 5, z: 205 })];
+    sounds.update(session(ring), 10);
+    sounds.update(session(ring), 10);
+    expect(clock).toHaveBeenCalledTimes(1);
+    now += 50;
+    ring.push(entry(2, 11, { type: 'landed', id: 2, x: 100, y: 5, z: 205 }));
+    sounds.update(session(ring), 11);
+    now += 50;
+    ring.push(entry(3, 12, { type: 'landed', id: 2, x: 100, y: 5, z: 205 }));
+    sounds.update(session(ring), 12);
+    expect(s.playAt.mock.calls.map((c) => c[0])).toEqual([
+      TURRET_THUMP_LIGHT_SFX,
+      TURRET_THUMP_HEAVY_SFX,
+    ]);
   });
 
   it('plays each feedback entry once, by sequence number, and restarts with a new seat', () => {
     const s = sink();
-    const sounds = new TurretDefenseSfx(s);
+    const sounds = player(s);
     const ring = [entry(1, 10, fired)];
     sounds.update(session(ring), 10);
     sounds.update(session(ring), 11);
     expect(s.playAt).toHaveBeenCalledTimes(1);
     expect(s.playAt.mock.calls[0][0]).toBe(TURRET_FIRE_SFX);
-    ring.push(entry(2, 16, impact([])), entry(3, 16, { type: 'landed', id: 1, x: 0, y: 0, z: 0 }));
+    ring.push(entry(2, 16, impact([])), entry(3, 16, { type: 'windupStart', id: 1, x: 0, z: 0 }));
     sounds.update(session(ring), 16);
     expect(s.playAt).toHaveBeenCalledTimes(2);
     expect(s.playAt.mock.calls[1][0]).toBe(TURRET_IMPACT_SFX);
@@ -136,7 +217,7 @@ describe('Fire and Fly sound player', () => {
 
   it('restarts when the seat is taken again on the same start tick, its sequence back at 1', () => {
     const s = sink();
-    const sounds = new TurretDefenseSfx(s);
+    const sounds = player(s);
     sounds.update(session([entry(1, 10, fired), entry(2, 10, fired), entry(3, 10, fired)]), 10);
     expect(s.playAt).toHaveBeenCalledTimes(3);
     sounds.update(session([entry(1, 12, fired)]), 12);
@@ -145,7 +226,7 @@ describe('Fire and Fly sound player', () => {
 
   it('plays every entry of a new seat, even one whose ring already runs past the old sequence', () => {
     const s = sink();
-    const sounds = new TurretDefenseSfx(s);
+    const sounds = player(s);
     sounds.update(session([entry(1, 10, fired), entry(2, 10, fired), entry(3, 10, fired)]), 10);
     s.playAt.mockClear();
     const next = [1, 2, 3, 4].map((seq) => entry(seq, 50, fired));
@@ -155,22 +236,49 @@ describe('Fire and Fly sound player', () => {
 
   it('still plays an entry exactly ten ticks old at its first read, not eleven', () => {
     const fresh = sink();
-    new TurretDefenseSfx(fresh).update(session([entry(1, 50, fired)]), 60);
+    player(fresh).update(session([entry(1, 50, fired)]), 60);
     expect(fresh.playAt).toHaveBeenCalledTimes(1);
     const late = sink();
-    new TurretDefenseSfx(late).update(session([entry(1, 49, fired)]), 60);
+    player(late).update(session([entry(1, 49, fired)]), 60);
     expect(late.playAt).not.toHaveBeenCalled();
   });
 
   it('plays nothing for entries already stale when first read', () => {
     const s = sink();
-    const sounds = new TurretDefenseSfx(s);
-    sounds.update(session([entry(1, 10, fired), entry(2, 16, impact([]))]), 60);
+    const sounds = player(s);
+    const stale = [
+      entry(1, 10, fired),
+      entry(2, 16, impact([])),
+      entry(3, 16, { type: 'launched', id: 1, x: 100, y: 5, z: 205, vx: 0, vy: 5, vz: 0 }),
+      entry(4, 16, { type: 'landed', id: 2, x: 100, y: 5, z: 205 }),
+    ];
+    sounds.update(session(stale), 60);
     expect(s.playAt).not.toHaveBeenCalled();
-    sounds.update(
-      session([entry(1, 10, fired), entry(2, 16, impact([])), entry(3, 60, fired)]),
-      60,
-    );
+    sounds.update(session([...stale, entry(5, 60, fired)]), 60);
     expect(s.playAt).toHaveBeenCalledTimes(1);
+  });
+
+  it("forgets the last seat's monsters when a new seat reuses their ids", () => {
+    const s = sink();
+    let now = 0;
+    const sounds = player(s, () => now);
+    sounds.update(session([entry(1, 10, { type: 'killed', id: 1, x: 100, y: 5, z: 205 })]), 10);
+    expect(s.playAt.mock.calls.map((c) => c[0])).toEqual([`${PLAN.kinds[0].templateId}_death`]);
+    now += 5000;
+    const reborn: TurretEvent = {
+      type: 'launched',
+      id: 1,
+      x: 100,
+      y: 5,
+      z: 205,
+      vx: 0,
+      vy: 5,
+      vz: 0,
+    };
+    sounds.update(session([entry(1, 50, reborn)], 40, [{ id: 1, kind: HUGE }]), 50);
+    expect(s.playAt.mock.calls.map((c) => c[0])).toEqual([
+      `${PLAN.kinds[0].templateId}_death`,
+      `${PLAN.kinds[HUGE].templateId}_hurt`,
+    ]);
   });
 });

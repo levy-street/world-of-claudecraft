@@ -24,6 +24,7 @@ import { ForgeActionBarController, type ForgeBarWorld } from './forge_action_bar
 import { createGliderActionBarView, gliderBoostDescription } from './glider_action_bar_view';
 import { ShadowActionBarController } from './shadow_action_bar_controller';
 import { type TurretAimCore, vehicleOwnsAim } from './turret_aim_core';
+import type { TurretFctSpawn } from './turret_damage_numbers_core';
 import { TurretHudController } from './turret_hud_controller';
 import type { TurretBanner } from './turret_hud_view';
 import { createVehicleActionBarView } from './vehicle_action_bar_view';
@@ -48,6 +49,8 @@ interface VehicleBarDeps {
   cancelOnEnter: readonly { cancel(): void }[];
   /** The HUD banner slot, for the turret's wave and result announcements. */
   showBanner?(banner: TurretBanner): void;
+  /** The HUD's floating combat text, for the turret's damage numbers. */
+  spawnFct?: TurretFctSpawn;
   /** Flight bar Climb/Dive slots: a held pointer pins the glider pitch (+1 climb,
    *  -1 dive) until release; 0 hands control back to the camera. */
   gliderPitchHold?(value: -1 | 0 | 1): void;
@@ -189,12 +192,10 @@ export class VehicleActionBarController {
     );
     deps.writers.setDisplay(this.root, 'none');
     document.getElementById('ui')?.append(this.root);
-    this.turret = new TurretHudController(
-      deps.world,
-      deps.writers,
-      deps.cancelOnEnter,
-      deps.showBanner,
-    );
+    this.turret = new TurretHudController(deps.world, deps.writers, deps.cancelOnEnter, {
+      showBanner: deps.showBanner,
+      spawnFct: deps.spawnFct,
+    });
   }
 
   /** The seat's ground aim: the cannon's per-shot aim, or the turret's standing one. */

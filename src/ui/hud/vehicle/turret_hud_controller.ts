@@ -4,6 +4,7 @@ import type { IWorldVehicles } from '../../../world_api/vehicles';
 import { t } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
 import { TurretAimCore } from './turret_aim_core';
+import { TurretDamageNumbers, type TurretFctSpawn } from './turret_damage_numbers_core';
 import {
   TURRET_RESULT_LINES,
   type TurretBanner,
@@ -15,6 +16,12 @@ type TurretHudWorld = Pick<
   IWorldVehicles,
   'turretSession' | 'turretClock' | 'useVehicleAction' | 'leaveVehicle'
 >;
+
+/** The HUD surfaces the seat reports through: the banner slot and the floating combat text. */
+export interface TurretHudHooks {
+  showBanner?(banner: TurretBanner): void;
+  spawnFct?: TurretFctSpawn;
+}
 
 /** The Fire and Fly seat HUD: integrity, wave, countdowns, the result panel and Leave. */
 export class TurretHudController {
@@ -35,14 +42,18 @@ export class TurretHudController {
   private readonly view = new TurretHudView();
   private readonly feedback = new TurretFeedbackCursor();
   private readonly sounds = new TurretDefenseSfx();
+  private readonly numbers: TurretDamageNumbers | null;
   private seated = false;
   constructor(
     private readonly world: TurretHudWorld,
     private readonly writers: PainterHostWriters,
     private readonly cancelOnEnter: readonly { cancel(): void }[],
-    private readonly showBanner?: (banner: TurretBanner) => void,
+    private readonly hooks: TurretHudHooks = {},
   ) {
     this.aim = new TurretAimCore(world);
+    this.numbers = hooks.spawnFct
+      ? new TurretDamageNumbers(hooks.spawnFct, () => performance.now())
+      : null;
     this.root.id = 'turret-hud';
     this.root.className = 'vehicle-bar turret-bar';
     this.title.className = 'vehicle-bar-title';
@@ -89,8 +100,9 @@ export class TurretHudController {
       writers.setDisplay(this.root, seated ? 'grid' : 'none');
     }
     const banner = this.feedback.consume(session);
-    if (banner) this.showBanner?.(banner);
+    if (banner) this.hooks.showBanner?.(banner);
     this.sounds.update(session, this.world.turretClock);
+    this.numbers?.update(session, this.world.turretClock);
     if (!session) return;
     const frame = this.view.tick(session, this.world.turretClock);
     writers.setText(this.title, t('hudChrome.turret.title'));

@@ -1,26 +1,47 @@
-// Fire and Fly sounds: the cannon's report at the muzzle and the shell's blast
-// where it lands, each played once per feedback entry (by sequence number) from
-// the seat HUD's frame. Both samples are preloaded the first time a seat is seen.
+// Fire and Fly sounds: the cannon's report at the muzzle, the shell's blast where
+// it lands, and the monsters' cries, thumps and knocks (turret_monster_sfx.ts),
+// each read once per feedback entry (by sequence number) from the seat HUD's
+// frame. Every clip a seat can play is preloaded when the seat is first seen.
+
 import type { TurretEvent } from '../sim/minigames/turret_defense';
-import { turretFeedbackSince } from '../sim/minigames/turret_feedback';
+import { TurretFeedbackReader } from '../ui/hud/vehicle/turret_feedback_reader_core';
+import { availableMobVoiceCue } from '../ui/hud_voice_cues';
 import type { TurretSessionView } from '../world_api/vehicles';
 import { type PlayOpts, sfx } from './sfx';
+import {
+  TURRET_KNOCK_SFX,
+  TURRET_THUMP_HEAVY_SFX,
+  TURRET_THUMP_LIGHT_SFX,
+  TurretMonsterSfx,
+  type TurretVoiceCue,
+  turretVoiceKeys,
+} from './turret_monster_sfx';
 
 export const TURRET_FIRE_SFX = 'proj_groundshaker';
 export const TURRET_IMPACT_SFX = 'impact_groundshaker';
+const SEAT_SFX = [
+  TURRET_FIRE_SFX,
+  TURRET_IMPACT_SFX,
+  TURRET_THUMP_LIGHT_SFX,
+  TURRET_THUMP_HEAVY_SFX,
+  TURRET_KNOCK_SFX,
+] as const;
 
 /** The muzzle sits this high over the turret and this far toward the shot. */
 const MUZZLE_LIFT = 2.2;
 const MUZZLE_REACH = 2;
 /**
- * A blast is heard from a point pulled toward the turret: yards past NEAR count
- * for FAR_SHARE of a yard, so a shell landing at the edge of the field stays
- * inside the one-shot cutoff (sfx MAX_DISTANCE, measured from the camera behind
- * the tank) instead of going silent. The direction is kept.
+ * Field sounds are heard from a point pulled toward the turret: yards past NEAR
+ * count for FAR_SHARE of a yard, so a shell landing or a body falling at the edge
+ * of the field stays inside the one-shot cutoff (sfx MAX_DISTANCE, measured from
+ * the camera behind the tank) instead of going silent. The direction is kept.
  */
 const NEAR = 8;
 const FAR_SHARE = 0.35;
-/** An entry older than this many ticks at its first read (a seat joined late) plays nothing. */
+/**
+ * An entry older than this many ticks at its first read plays nothing: a seat joined
+ * late, or a stall long enough that the moment has passed.
+ */
 const STALE_TICKS = 10;
 
 export interface TurretSfxSink {
@@ -36,6 +57,20 @@ export interface TurretSfxCue {
   gain: number;
   rate: number;
   jitter: boolean;
+}
+
+/** Pulls `point` toward the turret along its bearing (see NEAR). */
+export function turretHeardInto(
+  origin: { readonly x: number; readonly z: number },
+  point: { x: number; z: number },
+): void {
+  const dx = point.x - origin.x;
+  const dz = point.z - origin.z;
+  const dist = Math.hypot(dx, dz);
+  const heard = dist > NEAR ? NEAR + (dist - NEAR) * FAR_SHARE : dist;
+  const pull = dist > 1e-6 ? heard / dist : 1;
+  point.x = origin.x + dx * pull;
+  point.z = origin.z + dz * pull;
 }
 
 /** How big a blast was, 0 to 1: its strongest hit, plus a little per extra body caught. */
@@ -67,15 +102,11 @@ export function turretSfxCueInto(
   }
   if (event.type === 'impact') {
     const size = turretBlastSize(event.hits);
-    const dx = event.x - origin.x;
-    const dz = event.z - origin.z;
-    const dist = Math.hypot(dx, dz);
-    const heard = dist > NEAR ? NEAR + (dist - NEAR) * FAR_SHARE : dist;
-    const pull = dist > 1e-6 ? heard / dist : 1;
     out.key = TURRET_IMPACT_SFX;
-    out.x = origin.x + dx * pull;
+    out.x = event.x;
     out.y = event.y;
-    out.z = origin.z + dz * pull;
+    out.z = event.z;
+    turretHeardInto(origin, out);
     out.gain = (0.65 + 0.25 * size) * 1.5;
     out.rate = 0.9 + 0.2 * size;
     out.jitter = true;
@@ -85,9 +116,10 @@ export function turretSfxCueInto(
 }
 
 export class TurretDefenseSfx {
-  private startTick: number | null = null;
-  private lastSeq = 0;
-  private preloaded = false;
+  private readonly reader = new TurretFeedbackReader();
+  private readonly monsters: TurretMonsterSfx;
+  private readonly preloaded = new Set<string>();
+  private origin: { readonly x: number; readonly z: number } = { x: 0, z: 0 };
   private readonly cue: TurretSfxCue = {
     key: '',
     x: 0,
@@ -98,35 +130,52 @@ export class TurretDefenseSfx {
     jitter: true,
   };
 
-  constructor(private readonly sink: TurretSfxSink = sfx) {}
+  /** `now` is a millisecond clock for the monster sounds' gaps. */
+  constructor(
+    private readonly sink: TurretSfxSink = sfx,
+    private readonly voiceCue: TurretVoiceCue = availableMobVoiceCue,
+    private readonly now: () => number = () => performance.now(),
+  ) {
+    this.monsters = new TurretMonsterSfx(voiceCue);
+  }
 
   /** `clock` is the seat's sim tick (IWorld.turretClock), null when unknown. */
   update(session: TurretSessionView | null, clock: number | null = null): void {
     if (!session) return;
-    if (!this.preloaded) {
-      this.preloaded = true;
-      this.sink.preload(TURRET_FIRE_SFX);
-      this.sink.preload(TURRET_IMPACT_SFX);
+    const fresh = this.reader.read(session);
+    if (this.reader.newSeat) {
+      this.monsters.reset();
+      for (const key of SEAT_SFX) this.preload(key);
+      for (const key of turretVoiceKeys(session.defense.plan, this.voiceCue)) this.preload(key);
     }
-    const ring = session.feedback;
-    const newest = ring.length ? ring[ring.length - 1].seq : 0;
-    // A new seat: a new start tick, or a sequence that went back (a seat taken
-    // again within the same tick).
-    if (session.defense.startTick !== this.startTick || newest < this.lastSeq) {
-      this.startTick = session.defense.startTick;
-      this.lastSeq = 0;
-    }
-    if (newest <= this.lastSeq) return;
-    for (const entry of turretFeedbackSince(ring, this.lastSeq)) {
-      this.lastSeq = entry.seq;
+    if (fresh.length === 0) return;
+    const now = this.now();
+    this.origin = session.origin;
+    for (const entry of fresh) {
       if (clock !== null && entry.tick < clock - STALE_TICKS) continue;
       const cue = turretSfxCueInto(entry.event, session.origin, this.cue);
-      if (!cue) continue;
-      this.sink.playAt(cue.key, cue.x, cue.y, cue.z, {
-        gain: cue.gain,
-        rate: cue.rate,
-        jitter: cue.jitter,
-      });
+      if (cue) this.play(cue);
+      else this.monsters.offer(entry.event, session, now);
     }
+    this.monsters.flush(now, this.playHeard);
+  }
+
+  private readonly playHeard = (cue: TurretSfxCue): void => {
+    turretHeardInto(this.origin, cue);
+    this.play(cue);
+  };
+
+  private play(cue: TurretSfxCue): void {
+    this.sink.playAt(cue.key, cue.x, cue.y, cue.z, {
+      gain: cue.gain,
+      rate: cue.rate,
+      jitter: cue.jitter,
+    });
+  }
+
+  private preload(key: string): void {
+    if (this.preloaded.has(key)) return;
+    this.preloaded.add(key);
+    this.sink.preload(key);
   }
 }

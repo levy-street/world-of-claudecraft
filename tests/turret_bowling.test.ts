@@ -237,7 +237,16 @@ describe('a knock', () => {
     const { state, flyer, struck, from } = headOn();
     const events = run(state, from + 5);
     expect(bowls(events)).toEqual([
-      { type: 'bowled', flyerId: flyer.id, struckId: struck.id, x: 0, y: 0, z: 30, speed: 20 },
+      {
+        type: 'bowled',
+        flyerId: flyer.id,
+        struckId: struck.id,
+        x: 0,
+        y: 0,
+        z: 30,
+        speed: 20,
+        damage: KNOCK_DAMAGE,
+      },
     ]);
     const launched = events.find((e) => e.type === 'launched' && e.id === struck.id);
     expect(launched).toMatchObject({ x: 0, y: 0, z: 30 });
@@ -277,7 +286,9 @@ describe('a knock', () => {
       const [flyer, struck] = ms;
       stand(state, struck, 0, 30);
       launch(state, flyer, { x: 0, y: 0.3, z: 24 }, { x: 0, y: 5, z: 20 });
-      expect(bowls(run(state, state.tick + 5)), `${cores} wave ${wave}`).toHaveLength(1);
+      const knocks = bowls(run(state, state.tick + 5));
+      expect(knocks, `${cores} wave ${wave}`).toHaveLength(1);
+      expect(knocks[0].damage, `${cores} wave ${wave}`).toBe(damage);
       expect(struck.hp, `${cores} wave ${wave}`).toBe(100000 - damage);
     }
   });
@@ -620,7 +631,7 @@ describe('the toggle', () => {
     'turned off, a %s full run replays the pre-bowling engine exactly',
     (_name, seed, probe, count, digest) => {
       const r = fullRun(seed, resolveTurretPlan(undefined, undefined, OFF), probe, aimNearest);
-      const text = r.trace.map((s) => JSON.stringify(JSON.parse(s), dropBowled)).join('\n');
+      const text = r.trace.map((s) => JSON.stringify(JSON.parse(s), dropLaterFields)).join('\n');
       expect(r.trace).toHaveLength(count);
       expect(fnv(text)).toBe(digest);
       expect(r.state.stats.bowled).toBe(0);
@@ -721,8 +732,11 @@ function fullRun(
   return { state, trace };
 }
 
-function dropBowled(key: string, value: unknown): unknown {
-  return key === 'bowled' ? undefined : value;
+/** Drops what the engine gained after these digests: the bowled stat and each hit's position. */
+function dropLaterFields(this: object, key: string, value: unknown): unknown {
+  if (key === 'bowled') return undefined;
+  if ('falloff' in this && (key === 'x' || key === 'y' || key === 'z')) return undefined;
+  return value;
 }
 
 function fnv(text: string): string {

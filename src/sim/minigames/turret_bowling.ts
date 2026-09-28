@@ -155,6 +155,7 @@ function knock(
     y: at.y,
     z: at.z,
     speed,
+    damage,
   });
   events.push({
     type: 'launched',

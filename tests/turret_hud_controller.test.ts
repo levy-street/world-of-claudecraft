@@ -2,6 +2,11 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { sfx } from '../src/game/sfx';
 import { TURRET_FIRE_SFX, TURRET_IMPACT_SFX } from '../src/game/turret_defense_sfx';
+import {
+  TURRET_KNOCK_SFX,
+  TURRET_THUMP_HEAVY_SFX,
+  TURRET_THUMP_LIGHT_SFX,
+} from '../src/game/turret_monster_sfx';
 import { TURRET_TANK_MOUNT, TURRET_TIMING } from '../src/sim/content/turret_defense';
 import { createTurretDefense } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
@@ -18,7 +23,12 @@ import type { TurretSessionView } from '../src/world_api/vehicles';
 
 vi.mock('../src/ui/icons', () => ({ iconDataUrl: (_kind: string, key: string) => `/${key}.webp` }));
 vi.mock('../src/game/sfx', () => ({
-  sfx: { preload: vi.fn(), playUi: vi.fn(), playAt: vi.fn(() => true) },
+  sfx: {
+    preload: vi.fn(),
+    playUi: vi.fn(),
+    playAt: vi.fn(() => true),
+    hasVariants: () => false,
+  },
 }));
 
 const START = 400;
@@ -29,6 +39,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.restoreAllMocks();
   document.body.replaceChildren();
   document.body.className = '';
 });
@@ -161,7 +172,7 @@ it('marks a won result panel', () => {
   expect(text('.turret-result-title')).toBe('Victory!');
 });
 
-it('hands the HUD banner its text, motion, variant and the final-wave subtext', () => {
+function hudHost() {
   const world = {
     vehicleSession: null as VehicleSession | null,
     turretSession: null as TurretSessionView | null,
@@ -171,6 +182,7 @@ it('hands the HUD banner its text, motion, variant and the final-wave subtext', 
     leaveVehicle: vi.fn(),
   };
   const showBanner = vi.fn();
+  const spawn = vi.fn();
   const bar = createHudVehicleBar({
     sim: world,
     writerFacet: makeWriterFacet(new Map(), new Map(), new Map(), new Map(), vi.fn(), () => {}),
@@ -180,9 +192,68 @@ it('hands the HUD banner its text, motion, variant and the final-wave subtext', 
     renderer: undefined,
     playerGroundAim: { cancel: vi.fn() },
     empowerHold: { cancel: vi.fn() },
+    fctPainter: { spawn },
     attachTooltip: () => {},
     showBanner,
   });
+  return { world, bar, showBanner, spawn };
+}
+
+it("floats each hit's damage through the HUD floating combat text, once", () => {
+  vi.spyOn(performance, 'now').mockReturnValue(1234);
+  const { world, bar, spawn } = hudHost();
+  const session = seat();
+  session.nextFeedbackSeq = recordTurretFeedback(session.feedback, session.nextFeedbackSeq, START, [
+    {
+      type: 'impact',
+      shotId: 1,
+      x: 20,
+      y: 0,
+      z: 0,
+      hits: [{ id: 7, falloff: 1, damage: 60, x: 19, y: 0, z: 1 }],
+    },
+  ]);
+  world.turretSession = turretSessionView(session);
+  world.turretClock = START;
+  bar.update();
+  bar.update();
+  expect(spawn).toHaveBeenCalledTimes(1);
+  expect(spawn.mock.calls[0][0]).toMatchObject({
+    kind: 'damage-done-ability',
+    text: '60!',
+    crit: true,
+    target: { pos: { x: 19, y: 0, z: 1 } },
+  });
+  expect(spawn.mock.calls[0][1]).toBe(1234);
+});
+
+it('floats nothing for a hit already stale on the seat clock at its first read', () => {
+  const { world, bar, spawn } = hudHost();
+  const session = seat();
+  const hit = { id: 7, falloff: 1, damage: 60, x: 19, y: 0, z: 1 };
+  session.nextFeedbackSeq = recordTurretFeedback(
+    session.feedback,
+    session.nextFeedbackSeq,
+    START - 11,
+    [{ type: 'impact', shotId: 1, x: 20, y: 0, z: 0, hits: [hit] }],
+  );
+  world.turretSession = turretSessionView(session);
+  world.turretClock = START;
+  bar.update();
+  expect(spawn).not.toHaveBeenCalled();
+  session.nextFeedbackSeq = recordTurretFeedback(
+    session.feedback,
+    session.nextFeedbackSeq,
+    START - 10,
+    [{ type: 'impact', shotId: 2, x: 20, y: 0, z: 0, hits: [hit] }],
+  );
+  world.turretSession = turretSessionView(session);
+  bar.update();
+  expect(spawn).toHaveBeenCalledTimes(1);
+});
+
+it('hands the HUD banner its text, motion, variant and the final-wave subtext', () => {
+  const { world, bar, showBanner } = hudHost();
   const session = seat();
   session.nextFeedbackSeq = recordTurretFeedback(session.feedback, session.nextFeedbackSeq, START, [
     { type: 'waveStart', wave: 5, count: 9 },
@@ -262,5 +333,15 @@ it('plays the cannon report and the blast once each from the seat frame', () => 
     TURRET_IMPACT_SFX,
   ]);
   const preloaded = vi.mocked(sfx.preload).mock.calls.map((call) => call[0]);
-  expect(preloaded).toEqual(expect.arrayContaining([TURRET_FIRE_SFX, TURRET_IMPACT_SFX]));
+  expect(preloaded).toEqual(
+    expect.arrayContaining([
+      TURRET_FIRE_SFX,
+      TURRET_IMPACT_SFX,
+      TURRET_THUMP_LIGHT_SFX,
+      TURRET_THUMP_HEAVY_SFX,
+      TURRET_KNOCK_SFX,
+      'mob_beast_death',
+      'mob_ogre_hurt',
+    ]),
+  );
 });

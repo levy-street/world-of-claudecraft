@@ -1,9 +1,9 @@
 import { TURRET_TIMING } from '../../../sim/content/turret_defense';
 import type { TurretEvent } from '../../../sim/minigames/turret_defense';
-import { turretFeedbackSince } from '../../../sim/minigames/turret_feedback';
 import { TICK_RATE } from '../../../sim/types';
 import type { TurretSessionView } from '../../../world_api/vehicles';
 import { formatNumber, getI18nRevision, t } from '../../i18n';
+import { TurretFeedbackReader } from './turret_feedback_reader_core';
 
 /** Below this share of the bar, the gauge turns to its danger colour. */
 const LOW_INTEGRITY = 0.25;
@@ -172,27 +172,17 @@ function bannerFor(event: TurretEvent, waveCount: number): TurretBanner | null {
 }
 
 /**
- * Reads the seat's feedback ring once per entry, and one batch yields at most one
- * banner. The cursor restarts with every seat: a new start tick, or a sequence that
- * went back (a seat taken again within the same tick). A missing view keeps it, so
- * the same seat seen again never replays a banner.
+ * Reads the seat's feedback ring once per entry (TurretFeedbackReader), and one batch
+ * yields at most one banner. A missing view keeps the reader's place, so the same
+ * seat seen again never replays a banner.
  */
 export class TurretFeedbackCursor {
-  private startTick: number | null = null;
-  private lastSeq = 0;
+  private readonly reader = new TurretFeedbackReader();
   consume(session: TurretSessionView | null): TurretBanner | null {
     if (!session) return null;
-    const ring = session.feedback;
-    const newest = ring.length ? ring[ring.length - 1].seq : 0;
-    if (session.defense.startTick !== this.startTick || newest < this.lastSeq) {
-      this.startTick = session.defense.startTick;
-      this.lastSeq = 0;
-    }
-    if (newest <= this.lastSeq) return null;
     let banner: TurretBanner | null = null;
     let rank = 0;
-    for (const entry of turretFeedbackSince(ring, this.lastSeq)) {
-      this.lastSeq = entry.seq;
+    for (const entry of this.reader.read(session)) {
       const entryRank = BANNER_RANK[entry.event.type] ?? 0;
       if (entryRank === 0 || entryRank < rank) continue;
       banner = bannerFor(entry.event, session.waveCount);

@@ -125,6 +125,10 @@ export interface TurretHit {
   id: number;
   falloff: number;
   damage: number;
+  /** Where the struck body stood at the impact tick. */
+  x: number;
+  y: number;
+  z: number;
 }
 
 export type TurretEvent =
@@ -169,6 +173,8 @@ export type TurretEvent =
       y: number;
       z: number;
       speed: number;
+      /** The knock's damage, before the struck body's health floors it at 0. */
+      damage: number;
     }
   | { type: 'splash'; id: number; x: number; y: number; z: number }
   | { type: 'killed'; id: number; x: number; y: number; z: number }
@@ -487,7 +493,7 @@ function detonate(
     if (!(falloff > 0)) continue;
     const damage = Math.max(1, Math.round(shot.damage * falloff));
     m.hp = Math.max(0, m.hp - damage);
-    hits.push({ id: m.id, falloff, damage });
+    hits.push({ id: m.id, falloff, damage, x: p.x, y: p.y, z: p.z });
     launch(state, m, shot, falloff, p, tick, probe, events);
     if (m.hp <= 0) {
       state.stats.kills++;
