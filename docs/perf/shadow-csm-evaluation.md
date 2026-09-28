@@ -399,7 +399,7 @@ interacts:
 | `src/render/blade_grass.ts`, `src/render/blade_grass_band.ts` | `buildBladeGrass`, `buildBladeGrassBand` | `<common>`, `<begin_vertex>`, `<color_vertex>`, `<beginnormal_vertex>` | **assign**, no cache key | Would erase a prior CSM hook. |
 | `src/render/voxel_terrain.ts` | `buildVoxelTerrain` | `<common>`, `<begin_vertex>`, `<map_fragment>` | **assigns**, no cache key | Would erase a prior CSM hook. |
 | `src/render/vale_cup_stadium.ts` | `clothMaterial` (via `buildValeCupStadium`) | `<common>`, `<begin_vertex>` | **assigns**, relies on default key | Would erase a prior CSM hook. |
-| `src/render/props.ts` | `drownVeilMaterial` (via `buildProps`) | `<map_fragment>` | **assigns**, clobbers cache key | Would erase a prior CSM hook. |
+| `src/render/drowned_veil_material.ts` | `drownVeilMaterial` (via `buildProps`) | `<map_fragment>` | composes, folds prior key | Erased if after. |
 | `src/render/sky.ts` | `deferBasicSkyFragments` (via `buildSky`) | `<logdepthbuf_vertex>` | **assigns**, clobbers cache key | Sky is unlit; no CSM need, so no conflict in practice. |
 | `src/render/shadow_only_material.ts` | `makeShadowOnlyMaterial` | none (copies `onBeforeCompile` and `customProgramCacheKey` from a source) | copy-through | Would copy a CSM hook forward, which is probably correct but is another surface to re-verify. |
 

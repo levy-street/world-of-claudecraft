@@ -5,7 +5,7 @@
 // surface detail every other delve entrance carries.
 
 import * as THREE from 'three';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   attachBiomeHaze,
   disposeBiomeHazeField,
@@ -126,8 +126,67 @@ describe('drownVeilMaterial', () => {
     expect(shader.fragmentShader).toContain('float _veilRed');
   });
 
+  it('grants no layer the source never carried', () => {
+    const source = new THREE.MeshStandardMaterial({ color: 0xffffff });
+    applySurfaceDetail(source, 'rock', { strength: 0.45 });
+    const drowned = drownVeilMaterial(source);
+    expect(drowned.customProgramCacheKey()).not.toContain('woc-zone-haze');
+    const fragment = compiled(drowned).fragmentShader;
+    expect(fragment).not.toContain('uHazeField');
+    expect(fragment).toContain('float _veilRed');
+  });
+
   it('clones once per source material', () => {
     const source = convertedArchMaterial();
     expect(drownVeilMaterial(source)).toBe(drownVeilMaterial(source));
+  });
+});
+
+// The worn layer compiles to a pass-through until its family textures resolve,
+// so the cases above see only its key. Here the textures are ready (loader and
+// preload mocked, as tests/worn_stone_shader.test.ts does) and the layer's GLSL
+// is really spliced: the recolor must still read the raw texel, ahead of it.
+describe('drownVeilMaterial over a ready worn layer', () => {
+  afterAll(() => {
+    vi.unstubAllGlobals();
+    vi.doUnmock('../src/render/assets/loader');
+    vi.doUnmock('../src/render/assets/preload');
+  });
+
+  it('keeps the worn GLSL and splices the recolor ahead of it', async () => {
+    const pending: Promise<unknown>[] = [];
+    vi.resetModules();
+    vi.stubGlobal('location', { search: '?gfx=high' });
+    vi.doMock('../src/render/assets/loader', () => ({
+      loadTexture: () => Promise.resolve(new THREE.Texture()),
+      loadKtx2Texture: () => Promise.resolve(new THREE.Texture()),
+    }));
+    vi.doMock('../src/render/assets/preload', () => ({
+      registerPreload: (promise: Promise<unknown>) => {
+        pending.push(promise);
+      },
+      registerDeferredPreload: (start: () => Promise<unknown>) => {
+        pending.push(start());
+      },
+    }));
+    const worn = await import('../src/render/worn_stone');
+    const haze = await import('../src/render/biome_haze_field');
+    const veil = await import('../src/render/drowned_veil_material');
+    await Promise.all(pending);
+    haze.ensureBiomeHazeField(hazePresets());
+    const source = new THREE.MeshStandardMaterial({ color: 0xffffff });
+    haze.attachBiomeHaze(source);
+    worn.applySurfaceDetail(source, 'rock', { strength: 0.45 });
+    const drowned = veil.drownVeilMaterial(source);
+    expect(drowned.customProgramCacheKey().startsWith('surface-detail|on|')).toBe(true);
+    const fragment = compiled(drowned).fragmentShader;
+    const wornBlock = fragment.indexOf('vec3 wornP = ');
+    expect(wornBlock).toBeGreaterThan(-1);
+    expect(fragment).toContain('uHazeField');
+    expect(fragment.indexOf('float _veilRed')).toBeLessThan(wornBlock);
+    expect(fragment.replace(/\n\s*\/\/ recolor[\s\S]*?_veilRed\);\n */, '')).toBe(
+      compiled(source).fragmentShader,
+    );
+    haze.disposeBiomeHazeField();
   });
 });
