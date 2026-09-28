@@ -272,7 +272,7 @@ function cloneView(session: TurretSession): TurretSessionView {
       ...scalars,
       plan,
       shots: shots.map((shot) => ({ ...shot })),
-      monsters: monsters.map((m) => ({ ...m, seg: { ...m.seg } })),
+      monsters: monsters.map((m) => ({ ...m, seg: { ...m.seg }, knocked: m.knocked.slice() })),
       stats: { ...stats },
     },
     waveCount: plan.waves.length,

@@ -45,6 +45,7 @@ const stats = {
   pointsLost: 0,
   longestThrow: 0,
   longestAirtime: 0,
+  bowled: 0,
 };
 
 beforeEach(() => setLanguage('en'));

@@ -10217,6 +10217,26 @@ export interface TurretSizeDef {
   breachValue: number;
   /** Body radius (yd) for the strike distance and swept collider tests. */
   radius: number;
+  /** Standing height (yd): a flying body whose feet pass below it knocks this one over. */
+  height: number;
+}
+/** A fast, low flying body (a corpse included) knocks the grounded monsters it passes through. */
+export interface TurretBowlingDef {
+  enabled: boolean;
+  /** A flyer knocks only while moving faster than this across (yd/s). */
+  minSpeed: number;
+  /** Contact reach as a multiple of the two body radii summed. */
+  reachScale: number;
+  /** Share of the flyer's horizontal velocity the struck body takes, times sqrt(flyer mass / struck mass). */
+  transfer: number;
+  /** Upward launch of the struck body (yd/s), over sqrt(its mass). */
+  pop: number;
+  /** Knock damage as a share of the wave's core damage (at least 1). */
+  damageShare: number;
+  /** Share of its horizontal speed a flyer keeps through each knock. */
+  flyerKeep: number;
+  /** A lying body's top as a share of its standing height. */
+  lyingHeight: number;
 }
 export interface TurretWaveEntry {
   templateId: string;

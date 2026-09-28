@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   TURRET_ARENA,
+  TURRET_BOWLING,
   TURRET_PHYSICS,
   TURRET_SIZE_CLASSES,
   TURRET_TEMPLATE_SIZES,
@@ -205,10 +206,10 @@ describe('tuning constants in ticks and yards', () => {
 
   it('pins the size classes and the template map', () => {
     expect(TURRET_SIZE_CLASSES).toEqual({
-      small: { mass: 1, breachValue: 2, radius: 0.6 },
-      medium: { mass: 1.6, breachValue: 4, radius: 0.5 },
-      large: { mass: 3, breachValue: 10, radius: 0.9 },
-      huge: { mass: 4.5, breachValue: 15, radius: 1.2 },
+      small: { mass: 1, breachValue: 2, radius: 0.6, height: 1.2 },
+      medium: { mass: 1.6, breachValue: 4, radius: 0.5, height: 2 },
+      large: { mass: 3, breachValue: 10, radius: 0.9, height: 2.6 },
+      huge: { mass: 4.5, breachValue: 15, radius: 1.2, height: 3 },
     });
     expect(TURRET_TEMPLATE_SIZES).toEqual({
       forest_wolf: 'small',
@@ -223,5 +224,33 @@ describe('tuning constants in ticks and yards', () => {
       frostmane_yeti: 'huge',
       idol_guardian: 'huge',
     });
+  });
+
+  it('pins the bowling tuning, on by default, and carries it on the plan', () => {
+    expect(TURRET_BOWLING).toEqual({
+      enabled: true,
+      minSpeed: 5,
+      reachScale: 2,
+      transfer: 0.5,
+      pop: 7,
+      damageShare: 0.1,
+      flyerKeep: 0.6,
+      lyingHeight: 0.35,
+    });
+    expect(plan.bowling).toEqual(TURRET_BOWLING);
+    expect(plan.bowling).not.toBe(TURRET_BOWLING);
+    expect(Object.isFrozen(plan.bowling)).toBe(true);
+    const off = resolveTurretPlan(TURRET_WAVES, MOBS, { ...TURRET_BOWLING, enabled: false });
+    expect(off.bowling.enabled).toBe(false);
+    expect(off.kinds).toEqual(plan.kinds);
+    expect(off.waves).toEqual(plan.waves);
+  });
+
+  it('gives every size class a height that grows with its mass', () => {
+    const classes = Object.values(TURRET_SIZE_CLASSES).sort((a, b) => a.mass - b.mass);
+    for (let i = 1; i < classes.length; i++) {
+      expect(classes[i].height).toBeGreaterThan(classes[i - 1].height);
+    }
+    for (const k of plan.kinds) expect(k.height).toBe(TURRET_SIZE_CLASSES[k.sizeClass].height);
   });
 });

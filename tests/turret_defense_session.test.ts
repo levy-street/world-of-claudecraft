@@ -633,6 +633,7 @@ describe('the IWorld read', () => {
     expect(view.defense.monsters).toEqual(live.monsters);
     expect(view.defense.monsters).not.toBe(live.monsters);
     expect(view.defense.monsters[0].seg).not.toBe(live.monsters[0].seg);
+    expect(view.defense.monsters[0].knocked).not.toBe(live.monsters[0].knocked);
     expect(live.shots).toHaveLength(1);
     expect(view.defense.shots).toEqual(live.shots);
     expect(view.defense.shots).not.toBe(live.shots);
@@ -938,6 +939,7 @@ describe('a headless run on real terrain', () => {
     const waves = run.events.filter((e) => e.type === 'waveCleared').length;
     expect(waves).toBe(resolveTurretPlan().waves.length);
     expect(sim.turretSession?.defense.integrity).toBeGreaterThan(0);
+    expect(sim.turretSession?.defense.stats.bowled).toBeGreaterThan(0);
     for (let i = 0; i < 40; i++) sim.tick();
     expect(meta.vehicle?.kind).toBe('turret');
     expect(sim.turretSession?.defense.phase).toBe('won');

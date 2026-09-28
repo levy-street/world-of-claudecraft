@@ -2,16 +2,22 @@
 // src/sim/minigames/turret_defense.ts; the wave plan resolver
 // (src/sim/minigames/turret_defense_plan.ts) reads the templates from MOBS.
 
-import { DT, type TurretSizeClass, type TurretSizeDef, type TurretWaveDef } from '../types';
+import {
+  DT,
+  type TurretBowlingDef,
+  type TurretSizeClass,
+  type TurretSizeDef,
+  type TurretWaveDef,
+} from '../types';
 import type { MountKey } from './mounts';
 
 const ticks = (seconds: number): number => Math.round(seconds / DT);
 
 export const TURRET_SIZE_CLASSES: Readonly<Record<TurretSizeClass, Readonly<TurretSizeDef>>> = {
-  small: { mass: 1, breachValue: 2, radius: 0.6 },
-  medium: { mass: 1.6, breachValue: 4, radius: 0.5 },
-  large: { mass: 3, breachValue: 10, radius: 0.9 },
-  huge: { mass: 4.5, breachValue: 15, radius: 1.2 },
+  small: { mass: 1, breachValue: 2, radius: 0.6, height: 1.2 },
+  medium: { mass: 1.6, breachValue: 4, radius: 0.5, height: 2 },
+  large: { mass: 3, breachValue: 10, radius: 0.9, height: 2.6 },
+  huge: { mass: 4.5, breachValue: 15, radius: 1.2, height: 3 },
 };
 
 export const TURRET_TEMPLATE_SIZES: Readonly<Record<string, TurretSizeClass>> = {
@@ -109,6 +115,22 @@ export const TURRET_WEAPON = {
   maxLaunchSpeed: 32,
   maxLaunchLift: 26,
 } as const;
+
+/**
+ * Bowling. The reach doubles the standing radii: a tumbling body sweeps about
+ * twice its footprint, and at the bare radii a whole run saw only a handful of
+ * knocks.
+ */
+export const TURRET_BOWLING: Readonly<TurretBowlingDef> = {
+  enabled: true,
+  minSpeed: 5,
+  reachScale: 2,
+  transfer: 0.5,
+  pop: 7,
+  damageShare: 0.1,
+  flyerKeep: 0.6,
+  lyingHeight: 0.35,
+};
 
 /** Lent as the seated player's mount (never owned, never saved) and restored on leave. */
 export const TURRET_TANK_MOUNT: MountKey = 'terrorspark_groundshaker';

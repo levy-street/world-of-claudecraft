@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   TURRET_ARENA,
+  TURRET_BOWLING,
   TURRET_PHYSICS,
   TURRET_SIZE_CLASSES,
   TURRET_TIMING,
@@ -58,6 +59,7 @@ function kind(size: TurretSizeClass, maxHp: number, marchSpeed = 4.4): TurretKin
     mass: s.mass,
     radius: s.radius,
     breachValue: s.breachValue,
+    height: s.height,
   };
 }
 
@@ -65,6 +67,7 @@ function plan(kinds: TurretKind[], spawns: number[][], coreDamage = 60): TurretP
   return {
     kinds,
     waves: spawns.map((s) => ({ spawns: s, coreDamage, gapMinTicks: 16, gapMaxTicks: 32 })),
+    bowling: { ...TURRET_BOWLING, enabled: false },
   };
 }
 

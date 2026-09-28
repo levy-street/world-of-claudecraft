@@ -28,6 +28,7 @@ import {
   velocityAt,
   waterSurfaceOr,
 } from './thrown_body';
+import { resolveTurretBowling } from './turret_bowling';
 import type { TurretKind, TurretPlan } from './turret_defense_plan';
 import { TURRET_STREAM, turretDraw } from './turret_defense_rng';
 
@@ -63,6 +64,8 @@ export interface TurretMonster {
   throwZ: number;
   /** The latest throw has not touched the ground yet (its distance is still unmeasured). */
   throwOpen: boolean;
+  /** Ids this body met in its current flight (bowling): each pair knocks at most once per flight. */
+  knocked: number[];
 }
 
 export interface TurretShot {
@@ -84,6 +87,8 @@ export interface TurretStats {
   longestThrow: number;
   /** Seconds from a launch to the first ground contact (juggles extend it). */
   longestAirtime: number;
+  /** Grounded monsters knocked over by a flying body. */
+  bowled: number;
 }
 
 export interface TurretDefenseState {
@@ -155,6 +160,16 @@ export type TurretEvent =
       speed: number;
     }
   | { type: 'landed'; id: number; x: number; y: number; z: number }
+  | {
+      /** A flying body knocked a grounded one at the struck body's feet; `speed` is the flyer's across. */
+      type: 'bowled';
+      flyerId: number;
+      struckId: number;
+      x: number;
+      y: number;
+      z: number;
+      speed: number;
+    }
   | { type: 'splash'; id: number; x: number; y: number; z: number }
   | { type: 'killed'; id: number; x: number; y: number; z: number }
   | { type: 'windupStart'; id: number; x: number; z: number }
@@ -216,6 +231,7 @@ export function createTurretDefense(
       pointsLost: 0,
       longestThrow: 0,
       longestAirtime: 0,
+      bowled: 0,
     },
   };
 }
@@ -329,12 +345,18 @@ export function tickTurretDefense(
   if ((state.phase === 'intro' || state.phase === 'between') && tick >= state.phaseEndTick) {
     startWave(state, tick, events);
   }
+  // Knocks along the segments as they stood, then on the pairs this tick's
+  // transitions renewed (a bounce is the lowest, likeliest moment to knock).
+  resolveTurretBowling(state, tick - 1, tick, Number.NEGATIVE_INFINITY, world, events);
   if (state.phase === 'wave') spawnDue(state, tick, world);
   // Bodies catch up to this tick before the shells land (a juggle must not add the
   // velocity of a flight that already touched down), but a completing windup waits:
   // a shot landing on the tick a strike would land still saves the turret.
   advanceMonsters(state, tick, world, events, true);
-  if (!isLost(state)) resolveImpacts(state, tick, world, events);
+  if (!isLost(state)) {
+    resolveTurretBowling(state, tick - 1, tick, tick - 1, world, events);
+    resolveImpacts(state, tick, world, events);
+  }
   advanceMonsters(state, tick, world, events, false);
   if (state.phase === 'wave') checkWaveCleared(state, tick, events);
   return events;
@@ -417,6 +439,7 @@ function spawnDue(state: TurretDefenseState, tick: number, probe: ThrowProbe): v
       throwX: x,
       throwZ: z,
       throwOpen: false,
+      knocked: [],
     });
     bump(state);
   }
@@ -512,6 +535,7 @@ function launch(
     v.z *= TURRET_WEAPON.maxLaunchSpeed / horizontal;
   }
   v.y = Math.min(v.y, TURRET_WEAPON.maxLaunchLift);
+  if (m.state !== 'fly') m.knocked = [];
   m.seg = planFlight(tick, p.x, p.y, p.z, v, kind.radius, probe, TURRET_PHYSICS);
   m.state = 'fly';
   if (m.airSince < 0) m.airSince = tick;

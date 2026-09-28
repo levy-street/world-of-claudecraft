@@ -4,6 +4,7 @@
 // a fixed spawn order per wave.
 
 import {
+  TURRET_BOWLING,
   TURRET_SIZE_CLASSES,
   TURRET_TEMPLATE_SIZES,
   TURRET_TIMING,
@@ -12,7 +13,13 @@ import {
 import { MOBS } from '../data';
 import { deepFreeze } from '../deep_freeze';
 import { mobMaxHp } from '../entity';
-import type { MobTemplate, TurretSizeClass, TurretWaveDef, TurretWaveEntry } from '../types';
+import type {
+  MobTemplate,
+  TurretBowlingDef,
+  TurretSizeClass,
+  TurretWaveDef,
+  TurretWaveEntry,
+} from '../types';
 
 export interface TurretKind {
   readonly templateId: string;
@@ -23,6 +30,7 @@ export interface TurretKind {
   readonly mass: number;
   readonly radius: number;
   readonly breachValue: number;
+  readonly height: number;
 }
 
 export interface TurretWavePlan {
@@ -37,6 +45,7 @@ export interface TurretWavePlan {
 export interface TurretPlan {
   readonly kinds: readonly TurretKind[];
   readonly waves: readonly TurretWavePlan[];
+  readonly bowling: Readonly<TurretBowlingDef>;
 }
 
 /**
@@ -61,6 +70,7 @@ export function turretSpawnOrder(entries: readonly TurretWaveEntry[]): number[] 
 export function resolveTurretPlan(
   waves: readonly TurretWaveDef[] = TURRET_WAVES,
   mobs: Readonly<Record<string, MobTemplate>> = MOBS,
+  bowling: Readonly<TurretBowlingDef> = TURRET_BOWLING,
 ): TurretPlan {
   const kinds: TurretKind[] = [];
   const kindIndex = new Map<string, number>();
@@ -82,6 +92,7 @@ export function resolveTurretPlan(
       mass: size.mass,
       radius: size.radius,
       breachValue: size.breachValue,
+      height: size.height,
     });
     kindIndex.set(key, kinds.length - 1);
     return kinds.length - 1;
@@ -95,5 +106,5 @@ export function resolveTurretPlan(
       gapMaxTicks: wave.gapMaxTicks,
     };
   });
-  return deepFreeze({ kinds, waves: planned });
+  return deepFreeze({ kinds, waves: planned, bowling: { ...bowling } });
 }

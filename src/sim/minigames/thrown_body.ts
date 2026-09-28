@@ -248,6 +248,94 @@ export function velocityAt(seg: MotionSegment, tick: number): Vec3 {
   }
 }
 
+/** Horizontal position at any fractional tick, with no ground read. */
+export function horizontalAt(seg: MotionSegment, tick: number): { x: number; z: number } {
+  const s = span(seg, tick) * DT;
+  switch (seg.kind) {
+    case 'march':
+      return { x: seg.x + seg.dx * seg.speed * s, z: seg.z + seg.dz * seg.speed * s };
+    case 'fly':
+      return { x: seg.x + seg.vx * s, z: seg.z + seg.vz * s };
+    case 'skid': {
+      const k = skidDistance(seg, s);
+      return { x: seg.x + k.ux * k.d, z: seg.z + k.uz * k.d };
+    }
+    case 'still':
+      return { x: seg.x, z: seg.z };
+  }
+}
+
+/** Where along a step (0..1) a horizontal offset moving linearly lies within `reach` of zero. */
+function overlapSpan(
+  rx: number,
+  rz: number,
+  dx: number,
+  dz: number,
+  reach: number,
+): { from: number; to: number } | null {
+  const a = dx * dx + dz * dz;
+  const b = 2 * (rx * dx + rz * dz);
+  const c = rx * rx + rz * rz - reach * reach;
+  if (!(a > EPS)) return c < 0 ? { from: 0, to: 1 } : null;
+  const disc = b * b - 4 * a * c;
+  if (!(disc > 0)) return null;
+  const root = Math.sqrt(disc);
+  const lo = (-b - root) / (2 * a);
+  const hi = (-b + root) / (2 * a);
+  if (!(hi > 0) || !(lo < 1)) return null;
+  return { from: Math.max(0, lo), to: Math.min(1, hi) };
+}
+
+/**
+ * The first fractional tick in [from, to] at which a body on `fly` meets a body
+ * on `other`: horizontally closer than `reach` while the flyer's feet are below
+ * `top` above the other's feet. Only the span both segments cover is searched (a
+ * body that came to rest mid-tick was elsewhere before). Every segment moves
+ * along a straight line, so both horizontal motions are linear inside each of
+ * the `substeps` per tick and the entry into reach is solved exactly there; the
+ * height is read at the entry, the middle and the exit of that overlap. Null
+ * when they do not meet.
+ */
+export function flyContact(
+  fly: FlySegment,
+  other: MotionSegment,
+  reach: number,
+  top: number,
+  from: number,
+  to: number,
+  probe: GroundProbe,
+  substeps: number,
+): number | null {
+  const a = Math.max(from, fly.start, other.start);
+  const b = Math.min(to, fly.end);
+  if (!(b > a)) return null;
+  let p = horizontalAt(fly, a);
+  let q = horizontalAt(other, a);
+  const pEnd = horizontalAt(fly, b);
+  const qEnd = horizontalAt(other, b);
+  const travel = Math.hypot(pEnd.x - p.x, pEnd.z - p.z) + Math.hypot(qEnd.x - q.x, qEnd.z - q.z);
+  if (Math.hypot(p.x - q.x, p.z - q.z) - travel >= reach) return null;
+  const steps = Math.max(1, Math.ceil((b - a) * substeps));
+  for (let k = 1; k <= steps; k++) {
+    const t0 = a + ((b - a) * (k - 1)) / steps;
+    const t1 = k === steps ? b : a + ((b - a) * k) / steps;
+    const p1 = horizontalAt(fly, t1);
+    const q1 = horizontalAt(other, t1);
+    const rx = p.x - q.x;
+    const rz = p.z - q.z;
+    const inside = overlapSpan(rx, rz, p1.x - q1.x - rx, p1.z - q1.z - rz, reach);
+    if (inside) {
+      for (const u of [inside.from, (inside.from + inside.to) / 2, inside.to]) {
+        const t = t0 + (t1 - t0) * u;
+        if (positionAt(fly, t, probe).y < positionAt(other, t, probe).y + top) return t;
+      }
+    }
+    p = p1;
+    q = q1;
+  }
+  return null;
+}
+
 function deepWater(probe: ThrowProbe, phys: ThrowPhysics, x: number, z: number): number | null {
   const w = probe.water(x, z);
   if (w === null || !Number.isFinite(w)) return null;
