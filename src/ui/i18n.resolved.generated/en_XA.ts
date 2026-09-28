@@ -609,6 +609,9 @@ export const en_XA: EnTranslations = {
       "healerConfirmAccept": "[Ŕéʋíʋé Ɱé]",
       "healerConfirmCancel": "[Çáñçéļ]"
     },
+    "graphicsRestore": {
+      "note": "[Ŕéšţóŕíñĝ ĝŕáþĥíçš]"
+    },
     "wiki": {
       "confirmTitle": "[Óþéñ ţĥé Ŵíķí?]",
       "confirmBody": "[Ţĥíš óþéñš ţĥé Ŵóŕļð óƒ ÇļáúðéÇŕáƒţ ŵíķí íñ ýóúŕ ƀŕóŵšéŕ. Ţĥé ĝáɱé ķééþš ŕúññíñĝ.]",

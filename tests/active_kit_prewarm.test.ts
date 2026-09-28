@@ -24,6 +24,7 @@ import { WarriorPowerForms } from '../src/render/ability_vfx/warrior_power_forms
 import { WarriorSpiritHammers } from '../src/render/ability_vfx/warrior_spirit_hammers';
 import { setArrivalCover } from '../src/render/arrival_cover';
 import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
+import { runContextRestoreResets } from '../src/render/context_restore_registry';
 import { createGpuPrepAdmission } from '../src/render/gpu_prep_admission';
 import { createGpuPrepBudget } from '../src/render/gpu_prep_budget_core';
 import type { PrewarmResumeUnit } from '../src/render/prewarm_resume';
@@ -640,6 +641,38 @@ it('waits out a loading cover instead of freezing it, then paces its uploads', a
   } finally {
     setArrivalCover(false);
     await queue.shutdown();
+    f.close();
+  }
+});
+
+it('a WebGL context restore mid-recipe forgets what ran and runs the whole recipe again once the old run stops', async () => {
+  const f = fixture();
+  try {
+    let release!: () => void;
+    const hold = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    let calls = 0;
+    f.queue.run.mockImplementation(async (work: PrewarmResumeUnit['run']) => {
+      calls++;
+      // The third unit is still queued when the context comes back.
+      if (calls === 3) await hold;
+      await work();
+    });
+    const first = ensureActiveAbilityKit(f.scene);
+    for (let i = 0; i < 50; i++) await Promise.resolve();
+    expect(f.upload).toHaveBeenCalledTimes(2);
+    runContextRestoreResets();
+    expect(f.entry.progress().done).toBe(0);
+    release();
+    await first;
+    // The run that started on the lost context records nothing past the
+    // restore; the rerun then does the whole recipe on the restored one.
+    await vi.waitFor(() => expect(f.entry.progress().trimmed).toBe(false));
+    const planned = f.entry.progress().planned;
+    expect(f.entry.progress().done).toBe(planned);
+    expect(f.prep.ready('blood_cut')).toBe(true);
+  } finally {
     f.close();
   }
 });

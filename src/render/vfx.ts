@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { loadTexture, releaseTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { tagCastVfxEngine } from './cast_vfx_family';
+import { registerContextRestoreReset } from './context_restore_registry';
 import {
   type DrainLifeParticleKind,
   type DrainLifeParticleSink,
@@ -523,6 +524,7 @@ export class Vfx {
       if (this.points.geometry.drawRange.count === 0) this.points.visible = false;
     };
     scene.add(this.points);
+    registerContextRestoreReset('vfx-cloud', this, (owner) => owner.onContextRestored());
     this.paladinSpellFx = new PaladinSpellVfxController(anchor, (particle) => {
       const essential =
         particle.tag.includes('core') ||

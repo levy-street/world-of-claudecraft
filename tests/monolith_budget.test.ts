@@ -995,6 +995,10 @@ const MONOLITHS: MonolithRow[] = [
     // RE-PINNED 12687 -> 12688 at the second release merge into the same branch,
     // after PR 3847 landed on the release (its renderer.ts wiring adds one line;
     // the release pin stays 12684): wc -l on the merged tree. Exact count, zero slack.
+    // Held at 12688 by the WebGL context restore merge: the restore's host
+    // surface is paid for by the texture residency ledger and the loss/restore
+    // listeners moving to their own modules, so the branch adds no net line;
+    // wc -l on the merged tree. Exact count, zero slack.
     ceiling: 12688,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },

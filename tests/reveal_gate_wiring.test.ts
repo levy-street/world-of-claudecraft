@@ -112,7 +112,7 @@ describe('reveal gate wiring (source pins)', () => {
     // reads and the SAME depth-twin cache the shadow arm fills, so the depth
     // programs are polled under the twins that own them.
     expect(wiring).toContain(
-      'settle: pieceProgramSettle(this.webgl.properties, this.prewarmDepthMaterials),',
+      'settle: pieceProgramSettle(liveMaterialProperties(this.webgl), this.prewarmDepthMaterials),',
     );
     expect(wiring).toContain(
       'upload: (target, priority) => this.uploadGateTexturesGated(target, priority),',

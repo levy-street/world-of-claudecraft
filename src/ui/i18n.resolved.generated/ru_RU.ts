@@ -609,6 +609,9 @@ export const ru_RU: EnTranslations = {
       "healerConfirmAccept": "Воскресить",
       "healerConfirmCancel": "Отмена"
     },
+    "graphicsRestore": {
+      "note": "Restoring graphics"
+    },
     "wiki": {
       "confirmTitle": "Открыть вики?",
       "confirmBody": "Вики World of ClaudeCraft откроется в браузере. Игра продолжит работать.",

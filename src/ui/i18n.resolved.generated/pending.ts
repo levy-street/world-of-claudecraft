@@ -9,25 +9,65 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.graphicsRestore.note"
+  ],
+  "es_ES": [
+    "hudChrome.graphicsRestore.note"
+  ],
+  "fr_FR": [
+    "hudChrome.graphicsRestore.note"
+  ],
+  "fr_CA": [
+    "hudChrome.graphicsRestore.note"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.graphicsRestore.note"
+  ],
+  "de_DE": [
+    "hudChrome.graphicsRestore.note"
+  ],
+  "zh_CN": [
+    "hudChrome.graphicsRestore.note"
+  ],
+  "zh_TW": [
+    "hudChrome.graphicsRestore.note"
+  ],
+  "ko_KR": [
+    "hudChrome.graphicsRestore.note"
+  ],
+  "ja_JP": [
+    "hudChrome.graphicsRestore.note"
+  ],
+  "pt_BR": [
+    "hudChrome.graphicsRestore.note"
+  ],
+  "ru_RU": [
+    "hudChrome.graphicsRestore.note"
+  ],
+  "cs_CZ": [
+    "hudChrome.graphicsRestore.note"
+  ],
+  "nl_NL": [
+    "hudChrome.graphicsRestore.note"
+  ],
+  "pl_PL": [
+    "hudChrome.graphicsRestore.note"
+  ],
+  "id_ID": [
+    "hudChrome.graphicsRestore.note"
+  ],
+  "tr_TR": [
+    "hudChrome.graphicsRestore.note"
+  ],
+  "sv_SE": [
+    "hudChrome.graphicsRestore.note"
+  ],
+  "vi_VN": [
+    "hudChrome.graphicsRestore.note"
+  ],
+  "da_DK": [
+    "hudChrome.graphicsRestore.note"
+  ]
 };

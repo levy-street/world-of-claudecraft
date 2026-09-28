@@ -209,6 +209,8 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  // Whether the "restoring graphics" note shows over the held 3D view.
+  'src/ui/graphics_restore_note_view.ts',
   'src/ui/frame_presets_core.ts',
   'src/ui/frame_menu_core.ts',
   'src/ui/loot_quality_view.ts',
@@ -913,6 +915,9 @@ const RENDER_PURE_CORES = [
   'src/render/shader_warmup_gl_core.ts',
   'src/render/realm_builder_monument_fx_core.ts',
   'src/render/reveal_gate_core.ts',
+  // The WebGL context-restore registry and pass sequencing (context_restore.ts
+  // is its host).
+  'src/render/context_restore_core.ts',
   'src/render/stride_audio_core.ts',
   'src/render/town_reveal_core.ts',
   'src/render/foliage_bucket_reveal_core.ts',
@@ -2647,6 +2652,9 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  // Mints the "restoring graphics" status line and toggles it on the context
+  // restore hold's edges.
+  'src/ui/graphics_restore_note_controller.ts',
   'src/ui/error_toast_controller.ts',
   'src/ui/frame_presets_live.ts',
   'src/ui/frame_editor_deps.ts',

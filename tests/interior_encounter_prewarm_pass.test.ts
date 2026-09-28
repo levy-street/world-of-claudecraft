@@ -6,6 +6,7 @@ import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
+import { runContextRestoreResets } from '../src/render/context_restore_registry';
 import { activateGfxProfile, GFX, getActiveGfxProfile } from '../src/render/gfx';
 import type { LiveSoulRendLook } from '../src/render/interior_encounter_prewarm';
 import {
@@ -298,6 +299,22 @@ describe('interior encounter prewarm pass (driven)', () => {
     expect(player.calls.prewarmSoulRendSlots).toBe(0);
   });
 
+  it('re-queues the live bodies of the interior the player is in after a context restore', async () => {
+    const player = fakeVisual('player');
+    const host = fakeHost([{ id: 1, kind: 'player', visual: player }]);
+    startInteriorEncounterPrewarm('nythraxis', host);
+    await drain();
+    expect(player.calls.prewarmSoulRendSlots).toBe(1);
+    // The same look is not warmed twice on one context...
+    queueLiveSoulRendPrewarm(host, player as never, look(), 'player');
+    await drain();
+    expect(player.calls.prewarmSoulRendSlots).toBe(1);
+    // ...but the restored context never saw it.
+    runContextRestoreResets();
+    await drain();
+    expect(player.calls.prewarmSoulRendSlots).toBe(2);
+  });
+
   it('warms an interior once, however many times it attaches', async () => {
     const host = fakeHost();
     startInteriorEncounterPrewarm('nythraxis', host);
@@ -474,6 +491,31 @@ describe('interior encounter prewarm pass (driven)', () => {
     expect(host.compiled).toContain('ignivar-rotating-rays-prewarm');
     expect(host.compiled).toContain('ignivar-forge-judgment-prewarm');
     expect(host.compiled.filter((name) => name.startsWith('varkhul-'))).toEqual([]);
+  });
+
+  it('links the kept-alive sets again after a WebGL context restore: at once inside the interior, else at the next attach', async () => {
+    const host = fakeHost();
+    startInteriorEncounterPrewarm('ignivar', host);
+    await drain();
+    const rays = () => countOf(host.compiled, 'ignivar-rotating-rays-prewarm');
+    expect(rays()).toBe(1);
+    // Every program the claimed set linked went with the lost context; the
+    // set stays claimed (nothing is rebuilt), its kept-alive roots relink.
+    runContextRestoreResets();
+    await drain();
+    expect(rays()).toBe(2);
+    // Outside every encounter interior the relink waits for the next attach,
+    // and that attach still builds nothing new.
+    setEncounterPrewarmInterior(host, null);
+    runContextRestoreResets();
+    await drain();
+    expect(rays()).toBe(2);
+    startInteriorEncounterPrewarm('ignivar', host);
+    await drain();
+    expect(rays()).toBe(3);
+    startInteriorEncounterPrewarm('ignivar', host);
+    await drain();
+    expect(rays()).toBe(3);
   });
 
   it('builds each raid set once per session, from the Forge-Lift on', async () => {

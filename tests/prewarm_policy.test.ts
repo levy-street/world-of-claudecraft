@@ -1594,8 +1594,10 @@ describe('mandatory interaction-landmark prewarm', () => {
     // program variant its materials carry (program_variant_settle.ts), bound to
     // this renderer's material properties and depth-twin cache.
     expect(compileGate).toContain('linkPieceWork(target, color, shadow, settle)');
-    expect(compileGate).toContain(
-      'const settle = pieceProgramSettle(this.webgl.properties, this.prewarmDepthMaterials);',
+    // Read through the renderer at every poll, never captured: a context
+    // restore replaces three's properties object (context_restore.ts).
+    expect(compileGate).toMatch(
+      /const settle = pieceProgramSettle\(\s*liveMaterialProperties\(this\.webgl\),\s*this\.prewarmDepthMaterials,?\s*\);/,
     );
     expect(compileGate).toContain('VIEW_COMPILE_GATE_MAX_MS');
     expect(compileGate).not.toContain('onTimeout');

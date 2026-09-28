@@ -609,6 +609,9 @@ export const cs_CZ: EnTranslations = {
       "healerConfirmAccept": "Oživ mě",
       "healerConfirmCancel": "Zrušit"
     },
+    "graphicsRestore": {
+      "note": "Restoring graphics"
+    },
     "wiki": {
       "confirmTitle": "Otevřít wiki?",
       "confirmBody": "Tímto otevřeš wiki World of ClaudeCraft ve svém prohlížeči. Hra běží dál.",

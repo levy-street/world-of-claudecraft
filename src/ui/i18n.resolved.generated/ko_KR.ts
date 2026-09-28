@@ -609,6 +609,9 @@ export const ko_KR: EnTranslations = {
       "healerConfirmAccept": "부활",
       "healerConfirmCancel": "취소"
     },
+    "graphicsRestore": {
+      "note": "Restoring graphics"
+    },
     "wiki": {
       "confirmTitle": "위키를 열까요?",
       "confirmBody": "World of ClaudeCraft 위키를 브라우저에서 엽니다. 게임은 계속 실행됩니다.",

@@ -119,6 +119,7 @@ import { canopyDetailPrewarmTextures } from './canopy_detail';
 import {
   castVfxFirstReadsEntry,
   castVfxProgramUnits,
+  castVfxRestoreUnits,
   castVfxStandInSlot,
   createSceneCastVfxReadiness,
 } from './cast_vfx_prewarm';
@@ -233,6 +234,11 @@ import {
 import { compileTargetPrepared } from './compile_target_readiness';
 import { preflightWebGL2ContextRecycle, type RecycledRendererContext } from './context_recycle';
 import { trackWebGLContext } from './context_release';
+import {
+  ContextRestoreHost,
+  type ContextRestoreSurface,
+  prefilterSkyDome,
+} from './context_restore';
 import { type CorpseBeacon, createCorpseBeacon } from './corpse_beacon';
 import {
   animatesEveryFrame,
@@ -453,6 +459,7 @@ import {
   markPrewarmPacingReveal,
   type PrewarmPacingHandle,
 } from './link_rate_budget';
+import { liveMaterialProperties } from './linked_program_touch';
 import { runWorldGateTouchLane } from './linked_program_touch_lane';
 import * as liveProgramWatch from './live_program_watch';
 import {
@@ -788,7 +795,7 @@ import { applyTerrainDetailShed } from './terrain_detail_shed_core';
 import { refreshTextureAnisotropy } from './texture_anisotropy';
 import { runTexturePrepLane } from './texture_prep_lane';
 import { sweepMaterialTextures, sweepObjectTextures } from './texture_prewarm';
-import { uploadDataTextureInChunks } from './texture_upload';
+import { TextureResidencyLedger } from './texture_residency_ledger';
 import { sparkleTexture } from './textures';
 import {
   groundSpeedFromFrame,
@@ -1993,25 +2000,7 @@ export class Renderer {
   private glVendor = '';
   private glRenderer = '';
   private contextPowerPreference: WebGLPowerPreference | null = null;
-  private contextLostCount = 0;
-  private contextRestoredCount = 0;
-  private readonly onWebGLContextLost = (): void => {
-    this.contextLostCount++;
-  };
-  private readonly onWebGLContextRestored = (): void => {
-    this.contextRestoredCount++;
-    this.captureGlIdentity();
-    // three's onContextRestore re-runs initGLContext, which REPLACES
-    // webgl.info with a fresh WebGLInfo; the composer-tier draw-stats session
-    // captured the old object at construction and would read a dead
-    // accumulator (governor draw signal and opaque-sort input pinned at zero)
-    // for the rest of the session. Re-create it against the live info; the
-    // fresh session's first beginFrame re-baselines safely. Pre-existing on
-    // the release branch (not a phase 6 regression); r185 even preserves
-    // autoReset onto the new object, so only this rebind is needed.
-    if (this.drawStats) this.drawStats = createLogicalFrameDrawStats(this.webgl.info);
-    this.vfx?.onContextRestored();
-  };
+  private contextRestore: ContextRestoreHost | null = null;
   private readonly resizeGate = createResizeCoalescer(() => this.resizeViewport());
   private readonly onViewportResize = (): void => this.resizeGate.request();
   private readonly onOrientationChange = (): void => {
@@ -2125,8 +2114,7 @@ export class Renderer {
     // reloads (location.reload) don't exhaust the browser's WebGL context pool.
     this.unregisterWebGLContext = trackWebGLContext(this.webgl);
     this.captureGlIdentity();
-    canvas.addEventListener('webglcontextlost', this.onWebGLContextLost);
-    canvas.addEventListener('webglcontextrestored', this.onWebGLContextRestored);
+    this.contextRestore = new ContextRestoreHost(this.contextRestoreSurface());
     if (options.initializeGfx !== false) {
       initGfxTier(this.webgl); // software-GL autodetect needs the live context
     }
@@ -2337,14 +2325,8 @@ export class Renderer {
         this.scene.environmentRotation.y = this.skyView.envRotationY(seedBiome);
         this.envBiome = seedBiome;
       } else {
-        // fallback: prefilter the dome itself (gain/clamp already applied)
         this.pmremGenerator ??= new THREE.PMREMGenerator(this.webgl);
-        const envScene = new THREE.Scene();
-        envScene.add(this.sky.clone());
-        // far covers the 560u dome; size 128 matches the 512-wide equirect
-        // prefilters (cubeUV height is a program-cache-key input)
-        const envRT = this.pmremGenerator.fromScene(envScene, 0.04, 0.1, 1100, { size: 128 });
-        this.scene.environment = envRT.texture;
+        this.scene.environment = prefilterSkyDome(this.pmremGenerator, this.sky).texture;
       }
       this.scene.environmentIntensity = this.envOutdoorIntensity;
       this.envTransition.current = this.envBiome;
@@ -2615,7 +2597,7 @@ export class Renderer {
           this.liveCompileGates.runPieces(pieces, VIEW_COMPILE_GATE_MAX_MS, options, firstIndex),
         compileColor: (target) => this.compilePrewarmColorPrograms(target, false),
         compileShadow: (target) => this.compileShadowPrograms(target),
-        settle: pieceProgramSettle(this.webgl.properties, this.prewarmDepthMaterials),
+        settle: pieceProgramSettle(liveMaterialProperties(this.webgl), this.prewarmDepthMaterials),
         arms: this.compileArms,
         upload: (target, priority) => this.uploadGateTexturesGated(target, priority),
         touch: (target, priority, gate) => this.touchLinkedProgramsGated(target, priority, gate),
@@ -3011,7 +2993,7 @@ export class Renderer {
     const abilityPresentation = createRendererAbilityPresentation({
       scene: this.scene, camera: this.camera, vfx: this.vfx, anchor: vfxAnchor,
       world: () => this.sim, time: () => this.time, views: this.views,
-      visual: this.activeVisual.bind(this), textureReady: (t) => this.gpuReadyTextures.has(t),
+      visual: this.activeVisual.bind(this), textureReady: (t) => this.textureResidency.has(t),
       ground: (x, z) => groundHeight(x, z, this.sim.cfg.seed),
       height: () => this.webgl.domElement.clientHeight,
       pixelRatio: () => this.webgl.getPixelRatio(), reducedMotion: () => this.reducedMotion(),
@@ -3156,8 +3138,7 @@ export class Renderer {
     } catch {
       // A partially constructed terrain view may already be unwinding.
     }
-    this.canvas.removeEventListener('webglcontextlost', this.onWebGLContextLost);
-    this.canvas.removeEventListener('webglcontextrestored', this.onWebGLContextRestored);
+    this.contextRestore?.dispose();
     window.removeEventListener('resize', this.onViewportResize);
     window.removeEventListener('orientationchange', this.onOrientationChange);
     window.visualViewport?.removeEventListener('resize', this.onViewportResize);
@@ -3295,7 +3276,7 @@ export class Renderer {
     const pending = [
       ...this.pendingZonePrepares.values(),
       ...this.pendingZonePrewarms.values(),
-      ...this.textureUploadTaskSet.values(),
+      ...this.textureResidency.tasks.values(),
     ];
     this.beginRendererShutdown();
     const queueShutdown = this.backgroundGpuWork.shutdown(new Error('Renderer shut down'));
@@ -3351,6 +3332,51 @@ export class Renderer {
         : (vv?.height ?? (rect.height || window.innerHeight)),
     );
     return { width: Math.max(1, width), height: Math.max(1, height) };
+  }
+
+  private castVfxFirstReadRoots(): (THREE.Object3D | undefined)[] {
+    return [this.abilityVfxFx.ccBandDrawable(), this.aoeRings[0]?.ring, this.vfx.cloudDrawable()];
+  }
+
+  /** What an in-place context restore reads (context_restore.ts). */
+  private contextRestoreSurface(): ContextRestoreSurface {
+    return {
+      webgl: () => this.webgl,
+      queue: this.backgroundGpuWork,
+      isShutdown: () => this.shutdownStarted,
+      rebindContextReaders: () => {
+        this.captureGlIdentity();
+        if (this.drawStats) this.drawStats = createLogicalFrameDrawStats(this.webgl.info);
+      },
+      scene: () => this.scene,
+      player: () => this.sim.player.pos,
+      arms: this.compileArms,
+      compileColor: (root) => this.compilePrewarmColorPrograms(root, false),
+      compileShadow: (root) => this.compileShadowPrograms(root),
+      tail: () => entryCompileTail(this.webgl, this.prewarmDepthMaterials, this.backgroundGpuWork),
+      textureInFlight: this.textureResidency.inFlight,
+      compileBatchRoots: PREWARM_COMPILE_BATCH_ROOTS,
+      zoneProgramRecords: () => [
+        this.prewarmedZonePrograms,
+        this.prewarmedMobTemplates,
+        this.prewarmedNpcModels,
+      ],
+      prewarmZone: (x, z) => this.prewarmZoneAt(x, z, { background: true }),
+      presentationPrewarm: () => this.renderPresentationPrewarmPass(),
+      castVfxUnits: () =>
+        castVfxRestoreUnits(this.scene, this.castVfxFirstReadRoots(), this.compileArms, this.webgl),
+      selfSpirit: () => this.selfSpirit,
+      environment: () =>
+        this.lowGfx
+          ? null
+          : {
+              targets: this.envRTs,
+              source: (key) => this.skyView.envTexture(key as SkyKey),
+              pmrem: () => (this.pmremGenerator ??= new THREE.PMREMGenerator(this.webgl)),
+              drop: (key) => this.envRTs.delete(key as SkyKey),
+              dome: () => this.sky,
+            },
+    };
   }
 
   private captureGlIdentity(): void {
@@ -4366,8 +4392,8 @@ export class Renderer {
       glVendor: this.glVendor,
       glRenderer: this.glRenderer,
       glPowerPreference: this.contextPowerPreference,
-      contextLost: this.contextLostCount,
-      contextRestored: this.contextRestoredCount,
+      contextLost: this.contextRestore?.snapshot().losses ?? 0,
+      contextRestored: this.contextRestore?.snapshot().restores ?? 0,
       nightAmount: Math.round(this.dnGlobalNight * 100) / 100,
       phaseMs: this.rendererPhaseStats(),
       nameplates: this.nameplatePainter.paintStats(),
@@ -5093,9 +5119,7 @@ export class Renderer {
   }
 
   private prewarmTexture(texture: THREE.Texture | null | undefined): void {
-    if (!texture) return;
-    this.webgl.initTexture(texture);
-    this.gpuReadyTextures.add(texture);
+    this.textureResidency.prewarm(texture);
   }
 
   /** One spirit-puppet build per idle slot, arbitrated with every other lane
@@ -5123,40 +5147,17 @@ export class Renderer {
     return this.previewPrewarm.queueScheduled(label, unit);
   }
 
-  private readonly gpuReadyTextures = new WeakSet<THREE.Texture>();
-  private readonly textureUploadTasks = new WeakMap<THREE.Texture, Promise<void>>();
-  private readonly textureUploadTaskSet = new Set<Promise<void>>();
+  private readonly textureResidency = new TextureResidencyLedger({
+    webgl: () => this.webgl,
+    queue: this.backgroundGpuWork,
+    idleSlot: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS),
+  });
 
   private prewarmTextureInIdle(
     texture: THREE.Texture | null | undefined,
-    // The caller's queue priority for the chunk uploads: a lane whose stated
-    // intent is lowest-priority (the deferred sky resume at BOOT_RESUME) must
-    // not have its expensive upload steps outrank its cheap ones. An
-    // already-pending upload keeps the priority it entered the queue with.
     priority: number = GPU_WORK_PRIORITY.VISIBLE_PREWARM,
   ): Promise<void> {
-    if (!texture || this.gpuReadyTextures.has(texture)) return Promise.resolve();
-    const pending = this.textureUploadTasks.get(texture);
-    if (pending) return pending;
-    const task = uploadDataTextureInChunks(this.webgl, texture, {
-      beforeChunk: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS),
-      uploadChunk: (chunkTexture) =>
-        this.backgroundGpuWork.run(
-          () => this.webgl.initTexture(chunkTexture),
-          priority,
-          'texture-chunk-upload',
-        ),
-    })
-      .then(() => {
-        this.gpuReadyTextures.add(texture);
-      })
-      .finally(() => {
-        this.textureUploadTasks.delete(texture);
-        this.textureUploadTaskSet.delete(task);
-      });
-    this.textureUploadTasks.set(texture, task);
-    this.textureUploadTaskSet.add(task);
-    return task;
+    return this.textureResidency.prewarmInIdle(texture, priority);
   }
 
   private readonly textureSweepHost = {
@@ -6380,7 +6381,7 @@ export class Renderer {
         geometry: (kinds) =>
           this.abilityVfxFx.authoredPrewarmUnits(
             {
-              properties: this.webgl.properties,
+              properties: liveMaterialProperties(this.webgl),
               compile: (root, offscreen) => this.compilePrewarmColorPrograms(root, offscreen),
               draw: (group, child) => this.renderBoundedPrewarmRoot(group, child),
             },
@@ -6388,11 +6389,7 @@ export class Renderer {
           ),
         texture: (texture) => this.prewarmTexture(texture),
       }),
-      castVfxFirstReadsEntry(
-        [this.abilityVfxFx.ccBandDrawable(), this.aoeRings[0]?.ring, this.vfx.cloudDrawable()],
-        this.compileArms,
-        this.webgl,
-      ),
+      castVfxFirstReadsEntry(this.castVfxFirstReadRoots(), this.compileArms, this.webgl),
       {
         // The cast VFX (cast_vfx_prewarm.ts): stage the lazy stand-ins, link
         // every cast program through the compile arms; the spawn only binds
@@ -8247,7 +8244,10 @@ export class Renderer {
     // the policy holds it (shader_warm_gate.ts), then rides this gate queue.
     const color = (node: THREE.Object3D) => this.compilePrewarmColorPrograms(node, false);
     const shadow = (node: THREE.Object3D) => this.compileShadowPrograms(node);
-    const settle = pieceProgramSettle(this.webgl.properties, this.prewarmDepthMaterials);
+    const settle = pieceProgramSettle(
+      liveMaterialProperties(this.webgl),
+      this.prewarmDepthMaterials,
+    );
     const submit = () =>
       runPiecesWarmed(this.compileArms, target, linkPieceWork(target, color, shadow, settle), {
         priority,
@@ -8280,7 +8280,7 @@ export class Renderer {
   private uploadGateTexturesGated(target: THREE.Object3D, priority: number): Promise<number> {
     const { properties } = this.webgl;
     return runTexturePrepLane(this.backgroundGpuWork, properties, this.webgl, target, priority, {
-      inFlight: this.textureUploadTasks,
+      inFlight: this.textureResidency.inFlight,
     });
   }
 

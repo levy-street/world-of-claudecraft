@@ -13,6 +13,7 @@ import {
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import type { OverheadEmoteId } from '../../world_api';
 import { recordBuildSpan, timeBuildSpan } from '../build_spans';
+import { registerContextRestoreReset } from '../context_restore_registry';
 import { GFX } from '../gfx';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
 import type { MeleeImpactProfile } from '../melee_impact_core';
@@ -1010,6 +1011,7 @@ export class CharacterVisual {
           })
           .catch((err) => console.error('failed to load skin atlas:', err));
       }
+      registerContextRestoreReset('character-visual', this, (owner) => owner.forgetContext());
     } catch (err) {
       releaseModularVariant(this.model);
       // ...and the tinted-material leases applyMaterials and the far build
@@ -2078,6 +2080,16 @@ export class CharacterVisual {
    *  still pending from a previous life (pool re-acquire): a settle the old
    *  renderer generation dropped must not strand this visual articulated or
    *  keep a superseded far set's tinted lease. */
+  /** A WebGL context restore: the effect clones proved linked, and the far
+   *  mesh's programs, belonged to the lost context. The next effect toggle
+   *  stages its clones behind the gate again, and a baked far mesh goes back
+   *  behind the gate with the articulated rig standing in, as at its bake. */
+  forgetContext(): void {
+    if (this.disposed) return;
+    this.linkedEffectMaterials = new WeakSet();
+    if (this.farWrap && this.farBakeGate && !this.farCompilePending) this.gateFarMint();
+  }
+
   setFarBakeGate(gate: FarBakeGate | null): void {
     this.farBakeGate = gate;
     this.sanguineSheath.setGate(gate);

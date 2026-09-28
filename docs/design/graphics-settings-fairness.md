@@ -595,6 +595,27 @@ a cosmetic ease on the tiers that chose it, the same one the reduced-motion sett
 already removes, and never a hidden entity.
 The choice reads the static preset or the player's own dial, never the FPS governor.
 
+### A context restore holds the 3D view for at most 3 s (2026-09-27)
+
+When the browser loses the WebGL context and gives it back in place, three rebuilds every
+program, texture and render target at its next use. Drawn as is, the first frame after the
+restore linked everything on screen at once: the whole page froze, HUD and input included
+(2.3 s on an RTX 3090, 3.3 s in a traced AMD session). The restore host
+(`src/render/context_restore.ts`) now withholds only the world draw while the visible scene
+links off the main thread, through the same `worldDrawHeld` seam the blocking arrival uses
+(`src/game/presentation_gate.ts`), with a small "Restoring graphics" note over the view.
+
+Why it is fair: it is not a tier knob and never reads the FPS governor; a browser context
+restore triggers it, identically on every preset and online or offline. The canvas was
+already blank for the whole loss before it. The hold ends when the visible set is linked
+or at `CONTEXT_RESTORE_HOLD_MAX_MS` (3 s, the offline arrival bound), and that bound is
+read at every query (`src/render/context_restore_hold.ts`), so a release that never ran
+cannot extend it. During the hold the sim, the network, input and the whole HUD stay live:
+unit, party and target frames, cast bars, auras, and the nameplates, which the renderer
+still updates with the world draw skipped. The alternative it replaces froze all of those.
+Pinned by `tests/context_restore.test.ts` (the bound, the release on a second loss) and
+`tests/presentation_gate.test.ts` (the hold as a second owner the arrival cannot release).
+
 ## Enforcing guards
 
 - `tests/auras_painter.test.ts`: a debuff past the buff cap still renders; an all-debuff bar

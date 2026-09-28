@@ -609,6 +609,9 @@ export const es: EnTranslations = {
       "healerConfirmAccept": "Revívame",
       "healerConfirmCancel": "Cancelar"
     },
+    "graphicsRestore": {
+      "note": "Restoring graphics"
+    },
     "wiki": {
       "confirmTitle": "¿Abrir la Wiki?",
       "confirmBody": "Esto abre la wiki de World of ClaudeCraft en tu navegador. El juego sigue funcionando.",

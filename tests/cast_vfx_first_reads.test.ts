@@ -255,7 +255,9 @@ describe('the renderer wiring (source pin)', () => {
   );
 
   it('builds the entry from the live band cloud, ring and particle cloud, right after the kit entry', () => {
-    const at = renderer.indexOf('      castVfxFirstReadsEntry(\n');
+    const call =
+      '      castVfxFirstReadsEntry(this.castVfxFirstReadRoots(), this.compileArms, this.webgl),\n';
+    const at = renderer.indexOf(call);
     expect(at).toBeGreaterThan(-1);
     const kitCall = '      activeKitPrewarmEntry(this.scene';
     const kit = renderer.indexOf(kitCall);
@@ -269,14 +271,15 @@ describe('the renderer wiring (source pin)', () => {
     const afterKit = renderer.slice(kit + kitCall.length, at);
     expect(afterKit).not.toMatch(/id: '/);
     expect(afterKit.match(factoryCall)).toBeNull();
-    const between = renderer.slice(at + 'castVfxFirstReadsEntry('.length + 6, primitives);
+    const between = renderer.slice(at + call.length, primitives);
     expect(between).not.toMatch(/id: '/);
     expect(between.match(factoryCall)).toBeNull();
-    expect(between).toContain(
-      '[this.abilityVfxFx.ccBandDrawable(), this.aoeRings[0]?.ring, this.vfx.cloudDrawable()],',
+    // The roots are one helper, shared with the context restore's cast relink.
+    expect(renderer).toContain(
+      '  private castVfxFirstReadRoots(): (THREE.Object3D | undefined)[] {\n' +
+        '    return [this.abilityVfxFx.ccBandDrawable(), this.aoeRings[0]?.ring, this.vfx.cloudDrawable()];\n' +
+        '  }',
     );
-    expect(between).toContain('this.compileArms,');
-    expect(between).toContain('this.webgl,');
   });
 
   it('runs the kit entry, this entry and the primitives in manifest order on every policy', () => {

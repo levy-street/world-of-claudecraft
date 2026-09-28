@@ -609,6 +609,9 @@ export const ja_JP: EnTranslations = {
       "healerConfirmAccept": "復活する",
       "healerConfirmCancel": "キャンセル"
     },
+    "graphicsRestore": {
+      "note": "Restoring graphics"
+    },
     "wiki": {
       "confirmTitle": "Wikiを開きますか？",
       "confirmBody": "World of ClaudeCraft のWikiをブラウザで開きます。ゲームはそのまま続行されます。",

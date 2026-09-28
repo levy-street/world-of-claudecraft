@@ -609,6 +609,9 @@ export const vi_VN: EnTranslations = {
       "healerConfirmAccept": "Hồi sinh tôi",
       "healerConfirmCancel": "Hủy bỏ"
     },
+    "graphicsRestore": {
+      "note": "Restoring graphics"
+    },
     "wiki": {
       "confirmTitle": "Mở Wiki?",
       "confirmBody": "Thao tác này sẽ mở wiki của World of ClaudeCraft trong trình duyệt của bạn. Trò chơi vẫn tiếp tục chạy.",

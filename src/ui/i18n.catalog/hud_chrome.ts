@@ -208,6 +208,13 @@ export const hudChromeStrings = {
     healerConfirmAccept: 'Revive Me',
     healerConfirmCancel: 'Cancel',
   },
+  // The note over the 3D view while a WebGL context restore holds the world
+  // draw (src/ui/graphics_restore_note_controller.ts): the browser lost and
+  // gave back the graphics context, and the visible scene is being prepared
+  // again. A status line, not a warning: the HUD stays live under it.
+  graphicsRestore: {
+    note: 'Restoring graphics',
+  },
   // Wiki launcher (#mm-wiki, the Esc-menu row, the mobile More tray). The
   // button label reuses nav.wiki; these are the confirm dialog's strings
   // (confirm-first so a mid-fight tap never opens the browser by accident).

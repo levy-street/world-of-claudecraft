@@ -378,6 +378,7 @@ import {
 import { attachContextRecoveryHandlers } from './render/context_loss_recovery';
 import { type RecycledRendererContext, recycleWebGL2Context } from './render/context_recycle';
 import { installWebGLContextRelease } from './render/context_release';
+import { contextRestoreDrawHeld } from './render/context_restore_hold';
 import {
   activateGfxProfile,
   captureGfxCapabilities,
@@ -502,6 +503,7 @@ import {
   attachGatherNodeHoverTooltip,
   gatherNodeToolGateFor,
 } from './ui/gather_node_tooltip_controller';
+import { installGraphicsRestoreNote } from './ui/graphics_restore_note_controller';
 import { loadHighscoresInto } from './ui/highscore_board';
 import { type ClaudiumHooks, Hud } from './ui/hud';
 import { resolveActionBarVisibility } from './ui/hud/action_bar/action_bar_visibility_core';
@@ -1462,6 +1464,7 @@ async function startGame(
       stuckMessage: t('loading.rendererContextLost'),
     }),
   );
+  installGraphicsRestoreNote(document.getElementById('ui') ?? document.body);
   // The probe was armed before the locale/asset awaits above; mark that the await
   // window ended and the synchronous scene build is what runs next.
   entryDiagnostics.checkpoint('scene-build-start', baseEntryDiagnostics());
@@ -4193,7 +4196,7 @@ async function startGame(
   // Reused across frames: the rAF hot path must not allocate (the frame
   // allocation guard polices the loop body), and the gate reads it
   // synchronously before returning a shared frozen decision.
-  const gateInput = newPresentationGateInput(DESKTOP_APP);
+  const gateInput = newPresentationGateInput(DESKTOP_APP, contextRestoreDrawHeld);
   function frame(now: number): void {
     if (armFrameAndSkip(frame, now, gateInput)) return;
     // The desktop shell keeps rAF running while hidden (backgroundThrottling is

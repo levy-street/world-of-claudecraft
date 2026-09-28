@@ -609,6 +609,9 @@ export const id_ID: EnTranslations = {
       "healerConfirmAccept": "Bangkitkan Aku",
       "healerConfirmCancel": "Membatalkan"
     },
+    "graphicsRestore": {
+      "note": "Restoring graphics"
+    },
     "wiki": {
       "confirmTitle": "Buka Wiki?",
       "confirmBody": "Ini akan membuka wiki World of ClaudeCraft di perambanmu. Permainan tetap berjalan.",

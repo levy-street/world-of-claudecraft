@@ -15261,6 +15261,44 @@
     font-size: 12px;
     color: var(--color-text-secondary);
   }
+  /* ---------- graphics restore note ---------- */
+  /* The status line over the 3D view while a WebGL context restore holds the
+     world draw (src/ui/graphics_restore_note_controller.ts). Composes
+     .ui-pill; this section sets geometry only. Centred: the view under it is
+     blank for the whole hold, so it hides nothing. The fade waits a beat, so
+     a hold of a few frames does not flash it. */
+  .graphics-restore-note {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 30;
+    white-space: nowrap;
+    animation: graphics-restore-note-in 200ms ease-out 250ms both;
+  }
+  .graphics-restore-note[hidden] {
+    display: none;
+  }
+  @keyframes graphics-restore-note-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  /* Reduced motion drops the fade, never the delay: a hold of a few frames
+     still must not flash the note. Hide Interface (Alt+Z) hides it with the
+     rest of #ui on purpose: the player asked for no chrome. */
+  @media (prefers-reduced-motion: reduce) {
+    .graphics-restore-note {
+      animation-duration: 0s;
+    }
+  }
+  body.reduce-motion .graphics-restore-note {
+    animation-duration: 0s;
+  }
   /* ---------- Hide Interface (Alt+Z, interface_visibility_core.ts) ---------- */
   /* One body class hides every HUD surface for a clean screenshot or video:
      each #ui child except the visually-hidden a11y live regions (screen readers

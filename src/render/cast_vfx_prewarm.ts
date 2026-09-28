@@ -27,6 +27,7 @@ import { warriorKitAssetsState } from './ability_vfx/production_assets';
 import { CAST_VFX_FAMILIES, type CastVfxFamilyId } from './cast_vfx_family';
 import { type CastVfxReadiness, createCastVfxReadiness } from './cast_vfx_readiness_core';
 import { type CompileArmHost, linkColorPrograms } from './compile_arms';
+import { registerContextRestoreReset } from './context_restore_registry';
 import { isProgramKnownReady, markProgramsReadyUnder } from './linked_program_readiness';
 import type { LinkedProgramLike } from './linked_program_touch';
 import type { PrewarmManifestEntry } from './prewarm_entry';
@@ -115,6 +116,19 @@ export function castVfxStandInSlot(
   });
 }
 
+/** After a WebGL context restore closed the cast gate again: the first-read
+ *  links (the reads a player acts on) ahead of every pooled program, engine
+ *  then kit, each recording its proof on the restored context. */
+export function castVfxRestoreUnits(
+  scene: THREE.Object3D,
+  firstReadRoots: readonly (THREE.Object3D | null | undefined)[],
+  host: CompileArmHost,
+  webgl: LinkedProgramSource,
+): PrewarmResumeUnit[] {
+  const firstReads = castVfxFirstReadsEntry(firstReadRoots, host, webgl).resumeProgramUnits?.();
+  return [...(firstReads ?? []), ...castVfxProgramUnits(scene, null, host, webgl)];
+}
+
 export const CAST_VFX_FIRST_READS_ENTRY_ID = 'vfx.cast-first-reads';
 
 /** The boot entry for the reads a player acts on that draw through a closed
@@ -185,7 +199,7 @@ export function createSceneCastVfxReadiness(
     byFamily ??= abilityVfxFamilyMaterials(scene);
     return byFamily.get(id) ?? [];
   };
-  return createCastVfxReadiness<THREE.Material>({
+  const readiness = createCastVfxReadiness<THREE.Material>({
     now,
     frame: () => webgl.info?.render.frame ?? Number.NaN,
     deadlineMs,
@@ -205,4 +219,6 @@ export function createSceneCastVfxReadiness(
       return program && isProgramKnownReady(program) ? program : null;
     },
   });
+  registerContextRestoreReset('cast-vfx-readiness', readiness, (gate) => gate.reset());
+  return readiness;
 }

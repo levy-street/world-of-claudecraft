@@ -609,6 +609,9 @@ export const zh_CN: EnTranslations = {
       "healerConfirmAccept": "复活",
       "healerConfirmCancel": "取消"
     },
+    "graphicsRestore": {
+      "note": "Restoring graphics"
+    },
     "wiki": {
       "confirmTitle": "打开维基？",
       "confirmBody": "将在浏览器中打开 World of ClaudeCraft 维基，游戏会继续运行。",

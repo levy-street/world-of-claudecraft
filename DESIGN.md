@@ -1178,4 +1178,5 @@ only; behavior changes are named in the linked section.
 | `#arena-status`, spectate badge, reconnect overlay, tutorial cards | Restyle | Coordinated PR |
 | Discord surfaces (`#mm-discord` panel behavior, `#discord-window`, index-only CTA) | Keep the existing micro-menu behavior and restyle the window in place | Coordinated PR |
 | `#perf-overlay`, `#click-move-marker`, skip links, live regions | Unchanged | n/a |
+| `#graphics-restore-note` (transient status line over the held 3D view after a WebGL context restore) | New, composes `ui-pill` | This PR |
 | Mobile touch controls and sheets | Restyle the mobile HUD in the coordinated PR; broader mobile layout remains future Echoes work | Coordinated PR, then Echoes |

@@ -11238,6 +11238,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.gatheringSource.rareTag'
   | 'hudChrome.gatheringSource.specimenOfBase'
   | 'hudChrome.gatheringSource.title'
+  | 'hudChrome.graphicsRestore.note'
   | 'hudChrome.guildRanks.add'
   | 'hudChrome.guildRanks.colActions'
   | 'hudChrome.guildRanks.colMembers'

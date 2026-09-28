@@ -97,6 +97,13 @@ Everything else is a sibling module in one of these families:
   gap), and `software_renderer.ts` (the SINGLE source of truth for detecting a
   software rasterizer from the adapter string; `gfx.ts`, `perf_doctor.ts`, and
   `perf_reporter.ts` all consume it so the detectors cannot drift).
+  An in-place loss and restore is `context_restore.ts` (pure half
+  `context_restore_core.ts`): every "this GPU work is done" record registers its reset
+  or re-bake in `context_restore_registry.ts` next to the record (the source scan in
+  `tests/context_restore_registry.test.ts` fails a new record with no answer), a link
+  that straddles a loss is linked again (`context_generation.ts`, read by the compile
+  arms), and the world draw is held for at most `CONTEXT_RESTORE_HOLD_MAX_MS` while
+  the visible set links (`context_restore_hold.ts`).
 - `view_create_retry.ts`: bounded cooldown state for fail-soft character builds
   in per-frame paths, including required targets, form swaps, and visual-key
   swaps (`tests/view_create_retry.test.ts`).

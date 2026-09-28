@@ -609,6 +609,9 @@ export const tr_TR: EnTranslations = {
       "healerConfirmAccept": "Beni Canlandır",
       "healerConfirmCancel": "İptal etmek"
     },
+    "graphicsRestore": {
+      "note": "Restoring graphics"
+    },
     "wiki": {
       "confirmTitle": "Wiki Açılsın mı?",
       "confirmBody": "Bu, World of ClaudeCraft Wiki'sini tarayıcında açar. Oyun çalışmaya devam eder.",

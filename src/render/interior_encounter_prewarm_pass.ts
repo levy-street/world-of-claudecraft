@@ -8,6 +8,7 @@ import { VARKHUL_BOSS_ID } from '../sim/ignivar_raid_ids';
 import { ALL_CLASSES, type PlayerClass } from '../sim/types';
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
 import { type CharacterVisual, createCharacterVisual } from './characters';
+import { registerContextRestoreReset } from './context_restore_registry';
 import { GFX } from './gfx';
 import { idleSlot, runIdleQueue } from './idle_queue';
 import { buildIgnivarEncounterPrewarmVisual } from './ignivar_encounter';
@@ -47,7 +48,10 @@ const startedByHost = new WeakMap<object, Set<EncounterPrewarmSet>>();
 const keepAliveByHost = new WeakMap<object, CharacterVisual[]>();
 const varkhulKeepAliveByHost = new WeakMap<object, THREE.Group[]>();
 const varkhulPortalKeepAliveByHost = new WeakMap<object, VarkhulForgePortalPrewarmVisual[]>();
-const liveWarmedByVisual = new WeakMap<CharacterVisual, Set<string>>();
+let liveWarmedByVisual = new WeakMap<CharacterVisual, Set<string>>();
+// Hosts whose kept-alive catalog lost its programs to a context restore while
+// the player was outside every encounter interior: relinked at the next attach.
+const staleKeepAliveHosts = new WeakSet<object>();
 // One live body warms at a time, per host. Each pass waits for its own idle
 // slot, but a raid arrives together: six independent waits resolve in the SAME
 // idle period and their program links concatenate into one long task (measured:
@@ -78,6 +82,8 @@ export function startInteriorEncounterPrewarm(interior: string, host: object): v
   if (!spec || typed.shutdownStarted) return;
   // The attach is the earliest honest answer to "which interior is live".
   setEncounterPrewarmInterior(host, interior);
+  registerContextRestoreReset('interior-encounter-prewarm', host, forgetEncounterPrewarmContext);
+  if (staleKeepAliveHosts.delete(host)) relinkKeptAlive(typed);
   const started = startedByHost.get(host) ?? new Set<EncounterPrewarmSet>();
   startedByHost.set(host, started);
   // Claimed per SET, not per interior: the raid reaches the Varkhul and Ignivar
@@ -153,6 +159,66 @@ export function queueLiveSoulRendPrewarm(
     }),
   );
   liveChainByHost.set(host, chain);
+}
+
+/** A WebGL context restore: every claimed set and every warmed live look was
+ *  linked on the lost context. The kept-alive catalog is linked again as it
+ *  stands (the bodies are built, only their programs are gone), at once when
+ *  the player is in an encounter interior, else at the next attach; the live
+ *  bodies of the interior the player is in queue for their warm again. */
+function forgetEncounterPrewarmContext(host: object): void {
+  liveWarmedByVisual = new WeakMap();
+  const typed = host as InteriorEncounterPrewarmHost;
+  if (typed.shutdownStarted) return;
+  const interior = activeInteriorByHost.get(host);
+  if (!interior) {
+    staleKeepAliveHosts.add(host);
+    return;
+  }
+  relinkKeptAlive(typed);
+  for (const [id, view] of typed.views) {
+    if (!view.visual) continue;
+    queueLiveSoulRendPrewarm(
+      host,
+      view.visual,
+      view,
+      typed.sim.entities.get(id)?.kind ?? '',
+      interior,
+    );
+  }
+}
+
+function relinkKeptAlive(host: InteriorEncounterPrewarmHost): void {
+  const visuals = keepAliveByHost.get(host) ?? [];
+  const groups = varkhulKeepAliveByHost.get(host) ?? [];
+  const portals = varkhulPortalKeepAliveByHost.get(host) ?? [];
+  if (visuals.length + groups.length + portals.length === 0) return;
+  const group = new THREE.Group();
+  group.name = 'interior-encounter-prewarm';
+  placeHiddenPrewarmGroup(host, group);
+  for (const visual of visuals) {
+    visual.root.visible = true;
+    group.add(visual.root);
+  }
+  for (const kept of groups) {
+    kept.visible = true;
+    group.add(kept);
+  }
+  for (const portal of portals) group.add(portal.root);
+  void compileEncounterPrewarmGroup(host, group)
+    .catch(() => {
+      // Soft-fail like the first pass: whatever stays cold links at first use.
+    })
+    .finally(() => {
+      for (const visual of visuals) {
+        visual.root.removeFromParent();
+        visual.root.visible = false;
+      }
+      for (const kept of groups) {
+        kept.removeFromParent();
+        kept.visible = false;
+      }
+    });
 }
 
 async function runInteriorEncounterPrewarm(

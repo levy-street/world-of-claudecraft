@@ -5,6 +5,7 @@ import {
   OPEN_CAST_VFX_SPAWN_GATE,
   tagCastVfxEngine,
 } from '../cast_vfx_family';
+import { registerContextRestoreReset } from '../context_restore_registry';
 import type { VfxAnchorResolver } from '../vfx_anchor';
 import { type AbilityVfxTextures, OVERLAY_CELL } from './fx_textures';
 import { slashWidthScale } from './spectacle';
@@ -375,6 +376,7 @@ export class AbilityVfxRibbons {
       if (this.geo.drawRange.count === 0) this.mesh.visible = false;
     };
     scene.add(this.mesh);
+    registerContextRestoreReset('ribbons', this, (owner) => owner.forgetContext());
     for (let i = 0; i < BOLT_SLOTS; i++) {
       this.bolts.push({
         active: false,
@@ -1232,6 +1234,14 @@ export class AbilityVfxRibbons {
     this.geo.setDrawRange(0, 0);
     this.wasEmpty = true;
     this.mesh.visible = !this.warmed;
+  }
+
+  /** A WebGL context restore: the pool draws again until its program is
+   *  relinked on the restored context, the same idiom as ../vfx.ts. */
+  forgetContext(): void {
+    if (this.disposed) return;
+    this.warmed = false;
+    this.mesh.visible = true;
   }
 
   dispose(): void {
