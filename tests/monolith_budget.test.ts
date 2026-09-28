@@ -537,7 +537,10 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18093,
+    // LOWERED 18093 -> 18089 at the release/v0.45.0 merge into feature/mirefen-tavern:
+    // the tavern's rest badge read (rest_indicator.ts restStateOf) pays for the tavern's wiring.
+    // wc -l on the merged tree. Exact count.
+    ceiling: 18089,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -995,7 +998,11 @@ const MONOLITHS: MonolithRow[] = [
     // RE-PINNED 12687 -> 12688 at the second release merge into the same branch,
     // after PR 3847 landed on the release (its renderer.ts wiring adds one line;
     // the release pin stays 12684): wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 12688,
+    // LOWERED 12688 -> 12686 at the release/v0.45.0 merge into feature/mirefen-tavern:
+    // the tavern's indoor camera clamp and seat pose extractions (interior_camera.ts,
+    // chase_camera_floor_core.ts, seated_pose.ts) pays for the tavern's wiring. wc -l on the
+    // merged tree. Exact count.
+    ceiling: 12686,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1207,7 +1214,10 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 11642,
+    // LOWERED 11642 -> 11639 by the tavern's seats: standUp moved whole into seating.ts
+    // (bound straight into the context and the motion deps), paying for the sitOnSeat and
+    // resting delegates. Exact count.
+    ceiling: 11639,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1689,7 +1699,10 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 9827 and the
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 9840,
+    // LOWERED 9840 -> 9835 at the release/v0.45.0 merge into feature/mirefen-tavern:
+    // the tavern's tick_perf_log.ts mobZonePhase extraction pays for the tavern's wiring. wc -l
+    // on the merged tree. Exact count.
+    ceiling: 9835,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1868,7 +1881,10 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 5354 and the
     // branch 5426; the two sides' additions compose to 5356 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 5356,
+    // LOWERED 5356 -> 5355 at the release/v0.45.0 merge into feature/mirefen-tavern:
+    // the tavern's input_signature.ts extraction pays for the tavern's wiring. wc -l on the
+    // merged tree. Exact count.
+    ceiling: 5355,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

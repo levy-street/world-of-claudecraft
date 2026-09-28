@@ -37,6 +37,7 @@ import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 import { castBarState } from './cast_bar';
 import { anyCharacterRigDrawing, entityHasNoBody } from './entity_gate_stand_in_core';
 import { mobDisplayName, npcDisplayName, objectDisplayName } from './entity_labels';
+import { interiorHidesNameplate } from './interior_camera';
 import {
   createNameplateCanvasState,
   type NameplateCanvasState,
@@ -53,7 +54,7 @@ import {
   nameplateDotsInto,
 } from './nameplate_dots_core';
 import { isFriendlyNameplateHidden } from './nameplate_friendly_core';
-import { nameplateHeraldryLift } from './nameplate_heraldry_core';
+import { nameplateHeraldryLift, nameplateSubRowsLift } from './nameplate_heraldry_core';
 import { NameplatePaintGate } from './nameplate_paint_gate_core';
 import { type NameplatePickCandidate, pickNameplateHealthBarAt } from './nameplate_pick_core';
 import {
@@ -333,6 +334,11 @@ export class NameplatePainter {
       this.tmpV.copy(view.group.position);
       this.tmpV.y += plan.anchorYOffset;
       if (!isProjectedNameplateAnchorVisible(this.camera, this.tmpV, this.tmpV2)) continue;
+      // indoors (a walk-in interior holds the player), a plate outside shows only through a
+      // doorway, never through the walls; the unit frame of a selected target is untouched
+      // (tested after the cheap frustum check, so only on-screen plates pay for the walk)
+      const p = view.group.position;
+      if (interiorHidesNameplate(this.camera, p.x, p.y, p.z, this.tmpV.y)) continue;
       this.tmpV.project(this.camera);
       if (this.tmpV.z < -1 || this.tmpV.z > 1) continue;
       const screenX = (this.tmpV.x * 0.5 + 0.5) * width;
@@ -361,7 +367,8 @@ export class NameplatePainter {
       // crowd overlapped without being nudged apart.
       const extraLift =
         nameplateHeraldryLift(state.border) +
-        nameplateDotRowHeight(state.dots.count, state.dots.scale);
+        nameplateDotRowHeight(state.dots.count, state.dots.scale) +
+        nameplateSubRowsLift(!!state.guild, state.currentTarget, !!state.title);
       if (anchor) {
         anchor.id = id;
         anchor.sx = screenX;

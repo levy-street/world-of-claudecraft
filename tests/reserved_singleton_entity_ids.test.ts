@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { LAST_KEEP_SPIRIT_HEALER_ENTITY_ID } from '../src/sim/content/graveyards';
 import { HEALING_TRAINING_ENTITY_IDS } from '../src/sim/content/healing_training';
 import { CRUCIBLE_VENDOR_ENTITY_ID } from '../src/sim/content/ignivar_loot';
+import { TAVERN_KEEPER_ENTITY_ID, TAVERN_KEEPER_NPC_ID } from '../src/sim/content/mirefen_tavern';
 import { FURY_ENTITY_ID } from '../src/sim/content/pvp_honor';
 import { HARBOR_HOUSE_KEEPER_ENTITY_ID } from '../src/sim/content/wyrmwatch_harbor_house';
 import { WARFARE_QUARTERMASTER_ENTITY_ID } from '../src/sim/pvp/warfare_quartermaster';
@@ -26,6 +27,7 @@ const RESERVED: Record<string, number> = {
   LAST_KEEP_SPIRIT_HEALER_ENTITY_ID,
   HARBOR_HOUSE_KEEPER_ENTITY_ID,
   WEEKLY_KEEPER_ENTITY_ID,
+  TAVERN_KEEPER_ENTITY_ID,
   ...Object.fromEntries(
     Object.entries(HEALING_TRAINING_ENTITY_IDS).map(([id, n]) => [`HEALING_TRAINING:${id}`, n]),
   ),
@@ -49,13 +51,14 @@ describe('reserved singleton entity ids', () => {
     expect(collisions, 'ids reserved more than once').toEqual([]);
   });
 
-  it('the vault keeper and the harbormaster both spawn, each under her own id', () => {
+  it('the vault keeper, the harbormaster and the innkeeper all spawn, each under her own id', () => {
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
     expect(sim.entities.get(WEEKLY_KEEPER_ENTITY_ID)?.templateId).toBe(WEEKLY_KEEPER_ID);
     expect(sim.entities.get(HARBOR_HOUSE_KEEPER_ENTITY_ID)?.templateId).toBe(
       HARBOR_HOUSE_KEEPER_NPC_ID,
     );
-    for (const templateId of [WEEKLY_KEEPER_ID, HARBOR_HOUSE_KEEPER_NPC_ID]) {
+    expect(sim.entities.get(TAVERN_KEEPER_ENTITY_ID)?.templateId).toBe(TAVERN_KEEPER_NPC_ID);
+    for (const templateId of [WEEKLY_KEEPER_ID, HARBOR_HOUSE_KEEPER_NPC_ID, TAVERN_KEEPER_NPC_ID]) {
       const copies = [...sim.entities.values()].filter(
         (e) => e.kind === 'npc' && e.templateId === templateId,
       );

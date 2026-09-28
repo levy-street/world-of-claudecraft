@@ -217,6 +217,18 @@ COSMETIC (may be tiered down on lower presets):
   device policy (`gfxAaPolicy`) plus the Anti-Aliasing dial, never of the frame-budget
   governor, so it cannot vary between two players standing in the same spot.
 
+- Not a tier knob, recorded here so it is never mistaken for one: the indoor presentation
+  of a walk-in interior (`src/render/interior_camera.ts`). While a player stands inside a
+  registered interior (the Mirefen tavern), the plates and chat bubbles of bodies OUTSIDE it
+  draw only when the camera sees them through an opening (its door), never through a wall
+  (while the camera still follows the player in through the door from outside, the player's
+  eye decides the same way), and the camera keeps to the room. It reads no preset, dial or governor: every player, on
+  every device, standing in the same spot sees the same thing, and the walls it respects are
+  the ones the sim's line of sight already respects (`builtStructureColliders`), so a body
+  behind them could not be targeted by a spell anyway. The unit frame of a selected target is
+  untouched. Pinned by `tests/nameplate_interior_gate.test.ts` and
+  `tests/interior_camera.test.ts`.
+
 The test for any new tier knob: if a knob hides or delays something a player READS AND REACTS
 TO, it is not allowed. If it only reduces visual richness or redraw smoothness, it is fine.
 

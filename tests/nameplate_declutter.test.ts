@@ -12,6 +12,7 @@ import {
   STACK_OFFSET_PX,
 } from '../src/render/nameplate_declutter';
 import { NAMEPLATE_DOT_SCALE_MAX, nameplateDotRowHeight } from '../src/render/nameplate_dots_core';
+import { nameplateSubRowsLift } from '../src/render/nameplate_heraldry_core';
 
 // Independent oracle literals. This reference exists to catch drift in the
 // optimized spatial-hash implementation, so it must not import the production
@@ -909,5 +910,32 @@ describe('nameplate declutter: spatial-hash hot path', () => {
     ];
     expect(() => declutterNameplatesInPlace(anchors, 99)).not.toThrow();
     expect(Math.abs(anchors[0].sy - anchors[1].sy)).toBeGreaterThanOrEqual(STACK_OFFSET_PX);
+  });
+});
+
+describe('titled plates (a <role> or <guild> line under the name)', () => {
+  it('stacks two close titled plates clear of each other, which bare labels would not', () => {
+    // the innkeeper and a drover at the bar: 20px apart on screen, a line of title each
+    const lift = nameplateSubRowsLift(true, false, false);
+    expect(lift).toBe(12);
+    const bare = [
+      { id: 1, sx: 990, sy: 200 },
+      { id: 2, sx: 1010, sy: 220 },
+    ];
+    declutterNameplatesInPlace(bare);
+    expect(bare[1].sy - bare[0].sy).toBe(20); // bare labels 20px apart do not collide
+    const titled = [
+      { id: 1, sx: 990, sy: 200, extraLift: lift },
+      { id: 2, sx: 1010, sy: 220, extraLift: lift },
+    ];
+    declutterNameplatesInPlace(titled);
+    // the lower plate's name row now clears the upper plate's title line
+    expect(Math.abs(titled[1].sy - titled[0].sy)).toBeGreaterThanOrEqual(18 + lift);
+  });
+
+  it('counts the target plate taller title type and the deed title line', () => {
+    expect(nameplateSubRowsLift(true, true, false)).toBe(14);
+    expect(nameplateSubRowsLift(false, false, true)).toBe(11);
+    expect(nameplateSubRowsLift(false, false, false)).toBe(0);
   });
 });

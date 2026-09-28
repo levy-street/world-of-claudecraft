@@ -1355,6 +1355,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nameplate.npcRole.armorVendor': '護甲商人',
   'hudChrome.nameplate.npcRole.armsDealer': '軍械商人',
   'hudChrome.nameplate.npcRole.foodVendor': '食物和飲料商人',
+  'hudChrome.nameplate.npcRole.innkeeper': '旅店老闆',
   'hudChrome.nameplate.npcRole.potionVendor': '藥水商人',
   'hudChrome.nameplate.npcRole.stableMaster': '馬廄管理員',
   'hudChrome.nameplate.npcRole.generalGoods': '雜貨商人',
@@ -7560,6 +7561,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.targetCycleShort': '目標',
   'hudChrome.mobile.toggleHaptics': '切換觸覺回饋',
   'hudChrome.rest.resting': '休息中',
+  'hudChrome.rest.restArea': '休息中：你正處於休息區，會在這裡獲得休息經驗。',
   'hudChrome.swing.ready': '揮砍',
   'hudChrome.swing.seconds': '{seconds}秒',
   'hudChrome.widgets.clockTitle': '本地時間 - 點擊切換 12／24 小時制',
@@ -13066,6 +13068,26 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '從碼頭進來暖暖手吧。停在我們碼頭的船沿著漫長的東岸北上駛往燭港，再原路返回。在遙遠的西邊，另一艘渡船往返於東溪與夜綻花野之間。牆上的地圖畫著這兩條航線。攀登望龍哨之前，先在火邊歇一歇吧。',
   'entities.npcs.harbormaster_tamsin.name': '港務長塔姆辛',
   'entities.npcs.harbormaster_tamsin.title': '望龍哨碼頭看守',
+  'entities.npcs.innkeeper_maudie.greeting':
+    '快從濕氣裡進來吧，朋友，下到火邊時當心台階。水壺正燒著，長凳是暖的，樓上的房間也乾爽。從芬橋來的旅人都發誓說沼澤路白天很太平，可天黑以後沒人敢走。坐一會兒，歇歇腳吧。',
+  'entities.npcs.innkeeper_maudie.name': '莫迪·塔普賴特',
+  'entities.npcs.innkeeper_maudie.title': '旅店老闆',
+  'entities.npcs.patron_amos_eelby.greeting':
+    '拉條長凳坐下吧，{className}。格麗塞爾這人硬說芬橋底下的大鰻魚是瞎編的。我可親手摸到過牠兩回。兩回！滑得跟收稅官似的，差不多有這條長凳那麼長。',
+  'entities.npcs.patron_amos_eelby.name': '埃莫斯·伊爾比',
+  'entities.npcs.patron_amos_eelby.title': '捕鰻人',
+  'entities.npcs.patron_grissel_sedgeworth.greeting':
+    '別理埃莫斯。我挖了四十年泥炭，從這片沼澤裡挖出來的怪東西比他釣的鰻魚還多：靴子、骨頭，還有一頂頭盔，裡頭那顆腦袋到現在還一臉發愁。烤烤火吧，火不要錢。',
+  'entities.npcs.patron_grissel_sedgeworth.name': '格麗塞爾·塞奇沃斯',
+  'entities.npcs.patron_grissel_sedgeworth.title': '泥炭工',
+  'entities.npcs.patron_ned_oxley.greeting':
+    '我沿著堤道趕了四十頭牛，還沒到芬橋就有兩頭陷進了泥沼。這條路上從不讓人失望的，只有莫迪的麥酒。你的酒自己付錢。',
+  'entities.npcs.patron_ned_oxley.name': '內德·奧克斯利',
+  'entities.npcs.patron_ned_oxley.title': '趕牲人',
+  'entities.npcs.patron_hester_quillby.greeting':
+    '我買過的每一張這片沼澤的地圖，不出一季就不準了。水會挪動小路，小路又會挪動水。所以我自己畫，趁墨跡未乾，就坐在這兒乾爽的地方。',
+  'entities.npcs.patron_hester_quillby.name': '赫絲特·奎爾比',
+  'entities.npcs.patron_hester_quillby.title': '製圖師',
   'entities.npcs.harbormaster_odile.greeting':
     '這座海灣裡的每條船，龍骨都欠老燈塔一份情。有話快說，潮水可不等人。',
   'entities.npcs.head_gardener_amaranth.name': '首席園丁艾瑪蘭',

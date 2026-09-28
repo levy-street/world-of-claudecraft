@@ -1205,7 +1205,8 @@ export const zh_CN: EnTranslations = {
       "drowning": "溺水！"
     },
     "rest": {
-      "resting": "休息中"
+      "resting": "休息中",
+      "restArea": "休息中：你正处于休息区，会在这里获得休息经验。"
     },
     "paladin": {
       "devotion": "虔诚",
@@ -4211,7 +4212,8 @@ export const zh_CN: EnTranslations = {
         "foodVendor": "食物和饮料商人",
         "potionVendor": "药水商人",
         "stableMaster": "马厩管理员",
-        "generalGoods": "杂货商人"
+        "generalGoods": "杂货商人",
+        "innkeeper": "旅店老板"
       }
     },
     "mobTooltip": {
@@ -20595,6 +20597,31 @@ export const zh_CN: EnTranslations = {
         "name": "港务长塔姆辛",
         "title": "望龙哨码头看守",
         "greeting": "从码头进来暖暖手吧。停在我们码头的船沿着漫长的东岸北上驶往烛港，再原路返回。在遥远的西边，另一艘渡船往返于东溪与夜绽花野之间。墙上的地图画着这两条航线。攀登望龙哨之前，先在火边歇一歇吧。"
+      },
+      "innkeeper_maudie": {
+        "name": "莫迪·塔普赖特",
+        "title": "旅店老板",
+        "greeting": "快从湿气里进来吧，朋友，下到火边时当心台阶。水壶正烧着，长凳是暖的，楼上的房间也干爽。从芬桥来的旅人都发誓说沼泽路白天很太平，可天黑以后没人敢走。坐一会儿，歇歇脚吧。"
+      },
+      "patron_amos_eelby": {
+        "name": "埃莫斯·伊尔比",
+        "title": "捕鳗人",
+        "greeting": "拉条长凳坐下吧，{className}。格丽塞尔这人硬说芬桥底下的大鳗鱼是瞎编的。我可亲手摸到过它两回。两回！滑得跟收税官似的，差不多有这条长凳那么长。"
+      },
+      "patron_grissel_sedgeworth": {
+        "name": "格丽塞尔·塞奇沃斯",
+        "title": "泥炭工",
+        "greeting": "别理埃莫斯。我挖了四十年泥炭，从这片沼泽里挖出来的怪东西比他钓的鳗鱼还多：靴子、骨头，还有一顶头盔，里头那颗脑袋到现在还一脸发愁。烤烤火吧，火不要钱。"
+      },
+      "patron_ned_oxley": {
+        "name": "内德·奥克斯利",
+        "title": "赶牲人",
+        "greeting": "我沿着堤道赶了四十头牛，还没到芬桥就有两头陷进了泥沼。这条路上从不让人失望的，只有莫迪的麦酒。你的酒自己付钱。"
+      },
+      "patron_hester_quillby": {
+        "name": "赫丝特·奎尔比",
+        "title": "制图师",
+        "greeting": "我买过的每一张这片沼泽的地图，不出一季就不准了。水会挪动小路，小路又会挪动水。所以我自己画，趁墨迹未干，就坐在这儿干爽的地方。"
       },
       "reeve_ottoline": {
         "name": "镇务官奥托琳",

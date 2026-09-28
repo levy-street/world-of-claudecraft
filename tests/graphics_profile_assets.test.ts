@@ -25,6 +25,7 @@ const mocks = vi.hoisted(() => {
     wyrmwatchHarbor: prepare(),
     wickharborWharf: prepare(),
     wickharborHarbor: prepare(),
+    mirefenTavern: prepare(),
     reset: vi.fn(),
     sledReset: vi.fn(),
   };
@@ -91,6 +92,10 @@ vi.mock('../src/render/wickharbor_wharf', () => ({
 vi.mock('../src/render/wickharbor_harbor', () => ({
   prepareWickharborHarborAssets: mocks.wickharborHarbor,
   resetWickharborHarborCaches: mocks.reset,
+}));
+vi.mock('../src/render/mirefen_tavern', () => ({
+  prepareMirefenTavernAssets: mocks.mirefenTavern,
+  resetMirefenTavernCaches: mocks.reset,
 }));
 vi.mock('../src/render/eastbrook_grand_armoury', () => ({
   prepareEastbrookGrandArmouryProfileAssets: mocks.armoury,
@@ -178,6 +183,7 @@ const prepareSpies = [
   mocks.wyrmwatchHarbor,
   mocks.wickharborWharf,
   mocks.wickharborHarbor,
+  mocks.mirefenTavern,
 ];
 
 beforeEach(() => {
@@ -264,6 +270,7 @@ describe('graphics profile derived-cache reset', () => {
       'wyrmwatch_harbor',
       'wickharbor_wharf',
       'wickharbor_harbor',
+      'mirefen_tavern',
       'paladin_ascension_visual',
       'goblin_rocket_sled_fx',
       'ground_decor_prewarm',

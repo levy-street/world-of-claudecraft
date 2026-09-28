@@ -1865,6 +1865,107 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     worn: kit('mage', { hands: 'rogue' }),
     props: 'harbormaster',
   },
+  // Maudie Tapwright, innkeeper of the Mirefen tavern: round and rosy from the fire, a
+  // grey-streaked bun, laugh lines and a sleeves-rolled garnet dress under a long apron
+  // (the tavern's one textile colour); nothing in her hands but a welcome.
+  innkeeper_maudie: {
+    app: {
+      gender: 'female',
+      hair: 'highbun',
+      ...hair(24, 0.35, 0.5),
+      brows: 'arched',
+      eyeShape: 'round',
+      ...eyes(30, 0.45, 0.35),
+      ...skin(18, 0.5, 0.62),
+      mouth: 'smile',
+      blush: 'warm',
+      face: face({ cheeks: 0.35, chin: 0.1 }),
+      body: body({ chest: 0.2, shoulders: 0.1 }),
+      outfit: 'crimson',
+    },
+    worn: kit('mage'),
+    props: 'none',
+  },
+  // The tavern's regulars (src/sim/content/mirefen_tavern_patrons.ts), all seated.
+  // Amos Eelby, eel fisher: an old marshman gone bald on top and white in the beard,
+  // brows like thatch, skin weathered brown by forty summers on the water; fen-green
+  // leathers with the sleeves pushed up.
+  patron_amos_eelby: {
+    app: {
+      gender: 'male',
+      hair: 'bald',
+      ...hair(34, 0.08, 0.82),
+      beard: 'full',
+      brows: 'bushy',
+      eyeShape: 'narrow',
+      ...eyes(96, 0.3, 0.38),
+      ...skin(24, 0.42, 0.44),
+      mouth: 'grin',
+      face: face({ cheeks: 0.2, brow: 0.3, chin: 0.1 }),
+      body: body({ chest: 0.15 }),
+      outfit: 'forest',
+    },
+    worn: kit('ranger', { arms: null }),
+    props: 'none',
+  },
+  // Grissel Sedgeworth, peat cutter: a broad, wind-reddened woman with a grey-streaked
+  // brown bun, shrewd eyes and a dry mouth; peat-brown work clothes.
+  patron_grissel_sedgeworth: {
+    app: {
+      gender: 'female',
+      hair: 'lowbun',
+      ...hair(28, 0.25, 0.42),
+      brows: 'flat',
+      eyeShape: 'narrow',
+      ...eyes(32, 0.4, 0.33),
+      ...skin(16, 0.46, 0.55),
+      mouth: 'lips',
+      blush: 'warm',
+      face: face({ jaw: 0.25, cheeks: 0.25 }),
+      body: body({ shoulders: 0.25, chest: 0.1 }),
+      outfit: 'ember',
+    },
+    worn: kit('rogue', { arms: null }),
+    props: 'none',
+  },
+  // Ned Oxley, drover: a road-worn man of middle years, unkempt brown hair, a week of
+  // stubble and a sunburnt nose; dusty onyx leathers.
+  patron_ned_oxley: {
+    app: {
+      gender: 'male',
+      hair: 'messy',
+      ...hair(25, 0.4, 0.28),
+      beard: 'scruff',
+      brows: 'thick',
+      eyeShape: 'almond',
+      ...eyes(205, 0.35, 0.42),
+      ...skin(22, 0.5, 0.5),
+      mouth: 'neutral',
+      face: face({ jaw: 0.35, brow: 0.15 }),
+      body: body({ shoulders: 0.3 }),
+      outfit: 'onyx',
+    },
+    worn: kit('ranger'),
+    props: 'none',
+  },
+  // Hester Quillby, mapmaker: neat dark bob, an ink-blue coat and a scholar's patience;
+  // pale from indoor winters over her charts.
+  patron_hester_quillby: {
+    app: {
+      gender: 'female',
+      hair: 'chinbob',
+      ...hair(220, 0.2, 0.16),
+      brows: 'arched',
+      eyeShape: 'round',
+      ...eyes(160, 0.35, 0.45),
+      ...skin(26, 0.3, 0.7),
+      mouth: 'lips',
+      face: face({ cheeks: -0.05, chin: -0.1, smirk: 0.25 }),
+      outfit: 'azure',
+    },
+    worn: kit('mage'),
+    props: 'none',
+  },
   // Reeve Ottoline of Lanternmere: the harvest never ends; neither do ledgers.
   reeve_ottoline: {
     app: {

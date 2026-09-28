@@ -1,6 +1,15 @@
 import { isEastbrookGrandArmoury } from '../sim/building_layout';
+import {
+  TAVERN_HALL,
+  TAVERN_PORCH,
+  TAVERN_STEPS_MAX_RUN,
+  TAVERN_TOWER,
+  TAVERN_WING,
+  tavernToWorld,
+} from '../sim/content/mirefen_tavern';
 import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from '../sim/fenbridge_layout';
+import { tavernGroundsRects } from '../sim/mirefen_tavern_grounds';
 import type { BuildingDef, NoticeboardDef } from '../sim/types';
 
 export type EastbrookGrassExclusion =
@@ -223,6 +232,8 @@ export function eastbrookGrassExclusions(
     }
   }
 
+  if (builtInWorld) exclusions.push(...mirefenTavernGrassExclusions());
+
   for (const board of noticeboards) {
     exclusions.push({
       kind: 'obb',
@@ -242,6 +253,46 @@ export function eastbrookGrassExclusions(
     });
   }
   return exclusions;
+}
+
+/** The Mirefen tavern's floor keeps its grass out (sim/content/mirefen_tavern.ts): the hall,
+ *  the wing, the round tower, the porch and the run of its steps, and its grounds
+ *  (sim/mirefen_tavern_grounds.ts: the cobbled forecourt, the stable's floor and the pieces on
+ *  the terrain). The tavern's local axes run along the world's (its door faces +x), so each
+ *  rectangle is a plain one. */
+export function mirefenTavernGrassExclusions(): EastbrookGrassExclusion[] {
+  const rect = (id: string, x0: number, x1: number, z0: number, z1: number) => {
+    const a = tavernToWorld(x0, z0);
+    const b = tavernToWorld(x1, z1);
+    return {
+      kind: 'obb' as const,
+      id,
+      x: (a.x + b.x) / 2,
+      z: (a.z + b.z) / 2,
+      halfWidth: Math.abs(b.x - a.x) / 2,
+      halfDepth: Math.abs(b.z - a.z) / 2,
+      rotation: 0,
+    };
+  };
+  const tower = tavernToWorld(TAVERN_TOWER.x, TAVERN_TOWER.z);
+  const H = TAVERN_HALL;
+  const W = TAVERN_WING;
+  const P = TAVERN_PORCH;
+  return [
+    rect('mirefen_tavern:hall', H.x0, H.x1, H.z0, H.z1),
+    rect('mirefen_tavern:wing', W.x0, W.x1, W.z0, W.z1),
+    {
+      kind: 'circle',
+      id: 'mirefen_tavern:tower',
+      x: tower.x,
+      z: tower.z,
+      radius: TAVERN_TOWER.rOut,
+    },
+    rect('mirefen_tavern:porch', P.x0, P.x1, P.z0, P.z1 + TAVERN_STEPS_MAX_RUN),
+    ...tavernGroundsRects().map((r, i) =>
+      rect(`mirefen_tavern:grounds:${i}`, r[0], r[1], r[2], r[3]),
+    ),
+  ];
 }
 
 /** Pure candidate check used by streamed chunks after the one-time snapshot. */

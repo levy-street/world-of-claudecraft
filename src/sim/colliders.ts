@@ -57,6 +57,7 @@ export { MAX_BODY_RADIUS } from './collider_cells';
 // consumer, so only it is imported (not re-exported) for internal use here.
 export { allocRiftCollisionToken, clearRiftRegion, setRiftRegion } from './rift_regions';
 
+import { builtStructureColliders } from './built_structure_colliders';
 import {
   DAWNHOLD_PARAPET_HALF,
   DAWNHOLD_WALL_LEDGES,
@@ -80,7 +81,6 @@ import { emberLilySpots } from './ember_lilies';
 import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
 import { forgefatherFortressColliders, forgefatherStreetlampSites } from './forgefather_fortress';
-import { harborStructureColliders } from './harbor_structures';
 import { derivedInteriorColliders } from './interior_collider_sets';
 import {
   benchDrawnHeight,
@@ -779,9 +779,9 @@ function staticWorldColliders(seed: number): Collider[] {
   // Hand-placed GLB decor (src/sim/decor_prop_colliders.ts): a circle or box per
   // PROPS.decorProps row, walk-through without r/hw+hd, standable with standableTop.
   out.push(...buildDecorPropColliders(seed, PROPS.decorProps ?? []));
-  // Built-in only: the berths (transport_gates.ts), then the built harbors' rails and props.
+  // Built-in only: the berths (transport_gates.ts), then the built harbors and the tavern.
   if (content === BUILTIN_WORLD) out.push(...transportBerthColliders(seed));
-  if (content === BUILTIN_WORLD) out.push(...harborStructureColliders(seed));
+  if (content === BUILTIN_WORLD) out.push(...builtStructureColliders(seed));
 
   // THE GREAT MAZE's hedges. One box per drawn piece, straight off the same
   // grid the renderer lays the hedge GLBs from, so the blocked ground IS the

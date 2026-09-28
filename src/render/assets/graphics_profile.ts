@@ -27,6 +27,7 @@ import {
 import { resetIceBlockProfileCaches } from '../ice_block_visual';
 import { resetJailSceneProfileCaches } from '../jail_scene';
 import { prepareMailboxProfileAssets, resetMailboxProfileCaches } from '../mailbox';
+import { prepareMirefenTavernAssets, resetMirefenTavernCaches } from '../mirefen_tavern';
 import { prepareNoticeboardProfileAssets, resetNoticeboardProfileCaches } from '../noticeboard';
 import { resetPaladinAscensionProfileCaches } from '../paladin_ascension_visual';
 import { preparePropProfileAssets, resetPropProfileCaches } from '../props';
@@ -74,6 +75,7 @@ const PREPARERS: readonly GraphicsProfileAssetPreparer[] = [
       prepareWyrmwatchHarborAssets(),
       prepareWickharborWharfAssets(),
       prepareWickharborHarborAssets(),
+      prepareMirefenTavernAssets(),
     ]).then(() => undefined),
 ];
 
@@ -104,6 +106,7 @@ const RESETTERS = [
   ['wyrmwatch_harbor', resetWyrmwatchHarborCaches],
   ['wickharbor_wharf', resetWickharborWharfCaches],
   ['wickharbor_harbor', resetWickharborHarborCaches],
+  ['mirefen_tavern', resetMirefenTavernCaches],
   ['paladin_ascension_visual', resetPaladinAscensionProfileCaches],
   // The shared plume pair bakes the composer's HDR colour gain at build.
   ['goblin_rocket_sled_fx', resetGoblinRocketSledProfileCaches],

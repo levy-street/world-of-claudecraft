@@ -460,9 +460,7 @@ import {
   formatMobZoneLine,
   formatSimPhaseLine,
   formatTickPerfLine,
-  MOB_ZONE_PHASE_BY_ID,
-  MOB_ZONE_PHASE_INSTANCE,
-  MOB_ZONE_PHASE_OTHER,
+  mobZonePhase,
   round2,
   SIM_MOB_ZONE_PHASES,
 } from './tick_perf_log';
@@ -628,7 +626,7 @@ export const SIM_LAP_PHASES = [
 // The per-zone mob.update attribution buckets live beside the line that prints
 // them (server/tick_perf_log.ts); re-exported so the capture suite's pin keeps
 // its import.
-export { SIM_MOB_ZONE_PHASES };
+export { mobZonePhase, SIM_MOB_ZONE_PHASES };
 
 // Per-key-group attribution buckets for the bcastSelf phase (selfWireJson).
 // HOST-DERIVED like the mob zone buckets and populated only while a detailed
@@ -655,13 +653,6 @@ export const SELF_WIRE_PHASES = [
   'heavy', // the wireRev-gated heavy block
   'assemble', // the final base-JSON + extras splice (multi-KB copy on a heavy payload)
 ].map((n) => `self.${n}`);
-
-// The zone/group bucket a mob's update cost is attributed to. Pure and allocation-free
-// (a cheap zoneAt band scan plus a Map lookup of an interned string).
-export function mobZonePhase(mob: Entity): string {
-  if (mob.pos.x > DUNGEON_X_THRESHOLD) return MOB_ZONE_PHASE_INSTANCE;
-  return MOB_ZONE_PHASE_BY_ID.get(zoneAt(mob.pos.x, mob.pos.z).id) ?? MOB_ZONE_PHASE_OTHER;
-}
 
 const ARENA_WIRE_HZ = 0.1;
 const ARENA_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * ARENA_WIRE_HZ)));
@@ -7430,6 +7421,10 @@ export class GameServer {
       // post-cap cosmetic prestige (Max-Level XP Overflow)
       case 'prestige':
         sim.prestige(pid);
+        break;
+      // sit on furniture: the Sim re-checks the seat, the range and that it is free
+      case 'sit_seat':
+        if (typeof msg.seat === 'string' && msg.seat.length <= 64) sim.sitOnSeat(msg.seat, pid);
         break;
 
       // Talents & Specializations — every allocation re-validated in the Sim.

@@ -102,6 +102,7 @@ import {
 import { VARKHUL_WORK_FACING } from '../varkhul_forge_intermission';
 import { groundHeight, waterLevelAt } from '../world';
 import { MAX_AGGRO_RADIUS, MAX_WANDER_RADIUS, MIN_WANDER_RADIUS } from './aggro_ranges';
+import { proximityAggroSees } from './aggro_sight';
 import { isAmbientMob, updateAmbientMob } from './ambient';
 import {
   cancelMobChargeDash,
@@ -599,7 +600,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         if (e.auras.some((a) => a.kind === 'stealth'))
           radius = stealthDetectionRadius(mob, e, radius);
         const d = Math.sqrt(d2);
-        if (d < radius && d < detectedD) {
+        // no pull through a wall (mob/aggro_sight.ts), traced only for a would-be pull
+        if (d < radius && d < detectedD && proximityAggroSees(ctx, mob, e)) {
           detected = e;
           detectedD = d;
         }

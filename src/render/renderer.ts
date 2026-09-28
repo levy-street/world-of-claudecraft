@@ -210,6 +210,7 @@ import { playerRangedAttackStartsAtLaunch } from './characters/skin_attack';
 import { CharacterVisualPool, characterVisualPoolKey } from './characters/visual_pool';
 import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_policy';
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
+import { chaseCameraFloorY } from './chase_camera_floor_core';
 import {
   chosenCadenceHoldsQuality,
   chosenCadenceMissShare,
@@ -376,7 +377,6 @@ import { buildFrostSky, type FrostSkyView } from './frost_sky';
 import { FrozenOrbFx, handleFrozenOrbSpellfxEvent } from './frozen_orb_fx';
 import { buildGaleFeatures, type GaleFeaturesView } from './gale_features';
 import { buildGardenFeatures, type GardenFeaturesView } from './garden_features';
-import { gardenMazeCameraLift } from './garden_maze_core';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { buildGatherNodes, type GatherNodesView, resolveGatherNodePick } from './gather_nodes';
 import {
@@ -434,6 +434,7 @@ import {
   InitialSceneTextureAdmission,
   initialSceneTextureResumeUnits,
 } from './initial_scene_texture_admission';
+import * as interiorCam from './interior_camera';
 import * as encounterPrewarm from './interior_encounter_prewarm_pass';
 import {
   applyInteriorLightRig,
@@ -575,6 +576,7 @@ import { type RankedPointLight, reconcileViewPointLights } from './point_light_b
 import { attachPointLightCarriers, NO_POINT_LIGHTS } from './point_light_carriers';
 import { markPointLightSource } from './point_light_carriers_core';
 import { buildComposer, type PostPipeline } from './post';
+import { precipBiomeAt } from './precip_shelter';
 import { withSceneHiddenForPresentationPrewarm } from './presentation_prewarm';
 import { createPreviewPrewarmLane } from './preview_prewarm_lane';
 import {
@@ -719,6 +721,7 @@ import {
 import { sceneKeyLightUniform } from './scene_sampling';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { captureRendererScreenshot } from './screenshot_capture';
+import { applySeatAnim } from './seated_pose';
 import { drapeRingLocalY } from './selection_ring';
 import {
   createSelfRenderPositionState,
@@ -10817,9 +10820,7 @@ export class Renderer {
       // A mounted rider holds the seated pose (the sit loop reads as riding);
       // swim/cast still outrank it in desiredBaseState, so mounted casting
       // and swimming animate normally.
-      st.sitting =
-        e.kind === 'player' &&
-        (e.sitting || e.eating !== null || e.drinking !== null || riderMounted);
+      applySeatAnim(st, v, e, riderMounted, active.root); // a seat's clips + lift, or the sit
       // Facts about the ENTITY that override what its displayed motion implies
       // (battle-stance engagement, ice-slide suppression): anim_state_entity_core.
       applyEntityAnimOverrides(st, e, visuallyDead, characterEffects, hasStealth);
@@ -11590,6 +11591,7 @@ export class Renderer {
 
     this.camYaw += deckCameraTurn(sim, this.camBoom, this.lastLocalPos, this.camMirror);
     this.updateCamera(selfPos, dt);
+    interiorCam.hideSelfInCloseCamera(this.views.get(this.sim.playerId)?.group, this.camera);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'camera', worldStart);
     // Terrain chunks / tree buckets past the detail horizon are dropped
     // before the frustum; camera-ghost props fade against the eye ray. On
@@ -11765,7 +11767,7 @@ export class Renderer {
         this.updateEnvBiome(dt);
       }
     }
-    // precipitation only falls outdoors; indoors/underwater pass null to clear.
+    // precipitation only falls outdoors and in the open (precip_shelter.ts); indoors pass null.
     // The sampler lets a neighbouring zone's weather fall inside the box while
     // the player stands outside it (weather_field_core.ts).
     // Precipitation is unlit, so it takes the grade explicitly or snow stays
@@ -11774,7 +11776,7 @@ export class Renderer {
     this.weather.update(
       this.camera.position,
       dt,
-      this.fogState === 'outdoor' ? zoneBiomeAt(p.pos.x, p.pos.z) : null,
+      precipBiomeAt(this.fogState === 'outdoor', p.pos.x, p.pos.y, p.pos.z),
       zoneBiomeAt,
     );
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'sky', worldStart);
@@ -11811,6 +11813,7 @@ export class Renderer {
       this.camera.position.y += shakeY;
       this.shakeTrauma = Math.max(0, this.shakeTrauma - dt * 1.8);
     }
+    interiorCam.constrainInteriorCameraDraw(this.camera);
     this.jailScene.updateVisibility(this.camera, this.sun);
     this.gatherNodes.update(this.camera, this.sun, Math.max(fogFar, this.lastRequestedFogFar));
     this.updateOpaqueDrawOrder(dt);
@@ -11826,6 +11829,7 @@ export class Renderer {
     host.camera = this.camera;
     host.gpuTimer = this.gpuTimerProbe;
     if (presentFrame(host, dt, present)) this.presentedFrameCount++;
+    interiorCam.restoreInteriorCameraDraw(this.camera);
     if (shakeX !== 0 || shakeY !== 0) {
       this.camera.position.x -= shakeX;
       this.camera.position.y -= shakeY;
@@ -12292,9 +12296,8 @@ export class Renderer {
       this.selfSubmerged,
       waterLevelAt(selfPos.x, selfPos.z, seed),
     );
-    // The camera orbits the lagged/led pivot at the player's requested
-    // distance. Scene geometry never changes that distance; registered
-    // obstructors fade through their subsystem's occluder-fade pass.
+    // The camera orbits the lagged/led pivot at the requested distance; geometry never shortens
+    // it outdoors (obstructors fade), an authored interior clamps it (interior_camera.ts).
     const pose = stepRendererVehicleCamera(this, directedPose, dt, reduce);
     // The opt-in Action Cam shoulder shift rides on top of the vehicle-aware
     // pose: the vehicle camera decides the boom, the shoulder offsets it.
@@ -12307,18 +12310,8 @@ export class Renderer {
     const cx = px - Math.sin(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
     const cy = Math.min(eyeY + Math.sin(pose.pitch) * pose.dist, underwaterCeilingY);
     const cz = pz - Math.cos(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
-    let groundY = groundHeight(cx, cz, seed) + 0.6;
-    // On a raised rift tier the flat ground clamp would let the camera sink
-    // into the riser: add the same lift the sim stands entities on.
-    const rfCam = this.sim.riftFloor;
-    if (rfCam && isRiftPos(cx)) {
-      const floor = generateRiftFloor(rfCam.seed, rfCam.baseLevel, rfCam.floorIndex, rfCam.upgrade);
-      groundY += riftLiftAt(floor, cx - rfCam.origin.x, cz - rfCam.origin.z);
-    }
-    // The Great Maze's modeled hedges are not terrain, so the ground clamp
-    // alone would sit the camera inside their leaves: ride over them the
-    // way the old terrain walls lifted it.
-    groundY += gardenMazeCameraLift(cx, cz);
+    // the ground a hand over, a raised rift tier and the maze hedges (chase_camera_floor_core.ts)
+    const groundY = chaseCameraFloorY(cx, cz, seed, this.sim.riftFloor);
     this.camera.position.set(cx, Math.max(cy, groundY), cz);
     const fovTarget = Math.min(100, resolveCameraFov(this.baseFov, this.camFeel) + shoulder.fov);
     if (Math.abs(this.camera.fov - fovTarget) > 0.01) {
@@ -12326,6 +12319,7 @@ export class Renderer {
       this.camera.updateProjectionMatrix();
     }
     this.cameraLookAt.set(px, eyeY, pz);
+    interiorCam.clampChaseCameraToInterior(this.camera, this.cameraLookAt, selfPos, dt, reduce);
     // lookAtFrozen, never a bare lookAt (r185 frozen-matrix aim, static_matrix.ts).
     lookAtFrozen(this.camera, this.cameraLookAt);
     // Later readers (occluder fades, ambience) want the AVATAR eye, not the
@@ -12355,7 +12349,7 @@ export class Renderer {
         for (const p of this.riftAmbienceScratch) this.ambientPointsMergedScratch.push(p);
         points = this.ambientPointsMergedScratch;
       }
-      sink.ambience(amb.biome, amb.inDungeon, amb.precip, amb.nearWater, 0, points);
+      sink.ambience(amb.biome, amb.inDungeon, amb.precip, amb.nearWater, 0, points, eye);
     }
   }
 
@@ -12415,7 +12409,11 @@ export class Renderer {
       if (v.group.visible) this.tmpV.copy(v.group.position);
       else this.tmpV.set(e.pos.x, e.pos.y, e.pos.z);
       this.tmpV.y += (v.height + v.mountLift) * e.scale + 1.0;
-      if (!isProjectedNameplateAnchorVisible(this.camera, this.tmpV, this.tmpV2)) {
+      const { x: bx, y: by, z: bz } = this.tmpV;
+      if (
+        !isProjectedNameplateAnchorVisible(this.camera, this.tmpV, this.tmpV2) ||
+        interiorCam.interiorHidesNameplate(this.camera, bx, e.pos.y, bz, by)
+      ) {
         b.el.style.display = 'none';
         continue;
       }

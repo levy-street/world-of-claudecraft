@@ -1397,6 +1397,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nameplate.npcRole.armorVendor': '방어구 상인',
   'hudChrome.nameplate.npcRole.armsDealer': '무구 상인',
   'hudChrome.nameplate.npcRole.foodVendor': '음식 및 음료 상인',
+  'hudChrome.nameplate.npcRole.innkeeper': '여관 주인',
   'hudChrome.nameplate.npcRole.potionVendor': '물약 상인',
   'hudChrome.nameplate.npcRole.stableMaster': '마구간지기',
   'hudChrome.nameplate.npcRole.generalGoods': '잡화 상인',
@@ -7803,6 +7804,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.targetCycleShort': '대상',
   'hudChrome.mobile.toggleHaptics': '진동 전환',
   'hudChrome.rest.resting': '휴식 중',
+  'hudChrome.rest.restArea': '휴식 중: 이곳은 휴식 장소이며, 여기서 휴식 경험치를 얻습니다.',
   'hudChrome.swing.ready': '공격',
   'hudChrome.swing.seconds': '{seconds}초',
   'hudChrome.widgets.clockTitle': '현지 시각 - 클릭하면 12/24시간제 전환',
@@ -13695,6 +13697,26 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '부두에서 들어와 손 좀 녹이세요. 우리 부두의 배는 긴 동쪽 해안을 따라 윅하버까지 올라갔다가 다시 돌아옵니다. 저 멀리 서쪽에서는 다른 나룻배가 이스트브룩과 밤꽃 평원 사이를 오가지요. 벽에 걸린 지도에 두 항로가 모두 그려져 있습니다. 와이름 감시탑으로 오르기 전에 불가에서 좀 쉬어 가세요.',
   'entities.npcs.harbormaster_tamsin.name': '항만장 탐신',
   'entities.npcs.harbormaster_tamsin.title': '와이름 감시탑 부두지기',
+  'entities.npcs.innkeeper_maudie.greeting':
+    '눅눅한 바깥에서 어서 들어오세요, 친구. 불가로 내려가는 계단 조심하시고요. 주전자는 올려져 있고, 벤치는 따뜻하고, 위층 방들도 뽀송하답니다. 펜브리지에서 온 여행자들은 늪지 길이 낮에는 조용하다고 장담하지만, 해가 진 뒤에는 아무도 그 길을 걷지 않아요. 잠시 앉아서 발 좀 쉬어 가세요.',
+  'entities.npcs.innkeeper_maudie.name': '모디 탭라이트',
+  'entities.npcs.innkeeper_maudie.title': '여관 주인',
+  'entities.npcs.patron_amos_eelby.greeting':
+    '의자 하나 끌어다 앉게, {className}. 여기 그리셀은 펜브리지 밑의 큰 장어가 헛소문이라고 우기지. 난 그놈을 두 번이나 손으로 잡아 봤다고. 두 번! 세금 징수원처럼 미끌미끌하고, 길이는 이 의자만 했지.',
+  'entities.npcs.patron_amos_eelby.name': '에이모스 일비',
+  'entities.npcs.patron_amos_eelby.title': '장어잡이 어부',
+  'entities.npcs.patron_grissel_sedgeworth.greeting':
+    '에이모스 말은 신경 쓰지 마. 사십 년 토탄을 캐면서 이 늪에서 건진 이상한 물건이 저 양반이 잡은 장어보다 많아. 장화, 뼈다귀, 안에 든 머리가 아직도 걱정하는 투구까지. 몸 좀 녹이고 가, 불은 공짜니까.',
+  'entities.npcs.patron_grissel_sedgeworth.name': '그리셀 세지워스',
+  'entities.npcs.patron_grissel_sedgeworth.title': '토탄 채굴꾼',
+  'entities.npcs.patron_ned_oxley.greeting':
+    '둑길로 소 마흔 마리를 몰고 오다가 펜브리지 앞에서 두 마리를 늪에 잃었지. 이 길에서 사람을 배신하지 않는 건 모디의 에일뿐이야. 자네 술값은 자네가 내고.',
+  'entities.npcs.patron_ned_oxley.name': '네드 옥슬리',
+  'entities.npcs.patron_ned_oxley.title': '가축몰이꾼',
+  'entities.npcs.patron_hester_quillby.greeting':
+    '이 습지 지도는 사는 족족 한 철도 안 돼서 틀려 버렸어요. 물이 길을 옮기고, 길이 물을 옮기거든요. 그래서 직접 그리고, 잉크가 마르는 동안 여기 마른 자리에 앉아 있는 거예요.',
+  'entities.npcs.patron_hester_quillby.name': '헤스터 퀼비',
+  'entities.npcs.patron_hester_quillby.title': '지도 제작자',
   'entities.npcs.harbormaster_odile.greeting':
     '이 후미의 배는 죄다 올드 비컨에 제 용골을 빚졌지. 빨리 말하게, 조수는 기다려 주지 않으니.',
   'entities.npcs.head_gardener_amaranth.name': '수석 정원사 아마란스',

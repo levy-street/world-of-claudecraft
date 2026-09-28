@@ -60,6 +60,7 @@ import {
 import type { LocoGaitThresholds } from '../locomotion';
 import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
 import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
+import type { SeatClipSet } from './seat_clips';
 
 export interface EmoteClipSpec {
   clips: readonly string[];
@@ -137,6 +138,9 @@ export interface ClipMap {
   castTimeScaleByAbility?: Record<string, number>;
   sitDown?: string;
   sitIdle?: string;
+  /** Sitting on furniture (render/seated_pose.ts): the chair clip set. Absent = the rig
+   *  sits on its floor clips, drawn at the seat. */
+  seat?: SeatClipSet;
   /** swim base. On the authored player lane this is the SUBMERGED stroke and
    *  carries the whole prone posture; on rigs without one it is a lie-down pose
    *  the renderer pitches procedurally (see visual.ts SWIM_PITCH_*). */
@@ -1396,6 +1400,38 @@ function swims(def: VisualDef): VisualDef {
       wade: WATER_CLIP_WADE,
       fall: FALL_CLIP_FLAIL,
     },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Sitting on furniture (render/seated_pose.ts, the seats in src/sim/seat_anchor.ts)
+//
+// One clip-only GLB for every body on the shared Rig_Medium (the swim lane's pattern):
+// authored in Blender (scripts/anim/blender_sit_clips.py) and re-seated onto the shipped
+// rest pose by scripts/build_sit_anims.mjs. Every clip is in SEAT-ANCHOR space: the rig's
+// root is the point on the seat surface under the hips, facing away from any back, and the
+// renderer draws a seated body with its root there. The mech keeps its own rig and sits
+// on its floor clips.
+// ---------------------------------------------------------------------------
+const SIT_ANIMS_URL = `${PLAYERS}/sit_anims.glb`;
+export const SEAT_CLIPS: SeatClipSet = {
+  chairDown: 'Sit_Chair_Down',
+  chairIdle: 'Sit_Chair_Idle',
+  chairUp: 'Sit_Chair_StandUp',
+  relaxedIdle: 'Sit_Chair_Relaxed_Idle',
+  talkIdle: 'Sit_Chair_Talk',
+  drinkIdle: 'Sit_Chair_Drink',
+  highDown: 'Sit_High_Down',
+  highIdle: 'Sit_High_Idle',
+  highUp: 'Sit_High_StandUp',
+};
+
+/** Layer the chair clips onto a Rig_Medium body. */
+function seats(def: VisualDef): VisualDef {
+  return {
+    ...def,
+    animUrls: [...(def.animUrls ?? []), SIT_ANIMS_URL],
+    clips: { ...def.clips, seat: SEAT_CLIPS },
   };
 }
 
@@ -4408,6 +4444,9 @@ export const VISUALS: Record<string, VisualDef> = {
 //    colour belongs to the player's skin/hair wheels, and a tint over the
 //    picked skin tone repaints exactly what the player chose.
 // ---------------------------------------------------------------------------
+// Every class body sits on the chair clips (before the modular pass copies the defs).
+for (const cls of ALL_CLASSES) VISUALS[`player_${cls}`] = seats(VISUALS[`player_${cls}`]);
+
 // Driven by ALL_CLASSES rather than a local copy: a tenth class would otherwise
 // get no modular def at all and fall back to the warrior's clips through
 // modularKeyFor, silently, with no test able to see it.
@@ -4471,14 +4510,14 @@ const NPC_MODULAR_PROP_ATTACH: Record<NpcPropSet, AttachDef[]> = {
 };
 
 for (const propSet of NPC_PROP_SET_IDS) {
-  VISUALS[`npc_modular_${propSet}`] = {
+  VISUALS[`npc_modular_${propSet}`] = seats({
     url: `${MODULAR}/warrior_modular.glb`,
     modular: true,
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop']),
     animUrls: [`${PLAYERS}/rogue.glb`, `${PLAYERS}/rogue_hit_variety_anims.glb`],
     attach: NPC_MODULAR_PROP_ATTACH[propSet],
-  };
+  });
 }
 
 // ---------------------------------------------------------------------------

@@ -55,6 +55,7 @@
 //   reliquary.ts        IWorldReliquary      sparse firstFind / marks / recent + pure completion
 //   transport.ts        IWorldTransport      the scheduled ferry's phase, ship pose, passenger bit
 //   world_pvp.ts        IWorldWorldPvp       the /pvp flag: self readout + raise/lower command
+//   seating.ts          IWorldSeating        sit on a piece of furniture by its seat id
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
 // pinned THERE and re-stale here, so this prose stays count-free):
@@ -98,6 +99,7 @@ import type { IWorldQuests } from './world_api/quests';
 export type { WorldQuestLeaderboardEntry, WorldQuestLeaderboardPage } from './world_api/quests';
 
 import type { IWorldReliquary } from './world_api/reliquary';
+import type { IWorldSeating } from './world_api/seating';
 import type { IWorldSocialGraph } from './world_api/social_graph';
 import type { IWorldTalents } from './world_api/talents';
 import type { IWorldTargeting } from './world_api/targeting';
@@ -498,7 +500,8 @@ export interface IWorld
     IWorldFarming,
     IWorldVehicles,
     IWorldTransport,
-    IWorldWorldPvp {}
+    IWorldWorldPvp,
+    IWorldSeating {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -937,6 +940,8 @@ export const COMMAND_NAMES = [
   // Guild custom ranks (docs/prd/guild-custom-ranks.md): the Guild Master
   // replaces the guild's rank ladder (titles, order, permissions).
   'guild_set_ranks',
+  // Sit on a piece of furniture by its seat id (IWorldSeating.sitOnSeat).
+  'sit_seat',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -1027,7 +1032,8 @@ export type WorldFacet =
   | 'IWorldMounts'
   | 'IWorldFarming'
   | 'IWorldVehicles'
-  | 'IWorldWorldPvp';
+  | 'IWorldWorldPvp'
+  | 'IWorldSeating';
 
 export const COMMAND_FACETS = {
   weekly_reward_claim: 'IWorldBank',
@@ -1316,4 +1322,6 @@ export const COMMAND_FACETS = {
   // IWorldWorldPvp: the /pvp flag raise/lower. worldPvpInfo (the `wpvp`
   // self-delta mirror) carries no wire command and stays untagged.
   pvp_flag: 'IWorldWorldPvp',
+  // IWorldSeating: sit on a seat (the seats and who holds one are derived, untagged).
+  sit_seat: 'IWorldSeating',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

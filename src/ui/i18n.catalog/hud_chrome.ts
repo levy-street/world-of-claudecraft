@@ -820,6 +820,8 @@ export const hudChromeStrings = {
   },
   rest: {
     resting: 'Resting',
+    // the portrait's zZz while standing in a rest area (an inn, a house), out of combat
+    restArea: 'Resting: you are in a rest area and gain rested experience here.',
   },
   paladin: {
     devotion: 'Devotion',
@@ -5585,6 +5587,7 @@ export const hudChromeStrings = {
       potionVendor: 'Potion Vendor',
       stableMaster: 'Stable Master',
       generalGoods: 'General Goods',
+      innkeeper: 'Innkeeper',
     },
   },
   // World mouseover tooltip shown when hovering a mob (mob_tooltip_view.ts):

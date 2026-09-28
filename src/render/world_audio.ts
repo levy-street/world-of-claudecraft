@@ -1,7 +1,8 @@
 // Pure world-to-audio routing. Static prop data determines footstep surfaces
 // and positional ambience anchors without adding presentation-only sim events.
 
-import { DUNGEON_X_THRESHOLD, getActiveWorldContent } from '../sim/data';
+import { TAVERN_FLOOR_Y, TAVERN_ORIGIN } from '../sim/content/mirefen_tavern';
+import { DUNGEON_X_THRESHOLD, getActiveWorldContent, isBuiltinWorldActive } from '../sim/data';
 import { dockSectionAt } from '../sim/dock_layout';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { AmbientPointSource, Surface } from './audio_sink';
@@ -63,6 +64,17 @@ export function buildWorldAmbientSources(seed: number): AmbientPointSource[] {
       x: stall.x,
       y: groundHeight(stall.x, stall.z, seed) + 1,
       z: stall.z,
+    });
+  }
+  // the Mirefen tavern's room bed (built-in world only, where the tavern stands): anchored at
+  // the hall's middle; src/game/tavern_ambience_core.ts decides its level and tone
+  if (isBuiltinWorldActive()) {
+    sources.push({
+      id: 'world:tavern:mirefen',
+      kind: 'tavern',
+      x: TAVERN_ORIGIN.x,
+      y: TAVERN_FLOOR_Y + 2,
+      z: TAVERN_ORIGIN.z,
     });
   }
   return sources;

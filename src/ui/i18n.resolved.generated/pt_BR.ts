@@ -1205,7 +1205,8 @@ export const pt_BR: EnTranslations = {
       "drowning": "Afogando!"
     },
     "rest": {
-      "resting": "Descansando"
+      "resting": "Descansando",
+      "restArea": "Resting: you are in a rest area and gain rested experience here."
     },
     "paladin": {
       "devotion": "Devoção",
@@ -4211,7 +4212,8 @@ export const pt_BR: EnTranslations = {
         "foodVendor": "Vendedor de alimentos e bebidas",
         "potionVendor": "Vendedor de Poções",
         "stableMaster": "Mestre Estável",
-        "generalGoods": "Bens Gerais"
+        "generalGoods": "Bens Gerais",
+        "innkeeper": "Innkeeper"
       }
     },
     "mobTooltip": {
@@ -20595,6 +20597,31 @@ export const pt_BR: EnTranslations = {
         "name": "Mestra do Porto Tamsin",
         "title": "Guardiã dos Cais de Wyrmwatch",
         "greeting": "Saia do cais e esquente as mãos. O navio do nosso ancoradouro navega pela longa costa leste até Wickharbor e depois volta. Bem a oeste, a outra balsa faz a travessia entre Eastbrook e Nightbloom. O mapa na parede mostra as duas travessias. Descanse junto ao fogo antes da subida até Wyrmwatch."
+      },
+      "innkeeper_maudie": {
+        "name": "Maudie Tapwright",
+        "title": "Innkeeper",
+        "greeting": "Come in out of the damp, friend, and mind the step down to the fire. The kettle is on, the benches are warm, and the rooms upstairs are dry. Travelers from Fenbridge swear the marsh road is quiet by day, but nobody walks it after dark. Sit a while and rest your feet."
+      },
+      "patron_amos_eelby": {
+        "name": "Amos Eelby",
+        "title": "Eel Fisher",
+        "greeting": "Pull up a bench, {className}. Grissel here swears the big eel under Fenbridge is a myth. I've had my hand on him twice. Twice! Slippery as a tax collector, and near as long as this bench."
+      },
+      "patron_grissel_sedgeworth": {
+        "name": "Grissel Sedgeworth",
+        "title": "Peat Cutter",
+        "greeting": "Don't mind Amos. Forty years cutting peat and I've pulled more strange things out of this bog than he's pulled eels: boots, bones, a helmet with the head still worried about it. Warm yourself, the fire's free."
+      },
+      "patron_ned_oxley": {
+        "name": "Ned Oxley",
+        "title": "Drover",
+        "greeting": "Drove forty head down the causeway and lost two to the mire before Fenbridge. Maudie's ale is the only thing on this road that never lets a man down. Buy your own, mind."
+      },
+      "patron_hester_quillby": {
+        "name": "Hester Quillby",
+        "title": "Mapmaker",
+        "greeting": "Every map of this marsh I've ever bought was wrong within a season. The water moves the paths, and the paths move the water. So I draw my own, and I sit here where it's dry while the ink sets."
       },
       "reeve_ottoline": {
         "name": "Prefeita Ottoline",

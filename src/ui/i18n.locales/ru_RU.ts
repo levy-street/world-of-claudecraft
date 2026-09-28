@@ -1425,6 +1425,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nameplate.npcRole.armorVendor': 'Торговец доспехами',
   'hudChrome.nameplate.npcRole.armsDealer': 'Торговец вооружением',
   'hudChrome.nameplate.npcRole.foodVendor': 'Торговец едой и напитками',
+  'hudChrome.nameplate.npcRole.innkeeper': 'Хозяин таверны',
   'hudChrome.nameplate.npcRole.potionVendor': 'Торговец зельями',
   'hudChrome.nameplate.npcRole.stableMaster': 'Смотритель стойл',
   'hudChrome.nameplate.npcRole.generalGoods': 'Товары общего назначения',
@@ -7972,6 +7973,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.targetCycleShort': 'Цель',
   'hudChrome.mobile.toggleHaptics': 'Вкл/выкл вибрацию',
   'hudChrome.rest.resting': 'Отдых',
+  'hudChrome.rest.restArea':
+    'Отдых: эта таверна служит местом отдыха, и здесь вы накапливаете бодрость.',
   'hudChrome.swing.ready': 'Замах',
   'hudChrome.swing.seconds': '{seconds} сек.',
   'hudChrome.widgets.clockTitle': 'Местное время — нажмите для переключения 12/24-часового формата',
@@ -13963,6 +13966,26 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Заходите с причала, погрейте руки. Корабль у нашего пирса идёт вдоль длинного восточного берега до Викхарбора и обратно. Далеко на западе другой паром ходит между пристанями Истврука и Ночецветья. На карте на стене видны оба маршрута. Отдохните у огня, прежде чем подниматься к Змеиному дозору.',
   'entities.npcs.harbormaster_tamsin.name': 'Начальница гавани Тамсин',
   'entities.npcs.harbormaster_tamsin.title': 'Смотрительница причалов Змеиного дозора',
+  'entities.npcs.innkeeper_maudie.greeting':
+    'Заходите, друг, спасайтесь от сырости, и осторожнее со ступенькой вниз к огню. Чайник уже на огне, скамьи тёплые, а комнаты наверху сухие. Путники из Фенбриджа клянутся, что болотная дорога днём спокойна, но после темноты по ней никто не ходит. Посидите немного, дайте ногам отдохнуть.',
+  'entities.npcs.innkeeper_maudie.name': 'Моди Тапрайт',
+  'entities.npcs.innkeeper_maudie.title': 'Хозяйка таверны',
+  'entities.npcs.patron_amos_eelby.greeting':
+    'Садись на скамью, {className}. Гриссел вот клянётся, что большой угорь под Фенбриджем просто выдумка. А я его дважды в руках держал. Дважды! Скользкий, как сборщик податей, и длиной почти с эту скамью.',
+  'entities.npcs.patron_amos_eelby.name': 'Эймос Илби',
+  'entities.npcs.patron_amos_eelby.title': 'Ловец угрей',
+  'entities.npcs.patron_grissel_sedgeworth.greeting':
+    'Не слушай Эймоса. Сорок лет режу торф и вытащила из этого болота больше странностей, чем он угрей: сапоги, кости, шлем, а голова внутри до сих пор чем-то встревожена. Грейся, огонь бесплатный.',
+  'entities.npcs.patron_grissel_sedgeworth.name': 'Гриссел Седжворт',
+  'entities.npcs.patron_grissel_sedgeworth.title': 'Резчица торфа',
+  'entities.npcs.patron_ned_oxley.greeting':
+    'Гнал сорок голов по гати и двух потерял в трясине ещё до Фенбриджа. Только эль Моди на этой дороге ни разу не подвёл. Но за свой плати сам.',
+  'entities.npcs.patron_ned_oxley.name': 'Нед Оксли',
+  'entities.npcs.patron_ned_oxley.title': 'Погонщик скота',
+  'entities.npcs.patron_hester_quillby.greeting':
+    'Каждая карта этого болота, что я покупала, через сезон оказывалась неверной. Вода двигает тропы, а тропы двигают воду. Вот я и рисую свои и сижу здесь, где сухо, пока сохнут чернила.',
+  'entities.npcs.patron_hester_quillby.name': 'Хестер Квилби',
+  'entities.npcs.patron_hester_quillby.title': 'Картограф',
   'entities.npcs.head_gardener_amaranth.greeting':
     'Не обращай внимания на тени у меня под глазами. Кто-то должен бодрствовать, пока сад видит сны.',
   'entities.npcs.head_gardener_amaranth.name': 'Старшая садовница Амарант',

@@ -16,14 +16,27 @@ export interface MountEnginePhase {
   elapsed: number;
 }
 
+/** The avatar's eye, where the player stands: what a room bed (the tavern's) is decided
+ *  from. Not the camera, which trails the player and can sit in the doorway or over the
+ *  roof while the player stands in the hall. */
+export interface AmbienceEye {
+  readonly x: number;
+  readonly y: number;
+  readonly z: number;
+}
+
 export interface AmbientPointSource {
   readonly id: string;
   // 'rift_portal'/'rift_roller'/'rift_ice_glide' are dynamic (spawn/move/
   // despawn during play, or track a gliding player), as is 'hoard_entrance', unlike the static
-  // world-built campfire/forge set; see src/render/rift_ambience.ts.
+  // world-built campfire/forge set; see src/render/rift_ambience.ts. 'tavern' is the
+  // Mirefen tavern's room bed (src/game/tavern_ambience_core.ts decides its level and tone
+  // from where the player stands, the ambience eye below; it plays non-positional, the point
+  // only anchors it).
   readonly kind:
     | 'campfire'
     | 'forge'
+    | 'tavern'
     | 'rift_portal'
     | 'rift_roller'
     | 'rift_ice_glide'
@@ -196,7 +209,8 @@ export interface SpatialAudioSink {
    *  `biome` is the full `BiomeId` union (covers both the grid-world biomes and
    *  the beach/desert/volcano/cave set). `crowd` is the Sowfield crowd-murmur
    *  level (0 away from the stadium, about 0.4 on the grounds, 1 while a Vale
-   *  Cup match is live). */
+   *  Cup match is live). `eye` is the avatar's eye the biome was sampled at, which the
+   *  room beds follow too (the camera listener when omitted). */
   ambience(
     biome: BiomeId,
     inDungeon: boolean,
@@ -204,6 +218,7 @@ export interface SpatialAudioSink {
     nearWater: boolean,
     crowd: number,
     points?: readonly AmbientPointSource[],
+    eye?: AmbienceEye,
   ): void;
   /** One per-ability procedural audio moment at a world position (the 12
    *  palette identities live in src/game/sfx.ts). Optional: an engine without

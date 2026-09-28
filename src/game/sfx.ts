@@ -31,6 +31,11 @@ import {
   type SfxEntry,
 } from './sfx_manifest.generated';
 import { loadRuntimeSfxPack } from './sfx_runtime_pack';
+import {
+  newTavernAmbienceMix,
+  TAVERN_AMBIENCE_SILENT,
+  tavernAmbienceMix,
+} from './tavern_ambience_core';
 import { type WaterElementalCue, waterElementalSamples } from './water_elemental_audio';
 
 const SAMPLE_GAIN = 0.85; // base level for sampled clips; sfxVolume multiplies this
@@ -191,6 +196,8 @@ interface LoopSlot {
   src: AudioBufferSourceNode;
   gain: GainNode;
   panner: PannerNode | null;
+  /** An optional lowpass between the source and the gain (setLoopLowpass: the tavern bed). */
+  filter?: BiquadFilterNode;
   target: number; // last commanded gain; skip re-arming the ramp when unchanged
   x?: number;
   y?: number;
@@ -220,11 +227,21 @@ interface PendingLoop {
 // (e.g. a Professions 2.0 station bed: kitchens/apothecary/tannery/loom/
 // toolworks, see issue #2208) is a new 'kind' plus its own named constant,
 // same pattern, no changes needed to the override mechanism itself.
+/** The avatar's eye (where the player stands), which a room bed is decided from: the camera
+ *  trails the player and can sit in the doorway (or over the roof) while the player is in the
+ *  hall. Mirrors src/render/audio_sink.ts. */
+interface AmbienceEye {
+  readonly x: number;
+  readonly y: number;
+  readonly z: number;
+}
+
 interface AmbientPointSource {
   readonly id: string;
   readonly kind:
     | 'campfire'
     | 'forge'
+    | 'tavern'
     | 'rift_portal'
     | 'rift_roller'
     | 'rift_ice_glide'
@@ -287,7 +304,10 @@ class Sfx {
   private mountMovementKeyCache = new Map<string, string | null>();
   private footstepsOn = false; // off by default; driven by the footstepSfx setting
   private lx = 0;
+  private ly = 0;
   private lz = 0; // cached listener position
+  /** The tavern bed's mix, refilled each frame (allocation-free). */
+  private readonly tavernMix = newTavernAmbienceMix();
   // per-ability synth layer state (see the abilityAudio section)
   private synthNoise: AudioBuffer | null = null;
   private abilityVoiceEnds = new Float64Array(ABILITY_VOICES);
@@ -505,6 +525,7 @@ class Sfx {
     const ctx = this.ctx;
     if (!ctx) return;
     this.lx = x;
+    this.ly = y;
     this.lz = z;
     const l = ctx.listener;
     if (l.positionX) {
@@ -1005,6 +1026,7 @@ class Sfx {
         /* already stopped */
       }
       slot.src.disconnect();
+      slot.filter?.disconnect();
       slot.gain.disconnect();
       slot.panner?.disconnect();
       return;
@@ -1019,11 +1041,33 @@ class Sfx {
           /* already stopped */
         }
         src.disconnect();
+        slot.filter?.disconnect();
         slot.gain.disconnect();
         slot.panner?.disconnect();
       },
       fade * 1000 + 200,
     );
+  }
+
+  /** Run a live loop through a lowpass at `hz` (inserted between its source and its gain on
+   *  first use, then ramped). A loop still loading is a no-op; the next call catches it. */
+  setLoopLowpass(id: string, hz: number): void {
+    const ctx = this.ctx;
+    const slot = this.loops.get(id);
+    if (!ctx || !slot) return;
+    if (!slot.filter) {
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.Q.value = 0.5;
+      filter.frequency.value = hz;
+      slot.src.disconnect();
+      slot.src.connect(filter).connect(slot.gain);
+      slot.filter = filter;
+      return;
+    }
+    if (Math.abs(slot.filter.frequency.value - hz) > hz * 0.02) {
+      slot.filter.frequency.setTargetAtTime(hz, ctx.currentTime, 0.25);
+    }
   }
 
   hasLoop(id: string): boolean {
@@ -1708,10 +1752,15 @@ class Sfx {
     else this.unloop(key, 0.7);
   }
 
-  private pointAmbient(source: AmbientPointSource): void {
+  private pointAmbient(source: AmbientPointSource, eye: AmbienceEye | undefined): void {
     // The forge's own, narrower cull distance so it stops (unloops) exactly
     // where its own falloff (below) would already have gone silent, instead
     // of lingering as a silent loop out to the shared MAX_DISTANCE.
+    if (source.kind === 'tavern') {
+      if (eye) this.tavernAmbient(source.id, eye.x, eye.y, eye.z);
+      else this.tavernAmbient(source.id, this.lx, this.ly, this.lz);
+      return;
+    }
     const maxDistance = source.kind === 'forge' ? FORGE_MAX_DISTANCE : undefined;
     if (this.tooFar(source.x, source.z, maxDistance)) {
       if (this.loops.has(source.id) || this.pendingLoops.has(source.id)) {
@@ -1750,9 +1799,25 @@ class Sfx {
     this.loop(source.id, key, gain, source.x, source.y, source.z, maxDistance);
   }
 
+  /** The Mirefen tavern's room bed: a non-positional stereo loop whose level and lowpass
+   *  follow where the player stands (src/game/tavern_ambience_core.ts): muffled through the
+   *  walls, clear inside, silent beyond its radius from the door. */
+  private tavernAmbient(id: string, x: number, y: number, z: number): void {
+    const mix = tavernAmbienceMix(x, y, z, this.tavernMix);
+    if (mix.gain <= TAVERN_AMBIENCE_SILENT) {
+      if (this.loops.has(id) || this.pendingLoops.has(id)) this.unloop(id, 0.7);
+      return;
+    }
+    // quantized so a step or two does not re-arm the ramps every frame
+    this.loop(id, 'amb_tavern', Math.round(mix.gain * 400) / 400);
+    this.setLoopLowpass(id, mix.cutoffHz);
+  }
+
   /** Cross-fade the global ambience loops to match the player's surroundings.
    *  These are continuous background beds, kept well under the foreground
-   *  footstep/jump/combat one-shots so movement always reads clearly over them. */
+   *  footstep/jump/combat one-shots so movement always reads clearly over them.
+   *  `eye` is the avatar's eye, which the room beds follow (the camera listener when
+   *  omitted). */
   ambience(
     biome: BiomeId,
     inDungeon: boolean,
@@ -1760,6 +1825,7 @@ class Sfx {
     nearWater: boolean,
     crowd = 0,
     points: readonly AmbientPointSource[] = [],
+    eye?: AmbienceEye,
   ): void {
     this.ambient('amb_dungeon', inDungeon ? 0.3 : 0);
     // Sowfield crowd murmur (procedural bed): quiet chatter on the grounds,
@@ -1817,7 +1883,7 @@ class Sfx {
     const activeIds = new Set<string>();
     for (let i = 0; i < points.length; i++) {
       activeIds.add(points[i].id);
-      this.pointAmbient(points[i]);
+      this.pointAmbient(points[i], eye);
     }
     // Unlike the static campfire/forge set (the same fixed sources every frame,
     // culled only by distance), a rift or buried-hoard source can

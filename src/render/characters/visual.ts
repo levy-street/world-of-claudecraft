@@ -17,6 +17,7 @@ import { GFX } from '../gfx';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
 import type { MeleeImpactProfile } from '../melee_impact_core';
 import type { MountRideSpec } from '../mount_visuals';
+import type { SeatAnimInfo } from '../seated_pose_core';
 import {
   stoneboundShardMaterialOptions,
   stoneboundShellMaterialOptions,
@@ -100,6 +101,7 @@ import {
 } from './paladin_templars_verdict_clip';
 import { PaladinTemplarsVerdictFx } from './paladin_templars_verdict_fx';
 import { SanguineWeaponSheath } from './sanguine_weapon_sheath';
+import { type SeatClipPhase, seatClip, seatClipNames } from './seat_clips';
 import { attachSharedDepthMaterials } from './shadow_depth_materials';
 import { characterMeshCastsShadow } from './shadow_policy';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
@@ -693,6 +695,11 @@ export class CharacterVisual {
   private auraGlowIntensity = 0;
 
   private baseState: BaseState = 'idle';
+  /** The seat facts of the last update (AnimState.seat): which chair clips the sit and
+   *  stand-up states play. */
+  private seatAnim: SeatAnimInfo | null = null;
+  /** Whether the last base state played in a seat's anchor space. */
+  private inSeatSpace = false;
   private current: THREE.AnimationAction | null = null;
   private currentIsOneShot = false;
   /** Seconds until the next idle-breaker; -1 means "rearm on the next idle". */
@@ -1085,11 +1092,16 @@ export class CharacterVisual {
     this.wasAirborne = s.airborne;
 
     this.castingAbility = s.casting ? (s.castingAbility ?? null) : null;
+    this.seatAnim = s.seat ?? null;
     const rushChanged = this.warriorBody.updateRush(dt, s);
     if (!this.deadLock) {
       const desired = this.desiredBase(s);
       const baseChanged = desired !== this.baseState;
       const previousBase = this.baseState;
+      // the seated states play in the seat's anchor space (render/seated_pose.ts)
+      const inSeatSpace = (desired === 'sit' || desired === 'sitUp') && !!this.seatAction('idle');
+      const seatSnap = inSeatSpace !== this.inSeatSpace;
+      this.inSeatSpace = inSeatSpace;
       if (baseChanged) this.baseState = desired;
       if (this.warriorBody.rushArrivalStarted && this.def.clips.rushArrival) {
         this.playOneShot(this.def.clips.rushArrival, 1);
@@ -1139,7 +1151,11 @@ export class CharacterVisual {
         // a cast clip frozen at its hold point must never stay paused through
         // the exit, whichever exit path runs below
         if (previousBase === 'cast' && this.current?.paused) this.current.paused = false;
-        if (previousBase !== 'cast' || !this.beginCastExitPlayOut()) {
+        if (seatSnap) {
+          // into or out of a seat's anchor space: the root itself moved (seated_pose.ts),
+          // so a crossfade would draw the old pose at the new root for its whole length
+          this.fadeTo(this.baseAction(), CUT_FADE, false);
+        } else if (previousBase !== 'cast' || !this.beginCastExitPlayOut()) {
           this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
           this.fadeTo(this.baseAction(), waterFade(previousBase, desired), false);
         }
@@ -1153,6 +1169,13 @@ export class CharacterVisual {
         this.fadeTo(this.baseAction(), 0.15, false);
       }
       if (desired === 'cast') this.castClipAbility = this.castingAbility;
+      // a seated body's idle changing in place (it starts to eat or drink, or stops)
+      if (desired === 'sit' && !baseChanged && !this.currentIsOneShot) {
+        const want = this.seatAction('idle');
+        if (want && this.current !== want && this.current !== this.seatAction('down')) {
+          this.fadeTo(want, 0.4, false);
+        }
+      }
       this.tickIdleBeat(dt, desired);
       this.tickIdleVariant(dt, desired);
       // foot-speed matching on locomotion cycles
@@ -1173,6 +1196,8 @@ export class CharacterVisual {
             this.current.time = Math.max(0, this.current.getClip().duration - 1e-3);
           this.current.timeScale = timeScale;
         }
+        // the stand-up clip keeps pace with the drawn rise (hurried when walking off)
+        if (this.baseState === 'sitUp') this.current.timeScale = this.seatAnim?.rate ?? 1;
         if (this.baseState === 'spin')
           this.current.timeScale =
             (this.castingAbility && this.def.clips.castTimeScaleByAbility?.[this.castingAbility]) ||
@@ -3666,6 +3691,13 @@ export class CharacterVisual {
     return name ? (this.actions.get(name) ?? null) : null;
   }
 
+  /** The seated body's clip for a phase (seat_clips.ts), or null off a seat or on a rig
+   *  without the chair clips (it then sits on the floor clips, at the seat). */
+  private seatAction(phase: SeatClipPhase): THREE.AnimationAction | null {
+    const set = this.def.clips.seat;
+    return set && this.seatAnim ? this.action(seatClip(set, this.seatAnim, phase)) : null;
+  }
+
   private baseAction(): THREE.AnimationAction | null {
     const c = this.def.clips;
     switch (this.baseState) {
@@ -3722,7 +3754,14 @@ export class CharacterVisual {
       case 'wade':
         return this.action(c.wade) ?? this.action(c.walk) ?? this.action(c.idle);
       case 'sit':
-        return this.action(c.sitDown) ?? this.action(c.sitIdle) ?? this.action(c.idle);
+        return (
+          this.seatAction(this.seatAnim?.skipDown ? 'idle' : 'down') ??
+          this.action(c.sitDown) ??
+          this.action(c.sitIdle) ??
+          this.action(c.idle)
+        );
+      case 'sitUp':
+        return this.seatAction('up') ?? this.action(c.idle);
       case 'jump': {
         const moving = this.jumpWhileMoving ? this.action(c.jumpMoving) : null;
         return moving ?? this.action(c.jump) ?? this.action(c.idle);
@@ -3880,7 +3919,10 @@ export class CharacterVisual {
    *  as long as the body is off the ground. Rigs without a `land` clip keep
    *  looping `jump` unchanged. */
   private isOnce(a: THREE.AnimationAction): boolean {
-    if (this.baseState === 'sit') return a === this.action(this.def.clips.sitDown);
+    if (this.baseState === 'sit') {
+      return a === this.action(this.def.clips.sitDown) || a === this.seatAction('down');
+    }
+    if (this.baseState === 'sitUp') return a === this.seatAction('up');
     // 'fall' counts as well as 'jump'. A rig with no authored flail resolves
     // `fall` back to its jump clip (baseAction), so keying this on 'jump' alone
     // meant a long fall silently LOOPED the pose a short hop clamps. The check
@@ -4007,10 +4049,16 @@ export class CharacterVisual {
     if (a === this.templarsVerdictAction) this.stopTemplarsVerdictFx();
     if (a === this.bastionSweepAction) this.stopBastionSweepFx();
     if (this.deadLock) return; // death clip clamps on its last frame
+    if (this.baseState === 'sit' && a === this.seatAction('down')) {
+      this.fadeTo(this.seatAction('idle') ?? a, 0.25, false);
+      return;
+    }
     if (this.baseState === 'sit' && a === this.action(this.def.clips.sitDown)) {
       this.fadeTo(this.action(this.def.clips.sitIdle) ?? a, 0.25, false);
       return;
     }
+    // the stand-up clip holds its last (standing) frame until the body walks on
+    if (this.baseState === 'sitUp' && a === this.seatAction('up')) return;
     if (a === this.current) {
       this.currentIsOneShot = false;
       this.currentOneShotIsEmote = false;
@@ -4143,6 +4191,7 @@ function clipNamesOf(def: VisualDef): string[] {
     c.cast,
     c.sitDown,
     c.sitIdle,
+    ...seatClipNames(c.seat),
     c.swim,
     c.swimSurface,
     c.swimIdle,

@@ -38,7 +38,8 @@ export type NpcRole =
   | 'foodVendor'
   | 'potionVendor'
   | 'stableMaster'
-  | 'generalGoods';
+  | 'generalGoods'
+  | 'innkeeper';
 
 /** Every role id, so the i18n pin can assert a catalog key exists per role. */
 export const NPC_ROLES: readonly NpcRole[] = [
@@ -62,6 +63,7 @@ export const NPC_ROLES: readonly NpcRole[] = [
   'potionVendor',
   'stableMaster',
   'generalGoods',
+  'innkeeper',
 ];
 
 const TRAINER_ROLE_BY_STATION: Readonly<Record<StationType, NpcRole>> = {
@@ -125,6 +127,8 @@ export function npcRoleFor(def: NpcDef): NpcRole | null {
   if (def.crucibleVendor) return 'crucibleQuartermaster';
   if (def.heroicVendor) return 'heroicQuartermaster';
   if (def.warfareVendor) return 'pvpVendor';
+  // an inn's keeper is an innkeeper first, whatever fare she also sells
+  if (def.innkeeper) return 'innkeeper';
   const trainer = TRAINER_ROLE_BY_NPC.get(def.id);
   if (trainer) return trainer;
   if (def.vendorItems && def.vendorItems.length > 0) return vendorRoleForStock(def.vendorItems);

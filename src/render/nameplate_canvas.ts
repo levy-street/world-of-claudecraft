@@ -18,6 +18,7 @@ import {
   type NameplateHeraldryInput,
   nameplateHeraldryInto,
   nameplateHeraldryLift,
+  nameplateSubRowsLift,
 } from './nameplate_heraldry_core';
 import {
   NAMEPLATE_IMAGE_CACHE_LIMIT,
@@ -410,7 +411,7 @@ export class NameplateCanvasSurface {
       this.drawDots(state, screenX, y);
     }
     if (state.guild) {
-      y -= state.currentTarget ? 14 : 12;
+      y -= nameplateSubRowsLift(true, state.currentTarget, false);
       const guildStyle = state.currentTarget ? this.targetGuildStyle : this.guildStyle;
       // The `<guild>` wrapper is prebuilt by resolveContent (guild's only
       // writer): this runs per plate per frame, and an unconditional template
@@ -490,8 +491,7 @@ export class NameplateCanvasSurface {
     if (state.hpVisible) y -= 7;
     // Mirrors drawBase's dot row exactly (same core, same count).
     if (state.dots.count > 0) y -= nameplateDotRowHeight(state.dots.count, state.dots.scale);
-    if (state.guild) y -= state.currentTarget ? 14 : 12;
-    if (state.title) y -= NAMEPLATE_HERALDRY_TITLE_STEP;
+    y -= nameplateSubRowsLift(!!state.guild, state.currentTarget, !!state.title);
     y -= this.heraldryLift(state);
     y -= this.nameRowHeight(state);
     y -= NAMEPLATE_MARKER_ROW_HEIGHT;

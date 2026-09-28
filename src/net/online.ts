@@ -62,6 +62,7 @@ import type { HarvestPreference } from '../sim/professions/harvest_preference';
 import type { PerfectingSwapRequest } from '../sim/professions/perfecting_swap';
 import type { TownFocusPendingView } from '../sim/professions/town_focus_pending';
 import { emptyCraftSkills } from '../sim/professions/wheel';
+import { isResting } from '../sim/progression/xp';
 import {
   accountReliquaryOwnershipOpts,
   catalogRankOwned,
@@ -223,7 +224,7 @@ import { decodeGuildBoardPage, emptyGuildBoardPage, guildBoardPath } from './gui
 import { decodeGuildRoster } from './guild_roster_wire';
 import { foldInputAck } from './input_ack';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
-import { inputSignature } from './input_signature';
+import { inputFacingsMatch, inputSignature, type PendingTransientInput } from './input_signature';
 import { copyPos, wrapAngle } from './interp_math';
 import { applyMaterialInventoryWire } from './material_inventory_wire';
 import {
@@ -278,15 +279,6 @@ export { buildWebSocketAuthMessage } from './world_auth_message';
 type LooseJson = any;
 
 type InputSendMode = 'periodic' | 'changed' | 'forced-neutral' | 'forced-facing';
-
-const inputFacingsMatch = (a: number, b: number): boolean =>
-  Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b))) <= 1e-12;
-
-interface PendingTransientInput {
-  jump: boolean;
-  turnLeft: boolean;
-  turnRight: boolean;
-}
 
 // ---------------------------------------------------------------------------
 // REST
@@ -1223,6 +1215,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
   prestigeRank = 0;
   // Rested XP pool, mirrored from snapshot self.
   restedXp = 0;
+  // The inn "Resting" state, derived from the mirrored self like the Sim does it.
+  get resting(): boolean {
+    return isResting(this.player);
+  }
   // Lifetime played seconds, mirrored from snapshot self (`ptime`, quantized
   // to whole minutes server-side so the delta gate ships it about once a
   // minute).
@@ -4308,6 +4304,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // --- IWorldWorldPvp: raise/lower the /pvp flag (worldPvpInfo is a snapshot read). ---
   setWorldPvpFlag(enabled: boolean): void {
     this.cmd({ cmd: 'pvp_flag', on: enabled });
+  }
+  sitOnSeat(seatId: string): void {
+    this.cmd({ cmd: 'sit_seat', seat: seatId });
   }
   // --- IWorldDungeonFinder: group-finder sends (dungeonFinderInfo and
   // dungeonFinderBoard are snapshot reads, decoded in applySnapshot). ---
