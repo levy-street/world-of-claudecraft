@@ -10204,6 +10204,32 @@ export interface CannonEncounterState {
   victoryMedal?: CannonResult['medal'];
 }
 
+/** Fire and Fly (turret defense) content shapes; data in content/turret_defense.ts. */
+export type TurretSizeClass = 'small' | 'medium' | 'large' | 'huge';
+export interface TurretSizeDef {
+  /** Divides a throw by sqrt(mass): a wolf flies far, an ogre barely hops. */
+  mass: number;
+  /** Turret points a full-health strike costs (scaled by remaining health). */
+  breachValue: number;
+  /** Body radius (yd) for the strike distance and swept collider tests. */
+  radius: number;
+}
+export interface TurretWaveEntry {
+  templateId: string;
+  count: number;
+  /** Inside the template's own minLevel..maxLevel. */
+  level: number;
+  /** Spawns after every other entry of the wave. */
+  bossLast?: boolean;
+}
+export interface TurretWaveDef {
+  entries: readonly TurretWaveEntry[];
+  /** Damage of a core hit. */
+  coreDamage: number;
+  gapMinTicks: number;
+  gapMaxTicks: number;
+}
+
 export interface VehicleStationDef {
   id: string;
   entityId: number;
