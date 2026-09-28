@@ -3,12 +3,13 @@
 import type * as THREE from 'three';
 import type { IWorld } from '../world_api';
 import { CannonEncounterVisual } from './cannon_encounter_visual';
+import type { CannonShellHost } from './cannon_shell_visuals';
 import { GliderCourseVisual } from './glider_course_visual';
 import { IslandGuidance } from './island_guidance';
 import { MountBeacon } from './mount_beacon';
 import { RaceLine } from './race_line';
 import { ShadowInfiltrationVisual } from './shadow_infiltration_visual';
-import { TurretDefenseVisual } from './turret_defense_visual';
+import { TurretDefenseVisual, type TurretSelfView } from './turret_defense_visual';
 import { WispMazeVisual } from './wisp_maze_visual';
 import { WorldQuestTraceVisual } from './world_quest_trace_visual';
 
@@ -92,12 +93,17 @@ export class WorldGuidance {
     this.island.npcFizz(...args);
   }
 
+  /** The renderer services the Fire and Fly cannon's shots draw with. */
+  setTurretHost(host: CannonShellHost): void {
+    this.turret.setHost(host);
+  }
+
   update(
     world: IWorld,
     time: number,
     dt: number,
     reducedMotion = false,
-    renderedSelf?: { group: Pick<THREE.Object3D, 'position' | 'rotation'> },
+    renderedSelf?: { group: Pick<THREE.Object3D, 'position' | 'rotation'> } & TurretSelfView,
   ): void {
     // Racing line (cosmetic; reads the self race view only).
     this.race.update(world.mountRaceView(), time, dt);
@@ -110,7 +116,8 @@ export class WorldGuidance {
     );
     this.trace.update(world);
     this.cannon.update(world.vehicleSession, dt, reducedMotion);
-    this.turret.update(world.turretSession, world.turretClock, time, dt, reducedMotion);
+    const turret = world.turretSession;
+    this.turret.update(turret, world.turretClock, time, dt, reducedMotion, renderedSelf);
     this.glider.update(world, renderedSelf?.group);
     this.shadow.update(world);
     this.wispMaze.update(world, reducedMotion);

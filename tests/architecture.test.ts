@@ -943,6 +943,7 @@ const RENDER_PURE_CORES = [
   'src/render/vehicle_camera_core.ts',
   'src/render/turret_monster_pose_core.ts',
   'src/render/turret_defense_pool_core.ts',
+  'src/render/cannon_shell_core.ts',
   'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
   'src/render/character_effects_core.ts',

@@ -760,6 +760,7 @@ import {
   skyBiomesAt,
   skyResidencyTextures,
 } from './sky';
+import { aimCelestialSprites, aimGodRays } from './sky_overlays';
 import { zoneArrivalReady } from './sky_residency_core';
 import { SkyResidencyDriver } from './sky_residency_driver';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
@@ -3095,6 +3096,7 @@ export class Renderer {
       options.isQuestTracked,
       options.isEastbrookGuidanceEnabled,
     );
+    this.worldGuidance.setTurretHost(this);
 
     // ambient precipitation: biome-driven snow/rain that rides with the camera
     this.weather = new Weather(this.scene, this.lowGfx);
@@ -9518,25 +9520,10 @@ export class Renderer {
   }
 
   private updateCelestialSprites(): void {
-    // The basin keeps directional daylight and the sky dome, but the camera-
-    // riding sun and moon sprites can clip against its high rim as oversized
-    // wedges. Reserve screen-space celestial overlays for the overworld.
+    const { camera, sunDir, moonDir } = this;
     const outdoor = this.fogState === 'outdoor';
-    // keep the moon's shape on the lunar clock (no-op between phase buckets)
-    // and run the sun's disc to sunset orange on the same horizon curve the
-    // sky glow uses
-    this.celestialSprites?.setMoonPhase(currentLunarPhase());
-    this.celestialSprites?.setSunWarmth(duskWarmAmount(this.sunDir.y));
-    for (const sp of this.sunSprites) {
-      sp.position.copy(this.camera.position).addScaledVector(this.sunDir, 760);
-      sp.visible = outdoor && this.sunUp > 0.02;
-      sp.material.opacity = (sp.userData.baseOpacity as number) * this.sunUp;
-    }
-    for (const sp of this.moonSprites) {
-      sp.position.copy(this.camera.position).addScaledVector(this.moonDir, 760);
-      sp.visible = outdoor && this.moonUp > 0.02;
-      sp.material.opacity = (sp.userData.baseOpacity as number) * this.moonUp;
-    }
+    const sprites = this.celestialSprites;
+    aimCelestialSprites(sprites, camera, outdoor, sunDir, this.sunUp, moonDir, this.moonUp);
   }
 
   // Drop the view of an entity that left the world / our interest area.
@@ -11975,39 +11962,10 @@ export class Renderer {
     this.lightRankDirty = false;
   }
 
-  // light shafts fade in as the camera turns toward the sun, outdoor only
   private updateGodRays(): void {
-    if (this.godRays.length === 0) return;
-    // Wildheart and the Thornhollow hollow are open-air, but the long
-    // screen-space shafts read as giant triangles against an enclosed rim.
-    // Both keep the sun, sky, and outdoor grade while these shafts stay
-    // reserved for the overworld. Twilight and gloom realms also fade them
-    // completely through BIOME_GOD_RAYS, so skip their draw and math once the
-    // eased scale reaches zero.
-    const shafts = this.fogState === 'outdoor' && this.godRayZoneScale > 0.02;
-    // azimuth-only alignment, the chase cam always pitches down while the
-    // sun sits high, so a full 3D dot product would never light the shafts
-    this.camera.getWorldDirection(this.tmpV);
-    this.tmpV.y = 0;
-    this.tmpV.normalize();
-    const sunAzimuth = this.tmpV2.set(this.sunDir.x, 0, this.sunDir.z).normalize();
-    const facing = Math.max(0, this.tmpV.dot(sunAzimuth));
-    const side = this.tmpV.set(sunAzimuth.z, 0, -sunAzimuth.x); // sunAzimuth x up
-    for (let i = 0; i < this.godRays.length; i++) {
-      const sp = this.godRays[i];
-      sp.visible = shafts;
-      if (!shafts) continue;
-      const sway = Math.sin(this.time * 0.13 + i * 2.1) * 10;
-      // hang the shafts sunward of the camera but near eye height so they
-      // cross a third-person frame instead of floating 150u overhead
-      sp.position
-        .copy(this.camera.position)
-        .addScaledVector(sunAzimuth, 48 + i * 26)
-        .addScaledVector(side, (i - 1) * 30 + sway);
-      sp.position.y = this.camera.position.y + 16 + i * 7;
-      sp.material.opacity =
-        facing * facing * facing * (0.3 - i * 0.05) * this.sunUp * this.godRayZoneScale;
-    }
+    const outdoor = this.fogState === 'outdoor';
+    const { godRays, camera, godRayZoneScale, sunDir, sunUp, time } = this;
+    aimGodRays(godRays, camera, outdoor, godRayZoneScale, sunDir, sunUp, time);
   }
 
   // ---- Map-editor 3D seams (editor-only) --------------------------------

@@ -1,5 +1,7 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { sfx } from '../src/game/sfx';
+import { TURRET_FIRE_SFX, TURRET_IMPACT_SFX } from '../src/game/turret_defense_sfx';
 import { TURRET_TANK_MOUNT, TURRET_TIMING } from '../src/sim/content/turret_defense';
 import { createTurretDefense } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
@@ -15,7 +17,9 @@ import { makeWriterFacet } from '../src/ui/painter_host';
 import type { TurretSessionView } from '../src/world_api/vehicles';
 
 vi.mock('../src/ui/icons', () => ({ iconDataUrl: (_kind: string, key: string) => `/${key}.webp` }));
-vi.mock('../src/game/sfx', () => ({ sfx: { preload: vi.fn(), playUi: vi.fn() } }));
+vi.mock('../src/game/sfx', () => ({
+  sfx: { preload: vi.fn(), playUi: vi.fn(), playAt: vi.fn(() => true) },
+}));
 
 const START = 400;
 
@@ -228,4 +232,35 @@ it('drops a stale aim point when the seat changes', () => {
   world.turretSession = turretSessionView(seat());
   bar.update();
   expect(bar.aim.reticle()).toBeNull();
+});
+
+it('plays the cannon report and the blast once each from the seat frame', () => {
+  vi.mocked(sfx.playAt).mockClear();
+  vi.mocked(sfx.preload).mockClear();
+  const { world, bar } = rig();
+  const session = seat();
+  session.nextFeedbackSeq = recordTurretFeedback(session.feedback, session.nextFeedbackSeq, START, [
+    {
+      type: 'fired',
+      shotId: 1,
+      fromX: 0,
+      fromZ: 0,
+      x: 20,
+      y: 0,
+      z: 0,
+      flightTicks: 8,
+      impactTick: START + 8,
+    },
+    { type: 'impact', shotId: 1, x: 20, y: 0, z: 0, hits: [] },
+  ]);
+  world.turretSession = turretSessionView(session);
+  world.turretClock = START;
+  bar.update();
+  bar.update();
+  expect(vi.mocked(sfx.playAt).mock.calls.map((call) => call[0])).toEqual([
+    TURRET_FIRE_SFX,
+    TURRET_IMPACT_SFX,
+  ]);
+  const preloaded = vi.mocked(sfx.preload).mock.calls.map((call) => call[0]);
+  expect(preloaded).toEqual(expect.arrayContaining([TURRET_FIRE_SFX, TURRET_IMPACT_SFX]));
 });

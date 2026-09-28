@@ -1,3 +1,4 @@
+import { TurretDefenseSfx } from '../../../game/turret_defense_sfx';
 import { TURRET_TIMING } from '../../../sim/content/turret_defense';
 import type { IWorldVehicles } from '../../../world_api/vehicles';
 import { t } from '../../i18n';
@@ -33,6 +34,7 @@ export class TurretHudController {
   private readonly leave = document.createElement('button');
   private readonly view = new TurretHudView();
   private readonly feedback = new TurretFeedbackCursor();
+  private readonly sounds = new TurretDefenseSfx();
   private seated = false;
   constructor(
     private readonly world: TurretHudWorld,
@@ -88,6 +90,7 @@ export class TurretHudController {
     }
     const banner = this.feedback.consume(session);
     if (banner) this.showBanner?.(banner);
+    this.sounds.update(session, this.world.turretClock);
     if (!session) return;
     const frame = this.view.tick(session, this.world.turretClock);
     writers.setText(this.title, t('hudChrome.turret.title'));

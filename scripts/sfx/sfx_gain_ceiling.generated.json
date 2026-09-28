@@ -777,6 +777,17 @@
       }
     ]
   },
+  "impact_groundshaker": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "impact_groundshaker.mp3",
+        "sha256": "47c7e49397c4c5fe86a02a063bae90fa38f3113af0ca69e0a7bb5815103a0473",
+        "size": 74648,
+        "peakDb": -7.2
+      }
+    ]
+  },
   "impact_holy": {
     "ceilingDb": 6.5,
     "tracks": [
@@ -4681,6 +4692,29 @@
         "sha256": "6a4a6ae384a76c77b14ec8f8926b20659dfa9545969dbca62bc16f7ce453ff69",
         "size": 40167,
         "peakDb": -6.9
+      }
+    ]
+  },
+  "proj_groundshaker": {
+    "ceilingDb": 4.5,
+    "tracks": [
+      {
+        "filename": "proj_groundshaker_1.mp3",
+        "sha256": "c75e12d6bf89b7feb95ef9a2b886655ce8ade2e04e18e6a2b79d337ba30ea0f0",
+        "size": 65871,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "proj_groundshaker_2.mp3",
+        "sha256": "725ced04cdc54b91309af4df59518c7ffbb286d04d393cf48a00a6aa8f760f7b",
+        "size": 64617,
+        "peakDb": -6.1
+      },
+      {
+        "filename": "proj_groundshaker_3.mp3",
+        "sha256": "7493d239cec4ae039e2d6be2f9d88587b8c7500b0d7e4f4e95382804462c7ac4",
+        "size": 61483,
+        "peakDb": -5.5
       }
     ]
   },

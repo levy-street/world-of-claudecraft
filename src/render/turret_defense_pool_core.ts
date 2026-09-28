@@ -1,14 +1,12 @@
 // Fire and Fly monsters on screen, the pool half: how many rigs of each
 // template the wave plan can put on screen at once, which to build first,
 // which rig and which marker body each monster holds (by id, the living before
-// corpses), the feedback ring consumed once by sequence number, and the
-// placeholder shell and blast timeline. The painter is turret_defense_visual.ts.
+// corpses), and the feedback ring consumed once by sequence number. The painter
+// is turret_defense_visual.ts; the shots' own timeline is cannon_shell_core.ts.
 //
 // Three/DOM/i18n-free (RENDER_PURE_CORES) and allocation-free per frame: the
 // books and pools are fixed arrays refilled in place.
 
-import { TURRET_WEAPON } from '../sim/content/turret_defense';
-import type { TurretEvent } from '../sim/minigames/turret_defense';
 import { type TurretFeedback, turretFeedbackSince } from '../sim/minigames/turret_feedback';
 
 export interface TurretPlanInput {
@@ -261,135 +259,5 @@ export class TurretFeedbackCursor {
     if (fresh[0].seq > this.lastSeq + 1) this.dropped += fresh[0].seq - this.lastSeq - 1;
     this.lastSeq = fresh[fresh.length - 1].seq;
     return fresh;
-  }
-}
-
-export type TurretFiredEvent = Extract<TurretEvent, { type: 'fired' }>;
-export type TurretImpactEvent = Extract<TurretEvent, { type: 'impact' }>;
-
-/** The cooldown against the longest flight bounds the shells in the air below this. */
-export const TURRET_SHELL_POOL = 4;
-export const TURRET_BLAST_POOL = 4;
-export const TURRET_BLAST_TICKS = 8;
-export const TURRET_MUZZLE_LIFT = 2.2;
-export const TURRET_MUZZLE_REACH = 2;
-
-export interface TurretShellSlot {
-  shotId: number;
-  fromX: number;
-  fromY: number;
-  fromZ: number;
-  toX: number;
-  toY: number;
-  toZ: number;
-  firedTick: number;
-  impactTick: number;
-  arc: number;
-}
-
-export interface TurretBlastSlot {
-  active: boolean;
-  x: number;
-  y: number;
-  z: number;
-  tick: number;
-}
-
-export interface TurretBlastFrame {
-  /** Flash sphere radius (yd). */
-  flash: number;
-  /** Ground ring radius (yd), growing to the blast radius. */
-  ring: number;
-}
-
-/** The placeholder shot: a shell on a parabola from an approximate muzzle to the blast, then a flash and a ring. */
-export class TurretShotFx {
-  readonly shells: TurretShellSlot[] = Array.from({ length: TURRET_SHELL_POOL }, () => ({
-    shotId: 0,
-    fromX: 0,
-    fromY: 0,
-    fromZ: 0,
-    toX: 0,
-    toY: 0,
-    toZ: 0,
-    firedTick: 0,
-    impactTick: 0,
-    arc: 0,
-  }));
-  readonly blasts: TurretBlastSlot[] = Array.from({ length: TURRET_BLAST_POOL }, () => ({
-    active: false,
-    x: 0,
-    y: 0,
-    z: 0,
-    tick: 0,
-  }));
-  private nextShell = 0;
-  private nextBlast = 0;
-
-  clear(): void {
-    for (const shell of this.shells) shell.shotId = 0;
-    for (const blast of this.blasts) blast.active = false;
-  }
-
-  /** `originY` is the turret's ground height; the muzzle sits above it, toward the shot. */
-  fired(ev: TurretFiredEvent, originY: number): void {
-    const slot = this.shells[this.nextShell];
-    this.nextShell = (this.nextShell + 1) % this.shells.length;
-    const dx = ev.x - ev.fromX;
-    const dz = ev.z - ev.fromZ;
-    const dist = Math.hypot(dx, dz);
-    const ux = dist > 1e-6 ? dx / dist : 0;
-    const uz = dist > 1e-6 ? dz / dist : 1;
-    slot.shotId = ev.shotId;
-    slot.fromX = ev.fromX + ux * TURRET_MUZZLE_REACH;
-    slot.fromY = originY + TURRET_MUZZLE_LIFT;
-    slot.fromZ = ev.fromZ + uz * TURRET_MUZZLE_REACH;
-    slot.toX = ev.x;
-    slot.toY = ev.y;
-    slot.toZ = ev.z;
-    slot.impactTick = ev.impactTick;
-    slot.firedTick = ev.impactTick - ev.flightTicks;
-    slot.arc = Math.min(6, Math.max(1, dist * 0.12));
-  }
-
-  impact(ev: TurretImpactEvent, tick: number): void {
-    for (const shell of this.shells) if (shell.shotId === ev.shotId) shell.shotId = 0;
-    const slot = this.blasts[this.nextBlast];
-    this.nextBlast = (this.nextBlast + 1) % this.blasts.length;
-    slot.active = true;
-    slot.x = ev.x;
-    slot.y = ev.y;
-    slot.z = ev.z;
-    slot.tick = tick;
-  }
-
-  /** Writes the shell's position at `tick`; false when the slot draws nothing. */
-  shellAt(index: number, tick: number, out: { x: number; y: number; z: number }): boolean {
-    const s = this.shells[index];
-    if (!s || s.shotId === 0) return false;
-    const span = s.impactTick - s.firedTick;
-    const t = span > 0 ? Math.min(1, Math.max(0, (tick - s.firedTick) / span)) : 1;
-    if (t >= 1) {
-      s.shotId = 0;
-      return false;
-    }
-    out.x = s.fromX + (s.toX - s.fromX) * t;
-    out.z = s.fromZ + (s.toZ - s.fromZ) * t;
-    out.y = s.fromY + (s.toY - s.fromY) * t + 4 * s.arc * t * (1 - t);
-    return true;
-  }
-
-  /** Writes the blast's flash and ring at `tick`; false once it has faded. */
-  blastAt(index: number, tick: number, out: TurretBlastFrame): boolean {
-    const b = this.blasts[index];
-    if (!b?.active) return false;
-    const age = Math.max(0, tick - b.tick) / TURRET_BLAST_TICKS;
-    if (age >= 1) {
-      b.active = false;
-      return false;
-    }
-    out.flash = TURRET_WEAPON.blastCore * (1 + age) * (1 - age);
-    out.ring = 0.5 + (TURRET_WEAPON.blastRadius - 0.5) * Math.sqrt(age);
-    return true;
   }
 }

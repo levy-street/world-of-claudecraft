@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { CannonShellVisuals } from '../src/render/cannon_shell_visuals';
 import { farMeshShown } from '../src/render/characters/far_lod_reveal_core';
 import {
   characterFormReadyMask,
@@ -94,6 +95,12 @@ const GATE_CALL_SITES: readonly {
     // The Fire and Fly monster rigs: one gated attach per built rig.
     gate: 'attachSceneGroupGated',
     file: 'src/render/turret_defense_visual.ts',
+    marker: 'attachSceneGroupGated(',
+  },
+  {
+    // The cannon's shot pieces: one gated attach of the whole weapon root.
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/cannon_shell_visuals.ts',
     marker: 'attachSceneGroupGated(',
   },
 ];
@@ -569,5 +576,32 @@ describe('entity gate stand-ins actually stand in', () => {
     const painter = stripComments(sourceOf('src/render/turret_defense_visual.ts'));
     expect(painter).toContain('body.standIn.visible = !rig;');
     expect(painter).toContain('if (!this.book.rigReady[i] && this.rigs[i].gate.visible)');
+  });
+
+  it('Fire and Fly weapon gate: the prewarmed particles and AoE ring draw a shot until its pieces link', () => {
+    const gate = vi.fn(() => new Promise<void>(() => {}));
+    const visuals = new CannonShellVisuals({
+      blastRadius: 6,
+      groundAt: () => 0,
+      compileGate: gate,
+    });
+    const host = {
+      vfx: { burst: vi.fn(), groundPuff: vi.fn() },
+      camera: new THREE.PerspectiveCamera(),
+      addShake: vi.fn(),
+      punchFov: vi.fn(),
+      spawnAoeRing: vi.fn(),
+    };
+    visuals.setHost(host);
+    visuals.prepare(new THREE.Scene());
+    expect(gate).toHaveBeenCalledWith(visuals.root);
+    expect(visuals.root.visible).toBe(false);
+    const shot = { shotId: 1, x: 20, y: 0, z: 0, flightTicks: 8, impactTick: 168 };
+    visuals.fire(shot, { x: 2, y: 2.2, z: 0 }, 0, false);
+    visuals.impact(shot, 0.4, false);
+    expect(host.vfx.burst).toHaveBeenCalled();
+    expect(host.vfx.groundPuff).toHaveBeenCalled();
+    expect(host.spawnAoeRing).toHaveBeenCalledWith(20, 0, 6, 'physical');
+    visuals.dispose();
   });
 });

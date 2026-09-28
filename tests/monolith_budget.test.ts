@@ -995,7 +995,10 @@ const MONOLITHS: MonolithRow[] = [
     // RE-PINNED 12687 -> 12688 at the second release merge into the same branch,
     // after PR 3847 landed on the release (its renderer.ts wiring adds one line;
     // the release pin stays 12684): wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 12688,
+    // LOWERED 12688 -> 12646: the sun, moon and god-ray painters moved to
+    // src/render/sky_overlays.ts, paying for the one-line Fire and Fly weapon host
+    // (WorldGuidance.setTurretHost). Exact count, zero slack.
+    ceiling: 12646,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

@@ -1,19 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
   nextTurretRig,
-  TURRET_BLAST_TICKS,
-  TURRET_MUZZLE_LIFT,
-  TURRET_MUZZLE_REACH,
   TurretFeedbackCursor,
-  type TurretFiredEvent,
-  TurretShotFx,
   TurretSlotBook,
   turretBodyCapacity,
   turretBuildOrder,
   turretRigCapacities,
   turretUrgentTemplates,
 } from '../src/render/turret_defense_pool_core';
-import { TURRET_WEAPON } from '../src/sim/content/turret_defense';
 import type { TurretEvent } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { recordTurretFeedback, type TurretFeedback } from '../src/sim/minigames/turret_feedback';
@@ -198,60 +192,5 @@ describe('Fire and Fly feedback cursor', () => {
     const taken = cursor.take({ defense: { startTick: 500 }, feedback: flood });
     expect(taken[0].seq).toBe(9);
     expect(cursor.dropped).toBe(7);
-  });
-});
-
-describe('Fire and Fly placeholder shot', () => {
-  const fired: TurretFiredEvent = {
-    type: 'fired',
-    shotId: 4,
-    fromX: 0,
-    fromZ: 0,
-    x: 30,
-    y: 1,
-    z: 40,
-    flightTicks: 10,
-    impactTick: 210,
-  };
-
-  it('flies the shell on a parabola from the muzzle to the blast point over the flight ticks', () => {
-    const fx = new TurretShotFx();
-    fx.fired(fired, 2);
-    const at = { x: 0, y: 0, z: 0 };
-    expect(fx.shellAt(0, 200, at)).toBe(true);
-    expect(at.x).toBeCloseTo(0.6 * TURRET_MUZZLE_REACH, 9);
-    expect(at.z).toBeCloseTo(0.8 * TURRET_MUZZLE_REACH, 9);
-    expect(at.y).toBeCloseTo(2 + TURRET_MUZZLE_LIFT, 9);
-    expect(fx.shellAt(0, 205, at)).toBe(true);
-    const chord = (2 + TURRET_MUZZLE_LIFT + 1) / 2;
-    expect(at.y).toBeGreaterThan(chord + 1);
-    expect(fx.shellAt(0, 210, at)).toBe(false);
-    for (let i = 1; i < fx.shells.length; i++) expect(fx.shellAt(i, 205, at)).toBe(false);
-  });
-
-  it('turns an impact into a flash and a ring that grows to the blast radius, then fades', () => {
-    const fx = new TurretShotFx();
-    fx.fired(fired, 0);
-    fx.impact({ type: 'impact', shotId: 4, x: 30, y: 1, z: 40, hits: [] }, 210);
-    const at = { x: 0, y: 0, z: 0 };
-    expect(fx.shellAt(0, 205, at)).toBe(false);
-    const frame = { flash: 0, ring: 0 };
-    expect(fx.blastAt(0, 209, frame)).toBe(true);
-    expect(frame.flash).toBeCloseTo(TURRET_WEAPON.blastCore, 9);
-    const early = frame.ring;
-    expect(fx.blastAt(0, 210 + TURRET_BLAST_TICKS - 0.01, frame)).toBe(true);
-    expect(frame.ring).toBeGreaterThan(early);
-    expect(frame.ring).toBeLessThanOrEqual(TURRET_WEAPON.blastRadius);
-    expect(frame.ring).toBeGreaterThan(TURRET_WEAPON.blastRadius - 0.1);
-    expect(fx.blastAt(0, 210 + TURRET_BLAST_TICKS, frame)).toBe(false);
-  });
-
-  it('reuses its fixed pools round robin and clears on demand', () => {
-    const fx = new TurretShotFx();
-    for (let i = 1; i <= fx.shells.length + 1; i++) fx.fired({ ...fired, shotId: i }, 0);
-    expect(fx.shells.map((s) => s.shotId)).toEqual([5, 2, 3, 4]);
-    fx.clear();
-    expect(fx.shells.every((s) => s.shotId === 0)).toBe(true);
-    expect(fx.blasts.every((b) => !b.active)).toBe(true);
   });
 });

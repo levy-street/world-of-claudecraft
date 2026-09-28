@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
+import { turretSfxCueInto } from '../src/game/turret_defense_sfx';
+import { setBuildSpanSink } from '../src/render/build_spans';
 import { visualKeyFor } from '../src/render/characters/manifest';
 import { drawProgramSignature } from '../src/render/draw_program_signature_core';
 import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
@@ -140,6 +142,44 @@ function markers(visual: TurretDefenseVisual): THREE.Mesh[] {
   return part(visual, 'fire-and-fly-markers').children as THREE.Mesh[];
 }
 
+const firedAt160: TurretFeedback = {
+  seq: 1,
+  tick: 160,
+  event: {
+    type: 'fired',
+    shotId: 1,
+    fromX: 0,
+    fromZ: 0,
+    x: 20,
+    y: 0,
+    z: 0,
+    flightTicks: 8,
+    impactTick: 168,
+  },
+};
+const impactAt168: TurretFeedback = {
+  seq: 2,
+  tick: 168,
+  event: { type: 'impact', shotId: 1, x: 20, y: 0, z: 0, hits: [] },
+};
+
+function weaponPiece(visual: TurretDefenseVisual, role: string): THREE.InstancedMesh {
+  const found = visual.group.getObjectByName(`cannonShell:${role}`);
+  if (!(found instanceof THREE.InstancedMesh)) throw new Error(`missing weapon ${role}`);
+  return found;
+}
+
+function weaponDrawn(visual: TurretDefenseVisual, role: string): number {
+  const mesh = weaponPiece(visual, role);
+  return mesh.visible ? mesh.count : 0;
+}
+
+function weaponPosition(visual: TurretDefenseVisual, role: string): THREE.Vector3 {
+  const m = new THREE.Matrix4();
+  weaponPiece(visual, role).getMatrixAt(0, m);
+  return new THREE.Vector3().setFromMatrixPosition(m);
+}
+
 function capsules(visual: TurretDefenseVisual): THREE.Mesh[] {
   return markers(visual).filter((c) => c.geometry instanceof THREE.CapsuleGeometry);
 }
@@ -219,7 +259,7 @@ describe('Fire and Fly monsters on screen', () => {
     const state = engine(0);
     const plan = state.plan;
     visual.update(viewOf(state), 0, 0, 0.016);
-    expect(markers(visual)).toHaveLength(turretBodyCapacity(plan) * 3 + 12);
+    expect(markers(visual)).toHaveLength(turretBodyCapacity(plan) * 3);
     expect(actors.made).toHaveLength(0);
     await flush();
     visual.update(viewOf(state), 0, 0, 0.016);
@@ -509,69 +549,131 @@ describe('Fire and Fly monsters on screen', () => {
     visual.dispose();
   });
 
-  it('flies a placeholder shell from the fired entry and shows the blast from the impact entry', async () => {
+  it('flies the cannon shell from the fired entry and shows the blast from the impact entry', async () => {
     actors.made.length = 0;
     const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0, undefined, immediate);
     const state = engine(160);
     await buildAll(visual, viewOf(state), 160);
-    const fired: TurretFeedback = {
-      seq: 1,
-      tick: 160,
-      event: {
-        type: 'fired',
-        shotId: 1,
-        fromX: 0,
-        fromZ: 0,
-        x: 20,
-        y: 0,
-        z: 0,
-        flightTicks: 8,
-        impactTick: 168,
-      },
-    };
-    const spheres = () =>
-      markers(visual).filter((m) => m.visible && m.geometry instanceof THREE.SphereGeometry);
-    expect(spheres()).toHaveLength(0);
-    visual.update(viewOf(state, [fired]), 164, 0, 0.016);
-    const flying = spheres();
-    expect(flying).toHaveLength(1);
-    expect(flying[0].position.x).toBeGreaterThan(2);
-    expect(flying[0].position.x).toBeLessThan(20);
-    const impact: TurretFeedback = {
-      seq: 2,
-      tick: 168,
-      event: { type: 'impact', shotId: 1, x: 20, y: 0, z: 0, hits: [] },
-    };
-    visual.update(viewOf(state, [fired, impact]), 168, 0, 0.016);
-    const blast = markers(visual).filter((m) => m.visible && m.position.x === 20);
-    expect(blast.map((m) => m.geometry.type).sort()).toEqual(['RingGeometry', 'SphereGeometry']);
+    expect(weaponDrawn(visual, 'shell')).toBe(0);
+    visual.update(viewOf(state, [firedAt160]), 164, 0, 0.016);
+    expect(weaponDrawn(visual, 'shell')).toBe(1);
+    expect(weaponDrawn(visual, 'trail')).toBeGreaterThan(0);
+    const shell = weaponPosition(visual, 'shell');
+    expect(shell.x).toBeGreaterThan(2);
+    expect(shell.x).toBeLessThan(20);
+    visual.update(viewOf(state, [firedAt160, impactAt168]), 168, 0.4, 0.016);
+    expect(weaponDrawn(visual, 'shell')).toBe(0);
+    expect(weaponDrawn(visual, 'flash')).toBe(1);
+    expect(weaponDrawn(visual, 'wave')).toBe(1);
+    expect(weaponPosition(visual, 'flash').x).toBeCloseTo(20, 9);
+    expect(weaponDrawn(visual, 'scorch')).toBeGreaterThan(0);
     visual.dispose();
   });
 
-  it('clears the shells of a previous seat when a new one starts', () => {
+  it('clears the shots of a previous seat when a new one starts', () => {
     const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0);
     const state = engine(0);
-    const fired: TurretFeedback = {
-      seq: 1,
-      tick: 160,
-      event: {
-        type: 'fired',
-        shotId: 1,
-        fromX: 0,
-        fromZ: 0,
-        x: 20,
-        y: 0,
-        z: 0,
-        flightTicks: 8,
-        impactTick: 168,
-      },
-    };
-    const spheres = () =>
-      markers(visual).filter((m) => m.visible && m.geometry instanceof THREE.SphereGeometry);
-    visual.update(viewOf(state, [fired]), 164, 0, 0.016);
-    expect(spheres()).toHaveLength(1);
+    visual.update(viewOf(state, [firedAt160]), 164, 0, 0.016);
+    expect(weaponDrawn(visual, 'shell')).toBe(1);
     visual.update(viewOf({ ...state, startTick: 150 }), 164, 0, 0.016);
-    expect(spheres()).toHaveLength(0);
+    expect(weaponDrawn(visual, 'shell')).toBe(0);
+    visual.dispose();
+  });
+
+  it('draws no shot from an entry already stale when first read', () => {
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0);
+    const state = engine(0);
+    visual.update(viewOf(state, [firedAt160, impactAt168]), 200, 0, 0.016);
+    for (const role of ['shell', 'trail', 'muzzleCore', 'flash', 'wave', 'scorch']) {
+      expect(weaponDrawn(visual, role), role).toBe(0);
+    }
+    visual.dispose();
+  });
+
+  it('draws a shot entry exactly ten ticks old at its first read, not eleven', () => {
+    const state = engine(0);
+    const fresh = new TurretDefenseVisual(new THREE.Scene(), () => 0);
+    fresh.update(viewOf(state, [firedAt160]), 170, 0, 0.016);
+    expect(weaponDrawn(fresh, 'muzzleCore')).toBe(1);
+    fresh.dispose();
+    const late = new TurretDefenseVisual(new THREE.Scene(), () => 0);
+    late.update(viewOf(state, [firedAt160]), 171, 0, 0.016);
+    expect(weaponDrawn(late, 'muzzleCore')).toBe(0);
+    late.dispose();
+  });
+
+  it('fires from the same fallback muzzle the cannon report is played at, with no barrel', () => {
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0);
+    const state = engine(0);
+    const view = viewOf(state, [firedAt160]);
+    visual.update(view, 160, 0, 0.016);
+    const heard = turretSfxCueInto(firedAt160.event, view.origin, {
+      key: '',
+      x: 0,
+      y: 0,
+      z: 0,
+      gain: 0,
+      rate: 0,
+      jitter: false,
+    });
+    const shell = weaponPosition(visual, 'shell');
+    expect(shell.distanceTo(new THREE.Vector3(2, 2.2, 0))).toBeLessThan(1e-6);
+    expect(shell.distanceTo(new THREE.Vector3(heard?.x, heard?.y, heard?.z))).toBeLessThan(1e-6);
+    visual.dispose();
+  });
+
+  it('files the weapon build in the build ledger once, at the commitment', () => {
+    const spans: string[] = [];
+    setBuildSpanSink((kind) => spans.push(kind));
+    try {
+      const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0);
+      const view = viewOf(engine(0));
+      visual.update(view, 0, 0, 0.016);
+      visual.update(view, 1, 0.05, 0.016);
+      visual.update(view, 2, 0.1, 0.016);
+      expect(spans.filter((kind) => kind === 'zone:turret-weapon')).toHaveLength(1);
+      visual.dispose();
+    } finally {
+      setBuildSpanSink(null);
+    }
+  });
+
+  it("fires from the tank's own barrel and kicks it back, found through the self view", () => {
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0);
+    const scene = new THREE.Scene();
+    const root = new THREE.Group();
+    const hull = new THREE.Group();
+    hull.name = 'HullPivot';
+    const barrel = new THREE.Object3D();
+    barrel.name = 'TankCannon';
+    barrel.position.set(0.225, 1.66, 0.535);
+    hull.add(barrel);
+    root.add(hull);
+    scene.add(root);
+    const self = { mountVisual: { root } };
+    const state = engine(0);
+    visual.update(viewOf(state), 160, 0, 0.016, false, self);
+    visual.update(viewOf(state, [firedAt160]), 160, 0, 0.016, false, self);
+    const shell = weaponPosition(visual, 'shell');
+    const tip = new THREE.Vector3(-0.133, 0, 1.02).applyMatrix4(barrel.matrixWorld);
+    expect(shell.distanceTo(tip)).toBeLessThan(1e-6);
+    visual.update(viewOf(state, [firedAt160]), 160, 0.035, 0.016, false, self);
+    expect(barrel.position.z).toBeLessThan(0.535 - 0.2);
+    expect(hull.position.z).toBe(0);
+    visual.update(viewOf(state, [firedAt160]), 161, 2, 0.016, false, self);
+    expect(barrel.position.z).toBeCloseTo(0.535, 12);
+    visual.dispose();
+  });
+
+  it('builds the weapon at the commitment behind the same gate as the rigs', () => {
+    const gate = vi.fn(() => new Promise<void>(() => {}));
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0, gate);
+    expect(visual.group.getObjectByName('fire-and-fly-weapon')?.children ?? []).toHaveLength(0);
+    visual.update(viewOf(engine(0)), 0, 0, 0.016);
+    const weapon = part(visual, 'fire-and-fly-weapon');
+    expect(weapon.children.length).toBeGreaterThan(0);
+    expect(gate).toHaveBeenCalledWith(weapon);
+    expect(weapon.visible).toBe(false);
     visual.dispose();
   });
 

@@ -1,6 +1,8 @@
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import type { IWorld } from '../src/world_api';
+import { stripComments } from './helpers/strip_comments';
 
 const calls = vi.hoisted(() => ({
   events: [] as string[],
@@ -12,6 +14,7 @@ const calls = vi.hoisted(() => ({
   turretGate: vi.fn(),
   turretUpdate: vi.fn(),
   turretDispose: vi.fn(),
+  turretHost: vi.fn(),
 }));
 vi.mock('../src/render/race_line', () => ({
   RaceLine: class {
@@ -78,6 +81,7 @@ vi.mock('../src/render/turret_defense_visual', () => ({
       calls.events.push('turret');
       calls.turretUpdate(...args);
     }
+    setHost = calls.turretHost;
     dispose = calls.turretDispose;
   },
 }));
@@ -169,10 +173,25 @@ describe('personal world guidance coordinator', () => {
       turretClock: 42,
     } as unknown as IWorld;
     guidance.update(world, 10, 0.05, true);
-    expect(calls.turretUpdate).toHaveBeenLastCalledWith(session, 42, 10, 0.05, true);
+    expect(calls.turretUpdate).toHaveBeenLastCalledWith(session, 42, 10, 0.05, true, undefined);
+    // The self view's mount carries the tank's barrel the shots leave from.
+    const self = { group: new THREE.Group(), mountVisual: { root: new THREE.Group() } };
+    guidance.update(world, 11, 0.05, false, self);
+    expect(calls.turretUpdate).toHaveBeenLastCalledWith(session, 42, 11, 0.05, false, self);
+    const host = { vfx: {}, camera: new THREE.PerspectiveCamera() } as never;
+    guidance.setTurretHost(host);
+    expect(calls.turretHost).toHaveBeenCalledWith(host);
     calls.turretDispose.mockClear();
     guidance.dispose();
     expect(calls.turretDispose).toHaveBeenCalledTimes(1);
+  });
+  it('is lent the renderer as the turret host, once (source pin)', () => {
+    const lend = 'this.worldGuidance.setTurretHost(this);';
+    const lends = (source: string) => stripComments(source).split(lend).length - 1;
+    expect(lends(`// ${lend}\n/* ${lend} */`)).toBe(0);
+    expect(lends(lend)).toBe(1);
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    expect(lends(renderer)).toBe(1);
   });
   it('forwards NPC fizz arguments unchanged and releases the new visual', () => {
     const guidance = new WorldGuidance(new THREE.Scene(), () => 0);

@@ -1,18 +1,21 @@
 // Fire and Fly on screen: the private monsters' rigs with their stand-ins,
-// health bars and strike rings, plus the placeholder shell and blast, driven
-// from IWorld.turretSession. Nothing is built until the player is first seen
-// seated in the turret; the rig pools then grow one rig per frame for the
-// current and next wave, and one per idle slot for the others, and live for the
-// rest of the world session. Every rig attaches behind the compile gate while a
-// capsule on a prewarmed material stands in at the monster's exact position:
-// enemy positions are never hidden. An unused rig leaves the scene graph. No
-// lights, no shadows, no per-frame THREE allocation. Pure halves:
-// turret_monster_pose_core.ts and turret_defense_pool_core.ts.
+// health bars and strike rings, plus the cannon's shots (cannon_shell_visuals.ts,
+// its muzzle and recoil on the tank's own barrel), driven from
+// IWorld.turretSession. Nothing is built until the player is first seen seated
+// in the turret; the rig pools then grow one rig per frame for the current and
+// next wave, and one per idle slot for the others, and live for the rest of the
+// world session. Every rig attaches behind the compile gate while a capsule on a
+// prewarmed material stands in at the monster's exact position: enemy positions
+// are never hidden. An unused rig leaves the scene graph. No lights, no shadows,
+// no per-frame THREE allocation. Pure halves: turret_monster_pose_core.ts and
+// turret_defense_pool_core.ts.
 import * as THREE from 'three';
+import { TURRET_WEAPON } from '../sim/content/turret_defense';
 import { MOBS } from '../sim/data';
 import type { Entity } from '../sim/types';
 import type { TurretSessionView } from '../world_api/vehicles';
 import { timeBuildSpan } from './build_spans';
+import { type CannonShellHost, CannonShellVisuals } from './cannon_shell_visuals';
 import { type AnimState, CharacterVisual } from './characters';
 import { charactersReady } from './characters/assets';
 import { visualKeyFor } from './characters/manifest';
@@ -23,7 +26,6 @@ import { GAIT_RUN_ENTER } from './locomotion';
 import {
   nextTurretRig,
   TurretFeedbackCursor,
-  TurretShotFx,
   TurretSlotBook,
   turretBodyCapacity,
   turretBuildOrder,
@@ -43,6 +45,11 @@ import { worldQuestTraceMaterials } from './world_quest_trace_materials';
 
 type CompileGate = (target: THREE.Object3D) => Promise<unknown>;
 type TurretPlanView = TurretSessionView['defense']['plan'];
+
+/** The self view's tank, lent as the seated player's mount: its barrel is a node of the rig. */
+export interface TurretSelfView {
+  readonly mountVisual?: { readonly root: THREE.Object3D } | null;
+}
 
 interface RigSlot {
   readonly actor: CharacterVisual;
@@ -71,7 +78,16 @@ const HEALTH_BAR_LIFT = 0.35;
 const RING_LIFT = 0.08;
 /** A corpse sinks at least this far (yd), so a short body still leaves the ground. */
 const SINK_DEPTH = 1.1;
-const SHELL_RADIUS = 0.35;
+/** The Dreadspark Groundshaker's barrel node, and its muzzle in the node's own
+ *  (quantized, +z forward) space: the centre of the barrel's end ring. */
+const TANK_BARREL_NODE = 'TankCannon';
+const TANK_MUZZLE_TIP = { x: -0.133, y: 0, z: 1.02 };
+/** Without the barrel (a rig still loading), the muzzle sits this high over the
+ *  turret and this far toward the shot. */
+const MUZZLE_LIFT = 2.2;
+const MUZZLE_REACH = 2;
+/** A shot entry older than this many ticks at its first read (a seat seen late) draws nothing. */
+const SHOT_STALE_TICKS = 10;
 /** The renderer's view retry: a failed rig (a streamed GLB still arriving) is tried again after it. */
 const RIG_RETRY_MS = 2000;
 /** The retry gate keys (entity, slot): the pool is one entity, each template a slot. */
@@ -94,7 +110,8 @@ export class TurretDefenseVisual {
   };
   private readonly clock = new TurretDisplayClock();
   private readonly cursor = new TurretFeedbackCursor();
-  private readonly shots = new TurretShotFx();
+  private readonly weapon: CannonShellVisuals;
+  private barrelSource: THREE.Object3D | null = null;
   private readonly pose = newTurretMonsterPose();
   private readonly probe: { ground(x: number, z: number): number };
   private readonly anim: AnimState = {
@@ -112,17 +129,12 @@ export class TurretDefenseVisual {
     wading: false,
     sitting: false,
   };
-  private readonly point = { x: 0, y: 0, z: 0 };
-  private readonly blast = { flash: 0, ring: 0 };
+  private readonly muzzle = { x: 0, y: 0, z: 0 };
   private geometry: {
     capsule: THREE.CapsuleGeometry;
     box: THREE.BoxGeometry;
     ring: THREE.RingGeometry;
-    sphere: THREE.SphereGeometry;
   } | null = null;
-  private shellMeshes: THREE.Mesh[] = [];
-  private flashMeshes: THREE.Mesh[] = [];
-  private blastRings: THREE.Mesh[] = [];
   private plan: TurretPlanView | null = null;
   private capacities = new Map<string, number>();
   private order: string[] = [];
@@ -142,6 +154,11 @@ export class TurretDefenseVisual {
     private readonly idleScheduler?: IdleScheduler,
   ) {
     this.probe = { ground: groundAt };
+    this.weapon = new CannonShellVisuals({
+      blastRadius: TURRET_WEAPON.blastRadius,
+      groundAt,
+      compileGate,
+    });
     this.group.name = 'fire-and-fly';
     this.rigsRoot.name = 'fire-and-fly-rigs';
     this.markersRoot.name = 'fire-and-fly-markers';
@@ -155,12 +172,18 @@ export class TurretDefenseVisual {
     return this.built;
   }
 
+  /** The renderer services the shots draw with (particles, camera kick, AoE ring). */
+  setHost(host: CannonShellHost | null): void {
+    this.weapon.setHost(host);
+  }
+
   update(
     session: TurretSessionView | null | undefined,
     clock: number | null | undefined,
     time: number,
     dt: number,
     reducedMotion = false,
+    self?: TurretSelfView,
   ): void {
     if (this.disposed) return;
     if (!session) {
@@ -181,7 +204,8 @@ export class TurretDefenseVisual {
       if (!this.book.rigReady[i] && this.rigs[i].gate.visible) this.book.setRigReady(i);
     }
     this.book.assign(defense.monsters, this.templateOf);
-    this.consumeFeedback(session);
+    this.syncBarrel(self, false);
+    this.consumeFeedback(session, self, tick, time, reducedMotion);
     for (const rig of this.rigs) rig.used = false;
     for (const body of this.bodies) body.used = false;
     const frozen = defense.phase === 'lost';
@@ -249,7 +273,7 @@ export class TurretDefenseVisual {
       if (body.used) continue;
       body.standIn.visible = body.health.visible = body.ring.visible = false;
     }
-    this.drawShots(tick);
+    this.weapon.update(tick, time);
   }
 
   /** Stops showing a session: every slot released, the clock and the shots cleared. */
@@ -259,7 +283,9 @@ export class TurretDefenseVisual {
     this.book.releaseAll();
     this.clock.reset();
     this.cursor.reset();
-    this.shots.clear();
+    this.weapon.clear();
+    this.barrelSource = null;
+    this.weapon.setBarrel(null, TANK_MUZZLE_TIP);
     for (const body of this.bodies) body.owner = null;
   }
 
@@ -276,6 +302,9 @@ export class TurretDefenseVisual {
           console.error('Fire and Fly monster rigs unavailable, stand-ins only', error);
         },
       );
+    }
+    if (!this.weapon.prepared) {
+      timeBuildSpan('zone:turret-weapon', () => this.weapon.prepare(this.group));
     }
     if (plan !== this.plan) {
       this.plan = plan;
@@ -378,26 +407,12 @@ export class TurretDefenseVisual {
       capsule: new THREE.CapsuleGeometry(0.5, 1, 4, 10),
       box: new THREE.BoxGeometry(1, 1, 1),
       ring: new THREE.RingGeometry(0.86, 1, 32),
-      sphere: new THREE.SphereGeometry(1, 12, 8),
     };
     // vertexNormals is a program key bit and MeshBasic without an env map reads
     // no normal: without one, the markers draw the programs the world-quest-trace
     // prewarm stages (a positions-only ribbon), not a variant nothing links.
     for (const part of Object.values(geometry)) part.deleteAttribute('normal');
     this.geometry = geometry;
-    const materials = worldQuestTraceMaterials();
-    this.shellMeshes = this.shots.shells.map(() => {
-      const shell = this.marker(geometry.sphere, materials.gold);
-      shell.scale.setScalar(SHELL_RADIUS);
-      return shell;
-    });
-    this.flashMeshes = this.shots.blasts.map(() => this.marker(geometry.sphere, materials.gold));
-    this.blastRings = this.shots.blasts.map(() => {
-      const ring = this.marker(geometry.ring, materials.gold);
-      ring.rotation.x = -Math.PI / 2;
-      ring.renderOrder = floorVfxRenderOrder('player');
-      return ring;
-    });
     return geometry;
   }
 
@@ -409,15 +424,39 @@ export class TurretDefenseVisual {
     return mesh;
   }
 
-  private consumeFeedback(session: TurretSessionView): void {
+  /** The tank's barrel, looked up again only when the rig changes or a shot finds none. */
+  private syncBarrel(self: TurretSelfView | undefined, retry: boolean): void {
+    const root = self?.mountVisual?.root ?? null;
+    if (root === this.barrelSource && !(retry && root && !this.weapon.hasBarrel)) return;
+    this.barrelSource = root;
+    this.weapon.setBarrel(root?.getObjectByName(TANK_BARREL_NODE) ?? null, TANK_MUZZLE_TIP);
+  }
+
+  private consumeFeedback(
+    session: TurretSessionView,
+    self: TurretSelfView | undefined,
+    tick: number,
+    time: number,
+    reducedMotion: boolean,
+  ): void {
     for (const entry of this.cursor.take(session)) {
       const ev = entry.event;
+      const stale = entry.tick < tick - SHOT_STALE_TICKS;
       switch (ev.type) {
-        case 'fired':
-          this.shots.fired(ev, session.origin.y);
+        case 'fired': {
+          if (stale) break;
+          this.syncBarrel(self, true);
+          const dx = ev.x - ev.fromX;
+          const dz = ev.z - ev.fromZ;
+          const dist = Math.hypot(dx, dz);
+          this.muzzle.x = ev.fromX + (dist > 1e-6 ? dx / dist : 0) * MUZZLE_REACH;
+          this.muzzle.y = session.origin.y + MUZZLE_LIFT;
+          this.muzzle.z = ev.fromZ + (dist > 1e-6 ? dz / dist : 1) * MUZZLE_REACH;
+          this.weapon.fire(ev, this.muzzle, time, reducedMotion);
           break;
+        }
         case 'impact':
-          this.shots.impact(ev, entry.tick);
+          if (!stale) this.weapon.impact(ev, time, reducedMotion);
           break;
         // The stagger at every contact: playHit's own cooldown spaces a
         // bounce from its launch, and a corpse's death clip overrides it.
@@ -438,26 +477,6 @@ export class TurretDefenseVisual {
     return r >= 0 ? this.rigs[r] : null;
   }
 
-  private drawShots(tick: number): void {
-    for (let i = 0; i < this.shellMeshes.length; i++) {
-      const mesh = this.shellMeshes[i];
-      mesh.visible = this.shots.shellAt(i, tick, this.point);
-      if (mesh.visible) mesh.position.set(this.point.x, this.point.y, this.point.z);
-    }
-    for (let i = 0; i < this.flashMeshes.length; i++) {
-      const shown = this.shots.blastAt(i, tick, this.blast);
-      const flash = this.flashMeshes[i];
-      const ring = this.blastRings[i];
-      flash.visible = ring.visible = shown;
-      if (!shown) continue;
-      const b = this.shots.blasts[i];
-      flash.position.set(b.x, b.y + this.blast.flash * 0.5, b.z);
-      flash.scale.setScalar(Math.max(0.01, this.blast.flash));
-      ring.position.set(b.x, b.y + RING_LIFT, b.z);
-      ring.scale.setScalar(this.blast.ring);
-    }
-  }
-
   dispose(): void {
     this.disposed = true;
     this.group.removeFromParent();
@@ -472,6 +491,11 @@ export class TurretDefenseVisual {
     this.rigs.length = 0;
     if (this.geometry) for (const part of Object.values(this.geometry)) part.dispose();
     this.geometry = null;
+    try {
+      this.weapon.dispose();
+    } catch (error) {
+      errors.push(error);
+    }
     // Materials are page-lifetime prewarmed resources, owned by their cache.
     if (errors.length > 0) throw new AggregateError(errors, 'Fire and Fly rigs failed to dispose');
   }
