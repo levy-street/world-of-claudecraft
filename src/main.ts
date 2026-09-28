@@ -96,6 +96,7 @@ import {
   stopActiveEntryDiagnostics,
   suspendActiveEntryDiagnostics,
 } from './game/entry_diagnostics';
+import { waitForEntryPaint } from './game/entry_paint';
 import { ferryPrewarmTargetFor } from './game/ferry_prewarm';
 import { armFrameAndSkip } from './game/frame_cadence_wiring';
 import { createGameRenderer, validateGameRenderer } from './game/game_renderer';
@@ -1103,16 +1104,10 @@ function hideLoadingScreen(): void {
   }, loadingCurtainFadeDelayMs());
 }
 
-// Resolve only after the browser has actually painted. The scene build
-// (new Renderer/new Hud) runs fully synchronously and blocks the main thread,
-// so without a real paint first the loading screen never shows on warm loads
-// (cached assets ⇒ assetsReady resolves on a microtask) and entry looks frozen.
-// Two rAFs guarantee a paint happened between them, same idiom used to cut to
-// the game on the first rendered frame below.
+// Let the loading screen paint before synchronous scene work when visible.
+// Hidden tabs may pause rAF, so the preload continues if the tab is hidden.
 function nextPaint(): Promise<void> {
-  return new Promise((resolve) => {
-    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-  });
+  return waitForEntryPaint();
 }
 
 // The loading screen blocks pointer input but a covered button keeps keyboard
