@@ -6,13 +6,13 @@ import { CANNON_ACTIONS } from '../sim/content/cannon_encounter';
 import { VEHICLE_STATIONS } from '../sim/content/vehicle_stations';
 import type { VehicleSession } from '../sim/types';
 import { vehicleStationById } from '../sim/vehicle_stations';
-import { loadGltf } from './assets/loader';
 import { timeBuildSpan } from './build_spans';
 import { CannonEnemyVisuals } from './cannon_enemy_visuals';
 import { CannonTacticalVisuals, cannonBarrelTemplate } from './cannon_tactical_visuals';
 import { charactersReady } from './characters/assets';
 import { buildDoorBody, buildRiftGateBody } from './door_portal';
 import { attachSceneGroupGated } from './gated_scene_attach';
+import { loadStationScene } from './stations';
 import { worldQuestTraceMaterials } from './world_quest_trace_materials';
 
 export class CannonEncounterVisual {
@@ -87,9 +87,9 @@ export class CannonEncounterVisual {
     scene: THREE.Object3D,
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
   ): Promise<void> {
-    const [, barrel] = await Promise.all([charactersReady(), loadGltf('/models/props/barrel.glb')]);
+    const [, barrel] = await Promise.all([charactersReady(), loadStationScene('barrel')]);
     if (this.disposed) return;
-    const template = cannonBarrelTemplate(barrel.scene);
+    const template = cannonBarrelTemplate(barrel);
     this.enemies = timeBuildSpan('zone:cannon-enemies', () => new CannonEnemyVisuals(template));
     this.tactics = new CannonTacticalVisuals(template, scene);
     this.content.add(this.tactics.root);
