@@ -859,8 +859,9 @@ GPU work signs. Each rule names its seam and its guard.
   The cast-VFX gate (`cast_vfx_readiness_core.ts`,
   `cast_vfx_prewarm.ts`) is the same idea one level up, PER CAST and per
   program FAMILY (`cast_vfx_family.ts`: the engine every class draws, the
-  Warrior kit): one ready bit per family, and a cast draws its whole
-  composition or nothing on the mask of the families it draws from
+  Warrior kit, the Crucible trinket relics, which no cast waits on and whose
+  cosmetic holds wait on their own bit): one ready bit per family, and a cast
+  draws its whole composition or nothing on the mask of the families it draws from
   (`ability_vfx/cast_requirements.ts`: the engine, plus the kit for a Warrior
   appearance and no other class), decided at its first entry point and kept
   for the rest of that cast (`ability_vfx/cast_admission_core.ts`), while a
@@ -888,10 +889,11 @@ GPU work signs. Each rule names its seam and its guard.
   Because those two draw through a closed gate, their programs (the band's
   overlay cloud, the ring) link and are proved in their own deadline-exempt
   boot entry, `vfx.cast-first-reads` (`castVfxFirstReadsEntry`), with the Vfx
-  particle cloud, ahead of `vfx.ability-primitives`; dropped past the hard
-  deadline or skipped on the minimal manifest, it resumes as program debt ahead
-  of the primitives, whose units run engine, then kit, first
-  (`tests/cast_vfx_first_reads.test.ts`).
+  particle cloud and the Last Flame Lantern's light (drawn with no readiness
+  check, `AbilityVfx.firstReadDrawables`), ahead of `vfx.ability-primitives`;
+  dropped past the hard deadline or skipped on the minimal manifest, it resumes
+  as program debt ahead of the primitives, whose units run engine, then kit,
+  then relic, first (`tests/cast_vfx_first_reads.test.ts`).
 - **Verify, do not assert.** `?perf`, then `__game.renderer.perfStats().gpuPrep`: the
   budget snapshot, the event ring (`live-program`, `gate-timeout`, `reveal-watchdog`,
   `reveal-soft-deadline`, `submit-stop`, `attach-watchdog`, `touch-unproven` (programs a

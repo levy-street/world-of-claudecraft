@@ -6,7 +6,7 @@ import { resumeActiveAbilityKit } from './ability_vfx/active_kit_prewarm';
 import type { AbilityVfxDeps } from './ability_vfx/painter';
 import { isLivingWarriorAttentionSource } from './ability_vfx/warrior_attention_core';
 import { preparedAbilityAudio, type SpatialAudioSink } from './audio_sink';
-import { CAST_VFX_ENGINE } from './cast_vfx_family';
+import { CAST_VFX_RELIC } from './cast_vfx_family';
 import type { CastVfxReadiness } from './cast_vfx_readiness_core';
 import type { CharacterVisual } from './characters/visual';
 import { createOnrushArrivalHandler } from './characters/warrior_rush_pose';
@@ -94,9 +94,8 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
     ground: (x, z) => h.ground(x, z),
     vfx: h.vfx,
     time: () => h.time(),
-    // The relics are engine-family programs: ready once the cast gate has
-    // linked that family (the release's per-family cast admission).
-    ready: () => h.castGate.ready(CAST_VFX_ENGINE),
+    // The family trinket_relics.ts tags every relic drawable with.
+    ready: () => h.castGate.ready(CAST_VFX_RELIC),
   });
   const painter = new AbilityVfx(
     {

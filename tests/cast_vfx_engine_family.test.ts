@@ -320,7 +320,9 @@ for (const fragments of [false, true]) {
 
     it('splits the representatives by family, and the scene gate reads each on its own', () => {
       const byFamily = abilityVfxFamilyMaterials(h.scene);
-      expect([...byFamily.keys()]).toEqual(['engine', 'kit']);
+      expect([...byFamily.keys()]).toEqual(['engine', 'kit', 'relic']);
+      // The trinket relics are no engine pool: their family is empty here.
+      expect(byFamily.get('relic')).toEqual([]);
       const engine = byFamily.get('engine') ?? [];
       const kit = byFamily.get('kit') ?? [];
       expect(engine).toHaveLength(engineTotal);
@@ -343,6 +345,7 @@ for (const fragments of [false, true]) {
       expect(readiness.snapshot().families.map((family) => [family.id, family.pending])).toEqual([
         ['engine', engineTotal],
         ['kit', kitTotal(fragments)],
+        ['relic', 0],
       ]);
     });
 

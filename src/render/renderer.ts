@@ -6389,7 +6389,7 @@ export class Renderer {
         texture: (texture) => this.prewarmTexture(texture),
       }),
       castVfxFirstReadsEntry(
-        [this.abilityVfxFx.ccBandDrawable(), this.aoeRings[0]?.ring, this.vfx.cloudDrawable()],
+        [...this.abilityVfx.firstReadDrawables(), this.aoeRings[0]?.ring, this.vfx.cloudDrawable()],
         this.compileArms,
         this.webgl,
       ),

@@ -74,9 +74,9 @@ function linkUnit(
 }
 
 /** One link unit per distinct pooled program, the engine family's first,
- *  then the kit's (the programs the gate waits on), then one for the staged
- *  lazy stand-ins (null before their stage), which never hold a cast.
- *  `compile` is the test seam. */
+ *  then the kit's and the relics' (the programs the gate waits on), then one
+ *  for the staged lazy stand-ins (null before their stage), which never hold
+ *  a cast. `compile` is the test seam. */
 export function castVfxProgramUnits(
   scene: THREE.Object3D,
   standIns: THREE.Object3D | null,

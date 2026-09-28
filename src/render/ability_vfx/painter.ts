@@ -1,3 +1,4 @@
+import type * as THREE from 'three';
 import {
   claimFuryAudio,
   clearFuryAudioClaim,
@@ -210,6 +211,7 @@ export interface TrinketRelicsHook {
   handleSpellfx(ev: AbilityVfxSpellfxEvent, admitted: boolean): boolean;
   update(dt: number, reducedMotion: boolean): void;
   setQuality(q: number): void;
+  lanternLightDrawable(): THREE.Object3D;
 }
 
 // Structural slices of the SimEvent members this painter consumes.
@@ -583,6 +585,14 @@ export class AbilityVfx {
             deps.abilityAudio?.(kind, palette, power, x, y, z, opts)
         : undefined,
     );
+  }
+
+  /** The reads a player acts on that this painter draws past a closed gate
+   *  (the hard-CC band, the Last Flame Lantern's light): the roots the
+   *  vfx.cast-first-reads entry links before the curtain (cast_vfx_prewarm.ts). */
+  firstReadDrawables(): THREE.Object3D[] {
+    const lantern = this.deps.trinketRelics?.lanternLightDrawable();
+    return lantern ? [this.deps.fx.ccBandDrawable(), lantern] : [this.deps.fx.ccBandDrawable()];
   }
 
   setQuality(q: number): void {
