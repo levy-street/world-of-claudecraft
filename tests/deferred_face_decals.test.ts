@@ -10,6 +10,7 @@ import {
   attachFaceDecals,
   recolorMesh,
 } from '../src/render/characters/assets';
+import { SpiritVeilRig, spiritVeilPassOf } from '../src/render/characters/ghost_veil';
 import { lookPiecesStats, resetLookPiecesForTest } from '../src/render/characters/look_pieces';
 import {
   ensureMakeupGeometry,
@@ -256,8 +257,10 @@ describe('CharacterVisual.attachDeferredDecals', () => {
       shadowOn: true,
       farBakeGate: gate,
       ghosted: false,
-      ghostStyle: 'spirit',
-      ghostMaterials: new Map(),
+      ghostLook: 'spirit',
+      veilMaterials: new Map(),
+      spiritVeil: new SpiritVeilRig(),
+      weaponVfx: [],
       soulRend: false,
       moonkin: false,
       shadowform: false,
@@ -391,10 +394,12 @@ describe('CharacterVisual.attachDeferredDecals', () => {
     for (const decal of decalsOf(root)) {
       const original = fake.originalMaterials.get(decal);
       expect(original).toBeDefined();
-      // the mounted material is the ghost clone of the snapshot, so leaving
-      // stealth restores the decal like any other mesh
+      // the mounted material is the veil's decal variant of the snapshot, so
+      // leaving the veil restores the decal like any other mesh
       expect(decal.material).not.toBe(original);
-      expect(fake.ghostMaterials.get(original)).toBe(decal.material);
+      expect(spiritVeilPassOf(decal.material as THREE.Material)).toBe('decal');
+      const veils = [...fake.veilMaterials.values()].flatMap((bySource) => [...bySource.entries()]);
+      expect(veils).toContainEqual([original, decal.material]);
     }
   });
 });

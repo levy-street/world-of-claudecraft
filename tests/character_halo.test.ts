@@ -116,10 +116,13 @@ describe('class halo geometry', () => {
     visual.setShadow(true);
     expect(halo.castShadow).toBe(false);
     expect(emissive.castShadow).toBe(false);
+    // A veiled rig keeps the halo's own material and hides it instead.
     visual.setGhost(true);
-    expect(halo.material).not.toBe(originalMat);
+    expect(halo.material).toBe(originalMat);
+    expect(halo.visible).toBe(false);
     visual.setGhost(false);
     expect(halo.material).toBe(originalMat);
+    expect(halo.visible).toBe(true);
 
     // a swap DURING an active overlay must not capture the overlay clone as
     // the halo's "original" (Shadowform is the priest's everyday overlay:
@@ -134,6 +137,7 @@ describe('class halo geometry', () => {
     visual.setSkin(1);
     visual.setGhost(false);
     expect(halo.material).toBe(originalMat);
+    expect(halo.visible).toBe(true);
 
     vi.doUnmock('../src/render/assets/loader');
     vi.resetModules();

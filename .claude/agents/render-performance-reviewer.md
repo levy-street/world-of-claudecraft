@@ -94,7 +94,14 @@ Answer each question OF THE DIFF with a path and stable symbol, never a guess.
    registered by hand (`buildRingOfFrostStandIn`); an encounter visual attached by a sync
    loop when the boss is already active at arrival, before the interior's encounter prewarm
    has run (the forge meter in `varkhul_forge_beam_visual.ts` takes the compile gate for
-   this). Every new material must carry a
+   this); a translucent or effect look on a character rig (a released spirit, stealth, a
+   form, an encounter mark) drawn as a transparent or tinted clone of the rig's own
+   materials instead of through the shared spirit veil family and a palette
+   (`characters/ghost_veil.ts`, the tuples pinned by `tests/spirit_veil_census.test.ts`): a
+   clone per material and per look is a new program for every armour piece, earring or far
+   mesh a crowd brings, so it links live, while a new look is new palette values (uniforms),
+   never a new material (`tests/character_effect_twin_guard.test.ts` fails on a transparent
+   clone of a character material). Every new material must carry a
    `name` (module and role): three names a program after `material.name`, and the fleet
    `live-program` label is that name or a raw cache key nobody can map back to a file. An
    unnamed new material is SHOULD-FIX. All of this is verified by READING the diff: trace

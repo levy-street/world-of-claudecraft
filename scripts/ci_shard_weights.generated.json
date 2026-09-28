@@ -3,7 +3,7 @@
     "run": "34168361798",
     "harvested": "2026-09-08",
     "files": 4817,
-    "harvestedFiles": 3948,
+    "harvestedFiles": 3943,
     "carried": {
       "tests/ability_imbue_text.test.ts": {
         "ms": 1954,
@@ -708,6 +708,17 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           11
+        ]
+      },
+      "tests/character_spirit_veil.test.ts": {
+        "ms": 1610,
+        "method": "local-median",
+        "measured": "2026-09-27",
+        "reason": "spirit veil suites added before a CI full-mode harvest measured them",
+        "runs": [
+          1604,
+          1621,
+          1610
         ]
       },
       "tests/charselect_hints.test.ts": {
@@ -2142,6 +2153,17 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           5
+        ]
+      },
+      "tests/ghost_style_core.test.ts": {
+        "ms": 2,
+        "method": "local-median",
+        "measured": "2026-09-27",
+        "reason": "spirit veil suites added before a CI full-mode harvest measured them",
+        "runs": [
+          3,
+          2,
+          2
         ]
       },
       "tests/glb_punctual_lights.test.ts": {
@@ -5101,6 +5123,39 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           4
+        ]
+      },
+      "tests/spirit_veil_census.test.ts": {
+        "ms": 125,
+        "method": "local-median",
+        "measured": "2026-09-27",
+        "reason": "spirit veil suites added before a CI full-mode harvest measured them",
+        "runs": [
+          126,
+          125,
+          125
+        ]
+      },
+      "tests/spirit_veil_family_core.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-27",
+        "reason": "spirit veil suites added before a CI full-mode harvest measured them",
+        "runs": [
+          6,
+          8,
+          7
+        ]
+      },
+      "tests/spirit_veil_prewarm.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-09-27",
+        "reason": "spirit veil suites added before a CI full-mode harvest measured them",
+        "runs": [
+          12,
+          15,
+          12
         ]
       },
       "tests/static_merge_shadow_core.test.ts": {
@@ -8433,7 +8488,6 @@
   "tests/character_death_grounding.test.ts": 333,
   "tests/character_death_grounding_core.test.ts": 4,
   "tests/character_effect_compile_gate.test.ts": 1189,
-  "tests/character_effect_prewarm.test.ts": 18,
   "tests/character_effects.test.ts": 14,
   "tests/character_effects_impaled.test.ts": 8,
   "tests/character_far_compile_gate.test.ts": 18,
@@ -8459,6 +8513,7 @@
   "tests/character_shadow_proxy.test.ts": 581,
   "tests/character_sheet.test.ts": 43,
   "tests/character_skeleton_update.test.ts": 10,
+  "tests/character_spirit_veil.test.ts": 1610,
   "tests/character_state_backcompat.test.ts": 3315,
   "tests/character_state_module.test.ts": 15,
   "tests/character_tpose_repair.test.ts": 1197,
@@ -9483,6 +9538,7 @@
   "tests/gfx_override_core.test.ts": 14,
   "tests/gfx_profile.test.ts": 14,
   "tests/ghost_dead_gate.test.ts": 5219,
+  "tests/ghost_style_core.test.ts": 2,
   "tests/github_contributors.test.ts": 28,
   "tests/github_db.test.ts": 11,
   "tests/github_oauth.test.ts": 9,
@@ -11392,8 +11448,6 @@
   "tests/self_prediction_core.test.ts": 9,
   "tests/self_render_position_core.test.ts": 2581,
   "tests/self_social_wire.test.ts": 640,
-  "tests/self_spirit_prewarm.test.ts": 29,
-  "tests/self_spirit_warm.test.ts": 13,
   "tests/self_wire_phase_breakdown.test.ts": 2670,
   "tests/send_backpressure.test.ts": 6,
   "tests/sentence_renderer.test.ts": 38,
@@ -11843,8 +11897,6 @@
   "tests/software_render_notice.test.ts": 9,
   "tests/software_renderer.test.ts": 11,
   "tests/solid_impact_fragments_prewarm.test.ts": 11,
-  "tests/soul_rend_overlay.test.ts": 8,
-  "tests/soul_rend_prewarm_core.test.ts": 8,
   "tests/soulwell.test.ts": 4539,
   "tests/soulwell_visual.test.ts": 33,
   "tests/spatial.test.ts": 6090,
@@ -11875,6 +11927,9 @@
   "tests/spirit_puppet_build.test.ts": 161,
   "tests/spirit_puppet_compile_gate.test.ts": 741,
   "tests/spirit_run_triggers.test.ts": 4,
+  "tests/spirit_veil_census.test.ts": 125,
+  "tests/spirit_veil_family_core.test.ts": 7,
+  "tests/spirit_veil_prewarm.test.ts": 12,
   "tests/stable_yard.test.ts": 4997,
   "tests/stack_size_tooltip_view.test.ts": 52,
   "tests/staff_db.test.ts": 15,

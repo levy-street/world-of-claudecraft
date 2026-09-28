@@ -2181,7 +2181,8 @@ export const VISUALS: Record<string, VisualDef> = {
     attackTimeScale: 1,
     deathTimeScale: 1,
   },
-  // Shaman Shadewolf retains the original wolf, tint and ghost-material overlay.
+  // Shaman Shadewolf keeps the original wolf and tint, drawn under the spirit
+  // veil's wolf palette (its tint shows through the kept colours).
   form_ghost_wolf: {
     url: `${CREATURES}/wolf_basic.glb`,
     height: 1.6,

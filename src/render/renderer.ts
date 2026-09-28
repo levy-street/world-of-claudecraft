@@ -133,7 +133,6 @@ import {
   setCharacterCullCamera,
   setCharacterCullShadow,
 } from './character_cull_core';
-import { buildCharacterEffectPrewarmGroup } from './character_effect_prewarm';
 import {
   type CharacterWeaponAura,
   characterRuneTintColor,
@@ -203,6 +202,7 @@ import {
   requestedCharacterForm,
   resolvedCharacterForm,
 } from './characters/form_visual_selection_core';
+import { installSpiritVeil } from './characters/ghost_veil';
 import { visualKeyFor, weaponSkinModelUrl } from './characters/manifest';
 import { modularLookChanged } from './characters/player_look_core';
 import { PooledVisualLifecycle } from './characters/pooled_visual_lifecycle';
@@ -230,7 +230,7 @@ import {
   compileMayStartBeforeInitialPaint,
   compilePriorityForTarget,
 } from './compile_priority_core';
-import { compileTargetPrepared } from './compile_target_readiness';
+import { compileProof } from './compile_target_readiness';
 import { preflightWebGL2ContextRecycle, type RecycledRendererContext } from './context_recycle';
 import { trackWebGLContext } from './context_release';
 import { type CorpseBeacon, createCorpseBeacon } from './corpse_beacon';
@@ -389,6 +389,7 @@ import {
   sharedUniforms,
   urlForcedTier,
 } from './gfx';
+import { characterGhostLook } from './ghost_style_core';
 import { GlacialFrontVisual } from './glacial_front_visual';
 import { GoblinRocketSledFx } from './goblin_rocket_sled_fx';
 import { createGpuPrepAdmission } from './gpu_prep_admission';
@@ -725,8 +726,6 @@ import {
   noteSelfIdentity,
   type SelfRenderPrediction,
 } from './self_render_position_core';
-import { SelfSpiritPrewarmer } from './self_spirit_prewarm';
-import { warmSelfSpiritPrograms } from './self_spirit_warm';
 import { SentenceVfx } from './sentence_vfx';
 import { sentenceImpactPlan } from './sentence_vfx_core';
 import { SET_PROC_FX_BY_NAME } from './set_proc_fx';
@@ -765,6 +764,7 @@ import { SkyResidencyDriver } from './sky_residency_driver';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { buildSoulwell, disposeSoulwellVisual, syncSoulwellVisual } from './soulwell';
 import { SpiritGrade } from './spirit_grade';
+import { spiritVeilFamilyPrewarmEntry } from './spirit_veil_prewarm';
 import {
   freezeStaticMatrices,
   freezeStaticSubtreeMatrices,
@@ -772,7 +772,6 @@ import {
   refreshFrozenWorldMatrix,
 } from './static_matrix';
 import { buildStationProps } from './stations';
-import { shouldRenderStealthGhost } from './stealth';
 import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
 import { buildStreetlamps, type StreetlampsView } from './streetlamps';
 import { strideHit } from './stride_audio_core';
@@ -1804,20 +1803,6 @@ export class Renderer {
   // when a class is first sighted, so the builds queue behind one another and
   // each spends its own idle slot instead of stacking into one combat frame.
   private spiritBuildLane: Promise<unknown> = Promise.resolve();
-  private selfSpirit = new SelfSpiritPrewarmer({
-    // Two queue units with the warm worker's hold between them
-    // (self_spirit_warm.ts); the player's state is re-read at every step.
-    warm: () =>
-      warmSelfSpiritPrograms({
-        blocked: () => !this.asyncCompileSupported || this.sim.player.ghost,
-        visual: () => this.views.get(this.sim.player.id)?.visual ?? null,
-        arms: this.compileArms,
-        run: (work, priority, label, options) =>
-          this.backgroundGpuWork.run(work, priority, label, options),
-        link: (root) => linkColorPrograms(this.compileArms, root, false),
-      }),
-    idle: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS),
-  });
   // Static terrain/water/features just beyond the current zone are built in a
   // single background lane when their rectangles enter the relaxed fog
   // horizon, so a walked boundary crossing lands on already-resident ground.
@@ -3118,6 +3103,7 @@ export class Renderer {
     // Ghost tint: the grade pass on composer/grade tiers, the base.css filter on
     // low. See spirit_grade.ts.
     this.spiritGrade = new SpiritGrade(canvas, this.post, () => this.reducedMotion());
+    installSpiritVeil(this.webgl, () => this.reducedMotion());
     bd('weather-post');
     window.addEventListener('resize', this.onViewportResize);
     window.addEventListener('orientationchange', this.onOrientationChange);
@@ -4812,7 +4798,7 @@ export class Renderer {
   private readonly farBakeGate: FarBakeGate = (target, onSettled) =>
     this.farBakeLane.enqueue(
       (settled) => this.gateSwapFlagOnCompile(target, settled),
-      () => onSettled(() => compileTargetPrepared(this.webgl.properties, target)),
+      () => onSettled(compileProof(this.asyncCompileSupported, this.webgl, target)),
     );
 
   /** Build one lazy FORM rig into its view slot. A null build leaves the slot
@@ -4832,10 +4818,6 @@ export class Renderer {
     if (!built) return;
     v[slot] = built;
     v.group.add(built.root); // group.scale already carries e.scale
-    // The encounter mark lands on whichever body is ACTIVE, and a form rig keys
-    // its own Soul Rend programs (other meshes, other skinning): it cannot
-    // inherit the base rig's warmed variant.
-    encounterPrewarm.queueLiveSoulRendPrewarm(this, built, null, e.kind);
     if (!gateCompile) return;
     v.formCompilePending = built.root;
     this.gateSwapFlagOnCompile(built.root, () => {
@@ -5463,11 +5445,6 @@ export class Renderer {
       'ghost-fade-variants',
       buildGhostVariantPrewarmGroup,
     );
-    const characterEffectSlot = createVariantPrewarmSlot(
-      variantSlotHost,
-      'character-effect-variants',
-      buildCharacterEffectPrewarmGroup,
-    );
     let foliagePrewarmGroup: THREE.Group | null = null;
     let greatTreePrewarmGroup: THREE.Group | null = null;
     let weaponVfxPrewarmGroup: THREE.Group | null = null;
@@ -5587,7 +5564,6 @@ export class Renderer {
       ['objects', objectPrewarmGroup],
       ['props', propMaterialPrewarmGroup],
       ghostVariantSlot.staged(),
-      characterEffectSlot.staged(),
       abilityMaterialSlot.staged(),
       ['foliage', foliagePrewarmGroup],
       ['great-tree', greatTreePrewarmGroup],
@@ -5805,7 +5781,6 @@ export class Renderer {
         if (group) group.visible = false;
       }
       ghostVariantSlot.hide();
-      characterEffectSlot.hide();
       landmarkSlot.hide();
       weatherSlot.hide();
     };
@@ -5845,7 +5820,6 @@ export class Renderer {
       }
       if (propMaterialPrewarmGroup) this.scene.remove(propMaterialPrewarmGroup);
       ghostVariantSlot.cleanup();
-      characterEffectSlot.cleanup();
       if (foliagePrewarmGroup) this.scene.remove(foliagePrewarmGroup);
       if (greatTreePrewarmGroup) this.scene.remove(greatTreePrewarmGroup);
       // Removed, never disposed: disposing a material releases its linked
@@ -6128,20 +6102,8 @@ export class Renderer {
         detail: ghostVariantSlot.detail,
       },
       {
-        // The character effect treatments (ghost run, stealth, shadowform,
-        // moonkin) flip `transparent` on clones of the rig materials, so every
-        // rig material owns a second, transparent program (two for a
-        // double-sided one) that linked cold the first time a body faded in a
-        // crowd (production: 4.8 s on one link, then 115 to 130 ms per
-        // material). One hidden SkinnedMesh twin per distinct program, built
-        // through the same effect-material factory the live swap uses.
-        id: 'entities.character-effect-variants',
-        category: 'entities',
-        priority: 47,
-        required: false,
-        resumeUnits: characterEffectSlot.resumeUnits,
-        run: characterEffectSlot.run,
-        detail: characterEffectSlot.detail,
+        id: 'entities.spirit-veil-family',
+        ...spiritVeilFamilyPrewarmEntry(this.compileArms, this.webgl, this.backgroundGpuWork),
       },
       {
         // Compile every foliage shader (tree/rock/dressing species + far-tree
@@ -8188,7 +8150,6 @@ export class Renderer {
       groundSample: createEntityGroundSample(entityGroundSamplePhaseS(e.id)),
     });
     const view = this.views.get(e.id);
-    if (visual && view) encounterPrewarm.queueLiveSoulRendPrewarm(this, visual, view, e.kind);
     // Never gate the player's OWN view: it must be on screen immediately, its
     // class is already prewarmed, and the self render path does not re-evaluate
     // the compilePending flag (only the non-self loop does), so gating it would
@@ -8450,10 +8411,6 @@ export class Renderer {
     v.weaponStowed = false; // next was built drawn (fresh stow transition); the diff re-sheathes
     v.group.add(next.root);
     this.reconcileViewLights(v);
-    // The replacement rig is COLD: its Soul Rend clones are not the disposed
-    // rig's, so the encounter prewarm has to warm it like a body that just
-    // arrived (v carries the look `next` was built holding).
-    encounterPrewarm.queueLiveSoulRendPrewarm(this, next, v, e.kind);
     // A live base-visual replace (race/mech toggle) is exactly a brand-new
     // rig's materials linking for the first time; gate it the same as a
     // gear swap rather than freezing the frame it lands on (#2571).
@@ -8505,14 +8462,13 @@ export class Renderer {
   /** Apply (or clear) a weapon-skin cosmetic on one view and latch it. The
    *  latch is written HERE, never at enqueue time, so a queued application
    *  that never ran is retried by the next frame's diff. */
-  private applyWeaponSkin(v: EntityView, skinId: string | null, kind: string): void {
+  private applyWeaponSkin(v: EntityView, skinId: string | null): void {
     if (!v.visual) return;
     const refresh = skinId !== null && skinId === v.weaponSkinId;
     v.weaponSkinId = skinId;
     const changed = refresh ? v.visual.refreshWeaponSkin() : v.visual.setWeaponSkin(skinId);
     if (changed) for (const node of changed) this.gateSwapOnCompile(node);
     this.reconcileViewLights(v);
-    encounterPrewarm.queueLiveSoulRendPrewarm(this, v.visual, v, kind);
   }
 
   /** Spend this frame's weapon-skin application budget, nearest wearer first.
@@ -8529,8 +8485,7 @@ export class Renderer {
     );
     for (const entry of due) {
       const view = this.views.get(entry.viewId);
-      const kind = this.sim.entities.get(entry.viewId)?.kind ?? '';
-      if (view) this.applyWeaponSkin(view, entry.skinId, kind);
+      if (view) this.applyWeaponSkin(view, entry.skinId);
     }
   }
 
@@ -9162,7 +9117,6 @@ export class Renderer {
     // Which state this position means (and its preset below) is
     // fog_scene_state.ts's to own, the fog twin of interior_light_rig.ts.
     const fogScene = resolveFogScene(inside, px, camY, this.camera.position, this.sim.cfg.seed);
-    encounterPrewarm.setEncounterPrewarmInterior(this, fogScene.interior ?? null);
     const desired = valley ? 'hoardValley' : fogScene.desired;
     const fog = this.scene.fog as THREE.Fog;
     // Procedural rift: dynamic fog from the generated floor style, re-applied when
@@ -10366,17 +10320,6 @@ export class Renderer {
       }
       this.updateBaseVisual(e, v);
       if (!v.visual) continue;
-      // Warm the local player's own spirit variants once per distinct look, so
-      // a death spirit-release never links them inline on the ungated self view.
-      if (e.id === this.sim.player.id) {
-        this.selfSpirit.observe(
-          v.visual,
-          e.skin,
-          e.mainhandItemId,
-          e.offhandItemId,
-          e.weaponSkinId,
-        );
-      }
       if (iceBlockActivated) this.activeVisual(v)?.playEmote('wave', 1);
 
       // live skin swap: appearance changed (in-game changer or a multiplayer peer).
@@ -10399,16 +10342,11 @@ export class Renderer {
       // Gated per newly attached payload: nothing else in this loop drives its own
       // .visible, so first-sight materials link off-thread instead of freezing the
       // frame the gear lands on (#2571).
-      // Both held swaps re-run finishWeaponAttach, which re-snapshots the
-      // original-material map with the new weapon's meshes, so the encounter
-      // mark's warmed clones no longer describe this body: re-queue on the new
-      // held look (the identity carries it, so a sheathe toggle warms nothing).
       if (e.mainhandItemId !== v.mainhandItemId) {
         v.mainhandItemId = e.mainhandItemId;
         const changed = v.visual.setWeapon(e.mainhandItemId);
         if (changed) for (const node of changed) this.gateSwapOnCompile(node);
         this.reconcileViewLights(v);
-        encounterPrewarm.queueLiveSoulRendPrewarm(this, v.visual, v, e.kind);
       }
 
       if (e.offhandItemId !== v.offhandItemId) {
@@ -10416,7 +10354,6 @@ export class Renderer {
         const changed = v.visual.setOffhand(e.offhandItemId);
         if (changed) for (const node of changed) this.gateSwapOnCompile(node);
         this.reconcileViewLights(v);
-        encounterPrewarm.queueLiveSoulRendPrewarm(this, v.visual, v, e.kind);
       }
 
       // live weapon-skin swap: a Season 1 Armory cosmetic applied/detached (self
@@ -10433,7 +10370,7 @@ export class Renderer {
       if (e.weaponSkinId !== v.weaponSkinId) {
         if (e.weaponSkinId === null) {
           this.weaponSkinApplies.cancel(id);
-          this.applyWeaponSkin(v, null, e.kind);
+          this.applyWeaponSkin(v, null);
         } else {
           this.weaponSkinApplies.enqueue(id, e.weaponSkinId);
         }
@@ -10526,23 +10463,12 @@ export class Renderer {
         v.clickTarget = active.clickProxy;
       }
       v.height = active.height;
-      const stealthGhost = shouldRenderStealthGhost(this.sim.playerId, e);
-      const ghost =
-        ghostWolf ||
-        stealthGhost ||
-        e.templateId.startsWith('vision_') ||
-        e.ghost || // a released player spirit renders translucent (the ghost run)
-        e.templateId === 'spirit_healer'; // the graveyard angel is an ethereal figure
-      // Duskveil/Smokefade wear the denser stealth fade; every spirit read
-      // (ghost run, ghost wolf, visions, the graveyard angel) keeps the thin
-      // ethereal one. A dead stealther is a spirit first.
-      const ghostStyle =
-        stealthGhost && !ghostWolf && !e.ghost ? ('stealth' as const) : ('spirit' as const);
-      active.setGhost(ghost || veilboundState === 'march', ghostStyle);
+      const ghostLook = characterGhostLook(this.sim.playerId, e, ghostWolf, veilboundState);
+      active.setGhost(ghostLook !== null, ghostLook ?? 'spirit');
       active.setSoulRend(hasSoulRend);
-      // Shadowform tints the base priest rig shadow-purple (no rig swap). Moonkin Form and
-      // Metamorphosis reuse the same tint treatment (a bright violet, and a dark fel demon);
-      // Metamorphosis also grows the body via Entity.scale in the sim.
+      // Shadowform tints the base priest rig shadow-purple (no rig swap); Moonkin Form wears
+      // the spirit veil in its violet palette on the same body. Metamorphosis grows the
+      // body via Entity.scale in the sim.
       active.setShadowform(hasShadowform);
       active.setMoonkin(hasMoonkin);
       // Metamorphosis is no longer a tint on the base rig: it has its own lazy

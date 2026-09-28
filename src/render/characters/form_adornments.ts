@@ -8,8 +8,8 @@
 //   gloamveil_veil.ts        the veil and burning eyes (THREE)
 //
 // A set's FIRST mount on this rig rides the visual's injected compile gate
-// (the renderer's gateSwapFlagOnCompile, the same one that stages the tint's
-// transparent clones): the pieces mount hidden and show once their programs
+// (the renderer's gateSwapFlagOnCompile, the same one that stages an unlinked
+// veil tuple): the pieces mount hidden and show once their programs
 // have linked, while the tinted body stands in. The boot prewarm
 // (ABILITY_MATERIAL_SOURCES) normally links them long before, so the hold is a
 // frame; it is what covers a constrained device whose manifest deferred that

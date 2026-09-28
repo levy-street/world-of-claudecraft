@@ -1,6 +1,7 @@
 import { resetBankerChestProfileCaches } from '../banker_chest';
 import { prepareCanopyDetailProfileAssets } from '../canopy_detail';
 import { prepareCharacterProfileAssets, resetCharacterProfileCaches } from '../characters/assets';
+import { resetSpiritVeilLedger } from '../characters/ghost_veil';
 import { prepareCliffScreeProfileAssets, resetCliffScreeProfileCaches } from '../cliff_scree';
 import { prepareStoneDetailProfileAssets } from '../detail_normals';
 import { resetDoorPortalProfileCaches } from '../door_portal';
@@ -83,6 +84,8 @@ const RESETTERS = [
   ['foliage', resetFoliageProfileCaches],
   ['props', resetPropProfileCaches],
   ['characters', resetCharacterProfileCaches],
+  // The veil's linked-tuple ledger belongs to the retiring renderer's programs.
+  ['spirit_veil', resetSpiritVeilLedger],
   ['stations', resetStationProfileCaches],
   ['eastbrook_surface_atlas', resetEastbrookSurfaceProfileCaches],
   ['eastbrook_town', resetEastbrookTownProfileCaches],

@@ -586,19 +586,15 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   `gate-timeout` gpu-prep event under the `preview-open` key and draws anyway.
 - **A program only ONE encounter can reach warms at that interior's attach,
   never in the boot manifest** (`interior_encounter_prewarm.ts` spec +
-  `_pass.ts` + `_host.ts`, kill switch `?encounterPrewarm=0`). The Nythraxis
-  tenant is Soul Rend: its mark clones every marked body's materials
-  `transparent` with `depthWrite = false`, which three keys as a NEW program per
-  body AND per mesh SHAPE, so the first mark linked ~32 programs inside one
-  frame. Two halves, because neither covers the other: a CATALOG (class rigs,
-  VFX weapon skins) and the LIVE looks in the room, since real players carry dye
-  and jewel variants no default rig has. Three rules the measurements paid for:
-  the stand-in must be SKINNED (a `PlaneGeometry` proxy links a different
-  variant and changes nothing), the clone materials are kept alive and never
-  disposed (three releases the program with the last material), and BOTH the
-  build and the compile drain across idle slots, per body, chained, because a
-  raid arrives together and independent idle waits otherwise resolve in one idle
-  period and concatenate into a single long task.
+  `_pass.ts` + `_host.ts`, kill switch `?encounterPrewarm=0`): the mechanic
+  visuals an encounter builds lazily in live combat (Varkhul's and Ignivar's
+  sets, the Nythraxis floor telegraphs). The built visuals are kept alive and
+  never disposed (three releases the program with the last material), and the
+  builds drain across idle slots before the compile, because built in one loop
+  they land on the attach frame. Nythraxis' Soul Rend mark used to be this
+  module's biggest tenant (a lit transparent clone per marked body, catalog and
+  live arm); it now draws the spirit veil, whose family the boot manifest
+  links, so it needs nothing here.
   Warm nothing whose cost you have not measured: Brother Aldric was in this
   spec until an A/B from a start zone that had never compiled his model showed
   his spawn linking ZERO programs (the player bodies on screen already carry
