@@ -11,6 +11,13 @@ import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { GFX } from '../gfx';
 import { applyTextureAnisotropy } from '../texture_anisotropy';
+import {
+  capCompressedMips,
+  capGltfKtx2Mips,
+  isIosPhoneUserAgent,
+  type Ktx2MipCapProfile,
+  ktx2MipCapFor,
+} from './ktx2_mip_cap';
 import { classifyGltfKtx2Textures, dismissKtx2Source } from './ktx2_mip_release';
 import { ktx2Loader } from './ktx2_support';
 import { MAX_LOAD_ATTEMPTS, retryDelayMs } from './load_retry';
@@ -38,6 +45,13 @@ function constrainedBrowser(): boolean {
 }
 
 const constrained = constrainedBrowser();
+// The iPhone mip cap's gate (ktx2_mip_cap.ts), settled once at load from the
+// same user agent GFX.iosMemoryProfile reads, so a graphics rebuild cannot flip
+// it between two parses of the same texture family.
+const ktx2MipCapProfile: Ktx2MipCapProfile = {
+  iosMemoryProfile: GFX.iosMemoryProfile,
+  iosPhone: isIosPhoneUserAgent(typeof navigator !== 'undefined' ? navigator.userAgent : undefined),
+};
 const gltfQueue: AssetQueue = { active: 0, limit: constrained ? 2 : 4, pending: [] };
 const textureQueue: AssetQueue = { active: 0, limit: constrained ? 3 : 6, pending: [] };
 // Single-slot lane for the few very large textures (the biome sky domes, about
@@ -196,6 +210,10 @@ export function loadGltf(url: string): Promise<GLTF> {
         polishGltfTextures(gltf);
         // Transmissive materials become translucent (transmission_neutralize.ts).
         neutralizeGltfTransmission(gltf);
+        // iPhone only: character-side roots keep their mips at or under 512.
+        // Before classification and before any consumer, so before any upload.
+        const mipCap = ktx2MipCapFor(resolved, ktx2MipCapProfile);
+        if (mipCap !== null) capGltfKtx2Mips(gltf, mipCap);
         // Classify every KTX2 texture for post-upload mip release (world-only
         // categories) or source dismissal (everything a preview/portrait/armory
         // renderer can also upload). Runs here, in the parse's own resolve
@@ -342,6 +360,9 @@ export function loadKtx2Texture(
     }).then(
       (tex) => {
         if (opts.repeat) tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+        // iPhone only: the skin atlases keep their mips at or under 512.
+        const mipCap = ktx2MipCapFor(resolved, ktx2MipCapProfile);
+        if (mipCap !== null) capCompressedMips(tex, mipCap);
         // Standalone KTX2 atlases (character skins) draw in the character
         // preview, portrait and armory renderers too, so their CPU mip chains
         // must stay resident: dismiss the stashed restore source, never arm.
