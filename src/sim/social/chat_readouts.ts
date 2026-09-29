@@ -13,6 +13,7 @@
 import { isDebuffAura } from '../aura_classify';
 import { isRooted } from '../combat/cc';
 import { baseSwingSpeed, rangedAutoProfile } from '../combat/form_swing';
+import { FIRE_AND_FLY_DUNGEON_ID } from '../content/fire_and_fly_arena';
 import {
   FIRST_TALENT_LEVEL,
   pointsSpent,
@@ -189,8 +190,10 @@ export function combatReadout(e: Entity, heldByEnemies: boolean): string {
 // the overworld zone its door sits in and its suggested party size. Reads
 // only the static DUNGEON_LIST (already entrance-sorted by index) and the
 // door zone via zoneAt — no new fields.
+// The Fire and Fly arena is a private mini-game room only its seat enters,
+// never a dungeon to list.
 export function dungeonsReadout(): string {
-  const parts = DUNGEON_LIST.map(
+  const parts = DUNGEON_LIST.filter((d) => d.id !== FIRE_AND_FLY_DUNGEON_ID).map(
     (d) => `${d.name} (${zoneAt(d.doorPos.x, d.doorPos.z).name}, ${d.suggestedPlayers} players)`,
   );
   return `Dungeons (${parts.length}): ${parts.join(', ')}.`;

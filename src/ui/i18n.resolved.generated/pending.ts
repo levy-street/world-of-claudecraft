@@ -10,6 +10,9 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.dungeons.fire_and_fly_arena.enterText",
+    "entities.dungeons.fire_and_fly_arena.leaveText",
+    "entities.dungeons.fire_and_fly_arena.name",
     "hudChrome.turret.clearedBanner",
     "hudChrome.turret.defeat",
     "hudChrome.turret.finalWave",
@@ -31,6 +34,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.turret.waveBanner"
   ],
   "es_ES": [
+    "entities.dungeons.fire_and_fly_arena.enterText",
+    "entities.dungeons.fire_and_fly_arena.leaveText",
+    "entities.dungeons.fire_and_fly_arena.name",
     "hudChrome.turret.clearedBanner",
     "hudChrome.turret.defeat",
     "hudChrome.turret.finalWave",
@@ -52,6 +58,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.turret.waveBanner"
   ],
   "fr_FR": [
+    "entities.dungeons.fire_and_fly_arena.enterText",
+    "entities.dungeons.fire_and_fly_arena.leaveText",
+    "entities.dungeons.fire_and_fly_arena.name",
     "hudChrome.turret.clearedBanner",
     "hudChrome.turret.defeat",
     "hudChrome.turret.finalWave",
@@ -73,6 +82,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.turret.waveBanner"
   ],
   "fr_CA": [
+    "entities.dungeons.fire_and_fly_arena.enterText",
+    "entities.dungeons.fire_and_fly_arena.leaveText",
+    "entities.dungeons.fire_and_fly_arena.name",
     "hudChrome.turret.clearedBanner",
     "hudChrome.turret.defeat",
     "hudChrome.turret.finalWave",
@@ -95,6 +107,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.dungeons.fire_and_fly_arena.enterText",
+    "entities.dungeons.fire_and_fly_arena.leaveText",
+    "entities.dungeons.fire_and_fly_arena.name",
     "hudChrome.turret.clearedBanner",
     "hudChrome.turret.defeat",
     "hudChrome.turret.finalWave",
@@ -116,6 +131,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.turret.waveBanner"
   ],
   "de_DE": [
+    "entities.dungeons.fire_and_fly_arena.enterText",
+    "entities.dungeons.fire_and_fly_arena.leaveText",
+    "entities.dungeons.fire_and_fly_arena.name",
     "hudChrome.turret.clearedBanner",
     "hudChrome.turret.defeat",
     "hudChrome.turret.finalWave",
@@ -137,30 +155,37 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.turret.waveBanner"
   ],
   "zh_CN": [
+    "entities.dungeons.fire_and_fly_arena.name",
     "hudChrome.turret.integrityValue",
     "hudChrome.turret.title",
     "hudChrome.turret.wave",
     "hudChrome.turret.waveBanner"
   ],
   "zh_TW": [
+    "entities.dungeons.fire_and_fly_arena.name",
     "hudChrome.turret.integrityValue",
     "hudChrome.turret.title",
     "hudChrome.turret.wave",
     "hudChrome.turret.waveBanner"
   ],
   "ko_KR": [
+    "entities.dungeons.fire_and_fly_arena.name",
     "hudChrome.turret.integrityValue",
     "hudChrome.turret.title",
     "hudChrome.turret.wave",
     "hudChrome.turret.waveBanner"
   ],
   "ja_JP": [
+    "entities.dungeons.fire_and_fly_arena.name",
     "hudChrome.turret.integrityValue",
     "hudChrome.turret.title",
     "hudChrome.turret.wave",
     "hudChrome.turret.waveBanner"
   ],
   "pt_BR": [
+    "entities.dungeons.fire_and_fly_arena.enterText",
+    "entities.dungeons.fire_and_fly_arena.leaveText",
+    "entities.dungeons.fire_and_fly_arena.name",
     "hudChrome.turret.clearedBanner",
     "hudChrome.turret.defeat",
     "hudChrome.turret.finalWave",
@@ -182,12 +207,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.turret.waveBanner"
   ],
   "ru_RU": [
+    "entities.dungeons.fire_and_fly_arena.name",
     "hudChrome.turret.integrityValue",
     "hudChrome.turret.title",
     "hudChrome.turret.wave",
     "hudChrome.turret.waveBanner"
   ],
   "cs_CZ": [
+    "entities.dungeons.fire_and_fly_arena.enterText",
+    "entities.dungeons.fire_and_fly_arena.leaveText",
+    "entities.dungeons.fire_and_fly_arena.name",
     "hudChrome.turret.clearedBanner",
     "hudChrome.turret.defeat",
     "hudChrome.turret.finalWave",
@@ -209,6 +238,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.turret.waveBanner"
   ],
   "nl_NL": [
+    "entities.dungeons.fire_and_fly_arena.enterText",
+    "entities.dungeons.fire_and_fly_arena.leaveText",
+    "entities.dungeons.fire_and_fly_arena.name",
     "hudChrome.turret.clearedBanner",
     "hudChrome.turret.defeat",
     "hudChrome.turret.finalWave",
@@ -230,6 +262,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.turret.waveBanner"
   ],
   "pl_PL": [
+    "entities.dungeons.fire_and_fly_arena.enterText",
+    "entities.dungeons.fire_and_fly_arena.leaveText",
+    "entities.dungeons.fire_and_fly_arena.name",
     "hudChrome.turret.clearedBanner",
     "hudChrome.turret.defeat",
     "hudChrome.turret.finalWave",
@@ -251,6 +286,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.turret.waveBanner"
   ],
   "id_ID": [
+    "entities.dungeons.fire_and_fly_arena.enterText",
+    "entities.dungeons.fire_and_fly_arena.leaveText",
+    "entities.dungeons.fire_and_fly_arena.name",
     "hudChrome.turret.clearedBanner",
     "hudChrome.turret.defeat",
     "hudChrome.turret.finalWave",
@@ -272,6 +310,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.turret.waveBanner"
   ],
   "tr_TR": [
+    "entities.dungeons.fire_and_fly_arena.enterText",
+    "entities.dungeons.fire_and_fly_arena.leaveText",
+    "entities.dungeons.fire_and_fly_arena.name",
     "hudChrome.turret.clearedBanner",
     "hudChrome.turret.defeat",
     "hudChrome.turret.finalWave",
@@ -293,6 +334,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.turret.waveBanner"
   ],
   "sv_SE": [
+    "entities.dungeons.fire_and_fly_arena.enterText",
+    "entities.dungeons.fire_and_fly_arena.leaveText",
+    "entities.dungeons.fire_and_fly_arena.name",
     "hudChrome.turret.clearedBanner",
     "hudChrome.turret.defeat",
     "hudChrome.turret.finalWave",
@@ -314,6 +358,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.turret.waveBanner"
   ],
   "vi_VN": [
+    "entities.dungeons.fire_and_fly_arena.enterText",
+    "entities.dungeons.fire_and_fly_arena.leaveText",
+    "entities.dungeons.fire_and_fly_arena.name",
     "hudChrome.turret.clearedBanner",
     "hudChrome.turret.defeat",
     "hudChrome.turret.finalWave",
@@ -335,6 +382,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.turret.waveBanner"
   ],
   "da_DK": [
+    "entities.dungeons.fire_and_fly_arena.enterText",
+    "entities.dungeons.fire_and_fly_arena.leaveText",
+    "entities.dungeons.fire_and_fly_arena.name",
     "hudChrome.turret.clearedBanner",
     "hudChrome.turret.defeat",
     "hudChrome.turret.finalWave",

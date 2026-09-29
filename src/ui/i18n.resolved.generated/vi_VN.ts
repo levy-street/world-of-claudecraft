@@ -23744,6 +23744,11 @@ export const vi_VN: EnTranslations = {
         "enterText": "Bạn bước vào những sảnh đường ấm áp, thơm ngát hương hoa của Lâu Đài Dawnhold.",
         "leaveText": "Bạn lách ra ngoài, trở lại bãi cỏ vườn ngập nắng."
       },
+      "fire_and_fly_arena": {
+        "name": "Fire and Fly",
+        "enterText": "You climb the old cannon tower. Beyond the trees, the woods begin to stir.",
+        "leaveText": "You climb down from the tower and leave the arena behind."
+      },
       "drowned_temple": {
         "name": "Ngôi Đền Chết Chìm",
         "enterText": "Bạn bước qua nguyệt môn, không khí biến thành nước lạnh và ánh sáng nhợt nhạt, và tiếng hát khép lại trên đầu bạn.",

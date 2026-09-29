@@ -23744,6 +23744,11 @@ export const cs_CZ: EnTranslations = {
         "enterText": "Vstupuješ do teplých, květinami provoněných síní zámku Dawnhold.",
         "leaveText": "Vyklouzneš zpátky na sluncem zalitý zahradní trávník."
       },
+      "fire_and_fly_arena": {
+        "name": "Fire and Fly",
+        "enterText": "You climb the old cannon tower. Beyond the trees, the woods begin to stir.",
+        "leaveText": "You climb down from the tower and leave the arena behind."
+      },
       "drowned_temple": {
         "name": "Utopený chrám",
         "enterText": "Projdeš měsíční bránou: vzduch se mění ve studenou vodu a bledé světlo a zpěv se nad tebou zavírá.",

@@ -42,6 +42,7 @@ import {
   emberNearestOnLink,
 } from './ember_lava_layout';
 import { applyFarshoreShipwreckShore } from './farshore_shipwreck_shore';
+import { fireAndFlyFieldHeight } from './fire_and_fly_field';
 import { GALE_DECK_FREEBOARD } from './gale_harbor';
 import { applyGliderApproachPath } from './glider_approach_path';
 import { applyKeepSitePad, keepSitePadWeight } from './keep_site';
@@ -3833,6 +3834,10 @@ export function groundHeight(x: number, z: number, seed: number): number {
     if (dungeon?.interior === 'wildheart') {
       const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
       return DUNGEON_FLOOR_Y + wildheartFieldHeight(x - origin.x, z - origin.z);
+    }
+    if (dungeon?.interior === 'fire_and_fly') {
+      const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
+      return DUNGEON_FLOOR_Y + fireAndFlyFieldHeight(x - origin.x, z - origin.z);
     }
     if (dungeon?.interior === 'lastkeep') {
       // The Last Keep's authored rooms carry per-room lifts (door ramps

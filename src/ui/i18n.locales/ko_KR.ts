@@ -14030,6 +14030,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.dawnhold_castle.enterText':
     '꽃향기 가득한 던홀드 성의 따뜻한 홀 안으로 들어섭니다.',
   'entities.dungeons.dawnhold_castle.leaveText': '햇살 가득한 정원 잔디밭으로 다시 나옵니다.',
+  'entities.dungeons.fire_and_fly_arena.enterText':
+    '낡은 대포 탑에 오릅니다. 나무들 너머로 숲이 술렁이기 시작합니다.',
+  'entities.dungeons.fire_and_fly_arena.leaveText': '탑에서 내려와 투기장을 뒤로합니다.',
   'entities.items.wildheart_tuskblade.name': '야생심장 엄니대검',
   'entities.items.wildheart_hexwood_staff.name': '분지의 사술나무 지팡이',
   'entities.items.wildheart_fangknife.name': '줄가르의 송곳니칼',

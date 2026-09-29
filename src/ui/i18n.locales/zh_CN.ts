@@ -13380,6 +13380,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.dawnhold_posy.name': '晨曦堡花园小花束',
   'entities.dungeons.dawnhold_castle.enterText': '你走进晨曦堡温暖而花香四溢的厅堂。',
   'entities.dungeons.dawnhold_castle.leaveText': '你回到阳光洒落的花园草坪上。',
+  'entities.dungeons.fire_and_fly_arena.enterText':
+    '你登上古老的炮塔。树林之外，森林开始躁动起来。',
+  'entities.dungeons.fire_and_fly_arena.leaveText': '你走下塔楼，将竞技场抛在身后。',
   'entities.items.wildheart_tuskblade.name': '荒野之心獠牙巨刃',
   'entities.items.wildheart_hexwood_staff.name': '盆地巫木法杖',
   'entities.items.wildheart_fangknife.name': '祖尔加的獠牙匕首',

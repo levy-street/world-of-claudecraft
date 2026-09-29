@@ -622,14 +622,15 @@ describe('the toggle', () => {
     expect(state.stats.bowled).toBe(0);
   });
 
-  // Digests of the lot 1 engine's full auto-aimer runs, taken before bowling existed
-  // (re-taken on that engine with the current throw law and tuning): turned off,
-  // every event (throws, bounces, kills, waves) replays them exactly.
+  // Digests of full auto-aimer runs with bowling turned off, first taken on the lot 1
+  // engine before bowling existed, re-taken since with the current throw law, tuning
+  // and the cannon tower's body: turned off, every event (throws, bounces, kills,
+  // waves) replays them exactly.
   it.each([
-    ['flat', 42, flat, 1265, 'ea2ae5bc'],
-    ['hills', 21, hills, 3043, '626333b7'],
+    ['flat', 42, flat, 1245, 'c49bfa55'],
+    ['hills', 21, hills, 1242, 'b98dd5d4'],
   ] as const)(
-    'turned off, a %s full run replays the pre-bowling engine exactly',
+    'turned off, a %s full run replays the bowling-free engine exactly',
     (_name, seed, probe, count, digest) => {
       const r = fullRun(seed, resolveTurretPlan(undefined, undefined, OFF), probe, aimNearest);
       const text = r.trace.map((s) => JSON.stringify(JSON.parse(s), dropLaterFields)).join('\n');

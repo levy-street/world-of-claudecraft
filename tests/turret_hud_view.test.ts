@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { TURRET_TANK_MOUNT, TURRET_TIMING } from '../src/sim/content/turret_defense';
+import { TURRET_TIMING } from '../src/sim/content/turret_defense';
 import { createTurretDefense, type TurretEvent } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { recordTurretFeedback, TURRET_FEEDBACK_LIMIT } from '../src/sim/minigames/turret_feedback';
@@ -21,8 +21,8 @@ function seat(start = START): TurretSession {
     kind: 'turret',
     origin: { x: 0, y: 0, z: 0 },
     defense: createTurretDefense(resolveTurretPlan(), { x: 0, z: 0 }, 3, start),
-    lentMountKey: TURRET_TANK_MOUNT,
     priorMountKey: '',
+    returnTo: { x: 0, y: 0, z: 0, facing: 0 },
     feedback: [],
     nextFeedbackSeq: 1,
   };

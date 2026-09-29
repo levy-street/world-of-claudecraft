@@ -23744,6 +23744,11 @@ export const ko_KR: EnTranslations = {
         "enterText": "꽃향기 가득한 던홀드 성의 따뜻한 홀 안으로 들어섭니다.",
         "leaveText": "햇살 가득한 정원 잔디밭으로 다시 나옵니다."
       },
+      "fire_and_fly_arena": {
+        "name": "Fire and Fly",
+        "enterText": "낡은 대포 탑에 오릅니다. 나무들 너머로 숲이 술렁이기 시작합니다.",
+        "leaveText": "탑에서 내려와 투기장을 뒤로합니다."
+      },
       "drowned_temple": {
         "name": "익사한 신전",
         "enterText": "당신은 달의 관문을 지나갑니다 — 공기가 차가운 물과 창백한 빛으로 변하고, 노랫소리가 당신의 머리 위로 닫혀 옵니다.",

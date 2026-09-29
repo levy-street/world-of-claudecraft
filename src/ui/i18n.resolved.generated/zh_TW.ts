@@ -23744,6 +23744,11 @@ export const zh_TW: EnTranslations = {
         "enterText": "你走進晨曦堡溫暖而花香四溢的廳堂。",
         "leaveText": "你回到陽光灑落的花園草坪上。"
       },
+      "fire_and_fly_arena": {
+        "name": "Fire and Fly",
+        "enterText": "你登上古老的砲塔。樹林之外，森林開始躁動起來。",
+        "leaveText": "你走下塔樓，將競技場拋在身後。"
+      },
       "drowned_temple": {
         "name": "溺亡神殿",
         "enterText": "你踏過月門——空氣化作冰冷的水與蒼白的光，歌聲在你頭頂之上闔攏。",

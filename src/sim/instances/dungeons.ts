@@ -17,6 +17,7 @@
 
 import { supportHeightAt } from '../colliders';
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
+import { FIRE_AND_FLY_DUNGEON_ID } from '../content/fire_and_fly_arena';
 import {
   DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
@@ -106,6 +107,11 @@ export const INSTANCE_CLEARED_EMPTY_TIMEOUT = 15 * 60;
 export function instanceKeyFor(ctx: SimContext, pid: number): string {
   const party = ctx.partyOf(pid);
   if (party) return `party:${party.id}`;
+  return soloInstanceKeyFor(ctx, pid);
+}
+
+/** The claim key of a solo run, party or not (the Fire and Fly arena is always one). */
+export function soloInstanceKeyFor(ctx: SimContext, pid: number): string {
   // Solo instances key on the DURABLE character id when the server supplies one,
   // so a logout, relog, or character-select "Take Over" (each of which mints a
   // new entity id) rejoins the SAME live instance instead of claiming a fresh one
@@ -909,6 +915,12 @@ export function detachFromDungeon(
   if (dungeon.id === IGNIVAR_RAID_ARENA_ID) clearIgnivarEncounterAuras(p);
   if (dungeon.id === IGNIVAR_SECOND_WING_ID) clearVarkhulEncounterAuras(p);
   cancelProfessionSessionOnDisplacement(ctx, p);
+  // The Fire and Fly arena has no door: its seated player belongs back where
+  // the seat took them from (a battleground pop sets them down there after).
+  const seat = dungeon.id === FIRE_AND_FLY_DUNGEON_ID ? ctx.resolve(p.id)?.meta.vehicle : null;
+  if (seat?.kind === 'turret') {
+    return { x: seat.returnTo.x, z: seat.returnTo.z, facing: seat.returnTo.facing };
+  }
   const drop = dungeon.leaveOffset ?? { x: 0, z: -DUNGEON_DOOR_RETURN_INSET };
   return {
     x: dungeon.doorPos.x + drop.x,
@@ -948,13 +960,14 @@ export function leaveCrypt(ctx: SimContext, pid?: number): void {
   leaveDungeon(ctx, pid);
 }
 
-function claimInstance(
+/** Marks a free slot claimed by `key`, empty: claimInstance then adds the spawns
+ *  and the exit portal; the Fire and Fly arena needs neither. */
+export function markInstanceClaimed(
   ctx: SimContext,
   inst: InstanceSlot,
   key: string,
   difficulty: InstanceSlot['difficulty'],
 ): void {
-  const dungeon = DUNGEONS[inst.dungeonId];
   inst.partyKey = key;
   inst.difficulty = difficulty;
   inst.emptyFor = 0;
@@ -964,6 +977,16 @@ function claimInstance(
   inst.enteredBy = new Set();
   inst.raidReturnKeys = new Set();
   inst.raidBossWelcomeKeys = new Set();
+}
+
+function claimInstance(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  key: string,
+  difficulty: InstanceSlot['difficulty'],
+): void {
+  const dungeon = DUNGEONS[inst.dungeonId];
+  markInstanceClaimed(ctx, inst, key, difficulty);
   const origin = instanceOriginOf(inst);
   const mobDifficultyTuningId = dungeon.mobDifficultyTuningId ?? inst.dungeonId;
   for (const spawn of dungeon.spawns) {

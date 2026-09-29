@@ -1,11 +1,37 @@
 import { describe, expect, it } from 'vitest';
 import { QuestWorldWireState } from '../src/net/quest_world_wire_state';
-import { type CircleCollider, type Collider, queryOpenWorldColliders } from '../src/sim/colliders';
+import {
+  type CircleCollider,
+  type Collider,
+  queryOpenWorldColliders,
+  supportHeightAt,
+} from '../src/sim/colliders';
+import { FIRE_AND_FLY_DUNGEON_ID } from '../src/sim/content/fire_and_fly_arena';
+import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { DEFAULT_MOUNT } from '../src/sim/content/mounts';
-import { TURRET_TANK_MOUNT, TURRET_TIMING } from '../src/sim/content/turret_defense';
+import { TURRET_TIMING } from '../src/sim/content/turret_defense';
 import { NORTH_WATCH_CANNON } from '../src/sim/content/vehicle_stations';
-import { getActiveWorldContent, ITEMS, MOBS, WORLD_QUESTS_BY_ID } from '../src/sim/data';
+import {
+  DUNGEONS,
+  dungeonAt,
+  getActiveWorldContent,
+  instanceOrigin,
+  MOBS,
+  PLAYER_START,
+  WORLD_QUESTS_BY_ID,
+} from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import {
+  FIRE_AND_FLY_TOWER,
+  FIRE_AND_FLY_TREES,
+  fireAndFlyTrunkRadius,
+} from '../src/sim/fire_and_fly_field';
+import {
+  enterDungeon,
+  freeInstance,
+  leaveDungeon,
+  markInstanceClaimed,
+} from '../src/sim/instances/dungeons';
 import { positionAt } from '../src/sim/minigames/thrown_body';
 import type { TurretEvent } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
@@ -17,25 +43,30 @@ import {
   turretFeedbackSince,
 } from '../src/sim/minigames/turret_feedback';
 import {
-  forceDismount,
   forceTrainingMount,
   MOUNT_OWNERSHIP_REVALIDATE_TICKS,
   mountItemId,
-  mountOwned,
   summonMountItem,
   toggleMount,
 } from '../src/sim/mounts';
 import { summonPet } from '../src/sim/pet/pet_commands';
-import { jumpMult, moveSpeedMult } from '../src/sim/player_motion';
-import { isSalvageable } from '../src/sim/professions/salvage';
-import { type PlayerMeta, Sim } from '../src/sim/sim';
+import { moveSpeedMult } from '../src/sim/player_motion';
+import { RESURRECTION_SICKNESS_ID } from '../src/sim/resurrection';
+import { resolveSavedPosExit } from '../src/sim/saved_pos_exit';
+import { type InstanceSlot, type PlayerMeta, Sim } from '../src/sim/sim';
+import { isArenaQueued } from '../src/sim/social/arena';
+import { endBgMatch, startBgMatch } from '../src/sim/social/battleground';
+import { RES_HP_FRACTION } from '../src/sim/spirit';
+import { claimTurretArena } from '../src/sim/turret_arena_session';
 import { turretWorldProbe } from '../src/sim/turret_defense_session';
-import type {
-  Entity,
-  PlayerClass,
-  SimEvent,
-  TurretSession,
-  VehicleSession,
+import {
+  type Entity,
+  GATHER_CAST_ID,
+  type PlayerClass,
+  type SimEvent,
+  type TurretSession,
+  type Vec3,
+  type VehicleSession,
 } from '../src/sim/types';
 import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world';
 import { worldQuestCycleOfferingQuest } from '../src/sim/world_quest_rotation';
@@ -43,10 +74,12 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 import type { IWorldVehicles } from '../src/world_api/vehicles';
 
 // The best open-world spot of the site survey: real terrain, trees, no aggressive mob near.
+// The world probe is host-agnostic, so its open-world contract is still pinned here.
 const AMBERFALL = { x: -340, z: 1945 };
 // A lake south-east of Amberfall (water surface above the lakebed).
 const LAKE = { x: -282, z: 2016 };
 const RUN_BOUND = 20 * 60 * 8;
+const ARENA_INDEX = DUNGEONS[FIRE_AND_FLY_DUNGEON_ID].index;
 const ground = { ground: (x: number, z: number) => groundHeight(x, z, WORLD_SEED) };
 
 function rig(playerClass: PlayerClass = 'warrior') {
@@ -56,9 +89,22 @@ function rig(playerClass: PlayerClass = 'warrior') {
   return { sim, player, meta };
 }
 
-function seat(sim: Sim, at = AMBERFALL): void {
-  sim.chat(`/dev turret ${at.x} ${at.z}`);
+function seat(sim: Sim): void {
+  sim.chat('/dev turret');
   expect(sim.turretSession).not.toBeNull();
+}
+
+/**
+ * Moves the player to Amberfall and returns where they stand: far from the
+ * Eastbrook arrival point the rig starts on, which is also the arena's own
+ * fallback exit, so a return there cannot pass for a return home.
+ */
+function standAtAmberfall(sim: Sim): Vec3 {
+  sim.chat(`/dev tp ${AMBERFALL.x} ${AMBERFALL.z}`);
+  const at = { ...sim.player.pos };
+  expect(Math.hypot(at.x - PLAYER_START.x, at.z - PLAYER_START.z)).toBeGreaterThan(100);
+  expect(dungeonAt(at.x)).toBeNull();
+  return at;
 }
 
 function turretSeat(sim: Sim): TurretSession {
@@ -73,8 +119,18 @@ function cannonSeat(sim: Sim): VehicleSession {
   return seat;
 }
 
+function arenaClaims(sim: Sim): InstanceSlot[] {
+  return sim.ctx.instances.filter(
+    (inst) => inst.dungeonId === FIRE_AND_FLY_DUNGEON_ID && inst.partyKey !== null,
+  );
+}
+
 function turretEvents(events: readonly SimEvent[]) {
   return events.flatMap((e) => (e.type === 'turretDefense' ? [e] : []));
+}
+
+function logTexts(events: readonly SimEvent[]): string[] {
+  return events.flatMap((e) => (e.type === 'log' && typeof e.text === 'string' ? [e.text] : []));
 }
 
 function nearestLive(world: IWorldVehicles, tick: number): { x: number; z: number } | null {
@@ -94,7 +150,7 @@ function nearestLive(world: IWorldVehicles, tick: number): { x: number; z: numbe
   return best;
 }
 
-/** The scripted aimer: one shot at the monster nearest the tank whenever the cannon is ready. */
+/** The scripted aimer: one shot at the monster nearest the tower whenever the cannon is ready. */
 function aimOnce(sim: Sim): void {
   const world: IWorldVehicles = sim;
   const view = world.turretSession;
@@ -110,7 +166,7 @@ interface RunOutcome {
   pids: Set<number | undefined>;
 }
 
-/** Drives a seat to its end through the IWorld surface only; `aim` fires at the monster nearest the tank. */
+/** Drives a seat to its end through the IWorld surface only; `aim` fires at the monster nearest the tower. */
 function playOut(sim: Sim, aim: boolean): RunOutcome {
   const world: IWorldVehicles = sim;
   const events: TurretEvent[] = [];
@@ -161,11 +217,15 @@ function expectMountPathsRefused(sim: Sim, player: Entity, meta: PlayerMeta): vo
   expect({ key: player.mountKey, cast: player.mountCastRemaining ?? 0 }).toEqual(mount);
 }
 
+/** The player can ride the horse: trained, the reins in the bags, still on foot. */
+function ownReins(sim: Sim): void {
+  sim.meta(sim.playerId)!.ridingTrained = true;
+  sim.addItem(mountItemId(DEFAULT_MOUNT)!, 1);
+}
+
 /** The player owns the horse and rides it, summoned the normal way. */
 function ownHorse(sim: Sim): void {
-  const meta = sim.meta(sim.playerId)!;
-  meta.ridingTrained = true;
-  sim.addItem(mountItemId(DEFAULT_MOUNT)!, 1);
+  ownReins(sim);
   expect(summonMountItem(sim.ctx, sim.playerId, DEFAULT_MOUNT)).toBe(true);
   for (let i = 0; i < 40 && sim.player.mountKey === ''; i++) sim.tick();
   expect(sim.player.mountKey).toBe(DEFAULT_MOUNT);
@@ -183,15 +243,16 @@ function addDummy(sim: Sim, dx: number, dz: number): Entity {
 }
 
 describe('the turret seat', () => {
-  it('freezes movement and refuses casting, auto-attack, items, pets and mount changes', () => {
+  it('freezes movement on the roof and refuses casting, auto-attack, items, pets and mount changes', () => {
     const { sim, player, meta } = rig('warlock');
     ownHorse(sim);
     summonPet(sim.ctx, player, 'emberkin');
     const pet = [...sim.entities.values()].find((e) => e.ownerId === player.id)!;
-    // Where the character starts: a clear line of sight to the dummy ahead.
-    sim.chat('/dev turret');
-    expect(player.mountKey).toBe(TURRET_TANK_MOUNT);
+    // Where the character starts: a clear line of sight to the dummy ahead, which
+    // stays in the open world while the seat takes its owner to the arena.
     const dummy = addDummy(sim, 0, 10);
+    sim.chat('/dev turret');
+    expect(player.mountKey).toBe('');
     player.targetId = dummy.id;
     const origin = { ...player.pos };
     meta.moveInput.forward = true;
@@ -214,14 +275,15 @@ describe('the turret seat', () => {
     sim.useItem(mountItemId(DEFAULT_MOUNT)!);
     sim.toggleMounted();
     sim.tick();
-    expect(player.mountKey).toBe(TURRET_TANK_MOUNT);
+    expect(player.mountKey).toBe('');
     expect(player.mountCastRemaining ?? 0).toBe(0);
     expectMountPathsRefused(sim, player, meta);
 
     sim.leaveVehicle();
     expect(player.mountKey).toBe(DEFAULT_MOUNT);
     expect(sim.turretSession).toBeNull();
-    // Outside the seat the same calls act again: the refusals above were the seat's.
+    // Back beside the dummy, the same calls act again: the refusals above were the seat's.
+    player.targetId = dummy.id;
     sim.castAbility('shadow_bolt');
     expect(player.castingAbility).toBe('shadow_bolt');
     sim.startAutoAttack();
@@ -286,15 +348,22 @@ describe('the turret seat', () => {
     expect(outcome(true)).toMatchObject({ targetId: null, autoAttack: false });
   });
 
-  it('lends the tank over a player on foot and restores them on foot', () => {
+  it('lends no mount: a rider is set on foot for the whole seat, a walker stays on foot', () => {
+    const walker = rig();
+    seat(walker.sim);
+    expect(turretSeat(walker.sim)).not.toHaveProperty('lentMountKey');
+    for (let i = 0; i < 40; i++) walker.sim.tick();
+    expect(walker.player.mountKey).toBe('');
+    walker.sim.leaveVehicle();
+    expect(walker.player.mountKey).toBe('');
+
     const { sim, player } = rig();
-    expect(player.mountKey).toBe('');
+    ownHorse(sim);
     seat(sim);
-    expect(player.mountKey).toBe(TURRET_TANK_MOUNT);
-    for (let i = 0; i < 40; i++) sim.tick();
-    expect(player.mountKey).toBe(TURRET_TANK_MOUNT);
-    sim.leaveVehicle();
+    expect(turretSeat(sim).priorMountKey).toBe(DEFAULT_MOUNT);
+    for (let i = 0; i < MOUNT_OWNERSHIP_REVALIDATE_TICKS + 20; i++) sim.tick();
     expect(player.mountKey).toBe('');
+    expect(sim.turretSession).not.toBeNull();
   });
 
   it('restores the horse with the same derived speed as a normally mounted rider', () => {
@@ -308,7 +377,6 @@ describe('the turret seat', () => {
     const derived = (e: Entity) => ({
       mount: e.mountKey,
       speed: moveSpeedMult(e),
-      jump: jumpMult(e),
       moveSpeed: e.moveSpeed,
       maxHp: e.maxHp,
       stats: e.stats,
@@ -323,23 +391,8 @@ describe('the turret seat', () => {
     seat(sim);
     sim.removeItem(mountItemId(DEFAULT_MOUNT)!, 1);
     for (let i = 0; i < 20; i++) sim.tick();
-    expect(player.mountKey).toBe(TURRET_TANK_MOUNT);
     sim.leaveVehicle();
     expect(player.mountKey).toBe('');
-  });
-
-  it('strips Ghost Wolf before lending the tank, like a real summon', () => {
-    const { sim, player } = rig('shaman');
-    sim.setPlayerLevel(10);
-    sim.castAbility('ghost_wolf');
-    for (let i = 0; i < 20 * 3; i++) sim.tick();
-    expect(player.auras.some((a) => a.id === 'ghost_wolf')).toBe(true);
-    sim.chat('/dev turret');
-    expect(player.mountKey).toBe(TURRET_TANK_MOUNT);
-    expect(player.auras.some((a) => a.id === 'ghost_wolf')).toBe(false);
-    sim.leaveVehicle();
-    expect(player.auras.some((a) => a.id === 'ghost_wolf')).toBe(false);
-    expect(moveSpeedMult(player)).toBe(1);
   });
 
   it('bumps the owner wire revision when seating', () => {
@@ -365,35 +418,16 @@ describe('the turret seat', () => {
     );
   });
 
-  it('never owns or saves the lent tank, nor the seat', () => {
-    const { sim, player, meta } = rig();
+  it('never saves the seat or its return point', () => {
+    const { sim, player } = rig();
     seat(sim);
     for (let i = 0; i < 20 * 5; i++) sim.tick();
-    expect(mountOwned(meta, TURRET_TANK_MOUNT)).toBe(false);
-    expect(sim.ownedMounts()).not.toContain(TURRET_TANK_MOUNT);
     const save = sim.serializeCharacter(player.id);
     expect(save).not.toHaveProperty('vehicle');
     const json = JSON.stringify(save);
-    expect(json).not.toContain(TURRET_TANK_MOUNT);
     expect(json).not.toContain('"turret');
+    expect(json).not.toContain('returnTo');
     expect(turretSeat(sim).kind).toBe('turret');
-    // The scan's control: an owned tank does reach the save.
-    sim.addItem(mountItemId(TURRET_TANK_MOUNT)!, 1);
-    expect(JSON.stringify(sim.serializeCharacter(player.id))).toContain(TURRET_TANK_MOUNT);
-  });
-
-  it('revalidates the tank away when ridden with no turret seat, or from the cannon', () => {
-    const bare = rig();
-    bare.player.mountKey = TURRET_TANK_MOUNT;
-    for (let i = 0; i < MOUNT_OWNERSHIP_REVALIDATE_TICKS; i++) bare.sim.tick();
-    expect(bare.player.mountKey).toBe('');
-
-    const { sim, player, station } = cannonRig();
-    expect(sim.enterVehicle(station.id)).toBe(true);
-    player.mountKey = TURRET_TANK_MOUNT;
-    for (let i = 0; i < MOUNT_OWNERSHIP_REVALIDATE_TICKS; i++) sim.tick();
-    expect(cannonSeat(sim).kind).toBe('cannon');
-    expect(player.mountKey).toBe('');
   });
 
   it('refuses outside the open world: an instanced band, or a delve run', () => {
@@ -406,18 +440,199 @@ describe('the turret seat', () => {
     open.sim.ctx.delveRunForPlayer = () => delve;
     open.sim.chat('/dev turret');
     expect(open.meta.vehicle ?? null).toBeNull();
+    expect(arenaClaims(open.sim)).toEqual([]);
     open.sim.ctx.delveRunForPlayer = () => null;
     open.sim.chat('/dev turret');
     expect(open.meta.vehicle?.kind).toBe('turret');
   });
 });
 
+describe('the arena', () => {
+  it('claims a solo slot and sets the player on the roof, the tower center under their feet', () => {
+    const { sim, player } = rig();
+    sim.drainEvents();
+    sim.chat('/dev turret');
+    const logs = logTexts(sim.drainEvents());
+    const claims = arenaClaims(sim);
+    expect(claims).toHaveLength(1);
+    expect(claims[0].partyKey).toBe(`solo:${player.id}`);
+    expect(claims[0].exitId).toBeNull();
+    expect(claims[0].mobIds).toEqual([]);
+    const center = instanceOrigin(ARENA_INDEX, claims[0].slot);
+    expect(dungeonAt(player.pos.x)?.id).toBe(FIRE_AND_FLY_DUNGEON_ID);
+    expect(player.pos).toEqual({
+      x: center.x,
+      y: groundHeight(center.x, center.z, WORLD_SEED) + FIRE_AND_FLY_TOWER.roofY,
+      z: center.z,
+    });
+    const session = turretSeat(sim);
+    expect(session.origin).toEqual(player.pos);
+    expect([session.defense.cx, session.defense.cz]).toEqual([center.x, center.z]);
+    expect(logs).toContain(DUNGEONS[FIRE_AND_FLY_DUNGEON_ID].enterText);
+  });
+
+  it('keeps the seated player standing on the roof, the collider top under the feet', () => {
+    const { sim, player } = rig();
+    seat(sim);
+    const roof = { ...player.pos };
+    expect(supportHeightAt(WORLD_SEED, roof.x, roof.z, 0.5, roof.y)).toBeCloseTo(roof.y, 9);
+    expect(supportHeightAt(WORLD_SEED, roof.x, roof.z, 0.5, roof.y - 0.5)).toBe(
+      Number.NEGATIVE_INFINITY,
+    );
+    for (let i = 0; i < 20 * 20; i++) {
+      sim.tick();
+      aimOnce(sim);
+    }
+    expect(sim.turretSession).not.toBeNull();
+    expect(player.pos).toEqual(roof);
+  });
+
+  it('leaves back exactly where the player stood and frees the slot', () => {
+    const { sim, player } = rig();
+    const before = standAtAmberfall(sim);
+    player.facing = 1.25;
+    seat(sim);
+    for (let i = 0; i < TURRET_TIMING.introTicks + 60; i++) sim.tick();
+    sim.drainEvents();
+    sim.leaveVehicle();
+    expect(player.pos).toEqual(before);
+    expect(player.prevPos).toEqual(before);
+    expect(player.facing).toBe(1.25);
+    expect(arenaClaims(sim)).toEqual([]);
+    expect(logTexts(sim.drainEvents())).toContain(DUNGEONS[FIRE_AND_FLY_DUNGEON_ID].leaveText);
+  });
+
+  it('still takes the player home when the slot was freed under them', () => {
+    const { sim, player } = rig();
+    const before = standAtAmberfall(sim);
+    seat(sim);
+    freeInstance(sim.ctx, arenaClaims(sim)[0]);
+    sim.leaveVehicle();
+    expect(player.pos).toEqual(before);
+    expect(arenaClaims(sim)).toEqual([]);
+  });
+
+  it('reuses a clean slot on a second entry', () => {
+    const { sim, player } = rig();
+    seat(sim);
+    const first = arenaClaims(sim)[0];
+    for (let i = 0; i < TURRET_TIMING.introTicks + 60; i++) {
+      sim.tick();
+      aimOnce(sim);
+    }
+    sim.leaveVehicle();
+    for (let i = 0; i < 5; i++) sim.tick();
+    seat(sim);
+    const again = arenaClaims(sim);
+    expect(again).toEqual([first]);
+    expect(again[0]).toMatchObject({
+      slot: 0,
+      partyKey: `solo:${player.id}`,
+      enteredBy: new Set([player.id]),
+      mobIds: [],
+      exitId: null,
+    });
+    expect(again[0].claimedAt).toBe(sim.ctx.time);
+    expect(turretSeat(sim).defense.monsters).toEqual([]);
+    expect(turretSeat(sim).defense.stats.shots).toBe(0);
+  });
+
+  it('releases a stale claim of the same key before claiming, so entry always starts clean', () => {
+    const { sim, player } = rig();
+    const stale = sim.ctx.instances.find(
+      (inst) => inst.dungeonId === FIRE_AND_FLY_DUNGEON_ID && inst.slot === 3,
+    )!;
+    markInstanceClaimed(sim.ctx, stale, `solo:${player.id}`, 'normal');
+    seat(sim);
+    expect(stale.partyKey).toBeNull();
+    expect(arenaClaims(sim).map((inst) => inst.slot)).toEqual([0]);
+  });
+
+  it('claims under the solo key even in a party, and the durable key for a server character', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', devCommands: true });
+    const b = sim.addPlayer('mage', 'Partner');
+    sim.partyInvite(b, sim.playerId);
+    sim.partyAccept(b);
+    expect(sim.ctx.partyOf(sim.playerId)).not.toBeNull();
+    seat(sim);
+    expect(arenaClaims(sim).map((inst) => inst.partyKey)).toEqual([`solo:${sim.playerId}`]);
+
+    const server = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', noPlayer: true });
+    const pid = server.addPlayer('warrior', 'Durable', { characterId: 7 });
+    expect(claimTurretArena(server.ctx, pid)?.partyKey).toBe('solo:char:7');
+  });
+
+  it('refuses when every arena is taken, without moving the player', () => {
+    const { sim, player, meta } = rig();
+    for (const inst of sim.ctx.instances) {
+      if (inst.dungeonId === FIRE_AND_FLY_DUNGEON_ID) inst.partyKey = `taken:${inst.slot}`;
+    }
+    const before = { ...player.pos };
+    sim.chat('/dev turret');
+    expect(meta.vehicle ?? null).toBeNull();
+    expect(player.pos).toEqual(before);
+  });
+
+  it('drops an arena queue on entry, so no match pops for a player inside an instance', () => {
+    // Read before any tick: the 1v1 matchmaker's own in-instance prune would hide a missed leave.
+    const queuedAfter = (seated: boolean): boolean => {
+      const { sim, player } = rig();
+      sim.setPlayerLevel(20);
+      sim.arenaQueueJoin(player.id);
+      expect(isArenaQueued(sim.ctx, player.id)).toBe(true);
+      if (seated) seat(sim);
+      else sim.tick();
+      return isArenaQueued(sim.ctx, player.id);
+    };
+    expect(queuedAfter(false)).toBe(true);
+    expect(queuedAfter(true)).toBe(false);
+  });
+
+  it('resets what a teleport resets: one entry count, a gather cast, the target and swing', () => {
+    const { sim, player } = rig();
+    const node = GATHER_NODES[0];
+    // No tick at the node before seating: a mob there pulls within one.
+    sim.chat(`/dev tp ${node.pos.x} ${node.pos.z}`);
+    sim.addItem('copper_mining_pick', 1);
+    expect(sim.harvestNode(node.id)).toBe(true);
+    expect(player.castingAbility).toBe(GATHER_CAST_ID);
+    const entries = player.dungeonEntrySeq ?? 0;
+    seat(sim);
+    expect(player.dungeonEntrySeq).toBe(entries + 1);
+    expect(player.castingAbility).toBeNull();
+    player.targetId = player.id;
+    player.autoAttack = true;
+    player.queuedCastAbility = 'heroic_strike';
+    sim.leaveVehicle();
+    expect(player.targetId).toBeNull();
+    expect(player.autoAttack).toBe(false);
+    expect(player.queuedCastAbility).toBeNull();
+    expect(player.dungeonEntrySeq).toBe(entries + 1);
+  });
+
+  it('rejoins a save taken inside the arena at the Eastbrook arrival point', () => {
+    const center = instanceOrigin(ARENA_INDEX, 5);
+    expect(resolveSavedPosExit({ x: center.x, z: center.z })).toEqual({
+      pos: PLAYER_START,
+      instanceExit: true,
+    });
+  });
+});
+
 describe('ending the seat', () => {
-  const cases: { name: string; mount: string; end: (sim: Sim) => void }[] = [
+  const cases: {
+    name: string;
+    mount: string;
+    dies?: boolean;
+    /** False: the player holds the reins but seats on foot. */
+    rides?: boolean;
+    end: (sim: Sim) => void;
+  }[] = [
     { name: 'leave', mount: DEFAULT_MOUNT, end: (sim) => sim.leaveVehicle() },
     {
       name: 'death',
       mount: '',
+      dies: true,
       end: (sim) => {
         sim.player.dead = true;
         sim.tick();
@@ -426,6 +641,7 @@ describe('ending the seat', () => {
     {
       name: 'a real death through the damage path',
       mount: '',
+      dies: true,
       end: (sim) => {
         const p = sim.player;
         sim.ctx.dealDamage(null, p, p.maxHp * 10, false, 'physical', null, 'hit', true);
@@ -434,7 +650,19 @@ describe('ending the seat', () => {
       },
     },
     {
-      name: 'displacement from the origin',
+      name: 'a spirit released before the seat saw the death',
+      mount: '',
+      dies: true,
+      end: (sim) => {
+        const p = sim.player;
+        sim.ctx.dealDamage(null, p, p.maxHp * 10, false, 'physical', null, 'hit', true);
+        sim.releaseSpirit();
+        expect(p.ghost).toBe(true);
+        sim.tick();
+      },
+    },
+    {
+      name: 'displacement from the roof',
       mount: DEFAULT_MOUNT,
       end: (sim) => {
         sim.player.pos.x += 1;
@@ -450,57 +678,64 @@ describe('ending the seat', () => {
       },
     },
     {
-      name: 'world combat',
-      mount: DEFAULT_MOUNT,
+      name: 'world combat, not remounted while fighting',
+      mount: '',
       end: (sim) => {
         sim.player.inCombat = true;
         sim.tick();
       },
     },
     {
-      name: 'losing the tank while alive',
+      name: 'a mount another path put a walker on, left alone',
       mount: DEFAULT_MOUNT,
+      rides: false,
       end: (sim) => {
-        forceDismount(sim.ctx, sim.player);
+        sim.player.mountKey = DEFAULT_MOUNT;
         sim.tick();
       },
     },
     { name: 'removal', mount: '', end: (sim) => sim.removePlayer(sim.playerId) },
   ];
 
-  it.each(cases)('ends on $name with no monsters and the right mount', ({ end, mount }) => {
-    const { sim, meta } = rig();
-    ownHorse(sim);
-    seat(sim);
-    for (let i = 0; i < TURRET_TIMING.introTicks + 40; i++) sim.tick();
-    expect(turretSeat(sim).defense.monsters.length).toBeGreaterThan(0);
-    end(sim);
-    expect(meta.vehicle).toBeNull();
-    expect(sim.turretSession).toBeNull();
-    if (sim.entities.has(sim.playerId)) {
-      expect(sim.player.mountKey).toBe(mount);
-      const after: SimEvent[] = [];
-      for (let i = 0; i < 40; i++) after.push(...sim.tick());
-      expect(turretEvents(after)).toEqual([]);
-    }
-  });
+  it.each(cases)(
+    'ends on $name: back where the player stood, alive, slot freed',
+    ({ end, mount, dies, rides = true }) => {
+      const { sim, player, meta } = rig();
+      sim.setPlayerLevel(20);
+      standAtAmberfall(sim);
+      if (rides) ownHorse(sim);
+      else ownReins(sim);
+      player.facing = -0.5;
+      const before = { ...player.pos };
+      seat(sim);
+      expect(turretSeat(sim).priorMountKey).toBe(rides ? DEFAULT_MOUNT : '');
+      for (let i = 0; i < TURRET_TIMING.introTicks + 40; i++) sim.tick();
+      expect(turretSeat(sim).defense.monsters.length).toBeGreaterThan(0);
+      end(sim);
+      expect(meta.vehicle).toBeNull();
+      expect(sim.turretSession).toBeNull();
+      expect(arenaClaims(sim)).toEqual([]);
+      if (sim.entities.has(sim.playerId)) {
+        expect(player.pos).toEqual(before);
+        expect(player.facing).toBe(-0.5);
+        expect(player.dead || player.ghost).toBe(false);
+        if (dies) {
+          expect(player.hp).toBe(Math.max(1, Math.round(player.maxHp * RES_HP_FRACTION)));
+          expect(player.auras.map((a) => a.id)).not.toContain(RESURRECTION_SICKNESS_ID);
+        }
+        expect(player.mountKey).toBe(mount);
+        const after: SimEvent[] = [];
+        for (let i = 0; i < 40; i++) after.push(...sim.tick());
+        expect(turretEvents(after)).toEqual([]);
+      }
+    },
+  );
 
-  it('ends on a profession action that takes the tank, and gives the horse back', () => {
+  it('ends when a real mob pulls the seated player into combat, alive and back where they stood', () => {
     const { sim, player } = rig();
+    standAtAmberfall(sim);
     ownHorse(sim);
-    seat(sim);
-    const item = Object.values(ITEMS).find((d) => isSalvageable(d))!;
-    sim.addItem(item.id, 1);
-    sim.salvageItem(item.id);
-    expect(player.mountKey).toBe('');
-    sim.tick();
-    expect(sim.turretSession).toBeNull();
-    expect(player.mountKey).toBe(DEFAULT_MOUNT);
-  });
-
-  it('ends when a real world mob pulls the seated player into combat, alive', () => {
-    const { sim, player } = rig();
-    ownHorse(sim);
+    const before = { ...player.pos };
     seat(sim);
     sim.chat('/dev spawn thornpeak_ogre 1 20');
     const ogre = [...sim.entities.values()].find(
@@ -518,7 +753,40 @@ describe('ending the seat', () => {
     expect(sim.turretSession).toBeNull();
     expect(player.dead).toBe(false);
     expect(player.hp).toBeGreaterThan(0);
-    expect(player.mountKey).toBe(DEFAULT_MOUNT);
+    expect(player.pos).toEqual(before);
+    expect(player.mountKey).toBe('');
+  });
+
+  it('leaves a player some other path took out of the arena where it put them, on foot', () => {
+    const { sim, player } = rig();
+    ownHorse(sim);
+    seat(sim);
+    sim.chat('/dev tp -340 1945');
+    const moved = { ...player.pos };
+    sim.tick();
+    expect(sim.turretSession).toBeNull();
+    expect(player.pos).toEqual(moved);
+    expect(player.mountKey).toBe('');
+    expect(arenaClaims(sim)).toEqual([]);
+  });
+
+  it('sends a battleground pop home after the match, never remounted on the field', () => {
+    const { sim, player } = rig();
+    standAtAmberfall(sim);
+    ownHorse(sim);
+    const before = { ...player.pos };
+    seat(sim);
+    const foe = sim.addPlayer('mage', 'Foe');
+    startBgMatch(sim.ctx, [player.id], [foe]);
+    const match = sim.bgMatchFor(player.id);
+    if (!match) throw new Error('expected a battleground match');
+    expect(match.returns.get(player.id)).toMatchObject({ x: before.x, z: before.z });
+    sim.tick();
+    expect(sim.turretSession).toBeNull();
+    expect(arenaClaims(sim)).toEqual([]);
+    expect(player.mountKey).toBe('');
+    endBgMatch(sim.ctx, match, null, 'forfeit');
+    expect([player.pos.x, player.pos.z]).toEqual([before.x, before.z]);
   });
 
   it('keeps a lost seat open until the player leaves', () => {
@@ -538,7 +806,7 @@ describe('ending the seat', () => {
 describe('the cannon and the turret', () => {
   it('cannot enter the cannon from the turret', () => {
     const { sim, meta, station } = cannonRig();
-    sim.chat(`/dev turret ${station.x} ${station.z + 2}`);
+    sim.chat('/dev turret');
     expect(meta.vehicle?.kind).toBe('turret');
     expect(sim.enterVehicle(station.id)).toBe(false);
     expect(meta.vehicle?.kind).toBe('turret');
@@ -552,6 +820,7 @@ describe('the cannon and the turret', () => {
     sim.chat('/dev turret');
     expect(meta.vehicle?.kind).toBe('cannon');
     expect(sim.turretSession).toBeNull();
+    expect(arenaClaims(sim)).toEqual([]);
     sim.useItem(mountItemId(DEFAULT_MOUNT)!);
     sim.toggleMounted();
     for (let i = 0; i < 40; i++) sim.tick();
@@ -838,6 +1107,35 @@ describe('the world probe', () => {
     expect(cross(g + 1.5).blocked).toBe(true);
     expect(cross(g + 2.5)).toEqual({ x: to.x, z: to.z, blocked: false });
   });
+
+  it('binds the arena: its field ground, the tower up to its roof, and the trunks at any height', () => {
+    const center = instanceOrigin(ARENA_INDEX, 2);
+    expect(probe.ground(center.x + 30, center.z - 12)).toBe(
+      groundHeight(center.x + 30, center.z - 12, WORLD_SEED),
+    );
+    expect(probe.water(center.x + 30, center.z - 12)).toBeNull();
+    const reach = FIRE_AND_FLY_TOWER.radius + 0.5;
+    const across = (feet: number) =>
+      probe.sweep!(center.x - 6, center.z, center.x + 6, center.z, 0.5, feet, feet);
+    const low = across(1);
+    expect(low.blocked).toBe(true);
+    expect(low.x).toBeLessThanOrEqual(center.x - reach + 1e-6);
+    expect(across(FIRE_AND_FLY_TOWER.roofY + 0.2)).toEqual({
+      x: center.x + 6,
+      z: center.z,
+      blocked: false,
+    });
+    const tree = FIRE_AND_FLY_TREES[0];
+    const tx = center.x + tree.x;
+    const tz = center.z + tree.z;
+    for (const feet of [probe.ground(tx, tz), probe.ground(tx, tz) + 40]) {
+      const hit = probe.sweep!(tx - 4, tz, tx + 4, tz, 0.5, feet, feet);
+      expect(hit.blocked).toBe(true);
+      expect(Math.hypot(hit.x - tx, hit.z - tz)).toBeGreaterThanOrEqual(
+        fireAndFlyTrunkRadius(tree) + 0.5 - 1e-6,
+      );
+    }
+  });
 });
 
 describe('firing', () => {
@@ -895,16 +1193,18 @@ describe('determinism', () => {
       sim.rng.setObserver(() => {
         count++;
       });
-      sim.chat(
-        seated
-          ? `/dev turret ${AMBERFALL.x} ${AMBERFALL.z}`
-          : `/dev tp ${AMBERFALL.x} ${AMBERFALL.z}`,
-      );
+      // The control stands in an arena slot too (the plain dungeon path), so both
+      // runs take the player equally far from the world's mobs, and both leave it.
+      if (seated) sim.chat('/dev turret');
+      else expect(enterDungeon(sim.ctx, FIRE_AND_FLY_DUNGEON_ID, sim.playerId)).toBe(true);
       for (let i = 0; i < 20 * 40; i++) {
         sim.tick();
         aimOnce(sim);
       }
       if (seated) expect(turretSeat(sim).defense.stats.hits).toBeGreaterThan(0);
+      if (seated) sim.leaveVehicle();
+      else expect(leaveDungeon(sim.ctx, sim.playerId)).toBe(true);
+      expect(dungeonAt(sim.player.pos.x)).toBeNull();
       sim.rng.setObserver(null);
       return { count, next: [sim.rng.next(), sim.rng.next(), sim.rng.next()] };
     };
@@ -927,10 +1227,12 @@ describe('determinism', () => {
   });
 });
 
-describe('a headless run on real terrain', () => {
-  it('a scripted aimer on the IWorld surface wins at Amberfall, bounded, and stays seated after', () => {
+describe('a headless run in the arena', () => {
+  it('a scripted aimer on the IWorld surface wins, bounded, stays seated after, then leaves home', () => {
     const { sim, player, meta } = rig();
+    standAtAmberfall(sim);
     ownHorse(sim);
+    const before = { ...player.pos };
     seat(sim);
     const run = playOut(sim, true);
     expect(run.phase).toBe('won');
@@ -943,10 +1245,12 @@ describe('a headless run on real terrain', () => {
     for (let i = 0; i < 40; i++) sim.tick();
     expect(meta.vehicle?.kind).toBe('turret');
     expect(sim.turretSession?.defense.phase).toBe('won');
-    expect(player.mountKey).toBe(TURRET_TANK_MOUNT);
+    expect(player.mountKey).toBe('');
     sim.leaveVehicle();
     expect(sim.turretSession).toBeNull();
+    expect(player.pos).toEqual(before);
     expect(player.mountKey).toBe(DEFAULT_MOUNT);
+    expect(arenaClaims(sim)).toEqual([]);
   });
 
   it('a run that never fires loses, bounded', () => {

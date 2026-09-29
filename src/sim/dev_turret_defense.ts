@@ -1,13 +1,12 @@
-// `/dev turret [x z | leave]`: seats the player in the Fire and Fly tank where they
-// stand (or after the dev teleport to x z), or leaves it. Dev-channel text, English.
+// `/dev turret [leave]`: takes the player from the open world to the Fire and Fly
+// tower in their own arena and seats them, or leaves it (back where they stood).
+// Dev-channel text, English.
 
-import { displacePlayerForDev } from './dev/dev_displace';
 import type { SimContext } from './sim_context';
-import { seatTurret, type TurretSeatRefusal, turretSeatRefusal } from './turret_defense_session';
+import { seatTurret, type TurretSeatRefusal } from './turret_defense_session';
 import { leaveVehicle } from './vehicles';
 
-const TURRET_COMMAND =
-  /^\/dev\s+turret(?:\s+(leave)|\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?))?\s*$/i;
+const TURRET_COMMAND = /^\/dev\s+turret(?:\s+(leave))?\s*$/i;
 
 const REFUSAL_TEXT: Readonly<Record<TurretSeatRefusal, string>> = {
   missing: 'no player to seat',
@@ -20,6 +19,7 @@ const REFUSAL_TEXT: Readonly<Record<TurretSeatRefusal, string>> = {
   busy: 'another activity owns your movement',
   water: 'you are swimming or aboard a ship',
   cargo: 'you are carrying freight',
+  full: 'every Fire and Fly arena is taken',
 };
 
 function devLog(ctx: SimContext, pid: number, text: string): void {
@@ -49,24 +49,15 @@ export function handleDevTurretChat(ctx: SimContext, raw: string, pid: number): 
     devLog(ctx, pid, '[dev] Turret refused: offline only until online play lands.');
     return true;
   }
-  const early = turretSeatRefusal(ctx, resolved.meta, resolved.e);
-  if (early) {
-    refuse(ctx, pid, early);
-    return true;
-  }
-  if (match[2] !== undefined && match[3] !== undefined) {
-    displacePlayerForDev(ctx, resolved.e, Number(match[2]), Number(match[3]));
-  }
   const refusal = seatTurret(ctx, pid);
   if (refusal) {
     refuse(ctx, pid, refusal);
     return true;
   }
-  const at = resolved.e.pos;
   devLog(
     ctx,
     pid,
-    `[dev] Turret seated at ${at.x.toFixed(1)}, ${at.z.toFixed(1)}; /dev turret leave ends it.`,
+    '[dev] Turret seated in your Fire and Fly arena; /dev turret leave returns you.',
   );
   return true;
 }

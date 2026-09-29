@@ -368,14 +368,14 @@ export function tickTurretDefense(
   return events;
 }
 
-/** The caller's probe plus the tank's own body as a swept obstacle. */
+/** The caller's probe plus the cannon tower's own body as a swept obstacle. */
 function withTurretBody(state: TurretDefenseState, probe: ThrowProbe): ThrowProbe {
   const top = groundOr(probe, state.cx, state.cz, 0) + TURRET_ARENA.turretHeight;
   return {
     ground: (x, z) => probe.ground(x, z),
     water: (x, z) => probe.water(x, z),
     sweep: (fx, fz, tx, tz, radius, fromY, toY) => {
-      const tank = sweepCylinder(
+      const tower = sweepCylinder(
         state.cx,
         state.cz,
         TURRET_ARENA.turretRadius + radius,
@@ -388,10 +388,10 @@ function withTurretBody(state: TurretDefenseState, probe: ThrowProbe): ThrowProb
         toY,
       );
       const world = probe.sweep ? probe.sweep(fx, fz, tx, tz, radius, fromY, toY) : null;
-      if (!world?.blocked) return tank;
-      if (!tank.blocked) return world;
-      const toTank = Math.hypot(tank.x - fx, tank.z - fz);
-      return toTank <= Math.hypot(world.x - fx, world.z - fz) ? tank : world;
+      if (!world?.blocked) return tower;
+      if (!tower.blocked) return world;
+      const toTower = Math.hypot(tower.x - fx, tower.z - fz);
+      return toTower <= Math.hypot(world.x - fx, world.z - fz) ? tower : world;
     },
   };
 }
@@ -740,7 +740,7 @@ function rest(
   }
 }
 
-/** A body never rests inside the strike radius (the tank's footprint lies within it). */
+/** A body never rests inside the strike radius (the tower's footprint lies within it). */
 function outsideStrikeRadius(
   state: TurretDefenseState,
   kind: TurretKind,

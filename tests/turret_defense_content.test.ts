@@ -11,6 +11,7 @@ import {
 } from '../src/sim/content/turret_defense';
 import { MOBS } from '../src/sim/data';
 import { createMob, mobMaxHp } from '../src/sim/entity';
+import { FIRE_AND_FLY_TOWER } from '../src/sim/fire_and_fly_field';
 import { resolveTurretPlan, turretSpawnOrder } from '../src/sim/minigames/turret_defense_plan';
 
 const plan = resolveTurretPlan();
@@ -165,13 +166,16 @@ describe('tuning constants in ticks and yards', () => {
     for (const w of TURRET_WAVES) expect([w.gapMinTicks, w.gapMaxTicks]).toEqual([16, 32]);
   });
 
-  it('pins the arena, tank body and blast geometry', () => {
+  it('pins the arena, the tower body and the blast geometry', () => {
     expect(TURRET_ARENA).toEqual({
       spawnRadius: 46,
       breachRadius: 3.5,
-      turretRadius: 2.2,
-      turretHeight: 3,
+      turretRadius: FIRE_AND_FLY_TOWER.radius,
+      turretHeight: FIRE_AND_FLY_TOWER.topY,
     });
+    expect(TURRET_ARENA.turretRadius).toBeCloseTo(1.904, 9);
+    expect(TURRET_ARENA.turretHeight).toBeCloseTo(5.1, 9);
+    expect(TURRET_ARENA.breachRadius).toBeGreaterThan(TURRET_ARENA.turretRadius);
     expect(TURRET_WEAPON).toEqual({
       cooldownTicks: 9,
       minRange: 2,

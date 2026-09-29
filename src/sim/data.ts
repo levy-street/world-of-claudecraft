@@ -106,6 +106,7 @@ import {
   FARSHORE_ROADS,
   FARSHORE_ZONE,
 } from './content/farshore';
+import { FIRE_AND_FLY_DUNGEON_DEFS } from './content/fire_and_fly_arena';
 import {
   FROSTVEIL_CAMPS,
   FROSTVEIL_ESCORTS,
@@ -1131,6 +1132,7 @@ export const DUNGEONS: Record<string, DungeonDef> = {
   ...DUNGEON_DEFS,
   ...TEMPLE_DUNGEON_DEFS,
   ...WILDHEART_DUNGEON_DEFS,
+  ...FIRE_AND_FLY_DUNGEON_DEFS,
 };
 
 export const DUNGEON_LIST: DungeonDef[] = Object.values(DUNGEONS).sort((a, b) => a.index - b.index);

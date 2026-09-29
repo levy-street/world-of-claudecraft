@@ -23744,6 +23744,11 @@ export const id_ID: EnTranslations = {
         "enterText": "Kau melangkah masuk ke aula Kastil Dawnhold yang hangat dan harum bunga.",
         "leaveText": "Kau menyelinap keluar lagi ke halaman rumput taman yang bermandikan cahaya matahari."
       },
+      "fire_and_fly_arena": {
+        "name": "Fire and Fly",
+        "enterText": "You climb the old cannon tower. Beyond the trees, the woods begin to stir.",
+        "leaveText": "You climb down from the tower and leave the arena behind."
+      },
       "drowned_temple": {
         "name": "Kuil Tenggelam",
         "enterText": "Kau melangkah melewati gerbang bulan, udara berubah menjadi air dingin dan cahaya pucat, dan nyanyian itu menutup di atas kepalamu.",

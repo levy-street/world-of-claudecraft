@@ -2184,7 +2184,10 @@ const MONOLITHS: MonolithRow[] = [
     // 2486 to 2513 into the row's slack: the berth gate bookkeeping (setColliderGateOpen,
     // gridIndex-ordered reopen, lazy wishes) needs the grid's private state, net of the
     // decoration collider builder moving out to decoration_collider.ts. wc -l. Exact count.
-    ceiling: 2513,
+    // LOWERED 2513 -> 2484 with the static interior collider table (Wildheart, the
+    // Last Keep, Dawnhold, and the new Fire and Fly arena) moved into
+    // interior_collider_sets.ts. wc -l. Exact count.
+    ceiling: 2484,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

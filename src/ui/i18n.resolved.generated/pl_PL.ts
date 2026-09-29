@@ -23744,6 +23744,11 @@ export const pl_PL: EnTranslations = {
         "enterText": "Wchodzisz do ciepłych, pachnących kwiatami sal zamku Dawnhold.",
         "leaveText": "Wymykasz się z powrotem na skąpany w słońcu ogrodowy trawnik."
       },
+      "fire_and_fly_arena": {
+        "name": "Fire and Fly",
+        "enterText": "You climb the old cannon tower. Beyond the trees, the woods begin to stir.",
+        "leaveText": "You climb down from the tower and leave the arena behind."
+      },
       "drowned_temple": {
         "name": "Zatopiona Świątynia",
         "enterText": "Przechodzisz przez księżycową bramę - powietrze zmienia się w zimną wodę i blade światło, a śpiew zamyka się nad twoją głową.",

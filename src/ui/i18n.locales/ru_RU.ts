@@ -14298,6 +14298,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вы входите в теплые, напоенные ароматом цветов залы Замка Рассвета.',
   'entities.dungeons.dawnhold_castle.leaveText':
     'Вы возвращаетесь на залитую солнцем садовую лужайку.',
+  'entities.dungeons.fire_and_fly_arena.enterText':
+    'Вы поднимаетесь на старую пушечную башню. За деревьями начинает шевелиться лес.',
+  'entities.dungeons.fire_and_fly_arena.leaveText': 'Вы спускаетесь с башни и покидаете арену.',
   'entities.items.wildheart_tuskblade.name': 'Клыкастый клинок Дикого Сердца',
   'entities.items.wildheart_hexwood_staff.name': 'Посох колдовского дерева из Котловины',
   'entities.items.wildheart_fangknife.name': 'Клыковый нож Зулгара',

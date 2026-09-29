@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { TURRET_TANK_MOUNT, TURRET_WEAPON } from '../src/sim/content/turret_defense';
+import { TURRET_WEAPON } from '../src/sim/content/turret_defense';
 import { createTurretDefense } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { Sim } from '../src/sim/sim';
@@ -17,8 +17,8 @@ function seat(): TurretSession {
     kind: 'turret',
     origin: { x: CENTER.x, y: 0, z: CENTER.z },
     defense: createTurretDefense(resolveTurretPlan(), CENTER, 7, START),
-    lentMountKey: TURRET_TANK_MOUNT,
     priorMountKey: '',
+    returnTo: { x: 0, y: 0, z: 0, facing: 0 },
     feedback: [],
     nextFeedbackSeq: 1,
   };
@@ -155,9 +155,10 @@ describe('the turret aim core', () => {
 
   it('drives a real seat: the first click fires, a click in the cooldown is refused but consumed', () => {
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', devCommands: true });
-    sim.chat('/dev turret -340 1945');
+    sim.chat('/dev turret');
     const aim = new TurretAimCore(sim);
-    const target = { x: -340 + 20, z: 1945 };
+    const center = sim.turretSession!.origin;
+    const target = { x: center.x + 20, z: center.z };
     expect(aim.commitAt(target)).toBe(true);
     expect(sim.turretSession?.defense.stats.shots).toBe(1);
     expect(aim.commitAt(target)).toBe(true);

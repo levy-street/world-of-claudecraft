@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { TURRET_TANK_MOUNT } from '../src/sim/content/turret_defense';
+import { FIRE_AND_FLY_DUNGEON_ID } from '../src/sim/content/fire_and_fly_arena';
 import { WISP_MAZE_QUEST_ID } from '../src/sim/content/world_quest_wisp_maze';
-import { DUNGEON_X_THRESHOLD } from '../src/sim/data';
+import { DUNGEON_X_THRESHOLD, dungeonAt, PLAYER_START } from '../src/sim/data';
 import { handleDevTurretChat } from '../src/sim/dev_turret_defense';
+import { enterDungeon } from '../src/sim/instances/dungeons';
 import { type ArenaMatch, type DuelState, Sim } from '../src/sim/sim';
 import type { BgMatch } from '../src/sim/social/battleground';
 import type { Aura, MountRaceSession, SimEvent, WorldQuestProgress } from '../src/sim/types';
 import { WORLD_QUEST_DELIVERY_AURA_ID } from '../src/sim/world_quest_delivery';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
-const AMBERFALL = { x: -340, z: 1945 };
 const LAKE = { x: -282, z: 2016 };
 
 function rig(devCommands = true) {
@@ -51,44 +51,42 @@ describe('/dev turret', () => {
     const logs = devLogs(sim.drainEvents());
     expect(logs).toEqual(['[dev] Turret refused: offline only until online play lands.']);
     expect(sim.meta(pid)?.vehicle ?? null).toBeNull();
-    expect(sim.entities.get(pid)?.mountKey).not.toBe(TURRET_TANK_MOUNT);
+    expect(dungeonAt(sim.entities.get(pid)!.pos.x)).toBeNull();
   });
 
   it('ignores other dev lines', () => {
     const { sim } = rig();
     expect(handleDevTurretChat(sim.ctx, '/dev turrets', sim.playerId)).toBe(false);
     expect(handleDevTurretChat(sim.ctx, '/dev turret 12', sim.playerId)).toBe(false);
+    expect(handleDevTurretChat(sim.ctx, '/dev turret -340 1945', sim.playerId)).toBe(false);
   });
 
-  it('seats the player where they stand, feet position as the center', () => {
+  it('takes the player to the tower in their own arena, the tower as the center', () => {
     const { sim, player, meta } = rig();
-    const at = { ...player.pos };
     const logs = chat(sim, '/dev turret');
-    expect(logs.some((l) => l.startsWith('[dev] Turret seated'))).toBe(true);
+    expect(logs).toEqual([
+      '[dev] Turret seated in your Fire and Fly arena; /dev turret leave returns you.',
+    ]);
     expect(meta.vehicle?.kind).toBe('turret');
-    expect(sim.turretSession?.origin).toEqual(at);
-    expect(sim.turretSession?.defense.cx).toBe(at.x);
-    expect(sim.turretSession?.defense.cz).toBe(at.z);
-    expect(player.mountKey).toBe(TURRET_TANK_MOUNT);
+    expect(dungeonAt(player.pos.x)?.id).toBe(FIRE_AND_FLY_DUNGEON_ID);
+    expect(sim.turretSession?.origin).toEqual(player.pos);
+    expect(sim.turretSession?.defense.cx).toBe(player.pos.x);
+    expect(sim.turretSession?.defense.cz).toBe(player.pos.z);
+    expect(player.mountKey).toBe('');
   });
 
-  it('teleports first with coordinates, through the dev displacement', () => {
-    const { sim, player } = rig();
-    chat(sim, `/dev turret ${AMBERFALL.x} ${AMBERFALL.z}`);
-    const view = sim.turretSession!;
-    expect(view.origin.x).toBeCloseTo(AMBERFALL.x, 6);
-    expect(view.origin.z).toBeCloseTo(AMBERFALL.z, 6);
-    expect(player.pos).toEqual(view.origin);
-    for (let i = 0; i < 20; i++) sim.tick();
-    expect(sim.turretSession).not.toBeNull();
-  });
-
-  it('leaves with /dev turret leave, and says so when not seated', () => {
+  it('leaves with /dev turret leave, back where the player stood, and says so when not seated', () => {
     const { sim, player } = rig();
     expect(chat(sim, '/dev turret leave')).toEqual(['[dev] Not seated in the turret.']);
+    // Away from the Eastbrook arrival point, the arena's own fallback exit.
+    sim.chat('/dev tp -340 1945');
+    sim.tick();
+    const before = { ...player.pos };
+    expect(Math.hypot(before.x - PLAYER_START.x, before.z - PLAYER_START.z)).toBeGreaterThan(100);
     chat(sim, '/dev turret');
     expect(chat(sim, '/dev turret leave')).toEqual(['[dev] Turret left.']);
     expect(sim.turretSession).toBeNull();
+    expect(player.pos).toEqual(before);
     expect(player.mountKey).toBe('');
   });
 
@@ -124,6 +122,22 @@ describe('/dev turret', () => {
       name: 'inside an instanced band',
       text: 'you are not in the open world',
       set: ({ player }) => (player.pos.x = DUNGEON_X_THRESHOLD + 50),
+    },
+    {
+      name: 'standing in the arena through the dungeon path',
+      text: 'you are not in the open world',
+      set: ({ sim }) => {
+        expect(enterDungeon(sim.ctx, FIRE_AND_FLY_DUNGEON_ID, sim.playerId)).toBe(true);
+      },
+    },
+    {
+      name: 'every arena is taken',
+      text: 'every Fire and Fly arena is taken',
+      set: ({ sim }) => {
+        for (const inst of sim.ctx.instances) {
+          if (inst.dungeonId === FIRE_AND_FLY_DUNGEON_ID) inst.partyKey = `taken:${inst.slot}`;
+        }
+      },
     },
     {
       name: 'mid-jump',
@@ -173,10 +187,8 @@ describe('/dev turret', () => {
     const before = { ...r.player.pos };
     const seatedBefore = r.meta.vehicle ?? null;
     r.sim.drainEvents();
-    expect(chat(r.sim, `/dev turret ${AMBERFALL.x} ${AMBERFALL.z}`)).toEqual([
-      `[dev] Turret refused: ${text}.`,
-    ]);
+    expect(chat(r.sim, '/dev turret')).toEqual([`[dev] Turret refused: ${text}.`]);
     expect(r.meta.vehicle ?? null).toBe(seatedBefore);
-    if (!seatedBefore) expect(r.player.pos.x).toBe(before.x);
+    if (!seatedBefore) expect(r.player.pos).toEqual(before);
   });
 });

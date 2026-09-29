@@ -152,14 +152,9 @@ export function mountRideAllowed(meta: PlayerMeta, key: string): boolean {
   return mountOwned(meta, key) || trainingSummon(meta, key);
 }
 
-/** A vehicle seat's lent ride (the Fire and Fly tank): unowned, like the lesson steed. */
-function seatLentMount(meta: PlayerMeta, key: string): boolean {
-  return meta.vehicle?.kind === 'turret' && key === meta.vehicle.lentMountKey;
-}
-
-/** Applies a vehicle seat's lent mount, or restores the prior one ('' on foot), with no
- *  summon channel, stripping forms first like a real summon. Only the seat module calls
- *  it and it decides what may be restored; every other mount path refuses while seated. */
+/** Restores the mount a vehicle seat took ('' on foot) with no summon channel, stripping
+ *  forms first like a real summon. Only the seat module calls it and it decides what may
+ *  be restored; every other mount path refuses while seated. */
 export function applySeatMount(ctx: SimContext, e: Entity, key: string): void {
   if (key) cancelFormsAndGhostWolf(ctx, e);
   e.mountKey = key;
@@ -445,8 +440,7 @@ export function updateMountTransition(ctx: SimContext, e: Entity, swimming: bool
     e.mountKey &&
     meta &&
     ctx.tickCount % MOUNT_OWNERSHIP_REVALIDATE_TICKS === e.id % MOUNT_OWNERSHIP_REVALIDATE_TICKS &&
-    !mountRideAllowed(meta, e.mountKey) &&
-    !seatLentMount(meta, e.mountKey)
+    !mountRideAllowed(meta, e.mountKey)
   ) {
     forceDismount(ctx, e);
     return;

@@ -23744,6 +23744,11 @@ export const da_DK: EnTranslations = {
         "enterText": "Du træder ind i Dawnhold Slots varme, blomsterduftende sale.",
         "leaveText": "Du smutter ud igen på havens solbeskinnede græsplæne."
       },
+      "fire_and_fly_arena": {
+        "name": "Fire and Fly",
+        "enterText": "You climb the old cannon tower. Beyond the trees, the woods begin to stir.",
+        "leaveText": "You climb down from the tower and leave the arena behind."
+      },
       "drowned_temple": {
         "name": "Det Druknede Tempel",
         "enterText": "Du træder gennem måneporten, luften bliver til koldt vand og blegt lys, og sangen lukker sig over dit hoved.",

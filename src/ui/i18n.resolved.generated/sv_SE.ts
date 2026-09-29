@@ -23744,6 +23744,11 @@ export const sv_SE: EnTranslations = {
         "enterText": "Du kliver in i de varma, blomsterdoftande salarna i Dawnholds slott.",
         "leaveText": "Du kliver ut igen på trädgårdens solbelysta gräsmatta."
       },
+      "fire_and_fly_arena": {
+        "name": "Fire and Fly",
+        "enterText": "You climb the old cannon tower. Beyond the trees, the woods begin to stir.",
+        "leaveText": "You climb down from the tower and leave the arena behind."
+      },
       "drowned_temple": {
         "name": "Det dränkta templet",
         "enterText": "Du kliver genom månporten, luften förvandlas till kallt vatten och blekt ljus, och sången sluter sig över ditt huvud.",

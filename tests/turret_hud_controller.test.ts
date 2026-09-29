@@ -11,7 +11,7 @@ import {
   TURRET_THUMP_HEAVY_SFX,
   TURRET_THUMP_LIGHT_SFX,
 } from '../src/game/turret_monster_sfx';
-import { TURRET_TANK_MOUNT, TURRET_TIMING } from '../src/sim/content/turret_defense';
+import { TURRET_TIMING } from '../src/sim/content/turret_defense';
 import { createTurretDefense } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { recordTurretFeedback } from '../src/sim/minigames/turret_feedback';
@@ -59,8 +59,8 @@ function seat(): TurretSession {
     kind: 'turret',
     origin: { x: 0, y: 0, z: 0 },
     defense: createTurretDefense(resolveTurretPlan(), { x: 0, z: 0 }, 5, START),
-    lentMountKey: TURRET_TANK_MOUNT,
     priorMountKey: '',
+    returnTo: { x: 0, y: 0, z: 0, facing: 0 },
     feedback: [],
     nextFeedbackSeq: 1,
   };

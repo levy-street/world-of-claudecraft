@@ -23744,6 +23744,11 @@ export const de_DE: EnTranslations = {
         "enterText": "Du trittst in die warmen, blumenduftenden Hallen von Schloss Dawnhold ein.",
         "leaveText": "Du schlüpfst wieder hinaus auf den sonnenbeschienenen Gartenrasen."
       },
+      "fire_and_fly_arena": {
+        "name": "Fire and Fly",
+        "enterText": "You climb the old cannon tower. Beyond the trees, the woods begin to stir.",
+        "leaveText": "You climb down from the tower and leave the arena behind."
+      },
       "drowned_temple": {
         "name": "Der Ertränkte Tempel",
         "enterText": "Du trittst durch das Mondtor — die Luft wird zu kaltem Wasser und bleichem Licht, und der Gesang schließt sich über deinem Haupt.",

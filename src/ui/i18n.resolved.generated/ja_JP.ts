@@ -23744,6 +23744,11 @@ export const ja_JP: EnTranslations = {
         "enterText": "花の香り漂うドーンホールド城の暖かな広間へ足を踏み入れた。",
         "leaveText": "日差しあふれる庭園の芝生へと戻った。"
       },
+      "fire_and_fly_arena": {
+        "name": "Fire and Fly",
+        "enterText": "古い砲塔を登った。木々の向こうで、森がざわめき始める。",
+        "leaveText": "塔を降り、闘技場を後にした。"
+      },
       "drowned_temple": {
         "name": "溺れし神殿",
         "enterText": "月の門をくぐり抜けると——大気は冷たい水と蒼白の光に変わり、歌声が頭上で閉ざされていく。",

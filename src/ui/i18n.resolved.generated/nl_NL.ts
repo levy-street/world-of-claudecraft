@@ -23744,6 +23744,11 @@ export const nl_NL: EnTranslations = {
         "enterText": "Je stapt de warme, naar bloemen geurende zalen van Kasteel Dawnhold binnen.",
         "leaveText": "Je glipt weer naar buiten, het zonnige gazon van de tuin op."
       },
+      "fire_and_fly_arena": {
+        "name": "Fire and Fly",
+        "enterText": "You climb the old cannon tower. Beyond the trees, the woods begin to stir.",
+        "leaveText": "You climb down from the tower and leave the arena behind."
+      },
       "drowned_temple": {
         "name": "De Verdronken Tempel",
         "enterText": "Je stapt door de maanpoort, de lucht wordt koud water en bleek licht, en het gezang sluit zich boven je hoofd.",

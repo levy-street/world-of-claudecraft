@@ -23744,6 +23744,11 @@ export const tr_TR: EnTranslations = {
         "enterText": "Dawnhold Şatosu'nun sıcak, çiçek kokulu salonlarına adım atıyorsun.",
         "leaveText": "Güneşli bahçe çimenliğine geri süzülüyorsun."
       },
+      "fire_and_fly_arena": {
+        "name": "Fire and Fly",
+        "enterText": "You climb the old cannon tower. Beyond the trees, the woods begin to stir.",
+        "leaveText": "You climb down from the tower and leave the arena behind."
+      },
       "drowned_temple": {
         "name": "Boğulmuş Tapınak",
         "enterText": "Ay geçidinden geçersin — hava soğuk suya ve solgun ışığa dönüşür, şarkı başının üstünde kapanır.",

@@ -800,10 +800,10 @@ describe('the throw', () => {
   });
 });
 
-describe('the tank body', () => {
-  const TANK = TURRET_ARENA.turretRadius;
+describe('the tower body', () => {
+  const TOWER = TURRET_ARENA.turretRadius;
 
-  it('reflects a low flight off the tank', () => {
+  it('reflects a low flight off the tower', () => {
     const k = kind('large', 10000);
     const { state, m } = oneMonster(k);
     pin(state, m, 0, 6);
@@ -820,13 +820,13 @@ describe('the tank body', () => {
       for (let t = s.start; t <= s.end; t += 0.1) {
         const p = positionAt(s, t, flat);
         if (p.y < TURRET_ARENA.turretHeight) {
-          expect(Math.hypot(p.x, p.z)).toBeGreaterThanOrEqual(TANK + k.radius - 1e-6);
+          expect(Math.hypot(p.x, p.z)).toBeGreaterThanOrEqual(TOWER + k.radius - 1e-6);
         }
       }
     }
   });
 
-  it('lets a high flight pass over the tank to the far side', () => {
+  it('lets a high flight pass over the tower to the far side', () => {
     const { state, m } = oneMonster(kind('small', 10000));
     pin(state, m, 0, 12);
     const shot = fireAt(state, 0, 13);
@@ -838,7 +838,7 @@ describe('the tank body', () => {
     expect(landing?.type === 'bounce' && landing.z).toBeLessThan(-3);
   });
 
-  it('stops a skid against the tank, then rests the body on the strike radius', () => {
+  it('stops a skid against the tower, then rests the body on the strike radius', () => {
     const k = kind('small', 10000);
     const { state, m } = oneMonster(k);
     m.state = 'fly';
@@ -857,7 +857,7 @@ describe('the tank body', () => {
     const skid = segOf(m);
     expect(skid.kind === 'skid' && skid.contact).toBe('wall');
     const stop = positionAt(skid, skid.end, flat);
-    expect(Math.hypot(stop.x, stop.z)).toBeCloseTo(TANK + k.radius, 6);
+    expect(Math.hypot(stop.x, stop.z)).toBeCloseTo(TOWER + k.radius, 6);
     run(state, Math.ceil(skid.end));
     expect(m.state).toBe('down');
     const rest = positionAt(m.seg, state.tick, flat);
@@ -865,7 +865,7 @@ describe('the tank body', () => {
     expect(rest.z).toBeCloseTo(turretStrikeDistance(k), 9);
   });
 
-  it('never lets a body rest inside the tank footprint: it is placed on the strike radius on its bearing', () => {
+  it('never lets a body rest inside the tower footprint: it is placed on the strike radius on its bearing', () => {
     const k = kind('small', 10000);
     const { state, m } = oneMonster(k);
     m.state = 'fly';
@@ -1094,7 +1094,7 @@ describe('won sessions settle', () => {
 });
 
 describe('full scripted runs', () => {
-  it('an auto-aimer firing at the monster nearest the tank wins all six waves', () => {
+  it('an auto-aimer firing at the monster nearest the tower wins all six waves', () => {
     const r = fullRun(42, true);
     expect(r.state.phase).toBe('won');
     expect(r.waves).toHaveLength(6);

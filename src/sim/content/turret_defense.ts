@@ -2,6 +2,7 @@
 // src/sim/minigames/turret_defense.ts; the wave plan resolver
 // (src/sim/minigames/turret_defense_plan.ts) reads the templates from MOBS.
 
+import { FIRE_AND_FLY_TOWER } from '../fire_and_fly_field';
 import {
   DT,
   type TurretBowlingDef,
@@ -9,7 +10,6 @@ import {
   type TurretSizeDef,
   type TurretWaveDef,
 } from '../types';
-import type { MountKey } from './mounts';
 
 const ticks = (seconds: number): number => Math.round(seconds / DT);
 
@@ -134,16 +134,13 @@ export const TURRET_BOWLING: Readonly<TurretBowlingDef> = {
   lyingHeight: 0.35,
 };
 
-/** Lent as the seated player's mount (never owned, never saved) and restored on leave. */
-export const TURRET_TANK_MOUNT: MountKey = 'terrorspark_groundshaker';
-
 export const TURRET_ARENA = {
   spawnRadius: 46,
   /** A monster stops at breachRadius + its body radius from the center and winds up. */
   breachRadius: 3.5,
-  /** The tank's own body: a flight below its top reflects off it, a skid stops against it. */
-  turretRadius: 2.2,
-  turretHeight: 3,
+  /** The cannon tower's body: a flight below its parapet reflects off it, a skid stops against it. */
+  turretRadius: FIRE_AND_FLY_TOWER.radius,
+  turretHeight: FIRE_AND_FLY_TOWER.topY,
 } as const;
 
 export const TURRET_TIMING = {

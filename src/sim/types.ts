@@ -4179,7 +4179,8 @@ export interface DungeonDef {
     | 'ignivar_depths'
     | 'wildheart'
     | 'lastkeep'
-    | 'dawnhold';
+    | 'dawnhold'
+    | 'fire_and_fly';
   /**
    * What dresses this dungeon's wall-side obstacle slots (matches the render
    * variant): coffins get one standable lid, cargo splits into the crate
@@ -10272,15 +10273,25 @@ export interface VehicleSession {
   encounter: CannonEncounterState;
 }
 
-/** The Fire and Fly seat (src/sim/turret_defense_session.ts). Never included in character saves. */
+/** Where a player stood, and faced, before a seat moved them away. */
+export interface TurretReturnPoint {
+  x: number;
+  y: number;
+  z: number;
+  facing: number;
+}
+
+/** The Fire and Fly seat on the tower roof of the player's own arena
+ *  (src/sim/turret_defense_session.ts). Never included in character saves. */
 export interface TurretSession {
   kind: 'turret';
+  /** The player's feet on the roof; the tower (the engine's center) stands under it. */
   origin: Vec3;
   defense: TurretDefenseState;
-  /** The tank ridden while seated: lent, never owned, exempt from the mount ownership re-check. */
-  lentMountKey: string;
-  /** The mount ridden before the tank was lent ('' on foot), restored on leave while alive and still held. */
+  /** The mount ridden before the seat ('' on foot), restored on leave while alive and still held. */
   priorMountKey: string;
+  /** Leaving the seat also leaves the arena, back exactly here. */
+  returnTo: TurretReturnPoint;
   /** The newest engine events, oldest first (minigames/turret_feedback.ts). */
   feedback: TurretFeedback[];
   nextFeedbackSeq: number;

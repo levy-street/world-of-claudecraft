@@ -1,11 +1,11 @@
 // Fire and Fly seat: the `turret` kind of PlayerMeta.vehicle, dispatched from
-// vehicles.ts. Seating lends the tank as the player's mount, the per-tick hook
-// drives the pure engine with a probe bound to the world, engine events feed an
+// vehicles.ts. Seating takes the player from the open world onto the tower
+// roof of their own arena (turret_arena_session.ts), the per-tick hook drives
+// the pure engine with a probe bound to the world, engine events feed an
 // owner-scoped SimEvent and the feedback ring, and the read-only view is cloned
-// once per revision. Open world only. Draws no world rng.
+// once per revision. Ending the seat leaves the arena. Draws no world rng.
 
 import { resolveMovement } from './colliders';
-import { TURRET_TANK_MOUNT } from './content/turret_defense';
 import { DUNGEON_X_THRESHOLD } from './data';
 import { gliderActionsLocked } from './glider_action_lock';
 import type { ThrowProbe } from './minigames/thrown_body';
@@ -27,6 +27,7 @@ import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { arenaMatchFor } from './social/arena';
 import { bgInMatch } from './social/battleground';
+import { claimTurretArena, enterTurretArena, exitTurretArena } from './turret_arena_session';
 import type { CannonPoint, Entity, TurretSession, Vec3 } from './types';
 import { wispMazeActionsLocked } from './wisp_maze_action_lock';
 import { groundHeight, waterLevelAt } from './world';
@@ -42,7 +43,8 @@ export type TurretSeatRefusal =
   | 'instance'
   | 'busy'
   | 'water'
-  | 'cargo';
+  | 'cargo'
+  | 'full';
 
 type ReadonlyDeep<T> = T extends readonly (infer U)[]
   ? readonly ReadonlyDeep<U>[]
@@ -151,20 +153,28 @@ export function turretSeatRefusal(
   return null;
 }
 
-/** Seats the player where they stand and lends the tank; the feet position is the center. */
+/**
+ * Takes an eligible open-world player onto the tower roof of their own arena,
+ * on foot, and seats them there: the tower under their feet is the center.
+ * The eligibility is read here, before the move, so the arena itself never
+ * has to pass the open-world rule.
+ */
 export function seatTurret(ctx: SimContext, pid: number): TurretSeatRefusal | null {
   const resolved = ctx.resolve(pid);
   if (!resolved) return 'missing';
   const { meta, e: player } = resolved;
   const refusal = turretSeatRefusal(ctx, meta, player);
   if (refusal) return refusal;
+  const arena = claimTurretArena(ctx, meta.entityId);
+  if (!arena) return 'full';
+  const returnTo = { x: player.pos.x, y: player.pos.y, z: player.pos.z, facing: player.facing };
   ctx.cancelCast(player);
   player.autoAttack = false;
   player.followTargetId = null;
   player.vx = player.vy = player.vz = 0;
-  const origin = { ...player.pos };
   const priorMountKey = player.mountKey;
   forceDismount(ctx, player);
+  const origin = enterTurretArena(ctx, meta, player, arena);
   const start = ctx.tickCount;
   meta.vehicle = {
     kind: 'turret',
@@ -175,24 +185,23 @@ export function seatTurret(ctx: SimContext, pid: number): TurretSeatRefusal | nu
       turretSessionSeed(ctx.cfg.seed, meta.entityId, start),
       start,
     ),
-    lentMountKey: TURRET_TANK_MOUNT,
     priorMountKey,
+    returnTo,
     feedback: [],
     nextFeedbackSeq: 1,
   };
-  applySeatMount(ctx, player, TURRET_TANK_MOUNT);
   meta.wireRev++;
   return null;
 }
 
-/** False once the seat must end: the same eject rules as the cannon, plus the lent tank. */
+/** False once the seat must end: the same eject rules as the cannon, on foot. */
 function stillSeated(meta: PlayerMeta, player: Entity, session: TurretSession): boolean {
   return (
     !meta.leaving &&
     !player.dead &&
     !player.ghost &&
     !player.inCombat &&
-    player.mountKey === session.lentMountKey &&
+    player.mountKey === '' &&
     Math.hypot(player.pos.x - session.origin.x, player.pos.z - session.origin.z) <=
       SEAT_TOLERANCE &&
     Math.abs(player.pos.y - session.origin.y) <= SEAT_TOLERANCE
@@ -228,7 +237,7 @@ export function tickTurretSeat(
   return true;
 }
 
-/** One shot at a ground point; the tank faces its shot. Refusals are silent (the HUD shows the cooldown). */
+/** One shot at a ground point; the player faces its shot. Refusals are silent (the HUD shows the cooldown). */
 export function fireTurretSeat(
   ctx: SimContext,
   meta: PlayerMeta,
@@ -246,9 +255,12 @@ export function fireTurretSeat(
 }
 
 /**
- * Hands the tank back. A living player gets the prior mount again when they still
- * hold it, even if something took the tank first (a profession action dismounts
- * directly); the dead, and anyone whose prior reins left their bags, end on foot.
+ * Leaves the arena, back where the player stood, then gives a player who was
+ * alive and out of combat at the end the prior mount again when they still
+ * hold its reins; the dead, the fighting, and anyone whose reins left their
+ * bags end on foot. A player some other path took out of the arena (a
+ * battleground pop, a teleport) is not remounted where it put them, and a
+ * mount some other path put them on is left alone.
  */
 export function endTurretSeat(
   ctx: SimContext,
@@ -256,11 +268,12 @@ export function endTurretSeat(
   player: Entity,
   session: TurretSession,
 ): void {
-  if (player.mountKey !== session.lentMountKey && player.mountKey !== '') return;
-  const prior = session.priorMountKey;
   const alive = !player.dead && !player.ghost;
-  const next = alive && prior && mountRideAllowed(meta, prior) ? prior : '';
-  if (player.mountKey !== next) applySeatMount(ctx, player, next);
+  const home = exitTurretArena(ctx, meta, player, session.returnTo);
+  const prior = session.priorMountKey;
+  if (!home || !alive || player.inCombat || !prior || player.mountKey !== '') return;
+  if (!mountRideAllowed(meta, prior)) return;
+  applySeatMount(ctx, player, prior);
 }
 
 function cloneView(session: TurretSession): TurretSessionView {

@@ -23744,6 +23744,11 @@ export const fr_CA: EnTranslations = {
         "enterText": "Vous pénétrez dans les salles chaudes et parfumées de fleurs du Château Dawnhold.",
         "leaveText": "Vous ressortez sur la pelouse ensoleillée du jardin."
       },
+      "fire_and_fly_arena": {
+        "name": "Fire and Fly",
+        "enterText": "You climb the old cannon tower. Beyond the trees, the woods begin to stir.",
+        "leaveText": "You climb down from the tower and leave the arena behind."
+      },
       "drowned_temple": {
         "name": "Le Temple noyé",
         "enterText": "Tu franchis la porte de lune — l'air se mue en eau froide et en lumière blafarde, et le chant se referme au-dessus de ta tête.",

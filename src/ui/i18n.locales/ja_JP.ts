@@ -14067,6 +14067,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.dawnhold_castle.enterText':
     '花の香り漂うドーンホールド城の暖かな広間へ足を踏み入れた。',
   'entities.dungeons.dawnhold_castle.leaveText': '日差しあふれる庭園の芝生へと戻った。',
+  'entities.dungeons.fire_and_fly_arena.enterText':
+    '古い砲塔を登った。木々の向こうで、森がざわめき始める。',
+  'entities.dungeons.fire_and_fly_arena.leaveText': '塔を降り、闘技場を後にした。',
   'entities.items.wildheart_tuskblade.name': 'ワイルドハートの牙大剣',
   'entities.items.wildheart_hexwood_staff.name': '盆地の呪木杖',
   'entities.items.wildheart_fangknife.name': 'ズルガーの牙小刀',

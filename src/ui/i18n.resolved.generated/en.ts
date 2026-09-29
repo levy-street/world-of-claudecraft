@@ -23744,6 +23744,11 @@ export const en: EnTranslations = {
         "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
         "leaveText": "You slip back out onto the sunlit garden lawn."
       },
+      "fire_and_fly_arena": {
+        "name": "Fire and Fly",
+        "enterText": "You climb the old cannon tower. Beyond the trees, the woods begin to stir.",
+        "leaveText": "You climb down from the tower and leave the arena behind."
+      },
       "drowned_temple": {
         "name": "The Drowned Temple",
         "enterText": "You step through the moongate: the air turns to cold water and pale light, and the singing closes over your head.",

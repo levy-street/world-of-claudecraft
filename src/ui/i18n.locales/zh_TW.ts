@@ -13383,6 +13383,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.dawnhold_posy.name': '晨曦堡花園小花束',
   'entities.dungeons.dawnhold_castle.enterText': '你走進晨曦堡溫暖而花香四溢的廳堂。',
   'entities.dungeons.dawnhold_castle.leaveText': '你回到陽光灑落的花園草坪上。',
+  'entities.dungeons.fire_and_fly_arena.enterText':
+    '你登上古老的砲塔。樹林之外，森林開始躁動起來。',
+  'entities.dungeons.fire_and_fly_arena.leaveText': '你走下塔樓，將競技場拋在身後。',
   'entities.items.wildheart_tuskblade.name': '荒野之心獠牙巨刃',
   'entities.items.wildheart_hexwood_staff.name': '盆地巫木法杖',
   'entities.items.wildheart_fangknife.name': '祖爾加的獠牙匕首',
