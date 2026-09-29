@@ -6,8 +6,8 @@ import type { Aura, Entity } from '../types';
 
 export const COLDSIGHT_READ_AURA_ID = 'hunter_coldsight_read';
 export const COLDSIGHT_READ_DURATION_SEC = 10;
-export const COLDSIGHT_READ_LONG_DRAW_MULT = 1.5; // aimed_shot ("Long Draw")
-export const COLDSIGHT_READ_FELL_SHOT_MULT = 1.75; // arcane_shot ("Fell Shot")
+export const COLDSIGHT_READ_LONG_DRAW_MULT = 1.6; // aimed_shot ("Long Draw")
+export const COLDSIGHT_READ_FELL_SHOT_MULT = 1.85; // arcane_shot ("Fell Shot")
 
 export const FEVERED_DRAW_ABILITY_ID = 'rapid_fire';
 export const FEVERED_DRAW_PULSE_COUNT = 6; // rapid_fire's authored channel.ticks

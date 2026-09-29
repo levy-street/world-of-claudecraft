@@ -66,8 +66,9 @@ const OFFENSIVE_SPEC_TUNING: Partial<Record<PlayerClass, Record<string, Offensiv
     // Fieldcraft: survival offensive ability bonus (0.30 legacy + 0.15 here
     // = 0.45 total); AP is a stats.apPct edit (0.15 -> 0.22).
     survival: { physical: 0.15 },
-    // Coldsight numeric budget: a new offensive physical bonus, no AP change.
-    marksmanship: { physical: 0.1 },
+    // MM sustained floor: offense only, so stats, utility, autos and pets
+    // keep their existing values. Paired budget: docs/design/marksmanship-damage-budget.md.
+    marksmanship: { physical: 0.63 },
   },
   priest: {
     // Doctrine: discipline personal primary damage x1.30. Discipline carries

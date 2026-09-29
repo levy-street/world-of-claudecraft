@@ -125,6 +125,7 @@ export const CI_LONG_SUITES = Object.freeze([
   'tests/druid_balance_probe.test.ts',
   'tests/eastbrook_gameplay_integration.test.ts',
   'tests/hunter_dps_balance.test.ts',
+  'tests/marksmanship_damage_budget.test.ts',
   'tests/nythraxis_matrix.test.ts',
   // The owned-class harness pair was split into single-responsibility files
   // (2026-08-13) so no lane or shard chain carries a 13-minute single file:

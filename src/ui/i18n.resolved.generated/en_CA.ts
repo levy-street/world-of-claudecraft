@@ -13681,7 +13681,7 @@ export const en_CA: EnTranslations = {
       "arcane_shot": {
         "name": "Fell Shot",
         "description": "Shoot the target for {damage} Arcane damage. Damage increases with Ranged Attack Power.",
-        "specNote_marksmanship": "Coldsight Read from a completed Fevered Draw makes your next Fell Shot deal 75% more damage. Firing the shot spends Read."
+        "specNote_marksmanship": "Coldsight Read from a completed Fevered Draw makes your next Fell Shot deal 85% more damage. Firing the shot spends Read."
       },
       "concussive_shot": {
         "name": "Rattling Shot",
@@ -13713,11 +13713,11 @@ export const en_CA: EnTranslations = {
       },
       "aimed_shot": {
         "name": "Long Draw",
-        "description": "Shoot the target for {damage} Physical damage. Damage increases with Ranged Attack Power. Coldsight Read from a completed Fevered Draw makes your next Long Draw deal 50% more damage. Starting the cast spends Read."
+        "description": "Shoot the target for {damage} Physical damage. Damage increases with Ranged Attack Power. Coldsight Read from a completed Fevered Draw makes your next Long Draw deal 60% more damage. Starting the cast spends Read."
       },
       "rapid_fire": {
         "name": "Fevered Draw",
-        "description": "Fire 6 shots over 2.4 sec while moving. Each shot deals {damage} Physical damage and increases with Ranged Attack Power. Completing all 6 shots grants Coldsight Read for 10 sec: your next Long Draw deals 50% more damage, or your next Fell Shot deals 75% more. Starting either shot spends Read, even if interrupted."
+        "description": "Fire 6 shots over 2.4 sec while moving. Each shot deals {damage} Physical damage and increases with Ranged Attack Power. Completing all 6 shots grants Coldsight Read for 10 sec: your next Long Draw deals 60% more damage, or your next Fell Shot deals 85% more. Starting either shot spends Read, even if interrupted."
       },
       "smite": {
         "name": "Scouring Hymn",

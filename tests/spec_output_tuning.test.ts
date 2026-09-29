@@ -60,10 +60,13 @@ describe('offensiveAbilityBonus', () => {
     ).toBeCloseTo(0.15);
   });
 
-  it('gives Coldsight (hunter/marksmanship) its own, smaller offensive bonus', () => {
+  it('gives Coldsight (hunter/marksmanship) its own sustained offensive bonus', () => {
     expect(
       offensiveAbilityBonus(ability('hunter', 'nature', 'ranged'), mods('marksmanship')),
-    ).toBeCloseTo(0.1);
+    ).toBeCloseTo(0.63);
+    expect(
+      offensiveAbilityBonus(ability('hunter', 'nature', 'ranged'), mods('beast_mastery')),
+    ).toBe(0);
   });
 
   it('gives Doctrine (priest/discipline) the offensive bonus on both buckets (covers Hymn/Smite, hostile Scouring Mercy, Mindfracture, Dirge, and wand output)', () => {

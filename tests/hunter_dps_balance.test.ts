@@ -47,7 +47,12 @@ function matrix(targets: number): Record<string, number> {
 // (paying the BM debt lands the ratios inside, still green); the 3T ceiling
 // IS the design 1.15 and its floor is this round's measured value. After the
 // kit-item pass, collapse these back to the design bands.
-describe('Hunter v0.29 deterministic DPS alignment', () => {
+// 2026-09-29: the intentional MM-only +25-35% pass supersedes the MM
+// ceilings/floors above. Full/diet ST MM:BM is 2.130362/2.151268;
+// 3T BM:MM is 0.620542/0.618658. Re-pinned with the prior relative
+// margins, rounded outward; SV bounds stay unchanged. Paired release
+// evidence: docs/design/marksmanship-damage-budget.md.
+describe('Hunter deterministic DPS alignment', () => {
   it(
     'holds the single-target loops between design parity and the band-round ceiling',
     () => {
@@ -58,7 +63,7 @@ describe('Hunter v0.29 deterministic DPS alignment', () => {
       // The design floors remain unchanged. Profile and sibling-control
       // evidence: docs/design/class-balance-v042-results.md.
       expect(dps.marksmanship / dps.beast_mastery).toBeGreaterThanOrEqual(0.95);
-      expect(dps.marksmanship / dps.beast_mastery).toBeLessThanOrEqual(band(1.69, 1.75));
+      expect(dps.marksmanship / dps.beast_mastery).toBeLessThanOrEqual(band(2.26, 2.33));
       expect(dps.survival / dps.beast_mastery).toBeGreaterThanOrEqual(0.92);
       // Full SV ratio 1.335203, with the former 1.29/1.2010 margin -> 1.43.
       // Diet SV 1.409778 already passes 1.47; retain that ceiling.
@@ -84,7 +89,7 @@ describe('Hunter v0.29 deterministic DPS alignment', () => {
       // measure 0.8225; the five-seed full sweep passes its 0.8 floor
       // unchanged, so the lead itself is intact and only the thin-lane
       // anchor moved (same relative margin at the new actual).
-      expect(dps.beast_mastery / nextBest).toBeGreaterThanOrEqual(band(0.8, 0.78));
+      expect(dps.beast_mastery / nextBest).toBeGreaterThanOrEqual(band(0.6, 0.58));
       expect(dps.beast_mastery / nextBest).toBeLessThanOrEqual(1.15);
     },
     TEST_TIMEOUT_MS,

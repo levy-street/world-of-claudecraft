@@ -865,7 +865,7 @@ const classAbilityNamesEn = {
         'Shoot the target for {damage} Arcane damage. Damage increases with Ranged Attack Power.',
         {
           marksmanship:
-            'Coldsight Read from a completed Fevered Draw makes your next Fell Shot deal 75% more damage. Firing the shot spends Read.',
+            'Coldsight Read from a completed Fevered Draw makes your next Fell Shot deal 85% more damage. Firing the shot spends Read.',
         },
       ],
       [
@@ -906,12 +906,12 @@ const classAbilityNamesEn = {
       [
         'aimed_shot',
         'Long Draw',
-        'Shoot the target for {damage} Physical damage. Damage increases with Ranged Attack Power. Coldsight Read from a completed Fevered Draw makes your next Long Draw deal 50% more damage. Starting the cast spends Read.',
+        'Shoot the target for {damage} Physical damage. Damage increases with Ranged Attack Power. Coldsight Read from a completed Fevered Draw makes your next Long Draw deal 60% more damage. Starting the cast spends Read.',
       ],
       [
         'rapid_fire',
         'Fevered Draw',
-        'Fire 6 shots over 2.4 sec while moving. Each shot deals {damage} Physical damage and increases with Ranged Attack Power. Completing all 6 shots grants Coldsight Read for 10 sec: your next Long Draw deals 50% more damage, or your next Fell Shot deals 75% more. Starting either shot spends Read, even if interrupted.',
+        'Fire 6 shots over 2.4 sec while moving. Each shot deals {damage} Physical damage and increases with Ranged Attack Power. Completing all 6 shots grants Coldsight Read for 10 sec: your next Long Draw deals 60% more damage, or your next Fell Shot deals 85% more. Starting either shot spends Read, even if interrupted.',
       ],
       [
         'smite',
