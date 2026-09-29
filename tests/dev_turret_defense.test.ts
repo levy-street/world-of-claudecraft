@@ -38,6 +38,22 @@ describe('/dev turret', () => {
     expect(sim.turretSession).toBeNull();
   });
 
+  it('refuses a server player (database character id) until online play lands', () => {
+    const sim = new Sim({
+      seed: WORLD_SEED,
+      playerClass: 'warrior',
+      devCommands: true,
+      noPlayer: true,
+    });
+    const pid = sim.addPlayer('warrior', 'Probe', { characterId: 7 });
+    sim.drainEvents();
+    sim.chat('/dev turret', pid);
+    const logs = devLogs(sim.drainEvents());
+    expect(logs).toEqual(['[dev] Turret refused: offline only until online play lands.']);
+    expect(sim.meta(pid)?.vehicle ?? null).toBeNull();
+    expect(sim.entities.get(pid)?.mountKey).not.toBe(TURRET_TANK_MOUNT);
+  });
+
   it('ignores other dev lines', () => {
     const { sim } = rig();
     expect(handleDevTurretChat(sim.ctx, '/dev turrets', sim.playerId)).toBe(false);
