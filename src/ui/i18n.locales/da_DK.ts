@@ -1640,6 +1640,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Sød sejr',
   'questUi.worldQuest.matchConfections': 'Matchende tryllebetut konfekturer',
   'questUi.worldQuest.mineOre': 'Miner kobber ore',
+  'questUi.worldQuest.mineMaterial': 'Udvind {name}',
   'questUi.worldQuest.practiceRewards':
     'Øvelse: spil igen uden at tjene flere mønter, erfaring eller rygte.',
   'questUi.worldQuest.puzzleBeamReach': 'Krystaller nået: {count}',

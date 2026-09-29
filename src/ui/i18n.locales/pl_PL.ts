@@ -1656,6 +1656,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Słodkie zwycięstwo',
   'questUi.worldQuest.matchConfections': 'Dopasuj czarowane słodycze',
   'questUi.worldQuest.mineOre': 'Kopanie rudy miedzi',
+  'questUi.worldQuest.mineMaterial': 'Wydobądź: {name}',
   'questUi.worldQuest.practiceRewards':
     'Trening: graj ponownie bez zdobywania więcej monet, doświadczenia ani reputacji.',
   'questUi.worldQuest.puzzleBeamReach': 'Kryształy osiągnięte: {count}',

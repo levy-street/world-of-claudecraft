@@ -1662,6 +1662,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Kemenangan manis',
   'questUi.worldQuest.matchConfections': 'Cocokkan permen yang dipesona',
   'questUi.worldQuest.mineOre': 'Tambang bijih tembaga',
+  'questUi.worldQuest.mineMaterial': 'Tambang {name}',
   'questUi.worldQuest.practiceRewards':
     'Praktik: mainkan lagi tanpa menghasilkan lebih banyak koin, pengalaman atau reputasi.',
   'questUi.worldQuest.puzzleBeamReach': 'Kristal tercapai: {count}',

@@ -12324,6 +12324,7 @@ export const tr_TR: EnTranslations = {
       "activeStatus": "Aktif dünya görevi",
       "expiresIn": "Şu zaman sona eriyor {time}",
       "mineOre": "Bakır cevheri kaz",
+      "mineMaterial": "{name} çıkar",
       "recoverObject": "{name} kurtarin",
       "redirectLeyBeam": "Ley isinini yonlendir",
       "matchConfections": "Büyülü şekerleme eşleştir",

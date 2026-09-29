@@ -12324,6 +12324,7 @@ export const da_DK: EnTranslations = {
       "activeStatus": "Aktiv verden quest",
       "expiresIn": "Udløber om {time}",
       "mineOre": "Miner kobber ore",
+      "mineMaterial": "Udvind {name}",
       "recoverObject": "Genindvind {name}",
       "redirectLeyBeam": "Omdiriger leysstrålen",
       "matchConfections": "Matchende tryllebetut konfekturer",

@@ -1626,6 +1626,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Tatlı zafer',
   'questUi.worldQuest.matchConfections': 'Büyülü şekerleme eşleştir',
   'questUi.worldQuest.mineOre': 'Bakır cevheri kaz',
+  'questUi.worldQuest.mineMaterial': '{name} çıkar',
   'questUi.worldQuest.practiceRewards':
     'Pratik: daha fazla para, deneyim veya ün kazanmadan tekrar oyna.',
   'questUi.worldQuest.puzzleBeamReach': 'Kristallere ulaşıldı: {count}',

@@ -1640,6 +1640,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Söt seger',
   'questUi.worldQuest.matchConfections': 'Matcha förtrollad godis',
   'questUi.worldQuest.mineOre': 'Bryta kopparmalm',
+  'questUi.worldQuest.mineMaterial': 'Bryt {name}',
   'questUi.worldQuest.practiceRewards':
     'Träning: spela igen utan att tjäna mer mynt, erfarenhet eller rykte.',
   'questUi.worldQuest.puzzleBeamReach': 'Kristaller nådd: {count}',

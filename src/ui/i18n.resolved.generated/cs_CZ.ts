@@ -12324,6 +12324,7 @@ export const cs_CZ: EnTranslations = {
       "activeStatus": "Aktivní světový úkol",
       "expiresIn": "Vyprší za {time}",
       "mineOre": "Těž měděnou rudu",
+      "mineMaterial": "Těž {name}",
       "recoverObject": "Získej zpět {name}",
       "redirectLeyBeam": "Přesměruj ley paprsek",
       "matchConfections": "Spojuj okouzlené cukrovinky",

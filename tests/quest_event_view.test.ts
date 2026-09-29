@@ -5,6 +5,18 @@ import { questEventPresentation } from '../src/ui/quest_event_view';
 import { worldQuestDisplayName } from '../src/ui/world_quest_view';
 
 describe('quest event presentation', () => {
+  it('reports osmium rather than copper for Willowfen mining progress', () => {
+    const progress = questEventPresentation({
+      type: 'worldQuestProgress',
+      questId: 'wq_willowfen_ore',
+      count: 1,
+      required: 3,
+      pid: 1,
+    });
+    expect(progress?.logText).toBe('Mine Osmium Ore: 1/3');
+    expect(progress?.flashText).toBe('Mine Osmium Ore: 1/3');
+  });
+
   it.each(['bronze', 'silver', 'gold'] as const)(
     'keeps %s score in the durable log without changing normal completion feedback',
     (rating) => {

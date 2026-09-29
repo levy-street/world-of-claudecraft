@@ -4469,6 +4469,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.activeStatus': '進行中のワールドクエスト',
   'questUi.worldQuest.expiresIn': '終了まで{time}',
   'questUi.worldQuest.mineOre': '銅鉱石を採掘',
+  'questUi.worldQuest.mineMaterial': '{name}を採掘',
   'questUi.worldQuest.recoverObject': '{name}を回収',
   'questUi.worldQuest.redirectLeyBeam': 'レイビームを目的地へ導く',
   'questUi.worldQuest.puzzleTitle': 'レイビームの調整',

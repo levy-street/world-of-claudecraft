@@ -12324,6 +12324,7 @@ export const en: EnTranslations = {
       "activeStatus": "Active world quest",
       "expiresIn": "Expires in {time}",
       "mineOre": "Mine copper ore",
+      "mineMaterial": "Mine {name}",
       "recoverObject": "Recover {name}",
       "redirectLeyBeam": "Redirect the ley beam",
       "matchConfections": "Match enchanted confections",

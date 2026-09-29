@@ -12324,6 +12324,7 @@ export const de_DE: EnTranslations = {
       "activeStatus": "Aktive Weltquest",
       "expiresIn": "Läuft ab in {time}",
       "mineOre": "Baut Kupfererz ab",
+      "mineMaterial": "Baut {name} ab",
       "recoverObject": "Bergt {name}",
       "redirectLeyBeam": "Lenkt den Ley-Strahl um",
       "matchConfections": "Verzauberte Konfekte kombinieren",

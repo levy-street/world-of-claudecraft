@@ -12324,6 +12324,7 @@ export const es: EnTranslations = {
       "activeStatus": "Misión de mundo activa",
       "expiresIn": "Caduca en {time}",
       "mineOre": "Extrae mineral de cobre",
+      "mineMaterial": "Extrae {name}",
       "recoverObject": "Recupera {name}",
       "redirectLeyBeam": "Redirige el rayo ley",
       "matchConfections": "Combina dulces encantados",

@@ -12324,6 +12324,7 @@ export const en_XA: EnTranslations = {
       "activeStatus": "[Áçţíʋé ŵóŕļð ɋúéšţ]",
       "expiresIn": "[Éẋþíŕéš íñ {time}]",
       "mineOre": "[Ɱíñé çóþþéŕ óŕé]",
+      "mineMaterial": "[Ɱíñé {name}]",
       "recoverObject": "[Ŕéçóʋéŕ {name}]",
       "redirectLeyBeam": "[Ŕéðíŕéçţ ţĥé ļéý ƀéáɱ]",
       "matchConfections": "[Ɱáţçĥ éñçĥáñţéð çóñƒéçţíóñš]",

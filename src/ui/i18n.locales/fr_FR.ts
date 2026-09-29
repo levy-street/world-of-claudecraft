@@ -1709,6 +1709,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Douce victoire',
   'questUi.worldQuest.matchConfections': 'Assemblez des confiseries enchantées',
   'questUi.worldQuest.mineOre': 'Minez du minerai de cuivre',
+  'questUi.worldQuest.mineMaterial': 'Extrayez {name}',
   'questUi.worldQuest.practiceRewards':
     "Entraînement : rejouez sans gagner davantage de pièces, d'expérience ou de réputation.",
   'questUi.worldQuest.puzzleBeamReach': 'Cristaux atteints : {count}',

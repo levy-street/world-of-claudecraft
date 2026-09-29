@@ -8,6 +8,7 @@ import {
 } from '../sim/factions';
 import { itemLevel } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
+import { nodeMaterialFor } from '../sim/professions/gathering_materials';
 import type { PlayerClass, WorldQuestDef } from '../sim/types';
 import { worldQuestItemRewardForQuest } from '../sim/world_quest_item_slots';
 import { worldQuestCopperReward, worldQuestXpReward } from '../sim/world_quests';
@@ -58,7 +59,10 @@ export function worldQuestObjectiveLabel(questId: string): string {
   if (quest.objective.type === 'escort') {
     return t('questUi.worldQuest.escortCaravan', { zone: zoneDisplayName(quest.zoneId) });
   }
-  if (quest.objective.type === 'gather') return t('questUi.worldQuest.mineOre');
+  if (quest.objective.type === 'gather') {
+    const material = nodeMaterialFor(quest.objective.nodeType, quest.zoneId);
+    return t('questUi.worldQuest.mineMaterial', { name: itemDisplayName(ITEMS[material.itemId]) });
+  }
   if (quest.objective.type === 'puzzle') return t('questUi.worldQuest.redirectLeyBeam');
   if (quest.objective.type === 'match3') return t('questUi.worldQuest.matchConfections');
   if (quest.objective.type === 'delivery') return t('questUi.worldQuest.loadFreight');

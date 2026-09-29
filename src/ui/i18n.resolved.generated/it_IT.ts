@@ -12324,6 +12324,7 @@ export const it_IT: EnTranslations = {
       "activeStatus": "Missione mondiale attiva",
       "expiresIn": "Scade tra {time}",
       "mineOre": "Estrai minerale di rame",
+      "mineMaterial": "Estrai {name}",
       "recoverObject": "Recupera {name}",
       "redirectLeyBeam": "Reindirizza il fascio ley",
       "matchConfections": "Abbina i dolciumi incantati",

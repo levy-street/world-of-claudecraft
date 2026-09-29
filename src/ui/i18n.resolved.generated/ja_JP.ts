@@ -12324,6 +12324,7 @@ export const ja_JP: EnTranslations = {
       "activeStatus": "進行中のワールドクエスト",
       "expiresIn": "終了まで{time}",
       "mineOre": "銅鉱石を採掘",
+      "mineMaterial": "{name}を採掘",
       "recoverObject": "{name}を回収",
       "redirectLeyBeam": "レイビームを目的地へ導く",
       "matchConfections": "魔法のお菓子を揃える",

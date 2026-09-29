@@ -12324,6 +12324,7 @@ export const fr_FR: EnTranslations = {
       "activeStatus": "Quête mondiale active",
       "expiresIn": "Expire dans {time}",
       "mineOre": "Minez du minerai de cuivre",
+      "mineMaterial": "Extrayez {name}",
       "recoverObject": "Récupérez {name}",
       "redirectLeyBeam": "Redirigez le rayon de ley",
       "matchConfections": "Assemblez des confiseries enchantées",

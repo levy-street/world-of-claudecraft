@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { WORLD_QUESTS_BY_ID } from '../src/sim/data';
 import { createGroundObject } from '../src/sim/entity';
 import { entityDisplayName } from '../src/ui/entity_display_core';
+import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 import {
   worldQuestDisplayName,
   worldQuestObjectiveLabel,
@@ -12,6 +13,21 @@ import {
 } from '../src/ui/world_quest_view';
 
 describe('world quest view', () => {
+  it('names the ore actually harvested in Willowfen', () => {
+    expect(worldQuestObjectiveLabel('wq_willowfen_ore')).toBe('Mine Osmium Ore');
+    expect(worldQuestDisplayName('wq_willowfen_ore')).toBe('The Willowfen: Mine Osmium Ore');
+  });
+
+  it('uses the translated ore name in the Spanish Willowfen objective', async () => {
+    await ensureLocaleLoaded('es');
+    setLanguage('es');
+    try {
+      expect(worldQuestObjectiveLabel('wq_willowfen_ore')).toBe('Extrae Mineral de Osmio');
+    } finally {
+      setLanguage('en');
+    }
+  });
+
   it('distinguishes the Last Keep defense from the existing cannon quest', () => {
     expect(worldQuestDisplayName('wq_last_keep_cannon')).toBe('The Last Keep Cannon');
     expect(worldQuestObjectiveLabel('wq_last_keep_cannon')).toBe(

@@ -4286,6 +4286,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.activeStatus': '进行中的世界任务',
   'questUi.worldQuest.expiresIn': '{time}后结束',
   'questUi.worldQuest.mineOre': '开采铜矿石',
+  'questUi.worldQuest.mineMaterial': '开采{name}',
   'questUi.worldQuest.recoverObject': '回收{name}',
   'questUi.worldQuest.redirectLeyBeam': '引导魔网光束',
   'questUi.worldQuest.puzzleTitle': '魔网光束校准',

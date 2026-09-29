@@ -15243,6 +15243,7 @@ export type TranslationKeyFlat =
   | 'questUi.worldQuest.match3VictoryDetail'
   | 'questUi.worldQuest.match3VictoryTitle'
   | 'questUi.worldQuest.matchConfections'
+  | 'questUi.worldQuest.mineMaterial'
   | 'questUi.worldQuest.mineOre'
   | 'questUi.worldQuest.practiceRewards'
   | 'questUi.worldQuest.puzzleBeamReach'

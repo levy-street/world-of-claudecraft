@@ -8806,6 +8806,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.activeStatus': 'Misión de mundo activa',
   'questUi.worldQuest.expiresIn': 'Caduca en {time}',
   'questUi.worldQuest.mineOre': 'Extrae mineral de cobre',
+  'questUi.worldQuest.mineMaterial': 'Extrae {name}',
   'questUi.worldQuest.recoverObject': 'Recupera {name}',
   'questUi.worldQuest.redirectLeyBeam': 'Redirige el rayo ley',
   'questUi.worldQuest.puzzleTitle': 'Alineación del rayo ley',

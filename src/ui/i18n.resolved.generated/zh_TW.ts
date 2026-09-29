@@ -12324,6 +12324,7 @@ export const zh_TW: EnTranslations = {
       "activeStatus": "進行中的世界任務",
       "expiresIn": "{time}後結束",
       "mineOre": "開採銅礦石",
+      "mineMaterial": "開採{name}",
       "recoverObject": "回收{name}",
       "redirectLeyBeam": "引導魔網光束",
       "matchConfections": "配對魔法糖果",

@@ -12324,6 +12324,7 @@ export const ko_KR: EnTranslations = {
       "activeStatus": "진행 중인 전역 퀘스트",
       "expiresIn": "{time} 후 종료",
       "mineOre": "구리 광석 채굴",
+      "mineMaterial": "{name} 채굴",
       "recoverObject": "{name} 회수",
       "redirectLeyBeam": "지맥 광선의 방향을 바꾸기",
       "matchConfections": "마법 과자 맞추기",

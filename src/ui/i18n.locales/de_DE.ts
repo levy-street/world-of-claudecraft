@@ -1701,6 +1701,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Süßer Sieg',
   'questUi.worldQuest.matchConfections': 'Verzauberte Konfekte kombinieren',
   'questUi.worldQuest.mineOre': 'Baut Kupfererz ab',
+  'questUi.worldQuest.mineMaterial': 'Baut {name} ab',
   'questUi.worldQuest.practiceRewards':
     'Übung: Spielt erneut, ohne weitere Münzen, Erfahrung oder Ruf zu verdienen.',
   'questUi.worldQuest.puzzleBeamReach': 'Erreichte Kristalle: {count}',

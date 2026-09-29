@@ -12324,6 +12324,7 @@ export const sv_SE: EnTranslations = {
       "activeStatus": "Aktivt världsuppdrag",
       "expiresIn": "Upphör om {time}",
       "mineOre": "Bryta kopparmalm",
+      "mineMaterial": "Bryt {name}",
       "recoverObject": "Återhämta {name}",
       "redirectLeyBeam": "Omdirigera ljusstralens",
       "matchConfections": "Matcha förtrollad godis",

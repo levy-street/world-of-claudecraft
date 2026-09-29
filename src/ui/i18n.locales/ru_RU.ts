@@ -4520,6 +4520,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.activeStatus': 'Активное локальное задание',
   'questUi.worldQuest.expiresIn': 'Истекает через {time}',
   'questUi.worldQuest.mineOre': 'Добыть медную руду',
+  'questUi.worldQuest.mineMaterial': 'Добудьте {name}',
   'questUi.worldQuest.recoverObject': 'Вернуть: {name}',
   'questUi.worldQuest.redirectLeyBeam': 'Направить силовой луч',
   'questUi.worldQuest.puzzleTitle': 'Настройка силового луча',

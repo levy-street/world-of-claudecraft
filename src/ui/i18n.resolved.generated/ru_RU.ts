@@ -12324,6 +12324,7 @@ export const ru_RU: EnTranslations = {
       "activeStatus": "Активное локальное задание",
       "expiresIn": "Истекает через {time}",
       "mineOre": "Добыть медную руду",
+      "mineMaterial": "Добудьте {name}",
       "recoverObject": "Вернуть: {name}",
       "redirectLeyBeam": "Направить силовой луч",
       "matchConfections": "Собрать зачарованные сладости",

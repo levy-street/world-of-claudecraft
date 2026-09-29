@@ -12324,6 +12324,7 @@ export const pl_PL: EnTranslations = {
       "activeStatus": "Aktywne zadanie światowe",
       "expiresIn": "Wygasa za {time}",
       "mineOre": "Kopanie rudy miedzi",
+      "mineMaterial": "Wydobądź: {name}",
       "recoverObject": "Odzyskaj {name}",
       "redirectLeyBeam": "Przekieruj wiązkę linii magii",
       "matchConfections": "Dopasuj czarowane słodycze",

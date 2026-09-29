@@ -4436,6 +4436,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.activeStatus': '진행 중인 전역 퀘스트',
   'questUi.worldQuest.expiresIn': '{time} 후 종료',
   'questUi.worldQuest.mineOre': '구리 광석 채굴',
+  'questUi.worldQuest.mineMaterial': '{name} 채굴',
   'questUi.worldQuest.recoverObject': '{name} 회수',
   'questUi.worldQuest.redirectLeyBeam': '지맥 광선의 방향을 바꾸기',
   'questUi.worldQuest.puzzleTitle': '지맥 광선 정렬',

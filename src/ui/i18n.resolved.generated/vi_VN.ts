@@ -12324,6 +12324,7 @@ export const vi_VN: EnTranslations = {
       "activeStatus": "World quest hoạt động",
       "expiresIn": "Hết hạn trong {time}",
       "mineOre": "Khai thác đồng",
+      "mineMaterial": "Khai thác {name}",
       "recoverObject": "Khôi phục {name}",
       "redirectLeyBeam": "Chuyển hướng tia ley",
       "matchConfections": "Xếp bánh ngọt được mê hoặc",

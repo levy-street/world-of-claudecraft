@@ -1638,6 +1638,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Chiến thắng ngọt',
   'questUi.worldQuest.matchConfections': 'Xếp bánh ngọt được mê hoặc',
   'questUi.worldQuest.mineOre': 'Khai thác đồng',
+  'questUi.worldQuest.mineMaterial': 'Khai thác {name}',
   'questUi.worldQuest.practiceRewards':
     'Tập luyện: chơi lại mà không kiếm thêm tiền xu, kinh nghiệm, hoặc phần thưởng.',
   'questUi.worldQuest.puzzleBeamReach': 'Tinh thể đạt được: {count}',

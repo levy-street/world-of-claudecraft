@@ -1661,6 +1661,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Zoete overwinning',
   'questUi.worldQuest.matchConfections': 'Combineer betoverde snoepjes',
   'questUi.worldQuest.mineOre': 'Mijnen koperhout',
+  'questUi.worldQuest.mineMaterial': 'Delf {name}',
   'questUi.worldQuest.practiceRewards':
     'Oefening: speel opnieuw zonder meer munten, ervaring of reputatie te verdienen.',
   'questUi.worldQuest.puzzleBeamReach': 'Kristallen bereikt: {count}',

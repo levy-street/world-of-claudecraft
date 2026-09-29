@@ -12324,6 +12324,7 @@ export const nl_NL: EnTranslations = {
       "activeStatus": "Actieve wereldquest",
       "expiresIn": "Verloopt over {time}",
       "mineOre": "Mijnen koperhout",
+      "mineMaterial": "Delf {name}",
       "recoverObject": "{name} Herwinnen",
       "redirectLeyBeam": "Buig de magie-straal af",
       "matchConfections": "Combineer betoverde snoepjes",

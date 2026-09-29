@@ -1695,6 +1695,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Dolce vittoria',
   'questUi.worldQuest.matchConfections': 'Abbina i dolciumi incantati',
   'questUi.worldQuest.mineOre': 'Estrai minerale di rame',
+  'questUi.worldQuest.mineMaterial': 'Estrai {name}',
   'questUi.worldQuest.practiceRewards':
     'Prova: gioca di nuovo senza guadagnare altre monete, esperienza o reputazione.',
   'questUi.worldQuest.puzzleBeamReach': 'Cristalli raggiunti: {count}',

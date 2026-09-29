@@ -1637,6 +1637,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Sladké vítězství',
   'questUi.worldQuest.matchConfections': 'Spojuj okouzlené cukrovinky',
   'questUi.worldQuest.mineOre': 'Těž měděnou rudu',
+  'questUi.worldQuest.mineMaterial': 'Těž {name}',
   'questUi.worldQuest.practiceRewards':
     'Trénink: hraj znovu bez zisku dalších mincí, zkušeností nebo pověsti.',
   'questUi.worldQuest.puzzleBeamReach': 'Dosažené krystaly: {count}',

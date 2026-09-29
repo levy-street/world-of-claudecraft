@@ -12324,6 +12324,7 @@ export const id_ID: EnTranslations = {
       "activeStatus": "Misi dunia aktif",
       "expiresIn": "Kedaluwarsa dalam {time}",
       "mineOre": "Tambang bijih tembaga",
+      "mineMaterial": "Tambang {name}",
       "recoverObject": "Pulihkan {name}",
       "redirectLeyBeam": "Alihkan berkas ley",
       "matchConfections": "Cocokkan permen yang dipesona",
