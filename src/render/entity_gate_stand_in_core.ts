@@ -236,4 +236,13 @@ export const ENTITY_GATE_STAND_INS: readonly EntityGateStandIn[] = [
     standIn:
       "the renderer's boot-prewarmed Vfx particle cloud, which the weapon bursts at the muzzle and the blast only while its own root is still hidden or its page texels have not landed from their idle slot (CannonShellVisuals.revealed), and the camera kick; the thrown monsters themselves (their rigs or capsules) show where the blast landed, on every graphics tier, until the gate settles or its GATED_ATTACH_WATCHDOG_MS reveal",
   },
+  {
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/turret_ground_markers.ts',
+    callSite: 'void attachSceneGroupGated(parent, this.root,',
+    hides:
+      "the red ground marker under every living Fire and Fly monster (one instanced draw on its own material), minted when the player is first seen seated in the turret, until its program links, under the label live-gate:fire-and-fly-ground-markers; the turret's intro countdown runs before the first wave marches in from the clearing's edge",
+    standIn:
+      "the monsters themselves: each one's rig, or its capsule on the prewarmed calligraphy material (world_quest_trace_materials.ts) at its exact position, with its health bar and, during a windup, its red strike ring, on every graphics tier, until the gate settles or its GATED_ATTACH_WATCHDOG_MS reveal",
+  },
 ];

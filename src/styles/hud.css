@@ -380,6 +380,7 @@
   .vehicle-bar.turret-bar {
     grid-template-columns: minmax(0, 1fr);
     width: min(420px, calc(100% - 24px));
+    z-index: 5;
   }
   .turret-bar-status {
     display: flex;
@@ -409,6 +410,39 @@
   }
   .turret-result:not(.won) .turret-result-title {
     color: var(--color-vehicle-text);
+  }
+  /* A strike on the turret: the seat HUD (turret_hit_flash_painter.ts) drives these
+     variables per frame for the flash's life and hides the overlay between strikes.
+     The overlay sits where the low-health vignette does and never eats pointer
+     events; the bar glows red and swings sideways. Reduced motion is applied by the
+     controller (a softer flash, no swing). */
+  #turret-hit-vignette {
+    --turret-hit-flash: 0;
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    background: var(--low-health-veil);
+    opacity: var(--turret-hit-flash);
+  }
+  .vehicle-bar.turret-bar .vehicle-integrity {
+    --turret-hit-glow: 0;
+    --turret-hit-shake: 0;
+    isolation: isolate;
+    translate: calc(var(--turret-hit-shake) * 6px) 0;
+    box-shadow: 0 0 calc(var(--turret-hit-glow) * 14px) calc(var(--turret-hit-glow) * 3px)
+      var(--color-vehicle-danger);
+  }
+  .vehicle-bar.turret-bar .vehicle-integrity::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--color-vehicle-danger);
+    opacity: calc(var(--turret-hit-glow) * 0.6);
+    pointer-events: none;
+  }
+  .vehicle-bar.turret-bar .vehicle-integrity-text {
+    z-index: 1;
   }
   /* ---------- nameplates ---------- */
   .nameplate {
@@ -10617,12 +10651,7 @@
     pointer-events: none;
     --lhv-opacity: 0;
     --lhv-pulse: 1.6s;
-    background: radial-gradient(
-      ellipse at center,
-      rgba(120, 0, 0, 0) 42%,
-      rgba(150, 0, 0, 0.35) 74%,
-      rgba(190, 0, 0, 0.85) 100%
-    );
+    background: var(--low-health-veil);
     animation: lhv-breathe var(--lhv-pulse) ease-in-out infinite;
   }
   #low-health-vignette.active {

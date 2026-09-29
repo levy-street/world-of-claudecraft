@@ -252,6 +252,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/vehicle/turret_hud_view.ts',
   'src/ui/hud/vehicle/turret_feedback_reader_core.ts',
   'src/ui/hud/vehicle/turret_damage_numbers_core.ts',
+  'src/ui/hud/vehicle/turret_hit_feedback_core.ts',
   'src/ui/map_entity_disclosure_core.ts',
   'src/ui/map_navigation_landmarks_core.ts',
   'src/ui/map_marker_profile_core.ts',
@@ -950,6 +951,7 @@ const RENDER_PURE_CORES = [
   'src/render/cannon_puff_burst_core.ts',
   'src/render/turret_motion_forecast_core.ts',
   'src/render/turret_contact_dust_core.ts',
+  'src/render/turret_ground_marker_core.ts',
   'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
   'src/render/character_effects_core.ts',
@@ -2675,6 +2677,8 @@ const UI_DOM_MODULES = [
   'src/ui/hud/vehicle/shadow_action_bar_controller.ts',
   'src/ui/hud/vehicle/forge_action_bar_controller.ts',
   'src/ui/hud/vehicle/turret_hud_controller.ts',
+  // Reads the OS reduced-motion query and the in-game Reduce Motion body class.
+  'src/ui/hud/vehicle/reduced_motion_probe.ts',
   'src/ui/account_portal_dom.ts',
   'src/ui/appearance_customizer.ts',
   // Owns browser state on purpose: it mints the reticle tick ring's root and

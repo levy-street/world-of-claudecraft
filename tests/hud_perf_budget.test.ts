@@ -580,6 +580,9 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.className': 10 },
     reflowAllow: {},
   },
+  // The Fire and Fly hit flash: the edge overlay and the integrity bar's glow and
+  // swing, every write through the shared facet, none between strikes.
+  { file: 'hud/vehicle/turret_hit_flash_painter.ts', allow: {}, reflowAllow: {} },
   // Both writes are build-time. The .className is the base class stamped on a tick
   // as it is MINTED into the pool (the pool only grows to the high-water tick
   // count), and the .setAttribute is the one aria-hidden on the ring root in

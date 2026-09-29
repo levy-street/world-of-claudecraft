@@ -1,11 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
 import { SFX_CLIPS } from '../src/game/sfx_manifest.generated';
 import {
+  TURRET_BREACH_SFX,
   TURRET_FIRE_SFX,
   TURRET_IMPACT_SFX,
   TurretDefenseSfx,
   type TurretSfxCue,
   turretBlastSize,
+  turretBreachCueInto,
   turretSfxCueInto,
 } from '../src/game/turret_defense_sfx';
 import {
@@ -118,11 +120,27 @@ describe('Fire and Fly sound cues', () => {
     expect(turretBlastSize(Array.from({ length: 9 }, () => ({ falloff: 1 })))).toBe(1);
   });
 
+  it('crunches the turret where the strike landed, louder and deeper the more it cost', () => {
+    const clips: Record<string, { spatial: boolean; variants: readonly unknown[] }> = SFX_CLIPS;
+    expect(clips[TURRET_BREACH_SFX]?.spatial).toBe(true);
+    expect(clips[TURRET_BREACH_SFX]?.variants.length).toBeGreaterThan(1);
+    const at = { x: 103, y: 5, z: 200 };
+    const light = turretBreachCueInto(1, at, cue());
+    expect(light).toMatchObject({ key: TURRET_BREACH_SFX, x: 103, y: 5, z: 200, jitter: true });
+    const lightGain = light.gain;
+    const lightRate = light.rate;
+    const heavy = turretBreachCueInto(12, at, cue());
+    expect(heavy.gain).toBeGreaterThan(lightGain);
+    expect(heavy.rate).toBeLessThan(lightRate);
+    expect(heavy.rate).toBeGreaterThan(0.5);
+  });
+
   it('keeps every other event silent', () => {
     const quiet: TurretEvent[] = [
       { type: 'waveStart', wave: 0, count: 3 },
       { type: 'landed', id: 1, x: 0, y: 0, z: 0 },
       { type: 'windupStart', id: 1, x: 0, z: 0 },
+      { type: 'breach', id: 1, points: 4, integrity: 96, x: 3, y: 0, z: 0 },
     ];
     for (const event of quiet) expect(turretSfxCueInto(event, origin, cue())).toBeNull();
   });
@@ -145,6 +163,7 @@ describe('Fire and Fly sound player', () => {
       [
         TURRET_FIRE_SFX,
         TURRET_IMPACT_SFX,
+        TURRET_BREACH_SFX,
         TURRET_THUMP_LIGHT_SFX,
         TURRET_THUMP_HEAVY_SFX,
         TURRET_KNOCK_SFX,
@@ -255,6 +274,32 @@ describe('Fire and Fly sound player', () => {
     sounds.update(session(stale), 60);
     expect(s.playAt).not.toHaveBeenCalled();
     sounds.update(session([...stale, entry(5, 60, fired)]), 60);
+    expect(s.playAt).toHaveBeenCalledTimes(1);
+  });
+
+  it('plays one crunch for the strikes of a frame, at the strongest, and skips stale ones', () => {
+    const s = sink();
+    const sounds = player(s);
+    const strike = (id: number, points: number, x: number): TurretEvent => ({
+      type: 'breach',
+      id,
+      points,
+      integrity: 100 - points,
+      x,
+      y: 5,
+      z: 200,
+    });
+    sounds.update(session([entry(1, 40, strike(1, 8, 90))]), 60);
+    expect(s.playAt).not.toHaveBeenCalled();
+    const ring = [entry(1, 40, strike(1, 8, 90)), entry(2, 60, strike(1, 2, 97))];
+    ring.push(entry(3, 60, strike(2, 10, 103)));
+    sounds.update(session(ring), 60);
+    expect(s.playAt).toHaveBeenCalledTimes(1);
+    const [key, x, , , opts] = s.playAt.mock.calls[0];
+    expect(key).toBe(TURRET_BREACH_SFX);
+    expect(x).toBe(103);
+    expect(opts).toMatchObject({ gain: turretBreachCueInto(12, { x: 0, y: 0, z: 0 }, cue()).gain });
+    sounds.update(session(ring), 61);
     expect(s.playAt).toHaveBeenCalledTimes(1);
   });
 

@@ -3,8 +3,11 @@ import { TURRET_TIMING } from '../../../sim/content/turret_defense';
 import type { IWorldVehicles } from '../../../world_api/vehicles';
 import { t } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
+import { createReducedMotionProbe } from './reduced_motion_probe';
 import { TurretAimCore } from './turret_aim_core';
 import { TurretDamageNumbers, type TurretFctSpawn } from './turret_damage_numbers_core';
+import { TurretHitFeedback } from './turret_hit_feedback_core';
+import { TurretHitFlashPainter } from './turret_hit_flash_painter';
 import {
   TURRET_RESULT_LINES,
   type TurretBanner,
@@ -17,11 +20,17 @@ type TurretHudWorld = Pick<
   'turretSession' | 'turretClock' | 'useVehicleAction' | 'leaveVehicle'
 >;
 
-/** The HUD surfaces the seat reports through: the banner slot and the floating combat text. */
+/** The HUD surfaces the seat reports through: banner slot, floating combat text, camera. */
 export interface TurretHudHooks {
   showBanner?(banner: TurretBanner): void;
   spawnFct?: TurretFctSpawn;
+  /** Camera trauma for a strike on the turret. */
+  addShake?(amount: number): void;
+  /** Read once per strike; defaults to the OS setting or the in-game Reduce Motion switch. */
+  reducedMotion?(): boolean;
 }
+
+export const TURRET_HIT_OVERLAY_ID = 'turret-hit-vignette';
 
 /** The Fire and Fly seat HUD: integrity, wave, countdowns, the result panel and Leave. */
 export class TurretHudController {
@@ -39,10 +48,13 @@ export class TurretHudController {
   private readonly resultTitle = document.createElement('div');
   private readonly resultLines: HTMLElement[] = [];
   private readonly leave = document.createElement('button');
+  private readonly hitVeil = document.createElement('div');
   private readonly view = new TurretHudView();
   private readonly feedback = new TurretFeedbackCursor();
   private readonly sounds = new TurretDefenseSfx();
   private readonly numbers: TurretDamageNumbers | null;
+  private readonly hits: TurretHitFeedback;
+  private readonly hitFlash: TurretHitFlashPainter;
   private seated = false;
   constructor(
     private readonly world: TurretHudWorld,
@@ -66,6 +78,7 @@ export class TurretHudController {
     this.resultTitle.className = 'turret-result-title';
     this.leave.className = 'vehicle-exit';
     this.leave.type = 'button';
+    this.hitVeil.id = TURRET_HIT_OVERLAY_ID;
     writers.setAttr(this.status, 'role', 'status');
     writers.setAttr(this.gauge, 'role', 'meter');
     writers.setAttr(this.gauge, 'aria-valuemin', '0');
@@ -82,7 +95,14 @@ export class TurretHudController {
     this.root.append(this.title, this.status, this.gauge, this.phase, this.result, this.leave);
     writers.setDisplay(this.root, 'none');
     writers.setDisplay(this.result, 'none');
-    document.getElementById('ui')?.append(this.root);
+    writers.setAttr(this.hitVeil, 'aria-hidden', 'true');
+    writers.setDisplay(this.hitVeil, 'none');
+    document.getElementById('ui')?.append(this.root, this.hitVeil);
+    this.hits = new TurretHitFeedback(
+      () => performance.now(),
+      hooks.reducedMotion ?? createReducedMotionProbe(),
+    );
+    this.hitFlash = new TurretHitFlashPainter(writers, this.hitVeil, this.gauge);
   }
 
   get active(): boolean {
@@ -103,6 +123,9 @@ export class TurretHudController {
     if (banner) this.hooks.showBanner?.(banner);
     this.sounds.update(session, this.world.turretClock);
     this.numbers?.update(session, this.world.turretClock);
+    const hit = this.hits.update(session, this.world.turretClock);
+    this.hitFlash.paint(hit);
+    if (hit.cameraShake > 0) this.hooks.addShake?.(hit.cameraShake);
     if (!session) return;
     const frame = this.view.tick(session, this.world.turretClock);
     writers.setText(this.title, t('hudChrome.turret.title'));

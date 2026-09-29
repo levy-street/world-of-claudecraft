@@ -1,7 +1,11 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { sfx } from '../src/game/sfx';
-import { TURRET_FIRE_SFX, TURRET_IMPACT_SFX } from '../src/game/turret_defense_sfx';
+import {
+  TURRET_BREACH_SFX,
+  TURRET_FIRE_SFX,
+  TURRET_IMPACT_SFX,
+} from '../src/game/turret_defense_sfx';
 import {
   TURRET_KNOCK_SFX,
   TURRET_THUMP_HEAVY_SFX,
@@ -15,6 +19,11 @@ import { turretSessionView } from '../src/sim/turret_defense_session';
 import type { TurretSession, VehicleSession } from '../src/sim/types';
 import { createHudVehicleBar } from '../src/ui/hud/vehicle/hud_vehicle_bar';
 import { TurretAimCore } from '../src/ui/hud/vehicle/turret_aim_core';
+import {
+  TURRET_HIT_ATTACK_MS,
+  TURRET_HIT_RELEASE_MS,
+} from '../src/ui/hud/vehicle/turret_hit_feedback_core';
+import { TURRET_HIT_OVERLAY_ID } from '../src/ui/hud/vehicle/turret_hud_controller';
 import { VehicleActionBarController } from '../src/ui/hud/vehicle/vehicle_action_bar_controller';
 import { VehicleAimCore } from '../src/ui/hud/vehicle/vehicle_aim_core';
 import { setLanguage } from '../src/ui/i18n';
@@ -40,6 +49,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
   document.body.replaceChildren();
   document.body.className = '';
 });
@@ -172,7 +182,7 @@ it('marks a won result panel', () => {
   expect(text('.turret-result-title')).toBe('Victory!');
 });
 
-function hudHost() {
+function hudHost(renderer?: { setGroundAimReticle(value: null): void; addShake(n: number): void }) {
   const world = {
     vehicleSession: null as VehicleSession | null,
     turretSession: null as TurretSessionView | null,
@@ -189,7 +199,7 @@ function hudHost() {
     keybinds: { primaryLabel: () => '' },
     optionsHooks: null,
     peekGuard: { consume: () => false },
-    renderer: undefined,
+    renderer,
     playerGroundAim: { cancel: vi.fn() },
     empowerHold: { cancel: vi.fn() },
     fctPainter: { spawn },
@@ -344,4 +354,121 @@ it('plays the cannon report and the blast once each from the seat frame', () => 
       'mob_ogre_hurt',
     ]),
   );
+});
+
+function struck(session: TurretSession, points: number, tick = START): void {
+  session.nextFeedbackSeq = recordTurretFeedback(session.feedback, session.nextFeedbackSeq, tick, [
+    {
+      type: 'breach',
+      id: 3,
+      points,
+      integrity: TURRET_TIMING.integrity - points,
+      x: 4,
+      y: 0,
+      z: 0,
+    },
+  ]);
+  session.defense.integrity -= points;
+  session.defense.rev++;
+}
+
+it('flashes the screen edges and the integrity bar on a strike, then clears them', () => {
+  let now = 5000;
+  vi.spyOn(performance, 'now').mockImplementation(() => now);
+  const renderer = { setGroundAimReticle: vi.fn(), addShake: vi.fn() };
+  const { world, bar } = hudHost(renderer);
+  const session = seat();
+  world.turretSession = turretSessionView(session);
+  world.turretClock = START;
+  bar.update();
+  const overlay = document.getElementById(TURRET_HIT_OVERLAY_ID)!;
+  expect(overlay.parentElement?.id).toBe('ui');
+  expect(overlay.getAttribute('aria-hidden')).toBe('true');
+  expect(overlay.style.display).toBe('none');
+  struck(session, 10);
+  world.turretSession = turretSessionView(session);
+  bar.update();
+  expect(overlay.style.display).toBe('');
+  expect(renderer.addShake).toHaveBeenCalledTimes(1);
+  expect(renderer.addShake.mock.calls[0][0]).toBeGreaterThan(0);
+  now += TURRET_HIT_ATTACK_MS;
+  bar.update();
+  const gauge = hud().querySelector<HTMLElement>('.vehicle-integrity')!;
+  expect(Number(overlay.style.getPropertyValue('--turret-hit-flash'))).toBeGreaterThan(0.5);
+  expect(Number(gauge.style.getPropertyValue('--turret-hit-glow'))).toBeGreaterThan(0.5);
+  now += TURRET_HIT_RELEASE_MS;
+  bar.update();
+  bar.update();
+  expect(renderer.addShake).toHaveBeenCalledTimes(1);
+  expect(overlay.style.display).toBe('none');
+  expect(overlay.style.getPropertyValue('--turret-hit-flash')).toBe('0.000');
+  expect(gauge.style.getPropertyValue('--turret-hit-glow')).toBe('0.000');
+  expect(gauge.style.getPropertyValue('--turret-hit-shake')).toBe('0.000');
+});
+
+it('keeps the camera still and the bar steady under the in-game Reduce Motion switch', () => {
+  let now = 5000;
+  vi.spyOn(performance, 'now').mockImplementation(() => now);
+  document.body.classList.add('reduce-motion');
+  const renderer = { setGroundAimReticle: vi.fn(), addShake: vi.fn() };
+  const { world, bar } = hudHost(renderer);
+  const session = seat();
+  world.turretClock = START;
+  struck(session, 12);
+  world.turretSession = turretSessionView(session);
+  bar.update();
+  const gauge = hud().querySelector<HTMLElement>('.vehicle-integrity')!;
+  for (let i = 0; i < 8; i++) {
+    now += 16;
+    bar.update();
+    expect(gauge.style.getPropertyValue('--turret-hit-shake')).toBe('0.000');
+  }
+  expect(renderer.addShake).not.toHaveBeenCalled();
+  const overlay = document.getElementById(TURRET_HIT_OVERLAY_ID)!;
+  expect(Number(overlay.style.getPropertyValue('--turret-hit-flash'))).toBeGreaterThan(0);
+});
+
+it('keeps the camera still under the OS reduced-motion setting, resolving its query once', () => {
+  let now = 5000;
+  vi.spyOn(performance, 'now').mockImplementation(() => now);
+  const query = '(prefers-reduced-motion: reduce)';
+  const matchMedia = vi.fn((q: string) => ({ matches: q === query }) as MediaQueryList);
+  vi.stubGlobal('matchMedia', matchMedia);
+  const renderer = { setGroundAimReticle: vi.fn(), addShake: vi.fn() };
+  const { world, bar } = hudHost(renderer);
+  const session = seat();
+  world.turretSession = turretSessionView(session);
+  world.turretClock = START;
+  bar.update();
+  struck(session, 12);
+  world.turretSession = turretSessionView(session);
+  bar.update();
+  now += TURRET_HIT_ATTACK_MS;
+  struck(session, 4);
+  world.turretSession = turretSessionView(session);
+  bar.update();
+  const gauge = hud().querySelector<HTMLElement>('.vehicle-integrity')!;
+  expect(gauge.style.getPropertyValue('--turret-hit-shake')).toBe('0.000');
+  expect(Number(gauge.style.getPropertyValue('--turret-hit-glow'))).toBeGreaterThan(0);
+  expect(renderer.addShake).not.toHaveBeenCalled();
+  expect(matchMedia.mock.calls.filter(([q]) => q === query)).toHaveLength(1);
+});
+
+it('crunches the turret once per strike frame, and preloads the crunch with the seat', () => {
+  vi.mocked(sfx.playAt).mockClear();
+  vi.mocked(sfx.preload).mockClear();
+  const { world, bar } = rig();
+  const session = seat();
+  world.turretSession = turretSessionView(session);
+  world.turretClock = START;
+  bar.update();
+  expect(vi.mocked(sfx.preload).mock.calls.map((call) => call[0])).toContain(TURRET_BREACH_SFX);
+  struck(session, 2);
+  struck(session, 10);
+  world.turretSession = turretSessionView(session);
+  bar.update();
+  bar.update();
+  const breaches = vi.mocked(sfx.playAt).mock.calls.filter((call) => call[0] === TURRET_BREACH_SFX);
+  expect(breaches).toHaveLength(1);
+  expect(breaches[0].slice(1, 4)).toEqual([4, 0, 0]);
 });

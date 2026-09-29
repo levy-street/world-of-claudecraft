@@ -203,7 +203,7 @@ const UI_ROOT_TOUCHERS: Record<string, string> = {
   'src/ui/hud/vehicle/vehicle_action_bar_controller.ts':
     'the cannon vehicle action bar, shown only while the player mans a cannon (transient, activity-scoped)',
   'src/ui/hud/vehicle/turret_hud_controller.ts':
-    'the Fire and Fly seat HUD, shown only while the player is seated in the turret (transient, activity-scoped)',
+    'the Fire and Fly seat HUD, shown only while the player is seated in the turret (transient, activity-scoped), and its hit-flash edge veil, a decorative pointer-inert overlay shown only while a strike flashes',
 };
 
 /** Registry frames whose elements are minted at runtime rather than written

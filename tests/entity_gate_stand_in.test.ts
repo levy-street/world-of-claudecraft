@@ -25,6 +25,7 @@ import {
 import { gpuPrepEventsSnapshot, resetGpuPrepEventsForTest } from '../src/render/gpu_prep_events';
 import { NAMEPLATE_RANGE, nameplatePlanInto, newNameplatePlan } from '../src/render/nameplate_view';
 import { TurretSlotBook } from '../src/render/turret_defense_pool_core';
+import { TurretGroundMarkers } from '../src/render/turret_ground_markers';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import type { Entity } from '../src/sim/types';
 import { INTERACT_RANGE } from '../src/sim/types';
@@ -101,6 +102,12 @@ const GATE_CALL_SITES: readonly {
     // The cannon's shot pieces: one gated attach of the whole weapon root.
     gate: 'attachSceneGroupGated',
     file: 'src/render/cannon_shell_visuals.ts',
+    marker: 'attachSceneGroupGated(',
+  },
+  {
+    // The Fire and Fly ground markers: one gated attach of the marker pool.
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/turret_ground_markers.ts',
     marker: 'attachSceneGroupGated(',
   },
 ];
@@ -576,6 +583,25 @@ describe('entity gate stand-ins actually stand in', () => {
     const painter = stripComments(sourceOf('src/render/turret_defense_visual.ts'));
     expect(painter).toContain('body.standIn.visible = !rig;');
     expect(painter).toContain('if (!this.book.rigReady[i] && this.rigs[i].gate.visible)');
+  });
+
+  it('Fire and Fly ground marker gate: each monster draws its own body while the marker pool links', async () => {
+    let settle: () => void = () => {};
+    const gate = vi.fn(() => new Promise<void>((resolve) => (settle = resolve)));
+    const markers = new TurretGroundMarkers({ ground: () => 0 }, gate);
+    markers.prepare(new THREE.Scene(), 4);
+    expect(gate).toHaveBeenCalledWith(markers.root);
+    expect(markers.root.visible).toBe(false);
+    // The monster's rig or capsule never waits on the marker: the painter draws
+    // one of the two for every body whatever the marker gate's state.
+    const painter = stripComments(sourceOf('src/render/turret_defense_visual.ts'));
+    expect(painter).toContain('body.standIn.visible = !rig;');
+    expect(painter).not.toMatch(/groundMarkers\.[a-z]+[^;]*standIn/);
+    settle();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(markers.root.visible).toBe(true);
+    markers.dispose();
   });
 
   it('Fire and Fly weapon gate: the prewarmed particles draw a shot until its pieces link', async () => {

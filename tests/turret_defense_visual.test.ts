@@ -13,6 +13,8 @@ import { drawProgramSignature } from '../src/render/draw_program_signature_core'
 import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
 import type { IdleBudget, IdleScheduler } from '../src/render/idle_queue';
 import { turretBodyCapacity, turretRigCapacities } from '../src/render/turret_defense_pool_core';
+import { TURRET_MARKER_LIFT, turretMarkerRadius } from '../src/render/turret_ground_marker_core';
+import type { TurretGroundMarkers } from '../src/render/turret_ground_markers';
 import {
   buildWorldQuestTraceStandIn,
   worldQuestTraceMaterials,
@@ -211,6 +213,29 @@ function weaponPosition(visual: TurretDefenseVisual, role: string): THREE.Vector
   return new THREE.Vector3().setFromMatrixPosition(m);
 }
 
+function groundMarkers(visual: TurretDefenseVisual): THREE.InstancedMesh {
+  const found = part(visual, 'fire-and-fly-ground-markers').children[0];
+  if (!(found instanceof THREE.InstancedMesh)) throw new Error('ground marker pool expected');
+  return found;
+}
+
+/** Where each drawn ground marker lies, and its radius. */
+function groundMarkerSpots(visual: TurretDefenseVisual): { p: THREE.Vector3; radius: number }[] {
+  const mesh = groundMarkers(visual);
+  if (!mesh.visible) return [];
+  const m = new THREE.Matrix4();
+  const q = new THREE.Quaternion();
+  const spots: { p: THREE.Vector3; radius: number }[] = [];
+  for (let i = 0; i < mesh.count; i++) {
+    const p = new THREE.Vector3();
+    const s = new THREE.Vector3();
+    mesh.getMatrixAt(i, m);
+    m.decompose(p, q, s);
+    spots.push({ p, radius: s.x });
+  }
+  return spots;
+}
+
 function capsules(visual: TurretDefenseVisual): THREE.Mesh[] {
   return markers(visual).filter((c) => c.geometry instanceof THREE.CapsuleGeometry);
 }
@@ -372,6 +397,7 @@ describe('Fire and Fly monsters on screen', () => {
     for (let i = 0; i < 5; i++) visual.update(null, null, i * 0.016, 0.016);
     expect(actors.made).toHaveLength(0);
     expect(markers(visual)).toHaveLength(0);
+    expect(visual.group.getObjectByName('fire-and-fly-ground-markers')).toBeUndefined();
     expect(visual.group.visible).toBe(false);
     visual.dispose();
     expect(scene.children).not.toContain(visual.group);
@@ -575,6 +601,86 @@ describe('Fire and Fly monsters on screen', () => {
     expect(rings[0].position.x).toBeCloseTo(3, 9);
     expect(rings[0].position.z).toBeCloseTo(4, 9);
     expect(rings[0].renderOrder).toBe(floorVfxRenderOrder('encounter'));
+    visual.dispose();
+  });
+
+  it('marks every living monster on the ground under it, in flight too, and never a corpse, a gone body or a windup', () => {
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0);
+    const state = engine(0);
+    const flight = {
+      kind: 'fly' as const,
+      start: 0,
+      end: 40,
+      x: 5,
+      y: 0,
+      z: 0,
+      vx: 4,
+      vy: 12,
+      vz: 0,
+      g: 30,
+      contact: 'ground' as const,
+      nx: 0,
+      nz: 0,
+    };
+    const still = (x: number, z: number) => stillSegment(0, 40, { x, y: 0, z });
+    const monsters = [
+      wolf(state, { id: 1, hp: 50, state: 'fly', seg: flight }),
+      wolf(state, { id: 2, seg: marchSegment(0, 30, 0, 0, 0, 0, 4, 2) }),
+      wolf(state, { id: 3, state: 'down', seg: still(-8, 6) }),
+      wolf(state, { id: 4, hp: 0, state: 'dead', seg: still(12, 12) }),
+      wolf(state, { id: 5, hp: 0, state: 'gone', seg: still(-12, -12) }),
+      wolf(state, { id: 6, state: 'windup', seg: still(3, 4) }),
+      // Killed mid-air: a corpse in flight loses its marker at once.
+      wolf(state, { id: 7, hp: 0, state: 'fly', seg: { ...flight, x: -5, vx: -4 } }),
+    ];
+    const tick = 10;
+    visual.update(viewOf({ ...state, monsters }), tick, 0, 0.016);
+    const spots = groundMarkerSpots(visual);
+    expect(spots).toHaveLength(3);
+    const radius = turretMarkerRadius(state.plan.kinds[wolfKind(state)].radius);
+    for (const id of [1, 2, 3]) {
+      const m = monsters.find((w) => w.id === id);
+      if (!m) throw new Error(`monster ${id}`);
+      const body = positionAt(m.seg, tick, flat);
+      const spot = spots.find(
+        (s) => Math.abs(s.p.x - body.x) < 1e-5 && Math.abs(s.p.z - body.z) < 1e-5,
+      );
+      expect(spot, `monster ${id}`).toBeDefined();
+      expect(spot?.p.y).toBeCloseTo(TURRET_MARKER_LIFT, 5);
+      expect(spot?.radius).toBeCloseTo(radius, 5);
+    }
+    // The flyer is well up in the air over its marker.
+    expect(positionAt(flight, tick, flat).y).toBeGreaterThan(2);
+    // Over the dust, under every body's capsule, strike ring and health bar.
+    const order = groundMarkers(visual).renderOrder;
+    expect(order).toBeGreaterThan(weaponPiece(visual, 'puff').renderOrder);
+    for (const mesh of markers(visual)) expect(order).toBeLessThan(mesh.renderOrder);
+    // The capsule writes no depth, so only its order keeps the disc off its lower
+    // half; it still paints under the ring and the bar.
+    const [capsule] = capsules(visual);
+    expect((capsule.material as THREE.Material).depthWrite).toBe(false);
+    for (const mesh of markers(visual)) {
+      if (mesh.geometry instanceof THREE.CapsuleGeometry) continue;
+      expect(capsule.renderOrder).toBeLessThan(mesh.renderOrder);
+    }
+    visual.update(viewOf({ ...state, monsters: [] }), tick, 0, 0.016);
+    expect(groundMarkerSpots(visual)).toHaveLength(0);
+    visual.dispose();
+  });
+
+  it('builds the ground markers once at the commitment, sized for every body, behind the same gate', () => {
+    const gate = vi.fn((_target: THREE.Object3D) => new Promise<void>(() => {}));
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0, gate);
+    const state = engine(0);
+    visual.update(viewOf(state), 0, 0, 0.016);
+    const root = part(visual, 'fire-and-fly-ground-markers');
+    expect(gate).toHaveBeenCalledWith(root);
+    expect(root.visible).toBe(false);
+    const mesh = groundMarkers(visual);
+    expect(mesh.instanceMatrix.count).toBe(turretBodyCapacity(state.plan));
+    visual.update(viewOf(engine(200)), 200, 0, 0.016);
+    expect(groundMarkers(visual)).toBe(mesh);
+    expect(gate.mock.calls.filter(([target]) => target === root)).toHaveLength(1);
     visual.dispose();
   });
 
@@ -1034,5 +1140,31 @@ describe('Fire and Fly monsters on screen', () => {
     expect(() => visual.dispose()).toThrow(AggregateError);
     for (const actor of actors.made) expect(actor.dispose).toHaveBeenCalledTimes(1);
     for (const spy of released) expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('reports a ground marker disposal failure alongside a rig failure, never in place of it', async () => {
+    actors.made.length = 0;
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0, undefined, never);
+    const view = viewOf(engine(0));
+    visual.update(view, 0, 0, 0.016);
+    await flush();
+    visual.update(view, 0, 0, 0.016);
+    const rigFailure = new Error('rig');
+    actors.made[0].dispose.mockImplementation(() => {
+      throw rigFailure;
+    });
+    const markerFailure = new Error('markers');
+    const inner = visual as unknown as { groundMarkers: TurretGroundMarkers };
+    vi.spyOn(inner.groundMarkers, 'dispose').mockImplementation(() => {
+      throw markerFailure;
+    });
+    let thrown: unknown = null;
+    try {
+      visual.dispose();
+    } catch (error) {
+      thrown = error;
+    }
+    expect(thrown).toBeInstanceOf(AggregateError);
+    expect((thrown as AggregateError).errors).toEqual([rigFailure, markerFailure]);
   });
 });

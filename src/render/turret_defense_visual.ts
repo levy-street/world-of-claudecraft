@@ -14,7 +14,8 @@
 // materials meanwhile). A health bar and a strike ring are what a player acts
 // on: they paint over the cannon's dust (a higher rung of the floor ladder than
 // the puff draw) and the bar faces the camera upright over the body, whatever
-// its tumble. Pure halves: turret_monster_pose_core.ts,
+// its tumble. Every living monster also carries a red ground marker, drawn by
+// turret_ground_markers.ts. Pure halves: turret_monster_pose_core.ts,
 // turret_motion_forecast_core.ts, turret_contact_dust_core.ts and
 // turret_defense_pool_core.ts.
 import * as THREE from 'three';
@@ -54,6 +55,8 @@ import {
   turretRigCapacities,
   turretUrgentTemplates,
 } from './turret_defense_pool_core';
+import { TurretMarkerGround } from './turret_ground_marker_core';
+import { TURRET_MARKER_ORDER, TurretGroundMarkers } from './turret_ground_markers';
 import {
   newTurretMonsterPose,
   TurretAttitude,
@@ -93,6 +96,7 @@ interface BodySlot {
   owner: number | null;
   readonly attitude: TurretAttitude;
   readonly forecast: TurretMotionForecast;
+  readonly slope: TurretMarkerGround;
   readonly standIn: THREE.Mesh;
   readonly health: THREE.Mesh;
   readonly ring: THREE.Mesh;
@@ -146,6 +150,7 @@ export class TurretDefenseVisual {
   private readonly clock = new TurretDisplayClock();
   private readonly cursor = new TurretFeedbackCursor();
   private readonly weapon: CannonShellVisuals;
+  private readonly groundMarkers: TurretGroundMarkers;
   private barrelSource: THREE.Object3D | null = null;
   private readonly pose = newTurretMonsterPose();
   private readonly probe: ThrowProbe;
@@ -195,6 +200,7 @@ export class TurretDefenseVisual {
     private readonly idleScheduler?: IdleScheduler,
   ) {
     this.probe = { ground: groundAt, water: () => null };
+    this.groundMarkers = new TurretGroundMarkers(this.probe, compileGate);
     this.weapon = new CannonShellVisuals({
       blastRadius: TURRET_WEAPON.blastRadius,
       groundAt,
@@ -267,6 +273,7 @@ export class TurretDefenseVisual {
     for (const body of this.bodies) body.used = false;
     const frozen = defense.phase === 'lost';
     const step = Math.max(0, Math.min(dt, 0.1));
+    this.groundMarkers.begin();
     for (const m of defense.monsters) {
       const b = this.book.bodyOf(m.id);
       const kind = defense.plan.kinds[m.kind];
@@ -276,6 +283,7 @@ export class TurretDefenseVisual {
         body.owner = m.id;
         body.attitude.reset();
         body.forecast.reset();
+        body.slope.reset();
       }
       const motion = body.forecast.resolve(m, kind, defense, tick, this.probe, TURRET_PHYSICS);
       const pose = turretMonsterPoseInto(
@@ -288,6 +296,7 @@ export class TurretDefenseVisual {
         defense,
       );
       body.forecast.blend(pose, tick, this.probe);
+      this.groundMarkers.push(motion, pose, kind.radius, body.slope);
       body.attitude.step(pose, tick, reducedMotion);
       const r = this.book.rigOf(m.id);
       const rig = r >= 0 ? this.rigs[r] : null;
@@ -345,6 +354,7 @@ export class TurretDefenseVisual {
       if (body.used) continue;
       body.standIn.visible = body.health.visible = body.ring.visible = false;
     }
+    this.groundMarkers.end();
     this.weapon.update(tick, time);
   }
 
@@ -381,7 +391,9 @@ export class TurretDefenseVisual {
     if (plan !== this.plan) {
       this.plan = plan;
       this.capacities = turretRigCapacities(plan);
-      this.growMarkers(turretBodyCapacity(plan));
+      const bodies = turretBodyCapacity(plan);
+      this.growMarkers(bodies);
+      this.groundMarkers.prepare(this.group, bodies);
       this.orderWave = -1;
     }
     if (wave !== this.orderWave) {
@@ -469,12 +481,16 @@ export class TurretDefenseVisual {
       const health = this.marker(geometry.box, materials.green);
       const ring = this.marker(geometry.ring, materials.red);
       ring.rotation.x = -Math.PI / 2;
+      // The capsule writes no depth: it sorts after the ground marker under it,
+      // or the disc would blend over its lower half.
+      standIn.renderOrder = TURRET_MARKER_ORDER + 1;
       ring.renderOrder = floorVfxRenderOrder('encounter');
       health.renderOrder = floorVfxRenderOrder('encounter', 1);
       this.bodies.push({
         owner: null,
         attitude: new TurretAttitude(),
         forecast: new TurretMotionForecast(),
+        slope: new TurretMarkerGround(),
         standIn,
         health,
         ring,
@@ -660,7 +676,13 @@ export class TurretDefenseVisual {
     } catch (error) {
       errors.push(error);
     }
-    // Materials are page-lifetime prewarmed resources, owned by their cache.
+    try {
+      this.groundMarkers.dispose();
+    } catch (error) {
+      errors.push(error);
+    }
+    // The capsule, bar and ring materials are page-lifetime prewarmed resources,
+    // owned by their cache; the ground markers released their own above.
     if (errors.length > 0) throw new AggregateError(errors, 'Fire and Fly rigs failed to dispose');
   }
 }

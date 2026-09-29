@@ -195,6 +195,7 @@ export class VehicleActionBarController {
     this.turret = new TurretHudController(deps.world, deps.writers, deps.cancelOnEnter, {
       showBanner: deps.showBanner,
       spawnFct: deps.spawnFct,
+      addShake: (amount) => deps.presentation?.addShake(amount),
     });
   }
 
