@@ -17,7 +17,8 @@
 // on: they paint over the cannon's dust (a higher rung of the floor ladder than
 // the puff draw) and the bar faces the camera upright over the body, whatever
 // its tumble. Every living monster also carries a red ground marker, drawn by
-// turret_ground_markers.ts. Pure halves: turret_monster_pose_core.ts,
+// turret_ground_markers.ts, and the explosive barrels are
+// turret_barrel_visual.ts. Pure halves: turret_monster_pose_core.ts,
 // turret_motion_forecast_core.ts, turret_contact_dust_core.ts,
 // turret_defense_pool_core.ts and turret_tower_core.ts.
 import * as THREE from 'three';
@@ -37,6 +38,13 @@ import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { type IdleScheduler, idleSlot } from './idle_queue';
 import { GAIT_RUN_ENTER } from './locomotion';
+import {
+  TURRET_BARREL_BURSTS,
+  TURRET_BARREL_IMPACTS,
+  type TurretBarrelSource,
+  TurretBarrelVisual,
+  turretBarrelBlast,
+} from './turret_barrel_visual';
 import {
   newTurretContact,
   TURRET_CONTACT_BURSTS,
@@ -158,6 +166,8 @@ export class TurretDefenseVisual {
   private readonly clock = new TurretDisplayClock();
   private readonly cursor = new TurretFeedbackCursor();
   private readonly weapon: CannonShellVisuals;
+  private readonly barrels: TurretBarrelVisual;
+  private readonly takeBurst = (now: number) => this.weapon.puffBurst(now);
   private readonly groundMarkers: TurretGroundMarkers;
   private readonly tower: TurretTowerVisual;
   private readonly gunner = { x: 0, y: 0, z: 0 };
@@ -198,6 +208,7 @@ export class TurretDefenseVisual {
   private idleBuildPending = false;
   private nowMs = 0;
   private towerRetryAtMs = Number.NEGATIVE_INFINITY;
+  private barrelRetryAtMs = Number.NEGATIVE_INFINITY;
   private startTick = Number.NaN;
   private charactersState: 'idle' | 'loading' | 'ready' | 'failed' = 'idle';
   private disposed = false;
@@ -209,6 +220,7 @@ export class TurretDefenseVisual {
     private readonly compileGate?: CompileGate,
     private readonly idleScheduler?: IdleScheduler,
     towerSource?: TurretTowerSource,
+    barrelSource?: TurretBarrelSource,
   ) {
     this.probe = { ground: groundAt, water: () => null };
     this.tower = new TurretTowerVisual(compileGate, towerSource);
@@ -217,7 +229,8 @@ export class TurretDefenseVisual {
       blastRadius: TURRET_WEAPON.blastRadius,
       groundAt,
       compileGate,
-      bursts: { slots: TURRET_CONTACT_BURSTS, puffs: TURRET_CONTACT_PUFFS },
+      bursts: { slots: TURRET_CONTACT_BURSTS + TURRET_BARREL_BURSTS, puffs: TURRET_CONTACT_PUFFS },
+      impacts: TURRET_BARREL_IMPACTS,
       texelSlot: () =>
         idleSlot(RIG_IDLE_TIMEOUT_MS, {
           scheduler: this.idleScheduler,
@@ -225,6 +238,12 @@ export class TurretDefenseVisual {
         }),
     });
     this.contactCounts = turretContactCounts(this.weapon.lowEffects);
+    this.barrels = new TurretBarrelVisual(
+      groundAt,
+      compileGate,
+      barrelSource,
+      this.weapon.lowEffects,
+    );
     this.effectGate = compileGate
       ? (target, settle) => {
           void compileGate(target).then(
@@ -371,6 +390,7 @@ export class TurretDefenseVisual {
       body.standIn.visible = body.health.visible = body.ring.visible = false;
     }
     this.groundMarkers.end();
+    this.barrels.update(defense.barrels, frozen, tick, time);
     this.weapon.update(tick, time);
   }
 
@@ -382,6 +402,7 @@ export class TurretDefenseVisual {
     this.clock.reset();
     this.cursor.reset();
     this.weapon.clear();
+    this.barrels.clear();
     for (const body of this.bodies) body.owner = null;
   }
 
@@ -415,6 +436,11 @@ export class TurretDefenseVisual {
           this.towerRetryAtMs = this.nowMs + RIG_RETRY_MS;
         },
       );
+    }
+    if (!this.barrels.prepared && this.nowMs >= this.barrelRetryAtMs) {
+      this.barrels.prepare(this.group, () => {
+        this.barrelRetryAtMs = this.nowMs + RIG_RETRY_MS;
+      });
     }
     if (plan !== this.plan) {
       this.plan = plan;
@@ -588,15 +614,16 @@ export class TurretDefenseVisual {
         case 'impact':
           if (stale) break;
           this.weapon.impact(ev, time, reducedMotion);
-          for (const hit of ev.hits) {
-            const rig = this.rigFor(hit.id);
-            if (!rig) continue;
-            rig.actor.respondToElement(
-              'fire',
-              Math.min(0.95, FLASH_MIN + FLASH_GAIN * hit.falloff),
-            );
-            if (hit.falloff >= CORE_HIT_FALLOFF) this.coreHits.push(hit.id);
-          }
+          this.scorchRigs(ev.hits);
+          break;
+        case 'barrelLit':
+          if (!stale) this.barrels.light(ev, this.weapon.puffBurst(time), time);
+          break;
+        case 'barrelExploded':
+          if (stale) break;
+          this.weapon.impact(turretBarrelBlast(ev), time, reducedMotion);
+          this.barrels.explode(ev, this.takeBurst, time);
+          this.scorchRigs(ev.hits);
           break;
         // The stagger at every contact: playHit's own cooldown spaces a
         // bounce from its launch, and a corpse's death clip overrides it. The
@@ -633,6 +660,16 @@ export class TurretDefenseVisual {
           this.rigFor(ev.id)?.actor.playAttack();
           break;
       }
+    }
+  }
+
+  /** The scorch a blast leaves on each body it struck; a core hit's launch freezes on it. */
+  private scorchRigs(hits: readonly { readonly id: number; readonly falloff: number }[]): void {
+    for (const hit of hits) {
+      const rig = this.rigFor(hit.id);
+      if (!rig) continue;
+      rig.actor.respondToElement('fire', Math.min(0.95, FLASH_MIN + FLASH_GAIN * hit.falloff));
+      if (hit.falloff >= CORE_HIT_FALLOFF) this.coreHits.push(hit.id);
     }
   }
 
@@ -708,6 +745,11 @@ export class TurretDefenseVisual {
     }
     try {
       this.tower.dispose();
+    } catch (error) {
+      errors.push(error);
+    }
+    try {
+      this.barrels.dispose();
     } catch (error) {
       errors.push(error);
     }

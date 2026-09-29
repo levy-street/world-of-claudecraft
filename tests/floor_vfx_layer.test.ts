@@ -165,6 +165,8 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/rift_death_zone.ts', layer: 'encounter', strict: true },
   // Fire and Fly: a monster's strike windup ring is a mechanic to react to.
   { file: 'src/render/turret_defense_visual.ts', layer: 'encounter', strict: true },
+  // Fire and Fly: the warning ring under an explosive barrel, red while its fuse burns.
+  { file: 'src/render/turret_barrel_visual.ts', layer: 'encounter', strict: true },
   // Buried Hoard boss mechanics (the 2026-09-28 release/v0.44.0 merge into
   // feature/buried-hoards): the floor telegraphs, their standing pieces and the
   // cosmetic dressing and spell effects drawn over them, all on the encounter

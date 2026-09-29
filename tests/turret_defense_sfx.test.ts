@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { SFX_CLIPS } from '../src/game/sfx_manifest.generated';
 import {
+  TURRET_BARREL_SFX,
   TURRET_BREACH_SFX,
   TURRET_FIRE_SFX,
   TURRET_IMPACT_SFX,
@@ -113,6 +114,29 @@ describe('Fire and Fly sound cues', () => {
     expect(near?.z).toBeCloseTo(204, 12);
   });
 
+  it("booms a barrel's blast heavier than a shell's, from a pulled-in point", () => {
+    const clips: Record<string, { spatial: boolean }> = SFX_CLIPS;
+    expect(TURRET_BARREL_SFX).not.toBe(TURRET_IMPACT_SFX);
+    expect(clips[TURRET_BARREL_SFX]?.spatial).toBe(true);
+    const blast = (hits: TurretHit[]): TurretEvent => ({
+      type: 'barrelExploded',
+      id: 3,
+      x: 100,
+      y: 5,
+      z: 230,
+      hits,
+    });
+    const empty = turretSfxCueInto(blast([]), origin, cue());
+    const crowd = turretSfxCueInto(blast([hit(1, 1, 120), hit(2, 0.5, 60)]), origin, cue());
+    expect(empty).toMatchObject({ key: TURRET_BARREL_SFX, x: 100, jitter: true });
+    expect(empty?.z).toBeCloseTo(200 + 15.7, 9);
+    expect(crowd?.gain).toBeGreaterThan(empty?.gain ?? 0);
+    const shell = turretSfxCueInto(impact([hit(1, 1, 10)]), origin, cue());
+    expect(empty?.gain).toBeGreaterThan(shell?.gain ?? 0);
+    const lit: TurretEvent = { type: 'barrelLit', id: 3, x: 0, y: 0, z: 0, fuseTicks: 5 };
+    expect(turretSfxCueInto(lit, origin, cue())).toBeNull();
+  });
+
   it('sizes a blast by its strongest hit plus the extra bodies it caught', () => {
     expect(turretBlastSize([])).toBe(0);
     expect(turretBlastSize([{ falloff: 0.4 }])).toBeCloseTo(0.4, 12);
@@ -163,6 +187,7 @@ describe('Fire and Fly sound player', () => {
       [
         TURRET_FIRE_SFX,
         TURRET_IMPACT_SFX,
+        TURRET_BARREL_SFX,
         TURRET_BREACH_SFX,
         TURRET_THUMP_LIGHT_SFX,
         TURRET_THUMP_HEAVY_SFX,

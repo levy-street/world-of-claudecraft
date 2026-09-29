@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { TURRET_EXPLOSIVE_BARREL } from '../src/sim/content/turret_defense';
 import type { TurretEvent } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import {
@@ -28,8 +29,10 @@ describe('the turret feedback ring', () => {
   it('holds the worst single-tick burst the plan can emit, its leading impact included', () => {
     const widest = Math.max(...resolveTurretPlan().waves.map((w) => w.spawns.length));
     expect(widest).toBe(16);
-    // The impact, then per body a launch and a kill, and per knock a bowled, launch and kill.
-    const burst = 1 + widest * 2 + widest * 3;
+    // A shell's impact and every standing barrel's blast on one tick, each then a launch and a
+    // kill per body, every barrel lit once, and per knock a bowled, launch and kill.
+    const blasts = 1 + TURRET_EXPLOSIVE_BARREL.cap;
+    const burst = blasts * (1 + widest * 2) + TURRET_EXPLOSIVE_BARREL.cap + widest * 3;
     expect(TURRET_FEEDBACK_LIMIT).toBeGreaterThanOrEqual(burst);
     const ring: TurretFeedback[] = [];
     recordTurretFeedback(

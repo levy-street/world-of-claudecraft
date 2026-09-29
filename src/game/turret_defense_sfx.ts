@@ -1,5 +1,6 @@
 // Fire and Fly sounds: the cannon's report at the muzzle, the shell's blast where
-// it lands, the crunch of a monster's strike on the turret, and the monsters' cries,
+// it lands, a barrel's heavier boom, the crunch of a monster's strike on the
+// turret, and the monsters' cries,
 // thumps and knocks (turret_monster_sfx.ts),
 // each read once per feedback entry (by sequence number) from the seat HUD's
 // frame. Every clip a seat can play is preloaded when the seat is first seen.
@@ -21,11 +22,14 @@ import {
 
 export const TURRET_FIRE_SFX = 'proj_groundshaker';
 export const TURRET_IMPACT_SFX = 'impact_groundshaker';
+/** A barrel blowing: the meteor's bass-heavy blast and long rumble, a size above the shell's. */
+export const TURRET_BARREL_SFX = 'meteor';
 /** The turret taking a monster's blow: a heavy shield smashing plate. */
 export const TURRET_BREACH_SFX = 'impact_warrior_faultline';
 const SEAT_SFX = [
   TURRET_FIRE_SFX,
   TURRET_IMPACT_SFX,
+  TURRET_BARREL_SFX,
   TURRET_BREACH_SFX,
   TURRET_THUMP_LIGHT_SFX,
   TURRET_THUMP_HEAVY_SFX,
@@ -128,6 +132,18 @@ export function turretSfxCueInto(
     out.gain = 1.25;
     out.rate = 1;
     out.jitter = false;
+    return out;
+  }
+  if (event.type === 'barrelExploded') {
+    const size = turretBlastSize(event.hits);
+    out.key = TURRET_BARREL_SFX;
+    out.x = event.x;
+    out.y = event.y;
+    out.z = event.z;
+    turretHeardInto(origin, out);
+    out.gain = 1.5 + 0.3 * size;
+    out.rate = 0.95 + 0.1 * size;
+    out.jitter = true;
     return out;
   }
   if (event.type === 'impact') {

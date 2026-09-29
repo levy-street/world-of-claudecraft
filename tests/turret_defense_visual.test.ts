@@ -28,7 +28,7 @@ import {
   buildWorldQuestTraceStandIn,
   worldQuestTraceMaterials,
 } from '../src/render/world_quest_trace_materials';
-import { TURRET_TIMING } from '../src/sim/content/turret_defense';
+import { TURRET_EXPLOSIVE_BARREL, TURRET_TIMING } from '../src/sim/content/turret_defense';
 import { MOBS } from '../src/sim/data';
 import { FIRE_AND_FLY_TOWER } from '../src/sim/fire_and_fly_field';
 import {
@@ -1052,6 +1052,67 @@ describe('Fire and Fly monsters on screen', () => {
     const scorch = weaponPiece(visual, 'scorch').geometry.getAttribute('position');
     expect(scorch.getX(40)).toBeCloseTo(20, 6);
     expect(scorch.getZ(40)).toBeCloseTo(0, 6);
+    visual.dispose();
+  });
+
+  it("rings every standing barrel, lights its fuse, and blows it through the cannon's blast, wider, scorching the rigs it struck", async () => {
+    actors.made.length = 0;
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0, undefined, immediate);
+    const state = engine(160);
+    expect(state.barrels.length).toBeGreaterThan(0);
+    await buildAll(visual, viewOf(state), 160);
+    const rings = () =>
+      (part(visual, 'fire-and-fly-barrel-rings').children as THREE.Mesh[]).filter((r) => r.visible);
+    expect(rings()).toHaveLength(state.barrels.length);
+    const [core] = state.monsters;
+    const p = positionAt(core.seg, 160, flat);
+    const rig = actorAt(p.x, p.z);
+    expect(rig).toBeDefined();
+    const b = state.barrels[0];
+    const lit: TurretFeedback = {
+      seq: 1,
+      tick: 160,
+      event: { type: 'barrelLit', id: b.id, x: b.x, y: b.y, z: b.z, fuseTicks: 5 },
+    };
+    const hits = [{ id: core.id, falloff: 1, damage: 120, x: p.x, y: p.y, z: p.z }];
+    const blown: TurretFeedback = {
+      seq: 2,
+      tick: 165,
+      event: { type: 'barrelExploded', id: b.id, x: b.x, y: b.y, z: b.z, hits },
+    };
+    visual.update(viewOf(state, [lit]), 160, 0.4, 0.016);
+    visual.update(viewOf(state, [lit]), 161, 0.45, 0.016);
+    expect(weaponDrawn(visual, 'glow')).toBeGreaterThan(0);
+    const standing = { ...state, barrels: state.barrels.slice(1) };
+    visual.update(viewOf(standing, [lit, blown]), 165, 0.65, 0.016);
+    visual.update(viewOf(standing, [lit, blown]), 165, 0.75, 0.016);
+    expect(rings()).toHaveLength(standing.barrels.length);
+    expect(weaponDrawn(visual, 'flash')).toBe(1);
+    expect(weaponDrawn(visual, 'fireball')).toBeGreaterThan(8);
+    expect(weaponDrawn(visual, 'flame')).toBeGreaterThan(0);
+    expect(scorchShown(visual)).toBe(true);
+    // The scorch is laid on the barrel, as wide as a barrel's blast, not a shell's.
+    const scorch = weaponPiece(visual, 'scorch').geometry.getAttribute('position');
+    expect(scorch.getX(40)).toBeCloseTo(b.x, 4);
+    expect(scorch.getZ(40)).toBeCloseTo(b.z, 4);
+    const half = Math.hypot(scorch.getX(0) - b.x, scorch.getZ(0) - b.z) / Math.SQRT2;
+    expect(half).toBeCloseTo(9 * 0.45, 4);
+    expect(rig?.respondToElement).toHaveBeenCalledWith('fire', 0.9);
+    visual.dispose();
+  });
+
+  it("keeps a shell's blast and a whole chain's on the ground at once, none taken over", () => {
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0);
+    const feed: TurretFeedback[] = [impactAt168];
+    for (let id = 1; id <= TURRET_EXPLOSIVE_BARREL.cap; id++) {
+      feed.push({
+        seq: 2 + id,
+        tick: 168,
+        event: { type: 'barrelExploded', id, x: 10 * id, y: 0, z: 30, hits: [] },
+      });
+    }
+    visual.update(viewOf(engine(0), feed), 168, 0, 0.016);
+    expect(weaponDrawn(visual, 'flash')).toBe(1 + TURRET_EXPLOSIVE_BARREL.cap);
     visual.dispose();
   });
 

@@ -4,6 +4,7 @@ import {
   TURRET_PHYSICS,
   TURRET_SIZE_CLASSES,
   TURRET_TIMING,
+  TURRET_WAVES,
   TURRET_WEAPON,
 } from '../src/sim/content/turret_defense';
 import {
@@ -42,6 +43,7 @@ const hills: ThrowProbe = {
 const START = 1000;
 const HELD_BACK = Number.MAX_SAFE_INTEGER;
 const OFF: TurretBowlingDef = { ...TURRET_BOWLING, enabled: false };
+const NO_BARRELS = { count: 0, minRadius: 0, maxRadius: 0 };
 const CORE = 60;
 const KNOCK_DAMAGE = Math.max(1, Math.round(CORE * TURRET_BOWLING.damageShare));
 
@@ -64,7 +66,13 @@ function plan(
 ): TurretPlan {
   return {
     kinds,
-    waves: cores.map((coreDamage) => ({ spawns, coreDamage, gapMinTicks: 16, gapMaxTicks: 32 })),
+    waves: cores.map((coreDamage) => ({
+      spawns,
+      coreDamage,
+      gapMinTicks: 16,
+      gapMaxTicks: 32,
+      barrels: NO_BARRELS,
+    })),
     bowling,
   };
 }
@@ -627,13 +635,16 @@ describe('the toggle', () => {
   // the cannon tower's body, its strike ring and the grazing rule: turned off, every
   // event (throws, bounces, kills, waves) replays them exactly. Before the grazing
   // rule, rim hits relaunched a body lying past the maximum range hundreds of times.
+  // The barrels came after these digests: the runs place none, so the engine the
+  // barrels were added to still replays them untouched.
   it.each([
     ['flat', 42, flat, 1116, '313311f2'],
     ['hills', 21, hills, 1111, '268bf16a'],
   ] as const)(
     'turned off, a %s full run replays the bowling-free engine exactly',
     (_name, seed, probe, count, digest) => {
-      const r = fullRun(seed, resolveTurretPlan(undefined, undefined, OFF), probe, aimNearest);
+      const barrelFree = TURRET_WAVES.map((wave) => ({ ...wave, barrels: NO_BARRELS }));
+      const r = fullRun(seed, resolveTurretPlan(barrelFree, undefined, OFF), probe, aimNearest);
       const text = r.trace.map((s) => JSON.stringify(JSON.parse(s), dropLaterFields)).join('\n');
       expect(r.trace).toHaveLength(count);
       expect(fnv(text)).toBe(digest);
@@ -749,7 +760,7 @@ function fullRun(
 
 /** Drops what the engine gained after these digests: the bowled stat and each hit's position. */
 function dropLaterFields(this: object, key: string, value: unknown): unknown {
-  if (key === 'bowled') return undefined;
+  if (key === 'bowled' || key === 'barrelsDetonated' || key === 'barrelKills') return undefined;
   if ('falloff' in this && (key === 'x' || key === 'y' || key === 'z')) return undefined;
   return value;
 }

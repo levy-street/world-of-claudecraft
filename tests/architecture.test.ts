@@ -953,6 +953,7 @@ const RENDER_PURE_CORES = [
   'src/render/turret_contact_dust_core.ts',
   'src/render/turret_ground_marker_core.ts',
   'src/render/turret_tower_core.ts',
+  'src/render/turret_barrel_core.ts',
   'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
   'src/render/character_effects_core.ts',

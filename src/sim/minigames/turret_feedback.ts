@@ -6,10 +6,11 @@
 import { deepFreeze } from '../deep_freeze';
 import type { TurretEvent } from './turret_defense';
 
-// Sized for the worst single tick: a blast through the widest wave pushes its impact first, then
-// a launch and a kill per body, plus knocks; a smaller ring drops the impact before any reader
-// sees it, and with it the blast's damage numbers, sound and visual.
-export const TURRET_FEEDBACK_LIMIT = 96;
+// Sized for the worst single tick: a shell and every standing barrel blowing through the widest
+// wave, each blast pushing its own event first, then a launch and a kill per body, a barrel lit
+// by each, plus knocks; a smaller ring drops a blast before any reader sees it, and with it the
+// blast's damage numbers, sound and visual.
+export const TURRET_FEEDBACK_LIMIT = 320;
 
 export interface TurretFeedback {
   /** 1 for a seat's first event, then +1 per event; restarts with every new seat. */

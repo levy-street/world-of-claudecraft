@@ -5,6 +5,7 @@
 
 import {
   TURRET_ARENA,
+  TURRET_EXPLOSIVE_BARREL,
   TURRET_PHYSICS,
   TURRET_TIMING,
   TURRET_WEAPON,
@@ -21,6 +22,7 @@ import {
   positionAt,
   resolveFlightEnd,
   rotateDir,
+  type SweepResult,
   stillSegment,
   sweepCylinder,
   type ThrowProbe,
@@ -28,6 +30,17 @@ import {
   velocityAt,
   waterSurfaceOr,
 } from './thrown_body';
+import {
+  lightTurretBarrelByBody,
+  lightTurretBarrelsInBlast,
+  placeTurretBarrels,
+  replanPastTurretBarrel,
+  sweepTurretBarrels,
+  type TurretBarrel,
+  takeDueTurretBarrels,
+  turretBarrelBlast,
+  turretSpawnBearing,
+} from './turret_barrels';
 import { resolveTurretBowling } from './turret_bowling';
 import type { TurretKind, TurretPlan } from './turret_defense_plan';
 import { TURRET_STREAM, turretDraw } from './turret_defense_rng';
@@ -89,6 +102,9 @@ export interface TurretStats {
   longestAirtime: number;
   /** Grounded monsters knocked over by a flying body. */
   bowled: number;
+  barrelsDetonated: number;
+  /** Kills whose killing blow was a barrel's blast. */
+  barrelKills: number;
 }
 
 export interface TurretDefenseState {
@@ -116,8 +132,11 @@ export interface TurretDefenseState {
   aimZ: number;
   nextShotId: number;
   nextMonsterId: number;
+  nextBarrelId: number;
   shots: TurretShot[];
   monsters: TurretMonster[];
+  /** The standing explosive barrels, lit ones included, in the order they were placed. */
+  barrels: TurretBarrel[];
   stats: TurretStats;
 }
 
@@ -126,6 +145,29 @@ export interface TurretHit {
   falloff: number;
   damage: number;
   /** Where the struck body stood at the impact tick. */
+  x: number;
+  y: number;
+  z: number;
+}
+
+/** A blast on the field: a shell's, or a barrel's. */
+export interface TurretBlast {
+  x: number;
+  z: number;
+  radius: number;
+  core: number;
+  /** Damage at full strength (the core). */
+  damage: number;
+  /** Launch speeds of a full-strength hit on mass 1 (yd/s), across and up. */
+  push: number;
+  pop: number;
+  /** The private draw site of each thrown body's deviation: a stream and the blast's own key. */
+  stream: number;
+  key: number;
+}
+
+export interface TurretBarrelSpot {
+  id: number;
   x: number;
   y: number;
   z: number;
@@ -190,6 +232,9 @@ export type TurretEvent =
     }
   | { type: 'vanished'; id: number; x: number; y: number; z: number }
   | { type: 'waveStart'; wave: number; count: number }
+  | { type: 'barrelsPlaced'; barrels: TurretBarrelSpot[] }
+  | { type: 'barrelLit'; id: number; x: number; y: number; z: number; fuseTicks: number }
+  | { type: 'barrelExploded'; id: number; x: number; y: number; z: number; hits: TurretHit[] }
   | { type: 'waveCleared'; wave: number }
   | { type: 'ended'; result: 'won' | 'lost'; stats: TurretStats };
 
@@ -227,8 +272,10 @@ export function createTurretDefense(
     aimZ: 1,
     nextShotId: 1,
     nextMonsterId: 1,
+    nextBarrelId: 1,
     shots: [],
     monsters: [],
+    barrels: [],
     stats: {
       shots: 0,
       hits: 0,
@@ -238,6 +285,8 @@ export function createTurretDefense(
       longestThrow: 0,
       longestAirtime: 0,
       bowled: 0,
+      barrelsDetonated: 0,
+      barrelKills: 0,
     },
   };
 }
@@ -349,7 +398,7 @@ export function tickTurretDefense(
   state.tick = tick;
   const world = withTurretBody(state, probe);
   if ((state.phase === 'intro' || state.phase === 'between') && tick >= state.phaseEndTick) {
-    startWave(state, tick, events);
+    startWave(state, tick, world, events);
   }
   // Knocks along the segments as they stood, then on the pairs this tick's
   // transitions renewed (a bounce is the lowest, likeliest moment to knock).
@@ -362,20 +411,24 @@ export function tickTurretDefense(
   if (!isLost(state)) {
     resolveTurretBowling(state, tick - 1, tick, tick - 1, world, events);
     resolveImpacts(state, tick, world, events);
+    explodeDueBarrels(state, tick, world, events);
   }
   advanceMonsters(state, tick, world, events, false);
   if (state.phase === 'wave') checkWaveCleared(state, tick, events);
   return events;
 }
 
-/** The caller's probe plus the cannon tower's own body as a swept obstacle. */
+/**
+ * The caller's probe plus the cannon tower's own body and the standing barrels
+ * as swept obstacles: of every obstacle a move enters, the nearest stops it.
+ */
 function withTurretBody(state: TurretDefenseState, probe: ThrowProbe): ThrowProbe {
   const top = groundOr(probe, state.cx, state.cz, 0) + TURRET_ARENA.turretHeight;
   return {
     ground: (x, z) => probe.ground(x, z),
     water: (x, z) => probe.water(x, z),
     sweep: (fx, fz, tx, tz, radius, fromY, toY) => {
-      const tower = sweepCylinder(
+      let hit: SweepResult = sweepCylinder(
         state.cx,
         state.cz,
         TURRET_ARENA.turretRadius + radius,
@@ -387,16 +440,25 @@ function withTurretBody(state: TurretDefenseState, probe: ThrowProbe): ThrowProb
         fromY,
         toY,
       );
+      const barrel = sweepTurretBarrels(state.barrels, fx, fz, tx, tz, radius, fromY, toY);
+      if (barrel && (!hit.blocked || nearer(barrel, hit, fx, fz))) hit = barrel;
       const world = probe.sweep ? probe.sweep(fx, fz, tx, tz, radius, fromY, toY) : null;
-      if (!world?.blocked) return tower;
-      if (!tower.blocked) return world;
-      const toTower = Math.hypot(tower.x - fx, tower.z - fz);
-      return toTower <= Math.hypot(world.x - fx, world.z - fz) ? tower : world;
+      if (world?.blocked && (!hit.blocked || nearer(world, hit, fx, fz))) hit = world;
+      return hit;
     },
   };
 }
 
-function startWave(state: TurretDefenseState, tick: number, events: TurretEvent[]): void {
+function nearer(a: SweepResult, b: SweepResult, fx: number, fz: number): boolean {
+  return Math.hypot(a.x - fx, a.z - fz) < Math.hypot(b.x - fx, b.z - fz);
+}
+
+function startWave(
+  state: TurretDefenseState,
+  tick: number,
+  probe: ThrowProbe,
+  events: TurretEvent[],
+): void {
   if (state.phase === 'between') state.wave++;
   const wave = currentWave(state);
   bump(state);
@@ -408,6 +470,13 @@ function startWave(state: TurretDefenseState, tick: number, events: TurretEvent[
   state.spawnCursor = 0;
   state.nextSpawnTick = tick;
   events.push({ type: 'waveStart', wave: state.wave, count: wave.spawns.length });
+  const placed = placeTurretBarrels(state, wave.barrels, tick, probe);
+  if (placed.length) {
+    events.push({
+      type: 'barrelsPlaced',
+      barrels: placed.map(({ id, x, y, z }) => ({ id, x, y, z })),
+    });
+  }
 }
 
 function spawnDue(state: TurretDefenseState, tick: number, probe: ThrowProbe): void {
@@ -417,7 +486,11 @@ function spawnDue(state: TurretDefenseState, tick: number, probe: ThrowProbe): v
     const kindIndex = wave.spawns[state.spawnCursor++];
     const kind = state.plan.kinds[kindIndex];
     const id = state.nextMonsterId++;
-    const angle = turretDraw(state.seed, TURRET_STREAM.spawnAngle, id) * 2 * Math.PI;
+    const angle = turretSpawnBearing(
+      state,
+      turretDraw(state.seed, TURRET_STREAM.spawnAngle, id),
+      kind.radius,
+    );
     const x = state.cx + Math.sin(angle) * TURRET_ARENA.spawnRadius;
     const z = state.cz + Math.cos(angle) * TURRET_ARENA.spawnRadius;
     const span = wave.gapMaxTicks - wave.gapMinTicks + 1;
@@ -482,37 +555,102 @@ function detonate(
     z: shot.z,
     hits,
   });
+  const blast: TurretBlast = {
+    x: shot.x,
+    z: shot.z,
+    radius: TURRET_WEAPON.blastRadius,
+    core: TURRET_WEAPON.blastCore,
+    damage: shot.damage,
+    push: TURRET_WEAPON.push,
+    pop: TURRET_WEAPON.pop,
+    stream: TURRET_STREAM.throwDeviation,
+    key: shot.id,
+  };
+  blastBodies(state, blast, tick, probe, events, hits);
+  if (hits.length) state.stats.hits++;
+  lightTurretBarrelsInBlast(state, shot.x, shot.z, TURRET_WEAPON.blastRadius, tick, events);
+}
+
+/** The barrels whose fuse ran out blow, each lighting the ones its blast reaches. */
+function explodeDueBarrels(
+  state: TurretDefenseState,
+  tick: number,
+  probe: ThrowProbe,
+  events: TurretEvent[],
+): void {
+  for (const barrel of takeDueTurretBarrels(state, tick)) {
+    const hits: TurretHit[] = [];
+    events.push({
+      type: 'barrelExploded',
+      id: barrel.id,
+      x: barrel.x,
+      y: barrel.y,
+      z: barrel.z,
+      hits,
+    });
+    const kills = blastBodies(state, turretBarrelBlast(state, barrel), tick, probe, events, hits);
+    // The result froze at the win: a barrel still burning then blows for the show only.
+    if (state.phase !== 'won') {
+      state.stats.barrelsDetonated++;
+      state.stats.barrelKills += kills;
+    }
+    lightTurretBarrelsInBlast(
+      state,
+      barrel.x,
+      barrel.z,
+      TURRET_EXPLOSIVE_BARREL.blastRadius,
+      tick,
+      events,
+    );
+    replanPastTurretBarrel(state, barrel, tick, probe);
+  }
+}
+
+/**
+ * Damages every living body the blast reaches by its falloff, throws the ones
+ * it hits past a graze, and returns how many it killed. Corpses are never moved.
+ */
+function blastBodies(
+  state: TurretDefenseState,
+  blast: TurretBlast,
+  tick: number,
+  probe: ThrowProbe,
+  events: TurretEvent[],
+  hits: TurretHit[],
+): number {
+  let kills = 0;
   for (const m of state.monsters) {
     if (m.hp <= 0 || m.state === 'gone') continue;
     const p = positionAt(m.seg, tick, probe);
     const falloff = blastFalloff(
-      Math.hypot(p.x - shot.x, p.z - shot.z),
-      TURRET_WEAPON.blastRadius,
-      TURRET_WEAPON.blastCore,
+      Math.hypot(p.x - blast.x, p.z - blast.z),
+      blast.radius,
+      blast.core,
     );
     if (!(falloff > 0)) continue;
-    const damage = Math.max(1, Math.round(shot.damage * falloff));
+    const damage = Math.max(1, Math.round(blast.damage * falloff));
     m.hp = Math.max(0, m.hp - damage);
     hits.push({ id: m.id, falloff, damage, x: p.x, y: p.y, z: p.z });
     if (falloff >= TURRET_WEAPON.grazeFalloff) {
-      launch(state, m, shot, falloff, p, tick, probe, events);
+      launch(state, m, blast, falloff, p, tick, probe, events);
     } else if (m.hp <= 0 && m.state !== 'fly' && m.state !== 'skid') {
       // A flight or a slide already ends in rest(), which lays a dead body down.
       rest(state, m, state.plan.kinds[m.kind], tick, p, probe);
     }
     if (m.hp <= 0) {
       state.stats.kills++;
+      kills++;
       events.push({ type: 'killed', id: m.id, x: p.x, y: p.y, z: p.z });
     }
   }
-  if (hits.length) state.stats.hits++;
   bump(state);
+  return kills;
 }
 
 function launch(
   state: TurretDefenseState,
   m: TurretMonster,
-  shot: TurretShot,
+  blast: TurretBlast,
   falloff: number,
   p: Vec3,
   tick: number,
@@ -521,23 +659,23 @@ function launch(
 ): void {
   const kind = state.plan.kinds[m.kind];
   const base = throwDirection(
-    shot.x,
-    shot.z,
+    blast.x,
+    blast.z,
     p.x,
     p.z,
     state.cx,
     state.cz,
     TURRET_WEAPON.deadCenter,
   );
-  const spread = turretDraw(state.seed, TURRET_STREAM.throwDeviation, shot.id, m.id) * 2 - 1;
+  const spread = turretDraw(state.seed, blast.stream, blast.key, m.id) * 2 - 1;
   const dir = rotateDir(base.x, base.z, spread * TURRET_WEAPON.deviation);
   const v = launchVelocity(
     falloff,
     kind.mass,
     dir.x,
     dir.z,
-    TURRET_WEAPON.push,
-    TURRET_WEAPON.pop,
+    blast.push,
+    blast.pop,
     TURRET_WEAPON.massExponent,
   );
   // Only a body already in motion from a throw carries its velocity into the new
@@ -635,6 +773,18 @@ function transition(
       return;
     case 'skid': {
       const p = positionAt(m.seg, at, probe);
+      if (m.seg.kind === 'skid' && m.seg.contact === 'wall') {
+        const v = velocityAt(m.seg, at);
+        lightTurretBarrelByBody(
+          state,
+          p.x,
+          p.z,
+          kind.radius,
+          Math.hypot(v.x, v.z),
+          state.tick,
+          events,
+        );
+      }
       if (m.seg.kind === 'skid' && m.seg.contact === 'water') {
         splash(state, m, { x: p.x, y: waterSurfaceOr(probe, p.x, p.z, p.y), z: p.z }, events);
       } else rest(state, m, kind, at, p, probe);
@@ -681,6 +831,7 @@ function endFlight(
   if (out.kind === 'wall') {
     m.seg = out.seg;
     events.push({ type: 'bounce', id: m.id, surface: 'wall', ...p, speed: out.speed });
+    lightTurretBarrelByBody(state, p.x, p.z, kind.radius, out.speed, state.tick, events);
     return;
   }
   if (out.kind === 'void') {

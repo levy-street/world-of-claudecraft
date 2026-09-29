@@ -522,18 +522,7 @@ export class CannonShotTimeline {
     puffCount: 0,
     puffs: Array.from({ length: CANNON_MUZZLE_PUFFS }, newCannonPuff),
   }));
-  readonly impacts: CannonImpactSlot[] = Array.from({ length: CANNON_IMPACT_POOL }, () => ({
-    active: false,
-    x: 0,
-    y: 0,
-    z: 0,
-    at: 0,
-    power: 1,
-    chunkCount: 0,
-    chunks: Array.from({ length: CANNON_CHUNKS_PER_IMPACT }, newCannonChunk),
-    puffCount: 0,
-    puffs: Array.from({ length: CANNON_BLAST_PUFFS }, newCannonPuff),
-  }));
+  readonly impacts: CannonImpactSlot[];
   readonly scorches: CannonScorchSlot[] = Array.from({ length: CANNON_SCORCH_POOL }, () => ({
     active: false,
     x: 0,
@@ -552,6 +541,22 @@ export class CannonShotTimeline {
   private nextMuzzle = 0;
   private nextImpact = 0;
   private nextScorch = 0;
+
+  /** `impactPool` blasts stay on the ground at once; the next one takes over the oldest. */
+  constructor(impactPool: number = CANNON_IMPACT_POOL) {
+    this.impacts = Array.from({ length: Math.max(1, Math.floor(impactPool)) }, () => ({
+      active: false,
+      x: 0,
+      y: 0,
+      z: 0,
+      at: 0,
+      power: 1,
+      chunkCount: 0,
+      chunks: Array.from({ length: CANNON_CHUNKS_PER_IMPACT }, newCannonChunk),
+      puffCount: 0,
+      puffs: Array.from({ length: CANNON_BLAST_PUFFS }, newCannonPuff),
+    }));
+  }
 
   clear(): void {
     for (const shell of this.shells) shell.shotId = 0;

@@ -9,6 +9,9 @@ export const TURRET_STREAM = {
   spawnAngle: 1,
   spawnGap: 2,
   throwDeviation: 3,
+  barrelBearing: 4,
+  barrelRadius: 5,
+  barrelThrow: 6,
 } as const;
 
 function mixAll(values: readonly number[]): number {

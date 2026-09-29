@@ -15,6 +15,7 @@ import { deepFreeze } from '../deep_freeze';
 import { mobMaxHp } from '../entity';
 import type {
   MobTemplate,
+  TurretBarrelWaveDef,
   TurretBowlingDef,
   TurretSizeClass,
   TurretWaveDef,
@@ -39,6 +40,7 @@ export interface TurretWavePlan {
   readonly coreDamage: number;
   readonly gapMinTicks: number;
   readonly gapMaxTicks: number;
+  readonly barrels: Readonly<TurretBarrelWaveDef>;
 }
 
 /** Deep-frozen when resolved: sessions and their views share one plan by reference. */
@@ -104,6 +106,7 @@ export function resolveTurretPlan(
       coreDamage: wave.coreDamage,
       gapMinTicks: wave.gapMinTicks,
       gapMaxTicks: wave.gapMaxTicks,
+      barrels: { ...wave.barrels },
     };
   });
   return deepFreeze({ kinds, waves: planned, bowling: { ...bowling } });

@@ -46,6 +46,8 @@ const stats = {
   longestThrow: 0,
   longestAirtime: 0,
   bowled: 0,
+  barrelsDetonated: 0,
+  barrelKills: 0,
 };
 
 beforeEach(() => setLanguage('en'));

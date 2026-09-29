@@ -99,6 +99,7 @@ describe('wave table against the real templates', () => {
         coreDamage: 1,
         gapMinTicks: 1,
         gapMaxTicks: 1,
+        barrels: { count: 0, minRadius: 0, maxRadius: 0 },
       },
     ];
     expect(() => resolveTurretPlan(wave('no_such_mob'))).toThrow(/unknown mob template/);

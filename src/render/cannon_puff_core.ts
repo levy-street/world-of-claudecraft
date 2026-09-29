@@ -542,6 +542,9 @@ function launch(
   p.alpha = 1;
 }
 
+/** Writes one puff's launch: where, how it moves, grows and lives (see CannonPuff). */
+export { launch as cannonPuffLaunch };
+
 /**
  * How big a blast reads: 1 for a clean miss, up to 1.3 for a core hit (the
  * strongest falloff among the bodies it struck).

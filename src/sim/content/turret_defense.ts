@@ -36,6 +36,8 @@ export const TURRET_TEMPLATE_SIZES: Readonly<Record<string, TurretSizeClass>> = 
 
 const GAP_MIN = ticks(0.8);
 const GAP_MAX = ticks(1.6);
+/** Inside the march, well clear of the tower's foot and of the 46 yd spawn ring. */
+const BARREL_RING = { minRadius: 16, maxRadius: 30 } as const;
 
 export const TURRET_WAVES: readonly TurretWaveDef[] = [
   {
@@ -43,6 +45,7 @@ export const TURRET_WAVES: readonly TurretWaveDef[] = [
     coreDamage: 60,
     gapMinTicks: GAP_MIN,
     gapMaxTicks: GAP_MAX,
+    barrels: { count: 3, ...BARREL_RING },
   },
   {
     entries: [
@@ -52,6 +55,7 @@ export const TURRET_WAVES: readonly TurretWaveDef[] = [
     coreDamage: 64,
     gapMinTicks: GAP_MIN,
     gapMaxTicks: GAP_MAX,
+    barrels: { count: 3, ...BARREL_RING },
   },
   {
     entries: [
@@ -61,6 +65,7 @@ export const TURRET_WAVES: readonly TurretWaveDef[] = [
     coreDamage: 84,
     gapMinTicks: GAP_MIN,
     gapMaxTicks: GAP_MAX,
+    barrels: { count: 4, ...BARREL_RING },
   },
   {
     entries: [
@@ -70,6 +75,7 @@ export const TURRET_WAVES: readonly TurretWaveDef[] = [
     coreDamage: 100,
     gapMinTicks: GAP_MIN,
     gapMaxTicks: GAP_MAX,
+    barrels: { count: 4, ...BARREL_RING },
   },
   {
     entries: [
@@ -80,6 +86,7 @@ export const TURRET_WAVES: readonly TurretWaveDef[] = [
     coreDamage: 130,
     gapMinTicks: GAP_MIN,
     gapMaxTicks: GAP_MAX,
+    barrels: { count: 5, ...BARREL_RING },
   },
   {
     entries: [
@@ -90,6 +97,7 @@ export const TURRET_WAVES: readonly TurretWaveDef[] = [
     coreDamage: 220,
     gapMinTicks: GAP_MIN,
     gapMaxTicks: GAP_MAX,
+    barrels: { count: 5, ...BARREL_RING },
   },
 ];
 
@@ -122,6 +130,36 @@ export const TURRET_WEAPON = {
   /** Juggling adds velocity; these caps keep a juggled body's flight bounded. */
   maxLaunchSpeed: 32,
   maxLaunchLift: 26,
+} as const;
+
+/**
+ * Explosive barrels. A shell blast or a barrel blast reaching one (centre within
+ * the blast radius plus the barrel's), or a thrown body touching it faster than
+ * the bowling minimum speed, lights it; it blows after the fuse, so a chain reads
+ * as a ripple. Its blast follows the shell's falloff and launch rules, bigger.
+ */
+export const TURRET_EXPLOSIVE_BARREL = {
+  /** The drum's footprint (yd): a thrown body bounces off it, and a blast reaches it this much further. */
+  radius: 0.5,
+  /** Its top over the ground (yd): a body flying higher clears it. */
+  height: 1.3,
+  /** Barrels standing at once; an intact one outlives its wave. */
+  cap: 6,
+  /** The closest two barrels may stand (yd). */
+  minSpacing: 6,
+  /** How far a bearing may wander from the middle of its share of the circle, as a share of it, either side. */
+  bearingJitter: 0.35,
+  /** Draws a barrel gets at a clear spot before its wave does without it. */
+  placementTries: 6,
+  /** Room (yd) a marcher's lane keeps from a barrel, past the two radii. */
+  laneMargin: 0.4,
+  fuseTicks: ticks(0.25),
+  blastRadius: 9,
+  blastCore: 2.5,
+  /** A core hit's damage, as a multiple of the wave's shell core damage. */
+  damageScale: 2,
+  /** Push and pop, as a multiple of the shell's. */
+  throwScale: 1.35,
 } as const;
 
 /**

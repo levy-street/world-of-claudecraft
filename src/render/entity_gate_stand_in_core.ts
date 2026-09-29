@@ -254,4 +254,13 @@ export const ENTITY_GATE_STAND_INS: readonly EntityGateStandIn[] = [
     standIn:
       "the monsters themselves: each one's rig, or its capsule on the prewarmed calligraphy material (world_quest_trace_materials.ts) at its exact position, with its health bar and, during a windup, its red strike ring, on every graphics tier, until the gate settles or its GATED_ATTACH_WATCHDOG_MS reveal",
   },
+  {
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/turret_barrel_visual.ts',
+    callSite: 'void attachSceneGroupGated(parent, group,',
+    hides:
+      "the Fire and Fly explosive barrels' drums (the model on named materials of its own, one clone per pooled slot, attached once the model has loaded) and the shards a blowing drum throws (one instanced draw, attached when the player is first seen seated in the turret), each until its programs link, under the labels live-gate:fire-and-fly-barrels:drums and live-gate:fire-and-fly-barrels:shards",
+    standIn:
+      "the barrel's warning ring on the prewarmed calligraphy material (world_quest_trace_materials.ts), its geometry stripped of normals so it draws the very program the world-quest-trace prewarm stages, at the barrel's exact position from the commitment, gold while it stands and red while its fuse burns, on every graphics tier; the blast itself draws on the cannon's revealed shot pieces or their boot-prewarmed particle stand-in, until the gate settles or its GATED_ATTACH_WATCHDOG_MS reveal",
+  },
 ];

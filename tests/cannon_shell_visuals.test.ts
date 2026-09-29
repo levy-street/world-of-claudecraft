@@ -11,6 +11,8 @@ import {
 import { CANNON_PUFF_ATLAS_BYTES, CannonPuffMesh } from '../src/render/cannon_puff_mesh';
 import {
   CANNON_BLAST,
+  CANNON_CHUNKS_PER_IMPACT,
+  CANNON_IMPACT_POOL,
   CANNON_MUZZLE,
   CANNON_SCORCH_LAYERS,
   CANNON_SCORCH_VERTS,
@@ -594,6 +596,27 @@ describe('cannon shell visuals', () => {
     expect(puffs(visuals, PUFF.dust)).toBe(0);
     visuals.dispose();
     expect(visuals.puffBurst(3)).toBeNull();
+  });
+
+  it('keeps as many blasts on the ground at once as it was sized for, none taken over', () => {
+    const blasts = (n: number, impacts?: number) => {
+      const visuals = new CannonShellVisuals({ blastRadius: RADIUS, groundAt: () => 0, impacts });
+      visuals.prepare(new THREE.Scene());
+      for (let i = 0; i < n; i++)
+        visuals.impact({ ...landed, shotId: i + 1, x: 4 * i }, 0.1, false);
+      visuals.update(160, 0.3);
+      const out = { fire: puffs(visuals, PUFF.fireball), chunks: drawn(visuals, 'chunk') };
+      visuals.dispose();
+      return out;
+    };
+    const one = blasts(1);
+    expect(one.fire).toBeGreaterThan(0);
+    expect(blasts(CANNON_IMPACT_POOL + 3).fire).toBe(one.fire * CANNON_IMPACT_POOL);
+    const wide = CANNON_IMPACT_POOL + 6;
+    expect(blasts(wide, wide)).toEqual({
+      fire: one.fire * wide,
+      chunks: wide * CANNON_CHUNKS_PER_IMPACT,
+    });
   });
 
   it('holds no shot pool until prepared, so a player never seated pays for none', () => {

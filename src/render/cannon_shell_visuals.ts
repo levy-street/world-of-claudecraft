@@ -102,6 +102,10 @@ export interface CannonShellHost {
 /** A blast event, with the bodies it struck when the caller has them (a core hit reads bigger). */
 export interface CannonBlast extends CannonImpactShot {
   readonly hits?: readonly { readonly falloff: number }[];
+  /** A charge of its own (a barrel's): the ring's reach and the scorch; the shell's radius when absent. */
+  readonly radius?: number;
+  /** How much bigger than a shell's the whole blast reads, shake included; 1 when absent. */
+  readonly scale?: number;
 }
 
 export interface CannonShellOptions {
@@ -112,6 +116,8 @@ export interface CannonShellOptions {
   effectsTier?: GfxTier;
   /** Pooled bursts callers launch their own puffs into (puffBurst); none by default. */
   bursts?: { readonly slots: number; readonly puffs: number };
+  /** Blasts on the ground at once (a chain of charges adds its own); CANNON_IMPACT_POOL by default. */
+  impacts?: number;
   /**
    * Resolves when the page's texels may be built (an idle slot): until then the
    * atlas and the scorch are clear and the boot particles stand in. Without it,
@@ -157,9 +163,7 @@ const ZERO = new THREE.Matrix4().makeScale(0, 0, 0);
 const BLACK = { r: 0, g: 0, b: 0 };
 const FORWARD = new THREE.Vector3(0, 0, 1);
 const SHOT_PUFF_CAPACITY =
-  CANNON_SHELL_POOL * (CANNON_TRAIL_PUFFS + 1) +
-  CANNON_MUZZLE_POOL * CANNON_MUZZLE_PUFFS +
-  CANNON_IMPACT_POOL * CANNON_BLAST_PUFFS;
+  CANNON_SHELL_POOL * (CANNON_TRAIL_PUFFS + 1) + CANNON_MUZZLE_POOL * CANNON_MUZZLE_PUFFS;
 /** Floats of one draped layer (xyz or rgb per vertex) and of one scorch's slice. */
 const LAYER_FLOATS = CANNON_SCORCH_VERTS * 3;
 const SCORCH_FLOATS = LAYER_FLOATS * CANNON_SCORCH_LAYERS.length;
@@ -194,6 +198,7 @@ export class CannonShellVisuals {
   private readonly texelSlot?: () => Promise<unknown>;
   private readonly burstSlots: number;
   private readonly burstPuffs: number;
+  private readonly impactPool: number;
   private host: CannonShellHost | null = null;
   private pools: Pools | null = null;
   private parts: Parts | null = null;
@@ -218,7 +223,7 @@ export class CannonShellVisuals {
   private readonly byKind = new Int32Array(CANNON_PUFF_KINDS);
   private readonly liveScorches: boolean[] = new Array(CANNON_SCORCH_POOL).fill(false);
   private readonly scorchFades = new Float32Array(CANNON_SCORCH_POOL);
-  private readonly liveChunks: boolean[] = new Array(CANNON_IMPACT_POOL).fill(false);
+  private readonly liveChunks: boolean[];
   private readonly matrix = new THREE.Matrix4();
   private readonly quat = new THREE.Quaternion();
   private readonly euler = new THREE.Euler();
@@ -246,7 +251,10 @@ export class CannonShellVisuals {
     this.counts = cannonShotCounts(this.low);
     this.burstSlots = Math.max(0, options.bursts?.slots ?? 0);
     this.burstPuffs = Math.max(0, options.bursts?.puffs ?? 0);
-    this.puffCapacity = SHOT_PUFF_CAPACITY + this.burstSlots * this.burstPuffs;
+    this.impactPool = Math.max(1, Math.floor(options.impacts ?? CANNON_IMPACT_POOL));
+    this.liveChunks = new Array(this.impactPool).fill(false);
+    this.puffCapacity =
+      SHOT_PUFF_CAPACITY + this.impactPool * CANNON_BLAST_PUFFS + this.burstSlots * this.burstPuffs;
     this.root.name = 'fire-and-fly-weapon';
   }
 
@@ -312,7 +320,7 @@ export class CannonShellVisuals {
   prepare(parent: THREE.Object3D): void {
     if (this.pools || this.disposed) return;
     this.pools = {
-      timeline: new CannonShotTimeline(),
+      timeline: new CannonShotTimeline(this.impactPool),
       trailPuffs: Array.from({ length: CANNON_TRAIL_PUFFS }, newCannonPuff),
       trailAges: new Float32Array(CANNON_TRAIL_PUFFS),
       bursts: new CannonPuffBursts(this.burstSlots, this.burstPuffs),
@@ -354,14 +362,14 @@ export class CannonShellVisuals {
   /** The shell lands: its blast, chunks, puffs, scorch and shake. */
   impact(shot: CannonBlast, time: number, reducedMotion: boolean): void {
     if (this.disposed) return;
-    const power = cannonBlastPower(shot.hits);
+    const power = cannonBlastPower(shot.hits) * (shot.scale ?? 1);
     const pools = this.pools;
     if (pools) {
       const index = pools.timeline.impact(
         shot,
         time,
         this.counts,
-        this.blastRadius,
+        shot.radius ?? this.blastRadius,
         power,
         this.groundAt,
       );
@@ -560,7 +568,7 @@ export class CannonShellVisuals {
       'chunk',
       geometry(new THREE.DodecahedronGeometry(1, 0)),
       chunkMaterial,
-      CANNON_IMPACT_POOL * CANNON_CHUNKS_PER_IMPACT,
+      this.impactPool * CANNON_CHUNKS_PER_IMPACT,
       true,
     );
     for (let i = 0; i < chunks.instanceMatrix.count; i++) chunks.setMatrixAt(i, ZERO);

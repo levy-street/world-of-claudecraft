@@ -915,6 +915,10 @@ describe('the IWorld read', () => {
     expect(view.defense.shots).not.toBe(live.shots);
     expect(view.defense.shots[0]).not.toBe(live.shots[0]);
     expect(view.defense.stats).not.toBe(live.stats);
+    expect(live.barrels.length).toBeGreaterThan(0);
+    expect(view.defense.barrels).toEqual(live.barrels);
+    expect(view.defense.barrels).not.toBe(live.barrels);
+    expect(view.defense.barrels[0]).not.toBe(live.barrels[0]);
     expect(view.origin).not.toBe(turretSeat(sim).origin);
     expect(view.feedback).not.toBe(turretSeat(sim).feedback);
     expect(Object.isFrozen(view.feedback[0])).toBe(true);

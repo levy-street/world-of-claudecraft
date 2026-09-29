@@ -49,6 +49,7 @@ const lakeBeyond = (z0: number, depth = 2): ThrowProbe => ({
 const START = 1000;
 const INTRO_END = START + TURRET_TIMING.introTicks;
 const HELD_BACK = Number.MAX_SAFE_INTEGER;
+const NO_BARRELS = { count: 0, minRadius: 0, maxRadius: 0 };
 
 function kind(size: TurretSizeClass, maxHp: number, marchSpeed = 4.4): TurretKind {
   const s = TURRET_SIZE_CLASSES[size];
@@ -68,7 +69,13 @@ function kind(size: TurretSizeClass, maxHp: number, marchSpeed = 4.4): TurretKin
 function plan(kinds: TurretKind[], spawns: number[][], coreDamage = 60): TurretPlan {
   return {
     kinds,
-    waves: spawns.map((s) => ({ spawns: s, coreDamage, gapMinTicks: 16, gapMaxTicks: 32 })),
+    waves: spawns.map((s) => ({
+      spawns: s,
+      coreDamage,
+      gapMinTicks: 16,
+      gapMaxTicks: 32,
+      barrels: NO_BARRELS,
+    })),
     bowling: { ...TURRET_BOWLING, enabled: false },
   };
 }

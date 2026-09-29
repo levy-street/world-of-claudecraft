@@ -10247,12 +10247,19 @@ export interface TurretWaveEntry {
   /** Spawns after every other entry of the wave. */
   bossLast?: boolean;
 }
+/** The explosive barrels a wave's start adds on a ring around the turret (count 0: none). */
+export interface TurretBarrelWaveDef {
+  count: number;
+  minRadius: number;
+  maxRadius: number;
+}
 export interface TurretWaveDef {
   entries: readonly TurretWaveEntry[];
   /** Damage of a core hit. */
   coreDamage: number;
   gapMinTicks: number;
   gapMaxTicks: number;
+  barrels: TurretBarrelWaveDef;
 }
 
 export interface VehicleStationDef {

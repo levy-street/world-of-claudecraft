@@ -1,5 +1,5 @@
-// Fire and Fly damage numbers: every shell hit and every bowling knock floats its
-// damage over the struck body, where the sim says it stood, through the HUD's own
+// Fire and Fly damage numbers: every shell or barrel blast hit and every bowling
+// knock floats its damage over the struck body, where the sim says it stood, through the HUD's own
 // floating combat text. A core hit reads as a crit. Each feedback entry spawns
 // its numbers once, however often the same view is read.
 import type { TurretSessionView } from '../../../world_api/vehicles';
@@ -61,7 +61,7 @@ export class TurretDamageNumbers {
     for (const entry of fresh) {
       if (clock !== null && entry.tick < clock - STALE_TICKS) continue;
       const event = entry.event;
-      if (event.type === 'impact') {
+      if (event.type === 'impact' || event.type === 'barrelExploded') {
         for (const hit of event.hits) {
           now ??= this.now();
           this.float(session, hit.id, hit.x, hit.y, hit.z, hit.damage, hit.falloff >= 1, now);

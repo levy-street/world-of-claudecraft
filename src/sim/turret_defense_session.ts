@@ -278,7 +278,7 @@ export function endTurretSeat(
 
 function cloneView(session: TurretSession): TurretSessionView {
   const defense = session.defense;
-  const { tick: _clock, seed: _seed, plan, shots, monsters, stats, ...scalars } = defense;
+  const { tick: _clock, seed: _seed, plan, shots, monsters, barrels, stats, ...scalars } = defense;
   return {
     origin: { ...session.origin },
     defense: {
@@ -286,6 +286,7 @@ function cloneView(session: TurretSession): TurretSessionView {
       plan,
       shots: shots.map((shot) => ({ ...shot })),
       monsters: monsters.map((m) => ({ ...m, seg: { ...m.seg }, knocked: m.knocked.slice() })),
+      barrels: barrels.map((barrel) => ({ ...barrel })),
       stats: { ...stats },
     },
     waveCount: plan.waves.length,

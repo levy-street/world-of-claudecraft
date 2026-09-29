@@ -107,6 +107,24 @@ describe('Fire and Fly damage numbers', () => {
     });
   });
 
+  it("floats a barrel blast's hits like a shell's, its core hit as a crit", () => {
+    const { numbers, spawned } = rig();
+    const blast: TurretEvent = {
+      type: 'barrelExploded',
+      id: 4,
+      x: 0,
+      y: 0,
+      z: 10,
+      hits: [hit(1, 1, 120, 4, 1, 9), hit(2, 0.5, 60, -2, 3, 11)],
+    };
+    numbers.update(session([entry(1, 10, blast)]), 10);
+    expect(spawned.map((s) => [s.event.text, s.event.crit])).toEqual([
+      ['120!', true],
+      ['60', false],
+    ]);
+    expect(describeFct(spawned[1].event, 0.5).anchor.x).toBe(-2);
+  });
+
   it('floats a bowling knock over the struck body, never as a crit', () => {
     const { numbers, spawned } = rig();
     numbers.update(session([entry(1, 10, bowled)]), 10);
