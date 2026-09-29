@@ -3,7 +3,8 @@
 // roof of their own arena (turret_arena_session.ts), the per-tick hook drives
 // the pure engine with a probe bound to the world, engine events feed an
 // owner-scoped SimEvent and the feedback ring, and the read-only view is cloned
-// once per revision. Ending the seat leaves the arena. Draws no world rng.
+// once per revision. Ending the seat leaves the arena. The one world rng draw is
+// the hidden session seed, taken at seat time; the run itself draws none.
 
 import { resolveMovement } from './colliders';
 import { TURRET_DEFAULT_SCENARIO } from './content/fire_and_fly_scenarios';
@@ -173,12 +174,16 @@ export function turretSeatRefusal(
  * Takes an eligible open-world player onto the tower roof of their own arena,
  * on foot, and seats them there for a run of `scenario`: the tower under their
  * feet is the center. The eligibility is read here, before the move, so the
- * arena itself never has to pass the open-world rule.
+ * arena itself never has to pass the open-world rule. The run's seed is one
+ * world rng draw, taken only once the seat is committed and never shown. Only
+ * tests and dev tools pass `seed` (a replay, which draws nothing): an entry a
+ * player reaches must never forward one, or the player picks their own run.
  */
 export function seatTurret(
   ctx: SimContext,
   pid: number,
   scenario: Readonly<TurretScenarioDef> = TURRET_DEFAULT_SCENARIO,
+  seed?: number,
 ): TurretSeatRefusal | null {
   const resolved = ctx.resolve(pid);
   if (!resolved) return 'missing';
@@ -196,13 +201,14 @@ export function seatTurret(
   forceDismount(ctx, player);
   const origin = enterTurretArena(ctx, meta, player, arena);
   const start = ctx.tickCount;
+  const sessionSeed = seed ?? turretSessionSeed(ctx.rng.next());
   meta.vehicle = {
     kind: 'turret',
     origin,
     defense: createTurretDefense(
       resolveTurretPlan(scenario),
       { x: origin.x, z: origin.z },
-      turretSessionSeed(ctx.cfg.seed, meta.entityId, start),
+      sessionSeed,
       start,
     ),
     priorMountKey,

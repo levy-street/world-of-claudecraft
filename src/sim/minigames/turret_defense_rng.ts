@@ -24,9 +24,12 @@ function mixAll(values: readonly number[]): number {
   return h >>> 0;
 }
 
-/** Session seed from stable inputs, so a replay of the same session draws the same values. */
-export function turretSessionSeed(worldSeed: number, ownerId: number, startTick: number): number {
-  return mixAll([worldSeed, ownerId, startTick, 0x7475]);
+/**
+ * The session seed from one world rng draw taken at seat time (a uniform in [0, 1)): the
+ * farming hidden pre-roll, so no value a client sees derives it. A replay passes the seed.
+ */
+export function turretSessionSeed(worldDraw: number): number {
+  return Math.floor(worldDraw * 0x100000000) >>> 0;
 }
 
 /** One uniform value in [0, 1) for a draw site. */

@@ -35,6 +35,7 @@ import {
   type TurretPlan,
 } from '../src/sim/minigames/turret_defense_plan';
 import { turretSessionSeed } from '../src/sim/minigames/turret_defense_rng';
+import { Rng } from '../src/sim/rng';
 import { DT, type TurretSizeClass } from '../src/sim/types';
 
 const flat: ThrowProbe = { ground: () => 0, water: () => null };
@@ -289,11 +290,13 @@ describe('phases and spawns', () => {
     expect(angles(1)).not.toBe(angles(2));
   });
 
-  it('derives the session seed from world seed, owner and start tick', () => {
-    expect(turretSessionSeed(20260928, 7, 1000)).toBe(332875727);
-    expect(turretSessionSeed(20260929, 7, 1000)).not.toBe(332875727);
-    expect(turretSessionSeed(20260928, 8, 1000)).not.toBe(332875727);
-    expect(turretSessionSeed(20260928, 7, 1001)).not.toBe(332875727);
+  it('takes the session seed from one world draw alone, over the whole unsigned range', () => {
+    expect(turretSessionSeed(0)).toBe(0);
+    expect(turretSessionSeed(0.5)).toBe(0x80000000);
+    expect(turretSessionSeed(1 - 2 ** -32)).toBe(0xffffffff);
+    const world = new Rng(20260928);
+    const draws = [world.next(), world.next()];
+    expect(turretSessionSeed(draws[0])).not.toBe(turretSessionSeed(draws[1]));
   });
 });
 

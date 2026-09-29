@@ -7,6 +7,7 @@ import {
   supportHeightAt,
 } from '../src/sim/colliders';
 import { FIRE_AND_FLY_DUNGEON_ID } from '../src/sim/content/fire_and_fly_arena';
+import { TURRET_DEFAULT_SCENARIO } from '../src/sim/content/fire_and_fly_scenarios';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { DEFAULT_MOUNT } from '../src/sim/content/mounts';
 import { TURRET_BOWLING, TURRET_TIMING } from '../src/sim/content/turret_defense';
@@ -64,7 +65,11 @@ import { isArenaQueued } from '../src/sim/social/arena';
 import { endBgMatch, startBgMatch } from '../src/sim/social/battleground';
 import { RES_HP_FRACTION } from '../src/sim/spirit';
 import { claimTurretArena } from '../src/sim/turret_arena_session';
-import { type TurretDefenseView, turretWorldProbe } from '../src/sim/turret_defense_session';
+import {
+  seatTurret,
+  type TurretDefenseView,
+  turretWorldProbe,
+} from '../src/sim/turret_defense_session';
 import {
   type Entity,
   GATHER_CAST_ID,
@@ -129,6 +134,20 @@ function arenaClaims(sim: Sim): InstanceSlot[] {
   return sim.ctx.instances.filter(
     (inst) => inst.dungeonId === FIRE_AND_FLY_DUNGEON_ID && inst.partyKey !== null,
   );
+}
+
+/** Runs `act` and returns the world rng values it drew, in draw order. */
+function worldDraws(sim: Sim, act: () => void): number[] {
+  const drawn: number[] = [];
+  sim.rng.setObserver((value) => {
+    drawn.push(value);
+  });
+  try {
+    act();
+  } finally {
+    sim.rng.setObserver(null);
+  }
+  return drawn;
 }
 
 function turretEvents(events: readonly SimEvent[]) {
@@ -410,19 +429,48 @@ describe('the turret seat', () => {
     expect(meta.wireRev).toBeGreaterThan(before);
   });
 
-  it('seeds the session from the world seed, the owner and the seat tick', () => {
-    const { sim, player } = rig();
-    const first = sim.tickCount;
-    sim.chat('/dev turret');
-    expect(turretSeat(sim).defense.seed).toBe(turretSessionSeed(WORLD_SEED, player.id, first));
+  it('seeds each seat from one world rng draw, and a refused seat draws nothing', () => {
+    const { sim } = rig();
+    const first = worldDraws(sim, () => seat(sim));
+    expect(first).toHaveLength(1);
+    const seed = turretSeat(sim).defense.seed;
+    expect(seed).toBe(turretSessionSeed(first[0]));
+    expect(
+      worldDraws(sim, () => {
+        expect(seatTurret(sim.ctx, sim.playerId)).toBe('seated');
+      }),
+    ).toEqual([]);
     sim.leaveVehicle();
     for (let i = 0; i < 3; i++) sim.tick();
-    const second = sim.tickCount;
-    sim.chat('/dev turret');
-    expect(turretSeat(sim).defense.seed).toBe(turretSessionSeed(WORLD_SEED, player.id, second));
-    expect(turretSessionSeed(WORLD_SEED, player.id, second)).not.toBe(
-      turretSessionSeed(WORLD_SEED, player.id, first),
-    );
+    const second = worldDraws(sim, () => seat(sim));
+    expect(second).toHaveLength(1);
+    expect(turretSeat(sim).defense.seed).toBe(turretSessionSeed(second[0]));
+    expect(turretSeat(sim).defense.seed).not.toBe(seed);
+
+    const full = rig();
+    for (const inst of full.sim.ctx.instances) {
+      if (inst.dungeonId === FIRE_AND_FLY_DUNGEON_ID) inst.partyKey = `taken:${inst.slot}`;
+    }
+    expect(
+      worldDraws(full.sim, () => {
+        expect(seatTurret(full.sim.ctx, full.player.id)).toBe('full');
+      }),
+    ).toEqual([]);
+    expect(full.meta.vehicle ?? null).toBeNull();
+  });
+
+  it('derives no seed from what a client sees: the same pid at the same tick seeds apart only when the world rng differs', () => {
+    const seatIn = (skew: number) => {
+      const { sim, player } = rig();
+      for (let i = 0; i < skew; i++) sim.rng.next();
+      seat(sim);
+      return { pid: player.id, tick: sim.tickCount, seed: turretSeat(sim).defense.seed };
+    };
+    const first = seatIn(0);
+    const skewed = seatIn(1);
+    expect(seatIn(0)).toEqual(first);
+    expect({ pid: skewed.pid, tick: skewed.tick }).toEqual({ pid: first.pid, tick: first.tick });
+    expect(skewed.seed).not.toBe(first.seed);
   });
 
   it('never saves the seat or its return point', () => {
@@ -1246,7 +1294,7 @@ describe('firing', () => {
 });
 
 describe('determinism', () => {
-  it('draws nothing from the world rng: a seated, firing run leaves it where a control run does', () => {
+  it('draws one world value at the seat and none after: a seated, firing run leaves the world rng where a control run does', () => {
     const draws = (seated: boolean): { count: number; next: number[] } => {
       const { sim } = rig();
       let count = 0;
@@ -1254,9 +1302,15 @@ describe('determinism', () => {
         count++;
       });
       // The control stands in an arena slot too (the plain dungeon path), so both
-      // runs take the player equally far from the world's mobs, and both leave it.
-      if (seated) sim.chat('/dev turret');
-      else expect(enterDungeon(sim.ctx, FIRE_AND_FLY_DUNGEON_ID, sim.playerId)).toBe(true);
+      // runs take the player equally far from the world's mobs, and both leave it;
+      // its own draw stands in for the seat's seed.
+      if (seated) {
+        sim.chat('/dev turret');
+        expect(count).toBe(1);
+      } else {
+        expect(enterDungeon(sim.ctx, FIRE_AND_FLY_DUNGEON_ID, sim.playerId)).toBe(true);
+        sim.rng.next();
+      }
       for (let i = 0; i < 20 * 40; i++) {
         sim.tick();
         aimOnce(sim);
@@ -1284,6 +1338,33 @@ describe('determinism', () => {
       return { session: JSON.stringify(turretSeat(sim)), events };
     };
     expect(run()).toEqual(run());
+  });
+
+  it('replays a run from its seed alone, in a world whose rng differs, drawing nothing', () => {
+    const run = (skew: number, seed?: number) => {
+      const { sim, player } = rig();
+      for (let i = 0; i < skew; i++) sim.rng.next();
+      const drawn = worldDraws(sim, () => {
+        expect(seatTurret(sim.ctx, player.id, TURRET_DEFAULT_SCENARIO, seed)).toBeNull();
+      });
+      const events: string[] = [];
+      for (let i = 0; i < 20 * 40; i++) {
+        for (const e of turretEvents(sim.tick())) events.push(JSON.stringify(e));
+        aimOnce(sim);
+      }
+      expect(turretSeat(sim).defense.stats.hits).toBeGreaterThan(0);
+      return {
+        drawn: drawn.length,
+        seed: turretSeat(sim).defense.seed,
+        session: JSON.stringify(turretSeat(sim)),
+        events,
+      };
+    };
+    const original = run(0);
+    expect(original.drawn).toBe(1);
+    const replay = run(3, original.seed);
+    expect(replay).toEqual({ ...original, drawn: 0 });
+    expect(run(3).session).not.toBe(original.session);
   });
 });
 
