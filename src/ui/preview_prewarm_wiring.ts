@@ -1,11 +1,12 @@
 // Composes the pure post-entry preview prewarm plan
 // (buildPostEntryPreviewPrewarmUnits, preview_prewarm_core.ts) with the
 // stateless halves that need no Hud state: the class roster, the per-class
-// skin counts, and the async portrait prewarm. The Hud supplies only the
-// thunks that reach its own windows and previews, so the composition stays
-// out of the hud.ts coordinator (the monolith ratchet).
+// skin counts, the memory profile, and the async portrait prewarm. The Hud
+// supplies only the thunks that reach its own windows and previews, so the
+// composition stays out of the hud.ts coordinator (the monolith ratchet).
 import { skinCount } from '../render/characters/manifest';
 import { prewarmPlayerPortrait } from '../render/characters/portrait';
+import { GFX } from '../render/gfx';
 import { ALL_CLASSES, type PlayerClass } from '../sim/types';
 import { buildPostEntryPreviewPrewarmUnits, type PreviewPrewarmUnit } from './preview_prewarm_core';
 
@@ -38,6 +39,7 @@ export function buildHudPreviewPrewarmUnits<Pose>(
     warmCharSkins: deps.warmCharSkins,
     includeCardPoses: deps.includeCardPoses,
     portraitFramings: deps.portraitFramings,
+    iosMemoryProfile: GFX.iosMemoryProfile,
     renderCharShell: deps.renderCharShell,
     prewarmCharSkin: deps.prewarmCharSkin,
     prewarmCardPose: deps.prewarmCardPose,

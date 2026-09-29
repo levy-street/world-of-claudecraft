@@ -105,6 +105,13 @@ export interface PreviewPrewarmPlanDeps<Pose> {
    *  is only ever shown in the menu-gated Inspect window and is built lazily on
    *  open, so warming it at every entry is deferred cost for a rare surface. */
   portraitFramings: readonly ('headshot' | 'body')[];
+  /** The iOS memory profile (`GFX.iosMemoryProfile`) warms each class's
+   *  DEFAULT skin portrait only. Every alternate skin is a standalone atlas
+   *  that a warm fetches, transcodes, keeps for the page and uploads into the
+   *  portrait context, for a headshot most sessions never show (a composed
+   *  player gets a composed headshot); the live getter captures it on first
+   *  ask instead, with the class crest meanwhile. */
+  iosMemoryProfile: boolean;
   renderCharShell: () => void;
   prewarmCharSkin: (skin: number) => void | Promise<void>;
   prewarmCardPose: (pose: Pose) => void | Promise<void>;
@@ -114,8 +121,9 @@ export interface PreviewPrewarmPlanDeps<Pose> {
 /** Build the ordered post-entry preview prewarm plan: the paperdoll shell, the
  *  paperdoll skin swatches (only when `warmCharSkins`), the player-card poses
  *  (only when `includeCardPoses`), and the requested `portraitFramings` for
- *  every class. Login trims the set to what a player actually hits unprompted
- *  or cheaply: skins only for a fixed-rig look, no card poses, headshots only.
+ *  every class (default skin only on `iosMemoryProfile`). Login trims the
+ *  set to what a player actually hits unprompted or cheaply: skins only for a
+ *  fixed-rig look, no card poses, headshots only.
  *  The dropped surfaces (card closeup, full-body Inspect portrait) stay warmed
  *  by their own lazy on-open paths; see each flag's doc on
  *  `PreviewPrewarmPlanDeps`. NO Armory units: that catalog is not warmed ahead
@@ -150,7 +158,8 @@ export function buildPostEntryPreviewPrewarmUnits<Pose>(
     }
   }
   for (const portraitClass of deps.allClasses) {
-    const portraitSkins = deps.skinCount(`player_${portraitClass}`);
+    const classSkins = deps.skinCount(`player_${portraitClass}`);
+    const portraitSkins = deps.iosMemoryProfile ? Math.min(classSkins, 1) : classSkins;
     for (let skin = 0; skin < portraitSkins; skin++) {
       for (const framing of deps.portraitFramings) {
         units.push({

@@ -20,6 +20,7 @@ const assetsSource = read('../src/render/characters/assets.ts');
 const visualSource = read('../src/render/characters/visual.ts');
 const portraitSource = read('../src/render/characters/portrait.ts');
 const portraitChipSource = read('../src/ui/portrait_chip.ts');
+const hudSource = read('../src/ui/hud.ts');
 const vfxSource = read('../src/render/vfx.ts');
 
 describe('entry probe covers the await window', () => {
@@ -99,6 +100,24 @@ describe('tight-memory residency diet', () => {
     const revealAt = mainSource.indexOf('const revealWorld = (): void => {');
     expect(revealAt).toBeGreaterThan(-1);
     expect(startAt).toBeGreaterThan(revealAt);
+  });
+
+  it('never starts the schedule through a graphics rebuild when none was running', () => {
+    // The tight profile never starts the schedule at boot, so the rebuild
+    // restart must be conditional on a live one, or a rebuild would warm the
+    // portrait catalog on tight after all.
+    const resetAt = hudSource.indexOf('resetGraphicsPreviewContexts(): void {');
+    expect(resetAt).toBeGreaterThan(-1);
+    const reset = hudSource.slice(resetAt, hudSource.indexOf('\n  }', resetAt));
+    expect(reset).toContain(
+      'this.restartPreviewPrewarmAfterGraphicsRebuild = this.previewPrewarmHandle !== null;',
+    );
+    const restoreAt = hudSource.indexOf('restoreGraphicsPreviewContexts(): void {');
+    expect(restoreAt).toBeGreaterThan(-1);
+    const restore = hudSource.slice(restoreAt, hudSource.indexOf('\n  }', restoreAt));
+    const gateAt = restore.indexOf('if (this.restartPreviewPrewarmAfterGraphicsRebuild) {');
+    expect(gateAt).toBeGreaterThan(-1);
+    expect(restore.indexOf('this.startPostEntryPreviewPrewarm(false)')).toBeGreaterThan(gateAt);
   });
 
   it('keeps the curtain-side paperdoll shell build inside the tight-memory gate', () => {
