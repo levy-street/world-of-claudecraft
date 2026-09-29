@@ -674,7 +674,7 @@ import { type LowResourceView, lowResourceViewInto } from './low_resource';
 import { mailIndicatorView } from './mailbox_view';
 import { MailboxWindow } from './mailbox_window';
 import { onMapArtReady } from './map_art';
-import { bakedMapBgEligible, loadBakedMapBg } from './map_bg';
+import { bakedMapBgEligible, createMapBgCache, loadBakedMapBg } from './map_bg';
 import { createMapMarkerArt } from './map_marker_icon_loader';
 import { mapMarkerProfileForFlags } from './map_marker_profile_core';
 import { mapDragPanCenter } from './map_pan_core';
@@ -1697,11 +1697,10 @@ export class Hud {
   // presets (see minimap_zoom.ts), persisted to localStorage. 1 = shipped look.
   private minimapZoom = MINIMAP_ZOOM_DEFAULT;
   private minimapZoomLabel: HTMLElement | null = null;
-  // World-map terrain backgrounds, cached per zone. A background depends only on
-  // (seed, zone bounds), both fixed for the session, so it is immutable and
-  // cached forever; rendering one is ~200ms (230k terrainHeight/roadDistance
-  // samples), which is why it must never run on the open path (see mapPrewarm).
-  private mapBgCache = new Map<string, HTMLCanvasElement>();
+  // World-map terrain backgrounds per zone, kept for the session except on the iOS
+  // memory profile (map_bg_residency_core.ts). Rendering one is ~200ms (230k
+  // terrainHeight/roadDistance samples), so it never runs on the open path (see mapPrewarm).
+  private readonly mapBgCache = createMapBgCache(() => this.lastZoneId);
   // In-flight idle prewarm of one zone's background, painted a few rows per
   // idle slice so it never blocks a frame. Committed to mapBgCache when done.
   private mapPrewarm: {
@@ -10054,11 +10053,12 @@ export class Hud {
    * main.ts to the renderer's zone streaming, so every zone that becomes
    * resident also gets its map background rendered ahead of the first open
    * (opening the map must never pay the ~200ms terrain render on the click).
+   * A bounded residency policy skips it: such a zone loads on crossing or open.
    * One job runs at a time; the committed-zone prewarm preempts the lane and
    * the preempted zone resumes from the queue.
    */
   queueMapBgPrewarm(zoneId: string): void {
-    if (this.mapBgCache.has(zoneId)) return;
+    if (this.mapBgCache.has(zoneId) || !this.mapBgCache.policy.prewarmPreparedZones) return;
     if (this.mapPrewarm?.zoneId === zoneId) return;
     if (this.mapPrewarmQueue.includes(zoneId)) return;
     if (this.mapPrewarm) {

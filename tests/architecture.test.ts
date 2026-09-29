@@ -256,6 +256,8 @@ const UI_PURE_CORES = [
   'src/ui/map_semantic_accessibility_core.ts',
   'src/ui/map_surface_core.ts',
   'src/ui/map_pan_core.ts',
+  // Which per-zone map backgrounds the HUD keeps (map_bg.ts is its DOM half).
+  'src/ui/map_bg_residency_core.ts',
   'src/ui/mouseover_cast_core.ts',
   'src/ui/world_quest_view.ts',
   'src/ui/world_quest_trace_view.ts',
