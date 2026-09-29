@@ -1,7 +1,14 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
-import { CANNON_PUFF_KINDS, newCannonPuffFrame, PUFF } from '../src/render/cannon_puff_core';
-import { CannonPuffMesh } from '../src/render/cannon_puff_mesh';
+import { BufferUpdateRange } from '../src/render/buffer_update_range';
+import {
+  CANNON_PUFF_KINDS,
+  CANNON_PUFF_SPRITE_RADIUS,
+  CANNON_SHOCK_PUFFS,
+  newCannonPuffFrame,
+  PUFF,
+} from '../src/render/cannon_puff_core';
+import { CANNON_PUFF_ATLAS_BYTES, CannonPuffMesh } from '../src/render/cannon_puff_mesh';
 import {
   CANNON_BLAST,
   CANNON_MUZZLE,
@@ -10,7 +17,11 @@ import {
   cannonRecoilOffset,
   cannonShotCounts,
 } from '../src/render/cannon_shell_core';
-import { type CannonShellHost, CannonShellVisuals } from '../src/render/cannon_shell_visuals';
+import {
+  type CannonShellHost,
+  CannonShellVisuals,
+  resetCannonShotTexelsForTest,
+} from '../src/render/cannon_shell_visuals';
 import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
 
 const RADIUS = 6;
@@ -156,9 +167,12 @@ describe('cannon shell visuals', () => {
     visuals.update(168, 10.45);
     expect(drawn(visuals, 'shell')).toBe(0);
     expect(puffs(visuals, PUFF.glow)).toBe(0);
-    for (const kind of [PUFF.flash, PUFF.fireball, PUFF.shock, PUFF.dust, PUFF.dirt, PUFF.spark]) {
+    for (const kind of [PUFF.flash, PUFF.fireball, PUFF.shock, PUFF.dirt, PUFF.spark]) {
       expect(puffs(visuals, kind), `kind ${kind}`).toBeGreaterThan(0);
     }
+    // The thin dust heaves up out of its fade-in a moment later.
+    visuals.update(169, 10.6);
+    expect(puffs(visuals, PUFF.dust)).toBeGreaterThan(0);
     expect(drawn(visuals, 'chunk')).toBeGreaterThan(0);
     expect(piece(visuals, 'scorch').visible).toBe(true);
     visuals.update(175, 10.4 + 1.2);
@@ -207,6 +221,37 @@ describe('cannon shell visuals', () => {
     expect(scorch3.renderOrder).toBe(floorVfxRenderOrder('ground', 1));
     expect(piece(visuals, 'puff').renderOrder).toBe(floorVfxRenderOrder('player', 4));
     visuals.dispose();
+  });
+
+  it('links the same programs on the low preset as on the high one', () => {
+    // A preset only sheds counts: a key that differed by tier would be a
+    // program the other tier's warm-up never links.
+    const key = (visuals: CannonShellVisuals) =>
+      ['shell', 'chunk', 'scorch', 'puff'].map((role) => {
+        const mesh = piece(visuals, role);
+        const material = mesh.material as THREE.Material & { defines?: object };
+        return [
+          role,
+          material.type,
+          material.name,
+          material.transparent,
+          material.blending,
+          material.depthWrite,
+          material.premultipliedAlpha,
+          (material as THREE.MeshBasicMaterial).vertexColors,
+          !!(material as THREE.MeshBasicMaterial).map,
+          JSON.stringify(material.defines ?? {}),
+          material.customProgramCacheKey(),
+          (mesh as THREE.InstancedMesh).isInstancedMesh === true,
+          !!(mesh as THREE.InstancedMesh).instanceColor,
+          Object.keys(mesh.geometry.attributes).sort().join(','),
+        ];
+      });
+    const low = weapon('low').visuals;
+    const high = weapon('high').visuals;
+    expect(key(low)).toEqual(key(high));
+    low.dispose();
+    high.dispose();
   });
 
   it('keeps every program key as built through a whole shot', () => {
@@ -271,7 +316,7 @@ describe('cannon shell visuals', () => {
   });
 
   it('lights a puff by its unlit share only: self-lit fire keeps its colour in the dark', () => {
-    const mesh = new CannonPuffMesh(4, 'test');
+    const mesh = new CannonPuffMesh(4, 'test', null);
     const frame = { ...newCannonPuffFrame(), size: 1, a: 1, r: 2, g: 1, b: 0.5 };
     const tint = mesh.mesh.geometry.getAttribute('aTint') as THREE.InstancedBufferAttribute;
     mesh.setLight(0.1, 0.2, 0.3);
@@ -525,6 +570,204 @@ describe('cannon shell visuals', () => {
     expect(puffs(visuals, PUFF.dust)).toBe(0);
     visuals.dispose();
     expect(visuals.puffBurst(3)).toBeNull();
+  });
+
+  it('holds no shot pool until prepared, so a player never seated pays for none', () => {
+    // Every player builds the turret visual at boot; only the one who sits
+    // in it needs the pools of launched puffs and frames.
+    const reachable = (root: object): number => {
+      const seen = new Set<object>();
+      const stack: unknown[] = [root];
+      while (stack.length > 0) {
+        const value = stack.pop();
+        if (!value || typeof value !== 'object' || seen.has(value)) continue;
+        if (value !== root && (value instanceof THREE.Object3D || ArrayBuffer.isView(value))) {
+          seen.add(value);
+          continue;
+        }
+        seen.add(value);
+        for (const next of Object.values(value)) stack.push(next);
+      }
+      return seen.size;
+    };
+    const visuals = new CannonShellVisuals({
+      blastRadius: RADIUS,
+      groundAt: () => 0,
+      bursts: { slots: 24, puffs: 20 },
+    });
+    const idle = reachable(visuals);
+    expect(idle).toBeLessThan(120);
+    visuals.prepare(new THREE.Scene());
+    expect(reachable(visuals)).toBeGreaterThan(idle + 2000);
+    visuals.dispose();
+  });
+
+  it('builds the page texels in the texel slot, never on the commitment frame, and once', async () => {
+    resetCannonShotTexelsForTest();
+    let open: () => void = () => {};
+    const slot = vi.fn(() => new Promise<void>((resolve) => (open = resolve)));
+    const scene = new THREE.Scene();
+    const first = new CannonShellVisuals({
+      blastRadius: RADIUS,
+      groundAt: () => 0,
+      texelSlot: slot,
+    });
+    first.prepare(scene);
+    const atlasOf = (visuals: CannonShellVisuals) =>
+      (piece(visuals, 'puff').material as THREE.ShaderMaterial).uniforms.uAtlas
+        .value as THREE.DataTexture;
+    const scorchOf = (visuals: CannonShellVisuals) =>
+      (piece(visuals, 'scorch').material as THREE.MeshBasicMaterial).map as THREE.DataTexture;
+    const bytes = (texture: THREE.DataTexture) => texture.image.data as Uint8Array;
+    // Built clear at the commitment: nothing was computed yet.
+    expect(slot).toHaveBeenCalledTimes(1);
+    expect(bytes(atlasOf(first))).toHaveLength(CANNON_PUFF_ATLAS_BYTES);
+    expect(bytes(atlasOf(first)).some((b) => b !== 0)).toBe(false);
+    expect(bytes(scorchOf(first)).some((b) => b !== 0)).toBe(false);
+    // Its own pieces are not ready, so the boot particles stand in (no gate here).
+    const host = hostStub();
+    first.setHost(host);
+    first.fire(fired, fallback, 0, false);
+    expect(host.vfx.burst).toHaveBeenCalledTimes(1);
+    const version = atlasOf(first).version;
+    open();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(bytes(atlasOf(first)).some((b) => b !== 0)).toBe(true);
+    expect(bytes(scorchOf(first)).some((b) => b !== 0)).toBe(true);
+    expect(atlasOf(first).version).toBeGreaterThan(version);
+    first.fire({ ...fired, shotId: 2 }, fallback, 1, false);
+    expect(host.vfx.burst).toHaveBeenCalledTimes(1);
+    // A second weapon on the page takes the same texels at once, without a slot.
+    const again = vi.fn(() => new Promise<void>(() => {}));
+    const second = new CannonShellVisuals({
+      blastRadius: RADIUS,
+      groundAt: () => 0,
+      texelSlot: again,
+    });
+    second.prepare(scene);
+    expect(again).not.toHaveBeenCalled();
+    expect(bytes(atlasOf(second))).toBe(bytes(atlasOf(first)));
+    first.dispose();
+    second.dispose();
+  });
+
+  it('queues one reused upload range per buffer, however many writes a frame makes', () => {
+    const { visuals } = weapon();
+    const attributes = [
+      ...['aCenter', 'aTint', 'aLook'].map(
+        (name) => piece(visuals, 'puff').geometry.getAttribute(name) as THREE.BufferAttribute,
+      ),
+      piece(visuals, 'scorch').geometry.getAttribute('position') as THREE.BufferAttribute,
+      piece(visuals, 'scorch').geometry.getAttribute('color') as THREE.BufferAttribute,
+    ];
+    const first = new Map<THREE.BufferAttribute, object>();
+    // Twelve fading scorches and a live blast, and no renderer uploading between frames.
+    for (let i = 0; i < 12; i++)
+      visuals.impact({ ...landed, shotId: i + 1, x: 4 * i }, i * 0.1, false);
+    for (let frame = 0; frame < 30; frame++) {
+      visuals.update(170, 1.3 + frame * 0.2);
+      for (const attribute of attributes) {
+        expect(attribute.updateRanges.length).toBeLessThanOrEqual(1);
+        const range = attribute.updateRanges[0];
+        if (!range) continue;
+        if (!first.has(attribute)) first.set(attribute, range);
+        expect(range).toBe(first.get(attribute));
+      }
+    }
+    expect(first.size).toBe(attributes.length);
+    visuals.dispose();
+  });
+
+  it('widens a range still queued rather than dropping or duplicating it', () => {
+    const attribute = new THREE.BufferAttribute(new Float32Array(64), 1);
+    const upload = new BufferUpdateRange(attribute);
+    upload.mark(10, 5);
+    upload.mark(2, 3);
+    expect(attribute.updateRanges).toEqual([{ start: 2, count: 13 }]);
+    const range = attribute.updateRanges[0];
+    // Three uploads it and clears the list: the next frame reuses the same object.
+    attribute.clearUpdateRanges();
+    const version = attribute.version;
+    upload.mark(40, 4);
+    expect(attribute.updateRanges).toEqual([{ start: 40, count: 4 }]);
+    expect(attribute.updateRanges[0]).toBe(range);
+    expect(attribute.version).toBeGreaterThan(version);
+  });
+
+  it('draws the far blast before the near muzzle, and each source dust first, light last', () => {
+    const { visuals } = weapon();
+    visuals.fire(fired, fallback, 0, false);
+    visuals.impact(landed, 0, false);
+    visuals.update(162, 0.3);
+    const mesh = piece(visuals, 'puff') as THREE.Mesh<THREE.InstancedBufferGeometry>;
+    const center = mesh.geometry.getAttribute('aCenter') as THREE.InstancedBufferAttribute;
+    const look = mesh.geometry.getAttribute('aLook') as THREE.InstancedBufferAttribute;
+    const n = mesh.geometry.instanceCount;
+    const near = (i: number) => Math.hypot(center.getX(i) - fallback.x, center.getZ(i)) < 4;
+    const far = (i: number) => Math.hypot(center.getX(i) - landed.x, center.getZ(i)) < 12;
+    let lastFar = -1;
+    let firstNear = n;
+    for (let i = 0; i < n; i++) {
+      if (far(i)) lastFar = i;
+      if (near(i)) firstNear = Math.min(firstNear, i);
+    }
+    expect(lastFar).toBeGreaterThanOrEqual(0);
+    expect(firstNear).toBeLessThan(n);
+    expect(lastFar).toBeLessThan(firstNear);
+    // Inside the blast: the smoke and dust billows first, the flash and sparks last.
+    const SMOKE = 0;
+    let lastSmoke = -1;
+    let firstLight = n;
+    for (let i = 0; i <= lastFar; i++) {
+      const sprite = look.getZ(i);
+      if (sprite === SMOKE) lastSmoke = i;
+      if (sprite === 1 || sprite === 2) firstLight = Math.min(firstLight, i);
+    }
+    expect(lastSmoke).toBeGreaterThanOrEqual(0);
+    expect(lastSmoke).toBeLessThan(firstLight);
+    visuals.dispose();
+  });
+
+  it('cuts every billboard to the octagon around its sprite, a fifth less fill than a square', () => {
+    const mesh = new CannonPuffMesh(4, 'octagon', null);
+    const geometry = mesh.mesh.geometry;
+    const position = geometry.getAttribute('position');
+    const uv = geometry.getAttribute('uv');
+    expect(position.count).toBe(8);
+    expect(geometry.getIndex()?.count).toBe(18);
+    let area = 0;
+    for (let k = 0; k < 8; k++) {
+      const x = position.getX(k);
+      const y = position.getY(k);
+      expect(Math.abs(x)).toBeLessThanOrEqual(0.5);
+      expect(Math.abs(y)).toBeLessThanOrEqual(0.5);
+      expect(uv.getX(k)).toBeCloseTo(x + 0.5, 6);
+      expect(uv.getY(k)).toBeCloseTo(y + 0.5, 6);
+      const nx = position.getX((k + 1) % 8);
+      const ny = position.getY((k + 1) % 8);
+      area += (x * ny - nx * y) / 2;
+      // Each edge stays outside the sprite's clear radius: nothing drawn is cut.
+      const edge = Math.abs(x * ny - nx * y) / Math.hypot(nx - x, ny - y);
+      expect(edge).toBeGreaterThanOrEqual(0.5 * CANNON_PUFF_SPRITE_RADIUS - 1e-6);
+    }
+    expect(area).toBeLessThan(0.81);
+    mesh.dispose();
+  });
+
+  it('samples the ground once per point an impact needs, its scorch layers included', () => {
+    let calls = 0;
+    const counts = cannonShotCounts(false);
+    const { visuals } = weapon('high', () => {
+      calls++;
+      return 0;
+    });
+    visuals.impact(landed, 0, false);
+    visuals.update(168, 0.05);
+    expect(calls).toBe(
+      1 + counts.chunks + CANNON_SHOCK_PUFFS + counts.dirt + CANNON_SCORCH_VERTS - 1,
+    );
+    visuals.dispose();
   });
 
   it('tells its callers the static preset is low, so they shed their own cosmetic counts', () => {

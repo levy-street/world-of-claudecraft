@@ -11,7 +11,10 @@
 // are never hidden. An unused rig leaves the scene graph. No lights, no shadows,
 // no per-frame THREE allocation. A rig's scorch flash swaps its materials only
 // once their programs link behind the same compile gate (the rig keeps its own
-// materials meanwhile). Pure halves: turret_monster_pose_core.ts,
+// materials meanwhile). A health bar and a strike ring are what a player acts
+// on: they paint over the cannon's dust (a higher rung of the floor ladder than
+// the puff draw) and the bar faces the camera upright over the body, whatever
+// its tumble. Pure halves: turret_monster_pose_core.ts,
 // turret_motion_forecast_core.ts, turret_contact_dust_core.ts and
 // turret_defense_pool_core.ts.
 import * as THREE from 'three';
@@ -97,6 +100,7 @@ interface BodySlot {
 }
 
 const HEALTH_BAR_WIDTH = 1.2;
+/** Yards over the body's reach from its pivot (half its height, in any attitude). */
 const HEALTH_BAR_LIFT = 0.35;
 const RING_LIFT = 0.08;
 /** A corpse sinks at least this far (yd), so a short body still leaves the ground. */
@@ -166,6 +170,7 @@ export class TurretDefenseVisual {
     sitting: false,
   };
   private readonly muzzle = { x: 0, y: 0, z: 0 };
+  private camera: THREE.Camera | null = null;
   private geometry: {
     capsule: THREE.CapsuleGeometry;
     box: THREE.BoxGeometry;
@@ -195,6 +200,11 @@ export class TurretDefenseVisual {
       groundAt,
       compileGate,
       bursts: { slots: TURRET_CONTACT_BURSTS, puffs: TURRET_CONTACT_PUFFS },
+      texelSlot: () =>
+        idleSlot(RIG_IDLE_TIMEOUT_MS, {
+          scheduler: this.idleScheduler,
+          maxTimeoutDeferrals: RIG_IDLE_DEFERRALS,
+        }),
     });
     this.contactCounts = turretContactCounts(this.weapon.lowEffects);
     this.effectGate = compileGate
@@ -218,9 +228,10 @@ export class TurretDefenseVisual {
     return this.built;
   }
 
-  /** The renderer services the shots draw with (particles, camera kick, AoE ring). */
+  /** The renderer services the shots draw with (particles, camera kick, AoE ring); its camera the health bars face. */
   setHost(host: CannonShellHost | null): void {
     this.weapon.setHost(host);
+    this.camera = host?.camera ?? null;
   }
 
   update(
@@ -314,8 +325,9 @@ export class TurretDefenseVisual {
       const showHealth = !pose.dead && pose.health > 0 && pose.health < 1;
       body.health.visible = showHealth;
       if (showHealth) {
-        body.health.position.set(pose.x, baseY + 2 * pivot + HEALTH_BAR_LIFT, pose.z);
-        body.health.rotation.y = Math.atan2(pose.x - defense.cx, pose.z - defense.cz);
+        body.health.position.set(pose.x, baseY + pivot + height / 2 + HEALTH_BAR_LIFT, pose.z);
+        if (this.camera) body.health.quaternion.copy(this.camera.quaternion);
+        else body.health.rotation.set(0, Math.atan2(pose.x - defense.cx, pose.z - defense.cz), 0);
         body.health.scale.set(HEALTH_BAR_WIDTH * pose.health, 0.12, 0.12);
       }
       body.ring.visible = pose.windup >= 0;
@@ -458,6 +470,7 @@ export class TurretDefenseVisual {
       const ring = this.marker(geometry.ring, materials.red);
       ring.rotation.x = -Math.PI / 2;
       ring.renderOrder = floorVfxRenderOrder('encounter');
+      health.renderOrder = floorVfxRenderOrder('encounter', 1);
       this.bodies.push({
         owner: null,
         attitude: new TurretAttitude(),

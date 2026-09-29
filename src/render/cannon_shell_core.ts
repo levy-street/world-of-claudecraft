@@ -18,12 +18,15 @@
 import { DT } from '../sim/types';
 import {
   CANNON_BLAST_FIXED_PUFFS,
+  CANNON_DUST_PUFFS,
   CANNON_MUZZLE_FIXED_PUFFS,
+  CANNON_SMOKE_PUFFS,
   CANNON_TRAIL,
   type CannonPuff,
   cannonBlastPuffs,
   cannonHash01,
   cannonMuzzlePuffs,
+  cannonNoiseInto,
   cannonTrailPuffInto,
   newCannonPuff,
 } from './cannon_puff_core';
@@ -113,9 +116,9 @@ export interface CannonShotCounts {
 const FULL_COUNTS: Readonly<CannonShotCounts> = {
   chunks: 12,
   dirt: 24,
-  dust: 12,
+  dust: CANNON_DUST_PUFFS,
   sparks: 16,
-  smoke: 6,
+  smoke: CANNON_SMOKE_PUFFS,
 };
 const LOW_COUNTS: Readonly<CannonShotCounts> = {
   chunks: 5,
@@ -184,26 +187,14 @@ export function cannonScorchFade(age: number): number {
  */
 export function cannonScorchTexels(size: number): Uint8Array {
   const data = new Uint8Array(size * size * 4);
-  const cells = 6;
-  const mottle = (u: number, v: number): number => {
-    const x = (u * 0.5 + 0.5) * cells;
-    const y = (v * 0.5 + 0.5) * cells;
-    const x0 = Math.floor(x);
-    const y0 = Math.floor(y);
-    const fx = smoothstep(x - x0);
-    const fy = smoothstep(y - y0);
-    const at = (i: number, j: number): number => cannonHash01(i * 131 + 7, j);
-    const top = at(x0, y0) + (at(x0 + 1, y0) - at(x0, y0)) * fx;
-    const bottom = at(x0, y0 + 1) + (at(x0 + 1, y0 + 1) - at(x0, y0 + 1)) * fx;
-    return top + (bottom - top) * fy;
-  };
+  const mottle = cannonNoiseInto(new Float64Array(size * size), size, 6, 7, 1, 1);
   for (let j = 0; j < size; j++) {
     for (let i = 0; i < size; i++) {
       const u = ((i + 0.5) / size) * 2 - 1;
       const v = ((j + 0.5) / size) * 2 - 1;
       const r = Math.hypot(u, v);
       const angle = Math.atan2(v, u);
-      const soot = mottle(u, v);
+      const soot = mottle[j * size + i];
       // A ragged rim: the burn reaches further along some bearings than others.
       const rim = 0.72 + 0.14 * (soot - 0.5) + 0.06 * Math.sin(angle * 5 + 1.3);
       const core = 1 - smoothstep((r - 0.22) / (rim - 0.22));
@@ -399,6 +390,10 @@ export interface CannonScorchSlot {
   z: number;
   at: number;
   yaw: number;
+  /** Half-width (yd) of the square it is draped over. */
+  half: number;
+  /** The ground under each draped vertex, sampled once at the impact. */
+  readonly heights: Float32Array;
 }
 
 export interface CannonFiredShot {
@@ -418,11 +413,47 @@ export interface CannonImpactShot {
 }
 
 /**
- * Drapes a scorch over the ground: (GRID + 1)^2 vertices of a square `half`
- * yards from its centre each way, turned by `yaw`, every one at the sampled
- * ground height plus `lift`, written as xyz from `offset` in `out`. A flat mark
- * buries itself wherever the ground bulges (a 0.15 yd rise over 2 yd hides most
- * of a 5 yd plane), so each vertex takes its own height.
+ * Samples the ground under a scorch's (GRID + 1)^2 vertices into `heights`,
+ * once per vertex, for every layer draped over it: a square `half` yards from
+ * its centre each way, turned by `yaw`. `centre` is the ground under the blast,
+ * already sampled by the caller: it is the middle vertex (GRID is even) and the
+ * height a vertex with no ground takes. A flat mark buries itself wherever the
+ * ground bulges (a 0.15 yd rise over 2 yd hides most of a 5 yd plane), so each
+ * vertex takes its own height.
+ */
+export function cannonScorchHeightsInto(
+  heights: Float32Array,
+  x: number,
+  z: number,
+  yaw: number,
+  half: number,
+  centre: number,
+  ground: (x: number, z: number) => number,
+): Float32Array {
+  const grid = CANNON_SCORCH_GRID;
+  const mid = (grid / 2) * (grid + 1) + grid / 2;
+  const c = Math.cos(yaw);
+  const s = Math.sin(yaw);
+  let at = 0;
+  for (let j = 0; j <= grid; j++) {
+    const v = (j / grid) * 2 - 1;
+    for (let i = 0; i <= grid; i++, at++) {
+      if (at === mid) {
+        heights[at] = centre;
+        continue;
+      }
+      const u = (i / grid) * 2 - 1;
+      const g = ground(x + (u * c - v * s) * half, z + (u * s + v * c) * half);
+      heights[at] = Number.isFinite(g) ? g : centre;
+    }
+  }
+  return heights;
+}
+
+/**
+ * Drapes one layer of a scorch over its sampled `heights`
+ * (cannonScorchHeightsInto): every vertex at its ground height plus `lift`,
+ * written as xyz from `offset` in `out`.
  */
 export function cannonScorchDrapeInto(
   out: Float32Array,
@@ -432,23 +463,20 @@ export function cannonScorchDrapeInto(
   yaw: number,
   half: number,
   lift: number,
-  ground: (x: number, z: number) => number,
+  heights: Float32Array,
 ): void {
   const grid = CANNON_SCORCH_GRID;
   const c = Math.cos(yaw);
   const s = Math.sin(yaw);
-  const centre = ground(x, z);
   let at = offset;
+  let k = 0;
   for (let j = 0; j <= grid; j++) {
     const v = (j / grid) * 2 - 1;
     for (let i = 0; i <= grid; i++) {
       const u = (i / grid) * 2 - 1;
-      const wx = x + (u * c - v * s) * half;
-      const wz = z + (u * s + v * c) * half;
-      const g = ground(wx, wz);
-      out[at++] = wx;
-      out[at++] = (Number.isFinite(g) ? g : centre) + lift;
-      out[at++] = wz;
+      out[at++] = x + (u * c - v * s) * half;
+      out[at++] = heights[k++] + lift;
+      out[at++] = z + (u * s + v * c) * half;
     }
   }
 }
@@ -496,6 +524,8 @@ export class CannonShotTimeline {
     z: 0,
     at: 0,
     yaw: 0,
+    half: 0,
+    heights: new Float32Array(CANNON_SCORCH_VERTS),
   }));
   /** Frame seconds of the last shot's muzzle (the recoil runs from it). */
   muzzleAt = Number.NEGATIVE_INFINITY;
@@ -561,7 +591,10 @@ export class CannonShotTimeline {
 
   /**
    * The blast of shot `shotId`: its shell lands, and a blast of `power`
-   * (cannonBlastPower), its chunks, its puffs and a scorch start.
+   * (cannonBlastPower), its chunks, its puffs and a scorch start. The ground
+   * is sampled once per point that needs it: under the blast (shared by the
+   * ring, the sparks and the scorch's middle vertex), under each chunk, ring
+   * puff and clod, and under each scorch vertex for all of its layers.
    */
   impact(
     shot: CannonImpactShot,
@@ -581,6 +614,8 @@ export class CannonShotTimeline {
     slot.z = shot.z;
     slot.at = time;
     slot.power = power;
+    const under = ground(shot.x, shot.z);
+    const centre = Number.isFinite(under) ? under : shot.y;
     slot.chunkCount = Math.max(0, Math.min(CANNON_CHUNKS_PER_IMPACT, counts.chunks));
     for (let i = 0; i < slot.chunkCount; i++) {
       cannonChunkLaunch(
@@ -609,6 +644,7 @@ export class CannonShotTimeline {
         smoke: 0,
       },
       ground,
+      centre,
     );
     this.lastScorch = this.nextScorch;
     const scorch = this.scorches[this.nextScorch];
@@ -619,6 +655,16 @@ export class CannonShotTimeline {
     scorch.z = shot.z;
     scorch.at = time;
     scorch.yaw = cannonHash01(shot.shotId, 997) * Math.PI * 2;
+    scorch.half = radius * CANNON_BLAST.scorchScale;
+    cannonScorchHeightsInto(
+      scorch.heights,
+      shot.x,
+      shot.z,
+      scorch.yaw,
+      scorch.half,
+      centre,
+      ground,
+    );
     return index;
   }
 

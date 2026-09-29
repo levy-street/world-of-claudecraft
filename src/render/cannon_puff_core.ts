@@ -59,6 +59,9 @@ interface PuffStyleSpec {
   /** Self-lit share (ignores the scene light) at the start and the end, crossing
    *  over between u0 and u1; defaults to the additive share. */
   glow?: readonly [number, number, number, number];
+  /** Fire that cools into smoke: the peak opacity falls to the first value
+   *  between the second and the third (shares of the life); none by default. */
+  cool?: readonly [number, number, number];
 }
 
 export interface CannonPuffStyle {
@@ -79,6 +82,10 @@ export interface CannonPuffStyle {
   readonly glow1: number;
   readonly glowU0: number;
   readonly glowU1: number;
+  /** The peak opacity once cooled, and the span it falls over (`alpha` throughout by default). */
+  readonly alpha1: number;
+  readonly alphaU0: number;
+  readonly alphaU1: number;
 }
 
 const S = CANNON_PUFF_SPRITE;
@@ -124,12 +131,13 @@ const STYLE_SPECS: readonly PuffStyleSpec[] = [
     alpha: 0.95,
     attack: 0.05,
     fadeFrom: 0.5,
-    add0: 0.3,
+    add0: 1,
     add1: 0,
-    addU0: 0.08,
-    addU1: 0.35,
+    addU0: 0.25,
+    addU1: 0.5,
     shade: 0.7,
     glow: [1, 0, 0.2, 0.45],
+    cool: [0.015, 0.02, 0.3],
   },
   // dust: the big brown-grey cloud that lingers.
   {
@@ -137,7 +145,7 @@ const STYLE_SPECS: readonly PuffStyleSpec[] = [
     layer: 0,
     stops: [0xc2b6a4, 1, 0xb5ab9d, 1, 0xa7a199, 1],
     mid: 0.4,
-    alpha: 0.7,
+    alpha: 0.06,
     attack: 0.1,
     fadeFrom: 0.35,
     add0: 0,
@@ -152,13 +160,13 @@ const STYLE_SPECS: readonly PuffStyleSpec[] = [
     layer: 0,
     stops: [0xe2cdaa, 1, 0xd2c0a2, 1, 0xbcae98, 1],
     mid: 0.5,
-    alpha: 0.5,
+    alpha: 0.1,
     attack: 0.08,
     fadeFrom: 0.25,
-    add0: 0,
+    add0: 0.6,
     add1: 0,
-    addU0: 0,
-    addU1: 1,
+    addU0: 0.1,
+    addU1: 0.6,
     shade: 0.55,
   },
   // dirt: dark clods thrown up and falling back.
@@ -197,7 +205,7 @@ const STYLE_SPECS: readonly PuffStyleSpec[] = [
     layer: 0,
     stops: [0xb5aa9c, 1, 0xaba398, 1, 0xa39d95, 1],
     mid: 0.4,
-    alpha: 0.7,
+    alpha: 0.07,
     attack: 0.08,
     fadeFrom: 0.3,
     add0: 0,
@@ -212,7 +220,7 @@ const STYLE_SPECS: readonly PuffStyleSpec[] = [
     layer: 0,
     stops: [0xc2bbb2, 1, 0xb4aea6, 1, 0xaaa59f, 1],
     mid: 0.4,
-    alpha: 0.5,
+    alpha: 0.08,
     attack: 0.18,
     fadeFrom: 0.25,
     add0: 0,
@@ -281,7 +289,7 @@ function buildStyle(spec: PuffStyleSpec): CannonPuffStyle {
     rgb[s * 3 + 1] = srgbToLinear(((hex >> 8) & 255) / 255) * gain;
     rgb[s * 3 + 2] = srgbToLinear((hex & 255) / 255) * gain;
   }
-  const { stops: _stops, glow, ...rest } = spec;
+  const { stops: _stops, glow, cool, ...rest } = spec;
   return {
     ...rest,
     rgb,
@@ -289,6 +297,9 @@ function buildStyle(spec: PuffStyleSpec): CannonPuffStyle {
     glow1: glow ? glow[1] : spec.add1,
     glowU0: glow ? glow[2] : spec.addU0,
     glowU1: glow ? glow[3] : spec.addU1,
+    alpha1: cool ? cool[0] : spec.alpha,
+    alphaU0: cool ? cool[1] : 0,
+    alphaU1: cool ? cool[2] : 1,
   };
 }
 
@@ -334,6 +345,8 @@ export interface CannonPuff {
   spin: number;
   /** It never sinks below this height (dirt and sparks come to rest on the ground). */
   floorY: number;
+  /** Its peak opacity against its style's (cannonTierAlpha: fewer puffs, each denser). */
+  alpha: number;
 }
 
 export function newCannonPuff(): CannonPuff {
@@ -354,6 +367,7 @@ export function newCannonPuff(): CannonPuff {
     rot: 0,
     spin: 0,
     floorY: Number.NEGATIVE_INFINITY,
+    alpha: 1,
   };
 }
 
@@ -431,7 +445,10 @@ export function cannonPuffInto(p: CannonPuff, age: number, out: CannonPuffFrame)
   out.b = rgb[a + 2] + (rgb[a + 5] - rgb[a + 2]) * w;
   const attack = style.attack > 0 ? clamp01(u / style.attack) : 1;
   const fade = style.fadeFrom < 1 ? 1 - smoothstep((u - style.fadeFrom) / (1 - style.fadeFrom)) : 1;
-  out.a = style.alpha * attack * fade;
+  const coolSpan = style.alphaU1 - style.alphaU0;
+  const cooled = coolSpan > 0 ? smoothstep((u - style.alphaU0) / coolSpan) : 1;
+  const peak = style.alpha + (style.alpha1 - style.alpha) * cooled;
+  out.a = Math.min(1, peak * p.alpha) * attack * fade;
   const span = style.addU1 - style.addU0;
   const cross = span > 0 ? smoothstep((u - style.addU0) / span) : 1;
   out.add = style.add0 + (style.add1 - style.add0) * cross;
@@ -451,6 +468,31 @@ export interface CannonPuffCounts {
   dirt: number;
   sparks: number;
   smoke: number;
+}
+
+/** The dust cloud and the muzzle smoke at full count (the high preset's). */
+export const CANNON_DUST_PUFFS = 8;
+export const CANNON_SMOKE_PUFFS = 6;
+
+/**
+ * The most a smoke or dust source (one blast, one muzzle, one body's contact)
+ * may darken what stands behind it, stacked, on every preset: a monster and its
+ * health bar always read through the dust (the fairness rule: enemy positions
+ * are actionable). tests/cannon_puff_core.test.ts measures it from the turret
+ * camera through every live puff of a blast.
+ */
+export const CANNON_SMOKE_OCCLUSION_MAX = 0.4;
+
+/**
+ * The peak-opacity factor for `count` puffs of a style of peak `alpha` where
+ * the full preset draws `full`: the fewer puffs are each denser, so where they
+ * all overlap they stack to the opacity the full set stacks to there, never
+ * more, and a preset that sheds puffs never sees more through the dust than
+ * the full one does. 1 at the full count.
+ */
+export function cannonTierAlpha(alpha: number, full: number, count: number): number {
+  if (!(count > 0) || !(full > count) || !(alpha > 0) || !(alpha < 1)) return 1;
+  return (1 - (1 - alpha) ** (full / count)) / alpha;
 }
 
 export const CANNON_FIREBALL_PUFFS = 8;
@@ -497,6 +539,7 @@ function launch(
   p.rot = rot;
   p.spin = spin;
   p.floorY = floorY;
+  p.alpha = 1;
 }
 
 /**
@@ -521,8 +564,9 @@ const NO_FLOOR = Number.NEGATIVE_INFINITY;
  * Launches the blast's puffs at (x, y, z) into `out` from index 0 and returns
  * how many: the flash, the fireball and the shock ring (every tier), then the
  * dust cloud, the dirt and the sparks (`counts`). `radius` is the blast radius
- * the ring rolls out to; `power` scales the sizes (cannonBlastPower). The ground
- * is sampled once per ring puff and per clod, never per frame.
+ * the ring rolls out to; `power` scales the sizes (cannonBlastPower). `centre`
+ * is the ground under the blast, sampled once by the caller; the ground is
+ * sampled once more per ring puff and per clod, never per frame.
  */
 export function cannonBlastPuffs(
   out: CannonPuff[],
@@ -534,6 +578,7 @@ export function cannonBlastPuffs(
   power: number,
   counts: Readonly<CannonPuffCounts>,
   ground: (x: number, z: number) => number,
+  centre: number,
 ): number {
   let n = 0;
   const h = (i: number, k: number): number => cannonHash01(seed, i * 16 + k);
@@ -587,7 +632,7 @@ export function cannonBlastPuffs(
     );
   }
   // The shock ring: dust rolling out along the ground past the blast radius.
-  const ringFloor = floorAt(x, z);
+  const ringFloor = centre;
   for (let i = 0; i < CANNON_SHOCK_PUFFS; i++) {
     const idx = 10 + i;
     const a = ((i + 0.5 * h(idx, 0)) / CANNON_SHOCK_PUFFS) * TAU;
@@ -617,11 +662,17 @@ export function cannonBlastPuffs(
       NO_FLOOR,
     );
   }
-  // The dust cloud: big brown-grey puffs heaving up and lingering.
+  // The dust cloud: big brown-grey puffs heaving up and lingering, spread all
+  // around so a preset that draws fewer still covers the whole blast.
+  const dustAlpha = cannonTierAlpha(
+    CANNON_PUFF_STYLES[PUFF.dust].alpha,
+    CANNON_DUST_PUFFS,
+    counts.dust,
+  );
   for (let i = 0; i < counts.dust; i++) {
     const idx = 40 + i;
-    const a = h(idx, 0) * TAU;
-    const off = radius * 0.3 * Math.sqrt(h(idx, 1));
+    const a = ((i + h(idx, 0)) / counts.dust) * TAU;
+    const off = radius * 0.5 * Math.sqrt(h(idx, 1));
     const outward = 0.8 + 2.2 * h(idx, 2);
     launch(
       out[n++],
@@ -642,6 +693,8 @@ export function cannonBlastPuffs(
       (h(idx, 10) - 0.5) * 0.5,
       NO_FLOOR,
     );
+    // A core hit's bigger cloud spreads the same dust wider, never thicker.
+    out[n - 1].alpha = dustAlpha / (power * power);
   }
   // The dirt: dark clods thrown 3 to 5 yd up, landing around the blast.
   for (let i = 0; i < counts.dirt; i++) {
@@ -764,6 +817,11 @@ export function cannonMuzzlePuffs(
   const len = Math.hypot(dx, dz);
   const sx = len > 1e-6 ? dz / len : 1;
   const sz = len > 1e-6 ? -dx / len : 0;
+  const smokeAlpha = cannonTierAlpha(
+    CANNON_PUFF_STYLES[PUFF.smoke].alpha,
+    CANNON_SMOKE_PUFFS,
+    smoke,
+  );
   for (let i = 0; i < smoke; i++) {
     const idx = 8 + i;
     const at = 0.4 + 1.3 * h(idx, 0);
@@ -788,6 +846,7 @@ export function cannonMuzzlePuffs(
       (h(idx, 9) - 0.5) * 0.9,
       NO_FLOOR,
     );
+    out[n - 1].alpha = smokeAlpha;
   }
   return n;
 }
@@ -795,7 +854,7 @@ export function cannonMuzzlePuffs(
 /** The shell's wake: a grey smoke puff every `spacing` yards of the arc, a
  *  warm spark on every other one. */
 export const CANNON_TRAIL = {
-  spacing: 0.6,
+  spacing: 0.9,
   smokeLife: 0.55,
   sparkLife: 0.22,
 } as const;
@@ -850,7 +909,7 @@ export function cannonTrailPuffInto(
       (cannonHash01(salt, base + 4) - 0.5) * 0.4,
       1.5,
       -0.3,
-      0.42,
+      0.7,
       1.05 + 0.3 * cannonHash01(salt, base + 5),
       CANNON_TRAIL.smokeLife,
       0,
@@ -937,6 +996,64 @@ export function cannonPuffLightInto(
 
 const ATLAS_GRID = 2;
 
+/** Every sprite of the atlas is clear past this share of its half-cell (cannon_puff_mesh.ts cuts its billboards to it). */
+export const CANNON_PUFF_SPRITE_RADIUS = 0.98;
+
+/**
+ * Adds `gain` times one octave of value noise to `out`, a square field of
+ * `texels` by `texels` sampled at the texel centres (row by row): the lattice
+ * is `cells` wide across u in [-1, 1] after `scale`. Every lattice corner is
+ * hashed once and every column's and row's blend weight worked out once, so a
+ * texel costs four reads and three blends, in the order a per-sample hash
+ * blends them, so the result is the same to the last bit.
+ */
+export function cannonNoiseInto(
+  out: Float64Array,
+  texels: number,
+  cells: number,
+  salt: number,
+  scale: number,
+  gain: number,
+): Float64Array {
+  const lo = Math.floor((0.5 - 0.5 * scale) * cells);
+  const n = Math.floor((0.5 + 0.5 * scale) * cells) + 2 - lo;
+  const lattice = new Float64Array(n * n);
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) lattice[i * n + j] = cannonHash01((lo + i) * 131 + salt, lo + j);
+  }
+  const index = new Int32Array(texels);
+  const weight = new Float64Array(texels);
+  for (let i = 0; i < texels; i++) {
+    const x = ((((i + 0.5) / texels) * 2 - 1) * scale * 0.5 + 0.5) * cells;
+    const x0 = Math.floor(x);
+    index[i] = x0 - lo;
+    const t = x - x0;
+    weight[i] = t * t * (3 - 2 * t);
+  }
+  for (let j = 0; j < texels; j++) {
+    const fy = weight[j];
+    const row = index[j];
+    for (let i = 0; i < texels; i++) {
+      const fx = weight[i];
+      const a = index[i] * n + row;
+      const v00 = lattice[a];
+      const v01 = lattice[a + 1];
+      const top = v00 + (lattice[a + n] - v00) * fx;
+      const bottom = v01 + (lattice[a + n + 1] - v01) * fx;
+      out[j * texels + i] += gain * (top + (bottom - top) * fy);
+    }
+  }
+  return out;
+}
+
+/** Three octaves of value noise (4, 9 and 19 cells, weighted 0.55, 0.3, 0.15) at one scale. */
+function puffFbm(texels: number, scale: number, salt: number): Float64Array {
+  const out = new Float64Array(texels * texels);
+  cannonNoiseInto(out, texels, 4, salt, scale, 0.55);
+  cannonNoiseInto(out, texels, 9, salt + 17, scale, 0.3);
+  return cannonNoiseInto(out, texels, 19, salt + 41, scale, 0.15);
+}
+
 /**
  * The puff atlas, `cell` texels per sprite on a 2 by 2 grid, row 0 at the
  * bottom (texture v up): a lumpy smoke cloud, a soft glow with a hot core, a
@@ -946,31 +1063,22 @@ const ATLAS_GRID = 2;
 export function cannonPuffAtlasTexels(cell: number): Uint8Array {
   const size = cell * ATLAS_GRID;
   const data = new Uint8Array(size * size * 4);
-  const noise = (u: number, v: number, cells: number, salt: number): number => {
-    const x = (u * 0.5 + 0.5) * cells;
-    const y = (v * 0.5 + 0.5) * cells;
-    const x0 = Math.floor(x);
-    const y0 = Math.floor(y);
-    const fx = smoothstep(x - x0);
-    const fy = smoothstep(y - y0);
-    const at = (i: number, j: number): number => cannonHash01(i * 131 + salt, j);
-    const top = at(x0, y0) + (at(x0 + 1, y0) - at(x0, y0)) * fx;
-    const bottom = at(x0, y0 + 1) + (at(x0 + 1, y0 + 1) - at(x0, y0 + 1)) * fx;
-    return top + (bottom - top) * fy;
-  };
-  const fbm = (u: number, v: number, salt: number): number =>
-    0.55 * noise(u, v, 4, salt) +
-    0.3 * noise(u, v, 9, salt + 17) +
-    0.15 * noise(u, v, 19, salt + 41);
+  const billowNoise = puffFbm(cell, 0.8, 5);
+  const grainNoise = puffFbm(cell, 2.2, 47);
+  const litNoise = puffFbm(cell, 1.8, 29);
+  const rimNoise = puffFbm(cell, 1.4, 97);
+  const clodNoise = puffFbm(cell, 2, 61);
   const write = (cx: number, cy: number, i: number, j: number, r: number, a: number): void => {
     const at = ((cy * cell + j) * size + cx * cell + i) * 4;
-    data[at] = Math.round(255 * clamp01(r));
-    data[at + 1] = Math.round(255 * clamp01(r));
-    data[at + 2] = Math.round(255 * clamp01(r));
+    const lum = Math.round(255 * clamp01(r));
+    data[at] = lum;
+    data[at + 1] = lum;
+    data[at + 2] = lum;
     data[at + 3] = Math.round(255 * clamp01(a));
   };
   for (let j = 0; j < cell; j++) {
     for (let i = 0; i < cell; i++) {
+      const k = j * cell + i;
       const u = ((i + 0.5) / cell) * 2 - 1;
       const v = ((j + 0.5) / cell) * 2 - 1;
       const r = Math.hypot(u, v);
@@ -978,11 +1086,10 @@ export function cannonPuffAtlasTexels(cell: number): Uint8Array {
       const angle = Math.atan2(v, u);
       // Smoke: a soft billow whose outline and thickness follow a low noise, so
       // the edge frays into lumps and wisps and no two rotations look alike.
-      const billow = fbm(u * 0.8, v * 0.8, 5);
+      const billow = billowNoise[k];
       const dens = billow * 1.5 + 0.3 - 1.3 * r * r;
-      const smokeA = smoothstep(dens / 0.5) * (0.72 + 0.28 * fbm(u * 2.2, v * 2.2, 47)) * edge;
-      const smokeLit =
-        0.62 + 0.3 * smoothstep(dens / 0.9) + 0.2 * (fbm(u * 1.8, v * 1.8, 29) - 0.5);
+      const smokeA = smoothstep(dens / 0.5) * (0.72 + 0.28 * grainNoise[k]) * edge;
+      const smokeLit = 0.62 + 0.3 * smoothstep(dens / 0.9) + 0.2 * (litNoise[k] - 0.5);
       write(0, 0, i, j, smokeLit, smokeA);
       // Glow: a soft falloff with a hot core.
       const glowA = clamp01((1 - smoothstep(r)) ** 2.2 + 0.7 * Math.exp(-r * r * 30)) * edge;
@@ -995,9 +1102,9 @@ export function cannonPuffAtlasTexels(cell: number): Uint8Array {
         0.6 +
         0.08 * Math.sin(angle * 2 + 1.1) +
         0.05 * Math.sin(angle * 3 + 2.3) +
-        0.16 * (fbm(u * 1.4, v * 1.4, 97) - 0.5);
+        0.16 * (rimNoise[k] - 0.5);
       const clodA = 1 - smoothstep((r - rim + 0.04) / 0.07);
-      const lit = 0.6 + 0.32 * clamp01(v * 0.5 + 0.5) + 0.3 * (fbm(u * 2, v * 2, 61) - 0.5);
+      const lit = 0.6 + 0.32 * clamp01(v * 0.5 + 0.5) + 0.3 * (clodNoise[k] - 0.5);
       write(1, 1, i, j, lit, clodA);
     }
   }

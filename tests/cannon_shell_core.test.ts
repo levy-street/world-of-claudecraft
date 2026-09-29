@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   CANNON_BLAST_FIXED_PUFFS,
+  CANNON_SHOCK_PUFFS,
   CANNON_TRAIL,
   newCannonPuff,
   PUFF,
@@ -28,6 +29,7 @@ import {
   cannonRecoilOffset,
   cannonScorchDrapeInto,
   cannonScorchFade,
+  cannonScorchHeightsInto,
   cannonScorchTexels,
   cannonShakeFalloff,
   cannonShotCounts,
@@ -58,15 +60,17 @@ describe('cannon shot tuning', () => {
       CANNON_SCORCH_POOL,
       CANNON_CHUNKS_PER_IMPACT,
     ]).toEqual([4, 4, 6, 18, 12]);
+    // The dust is 8 fuller puffs, not 12 thin ones: the same cloud for a third
+    // less fill, and the low preset's 4 carry the rest (cannonTierAlpha).
     expect(cannonShotCounts(false)).toEqual({
       chunks: 12,
       dirt: 24,
-      dust: 12,
+      dust: 8,
       sparks: 16,
       smoke: 6,
     });
     expect(cannonShotCounts(true)).toEqual({ chunks: 5, dirt: 8, dust: 4, sparks: 5, smoke: 2 });
-    expect(CANNON_BLAST_PUFFS).toBe(CANNON_BLAST_FIXED_PUFFS + 12 + 24 + 16);
+    expect(CANNON_BLAST_PUFFS).toBe(CANNON_BLAST_FIXED_PUFFS + 8 + 24 + 16);
   });
 });
 
@@ -316,12 +320,24 @@ describe('cannon scorch', () => {
     expect(cannonScorchTexels(size)).toEqual(texels);
   });
 
+  it('keeps the exact char it drew before its mottle was precomputed', () => {
+    // The mottle reads a lattice hashed once (no hash and no closure per
+    // texel) in the same blend order: byte for byte the same texels. Re-pin
+    // only on a deliberate retune.
+    const texels = cannonScorchTexels(64);
+    let h = 2166136261;
+    for (let i = 0; i < texels.length; i++) h = Math.imul(h ^ texels[i], 16777619);
+    expect((h >>> 0).toString(16)).toBe('fecf7191');
+  });
+
   it('drapes every vertex over bumpy ground instead of burying a flat plane in it', () => {
     // The test site's ground: a 0.15 yd bulge within 2 yd of the blast, which
     // swallowed most of the old flat mark (centre height plus a lift).
     const ground = (x: number, z: number) => 1 + 0.15 * Math.cos(x * 0.8) * Math.cos(z * 0.8);
     const out = new Float32Array(CANNON_SCORCH_VERTS * 3 + 6);
-    cannonScorchDrapeInto(out, 3, 10, -4, 0.7, 2.7, 0.06, ground);
+    const heights = new Float32Array(CANNON_SCORCH_VERTS);
+    cannonScorchHeightsInto(heights, 10, -4, 0.7, 2.7, ground(10, -4), ground);
+    cannonScorchDrapeInto(out, 3, 10, -4, 0.7, 2.7, 0.06, heights);
     expect(out[0]).toBe(0);
     expect(out[out.length - 1]).toBe(0);
     let spanX = 0;
@@ -340,6 +356,44 @@ describe('cannon scorch', () => {
     expect(out[3 + mid * 3 + 2]).toBeCloseTo(-4, 9);
   });
 
+  it('samples the ground once per vertex, reuses the centre for the middle one, and falls back to it', () => {
+    const calls: [number, number][] = [];
+    const ground = (x: number, z: number) => {
+      calls.push([x, z]);
+      return x > 11 ? Number.NaN : 0.5 + 0.01 * x;
+    };
+    const heights = new Float32Array(CANNON_SCORCH_VERTS);
+    cannonScorchHeightsInto(heights, 10, -4, 0.3, 2.7, 7, ground);
+    // The middle vertex is the blast point the caller already sampled.
+    expect(calls).toHaveLength(CANNON_SCORCH_VERTS - 1);
+    expect(calls.some(([x, z]) => x === 10 && z === -4)).toBe(false);
+    const grid = CANNON_SCORCH_GRID;
+    expect(heights[(grid / 2) * (grid + 1) + grid / 2]).toBe(7);
+    // A vertex off the terrain takes the centre's height, never NaN.
+    expect(heights.filter((h) => h === 7).length).toBeGreaterThan(1);
+    expect(heights.every((h) => Number.isFinite(h))).toBe(true);
+    // Three layers drape over one sampling: no layer reads the ground again.
+    const out = new Float32Array(CANNON_SCORCH_VERTS * 3 * CANNON_SCORCH_LAYERS.length);
+    for (let layer = 0; layer < CANNON_SCORCH_LAYERS.length; layer++) {
+      cannonScorchDrapeInto(
+        out,
+        layer * CANNON_SCORCH_VERTS * 3,
+        10,
+        -4,
+        0.3,
+        2.7,
+        CANNON_SCORCH_LAYERS[layer].lift,
+        heights,
+      );
+    }
+    expect(calls).toHaveLength(CANNON_SCORCH_VERTS - 1);
+    const top = CANNON_SCORCH_LAYERS.length - 1;
+    const lift = CANNON_SCORCH_LAYERS[top].lift - CANNON_SCORCH_LAYERS[0].lift;
+    for (let v = 0; v < CANNON_SCORCH_VERTS; v++) {
+      expect(out[top * CANNON_SCORCH_VERTS * 3 + v * 3 + 1] - out[v * 3 + 1]).toBeCloseTo(lift, 5);
+    }
+  });
+
   it('stacks a soil sheet under canopy sheets that darken less', () => {
     expect(CANNON_SCORCH_LAYERS[0]).toEqual({ lift: 0.06, strength: 1 });
     for (let i = 1; i < CANNON_SCORCH_LAYERS.length; i++) {
@@ -350,6 +404,33 @@ describe('cannon scorch', () => {
 });
 
 describe('cannon shot timeline pools', () => {
+  it('samples the ground once per point an impact needs, and never per scorch layer', () => {
+    for (const low of [false, true]) {
+      const counts = cannonShotCounts(low);
+      const timeline = new CannonShotTimeline();
+      const seen = new Map<string, number>();
+      let calls = 0;
+      const ground = (x: number, z: number) => {
+        calls++;
+        const key = `${x},${z}`;
+        seen.set(key, (seen.get(key) ?? 0) + 1);
+        return 0.02 * x;
+      };
+      timeline.impact({ shotId: 9, x: 12, y: 0.24, z: -3 }, 1, counts, 6, 1, ground);
+      // The blast point once (the ring, the sparks and the scorch's middle
+      // vertex share it), one per chunk, ring puff and clod, one per other
+      // scorch vertex: before, every scorch layer sampled all 81 vertices again.
+      expect(calls).toBe(
+        1 + counts.chunks + CANNON_SHOCK_PUFFS + counts.dirt + (CANNON_SCORCH_VERTS - 1),
+      );
+      expect(seen.get('12,-3')).toBe(1);
+      const scorch = timeline.scorches[timeline.lastScorch];
+      expect(scorch.half).toBeCloseTo(6 * CANNON_BLAST.scorchScale, 12);
+      const grid = CANNON_SCORCH_GRID;
+      expect(scorch.heights[(grid / 2) * (grid + 1) + grid / 2]).toBeCloseTo(0.24, 6);
+    }
+  });
+
   it('reuses its fixed pools round robin, starts a blast, chunks and a scorch per impact, and clears', () => {
     const timeline = new CannonShotTimeline();
     for (let i = 1; i <= CANNON_SHELL_POOL + 1; i++) {

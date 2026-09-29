@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import {
   CANNON_BLAST_FIXED_PUFFS,
+  CANNON_DUST_PUFFS,
   CANNON_FIREBALL_PUFFS,
   CANNON_MUZZLE_FIXED_PUFFS,
   CANNON_PUFF_KINDS,
   CANNON_PUFF_LIGHT,
   CANNON_PUFF_SPRITE,
+  CANNON_PUFF_SPRITE_RADIUS,
   CANNON_PUFF_STYLES,
   CANNON_SHOCK_PUFFS,
+  CANNON_SMOKE_OCCLUSION_MAX,
+  CANNON_SMOKE_PUFFS,
   CANNON_TRAIL,
   type CannonPuff,
   cannonBlastPower,
@@ -17,17 +21,35 @@ import {
   cannonPuffInto,
   cannonPuffLightInto,
   cannonShellGlowInto,
+  cannonTierAlpha,
   cannonTrailPuffInto,
   newCannonPuff,
   newCannonPuffFrame,
   PUFF,
 } from '../src/render/cannon_puff_core';
-import { CANNON_BLAST, CANNON_MUZZLE } from '../src/render/cannon_shell_core';
+import {
+  CANNON_BLAST,
+  CANNON_MUZZLE,
+  CannonShotTimeline,
+  cannonShotCounts,
+} from '../src/render/cannon_shell_core';
+import {
+  occlusionTargets,
+  smokeOcclusionPeak,
+  TURRET_CAMERA_EYE,
+} from './helpers/cannon_smoke_occlusion';
 
 const flat = () => 0;
 const pool = (n: number): CannonPuff[] => Array.from({ length: n }, newCannonPuff);
-const full = { dust: 12, dirt: 24, sparks: 16, smoke: 0 };
+const full = { dust: CANNON_DUST_PUFFS, dirt: 24, sparks: 16, smoke: 0 };
 const low = { dust: 4, dirt: 8, sparks: 5, smoke: 0 };
+
+/** A 32-bit FNV-1a of the bytes: pins a texel builder's exact output. */
+function fnv(bytes: Uint8Array): string {
+  let h = 2166136261;
+  for (let i = 0; i < bytes.length; i++) h = Math.imul(h ^ bytes[i], 16777619);
+  return (h >>> 0).toString(16);
+}
 
 function kinds(puffs: CannonPuff[], n: number): Record<number, number> {
   const out: Record<number, number> = {};
@@ -66,7 +88,7 @@ describe('cannon puff flight', () => {
     expect(f.size).toBeCloseTo(2, 9);
     expect(cannonPuffInto(p, 0.4, f)).toBe(true);
     const early = f.a;
-    expect(early).toBeGreaterThan(0.3);
+    expect(early).toBeGreaterThan(0.8 * CANNON_PUFF_STYLES[PUFF.dust].alpha);
     cannonPuffInto(p, 1.55, f);
     expect(f.a).toBeLessThan(early * 0.2);
     expect(f.size).toBeGreaterThan(5.5);
@@ -111,12 +133,19 @@ describe('cannon puff flight', () => {
     expect(f.add).toBe(0);
     expect(f.glow).toBe(0);
     expect(f.r).toBeLessThan(hot / 10);
-    for (const kind of [PUFF.dust, PUFF.shock, PUFF.smoke, PUFF.dirt]) {
+    for (const kind of [PUFF.dust, PUFF.smoke, PUFF.dirt]) {
       Object.assign(p, { kind });
       cannonPuffInto(p, 0.5, f);
       expect(f.add).toBe(0);
       expect(f.glow).toBe(0);
     }
+    // The ground ring rolls out lit by the flash, then settles as plain dust.
+    Object.assign(p, { kind: PUFF.shock });
+    cannonPuffInto(p, 0.05, f);
+    expect(f.add).toBeGreaterThan(0.5);
+    cannonPuffInto(p, 0.7, f);
+    expect(f.add).toBe(0);
+    expect(f.glow).toBe(0);
     for (const kind of [PUFF.flash, PUFF.flame, PUFF.spark, PUFF.trailSpark]) {
       Object.assign(p, { kind });
       cannonPuffInto(p, 0.05, f);
@@ -133,8 +162,8 @@ describe('cannon blast puffs', () => {
   it('launches the flash, fireball and shock ring on every tier and sheds only the rest', () => {
     const high = pool(200);
     const lower = pool(200);
-    const n = cannonBlastPuffs(high, 5, 10, 1, 10, 6, 1, full, flat);
-    const m = cannonBlastPuffs(lower, 5, 10, 1, 10, 6, 1, low, flat);
+    const n = cannonBlastPuffs(high, 5, 10, 1, 10, 6, 1, full, flat, 0);
+    const m = cannonBlastPuffs(lower, 5, 10, 1, 10, 6, 1, low, flat, 0);
     expect(n).toBe(CANNON_BLAST_FIXED_PUFFS + full.dust + full.dirt + full.sparks);
     expect(m).toBe(CANNON_BLAST_FIXED_PUFFS + low.dust + low.dirt + low.sparks);
     expect(kinds(high, n)).toEqual({
@@ -156,7 +185,7 @@ describe('cannon blast puffs', () => {
     // 5 to 10 px at the 35 to 40 yd a blast sits from the camera: the blast's
     // own puffs must stay big and long enough to be seen at all.
     const puffs = pool(200);
-    const n = cannonBlastPuffs(puffs, 9, 0, 0, 0, 6, 1, full, flat);
+    const n = cannonBlastPuffs(puffs, 9, 0, 0, 0, 6, 1, full, flat, 0);
     const of = (kind: number) => puffs.slice(0, n).filter((p) => p.kind === kind);
     for (const dust of of(PUFF.dust)) {
       expect(peak(dust).size).toBeGreaterThanOrEqual(5);
@@ -176,7 +205,7 @@ describe('cannon blast puffs', () => {
   it('rolls the shock ring out along the ground to the blast radius, all around', () => {
     const puffs = pool(200);
     const ground = (x: number) => 0.1 * x;
-    const n = cannonBlastPuffs(puffs, 3, 0, 0, 0, 6, 1, full, ground);
+    const n = cannonBlastPuffs(puffs, 3, 0, 0, 0, 6, 1, full, ground, 0);
     const ring = puffs.slice(0, n).filter((p) => p.kind === PUFF.shock);
     const f = newCannonPuffFrame();
     const bearings = new Set<number>();
@@ -198,9 +227,9 @@ describe('cannon blast puffs', () => {
     const a = pool(200);
     const b = pool(200);
     const core = pool(200);
-    cannonBlastPuffs(a, 7, 1, 2, 3, 6, 1, full, flat);
-    cannonBlastPuffs(b, 7, 1, 2, 3, 6, 1, full, flat);
-    cannonBlastPuffs(core, 7, 1, 2, 3, 6, 1.3, full, flat);
+    cannonBlastPuffs(a, 7, 1, 2, 3, 6, 1, full, flat, 0);
+    cannonBlastPuffs(b, 7, 1, 2, 3, 6, 1, full, flat, 0);
+    cannonBlastPuffs(core, 7, 1, 2, 3, 6, 1.3, full, flat, 0);
     expect(a).toEqual(b);
     expect(core[0].size1).toBeCloseTo(a[0].size1 * 1.3, 9);
   });
@@ -296,5 +325,137 @@ describe('cannon puff atlas', () => {
       }
     }
     expect(cannonPuffAtlasTexels(cell)).toEqual(data);
+  });
+
+  it('keeps every sprite clear past its radius, so the octagon billboards clip nothing', () => {
+    const cell = 64;
+    const data = cannonPuffAtlasTexels(cell);
+    for (const sprite of Object.values(CANNON_PUFF_SPRITE)) {
+      const cx = sprite % 2;
+      const cy = Math.floor(sprite / 2);
+      for (let j = 0; j < cell; j++) {
+        for (let i = 0; i < cell; i++) {
+          const r = Math.hypot(((i + 0.5) / cell) * 2 - 1, ((j + 0.5) / cell) * 2 - 1);
+          if (r < CANNON_PUFF_SPRITE_RADIUS) continue;
+          expect(data[((cy * cell + j) * cell * 2 + cx * cell + i) * 4 + 3]).toBe(0);
+        }
+      }
+    }
+  });
+
+  it('keeps the exact sprites it drew before its noise was precomputed per octave', () => {
+    // The value noise reads every lattice corner from a table hashed once per
+    // octave (no hash and no closure per sample) in the same blend order, so
+    // the atlas is byte for byte what the per-sample hashing drew. Re-pin only
+    // on a deliberate retune of the sprites.
+    expect(fnv(cannonPuffAtlasTexels(64))).toBe('aba7c2e0');
+  });
+});
+
+describe('cannon smoke fairness', () => {
+  // A monster and its health bar always read through the smoke (the
+  // fairness rule: enemy positions are actionable). The worst the smoke of one
+  // source hides from the turret camera is capped on every preset, and the
+  // high preset, which draws more puffs, never hides more than the low one.
+  const blastWorst = (low: boolean): number => {
+    const counts = cannonShotCounts(low);
+    const puffs = pool(200);
+    let worst = 0;
+    for (const seed of [3, 7, 19]) {
+      for (const power of [1, 1.3]) {
+        for (const d of [10, 35]) {
+          const n = cannonBlastPuffs(
+            puffs,
+            seed,
+            0,
+            0,
+            d,
+            6,
+            power,
+            { ...counts, smoke: 0 },
+            flat,
+            0,
+          );
+          const peak = smokeOcclusionPeak(puffs, n, TURRET_CAMERA_EYE, occlusionTargets(0, d), 2.1);
+          worst = Math.max(worst, peak);
+        }
+      }
+    }
+    return worst;
+  };
+
+  it('never lets a blast hide more than the cap of a monster behind it, on high or on low', () => {
+    const high = blastWorst(false);
+    const lowest = blastWorst(true);
+    expect(high).toBeLessThanOrEqual(CANNON_SMOKE_OCCLUSION_MAX);
+    expect(lowest).toBeLessThanOrEqual(CANNON_SMOKE_OCCLUSION_MAX);
+    expect(high).toBeLessThanOrEqual(lowest);
+    // Measured, not vacuous: a blast still reads as a dirty cloud.
+    expect(high).toBeGreaterThan(0.25);
+  });
+
+  it("caps the muzzle smoke over the monsters at the tank and the shell's wake over its target", () => {
+    const front = occlusionTargets(0, 8);
+    const muzzle = (smoke: number) => {
+      const puffs = pool(20);
+      const n = cannonMuzzlePuffs(puffs, 5, 0, 2.2, 2, 0, 0, 1, smoke);
+      return smokeOcclusionPeak(puffs, n, TURRET_CAMERA_EYE, front, CANNON_MUZZLE.life);
+    };
+    const high = muzzle(cannonShotCounts(false).smoke);
+    const lowest = muzzle(cannonShotCounts(true).smoke);
+    expect(high).toBeLessThanOrEqual(CANNON_SMOKE_OCCLUSION_MAX);
+    expect(lowest).toBeLessThanOrEqual(CANNON_SMOKE_OCCLUSION_MAX);
+    expect(high).toBeLessThanOrEqual(lowest + 1e-9);
+    // The wake, seen nearly end-on down the shot line, frozen at every half tick of its life.
+    const timeline = new CannonShotTimeline();
+    timeline.fired(
+      { shotId: 4, x: 0, y: 0, z: 20, flightTicks: 12, impactTick: 112 },
+      { x: 0, y: 2.2, z: 2 },
+      { x: 0, y: 0, z: 1 },
+      0,
+      0,
+    );
+    const wake = pool(80);
+    const ages = new Float32Array(80);
+    let worst = 0;
+    for (let tick = 100; tick <= 125; tick += 0.5) {
+      const n = timeline.trailPuffsInto(0, tick, wake, ages);
+      for (let i = 0; i < n; i++) wake[i].delay -= ages[i];
+      worst = Math.max(
+        worst,
+        smokeOcclusionPeak(wake, n, TURRET_CAMERA_EYE, occlusionTargets(0, 20), 0),
+      );
+    }
+    expect(worst).toBeLessThanOrEqual(CANNON_SMOKE_OCCLUSION_MAX);
+  });
+
+  it('makes each puff a low preset keeps denser, so where they overlap they stack like the full set', () => {
+    for (const alpha of [0.044, 0.07, 0.3]) {
+      const factor = cannonTierAlpha(alpha, 8, 4);
+      expect(factor).toBeGreaterThan(1);
+      expect(1 - (1 - alpha * factor) ** 4).toBeCloseTo(1 - (1 - alpha) ** 8, 12);
+      expect(cannonTierAlpha(alpha, 8, 8)).toBe(1);
+    }
+    const dust = CANNON_PUFF_STYLES[PUFF.dust].alpha;
+    const kept = (counts: typeof full) => {
+      const puffs = pool(200);
+      const n = cannonBlastPuffs(puffs, 5, 0, 0, 10, 6, 1, counts, flat, 0);
+      return puffs.slice(0, n);
+    };
+    const on = (puffs: CannonPuff[], kind: number) => puffs.filter((p) => p.kind === kind);
+    for (const p of on(kept(full), PUFF.dust)) expect(p.alpha).toBe(1);
+    for (const p of on(kept(low), PUFF.dust)) {
+      expect(p.alpha).toBeCloseTo(cannonTierAlpha(dust, CANNON_DUST_PUFFS, low.dust), 12);
+    }
+    // The every-tier puffs carry no tier factor at all.
+    for (const kind of [PUFF.flash, PUFF.fireball, PUFF.shock]) {
+      for (const p of on(kept(low), kind)) expect(p.alpha).toBe(1);
+    }
+    const smoke = pool(20);
+    const n = cannonMuzzlePuffs(smoke, 4, 0, 2, 0, 1, 0, 0, 2);
+    const factor = cannonTierAlpha(CANNON_PUFF_STYLES[PUFF.smoke].alpha, CANNON_SMOKE_PUFFS, 2);
+    for (const p of smoke.slice(0, n).filter((q) => q.kind === PUFF.smoke)) {
+      expect(p.alpha).toBeCloseTo(factor, 12);
+    }
   });
 });

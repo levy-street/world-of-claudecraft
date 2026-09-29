@@ -14,7 +14,14 @@
 
 import { DT } from '../sim/types';
 import type { CannonPuffBurst } from './cannon_puff_burst_core';
-import { CANNON_DIRT_GRAVITY, type CannonPuff, cannonHash01, PUFF } from './cannon_puff_core';
+import {
+  CANNON_DIRT_GRAVITY,
+  CANNON_PUFF_STYLES,
+  type CannonPuff,
+  cannonHash01,
+  cannonTierAlpha,
+  PUFF,
+} from './cannon_puff_core';
 
 export type TurretContactKind = 'bounce' | 'land' | 'wall' | 'bowl';
 
@@ -168,12 +175,26 @@ function launch(
   p.rot = rot;
   p.spin = spin;
   p.floorY = floorY;
+  p.alpha = 1;
   return delay + life;
 }
 
 function groundOr(ground: (x: number, z: number) => number, x: number, z: number, y: number) {
   const g = ground(x, z);
   return Number.isFinite(g) ? g : y;
+}
+
+const DUST_ALPHA = CANNON_PUFF_STYLES[PUFF.dust].alpha;
+const SHOCK_ALPHA = CANNON_PUFF_STYLES[PUFF.shock].alpha;
+
+/** Dust rolled out along the ground by a contact of `weight`: a few for a soft one, the whole ring for a hard one. */
+function ringPuffs(counts: Readonly<TurretContactCounts>, weight: number): number {
+  return Math.max(Math.min(2, counts.ring), Math.ceil(counts.ring * weight));
+}
+
+/** Dust heaved up by a contact of `power`: one puff for a settling hop. */
+function risePuffs(counts: Readonly<TurretContactCounts>, power: number): number {
+  return power > 0.3 ? counts.rise : Math.min(1, counts.rise);
 }
 
 /** Seconds until a chip thrown up at `vy` from `y0` comes down on `floor`. */
@@ -243,6 +264,7 @@ export function turretContactBurstInto(
       );
     }
     const puffs = Math.min(counts.rise, cap - n);
+    const puffAlpha = cannonTierAlpha(DUST_ALPHA, FULL_COUNTS.rise, puffs);
     for (let i = 0; i < puffs; i++) {
       const idx = 20 + i;
       life = Math.max(
@@ -267,6 +289,7 @@ export function turretContactBurstInto(
           NO_FLOOR,
         ),
       );
+      out[n - 1].alpha = puffAlpha;
     }
     burst.count = n;
     burst.life = life;
@@ -275,7 +298,8 @@ export function turretContactBurstInto(
   const g = groundOr(ground, c.x, c.z, c.y);
   // A small soft landing rolls a few puffs; a heavy or hard one, the whole ring.
   const weight = clamp01((0.3 + 0.7 * p) * (0.6 + 0.4 * k));
-  const ring = Math.min(cap, Math.max(Math.min(2, counts.ring), Math.ceil(counts.ring * weight)));
+  const ring = Math.min(cap, ringPuffs(counts, weight));
+  const ringAlpha = cannonTierAlpha(SHOCK_ALPHA, ringPuffs(FULL_COUNTS, weight), ring);
   const reach = (0.4 + 1.1 * p) * k;
   const roll = 4.5;
   for (let i = 0; i < ring && n < cap; i++) {
@@ -305,8 +329,10 @@ export function turretContactBurstInto(
         NO_FLOOR,
       ),
     );
+    out[n - 1].alpha = ringAlpha;
   }
-  const rise = Math.min(cap - n, p > 0.3 ? counts.rise : Math.min(1, counts.rise));
+  const rise = Math.min(cap - n, risePuffs(counts, p));
+  const riseAlpha = cannonTierAlpha(DUST_ALPHA, risePuffs(FULL_COUNTS, p), rise);
   for (let i = 0; i < rise; i++) {
     const idx = 20 + i;
     const side = (h(idx, 0) - 0.5) * 1.2;
@@ -332,6 +358,7 @@ export function turretContactBurstInto(
         NO_FLOOR,
       ),
     );
+    out[n - 1].alpha = riseAlpha;
   }
   if (c.kind !== 'land' && c.speed >= TURRET_CLOD_SPEED) {
     const hard = clamp01(
@@ -384,7 +411,9 @@ export function turretContactBurstInto(
  * Appends to `burst` the dust a slide ploughs up behind a body of `height`: a
  * puff every stretch of the slide, dropped the moment the body passes there
  * (its delay), sized by the speed the body still has. `from` is the tick the
- * burst's age 0 stands for; the slide's own start may precede it.
+ * burst's age 0 stands for; the slide's own start may precede it. A preset
+ * that drops fewer spaces them wider at the same opacity: they lie where the
+ * body has already been, so they never stack over it.
  */
 export function turretSlideTrailInto(
   burst: CannonPuffBurst,

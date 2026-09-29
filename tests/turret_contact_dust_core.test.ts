@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { type CannonPuffBurst, CannonPuffBursts } from '../src/render/cannon_puff_burst_core';
 import {
   CANNON_PUFF_STYLES,
+  CANNON_SMOKE_OCCLUSION_MAX,
   cannonPuffInto,
   newCannonPuffFrame,
   PUFF,
@@ -22,6 +23,11 @@ import {
 } from '../src/render/turret_contact_dust_core';
 import { TURRET_SIZE_CLASSES } from '../src/sim/content/turret_defense';
 import { DT } from '../src/sim/types';
+import {
+  occlusionTargets,
+  smokeOcclusionPeak,
+  TURRET_CAMERA_EYE,
+} from './helpers/cannon_smoke_occlusion';
 
 const flat = () => 0;
 const full = turretContactCounts(false);
@@ -156,6 +162,42 @@ describe('Fire and Fly contact dust power', () => {
     const c = contact({ speed: 16, height: 3 });
     expect(launched(c, low).count).toBeLessThan(launched(c, full).count);
     expect(launched(c, low).count).toBeGreaterThan(0);
+  });
+
+  it('never lets a landing hide more than the cap of the body in its dust, and no more on high', () => {
+    // The body stands in its own dust: the worst of every contact kind, from
+    // a settling hop to a yeti's hardest bounce, on each preset.
+    const worst = (counts: typeof full): number => {
+      let peak = 0;
+      for (const kind of ['bounce', 'land', 'bowl', 'wall'] as const) {
+        for (const size of [TURRET_SIZE_CLASSES.small, TURRET_SIZE_CLASSES.huge]) {
+          for (const speed of [4, 9, 16]) {
+            const c = contact({ kind, speed, x: 0, z: 18, dirX: 0, dirZ: 1, ...size });
+            const b = launched(c, counts);
+            const at = occlusionTargets(0, 18);
+            peak = Math.max(
+              peak,
+              smokeOcclusionPeak(b.puffs, b.count, TURRET_CAMERA_EYE, at, b.life),
+            );
+          }
+        }
+      }
+      return peak;
+    };
+    const high = worst(full);
+    const lowest = worst(low);
+    expect(high).toBeLessThanOrEqual(CANNON_SMOKE_OCCLUSION_MAX);
+    expect(lowest).toBeLessThanOrEqual(CANNON_SMOKE_OCCLUSION_MAX);
+    expect(high).toBeLessThanOrEqual(lowest);
+    expect(high).toBeGreaterThan(0.1);
+    // The dust a low preset keeps carries the puffs it sheds; the full set is as authored.
+    const hard = contact({ speed: 16, ...TURRET_SIZE_CLASSES.huge });
+    const kept = launched(hard, low);
+    const ring = kept.puffs.slice(0, kept.count).filter((p) => p.kind === PUFF.shock);
+    expect(ring.length).toBeGreaterThan(0);
+    for (const p of ring) expect(p.alpha).toBeGreaterThan(1);
+    const all = launched(hard, full);
+    for (const p of all.puffs.slice(0, all.count)) expect(p.alpha).toBe(1);
   });
 
   it('ploughs a trail along the slide, each puff dropped as the body passes, sized by its speed', () => {

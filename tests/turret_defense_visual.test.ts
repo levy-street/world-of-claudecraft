@@ -1,9 +1,13 @@
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { turretSfxCueInto } from '../src/game/turret_defense_sfx';
 import { setBuildSpanSink } from '../src/render/build_spans';
 import { PUFF } from '../src/render/cannon_puff_core';
-import type { CannonShellVisuals } from '../src/render/cannon_shell_visuals';
+import {
+  type CannonShellHost,
+  CannonShellVisuals,
+  resetCannonShotTexelsForTest,
+} from '../src/render/cannon_shell_visuals';
 import { visualKeyFor } from '../src/render/characters/manifest';
 import { drawProgramSignature } from '../src/render/draw_program_signature_core';
 import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
@@ -29,7 +33,7 @@ import {
 } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import type { TurretFeedback } from '../src/sim/minigames/turret_feedback';
-import type { Entity } from '../src/sim/types';
+import { DT, type Entity } from '../src/sim/types';
 import type { TurretSessionView } from '../src/world_api/vehicles';
 import { drawsUnder, threeProgramKeys } from './helpers/three_program_keys';
 
@@ -92,6 +96,15 @@ vi.mock('../src/render/characters/assets', () => ({
 import { TurretDefenseVisual } from '../src/render/turret_defense_visual';
 
 const flat: ThrowProbe = { ground: () => 0, water: () => null };
+
+/** Builds the page's cannon texels, so a weapon prepared later asks no idle slot for them. */
+function warmCannonTexels(): void {
+  const weapon = new CannonShellVisuals({ blastRadius: 6, groundAt: () => 0 });
+  weapon.prepare(new THREE.Scene());
+  weapon.dispose();
+}
+
+beforeAll(warmCannonTexels);
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 const IDLE: IdleBudget = { didTimeout: false, timeRemaining: () => 10 };
 const immediate: IdleScheduler = (callback) => callback(IDLE);
@@ -259,6 +272,99 @@ function totalRigs(state: TurretDefenseState): number {
 }
 
 describe('Fire and Fly monsters on screen', () => {
+  it('paints health bars and strike rings over the dust, the bar upright to the camera whatever the tumble', async () => {
+    actors.made.length = 0;
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0, undefined, immediate);
+    const camera = new THREE.PerspectiveCamera();
+    camera.position.set(-9, 8, -14);
+    camera.lookAt(4, 1, 6);
+    camera.updateMatrixWorld();
+    visual.setHost({
+      vfx: { burst: vi.fn() },
+      camera,
+      addShake: vi.fn(),
+      punchFov: vi.fn(),
+    } as unknown as CannonShellHost);
+    const state = engine(0);
+    const flight = {
+      kind: 'fly' as const,
+      start: 0,
+      end: 40,
+      x: 5,
+      y: 0,
+      z: 0,
+      vx: 4,
+      vy: 12,
+      vz: 0,
+      g: 30,
+      contact: 'ground' as const,
+      nx: 0,
+      nz: 0,
+    };
+    const flyer = wolf(state, { id: 1, hp: 50, state: 'fly', seg: flight });
+    const striker = wolf(state, {
+      id: 2,
+      state: 'windup',
+      seg: stillSegment(0, TURRET_TIMING.windupTicks, { x: 3, y: 0, z: 4 }),
+    });
+    const view = viewOf({ ...state, monsters: [flyer, striker] });
+    await buildAll(visual, view, 1);
+    const bar = markers(visual).find((m) => m.visible && m.geometry instanceof THREE.BoxGeometry);
+    const ring = markers(visual).find((m) => m.visible && m.geometry instanceof THREE.RingGeometry);
+    if (!bar || !ring) throw new Error('a health bar and a strike ring expected');
+    // Both are what a player acts on: they sort after the puff draw, which
+    // writes no depth, so the dust never paints over them.
+    const puff = weaponPiece(visual, 'puff');
+    expect((puff.material as THREE.Material).depthWrite).toBe(false);
+    for (const marker of [bar, ring]) {
+      expect((marker.material as THREE.Material).transparent).toBe(true);
+      expect(marker.renderOrder).toBeGreaterThan(puff.renderOrder);
+    }
+    const rig = actors.made.find((a) => a.update.mock.calls.length > 0 && rigRootOf(a).visible);
+    if (!rig) throw new Error('a drawn rig expected');
+    const attitudes = new Set<string>();
+    for (const tick of [2, 5, 8, 11, 14]) {
+      visual.update(view, tick, tick * DT, 0.016);
+      attitudes.add(
+        rigRootOf(rig)
+          .quaternion.toArray()
+          .map((v) => v.toFixed(3))
+          .join(),
+      );
+      expect(bar.quaternion.angleTo(camera.quaternion)).toBeLessThan(1e-6);
+      expect(bar.scale.y).toBeCloseTo(0.12, 12);
+      expect(bar.scale.z).toBeCloseTo(0.12, 12);
+      expect(bar.scale.x).toBeCloseTo(1.2 * 0.5, 12);
+      const body = rigRootOf(rig).position;
+      expect(bar.position.x).toBeCloseTo(body.x, 9);
+      expect(bar.position.y).toBeGreaterThan(body.y);
+    }
+    // The body really tumbled under a bar that never did.
+    expect(attitudes.size).toBeGreaterThan(3);
+    visual.dispose();
+  });
+
+  it("builds the cannon's texels in its own idle slot, never on the frame the player is seated", async () => {
+    resetCannonShotTexelsForTest();
+    const slots: ((deadline?: IdleBudget) => void)[] = [];
+    const held: IdleScheduler = (callback) => {
+      slots.push(callback);
+    };
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0, undefined, held);
+    visual.update(viewOf(engine(0)), 0, 0, 0.016);
+    const atlas = () =>
+      (
+        (weaponPiece(visual, 'puff').material as THREE.ShaderMaterial).uniforms.uAtlas
+          .value as THREE.DataTexture
+      ).image.data as Uint8Array;
+    expect(atlas().some((b) => b !== 0)).toBe(false);
+    expect(slots.length).toBeGreaterThan(0);
+    while (slots.length > 0) slots.shift()?.(IDLE);
+    await flush();
+    expect(atlas().some((b) => b !== 0)).toBe(true);
+    visual.dispose();
+  });
+
   it('builds nothing until the player is first seen seated in the turret', () => {
     actors.made.length = 0;
     const scene = new THREE.Scene();
@@ -600,9 +706,10 @@ describe('Fire and Fly monsters on screen', () => {
     };
     const view = viewOf({ ...state, monsters: [flyer] }, [bounce]);
     await buildAll(visual, viewOf({ ...state, monsters: [flyer] }), 160);
-    const weapon = (visual as unknown as { weapon: { bursts: { slots: { active: boolean }[] } } })
-      .weapon;
-    const live = () => weapon.bursts.slots.filter((b) => b.active).length;
+    const weapon = (
+      visual as unknown as { weapon: { pools: { bursts: { slots: { active: boolean }[] } } } }
+    ).weapon;
+    const live = () => weapon.pools.bursts.slots.filter((b) => b.active).length;
     expect(live()).toBe(0);
     visual.update(view, 160, 1, 0.016);
     expect(live()).toBe(1);

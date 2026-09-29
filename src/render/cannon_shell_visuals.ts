@@ -9,25 +9,37 @@
 // and impact events; the curves are cannon_shell_core.ts and cannon_puff_core.ts.
 //
 // GPU rules (src/render/CLAUDE.md "GPU work"): nothing is built until
-// `prepare`, which mints every mesh, named material and texture the shot will
-// ever draw and attaches the root behind the compile gate, hidden until its
-// programs link; while it is hidden, the renderer's boot-prewarmed particles
-// stand in at the muzzle and the blast, beside the thrown monsters themselves.
-// Four draws on shared materials: the shells and the chunks are instanced, the
-// scorches one draped mesh (their fade rides its vertex colours on a
-// subtractive blend), every puff one instanced quad (cannon_puff_mesh.ts); no
-// per-use clone, no light, no shadow, and a frame allocates nothing.
+// `prepare`, which allocates the shot pools, mints every mesh, named material
+// and texture the shot will ever draw and attaches the root behind the compile
+// gate, hidden until its programs link; while it is hidden, the renderer's
+// boot-prewarmed particles stand in at the muzzle and the blast, beside the
+// thrown monsters themselves. The texels of the puff atlas and the scorch are
+// built once per page, and with a `texelSlot` in that idle slot rather than on
+// the commitment frame (the stand-in holds until they land). Four draws on
+// shared materials: the shells and the chunks are instanced, the scorches one
+// draped mesh (their fade rides its vertex colours on a subtractive blend),
+// every puff one instanced billboard (cannon_puff_mesh.ts); no per-use clone,
+// no light, no shadow, and a frame allocates nothing.
+//
+// Draw order inside the puff draw: far to near by source (the blasts, the
+// contact bursts, the shells' wakes, then the muzzle nearest the camera), and
+// within each source the dust behind, then smoke and dirt, then light, so a far
+// blast's dust never paints over the near muzzle smoke.
 //
 // Tiers: the low static preset sheds cosmetic counts only (chunks, dirt, dust,
-// sparks, smoke); the shell and its wake, the flash, the fireball and the shock
-// ring are the same on every tier. Reduced motion drops the camera shake and the
-// FOV punch.
+// sparks, smoke), each shed puff's opacity carried by the ones left
+// (cannonTierAlpha), so the dust hides no more and no less of a monster on any
+// preset; the shell and its wake, the flash, the fireball and the shock ring
+// (which draws the blast radius) are the same on every tier. Reduced motion
+// drops the camera shake and the FOV punch.
 //
 // A caller may also launch its own puffs on the same draw (puffBurst: a pooled
 // burst, cannon_puff_burst_core.ts, sized at construction), such as the dust a
 // thrown monster kicks up, so it never needs a material of its own.
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../game/ui_effects_profile';
+import { BufferUpdateRange } from './buffer_update_range';
+import { timeBuildSpan } from './build_spans';
 import { type CannonPuffBurst, CannonPuffBursts } from './cannon_puff_burst_core';
 import {
   CANNON_PUFF_KINDS,
@@ -35,13 +47,14 @@ import {
   type CannonPuff,
   type CannonPuffFrame,
   cannonBlastPower,
+  cannonPuffAtlasTexels,
   cannonPuffInto,
   cannonPuffLightInto,
   cannonShellGlowInto,
   newCannonPuff,
   newCannonPuffFrame,
 } from './cannon_puff_core';
-import { CannonPuffMesh } from './cannon_puff_mesh';
+import { CANNON_PUFF_ATLAS_CELL, CannonPuffMesh } from './cannon_puff_mesh';
 import {
   CANNON_BLAST,
   CANNON_BLAST_PUFFS,
@@ -99,6 +112,26 @@ export interface CannonShellOptions {
   effectsTier?: GfxTier;
   /** Pooled bursts callers launch their own puffs into (puffBurst); none by default. */
   bursts?: { readonly slots: number; readonly puffs: number };
+  /**
+   * Resolves when the page's texels may be built (an idle slot): until then the
+   * atlas and the scorch are clear and the boot particles stand in. Without it,
+   * or once any weapon built them, they are ready at `prepare`.
+   */
+  texelSlot?: () => Promise<unknown>;
+}
+
+/** The shot's CPU pools: allocated at `prepare`, never for a player who is never seated. */
+interface Pools {
+  readonly timeline: CannonShotTimeline;
+  readonly trailPuffs: CannonPuff[];
+  readonly trailAges: Float32Array;
+  readonly bursts: CannonPuffBursts;
+  readonly frames: CannonPuffFrame[];
+}
+
+interface ShotTexels {
+  readonly atlas: Uint8Array;
+  readonly scorch: Uint8Array;
 }
 
 interface Parts {
@@ -110,6 +143,8 @@ interface Parts {
   readonly scorch: THREE.Mesh;
   readonly scorchPosition: THREE.BufferAttribute;
   readonly scorchColor: THREE.BufferAttribute;
+  readonly scorchPositionUpload: BufferUpdateRange;
+  readonly scorchColorUpload: BufferUpdateRange;
   readonly puffs: CannonPuffMesh;
 }
 
@@ -129,17 +164,40 @@ const SHOT_PUFF_CAPACITY =
 const LAYER_FLOATS = CANNON_SCORCH_VERTS * 3;
 const SCORCH_FLOATS = LAYER_FLOATS * CANNON_SCORCH_LAYERS.length;
 
+/** Puff sources in draw order, far to near (see the header). */
+const GROUPS = 4;
+
 const materialName = (role: string): string => `cannonShell:${role}`;
+
+let pageTexels: ShotTexels | null = null;
+
+/** The atlas and scorch texels, built once per page (filed in the build ledger). */
+function shotTexels(): ShotTexels {
+  pageTexels ??= timeBuildSpan('zone:cannon-texels', () => ({
+    atlas: cannonPuffAtlasTexels(CANNON_PUFF_ATLAS_CELL),
+    scorch: cannonScorchTexels(SCORCH_TEXELS),
+  }));
+  return pageTexels;
+}
+
+/** Forgets the page's texels, so a test can watch a cold build. */
+export function resetCannonShotTexelsForTest(): void {
+  pageTexels = null;
+}
 
 export class CannonShellVisuals {
   readonly root = new THREE.Group();
-  private readonly timeline = new CannonShotTimeline();
   private readonly counts: Readonly<CannonShotCounts>;
   private readonly blastRadius: number;
   private readonly groundAt: (x: number, z: number) => number;
   private readonly compileGate?: (target: THREE.Object3D) => Promise<unknown>;
+  private readonly texelSlot?: () => Promise<unknown>;
+  private readonly burstSlots: number;
+  private readonly burstPuffs: number;
   private host: CannonShellHost | null = null;
+  private pools: Pools | null = null;
   private parts: Parts | null = null;
+  private texelsReady = false;
   private disposed = false;
   private barrel: THREE.Object3D | null = null;
   private barrelKicked = false;
@@ -151,15 +209,10 @@ export class CannonShellVisuals {
   private readonly point: CannonPoint = { x: 0, y: 0, z: 0 };
   private readonly dir: CannonPoint = { x: 0, y: 0, z: 1 };
   private readonly chunkFrame: CannonChunkFrame = { x: 0, y: 0, z: 0, angle: 0, scale: 0 };
-  private readonly trailPuffs: CannonPuff[] = Array.from(
-    { length: CANNON_TRAIL_PUFFS },
-    newCannonPuff,
-  );
-  private readonly trailAges = new Float32Array(CANNON_TRAIL_PUFFS);
-  private readonly bursts: CannonPuffBursts;
   private readonly puffCapacity: number;
-  private readonly frames: CannonPuffFrame[];
   private frameCount = 0;
+  /** Where each source's puffs end in `frames` this frame (GROUPS, far to near). */
+  private readonly groupEnds = new Int32Array(GROUPS);
   private readonly low: boolean;
   private readonly byKind = new Int32Array(CANNON_PUFF_KINDS);
   private readonly liveScorches: boolean[] = new Array(CANNON_SCORCH_POOL).fill(false);
@@ -182,6 +235,7 @@ export class CannonShellVisuals {
     this.blastRadius = options.blastRadius;
     this.groundAt = options.groundAt;
     this.compileGate = options.compileGate;
+    this.texelSlot = options.texelSlot;
     const profile = resolveUiEffectsProfile({
       presetLabel: options.effectsTier ?? GFX.tier,
       effectsQuality: 1,
@@ -189,9 +243,9 @@ export class CannonShellVisuals {
     });
     this.low = profile.tier === 'low';
     this.counts = cannonShotCounts(this.low);
-    this.bursts = new CannonPuffBursts(options.bursts?.slots ?? 0, options.bursts?.puffs ?? 0);
-    this.puffCapacity = SHOT_PUFF_CAPACITY + this.bursts.capacity;
-    this.frames = Array.from({ length: this.puffCapacity }, newCannonPuffFrame);
+    this.burstSlots = Math.max(0, options.bursts?.slots ?? 0);
+    this.burstPuffs = Math.max(0, options.bursts?.puffs ?? 0);
+    this.puffCapacity = SHOT_PUFF_CAPACITY + this.burstSlots * this.burstPuffs;
     this.root.name = 'fire-and-fly-weapon';
   }
 
@@ -200,8 +254,9 @@ export class CannonShellVisuals {
     return this.low;
   }
 
+  /** `prepare` ran: the pools and the pieces exist (the texels may still be on their way). */
   get prepared(): boolean {
-    return this.parts !== null;
+    return this.pools !== null;
   }
 
   get hasBarrel(): boolean {
@@ -224,8 +279,8 @@ export class CannonShellVisuals {
    * a burst pool.
    */
   puffBurst(now: number): CannonPuffBurst | null {
-    if (!this.parts || this.disposed) return null;
-    return this.bursts.take(now);
+    if (!this.parts || !this.pools || this.disposed) return null;
+    return this.pools.bursts.take(now);
   }
 
   /**
@@ -243,14 +298,31 @@ export class CannonShellVisuals {
     this.barrelTip.set(tip.x, tip.y, tip.z);
   }
 
-  /** Mints every piece and attaches the root under `parent` behind the compile gate. */
+  /**
+   * Allocates the pools, mints every piece and attaches the root under `parent`
+   * behind the compile gate; the texels land now or in the texel slot.
+   */
   prepare(parent: THREE.Object3D): void {
-    if (this.parts || this.disposed) return;
-    this.parts = this.build();
+    if (this.pools || this.disposed) return;
+    this.pools = {
+      timeline: new CannonShotTimeline(),
+      trailPuffs: Array.from({ length: CANNON_TRAIL_PUFFS }, newCannonPuff),
+      trailAges: new Float32Array(CANNON_TRAIL_PUFFS),
+      bursts: new CannonPuffBursts(this.burstSlots, this.burstPuffs),
+      frames: Array.from({ length: this.puffCapacity }, newCannonPuffFrame),
+    };
+    const ready = pageTexels ?? (this.texelSlot ? null : shotTexels());
+    this.parts = this.build(ready);
+    this.texelsReady = ready !== null;
     tagVfxSubtree(this.root);
     void attachSceneGroupGated(parent, this.root, this.compileGate, () => this.disposed).catch(
       () => {},
     );
+    const slot = this.texelSlot;
+    if (!this.texelsReady && slot) {
+      const land = (): void => this.landTexels();
+      slot().then(land, land);
+    }
   }
 
   /** A shell leaves the barrel (or `fallback` when there is none) toward the blast point. */
@@ -263,7 +335,7 @@ export class CannonShellVisuals {
     this.dir.x = this.muzzleDir.x;
     this.dir.y = this.muzzleDir.y;
     this.dir.z = this.muzzleDir.z;
-    this.timeline.fired(shot, this.point, this.dir, time, this.counts.smoke);
+    this.pools?.timeline.fired(shot, this.point, this.dir, time, this.counts.smoke);
     const host = this.host;
     if (!host) return;
     if (!this.revealed()) host.vfx.burst(this.muzzle, 'fire', 10, 0.8);
@@ -276,16 +348,19 @@ export class CannonShellVisuals {
   impact(shot: CannonBlast, time: number, reducedMotion: boolean): void {
     if (this.disposed) return;
     const power = cannonBlastPower(shot.hits);
-    const index = this.timeline.impact(
-      shot,
-      time,
-      this.counts,
-      this.blastRadius,
-      power,
-      this.groundAt,
-    );
-    this.paintImpactColours(index);
-    this.placeScorch();
+    const pools = this.pools;
+    if (pools) {
+      const index = pools.timeline.impact(
+        shot,
+        time,
+        this.counts,
+        this.blastRadius,
+        power,
+        this.groundAt,
+      );
+      this.paintImpactColours(pools, index);
+      this.placeScorch(pools);
+    }
     const host = this.host;
     if (!host) return;
     const { x, y, z } = shot;
@@ -301,18 +376,19 @@ export class CannonShellVisuals {
 
   /** Stops every shot, blast and scorch, and sets the barrel back to rest. */
   clear(): void {
-    this.timeline.clear();
+    this.pools?.timeline.clear();
     this.restBarrel();
     const parts = this.parts;
-    if (!parts) return;
+    const pools = this.pools;
+    if (!parts || !pools) return;
     parts.shells.count = 0;
     parts.shells.visible = false;
     parts.chunks.count = 0;
     parts.chunks.visible = false;
     this.liveChunks.fill(false);
-    this.bursts.clear();
+    pools.bursts.clear();
     for (let i = 0; i < CANNON_SCORCH_POOL; i++) {
-      if (this.liveScorches[i]) this.retireScorch(parts, i);
+      if (this.liveScorches[i]) this.retireScorch(parts, pools, i);
     }
     parts.scorch.visible = false;
     this.byKind.fill(0);
@@ -322,18 +398,23 @@ export class CannonShellVisuals {
 
   /** `tick` is the display tick the monsters are sampled on; `time` the frame seconds. */
   update(tick: number, time: number): void {
-    this.recoil(time);
     const parts = this.parts;
-    if (!parts || this.disposed) return;
+    const pools = this.pools;
+    if (!parts || !pools || this.disposed) return;
+    this.recoil(pools, time);
     this.frameCount = 0;
     this.lightPuffs(parts);
-    this.drawShells(parts, tick);
-    this.gatherMuzzles(time);
-    this.gatherBlasts(time);
-    this.gatherBursts(time);
-    this.drawPuffs(parts);
-    this.drawChunks(parts, time);
-    this.drawScorches(parts, time);
+    this.gatherBlasts(pools, time);
+    this.groupEnds[0] = this.frameCount;
+    this.gatherBursts(pools, time);
+    this.groupEnds[1] = this.frameCount;
+    this.drawShells(parts, pools, tick);
+    this.groupEnds[2] = this.frameCount;
+    this.gatherMuzzles(pools, time);
+    this.groupEnds[3] = this.frameCount;
+    this.drawPuffs(parts, pools);
+    this.drawChunks(parts, pools, time);
+    this.drawScorches(parts, pools, time);
   }
 
   dispose(): void {
@@ -344,6 +425,7 @@ export class CannonShellVisuals {
     this.root.removeFromParent();
     const parts = this.parts;
     this.parts = null;
+    this.pools = null;
     if (!parts) return;
     const errors: unknown[] = [];
     const resources: { dispose(): void }[] = [
@@ -364,9 +446,22 @@ export class CannonShellVisuals {
     if (errors.length > 0) throw new AggregateError(errors, 'Cannon shot failed to dispose');
   }
 
-  /** The gate has revealed the weapon's own pieces (false while their programs link). */
+  /** The gate has revealed the weapon's own pieces with their texels (false while either is on its way). */
   private revealed(): boolean {
-    return this.parts !== null && this.root.visible && this.root.parent !== null;
+    return (
+      this.parts !== null && this.texelsReady && this.root.visible && this.root.parent !== null
+    );
+  }
+
+  /** The texel slot resolved: the page's texels fill the atlas and the scorch built clear. */
+  private landTexels(): void {
+    const parts = this.parts;
+    if (!parts || this.disposed || this.texelsReady) return;
+    const texels = shotTexels();
+    parts.puffs.setAtlas(texels.atlas);
+    parts.scorchTexture.image.data = texels.scorch;
+    parts.scorchTexture.needsUpdate = true;
+    this.texelsReady = true;
   }
 
   private restBarrel(): void {
@@ -374,10 +469,10 @@ export class CannonShellVisuals {
     this.barrelKicked = false;
   }
 
-  private recoil(time: number): void {
+  private recoil(pools: Pools, time: number): void {
     const barrel = this.barrel;
     if (!barrel) return;
-    const kick = cannonRecoilOffset(time - this.timeline.muzzleAt);
+    const kick = cannonRecoilOffset(time - pools.timeline.muzzleAt);
     if (kick !== 0) {
       barrel.position.copy(this.barrelRest).addScaledVector(this.barrelAxis, -kick);
       this.barrelKicked = true;
@@ -405,7 +500,8 @@ export class CannonShellVisuals {
     this.muzzleDir.normalize();
   }
 
-  private build(): Parts {
+  /** Every piece, on the page's texels, or on clear ones the texel slot fills later. */
+  private build(texels: ShotTexels | null): Parts {
     const geometries: THREE.BufferGeometry[] = [];
     const materials: THREE.Material[] = [];
     const geometry = <T extends THREE.BufferGeometry>(g: T): T => {
@@ -413,7 +509,7 @@ export class CannonShellVisuals {
       return g;
     };
     const scorchTexture = new THREE.DataTexture(
-      cannonScorchTexels(SCORCH_TEXELS),
+      texels?.scorch ?? new Uint8Array(SCORCH_TEXELS * SCORCH_TEXELS * 4),
       SCORCH_TEXELS,
       SCORCH_TEXELS,
       THREE.RGBAFormat,
@@ -468,11 +564,17 @@ export class CannonShellVisuals {
     scorch.receiveShadow = false;
     scorch.visible = false;
     scorch.renderOrder = floorVfxRenderOrder('ground', 1);
-    const puffs = new CannonPuffMesh(this.puffCapacity, materialName('puff'));
+    const puffs = new CannonPuffMesh(
+      this.puffCapacity,
+      materialName('puff'),
+      texels?.atlas ?? null,
+    );
     // Airborne, but it must paint after the scorch it rises over and under every
     // telegraph and the aim reticle: the player band's upper rungs.
     puffs.mesh.renderOrder = floorVfxRenderOrder('player', 4);
     this.root.add(scorch, puffs.mesh);
+    const scorchPosition = scorchGeometry.getAttribute('position') as THREE.BufferAttribute;
+    const scorchColor = scorchGeometry.getAttribute('color') as THREE.BufferAttribute;
     return {
       geometries,
       materials,
@@ -480,8 +582,10 @@ export class CannonShellVisuals {
       shells,
       chunks,
       scorch,
-      scorchPosition: scorchGeometry.getAttribute('position') as THREE.BufferAttribute,
-      scorchColor: scorchGeometry.getAttribute('color') as THREE.BufferAttribute,
+      scorchPosition,
+      scorchColor,
+      scorchPositionUpload: new BufferUpdateRange(scorchPosition),
+      scorchColorUpload: new BufferUpdateRange(scorchColor),
       puffs,
     };
   }
@@ -555,10 +659,10 @@ export class CannonShellVisuals {
     return mesh;
   }
 
-  private paintImpactColours(index: number): void {
+  private paintImpactColours(pools: Pools, index: number): void {
     const parts = this.parts;
     if (!parts) return;
-    const slot = this.timeline.impacts[index];
+    const slot = pools.timeline.impacts[index];
     const base = index * CANNON_CHUNKS_PER_IMPACT;
     for (let i = 0; i < slot.chunkCount; i++) {
       const shade = slot.chunks[i].shade;
@@ -575,12 +679,15 @@ export class CannonShellVisuals {
     this.liveChunks[index] = slot.chunkCount > 0;
   }
 
-  /** The newest scorch is draped once, where it lands; only its fade changes after. */
-  private placeScorch(): void {
+  /**
+   * The newest scorch is draped once, where it lands, every layer over the
+   * ground its impact sampled once per vertex; only its fade changes after.
+   */
+  private placeScorch(pools: Pools): void {
     const parts = this.parts;
-    const newest = this.timeline.lastScorch;
+    const newest = pools.timeline.lastScorch;
     if (!parts || newest < 0) return;
-    const s = this.timeline.scorches[newest];
+    const s = pools.timeline.scorches[newest];
     for (let layer = 0; layer < CANNON_SCORCH_LAYERS.length; layer++) {
       cannonScorchDrapeInto(
         parts.scorchPosition.array as Float32Array,
@@ -588,13 +695,12 @@ export class CannonShellVisuals {
         s.x,
         s.z,
         s.yaw,
-        this.blastRadius * CANNON_BLAST.scorchScale,
+        s.half,
         CANNON_SCORCH_LAYERS[layer].lift,
-        this.groundAt,
+        s.heights,
       );
     }
-    parts.scorchPosition.addUpdateRange(newest * SCORCH_FLOATS, SCORCH_FLOATS);
-    parts.scorchPosition.needsUpdate = true;
+    parts.scorchPositionUpload.mark(newest * SCORCH_FLOATS, SCORCH_FLOATS);
     this.setScorchFade(parts, newest, 0);
     this.liveScorches[newest] = true;
   }
@@ -605,18 +711,16 @@ export class CannonShellVisuals {
       const from = slot * SCORCH_FLOATS + layer * LAYER_FLOATS;
       colors.fill(fade * CANNON_SCORCH_LAYERS[layer].strength, from, from + LAYER_FLOATS);
     }
-    parts.scorchColor.addUpdateRange(slot * SCORCH_FLOATS, SCORCH_FLOATS);
-    parts.scorchColor.needsUpdate = true;
+    parts.scorchColorUpload.mark(slot * SCORCH_FLOATS, SCORCH_FLOATS);
     this.scorchFades[slot] = fade;
   }
 
-  private retireScorch(parts: Parts, slot: number): void {
+  private retireScorch(parts: Parts, pools: Pools, slot: number): void {
     const positions = parts.scorchPosition.array as Float32Array;
     positions.fill(0, slot * SCORCH_FLOATS, (slot + 1) * SCORCH_FLOATS);
-    parts.scorchPosition.addUpdateRange(slot * SCORCH_FLOATS, SCORCH_FLOATS);
-    parts.scorchPosition.needsUpdate = true;
+    parts.scorchPositionUpload.mark(slot * SCORCH_FLOATS, SCORCH_FLOATS);
     this.setScorchFade(parts, slot, 0);
-    this.timeline.scorches[slot].active = false;
+    pools.timeline.scorches[slot].active = false;
     this.liveScorches[slot] = false;
   }
 
@@ -649,17 +753,17 @@ export class CannonShellVisuals {
     parts.puffs.setLight(this.light.r, this.light.g, this.light.b);
   }
 
-  private nextFrame(): CannonPuffFrame | null {
-    return this.frameCount < this.frames.length ? this.frames[this.frameCount] : null;
+  private nextFrame(pools: Pools): CannonPuffFrame | null {
+    return this.frameCount < pools.frames.length ? pools.frames[this.frameCount] : null;
   }
 
-  private gather(puff: CannonPuff, age: number): void {
-    const frame = this.nextFrame();
+  private gather(pools: Pools, puff: CannonPuff, age: number): void {
+    const frame = this.nextFrame(pools);
     if (frame && cannonPuffInto(puff, age, frame)) this.frameCount++;
   }
 
-  private drawShells(parts: Parts, tick: number): void {
-    const timeline = this.timeline;
+  private drawShells(parts: Parts, pools: Pools, tick: number): void {
+    const timeline = pools.timeline;
     let shells = 0;
     for (let i = 0; i < CANNON_SHELL_POOL; i++) {
       if (timeline.shellAt(i, tick, this.point)) {
@@ -669,72 +773,77 @@ export class CannonShellVisuals {
         this.quat.setFromEuler(this.euler);
         this.matrix.compose(this.pos, this.quat, this.scale.setScalar(1));
         parts.shells.setMatrixAt(shells++, this.matrix);
-        const glow = this.nextFrame();
+        const glow = this.nextFrame(pools);
         if (glow) {
           cannonShellGlowInto(this.point.x, this.point.y, this.point.z, age, glow);
           this.frameCount++;
         }
       }
-      const n = timeline.trailPuffsInto(i, tick, this.trailPuffs, this.trailAges);
-      for (let k = 0; k < n; k++) this.gather(this.trailPuffs[k], this.trailAges[k]);
+      const n = timeline.trailPuffsInto(i, tick, pools.trailPuffs, pools.trailAges);
+      for (let k = 0; k < n; k++) this.gather(pools, pools.trailPuffs[k], pools.trailAges[k]);
     }
     parts.shells.count = shells;
     parts.shells.visible = shells > 0;
     if (shells > 0) parts.shells.instanceMatrix.needsUpdate = true;
   }
 
-  private gatherMuzzles(time: number): void {
-    for (const slot of this.timeline.muzzles) {
+  private gatherMuzzles(pools: Pools, time: number): void {
+    for (const slot of pools.timeline.muzzles) {
       if (!slot.active) continue;
       const age = time - slot.at;
       if (age >= CANNON_MUZZLE.life) {
         slot.active = false;
         continue;
       }
-      for (let i = 0; i < slot.puffCount; i++) this.gather(slot.puffs[i], age);
+      for (let i = 0; i < slot.puffCount; i++) this.gather(pools, slot.puffs[i], age);
     }
   }
 
-  private gatherBlasts(time: number): void {
-    for (const slot of this.timeline.impacts) {
+  private gatherBlasts(pools: Pools, time: number): void {
+    for (const slot of pools.timeline.impacts) {
       if (!slot.active) continue;
       const age = time - slot.at;
       if (age >= CANNON_BLAST.life) {
         slot.active = false;
         continue;
       }
-      for (let i = 0; i < slot.puffCount; i++) this.gather(slot.puffs[i], age);
+      for (let i = 0; i < slot.puffCount; i++) this.gather(pools, slot.puffs[i], age);
     }
   }
 
-  private gatherBursts(time: number): void {
-    if (!this.bursts.sweep(time)) return;
-    for (const burst of this.bursts.slots) {
+  private gatherBursts(pools: Pools, time: number): void {
+    if (!pools.bursts.sweep(time)) return;
+    for (const burst of pools.bursts.slots) {
       if (!burst.active) continue;
       const age = time - burst.at;
-      for (let i = 0; i < burst.count; i++) this.gather(burst.puffs[i], age);
+      for (let i = 0; i < burst.count; i++) this.gather(pools, burst.puffs[i], age);
     }
   }
 
-  /** Back to front by pass: the dust behind, then smoke, fireball and dirt, then the light. */
-  private drawPuffs(parts: Parts): void {
+  /** Source by source, far to near, and inside each the dust behind, then smoke, fireball and dirt, then the light. */
+  private drawPuffs(parts: Parts, pools: Pools): void {
     const mesh = parts.puffs;
     this.byKind.fill(0);
     mesh.begin();
-    for (let layer = 0; layer < CANNON_PUFF_LAYERS; layer++) {
-      for (let i = 0; i < this.frameCount; i++) {
-        const frame = this.frames[i];
-        if (frame.layer !== layer) continue;
-        const before = mesh.drawn;
-        mesh.push(frame);
-        if (mesh.drawn > before) this.byKind[frame.kind]++;
+    let from = 0;
+    for (let group = 0; group < GROUPS; group++) {
+      const to = this.groupEnds[group];
+      for (let layer = 0; layer < CANNON_PUFF_LAYERS; layer++) {
+        for (let i = from; i < to; i++) {
+          const frame = pools.frames[i];
+          if (frame.layer !== layer) continue;
+          const before = mesh.drawn;
+          mesh.push(frame);
+          if (mesh.drawn > before) this.byKind[frame.kind]++;
+        }
       }
+      from = to;
     }
     mesh.end();
   }
 
-  private drawChunks(parts: Parts, time: number): void {
-    const impacts = this.timeline.impacts;
+  private drawChunks(parts: Parts, pools: Pools, time: number): void {
+    const impacts = pools.timeline.impacts;
     let any = false;
     let wrote = false;
     for (let s = 0; s < impacts.length; s++) {
@@ -767,15 +876,15 @@ export class CannonShellVisuals {
     parts.chunks.visible = any;
   }
 
-  private drawScorches(parts: Parts, time: number): void {
+  private drawScorches(parts: Parts, pools: Pools, time: number): void {
     let any = false;
-    const scorches = this.timeline.scorches;
+    const scorches = pools.timeline.scorches;
     for (let i = 0; i < scorches.length; i++) {
       if (!this.liveScorches[i]) continue;
       const s = scorches[i];
       const age = time - s.at;
       if (!s.active || age >= CANNON_BLAST.scorchLife) {
-        this.retireScorch(parts, i);
+        this.retireScorch(parts, pools, i);
         continue;
       }
       any = true;
