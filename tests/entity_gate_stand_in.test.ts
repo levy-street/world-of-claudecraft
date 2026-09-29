@@ -578,19 +578,19 @@ describe('entity gate stand-ins actually stand in', () => {
     expect(painter).toContain('if (!this.book.rigReady[i] && this.rigs[i].gate.visible)');
   });
 
-  it('Fire and Fly weapon gate: the prewarmed particles and AoE ring draw a shot until its pieces link', () => {
-    const gate = vi.fn(() => new Promise<void>(() => {}));
+  it('Fire and Fly weapon gate: the prewarmed particles draw a shot until its pieces link', async () => {
+    let settle: () => void = () => {};
+    const gate = vi.fn(() => new Promise<void>((resolve) => (settle = resolve)));
     const visuals = new CannonShellVisuals({
       blastRadius: 6,
       groundAt: () => 0,
       compileGate: gate,
     });
     const host = {
-      vfx: { burst: vi.fn(), groundPuff: vi.fn() },
+      vfx: { burst: vi.fn() },
       camera: new THREE.PerspectiveCamera(),
       addShake: vi.fn(),
       punchFov: vi.fn(),
-      spawnAoeRing: vi.fn(),
     };
     visuals.setHost(host);
     visuals.prepare(new THREE.Scene());
@@ -598,10 +598,20 @@ describe('entity gate stand-ins actually stand in', () => {
     expect(visuals.root.visible).toBe(false);
     const shot = { shotId: 1, x: 20, y: 0, z: 0, flightTicks: 8, impactTick: 168 };
     visuals.fire(shot, { x: 2, y: 2.2, z: 0 }, 0, false);
+    expect(host.vfx.burst).toHaveBeenCalledTimes(1);
     visuals.impact(shot, 0.4, false);
-    expect(host.vfx.burst).toHaveBeenCalled();
-    expect(host.vfx.groundPuff).toHaveBeenCalled();
-    expect(host.spawnAoeRing).toHaveBeenCalledWith(20, 0, 6, 'physical');
+    const atBlast = host.vfx.burst.mock.calls.slice(1);
+    expect(atBlast.length).toBeGreaterThan(0);
+    for (const [at] of atBlast) expect(at.x).toBe(20);
+    // Linked: the weapon draws its own pieces and the stand-in stops.
+    settle();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(visuals.root.visible).toBe(true);
+    host.vfx.burst.mockClear();
+    visuals.fire({ ...shot, shotId: 2 }, { x: 2, y: 2.2, z: 0 }, 1, false);
+    visuals.impact({ ...shot, shotId: 2 }, 1.4, false);
+    expect(host.vfx.burst).not.toHaveBeenCalled();
     visuals.dispose();
   });
 });

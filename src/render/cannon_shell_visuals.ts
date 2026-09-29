@@ -1,50 +1,70 @@
-// A heavy cannon shot, drawn: the muzzle flash, smoke and barrel recoil, a
-// glowing shell on its arc behind an instanced trail, and at the blast a flash,
-// a shockwave, a dirt burst, a dust cloud, sparks, tumbling dirt chunks, a
-// scorch on the ground, the renderer's AoE ring at the blast radius and a camera
-// shake by distance. The look is the Realm Racers Ground Blast's, without its
-// rival-dodge telegraph. Neutral: the caller passes the blast radius and feeds
-// fire and impact events; the curves are cannon_shell_core.ts.
+// A heavy cannon shot, drawn: at the muzzle a yellow-orange flash, a flame
+// tongue and a grey-brown smoke puff, with the barrel's recoil; a dark iron
+// shell in a hot orange glow on its arc, shedding grey smoke and warm sparks;
+// at the blast a white-yellow flash, a fireball that cools into rising smoke, a
+// brown-grey dust cloud that lingers, a beige ring of dust rolling out along the
+// ground, dark dirt clods and tumbling chunks thrown 3 to 5 yd up, hot sparks,
+// and a dark scorch draped on the ground that fades over its life; the camera
+// shakes by distance. Neutral: the caller passes the blast radius and feeds fire
+// and impact events; the curves are cannon_shell_core.ts and cannon_puff_core.ts.
 //
 // GPU rules (src/render/CLAUDE.md "GPU work"): nothing is built until
 // `prepare`, which mints every mesh, named material and texture the shot will
 // ever draw and attaches the root behind the compile gate, hidden until its
-// programs link; what stands in meanwhile is the renderer's boot-prewarmed
-// particles and AoE ring, and the thrown monsters themselves. Every piece is an
-// InstancedMesh on a shared material (fades ride instance colours on additive
-// or subtractive blends, never a per-use clone), there are no lights and no
-// shadows, and a frame allocates nothing.
+// programs link; while it is hidden, the renderer's boot-prewarmed particles
+// stand in at the muzzle and the blast, beside the thrown monsters themselves.
+// Four draws on shared materials: the shells and the chunks are instanced, the
+// scorches one draped mesh (their fade rides its vertex colours on a
+// subtractive blend), every puff one instanced quad (cannon_puff_mesh.ts); no
+// per-use clone, no light, no shadow, and a frame allocates nothing.
 //
 // Tiers: the low static preset sheds cosmetic counts only (chunks, dirt, dust,
-// sparks, smoke); the shell, the flash, the shockwave and the ring are the same
-// on every tier. Reduced motion drops the camera shake and the FOV punch.
+// sparks, smoke); the shell and its wake, the flash, the fireball and the shock
+// ring are the same on every tier. Reduced motion drops the camera shake and the
+// FOV punch.
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../game/ui_effects_profile';
 import {
+  CANNON_PUFF_KINDS,
+  CANNON_PUFF_LAYERS,
+  type CannonPuff,
+  type CannonPuffFrame,
+  cannonBlastPower,
+  cannonPuffInto,
+  cannonPuffLightInto,
+  cannonShellGlowInto,
+  newCannonPuff,
+  newCannonPuffFrame,
+} from './cannon_puff_core';
+import { CannonPuffMesh } from './cannon_puff_mesh';
+import {
   CANNON_BLAST,
+  CANNON_BLAST_PUFFS,
   CANNON_CHUNKS_PER_IMPACT,
   CANNON_IMPACT_POOL,
   CANNON_MUZZLE,
+  CANNON_MUZZLE_POOL,
+  CANNON_MUZZLE_PUFFS,
+  CANNON_SCORCH_GRID,
+  CANNON_SCORCH_LAYERS,
   CANNON_SCORCH_POOL,
+  CANNON_SCORCH_VERTS,
   CANNON_SHELL,
   CANNON_SHELL_POOL,
-  type CannonBurstFrame,
+  CANNON_TRAIL_PUFFS,
   type CannonChunkFrame,
   type CannonFiredShot,
   type CannonImpactShot,
-  type CannonMuzzleFlashFrame,
   type CannonPoint,
   type CannonShotCounts,
   CannonShotTimeline,
   cannonChunkInto,
-  cannonFlashInto,
-  cannonMuzzleFlashInto,
   cannonRecoilOffset,
+  cannonScorchDrapeInto,
   cannonScorchFade,
   cannonScorchTexels,
   cannonShakeFalloff,
   cannonShotCounts,
-  cannonWaveInto,
 } from './cannon_shell_core';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { attachSceneGroupGated } from './gated_scene_attach';
@@ -54,11 +74,16 @@ import type { Vfx } from './vfx';
 
 /** The renderer services a shot draws with. */
 export interface CannonShellHost {
-  readonly vfx: Pick<Vfx, 'burst' | 'groundPuff'>;
+  /** The boot-prewarmed particle cloud: the stand-in while the weapon's gate is pending. */
+  readonly vfx: Pick<Vfx, 'burst'>;
   readonly camera: THREE.Camera;
   addShake(amount: number): void;
   punchFov(degrees: number): void;
-  spawnAoeRing(x: number, z: number, radius: number, school: string, colorHex?: number): void;
+}
+
+/** A blast event, with the bodies it struck when the caller has them (a core hit reads bigger). */
+export interface CannonBlast extends CannonImpactShot {
+  readonly hits?: readonly { readonly falloff: number }[];
 }
 
 export interface CannonShellOptions {
@@ -74,29 +99,28 @@ interface Parts {
   readonly materials: THREE.Material[];
   readonly scorchTexture: THREE.DataTexture;
   readonly shells: THREE.InstancedMesh;
-  readonly glows: THREE.InstancedMesh;
-  readonly motes: THREE.InstancedMesh;
-  readonly muzzleCore: THREE.InstancedMesh;
-  readonly muzzleTongue: THREE.InstancedMesh;
-  readonly flashes: THREE.InstancedMesh;
-  readonly waves: THREE.InstancedMesh;
   readonly chunks: THREE.InstancedMesh;
-  readonly scorches: THREE.InstancedMesh;
+  readonly scorch: THREE.Mesh;
+  readonly scorchPosition: THREE.BufferAttribute;
+  readonly scorchColor: THREE.BufferAttribute;
+  readonly puffs: CannonPuffMesh;
 }
 
 const SCORCH_TEXELS = 64;
-const SCORCH_LIFT = 0.04;
-const DIRT = 0x5b4632;
-const DUST = 0x9c8a6c;
-const SPARK = 0xffc56b;
-const SMOKE = 0x8f8a80;
+const IRON = 0x2b2622;
 const SOIL_DARK = new THREE.Color(0x3a2a1c);
 const SOIL_LIGHT = new THREE.Color(0x6e5a42);
 const SOIL_GRASS = new THREE.Color(0x4d5a2c);
-const UP = new THREE.Vector3(0, 1, 0);
-const FORWARD = new THREE.Vector3(0, 0, 1);
-const IDENTITY = new THREE.Quaternion();
 const ZERO = new THREE.Matrix4().makeScale(0, 0, 0);
+const BLACK = { r: 0, g: 0, b: 0 };
+const FORWARD = new THREE.Vector3(0, 0, 1);
+const PUFF_CAPACITY =
+  CANNON_SHELL_POOL * (CANNON_TRAIL_PUFFS + 1) +
+  CANNON_MUZZLE_POOL * CANNON_MUZZLE_PUFFS +
+  CANNON_IMPACT_POOL * CANNON_BLAST_PUFFS;
+/** Floats of one draped layer (xyz or rgb per vertex) and of one scorch's slice. */
+const LAYER_FLOATS = CANNON_SCORCH_VERTS * 3;
+const SCORCH_FLOATS = LAYER_FLOATS * CANNON_SCORCH_LAYERS.length;
 
 const materialName = (role: string): string => `cannonShell:${role}`;
 
@@ -117,23 +141,35 @@ export class CannonShellVisuals {
   private readonly barrelTip = new THREE.Vector3();
   private readonly muzzle = new THREE.Vector3();
   private readonly muzzleDir = new THREE.Vector3(0, 0, 1);
-  private readonly muzzleTurn = new THREE.Quaternion();
   private readonly point: CannonPoint = { x: 0, y: 0, z: 0 };
-  private readonly burstFrame: CannonBurstFrame = { scale: 0, fade: 0 };
-  private readonly flashFrame: CannonMuzzleFlashFrame = { core: 0, length: 0, width: 0 };
+  private readonly dir: CannonPoint = { x: 0, y: 0, z: 1 };
   private readonly chunkFrame: CannonChunkFrame = { x: 0, y: 0, z: 0, angle: 0, scale: 0 };
-  private readonly trail = new Float32Array(CANNON_SHELL.trailMotes * 4);
+  private readonly trailPuffs: CannonPuff[] = Array.from(
+    { length: CANNON_TRAIL_PUFFS },
+    newCannonPuff,
+  );
+  private readonly trailAges = new Float32Array(CANNON_TRAIL_PUFFS);
+  private readonly frames: CannonPuffFrame[] = Array.from(
+    { length: PUFF_CAPACITY },
+    newCannonPuffFrame,
+  );
+  private frameCount = 0;
+  private readonly byKind = new Int32Array(CANNON_PUFF_KINDS);
   private readonly liveScorches: boolean[] = new Array(CANNON_SCORCH_POOL).fill(false);
+  private readonly scorchFades = new Float32Array(CANNON_SCORCH_POOL);
   private readonly liveChunks: boolean[] = new Array(CANNON_IMPACT_POOL).fill(false);
   private readonly matrix = new THREE.Matrix4();
   private readonly quat = new THREE.Quaternion();
-  private readonly quat2 = new THREE.Quaternion();
   private readonly euler = new THREE.Euler();
   private readonly pos = new THREE.Vector3();
   private readonly scale = new THREE.Vector3();
   private readonly axis = new THREE.Vector3();
   private readonly color = new THREE.Color();
   private readonly at = new THREE.Vector3();
+  private readonly light = { r: 1, g: 1, b: 1 };
+  private hemi: THREE.HemisphereLight | null = null;
+  private sun: THREE.DirectionalLight | null = null;
+  private lightsSought = false;
 
   constructor(options: CannonShellOptions) {
     this.blastRadius = options.blastRadius;
@@ -154,6 +190,11 @@ export class CannonShellVisuals {
 
   get hasBarrel(): boolean {
     return this.barrel !== null;
+  }
+
+  /** Puffs of `kind` (cannon_puff_core.ts PUFF) the last frame drew. */
+  drawnPuffs(kind: number): number {
+    return this.byKind[kind] ?? 0;
   }
 
   setHost(host: CannonShellHost | null): void {
@@ -192,45 +233,43 @@ export class CannonShellVisuals {
     this.point.x = this.muzzle.x;
     this.point.y = this.muzzle.y;
     this.point.z = this.muzzle.z;
-    this.timeline.fired(shot, this.point, time);
-    this.muzzleTurn.setFromUnitVectors(FORWARD, this.muzzleDir);
+    this.dir.x = this.muzzleDir.x;
+    this.dir.y = this.muzzleDir.y;
+    this.dir.z = this.muzzleDir.z;
+    this.timeline.fired(shot, this.point, this.dir, time, this.counts.smoke);
     const host = this.host;
     if (!host) return;
-    host.vfx.burst(this.muzzle, 'arcane', this.counts.sparks, 0.65);
-    this.at.copy(this.muzzle).addScaledVector(this.muzzleDir, 0.6);
-    for (let i = 0; i < this.counts.smoke; i++) {
-      host.vfx.groundPuff(this.at, 0.55, SMOKE);
-      this.at.addScaledVector(this.muzzleDir, 0.7);
-    }
+    if (!this.revealed()) host.vfx.burst(this.muzzle, 'fire', 10, 0.8);
     if (reducedMotion) return;
     host.punchFov(CANNON_MUZZLE.fovPunch);
     host.addShake(CANNON_MUZZLE.shake);
   }
 
-  /** The shell lands: blast, chunks, scorch, particles, ring and shake. */
-  impact(shot: CannonImpactShot, time: number, reducedMotion: boolean): void {
+  /** The shell lands: its blast, chunks, puffs, scorch and shake. */
+  impact(shot: CannonBlast, time: number, reducedMotion: boolean): void {
     if (this.disposed) return;
-    const index = this.timeline.impact(shot, time, this.counts.chunks, this.groundAt);
+    const power = cannonBlastPower(shot.hits);
+    const index = this.timeline.impact(
+      shot,
+      time,
+      this.counts,
+      this.blastRadius,
+      power,
+      this.groundAt,
+    );
     this.paintImpactColours(index);
     this.placeScorch();
     const host = this.host;
     if (!host) return;
     const { x, y, z } = shot;
-    const vfx = host.vfx;
-    vfx.burst(this.at.set(x, y + 0.35, z), 'blood', this.counts.dirt, 1.35, DIRT, 0.95);
-    vfx.burst(this.at.set(x, y + 0.6, z), 'fire', 16, 1.1);
-    vfx.burst(this.at.set(x, y + 0.5, z), 'arcane', this.counts.sparks, 1.7, SPARK, 0.55);
-    for (let i = 0; i < this.counts.dust; i++) {
-      const angle = (i / this.counts.dust) * Math.PI * 2 + shot.shotId;
-      const reach = i === 0 ? 0 : this.blastRadius * 0.3;
-      this.at.set(x + Math.sin(angle) * reach, y, z + Math.cos(angle) * reach);
-      vfx.groundPuff(this.at, 1, DUST);
+    if (!this.revealed()) {
+      host.vfx.burst(this.at.set(x, y + 0.6, z), 'fire', 16, 1.2);
+      host.vfx.burst(this.at.set(x, y + 0.4, z), 'blood', 20, 1.3, 0x5b4632, 0.9);
     }
-    host.spawnAoeRing(x, z, this.blastRadius, 'physical');
     if (reducedMotion) return;
     const eye = host.camera.position;
     const falloff = cannonShakeFalloff(Math.hypot(x - eye.x, y - eye.y, z - eye.z));
-    if (falloff > 0) host.addShake(CANNON_BLAST.shake * falloff);
+    if (falloff > 0) host.addShake(CANNON_BLAST.shake * falloff * power);
   }
 
   /** Stops every shot, blast and scorch, and sets the barrel back to rest. */
@@ -239,12 +278,18 @@ export class CannonShellVisuals {
     this.restBarrel();
     const parts = this.parts;
     if (!parts) return;
-    for (const mesh of this.meshes(parts)) {
-      mesh.count = 0;
-      mesh.visible = false;
-    }
+    parts.shells.count = 0;
+    parts.shells.visible = false;
+    parts.chunks.count = 0;
+    parts.chunks.visible = false;
     this.liveChunks.fill(false);
-    this.liveScorches.fill(false);
+    for (let i = 0; i < CANNON_SCORCH_POOL; i++) {
+      if (this.liveScorches[i]) this.retireScorch(parts, i);
+    }
+    parts.scorch.visible = false;
+    this.byKind.fill(0);
+    parts.puffs.begin();
+    parts.puffs.end();
   }
 
   /** `tick` is the display tick the monsters are sampled on; `time` the frame seconds. */
@@ -252,9 +297,12 @@ export class CannonShellVisuals {
     this.recoil(time);
     const parts = this.parts;
     if (!parts || this.disposed) return;
+    this.frameCount = 0;
+    this.lightPuffs(parts);
     this.drawShells(parts, tick);
-    this.drawMuzzle(parts, time);
-    this.drawBlasts(parts, time);
+    this.gatherMuzzles(time);
+    this.gatherBlasts(time);
+    this.drawPuffs(parts);
     this.drawChunks(parts, time);
     this.drawScorches(parts, time);
   }
@@ -269,11 +317,13 @@ export class CannonShellVisuals {
     this.parts = null;
     if (!parts) return;
     const errors: unknown[] = [];
-    const resources = [
-      ...this.meshes(parts),
+    const resources: { dispose(): void }[] = [
+      parts.shells,
+      parts.chunks,
       ...parts.geometries,
       ...parts.materials,
       parts.scorchTexture,
+      parts.puffs,
     ];
     for (const resource of resources) {
       try {
@@ -283,6 +333,11 @@ export class CannonShellVisuals {
       }
     }
     if (errors.length > 0) throw new AggregateError(errors, 'Cannon shot failed to dispose');
+  }
+
+  /** The gate has revealed the weapon's own pieces (false while their programs link). */
+  private revealed(): boolean {
+    return this.parts !== null && this.root.visible && this.root.parent !== null;
   }
 
   private restBarrel(): void {
@@ -321,20 +376,6 @@ export class CannonShellVisuals {
     this.muzzleDir.normalize();
   }
 
-  private meshes(parts: Parts): THREE.InstancedMesh[] {
-    return [
-      parts.shells,
-      parts.glows,
-      parts.motes,
-      parts.muzzleCore,
-      parts.muzzleTongue,
-      parts.flashes,
-      parts.waves,
-      parts.chunks,
-      parts.scorches,
-    ];
-  }
-
   private build(): Parts {
     const geometries: THREE.BufferGeometry[] = [];
     const materials: THREE.Material[] = [];
@@ -342,27 +383,6 @@ export class CannonShellVisuals {
       geometries.push(g);
       return g;
     };
-    const basic = (role: string, params: THREE.MeshBasicMaterialParameters) => {
-      const material = new THREE.MeshBasicMaterial({ name: materialName(role), ...params });
-      materials.push(material);
-      return material;
-    };
-    const additive = (role: string, color: number, opacity: number) =>
-      basic(role, {
-        color,
-        opacity,
-        transparent: true,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-      });
-    const tongue = geometry(new THREE.ConeGeometry(1, 1, 12));
-    // Tip at the muzzle, opening along +z.
-    tongue.translate(0, -0.5, 0);
-    tongue.rotateX(-Math.PI / 2);
-    const wave = geometry(new THREE.RingGeometry(0.82, 1, 48, 1));
-    wave.rotateX(-Math.PI / 2);
-    const scorch = geometry(new THREE.PlaneGeometry(2, 2));
-    scorch.rotateX(-Math.PI / 2);
     const scorchTexture = new THREE.DataTexture(
       cannonScorchTexels(SCORCH_TEXELS),
       SCORCH_TEXELS,
@@ -374,89 +394,114 @@ export class CannonShellVisuals {
     scorchTexture.minFilter = THREE.LinearMipmapLinearFilter;
     scorchTexture.generateMipmaps = true;
     scorchTexture.needsUpdate = true;
-    const lambert = new THREE.MeshLambertMaterial({ name: materialName('chunk'), color: 0xffffff });
-    materials.push(lambert);
-    const parts: Parts = {
+    const shellMaterial = new THREE.MeshBasicMaterial({ name: materialName('shell'), color: IRON });
+    const chunkMaterial = new THREE.MeshLambertMaterial({
+      name: materialName('chunk'),
+      color: 0xffffff,
+    });
+    // Subtractive: the ground under it darkens by the texel times the fade in
+    // its vertex colours, so a spent scorch darkens nothing.
+    const scorchMaterial = new THREE.MeshBasicMaterial({
+      name: materialName('scorch'),
+      map: scorchTexture,
+      vertexColors: true,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.SubtractiveBlending,
+      premultipliedAlpha: true,
+      fog: false,
+      toneMapped: false,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: -4,
+    });
+    materials.push(shellMaterial, chunkMaterial, scorchMaterial);
+    const shells = this.instanced(
+      'shell',
+      geometry(new THREE.IcosahedronGeometry(0.2, 1)),
+      shellMaterial,
+      CANNON_SHELL_POOL,
+      false,
+    );
+    const chunks = this.instanced(
+      'chunk',
+      geometry(new THREE.DodecahedronGeometry(1, 0)),
+      chunkMaterial,
+      CANNON_IMPACT_POOL * CANNON_CHUNKS_PER_IMPACT,
+      true,
+    );
+    for (let i = 0; i < chunks.instanceMatrix.count; i++) chunks.setMatrixAt(i, ZERO);
+    const scorchGeometry = geometry(this.scorchGeometry());
+    const scorch = new THREE.Mesh(scorchGeometry, scorchMaterial);
+    scorch.name = materialName('scorch');
+    scorch.frustumCulled = false;
+    scorch.castShadow = false;
+    scorch.receiveShadow = false;
+    scorch.visible = false;
+    scorch.renderOrder = floorVfxRenderOrder('ground', 1);
+    const puffs = new CannonPuffMesh(PUFF_CAPACITY, materialName('puff'));
+    // Airborne, but it must paint after the scorch it rises over and under every
+    // telegraph and the aim reticle: the player band's upper rungs.
+    puffs.mesh.renderOrder = floorVfxRenderOrder('player', 4);
+    this.root.add(scorch, puffs.mesh);
+    return {
       geometries,
       materials,
       scorchTexture,
-      shells: this.instanced(
-        'shell',
-        geometry(new THREE.IcosahedronGeometry(0.3, 1)),
-        basic('shell', { color: 0xdcf7ff }),
-        CANNON_SHELL_POOL,
-        false,
-      ),
-      glows: this.instanced(
-        'glow',
-        geometry(new THREE.IcosahedronGeometry(0.72, 1)),
-        additive('glow', 0x63d5ff, 0.4),
-        CANNON_SHELL_POOL,
-        false,
-      ),
-      motes: this.instanced(
-        'trail',
-        geometry(new THREE.IcosahedronGeometry(0.2, 0)),
-        additive('trail', 0x9ce6ff, 0.7),
-        CANNON_SHELL_POOL * CANNON_SHELL.trailMotes,
-        false,
-      ),
-      muzzleCore: this.instanced(
-        'muzzleCore',
-        geometry(new THREE.IcosahedronGeometry(1, 1)),
-        additive('muzzleCore', 0xf2fbff, 1),
-        1,
-        false,
-      ),
-      muzzleTongue: this.instanced(
-        'muzzleTongue',
-        tongue,
-        additive('muzzleTongue', 0x8fe3ff, 0.85),
-        1,
-        false,
-      ),
-      flashes: this.instanced(
-        'flash',
-        geometry(new THREE.IcosahedronGeometry(1, 2)),
-        additive('flash', 0xfff0cf, 1),
-        CANNON_IMPACT_POOL,
-        true,
-      ),
-      waves: this.instanced('wave', wave, additive('wave', 0xffd9a0, 1), CANNON_IMPACT_POOL, true),
-      chunks: this.instanced(
-        'chunk',
-        geometry(new THREE.DodecahedronGeometry(1, 0)),
-        lambert,
-        CANNON_IMPACT_POOL * CANNON_CHUNKS_PER_IMPACT,
-        true,
-      ),
-      // Subtractive: the ground under it darkens by the texel, times the fade
-      // in its instance colour, so a spent scorch darkens nothing.
-      scorches: this.instanced(
-        'scorch',
-        scorch,
-        basic('scorch', {
-          map: scorchTexture,
-          transparent: true,
-          depthWrite: false,
-          blending: THREE.SubtractiveBlending,
-          premultipliedAlpha: true,
-          fog: false,
-          toneMapped: false,
-          polygonOffset: true,
-          polygonOffsetFactor: -1,
-          polygonOffsetUnits: -4,
-        }),
-        CANNON_SCORCH_POOL,
-        true,
-      ),
+      shells,
+      chunks,
+      scorch,
+      scorchPosition: scorchGeometry.getAttribute('position') as THREE.BufferAttribute,
+      scorchColor: scorchGeometry.getAttribute('color') as THREE.BufferAttribute,
+      puffs,
     };
-    parts.waves.renderOrder = floorVfxRenderOrder('player', 1);
-    parts.scorches.renderOrder = floorVfxRenderOrder('ground', 1);
-    for (const mesh of [parts.chunks, parts.scorches]) {
-      for (let i = 0; i < mesh.instanceMatrix.count; i++) mesh.setMatrixAt(i, ZERO);
+  }
+
+  /** Every scorch's draped layers in one mesh, collapsed to a point until it is laid. */
+  private scorchGeometry(): THREE.BufferGeometry {
+    const grid = CANNON_SCORCH_GRID;
+    const layers = CANNON_SCORCH_LAYERS.length;
+    const grids = CANNON_SCORCH_POOL * layers;
+    const verts = grids * CANNON_SCORCH_VERTS;
+    const positions = new Float32Array(verts * 3);
+    const colors = new Float32Array(verts * 3);
+    const uvs = new Float32Array(verts * 2);
+    const index = new Uint16Array(grids * grid * grid * 6);
+    let u = 0;
+    let q = 0;
+    for (let s = 0; s < grids; s++) {
+      const base = s * CANNON_SCORCH_VERTS;
+      for (let j = 0; j <= grid; j++) {
+        for (let i = 0; i <= grid; i++) {
+          uvs[u++] = i / grid;
+          uvs[u++] = j / grid;
+        }
+      }
+      for (let j = 0; j < grid; j++) {
+        for (let i = 0; i < grid; i++) {
+          const a = base + j * (grid + 1) + i;
+          const b = a + 1;
+          const c = a + grid + 1;
+          const d = c + 1;
+          index[q++] = a;
+          index[q++] = c;
+          index[q++] = b;
+          index[q++] = b;
+          index[q++] = c;
+          index[q++] = d;
+        }
+      }
     }
-    return parts;
+    const geometry = new THREE.BufferGeometry();
+    const position = new THREE.BufferAttribute(positions, 3);
+    position.setUsage(THREE.DynamicDrawUsage);
+    const color = new THREE.BufferAttribute(colors, 3);
+    color.setUsage(THREE.DynamicDrawUsage);
+    geometry.setAttribute('position', position);
+    geometry.setAttribute('color', color);
+    geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+    geometry.setIndex(new THREE.BufferAttribute(index, 1));
+    return geometry;
   }
 
   private instanced(
@@ -467,7 +512,7 @@ export class CannonShellVisuals {
     coloured: boolean,
   ): THREE.InstancedMesh {
     const mesh = new THREE.InstancedMesh(geometry, material, count);
-    mesh.name = `cannonShell:${role}`;
+    mesh.name = materialName(role);
     mesh.frustumCulled = false;
     mesh.castShadow = false;
     mesh.receiveShadow = false;
@@ -501,37 +546,92 @@ export class CannonShellVisuals {
     this.liveChunks[index] = slot.chunkCount > 0;
   }
 
-  /** The newest scorch's matrix is static: flat on the ground's normal, turned by its yaw. */
+  /** The newest scorch is draped once, where it lands; only its fade changes after. */
   private placeScorch(): void {
     const parts = this.parts;
     const newest = this.timeline.lastScorch;
     if (!parts || newest < 0) return;
     const s = this.timeline.scorches[newest];
-    this.axis.set(s.nx, s.ny, s.nz);
-    this.quat.setFromUnitVectors(UP, this.axis);
-    this.quat2.setFromAxisAngle(UP, s.yaw);
-    this.quat.multiply(this.quat2);
-    const size = this.blastRadius * CANNON_BLAST.scorchScale;
-    this.pos.set(s.x, s.y + SCORCH_LIFT, s.z);
-    this.scale.set(size, 1, size);
-    this.matrix.compose(this.pos, this.quat, this.scale);
-    parts.scorches.setMatrixAt(newest, this.matrix);
-    parts.scorches.instanceMatrix.needsUpdate = true;
+    for (let layer = 0; layer < CANNON_SCORCH_LAYERS.length; layer++) {
+      cannonScorchDrapeInto(
+        parts.scorchPosition.array as Float32Array,
+        newest * SCORCH_FLOATS + layer * LAYER_FLOATS,
+        s.x,
+        s.z,
+        s.yaw,
+        this.blastRadius * CANNON_BLAST.scorchScale,
+        CANNON_SCORCH_LAYERS[layer].lift,
+        this.groundAt,
+      );
+    }
+    parts.scorchPosition.addUpdateRange(newest * SCORCH_FLOATS, SCORCH_FLOATS);
+    parts.scorchPosition.needsUpdate = true;
+    this.setScorchFade(parts, newest, 0);
     this.liveScorches[newest] = true;
   }
 
-  private commit(mesh: THREE.InstancedMesh, count: number, coloured = false): void {
-    mesh.count = count;
-    mesh.visible = count > 0;
-    if (count === 0) return;
-    mesh.instanceMatrix.needsUpdate = true;
-    if (coloured && mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  private setScorchFade(parts: Parts, slot: number, fade: number): void {
+    const colors = parts.scorchColor.array as Float32Array;
+    for (let layer = 0; layer < CANNON_SCORCH_LAYERS.length; layer++) {
+      const from = slot * SCORCH_FLOATS + layer * LAYER_FLOATS;
+      colors.fill(fade * CANNON_SCORCH_LAYERS[layer].strength, from, from + LAYER_FLOATS);
+    }
+    parts.scorchColor.addUpdateRange(slot * SCORCH_FLOATS, SCORCH_FLOATS);
+    parts.scorchColor.needsUpdate = true;
+    this.scorchFades[slot] = fade;
+  }
+
+  private retireScorch(parts: Parts, slot: number): void {
+    const positions = parts.scorchPosition.array as Float32Array;
+    positions.fill(0, slot * SCORCH_FLOATS, (slot + 1) * SCORCH_FLOATS);
+    parts.scorchPosition.addUpdateRange(slot * SCORCH_FLOATS, SCORCH_FLOATS);
+    parts.scorchPosition.needsUpdate = true;
+    this.setScorchFade(parts, slot, 0);
+    this.timeline.scorches[slot].active = false;
+    this.liveScorches[slot] = false;
+  }
+
+  /**
+   * Smoke and dust take the scene's hemisphere and sun as graded this frame
+   * (day, dusk, night): read-only, found once among the scene's own children.
+   */
+  private lightPuffs(parts: Parts): void {
+    if (!this.lightsSought && this.root.parent) {
+      this.lightsSought = true;
+      let top: THREE.Object3D = this.root;
+      while (top.parent) top = top.parent;
+      for (const child of top.children) {
+        const light = child as THREE.HemisphereLight & THREE.DirectionalLight;
+        if (light.isHemisphereLight && !this.hemi) this.hemi = light;
+        else if (light.isDirectionalLight && !this.sun) this.sun = light;
+      }
+    }
+    const hemi = this.hemi;
+    const sun = this.sun;
+    if (!hemi && !sun) return;
+    cannonPuffLightInto(
+      hemi ? hemi.color : BLACK,
+      hemi ? hemi.groundColor : BLACK,
+      hemi ? hemi.intensity : 0,
+      sun ? sun.color : BLACK,
+      sun ? sun.intensity : 0,
+      this.light,
+    );
+    parts.puffs.setLight(this.light.r, this.light.g, this.light.b);
+  }
+
+  private nextFrame(): CannonPuffFrame | null {
+    return this.frameCount < this.frames.length ? this.frames[this.frameCount] : null;
+  }
+
+  private gather(puff: CannonPuff, age: number): void {
+    const frame = this.nextFrame();
+    if (frame && cannonPuffInto(puff, age, frame)) this.frameCount++;
   }
 
   private drawShells(parts: Parts, tick: number): void {
     const timeline = this.timeline;
     let shells = 0;
-    let motes = 0;
     for (let i = 0; i < CANNON_SHELL_POOL; i++) {
       if (timeline.shellAt(i, tick, this.point)) {
         const age = timeline.shellAge(i, tick);
@@ -539,63 +639,60 @@ export class CannonShellVisuals {
         this.euler.set(CANNON_SHELL.spinX * age, CANNON_SHELL.spinY * age, 0);
         this.quat.setFromEuler(this.euler);
         this.matrix.compose(this.pos, this.quat, this.scale.setScalar(1));
-        parts.shells.setMatrixAt(shells, this.matrix);
-        const pulse = 1 + CANNON_SHELL.glowPulse * Math.sin(CANNON_SHELL.glowRate * age);
-        this.matrix.compose(this.pos, IDENTITY, this.scale.setScalar(pulse));
-        parts.glows.setMatrixAt(shells, this.matrix);
-        shells++;
+        parts.shells.setMatrixAt(shells++, this.matrix);
+        const glow = this.nextFrame();
+        if (glow) {
+          cannonShellGlowInto(this.point.x, this.point.y, this.point.z, age, glow);
+          this.frameCount++;
+        }
       }
-      const n = timeline.trailInto(i, tick, this.trail);
-      for (let k = 0; k < n; k++) {
-        const at = k * 4;
-        const size = this.trail[at + 3];
-        this.matrix.makeScale(size, size, size);
-        this.matrix.setPosition(this.trail[at], this.trail[at + 1], this.trail[at + 2]);
-        parts.motes.setMatrixAt(motes++, this.matrix);
-      }
+      const n = timeline.trailPuffsInto(i, tick, this.trailPuffs, this.trailAges);
+      for (let k = 0; k < n; k++) this.gather(this.trailPuffs[k], this.trailAges[k]);
     }
-    this.commit(parts.shells, shells);
-    this.commit(parts.glows, shells);
-    this.commit(parts.motes, motes);
+    parts.shells.count = shells;
+    parts.shells.visible = shells > 0;
+    if (shells > 0) parts.shells.instanceMatrix.needsUpdate = true;
   }
 
-  private drawMuzzle(parts: Parts, time: number): void {
-    const shown = cannonMuzzleFlashInto(time - this.timeline.muzzleAt, this.flashFrame);
-    if (shown) {
-      const f = this.flashFrame;
-      this.matrix.compose(this.muzzle, IDENTITY, this.scale.setScalar(f.core));
-      parts.muzzleCore.setMatrixAt(0, this.matrix);
-      this.matrix.compose(this.muzzle, this.muzzleTurn, this.scale.set(f.width, f.width, f.length));
-      parts.muzzleTongue.setMatrixAt(0, this.matrix);
+  private gatherMuzzles(time: number): void {
+    for (const slot of this.timeline.muzzles) {
+      if (!slot.active) continue;
+      const age = time - slot.at;
+      if (age >= CANNON_MUZZLE.life) {
+        slot.active = false;
+        continue;
+      }
+      for (let i = 0; i < slot.puffCount; i++) this.gather(slot.puffs[i], age);
     }
-    this.commit(parts.muzzleCore, shown ? 1 : 0);
-    this.commit(parts.muzzleTongue, shown ? 1 : 0);
   }
 
-  private drawBlasts(parts: Parts, time: number): void {
-    let flashes = 0;
-    let waves = 0;
+  private gatherBlasts(time: number): void {
     for (const slot of this.timeline.impacts) {
       if (!slot.active) continue;
       const age = time - slot.at;
-      if (age >= CANNON_BLAST.chunkLife) slot.active = false;
-      if (cannonFlashInto(age, this.blastRadius, this.burstFrame)) {
-        this.pos.set(slot.x, slot.y + CANNON_BLAST.flashLift, slot.z);
-        this.matrix.compose(this.pos, IDENTITY, this.scale.setScalar(this.burstFrame.scale));
-        parts.flashes.setMatrixAt(flashes, this.matrix);
-        const fade = this.burstFrame.fade;
-        parts.flashes.setColorAt(flashes++, this.color.setRGB(fade, fade, fade));
+      if (age >= CANNON_BLAST.life) {
+        slot.active = false;
+        continue;
       }
-      if (cannonWaveInto(age, this.blastRadius, this.burstFrame)) {
-        this.pos.set(slot.x, slot.y + CANNON_BLAST.waveLift, slot.z);
-        this.matrix.compose(this.pos, IDENTITY, this.scale.setScalar(this.burstFrame.scale));
-        parts.waves.setMatrixAt(waves, this.matrix);
-        const fade = this.burstFrame.fade;
-        parts.waves.setColorAt(waves++, this.color.setRGB(fade, fade, fade));
+      for (let i = 0; i < slot.puffCount; i++) this.gather(slot.puffs[i], age);
+    }
+  }
+
+  /** Back to front by pass: the dust behind, then smoke, fireball and dirt, then the light. */
+  private drawPuffs(parts: Parts): void {
+    const mesh = parts.puffs;
+    this.byKind.fill(0);
+    mesh.begin();
+    for (let layer = 0; layer < CANNON_PUFF_LAYERS; layer++) {
+      for (let i = 0; i < this.frameCount; i++) {
+        const frame = this.frames[i];
+        if (frame.layer !== layer) continue;
+        const before = mesh.drawn;
+        mesh.push(frame);
+        if (mesh.drawn > before) this.byKind[frame.kind]++;
       }
     }
-    this.commit(parts.flashes, flashes, true);
-    this.commit(parts.waves, waves, true);
+    mesh.end();
   }
 
   private drawChunks(parts: Parts, time: number): void {
@@ -634,26 +731,20 @@ export class CannonShellVisuals {
 
   private drawScorches(parts: Parts, time: number): void {
     let any = false;
-    let wrote = false;
     const scorches = this.timeline.scorches;
     for (let i = 0; i < scorches.length; i++) {
       if (!this.liveScorches[i]) continue;
       const s = scorches[i];
       const age = time - s.at;
-      wrote = true;
       if (!s.active || age >= CANNON_BLAST.scorchLife) {
-        s.active = false;
-        this.liveScorches[i] = false;
-        parts.scorches.setMatrixAt(i, ZERO);
-        parts.scorches.instanceMatrix.needsUpdate = true;
+        this.retireScorch(parts, i);
         continue;
       }
       any = true;
       const fade = cannonScorchFade(age);
-      parts.scorches.setColorAt(i, this.color.setRGB(fade, fade, fade));
+      // A held scorch keeps its colours: only a fade that moved is uploaded.
+      if (Math.abs(fade - this.scorchFades[i]) > 1 / 512) this.setScorchFade(parts, i, fade);
     }
-    if (wrote && parts.scorches.instanceColor) parts.scorches.instanceColor.needsUpdate = true;
-    parts.scorches.count = any ? parts.scorches.instanceMatrix.count : 0;
-    parts.scorches.visible = any;
+    parts.scorch.visible = any;
   }
 }

@@ -1,9 +1,10 @@
 // The cannon shot on screen, the pure half: the shell's arc from the muzzle to
-// the blast and the trail it drops, the muzzle flash and the barrel's recoil
-// spring, the impact flash and shockwave, the dirt chunks' closed-form flights,
-// the scorch mark's fade, the camera shake by distance and the counts the low
-// preset sheds. The Three consumer is cannon_shell_visuals.ts; the Ground Blast
-// of Realm Racers is where the shell, trail, flash and shockwave curves come from.
+// the blast and the wake it drops, the barrel's recoil spring, the dirt chunks'
+// closed-form flights, the scorch draped on the ground and its fade, the camera
+// shake by distance and the counts the low preset sheds, plus the pools every
+// event's puffs (cannon_puff_core.ts) are launched into. The Three consumer is
+// cannon_shell_visuals.ts; the Realm Racers Ground Blast is where the shell's
+// arc comes from.
 //
 // Two clocks: a shell flies on the sim tick (fractional, from the display clock)
 // so it lands on the tick its blast resolves; everything an event starts (the
@@ -15,24 +16,31 @@
 // refilled in place.
 
 import { DT } from '../sim/types';
+import {
+  CANNON_BLAST_FIXED_PUFFS,
+  CANNON_MUZZLE_FIXED_PUFFS,
+  CANNON_TRAIL,
+  type CannonPuff,
+  cannonBlastPuffs,
+  cannonHash01,
+  cannonMuzzlePuffs,
+  cannonTrailPuffInto,
+  newCannonPuff,
+} from './cannon_puff_core';
+
+export { cannonHash01 } from './cannon_puff_core';
 
 export const CANNON_SHELL = {
   /** Arc height above the chord, as a share of the span, clamped. */
   arcFraction: 0.18,
   arcMin: 2.5,
   arcMax: 7,
-  trailMotes: 16,
-  /** Seconds a trail mote lingers; one drops every trailLife / trailMotes seconds. */
-  trailLife: 0.32,
-  /** Shell spin (rad/s) and its glow's pulse. */
+  /** Shell spin (rad/s). */
   spinY: 9,
   spinX: 6,
-  glowPulse: 0.12,
-  glowRate: 30,
 } as const;
 
 export const CANNON_MUZZLE = {
-  flashLife: 0.08,
   /** The barrel's kick back along its own axis (local units) and its spring. */
   recoilKick: 0.35,
   recoilAttack: 0.035,
@@ -40,21 +48,19 @@ export const CANNON_MUZZLE = {
   fovPunch: 2,
   /** Camera trauma per shot: the renderer squares trauma, so this is a light kick. */
   shake: 0.22,
+  /** Seconds a shot's muzzle puffs can live (the smoke is the longest). */
+  life: 1.5,
 } as const;
 
 export const CANNON_BLAST = {
-  flashLife: 0.28,
-  flashLift: 0.9,
-  waveLife: 0.45,
-  /** The shockwave runs out to (0.4 + waveReach) blast radii. */
-  waveReach: 2.4,
-  waveLift: 0.12,
-  chunkLife: 1.6,
+  /** Seconds a blast's puffs and chunks can live (the dust is the longest). */
+  life: 2.1,
+  chunkLife: 2,
   chunkGravity: 26,
   /** Seconds the scorch holds before it starts to fade, and its whole life. */
   scorchHold: 1.5,
   scorchLife: 8,
-  /** Scorch radius, as a share of the blast radius. */
+  /** Scorch half-width, as a share of the blast radius. */
   scorchScale: 0.45,
   /** Camera shake of a blast: full within `full` yards of the turret, none past `zero`. */
   shake: 0.55,
@@ -63,9 +69,26 @@ export const CANNON_BLAST = {
 } as const;
 
 export const CANNON_SHELL_POOL = 4;
+export const CANNON_MUZZLE_POOL = 4;
 export const CANNON_IMPACT_POOL = 6;
 export const CANNON_SCORCH_POOL = 18;
 export const CANNON_CHUNKS_PER_IMPACT = 12;
+/** Quads per side of a draped scorch. */
+export const CANNON_SCORCH_GRID = 8;
+export const CANNON_SCORCH_VERTS = (CANNON_SCORCH_GRID + 1) * (CANNON_SCORCH_GRID + 1);
+/**
+ * A scorch's draped layers, as yards over the sampled ground and a share of
+ * its darkening: the soil itself, then two sheets through the grass canopy,
+ * because a meadow's blades hide nearly all the soil a mark on the ground could
+ * darken (the test site's grass left a sliver of it showing). Stacked, the
+ * blades read burnt at the root and singed at the tip.
+ */
+export const CANNON_SCORCH_LAYERS: readonly { readonly lift: number; readonly strength: number }[] =
+  [
+    { lift: 0.06, strength: 1 },
+    { lift: 0.3, strength: 0.32 },
+    { lift: 0.55, strength: 0.25 },
+  ];
 
 const clamp01 = (n: number): number => (n < 0 ? 0 : n > 1 ? 1 : n);
 
@@ -74,13 +97,13 @@ function smoothstep(n: number): number {
   return t * t * (3 - 2 * t);
 }
 
-/** Cosmetic counts per shot. The low preset sheds these only: the shell, the
- *  flash, the shockwave and the AoE ring are the same on every tier. */
+/** Cosmetic counts per shot. The low preset sheds these only: the shell and
+ *  its wake, the flash, the fireball and the shock ring are the same on every tier. */
 export interface CannonShotCounts {
   chunks: number;
-  /** Debris particles of the dirt burst. */
+  /** Dirt clods of the burst. */
   dirt: number;
-  /** Dust puffs around the blast. */
+  /** Puffs of the dust cloud. */
   dust: number;
   sparks: number;
   /** Smoke puffs at the muzzle. */
@@ -89,22 +112,31 @@ export interface CannonShotCounts {
 
 const FULL_COUNTS: Readonly<CannonShotCounts> = {
   chunks: 12,
-  dirt: 28,
-  dust: 3,
-  sparks: 14,
-  smoke: 2,
+  dirt: 24,
+  dust: 12,
+  sparks: 16,
+  smoke: 6,
 };
 const LOW_COUNTS: Readonly<CannonShotCounts> = {
   chunks: 5,
-  dirt: 12,
-  dust: 1,
-  sparks: 4,
-  smoke: 1,
+  dirt: 8,
+  dust: 4,
+  sparks: 5,
+  smoke: 2,
 };
 
 export function cannonShotCounts(low: boolean): Readonly<CannonShotCounts> {
   return low ? LOW_COUNTS : FULL_COUNTS;
 }
+
+/** The most puffs one blast launches (the full counts). */
+export const CANNON_BLAST_PUFFS =
+  CANNON_BLAST_FIXED_PUFFS + FULL_COUNTS.dust + FULL_COUNTS.dirt + FULL_COUNTS.sparks;
+/** The most puffs one muzzle launches. */
+export const CANNON_MUZZLE_PUFFS = CANNON_MUZZLE_FIXED_PUFFS + FULL_COUNTS.smoke;
+/** The most wake puffs one shell keeps alive: a 60 yd shot drops about as many
+ *  in its last half second. */
+export const CANNON_TRAIL_PUFFS = 80;
 
 export function cannonArcHeight(span: number): number {
   return Math.min(
@@ -134,50 +166,6 @@ export function cannonRecoilOffset(age: number): number {
   return recoilKick * Math.exp(-4 * r) * Math.cos(1.35 * Math.PI * r);
 }
 
-export interface CannonMuzzleFlashFrame {
-  /** Radius of the hot core (yd). */
-  core: number;
-  /** Length and width of the flame tongue along the barrel (yd). */
-  length: number;
-  width: number;
-}
-
-/** The muzzle flash `age` seconds after the shot; false once it is spent. */
-export function cannonMuzzleFlashInto(age: number, out: CannonMuzzleFlashFrame): boolean {
-  if (!(age >= 0) || age >= CANNON_MUZZLE.flashLife) return false;
-  const u = age / CANNON_MUZZLE.flashLife;
-  const env = u < 0.2 ? 0.6 + 2 * u : (1 - u) / 0.8;
-  out.core = 0.7 * env;
-  out.length = 1.9 * env * (0.8 + 0.4 * u);
-  out.width = 0.42 * env;
-  return true;
-}
-
-export interface CannonBurstFrame {
-  /** Scale of the flash sphere or the shockwave ring (yd). */
-  scale: number;
-  /** Brightness, 0 to 1 (an additive fade). */
-  fade: number;
-}
-
-/** The impact flash sphere `age` seconds after the blast; false once it is spent. */
-export function cannonFlashInto(age: number, radius: number, out: CannonBurstFrame): boolean {
-  if (!(age >= 0) || age >= CANNON_BLAST.flashLife) return false;
-  const t = age / CANNON_BLAST.flashLife;
-  out.scale = radius * (0.35 + 0.9 * t);
-  out.fade = (1 - t) * (1 - t);
-  return true;
-}
-
-/** The ground shockwave `age` seconds after the blast; false once it is spent. */
-export function cannonWaveInto(age: number, radius: number, out: CannonBurstFrame): boolean {
-  if (!(age >= 0) || age >= CANNON_BLAST.waveLife) return false;
-  const t = age / CANNON_BLAST.waveLife;
-  out.scale = radius * (0.4 + CANNON_BLAST.waveReach * t);
-  out.fade = 0.9 * (1 - t) ** 1.5;
-  return true;
-}
-
 /** The scorch's darkening, 0 to 1, `age` seconds after the blast. */
 export function cannonScorchFade(age: number): number {
   const { scorchHold, scorchLife } = CANNON_BLAST;
@@ -188,9 +176,11 @@ export function cannonScorchFade(age: number): number {
 
 /**
  * The scorch texture, `size` square RGBA texels: how much each texel darkens
- * the ground (a subtractive blend), strongest at the centre, broken by a coarse
- * soot mottle and radial burn streaks, zero at the rim, and a little more in
- * blue than in red so the mark reads as brown char rather than grey.
+ * the ground (a subtractive blend), near black char over the inner half, broken
+ * by a coarse soot mottle and radial burn streaks, fading to nothing at the rim,
+ * and a little more in blue than in red so the mark reads as brown char rather
+ * than grey. It has to be this dark: tone mapping, mip averaging and the
+ * grazing angle a blast 35 to 40 yd away is seen at eat a faint mark whole.
  */
 export function cannonScorchTexels(size: number): Uint8Array {
   const data = new Uint8Array(size * size * 4);
@@ -213,12 +203,14 @@ export function cannonScorchTexels(size: number): Uint8Array {
       const v = ((j + 0.5) / size) * 2 - 1;
       const r = Math.hypot(u, v);
       const angle = Math.atan2(v, u);
-      const core = 1 - smoothstep((r - 0.12) / 0.62);
-      const streak = Math.max(0, Math.cos(angle * 9 + 0.9 * Math.sin(angle * 4))) ** 6;
-      const reach = 1 - smoothstep((r - 0.35) / 0.6);
       const soot = mottle(u, v);
-      const dark = clamp01(core * (0.55 + 0.45 * soot) + streak * reach * 0.45 * soot);
-      const amount = r >= 0.98 ? 0 : 0.78 * dark;
+      // A ragged rim: the burn reaches further along some bearings than others.
+      const rim = 0.72 + 0.14 * (soot - 0.5) + 0.06 * Math.sin(angle * 5 + 1.3);
+      const core = 1 - smoothstep((r - 0.22) / (rim - 0.22));
+      const streak = Math.max(0, Math.cos(angle * 9 + 0.9 * Math.sin(angle * 4))) ** 6;
+      const reach = 1 - smoothstep((r - 0.45) / 0.5);
+      const dark = clamp01(core * (0.72 + 0.28 * soot) + streak * reach * 0.35 * soot);
+      const amount = r >= 0.98 ? 0 : 0.85 * dark;
       const at = (j * size + i) * 4;
       data[at] = Math.round(255 * amount * 0.86);
       data[at + 1] = Math.round(255 * amount * 0.92);
@@ -227,17 +219,6 @@ export function cannonScorchTexels(size: number): Uint8Array {
     }
   }
   return data;
-}
-
-/** A uniform draw in [0, 1) from two integers (a stateless hash, no random source). */
-export function cannonHash01(a: number, b: number): number {
-  let h = Math.imul(a | 0, 0x9e3779b1) ^ Math.imul((b | 0) + 0x7f4a7c15, 0x85ebca77);
-  h ^= h >>> 15;
-  h = Math.imul(h, 0x2c1b3c6d);
-  h ^= h >>> 12;
-  h = Math.imul(h, 0x297a2d39);
-  h ^= h >>> 15;
-  return (h >>> 0) / 4294967296;
 }
 
 export interface CannonChunk {
@@ -312,8 +293,8 @@ export function cannonChunkLaunch(
   out.startX = x + out.dirX * offset;
   out.startY = y + 0.2;
   out.startZ = z + out.dirZ * offset;
-  out.speed = 4.5 + 5 * h(2);
-  out.lift = 6 + 6 * h(3);
+  out.speed = 2.5 + 4 * h(2);
+  out.lift = 12 + 4.5 * h(3);
   out.spin = 6 + 10 * h(4);
   const ax = h(5) - 0.5;
   const ay = h(6) - 0.5;
@@ -328,7 +309,7 @@ export function cannonChunkLaunch(
     out.axisY = 0;
     out.axisZ = 0;
   }
-  out.size = 0.14 + 0.2 * h(8);
+  out.size = 0.2 + 0.26 * h(8);
   out.shade = h(9);
   const guess = landTime(out.lift, out.startY, y);
   const floor = ground(
@@ -384,8 +365,16 @@ export interface CannonShellSlot {
   firedTick: number;
   impactTick: number;
   arc: number;
-  /** Set by the shot's impact: the shell is gone, its trail fades out. */
+  /** Set by the shot's impact: the shell is gone, its wake fades out. */
   landed: boolean;
+}
+
+export interface CannonMuzzleSlot {
+  active: boolean;
+  /** Frame seconds of the frame that consumed the shot. */
+  at: number;
+  puffCount: number;
+  readonly puffs: CannonPuff[];
 }
 
 export interface CannonImpactSlot {
@@ -395,8 +384,12 @@ export interface CannonImpactSlot {
   z: number;
   /** Frame seconds of the frame that consumed the impact. */
   at: number;
+  /** How big the blast reads (cannonBlastPower). */
+  power: number;
   chunkCount: number;
   readonly chunks: CannonChunk[];
+  puffCount: number;
+  readonly puffs: CannonPuff[];
 }
 
 export interface CannonScorchSlot {
@@ -406,10 +399,6 @@ export interface CannonScorchSlot {
   z: number;
   at: number;
   yaw: number;
-  /** The ground's unit normal under it. */
-  nx: number;
-  ny: number;
-  nz: number;
 }
 
 export interface CannonFiredShot {
@@ -428,25 +417,40 @@ export interface CannonImpactShot {
   readonly z: number;
 }
 
-/** Samples the ground normal at (x, z) from four heights a yard apart. */
-export function cannonGroundNormalInto(
-  ground: (x: number, z: number) => number,
+/**
+ * Drapes a scorch over the ground: (GRID + 1)^2 vertices of a square `half`
+ * yards from its centre each way, turned by `yaw`, every one at the sampled
+ * ground height plus `lift`, written as xyz from `offset` in `out`. A flat mark
+ * buries itself wherever the ground bulges (a 0.15 yd rise over 2 yd hides most
+ * of a 5 yd plane), so each vertex takes its own height.
+ */
+export function cannonScorchDrapeInto(
+  out: Float32Array,
+  offset: number,
   x: number,
   z: number,
-  out: { nx: number; ny: number; nz: number },
+  yaw: number,
+  half: number,
+  lift: number,
+  ground: (x: number, z: number) => number,
 ): void {
-  const dx = (ground(x - 1, z) - ground(x + 1, z)) / 2;
-  const dz = (ground(x, z - 1) - ground(x, z + 1)) / 2;
-  const len = Math.hypot(dx, 1, dz);
-  if (!Number.isFinite(len) || len < 1e-6) {
-    out.nx = 0;
-    out.ny = 1;
-    out.nz = 0;
-    return;
+  const grid = CANNON_SCORCH_GRID;
+  const c = Math.cos(yaw);
+  const s = Math.sin(yaw);
+  const centre = ground(x, z);
+  let at = offset;
+  for (let j = 0; j <= grid; j++) {
+    const v = (j / grid) * 2 - 1;
+    for (let i = 0; i <= grid; i++) {
+      const u = (i / grid) * 2 - 1;
+      const wx = x + (u * c - v * s) * half;
+      const wz = z + (u * s + v * c) * half;
+      const g = ground(wx, wz);
+      out[at++] = wx;
+      out[at++] = (Number.isFinite(g) ? g : centre) + lift;
+      out[at++] = wz;
+    }
   }
-  out.nx = dx / len;
-  out.ny = 1 / len;
-  out.nz = dz / len;
 }
 
 /**
@@ -467,14 +471,23 @@ export class CannonShotTimeline {
     arc: 0,
     landed: false,
   }));
+  readonly muzzles: CannonMuzzleSlot[] = Array.from({ length: CANNON_MUZZLE_POOL }, () => ({
+    active: false,
+    at: 0,
+    puffCount: 0,
+    puffs: Array.from({ length: CANNON_MUZZLE_PUFFS }, newCannonPuff),
+  }));
   readonly impacts: CannonImpactSlot[] = Array.from({ length: CANNON_IMPACT_POOL }, () => ({
     active: false,
     x: 0,
     y: 0,
     z: 0,
     at: 0,
+    power: 1,
     chunkCount: 0,
     chunks: Array.from({ length: CANNON_CHUNKS_PER_IMPACT }, newCannonChunk),
+    puffCount: 0,
+    puffs: Array.from({ length: CANNON_BLAST_PUFFS }, newCannonPuff),
   }));
   readonly scorches: CannonScorchSlot[] = Array.from({ length: CANNON_SCORCH_POOL }, () => ({
     active: false,
@@ -483,28 +496,36 @@ export class CannonShotTimeline {
     z: 0,
     at: 0,
     yaw: 0,
-    nx: 0,
-    ny: 1,
-    nz: 0,
   }));
-  /** Frame seconds of the last shot's muzzle (its flash and the recoil run from it). */
+  /** Frame seconds of the last shot's muzzle (the recoil runs from it). */
   muzzleAt = Number.NEGATIVE_INFINITY;
   /** The scorch slot the last impact took. */
   lastScorch = -1;
   private nextShell = 0;
+  private nextMuzzle = 0;
   private nextImpact = 0;
   private nextScorch = 0;
 
   clear(): void {
     for (const shell of this.shells) shell.shotId = 0;
+    for (const muzzle of this.muzzles) muzzle.active = false;
     for (const impact of this.impacts) impact.active = false;
     for (const scorch of this.scorches) scorch.active = false;
     this.muzzleAt = Number.NEGATIVE_INFINITY;
     this.lastScorch = -1;
   }
 
-  /** A shell leaves `muzzle` toward the blast point; returns its slot. */
-  fired(shot: CannonFiredShot, muzzle: CannonPoint, time: number): number {
+  /**
+   * A shell leaves `muzzle` toward the blast point along the barrel's unit
+   * axis `dir`, breathing `smoke` puffs; returns its shell slot.
+   */
+  fired(
+    shot: CannonFiredShot,
+    muzzle: CannonPoint,
+    dir: CannonPoint,
+    time: number,
+    smoke: number,
+  ): number {
     const index = this.nextShell;
     this.nextShell = (index + 1) % this.shells.length;
     const slot = this.shells[index];
@@ -520,14 +541,34 @@ export class CannonShotTimeline {
     slot.arc = cannonArcHeight(Math.hypot(shot.x - muzzle.x, shot.z - muzzle.z));
     slot.landed = false;
     this.muzzleAt = time;
+    const puffs = this.muzzles[this.nextMuzzle];
+    this.nextMuzzle = (this.nextMuzzle + 1) % this.muzzles.length;
+    puffs.active = true;
+    puffs.at = time;
+    puffs.puffCount = cannonMuzzlePuffs(
+      puffs.puffs,
+      shot.shotId,
+      muzzle.x,
+      muzzle.y,
+      muzzle.z,
+      dir.x,
+      dir.y,
+      dir.z,
+      Math.max(0, Math.min(CANNON_MUZZLE_PUFFS - CANNON_MUZZLE_FIXED_PUFFS, smoke)),
+    );
     return index;
   }
 
-  /** The blast of shot `shotId`: its shell lands, and a blast, chunks and a scorch start. */
+  /**
+   * The blast of shot `shotId`: its shell lands, and a blast of `power`
+   * (cannonBlastPower), its chunks, its puffs and a scorch start.
+   */
   impact(
     shot: CannonImpactShot,
     time: number,
-    chunkCount: number,
+    counts: Readonly<CannonShotCounts>,
+    radius: number,
+    power: number,
     ground: (x: number, z: number) => number,
   ): number {
     for (const shell of this.shells) if (shell.shotId === shot.shotId) shell.landed = true;
@@ -539,7 +580,8 @@ export class CannonShotTimeline {
     slot.y = shot.y;
     slot.z = shot.z;
     slot.at = time;
-    slot.chunkCount = Math.max(0, Math.min(CANNON_CHUNKS_PER_IMPACT, chunkCount));
+    slot.power = power;
+    slot.chunkCount = Math.max(0, Math.min(CANNON_CHUNKS_PER_IMPACT, counts.chunks));
     for (let i = 0; i < slot.chunkCount; i++) {
       cannonChunkLaunch(
         slot.chunks[i],
@@ -552,6 +594,22 @@ export class CannonShotTimeline {
         ground,
       );
     }
+    slot.puffCount = cannonBlastPuffs(
+      slot.puffs,
+      shot.shotId,
+      shot.x,
+      shot.y,
+      shot.z,
+      radius,
+      power,
+      {
+        dust: Math.min(FULL_COUNTS.dust, counts.dust),
+        dirt: Math.min(FULL_COUNTS.dirt, counts.dirt),
+        sparks: Math.min(FULL_COUNTS.sparks, counts.sparks),
+        smoke: 0,
+      },
+      ground,
+    );
     this.lastScorch = this.nextScorch;
     const scorch = this.scorches[this.nextScorch];
     this.nextScorch = (this.nextScorch + 1) % this.scorches.length;
@@ -561,7 +619,6 @@ export class CannonShotTimeline {
     scorch.z = shot.z;
     scorch.at = time;
     scorch.yaw = cannonHash01(shot.shotId, 997) * Math.PI * 2;
-    cannonGroundNormalInto(ground, shot.x, shot.z, scorch);
     return index;
   }
 
@@ -598,36 +655,41 @@ export class CannonShotTimeline {
   }
 
   /**
-   * The live trail motes of shell `index` at `tick`, newest first, as (x, y, z,
-   * scale) quads in `out`; returns how many. A mote drops every trailLife /
-   * trailMotes seconds of the flight and shrinks away over trailLife, so the
-   * trail keeps fading after the shell lands. A slot whose trail is spent is freed.
+   * The live wake of shell `index` at `tick`, newest first: its puffs written
+   * into `out` from index 0 with each one's age in `ages`; returns how many. A
+   * puff drops every CANNON_TRAIL.spacing yards of the arc (by distance, so a
+   * fast shell leaves an unbroken line) at the moment the shell passed there,
+   * and lives on after the shell lands. A slot whose wake is spent is freed.
    */
-  trailInto(index: number, tick: number, out: Float32Array): number {
+  trailPuffsInto(index: number, tick: number, out: CannonPuff[], ages: Float32Array): number {
     const s = this.shells[index];
     if (!s || s.shotId === 0) return 0;
-    const { trailLife, trailMotes } = CANNON_SHELL;
+    const { smokeLife, sparkLife, spacing } = CANNON_TRAIL;
     const flight = Math.max(0, s.impactTick - s.firedTick) * DT;
-    const age = (tick - s.firedTick) * DT;
-    if (age < 0) return 0;
-    if (age >= flight + trailLife) {
+    const elapsed = (tick - s.firedTick) * DT;
+    if (elapsed < 0) return 0;
+    if (elapsed >= flight + smokeLife) {
       s.shotId = 0;
       return 0;
     }
-    const interval = trailLife / trailMotes;
-    const last = Math.floor(Math.min(age, flight) / interval);
+    const length = Math.hypot(s.toX - s.fromX, s.toY - s.fromY, s.toZ - s.fromZ) + s.arc * 0.6;
+    const drops = Math.max(1, Math.ceil(length / spacing));
+    const last = flight > 0 ? Math.floor((Math.min(elapsed, flight) / flight) * drops) : drops;
+    const cap = Math.min(out.length, ages.length);
     let n = 0;
-    for (let k = last; k >= 0 && n < trailMotes && (n + 1) * 4 <= out.length; k--) {
-      const moteAge = age - k * interval;
-      if (moteAge >= trailLife) break;
-      const life = 1 - moteAge / trailLife;
-      const t = flight > 0 ? Math.min(1, (k * interval) / flight) : 1;
-      const at = n * 4;
-      out[at] = s.fromX + (s.toX - s.fromX) * t;
-      out[at + 1] = s.fromY + (s.toY - s.fromY) * t + s.arc * 4 * t * (1 - t);
-      out[at + 2] = s.fromZ + (s.toZ - s.fromZ) * t;
-      out[at + 3] = life * life;
-      n++;
+    for (let k = Math.min(last, drops); k >= 0 && n < cap; k--) {
+      const t = k / drops;
+      const age = elapsed - t * flight;
+      if (age >= smokeLife) break;
+      const x = s.fromX + (s.toX - s.fromX) * t;
+      const y = s.fromY + (s.toY - s.fromY) * t + s.arc * 4 * t * (1 - t);
+      const z = s.fromZ + (s.toZ - s.fromZ) * t;
+      cannonTrailPuffInto(out[n], s.shotId, k, false, x, y, z);
+      ages[n++] = age;
+      if ((k & 1) === 1 && age < sparkLife && n < cap) {
+        cannonTrailPuffInto(out[n], s.shotId, k, true, x, y, z);
+        ages[n++] = age;
+      }
     }
     return n;
   }

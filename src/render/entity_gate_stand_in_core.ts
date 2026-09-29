@@ -232,8 +232,8 @@ export const ENTITY_GATE_STAND_INS: readonly EntityGateStandIn[] = [
     file: 'src/render/cannon_shell_visuals.ts',
     callSite: 'void attachSceneGroupGated(parent, this.root,',
     hides:
-      "a cannon's shot pieces (shell, glow, trail, muzzle flash, impact flash, shockwave, dirt chunks, scorch), all minted at once when the player is first seen seated in the Fire and Fly turret, until their programs link, under the label live-gate:fire-and-fly-weapon; nothing of an entity rides it, and the turret's intro countdown runs before the first shot",
+      "a cannon's shot pieces (the iron shell, the dirt chunks, the draped scorch and the one puff mesh of every muzzle, wake and blast billboard), all minted at once when the player is first seen seated in the Fire and Fly turret, until their programs link, under the label live-gate:fire-and-fly-weapon; nothing of an entity rides it, and the turret's intro countdown runs before the first shot",
     standIn:
-      "the renderer's boot-prewarmed pieces the same shot also draws: the Vfx particle bursts at the muzzle and the blast, the AoE ring at the blast radius (spawnAoeRing), and the camera kick; the thrown monsters themselves (their rigs or capsules) show where the blast landed, on every graphics tier, until the gate settles or its GATED_ATTACH_WATCHDOG_MS reveal",
+      "the renderer's boot-prewarmed Vfx particle cloud, which the weapon bursts at the muzzle and the blast only while its own root is still hidden (CannonShellVisuals.revealed), and the camera kick; the thrown monsters themselves (their rigs or capsules) show where the blast landed, on every graphics tier, until the gate settles or its GATED_ATTACH_WATCHDOG_MS reveal",
   },
 ];

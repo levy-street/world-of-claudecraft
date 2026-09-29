@@ -1,28 +1,36 @@
 import { describe, expect, it } from 'vitest';
 import {
+  CANNON_BLAST_FIXED_PUFFS,
+  CANNON_TRAIL,
+  newCannonPuff,
+  PUFF,
+} from '../src/render/cannon_puff_core';
+import {
   CANNON_BLAST,
+  CANNON_BLAST_PUFFS,
   CANNON_CHUNKS_PER_IMPACT,
   CANNON_IMPACT_POOL,
   CANNON_MUZZLE,
+  CANNON_MUZZLE_POOL,
+  CANNON_SCORCH_GRID,
+  CANNON_SCORCH_LAYERS,
   CANNON_SCORCH_POOL,
+  CANNON_SCORCH_VERTS,
   CANNON_SHELL,
   CANNON_SHELL_POOL,
-  type CannonBurstFrame,
+  CANNON_TRAIL_PUFFS,
   type CannonChunkFrame,
   CannonShotTimeline,
   cannonArcHeight,
   cannonChunkInto,
   cannonChunkLaunch,
-  cannonFlashInto,
-  cannonGroundNormalInto,
   cannonHash01,
-  cannonMuzzleFlashInto,
   cannonRecoilOffset,
+  cannonScorchDrapeInto,
   cannonScorchFade,
   cannonScorchTexels,
   cannonShakeFalloff,
   cannonShotCounts,
-  cannonWaveInto,
   newCannonChunk,
 } from '../src/render/cannon_shell_core';
 import { DT } from '../src/sim/types';
@@ -30,18 +38,13 @@ import { DT } from '../src/sim/types';
 const flat = () => 0;
 const shot = { shotId: 3, x: 30, y: 1, z: 40, flightTicks: 10, impactTick: 210 };
 const muzzle = { x: 0, y: 2.5, z: 0 };
+const axis = { x: 0.6, y: 0, z: 0.8 };
+const FULL = cannonShotCounts(false);
 
 describe('cannon shot tuning', () => {
   it('keeps the spec and Ground Blast values', () => {
-    expect(CANNON_SHELL).toMatchObject({
-      arcFraction: 0.18,
-      arcMin: 2.5,
-      arcMax: 7,
-      trailMotes: 16,
-      trailLife: 0.32,
-    });
+    expect(CANNON_SHELL).toMatchObject({ arcFraction: 0.18, arcMin: 2.5, arcMax: 7 });
     expect(CANNON_MUZZLE).toMatchObject({
-      flashLife: 0.08,
       recoilKick: 0.35,
       recoilLife: 0.25,
       fovPunch: 2,
@@ -50,18 +53,20 @@ describe('cannon shot tuning', () => {
     expect(CANNON_BLAST).toMatchObject({ scorchLife: 8, shakeFull: 10, shakeZero: 40 });
     expect([
       CANNON_SHELL_POOL,
+      CANNON_MUZZLE_POOL,
       CANNON_IMPACT_POOL,
       CANNON_SCORCH_POOL,
       CANNON_CHUNKS_PER_IMPACT,
-    ]).toEqual([4, 6, 18, 12]);
+    ]).toEqual([4, 4, 6, 18, 12]);
     expect(cannonShotCounts(false)).toEqual({
       chunks: 12,
-      dirt: 28,
-      dust: 3,
-      sparks: 14,
-      smoke: 2,
+      dirt: 24,
+      dust: 12,
+      sparks: 16,
+      smoke: 6,
     });
-    expect(cannonShotCounts(true)).toEqual({ chunks: 5, dirt: 12, dust: 1, sparks: 4, smoke: 1 });
+    expect(cannonShotCounts(true)).toEqual({ chunks: 5, dirt: 8, dust: 4, sparks: 5, smoke: 2 });
+    expect(CANNON_BLAST_PUFFS).toBe(CANNON_BLAST_FIXED_PUFFS + 12 + 24 + 16);
   });
 });
 
@@ -74,7 +79,7 @@ describe('cannon shell arc', () => {
 
   it('leaves the muzzle, peaks over the chord and lands on the blast point on the impact tick', () => {
     const timeline = new CannonShotTimeline();
-    const slot = timeline.fired(shot, muzzle, 5);
+    const slot = timeline.fired(shot, muzzle, axis, 5, FULL.smoke);
     const at = { x: 0, y: 0, z: 0 };
     expect(timeline.progress(slot, 200)).toBe(0);
     expect(timeline.progress(slot, 205)).toBeCloseTo(0.5, 12);
@@ -94,91 +99,66 @@ describe('cannon shell arc', () => {
     expect(timeline.muzzleAt).toBe(5);
   });
 
-  it('drops the shell at its impact while the trail fades out after it', () => {
+  it('drops the shell at its impact while its wake fades out after it', () => {
     const timeline = new CannonShotTimeline();
-    const slot = timeline.fired(shot, muzzle, 0);
-    const trail = new Float32Array(CANNON_SHELL.trailMotes * 4);
-    timeline.impact({ shotId: 3, x: 30, y: 1, z: 40 }, 1, 12, flat);
+    const slot = timeline.fired(shot, muzzle, axis, 0, FULL.smoke);
+    const puffs = Array.from({ length: CANNON_TRAIL_PUFFS }, newCannonPuff);
+    const ages = new Float32Array(CANNON_TRAIL_PUFFS);
+    timeline.impact({ shotId: 3, x: 30, y: 1, z: 40 }, 1, FULL, 6, 1, flat);
     const at = { x: 0, y: 0, z: 0 };
     expect(timeline.shellAt(slot, 209, at)).toBe(false);
-    expect(timeline.trailInto(slot, 211, trail)).toBeGreaterThan(0);
-    const spent = 210 + Math.ceil(CANNON_SHELL.trailLife / DT);
-    expect(timeline.trailInto(slot, spent, trail)).toBe(0);
+    expect(timeline.trailPuffsInto(slot, 211, puffs, ages)).toBeGreaterThan(0);
+    const spent = 210 + Math.ceil(CANNON_TRAIL.smokeLife / DT);
+    expect(timeline.trailPuffsInto(slot, spent, puffs, ages)).toBe(0);
     expect(timeline.shells[slot].shotId).toBe(0);
   });
 });
 
-describe('cannon shell trail cadence', () => {
-  const interval = CANNON_SHELL.trailLife / CANNON_SHELL.trailMotes;
-
-  it('drops one mote per interval along the arc, newest first, each shrinking over its life', () => {
+describe('cannon shell wake', () => {
+  const run = () => {
     const timeline = new CannonShotTimeline();
-    const slot = timeline.fired(shot, muzzle, 0);
-    const trail = new Float32Array(CANNON_SHELL.trailMotes * 4);
-    expect(timeline.trailInto(slot, 199, trail)).toBe(0);
-    expect(timeline.trailInto(slot, 200, trail)).toBe(1);
-    expect(trail[3]).toBe(1);
-    // 0.1 s in: motes at 0, 0.02, ..., 0.1 s (six), the newest at full size.
-    const tick = 200 + 0.1 / DT;
-    const n = timeline.trailInto(slot, tick, trail);
-    expect(n).toBe(Math.floor(0.1 / interval + 1e-9) + 1);
-    for (let k = 1; k < n; k++) expect(trail[k * 4 + 3]).toBeLessThan(trail[(k - 1) * 4 + 3]);
+    const slot = timeline.fired(shot, muzzle, axis, 0, FULL.smoke);
+    const puffs = Array.from({ length: CANNON_TRAIL_PUFFS }, newCannonPuff);
+    const ages = new Float32Array(CANNON_TRAIL_PUFFS);
+    return { timeline, slot, puffs, ages };
+  };
+
+  it('drops smoke by distance along the arc, newest first, with sparks between', () => {
+    const { timeline, slot, puffs, ages } = run();
+    expect(timeline.trailPuffsInto(slot, 199, puffs, ages)).toBe(0);
+    const n = timeline.trailPuffsInto(slot, 205, puffs, ages);
+    const smoke = puffs.slice(0, n).filter((p) => p.kind === PUFF.trailSmoke);
+    const sparks = puffs.slice(0, n).filter((p) => p.kind === PUFF.trailSpark);
+    expect(smoke.length).toBeGreaterThan(10);
+    expect(sparks.length).toBeGreaterThan(0);
+    expect(sparks.length).toBeLessThan(smoke.length);
+    for (let k = 1; k < n; k++) expect(ages[k]).toBeGreaterThanOrEqual(ages[k - 1]);
+    // Unbroken: consecutive smoke puffs sit closer than a puff is wide.
+    for (let k = 1; k < smoke.length; k++) {
+      const gap = Math.hypot(smoke[k].x - smoke[k - 1].x, smoke[k].z - smoke[k - 1].z);
+      expect(gap).toBeLessThan(smoke[k].size0 + 0.3);
+    }
+    // The newest is where the shell is now.
     const at = { x: 0, y: 0, z: 0 };
-    timeline.arcPointInto(slot, (5 * interval) / (10 * DT), at);
-    expect(trail[0]).toBeCloseTo(at.x, 5);
-    expect(trail[1]).toBeCloseTo(at.y, 5);
-    expect(trail[2]).toBeCloseTo(at.z, 5);
+    timeline.shellAt(slot, 205, at);
+    expect(Math.hypot(puffs[0].x - at.x, puffs[0].z - at.z)).toBeLessThan(
+      CANNON_TRAIL.spacing + 0.2,
+    );
   });
 
-  it('never holds more than trailMotes motes, and stops dropping them once the shell lands', () => {
-    const timeline = new CannonShotTimeline();
-    const slot = timeline.fired(shot, muzzle, 0);
-    const trail = new Float32Array(CANNON_SHELL.trailMotes * 4);
-    expect(timeline.trailInto(slot, 209.9, trail)).toBe(CANNON_SHELL.trailMotes);
-    const landedAt = timeline.trailInto(slot, 210, trail);
-    const later = timeline.trailInto(slot, 212, trail);
+  it('never holds more than its pool, and drops nothing past the blast', () => {
+    const { timeline, slot, puffs, ages } = run();
+    expect(timeline.trailPuffsInto(slot, 209.9, puffs, ages)).toBeLessThanOrEqual(
+      CANNON_TRAIL_PUFFS,
+    );
+    const landedAt = timeline.trailPuffsInto(slot, 210, puffs, ages);
+    const later = timeline.trailPuffsInto(slot, 216, puffs, ages);
     expect(later).toBeLessThan(landedAt);
-    // Nothing newer than the landing: the newest mote is the one at the blast.
-    expect(trail[0]).toBeCloseTo(30, 6);
-    expect(trail[2]).toBeCloseTo(40, 6);
+    expect(Math.hypot(puffs[0].x - 30, puffs[0].z - 40)).toBeLessThan(0.2);
   });
 });
 
-describe('cannon muzzle and blast curves', () => {
-  it('pops the muzzle flash and spends it in flashLife', () => {
-    const f = { core: 0, length: 0, width: 0 };
-    expect(cannonMuzzleFlashInto(-0.01, f)).toBe(false);
-    expect(cannonMuzzleFlashInto(0, f)).toBe(true);
-    const first = f.core;
-    expect(cannonMuzzleFlashInto(CANNON_MUZZLE.flashLife * 0.2, f)).toBe(true);
-    expect(f.core).toBeGreaterThan(first);
-    expect(cannonMuzzleFlashInto(CANNON_MUZZLE.flashLife * 0.9, f)).toBe(true);
-    expect(f.core).toBeLessThan(first);
-    expect(f.length).toBeGreaterThan(f.width);
-    expect(cannonMuzzleFlashInto(CANNON_MUZZLE.flashLife, f)).toBe(false);
-  });
-
-  it('grows the flash from 0.35 radii as it fades on a square', () => {
-    const f: CannonBurstFrame = { scale: 0, fade: 0 };
-    expect(cannonFlashInto(0, 6, f)).toBe(true);
-    expect(f).toEqual({ scale: 6 * 0.35, fade: 1 });
-    expect(cannonFlashInto(CANNON_BLAST.flashLife / 2, 6, f)).toBe(true);
-    expect(f.scale).toBeCloseTo(6 * (0.35 + 0.45), 9);
-    expect(f.fade).toBeCloseTo(0.25, 9);
-    expect(cannonFlashInto(CANNON_BLAST.flashLife, 6, f)).toBe(false);
-  });
-
-  it('runs the shockwave out past the blast radius and thins it', () => {
-    const f: CannonBurstFrame = { scale: 0, fade: 0 };
-    expect(cannonWaveInto(0, 6, f)).toBe(true);
-    expect(f.scale).toBeCloseTo(2.4, 9);
-    expect(f.fade).toBeCloseTo(0.9, 9);
-    expect(cannonWaveInto(CANNON_BLAST.waveLife * 0.99, 6, f)).toBe(true);
-    expect(f.scale).toBeGreaterThan(6 * 2.7);
-    expect(f.fade).toBeLessThan(0.01);
-    expect(cannonWaveInto(CANNON_BLAST.waveLife, 6, f)).toBe(false);
-  });
-
+describe('cannon scorch fade', () => {
   it('holds the scorch, fades it to nothing by its life, and never before the blast', () => {
     expect(cannonScorchFade(-1)).toBe(0);
     expect(cannonScorchFade(0)).toBe(0);
@@ -306,13 +286,23 @@ describe('cannon dirt chunks', () => {
 });
 
 describe('cannon scorch', () => {
-  it('darkens most at the centre, nothing at the rim, a little more in blue', () => {
-    const size = 32;
+  it('chars the inner half dark, nothing at the rim, a little more in blue', () => {
+    const size = 64;
     const texels = cannonScorchTexels(size);
     expect(texels).toHaveLength(size * size * 4);
     const at = (i: number, j: number) => (j * size + i) * 4;
+    const blue = (i: number, j: number) => texels[at(i, j) + 2] / 255;
+    // Dark enough to survive tone mapping at a grazing 40 yd: the old mark
+    // peaked at 0.43 at its very centre and was gone by half its radius.
+    expect(blue(size / 2, size / 2)).toBeGreaterThan(0.6);
+    const half = [
+      blue(size / 2 + size / 8, size / 2),
+      blue(size / 2 - size / 8, size / 2),
+      blue(size / 2, size / 2 + size / 8),
+      blue(size / 2, size / 2 - size / 8),
+    ];
+    expect(Math.min(...half)).toBeGreaterThan(0.5);
     const centre = at(size / 2, size / 2);
-    expect(texels[centre + 2]).toBeGreaterThan(100);
     expect(texels[centre + 2]).toBeGreaterThanOrEqual(texels[centre]);
     for (const [i, j] of [
       [0, 0],
@@ -326,14 +316,36 @@ describe('cannon scorch', () => {
     expect(cannonScorchTexels(size)).toEqual(texels);
   });
 
-  it('lies on the ground normal', () => {
-    const out = { nx: 0, ny: 0, nz: 0 };
-    cannonGroundNormalInto(flat, 0, 0, out);
-    expect(out).toEqual({ nx: 0, ny: 1, nz: 0 });
-    cannonGroundNormalInto((x) => x, 0, 0, out);
-    expect(out.nx).toBeCloseTo(-Math.SQRT1_2, 9);
-    expect(out.ny).toBeCloseTo(Math.SQRT1_2, 9);
-    expect(out.nz).toBe(0);
+  it('drapes every vertex over bumpy ground instead of burying a flat plane in it', () => {
+    // The test site's ground: a 0.15 yd bulge within 2 yd of the blast, which
+    // swallowed most of the old flat mark (centre height plus a lift).
+    const ground = (x: number, z: number) => 1 + 0.15 * Math.cos(x * 0.8) * Math.cos(z * 0.8);
+    const out = new Float32Array(CANNON_SCORCH_VERTS * 3 + 6);
+    cannonScorchDrapeInto(out, 3, 10, -4, 0.7, 2.7, 0.06, ground);
+    expect(out[0]).toBe(0);
+    expect(out[out.length - 1]).toBe(0);
+    let spanX = 0;
+    for (let v = 0; v < CANNON_SCORCH_VERTS; v++) {
+      const x = out[3 + v * 3];
+      const y = out[3 + v * 3 + 1];
+      const z = out[3 + v * 3 + 2];
+      expect(y).toBeCloseTo(ground(x, z) + 0.06, 5);
+      spanX = Math.max(spanX, Math.hypot(x - 10, z + 4));
+    }
+    // A square 2.7 yd from its centre each way, turned: its corners reach 2.7 * sqrt 2.
+    expect(spanX).toBeCloseTo(2.7 * Math.SQRT2, 4);
+    const grid = CANNON_SCORCH_GRID;
+    const mid = (grid / 2) * (grid + 1) + grid / 2;
+    expect(out[3 + mid * 3]).toBeCloseTo(10, 9);
+    expect(out[3 + mid * 3 + 2]).toBeCloseTo(-4, 9);
+  });
+
+  it('stacks a soil sheet under canopy sheets that darken less', () => {
+    expect(CANNON_SCORCH_LAYERS[0]).toEqual({ lift: 0.06, strength: 1 });
+    for (let i = 1; i < CANNON_SCORCH_LAYERS.length; i++) {
+      expect(CANNON_SCORCH_LAYERS[i].lift).toBeGreaterThan(CANNON_SCORCH_LAYERS[i - 1].lift);
+      expect(CANNON_SCORCH_LAYERS[i].strength).toBeLessThan(CANNON_SCORCH_LAYERS[i - 1].strength);
+    }
   });
 });
 
@@ -341,15 +353,31 @@ describe('cannon shot timeline pools', () => {
   it('reuses its fixed pools round robin, starts a blast, chunks and a scorch per impact, and clears', () => {
     const timeline = new CannonShotTimeline();
     for (let i = 1; i <= CANNON_SHELL_POOL + 1; i++) {
-      timeline.fired({ ...shot, shotId: i }, muzzle, i);
+      timeline.fired({ ...shot, shotId: i }, muzzle, axis, i, i % 2 ? FULL.smoke : 2);
     }
     expect(timeline.shells.map((s) => s.shotId)).toEqual([5, 2, 3, 4]);
     for (let i = 1; i <= CANNON_SCORCH_POOL + 1; i++) {
-      timeline.impact({ shotId: i, x: i, y: 0, z: 0 }, i, i % 2 ? 12 : 5, flat);
+      timeline.impact(
+        { shotId: i, x: i, y: 0, z: 0 },
+        i,
+        cannonShotCounts(i % 2 === 0),
+        6,
+        1,
+        flat,
+      );
     }
     expect(timeline.impacts).toHaveLength(CANNON_IMPACT_POOL);
     expect(timeline.impacts.every((s) => s.active)).toBe(true);
     expect(timeline.impacts.map((s) => s.chunkCount).sort()).toEqual([12, 12, 12, 5, 5, 5]);
+    const low = cannonShotCounts(true);
+    expect(timeline.impacts.map((s) => s.puffCount).sort()).toEqual(
+      [
+        ...Array(3).fill(CANNON_BLAST_FIXED_PUFFS + FULL.dust + FULL.dirt + FULL.sparks),
+        ...Array(3).fill(CANNON_BLAST_FIXED_PUFFS + low.dust + low.dirt + low.sparks),
+      ].sort(),
+    );
+    expect(timeline.muzzles.every((m) => m.active)).toBe(true);
+    expect(timeline.muzzles.map((m) => m.at)).toEqual([5, 2, 3, 4]);
     expect(timeline.scorches.map((s) => s.x)).toEqual([
       19, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
     ]);
@@ -357,6 +385,7 @@ describe('cannon shot timeline pools', () => {
     timeline.clear();
     expect(timeline.shells.every((s) => s.shotId === 0)).toBe(true);
     expect(timeline.impacts.every((s) => !s.active)).toBe(true);
+    expect(timeline.muzzles.every((m) => !m.active)).toBe(true);
     expect(timeline.scorches.every((s) => !s.active)).toBe(true);
     expect(timeline.muzzleAt).toBe(Number.NEGATIVE_INFINITY);
     expect(timeline.lastScorch).toBe(-1);

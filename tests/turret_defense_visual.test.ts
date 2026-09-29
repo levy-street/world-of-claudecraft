@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { turretSfxCueInto } from '../src/game/turret_defense_sfx';
 import { setBuildSpanSink } from '../src/render/build_spans';
+import { PUFF } from '../src/render/cannon_puff_core';
+import type { CannonShellVisuals } from '../src/render/cannon_shell_visuals';
 import { visualKeyFor } from '../src/render/characters/manifest';
 import { drawProgramSignature } from '../src/render/draw_program_signature_core';
 import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
@@ -163,20 +165,30 @@ const impactAt168: TurretFeedback = {
   event: { type: 'impact', shotId: 1, x: 20, y: 0, z: 0, hits: [] },
 };
 
-function weaponPiece(visual: TurretDefenseVisual, role: string): THREE.InstancedMesh {
+function weaponPiece(visual: TurretDefenseVisual, role: string): THREE.Mesh {
   const found = visual.group.getObjectByName(`cannonShell:${role}`);
-  if (!(found instanceof THREE.InstancedMesh)) throw new Error(`missing weapon ${role}`);
+  if (!(found instanceof THREE.Mesh)) throw new Error(`missing weapon ${role}`);
   return found;
 }
 
-function weaponDrawn(visual: TurretDefenseVisual, role: string): number {
-  const mesh = weaponPiece(visual, role);
-  return mesh.visible ? mesh.count : 0;
+/** The shells drawn, or for any other role the puffs of that kind (cannon_puff_core PUFF). */
+function weaponDrawn(visual: TurretDefenseVisual, role: 'shell' | keyof typeof PUFF): number {
+  if (role === 'shell') {
+    const mesh = weaponPiece(visual, 'shell') as THREE.InstancedMesh;
+    return mesh.visible ? mesh.count : 0;
+  }
+  if (!visual.group.getObjectByName('cannonShell:puff')?.visible) return 0;
+  const weapon = (visual as unknown as { weapon: CannonShellVisuals }).weapon;
+  return weapon.drawnPuffs(PUFF[role]);
+}
+
+function scorchShown(visual: TurretDefenseVisual): boolean {
+  return weaponPiece(visual, 'scorch').visible;
 }
 
 function weaponPosition(visual: TurretDefenseVisual, role: string): THREE.Vector3 {
   const m = new THREE.Matrix4();
-  weaponPiece(visual, role).getMatrixAt(0, m);
+  (weaponPiece(visual, role) as THREE.InstancedMesh).getMatrixAt(0, m);
   return new THREE.Vector3().setFromMatrixPosition(m);
 }
 
@@ -557,16 +569,21 @@ describe('Fire and Fly monsters on screen', () => {
     expect(weaponDrawn(visual, 'shell')).toBe(0);
     visual.update(viewOf(state, [firedAt160]), 164, 0, 0.016);
     expect(weaponDrawn(visual, 'shell')).toBe(1);
-    expect(weaponDrawn(visual, 'trail')).toBeGreaterThan(0);
+    expect(weaponDrawn(visual, 'trailSmoke')).toBeGreaterThan(0);
     const shell = weaponPosition(visual, 'shell');
     expect(shell.x).toBeGreaterThan(2);
     expect(shell.x).toBeLessThan(20);
     visual.update(viewOf(state, [firedAt160, impactAt168]), 168, 0.4, 0.016);
+    visual.update(viewOf(state, [firedAt160, impactAt168]), 168, 0.45, 0.016);
     expect(weaponDrawn(visual, 'shell')).toBe(0);
     expect(weaponDrawn(visual, 'flash')).toBe(1);
-    expect(weaponDrawn(visual, 'wave')).toBe(1);
-    expect(weaponPosition(visual, 'flash').x).toBeCloseTo(20, 9);
-    expect(weaponDrawn(visual, 'scorch')).toBeGreaterThan(0);
+    expect(weaponDrawn(visual, 'shock')).toBeGreaterThan(0);
+    expect(weaponDrawn(visual, 'fireball')).toBeGreaterThan(0);
+    expect(scorchShown(visual)).toBe(true);
+    // The blast is laid where the impact entry says: the scorch's middle vertex.
+    const scorch = weaponPiece(visual, 'scorch').geometry.getAttribute('position');
+    expect(scorch.getX(40)).toBeCloseTo(20, 6);
+    expect(scorch.getZ(40)).toBeCloseTo(0, 6);
     visual.dispose();
   });
 
@@ -584,9 +601,10 @@ describe('Fire and Fly monsters on screen', () => {
     const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0);
     const state = engine(0);
     visual.update(viewOf(state, [firedAt160, impactAt168]), 200, 0, 0.016);
-    for (const role of ['shell', 'trail', 'muzzleCore', 'flash', 'wave', 'scorch']) {
+    for (const role of ['shell', 'trailSmoke', 'flame', 'flash', 'shock'] as const) {
       expect(weaponDrawn(visual, role), role).toBe(0);
     }
+    expect(scorchShown(visual)).toBe(false);
     visual.dispose();
   });
 
@@ -594,11 +612,11 @@ describe('Fire and Fly monsters on screen', () => {
     const state = engine(0);
     const fresh = new TurretDefenseVisual(new THREE.Scene(), () => 0);
     fresh.update(viewOf(state, [firedAt160]), 170, 0, 0.016);
-    expect(weaponDrawn(fresh, 'muzzleCore')).toBe(1);
+    expect(weaponDrawn(fresh, 'flash')).toBe(1);
     fresh.dispose();
     const late = new TurretDefenseVisual(new THREE.Scene(), () => 0);
     late.update(viewOf(state, [firedAt160]), 171, 0, 0.016);
-    expect(weaponDrawn(late, 'muzzleCore')).toBe(0);
+    expect(weaponDrawn(late, 'flash')).toBe(0);
     late.dispose();
   });
 
