@@ -253,6 +253,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/vehicle/turret_feedback_reader_core.ts',
   'src/ui/hud/vehicle/turret_damage_numbers_core.ts',
   'src/ui/hud/vehicle/turret_hit_feedback_core.ts',
+  'src/ui/hud/vehicle/turret_own_shot_core.ts',
   'src/ui/map_entity_disclosure_core.ts',
   'src/ui/map_navigation_landmarks_core.ts',
   'src/ui/map_marker_profile_core.ts',

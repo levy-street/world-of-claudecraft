@@ -14,6 +14,7 @@ import {
   CANNON_CHUNKS_PER_IMPACT,
   CANNON_IMPACT_POOL,
   CANNON_MUZZLE,
+  CANNON_OWN_FADE_SECONDS,
   CANNON_SCORCH_LAYERS,
   CANNON_SCORCH_VERTS,
   cannonRecoilOffset,
@@ -874,5 +875,67 @@ describe('cannon shell visuals', () => {
     for (const spy of released) expect(spy).toHaveBeenCalled();
     expect(texture).toHaveBeenCalled();
     expect(() => visuals.dispose()).not.toThrow();
+  });
+
+  it("flies its caller's own shot on the click with the whole report, and its event adopts it", () => {
+    const { visuals } = weapon();
+    const host = hostStub();
+    visuals.setHost(host);
+    visuals.launchOwn(3, { x: 20, y: 0, z: 0 }, 160, 170, fallback, 0, false);
+    expect(host.punchFov).toHaveBeenCalledWith(CANNON_MUZZLE.fovPunch);
+    expect(host.addShake).toHaveBeenCalledWith(CANNON_MUZZLE.shake);
+    visuals.update(165, 0.05);
+    expect(drawn(visuals, 'shell')).toBe(1);
+    expect(puffs(visuals, PUFF.flash)).toBe(1);
+    const mid = instancePosition(piece(visuals, 'shell') as THREE.InstancedMesh, 0);
+    expect(mid.x).toBeGreaterThan(fallback.x);
+    expect(mid.x).toBeLessThan(20);
+    expect(visuals.adoptOwn(3, fired, 165)).toBe(true);
+    expect(visuals.adoptOwn(9, fired, 165)).toBe(false);
+    host.punchFov.mockClear();
+    visuals.update(166, 0.1);
+    expect(drawn(visuals, 'shell')).toBe(1);
+    expect(host.punchFov).not.toHaveBeenCalled();
+    visuals.update(168, 0.15);
+    expect(drawn(visuals, 'shell')).toBe(0);
+    visuals.impact(landed, 0.16, false);
+    visuals.update(168, 0.21);
+    expect(puffs(visuals, PUFF.shock)).toBeGreaterThan(0);
+    visuals.dispose();
+  });
+
+  it('shrinks a refused own shot away with no blast, no scorch and no chunk', () => {
+    const { visuals } = weapon();
+    visuals.launchOwn(3, { x: 20, y: 0, z: 0 }, 160, 170, fallback, 0, false);
+    const refused = (serial: number) => serial === 3;
+    visuals.update(162, 0.1, refused);
+    const shell = piece(visuals, 'shell') as THREE.InstancedMesh;
+    const m = new THREE.Matrix4();
+    shell.getMatrixAt(0, m);
+    expect(new THREE.Vector3().setFromMatrixScale(m).x).toBeCloseTo(1, 6);
+    visuals.update(163, 0.1 + CANNON_OWN_FADE_SECONDS / 2, refused);
+    shell.getMatrixAt(0, m);
+    expect(new THREE.Vector3().setFromMatrixScale(m).x).toBeCloseTo(0.5, 6);
+    visuals.update(164, 0.11 + CANNON_OWN_FADE_SECONDS, refused);
+    expect(drawn(visuals, 'shell')).toBe(0);
+    expect(visuals.adoptOwn(3, fired, 164)).toBe(false);
+    visuals.update(170, 0.6, refused);
+    expect(puffs(visuals, PUFF.shock)).toBe(0);
+    expect(drawn(visuals, 'chunk')).toBe(0);
+    expect(piece(visuals, 'scorch').visible).toBe(false);
+    visuals.dispose();
+  });
+
+  it('flies an event shell with no report when its report played on the click', () => {
+    const { visuals } = weapon();
+    const host = hostStub();
+    visuals.setHost(host);
+    visuals.fire(fired, fallback, 0, false, false);
+    expect(host.punchFov).not.toHaveBeenCalled();
+    expect(host.addShake).not.toHaveBeenCalled();
+    visuals.update(164, 0.05);
+    expect(drawn(visuals, 'shell')).toBe(1);
+    expect(puffs(visuals, PUFF.flash)).toBe(0);
+    visuals.dispose();
   });
 });

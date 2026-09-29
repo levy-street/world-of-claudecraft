@@ -17,39 +17,71 @@ import { FALL_FLAIL_ENTER_SPEED } from './characters/anim_state';
 
 /** How far the display tick may lead the last processed sim tick. */
 export const TURRET_TICK_LEAD_MAX = 1.25;
+/** How much further a clock that steps late (snapshots over a jittery link) may be led. */
+export const TURRET_TICK_LATE_MAX = 3;
 /** Ticks per tick the phase may slide back, so it follows a sim that runs slow. */
 const PHASE_RELAX = 0.005;
+/** Each step grows the late lead past the lead its clock needed by this much (ticks). */
+const LATE_MARGIN = 0.25;
+/** Ticks per tick the late lead gives back: slowly, it costs nothing while snapshots keep time. */
+const LATE_RELAX = 0.002;
 
 /**
  * The fractional tick the monsters are sampled on: the frame time in ticks
- * plus a phase, clamped to [clock, clock + TURRET_TICK_LEAD_MAX]. Every frame
- * bounds the phase from below (the tick it sees has already happened), so the
- * phase is the highest bound seen, relaxing slowly. Setting the lead to the
+ * plus a phase, clamped to [clock, clock + TURRET_TICK_LEAD_MAX + late]. Every
+ * frame bounds the phase from below (the tick it sees has already happened), so
+ * the phase is the highest bound seen, relaxing slowly. Setting the lead to the
  * time since the tick last changed would step unevenly whenever the frame rate
  * is not a multiple of the tick rate (30 fps against 20 Hz); a phase advances
  * with frame time at any rate.
+ *
+ * Online the clock steps on snapshot arrival, and a snapshot later than the
+ * earliest ones held the display at the cap: a stall, then a jump. So each step
+ * measures the lead its clock needed and grows `late` to cover it with a margin,
+ * up to `lateMax`, giving it back slowly. The cap only binds when a step is late:
+ * a local sim steps on the frames themselves, its display never reaches even
+ * TURRET_TICK_LEAD_MAX, and `late` changes nothing there.
  */
 export class TurretDisplayClock {
   private phase = Number.NaN;
   private lastClock = Number.NaN;
   private lastTime = 0;
+  private late = 0;
+
+  constructor(private readonly lateMax: number = TURRET_TICK_LATE_MAX) {}
+
+  /** Ticks the lead cap has grown past TURRET_TICK_LEAD_MAX for a clock that steps late. */
+  get lateLead(): number {
+    return this.late;
+  }
 
   reset(): void {
     this.phase = Number.NaN;
     this.lastClock = Number.NaN;
+    this.late = 0;
   }
 
   sample(clock: number, time: number): number {
-    if (!(clock >= this.lastClock)) this.phase = Number.NaN;
-    this.lastClock = clock;
+    if (!(clock >= this.lastClock)) {
+      this.phase = Number.NaN;
+      this.late = 0;
+    }
     const base = time / DT;
     const bound = clock - base;
+    const elapsed = Math.max(0, time - this.lastTime);
     if (Number.isFinite(this.phase)) {
-      const relaxed = this.phase - (PHASE_RELAX * Math.max(0, time - this.lastTime)) / DT;
+      const relaxed = this.phase - (PHASE_RELAX * elapsed) / DT;
+      if (this.late > 0) this.late = Math.max(0, this.late - (LATE_RELAX * elapsed) / DT);
+      if (clock > this.lastClock) {
+        // The lead the last clock needed up to this step, with a margin for the next one.
+        const needed = base + relaxed - this.lastClock - TURRET_TICK_LEAD_MAX + LATE_MARGIN;
+        if (needed > this.late) this.late = Math.min(this.lateMax, needed);
+      }
       this.phase = Math.max(bound, relaxed);
     } else this.phase = bound;
+    this.lastClock = clock;
     this.lastTime = time;
-    return Math.min(clock + TURRET_TICK_LEAD_MAX, Math.max(clock, base + this.phase));
+    return Math.min(clock + TURRET_TICK_LEAD_MAX + this.late, Math.max(clock, base + this.phase));
   }
 }
 

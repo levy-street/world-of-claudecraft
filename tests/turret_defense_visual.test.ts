@@ -1,6 +1,13 @@
 import * as THREE from 'three';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
-import { turretSfxCueInto } from '../src/game/turret_defense_sfx';
+import { emitTurretSelfKeys } from '../server/turret_self_wire';
+import { dispatchVehicleCommand } from '../server/vehicle_command_wire';
+import {
+  TURRET_FIRE_SFX,
+  TurretDefenseSfx,
+  turretSfxCueInto,
+} from '../src/game/turret_defense_sfx';
+import { type QuestWorldCommand, QuestWorldWireState } from '../src/net/quest_world_wire_state';
 import { setBuildSpanSink } from '../src/render/build_spans';
 import { PUFF } from '../src/render/cannon_puff_core';
 import { CANNON_MUZZLE, cannonRecoilOffset } from '../src/render/cannon_shell_core';
@@ -29,7 +36,7 @@ import {
   worldQuestTraceMaterials,
 } from '../src/render/world_quest_trace_materials';
 import { TURRET_EXPLOSIVE_BARREL, TURRET_TIMING } from '../src/sim/content/turret_defense';
-import { MOBS } from '../src/sim/data';
+import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
 import { FIRE_AND_FLY_TOWER } from '../src/sim/fire_and_fly_field';
 import {
   marchSegment,
@@ -45,8 +52,14 @@ import {
 } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import type { TurretFeedback } from '../src/sim/minigames/turret_feedback';
-import { DT, type Entity } from '../src/sim/types';
-import type { TurretSessionView } from '../src/world_api/vehicles';
+import { Rng } from '../src/sim/rng';
+import { Sim } from '../src/sim/sim';
+import { DT, type Entity, type SimEvent, type WorldContent } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
+import { TurretAimCore } from '../src/ui/hud/vehicle/turret_aim_core';
+import { TurretOwnShotLedger } from '../src/ui/hud/vehicle/turret_own_shot_core';
+import type { IWorldVehicles, TurretSessionView } from '../src/world_api/vehicles';
 import { drawsUnder, threeProgramKeys } from './helpers/three_program_keys';
 
 interface MockActor {
@@ -1427,5 +1440,388 @@ describe('Fire and Fly monsters on screen', () => {
     }
     expect(thrown).toBeInstanceOf(AggregateError);
     expect((thrown as AggregateError).errors).toEqual([rigFailure, markerFailure]);
+  });
+});
+
+describe('Fire and Fly own shot on screen', () => {
+  const click = { x: 20, z: 0, dirX: 1, dirZ: 0, range: 20 };
+  const ownFired = (tick: number, impactTick = tick + 8): TurretFeedback => ({
+    seq: 1,
+    tick,
+    event: {
+      type: 'fired',
+      shotId: 1,
+      fromX: 0,
+      fromZ: 0,
+      x: 20,
+      y: 0,
+      z: 0,
+      flightTicks: impactTick - tick,
+      impactTick,
+    },
+  });
+
+  function ownRig(groundAt: (x: number, z: number) => number = () => 0) {
+    const shots = new TurretOwnShotLedger();
+    const visual = new TurretDefenseVisual(
+      new THREE.Scene(),
+      groundAt,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      shots,
+    );
+    const weapon = (visual as unknown as { weapon: CannonShellVisuals }).weapon;
+    const launched = vi.spyOn(weapon, 'launchOwn');
+    const fired = vi.spyOn(weapon, 'fire');
+    const reports = () =>
+      launched.mock.calls.length + fired.mock.calls.filter((call) => call[4] !== false).length;
+    return { shots, visual, launched, fired, reports };
+  }
+
+  it('plays the shot on the click frame, then flies the same shell on its fired entry', () => {
+    const { shots, visual, launched, fired } = ownRig();
+    const state = engine(0);
+    const idle = viewOf(state);
+    visual.update(idle, 160, 0, 0.016);
+    shots.mark(idle, 160, click);
+    visual.update(idle, 160, 0.016, 0.016);
+    expect(launched).toHaveBeenCalledTimes(1);
+    expect(weaponDrawn(visual, 'shell')).toBe(1);
+    expect(weaponDrawn(visual, 'flash')).toBe(1);
+    // Online its entry comes a round trip later: the shell carries on, nothing plays again.
+    const confirmed = viewOf(state, [ownFired(163)]);
+    visual.update(confirmed, 163, 0.17, 0.016);
+    visual.update(confirmed, 164, 0.2, 0.016);
+    expect(fired).not.toHaveBeenCalled();
+    expect(launched).toHaveBeenCalledTimes(1);
+    expect(weaponDrawn(visual, 'shell')).toBe(1);
+    expect(shots.status(1)).toBe('confirmed');
+    // Online the display runs ahead of the clock: the shell waits at its blast point for its impact.
+    visual.update(confirmed, 171, 0.6, 0.016);
+    expect(weaponDrawn(visual, 'shell')).toBe(1);
+    const impact: TurretFeedback = { ...impactAt168, tick: 171 };
+    visual.update(viewOf(state, [ownFired(163), impact]), 171, 0.62, 0.016);
+    visual.update(viewOf(state, [ownFired(163), impact]), 171, 0.67, 0.016);
+    expect(weaponDrawn(visual, 'shell')).toBe(0);
+    expect(weaponDrawn(visual, 'shock')).toBeGreaterThan(0);
+    visual.dispose();
+  });
+
+  it('adopts the fired entry offline on the click frame itself: one report, one shell', () => {
+    const { shots, visual, launched, fired } = ownRig();
+    const state = engine(0);
+    visual.update(viewOf(state), 160, 0, 0.016);
+    shots.mark(viewOf(state), 160, click);
+    visual.update(viewOf(state, [ownFired(160)]), 160, 0.016, 0.016);
+    expect(launched).toHaveBeenCalledTimes(1);
+    expect(fired).not.toHaveBeenCalled();
+    expect(weaponDrawn(visual, 'shell')).toBe(1);
+    visual.dispose();
+  });
+
+  it('shrinks a shot the server never fired away with no blast, and flies a late one unheard', () => {
+    const { shots, visual, fired, reports } = ownRig();
+    const state = engine(0);
+    const idle = viewOf(state);
+    visual.update(idle, 160, 0, 0.016);
+    shots.mark(idle, 160, click);
+    visual.update(idle, 160, 0.016, 0.016);
+    expect(weaponDrawn(visual, 'shell')).toBe(1);
+    const expiry = 160 + shots.confirmWindow + 1;
+    visual.update(idle, expiry, 0.1, 0.016);
+    expect(shots.status(1)).toBe('refused');
+    visual.update(idle, expiry, 0.4, 0.016);
+    visual.update(idle, expiry, 0.45, 0.016);
+    expect(weaponDrawn(visual, 'shell')).toBe(0);
+    expect(weaponDrawn(visual, 'shock')).toBe(0);
+    expect(scorchShown(visual)).toBe(false);
+    // The server did fire it after all: a fresh shell, and its report played on the click.
+    const late = viewOf(state, [ownFired(expiry)]);
+    visual.update(late, expiry, 0.5, 0.016);
+    expect(fired).toHaveBeenCalledTimes(1);
+    expect(fired.mock.calls[0][4]).toBe(false);
+    expect(reports()).toBe(1);
+    expect(weaponDrawn(visual, 'shell')).toBe(1);
+    visual.dispose();
+  });
+
+  it('never replays a shot an earlier visual of the page already played', () => {
+    const shots = new TurretOwnShotLedger();
+    const state = engine(0);
+    shots.mark(viewOf(state), 160, click);
+    // A rebuilt visual (a graphics rebuild) shares the page's ledger.
+    const rebuilt = new TurretDefenseVisual(
+      new THREE.Scene(),
+      () => 0,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      shots,
+    );
+    const weapon = (rebuilt as unknown as { weapon: CannonShellVisuals }).weapon;
+    const launched = vi.spyOn(weapon, 'launchOwn');
+    rebuilt.update(viewOf(state), 161, 0.05, 0.016);
+    expect(launched).not.toHaveBeenCalled();
+    shots.mark(viewOf(state), 170, { ...click, z: 3 });
+    rebuilt.update(viewOf(state), 170, 0.5, 0.016);
+    expect(launched).toHaveBeenCalledTimes(1);
+    rebuilt.dispose();
+  });
+
+  it('flies a fresh shell with no second report when its own shell is gone', () => {
+    const { shots, visual, fired, reports } = ownRig();
+    const state = engine(0);
+    const idle = viewOf(state);
+    visual.update(idle, 160, 0, 0.016);
+    shots.mark(idle, 160, click);
+    visual.update(idle, 160, 0.016, 0.016);
+    // A frame with no seat mirrored clears the shots; the same seat comes back.
+    visual.update(null, 161, 0.05, 0.016);
+    visual.update(viewOf(state, [ownFired(162)]), 162, 0.1, 0.016);
+    expect(fired).toHaveBeenCalledTimes(1);
+    expect(fired.mock.calls[0][4]).toBe(false);
+    expect(reports()).toBe(1);
+    expect(weaponDrawn(visual, 'shell')).toBe(1);
+    visual.dispose();
+  });
+
+  describe('never plays a shot twice, on either host', () => {
+    const EMPTY_WORLD: WorldContent = { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] };
+    const FPS = 60;
+    const groundAt = (x: number, z: number) => groundHeight(x, z, WORLD_SEED);
+
+    function listeners(
+      world: Pick<IWorldVehicles, 'turretSession' | 'turretClock' | 'useVehicleAction'>,
+    ) {
+      const rig = ownRig(groundAt);
+      const aim = new TurretAimCore(world, rig.shots);
+      const sink = {
+        playAt: vi.fn((_key: string, _x: number, _y: number, _z: number, _opts?: unknown) => true),
+        preload: vi.fn((_key: string) => {}),
+      };
+      const sounds = new TurretDefenseSfx(
+        sink,
+        () => null,
+        () => 0,
+        rig.shots,
+      );
+      const heard = () =>
+        sink.playAt.mock.calls.filter((call) => call[0] === TURRET_FIRE_SFX).length;
+      return { ...rig, aim, sounds, heard };
+    }
+
+    /** One of a ring of aim points, a new one every click. */
+    const pointFor = (n: number, cx: number, cz: number) => ({
+      x: cx + Math.sin(n * 1.7) * (8 + (n % 5) * 9),
+      z: cz + Math.cos(n * 1.7) * (8 + (n % 5) * 9),
+    });
+
+    it('offline: the report and the sound play once per shot the sim fired', () => {
+      const sim = new Sim({
+        seed: WORLD_SEED,
+        playerClass: 'warrior',
+        devCommands: true,
+        world: EMPTY_WORLD,
+      });
+      sim.chat('/dev turret');
+      const host = listeners(sim);
+      let clicks = 0;
+      let acc = 0;
+      for (let frame = 0; frame < FPS * 20; frame++) {
+        const time = frame / FPS;
+        acc += 1 / FPS;
+        while (acc >= DT) {
+          sim.tick();
+          acc -= DT;
+        }
+        const session = sim.turretSession!;
+        if (frame % 13 === 0 && frame > FPS) {
+          host.aim.commitAt(pointFor(clicks++, session.defense.cx, session.defense.cz));
+        }
+        host.visual.update(sim.turretSession, sim.turretClock, time, 1 / FPS);
+        host.sounds.update(sim.turretSession, sim.turretClock);
+      }
+      const shots = sim.turretSession!.defense.stats.shots;
+      expect(clicks).toBeGreaterThan(shots);
+      expect(shots).toBeGreaterThan(20);
+      // Offline the mirror is the sim itself: every shot it fires was played on its click.
+      expect(host.launched.mock.calls.length).toBe(shots);
+      expect(host.reports()).toBe(shots);
+      expect(host.heard()).toBe(shots);
+      host.visual.dispose();
+    });
+
+    interface Link {
+      /** One-way delay and its jitter, ms. */
+      delay?: number;
+      jitter?: number;
+      seed?: number;
+      /** Clicks besides the ones on a bright reticle: none, every 17 frames, or every 5. */
+      early?: 0 | 17 | 5;
+      /** Every click on one point, so the fired entries cannot tell the clicks apart. */
+      samePoint?: boolean;
+      /** Seconds of clicking. */
+      seconds?: number;
+    }
+
+    /** A seat played online; by default 60 ms plus or minus 30 ms each way, clicking when bright. */
+    function online(link: Link) {
+      const { delay: oneWay = 60, jitter = 30, seed = 0x60d, early = 0, samePoint } = link;
+      const seconds = link.seconds ?? 19;
+      const sim = new Sim({
+        seed: WORLD_SEED,
+        playerClass: 'warrior',
+        devCommands: true,
+        noPlayer: true,
+        world: EMPTY_WORLD,
+      });
+      const pid = sim.addPlayer('warrior', 'Gunner', { characterId: 7 });
+      sim.drainEvents();
+      sim.chat('/dev turret', pid);
+      const rng = new Rng(seed);
+      const delay = () => (oneWay + rng.range(-jitter, jitter)) / 1000;
+      const uplink: { at: number; command: QuestWorldCommand }[] = [];
+      const downlink: {
+        at: number;
+        events: SimEvent[];
+        self: Record<string, unknown>;
+        time: number;
+        tick: number;
+      }[] = [];
+      let now = 0;
+      class Client extends QuestWorldWireState {
+        protected override sendQuestWorldCommand(command: QuestWorldCommand): void {
+          const last = uplink.at(-1)?.at ?? 0;
+          uplink.push({ at: Math.max(last, now + delay()), command });
+        }
+        route(event: SimEvent): void {
+          this.applyQuestWorldEvent(JSON.parse(JSON.stringify(event)) as SimEvent);
+        }
+      }
+      const client = new Client();
+      const host = listeners(client);
+      const sent: Record<string, string> = {};
+      let serverTicks = 0;
+      let arrival = 0;
+      let clicks = 0;
+      let fired = 0;
+      // Whether each click sent played its report, in send order; a played one the server refuses is a phantom.
+      const sentPlayed: boolean[] = [];
+      let dispatched = 0;
+      let phantoms = 0;
+      const shotsFired = () => sim.turretSession?.defense.stats.shots ?? 0;
+      for (let frame = 0; frame < FPS * (seconds + 5); frame++) {
+        now = frame / FPS;
+        while (serverTicks * DT <= now) {
+          while (uplink.length && uplink[0].at <= serverTicks * DT) {
+            const before = shotsFired();
+            dispatchVehicleCommand(sim, pid, JSON.parse(JSON.stringify(uplink.shift()!.command)));
+            if (sentPlayed[dispatched++] && shotsFired() === before) phantoms++;
+          }
+          const events = sim.tick().filter((e) => e.pid === pid);
+          for (const e of events) {
+            if (e.type === 'turretDefense' && e.event.type === 'fired') fired++;
+          }
+          serverTicks++;
+          let extra = '';
+          emitTurretSelfKeys(
+            (key, serialized) => {
+              if (sent[key] === serialized) return;
+              sent[key] = serialized;
+              extra += `,"${key}":${serialized}`;
+            },
+            sim.meta(pid)!,
+            sim.tickCount,
+          );
+          arrival = Math.max(arrival, serverTicks * DT + delay());
+          downlink.push({
+            at: arrival,
+            events,
+            self: JSON.parse(`{${extra.slice(1)}}`),
+            time: sim.time,
+            tick: sim.tickCount,
+          });
+        }
+        while (downlink.length && downlink[0].at <= now) {
+          const d = downlink.shift()!;
+          for (const event of d.events) client.route(event);
+          client.applyQuestSelfSnapshot(d.self, d.time, d.tick);
+        }
+        const session = client.turretSession;
+        const target = session
+          ? pointFor(samePoint ? 0 : clicks, session.defense.cx, session.defense.cz)
+          : null;
+        host.aim.updatePoint(target);
+        // A player clicking once the reticle brightens, and maybe early clicks too.
+        const ready = host.aim.reticle()?.dimmed === false;
+        const eager = early > 0 && frame % early === 0;
+        if (session && target && frame > FPS && frame < FPS * (seconds + 1) && (ready || eager)) {
+          const before = host.launched.mock.calls.length;
+          const played = host.shots.canMark(session, client.turretClock);
+          sentPlayed.push(played);
+          host.aim.commitAt(target);
+          clicks++;
+          host.visual.update(client.turretSession, client.turretClock, now, 1 / FPS);
+          // A click the mirrors accept plays its report on that very frame.
+          expect(host.launched.mock.calls.length).toBe(before + (played ? 1 : 0));
+        } else host.visual.update(client.turretSession, client.turretClock, now, 1 / FPS);
+        host.sounds.update(client.turretSession, client.turretClock);
+      }
+      expect(fired).toBeGreaterThan(20);
+      expect(shotsFired()).toBe(fired);
+      expect(sentPlayed).toHaveLength(dispatched);
+      expect(phantoms).toBe(0);
+      expect(host.reports()).toBe(fired);
+      expect(host.heard()).toBe(fired);
+      expect(host.shots.leadTicks).toBeGreaterThan(1);
+      host.visual.dispose();
+      return { fired, clicks, launched: host.launched.mock.calls.length };
+    }
+
+    it('online: a player clicking once the reticle brightens hears and sees every shot on the click', () => {
+      const run = online({});
+      expect(run.launched).toBe(run.fired);
+    });
+
+    const SEEDS = [0x60d, 0x1234, 0x9999];
+
+    it('online over 150 ms plus or minus 75 ms: every shot on the click, none the server refuses', () => {
+      for (const seed of SEEDS) {
+        const run = online({ delay: 150, jitter: 75, seed, seconds: 60 });
+        expect(run.launched).toBe(run.fired);
+      }
+    });
+
+    it('online with impatient clicks too: still once per shot, most of them on the click', () => {
+      // The mirror's clock trails the server's by a trip, so an early click it shows
+      // cooling down can reach the server ready: that shot reports once, from its entry.
+      const run = online({ early: 17 });
+      expect(run.clicks).toBeGreaterThan(run.fired);
+      expect(run.launched).toBeLessThan(run.fired);
+      expect(run.launched).toBeGreaterThan(run.fired * 0.6);
+    });
+
+    it('online with every click on one point: once per shot, none played the server refuses', () => {
+      // Its entries cannot tell the clicks apart: an older click the server refused must
+      // not be read as a longer trip, or the reticle brightens too early.
+      for (const seed of SEEDS) {
+        online({ delay: 150, jitter: 75, seed, seconds: 60, samePoint: true });
+        online({ delay: 100, jitter: 50, seed, seconds: 60, samePoint: true });
+      }
+      online({ early: 17, samePoint: true, seconds: 60 });
+      online({ delay: 150, jitter: 75, early: 17, samePoint: true, seconds: 60 });
+    });
+
+    it('online with rapid clicks: once per shot, never a click played the server may refuse', () => {
+      // Five clicks a cooldown: the server takes whichever arrives first once ready, which
+      // no click can know, so the shots report from their entries.
+      const run = online({ early: 5 });
+      expect(run.clicks).toBeGreaterThan(3 * run.fired);
+      online({ delay: 150, jitter: 75, seed: 0x1234, early: 5, seconds: 60 });
+      online({ delay: 150, jitter: 75, seed: 0x1234, early: 5, samePoint: true, seconds: 60 });
+    });
   });
 });

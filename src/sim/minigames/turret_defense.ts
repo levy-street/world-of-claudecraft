@@ -309,6 +309,43 @@ export function turretStrikeDistance(kind: TurretKind): number {
   return TURRET_ARENA.breachRadius + kind.radius;
 }
 
+/** An aim held inside the weapon's reach band: the point, its unit bearing and its range. */
+export interface TurretAim {
+  x: number;
+  z: number;
+  dirX: number;
+  dirZ: number;
+  range: number;
+}
+
+/**
+ * The shot's one clamp, shared by the engine, the reticle and the local shell: the
+ * point `x, z` pulled into the weapon's reach band around `cx, cz` along its bearing.
+ * A point-blank aim keeps the last bearing `aimX, aimZ`.
+ */
+export function clampTurretAimInto(
+  cx: number,
+  cz: number,
+  aimX: number,
+  aimZ: number,
+  x: number,
+  z: number,
+  out: TurretAim,
+): TurretAim {
+  const dx = x - cx;
+  const dz = z - cz;
+  const dist = Math.hypot(dx, dz);
+  const dirX = dist > 1e-6 ? dx / dist : aimX;
+  const dirZ = dist > 1e-6 ? dz / dist : aimZ;
+  const range = Math.min(TURRET_WEAPON.maxRange, Math.max(TURRET_WEAPON.minRange, dist));
+  out.dirX = dirX;
+  out.dirZ = dirZ;
+  out.range = range;
+  out.x = cx + dirX * range;
+  out.z = cz + dirZ * range;
+  return out;
+}
+
 /** Shell flight in ticks for an aim distance already clamped to the weapon's range. */
 export function turretShellFlightTicks(range: number): number {
   const ticks = Math.round((range / TURRET_WEAPON.shellSpeed) * TICK_RATE);
@@ -344,16 +381,18 @@ export function fireTurret(
   if (!Number.isFinite(x) || !Number.isFinite(z))
     return { ok: false, reason: 'invalid', events: [] };
   if (tick < state.readyTick) return { ok: false, reason: 'cooldown', events: [] };
-  const dx = x - state.cx;
-  const dz = z - state.cz;
-  const dist = Math.hypot(dx, dz);
-  if (dist > 1e-6) {
-    state.aimX = dx / dist;
-    state.aimZ = dz / dist;
-  }
-  const range = Math.min(TURRET_WEAPON.maxRange, Math.max(TURRET_WEAPON.minRange, dist));
-  const tx = state.cx + state.aimX * range;
-  const tz = state.cz + state.aimZ * range;
+  const aim = clampTurretAimInto(state.cx, state.cz, state.aimX, state.aimZ, x, z, {
+    x: 0,
+    z: 0,
+    dirX: 0,
+    dirZ: 0,
+    range: 0,
+  });
+  state.aimX = aim.dirX;
+  state.aimZ = aim.dirZ;
+  const range = aim.range;
+  const tx = aim.x;
+  const tz = aim.z;
   const flightTicks = turretShellFlightTicks(range);
   const wave = state.plan.waves[Math.min(state.wave, state.plan.waves.length - 1)];
   const shot: TurretShot = {

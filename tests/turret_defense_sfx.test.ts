@@ -19,6 +19,7 @@ import {
 import type { TurretEvent, TurretHit } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import type { TurretFeedback } from '../src/sim/minigames/turret_feedback';
+import { TurretOwnShotLedger } from '../src/ui/hud/vehicle/turret_own_shot_core';
 import type { TurretSessionView } from '../src/world_api/vehicles';
 
 const origin = { x: 100, y: 5, z: 200 };
@@ -350,5 +351,83 @@ describe('Fire and Fly sound player', () => {
       `${PLAN.kinds[0].templateId}_death`,
       `${PLAN.kinds[HUGE].templateId}_hurt`,
     ]);
+  });
+
+  it("reports the player's own shot on the click, then plays its fired entry no more", () => {
+    const shots = new TurretOwnShotLedger();
+    const out = sink();
+    const sounds = new TurretDefenseSfx(
+      out,
+      () => null,
+      () => 0,
+      shots,
+    );
+    const seated = (entries: TurretFeedback[]): TurretSessionView => {
+      const base = session(entries, 0);
+      return {
+        ...base,
+        defense: { ...base.defense, cx: 100, cz: 200, phase: 'wave', readyTick: 0 },
+      };
+    };
+    const reports = () => out.playAt.mock.calls.filter((call) => call[0] === TURRET_FIRE_SFX);
+    sounds.update(seated([]), 10);
+    shots.mark(seated([]), 10, { x: 100, z: 230, dirX: 0, dirZ: 1, range: 30 });
+    sounds.update(seated([]), 10);
+    expect(reports()).toHaveLength(1);
+    const heard = turretSfxCueInto(fired, origin, cue());
+    expect(reports()[0].slice(1, 4)).toEqual([heard?.x, heard?.y, heard?.z]);
+    sounds.update(seated([]), 11);
+    expect(reports()).toHaveLength(1);
+    // Its entry comes a round trip later: latched. Another shot's entry plays as usual.
+    const own = entry(1, 13, fired);
+    sounds.update(seated([own]), 13);
+    expect(reports()).toHaveLength(1);
+    const other = entry(2, 22, { ...fired, shotId: 2, x: 120 });
+    sounds.update(seated([own, other]), 22);
+    expect(reports()).toHaveLength(2);
+  });
+
+  it("never reports the player's own shot twice: late, or from a rebuilt player", () => {
+    const shots = new TurretOwnShotLedger();
+    const out = sink();
+    const sounds = new TurretDefenseSfx(
+      out,
+      () => null,
+      () => 0,
+      shots,
+    );
+    const seated = (entries: TurretFeedback[]): TurretSessionView => {
+      const base = session(entries, 0);
+      return {
+        ...base,
+        defense: { ...base.defense, cx: 100, cz: 200, phase: 'wave', readyTick: 0 },
+      };
+    };
+    const reports = (to: ReturnType<typeof sink>) =>
+      to.playAt.mock.calls.filter((call) => call[0] === TURRET_FIRE_SFX);
+    sounds.update(seated([]), 10);
+    const serial = shots.mark(seated([]), 10, { x: 100, z: 230, dirX: 0, dirZ: 1, range: 30 });
+    sounds.update(seated([]), 10);
+    expect(reports(out)).toHaveLength(1);
+    // A player built later on the page (a rebuild) starts past the shots already reported.
+    const rebuiltOut = sink();
+    const rebuilt = new TurretDefenseSfx(
+      rebuiltOut,
+      () => null,
+      () => 0,
+      shots,
+    );
+    rebuilt.update(seated([]), 11);
+    expect(reports(rebuiltOut)).toHaveLength(0);
+    // No entry inside the window, then the server's comes late: its report already played.
+    const lapsed = 10 + shots.confirmWindow + 1;
+    // The render and the reticle lapse the marks every frame.
+    shots.update(seated([]), lapsed);
+    sounds.update(seated([]), lapsed);
+    expect(shots.status(serial)).toBe('refused');
+    const late = entry(1, lapsed, fired);
+    sounds.update(seated([late]), lapsed);
+    expect(shots.status(serial)).toBe('confirmed');
+    expect(reports(out)).toHaveLength(1);
   });
 });

@@ -5,6 +5,7 @@ import {
   TURRET_HALF_WIDTH,
   TURRET_LIE_SECONDS,
   TURRET_SINK_SECONDS,
+  TURRET_TICK_LATE_MAX,
   TURRET_TICK_LEAD_MAX,
   TURRET_TUMBLE_MAX,
   TURRET_TUMBLE_TILT,
@@ -548,6 +549,60 @@ describe('Fire and Fly display clock', () => {
       const lead = clock.sample(simTick, time) - simTick;
       if (i >= fps * 30) expect(lead).toBeLessThan(1.1);
     }
+  });
+
+  it.each([144, 60, 30, 24])(
+    'shows a local sim exactly as the fixed cap did at %i fps, frame jitter and hitches included',
+    (fps) => {
+      // The offline host: one accumulator ticks the sim, and the render time takes the same
+      // clamped frame steps, so the display never reaches the fixed cap and the late lead
+      // it learns changes nothing.
+      const learned = new TurretDisplayClock();
+      const fixed = new TurretDisplayClock(0);
+      let acc = 0;
+      let time = 0;
+      let tick = 500;
+      for (let i = 0; i < fps * 30; i++) {
+        const wobble = ((i * 7919) % 13) / 13 - 0.5;
+        const hitch = i % (fps * 7) === fps * 3 ? 0.4 : 0;
+        const dt = Math.min(0.25, 1 / fps + wobble * 0.004 + hitch);
+        acc += dt;
+        time += dt;
+        while (acc >= DT) {
+          tick++;
+          acc -= DT;
+        }
+        expect(learned.sample(tick, time)).toBe(fixed.sample(tick, time));
+      }
+    },
+  );
+
+  it('leads a clock whose steps come late further, so the next late one never stalls', () => {
+    const clock = new TurretDisplayClock();
+    const fps = 60;
+    // Every fourth step past the first second arrives 60 ms late, the ones after it in order.
+    const arrival = (k: number) => k * DT + (k > 20 && k % 4 === 0 ? 0.06 : 0);
+    let k = 0;
+    let prior = Number.NaN;
+    let stalls = 0;
+    for (let i = 0; i < fps * 12; i++) {
+      const time = i / fps;
+      while (arrival(k + 1) <= time) k++;
+      const shown = clock.sample(k, time);
+      if (time > 3 && shown - prior < 0.5 / (fps * DT)) stalls++;
+      prior = shown;
+    }
+    expect(clock.lateLead).toBeGreaterThan(0.5);
+    expect(clock.lateLead).toBeLessThanOrEqual(TURRET_TICK_LATE_MAX);
+    expect(stalls).toBe(0);
+    const grown = clock.lateLead;
+    for (let i = fps * 12; i < fps * 30; i++) {
+      const time = i / fps;
+      clock.sample(Math.floor(time / DT), time);
+    }
+    expect(clock.lateLead).toBeLessThan(grown);
+    clock.reset();
+    expect(clock.lateLead).toBe(0);
   });
 
   it('snaps to a clock that jumped ahead, holds at the lead when the sim stalls, and resets on a new seat', () => {

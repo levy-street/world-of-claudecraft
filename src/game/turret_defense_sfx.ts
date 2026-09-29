@@ -4,10 +4,14 @@
 // thumps and knocks (turret_monster_sfx.ts),
 // each read once per feedback entry (by sequence number) from the seat HUD's
 // frame. Every clip a seat can play is preloaded when the seat is first seen.
+// The player's own shot reports on the click, from the own-shot ledger
+// (turret_own_shot_core.ts); the `fired` entry it confirms plays nothing more.
 
 import type { TurretEvent } from '../sim/minigames/turret_defense';
 import { TurretFeedbackReader } from '../ui/hud/vehicle/turret_feedback_reader_core';
 import { turretHitStrength } from '../ui/hud/vehicle/turret_hit_feedback_core';
+import type { TurretOwnShotLedger } from '../ui/hud/vehicle/turret_own_shot_core';
+import { turretOwnShots } from '../ui/hud/vehicle/turret_own_shots';
 import { availableMobVoiceCue } from '../ui/hud_voice_cues';
 import type { TurretSessionView } from '../world_api/vehicles';
 import { type PlayOpts, sfx } from './sfx';
@@ -112,6 +116,28 @@ export function turretBreachCueInto(
   return out;
 }
 
+/** The cannon's report for a shot from (fromX, fromZ) toward (x, z), at the muzzle. */
+export function turretFireCueInto(
+  fromX: number,
+  fromZ: number,
+  x: number,
+  z: number,
+  origin: { readonly y: number },
+  out: TurretSfxCue,
+): TurretSfxCue {
+  const dx = x - fromX;
+  const dz = z - fromZ;
+  const dist = Math.hypot(dx, dz);
+  out.key = TURRET_FIRE_SFX;
+  out.x = fromX + (dist > 1e-6 ? dx / dist : 0) * MUZZLE_REACH;
+  out.y = origin.y + MUZZLE_LIFT;
+  out.z = fromZ + (dist > 1e-6 ? dz / dist : 1) * MUZZLE_REACH;
+  out.gain = 1.25;
+  out.rate = 1;
+  out.jitter = false;
+  return out;
+}
+
 /**
  * The sound an engine event makes, written into `out`; null for a silent event.
  * A breach is silent here: a frame's strikes play once, through turretBreachCueInto.
@@ -122,17 +148,7 @@ export function turretSfxCueInto(
   out: TurretSfxCue,
 ): TurretSfxCue | null {
   if (event.type === 'fired') {
-    const dx = event.x - event.fromX;
-    const dz = event.z - event.fromZ;
-    const dist = Math.hypot(dx, dz);
-    out.key = TURRET_FIRE_SFX;
-    out.x = event.fromX + (dist > 1e-6 ? dx / dist : 0) * MUZZLE_REACH;
-    out.y = origin.y + MUZZLE_LIFT;
-    out.z = event.fromZ + (dist > 1e-6 ? dz / dist : 1) * MUZZLE_REACH;
-    out.gain = 1.25;
-    out.rate = 1;
-    out.jitter = false;
-    return out;
+    return turretFireCueInto(event.fromX, event.fromZ, event.x, event.z, origin, out);
   }
   if (event.type === 'barrelExploded') {
     const size = turretBlastSize(event.hits);
@@ -165,6 +181,8 @@ export class TurretDefenseSfx {
   private readonly reader = new TurretFeedbackReader();
   private readonly monsters: TurretMonsterSfx;
   private readonly preloaded = new Set<string>();
+  /** The newest own-shot serial already reported; a rebuilt player starts past the page's. */
+  private launched: number;
   private origin: { readonly x: number; readonly z: number } = { x: 0, z: 0 };
   private readonly cue: TurretSfxCue = {
     key: '',
@@ -181,8 +199,10 @@ export class TurretDefenseSfx {
     private readonly sink: TurretSfxSink = sfx,
     private readonly voiceCue: TurretVoiceCue = availableMobVoiceCue,
     private readonly now: () => number = () => performance.now(),
+    private readonly shots: TurretOwnShotLedger = turretOwnShots,
   ) {
     this.monsters = new TurretMonsterSfx(voiceCue);
+    this.launched = shots.newestSerial;
   }
 
   /** `clock` is the seat's sim tick (IWorld.turretClock), null when unknown. */
@@ -194,6 +214,7 @@ export class TurretDefenseSfx {
       for (const key of SEAT_SFX) this.preload(key);
       for (const key of turretVoiceKeys(session.defense.plan, this.voiceCue)) this.preload(key);
     }
+    this.reportOwnShots(session, clock);
     if (fresh.length === 0) return;
     const now = this.now();
     this.origin = session.origin;
@@ -207,12 +228,26 @@ export class TurretDefenseSfx {
         if (!strongest || event.points > strongest.points) strongest = event;
         continue;
       }
+      if (event.type === 'fired' && this.shots.ownShotOf(session, entry) !== 0) continue;
       const cue = turretSfxCueInto(event, session.origin, this.cue);
       if (cue) this.play(cue);
       else this.monsters.offer(event, session, now);
     }
     if (strongest) this.play(turretBreachCueInto(breachPoints, strongest, this.cue));
     this.monsters.flush(now, this.playHeard);
+  }
+
+  /** The report of every own shot marked since the last read, on the click's frame. */
+  private reportOwnShots(session: TurretSessionView, clock: number | null): void {
+    for (let shot = this.shots.launchAfter(session, this.launched); shot; ) {
+      this.launched = shot.serial;
+      if (clock === null || shot.clock >= clock - STALE_TICKS) {
+        this.play(
+          turretFireCueInto(shot.fromX, shot.fromZ, shot.x, shot.z, session.origin, this.cue),
+        );
+      }
+      shot = this.shots.launchAfter(session, this.launched);
+    }
   }
 
   private readonly playHeard = (cue: TurretSfxCue): void => {

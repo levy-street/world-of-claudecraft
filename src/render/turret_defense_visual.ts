@@ -18,17 +18,24 @@
 // the puff draw) and the bar faces the camera upright over the body, whatever
 // its tumble. Every living monster also carries a red ground marker, drawn by
 // turret_ground_markers.ts, and the explosive barrels are
-// turret_barrel_visual.ts. Pure halves: turret_monster_pose_core.ts,
+// turret_barrel_visual.ts. The player's own shot plays on the click: the seat
+// HUD marks it in the page's own-shot ledger (turret_own_shot_core.ts), the head
+// recoils and the shell leaves at once, and the shot's `fired` entry adopts that
+// shell rather than drawing another. Pure halves: turret_monster_pose_core.ts,
 // turret_motion_forecast_core.ts, turret_contact_dust_core.ts,
 // turret_defense_pool_core.ts and turret_tower_core.ts.
 import * as THREE from 'three';
 import { TURRET_PHYSICS, TURRET_WEAPON } from '../sim/content/turret_defense';
 import { MOBS } from '../sim/data';
 import type { ThrowProbe } from '../sim/minigames/thrown_body';
+import { turretShellFlightTicks } from '../sim/minigames/turret_defense';
 import type { TurretFeedback } from '../sim/minigames/turret_feedback';
 import { DT, type Entity } from '../sim/types';
+import type { TurretOwnShotLedger } from '../ui/hud/vehicle/turret_own_shot_core';
+import { turretOwnShots } from '../ui/hud/vehicle/turret_own_shots';
 import type { TurretSessionView } from '../world_api/vehicles';
 import { timeBuildSpan } from './build_spans';
+import type { CannonPoint } from './cannon_shell_core';
 import { type CannonShellHost, CannonShellVisuals } from './cannon_shell_visuals';
 import { type AnimState, CharacterVisual } from './characters';
 import { charactersReady } from './characters/assets';
@@ -69,6 +76,8 @@ import { TurretMarkerGround } from './turret_ground_marker_core';
 import { TURRET_MARKER_ORDER, TurretGroundMarkers } from './turret_ground_markers';
 import {
   newTurretMonsterPose,
+  TURRET_TICK_LATE_MAX,
+  TURRET_TICK_LEAD_MAX,
   TurretAttitude,
   TurretDisplayClock,
   turretMonsterPoseInto,
@@ -194,6 +203,11 @@ export class TurretDefenseVisual {
     sitting: false,
   };
   private readonly muzzle = { x: 0, y: 0, z: 0 };
+  private readonly ownTarget = { x: 0, y: 0, z: 0 };
+  /** The newest own-shot serial already launched; a rebuilt visual starts past the page's. */
+  private launched: number;
+  private readonly refusedOwn = (serial: number): boolean =>
+    this.shots.status(serial) === 'refused';
   private camera: THREE.Camera | null = null;
   private geometry: {
     capsule: THREE.CapsuleGeometry;
@@ -221,7 +235,9 @@ export class TurretDefenseVisual {
     private readonly idleScheduler?: IdleScheduler,
     towerSource?: TurretTowerSource,
     barrelSource?: TurretBarrelSource,
+    private readonly shots: TurretOwnShotLedger = turretOwnShots,
   ) {
+    this.launched = shots.newestSerial;
     this.probe = { ground: groundAt, water: () => null };
     this.tower = new TurretTowerVisual(compileGate, towerSource);
     this.groundMarkers = new TurretGroundMarkers(this.probe, compileGate);
@@ -237,6 +253,7 @@ export class TurretDefenseVisual {
       bursts: { slots: TURRET_CONTACT_BURSTS + TURRET_BARREL_BURSTS, puffs: TURRET_CONTACT_PUFFS },
       impacts: TURRET_BARREL_IMPACTS,
       texelSlot,
+      holdTicks: TURRET_TICK_LEAD_MAX + TURRET_TICK_LATE_MAX,
     });
     this.contactCounts = turretContactCounts(this.weapon.lowEffects);
     this.barrels = new TurretBarrelVisual(
@@ -304,6 +321,9 @@ export class TurretDefenseVisual {
     this.book.assign(defense.monsters, this.templateOf);
     this.tower.place(defense.cx, session.origin.y, defense.cz);
     this.tower.aim(aimYaw, dt);
+    const now = clock ?? defense.startTick;
+    this.shots.update(session, now);
+    this.launchOwnShots(session, now, tick, time, reducedMotion);
     this.consumeFeedback(session, tick, time, reducedMotion);
     if (self) this.standGunner(self, defense.cx, session.origin.y, defense.cz);
     for (const rig of this.rigs) rig.used = false;
@@ -393,7 +413,7 @@ export class TurretDefenseVisual {
     }
     this.groundMarkers.end();
     this.barrels.update(defense, frozen, tick, time);
-    this.weapon.update(tick, time);
+    this.weapon.update(tick, time, this.refusedOwn);
   }
 
   /** Stops showing a session: every slot released, the clock and the shots cleared. */
@@ -599,18 +619,13 @@ export class TurretDefenseVisual {
       const stale = entry.tick < tick - SHOT_STALE_TICKS;
       switch (ev.type) {
         case 'fired': {
+          // An own shot's report played on the click: its shell carries on as this
+          // one, or a fresh one flies with no second report.
+          const own = this.shots.ownShotOf(session, entry);
+          if (own > 0 && this.weapon.adoptOwn(own, ev, tick)) break;
           if (stale) break;
-          const dx = ev.x - ev.fromX;
-          const dz = ev.z - ev.fromZ;
-          const dist = Math.hypot(dx, dz);
-          this.tower.fireAt(
-            dist > 1e-6 ? Math.atan2(dx, dz) : this.tower.headYaw,
-            turretBarrelPitch(dist, ev.y - session.origin.y),
-          );
-          this.muzzle.x = ev.fromX + (dist > 1e-6 ? dx / dist : 0) * MUZZLE_REACH;
-          this.muzzle.y = session.origin.y + MUZZLE_LIFT;
-          this.muzzle.z = ev.fromZ + (dist > 1e-6 ? dz / dist : 1) * MUZZLE_REACH;
-          this.weapon.fire(ev, this.muzzle, time, reducedMotion);
+          this.layBarrel(session, ev.fromX, ev.fromZ, ev);
+          this.weapon.fire(ev, this.muzzle, time, reducedMotion, own === 0);
           break;
         }
         case 'impact':
@@ -663,6 +678,54 @@ export class TurretDefenseVisual {
           break;
       }
     }
+  }
+
+  /**
+   * The own shots the seat HUD marked since the last frame: the head lies on each,
+   * the muzzle flashes and its shell leaves now, on a flight predicted to land when
+   * its `fired` entry's impact would (the click's clock plus the measured lead).
+   */
+  private launchOwnShots(
+    session: TurretSessionView,
+    clock: number,
+    tick: number,
+    time: number,
+    reducedMotion: boolean,
+  ): void {
+    const shots = this.shots;
+    for (let shot = shots.launchAfter(session, this.launched); shot; ) {
+      this.launched = shot.serial;
+      if (shot.clock >= clock - SHOT_STALE_TICKS) {
+        const target = this.ownTarget;
+        target.x = shot.x;
+        target.y = this.groundAt(shot.x, shot.z);
+        target.z = shot.z;
+        this.layBarrel(session, shot.fromX, shot.fromZ, target);
+        const lands =
+          Math.max(tick, shot.clock + shots.leadTicks) + turretShellFlightTicks(shot.range);
+        this.weapon.launchOwn(shot.serial, target, tick, lands, this.muzzle, time, reducedMotion);
+      }
+      shot = shots.launchAfter(session, this.launched);
+    }
+  }
+
+  /** The head and barrel lie on a shot from (fromX, fromZ) to `at`; sets the fallback muzzle. */
+  private layBarrel(
+    session: TurretSessionView,
+    fromX: number,
+    fromZ: number,
+    at: Readonly<CannonPoint>,
+  ): void {
+    const dx = at.x - fromX;
+    const dz = at.z - fromZ;
+    const dist = Math.hypot(dx, dz);
+    this.tower.fireAt(
+      dist > 1e-6 ? Math.atan2(dx, dz) : this.tower.headYaw,
+      turretBarrelPitch(dist, at.y - session.origin.y),
+    );
+    this.muzzle.x = fromX + (dist > 1e-6 ? dx / dist : 0) * MUZZLE_REACH;
+    this.muzzle.y = session.origin.y + MUZZLE_LIFT;
+    this.muzzle.z = fromZ + (dist > 1e-6 ? dz / dist : 1) * MUZZLE_REACH;
   }
 
   /** The scorch a blast leaves on each body it struck; a core hit's launch freezes on it. */

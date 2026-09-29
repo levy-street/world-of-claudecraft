@@ -1,7 +1,10 @@
 import { TURRET_WEAPON } from '../../../sim/content/turret_defense';
+import { clampTurretAimInto, type TurretAim } from '../../../sim/minigames/turret_defense';
 import type { CannonPoint } from '../../../sim/types';
 import type { IWorldVehicles, TurretSessionView } from '../../../world_api/vehicles';
 import type { GroundAimReticleView } from '../action_bar/ground_aim_controller';
+import type { TurretOwnShotLedger } from './turret_own_shot_core';
+import { turretOwnShots } from './turret_own_shots';
 
 type TurretAimWorld = Pick<IWorldVehicles, 'turretSession' | 'turretClock' | 'useVehicleAction'>;
 
@@ -22,12 +25,15 @@ function ended(session: TurretSessionView): boolean {
 /**
  * The Fire and Fly aim: on for the whole seat. A click fires and keeps aiming, and a
  * shot the sim refuses (cooldown) still consumes the click; cancel never drops it,
- * so Escape falls through to the seat's own exit.
+ * so Escape falls through to the seat's own exit. Every click sent is marked in
+ * the own-shot ledger, which plays its report at once when the server will
+ * surely take it.
  */
 export class TurretAimCore {
   private readonly raw: CannonPoint = { x: 0, z: 0 };
   private hasPoint = false;
   private readonly aimed: CannonPoint = { x: 0, z: 0 };
+  private readonly clamp: TurretAim = { x: 0, z: 0, dirX: 0, dirZ: 1, range: 0 };
   private readonly view: GroundAimReticleView = {
     point: this.aimed,
     radius: TURRET_WEAPON.blastRadius,
@@ -35,7 +41,10 @@ export class TurretAimCore {
     dimmed: false,
     blocked: false,
   };
-  constructor(private readonly world: TurretAimWorld) {}
+  constructor(
+    private readonly world: TurretAimWorld,
+    readonly shots: TurretOwnShotLedger = turretOwnShots,
+  ) {}
   isActive(): boolean {
     return !!this.world.turretSession;
   }
@@ -75,7 +84,8 @@ export class TurretAimCore {
     const session = this.world.turretSession;
     if (!session || !this.hasPoint || ended(session)) return null;
     this.clampInto(session, this.raw.x, this.raw.z);
-    this.view.dimmed = (this.world.turretClock ?? Infinity) < session.defense.readyTick;
+    const clock = this.world.turretClock;
+    this.view.dimmed = clock !== null && !this.shots.canMark(session, clock);
     this.view.blocked = false;
     return this.view;
   }
@@ -84,6 +94,9 @@ export class TurretAimCore {
     if (!session) return false;
     if (!point) return true;
     this.clampInto(session, point.x, point.z);
+    // Marked before the send: offline the shot fires inside it, and its entry must find the mark.
+    const clock = this.world.turretClock;
+    if (clock !== null) this.shots.mark(session, clock, this.clamp);
     this.world.useVehicleAction('turret_fire', { x: this.aimed.x, z: this.aimed.z });
     return true;
   }
@@ -91,21 +104,11 @@ export class TurretAimCore {
     this.raw.x = x;
     this.raw.z = z;
   }
-  /** Writes the point, held inside the weapon's reach band, into `aimed`; returns its distance.
-   *  A point-blank click fires at the minimum range along its bearing, as the sim would. */
-  private clampInto(session: TurretSessionView, x: number, z: number): number {
+  /** Writes the point, held in the weapon's reach band by the engine's own clamp, into `aimed`. */
+  private clampInto(session: TurretSessionView, x: number, z: number): void {
     const { cx, cz, aimX, aimZ } = session.defense;
-    let dx = x - cx;
-    let dz = z - cz;
-    let distance = Math.hypot(dx, dz);
-    if (distance < 1e-6) {
-      dx = aimX;
-      dz = aimZ;
-      distance = 1;
-    }
-    const reach = Math.min(TURRET_WEAPON.maxRange, Math.max(TURRET_WEAPON.minRange, distance));
-    this.aimed.x = cx + (dx / distance) * reach;
-    this.aimed.z = cz + (dz / distance) * reach;
-    return reach;
+    clampTurretAimInto(cx, cz, aimX, aimZ, x, z, this.clamp);
+    this.aimed.x = this.clamp.x;
+    this.aimed.z = this.clamp.z;
   }
 }

@@ -9,7 +9,10 @@
 // Two clocks: a shell flies on the sim tick (fractional, from the display clock)
 // so it lands on the tick its blast resolves; everything an event starts (the
 // muzzle, the blast, the chunks, the scorch) runs on frame seconds from the frame
-// that consumed it, so a flash is never seen half spent.
+// that consumed it, so a flash is never seen half spent. A caller's own shot may
+// launch its shell before its event (launchOwn, on a predicted flight); the event
+// then adopts it (adoptOwn: re-timed to its impact tick, the aim offset fading
+// out over the rest of the flight), or it shrinks away with no blast.
 //
 // Three/DOM/i18n-free (RENDER_PURE_CORES), deterministic (a chunk's spread is a
 // hash of its impact and index) and allocation-free per frame: fixed pools
@@ -72,6 +75,9 @@ export const CANNON_BLAST = {
   shakeFull: 10,
   shakeZero: 40,
 } as const;
+
+/** Seconds an own shell no event confirmed takes to shrink away (no blast, no scorch). */
+export const CANNON_OWN_FADE_SECONDS = 0.25;
 
 export const CANNON_SHELL_POOL = 4;
 export const CANNON_MUZZLE_POOL = 4;
@@ -375,6 +381,23 @@ export interface CannonShellSlot {
   arc: number;
   /** Set by the shot's impact: the shell is gone, its wake fades out. */
   landed: boolean;
+  /** Hash seed of its muzzle and wake: the shot id, or its own launch's. */
+  seed: number;
+  /** The caller's serial for a shell launched ahead of its event (its own shot), else 0. */
+  own: number;
+  /** An own shell its event took over: the rest of its flight is the event's. */
+  adopted: boolean;
+  /** Where an adopted flight was re-timed from: the tick, and the progress there. */
+  bendTick: number;
+  bendProgress: number;
+  /** The own aim point less the event's: it fades to nothing over the rest of the flight. */
+  offX: number;
+  offY: number;
+  offZ: number;
+  /** Frame seconds an own shell its event never confirmed began to shrink away; NaN otherwise. */
+  fadeAt: number;
+  /** The progress its wake ends at: where a shrunk shell vanished, 1 otherwise. */
+  endProgress: number;
 }
 
 export interface CannonMuzzleSlot {
@@ -502,6 +525,96 @@ export function cannonScorchDrapeInto(
  * The shots in flight and the blasts on the ground, in fixed round-robin pools.
  * Fed the seat's fired and impact events once each; read back per frame.
  */
+const OWN_POINT: CannonPoint = { x: 0, y: 0, z: 0 };
+
+/** An adopted own shell's progress: its predicted line up to the bend, then on to the impact. */
+function adoptedProgress(s: CannonShellSlot, tick: number): number {
+  if (tick <= s.bendTick) {
+    const head = s.bendTick - s.firedTick;
+    return head > 0 ? clamp01(s.bendProgress * ((tick - s.firedTick) / head)) : s.bendProgress;
+  }
+  const tail = s.impactTick - s.bendTick;
+  return tail > 0
+    ? clamp01(s.bendProgress + (1 - s.bendProgress) * ((tick - s.bendTick) / tail))
+    : 1;
+}
+
+/**
+ * An adopted own shell's point at progress `t`: on its own aim up to the bend,
+ * then on the event's arc plus the gap it had at the bend, fading to nothing
+ * by the impact.
+ */
+function adoptedPointInto(s: CannonShellSlot, t: number, out: CannonPoint): void {
+  const bend = s.bendProgress;
+  const gap = t <= bend ? t : bend < 1 ? (bend * (1 - t)) / (1 - bend) : 0;
+  out.x = s.fromX + (s.toX - s.fromX) * t + s.offX * gap;
+  out.z = s.fromZ + (s.toZ - s.fromZ) * t + s.offZ * gap;
+  out.y = s.fromY + (s.toY - s.fromY) * t + s.arc * 4 * t * (1 - t) + s.offY * gap;
+}
+
+function slotProgress(s: CannonShellSlot, tick: number): number {
+  if (s.adopted) return adoptedProgress(s, tick);
+  const span = s.impactTick - s.firedTick;
+  return span > 0 ? clamp01((tick - s.firedTick) / span) : 1;
+}
+
+/** The tick an own shell passed progress `t`: the inverse of its progress. */
+function ownTickAt(s: CannonShellSlot, t: number): number {
+  if (s.adopted && t < s.bendProgress) {
+    return s.firedTick + (t / s.bendProgress) * (s.bendTick - s.firedTick);
+  }
+  const from = s.adopted ? s.bendTick : s.firedTick;
+  const p0 = s.adopted ? s.bendProgress : 0;
+  return p0 < 1 ? from + ((t - p0) / (1 - p0)) * (s.impactTick - from) : from;
+}
+
+/**
+ * An own shell's wake (CannonShotTimeline.trailPuffsInto): dropped along the path it
+ * actually flew, on its own timing, and ending where a shrunk shell vanished. The
+ * spacing comes from its launch's aim, so an adoption moves no puff already dropped.
+ */
+function ownTrailInto(
+  s: CannonShellSlot,
+  tick: number,
+  out: CannonPuff[],
+  ages: Float32Array,
+): number {
+  const { smokeLife, sparkLife, spacing } = CANNON_TRAIL;
+  if (tick < s.firedTick) return 0;
+  const reach = Math.min(slotProgress(s, tick), s.endProgress);
+  if ((tick - ownTickAt(s, reach)) * DT >= smokeLife) {
+    s.shotId = 0;
+    s.own = 0;
+    return 0;
+  }
+  const length =
+    Math.hypot(s.toX + s.offX - s.fromX, s.toY + s.offY - s.fromY, s.toZ + s.offZ - s.fromZ) +
+    s.arc * 0.6;
+  const drops = Math.max(1, Math.ceil(length / spacing));
+  const last = Math.floor(reach * drops);
+  const cap = Math.min(out.length, ages.length);
+  const p = OWN_POINT;
+  let n = 0;
+  for (let k = Math.min(last, drops); k >= 0 && n < cap; k--) {
+    const t = k / drops;
+    const age = (tick - ownTickAt(s, t)) * DT;
+    if (age >= smokeLife) break;
+    if (s.adopted) adoptedPointInto(s, t, p);
+    else {
+      p.x = s.fromX + (s.toX - s.fromX) * t;
+      p.z = s.fromZ + (s.toZ - s.fromZ) * t;
+      p.y = s.fromY + (s.toY - s.fromY) * t + s.arc * 4 * t * (1 - t);
+    }
+    cannonTrailPuffInto(out[n], s.seed, k, false, p.x, p.y, p.z);
+    ages[n++] = age;
+    if ((k & 1) === 1 && age < sparkLife && n < cap) {
+      cannonTrailPuffInto(out[n], s.seed, k, true, p.x, p.y, p.z);
+      ages[n++] = age;
+    }
+  }
+  return n;
+}
+
 export class CannonShotTimeline {
   readonly shells: CannonShellSlot[] = Array.from({ length: CANNON_SHELL_POOL }, () => ({
     shotId: 0,
@@ -515,6 +628,16 @@ export class CannonShotTimeline {
     impactTick: 0,
     arc: 0,
     landed: false,
+    seed: 0,
+    own: 0,
+    adopted: false,
+    bendTick: 0,
+    bendProgress: 0,
+    offX: 0,
+    offY: 0,
+    offZ: 0,
+    fadeAt: Number.NaN,
+    endProgress: 1,
   }));
   readonly muzzles: CannonMuzzleSlot[] = Array.from({ length: CANNON_MUZZLE_POOL }, () => ({
     active: false,
@@ -542,8 +665,16 @@ export class CannonShotTimeline {
   private nextImpact = 0;
   private nextScorch = 0;
 
-  /** `impactPool` blasts stay on the ground at once; the next one takes over the oldest. */
-  constructor(impactPool: number = CANNON_IMPACT_POOL) {
+  /**
+   * `impactPool` blasts stay on the ground at once; the next one takes over the
+   * oldest. A shell whose flight is over waits at its blast point for its impact
+   * for up to `holdTicks` (an own one once adopted), for a display tick that runs
+   * ahead of the clock bringing the impact.
+   */
+  constructor(
+    impactPool: number = CANNON_IMPACT_POOL,
+    private readonly holdTicks = 0,
+  ) {
     this.impacts = Array.from({ length: Math.max(1, Math.floor(impactPool)) }, () => ({
       active: false,
       x: 0,
@@ -559,7 +690,10 @@ export class CannonShotTimeline {
   }
 
   clear(): void {
-    for (const shell of this.shells) shell.shotId = 0;
+    for (const shell of this.shells) {
+      shell.shotId = 0;
+      shell.own = 0;
+    }
     for (const muzzle of this.muzzles) muzzle.active = false;
     for (const impact of this.impacts) impact.active = false;
     for (const scorch of this.scorches) scorch.active = false;
@@ -577,21 +711,143 @@ export class CannonShotTimeline {
     dir: CannonPoint,
     time: number,
     smoke: number,
+    report = true,
+  ): number {
+    const index = this.launch(
+      shot.shotId,
+      shot.shotId,
+      shot,
+      shot.impactTick - shot.flightTicks,
+      shot.impactTick,
+      muzzle,
+    );
+    if (report) this.report(shot.shotId, muzzle, dir, time, smoke);
+    return index;
+  }
+
+  /**
+   * A shell the caller launches ahead of its event (its own shot, on the click),
+   * named by the caller's `serial`, with its muzzle report: it flies toward
+   * `target` from `firedTick` to the predicted `impactTick` until `adoptOwn`
+   * hands it the event's flight. Returns its shell slot.
+   */
+  launchOwn(
+    serial: number,
+    target: CannonPoint,
+    firedTick: number,
+    impactTick: number,
+    muzzle: CannonPoint,
+    dir: CannonPoint,
+    time: number,
+    smoke: number,
+  ): number {
+    // Negative: never a real shot id, so no impact lands it before it is adopted.
+    const index = this.launch(-serial, -serial, target, firedTick, impactTick, muzzle);
+    this.shells[index].own = serial;
+    this.report(-serial, muzzle, dir, time, smoke);
+    return index;
+  }
+
+  /**
+   * The event of own launch `serial` arrived at display `tick`: the shell keeps its
+   * progress, the rest of its flight lands on the event's impact tick, and its
+   * offset from the event's point fades to nothing on the way. False when no
+   * shell of that launch still flies (its slot recycled, shrunk away or spent).
+   */
+  adoptOwn(serial: number, shot: CannonFiredShot, tick: number): boolean {
+    for (let i = 0; i < this.shells.length; i++) {
+      const s = this.shells[i];
+      if (s.own !== serial || s.shotId === 0 || s.adopted || s.landed) continue;
+      if (!Number.isNaN(s.fadeAt)) continue;
+      const at = Math.max(tick, s.firedTick);
+      const progress = this.progress(i, at);
+      if (progress >= 1) return false;
+      s.bendProgress = progress;
+      s.bendTick = at;
+      s.offX = s.toX - shot.x;
+      s.offY = s.toY - shot.y;
+      s.offZ = s.toZ - shot.z;
+      s.toX = shot.x;
+      s.toY = shot.y;
+      s.toZ = shot.z;
+      s.impactTick = shot.impactTick;
+      s.shotId = shot.shotId;
+      s.adopted = true;
+      return true;
+    }
+    return false;
+  }
+
+  /** Own shells no event adopted whose launch `refused` names start shrinking away at `time`. */
+  fadeRefused(refused: (serial: number) => boolean, time: number): void {
+    for (const s of this.shells) {
+      if (s.own === 0 || s.shotId === 0 || s.adopted || s.landed) continue;
+      if (Number.isNaN(s.fadeAt) && refused(s.own)) s.fadeAt = time;
+    }
+  }
+
+  /** A shrunk shell is gone: its wake ends where it vanished, with no blast. */
+  settleFades(tick: number, time: number): void {
+    for (let i = 0; i < this.shells.length; i++) {
+      const s = this.shells[i];
+      if (s.landed || s.shotId === 0 || !(time - s.fadeAt >= CANNON_OWN_FADE_SECONDS)) continue;
+      s.endProgress = this.progress(i, tick);
+      s.landed = true;
+    }
+  }
+
+  /** The shell's size at `time`: 1, or shrinking to 0 once it began to fade. */
+  shellScale(index: number, time: number): number {
+    const fadeAt = this.shells[index].fadeAt;
+    if (Number.isNaN(fadeAt)) return 1;
+    return clamp01(1 - (time - fadeAt) / CANNON_OWN_FADE_SECONDS);
+  }
+
+  private launch(
+    shotId: number,
+    seed: number,
+    target: CannonPoint,
+    firedTick: number,
+    impactTick: number,
+    muzzle: CannonPoint,
   ): number {
     const index = this.nextShell;
     this.nextShell = (index + 1) % this.shells.length;
     const slot = this.shells[index];
-    slot.shotId = shot.shotId;
+    slot.shotId = shotId;
     slot.fromX = muzzle.x;
     slot.fromY = muzzle.y;
     slot.fromZ = muzzle.z;
-    slot.toX = shot.x;
-    slot.toY = shot.y;
-    slot.toZ = shot.z;
-    slot.impactTick = shot.impactTick;
-    slot.firedTick = shot.impactTick - shot.flightTicks;
-    slot.arc = cannonShellArc(Math.hypot(shot.x - muzzle.x, shot.z - muzzle.z), shot.y - muzzle.y);
+    slot.toX = target.x;
+    slot.toY = target.y;
+    slot.toZ = target.z;
+    slot.impactTick = impactTick;
+    slot.firedTick = firedTick;
+    slot.arc = cannonShellArc(
+      Math.hypot(target.x - muzzle.x, target.z - muzzle.z),
+      target.y - muzzle.y,
+    );
     slot.landed = false;
+    slot.seed = seed;
+    slot.own = 0;
+    slot.adopted = false;
+    slot.bendTick = firedTick;
+    slot.bendProgress = 0;
+    slot.offX = 0;
+    slot.offY = 0;
+    slot.offZ = 0;
+    slot.fadeAt = Number.NaN;
+    slot.endProgress = 1;
+    return index;
+  }
+
+  private report(
+    seed: number,
+    muzzle: CannonPoint,
+    dir: CannonPoint,
+    time: number,
+    smoke: number,
+  ): void {
     this.muzzleAt = time;
     const puffs = this.muzzles[this.nextMuzzle];
     this.nextMuzzle = (this.nextMuzzle + 1) % this.muzzles.length;
@@ -599,7 +855,7 @@ export class CannonShotTimeline {
     puffs.at = time;
     puffs.puffCount = cannonMuzzlePuffs(
       puffs.puffs,
-      shot.shotId,
+      seed,
       muzzle.x,
       muzzle.y,
       muzzle.z,
@@ -608,7 +864,6 @@ export class CannonShotTimeline {
       dir.z,
       Math.max(0, Math.min(CANNON_MUZZLE_PUFFS - CANNON_MUZZLE_FIXED_PUFFS, smoke)),
     );
-    return index;
   }
 
   /**
@@ -626,7 +881,10 @@ export class CannonShotTimeline {
     power: number,
     ground: (x: number, z: number) => number,
   ): number {
-    for (const shell of this.shells) if (shell.shotId === shot.shotId) shell.landed = true;
+    // An own shell not yet adopted flies on a caller's serial, which a blast's id may equal.
+    for (const shell of this.shells) {
+      if (shell.shotId === shot.shotId && (shell.own === 0 || shell.adopted)) shell.landed = true;
+    }
     const index = this.nextImpact;
     this.nextImpact = (index + 1) % this.impacts.length;
     const slot = this.impacts[index];
@@ -692,29 +950,37 @@ export class CannonShotTimeline {
 
   /** The shell's progress along its arc at `tick` (0 at the muzzle, 1 at the blast). */
   progress(index: number, tick: number): number {
-    const s = this.shells[index];
-    const span = s.impactTick - s.firedTick;
-    return span > 0 ? clamp01((tick - s.firedTick) / span) : 1;
+    return slotProgress(this.shells[index], tick);
   }
 
   /** Writes the shell's point at progress `t` along its arc. */
   arcPointInto(index: number, t: number, out: CannonPoint): void {
     const s = this.shells[index];
+    if (s.adopted) {
+      adoptedPointInto(s, t, out);
+      return;
+    }
     out.x = s.fromX + (s.toX - s.fromX) * t;
     out.z = s.fromZ + (s.toZ - s.fromZ) * t;
     out.y = s.fromY + (s.toY - s.fromY) * t + s.arc * 4 * t * (1 - t);
   }
 
   /** Writes the shell's point at `tick`; false when no shell flies in this slot
-   *  (free, landed, or not yet or no longer in the air). */
+   *  (free, landed, or not yet or no longer in the air, past any hold). */
   shellAt(index: number, tick: number, out: CannonPoint): boolean {
     const s = this.shells[index];
     if (!s || s.shotId === 0 || s.landed) return false;
     if (tick < s.firedTick) return false;
     const t = this.progress(index, tick);
-    if (t >= 1) return false;
+    if (t >= 1 && !this.waiting(s, tick)) return false;
     this.arcPointInto(index, t, out);
     return true;
+  }
+
+  private waiting(s: CannonShellSlot, tick: number): boolean {
+    return (
+      this.holdTicks > 0 && (s.own === 0 || s.adopted) && tick - s.impactTick <= this.holdTicks
+    );
   }
 
   /** Seconds the shell in `index` has flown at `tick`. */
@@ -732,6 +998,7 @@ export class CannonShotTimeline {
   trailPuffsInto(index: number, tick: number, out: CannonPuff[], ages: Float32Array): number {
     const s = this.shells[index];
     if (!s || s.shotId === 0) return 0;
+    if (s.own !== 0) return ownTrailInto(s, tick, out, ages);
     const { smokeLife, sparkLife, spacing } = CANNON_TRAIL;
     const flight = Math.max(0, s.impactTick - s.firedTick) * DT;
     const elapsed = (tick - s.firedTick) * DT;

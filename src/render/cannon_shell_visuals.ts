@@ -7,6 +7,8 @@
 // and a dark scorch draped on the ground that fades over its life; the camera
 // shakes by distance. Neutral: the caller passes the blast radius and feeds fire
 // and impact events; the curves are cannon_shell_core.ts and cannon_puff_core.ts.
+// A caller's own shot may fly before its event (launchOwn): the event adopts the
+// shell (adoptOwn), or a refused launch shrinks away with no blast.
 //
 // GPU rules (src/render/CLAUDE.md "GPU work"): nothing is built until
 // `prepare`, which allocates the shot pools, mints every mesh, named material
@@ -124,6 +126,11 @@ export interface CannonShellOptions {
    * or once any weapon built them, they are ready at `prepare`.
    */
   texelSlot?: () => Promise<unknown>;
+  /**
+   * Ticks a shell whose flight is over waits at its blast point for its impact,
+   * for a display tick that runs ahead of the clock bringing it; none by default.
+   */
+  holdTicks?: number;
 }
 
 /** The shot's CPU pools: allocated at `prepare`, never for a player who is never seated. */
@@ -199,6 +206,7 @@ export class CannonShellVisuals {
   private readonly burstSlots: number;
   private readonly burstPuffs: number;
   private readonly impactPool: number;
+  private readonly holdTicks: number;
   private host: CannonShellHost | null = null;
   private pools: Pools | null = null;
   private parts: Parts | null = null;
@@ -252,6 +260,7 @@ export class CannonShellVisuals {
     this.burstSlots = Math.max(0, options.bursts?.slots ?? 0);
     this.burstPuffs = Math.max(0, options.bursts?.puffs ?? 0);
     this.impactPool = Math.max(1, Math.floor(options.impacts ?? CANNON_IMPACT_POOL));
+    this.holdTicks = Math.max(0, options.holdTicks ?? 0);
     this.liveChunks = new Array(this.impactPool).fill(false);
     this.puffCapacity =
       SHOT_PUFF_CAPACITY + this.impactPool * CANNON_BLAST_PUFFS + this.burstSlots * this.burstPuffs;
@@ -320,7 +329,7 @@ export class CannonShellVisuals {
   prepare(parent: THREE.Object3D): void {
     if (this.pools || this.disposed) return;
     this.pools = {
-      timeline: new CannonShotTimeline(this.impactPool),
+      timeline: new CannonShotTimeline(this.impactPool, this.holdTicks),
       trailPuffs: Array.from({ length: CANNON_TRAIL_PUFFS }, newCannonPuff),
       trailAges: new Float32Array(CANNON_TRAIL_PUFFS),
       bursts: new CannonPuffBursts(this.burstSlots, this.burstPuffs),
@@ -340,23 +349,61 @@ export class CannonShellVisuals {
     }
   }
 
-  /** A shell leaves the barrel (or `fallback` when there is none) toward the blast point. */
-  fire(shot: CannonFiredShot, fallback: CannonPoint, time: number, reducedMotion: boolean): void {
+  /**
+   * A shell leaves the barrel (or `fallback` when there is none) toward the blast
+   * point. Without its `report` (an own shot's report already played on the
+   * click) it flies with no muzzle, no recoil and no camera kick.
+   */
+  fire(
+    shot: CannonFiredShot,
+    fallback: CannonPoint,
+    time: number,
+    reducedMotion: boolean,
+    report = true,
+  ): void {
     if (this.disposed) return;
-    this.muzzleInto(fallback, shot.x, shot.z);
-    this.point.x = this.muzzle.x;
-    this.point.y = this.muzzle.y;
-    this.point.z = this.muzzle.z;
-    this.dir.x = this.muzzleDir.x;
-    this.dir.y = this.muzzleDir.y;
-    this.dir.z = this.muzzleDir.z;
-    this.pools?.timeline.fired(shot, this.point, this.dir, time, this.counts.smoke);
-    const host = this.host;
-    if (!host) return;
-    if (!this.revealed()) host.vfx.burst(this.muzzle, 'fire', 10, 0.8);
-    if (reducedMotion) return;
-    host.punchFov(CANNON_MUZZLE.fovPunch);
-    host.addShake(CANNON_MUZZLE.shake);
+    this.aimMuzzle(fallback, shot.x, shot.z);
+    this.pools?.timeline.fired(shot, this.point, this.dir, time, this.counts.smoke, report);
+    if (report) this.kick(reducedMotion);
+  }
+
+  /**
+   * The caller's own shot, ahead of its event: the muzzle, the recoil and a shell
+   * toward `target` on a predicted flight from `firedTick` to `impactTick` (display
+   * ticks). `adoptOwn` hands it the event's flight; a launch the caller's `refused`
+   * names (update) shrinks away instead, with no blast.
+   */
+  launchOwn(
+    serial: number,
+    target: CannonPoint,
+    firedTick: number,
+    impactTick: number,
+    fallback: CannonPoint,
+    time: number,
+    reducedMotion: boolean,
+  ): void {
+    if (this.disposed) return;
+    this.aimMuzzle(fallback, target.x, target.z);
+    this.pools?.timeline.launchOwn(
+      serial,
+      target,
+      firedTick,
+      impactTick,
+      this.point,
+      this.dir,
+      time,
+      this.counts.smoke,
+    );
+    this.kick(reducedMotion);
+  }
+
+  /**
+   * The event of own launch `serial`, seen at display `tick`: its shell keeps
+   * flying and lands on the event's impact tick at the event's point. False when
+   * no shell of that launch still flies (the caller draws the event's own).
+   */
+  adoptOwn(serial: number, shot: CannonFiredShot, tick: number): boolean {
+    return !this.disposed && !!this.pools?.timeline.adoptOwn(serial, shot, tick);
   }
 
   /** The shell lands: its blast, chunks, puffs, scorch and shake. */
@@ -411,11 +458,16 @@ export class CannonShellVisuals {
     parts.puffs.end();
   }
 
-  /** `tick` is the display tick the monsters are sampled on; `time` the frame seconds. */
-  update(tick: number, time: number): void {
+  /**
+   * `tick` is the display tick the monsters are sampled on; `time` the frame
+   * seconds; `refused` names the own launches no event will confirm.
+   */
+  update(tick: number, time: number, refused?: (serial: number) => boolean): void {
     const parts = this.parts;
     const pools = this.pools;
     if (!parts || !pools || this.disposed) return;
+    if (refused) pools.timeline.fadeRefused(refused, time);
+    pools.timeline.settleFades(tick, time);
     this.recoil(pools, time);
     this.frameCount = 0;
     this.lightPuffs(parts);
@@ -423,7 +475,7 @@ export class CannonShellVisuals {
     this.groupEnds[0] = this.frameCount;
     this.gatherBursts(pools, time);
     this.groupEnds[1] = this.frameCount;
-    this.drawShells(parts, pools, tick);
+    this.drawShells(parts, pools, tick, time);
     this.groupEnds[2] = this.frameCount;
     this.gatherMuzzles(pools, time);
     this.groupEnds[3] = this.frameCount;
@@ -496,6 +548,26 @@ export class CannonShellVisuals {
       barrel.position.copy(this.barrelRest);
       this.barrelKicked = false;
     }
+  }
+
+  private aimMuzzle(fallback: CannonPoint, towardX: number, towardZ: number): void {
+    this.muzzleInto(fallback, towardX, towardZ);
+    this.point.x = this.muzzle.x;
+    this.point.y = this.muzzle.y;
+    this.point.z = this.muzzle.z;
+    this.dir.x = this.muzzleDir.x;
+    this.dir.y = this.muzzleDir.y;
+    this.dir.z = this.muzzleDir.z;
+  }
+
+  /** The report's camera kick, and the boot particles' flash while the pieces are gated. */
+  private kick(reducedMotion: boolean): void {
+    const host = this.host;
+    if (!host) return;
+    if (!this.revealed()) host.vfx.burst(this.muzzle, 'fire', 10, 0.8);
+    if (reducedMotion) return;
+    host.punchFov(CANNON_MUZZLE.fovPunch);
+    host.addShake(CANNON_MUZZLE.shake);
   }
 
   private muzzleInto(fallback: CannonPoint, towardX: number, towardZ: number): void {
@@ -778,20 +850,25 @@ export class CannonShellVisuals {
     if (frame && cannonPuffInto(puff, age, frame)) this.frameCount++;
   }
 
-  private drawShells(parts: Parts, pools: Pools, tick: number): void {
+  private drawShells(parts: Parts, pools: Pools, tick: number, time: number): void {
     const timeline = pools.timeline;
     let shells = 0;
     for (let i = 0; i < CANNON_SHELL_POOL; i++) {
-      if (timeline.shellAt(i, tick, this.point)) {
+      const size = timeline.shellScale(i, time);
+      if (size > 0 && timeline.shellAt(i, tick, this.point)) {
         const age = timeline.shellAge(i, tick);
         this.pos.set(this.point.x, this.point.y, this.point.z);
         this.euler.set(CANNON_SHELL.spinX * age, CANNON_SHELL.spinY * age, 0);
         this.quat.setFromEuler(this.euler);
-        this.matrix.compose(this.pos, this.quat, this.scale.setScalar(1));
+        this.matrix.compose(this.pos, this.quat, this.scale.setScalar(size));
         parts.shells.setMatrixAt(shells++, this.matrix);
         const glow = this.nextFrame(pools);
         if (glow) {
           cannonShellGlowInto(this.point.x, this.point.y, this.point.z, age, glow);
+          if (size < 1) {
+            glow.size *= size;
+            glow.a *= size;
+          }
           this.frameCount++;
         }
       }

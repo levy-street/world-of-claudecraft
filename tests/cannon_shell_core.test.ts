@@ -501,3 +501,161 @@ describe('cannon shot timeline pools', () => {
     expect(timeline.lastScorch).toBe(-1);
   });
 });
+
+describe('cannon own shell (launched before its event)', () => {
+  const target = { x: 30, y: 0, z: 40 };
+  const at = (timeline: CannonShotTimeline, index: number, tick: number) => {
+    const p = { x: 0, y: 0, z: 0 };
+    return timeline.shellAt(index, tick, p) ? p : null;
+  };
+
+  it('flies its predicted flight, and no impact of another shot lands it', () => {
+    const timeline = new CannonShotTimeline();
+    const i = timeline.launchOwn(7, target, 100, 112, muzzle, axis, 0, FULL.smoke);
+    expect(timeline.shells[i]).toMatchObject({ own: 7, adopted: false });
+    expect(timeline.shells[i].shotId).toBeLessThan(0);
+    expect(timeline.muzzleAt).toBe(0);
+    expect(timeline.muzzles.filter((m) => m.active)).toHaveLength(1);
+    expect(timeline.progress(i, 106)).toBeCloseTo(0.5, 12);
+    timeline.impact({ shotId: 1, x: 5, y: 0, z: 5 }, 0.1, FULL, 6, 1, flat);
+    expect(at(timeline, i, 106)).not.toBeNull();
+  });
+
+  it('keeps its progress when adopted, lands on the event tick at the event point, the offset fading out', () => {
+    const timeline = new CannonShotTimeline();
+    const i = timeline.launchOwn(7, target, 100, 112, muzzle, axis, 0, FULL.smoke);
+    const before = at(timeline, i, 103)!;
+    const event = { shotId: 4, x: 31, y: 0.5, z: 39, flightTicks: 8, impactTick: 115 };
+    expect(timeline.adoptOwn(7, event, 103)).toBe(true);
+    expect(timeline.adoptOwn(7, event, 103)).toBe(false);
+    const after = at(timeline, i, 103)!;
+    expect(Math.hypot(after.x - before.x, after.y - before.y, after.z - before.z)).toBeLessThan(
+      1e-9,
+    );
+    // Re-timed: a quarter of the way at the bend, all the way on the event's impact tick.
+    expect(timeline.progress(i, 103)).toBeCloseTo(0.25, 12);
+    expect(timeline.progress(i, 109)).toBeCloseTo(0.25 + 0.75 * 0.5, 12);
+    expect(timeline.progress(i, 115)).toBe(1);
+    expect(at(timeline, i, 115)).toBeNull();
+    const near = { x: 0, y: 0, z: 0 };
+    timeline.arcPointInto(i, 1 - 1e-9, near);
+    expect(Math.hypot(near.x - 31, near.y - 0.5, near.z - 39)).toBeLessThan(1e-6);
+    // The gap to the event's own arc shrinks all the way down.
+    const gap = (t: number) => {
+      const own = { x: 0, y: 0, z: 0 };
+      timeline.arcPointInto(i, t, own);
+      const s = timeline.shells[i];
+      const x = s.fromX + (event.x - s.fromX) * t;
+      const z = s.fromZ + (event.z - s.fromZ) * t;
+      return Math.hypot(own.x - x, own.z - z);
+    };
+    expect(gap(0.5)).toBeLessThan(gap(0.3));
+    expect(gap(0.9)).toBeLessThan(gap(0.5));
+    // Its impact now lands it like any shot.
+    timeline.impact({ shotId: 4, x: 31, y: 0.5, z: 39 }, 0.6, FULL, 6, 1, flat);
+    expect(timeline.shells[i].landed).toBe(true);
+  });
+
+  it('moves no wake puff it already dropped when it is adopted', () => {
+    const timeline = new CannonShotTimeline();
+    const i = timeline.launchOwn(7, target, 100, 112, muzzle, axis, 0, FULL.smoke);
+    const puffs = Array.from({ length: CANNON_TRAIL_PUFFS }, newCannonPuff);
+    const ages = new Float32Array(CANNON_TRAIL_PUFFS);
+    const n = timeline.trailPuffsInto(i, 104, puffs, ages);
+    expect(n).toBeGreaterThan(2);
+    const dropped = puffs.slice(0, n).map((p) => ({ ...p }));
+    timeline.adoptOwn(7, { shotId: 4, x: 33, y: 0, z: 37, flightTicks: 8, impactTick: 118 }, 104);
+    const again = timeline.trailPuffsInto(i, 104, puffs, ages);
+    expect(again).toBe(n);
+    for (let k = 0; k < n; k++) {
+      const moved = Math.hypot(
+        puffs[k].x - dropped[k].x,
+        puffs[k].y - dropped[k].y,
+        puffs[k].z - dropped[k].z,
+      );
+      expect(moved).toBeLessThan(1e-9);
+      expect(puffs[k].kind).toBe(dropped[k].kind);
+    }
+  });
+
+  it('shrinks away when its launch was refused: no blast, its wake ending where it vanished', () => {
+    const timeline = new CannonShotTimeline();
+    const i = timeline.launchOwn(7, target, 100, 112, muzzle, axis, 0, FULL.smoke);
+    timeline.fadeRefused((serial) => serial === 8, 0.2);
+    expect(Number.isNaN(timeline.shells[i].fadeAt)).toBe(true);
+    timeline.fadeRefused((serial) => serial === 7, 0.2);
+    expect(timeline.shellScale(i, 0.2)).toBe(1);
+    expect(timeline.shellScale(i, 0.325)).toBeCloseTo(0.5, 9);
+    timeline.settleFades(104, 0.3);
+    expect(at(timeline, i, 104)).not.toBeNull();
+    timeline.settleFades(105, 0.45);
+    expect(timeline.shellScale(i, 0.45)).toBe(0);
+    expect(at(timeline, i, 105)).toBeNull();
+    expect(timeline.shells[i].endProgress).toBeCloseTo(5 / 12, 12);
+    expect(timeline.impacts.some((s) => s.active)).toBe(false);
+    expect(timeline.adoptOwn(7, { ...shot, impactTick: 115 }, 105)).toBe(false);
+    const puffs = Array.from({ length: CANNON_TRAIL_PUFFS }, newCannonPuff);
+    const ages = new Float32Array(CANNON_TRAIL_PUFFS);
+    const stopped = timeline.trailPuffsInto(i, 105, puffs, ages);
+    expect(timeline.trailPuffsInto(i, 108, puffs, ages)).toBeLessThanOrEqual(stopped);
+    const spent = 105 + Math.ceil(CANNON_TRAIL.smokeLife / DT) + 1;
+    expect(timeline.trailPuffsInto(i, spent, puffs, ages)).toBe(0);
+    expect(timeline.shells[i].shotId).toBe(0);
+  });
+
+  it('never adopts a recycled slot: the next launches took it over', () => {
+    const timeline = new CannonShotTimeline();
+    const first = timeline.launchOwn(1, target, 100, 112, muzzle, axis, 0, FULL.smoke);
+    for (let serial = 2; serial <= CANNON_SHELL_POOL + 1; serial++) {
+      timeline.launchOwn(serial, target, 100, 112, muzzle, axis, 0, FULL.smoke);
+    }
+    expect(timeline.shells[first].own).toBe(CANNON_SHELL_POOL + 1);
+    expect(timeline.adoptOwn(1, { ...shot, impactTick: 115 }, 104)).toBe(false);
+    expect(timeline.adoptOwn(CANNON_SHELL_POOL + 1, { ...shot, impactTick: 115 }, 104)).toBe(true);
+  });
+
+  it('flies on through a keg blast whose id equals its serial', () => {
+    // A keg's blast lands shells by the id -keg (turretBarrelBlast); kegs and launches both count from 1.
+    const timeline = new CannonShotTimeline();
+    const i = timeline.launchOwn(1, target, 100, 112, muzzle, axis, 0, FULL.smoke);
+    timeline.impact({ shotId: -1, x: 5, y: 0, z: 5 }, 0.1, FULL, 6, 1, flat);
+    expect(at(timeline, i, 106)).not.toBeNull();
+    expect(timeline.adoptOwn(1, { ...shot, impactTick: 115 }, 106)).toBe(true);
+  });
+
+  it('is not adopted once its predicted flight is spent: the event draws its own', () => {
+    const timeline = new CannonShotTimeline();
+    timeline.launchOwn(7, target, 100, 112, muzzle, axis, 0, FULL.smoke);
+    expect(timeline.adoptOwn(7, { ...shot, impactTick: 120 }, 112)).toBe(false);
+    expect(timeline.adoptOwn(7, { ...shot, impactTick: 120 }, 111)).toBe(true);
+  });
+
+  it('waits at its blast point for its impact within the hold, and not at all by default', () => {
+    const held = new CannonShotTimeline(undefined, 4);
+    const i = held.fired(shot, muzzle, axis, 0, FULL.smoke);
+    const end = { x: 0, y: 0, z: 0 };
+    held.arcPointInto(i, 1, end);
+    const waiting = at(held, i, 210 + 2) ?? { x: Number.NaN, y: 0, z: 0 };
+    expect(Math.hypot(waiting.x - end.x, waiting.y - end.y, waiting.z - end.z)).toBeLessThan(1e-9);
+    expect(at(held, i, 210 + 4)).not.toBeNull();
+    expect(at(held, i, 210 + 4.01)).toBeNull();
+    held.impact(shot, 0.6, FULL, 6, 1, flat);
+    expect(at(held, i, 210 + 2)).toBeNull();
+    // An own shell waits once adopted: before, its landing is only a guess.
+    const own = held.launchOwn(7, target, 100, 112, muzzle, axis, 0, FULL.smoke);
+    expect(at(held, own, 113)).toBeNull();
+    held.adoptOwn(7, { ...shot, shotId: 9, impactTick: 115 }, 105);
+    expect(at(held, own, 117)).not.toBeNull();
+    const plain = new CannonShotTimeline();
+    const j = plain.fired(shot, muzzle, axis, 0, FULL.smoke);
+    expect(at(plain, j, 210)).toBeNull();
+  });
+
+  it('flies an event shell without its report when the report already played', () => {
+    const timeline = new CannonShotTimeline();
+    timeline.fired(shot, muzzle, axis, 0.5, FULL.smoke, false);
+    expect(timeline.muzzleAt).toBe(Number.NEGATIVE_INFINITY);
+    expect(timeline.muzzles.some((m) => m.active)).toBe(false);
+    expect(at(timeline, 0, 205)).not.toBeNull();
+  });
+});
