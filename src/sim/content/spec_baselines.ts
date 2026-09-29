@@ -36,7 +36,8 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       ability: [
         { ability: 'arcane_shot', dmgPct: 0.24, costPct: -0.16, cooldownPct: -0.1 },
         { ability: 'serpent_sting', costPct: -0.16 },
-        { ability: 'aimed_shot', dmgPct: 0.5, castPct: -0.2 },
+        { ability: 'aimed_shot', dmgPct: 0.65, castPct: -0.2 },
+        { ability: 'measured_shot', dmgPct: 0.05 },
         { ability: 'concussive_shot', cooldownPct: -0.1 },
       ],
     },

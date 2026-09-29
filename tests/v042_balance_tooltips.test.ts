@@ -18,6 +18,10 @@
 import { describe, expect, it } from 'vitest';
 import { buildAbilityOutputScaling } from '../src/sim/ability_output_scaling';
 import { castAbility } from '../src/sim/combat/casting_lifecycle';
+import {
+  COLDSIGHT_READ_FELL_SHOT_MULT,
+  COLDSIGHT_READ_LONG_DRAW_MULT,
+} from '../src/sim/combat/hunter_coldsight_read';
 import { VESPERS_DOT_DAMAGE_MULT } from '../src/sim/combat/priest/vespers';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import {
@@ -43,7 +47,7 @@ import {
   abilityPrimaryHealingTotal,
   abilityScalingOf,
 } from '../src/ui/ability_damage';
-import { abilityEffectText } from '../src/ui/ability_description';
+import { abilityDisplayDescription, abilityEffectText } from '../src/ui/ability_description';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 import { WORLD_WITHOUT_HUB_YARD } from './helpers/hub_yard';
@@ -404,8 +408,29 @@ describe('v0.42.0 Skulduggery/Coldsight tooltip drift fixes', () => {
       }),
     ).toEqual({
       key: 'hudChrome.auraEffect.coldsightRead',
-      nums: { longDrawPct: 50, fellShotPct: 75 },
+      nums: { longDrawPct: 60, fellShotPct: 85 },
     });
+  });
+
+  it('keeps English shot descriptions aligned with Read and excludes its note from other specs', () => {
+    const longPct = Math.round((COLDSIGHT_READ_LONG_DRAW_MULT - 1) * 100);
+    const fellPct = Math.round((COLDSIGHT_READ_FELL_SHOT_MULT - 1) * 100);
+    for (const spec of ['marksmanship', 'beast_mastery', 'survival']) {
+      const mods = computeTalentModifiers('hunter', { spec, rows: {} });
+      const fell = known('hunter', 'arcane_shot', mods);
+      const fellText = abilityDisplayDescription(fell, '100', SC, undefined, spec);
+      if (spec !== 'marksmanship') {
+        expect(fellText).not.toContain('Coldsight Read');
+        continue;
+      }
+      expect(fellText).toContain(`${fellPct}% more damage`);
+      for (const id of ['aimed_shot', 'rapid_fire']) {
+        const shot = known('hunter', id, mods);
+        const text = abilityDisplayDescription(shot, '100', SC, undefined, spec);
+        expect(text).toContain(`${longPct}% more damage`);
+        if (id === 'rapid_fire') expect(text).toContain(`${fellPct}% more`);
+      }
+    }
   });
 });
 

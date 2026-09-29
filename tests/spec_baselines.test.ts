@@ -29,7 +29,8 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     abilities: {
       arcane_shot: { dmgPct: 0.24, costPct: -0.16, cooldownPct: -0.1 },
       serpent_sting: { costPct: -0.16 },
-      aimed_shot: { dmgPct: 0.5, castPct: -0.2 },
+      aimed_shot: { dmgPct: 0.65, castPct: -0.2 },
+      measured_shot: { dmgPct: 0.05 },
       concussive_shot: { cooldownPct: -0.1 },
     },
   },
