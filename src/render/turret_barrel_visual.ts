@@ -1,6 +1,6 @@
 // Fire and Fly explosive barrels, drawn: a powder keg on a gold warning ring
-// for every standing barrel, popping up where the wave placed it, a flame
-// painted on the facet that faces the tower and a short wick on its lid; lit,
+// for every standing barrel, popping up where the wave placed it, a bomb
+// stencilled on the facet that faces the tower and a short wick on its lid; lit,
 // the ring turns red and throbs, the keg rattles and swells while the wick's
 // tip spits sparks; blowing, a tall fire column and the keg's shards flying
 // off, on top of the cannon's own blast drawn wider and hotter (the owner
@@ -15,13 +15,15 @@
 // The shards (one instanced draw) attach behind the compile gate at the
 // commitment, the kegs (the model's materials swapped for named ones of its
 // own, one clone per pooled slot) behind it too once the model has loaded.
-// The flame mark and the wick are one small mesh per keg on one shared named
-// material: an opaque shield-shaped polygon and a cord on a painted texture
-// the gate uploads, the keg's own program (no alpha test, no blending); its
-// texels are painted once per page, in the texel slot when one is given, and
-// the kegs wait for them behind their rings. The fuse sparks and the fire
-// column ride the cannon's one puff draw through its pooled bursts. No light;
-// a frame allocates nothing. The pure half is turret_barrel_core.ts.
+// The bomb mark and the wick are one small mesh per keg on one shared named
+// material: an opaque mesh cut to the bomb's outline and grown onto bare wood
+// (painted in the keg's own atlas colours, lit through the facet's own blended
+// normals, so its edge does not show) and a cord, on a painted texture the
+// gate uploads, the keg's own program and surface values (no alpha test, no
+// blending); its texels are painted once per page, in the texel slot when one
+// is given, and the kegs wait for them behind their rings. The fuse sparks and
+// the fire column ride the cannon's one puff draw through its pooled bursts.
+// No light; a frame allocates nothing. The pure half is turret_barrel_core.ts.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { TURRET_EXPLOSIVE_BARREL } from '../sim/content/turret_defense';
@@ -45,12 +47,13 @@ import {
   TURRET_BARREL_MODEL_URL,
   TURRET_BARREL_SHARDS,
   TURRET_FUSE_PUFFS,
+  TURRET_KEG_BARE_ASPECT,
   TURRET_KEG_MARK,
   TURRET_KEG_MARK_FRAME,
-  TURRET_KEG_SHIELD_ASPECT,
   TURRET_KEG_WICK,
   TURRET_SHARD_BAND_SHADE,
   type TurretBarrelCounts,
+  type TurretKegNormal,
   type TurretKegPoint,
   type TurretShard,
   type TurretShardFrame,
@@ -61,8 +64,10 @@ import {
   turretBarrelPop,
   turretBarrelRingRadius,
   turretFuseSparksInto,
+  turretKegBombTriangles,
+  turretKegFacetNormalInto,
+  turretKegMarkLayout,
   turretKegMarkTexels,
-  turretKegShieldOutline,
   turretKegWickInto,
   turretKegWickTipInto,
   turretKegYaw,
@@ -103,7 +108,7 @@ const loadBarrelModel: TurretBarrelSource = () =>
 
 let pageMarkTexels: Uint8Array | null = null;
 
-/** The flame mark's texels, painted once per page (filed in the build ledger). */
+/** The bomb mark's texels, painted once per page (filed in the build ledger). */
 function kegMarkTexels(): Uint8Array {
   pageMarkTexels ??= timeBuildSpan('zone:turret-keg-mark', () =>
     turretKegMarkTexels(TURRET_KEG_MARK.texels),
@@ -138,8 +143,6 @@ const LID = new THREE.Color(0x7a4a36);
 const BAND = new THREE.Color(0x8b9ba6);
 const STAVE_DARK = new THREE.Color(0x5a3326);
 const STAVE_LIGHT = new THREE.Color(0x9c5d42);
-/** Arc steps per side of the painted shield's lower point. */
-const SHIELD_ARC_STEPS = 8;
 const WICK_POINTS = 6;
 
 interface Slot {
@@ -152,7 +155,7 @@ interface Slot {
   used: boolean;
 }
 
-/** The flame mark and the wick: one geometry and one material every keg shares. */
+/** The bomb mark and the wick: one geometry and one material every keg shares. */
 interface Mark {
   readonly geometry: THREE.BufferGeometry;
   readonly material: THREE.Material;
@@ -495,7 +498,7 @@ export class TurretBarrelVisual {
     const fit = new THREE.Group();
     fit.add(template);
     fit.scale.setScalar(TURRET_EXPLOSIVE_BARREL.height / size.y);
-    const mark = this.mintMark();
+    const mark = this.mintMark(this.materials[0]);
     if (!mark) return false;
     this.slots.forEach((slot, i) => {
       slot.root.add(i === 0 ? fit : fit.clone(true));
@@ -508,19 +511,24 @@ export class TurretBarrelVisual {
     return true;
   }
 
-  /** The shield and wick geometry, the flame mark's texture and its material on the keg's own surface family; null when the geometry cannot be built. */
-  private mintMark(): Mark | null {
+  /** The bomb and wick geometry, the mark's texture and its material on the keg's own surface (its family, colour and roughness, so the bare wood matches); null when the geometry cannot be built. */
+  private mintMark(keg: THREE.Material): Mark | null {
     const geometry = kegMarkGeometry();
     if (!geometry) return null;
-    const n = TURRET_KEG_MARK.texels;
-    const texture = new THREE.DataTexture(kegMarkTexels(), n, n * 2);
+    const layout = turretKegMarkLayout(TURRET_KEG_MARK.texels);
+    const texture = new THREE.DataTexture(kegMarkTexels(), layout.width, layout.height);
     texture.name = `${TURRET_BARREL_MATERIAL_PREFIX}mark`;
     texture.colorSpace = THREE.SRGBColorSpace;
     texture.magFilter = THREE.LinearFilter;
     texture.minFilter = THREE.LinearMipmapLinearFilter;
     texture.generateMipmaps = true;
     texture.needsUpdate = true;
-    const material = kegSurface(new THREE.Color(0xffffff), texture, 0.85);
+    const surface = keg as THREE.MeshStandardMaterial;
+    const material = kegSurface(
+      surface.color?.clone() ?? new THREE.Color(0xffffff),
+      texture,
+      surface.roughness ?? 0.8,
+    );
     material.name = `${TURRET_BARREL_MATERIAL_PREFIX}mark`;
     const mark = { geometry, material, texture };
     this.mark = mark;
@@ -618,37 +626,42 @@ function kegSurface(
 }
 
 /**
- * The painted shield, a polygon just off its facet whose outline is the
- * texture's own, and the wick's cord rising from the bung, in the keg's frame
- * (yd, before its yaw) with the mark texture's uvs: one geometry.
+ * The bomb's mesh just off its facet, cut to its outline and grown onto bare
+ * wood, and the wick's cord rising from the bung, in the keg's frame (yd,
+ * before its yaw) with the mark texture's uvs: one geometry. The bomb's
+ * normals are the facet's own, blended between its corners as the kit shades
+ * it, so the bare wood round the paint lights as the stave under it.
  */
 function kegMarkGeometry(): THREE.BufferGeometry | null {
   const f = TURRET_KEG_MARK_FRAME;
   const half = f.width / 2;
-  const outline = turretKegShieldOutline(SHIELD_ARC_STEPS);
-  const count = outline.length / 2;
-  const position = new Float32Array((count + 1) * 3);
-  const normal = new Float32Array((count + 1) * 3);
-  const uv = new Float32Array((count + 1) * 2);
-  const v0 = TURRET_KEG_MARK.markBottom;
-  const put = (i: number, x: number, y: number): void => {
+  const layout = turretKegMarkLayout(TURRET_KEG_MARK.texels);
+  const corners = turretKegBombTriangles();
+  const count = corners.length / 2;
+  const position = new Float32Array(count * 3);
+  const normal = new Float32Array(count * 3);
+  const uv = new Float32Array(count * 2);
+  const index: number[] = [];
+  const n: TurretKegNormal = { x: 0, z: 0 };
+  const v0 = layout.markBottom;
+  for (let i = 0; i < count; i++) {
+    const x = corners[i * 2];
+    const y = corners[i * 2 + 1];
     position[i * 3] = f.normalX * f.offset + f.sideX * x * half;
     position[i * 3 + 1] = f.centreY + y * half;
     position[i * 3 + 2] = f.normalZ * f.offset + f.sideZ * x * half;
-    normal[i * 3] = f.normalX;
-    normal[i * 3 + 2] = f.normalZ;
+    turretKegFacetNormalInto(n, x);
+    normal[i * 3] = n.x;
+    normal[i * 3 + 2] = n.z;
     uv[i * 2] = (x + 1) / 2;
-    uv[i * 2 + 1] = v0 + ((1 - v0) * (y / TURRET_KEG_SHIELD_ASPECT + 1)) / 2;
-  };
-  put(0, 0, 0);
-  for (let i = 0; i < count; i++) put(i + 1, outline[i * 2], outline[i * 2 + 1]);
-  const index: number[] = [];
-  for (let i = 0; i < count; i++) index.push(0, 1 + i, 1 + ((i + 1) % count));
-  const shield = new THREE.BufferGeometry();
-  shield.setAttribute('position', new THREE.BufferAttribute(position, 3));
-  shield.setAttribute('normal', new THREE.BufferAttribute(normal, 3));
-  shield.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
-  shield.setIndex(index);
+    uv[i * 2 + 1] = v0 + ((1 - v0) * (y / TURRET_KEG_BARE_ASPECT + 1)) / 2;
+    index.push(i);
+  }
+  const bomb = new THREE.BufferGeometry();
+  bomb.setAttribute('position', new THREE.BufferAttribute(position, 3));
+  bomb.setAttribute('normal', new THREE.BufferAttribute(normal, 3));
+  bomb.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  bomb.setIndex(index);
   const points: THREE.Vector3[] = [];
   const p: TurretKegPoint = { x: 0, y: 0, z: 0 };
   for (let i = 0; i < WICK_POINTS; i++) {
@@ -665,10 +678,10 @@ function kegMarkGeometry(): THREE.BufferGeometry | null {
   // The cord samples the strip along the texture's bottom.
   const wickUv = wick.getAttribute('uv');
   for (let i = 0; i < wickUv.count; i++) {
-    wickUv.setY(i, wickUv.getY(i) * TURRET_KEG_MARK.wickTop);
+    wickUv.setY(i, wickUv.getY(i) * layout.wickTop);
   }
-  const merged = mergeGeometries([shield, wick]);
-  shield.dispose();
+  const merged = mergeGeometries([bomb, wick]);
+  bomb.dispose();
   wick.dispose();
   if (merged) merged.name = `${TURRET_BARREL_MATERIAL_PREFIX}mark`;
   return merged;

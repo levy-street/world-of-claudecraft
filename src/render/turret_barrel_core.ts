@@ -1,23 +1,17 @@
 // Fire and Fly explosive barrels on screen, the pure half: the powder keg's
-// shape and where its painted flame and its wick sit, the flame mark's texels,
-// a new keg's pop up, its warning ring's breathing, the shake and swell
-// through the fuse, the sparks the fuse throws from the wick's tip, the tall
-// fire column of its blast and the keg's shards flying off. The Three
-// consumer is turret_barrel_visual.ts; the blast's flash, fireball, shock
-// ring, dust, dirt and scorch are the cannon's own (cannon_shell_visuals.ts),
-// drawn wider and hotter.
+// shape and where its stencilled bomb and its wick sit, the mark's texels and
+// the outline its mesh is cut to, a new keg's pop up, its warning ring's
+// breathing, the shake and swell through the fuse, the sparks the fuse throws
+// from the wick's tip, the tall fire column of its blast and the keg's shards
+// flying off. The Three consumer is turret_barrel_visual.ts; the blast's
+// flash, fireball, shock ring, dust, dirt and scorch are the cannon's own
+// (cannon_shell_visuals.ts), drawn wider and hotter.
 //
 // Three/DOM/i18n-free (RENDER_PURE_CORES), deterministic (every spread is a
 // hash of the barrel and the index) and allocation-free per frame.
 
 import { TURRET_EXPLOSIVE_BARREL } from '../sim/content/turret_defense';
-import {
-  type CannonPuff,
-  cannonHash01,
-  cannonNoiseInto,
-  cannonPuffLaunch,
-  PUFF,
-} from './cannon_puff_core';
+import { type CannonPuff, cannonHash01, cannonPuffLaunch, PUFF } from './cannon_puff_core';
 
 /** The faceted powder keg of the cannon tower's own kit. */
 export const TURRET_BARREL_MODEL_URL = '/models/biome/hex_barrel.glb';
@@ -28,8 +22,10 @@ export const TURRET_BARREL_MODEL_URL = '/models/biome/hex_barrel.glb';
  * eight flat staves between two iron bands, a bung off the axis on the lid.
  */
 export const TURRET_KEG_SHAPE = {
-  /** The facet the flame is painted on faces this bearing in the model (x += sin, z += cos): the one beside the bung. */
+  /** The facet the bomb is painted on faces this bearing in the model (x += sin, z += cos): the one beside the bung. */
   markFacet: (3 * Math.PI) / 8,
+  /** A facet spans this bearing either side of its middle; the kit's normals point out through its corners. */
+  facetSpread: Math.PI / 8,
   /** That facet's distance from the axis, and its width between its two corners. */
   facetApothem: 0.4137,
   facetWidth: 0.3427,
@@ -42,16 +38,30 @@ export const TURRET_KEG_SHAPE = {
 } as const;
 
 export const TURRET_KEG_MARK = {
-  /** The painted shield's width as a share of its facet's, its height as a share of the bare staves. */
-  width: 0.9,
-  height: 0.88,
   /** Drawn this far off the facet (yd): no depth fight at the clearing's far side. */
   lift: 0.015,
-  /** Texels across the mark's texture; it is twice as tall. */
+  /** Texels across the mark's texture; turretKegMarkLayout gives its rows. */
   texels: 128,
-  /** Texture v: the wick's cord below wickTop, the shield above markBottom, clear between. */
-  wickTop: 1 / 16,
-  markBottom: 1 / 8,
+} as const;
+
+/**
+ * The painted facet's bare wood as hex_barrel.glb's palette atlas holds it
+ * (TURRET_KEG_WOOD.atlas texels square, decoded): the facet's v at its upper
+ * and at its lower band, and the atlas rows between, one sRGB colour each from
+ * `firstRow` down, the same across the facet's columns and a few beyond. The
+ * mark paints its bare wood from them, so under the keg's own light the wood
+ * round the bomb and in its gaps is the keg's.
+ */
+export const TURRET_KEG_WOOD = {
+  atlas: 512,
+  vTop: 6545 / 65535,
+  vBottom: 8578 / 65535,
+  firstRow: 50,
+  rows: [
+    163, 97, 72, 163, 97, 72, 161, 95, 71, 161, 95, 71, 161, 95, 71, 161, 95, 71, 158, 92, 76, 158,
+    92, 76, 158, 92, 76, 158, 92, 76, 156, 90, 74, 156, 90, 74, 156, 90, 74, 156, 90, 74, 158, 92,
+    68, 154, 88, 64, 154, 88, 64, 154, 88, 64,
+  ],
 } as const;
 
 export const TURRET_KEG_WICK = {
@@ -68,10 +78,41 @@ const KEG_H = TURRET_EXPLOSIVE_BARREL.height;
 const FACET_X = Math.sin(TURRET_KEG_SHAPE.markFacet);
 const FACET_Z = Math.cos(TURRET_KEG_SHAPE.markFacet);
 
-/** The painted shield on its facet, in yards of the keg's own frame (before its yaw). */
+/** The bare staves' height over the facet's width: mark units run x over [-1, 1] between its corners and y over [-aspect, aspect] between its bands. */
+export const TURRET_KEG_BARE_ASPECT =
+  (TURRET_KEG_SHAPE.bareHigh - TURRET_KEG_SHAPE.bareLow) / TURRET_KEG_SHAPE.facetWidth;
+
+export interface TurretKegMarkLayout {
+  width: number;
+  height: number;
+  /** Rows of the wick's cord along the bottom; the gutter above it ends at markRow, where the facet's bare staves begin. */
+  cordRows: number;
+  markRow: number;
+  /** The same as texture v: the cord below wickTop, the facet above markBottom. */
+  wickTop: number;
+  markBottom: number;
+}
+
+/** The mark texture's rows for `texels` across: a cord strip and a gutter an eighth of its width each, then the facet in square texels. */
+export function turretKegMarkLayout(texels: number): TurretKegMarkLayout {
+  const width = Math.max(8, Math.floor(texels));
+  const cordRows = Math.max(1, Math.round(width / 8));
+  const markRow = 2 * cordRows;
+  const height = markRow + Math.round(width * TURRET_KEG_BARE_ASPECT);
+  return {
+    width,
+    height,
+    cordRows,
+    markRow,
+    wickTop: cordRows / height,
+    markBottom: markRow / height,
+  };
+}
+
+/** The painted facet's bare staves, in yards of the keg's own frame (before its yaw); one mark unit is half its width. */
 export const TURRET_KEG_MARK_FRAME = {
-  width: TURRET_KEG_MARK.width * TURRET_KEG_SHAPE.facetWidth * KEG_H,
-  height: TURRET_KEG_MARK.height * (TURRET_KEG_SHAPE.bareHigh - TURRET_KEG_SHAPE.bareLow) * KEG_H,
+  width: TURRET_KEG_SHAPE.facetWidth * KEG_H,
+  height: (TURRET_KEG_SHAPE.bareHigh - TURRET_KEG_SHAPE.bareLow) * KEG_H,
   centreY: 0.5 * (TURRET_KEG_SHAPE.bareLow + TURRET_KEG_SHAPE.bareHigh) * KEG_H,
   offset: TURRET_KEG_SHAPE.facetApothem * KEG_H + TURRET_KEG_MARK.lift,
   /** The facet's outward normal, and its right as seen from in front of it. */
@@ -81,12 +122,29 @@ export const TURRET_KEG_MARK_FRAME = {
   sideZ: -FACET_X,
 } as const;
 
-/** The shield's height over its width: its outline spans x in [-1, 1] and y in [-aspect, aspect]. */
-export const TURRET_KEG_SHIELD_ASPECT = TURRET_KEG_MARK_FRAME.height / TURRET_KEG_MARK_FRAME.width;
-
 /** The yaw that turns a keg standing at (x, z) so its painted facet faces the tower at (cx, cz). */
 export function turretKegYaw(x: number, z: number, cx: number, cz: number): number {
   return Math.atan2(cx - x, cz - z) - TURRET_KEG_SHAPE.markFacet;
+}
+
+export interface TurretKegNormal {
+  x: number;
+  z: number;
+}
+
+/**
+ * The keg's own shading normal on its painted facet at mark x, in its frame
+ * before its yaw and not normalized: the kit shades its staves smooth, each
+ * corner's normal pointing out through the corner and blended across the
+ * facet, so bare wood painted on the mark and lit by it matches the facet.
+ */
+export function turretKegFacetNormalInto(out: TurretKegNormal, x: number): TurretKegNormal {
+  const s = x <= -1 ? 0 : x >= 1 ? 1 : 0.5 * (x + 1);
+  const left = TURRET_KEG_SHAPE.markFacet - TURRET_KEG_SHAPE.facetSpread;
+  const right = TURRET_KEG_SHAPE.markFacet + TURRET_KEG_SHAPE.facetSpread;
+  out.x = (1 - s) * Math.sin(left) + s * Math.sin(right);
+  out.z = (1 - s) * Math.cos(left) + s * Math.cos(right);
+  return out;
 }
 
 export interface TurretKegPoint {
@@ -128,251 +186,708 @@ export function turretKegWickTipInto(
   return out;
 }
 
-const SQRT3 = Math.sqrt(3);
+/** Mark units per unit of the bomb's design panel (360 across the facet, y down), and where that panel's origin lands. */
+const PANEL = 1 / 150;
+const panelX = (x: number): number => -1.263 + x * PANEL;
+const panelY = (y: number): number => 1.485 - y * PANEL;
+const DEG = Math.PI / 180;
 
 /**
- * The shield's outline, counter-clockwise seen from in front, as x, y pairs
- * in its own units (x in [-1, 1], y in [-aspect, aspect]): a heater shield,
- * flat on top, straight sides, then two arcs meeting at a point below.
+ * The stencilled bomb, in mark units: a black ball low in the middle, a bare
+ * highlight crescent on it tied to its rim by two stencil bridges, its neck,
+ * a dashed fuse curling up to a yellow spark at the upper right. Traced from
+ * its design panel a fifth larger, the facet being taller than the panel.
  */
-export function turretKegShieldOutline(perArc: number): number[] {
-  const k = TURRET_KEG_SHIELD_ASPECT;
-  const mid = SQRT3 - k;
-  const n = Math.max(1, Math.floor(perArc));
-  const out: number[] = [];
-  for (let i = 0; i < n; i++) {
-    const a = -Math.PI / 3 + (i / n) * (Math.PI / 3);
-    out.push(-1 + 2 * Math.cos(a), mid + 2 * Math.sin(a));
-  }
-  out.push(1, mid, 1, k, -1, k, -1, mid);
-  for (let i = 1; i < n; i++) {
-    const a = Math.PI + (i / n) * (Math.PI / 3);
-    out.push(1 + 2 * Math.cos(a), mid + 2 * Math.sin(a));
+export const TURRET_KEG_BOMB = {
+  ballX: panelX(168),
+  ballY: panelY(270),
+  ballR: 96 * PANEL,
+  /** The crescent: an arc at this share of the ball's radius between two bearings (counter-clockwise from +x), this wide. */
+  crescentR: 0.72,
+  crescentFrom: 98 * DEG,
+  crescentTo: 164 * DEG,
+  crescentWidth: 15 * PANEL,
+  /** A bridge from each end of the crescent out through the rim, this far from the ball's centre. */
+  bridgeWidth: 5 * PANEL,
+  bridgeReach: 100 * PANEL,
+  neckX: panelX(214),
+  neckY: panelY(170),
+  neckLong: 48 * PANEL,
+  neckShort: 28 * PANEL,
+  neckRound: 4 * PANEL,
+  neckTilt: -28 * DEG,
+  /** Two cubic curves from the neck: a start, two controls and an end, then two controls and the end at the spark. */
+  fuse: [
+    panelX(225),
+    panelY(150),
+    panelX(232),
+    panelY(128),
+    panelX(212),
+    panelY(116),
+    panelX(232),
+    panelY(100),
+    panelX(250),
+    panelY(86),
+    panelX(262),
+    panelY(108),
+    panelX(280),
+    panelY(92),
+  ],
+  fuseWidth: 12 * PANEL,
+  dash: 19 * PANEL,
+  gap: 6 * PANEL,
+  /** The spark: a jagged yellow star round a paler heart, each point's reach and bearing wandering by `jitter`; its body a little fuller than the design's, so it stays a yellow dot from afar. */
+  sparkX: panelX(288),
+  sparkY: panelY(86),
+  sparkOuter: 34 * PANEL,
+  sparkInner: 14 * PANEL,
+  sparkPoints: 8,
+  sparkTurn: 0.2,
+  heartOuter: 19 * PANEL,
+  heartInner: 9 * PANEL,
+  heartPoints: 6,
+  heartTurn: -0.3,
+  jitter: 0.18,
+  /** The soft dark overspray round and under the paint: it fades out over twice this either side of the paint's edge, at this strength. */
+  spray: 5 * PANEL,
+  sprayStrength: 0.32,
+  /** How far the mark's mesh reaches past the paint's edge: past the overspray, so its own edge lies on bare wood. */
+  margin: 15 * PANEL,
+  /** The spark sprays nothing: its disc reaches this far past the star's tips. */
+  sparkMargin: 6 * PANEL,
+} as const;
+
+/** Sides of the discs the mesh cuts round the ball and the spark, and steps along each fuse curve. */
+const BALL_SIDES = 32;
+const SPARK_SIDES = 16;
+const FUSE_STEPS = 10;
+
+/** Painted colours (sRGB bytes): the stencil black, the spark's yellow and its heart, the wick's cord. */
+const BOMB_INK = [27, 20, 17] as const;
+const SPARK = [255, 210, 79] as const;
+const SPARK_HEART = [255, 247, 218] as const;
+const CORD = [46, 36, 28] as const;
+/** The paint's edge wanders this far (mark units); a worn streak along the grain takes up to this share of the paint. */
+const PAINT_WOBBLE = 0.013;
+const PAINT_WEAR = 0.85;
+
+/** The keg's bare wood at mark height `y`, as sRGB bytes (unrounded) into `out`: its atlas column, sampled as the facet samples it. */
+export function turretKegWoodInto<T extends number[] | Float64Array>(out: T, y: number): T {
+  const wood = TURRET_KEG_WOOD;
+  const up = 0.5 * (y / TURRET_KEG_BARE_ASPECT + 1);
+  const v = wood.vBottom + (wood.vTop - wood.vBottom) * up;
+  const last = wood.rows.length / 3 - 1;
+  const r = Math.min(last, Math.max(0, v * wood.atlas - 0.5 - wood.firstRow));
+  const r0 = Math.min(last - 1, Math.floor(r));
+  const f = r - r0;
+  for (let c = 0; c < 3; c++) {
+    const a = wood.rows[r0 * 3 + c];
+    out[c] = a + (wood.rows[(r0 + 1) * 3 + c] - a) * f;
   }
   return out;
 }
 
-/** Signed distance to the shield's outline, in its own units: negative inside. */
-function shieldDistance(x: number, y: number): number {
-  const k = TURRET_KEG_SHIELD_ASPECT;
-  const mid = SQRT3 - k;
-  if (y >= mid) return Math.max(Math.abs(x) - 1, y - k);
-  return Math.max(Math.hypot(x + 1, y - mid) - 2, Math.hypot(x - 1, y - mid) - 2, y - k);
+/** The fuse as a polyline (x, y pairs, mark units) and each point's distance along it. */
+interface FusePath {
+  points: Float64Array;
+  along: Float64Array;
 }
 
-interface FlameTongue {
-  /** The foot of its round bulb, the bulb's radius, and its tip. */
-  x0: number;
-  y0: number;
-  r: number;
-  x1: number;
-  y1: number;
-  /** A sideways sway of its middle. */
-  curl: number;
-}
-
-const tongue = (x0: number, y0: number, r: number, x1: number, y1: number, curl: number) => ({
-  x0,
-  y0,
-  r,
-  x1,
-  y1,
-  curl,
-});
-
-/** The painted flame, in the shield's units: a tall middle tongue and one lick either side. */
-const FLAME: readonly FlameTongue[] = [
-  tongue(0, -0.88, 0.46, -0.08, 1.02, 0.12),
-  tongue(-0.2, -0.8, 0.2, -0.55, 0.3, -0.05),
-  tongue(0.2, -0.8, 0.21, 0.52, 0.5, 0.05),
-];
-const FLAME_CORE = tongue(0, -0.74, 0.26, -0.03, 0.32, 0.06);
-
-/** A tongue's edge above its bulb's middle, `u` of the way to the tip: tapering to a point with hollow flanks. */
-function tongueEdge(t: FlameTongue, u: number, side: number): number {
-  const c = t.x0 + (t.x1 - t.x0) * u ** 1.6 + t.curl * Math.sin(Math.PI * u);
-  return c + side * t.r * (1 - u * u) ** 1.5;
-}
-
-/** One tongue's terms along one texel row: all its taper needs depends on the row alone. */
-interface TongueRow {
-  /** 0 beside its bulb only, 1 along its taper, 2 above its tip. */
-  part: number;
-  /** The row's height over the bulb's middle, and over the tip. */
-  dy: number;
-  tipDy: number;
-  centre: number;
-  left: number;
-  right: number;
-  /** Each edge's slope term, sqrt(1 + slope^2). */
-  leftNorm: number;
-  rightNorm: number;
-}
-
-const newTongueRow = (): TongueRow => ({
-  part: 0,
-  dy: 0,
-  tipDy: 0,
-  centre: 0,
-  left: 0,
-  right: 0,
-  leftNorm: 1,
-  rightNorm: 1,
-});
-
-function edgeNorm(t: FlameTongue, u: number, du: number, span: number, side: number): number {
-  const slope =
-    du > 0 ? (tongueEdge(t, u + du, side) - tongueEdge(t, u - du, side)) / (2 * du * span) : 0;
-  return Math.sqrt(1 + slope * slope);
-}
-
-function tongueRowInto(row: TongueRow, t: FlameTongue, y: number): void {
-  const cy = t.y0 + t.r;
-  row.dy = y - cy;
-  row.tipDy = y - t.y1;
-  if (y <= cy) {
-    row.part = 0;
-    return;
+function fusePath(): FusePath {
+  const f = TURRET_KEG_BOMB.fuse;
+  const count = 2 * FUSE_STEPS + 1;
+  const points = new Float64Array(count * 2);
+  const along = new Float64Array(count);
+  let n = 0;
+  for (let curve = 0; curve < 2; curve++) {
+    const o = curve * 6;
+    for (let k = curve === 0 ? 0 : 1; k <= FUSE_STEPS; k++) {
+      const t = k / FUSE_STEPS;
+      const u = 1 - t;
+      const a = u * u * u;
+      const b = 3 * u * u * t;
+      const c = 3 * u * t * t;
+      const d = t * t * t;
+      points[n * 2] = a * f[o] + b * f[o + 2] + c * f[o + 4] + d * f[o + 6];
+      points[n * 2 + 1] = a * f[o + 1] + b * f[o + 3] + c * f[o + 5] + d * f[o + 7];
+      if (n > 0) {
+        along[n] =
+          along[n - 1] +
+          Math.hypot(points[n * 2] - points[n * 2 - 2], points[n * 2 + 1] - points[n * 2 - 1]);
+      }
+      n++;
+    }
   }
-  if (y >= t.y1) {
-    row.part = 2;
-    return;
+  return { points, along };
+}
+
+/** A jagged star's outline (x, y pairs, mark units), every tip and dip wandering by a hash of `salt`. */
+function starOutline(
+  x: number,
+  y: number,
+  points: number,
+  outer: number,
+  inner: number,
+  turn: number,
+  salt: number,
+): Float64Array {
+  const out = new Float64Array(points * 4);
+  const jitter = TURRET_KEG_BOMB.jitter;
+  for (let i = 0; i < points * 2; i++) {
+    const r = (i % 2 === 0 ? outer : inner) * (1 + (cannonHash01(salt, 2 * i) - 0.5) * 2 * jitter);
+    const a =
+      turn +
+      (i / (points * 2)) * 2 * Math.PI +
+      (cannonHash01(salt, 2 * i + 1) - 0.5) * (Math.PI / points) * 0.45;
+    out[i * 2] = x + Math.cos(a) * r;
+    out[i * 2 + 1] = y + Math.sin(a) * r;
   }
-  row.part = 1;
-  const span = t.y1 - cy;
-  const u = (y - cy) / span;
-  row.right = tongueEdge(t, u, 1);
-  row.left = tongueEdge(t, u, -1);
-  row.centre = 0.5 * (row.right + row.left);
-  const du = Math.min(1e-3, u, 1 - u);
-  row.rightNorm = edgeNorm(t, u, du, span, 1);
-  row.leftNorm = edgeNorm(t, u, du, span, -1);
+  return out;
 }
 
-/** Signed distance to one tongue on its row, near enough for painting: its round bulb, then its taper's sideways gap eased by the edge's slope. */
-function tongueDistance(t: FlameTongue, row: TongueRow, x: number): number {
-  const bulb = Math.hypot(x - t.x0, row.dy) - t.r;
-  if (row.part === 0) return bulb;
-  if (row.part === 2) return Math.min(bulb, Math.hypot(row.tipDy, x - t.x1));
-  return x >= row.centre
-    ? Math.min(bulb, (x - row.right) / row.rightNorm)
-    : Math.min(bulb, -(x - row.left) / row.leftNorm);
+const SPARK_SALT = 77;
+const HEART_SALT = 78;
+
+/** The spark's farthest reach from its centre: its disc in the mesh clears it by sparkMargin. */
+function sparkReach(): number {
+  const b = TURRET_KEG_BOMB;
+  return b.sparkOuter * (1 + b.jitter);
 }
 
-/** Painted colours (sRGB bytes): the dark outline, the pale field, the flame's three heats, the wick's cord. */
-const INK = [43, 26, 16] as const;
-const FIELD = [236, 222, 188] as const;
-const FLAME_OUTER = [217, 68, 26] as const;
-const FLAME_MID = [242, 138, 28] as const;
-const FLAME_HOT = [255, 210, 63] as const;
-const CORD = [46, 36, 28] as const;
-const SHIELD_BORDER = 0.09;
-const FLAME_OUTLINE = 0.07;
-const FLAME_INSET = 0.12;
+/** Signed distance to a closed outline (x, y pairs): negative inside. */
+function outlineDistance(outline: Float64Array, x: number, y: number): number {
+  const n = outline.length / 2;
+  let best = Number.POSITIVE_INFINITY;
+  let crossings = 0;
+  let xj = outline[n * 2 - 2];
+  let yj = outline[n * 2 - 1];
+  for (let i = 0; i < n; i++) {
+    const xi = outline[i * 2];
+    const yi = outline[i * 2 + 1];
+    const ex = xi - xj;
+    const ey = yi - yj;
+    const wx = x - xj;
+    const wy = y - yj;
+    const t = Math.min(1, Math.max(0, (wx * ex + wy * ey) / (ex * ex + ey * ey)));
+    const gx = wx - ex * t;
+    const gy = wy - ey * t;
+    best = Math.min(best, gx * gx + gy * gy);
+    // Both tests on every edge, so the loop never meets an untried branch.
+    const spans = yi > y !== yj > y;
+    const left = x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+    crossings += spans && left ? 1 : 0;
+    xj = xi;
+    yj = yi;
+  }
+  const d = Math.sqrt(best);
+  return crossings % 2 === 1 ? -d : d;
+}
+
+/** A value-noise lattice over the facet, `across` cells wide and `up` cells tall. */
+interface NoiseLattice {
+  across: number;
+  up: number;
+  values: Float64Array;
+}
+
+function noiseLattice(across: number, up: number, salt: number): NoiseLattice {
+  const values = new Float64Array((across + 2) * (up + 2));
+  for (let j = 0; j < up + 2; j++) {
+    for (let i = 0; i < across + 2; i++) values[j * (across + 2) + i] = cannonHash01(salt + j, i);
+  }
+  return { across, up, values };
+}
+
+/** The lattice's noise at facet shares (u, v), each in [0, 1], eased between its cells. */
+function noiseAt(l: NoiseLattice, u: number, v: number): number {
+  const x = u * l.across;
+  const y = v * l.up;
+  const i = Math.max(0, Math.min(l.across, Math.floor(x)));
+  const j = Math.max(0, Math.min(l.up, Math.floor(y)));
+  const fx = x - i;
+  const fy = y - j;
+  const sx = fx * fx * (3 - 2 * fx);
+  const sy = fy * fy * (3 - 2 * fy);
+  const row = l.across + 2;
+  const a = l.values[j * row + i];
+  const b = l.values[j * row + i + 1];
+  const c = l.values[(j + 1) * row + i];
+  const d = l.values[(j + 1) * row + i + 1];
+  const bottom = a + (b - a) * sx;
+  return bottom + (c + (d - c) * sx - bottom) * sy;
+}
 
 /**
- * The flame mark's texture, `texels` wide and twice as tall, row 0 at the
- * bottom (texture v up): the wick's dark cord in a strip along the bottom,
- * then a clear gutter, then a hand-painted heater shield, pale inside a dark
- * border, bearing an orange flame with a yellow heart and a dark outline.
- * Alpha is the shield's coverage (clear around it) and the cord's; RGB past
- * the shield's edge carries its border ink, so no mip level greys the rim.
+ * The mesh the mark is drawn on, cut to the bomb: a disc round its ball, its
+ * neck, a strip along its fuse and a disc round its spark, each grown by the
+ * margin so its edge lies on bare wood, as triangles (x, y per corner, in
+ * mark units) wound counter-clockwise seen from in front. The pieces overlap;
+ * the texture maps flat across all of them, so an overlap draws the same texel.
+ */
+export function turretKegBombTriangles(): number[] {
+  const b = TURRET_KEG_BOMB;
+  const m = b.margin;
+  const out: number[] = [];
+  const tri = (ax: number, ay: number, bx: number, by: number, cx: number, cy: number): void => {
+    if ((bx - ax) * (cy - ay) - (by - ay) * (cx - ax) >= 0) out.push(ax, ay, bx, by, cx, cy);
+    else out.push(ax, ay, cx, cy, bx, by);
+  };
+  const disc = (x: number, y: number, reach: number, sides: number): void => {
+    // The polygon's sides, not its corners, clear the reach.
+    const r = reach / Math.cos(Math.PI / sides);
+    for (let i = 0; i < sides; i++) {
+      const a0 = (i / sides) * 2 * Math.PI;
+      const a1 = ((i + 1) / sides) * 2 * Math.PI;
+      tri(
+        x,
+        y,
+        x + Math.cos(a0) * r,
+        y + Math.sin(a0) * r,
+        x + Math.cos(a1) * r,
+        y + Math.sin(a1) * r,
+      );
+    }
+  };
+  disc(b.ballX, b.ballY, b.ballR + m, BALL_SIDES);
+  const c = Math.cos(b.neckTilt);
+  const s = Math.sin(b.neckTilt);
+  const hl = b.neckLong / 2 + m;
+  const hs = b.neckShort / 2 + m;
+  const corner = (u: number, v: number, k: number): number =>
+    k === 0 ? b.neckX + c * u - s * v : b.neckY + s * u + c * v;
+  const x0 = corner(-hl, -hs, 0);
+  const y0 = corner(-hl, -hs, 1);
+  const x1 = corner(hl, -hs, 0);
+  const y1 = corner(hl, -hs, 1);
+  const x2 = corner(hl, hs, 0);
+  const y2 = corner(hl, hs, 1);
+  const x3 = corner(-hl, hs, 0);
+  const y3 = corner(-hl, hs, 1);
+  tri(x0, y0, x1, y1, x2, y2);
+  tri(x0, y0, x2, y2, x3, y3);
+  const { points } = fusePath();
+  const count = points.length / 2;
+  const half = b.fuseWidth / 2 + m;
+  let leftX = 0;
+  let leftY = 0;
+  let rightX = 0;
+  let rightY = 0;
+  for (let k = 0; k < count; k++) {
+    const a = Math.max(0, k - 1);
+    const z = Math.min(count - 1, k + 1);
+    let tx = points[z * 2] - points[a * 2];
+    let ty = points[z * 2 + 1] - points[a * 2 + 1];
+    const len = Math.hypot(tx, ty) || 1;
+    tx /= len;
+    ty /= len;
+    // Its two ends reach past the curve by the margin too.
+    const ext = k === 0 ? -m : k === count - 1 ? m : 0;
+    const x = points[k * 2] + tx * ext;
+    const y = points[k * 2 + 1] + ty * ext;
+    const lx = x - ty * half;
+    const ly = y + tx * half;
+    const rx = x + ty * half;
+    const ry = y - tx * half;
+    if (k > 0) {
+      tri(leftX, leftY, rightX, rightY, rx, ry);
+      tri(leftX, leftY, rx, ry, lx, ly);
+    }
+    leftX = lx;
+    leftY = ly;
+    rightX = rx;
+    rightY = ry;
+  }
+  disc(b.sparkX, b.sparkY, sparkReach() + b.sparkMargin, SPARK_SIDES);
+  return out;
+}
+
+/**
+ * The mark's texture as turretKegMarkLayout sizes it, row 0 at the bottom
+ * (texture v up): the wick's dark cord in a strip along the bottom, a gutter,
+ * then the painted facet's bare staves between its bands, the keg's own wood
+ * (TURRET_KEG_WOOD) bearing the stencilled bomb: black paint with a soft
+ * overspray, worn in streaks along the grain, bare wood in its crescent and
+ * its bridges, and the spark's yellow star. Opaque throughout: the mesh's
+ * outline is the bomb's, grown onto bare wood.
  */
 export function turretKegMarkTexels(texels: number): Uint8Array {
-  const w = Math.max(8, Math.floor(texels));
-  const h = w * 2;
-  const data = new Uint8Array(w * h * 4);
-  // One soft octave for the brush's unevenness and one fine one for its grain.
-  const brush = cannonNoiseInto(new Float64Array(h * h), h, 6, 83, 1, 1);
-  const grain = cannonNoiseInto(new Float64Array(h * h), h, 40, 29, 1, 1);
-  // A loop of its own each: one loop crossing from the cord to the shield
+  const layout = turretKegMarkLayout(texels);
+  const data = new Uint8Array(layout.width * layout.height * 4);
+  // A loop of its own each: one loop crossing from the cord to the facet
   // deoptimized on the way, a cost the page's first paint pays.
-  paintKegCord(data, w, grain);
-  paintKegShield(data, w, brush, grain);
+  paintKegCord(data, layout);
+  paintKegBomb(data, layout);
   return data;
 }
 
-function putTexel(data: Uint8Array, at: number, r: number, g: number, b: number, a: number): void {
-  data[at] = Math.round(Math.min(255, Math.max(0, r)));
-  data[at + 1] = Math.round(Math.min(255, Math.max(0, g)));
-  data[at + 2] = Math.round(Math.min(255, Math.max(0, b)));
-  data[at + 3] = Math.round(255 * a);
-}
-
-/** The wick's cord, twisted in faint diagonal strands, along the bottom; its ink carried on through the clear gutter above. */
-function paintKegCord(data: Uint8Array, w: number, grain: Float64Array): void {
-  const h = w * 2;
-  const wickRows = Math.round(h * TURRET_KEG_MARK.wickTop);
-  const markRow = Math.round(h * TURRET_KEG_MARK.markBottom);
-  for (let j = 0; j < markRow; j++) {
+/** The wick's cord, twisted in faint diagonal strands, along the bottom; the gutter above it carries the cord's ink, then the wood's, so no mip level greys either. */
+function paintKegCord(data: Uint8Array, layout: TurretKegMarkLayout): void {
+  const w = layout.width;
+  const wickRows = layout.cordRows;
+  const markRow = layout.markRow;
+  // The cord's fibre: a faint unevenness along it, the same all round it.
+  const grain = noiseLattice(40, 1, 29);
+  for (let j = 0; j < wickRows; j++) {
+    for (let i = 0; i < w; i++) {
+      const strand = ((i / w) * 10 + j / wickRows) % 1;
+      const fine = noiseAt(grain, i / w, 0) - 0.5;
+      const lit = 0.82 + 0.3 * (strand < 0.5 ? strand : 1 - strand) + 0.1 * fine;
+      const at = (j * w + i) * 4;
+      data[at] = CORD[0] * lit + 0.5;
+      data[at + 1] = CORD[1] * lit + 0.5;
+      data[at + 2] = CORD[2] * lit + 0.5;
+      data[at + 3] = 255;
+    }
+  }
+  const wood = turretKegWoodInto(new Float64Array(3), -TURRET_KEG_BARE_ASPECT);
+  const split = Math.round((wickRows + markRow) / 2);
+  for (let j = wickRows; j < markRow; j++) {
+    const ink = j < split ? CORD : wood;
     for (let i = 0; i < w; i++) {
       const at = (j * w + i) * 4;
-      if (j < wickRows) {
-        const strand = ((i / w) * 10 + j / wickRows) % 1;
-        const fine = grain[j * h + 2 * i] - 0.5;
-        const lit = 0.82 + 0.3 * (strand < 0.5 ? strand : 1 - strand) + 0.1 * fine;
-        putTexel(data, at, CORD[0] * lit, CORD[1] * lit, CORD[2] * lit, 1);
-      } else {
-        putTexel(data, at, CORD[0], CORD[1], CORD[2], 0);
-      }
+      data[at] = ink[0] + 0.5;
+      data[at + 1] = ink[1] + 0.5;
+      data[at + 2] = ink[2] + 0.5;
+      data[at + 3] = 255;
     }
   }
 }
 
-function paintKegShield(
-  data: Uint8Array,
-  w: number,
-  brush: Float64Array,
-  grain: Float64Array,
-): void {
-  const h = w * 2;
-  const markRow = Math.round(h * TURRET_KEG_MARK.markBottom);
-  const rows = h - markRow;
-  const k = TURRET_KEG_SHIELD_ASPECT;
-  const aa = 1.2 / w;
-  const cover = (d: number): number => {
-    const c = 0.5 - d / aa;
-    return c < 0 ? 0 : c > 1 ? 1 : c;
+/** Rows of the mark's texture and where they sit in mark units: row `j` of the facet's stretch is at mark height `y0 + j * dy`. */
+interface MarkGrid {
+  w: number;
+  markRow: number;
+  rows: number;
+  dy: number;
+  y0: number;
+}
+
+function markGrid(layout: TurretKegMarkLayout): MarkGrid {
+  const rows = layout.height - layout.markRow;
+  const dy = (2 * TURRET_KEG_BARE_ASPECT) / rows;
+  return {
+    w: layout.width,
+    markRow: layout.markRow,
+    rows,
+    dy,
+    y0: -TURRET_KEG_BARE_ASPECT + dy / 2,
   };
-  const rgb = [0, 0, 0];
-  const over = (colour: readonly number[], a: number): void => {
-    for (let c = 0; c < 3; c++) rgb[c] += (colour[c] - rgb[c]) * a;
-  };
-  const flameRows = FLAME.map(newTongueRow);
-  const coreRow = newTongueRow();
-  for (let j = markRow; j < h; j++) {
-    const y = (((j - markRow + 0.5) / rows) * 2 - 1) * k;
-    for (let t = 0; t < FLAME.length; t++) tongueRowInto(flameRows[t], FLAME[t], y);
-    tongueRowInto(coreRow, FLAME_CORE, y);
-    for (let i = 0; i < w; i++) {
-      const noise = brush[j * h + 2 * i] - 0.5;
-      const x = ((i + 0.5) / w) * 2 - 1;
-      const d = shieldDistance(x, y);
-      // The border's inner edge wanders a little, as a brush's would; its
-      // outer edge is the shield's own, the mesh's silhouette.
-      const border = cover(-(d + SHIELD_BORDER + 0.025 * noise));
-      // Wholly under the border's ink: nothing beneath it shows.
-      if (border === 1) {
-        rgb[0] = INK[0];
-        rgb[1] = INK[1];
-        rgb[2] = INK[2];
-      } else {
-        const tone = 1 + 0.08 * noise + 0.06 * (grain[j * h + 2 * i] - 0.5);
-        rgb[0] = FIELD[0] * tone;
-        rgb[1] = FIELD[1] * tone;
-        rgb[2] = FIELD[2] * tone;
-        let df = Number.POSITIVE_INFINITY;
-        for (let t = 0; t < FLAME.length; t++) {
-          df = Math.min(df, tongueDistance(FLAME[t], flameRows[t], x));
-        }
-        df += 0.05 * noise;
-        over(INK, cover(df - FLAME_OUTLINE));
-        over(FLAME_OUTER, cover(df));
-        over(FLAME_MID, cover(df + FLAME_INSET));
-        over(FLAME_HOT, cover(tongueDistance(FLAME_CORE, coreRow, x) + 0.04 * noise));
-        over(INK, border);
+}
+
+/** The texel range [lo, hi) a span of mark units covers, clamped to `count`. */
+function spanLo(lo: number, step: number, origin: number): number {
+  return Math.max(0, Math.floor((lo - origin) / step));
+}
+
+function spanHi(hi: number, step: number, origin: number, count: number): number {
+  return Math.min(count, Math.ceil((hi - origin) / step) + 1);
+}
+
+/**
+ * The bomb over the keg's wood, in passes of one small loop each (a loop
+ * that meets a new branch rows after the optimizer took it deoptimizes, a
+ * cost the page's first paint pays): the wood, then the paint's signed
+ * distance (the ball less its crescent and bridges, the neck, then the fuse),
+ * then the ink from that field, then the spark.
+ */
+function paintKegBomb(data: Uint8Array, layout: TurretKegMarkLayout): void {
+  const grid = markGrid(layout);
+  paintKegWood(data, grid);
+  const field = new Float64Array(grid.w * grid.rows).fill(Number.POSITIVE_INFINITY);
+  inkBall(field, grid);
+  inkNeck(field, grid);
+  inkFuse(field, grid);
+  const wear = { streaks: noiseLattice(48, 3, 911), patches: noiseLattice(5, 6, 419) };
+  paintKegInk(data, field, grid, wear);
+  paintKegSpark(data, grid, wear);
+}
+
+function paintKegWood(data: Uint8Array, g: MarkGrid): void {
+  const wood = new Float64Array(3);
+  for (let j = 0; j < g.rows; j++) {
+    turretKegWoodInto(wood, g.y0 + j * g.dy);
+    const r = wood[0] + 0.5;
+    const gr = wood[1] + 0.5;
+    const b = wood[2] + 0.5;
+    const row = (g.markRow + j) * g.w * 4;
+    for (let i = 0; i < g.w; i++) {
+      const at = row + i * 4;
+      data[at] = r;
+      data[at + 1] = gr;
+      data[at + 2] = b;
+      data[at + 3] = 255;
+    }
+  }
+}
+
+/**
+ * The ball less its bare crescent and the crescent's two stencil bridges.
+ * Past the mesh's margin a texel is bare whatever the cuts say, so there the
+ * plain disc's distance stands in for them.
+ */
+function inkBall(field: Float64Array, g: MarkGrid): void {
+  const b = TURRET_KEG_BOMB;
+  const bx = b.ballX;
+  const by = b.ballY;
+  const r = b.ballR;
+  const cutR = b.crescentR * r;
+  const cutHalf = b.crescentWidth / 2;
+  const bridgeHalf = b.bridgeWidth / 2;
+  const fromX = Math.cos(b.crescentFrom);
+  const fromY = Math.sin(b.crescentFrom);
+  const toX = Math.cos(b.crescentTo);
+  const toY = Math.sin(b.crescentTo);
+  const ax0 = bx + fromX * cutR;
+  const ay0 = by + fromY * cutR;
+  const ax1 = bx + toX * cutR;
+  const ay1 = by + toY * cutR;
+  const ex0 = fromX * (b.bridgeReach - cutR);
+  const ey0 = fromY * (b.bridgeReach - cutR);
+  const ex1 = toX * (b.bridgeReach - cutR);
+  const ey1 = toY * (b.bridgeReach - cutR);
+  const len = (b.bridgeReach - cutR) ** 2;
+  const reach = r + b.margin;
+  const dx = 2 / g.w;
+  const x0 = -1 + dx / 2;
+  const jLo = spanLo(by - reach, g.dy, g.y0);
+  const jHi = spanHi(by + reach, g.dy, g.y0, g.rows);
+  const iLo = spanLo(bx - reach, dx, x0);
+  const iHi = spanHi(bx + reach, dx, x0, g.w);
+  for (let j = jLo; j < jHi; j++) {
+    const y = g.y0 + j * g.dy;
+    const oy = y - by;
+    for (let i = iLo; i < iHi; i++) {
+      const x = x0 + i * dx;
+      const ox = x - bx;
+      const rho = Math.sqrt(ox * ox + oy * oy);
+      const cell = j * g.w + i;
+      if (!(rho < reach)) {
+        field[cell] = rho - r;
+        continue;
       }
-      putTexel(data, (j * w + i) * 4, rgb[0], rgb[1], rgb[2], cover(d));
+      // Within the crescent's sweep (under half a turn): past its start and short of its end.
+      const pastStart = fromX * oy - fromY * ox >= 0;
+      const shortOfEnd = ox * toY - oy * toX >= 0;
+      const arc = Math.abs(rho - cutR);
+      const caps = Math.sqrt(
+        Math.min((x - ax0) ** 2 + (y - ay0) ** 2, (x - ax1) ** 2 + (y - ay1) ** 2),
+      );
+      const crescent = (pastStart && shortOfEnd ? arc : caps) - cutHalf;
+      const t0 = Math.min(1, Math.max(0, ((x - ax0) * ex0 + (y - ay0) * ey0) / len));
+      const t1 = Math.min(1, Math.max(0, ((x - ax1) * ex1 + (y - ay1) * ey1) / len));
+      const bridge0 = Math.sqrt((x - ax0 - ex0 * t0) ** 2 + (y - ay0 - ey0 * t0) ** 2) - bridgeHalf;
+      const bridge1 = Math.sqrt((x - ax1 - ex1 * t1) ** 2 + (y - ay1 - ey1 * t1) ** 2) - bridgeHalf;
+      field[cell] = Math.max(rho - r, -Math.min(crescent, bridge0, bridge1));
+    }
+  }
+}
+
+/** The bomb's neck, a rounded bar tilted over the ball's upper right, over the ball's field. */
+function inkNeck(field: Float64Array, g: MarkGrid): void {
+  const b = TURRET_KEG_BOMB;
+  const nx = b.neckX;
+  const ny = b.neckY;
+  const c = Math.cos(b.neckTilt);
+  const s = Math.sin(b.neckTilt);
+  const round = b.neckRound;
+  const hl = b.neckLong / 2 - round;
+  const hs = b.neckShort / 2 - round;
+  const reach = Math.hypot(b.neckLong, b.neckShort) / 2 + b.margin;
+  const dx = 2 / g.w;
+  const x0 = -1 + dx / 2;
+  const jLo = spanLo(ny - reach, g.dy, g.y0);
+  const jHi = spanHi(ny + reach, g.dy, g.y0, g.rows);
+  const iLo = spanLo(nx - reach, dx, x0);
+  const iHi = spanHi(nx + reach, dx, x0, g.w);
+  for (let j = jLo; j < jHi; j++) {
+    const ny0 = g.y0 + j * g.dy - ny;
+    for (let i = iLo; i < iHi; i++) {
+      const nx0 = x0 + i * dx - nx;
+      const qx = Math.abs(nx0 * c + ny0 * s) - hl;
+      const qy = Math.abs(-nx0 * s + ny0 * c) - hs;
+      const outX = Math.max(qx, 0);
+      const outY = Math.max(qy, 0);
+      const neck = Math.sqrt(outX * outX + outY * outY) + Math.min(Math.max(qx, qy), 0) - round;
+      const cell = j * g.w + i;
+      field[cell] = Math.min(field[cell], neck);
+    }
+  }
+}
+
+/** The dashed fuse: each texel near it measures the segments its row comes near. */
+function inkFuse(field: Float64Array, g: MarkGrid): void {
+  const b = TURRET_KEG_BOMB;
+  const { points, along } = fusePath();
+  const segments = points.length / 2 - 1;
+  const half = b.fuseWidth / 2;
+  const reach = half + b.margin;
+  const dash = b.dash;
+  const period = b.dash + b.gap;
+  let low = Number.POSITIVE_INFINITY;
+  let high = Number.NEGATIVE_INFINITY;
+  for (let k = 0; k <= segments; k++) {
+    low = Math.min(low, points[k * 2 + 1]);
+    high = Math.max(high, points[k * 2 + 1]);
+  }
+  const dx = 2 / g.w;
+  const x0 = -1 + dx / 2;
+  const jLo = spanLo(low - reach, g.dy, g.y0);
+  const jHi = spanHi(high + reach, g.dy, g.y0, g.rows);
+  const near = new Int32Array(segments);
+  for (let j = jLo; j < jHi; j++) {
+    const y = g.y0 + j * g.dy;
+    let count = 0;
+    let left = Number.POSITIVE_INFINITY;
+    let right = Number.NEGATIVE_INFINITY;
+    for (let k = 0; k < segments; k++) {
+      const ay = points[k * 2 + 1];
+      const by = points[k * 2 + 3];
+      const inReach = y > Math.min(ay, by) - reach && y < Math.max(ay, by) + reach;
+      near[count] = k;
+      count += inReach ? 1 : 0;
+      left = inReach ? Math.min(left, points[k * 2], points[k * 2 + 2]) : left;
+      right = inReach ? Math.max(right, points[k * 2], points[k * 2 + 2]) : right;
+    }
+    if (count === 0) continue;
+    const iLo = spanLo(left - reach, dx, x0);
+    const iHi = spanHi(right + reach, dx, x0, g.w);
+    for (let i = iLo; i < iHi; i++) {
+      const x = x0 + i * dx;
+      let best = Number.POSITIVE_INFINITY;
+      let at = 0;
+      for (let n = 0; n < count; n++) {
+        const k = near[n];
+        const ax = points[k * 2];
+        const ay = points[k * 2 + 1];
+        const ex = points[k * 2 + 2] - ax;
+        const ey = points[k * 2 + 3] - ay;
+        const t = Math.min(1, Math.max(0, ((x - ax) * ex + (y - ay) * ey) / (ex * ex + ey * ey)));
+        const gx = x - ax - ex * t;
+        const gy = y - ay - ey * t;
+        const dist = gx * gx + gy * gy;
+        const closer = dist < best;
+        at = closer ? along[k] + (along[k + 1] - along[k]) * t : at;
+        best = closer ? dist : best;
+      }
+      const phase = at % period;
+      const inDash = -Math.min(phase, dash - phase);
+      const inGap = Math.min(phase - dash, period - phase);
+      const along2 = phase < dash ? inDash : inGap;
+      const cell = j * g.w + i;
+      field[cell] = Math.min(field[cell], Math.max(Math.sqrt(best) - half, along2));
+    }
+  }
+}
+
+/** How much of the paint a worn patch keeps at facet shares (u, v): streaks along the grain, gathered in patches. */
+function wearKeep(wear: KegWear, u: number, v: number): number {
+  const patch = smoothstep((noiseAt(wear.patches, u, v) - 0.4) / 0.25);
+  return 1 - PAINT_WEAR * patch * smoothstep((noiseAt(wear.streaks, u, v) - 0.55) / 0.15);
+}
+
+interface KegWear {
+  streaks: NoiseLattice;
+  patches: NoiseLattice;
+}
+
+/**
+ * The stencil black from the paint's distance field: a soft overspray round
+ * and under it, the paint over that with a wandering edge, worn off in
+ * streaks along the grain where a patch of wear lies.
+ */
+function paintKegInk(data: Uint8Array, field: Float64Array, g: MarkGrid, wear: KegWear): void {
+  const b = TURRET_KEG_BOMB;
+  const wobble = noiseLattice(10, 12, 263);
+  const wood = new Float64Array(3);
+  const aa = 2.4 / g.w;
+  const reach = b.margin;
+  const strength = b.sprayStrength;
+  const sprayIn = -2 * b.spray;
+  const sprayOut = 4 * b.spray;
+  const dx = 2 / g.w;
+  const x0 = -1 + dx / 2;
+  for (let j = 0; j < g.rows; j++) {
+    const y = g.y0 + j * g.dy;
+    const v = 0.5 * (y / TURRET_KEG_BARE_ASPECT + 1);
+    turretKegWoodInto(wood, y);
+    const row = j * g.w;
+    for (let i = 0; i < g.w; i++) {
+      const d = field[row + i];
+      if (!(d < reach)) continue;
+      const u = 0.5 * (x0 + i * dx + 1);
+      const keep = wearKeep(wear, u, v);
+      const spray = strength * (1 - smoothstep((d - sprayIn) / sprayOut));
+      // The stencil's edge wanders a little; the overspray under it does not.
+      const edge = d + PAINT_WOBBLE * (2 * noiseAt(wobble, u, v) - 1);
+      const paint = Math.min(1, Math.max(0, 0.5 - edge / aa)) * keep;
+      const ink = spray + (1 - spray) * paint;
+      const at = (g.markRow * g.w + row + i) * 4;
+      data[at] = wood[0] + (BOMB_INK[0] - wood[0]) * ink + 0.5;
+      data[at + 1] = wood[1] + (BOMB_INK[1] - wood[1]) * ink + 0.5;
+      data[at + 2] = wood[2] + (BOMB_INK[2] - wood[2]) * ink + 0.5;
+    }
+  }
+}
+
+/** The spark's yellow star, then its paler heart, over whatever lies under them (the fuse's end). */
+function paintKegSpark(data: Uint8Array, g: MarkGrid, wear: KegWear): void {
+  const b = TURRET_KEG_BOMB;
+  const reach = 1 + b.jitter;
+  const spark = starOutline(
+    b.sparkX,
+    b.sparkY,
+    b.sparkPoints,
+    b.sparkOuter,
+    b.sparkInner,
+    b.sparkTurn,
+    SPARK_SALT,
+  );
+  paintKegStar(data, g, wear, spark, b.sparkOuter * reach, SPARK);
+  const heart = starOutline(
+    b.sparkX,
+    b.sparkY,
+    b.heartPoints,
+    b.heartOuter,
+    b.heartInner,
+    b.heartTurn,
+    HEART_SALT,
+  );
+  paintKegStar(data, g, wear, heart, b.heartOuter * reach, SPARK_HEART);
+}
+
+/** One star outline filled in `colour` round the spark's centre, out to `reach`, worn like the paint. */
+function paintKegStar(
+  data: Uint8Array,
+  g: MarkGrid,
+  wear: KegWear,
+  outline: Float64Array,
+  reach: number,
+  colour: readonly number[],
+): void {
+  const b = TURRET_KEG_BOMB;
+  const aa = 2.4 / g.w;
+  const out = reach + aa;
+  const dx = 2 / g.w;
+  const x0 = -1 + dx / 2;
+  const jLo = spanLo(b.sparkY - out, g.dy, g.y0);
+  const jHi = spanHi(b.sparkY + out, g.dy, g.y0, g.rows);
+  const iLo = spanLo(b.sparkX - out, dx, x0);
+  const iHi = spanHi(b.sparkX + out, dx, x0, g.w);
+  for (let j = jLo; j < jHi; j++) {
+    const y = g.y0 + j * g.dy;
+    const v = 0.5 * (y / TURRET_KEG_BARE_ASPECT + 1);
+    const oy = y - b.sparkY;
+    for (let i = iLo; i < iHi; i++) {
+      const x = x0 + i * dx;
+      const ox = x - b.sparkX;
+      if (ox * ox + oy * oy > out * out) continue;
+      const fill =
+        Math.min(1, Math.max(0, 0.5 - outlineDistance(outline, x, y) / aa)) *
+        wearKeep(wear, 0.5 * (x + 1), v);
+      const at = ((g.markRow + j) * g.w + i) * 4;
+      data[at] += (colour[0] - data[at]) * fill + 0.5;
+      data[at + 1] += (colour[1] - data[at + 1]) * fill + 0.5;
+      data[at + 2] += (colour[2] - data[at + 2]) * fill + 0.5;
     }
   }
 }

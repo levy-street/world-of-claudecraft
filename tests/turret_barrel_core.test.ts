@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import path from 'node:path';
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
@@ -24,11 +27,13 @@ import {
   TURRET_BARREL_SHARDS,
   TURRET_FUSE_FIXED_PUFFS,
   TURRET_FUSE_PUFFS,
+  TURRET_KEG_BARE_ASPECT,
+  TURRET_KEG_BOMB,
   TURRET_KEG_MARK,
   TURRET_KEG_MARK_FRAME,
   TURRET_KEG_SHAPE,
-  TURRET_KEG_SHIELD_ASPECT,
   TURRET_KEG_WICK,
+  TURRET_KEG_WOOD,
   TURRET_SHARD_BAND_SHADE,
   type TurretKegPoint,
   type TurretShardFrame,
@@ -39,10 +44,13 @@ import {
   turretBarrelPop,
   turretBarrelRingRadius,
   turretFuseSparksInto,
+  turretKegBombTriangles,
+  turretKegFacetNormalInto,
+  turretKegMarkLayout,
   turretKegMarkTexels,
-  turretKegShieldOutline,
   turretKegWickInto,
   turretKegWickTipInto,
+  turretKegWoodInto,
   turretKegYaw,
   turretPuffsEnd,
   turretShardInto,
@@ -62,8 +70,26 @@ const FUSE = TURRET_EXPLOSIVE_BARREL.fuseTicks / 20;
 const H = TURRET_EXPLOSIVE_BARREL.height;
 const point = (): TurretKegPoint => ({ x: 0, y: 0, z: 0 });
 
-/** hex_barrel.glb's vertices and triangles, its foot at 0, in shares of its height. */
-async function kegShares(): Promise<{ v: number[][]; tris: number[][] }> {
+interface KegModel {
+  /** Vertices in shares of its height, its foot at 0; triangles; uvs; normals; the atlas's KTX2 bytes; its primitives and materials. */
+  v: number[][];
+  tris: number[][];
+  uv: number[][];
+  n: number[][];
+  atlas: Uint8Array;
+  primitives: number;
+  materials: number;
+}
+
+let kegModelRead: Promise<KegModel> | null = null;
+
+/** hex_barrel.glb as its one mesh and its palette atlas. */
+function kegModel(): Promise<KegModel> {
+  kegModelRead ??= readKegModel();
+  return kegModelRead;
+}
+
+async function readKegModel(): Promise<KegModel> {
   await MeshoptDecoder.ready;
   const io = new NodeIO()
     .registerExtensions(ALL_EXTENSIONS)
@@ -74,10 +100,17 @@ async function kegShares(): Promise<{ v: number[][]; tris: number[][] }> {
   const node = nodes[0];
   const prim = node.getMesh()?.listPrimitives()[0];
   const position = prim?.getAttribute('POSITION');
+  const texcoord = prim?.getAttribute('TEXCOORD_0');
+  const normal = prim?.getAttribute('NORMAL');
   const indices = prim?.getIndices();
-  if (!position || !indices) throw new Error('the keg has no triangles');
+  const atlas = prim?.getMaterial()?.getBaseColorTexture()?.getImage();
+  if (!position || !texcoord || !normal || !indices || !atlas) {
+    throw new Error('the keg has no textured triangles');
+  }
   const m = node.getWorldMatrix();
   const raw: number[][] = [];
+  const uv: number[][] = [];
+  const n: number[][] = [];
   const e: number[] = [];
   for (let i = 0; i < position.getCount(); i++) {
     position.getElement(i, e);
@@ -86,6 +119,10 @@ async function kegShares(): Promise<{ v: number[][]; tris: number[][] }> {
       m[1] * e[0] + m[5] * e[1] + m[9] * e[2] + m[13],
       m[2] * e[0] + m[6] * e[1] + m[10] * e[2] + m[14],
     ]);
+    uv.push(texcoord.getElement(i, []));
+    const d = normal.getElement(i, []);
+    const len = Math.hypot(d[0], d[1], d[2]);
+    n.push([d[0] / len, d[1] / len, d[2] / len]);
   }
   const lo = Math.min(...raw.map((p) => p[1]));
   const height = Math.max(...raw.map((p) => p[1])) - lo;
@@ -94,20 +131,142 @@ async function kegShares(): Promise<{ v: number[][]; tris: number[][] }> {
   for (let i = 0; i < indices.getCount(); i += 3) {
     tris.push([indices.getScalar(i), indices.getScalar(i + 1), indices.getScalar(i + 2)]);
   }
-  return { v, tris };
+  return {
+    v,
+    tris,
+    uv,
+    n,
+    atlas,
+    primitives: node.getMesh()?.listPrimitives().length ?? 0,
+    materials: root.listMaterials().length,
+  };
 }
 
-/** The mark texture's texel under shield point (x, y), as RGBA bytes. */
+/** The painted facet's triangles: flat, upright, facing its bearing, across the bare staves. */
+function facetTriangles({ v, tris }: KegModel): number[][] {
+  const k = TURRET_KEG_SHAPE;
+  return tris.filter(([a, b, c]) => {
+    const e1 = [0, 1, 2].map((i) => v[b][i] - v[a][i]);
+    const e2 = [0, 1, 2].map((i) => v[c][i] - v[a][i]);
+    const n = [
+      e1[1] * e2[2] - e1[2] * e2[1],
+      e1[2] * e2[0] - e1[0] * e2[2],
+      e1[0] * e2[1] - e1[1] * e2[0],
+    ];
+    const len = Math.hypot(n[0], n[1], n[2]);
+    const along = (n[0] * Math.sin(k.markFacet) + n[2] * Math.cos(k.markFacet)) / len;
+    const lowY = Math.min(v[a][1], v[b][1], v[c][1]);
+    return along > 0.9999 && Math.abs(lowY - k.bareLow) < 1e-3;
+  });
+}
+
+interface BasisFile {
+  startTranscoding(): boolean;
+  getWidth(): number;
+  getHeight(): number;
+  getImageTranscodedSizeInBytes(level: number, layer: number, face: number, format: number): number;
+  transcodeImage(
+    dst: Uint8Array,
+    level: number,
+    layer: number,
+    face: number,
+    format: number,
+    flags: number,
+    rowPitch: number,
+    outputRows: number,
+  ): boolean;
+  close(): void;
+  delete(): void;
+}
+
+type BasisFactory = (opts: { wasmBinary: Buffer }) => Promise<{
+  initializeBasis(): void;
+  KTX2File: new (data: Uint8Array) => BasisFile;
+}>;
+
+const TRANSCODE_RGBA32 = 13;
+
+/** The atlas as the shipped transcoder decodes its top level, rows from the top (glTF v down). */
+async function decodeAtlas(ktx2: Uint8Array): Promise<{ size: number; rgba: Uint8Array }> {
+  const dir = path.resolve('public', 'basis');
+  const file = path.join(dir, 'basis_transcoder.js');
+  // The shipped transcoder is a UMD script and the package is ESM, so it
+  // cannot be required: it runs with a CommonJS module handed in, as in
+  // tests/basis_transcoder_csp.test.ts.
+  const shim = { exports: {} as unknown };
+  new Function(
+    'module',
+    'exports',
+    'require',
+    '__filename',
+    '__dirname',
+    readFileSync(file, 'utf8'),
+  )(shim, shim.exports, createRequire(file), file, dir);
+  const basis = await (shim.exports as BasisFactory)({
+    wasmBinary: readFileSync(path.join(dir, 'basis_transcoder.wasm')),
+  });
+  basis.initializeBasis();
+  const ktx = new basis.KTX2File(ktx2);
+  expect(ktx.startTranscoding()).toBeTruthy();
+  const size = ktx.getWidth();
+  expect(ktx.getHeight()).toBe(size);
+  const rgba = new Uint8Array(ktx.getImageTranscodedSizeInBytes(0, 0, 0, TRANSCODE_RGBA32));
+  expect(ktx.transcodeImage(rgba, 0, 0, 0, TRANSCODE_RGBA32, 0, -1, -1)).toBeTruthy();
+  ktx.close();
+  ktx.delete();
+  return { size, rgba };
+}
+
+const LAYOUT = turretKegMarkLayout(TURRET_KEG_MARK.texels);
+const MARK_ROWS = LAYOUT.height - LAYOUT.markRow;
+const ASPECT = TURRET_KEG_BARE_ASPECT;
+const lum = ([r, g, b]: readonly number[]) => 0.2126 * r + 0.7152 * g + 0.0722 * b;
+
+/** The mark texture's texel under facet point (x, y) in mark units, as RGBA bytes. */
 function markTexel(data: Uint8Array, x: number, y: number): number[] {
-  const w = TURRET_KEG_MARK.texels;
-  const h = w * 2;
-  const v =
-    TURRET_KEG_MARK.markBottom +
-    ((1 - TURRET_KEG_MARK.markBottom) * (y / TURRET_KEG_SHIELD_ASPECT + 1)) / 2;
-  const i = Math.min(w - 1, Math.floor(((x + 1) / 2) * w));
-  const j = Math.min(h - 1, Math.floor(v * h));
-  const at = (j * w + i) * 4;
+  const i = Math.min(LAYOUT.width - 1, Math.max(0, Math.floor(((x + 1) / 2) * LAYOUT.width)));
+  const j = Math.min(MARK_ROWS - 1, Math.max(0, Math.floor(((y / ASPECT + 1) / 2) * MARK_ROWS)));
+  const at = ((LAYOUT.markRow + j) * LAYOUT.width + i) * 4;
   return [data[at], data[at + 1], data[at + 2], data[at + 3]];
+}
+
+/** The keg's wood at mark height y, rounded as the texture stores it. */
+function woodAt(y: number): number[] {
+  return turretKegWoodInto([0, 0, 0], y).map((c) => Math.round(c));
+}
+
+/** The bomb's fuse as a fine polyline in mark units, with the distance along it at each point. */
+function fuseLine(): { x: number; y: number; s: number }[] {
+  const f = TURRET_KEG_BOMB.fuse;
+  const out: { x: number; y: number; s: number }[] = [];
+  for (let curve = 0; curve < 2; curve++) {
+    const o = curve * 6;
+    for (let k = curve === 0 ? 0 : 1; k <= 400; k++) {
+      const t = k / 400;
+      const u = 1 - t;
+      const w = [u * u * u, 3 * u * u * t, 3 * u * t * t, t * t * t];
+      const x = w[0] * f[o] + w[1] * f[o + 2] + w[2] * f[o + 4] + w[3] * f[o + 6];
+      const y = w[0] * f[o + 1] + w[1] * f[o + 3] + w[2] * f[o + 5] + w[3] * f[o + 7];
+      const prev = out[out.length - 1];
+      out.push({ x, y, s: prev ? prev.s + Math.hypot(x - prev.x, y - prev.y) : 0 });
+    }
+  }
+  return out;
+}
+
+/** Whether (x, y) lies in one of the mesh's triangles (wound counter-clockwise). */
+function inMesh(tris: readonly number[], x: number, y: number): boolean {
+  for (let t = 0; t < tris.length; t += 6) {
+    const [ax, ay, bx, by, cx, cy] = tris.slice(t, t + 6);
+    if (
+      (bx - ax) * (y - ay) - (by - ay) * (x - ax) >= 0 &&
+      (cx - bx) * (y - by) - (cy - by) * (x - bx) >= 0 &&
+      (ax - cx) * (y - cy) - (ay - cy) * (x - cx) >= 0
+    ) {
+      return true;
+    }
+  }
+  return false;
 }
 
 describe('a standing barrel', () => {
@@ -352,8 +511,12 @@ describe('the shards', () => {
 });
 
 describe('the powder keg', () => {
-  it('matches hex_barrel.glb: eight staves, the painted facet, the bare staves between the bands, the bung', async () => {
-    const { v, tris } = await kegShares();
+  it('matches hex_barrel.glb: one surface, eight staves, the painted facet, the bare staves between the bands, the bung', async () => {
+    const model = await kegModel();
+    // The mark copies the kit's first material as the keg's own surface: it must be the only one.
+    expect(model.primitives).toBe(1);
+    expect(model.materials).toBe(1);
+    const { v } = model;
     const k = TURRET_KEG_SHAPE;
     // The staves' corners at the edges of the bare stretch, on the kit's eight bearings.
     const corner = k.facetApothem / Math.cos(Math.PI / 8);
@@ -371,19 +534,7 @@ describe('the powder keg', () => {
     const band = Math.max(...v.map((p) => Math.hypot(p[0], p[2])));
     expect(band).toBeGreaterThan(corner + 0.01);
     // The painted facet: a flat, upright face at its bearing and distance, the bare stretch tall.
-    const facet = tris.filter(([a, b, c]) => {
-      const e1 = [0, 1, 2].map((i) => v[b][i] - v[a][i]);
-      const e2 = [0, 1, 2].map((i) => v[c][i] - v[a][i]);
-      const n = [
-        e1[1] * e2[2] - e1[2] * e2[1],
-        e1[2] * e2[0] - e1[0] * e2[2],
-        e1[0] * e2[1] - e1[1] * e2[0],
-      ];
-      const len = Math.hypot(n[0], n[1], n[2]);
-      const along = (n[0] * Math.sin(k.markFacet) + n[2] * Math.cos(k.markFacet)) / len;
-      const lowY = Math.min(v[a][1], v[b][1], v[c][1]);
-      return along > 0.9999 && Math.abs(lowY - k.bareLow) < 1e-3;
-    });
+    const facet = facetTriangles(model);
     expect(facet.length).toBeGreaterThan(0);
     for (const [a] of facet) {
       const out = v[a][0] * Math.sin(k.markFacet) + v[a][2] * Math.cos(k.markFacet);
@@ -407,89 +558,6 @@ describe('the powder keg', () => {
       expect(Math.sin(facing)).toBeCloseTo(-Math.sin(a), 12);
       expect(Math.cos(facing)).toBeCloseTo(-Math.cos(a), 12);
     }
-  });
-
-  it('paints a shield that fills its facet between the bands', () => {
-    const f = TURRET_KEG_MARK_FRAME;
-    expect(f.width).toBeLessThan(TURRET_KEG_SHAPE.facetWidth * H);
-    expect(f.width).toBeGreaterThan(0.8 * TURRET_KEG_SHAPE.facetWidth * H);
-    const bare = (TURRET_KEG_SHAPE.bareHigh - TURRET_KEG_SHAPE.bareLow) * H;
-    expect(f.height).toBeLessThan(bare);
-    expect(f.height).toBeGreaterThan(0.8 * bare);
-    expect(f.centreY - f.height / 2).toBeGreaterThan(TURRET_KEG_SHAPE.bareLow * H);
-    expect(f.centreY + f.height / 2).toBeLessThan(TURRET_KEG_SHAPE.bareHigh * H);
-    expect(f.offset - TURRET_KEG_SHAPE.facetApothem * H).toBeCloseTo(TURRET_KEG_MARK.lift, 12);
-    expect(TURRET_KEG_MARK.lift).toBeGreaterThan(0.005);
-    expect(f.sideX * f.normalX + f.sideZ * f.normalZ).toBeCloseTo(0, 12);
-    // A heater shield: flat on top, a point below, wound counter-clockwise seen from the front.
-    const o = turretKegShieldOutline(8);
-    let area = 0;
-    for (let i = 0; i < o.length; i += 2) {
-      const j = (i + 2) % o.length;
-      area += o[i] * o[j + 1] - o[j] * o[i + 1];
-      expect(Math.abs(o[i])).toBeLessThanOrEqual(1 + 1e-12);
-      expect(Math.abs(o[i + 1])).toBeLessThanOrEqual(TURRET_KEG_SHIELD_ASPECT + 1e-12);
-    }
-    expect(area).toBeGreaterThan(0);
-    expect(o[0]).toBeCloseTo(0, 12);
-    expect(o[1]).toBeCloseTo(-TURRET_KEG_SHIELD_ASPECT, 12);
-    const ys = o.filter((_, i) => i % 2 === 1);
-    expect(ys.filter((y) => y === TURRET_KEG_SHIELD_ASPECT)).toHaveLength(2);
-  });
-
-  it('paints a flame on a pale shield inside a dark border, clear around it, and a dark cord below', () => {
-    const data = turretKegMarkTexels(TURRET_KEG_MARK.texels);
-    const w = TURRET_KEG_MARK.texels;
-    expect(data).toHaveLength(w * w * 2 * 4);
-    expect(turretKegMarkTexels(TURRET_KEG_MARK.texels)).toEqual(data);
-    const lum = ([r, g, b]: number[]) => 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    // The flame's heart and body: opaque, hot, well apart from the pale field.
-    const heart = markTexel(data, 0, -0.35);
-    expect(heart[3]).toBe(255);
-    expect(heart[0]).toBeGreaterThan(230);
-    expect(heart[2]).toBeLessThan(110);
-    const body = markTexel(data, -0.3, -0.35);
-    expect(body[3]).toBe(255);
-    expect(body[0]).toBeGreaterThan(190);
-    expect(body[0]).toBeGreaterThan(body[1] + 60);
-    expect(body[1]).toBeGreaterThan(body[2] + 30);
-    const field = markTexel(data, 0.72, 0.95);
-    expect(field[3]).toBe(255);
-    expect(Math.min(field[0], field[1], field[2])).toBeGreaterThan(160);
-    expect(lum(field) - lum(body)).toBeGreaterThan(40);
-    // The dark outline between them, and the shield's dark border.
-    let inked = 0;
-    for (let x = -0.95; x < 0; x += 0.01) {
-      const t = markTexel(data, x, -0.35);
-      if (lum(t) < 70) inked++;
-    }
-    expect(inked).toBeGreaterThan(3);
-    const border = markTexel(data, 0.97, 0.9);
-    expect(border[3]).toBe(255);
-    expect(lum(border)).toBeLessThan(70);
-    // Clear past the shield, its ink carried on for the mip levels.
-    const outside = markTexel(data, 0.95, -1.1);
-    expect(outside[3]).toBe(0);
-    expect(lum(outside)).toBeLessThan(70);
-    // The cord: opaque and dark along the bottom; clear in the gutter above it.
-    const cordRow = Math.floor((TURRET_KEG_MARK.wickTop * w * 2) / 2);
-    const gutterRow = Math.floor(
-      ((TURRET_KEG_MARK.wickTop + TURRET_KEG_MARK.markBottom) / 2) * w * 2,
-    );
-    for (let i = 0; i < w; i++) {
-      const cord = (cordRow * w + i) * 4;
-      expect(data[cord + 3]).toBe(255);
-      expect(lum([data[cord], data[cord + 1], data[cord + 2]])).toBeLessThan(70);
-      expect(data[(gutterRow * w + i) * 4 + 3]).toBe(0);
-    }
-    // Most of the shield is opaque paint; its corners are clear.
-    let opaque = 0;
-    for (let j = Math.round(TURRET_KEG_MARK.markBottom * w * 2); j < w * 2; j++) {
-      for (let i = 0; i < w; i++) if (data[(j * w + i) * 4 + 3] === 255) opaque++;
-    }
-    const markTexels = w * (w * 2 - Math.round(TURRET_KEG_MARK.markBottom * w * 2));
-    expect(opaque / markTexels).toBeGreaterThan(0.7);
-    expect(opaque / markTexels).toBeLessThan(0.95);
   });
 
   it('rises its wick out of the bung and bends it over, the fuse burning at its tip', () => {
@@ -537,5 +605,265 @@ describe('the powder keg', () => {
     }
     expect(bands / (bands + staves)).toBeGreaterThan(0.08);
     expect(bands / (bands + staves)).toBeLessThan(0.35);
+  });
+});
+
+describe('the stencilled bomb', () => {
+  const b = TURRET_KEG_BOMB;
+  const data = turretKegMarkTexels(TURRET_KEG_MARK.texels);
+
+  it("paints its bare wood as hex_barrel.glb's own atlas holds it under the painted facet", async () => {
+    const model = await kegModel();
+    const facet = facetTriangles(model);
+    const corners = [...new Set(facet.flat())];
+    const k = TURRET_KEG_SHAPE;
+    // The facet's v at its upper and at its lower band, and the u it spans.
+    for (const i of corners) {
+      const top = Math.abs(model.v[i][1] - k.bareHigh) < 1e-3;
+      expect(model.uv[i][1]).toBeCloseTo(top ? TURRET_KEG_WOOD.vTop : TURRET_KEG_WOOD.vBottom, 5);
+    }
+    const us = corners.map((i) => model.uv[i][0]);
+    const { size, rgba } = await decodeAtlas(model.atlas);
+    expect(size).toBe(TURRET_KEG_WOOD.atlas);
+    // Every pinned row is the atlas's, across the facet's columns and a few beyond (its mips hold).
+    const lo = Math.floor(Math.min(...us) * size) - 3;
+    const hi = Math.ceil(Math.max(...us) * size) + 3;
+    const rows = TURRET_KEG_WOOD.rows.length / 3;
+    const topRow = TURRET_KEG_WOOD.vTop * size - 0.5;
+    const bottomRow = TURRET_KEG_WOOD.vBottom * size - 0.5;
+    expect(TURRET_KEG_WOOD.firstRow).toBeLessThanOrEqual(Math.floor(topRow));
+    expect(TURRET_KEG_WOOD.firstRow + rows - 1).toBeGreaterThanOrEqual(Math.ceil(bottomRow));
+    for (let r = 0; r < rows; r++) {
+      const pinned = TURRET_KEG_WOOD.rows.slice(r * 3, r * 3 + 3);
+      for (let col = lo; col <= hi; col++) {
+        const at = ((TURRET_KEG_WOOD.firstRow + r) * size + col) * 4;
+        expect([rgba[at], rgba[at + 1], rgba[at + 2]]).toEqual(pinned);
+      }
+    }
+    // The mark's wood at any height is the atlas sampled as the facet samples it.
+    const column = Math.round(((Math.min(...us) + Math.max(...us)) / 2) * size);
+    for (const share of [0, 0.13, 0.5, 0.71, 1]) {
+      const y = (2 * share - 1) * ASPECT;
+      const v = TURRET_KEG_WOOD.vBottom + (TURRET_KEG_WOOD.vTop - TURRET_KEG_WOOD.vBottom) * share;
+      const row = v * size - 0.5;
+      const r0 = Math.floor(row);
+      const f = row - r0;
+      const wood = turretKegWoodInto([0, 0, 0], y);
+      for (let c = 0; c < 3; c++) {
+        const a = rgba[(r0 * size + column) * 4 + c];
+        const z = rgba[((r0 + 1) * size + column) * 4 + c];
+        expect(wood[c]).toBeCloseTo(a + (z - a) * f, 9);
+      }
+    }
+  });
+
+  it('lights the mark as the kit shades the facet: blended between its corner normals', async () => {
+    const model = await kegModel();
+    const k = TURRET_KEG_SHAPE;
+    const n = { x: 0, z: 0 };
+    let seen = 0;
+    for (const i of new Set(facetTriangles(model).flat())) {
+      const [x, , z] = model.v[i];
+      // Mark x: -1 at the facet's left corner, 1 at its right, seen from in front.
+      const side = (x * Math.cos(k.markFacet) - z * Math.sin(k.markFacet)) / (k.facetWidth / 2);
+      expect(Math.abs(Math.abs(side) - 1)).toBeLessThan(1e-2);
+      turretKegFacetNormalInto(n, Math.sign(side));
+      expect(model.n[i][0]).toBeCloseTo(n.x, 1);
+      expect(model.n[i][1]).toBeCloseTo(0, 2);
+      expect(model.n[i][2]).toBeCloseTo(n.z, 1);
+      expect(Math.hypot(model.n[i][0] - n.x, model.n[i][2] - n.z)).toBeLessThan(0.012);
+      seen++;
+    }
+    expect(seen).toBeGreaterThanOrEqual(4);
+    // Across the facet it turns from one corner to the other, straight out at the middle.
+    turretKegFacetNormalInto(n, 0);
+    const len = Math.hypot(n.x, n.z);
+    expect(n.x / len).toBeCloseTo(TURRET_KEG_MARK_FRAME.normalX, 12);
+    expect(n.z / len).toBeCloseTo(TURRET_KEG_MARK_FRAME.normalZ, 12);
+    const left = turretKegFacetNormalInto({ x: 0, z: 0 }, -1);
+    const right = turretKegFacetNormalInto({ x: 0, z: 0 }, 1);
+    const between = Math.acos(left.x * right.x + left.z * right.z);
+    expect(between).toBeCloseTo(2 * k.facetSpread, 12);
+  });
+
+  it('lays the bomb on its facet between the bands: the ball low in the middle, the spark at the upper right', () => {
+    const f = TURRET_KEG_MARK_FRAME;
+    expect(f.width).toBeCloseTo(TURRET_KEG_SHAPE.facetWidth * H, 12);
+    expect(f.height / f.width).toBeCloseTo(ASPECT, 12);
+    expect(f.centreY - f.height / 2).toBeCloseTo(TURRET_KEG_SHAPE.bareLow * H, 12);
+    expect(f.offset - TURRET_KEG_SHAPE.facetApothem * H).toBeCloseTo(TURRET_KEG_MARK.lift, 12);
+    expect(TURRET_KEG_MARK.lift).toBeGreaterThan(0.005);
+    expect(f.sideX * f.normalX + f.sideZ * f.normalZ).toBeCloseTo(0, 12);
+    // The ball fills most of the facet's width, low and a little left of its middle.
+    expect(2 * b.ballR).toBeGreaterThan(1.1);
+    expect(2 * b.ballR).toBeLessThan(1.5);
+    expect(Math.abs(b.ballX)).toBeLessThan(0.2);
+    expect(b.ballY).toBeLessThan(0);
+    expect(b.ballY - b.ballR).toBeGreaterThan(-ASPECT);
+    // The neck on its upper right, the spark high on the right, above the ball.
+    expect(b.neckX).toBeGreaterThan(b.ballX);
+    expect(b.neckY).toBeGreaterThan(b.ballY + 0.6 * b.ballR);
+    expect(b.sparkX).toBeGreaterThan(0.5);
+    expect(b.sparkY).toBeGreaterThan(0.6 * ASPECT);
+    expect(b.sparkY).toBeGreaterThan(b.neckY);
+    // The fuse runs from the neck to the spark.
+    const line = fuseLine();
+    expect(Math.hypot(line[0].x - b.neckX, line[0].y - b.neckY)).toBeLessThan(b.neckLong);
+    const end = line[line.length - 1];
+    expect(Math.hypot(end.x - b.sparkX, end.y - b.sparkY)).toBeLessThan(b.sparkOuter);
+    // Its whole mesh stays on the facet, inside its corners and between the bands.
+    const tris = turretKegBombTriangles();
+    for (let i = 0; i < tris.length; i += 2) {
+      expect(Math.abs(tris[i])).toBeLessThan(1);
+      expect(Math.abs(tris[i + 1])).toBeLessThan(ASPECT);
+    }
+  });
+
+  it('stencils a black bomb straight on the wood: a bare crescent and bridges, a dashed fuse, a yellow spark', () => {
+    expect(turretKegMarkTexels(TURRET_KEG_MARK.texels)).toEqual(data);
+    const ink = (t: number[]) => lum(t) < 45;
+    const wood = (t: number[], y: number) =>
+      t.slice(0, 3).every((c, i) => Math.abs(c - woodAt(y)[i]) <= 1);
+    // Straight on the wood: no patch, no border, the keg's own colour all round.
+    for (const [x, y] of [
+      [-0.85, 1.1],
+      [0.85, -1.1],
+      [-0.9, -0.3],
+      [0.9, 0.2],
+    ]) {
+      expect(wood(markTexel(data, x, y), y)).toBe(true);
+    }
+    // The ball: black paint, worn only slightly along the grain.
+    const cutR = b.crescentR * b.ballR;
+    let paint = 0;
+    let worn = 0;
+    for (let x = b.ballX - b.ballR; x <= b.ballX + b.ballR; x += 0.01) {
+      for (let y = b.ballY - b.ballR; y <= b.ballY + b.ballR; y += 0.01) {
+        const rho = Math.hypot(x - b.ballX, y - b.ballY);
+        const bearing = Math.atan2(y - b.ballY, x - b.ballX);
+        const nearCut =
+          Math.abs(rho - cutR) < b.crescentWidth ||
+          (bearing > b.crescentFrom - 0.2 && bearing < b.crescentTo + 0.2 && rho > cutR);
+        if (rho > b.ballR - 0.05 || nearCut) continue;
+        const t = markTexel(data, x, y);
+        if (ink(t)) paint++;
+        else worn++;
+      }
+    }
+    expect(worn / (paint + worn)).toBeGreaterThan(0.01);
+    expect(worn / (paint + worn)).toBeLessThan(0.12);
+    // The highlight crescent: bare wood across the ball's upper left.
+    for (const k of [0.25, 0.5, 0.75]) {
+      const a = b.crescentFrom + (b.crescentTo - b.crescentFrom) * k;
+      const x = b.ballX + Math.cos(a) * cutR;
+      const y = b.ballY + Math.sin(a) * cutR;
+      expect(lum(markTexel(data, x, y))).toBeGreaterThan(lum(woodAt(y)) - 8);
+    }
+    // A stencil bridge at each end of it, through to the rim: a thin bare gap in the paint.
+    for (const a of [b.crescentFrom, b.crescentTo]) {
+      let lightest = 0;
+      for (let rho = cutR + 0.05; rho < b.ballR - 0.03; rho += 0.01) {
+        for (let side = -0.03; side <= 0.03; side += 0.005) {
+          const x = b.ballX + Math.cos(a) * rho - Math.sin(a) * side;
+          const y = b.ballY + Math.sin(a) * rho + Math.cos(a) * side;
+          lightest = Math.max(lightest, lum(markTexel(data, x, y)) / lum(woodAt(y)));
+        }
+      }
+      expect(lightest).toBeGreaterThan(0.7);
+    }
+    // The neck: black.
+    expect(ink(markTexel(data, b.neckX, b.neckY))).toBe(true);
+    // The fuse: dashes of black with bare gaps between, all along to the spark.
+    const line = fuseLine();
+    const at = (along: number) => line.find((p) => p.s >= along) ?? line[line.length - 1];
+    const clear = (p: { x: number; y: number }) =>
+      Math.hypot(p.x - b.sparkX, p.y - b.sparkY) > b.sparkOuter * (1 + b.jitter) + 0.03;
+    const period = b.dash + b.gap;
+    let dashes = 0;
+    for (let k = 0; k * period < line[line.length - 1].s; k++) {
+      const dash = at(k * period + b.dash / 2);
+      const gap = at(k * period + b.dash + b.gap / 2);
+      if (!clear(dash)) continue;
+      const dashTexel = markTexel(data, dash.x, dash.y);
+      expect(lum(dashTexel)).toBeLessThan(70);
+      if (clear(gap)) {
+        expect(lum(markTexel(data, gap.x, gap.y)) - lum(dashTexel)).toBeGreaterThan(40);
+      }
+      dashes++;
+    }
+    expect(dashes).toBeGreaterThanOrEqual(3);
+    // The spark: a pale heart in a yellow star.
+    const heart = markTexel(data, b.sparkX, b.sparkY);
+    expect(heart[0]).toBeGreaterThan(235);
+    expect(heart[1]).toBeGreaterThan(210);
+    let yellow = 0;
+    for (let x = b.sparkX - b.sparkOuter; x <= b.sparkX + b.sparkOuter; x += 0.01) {
+      for (let y = b.sparkY - b.sparkOuter; y <= b.sparkY + b.sparkOuter; y += 0.01) {
+        const [r, g, bl] = markTexel(data, x, y);
+        if (r > 220 && g > 150 && g < 230 && bl < 140) yellow++;
+      }
+    }
+    expect(yellow).toBeGreaterThan(40);
+  });
+
+  it('cuts its mesh to the bomb: every painted texel well inside it, so its edge samples bare wood', () => {
+    const tris = turretKegBombTriangles();
+    expect(tris.length % 6).toBe(0);
+    for (let t = 0; t < tris.length; t += 6) {
+      const [ax, ay, bx, by, cx, cy] = tris.slice(t, t + 6);
+      // Wound counter-clockwise seen from in front: the keg's program culls the back.
+      expect((bx - ax) * (cy - ay) - (by - ay) * (cx - ax)).toBeGreaterThan(0);
+    }
+    const step = 2 / LAYOUT.width;
+    expect((2 * ASPECT) / MARK_ROWS).toBeCloseTo(step, 2);
+    // The texels a bilinear read at the mesh's edge blends (a texel either way)
+    // are bare wood: the square a texel round any paint is still mesh.
+    const reach = step;
+    let painted = 0;
+    for (let j = 0; j < MARK_ROWS; j++) {
+      const y = ((j + 0.5) / MARK_ROWS) * 2 * ASPECT - ASPECT;
+      const bare = woodAt(y);
+      for (let i = 0; i < LAYOUT.width; i++) {
+        const at = ((LAYOUT.markRow + j) * LAYOUT.width + i) * 4;
+        if ([0, 1, 2].every((c) => Math.abs(data[at + c] - bare[c]) <= 1)) continue;
+        painted++;
+        const x = ((i + 0.5) / LAYOUT.width) * 2 - 1;
+        for (const [ox, oy] of [
+          [0, 0],
+          [reach, 0],
+          [-reach, 0],
+          [0, reach],
+          [0, -reach],
+          [reach, reach],
+          [reach, -reach],
+          [-reach, reach],
+          [-reach, -reach],
+        ]) {
+          expect(inMesh(tris, x + ox, y + oy), `texel ${i},${j} at ${ox},${oy}`).toBe(true);
+        }
+      }
+    }
+    expect(painted).toBeGreaterThan(1000);
+  });
+
+  it('lays its texture out as the cord, a gutter, then the facet in square texels, opaque throughout', () => {
+    expect(LAYOUT.width).toBe(TURRET_KEG_MARK.texels);
+    expect(data).toHaveLength(LAYOUT.width * LAYOUT.height * 4);
+    expect(LAYOUT.wickTop).toBeCloseTo(LAYOUT.cordRows / LAYOUT.height, 12);
+    expect(LAYOUT.markBottom).toBeCloseTo(LAYOUT.markRow / LAYOUT.height, 12);
+    expect(LAYOUT.markRow).toBeGreaterThan(LAYOUT.cordRows);
+    expect(MARK_ROWS / LAYOUT.width).toBeCloseTo(ASPECT, 2);
+    for (let at = 3; at < data.length; at += 4) expect(data[at]).toBe(255);
+    const bottom = woodAt(-ASPECT);
+    for (let i = 0; i < LAYOUT.width; i++) {
+      // The cord: dark along the bottom.
+      const cord = (Math.floor(LAYOUT.cordRows / 2) * LAYOUT.width + i) * 4;
+      expect(lum([data[cord], data[cord + 1], data[cord + 2]])).toBeLessThan(70);
+      // The gutter: the cord's ink over it, then the facet's wood under the facet.
+      const low = ((LAYOUT.cordRows + 1) * LAYOUT.width + i) * 4;
+      expect(lum([data[low], data[low + 1], data[low + 2]])).toBeLessThan(70);
+      const high = ((LAYOUT.markRow - 1) * LAYOUT.width + i) * 4;
+      expect([data[high], data[high + 1], data[high + 2]]).toEqual(bottom);
+    }
   });
 });

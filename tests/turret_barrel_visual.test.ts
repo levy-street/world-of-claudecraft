@@ -12,10 +12,14 @@ import {
   TURRET_BARREL_LOOK,
   TURRET_BARREL_SHARDS,
   TURRET_FUSE_FIXED_PUFFS,
+  TURRET_KEG_BARE_ASPECT,
   TURRET_KEG_MARK,
   TURRET_KEG_MARK_FRAME,
   TURRET_KEG_SHAPE,
   turretBarrelCounts,
+  turretKegBombTriangles,
+  turretKegFacetNormalInto,
+  turretKegMarkLayout,
   turretKegMarkTexels,
   turretKegWickTipInto,
   turretKegYaw,
@@ -42,7 +46,7 @@ import { drawsUnder, threeProgramKeys } from './helpers/three_program_keys';
 
 type Barrel = TurretSessionView['defense']['barrels'][number];
 
-/** Lets a case make the mark's shield and wick fail to merge. */
+/** Lets a case make the mark's bomb and wick fail to merge. */
 const merge = vi.hoisted(() => ({ fail: false }));
 vi.mock('three/examples/jsm/utils/BufferGeometryUtils.js', async (importOriginal) => {
   const real =
@@ -275,16 +279,21 @@ describe('the barrel visual', () => {
     const toward = new THREE.Vector3();
     const top = new THREE.Vector3();
     const tip = { x: 0, y: 0, z: 0 };
+    const corner = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
     for (const b of spots) {
       const root = slotRoots(visual).find((r) => r.visible && r.position.x === b.x) as THREE.Group;
       root.updateMatrixWorld(true);
       const mark = markOf(root);
-      const normals = mark.geometry.getAttribute('normal');
-      normal.fromBufferAttribute(normals, 0).transformDirection(mark.matrixWorld);
+      // The bomb's first triangle lies on the facet's plane, facing out of it.
+      const positions = mark.geometry.getAttribute('position');
+      const index = mark.geometry.getIndex() as THREE.BufferAttribute;
+      for (let k = 0; k < 3; k++) {
+        corner[k].fromBufferAttribute(positions, index.getX(k)).applyMatrix4(mark.matrixWorld);
+      }
+      normal.subVectors(corner[1], corner[0]).cross(corner[2].clone().sub(corner[0])).normalize();
       toward.set(centre.cx - b.x, 0, centre.cz - b.z).normalize();
       expect(normal.dot(toward)).toBeGreaterThan(0.9999);
       // The wick's highest point is its tip, where a lit fuse burns.
-      const positions = mark.geometry.getAttribute('position');
       let best = Number.NEGATIVE_INFINITY;
       for (let i = 0; i < positions.count; i++) {
         const p = new THREE.Vector3()
@@ -304,7 +313,7 @@ describe('the barrel visual', () => {
     visual.dispose();
   });
 
-  it('paints one shared flame mark and wick in every slot: an opaque shield on the facet, off it, between the bands', async () => {
+  it('paints one shared bomb mark and wick in every slot: an opaque mesh cut to the bomb on the facet, off it, between the bands', async () => {
     const { visual } = await built();
     const roots = slotRoots(visual);
     const marks = roots.map(markOf);
@@ -318,38 +327,58 @@ describe('the barrel visual', () => {
       expect(mark.castShadow).toBe(false);
       expect(mark.receiveShadow).toBe(true);
     }
-    // No alpha test, no blending: the shield's outline is the polygon's own.
+    // No alpha test, no blending: the mark's outline is the mesh's own.
     expect(material.transparent).toBe(false);
     expect(material.alphaTest).toBe(0);
+    // The keg's own surface under the paint: its colour and roughness, so the bare wood matches.
+    const keg = kegMeshOf(roots[0]).material as THREE.MeshStandardMaterial;
+    expect(material.color.getHex()).toBe(keg.color.getHex());
+    expect(material.roughness).toBe(keg.roughness);
+    expect(material.metalness).toBe(keg.metalness);
+    const layout = turretKegMarkLayout(TURRET_KEG_MARK.texels);
     const map = material.map as THREE.DataTexture;
     expect(map.isDataTexture).toBe(true);
     expect(map.colorSpace).toBe(THREE.SRGBColorSpace);
-    expect(map.image.width).toBe(TURRET_KEG_MARK.texels);
-    expect(map.image.height).toBe(TURRET_KEG_MARK.texels * 2);
+    expect(map.image.width).toBe(layout.width);
+    expect(map.image.height).toBe(layout.height);
     expect(map.image.data).toEqual(turretKegMarkTexels(TURRET_KEG_MARK.texels));
-    // The shield: on a plane just off the painted facet, inside its corners, between the bands.
+    // The bomb: on a plane just off the painted facet, inside its corners, between the bands.
     const f = TURRET_KEG_MARK_FRAME;
     const h = TURRET_EXPLOSIVE_BARREL.height;
     const position = first.geometry.getAttribute('position');
+    const normals = first.geometry.getAttribute('normal');
     const uv = first.geometry.getAttribute('uv');
-    let shield = 0;
+    const n = { x: 0, z: 0 };
+    let bomb = 0;
     for (let i = 0; i < position.count; i++) {
       const x = position.getX(i);
       const y = position.getY(i);
       const z = position.getZ(i);
-      const out = x * f.normalX + z * f.normalZ;
-      if (uv.getY(i) < TURRET_KEG_MARK.markBottom) continue;
-      shield++;
-      expect(out).toBeCloseTo(TURRET_KEG_SHAPE.facetApothem * h + TURRET_KEG_MARK.lift, 5);
-      expect(Math.abs(x * f.sideX + z * f.sideZ)).toBeLessThan(
-        (TURRET_KEG_SHAPE.facetWidth * h) / 2,
+      if (uv.getY(i) < layout.markBottom) continue;
+      bomb++;
+      expect(x * f.normalX + z * f.normalZ).toBeCloseTo(
+        TURRET_KEG_SHAPE.facetApothem * h + TURRET_KEG_MARK.lift,
+        5,
       );
+      const side = (x * f.sideX + z * f.sideZ) / (f.width / 2);
+      expect(Math.abs(side)).toBeLessThan(1);
       expect(y).toBeGreaterThan(TURRET_KEG_SHAPE.bareLow * h);
       expect(y).toBeLessThan(TURRET_KEG_SHAPE.bareHigh * h);
+      // Its texture maps flat across the facet; its normals are the facet's own, blended between its corners.
+      expect(uv.getX(i)).toBeCloseTo((side + 1) / 2, 5);
+      const up = (y - f.centreY) / (f.width / 2) / TURRET_KEG_BARE_ASPECT;
+      expect(uv.getY(i)).toBeCloseTo(
+        layout.markBottom + ((1 - layout.markBottom) * (up + 1)) / 2,
+        5,
+      );
+      turretKegFacetNormalInto(n, side);
+      expect(normals.getX(i)).toBeCloseTo(n.x, 5);
+      expect(normals.getY(i)).toBe(0);
+      expect(normals.getZ(i)).toBeCloseTo(n.z, 5);
     }
-    expect(shield).toBeGreaterThan(8);
-    // The wick: every other vertex, on the cord's strip, rising from the bung above the lid.
-    expect(position.count - shield).toBeGreaterThan(20);
+    // One vertex per corner of the bomb's triangles, then the wick's cord above the lid.
+    expect(bomb).toBe(turretKegBombTriangles().length / 2);
+    expect(position.count - bomb).toBeGreaterThan(20);
     visual.dispose();
   });
 
