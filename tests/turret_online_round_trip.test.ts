@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { emitTurretSelfKeys } from '../server/turret_self_wire';
+import { emitTurretSelfKeys, turretWireNumber } from '../server/turret_self_wire';
 import { dispatchVehicleCommand } from '../server/vehicle_command_wire';
 import { type QuestWorldCommand, QuestWorldWireState } from '../src/net/quest_world_wire_state';
 import { BUILTIN_WORLD, dungeonAt } from '../src/sim/data';
-import { positionAt } from '../src/sim/minigames/thrown_body';
+import { type MotionSegment, positionAt } from '../src/sim/minigames/thrown_body';
 import { Sim } from '../src/sim/sim';
 import type { TurretDefenseView, TurretSessionView } from '../src/sim/turret_defense_session';
 import type { SimEvent, WorldContent } from '../src/sim/types';
@@ -12,7 +12,8 @@ import { groundHeight } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 const RUN_BOUND = 20 * 60 * 8;
-const TUR_BYTES_PER_SECOND_CEILING = 25_000;
+const TUR_BYTES_PER_SECOND_CEILING = 15_000;
+const DRIFT_BOUND_YD = 0.005;
 const FORGED_PID = 987_654;
 const ground = { ground: (x: number, z: number) => groundHeight(x, z, WORLD_SEED) };
 // The arena reads no world spawn, so the round trip skips ticking the open world's crowds.
@@ -58,6 +59,34 @@ function wirePass(
   return JSON.parse(`{${extra.slice(1)}}`);
 }
 
+/** A value as the `tur` key carries it: the rounding the server applies, both sides alike. */
+function rounded(value: unknown): unknown {
+  return JSON.parse(JSON.stringify(value, turretWireNumber));
+}
+
+/** The state within the wire rounding; the event-built ring and the result stats exact. */
+function expectMirrors(shown: TurretSessionView | null, truth: TurretSessionView | null): void {
+  expect(rounded(shown && { ...shown, feedback: [] })).toEqual(
+    rounded(truth && { ...truth, feedback: [] }),
+  );
+  expect(shown?.feedback).toEqual(truth?.feedback);
+  expect(shown?.defense.stats).toEqual(truth?.defense.stats);
+}
+
+const DRIFT_SAMPLES = 16;
+
+/** The farthest a body drawn from the rounded segment strays from the exact one over its span. */
+function segmentDrift(shown: MotionSegment, exact: MotionSegment): number {
+  let worst = 0;
+  for (let i = 0; i <= DRIFT_SAMPLES; i++) {
+    const t = exact.start + ((exact.end - exact.start) * i) / DRIFT_SAMPLES;
+    const a = positionAt(shown, t, ground);
+    const b = positionAt(exact, t, ground);
+    worst = Math.max(worst, Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z));
+  }
+  return worst;
+}
+
 function nearestLive(defense: TurretDefenseView, tick: number): { x: number; z: number } | null {
   let best: { x: number; z: number } | null = null;
   let bestD = Number.POSITIVE_INFINITY;
@@ -94,7 +123,7 @@ function turretEvents(events: readonly SimEvent[], pid: number) {
 }
 
 describe('Fire and Fly online: the socket-free round trip', () => {
-  it('mirrors the authoritative seat every tick of a won run, then clears on leave', () => {
+  it('mirrors the authoritative seat within the wire rounding every tick of a won run, then clears on leave', () => {
     const { sim, pid } = serverPlayer();
     const client = new WireClient(sim, pid);
     const sent: Record<string, string> = {};
@@ -108,6 +137,9 @@ describe('Fire and Fly online: the socket-free round trip', () => {
     let phase = '';
     let ticks = 0;
     const bytes: Record<string, number> = {};
+    const drift = { march: 0, fly: 0, skid: 0 };
+    const drawn = { march: 0, fly: 0, skid: 0 };
+    const drawnSegments = new Set<string>();
     for (let i = 0; i < RUN_BOUND && phase !== 'won' && phase !== 'lost'; i++) {
       const events = sim.tick();
       ticks++;
@@ -129,11 +161,19 @@ describe('Fire and Fly online: the socket-free round trip', () => {
         expect(authoritative).toBe(priorTruth);
         identical++;
       } else {
-        expect(client.turretSession).toEqual(authoritative);
+        expectMirrors(client.turretSession, authoritative);
       }
       priorTruth = authoritative;
 
       const view = client.turretSession as TurretSessionView;
+      for (const [index, m] of view.defense.monsters.entries()) {
+        const kind = m.seg.kind;
+        if (kind === 'still' || drawnSegments.has(`${m.id}:${m.seg.start}`)) continue;
+        drawnSegments.add(`${m.id}:${m.seg.start}`);
+        const exact = authoritative!.defense.monsters[index].seg;
+        drift[kind] = Math.max(drift[kind], segmentDrift(m.seg, exact));
+        drawn[kind]++;
+      }
       phase = view.defense.phase;
       const clock = client.turretClock!;
       if (clock < view.defense.readyTick) continue;
@@ -145,8 +185,12 @@ describe('Fire and Fly online: the socket-free round trip', () => {
     expect(phase).toBe('won');
     expect(shots).toBeGreaterThan(50);
     expect(identical).toBeGreaterThan(0);
-    // The H1 baseline (D31: the whole state per revision, no delta, no rounding) measured
-    // 23.7 KB/s over this run: a later lot that grows the seat's `tur` rate fails here.
+    for (const kind of ['march', 'fly', 'skid'] as const) {
+      expect(drawn[kind]).toBeGreaterThan(0);
+      expect(drift[kind]).toBeLessThan(DRIFT_BOUND_YD);
+    }
+    // The whole state per revision (D31, no delta), pruned and rounded: 13.9 KB/s over this
+    // run, against 23.7 KB/s before; a later lot that grows the seat's `tur` rate fails here.
     expect(bytes.tur / (ticks / 20)).toBeLessThan(TUR_BYTES_PER_SECOND_CEILING);
     const ring = client.turretSession!.feedback;
     expect(ring.map((f) => f.seq)).toEqual(ring.map((_, i) => ring[0].seq + i));
@@ -189,7 +233,7 @@ describe('Fire and Fly online: the socket-free round trip', () => {
     const view = client.turretSession!;
     const authoritative = turretSessionFor(sim.ctx, pid)!;
     const { feedback: _ring, ...seat } = authoritative;
-    expect({ ...view, feedback: [] }).toEqual({ ...seat, feedback: [] });
+    expect(rounded({ ...view, feedback: [] })).toEqual(rounded({ ...seat, feedback: [] }));
     expect(view.feedback.map((f) => f.seq)).toEqual(
       events.map((e) => (e.type === 'turretDefense' ? e.seq : -1)),
     );
@@ -226,6 +270,8 @@ describe('Fire and Fly online: the socket-free round trip', () => {
     // Its sequence runs ahead of the one left, so only the seat change can start the ring over.
     expect(routed[0]).toBeGreaterThan(lastSeen);
     const { feedback: _ring, ...seat } = turretSessionFor(sim.ctx, early)!;
-    expect({ ...client.turretSession!, feedback: [] }).toEqual({ ...seat, feedback: [] });
+    expect(rounded({ ...client.turretSession!, feedback: [] })).toEqual(
+      rounded({ ...seat, feedback: [] }),
+    );
   });
 });

@@ -9,16 +9,18 @@ import type { MotionSegment } from '../sim/minigames/thrown_body';
 import type { TurretBarrel } from '../sim/minigames/turret_barrels';
 import type {
   TurretBarrelSpot,
-  TurretDefenseState,
   TurretEvent,
   TurretHit,
-  TurretMonster,
   TurretShot,
   TurretStats,
 } from '../sim/minigames/turret_defense';
 import type { TurretKind, TurretPlan, TurretWavePlan } from '../sim/minigames/turret_defense_plan';
 import type { TurretFeedback } from '../sim/minigames/turret_feedback';
-import type { TurretSessionView } from '../sim/turret_defense_session';
+import type {
+  TurretDefenseView,
+  TurretMonsterView,
+  TurretSessionView,
+} from '../sim/turret_defense_session';
 import type { TurretBarrelWaveDef, TurretBowlingDef, Vec3 } from '../sim/types';
 
 /** The seat as the wire carries it, the plan joined back in: the view minus its feedback ring. */
@@ -214,7 +216,7 @@ const segment = tagged<MotionSegment, 'kind'>('kind', {
   still: segmentArm({ kind: lit('still'), start: num, end: num, ...at }),
 });
 
-const monster = shape<TurretMonster>({
+const monster = shape<TurretMonsterView>({
   id: count,
   kind: count,
   hp: nonNegative,
@@ -222,11 +224,6 @@ const monster = shape<TurretMonster>({
   state: oneOf('march', 'windup', 'fly', 'skid', 'down', 'rise', 'dead', 'gone'),
   seg: segment,
   facing: num,
-  airSince: tick,
-  throwX: num,
-  throwZ: num,
-  throwOpen: bool,
-  knocked: list(MAX_MONSTERS, count),
 });
 
 const shot = shape<TurretShot>({
@@ -240,7 +237,7 @@ const shot = shape<TurretShot>({
 
 const barrel = shape<TurretBarrel>({ id: count, ...at, litTick: tick, blowTick: tick });
 
-const defense = shape<Omit<TurretDefenseState, 'plan' | 'seed' | 'tick'>>({
+const defense = shape<Omit<TurretDefenseView, 'plan'>>({
   cx: num,
   cz: num,
   startTick: tick,
@@ -248,15 +245,10 @@ const defense = shape<Omit<TurretDefenseState, 'plan' | 'seed' | 'tick'>>({
   phase: oneOf('intro', 'wave', 'between', 'won', 'lost'),
   phaseEndTick: tick,
   wave: count,
-  spawnCursor: count,
-  nextSpawnTick: tick,
   integrity: num,
   readyTick: tick,
   aimX: num,
   aimZ: num,
-  nextShotId: count,
-  nextMonsterId: count,
-  nextBarrelId: count,
   shots: list(MAX_SHOTS, shot),
   monsters: list(MAX_MONSTERS, monster),
   barrels: list(MAX_BARRELS, barrel),

@@ -2,6 +2,7 @@
 // leaf that calls it (game.ts sits at a zero-margin monolith ceiling). The
 // feedback ring is not here: the owner-scoped `turretDefense` event carries each
 // entry, and the client rebuilds the ring from those.
+import type { TurretStats } from '../src/sim/minigames/turret_defense';
 import type { TurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import type { PlayerMeta } from '../src/sim/sim';
 import { turretSessionView } from '../src/sim/turret_defense_session';
@@ -11,6 +12,28 @@ type EmitRawSelfKey = (key: string, serialized: string) => void;
 
 const stateJson = new WeakMap<TurretSession, { rev: number; tick: number; json: string }>();
 const planJson = new WeakMap<TurretPlan, string>();
+
+// A march multiplies its direction and its speed by the length of the walk.
+const FINE_KEYS: ReadonlySet<string> = new Set(['dx', 'dz', 'speed']);
+// The result card formats these itself: rounding them first could flip its last digit.
+const EXACT_KEYS: ReadonlySet<string> = new Set([
+  'longestThrow',
+  'longestAirtime',
+] satisfies (keyof TurretStats)[]);
+
+/**
+ * The `tur` replacer: a non-integer to 3 decimals (positions to the millimetre, speeds to
+ * 1 mm/s, contact ticks to 50 microseconds), a march's direction and speed to 5, the result
+ * card's distance and airtime exact; ids, ticks and counts stay exact. The client reads the
+ * rounded seat: the online view equals the authoritative one within 1e-3. The half step
+ * stays under the 1e-3 the renderer allows when it matches a contact to the segment that
+ * starts there (the landing dust and the slide trail).
+ */
+export function turretWireNumber(key: string, value: unknown): unknown {
+  if (typeof value !== 'number' || Number.isInteger(value) || EXACT_KEYS.has(key)) return value;
+  const scale = FINE_KEYS.has(key) ? 1e5 : 1e3;
+  return Math.round(value * scale) / scale;
+}
 
 /**
  * The seat's view minus the feedback ring and the plan, serialized once per engine revision.
@@ -28,7 +51,7 @@ export function turretStateWireJson(session: TurretSession, tick: number): strin
   if (cached && cached.tick === tick) return cached.json;
   const { feedback: _ring, defense, ...seat } = turretSessionView(session);
   const { plan: _plan, ...state } = defense;
-  const json = JSON.stringify({ ...seat, defense: state });
+  const json = JSON.stringify({ ...seat, defense: state }, turretWireNumber);
   stateJson.set(session, { rev, tick, json });
   return json;
 }

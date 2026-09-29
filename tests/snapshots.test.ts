@@ -56,6 +56,7 @@ import { gameMetricsCounters } from '../server/http/game_signals';
 import { consumeMovementFramesV2 } from '../server/movement_input_timeline_v2';
 import { updateMovementOverrideEpochs } from '../server/movement_override_epoch';
 import { KeyedSerialWriteAborted } from '../server/serial_writer';
+import { turretWireNumber } from '../server/turret_self_wire';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { EMPTY_MST_CRAFTS } from '../src/net/crafting_wire';
 import { ClientWorld } from '../src/net/online';
@@ -7125,6 +7126,8 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('Fire and Fly seat over the wire (GameServer to ClientWorld)', () => {
+  const rounded = (value: unknown): unknown => JSON.parse(JSON.stringify(value, turretWireNumber));
+
   it('mirrors the seat, its plan and its event-built ring to the owner only, then clears it', () => {
     const server = new GameServer();
     const fc = fakeWs();
@@ -7153,7 +7156,11 @@ describe('Fire and Fly seat over the wire (GameServer to ClientWorld)', () => {
     let fired = false;
     for (let i = 0; i < 240; i++) {
       step();
-      expect(client.turretSession).toEqual(turretSessionFor(server.sim.ctx, pid));
+      const truth = turretSessionFor(server.sim.ctx, pid);
+      expect(rounded(client.turretSession && { ...client.turretSession, feedback: [] })).toEqual(
+        rounded(truth && { ...truth, feedback: [] }),
+      );
+      expect(client.turretSession?.feedback).toEqual(truth?.feedback);
       expect(client.turretClock).toBe(server.sim.tickCount);
       const view = client.turretSession!;
       const target = view.defense.monsters.find((m) => m.hp > 0);

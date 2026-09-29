@@ -14,6 +14,7 @@ import {
   fireTurret,
   type TurretDefenseState,
   type TurretEvent,
+  type TurretMonster,
   tickTurretDefense,
   turretMonstersLeft,
 } from './minigames/turret_defense';
@@ -52,11 +53,25 @@ type ReadonlyDeep<T> = T extends readonly (infer U)[]
     ? { readonly [K in keyof T]: ReadonlyDeep<T[K]> }
     : T;
 
+// Engine bookkeeping no reader draws from (the throw and airtime stats, the bowling pair
+// guard, the spawn and id cursors); the online wire would otherwise carry it every revision.
+type TurretMonsterBookkeeping = 'airSince' | 'throwX' | 'throwZ' | 'throwOpen' | 'knocked';
+type TurretDefenseBookkeeping =
+  | 'spawnCursor'
+  | 'nextSpawnTick'
+  | 'nextShotId'
+  | 'nextMonsterId'
+  | 'nextBarrelId';
+
+export type TurretMonsterView = ReadonlyDeep<Omit<TurretMonster, TurretMonsterBookkeeping>>;
+
 /**
  * The engine state minus its clock (`tick` advances outside the revision; read
- * `IWorld.turretClock`) and minus its seed (it would predict spawns and throws).
+ * `IWorld.turretClock`), its seed (it would predict spawns and throws) and its bookkeeping.
  */
-export type TurretDefenseView = ReadonlyDeep<Omit<TurretDefenseState, 'tick' | 'seed'>>;
+export type TurretDefenseView = ReadonlyDeep<
+  Omit<TurretDefenseState, 'tick' | 'seed' | 'monsters' | TurretDefenseBookkeeping>
+> & { readonly monsters: readonly TurretMonsterView[] };
 
 export interface TurretSessionView {
   readonly origin: Readonly<Vec3>;
@@ -274,16 +289,43 @@ export function endTurretSeat(
   applySeatMount(ctx, player, prior);
 }
 
+function monsterView(m: TurretMonster): TurretMonsterView {
+  const {
+    airSince: _air,
+    throwX: _throwX,
+    throwZ: _throwZ,
+    throwOpen: _open,
+    knocked: _knocked,
+    seg,
+    ...shown
+  } = m;
+  return { ...shown, seg: { ...seg } };
+}
+
 function cloneView(session: TurretSession): TurretSessionView {
   const defense = session.defense;
-  const { tick: _clock, seed: _seed, plan, shots, monsters, barrels, stats, ...scalars } = defense;
+  const {
+    tick: _clock,
+    seed: _seed,
+    spawnCursor: _cursor,
+    nextSpawnTick: _nextSpawn,
+    nextShotId: _nextShot,
+    nextMonsterId: _nextMonster,
+    nextBarrelId: _nextBarrel,
+    plan,
+    shots,
+    monsters,
+    barrels,
+    stats,
+    ...scalars
+  } = defense;
   return {
     origin: { ...session.origin },
     defense: {
       ...scalars,
       plan,
       shots: shots.map((shot) => ({ ...shot })),
-      monsters: monsters.map((m) => ({ ...m, seg: { ...m.seg }, knocked: m.knocked.slice() })),
+      monsters: monsters.map(monsterView),
       barrels: barrels.map((barrel) => ({ ...barrel })),
       stats: { ...stats },
     },

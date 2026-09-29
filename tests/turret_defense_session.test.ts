@@ -906,10 +906,12 @@ describe('the IWorld read', () => {
     expect(sim.useVehicleAction('turret_fire', { x: center.x + 12, z: center.z })).toBe(true);
     const view = sim.turretSession!;
     const live = turretSeat(sim).defense;
-    expect(view.defense.monsters).toEqual(live.monsters);
+    const shown = live.monsters.map(
+      ({ airSince: _air, throwX: _x, throwZ: _z, throwOpen: _open, knocked: _knocked, ...m }) => m,
+    );
+    expect(view.defense.monsters).toEqual(shown);
     expect(view.defense.monsters).not.toBe(live.monsters);
     expect(view.defense.monsters[0].seg).not.toBe(live.monsters[0].seg);
-    expect(view.defense.monsters[0].knocked).not.toBe(live.monsters[0].knocked);
     expect(live.shots).toHaveLength(1);
     expect(view.defense.shots).toEqual(live.shots);
     expect(view.defense.shots).not.toBe(live.shots);
@@ -923,6 +925,27 @@ describe('the IWorld read', () => {
     expect(view.feedback).not.toBe(turretSeat(sim).feedback);
     expect(Object.isFrozen(view.feedback[0])).toBe(true);
     expect(Object.isFrozen(view.feedback[0].event)).toBe(true);
+  });
+
+  it('leaves the engine bookkeeping out of the view, and keeps each maxHp', () => {
+    const { sim } = rig();
+    seat(sim);
+    for (let i = 0; i < TURRET_TIMING.introTicks + 5; i++) sim.tick();
+    const view = sim.turretSession!;
+    const live = turretSeat(sim).defense;
+    expect(live.monsters.length).toBeGreaterThan(0);
+    const cursors = ['spawnCursor', 'nextSpawnTick', 'nextShotId', 'nextMonsterId', 'nextBarrelId'];
+    for (const key of ['tick', 'seed', ...cursors]) {
+      expect(live).toHaveProperty(key);
+      expect(view.defense).not.toHaveProperty(key);
+    }
+    for (const [i, m] of view.defense.monsters.entries()) {
+      for (const key of ['airSince', 'throwX', 'throwZ', 'throwOpen', 'knocked']) {
+        expect(live.monsters[i]).toHaveProperty(key);
+        expect(m).not.toHaveProperty(key);
+      }
+      expect(m.maxHp).toBe(live.monsters[i].maxHp);
+    }
   });
 
   it('exposes what the HUD needs: cooldown, phase and end, wave and count, monsters left, integrity, stats', () => {

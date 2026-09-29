@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { turretPlanWireJson, turretStateWireJson } from '../server/turret_self_wire';
+import {
+  turretPlanWireJson,
+  turretStateWireJson,
+  turretWireNumber,
+} from '../server/turret_self_wire';
 import {
   decodeTurretFeedback,
   decodeTurretPlan,
@@ -25,6 +29,11 @@ type Wire = ReturnType<typeof JSON.parse>;
 
 function wire(value: unknown): Wire {
   return JSON.parse(JSON.stringify(value));
+}
+
+/** A value as the `tur` key carries it: the rounding the server applies, both sides alike. */
+function rounded(value: unknown): unknown {
+  return JSON.parse(JSON.stringify(value, turretWireNumber));
 }
 
 function seatOf(view: TurretSessionView): TurretSeatState {
@@ -129,12 +138,12 @@ describe('the turret plan key', () => {
 });
 
 describe('the turret seat key', () => {
-  it('round-trips every revision of a won and a lost run by value, joined to its plan', () => {
+  it('round-trips every revision of a won and a lost run within the wire rounding, joined to its plan', () => {
     const states = new Set<string>();
     const segments = new Set<string>();
     for (const { view, json } of [...won.revisions, ...lost.revisions]) {
       const decoded = decodeTurretSeat(JSON.parse(json), plan);
-      expect(decoded).toEqual(seatOf(view));
+      expect(rounded(decoded)).toEqual(rounded(seatOf(view)));
       expect(decoded!.defense.plan).toBe(plan);
       for (const m of view.defense.monsters) {
         states.add(m.state);
@@ -162,6 +171,16 @@ describe('the turret seat key', () => {
     const decoded = decodeTurretSeat(forged, plan)!;
     expect(decoded.defense.monsters[0]).not.toHaveProperty('tint');
     expect(decoded).not.toHaveProperty('later');
+  });
+
+  it("drops the engine bookkeeping an older server's seat still carries", () => {
+    const forged = wire(seatOf(midWave()));
+    Object.assign(forged.defense, { spawnCursor: 2, nextShotId: 9, nextBarrelId: 3 });
+    Object.assign(forged.defense.monsters[0], { airSince: -1, throwOpen: false, knocked: [] });
+    const decoded = decodeTurretSeat(forged, plan)!;
+    expect(decoded).toEqual(seatOf(midWave()));
+    expect(decoded.defense).not.toHaveProperty('nextShotId');
+    expect(decoded.defense.monsters[0]).not.toHaveProperty('knocked');
   });
 
   it.each([
@@ -194,7 +213,7 @@ describe('the turret seat key', () => {
       'oversized barrels',
       (s: Wire) => (s.defense.barrels = Array.from({ length: 65 }, () => s.defense.barrels[0])),
     ],
-    ['a negative knock id', (s: Wire) => (s.defense.monsters[0].knocked = [-1])],
+    ['a negative shot id', (s: Wire) => (s.defense.shots[0].id = -1)],
   ])('rejects the whole seat for %s', (_, forge) => {
     const forged = wire(seatOf(midWave()));
     forge(forged);
