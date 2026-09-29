@@ -693,6 +693,7 @@ import {
 } from './talent_save_migration';
 import * as ferryMod from './transport_ferry';
 import type { TransportFerryView } from './transport_schedule';
+import { turretSavePosition } from './turret_save_position';
 import { updateAbilityDrill } from './tutorial/ability_drill';
 import { updateGauntletRuns } from './tutorial/gauntlet_run';
 import { updateTutorialGreeting } from './tutorial/greeting';
@@ -3882,8 +3883,7 @@ export class Sim {
         e.resource,
         e.savedMana,
       ),
-      pos: ferryMod.ferrySavePosition(e), // never the sea: a ride saves the destination pier
-      facing: e.facing,
+      ...turretSavePosition(meta.vehicle, e), // pos and facing: never the arena, never the sea
       // Death state: a released spirit resumes its corpse run on relog, and a
       // dead-but-unreleased corpse auto-releases on load (see addPlayer).
       dead: e.dead,
