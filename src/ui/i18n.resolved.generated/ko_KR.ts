@@ -826,6 +826,26 @@ export const ko_KR: EnTranslations = {
       }
     },
     "wocStore": {
+      "subscription": {
+        "title": "게임 정기 구독",
+        "price": "월 {price}",
+        "terms": "매월 자동 갱신됩니다. Stripe에서 법정 화폐로 결제하세요. 결제 설정에서 취소할 수 있습니다.",
+        "subscribe": "구독하기",
+        "manage": "구독 관리",
+        "ending": "현재 결제 기간이 끝나면 취소됩니다",
+        "error": "결제 페이지를 열 수 없습니다. 팝업을 허용한 후 다시 시도하세요.",
+        "status": {
+          "none": "구독 안 함",
+          "incomplete": "결제 미완료",
+          "incomplete_expired": "결제 유효 기간 만료",
+          "trialing": "체험 중",
+          "active": "활성",
+          "past_due": "결제 기한 초과",
+          "canceled": "취소됨",
+          "unpaid": "미납",
+          "paused": "일시 중지됨"
+        }
+      },
       "title": "WOC 상점",
       "close": "WOC 상점 닫기",
       "tabsLabel": "WOC 상점 구역",

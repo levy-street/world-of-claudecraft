@@ -826,6 +826,26 @@ export const ja_JP: EnTranslations = {
       }
     },
     "wocStore": {
+      "subscription": {
+        "title": "ゲームの定期購入",
+        "price": "月額 {price}",
+        "terms": "毎月自動更新されます。Stripe で法定通貨によるお支払いができます。請求設定から解約できます。",
+        "subscribe": "定期購入する",
+        "manage": "定期購入を管理",
+        "ending": "現在の請求期間の終了時に解約されます",
+        "error": "請求ページを開けませんでした。ポップアップを許可して再試行してください。",
+        "status": {
+          "none": "未登録",
+          "incomplete": "支払い未完了",
+          "incomplete_expired": "決済の有効期限切れ",
+          "trialing": "試用中",
+          "active": "有効",
+          "past_due": "支払い期限超過",
+          "canceled": "解約済み",
+          "unpaid": "未払い",
+          "paused": "一時停止中"
+        }
+      },
       "title": "WOCストア",
       "close": "WOCストアを閉じる",
       "tabsLabel": "WOCストアのセクション",

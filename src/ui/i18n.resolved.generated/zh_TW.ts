@@ -826,6 +826,26 @@ export const zh_TW: EnTranslations = {
       }
     },
     "wocStore": {
+      "subscription": {
+        "title": "遊戲訂閱",
+        "price": "每月 {price}",
+        "terms": "每月自動續訂。透過 Stripe 使用法定貨幣付款。可在帳單設定中取消。",
+        "subscribe": "訂閱",
+        "manage": "管理訂閱",
+        "ending": "將在目前帳單週期結束時取消",
+        "error": "無法開啟帳單頁面。請允許彈出式視窗後重試。",
+        "status": {
+          "none": "未訂閱",
+          "incomplete": "付款未完成",
+          "incomplete_expired": "結帳已過期",
+          "trialing": "試用中",
+          "active": "有效",
+          "past_due": "付款逾期",
+          "canceled": "已取消",
+          "unpaid": "未付款",
+          "paused": "已暫停"
+        }
+      },
       "title": "WOC 商店",
       "close": "關閉 WOC 商店",
       "tabsLabel": "WOC 商店分區",

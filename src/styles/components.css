@@ -3941,6 +3941,13 @@
     color: var(--color-accent);
     background: var(--color-primary-glow);
   }
+  [data-subscription-section] .ui-btn {
+    min-height: 40px;
+    min-width: 40px;
+  }
+  [data-subscription-section] p {
+    margin-block: var(--spacing-sm);
+  }
   .woc-store-balance {
     z-index: 1;
     align-self: start;

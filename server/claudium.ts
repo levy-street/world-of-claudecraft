@@ -17,6 +17,7 @@ import type * as http from 'node:http';
 import { isMountSkinId } from '../src/sim/content/mount_skins';
 import { isKnownStorageSkuId } from '../src/sim/content/storage_charters';
 import { WEAPON_SKINS } from '../src/sim/content/weapon_skins';
+import { GAME_SUBSCRIPTION_PLAN, GAME_SUBSCRIPTION_PRICE } from '../src/subscription_contract';
 import {
   type ClaudiumNativeRail,
   type ClaudiumPriceRail,
@@ -61,8 +62,11 @@ import {
   type ClaudiumMutationAction,
   claudiumMutationRateLimited,
   claudiumPreAuthRateLimited as claudiumPreAuthIpRateLimited,
+  publicReadRateLimited,
 } from './ratelimit';
 import { STORAGE_KEY_PATTERN, STORAGE_MAX_EXPECTED_COST_CLAUDIUM } from './storage_purchases';
+
+import { gameSubscriptionLink, gameSubscriptionSnapshot } from './subscription_proxy';
 
 const STRIPE_WEBHOOK_MAX_BYTES = 1024 * 1024;
 
@@ -113,7 +117,12 @@ function isKnownWeaponSkinId(itemId: string): boolean {
 function claudiumMutationAction(req: http.IncomingMessage): ClaudiumMutationAction | null {
   if (req.method !== 'POST') return null;
   const path = new URL(req.url ?? '/', 'http://localhost').pathname;
-  if (path === '/api/claudium/purchase') return 'purchase';
+  if (
+    path === '/api/claudium/purchase' ||
+    path === '/api/claudium/subscription/checkout' ||
+    path === '/api/claudium/subscription/portal'
+  )
+    return 'purchase';
   if (path === '/api/claudium/native/quote') return 'quote';
   if (path === '/api/claudium/native/confirm') {
     return 'confirm';
@@ -126,6 +135,11 @@ function claudiumMutationAction(req: http.IncomingMessage): ClaudiumMutationActi
 export function claudiumPreAuthMutationRateLimited(
   req: http.IncomingMessage,
 ): RateLimitOutcome | null {
+  if (
+    req.method === 'GET' &&
+    new URL(req.url ?? '/', 'http://localhost').pathname === '/api/claudium/subscription'
+  )
+    return publicReadRateLimited(req);
   const action = claudiumMutationAction(req);
   return action ? claudiumPreAuthIpRateLimited(req, action) : null;
 }
@@ -240,6 +254,27 @@ export async function handleClaudiumApi(
     if (!outcome.allowed) return json(res, 429, { error: 'rate_limited' });
   }
 
+  if (req.method === 'GET' && path === '/api/claudium/subscription') {
+    return json(res, 200, {
+      plan: GAME_SUBSCRIPTION_PLAN,
+      price: GAME_SUBSCRIPTION_PRICE,
+      ...(await gameSubscriptionSnapshot(accountId)),
+    });
+  }
+  if (req.method === 'POST' && path === '/api/claudium/subscription/checkout') {
+    return json(
+      res,
+      200,
+      await gameSubscriptionLink(accountId, 'checkout', await readBody(req).catch(() => null)),
+    );
+  }
+  if (req.method === 'POST' && path === '/api/claudium/subscription/portal') {
+    return json(
+      res,
+      200,
+      await gameSubscriptionLink(accountId, 'portal', await readBody(req).catch(() => null)),
+    );
+  }
   if (req.method === 'GET' && path === '/api/claudium/balance') {
     return json(res, 200, await claudiumBalance(accountId));
   }
@@ -502,6 +537,46 @@ function claudiumHandler(ctx: Ctx): Promise<void> {
 }
 
 export const routes: RouteDef[] = [
+  {
+    method: 'GET',
+    path: '/api/claudium/subscription',
+    surface: 'api',
+    middleware: [
+      async (ctx, next) => {
+        const outcome = publicReadRateLimited(ctx.req);
+        if (!outcome.allowed) {
+          json(ctx.res, 429, { error: 'rate_limited' });
+          return;
+        }
+        await next();
+      },
+      activeGuard,
+    ],
+    handler: claudiumHandler,
+  },
+  {
+    method: 'POST',
+    path: '/api/claudium/subscription/checkout',
+    surface: 'api',
+    middleware: [
+      rateLimit(CLAUDIUM_PURCHASE_PRE_AUTH_POLICY),
+      activeGuard,
+      rateLimit(CLAUDIUM_PURCHASE_POLICY),
+    ],
+    handler: claudiumHandler,
+  },
+  {
+    method: 'POST',
+    path: '/api/claudium/subscription/portal',
+    surface: 'api',
+    middleware: [
+      rateLimit(CLAUDIUM_PURCHASE_PRE_AUTH_POLICY),
+      activeGuard,
+      rateLimit(CLAUDIUM_PURCHASE_POLICY),
+    ],
+    handler: claudiumHandler,
+  },
+
   {
     method: 'POST',
     path: '/api/claudium/stripe/webhook',

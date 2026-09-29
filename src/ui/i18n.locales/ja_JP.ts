@@ -13,6 +13,24 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.wocStore.subscription.title': 'ゲームの定期購入',
+  'hudChrome.wocStore.subscription.price': '月額 {price}',
+  'hudChrome.wocStore.subscription.terms':
+    '毎月自動更新されます。Stripe で法定通貨によるお支払いができます。請求設定から解約できます。',
+  'hudChrome.wocStore.subscription.subscribe': '定期購入する',
+  'hudChrome.wocStore.subscription.manage': '定期購入を管理',
+  'hudChrome.wocStore.subscription.ending': '現在の請求期間の終了時に解約されます',
+  'hudChrome.wocStore.subscription.error':
+    '請求ページを開けませんでした。ポップアップを許可して再試行してください。',
+  'hudChrome.wocStore.subscription.status.none': '未登録',
+  'hudChrome.wocStore.subscription.status.incomplete': '支払い未完了',
+  'hudChrome.wocStore.subscription.status.incomplete_expired': '決済の有効期限切れ',
+  'hudChrome.wocStore.subscription.status.trialing': '試用中',
+  'hudChrome.wocStore.subscription.status.active': '有効',
+  'hudChrome.wocStore.subscription.status.past_due': '支払い期限超過',
+  'hudChrome.wocStore.subscription.status.canceled': '解約済み',
+  'hudChrome.wocStore.subscription.status.unpaid': '未払い',
+  'hudChrome.wocStore.subscription.status.paused': '一時停止中',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}分',
   'abilityUi.cast.hoard_cast_rime_beam': '霜光線',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount}{currency}',

@@ -2733,6 +2733,7 @@ const UI_DOM_MODULES = [
   // carries or the by-name sweep that would drop this very row. The double
   // coverage is the deliberate one this file's own header describes.
   'src/ui/daily_rewards_spin_controller.ts',
+  'src/ui/store_subscription.ts',
   'src/ui/daily_rewards_window.ts',
   'src/ui/deeds_window.ts',
   'src/ui/desktop_update_toast.ts',

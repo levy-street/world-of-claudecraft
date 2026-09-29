@@ -129,6 +129,7 @@ import {
   xpUntilNextPrestige,
 } from '../sim/types';
 import { maxBuyCount } from '../sim/vendor_buy_stack';
+import type { SubscriptionStoreHooks } from '../subscription_contract';
 import {
   type CharacterProfile,
   type DailyRewardStatus,
@@ -869,6 +870,7 @@ import { stackSizeTooltipLine } from './stack_size_tooltip_view';
 import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tooltip_view';
 import { clearOpenStoreResult, MODAL_PROMPT_SELECTOR } from './store_decision_prompt';
 import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
+import { dailyRewardsStoreSnapshot } from './store_snapshot_adapter';
 import { nearestSubzone } from './subzone';
 import { SwingTimerBars } from './swing_timer_bars';
 import { localizeSystemText } from './system_text_i18n';
@@ -1020,6 +1022,7 @@ export interface ReportHooks {
  * purchase / cosmetic-redeem flows. All values originate in the economy service.
  */
 export interface ClaudiumHooks {
+  subscription?: SubscriptionStoreHooks;
   balance(): Promise<number | null>;
   storeSnapshot(): Promise<{
     available: boolean;
@@ -5858,15 +5861,12 @@ export class Hud {
     onClose: () => this.dailyRewardsLauncher.refresh(true),
     onWalletConnect: requestWalletVerify,
     ...this.claudiumPurchase,
+    subscriptionHooks: () => this.claudiumHooks?.subscription,
     storeSnapshot: async () => {
       const snapshot = await this.claudiumHooks?.storeSnapshot();
       if (!snapshot) return { available: false, balance: null, items: [] };
       this.claudiumBalance.set(snapshot.balance);
-      return {
-        available: snapshot.available,
-        balance: snapshot.balance,
-        items: [...snapshot.storeItems],
-      };
+      return dailyRewardsStoreSnapshot(snapshot);
     },
     ...this.windowFocus('#daily-rewards-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),

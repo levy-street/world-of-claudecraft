@@ -1,4 +1,5 @@
 import { applyFrameGeometrySetting } from './game/frame_geometry_settings';
+import { createSubscriptionStoreHooks, storeSnapshotForHud } from './net/subscription_sdk';
 import { formatAbilityImbueDamage } from './ui/ability_imbue_text';
 import { bindChatComposerFocusState, resetChatComposer } from './ui/chat_composer_focus_controller';
 import { dispatchCollectionAction } from './ui/collection_actions_core';
@@ -3103,14 +3104,8 @@ async function startGame(
     };
     const claudiumHooks: ClaudiumHooks = {
       balance: async () => (await economy.balance()).balance,
-      storeSnapshot: async () => {
-        const snapshot = await economy.storeSnapshot();
-        return {
-          available: snapshot.available,
-          balance: snapshot.balance,
-          storeItems: snapshot.items,
-        };
-      },
+      subscription: createSubscriptionStoreHooks({ token: () => api.token, base: api.base }),
+      storeSnapshot: () => storeSnapshotForHud(economy),
       snapshot: async () => {
         const pack = await economy.packSnapshot();
         if (!pack.available) {

@@ -13,6 +13,23 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.wocStore.subscription.title': '游戏订阅',
+  'hudChrome.wocStore.subscription.price': '每月 {price}',
+  'hudChrome.wocStore.subscription.terms':
+    '每月自动续费。通过 Stripe 使用法定货币付款。可在账单设置中取消。',
+  'hudChrome.wocStore.subscription.subscribe': '订阅',
+  'hudChrome.wocStore.subscription.manage': '管理订阅',
+  'hudChrome.wocStore.subscription.ending': '将在当前账单周期结束时取消',
+  'hudChrome.wocStore.subscription.error': '无法打开账单页面。请允许弹出窗口后重试。',
+  'hudChrome.wocStore.subscription.status.none': '未订阅',
+  'hudChrome.wocStore.subscription.status.incomplete': '付款未完成',
+  'hudChrome.wocStore.subscription.status.incomplete_expired': '结账已过期',
+  'hudChrome.wocStore.subscription.status.trialing': '试用中',
+  'hudChrome.wocStore.subscription.status.active': '有效',
+  'hudChrome.wocStore.subscription.status.past_due': '付款逾期',
+  'hudChrome.wocStore.subscription.status.canceled': '已取消',
+  'hudChrome.wocStore.subscription.status.unpaid': '未付款',
+  'hudChrome.wocStore.subscription.status.paused': '已暂停',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}分钟',
   'abilityUi.cast.hoard_cast_rime_beam': '白霜射束',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',

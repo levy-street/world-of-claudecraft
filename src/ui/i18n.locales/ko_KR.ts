@@ -13,6 +13,24 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.wocStore.subscription.title': '게임 정기 구독',
+  'hudChrome.wocStore.subscription.price': '월 {price}',
+  'hudChrome.wocStore.subscription.terms':
+    '매월 자동 갱신됩니다. Stripe에서 법정 화폐로 결제하세요. 결제 설정에서 취소할 수 있습니다.',
+  'hudChrome.wocStore.subscription.subscribe': '구독하기',
+  'hudChrome.wocStore.subscription.manage': '구독 관리',
+  'hudChrome.wocStore.subscription.ending': '현재 결제 기간이 끝나면 취소됩니다',
+  'hudChrome.wocStore.subscription.error':
+    '결제 페이지를 열 수 없습니다. 팝업을 허용한 후 다시 시도하세요.',
+  'hudChrome.wocStore.subscription.status.none': '구독 안 함',
+  'hudChrome.wocStore.subscription.status.incomplete': '결제 미완료',
+  'hudChrome.wocStore.subscription.status.incomplete_expired': '결제 유효 기간 만료',
+  'hudChrome.wocStore.subscription.status.trialing': '체험 중',
+  'hudChrome.wocStore.subscription.status.active': '활성',
+  'hudChrome.wocStore.subscription.status.past_due': '결제 기한 초과',
+  'hudChrome.wocStore.subscription.status.canceled': '취소됨',
+  'hudChrome.wocStore.subscription.status.unpaid': '미납',
+  'hudChrome.wocStore.subscription.status.paused': '일시 중지됨',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}분',
   'abilityUi.cast.hoard_cast_rime_beam': '상고대 광선',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',

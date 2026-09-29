@@ -13,6 +13,24 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.wocStore.subscription.title': 'Подписка на игру',
+  'hudChrome.wocStore.subscription.price': '{price} в месяц',
+  'hudChrome.wocStore.subscription.terms':
+    'Продлевается ежемесячно. Оплата фиатной валютой через Stripe. Отмена в настройках платежей.',
+  'hudChrome.wocStore.subscription.subscribe': 'Подписаться',
+  'hudChrome.wocStore.subscription.manage': 'Управление подпиской',
+  'hudChrome.wocStore.subscription.ending': 'Будет отменена в конце расчётного периода',
+  'hudChrome.wocStore.subscription.error':
+    'Не удалось открыть страницу оплаты. Разрешите всплывающие окна и повторите попытку.',
+  'hudChrome.wocStore.subscription.status.none': 'Нет подписки',
+  'hudChrome.wocStore.subscription.status.incomplete': 'Оплата не завершена',
+  'hudChrome.wocStore.subscription.status.incomplete_expired': 'Срок оплаты истёк',
+  'hudChrome.wocStore.subscription.status.trialing': 'Пробный период',
+  'hudChrome.wocStore.subscription.status.active': 'Активна',
+  'hudChrome.wocStore.subscription.status.past_due': 'Платёж просрочен',
+  'hudChrome.wocStore.subscription.status.canceled': 'Отменена',
+  'hudChrome.wocStore.subscription.status.unpaid': 'Не оплачена',
+  'hudChrome.wocStore.subscription.status.paused': 'Приостановлена',
   'abilityUi.actionBar.cooldownMinutes': '{minutes} мин',
   'abilityUi.cast.hoard_cast_rime_beam': 'Луч инея',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',

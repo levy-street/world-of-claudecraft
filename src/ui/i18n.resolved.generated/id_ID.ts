@@ -826,6 +826,26 @@ export const id_ID: EnTranslations = {
       }
     },
     "wocStore": {
+      "subscription": {
+        "title": "Game subscription",
+        "price": "{price} per month",
+        "terms": "Renews monthly. Pay with fiat through Stripe. Cancel in billing settings.",
+        "subscribe": "Subscribe",
+        "manage": "Manage subscription",
+        "ending": "Cancels at the end of the billing period",
+        "error": "Could not open billing. Allow popups and try again.",
+        "status": {
+          "none": "Not subscribed",
+          "incomplete": "Payment incomplete",
+          "incomplete_expired": "Checkout expired",
+          "trialing": "Trial",
+          "active": "Active",
+          "past_due": "Payment overdue",
+          "canceled": "Canceled",
+          "unpaid": "Unpaid",
+          "paused": "Paused"
+        }
+      },
       "title": "Toko WOC",
       "close": "Tutup Toko WOC",
       "tabsLabel": "Bagian Toko WOC",
