@@ -18011,7 +18011,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turret.statAccuracy': '命中率：{value}',
   'hudChrome.turret.statThrow': '最远抛飞：{yards} 码',
   'hudChrome.turret.statAirtime': '最长滞空：{seconds} 秒',
-  'hudChrome.turret.leave': '离开坦克',
+  'hudChrome.turret.leave': '离开塔楼',
   'hudChrome.leaderboard.tabWorldQuests': '世界任务',
   'hudChrome.leaderboard.wqBoardsLabel': '世界任务排行榜',
   'hudChrome.leaderboard.wqMedal': '奖牌',

@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { turretSfxCueInto } from '../src/game/turret_defense_sfx';
 import { setBuildSpanSink } from '../src/render/build_spans';
 import { PUFF } from '../src/render/cannon_puff_core';
+import { CANNON_MUZZLE, cannonRecoilOffset } from '../src/render/cannon_shell_core';
 import {
   type CannonShellHost,
   CannonShellVisuals,
@@ -16,11 +17,20 @@ import { turretBodyCapacity, turretRigCapacities } from '../src/render/turret_de
 import { TURRET_MARKER_LIFT, turretMarkerRadius } from '../src/render/turret_ground_marker_core';
 import type { TurretGroundMarkers } from '../src/render/turret_ground_markers';
 import {
+  TURRET_BARREL,
+  TURRET_GUNNER,
+  TURRET_HEAD,
+  TURRET_TOWER_MODEL,
+  turretBarrelPitch,
+} from '../src/render/turret_tower_core';
+import { TURRET_TOWER_MATERIAL_PREFIX, TURRET_TOWER_NAME } from '../src/render/turret_tower_visual';
+import {
   buildWorldQuestTraceStandIn,
   worldQuestTraceMaterials,
 } from '../src/render/world_quest_trace_materials';
 import { TURRET_TIMING } from '../src/sim/content/turret_defense';
 import { MOBS } from '../src/sim/data';
+import { FIRE_AND_FLY_TOWER } from '../src/sim/fire_and_fly_field';
 import {
   marchSegment,
   positionAt,
@@ -94,6 +104,11 @@ vi.mock('../src/render/characters', () => ({
 vi.mock('../src/render/characters/assets', () => ({
   charactersReady: () => Promise.resolve(),
 }));
+// The tower's GLB never arrives unless a case hands the painter a model of its own.
+vi.mock('../src/render/assets/loader', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/render/assets/loader')>()),
+  loadGltf: () => new Promise(() => {}),
+}));
 
 import { TurretDefenseVisual } from '../src/render/turret_defense_visual';
 
@@ -153,6 +168,46 @@ function wolf(state: TurretDefenseState, over: Partial<TurretMonster>): TurretMo
     throwOpen: false,
     ...over,
   } as TurretMonster;
+}
+
+/** hex_tower_cannon.glb's node tree as GLTFLoader builds it: the painter reads its names and transforms. */
+function towerModel(): THREE.Group {
+  const material = new THREE.MeshStandardMaterial({ roughness: 0.7, metalness: 0.4 });
+  material.name = 'hexagons_medieval';
+  const box = new THREE.BoxGeometry();
+  const scene = new THREE.Group();
+  const root = new THREE.Group();
+  root.name = 'building_tower_cannon_green';
+  const body = new THREE.Mesh(box, material);
+  body.position.set(0, 0.75, 0.024);
+  const head = new THREE.Group();
+  head.name = TURRET_TOWER_MODEL.headNode;
+  head.position.y = 1.4;
+  const headMesh = new THREE.Mesh(box, material);
+  headMesh.position.set(0.04, 0.282, 0);
+  const barrel = new THREE.Mesh(box, material);
+  barrel.name = TURRET_TOWER_MODEL.barrelNode;
+  barrel.position.set(0, TURRET_TOWER_MODEL.barrelPivot.y, TURRET_TOWER_MODEL.barrelPivot.z);
+  barrel.scale.setScalar(TURRET_TOWER_MODEL.barrelHalfLength);
+  head.add(barrel, headMesh);
+  root.add(head, body);
+  scene.add(root);
+  return scene;
+}
+
+/** A turret painter whose tower is built (its gate settled at once) once seated. */
+async function seatedWithTower(view: TurretSessionView, self?: { group: THREE.Group }) {
+  const source = vi.fn(async () => towerModel());
+  const visual = new TurretDefenseVisual(
+    new THREE.Scene(),
+    () => 0,
+    () => Promise.resolve(),
+    undefined,
+    source,
+  );
+  visual.update(view, 0, 0, 0.016, false, self);
+  await flush();
+  return { visual, source };
 }
 
 function part(visual: TurretDefenseVisual, name: string): THREE.Object3D {
@@ -1069,30 +1124,175 @@ describe('Fire and Fly monsters on screen', () => {
     }
   });
 
-  it("fires from the tank's own barrel and kicks it back, found through the self view", () => {
-    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0);
-    const scene = new THREE.Scene();
-    const root = new THREE.Group();
-    const hull = new THREE.Group();
-    hull.name = 'HullPivot';
-    const barrel = new THREE.Object3D();
-    barrel.name = 'TankCannon';
-    barrel.position.set(0.225, 1.66, 0.535);
-    hull.add(barrel);
-    root.add(hull);
-    scene.add(root);
-    const self = { mountVisual: { root } };
+  it('files the tower build in the build ledger once, when its model lands', async () => {
+    const spans: string[] = [];
+    setBuildSpanSink((kind) => spans.push(kind));
+    try {
+      const view = viewOf(engine(0));
+      const { visual } = await seatedWithTower(view);
+      visual.update(view, 1, 0.05, 0.016);
+      visual.update(view, 2, 0.1, 0.016);
+      await flush();
+      expect(spans.filter((kind) => kind === 'zone:turret-tower')).toHaveLength(1);
+      visual.dispose();
+    } finally {
+      setBuildSpanSink(null);
+    }
+  });
+
+  it('tries a tower model that failed to load again after the view retry cooldown, not every frame', async () => {
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const view = viewOf(engine(0));
+      const source = vi
+        .fn<() => Promise<THREE.Object3D>>()
+        .mockRejectedValueOnce(new Error('offline'))
+        .mockImplementation(async () => towerModel());
+      const visual = new TurretDefenseVisual(
+        new THREE.Scene(),
+        () => 0,
+        () => Promise.resolve(),
+        undefined,
+        source,
+      );
+      visual.update(view, 0, 0, 0.016);
+      await flush();
+      expect(source).toHaveBeenCalledTimes(1);
+      visual.update(view, 1, 1, 0.016);
+      visual.update(view, 2, 1.9, 0.016);
+      await flush();
+      expect(source).toHaveBeenCalledTimes(1);
+      expect(visual.group.getObjectByName(TURRET_TOWER_MODEL.headNode)).toBeUndefined();
+      visual.update(view, 3, 2.1, 0.016);
+      await flush();
+      expect(source).toHaveBeenCalledTimes(2);
+      expect(visual.group.getObjectByName(TURRET_TOWER_MODEL.headNode)).toBeDefined();
+      visual.dispose();
+    } finally {
+      errors.mockRestore();
+    }
+  });
+
+  it('builds the cannon tower once at the commitment, behind the gate, its roof under the seated feet', async () => {
     const state = engine(0);
-    visual.update(viewOf(state), 160, 0, 0.016, false, self);
-    visual.update(viewOf(state, [firedAt160]), 160, 0, 0.016, false, self);
-    const shell = weaponPosition(visual, 'shell');
-    const tip = new THREE.Vector3(-0.133, 0, 1.02).applyMatrix4(barrel.matrixWorld);
-    expect(shell.distanceTo(tip)).toBeLessThan(1e-6);
-    visual.update(viewOf(state, [firedAt160]), 160, 0.035, 0.016, false, self);
-    expect(barrel.position.z).toBeLessThan(0.535 - 0.2);
-    expect(hull.position.z).toBe(0);
-    visual.update(viewOf(state, [firedAt160]), 161, 2, 0.016, false, self);
-    expect(barrel.position.z).toBeCloseTo(0.535, 12);
+    const view = { ...viewOf(state), origin: { x: 0, y: 7, z: 0 } };
+    const source = vi.fn(async () => towerModel());
+    const gate = vi.fn(() => new Promise<void>(() => {}));
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0, gate, undefined, source);
+    await flush();
+    expect(source).not.toHaveBeenCalled();
+    visual.update(view, 0, 0, 0.016);
+    visual.update(view, 1, 0.05, 0.016);
+    await flush();
+    expect(source).toHaveBeenCalledTimes(1);
+    const tower = part(visual, TURRET_TOWER_NAME);
+    expect(gate).toHaveBeenCalledWith(tower);
+    expect(tower.visible).toBe(false);
+    visual.update(view, 2, 0.1, 0.016);
+    const head = part(visual, TURRET_TOWER_MODEL.headNode);
+    head.updateWorldMatrix(true, false);
+    expect(new THREE.Vector3().setFromMatrixPosition(head.matrixWorld).y).toBeCloseTo(7, 9);
+    expect(tower.position.y).toBeCloseTo(7 - FIRE_AND_FLY_TOWER.roofY, 12);
+    expect(tower.children[0].scale.x).toBe(FIRE_AND_FLY_TOWER.scale);
+    // One material of its own, named, dielectric: the kit's shared one is never touched.
+    const materials = new Set<THREE.Material>();
+    tower.traverse((node) => {
+      const mesh = node as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      materials.add(mesh.material as THREE.Material);
+      expect(mesh.castShadow && mesh.receiveShadow).toBe(true);
+    });
+    expect(materials.size).toBe(1);
+    const [material] = materials;
+    expect(material.name).toBe(`${TURRET_TOWER_MATERIAL_PREFIX}hexagons_medieval`);
+    if (material instanceof THREE.MeshStandardMaterial) expect(material.metalness).toBe(0);
+    let lights = 0;
+    visual.group.traverse((node) => {
+      if ((node as THREE.Light).isLight) lights++;
+    });
+    expect(lights).toBe(0);
+    visual.dispose();
+  });
+
+  it('turns only the head toward the aim, eased and never past 540 degrees a second', async () => {
+    const state = engine(0);
+    const view = viewOf(state);
+    const self = { group: new THREE.Group() };
+    const { visual } = await seatedWithTower(view, self);
+    const head = part(visual, TURRET_TOWER_MODEL.headNode);
+    const root = part(visual, 'building_tower_cannon_green');
+    const tower = part(visual, TURRET_TOWER_NAME);
+    expect(head.rotation.y).toBeCloseTo(0, 12);
+    const target = Math.PI / 2;
+    const frame = 1 / 60;
+    let last = head.rotation.y;
+    let frames = 0;
+    for (; frames < 120 && Math.abs(target - head.rotation.y) > 1e-3; frames++) {
+      // The renderer turns the self model toward the reticle before the painter runs.
+      self.group.rotation.y = target;
+      visual.update(view, frames, frames * frame, frame, false, self);
+      const turned = head.rotation.y - last;
+      expect(turned).toBeGreaterThan(0);
+      expect(turned).toBeLessThanOrEqual(TURRET_HEAD.maxTurnRate * frame + 1e-9);
+      last = head.rotation.y;
+    }
+    expect(frames).toBeGreaterThan(5);
+    expect(frames).toBeLessThan(60);
+    expect(root.rotation.y).toBe(0);
+    expect(tower.rotation.y).toBe(0);
+    expect(part(visual, TURRET_TOWER_MODEL.barrelNode).rotation.y).toBe(0);
+    visual.dispose();
+  });
+
+  it('stands the player behind the breech on the head yaw, on the parapet, facing along the barrel', async () => {
+    const state = engine(0);
+    const view = { ...viewOf(state), origin: { x: 0, y: 7, z: 0 } };
+    const self = { group: new THREE.Group() };
+    self.group.rotation.y = Math.PI;
+    const { visual } = await seatedWithTower(view, self);
+    self.group.rotation.y = Math.PI;
+    visual.update(view, 1, 0.05, 0.016, false, self);
+    expect(self.group.position.x).toBeCloseTo(0, 9);
+    expect(self.group.position.z).toBeCloseTo(TURRET_GUNNER.behind, 9);
+    expect(self.group.position.y).toBeCloseTo(7 + TURRET_GUNNER.lift, 12);
+    expect(Math.cos(self.group.rotation.y)).toBeCloseTo(-1, 9);
+    visual.dispose();
+  });
+
+  it('fires from the barrel tip, lying head and barrel on the shot, and kicks the barrel alone back', async () => {
+    const state = engine(0);
+    const view = { ...viewOf(state), origin: { x: 0, y: 7, z: 0 } };
+    const self = { group: new THREE.Group() };
+    const { visual } = await seatedWithTower(view, self);
+    const head = part(visual, TURRET_TOWER_MODEL.headNode);
+    const barrel = part(visual, TURRET_TOWER_MODEL.barrelNode);
+    const tower = part(visual, TURRET_TOWER_NAME);
+    const headRest = head.position.clone();
+    const barrelRest = barrel.position.clone();
+    // The aim still faces the default heading: the shot, due +x, lays the head on it at once.
+    self.group.rotation.y = 0;
+    const fired = { ...viewOf(state, [firedAt160]), origin: view.origin };
+    visual.update(fired, 160, 1, 0.016, false, self);
+    expect(head.rotation.y).toBeCloseTo(Math.PI / 2, 12);
+    const pitch = turretBarrelPitch(20, 0 - 7);
+    expect(pitch).toBeGreaterThan(0);
+    expect(barrel.rotation.x).toBeCloseTo(-pitch, 12);
+    barrel.updateWorldMatrix(true, false);
+    const tip = new THREE.Vector3(0, 0, 1).applyMatrix4(barrel.matrixWorld);
+    expect(weaponPosition(visual, 'shell').distanceTo(tip)).toBeLessThan(1e-6);
+    // The tip leans toward the shot and above the roof.
+    expect(tip.x).toBeGreaterThan(1);
+    expect(tip.y).toBeGreaterThan(7 + 1);
+    visual.update(fired, 160, 1 + CANNON_MUZZLE.recoilAttack, 0.016, false, self);
+    const kick = barrel.position.clone().sub(barrelRest);
+    const scale = TURRET_BARREL.recoilKick / CANNON_MUZZLE.recoilKick;
+    expect(kick.length()).toBeCloseTo(cannonRecoilOffset(CANNON_MUZZLE.recoilAttack) * scale, 9);
+    const axis = new THREE.Vector3(0, 0, 1).applyQuaternion(barrel.quaternion);
+    expect(kick.normalize().dot(axis)).toBeCloseTo(-1, 9);
+    expect(head.position.equals(headRest)).toBe(true);
+    expect(tower.position.y).toBeCloseTo(7 - FIRE_AND_FLY_TOWER.roofY, 12);
+    visual.update(fired, 161, 3, 0.016, false, self);
+    expect(barrel.position.equals(barrelRest)).toBe(true);
     visual.dispose();
   });
 

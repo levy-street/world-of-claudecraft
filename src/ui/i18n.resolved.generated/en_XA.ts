@@ -569,7 +569,7 @@ export const en_XA: EnTranslations = {
       "statAccuracy": "[Áççúŕáçý: {value}]",
       "statThrow": "[Ļóñĝéšţ ţĥŕóŵ: {yards} ýáŕðš]",
       "statAirtime": "[Ļóñĝéšţ áíŕţíɱé: {seconds} šéç]",
-      "leave": "[Ļéáʋé ţĥé ţáñķ]"
+      "leave": "[Ļéáʋé ţĥé ţóŵéŕ]"
     },
     "warlock": {
       "doomLabel": "[Çóñðéɱñáţíóñ]",

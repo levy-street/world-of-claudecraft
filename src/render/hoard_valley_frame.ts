@@ -6,6 +6,11 @@
 import type * as THREE from 'three';
 import type { RiftFloorPlan } from '../sim/rift/types';
 import type { RiftFloorView } from '../world_api';
+import {
+  FIRE_AND_FLY_SKY_ANCHOR,
+  FIRE_AND_FLY_SKY_HOLD,
+  isFireAndFlyArenaAt,
+} from './fire_and_fly_arena_core';
 import { GFX } from './gfx';
 import { buildHoardValley, resolveHoardValleyEffectsProfile } from './hoard_valley';
 import {
@@ -52,13 +57,19 @@ export function buildInterior(
 }
 
 /** Rides the sky dome along with the camera, except inside a hoard valley,
- *  where the dome stays on the dig zone's representative sky point. */
+ *  where the dome stays on the dig zone's representative sky point, and inside
+ *  the Fire and Fly arena, whose dome stays on its golden-hour sky and holds
+ *  that hour's grade whatever the world clock says (the renderer's cycle calls
+ *  follow this one in the same frame, so the hold is always current). */
 export function setSkyCamera(
-  sky: Pick<SkyView, 'setCameraPos'>,
+  sky: Pick<SkyView, 'setCameraPos' | 'holdCycle'>,
   riftFloor: RiftFloorView | null,
   camera: { readonly x: number; readonly z: number },
   dt: number,
 ): void {
-  const anchor = resolveHoardValleyEnvironment(riftFloor)?.sky;
+  const arena = isFireAndFlyArenaAt(camera.x);
+  const anchor =
+    resolveHoardValleyEnvironment(riftFloor)?.sky ?? (arena ? FIRE_AND_FLY_SKY_ANCHOR : null);
   sky.setCameraPos(anchor?.x ?? camera.x, anchor?.z ?? camera.z, dt);
+  sky.holdCycle(arena ? FIRE_AND_FLY_SKY_HOLD : null);
 }

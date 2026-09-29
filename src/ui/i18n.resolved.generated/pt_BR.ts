@@ -569,7 +569,7 @@ export const pt_BR: EnTranslations = {
       "statAccuracy": "Accuracy: {value}",
       "statThrow": "Longest throw: {yards} yards",
       "statAirtime": "Longest airtime: {seconds} sec",
-      "leave": "Leave the tank"
+      "leave": "Leave the tower"
     },
     "warlock": {
       "doomLabel": "Condenação",

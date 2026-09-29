@@ -110,13 +110,13 @@ import {
 import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
+import { attachOpenFieldInterior, openFieldInteriorBuilder } from './open_field_interiors';
 import type { FireLightSink } from './point_light_budget';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
 import { riftPlatformSlabs } from './rift_platform_core';
 import { markSharedGeometry, markSharedMaterial, markSharedTexture } from './shared_resource';
 import { radialGlowTexture } from './textures';
 import { addTorchGlowDecal } from './torch_glow_decal';
-import { buildWildheartFieldInterior } from './wildheart_props';
 import { applySurfaceDetail } from './worn_stone';
 
 const FLAME_EMISSIVE_HIGH = EMISSIVE_LIGHT;
@@ -652,15 +652,17 @@ export class DungeonInteriors {
     await ensureDungeonAssets();
     await ensureIgnivarRaidDressingAssets(interior);
     await ensureIgnivarTileAssets(interior, loadModuleAsset);
-    if (interior === 'wildheart') {
-      const group = buildWildheartFieldInterior({
+    const openField = openFieldInteriorBuilder(interior);
+    if (openField) {
+      const group = openField.build({
         lowGfx: this.lowGfx,
         flames: this.flames,
         fireLights: this.fireLights,
+        origin: { x: ox, z: oz },
       });
-      group.position.set(ox, 0, oz);
-      group.userData.renderCategory = 'dungeon';
-      await attachSceneGroupGated(this.scene, group, this.compileGate);
+      const registry = createOwnedInteriorResourceRegistry();
+      this.interiorResources.set(group, registry);
+      await attachOpenFieldInterior(this.scene, group, openField, this.compileGate, registry);
       return group;
     }
     // Delve modules pass an explicit per-module layout so render geometry matches

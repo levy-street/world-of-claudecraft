@@ -134,7 +134,7 @@ export const hudChromeStrings = {
     statAccuracy: 'Accuracy: {value}',
     statThrow: 'Longest throw: {yards} yards',
     statAirtime: 'Longest airtime: {seconds} sec',
-    leave: 'Leave the tank',
+    leave: 'Leave the tower',
   },
   warlock: {
     doomLabel: 'Condemnation',

@@ -569,7 +569,7 @@ export const ko_KR: EnTranslations = {
       "statAccuracy": "명중률: {value}",
       "statThrow": "최장 날리기 거리: {yards}야드",
       "statAirtime": "최장 체공 시간: {seconds}초",
-      "leave": "전차에서 내리기"
+      "leave": "탑에서 내려가기"
     },
     "warlock": {
       "doomLabel": "단죄",

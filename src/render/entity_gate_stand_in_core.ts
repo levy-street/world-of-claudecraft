@@ -238,6 +238,15 @@ export const ENTITY_GATE_STAND_INS: readonly EntityGateStandIn[] = [
   },
   {
     gate: 'attachSceneGroupGated',
+    file: 'src/render/turret_tower_visual.ts',
+    callSite: 'void attachSceneGroupGated(parent, this.group,',
+    hides:
+      "the Fire and Fly cannon tower (the stone tower, its turning head and its barrel on one named material of its own), loaded and built when the player is first seen seated in the turret, until its programs link, under the label live-gate:fire-and-fly-tower; nothing of an entity rides it, and the turret's intro countdown runs before the first wave marches in",
+    standIn:
+      "the player's own model, which the painter stands on the roof behind the breech whatever the tower's state (the sim seats the player on the tower's axis), the monsters with their rigs or capsules, health bars, strike rings and ground markers, and the HUD's turret integrity bar; a shot leaves from the hidden barrel's tip as it would from the drawn one (or, before the model has loaded, from the fallback muzzle above the roof, a step out from the axis toward the shot), until the gate settles or its GATED_ATTACH_WATCHDOG_MS reveal",
+  },
+  {
+    gate: 'attachSceneGroupGated',
     file: 'src/render/turret_ground_markers.ts',
     callSite: 'void attachSceneGroupGated(parent, this.root,',
     hides:

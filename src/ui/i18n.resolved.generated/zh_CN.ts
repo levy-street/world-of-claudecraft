@@ -569,7 +569,7 @@ export const zh_CN: EnTranslations = {
       "statAccuracy": "命中率：{value}",
       "statThrow": "最远抛飞：{yards} 码",
       "statAirtime": "最长滞空：{seconds} 秒",
-      "leave": "离开坦克"
+      "leave": "离开塔楼"
     },
     "warlock": {
       "doomLabel": "谴罪",

@@ -204,10 +204,11 @@ export function hasTerrainSplatAssets(): boolean {
   );
 }
 
-/** Narrow read of the loaded grass splat layers for interiors that reuse the
- *  overworld ground look (the Wildheart Basin floor). Undefined until the
- *  boot preload resolves; callers must fall back to their own material. */
-export function terrainSplatTexture(key: 'grassC' | 'grassN'): THREE.Texture | undefined {
+/** Narrow read of the loaded grass and earth splat layers for interiors that
+ *  reuse the overworld ground look (the Wildheart Basin floor, the Fire and
+ *  Fly clearing). Undefined until the boot preload resolves; callers must
+ *  fall back to their own material. */
+export function terrainSplatTexture(key: 'grassC' | 'grassN' | 'dirtC'): THREE.Texture | undefined {
   return TERRAIN_TEX[key];
 }
 

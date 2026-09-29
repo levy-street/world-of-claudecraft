@@ -291,7 +291,7 @@ it('shows the result panel at the end and leaves through the Leave button', () =
   expect(text('.turret-result-title')).toBe('The turret has fallen');
   expect(result.textContent).toContain('Accuracy: 25%');
   const leave = hud().querySelector<HTMLButtonElement>('.vehicle-exit')!;
-  expect(leave.textContent).toBe('Leave the tank');
+  expect(leave.textContent).toBe('Leave the tower');
   leave.click();
   bar.update();
   expect(world.leaveVehicle).toHaveBeenCalledTimes(1);

@@ -569,7 +569,7 @@ export const ja_JP: EnTranslations = {
       "statAccuracy": "命中率：{value}",
       "statThrow": "最長の吹き飛ばし：{yards} ヤード",
       "statAirtime": "最長の滞空時間：{seconds} 秒",
-      "leave": "戦車を降りる"
+      "leave": "塔を降りる"
     },
     "warlock": {
       "doomLabel": "断罪",

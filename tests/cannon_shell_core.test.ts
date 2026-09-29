@@ -26,12 +26,14 @@ import {
   cannonChunkInto,
   cannonChunkLaunch,
   cannonHash01,
+  cannonLaunchPitch,
   cannonRecoilOffset,
   cannonScorchDrapeInto,
   cannonScorchFade,
   cannonScorchHeightsInto,
   cannonScorchTexels,
   cannonShakeFalloff,
+  cannonShellArc,
   cannonShotCounts,
   newCannonChunk,
 } from '../src/render/cannon_shell_core';
@@ -79,6 +81,33 @@ describe('cannon shell arc', () => {
     expect(cannonArcHeight(2)).toBe(CANNON_SHELL.arcMin);
     expect(cannonArcHeight(20)).toBeCloseTo(20 * CANNON_SHELL.arcFraction, 12);
     expect(cannonArcHeight(500)).toBe(CANNON_SHELL.arcMax);
+  });
+
+  it('flattens a close shot so it never leaves steeper than the barrel can lift, and no other', () => {
+    const max = CANNON_SHELL.maxLaunchPitch;
+    // A long shot keeps its span-scaled arc, its launch under the limit.
+    expect(cannonShellArc(50, -6)).toBe(cannonArcHeight(50));
+    expect(cannonLaunchPitch(50, -6)).toBeCloseTo(Math.atan2(-6 + 4 * cannonArcHeight(50), 50), 12);
+    expect(cannonLaunchPitch(50, -6)).toBeLessThan(max);
+    // A close one from a height would leave near vertical: its arc lowers to the limit exactly.
+    const natural = Math.atan2(-6 + 4 * cannonArcHeight(2), 2);
+    expect(natural).toBeGreaterThan(max);
+    expect(cannonShellArc(2, -6)).toBeLessThan(cannonArcHeight(2));
+    expect(cannonLaunchPitch(2, -6)).toBeCloseTo(max, 12);
+    // Never below a straight line, and a zero reach reads as no arc.
+    expect(cannonShellArc(1, 50)).toBe(0);
+    expect(cannonShellArc(0, 0)).toBe(0);
+  });
+
+  it('flies a close shot on the flattened arc', () => {
+    const timeline = new CannonShotTimeline();
+    const close = { shotId: 9, x: 2, y: 0, z: 0, flightTicks: 4, impactTick: 104 };
+    const high = { x: 0, y: 6, z: 0 };
+    const slot = timeline.fired(close, high, { x: 1, y: 0, z: 0 }, 0, 0);
+    expect(timeline.shells[slot].arc).toBeCloseTo(cannonShellArc(2, -6), 12);
+    const at = { x: 0, y: 0, z: 0 };
+    timeline.arcPointInto(slot, 1e-4, at);
+    expect(Math.atan2(at.y - high.y, at.x - high.x)).toBeCloseTo(CANNON_SHELL.maxLaunchPitch, 3);
   });
 
   it('leaves the muzzle, peaks over the chord and lands on the blast point on the impact tick', () => {

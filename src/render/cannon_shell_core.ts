@@ -38,6 +38,8 @@ export const CANNON_SHELL = {
   arcFraction: 0.18,
   arcMin: 2.5,
   arcMax: 7,
+  /** The steepest a shell leaves its muzzle (rad): a close shot's arc flattens to it. */
+  maxLaunchPitch: Math.PI / 4,
   /** Shell spin (rad/s). */
   spinY: 9,
   spinX: 6,
@@ -146,6 +148,21 @@ export function cannonArcHeight(span: number): number {
     CANNON_SHELL.arcMax,
     Math.max(CANNON_SHELL.arcMin, span * CANNON_SHELL.arcFraction),
   );
+}
+
+/**
+ * The arc height of a shell that falls `rise` yards (negative: down) over a
+ * `span` yard reach: cannonArcHeight, flattened so the shell never leaves the
+ * muzzle steeper than CANNON_SHELL.maxLaunchPitch (a barrel cannot elevate past it).
+ */
+export function cannonShellArc(span: number, rise: number): number {
+  const flattest = (Math.max(0, span) * Math.tan(CANNON_SHELL.maxLaunchPitch) - rise) / 4;
+  return Math.max(0, Math.min(cannonArcHeight(span), flattest));
+}
+
+/** The elevation (rad) a shell leaves its muzzle at on that arc: the tangent at its start. */
+export function cannonLaunchPitch(span: number, rise: number): number {
+  return Math.atan2(rise + 4 * cannonShellArc(span, rise), Math.max(0, span));
 }
 
 /** How far the camera shakes for a blast `distance` yards from the turret (0 to 1). */
@@ -568,7 +585,7 @@ export class CannonShotTimeline {
     slot.toZ = shot.z;
     slot.impactTick = shot.impactTick;
     slot.firedTick = shot.impactTick - shot.flightTicks;
-    slot.arc = cannonArcHeight(Math.hypot(shot.x - muzzle.x, shot.z - muzzle.z));
+    slot.arc = cannonShellArc(Math.hypot(shot.x - muzzle.x, shot.z - muzzle.z), shot.y - muzzle.y);
     slot.landed = false;
     this.muzzleAt = time;
     const puffs = this.muzzles[this.nextMuzzle];

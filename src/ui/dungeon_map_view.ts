@@ -5,9 +5,17 @@
 // the authoritative Sim. Position-only instance resolution keeps offline Sim
 // and online ClientWorld mirrors on the same path.
 
+import { FIRE_AND_FLY_DUNGEON_ID } from '../sim/content/fire_and_fly_arena';
 import { MOBS } from '../sim/data';
 import { dungeonInstanceAt } from '../sim/dungeon_floor';
 import { DUNGEON_WALL_HW, type DungeonLayout } from '../sim/dungeon_layout';
+import {
+  FIRE_AND_FLY_ROCKS,
+  FIRE_AND_FLY_TOWER,
+  FIRE_AND_FLY_TREES,
+  FIRE_AND_FLY_WALL_RADIUS,
+  fireAndFlyTrunkRadius,
+} from '../sim/fire_and_fly_field';
 import { IGNIVAR_GATE_LOCKED_TEMPLATE } from '../sim/ignivar_raid_ids';
 import { authoredWallSegments } from '../sim/rift/authored';
 import { PLAYER_INTEREST_RADIUS } from '../sim/types';
@@ -19,6 +27,49 @@ const NPC_INTEREST_RADIUS = 120;
 
 function hasDedicatedCastleMap(interior: string): boolean {
   return interior === 'lastkeep' || interior === 'dawnhold';
+}
+
+// The Fire and Fly arena has no room plan (the sim frame falls back to the
+// crypt's): its map is the arena itself, a round field closed by the wall, the
+// trunks and rocks as obstacles, the tower as the highlighted centre.
+const FIRE_AND_FLY_MAP_SIDES = 48;
+const FIRE_AND_FLY_MAP_LAYOUT: DungeonLayout = {
+  zMin: -FIRE_AND_FLY_WALL_RADIUS,
+  zMax: FIRE_AND_FLY_WALL_RADIUS,
+  sideWallZ: 0,
+  sideWallHd: FIRE_AND_FLY_WALL_RADIUS,
+  pillars: [],
+  tombs: [],
+  stubs: [],
+  dais: { x: 0, z: 0, r: FIRE_AND_FLY_TOWER.radius },
+  shellPolygon: Array.from({ length: FIRE_AND_FLY_MAP_SIDES }, (_, i) => {
+    const angle = (i / FIRE_AND_FLY_MAP_SIDES) * Math.PI * 2;
+    return {
+      x: Math.cos(angle) * FIRE_AND_FLY_WALL_RADIUS,
+      z: Math.sin(angle) * FIRE_AND_FLY_WALL_RADIUS,
+    };
+  }),
+  decor: [
+    ...FIRE_AND_FLY_ROCKS.map((rock, i) => ({
+      key: `rock${i}`,
+      x: rock.x,
+      z: rock.z,
+      yaw: 0,
+      r: rock.radius,
+    })),
+    ...FIRE_AND_FLY_TREES.map((tree, i) => ({
+      key: `tree${i}`,
+      x: tree.x,
+      z: tree.z,
+      yaw: 0,
+      r: fireAndFlyTrunkRadius(tree),
+    })),
+  ],
+};
+
+/** The plan a frame draws: the frame's own layout, or the arena's field. */
+function mapLayoutOf(frame: { dungeonId: string; layout: DungeonLayout }): DungeonLayout {
+  return frame.dungeonId === FIRE_AND_FLY_DUNGEON_ID ? FIRE_AND_FLY_MAP_LAYOUT : frame.layout;
 }
 
 export interface DungeonMapPoint {
@@ -228,7 +279,7 @@ export function dungeonMapLocal(x: number, z: number): DungeonMapLocal | null {
   if (!frame || hasDedicatedCastleMap(frame.interior)) return null;
   return {
     dungeonId: frame.dungeonId,
-    layout: frame.layout,
+    layout: mapLayoutOf(frame),
     originX: frame.ox,
     originZ: frame.oz,
     lx: x - frame.ox,
@@ -664,12 +715,9 @@ export class DungeonMapViewCore {
     const player = world.player;
     const frame = dungeonInstanceAt(player.pos.x, player.pos.z);
     if (!frame || hasDedicatedCastleMap(frame.interior)) return null;
-    const plan = planFor(frame.layout);
-    if (
-      !this.minimapModel ||
-      this.minimapLayout !== frame.layout ||
-      this.minimapScale !== pxPerYard
-    ) {
+    const layout = mapLayoutOf(frame);
+    const plan = planFor(layout);
+    if (!this.minimapModel || this.minimapLayout !== layout || this.minimapScale !== pxPerYard) {
       const cold = buildDungeonMinimapPaintModel(world, canvasSize, pxPerYard);
       if (!cold) return null;
       if (!this.minimapModel) {
@@ -683,7 +731,7 @@ export class DungeonMapViewCore {
       } else {
         this.minimapModel.staticGeometry = cold.staticGeometry;
       }
-      this.minimapLayout = frame.layout;
+      this.minimapLayout = layout;
       this.minimapScale = pxPerYard;
     }
 
@@ -716,10 +764,11 @@ export class DungeonMapViewCore {
     const at = anchor ?? world.player.pos;
     const frame = dungeonInstanceAt(at.x, at.z);
     if (!frame || hasDedicatedCastleMap(frame.interior)) return null;
-    const plan = planFor(frame.layout);
+    const layout = mapLayoutOf(frame);
+    const plan = planFor(layout);
     if (
       !this.worldModel ||
-      this.worldLayout !== frame.layout ||
+      this.worldLayout !== layout ||
       this.worldSize !== canvasSize ||
       this.worldPad !== pad
     ) {
@@ -739,7 +788,7 @@ export class DungeonMapViewCore {
         this.worldModel.dais = cold.dais;
         this.worldModel.staticGeometry = cold.staticGeometry;
       }
-      this.worldLayout = frame.layout;
+      this.worldLayout = layout;
       this.worldSize = canvasSize;
       this.worldPad = pad;
     }

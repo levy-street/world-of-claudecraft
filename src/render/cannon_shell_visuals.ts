@@ -201,6 +201,7 @@ export class CannonShellVisuals {
   private disposed = false;
   private barrel: THREE.Object3D | null = null;
   private barrelKicked = false;
+  private barrelKick = 1;
   private readonly barrelRest = new THREE.Vector3();
   private readonly barrelAxis = new THREE.Vector3(0, 0, 1);
   private readonly barrelTip = new THREE.Vector3();
@@ -285,17 +286,23 @@ export class CannonShellVisuals {
 
   /**
    * The barrel the muzzle and the recoil follow: `tip` is its muzzle point in
-   * the node's own space, and it kicks back along its local +z. Null falls back
-   * to the muzzle point each shot supplies. The previous barrel is set back to rest.
+   * the node's own space, and it kicks back along its local +z as it points on
+   * the frame (its owner may pitch it), by `kick` of its parent's units at the
+   * full kick. Null falls back to the muzzle point each shot supplies. The
+   * previous barrel is set back to rest.
    */
-  setBarrel(node: THREE.Object3D | null, tip: CannonPoint): void {
+  setBarrel(
+    node: THREE.Object3D | null,
+    tip: CannonPoint,
+    kick: number = CANNON_MUZZLE.recoilKick,
+  ): void {
     if (node === this.barrel) return;
     this.restBarrel();
     this.barrel = node;
     if (!node) return;
     this.barrelRest.copy(node.position);
-    this.barrelAxis.copy(FORWARD).applyQuaternion(node.quaternion);
     this.barrelTip.set(tip.x, tip.y, tip.z);
+    this.barrelKick = kick / CANNON_MUZZLE.recoilKick;
   }
 
   /**
@@ -472,8 +479,9 @@ export class CannonShellVisuals {
   private recoil(pools: Pools, time: number): void {
     const barrel = this.barrel;
     if (!barrel) return;
-    const kick = cannonRecoilOffset(time - pools.timeline.muzzleAt);
+    const kick = cannonRecoilOffset(time - pools.timeline.muzzleAt) * this.barrelKick;
     if (kick !== 0) {
+      this.barrelAxis.copy(FORWARD).applyQuaternion(barrel.quaternion);
       barrel.position.copy(this.barrelRest).addScaledVector(this.barrelAxis, -kick);
       this.barrelKicked = true;
     } else if (this.barrelKicked) {

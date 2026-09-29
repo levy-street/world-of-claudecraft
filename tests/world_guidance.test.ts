@@ -174,8 +174,8 @@ describe('personal world guidance coordinator', () => {
     } as unknown as IWorld;
     guidance.update(world, 10, 0.05, true);
     expect(calls.turretUpdate).toHaveBeenLastCalledWith(session, 42, 10, 0.05, true, undefined);
-    // The self view's mount carries the tank's barrel the shots leave from.
-    const self = { group: new THREE.Group(), mountVisual: { root: new THREE.Group() } };
+    // The self view: its facing is the head's aim, and the gunner is drawn on it.
+    const self = { group: new THREE.Group() };
     guidance.update(world, 11, 0.05, false, self);
     expect(calls.turretUpdate).toHaveBeenLastCalledWith(session, 42, 11, 0.05, false, self);
     const host = { vfx: {}, camera: new THREE.PerspectiveCamera() } as never;

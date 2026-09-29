@@ -19259,7 +19259,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turret.statAccuracy': 'Точность: {value}',
   'hudChrome.turret.statThrow': 'Самый дальний бросок: {yards} м',
   'hudChrome.turret.statAirtime': 'Самый долгий полёт: {seconds} сек.',
-  'hudChrome.turret.leave': 'Покинуть танк',
+  'hudChrome.turret.leave': 'Покинуть башню',
   'hudChrome.leaderboard.tabWorldQuests': 'Локальные задания',
   'hudChrome.leaderboard.wqBoardsLabel': 'Таблицы рекордов локальных заданий',
   'hudChrome.leaderboard.wqMedal': 'Медаль',

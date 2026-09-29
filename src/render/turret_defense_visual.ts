@@ -1,9 +1,11 @@
 // Fire and Fly on screen: the private monsters' rigs with their stand-ins,
 // health bars and strike rings, the dust they kick up wherever they meet the
 // world (turret_contact_dust_core.ts, launched on the cannon's own puff draw),
-// their hitstop and scorch flash when a shell strikes them, plus the cannon's
-// shots (cannon_shell_visuals.ts, its muzzle and recoil on the tank's own
-// barrel), driven from IWorld.turretSession. Nothing is built until the player
+// their hitstop and scorch flash when a shell strikes them, the cannon tower
+// whose head turns toward the aim (turret_tower_visual.ts) with the player
+// standing behind its breech, plus the cannon's shots (cannon_shell_visuals.ts,
+// their muzzle and recoil on the tower's barrel), driven from
+// IWorld.turretSession. Nothing is built until the player
 // is first seen seated in the turret; the rig pools then grow one rig per frame
 // for the current and next wave, and one per idle slot for the others, and live
 // for the rest of the world session. Every rig attaches behind the compile gate while a capsule on a
@@ -16,8 +18,8 @@
 // the puff draw) and the bar faces the camera upright over the body, whatever
 // its tumble. Every living monster also carries a red ground marker, drawn by
 // turret_ground_markers.ts. Pure halves: turret_monster_pose_core.ts,
-// turret_motion_forecast_core.ts, turret_contact_dust_core.ts and
-// turret_defense_pool_core.ts.
+// turret_motion_forecast_core.ts, turret_contact_dust_core.ts,
+// turret_defense_pool_core.ts and turret_tower_core.ts.
 import * as THREE from 'three';
 import { TURRET_PHYSICS, TURRET_WEAPON } from '../sim/content/turret_defense';
 import { MOBS } from '../sim/data';
@@ -65,6 +67,13 @@ import {
   turretPivotHeight,
 } from './turret_monster_pose_core';
 import { TurretMotionForecast } from './turret_motion_forecast_core';
+import {
+  TURRET_BARREL,
+  TURRET_TOWER_MODEL,
+  turretBarrelPitch,
+  turretGunnerInto,
+} from './turret_tower_core';
+import { type TurretTowerSource, TurretTowerVisual } from './turret_tower_visual';
 import { ViewCreateRetryGate } from './view_create_retry';
 import { worldQuestTraceMaterials } from './world_quest_trace_materials';
 
@@ -72,9 +81,12 @@ type CompileGate = (target: THREE.Object3D) => Promise<unknown>;
 type TurretPlanView = TurretSessionView['defense']['plan'];
 type TurretDefenseView = TurretSessionView['defense'];
 
-/** The self view's tank, lent as the seated player's mount: its barrel is a node of the rig. */
+/**
+ * The seated player's own view: its facing, already turned toward the aim, is
+ * where the head turns; it is drawn standing behind the breech on the head's yaw.
+ */
 export interface TurretSelfView {
-  readonly mountVisual?: { readonly root: THREE.Object3D } | null;
+  readonly group: Pick<THREE.Object3D, 'position' | 'rotation'>;
 }
 
 interface RigSlot {
@@ -109,17 +121,13 @@ const HEALTH_BAR_LIFT = 0.35;
 const RING_LIFT = 0.08;
 /** A corpse sinks at least this far (yd), so a short body still leaves the ground. */
 const SINK_DEPTH = 1.1;
-/** The Dreadspark Groundshaker's barrel node, and its muzzle in the node's own
- *  (quantized, +z forward) space: the centre of the barrel's end ring. */
-const TANK_BARREL_NODE = 'TankCannon';
-const TANK_MUZZLE_TIP = { x: -0.133, y: 0, z: 1.02 };
-/** Without the barrel (a rig still loading), the muzzle sits this high over the
- *  turret and this far toward the shot. */
+/** Without the barrel (the tower still loading), the muzzle sits this high over the
+ *  seated feet and this far toward the shot (turret_defense_sfx.ts plays the report there). */
 const MUZZLE_LIFT = 2.2;
 const MUZZLE_REACH = 2;
 /** A shot entry older than this many ticks at its first read (a seat seen late) draws nothing. */
 const SHOT_STALE_TICKS = 10;
-/** The renderer's view retry: a failed rig (a streamed GLB still arriving) is tried again after it. */
+/** The renderer's view retry: a failed rig or tower load (a streamed GLB still arriving) is tried again after it. */
 const RIG_RETRY_MS = 2000;
 /** The retry gate keys (entity, slot): the pool is one entity, each template a slot. */
 const POOL = 0;
@@ -151,7 +159,8 @@ export class TurretDefenseVisual {
   private readonly cursor = new TurretFeedbackCursor();
   private readonly weapon: CannonShellVisuals;
   private readonly groundMarkers: TurretGroundMarkers;
-  private barrelSource: THREE.Object3D | null = null;
+  private readonly tower: TurretTowerVisual;
+  private readonly gunner = { x: 0, y: 0, z: 0 };
   private readonly pose = newTurretMonsterPose();
   private readonly probe: ThrowProbe;
   private readonly contact = newTurretContact();
@@ -188,6 +197,7 @@ export class TurretDefenseVisual {
   private orderWave = -1;
   private idleBuildPending = false;
   private nowMs = 0;
+  private towerRetryAtMs = Number.NEGATIVE_INFINITY;
   private startTick = Number.NaN;
   private charactersState: 'idle' | 'loading' | 'ready' | 'failed' = 'idle';
   private disposed = false;
@@ -198,8 +208,10 @@ export class TurretDefenseVisual {
     private readonly groundAt: (x: number, z: number) => number,
     private readonly compileGate?: CompileGate,
     private readonly idleScheduler?: IdleScheduler,
+    towerSource?: TurretTowerSource,
   ) {
     this.probe = { ground: groundAt, water: () => null };
+    this.tower = new TurretTowerVisual(compileGate, towerSource);
     this.groundMarkers = new TurretGroundMarkers(this.probe, compileGate);
     this.weapon = new CannonShellVisuals({
       blastRadius: TURRET_WEAPON.blastRadius,
@@ -255,9 +267,11 @@ export class TurretDefenseVisual {
     }
     this.nowMs = time * 1000;
     const defense = session.defense;
+    const aimYaw = self ? self.group.rotation.y : Math.atan2(defense.aimX, defense.aimZ);
     if (defense.startTick !== this.startTick) {
       this.stand();
       this.startTick = defense.startTick;
+      this.tower.reset(aimYaw);
     }
     this.commit(defense.plan, defense.wave);
     this.group.visible = true;
@@ -267,8 +281,10 @@ export class TurretDefenseVisual {
       if (!this.book.rigReady[i] && this.rigs[i].gate.visible) this.book.setRigReady(i);
     }
     this.book.assign(defense.monsters, this.templateOf);
-    this.syncBarrel(self, false);
-    this.consumeFeedback(session, self, tick, time, reducedMotion);
+    this.tower.place(defense.cx, session.origin.y, defense.cz);
+    this.tower.aim(aimYaw, dt);
+    this.consumeFeedback(session, tick, time, reducedMotion);
+    if (self) this.standGunner(self, defense.cx, session.origin.y, defense.cz);
     for (const rig of this.rigs) rig.used = false;
     for (const body of this.bodies) body.used = false;
     const frozen = defense.phase === 'lost';
@@ -366,8 +382,6 @@ export class TurretDefenseVisual {
     this.clock.reset();
     this.cursor.reset();
     this.weapon.clear();
-    this.barrelSource = null;
-    this.weapon.setBarrel(null, TANK_MUZZLE_TIP);
     for (const body of this.bodies) body.owner = null;
   }
 
@@ -387,6 +401,20 @@ export class TurretDefenseVisual {
     }
     if (!this.weapon.prepared) {
       timeBuildSpan('zone:turret-weapon', () => this.weapon.prepare(this.group));
+    }
+    if (!this.tower.prepared && this.nowMs >= this.towerRetryAtMs) {
+      this.tower.prepare(
+        this.group,
+        () =>
+          this.weapon.setBarrel(
+            this.tower.barrelNode,
+            TURRET_TOWER_MODEL.muzzleTip,
+            TURRET_BARREL.recoilKick,
+          ),
+        () => {
+          this.towerRetryAtMs = this.nowMs + RIG_RETRY_MS;
+        },
+      );
     }
     if (plan !== this.plan) {
       this.plan = plan;
@@ -522,17 +550,16 @@ export class TurretDefenseVisual {
     return mesh;
   }
 
-  /** The tank's barrel, looked up again only when the rig changes or a shot finds none. */
-  private syncBarrel(self: TurretSelfView | undefined, retry: boolean): void {
-    const root = self?.mountVisual?.root ?? null;
-    if (root === this.barrelSource && !(retry && root && !this.weapon.hasBarrel)) return;
-    this.barrelSource = root;
-    this.weapon.setBarrel(root?.getObjectByName(TANK_BARREL_NODE) ?? null, TANK_MUZZLE_TIP);
+  /** The player's own model, drawn behind the breech and facing along the barrel. */
+  private standGunner(self: TurretSelfView, cx: number, roofY: number, cz: number): void {
+    const yaw = this.tower.headYaw;
+    turretGunnerInto(this.gunner, cx, cz, roofY, yaw);
+    self.group.position.set(this.gunner.x, this.gunner.y, this.gunner.z);
+    self.group.rotation.y = yaw;
   }
 
   private consumeFeedback(
     session: TurretSessionView,
-    self: TurretSelfView | undefined,
     tick: number,
     time: number,
     reducedMotion: boolean,
@@ -545,10 +572,13 @@ export class TurretDefenseVisual {
       switch (ev.type) {
         case 'fired': {
           if (stale) break;
-          this.syncBarrel(self, true);
           const dx = ev.x - ev.fromX;
           const dz = ev.z - ev.fromZ;
           const dist = Math.hypot(dx, dz);
+          this.tower.fireAt(
+            dist > 1e-6 ? Math.atan2(dx, dz) : this.tower.headYaw,
+            turretBarrelPitch(dist, ev.y - session.origin.y),
+          );
           this.muzzle.x = ev.fromX + (dist > 1e-6 ? dx / dist : 0) * MUZZLE_REACH;
           this.muzzle.y = session.origin.y + MUZZLE_LIFT;
           this.muzzle.z = ev.fromZ + (dist > 1e-6 ? dz / dist : 1) * MUZZLE_REACH;
@@ -673,6 +703,11 @@ export class TurretDefenseVisual {
     this.geometry = null;
     try {
       this.weapon.dispose();
+    } catch (error) {
+      errors.push(error);
+    }
+    try {
+      this.tower.dispose();
     } catch (error) {
       errors.push(error);
     }

@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
+import { FIRE_AND_FLY_DUNGEON_ID } from '../src/sim/content/fire_and_fly_arena';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import { CRYPT_LAYOUT } from '../src/sim/dungeon_layout';
+import {
+  FIRE_AND_FLY_ROCKS,
+  FIRE_AND_FLY_TREES,
+  FIRE_AND_FLY_WALL_RADIUS,
+} from '../src/sim/fire_and_fly_field';
 import {
   IGNIVAR_GATE_LOCKED_TEMPLATE,
   IGNIVAR_MOLTEN_ASSEMBLY_ID,
@@ -183,5 +189,37 @@ describe('generic dungeon map view', () => {
       expect(core.minimap(world, 162, 1.7)?.markers).toBe(minimap?.markers);
       expect(core.worldMap(world, 560, 34)?.markers).toBe(worldMap?.markers);
     }
+  });
+});
+
+describe('the Fire and Fly arena map', () => {
+  // The sim frame has no room plan for the arena and falls back to the crypt's;
+  // both HUD surfaces must draw the arena itself instead.
+  it('draws the round field, its trunks and rocks and the tower, never the crypt plan', () => {
+    const world = worldIn(FIRE_AND_FLY_DUNGEON_ID);
+    expect(dungeonMapActive(world)).toBe(true);
+    const local = dungeonMapLocal(world.player.pos.x, world.player.pos.z);
+    expect(local?.dungeonId).toBe(FIRE_AND_FLY_DUNGEON_ID);
+    expect(local?.layout).not.toBe(CRYPT_LAYOUT);
+    const model = buildDungeonWorldMapModel(world, 560, 34);
+    expect(model?.sourceLayout).toBe(local?.layout);
+    expect(model?.floors).toHaveLength(1);
+    expect(model?.floors[0].points.length).toBeGreaterThanOrEqual(32);
+    expect(model?.walls.length).toBe(model?.floors[0].points.length);
+    expect(model?.obstacles).toHaveLength(FIRE_AND_FLY_ROCKS.length + FIRE_AND_FLY_TREES.length);
+    expect(model?.dais?.r).toBeGreaterThan(0);
+    // The plan fits the whole walled field: its span is the wall's diameter.
+    expect(model?.bounds.maxX).toBeGreaterThanOrEqual(FIRE_AND_FLY_WALL_RADIUS);
+    expect(model?.markers.at(-1)).toMatchObject({ kind: 'player' });
+  });
+
+  it('keeps the hot-path core on the arena plan too', () => {
+    const core = new DungeonMapViewCore();
+    const world = worldIn(FIRE_AND_FLY_DUNGEON_ID);
+    const minimap = core.minimap(world, 162, 1.7);
+    expect(minimap?.staticGeometry.sourceLayout).not.toBe(CRYPT_LAYOUT);
+    expect(core.minimap(world, 162, 1.7)).toBe(minimap);
+    const worldMap = core.worldMap(world, 560, 34);
+    expect(worldMap?.sourceLayout).toBe(minimap?.staticGeometry.sourceLayout);
   });
 });

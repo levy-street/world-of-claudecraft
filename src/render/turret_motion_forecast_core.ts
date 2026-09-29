@@ -49,7 +49,7 @@ function sameSegment(a: MotionSegment, b: MotionSegment): boolean {
   return a.kind === b.kind && a.start === b.start && a.end === b.end && a.x === b.x && a.z === b.z;
 }
 
-/** The engine's rest point: never inside the strike ring (the tank's footprint lies within it). */
+/** The engine's rest point: never inside the strike ring (the tower's footprint lies within it). */
 function outsideStrike(
   p: Vec3,
   kind: TurretForecastKind,
@@ -134,7 +134,7 @@ export class TurretMotionForecast implements TurretMonsterInput {
    * Adds the fading correction to a pose sampled on `seg` at `tick`. When the
    * segment changes, the old and the new one are compared at the same tick:
    * where the new one begins (a transition that chains, so a forecast step or
-   * a rest pushed off the tank reads its true jump), or now while the old one
+   * a rest pushed off the tower reads its true jump), or now while the old one
    * still runs (a forecast the engine corrected, a body knocked mid-stride).
    */
   blend(pose: { x: number; y: number; z: number }, tick: number, probe: ThrowProbe): void {

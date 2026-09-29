@@ -103,7 +103,7 @@ export class WorldGuidance {
     time: number,
     dt: number,
     reducedMotion = false,
-    renderedSelf?: { group: Pick<THREE.Object3D, 'position' | 'rotation'> } & TurretSelfView,
+    renderedSelf?: TurretSelfView,
   ): void {
     // Racing line (cosmetic; reads the self race view only).
     this.race.update(world.mountRaceView(), time, dt);

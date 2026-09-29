@@ -26,6 +26,8 @@ import { gpuPrepEventsSnapshot, resetGpuPrepEventsForTest } from '../src/render/
 import { NAMEPLATE_RANGE, nameplatePlanInto, newNameplatePlan } from '../src/render/nameplate_view';
 import { TurretSlotBook } from '../src/render/turret_defense_pool_core';
 import { TurretGroundMarkers } from '../src/render/turret_ground_markers';
+import { TURRET_TOWER_MODEL } from '../src/render/turret_tower_core';
+import { TurretTowerVisual } from '../src/render/turret_tower_visual';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import type { Entity } from '../src/sim/types';
 import { INTERACT_RANGE } from '../src/sim/types';
@@ -108,6 +110,12 @@ const GATE_CALL_SITES: readonly {
     // The Fire and Fly ground markers: one gated attach of the marker pool.
     gate: 'attachSceneGroupGated',
     file: 'src/render/turret_ground_markers.ts',
+    marker: 'attachSceneGroupGated(',
+  },
+  {
+    // The Fire and Fly cannon tower: one gated attach of the built model.
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/turret_tower_visual.ts',
     marker: 'attachSceneGroupGated(',
   },
 ];
@@ -602,6 +610,40 @@ describe('entity gate stand-ins actually stand in', () => {
     await Promise.resolve();
     expect(markers.root.visible).toBe(true);
     markers.dispose();
+  });
+
+  it('Fire and Fly tower gate: the barrel a shot leaves from exists while the tower links', async () => {
+    let settle: () => void = () => {};
+    const gate = vi.fn(() => new Promise<void>((resolve) => (settle = resolve)));
+    const model = new THREE.Group();
+    const head = new THREE.Group();
+    head.name = TURRET_TOWER_MODEL.headNode;
+    const barrel = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial());
+    barrel.name = TURRET_TOWER_MODEL.barrelNode;
+    head.add(barrel);
+    model.add(head);
+    const tower = new TurretTowerVisual(gate, () => Promise.resolve(model));
+    let ready = false;
+    tower.prepare(new THREE.Scene(), () => {
+      ready = true;
+    });
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(ready).toBe(true);
+    expect(gate).toHaveBeenCalledWith(tower.group);
+    expect(tower.group.visible).toBe(false);
+    // The weapon takes its muzzle from this node from the moment it is built:
+    // the shots never wait on the tower's link, and the player's own model is
+    // placed on the roof by the painter whatever the gate's state.
+    expect(tower.barrelNode?.name).toBe(TURRET_TOWER_MODEL.barrelNode);
+    const painter = stripComments(sourceOf('src/render/turret_defense_visual.ts'));
+    expect(painter).toContain('if (self) this.standGunner(');
+    expect(painter).not.toMatch(/standGunner[^;]*visible/);
+    settle();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(tower.group.visible).toBe(true);
+    tower.dispose();
   });
 
   it('Fire and Fly weapon gate: the prewarmed particles draw a shot until its pieces link', async () => {

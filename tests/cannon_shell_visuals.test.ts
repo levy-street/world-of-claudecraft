@@ -354,16 +354,40 @@ describe('cannon shell visuals', () => {
     visuals.dispose();
   });
 
+  it('kicks a barrel pitched after it was handed over along its new axis, by the kick it was given', () => {
+    const { scene, visuals } = weapon();
+    const head = new THREE.Group();
+    head.rotation.y = 1.1;
+    const barrel = new THREE.Object3D();
+    barrel.position.set(0, 0.48, 0.05);
+    head.add(barrel);
+    scene.add(head);
+    visuals.setBarrel(barrel, { x: 0, y: 0, z: 1 }, 0.16);
+    const rest = barrel.position.clone();
+    barrel.rotation.x = -0.4;
+    visuals.fire(fired, fallback, 1, false);
+    visuals.update(160, 1 + CANNON_MUZZLE.recoilAttack);
+    const kick = barrel.position.clone().sub(rest);
+    const scale = 0.16 / CANNON_MUZZLE.recoilKick;
+    expect(kick.length()).toBeCloseTo(cannonRecoilOffset(CANNON_MUZZLE.recoilAttack) * scale, 9);
+    const axis = new THREE.Vector3(0, 0, 1).applyQuaternion(barrel.quaternion);
+    expect(kick.normalize().dot(axis)).toBeCloseTo(-1, 9);
+    expect(head.position.lengthSq()).toBe(0);
+    visuals.update(162, 1 + CANNON_MUZZLE.recoilLife + 0.01);
+    expect(barrel.position.equals(rest)).toBe(true);
+    visuals.dispose();
+  });
+
   it('takes the muzzle from the barrel tip, kicks the barrel back and springs it home', () => {
     const { scene, visuals } = weapon();
-    const tank = new THREE.Group();
-    tank.position.set(5, 1, 5);
-    tank.rotation.y = Math.PI / 2;
+    const mount = new THREE.Group();
+    mount.position.set(5, 1, 5);
+    mount.rotation.y = Math.PI / 2;
     const barrel = new THREE.Object3D();
     barrel.position.set(0.2, 1.6, 0.5);
     barrel.scale.setScalar(2);
-    tank.add(barrel);
-    scene.add(tank);
+    mount.add(barrel);
+    scene.add(mount);
     const tip = { x: 0, y: 0, z: 1 };
     visuals.setBarrel(barrel, tip);
     expect(visuals.hasBarrel).toBe(true);
@@ -373,7 +397,7 @@ describe('cannon shell visuals', () => {
     const expected = new THREE.Vector3(tip.x, tip.y, tip.z).applyMatrix4(barrel.matrixWorld);
     const shell = instancePosition(piece(visuals, 'shell') as THREE.InstancedMesh, 0);
     expect(shell.distanceTo(expected)).toBeLessThan(1e-6);
-    // The muzzle faces the barrel's +z: with the tank turned a quarter, world +x.
+    // The muzzle faces the barrel's +z: with its mount turned a quarter, world +x.
     expect(expected.x).toBeGreaterThan(rest.x + 5);
     visuals.update(160, 1 + CANNON_MUZZLE.recoilAttack);
     expect(barrel.position.z).toBeCloseTo(

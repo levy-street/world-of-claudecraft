@@ -18891,7 +18891,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turret.statAccuracy': '명중률: {value}',
   'hudChrome.turret.statThrow': '최장 날리기 거리: {yards}야드',
   'hudChrome.turret.statAirtime': '최장 체공 시간: {seconds}초',
-  'hudChrome.turret.leave': '전차에서 내리기',
+  'hudChrome.turret.leave': '탑에서 내려가기',
   'hudChrome.leaderboard.tabWorldQuests': '전역 퀘스트',
   'hudChrome.leaderboard.wqBoardsLabel': '전역 퀘스트 점수판',
   'hudChrome.leaderboard.wqMedal': '메달',

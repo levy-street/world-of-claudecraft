@@ -18932,7 +18932,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turret.statAccuracy': '命中率：{value}',
   'hudChrome.turret.statThrow': '最長の吹き飛ばし：{yards} ヤード',
   'hudChrome.turret.statAirtime': '最長の滞空時間：{seconds} 秒',
-  'hudChrome.turret.leave': '戦車を降りる',
+  'hudChrome.turret.leave': '塔を降りる',
   'hudChrome.leaderboard.tabWorldQuests': 'ワールドクエスト',
   'hudChrome.leaderboard.wqBoardsLabel': 'ワールドクエストのスコアボード',
   'hudChrome.leaderboard.wqMedal': 'メダル',

@@ -569,7 +569,7 @@ export const ru_RU: EnTranslations = {
       "statAccuracy": "Точность: {value}",
       "statThrow": "Самый дальний бросок: {yards} м",
       "statAirtime": "Самый долгий полёт: {seconds} сек.",
-      "leave": "Покинуть танк"
+      "leave": "Покинуть башню"
     },
     "warlock": {
       "doomLabel": "Осуждение",
