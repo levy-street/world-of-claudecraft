@@ -196,6 +196,7 @@ export class VehicleActionBarController {
       showBanner: deps.showBanner,
       spawnFct: deps.spawnFct,
       addShake: (amount) => deps.presentation?.addShake(amount),
+      padKind: deps.padKind,
     });
   }
 

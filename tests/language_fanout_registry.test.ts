@@ -686,9 +686,9 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
   },
   {
     file: 'hud/vehicle/turret_hud_view.ts',
-    memos: ['lastLanguage', 'lastSeconds', 'lastSession'],
+    memos: ['lastLanguage', 'lastPhase', 'lastSeconds', 'lastSession', 'lastWave'],
     reason:
-      'lastSession and lastSeconds key the rebuild of the turret seat text on the session view object and the shown countdown second, while lastLanguage is compared against getI18nRevision() in the same early-return guard. A locale switch always moves lastLanguage and rebuilds every localized line on the next frame, so the gate is explicitly locale-aware.',
+      'lastSession and lastSeconds key the rebuild of the turret seat text on the session view object and the shown countdown second, while lastLanguage is compared against getI18nRevision() in the same early-return guard. A locale switch always moves lastLanguage and rebuilds every localized line on the next frame, so the gate is explicitly locale-aware. lastPhase and lastWave are the engine phase id and wave index, never text: they only decide WHICH moment the live line speaks for, and that line is re-resolved through t() on every rebuild, so a locale switch re-localizes it too.',
   },
   {
     file: 'movable_frame.ts',

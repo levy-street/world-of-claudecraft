@@ -2,7 +2,8 @@
 // screen edges flash red, the integrity bar glows and shakes, and the camera
 // kicks, all scaled by the points lost. Each breach is read once, by sequence
 // number, from the seat's feedback ring; the clock and the motion preference are
-// injected, so the whole curve is testable without a DOM.
+// injected, so the whole curve is testable without a DOM. The edge flash rises
+// afresh at most three times a second, however fast the strikes land.
 import type { TurretSessionView } from '../../../world_api/vehicles';
 import { TurretFeedbackReader } from './turret_feedback_reader_core';
 
@@ -12,6 +13,12 @@ export const TURRET_HIT_RELEASE_MS = 600;
 export const TURRET_HIT_MAX_FLASH = 0.9;
 /** Under reduced motion the flash peaks at this share of its usual opacity. */
 export const TURRET_HIT_REDUCED_FLASH = 0.5;
+/**
+ * The shortest gap between two fresh rises of the edge flash, so it never flashes more
+ * than three times in any second (WCAG 2.3.1). A strike inside the gap still glows and
+ * swings the bar and kicks the camera at once; the edge flash takes it when the gap ends.
+ */
+export const TURRET_HIT_MIN_RISE_GAP_MS = 334;
 /** A 1-point strike still reads at this share of full strength. */
 const MIN_STRENGTH = 0.4;
 /** Points lost in one frame that read at full strength: a large monster striking near full health. */
@@ -64,6 +71,37 @@ export interface TurretHitFrame {
   cameraShake: number;
 }
 
+/** One strike's curve: from where it stands up to the strike's peak, then down to 0. */
+class HitEnvelope {
+  running = false;
+  /** When the last strike restarted it. */
+  startMs = 0;
+  private from = 0;
+  private peak = 0;
+
+  level(now: number): number {
+    return this.running ? turretHitLevel(now - this.startMs, this.from, this.peak) : 0;
+  }
+
+  /** Restacks a strike from the current level, never dropping to black first. */
+  trigger(strength: number, now: number): void {
+    const current = this.level(now);
+    this.from = current;
+    this.peak = Math.max(strength, current);
+    this.startMs = now;
+    this.running = true;
+  }
+
+  /** The level at `now`; the envelope stops once it has faded out. */
+  settle(now: number): number {
+    if (!this.running) return 0;
+    const elapsed = now - this.startMs;
+    const level = turretHitLevel(elapsed, this.from, this.peak);
+    if (level <= 0 && elapsed > 0) this.running = false;
+    return this.running ? level : 0;
+  }
+}
+
 export class TurretHitFeedback {
   private readonly reader = new TurretFeedbackReader();
   private readonly frame: TurretHitFrame = {
@@ -73,10 +111,12 @@ export class TurretHitFeedback {
     shake: 0,
     cameraShake: 0,
   };
-  private running = false;
-  private startMs = 0;
-  private from = 0;
-  private peak = 0;
+  /** The bar's glow and swing: every strike restacks it at once. */
+  private readonly gauge = new HitEnvelope();
+  /** The edge flash: its fresh rises stay TURRET_HIT_MIN_RISE_GAP_MS apart. */
+  private readonly veil = new HitEnvelope();
+  /** The strongest strike waiting for the edge flash's gap to end; 0 for none. */
+  private heldStrength = 0;
   private reduced = false;
 
   /**
@@ -103,36 +143,43 @@ export class TurretHitFeedback {
       if (clock !== null && entry.tick < clock - STALE_TICKS) continue;
       if (entry.event.type === 'breach') points += entry.event.points;
     }
-    if (points === 0 && !this.running) return frame;
+    if (points === 0 && !this.gauge.running && !this.veil.running && this.heldStrength === 0)
+      return frame;
     const now = this.now();
     if (points > 0) this.strike(points, now);
-    const elapsed = now - this.startMs;
-    const level = turretHitLevel(elapsed, this.from, this.peak);
-    if (level <= 0 && elapsed > 0) {
+    if (this.heldStrength > 0 && now - this.veil.startMs >= TURRET_HIT_MIN_RISE_GAP_MS) {
+      this.veil.trigger(this.heldStrength, now);
+      this.heldStrength = 0;
+    }
+    const glow = this.gauge.settle(now);
+    const flash = this.veil.settle(now);
+    if (!this.gauge.running && !this.veil.running && this.heldStrength === 0) {
       this.stop();
       return frame;
     }
     frame.active = true;
-    frame.flash = level * TURRET_HIT_MAX_FLASH * (this.reduced ? TURRET_HIT_REDUCED_FLASH : 1);
-    frame.glow = level;
+    frame.flash = flash * TURRET_HIT_MAX_FLASH * (this.reduced ? TURRET_HIT_REDUCED_FLASH : 1);
+    frame.glow = glow;
     frame.shake = this.reduced
       ? 0
-      : Math.sin((2 * Math.PI * GAUGE_SHAKE_HZ * elapsed) / 1000) * level;
+      : Math.sin((2 * Math.PI * GAUGE_SHAKE_HZ * (now - this.gauge.startMs)) / 1000) * glow;
     return frame;
   }
 
   private strike(points: number, now: number): void {
-    const current = this.running ? turretHitLevel(now - this.startMs, this.from, this.peak) : 0;
+    const strength = turretHitStrength(points);
     this.reduced = this.reducedMotion();
-    this.from = current;
-    this.peak = Math.max(turretHitStrength(points), current);
-    this.startMs = now;
-    this.running = true;
+    this.gauge.trigger(strength, now);
+    if (this.veil.running && now - this.veil.startMs < TURRET_HIT_MIN_RISE_GAP_MS)
+      this.heldStrength = Math.max(this.heldStrength, strength);
+    else this.veil.trigger(strength, now);
     this.frame.cameraShake = turretHitCameraShake(points, this.reduced);
   }
 
   private stop(): void {
-    this.running = false;
+    this.gauge.running = false;
+    this.veil.running = false;
+    this.heldStrength = 0;
     const frame = this.frame;
     frame.active = false;
     frame.flash = 0;

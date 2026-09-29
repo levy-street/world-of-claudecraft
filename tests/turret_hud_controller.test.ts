@@ -23,7 +23,15 @@ import {
   TURRET_HIT_ATTACK_MS,
   TURRET_HIT_RELEASE_MS,
 } from '../src/ui/hud/vehicle/turret_hit_feedback_core';
-import { TURRET_HIT_OVERLAY_ID } from '../src/ui/hud/vehicle/turret_hud_controller';
+import {
+  TURRET_HIT_OVERLAY_ID,
+  TURRET_SEATED_CLASS,
+} from '../src/ui/hud/vehicle/turret_hud_controller';
+import {
+  TURRET_HUD_ID,
+  TURRET_LIVE_ID,
+  TURRET_RAIL_ID,
+} from '../src/ui/hud/vehicle/turret_hud_painter';
 import { VehicleActionBarController } from '../src/ui/hud/vehicle/vehicle_action_bar_controller';
 import { VehicleAimCore } from '../src/ui/hud/vehicle/vehicle_aim_core';
 import { setLanguage } from '../src/ui/i18n';
@@ -89,42 +97,93 @@ function rig() {
     cancelOnEnter: [{ cancel }],
     attachTooltip: () => {},
     showBanner,
+    padKind: () => 'xbox',
   });
   return { world, bar, writes, cancel, showBanner };
 }
 
-const hud = () => document.getElementById('turret-hud')!;
-const text = (selector: string) => hud().querySelector(selector)!.textContent;
+const hud = () => document.getElementById(TURRET_HUD_ID)!;
+const rail = () => document.getElementById(TURRET_RAIL_ID)!;
+const live = () => document.getElementById(TURRET_LIVE_ID)!;
+const text = (selector: string) => document.querySelector(selector)!.textContent;
+const leaveButton = () => hud().querySelector<HTMLButtonElement>('.turret-leave')!;
+const seatedClass = () => document.body.classList.contains(TURRET_SEATED_CLASS);
 
-it('shows the seat HUD, hides the action bars and swaps in the turret aim while seated', () => {
+it('shows the strip and the rail, hides the action bars and swaps in the turret aim while seated', () => {
   const { world, bar, cancel } = rig();
   bar.update();
   expect(hud().style.display).toBe('none');
+  expect(rail().style.display).toBe('none');
+  expect(hud().parentElement?.id).toBe('ui');
+  expect(rail().parentElement?.id).toBe('ui');
+  expect(live().parentElement?.id).toBe('ui');
+  expect(live().style.display).toBe('');
+  expect(live().textContent).toBe('');
   expect(bar.aim).toBeInstanceOf(VehicleAimCore);
   const session = seat();
   world.turretSession = turretSessionView(session);
   world.turretClock = START;
   bar.update();
-  expect(hud().style.display).toBe('grid');
+  expect(hud().style.display).toBe('');
+  expect(rail().style.display).toBe('');
   expect(document.getElementById('vehicle-action-bar')!.style.display).toBe('none');
   expect(document.body.classList.contains('operating-vehicle')).toBe(true);
+  expect(seatedClass()).toBe(true);
   expect(cancel).toHaveBeenCalledTimes(1);
   expect(bar.aim).toBeInstanceOf(TurretAimCore);
   expect(bar.aim.isActive()).toBe(true);
   expect(bar.blocksPlayerActions).toBe(true);
   expect(VehicleActionBarController.blocksPlayerActions({ vehicleSession: null })).toBe(false);
-  expect(text('.vehicle-bar-title')).toBe('Fire and Fly');
-  expect(text('.turret-bar-status')).toBe('Wave 1/6');
-  expect(text('.vehicle-bar-hint')).toBe('First wave in 3 sec');
-  const gauge = hud().querySelector('.vehicle-integrity')!;
-  expect(gauge.getAttribute('role')).toBe('meter');
-  expect(gauge.getAttribute('aria-valuemax')).toBe(String(TURRET_TIMING.integrity));
-  expect(gauge.getAttribute('aria-valuenow')).toBe(String(TURRET_TIMING.integrity));
-  expect(gauge.getAttribute('aria-label')).toBe('Turret integrity');
-  expect(hud().querySelector<HTMLElement>('.turret-result')!.style.display).toBe('none');
+  expect(hud().getAttribute('aria-label')).toBe('Fire and Fly');
+  expect(hud().classList.contains('ui-panel-strong')).toBe(true);
+  expect(text('.turret-strip-wave')).toBe('Wave 1/6');
+  expect(text('.turret-strip-slot')).toBe('First wave in 3 sec');
+  expect(hud().classList.contains('ended')).toBe(false);
+  const leave = leaveButton();
+  expect(leave.classList.contains('ui-btn')).toBe(true);
+  expect(leave.classList.contains('ui-btn--lg')).toBe(false);
+  expect(text('.turret-leave-label')).toBe('Leave');
+  expect(text('.turret-leave-key')).toBe('Esc');
+  expect(leave.getAttribute('aria-label')).toBe('Leave the tower');
+  expect(leave.getAttribute('title')).toBe('Leave the tower');
+  expect(leave.getAttribute('aria-keyshortcuts')).toBe('Escape');
+  expect(rail().getAttribute('role')).toBe('meter');
+  expect(rail().getAttribute('aria-label')).toBe('Tower integrity');
+  expect(rail().getAttribute('aria-valuemax')).toBe(String(TURRET_TIMING.integrity));
+  expect(rail().getAttribute('aria-valuenow')).toBe(String(TURRET_TIMING.integrity));
+  expect(text('.turret-rail-caption')).toBe('Tower');
+  expect(rail().querySelectorAll('.ui-bevel-ticks > span')).toHaveLength(4);
+  expect(live().classList.contains('visually-hidden')).toBe(true);
+  expect(live().textContent).toBe('First wave in 3 sec');
+  expect(hud().querySelector('[role="status"]')).toBeNull();
 });
 
-it('writes nothing on unchanged frames and announces each wave once', () => {
+it('shows the pad Start glyph on Leave while the pad is in hand', () => {
+  const { world, bar } = rig();
+  world.turretSession = turretSessionView(seat());
+  world.turretClock = START;
+  bar.update();
+  expect(text('.turret-leave-key')).toBe('Esc');
+  document.body.classList.add('pad-active');
+  bar.update();
+  expect(text('.turret-leave-key')).toBe('Menu');
+});
+
+it('hides the player frame and the XP rail only while seated, and gives them back on leaving', () => {
+  const { world, bar } = rig();
+  bar.update();
+  expect(seatedClass()).toBe(false);
+  world.turretSession = turretSessionView(seat());
+  world.turretClock = START;
+  bar.update();
+  expect(seatedClass()).toBe(true);
+  world.leaveVehicle();
+  bar.update();
+  expect(seatedClass()).toBe(false);
+  expect(document.body.classList.contains('operating-vehicle')).toBe(false);
+});
+
+it('writes nothing on unchanged frames, announces each wave once, and never speaks a kill', () => {
   const { world, bar, writes, showBanner } = rig();
   const session = seat();
   world.turretSession = turretSessionView(session);
@@ -143,11 +202,20 @@ it('writes nothing on unchanged frames and announces each wave once', () => {
   bar.update();
   bar.update();
   expect(showBanner).toHaveBeenCalledTimes(1);
-  expect(showBanner).toHaveBeenCalledWith({ text: 'Wave 1 of 6' });
-  expect(text('.turret-bar-status')).toBe('Wave 1/6Monsters left: 8');
+  expect(showBanner).toHaveBeenCalledWith({
+    text: 'Wave 1 of 6',
+    subtext: 'Blast the monsters before they reach the tower',
+  });
+  expect(text('.turret-strip-wave')).toBe('Wave 1/6');
+  expect(text('.turret-strip-slot')).toBe('Monsters left: 8');
+  expect(live().textContent).toBe('Wave 1 of 6');
+  world.turretSession = { ...turretSessionView(session), monstersLeft: 7 };
+  bar.update();
+  expect(text('.turret-strip-slot')).toBe('Monsters left: 7');
+  expect(live().textContent).toBe('Wave 1 of 6');
 });
 
-it('paints the integrity bar from the session, and turns it to danger when low', () => {
+it('paints the tower rail from the session, and turns it to danger when low', () => {
   const { world, bar } = rig();
   const session = seat();
   const max = TURRET_TIMING.integrity;
@@ -156,30 +224,34 @@ it('paints the integrity bar from the session, and turns it to danger when low',
   world.turretSession = turretSessionView(session);
   world.turretClock = START;
   bar.update();
-  const gauge = hud().querySelector<HTMLElement>('.vehicle-integrity')!;
-  const fill = hud().querySelector<HTMLElement>('.vehicle-integrity-fill')!;
-  expect(fill.style.getPropertyValue('--vehicle-integrity')).toBe(String(low / max));
-  expect(gauge.classList.contains('low-integrity')).toBe(true);
-  expect(gauge.getAttribute('aria-valuenow')).toBe(String(low));
-  expect(text('.vehicle-integrity-text')).toBe(`${low}/${max}`);
+  const fill = rail().querySelector<HTMLElement>('.turret-rail-fill')!;
+  expect(fill.classList.contains('ui-bevel-fill')).toBe(true);
+  expect(fill.style.getPropertyValue('--turret-integrity')).toBe(String(low / max));
+  expect(rail().classList.contains('low-integrity')).toBe(true);
+  expect(rail().getAttribute('aria-valuenow')).toBe(String(low));
+  expect(text('.turret-rail-value')).toBe(`${low}/${max}`);
+  expect(fill.textContent).toBe('');
   session.defense.integrity = max;
   session.defense.rev++;
   world.turretSession = turretSessionView(session);
   bar.update();
-  expect(fill.style.getPropertyValue('--vehicle-integrity')).toBe('1');
-  expect(gauge.classList.contains('low-integrity')).toBe(false);
+  expect(fill.style.getPropertyValue('--turret-integrity')).toBe('1');
+  expect(rail().classList.contains('low-integrity')).toBe(false);
 });
 
-it('marks a won result panel', () => {
+it('unfolds the strip into a won result card', () => {
   const { world, bar } = rig();
   const session = seat();
   session.defense.phase = 'won';
   world.turretSession = turretSessionView(session);
   world.turretClock = START;
   bar.update();
-  const result = hud().querySelector<HTMLElement>('.turret-result')!;
-  expect(result.classList.contains('won')).toBe(true);
-  expect(text('.turret-result-title')).toBe('Victory!');
+  expect(hud().classList.contains('ended')).toBe(true);
+  const card = hud().querySelector<HTMLElement>('.turret-card')!;
+  expect(card.classList.contains('won')).toBe(true);
+  expect(text('.turret-card-kicker')).toBe('Fire and Fly');
+  expect(text('.turret-card-verdict')).toBe('Victory!');
+  expect(live().textContent).toBe('Victory!');
 });
 
 function hudHost(renderer?: { setGroundAimReticle(value: null): void; addShake(n: number): void }) {
@@ -275,28 +347,39 @@ it('hands the HUD banner its text, motion, variant and the final-wave subtext', 
   expect(showBanner).toHaveBeenCalledWith('Wave 6 of 6', true, undefined, 'default', 'Final wave');
 });
 
-it('shows the result panel at the end and leaves through the Leave button', () => {
+it('shows the result card at the end and leaves through its large Leave button', () => {
   const { world, bar } = rig();
   const session = seat();
   session.defense.phase = 'lost';
+  session.defense.integrity = 0;
   session.defense.stats.shots = 4;
   session.defense.stats.hits = 1;
   world.turretSession = turretSessionView(session);
   world.turretClock = START;
   bar.update();
-  const result = hud().querySelector<HTMLElement>('.turret-result')!;
-  expect(result.style.display).toBe('');
-  expect(result.classList.contains('won')).toBe(false);
-  expect(text('.vehicle-bar-hint')).toBe('');
-  expect(text('.turret-result-title')).toBe('The turret has fallen');
-  expect(result.textContent).toContain('Accuracy: 25%');
-  const leave = hud().querySelector<HTMLButtonElement>('.vehicle-exit')!;
-  expect(leave.textContent).toBe('Leave the tower');
+  expect(hud().classList.contains('ended')).toBe(true);
+  const card = hud().querySelector<HTMLElement>('.turret-card')!;
+  expect(card.classList.contains('won')).toBe(false);
+  expect(text('.turret-strip-slot')).toBe('');
+  expect(text('.turret-card-verdict')).toBe('The tower has fallen');
+  const rows = [...card.querySelectorAll('.ui-stat-row')].map((row) => [
+    row.querySelector('dt')!.textContent,
+    row.querySelector('dd')!.textContent,
+  ]);
+  expect(rows).toContainEqual(['Accuracy', '25%']);
+  expect(rows).toContainEqual(['Tower', `0/${TURRET_TIMING.integrity}`]);
+  const leave = leaveButton();
+  expect(leave.classList.contains('ui-btn--lg')).toBe(true);
+  expect(text('.turret-leave-label')).toBe('Leave the tower');
   leave.click();
   bar.update();
   expect(world.leaveVehicle).toHaveBeenCalledTimes(1);
   expect(hud().style.display).toBe('none');
+  expect(rail().style.display).toBe('none');
+  expect(live().textContent).toBe('');
+  expect(live().style.display).toBe('');
   expect(document.body.classList.contains('operating-vehicle')).toBe(false);
+  expect(seatedClass()).toBe(false);
   expect(bar.aim).toBeInstanceOf(VehicleAimCore);
   expect(bar.aim.isActive()).toBe(false);
 });
@@ -372,7 +455,7 @@ function struck(session: TurretSession, points: number, tick = START): void {
   session.defense.rev++;
 }
 
-it('flashes the screen edges and the integrity bar on a strike, then clears them', () => {
+it('flashes the screen edges and the tower rail on a strike, then clears them', () => {
   let now = 5000;
   vi.spyOn(performance, 'now').mockImplementation(() => now);
   const renderer = { setGroundAimReticle: vi.fn(), addShake: vi.fn() };
@@ -393,7 +476,7 @@ it('flashes the screen edges and the integrity bar on a strike, then clears them
   expect(renderer.addShake.mock.calls[0][0]).toBeGreaterThan(0);
   now += TURRET_HIT_ATTACK_MS;
   bar.update();
-  const gauge = hud().querySelector<HTMLElement>('.vehicle-integrity')!;
+  const gauge = rail().querySelector<HTMLElement>('.turret-rail-bar')!;
   expect(Number(overlay.style.getPropertyValue('--turret-hit-flash'))).toBeGreaterThan(0.5);
   expect(Number(gauge.style.getPropertyValue('--turret-hit-glow'))).toBeGreaterThan(0.5);
   now += TURRET_HIT_RELEASE_MS;
@@ -406,7 +489,7 @@ it('flashes the screen edges and the integrity bar on a strike, then clears them
   expect(gauge.style.getPropertyValue('--turret-hit-shake')).toBe('0.000');
 });
 
-it('keeps the camera still and the bar steady under the in-game Reduce Motion switch', () => {
+it('keeps the camera still and the rail steady under the in-game Reduce Motion switch', () => {
   let now = 5000;
   vi.spyOn(performance, 'now').mockImplementation(() => now);
   document.body.classList.add('reduce-motion');
@@ -417,7 +500,7 @@ it('keeps the camera still and the bar steady under the in-game Reduce Motion sw
   struck(session, 12);
   world.turretSession = turretSessionView(session);
   bar.update();
-  const gauge = hud().querySelector<HTMLElement>('.vehicle-integrity')!;
+  const gauge = rail().querySelector<HTMLElement>('.turret-rail-bar')!;
   for (let i = 0; i < 8; i++) {
     now += 16;
     bar.update();
@@ -447,7 +530,7 @@ it('keeps the camera still under the OS reduced-motion setting, resolving its qu
   struck(session, 4);
   world.turretSession = turretSessionView(session);
   bar.update();
-  const gauge = hud().querySelector<HTMLElement>('.vehicle-integrity')!;
+  const gauge = rail().querySelector<HTMLElement>('.turret-rail-bar')!;
   expect(gauge.style.getPropertyValue('--turret-hit-shake')).toBe('0.000');
   expect(Number(gauge.style.getPropertyValue('--turret-hit-glow'))).toBeGreaterThan(0);
   expect(renderer.addShake).not.toHaveBeenCalled();

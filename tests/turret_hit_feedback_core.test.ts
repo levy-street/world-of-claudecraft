@@ -4,6 +4,7 @@ import type { TurretFeedback } from '../src/sim/minigames/turret_feedback';
 import {
   TURRET_HIT_ATTACK_MS,
   TURRET_HIT_MAX_FLASH,
+  TURRET_HIT_MIN_RISE_GAP_MS,
   TURRET_HIT_REDUCED_FLASH,
   TURRET_HIT_RELEASE_MS,
   TurretHitFeedback,
@@ -171,6 +172,60 @@ describe('turret hit feedback', () => {
     expect(after.glow).toBeCloseTo(before, 12);
     advance(TURRET_HIT_ATTACK_MS);
     expect(hits.update(session(ring), 12).glow).toBeCloseTo(before, 12);
+  });
+
+  it('rises the edge flash at most three times a second, while the bar answers every strike', () => {
+    const { hits, advance } = rig();
+    const ring: TurretFeedback[] = [];
+    const frameMs = 20;
+    const strikeEveryMs = 100;
+    const strikes = 20;
+    let flash = 0;
+    let glow = 0;
+    let flashRising = false;
+    let glowRising = false;
+    const flashRises: number[] = [];
+    let glowRises = 0;
+    let kicks = 0;
+    for (let t = 0; t <= strikes * strikeEveryMs + 1000; t += frameMs) {
+      if (t % strikeEveryMs === 0 && ring.length < strikes)
+        ring.push(entry(ring.length + 1, 10, breach(12, ring.length + 1)));
+      const frame = hits.update(session(ring), 10);
+      if (frame.cameraShake > 0) kicks++;
+      const nowRising = frame.flash > flash + 1e-9;
+      if (nowRising && !flashRising) flashRises.push(t);
+      flashRising = nowRising;
+      flash = frame.flash;
+      const glowUp = frame.glow > glow + 1e-9;
+      if (glowUp && !glowRising) glowRises++;
+      glowRising = glowUp;
+      glow = frame.glow;
+      advance(frameMs);
+    }
+    expect(kicks).toBe(strikes);
+    expect(glowRises).toBe(strikes);
+    expect(flashRises.length).toBeGreaterThan(3);
+    for (let i = 3; i < flashRises.length; i++)
+      expect(flashRises[i] - flashRises[i - 3]).toBeGreaterThanOrEqual(1000);
+    for (let i = 1; i < flashRises.length; i++)
+      expect(flashRises[i] - flashRises[i - 1]).toBeGreaterThanOrEqual(TURRET_HIT_MIN_RISE_GAP_MS);
+  });
+
+  it('flashes a strike held by the gap once the gap has passed', () => {
+    const { hits, advance } = rig();
+    const ring = [entry(1, 10, breach(1))];
+    hits.update(session(ring), 10);
+    advance(100);
+    ring.push(entry(2, 10, breach(12, 2)));
+    hits.update(session(ring), 10);
+    advance(TURRET_HIT_ATTACK_MS / 2);
+    const held = hits.update(session(ring), 10);
+    expect(held.glow).toBeGreaterThan(turretHitStrength(1));
+    expect(held.flash).toBeLessThan(turretHitStrength(1) * TURRET_HIT_MAX_FLASH);
+    advance(TURRET_HIT_MIN_RISE_GAP_MS - 100 - TURRET_HIT_ATTACK_MS / 2);
+    hits.update(session(ring), 10);
+    advance(TURRET_HIT_ATTACK_MS);
+    expect(hits.update(session(ring), 10).flash).toBeCloseTo(TURRET_HIT_MAX_FLASH, 12);
   });
 
   it('swings the bar while it flashes', () => {

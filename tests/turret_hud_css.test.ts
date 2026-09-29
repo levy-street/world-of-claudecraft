@@ -1,0 +1,125 @@
+// The Fire and Fly seat HUD's stylesheet contract (turret_hud_painter.ts builds the
+// DOM these rules dress): the strip and the rail never take the aim's pointer, only
+// Leave does; the seat hides the player frame and the XP rail while the cannon keeps
+// its own lift; touch keeps Leave at the 40px floor; forced colors keep the rail
+// readable. Pinned by text because a dropped or renamed rule fails silently in the
+// browser.
+import { readFileSync } from 'node:fs';
+import { describe, expect, it } from 'vitest';
+import { TURRET_SEATED_CLASS } from '../src/ui/hud/vehicle/turret_hud_controller';
+import { TURRET_HUD_ID, TURRET_RAIL_ID } from '../src/ui/hud/vehicle/turret_hud_painter';
+
+const flat = (path: string) =>
+  readFileSync(path, 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/\s+/g, ' ');
+const hud = flat('src/styles/hud.css');
+const mobile = flat('src/styles/hud.mobile.css');
+
+/** The declarations of the rule whose WHOLE selector is `selector` (never one arm of a list). */
+function declarationsFor(css: string, selector: string): string {
+  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const match = new RegExp(`(?:^|[{}]) ?${escaped} \\{`).exec(css);
+  expect(match, `no rule for ${selector}`).not.toBeNull();
+  const open = css.indexOf('{', (match?.index ?? 0) + 1 + selector.length);
+  return css.slice(open + 1, css.indexOf('}', open)).trim();
+}
+
+describe('the Fire and Fly seat HUD stylesheet', () => {
+  it('keeps the strip and the rail pointer-inert, with Leave the one live target', () => {
+    expect(declarationsFor(hud, `#${TURRET_HUD_ID}`)).toContain('pointer-events: none;');
+    expect(declarationsFor(hud, `#${TURRET_RAIL_ID}`)).toContain('pointer-events: none;');
+    expect(declarationsFor(hud, '.turret-leave')).toContain('pointer-events: auto;');
+  });
+
+  it('seats the strip at the top centre and the rail on the action-rail width at the bottom', () => {
+    const strip = declarationsFor(hud, `#${TURRET_HUD_ID}`);
+    expect(strip).toContain('top: 8px;');
+    expect(strip).toContain('left: 50%;');
+    expect(strip).toContain('transform: translateX(-50%);');
+    const rail = declarationsFor(hud, `#${TURRET_RAIL_ID}`);
+    expect(rail).toContain('bottom: 26px;');
+    expect(rail).toContain('var(--action-rail-w)');
+  });
+
+  it('hides the player frame and the XP rail only under the seat class', () => {
+    expect(declarationsFor(hud, `body.${TURRET_SEATED_CLASS} :is(#player-frame, #xpbar)`)).toBe(
+      'display: none !important;',
+    );
+    expect(
+      declarationsFor(
+        hud,
+        `body.operating-vehicle:not(.${TURRET_SEATED_CLASS}) #player-frame:not(.pf-detached)`,
+      ),
+    ).toBe('margin-bottom: 250px;');
+    expect(hud).not.toContain('turret-bar');
+    expect(mobile).not.toContain('turret-bar');
+  });
+
+  it('keeps the rail number outside the fill and lays the hit glow on the unclipped wrapper', () => {
+    expect(declarationsFor(hud, '.turret-rail-value')).toContain('left: calc(100% + 10px);');
+    expect(declarationsFor(hud, '.turret-rail-caption')).toContain('right: calc(100% + 10px);');
+    const wrapper = declarationsFor(hud, '.turret-rail-bar');
+    expect(wrapper).toContain('box-shadow:');
+    expect(wrapper).toContain('translate:');
+    expect(declarationsFor(hud, '.turret-rail-fill')).toContain(
+      'transform: scaleX(var(--turret-integrity, 1));',
+    );
+  });
+
+  it('unfolds the result card only in the ended state', () => {
+    expect(declarationsFor(hud, '.turret-card')).toContain('display: none;');
+    expect(declarationsFor(hud, `#${TURRET_HUD_ID}.ended .turret-card`)).toContain(
+      'display: grid;',
+    );
+    expect(
+      declarationsFor(hud, `#${TURRET_HUD_ID}.ended :is(.turret-strip-wave, .turret-strip-slot)`),
+    ).toBe('display: none;');
+  });
+
+  it('drops the result card under the banner lane on a short screen', () => {
+    const bannerTop = /top: (\d+%);/.exec(declarationsFor(hud, '#banner'))?.[1];
+    expect(bannerTop).toBe('28%');
+    const short = hud.slice(hud.indexOf('@media (max-height: 820px) {'));
+    expect(declarationsFor(short, `#${TURRET_HUD_ID}.ended`)).toBe(
+      `top: calc(${bannerTop} + 56px);`,
+    );
+  });
+
+  it('folds the rail caption and number inside the rail band on a narrower desktop', () => {
+    const narrow = hud.slice(hud.indexOf('@media (max-width: 1600px) {'));
+    expect(declarationsFor(narrow, `body:not(.mobile-touch) #${TURRET_RAIL_ID}`)).toContain(
+      'display: flex;',
+    );
+    expect(
+      declarationsFor(
+        narrow,
+        'body:not(.mobile-touch) :is(.turret-rail-caption, .turret-rail-value)',
+      ),
+    ).toBe('position: static; transform: none;');
+    expect(declarationsFor(narrow, 'body:not(.mobile-touch) .turret-rail-bar')).toContain(
+      'flex: 1;',
+    );
+    expect(declarationsFor(narrow, 'body:not(.mobile-touch) .turret-rail-value')).toBe(
+      'min-width: 7ch;',
+    );
+  });
+
+  it('gives the rail a forced-colors meter', () => {
+    const forced = hud.slice(hud.indexOf('.turret-rail-bevel { forced-color-adjust: none;'));
+    expect(forced).toContain('border: 1px solid CanvasText;');
+    expect(declarationsFor(forced, '.turret-rail-fill')).toBe('background: Highlight;');
+  });
+
+  it('keeps Leave at the touch floor without a keycap, and the card under the touch banner', () => {
+    const leave = declarationsFor(mobile, 'body.mobile-touch .turret-leave');
+    expect(leave).toContain('min-width: 40px;');
+    expect(leave).toContain('height: 40px;');
+    expect(declarationsFor(mobile, 'body.mobile-touch .turret-leave .ui-keycap')).toBe(
+      'display: none;',
+    );
+    expect(declarationsFor(mobile, `body.mobile-touch #${TURRET_HUD_ID}.ended`)).toContain(
+      'top: calc(18% + 44px);',
+    );
+  });
+});

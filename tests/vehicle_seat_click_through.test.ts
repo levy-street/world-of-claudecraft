@@ -31,9 +31,11 @@ describe('vehicle seat click-through', () => {
     ).toBe('pointer-events: auto;');
   });
 
-  it('still lifts the docked player frame, the reason the band exists', () => {
-    expect(declarationsFor('body.operating-vehicle #player-frame:not(.pf-detached)')).toBe(
-      'margin-bottom: 250px;',
-    );
+  it('still lifts the docked player frame over the bottom vehicle bars, the reason the band exists', () => {
+    expect(
+      declarationsFor(
+        'body.operating-vehicle:not(.manning-turret) #player-frame:not(.pf-detached)',
+      ),
+    ).toBe('margin-bottom: 250px;');
   });
 });

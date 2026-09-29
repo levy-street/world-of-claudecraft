@@ -83,22 +83,49 @@
     gap: 4px;
     padding: 8px;
   }
-  /* The Fire and Fly seat keeps the cannon's bottom anchor (movement is locked, as
-     in the cannon): a lift like the walking shadow bar's would push its result
-     panel off a landscape phone. */
-  body.mobile-touch .vehicle-bar.turret-bar {
-    grid-template-columns: minmax(0, 1fr);
-    width: min(360px, calc(100% - 24px));
-    gap: 4px;
-    padding: 8px;
-  }
-  body.mobile-touch .shadow-action-bar .vehicle-integrity,
-  body.mobile-touch .turret-bar .vehicle-integrity {
+  body.mobile-touch .shadow-action-bar .vehicle-integrity {
     min-height: 20px;
     height: 20px;
   }
-  body.mobile-touch .turret-result {
+  /* The Fire and Fly seat on touch: the strip in the touch scoreboard seat between the
+     Chat trio and the minimap, Leave at the 40px touch floor with no keycap (no Escape
+     key here); the result card below the touch banner lane so the verdict banner never
+     covers it; the rail between the joystick and the menu cluster, on the hidden player
+     frame's seat. */
+  body.mobile-touch #turret-hud {
+    top: max(4px, env(safe-area-inset-top));
+    min-width: min(300px, calc(100% - 24px));
+    min-height: 44px;
+    padding: 2px 2px 2px 10px;
+    column-gap: 8px;
     font-size: 12px;
+  }
+  body.mobile-touch .turret-leave {
+    min-width: 40px;
+    height: 40px;
+    padding: 0 10px;
+  }
+  body.mobile-touch .turret-leave .ui-keycap {
+    display: none;
+  }
+  body.mobile-touch #turret-hud.ended {
+    top: calc(18% + 44px);
+    row-gap: 8px;
+    min-width: min(400px, calc(100% - 24px));
+    padding: 8px 12px 10px;
+  }
+  body.mobile-touch .turret-card-verdict {
+    font-size: 20px;
+  }
+  body.mobile-touch .turret-card-stats .ui-stat-row {
+    font-size: 12px;
+  }
+  body.mobile-touch #turret-rail {
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: clamp(160px, calc(100% - 340px), 300px);
+  }
+  body.mobile-touch .turret-rail-bevel {
+    height: 14px;
   }
   body.mobile-touch .shadow-action-bar .vehicle-bar-hint {
     grid-column: 1 / -1;

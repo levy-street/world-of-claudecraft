@@ -1,19 +1,16 @@
+import { type GamepadKind, GP, gamepadButtonLabel } from '../../../game/gamepad_map';
+import { currentInputHintMode } from '../../../game/input_hint_mode';
+import { keyLabel } from '../../../game/keybinds';
 import { TurretDefenseSfx } from '../../../game/turret_defense_sfx';
-import { TURRET_TIMING } from '../../../sim/content/turret_defense';
 import type { IWorldVehicles } from '../../../world_api/vehicles';
-import { t } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
 import { createReducedMotionProbe } from './reduced_motion_probe';
 import { TurretAimCore } from './turret_aim_core';
 import { TurretDamageNumbers, type TurretFctSpawn } from './turret_damage_numbers_core';
 import { TurretHitFeedback } from './turret_hit_feedback_core';
 import { TurretHitFlashPainter } from './turret_hit_flash_painter';
-import {
-  TURRET_RESULT_LINES,
-  type TurretBanner,
-  TurretFeedbackCursor,
-  TurretHudView,
-} from './turret_hud_view';
+import { TurretHudPainter } from './turret_hud_painter';
+import { type TurretBanner, TurretFeedbackCursor, TurretHudView } from './turret_hud_view';
 
 type TurretHudWorld = Pick<
   IWorldVehicles,
@@ -28,26 +25,21 @@ export interface TurretHudHooks {
   addShake?(amount: number): void;
   /** Read once per strike; defaults to the OS setting or the in-game Reduce Motion switch. */
   reducedMotion?(): boolean;
+  /** The connected pad's brand, for Leave's Start glyph while the pad is in hand. */
+  padKind?(): GamepadKind;
 }
 
 export const TURRET_HIT_OVERLAY_ID = 'turret-hit-vignette';
+/**
+ * On body while seated: the tower's rail takes the vitals seat, so the player frame and
+ * the XP rail step aside, and the vehicle bars' player-frame lift stays off.
+ */
+export const TURRET_SEATED_CLASS = 'manning-turret';
 
-/** The Fire and Fly seat HUD: integrity, wave, countdowns, the result panel and Leave. */
+/** The Fire and Fly seat HUD: status strip, result card, tower rail, hit feedback and Leave. */
 export class TurretHudController {
   readonly aim: TurretAimCore;
-  private readonly root = document.createElement('section');
-  private readonly title = document.createElement('div');
-  private readonly status = document.createElement('div');
-  private readonly waveLabel = document.createElement('span');
-  private readonly leftLabel = document.createElement('span');
-  private readonly gauge = document.createElement('div');
-  private readonly fill = document.createElement('div');
-  private readonly integrity = document.createElement('span');
-  private readonly phase = document.createElement('div');
-  private readonly result = document.createElement('div');
-  private readonly resultTitle = document.createElement('div');
-  private readonly resultLines: HTMLElement[] = [];
-  private readonly leave = document.createElement('button');
+  private readonly painter: TurretHudPainter;
   private readonly hitVeil = document.createElement('div');
   private readonly view = new TurretHudView();
   private readonly feedback = new TurretFeedbackCursor();
@@ -66,43 +58,18 @@ export class TurretHudController {
     this.numbers = hooks.spawnFct
       ? new TurretDamageNumbers(hooks.spawnFct, () => performance.now())
       : null;
-    this.root.id = 'turret-hud';
-    this.root.className = 'vehicle-bar turret-bar';
-    this.title.className = 'vehicle-bar-title';
-    this.status.className = 'vehicle-bar-status turret-bar-status';
-    this.gauge.className = 'vehicle-integrity';
-    this.fill.className = 'vehicle-integrity-fill';
-    this.integrity.className = 'vehicle-integrity-text';
-    this.phase.className = 'vehicle-bar-hint';
-    this.result.className = 'turret-result';
-    this.resultTitle.className = 'turret-result-title';
-    this.leave.className = 'vehicle-exit';
-    this.leave.type = 'button';
+    this.painter = new TurretHudPainter(writers, () => world.leaveVehicle());
     this.hitVeil.id = TURRET_HIT_OVERLAY_ID;
-    writers.setAttr(this.status, 'role', 'status');
-    writers.setAttr(this.gauge, 'role', 'meter');
-    writers.setAttr(this.gauge, 'aria-valuemin', '0');
-    writers.setAttr(this.gauge, 'aria-valuemax', String(TURRET_TIMING.integrity));
-    this.status.append(this.waveLabel, this.leftLabel);
-    this.gauge.append(this.fill, this.integrity);
-    this.result.append(this.resultTitle);
-    for (let i = 0; i < TURRET_RESULT_LINES; i++) {
-      const line = document.createElement('div');
-      this.resultLines.push(line);
-      this.result.append(line);
-    }
-    this.leave.addEventListener('click', () => world.leaveVehicle());
-    this.root.append(this.title, this.status, this.gauge, this.phase, this.result, this.leave);
-    writers.setDisplay(this.root, 'none');
-    writers.setDisplay(this.result, 'none');
     writers.setAttr(this.hitVeil, 'aria-hidden', 'true');
     writers.setDisplay(this.hitVeil, 'none');
-    document.getElementById('ui')?.append(this.root, this.hitVeil);
+    document
+      .getElementById('ui')
+      ?.append(this.painter.strip, this.painter.rail, this.painter.live, this.hitVeil);
     this.hits = new TurretHitFeedback(
       () => performance.now(),
       hooks.reducedMotion ?? createReducedMotionProbe(),
     );
-    this.hitFlash = new TurretHitFlashPainter(writers, this.hitVeil, this.gauge);
+    this.hitFlash = new TurretHitFlashPainter(writers, this.hitVeil, this.painter.railBar);
   }
 
   get active(): boolean {
@@ -116,8 +83,10 @@ export class TurretHudController {
     if (seated !== this.seated) {
       this.seated = seated;
       this.aim.reset();
+      this.view.reset();
       if (seated) for (const controller of this.cancelOnEnter) controller.cancel();
-      writers.setDisplay(this.root, seated ? 'grid' : 'none');
+      this.painter.show(seated);
+      writers.toggleClass(document.body, TURRET_SEATED_CLASS, seated);
     }
     const banner = this.feedback.consume(session);
     if (banner) this.hooks.showBanner?.(banner);
@@ -127,23 +96,13 @@ export class TurretHudController {
     this.hitFlash.paint(hit);
     if (hit.cameraShake > 0) this.hooks.addShake?.(hit.cameraShake);
     if (!session) return;
-    const frame = this.view.tick(session, this.world.turretClock);
-    writers.setText(this.title, t('hudChrome.turret.title'));
-    writers.setText(this.waveLabel, frame.wave);
-    writers.setText(this.leftLabel, frame.left);
-    writers.setAttr(this.gauge, 'aria-label', t('hudChrome.turret.integrity'));
-    writers.setAttr(this.gauge, 'aria-valuenow', frame.integrityNow);
-    writers.setStyleProp(this.fill, '--vehicle-integrity', frame.integrityFill);
-    writers.toggleClass(this.gauge, 'low-integrity', frame.low);
-    writers.setText(this.integrity, frame.integrityText);
-    writers.setText(this.phase, frame.phase);
-    writers.setText(this.leave, t('hudChrome.turret.leave'));
-    const result = frame.result;
-    writers.setDisplay(this.result, result ? '' : 'none');
-    if (!result) return;
-    writers.toggleClass(this.result, 'won', result.won);
-    writers.setText(this.resultTitle, result.title);
-    for (let i = 0; i < this.resultLines.length; i++)
-      writers.setText(this.resultLines[i], result.lines[i]);
+    this.painter.paint(this.view.tick(session, this.world.turretClock), this.leaveKeycap());
+  }
+
+  /** Escape leaves the seat; on a pad in hand, Start sends the same escape. */
+  private leaveKeycap(): string {
+    return currentInputHintMode() === 'pad'
+      ? gamepadButtonLabel(GP.START, this.hooks.padKind?.() ?? 'generic')
+      : keyLabel('Escape');
   }
 }

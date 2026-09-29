@@ -123,18 +123,15 @@
     grid-template-columns: 1fr;
     width: min(420px, calc(100% - 24px));
   }
-  .vehicle-bar.shadow-action-bar > *,
-  .vehicle-bar.turret-bar > * {
+  .vehicle-bar.shadow-action-bar > * {
     grid-column: 1 / -1;
   }
-  .vehicle-bar.shadow-action-bar .vehicle-integrity,
-  .vehicle-bar.turret-bar .vehicle-integrity {
+  .vehicle-bar.shadow-action-bar .vehicle-integrity {
     min-height: 22px;
     height: 22px;
     border-radius: 4px;
   }
-  .vehicle-bar.shadow-action-bar .vehicle-integrity-fill,
-  .vehicle-bar.turret-bar .vehicle-integrity-fill {
+  .vehicle-bar.shadow-action-bar .vehicle-integrity-fill {
     transform: scaleX(var(--vehicle-integrity));
     transform-origin: left;
   }
@@ -242,9 +239,16 @@
   ) {
     display: none !important;
   }
-  /* Temporary layout only: the saved unit-frame position and action bindings stay intact. */
-  body.operating-vehicle #player-frame:not(.pf-detached) {
+  /* Temporary layout only: the saved unit-frame position and action bindings stay intact.
+     The Fire and Fly seat keeps no bottom panel to clear, so the lift stays off there. */
+  body.operating-vehicle:not(.manning-turret) #player-frame:not(.pf-detached) {
     margin-bottom: 250px;
+  }
+  /* On the Fire and Fly tower the integrity rail takes the vitals seat: nothing seated can
+     change the player's own frame (docked or moved), and the XP rail would read as a second
+     tower bar right under it (turret_hud_controller.ts toggles the class). */
+  body.manning-turret :is(#player-frame, #xpbar) {
+    display: none !important;
   }
   /* That lift leaves the stack's box standing empty over the world in front of the seat:
      let clicks through it so the aim reaches the ground there; its rows stay clickable. */
@@ -374,47 +378,188 @@
   .vehicle-bar-hint {
     min-height: 2.4em;
   }
-  /* The Fire and Fly seat: one column, the shadow bar's horizontal integrity bar
-     (shared above), and a result panel that takes the phase line's place once the
-     defense ends. */
-  .vehicle-bar.turret-bar {
-    grid-template-columns: minmax(0, 1fr);
-    width: min(420px, calc(100% - 24px));
+  /* The Fire and Fly seat (turret_hud_painter.ts): a status strip in the top-centre
+     match-strip seat (the wave, the monsters left or the countdown, Leave) that unfolds
+     into the result card when the defense ends, clear of the 28 percent banner lane, and
+     the tower's integrity rail on the action-rail width at the bottom, where the XP rail
+     it hides sits. Only Leave takes the pointer: aim clicks and drags pass through the
+     rest. The strip keeps one width while its middle slot changes text. */
+  #turret-hud {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 5;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: "wave slot leave";
+    align-items: center;
+    column-gap: 14px;
+    width: max-content;
+    min-width: min(420px, calc(100% - 24px));
+    max-width: min(520px, calc(100% - 24px));
+    min-height: 38px;
+    padding: 4px 4px 4px 14px;
+    font-size: 14px;
+    pointer-events: none;
   }
-  .turret-bar-status {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 4px 16px;
+  .turret-strip-wave {
+    grid-area: wave;
+    color: var(--color-accent);
+    white-space: nowrap;
   }
-  .vehicle-bar.turret-bar .vehicle-bar-hint {
-    min-height: 1.4em;
+  .turret-strip-slot {
+    grid-area: slot;
+    min-width: 0;
+    overflow: hidden;
+    font-weight: 500;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
-  .vehicle-bar.turret-bar .vehicle-bar-hint:empty {
+  .turret-leave {
+    grid-area: leave;
+    height: 28px;
+    padding: 0 6px 0 12px;
+    pointer-events: auto;
+  }
+  .turret-leave.ui-btn--lg {
+    justify-self: center;
+    height: var(--btn-h-lg);
+    padding: 0 10px 0 18px;
+  }
+  .turret-card {
+    display: none;
+    grid-area: card;
+  }
+  #turret-hud.ended {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "card"
+      "leave";
+    row-gap: 12px;
+    min-width: min(440px, calc(100% - 24px));
+    padding: 12px 18px 16px;
+  }
+  /* On a short screen the 28 percent banner lane rises into the card, so the card
+     drops under the lane (one banner line and a gap), as on touch, and the verdict
+     banner never covers it. */
+  @media (max-height: 820px) {
+    #turret-hud.ended {
+      top: calc(28% + 56px);
+    }
+  }
+  #turret-hud.ended :is(.turret-strip-wave, .turret-strip-slot) {
     display: none;
   }
-  .vehicle-bar.turret-bar .vehicle-exit {
-    justify-self: center;
-    padding: 0 18px;
-  }
-  .turret-result {
+  #turret-hud.ended .turret-card {
     display: grid;
-    gap: 2px;
-    font-size: 14px;
+    gap: 6px;
     text-align: center;
+    animation: turret-card-in var(--dur-panel) ease-out;
   }
-  .turret-result-title {
-    font-family: var(--title-font);
-    font-size: 18px;
+  @keyframes turret-card-in {
+    from {
+      opacity: 0;
+    }
   }
-  .turret-result:not(.won) .turret-result-title {
+  .turret-card-kicker {
+    font-size: 12px;
+  }
+  .turret-card-verdict {
+    font-size: 26px;
+    line-height: 1.2;
+    color: var(--color-text-success);
+  }
+  .turret-card:not(.won) .turret-card-verdict {
+    color: var(--color-hostile);
+  }
+  .turret-card-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 24px;
+    margin: 0;
+    text-align: left;
+  }
+  .turret-card-stats .ui-stat-row {
+    gap: 12px;
+    font-size: 14px;
+  }
+  .turret-card-value {
+    margin: 0;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  #turret-rail {
+    position: absolute;
+    left: 50%;
+    bottom: 26px;
+    transform: translateX(-50%);
+    z-index: 5;
+    width: min(var(--action-rail-w), calc(100% - 200px));
     color: var(--color-vehicle-text);
+    pointer-events: none;
   }
-  /* A strike on the turret: the seat HUD (turret_hit_flash_painter.ts) drives these
+  .turret-rail-caption,
+  .turret-rail-value {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    white-space: nowrap;
+  }
+  .turret-rail-caption {
+    right: calc(100% + 10px);
+    font-size: 12px;
+  }
+  .turret-rail-value {
+    left: calc(100% + 10px);
+    font-size: 13px;
+    font-weight: 700;
+  }
+  /* The chat box is sized to clear only the action-rail band, so on a narrower
+     desktop the caption and the number fold inside the rail's width; the number
+     keeps room for its widest value so the bar never resizes as integrity falls. */
+  @media (max-width: 1600px) {
+    body:not(.mobile-touch) #turret-rail {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    body:not(.mobile-touch) :is(.turret-rail-caption, .turret-rail-value) {
+      position: static;
+      transform: none;
+    }
+    body:not(.mobile-touch) .turret-rail-bar {
+      flex: 1;
+      min-width: 0;
+    }
+    body:not(.mobile-touch) .turret-rail-value {
+      min-width: 7ch;
+    }
+  }
+  body.high-contrast-text :is(.turret-rail-caption, .turret-rail-value) {
+    text-shadow:
+      var(--outline-shadow),
+      0 0 4px var(--color-keyline);
+  }
+  .turret-rail-bevel {
+    --bar-color: var(--color-vehicle-integrity);
+    height: 18px;
+  }
+  #turret-rail.low-integrity .turret-rail-bevel {
+    --bar-color: var(--color-vehicle-danger);
+  }
+  .turret-rail-fill {
+    width: 100%;
+    transform: scaleX(var(--turret-integrity, 1));
+    transform-origin: left;
+  }
+  /* A strike on the tower: the seat HUD (turret_hit_flash_painter.ts) drives these
      variables per frame for the flash's life and hides the overlay between strikes.
      The overlay sits where the low-health vignette does and never eats pointer
-     events; the bar glows red and swings sideways. Reduced motion is applied by the
+     events; the rail glows red and swings sideways from the bevel's wrapper, since
+     the bevel's own clip would cut a glow off. Reduced motion is applied by the
      controller (a softer flash, no swing). */
   #turret-hit-vignette {
     --turret-hit-flash: 0;
@@ -425,15 +570,14 @@
     background: var(--low-health-veil);
     opacity: var(--turret-hit-flash);
   }
-  .vehicle-bar.turret-bar .vehicle-integrity {
+  .turret-rail-bar {
     --turret-hit-glow: 0;
     --turret-hit-shake: 0;
-    isolation: isolate;
     translate: calc(var(--turret-hit-shake) * 6px) 0;
     box-shadow: 0 0 calc(var(--turret-hit-glow) * 14px) calc(var(--turret-hit-glow) * 3px)
       var(--color-vehicle-danger);
   }
-  .vehicle-bar.turret-bar .vehicle-integrity::after {
+  .turret-rail-bevel::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -441,8 +585,16 @@
     opacity: calc(var(--turret-hit-glow) * 0.6);
     pointer-events: none;
   }
-  .vehicle-bar.turret-bar .vehicle-integrity-text {
-    z-index: 1;
+  @media (forced-colors: active) {
+    .turret-rail-bevel {
+      forced-color-adjust: none;
+      box-sizing: border-box;
+      border: 1px solid CanvasText;
+      background: Canvas;
+    }
+    .turret-rail-fill {
+      background: Highlight;
+    }
   }
   /* ---------- nameplates ---------- */
   .nameplate {

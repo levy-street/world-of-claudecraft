@@ -5,8 +5,14 @@ import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { recordTurretFeedback, TURRET_FEEDBACK_LIMIT } from '../src/sim/minigames/turret_feedback';
 import { turretSessionView } from '../src/sim/turret_defense_session';
 import { TICK_RATE, type TurretSession } from '../src/sim/types';
-import { TurretFeedbackCursor, TurretHudView } from '../src/ui/hud/vehicle/turret_hud_view';
+import {
+  TURRET_INTEGRITY_ALERTS,
+  TURRET_RESULT_ROWS,
+  TurretFeedbackCursor,
+  TurretHudView,
+} from '../src/ui/hud/vehicle/turret_hud_view';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
+import type { TurretSessionView } from '../src/world_api/vehicles';
 import { probeAllocationStability } from './util/alloc_probe';
 
 vi.mock('../src/ui/i18n', async (importOriginal) => {
@@ -52,15 +58,19 @@ const stats = {
 
 beforeEach(() => setLanguage('en'));
 
+const firstWaveBanner = {
+  text: 'Wave 1 of 6',
+  subtext: 'Blast the monsters before they reach the tower',
+};
+
 describe('the turret HUD view', () => {
-  it('counts down to the first wave from the clock', () => {
+  it('counts down to the first wave from the clock, in the strip slot', () => {
     const session = seat();
     const view = new TurretHudView();
     const frame = view.tick(turretSessionView(session), START);
     expect(frame.wave).toBe('Wave 1/6');
-    expect(frame.left).toBe('');
-    expect(frame.phase).toBe(`First wave in ${TURRET_TIMING.introTicks / TICK_RATE} sec`);
-    expect(view.tick(turretSessionView(session), START + TURRET_TIMING.introTicks - 1).phase).toBe(
+    expect(frame.slot).toBe(`First wave in ${TURRET_TIMING.introTicks / TICK_RATE} sec`);
+    expect(view.tick(turretSessionView(session), START + TURRET_TIMING.introTicks - 1).slot).toBe(
       'First wave in 1 sec',
     );
     expect(frame.integrity).toBe(1);
@@ -68,35 +78,46 @@ describe('the turret HUD view', () => {
     expect(frame.result).toBeNull();
   });
 
-  it('shows the wave, the monsters left and the fire hint during a wave', () => {
+  it('names the seat, its rail and its Leave button in the tower wording', () => {
+    const { labels } = new TurretHudView().tick(turretSessionView(seat()), START);
+    expect(labels).toEqual({
+      title: 'Fire and Fly',
+      meter: 'Tower integrity',
+      caption: 'Tower',
+      leave: 'Leave the tower',
+      leaveShort: 'Leave',
+    });
+  });
+
+  it('shows the wave and the monsters left during a wave, with no aim hint', () => {
     const session = seat();
     session.defense.phase = 'wave';
     session.defense.wave = 2;
     session.defense.integrity = 20;
     const frame = new TurretHudView().tick(turretSessionView(session), START);
     expect(frame.wave).toBe('Wave 3/6');
-    expect(frame.left).toBe(
+    expect(frame.slot).toBe(
       `Monsters left: ${resolveTurretPlan().waves[2].spawns.length.toLocaleString('en')}`,
     );
-    expect(frame.phase).toBe('Aim with the mouse and click to fire.');
     expect(frame.integrity).toBeCloseTo(0.2);
     expect(frame.low).toBe(true);
   });
 
-  it('announces the next wave countdown between waves', () => {
+  it('counts down to the next wave between waves, without repeating the cleared banner', () => {
     const session = seat();
     session.defense.phase = 'between';
     session.defense.wave = 1;
     session.defense.phaseEndTick = START + 4 * TICK_RATE;
     const frame = new TurretHudView().tick(turretSessionView(session), START + 1);
-    expect(frame.phase).toBe('Wave cleared. Next wave in 4 sec');
+    expect(frame.slot).toBe('Next wave in 4 sec');
     expect(frame.wave).toBe('Wave 2/6');
   });
 
-  it('builds the result panel with every stat once the defense ends', () => {
+  it('builds the result card with every stat and the final tower once the defense ends', () => {
     const session = seat();
     session.defense.phase = 'won';
     session.defense.wave = 5;
+    session.defense.integrity = 72;
     Object.assign(session.defense.stats, {
       shots: 40,
       hits: 30,
@@ -105,24 +126,26 @@ describe('the turret HUD view', () => {
       longestAirtime: 1.84,
     });
     const frame = new TurretHudView().tick(turretSessionView(session), START);
-    expect(frame.phase).toBe('');
+    expect(frame.slot).toBe('');
     expect(frame.result).toEqual({
       won: true,
-      title: 'Victory!',
-      lines: [
-        'Kills: 55',
-        'Shots fired: 40',
-        'Accuracy: 75%',
-        'Longest throw: 23.5 yards',
-        'Longest airtime: 1.8 sec',
+      verdict: 'Victory!',
+      rows: [
+        { label: 'Kills', value: '55' },
+        { label: 'Shots fired', value: '40' },
+        { label: 'Accuracy', value: '75%' },
+        { label: 'Longest throw', value: '23.5 yd' },
+        { label: 'Longest airtime', value: '1.8 sec' },
+        { label: 'Tower', value: `72/${TURRET_TIMING.integrity}` },
       ],
     });
+    expect(frame.result?.rows).toHaveLength(TURRET_RESULT_ROWS);
     const lost = seat();
     lost.defense.phase = 'lost';
     const lostFrame = new TurretHudView().tick(turretSessionView(lost), START);
     expect(lostFrame.result?.won).toBe(false);
-    expect(lostFrame.result?.title).toBe('The turret has fallen');
-    expect(lostFrame.result?.lines[2]).toBe('Accuracy: 0%');
+    expect(lostFrame.result?.verdict).toBe('The tower has fallen');
+    expect(lostFrame.result?.rows[2].value).toBe('0%');
   });
 
   it('holds a countdown at zero once the phase end tick has passed', () => {
@@ -131,18 +154,18 @@ describe('the turret HUD view', () => {
       turretSessionView(session),
       START + TURRET_TIMING.introTicks + 3 * TICK_RATE,
     );
-    expect(frame.phase).toBe('First wave in 0 sec');
+    expect(frame.slot).toBe('First wave in 0 sec');
   });
 
   it('shows no countdown without a clock to count from', () => {
     const intro = seat();
-    expect(new TurretHudView().tick(turretSessionView(intro), null).phase).toBe('');
+    expect(new TurretHudView().tick(turretSessionView(intro), null).slot).toBe('');
     const between = seat();
     between.defense.phase = 'between';
-    expect(new TurretHudView().tick(turretSessionView(between), null).phase).toBe('');
+    expect(new TurretHudView().tick(turretSessionView(between), null).slot).toBe('');
   });
 
-  it('reuses one frame and one result panel, rebuilt only when the view or the second changes', () => {
+  it('reuses one frame and one result card, rebuilt only when the view or the second changes', () => {
     const view = new TurretHudView();
     const translate = vi.mocked(t);
     const ended = seat();
@@ -158,14 +181,14 @@ describe('the turret HUD view', () => {
     ended.defense.rev++;
     const next = view.tick(turretSessionView(ended), START);
     expect(next.result).toBe(result);
-    expect(next.result?.lines).toBe(result?.lines);
-    expect(next.result?.lines[0]).toBe('Kills: 3');
+    expect(next.result?.rows).toBe(result?.rows);
+    expect(next.result?.rows[0].value).toBe('3');
     const countingView = turretSessionView(seat());
     view.tick(countingView, START);
     translate.mockClear();
     view.tick(countingView, START + 1);
     expect(translate).not.toHaveBeenCalled();
-    expect(view.tick(countingView, START + TICK_RATE).phase).toBe(
+    expect(view.tick(countingView, START + TICK_RATE).slot).toBe(
       `First wave in ${TURRET_TIMING.introTicks / TICK_RATE - 1} sec`,
     );
   });
@@ -175,10 +198,77 @@ describe('the turret HUD view', () => {
     ended.defense.phase = 'won';
     const endedView = turretSessionView(ended);
     const view = new TurretHudView();
-    expect(view.tick(endedView, START).result?.title).toBe('Victory!');
+    expect(view.tick(endedView, START).result?.verdict).toBe('Victory!');
     await ensureLocaleLoaded('zh_CN');
     setLanguage('zh_CN');
-    expect(view.tick(endedView, START).result?.title).toBe('胜利！');
+    const frame = view.tick(endedView, START);
+    expect(frame.result?.verdict).toBe('胜利！');
+    expect(frame.announce).toBe('胜利！');
+  });
+});
+
+describe('the turret HUD live line', () => {
+  const at = (session: TurretSession, patch: Partial<TurretSessionView> = {}) => ({
+    ...turretSessionView(session),
+    ...patch,
+  });
+
+  it('speaks each phase start once, and never a kill or a countdown second', () => {
+    const session = seat();
+    const view = new TurretHudView();
+    const intro = `First wave in ${TURRET_TIMING.introTicks / TICK_RATE} sec`;
+    expect(view.tick(turretSessionView(session), START).announce).toBe(intro);
+    expect(view.tick(turretSessionView(session), START + TICK_RATE).announce).toBe(intro);
+    session.defense.phase = 'wave';
+    session.defense.rev++;
+    expect(view.tick(at(session, { monstersLeft: 8 }), START + 70).announce).toBe('Wave 1 of 6');
+    const killed = view.tick(at(session, { monstersLeft: 7 }), START + 80);
+    expect(killed.slot).toBe('Monsters left: 7');
+    expect(killed.announce).toBe('Wave 1 of 6');
+    session.defense.phase = 'between';
+    session.defense.phaseEndTick = START + 100 + 5 * TICK_RATE;
+    session.defense.rev++;
+    expect(view.tick(turretSessionView(session), START + 100).announce).toBe('Next wave in 5 sec');
+    expect(view.tick(turretSessionView(session), START + 100 + TICK_RATE).announce).toBe(
+      'Next wave in 5 sec',
+    );
+    session.defense.phase = 'lost';
+    session.defense.rev++;
+    expect(view.tick(turretSessionView(session), START + 200).announce).toBe(
+      'The tower has fallen',
+    );
+  });
+
+  it('speaks the tower crossing half, then a quarter, once each', () => {
+    const session = seat();
+    session.defense.phase = 'wave';
+    const view = new TurretHudView();
+    const max = TURRET_TIMING.integrity;
+    const breach = (integrity: number) => {
+      session.defense.integrity = integrity;
+      session.defense.rev++;
+      return view.tick(turretSessionView(session), START).announce;
+    };
+    expect(breach(max)).toBe('Wave 1 of 6');
+    expect(breach(Math.round(max * 0.6))).toBe('Wave 1 of 6');
+    expect(breach(Math.round(max * 0.45))).toBe('Tower integrity below 50%');
+    expect(breach(Math.round(max * 0.3))).toBe('Tower integrity below 50%');
+    expect(breach(Math.round(max * 0.2))).toBe('Tower integrity below 25%');
+    expect(breach(Math.round(max * 0.1))).toBe('Tower integrity below 25%');
+    session.defense.wave = 1;
+    expect(breach(Math.round(max * 0.1))).toBe('Wave 2 of 6');
+  });
+
+  it('forgets the seat on reset, so the next seat is announced again', () => {
+    const view = new TurretHudView();
+    const intro = `First wave in ${TURRET_TIMING.introTicks / TICK_RATE} sec`;
+    expect(view.tick(turretSessionView(seat()), START).announce).toBe(intro);
+    const again = seat();
+    again.defense.integrity = 10;
+    view.reset();
+    const frame = view.tick(turretSessionView(again), START);
+    expect(frame.announce).toBe(intro);
+    expect(TURRET_INTEGRITY_ALERTS).toEqual([0.5, 0.25]);
   });
 });
 
@@ -188,7 +278,7 @@ describe('the turret feedback cursor', () => {
     const cursor = new TurretFeedbackCursor();
     expect(cursor.consume(turretSessionView(session))).toBeNull();
     push(session, START + 60, { type: 'waveStart', wave: 0, count: 8 });
-    expect(cursor.consume(turretSessionView(session))).toEqual({ text: 'Wave 1 of 6' });
+    expect(cursor.consume(turretSessionView(session))).toEqual(firstWaveBanner);
     expect(cursor.consume(turretSessionView(session))).toBeNull();
     push(session, START + 90, { type: 'killed', id: 1, x: 0, y: 0, z: 0 });
     expect(cursor.consume(turretSessionView(session))).toBeNull();
@@ -241,7 +331,7 @@ describe('the turret feedback cursor', () => {
     const second = seat(START + 1000);
     push(second, START + 1060, { type: 'waveStart', wave: 0, count: 8 });
     expect(second.feedback[0].seq).toBe(first.feedback[0].seq);
-    expect(cursor.consume(turretSessionView(second))).toEqual({ text: 'Wave 1 of 6' });
+    expect(cursor.consume(turretSessionView(second))).toEqual(firstWaveBanner);
     expect(cursor.consume(null)).toBeNull();
     expect(cursor.consume(turretSessionView(second))).toBeNull();
   });
@@ -254,7 +344,7 @@ describe('the turret feedback cursor', () => {
     expect(cursor.consume(turretSessionView(first))).not.toBeNull();
     const again = seat();
     push(again, START + 60, { type: 'waveStart', wave: 0, count: 8 });
-    expect(cursor.consume(turretSessionView(again))).toEqual({ text: 'Wave 1 of 6' });
+    expect(cursor.consume(turretSessionView(again))).toEqual(firstWaveBanner);
   });
 
   it('still announces what survived when older entries left the ring unseen', () => {
@@ -265,6 +355,6 @@ describe('the turret feedback cursor', () => {
       push(session, START + i, { type: 'killed', id: i, x: 0, y: 0, z: 0 });
     push(session, START + overflow + 10, { type: 'ended', result: 'lost', stats: { ...stats } });
     expect(session.feedback[0].seq).toBeGreaterThan(1);
-    expect(cursor.consume(turretSessionView(session))).toEqual({ text: 'The turret has fallen' });
+    expect(cursor.consume(turretSessionView(session))).toEqual({ text: 'The tower has fallen' });
   });
 });

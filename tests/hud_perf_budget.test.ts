@@ -573,15 +573,20 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.className': 16 },
     reflowAllow: {},
   },
-  // The Fire and Fly seat HUD: ten construction-only class assignments; every update
-  // write, the result panel included, goes through the shared facet.
+  // The Fire and Fly seat HUD's orchestrator: it mounts the painter's two roots and the
+  // hit veil, and every write it makes (the veil, the seat body class) goes through the
+  // shared facet.
+  { file: 'hud/vehicle/turret_hud_controller.ts', allow: {}, reflowAllow: {} },
+  // The Fire and Fly status strip, result card and tower rail: the one .className is
+  // the construction-only element helper every node is minted through; every frame
+  // write, the result card and the live line included, goes through the shared facet.
   {
-    file: 'hud/vehicle/turret_hud_controller.ts',
-    allow: { '.className': 10 },
+    file: 'hud/vehicle/turret_hud_painter.ts',
+    allow: { '.className': 1 },
     reflowAllow: {},
   },
-  // The Fire and Fly hit flash: the edge overlay and the integrity bar's glow and
-  // swing, every write through the shared facet, none between strikes.
+  // The Fire and Fly hit flash: the edge overlay and the tower rail's glow and swing,
+  // every write through the shared facet, none between strikes.
   { file: 'hud/vehicle/turret_hit_flash_painter.ts', allow: {}, reflowAllow: {} },
   // Both writes are build-time. The .className is the base class stamped on a tick
   // as it is MINTED into the pool (the pool only grows to the high-water tick
