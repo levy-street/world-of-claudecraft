@@ -6929,8 +6929,10 @@ export type SimEvent = { pid?: number } & (
    *  wording under questUi.worldQuest.banner.<banner>). */
   | { type: 'worldQuestBanner'; banner: WorldQuestBannerId }
   | ({ type: 'cannonResult' } & CannonResult)
-  /** One Fire and Fly engine event for the seated owner, as plain data. */
-  | { type: 'turretDefense'; pid: number; event: TurretEvent }
+  /** One Fire and Fly engine event for the seated owner, as plain data, with the
+   *  feedback ring entry it was recorded as (turret_feedback.ts): an online mirror
+   *  rebuilds the ring from these. */
+  | { type: 'turretDefense'; pid: number; seq: number; tick: number; event: TurretEvent }
   /** One finished scoreboard attempt (src/sim/world_quest_scoreboards.ts); the
    *  server keeps the character's best row per board. */
   | {

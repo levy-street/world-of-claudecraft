@@ -38,7 +38,7 @@ describe('/dev turret', () => {
     expect(sim.turretSession).toBeNull();
   });
 
-  it('refuses a server player (database character id) until online play lands', () => {
+  it('seats a server player (database character id) in the arena of their durable key', () => {
     const sim = new Sim({
       seed: WORLD_SEED,
       playerClass: 'warrior',
@@ -49,7 +49,23 @@ describe('/dev turret', () => {
     sim.drainEvents();
     sim.chat('/dev turret', pid);
     const logs = devLogs(sim.drainEvents());
-    expect(logs).toEqual(['[dev] Turret refused: offline only until online play lands.']);
+    expect(logs).toEqual([
+      '[dev] Turret seated in your Fire and Fly arena; /dev turret leave returns you.',
+    ]);
+    expect(sim.meta(pid)?.vehicle?.kind).toBe('turret');
+    expect(dungeonAt(sim.entities.get(pid)!.pos.x)?.id).toBe(FIRE_AND_FLY_DUNGEON_ID);
+    expect(
+      sim.ctx.instances.filter((inst) => inst.partyKey === 'solo:char:7').map((i) => i.dungeonId),
+    ).toEqual([FIRE_AND_FLY_DUNGEON_ID]);
+    sim.chat('/dev turret leave', pid);
+    expect(devLogs(sim.drainEvents())).toEqual(['[dev] Turret left.']);
+    expect(dungeonAt(sim.entities.get(pid)!.pos.x)).toBeNull();
+  });
+
+  it('still seats nobody on a server without dev commands', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Probe', { characterId: 7 });
+    sim.chat('/dev turret', pid);
     expect(sim.meta(pid)?.vehicle ?? null).toBeNull();
     expect(dungeonAt(sim.entities.get(pid)!.pos.x)).toBeNull();
   });

@@ -1,11 +1,22 @@
 import { isCannonActionId } from '../src/sim/minigames/cannon_encounter';
-import type { CannonPoint, VehicleActionId } from '../src/sim/types';
+import type { CannonActionId, CannonPoint, VehicleActionId } from '../src/sim/types';
 import { vehicleStationById } from '../src/sim/vehicle_stations';
 
 interface VehicleCommands {
   enterVehicle(station: string, pid: number): unknown;
   useVehicleAction(action: VehicleActionId, point: CannonPoint, pid: number): unknown;
   leaveVehicle(pid: number): void;
+}
+
+// Keyed by every non-cannon action, so tsc flags a `VehicleActionId` this router would drop.
+const SEAT_ACTIONS: Readonly<Record<Exclude<VehicleActionId, CannonActionId>, true>> = {
+  turret_fire: true,
+};
+
+function vehicleActionId(value: unknown): value is VehicleActionId {
+  return (
+    isCannonActionId(value) || (typeof value === 'string' && Object.hasOwn(SEAT_ACTIONS, value))
+  );
 }
 
 export function dispatchVehicleCommand(
@@ -22,7 +33,7 @@ export function dispatchVehicleCommand(
     sim.enterVehicle(msg.station, pid);
   else if (
     msg.cmd === 'vehicle_action' &&
-    isCannonActionId(msg.action) &&
+    vehicleActionId(msg.action) &&
     typeof msg.x === 'number' &&
     Number.isFinite(msg.x) &&
     typeof msg.z === 'number' &&

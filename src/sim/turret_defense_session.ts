@@ -215,13 +215,11 @@ function emitTurretEvents(
   events: readonly TurretEvent[],
 ): void {
   if (!events.length) return;
-  session.nextFeedbackSeq = recordTurretFeedback(
-    session.feedback,
-    session.nextFeedbackSeq,
-    ctx.tickCount,
-    events,
-  );
-  for (const event of events) ctx.emit({ type: 'turretDefense', pid, event });
+  const first = session.nextFeedbackSeq;
+  const tick = ctx.tickCount;
+  session.nextFeedbackSeq = recordTurretFeedback(session.feedback, first, tick, events);
+  for (let i = 0; i < events.length; i++)
+    ctx.emit({ type: 'turretDefense', pid, seq: first + i, tick, event: events[i] });
 }
 
 /** Advances the seat one sim tick; false when the caller must end it. */

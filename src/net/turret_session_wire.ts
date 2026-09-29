@@ -1,0 +1,344 @@
+// Decoders for the Fire and Fly wire: the owner-only `turp` (plan) and `tur`
+// (seat state) self keys and the `turretDefense` feedback event. Untrusted JSON:
+// every field is re-validated against the sim's own types (a spec per shape, so
+// a field the sim adds fails tsc here until it is decoded), numbers finite,
+// enums closed, arrays bounded, and a malformed payload rejects the whole
+// value, never a stale half.
+import { deepFreeze } from '../sim/deep_freeze';
+import type { MotionSegment } from '../sim/minigames/thrown_body';
+import type { TurretBarrel } from '../sim/minigames/turret_barrels';
+import type {
+  TurretBarrelSpot,
+  TurretDefenseState,
+  TurretEvent,
+  TurretHit,
+  TurretMonster,
+  TurretShot,
+  TurretStats,
+} from '../sim/minigames/turret_defense';
+import type { TurretKind, TurretPlan, TurretWavePlan } from '../sim/minigames/turret_defense_plan';
+import type { TurretFeedback } from '../sim/minigames/turret_feedback';
+import type { TurretSessionView } from '../sim/turret_defense_session';
+import type { TurretBarrelWaveDef, TurretBowlingDef, Vec3 } from '../sim/types';
+
+/** The seat as the wire carries it, the plan joined back in: the view minus its feedback ring. */
+export type TurretSeatState = Omit<TurretSessionView, 'feedback'>;
+
+// Bounds on a forged payload, far above the content (the largest wave spawns 16 monsters,
+// the barrel cap is 6, at most 2 shells fly at once).
+const MAX_KINDS = 64;
+const MAX_WAVES = 64;
+const MAX_SPAWNS = 256;
+const MAX_MONSTERS = 256;
+const MAX_SHOTS = 32;
+const MAX_BARRELS = 64;
+const MAX_HITS = 256;
+const MAX_TEMPLATE_ID = 64;
+const MAX_MAGNITUDE = 1e9;
+
+const BAD: unique symbol = Symbol('malformed');
+type Dec<T> = (value: unknown) => T | typeof BAD;
+type Spec<T> = { [K in keyof T]-?: Dec<T[K]> };
+
+function record(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+const num: Dec<number> = (v) =>
+  typeof v === 'number' && Number.isFinite(v) && Math.abs(v) <= MAX_MAGNITUDE ? v : BAD;
+const positive: Dec<number> = (v) => (num(v) !== BAD && (v as number) > 0 ? (v as number) : BAD);
+const nonNegative: Dec<number> = (v) =>
+  num(v) !== BAD && (v as number) >= 0 ? (v as number) : BAD;
+const int =
+  (min: number): Dec<number> =>
+  (v) =>
+    typeof v === 'number' && Number.isSafeInteger(v) && v >= min ? v : BAD;
+const count = int(0);
+/** A sim tick, fractional where a contact lands between ticks, or -1 where the sim marks "none". */
+const tick: Dec<number> = (v) => (num(v) !== BAD && (v as number) >= -1 ? (v as number) : BAD);
+const bool: Dec<boolean> = (v) => (typeof v === 'boolean' ? v : BAD);
+const text =
+  (max: number): Dec<string> =>
+  (v) =>
+    typeof v === 'string' && v.length > 0 && v.length <= max ? v : BAD;
+const oneOf =
+  <T extends string>(...values: readonly T[]): Dec<T> =>
+  (v) =>
+    values.includes(v as T) ? (v as T) : BAD;
+const lit = <T extends string>(value: T): Dec<T> => oneOf(value);
+
+function list<T>(max: number, item: Dec<T>): Dec<T[]> {
+  return (v) => {
+    if (!Array.isArray(v) || v.length > max) return BAD;
+    const out: T[] = [];
+    for (const row of v) {
+      const decoded = item(row);
+      if (decoded === BAD) return BAD;
+      out.push(decoded);
+    }
+    return out;
+  };
+}
+
+function shape<T>(spec: Spec<T>): Dec<T> {
+  return (v) => {
+    if (!record(v)) return BAD;
+    const out: Record<string, unknown> = {};
+    for (const key in spec) {
+      const decoded = spec[key](v[key]);
+      if (decoded === BAD) return BAD;
+      out[key] = decoded;
+    }
+    return out as T;
+  };
+}
+
+function tagged<T, Tag extends keyof T & string>(
+  tag: Tag,
+  arms: { [K in T[Tag] & string]: Dec<Extract<T, Record<Tag, K>>> },
+): Dec<T> {
+  const table = arms as unknown as Record<string, Dec<T>>;
+  return (v) => {
+    if (!record(v)) return BAD;
+    const kind = v[tag];
+    return typeof kind === 'string' && Object.hasOwn(table, kind) ? table[kind](v) : BAD;
+  };
+}
+
+type Arm<T, Tag extends keyof T, K> = Spec<Extract<T, Record<Tag, K>>>;
+const eventArm = <K extends TurretEvent['type']>(spec: Arm<TurretEvent, 'type', K>) =>
+  shape<Extract<TurretEvent, { type: K }>>(spec);
+const segmentArm = <K extends MotionSegment['kind']>(spec: Arm<MotionSegment, 'kind', K>) =>
+  shape<Extract<MotionSegment, { kind: K }>>(spec);
+
+const at = { x: num, y: num, z: num };
+const vec3 = shape<Vec3>(at);
+
+const stats = shape<TurretStats>({
+  shots: count,
+  hits: count,
+  kills: count,
+  breaches: count,
+  pointsLost: count,
+  longestThrow: nonNegative,
+  longestAirtime: nonNegative,
+  bowled: count,
+  barrelsDetonated: count,
+  barrelKills: count,
+});
+
+const hit = shape<TurretHit>({ id: count, falloff: num, damage: num, ...at });
+
+const turretEvent = tagged<TurretEvent, 'type'>('type', {
+  fired: eventArm({
+    type: lit('fired'),
+    shotId: count,
+    fromX: num,
+    fromZ: num,
+    ...at,
+    flightTicks: nonNegative,
+    impactTick: tick,
+  }),
+  impact: eventArm({ type: lit('impact'), shotId: count, ...at, hits: list(MAX_HITS, hit) }),
+  launched: eventArm({ type: lit('launched'), id: count, ...at, vx: num, vy: num, vz: num }),
+  bounce: eventArm({
+    type: lit('bounce'),
+    id: count,
+    surface: oneOf('ground', 'wall'),
+    ...at,
+    speed: num,
+  }),
+  landed: eventArm({ type: lit('landed'), id: count, ...at }),
+  bowled: eventArm({
+    type: lit('bowled'),
+    flyerId: count,
+    struckId: count,
+    ...at,
+    speed: num,
+    damage: num,
+  }),
+  splash: eventArm({ type: lit('splash'), id: count, ...at }),
+  killed: eventArm({ type: lit('killed'), id: count, ...at }),
+  windupStart: eventArm({ type: lit('windupStart'), id: count, x: num, z: num }),
+  breach: eventArm({ type: lit('breach'), id: count, points: num, integrity: num, ...at }),
+  vanished: eventArm({ type: lit('vanished'), id: count, ...at }),
+  waveStart: eventArm({ type: lit('waveStart'), wave: count, count }),
+  barrelsPlaced: eventArm({
+    type: lit('barrelsPlaced'),
+    barrels: list(MAX_BARRELS, shape<TurretBarrelSpot>({ id: count, ...at })),
+  }),
+  barrelLit: eventArm({ type: lit('barrelLit'), id: count, ...at, fuseTicks: nonNegative }),
+  barrelExploded: eventArm({
+    type: lit('barrelExploded'),
+    id: count,
+    ...at,
+    hits: list(MAX_HITS, hit),
+  }),
+  waveCleared: eventArm({ type: lit('waveCleared'), wave: count }),
+  ended: eventArm({ type: lit('ended'), result: oneOf('won', 'lost'), stats }),
+});
+
+const segment = tagged<MotionSegment, 'kind'>('kind', {
+  march: segmentArm({
+    kind: lit('march'),
+    start: num,
+    end: num,
+    ...at,
+    dx: num,
+    dz: num,
+    speed: num,
+  }),
+  fly: segmentArm({
+    kind: lit('fly'),
+    start: num,
+    end: num,
+    ...at,
+    vx: num,
+    vy: num,
+    vz: num,
+    g: num,
+    contact: oneOf('ground', 'water', 'wall', 'void'),
+    nx: num,
+    nz: num,
+  }),
+  skid: segmentArm({
+    kind: lit('skid'),
+    start: num,
+    end: num,
+    ...at,
+    vx: num,
+    vz: num,
+    decel: num,
+    contact: oneOf('stop', 'wall', 'water'),
+  }),
+  still: segmentArm({ kind: lit('still'), start: num, end: num, ...at }),
+});
+
+const monster = shape<TurretMonster>({
+  id: count,
+  kind: count,
+  hp: nonNegative,
+  maxHp: positive,
+  state: oneOf('march', 'windup', 'fly', 'skid', 'down', 'rise', 'dead', 'gone'),
+  seg: segment,
+  facing: num,
+  airSince: tick,
+  throwX: num,
+  throwZ: num,
+  throwOpen: bool,
+  knocked: list(MAX_MONSTERS, count),
+});
+
+const shot = shape<TurretShot>({
+  id: count,
+  x: num,
+  z: num,
+  damage: num,
+  firedTick: tick,
+  impactTick: tick,
+});
+
+const barrel = shape<TurretBarrel>({ id: count, ...at, litTick: tick, blowTick: tick });
+
+const defense = shape<Omit<TurretDefenseState, 'plan' | 'seed' | 'tick'>>({
+  cx: num,
+  cz: num,
+  startTick: tick,
+  rev: count,
+  phase: oneOf('intro', 'wave', 'between', 'won', 'lost'),
+  phaseEndTick: tick,
+  wave: count,
+  spawnCursor: count,
+  nextSpawnTick: tick,
+  integrity: num,
+  readyTick: tick,
+  aimX: num,
+  aimZ: num,
+  nextShotId: count,
+  nextMonsterId: count,
+  nextBarrelId: count,
+  shots: list(MAX_SHOTS, shot),
+  monsters: list(MAX_MONSTERS, monster),
+  barrels: list(MAX_BARRELS, barrel),
+  stats,
+});
+
+const seat = shape({ origin: vec3, defense, waveCount: count, monstersLeft: count });
+
+const plan = shape<TurretPlan>({
+  kinds: list(
+    MAX_KINDS,
+    shape<TurretKind>({
+      templateId: text(MAX_TEMPLATE_ID),
+      level: count,
+      sizeClass: oneOf('small', 'medium', 'large', 'huge'),
+      maxHp: positive,
+      marchSpeed: nonNegative,
+      mass: positive,
+      radius: positive,
+      breachValue: nonNegative,
+      height: positive,
+    }),
+  ),
+  waves: list(
+    MAX_WAVES,
+    shape<TurretWavePlan>({
+      spawns: list(MAX_SPAWNS, count),
+      coreDamage: num,
+      gapMinTicks: count,
+      gapMaxTicks: count,
+      barrels: shape<TurretBarrelWaveDef>({ count, minRadius: num, maxRadius: num }),
+    }),
+  ),
+  bowling: shape<TurretBowlingDef>({
+    enabled: bool,
+    minSpeed: num,
+    reachScale: num,
+    transfer: num,
+    pop: num,
+    damageShare: num,
+    flyerKeep: num,
+    lyingHeight: num,
+  }),
+});
+
+const feedback = shape<TurretFeedback>({ seq: int(1), tick: count, event: turretEvent });
+
+/** The `turp` key: the resolved plan, deep-frozen like the sim's, or null. */
+export function decodeTurretPlan(value: unknown): TurretPlan | null {
+  const decoded = plan(value);
+  if (decoded === BAD || decoded.waves.length === 0) return null;
+  const kinds = decoded.kinds.length;
+  for (const wave of decoded.waves) if (wave.spawns.some((kind) => kind >= kinds)) return null;
+  return deepFreeze(decoded);
+}
+
+/** The `tur` key against its plan: the seat minus the feedback ring, or null. */
+export function decodeTurretSeat(value: unknown, turretPlan: TurretPlan): TurretSeatState | null {
+  const decoded = seat(value);
+  if (decoded === BAD) return null;
+  const { kinds, waves } = turretPlan;
+  if (
+    decoded.waveCount !== waves.length ||
+    decoded.defense.wave >= waves.length ||
+    decoded.defense.monsters.some((m) => m.kind >= kinds.length)
+  )
+    return null;
+  return { ...decoded, defense: { ...decoded.defense, plan: turretPlan } };
+}
+
+/** One `turretDefense` event as the feedback entry it was recorded as, deep-frozen, or null. */
+export function decodeTurretFeedback(value: unknown): TurretFeedback | null {
+  const decoded = feedback(value);
+  return decoded === BAD ? null : deepFreeze(decoded);
+}
+
+/** True when two decoded seats are one run: the same arena tower and the same start tick. */
+export function sameTurretSeat(a: TurretSeatState, b: TurretSeatState): boolean {
+  return (
+    a.defense.startTick === b.defense.startTick &&
+    a.origin.x === b.origin.x &&
+    a.origin.y === b.origin.y &&
+    a.origin.z === b.origin.z
+  );
+}

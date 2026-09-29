@@ -982,12 +982,13 @@ describe('the IWorld read', () => {
     expect(cannon.sim.turretClock).toBeNull();
   });
 
-  it('leaves the online mirror empty until the turret goes online', () => {
+  it('starts the online mirror empty; the wire round trip lives in turret_online_round_trip', () => {
     const client = new QuestWorldWireState();
     expect(client.turretSession).toBeNull();
     expect(client.turretClock).toBeNull();
     client.resetQuestWorldWireState();
     expect(client.turretSession).toBeNull();
+    expect(client.turretClock).toBeNull();
   });
 });
 
@@ -997,11 +998,15 @@ describe('the feedback ring', () => {
     seat(sim);
     const world: IWorldVehicles = sim;
     const emitted: TurretEvent[] = [];
+    const stamps: [number, number][] = [];
     const consumed: TurretFeedback[] = [];
     let cursor = 0;
     let longest = 0;
     for (let i = 0; i < RUN_BOUND && world.turretSession?.defense.phase !== 'won'; i++) {
-      for (const e of turretEvents(sim.tick())) emitted.push(e.event);
+      for (const e of turretEvents(sim.tick())) {
+        emitted.push(e.event);
+        stamps.push([e.seq, e.tick]);
+      }
       const view = world.turretSession!;
       const fresh = turretFeedbackSince(view.feedback, cursor);
       longest = Math.max(longest, fresh.length);
@@ -1014,11 +1019,16 @@ describe('the feedback ring', () => {
       aimOnce(sim);
     }
     expect(world.turretSession?.defense.phase).toBe('won');
-    for (const e of turretEvents(sim.drainEvents())) emitted.push(e.event);
+    for (const e of turretEvents(sim.drainEvents())) {
+      emitted.push(e.event);
+      stamps.push([e.seq, e.tick]);
+    }
     const tail = turretFeedbackSince(world.turretSession!.feedback, cursor);
     consumed.push(...tail);
     expect(consumed.map((f) => f.seq)).toEqual(consumed.map((_, i) => i + 1));
     expect(consumed.map((f) => f.event)).toEqual(emitted);
+    // Each event carries the ring entry it was recorded as: the online mirror's whole input.
+    expect(stamps).toEqual(consumed.map((f) => [f.seq, f.tick]));
     for (let i = 0; i < emitted.length; i++) expect(consumed[i].event).toBe(emitted[i]);
     expect(emitted.filter((e) => e.type === 'waveCleared')).toHaveLength(6);
     expect(longest).toBeLessThanOrEqual(TURRET_FEEDBACK_LIMIT);

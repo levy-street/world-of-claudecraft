@@ -43,12 +43,6 @@ export function handleDevTurretChat(ctx: SimContext, raw: string, pid: number): 
     devLog(ctx, pid, seated ? '[dev] Turret left.' : '[dev] Not seated in the turret.');
     return true;
   }
-  // A server player (the only kind with a database character id) has no turret wire yet: a
-  // seat there would lock them in a session their client cannot see or leave.
-  if (resolved.meta.characterId !== undefined) {
-    devLog(ctx, pid, '[dev] Turret refused: offline only until online play lands.');
-    return true;
-  }
   const refusal = seatTurret(ctx, pid);
   if (refusal) {
     refuse(ctx, pid, refusal);
