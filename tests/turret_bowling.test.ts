@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { TURRET_SCENARIO_STANDARD } from '../src/sim/content/fire_and_fly_scenarios';
 import {
   TURRET_BOWLING,
   TURRET_PHYSICS,
@@ -65,6 +66,9 @@ function plan(
   cores = [CORE],
 ): TurretPlan {
   return {
+    scenarioId: 'test',
+    integrity: 100,
+    arsenal: { shockwave: 0, fragmentation: 0 },
     kinds,
     waves: cores.map((coreDamage) => ({
       spawns,
@@ -72,6 +76,7 @@ function plan(
       gapMinTicks: 16,
       gapMaxTicks: 32,
       barrels: NO_BARRELS,
+      arrival: { kind: 'ring' },
     })),
     bowling,
   };
@@ -453,7 +458,7 @@ describe('a knock', () => {
     const events = run(state, state.tick + TURRET_TIMING.windupTicks + 20);
     expect(bowls(events).map((b) => b.struckId)).toEqual([struck.id]);
     expect(events.some((e) => e.type === 'breach')).toBe(false);
-    expect(state.integrity).toBe(TURRET_TIMING.integrity);
+    expect(state.integrity).toBe(state.plan.integrity);
     expect(state.stats.breaches).toBe(0);
   });
 
@@ -644,7 +649,8 @@ describe('the toggle', () => {
     'turned off, a %s full run replays the bowling-free engine exactly',
     (_name, seed, probe, count, digest) => {
       const barrelFree = TURRET_WAVES.map((wave) => ({ ...wave, barrels: NO_BARRELS }));
-      const r = fullRun(seed, resolveTurretPlan(barrelFree, undefined, OFF), probe, aimNearest);
+      const scenario = { ...TURRET_SCENARIO_STANDARD, waves: barrelFree };
+      const r = fullRun(seed, resolveTurretPlan(scenario, undefined, OFF), probe, aimNearest);
       const text = r.trace.map((s) => JSON.stringify(JSON.parse(s), dropLaterFields)).join('\n');
       expect(r.trace).toHaveLength(count);
       expect(fnv(text)).toBe(digest);

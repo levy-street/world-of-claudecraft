@@ -6,6 +6,7 @@
 // once per revision. Ending the seat leaves the arena. Draws no world rng.
 
 import { resolveMovement } from './colliders';
+import { TURRET_DEFAULT_SCENARIO } from './content/fire_and_fly_scenarios';
 import { DUNGEON_X_THRESHOLD } from './data';
 import { gliderActionsLocked } from './glider_action_lock';
 import type { ThrowProbe } from './minigames/thrown_body';
@@ -29,7 +30,7 @@ import type { SimContext } from './sim_context';
 import { arenaMatchFor } from './social/arena';
 import { bgInMatch } from './social/battleground';
 import { claimTurretArena, enterTurretArena, exitTurretArena } from './turret_arena_session';
-import type { CannonPoint, Entity, TurretSession, Vec3 } from './types';
+import type { CannonPoint, Entity, TurretScenarioDef, TurretSession, Vec3 } from './types';
 import { wispMazeActionsLocked } from './wisp_maze_action_lock';
 import { groundHeight, waterLevelAt } from './world';
 import { hasWorldQuestDeliveryCargo } from './world_quest_delivery';
@@ -170,11 +171,15 @@ export function turretSeatRefusal(
 
 /**
  * Takes an eligible open-world player onto the tower roof of their own arena,
- * on foot, and seats them there: the tower under their feet is the center.
- * The eligibility is read here, before the move, so the arena itself never
- * has to pass the open-world rule.
+ * on foot, and seats them there for a run of `scenario`: the tower under their
+ * feet is the center. The eligibility is read here, before the move, so the
+ * arena itself never has to pass the open-world rule.
  */
-export function seatTurret(ctx: SimContext, pid: number): TurretSeatRefusal | null {
+export function seatTurret(
+  ctx: SimContext,
+  pid: number,
+  scenario: Readonly<TurretScenarioDef> = TURRET_DEFAULT_SCENARIO,
+): TurretSeatRefusal | null {
   const resolved = ctx.resolve(pid);
   if (!resolved) return 'missing';
   const { meta, e: player } = resolved;
@@ -195,7 +200,7 @@ export function seatTurret(ctx: SimContext, pid: number): TurretSeatRefusal | nu
     kind: 'turret',
     origin,
     defense: createTurretDefense(
-      resolveTurretPlan(),
+      resolveTurretPlan(scenario),
       { x: origin.x, z: origin.z },
       turretSessionSeed(ctx.cfg.seed, meta.entityId, start),
       start,

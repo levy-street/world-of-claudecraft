@@ -960,7 +960,7 @@ describe('the IWorld read', () => {
       phaseEndTick: live().startTick + TURRET_TIMING.introTicks,
       wave: 0,
       readyTick: live().readyTick,
-      integrity: TURRET_TIMING.integrity,
+      integrity: plan.integrity,
       stats: live().stats,
     });
     expect(intro.monstersLeft).toBe(0);

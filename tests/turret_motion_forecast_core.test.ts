@@ -10,12 +10,12 @@ import {
   TURRET_FORECAST_STEPS,
   TurretMotionForecast,
 } from '../src/render/turret_motion_forecast_core';
+import { TURRET_SCENARIO_STANDARD } from '../src/sim/content/fire_and_fly_scenarios';
 import {
   TURRET_ARENA,
   TURRET_BOWLING,
   TURRET_PHYSICS,
   TURRET_TIMING,
-  TURRET_WAVES,
 } from '../src/sim/content/turret_defense';
 import { MOBS } from '../src/sim/data';
 import {
@@ -253,7 +253,10 @@ describe('Fire and Fly bodies drawn between engine ticks', () => {
    * segments.
    */
   function frameSteps(forecast: boolean): { steps: number[]; states: string[] } {
-    const plan = resolveTurretPlan(TURRET_WAVES, MOBS, { ...TURRET_BOWLING, enabled: false });
+    const plan = resolveTurretPlan(TURRET_SCENARIO_STANDARD, MOBS, {
+      ...TURRET_BOWLING,
+      enabled: false,
+    });
     const state = createTurretDefense(plan, { x: 0, z: 0 }, 11, 0);
     let clock = 0;
     let target: (typeof state.monsters)[number] | undefined;

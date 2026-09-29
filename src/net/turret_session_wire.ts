@@ -14,29 +14,35 @@ import type {
   TurretShot,
   TurretStats,
 } from '../sim/minigames/turret_defense';
-import type { TurretKind, TurretPlan, TurretWavePlan } from '../sim/minigames/turret_defense_plan';
+import {
+  TURRET_PLAN_LIMITS,
+  type TurretArsenal,
+  type TurretKind,
+  type TurretPlan,
+  type TurretWavePlan,
+  turretScenarioIdValid,
+} from '../sim/minigames/turret_defense_plan';
 import type { TurretFeedback } from '../sim/minigames/turret_feedback';
 import type {
   TurretDefenseView,
   TurretMonsterView,
   TurretSessionView,
 } from '../sim/turret_defense_session';
-import type { TurretBarrelWaveDef, TurretBowlingDef, Vec3 } from '../sim/types';
+import type { TurretArrivalDef, TurretBarrelWaveDef, TurretBowlingDef, Vec3 } from '../sim/types';
 
 /** The seat as the wire carries it, the plan joined back in: the view minus its feedback ring. */
 export type TurretSeatState = Omit<TurretSessionView, 'feedback'>;
 
 // Bounds on a forged payload, far above the content (the largest wave spawns 16 monsters,
-// the barrel cap is 6, at most 2 shells fly at once).
-const MAX_KINDS = 64;
-const MAX_WAVES = 64;
-const MAX_SPAWNS = 256;
+// the barrel cap is 6, at most 2 shells fly at once). The plan's are the resolver's own
+// limits, so every plan the server resolves decodes.
 const MAX_MONSTERS = 256;
 const MAX_SHOTS = 32;
 const MAX_BARRELS = 64;
 const MAX_HITS = 256;
 const MAX_TEMPLATE_ID = 64;
 const MAX_MAGNITUDE = 1e9;
+const LIMITS = TURRET_PLAN_LIMITS;
 
 const BAD: unique symbol = Symbol('malformed');
 type Dec<T> = (value: unknown) => T | typeof BAD;
@@ -68,6 +74,16 @@ const oneOf =
   (v) =>
     values.includes(v as T) ? (v as T) : BAD;
 const lit = <T extends string>(value: T): Dec<T> => oneOf(value);
+const within =
+  (min: number, max: number): Dec<number> =>
+  (v) =>
+    typeof v === 'number' && Number.isSafeInteger(v) && v >= min && v <= max ? v : BAD;
+/** A share of a full turn: above 0, at most 1. */
+const turn: Dec<number> = (v) =>
+  num(v) !== BAD && (v as number) > 0 && (v as number) <= 1 ? (v as number) : BAD;
+const flankCount: Dec<2 | 3> = (v) => (v === 2 || v === 3 ? v : BAD);
+const scenarioId: Dec<string> = (v) =>
+  typeof v === 'string' && turretScenarioIdValid(v) ? v : BAD;
 
 function list<T>(max: number, item: Dec<T>): Dec<T[]> {
   return (v) => {
@@ -112,6 +128,8 @@ const eventArm = <K extends TurretEvent['type']>(spec: Arm<TurretEvent, 'type', 
   shape<Extract<TurretEvent, { type: K }>>(spec);
 const segmentArm = <K extends MotionSegment['kind']>(spec: Arm<MotionSegment, 'kind', K>) =>
   shape<Extract<MotionSegment, { kind: K }>>(spec);
+const arrivalArm = <K extends TurretArrivalDef['kind']>(spec: Arm<TurretArrivalDef, 'kind', K>) =>
+  shape<Extract<TurretArrivalDef, { kind: K }>>(spec);
 
 const at = { x: num, y: num, z: num };
 const vec3 = shape<Vec3>(at);
@@ -257,9 +275,27 @@ const defense = shape<Omit<TurretDefenseView, 'plan'>>({
 
 const seat = shape({ origin: vec3, defense, waveCount: count, monstersLeft: count });
 
+const arrival = tagged<TurretArrivalDef, 'kind'>('kind', {
+  ring: arrivalArm({ kind: lit('ring') }),
+  arc: arrivalArm({ kind: lit('arc'), widthTurn: turn }),
+  flanks: arrivalArm({ kind: lit('flanks'), count: flankCount, widthTurn: turn }),
+  burst: arrivalArm({
+    kind: lit('burst'),
+    groupSize: within(1, LIMITS.spawnsPerWave),
+    groupGapTicks: within(0, LIMITS.groupGapTicks),
+    widthTurn: turn,
+  }),
+});
+
 const plan = shape<TurretPlan>({
+  scenarioId,
+  integrity: within(1, LIMITS.integrity),
+  arsenal: shape<TurretArsenal>({
+    shockwave: within(0, LIMITS.charges),
+    fragmentation: within(0, LIMITS.charges),
+  }),
   kinds: list(
-    MAX_KINDS,
+    LIMITS.kinds,
     shape<TurretKind>({
       templateId: text(MAX_TEMPLATE_ID),
       level: count,
@@ -273,13 +309,14 @@ const plan = shape<TurretPlan>({
     }),
   ),
   waves: list(
-    MAX_WAVES,
+    LIMITS.waves,
     shape<TurretWavePlan>({
-      spawns: list(MAX_SPAWNS, count),
+      spawns: list(LIMITS.spawnsPerWave, count),
       coreDamage: num,
       gapMinTicks: count,
       gapMaxTicks: count,
       barrels: shape<TurretBarrelWaveDef>({ count, minRadius: num, maxRadius: num }),
+      arrival,
     }),
   ),
   bowling: shape<TurretBowlingDef>({

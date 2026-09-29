@@ -1,6 +1,7 @@
 // Fire and Fly (turret defense POC) tuning, data only. The engine is
 // src/sim/minigames/turret_defense.ts; the wave plan resolver
 // (src/sim/minigames/turret_defense_plan.ts) reads the templates from MOBS.
+// TURRET_WAVES is the Standard scenario's table (fire_and_fly_scenarios.ts).
 
 import { FIRE_AND_FLY_TOWER } from '../fire_and_fly_field';
 import {
@@ -37,7 +38,7 @@ export const TURRET_TEMPLATE_SIZES: Readonly<Record<string, TurretSizeClass>> = 
 const GAP_MIN = ticks(0.8);
 const GAP_MAX = ticks(1.6);
 /** Inside the march, well clear of the tower's foot and of the 46 yd spawn ring. */
-const BARREL_RING = { minRadius: 16, maxRadius: 30 } as const;
+export const TURRET_BARREL_RING = { minRadius: 16, maxRadius: 30 } as const;
 
 export const TURRET_WAVES: readonly TurretWaveDef[] = [
   {
@@ -45,7 +46,7 @@ export const TURRET_WAVES: readonly TurretWaveDef[] = [
     coreDamage: 60,
     gapMinTicks: GAP_MIN,
     gapMaxTicks: GAP_MAX,
-    barrels: { count: 3, ...BARREL_RING },
+    barrels: { count: 3, ...TURRET_BARREL_RING },
   },
   {
     entries: [
@@ -55,7 +56,7 @@ export const TURRET_WAVES: readonly TurretWaveDef[] = [
     coreDamage: 64,
     gapMinTicks: GAP_MIN,
     gapMaxTicks: GAP_MAX,
-    barrels: { count: 3, ...BARREL_RING },
+    barrels: { count: 3, ...TURRET_BARREL_RING },
   },
   {
     entries: [
@@ -65,7 +66,7 @@ export const TURRET_WAVES: readonly TurretWaveDef[] = [
     coreDamage: 84,
     gapMinTicks: GAP_MIN,
     gapMaxTicks: GAP_MAX,
-    barrels: { count: 4, ...BARREL_RING },
+    barrels: { count: 4, ...TURRET_BARREL_RING },
   },
   {
     entries: [
@@ -75,7 +76,7 @@ export const TURRET_WAVES: readonly TurretWaveDef[] = [
     coreDamage: 100,
     gapMinTicks: GAP_MIN,
     gapMaxTicks: GAP_MAX,
-    barrels: { count: 4, ...BARREL_RING },
+    barrels: { count: 4, ...TURRET_BARREL_RING },
   },
   {
     entries: [
@@ -86,7 +87,7 @@ export const TURRET_WAVES: readonly TurretWaveDef[] = [
     coreDamage: 130,
     gapMinTicks: GAP_MIN,
     gapMaxTicks: GAP_MAX,
-    barrels: { count: 5, ...BARREL_RING },
+    barrels: { count: 5, ...TURRET_BARREL_RING },
   },
   {
     entries: [
@@ -97,7 +98,7 @@ export const TURRET_WAVES: readonly TurretWaveDef[] = [
     coreDamage: 220,
     gapMinTicks: GAP_MIN,
     gapMaxTicks: GAP_MAX,
-    barrels: { count: 5, ...BARREL_RING },
+    barrels: { count: 5, ...TURRET_BARREL_RING },
   },
 ];
 
@@ -193,7 +194,6 @@ export const TURRET_ARENA = {
 } as const;
 
 export const TURRET_TIMING = {
-  integrity: 100,
   introTicks: ticks(3),
   betweenTicks: ticks(5),
   /** March speed = template moveSpeed x marchFactor. */

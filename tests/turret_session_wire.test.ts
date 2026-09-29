@@ -10,13 +10,18 @@ import {
   decodeTurretSeat,
   type TurretSeatState,
 } from '../src/net/turret_session_wire';
+import {
+  TURRET_SCENARIO_HARD,
+  TURRET_SCENARIO_STANDARD,
+  TURRET_SCENARIOS,
+} from '../src/sim/content/fire_and_fly_scenarios';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import { positionAt } from '../src/sim/minigames/thrown_body';
 import type { TurretEvent } from '../src/sim/minigames/turret_defense';
-import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
+import { resolveTurretPlan, TURRET_PLAN_LIMITS } from '../src/sim/minigames/turret_defense_plan';
 import { Sim } from '../src/sim/sim';
 import type { TurretSessionView } from '../src/sim/turret_defense_session';
-import type { SimEvent, TurretSession, WorldContent } from '../src/sim/types';
+import type { SimEvent, TurretSession, TurretWaveDef, WorldContent } from '../src/sim/types';
 import { turretSessionFor } from '../src/sim/vehicles';
 import { groundHeight } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
@@ -114,6 +119,117 @@ describe('the turret plan key', () => {
     expect(Object.isFrozen(decoded)).toBe(true);
     expect(Object.isFrozen(decoded!.kinds[0])).toBe(true);
     expect(Object.isFrozen(decoded!.waves[0].spawns)).toBe(true);
+  });
+
+  it.each(TURRET_SCENARIOS.map((s) => [s.boardKey, s] as const))(
+    'round-trips the %s plan, its scenario, tower points, arsenal and arrivals',
+    (_key, scenario) => {
+      const resolved = resolveTurretPlan(scenario);
+      const decoded = decodeTurretPlan(JSON.parse(turretPlanWireJson(resolved)));
+      expect(decoded).toEqual(resolved);
+      expect(decoded?.scenarioId).toBe(scenario.id);
+      expect(decoded?.integrity).toBe(scenario.integrity);
+      expect(decoded?.arsenal).toEqual({ shockwave: 0, fragmentation: 0 });
+      expect(decoded?.waves.map((w) => w.arrival)).toEqual(
+        scenario.waves.map((w) => w.arrival ?? { kind: 'ring' }),
+      );
+      expect(Object.isFrozen(decoded!.waves[0].arrival)).toBe(true);
+    },
+  );
+
+  it('decodes a plan the resolver builds at every one of its limits', () => {
+    const L = TURRET_PLAN_LIMITS;
+    const wolf = { templateId: 'forest_wolf', count: 1, level: 2 };
+    const wave = (entries: TurretWaveDef['entries'], arrival?: TurretWaveDef['arrival']) => ({
+      entries,
+      coreDamage: 60,
+      gapMinTicks: 16,
+      gapMaxTicks: 32,
+      barrels: { count: 0, minRadius: 0, maxRadius: 0 },
+      ...(arrival ? { arrival } : {}),
+    });
+    const kinds = Array.from({ length: L.kinds }, (_, i) => ({ ...wolf, hpScale: 1 + i / 100 }));
+    const crowd = { ...wolf, count: L.spawnsPerWave };
+    const pack = {
+      kind: 'burst',
+      groupSize: L.spawnsPerWave,
+      groupGapTicks: L.groupGapTicks,
+      widthTurn: 1,
+    } as const;
+    const resolved = resolveTurretPlan({
+      ...TURRET_SCENARIO_STANDARD,
+      id: 'z'.repeat(L.scenarioIdLength),
+      integrity: L.integrity,
+      arsenal: { shockwave: L.charges, fragmentation: L.charges },
+      waves: [
+        wave(kinds),
+        wave([crowd], pack),
+        ...Array.from({ length: L.waves - 2 }, () => wave([wolf])),
+      ],
+    });
+    expect(resolved.kinds).toHaveLength(L.kinds);
+    expect(resolved.waves).toHaveLength(L.waves);
+    expect(resolved.waves[1].spawns).toHaveLength(L.spawnsPerWave);
+    expect(decodeTurretPlan(JSON.parse(turretPlanWireJson(resolved)))).toEqual(resolved);
+  });
+
+  it('carries the scenario a seat was taken for, charges included', () => {
+    const sim = new Sim({
+      seed: WORLD_SEED,
+      playerClass: 'warrior',
+      devCommands: true,
+      noPlayer: true,
+      world: EMPTY_WORLD,
+    });
+    const pid = sim.addPlayer('warrior', 'Gunner', { characterId: 9 });
+    sim.chat('/dev turret hard', pid);
+    const session = sim.meta(pid)!.vehicle as TurretSession;
+    const decoded = decodeTurretPlan(JSON.parse(turretPlanWireJson(session.defense.plan)))!;
+    expect(decoded).toEqual(session.defense.plan);
+    expect(decoded.scenarioId).toBe(TURRET_SCENARIO_HARD.id);
+    const armed = resolveTurretPlan({ ...TURRET_SCENARIO_HARD, arsenal: { fragmentation: 4 } });
+    expect(decodeTurretPlan(wire(armed))?.arsenal).toEqual({ shockwave: 0, fragmentation: 4 });
+  });
+
+  it.each([
+    ['an unknown arrival', (p: Wire) => (p.waves[0].arrival = { kind: 'spiral' })],
+    ['a missing arrival', (p: Wire) => delete p.waves[0].arrival],
+    [
+      'four flanks',
+      (p: Wire) => (p.waves[1].arrival = { kind: 'flanks', count: 4, widthTurn: 0.1 }),
+    ],
+    ['an empty arc', (p: Wire) => (p.waves[0].arrival = { kind: 'arc', widthTurn: 0 })],
+    [
+      'an arc past a full turn',
+      (p: Wire) => (p.waves[0].arrival = { kind: 'arc', widthTurn: 1.01 }),
+    ],
+    [
+      'an empty pack',
+      (p: Wire) =>
+        (p.waves[0].arrival = { kind: 'burst', groupSize: 0, groupGapTicks: 20, widthTurn: 0.1 }),
+    ],
+    [
+      'a fractional pause',
+      (p: Wire) =>
+        (p.waves[0].arrival = { kind: 'burst', groupSize: 2, groupGapTicks: 1.5, widthTurn: 0.1 }),
+    ],
+    [
+      'an endless pause',
+      (p: Wire) =>
+        (p.waves[0].arrival = { kind: 'burst', groupSize: 2, groupGapTicks: 1e6, widthTurn: 0.1 }),
+    ],
+    ['no tower points', (p: Wire) => (p.integrity = 0)],
+    ['fractional tower points', (p: Wire) => (p.integrity = 99.5)],
+    ['a missing scenario', (p: Wire) => delete p.scenarioId],
+    ['a scenario id out of its alphabet', (p: Wire) => (p.scenarioId = 'Hard <b>')],
+    ['an oversized scenario id', (p: Wire) => (p.scenarioId = 'x'.repeat(65))],
+    ['a missing arsenal', (p: Wire) => delete p.arsenal],
+    ['negative charges', (p: Wire) => (p.arsenal.shockwave = -1)],
+    ['too many charges', (p: Wire) => (p.arsenal.fragmentation = 100)],
+  ])('rejects %s', (_, forge) => {
+    const forged = wire(resolveTurretPlan(TURRET_SCENARIO_HARD));
+    forge(forged);
+    expect(decodeTurretPlan(forged)).toBeNull();
   });
 
   it.each([

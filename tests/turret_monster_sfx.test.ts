@@ -32,6 +32,9 @@ function kind(templateId: string, sizeClass: TurretSizeClass): TurretKind {
 }
 
 const PLAN = {
+  scenarioId: 'test',
+  integrity: 100,
+  arsenal: { shockwave: 0, fragmentation: 0 },
   kinds: [
     kind('forest_wolf', 'small'),
     kind('vale_bandit', 'medium'),

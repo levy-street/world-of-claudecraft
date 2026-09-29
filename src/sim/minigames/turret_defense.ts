@@ -30,6 +30,7 @@ import {
   velocityAt,
   waterSurfaceOr,
 } from './thrown_body';
+import { turretArrivalGap, turretArrivalSector } from './turret_arrival';
 import {
   lightTurretBarrelByBody,
   lightTurretBarrelsInBlast,
@@ -266,7 +267,7 @@ export function createTurretDefense(
     wave: 0,
     spawnCursor: 0,
     nextSpawnTick: startTick,
-    integrity: TURRET_TIMING.integrity,
+    integrity: plan.integrity,
     readyTick: startTick,
     aimX: 0,
     aimZ: 1,
@@ -522,20 +523,19 @@ function spawnDue(state: TurretDefenseState, tick: number, probe: ThrowProbe): v
   const wave = currentWave(state);
   if (!wave) return;
   while (state.spawnCursor < wave.spawns.length && tick >= state.nextSpawnTick) {
-    const kindIndex = wave.spawns[state.spawnCursor++];
+    const index = state.spawnCursor++;
+    const kindIndex = wave.spawns[index];
     const kind = state.plan.kinds[kindIndex];
     const id = state.nextMonsterId++;
     const angle = turretSpawnBearing(
       state,
       turretDraw(state.seed, TURRET_STREAM.spawnAngle, id),
       kind.radius,
+      turretArrivalSector(state.seed, state.wave, wave.arrival, index),
     );
     const x = state.cx + Math.sin(angle) * TURRET_ARENA.spawnRadius;
     const z = state.cz + Math.cos(angle) * TURRET_ARENA.spawnRadius;
-    const span = wave.gapMaxTicks - wave.gapMinTicks + 1;
-    const gap =
-      wave.gapMinTicks + Math.floor(turretDraw(state.seed, TURRET_STREAM.spawnGap, id) * span);
-    state.nextSpawnTick = tick + gap;
+    state.nextSpawnTick = tick + turretArrivalGap(state.seed, wave, index, id);
     state.monsters.push({
       id,
       kind: kindIndex,

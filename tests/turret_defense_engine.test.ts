@@ -68,6 +68,9 @@ function kind(size: TurretSizeClass, maxHp: number, marchSpeed = 4.4): TurretKin
 
 function plan(kinds: TurretKind[], spawns: number[][], coreDamage = 60): TurretPlan {
   return {
+    scenarioId: 'test',
+    integrity: 100,
+    arsenal: { shockwave: 0, fragmentation: 0 },
     kinds,
     waves: spawns.map((s) => ({
       spawns: s,
@@ -75,6 +78,7 @@ function plan(kinds: TurretKind[], spawns: number[][], coreDamage = 60): TurretP
       gapMinTicks: 16,
       gapMaxTicks: 32,
       barrels: NO_BARRELS,
+      arrival: { kind: 'ring' },
     })),
     bowling: { ...TURRET_BOWLING, enabled: false },
   };
@@ -1128,7 +1132,7 @@ describe('the breach', () => {
     run(state, shot.impactTick);
     expect(m.state).toBe('fly');
     run(state, state.tick + TURRET_TIMING.windupTicks);
-    expect(state.integrity).toBe(TURRET_TIMING.integrity);
+    expect(state.integrity).toBe(state.plan.integrity);
     expect(state.stats.breaches).toBe(0);
   });
 
@@ -1310,7 +1314,7 @@ describe('full scripted runs', () => {
     const r = fullRun(42, false);
     expect(r.state.phase).toBe('lost');
     expect(r.state.integrity).toBe(0);
-    expect(r.state.stats.pointsLost).toBeGreaterThanOrEqual(TURRET_TIMING.integrity);
+    expect(r.state.stats.pointsLost).toBeGreaterThanOrEqual(r.state.plan.integrity);
     expect(r.ticks).toBeLessThan(20 * 60 * 5);
   });
 });

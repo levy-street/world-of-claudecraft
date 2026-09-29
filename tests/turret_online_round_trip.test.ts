@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { emitTurretSelfKeys, turretWireNumber } from '../server/turret_self_wire';
 import { dispatchVehicleCommand } from '../server/vehicle_command_wire';
 import { type QuestWorldCommand, QuestWorldWireState } from '../src/net/quest_world_wire_state';
+import {
+  TURRET_DEFAULT_SCENARIO,
+  TURRET_SCENARIOS,
+} from '../src/sim/content/fire_and_fly_scenarios';
 import { BUILTIN_WORLD, dungeonAt } from '../src/sim/data';
 import { type MotionSegment, positionAt } from '../src/sim/minigames/thrown_body';
 import { Sim } from '../src/sim/sim';
@@ -122,76 +126,85 @@ function turretEvents(events: readonly SimEvent[], pid: number) {
   );
 }
 
+/**
+ * A whole seat played through the wire by the online client's nearest-first aimer,
+ * the client's view checked against the server's every tick.
+ */
+function playOnline(command: string) {
+  const { sim, pid } = serverPlayer();
+  const client = new WireClient(sim, pid);
+  const sent: Record<string, string> = {};
+  const before = { ...sim.entities.get(pid)!.pos };
+  sim.chat(command, pid);
+  expect(sim.meta(pid)?.vehicle?.kind).toBe('turret');
+
+  let priorTruth: TurretSessionView | null = null;
+  let shots = 0;
+  let identical = 0;
+  let phase = '';
+  let ticks = 0;
+  const bytes: Record<string, number> = {};
+  const drift = { march: 0, fly: 0, skid: 0 };
+  const drawn = { march: 0, fly: 0, skid: 0 };
+  const drawnSegments = new Set<string>();
+  for (let i = 0; i < RUN_BOUND && phase !== 'won' && phase !== 'lost'; i++) {
+    const events = sim.tick();
+    ticks++;
+    let fed = 0;
+    for (const event of events) {
+      if (event.pid !== pid) continue;
+      client.route(event);
+      if (event.type === 'turretDefense') fed++;
+    }
+    const prior = client.turretSession;
+    const self = wirePass(sent, sim, pid, bytes);
+    client.applyQuestSelfSnapshot(self, sim.time, sim.tickCount);
+
+    const authoritative = turretSessionFor(sim.ctx, pid);
+    expect(client.turretClock).toBe(turretClockFor(sim.ctx, pid));
+    if (self.tur === undefined && self.turp === undefined && fed === 0 && prior) {
+      // Nothing moved on the wire: the same object on both sides, so still equal.
+      expect(client.turretSession).toBe(prior);
+      expect(authoritative).toBe(priorTruth);
+      identical++;
+    } else {
+      expectMirrors(client.turretSession, authoritative);
+    }
+    priorTruth = authoritative;
+
+    const view = client.turretSession as TurretSessionView;
+    for (const [index, m] of view.defense.monsters.entries()) {
+      const kind = m.seg.kind;
+      if (kind === 'still' || drawnSegments.has(`${m.id}:${m.seg.start}`)) continue;
+      drawnSegments.add(`${m.id}:${m.seg.start}`);
+      const exact = authoritative!.defense.monsters[index].seg;
+      drift[kind] = Math.max(drift[kind], segmentDrift(m.seg, exact));
+      drawn[kind]++;
+    }
+    phase = view.defense.phase;
+    const clock = client.turretClock!;
+    if (clock < view.defense.readyTick) continue;
+    const target = nearestLive(view.defense, clock);
+    if (!target) continue;
+    client.useVehicleAction('turret_fire', target);
+    shots++;
+  }
+  expect(phase).toBe('won');
+  expect(identical).toBeGreaterThan(0);
+  for (const kind of ['march', 'fly', 'skid'] as const) {
+    expect(drawn[kind]).toBeGreaterThan(0);
+    expect(drift[kind]).toBeLessThan(DRIFT_BOUND_YD);
+  }
+  return { sim, pid, client, sent, before, shots, turBytesPerSecond: bytes.tur / (ticks / 20) };
+}
+
 describe('Fire and Fly online: the socket-free round trip', () => {
   it('mirrors the authoritative seat within the wire rounding every tick of a won run, then clears on leave', () => {
-    const { sim, pid } = serverPlayer();
-    const client = new WireClient(sim, pid);
-    const sent: Record<string, string> = {};
-    const before = { ...sim.entities.get(pid)!.pos };
-    sim.chat('/dev turret', pid);
-    expect(sim.meta(pid)?.vehicle?.kind).toBe('turret');
-
-    let priorTruth: TurretSessionView | null = null;
-    let shots = 0;
-    let identical = 0;
-    let phase = '';
-    let ticks = 0;
-    const bytes: Record<string, number> = {};
-    const drift = { march: 0, fly: 0, skid: 0 };
-    const drawn = { march: 0, fly: 0, skid: 0 };
-    const drawnSegments = new Set<string>();
-    for (let i = 0; i < RUN_BOUND && phase !== 'won' && phase !== 'lost'; i++) {
-      const events = sim.tick();
-      ticks++;
-      let fed = 0;
-      for (const event of events) {
-        if (event.pid !== pid) continue;
-        client.route(event);
-        if (event.type === 'turretDefense') fed++;
-      }
-      const prior = client.turretSession;
-      const self = wirePass(sent, sim, pid, bytes);
-      client.applyQuestSelfSnapshot(self, sim.time, sim.tickCount);
-
-      const authoritative = turretSessionFor(sim.ctx, pid);
-      expect(client.turretClock).toBe(turretClockFor(sim.ctx, pid));
-      if (self.tur === undefined && self.turp === undefined && fed === 0 && prior) {
-        // Nothing moved on the wire: the same object on both sides, so still equal.
-        expect(client.turretSession).toBe(prior);
-        expect(authoritative).toBe(priorTruth);
-        identical++;
-      } else {
-        expectMirrors(client.turretSession, authoritative);
-      }
-      priorTruth = authoritative;
-
-      const view = client.turretSession as TurretSessionView;
-      for (const [index, m] of view.defense.monsters.entries()) {
-        const kind = m.seg.kind;
-        if (kind === 'still' || drawnSegments.has(`${m.id}:${m.seg.start}`)) continue;
-        drawnSegments.add(`${m.id}:${m.seg.start}`);
-        const exact = authoritative!.defense.monsters[index].seg;
-        drift[kind] = Math.max(drift[kind], segmentDrift(m.seg, exact));
-        drawn[kind]++;
-      }
-      phase = view.defense.phase;
-      const clock = client.turretClock!;
-      if (clock < view.defense.readyTick) continue;
-      const target = nearestLive(view.defense, clock);
-      if (!target) continue;
-      client.useVehicleAction('turret_fire', target);
-      shots++;
-    }
-    expect(phase).toBe('won');
+    const { sim, pid, client, sent, before, shots, turBytesPerSecond } = playOnline('/dev turret');
     expect(shots).toBeGreaterThan(50);
-    expect(identical).toBeGreaterThan(0);
-    for (const kind of ['march', 'fly', 'skid'] as const) {
-      expect(drawn[kind]).toBeGreaterThan(0);
-      expect(drift[kind]).toBeLessThan(DRIFT_BOUND_YD);
-    }
     // The whole state per revision (D31, no delta), pruned and rounded: 13.9 KB/s over this
     // run, against 23.7 KB/s before; a later lot that grows the seat's `tur` rate fails here.
-    expect(bytes.tur / (ticks / 20)).toBeLessThan(TUR_BYTES_PER_SECOND_CEILING);
+    expect(turBytesPerSecond).toBeLessThan(TUR_BYTES_PER_SECOND_CEILING);
     const ring = client.turretSession!.feedback;
     expect(ring.map((f) => f.seq)).toEqual(ring.map((_, i) => ring[0].seq + i));
 
@@ -203,6 +216,16 @@ describe('Fire and Fly online: the socket-free round trip', () => {
     expect(client.turretClock).toBeNull();
     expect(sim.entities.get(pid)!.pos).toEqual(before);
     expect(dungeonAt(sim.entities.get(pid)!.pos.x)).toBeNull();
+  });
+
+  it.each(
+    TURRET_SCENARIOS.filter((s) => s !== TURRET_DEFAULT_SCENARIO).map((s) => [s.boardKey, s]),
+  )('mirrors every tick of a won %s run, its plan carried to the client', (key, scenario) => {
+    const { client } = playOnline(`/dev turret ${key}`);
+    const seat = client.turretSession!;
+    expect(seat.defense.plan.scenarioId).toBe(scenario.id);
+    expect(seat.defense.plan.integrity).toBe(scenario.integrity);
+    expect(seat.waveCount).toBe(scenario.waves.length);
   });
 
   it('starts a resumed client with an empty ring and replays nothing', () => {

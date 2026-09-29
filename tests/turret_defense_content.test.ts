@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+  TURRET_SCENARIO_STANDARD,
+  TURRET_SCENARIOS,
+} from '../src/sim/content/fire_and_fly_scenarios';
+import {
   TURRET_ARENA,
   TURRET_BOWLING,
   TURRET_PHYSICS,
@@ -15,7 +19,8 @@ import { FIRE_AND_FLY_TOWER } from '../src/sim/fire_and_fly_field';
 import { resolveTurretPlan, turretSpawnOrder } from '../src/sim/minigames/turret_defense_plan';
 
 const plan = resolveTurretPlan();
-const templateIds = [...new Set(TURRET_WAVES.flatMap((w) => w.entries.map((e) => e.templateId)))];
+const allWaves = TURRET_SCENARIOS.flatMap((scenario) => scenario.waves);
+const templateIds = [...new Set(allWaves.flatMap((w) => w.entries.map((e) => e.templateId)))];
 
 function hitsToKill(wave: number, templateId: string): number {
   const k = plan.kinds.find(
@@ -26,7 +31,7 @@ function hitsToKill(wave: number, templateId: string): number {
 }
 
 describe('wave table against the real templates', () => {
-  it('uses only templates that exist, each with a size class, and no stale size rows', () => {
+  it('uses only templates that exist in every scenario, each with a size class, and no stale size rows', () => {
     for (const id of templateIds) {
       expect(MOBS[id], id).toBeDefined();
       expect(TURRET_TEMPLATE_SIZES[id], id).toBeDefined();
@@ -35,8 +40,8 @@ describe('wave table against the real templates', () => {
     expect(Object.keys(TURRET_TEMPLATE_SIZES).sort()).toEqual([...templateIds].sort());
   });
 
-  it('keeps every level inside its template level range', () => {
-    for (const wave of TURRET_WAVES) {
+  it('keeps every level inside its template level range, in every scenario', () => {
+    for (const wave of allWaves) {
       for (const e of wave.entries) {
         const t = MOBS[e.templateId];
         expect(e.level, e.templateId).toBeGreaterThanOrEqual(t.minLevel);
@@ -93,15 +98,18 @@ describe('wave table against the real templates', () => {
   });
 
   it('refuses an unknown template and a template without a size class', () => {
-    const wave = (templateId: string) => [
-      {
-        entries: [{ templateId, count: 1, level: 2 }],
-        coreDamage: 1,
-        gapMinTicks: 1,
-        gapMaxTicks: 1,
-        barrels: { count: 0, minRadius: 0, maxRadius: 0 },
-      },
-    ];
+    const wave = (templateId: string) => ({
+      ...TURRET_SCENARIO_STANDARD,
+      waves: [
+        {
+          entries: [{ templateId, count: 1, level: 2 }],
+          coreDamage: 1,
+          gapMinTicks: 1,
+          gapMaxTicks: 1,
+          barrels: { count: 0, minRadius: 0, maxRadius: 0 },
+        },
+      ],
+    });
     expect(() => resolveTurretPlan(wave('no_such_mob'))).toThrow(/unknown mob template/);
     const unsized = Object.keys(MOBS).find((id) => !(id in TURRET_TEMPLATE_SIZES));
     expect(unsized).toBeDefined();
@@ -154,7 +162,6 @@ describe('core-hit tuning intent (hits to kill, from the real template health)',
 describe('tuning constants in ticks and yards', () => {
   it('converts the authored seconds to 20 Hz ticks', () => {
     expect(TURRET_TIMING).toMatchObject({
-      integrity: 100,
       introTicks: 60,
       betweenTicks: 100,
       windupTicks: 30,
@@ -247,7 +254,10 @@ describe('tuning constants in ticks and yards', () => {
     expect(plan.bowling).toEqual(TURRET_BOWLING);
     expect(plan.bowling).not.toBe(TURRET_BOWLING);
     expect(Object.isFrozen(plan.bowling)).toBe(true);
-    const off = resolveTurretPlan(TURRET_WAVES, MOBS, { ...TURRET_BOWLING, enabled: false });
+    const off = resolveTurretPlan(TURRET_SCENARIO_STANDARD, MOBS, {
+      ...TURRET_BOWLING,
+      enabled: false,
+    });
     expect(off.bowling.enabled).toBe(false);
     expect(off.kinds).toEqual(plan.kinds);
     expect(off.waves).toEqual(plan.waves);

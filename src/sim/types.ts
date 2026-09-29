@@ -10248,6 +10248,8 @@ export interface TurretWaveEntry {
   level: number;
   /** Spawns after every other entry of the wave. */
   bossLast?: boolean;
+  /** Multiplies the template's health (absent: 1). */
+  hpScale?: number;
 }
 /** The explosive barrels a wave's start adds on a ring around the turret (count 0: none). */
 export interface TurretBarrelWaveDef {
@@ -10255,6 +10257,23 @@ export interface TurretBarrelWaveDef {
   minRadius: number;
   maxRadius: number;
 }
+/**
+ * Where a wave's monsters come from around the spawn ring. Widths are shares of a
+ * full turn; every centre is a private draw per wave (per pack for a burst), so a
+ * run keeps its sides secret and a replay of the same seed keeps them.
+ */
+export type TurretArrivalDef =
+  /** Anywhere on the ring. */
+  | { kind: 'ring' }
+  /** One side. */
+  | { kind: 'arc'; widthTurn: number }
+  /** Two or three sides evenly apart, the wave's monsters taking them in turn. */
+  | { kind: 'flanks'; count: 2 | 3; widthTurn: number }
+  /**
+   * Packs of `groupSize` from one side each: inside a pack the wave's own gap,
+   * between packs `groupGapTicks`.
+   */
+  | { kind: 'burst'; groupSize: number; groupGapTicks: number; widthTurn: number };
 export interface TurretWaveDef {
   entries: readonly TurretWaveEntry[];
   /** Damage of a core hit. */
@@ -10262,6 +10281,30 @@ export interface TurretWaveDef {
   gapMinTicks: number;
   gapMaxTicks: number;
   barrels: TurretBarrelWaveDef;
+  /** Absent: the whole ring. */
+  arrival?: TurretArrivalDef;
+}
+/** A medal's bar at the end of a won run: bronze is any win. */
+export interface TurretMedalBar {
+  minIntegrity: number;
+  minPoints?: number;
+}
+/** Limited-weapon charges per run (absent or 0: none). */
+export interface TurretArsenalDef {
+  shockwave?: number;
+  fragmentation?: number;
+}
+/** One Fire and Fly scenario (a difficulty); data in content/fire_and_fly_scenarios.ts. */
+export interface TurretScenarioDef {
+  /** Frozen and player-invisible. */
+  id: string;
+  /** Frozen short key for board ids: fire_and_fly_<key>_v<version>_<period>. */
+  boardKey: string;
+  waves: readonly TurretWaveDef[];
+  /** Tower points at the start. */
+  integrity: number;
+  medals: { gold: TurretMedalBar; silver: TurretMedalBar };
+  arsenal?: TurretArsenalDef;
 }
 
 export interface VehicleStationDef {

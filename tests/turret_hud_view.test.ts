@@ -1,4 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  TURRET_SCENARIO_INTRODUCTION,
+  TURRET_SCENARIO_STANDARD,
+} from '../src/sim/content/fire_and_fly_scenarios';
 import { TURRET_TIMING } from '../src/sim/content/turret_defense';
 import { createTurretDefense, type TurretEvent } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
@@ -22,11 +26,11 @@ vi.mock('../src/ui/i18n', async (importOriginal) => {
 
 const START = 200;
 
-function seat(start = START): TurretSession {
+function seat(start = START, plan = resolveTurretPlan()): TurretSession {
   return {
     kind: 'turret',
     origin: { x: 0, y: 0, z: 0 },
-    defense: createTurretDefense(resolveTurretPlan(), { x: 0, z: 0 }, 3, start),
+    defense: createTurretDefense(plan, { x: 0, z: 0 }, 3, start),
     priorMountKey: '',
     returnTo: { x: 0, y: 0, z: 0, facing: 0 },
     feedback: [],
@@ -74,8 +78,32 @@ describe('the turret HUD view', () => {
       'First wave in 1 sec',
     );
     expect(frame.integrity).toBe(1);
-    expect(frame.integrityText).toBe(`${TURRET_TIMING.integrity}/${TURRET_TIMING.integrity}`);
+    expect(frame.integrityText).toBe(
+      `${TURRET_SCENARIO_STANDARD.integrity}/${TURRET_SCENARIO_STANDARD.integrity}`,
+    );
     expect(frame.result).toBeNull();
+  });
+
+  it("reads the waves and the tower's maximum from the scenario's plan", () => {
+    const intro = TURRET_SCENARIO_INTRODUCTION;
+    const session = seat(START, resolveTurretPlan(intro));
+    const view = new TurretHudView();
+    const frame = view.tick(turretSessionView(session), START);
+    expect(frame.wave).toBe(`Wave 1/${intro.waves.length}`);
+    expect(frame.integrityMax).toBe(String(intro.integrity));
+    expect(frame.integrityNow).toBe(String(intro.integrity));
+    expect(frame.integrityText).toBe(`${intro.integrity}/${intro.integrity}`);
+    expect(frame.integrity).toBe(1);
+    session.defense.integrity = 30;
+    session.defense.rev++;
+    const hurt = view.tick(turretSessionView(session), START);
+    expect(hurt.integrity).toBeCloseTo(30 / intro.integrity, 12);
+    expect(hurt.integrityText).toBe(`30/${intro.integrity}`);
+    expect(hurt.low).toBe(true);
+    session.defense.phase = 'lost';
+    session.defense.rev++;
+    const ended = view.tick(turretSessionView(session), START);
+    expect(ended.result?.rows[TURRET_RESULT_ROWS - 1].value).toBe(`30/${intro.integrity}`);
   });
 
   it('names the seat, its rail and its Leave button in the tower wording', () => {
@@ -136,7 +164,7 @@ describe('the turret HUD view', () => {
         { label: 'Accuracy', value: '75%' },
         { label: 'Longest throw', value: '23.5 yd' },
         { label: 'Longest airtime', value: '1.8 sec' },
-        { label: 'Tower', value: `72/${TURRET_TIMING.integrity}` },
+        { label: 'Tower', value: `72/${TURRET_SCENARIO_STANDARD.integrity}` },
       ],
     });
     expect(frame.result?.rows).toHaveLength(TURRET_RESULT_ROWS);
@@ -243,7 +271,7 @@ describe('the turret HUD live line', () => {
     const session = seat();
     session.defense.phase = 'wave';
     const view = new TurretHudView();
-    const max = TURRET_TIMING.integrity;
+    const max = TURRET_SCENARIO_STANDARD.integrity;
     const breach = (integrity: number) => {
       session.defense.integrity = integrity;
       session.defense.rev++;

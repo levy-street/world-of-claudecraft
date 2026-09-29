@@ -1,4 +1,3 @@
-import { TURRET_TIMING } from '../../../sim/content/turret_defense';
 import type { TurretEvent } from '../../../sim/minigames/turret_defense';
 import { TICK_RATE } from '../../../sim/types';
 import type { TurretSessionView } from '../../../world_api/vehicles';
@@ -44,12 +43,14 @@ export interface TurretHudFrame {
   wave: string;
   /** The strip's middle slot: the monsters left in a wave, else the countdown; empty at the end. */
   slot: string;
-  /** 0 to 1 of TURRET_TIMING.integrity. */
+  /** 0 to 1 of the plan's integrity. */
   integrity: number;
   /** `integrity` for the fill's CSS variable. */
   integrityFill: string;
   /** The points left, for the meter's aria-valuenow. */
   integrityNow: string;
+  /** The plan's integrity (the scenario's tower points), for the meter's aria-valuemax. */
+  integrityMax: string;
   integrityText: string;
   low: boolean;
   /**
@@ -145,7 +146,8 @@ export class TurretHudView {
     slot: '',
     integrity: 1,
     integrityFill: '1',
-    integrityNow: String(TURRET_TIMING.integrity),
+    integrityNow: '',
+    integrityMax: '',
     integrityText: '',
     low: false,
     announce: '',
@@ -187,7 +189,7 @@ export class TurretHudView {
     this.lastSeconds = seconds;
     this.lastLanguage = language;
     const defense = session.defense;
-    const max = TURRET_TIMING.integrity;
+    const max = defense.plan.integrity;
     const value = Math.max(0, Math.min(max, defense.integrity));
     const ended = defense.phase === 'won' || defense.phase === 'lost';
     const labels = frame.labels;
@@ -209,6 +211,7 @@ export class TurretHudView {
     frame.integrity = value / max;
     frame.integrityFill = String(frame.integrity);
     frame.integrityNow = String(value);
+    frame.integrityMax = String(max);
     frame.integrityText = t('hudChrome.turret.integrityValue', {
       value: formatNumber(value),
       max: formatNumber(max),

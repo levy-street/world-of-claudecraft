@@ -6,7 +6,6 @@
 // inert), so aim clicks and drags pass through both roots. The polite live line is a
 // third, visually hidden #ui child that stays rendered while the roots hide: a region
 // shown already filled is rarely spoken, and Hide Interface spares only such children.
-import { TURRET_TIMING } from '../../../sim/content/turret_defense';
 import type { PainterHostWriters } from '../../painter_host';
 import { TURRET_RESULT_ROWS, type TurretHudFrame } from './turret_hud_view';
 
@@ -65,7 +64,6 @@ export class TurretHudPainter {
     writers.setAttr(this.leave, 'aria-keyshortcuts', 'Escape');
     writers.setAttr(this.rail, 'role', 'meter');
     writers.setAttr(this.rail, 'aria-valuemin', '0');
-    writers.setAttr(this.rail, 'aria-valuemax', String(TURRET_TIMING.integrity));
     writers.setAttr(this.caption, 'aria-hidden', 'true');
     writers.setAttr(this.value, 'aria-hidden', 'true');
     this.leave.append(this.leaveLabel, this.keycap);
@@ -115,6 +113,7 @@ export class TurretHudPainter {
     writers.setAttr(this.leave, 'title', labels.leave);
     writers.setText(this.keycap, keycap);
     writers.setAttr(this.rail, 'aria-label', labels.meter);
+    writers.setAttr(this.rail, 'aria-valuemax', frame.integrityMax);
     writers.setAttr(this.rail, 'aria-valuenow', frame.integrityNow);
     writers.toggleClass(this.rail, 'low-integrity', frame.low);
     writers.setStyleProp(this.fill, '--turret-integrity', frame.integrityFill);

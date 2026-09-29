@@ -69,6 +69,9 @@ function kind(size: TurretSizeClass, maxHp: number, marchSpeed = 4.4): TurretKin
 
 function plan(kinds: TurretKind[], spawns: number[][], barrels = NO_BARRELS): TurretPlan {
   return {
+    scenarioId: 'test',
+    integrity: 100,
+    arsenal: { shockwave: 0, fragmentation: 0 },
     kinds,
     waves: spawns.map((s) => ({
       spawns: s,
@@ -76,6 +79,7 @@ function plan(kinds: TurretKind[], spawns: number[][], barrels = NO_BARRELS): Tu
       gapMinTicks: 16,
       gapMaxTicks: 32,
       barrels,
+      arrival: { kind: 'ring' },
     })),
     bowling: { ...TURRET_BOWLING, enabled: false },
   };
@@ -178,12 +182,22 @@ function nearestLive(state: TurretDefenseState, tick: number, probe: ThrowProbe)
 function fullRun(seed: number, probe: ThrowProbe, maxTicks = 20 * 60 * 15) {
   const state = createTurretDefense(resolveTurretPlan(), { x: 0, z: 0 }, seed, START);
   const trace: string[] = [];
+  /** Each monster's spawn point, in spawn order. */
+  const spawns: string[] = [];
+  const seen = new Set<number>();
+  let spawnsBesideBarrels = 0;
   let standingMost = 0;
   let t = START;
   while (t < START + maxTicks && state.phase !== 'won' && state.phase !== 'lost') {
     t++;
     for (const e of tickTurretDefense(state, t, probe)) trace.push(JSON.stringify(e));
     standingMost = Math.max(standingMost, state.barrels.length);
+    for (const m of state.monsters) {
+      if (seen.has(m.id)) continue;
+      seen.add(m.id);
+      spawns.push(JSON.stringify({ id: m.id, x: m.seg.x, z: m.seg.z }));
+      if (state.barrels.length) spawnsBesideBarrels++;
+    }
     if (t >= state.readyTick) {
       const target = nearestLive(state, t, probe);
       if (target) {
@@ -193,7 +207,16 @@ function fullRun(seed: number, probe: ThrowProbe, maxTicks = 20 * 60 * 15) {
     }
   }
   const events = trace.map((s) => JSON.parse(s) as TurretEvent);
-  return { state, trace, events, ticks: t - START, standingMost };
+  return { state, trace, events, spawns, spawnsBesideBarrels, ticks: t - START, standingMost };
+}
+
+function fnv(text: string): string {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    h = (h ^ text.charCodeAt(i)) >>> 0;
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h.toString(16).padStart(8, '0');
 }
 
 describe('placement', () => {
@@ -720,7 +743,7 @@ describe('the barrel blast', () => {
     const events = run(state, barrel.blowTick);
     expect(ofType(events, 'barrelExploded')[0].hits).toEqual([]);
     expect(corpse.seg).toBe(lying);
-    expect(state.integrity).toBe(TURRET_TIMING.integrity);
+    expect(state.integrity).toBe(state.plan.integrity);
     expect(ofType(events, 'breach')).toEqual([]);
   });
 
@@ -864,6 +887,24 @@ describe('full runs with barrels', () => {
       expect(r.state.stats.kills).toBe(
         resolveTurretPlan().waves.reduce((n, w) => n + w.spawns.length, 0),
       );
+    },
+  );
+
+  // Digests of Standard runs with barrels and bowling on, taken on the engine before
+  // arrival sectors: every spawn of these runs has barrels standing, so each bearing
+  // goes through the lane walk the sectors rewrote, and Standard must replay it exactly.
+  it.each([
+    [42, 'flat', flat, 1140, 'bf47cb63'],
+    [21, 'hills', hills, 1134, '3736426a'],
+  ] as const)(
+    'replays the spawn bearings beside the barrels of a seed %i %s run exactly',
+    (seed, _n, probe, count, digest) => {
+      const r = fullRun(seed, probe);
+      expect(r.state.phase).toBe('won');
+      expect(r.spawns).toHaveLength(r.state.stats.kills);
+      expect(r.spawnsBesideBarrels).toBe(r.spawns.length);
+      expect(r.trace).toHaveLength(count);
+      expect(fnv([...r.trace, ...r.spawns].join('\n'))).toBe(digest);
     },
   );
 

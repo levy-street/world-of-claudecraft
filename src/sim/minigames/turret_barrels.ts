@@ -49,55 +49,86 @@ function mod(a: number, n: number): number {
   return r < 0 ? r + n : r;
 }
 
+/** The bearings from `from` to `from + width` (rad, width up to a full turn). */
+export interface TurretBearingSector {
+  from: number;
+  width: number;
+}
+
 /**
- * Maps `u` in [0, 1) uniformly onto the bearings no arc blocks, walking the
- * free gaps from bearing 0: with no arc it is `u * 2 PI` exactly. When the arcs
- * leave nothing free, `u * 2 PI` all the same.
+ * Maps `u` in [0, 1) uniformly onto the bearings of the sector no arc blocks,
+ * walking its free gaps from `from`; null when an arc covers everything or the
+ * arcs leave nothing free. A whole turn from 0 skips the clip, so the ring's
+ * bearings (the Standard run's digests) replay to the bit.
  */
-export function turretFreeBearing(u: number, arcs: readonly TurretBearingArc[]): number {
+function freeBearingWithin(
+  u: number,
+  arcs: readonly TurretBearingArc[],
+  from: number,
+  width: number,
+): number | null {
   const spans: [number, number][] = [];
   for (const arc of arcs) {
     if (!(arc.half > 0)) continue;
-    if (arc.half >= Math.PI) return u * TAU;
-    const from = mod(arc.center - arc.half, TAU);
-    const to = from + 2 * arc.half;
-    if (to > TAU) spans.push([from, TAU], [0, to - TAU]);
-    else spans.push([from, to]);
+    if (arc.half >= Math.PI) return null;
+    const start = mod(arc.center - arc.half - from, TAU);
+    const end = start + 2 * arc.half;
+    if (end > TAU) spans.push([start, TAU], [0, end - TAU]);
+    else spans.push([start, end]);
   }
-  if (!spans.length) return u * TAU;
-  spans.sort((a, b) => a[0] - b[0]);
+  const inside = width < TAU ? spans.filter((span) => span[0] < width) : spans;
+  if (!inside.length) return from + u * width;
+  if (width < TAU) for (const span of inside) span[1] = Math.min(span[1], width);
+  inside.sort((a, b) => a[0] - b[0]);
   const merged: [number, number][] = [];
-  for (const span of spans) {
+  for (const span of inside) {
     const last = merged[merged.length - 1];
     if (last && span[0] <= last[1]) last[1] = Math.max(last[1], span[1]);
     else merged.push([span[0], span[1]]);
   }
   let blocked = 0;
-  for (const [from, to] of merged) blocked += to - from;
-  const free = TAU - blocked;
-  if (!(free > 1e-9)) return u * TAU;
+  for (const [start, end] of merged) blocked += end - start;
+  const free = width - blocked;
+  if (!(free > 1e-9)) return null;
   let left = u * free;
   let cursor = 0;
-  for (const [from, to] of merged) {
-    const gap = from - cursor;
-    if (left < gap) return cursor + left;
+  for (const [start, end] of merged) {
+    const gap = start - cursor;
+    if (left < gap) return from + (cursor + left);
     left -= gap;
-    cursor = to;
+    cursor = end;
   }
-  return cursor + left;
+  return from + (cursor + left);
 }
 
 /**
- * A spawn bearing for a body of `bodyRadius` from the uniform draw `u`: never
- * one whose straight march to the turret would brush a standing barrel (its
- * lane keeps the two radii plus a margin clear of the barrel's centre).
+ * Maps `u` in [0, 1) uniformly onto the bearings no arc blocks, walking the
+ * free gaps from bearing 0: with no arc it is `u * 2 PI` exactly. When the arcs
+ * leave nothing free, `u * 2 PI` all the same. With a sector, onto the sector's
+ * free bearings; a sector the arcs close falls back to the whole circle's.
+ */
+export function turretFreeBearing(
+  u: number,
+  arcs: readonly TurretBearingArc[],
+  sector?: TurretBearingSector | null,
+): number {
+  const within = sector ? freeBearingWithin(u, arcs, sector.from, sector.width) : null;
+  return within ?? freeBearingWithin(u, arcs, 0, TAU) ?? u * TAU;
+}
+
+/**
+ * A spawn bearing for a body of `bodyRadius` from the uniform draw `u`, inside
+ * the arrival sector when there is one: never one whose straight march to the
+ * turret would brush a standing barrel (its lane keeps the two radii plus a
+ * margin clear of the barrel's centre).
  */
 export function turretSpawnBearing(
   state: TurretDefenseState,
   u: number,
   bodyRadius: number,
+  sector?: TurretBearingSector | null,
 ): number {
-  if (!state.barrels.length) return u * TAU;
+  if (!state.barrels.length) return sector ? sector.from + u * sector.width : u * TAU;
   const reach = TURRET_EXPLOSIVE_BARREL.radius + bodyRadius + TURRET_EXPLOSIVE_BARREL.laneMargin;
   // A barrel inside the reach sits across every lane alike: no bearing avoids
   // it, so it blocks none and the others are still steered around.
@@ -107,7 +138,7 @@ export function turretSpawnBearing(
     const d = Math.hypot(dx, dz);
     return { center: Math.atan2(dx, dz), half: d > reach ? Math.asin(reach / d) : 0 };
   });
-  return turretFreeBearing(u, arcs);
+  return turretFreeBearing(u, arcs, sector);
 }
 
 /** Dry, free of every barrel by the spacing, and of every body still on the field. */

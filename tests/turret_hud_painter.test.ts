@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { TURRET_SCENARIO_INTRODUCTION } from '../src/sim/content/fire_and_fly_scenarios';
 import { createTurretDefense } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { turretSessionView } from '../src/sim/turret_defense_session';
@@ -16,11 +17,11 @@ import { makeWriterFacet } from '../src/ui/painter_host';
 
 const START = 300;
 
-function seat(): TurretSession {
+function seat(plan = resolveTurretPlan()): TurretSession {
   return {
     kind: 'turret',
     origin: { x: 0, y: 0, z: 0 },
-    defense: createTurretDefense(resolveTurretPlan(), { x: 0, z: 0 }, 7, START),
+    defense: createTurretDefense(plan, { x: 0, z: 0 }, 7, START),
     priorMountKey: '',
     returnTo: { x: 0, y: 0, z: 0, facing: 0 },
     feedback: [],
@@ -77,6 +78,22 @@ describe('the turret HUD painter', () => {
     painter.paint(view.tick({ ...first, monstersLeft: first.monstersLeft - 1 }, START), 'Menu');
     expect(writes).toHaveBeenCalledTimes(1);
     expect(painter.strip.querySelector('.turret-leave-key')!.textContent).toBe('Menu');
+  });
+
+  it("gives the rail the scenario's maximum, and changes it with the next seat's", () => {
+    const { painter, view } = rig();
+    painter.show(true);
+    painter.paint(view.tick(turretSessionView(seat()), START), 'Esc');
+    expect(painter.rail.getAttribute('aria-valuemin')).toBe('0');
+    expect(painter.rail.getAttribute('aria-valuemax')).toBe('100');
+    expect(painter.rail.getAttribute('aria-valuenow')).toBe('100');
+    view.reset();
+    const intro = seat(resolveTurretPlan(TURRET_SCENARIO_INTRODUCTION));
+    painter.paint(view.tick(turretSessionView(intro), START), 'Esc');
+    const max = String(TURRET_SCENARIO_INTRODUCTION.integrity);
+    expect(painter.rail.getAttribute('aria-valuemax')).toBe(max);
+    expect(painter.rail.getAttribute('aria-valuenow')).toBe(max);
+    expect(painter.rail.querySelector('.turret-rail-value')!.textContent).toBe(`${max}/${max}`);
   });
 
   it('unfolds the card at the end and turns Leave into the large button', () => {

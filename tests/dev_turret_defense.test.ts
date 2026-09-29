@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { FIRE_AND_FLY_DUNGEON_ID } from '../src/sim/content/fire_and_fly_arena';
+import {
+  TURRET_DEFAULT_SCENARIO,
+  TURRET_SCENARIOS,
+} from '../src/sim/content/fire_and_fly_scenarios';
 import { WISP_MAZE_QUEST_ID } from '../src/sim/content/world_quest_wisp_maze';
 import { DUNGEON_X_THRESHOLD, dungeonAt, PLAYER_START } from '../src/sim/data';
 import { handleDevTurretChat } from '../src/sim/dev_turret_defense';
@@ -50,7 +54,7 @@ describe('/dev turret', () => {
     sim.chat('/dev turret', pid);
     const logs = devLogs(sim.drainEvents());
     expect(logs).toEqual([
-      '[dev] Turret seated in your Fire and Fly arena; /dev turret leave returns you.',
+      '[dev] Turret seated in your Fire and Fly arena (standard); /dev turret leave returns you.',
     ]);
     expect(sim.meta(pid)?.vehicle?.kind).toBe('turret');
     expect(dungeonAt(sim.entities.get(pid)!.pos.x)?.id).toBe(FIRE_AND_FLY_DUNGEON_ID);
@@ -75,13 +79,61 @@ describe('/dev turret', () => {
     expect(handleDevTurretChat(sim.ctx, '/dev turrets', sim.playerId)).toBe(false);
     expect(handleDevTurretChat(sim.ctx, '/dev turret 12', sim.playerId)).toBe(false);
     expect(handleDevTurretChat(sim.ctx, '/dev turret -340 1945', sim.playerId)).toBe(false);
+    expect(handleDevTurretChat(sim.ctx, '/dev turret hard now', sim.playerId)).toBe(false);
+  });
+
+  it('runs Standard when no scenario is named', () => {
+    const { sim } = rig();
+    chat(sim, '/dev turret');
+    const plan = sim.turretSession?.defense.plan;
+    expect(plan?.scenarioId).toBe(TURRET_DEFAULT_SCENARIO.id);
+    expect(plan?.scenarioId).toBe('fire_and_fly_standard');
+    expect(sim.turretSession?.defense.integrity).toBe(100);
+  });
+
+  it.each([
+    ['introduction', 'introduction', 150],
+    ['hard', 'hard', 100],
+    ['HARD', 'hard', 100],
+    ['fire_and_fly_introduction', 'introduction', 150],
+  ])('runs the scenario named by /dev turret %s', (word, key, integrity) => {
+    const { sim } = rig();
+    const scenario = TURRET_SCENARIOS.find((s) => s.boardKey === key)!;
+    expect(chat(sim, `/dev turret ${word}`)).toEqual([
+      `[dev] Turret seated in your Fire and Fly arena (${key}); /dev turret leave returns you.`,
+    ]);
+    const session = sim.turretSession!;
+    expect(session.defense.plan.scenarioId).toBe(scenario.id);
+    expect(session.defense.plan.integrity).toBe(integrity);
+    expect(session.defense.integrity).toBe(integrity);
+    expect(session.waveCount).toBe(scenario.waves.length);
+    expect(chat(sim, '/dev turret leave')).toEqual(['[dev] Turret left.']);
+  });
+
+  it('refuses an unknown scenario without seating, naming the known ones', () => {
+    const { sim, player, meta } = rig();
+    const before = { ...player.pos };
+    expect(chat(sim, '/dev turret nightmare')).toEqual([
+      '[dev] Unknown turret scenario "nightmare"; try one of: introduction, standard, hard.',
+    ]);
+    expect(meta.vehicle ?? null).toBeNull();
+    expect(player.pos).toEqual(before);
+  });
+
+  it('takes a scenario name with digits in it as its own, refusing it when unknown', () => {
+    const { sim, meta } = rig();
+    expect(handleDevTurretChat(sim.ctx, '/dev turret hard2', sim.playerId)).toBe(true);
+    expect(devLogs(sim.drainEvents())).toEqual([
+      '[dev] Unknown turret scenario "hard2"; try one of: introduction, standard, hard.',
+    ]);
+    expect(meta.vehicle ?? null).toBeNull();
   });
 
   it('takes the player to the tower in their own arena, the tower as the center', () => {
     const { sim, player, meta } = rig();
     const logs = chat(sim, '/dev turret');
     expect(logs).toEqual([
-      '[dev] Turret seated in your Fire and Fly arena; /dev turret leave returns you.',
+      '[dev] Turret seated in your Fire and Fly arena (standard); /dev turret leave returns you.',
     ]);
     expect(meta.vehicle?.kind).toBe('turret');
     expect(dungeonAt(player.pos.x)?.id).toBe(FIRE_AND_FLY_DUNGEON_ID);

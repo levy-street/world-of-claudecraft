@@ -11,7 +11,7 @@ import {
   TURRET_THUMP_HEAVY_SFX,
   TURRET_THUMP_LIGHT_SFX,
 } from '../src/game/turret_monster_sfx';
-import { TURRET_TIMING } from '../src/sim/content/turret_defense';
+import { TURRET_SCENARIO_STANDARD } from '../src/sim/content/fire_and_fly_scenarios';
 import { createTurretDefense } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { recordTurretFeedback } from '../src/sim/minigames/turret_feedback';
@@ -149,8 +149,8 @@ it('shows the strip and the rail, hides the action bars and swaps in the turret 
   expect(leave.getAttribute('aria-keyshortcuts')).toBe('Escape');
   expect(rail().getAttribute('role')).toBe('meter');
   expect(rail().getAttribute('aria-label')).toBe('Tower integrity');
-  expect(rail().getAttribute('aria-valuemax')).toBe(String(TURRET_TIMING.integrity));
-  expect(rail().getAttribute('aria-valuenow')).toBe(String(TURRET_TIMING.integrity));
+  expect(rail().getAttribute('aria-valuemax')).toBe(String(TURRET_SCENARIO_STANDARD.integrity));
+  expect(rail().getAttribute('aria-valuenow')).toBe(String(TURRET_SCENARIO_STANDARD.integrity));
   expect(text('.turret-rail-caption')).toBe('Tower');
   expect(rail().querySelectorAll('.ui-bevel-ticks > span')).toHaveLength(4);
   expect(live().classList.contains('visually-hidden')).toBe(true);
@@ -218,7 +218,7 @@ it('writes nothing on unchanged frames, announces each wave once, and never spea
 it('paints the tower rail from the session, and turns it to danger when low', () => {
   const { world, bar } = rig();
   const session = seat();
-  const max = TURRET_TIMING.integrity;
+  const max = TURRET_SCENARIO_STANDARD.integrity;
   const low = Math.round(max * 0.2);
   session.defense.integrity = low;
   world.turretSession = turretSessionView(session);
@@ -367,7 +367,7 @@ it('shows the result card at the end and leaves through its large Leave button',
     row.querySelector('dd')!.textContent,
   ]);
   expect(rows).toContainEqual(['Accuracy', '25%']);
-  expect(rows).toContainEqual(['Tower', `0/${TURRET_TIMING.integrity}`]);
+  expect(rows).toContainEqual(['Tower', `0/${TURRET_SCENARIO_STANDARD.integrity}`]);
   const leave = leaveButton();
   expect(leave.classList.contains('ui-btn--lg')).toBe(true);
   expect(text('.turret-leave-label')).toBe('Leave the tower');
@@ -445,7 +445,7 @@ function struck(session: TurretSession, points: number, tick = START): void {
       type: 'breach',
       id: 3,
       points,
-      integrity: TURRET_TIMING.integrity - points,
+      integrity: TURRET_SCENARIO_STANDARD.integrity - points,
       x: 4,
       y: 0,
       z: 0,
