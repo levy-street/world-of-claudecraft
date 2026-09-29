@@ -1,17 +1,381 @@
-// Fire and Fly explosive barrels on screen, the pure half: a new barrel's pop
-// up, its warning ring's breathing, the shake and swell through the fuse, the
-// sparks the fuse throws, the tall fire column of its blast and the drum's
-// shards flying off. The Three consumer is turret_barrel_visual.ts; the
-// blast's flash, fireball, shock ring, dust, dirt and scorch are the cannon's
-// own (cannon_shell_visuals.ts), drawn wider and hotter.
+// Fire and Fly explosive barrels on screen, the pure half: the powder keg's
+// shape and where its painted flame and its wick sit, the flame mark's texels,
+// a new keg's pop up, its warning ring's breathing, the shake and swell
+// through the fuse, the sparks the fuse throws from the wick's tip, the tall
+// fire column of its blast and the keg's shards flying off. The Three
+// consumer is turret_barrel_visual.ts; the blast's flash, fireball, shock
+// ring, dust, dirt and scorch are the cannon's own (cannon_shell_visuals.ts),
+// drawn wider and hotter.
 //
 // Three/DOM/i18n-free (RENDER_PURE_CORES), deterministic (every spread is a
 // hash of the barrel and the index) and allocation-free per frame.
 
-import { type CannonPuff, cannonHash01, cannonPuffLaunch, PUFF } from './cannon_puff_core';
+import { TURRET_EXPLOSIVE_BARREL } from '../sim/content/turret_defense';
+import {
+  type CannonPuff,
+  cannonHash01,
+  cannonNoiseInto,
+  cannonPuffLaunch,
+  PUFF,
+} from './cannon_puff_core';
 
-/** The red drum with soot on its lid: of the kit's barrels, the one that reads as explosive at 35 yd. */
-export const TURRET_BARREL_MODEL_URL = '/models/resources/fuel_a_barrel_dirty.glb';
+/** The faceted powder keg of the cannon tower's own kit. */
+export const TURRET_BARREL_MODEL_URL = '/models/biome/hex_barrel.glb';
+
+/**
+ * hex_barrel.glb as the visual fits it (TURRET_EXPLOSIVE_BARREL.height tall,
+ * its foot on the ground, centred on its axis), in shares of that height:
+ * eight flat staves between two iron bands, a bung off the axis on the lid.
+ */
+export const TURRET_KEG_SHAPE = {
+  /** The facet the flame is painted on faces this bearing in the model (x += sin, z += cos): the one beside the bung. */
+  markFacet: (3 * Math.PI) / 8,
+  /** That facet's distance from the axis, and its width between its two corners. */
+  facetApothem: 0.4137,
+  facetWidth: 0.3427,
+  /** The bare staves between the lower and the upper band. */
+  bareLow: 0.2785,
+  bareHigh: 0.7131,
+  /** The bung's top, off the axis on the model's +x. */
+  bungX: 0.0654,
+  bungTop: 1,
+} as const;
+
+export const TURRET_KEG_MARK = {
+  /** The painted shield's width as a share of its facet's, its height as a share of the bare staves. */
+  width: 0.9,
+  height: 0.88,
+  /** Drawn this far off the facet (yd): no depth fight at the clearing's far side. */
+  lift: 0.015,
+  /** Texels across the mark's texture; it is twice as tall. */
+  texels: 128,
+  /** Texture v: the wick's cord below wickTop, the shield above markBottom, clear between. */
+  wickTop: 1 / 16,
+  markBottom: 1 / 8,
+} as const;
+
+export const TURRET_KEG_WICK = {
+  /** Its rise over the bung, its bend aside and toward the painted facet, its thickness (yd). */
+  rise: 0.24,
+  bend: 0.09,
+  lean: 0.03,
+  radius: 0.024,
+  /** Sunk this far into the bung so no gap shows (yd). */
+  sink: 0.015,
+} as const;
+
+const KEG_H = TURRET_EXPLOSIVE_BARREL.height;
+const FACET_X = Math.sin(TURRET_KEG_SHAPE.markFacet);
+const FACET_Z = Math.cos(TURRET_KEG_SHAPE.markFacet);
+
+/** The painted shield on its facet, in yards of the keg's own frame (before its yaw). */
+export const TURRET_KEG_MARK_FRAME = {
+  width: TURRET_KEG_MARK.width * TURRET_KEG_SHAPE.facetWidth * KEG_H,
+  height: TURRET_KEG_MARK.height * (TURRET_KEG_SHAPE.bareHigh - TURRET_KEG_SHAPE.bareLow) * KEG_H,
+  centreY: 0.5 * (TURRET_KEG_SHAPE.bareLow + TURRET_KEG_SHAPE.bareHigh) * KEG_H,
+  offset: TURRET_KEG_SHAPE.facetApothem * KEG_H + TURRET_KEG_MARK.lift,
+  /** The facet's outward normal, and its right as seen from in front of it. */
+  normalX: FACET_X,
+  normalZ: FACET_Z,
+  sideX: FACET_Z,
+  sideZ: -FACET_X,
+} as const;
+
+/** The shield's height over its width: its outline spans x in [-1, 1] and y in [-aspect, aspect]. */
+export const TURRET_KEG_SHIELD_ASPECT = TURRET_KEG_MARK_FRAME.height / TURRET_KEG_MARK_FRAME.width;
+
+/** The yaw that turns a keg standing at (x, z) so its painted facet faces the tower at (cx, cz). */
+export function turretKegYaw(x: number, z: number, cx: number, cz: number): number {
+  return Math.atan2(cx - x, cz - z) - TURRET_KEG_SHAPE.markFacet;
+}
+
+export interface TurretKegPoint {
+  x: number;
+  y: number;
+  z: number;
+}
+
+/** A point `t` (0 at the bung, 1 at the tip) along the wick, in the keg's own frame (yd, before its yaw). */
+export function turretKegWickInto(out: TurretKegPoint, t: number): TurretKegPoint {
+  const w = TURRET_KEG_WICK;
+  const f = TURRET_KEG_MARK_FRAME;
+  const u = t < 0 ? 0 : t > 1 ? 1 : t;
+  // A quadratic curve: straight up out of the bung, then bending over.
+  const b = u * u;
+  const aside = w.bend * b;
+  const toward = w.lean * b;
+  out.x = TURRET_KEG_SHAPE.bungX * KEG_H + f.sideX * aside + f.normalX * toward;
+  out.y = TURRET_KEG_SHAPE.bungTop * KEG_H - w.sink + (w.rise + w.sink) * (2 * u - u * u);
+  out.z = f.sideZ * aside + f.normalZ * toward;
+  return out;
+}
+
+const wickTip = turretKegWickInto({ x: 0, y: 0, z: 0 }, 1);
+
+/** The wick's tip over a keg standing at (x, y, z) turned by `yaw`: where its lit fuse burns. */
+export function turretKegWickTipInto(
+  out: TurretKegPoint,
+  x: number,
+  y: number,
+  z: number,
+  yaw: number,
+): TurretKegPoint {
+  const c = Math.cos(yaw);
+  const s = Math.sin(yaw);
+  out.x = x + wickTip.x * c + wickTip.z * s;
+  out.y = y + wickTip.y;
+  out.z = z - wickTip.x * s + wickTip.z * c;
+  return out;
+}
+
+const SQRT3 = Math.sqrt(3);
+
+/**
+ * The shield's outline, counter-clockwise seen from in front, as x, y pairs
+ * in its own units (x in [-1, 1], y in [-aspect, aspect]): a heater shield,
+ * flat on top, straight sides, then two arcs meeting at a point below.
+ */
+export function turretKegShieldOutline(perArc: number): number[] {
+  const k = TURRET_KEG_SHIELD_ASPECT;
+  const mid = SQRT3 - k;
+  const n = Math.max(1, Math.floor(perArc));
+  const out: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const a = -Math.PI / 3 + (i / n) * (Math.PI / 3);
+    out.push(-1 + 2 * Math.cos(a), mid + 2 * Math.sin(a));
+  }
+  out.push(1, mid, 1, k, -1, k, -1, mid);
+  for (let i = 1; i < n; i++) {
+    const a = Math.PI + (i / n) * (Math.PI / 3);
+    out.push(1 + 2 * Math.cos(a), mid + 2 * Math.sin(a));
+  }
+  return out;
+}
+
+/** Signed distance to the shield's outline, in its own units: negative inside. */
+function shieldDistance(x: number, y: number): number {
+  const k = TURRET_KEG_SHIELD_ASPECT;
+  const mid = SQRT3 - k;
+  if (y >= mid) return Math.max(Math.abs(x) - 1, y - k);
+  return Math.max(Math.hypot(x + 1, y - mid) - 2, Math.hypot(x - 1, y - mid) - 2, y - k);
+}
+
+interface FlameTongue {
+  /** The foot of its round bulb, the bulb's radius, and its tip. */
+  x0: number;
+  y0: number;
+  r: number;
+  x1: number;
+  y1: number;
+  /** A sideways sway of its middle. */
+  curl: number;
+}
+
+const tongue = (x0: number, y0: number, r: number, x1: number, y1: number, curl: number) => ({
+  x0,
+  y0,
+  r,
+  x1,
+  y1,
+  curl,
+});
+
+/** The painted flame, in the shield's units: a tall middle tongue and one lick either side. */
+const FLAME: readonly FlameTongue[] = [
+  tongue(0, -0.88, 0.46, -0.08, 1.02, 0.12),
+  tongue(-0.2, -0.8, 0.2, -0.55, 0.3, -0.05),
+  tongue(0.2, -0.8, 0.21, 0.52, 0.5, 0.05),
+];
+const FLAME_CORE = tongue(0, -0.74, 0.26, -0.03, 0.32, 0.06);
+
+/** A tongue's edge above its bulb's middle, `u` of the way to the tip: tapering to a point with hollow flanks. */
+function tongueEdge(t: FlameTongue, u: number, side: number): number {
+  const c = t.x0 + (t.x1 - t.x0) * u ** 1.6 + t.curl * Math.sin(Math.PI * u);
+  return c + side * t.r * (1 - u * u) ** 1.5;
+}
+
+/** One tongue's terms along one texel row: all its taper needs depends on the row alone. */
+interface TongueRow {
+  /** 0 beside its bulb only, 1 along its taper, 2 above its tip. */
+  part: number;
+  /** The row's height over the bulb's middle, and over the tip. */
+  dy: number;
+  tipDy: number;
+  centre: number;
+  left: number;
+  right: number;
+  /** Each edge's slope term, sqrt(1 + slope^2). */
+  leftNorm: number;
+  rightNorm: number;
+}
+
+const newTongueRow = (): TongueRow => ({
+  part: 0,
+  dy: 0,
+  tipDy: 0,
+  centre: 0,
+  left: 0,
+  right: 0,
+  leftNorm: 1,
+  rightNorm: 1,
+});
+
+function edgeNorm(t: FlameTongue, u: number, du: number, span: number, side: number): number {
+  const slope =
+    du > 0 ? (tongueEdge(t, u + du, side) - tongueEdge(t, u - du, side)) / (2 * du * span) : 0;
+  return Math.sqrt(1 + slope * slope);
+}
+
+function tongueRowInto(row: TongueRow, t: FlameTongue, y: number): void {
+  const cy = t.y0 + t.r;
+  row.dy = y - cy;
+  row.tipDy = y - t.y1;
+  if (y <= cy) {
+    row.part = 0;
+    return;
+  }
+  if (y >= t.y1) {
+    row.part = 2;
+    return;
+  }
+  row.part = 1;
+  const span = t.y1 - cy;
+  const u = (y - cy) / span;
+  row.right = tongueEdge(t, u, 1);
+  row.left = tongueEdge(t, u, -1);
+  row.centre = 0.5 * (row.right + row.left);
+  const du = Math.min(1e-3, u, 1 - u);
+  row.rightNorm = edgeNorm(t, u, du, span, 1);
+  row.leftNorm = edgeNorm(t, u, du, span, -1);
+}
+
+/** Signed distance to one tongue on its row, near enough for painting: its round bulb, then its taper's sideways gap eased by the edge's slope. */
+function tongueDistance(t: FlameTongue, row: TongueRow, x: number): number {
+  const bulb = Math.hypot(x - t.x0, row.dy) - t.r;
+  if (row.part === 0) return bulb;
+  if (row.part === 2) return Math.min(bulb, Math.hypot(row.tipDy, x - t.x1));
+  return x >= row.centre
+    ? Math.min(bulb, (x - row.right) / row.rightNorm)
+    : Math.min(bulb, -(x - row.left) / row.leftNorm);
+}
+
+/** Painted colours (sRGB bytes): the dark outline, the pale field, the flame's three heats, the wick's cord. */
+const INK = [43, 26, 16] as const;
+const FIELD = [236, 222, 188] as const;
+const FLAME_OUTER = [217, 68, 26] as const;
+const FLAME_MID = [242, 138, 28] as const;
+const FLAME_HOT = [255, 210, 63] as const;
+const CORD = [46, 36, 28] as const;
+const SHIELD_BORDER = 0.09;
+const FLAME_OUTLINE = 0.07;
+const FLAME_INSET = 0.12;
+
+/**
+ * The flame mark's texture, `texels` wide and twice as tall, row 0 at the
+ * bottom (texture v up): the wick's dark cord in a strip along the bottom,
+ * then a clear gutter, then a hand-painted heater shield, pale inside a dark
+ * border, bearing an orange flame with a yellow heart and a dark outline.
+ * Alpha is the shield's coverage (clear around it) and the cord's; RGB past
+ * the shield's edge carries its border ink, so no mip level greys the rim.
+ */
+export function turretKegMarkTexels(texels: number): Uint8Array {
+  const w = Math.max(8, Math.floor(texels));
+  const h = w * 2;
+  const data = new Uint8Array(w * h * 4);
+  // One soft octave for the brush's unevenness and one fine one for its grain.
+  const brush = cannonNoiseInto(new Float64Array(h * h), h, 6, 83, 1, 1);
+  const grain = cannonNoiseInto(new Float64Array(h * h), h, 40, 29, 1, 1);
+  // A loop of its own each: one loop crossing from the cord to the shield
+  // deoptimized on the way, a cost the page's first paint pays.
+  paintKegCord(data, w, grain);
+  paintKegShield(data, w, brush, grain);
+  return data;
+}
+
+function putTexel(data: Uint8Array, at: number, r: number, g: number, b: number, a: number): void {
+  data[at] = Math.round(Math.min(255, Math.max(0, r)));
+  data[at + 1] = Math.round(Math.min(255, Math.max(0, g)));
+  data[at + 2] = Math.round(Math.min(255, Math.max(0, b)));
+  data[at + 3] = Math.round(255 * a);
+}
+
+/** The wick's cord, twisted in faint diagonal strands, along the bottom; its ink carried on through the clear gutter above. */
+function paintKegCord(data: Uint8Array, w: number, grain: Float64Array): void {
+  const h = w * 2;
+  const wickRows = Math.round(h * TURRET_KEG_MARK.wickTop);
+  const markRow = Math.round(h * TURRET_KEG_MARK.markBottom);
+  for (let j = 0; j < markRow; j++) {
+    for (let i = 0; i < w; i++) {
+      const at = (j * w + i) * 4;
+      if (j < wickRows) {
+        const strand = ((i / w) * 10 + j / wickRows) % 1;
+        const fine = grain[j * h + 2 * i] - 0.5;
+        const lit = 0.82 + 0.3 * (strand < 0.5 ? strand : 1 - strand) + 0.1 * fine;
+        putTexel(data, at, CORD[0] * lit, CORD[1] * lit, CORD[2] * lit, 1);
+      } else {
+        putTexel(data, at, CORD[0], CORD[1], CORD[2], 0);
+      }
+    }
+  }
+}
+
+function paintKegShield(
+  data: Uint8Array,
+  w: number,
+  brush: Float64Array,
+  grain: Float64Array,
+): void {
+  const h = w * 2;
+  const markRow = Math.round(h * TURRET_KEG_MARK.markBottom);
+  const rows = h - markRow;
+  const k = TURRET_KEG_SHIELD_ASPECT;
+  const aa = 1.2 / w;
+  const cover = (d: number): number => {
+    const c = 0.5 - d / aa;
+    return c < 0 ? 0 : c > 1 ? 1 : c;
+  };
+  const rgb = [0, 0, 0];
+  const over = (colour: readonly number[], a: number): void => {
+    for (let c = 0; c < 3; c++) rgb[c] += (colour[c] - rgb[c]) * a;
+  };
+  const flameRows = FLAME.map(newTongueRow);
+  const coreRow = newTongueRow();
+  for (let j = markRow; j < h; j++) {
+    const y = (((j - markRow + 0.5) / rows) * 2 - 1) * k;
+    for (let t = 0; t < FLAME.length; t++) tongueRowInto(flameRows[t], FLAME[t], y);
+    tongueRowInto(coreRow, FLAME_CORE, y);
+    for (let i = 0; i < w; i++) {
+      const noise = brush[j * h + 2 * i] - 0.5;
+      const x = ((i + 0.5) / w) * 2 - 1;
+      const d = shieldDistance(x, y);
+      // The border's inner edge wanders a little, as a brush's would; its
+      // outer edge is the shield's own, the mesh's silhouette.
+      const border = cover(-(d + SHIELD_BORDER + 0.025 * noise));
+      // Wholly under the border's ink: nothing beneath it shows.
+      if (border === 1) {
+        rgb[0] = INK[0];
+        rgb[1] = INK[1];
+        rgb[2] = INK[2];
+      } else {
+        const tone = 1 + 0.08 * noise + 0.06 * (grain[j * h + 2 * i] - 0.5);
+        rgb[0] = FIELD[0] * tone;
+        rgb[1] = FIELD[1] * tone;
+        rgb[2] = FIELD[2] * tone;
+        let df = Number.POSITIVE_INFINITY;
+        for (let t = 0; t < FLAME.length; t++) {
+          df = Math.min(df, tongueDistance(FLAME[t], flameRows[t], x));
+        }
+        df += 0.05 * noise;
+        over(INK, cover(df - FLAME_OUTLINE));
+        over(FLAME_OUTER, cover(df));
+        over(FLAME_MID, cover(df + FLAME_INSET));
+        over(FLAME_HOT, cover(tongueDistance(FLAME_CORE, coreRow, x) + 0.04 * noise));
+        over(INK, border);
+      }
+      putTexel(data, (j * w + i) * 4, rgb[0], rgb[1], rgb[2], cover(d));
+    }
+  }
+}
 
 export const TURRET_BARREL_LOOK = {
   /** Seconds a new barrel takes to pop up to its size (a little over on the way). */
@@ -29,13 +393,16 @@ export const TURRET_BARREL_LOOK = {
   shakeOffset: 0.06,
   shakeTilt: 0.1,
   shakeHz: 26,
-  /** How much the drum swells by the end of the fuse, as a share of its size. */
+  /** How much the keg swells by the end of the fuse, as a share of its size. */
   swell: 0.1,
   /** The cannon's blast drawn this much bigger than a shell's (flash, fireball, dust, shake). */
   blastScale: 1.4,
 } as const;
 
-/** The drum's shards: pieces per blast, blasts whose shards fly at once, their life and pull. */
+/** How far the wick's tip rises over a fuse as the keg swells from its foot (yd). */
+const WICK_TIP_SWELL_RISE = wickTip.y * TURRET_BARREL_LOOK.swell;
+
+/** The keg's shards: pieces per blast, blasts whose shards fly at once, their life and pull. */
 export const TURRET_BARREL_SHARDS = { perBlast: 10, pool: 6, life: 2.6, gravity: 26 } as const;
 
 /** Cosmetic counts per blast and per fuse. The low preset sheds these only; the warning ring,
@@ -56,7 +423,7 @@ export function turretBarrelCounts(low: boolean): Readonly<TurretBarrelCounts> {
 /** The fire column's fixed part: rising fireballs and the bright flame core. */
 export const TURRET_BARREL_FIREBALLS = 10;
 export const TURRET_BARREL_FLAMES = 8;
-/** The fuse's fixed part: the hot glow over the bung and two flame licks. */
+/** The fuse's fixed part: the hot glow at the wick's tip and two flame licks. */
 export const TURRET_FUSE_FIXED_PUFFS = 3;
 /** The most puffs one fuse and one blast's fire column launch (the full counts). */
 export const TURRET_FUSE_PUFFS = TURRET_FUSE_FIXED_PUFFS + FULL_COUNTS.fuseSparks;
@@ -99,7 +466,7 @@ export interface TurretBarrelFuseFrame {
   dz: number;
   tiltX: number;
   tiltZ: number;
-  /** A multiplier on the drum's size. */
+  /** A multiplier on the keg's size. */
   swell: number;
 }
 
@@ -107,7 +474,7 @@ export function newTurretBarrelFuseFrame(): TurretBarrelFuseFrame {
   return { dx: 0, dz: 0, tiltX: 0, tiltZ: 0, swell: 1 };
 }
 
-/** The drum rattling harder and swelling as its fuse of `fuse` seconds burns down, `age` seconds in. */
+/** The keg rattling harder and swelling as its fuse of `fuse` seconds burns down, `age` seconds in. */
 export function turretBarrelFuseInto(
   out: TurretBarrelFuseFrame,
   age: number,
@@ -129,30 +496,34 @@ export function turretBarrelFuseInto(
 
 /**
  * Launches a lit fuse's puffs into `out` from index 0 and returns how many: a
- * hot glow over the bung for the whole fuse and two flame licks (every tier),
- * then `sparks` sparks spraying up and out of the bung, spread over the fuse.
- * `topY` is the drum's top, `floorY` the ground the sparks come to rest on.
+ * hot glow on the wick's tip at (x, tipY, z) for the whole fuse and two flame
+ * licks (every tier), then `sparks` sparks spraying up and out of the tip,
+ * spread over the fuse. The tip is where it stands when the keg is lit; each
+ * puff starts where the swelling keg has lifted it by then, and the glow rises
+ * with it. `floorY` is the ground the sparks come to rest on.
  */
 export function turretFuseSparksInto(
   out: CannonPuff[],
   seed: number,
   x: number,
-  topY: number,
+  tipY: number,
   z: number,
   floorY: number,
   fuse: number,
   sparks: number,
 ): number {
   const h = (i: number, k: number): number => cannonHash01(seed ^ 0x5f3a, i * 8 + k);
+  const lift = (delay: number): number =>
+    fuse > 0 ? WICK_TIP_SWELL_RISE * smoothstep(delay / fuse) : 0;
   let n = 0;
   cannonPuffLaunch(
     out[n++],
     PUFF.glow,
     x,
-    topY + 0.12,
+    tipY + 0.04,
     z,
     0,
-    0,
+    fuse > 0 ? WICK_TIP_SWELL_RISE / fuse : 0,
     0,
     0,
     0,
@@ -165,11 +536,12 @@ export function turretFuseSparksInto(
     NO_FLOOR,
   );
   for (let i = 0; i < 2; i++) {
+    const delay = i * fuse * 0.45;
     cannonPuffLaunch(
       out[n++],
       PUFF.flame,
       x,
-      topY + 0.08,
+      tipY + 0.02 + lift(delay),
       z,
       (h(1 + i, 0) - 0.5) * 0.6,
       2.2 + 1.6 * h(1 + i, 1),
@@ -179,7 +551,7 @@ export function turretFuseSparksInto(
       0.45,
       0.85,
       0.16 + 0.06 * h(1 + i, 3),
-      i * fuse * 0.45,
+      delay,
       h(1 + i, 4) * TAU,
       0,
       NO_FLOOR,
@@ -189,12 +561,13 @@ export function turretFuseSparksInto(
   for (let i = 0; i < count; i++) {
     const a = h(10 + i, 0) * TAU;
     const speed = 2.5 + 3.5 * h(10 + i, 1);
+    const delay = (i / Math.max(1, count)) * fuse;
     cannonPuffLaunch(
       out[n++],
       PUFF.spark,
-      x + Math.sin(a) * 0.08,
-      topY + 0.05,
-      z + Math.cos(a) * 0.08,
+      x + Math.sin(a) * 0.03,
+      tipY + lift(delay),
+      z + Math.cos(a) * 0.03,
       Math.sin(a) * speed,
       3 + 4 * h(10 + i, 2),
       Math.cos(a) * speed,
@@ -203,7 +576,7 @@ export function turretFuseSparksInto(
       0.26 + 0.12 * h(10 + i, 3),
       0.06,
       0.35 + 0.25 * h(10 + i, 4),
-      (i / Math.max(1, count)) * fuse,
+      delay,
       0,
       0,
       floorY + 0.05,
@@ -324,6 +697,9 @@ export function turretPuffsEnd(puffs: readonly CannonPuff[], count: number): num
   return end;
 }
 
+/** A shard whose shade is under this is a piece of an iron band; above it, a stave. */
+export const TURRET_SHARD_BAND_SHADE = 0.35;
+
 export interface TurretShard {
   startX: number;
   startY: number;
@@ -342,7 +718,7 @@ export interface TurretShard {
   sx: number;
   sy: number;
   sz: number;
-  /** 0 to 1: which shade of the drum it takes (the lid, sooty paint, clean paint). */
+  /** 0 to 1: which piece of the keg it is: 0 the lid, under TURRET_SHARD_BAND_SHADE a band, then darker to lighter staves. */
   shade: number;
 }
 
@@ -375,8 +751,8 @@ function landTime(lift: number, startY: number, floorY: number): number {
 }
 
 /**
- * Launches shard `index` of `count` off a drum blowing at (x, y, z): torn
- * around the drum, thrown out and high at a hashed speed, tumbling about a
+ * Launches shard `index` of `count` off a keg blowing at (x, y, z): torn
+ * around the keg, thrown out and high at a hashed speed, tumbling about a
  * hashed axis; the first one is the lid. The floor it lands on is sampled
  * once, under where it comes down.
  */

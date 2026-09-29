@@ -225,17 +225,18 @@ export class TurretDefenseVisual {
     this.probe = { ground: groundAt, water: () => null };
     this.tower = new TurretTowerVisual(compileGate, towerSource);
     this.groundMarkers = new TurretGroundMarkers(this.probe, compileGate);
+    const texelSlot = () =>
+      idleSlot(RIG_IDLE_TIMEOUT_MS, {
+        scheduler: this.idleScheduler,
+        maxTimeoutDeferrals: RIG_IDLE_DEFERRALS,
+      });
     this.weapon = new CannonShellVisuals({
       blastRadius: TURRET_WEAPON.blastRadius,
       groundAt,
       compileGate,
       bursts: { slots: TURRET_CONTACT_BURSTS + TURRET_BARREL_BURSTS, puffs: TURRET_CONTACT_PUFFS },
       impacts: TURRET_BARREL_IMPACTS,
-      texelSlot: () =>
-        idleSlot(RIG_IDLE_TIMEOUT_MS, {
-          scheduler: this.idleScheduler,
-          maxTimeoutDeferrals: RIG_IDLE_DEFERRALS,
-        }),
+      texelSlot,
     });
     this.contactCounts = turretContactCounts(this.weapon.lowEffects);
     this.barrels = new TurretBarrelVisual(
@@ -243,6 +244,7 @@ export class TurretDefenseVisual {
       compileGate,
       barrelSource,
       this.weapon.lowEffects,
+      texelSlot,
     );
     this.effectGate = compileGate
       ? (target, settle) => {
@@ -390,7 +392,7 @@ export class TurretDefenseVisual {
       body.standIn.visible = body.health.visible = body.ring.visible = false;
     }
     this.groundMarkers.end();
-    this.barrels.update(defense.barrels, frozen, tick, time);
+    this.barrels.update(defense, frozen, tick, time);
     this.weapon.update(tick, time);
   }
 
@@ -617,7 +619,7 @@ export class TurretDefenseVisual {
           this.scorchRigs(ev.hits);
           break;
         case 'barrelLit':
-          if (!stale) this.barrels.light(ev, this.weapon.puffBurst(time), time);
+          if (!stale) this.barrels.light(ev, defense, this.weapon.puffBurst(time), time);
           break;
         case 'barrelExploded':
           if (stale) break;

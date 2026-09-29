@@ -1,10 +1,11 @@
-// Fire and Fly explosive barrels, drawn: a red drum on a gold warning ring for
-// every standing barrel, popping up where the wave placed it; lit, the ring
-// turns red and throbs, the drum rattles and swells while its fuse spits
-// sparks; blowing, a tall fire column and the drum's shards flying off, on top
-// of the cannon's own blast drawn wider and hotter (the owner calls it,
-// turret_defense_visual.ts). Driven from IWorld.turretSession's barrels and
-// feedback.
+// Fire and Fly explosive barrels, drawn: a powder keg on a gold warning ring
+// for every standing barrel, popping up where the wave placed it, a flame
+// painted on the facet that faces the tower and a short wick on its lid; lit,
+// the ring turns red and throbs, the keg rattles and swells while the wick's
+// tip spits sparks; blowing, a tall fire column and the keg's shards flying
+// off, on top of the cannon's own blast drawn wider and hotter (the owner
+// calls it, turret_defense_visual.ts). Driven from IWorld.turretSession's
+// barrels and feedback.
 //
 // GPU rules (src/render/CLAUDE.md "GPU work"): built at the commitment (the
 // first frame seen seated), never at world boot. The warning rings draw the
@@ -12,12 +13,17 @@
 // prewarm stages, their geometry stripped of normals so they link nothing,
 // and show from the first frame on every graphics tier: a player aims by them.
 // The shards (one instanced draw) attach behind the compile gate at the
-// commitment, the drums (the model's materials swapped for named ones of its
-// own, one clone per pooled slot) behind it too once the model has loaded;
-// the fuse sparks and the fire column ride the cannon's one puff draw through
-// its pooled bursts. No light; a frame allocates nothing. The
-// pure half is turret_barrel_core.ts.
+// commitment, the kegs (the model's materials swapped for named ones of its
+// own, one clone per pooled slot) behind it too once the model has loaded.
+// The flame mark and the wick are one small mesh per keg on one shared named
+// material: an opaque shield-shaped polygon and a cord on a painted texture
+// the gate uploads, the keg's own program (no alpha test, no blending); its
+// texels are painted once per page, in the texel slot when one is given, and
+// the kegs wait for them behind their rings. The fuse sparks and the fire
+// column ride the cannon's one puff draw through its pooled bursts. No light;
+// a frame allocates nothing. The pure half is turret_barrel_core.ts.
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { TURRET_EXPLOSIVE_BARREL } from '../sim/content/turret_defense';
 import type { TurretEvent } from '../sim/minigames/turret_defense';
 import { DT } from '../sim/types';
@@ -25,7 +31,6 @@ import type { TurretSessionView } from '../world_api/vehicles';
 import { loadGltf } from './assets/loader';
 import { timeBuildSpan } from './build_spans';
 import type { CannonPuffBurst } from './cannon_puff_burst_core';
-import { cannonHash01 } from './cannon_puff_core';
 import { CANNON_IMPACT_POOL } from './cannon_shell_core';
 import type { CannonBlast } from './cannon_shell_visuals';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
@@ -40,7 +45,13 @@ import {
   TURRET_BARREL_MODEL_URL,
   TURRET_BARREL_SHARDS,
   TURRET_FUSE_PUFFS,
+  TURRET_KEG_MARK,
+  TURRET_KEG_MARK_FRAME,
+  TURRET_KEG_SHIELD_ASPECT,
+  TURRET_KEG_WICK,
+  TURRET_SHARD_BAND_SHADE,
   type TurretBarrelCounts,
+  type TurretKegPoint,
   type TurretShard,
   type TurretShardFrame,
   turretBarrelCounts,
@@ -50,6 +61,11 @@ import {
   turretBarrelPop,
   turretBarrelRingRadius,
   turretFuseSparksInto,
+  turretKegMarkTexels,
+  turretKegShieldOutline,
+  turretKegWickInto,
+  turretKegWickTipInto,
+  turretKegYaw,
   turretPuffsEnd,
   turretShardInto,
   turretShardLaunch,
@@ -62,7 +78,10 @@ type CompileGate = (target: THREE.Object3D) => Promise<unknown>;
 export type TurretBarrelSource = () => Promise<THREE.Object3D>;
 /** A pooled burst on the cannon's puff draw (CannonShellVisuals.puffBurst). */
 export type TurretBurstTaker = (now: number) => CannonPuffBurst | null;
-type BarrelView = TurretSessionView['defense']['barrels'][number];
+type DefenseView = TurretSessionView['defense'];
+/** What the barrels are drawn from: the standing barrels and the tower's centre their marks face. */
+export type TurretBarrelField = Pick<DefenseView, 'barrels' | 'cx' | 'cz'>;
+type TowerCentre = Pick<DefenseView, 'cx' | 'cz'>;
 type BarrelLit = Extract<TurretEvent, { type: 'barrelLit' }>;
 type BarrelBlast = Extract<TurretEvent, { type: 'barrelExploded' }>;
 
@@ -82,6 +101,21 @@ export const TURRET_BARREL_IMPACTS = CANNON_IMPACT_POOL + TURRET_EXPLOSIVE_BARRE
 const loadBarrelModel: TurretBarrelSource = () =>
   loadGltf(TURRET_BARREL_MODEL_URL).then((gltf) => gltf.scene);
 
+let pageMarkTexels: Uint8Array | null = null;
+
+/** The flame mark's texels, painted once per page (filed in the build ledger). */
+function kegMarkTexels(): Uint8Array {
+  pageMarkTexels ??= timeBuildSpan('zone:turret-keg-mark', () =>
+    turretKegMarkTexels(TURRET_KEG_MARK.texels),
+  );
+  return pageMarkTexels;
+}
+
+/** Forgets the page's mark texels, so a test can watch a cold build. */
+export function resetTurretKegMarkTexelsForTest(): void {
+  pageMarkTexels = null;
+}
+
 /**
  * A barrel's blast as the cannon's shot visuals draw it: its own radius (the
  * shock ring's reach and the scorch), bigger and hotter than a shell's, on an
@@ -100,19 +134,29 @@ export function turretBarrelBlast(ev: BarrelBlast): CannonBlast {
 }
 
 const ZERO = new THREE.Matrix4().makeScale(0, 0, 0);
-const LID = new THREE.Color(0x2b2622);
-const SOOT = new THREE.Color(0x5a1c16);
-const PAINT = new THREE.Color(0xb3281e);
+const LID = new THREE.Color(0x7a4a36);
+const BAND = new THREE.Color(0x8b9ba6);
+const STAVE_DARK = new THREE.Color(0x5a3326);
+const STAVE_LIGHT = new THREE.Color(0x9c5d42);
+/** Arc steps per side of the painted shield's lower point. */
+const SHIELD_ARC_STEPS = 8;
+const WICK_POINTS = 6;
 
 interface Slot {
   /** The barrel this slot draws, 0 when free. */
   id: number;
-  /** Pose of the drum: the fuse's rattle, its swell and its pop. */
+  /** Pose of the keg: its yaw to the tower, the fuse's rattle, its swell and its pop. */
   readonly root: THREE.Group;
   readonly ring: THREE.Mesh;
   bornAt: number;
-  yaw: number;
   used: boolean;
+}
+
+/** The flame mark and the wick: one geometry and one material every keg shares. */
+interface Mark {
+  readonly geometry: THREE.BufferGeometry;
+  readonly material: THREE.Material;
+  readonly texture: THREE.DataTexture;
 }
 
 interface Shards {
@@ -122,11 +166,11 @@ interface Shards {
 }
 
 export class TurretBarrelVisual {
-  /** Holds the drums and the shards, each attached behind the compile gate. */
+  /** Holds the kegs and the shards, each attached behind the compile gate. */
   readonly group = new THREE.Group();
   /** The warning rings: on prewarmed programs, drawn from the commitment. */
   readonly rings = new THREE.Group();
-  private readonly drums = new THREE.Group();
+  private readonly kegs = new THREE.Group();
   private readonly shardsRoot = new THREE.Group();
   private readonly slots: Slot[] = [];
   private readonly counts: Readonly<TurretBarrelCounts>;
@@ -146,8 +190,10 @@ export class TurretBarrelVisual {
   private readonly scale = new THREE.Vector3();
   private readonly axis = new THREE.Vector3();
   private readonly color = new THREE.Color();
+  private readonly tip: TurretKegPoint = { x: 0, y: 0, z: 0 };
   private ringGeometry: THREE.RingGeometry | null = null;
   private shards: Shards | null = null;
+  private mark: Mark | null = null;
   private nextBlast = 0;
   private state: 'idle' | 'loading' | 'ready' | 'failed' = 'idle';
   private disposed = false;
@@ -157,11 +203,12 @@ export class TurretBarrelVisual {
     private readonly compileGate?: CompileGate,
     private readonly source: TurretBarrelSource = loadBarrelModel,
     low = false,
+    private readonly texelSlot?: () => Promise<unknown>,
   ) {
     this.counts = turretBarrelCounts(low);
     this.group.name = TURRET_BARREL_NAME;
     this.rings.name = TURRET_BARREL_RINGS_NAME;
-    this.drums.name = `${TURRET_BARREL_NAME}:drums`;
+    this.kegs.name = `${TURRET_BARREL_NAME}:kegs`;
     this.shardsRoot.name = `${TURRET_BARREL_NAME}:shards`;
   }
 
@@ -170,7 +217,7 @@ export class TurretBarrelVisual {
     return this.state !== 'idle';
   }
 
-  /** The drums are built (their gate may still be pending). */
+  /** The kegs are built (their gate may still be pending). */
   get modelReady(): boolean {
     return this.state === 'ready';
   }
@@ -178,23 +225,26 @@ export class TurretBarrelVisual {
   /**
    * The commitment: mints the rings (shown at once) and the shards (behind the
    * compile gate), and loads the model into the slots, attached behind the gate
-   * once built. A load that fails leaves the barrels unprepared and calls
-   * `onUnavailable`, so the caller can try again later; the rings stand in.
+   * once built with the mark's texels. A load that fails leaves the barrels
+   * unprepared and calls `onUnavailable`, so the caller can try again later;
+   * the rings stand in.
    */
   prepare(parent: THREE.Object3D, onUnavailable?: () => void): void {
     if (this.state !== 'idle' || this.disposed) return;
     this.state = 'loading';
     if (!this.ringGeometry) this.mintPools(parent);
-    this.source().then(
-      (scene) => {
+    const slot = this.texelSlot;
+    const texels = pageMarkTexels || !slot ? null : slot().then(kegMarkTexels, kegMarkTexels);
+    Promise.all([this.source(), texels]).then(
+      ([scene]) => {
         if (this.disposed) return;
         if (!timeBuildSpan('zone:turret-barrels', () => this.build(scene))) {
           this.state = 'failed';
-          console.error('Fire and Fly barrel model has no mesh, rings only');
+          console.error('Fire and Fly kegs could not be built, rings only');
           return;
         }
         this.state = 'ready';
-        this.attach(this.drums);
+        this.attach(this.kegs);
       },
       (error) => {
         if (this.disposed) return;
@@ -206,15 +256,16 @@ export class TurretBarrelVisual {
   }
 
   /**
-   * One frame: every standing barrel on a slot, popping up when new, rattling
-   * through its fuse; `tick` is the display tick, `time` the frame seconds.
-   * A frozen (lost) session holds its lit barrels still.
+   * One frame: every standing barrel on a slot, its painted facet toward the
+   * tower, popping up when new, rattling through its fuse; `tick` is the
+   * display tick, `time` the frame seconds. A frozen (lost) session holds its
+   * lit barrels still.
    */
-  update(barrels: readonly BarrelView[], frozen: boolean, tick: number, time: number): void {
+  update(field: TurretBarrelField, frozen: boolean, tick: number, time: number): void {
     if (this.disposed || !this.ringGeometry) return;
     const mats = worldQuestTraceMaterials();
     for (const slot of this.slots) slot.used = false;
-    for (const b of barrels) {
+    for (const b of field.barrels) {
       const slot = this.slotFor(b.id, time);
       if (!slot) continue;
       slot.used = true;
@@ -231,7 +282,7 @@ export class TurretBarrelVisual {
       const root = slot.root;
       root.visible = pop > 0;
       root.position.set(b.x + fuse.dx, b.y, b.z + fuse.dz);
-      root.rotation.set(fuse.tiltX, slot.yaw, fuse.tiltZ);
+      root.rotation.set(fuse.tiltX, turretKegYaw(b.x, b.z, field.cx, field.cz), fuse.tiltZ);
       root.scale.setScalar(Math.max(1e-3, pop * fuse.swell));
       const ring = slot.ring;
       ring.visible = true;
@@ -248,16 +299,18 @@ export class TurretBarrelVisual {
     this.drawShards(time);
   }
 
-  /** A barrel is lit: its fuse's glow, flame licks and sparks on a pooled burst. */
-  light(ev: BarrelLit, burst: CannonPuffBurst | null, time: number): void {
+  /** A barrel is lit: its fuse's glow, flame licks and sparks at the wick's tip, on a pooled burst. */
+  light(ev: BarrelLit, centre: TowerCentre, burst: CannonPuffBurst | null, time: number): void {
     if (!burst || this.disposed) return;
     const fuse = ev.fuseTicks * DT;
+    const yaw = turretKegYaw(ev.x, ev.z, centre.cx, centre.cz);
+    const tip = turretKegWickTipInto(this.tip, ev.x, ev.y, ev.z, yaw);
     const n = turretFuseSparksInto(
       burst.puffs,
       ev.id,
-      ev.x,
-      ev.y + TURRET_EXPLOSIVE_BARREL.height,
-      ev.z,
+      tip.x,
+      tip.y,
+      tip.z,
       ev.y,
       fuse,
       this.counts.fuseSparks,
@@ -324,6 +377,13 @@ export class TurretBarrelVisual {
       shards.geometry.dispose();
       shards.material.dispose();
     }
+    const mark = this.mark;
+    this.mark = null;
+    if (mark) {
+      mark.geometry.dispose();
+      mark.material.dispose();
+      mark.texture.dispose();
+    }
     // The model's geometries and textures belong to the loader's cache.
     for (const material of this.materials) material.dispose();
     this.materials.length = 0;
@@ -339,7 +399,6 @@ export class TurretBarrelVisual {
     if (!free) return null;
     free.id = id;
     free.bornAt = time;
-    free.yaw = cannonHash01(id, 3) * Math.PI * 2;
     return free;
   }
 
@@ -362,8 +421,8 @@ export class TurretBarrelVisual {
       this.rings.add(ring);
       const root = new THREE.Group();
       root.visible = false;
-      this.drums.add(root);
-      this.slots.push({ id: 0, root, ring, bornAt: 0, yaw: 0, used: false });
+      this.kegs.add(root);
+      this.slots.push({ id: 0, root, ring, bornAt: 0, used: false });
     }
     this.shards = this.mintShards();
     tagVfxSubtree(this.shardsRoot);
@@ -371,7 +430,7 @@ export class TurretBarrelVisual {
     this.attach(this.shardsRoot);
   }
 
-  /** One gated attach under the visual's group: the shards at the commitment, the drums once built. */
+  /** One gated attach under the visual's group: the shards at the commitment, the kegs once built. */
   private attach(group: THREE.Group): void {
     const parent = this.group;
     void attachSceneGroupGated(parent, group, this.compileGate, () => this.disposed).catch(
@@ -404,7 +463,7 @@ export class TurretBarrelVisual {
     return { mesh, geometry, material };
   }
 
-  /** The model sized to the sim's drum, its foot on the slot's origin, one clone per slot. */
+  /** The model sized to the sim's barrel, its foot on the slot's origin, one clone and one mark per slot. */
   private build(source: THREE.Object3D): boolean {
     const template = source.clone(true);
     const owned = new Map<THREE.Material, THREE.Material>();
@@ -436,10 +495,36 @@ export class TurretBarrelVisual {
     const fit = new THREE.Group();
     fit.add(template);
     fit.scale.setScalar(TURRET_EXPLOSIVE_BARREL.height / size.y);
+    const mark = this.mintMark();
+    if (!mark) return false;
     this.slots.forEach((slot, i) => {
       slot.root.add(i === 0 ? fit : fit.clone(true));
+      const painted = new THREE.Mesh(mark.geometry, mark.material);
+      painted.name = `${TURRET_BARREL_MATERIAL_PREFIX}mark`;
+      painted.castShadow = false;
+      painted.receiveShadow = true;
+      slot.root.add(painted);
     });
     return true;
+  }
+
+  /** The shield and wick geometry, the flame mark's texture and its material on the keg's own surface family; null when the geometry cannot be built. */
+  private mintMark(): Mark | null {
+    const geometry = kegMarkGeometry();
+    if (!geometry) return null;
+    const n = TURRET_KEG_MARK.texels;
+    const texture = new THREE.DataTexture(kegMarkTexels(), n, n * 2);
+    texture.name = `${TURRET_BARREL_MATERIAL_PREFIX}mark`;
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.magFilter = THREE.LinearFilter;
+    texture.minFilter = THREE.LinearMipmapLinearFilter;
+    texture.generateMipmaps = true;
+    texture.needsUpdate = true;
+    const material = kegSurface(new THREE.Color(0xffffff), texture, 0.85);
+    material.name = `${TURRET_BARREL_MATERIAL_PREFIX}mark`;
+    const mark = { geometry, material, texture };
+    this.mark = mark;
+    return mark;
   }
 
   private launchShards(ev: BarrelBlast, time: number): void {
@@ -461,7 +546,11 @@ export class TurretBarrelVisual {
         this.groundAt,
       );
       if (shard.shade < 0.1) this.color.copy(LID);
-      else this.color.copy(SOOT).lerp(PAINT, shard.shade);
+      else if (shard.shade < TURRET_SHARD_BAND_SHADE) this.color.copy(BAND);
+      else {
+        const k = (shard.shade - TURRET_SHARD_BAND_SHADE) / (1 - TURRET_SHARD_BAND_SHADE);
+        this.color.copy(STAVE_DARK).lerp(STAVE_LIGHT, k);
+      }
       shards.mesh.setColorAt(s * per + i, this.color);
     }
     for (let i = count; i < per; i++) shards.mesh.setMatrixAt(s * per + i, ZERO);
@@ -509,16 +598,78 @@ export class TurretBarrelVisual {
 /** The kit's palette atlas on this tier's surface family, dielectric like the tower's. */
 function barrelMaterial(source: THREE.Material): THREE.Material {
   const s = source as THREE.MeshStandardMaterial;
-  const color = s.color?.clone() ?? new THREE.Color(0xffffff);
-  const map = s.map ?? null;
-  const material = GFX.standardMaterials
-    ? new THREE.MeshStandardMaterial({
-        color,
-        map,
-        roughness: s.isMeshStandardMaterial ? s.roughness : 0.8,
-        metalness: 0,
-      })
-    : new THREE.MeshLambertMaterial({ color, map });
+  const material = kegSurface(
+    s.color?.clone() ?? new THREE.Color(0xffffff),
+    s.map ?? null,
+    s.isMeshStandardMaterial ? s.roughness : 0.8,
+  );
   material.name = `${TURRET_BARREL_MATERIAL_PREFIX}${s.name || 'surface'}`;
   return material;
+}
+
+function kegSurface(
+  color: THREE.Color,
+  map: THREE.Texture | null,
+  roughness: number,
+): THREE.MeshStandardMaterial | THREE.MeshLambertMaterial {
+  return GFX.standardMaterials
+    ? new THREE.MeshStandardMaterial({ color, map, roughness, metalness: 0 })
+    : new THREE.MeshLambertMaterial({ color, map });
+}
+
+/**
+ * The painted shield, a polygon just off its facet whose outline is the
+ * texture's own, and the wick's cord rising from the bung, in the keg's frame
+ * (yd, before its yaw) with the mark texture's uvs: one geometry.
+ */
+function kegMarkGeometry(): THREE.BufferGeometry | null {
+  const f = TURRET_KEG_MARK_FRAME;
+  const half = f.width / 2;
+  const outline = turretKegShieldOutline(SHIELD_ARC_STEPS);
+  const count = outline.length / 2;
+  const position = new Float32Array((count + 1) * 3);
+  const normal = new Float32Array((count + 1) * 3);
+  const uv = new Float32Array((count + 1) * 2);
+  const v0 = TURRET_KEG_MARK.markBottom;
+  const put = (i: number, x: number, y: number): void => {
+    position[i * 3] = f.normalX * f.offset + f.sideX * x * half;
+    position[i * 3 + 1] = f.centreY + y * half;
+    position[i * 3 + 2] = f.normalZ * f.offset + f.sideZ * x * half;
+    normal[i * 3] = f.normalX;
+    normal[i * 3 + 2] = f.normalZ;
+    uv[i * 2] = (x + 1) / 2;
+    uv[i * 2 + 1] = v0 + ((1 - v0) * (y / TURRET_KEG_SHIELD_ASPECT + 1)) / 2;
+  };
+  put(0, 0, 0);
+  for (let i = 0; i < count; i++) put(i + 1, outline[i * 2], outline[i * 2 + 1]);
+  const index: number[] = [];
+  for (let i = 0; i < count; i++) index.push(0, 1 + i, 1 + ((i + 1) % count));
+  const shield = new THREE.BufferGeometry();
+  shield.setAttribute('position', new THREE.BufferAttribute(position, 3));
+  shield.setAttribute('normal', new THREE.BufferAttribute(normal, 3));
+  shield.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  shield.setIndex(index);
+  const points: THREE.Vector3[] = [];
+  const p: TurretKegPoint = { x: 0, y: 0, z: 0 };
+  for (let i = 0; i < WICK_POINTS; i++) {
+    turretKegWickInto(p, i / (WICK_POINTS - 1));
+    points.push(new THREE.Vector3(p.x, p.y, p.z));
+  }
+  const wick = new THREE.TubeGeometry(
+    new THREE.CatmullRomCurve3(points),
+    8,
+    TURRET_KEG_WICK.radius,
+    5,
+    false,
+  );
+  // The cord samples the strip along the texture's bottom.
+  const wickUv = wick.getAttribute('uv');
+  for (let i = 0; i < wickUv.count; i++) {
+    wickUv.setY(i, wickUv.getY(i) * TURRET_KEG_MARK.wickTop);
+  }
+  const merged = mergeGeometries([shield, wick]);
+  shield.dispose();
+  wick.dispose();
+  if (merged) merged.name = `${TURRET_BARREL_MATERIAL_PREFIX}mark`;
+  return merged;
 }

@@ -119,7 +119,7 @@ const GATE_CALL_SITES: readonly {
     marker: 'attachSceneGroupGated(',
   },
   {
-    // The Fire and Fly barrels: one gated attach helper for the shards and the drums.
+    // The Fire and Fly barrels: one gated attach helper for the shards and the kegs.
     gate: 'attachSceneGroupGated',
     file: 'src/render/turret_barrel_visual.ts',
     marker: 'attachSceneGroupGated(',
