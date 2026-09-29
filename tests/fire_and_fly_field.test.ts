@@ -16,6 +16,7 @@ import {
   FIRE_AND_FLY_DUNGEON_DEFS,
   FIRE_AND_FLY_DUNGEON_ID,
 } from '../src/sim/content/fire_and_fly_arena';
+import { TURRET_ARENA, TURRET_SIZE_CLASSES } from '../src/sim/content/turret_defense';
 import {
   DUNGEON_FLOOR_Y,
   DUNGEON_LIST,
@@ -263,11 +264,22 @@ describe('the Fire and Fly dressing and walls', () => {
       expect(d).toBeGreaterThan(20);
       if (d < FIRE_AND_FLY_TREE_RING.inner) expect(c.standable).toBe(true);
     }
+  });
+
+  it('sets the rocks at the forest edge, out of every lane in from the spawn ring, clear of the trunks', () => {
     expect(FIRE_AND_FLY_ROCKS.length).toBeGreaterThanOrEqual(5);
+    const widest = Math.max(...Object.values(TURRET_SIZE_CLASSES).map((c) => c.radius));
     for (const rock of FIRE_AND_FLY_ROCKS) {
       const d = Math.hypot(rock.x, rock.z);
-      expect(d).toBeGreaterThan(20);
-      expect(d).toBeLessThan(FIRE_AND_FLY_CLEARING_RADIUS);
+      expect(d).toBeGreaterThanOrEqual(50);
+      expect(d).toBeLessThanOrEqual(58);
+      // Marchers walk straight in from the spawn ring, so a rock wholly beyond it
+      // by more than the widest body is never in a lane.
+      expect(d - rock.radius).toBeGreaterThan(TURRET_ARENA.spawnRadius + widest);
+      for (const tree of FIRE_AND_FLY_TREES) {
+        const gap = Math.hypot(tree.x - rock.x, tree.z - rock.z) - rock.radius;
+        expect(gap - fireAndFlyTrunkRadius(tree)).toBeGreaterThan(1);
+      }
     }
   });
 

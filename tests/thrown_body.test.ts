@@ -105,10 +105,10 @@ describe('launch velocity', () => {
 
 describe('core-hit throw tuning on flat ground', () => {
   const targets: Record<TurretSizeClass, { distance: number; peak?: number }> = {
-    small: { distance: 30, peak: 8 },
-    medium: { distance: 22 },
-    large: { distance: 15 },
-    huge: { distance: 11, peak: 3 },
+    small: { distance: 24, peak: 6.4 },
+    medium: { distance: 17.5 },
+    large: { distance: 11.5 },
+    huge: { distance: 8.8, peak: 2.35 },
   };
   const firstContact = (size: TurretSizeClass) => {
     const { seg } = coreThrow(size);

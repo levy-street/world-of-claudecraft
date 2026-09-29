@@ -9,7 +9,7 @@ import {
 import { FIRE_AND_FLY_DUNGEON_ID } from '../src/sim/content/fire_and_fly_arena';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { DEFAULT_MOUNT } from '../src/sim/content/mounts';
-import { TURRET_TIMING } from '../src/sim/content/turret_defense';
+import { TURRET_BOWLING, TURRET_TIMING } from '../src/sim/content/turret_defense';
 import { NORTH_WATCH_CANNON } from '../src/sim/content/vehicle_stations';
 import {
   DUNGEONS,
@@ -22,6 +22,7 @@ import {
 } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import {
+  FIRE_AND_FLY_ROCKS,
   FIRE_AND_FLY_TOWER,
   FIRE_AND_FLY_TREES,
   fireAndFlyTrunkRadius,
@@ -33,7 +34,12 @@ import {
   markInstanceClaimed,
 } from '../src/sim/instances/dungeons';
 import { positionAt } from '../src/sim/minigames/thrown_body';
-import type { TurretEvent } from '../src/sim/minigames/turret_defense';
+import {
+  createTurretDefense,
+  fireTurret,
+  type TurretEvent,
+  tickTurretDefense,
+} from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { turretSessionSeed } from '../src/sim/minigames/turret_defense_rng';
 import {
@@ -58,7 +64,7 @@ import { isArenaQueued } from '../src/sim/social/arena';
 import { endBgMatch, startBgMatch } from '../src/sim/social/battleground';
 import { RES_HP_FRACTION } from '../src/sim/spirit';
 import { claimTurretArena } from '../src/sim/turret_arena_session';
-import { turretWorldProbe } from '../src/sim/turret_defense_session';
+import { type TurretDefenseView, turretWorldProbe } from '../src/sim/turret_defense_session';
 import {
   type Entity,
   GATHER_CAST_ID,
@@ -133,15 +139,16 @@ function logTexts(events: readonly SimEvent[]): string[] {
   return events.flatMap((e) => (e.type === 'log' && typeof e.text === 'string' ? [e.text] : []));
 }
 
-function nearestLive(world: IWorldVehicles, tick: number): { x: number; z: number } | null {
-  const view = world.turretSession;
-  if (!view) return null;
+function nearestLive(
+  defense: Pick<TurretDefenseView, 'cx' | 'cz' | 'monsters'>,
+  tick: number,
+): { x: number; z: number } | null {
   let best: { x: number; z: number } | null = null;
   let bestD = Number.POSITIVE_INFINITY;
-  for (const m of view.defense.monsters) {
+  for (const m of defense.monsters) {
     if (m.hp <= 0) continue;
     const p = positionAt(m.seg, tick, ground);
-    const d = Math.hypot(p.x - view.defense.cx, p.z - view.defense.cz);
+    const d = Math.hypot(p.x - defense.cx, p.z - defense.cz);
     if (d < bestD) {
       bestD = d;
       best = p;
@@ -155,7 +162,7 @@ function aimOnce(sim: Sim): void {
   const world: IWorldVehicles = sim;
   const view = world.turretSession;
   if (!view || sim.tickCount < view.defense.readyTick) return;
-  const target = nearestLive(world, sim.tickCount);
+  const target = nearestLive(view.defense, sim.tickCount);
   if (target) world.useVehicleAction('turret_fire', target);
 }
 
@@ -1108,7 +1115,7 @@ describe('the world probe', () => {
     expect(cross(g + 2.5)).toEqual({ x: to.x, z: to.z, blocked: false });
   });
 
-  it('binds the arena: its field ground, the tower up to its roof, and the trunks at any height', () => {
+  it('binds the arena: its field ground, the tower up to its roof, the rocks and the trunks', () => {
     const center = instanceOrigin(ARENA_INDEX, 2);
     expect(probe.ground(center.x + 30, center.z - 12)).toBe(
       groundHeight(center.x + 30, center.z - 12, WORLD_SEED),
@@ -1134,6 +1141,22 @@ describe('the world probe', () => {
       expect(Math.hypot(hit.x - tx, hit.z - tz)).toBeGreaterThanOrEqual(
         fireAndFlyTrunkRadius(tree) + 0.5 - 1e-6,
       );
+    }
+    // A body thrown out past the spawn ring meets a rock low and clears it high.
+    for (const rock of FIRE_AND_FLY_ROCKS) {
+      const d = Math.hypot(rock.x, rock.z);
+      const at = (r: number) => ({
+        x: center.x + (rock.x / d) * r,
+        z: center.z + (rock.z / d) * r,
+      });
+      const from = at(d - 6);
+      const to = at(d + 2);
+      const g = probe.ground(center.x + rock.x, center.z + rock.z);
+      const outward = (feet: number) => probe.sweep!(from.x, from.z, to.x, to.z, 0.5, feet, feet);
+      const low = outward(g);
+      expect(low.blocked).toBe(true);
+      expect(Math.hypot(low.x - from.x, low.z - from.z)).toBeCloseTo(6 - rock.radius - 0.5, 6);
+      expect(outward(g + rock.height + 0.3)).toEqual({ x: to.x, z: to.z, blocked: false });
     }
   });
 });
@@ -1241,7 +1264,7 @@ describe('a headless run in the arena', () => {
     const waves = run.events.filter((e) => e.type === 'waveCleared').length;
     expect(waves).toBe(resolveTurretPlan().waves.length);
     expect(sim.turretSession?.defense.integrity).toBeGreaterThan(0);
-    expect(sim.turretSession?.defense.stats.bowled).toBeGreaterThan(0);
+    expect(sim.turretSession?.defense.plan.bowling).toEqual(TURRET_BOWLING);
     for (let i = 0; i < 40; i++) sim.tick();
     expect(meta.vehicle?.kind).toBe('turret');
     expect(sim.turretSession?.defense.phase).toBe('won');
@@ -1251,6 +1274,28 @@ describe('a headless run in the arena', () => {
     expect(player.pos).toEqual(before);
     expect(player.mountKey).toBe(DEFAULT_MOUNT);
     expect(arenaClaims(sim)).toEqual([]);
+  });
+
+  // playOut's nearest-first aimer rarely knocks a body over here (0 or 1 a run),
+  // so the knock rate on the arena's real ground, tower, rocks and trunks is
+  // pinned on a looser aimer that throws bodies into the crowd.
+  it('a looser aimer throws bodies into others on the arena ground, run after run', () => {
+    const probe = turretWorldProbe(WORLD_SEED);
+    const center = instanceOrigin(ARENA_INDEX, 0);
+    for (const seed of [42, 21, 99]) {
+      const state = createTurretDefense(resolveTurretPlan(), center, seed, 0);
+      let launches = 0;
+      for (let t = 1; t <= RUN_BOUND && state.phase !== 'won' && state.phase !== 'lost'; t++) {
+        for (const e of tickTurretDefense(state, t, probe)) if (e.type === 'launched') launches++;
+        const target = t >= state.readyTick + 16 ? nearestLive(state, t) : null;
+        if (!target) continue;
+        const off = (k: number) => ((t * k) % 400) / 100 - 2;
+        fireTurret(state, t, target.x + off(7919), target.z + off(104729), probe);
+      }
+      expect(state.phase).toBe('won');
+      expect(state.stats.bowled).toBeGreaterThanOrEqual(10);
+      expect(state.stats.bowled).toBeLessThanOrEqual(0.15 * launches);
+    }
   });
 
   it('a run that never fires loses, bounded', () => {

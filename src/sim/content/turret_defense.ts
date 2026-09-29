@@ -104,9 +104,9 @@ export const TURRET_WEAPON = {
   blastRadius: 6,
   blastCore: 1.5,
   /** Horizontal launch speed of a core hit on mass 1 (yd/s), scaled by falloff / mass^massExponent. */
-  push: 20.5,
+  push: 18.34,
   /** Vertical launch speed of a core hit on mass 1 (yd/s), scaled the same way. */
-  pop: 21.9,
+  pop: 19.59,
   /** A cube root: on flat ground a yeti still flies about a third as far as a wolf. */
   massExponent: 1 / 3,
   /** Random spread of the throw direction, either side (radians). */
@@ -134,10 +134,15 @@ export const TURRET_BOWLING: Readonly<TurretBowlingDef> = {
   lyingHeight: 0.35,
 };
 
+const STRIKE_MARGIN = 0.4;
+
 export const TURRET_ARENA = {
   spawnRadius: 46,
-  /** A monster stops at breachRadius + its body radius from the center and winds up. */
-  breachRadius: 3.5,
+  /**
+   * A monster stops at breachRadius + its body radius from the center and winds
+   * up: a small margin off the tower's wall, so it strikes in contact.
+   */
+  breachRadius: FIRE_AND_FLY_TOWER.radius + STRIKE_MARGIN,
   /** The cannon tower's body: a flight below its parapet reflects off it, a skid stops against it. */
   turretRadius: FIRE_AND_FLY_TOWER.radius,
   turretHeight: FIRE_AND_FLY_TOWER.topY,

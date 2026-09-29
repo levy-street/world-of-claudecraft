@@ -78,12 +78,15 @@ export interface FireAndFlyTree {
 }
 
 const ROCK_COUNT = 7;
+// The forest edge, behind the 46 yd spawn ring: marchers never cross a rock on
+// their way in, while a body thrown far out still meets one.
+const ROCK_RING = { inner: 50, span: 8 } as const;
 
 export const FIRE_AND_FLY_ROCKS: readonly FireAndFlyRock[] = Array.from(
   { length: ROCK_COUNT },
   (_, i) => {
     const angle = ((i + 0.2 + 0.6 * unit(i, 1)) * 2 * Math.PI) / ROCK_COUNT + 0.4;
-    const r = 24 + 26 * unit(i, 2);
+    const r = ROCK_RING.inner + ROCK_RING.span * unit(i, 2);
     const scale = 1.4 + 0.8 * unit(i, 3);
     return {
       x: Math.sin(angle) * r,

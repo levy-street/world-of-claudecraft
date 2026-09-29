@@ -169,13 +169,13 @@ describe('tuning constants in ticks and yards', () => {
   it('pins the arena, the tower body and the blast geometry', () => {
     expect(TURRET_ARENA).toEqual({
       spawnRadius: 46,
-      breachRadius: 3.5,
+      breachRadius: FIRE_AND_FLY_TOWER.radius + 0.4,
       turretRadius: FIRE_AND_FLY_TOWER.radius,
       turretHeight: FIRE_AND_FLY_TOWER.topY,
     });
     expect(TURRET_ARENA.turretRadius).toBeCloseTo(1.904, 9);
     expect(TURRET_ARENA.turretHeight).toBeCloseTo(5.1, 9);
-    expect(TURRET_ARENA.breachRadius).toBeGreaterThan(TURRET_ARENA.turretRadius);
+    expect(TURRET_ARENA.breachRadius).toBeCloseTo(2.304, 9);
     expect(TURRET_WEAPON).toEqual({
       cooldownTicks: 9,
       minRange: 2,
@@ -185,8 +185,8 @@ describe('tuning constants in ticks and yards', () => {
       maxFlightTicks: 18,
       blastRadius: 6,
       blastCore: 1.5,
-      push: 20.5,
-      pop: 21.9,
+      push: 18.34,
+      pop: 19.59,
       massExponent: 1 / 3,
       deviation: Math.PI / 12,
       deadCenter: 0.05,

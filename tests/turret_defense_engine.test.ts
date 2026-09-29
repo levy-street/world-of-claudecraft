@@ -300,6 +300,17 @@ describe('march and windup', () => {
     const p = positionAt(m.seg, state.tick, flat);
     expect(Math.hypot(p.x, p.z)).toBeCloseTo(TURRET_ARENA.breachRadius + k.radius, 9);
   });
+
+  it('strikes in contact: every size winds up 0.4 yd off the tower wall, body edge to wall', () => {
+    for (const size of Object.keys(TURRET_SIZE_CLASSES) as TurretSizeClass[]) {
+      const k = kind(size, 50);
+      const { state, m } = oneMonster(k);
+      run(state, Math.ceil(m.seg.end));
+      expect(m.state).toBe('windup');
+      const p = positionAt(m.seg, state.tick, flat);
+      expect(Math.hypot(p.x, p.z) - k.radius - TURRET_ARENA.turretRadius).toBeCloseTo(0.4, 9);
+    }
+  });
 });
 
 describe('the shot', () => {
@@ -494,8 +505,8 @@ describe('the throw', () => {
     const at = (s: string) => seen.find((x) => x.state === s)?.tick ?? 0;
     expect(at('rise') - at('down')).toBe(TURRET_TIMING.downTicks);
     expect(at('march') - at('rise')).toBe(TURRET_TIMING.riseTicks);
-    expect(state.stats.longestThrow).toBeGreaterThan(30 * 0.85);
-    expect(state.stats.longestThrow).toBeLessThan(30 * 1.15);
+    expect(state.stats.longestThrow).toBeGreaterThan(24 * 0.85);
+    expect(state.stats.longestThrow).toBeLessThan(24 * 1.15);
     expect(state.stats.longestAirtime).toBeCloseTo((first.end - first.start) * 0.05, 12);
     const from = positionAt(m.seg, m.seg.start, flat);
     const toCenter = Math.atan2(-from.x, -from.z);
@@ -863,6 +874,29 @@ describe('the tower body', () => {
     const rest = positionAt(m.seg, state.tick, flat);
     expect(rest.x).toBeCloseTo(0, 9);
     expect(rest.z).toBeCloseTo(turretStrikeDistance(k), 9);
+    expect(rest.z - stop.z).toBeCloseTo(0.4, 6);
+  });
+
+  it('rests a body landing just outside the strike ring where it lands', () => {
+    const k = kind('large', 10000);
+    const { state, m } = oneMonster(k);
+    const at = turretStrikeDistance(k) + 0.3;
+    m.state = 'fly';
+    m.seg = planFlight(
+      state.tick,
+      at,
+      0.4,
+      0,
+      { x: 0, y: 0, z: 0 },
+      k.radius,
+      flat,
+      TURRET_PHYSICS,
+    );
+    const { seen } = statesUntil(state, m, 10);
+    expect(seen.map((s) => s.state)).toEqual(['fly', 'down']);
+    const rest = positionAt(m.seg, state.tick, flat);
+    expect(rest.x).toBeCloseTo(at, 9);
+    expect(rest.z).toBeCloseTo(0, 9);
   });
 
   it('never lets a body rest inside the tower footprint: it is placed on the strike radius on its bearing', () => {
@@ -916,6 +950,7 @@ describe('the breach', () => {
     const k = kind('large', 400);
     const { state, m } = atWindup(k);
     const at = positionAt(m.seg, state.tick, flat);
+    expect(Math.hypot(at.x, at.z)).toBeCloseTo(TURRET_ARENA.turretRadius + 0.4 + k.radius, 9);
     m.hp = 150;
     const start = state.tick;
     const events = run(state, start + TURRET_TIMING.windupTicks);
