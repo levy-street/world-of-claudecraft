@@ -4827,20 +4827,48 @@ const NPC_KEYS: Record<string, string> = {
   huntsman_deral: 'npc_scout',
 };
 
+const MOB_FALLBACK_KEY = 'mob_bandit';
+
 export function visualKeyFor(e: Entity): string {
   if (e.kind === 'player') {
     if (isMechWearer(e)) return 'player_mech';
     return VISUALS[`player_${e.templateId}`] ? `player_${e.templateId}` : 'player_warrior';
   }
-  if (e.kind === 'mob') {
-    const override = MOB_KEYS[e.templateId];
-    if (override) return override;
-    const family = MOBS[e.templateId]?.family;
-    return (family && FAMILY_KEYS[family]) || 'mob_bandit';
-  }
+  if (e.kind === 'mob') return mobVisualKeyFor(e.templateId);
   // npcs — Brother Aldric recurs in every hub under suffixed ids
   if (e.templateId.startsWith('brother_aldric')) return 'npc_aldric';
   return NPC_KEYS[e.templateId] ?? 'npc_villager';
+}
+
+/** The mob arm of visualKeyFor, by template id alone. */
+export function mobVisualKeyFor(templateId: string): string {
+  const override = MOB_KEYS[templateId];
+  if (override) return override;
+  const family = MOBS[templateId]?.family;
+  return (family && FAMILY_KEYS[family]) || MOB_FALLBACK_KEY;
+}
+
+/** Every template id the mob dispatch names, including transient templates
+ *  that have no MOBS row (the Packlord Stampede guardians). */
+export function mobKeyTemplateIds(): string[] {
+  return Object.keys(MOB_KEYS);
+}
+
+/** The visual keys the dispatch reaches WITHOUT naming a mob template: the
+ *  family and global mob fallbacks and every NPC route (the table plus the two
+ *  defaults visualKeyFor returns). Any entity no content table describes can
+ *  land on one of these, so no content-derived class of keys
+ *  (rift_body_stream_core.ts) may ever claim them. */
+export function fallbackVisualKeys(): string[] {
+  return [
+    ...new Set([
+      ...Object.values(FAMILY_KEYS),
+      MOB_FALLBACK_KEY,
+      ...Object.values(NPC_KEYS),
+      'npc_villager',
+      'npc_aldric',
+    ]),
+  ];
 }
 
 /** Held-weapon layout override for the class-agnostic Combat Mech body. The mech

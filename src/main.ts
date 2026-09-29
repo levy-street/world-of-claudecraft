@@ -351,6 +351,7 @@ import {
   charactersReady,
   ensureCharacterUrl,
   modularCacheStats,
+  pollRiftCharacterStream,
   preloadMechAssets,
   startStreamedCharacterPreloads,
 } from './render/characters/assets';
@@ -4209,6 +4210,7 @@ async function startGame(
     }
     maybeWarmCurrentZone();
     maybeWarmFerryDestination();
+    pollRiftCharacterStream(world);
     const elapsedFrameDt = (now - last) / 1000;
     let frameDt = elapsedFrameDt;
     last = now;

@@ -27,7 +27,17 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   delayed, backed-off retry loop, so a transient failure anywhere else on the
   site can never permanently blank the landing character-creation preview
   (`src/main.ts` awaits it there instead of `assetsReady()`;
-  `tests/character_preview_boot.test.ts`).
+  `tests/character_preview_boot.test.ts`). Which GLBs leave that gate is
+  `rift_body_stream_core.ts` `characterStreamPlan`: on the iOS memory profile
+  every creature body streams, the overworld ones right after first paint and
+  the Rift-only ones (derived from the Rift and Buried Hoard templates, never a
+  file name) in two paced lanes (`RiftBodyLanes`: the Rift lane a natural Rift
+  needs, the hoard lane only a Buried Hoard needs) that `RiftBodyStreamTrigger`
+  opens on a read treasure map, a reachable entrance, or the player inside;
+  every other profile gates them all. The client loop polls it through
+  `pollRiftCharacterStream`. `tests/ios_rift_body_stream.test.ts` pins the class,
+  the lanes, the pacing, and the on-disk budget of the iOS post-entry creature
+  stream.
 - `armor_dye.ts`: the outfit-colorway dye shader layer (`attachArmorDye`, plus
   `reapplyArmorDyeToClone` for the clone path). Its own leaf module because
   `../material_clone_hooks.ts` must re-attach it on every program-preserving

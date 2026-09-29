@@ -97,6 +97,12 @@ import {
   createPaladinTemplarsVerdictClip,
   PALADIN_TEMPLARS_VERDICT_CLIP,
 } from './paladin_templars_verdict_clip';
+import {
+  characterStreamPlan,
+  RiftBodyLanes,
+  RiftBodyStreamTrigger,
+  type RiftBodyStreamWorld,
+} from './rift_body_stream_core';
 import { animatedNodeNames, mergeSkinnedParts } from './rig_merge';
 import { shareRigSkeleton } from './rig_shared_skeleton';
 import { attachSharedDepthMaterials, clearSharedDepthMaterials } from './shadow_depth_materials';
@@ -565,8 +571,9 @@ function assetUrl(url: string): string {
 // world entry crashes (the character-side twin of the v0.16.0 props P0).
 const allPreloadUrls = characterPreloadUrls(false);
 
-// Every iOS WebKit host carves the mob bodies out of the boot gate and STREAMS
-// them after first frame instead. They are the
+// Every iOS WebKit host carves the mob bodies (rift_body_stream_core.ts
+// STREAMED_BODY_URL_PREFIXES) out of the boot gate and STREAMS them after first
+// frame instead. They are the
 // heaviest character content (creature + skeleton-family GLBs with embedded
 // 1024-class atlases; 47 files, and by far the largest share of the decoded
 // character residency) and nothing on the launcher, the character-select
@@ -580,7 +587,9 @@ const allPreloadUrls = characterPreloadUrls(false);
 // and click target do not exist. Weapons and NPC bodies also stay in the gate:
 // the char-select preview builds CharacterVisual DIRECTLY (not through the
 // fail-soft factory), so a missing held-weapon GLB there would throw.
-const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/'];
+// The Rift-only share of those bodies does not ride the post-entry stream at
+// all: it waits for a reachable Rift or Buried Hoard (rift_body_stream_core.ts,
+// the lanes, their pacing, the trigger and why).
 // Armory weapon-SKIN models stay out of the gate too (64 of the 78 weapon
 // files), but remain on demand instead of joining the bulk post-entry stream.
 // They are cosmetic replacements for base weapons that always stay in the
@@ -595,17 +604,11 @@ const streamedSkinUrls = new Set(weaponSkinModelUrls());
 export function isWeaponSkinModelUrl(url: string): boolean {
   return streamedSkinUrls.has(url);
 }
-function streamedCharacterUrlsFor(profile: Readonly<GfxSettings>): string[] {
-  return allPreloadUrls.filter(
-    (url) =>
-      streamedSkinUrls.has(url) ||
-      (profile.iosMemoryProfile && STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix))),
-  );
+function streamPlanFor(profile: Readonly<GfxSettings>) {
+  return characterStreamPlan(allPreloadUrls, streamedSkinUrls, profile.iosMemoryProfile);
 }
-function postEntryStreamUrlsFor(urls: readonly string[]): string[] {
-  return urls.filter((url) => STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix)));
-}
-let streamedUrls = streamedCharacterUrlsFor(GFX);
+const initialStreamPlan = streamPlanFor(GFX);
+let streamedUrls = initialStreamPlan.streamed;
 let streamedUrlSet = new Set(streamedUrls);
 const lazyOnDemandUrls = new Set(
   Object.values(VISUALS).flatMap((def) =>
@@ -614,7 +617,7 @@ const lazyOnDemandUrls = new Set(
       : [],
   ),
 );
-let postEntryStreamUrls = postEntryStreamUrlsFor(streamedUrls);
+let postEntryStreamUrls = initialStreamPlan.postEntry;
 const preloadUrls = allPreloadUrls.filter((url) => !streamedUrlSet.has(url));
 const characterLoadTasks = new Map<string, Promise<void>>();
 type CharacterAssetReadyListener = (url: string) => void;
@@ -703,6 +706,28 @@ export function startStreamedCharacterPreloads(): number {
   return postEntryStreamUrls.length;
 }
 
+// The Rift-only bodies ride their own paced lanes (rift_body_stream_core.ts has
+// the class, the pacing and the trigger); every other profile's lanes are empty.
+const riftLanes = new RiftBodyLanes({
+  fetch: prepareCharacterUrl,
+  postEntryStarted: () => streamedStarted,
+  onLaneStart: (lane, count) => {
+    console.info(`[entry-guard] streaming ${count} ${lane} character assets`);
+  },
+});
+riftLanes.setUrls(initialStreamPlan.rift, initialStreamPlan.hoard);
+const riftTrigger = new RiftBodyStreamTrigger(riftLanes);
+
+/**
+ * Poll the Rift lanes once per frame (the client loop, src/main.ts). A body
+ * fetched here still reaches the screen through the live compile gate at its
+ * first view, and a view that asks early re-arms its own fetch through the
+ * build-miss path (resolvedGltf), like every streamed body.
+ */
+export function pollRiftCharacterStream(world: RiftBodyStreamWorld): void {
+  riftTrigger.update(world);
+}
+
 // Skin textures: player alternate body atlases, loaded sRGB + flipY=false so
 // they line up with the glTF-embedded UVs. These load on every tier so skin
 // selection previews and cosmetics keep distinct colours even on low graphics.
@@ -757,7 +782,8 @@ if (eagerSkinAtlases) {
 
 /** Prepare character sources and cosmetic atlases selected by an explicit target profile. */
 export async function prepareCharacterProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
-  const nextStreamedUrls = streamedCharacterUrlsFor(target);
+  const nextPlan = streamPlanFor(target);
+  const nextStreamedUrls = nextPlan.streamed;
   const nextStreamedSet = new Set(nextStreamedUrls);
   const requiredGltf = manifestUrlsForGraphics(target.standardMaterials).filter(
     (url) => !nextStreamedSet.has(url),
@@ -767,7 +793,8 @@ export async function prepareCharacterProfileAssets(target: Readonly<GfxSettings
   if (nextSignature !== streamedUrls.join('|')) streamedStarted = false;
   streamedUrls = nextStreamedUrls;
   streamedUrlSet = nextStreamedSet;
-  postEntryStreamUrls = postEntryStreamUrlsFor(nextStreamedUrls);
+  postEntryStreamUrls = nextPlan.postEntry;
+  riftLanes.setUrls(nextPlan.rift, nextPlan.hoard);
 }
 
 /** Resolve once every boot-time character GLB + skin atlas is cached, retrying
