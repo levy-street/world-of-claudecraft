@@ -185,6 +185,7 @@ describe('tuning constants in ticks and yards', () => {
       maxFlightTicks: 18,
       blastRadius: 6,
       blastCore: 1.5,
+      grazeFalloff: 0.2,
       push: 18.34,
       pop: 19.59,
       massExponent: 1 / 3,

@@ -22,6 +22,7 @@ import {
   fireTurret,
   type TurretDefenseState,
   type TurretEvent,
+  type TurretHit,
   type TurretMonster,
   tickTurretDefense,
   turretBreachPoints,
@@ -808,6 +809,155 @@ describe('the throw', () => {
     expect(bad).toEqual([]);
     expect(state.stats.hits).toBeGreaterThan(20);
     expect(flying).toBeGreaterThan(100);
+  });
+});
+
+describe('grazing hits', () => {
+  const { blastCore, blastRadius, grazeFalloff } = TURRET_WEAPON;
+  /** How far from the blast point a body takes exactly this falloff. */
+  const reachOf = (falloff: number) => blastCore + (1 - falloff) * (blastRadius - blastCore);
+  const GRAZE = reachOf(0.19);
+  // A hair inside the threshold reach, so float rounding cannot read it as a graze.
+  const THRESHOLD = reachOf(grazeFalloff) - 1e-9;
+
+  type Pose = 'march' | 'windup' | 'down' | 'rise' | 'fly';
+  function posed(k: TurretKind, pose: Pose) {
+    const { state, m } = oneMonster(k);
+    const at = { x: 0, y: 0, z: 20 };
+    m.state = pose;
+    if (pose === 'march') m.seg = marchSegment(state.tick, 0, 0, 20, 0, 0, 4.4, 2);
+    if (pose === 'windup') m.seg = stillSegment(state.tick - 2, TURRET_TIMING.windupTicks, at);
+    if (pose === 'down') m.seg = stillSegment(state.tick - 5, TURRET_TIMING.downTicks, at);
+    if (pose === 'rise') m.seg = stillSegment(state.tick - 3, TURRET_TIMING.riseTicks, at);
+    if (pose === 'fly') {
+      m.airSince = state.tick;
+      m.seg = planFlight(
+        state.tick,
+        0,
+        0,
+        20,
+        { x: 0, y: 12, z: 0 },
+        k.radius,
+        flat,
+        TURRET_PHYSICS,
+      );
+    }
+    return { state, m };
+  }
+
+  /** Fires so the blast lands `reach` yd beside where the body stands at the impact tick. */
+  function fireBeside(state: TurretDefenseState, m: TurretMonster, reach: number) {
+    let impact = state.tick + TURRET_WEAPON.minFlightTicks;
+    let aim = { x: 0, z: 0 };
+    for (let i = 0; i < 6; i++) {
+      const p = positionAt(m.seg, impact, flat);
+      aim = { x: p.x + reach, z: p.z };
+      impact = state.tick + turretShellFlightTicks(Math.hypot(aim.x, aim.z));
+    }
+    const shot = fireAt(state, aim.x, aim.z);
+    expect(shot.impactTick).toBe(impact);
+    const events = run(state, impact);
+    const impactEvent = events.find((e) => e.type === 'impact' && e.shotId === shot.id);
+    const hit = impactEvent?.type === 'impact' ? impactEvent.hits.find((h) => h.id === m.id) : null;
+    if (!hit) throw new Error('the blast missed');
+    return { hit, events };
+  }
+
+  it.each(['march', 'windup', 'down', 'rise', 'fly'] as const)(
+    'a %s body hit at falloff 0.19 takes its damage but keeps its action and timers',
+    (pose) => {
+      const k = kind('small', 10000);
+      const { state, m } = posed(k, pose);
+      const seg = m.seg;
+      const { hit, events } = fireBeside(state, m, GRAZE);
+      expect(hit.falloff).toBeCloseTo(0.19, 9);
+      expect(hit.damage).toBe(Math.round(60 * 0.19));
+      expect(m.hp).toBe(10000 - hit.damage);
+      expect(launchesOf(events, m.id)).toEqual([]);
+      expect(m.state).toBe(pose);
+      expect(m.seg).toBe(seg);
+      expect(state.stats.hits).toBe(1);
+    },
+  );
+
+  it.each(['march', 'windup', 'down', 'rise', 'fly'] as const)(
+    'a %s body hit at the 0.2 threshold is thrown as before',
+    (pose) => {
+      const k = kind('small', 10000);
+      const { state, m } = posed(k, pose);
+      const seg = m.seg;
+      const { hit, events } = fireBeside(state, m, THRESHOLD);
+      expect(hit.falloff).toBeGreaterThanOrEqual(grazeFalloff);
+      expect(hit.falloff).toBeCloseTo(grazeFalloff, 6);
+      expect(launchesOf(events, m.id)).toHaveLength(1);
+      expect(stateOf(m)).toBe('fly');
+      expect(m.seg).not.toBe(seg);
+    },
+  );
+
+  it('lays a body a graze kills down as a corpse where it stands; a flying one on landing', () => {
+    const walker = posed(kind('small', 5), 'march');
+    const { hit, events } = fireBeside(walker.state, walker.m, GRAZE);
+    expect(hit.falloff).toBeLessThan(grazeFalloff);
+    expect(events.filter((e) => 'id' in e && e.id === walker.m.id).map((e) => e.type)).toEqual([
+      'killed',
+    ]);
+    expect(walker.m.state).toBe('dead');
+    expect(positionAt(walker.m.seg, walker.state.tick + 20, flat)).toMatchObject({
+      x: hit.x,
+      z: hit.z,
+    });
+    expect(walker.state.stats.kills).toBe(1);
+    const later = run(walker.state, walker.state.tick + TURRET_TIMING.corpseTicks);
+    expect(later.some((e) => e.type === 'breach')).toBe(false);
+    expect(walker.state.monsters).not.toContain(walker.m);
+
+    const flyer = posed(kind('small', 5), 'fly');
+    const flight = flyer.m.seg;
+    fireBeside(flyer.state, flyer.m, GRAZE);
+    expect(flyer.m.hp).toBe(0);
+    expect(flyer.m.seg).toBe(flight);
+    run(flyer.state, flyer.state.tick + 20 * 3);
+    expect(flyer.m.state).toBe('dead');
+    expect(flyer.state.stats.kills).toBe(1);
+  });
+
+  it('lets a body lying past the maximum range get up under rim fire, then march back into range', () => {
+    const k = kind('small', 100000);
+    const { state, m } = oneMonster(k);
+    const lying = TURRET_WEAPON.maxRange + 5.5;
+    m.state = 'down';
+    m.seg = stillSegment(state.tick, TURRET_TIMING.downTicks, { x: 0, y: 0, z: lying });
+    const downAt = state.tick;
+    const grazes: TurretHit[] = [];
+    const launched: TurretEvent[] = [];
+    const seen = [{ state: 'down', tick: downAt }];
+    for (let t = downAt + 1; t < downAt + 20 * 30 && stateOf(m) !== 'windup'; t++) {
+      for (const e of tickTurretDefense(state, t, flat)) {
+        if (e.type === 'impact') grazes.push(...e.hits.filter((h) => h.id === m.id));
+        if (e.type === 'launched' && e.id === m.id) launched.push(e);
+      }
+      if (seen[seen.length - 1].state !== m.state) seen.push({ state: m.state, tick: t });
+      // Aimed at the body while it lies: the shells land clamped to the maximum range.
+      if (stateOf(m) === 'down' && t >= state.readyTick) {
+        const p = positionAt(m.seg, t, flat);
+        const shot = fireAt(state, p.x, p.z);
+        expect(Math.hypot(shot.x, shot.z)).toBeCloseTo(TURRET_WEAPON.maxRange, 9);
+      }
+    }
+    expect(launched).toEqual([]);
+    expect(grazes.length).toBeGreaterThanOrEqual(2);
+    for (const g of grazes) {
+      expect(g.falloff).toBeGreaterThan(0);
+      expect(g.falloff).toBeLessThan(grazeFalloff);
+      expect(g.damage).toBeGreaterThanOrEqual(1);
+    }
+    expect(m.hp).toBe(100000 - grazes.reduce((n, g) => n + g.damage, 0));
+    expect(seen.map((s) => s.state)).toEqual(['down', 'rise', 'march', 'windup']);
+    expect(seen[1].tick).toBe(downAt + TURRET_TIMING.downTicks);
+    expect(seen[2].tick).toBe(seen[1].tick + TURRET_TIMING.riseTicks);
+    const strike = positionAt(m.seg, state.tick, flat);
+    expect(Math.hypot(strike.x, strike.z)).toBeCloseTo(turretStrikeDistance(k), 9);
   });
 });
 

@@ -624,11 +624,12 @@ describe('the toggle', () => {
 
   // Digests of full auto-aimer runs with bowling turned off, first taken on the lot 1
   // engine before bowling existed, re-taken since with the current throw law, tuning,
-  // the cannon tower's body and its strike ring: turned off, every event (throws,
-  // bounces, kills, waves) replays them exactly.
+  // the cannon tower's body, its strike ring and the grazing rule: turned off, every
+  // event (throws, bounces, kills, waves) replays them exactly. Before the grazing
+  // rule, rim hits relaunched a body lying past the maximum range hundreds of times.
   it.each([
-    ['flat', 42, flat, 1173, '75895c32'],
-    ['hills', 21, hills, 3144, '98db3478'],
+    ['flat', 42, flat, 1116, '313311f2'],
+    ['hills', 21, hills, 1111, '268bf16a'],
   ] as const)(
     'turned off, a %s full run replays the bowling-free engine exactly',
     (_name, seed, probe, count, digest) => {
@@ -638,6 +639,13 @@ describe('the toggle', () => {
       expect(fnv(text)).toBe(digest);
       expect(r.state.phase).toBe('won');
       expect(r.state.stats.bowled).toBe(0);
+      const launches = new Map<number, number>();
+      for (const s of r.trace) {
+        const e = JSON.parse(s) as TurretEvent;
+        if (e.type === 'launched') launches.set(e.id, (launches.get(e.id) ?? 0) + 1);
+      }
+      expect(launches.size).toBeGreaterThan(0);
+      expect(Math.max(...launches.values())).toBeLessThanOrEqual(30);
     },
   );
 });

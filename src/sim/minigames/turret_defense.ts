@@ -494,7 +494,12 @@ function detonate(
     const damage = Math.max(1, Math.round(shot.damage * falloff));
     m.hp = Math.max(0, m.hp - damage);
     hits.push({ id: m.id, falloff, damage, x: p.x, y: p.y, z: p.z });
-    launch(state, m, shot, falloff, p, tick, probe, events);
+    if (falloff >= TURRET_WEAPON.grazeFalloff) {
+      launch(state, m, shot, falloff, p, tick, probe, events);
+    } else if (m.hp <= 0 && m.state !== 'fly' && m.state !== 'skid') {
+      // A flight or a slide already ends in rest(), which lays a dead body down.
+      rest(state, m, state.plan.kinds[m.kind], tick, p, probe);
+    }
     if (m.hp <= 0) {
       state.stats.kills++;
       events.push({ type: 'killed', id: m.id, x: p.x, y: p.y, z: p.z });

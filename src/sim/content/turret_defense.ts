@@ -103,6 +103,12 @@ export const TURRET_WEAPON = {
   maxFlightTicks: ticks(0.9),
   blastRadius: 6,
   blastCore: 1.5,
+  /**
+   * A hit below this falloff only grazes: full damage, but no throw and no timer
+   * restarted. Relaunching on every rim hit kept a body lying past the maximum
+   * range from ever getting up.
+   */
+  grazeFalloff: 0.2,
   /** Horizontal launch speed of a core hit on mass 1 (yd/s), scaled by falloff / mass^massExponent. */
   push: 18.34,
   /** Vertical launch speed of a core hit on mass 1 (yd/s), scaled the same way. */
