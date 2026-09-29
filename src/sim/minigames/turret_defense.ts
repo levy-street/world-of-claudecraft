@@ -10,6 +10,7 @@ import {
   TURRET_TIMING,
   TURRET_WEAPON,
 } from '../content/turret_defense';
+import { deepFreeze } from '../deep_freeze';
 import { DT, TICK_RATE, type Vec3 } from '../types';
 import {
   blastFalloff,
@@ -45,6 +46,12 @@ import {
 import { resolveTurretBowling } from './turret_bowling';
 import type { TurretKind, TurretPlan } from './turret_defense_plan';
 import { TURRET_STREAM, turretDraw } from './turret_defense_rng';
+import {
+  type TurretMedal,
+  type TurretPointsBreakdown,
+  type TurretResult,
+  turretResult,
+} from './turret_result';
 
 export type TurretPhase = 'intro' | 'wave' | 'between' | 'won' | 'lost';
 
@@ -139,6 +146,8 @@ export interface TurretDefenseState {
   /** The standing explosive barrels, lit ones included, in the order they were placed. */
   barrels: TurretBarrel[];
   stats: TurretStats;
+  /** The medal and points, set once the run ends (deep-frozen: views share it). */
+  result: TurretResult | null;
 }
 
 export interface TurretHit {
@@ -237,7 +246,14 @@ export type TurretEvent =
   | { type: 'barrelLit'; id: number; x: number; y: number; z: number; fuseTicks: number }
   | { type: 'barrelExploded'; id: number; x: number; y: number; z: number; hits: TurretHit[] }
   | { type: 'waveCleared'; wave: number }
-  | { type: 'ended'; result: 'won' | 'lost'; stats: TurretStats };
+  | {
+      type: 'ended';
+      result: 'won' | 'lost';
+      stats: TurretStats;
+      medal: TurretMedal | null;
+      points: number;
+      breakdown: TurretPointsBreakdown;
+    };
 
 export type TurretFireRefusal = 'ended' | 'cooldown' | 'invalid';
 
@@ -289,6 +305,7 @@ export function createTurretDefense(
       barrelsDetonated: 0,
       barrelKills: 0,
     },
+    result: null,
   };
 }
 
@@ -980,13 +997,26 @@ function checkWaveCleared(state: TurretDefenseState, tick: number, events: Turre
 
 function win(state: TurretDefenseState, events: TurretEvent[]): void {
   state.phase = 'won';
-  events.push({ type: 'ended', result: 'won', stats: { ...state.stats } });
+  end(state, events);
 }
 
 function lose(state: TurretDefenseState, events: TurretEvent[]): void {
   state.phase = 'lost';
   state.shots = [];
-  events.push({ type: 'ended', result: 'lost', stats: { ...state.stats } });
+  end(state, events);
+}
+
+function end(state: TurretDefenseState, events: TurretEvent[]): void {
+  const result = deepFreeze(turretResult(state.plan, state));
+  state.result = result;
+  events.push({
+    type: 'ended',
+    result: result.won ? 'won' : 'lost',
+    stats: { ...state.stats },
+    medal: result.medal,
+    points: result.points,
+    breakdown: { ...result.breakdown },
+  });
 }
 
 /** A lost session keeps every monster where it stands (mid-air included) for the result view. */

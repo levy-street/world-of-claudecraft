@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { turretPlanWireJson, turretStateWireJson } from '../server/turret_self_wire';
+import { decodeTurretPlan, decodeTurretSeat } from '../src/net/turret_session_wire';
 import {
   TURRET_SCENARIO_INTRODUCTION,
   TURRET_SCENARIO_STANDARD,
@@ -7,10 +9,12 @@ import { TURRET_TIMING } from '../src/sim/content/turret_defense';
 import { createTurretDefense, type TurretEvent } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { recordTurretFeedback, TURRET_FEEDBACK_LIMIT } from '../src/sim/minigames/turret_feedback';
+import { turretResult } from '../src/sim/minigames/turret_result';
 import { turretSessionView } from '../src/sim/turret_defense_session';
 import { TICK_RATE, type TurretSession } from '../src/sim/types';
 import {
   TURRET_INTEGRITY_ALERTS,
+  TURRET_POINT_ROWS,
   TURRET_RESULT_ROWS,
   TurretFeedbackCursor,
   TurretHudView,
@@ -59,6 +63,13 @@ const stats = {
   barrelsDetonated: 0,
   barrelKills: 0,
 };
+
+const NO_POINTS = { kills: 0, integrity: 0, kegKills: 0, bowled: 0 };
+
+function endedEvent(result: 'won' | 'lost'): TurretEvent {
+  const medal = result === 'won' ? 'bronze' : null;
+  return { type: 'ended', result, stats: { ...stats }, medal, points: 0, breakdown: NO_POINTS };
+}
 
 beforeEach(() => setLanguage('en'));
 
@@ -141,7 +152,7 @@ describe('the turret HUD view', () => {
     expect(frame.wave).toBe('Wave 2/6');
   });
 
-  it('builds the result card with every stat and the final tower once the defense ends', () => {
+  it('builds the result card with every stat, the final tower, the medal and the points', () => {
     const session = seat();
     session.defense.phase = 'won';
     session.defense.wave = 5;
@@ -152,12 +163,26 @@ describe('the turret HUD view', () => {
       kills: 55,
       longestThrow: 23.46,
       longestAirtime: 1.84,
+      barrelKills: 3,
+      bowled: 1234,
     });
+    session.defense.result = turretResult(session.defense.plan, session.defense);
     const frame = new TurretHudView().tick(turretSessionView(session), START);
     expect(frame.slot).toBe('');
     expect(frame.result).toEqual({
       won: true,
       verdict: 'Victory!',
+      scored: true,
+      medal: 'silver',
+      medalText: 'Silver medal',
+      pointRows: [
+        { label: 'Kills (55)', value: '+1,100' },
+        { label: 'Tower kept (72)', value: '+14,400' },
+        { label: 'Keg kills (3)', value: '+15' },
+        // The bonus stops under one tower point, however many bodies were bowled over.
+        { label: 'Bowled over (1,234)', value: '+184' },
+        { label: 'Total points', value: '15,699' },
+      ],
       rows: [
         { label: 'Kills', value: '55' },
         { label: 'Shots fired', value: '40' },
@@ -168,12 +193,72 @@ describe('the turret HUD view', () => {
       ],
     });
     expect(frame.result?.rows).toHaveLength(TURRET_RESULT_ROWS);
+    expect(frame.result?.pointRows).toHaveLength(TURRET_POINT_ROWS);
     const lost = seat();
     lost.defense.phase = 'lost';
+    lost.defense.integrity = 0;
+    lost.defense.stats.kills = 9;
+    lost.defense.result = turretResult(lost.defense.plan, lost.defense);
     const lostFrame = new TurretHudView().tick(turretSessionView(lost), START);
     expect(lostFrame.result?.won).toBe(false);
     expect(lostFrame.result?.verdict).toBe('The tower has fallen');
     expect(lostFrame.result?.rows[2].value).toBe('0%');
+    expect(lostFrame.result?.medal).toBeNull();
+    expect(lostFrame.result?.medalText).toBe('No medal');
+    expect(lostFrame.result?.pointRows.map((row) => row.value)).toEqual([
+      '+180',
+      '0',
+      '0',
+      '0',
+      '180',
+    ]);
+    expect(lostFrame.result?.pointRows[0].label).toBe('Kills (9)');
+    expect(lostFrame.result?.pointRows[1].label).toBe('Tower kept (0)');
+  });
+
+  it('reads the medal and the points the same off the online seat as off the offline view', () => {
+    const session = seat();
+    session.defense.phase = 'won';
+    session.defense.wave = 5;
+    session.defense.integrity = 93;
+    Object.assign(session.defense.stats, { kills: 71, barrelKills: 4, bowled: 17 });
+    session.defense.result = turretResult(session.defense.plan, session.defense);
+    const offline = turretSessionView(session);
+    const plan = decodeTurretPlan(JSON.parse(turretPlanWireJson(session.defense.plan)))!;
+    const decoded = decodeTurretSeat(JSON.parse(turretStateWireJson(session, START)), plan)!;
+    const online: TurretSessionView = { ...decoded, feedback: [] };
+    const offlineResult = structuredClone(new TurretHudView().tick(offline, START).result);
+    const onlineResult = new TurretHudView().tick(online, START).result;
+    expect(onlineResult?.scored).toBe(true);
+    expect(onlineResult?.medalText).toBe('Gold medal');
+    expect(onlineResult?.pointRows[4]).toEqual({ label: 'Total points', value: '20,057' });
+    expect(onlineResult).toEqual(offlineResult);
+  });
+
+  it('names each medal in words, for a gold, a silver and a bronze win', () => {
+    const view = new TurretHudView();
+    const medalAt = (integrity: number) => {
+      const session = seat();
+      session.defense.phase = 'won';
+      session.defense.integrity = integrity;
+      session.defense.result = turretResult(session.defense.plan, session.defense);
+      const result = view.tick(turretSessionView(session), START).result;
+      return [result?.medal, result?.medalText];
+    };
+    expect(medalAt(95)).toEqual(['gold', 'Gold medal']);
+    expect(medalAt(60)).toEqual(['silver', 'Silver medal']);
+    expect(medalAt(59)).toEqual(['bronze', 'Bronze medal']);
+  });
+
+  it('hides the medal and the points while an ended view carries no result', () => {
+    const session = seat();
+    session.defense.phase = 'won';
+    const result = new TurretHudView().tick(turretSessionView(session), START).result;
+    expect(result?.verdict).toBe('Victory!');
+    expect(result?.scored).toBe(false);
+    expect(result?.medal).toBeNull();
+    expect(result?.medalText).toBe('');
+    expect(result?.pointRows.every((row) => row.label === '' && row.value === '')).toBe(true);
   });
 
   it('holds a countdown at zero once the phase end tick has passed', () => {
@@ -287,6 +372,19 @@ describe('the turret HUD live line', () => {
     expect(breach(Math.round(max * 0.1))).toBe('Wave 2 of 6');
   });
 
+  it('speaks the medal after the verdict as a won run ends, the verdict alone on a loss', () => {
+    const ended = (phase: 'won' | 'lost', integrity: number) => {
+      const session = seat();
+      session.defense.phase = phase;
+      session.defense.integrity = integrity;
+      session.defense.result = turretResult(session.defense.plan, session.defense);
+      return new TurretHudView().tick(turretSessionView(session), START).announce;
+    };
+    expect(ended('won', 95)).toBe('Victory! Gold medal');
+    expect(ended('won', 59)).toBe('Victory! Bronze medal');
+    expect(ended('lost', 0)).toBe('The tower has fallen');
+  });
+
   it('forgets the seat on reset, so the next seat is announced again', () => {
     const view = new TurretHudView();
     const intro = `First wave in ${TURRET_TIMING.introTicks / TICK_RATE} sec`;
@@ -322,24 +420,14 @@ describe('the turret feedback cursor', () => {
   it('lets the end outrank the last wave clear it lands with', () => {
     const session = seat();
     const cursor = new TurretFeedbackCursor();
-    push(
-      session,
-      START + 10,
-      { type: 'waveCleared', wave: 5 },
-      { type: 'ended', result: 'won', stats: { ...stats } },
-    );
+    push(session, START + 10, { type: 'waveCleared', wave: 5 }, endedEvent('won'));
     expect(cursor.consume(turretSessionView(session))).toEqual({ text: 'Victory!' });
   });
 
   it('ranks a batch by event, whatever order the events arrive in', () => {
     const ended = seat();
     const cursor = new TurretFeedbackCursor();
-    push(
-      ended,
-      START + 10,
-      { type: 'ended', result: 'won', stats: { ...stats } },
-      { type: 'waveCleared', wave: 5 },
-    );
+    push(ended, START + 10, endedEvent('won'), { type: 'waveCleared', wave: 5 });
     expect(cursor.consume(turretSessionView(ended))).toEqual({ text: 'Victory!' });
     const started = seat(START + 500);
     push(
@@ -381,7 +469,7 @@ describe('the turret feedback cursor', () => {
     const overflow = TURRET_FEEDBACK_LIMIT + 8;
     for (let i = 0; i < overflow; i++)
       push(session, START + i, { type: 'killed', id: i, x: 0, y: 0, z: 0 });
-    push(session, START + overflow + 10, { type: 'ended', result: 'lost', stats: { ...stats } });
+    push(session, START + overflow + 10, endedEvent('lost'));
     expect(session.feedback[0].seq).toBeGreaterThan(1);
     expect(cursor.consume(turretSessionView(session))).toEqual({ text: 'The tower has fallen' });
   });

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TURRET_SCENARIO_INTRODUCTION } from '../src/sim/content/fire_and_fly_scenarios';
 import { createTurretDefense } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
+import { turretResult } from '../src/sim/minigames/turret_result';
 import { turretSessionView } from '../src/sim/turret_defense_session';
 import type { TurretSession } from '../src/sim/types';
 import {
@@ -27,6 +28,23 @@ function seat(plan = resolveTurretPlan()): TurretSession {
     feedback: [],
     nextFeedbackSeq: 1,
   };
+}
+
+/** An ended seat whose result the sim's own rule scored: 71 kills, `integrity` kept. */
+function ended(phase: 'won' | 'lost', integrity: number): TurretSession {
+  const session = seat();
+  session.defense.phase = phase;
+  session.defense.integrity = integrity;
+  session.defense.stats.kills = 71;
+  session.defense.result = turretResult(session.defense.plan, session.defense);
+  return session;
+}
+
+/** The medal modifier classes the line carries, by medal name. */
+function tints(line: HTMLElement): string[] {
+  return ['gold', 'silver', 'bronze'].filter((m) =>
+    line.classList.contains(`turret-card-medal--${m}`),
+  );
 }
 
 function rig() {
@@ -106,9 +124,9 @@ describe('the turret HUD painter', () => {
     const leave = painter.strip.querySelector<HTMLButtonElement>('.turret-leave')!;
     expect(leave.classList.contains('ui-btn--lg')).toBe(true);
     expect(leave.querySelector('.turret-leave-label')!.textContent).toBe('Leave the tower');
-    const labels = [...painter.strip.querySelectorAll('.turret-card-stats dt')].map(
-      (dt) => dt.textContent,
-    );
+    const labels = [
+      ...painter.strip.querySelectorAll('.turret-card-stats:not(.turret-card-points) dt'),
+    ].map((dt) => dt.textContent);
     expect(labels).toEqual([
       'Kills',
       'Shots fired',
@@ -119,6 +137,62 @@ describe('the turret HUD painter', () => {
     ]);
     leave.click();
     expect(onLeave).toHaveBeenCalledTimes(1);
+  });
+
+  it('names the medal beside its tinted disc and lists the points, then writes nothing more', () => {
+    const { painter, writes, view } = rig();
+    painter.show(true);
+    const won = ended('won', 95);
+    painter.paint(view.tick(turretSessionView(won), START), 'Esc');
+    const medal = painter.strip.querySelector<HTMLElement>('.turret-card-medal')!;
+    const icon = medal.querySelector<HTMLElement>('.turret-card-medal-icon')!;
+    const points = painter.strip.querySelector<HTMLElement>('.turret-card-points')!;
+    expect(medal.style.display).toBe('');
+    expect(points.style.display).toBe('');
+    expect(medal.querySelector('.turret-card-medal-text')!.textContent).toBe('Gold medal');
+    expect(tints(medal)).toEqual(['gold']);
+    expect(icon.getAttribute('aria-hidden')).toBe('true');
+    expect(icon.style.display).toBe('');
+    expect(
+      [...points.querySelectorAll('.ui-stat-row')].map((row) => [
+        row.querySelector('dt')!.textContent,
+        row.querySelector('dd')!.textContent,
+      ]),
+    ).toEqual([
+      ['Kills (71)', '+1,420'],
+      ['Tower kept (95)', '+19,000'],
+      ['Keg kills (0)', '0'],
+      ['Bowled over (0)', '0'],
+      ['Total points', '20,420'],
+    ]);
+    expect(points.lastElementChild!.classList.contains('turret-card-total')).toBe(true);
+    const view95 = turretSessionView(won);
+    writes.mockClear();
+    for (let i = 0; i < 10; i++) painter.paint(view.tick(view95, START + i), 'Esc');
+    expect(writes).not.toHaveBeenCalled();
+
+    painter.paint(view.tick(turretSessionView(ended('won', 70)), START), 'Esc');
+    expect(medal.querySelector('.turret-card-medal-text')!.textContent).toBe('Silver medal');
+    expect(tints(medal)).toEqual(['silver']);
+    painter.paint(view.tick(turretSessionView(ended('lost', 0)), START), 'Esc');
+    expect(medal.querySelector('.turret-card-medal-text')!.textContent).toBe('No medal');
+    expect(tints(medal)).toEqual([]);
+    expect(icon.style.display).toBe('none');
+  });
+
+  it('hides the medal line and the points while the ended view carries no result', () => {
+    const { painter, view } = rig();
+    painter.show(true);
+    const session = seat();
+    session.defense.phase = 'won';
+    painter.paint(view.tick(turretSessionView(session), START), 'Esc');
+    expect(painter.strip.querySelector<HTMLElement>('.turret-card-medal')!.style.display).toBe(
+      'none',
+    );
+    expect(painter.strip.querySelector<HTMLElement>('.turret-card-points')!.style.display).toBe(
+      'none',
+    );
+    expect(painter.strip.querySelector('.turret-card-verdict')!.textContent).toBe('Victory!');
   });
 
   it('keeps the live line outside both roots, rendered and empty while they hide', () => {

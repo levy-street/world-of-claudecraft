@@ -20,15 +20,30 @@ import {
   type TurretKind,
   type TurretPlan,
   type TurretWavePlan,
+  turretMedalBarsValid,
   turretScenarioIdValid,
 } from '../sim/minigames/turret_defense_plan';
 import type { TurretFeedback } from '../sim/minigames/turret_feedback';
+import {
+  TURRET_BONUS_CAP,
+  TURRET_POINTS,
+  type TurretMedal,
+  type TurretPointsBreakdown,
+  type TurretResult,
+} from '../sim/minigames/turret_result';
 import type {
   TurretDefenseView,
   TurretMonsterView,
   TurretSessionView,
 } from '../sim/turret_defense_session';
-import type { TurretArrivalDef, TurretBarrelWaveDef, TurretBowlingDef, Vec3 } from '../sim/types';
+import type {
+  TurretArrivalDef,
+  TurretBarrelWaveDef,
+  TurretBowlingDef,
+  TurretMedalBar,
+  TurretMedalBars,
+  Vec3,
+} from '../sim/types';
 
 /** The seat as the wire carries it, the plan joined back in: the view minus its feedback ring. */
 export type TurretSeatState = Omit<TurretSessionView, 'feedback'>;
@@ -43,6 +58,10 @@ const MAX_HITS = 256;
 const MAX_TEMPLATE_ID = 64;
 const MAX_MAGNITUDE = 1e9;
 const LIMITS = TURRET_PLAN_LIMITS;
+// The most each points term can reach on a plan the resolver accepts.
+const MAX_KILL_POINTS = LIMITS.waves * LIMITS.spawnsPerWave * TURRET_POINTS.kill;
+const MAX_TOWER_POINTS = LIMITS.integrity * TURRET_POINTS.integrity;
+const MAX_POINTS = MAX_KILL_POINTS + MAX_TOWER_POINTS + TURRET_BONUS_CAP;
 
 const BAD: unique symbol = Symbol('malformed');
 type Dec<T> = (value: unknown) => T | typeof BAD;
@@ -82,8 +101,27 @@ const within =
 const turn: Dec<number> = (v) =>
   num(v) !== BAD && (v as number) > 0 && (v as number) <= 1 ? (v as number) : BAD;
 const flankCount: Dec<2 | 3> = (v) => (v === 2 || v === 3 ? v : BAD);
+/** A share of a whole: above 0, at most 1. */
+const share: Dec<number> = turn;
 const scenarioId: Dec<string> = (v) =>
   typeof v === 'string' && turretScenarioIdValid(v) ? v : BAD;
+
+function nullable<T>(item: Dec<T>): Dec<T | null> {
+  return (v) => (v === null ? null : item(v));
+}
+
+/** Absent reads as absent (`shape` then leaves the key out); anything present must decode. */
+function optional<T>(item: Dec<T>): Dec<T | undefined> {
+  return (v) => (v === undefined ? undefined : item(v));
+}
+
+/** `decode`, then `valid` on what it decoded: a cross-field rule the shape cannot state. */
+function checked<T>(decode: Dec<T>, valid: (value: T) => boolean): Dec<T> {
+  return (v) => {
+    const decoded = decode(v);
+    return decoded !== BAD && valid(decoded) ? decoded : BAD;
+  };
+}
 
 function list<T>(max: number, item: Dec<T>): Dec<T[]> {
   return (v) => {
@@ -105,7 +143,7 @@ function shape<T>(spec: Spec<T>): Dec<T> {
     for (const key in spec) {
       const decoded = spec[key](v[key]);
       if (decoded === BAD) return BAD;
-      out[key] = decoded;
+      if (decoded !== undefined) out[key] = decoded;
     }
     return out as T;
   };
@@ -148,6 +186,28 @@ const stats = shape<TurretStats>({
 });
 
 const hit = shape<TurretHit>({ id: count, falloff: num, damage: num, ...at });
+
+const medal: Dec<TurretMedal | null> = nullable(oneOf('gold', 'silver', 'bronze'));
+const points = within(0, MAX_POINTS);
+const breakdown = checked(
+  shape<TurretPointsBreakdown>({
+    kills: within(0, MAX_KILL_POINTS),
+    integrity: within(0, MAX_TOWER_POINTS),
+    kegKills: within(0, TURRET_BONUS_CAP),
+    bowled: within(0, TURRET_BONUS_CAP),
+  }),
+  (b) => b.kegKills + b.bowled <= TURRET_BONUS_CAP,
+);
+
+/** A run's result as the sim builds it: its terms sum to its points, only a win holds a medal. */
+function resultConsistent(won: boolean, r: Omit<TurretResult, 'won'>): boolean {
+  const b = r.breakdown;
+  return r.points === b.kills + b.integrity + b.kegKills + b.bowled && won === (r.medal !== null);
+}
+
+const result = checked(shape<TurretResult>({ won: bool, medal, points, breakdown }), (r) =>
+  resultConsistent(r.won, r),
+);
 
 const turretEvent = tagged<TurretEvent, 'type'>('type', {
   fired: eventArm({
@@ -195,7 +255,17 @@ const turretEvent = tagged<TurretEvent, 'type'>('type', {
     hits: list(MAX_HITS, hit),
   }),
   waveCleared: eventArm({ type: lit('waveCleared'), wave: count }),
-  ended: eventArm({ type: lit('ended'), result: oneOf('won', 'lost'), stats }),
+  ended: checked(
+    eventArm({
+      type: lit('ended'),
+      result: oneOf('won', 'lost'),
+      stats,
+      medal,
+      points,
+      breakdown,
+    }),
+    (e) => resultConsistent(e.result === 'won', e),
+  ),
 });
 
 const segment = tagged<MotionSegment, 'kind'>('kind', {
@@ -271,6 +341,7 @@ const defense = shape<Omit<TurretDefenseView, 'plan'>>({
   monsters: list(MAX_MONSTERS, monster),
   barrels: list(MAX_BARRELS, barrel),
   stats,
+  result: optional(result),
 });
 
 const seat = shape({ origin: vec3, defense, waveCount: count, monstersLeft: count });
@@ -287,9 +358,12 @@ const arrival = tagged<TurretArrivalDef, 'kind'>('kind', {
   }),
 });
 
+const medalBar = shape<TurretMedalBar>({ minIntegrityShare: share });
+
 const plan = shape<TurretPlan>({
   scenarioId,
   integrity: within(1, LIMITS.integrity),
+  medals: shape<TurretMedalBars>({ gold: medalBar, silver: medalBar }),
   arsenal: shape<TurretArsenal>({
     shockwave: within(0, LIMITS.charges),
     fragmentation: within(0, LIMITS.charges),
@@ -337,6 +411,7 @@ const feedback = shape<TurretFeedback>({ seq: int(1), tick: count, event: turret
 export function decodeTurretPlan(value: unknown): TurretPlan | null {
   const decoded = plan(value);
   if (decoded === BAD || decoded.waves.length === 0) return null;
+  if (!turretMedalBarsValid(decoded.medals, decoded.integrity)) return null;
   const kinds = decoded.kinds.length;
   for (const wave of decoded.waves) if (wave.spawns.some((kind) => kind >= kinds)) return null;
   return deepFreeze(decoded);
@@ -347,10 +422,13 @@ export function decodeTurretSeat(value: unknown, turretPlan: TurretPlan): Turret
   const decoded = seat(value);
   if (decoded === BAD) return null;
   const { kinds, waves } = turretPlan;
+  const { phase, result: outcome } = decoded.defense;
+  const ended = phase === 'won' || phase === 'lost';
   if (
     decoded.waveCount !== waves.length ||
     decoded.defense.wave >= waves.length ||
-    decoded.defense.monsters.some((m) => m.kind >= kinds.length)
+    decoded.defense.monsters.some((m) => m.kind >= kinds.length) ||
+    (outcome === undefined ? ended : !ended || outcome.won !== (phase === 'won'))
   )
     return null;
   return { ...decoded, defense: { ...decoded.defense, plan: turretPlan } };

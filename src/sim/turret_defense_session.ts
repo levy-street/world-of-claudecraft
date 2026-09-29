@@ -23,6 +23,7 @@ import {
 import { resolveTurretPlan } from './minigames/turret_defense_plan';
 import { turretSessionSeed } from './minigames/turret_defense_rng';
 import { recordTurretFeedback, type TurretFeedback } from './minigames/turret_feedback';
+import type { TurretResult } from './minigames/turret_result';
 import { applySeatMount, forceDismount, mountRideAllowed } from './mounts';
 import { shadowActionsLocked } from './shadow_action_lock';
 import { onShipDeck } from './ship_deck_presence';
@@ -70,10 +71,14 @@ export type TurretMonsterView = ReadonlyDeep<Omit<TurretMonster, TurretMonsterBo
 /**
  * The engine state minus its clock (`tick` advances outside the revision; read
  * `IWorld.turretClock`), its seed (it would predict spawns and throws) and its bookkeeping.
+ * The result is absent until the run ends, so the wire carries nothing for it before.
  */
 export type TurretDefenseView = ReadonlyDeep<
-  Omit<TurretDefenseState, 'tick' | 'seed' | 'monsters' | TurretDefenseBookkeeping>
-> & { readonly monsters: readonly TurretMonsterView[] };
+  Omit<TurretDefenseState, 'tick' | 'seed' | 'monsters' | 'result' | TurretDefenseBookkeeping>
+> & {
+  readonly monsters: readonly TurretMonsterView[];
+  readonly result?: ReadonlyDeep<TurretResult>;
+};
 
 export interface TurretSessionView {
   readonly origin: Readonly<Vec3>;
@@ -328,12 +333,14 @@ function cloneView(session: TurretSession): TurretSessionView {
     monsters,
     barrels,
     stats,
+    result,
     ...scalars
   } = defense;
   return {
     origin: { ...session.origin },
     defense: {
       ...scalars,
+      ...(result ? { result } : {}),
       plan,
       shots: shots.map((shot) => ({ ...shot })),
       monsters: monsters.map(monsterView),
@@ -346,8 +353,8 @@ function cloneView(session: TurretSession): TurretSessionView {
   };
 }
 
-/** The same object until the engine revision or the feedback ring moves; the plan and
- *  the ring's frozen entries are shared, never cloned. */
+/** The same object until the engine revision or the feedback ring moves; the plan, the
+ *  run's result and the ring's frozen entries are shared, never cloned. */
 export function turretSessionView(session: TurretSession): TurretSessionView {
   const rev = session.defense.rev;
   const seq = session.nextFeedbackSeq;

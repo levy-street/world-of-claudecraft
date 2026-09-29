@@ -1,19 +1,28 @@
 // The Fire and Fly seat HUD's two roots: the status strip at the top centre (the wave,
-// the monsters left or the countdown, Leave), which unfolds into the result card when
-// the defense ends, and the tower's integrity rail at the bottom centre. Frames come
-// from TurretHudView and every write goes through the shared facet, so an unchanged
-// frame writes nothing. Only Leave takes the pointer (the stylesheet keeps the rest
-// inert), so aim clicks and drags pass through both roots. The polite live line is a
-// third, visually hidden #ui child that stays rendered while the roots hide: a region
-// shown already filled is rarely spoken, and Hide Interface spares only such children.
+// the monsters left or the countdown, Leave), which unfolds into the result card (the
+// verdict, the medal, the run's stats and its points) when the defense ends, and the
+// tower's integrity rail at the bottom centre. Frames come from TurretHudView and every
+// write goes through the shared facet, so an unchanged frame writes nothing. Only Leave
+// takes the pointer (the stylesheet keeps the rest inert), so aim clicks and drags pass
+// through both roots. The polite live line is a third, visually hidden #ui child that
+// stays rendered while the roots hide: a region shown already filled is rarely spoken,
+// and Hide Interface spares only such children.
+import type { TurretMedal } from '../../../sim/minigames/turret_result';
 import type { PainterHostWriters } from '../../painter_host';
-import { TURRET_RESULT_ROWS, type TurretHudFrame } from './turret_hud_view';
+import { TURRET_POINT_ROWS, TURRET_RESULT_ROWS, type TurretHudFrame } from './turret_hud_view';
 
 export const TURRET_HUD_ID = 'turret-hud';
 export const TURRET_RAIL_ID = 'turret-rail';
 export const TURRET_LIVE_ID = 'turret-live';
 /** The rail's quarter ticks; the first one is the danger line. */
 const RAIL_SEGMENTS = 4;
+const MEDALS: readonly TurretMedal[] = ['gold', 'silver', 'bronze'];
+/** The medal line's tint per medal, prefixed clear of the global `.gold` colour. */
+const MEDAL_CLASSES = {
+  gold: 'turret-card-medal--gold',
+  silver: 'turret-card-medal--silver',
+  bronze: 'turret-card-medal--bronze',
+} as const satisfies Record<TurretMedal, string>;
 
 function el<K extends keyof HTMLElementTagNameMap>(
   tag: K,
@@ -29,6 +38,23 @@ interface StatRowElements {
   value: HTMLElement;
 }
 
+/** `count` label and value rows minted into `list`; the last one takes `lastClass`. */
+function statRows(list: HTMLElement, count: number, lastClass = ''): StatRowElements[] {
+  const rows: StatRowElements[] = [];
+  for (let i = 0; i < count; i++) {
+    const row = el(
+      'div',
+      i === count - 1 && lastClass ? `ui-stat-row ${lastClass}` : 'ui-stat-row',
+    );
+    const label = el('dt', 'turret-card-label');
+    const value = el('dd', 'turret-card-value ui-num');
+    row.append(label, value);
+    list.append(row);
+    rows.push({ label, value });
+  }
+  return rows;
+}
+
 export class TurretHudPainter {
   readonly strip = el('section', 'turret-strip ui-panel-strong');
   readonly rail = el('div', 'turret-rail');
@@ -40,7 +66,14 @@ export class TurretHudPainter {
   private readonly card = el('div', 'turret-card');
   private readonly kicker = el('div', 'turret-card-kicker ui-cin ui-muted');
   private readonly verdict = el('div', 'turret-card-verdict ui-cin');
-  private readonly rows: StatRowElements[] = [];
+  private readonly medal = el('div', 'turret-card-medal');
+  /** The medal's colour cue; the name beside it carries the medal. */
+  private readonly medalIcon = el('span', 'turret-card-medal-icon');
+  private readonly medalText = el('span', 'turret-card-medal-text ui-cin');
+  private readonly pointsDivider = el('div', 'ui-divider');
+  private readonly points = el('dl', 'turret-card-stats turret-card-points');
+  private readonly rows: StatRowElements[];
+  private readonly pointRows: StatRowElements[];
   private readonly leave = el('button', 'turret-leave ui-btn');
   private readonly leaveLabel = el('span', 'turret-leave-label');
   private readonly keycap = el('kbd', 'turret-leave-key ui-keycap');
@@ -70,16 +103,21 @@ export class TurretHudPainter {
     this.leave.addEventListener('click', onLeave);
     const divider = el('div', 'ui-divider');
     writers.setAttr(divider, 'aria-hidden', 'true');
+    writers.setAttr(this.pointsDivider, 'aria-hidden', 'true');
+    writers.setAttr(this.medalIcon, 'aria-hidden', 'true');
+    this.medal.append(this.medalIcon, this.medalText);
     const stats = el('dl', 'turret-card-stats');
-    for (let i = 0; i < TURRET_RESULT_ROWS; i++) {
-      const row = el('div', 'ui-stat-row');
-      const label = el('dt', 'turret-card-label');
-      const value = el('dd', 'turret-card-value ui-num');
-      row.append(label, value);
-      stats.append(row);
-      this.rows.push({ label, value });
-    }
-    this.card.append(this.kicker, this.verdict, divider, stats);
+    this.rows = statRows(stats, TURRET_RESULT_ROWS);
+    this.pointRows = statRows(this.points, TURRET_POINT_ROWS, 'turret-card-total');
+    this.card.append(
+      this.kicker,
+      this.verdict,
+      this.medal,
+      divider,
+      stats,
+      this.pointsDivider,
+      this.points,
+    );
     this.strip.append(this.wave, this.slot, this.card, this.leave);
     const bevel = el('div', 'turret-rail-bevel ui-bevel');
     const ticks = el('div', 'ui-bevel-ticks');
@@ -131,6 +169,20 @@ export class TurretHudPainter {
     for (let i = 0; i < this.rows.length; i++) {
       writers.setText(this.rows[i].label, result.rows[i].label);
       writers.setText(this.rows[i].value, result.rows[i].value);
+    }
+    const shown = result.scored ? '' : 'none';
+    writers.setDisplay(this.medal, shown);
+    writers.setDisplay(this.pointsDivider, shown);
+    writers.setDisplay(this.points, shown);
+    for (let i = 0; i < MEDALS.length; i++) {
+      const medal = MEDALS[i];
+      writers.toggleClass(this.medal, MEDAL_CLASSES[medal], result.medal === medal);
+    }
+    writers.setDisplay(this.medalIcon, result.medal ? '' : 'none');
+    writers.setText(this.medalText, result.medalText);
+    for (let i = 0; i < this.pointRows.length; i++) {
+      writers.setText(this.pointRows[i].label, result.pointRows[i].label);
+      writers.setText(this.pointRows[i].value, result.pointRows[i].value);
     }
   }
 }

@@ -140,6 +140,20 @@ export const hudChromeStrings = {
     statAirtime: 'Longest airtime',
     statYards: '{yards} yd',
     statSeconds: '{seconds} sec',
+    // The result card's medal line (a loss earns none) and its points rows: what each
+    // part of the run scored ({count} is how many kills, keg kills or knocks, {points}
+    // the tower points kept), then the total.
+    medalGold: 'Gold medal',
+    medalSilver: 'Silver medal',
+    medalBronze: 'Bronze medal',
+    noMedal: 'No medal',
+    // The live region's line as a won run ends: the verdict, then the medal's name.
+    endAnnouncement: '{verdict} {medal}',
+    pointsKills: 'Kills ({count})',
+    pointsTower: 'Tower kept ({points})',
+    pointsKegKills: 'Keg kills ({count})',
+    pointsBowled: 'Bowled over ({count})',
+    pointsTotal: 'Total points',
     leave: 'Leave the tower',
     leaveShort: 'Leave',
   },

@@ -491,6 +491,61 @@
     font-weight: 700;
     white-space: nowrap;
   }
+  /* The medal line under the verdict: the name says the medal, the disc's tint and the
+     name's colour (the rankings window's medal colours) only echo it. The points rows
+     follow the stats, their total across both columns. */
+  .turret-card-medal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 16px;
+    color: var(--color-text-muted);
+  }
+  .turret-card-medal-icon {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--color-wq-ranking-medal-ring);
+    border-radius: 50%;
+    background: var(--turret-medal-tint, var(--color-border-default));
+  }
+  .turret-card-medal--gold {
+    --turret-medal-tint: var(--color-wq-ranking-gilt);
+    color: var(--color-wq-ranking-heading);
+  }
+  .turret-card-medal--silver {
+    --turret-medal-tint: var(--color-ranking-place-second);
+    color: var(--color-wq-ranking-silver-text);
+  }
+  .turret-card-medal--bronze {
+    --turret-medal-tint: var(--color-ranking-place-third);
+    color: var(--color-wq-ranking-bronze-text);
+  }
+  .turret-card-total {
+    grid-column: 1 / -1;
+  }
+  .turret-card-total .turret-card-value {
+    color: var(--color-accent);
+  }
+  /* A short screen, a phone on its side or a low desktop window where the card sits
+     under the banner lane: the card, its medal and points included, keeps Leave above
+     the tower rail by dropping the decorative kicker (the strip's name stays its label)
+     and tightening its rows. */
+  @media (max-height: 600px) {
+    #turret-hud.ended .turret-card {
+      gap: 4px;
+    }
+    .turret-card-kicker {
+      display: none;
+    }
+    .turret-card-stats {
+      --stat-row-h: 16px;
+    }
+    .turret-card-stats .ui-stat-row {
+      line-height: 16px;
+    }
+  }
   #turret-rail {
     position: absolute;
     left: 50%;

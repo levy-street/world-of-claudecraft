@@ -19,6 +19,7 @@ import { BUILTIN_WORLD } from '../src/sim/data';
 import { positionAt } from '../src/sim/minigames/thrown_body';
 import type { TurretEvent } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan, TURRET_PLAN_LIMITS } from '../src/sim/minigames/turret_defense_plan';
+import { TURRET_BONUS_CAP, turretResult } from '../src/sim/minigames/turret_result';
 import { Sim } from '../src/sim/sim';
 import type { TurretSessionView } from '../src/sim/turret_defense_session';
 import type { SimEvent, TurretSession, TurretWaveDef, WorldContent } from '../src/sim/types';
@@ -226,6 +227,21 @@ describe('the turret plan key', () => {
     ['a missing arsenal', (p: Wire) => delete p.arsenal],
     ['negative charges', (p: Wire) => (p.arsenal.shockwave = -1)],
     ['too many charges', (p: Wire) => (p.arsenal.fragmentation = 100)],
+    ['missing medal bars', (p: Wire) => delete p.medals],
+    ['a missing silver bar', (p: Wire) => delete p.medals.silver],
+    ['a silver bar at gold', (p: Wire) => (p.medals.silver.minIntegrityShare = 0.85)],
+    ['a gold bar past the whole tower', (p: Wire) => (p.medals.gold.minIntegrityShare = 1.2)],
+    ['a silver bar at nothing', (p: Wire) => (p.medals.silver.minIntegrityShare = 0)],
+    ['a string bar', (p: Wire) => (p.medals.gold.minIntegrityShare = '0.9')],
+    [
+      'bars that round to one tower point',
+      (p: Wire) => {
+        p.integrity = 10;
+        p.medals.gold.minIntegrityShare = 0.95;
+        p.medals.silver.minIntegrityShare = 0.91;
+      },
+    ],
+    ["a silver bar at a win's last point", (p: Wire) => (p.medals.silver.minIntegrityShare = 0.01)],
   ])('rejects %s', (_, forge) => {
     const forged = wire(resolveTurretPlan(TURRET_SCENARIO_HARD));
     forge(forged);
@@ -271,6 +287,24 @@ describe('the turret seat key', () => {
       expect(states).toContain(state);
     expect(won.revisions.at(-1)!.view.defense.phase).toBe('won');
     expect(lost.revisions.at(-1)!.view.defense.phase).toBe('lost');
+  });
+
+  it("carries no result while the run lasts and the sim's own result once it ends", () => {
+    for (const run of [won, lost]) {
+      const last = run.revisions.at(-1)!;
+      for (const { view, json } of run.revisions.slice(0, -1)) {
+        expect(view.defense).not.toHaveProperty('result');
+        expect(json).not.toContain('"result"');
+        // Absent as the offline view leaves it, never an own key holding undefined.
+        const keys = Object.keys(decodeTurretSeat(JSON.parse(json), plan)!.defense);
+        expect(keys.sort()).toEqual(Object.keys(view.defense).sort());
+      }
+      const result = decodeTurretSeat(JSON.parse(last.json), plan)!.defense.result;
+      expect(result).toEqual(run.session.defense.result);
+      expect(result).toEqual(turretResult(plan, run.session.defense));
+    }
+    expect(won.session.defense.result?.medal).not.toBeNull();
+    expect(lost.session.defense.result).toMatchObject({ won: false, medal: null });
   });
 
   it('decodes a copy the caller cannot reach the sim through', () => {
@@ -334,6 +368,43 @@ describe('the turret seat key', () => {
     const forged = wire(seatOf(midWave()));
     forge(forged);
     expect(decodeTurretSeat(forged, plan)).toBeNull();
+  });
+
+  it.each([
+    ['an ended seat with no result', (s: Wire) => delete s.defense.result],
+    ['a null result', (s: Wire) => (s.defense.result = null)],
+    ['a result the phase contradicts', (s: Wire) => (s.defense.result.won = false)],
+    ['a result on a running seat', (s: Wire) => (s.defense.phase = 'wave')],
+    ['an unknown medal', (s: Wire) => (s.defense.result.medal = 'platinum')],
+    ['a win with no medal', (s: Wire) => (s.defense.result.medal = null)],
+    ['points off their terms', (s: Wire) => s.defense.result.points++],
+    ['fractional points', (s: Wire) => (s.defense.result.breakdown.kills += 0.5)],
+    ['a negative term', (s: Wire) => (s.defense.result.breakdown.bowled = -1)],
+    [
+      'a bonus past its cap',
+      (s: Wire) => {
+        const b = s.defense.result.breakdown;
+        b.kegKills = TURRET_BONUS_CAP;
+        b.bowled = 1;
+        s.defense.result.points = b.kills + b.integrity + b.kegKills + b.bowled;
+      },
+    ],
+    ['runaway points', (s: Wire) => (s.defense.result.points = 1e12)],
+  ])('rejects the whole seat for %s', (_, forge) => {
+    const forged = wire(seatOf(won.revisions.at(-1)!.view));
+    expect(decodeTurretSeat(wire(forged), plan)).not.toBeNull();
+    forge(forged);
+    expect(decodeTurretSeat(forged, plan)).toBeNull();
+  });
+
+  it('rejects a lost seat whose result holds a medal, or a running one with a result', () => {
+    const forged = wire(seatOf(lost.revisions.at(-1)!.view));
+    expect(decodeTurretSeat(wire(forged), plan)).not.toBeNull();
+    forged.defense.result.medal = 'bronze';
+    expect(decodeTurretSeat(forged, plan)).toBeNull();
+    const running = wire(seatOf(lost.revisions.at(-1)!.view));
+    running.defense.phase = 'between';
+    expect(decodeTurretSeat(running, plan)).toBeNull();
   });
 
   it('reads null as no seat', () => {
@@ -417,6 +488,34 @@ describe('the turretDefense event', () => {
     ).toBeNull();
     const ended = wire(won.events.find((e) => e.event.type === 'ended'));
     ended.event.result = 'draw';
+    expect(decodeTurretFeedback(ended)).toBeNull();
+  });
+
+  it("carries the run's medal and points on its end entry", () => {
+    for (const run of [won, lost]) {
+      const end = run.events.find((e) => e.event.type === 'ended')!;
+      const result = run.session.defense.result!;
+      expect(decodeTurretFeedback(wire(end))?.event).toMatchObject({
+        result: result.won ? 'won' : 'lost',
+        medal: result.medal,
+        points: result.points,
+        breakdown: result.breakdown,
+      });
+    }
+  });
+
+  it.each([
+    ['an unknown medal', (e: Wire) => (e.event.medal = 'platinum')],
+    ['a win with no medal', (e: Wire) => (e.event.medal = null)],
+    ['a loss with a medal', (e: Wire) => (e.event.result = 'lost')],
+    ['points off their terms', (e: Wire) => (e.event.points += 1)],
+    ['a missing breakdown', (e: Wire) => delete e.event.breakdown],
+    ['a fractional term', (e: Wire) => (e.event.breakdown.integrity += 0.5)],
+    ['a keg bonus past its cap', (e: Wire) => (e.event.breakdown.kegKills = TURRET_BONUS_CAP + 1)],
+  ])('rejects an end entry with %s', (_, forge) => {
+    const ended = wire(won.events.find((e) => e.event.type === 'ended'));
+    expect(decodeTurretFeedback(wire(ended))).not.toBeNull();
+    forge(ended);
     expect(decodeTurretFeedback(ended)).toBeNull();
   });
 });

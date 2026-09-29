@@ -68,6 +68,7 @@ function plan(
   return {
     scenarioId: 'test',
     integrity: 100,
+    medals: TURRET_SCENARIO_STANDARD.medals,
     arsenal: { shockwave: 0, fragmentation: 0 },
     kinds,
     waves: cores.map((coreDamage) => ({
@@ -764,9 +765,13 @@ function fullRun(
   return { state, trace };
 }
 
-/** Drops what the engine gained after these digests: the bowled stat and each hit's position. */
+const ENDED_LATER = new Set(['medal', 'points', 'breakdown']);
+
+/** Drops what the engine gained after these digests: the bowled stat, each hit's position
+ *  and the end's medal and points. */
 function dropLaterFields(this: object, key: string, value: unknown): unknown {
   if (key === 'bowled' || key === 'barrelsDetonated' || key === 'barrelKills') return undefined;
+  if ((this as { type?: string }).type === 'ended' && ENDED_LATER.has(key)) return undefined;
   if ('falloff' in this && (key === 'x' || key === 'y' || key === 'z')) return undefined;
   return value;
 }

@@ -10286,8 +10286,12 @@ export interface TurretWaveDef {
 }
 /** A medal's bar at the end of a won run: bronze is any win. */
 export interface TurretMedalBar {
-  minIntegrity: number;
-  minPoints?: number;
+  /** The share of the scenario's tower points still standing, above 0 and at most 1. */
+  minIntegrityShare: number;
+}
+export interface TurretMedalBars {
+  gold: TurretMedalBar;
+  silver: TurretMedalBar;
 }
 /** Limited-weapon charges per run (absent or 0: none). */
 export interface TurretArsenalDef {
@@ -10303,7 +10307,7 @@ export interface TurretScenarioDef {
   waves: readonly TurretWaveDef[];
   /** Tower points at the start. */
   integrity: number;
-  medals: { gold: TurretMedalBar; silver: TurretMedalBar };
+  medals: TurretMedalBars;
   arsenal?: TurretArsenalDef;
 }
 

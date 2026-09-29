@@ -3,7 +3,9 @@
 // (TURRET_WAVES and 100 tower points) and must replay it exactly. Introduction and
 // Hard, and every medal bar, are first values to tune by playtest: mini-game tuning,
 // not classic-era formulas. A tuning change after boards open mints a new board
-// version.
+// version. The medal bars come from scripted aimers on the arena ground, up to 3 yd
+// off: on Standard, firing within about 0.8 s of each reload keeps gold, about 1 s
+// mostly silver, 1.5 s bronze.
 
 import { DT, type TurretScenarioDef } from '../types';
 import { TURRET_BARREL_RING, TURRET_WAVES } from './turret_defense';
@@ -22,7 +24,9 @@ export const TURRET_SCENARIO_INTRODUCTION: TurretScenarioDef = {
   id: 'fire_and_fly_introduction',
   boardKey: 'introduction',
   integrity: 150,
-  medals: { gold: { minIntegrity: 140 }, silver: { minIntegrity: 110 } },
+  // Its small monsters cost 1 or 2 of 150 points a strike, so even a slow aimer keeps
+  // most of the tower: gold is a nearly untouched one.
+  medals: { gold: { minIntegrityShare: 0.98 }, silver: { minIntegrityShare: 0.9 } },
   waves: [
     {
       entries: [{ templateId: 'forest_wolf', count: 5, level: 1 }],
@@ -55,7 +59,7 @@ export const TURRET_SCENARIO_STANDARD: TurretScenarioDef = {
   id: 'fire_and_fly_standard',
   boardKey: 'standard',
   integrity: 100,
-  medals: { gold: { minIntegrity: 80 }, silver: { minIntegrity: 50 } },
+  medals: { gold: { minIntegrityShare: 0.9 }, silver: { minIntegrityShare: 0.6 } },
   waves: TURRET_WAVES,
 };
 
@@ -68,7 +72,7 @@ export const TURRET_SCENARIO_HARD: TurretScenarioDef = {
   id: 'fire_and_fly_hard',
   boardKey: 'hard',
   integrity: 100,
-  medals: { gold: { minIntegrity: 60 }, silver: { minIntegrity: 30 } },
+  medals: { gold: { minIntegrityShare: 0.85 }, silver: { minIntegrityShare: 0.5 } },
   waves: [
     {
       entries: [

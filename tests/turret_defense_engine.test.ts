@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { TURRET_SCENARIO_STANDARD } from '../src/sim/content/fire_and_fly_scenarios';
 import {
   TURRET_ARENA,
   TURRET_BOWLING,
@@ -35,6 +36,7 @@ import {
   type TurretPlan,
 } from '../src/sim/minigames/turret_defense_plan';
 import { turretSessionSeed } from '../src/sim/minigames/turret_defense_rng';
+import { turretResult } from '../src/sim/minigames/turret_result';
 import { Rng } from '../src/sim/rng';
 import { DT, type TurretSizeClass } from '../src/sim/types';
 
@@ -71,6 +73,7 @@ function plan(kinds: TurretKind[], spawns: number[][], coreDamage = 60): TurretP
   return {
     scenarioId: 'test',
     integrity: 100,
+    medals: TURRET_SCENARIO_STANDARD.medals,
     arsenal: { shockwave: 0, fragmentation: 0 },
     kinds,
     waves: spawns.map((s) => ({
@@ -1306,10 +1309,15 @@ describe('full scripted runs', () => {
     );
     expect(r.state.integrity).toBeGreaterThan(50);
     expect(r.ticks).toBeLessThan(20 * 60 * 6);
+    const result = r.state.result;
+    expect(result).toEqual(turretResult(r.state.plan, r.state));
     expect(JSON.parse(r.trace[r.trace.length - 1])).toEqual({
       type: 'ended',
       result: 'won',
       stats: r.state.stats,
+      medal: result?.medal,
+      points: result?.points,
+      breakdown: result?.breakdown,
     });
   });
 

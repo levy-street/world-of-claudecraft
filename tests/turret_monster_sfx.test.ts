@@ -34,6 +34,7 @@ function kind(templateId: string, sizeClass: TurretSizeClass): TurretKind {
 const PLAN = {
   scenarioId: 'test',
   integrity: 100,
+  medals: { gold: { minIntegrityShare: 0.9 }, silver: { minIntegrityShare: 0.6 } },
   arsenal: { shockwave: 0, fragmentation: 0 },
   kinds: [
     kind('forest_wolf', 'small'),

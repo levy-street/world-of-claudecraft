@@ -77,6 +77,53 @@ describe('the Fire and Fly seat HUD stylesheet', () => {
     ).toBe('display: none;');
   });
 
+  it("tints the card's medal line with the rankings' medal colours, never the name alone", () => {
+    const tints = {
+      gold: 'var(--color-wq-ranking-gilt)',
+      silver: 'var(--color-ranking-place-second)',
+      bronze: 'var(--color-ranking-place-third)',
+    };
+    for (const [medal, tint] of Object.entries(tints)) {
+      expect(declarationsFor(hud, `.turret-card-medal--${medal}`)).toContain(
+        `--turret-medal-tint: ${tint};`,
+      );
+    }
+    expect(declarationsFor(hud, '.turret-card-medal-icon')).toContain(
+      'background: var(--turret-medal-tint, var(--color-border-default));',
+    );
+    expect(declarationsFor(hud, '.turret-card-total')).toBe('grid-column: 1 / -1;');
+  });
+
+  it('keeps the card, medal and points included, above the rail on a short screen', () => {
+    const compact = /@media \(max-height: (\d+)px\) \{ #turret-hud\.ended \.turret-card \{/.exec(
+      hud,
+    );
+    expect(compact).not.toBeNull();
+    const side = hud.slice(compact?.index);
+    expect(declarationsFor(side, '.turret-card-kicker')).toBe('display: none;');
+    expect(declarationsFor(side, '.turret-card-stats')).toBe('--stat-row-h: 16px;');
+    expect(declarationsFor(side, '.turret-card-stats .ui-stat-row')).toBe('line-height: 16px;');
+    expect(declarationsFor(side, `#${TURRET_HUD_ID}.ended .turret-card`)).toBe('gap: 4px;');
+    // The first desktop height the full card shows at, laid under the banner lane, clears
+    // the rail: the card's height as the result probe measured it at 1920x1080.
+    const fullCardPx = 313;
+    const first = Number(compact?.[1]) + 1;
+    const top = /top: calc\((\d+)% \+ (\d+)px\);/.exec(
+      declarationsFor(
+        hud.slice(hud.indexOf('@media (max-height: 820px) {')),
+        `#${TURRET_HUD_ID}.ended`,
+      ),
+    );
+    const railBottom = Number(
+      /bottom: (\d+)px;/.exec(declarationsFor(hud, `#${TURRET_RAIL_ID}`))?.[1],
+    );
+    const railHeight = Number(
+      /height: (\d+)px;/.exec(declarationsFor(hud, '.turret-rail-bevel'))?.[1],
+    );
+    const cardBottom = (first * Number(top?.[1])) / 100 + Number(top?.[2]) + fullCardPx;
+    expect(cardBottom).toBeLessThanOrEqual(first - railBottom - railHeight);
+  });
+
   it('drops the result card under the banner lane on a short screen', () => {
     const bannerTop = /top: (\d+%);/.exec(declarationsFor(hud, '#banner'))?.[1];
     expect(bannerTop).toBe('28%');

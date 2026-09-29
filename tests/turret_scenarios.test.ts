@@ -36,6 +36,7 @@ import {
   type TurretPlan,
 } from '../src/sim/minigames/turret_defense_plan';
 import { TURRET_STREAM, turretDraw } from '../src/sim/minigames/turret_defense_rng';
+import { turretResult } from '../src/sim/minigames/turret_result';
 import type { TurretArrivalDef, TurretScenarioDef, TurretWaveDef } from '../src/sim/types';
 
 const TAU = Math.PI * 2;
@@ -118,8 +119,9 @@ describe('the scenario table', () => {
     for (const s of TURRET_SCENARIOS) {
       expect(s.boardKey).toMatch(/^[a-z]+$/);
       expect(s.arsenal).toBeUndefined();
-      expect(s.medals.silver.minIntegrity).toBeLessThan(s.medals.gold.minIntegrity);
-      expect(s.medals.gold.minIntegrity).toBeLessThanOrEqual(s.integrity);
+      expect(s.medals.silver.minIntegrityShare).toBeGreaterThan(0);
+      expect(s.medals.silver.minIntegrityShare).toBeLessThan(s.medals.gold.minIntegrityShare);
+      expect(s.medals.gold.minIntegrityShare).toBeLessThanOrEqual(1);
     }
   });
 
@@ -192,6 +194,45 @@ describe('resolving a scenario into a plan', () => {
       });
     },
   );
+
+  it('carries the medal bars, and refuses bars that are not silver under gold within the tower', () => {
+    for (const s of TURRET_SCENARIOS) expect(resolveTurretPlan(s).medals).toEqual(s.medals);
+    const plan = resolveTurretPlan();
+    expect(plan.medals).not.toBe(TURRET_SCENARIO_STANDARD.medals);
+    expect(Object.isFrozen(plan.medals.gold)).toBe(true);
+    const bars = (gold: number, silver: number) => () =>
+      resolveTurretPlan({
+        ...TURRET_SCENARIO_STANDARD,
+        medals: { gold: { minIntegrityShare: gold }, silver: { minIntegrityShare: silver } },
+      });
+    expect(bars(1, 0.99)).not.toThrow();
+    for (const [gold, silver] of [
+      [0.6, 0.6],
+      [0.5, 0.6],
+      [1.1, 0.6],
+      [0.9, 0],
+      [0.9, -0.2],
+      [Number.NaN, 0.5],
+    ]) {
+      expect(bars(gold, silver)).toThrow(/bad medal bars/);
+    }
+  });
+
+  it('refuses bars that leave a medal out of reach once rounded to whole tower points', () => {
+    const bars = (integrity: number, gold: number, silver: number) => () =>
+      resolveTurretPlan({
+        ...TURRET_SCENARIO_STANDARD,
+        integrity,
+        medals: { gold: { minIntegrityShare: gold }, silver: { minIntegrityShare: silver } },
+      });
+    expect(bars(3, 0.9, 0.6)).not.toThrow();
+    // Gold and silver at the same whole point: no win is silver.
+    expect(bars(10, 0.95, 0.91)).toThrow(/bad medal bars/);
+    expect(bars(2, 0.9, 0.6)).toThrow(/bad medal bars/);
+    // Silver at a win's last point: no win is bronze.
+    expect(bars(100, 0.9, 0.01)).toThrow(/bad medal bars/);
+    expect(bars(1, 1, 0.5)).toThrow(/bad medal bars/);
+  });
 
   it('carries a scenario arsenal, absent charges as 0', () => {
     const plan = resolveTurretPlan({ ...TURRET_SCENARIO_STANDARD, arsenal: { shockwave: 3 } });
@@ -520,13 +561,23 @@ function nearestLive(state: TurretDefenseState, tick: number, probe: ThrowProbe)
 const aimNearest: Aim = (state, tick, probe) =>
   tick >= state.readyTick ? nearestLive(state, tick, probe) : null;
 
+/** `delay` ticks after each reload, up to 3 yd off the nearest monster. */
+const aimLate =
+  (delay: number): Aim =>
+  (state, tick, probe) => {
+    if (tick < state.readyTick + delay) return null;
+    const p = nearestLive(state, tick, probe);
+    if (!p) return null;
+    return {
+      x: p.x + ((tick * 7919) % 600) / 100 - 3,
+      z: p.z + ((tick * 104729) % 600) / 100 - 3,
+    };
+  };
+
 /** At most every 1.2 s, up to 3 yd off the nearest monster: nearer a person than the other. */
-const aimSloppily: Aim = (state, tick, probe) => {
-  if (tick < state.readyTick + 15) return null;
-  const p = nearestLive(state, tick, probe);
-  if (!p) return null;
-  return { x: p.x + ((tick * 7919) % 600) / 100 - 3, z: p.z + ((tick * 104729) % 600) / 100 - 3 };
-};
+const aimSloppily = aimLate(15);
+/** 1.2 s after each reload, up to 3 yd off: slower than a clean hand. */
+const aimSlowly = aimLate(24);
 
 function fullRun(s: TurretScenarioDef, seed: number, probe: ThrowProbe, aim: Aim) {
   const plan = resolveTurretPlan(s);
@@ -556,7 +607,21 @@ describe('full runs of every scenario with the scripted aimers', () => {
       expect(r.state.wave).toBe(s.waves.length - 1);
       expect(r.state.stats.kills + r.state.stats.breaches).toBe(r.monsters);
       expect(r.state.integrity).toBe(s.integrity - r.state.stats.pointsLost);
+      expect(r.state.result).toEqual(turretResult(r.plan, r.state));
     }
+  });
+
+  it.each(TURRET_SCENARIOS.map((s) => [s.boardKey, s] as const))(
+    'medals the clean nearest-first aimer gold on %s',
+    (_key, s) => {
+      expect(fullRun(s, 42, flat, aimNearest).state.result?.medal).toBe('gold');
+    },
+  );
+
+  it('keeps gold out of reach of an aimer firing 1.2 s after each reload on Standard', () => {
+    const r = fullRun(TURRET_SCENARIO_STANDARD, 42, hills, aimSlowly);
+    expect(r.state.phase).toBe('won');
+    expect(r.state.result?.medal).not.toBe('gold');
   });
 
   it('Hard runs to an end with both aimers, its numbers consistent', () => {

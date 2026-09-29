@@ -1,7 +1,8 @@
 import type { TurretEvent } from '../../../sim/minigames/turret_defense';
+import type { TurretMedal } from '../../../sim/minigames/turret_result';
 import { TICK_RATE } from '../../../sim/types';
 import type { TurretSessionView } from '../../../world_api/vehicles';
-import { formatNumber, getI18nRevision, t } from '../../i18n';
+import { formatNumber, getI18nRevision, type TranslationKey, t } from '../../i18n';
 import { TurretFeedbackReader } from './turret_feedback_reader_core';
 
 /** Below this share of the bar, the rail turns to its danger colour. */
@@ -11,6 +12,14 @@ export const TURRET_INTEGRITY_ALERTS = [0.5, LOW_INTEGRITY] as const;
 
 /** The result card's stat rows: kills, shots, accuracy, longest throw, longest airtime, tower. */
 export const TURRET_RESULT_ROWS = 6;
+/** The result card's points rows: kills, tower kept, keg kills, bowled over, then the total. */
+export const TURRET_POINT_ROWS = 5;
+
+const MEDAL_KEYS = {
+  gold: 'hudChrome.turret.medalGold',
+  silver: 'hudChrome.turret.medalSilver',
+  bronze: 'hudChrome.turret.medalBronze',
+} as const satisfies Record<TurretMedal, TranslationKey>;
 
 export interface TurretStatRow {
   label: string;
@@ -20,8 +29,15 @@ export interface TurretStatRow {
 export interface TurretHudResult {
   won: boolean;
   verdict: string;
+  /** False while the view has no scored result (the medal line and points stay hidden). */
+  scored: boolean;
+  /** The medal earned, null for none: it only tints the line `medalText` names. */
+  medal: TurretMedal | null;
+  medalText: string;
   /** TURRET_RESULT_ROWS rows, in the order the card lists them. */
   readonly rows: readonly TurretStatRow[];
+  /** TURRET_POINT_ROWS rows, in the order the card lists them. */
+  readonly pointRows: readonly TurretStatRow[];
 }
 
 /** The seat's fixed words, resolved with the frame so a language change reaches them. */
@@ -93,11 +109,19 @@ function verdictText(won: boolean): string {
   return t(won ? 'hudChrome.turret.victory' : 'hudChrome.turret.defeat');
 }
 
+/** The end of a run as the live region says it: the verdict, then any medal won. */
+function endAnnouncement(session: TurretSessionView): string {
+  const verdict = verdictText(session.defense.phase === 'won');
+  const medal = session.defense.result?.medal;
+  if (!medal) return verdict;
+  return t('hudChrome.turret.endAnnouncement', { verdict, medal: t(MEDAL_KEYS[medal]) });
+}
+
 /** What the live region says as a phase starts: its countdown, its wave, or the result. */
 function phaseAnnouncement(session: TurretSessionView, seconds: number | null): string {
   const { phase, wave } = session.defense;
   if (phase === 'wave') return waveBannerText(wave, session.waveCount);
-  if (phase === 'won' || phase === 'lost') return verdictText(phase === 'won');
+  if (phase === 'won' || phase === 'lost') return endAnnouncement(session);
   return countdownLine(session, seconds);
 }
 
@@ -129,6 +153,50 @@ function fillResultRows(rows: TurretStatRow[], session: TurretSessionView, tower
   rows[5].value = tower;
 }
 
+const SIGNED_POINTS: Intl.NumberFormatOptions = { signDisplay: 'exceptZero' };
+
+/** A term's points as an addition: a sign on any nonzero value, never a hand-built '+'. */
+function addedPoints(points: number): string {
+  return formatNumber(points, SIGNED_POINTS);
+}
+
+/**
+ * The medal line and the points rows from the sim's result, each row naming what it
+ * counts (the kills, the tower points kept); false when there is no result.
+ */
+function fillPoints(
+  result: TurretHudResult,
+  rows: TurretStatRow[],
+  session: TurretSessionView,
+  kept: number,
+): boolean {
+  const scored = session.defense.result;
+  if (!scored) {
+    result.medal = null;
+    result.medalText = '';
+    for (const row of rows) {
+      row.label = '';
+      row.value = '';
+    }
+    return false;
+  }
+  const { stats } = session.defense;
+  const { breakdown } = scored;
+  result.medal = scored.medal;
+  result.medalText = t(scored.medal ? MEDAL_KEYS[scored.medal] : 'hudChrome.turret.noMedal');
+  rows[0].label = t('hudChrome.turret.pointsKills', { count: formatNumber(stats.kills) });
+  rows[0].value = addedPoints(breakdown.kills);
+  rows[1].label = t('hudChrome.turret.pointsTower', { points: formatNumber(kept) });
+  rows[1].value = addedPoints(breakdown.integrity);
+  rows[2].label = t('hudChrome.turret.pointsKegKills', { count: formatNumber(stats.barrelKills) });
+  rows[2].value = addedPoints(breakdown.kegKills);
+  rows[3].label = t('hudChrome.turret.pointsBowled', { count: formatNumber(stats.bowled) });
+  rows[3].value = addedPoints(breakdown.bowled);
+  rows[4].label = t('hudChrome.turret.pointsTotal');
+  rows[4].value = formatNumber(scored.points);
+  return true;
+}
+
 /**
  * The seat's HUD text in one reused frame, rebuilt only when the session view, the
  * shown countdown second or the language changes (the view is identical between
@@ -139,7 +207,19 @@ export class TurretHudView {
     label: '',
     value: '',
   }));
-  private readonly result: TurretHudResult = { won: false, verdict: '', rows: this.rows };
+  private readonly pointRows: TurretStatRow[] = Array.from({ length: TURRET_POINT_ROWS }, () => ({
+    label: '',
+    value: '',
+  }));
+  private readonly result: TurretHudResult = {
+    won: false,
+    verdict: '',
+    scored: false,
+    medal: null,
+    medalText: '',
+    rows: this.rows,
+    pointRows: this.pointRows,
+  };
   private readonly frame: TurretHudFrame = {
     labels: { title: '', meter: '', caption: '', leave: '', leaveShort: '' },
     wave: '',
@@ -223,6 +303,7 @@ export class TurretHudView {
       result.won = defense.phase === 'won';
       result.verdict = verdictText(result.won);
       fillResultRows(this.rows, session, frame.integrityText);
+      result.scored = fillPoints(result, this.pointRows, session, value);
       frame.result = result;
     } else {
       frame.result = null;

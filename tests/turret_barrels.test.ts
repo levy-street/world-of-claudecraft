@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { TURRET_SCENARIO_STANDARD } from '../src/sim/content/fire_and_fly_scenarios';
 import {
   TURRET_ARENA,
   TURRET_BOWLING,
@@ -71,6 +72,7 @@ function plan(kinds: TurretKind[], spawns: number[][], barrels = NO_BARRELS): Tu
   return {
     scenarioId: 'test',
     integrity: 100,
+    medals: TURRET_SCENARIO_STANDARD.medals,
     arsenal: { shockwave: 0, fragmentation: 0 },
     kinds,
     waves: spawns.map((s) => ({
@@ -208,6 +210,12 @@ function fullRun(seed: number, probe: ThrowProbe, maxTicks = 20 * 60 * 15) {
   }
   const events = trace.map((s) => JSON.parse(s) as TurretEvent);
   return { state, trace, events, spawns, spawnsBesideBarrels, ticks: t - START, standingMost };
+}
+
+const ENDED_LATER = new Set(['medal', 'points', 'breakdown']);
+
+function dropResultFields(this: object, key: string, value: unknown): unknown {
+  return (this as { type?: string }).type === 'ended' && ENDED_LATER.has(key) ? undefined : value;
 }
 
 function fnv(text: string): string {
@@ -904,7 +912,9 @@ describe('full runs with barrels', () => {
       expect(r.spawns).toHaveLength(r.state.stats.kills);
       expect(r.spawnsBesideBarrels).toBe(r.spawns.length);
       expect(r.trace).toHaveLength(count);
-      expect(fnv([...r.trace, ...r.spawns].join('\n'))).toBe(digest);
+      // The end's medal and points came after these digests: dropped, the trace is the same.
+      const trace = r.trace.map((s) => JSON.stringify(JSON.parse(s), dropResultFields));
+      expect(fnv([...trace, ...r.spawns].join('\n'))).toBe(digest);
     },
   );
 

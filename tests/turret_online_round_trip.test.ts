@@ -127,10 +127,10 @@ function turretEvents(events: readonly SimEvent[], pid: number) {
 }
 
 /**
- * A whole seat played through the wire by the online client's nearest-first aimer,
- * the client's view checked against the server's every tick.
+ * A whole seat played through the wire by the online client's nearest-first aimer (or
+ * left to fall with `aim` off), the client's view checked against the server's every tick.
  */
-function playOnline(command: string) {
+function playOnline(command: string, aim = true) {
   const { sim, pid } = serverPlayer();
   const client = new WireClient(sim, pid);
   const sent: Record<string, string> = {};
@@ -183,15 +183,15 @@ function playOnline(command: string) {
     }
     phase = view.defense.phase;
     const clock = client.turretClock!;
-    if (clock < view.defense.readyTick) continue;
+    if (!aim || clock < view.defense.readyTick) continue;
     const target = nearestLive(view.defense, clock);
     if (!target) continue;
     client.useVehicleAction('turret_fire', target);
     shots++;
   }
-  expect(phase).toBe('won');
+  expect(phase).toBe(aim ? 'won' : 'lost');
   expect(identical).toBeGreaterThan(0);
-  for (const kind of ['march', 'fly', 'skid'] as const) {
+  for (const kind of aim ? (['march', 'fly', 'skid'] as const) : (['march'] as const)) {
     expect(drawn[kind]).toBeGreaterThan(0);
     expect(drift[kind]).toBeLessThan(DRIFT_BOUND_YD);
   }
@@ -226,6 +226,13 @@ describe('Fire and Fly online: the socket-free round trip', () => {
     expect(seat.defense.plan.scenarioId).toBe(scenario.id);
     expect(seat.defense.plan.integrity).toBe(scenario.integrity);
     expect(seat.waveCount).toBe(scenario.waves.length);
+  });
+
+  it('mirrors every tick of a lost run, its result reaching the client on the last revision', () => {
+    const { sim, pid, client } = playOnline('/dev turret', false);
+    const result = client.turretSession!.defense.result;
+    expect(result).toMatchObject({ won: false, medal: null });
+    expect(result).toEqual(turretSessionFor(sim.ctx, pid)!.defense.result);
   });
 
   it('starts a resumed client with an empty ring and replays nothing', () => {

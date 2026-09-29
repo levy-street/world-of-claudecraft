@@ -20,10 +20,12 @@ import type {
   TurretArrivalDef,
   TurretBarrelWaveDef,
   TurretBowlingDef,
+  TurretMedalBars,
   TurretScenarioDef,
   TurretSizeClass,
   TurretWaveEntry,
 } from '../types';
+import { turretMedalBarPoints } from './turret_result';
 
 export interface TurretKind {
   readonly templateId: string;
@@ -58,6 +60,8 @@ export interface TurretPlan {
   readonly scenarioId: string;
   /** Tower points at the start, and the most it can hold. */
   readonly integrity: number;
+  /** The medal bars, as shares of `integrity` kept at a win (turret_result.ts). */
+  readonly medals: Readonly<TurretMedalBars>;
   readonly arsenal: TurretArsenal;
   readonly kinds: readonly TurretKind[];
   readonly waves: readonly TurretWavePlan[];
@@ -110,6 +114,24 @@ function validWidth(widthTurn: number): boolean {
   return Number.isFinite(widthTurn) && widthTurn > 0 && widthTurn <= 1;
 }
 
+/**
+ * Silver below gold, both above 0 and at most the whole tower, and still three medals
+ * once the shares round to whole points: a win keeps at least 1 point, so silver asks
+ * for 2 or more, and gold for more than silver.
+ */
+export function turretMedalBarsValid(
+  medals: Readonly<TurretMedalBars>,
+  integrity: number,
+): boolean {
+  const gold = medals.gold.minIntegrityShare;
+  const silver = medals.silver.minIntegrityShare;
+  const shares =
+    Number.isFinite(gold) && Number.isFinite(silver) && silver > 0 && silver < gold && gold <= 1;
+  if (!shares) return false;
+  const silverPoints = turretMedalBarPoints(silver, integrity);
+  return silverPoints >= 2 && silverPoints < turretMedalBarPoints(gold, integrity);
+}
+
 function resolveArrival(
   arrival: TurretArrivalDef | undefined,
   scenarioId: string,
@@ -139,6 +161,8 @@ export function resolveTurretPlan(
     throw new Error(`turret plan: bad scenario id ${JSON.stringify(scenario.id)}`);
   if (!intWithin(scenario.integrity, 1, limits.integrity))
     throw new Error(`turret plan: bad integrity in ${scenario.id}`);
+  if (!turretMedalBarsValid(scenario.medals, scenario.integrity))
+    throw new Error(`turret plan: bad medal bars in ${scenario.id}`);
   const arsenal: TurretArsenal = {
     shockwave: scenario.arsenal?.shockwave ?? 0,
     fragmentation: scenario.arsenal?.fragmentation ?? 0,
@@ -197,6 +221,10 @@ export function resolveTurretPlan(
   return deepFreeze({
     scenarioId: scenario.id,
     integrity: scenario.integrity,
+    medals: {
+      gold: { minIntegrityShare: scenario.medals.gold.minIntegrityShare },
+      silver: { minIntegrityShare: scenario.medals.silver.minIntegrityShare },
+    },
     arsenal,
     kinds,
     waves: planned,
