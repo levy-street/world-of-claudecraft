@@ -494,8 +494,8 @@ describe('the throw', () => {
     const at = (s: string) => seen.find((x) => x.state === s)?.tick ?? 0;
     expect(at('rise') - at('down')).toBe(TURRET_TIMING.downTicks);
     expect(at('march') - at('rise')).toBe(TURRET_TIMING.riseTicks);
-    expect(state.stats.longestThrow).toBeGreaterThan(18 * 0.8);
-    expect(state.stats.longestThrow).toBeLessThan(18 * 1.2);
+    expect(state.stats.longestThrow).toBeGreaterThan(30 * 0.85);
+    expect(state.stats.longestThrow).toBeLessThan(30 * 1.15);
     expect(state.stats.longestAirtime).toBeCloseTo((first.end - first.start) * 0.05, 12);
     const from = positionAt(m.seg, m.seg.start, flat);
     const toCenter = Math.atan2(-from.x, -from.z);
@@ -513,8 +513,8 @@ describe('the throw', () => {
   });
 
   it('adds a juggle to the velocity the body already has, and extends its airtime', () => {
-    // Medium mass keeps the summed velocity under the juggle caps, so the sum is exact.
-    const k = kind('medium', 10000);
+    // Large mass keeps the summed velocity under the juggle caps, so the sum is exact.
+    const k = kind('large', 10000);
     const { state, m } = oneMonster(k);
     pin(state, m, 0, 20);
     const first = fireAt(state, 0, 20);
@@ -527,12 +527,12 @@ describe('the throw', () => {
     fireAt(state, aim.x, aim.z);
     const [launched] = launchesOf(run(state, aim.impact), m.id);
     const before = velocityAt(flight, aim.impact);
-    const lift = TURRET_WEAPON.pop / Math.sqrt(k.mass);
+    const lift = TURRET_WEAPON.pop / k.mass ** TURRET_WEAPON.massExponent;
     expect(before.y + lift).toBeLessThan(TURRET_WEAPON.maxLaunchLift);
     expect(launched.vy).toBeCloseTo(before.y + lift, 9);
     expect(Math.hypot(launched.vx, launched.vz)).toBeLessThan(TURRET_WEAPON.maxLaunchSpeed);
     const added = Math.hypot(launched.vx - before.x, launched.vz - before.z);
-    expect(added).toBeCloseTo(TURRET_WEAPON.push / Math.sqrt(k.mass), 9);
+    expect(added).toBeCloseTo(TURRET_WEAPON.push / k.mass ** TURRET_WEAPON.massExponent, 9);
     expect(m.hp).toBe(10000 - 120);
     const second = m.seg;
     run(state, Math.ceil(second.end));
@@ -559,14 +559,13 @@ describe('the throw', () => {
     const across = launches.map((l) => Math.hypot(l.vx, l.vz));
     for (const l of launches) expect(l.vy).toBeLessThanOrEqual(26 + 1e-9);
     for (const h of across) expect(h).toBeLessThanOrEqual(32 + 1e-9);
-    const atCap = across.some((h) => Math.abs(h - 32) < 1e-9);
-    const liftAtCap = launches.some((l) => Math.abs(l.vy - 26) < 1e-9);
-    expect(atCap || liftAtCap).toBe(true);
+    expect(across.some((h) => Math.abs(h - 32) < 1e-9)).toBe(true);
+    expect(launches.some((l) => Math.abs(l.vy - 26) < 1e-9)).toBe(true);
     run(state, Math.ceil(m.seg.end) + 20 * 5);
     expectPlainData(state);
   });
 
-  it('launches a marching body at exactly push and pop over sqrt(mass), with no carried walk', () => {
+  it('launches a marching body at exactly push and pop over the cube root of its mass, with no carried walk', () => {
     const k = kind('large', 10000);
     const { state, m } = oneMonster(k);
     expect(m.state).toBe('march');
@@ -574,8 +573,8 @@ describe('the throw', () => {
     const aim = lead(state, m.seg);
     fireAt(state, aim.x, aim.z);
     const [launched] = launchesOf(run(state, aim.impact), m.id);
-    expect(Math.hypot(launched.vx, launched.vz)).toBeCloseTo(TURRET_WEAPON.push / Math.sqrt(3), 9);
-    expect(launched.vy).toBeCloseTo(TURRET_WEAPON.pop / Math.sqrt(3), 9);
+    expect(Math.hypot(launched.vx, launched.vz)).toBeCloseTo(TURRET_WEAPON.push / Math.cbrt(3), 9);
+    expect(launched.vy).toBeCloseTo(TURRET_WEAPON.pop / Math.cbrt(3), 9);
   });
 
   it('carries the velocity of a skidding body into its next throw', () => {
@@ -591,8 +590,11 @@ describe('the throw', () => {
     const [launched] = launchesOf(run(state, aim.impact), m.id);
     const carried = velocityAt(skid, aim.impact);
     expect(Math.hypot(carried.x, carried.z)).toBeGreaterThan(1);
-    expect(Math.hypot(launched.vx - carried.x, launched.vz - carried.z)).toBeCloseTo(16.5, 9);
-    expect(launched.vy).toBeCloseTo(17.3, 9);
+    expect(Math.hypot(launched.vx - carried.x, launched.vz - carried.z)).toBeCloseTo(
+      TURRET_WEAPON.push,
+      9,
+    );
+    expect(launched.vy).toBeCloseTo(TURRET_WEAPON.pop, 9);
   });
 
   it('throws a monster killed by the blast as a corpse, lays it down for 5 s, then removes it', () => {
@@ -611,6 +613,48 @@ describe('the throw', () => {
     expect(state.monsters).toContain(m);
     run(state, Math.ceil(m.seg.end));
     expect(state.monsters).not.toContain(m);
+  });
+
+  it('throws a corpse exactly as it throws a living body, bounces and slide included', () => {
+    const throwOf = (hp: number) => {
+      const { state, m } = oneMonster(kind('medium', hp));
+      pin(state, m, 3, 20);
+      const shot = fireAt(state, 0, 20);
+      const [launched] = launchesOf(run(state, shot.impactTick), m.id);
+      const path: TurretEvent[] = [];
+      const states: string[] = [stateOf(m)];
+      const until = state.tick + 20 * 10;
+      while (stateOf(m) !== 'dead' && stateOf(m) !== 'down' && state.tick < until) {
+        for (const e of run(state, state.tick + 1))
+          if ('id' in e && e.id === m.id && e.type !== 'killed') path.push(e);
+        if (states[states.length - 1] !== stateOf(m)) states.push(stateOf(m));
+      }
+      return {
+        launched,
+        alive: m.hp > 0,
+        flight: state.stats.longestThrow,
+        airtime: state.stats.longestAirtime,
+        path,
+        states,
+        rest: positionAt(m.seg, state.tick, flat),
+        restTick: m.seg.start,
+      };
+    };
+    const corpse = throwOf(30);
+    const living = throwOf(10000);
+    expect([corpse.alive, living.alive]).toEqual([false, true]);
+    expect(corpse.launched).toEqual(living.launched);
+    expect(corpse.flight).toBe(living.flight);
+    const { vx, vy, vz } = corpse.launched;
+    expect(corpse.flight).toBeCloseTo((2 * Math.hypot(vx, vz) * vy) / TURRET_PHYSICS.gravity, 3);
+    expect(living.path.map((e) => e.type)).toContain('bounce');
+    expect(living.states).toContain('skid');
+    expect(corpse.path).toEqual(living.path);
+    expect(corpse.states.slice(0, -1)).toEqual(living.states.slice(0, -1));
+    expect([corpse.states.at(-1), living.states.at(-1)]).toEqual(['dead', 'down']);
+    expect(corpse.airtime).toBe(living.airtime);
+    expect(corpse.rest).toEqual(living.rest);
+    expect(corpse.restTick).toBe(living.restTick);
   });
 
   it('does not re-throw a corpse lying on the ground', () => {
@@ -762,8 +806,8 @@ describe('the tank body', () => {
   it('reflects a low flight off the tank', () => {
     const k = kind('large', 10000);
     const { state, m } = oneMonster(k);
-    pin(state, m, 0, 8);
-    const shot = fireAt(state, 0, 9);
+    pin(state, m, 0, 6);
+    const shot = fireAt(state, 0, 7);
     run(state, shot.impactTick);
     const segs: MotionSegment[] = [m.seg];
     const events: TurretEvent[] = [];

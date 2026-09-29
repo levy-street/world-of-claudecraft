@@ -526,7 +526,15 @@ function launch(
   );
   const spread = turretDraw(state.seed, TURRET_STREAM.throwDeviation, shot.id, m.id) * 2 - 1;
   const dir = rotateDir(base.x, base.z, spread * TURRET_WEAPON.deviation);
-  const v = launchVelocity(falloff, kind.mass, dir.x, dir.z, TURRET_WEAPON.push, TURRET_WEAPON.pop);
+  const v = launchVelocity(
+    falloff,
+    kind.mass,
+    dir.x,
+    dir.z,
+    TURRET_WEAPON.push,
+    TURRET_WEAPON.pop,
+    TURRET_WEAPON.massExponent,
+  );
   // Only a body already in motion from a throw carries its velocity into the new
   // one (juggling); a marcher's walk would make a hit's throw depend on its heading.
   if (m.state === 'fly' || m.state === 'skid') {

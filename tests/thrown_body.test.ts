@@ -33,7 +33,15 @@ const SIZES = Object.keys(TURRET_SIZE_CLASSES) as TurretSizeClass[];
 
 function coreThrow(size: TurretSizeClass, probe: ThrowProbe = flat, dirX = 1, dirZ = 0) {
   const c = TURRET_SIZE_CLASSES[size];
-  const v = launchVelocity(1, c.mass, dirX, dirZ, TURRET_WEAPON.push, TURRET_WEAPON.pop);
+  const v = launchVelocity(
+    1,
+    c.mass,
+    dirX,
+    dirZ,
+    TURRET_WEAPON.push,
+    TURRET_WEAPON.pop,
+    TURRET_WEAPON.massExponent,
+  );
   const y = probe.ground(0, 0);
   return { v, seg: planFlight(0, 0, y, 0, v, c.radius, probe, TURRET_PHYSICS), radius: c.radius };
 }
@@ -85,12 +93,22 @@ describe('blast falloff', () => {
   });
 });
 
+describe('launch velocity', () => {
+  it('scales push and pop by the falloff over the mass raised to the exponent', () => {
+    const v = launchVelocity(0.5, 8, 0.6, 0.8, 10, 12, 1 / 3);
+    expect(v.x).toBeCloseTo(1.5, 12);
+    expect(v.y).toBeCloseTo(3, 12);
+    expect(v.z).toBeCloseTo(2, 12);
+    expect(launchVelocity(1, 4, 1, 0, 10, 12, 0.5)).toEqual({ x: 5, y: 6, z: 0 });
+  });
+});
+
 describe('core-hit throw tuning on flat ground', () => {
-  const targets: Record<TurretSizeClass, { distance: number; peak?: number; peakMax?: number }> = {
-    small: { distance: 18, peak: 5 },
-    medium: { distance: 13 },
-    large: { distance: 7 },
-    huge: { distance: 4, peakMax: 1.5 },
+  const targets: Record<TurretSizeClass, { distance: number; peak?: number }> = {
+    small: { distance: 30, peak: 8 },
+    medium: { distance: 22 },
+    large: { distance: 15 },
+    huge: { distance: 11, peak: 3 },
   };
   const firstContact = (size: TurretSizeClass) => {
     const { seg } = coreThrow(size);
@@ -98,21 +116,29 @@ describe('core-hit throw tuning on flat ground', () => {
     return Math.hypot(end.x, end.z);
   };
 
-  it.each(SIZES)('%s flies to its target distance and peak (within 20 percent)', (size) => {
+  it.each(SIZES)('%s flies to its target distance and peak (within 15 percent)', (size) => {
     const { seg } = coreThrow(size);
     const distance = firstContact(size);
     let peak = 0;
     for (let t = seg.start; t <= seg.end; t += 0.05)
       peak = Math.max(peak, positionAt(seg, t, flat).y);
     const want = targets[size];
-    expect(distance).toBeGreaterThan(want.distance * 0.8);
-    expect(distance).toBeLessThan(want.distance * 1.2);
+    expect(distance).toBeGreaterThan(want.distance * 0.85);
+    expect(distance).toBeLessThan(want.distance * 1.15);
     if (want.peak !== undefined) {
-      expect(peak).toBeGreaterThan(want.peak * 0.8);
-      expect(peak).toBeLessThan(want.peak * 1.2);
+      expect(peak).toBeGreaterThan(want.peak * 0.85);
+      expect(peak).toBeLessThan(want.peak * 1.15);
     }
-    if (want.peakMax !== undefined) expect(peak).toBeLessThan(want.peakMax);
     expect(seg.contact).toBe('ground');
+  });
+
+  it('keeps a single core hit on the lightest body under the juggle caps', () => {
+    const lightest = SIZES.reduce((a, b) =>
+      TURRET_SIZE_CLASSES[a].mass <= TURRET_SIZE_CLASSES[b].mass ? a : b,
+    );
+    const { v } = coreThrow(lightest);
+    expect(Math.hypot(v.x, v.z)).toBeLessThan(TURRET_WEAPON.maxLaunchSpeed);
+    expect(v.y).toBeLessThan(TURRET_WEAPON.maxLaunchLift);
   });
 
   it('ranks the size classes by distance: a wolf flies farther than an ogre, an ogre than a yeti', () => {
@@ -399,7 +425,15 @@ describe('water and the void', () => {
   it('loses a flight that finds no contact within the bound, instead of bouncing it', () => {
     expect(TURRET_PHYSICS.maxFlightTicks).toBe(200);
     const abyss: ThrowProbe = { ground: () => -1e9, water: () => null };
-    const v = launchVelocity(1, 1, 1, 0, TURRET_WEAPON.push, TURRET_WEAPON.pop);
+    const v = launchVelocity(
+      1,
+      1,
+      1,
+      0,
+      TURRET_WEAPON.push,
+      TURRET_WEAPON.pop,
+      TURRET_WEAPON.massExponent,
+    );
     const seg = planFlight(0, 0, 0, 0, v, 0.6, abyss, TURRET_PHYSICS);
     expect(seg.end - seg.start).toBe(200);
     expect(seg.contact).toBe('void');
@@ -417,7 +451,15 @@ describe('dead-center hits', () => {
   it('stays finite when the body sits on both the blast and the center', () => {
     const d = throwDirection(0, 0, 0, 0, 0, 0, TURRET_WEAPON.deadCenter);
     expect(Math.hypot(d.x, d.z)).toBeCloseTo(1, 12);
-    const v = launchVelocity(1, 1, d.x, d.z, TURRET_WEAPON.push, TURRET_WEAPON.pop);
+    const v = launchVelocity(
+      1,
+      1,
+      d.x,
+      d.z,
+      TURRET_WEAPON.push,
+      TURRET_WEAPON.pop,
+      TURRET_WEAPON.massExponent,
+    );
     const seg = planFlight(0, 0, 0, 0, v, 0.6, flat, TURRET_PHYSICS);
     const p = positionAt(seg, 3.3, flat);
     expect([p.x, p.y, p.z, seg.end].every(Number.isFinite)).toBe(true);

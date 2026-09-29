@@ -103,10 +103,12 @@ export const TURRET_WEAPON = {
   maxFlightTicks: ticks(0.9),
   blastRadius: 6,
   blastCore: 1.5,
-  /** Horizontal launch speed of a core hit on mass 1 (yd/s), scaled by falloff / sqrt(mass). */
-  push: 16.5,
+  /** Horizontal launch speed of a core hit on mass 1 (yd/s), scaled by falloff / mass^massExponent. */
+  push: 20.5,
   /** Vertical launch speed of a core hit on mass 1 (yd/s), scaled the same way. */
-  pop: 17.3,
+  pop: 21.9,
+  /** A cube root: on flat ground a yeti still flies about a third as far as a wolf. */
+  massExponent: 1 / 3,
   /** Random spread of the throw direction, either side (radians). */
   deviation: Math.PI / 12,
   /** Closer than this to the blast point, a body is thrown outward from the turret. */

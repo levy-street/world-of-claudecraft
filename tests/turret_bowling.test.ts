@@ -622,11 +622,12 @@ describe('the toggle', () => {
     expect(state.stats.bowled).toBe(0);
   });
 
-  // Digests of the lot 1 engine's full auto-aimer runs, taken before bowling existed:
-  // turned off, every event (throws, bounces, kills, waves) replays them exactly.
+  // Digests of the lot 1 engine's full auto-aimer runs, taken before bowling existed
+  // (re-taken on that engine with the current throw law and tuning): turned off,
+  // every event (throws, bounces, kills, waves) replays them exactly.
   it.each([
-    ['flat', 42, flat, 1136, '960d5f46'],
-    ['hills', 21, hills, 1113, '3b581829'],
+    ['flat', 42, flat, 1265, 'ea2ae5bc'],
+    ['hills', 21, hills, 3043, '626333b7'],
   ] as const)(
     'turned off, a %s full run replays the pre-bowling engine exactly',
     (_name, seed, probe, count, digest) => {
@@ -634,6 +635,7 @@ describe('the toggle', () => {
       const text = r.trace.map((s) => JSON.stringify(JSON.parse(s), dropLaterFields)).join('\n');
       expect(r.trace).toHaveLength(count);
       expect(fnv(text)).toBe(digest);
+      expect(r.state.phase).toBe('won');
       expect(r.state.stats.bowled).toBe(0);
     },
   );
@@ -656,6 +658,9 @@ describe('full runs with bowling', () => {
       const knocks = r.trace.filter((s) => s.startsWith('{"type":"bowled"'));
       expect(knocks.length).toBe(r.state.stats.bowled);
       expect(r.state.stats.bowled).toBeGreaterThanOrEqual(5);
+      // About one launch in ten knocks a body over; far more reads as chaos, not bowling.
+      const launches = r.trace.filter((s) => s.startsWith('{"type":"launched"')).length;
+      expect(r.state.stats.bowled).toBeLessThanOrEqual(0.15 * launches);
     }
   });
 

@@ -10211,7 +10211,7 @@ export interface CannonEncounterState {
 /** Fire and Fly (turret defense) content shapes; data in content/turret_defense.ts. */
 export type TurretSizeClass = 'small' | 'medium' | 'large' | 'huge';
 export interface TurretSizeDef {
-  /** Divides a throw by sqrt(mass): a wolf flies far, an ogre barely hops. */
+  /** Divides a throw by mass ** TURRET_WEAPON.massExponent: the heavier, the shorter it flies. */
   mass: number;
   /** Turret points a full-health strike costs (scaled by remaining health). */
   breachValue: number;

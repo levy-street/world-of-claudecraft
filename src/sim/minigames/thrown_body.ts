@@ -164,8 +164,9 @@ export function launchVelocity(
   dirZ: number,
   push: number,
   pop: number,
+  massExponent: number,
 ): Vec3 {
-  const k = falloff / Math.sqrt(mass);
+  const k = falloff / mass ** massExponent;
   return { x: dirX * push * k, y: pop * k, z: dirZ * push * k };
 }
 
