@@ -1,28 +1,47 @@
 // Fire and Fly on screen: the private monsters' rigs with their stand-ins,
-// health bars and strike rings, plus the cannon's shots (cannon_shell_visuals.ts,
-// its muzzle and recoil on the tank's own barrel), driven from
-// IWorld.turretSession. Nothing is built until the player is first seen seated
-// in the turret; the rig pools then grow one rig per frame for the current and
-// next wave, and one per idle slot for the others, and live for the rest of the
-// world session. Every rig attaches behind the compile gate while a capsule on a
+// health bars and strike rings, the dust they kick up wherever they meet the
+// world (turret_contact_dust_core.ts, launched on the cannon's own puff draw),
+// their hitstop and scorch flash when a shell strikes them, plus the cannon's
+// shots (cannon_shell_visuals.ts, its muzzle and recoil on the tank's own
+// barrel), driven from IWorld.turretSession. Nothing is built until the player
+// is first seen seated in the turret; the rig pools then grow one rig per frame
+// for the current and next wave, and one per idle slot for the others, and live
+// for the rest of the world session. Every rig attaches behind the compile gate while a capsule on a
 // prewarmed material stands in at the monster's exact position: enemy positions
 // are never hidden. An unused rig leaves the scene graph. No lights, no shadows,
-// no per-frame THREE allocation. Pure halves: turret_monster_pose_core.ts and
+// no per-frame THREE allocation. A rig's scorch flash swaps its materials only
+// once their programs link behind the same compile gate (the rig keeps its own
+// materials meanwhile). Pure halves: turret_monster_pose_core.ts,
+// turret_motion_forecast_core.ts, turret_contact_dust_core.ts and
 // turret_defense_pool_core.ts.
 import * as THREE from 'three';
-import { TURRET_WEAPON } from '../sim/content/turret_defense';
+import { TURRET_PHYSICS, TURRET_WEAPON } from '../sim/content/turret_defense';
 import { MOBS } from '../sim/data';
-import type { Entity } from '../sim/types';
+import type { ThrowProbe } from '../sim/minigames/thrown_body';
+import type { TurretFeedback } from '../sim/minigames/turret_feedback';
+import { DT, type Entity } from '../sim/types';
 import type { TurretSessionView } from '../world_api/vehicles';
 import { timeBuildSpan } from './build_spans';
 import { type CannonShellHost, CannonShellVisuals } from './cannon_shell_visuals';
 import { type AnimState, CharacterVisual } from './characters';
 import { charactersReady } from './characters/assets';
-import { visualKeyFor } from './characters/manifest';
+import { VISUALS, visualKeyFor } from './characters/manifest';
+import type { FarBakeGate } from './characters/visual';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { type IdleScheduler, idleSlot } from './idle_queue';
 import { GAIT_RUN_ENTER } from './locomotion';
+import {
+  newTurretContact,
+  TURRET_CONTACT_BURSTS,
+  TURRET_CONTACT_PUFFS,
+  type TurretContactCounts,
+  type TurretContactKind,
+  turretContactBurstInto,
+  turretContactCounts,
+  turretContactLag,
+  turretSlideTrailInto,
+} from './turret_contact_dust_core';
 import {
   nextTurretRig,
   TurretFeedbackCursor,
@@ -34,17 +53,18 @@ import {
 } from './turret_defense_pool_core';
 import {
   newTurretMonsterPose,
-  TURRET_STAND_IN_HEIGHT,
   TurretAttitude,
   TurretDisplayClock,
   turretMonsterPoseInto,
   turretPivotHeight,
 } from './turret_monster_pose_core';
+import { TurretMotionForecast } from './turret_motion_forecast_core';
 import { ViewCreateRetryGate } from './view_create_retry';
 import { worldQuestTraceMaterials } from './world_quest_trace_materials';
 
 type CompileGate = (target: THREE.Object3D) => Promise<unknown>;
 type TurretPlanView = TurretSessionView['defense']['plan'];
+type TurretDefenseView = TurretSessionView['defense'];
 
 /** The self view's tank, lent as the seated player's mount: its barrel is a node of the rig. */
 export interface TurretSelfView {
@@ -61,12 +81,15 @@ interface RigSlot {
   readonly body: THREE.Group;
   /** World height of the scaled rig. */
   readonly height: number;
+  /** The rig has its own airborne clip (a jump or fall pose). */
+  readonly airClip: boolean;
   used: boolean;
 }
 
 interface BodySlot {
   owner: number | null;
   readonly attitude: TurretAttitude;
+  readonly forecast: TurretMotionForecast;
   readonly standIn: THREE.Mesh;
   readonly health: THREE.Mesh;
   readonly ring: THREE.Mesh;
@@ -95,6 +118,14 @@ const POOL = 0;
 /** A later wave's rig waits for an idle slot, on the renderer's idle prewarm terms. */
 const RIG_IDLE_TIMEOUT_MS = 250;
 const RIG_IDLE_DEFERRALS = 2;
+/** A hit at least this close to the blast's full strength is a core hit: the rig freezes on it. */
+const CORE_HIT_FALLOFF = 0.999;
+/** The core hit's hitstop: the rig's clip at this speed for this long (s). */
+const HITSTOP_SCALE = 0.05;
+const HITSTOP_SECONDS = 0.12;
+/** The scorch a blast leaves on a body, by its falloff: from a graze to a core hit. */
+const FLASH_MIN = 0.35;
+const FLASH_GAIN = 0.55;
 
 export class TurretDefenseVisual {
   readonly group = new THREE.Group();
@@ -113,7 +144,12 @@ export class TurretDefenseVisual {
   private readonly weapon: CannonShellVisuals;
   private barrelSource: THREE.Object3D | null = null;
   private readonly pose = newTurretMonsterPose();
-  private readonly probe: { ground(x: number, z: number): number };
+  private readonly probe: ThrowProbe;
+  private readonly contact = newTurretContact();
+  private readonly contactCounts: Readonly<TurretContactCounts>;
+  private readonly effectGate: FarBakeGate | null;
+  /** Ids a shell struck at its core in the feedback being read (their launch freezes on it). */
+  private readonly coreHits: number[] = [];
   private readonly anim: AnimState = {
     speed: 0,
     moving: false,
@@ -149,16 +185,26 @@ export class TurretDefenseVisual {
 
   constructor(
     scene: THREE.Object3D,
-    groundAt: (x: number, z: number) => number,
+    private readonly groundAt: (x: number, z: number) => number,
     private readonly compileGate?: CompileGate,
     private readonly idleScheduler?: IdleScheduler,
   ) {
-    this.probe = { ground: groundAt };
+    this.probe = { ground: groundAt, water: () => null };
     this.weapon = new CannonShellVisuals({
       blastRadius: TURRET_WEAPON.blastRadius,
       groundAt,
       compileGate,
+      bursts: { slots: TURRET_CONTACT_BURSTS, puffs: TURRET_CONTACT_PUFFS },
     });
+    this.contactCounts = turretContactCounts(this.weapon.lowEffects);
+    this.effectGate = compileGate
+      ? (target, settle) => {
+          void compileGate(target).then(
+            () => settle(),
+            () => settle(),
+          );
+        }
+      : null;
     this.group.name = 'fire-and-fly';
     this.rigsRoot.name = 'fire-and-fly-rigs';
     this.markersRoot.name = 'fire-and-fly-markers';
@@ -218,12 +264,23 @@ export class TurretDefenseVisual {
       if (body.owner !== m.id) {
         body.owner = m.id;
         body.attitude.reset();
+        body.forecast.reset();
       }
-      const pose = turretMonsterPoseInto(this.pose, m, kind, tick, this.probe, frozen);
-      body.attitude.step(pose, m.state, m.seg.start, tick, reducedMotion);
+      const motion = body.forecast.resolve(m, kind, defense, tick, this.probe, TURRET_PHYSICS);
+      const pose = turretMonsterPoseInto(
+        this.pose,
+        motion,
+        kind,
+        tick,
+        this.probe,
+        frozen,
+        defense,
+      );
+      body.forecast.blend(pose, tick, this.probe);
+      body.attitude.step(pose, tick, reducedMotion);
       const r = this.book.rigOf(m.id);
       const rig = r >= 0 ? this.rigs[r] : null;
-      const height = rig ? rig.height : TURRET_STAND_IN_HEIGHT[kind.sizeClass];
+      const height = rig ? rig.height : kind.height;
       const pivot = turretPivotHeight(height, body.attitude.upY());
       const baseY = pose.y - pose.sink * Math.max(height, SINK_DEPTH);
       const a = body.attitude;
@@ -233,7 +290,6 @@ export class TurretDefenseVisual {
         rig.root.visible = true;
         rig.root.position.set(pose.x, baseY + pivot, pose.z);
         rig.root.quaternion.set(a.x, a.y, a.z, a.w);
-        rig.body.rotation.y = pose.yaw;
         this.anim.speed = pose.speed;
         this.anim.moving = pose.moving;
         this.anim.running =
@@ -241,6 +297,10 @@ export class TurretDefenseVisual {
         this.anim.airborne = pose.airborne;
         this.anim.falling = pose.falling;
         this.anim.dead = pose.dead;
+        // A rig with no airborne clip keeps flailing through its hit reactions in the air.
+        if (pose.airborne && !rig.airClip && !pose.dead && !rig.actor.isMidOneShot) {
+          rig.actor.playHit();
+        }
         rig.actor.update(step, this.anim, true, reducedMotion);
       }
       body.used = true;
@@ -354,12 +414,12 @@ export class TurretDefenseVisual {
 
   private mintRig(templateId: string): void {
     const template = MOBS[templateId];
-    const actor = new CharacterVisual(
-      visualKeyFor({ kind: 'mob', templateId } as Entity),
-      template?.color ?? 0xffffff,
-    );
+    const key = visualKeyFor({ kind: 'mob', templateId } as Entity);
+    const actor = new CharacterVisual(key, template?.color ?? 0xffffff);
+    const clips = VISUALS[key]?.clips;
     actor.setShadow(false);
     actor.setProxyShadow(false);
+    actor.setFarBakeGate(this.effectGate);
     const scale = template?.scale ?? 1;
     const height = actor.height * scale;
     const body = new THREE.Group();
@@ -373,7 +433,15 @@ export class TurretDefenseVisual {
     gate.name = `fire-and-fly-rig:${templateId}`;
     gate.add(root);
     this.book.addRig(templateId);
-    this.rigs.push({ actor, gate, root, body, height, used: false });
+    this.rigs.push({
+      actor,
+      gate,
+      root,
+      body,
+      height,
+      airClip: !!(clips?.jump || clips?.fall),
+      used: false,
+    });
     this.built.set(templateId, (this.built.get(templateId) ?? 0) + 1);
     void attachSceneGroupGated(this.rigsRoot, gate, this.compileGate, () => this.disposed).catch(
       () => {},
@@ -393,6 +461,7 @@ export class TurretDefenseVisual {
       this.bodies.push({
         owner: null,
         attitude: new TurretAttitude(),
+        forecast: new TurretMotionForecast(),
         standIn,
         health,
         ring,
@@ -439,6 +508,8 @@ export class TurretDefenseVisual {
     time: number,
     reducedMotion: boolean,
   ): void {
+    this.coreHits.length = 0;
+    const defense = session.defense;
     for (const entry of this.cursor.take(session)) {
       const ev = entry.event;
       const stale = entry.tick < tick - SHOT_STALE_TICKS;
@@ -456,20 +527,100 @@ export class TurretDefenseVisual {
           break;
         }
         case 'impact':
-          if (!stale) this.weapon.impact(ev, time, reducedMotion);
+          if (stale) break;
+          this.weapon.impact(ev, time, reducedMotion);
+          for (const hit of ev.hits) {
+            const rig = this.rigFor(hit.id);
+            if (!rig) continue;
+            rig.actor.respondToElement(
+              'fire',
+              Math.min(0.95, FLASH_MIN + FLASH_GAIN * hit.falloff),
+            );
+            if (hit.falloff >= CORE_HIT_FALLOFF) this.coreHits.push(hit.id);
+          }
           break;
         // The stagger at every contact: playHit's own cooldown spaces a
-        // bounce from its launch, and a corpse's death clip overrides it.
-        case 'launched':
+        // bounce from its launch, and a corpse's death clip overrides it. The
+        // impact precedes its launches in the ring, so a core hit's stagger
+        // starts frozen on the blast.
+        case 'launched': {
+          const rig = this.rigFor(ev.id);
+          if (!rig) break;
+          rig.actor.playHit(true);
+          if (!reducedMotion && this.coreHits.includes(ev.id)) {
+            rig.actor.holdFrame(HITSTOP_SCALE, HITSTOP_SECONDS);
+          }
+          break;
+        }
         case 'bounce':
+          this.rigFor(ev.id)?.actor.playHit();
+          if (!stale) {
+            const kind = ev.surface === 'wall' ? 'wall' : 'bounce';
+            this.kickDust(defense, entry, kind, ev.id, ev, ev.speed, tick, time);
+          }
+          break;
         case 'landed':
           this.rigFor(ev.id)?.actor.playHit();
+          // A landing is the contact too slow to bounce: its speed into the ground is at most that.
+          if (!stale) {
+            const speed = TURRET_PHYSICS.bounceMinSpeed;
+            this.kickDust(defense, entry, 'land', ev.id, ev, speed, tick, time);
+          }
+          break;
+        case 'bowled':
+          if (!stale) this.kickDust(defense, entry, 'bowl', ev.struckId, ev, ev.speed, tick, time);
           break;
         case 'windupStart':
           this.rigFor(ev.id)?.actor.playAttack();
           break;
       }
     }
+  }
+
+  /**
+   * The dust of one contact, launched on the weapon's puff draw. The segment
+   * the body starts at the contact gives the direction it leaves in, the tick
+   * it touched (a contact read a frame late is aged by the difference) and,
+   * after a landing, the slide the trail follows.
+   */
+  private kickDust(
+    defense: TurretDefenseView,
+    entry: TurretFeedback,
+    kind: TurretContactKind,
+    id: number,
+    at: { readonly x: number; readonly y: number; readonly z: number },
+    speed: number,
+    tick: number,
+    time: number,
+  ): void {
+    const m = monsterById(defense.monsters, id);
+    const size = m ? defense.plan.kinds[m.kind] : undefined;
+    if (!m || !size) return;
+    const burst = this.weapon.puffBurst(time);
+    if (!burst) return;
+    const seg = m.seg;
+    const fromHere = Math.abs(seg.x - at.x) < 1e-3 && Math.abs(seg.z - at.z) < 1e-3;
+    const moving = fromHere && (seg.kind === 'fly' || seg.kind === 'skid');
+    const c = this.contact;
+    c.kind = kind;
+    c.id = id;
+    c.seq = entry.seq;
+    c.x = at.x;
+    c.y = at.y;
+    c.z = at.z;
+    c.speed = speed;
+    c.dirX = moving ? seg.vx : 0;
+    c.dirZ = moving ? seg.vz : 0;
+    c.height = size.height;
+    c.radius = size.radius;
+    const lag = turretContactLag(tick - (fromHere ? seg.start : entry.tick));
+    turretContactBurstInto(burst, c, this.contactCounts, this.groundAt);
+    if (kind === 'land' && fromHere && seg.kind === 'skid') {
+      const seed = Math.imul(id, 0x2545) ^ entry.seq;
+      const from = tick - lag / DT;
+      turretSlideTrailInto(burst, seg, size.height, seed, from, this.contactCounts, this.groundAt);
+    }
+    burst.at = time - lag;
   }
 
   private rigFor(id: number): RigSlot | null {
@@ -499,4 +650,12 @@ export class TurretDefenseVisual {
     // Materials are page-lifetime prewarmed resources, owned by their cache.
     if (errors.length > 0) throw new AggregateError(errors, 'Fire and Fly rigs failed to dispose');
   }
+}
+
+function monsterById(
+  monsters: TurretDefenseView['monsters'],
+  id: number,
+): TurretDefenseView['monsters'][number] | null {
+  for (const m of monsters) if (m.id === id) return m;
+  return null;
 }

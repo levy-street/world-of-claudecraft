@@ -10,7 +10,11 @@ import {
 } from '../src/render/turret_defense_pool_core';
 import type { TurretEvent } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
-import { recordTurretFeedback, type TurretFeedback } from '../src/sim/minigames/turret_feedback';
+import {
+  recordTurretFeedback,
+  TURRET_FEEDBACK_LIMIT,
+  type TurretFeedback,
+} from '../src/sim/minigames/turret_feedback';
 
 // kinds: 0 wolf, 1 boar, 2 bandit
 const plan = {
@@ -185,7 +189,7 @@ describe('Fire and Fly feedback cursor', () => {
     const reseated = { defense: { startTick: 500 }, feedback: ring([[wave(0)]], 500) };
     expect(cursor.take(reseated).map((e) => e.seq)).toEqual([1]);
     const flood = ring(
-      Array.from({ length: 40 }, (_, i) => [wave(i)]),
+      Array.from({ length: TURRET_FEEDBACK_LIMIT + 8 }, (_, i) => [wave(i)]),
       500,
     );
     expect(flood[0].seq).toBe(9);

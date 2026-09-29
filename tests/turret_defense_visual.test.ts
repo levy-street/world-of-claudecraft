@@ -9,7 +9,6 @@ import { drawProgramSignature } from '../src/render/draw_program_signature_core'
 import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
 import type { IdleBudget, IdleScheduler } from '../src/render/idle_queue';
 import { turretBodyCapacity, turretRigCapacities } from '../src/render/turret_defense_pool_core';
-import { TURRET_STAND_IN_HEIGHT } from '../src/render/turret_monster_pose_core';
 import {
   buildWorldQuestTraceStandIn,
   worldQuestTraceMaterials,
@@ -43,6 +42,9 @@ interface MockActor {
   dispose: ReturnType<typeof vi.fn>;
   playHit: ReturnType<typeof vi.fn>;
   playAttack: ReturnType<typeof vi.fn>;
+  holdFrame: ReturnType<typeof vi.fn>;
+  respondToElement: ReturnType<typeof vi.fn>;
+  setFarBakeGate: ReturnType<typeof vi.fn>;
   setShadow: ReturnType<typeof vi.fn>;
   setProxyShadow: ReturnType<typeof vi.fn>;
 }
@@ -64,6 +66,10 @@ vi.mock('../src/render/characters', () => ({
     dispose = vi.fn();
     playHit = vi.fn();
     playAttack = vi.fn();
+    holdFrame = vi.fn();
+    respondToElement = vi.fn();
+    setFarBakeGate = vi.fn();
+    isMidOneShot = false;
     setShadow = vi.fn();
     setProxyShadow = vi.fn();
     constructor(
@@ -380,13 +386,15 @@ describe('Fire and Fly monsters on screen', () => {
     expect(drawnRigs(visual)).toHaveLength(0);
     const shown = capsules(visual).filter((c) => c.visible);
     expect(shown).toHaveLength(state.monsters.length);
-    const standHeight = TURRET_STAND_IN_HEIGHT.small;
     for (const m of state.monsters) {
+      // The stand-in stands as tall as the plan's own body for the kind.
+      const standHeight = state.plan.kinds[m.kind].height;
       const p = positionAt(m.seg, 160, flat);
       const capsule = shown.find(
         (c) => Math.abs(c.position.x - p.x) < 1e-9 && Math.abs(c.position.z - p.z) < 1e-9,
       );
       expect(capsule?.position.y).toBeCloseTo(p.y + standHeight / 2, 9);
+      expect(capsule?.scale.y).toBeCloseTo(standHeight / 2, 9);
     }
     for (const done of release) done();
     await flush();
@@ -540,6 +548,8 @@ describe('Fire and Fly monsters on screen', () => {
     expect(hit).toHaveLength(1);
     expect(hit[0]).toBe(target);
     expect(target?.playHit).toHaveBeenCalledTimes(1);
+    // A launch cuts the body's own swing short.
+    expect(target?.playHit).toHaveBeenCalledWith(true);
     expect(target?.playAttack).toHaveBeenCalledTimes(1);
     const contacts: TurretFeedback[] = [
       ...feedback,
@@ -559,6 +569,196 @@ describe('Fire and Fly monsters on screen', () => {
     visual.update(null, null, 0, 0.016);
     expect(visual.group.visible).toBe(false);
     visual.dispose();
+  });
+
+  it('kicks up dust once per contact entry, on the weapon draw, sized by the body', async () => {
+    actors.made.length = 0;
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0, undefined, immediate);
+    const state = engine(160);
+    const k = wolfKind(state);
+    const launch = { x: 5, y: 0, z: 0, vx: 8, vy: -6, vz: 0 };
+    const flight = {
+      kind: 'fly' as const,
+      start: 159.5,
+      end: 175,
+      x: 5,
+      y: 0,
+      z: 0,
+      vx: 8,
+      vy: 3,
+      vz: 0,
+      g: 30,
+      contact: 'ground' as const,
+      nx: 0,
+      nz: 0,
+    };
+    const flyer = wolf(state, { id: 1, kind: k, state: 'fly', seg: flight });
+    const bounce: TurretFeedback = {
+      seq: 1,
+      tick: 160,
+      event: { type: 'bounce', id: 1, surface: 'ground', ...launch, speed: 14 },
+    };
+    const view = viewOf({ ...state, monsters: [flyer] }, [bounce]);
+    await buildAll(visual, viewOf({ ...state, monsters: [flyer] }), 160);
+    const weapon = (visual as unknown as { weapon: { bursts: { slots: { active: boolean }[] } } })
+      .weapon;
+    const live = () => weapon.bursts.slots.filter((b) => b.active).length;
+    expect(live()).toBe(0);
+    visual.update(view, 160, 1, 0.016);
+    expect(live()).toBe(1);
+    expect(weaponDrawn(visual, 'shock')).toBeGreaterThan(0);
+    expect(weaponDrawn(visual, 'dirt')).toBeGreaterThan(0);
+    // Read again (the same entries in a fresh view object): nothing new is launched.
+    visual.update(viewOf({ ...state, monsters: [flyer] }, [bounce]), 160, 1.02, 0.016);
+    expect(live()).toBe(1);
+    // A landing, a trunk and a knock each kick their own.
+    const more: TurretFeedback[] = [
+      bounce,
+      { seq: 2, tick: 161, event: { type: 'landed', id: 1, x: 7, y: 0, z: 0 } },
+      {
+        seq: 3,
+        tick: 161,
+        event: { type: 'bounce', id: 1, surface: 'wall', x: 7, y: 0.4, z: 0, speed: 9 },
+      },
+      {
+        seq: 4,
+        tick: 161,
+        event: {
+          type: 'bowled',
+          flyerId: 1,
+          struckId: 1,
+          x: 7,
+          y: 0,
+          z: 0,
+          speed: 12,
+          damage: 3,
+        },
+      },
+    ];
+    visual.update(viewOf({ ...state, monsters: [flyer] }, more), 161, 1.05, 0.016);
+    expect(live()).toBe(4);
+    expect(weaponDrawn(visual, 'bark')).toBeGreaterThan(0);
+    // A contact of a body no longer in the view kicks nothing.
+    const gone: TurretFeedback = {
+      seq: 5,
+      tick: 162,
+      event: { type: 'landed', id: 99, x: 7, y: 0, z: 0 },
+    };
+    visual.update(viewOf({ ...state, monsters: [flyer] }, [...more, gone]), 162, 1.1, 0.016);
+    expect(live()).toBe(4);
+    visual.dispose();
+  });
+
+  it('freezes a core-hit rig on the blast and scorches every rig the blast struck', async () => {
+    actors.made.length = 0;
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0, undefined, immediate);
+    const state = engine(160);
+    await buildAll(visual, viewOf(state), 160);
+    const [core, graze] = state.monsters;
+    const rigOf = (m: TurretMonster) => {
+      const p = positionAt(m.seg, 160, flat);
+      return actorAt(p.x, p.z);
+    };
+    const coreRig = rigOf(core);
+    const grazeRig = rigOf(graze);
+    expect(coreRig).toBeDefined();
+    expect(grazeRig).toBeDefined();
+    const hits = [
+      { id: core.id, falloff: 1, damage: 60, x: 0, y: 0, z: 0 },
+      { id: graze.id, falloff: 0.4, damage: 24, x: 0, y: 0, z: 0 },
+    ];
+    const feedback: TurretFeedback[] = [
+      { seq: 1, tick: 160, event: { type: 'impact', shotId: 1, x: 0, y: 0, z: 0, hits } },
+      {
+        seq: 2,
+        tick: 160,
+        event: { type: 'launched', id: core.id, x: 0, y: 0, z: 0, vx: 1, vy: 5, vz: 0 },
+      },
+      {
+        seq: 3,
+        tick: 160,
+        event: { type: 'launched', id: graze.id, x: 0, y: 0, z: 0, vx: 1, vy: 5, vz: 0 },
+      },
+    ];
+    visual.update(viewOf(state, feedback), 160, 0, 0.016);
+    expect(coreRig?.holdFrame).toHaveBeenCalledTimes(1);
+    expect(coreRig?.holdFrame).toHaveBeenCalledWith(0.05, 0.12);
+    expect(grazeRig?.holdFrame).not.toHaveBeenCalled();
+    expect(coreRig?.respondToElement).toHaveBeenCalledWith('fire', 0.9);
+    expect(grazeRig?.respondToElement).toHaveBeenCalledWith('fire', 0.35 + 0.55 * 0.4);
+    // Reduced motion keeps the scorch and drops the hitstop.
+    const calm = new TurretDefenseVisual(new THREE.Scene(), () => 0, undefined, immediate);
+    actors.made.length = 0;
+    await buildAll(calm, viewOf(state), 160);
+    const calmRig = rigOf(core);
+    calm.update(viewOf(state, feedback), 160, 0, 0.016, true);
+    expect(calmRig?.holdFrame).not.toHaveBeenCalled();
+    expect(calmRig?.respondToElement).toHaveBeenCalledTimes(1);
+    visual.dispose();
+    calm.dispose();
+  });
+
+  it('keeps a rig with no airborne clip in its hit reactions while it flies, never one that has one', async () => {
+    actors.made.length = 0;
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0, undefined, immediate);
+    const state = engine(0);
+    const boarKind = state.plan.kinds.findIndex((k) => k.templateId === 'wild_boar');
+    expect(boarKind).toBeGreaterThanOrEqual(0);
+    const flight = {
+      kind: 'fly' as const,
+      start: 0,
+      end: 40,
+      x: 5,
+      y: 0,
+      z: 0,
+      vx: 4,
+      vy: 12,
+      vz: 0,
+      g: 30,
+      contact: 'ground' as const,
+      nx: 0,
+      nz: 0,
+    };
+    const boar = wolf(state, { id: 1, kind: boarKind, state: 'fly', seg: flight });
+    const flyingWolf = wolf(state, { id: 2, state: 'fly', seg: { ...flight, x: -5 } });
+    const view = viewOf({ ...state, wave: 1, monsters: [boar, flyingWolf] });
+    await buildAll(visual, view, 1);
+    const boarKey = visualKeyFor({ kind: 'mob', templateId: 'wild_boar' } as Entity);
+    const boarRig = actors.made.find((a) => a.key === boarKey && a.update.mock.calls.length > 0);
+    const wolfRig = actors.made.find(
+      (a) => a.key !== boarKey && a.update.mock.calls.length > 0,
+    ) as MockActor & { isMidOneShot: boolean };
+    expect(boarRig).toBeDefined();
+    expect(wolfRig).toBeDefined();
+    for (const a of actors.made) a.playHit.mockClear();
+    visual.update(view, 2, 0, 0.016);
+    expect(boarRig?.playHit).toHaveBeenCalledTimes(1);
+    expect(wolfRig.playHit).not.toHaveBeenCalled();
+    (boarRig as MockActor & { isMidOneShot: boolean }).isMidOneShot = true;
+    visual.update(view, 3, 0, 0.016);
+    expect(boarRig?.playHit).toHaveBeenCalledTimes(1);
+    visual.dispose();
+  });
+
+  it("links a rig's scorch materials behind the rig's own compile gate before they swap in", async () => {
+    actors.made.length = 0;
+    const gate = vi.fn(() => Promise.resolve());
+    const gated = new TurretDefenseVisual(new THREE.Scene(), () => 0, gate, immediate);
+    await buildAll(gated, viewOf(engine(0)), 0);
+    const installed = actors.made[0].setFarBakeGate.mock.calls[0]?.[0];
+    expect(typeof installed).toBe('function');
+    const target = new THREE.Group();
+    const settled = vi.fn();
+    installed(target, settled);
+    expect(gate).toHaveBeenCalledWith(target);
+    await flush();
+    expect(settled).toHaveBeenCalledTimes(1);
+    gated.dispose();
+    actors.made.length = 0;
+    const bare = new TurretDefenseVisual(new THREE.Scene(), () => 0, undefined, immediate);
+    await buildAll(bare, viewOf(engine(0)), 0);
+    expect(actors.made[0].setFarBakeGate).toHaveBeenCalledWith(null);
+    bare.dispose();
   });
 
   it('flies the cannon shell from the fired entry and shows the blast from the impact entry', async () => {

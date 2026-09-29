@@ -22,8 +22,13 @@
 // sparks, smoke); the shell and its wake, the flash, the fireball and the shock
 // ring are the same on every tier. Reduced motion drops the camera shake and the
 // FOV punch.
+//
+// A caller may also launch its own puffs on the same draw (puffBurst: a pooled
+// burst, cannon_puff_burst_core.ts, sized at construction), such as the dust a
+// thrown monster kicks up, so it never needs a material of its own.
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../game/ui_effects_profile';
+import { type CannonPuffBurst, CannonPuffBursts } from './cannon_puff_burst_core';
 import {
   CANNON_PUFF_KINDS,
   CANNON_PUFF_LAYERS,
@@ -92,6 +97,8 @@ export interface CannonShellOptions {
   compileGate?: (target: THREE.Object3D) => Promise<unknown>;
   /** The static graphics preset (never the frame governor). */
   effectsTier?: GfxTier;
+  /** Pooled bursts callers launch their own puffs into (puffBurst); none by default. */
+  bursts?: { readonly slots: number; readonly puffs: number };
 }
 
 interface Parts {
@@ -114,7 +121,7 @@ const SOIL_GRASS = new THREE.Color(0x4d5a2c);
 const ZERO = new THREE.Matrix4().makeScale(0, 0, 0);
 const BLACK = { r: 0, g: 0, b: 0 };
 const FORWARD = new THREE.Vector3(0, 0, 1);
-const PUFF_CAPACITY =
+const SHOT_PUFF_CAPACITY =
   CANNON_SHELL_POOL * (CANNON_TRAIL_PUFFS + 1) +
   CANNON_MUZZLE_POOL * CANNON_MUZZLE_PUFFS +
   CANNON_IMPACT_POOL * CANNON_BLAST_PUFFS;
@@ -149,11 +156,11 @@ export class CannonShellVisuals {
     newCannonPuff,
   );
   private readonly trailAges = new Float32Array(CANNON_TRAIL_PUFFS);
-  private readonly frames: CannonPuffFrame[] = Array.from(
-    { length: PUFF_CAPACITY },
-    newCannonPuffFrame,
-  );
+  private readonly bursts: CannonPuffBursts;
+  private readonly puffCapacity: number;
+  private readonly frames: CannonPuffFrame[];
   private frameCount = 0;
+  private readonly low: boolean;
   private readonly byKind = new Int32Array(CANNON_PUFF_KINDS);
   private readonly liveScorches: boolean[] = new Array(CANNON_SCORCH_POOL).fill(false);
   private readonly scorchFades = new Float32Array(CANNON_SCORCH_POOL);
@@ -180,8 +187,17 @@ export class CannonShellVisuals {
       effectsQuality: 1,
       reduceMotion: false,
     });
-    this.counts = cannonShotCounts(profile.tier === 'low');
+    this.low = profile.tier === 'low';
+    this.counts = cannonShotCounts(this.low);
+    this.bursts = new CannonPuffBursts(options.bursts?.slots ?? 0, options.bursts?.puffs ?? 0);
+    this.puffCapacity = SHOT_PUFF_CAPACITY + this.bursts.capacity;
+    this.frames = Array.from({ length: this.puffCapacity }, newCannonPuffFrame);
     this.root.name = 'fire-and-fly-weapon';
+  }
+
+  /** The static preset is the low one: callers shed their cosmetic counts too. */
+  get lowEffects(): boolean {
+    return this.low;
   }
 
   get prepared(): boolean {
@@ -199,6 +215,17 @@ export class CannonShellVisuals {
 
   setHost(host: CannonShellHost | null): void {
     this.host = host;
+  }
+
+  /**
+   * A pooled burst for the caller's own puffs, seen at frame seconds `now`:
+   * launch into its `puffs`, then set `count`, `life` and, for an event seen
+   * late, an earlier `at`. Null before `prepare`, after `dispose`, or without
+   * a burst pool.
+   */
+  puffBurst(now: number): CannonPuffBurst | null {
+    if (!this.parts || this.disposed) return null;
+    return this.bursts.take(now);
   }
 
   /**
@@ -283,6 +310,7 @@ export class CannonShellVisuals {
     parts.chunks.count = 0;
     parts.chunks.visible = false;
     this.liveChunks.fill(false);
+    this.bursts.clear();
     for (let i = 0; i < CANNON_SCORCH_POOL; i++) {
       if (this.liveScorches[i]) this.retireScorch(parts, i);
     }
@@ -302,6 +330,7 @@ export class CannonShellVisuals {
     this.drawShells(parts, tick);
     this.gatherMuzzles(time);
     this.gatherBlasts(time);
+    this.gatherBursts(time);
     this.drawPuffs(parts);
     this.drawChunks(parts, time);
     this.drawScorches(parts, time);
@@ -439,7 +468,7 @@ export class CannonShellVisuals {
     scorch.receiveShadow = false;
     scorch.visible = false;
     scorch.renderOrder = floorVfxRenderOrder('ground', 1);
-    const puffs = new CannonPuffMesh(PUFF_CAPACITY, materialName('puff'));
+    const puffs = new CannonPuffMesh(this.puffCapacity, materialName('puff'));
     // Airborne, but it must paint after the scorch it rises over and under every
     // telegraph and the aim reticle: the player band's upper rungs.
     puffs.mesh.renderOrder = floorVfxRenderOrder('player', 4);
@@ -675,6 +704,15 @@ export class CannonShellVisuals {
         continue;
       }
       for (let i = 0; i < slot.puffCount; i++) this.gather(slot.puffs[i], age);
+    }
+  }
+
+  private gatherBursts(time: number): void {
+    if (!this.bursts.sweep(time)) return;
+    for (const burst of this.bursts.slots) {
+      if (!burst.active) continue;
+      const age = time - burst.at;
+      for (let i = 0; i < burst.count; i++) this.gather(burst.puffs[i], age);
     }
   }
 

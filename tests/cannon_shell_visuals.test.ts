@@ -466,6 +466,72 @@ describe('cannon shell visuals', () => {
     high.dispose();
   });
 
+  it("draws a caller's pooled bursts in the same puff draw, and sizes that draw for them", () => {
+    const bare = new CannonShellVisuals({ blastRadius: RADIUS, groundAt: () => 0 });
+    expect(bare.puffBurst(0)).toBeNull();
+    bare.prepare(new THREE.Scene());
+    expect(bare.puffBurst(0)).toBeNull();
+    const plain = (piece(bare, 'puff') as THREE.Mesh<THREE.InstancedBufferGeometry>).geometry;
+    const plainCapacity = (plain.getAttribute('aCenter') as THREE.InstancedBufferAttribute).count;
+    bare.dispose();
+
+    const scene = new THREE.Scene();
+    const visuals = new CannonShellVisuals({
+      blastRadius: RADIUS,
+      groundAt: () => 0,
+      bursts: { slots: 3, puffs: 4 },
+    });
+    expect(visuals.puffBurst(0)).toBeNull();
+    visuals.prepare(scene);
+    const mesh = piece(visuals, 'puff') as THREE.Mesh<THREE.InstancedBufferGeometry>;
+    const capacity = (mesh.geometry.getAttribute('aCenter') as THREE.InstancedBufferAttribute)
+      .count;
+    expect(capacity).toBe(plainCapacity + 12);
+    const materials = materialsUnder(visuals.root);
+    const burst = visuals.puffBurst(1);
+    if (!burst) throw new Error('a burst slot expected');
+    for (let i = 0; i < 3; i++) {
+      Object.assign(burst.puffs[i], {
+        kind: PUFF.shock,
+        x: 4 + i,
+        y: 0.3,
+        z: 0,
+        size0: 1,
+        size1: 2,
+        life: 0.8,
+        delay: 0,
+      });
+    }
+    burst.count = 3;
+    burst.life = 0.8;
+    visuals.update(160, 1.2);
+    expect(puffs(visuals, PUFF.shock)).toBe(3);
+    // One draw, one material: the burst adds instances, never a mesh or a program.
+    expect(materialsUnder(visuals.root)).toEqual(materials);
+    expect(mesh.geometry.instanceCount).toBe(3);
+    // Spent, it frees its slot and draws nothing.
+    visuals.update(160, 1.9);
+    expect(puffs(visuals, PUFF.shock)).toBe(0);
+    expect(burst.active).toBe(false);
+    const again = visuals.puffBurst(2);
+    if (!again) throw new Error('a burst slot expected');
+    Object.assign(again.puffs[0], { kind: PUFF.dust, size0: 1, size1: 2, life: 5, delay: 0 });
+    again.count = 1;
+    again.life = 5;
+    visuals.update(160, 2.1);
+    expect(puffs(visuals, PUFF.dust)).toBe(1);
+    visuals.clear();
+    visuals.update(160, 2.2);
+    expect(puffs(visuals, PUFF.dust)).toBe(0);
+    visuals.dispose();
+    expect(visuals.puffBurst(3)).toBeNull();
+  });
+
+  it('tells its callers the static preset is low, so they shed their own cosmetic counts', () => {
+    expect(weapon('low').visuals.lowEffects).toBe(true);
+    expect(weapon('high').visuals.lowEffects).toBe(false);
+  });
+
   it('clears every shot and blast, and releases what it minted on dispose', () => {
     const { visuals } = weapon();
     visuals.fire(fired, fallback, 0, false);

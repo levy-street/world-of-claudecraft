@@ -1,10 +1,11 @@
 // The cannon shot's billboard particles, the pure half: every puff of the
 // muzzle, the shell's trail and the blast (the flash, the fireball, the dust
-// cloud, the ground shock ring of dust, the thrown dirt, the sparks) is a
-// closed-form flight from a launch record, so a frame evaluates each live puff
-// from its age alone and nothing integrates. The Three consumer is
-// cannon_puff_mesh.ts (one instanced draw on a premultiplied blend, so a puff
-// can be additive fire, alpha-blended dust, or fade from one to the other).
+// cloud, the ground shock ring of dust, the thrown dirt, the sparks), and the
+// bark chips a thrown body knocks off a trunk, is a closed-form flight from a
+// launch record, so a frame evaluates each live puff from its age alone and
+// nothing integrates. The Three consumer is cannon_puff_mesh.ts (one instanced
+// draw on a premultiplied blend, so a puff can be additive fire, alpha-blended
+// dust, or fade from one to the other).
 //
 // Sized for the distance a blast is seen from: the shared Vfx point cloud is
 // tuned for melee range (a 0.5 yd sprite is 8 px at the 38 yd a blast sits from
@@ -31,11 +32,12 @@ export const PUFF = {
   trailSmoke: 8,
   trailSpark: 9,
   glow: 10,
+  bark: 11,
 } as const;
 
 export type CannonPuffKind = (typeof PUFF)[keyof typeof PUFF];
 
-export const CANNON_PUFF_KINDS = 11;
+export const CANNON_PUFF_KINDS = 12;
 
 interface PuffStyleSpec {
   sprite: number;
@@ -248,6 +250,21 @@ const STYLE_SPECS: readonly PuffStyleSpec[] = [
     addU0: 0,
     addU1: 1,
     shade: 0,
+  },
+  // bark: red-brown chips knocked off a trunk a thrown body hits.
+  {
+    sprite: S.clod,
+    layer: 1,
+    stops: [0x8a4a2c, 1, 0x7a4026, 1, 0x6a3822, 1],
+    mid: 0.5,
+    alpha: 1,
+    attack: 0.02,
+    fadeFrom: 0.75,
+    add0: 0,
+    add1: 0,
+    addU0: 0,
+    addU1: 1,
+    shade: 0.5,
   },
 ];
 

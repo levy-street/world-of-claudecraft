@@ -1868,8 +1868,9 @@ export class CharacterVisual {
     );
   }
 
-  playHit(): void {
-    if (this.deadLock || this.currentIsOneShot || this.hitCooldown > 0) return;
+  /** `interrupt` cuts a one-shot in progress short (a body thrown mid-swing). */
+  playHit(interrupt = false): void {
+    if (this.deadLock || (this.currentIsOneShot && !interrupt) || this.hitCooldown > 0) return;
     const clips = this.def.clips.hit;
     if (!clips || clips.length === 0) return;
     this.hitCooldown = HIT_REACT_COOLDOWN;
