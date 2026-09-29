@@ -59,6 +59,16 @@ export interface ActiveMinigameMusicInput {
   entities?: Iterable<ActiveMinigameEntity>;
 }
 
+/** The Fire and Fly seat plays the cannon's track this much softer, under its shots and blasts. */
+export const TURRET_MUSIC_LEVEL = 0.6;
+
+/** The level the resolved track plays at: the turret seat's softer mix, full for every other activity. */
+export function resolveActiveMinigameLevel(input: ActiveMinigameMusicInput): number {
+  return !input.activePuzzleQuestId && !input.vehicleSession && input.turretSession
+    ? TURRET_MUSIC_LEVEL
+    : 1;
+}
+
 /** Resolves which minigame music track (if any) should override the ambient score. */
 export function resolveActiveMinigameTrack(input: ActiveMinigameMusicInput): MinigameTrack | null {
   // 1. Interactive puzzle modal (Match-3 or Leyline puzzle)

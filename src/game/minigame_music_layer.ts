@@ -28,6 +28,8 @@ interface MusicDirectorHost<S extends MinigameStream> {
 export class MinigameMusicLayer<S extends MinigameStream = MinigameStream> {
   readonly streamsByTrack: Partial<Record<MinigameTrack, S>> = {};
   active: MinigameTrack | null = null;
+  /** The level the active track plays at (1 is the track's full mix). */
+  level = 1;
 
   constructor(private readonly director: object) {}
 
@@ -53,11 +55,12 @@ export class MinigameMusicLayer<S extends MinigameStream = MinigameStream> {
     for (const stream of Object.values(this.streamsByTrack)) yield stream as S;
   }
 
-  /** Override zone and combat soundtrack with a dedicated minigame/activity track. */
-  set(track: MinigameTrack | null): void {
+  /** Override zone and combat soundtrack with a dedicated minigame/activity track at `level`. */
+  set(track: MinigameTrack | null, level = 1): void {
     const h = this.host;
-    if (track === this.active && h.ctx) return;
+    if (track === this.active && level === this.level && h.ctx) return;
     this.active = track;
+    this.level = level;
     if (!h.ctx) return;
 
     if (track !== null) {
@@ -71,7 +74,7 @@ export class MinigameMusicLayer<S extends MinigameStream = MinigameStream> {
         }
       }
       for (const [name, stream] of Object.entries(this.streamsByTrack) as [MinigameTrack, S][]) {
-        const target = name === track ? 1 : 0;
+        const target = name === track ? level : 0;
         h.setStreamTarget(stream, target, target > 0 ? 0.4 : 0.3);
       }
       for (const stream of Object.values(h.zoneStreams)) {
