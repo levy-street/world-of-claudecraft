@@ -27,14 +27,13 @@
 // nothing in a live frame. Nothing here runs per frame.
 
 import * as THREE from 'three';
-import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {
   HARBOR_ROUTE_MARKERS,
   type HarborRouteMarkerDef,
 } from '../sim/content/harbor_route_markers';
 import { harborRouteMarkerYaw } from '../sim/harbor_route_markers';
 import { groundHeight } from '../sim/world';
-import { loadGltf } from './assets/loader';
+import { type LoadedGltf, loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { harborDestinationLabel } from './entity_labels';
 import { GFX, surfaceMat } from './gfx';
@@ -70,7 +69,7 @@ const FALLBACK_PLATE: HarborRouteMarkerPlate = {
   textHeight: 0.62,
 };
 
-let loaded: GLTF | null = null;
+let loaded: LoadedGltf | null = null;
 let loadTask: Promise<void> | null = null;
 
 export function prepareHarborRouteMarkerAssets(): Promise<void> {
@@ -149,7 +148,7 @@ function plateGeometry(plate: HarborRouteMarkerPlate): THREE.BufferGeometry {
   return geo;
 }
 
-function buildTemplate(gltf: GLTF, keep: readonly string[]): MarkerTemplate {
+function buildTemplate(gltf: LoadedGltf, keep: readonly string[]): MarkerTemplate {
   // loader cache results are immutable: read a clone
   const root = gltf.scene.clone(true);
   root.updateMatrixWorld(true);
@@ -349,7 +348,7 @@ export const harborRouteMarkerInternalsForTest = {
   assetUrl: MARKER_URL,
   destinationLabel: harborDestinationLabel,
   /** Hand a parsed GLB to the preload slot (Node tests have no fetch path). */
-  setLoadedGltfForTest(gltf: GLTF | null): void {
+  setLoadedGltfForTest(gltf: LoadedGltf | null): void {
     loaded = gltf;
     resetHarborRouteMarkerCaches();
   },

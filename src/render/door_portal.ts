@@ -1,9 +1,8 @@
 import * as THREE from 'three';
-import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { DUNGEONS } from '../sim/data';
 import { FORGEFATHER_FORTRESS_PLACEMENTS } from '../sim/forgefather_fortress';
 import { RIFT_TIER_COLORS, type RiftTier } from '../sim/types';
-import { loadGltf } from './assets/loader';
+import { type LoadedGltf, loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
 import { markOwnedMaterial, markSharedGeometry, markSharedMaterial } from './shared_resource';
@@ -325,7 +324,7 @@ const RIFT_GATE_URL = '/models/props/rift_portal.glb';
 // Target world height (yards) the ~1.13-unit native model is scaled up to; the
 // gate looms taller than the old 5 yd arch to read from across the zone.
 const RIFT_GATE_HEIGHT = 6.0;
-let riftGateGltf: GLTF | null = null;
+let riftGateGltf: LoadedGltf | null = null;
 
 // The rift boulder / rolling boulder reuse a real detailed rock mesh (a shipped
 // KayKit-style prop) instead of a bare dodecahedron, so they read as proper craggy
@@ -333,17 +332,17 @@ let riftGateGltf: GLTF | null = null;
 // `--model-file` import lane's spirit): no new GLB, no Tripo credits. Cached +
 // shared like the gate; buildRiftPuzzleProp falls back to a dodecahedron if absent.
 const RIFT_ROCK_URL = '/models/props/rock_large_f.glb';
-let riftRockGltf: GLTF | null = null;
+let riftRockGltf: LoadedGltf | null = null;
 // Tripo-generated rift props (see CREDITS.md): an arcane flame that crowns the rune
 // pylons (replacing the old crystal/beam) and a carved rune monolith for the
 // sequence runes. Preloaded + shared like the rock; builders fall back to procedural
 // geometry if the asset is still loading.
 const RIFT_FLAME_URL = '/models/props/rift_flame.glb';
-let riftFlameGltf: GLTF | null = null;
+let riftFlameGltf: LoadedGltf | null = null;
 const RIFT_RUNE_URL = '/models/props/rift_rune.glb';
-let riftRuneGltf: GLTF | null = null;
+let riftRuneGltf: LoadedGltf | null = null;
 
-function markGltfShared(gltf: GLTF): void {
+function markGltfShared(gltf: LoadedGltf): void {
   gltf.scene.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh) return;
@@ -361,7 +360,7 @@ function markGltfShared(gltf: GLTF): void {
  * Recolor allocates a NEW per-clone material (the cached original stays shared and
  * untouched), disposed with the view like the procedural props. */
 function fittedPropClone(
-  gltf: GLTF,
+  gltf: LoadedGltf,
   height: number,
   stone?: { color: number; emissive: number },
 ): THREE.Group {

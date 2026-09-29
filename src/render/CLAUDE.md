@@ -200,6 +200,11 @@ cadence logic of its own. Narrow helpers:
 rules, all CI-enforced:
 - **Cache results are IMMUTABLE: clone before mutating.** `releaseGltf(url)` drops
   the cache entry after geometry is extracted.
+- **A loaded GLB carries no parser.** `loadGltf` resolves a `LoadedGltf` (the GLTF
+  minus `parser`): the parser held a copy of the binary chunk and every bufferView,
+  embedded images included, for as long as the GLTF stayed cached. Data only the
+  parser has is extracted in the loader's post-parse hooks, before the drop
+  (`tests/gltf_parser_release.test.ts` pins the drop and bans `src/` readers).
 - **Never `dispose()` a shared GLB-cache texture that may still be drawn.** With the
   KTX2 mip release (`assets/ktx2_mip_release.ts`) its CPU data is full-shape stubs and
   its restore source drops on dispose, so a later re-upload renders black.

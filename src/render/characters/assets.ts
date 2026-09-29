@@ -12,7 +12,6 @@
 // assetsReady() left an unrelated preload failure anywhere on the site
 // permanently blanking it on a cold, first-visit cache.
 import * as THREE from 'three';
-import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import {
@@ -21,7 +20,7 @@ import {
 } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
-import { loadGltf, loadKtx2Texture, loadTexture } from '../assets/loader';
+import { type LoadedGltf, loadGltf, loadKtx2Texture, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
 import { recordBuildSpan, timeBuildSpan } from '../build_spans';
 import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
@@ -552,7 +551,7 @@ function resolveBone(root: THREE.Object3D, name: string): THREE.Object3D | null 
 // Preload
 // ---------------------------------------------------------------------------
 
-const gltfByUrl = new Map<string, GLTF>();
+const gltfByUrl = new Map<string, LoadedGltf>();
 
 function assetUrl(url: string): string {
   return visualAssetUrlForGraphics(url, GFX.standardMaterials);
@@ -956,7 +955,7 @@ export function characterResidencySources(): { parsedScenes: THREE.Object3D[] } 
   return { parsedScenes: [...gltfByUrl.values()].map((g) => g.scene) };
 }
 
-function resolvedGltf(url: string): GLTF {
+function resolvedGltf(url: string): LoadedGltf {
   const resolvedUrl = assetUrl(url);
   const g = gltfByUrl.get(resolvedUrl);
   if (!g) {

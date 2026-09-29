@@ -18,8 +18,12 @@ import { assetUrl } from './media';
 import { assetLoadStarted, recordAssetLoad } from './stats';
 import { neutralizeGltfTransmission } from './transmission_neutralize';
 
+/** A parsed GLB as every consumer receives it: the GLTF minus its parser,
+ *  which loadGltf drops once the post-parse hooks have run (dropGltfParser). */
+export type LoadedGltf = Omit<GLTF, 'parser'>;
+
 let gltfLoader: GLTFLoader | null = null;
-const gltfCache = new Map<string, Promise<GLTF>>();
+const gltfCache = new Map<string, Promise<LoadedGltf>>();
 const texCache = new Map<string, Promise<THREE.Texture>>();
 const ktx2TexCache = new Map<string, Promise<THREE.CompressedTexture>>();
 
@@ -132,6 +136,19 @@ function polishGltfTextures(gltf: GLTF): void {
   });
 }
 
+// The parser is the only path from a cached GLTF to a copy of the whole binary
+// chunk, the bufferView promise cache (embedded image slices included) and the
+// parsed JSON. Nothing drawn needs it after parse: vertex, index and animation
+// arrays view their own decoded bufferViews, and a texture re-uploads (context
+// restore included) from its image, its mip chain, or the KTX2 restore source
+// that ktx2_mip_release keeps as its own copy. Every consumer shares this one
+// object, so deleting in place frees it for all of them. Pinned, with a ban on
+// src/ readers, by tests/gltf_parser_release.test.ts.
+function dropGltfParser(gltf: GLTF): LoadedGltf {
+  delete (gltf as { parser?: unknown }).parser;
+  return gltf;
+}
+
 // asset fetch start/settle so a device console shows exactly how far through the
 // preload set a WebContent kill lands and which asset preceded it (the iPhone 17
 // Pro entry-kill investigation: WebContent died at 1.54 GB resident mid-decode
@@ -167,7 +184,7 @@ function diagSettle(seq: number, kind: string, resolved: string, ok: boolean): v
 
 /** Load + parse a .glb once; subsequent calls share the same parsed scene.
  *  Consumers must treat the result as immutable — clone before mutating. */
-export function loadGltf(url: string): Promise<GLTF> {
+export function loadGltf(url: string): Promise<LoadedGltf> {
   const resolved = assetUrl(url);
   let p = gltfCache.get(resolved);
   if (!p) {
@@ -202,7 +219,7 @@ export function loadGltf(url: string): Promise<GLTF> {
         // chain, so classification always precedes the first GPU upload.
         classifyGltfKtx2Textures(gltf, resolved);
         recordAssetLoad('gltf', resolved, startedAt);
-        return gltf;
+        return dropGltfParser(gltf);
       },
       (err: unknown) => {
         recordAssetLoad('gltf', resolved, startedAt, true);

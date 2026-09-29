@@ -14,9 +14,8 @@
 // building's ghost fade, prefetched once the camera comes within reach.
 
 import * as THREE from 'three';
-import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { loadGltf, releaseGltf } from './assets/loader';
+import { type LoadedGltf, loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { dequantizeAttribute } from './characters/dequantize_attribute';
 import { GFX, surfaceMat } from './gfx';
@@ -70,7 +69,7 @@ export function isTransportShipKey(key: string): boolean {
   return key in TRANSPORT_SHIP_MODELS;
 }
 
-const loaded = new Map<string, GLTF>();
+const loaded = new Map<string, LoadedGltf>();
 /** Prepared templates by `url|tier`: the Standard and Lambert tiers convert the
  *  materials differently, so a graphics rebuild never reuses the other tier's. */
 const templates = new Map<string, ShipTemplate>();
@@ -224,7 +223,7 @@ function mergeStatic(anchor: THREE.Object3D, live: ReadonlySet<THREE.Object3D>):
   }
 }
 
-function buildTemplate(gltf: GLTF): ShipTemplate {
+function buildTemplate(gltf: LoadedGltf): ShipTemplate {
   const root = gltf.scene.clone(true);
   root.traverse((node) => {
     const mesh = node as THREE.Mesh;
@@ -531,7 +530,7 @@ export const transportShipInternalsForTest = {
   buildTemplate,
   mergeStatic,
   /** Hand a parsed GLB to the preload map (Node tests have no fetch path). */
-  setLoadedGltfForTest(url: string, gltf: GLTF | null): void {
+  setLoadedGltfForTest(url: string, gltf: LoadedGltf | null): void {
     templates.delete(templateKey(url));
     if (gltf) loaded.set(url, gltf);
     else loaded.delete(url);

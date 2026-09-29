@@ -119,7 +119,7 @@ describe('foliage preload set covers placement at every graphics tier (regressio
 describe('extracted world assets release their duplicate parsed glTF sources', () => {
   it('caches foliage extraction before releasing the parsed source scene', () => {
     const source = readFileSync(new URL('../src/render/foliage.ts', import.meta.url), 'utf8');
-    expect(source).toContain("import { loadGltf, releaseGltf } from './assets/loader';");
+    expect(source).toMatch(/import \{[^}]*\breleaseGltf\b[^}]*\} from '\.\/assets\/loader';/);
     expect(source).toContain('const extractedParts = new Map<string, ModelPart[]>();');
     expect(source).toContain('const cached = extractedParts.get(url);');
     expect(source).toContain('loadedModels.delete(url);');
@@ -128,7 +128,7 @@ describe('extracted world assets release their duplicate parsed glTF sources', (
 
   it('releases each prop source after its extracted geometry is cached', () => {
     const source = readFileSync(new URL('../src/render/props.ts', import.meta.url), 'utf8');
-    expect(source).toContain("import { loadGltf, releaseGltf } from './assets/loader';");
+    expect(source).toMatch(/import \{[^}]*\breleaseGltf\b[^}]*\} from '\.\/assets\/loader';/);
     expect(source).toContain('loadedProps.delete(key);');
     expect(source).toContain('releaseGltf(def.url);');
     expect(source).toContain(
