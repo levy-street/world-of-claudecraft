@@ -17,9 +17,11 @@ import {
   fireAndFlyTrunkRadius,
 } from '../sim/fire_and_fly_field';
 import { IGNIVAR_GATE_LOCKED_TEMPLATE } from '../sim/ignivar_raid_ids';
+import { horizontalAt } from '../sim/minigames/thrown_body';
 import { authoredWallSegments } from '../sim/rift/authored';
 import { PLAYER_INTEREST_RADIUS } from '../sim/types';
 import type { IWorld } from '../world_api';
+import type { TurretSessionView } from '../world_api/vehicles';
 
 const PLAN_MARGIN_YD = DUNGEON_WALL_HW + 2;
 const MINIMAP_RIM_INSET = 7;
@@ -291,8 +293,38 @@ export function dungeonMapLocal(x: number, z: number): DungeonMapLocal | null {
  *  coordinates repeat per copy, so a member in another copy of the same dungeon
  *  (or in another dungeon entirely) would otherwise project onto this plan. */
 function sameInstance(local: { originX: number; originZ: number }, x: number, z: number): boolean {
+  return sameInstanceAt(local.originX, local.originZ, x, z);
+}
+
+function sameInstanceAt(originX: number, originZ: number, x: number, z: number): boolean {
   const frame = dungeonInstanceAt(x, z);
-  return frame !== null && frame.ox === local.originX && frame.oz === local.originZ;
+  return frame !== null && frame.ox === originX && frame.oz === originZ;
+}
+
+type TurretMonsterView = TurretSessionView['defense']['monsters'][number];
+
+/**
+ * The local seat's Fire and Fly session when its tower stands in this instance
+ * copy, else null. Its monsters are private to the session, never world
+ * entities, so the plan reads them here and draws them as hostile mobs.
+ */
+function turretSessionIn(
+  world: IWorld,
+  originX: number,
+  originZ: number,
+): TurretSessionView | null {
+  const session = world.turretSession;
+  if (!session || !sameInstanceAt(originX, originZ, session.origin.x, session.origin.z)) {
+    return null;
+  }
+  return session;
+}
+
+/** The mob template a live monster is drawn as; null for a corpse (even one still
+ *  flying) or a monster gone from the field. */
+function turretMobTemplate(session: TurretSessionView, m: TurretMonsterView): string | null {
+  if (!(m.hp > 0) || m.state === 'dead' || m.state === 'gone') return null;
+  return session.defense.plan.kinds[m.kind]?.templateId ?? null;
 }
 
 /** Shared branch guard for the M-map and minimap. */
@@ -347,6 +379,25 @@ function collectMarkers(
       aggro: entity.aggroTargetId === p.id,
       boss: MOBS[entity.templateId]?.boss === true,
     });
+  }
+
+  const turret = turretSessionIn(world, local.originX, local.originZ);
+  const tick = turret ? world.turretClock : null;
+  if (turret && tick !== null) {
+    for (const m of turret.defense.monsters) {
+      const templateId = turretMobTemplate(turret, m);
+      if (!templateId) continue;
+      const at = horizontalAt(m.seg, tick);
+      const point = projection.point(at.x - local.originX, at.z - local.originZ);
+      if (!visible(point)) continue;
+      markers.push({
+        kind: 'mob',
+        ...point,
+        templateId,
+        aggro: m.state === 'windup',
+        boss: MOBS[templateId]?.boss === true,
+      });
+    }
   }
 
   const party = world.partyInfo;
@@ -665,6 +716,27 @@ class DungeonMarkerBuffer {
       marker.templateId = entity.templateId;
       marker.aggro = entity.aggroTargetId === player.id;
       marker.boss = MOBS[entity.templateId]?.boss === true;
+    }
+
+    const turret = turretSessionIn(world, frame.ox, frame.oz);
+    const tick = turret ? world.turretClock : null;
+    if (turret && tick !== null) {
+      for (const m of turret.defense.monsters) {
+        const templateId = turretMobTemplate(turret, m);
+        if (!templateId) continue;
+        const at = horizontalAt(m.seg, tick);
+        const cx = baseX - (at.x - frame.ox) * scale;
+        const cy = baseY - (at.z - frame.oz) * scale;
+        if (circular) {
+          const dx = cx - half;
+          const dy = cy - half;
+          if (dx * dx + dy * dy > rim2) continue;
+        } else if (cx < 0 || cx > canvasSize || cy < 0 || cy > canvasSize) continue;
+        const marker = this.next('mob', cx, cy);
+        marker.templateId = templateId;
+        marker.aggro = m.state === 'windup';
+        marker.boss = MOBS[templateId]?.boss === true;
+      }
     }
 
     const party = world.partyInfo;
