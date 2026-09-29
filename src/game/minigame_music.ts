@@ -61,9 +61,10 @@ export interface ActiveMinigameMusicInput {
 
 /**
  * The Fire and Fly seat plays the cannon's track this much softer, under its shots and blasts:
- * the file measures -10.7 LUFS integrated, and 0.34 (-9.3 dB) brings it to about -20 LUFS.
+ * the file measures -10.7 LUFS integrated, and 0.61 (-4.3 dB) brings it to about -15 LUFS, the
+ * loudness of the zone music.
  */
-export const TURRET_MUSIC_LEVEL = 0.34;
+export const TURRET_MUSIC_LEVEL = 0.61;
 
 /** The level the resolved track plays at: the turret seat's softer mix, full for every other activity. */
 export function resolveActiveMinigameLevel(input: ActiveMinigameMusicInput): number {
