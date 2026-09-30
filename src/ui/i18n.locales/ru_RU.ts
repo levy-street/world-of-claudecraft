@@ -13835,6 +13835,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showUtilityModes': 'Включать скрытность и формы передвижения',
   'hudChrome.options.showFriendlyTrack': 'Показывать мои эффекты на союзниках',
   'hudChrome.options.showShieldTrack': 'Показывать мои щиты',
+  'hudChrome.options.classicCombatText': 'Классический боевой текст',
   'hudChrome.options.stickyTarget': 'Сохранять цель при клике по земле',
   'hudChrome.options.showNameplateDots': 'Показывать мои эффекты на полосах имён',
   'hudChrome.options.nameplateDotScale': 'Размер эффектов на полосах имён',
@@ -17075,6 +17076,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifExtraBars':
     'Открывает второй ряд панели способностей, а следом за ним и третий. Ячейки остаются доступны по своим горячим клавишам, даже пока ряды скрыты.',
   'guide.settingsPage.ifFctScale': 'Размер чисел урона и лечения, что всплывают над вашей целью.',
+  'guide.settingsPage.ifClassicCombatText':
+    'Возвращает простые белые и бледно-золотые числа урона, которые поднимаются прямо вверх. Если оставить выключенным (по умолчанию), числа становятся ярче и разлетаются в стороны, а критические и особо крупные удары вспыхивают.',
   'guide.settingsPage.ifFramesIntro':
     'Ваша собственная рамка, рамка цели и вся раскладка группы. У группового блока есть ещё и ползунки масштаба, ширины, высоты, отступов и числа столбцов, чтобы рейдовая сетка вписалась в ваш экран, а кнопка «Сброс» внизу вкладки возвращает все рамки на исходные места.',
   'guide.settingsPage.ifGeneralIntro':

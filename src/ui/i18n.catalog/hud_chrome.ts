@@ -2716,6 +2716,9 @@ export const hudChromeStrings = {
     showUtilityModes: 'Include Stealth and Travel Modes',
     showFriendlyTrack: 'Show My Buffs on Allies',
     showShieldTrack: 'Show My Shields',
+    // Interface > Combat opt-out of the vivid floating combat text (school colours,
+    // fan-out, crit and big-hit emphasis) back to the classic white and gold.
+    classicCombatText: 'Classic Combat Text',
     // Graphics-panel opt-in (default off) for the interactive wake/ripple
     // simulation on water surfaces; bubbles and splash particles do not key
     // off it. It sits in the Display card beside Weather because it costs

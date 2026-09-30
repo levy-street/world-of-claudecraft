@@ -12952,6 +12952,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showUtilityModes': '包含潛行與旅行形態',
   'hudChrome.options.showFriendlyTrack': '顯示我給隊友的增益',
   'hudChrome.options.showShieldTrack': '顯示我的護盾',
+  'hudChrome.options.classicCombatText': '經典戰鬥文字',
   'hudChrome.options.stickyTarget': '點擊地面時保留目標',
   'hudChrome.options.showNameplateDots': '在名條上顯示我的減益',
   'hudChrome.options.nameplateDotScale': '名條減益圖示大小',
@@ -16007,6 +16008,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifExtraBars':
     '顯示第二排動作列，開了第二排之後還能再開第三排。即使整排隱藏著，那些格子依然可以用快捷鍵使用。',
   'guide.settingsPage.ifFctScale': '從目標身上飄起的傷害與治療數字的大小。',
+  'guide.settingsPage.ifClassicCombatText':
+    '恢復為直線上升的純白色與淡金色傷害數字。保持關閉（預設）時，數字更醒目並向兩側散開，致命一擊和格外大的傷害會閃耀。',
   'guide.settingsPage.ifFramesIntro':
     '你自己的框、目標框，以及整個隊伍的排列方式。隊伍區塊還帶有縮放、寬度、高度、間距與欄數的滑桿，好讓團隊格線放得進你的螢幕，而分頁底部的「重設」按鈕會把每一個框都放回原位。',
   'guide.settingsPage.ifGeneralIntro':

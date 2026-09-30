@@ -13612,6 +13612,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showUtilityModes': 'ステルスと移動形態を含める',
   'hudChrome.options.showFriendlyTrack': '味方へのバフを表示',
   'hudChrome.options.showShieldTrack': '自分のシールドを表示',
+  'hudChrome.options.classicCombatText': 'クラシック戦闘テキスト',
   'hudChrome.options.stickyTarget': '地面クリックでターゲットを維持',
   'hudChrome.options.showNameplateDots': 'ネームプレートに自分のデバフを表示',
   'hudChrome.options.nameplateDotScale': 'ネームプレートのデバフ表示サイズ',
@@ -16788,6 +16789,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifExtraBars':
     '2段目のアクションバーを表示し、2段目をオンにすると3段目も現れます。段が隠れているあいだも、スロットはキー割り当てから使えます。',
   'guide.settingsPage.ifFctScale': 'ターゲットから浮かび上がるダメージと回復の数字の大きさです。',
+  'guide.settingsPage.ifClassicCombatText':
+    'まっすぐ上昇する白と淡い金色のシンプルなダメージ数字に戻します。オフ（デフォルト）のままにすると、数字がより目立って左右に広がり、クリティカルや特に大きなヒットが輝きます。',
   'guide.settingsPage.ifFramesIntro':
     '自分のフレーム、ターゲットフレーム、そしてパーティのレイアウト全体です。パーティのまとまりには大きさ、幅、高さ、間隔、列数のスライダーもあるので、レイド用のグリッドを画面に合わせられます。タブの最下部にあるリセットボタンで、すべてのフレームを元の位置に戻せます。',
   'guide.settingsPage.ifGeneralIntro':

@@ -9293,6 +9293,198 @@
   .fct-self-note {
     color: var(--color-fct-self-note);
   }
+  /* Vivid combat text, the default look (Interface > Combat > Classic Combat Text turns
+     it off: the painter then adds none of these classes, so every rule above renders
+     byte-identical to the shipped floater). What it borrows, and why:
+       - ability damage in a saturated gold beside the white auto-attacks, so the two
+         separate at a glance (the shipped pale parchment read as grey);
+       - a heavier keyline, so a number holds its colour on a grey scene;
+       - a hold-then-fade that keeps the number fully opaque for over half its life
+         (the plain rise fades from the first frame, which is what read as grey);
+       - outgoing numbers dealt into four lanes (near / far, alternating sides) that
+         arc out and up, so a burst fans out instead of stacking in one column;
+       - a louder crit that pops in the free centre column as the headline number
+         (overshoot pop, a small twist, a glow in the hit's own colour);
+       - a big-hit flag for a hit well above your own running average (fct_emphasis_core).
+     Presentation only: every number still shows on every tier; the low tier sheds only
+     the crit pop (a vivid crit falls back to the hold-then-fade rise, never the plain
+     fade-from-frame-one rise) and fits the animations to its shorter floater life. */
+  .fct.fct-vivid {
+    text-shadow: var(--fct-vivid-outline);
+  }
+  .fct.fct-vivid.fct-damage-done-ability {
+    color: var(--color-fct-vivid-ability);
+  }
+  .fct.fct-out-l,
+  .fct.fct-out-r,
+  .fct.fct-out-ll,
+  .fct.fct-out-rr {
+    font-size: calc(19px * var(--fct-scale, 1));
+    animation-duration: 1.25s;
+  }
+  .fct.fct-out-l {
+    animation-name: fct-out-l;
+  }
+  .fct.fct-out-r {
+    animation-name: fct-out-r;
+  }
+  .fct.fct-out-ll {
+    animation-name: fct-out-ll;
+  }
+  .fct.fct-out-rr {
+    animation-name: fct-out-rr;
+  }
+  /* A crit (in any lane, or incoming) pops in place. Declared after the lanes so the
+     equal-specificity lane rules above never pull a crit off centre stage. */
+  .fct.fct-vivid.crit {
+    font-size: calc(30px * var(--fct-scale, 1));
+    text-shadow: var(--glow-fct-crit);
+    animation-name: fct-vivid-crit;
+    animation-duration: 1.25s;
+  }
+  .fct.fct-big {
+    font-size: calc(23px * var(--fct-scale, 1));
+    text-shadow: var(--glow-fct-big);
+  }
+  .fct.fct-big.crit {
+    font-size: calc(35px * var(--fct-scale, 1));
+    text-shadow: var(--glow-fct-big-crit);
+  }
+  /* Incoming damage keeps its straight rise over the player, but with the same
+     hold-then-fade, so the hit you just took does not wash out before you read it. */
+  .fct.fct-vivid.fct-damage-taken:not(.crit),
+  .fct.fct-vivid.fct-damage-taken-block:not(.crit) {
+    animation-name: fct-vivid-rise;
+    animation-duration: 1.25s;
+  }
+  /* Low tier: shed the pop (and the twist) exactly as the classic crit does, but keep
+     the hold-then-fade, so a low-tier crit is not the one number that goes grey. This
+     outranks both the vivid crit above and the shipped low-tier crit shed. */
+  :root[data-fx-level="low"] .fct.fct-vivid.crit {
+    animation-name: fct-vivid-rise;
+  }
+  /* The low tier also recycles every floater sooner (FCT_TTL_MS x FCT_TTL_SCALE_LOW =
+     0.75s, src/game/ui_tier_knobs.ts). A vivid animation holds full opacity until 60%, so
+     at its 1.25s length the node would be removed at full opacity the instant its fade
+     began; compressing the vivid animations to the low TTL keeps the fade on screen. XP,
+     heals and every classic floater keep their own durations. */
+  :root[data-fx-level="low"]
+    .fct.fct-vivid:is(
+      .fct-out-l,
+      .fct-out-r,
+      .fct-out-ll,
+      .fct-out-rr,
+      .crit,
+      .fct-damage-taken,
+      .fct-damage-taken-block
+    ) {
+    animation-duration: 0.75s;
+  }
+  /* Static keyframes per lane (never a var() inside keyframes, so the rise stays on the
+     compositor). Each number bows out sideways first and then climbs, an arc rather
+     than a straight diagonal, and holds full opacity until 60% before fading. */
+  @keyframes fct-out-l {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    30% {
+      translate: calc(-50% - 30px) calc(-50% - 24px);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: calc(-50% - 46px) calc(-50% - 84px);
+    }
+  }
+  @keyframes fct-out-r {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    30% {
+      translate: calc(-50% + 30px) calc(-50% - 24px);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: calc(-50% + 46px) calc(-50% - 84px);
+    }
+  }
+  @keyframes fct-out-ll {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    30% {
+      translate: calc(-50% - 62px) calc(-50% - 16px);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: calc(-50% - 88px) calc(-50% - 70px);
+    }
+  }
+  @keyframes fct-out-rr {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    30% {
+      translate: calc(-50% + 62px) calc(-50% - 16px);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: calc(-50% + 88px) calc(-50% - 70px);
+    }
+  }
+  @keyframes fct-vivid-rise {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 80px);
+    }
+  }
+  @keyframes fct-vivid-crit {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+      scale: 0.6;
+      rotate: -8deg;
+    }
+    12% {
+      scale: 1.7;
+      rotate: 4deg;
+    }
+    26% {
+      scale: 1;
+      rotate: 0deg;
+    }
+    65% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 86px);
+      scale: 1;
+      rotate: 0deg;
+    }
+  }
   @media (prefers-reduced-motion: reduce) {
     .fct {
       animation: none !important;

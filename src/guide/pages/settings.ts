@@ -436,6 +436,10 @@ const INTERFACE_TABS: InterfaceTabBlock[] = [
       { setting: 'hudChrome.options.stickyTarget', body: 'guide.settingsPage.ifStickyTarget' },
       { setting: 'hud.options.fctScale', body: 'guide.settingsPage.ifFctScale' },
       {
+        setting: 'hudChrome.options.classicCombatText',
+        body: 'guide.settingsPage.ifClassicCombatText',
+      },
+      {
         setting: 'hudChrome.options.showSecondaryActionBar',
         body: 'guide.settingsPage.ifExtraBars',
       },

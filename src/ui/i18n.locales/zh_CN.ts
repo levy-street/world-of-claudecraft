@@ -12951,6 +12951,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showUtilityModes': '包含潜行与旅行形态',
   'hudChrome.options.showFriendlyTrack': '显示我给队友的增益',
   'hudChrome.options.showShieldTrack': '显示我的护盾',
+  'hudChrome.options.classicCombatText': '经典战斗文字',
   'hudChrome.options.stickyTarget': '点击地面时保留目标',
   'hudChrome.options.showNameplateDots': '在姓名板上显示我的减益',
   'hudChrome.options.nameplateDotScale': '姓名板减益图标大小',
@@ -16002,6 +16003,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifExtraBars':
     '显示第二排动作条，开启第二排之后还能再开第三排。即使这些排处于隐藏状态，其中的格子依然可以用快捷键触发。',
   'guide.settingsPage.ifFctScale': '从目标身上飘出的伤害与治疗数字的大小。',
+  'guide.settingsPage.ifClassicCombatText':
+    '恢复为直线上升的纯白色与淡金色伤害数字。保持关闭（默认）时，数字更醒目并向两侧散开，暴击和格外大的伤害会闪耀。',
   'guide.settingsPage.ifFramesIntro':
     '你自己的框体、你的目标框体，以及整个队伍布局。队伍那一组还带有缩放、宽度、高度、间距和列数滑块，方便把团队网格塞进你的屏幕；标签页底部的“重置”按钮会把每一个框体放回最初的位置。',
   'guide.settingsPage.ifGeneralIntro':

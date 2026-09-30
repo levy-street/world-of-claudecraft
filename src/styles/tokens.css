@@ -1159,6 +1159,31 @@
     --color-fct-honor: #ffd100;
     /* Self-note combat text keeps the shipped warm warning hue. */
     --color-fct-self-note: #ff8c66;
+    /* Vivid combat text (the default; Classic Combat Text keeps the rows above).
+       Ability damage moves from the pale parchment highlight to a saturated gold so it
+       separates from the white auto-attacks at a glance. */
+    --color-fct-vivid-ability: #ffc933;
+    /* The hot underglow of a hit well above your usual (the big-hit flag). */
+    --color-fct-big-flare: #ff7a1a;
+    /* A solid two-pixel keyline plus a soft drop, so a number holds its colour over
+       bright snow, grey stone and dark dungeon floor alike (the thin shared outline
+       lets it wash out against a mid-grey scene). */
+    --fct-vivid-outline:
+      -1.5px -1.5px 0 var(--color-keyline), 1.5px -1.5px 0 var(--color-keyline),
+      -1.5px 1.5px 0 var(--color-keyline), 1.5px 1.5px 0 var(--color-keyline),
+      0 -2px 0 var(--color-keyline), 0 2px 0 var(--color-keyline),
+      -2px 0 0 var(--color-keyline), 2px 0 0 var(--color-keyline),
+      0 3px 4px var(--color-keyline);
+    /* A crit flares in its own colour (currentColor), so an ability crit burns gold and
+       an incoming crit glows red. Only these decorative glow blurs ride the effect tier
+       (the --glow-* family); the keyline above is legibility, identical on every tier. */
+    --glow-fct-crit:
+      var(--fct-vivid-outline), 0 0 calc(8px * var(--fx-shadow, 1)) currentColor,
+      0 0 calc(18px * var(--fx-shadow, 1)) color-mix(in srgb, currentColor 55%, transparent);
+    --glow-fct-big:
+      var(--fct-vivid-outline), 0 0 calc(10px * var(--fx-shadow, 1)) var(--color-fct-big-flare);
+    --glow-fct-big-crit:
+      var(--glow-fct-crit), 0 0 calc(24px * var(--fx-shadow, 1)) var(--color-fct-big-flare);
     /* Fire aura overlays keep their shipped orange school identity. */
     --color-aura-overlay-fire: #ff8a33;
     /* Frost aura overlays keep their shipped cyan school identity. */

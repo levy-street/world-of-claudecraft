@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "guide.settingsPage.ifClassicCombatText",
+    "hudChrome.options.classicCombatText"
+  ],
+  "es_ES": [
+    "guide.settingsPage.ifClassicCombatText",
+    "hudChrome.options.classicCombatText"
+  ],
+  "fr_FR": [
+    "guide.settingsPage.ifClassicCombatText",
+    "hudChrome.options.classicCombatText"
+  ],
+  "fr_CA": [
+    "guide.settingsPage.ifClassicCombatText",
+    "hudChrome.options.classicCombatText"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "guide.settingsPage.ifClassicCombatText",
+    "hudChrome.options.classicCombatText"
+  ],
+  "de_DE": [
+    "guide.settingsPage.ifClassicCombatText",
+    "hudChrome.options.classicCombatText"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "guide.settingsPage.ifClassicCombatText",
+    "hudChrome.options.classicCombatText"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "guide.settingsPage.ifClassicCombatText",
+    "hudChrome.options.classicCombatText"
+  ],
+  "nl_NL": [
+    "guide.settingsPage.ifClassicCombatText",
+    "hudChrome.options.classicCombatText"
+  ],
+  "pl_PL": [
+    "guide.settingsPage.ifClassicCombatText",
+    "hudChrome.options.classicCombatText"
+  ],
+  "id_ID": [
+    "guide.settingsPage.ifClassicCombatText",
+    "hudChrome.options.classicCombatText"
+  ],
+  "tr_TR": [
+    "guide.settingsPage.ifClassicCombatText",
+    "hudChrome.options.classicCombatText"
+  ],
+  "sv_SE": [
+    "guide.settingsPage.ifClassicCombatText",
+    "hudChrome.options.classicCombatText"
+  ],
+  "vi_VN": [
+    "guide.settingsPage.ifClassicCombatText",
+    "hudChrome.options.classicCombatText"
+  ],
+  "da_DK": [
+    "guide.settingsPage.ifClassicCombatText",
+    "hudChrome.options.classicCombatText"
+  ]
 };

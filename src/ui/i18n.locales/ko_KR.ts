@@ -13570,6 +13570,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showUtilityModes': '은신 및 이동 형태 포함',
   'hudChrome.options.showFriendlyTrack': '아군에게 건 내 버프 표시',
   'hudChrome.options.showShieldTrack': '내 보호막 표시',
+  'hudChrome.options.classicCombatText': '클래식 전투 문자',
   'hudChrome.options.stickyTarget': '지면 클릭 시 대상 유지',
   'hudChrome.options.showNameplateDots': '이름표에 내 디버프 표시',
   'hudChrome.options.nameplateDotScale': '이름표 디버프 아이콘 크기',
@@ -16753,6 +16754,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifExtraBars':
     '두 번째 행동 단축바 행을 드러내고, 두 번째가 켜지면 세 번째도 나타납니다. 행이 숨겨져 있어도 슬롯은 단축키로 계속 쓸 수 있습니다.',
   'guide.settingsPage.ifFctScale': '대상에게서 떠오르는 피해량과 치유량 숫자의 크기입니다.',
+  'guide.settingsPage.ifClassicCombatText':
+    '곧게 떠오르는 흰색과 옅은 금색의 단순한 피해 숫자로 되돌립니다. 끈 상태(기본값)로 두면 숫자가 더 또렷하게 양옆으로 퍼지고, 치명타와 유난히 큰 타격이 빛납니다.',
   'guide.settingsPage.ifFramesIntro':
     '내 프레임, 대상 프레임, 그리고 파티 배치 전체를 다룹니다. 파티 묶음에는 크기, 너비, 높이, 간격, 열 슬라이더도 있어 공격대 격자를 화면에 맞출 수 있으며, 탭 맨 아래의 초기화 버튼은 모든 프레임을 처음 자리로 되돌립니다.',
   'guide.settingsPage.ifGeneralIntro':

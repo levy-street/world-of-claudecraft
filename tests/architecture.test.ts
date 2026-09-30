@@ -699,6 +699,7 @@ const UI_PURE_CORES = [
   // class div, nothing else.
   'src/ui/tooltip_line_core.ts',
   'src/ui/fct_core.ts',
+  'src/ui/fct_emphasis_core.ts',
   'src/ui/fct_event.ts',
   // Which authored contact beat a damage floater rides, and how long it waits. The
   // beat table is INJECTED by the painter (it lives in src/game, a layer a pure core

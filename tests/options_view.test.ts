@@ -929,6 +929,7 @@ const COMBAT_KEYS = [
   'showFriendlyTrack',
   'showShieldTrack',
   'fctScale',
+  'classicCombatText',
 ];
 const INTERFACE_KEYS_BY_TAB: Record<InterfaceTab, string[]> = {
   general: GENERAL_KEYS,

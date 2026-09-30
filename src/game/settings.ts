@@ -456,6 +456,13 @@ export const BOOL_SETTINGS = {
   // an accessibility choice, never a graphics-tier knob. Read live by the
   // renderer (setHazardPaletteMode) plus a body class hook (interface_body_classes.ts).
   colorblindMode: { def: false },
+  // off by default: Classic Combat Text. The default floating combat text is the
+  // vivid look (outgoing spell damage in its school's colour, a heavier outline,
+  // numbers that fan out sideways, and a louder crit and big-hit emphasis). On
+  // restores the shipped classic look: white auto-attacks and gold abilities
+  // rising straight up. Purely presentational: both show every number; mirrored
+  // onto a body class (interface_body_classes.ts) the FCT painter reads.
+  classicCombatText: { def: false },
   // off by default: an opt-in frosted-glass blur behind HUD panels & windows.
   // Off keeps the classic crisp look (and zero GPU cost); on softens the world
   // showing through translucent frames.
