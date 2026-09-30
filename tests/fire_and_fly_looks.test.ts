@@ -8,7 +8,10 @@ import {
   fireAndFlyLookTemplate,
   fireAndFlyRigId,
 } from '../src/sim/content/fire_and_fly_looks';
-import { FIRE_AND_FLY_SCENARIOS } from '../src/sim/content/fire_and_fly_scenarios';
+import {
+  FIRE_AND_FLY_SCENARIOS,
+  TURRET_SCENARIOS,
+} from '../src/sim/content/fire_and_fly_scenarios';
 import { MOBS } from '../src/sim/data';
 import type { Entity } from '../src/sim/types';
 import { tsFilesUnder } from './helpers/ts_files_under';
@@ -26,21 +29,49 @@ const fielded = (scenarioId: string): Set<string> =>
 const DELUGE = 'fire_and_fly_deluge';
 
 describe('Fire and Fly monster looks', () => {
-  it('dresses the yeti as the pyre colossus in every scenario, and keeps the wolf a wolf', () => {
+  it('dresses the yeti as the pyre colossus unless a mission dresses it otherwise, and keeps the wolf a wolf', () => {
     for (const s of FIRE_AND_FLY_SCENARIOS) {
-      expect(fireAndFlyLookTemplate('frostmane_yeti', s.id)).toBe('pyre_colossus');
+      const own = FIRE_AND_FLY_SCENARIO_LOOKS[s.id]?.frostmane_yeti ?? 'pyre_colossus';
+      expect(fireAndFlyLookTemplate('frostmane_yeti', s.id)).toBe(own);
       expect(fireAndFlyLookTemplate('forest_wolf', s.id)).toBe('forest_wolf');
     }
+    expect(fireAndFlyLookTemplate('frostmane_yeti', 'fire_and_fly_pack')).toBe('old_greyjaw');
     expect(modelOf('pyre_colossus')).toMatch(/\/pyre_colossus\.glb$/);
   });
 
-  it("dresses the Deluge's diggers as tunnelers, and nowhere else", () => {
+  it('keeps the trials in their own bodies, the yeti aside', () => {
+    for (const s of TURRET_SCENARIOS) {
+      expect(FIRE_AND_FLY_SCENARIO_LOOKS[s.id], s.id).toBeUndefined();
+      for (const id of fielded(s.id)) {
+        if (id === 'frostmane_yeti') continue;
+        expect(fireAndFlyLookTemplate(id, s.id), `${s.id} ${id}`).toBe(id);
+      }
+    }
+  });
+
+  it("dresses the Deluge's diggers as tunnelers", () => {
     expect(fireAndFlyLookTemplate('tunnel_rat', DELUGE)).toBe('deeprock_kobold');
     expect(modelOf('deeprock_kobold')).toMatch(/\/goblin\.glb$/);
+    expect(fireAndFlyLookTemplate('tunnel_rat', 'fire_and_fly_standard')).toBe('tunnel_rat');
+  });
+
+  it('never shows two monsters of one scenario in the same model', () => {
     for (const s of FIRE_AND_FLY_SCENARIOS) {
-      if (s.id === DELUGE) continue;
-      expect(fireAndFlyLookTemplate('tunnel_rat', s.id), s.id).toBe('tunnel_rat');
-      expect(fireAndFlyLookTemplate('deeprock_kobold', s.id), s.id).toBe('deeprock_kobold');
+      const models = [...fielded(s.id)].map((id) => modelOf(fireAndFlyLookTemplate(id, s.id)));
+      expect(new Set(models).size, s.id).toBe(models.length);
+    }
+  });
+
+  it('lends only bodies that walk, strike, flinch and die in the arena', () => {
+    const looks = new Set([
+      ...Object.values(FIRE_AND_FLY_MONSTER_LOOKS),
+      ...Object.values(FIRE_AND_FLY_SCENARIO_LOOKS).flatMap((looks) => Object.values(looks)),
+    ]);
+    for (const look of looks) {
+      const clips = VISUALS[visualKeyFor({ kind: 'mob', templateId: look } as Entity)]?.clips;
+      for (const clip of ['walk', 'attack', 'hit', 'death'] as const) {
+        expect(clips?.[clip], `${look} ${clip}`).toBeDefined();
+      }
     }
   });
 
