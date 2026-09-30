@@ -8,6 +8,7 @@ import { MeshoptDecoder } from 'meshoptimizer';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { MATERIALS, NODES, SOURCE, TARGET } from '../scripts/assets/reward_chest/build.mjs';
+import { sharedUniforms } from '../src/render/gfx';
 import { HOARD_BODY_IDS, hoardEntrance } from '../src/render/hoard_entrance';
 import { buildHoardRewardChest } from '../src/render/hoard_reward_chest';
 import {
@@ -21,6 +22,7 @@ import {
   chestRarity,
   chestRay,
   chestSpawn,
+  chestSpentLight,
 } from '../src/render/hoard_reward_chest_core';
 import type { Entity } from '../src/sim/types';
 
@@ -225,6 +227,69 @@ describe('reward chest body', () => {
     closed.body.traverse((node) => expect(node).not.toBeInstanceOf(THREE.Light));
     const open = buildHoardRewardChest(entity('hoard_reward_chest_open', 'rare'), () => false);
     expect(open.body.userData.hoardChestOpened).toBe(true);
+  });
+
+  it('once emptied, finishes opening, then goes dark and stops drawing its light', () => {
+    // The last share taken: the sim keeps the opened chest in the room but no
+    // longer lootable. Its body stays up with the lid thrown back, but nothing
+    // is left inside to shine (follows #4261).
+    expect(chestSpentLight(0)).toBe(1);
+    expect(chestSpentLight(-1)).toBe(1);
+    expect(chestSpentLight(CHEST_TUNING.SPENT_FADE / 2)).toBeCloseTo(0.5);
+    expect(chestSpentLight(CHEST_TUNING.SPENT_FADE)).toBe(0);
+    expect(chestSpentLight(0, true)).toBe(0);
+
+    /** A stand-in asset with the shipped part and glow-material names. */
+    const asset = () => {
+      const root = new THREE.Group();
+      const lid = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 0.4, 1),
+        new THREE.MeshStandardMaterial(),
+      );
+      lid.name = 'Chest_Lid';
+      const inner = new THREE.MeshStandardMaterial();
+      inner.name = 'InnerGlow';
+      root.add(lid, new THREE.Mesh(new THREE.BoxGeometry(1, 0.1, 1), inner));
+      return root;
+    };
+    const drive = (live: Entity, seconds: number) => {
+      const built = buildHoardRewardChest(live, () => false, asset());
+      const effects = built.body.children[1];
+      const clock = effects.children[0] as THREE.Mesh;
+      const glow: THREE.MeshStandardMaterial[] = [];
+      built.body.traverse((node) => {
+        if (node instanceof THREE.Mesh && node.material instanceof THREE.MeshStandardMaterial)
+          if (node.material.name.includes('Glow')) glow.push(node.material);
+      });
+      expect(glow.length).toBeGreaterThan(0);
+      const frame = () => (clock.onBeforeRender as unknown as () => void).call(clock);
+      for (let t = 0; t <= seconds && effects.visible; t += 0.05) {
+        sharedUniforms.uTime.value = 100 + t;
+        frame();
+      }
+      const hinge = built.body.getObjectByName('Chest_LidHinge');
+      return { effects, glow, lidAngle: -THREE.MathUtils.radToDeg(hinge?.rotation.x ?? 0) };
+    };
+    const time = sharedUniforms.uTime.value;
+    try {
+      const settle = CHEST_TUNING.OPEN_DURATION + CHEST_TUNING.SPENT_FADE + 0.5;
+      const spent = entity('hoard_reward_chest_open', 'legendary');
+      spent.lootable = false;
+      const dark = drive(spent, settle);
+      expect(dark.lidAngle).toBeCloseTo(CHEST_TUNING.LID_OPEN_ANGLE, 0);
+      expect(dark.effects.visible).toBe(false);
+      for (const material of dark.glow) expect(material.emissiveIntensity).toBe(0);
+
+      // Still holding shares for others: the same opened chest keeps its light.
+      const holding = entity('hoard_reward_chest_open', 'legendary');
+      holding.lootable = true;
+      const lit = drive(holding, settle);
+      expect(lit.lidAngle).toBeCloseTo(CHEST_TUNING.LID_OPEN_ANGLE, 0);
+      expect(lit.effects.visible).toBe(true);
+      for (const material of lit.glow) expect(material.emissiveIntensity).toBeGreaterThan(0);
+    } finally {
+      sharedUniforms.uTime.value = time;
+    }
   });
 });
 

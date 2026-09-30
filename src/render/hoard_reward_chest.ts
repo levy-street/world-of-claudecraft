@@ -33,6 +33,7 @@ import {
   chestRarity,
   chestRay,
   chestSpawn,
+  chestSpentLight,
 } from './hoard_reward_chest_core';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
@@ -154,7 +155,7 @@ export function hoardRewardChest(entity: Entity, reducedMotion: () => boolean) {
 }
 
 export function buildHoardRewardChest(
-  entity: Pick<Entity, 'templateId' | 'vaultRarity'>,
+  entity: Pick<Entity, 'templateId' | 'vaultRarity'> & { readonly lootable?: boolean },
   reducedMotion: () => boolean,
   asset: THREE.Group | undefined = source,
 ): { body: THREE.Group; portal?: THREE.Mesh } {
@@ -276,6 +277,10 @@ export function buildHoardRewardChest(
 
   let start = -1;
   let last = -1;
+  // When this view first saw the chest spent (its last share taken). The entity
+  // is the live world record, so `lootable` is read as it changes; the sim and
+  // the wire both keep it on the entity.
+  let spentAt = -1;
   const mote: ChestMotePose = { x: 0, y: 0, z: 0, size: 0, alpha: 0 };
   const rayPose: ChestRayPose = { yaw: 0, lean: 0, length: 0, width: 0, alpha: 0 };
   const lidZ = (CHEST_TUNING.HINGE_Z + 0.96) * s;
@@ -305,11 +310,19 @@ export function buildHoardRewardChest(
     ringCard.alpha = 0;
     burst.alpha = 0;
     let flash = 0;
+    // Emptied: the opening plays out, then the light dies and the chest stands
+    // open and dark (chestSpentLight). Only the opened chest can be spent.
+    let light = 1;
     if (opened) {
       const plan = chestOpen(age, profile, calm);
+      if (entity.lootable === false) {
+        if (spentAt < 0) spentAt = time;
+        const openDone = start + (calm ? 0 : CHEST_TUNING.OPEN_DURATION);
+        light = chestSpentLight(time - Math.max(spentAt, openDone), calm);
+      }
       lidAngle = plan.lidAngle;
-      glow = plan.glow;
-      leak = plan.leak;
+      glow = plan.glow * light;
+      leak = plan.leak * light;
       flash = plan.burst * 0.6;
       ringCard.alpha = plan.burst * 0.8;
       ringCard.mesh.scale.setScalar(1.2 + (1 - plan.burst) * 2.4);
@@ -350,7 +363,8 @@ export function buildHoardRewardChest(
     // Light hierarchy: an intense heart inside, a leak at the seam, a soft pool
     // outside. The brightest thing is always inside the chest.
     const open01 = Math.min(1, lidAngle / 60);
-    if (opened || chestSpawn(age, calm).done) pool.alpha = (0.42 + 0.3 * leak) * profile.intensity;
+    if (opened || chestSpawn(age, calm).done)
+      pool.alpha = (0.42 + 0.3 * leak) * profile.intensity * light;
     pool.mesh.scale.setScalar(3.0 + leak * 0.7 + flash * 1.6);
     seam.alpha = Math.min(1.5, leak * 0.85 + flash) * (low ? 0.6 : 1);
     seam.mesh.position.set(shakeX, seamY + lift + open01 * 0.5, lidZ * (1 - open01 * 0.6));
@@ -380,13 +394,16 @@ export function buildHoardRewardChest(
         chestMote(i, time, profile, gather, mote);
         motePosition.setXYZ(i, mote.x + shakeX, mote.y + lift, mote.z + lidZ * 0.35 * (1 - gather));
         moteSize.setX(i, mote.size);
-        moteAlpha.setX(i, mote.alpha * Math.max(gather, reveal) * (calm ? 0.6 : 1));
+        moteAlpha.setX(i, mote.alpha * Math.max(gather, reveal) * (calm ? 0.6 : 1) * light);
       }
       motePosition.needsUpdate = true;
       moteSize.needsUpdate = true;
       moteAlpha.needsUpdate = true;
     }
     body.updateMatrixWorld(true);
+    // Fully dark and fully open: the pose above is final, so the light cards
+    // and motes stop drawing (and with them this clock) for good.
+    if (light === 0) effects.visible = false;
   };
 
   body.userData.hoardChestRarity = rarity;

@@ -107,8 +107,16 @@ function unclaimed(state: HoardRewardChestState, pid: number): boolean {
 function closeIfSpent(ctx: SimContext, state: HoardRewardChestState): void {
   if (state.eligible.some((pid) => !state.claimed.includes(pid))) return;
   const chest = ctx.entities.get(state.entityId);
-  // Nothing left inside: it stays in the room, open, but is no longer a target.
-  if (chest) chest.lootable = false;
+  // Nothing left inside: it stays in the room, open, but is no longer a target
+  // until the run is torn down (clearHoardRewardChest). Parked out of the
+  // generic ground-object re-arm (sim.ts counts a non-lootable object's
+  // respawnTimer down and flips it lootable again), the same seal the unconfirmed
+  // chest wears: re-armed, it offered every entrant a prompt that only answered
+  // "There is nothing left to take."
+  if (chest) {
+    chest.lootable = false;
+    chest.respawnTimer = Number.MAX_SAFE_INTEGER;
+  }
 }
 
 /** A player opens the chest: their share, once. */

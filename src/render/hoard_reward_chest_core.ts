@@ -60,6 +60,8 @@ export const CHEST_TUNING = {
   SPAWN_FLASH_INTENSITY: 1,
   SPAWN_RING_SIZE: 3.4,
   OPEN_DURATION: 0.85,
+  /** Seconds the light takes to die once the last share is taken. */
+  SPENT_FADE: 1.6,
 } as const;
 
 const clamp01 = (value: number): number => Math.max(0, Math.min(1, value));
@@ -212,6 +214,17 @@ export function chestOpen(age: number, profile: ChestRarityProfile, calm = false
     burst,
     done: t >= 1,
   };
+}
+
+// ---------------------------------------------------------------- spent
+
+/** How much of the chest's light is left once its last share is taken, 1 to 0.
+ *  `sinceSpent` counts from when the lid has finished opening (or from the
+ *  moment it was emptied, if later): the opening plays in full, then the light
+ *  dies away and the chest stands open and dark. */
+export function chestSpentLight(sinceSpent: number, calm = false): number {
+  if (calm) return 0;
+  return 1 - clamp01(Math.max(0, sinceSpent) / CHEST_TUNING.SPENT_FADE);
 }
 
 // ---------------------------------------------------------------- motes and rays

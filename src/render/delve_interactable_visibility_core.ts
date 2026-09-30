@@ -10,12 +10,18 @@
  * position is actionable info that must stay visible on every tier
  * (battleground_props.ts). Without this arm, an always-non-lootable `bg_`
  * prop would read as invisible through this same `syncDelveInteractableVisibility`
- * gate, which every 'object'-kind entity view runs through, not just delves. */
+ * gate, which every 'object'-kind entity view runs through, not just delves.
+ *
+ * The opened Buried Hoard reward chest rides it too: once its last share is
+ * taken the sim keeps it in the room but no longer lootable (no prompt, no
+ * target), and it must still stand there, open and empty, until the run is
+ * torn down (src/sim/rift/hoard_reward_chest.ts). */
 export function delveInteractableVisible(templateId: string | null, lootable: boolean): boolean {
   return (
     lootable ||
     templateId?.startsWith('delve_') === true ||
     templateId?.startsWith('rift_') === true ||
-    templateId?.startsWith('bg_') === true
+    templateId?.startsWith('bg_') === true ||
+    templateId === 'hoard_reward_chest_open'
   );
 }
