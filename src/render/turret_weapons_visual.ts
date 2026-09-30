@@ -11,7 +11,8 @@
 // The fragmentation shell: its `fragBurst` entry flashes the airburst and flies
 // the bomblets to their points, each `bomblet` entry lands one into a small blast
 // with no dust cloud.
-import { TURRET_EXPLOSIVE_BARREL, TURRET_FRAGMENTATION } from '../sim/content/turret_defense';
+import { FIRE_AND_FLY_MAX_KEG_CAP } from '../sim/content/fire_and_fly_scenarios';
+import { TURRET_FRAGMENTATION } from '../sim/content/turret_defense';
 import type { TurretEvent } from '../sim/minigames/turret_defense';
 import { TURRET_BOMBLETS } from '../sim/minigames/turret_fragmentation';
 import { DT } from '../sim/types';
@@ -45,7 +46,7 @@ export function turretShockwaveBursts(perBurst: number): number {
 
 /** Blasts the cannon keeps on the ground at once: the shells' own, a whole keg chain's, and a frag's airburst and bomblets. */
 export const TURRET_WEAPON_IMPACTS =
-  CANNON_IMPACT_POOL + TURRET_EXPLOSIVE_BARREL.cap + 1 + TURRET_BOMBLETS;
+  CANNON_IMPACT_POOL + FIRE_AND_FLY_MAX_KEG_CAP + 1 + TURRET_BOMBLETS;
 
 /** Bomblets in flight at once: two frag shells' worth, fired a reload apart on different ranges. */
 export const TURRET_WEAPON_BOMBLETS = 2 * TURRET_BOMBLETS;

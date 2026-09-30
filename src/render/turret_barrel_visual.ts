@@ -26,6 +26,7 @@
 // No light; a frame allocates nothing. The pure half is turret_barrel_core.ts.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { FIRE_AND_FLY_MAX_KEG_CAP } from '../sim/content/fire_and_fly_scenarios';
 import { TURRET_EXPLOSIVE_BARREL } from '../sim/content/turret_defense';
 import type { TurretEvent } from '../sim/minigames/turret_defense';
 import { DT } from '../sim/types';
@@ -33,7 +34,6 @@ import type { TurretSessionView } from '../world_api/vehicles';
 import { loadGltf } from './assets/loader';
 import { timeBuildSpan } from './build_spans';
 import type { CannonPuffBurst } from './cannon_puff_burst_core';
-import { CANNON_IMPACT_POOL } from './cannon_shell_core';
 import type { CannonBlast } from './cannon_shell_visuals';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { attachSceneGroupGated } from './gated_scene_attach';
@@ -99,9 +99,9 @@ const burstsOf = (puffs: number): number => Math.ceil(puffs / TURRET_CONTACT_PUF
  * (TURRET_CONTACT_PUFFS each): every barrel's fuse and its fire column.
  */
 export const TURRET_BARREL_BURSTS =
-  TURRET_EXPLOSIVE_BARREL.cap * (burstsOf(TURRET_FUSE_PUFFS) + burstsOf(TURRET_BARREL_FIRE_PUFFS));
-/** Blasts the cannon visuals keep on the ground at once: the shells' own and a whole chain's. */
-export const TURRET_BARREL_IMPACTS = CANNON_IMPACT_POOL + TURRET_EXPLOSIVE_BARREL.cap;
+  FIRE_AND_FLY_MAX_KEG_CAP * (burstsOf(TURRET_FUSE_PUFFS) + burstsOf(TURRET_BARREL_FIRE_PUFFS));
+/** Blasts whose shards fly at once: a whole chain of the largest keg cap, one fuse apart. */
+export const TURRET_BARREL_SHARD_BLASTS = FIRE_AND_FLY_MAX_KEG_CAP;
 
 const loadBarrelModel: TurretBarrelSource = () =>
   loadGltf(TURRET_BARREL_MODEL_URL).then((gltf) => gltf.scene);
@@ -179,12 +179,12 @@ export class TurretBarrelVisual {
   private readonly counts: Readonly<TurretBarrelCounts>;
   private readonly materials: THREE.Material[] = [];
   private readonly shardPool: TurretShard[] = Array.from(
-    { length: TURRET_BARREL_SHARDS.pool * TURRET_BARREL_SHARDS.perBlast },
+    { length: TURRET_BARREL_SHARD_BLASTS * TURRET_BARREL_SHARDS.perBlast },
     newTurretShard,
   );
-  private readonly blastAt = new Float64Array(TURRET_BARREL_SHARDS.pool);
-  private readonly shardCounts = new Int32Array(TURRET_BARREL_SHARDS.pool);
-  private readonly liveShards: boolean[] = new Array(TURRET_BARREL_SHARDS.pool).fill(false);
+  private readonly blastAt = new Float64Array(TURRET_BARREL_SHARD_BLASTS);
+  private readonly shardCounts = new Int32Array(TURRET_BARREL_SHARD_BLASTS);
+  private readonly liveShards: boolean[] = new Array(TURRET_BARREL_SHARD_BLASTS).fill(false);
   private readonly fuse = newTurretBarrelFuseFrame();
   private readonly shardFrame: TurretShardFrame = { x: 0, y: 0, z: 0, angle: 0, scale: 0 };
   private readonly matrix = new THREE.Matrix4();
@@ -414,7 +414,7 @@ export class TurretBarrelVisual {
     ringGeometry.deleteAttribute('normal');
     this.ringGeometry = ringGeometry;
     const gold = worldQuestTraceMaterials().gold;
-    for (let i = 0; i < TURRET_EXPLOSIVE_BARREL.cap; i++) {
+    for (let i = 0; i < FIRE_AND_FLY_MAX_KEG_CAP; i++) {
       const ring = new THREE.Mesh(ringGeometry, gold);
       ring.name = `${TURRET_BARREL_RINGS_NAME}:${i}`;
       ring.rotation.x = -Math.PI / 2;
@@ -442,7 +442,7 @@ export class TurretBarrelVisual {
   }
 
   private mintShards(): Shards {
-    const count = TURRET_BARREL_SHARDS.pool * TURRET_BARREL_SHARDS.perBlast;
+    const count = TURRET_BARREL_SHARD_BLASTS * TURRET_BARREL_SHARDS.perBlast;
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     const material = new THREE.MeshLambertMaterial({
       name: `${TURRET_BARREL_MATERIAL_PREFIX}shard`,
@@ -539,7 +539,7 @@ export class TurretBarrelVisual {
     const shards = this.shards;
     if (!shards) return;
     const s = this.nextBlast;
-    this.nextBlast = (s + 1) % TURRET_BARREL_SHARDS.pool;
+    this.nextBlast = (s + 1) % TURRET_BARREL_SHARD_BLASTS;
     const per = TURRET_BARREL_SHARDS.perBlast;
     const count = Math.max(0, Math.min(per, this.counts.shards));
     for (let i = 0; i < count; i++) {
@@ -574,7 +574,7 @@ export class TurretBarrelVisual {
     const per = TURRET_BARREL_SHARDS.perBlast;
     let any = false;
     let wrote = false;
-    for (let s = 0; s < TURRET_BARREL_SHARDS.pool; s++) {
+    for (let s = 0; s < TURRET_BARREL_SHARD_BLASTS; s++) {
       if (!this.liveShards[s]) continue;
       const age = time - this.blastAt[s];
       let live = false;

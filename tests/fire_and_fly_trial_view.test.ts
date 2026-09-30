@@ -3,6 +3,15 @@ import { turretPlanWireJson, turretStateWireJson } from '../server/turret_self_w
 import { decodeTurretPlan, decodeTurretSeat } from '../src/net/turret_session_wire';
 import { FIRE_AND_FLY_DUNGEON_ID } from '../src/sim/content/fire_and_fly_arena';
 import {
+  TURRET_MISSION_BRITTLE,
+  TURRET_MISSION_DELUGE,
+  TURRET_MISSION_GIANTS,
+  TURRET_MISSION_PACK,
+  TURRET_MISSION_POWDER,
+  TURRET_MISSIONS,
+} from '../src/sim/content/fire_and_fly_missions';
+import {
+  FIRE_AND_FLY_SCENARIOS,
   TURRET_SCENARIO_HARD,
   TURRET_SCENARIO_INTRODUCTION,
   TURRET_SCENARIO_STANDARD,
@@ -17,6 +26,7 @@ import {
   FIRE_AND_FLY_TRIAL_TEXT,
   fireAndFlyTrialName,
   interiorMinimapLabel,
+  isFireAndFlyMission,
 } from '../src/ui/fire_and_fly_trial_view';
 import { TurretHudView } from '../src/ui/hud/vehicle/turret_hud_view';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
@@ -41,6 +51,14 @@ const TRIALS = [
   [TURRET_SCENARIO_HARD, "Veterans' Test"],
 ] as const;
 
+const MISSIONS = [
+  [TURRET_MISSION_PACK, 'The Pack'],
+  [TURRET_MISSION_GIANTS, 'Heavy Tread'],
+  [TURRET_MISSION_DELUGE, 'The Deluge'],
+  [TURRET_MISSION_BRITTLE, 'The Cracked Tower'],
+  [TURRET_MISSION_POWDER, 'The Powder Store'],
+] as const;
+
 beforeEach(() => setLanguage('en'));
 
 describe('the Fire and Fly trial name', () => {
@@ -48,8 +66,18 @@ describe('the Fire and Fly trial name', () => {
     expect(fireAndFlyTrialName(scenario.id)).toBe(name);
   });
 
+  it.each(MISSIONS)('names the %# mission by its audited name', (scenario, name) => {
+    expect(fireAndFlyTrialName(scenario.id)).toBe(name);
+    expect(isFireAndFlyMission(scenario.id)).toBe(true);
+  });
+
   it('names every scenario the instructor offers', () => {
-    for (const scenario of TURRET_SCENARIOS) expect(fireAndFlyTrialName(scenario.id)).toBeTruthy();
+    expect(FIRE_AND_FLY_SCENARIOS).toHaveLength(TURRET_SCENARIOS.length + TURRET_MISSIONS.length);
+    for (const scenario of FIRE_AND_FLY_SCENARIOS) {
+      expect(fireAndFlyTrialName(scenario.id)).toBeTruthy();
+      expect(t(FIRE_AND_FLY_TRIAL_TEXT[scenario.boardKey].pitch)).toBeTruthy();
+    }
+    for (const scenario of TURRET_SCENARIOS) expect(isFireAndFlyMission(scenario.id)).toBe(false);
   });
 
   it("gives the instructor's buttons the same names, from the one table", () => {
@@ -105,14 +133,37 @@ describe('the interior minimap label', () => {
     expect(interiorMinimapLabel('hollow_crypt', session)).toBe(dungeonDisplayName('hollow_crypt'));
   });
 
-  it.each(TRIALS)("reads the %# seat's trial the same off the online mirror", (scenario, name) => {
-    const session = seatFor(scenario);
-    const plan = decodeTurretPlan(JSON.parse(turretPlanWireJson(session.defense.plan)));
-    expect(plan).not.toBeNull();
-    const decoded = decodeTurretSeat(JSON.parse(turretStateWireJson(session, 100)), plan!);
-    expect(decoded).not.toBeNull();
-    const online: TurretSessionView = { ...decoded!, feedback: [] };
-    expect(interiorMinimapLabel(FIRE_AND_FLY_DUNGEON_ID, online)).toBe(name);
-    expect(new TurretHudView().tick(online, 100).labels.trial).toBe(name);
+  it.each(MISSIONS)(
+    "reads the %# seat's mission in the arena, the strip and the card",
+    (scenario, name) => {
+      const session = turretSessionView(seatFor(scenario));
+      expect(interiorMinimapLabel(FIRE_AND_FLY_DUNGEON_ID, session)).toBe(name);
+      const labels = new TurretHudView().tick(session, 100).labels;
+      expect(labels.trial).toBe(name);
+      expect(labels.replayHint).toBe(t('hudChrome.turret.replayHintMission'));
+      expect(labels.replayHint).toContain('same mission');
+    },
+  );
+
+  it("keeps the trial's replay tooltip for a trial seat", () => {
+    const labels = new TurretHudView().tick(
+      turretSessionView(seatFor(TURRET_SCENARIO_HARD)),
+      100,
+    ).labels;
+    expect(labels.replayHint).toBe(t('hudChrome.turret.replayHint'));
   });
+
+  it.each([...TRIALS, ...MISSIONS])(
+    "reads the %# seat's run the same off the online mirror",
+    (scenario, name) => {
+      const session = seatFor(scenario);
+      const plan = decodeTurretPlan(JSON.parse(turretPlanWireJson(session.defense.plan)));
+      expect(plan).not.toBeNull();
+      const decoded = decodeTurretSeat(JSON.parse(turretStateWireJson(session, 100)), plan!);
+      expect(decoded).not.toBeNull();
+      const online: TurretSessionView = { ...decoded!, feedback: [] };
+      expect(interiorMinimapLabel(FIRE_AND_FLY_DUNGEON_ID, online)).toBe(name);
+      expect(new TurretHudView().tick(online, 100).labels.trial).toBe(name);
+    },
+  );
 });

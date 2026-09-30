@@ -29,6 +29,7 @@ import {
   TURRET_BARREL_BURSTS,
   TURRET_BARREL_MATERIAL_PREFIX,
   TURRET_BARREL_NAME,
+  TURRET_BARREL_SHARD_BLASTS,
   type TurretBarrelField,
   TurretBarrelVisual,
   turretBarrelBlast,
@@ -38,6 +39,8 @@ import {
   buildWorldQuestTraceStandIn,
   worldQuestTraceMaterials,
 } from '../src/render/world_quest_trace_materials';
+import { TURRET_MISSION_POWDER } from '../src/sim/content/fire_and_fly_missions';
+import { FIRE_AND_FLY_MAX_KEG_CAP } from '../src/sim/content/fire_and_fly_scenarios';
 import { TURRET_EXPLOSIVE_BARREL } from '../src/sim/content/turret_defense';
 import type { TurretEvent } from '../src/sim/minigames/turret_defense';
 import { DT } from '../src/sim/types';
@@ -134,13 +137,28 @@ describe('the barrel visual', () => {
     expect(spans.filter((kind) => kind === 'zone:turret-barrels')).toHaveLength(1);
     expect(visual.rings.parent).toBe(parent);
     expect(visual.group.parent).toBe(parent);
-    expect(rings(visual)).toHaveLength(TURRET_EXPLOSIVE_BARREL.cap);
+    expect(rings(visual)).toHaveLength(FIRE_AND_FLY_MAX_KEG_CAP);
     const gated = gate.mock.calls.map(([target]) => target.name);
     expect(gated).toEqual([`${TURRET_BARREL_NAME}:shards`, `${TURRET_BARREL_NAME}:kegs`]);
     for (const [target] of gate.mock.calls) expect(target.visible).toBe(false);
-    expect(slotRoots(visual)).toHaveLength(TURRET_EXPLOSIVE_BARREL.cap);
+    expect(slotRoots(visual)).toHaveLength(FIRE_AND_FLY_MAX_KEG_CAP);
     visual.prepare(parent);
     expect(source).toHaveBeenCalledTimes(1);
+    visual.dispose();
+  });
+
+  it("draws every keg The Powder Store stands at once, past the trials' cap", async () => {
+    expect(FIRE_AND_FLY_MAX_KEG_CAP).toBe(TURRET_MISSION_POWDER.kegs?.cap);
+    expect(FIRE_AND_FLY_MAX_KEG_CAP).toBeGreaterThan(TURRET_EXPLOSIVE_BARREL.cap);
+    const { visual } = await built();
+    const kegs = Array.from({ length: FIRE_AND_FLY_MAX_KEG_CAP }, (_, i) =>
+      barrel({ id: i + 1, x: 8 * Math.cos(i), z: 8 * Math.sin(i) }),
+    );
+    visual.update(field(kegs), false, 0, 0);
+    // A second later every keg has popped up.
+    visual.update(field(kegs), false, 20, 1);
+    expect(rings(visual).filter((r) => r.visible)).toHaveLength(FIRE_AND_FLY_MAX_KEG_CAP);
+    expect(slotRoots(visual).filter((root) => root.visible)).toHaveLength(FIRE_AND_FLY_MAX_KEG_CAP);
     visual.dispose();
   });
 
@@ -204,7 +222,7 @@ describe('the barrel visual', () => {
     const signatures = new Set(staged.map((d) => drawProgramSignature(d.object, d.material)));
     const keys = new Set(staged.flatMap((d) => threeProgramKeys(d.material, d.object).split('\n')));
     const draws = drawsUnder(visual.rings);
-    expect(draws).toHaveLength(TURRET_EXPLOSIVE_BARREL.cap);
+    expect(draws).toHaveLength(FIRE_AND_FLY_MAX_KEG_CAP);
     for (const draw of draws) {
       expect(signatures.has(drawProgramSignature(draw.object, draw.material))).toBe(true);
       for (const key of threeProgramKeys(draw.material, draw.object).split('\n')) {
@@ -317,7 +335,7 @@ describe('the barrel visual', () => {
     const { visual } = await built();
     const roots = slotRoots(visual);
     const marks = roots.map(markOf);
-    expect(marks).toHaveLength(TURRET_EXPLOSIVE_BARREL.cap);
+    expect(marks).toHaveLength(FIRE_AND_FLY_MAX_KEG_CAP);
     const [first] = marks;
     const material = first.material as THREE.MeshStandardMaterial;
     expect(material.name).toBe(`${TURRET_BARREL_MATERIAL_PREFIX}mark`);
@@ -496,10 +514,10 @@ describe('the barrel visual', () => {
       >;
     // A ripple through the cap: each blast lights the next as it blows.
     visual.light(lit(1), CENTRE, take(0), 0);
-    for (let id = 1; id <= TURRET_EXPLOSIVE_BARREL.cap; id++) {
+    for (let id = 1; id <= FIRE_AND_FLY_MAX_KEG_CAP; id++) {
       const now = id * fuse;
       visual.explode(blown(id), take, now);
-      if (id < TURRET_EXPLOSIVE_BARREL.cap) visual.light(lit(id + 1), CENTRE, take(now), now);
+      if (id < FIRE_AND_FLY_MAX_KEG_CAP) visual.light(lit(id + 1), CENTRE, take(now), now);
     }
     const alive = bursts.slots.filter((s) => s.active && s.count > 0);
     expect(alive.length).toBeGreaterThan(12);
@@ -537,16 +555,46 @@ describe('the barrel visual', () => {
     visual.dispose();
   });
 
+  it("keeps the first keg's shards flying through a whole chain of the largest cap", async () => {
+    const { visual } = await built();
+    const fuse = TURRET_EXPLOSIVE_BARREL.fuseTicks * DT;
+    const t0 = 1;
+    const end = t0 + TURRET_BARREL_SHARDS.life - 0.05;
+    for (let i = 0; i < FIRE_AND_FLY_MAX_KEG_CAP; i++) {
+      const at = t0 + i * fuse;
+      if (at > end) break;
+      const x = i === 0 ? -200 : 200;
+      visual.explode(
+        { type: 'barrelExploded', id: i + 1, x, y: 0, z: 0, hits: [] },
+        () => null,
+        at,
+      );
+      visual.update(field([]), false, 0, at);
+    }
+    visual.update(field([]), false, 0, end);
+    const mesh = shardMesh(visual);
+    const m = new THREE.Matrix4();
+    const p = new THREE.Vector3();
+    let first = 0;
+    for (let i = 0; i < mesh.instanceMatrix.count; i++) {
+      mesh.getMatrixAt(i, m);
+      p.setFromMatrixPosition(m);
+      if (p.x < -100) first++;
+    }
+    expect(first).toBeGreaterThan(0);
+    visual.dispose();
+  });
+
   it('colours the shards as wood and iron bands, no paint left', async () => {
     const { visual } = await built();
-    for (let id = 1; id <= TURRET_BARREL_SHARDS.pool; id++) {
+    for (let id = 1; id <= TURRET_BARREL_SHARD_BLASTS; id++) {
       visual.explode({ type: 'barrelExploded', id, x: 0, y: 0, z: 0, hits: [] }, () => null, 1);
     }
     const mesh = shardMesh(visual);
     const c = new THREE.Color();
     let bands = 0;
     let wood = 0;
-    for (let i = 0; i < TURRET_BARREL_SHARDS.pool * TURRET_BARREL_SHARDS.perBlast; i++) {
+    for (let i = 0; i < TURRET_BARREL_SHARD_BLASTS * TURRET_BARREL_SHARDS.perBlast; i++) {
       mesh.getColorAt(i, c);
       if (c.b > c.r) {
         // An iron band: a cool grey.
@@ -741,7 +789,7 @@ describe('the barrel visual', () => {
     expect(rings(visual).filter((r) => r.visible)).toHaveLength(1);
     visual.prepare(parent, onUnavailable);
     expect(source).toHaveBeenCalledTimes(2);
-    expect(rings(visual)).toHaveLength(TURRET_EXPLOSIVE_BARREL.cap);
+    expect(rings(visual)).toHaveLength(FIRE_AND_FLY_MAX_KEG_CAP);
     errors.mockRestore();
     visual.dispose();
   });

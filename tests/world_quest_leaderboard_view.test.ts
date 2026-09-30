@@ -1,11 +1,15 @@
 // The World Quests high-score tab's pure core (src/ui/world_quest_leaderboard_view.ts).
 import { describe, expect, it } from 'vitest';
+import { TURRET_MISSION_POWDER } from '../src/sim/content/fire_and_fly_missions';
+import { FIRE_AND_FLY_QUEST_ID } from '../src/sim/content/world_quest_fire_and_fly';
+import { fireAndFlyScoreboardId } from '../src/sim/fire_and_fly_scoreboards';
 import { WORLD_QUEST_SCOREBOARDS } from '../src/sim/world_quest_scoreboards';
 import {
   DEFAULT_WORLD_QUEST_BOARD,
   resolveWorldQuestBoard,
   worldQuestBoardChips,
   worldQuestBoardFamily,
+  worldQuestBoardLabel,
   worldQuestLeaderboardRow,
   worldQuestMedalText,
   worldQuestMetricHeader,
@@ -57,6 +61,18 @@ describe('board families', () => {
     expect(chips.filter((c) => c.active).map((c) => c.id)).toEqual([
       'fire_and_fly_standard_v2_lifetime',
     ]);
+  });
+
+  it("titles a mission's board with the mission's own name, not the quest's", () => {
+    const id = fireAndFlyScoreboardId(TURRET_MISSION_POWDER.id, 'lifetime');
+    expect(id).not.toBeNull();
+    const label = worldQuestBoardLabel({
+      id: id ?? '',
+      questId: FIRE_AND_FLY_QUEST_ID,
+      metric: 'points',
+      primary: 'medal',
+    });
+    expect(label).toBe('The Powder Store: All time');
   });
 });
 

@@ -912,7 +912,7 @@ export class QuestDialogController {
       // One button per profile; the pick travels as its own command so the
       // server starts the kernel with that profile after its own revalidation.
       const questId = view.questId;
-      for (const choice of view.difficulties) {
+      const startButton = (choice: (typeof view.difficulties)[number]) => {
         const button = this.makeButton(choice.label);
         button.dataset.startWq = String(npc.id);
         button.dataset.difficulty = choice.key;
@@ -922,6 +922,26 @@ export class QuestDialogController {
           this.deps.world().startWorldQuestActivity(questId, choice.difficulty);
         });
         this.deps.element.appendChild(button);
+      };
+      if (view.sections) {
+        for (const section of view.sections) {
+          const doc = this.deps.document;
+          const title = doc.createElement('div');
+          title.className = 'qd-sub';
+          title.dataset.wqSection = section.key;
+          title.textContent = section.title;
+          this.deps.element.appendChild(title);
+          for (const choice of section.choices) startButton(choice);
+          for (const text of section.locked) {
+            const locked = doc.createElement('div');
+            locked.className = 'qd-obj';
+            locked.dataset.wqLocked = section.key;
+            locked.textContent = text;
+            this.deps.element.appendChild(locked);
+          }
+        }
+      } else {
+        for (const choice of view.difficulties) startButton(choice);
       }
     } else if (view.canStart) {
       const button = this.makeButton(view.buttonLabel);

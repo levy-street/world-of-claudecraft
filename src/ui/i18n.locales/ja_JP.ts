@@ -18950,6 +18950,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turret.replay': 'もう一度',
   'hudChrome.turret.replayHint':
     '塔の上で同じ試練にもう一度挑む。本日の報酬を受け取った後の再挑戦では、報酬は得られない。',
+  'hudChrome.turret.replayHintMission':
+    '塔の上で同じ任務にもう一度挑む。本日の報酬を受け取った後の再挑戦では、報酬は得られない。',
+  'hudChrome.turret.recruitedBanner': '入隊！',
+  'hudChrome.turret.recruitedLine':
+    '{name}：「門の砲兵隊へようこそ、砲手。これからは私の任務を任せる。」',
   'hudChrome.turret.weapons': '塔の兵装',
   'hudChrome.turret.shockwave': '衝撃波',
   'hudChrome.turret.shockwaveTip':
@@ -19215,6 +19220,21 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.fireAndFly.pitch.hard': '古参兵が試される包囲戦',
   'questUi.worldQuest.fireAndFly.start': '{name}：{detail}（{count}波）',
   'questUi.worldQuest.fireAndFly.practice': '{name}を練習する（{count}波）',
+  'questUi.worldQuest.fireAndFly.scenarios.pack': '群れ',
+  'questUi.worldQuest.fireAndFly.scenarios.giants': '重い足音',
+  'questUi.worldQuest.fireAndFly.scenarios.deluge': '大洪水',
+  'questUi.worldQuest.fireAndFly.scenarios.brittle': 'ひび割れた塔',
+  'questUi.worldQuest.fireAndFly.scenarios.powder': '火薬庫',
+  'questUi.worldQuest.fireAndFly.pitch.pack': '群れで来る、一発も無駄にするな',
+  'questUi.worldQuest.fireAndFly.pitch.giants': '遠くへは飛ばせない重い巨獣が数体',
+  'questUi.worldQuest.fireAndFly.pitch.deluge': '小さく素早い獣の洪水',
+  'questUi.worldQuest.fireAndFly.pitch.brittle': '数撃で塔が崩れる',
+  'questUi.worldQuest.fireAndFly.pitch.powder': '倍の火薬樽を奴らの通り道に',
+  'questUi.worldQuest.fireAndFly.practiceMission': '{name}：練習（{count}波）',
+  'questUi.worldQuest.fireAndFly.sections.trials': '試練',
+  'questUi.worldQuest.fireAndFly.sections.missions': '任務',
+  'questUi.worldQuest.fireAndFly.lockedTrial': '{name}：{previous}に合格すると解放',
+  'questUi.worldQuest.fireAndFly.missionsLocked': '{name}に合格すると入隊し、任務が解放されます。',
   'entities.npcs.fire_and_fly_instructor.name': '砲術長アルダー',
   'entities.npcs.fire_and_fly_instructor.title': '砲術隊の募集係',
   'entities.npcs.fire_and_fly_instructor.greeting':

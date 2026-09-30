@@ -160,6 +160,12 @@ export const hudChromeStrings = {
     replay: 'Replay',
     replayHint:
       "Play the same trial again from the tower. Once today's reward is earned, a replay pays no reward.",
+    replayHintMission:
+      "Play the same mission again from the tower. Once today's reward is earned, a replay pays no reward.",
+    // The banner as the last trial's win recruits the character: {name} is Master
+    // Gunner Alder, who opens the missions to the new recruit.
+    recruitedBanner: 'Recruited!',
+    recruitedLine: '{name}: "Welcome to the gate crew, gunner. My missions are open to you now."',
     // The limited weapons: two sockets above the tower rail (the group's accessible name,
     // each weapon's name and tooltip, the charges line), the first wave's banner subtext
     // naming their keys ({shockKey} and {fragKey} are the player's own bindings; touch

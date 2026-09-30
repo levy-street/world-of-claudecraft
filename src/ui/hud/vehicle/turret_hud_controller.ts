@@ -3,6 +3,7 @@ import { currentInputHintMode } from '../../../game/input_hint_mode';
 import { keyLabel } from '../../../game/keybinds';
 import { TURRET_PAD_WEAPON_BUTTONS } from '../../../game/turret_controls';
 import { TurretDefenseSfx } from '../../../game/turret_defense_sfx';
+import type { IWorldQuests } from '../../../world_api/quests';
 import type { IWorldVehicles } from '../../../world_api/vehicles';
 import type { PainterHostWriters } from '../../painter_host';
 import { createReducedMotionProbe } from './reduced_motion_probe';
@@ -12,6 +13,7 @@ import { TurretHitFeedback } from './turret_hit_feedback_core';
 import { TurretHitFlashPainter } from './turret_hit_flash_painter';
 import { TurretHudPainter } from './turret_hud_painter';
 import { type TurretBanner, TurretFeedbackCursor, TurretHudView } from './turret_hud_view';
+import { FireAndFlyRecruitmentWatch, fireAndFlyRecruitedBanner } from './turret_recruitment_core';
 import { TurretWeaponBarPainter } from './turret_weapon_bar_painter';
 import { type TurretWeaponBarInput, TurretWeaponBarView } from './turret_weapon_bar_view';
 import { turretWaveCoreDamage, turretWeaponTooltip } from './turret_weapon_tooltip';
@@ -19,7 +21,8 @@ import { turretWaveCoreDamage, turretWeaponTooltip } from './turret_weapon_toolt
 type TurretHudWorld = Pick<
   IWorldVehicles,
   'turretSession' | 'turretClock' | 'useVehicleAction' | 'leaveVehicle'
->;
+> &
+  Partial<Pick<IWorldQuests, 'fireAndFlyRecruitment'>>;
 
 /** The HUD surfaces the seat reports through: banner slot, floating combat text, camera. */
 export interface TurretHudHooks {
@@ -59,6 +62,7 @@ export class TurretHudController {
   private readonly hitVeil = document.createElement('div');
   private readonly view = new TurretHudView();
   private readonly feedback = new TurretFeedbackCursor();
+  private readonly recruitment = new FireAndFlyRecruitmentWatch();
   private readonly sounds = new TurretDefenseSfx();
   private readonly numbers: TurretDamageNumbers | null;
   private readonly hits: TurretHitFeedback;
@@ -141,7 +145,9 @@ export class TurretHudController {
     const runEnded = phase === 'won' || phase === 'lost';
     if (session && this.runEnded && !runEnded) this.hooks.onNewRun?.();
     this.runEnded = runEnded;
-    const banner = this.feedback.consume(session, () => this.weaponKeys());
+    let banner = this.feedback.consume(session, () => this.weaponKeys());
+    const recruited = this.world.fireAndFlyRecruitment?.recruited === true;
+    if (this.recruitment.observe(seated, recruited)) banner = fireAndFlyRecruitedBanner();
     if (banner) this.hooks.showBanner?.(banner);
     this.sounds.update(session, this.world.turretClock);
     this.numbers?.update(session, this.world.turretClock);

@@ -587,6 +587,9 @@ export const de_DE: EnTranslations = {
       "leaveShort": "Leave",
       "replay": "Replay",
       "replayHint": "Play the same trial again from the tower. Once today's reward is earned, a replay pays no reward.",
+      "replayHintMission": "Play the same mission again from the tower. Once today's reward is earned, a replay pays no reward.",
+      "recruitedBanner": "Recruited!",
+      "recruitedLine": "{name}: \"Welcome to the gate crew, gunner. My missions are open to you now.\"",
       "weapons": "Tower weapons",
       "shockwave": "Shockwave",
       "shockwaveTip": "Slam the tower: a ring rolls from its wall out to {reach} yd in {seconds} sec. Every monster on the ground it reaches is thrown away from the tower, which stops a strike it is still winding up, and takes {damage} damage within {core} yd of the tower, less beyond. Monsters in the air pass over it.",
@@ -12617,15 +12620,32 @@ export const de_DE: EnTranslations = {
         "scenarios": {
           "introduction": "Recruit's Trial",
           "standard": "Standing Watch",
-          "hard": "Veterans' Test"
+          "hard": "Veterans' Test",
+          "pack": "The Pack",
+          "giants": "Heavy Tread",
+          "deluge": "The Deluge",
+          "brittle": "The Cracked Tower",
+          "powder": "The Powder Store"
         },
         "pitch": {
           "introduction": "a first watch for a new recruit",
           "standard": "the real watch on the walls",
-          "hard": "the siege the old hands are tested on"
+          "hard": "the siege the old hands are tested on",
+          "pack": "they run in packs; make each shell count",
+          "giants": "a few brutes too heavy to throw far",
+          "deluge": "a flood of small, quick beasts",
+          "brittle": "a few blows and the tower falls",
+          "powder": "twice the kegs, right on their path"
         },
         "start": "{name}: {detail} (waves: {count})",
-        "practice": "Practice the {name} (waves: {count})"
+        "practice": "Practice the {name} (waves: {count})",
+        "practiceMission": "{name}: practice run (waves: {count})",
+        "sections": {
+          "trials": "Trials",
+          "missions": "Missions"
+        },
+        "lockedTrial": "{name}: pass the {previous} to open it",
+        "missionsLocked": "Pass the {name} to be recruited and open the missions."
       },
       "calligraphyTitle": "Arkane Kalligraphie",
       "traceOutline": "Zeichnet die Kontur mit Euren Schritten nach",

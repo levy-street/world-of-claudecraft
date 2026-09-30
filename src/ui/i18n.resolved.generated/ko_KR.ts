@@ -587,6 +587,9 @@ export const ko_KR: EnTranslations = {
       "leaveShort": "내려가기",
       "replay": "다시 하기",
       "replayHint": "탑 위에서 같은 시련에 다시 도전하기. 오늘의 보상을 받은 뒤에는 다시 도전해도 보상이 없습니다.",
+      "replayHintMission": "탑 위에서 같은 임무에 다시 도전하기. 오늘의 보상을 받은 뒤에는 다시 도전해도 보상이 없습니다.",
+      "recruitedBanner": "입대!",
+      "recruitedLine": "{name}: \"성문 포병대에 온 것을 환영하네, 포수. 이제 내 임무를 맡기겠네.\"",
       "weapons": "탑 무기",
       "shockwave": "충격파",
       "shockwaveTip": "탑을 내리칩니다. 고리가 탑의 벽에서 {reach}야드까지 {seconds}초 동안 퍼져 나갑니다. 고리에 닿은 지상의 몬스터는 모두 탑에서 멀리 날아가고 준비 중인 공격이 멈추며, 탑에서 {core}야드 이내에서는 {damage}의 피해를 입고 그 너머에서는 피해가 줄어듭니다. 공중의 몬스터는 고리를 넘어갑니다.",
@@ -12617,15 +12620,32 @@ export const ko_KR: EnTranslations = {
         "scenarios": {
           "introduction": "신병의 시련",
           "standard": "정식 경계 근무",
-          "hard": "고참병의 시험"
+          "hard": "고참병의 시험",
+          "pack": "무리",
+          "giants": "무거운 발걸음",
+          "deluge": "대홍수",
+          "brittle": "금 간 탑",
+          "powder": "화약고"
         },
         "pitch": {
           "introduction": "신병의 첫 경계 근무",
           "standard": "성벽 위의 진짜 경계 근무",
-          "hard": "고참병들이 치르는 포위전"
+          "hard": "고참병들이 치르는 포위전",
+          "pack": "무리로 오니 한 발도 헛되이 쏘지 말게",
+          "giants": "멀리 날려 보내기엔 너무 무거운 거구 몇 마리",
+          "deluge": "작고 빠른 짐승의 홍수",
+          "brittle": "몇 번만 맞아도 탑이 무너진다",
+          "powder": "두 배의 화약통, 놈들 길목에"
         },
         "start": "{name}: {detail} (파도 {count}개)",
-        "practice": "{name} 연습 (파도 {count}개)"
+        "practice": "{name} 연습 (파도 {count}개)",
+        "practiceMission": "{name} 연습 (파도 {count}개)",
+        "sections": {
+          "trials": "시련",
+          "missions": "임무"
+        },
+        "lockedTrial": "{name}: {previous}을(를) 통과하면 열림",
+        "missionsLocked": "{name}을(를) 통과하면 입대하고 임무가 열립니다."
       },
       "calligraphyTitle": "비전 서예",
       "traceOutline": "발걸음으로 윤곽 따라 그리기",

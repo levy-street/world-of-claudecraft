@@ -18909,6 +18909,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turret.replay': '다시 하기',
   'hudChrome.turret.replayHint':
     '탑 위에서 같은 시련에 다시 도전하기. 오늘의 보상을 받은 뒤에는 다시 도전해도 보상이 없습니다.',
+  'hudChrome.turret.replayHintMission':
+    '탑 위에서 같은 임무에 다시 도전하기. 오늘의 보상을 받은 뒤에는 다시 도전해도 보상이 없습니다.',
+  'hudChrome.turret.recruitedBanner': '입대!',
+  'hudChrome.turret.recruitedLine':
+    '{name}: "성문 포병대에 온 것을 환영하네, 포수. 이제 내 임무를 맡기겠네."',
   'hudChrome.turret.weapons': '탑 무기',
   'hudChrome.turret.shockwave': '충격파',
   'hudChrome.turret.shockwaveTip':
@@ -19184,6 +19189,21 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.fireAndFly.pitch.hard': '고참병들이 치르는 포위전',
   'questUi.worldQuest.fireAndFly.start': '{name}: {detail} (파도 {count}개)',
   'questUi.worldQuest.fireAndFly.practice': '{name} 연습 (파도 {count}개)',
+  'questUi.worldQuest.fireAndFly.scenarios.pack': '무리',
+  'questUi.worldQuest.fireAndFly.scenarios.giants': '무거운 발걸음',
+  'questUi.worldQuest.fireAndFly.scenarios.deluge': '대홍수',
+  'questUi.worldQuest.fireAndFly.scenarios.brittle': '금 간 탑',
+  'questUi.worldQuest.fireAndFly.scenarios.powder': '화약고',
+  'questUi.worldQuest.fireAndFly.pitch.pack': '무리로 오니 한 발도 헛되이 쏘지 말게',
+  'questUi.worldQuest.fireAndFly.pitch.giants': '멀리 날려 보내기엔 너무 무거운 거구 몇 마리',
+  'questUi.worldQuest.fireAndFly.pitch.deluge': '작고 빠른 짐승의 홍수',
+  'questUi.worldQuest.fireAndFly.pitch.brittle': '몇 번만 맞아도 탑이 무너진다',
+  'questUi.worldQuest.fireAndFly.pitch.powder': '두 배의 화약통, 놈들 길목에',
+  'questUi.worldQuest.fireAndFly.practiceMission': '{name} 연습 (파도 {count}개)',
+  'questUi.worldQuest.fireAndFly.sections.trials': '시련',
+  'questUi.worldQuest.fireAndFly.sections.missions': '임무',
+  'questUi.worldQuest.fireAndFly.lockedTrial': '{name}: {previous}을(를) 통과하면 열림',
+  'questUi.worldQuest.fireAndFly.missionsLocked': '{name}을(를) 통과하면 입대하고 임무가 열립니다.',
   'entities.npcs.fire_and_fly_instructor.name': '포술장 올더',
   'entities.npcs.fire_and_fly_instructor.title': '포병 모집관',
   'entities.npcs.fire_and_fly_instructor.greeting':

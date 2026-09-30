@@ -587,6 +587,9 @@ export const ja_JP: EnTranslations = {
       "leaveShort": "降りる",
       "replay": "もう一度",
       "replayHint": "塔の上で同じ試練にもう一度挑む。本日の報酬を受け取った後の再挑戦では、報酬は得られない。",
+      "replayHintMission": "塔の上で同じ任務にもう一度挑む。本日の報酬を受け取った後の再挑戦では、報酬は得られない。",
+      "recruitedBanner": "入隊！",
+      "recruitedLine": "{name}：「門の砲兵隊へようこそ、砲手。これからは私の任務を任せる。」",
       "weapons": "塔の兵装",
       "shockwave": "衝撃波",
       "shockwaveTip": "塔を叩きつける：輪が塔の壁から {reach} ヤード先まで {seconds} 秒で広がる。輪が届いた地上のモンスターはすべて塔から吹き飛ばされ、溜め中の攻撃は止まる。塔から {core} ヤード以内では {damage} ダメージ、その先では減少する。空中のモンスターは輪を越える。",
@@ -12617,15 +12620,32 @@ export const ja_JP: EnTranslations = {
         "scenarios": {
           "introduction": "新兵の試練",
           "standard": "本番の見張り",
-          "hard": "古参兵の試験"
+          "hard": "古参兵の試験",
+          "pack": "群れ",
+          "giants": "重い足音",
+          "deluge": "大洪水",
+          "brittle": "ひび割れた塔",
+          "powder": "火薬庫"
         },
         "pitch": {
           "introduction": "新兵の初めての見張り",
           "standard": "城壁での本物の見張り",
-          "hard": "古参兵が試される包囲戦"
+          "hard": "古参兵が試される包囲戦",
+          "pack": "群れで来る、一発も無駄にするな",
+          "giants": "遠くへは飛ばせない重い巨獣が数体",
+          "deluge": "小さく素早い獣の洪水",
+          "brittle": "数撃で塔が崩れる",
+          "powder": "倍の火薬樽を奴らの通り道に"
         },
         "start": "{name}：{detail}（{count}波）",
-        "practice": "{name}を練習する（{count}波）"
+        "practice": "{name}を練習する（{count}波）",
+        "practiceMission": "{name}：練習（{count}波）",
+        "sections": {
+          "trials": "試練",
+          "missions": "任務"
+        },
+        "lockedTrial": "{name}：{previous}に合格すると解放",
+        "missionsLocked": "{name}に合格すると入隊し、任務が解放されます。"
       },
       "calligraphyTitle": "秘術の書道",
       "traceOutline": "足取りで輪郭をなぞる",

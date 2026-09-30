@@ -3,7 +3,7 @@ import type { TurretArsenal } from '../../../sim/minigames/turret_defense_plan';
 import type { TurretMedal } from '../../../sim/minigames/turret_result';
 import { TICK_RATE } from '../../../sim/types';
 import type { TurretSessionView } from '../../../world_api/vehicles';
-import { fireAndFlyTrialName } from '../../fire_and_fly_trial_view';
+import { fireAndFlyTrialName, isFireAndFlyMission } from '../../fire_and_fly_trial_view';
 import { formatNumber, getI18nRevision, type TranslationKey, t } from '../../i18n';
 import { TurretFeedbackReader } from './turret_feedback_reader_core';
 
@@ -320,7 +320,11 @@ export class TurretHudView {
       labels.leave = t('hudChrome.turret.leave');
       labels.leaveShort = t('hudChrome.turret.leaveShort');
       labels.replay = t('hudChrome.turret.replay');
-      labels.replayHint = t('hudChrome.turret.replayHint');
+      labels.replayHint = t(
+        isFireAndFlyMission(scenarioId)
+          ? 'hudChrome.turret.replayHintMission'
+          : 'hudChrome.turret.replayHint',
+      );
     }
     frame.wave = t('hudChrome.turret.wave', {
       wave: formatNumber(Math.min(defense.wave + 1, session.waveCount)),

@@ -492,12 +492,15 @@ describe('online', () => {
 });
 
 describe('the instructor dialog, tracker and map', () => {
+  // Every trial won: the whole recruitment is open (fire_and_fly_dialog_sections.test.ts
+  // covers the locks).
   function world(state: 'active' | 'completed', level = 20) {
     return {
       worldQuestLog: new Map([
         [FIRE_AND_FLY_QUEST_ID, { questId: FIRE_AND_FLY_QUEST_ID, count: 0, state }],
       ]),
       player: { id: 1, level, dead: false, pos: { x: 0, y: 0, z: 0 } } as Entity,
+      fireAndFlyRecruitment: { trialsWon: TURRET_SCENARIOS.length, recruited: true },
     };
   }
   const alder = { id: 9, kind: 'npc', templateId: FIRE_AND_FLY_NPC_DEF.id } as Entity;
@@ -508,15 +511,17 @@ describe('the instructor dialog, tracker and map', () => {
     expect(view?.speakerTitle).toBe('Gunnery Recruiter');
     expect(view?.questTitle).toBe("The Gunner's Trials");
     expect(view?.canStart).toBe(true);
-    expect(view?.difficulties?.map((c) => c.difficulty)).toEqual(
+    const trials = view?.sections?.[0]?.choices;
+    expect(trials?.map((c) => c.difficulty)).toEqual(
       TURRET_SCENARIOS.map((s) => ({ courseId: s.id })),
     );
-    expect(view?.difficulties?.map((c) => c.key)).toEqual(['introduction', 'standard', 'hard']);
-    expect(view?.difficulties?.map((c) => c.label)).toEqual([
+    expect(trials?.map((c) => c.key)).toEqual(['introduction', 'standard', 'hard']);
+    expect(trials?.map((c) => c.label)).toEqual([
       "Recruit's Trial: a first watch for a new recruit (waves: 3)",
       'Standing Watch: the real watch on the walls (waves: 6)',
       "Veterans' Test: the siege the old hands are tested on (waves: 6)",
     ]);
+    expect(view?.difficulties?.slice(0, 3)).toEqual(trials);
   });
 
   it('turns every trial into practice after the paid win, and offers nothing under the level', () => {
@@ -525,7 +530,7 @@ describe('the instructor dialog, tracker and map', () => {
     expect(view?.hint).toBe(
       'Practice: play again without earning more coins, experience or reputation.',
     );
-    expect(view?.difficulties?.map((c) => c.label)).toEqual(
+    expect(view?.sections?.[0]?.choices.map((c) => c.label)).toEqual(
       fireAndFlyTrialChoices(true).map((c) => c.label),
     );
     expect(view?.difficulties?.[0]?.label).toBe("Practice the Recruit's Trial (waves: 3)");

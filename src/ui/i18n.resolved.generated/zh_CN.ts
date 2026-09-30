@@ -587,6 +587,9 @@ export const zh_CN: EnTranslations = {
       "leaveShort": "离开",
       "replay": "再来一次",
       "replayHint": "在塔上再次挑战同一试炼。领取今日奖励后，再次挑战不再给予奖励。",
+      "replayHintMission": "在塔上再次执行同一任务。领取今日奖励后，再次挑战不再给予奖励。",
+      "recruitedBanner": "已入伍！",
+      "recruitedLine": "{name}：“欢迎加入城门炮组，炮手。我的任务现在向你开放了。”",
       "weapons": "塔楼武器",
       "shockwave": "冲击波",
       "shockwaveTip": "猛击塔楼：一道冲击环在 {seconds} 秒内从塔墙向外扩散至 {reach} 码。它触及的每个地面怪物都会被抛离塔楼，并被打断仍在蓄力的攻击；距塔楼 {core} 码内受到 {damage} 点伤害，更远处伤害降低。空中的怪物会越过冲击环。",
@@ -12617,15 +12620,32 @@ export const zh_CN: EnTranslations = {
         "scenarios": {
           "introduction": "新兵试炼",
           "standard": "正式值守",
-          "hard": "老兵考验"
+          "hard": "老兵考验",
+          "pack": "兽群",
+          "giants": "沉重步伐",
+          "deluge": "洪流",
+          "brittle": "裂塔",
+          "powder": "火药库"
         },
         "pitch": {
           "introduction": "新兵的第一次值守",
           "standard": "城墙上真正的值守",
-          "hard": "老兵们要经受的围攻"
+          "hard": "老兵们要经受的围攻",
+          "pack": "成群奔袭，弹弹都要打准",
+          "giants": "寥寥几头巨兽，重得难以轰远",
+          "deluge": "小而快的兽潮",
+          "brittle": "挨几下塔就倒了",
+          "powder": "双倍火药桶，就在它们路上"
         },
         "start": "{name}：{detail}（{count}波）",
-        "practice": "练习{name}（{count}波）"
+        "practice": "练习{name}（{count}波）",
+        "practiceMission": "{name}：练习（{count}波）",
+        "sections": {
+          "trials": "试炼",
+          "missions": "任务"
+        },
+        "lockedTrial": "{name}：通过{previous}后开启",
+        "missionsLocked": "通过{name}即可入伍，并开启任务。"
       },
       "calligraphyTitle": "奥术书法",
       "traceOutline": "用脚步描绘轮廓",

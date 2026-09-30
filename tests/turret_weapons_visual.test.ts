@@ -24,7 +24,8 @@ import {
   turretBombletBlast,
   turretShockwaveBursts,
 } from '../src/render/turret_weapons_visual';
-import { TURRET_EXPLOSIVE_BARREL, TURRET_FRAGMENTATION } from '../src/sim/content/turret_defense';
+import { FIRE_AND_FLY_MAX_KEG_CAP } from '../src/sim/content/fire_and_fly_scenarios';
+import { TURRET_FRAGMENTATION } from '../src/sim/content/turret_defense';
 import { burstTurretFrag, TURRET_BOMBLETS } from '../src/sim/minigames/turret_fragmentation';
 import { DT } from '../src/sim/types';
 
@@ -240,7 +241,7 @@ describe('Fire and Fly fragmentation shell on screen', () => {
   });
 
   it('holds a frag landing in a whole keg chain beside a shell blast: every blast on the ground at once', () => {
-    expect(TURRET_WEAPON_IMPACTS).toBe(6 + TURRET_EXPLOSIVE_BARREL.cap + 1 + TURRET_BOMBLETS);
+    expect(TURRET_WEAPON_IMPACTS).toBe(6 + FIRE_AND_FLY_MAX_KEG_CAP + 1 + TURRET_BOMBLETS);
     const { weapon, weapons, puffs } = rig();
     const ev = burst();
     if (ev.type !== 'fragBurst') throw new Error('fragBurst expected');
@@ -254,11 +255,11 @@ describe('Fire and Fly fragmentation shell on screen', () => {
         false,
       );
     }
-    for (let id = 1; id <= TURRET_EXPLOSIVE_BARREL.cap; id++) {
+    for (let id = 1; id <= FIRE_AND_FLY_MAX_KEG_CAP; id++) {
       weapon.impact({ shotId: -id, x: 30 + 3 * id, y: 0, z: 10, radius: 9, scale: 1.5 }, 1, false);
     }
     weapon.update(310, 1.01);
-    expect(puffs(PUFF.flash)).toBe(1 + 1 + TURRET_BOMBLETS + TURRET_EXPLOSIVE_BARREL.cap);
+    expect(puffs(PUFF.flash)).toBe(1 + 1 + TURRET_BOMBLETS + FIRE_AND_FLY_MAX_KEG_CAP);
     weapon.dispose();
   });
 

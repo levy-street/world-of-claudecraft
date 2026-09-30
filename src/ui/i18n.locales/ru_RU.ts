@@ -19277,6 +19277,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turret.replay': 'Ещё раз',
   'hudChrome.turret.replayHint':
     'Пройти то же испытание ещё раз, не покидая башни. После получения сегодняшней награды повтор больше не награждается.',
+  'hudChrome.turret.replayHintMission':
+    'Пройти то же задание ещё раз, не покидая башни. После получения сегодняшней награды повтор больше не награждается.',
+  'hudChrome.turret.recruitedBanner': 'Вы в расчёте!',
+  'hudChrome.turret.recruitedLine':
+    '{name}: «Добро пожаловать в расчёт ворот, канонир. Мои задания теперь открыты для вас.»',
   'hudChrome.turret.weapons': 'Оружие башни',
   'hudChrome.turret.shockwave': 'Ударная волна',
   'hudChrome.turret.shockwaveTip':
@@ -19558,6 +19563,22 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.fireAndFly.pitch.hard': 'осада, которой проверяют бывалых',
   'questUi.worldQuest.fireAndFly.start': '{name}: {detail} (волн: {count})',
   'questUi.worldQuest.fireAndFly.practice': 'Тренировка: {name} (волн: {count})',
+  'questUi.worldQuest.fireAndFly.scenarios.pack': 'Стая',
+  'questUi.worldQuest.fireAndFly.scenarios.giants': 'Тяжёлая поступь',
+  'questUi.worldQuest.fireAndFly.scenarios.deluge': 'Потоп',
+  'questUi.worldQuest.fireAndFly.scenarios.brittle': 'Треснувшая башня',
+  'questUi.worldQuest.fireAndFly.scenarios.powder': 'Пороховой склад',
+  'questUi.worldQuest.fireAndFly.pitch.pack': 'бегут стаями, берегите снаряды',
+  'questUi.worldQuest.fireAndFly.pitch.giants': 'громилы, которых не отбросить',
+  'questUi.worldQuest.fireAndFly.pitch.deluge': 'поток мелких быстрых тварей',
+  'questUi.worldQuest.fireAndFly.pitch.brittle': 'пара ударов, и башня падёт',
+  'questUi.worldQuest.fireAndFly.pitch.powder': 'вдвое больше бочек на их пути',
+  'questUi.worldQuest.fireAndFly.practiceMission': 'Тренировка: {name} (волн: {count})',
+  'questUi.worldQuest.fireAndFly.sections.trials': 'Испытания',
+  'questUi.worldQuest.fireAndFly.sections.missions': 'Задания',
+  'questUi.worldQuest.fireAndFly.lockedTrial': '{name}: откроется после «{previous}»',
+  'questUi.worldQuest.fireAndFly.missionsLocked':
+    'Пройдите «{name}», чтобы вступить в расчёт и открыть задания.',
   'entities.npcs.fire_and_fly_instructor.name': 'Мастер-канонир Олдер',
   'entities.npcs.fire_and_fly_instructor.title': 'Вербовщик канониров',
   'entities.npcs.fire_and_fly_instructor.greeting':
