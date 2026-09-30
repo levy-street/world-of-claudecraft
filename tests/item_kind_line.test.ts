@@ -6,7 +6,15 @@
 // and taxonomy rules. Unit arms drive item_kind_label directly; one integration
 // arm keeps Hud.prototype.itemTooltip honest.
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { inertCharacters } from './helpers/inert_characters';
+
+// Hud reaches the character model preload; keep it inert
+// (tests/helpers/inert_characters.ts has the why).
+vi.mock('../src/render/characters', () => inertCharacters.barrel());
+vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
+vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
+
 import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { RAW_COOKING_CATCH_IDS } from '../src/sim/content/items';
 import { ITEMS } from '../src/sim/data';

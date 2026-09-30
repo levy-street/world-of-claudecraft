@@ -15,6 +15,14 @@
 // deferred rebuild once the drag concludes.
 
 import { describe, expect, it, vi } from 'vitest';
+import { inertCharacters } from './helpers/inert_characters';
+
+// char_window's portrait chip reaches the character model preload; keep it
+// inert (tests/helpers/inert_characters.ts has the why).
+vi.mock('../src/render/characters', () => inertCharacters.barrel());
+vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
+vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
+
 import { CharWindow, type CharWindowDeps } from '../src/ui/char_window';
 import { ItemDragState } from '../src/ui/item_drag_state';
 
