@@ -19,7 +19,7 @@ export interface TurretShockwaveRing {
   struck: number[];
 }
 
-export type TurretShockwaveRefusal = 'ended' | 'empty' | 'cooldown';
+export type TurretShockwaveRefusal = 'ended' | 'lull' | 'empty' | 'cooldown';
 
 export type TurretShockwaveOutcome =
   | { ok: true; events: TurretEvent[] }
@@ -36,7 +36,10 @@ export function turretShockwaveFront(elapsed: number): number {
   return innerRadius + (reach - innerRadius) * t;
 }
 
-/** Spends a charge and starts a ring at `tick`; refused once the run has ended, with no charge left, or while it rearms. */
+/**
+ * Spends a charge and starts a ring at `tick`; refused once the run has ended,
+ * outside a wave (so a charge is never wasted), with no charge left, or while it rearms.
+ */
 export function startTurretShockwave(
   state: TurretDefenseState,
   tick: number,
@@ -44,6 +47,7 @@ export function startTurretShockwave(
 ): TurretShockwaveOutcome {
   if (state.phase === 'won' || state.phase === 'lost')
     return { ok: false, reason: 'ended', events: [] };
+  if (state.phase !== 'wave') return { ok: false, reason: 'lull', events: [] };
   if (!(turretChargesLeft(state).shockwave > 0)) return { ok: false, reason: 'empty', events: [] };
   if (tick < state.shockReadyTick) return { ok: false, reason: 'cooldown', events: [] };
   state.shockReadyTick = tick + TURRET_SHOCKWAVE.rearmTicks;

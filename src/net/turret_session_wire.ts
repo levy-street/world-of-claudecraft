@@ -4,6 +4,7 @@
 // a field the sim adds fails tsc here until it is decoded), numbers finite,
 // enums closed, arrays bounded, and a malformed payload rejects the whole
 // value, never a stale half.
+import { TURRET_ARENA } from '../sim/content/turret_defense';
 import { deepFreeze } from '../sim/deep_freeze';
 import type { MotionSegment } from '../sim/minigames/thrown_body';
 import type { TurretBarrel } from '../sim/minigames/turret_barrels';
@@ -59,6 +60,8 @@ const MAX_HITS = 256;
 const MAX_TEMPLATE_ID = 64;
 const MAX_MAGNITUDE = 1e9;
 const LIMITS = TURRET_PLAN_LIMITS;
+// A Shockwave's ring never rolls past the ring the monsters spawn on.
+const MAX_SHOCKWAVE_REACH = TURRET_ARENA.spawnRadius;
 // The most each points term can reach on a plan the resolver accepts.
 const MAX_KILL_POINTS = LIMITS.waves * LIMITS.spawnsPerWave * TURRET_POINTS.kill;
 const MAX_TOWER_POINTS = LIMITS.integrity * TURRET_POINTS.integrity;
@@ -173,20 +176,34 @@ const arrivalArm = <K extends TurretArrivalDef['kind']>(spec: Arm<TurretArrivalD
 const at = { x: num, y: num, z: num };
 const vec3 = shape<Vec3>(at);
 
-const stats = shape<TurretStats>({
-  shots: count,
-  hits: count,
-  kills: count,
-  breaches: count,
-  pointsLost: count,
-  longestThrow: nonNegative,
-  longestAirtime: nonNegative,
-  bowled: count,
-  barrelsDetonated: count,
-  barrelKills: count,
-  shockwaves: count,
-  frags: count,
-});
+/** Charges spent: at most the most any plan the resolver accepts can hold (the seat checks its own). */
+const charges = within(0, LIMITS.charges);
+/** A run's Shockwaves are numbered from 1, one per charge spent. */
+const shockwaveId = within(1, LIMITS.charges);
+/** Shell ids start at 1. */
+const shotId = int(1);
+/** A whole sim tick, capped like every other wire number. */
+const wholeTick = within(0, MAX_MAGNITUDE);
+const bombletIndex = within(0, TURRET_BOMBLETS - 1);
+
+/** A frag shell is also a shot, so the frags spent never exceed the shots fired. */
+const stats = checked(
+  shape<TurretStats>({
+    shots: count,
+    hits: count,
+    kills: count,
+    breaches: count,
+    pointsLost: count,
+    longestThrow: nonNegative,
+    longestAirtime: nonNegative,
+    bowled: count,
+    barrelsDetonated: count,
+    barrelKills: count,
+    shockwaves: charges,
+    frags: charges,
+  }),
+  (st) => st.frags <= st.shots,
+);
 
 const hit = shape<TurretHit>({ id: count, falloff: num, damage: num, ...at });
 
@@ -202,6 +219,14 @@ const breakdown = checked(
   (b) => b.kegKills + b.bowled <= TURRET_BONUS_CAP,
 );
 
+/** The whole star in landing order: every bomblet once, by index, none before the one ahead. */
+function bombletSchedule(star: readonly TurretBombletSpot[]): boolean {
+  return (
+    star.length === TURRET_BOMBLETS &&
+    star.every((b, i) => b.index === i && (i === 0 || b.landTick >= star[i - 1].landTick))
+  );
+}
+
 /** A run's result as the sim builds it: its terms sum to its points, only a win holds a medal. */
 function resultConsistent(won: boolean, r: Omit<TurretResult, 'won'>): boolean {
   const b = r.breakdown;
@@ -215,7 +240,7 @@ const result = checked(shape<TurretResult>({ won: bool, medal, points, breakdown
 const turretEvent = tagged<TurretEvent, 'type'>('type', {
   fired: eventArm({
     type: lit('fired'),
-    shotId: count,
+    shotId,
     fromX: num,
     fromZ: num,
     ...at,
@@ -223,7 +248,7 @@ const turretEvent = tagged<TurretEvent, 'type'>('type', {
     impactTick: tick,
     weapon: optional(lit('frag')),
   }),
-  impact: eventArm({ type: lit('impact'), shotId: count, ...at, hits: list(MAX_HITS, hit) }),
+  impact: eventArm({ type: lit('impact'), shotId, ...at, hits: list(MAX_HITS, hit) }),
   launched: eventArm({ type: lit('launched'), id: count, ...at, vx: num, vy: num, vz: num }),
   bounce: eventArm({
     type: lit('bounce'),
@@ -261,25 +286,29 @@ const turretEvent = tagged<TurretEvent, 'type'>('type', {
   waveCleared: eventArm({ type: lit('waveCleared'), wave: count }),
   shockwave: eventArm({
     type: lit('shockwave'),
-    id: count,
+    id: shockwaveId,
     ...at,
-    startTick: tick,
-    reach: nonNegative,
+    startTick: wholeTick,
+    reach: checked(positive, (r) => r <= MAX_SHOCKWAVE_REACH),
   }),
-  shockwaveHit: eventArm({ type: lit('shockwaveHit'), id: count, hits: list(MAX_HITS, hit) }),
+  shockwaveHit: eventArm({
+    type: lit('shockwaveHit'),
+    id: shockwaveId,
+    hits: list(MAX_HITS, hit),
+  }),
   fragBurst: eventArm({
     type: lit('fragBurst'),
-    shotId: count,
+    shotId,
     ...at,
-    bomblets: list(
-      TURRET_BOMBLETS,
-      shape<TurretBombletSpot>({ index: count, ...at, landTick: tick }),
+    bomblets: checked(
+      list(TURRET_BOMBLETS, shape<TurretBombletSpot>({ index: count, ...at, landTick: wholeTick })),
+      bombletSchedule,
     ),
   }),
   bomblet: eventArm({
     type: lit('bomblet'),
-    shotId: count,
-    index: count,
+    shotId,
+    index: bombletIndex,
     ...at,
     hits: list(MAX_HITS, hit),
   }),
@@ -343,7 +372,7 @@ const monster = shape<TurretMonsterView>({
 });
 
 const shot = shape<TurretShot>({
-  id: count,
+  id: shotId,
   x: num,
   z: num,
   damage: num,
@@ -364,7 +393,7 @@ const defense = shape<Omit<TurretDefenseView, 'plan'>>({
   wave: count,
   integrity: num,
   readyTick: tick,
-  shockReadyTick: tick,
+  shockReadyTick: wholeTick,
   aimX: num,
   aimZ: num,
   shots: list(MAX_SHOTS, shot),
@@ -435,7 +464,20 @@ const plan = shape<TurretPlan>({
   }),
 });
 
-const feedback = shape<TurretFeedback>({ seq: int(1), tick: count, event: turretEvent });
+/**
+ * An entry against its own tick: a Shockwave starts on the tick it is recorded on,
+ * and a frag's bomblets all land after the burst.
+ */
+function entryTimed({ tick: at, event }: TurretFeedback): boolean {
+  if (event.type === 'shockwave') return event.startTick === at;
+  if (event.type === 'fragBurst') return event.bomblets.every((b) => b.landTick > at);
+  return true;
+}
+
+const feedback = checked(
+  shape<TurretFeedback>({ seq: int(1), tick: count, event: turretEvent }),
+  entryTimed,
+);
 
 /** The `turp` key: the resolved plan, deep-frozen like the sim's, or null. */
 export function decodeTurretPlan(value: unknown): TurretPlan | null {
@@ -447,6 +489,22 @@ export function decodeTurretPlan(value: unknown): TurretPlan | null {
   return deepFreeze(decoded);
 }
 
+/**
+ * The limited weapons against the plan: never more charges spent than it gave,
+ * no more frag shells flying than were spent, and the Shockwave's rearm at the
+ * seat's start until the first one, after it since.
+ */
+function armsConsistent(defense: Omit<TurretDefenseView, 'plan'>, turretPlan: TurretPlan): boolean {
+  const { stats, startTick, shockReadyTick } = defense;
+  const flying = defense.shots.filter((shot) => shot.weapon === 'frag').length;
+  return (
+    stats.shockwaves <= turretPlan.arsenal.shockwave &&
+    stats.frags <= turretPlan.arsenal.fragmentation &&
+    flying <= stats.frags &&
+    (stats.shockwaves === 0 ? shockReadyTick === startTick : shockReadyTick > startTick)
+  );
+}
+
 /** The `tur` key against its plan: the seat minus the feedback ring, or null. */
 export function decodeTurretSeat(value: unknown, turretPlan: TurretPlan): TurretSeatState | null {
   const decoded = seat(value);
@@ -455,6 +513,7 @@ export function decodeTurretSeat(value: unknown, turretPlan: TurretPlan): Turret
   const { phase, result: outcome } = decoded.defense;
   const ended = phase === 'won' || phase === 'lost';
   if (
+    !armsConsistent(decoded.defense, turretPlan) ||
     decoded.waveCount !== waves.length ||
     decoded.defense.wave >= waves.length ||
     decoded.defense.monsters.some((m) => m.kind >= kinds.length) ||

@@ -317,7 +317,7 @@ export type TurretEvent =
       breakdown: TurretPointsBreakdown;
     };
 
-export type TurretFireRefusal = 'ended' | 'cooldown' | 'invalid' | 'empty';
+export type TurretFireRefusal = 'ended' | 'lull' | 'cooldown' | 'invalid' | 'empty';
 
 export type TurretFireOutcome =
   | { ok: true; shot: TurretShot; events: TurretEvent[] }
@@ -462,7 +462,10 @@ function shellCoreDamage(state: TurretDefenseState): number {
   return wave ? wave.coreDamage : 0;
 }
 
-/** Fires a shell at a ground point; a frag shell also spends a charge (refused as `empty` with none left). */
+/**
+ * Fires a shell at a ground point; a frag shell also spends a charge (refused as
+ * `empty` with none left, and as `lull` outside a wave so a charge is never wasted).
+ */
 export function fireTurret(
   state: TurretDefenseState,
   tick: number,
@@ -473,9 +476,10 @@ export function fireTurret(
 ): TurretFireOutcome {
   if (state.phase === 'won' || state.phase === 'lost')
     return { ok: false, reason: 'ended', events: [] };
+  const frag = weapon === 'frag';
+  if (frag && state.phase !== 'wave') return { ok: false, reason: 'lull', events: [] };
   if (!Number.isFinite(x) || !Number.isFinite(z))
     return { ok: false, reason: 'invalid', events: [] };
-  const frag = weapon === 'frag';
   if (frag && !(turretChargesLeft(state).fragmentation > 0))
     return { ok: false, reason: 'empty', events: [] };
   if (tick < state.readyTick) return { ok: false, reason: 'cooldown', events: [] };

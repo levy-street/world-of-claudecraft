@@ -15,7 +15,7 @@ import {
   TURRET_SCENARIO_STANDARD,
   TURRET_SCENARIOS,
 } from '../src/sim/content/fire_and_fly_scenarios';
-import { TURRET_SHOCKWAVE } from '../src/sim/content/turret_defense';
+import { TURRET_ARENA, TURRET_SHOCKWAVE } from '../src/sim/content/turret_defense';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import { positionAt } from '../src/sim/minigames/thrown_body';
 import type { TurretEvent } from '../src/sim/minigames/turret_defense';
@@ -24,6 +24,7 @@ import {
   TURRET_PLAN_LIMITS,
   turretChargesLeft,
 } from '../src/sim/minigames/turret_defense_plan';
+import { TURRET_BOMBLETS } from '../src/sim/minigames/turret_fragmentation';
 import { TURRET_BONUS_CAP, turretResult } from '../src/sim/minigames/turret_result';
 import { Sim } from '../src/sim/sim';
 import type { TurretSessionView } from '../src/sim/turret_defense_session';
@@ -37,6 +38,7 @@ const EMPTY_WORLD: WorldContent = { ...BUILTIN_WORLD, camps: [], npcs: {}, groun
 const RUN_BOUND = 20 * 60 * 8;
 
 type Wire = ReturnType<typeof JSON.parse>;
+type TurretPlanOf = NonNullable<ReturnType<typeof decodeTurretPlan>>;
 
 function wire(value: unknown): Wire {
   return JSON.parse(JSON.stringify(value));
@@ -440,6 +442,88 @@ describe('the turret seat key', () => {
     expect(decodeTurretSeat(forged, plan)).toBeNull();
   });
 
+  const armedPlan = (): TurretPlanOf =>
+    decodeTurretPlan(JSON.parse(turretPlanWireJson(armed.session.defense.plan)))!;
+  /** An armed revision in a wave with a Shockwave spent and a shell in flight. */
+  function armedMidWave(): Wire {
+    const found = armed.revisions.find(
+      ({ view }) =>
+        view.defense.phase === 'wave' &&
+        view.defense.stats.shockwaves > 0 &&
+        view.defense.shots.length > 0,
+    );
+    expect(found).toBeDefined();
+    return wire(seatOf(found!.view));
+  }
+
+  it.each([
+    [
+      "Shockwaves past the plan's arsenal",
+      (s: Wire, p: TurretPlanOf) => (s.defense.stats.shockwaves = p.arsenal.shockwave + 1),
+    ],
+    [
+      "frag shells past the plan's arsenal",
+      (s: Wire, p: TurretPlanOf) => {
+        s.defense.stats.frags = p.arsenal.fragmentation + 1;
+        s.defense.stats.shots = Math.max(s.defense.stats.shots, s.defense.stats.frags);
+      },
+    ],
+    [
+      'more frag shells than shots',
+      (s: Wire) => {
+        s.defense.stats.frags = 1;
+        s.defense.stats.shots = 0;
+      },
+    ],
+    [
+      'charges past any plan',
+      (s: Wire) => (s.defense.stats.shockwaves = TURRET_PLAN_LIMITS.charges + 1),
+    ],
+    ['negative charges', (s: Wire) => (s.defense.stats.frags = -1)],
+    [
+      'a frag shell in flight that no charge paid for',
+      (s: Wire) => {
+        s.defense.stats.frags = 0;
+        s.defense.shots[0].weapon = 'frag';
+      },
+    ],
+    ['a shell kind the wire does not know', (s: Wire) => (s.defense.shots[0].weapon = 'nuke')],
+    [
+      'a Shockwave spent with its rearm at the start',
+      (s: Wire) => (s.defense.shockReadyTick = s.defense.startTick),
+    ],
+    [
+      'a rearm before any Shockwave',
+      (s: Wire) => {
+        s.defense.stats.shockwaves = 0;
+        s.defense.shockReadyTick = s.defense.startTick + 1;
+      },
+    ],
+    ['a fractional rearm tick', (s: Wire) => (s.defense.shockReadyTick += 0.5)],
+    ['a rearm tick past any tick', (s: Wire) => (s.defense.shockReadyTick = 1e15)],
+    ['a shell in flight numbered 0', (s: Wire) => (s.defense.shots[0].id = 0)],
+    ['a missing rearm tick', (s: Wire) => delete s.defense.shockReadyTick],
+    ['a missing charge count', (s: Wire) => delete s.defense.stats.shockwaves],
+  ] as [string, (s: Wire, p: TurretPlanOf) => unknown][])(
+    'rejects the whole armed seat for %s',
+    (_, forge) => {
+      const forged = armedMidWave();
+      const p = armedPlan();
+      expect(decodeTurretSeat(wire(forged), p)).not.toBeNull();
+      forge(forged, p);
+      expect(decodeTurretSeat(forged, p)).toBeNull();
+    },
+  );
+
+  it("reads the plan's own arsenal as the charge bound, not the resolver's limit", () => {
+    const forged = armedMidWave();
+    const p = armedPlan();
+    forged.defense.stats.shockwaves = p.arsenal.shockwave;
+    expect(decodeTurretSeat(wire(forged), p)).not.toBeNull();
+    const poorer = { ...p, arsenal: { ...p.arsenal, shockwave: p.arsenal.shockwave - 1 } };
+    expect(decodeTurretSeat(forged, poorer)).toBeNull();
+  });
+
   it('rejects a lost seat whose result holds a medal, or a running one with a result', () => {
     const forged = wire(seatOf(lost.revisions.at(-1)!.view));
     expect(decodeTurretSeat(wire(forged), plan)).not.toBeNull();
@@ -518,8 +602,74 @@ describe('the turretDefense event', () => {
       (e: Wire) => e.event.bomblets.push(e.event.bomblets[0]),
     ],
     ['a shell kind the wire does not know', 'fired', (e: Wire) => (e.event.weapon = 'shell')],
+    ['a null shell kind', 'fired', (e: Wire) => (e.event.weapon = null)],
+    ['a shell fired as shot 0', 'fired', (e: Wire) => (e.event.shotId = 0)],
+    ['an impact of shot 0', 'impact', (e: Wire) => (e.event.shotId = 0)],
+    [
+      'a Shockwave starting past any tick',
+      'shockwave',
+      (e: Wire) => {
+        e.tick = 1e15;
+        e.event.startTick = 1e15;
+      },
+    ],
+    [
+      'a bomblet landing past any tick',
+      'fragBurst',
+      (e: Wire) => (e.event.bomblets[TURRET_BOMBLETS - 1].landTick = 1e15),
+    ],
     ['a negative Shockwave reach', 'shockwave', (e: Wire) => (e.event.reach = -1)],
+    ['a Shockwave with no reach', 'shockwave', (e: Wire) => (e.event.reach = 0)],
+    [
+      'a Shockwave reach past the spawn ring',
+      'shockwave',
+      (e: Wire) => (e.event.reach = TURRET_ARENA.spawnRadius + 1),
+    ],
+    ['a Shockwave numbered 0', 'shockwave', (e: Wire) => (e.event.id = 0)],
+    [
+      'a Shockwave numbered past any arsenal',
+      'shockwave',
+      (e: Wire) => (e.event.id = TURRET_PLAN_LIMITS.charges + 1),
+    ],
+    ['a Shockwave starting off its entry tick', 'shockwave', (e: Wire) => e.event.startTick++],
+    ['a fractional Shockwave start', 'shockwave', (e: Wire) => (e.event.startTick += 0.5)],
+    ['a missing Shockwave start', 'shockwave', (e: Wire) => delete e.event.startTick],
+    ['a Shockwave hit numbered 0', 'shockwaveHit', (e: Wire) => (e.event.id = 0)],
+    ['a Shockwave hit with no hit list', 'shockwaveHit', (e: Wire) => delete e.event.hits],
+    ['a frag burst short a bomblet', 'fragBurst', (e: Wire) => e.event.bomblets.pop()],
+    [
+      'a frag burst with its bomblets out of order',
+      'fragBurst',
+      (e: Wire) => e.event.bomblets.reverse(),
+    ],
+    [
+      'a bomblet landing before the one ahead',
+      'fragBurst',
+      (e: Wire) => (e.event.bomblets[2].landTick = e.event.bomblets[1].landTick - 1),
+    ],
+    [
+      'a bomblet landing on the burst tick',
+      'fragBurst',
+      (e: Wire) => (e.event.bomblets[0].landTick = e.tick),
+    ],
+    ['a fractional landing tick', 'fragBurst', (e: Wire) => (e.event.bomblets[5].landTick += 0.5)],
+    ['a star index past its bomblets', 'fragBurst', (e: Wire) => (e.event.bomblets[5].index = 6)],
+    ['a frag burst of shot 0', 'fragBurst', (e: Wire) => (e.event.shotId = 0)],
     ['a fractional bomblet index', 'bomblet', (e: Wire) => (e.event.index = 1.5)],
+    ['a bomblet past the star', 'bomblet', (e: Wire) => (e.event.index = TURRET_BOMBLETS)],
+    ['a negative bomblet index', 'bomblet', (e: Wire) => (e.event.index = -1)],
+    ['a bomblet of shot 0', 'bomblet', (e: Wire) => (e.event.shotId = 0)],
+    [
+      'an end with more frag shells than shots',
+      'ended',
+      (e: Wire) => (e.event.stats.frags = e.event.stats.shots + 1),
+    ],
+    [
+      'an end with Shockwaves past any arsenal',
+      'ended',
+      (e: Wire) => (e.event.stats.shockwaves = TURRET_PLAN_LIMITS.charges + 1),
+    ],
+    ['an end with fractional charges', 'ended', (e: Wire) => (e.event.stats.frags = 1.5)],
   ] as [string, TurretEvent['type'], (e: Wire) => unknown][])('rejects %s', (_, type, forge) => {
     const forged = entry(type);
     expect(decodeTurretFeedback(wire(forged))).not.toBeNull();

@@ -63,6 +63,18 @@ describe('the turret feedback mirror', () => {
     expect(mirror.entries).toEqual([]);
   });
 
+  it('drops an entry kind a newer server adds, keeping its neighbours in order with no restart', () => {
+    const mirror = new TurretFeedbackMirror();
+    mirror.apply(entry(1));
+    mirror.apply({ ...entry(2), event: { type: 'meteor', id: 1 } } as unknown as SimEvent);
+    mirror.apply(entry(3));
+    mirror.publish();
+    expect(seqs(mirror)).toEqual([1, 3]);
+    mirror.apply(entry(4));
+    mirror.publish();
+    expect(seqs(mirror)).toEqual([1, 3, 4]);
+  });
+
   it('clears the published ring but keeps what is held for the next seat; reset drops both', () => {
     const mirror = new TurretFeedbackMirror();
     mirror.apply(entry(1));

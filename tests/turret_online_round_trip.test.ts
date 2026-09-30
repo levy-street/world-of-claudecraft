@@ -6,9 +6,10 @@ import {
   TURRET_DEFAULT_SCENARIO,
   TURRET_SCENARIOS,
 } from '../src/sim/content/fire_and_fly_scenarios';
-import { TURRET_TIMING } from '../src/sim/content/turret_defense';
+import { TURRET_SHOCKWAVE, TURRET_TIMING } from '../src/sim/content/turret_defense';
 import { BUILTIN_WORLD, dungeonAt } from '../src/sim/data';
 import { type MotionSegment, positionAt } from '../src/sim/minigames/thrown_body';
+import { turretChargesLeft } from '../src/sim/minigames/turret_defense_plan';
 import { turretResult } from '../src/sim/minigames/turret_result';
 import { Sim } from '../src/sim/sim';
 import type { TurretDefenseView, TurretSessionView } from '../src/sim/turret_defense_session';
@@ -20,6 +21,10 @@ import { TurretFeedbackReader } from '../src/ui/hud/vehicle/turret_feedback_read
 
 const RUN_BOUND = 20 * 60 * 8;
 const TUR_BYTES_PER_SECOND_CEILING = 15_000;
+// Regression guards per trial, set about 10 percent over the measured won runs (introduction about
+// 7.1 KB/s, the Veterans' Test about 27.5 KB/s with its 99 monsters); all stay under the fleet's
+// mean egress per account (BANDWIDTH_OPINION.md), so no trim is owed, only no silent growth.
+const TUR_BYTES_PER_SECOND_BY_TRIAL: Record<string, number> = { introduction: 8_000, hard: 30_500 };
 const DRIFT_BOUND_YD = 0.005;
 const FORGED_PID = 987_654;
 const ground = { ground: (x: number, z: number) => groundHeight(x, z, WORLD_SEED) };
@@ -129,11 +134,23 @@ function turretEvents(events: readonly SimEvent[], pid: number) {
   );
 }
 
+/** Whether a living body stands inside the Shockwave's reach at `tick`. */
+function inReach(defense: TurretDefenseView, tick: number): boolean {
+  return defense.monsters.some((m) => {
+    if (m.hp <= 0) return false;
+    const p = positionAt(m.seg, tick, ground);
+    return Math.hypot(p.x - defense.cx, p.z - defense.cz) < TURRET_SHOCKWAVE.reach;
+  });
+}
+
 /**
  * A whole seat played through the wire by the online client's nearest-first aimer (or
  * left to fall with `aim` off), the client's view checked against the server's every tick.
+ * `armed`, the aimer spends what its own mirror says is left: a frag shell for each shot
+ * while any remain, and a Shockwave whenever a body stands inside the reach and it has
+ * rearmed.
  */
-function playOnline(command: string, aim = true) {
+function playOnline(command: string, aim = true, armed = false) {
   const { sim, pid } = serverPlayer();
   const client = new WireClient(sim, pid);
   const sent: Record<string, string> = {};
@@ -143,6 +160,10 @@ function playOnline(command: string, aim = true) {
 
   let priorTruth: TurretSessionView | null = null;
   let shots = 0;
+  let slams = 0;
+  let lullTried = false;
+  let lullWatch = false;
+  const routed = new Set<string>();
   let identical = 0;
   let phase = '';
   let ticks = 0;
@@ -157,7 +178,11 @@ function playOnline(command: string, aim = true) {
     for (const event of events) {
       if (event.pid !== pid) continue;
       client.route(event);
-      if (event.type === 'turretDefense') fed++;
+      if (event.type !== 'turretDefense') continue;
+      fed++;
+      const e = event.event;
+      if (lullWatch) expect(['fired', 'shockwave']).not.toContain(e.type);
+      routed.add(e.type === 'fired' && e.weapon ? `fired ${e.weapon}` : e.type);
     }
     const prior = client.turretSession;
     const self = wirePass(sent, sim, pid, bytes);
@@ -176,6 +201,10 @@ function playOnline(command: string, aim = true) {
     priorTruth = authoritative;
 
     const view = client.turretSession as TurretSessionView;
+    if (authoritative) {
+      expect(turretChargesLeft(view.defense)).toEqual(turretChargesLeft(authoritative.defense));
+      expect(view.defense.shockReadyTick).toBe(authoritative.defense.shockReadyTick);
+    }
     for (const [index, m] of view.defense.monsters.entries()) {
       const kind = m.seg.kind;
       if (kind === 'still' || drawnSegments.has(`${m.id}:${m.seg.start}`)) continue;
@@ -186,27 +215,62 @@ function playOnline(command: string, aim = true) {
     }
     phase = view.defense.phase;
     const clock = client.turretClock!;
+    const left = turretChargesLeft(view.defense);
+    const live = view.defense.phase === 'wave';
+    lullWatch = false;
+    if (armed && !lullTried && view.defense.phase === 'intro') {
+      // Both weapons clicked in the intro: refused on the server, nothing spent or sent.
+      lullTried = true;
+      lullWatch = true;
+      const seat = (sim.meta(pid)!.vehicle as TurretSession).defense;
+      const { rev, shockReadyTick } = seat;
+      const aimAt = { x: seat.cx + 10, z: seat.cz };
+      client.useVehicleAction('turret_frag', aimAt);
+      client.useVehicleAction('turret_shockwave', aimAt);
+      expect(seat.rev).toBe(rev);
+      expect(seat.shockReadyTick).toBe(shockReadyTick);
+      expect(turretChargesLeft(seat)).toEqual(seat.plan.arsenal);
+    }
+    if (armed && live && left.shockwave > 0 && clock >= view.defense.shockReadyTick) {
+      if (inReach(view.defense, clock)) {
+        client.useVehicleAction('turret_shockwave', { x: 0, z: 0 });
+        slams++;
+      }
+    }
     if (!aim || clock < view.defense.readyTick) continue;
     const target = nearestLive(view.defense, clock);
     if (!target) continue;
-    client.useVehicleAction('turret_fire', target);
+    const frag = armed && live && left.fragmentation > 0;
+    client.useVehicleAction(frag ? 'turret_frag' : 'turret_fire', target);
     shots++;
   }
   expect(phase).toBe(aim ? 'won' : 'lost');
+  expect(lullTried).toBe(armed);
   expect(identical).toBeGreaterThan(0);
   for (const kind of aim ? (['march', 'fly', 'skid'] as const) : (['march'] as const)) {
     expect(drawn[kind]).toBeGreaterThan(0);
     expect(drift[kind]).toBeLessThan(DRIFT_BOUND_YD);
   }
-  return { sim, pid, client, sent, before, shots, turBytesPerSecond: bytes.tur / (ticks / 20) };
+  return {
+    sim,
+    pid,
+    client,
+    sent,
+    before,
+    shots,
+    slams,
+    routed,
+    turBytesPerSecond: bytes.tur / (ticks / 20),
+  };
 }
 
 describe('Fire and Fly online: the socket-free round trip', () => {
   it('mirrors the authoritative seat within the wire rounding every tick of a won run, then clears on leave', () => {
     const { sim, pid, client, sent, before, shots, turBytesPerSecond } = playOnline('/dev turret');
     expect(shots).toBeGreaterThan(50);
-    // The whole state per revision (D31, no delta), pruned and rounded: 13.9 KB/s over this
-    // run, against 23.7 KB/s before; a later lot that grows the seat's `tur` rate fails here.
+    // The whole state per revision (D31, no delta), pruned and rounded: 14.8 KB/s over this
+    // run (14.5 before the limited weapons' stats and rearm tick joined the seat, 23.7 before
+    // the pruning); a later lot that grows the seat's `tur` rate fails here.
     expect(turBytesPerSecond).toBeLessThan(TUR_BYTES_PER_SECOND_CEILING);
     const ring = client.turretSession!.feedback;
     expect(ring.map((f) => f.seq)).toEqual(ring.map((_, i) => ring[0].seq + i));
@@ -221,10 +285,35 @@ describe('Fire and Fly online: the socket-free round trip', () => {
     expect(dungeonAt(sim.entities.get(pid)!.pos.x)).toBeNull();
   });
 
+  it("mirrors every tick of a won run that spends its limited weapons: charges, rearm and every weapon's entries", () => {
+    const { sim, pid, client, slams, routed, turBytesPerSecond } = playOnline(
+      '/dev turret',
+      true,
+      true,
+    );
+    const truth = turretSessionFor(sim.ctx, pid)!;
+    const plan = truth.defense.plan;
+    expect(truth.defense.stats.frags).toBe(plan.arsenal.fragmentation);
+    expect(truth.defense.stats.shockwaves).toBe(plan.arsenal.shockwave);
+    expect(slams).toBeGreaterThanOrEqual(plan.arsenal.shockwave);
+    expect(client.turretSession!.defense.stats).toEqual(truth.defense.stats);
+    expect(turretChargesLeft(client.turretSession!.defense)).toEqual({
+      shockwave: 0,
+      fragmentation: 0,
+    });
+    // Each weapon's entries reached the client and matched the server's ring every tick.
+    for (const kind of ['fired frag', 'fragBurst', 'bomblet', 'shockwave', 'shockwaveHit'])
+      expect(routed.has(kind), kind).toBe(true);
+    // 14.6 KB/s over this run: the ring and the bomblets never ride `tur`, only the charges
+    // spent (in the stats) and the Shockwave's rearm tick do.
+    expect(turBytesPerSecond).toBeLessThan(TUR_BYTES_PER_SECOND_CEILING);
+  });
+
   it.each(
     TURRET_SCENARIOS.filter((s) => s !== TURRET_DEFAULT_SCENARIO).map((s) => [s.boardKey, s]),
   )('mirrors every tick of a won %s run, its plan carried to the client', (key, scenario) => {
-    const { client } = playOnline(`/dev turret ${key}`);
+    const { client, turBytesPerSecond } = playOnline(`/dev turret ${key}`);
+    expect(turBytesPerSecond).toBeLessThan(TUR_BYTES_PER_SECOND_BY_TRIAL[key]);
     const seat = client.turretSession!;
     expect(seat.defense.plan.scenarioId).toBe(scenario.id);
     expect(seat.defense.plan.integrity).toBe(scenario.integrity);

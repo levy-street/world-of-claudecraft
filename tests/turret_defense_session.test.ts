@@ -1294,9 +1294,16 @@ describe('firing', () => {
 });
 
 describe('the limited weapons', () => {
+  /** Seats the player and plays the intro out: the weapons fire only during a wave. */
+  function seatInWave(sim: Sim): void {
+    seat(sim);
+    for (let i = 0; i <= TURRET_TIMING.introTicks; i++) sim.tick();
+    expect(turretSeat(sim).defense.phase).toBe('wave');
+  }
+
   it('fires a frag shell through useVehicleAction, turned toward it, spending a charge', () => {
     const { sim, player } = rig();
-    seat(sim);
+    seatInWave(sim);
     const defense = turretSeat(sim).defense;
     expect(turretChargesLeft(defense)).toEqual({ shockwave: 2, fragmentation: 3 });
     const aim = { x: defense.cx + 18, z: defense.cz - 18 };
@@ -1320,7 +1327,7 @@ describe('the limited weapons', () => {
 
   it('slams the Shockwave at the tower whatever the point, rearms, then runs dry', () => {
     const { sim, player } = rig();
-    seat(sim);
+    seatInWave(sim);
     const defense = turretSeat(sim).defense;
     const facing = player.facing;
     const seq = turretSeat(sim).nextFeedbackSeq;
@@ -1337,6 +1344,22 @@ describe('the limited weapons', () => {
     expect(sim.useVehicleAction('turret_shockwave', { x: 0, z: 0 })).toBe(false);
     expect(defense.stats).toMatchObject({ shockwaves: 2, shots: 0 });
     expect(turretChargesLeft(defense)).toEqual({ shockwave: 0, fragmentation: 3 });
+  });
+
+  it('refuses both weapons in the intro, spending nothing and recording no entry', () => {
+    const { sim } = rig();
+    seat(sim);
+    const session = turretSeat(sim);
+    const defense = session.defense;
+    expect(defense.phase).toBe('intro');
+    const seq = session.nextFeedbackSeq;
+    const aim = { x: defense.cx + 18, z: defense.cz - 18 };
+    expect(sim.useVehicleAction('turret_shockwave', aim)).toBe(false);
+    expect(sim.useVehicleAction('turret_frag', aim)).toBe(false);
+    expect(defense.stats).toMatchObject({ shockwaves: 0, frags: 0, shots: 0 });
+    expect(turretChargesLeft(defense)).toEqual({ shockwave: 2, fragmentation: 3 });
+    expect(session.nextFeedbackSeq).toBe(seq);
+    expect(sim.useVehicleAction('turret_fire', aim)).toBe(true);
   });
 
   it('refuses off the seat, for another player, once the run has ended and in the cannon', () => {
@@ -1366,7 +1389,7 @@ describe('the limited weapons', () => {
 
   it('shows the charges through the plan and stats and the rearm, never the ring or the bomblets', () => {
     const { sim } = rig();
-    seat(sim);
+    seatInWave(sim);
     const live = turretSeat(sim).defense;
     sim.useVehicleAction('turret_shockwave', { x: 0, z: 0 });
     sim.useVehicleAction('turret_frag', { x: live.cx + 3, z: live.cz + 4 });

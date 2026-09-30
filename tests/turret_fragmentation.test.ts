@@ -224,6 +224,34 @@ describe('firing a frag shell', () => {
       reason: 'ended',
     });
   });
+  it.each(['intro', 'between'] as const)(
+    'refuses in the %s (D50), before the aim, the charges and the reload, spending nothing',
+    (phase) => {
+      const { state } = field(kind('small', 5000), 1, 1);
+      fireTurret(state, state.tick, 20, 0, flat);
+      state.phase = phase;
+      const rev = state.rev;
+      const ready = state.readyTick;
+      expect(fireTurret(state, state.tick, 20, 0, flat, 'frag')).toEqual({
+        ok: false,
+        reason: 'lull',
+        events: [],
+      });
+      expect(fireTurret(state, state.tick, Number.NaN, 0, flat, 'frag')).toMatchObject({
+        reason: 'lull',
+      });
+      expect(state.rev).toBe(rev);
+      expect(state.readyTick).toBe(ready);
+      expect(state.stats).toMatchObject({ shots: 1, frags: 0 });
+      expect(state.shots).toHaveLength(1);
+      state.phase = 'won';
+      expect(fireTurret(state, state.tick, 20, 0, flat, 'frag')).toMatchObject({ reason: 'ended' });
+      // A plain shell still fires outside a wave.
+      const fresh = field(kind('small', 5000), 1, 1).state;
+      fresh.phase = phase;
+      expect(fireTurret(fresh, fresh.tick, 20, 0, flat).ok).toBe(true);
+    },
+  );
 });
 
 describe('the burst and the bomblets', () => {

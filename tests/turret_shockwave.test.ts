@@ -427,6 +427,27 @@ describe('charges and the rearm', () => {
     }
   });
 
+  it.each(['intro', 'between'] as const)(
+    'refuses in the %s (D50), before the charges and the rearm, spending nothing',
+    (phase) => {
+      const { state } = field(kind('small', 5000), 1, 1);
+      slam(state);
+      state.phase = phase;
+      const rev = state.rev;
+      const ready = state.shockReadyTick;
+      expect(startTurretShockwave(state, state.tick, flat)).toEqual({
+        ok: false,
+        reason: 'lull',
+        events: [],
+      });
+      expect(state.rev).toBe(rev);
+      expect(state.shockReadyTick).toBe(ready);
+      expect(state.stats.shockwaves).toBe(1);
+      state.phase = 'lost';
+      expect(startTurretShockwave(state, state.tick, flat)).toMatchObject({ reason: 'ended' });
+    },
+  );
+
   it('keeps a lost run frozen: the ring in progress is dropped', () => {
     const state = createTurretDefense(plan(kind('huge', 5000), 1), { x: 0, z: 0 }, 7, START);
     run(state, INTRO_END);
