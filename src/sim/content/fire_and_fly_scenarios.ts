@@ -6,8 +6,13 @@
 // version. The medal bars come from scripted aimers on the arena ground, up to 3 yd
 // off: on Standard, firing within about 0.4 s of each reload keeps gold, 0.8 s gold
 // or silver, 1 s silver, 1.5 s bronze; on Hard, 0.4 s gold, 0.8 s mostly silver, 1 s
-// bronze or a loss. Those aimers fired no limited weapon: every trial now carries
-// the same arsenal, and its bars are to re-measure with a weapon policy.
+// bronze or a loss. Re-measured with a weapon policy (a Shockwave once 3 windups are
+// the aimer's own delay old, a fragmentation shell on the densest group of 4 within
+// 6 yd) and a sharper one (2 windups, groups within 25 yd of the tower), the weapons
+// barely move the medals: Introduction's golds stay put, the plain policy even costs
+// Standard's fast aimers a few golds (a reload spent on a far pack), and on Hard the
+// 0.8 s aimer stays mostly silver under both. So Hard keeps its 2 Shockwaves; the
+// trim to 1 waits for that aimer turning gold.
 
 import { DT, type TurretScenarioDef } from '../types';
 import { TURRET_BARREL_RING, TURRET_WAVES } from './turret_defense';
