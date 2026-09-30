@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "4b385e97",
+      "state": "5a78624d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -70,6 +70,7 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -172,7 +173,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1014,
-      "state": "a176b59d",
+      "state": "7131643f",
       "events": "feceea31",
       "rng": {
         "draws": 1,
@@ -183,7 +184,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1014,
-      "state": "a176b59d",
+      "state": "7131643f",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -264,6 +265,7 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -458,7 +460,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 1015,
-      "state": "b547dd7c",
+      "state": "802cca34",
       "events": "142d780d",
       "rng": {
         "draws": 1,
@@ -469,7 +471,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 1015,
-      "state": "f9fee308",
+      "state": "c9996940",
       "events": "701788f0",
       "rng": {
         "draws": 1,
@@ -480,7 +482,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 1015,
-      "state": "c5365fc3",
+      "state": "eab97cbb",
       "events": "6c83945b",
       "rng": {
         "draws": 1,
@@ -491,7 +493,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 1015,
-      "state": "c5365fc3",
+      "state": "eab97cbb",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -572,6 +574,7 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -678,6 +681,7 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -973,7 +977,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1015,
-      "state": "a0a3cca4",
+      "state": "bd71ab14",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -984,7 +988,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1015,
-      "state": "a0a3cca4",
+      "state": "bd71ab14",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -1065,6 +1069,7 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -1171,6 +1176,7 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -1390,7 +1396,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1015,
-      "state": "a0a3cca4",
+      "state": "bd71ab14",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -1471,6 +1477,7 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -1577,6 +1584,7 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {

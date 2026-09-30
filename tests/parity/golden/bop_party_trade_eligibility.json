@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "30bab540",
+      "state": "117223a0",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -84,6 +84,7 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
           "gathererIdentity": {
             "id": 101,
             "kind": "character"
@@ -163,6 +164,7 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
           "gathererIdentity": {
             "id": 102,
             "kind": "character"
@@ -405,7 +407,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "93085858",
+      "state": "0f2d21a6",
       "events": "31e5d163",
       "rng": {
         "draws": 8,
@@ -463,6 +465,7 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
           "gathererIdentity": {
             "id": 101,
             "kind": "character"
@@ -559,6 +562,7 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
           "gathererIdentity": {
             "id": 102,
             "kind": "character"
@@ -802,7 +806,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "93085858",
+      "state": "0f2d21a6",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -860,6 +864,7 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
           "gathererIdentity": {
             "id": 101,
             "kind": "character"
@@ -956,6 +961,7 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
           "gathererIdentity": {
             "id": 102,
             "kind": "character"

@@ -21,7 +21,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "316057a2",
+      "state": "4e52746e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -76,6 +76,7 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -178,7 +179,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 1011,
-      "state": "1f42daf6",
+      "state": "ff519d92",
       "events": "600fbb27",
       "rng": {
         "draws": 2,
@@ -253,6 +254,7 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
           "gatheringProficiency": {
             "mining": 1
           },
@@ -385,7 +387,7 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 1011,
-      "state": "d6312746",
+      "state": "4da52444",
       "events": "f222566b",
       "rng": {
         "draws": 4,
@@ -471,6 +473,7 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
           "gatheringProficiency": {
             "logging": 100,
             "mining": 1
@@ -618,7 +621,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 1011,
-      "state": "0435c059",
+      "state": "39544bcb",
       "events": "975cf7cd",
       "rng": {
         "draws": 18,
@@ -629,7 +632,7 @@
       "tick": 1000,
       "time": 50,
       "nextId": 1011,
-      "state": "6322cb47",
+      "state": "3785a059",
       "events": "e0e9383b",
       "rng": {
         "draws": 38,
@@ -640,7 +643,7 @@
       "tick": 1500,
       "time": 75,
       "nextId": 1011,
-      "state": "ff4e5c51",
+      "state": "36cbc2ff",
       "events": "52583720",
       "rng": {
         "draws": 58,
@@ -651,7 +654,7 @@
       "tick": 2000,
       "time": 100,
       "nextId": 1011,
-      "state": "c7d045da",
+      "state": "1d6aa036",
       "events": "a65169dd",
       "rng": {
         "draws": 78,
@@ -662,7 +665,7 @@
       "tick": 2500,
       "time": 125,
       "nextId": 1011,
-      "state": "5ba62109",
+      "state": "18c9e527",
       "events": "9c18b38d",
       "rng": {
         "draws": 96,
@@ -673,7 +676,7 @@
       "tick": 3000,
       "time": 150,
       "nextId": 1011,
-      "state": "d869b2df",
+      "state": "d288d82b",
       "events": "a65169dd",
       "rng": {
         "draws": 116,
@@ -684,7 +687,7 @@
       "tick": 3500,
       "time": 175,
       "nextId": 1011,
-      "state": "5903383e",
+      "state": "04f18ffa",
       "events": "31e4542a",
       "rng": {
         "draws": 136,
@@ -695,7 +698,7 @@
       "tick": 4000,
       "time": 200,
       "nextId": 1011,
-      "state": "f15d8f71",
+      "state": "456b3567",
       "events": "16549bdd",
       "rng": {
         "draws": 156,
@@ -706,7 +709,7 @@
       "tick": 4500,
       "time": 225,
       "nextId": 1011,
-      "state": "9d415e24",
+      "state": "237bbe08",
       "events": "ba8d7d9c",
       "rng": {
         "draws": 176,
@@ -717,7 +720,7 @@
       "tick": 5000,
       "time": 250,
       "nextId": 1011,
-      "state": "5c940bd3",
+      "state": "345ca2c1",
       "events": "972455e1",
       "rng": {
         "draws": 194,
@@ -728,7 +731,7 @@
       "tick": 5206,
       "time": 260.3,
       "nextId": 1011,
-      "state": "7df67280",
+      "state": "eac50f0a",
       "events": "0de89e63",
       "rng": {
         "draws": 204,
@@ -834,6 +837,7 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
           "gatheringProficiency": {
             "herbalism": 1,
             "logging": 100,
@@ -1001,7 +1005,7 @@
       "tick": 5208,
       "time": 260.4,
       "nextId": 1011,
-      "state": "4ac7464f",
+      "state": "f1248f4b",
       "events": "741638a5",
       "rng": {
         "draws": 204,
@@ -1107,6 +1111,7 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
           "gatheringProficiency": {
             "herbalism": 1,
             "logging": 100,
