@@ -235,11 +235,12 @@ describe('Allied Faction World Quest Rewards & Toys', () => {
         sim.tick();
       }
 
-      // Check Blessing of the Dawn was granted (+5 Stamina, 15 min duration)
+      // Check Blessing of the Dawn was granted (+5% all attributes, 30 min duration)
       const blessing = sim.player.auras.find((a) => a.id === 'blessing_of_the_dawn');
       expect(blessing).toBeDefined();
+      expect(blessing?.kind).toBe('buff_stats_pct');
       expect(blessing?.value).toBe(5);
-      expect(blessing?.duration).toBe(900);
+      expect(blessing?.duration).toBe(1800);
 
       // Moving out of radius resets accumulation
       sim.player.pos = { x: -100 + DAWN_STANDARD_RADIUS + 10, y: 0, z: 200 };

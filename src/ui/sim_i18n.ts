@@ -1150,6 +1150,11 @@ const baseEnTable = {
   'aura.broodlordsWard': "Broodlord's Ward",
   'aura.matriarchsWard': "Matriarch's Ward",
   'log.seaFatigue': 'The open sea saps your strength. Swim back to shore!',
+  // The Dawn Battle Standard toy (src/sim/content/faction_rewards.ts
+  // applyBlessingOfTheDawn): the once-per-stay blessing line. Placeholder-free,
+  // so it registers in the EXACT matcher automatically.
+  'log.dawnBlessing':
+    'You are bathed in the sacred light: Blessing of the Dawn (+5% to all attributes).',
   'log.veilEnter': 'A veil of dusk parts before you, and the Hollow opens ahead.',
   'log.veilLeave': 'The veil closes behind you, and the mountain air bites again.',
   'log.ferryEnter': 'The ferry bell rings once, and the Farshore rises out of the spray.',
