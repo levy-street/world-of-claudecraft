@@ -78,7 +78,10 @@ ratings.
   (stake + honor pool, integer copper and integer honor, zero rng, paid exactly
   once per death; gold is staked by a FLAGGED victim and taken by FLAGGED
   contributors only; two players mid-duel with each other are the duel's
-  business, never the world's), the IWorld readout
+  business, never the world's), the server-only `worldPvpKill` record each paid
+  death fires for the Discord kill feed (both resolution arms, a no-earner kill
+  included; no pid, no text, no rng; `server/event_frame.ts` strips it from
+  client frames), the IWorld readout
   (`worldPvpInfoFor`, whole-second countdown so the self wire elides it), the
   `/pvp` chat arms' entry points, and the persisted record (`savedWorldPvpFields`
   / `loadWorldPvpState`, the countdown stored as remaining seconds and
@@ -146,7 +149,9 @@ ratings.
   in the attempt number so a retry searches new ground), the `/dev hill` test
   levers (`spawnHillNow`, `riseHillNow`, `endHillNow`, `warnNextHillNow`; their
   argument grammar is the pure `hill_dev.ts`), the once-a-second `updateHill` pass (the
-  phases warning, risen, fallen, each announced to the realm; then, only while
+  phases warning, risen, fallen, each announced to the realm, with the server-only
+  `hillAnnounced` twin for the Discord PvP channel beside each line: no text, no pid,
+  times relative to the announcement; then, only while
   risen, presence by party, contest, payouts through `grantHonor` with reason
   `hill_hold`), the readout (`hillInfoFor`, live fields only for a viewer in the
   hill's zone while it is risen, so the self wire elides it elsewhere), the

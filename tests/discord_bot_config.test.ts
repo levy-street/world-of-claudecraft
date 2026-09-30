@@ -33,6 +33,7 @@ const BOT_ENV_KEYS = [
   'DISCORD_RELAY_CHANNEL_ID',
   'DISCORD_ACTIVITY_CHANNEL_ID',
   'DISCORD_DAILY_REWARDS_CHANNEL_ID',
+  'DISCORD_PVP_FEED_CHANNEL_ID',
   'DISCORD_SYNC_NICKNAMES',
   'DISCORD_MAX_RPS',
   'DISCORD_BAN_PAUSE_MS',
@@ -158,6 +159,7 @@ describe('loadConfig defaults', () => {
     expect(cfg.relayChannelId).toBe('');
     expect(cfg.activityChannelId).toBe('');
     expect(cfg.dailyRewardsChannelId).toBe('');
+    expect(cfg.pvpFeedChannelId).toBe('');
   });
 
   it('reads each channel field from its OWN env key', () => {
@@ -171,6 +173,7 @@ describe('loadConfig defaults', () => {
     process.env.DISCORD_RELAY_CHANNEL_ID = 'relay-id';
     process.env.DISCORD_ACTIVITY_CHANNEL_ID = 'activity-id';
     process.env.DISCORD_DAILY_REWARDS_CHANNEL_ID = 'daily-id';
+    process.env.DISCORD_PVP_FEED_CHANNEL_ID = 'pvp-id';
 
     const cfg = loadConfig();
     expect(cfg.voiceChannelId).toBe('voice-id');
@@ -179,6 +182,7 @@ describe('loadConfig defaults', () => {
     expect(cfg.relayChannelId).toBe('relay-id');
     expect(cfg.activityChannelId).toBe('activity-id');
     expect(cfg.dailyRewardsChannelId).toBe('daily-id');
+    expect(cfg.pvpFeedChannelId).toBe('pvp-id');
   });
 });
 
@@ -196,6 +200,17 @@ describe('loadConfig channel fallback ladders', () => {
     expect(loadConfig().relayChannelId).toBe('test-1');
     delete process.env.DISCORD_TEST_CHANNEL_ID;
     expect(loadConfig().relayChannelId).toBe('');
+  });
+
+  it('gives the PvP kill feed NO ladder: every other channel set still leaves it off', () => {
+    // A kill feed that fell back to activity/relay/test would bury those
+    // channels under kill lines, so unset must mean off, whatever else is set.
+    setRequired();
+    process.env.DISCORD_ACTIVITY_CHANNEL_ID = 'activity-1';
+    process.env.DISCORD_RELAY_CHANNEL_ID = 'relay-1';
+    process.env.DISCORD_TEST_CHANNEL_ID = 'test-1';
+    process.env.DISCORD_DAILY_REWARDS_CHANNEL_ID = 'daily-1';
+    expect(loadConfig().pvpFeedChannelId).toBe('');
   });
 
   it('walks the activity ladder: activity, then relay, then test, then empty', () => {

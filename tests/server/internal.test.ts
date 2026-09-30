@@ -103,10 +103,23 @@ import {
   setDiscordGuildMember,
   setDiscordMemberMetaBulk,
 } from '../../server/discord_db';
+// Same for the PvP kill feed and the hill calls: pure and dependency-free, so
+// the REAL queues run.
+import {
+  drainHillAnnouncements,
+  enqueueHillAnnouncement,
+  hillAnnouncementQueueDepth,
+} from '../../server/discord_hill_feed';
 // The change feed itself is pure and dependency-free, so the REAL module runs
 // here: tests enqueue into it and the outbox handler drains it, which exercises
 // the actual FIFO rather than a fake standing in for it.
 import { drainLinkChanges, enqueueLinkChange } from '../../server/discord_link_changes';
+import {
+  drainPvpKills,
+  enqueuePvpKill,
+  pvpKillQueueDepth,
+  type QueuedPvpKill,
+} from '../../server/discord_pvp_feed';
 import {
   enqueueQueuePop,
   type QueuedQueuePop,
@@ -1786,6 +1799,8 @@ describe('discord/outbox', () => {
       winners: NO_WINNERS,
       linkChanges: { items: [] },
       queuePops: { items: [], watching: false },
+      pvpKills: { items: [] },
+      hillAnnouncements: { items: [] },
     });
   });
 
@@ -1808,6 +1823,8 @@ describe('discord/outbox', () => {
       winners: NO_WINNERS,
       linkChanges: { items: [] },
       queuePops: { items: [], watching: false },
+      pvpKills: { items: [] },
+      hillAnnouncements: { items: [] },
     });
   });
 
@@ -1891,6 +1908,121 @@ describe('discord/outbox', () => {
     ).toEqual([4]);
   });
 
+  it('serves PvP kills verbatim, FIFO, with no identity read (names only, nobody pinged)', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+    stubDrains();
+    drainPvpKills(); // the real queue is module state; start from empty
+    const kill = (killerName: string): QueuedPvpKill => ({
+      killerName,
+      victimName: 'Annthar',
+      killerLevel: 60,
+      victimLevel: 58,
+      zoneName: 'Drakelands',
+      assists: 1,
+      copper: 120,
+      realm: 'R',
+    });
+    enqueuePvpKill(kill('Kargath'));
+    enqueuePvpKill(kill('Borin'));
+    vi.mocked(dailyRewardService.discordWinnerAnnouncements).mockResolvedValue(NO_WINNERS);
+
+    const r = await runRoute('GET', '/internal/discord/outbox', { headers: DISCORD_HEADERS });
+
+    expect(r.status).toBe(200);
+    // Fresh literals, never the enqueued objects: the item shape IS the wire.
+    expect(dataOf(r.body).pvpKills).toEqual({
+      items: [
+        {
+          killerName: 'Kargath',
+          victimName: 'Annthar',
+          killerLevel: 60,
+          victimLevel: 58,
+          zoneName: 'Drakelands',
+          assists: 1,
+          copper: 120,
+          realm: 'R',
+        },
+        {
+          killerName: 'Borin',
+          victimName: 'Annthar',
+          killerLevel: 60,
+          victimLevel: 58,
+          zoneName: 'Drakelands',
+          assists: 1,
+          copper: 120,
+          realm: 'R',
+        },
+      ],
+    });
+    // The stream mentions no accounts, so a kills-only drain reads nothing.
+    expect(vi.mocked(discordLinksForAccounts)).not.toHaveBeenCalled();
+    expect(pvpKillQueueDepth()).toBe(0);
+  });
+
+  it('serves King of the Hill calls verbatim with no identity read, and requeues them on a failed build', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+    drainHillAnnouncements();
+    stubDrains();
+    const call = {
+      phase: 'warning' as const,
+      zoneName: 'Drakelands',
+      risesAtMs: 1_790_000_900_000,
+      fallsAtMs: 1_790_003_600_000,
+      realm: 'R',
+    };
+    enqueueHillAnnouncement(call);
+    vi.mocked(dailyRewardService.discordWinnerAnnouncements).mockResolvedValue(NO_WINNERS);
+
+    const r = await runRoute('GET', '/internal/discord/outbox', { headers: DISCORD_HEADERS });
+    expect(r.status).toBe(200);
+    expect(dataOf(r.body).hillAnnouncements).toEqual({
+      items: [
+        {
+          phase: 'warning',
+          zoneName: 'Drakelands',
+          risesAtMs: 1_790_000_900_000,
+          fallsAtMs: 1_790_003_600_000,
+          realm: 'R',
+        },
+      ],
+    });
+    expect(vi.mocked(discordLinksForAccounts)).not.toHaveBeenCalled();
+    expect(hillAnnouncementQueueDepth()).toBe(0);
+
+    // A failed build puts the call back in the REAL queue.
+    enqueueHillAnnouncement(call);
+    stubDrains([], [activityItem(2, 'Bea')]);
+    vi.mocked(discordLinksForAccounts).mockRejectedValueOnce(new Error('identity read failed'));
+    const failed = await runRoute('GET', '/internal/discord/outbox', { headers: DISCORD_HEADERS });
+    expect(failed.status).toBe(500);
+    expect(drainHillAnnouncements().map((c) => c.phase)).toEqual(['warning']);
+  });
+
+  it('requeues drained PvP kills when the response build throws', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+    drainPvpKills();
+    // An activity item forces the identity read, which is what fails here.
+    stubDrains([], [activityItem(2, 'Bea')]);
+    enqueuePvpKill({
+      killerName: 'Kargath',
+      victimName: 'Annthar',
+      killerLevel: 60,
+      victimLevel: 58,
+      zoneName: null,
+      assists: 0,
+      copper: 0,
+      realm: 'R',
+    });
+    vi.mocked(dailyRewardService.discordWinnerAnnouncements).mockResolvedValue(NO_WINNERS);
+    vi.mocked(discordLinksForAccounts).mockRejectedValueOnce(new Error('identity read failed'));
+
+    const failed = await runRoute('GET', '/internal/discord/outbox', { headers: DISCORD_HEADERS });
+
+    expect(failed.status).toBe(500);
+    // Back in the REAL queue, so the next poll carries it.
+    expect(drainPvpKills().map((k) => k.killerName)).toEqual(['Kargath']);
+  });
+
   it('carries the envelope fields in the documented order', async () => {
     process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
     stubDrains();
@@ -1904,6 +2036,8 @@ describe('discord/outbox', () => {
       'winners',
       'linkChanges',
       'queuePops',
+      'pvpKills',
+      'hillAnnouncements',
     ]);
   });
 

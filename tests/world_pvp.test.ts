@@ -745,6 +745,177 @@ describe('kill resolution: the stake and the honor pool', () => {
   });
 });
 
+describe('the Discord kill feed record (the server-only worldPvpKill event)', () => {
+  function kills(sim: Sim) {
+    return sim.events.filter(
+      (ev): ev is Extract<SimEvent, { type: 'worldPvpKill' }> => ev.type === 'worldPvpKill',
+    );
+  }
+
+  it('a clean 1v1 fires exactly one record: names, levels, zone, the stake TAKEN, no pid', () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1001);
+    const b = addFighter(sim, 'Bet', 18, 1002);
+    standTogether(sim, [a, b]);
+    flag(sim, a);
+    flag(sim, b);
+    sim.meta(b)!.copper = 20_000;
+    sim.events = [];
+    slay(sim, a, b);
+    expect(kills(sim)).toEqual([
+      {
+        type: 'worldPvpKill',
+        killerName: 'Aleph',
+        victimName: 'Bet',
+        killerLevel: 20,
+        victimLevel: 18,
+        zoneId: CONTESTED_ZONE,
+        assists: 0,
+        copper: 2_000,
+      },
+    ]);
+  });
+
+  it('counts every credited contributor but the blow as an assist, and reports the whole take', () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1);
+    const b = addFighter(sim, 'Bet', 20, 2);
+    const healer = addFighter(sim, 'Heal', 20, 3);
+    const victim = addFighter(sim, 'Victim', 20, 4);
+    standTogether(sim, [victim, a, b, healer]);
+    for (const pid of [a, b, healer, victim]) flag(sim, pid);
+    sim.meta(victim)!.copper = 10_000;
+    sim.events = [];
+    hit(sim, b, victim);
+    heal(sim, healer, b);
+    slay(sim, a, victim);
+    expect(kills(sim).map((k) => [k.killerName, k.assists, k.copper])).toEqual([
+      ['Aleph', 2, 1_000],
+    ]);
+  });
+
+  it('a grey killing blow still names the killer; only the peer who earned counts as an assist', () => {
+    const sim = world();
+    const high = addFighter(sim, 'Cap', 20, 1);
+    const peer = addFighter(sim, 'Peer', 14, 2);
+    const low = addFighter(sim, 'Low', 14, 3);
+    standTogether(sim, [low, high, peer]);
+    for (const pid of [high, peer, low]) flag(sim, pid);
+    sim.meta(low)!.copper = 10_000;
+    hit(sim, peer, low);
+    sim.events = [];
+    slay(sim, high, low);
+    expect(kills(sim).map((k) => [k.killerName, k.victimName, k.assists, k.copper])).toEqual([
+      ['Cap', 'Low', 1, 1_000],
+    ]);
+  });
+
+  it('a kill nobody earned from (a grey solo gank) still fires, with no assists and no stake', () => {
+    const sim = world();
+    const high = addFighter(sim, 'Cap', 20, 1);
+    const low = addFighter(sim, 'Low', 14, 2);
+    standTogether(sim, [low, high]);
+    flag(sim, high);
+    flag(sim, low);
+    sim.meta(low)!.copper = 10_000;
+    sim.events = [];
+    slay(sim, high, low);
+    expect(kills(sim).map((k) => [k.killerName, k.assists, k.copper])).toEqual([['Cap', 0, 0]]);
+    expect(sim.meta(low)!.copper).toBe(10_000);
+  });
+
+  it('fires once per death even if the death hub is re-entered on the corpse', () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1);
+    const b = addFighter(sim, 'Bet', 20, 2);
+    standTogether(sim, [a, b]);
+    flag(sim, a);
+    flag(sim, b);
+    sim.events = [];
+    slay(sim, a, b);
+    worldPvpOnPlayerDeath(sim.ctx, ent(sim, b), ent(sim, a));
+    expect(kills(sim)).toHaveLength(1);
+  });
+
+  it('never fires for a death that was not a world PvP kill', () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1);
+    const b = addFighter(sim, 'Bet', 20, 2);
+    standTogether(sim, [a, b]);
+    // Unflagged pair on contested ground: not world-hostile, so no kill record.
+    sim.events = [];
+    slay(sim, a, b);
+    expect(ent(sim, b).dead).toBe(true);
+    expect(kills(sim)).toEqual([]);
+    // A flagged player dying to no player at all (falling, a mob).
+    const lone = addFighter(sim, 'Wanderer', 20, 3);
+    flag(sim, lone);
+    sim.events = [];
+    sim.ctx.dealDamage(null, ent(sim, lone), 100_000, false, 'physical', 'Falling', 'hit');
+    expect(ent(sim, lone).dead).toBe(true);
+    expect(kills(sim)).toEqual([]);
+  });
+
+  it("reads the victim's zone, not the killer's", () => {
+    // Different zones on purpose: a record read off the killer's position
+    // would say CONTESTED_ZONE here. Both flagged, so the pair is hostile.
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1);
+    const b = addFighter(sim, 'Bet', 20, 2);
+    flag(sim, a);
+    flag(sim, b);
+    placeIn(sim, a, CONTESTED_ZONE);
+    placeIn(sim, b, FFA_ZONE);
+    sim.events = [];
+    slay(sim, a, b);
+    expect(kills(sim).map((k) => k.zoneId)).toEqual([FFA_ZONE]);
+  });
+
+  it('an UNFLAGGED kill on free-for-all ground still fires (world PvP, not only /pvp)', () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1);
+    const b = addFighter(sim, 'Bet', 20, 2);
+    placeIn(sim, a, FFA_ZONE);
+    placeIn(sim, b, FFA_ZONE, 2);
+    sim.events = [];
+    slay(sim, a, b);
+    expect(kills(sim).map((k) => [k.killerName, k.victimName, k.zoneId])).toEqual([
+      ['Aleph', 'Bet', FFA_ZONE],
+    ]);
+  });
+
+  it("a pet's killing blow names its OWNER as the killer", () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1);
+    const victim = addFighter(sim, 'Victim', 18, 2);
+    standTogether(sim, [a, victim]);
+    flag(sim, a);
+    flag(sim, victim);
+    const pet = { kind: 'mob', id: 999_999, ownerId: a, name: 'Wolf', level: 60 } as Entity;
+    sim.events = [];
+    worldPvpOnPlayerDeath(sim.ctx, ent(sim, victim), pet);
+    expect(kills(sim).map((k) => [k.killerName, k.killerLevel, k.victimName])).toEqual([
+      ['Aleph', 20, 'Victim'],
+    ]);
+  });
+
+  it("two flagged players mid-duel with each other are the duel's business: no record", () => {
+    const sim = world();
+    const a = addFighter(sim, 'Aleph', 20, 1);
+    const b = addFighter(sim, 'Bet', 20, 2);
+    standTogether(sim, [a, b]);
+    flag(sim, a);
+    flag(sim, b);
+    // The state the duel arm of isWorldPvpHostile reads (inActiveDuelTogether).
+    const duel = { a, b, state: 'active' } as never;
+    sim.ctx.duels.set(a, duel);
+    sim.ctx.duels.set(b, duel);
+    sim.events = [];
+    worldPvpOnPlayerDeath(sim.ctx, ent(sim, b), ent(sim, a));
+    expect(kills(sim)).toEqual([]);
+  });
+});
+
 describe('the healer rule: aiding a flagged fighter raises your own flag', () => {
   it('an unflagged healer who heals a flagged player mid-fight is flagged and then credited', () => {
     const sim = world();

@@ -210,6 +210,15 @@ function announcePhase(
   } else {
     announce(ctx, hillFallenLine(name), RISE_COLOR);
   }
+  // The server-only twin of the line above for the Discord PvP feed: no
+  // text, no pid, times relative to now (types.ts 'hillAnnounced').
+  ctx.emit({
+    type: 'hillAnnounced',
+    phase: what,
+    zoneId: hill.zoneId,
+    secondsUntilRise: Math.max(0, hill.risesAt - ctx.time),
+    secondsUntilFall: Math.max(0, hill.closesAt - ctx.time),
+  });
 }
 
 /**

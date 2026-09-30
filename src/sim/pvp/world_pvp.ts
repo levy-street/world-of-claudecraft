@@ -38,6 +38,7 @@
 // the server, and the headless env resolve every flag and every kill
 // identically.
 
+import { zoneContaining } from '../data';
 import { formatMoney } from '../format_money';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -198,6 +199,28 @@ function playerOf(ctx: SimContext, pid: number): { e: Entity; meta: PlayerMeta }
 
 function notice(ctx: SimContext, pid: number, text: string, color = NOTICE_COLOR): void {
   ctx.emit({ type: 'log', text, color, pid });
+}
+
+/** The server-only kill-feed record (SimEvent 'worldPvpKill'): once per paid
+ *  death, both resolution arms. No pid, no rng, no text: the server resolves
+ *  the zone name and the Discord bot writes the line. */
+function emitKillFeed(
+  ctx: SimContext,
+  killer: Entity,
+  victim: Entity,
+  assists: number,
+  copper: number,
+): void {
+  ctx.emit({
+    type: 'worldPvpKill',
+    killerName: killer.name,
+    victimName: victim.name,
+    killerLevel: killer.level,
+    victimLevel: victim.level,
+    zoneId: zoneContaining(victim.pos.x, victim.pos.z)?.id ?? null,
+    assists,
+    copper,
+  });
 }
 
 /** The disarm delay in whole minutes, for the notice line. */
@@ -680,6 +703,9 @@ export function worldPvpOnPlayerDeath(
   const n = contributors.length;
   if (n === 0) {
     notice(ctx, victim.id, worldPvpDefeatLine(killerPlayer.name, 0, 1), DEFEATED_COLOR);
+    // Still a kill for the feed: nobody earned (grey victim, fully decayed
+    // pair, an oversized group), but the killing blow landed.
+    emitKillFeed(ctx, killerPlayer, victim, 0, 0);
     return;
   }
   const gold = worldPvpSplit(victim.pvpFlag ? worldPvpStake(victimMeta.copper) : 0, n);
@@ -700,6 +726,11 @@ export function worldPvpOnPlayerDeath(
   }
   victimMeta.copper = Math.max(0, victimMeta.copper - taken);
   notice(ctx, victim.id, worldPvpDefeatLine(killerPlayer.name, taken, n), DEFEATED_COLOR);
+  // The killing blow may itself be excluded from the pool (grey, decayed), so
+  // assists count every credited contributor who is NOT the killer.
+  let assists = 0;
+  for (const c of contributors) if (c.e.id !== killerPlayer.id) assists++;
+  emitKillFeed(ctx, killerPlayer, victim, assists, taken);
 }
 
 /** The IWorld readout for the World PvP tab and the target/nameplate cores.

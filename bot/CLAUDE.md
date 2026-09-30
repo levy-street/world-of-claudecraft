@@ -9,7 +9,10 @@ official Discord server and the game two ways:
   poll reads it); in-game "!" community posts relayed as embeds with a respond
   deep-link button; a significant-activity feed (the kind set is pinned by
   `SERVER_KINDS`; see Activity-kind parity below);
-  daily-rewards top-10 winner posts; a member reward on guild join
+  daily-rewards top-10 winner posts; a World PvP kill feed (every `/pvp` kill as one
+  line, digest-batched, names only, its own channel) with the King of the Hill spawn
+  calls in the same channel (see PvP kill feed below);
+  a member reward on guild join
   (server-deduped; no welcome message is posted, intentionally quiet).
 - **Into the game:** presence (online count + the featured voice room) and member
   metadata (guild join date + top staff role) pushed to the server, which renders
@@ -144,6 +147,27 @@ for it and a second kind would double-announce; the id constants are
 deliberate COPIES pinned against the DEEDS catalog in
 `tests/discord_activity_professions.test.ts`, never imports.
 
+### PvP kill feed (its own stream, never an activity kind)
+The `pvpKills` outbox stream (server half: `server/discord_pvp_feed.ts`) is deliberately
+NOT an `ActivityKind`: the activity feed posts one card per moment, tags linked players,
+and drops items nobody linked is in, and a kill feed is the opposite on all three counts.
+Items carry names only, so no identity is resolved and `allowed_mentions` is always
+empty. `runOutboxPoll` posts them after the activity cards as DIGESTS: `chunkPvpKills`
+splits a drain into `PVP_FEED_LINES_PER_POST` batches, each one `createMessage` in its
+own catch. That constant is sized against the WORST line (two `PVP_FEED_NAME_MAX` names
+of pure markdown metacharacters escape to double length), and the 4096-character embed
+description limit is pinned by a test in `tests/discord_bot.test.ts`: raise the line
+count or the name bound only with that test green. `DISCORD_PVP_FEED_CHANNEL_ID` has no
+fallback ladder on purpose (pinned in `tests/discord_bot_config.test.ts`).
+
+The same channel carries the King of the Hill spawn calls, the `hillAnnouncements`
+stream (server half: `server/discord_hill_feed.ts`): one card per warning and per rise
+(`buildHillAnnouncementMessage`, a live Discord `<t:...:R>` countdown; the fall is never
+sent), posted after the activity cards and AHEAD of the kill digests. Each carries
+wall-clock deadlines on the server's clock, and `runOutboxPoll` skips a call whose moment
+already passed while it sat in a backlog (`hillAnnouncementIsStale`: a warning once the
+hill has risen, a rise once it has fallen), silently, the queue-pop deadline rule.
+
 ### Discord posts are English
 Every builder in `logic.ts` writes English literals, deliberately. The repo's
 "every player-visible string is a `t()` key" rule scopes to the GAME surfaces
@@ -236,8 +260,9 @@ not stay phase-locked, and repeated event kicks coalesce into exactly one follow
   `cfg.presenceDebounceMs` window and every event inside it folds into one push.
 - Outbox (`outbox`): the ONE pickup loop, every `cfg.outboxPollMs` while it keeps
   finding work, decaying to `cfg.outboxIdleMs` once the drains come back empty.
-  `GET /internal/discord/outbox` answers five streams at once (relay posts, the activity
-  feed, the reward-winner days, the link-change feed, and the queue-pop DMs), replacing the
+  `GET /internal/discord/outbox` answers every stream at once (`OutboxEnvelope`: relay posts, the activity
+  feed, the reward-winner days, the link-change feed, the queue-pop DMs, the World PvP
+  kill feed, and the King of the Hill spawn calls), replacing the
   three separate pollers and the sweep's full flex re-read. `outbox_consumer.ts` owns what
   it does with them: it will NOT drain while the rate governor's breaker is open or half-open
   (those posts are non-essential, so the governor would refuse them, and a 200 is the
@@ -357,7 +382,8 @@ Required: `DISCORD_BOT_TOKEN`, `DISCORD_CLIENT_ID`, `DISCORD_GUILD_ID`,
 `DISCORD_VOICE_CHANNEL_ID` (featured voice room), `DISCORD_TEST_CHANNEL_ID`
 (one-time startup announcement), `DISCORD_RELAY_CHANNEL_ID` (falls back to test),
 `DISCORD_ACTIVITY_CHANNEL_ID` (falls back to relay, then test),
-`DISCORD_DAILY_REWARDS_CHANNEL_ID`, `DISCORD_SYNC_NICKNAMES` (`0` disables, default
+`DISCORD_DAILY_REWARDS_CHANNEL_ID`, `DISCORD_PVP_FEED_CHANNEL_ID` (the World PvP kill
+feed and the King of the Hill spawn calls; no fallback, unset is off), `DISCORD_SYNC_NICKNAMES` (`0` disables, default
 on). Governor knobs (all optional, safe defaults): `DISCORD_MAX_RPS`,
 `DISCORD_BAN_PAUSE_MS`, `DISCORD_BREAKER_LIMIT`, `DISCORD_FORBIDDEN_TTL_MS`. Loop
 cadences (D13, all optional): `DISCORD_ROLE_SYNC_INTERVAL_MS`,
