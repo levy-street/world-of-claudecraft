@@ -1100,6 +1100,7 @@ const RENDER_PURE_CORES = [
   'src/render/zone_dressing_lod_core.ts',
   'src/render/zone_feature_visibility_core.ts',
   'src/render/zone_eviction_core.ts',
+  'src/render/drakelands_kit_lane_core.ts',
   'src/render/zone_prewarm_templates_core.ts',
   'src/render/cast_vfx_readiness_core.ts',
   'src/render/characters/skeleton_update_core.ts',

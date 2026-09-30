@@ -995,7 +995,10 @@ const MONOLITHS: MonolithRow[] = [
     // RE-PINNED 12687 -> 12688 at the second release merge into the same branch,
     // after PR 3847 landed on the release (its renderer.ts wiring adds one line;
     // the release pin stays 12684): wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 12688,
+    // LOWERED 12688 -> 12683 by the Drakelands kit lane: its prepare await and
+    // approach prefetch came in, paid for by moving the visible-zone recheck
+    // cadence into zone_streaming.ts (claimZoneStreamRecheck). Exact count.
+    ceiling: 12683,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

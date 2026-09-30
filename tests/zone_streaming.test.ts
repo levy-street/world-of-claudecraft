@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   ARRIVAL_NEIGHBOR_STREAM_RADIUS,
+  claimZoneStreamRecheck,
+  createZoneStreamRecheck,
   distanceSqToZone,
   INITIAL_SKY_PREWARM_RADIUS,
   ZONE_STREAM_RECHECK_DISTANCE,
@@ -75,6 +77,27 @@ describe('renderer zone-streaming horizon', () => {
 
   it('uses a non-zero movement threshold for cheap frame-loop rechecks', () => {
     expect(ZONE_STREAM_RECHECK_DISTANCE).toBeGreaterThan(0);
+  });
+
+  it('claims a recheck on the first call, on travel, and on a horizon change, never in between', () => {
+    const check = createZoneStreamRecheck();
+    expect(claimZoneStreamRecheck(check, 10, 20, 340)).toBe(true);
+    expect(check).toEqual({ x: 10, z: 20, far: 340 });
+    // Less than the threshold away, same horizon: the frame loop skips.
+    expect(claimZoneStreamRecheck(check, 10 + ZONE_STREAM_RECHECK_DISTANCE - 0.5, 20, 340)).toBe(
+      false,
+    );
+    expect(claimZoneStreamRecheck(check, 10, 20, 340.5)).toBe(false);
+    expect(check).toEqual({ x: 10, z: 20, far: 340 });
+    // Travel is measured from the last CLAIMED position, not the last call.
+    expect(claimZoneStreamRecheck(check, 10, 20 + ZONE_STREAM_RECHECK_DISTANCE, 340)).toBe(true);
+    expect(check).toEqual({ x: 10, z: 20 + ZONE_STREAM_RECHECK_DISTANCE, far: 340 });
+    // A yard of horizon change re-claims in place.
+    expect(claimZoneStreamRecheck(check, 10, 44, 341)).toBe(true);
+    // Forcing the next recheck (a failed prepare) is a NaN position.
+    check.x = Number.NaN;
+    expect(claimZoneStreamRecheck(check, 10, 44, 341)).toBe(true);
+    expect(check.x).toBe(10);
   });
 
   it('every entry point resolves back to its own zone, even from a boundary camera', () => {

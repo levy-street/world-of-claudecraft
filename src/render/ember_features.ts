@@ -17,8 +17,10 @@ import { hash2 } from '../sim/rng';
 import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { drakelandsKitBootThunk } from './drakelands_kit_lane_core';
 import { buildForgefatherFortress } from './forgefather_fortress';
 import { GFX } from './gfx';
+import { ignivarEnvPropsSettled } from './ignivar_env_props';
 import { lavaChainPlacements } from './lava_chain_core';
 
 // the Drakelands prop models (built by build_drakelands_props.mjs)
@@ -33,13 +35,34 @@ const EMBER_PROP_URLS = {
   lily: '/models/props/ember_lily.glb',
 } as const;
 type EmberPropKey = keyof typeof EMBER_PROP_URLS;
+const EMBER_PROP_KEYS = Object.keys(EMBER_PROP_URLS) as EmberPropKey[];
 const propScenes: Partial<Record<EmberPropKey, THREE.Group>> = {};
-for (const key of Object.keys(EMBER_PROP_URLS) as EmberPropKey[]) {
-  registerDeferredPreload(() =>
-    loadGltf(EMBER_PROP_URLS[key]).then((gltf) => {
-      propScenes[key] = gltf.scene;
-    }),
+function loadEmberPropScene(key: EmberPropKey): Promise<void> {
+  return loadGltf(EMBER_PROP_URLS[key]).then((gltf) => {
+    propScenes[key] = gltf.scene;
+  });
+}
+// Boot-loaded everywhere but the iOS memory profile (drakelands_kit_lane.ts).
+for (const key of EMBER_PROP_KEYS) {
+  registerDeferredPreload(
+    drakelandsKitBootThunk(
+      () => loadEmberPropScene(key),
+      () => GFX,
+    ),
   );
+}
+
+/** Load the prop scenes not resident yet: the kit lane's half of the kit (the
+ *  Ignivar templates are prepareIgnivarEnvProps'). Rejects if one fails. */
+export function loadEmberPropScenes(): Promise<void> {
+  const missing = EMBER_PROP_KEYS.filter((key) => !propScenes[key]);
+  return Promise.all(missing.map(loadEmberPropScene)).then(() => undefined);
+}
+
+/** Every asset buildEmberFeatures reads: the six prop scenes and the settled
+ *  Ignivar templates the fortress instances. */
+export function emberFeatureAssetsResident(): boolean {
+  return EMBER_PROP_KEYS.every((key) => propScenes[key] !== undefined) && ignivarEnvPropsSettled();
 }
 
 interface PropPlacement {
@@ -120,6 +143,13 @@ function shardGeo(): THREE.BufferGeometry {
 }
 
 export function buildEmberFeatures(seed: number): EmberFeaturesView {
+  // This group is built once per session, and the fortress it carries is
+  // collider-backed in the sim: refuse to build before the kit has settled, so
+  // the zone prepare (which awaits the kit lane first) fails and retries rather
+  // than skipping every piece whose load had not landed yet.
+  if (!emberFeatureAssetsResident()) {
+    throw new Error('buildEmberFeatures: the Drakelands kit is not resident');
+  }
   const group = new THREE.Group();
   group.name = 'ember-features';
   const glowLights: THREE.PointLight[] = [];
@@ -475,3 +505,7 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
     },
   };
 }
+
+export const emberFeaturesInternalsForTest = {
+  propUrls: EMBER_PROP_URLS,
+};

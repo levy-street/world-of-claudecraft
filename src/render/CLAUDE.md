@@ -224,6 +224,19 @@ rules, all CI-enforced:
   superset of EVERY tier's placement set or world entry crashes with "asset not
   preloaded" (the v0.16.0 P0; see the comment in `characters/manifest.ts` and
   `tests/render_asset_preload.test.ts`).
+- **A deferred thunk may skip its load on one profile only when every consumer
+  awaits it.** The Drakelands kit (the ember prop GLBs and the Ignivar templates)
+  resolves at once on the iOS memory profile (`drakelands_kit_lane_core.ts`
+  `drakelandsKitBootThunk`) and loads on approach instead: the zone prepare
+  awaits `drakelands_kit_lane.ts` before it builds the ember features, and the
+  build refuses to run until every template was attempted and settled (the
+  fortress is collider-backed in the sim, so a build that outran its loads would
+  leave those pieces invisible but solid; a template that still fails after the
+  loader's retries is skipped for the session, as at boot). The raid dressing
+  awaits the templates itself, and the visible-zone lane holds the zone out of
+  its one-at-a-time queue until the kit is resident. A synchronous `build*()`
+  reader never gets this exception. Pinned by `tests/drakelands_kit_lane.test.ts`
+  and `tests/drakelands_kit_renderer_seam.test.ts`.
 - **Every asset under `public/` must be in the media manifest** (regenerate via
   `node scripts/build_media_manifest.mjs generate`, automatic in `npm run build`).
   `tests/render_glb_replacement_assets.test.ts` fails on a GLB missing from

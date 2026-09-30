@@ -278,6 +278,7 @@ import { detailHorizonStarved } from './detail_horizon_core';
 import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_portal';
 import { watchDevicePixelRatio } from './dpr_watch';
 import { DrainChannelStopLatch, drainChannelVisualPlan } from './drain_channel_visual_core';
+import { drakelandsKitLoadFor, drakelandsKitRecheck } from './drakelands_kit_lane';
 import { createLogicalFrameDrawStats, type LogicalFrameDrawStats } from './draw_stats_core';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { DynamicEntityAmbienceSources } from './dynamic_entity_ambience';
@@ -882,9 +883,10 @@ import {
 } from './zone_prewarm_groups';
 import { zonePrewarmTemplateIds } from './zone_prewarm_templates_core';
 import {
+  claimZoneStreamRecheck,
+  createZoneStreamRecheck,
   INITIAL_SKY_PREWARM_RADIUS,
   MAX_OUTDOOR_FOG_FAR,
-  ZONE_STREAM_RECHECK_DISTANCE,
   zoneEntryPoint,
   zonesWithinStreamingHorizon,
 } from './zone_streaming';
@@ -1825,9 +1827,7 @@ export class Renderer {
   // discard stale not-yet-started work instead of walking an old route first.
   private visibleZonePrepareQueue: ZoneDef[] = [];
   private visibleZonePrepareActive = false;
-  private visibleZoneCheckX = Number.NaN;
-  private visibleZoneCheckZ = Number.NaN;
-  private visibleZoneCheckFar = Number.NaN;
+  private visibleZoneCheck = createZoneStreamRecheck();
   // The biome preset's requested fog far BEFORE fogFarForPreparedZones clamps
   // it. The streaming horizon keys off this relaxed value: keying off the
   // clamped live fog would only start preparing a zone once its boundary is
@@ -3624,6 +3624,7 @@ export class Renderer {
     }
     const zone = zoneAt(x, z);
     const idlePace = opts?.pace === 'idle';
+    const kitLoad = drakelandsKitLoadFor(zone.biome);
     const task = (async () => {
       const started = performance.now();
       onProgress?.(0, 100);
@@ -3658,6 +3659,9 @@ export class Renderer {
       freezeStaticMatrices(this.terrainView.group);
       const terrainDone = performance.now();
       onProgress?.(89, 100);
+      // The kit the iOS profile loads on approach: no feature builds before it settles.
+      // Awaited ahead of the water, so a failed load never strands a hidden idle sheet.
+      if (kitLoad) await kitLoad;
       const waterMeshes = await this.waterView.ensureZone(zone, { pace: opts?.pace });
       for (const mesh of waterMeshes) freezeStaticMatrices(mesh);
       const waterDone = performance.now();
@@ -3902,33 +3906,24 @@ export class Renderer {
     }
     const cameraX = this.camera.position.x;
     const cameraZ = this.camera.position.z;
-    const moved = Math.hypot(cameraX - this.visibleZoneCheckX, cameraZ - this.visibleZoneCheckZ);
-    if (
-      Number.isFinite(this.visibleZoneCheckX) &&
-      moved < ZONE_STREAM_RECHECK_DISTANCE &&
-      Math.abs(horizon - this.visibleZoneCheckFar) < 1
-    ) {
-      return;
-    }
-    this.visibleZoneCheckX = cameraX;
-    this.visibleZoneCheckZ = cameraZ;
-    this.visibleZoneCheckFar = horizon;
+    if (!claimZoneStreamRecheck(this.visibleZoneCheck, cameraX, cameraZ, horizon)) return;
     this.evictFarZoneIfConstrained(currentZoneId, player.pos.x, player.pos.z);
     // Same cadence, opposite direction: the per-biome sky stores are unbounded
     // without an eviction pass, and this is the one place that already knows
     // the camera moved far enough to reconsider zone residency.
     this.skyResidency.updateSkyResidency(cameraX, cameraZ);
+    // The ACTIVE world's zones, never the module list.
+    const zones = this.sim.cfg.world?.zones ?? ZONES;
+    const kitHolds = drakelandsKitRecheck(zones, cameraX, cameraZ, horizon, this.visibleZoneCheck);
     const forwardX = this.cameraLookAt.x - cameraX;
     const forwardZ = this.cameraLookAt.z - cameraZ;
-    // The ACTIVE world's zones, never the module list.
-    this.visibleZonePrepareQueue = zonesWithinStreamingHorizon(
-      this.sim.cfg.world?.zones ?? ZONES,
-      cameraX,
-      cameraZ,
-      horizon,
-      forwardX,
-      forwardZ,
-    ).filter((zone) => !this.preparedZones.has(zone.id) && !this.pendingZonePrepares.has(zone.id));
+    const near = zonesWithinStreamingHorizon(zones, cameraX, cameraZ, horizon, forwardX, forwardZ);
+    this.visibleZonePrepareQueue = near.filter(
+      (zone) =>
+        !this.preparedZones.has(zone.id) &&
+        !this.pendingZonePrepares.has(zone.id) &&
+        !kitHolds(zone.biome),
+    );
     this.pumpVisibleZonePrepareQueue();
   }
 
@@ -3987,7 +3982,7 @@ export class Renderer {
       .catch((err) => {
         console.warn(`Visible-zone preparation failed: ${zone.id}`, err);
         // Permit a retry on the next frame even if the camera has not moved.
-        this.visibleZoneCheckX = Number.NaN;
+        this.visibleZoneCheck.x = Number.NaN;
       })
       .finally(() => {
         this.visibleZonePrepareActive = false;
