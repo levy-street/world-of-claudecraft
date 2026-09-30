@@ -21,21 +21,23 @@
 // turret_barrel_visual.ts. The player's own shot plays on the click: the seat
 // HUD marks it in the page's own-shot ledger (turret_own_shot_core.ts), the head
 // recoils and the shell leaves at once, and the shot's `fired` entry adopts that
-// shell rather than drawing another. Pure halves: turret_monster_pose_core.ts,
+// shell rather than drawing another. The limited weapons (the Shockwave's slam
+// and front, the fragmentation shell's burst and bomblets) are
+// turret_weapons_visual.ts, on the same draws. Pure halves: turret_monster_pose_core.ts,
 // turret_motion_forecast_core.ts, turret_contact_dust_core.ts,
 // turret_defense_pool_core.ts and turret_tower_core.ts.
 import * as THREE from 'three';
 import { TURRET_PHYSICS, TURRET_WEAPON } from '../sim/content/turret_defense';
 import { MOBS } from '../sim/data';
 import type { ThrowProbe } from '../sim/minigames/thrown_body';
-import { turretShellFlightTicks } from '../sim/minigames/turret_defense';
+import { type TurretEvent, turretShellFlightTicks } from '../sim/minigames/turret_defense';
 import type { TurretFeedback } from '../sim/minigames/turret_feedback';
 import { DT, type Entity } from '../sim/types';
 import type { TurretOwnShotLedger } from '../ui/hud/vehicle/turret_own_shot_core';
 import { turretOwnShots } from '../ui/hud/vehicle/turret_own_shots';
 import type { TurretSessionView } from '../world_api/vehicles';
 import { timeBuildSpan } from './build_spans';
-import type { CannonPoint } from './cannon_shell_core';
+import type { CannonFiredShot, CannonPoint } from './cannon_shell_core';
 import { type CannonShellHost, CannonShellVisuals } from './cannon_shell_visuals';
 import { type AnimState, CharacterVisual } from './characters';
 import { charactersReady } from './characters/assets';
@@ -47,7 +49,6 @@ import { type IdleScheduler, idleSlot } from './idle_queue';
 import { GAIT_RUN_ENTER } from './locomotion';
 import {
   TURRET_BARREL_BURSTS,
-  TURRET_BARREL_IMPACTS,
   type TurretBarrelSource,
   TurretBarrelVisual,
   turretBarrelBlast,
@@ -91,6 +92,13 @@ import {
   turretGunnerInto,
 } from './turret_tower_core';
 import { type TurretTowerSource, TurretTowerVisual } from './turret_tower_visual';
+import {
+  TURRET_WEAPON_BOMBLETS,
+  TURRET_WEAPON_IMPACTS,
+  TurretWeaponsVisual,
+  turretShellEndLift,
+  turretShockwaveBursts,
+} from './turret_weapons_visual';
 import { ViewCreateRetryGate } from './view_create_retry';
 import { worldQuestTraceMaterials } from './world_quest_trace_materials';
 
@@ -175,6 +183,7 @@ export class TurretDefenseVisual {
   private readonly clock = new TurretDisplayClock();
   private readonly cursor = new TurretFeedbackCursor();
   private readonly weapon: CannonShellVisuals;
+  private readonly weapons: TurretWeaponsVisual;
   private readonly barrels: TurretBarrelVisual;
   private readonly takeBurst = (now: number) => this.weapon.puffBurst(now);
   private readonly groundMarkers: TurretGroundMarkers;
@@ -204,6 +213,15 @@ export class TurretDefenseVisual {
   };
   private readonly muzzle = { x: 0, y: 0, z: 0 };
   private readonly ownTarget = { x: 0, y: 0, z: 0 };
+  private readonly firedEnd: {
+    shotId: number;
+    x: number;
+    y: number;
+    z: number;
+    flightTicks: number;
+    impactTick: number;
+    weapon?: 'frag';
+  } = { shotId: 0, x: 0, y: 0, z: 0, flightTicks: 0, impactTick: 0 };
   /** The newest own-shot serial already launched; a rebuilt visual starts past the page's. */
   private launched: number;
   private readonly refusedOwn = (serial: number): boolean =>
@@ -250,11 +268,19 @@ export class TurretDefenseVisual {
       blastRadius: TURRET_WEAPON.blastRadius,
       groundAt,
       compileGate,
-      bursts: { slots: TURRET_CONTACT_BURSTS + TURRET_BARREL_BURSTS, puffs: TURRET_CONTACT_PUFFS },
-      impacts: TURRET_BARREL_IMPACTS,
+      bursts: {
+        slots:
+          TURRET_CONTACT_BURSTS +
+          TURRET_BARREL_BURSTS +
+          turretShockwaveBursts(TURRET_CONTACT_PUFFS),
+        puffs: TURRET_CONTACT_PUFFS,
+      },
+      impacts: TURRET_WEAPON_IMPACTS,
+      bomblets: TURRET_WEAPON_BOMBLETS,
       texelSlot,
       holdTicks: TURRET_TICK_LEAD_MAX + TURRET_TICK_LATE_MAX,
     });
+    this.weapons = new TurretWeaponsVisual(this.weapon, this.tower, groundAt);
     this.contactCounts = turretContactCounts(this.weapon.lowEffects);
     this.barrels = new TurretBarrelVisual(
       groundAt,
@@ -287,6 +313,7 @@ export class TurretDefenseVisual {
   /** The renderer services the shots draw with (particles, camera kick, AoE ring); its camera the health bars face. */
   setHost(host: CannonShellHost | null): void {
     this.weapon.setHost(host);
+    this.weapons.setHost(host);
     this.camera = host?.camera ?? null;
   }
 
@@ -321,6 +348,7 @@ export class TurretDefenseVisual {
     this.book.assign(defense.monsters, this.templateOf);
     this.tower.place(defense.cx, session.origin.y, defense.cz);
     this.tower.aim(aimYaw, dt);
+    this.tower.hop(time);
     const now = clock ?? defense.startTick;
     this.shots.update(session, now);
     this.launchOwnShots(session, now, tick, time, reducedMotion);
@@ -635,10 +663,11 @@ export class TurretDefenseVisual {
           // An own shot's report played on the click: its shell carries on as this
           // one, or a fresh one flies with no second report.
           const own = this.shots.ownShotOf(session, entry);
-          if (own > 0 && this.weapon.adoptOwn(own, ev, tick)) break;
+          const shot = this.shellEnd(ev);
+          if (own > 0 && this.weapon.adoptOwn(own, shot, tick)) break;
           if (stale) break;
-          this.layBarrel(session, ev.fromX, ev.fromZ, ev);
-          this.weapon.fire(ev, this.muzzle, time, reducedMotion, own === 0);
+          this.layBarrel(session, ev.fromX, ev.fromZ, shot);
+          this.weapon.fire(shot, this.muzzle, time, reducedMotion, own === 0);
           break;
         }
         case 'impact':
@@ -689,6 +718,21 @@ export class TurretDefenseVisual {
         case 'windupStart':
           this.rigFor(ev.id)?.actor.playAttack();
           break;
+        // An own Shockwave's slam played on the click; its front always plays from here.
+        case 'shockwave': {
+          const own = this.shots.ownShotOf(session, entry);
+          if (stale) break;
+          if (own === 0) this.weapons.slam(ev.id, ev.x, ev.z, time, reducedMotion);
+          this.weapons.roll(ev, tick, time);
+          break;
+        }
+        case 'fragBurst':
+          if (!stale) this.weapons.burst(ev, entry.tick, time);
+          break;
+        case 'bomblet':
+          this.weapons.bomblet(ev, stale, time, reducedMotion);
+          if (!stale) this.scorchRigs(ev.hits);
+          break;
       }
     }
   }
@@ -708,18 +752,44 @@ export class TurretDefenseVisual {
     const shots = this.shots;
     for (let shot = shots.launchAfter(session, this.launched); shot; ) {
       this.launched = shot.serial;
-      if (shot.clock >= clock - SHOT_STALE_TICKS) {
+      if (shot.clock >= clock - SHOT_STALE_TICKS && shot.weapon === 'shock') {
+        this.weapons.slam(shot.serial, session.defense.cx, session.defense.cz, time, reducedMotion);
+      } else if (shot.clock >= clock - SHOT_STALE_TICKS) {
         const target = this.ownTarget;
         target.x = shot.x;
-        target.y = this.groundAt(shot.x, shot.z);
+        target.y = this.groundAt(shot.x, shot.z) + turretShellEndLift(shot.weapon);
         target.z = shot.z;
         this.layBarrel(session, shot.fromX, shot.fromZ, target);
         const lands =
           Math.max(tick, shot.clock + shots.leadTicks) + turretShellFlightTicks(shot.range);
-        this.weapon.launchOwn(shot.serial, target, tick, lands, this.muzzle, time, reducedMotion);
+        this.weapon.launchOwn(
+          shot.serial,
+          target,
+          tick,
+          lands,
+          this.muzzle,
+          time,
+          reducedMotion,
+          shot.weapon === 'frag',
+        );
       }
       shot = shots.launchAfter(session, this.launched);
     }
+  }
+
+  /** Where the shell of a `fired` entry ends: its blast point, or a frag's airburst above it. */
+  private shellEnd(ev: Extract<TurretEvent, { type: 'fired' }>): CannonFiredShot {
+    const lift = turretShellEndLift(ev.weapon);
+    if (lift === 0) return ev;
+    const end = this.firedEnd;
+    end.shotId = ev.shotId;
+    end.x = ev.x;
+    end.y = ev.y + lift;
+    end.z = ev.z;
+    end.flightTicks = ev.flightTicks;
+    end.impactTick = ev.impactTick;
+    end.weapon = ev.weapon;
+    return end;
   }
 
   /** The head and barrel lie on a shot from (fromX, fromZ) to `at`; sets the fallback muzzle. */

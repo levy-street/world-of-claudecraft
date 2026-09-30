@@ -5,7 +5,7 @@
 // drawn at), at the worst ray and frame of a source's whole life. The rays run
 // through a block of points around the source and on past it, so a cloud
 // hanging over the ground far behind counts as much as one at the monsters'
-// feet. Clods and bark chips are fist-sized: they can cover a sampled ray but
+// feet. Clods, bark and stone chips are fist-sized: they can cover a sampled ray but
 // never a monster, so they are left out; light (the flash, the flame, sparks,
 // a hot fireball) takes nothing from what stands behind it and counts as zero
 // by the blend itself.
@@ -32,7 +32,7 @@ export const TURRET_CAMERA_EYE: OcclusionPoint = {
 
 const CELL = 64;
 const BINS = 50;
-const DEBRIS: readonly number[] = [PUFF.dirt, PUFF.bark];
+const DEBRIS: readonly number[] = [PUFF.dirt, PUFF.bark, PUFF.stone];
 
 /** Each sprite's mean alpha by radius (share of its half-cell), read off the real atlas. */
 const PROFILE: readonly Float64Array[] = (() => {

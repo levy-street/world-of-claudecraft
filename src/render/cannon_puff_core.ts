@@ -1,7 +1,8 @@
 // The cannon shot's billboard particles, the pure half: every puff of the
 // muzzle, the shell's trail and the blast (the flash, the fireball, the dust
-// cloud, the ground shock ring of dust, the thrown dirt, the sparks), and the
-// bark chips a thrown body knocks off a trunk, is a closed-form flight from a
+// cloud, the ground shock ring of dust, the thrown dirt, the sparks), the bark
+// chips a thrown body knocks off a trunk and the stone chips a slam knocks off
+// the tower's plinth, is a closed-form flight from a
 // launch record, so a frame evaluates each live puff from its age alone and
 // nothing integrates. The Three consumer is cannon_puff_mesh.ts (one instanced
 // draw on a premultiplied blend, so a puff can be additive fire, alpha-blended
@@ -33,11 +34,12 @@ export const PUFF = {
   trailSpark: 9,
   glow: 10,
   bark: 11,
+  stone: 12,
 } as const;
 
 export type CannonPuffKind = (typeof PUFF)[keyof typeof PUFF];
 
-export const CANNON_PUFF_KINDS = 12;
+export const CANNON_PUFF_KINDS = 13;
 
 interface PuffStyleSpec {
   sprite: number;
@@ -274,6 +276,21 @@ const STYLE_SPECS: readonly PuffStyleSpec[] = [
     addU1: 1,
     shade: 0.5,
   },
+  // stone: grey chips knocked off the tower's plinth by a slam.
+  {
+    sprite: S.clod,
+    layer: 1,
+    stops: [0x959390, 1, 0x888683, 1, 0x7a7876, 1],
+    mid: 0.5,
+    alpha: 1,
+    attack: 0.02,
+    fadeFrom: 0.75,
+    add0: 0,
+    add1: 0,
+    addU0: 0,
+    addU1: 1,
+    shade: 0.55,
+  },
 ];
 
 function srgbToLinear(c: number): number {
@@ -345,6 +362,8 @@ export interface CannonPuff {
   spin: number;
   /** It never sinks below this height (dirt and sparks come to rest on the ground). */
   floorY: number;
+  /** Seconds after its delay at which it stops where it is and lingers (never, by default). */
+  halt: number;
   /** Its peak opacity against its style's (cannonTierAlpha: fewer puffs, each denser). */
   alpha: number;
 }
@@ -367,6 +386,7 @@ export function newCannonPuff(): CannonPuff {
     rot: 0,
     spin: 0,
     floorY: Number.NEGATIVE_INFINITY,
+    halt: Number.POSITIVE_INFINITY,
     alpha: 1,
   };
 }
@@ -429,9 +449,10 @@ export function cannonPuffInto(p: CannonPuff, age: number, out: CannonPuffFrame)
   const style = CANNON_PUFF_STYLES[p.kind];
   if (!style) return false;
   const u = t / p.life;
-  out.x = p.x + travel(p.vx, p.drag, t);
-  out.z = p.z + travel(p.vz, p.drag, t);
-  out.y = Math.max(p.floorY, p.y + rise(p.vy, p.drag, p.gravity, t));
+  const moved = t < p.halt ? t : p.halt;
+  out.x = p.x + travel(p.vx, p.drag, moved);
+  out.z = p.z + travel(p.vz, p.drag, moved);
+  out.y = Math.max(p.floorY, p.y + rise(p.vy, p.drag, p.gravity, moved));
   const grow = 1 - (1 - u) * (1 - u);
   out.size = p.size0 + (p.size1 - p.size0) * grow;
   out.rot = p.rot + p.spin * t;
@@ -539,6 +560,7 @@ function launch(
   p.rot = rot;
   p.spin = spin;
   p.floorY = floorY;
+  p.halt = Number.POSITIVE_INFINITY;
   p.alpha = 1;
 }
 

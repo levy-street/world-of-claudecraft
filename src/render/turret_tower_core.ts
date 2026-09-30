@@ -1,7 +1,8 @@
 // The Fire and Fly cannon tower on screen, the pure half: the GLB's head and
 // barrel nodes and where they sit, the head's eased turn toward the aim, the
-// barrel's elevation from the shell's own arc (cannon_shell_core.ts), and the
-// gunner's feet behind the breech. The painter is turret_tower_visual.ts; the
+// barrel's elevation from the shell's own arc (cannon_shell_core.ts), the head's
+// hop on its mount when the Shockwave slams, and the gunner's feet behind the
+// breech. The painter is turret_tower_visual.ts; the
 // tower's scale and roof are the sim's (fire_and_fly_field.ts).
 //
 // Three/DOM/i18n-free (RENDER_PURE_CORES).
@@ -46,6 +47,22 @@ export const TURRET_GUNNER = {
   behind: 1.7,
   /** The head fills the roof platform: the gunner stands on the parapet ring around it. */
   lift: FIRE_AND_FLY_TOWER.topY - FIRE_AND_FLY_TOWER.roofY,
+} as const;
+
+/**
+ * The Shockwave's slam: the head hops on its mount, comes down hard past its
+ * seat and springs back. Only the head moves: the gunner stands on the tower's
+ * body, which would leave him floating.
+ */
+export const TURRET_HEAD_HOP = {
+  /** How high it hops (yd) and when it tops out (s). */
+  rise: 0.2,
+  riseTime: 0.06,
+  /** How far it slams past its seat (yd) and how soon after the top (s). */
+  dip: 0.05,
+  dropTime: 0.07,
+  /** Seconds the spring back to rest takes. */
+  settle: 0.35,
 } as const;
 
 /** A hitch never swings the head further than a frame this long would. */
@@ -118,4 +135,22 @@ export function turretGunnerInto(
   out.x = cx - Math.sin(yaw) * TURRET_GUNNER.behind;
   out.y = roofY + TURRET_GUNNER.lift;
   out.z = cz - Math.cos(yaw) * TURRET_GUNNER.behind;
+}
+
+/** The head's lift over its seat (yd) `age` seconds after a slam: 0 before it and once settled. */
+export function turretHeadHop(age: number): number {
+  const { rise, riseTime, dip, dropTime, settle } = TURRET_HEAD_HOP;
+  if (!(age >= 0)) return 0;
+  if (age < riseTime) {
+    const u = age / riseTime;
+    return rise * (1 - (1 - u) * (1 - u));
+  }
+  const fall = age - riseTime;
+  if (fall < dropTime) {
+    const u = fall / dropTime;
+    return rise - (rise + dip) * u * u;
+  }
+  const r = (fall - dropTime) / settle;
+  if (r >= 1) return 0;
+  return -dip * Math.exp(-4 * r) * Math.cos(1.5 * Math.PI * r);
 }

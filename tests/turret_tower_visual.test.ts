@@ -4,7 +4,11 @@
 
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { TURRET_TOWER_MODEL } from '../src/render/turret_tower_core';
+import {
+  TURRET_HEAD_HOP,
+  TURRET_TOWER_MODEL,
+  turretHeadHop,
+} from '../src/render/turret_tower_core';
 import { TurretTowerVisual } from '../src/render/turret_tower_visual';
 
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
@@ -156,6 +160,49 @@ describe('the cannon tower lifecycle', () => {
     tower.prepare(parent);
     await flush();
     expect(source).toHaveBeenCalledTimes(1);
+    tower.dispose();
+  });
+});
+
+describe('the cannon tower slam', () => {
+  it('hops the head alone on its mount, in yards whatever the model scale, then sets it back', async () => {
+    const tower = new TurretTowerVisual(undefined, async () => towerModel().scene);
+    tower.prepare(new THREE.Scene());
+    await flush();
+    const head = tower.group.getObjectByName(TURRET_TOWER_MODEL.headNode);
+    if (!head) throw new Error('head expected');
+    const body = tower.group.children[0].children.find((c) => c !== head);
+    if (!body) throw new Error('body expected');
+    tower.place(3, 10, 4);
+    const rest = head.getWorldPosition(new THREE.Vector3());
+    const bodyAt = body.getWorldPosition(new THREE.Vector3());
+    const groupAt = tower.group.position.clone();
+    tower.slam(2);
+    tower.hop(2 + TURRET_HEAD_HOP.riseTime);
+    tower.group.updateMatrixWorld(true);
+    const up = head.getWorldPosition(new THREE.Vector3());
+    expect(up.y - rest.y).toBeCloseTo(TURRET_HEAD_HOP.rise, 9);
+    expect(up.x).toBeCloseTo(rest.x, 9);
+    expect(up.z).toBeCloseTo(rest.z, 9);
+    // The tower body, and the gunner standing on it, never move.
+    expect(body.getWorldPosition(new THREE.Vector3())).toEqual(bodyAt);
+    expect(tower.group.position).toEqual(groupAt);
+    tower.hop(2 + 0.1);
+    tower.group.updateMatrixWorld(true);
+    expect(head.getWorldPosition(new THREE.Vector3()).y - rest.y).toBeCloseTo(
+      turretHeadHop(0.1),
+      9,
+    );
+    tower.hop(5);
+    tower.group.updateMatrixWorld(true);
+    expect(head.getWorldPosition(new THREE.Vector3()).y).toBeCloseTo(rest.y, 9);
+    // A new seat sets it back on its mount mid-hop.
+    tower.slam(6);
+    tower.hop(6 + TURRET_HEAD_HOP.riseTime);
+    tower.reset(0);
+    tower.hop(6 + TURRET_HEAD_HOP.riseTime);
+    tower.group.updateMatrixWorld(true);
+    expect(head.getWorldPosition(new THREE.Vector3()).y).toBeCloseTo(rest.y, 9);
     tower.dispose();
   });
 });

@@ -1,8 +1,11 @@
 // The cannon shot on screen, the pure half: the shell's arc from the muzzle to
-// the blast and the wake it drops, the barrel's recoil spring, the dirt chunks'
-// closed-form flights, the scorch draped on the ground and its fade, the camera
-// shake by distance and the counts the low preset sheds, plus the pools every
-// event's puffs (cannon_puff_core.ts) are launched into. The Three consumer is
+// the blast and the wake it drops (a fragmentation shell's fizzes with sparks),
+// the barrel's recoil spring, the dirt chunks' closed-form flights, the scorch
+// draped on the ground and its fade, the camera shake by distance and the counts
+// the low preset sheds, plus the pools every event's puffs (cannon_puff_core.ts)
+// are launched into: the blasts, a fragmentation shell's airburst
+// (cannon_frag_core.ts) and one slot for a slam's cracked ground mark
+// (cannon_ground_mark_core.ts). The Three consumer is
 // cannon_shell_visuals.ts; the Realm Racers Ground Blast is where the shell's
 // arc comes from.
 //
@@ -19,6 +22,7 @@
 // refilled in place.
 
 import { DT } from '../sim/types';
+import { type CannonAirburstCounts, cannonAirburstPuffs } from './cannon_frag_core';
 import {
   CANNON_BLAST_FIXED_PUFFS,
   CANNON_DUST_PUFFS,
@@ -396,6 +400,8 @@ export interface CannonShellSlot {
   offZ: number;
   /** Frame seconds an own shell its event never confirmed began to shrink away; NaN otherwise. */
   fadeAt: number;
+  /** A fragmentation shell: its wake fizzes, a spark at every drop. */
+  fizz: boolean;
   /** The progress its wake ends at: where a shrunk shell vanished, 1 otherwise. */
   endProgress: number;
 }
@@ -436,6 +442,19 @@ export interface CannonScorchSlot {
   readonly heights: Float32Array;
 }
 
+function newScorch(): CannonScorchSlot {
+  return {
+    active: false,
+    x: 0,
+    y: 0,
+    z: 0,
+    at: 0,
+    yaw: 0,
+    half: 0,
+    heights: new Float32Array(CANNON_SCORCH_VERTS),
+  };
+}
+
 export interface CannonFiredShot {
   readonly shotId: number;
   readonly x: number;
@@ -443,6 +462,8 @@ export interface CannonFiredShot {
   readonly z: number;
   readonly flightTicks: number;
   readonly impactTick: number;
+  /** A fragmentation shell; a plain one when absent. */
+  readonly weapon?: 'frag';
 }
 
 export interface CannonImpactShot {
@@ -607,7 +628,7 @@ function ownTrailInto(
     }
     cannonTrailPuffInto(out[n], s.seed, k, false, p.x, p.y, p.z);
     ages[n++] = age;
-    if ((k & 1) === 1 && age < sparkLife && n < cap) {
+    if ((s.fizz || (k & 1) === 1) && age < sparkLife && n < cap) {
       cannonTrailPuffInto(out[n], s.seed, k, true, p.x, p.y, p.z);
       ages[n++] = age;
     }
@@ -638,6 +659,7 @@ export class CannonShotTimeline {
     offZ: 0,
     fadeAt: Number.NaN,
     endProgress: 1,
+    fizz: false,
   }));
   readonly muzzles: CannonMuzzleSlot[] = Array.from({ length: CANNON_MUZZLE_POOL }, () => ({
     active: false,
@@ -646,16 +668,9 @@ export class CannonShotTimeline {
     puffs: Array.from({ length: CANNON_MUZZLE_PUFFS }, newCannonPuff),
   }));
   readonly impacts: CannonImpactSlot[];
-  readonly scorches: CannonScorchSlot[] = Array.from({ length: CANNON_SCORCH_POOL }, () => ({
-    active: false,
-    x: 0,
-    y: 0,
-    z: 0,
-    at: 0,
-    yaw: 0,
-    half: 0,
-    heights: new Float32Array(CANNON_SCORCH_VERTS),
-  }));
+  readonly scorches: CannonScorchSlot[] = Array.from({ length: CANNON_SCORCH_POOL }, newScorch);
+  /** A slam's cracked ground mark: one slot of its own, the newest slam's. */
+  readonly groundMark: CannonScorchSlot = newScorch();
   /** Frame seconds of the last shot's muzzle (the recoil runs from it). */
   muzzleAt = Number.NEGATIVE_INFINITY;
   /** The scorch slot the last impact took. */
@@ -697,6 +712,7 @@ export class CannonShotTimeline {
     for (const muzzle of this.muzzles) muzzle.active = false;
     for (const impact of this.impacts) impact.active = false;
     for (const scorch of this.scorches) scorch.active = false;
+    this.groundMark.active = false;
     this.muzzleAt = Number.NEGATIVE_INFINITY;
     this.lastScorch = -1;
   }
@@ -721,6 +737,7 @@ export class CannonShotTimeline {
       shot.impactTick,
       muzzle,
     );
+    this.shells[index].fizz = shot.weapon === 'frag';
     if (report) this.report(shot.shotId, muzzle, dir, time, smoke);
     return index;
   }
@@ -729,7 +746,8 @@ export class CannonShotTimeline {
    * A shell the caller launches ahead of its event (its own shot, on the click),
    * named by the caller's `serial`, with its muzzle report: it flies toward
    * `target` from `firedTick` to the predicted `impactTick` until `adoptOwn`
-   * hands it the event's flight. Returns its shell slot.
+   * hands it the event's flight; a fragmentation shell's (`fizz`) wake fizzes
+   * from the muzzle. Returns its shell slot.
    */
   launchOwn(
     serial: number,
@@ -740,10 +758,12 @@ export class CannonShotTimeline {
     dir: CannonPoint,
     time: number,
     smoke: number,
+    fizz = false,
   ): number {
     // Negative: never a real shot id, so no impact lands it before it is adopted.
     const index = this.launch(-serial, -serial, target, firedTick, impactTick, muzzle);
     this.shells[index].own = serial;
+    this.shells[index].fizz = fizz;
     this.report(-serial, muzzle, dir, time, smoke);
     return index;
   }
@@ -773,6 +793,7 @@ export class CannonShotTimeline {
       s.impactTick = shot.impactTick;
       s.shotId = shot.shotId;
       s.adopted = true;
+      s.fizz = shot.weapon === 'frag';
       return true;
     }
     return false;
@@ -838,6 +859,7 @@ export class CannonShotTimeline {
     slot.offZ = 0;
     slot.fadeAt = Number.NaN;
     slot.endProgress = 1;
+    slot.fizz = false;
     return index;
   }
 
@@ -881,10 +903,7 @@ export class CannonShotTimeline {
     power: number,
     ground: (x: number, z: number) => number,
   ): number {
-    // An own shell not yet adopted flies on a caller's serial, which a blast's id may equal.
-    for (const shell of this.shells) {
-      if (shell.shotId === shot.shotId && (shell.own === 0 || shell.adopted)) shell.landed = true;
-    }
+    this.land(shot.shotId);
     const index = this.nextImpact;
     this.nextImpact = (index + 1) % this.impacts.length;
     const slot = this.impacts[index];
@@ -946,6 +965,76 @@ export class CannonShotTimeline {
       ground,
     );
     return index;
+  }
+
+  /**
+   * Shot `shotId` bursts in the air at (x, y, z): its shell is gone, and an
+   * impact slot shows the airburst's puffs (`counts`), with no chunk and no
+   * scorch. Returns the slot.
+   */
+  airburst(
+    shotId: number,
+    x: number,
+    y: number,
+    z: number,
+    time: number,
+    counts: Readonly<CannonAirburstCounts>,
+  ): number {
+    this.land(shotId);
+    const index = this.nextImpact;
+    this.nextImpact = (index + 1) % this.impacts.length;
+    const slot = this.impacts[index];
+    slot.active = true;
+    slot.x = x;
+    slot.y = y;
+    slot.z = z;
+    slot.at = time;
+    slot.power = 1;
+    slot.chunkCount = 0;
+    slot.puffCount = cannonAirburstPuffs(slot.puffs, shotId, x, y, z, counts);
+    return index;
+  }
+
+  /**
+   * A slam's cracked mark around (x, z), `half` yards each way, laid at `time`
+   * in the ground-mark slot (a newer slam's takes it over), its ground sampled
+   * once per vertex as a scorch's is.
+   */
+  markGround(
+    seed: number,
+    x: number,
+    y: number,
+    z: number,
+    half: number,
+    time: number,
+    ground: (x: number, z: number) => number,
+  ): void {
+    const mark = this.groundMark;
+    const under = ground(x, z);
+    mark.active = true;
+    mark.x = x;
+    mark.y = y;
+    mark.z = z;
+    mark.at = time;
+    mark.yaw = cannonHash01(seed, 991) * Math.PI * 2;
+    mark.half = half;
+    cannonScorchHeightsInto(
+      mark.heights,
+      x,
+      z,
+      mark.yaw,
+      half,
+      Number.isFinite(under) ? under : y,
+      ground,
+    );
+  }
+
+  /** The shell of shot `shotId` is down (an own one only once adopted). */
+  private land(shotId: number): void {
+    // An own shell not yet adopted flies on a caller's serial, which a blast's id may equal.
+    for (const shell of this.shells) {
+      if (shell.shotId === shotId && (shell.own === 0 || shell.adopted)) shell.landed = true;
+    }
   }
 
   /** The shell's progress along its arc at `tick` (0 at the muzzle, 1 at the blast). */
@@ -1021,7 +1110,7 @@ export class CannonShotTimeline {
       const z = s.fromZ + (s.toZ - s.fromZ) * t;
       cannonTrailPuffInto(out[n], s.shotId, k, false, x, y, z);
       ages[n++] = age;
-      if ((k & 1) === 1 && age < sparkLife && n < cap) {
+      if ((s.fizz || (k & 1) === 1) && age < sparkLife && n < cap) {
         cannonTrailPuffInto(out[n], s.shotId, k, true, x, y, z);
         ages[n++] = age;
       }

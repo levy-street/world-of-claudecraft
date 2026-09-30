@@ -1,6 +1,7 @@
 // The Fire and Fly cannon tower, drawn: the stone tower of hex_tower_cannon.glb
 // at the session centre, at the sim's own scale so its roof is where the sim
-// seats the player. Only the head turns (toward the aim, eased); the barrel,
+// seats the player. Only the head turns (toward the aim, eased) and hops on its
+// mount when the Shockwave slams; the barrel,
 // its child, lifts to the elevation of the shot it fires, and the weapon
 // (cannon_shell_visuals.ts) takes its muzzle and kicks its recoil from it.
 // Loaded and built at the commitment (the first frame seen seated), then
@@ -18,6 +19,7 @@ import {
   stepTurretHeadYaw,
   TURRET_BARREL,
   TURRET_TOWER_MODEL,
+  turretHeadHop,
   turretRestPitch,
 } from './turret_tower_core';
 
@@ -41,6 +43,10 @@ export class TurretTowerVisual {
   private disposed = false;
   private yaw = 0;
   private pitch = turretRestPitch();
+  /** The head's seat in its parent's space, and the parent's units per yard. */
+  private headRestY = 0;
+  private headUnits = 1;
+  private hopAt = Number.NEGATIVE_INFINITY;
 
   constructor(
     private readonly compileGate?: CompileGate,
@@ -102,11 +108,25 @@ export class TurretTowerVisual {
     this.group.position.set(cx, roofY - FIRE_AND_FLY_TOWER.roofY, cz);
   }
 
-  /** A new seat: the head faces `yaw` at once and the barrel lies at rest. */
+  /** A new seat: the head faces `yaw` at once, sits on its mount, and the barrel lies at rest. */
   reset(yaw: number): void {
     if (Number.isFinite(yaw)) this.yaw = yaw;
     this.pitch = turretRestPitch();
+    this.hopAt = Number.NEGATIVE_INFINITY;
     this.pose();
+    this.hop(0);
+  }
+
+  /** The Shockwave slams at frame seconds `time`: the head hops on its mount. */
+  slam(time: number): void {
+    this.hopAt = time;
+  }
+
+  /** The head's hop at frame seconds `time` (it rests on its mount outside one). */
+  hop(time: number): void {
+    if (this.head) {
+      this.head.position.y = this.headRestY + turretHeadHop(time - this.hopAt) * this.headUnits;
+    }
   }
 
   /** One frame of the head's eased turn toward `targetYaw`; the barrel holds its elevation. */
@@ -167,6 +187,11 @@ export class TurretTowerVisual {
     this.group.add(root);
     this.head = head;
     this.barrel = barrel;
+    this.headRestY = head.position.y;
+    const scale = new THREE.Vector3();
+    root.updateWorldMatrix(false, true);
+    head.parent?.getWorldScale(scale);
+    this.headUnits = scale.y > 1e-9 ? 1 / scale.y : 1;
     this.pose();
     return true;
   }

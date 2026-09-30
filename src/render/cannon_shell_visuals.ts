@@ -8,7 +8,12 @@
 // shakes by distance. Neutral: the caller passes the blast radius and feeds fire
 // and impact events; the curves are cannon_shell_core.ts and cannon_puff_core.ts.
 // A caller's own shot may fly before its event (launchOwn): the event adopts the
-// shell (adoptOwn), or a refused launch shrinks away with no blast.
+// shell (adoptOwn), or a refused launch shrinks away with no blast. A
+// fragmentation shell fizzes with sparks on its way, bursts in the air (scatter)
+// and its bomblets fly to their points on the same instanced shell draw, each
+// landing into a small blast with no dust cloud (cannon_frag_core.ts); a slam
+// lays a pale cracked mark in the scorch's own draw (markGround,
+// cannon_ground_mark_core.ts).
 //
 // GPU rules (src/render/CLAUDE.md "GPU work"): nothing is built until
 // `prepare`, which allocates the shot pools, mints every mesh, named material
@@ -42,6 +47,17 @@ import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../game/ui_effects_profile';
 import { BufferUpdateRange } from './buffer_update_range';
 import { timeBuildSpan } from './build_spans';
+import {
+  CANNON_BOMBLET,
+  CannonBomblets,
+  cannonAirburstCounts,
+  cannonBombletKey,
+} from './cannon_frag_core';
+import {
+  CANNON_GROUND_MARK,
+  cannonCrackTexels,
+  cannonGroundMarkFade,
+} from './cannon_ground_mark_core';
 import { type CannonPuffBurst, CannonPuffBursts } from './cannon_puff_burst_core';
 import {
   CANNON_PUFF_KINDS,
@@ -76,6 +92,7 @@ import {
   type CannonFiredShot,
   type CannonImpactShot,
   type CannonPoint,
+  type CannonScorchSlot,
   type CannonShotCounts,
   CannonShotTimeline,
   cannonChunkInto,
@@ -108,6 +125,23 @@ export interface CannonBlast extends CannonImpactShot {
   readonly radius?: number;
   /** How much bigger than a shell's the whole blast reads, shake included; 1 when absent. */
   readonly scale?: number;
+  /** False: no lingering dust cloud (a bomblet's, so six of them never stack past the smoke cap). */
+  readonly cloud?: boolean;
+}
+
+/** A fragmentation shell's burst over its point, and where and when each bomblet lands. */
+export interface CannonFragBurst {
+  readonly shotId: number;
+  readonly x: number;
+  readonly y: number;
+  readonly z: number;
+  readonly bomblets: readonly {
+    readonly index: number;
+    readonly x: number;
+    readonly y: number;
+    readonly z: number;
+    readonly landTick: number;
+  }[];
 }
 
 export interface CannonShellOptions {
@@ -120,6 +154,8 @@ export interface CannonShellOptions {
   bursts?: { readonly slots: number; readonly puffs: number };
   /** Blasts on the ground at once (a chain of charges adds its own); CANNON_IMPACT_POOL by default. */
   impacts?: number;
+  /** Bomblets in flight at once (fragmentation shells); none by default. */
+  bomblets?: number;
   /**
    * Resolves when the page's texels may be built (an idle slot): until then the
    * atlas and the scorch are clear and the boot particles stand in. Without it,
@@ -139,6 +175,7 @@ interface Pools {
   readonly trailPuffs: CannonPuff[];
   readonly trailAges: Float32Array;
   readonly bursts: CannonPuffBursts;
+  readonly bomblets: CannonBomblets;
   readonly frames: CannonPuffFrame[];
 }
 
@@ -162,6 +199,11 @@ interface Parts {
 }
 
 const SCORCH_TEXELS = 64;
+/** The scorch texture's cells side by side: the char, then the cracked mark. */
+const SCORCH_CELLS = 2;
+/** The draped slots: the scorch pool's, then the ground mark's. */
+const MARK_SLOT = CANNON_SCORCH_POOL;
+const DRAPED_SLOTS = CANNON_SCORCH_POOL + 1;
 const IRON = 0x2b2622;
 const SOIL_DARK = new THREE.Color(0x3a2a1c);
 const SOIL_LIGHT = new THREE.Color(0x6e5a42);
@@ -186,9 +228,20 @@ let pageTexels: ShotTexels | null = null;
 function shotTexels(): ShotTexels {
   pageTexels ??= timeBuildSpan('zone:cannon-texels', () => ({
     atlas: cannonPuffAtlasTexels(CANNON_PUFF_ATLAS_CELL),
-    scorch: cannonScorchTexels(SCORCH_TEXELS),
+    scorch: scorchAtlas(cannonScorchTexels(SCORCH_TEXELS), cannonCrackTexels(SCORCH_TEXELS)),
   }));
   return pageTexels;
+}
+
+/** The char and the cracked mark, row by row side by side in one texture. */
+function scorchAtlas(char: Uint8Array, crack: Uint8Array): Uint8Array {
+  const row = SCORCH_TEXELS * 4;
+  const out = new Uint8Array(row * SCORCH_CELLS * SCORCH_TEXELS);
+  for (let j = 0; j < SCORCH_TEXELS; j++) {
+    out.set(char.subarray(j * row, (j + 1) * row), j * row * SCORCH_CELLS);
+    out.set(crack.subarray(j * row, (j + 1) * row), j * row * SCORCH_CELLS + row);
+  }
+  return out;
 }
 
 /** Forgets the page's texels, so a test can watch a cold build. */
@@ -206,6 +259,7 @@ export class CannonShellVisuals {
   private readonly burstSlots: number;
   private readonly burstPuffs: number;
   private readonly impactPool: number;
+  private readonly bombletSlots: number;
   private readonly holdTicks: number;
   private host: CannonShellHost | null = null;
   private pools: Pools | null = null;
@@ -229,8 +283,10 @@ export class CannonShellVisuals {
   private readonly groupEnds = new Int32Array(GROUPS);
   private readonly low: boolean;
   private readonly byKind = new Int32Array(CANNON_PUFF_KINDS);
-  private readonly liveScorches: boolean[] = new Array(CANNON_SCORCH_POOL).fill(false);
-  private readonly scorchFades = new Float32Array(CANNON_SCORCH_POOL);
+  private readonly liveScorches: boolean[] = new Array(DRAPED_SLOTS).fill(false);
+  private readonly scorchFades = new Float32Array(DRAPED_SLOTS);
+  private readonly cloudless: Readonly<CannonShotCounts>;
+  private readonly airburstCounts: ReturnType<typeof cannonAirburstCounts>;
   private readonly liveChunks: boolean[];
   private readonly matrix = new THREE.Matrix4();
   private readonly quat = new THREE.Quaternion();
@@ -257,13 +313,19 @@ export class CannonShellVisuals {
     });
     this.low = profile.tier === 'low';
     this.counts = cannonShotCounts(this.low);
+    this.cloudless = { ...this.counts, dust: 0 };
+    this.airburstCounts = cannonAirburstCounts(this.low);
     this.burstSlots = Math.max(0, options.bursts?.slots ?? 0);
     this.burstPuffs = Math.max(0, options.bursts?.puffs ?? 0);
     this.impactPool = Math.max(1, Math.floor(options.impacts ?? CANNON_IMPACT_POOL));
     this.holdTicks = Math.max(0, options.holdTicks ?? 0);
+    this.bombletSlots = Math.max(0, Math.floor(options.bomblets ?? 0));
     this.liveChunks = new Array(this.impactPool).fill(false);
     this.puffCapacity =
-      SHOT_PUFF_CAPACITY + this.impactPool * CANNON_BLAST_PUFFS + this.burstSlots * this.burstPuffs;
+      SHOT_PUFF_CAPACITY +
+      this.impactPool * CANNON_BLAST_PUFFS +
+      this.burstSlots * this.burstPuffs +
+      this.bombletSlots * CANNON_BOMBLET.motes;
     this.root.name = 'fire-and-fly-weapon';
   }
 
@@ -333,6 +395,7 @@ export class CannonShellVisuals {
       trailPuffs: Array.from({ length: CANNON_TRAIL_PUFFS }, newCannonPuff),
       trailAges: new Float32Array(CANNON_TRAIL_PUFFS),
       bursts: new CannonPuffBursts(this.burstSlots, this.burstPuffs),
+      bomblets: new CannonBomblets(this.bombletSlots, this.holdTicks),
       frames: Array.from({ length: this.puffCapacity }, newCannonPuffFrame),
     };
     const ready = pageTexels ?? (this.texelSlot ? null : shotTexels());
@@ -371,7 +434,8 @@ export class CannonShellVisuals {
    * The caller's own shot, ahead of its event: the muzzle, the recoil and a shell
    * toward `target` on a predicted flight from `firedTick` to `impactTick` (display
    * ticks). `adoptOwn` hands it the event's flight; a launch the caller's `refused`
-   * names (update) shrinks away instead, with no blast.
+   * names (update) shrinks away instead, with no blast. A fragmentation shell's
+   * (`fizz`) wake fizzes from the muzzle.
    */
   launchOwn(
     serial: number,
@@ -381,6 +445,7 @@ export class CannonShellVisuals {
     fallback: CannonPoint,
     time: number,
     reducedMotion: boolean,
+    fizz = false,
   ): void {
     if (this.disposed) return;
     this.aimMuzzle(fallback, target.x, target.z);
@@ -393,6 +458,7 @@ export class CannonShellVisuals {
       this.dir,
       time,
       this.counts.smoke,
+      fizz,
     );
     this.kick(reducedMotion);
   }
@@ -415,7 +481,7 @@ export class CannonShellVisuals {
       const index = pools.timeline.impact(
         shot,
         time,
-        this.counts,
+        shot.cloud === false ? this.cloudless : this.counts,
         shot.radius ?? this.blastRadius,
         power,
         this.groundAt,
@@ -436,9 +502,62 @@ export class CannonShellVisuals {
     if (falloff > 0) host.addShake(CANNON_BLAST.shake * falloff * power);
   }
 
+  /**
+   * A fragmentation shell bursts over its point, seen at display tick
+   * `burstTick`: its shell is gone, the airburst flashes, and each bomblet flies
+   * from the burst to its point, landing on its tick; `landBomblet` ends a flight.
+   */
+  scatter(burst: CannonFragBurst, burstTick: number, time: number): void {
+    if (this.disposed) return;
+    const pools = this.pools;
+    if (pools) {
+      const index = pools.timeline.airburst(
+        burst.shotId,
+        burst.x,
+        burst.y,
+        burst.z,
+        time,
+        this.airburstCounts,
+      );
+      this.paintImpactColours(pools, index);
+      for (const b of burst.bomblets) {
+        this.at.set(b.x, b.y, b.z);
+        pools.bomblets.launch(
+          cannonBombletKey(burst.shotId, b.index),
+          burst,
+          this.at,
+          burstTick,
+          b.landTick,
+        );
+      }
+    }
+    if (!this.revealed())
+      this.host?.vfx.burst(this.at.set(burst.x, burst.y, burst.z), 'fire', 10, 0.8);
+  }
+
+  /** Bomblet `index` of shot `shotId` blasted: its flight is over. */
+  landBomblet(shotId: number, index: number): void {
+    this.pools?.bomblets.land(cannonBombletKey(shotId, index));
+  }
+
+  /**
+   * A slam's pale cracked mark `half` yards around (x, y, z), laid now in the
+   * scorch's draw and fading over CANNON_GROUND_MARK.life; a newer slam's
+   * takes its place.
+   */
+  markGround(seed: number, x: number, y: number, z: number, half: number, time: number): void {
+    const parts = this.parts;
+    const pools = this.pools;
+    if (!parts || !pools || this.disposed) return;
+    const mark = pools.timeline.groundMark;
+    pools.timeline.markGround(seed, x, y, z, half, time, this.groundAt);
+    this.drape(parts, MARK_SLOT, mark);
+  }
+
   /** Stops every shot, blast and scorch, and sets the barrel back to rest. */
   clear(): void {
     this.pools?.timeline.clear();
+    this.pools?.bomblets.clear();
     this.restBarrel();
     const parts = this.parts;
     const pools = this.pools;
@@ -449,7 +568,7 @@ export class CannonShellVisuals {
     parts.chunks.visible = false;
     this.liveChunks.fill(false);
     pools.bursts.clear();
-    for (let i = 0; i < CANNON_SCORCH_POOL; i++) {
+    for (let i = 0; i < DRAPED_SLOTS; i++) {
       if (this.liveScorches[i]) this.retireScorch(parts, pools, i);
     }
     parts.scorch.visible = false;
@@ -597,8 +716,8 @@ export class CannonShellVisuals {
       return g;
     };
     const scorchTexture = new THREE.DataTexture(
-      texels?.scorch ?? new Uint8Array(SCORCH_TEXELS * SCORCH_TEXELS * 4),
-      SCORCH_TEXELS,
+      texels?.scorch ?? new Uint8Array(SCORCH_TEXELS * SCORCH_CELLS * SCORCH_TEXELS * 4),
+      SCORCH_TEXELS * SCORCH_CELLS,
       SCORCH_TEXELS,
       THREE.RGBAFormat,
     );
@@ -633,7 +752,7 @@ export class CannonShellVisuals {
       'shell',
       geometry(new THREE.IcosahedronGeometry(0.2, 1)),
       shellMaterial,
-      CANNON_SHELL_POOL,
+      CANNON_SHELL_POOL + this.bombletSlots,
       false,
     );
     const chunks = this.instanced(
@@ -678,11 +797,11 @@ export class CannonShellVisuals {
     };
   }
 
-  /** Every scorch's draped layers in one mesh, collapsed to a point until it is laid. */
+  /** Every scorch's draped layers in one mesh, collapsed to a point until it is laid; the ground mark's last, on the texture's second cell. */
   private scorchGeometry(): THREE.BufferGeometry {
     const grid = CANNON_SCORCH_GRID;
     const layers = CANNON_SCORCH_LAYERS.length;
-    const grids = CANNON_SCORCH_POOL * layers;
+    const grids = DRAPED_SLOTS * layers;
     const verts = grids * CANNON_SCORCH_VERTS;
     const positions = new Float32Array(verts * 3);
     const colors = new Float32Array(verts * 3);
@@ -692,9 +811,10 @@ export class CannonShellVisuals {
     let q = 0;
     for (let s = 0; s < grids; s++) {
       const base = s * CANNON_SCORCH_VERTS;
+      const cell = Math.floor(s / layers) === MARK_SLOT ? 1 : 0;
       for (let j = 0; j <= grid; j++) {
         for (let i = 0; i <= grid; i++) {
-          uvs[u++] = i / grid;
+          uvs[u++] = (cell + i / grid) / SCORCH_CELLS;
           uvs[u++] = j / grid;
         }
       }
@@ -775,11 +895,15 @@ export class CannonShellVisuals {
     const parts = this.parts;
     const newest = pools.timeline.lastScorch;
     if (!parts || newest < 0) return;
-    const s = pools.timeline.scorches[newest];
+    this.drape(parts, newest, pools.timeline.scorches[newest]);
+  }
+
+  /** Lays draped slot `slot` over its sampled ground, not yet darkening anything. */
+  private drape(parts: Parts, slot: number, s: CannonScorchSlot): void {
     for (let layer = 0; layer < CANNON_SCORCH_LAYERS.length; layer++) {
       cannonScorchDrapeInto(
         parts.scorchPosition.array as Float32Array,
-        newest * SCORCH_FLOATS + layer * LAYER_FLOATS,
+        slot * SCORCH_FLOATS + layer * LAYER_FLOATS,
         s.x,
         s.z,
         s.yaw,
@@ -788,16 +912,27 @@ export class CannonShellVisuals {
         s.heights,
       );
     }
-    parts.scorchPositionUpload.mark(newest * SCORCH_FLOATS, SCORCH_FLOATS);
-    this.setScorchFade(parts, newest, 0);
-    this.liveScorches[newest] = true;
+    parts.scorchPositionUpload.mark(slot * SCORCH_FLOATS, SCORCH_FLOATS);
+    this.setScorchFade(parts, slot, 0);
+    this.liveScorches[slot] = true;
   }
 
+  /** A scorch darkens grey by its fade; the ground mark by its fade in its own tint. */
   private setScorchFade(parts: Parts, slot: number, fade: number): void {
     const colors = parts.scorchColor.array as Float32Array;
+    const tint = slot === MARK_SLOT ? CANNON_GROUND_MARK.tint : null;
     for (let layer = 0; layer < CANNON_SCORCH_LAYERS.length; layer++) {
       const from = slot * SCORCH_FLOATS + layer * LAYER_FLOATS;
-      colors.fill(fade * CANNON_SCORCH_LAYERS[layer].strength, from, from + LAYER_FLOATS);
+      const amount = fade * CANNON_SCORCH_LAYERS[layer].strength;
+      if (!tint) {
+        colors.fill(amount, from, from + LAYER_FLOATS);
+        continue;
+      }
+      for (let at = from; at < from + LAYER_FLOATS; at += 3) {
+        colors[at] = amount * tint[0];
+        colors[at + 1] = amount * tint[1];
+        colors[at + 2] = amount * tint[2];
+      }
     }
     parts.scorchColorUpload.mark(slot * SCORCH_FLOATS, SCORCH_FLOATS);
     this.scorchFades[slot] = fade;
@@ -808,8 +943,12 @@ export class CannonShellVisuals {
     positions.fill(0, slot * SCORCH_FLOATS, (slot + 1) * SCORCH_FLOATS);
     parts.scorchPositionUpload.mark(slot * SCORCH_FLOATS, SCORCH_FLOATS);
     this.setScorchFade(parts, slot, 0);
-    pools.timeline.scorches[slot].active = false;
+    this.draped(pools, slot).active = false;
     this.liveScorches[slot] = false;
+  }
+
+  private draped(pools: Pools, slot: number): CannonScorchSlot {
+    return slot === MARK_SLOT ? pools.timeline.groundMark : pools.timeline.scorches[slot];
   }
 
   /**
@@ -873,6 +1012,18 @@ export class CannonShellVisuals {
         }
       }
       const n = timeline.trailPuffsInto(i, tick, pools.trailPuffs, pools.trailAges);
+      for (let k = 0; k < n; k++) this.gather(pools, pools.trailPuffs[k], pools.trailAges[k]);
+    }
+    const bomblets = pools.bomblets;
+    for (let i = 0; i < bomblets.flights.length; i++) {
+      if (!bomblets.at(i, tick, this.point)) continue;
+      const age = bomblets.age(i, tick);
+      this.pos.set(this.point.x, this.point.y, this.point.z);
+      this.euler.set(CANNON_SHELL.spinX * age, CANNON_SHELL.spinY * age, 0);
+      this.quat.setFromEuler(this.euler);
+      this.matrix.compose(this.pos, this.quat, this.scale.setScalar(CANNON_BOMBLET.scale));
+      parts.shells.setMatrixAt(shells++, this.matrix);
+      const n = bomblets.motesInto(i, tick, pools.trailPuffs, pools.trailAges);
       for (let k = 0; k < n; k++) this.gather(pools, pools.trailPuffs[k], pools.trailAges[k]);
     }
     parts.shells.count = shells;
@@ -971,17 +1122,17 @@ export class CannonShellVisuals {
 
   private drawScorches(parts: Parts, pools: Pools, time: number): void {
     let any = false;
-    const scorches = pools.timeline.scorches;
-    for (let i = 0; i < scorches.length; i++) {
+    for (let i = 0; i < DRAPED_SLOTS; i++) {
       if (!this.liveScorches[i]) continue;
-      const s = scorches[i];
+      const s = this.draped(pools, i);
       const age = time - s.at;
-      if (!s.active || age >= CANNON_BLAST.scorchLife) {
+      const mark = i === MARK_SLOT;
+      if (!s.active || age >= (mark ? CANNON_GROUND_MARK.life : CANNON_BLAST.scorchLife)) {
         this.retireScorch(parts, pools, i);
         continue;
       }
       any = true;
-      const fade = cannonScorchFade(age);
+      const fade = mark ? cannonGroundMarkFade(age) : cannonScorchFade(age);
       // A held scorch keeps its colours: only a fade that moved is uploaded.
       if (Math.abs(fade - this.scorchFades[i]) > 1 / 512) this.setScorchFade(parts, i, fade);
     }

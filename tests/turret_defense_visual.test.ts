@@ -10,7 +10,12 @@ import {
 import { type QuestWorldCommand, QuestWorldWireState } from '../src/net/quest_world_wire_state';
 import { setBuildSpanSink } from '../src/render/build_spans';
 import { PUFF } from '../src/render/cannon_puff_core';
-import { CANNON_MUZZLE, cannonRecoilOffset } from '../src/render/cannon_shell_core';
+import {
+  CANNON_MUZZLE,
+  type CannonPoint,
+  type CannonShotTimeline,
+  cannonRecoilOffset,
+} from '../src/render/cannon_shell_core';
 import {
   type CannonShellHost,
   CannonShellVisuals,
@@ -23,10 +28,12 @@ import type { IdleBudget, IdleScheduler } from '../src/render/idle_queue';
 import { turretBodyCapacity, turretRigCapacities } from '../src/render/turret_defense_pool_core';
 import { TURRET_MARKER_LIFT, turretMarkerRadius } from '../src/render/turret_ground_marker_core';
 import type { TurretGroundMarkers } from '../src/render/turret_ground_markers';
+import { turretShockwaveCounts } from '../src/render/turret_shockwave_core';
 import {
   TURRET_BARREL,
   TURRET_GUNNER,
   TURRET_HEAD,
+  TURRET_HEAD_HOP,
   TURRET_TOWER_MODEL,
   turretBarrelPitch,
 } from '../src/render/turret_tower_core';
@@ -52,6 +59,7 @@ import {
 } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import type { TurretFeedback } from '../src/sim/minigames/turret_feedback';
+import { burstTurretFrag, TURRET_BOMBLETS } from '../src/sim/minigames/turret_fragmentation';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity, type SimEvent, type WorldContent } from '../src/sim/types';
@@ -1886,5 +1894,275 @@ describe('Fire and Fly own shot on screen', () => {
       online({ delay: 150, jitter: 75, seed: 0x1234, early: 5, seconds: 60 });
       online({ delay: 150, jitter: 75, seed: 0x1234, early: 5, samePoint: true, seconds: 60 });
     });
+  });
+});
+
+describe('Fire and Fly limited weapons on screen', () => {
+  const shockwaveAt = (seq: number, tick: number): TurretFeedback => ({
+    seq,
+    tick,
+    event: { type: 'shockwave', id: 1, x: 0, y: 0, z: 0, startTick: tick, reach: 12 },
+  });
+
+  function hosted(visual: TurretDefenseVisual) {
+    const host = {
+      vfx: { burst: vi.fn() },
+      camera: new THREE.PerspectiveCamera(),
+      addShake: vi.fn(),
+      punchFov: vi.fn(),
+    };
+    visual.setHost(host as unknown as CannonShellHost);
+    return host;
+  }
+
+  it('plays a Shockwave from its ring entry: the head hops, chips fly, the dust wall rolls, the mark is laid', async () => {
+    const state = engine(0);
+    const view = { ...viewOf(state), origin: { x: 0, y: 7, z: 0 } };
+    const { visual } = await seatedWithTower(view);
+    const host = hosted(visual);
+    const head = part(visual, TURRET_TOWER_MODEL.headNode);
+    visual.update(view, 199, 1, 0.016);
+    const rest = head.position.y;
+    const slammed = { ...viewOf(state, [shockwaveAt(1, 200)]), origin: view.origin };
+    visual.update(slammed, 200, 2, 0.016);
+    expect(host.addShake).toHaveBeenCalled();
+    expect(host.punchFov).toHaveBeenCalled();
+    visual.update(slammed, 201, 2 + TURRET_HEAD_HOP.riseTime, 0.016);
+    expect(head.position.y).toBeGreaterThan(rest);
+    expect(weaponDrawn(visual, 'stone')).toBe(turretShockwaveCounts(false).chips);
+    expect(weaponDrawn(visual, 'shock')).toBe(turretShockwaveCounts(false).wall);
+    expect(scorchShown(visual)).toBe(true);
+    visual.update(slammed, 230, 4, 0.016);
+    expect(head.position.y).toBeCloseTo(rest, 12);
+    // Read once: a later frame plays nothing again.
+    expect(host.addShake).toHaveBeenCalledTimes(1);
+    visual.dispose();
+  });
+
+  it("plays an own Shockwave's slam on the click, and only its front from its entry", () => {
+    const shots = new TurretOwnShotLedger();
+    const visual = new TurretDefenseVisual(
+      new THREE.Scene(),
+      () => 0,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      shots,
+    );
+    const host = hosted(visual);
+    const weapons = (visual as unknown as { weapons: { slam: () => void } }).weapons;
+    const slam = vi.spyOn(weapons, 'slam');
+    const launched = vi.spyOn(
+      (visual as unknown as { weapon: CannonShellVisuals }).weapon,
+      'launchOwn',
+    );
+    const state = engine(0);
+    const idle = viewOf(state);
+    visual.update(idle, 160, 0, 0.016);
+    shots.markWeapon(idle, 160, { x: 0, z: 0, dirX: 0, dirZ: 1, range: 0 }, 'shock', 'played');
+    visual.update(idle, 160, 0.016, 0.016);
+    expect(slam).toHaveBeenCalledTimes(1);
+    expect(host.addShake).toHaveBeenCalledTimes(1);
+    // A Shockwave is no shell: nothing leaves the barrel.
+    expect(launched).not.toHaveBeenCalled();
+    expect(weaponDrawn(visual, 'shell')).toBe(0);
+    expect(weaponDrawn(visual, 'shock')).toBe(0);
+    const confirmed = viewOf(state, [shockwaveAt(1, 163)]);
+    visual.update(confirmed, 163, 0.17, 0.016);
+    visual.update(confirmed, 164, 0.2, 0.016);
+    expect(slam).toHaveBeenCalledTimes(1);
+    expect(weaponDrawn(visual, 'shock')).toBeGreaterThan(0);
+    visual.dispose();
+  });
+
+  it('fizzes a frag shell in flight, bursts it into its bomblets and lands each one in a small, cloudless blast', () => {
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0);
+    const state = engine(0);
+    const frag: TurretFeedback = {
+      ...firedAt160,
+      event: {
+        ...(firedAt160.event as Extract<TurretFeedback['event'], { type: 'fired' }>),
+        weapon: 'frag',
+      },
+    };
+    visual.update(viewOf(state, [firedAt160]), 164, 0.2, 0.016);
+    const plainSparks = weaponDrawn(visual, 'trailSpark');
+    visual.dispose();
+    const fizzing = new TurretDefenseVisual(new THREE.Scene(), () => 0);
+    fizzing.update(viewOf(state, [frag]), 164, 0.2, 0.016);
+    expect(weaponDrawn(fizzing, 'trailSpark')).toBeGreaterThan(plainSparks);
+    const shot = { id: 1, x: 20, z: 0, damage: 60, impactTick: 168, weapon: 'frag' as const };
+    const burst = burstTurretFrag(shot as never, 0, 0, 168, flat).event;
+    if (burst.type !== 'fragBurst') throw new Error('fragBurst expected');
+    const feed: TurretFeedback[] = [frag, { seq: 2, tick: 168, event: burst }];
+    fizzing.update(viewOf(state, feed), 168, 0.4, 0.016);
+    expect(weaponDrawn(fizzing, 'shell')).toBe(TURRET_BOMBLETS);
+    expect(weaponDrawn(fizzing, 'flash')).toBe(1);
+    let seq = 3;
+    for (const b of burst.bomblets) {
+      feed.push({
+        seq: seq++,
+        tick: b.landTick,
+        event: { type: 'bomblet', shotId: 1, index: b.index, x: b.x, y: b.y, z: b.z, hits: [] },
+      });
+      fizzing.update(viewOf(state, feed), b.landTick, 0.4 + (b.landTick - 168) * DT, 0.016);
+    }
+    expect(weaponDrawn(fizzing, 'shell')).toBe(0);
+    expect(scorchShown(fizzing)).toBe(true);
+    for (const time of [1, 1.4, 1.8]) {
+      fizzing.update(viewOf(state, feed), 180, time, 0.016);
+      expect(weaponDrawn(fizzing, 'dust')).toBe(0);
+    }
+    fizzing.dispose();
+  });
+
+  function shellEnd(visual: TurretDefenseVisual, shotId: number): CannonPoint {
+    const timeline = (visual as unknown as { weapon: { pools: { timeline: CannonShotTimeline } } })
+      .weapon.pools.timeline;
+    const index = timeline.shells.findIndex((s) => s.shotId === shotId && !s.landed);
+    if (index < 0) throw new Error(`no shell of shot ${shotId}`);
+    const end = { x: 0, y: 0, z: 0 };
+    timeline.arcPointInto(index, 1, end);
+    return end;
+  }
+
+  const fragBurstOf = (id: number) => {
+    const shot = { id, x: 20, z: 0, damage: 60, impactTick: 168, weapon: 'frag' as const };
+    const burst = burstTurretFrag(shot as never, 0, 0, 168, flat).event;
+    if (burst.type !== 'fragBurst') throw new Error('fragBurst expected');
+    return burst;
+  };
+
+  it('flies a frag shell to its airburst point, the barrel laid on it, not to the ground under it', async () => {
+    const state = engine(0);
+    const view = { ...viewOf(state), origin: { x: 0, y: 7, z: 0 } };
+    const { visual } = await seatedWithTower(view);
+    const barrel = part(visual, TURRET_TOWER_MODEL.barrelNode);
+    const frag: TurretFeedback = {
+      ...firedAt160,
+      event: {
+        ...(firedAt160.event as Extract<TurretFeedback['event'], { type: 'fired' }>),
+        weapon: 'frag',
+      },
+    };
+    visual.update({ ...viewOf(state, [frag]), origin: view.origin }, 160, 1, 0.016);
+    const burst = fragBurstOf(1);
+    const end = shellEnd(visual, 1);
+    expect(end.x).toBeCloseTo(burst.x, 9);
+    expect(end.y).toBeCloseTo(burst.y, 9);
+    expect(end.z).toBeCloseTo(burst.z, 9);
+    expect(barrel.rotation.x).toBeCloseTo(-turretBarrelPitch(20, burst.y - 7), 12);
+    visual.dispose();
+  });
+
+  it('flies an own frag shell to its airburst point from the click, and still once its entry adopts it', () => {
+    const shots = new TurretOwnShotLedger();
+    const visual = new TurretDefenseVisual(
+      new THREE.Scene(),
+      () => 0,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      shots,
+    );
+    const state = engine(0);
+    const idle = viewOf(state);
+    visual.update(idle, 160, 0, 0.016);
+    const click = { x: 20, z: 0, dirX: 1, dirZ: 0, range: 20 };
+    const serial = shots.markWeapon(idle, 160, click, 'frag', 'played');
+    visual.update(idle, 160, 0.016, 0.016);
+    const burst = fragBurstOf(1);
+    expect(shellEnd(visual, -serial).y).toBeCloseTo(burst.y, 9);
+    const fired: TurretFeedback = {
+      seq: 1,
+      tick: 163,
+      event: {
+        type: 'fired',
+        shotId: 1,
+        fromX: 0,
+        fromZ: 0,
+        x: 20,
+        y: 0,
+        z: 0,
+        flightTicks: 5,
+        impactTick: 168,
+        weapon: 'frag',
+      },
+    };
+    visual.update(viewOf(state, [fired]), 163, 0.17, 0.016);
+    const end = shellEnd(visual, 1);
+    expect(end.x).toBeCloseTo(burst.x, 9);
+    expect(end.y).toBeCloseTo(burst.y, 9);
+    expect(end.z).toBeCloseTo(burst.z, 9);
+    visual.dispose();
+  });
+
+  it("keeps a frag's blasts, a whole keg chain's and a shell's on the ground at once, none taken over", () => {
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0);
+    const shot = { id: 2, x: 30, z: 0, damage: 60, impactTick: 168, weapon: 'frag' as const };
+    const burst = burstTurretFrag(shot as never, 0, 0, 168, flat).event;
+    if (burst.type !== 'fragBurst') throw new Error('fragBurst expected');
+    const feed: TurretFeedback[] = [impactAt168, { seq: 2, tick: 168, event: burst }];
+    for (const b of burst.bomblets) {
+      feed.push({
+        seq: feed.length + 1,
+        tick: 168,
+        event: { type: 'bomblet', shotId: 2, index: b.index, x: b.x, y: b.y, z: b.z, hits: [] },
+      });
+    }
+    for (let id = 1; id <= TURRET_EXPLOSIVE_BARREL.cap; id++) {
+      feed.push({
+        seq: feed.length + 1,
+        tick: 168,
+        event: { type: 'barrelExploded', id, x: 10 * id, y: 0, z: 30, hits: [] },
+      });
+    }
+    visual.update(viewOf(engine(0), feed), 168, 0, 0.016);
+    expect(weaponDrawn(visual, 'flash')).toBe(
+      1 + 1 + TURRET_BOMBLETS + TURRET_EXPLOSIVE_BARREL.cap,
+    );
+    visual.dispose();
+  });
+
+  it('draws the limited weapons on the programs the weapon linked at the commitment', () => {
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0);
+    hosted(visual);
+    const state = engine(0);
+    visual.update(viewOf(state), 160, 0, 0.016);
+    const weaponRoot = part(visual, 'fire-and-fly-weapon');
+    const keysOf = () =>
+      new Set(drawsUnder(weaponRoot).map((d) => threeProgramKeys(d.material, d.object)));
+    const built = keysOf();
+    const materials = new Set(drawsUnder(weaponRoot).map((d) => d.material));
+    const shot = { id: 1, x: 20, z: 0, damage: 60, impactTick: 168, weapon: 'frag' as const };
+    const burst = burstTurretFrag(shot as never, 0, 0, 168, flat).event;
+    const feed: TurretFeedback[] = [
+      shockwaveAt(1, 166),
+      { seq: 2, tick: 168, event: burst },
+      {
+        seq: 3,
+        tick: 172,
+        event: { type: 'bomblet', shotId: 1, index: 0, x: 20, y: 0, z: 0, hits: [] },
+      },
+    ];
+    for (const [tick, time] of [
+      [166, 0.1],
+      [168, 0.2],
+      [172, 0.4],
+      [175, 0.6],
+    ] as const) {
+      visual.update(viewOf(state, feed), tick, time, 0.016);
+    }
+    expect(weaponDrawn(visual, 'shock')).toBeGreaterThan(0);
+    expect(keysOf()).toEqual(built);
+    expect(new Set(drawsUnder(weaponRoot).map((d) => d.material))).toEqual(materials);
+    let lights = 0;
+    visual.group.traverse((node) => {
+      if ((node as THREE.Light).isLight) lights++;
+    });
+    expect(lights).toBe(0);
+    visual.dispose();
   });
 });

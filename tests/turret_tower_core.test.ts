@@ -12,9 +12,11 @@ import {
   TURRET_BARREL,
   TURRET_GUNNER,
   TURRET_HEAD,
+  TURRET_HEAD_HOP,
   TURRET_TOWER_MODEL,
   turretBarrelPitch,
   turretGunnerInto,
+  turretHeadHop,
   turretRestPitch,
 } from '../src/render/turret_tower_core';
 import { FIRE_AND_FLY_TOWER } from '../src/sim/fire_and_fly_field';
@@ -112,6 +114,33 @@ describe('the barrel elevation', () => {
     );
     expect(turretBarrelPitch(Number.NaN, -FIRE_AND_FLY_TOWER.roofY)).toBeCloseTo(rest, 12);
     expect(Number.isFinite(turretBarrelPitch(20, Number.NaN))).toBe(true);
+  });
+});
+
+describe('the head hop on a slam', () => {
+  it('hops up, slams down past its seat, springs back and rests, with no jump between frames', () => {
+    const { rise, riseTime, dip, dropTime, settle } = TURRET_HEAD_HOP;
+    expect(turretHeadHop(-0.01)).toBe(0);
+    expect(turretHeadHop(0)).toBe(0);
+    expect(turretHeadHop(riseTime)).toBeCloseTo(rise, 12);
+    expect(turretHeadHop(riseTime + dropTime)).toBeCloseTo(-dip, 12);
+    let top = 0;
+    let bottom = 0;
+    let last = 0;
+    for (let t = 0; t <= riseTime + dropTime + settle + 0.2; t += 1 / 240) {
+      const y = turretHeadHop(t);
+      top = Math.max(top, y);
+      bottom = Math.min(bottom, y);
+      // Continuous: at 240 frames a second no step is more than the slam's fastest.
+      expect(Math.abs(y - last)).toBeLessThan(0.035);
+      last = y;
+    }
+    expect(top).toBeCloseTo(rise, 2);
+    expect(bottom).toBeCloseTo(-dip, 2);
+    expect(turretHeadHop(riseTime + dropTime + settle)).toBe(0);
+    expect(turretHeadHop(Number.NaN)).toBe(0);
+    // It comes down harder than it went up: the slam.
+    expect((rise + dip) / dropTime).toBeGreaterThan(rise / riseTime);
   });
 });
 

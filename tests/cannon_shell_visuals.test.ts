@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { BufferUpdateRange } from '../src/render/buffer_update_range';
+import { CANNON_BOMBLET, cannonAirburstCounts } from '../src/render/cannon_frag_core';
+import { CANNON_GROUND_MARK, cannonGroundMarkFade } from '../src/render/cannon_ground_mark_core';
 import {
   CANNON_PUFF_KINDS,
   CANNON_PUFF_SPRITE_RADIUS,
@@ -937,5 +939,176 @@ describe('cannon shell visuals', () => {
     expect(drawn(visuals, 'shell')).toBe(1);
     expect(puffs(visuals, PUFF.flash)).toBe(0);
     visuals.dispose();
+  });
+});
+
+describe('cannon fragmentation shell and ground mark', () => {
+  const frag = { ...fired, weapon: 'frag' as const };
+  const burst = {
+    shotId: 1,
+    x: 20,
+    y: 4,
+    z: 0,
+    bomblets: [
+      { index: 0, x: 20, y: 0, z: 0, landTick: 172 },
+      { index: 1, x: 20, y: 0, z: 4.5, landTick: 173 },
+      { index: 2, x: 24.3, y: 0, z: 1.4, landTick: 174 },
+    ],
+  };
+
+  function fragWeapon(tier: 'low' | 'high' = 'high') {
+    const scene = new THREE.Scene();
+    const visuals = new CannonShellVisuals({
+      blastRadius: RADIUS,
+      groundAt: () => 0,
+      effectsTier: tier,
+      bomblets: 6,
+      holdTicks: 2,
+    });
+    visuals.prepare(scene);
+    return visuals;
+  }
+
+  function sparksBehind(visuals: CannonShellVisuals, shot: typeof fired): number {
+    visuals.fire(shot, fallback, 0, false);
+    visuals.update(166, 0.3);
+    return puffs(visuals, PUFF.trailSpark);
+  }
+
+  it('fizzes a fragmentation shell with a denser spark wake, and an own one from the click', () => {
+    const plain = fragWeapon();
+    const fizzing = fragWeapon();
+    expect(sparksBehind(fizzing, frag)).toBeGreaterThan(sparksBehind(plain, fired) * 1.5);
+    plain.dispose();
+    fizzing.dispose();
+    const own = fragWeapon();
+    own.launchOwn(3, { x: 20, y: 0, z: 0 }, 160, 168, fallback, 0, false, true);
+    own.update(166, 0.3);
+    const early = puffs(own, PUFF.trailSpark);
+    const adopted = fragWeapon();
+    adopted.launchOwn(3, { x: 20, y: 0, z: 0 }, 160, 168, fallback, 0, false);
+    expect(adopted.adoptOwn(3, frag, 161)).toBe(true);
+    adopted.update(166, 0.3);
+    expect(puffs(adopted, PUFF.trailSpark)).toBe(early);
+    own.dispose();
+    adopted.dispose();
+  });
+
+  it('bursts in the air: the shell is gone, the airburst flashes and the bomblets fly small on the shell draw', () => {
+    const visuals = fragWeapon();
+    visuals.fire(frag, fallback, 0, false);
+    visuals.update(166, 0.3);
+    expect(drawn(visuals, 'shell')).toBe(1);
+    visuals.scatter(burst, 168, 0.4);
+    visuals.update(168, 0.41);
+    const shells = piece(visuals, 'shell') as THREE.InstancedMesh;
+    // The frag shell landed; its three bomblets fly in its place.
+    expect(drawn(visuals, 'shell')).toBe(3);
+    const m = new THREE.Matrix4();
+    for (let i = 0; i < 3; i++) {
+      shells.getMatrixAt(i, m);
+      expect(new THREE.Vector3().setFromMatrixScale(m).x).toBeCloseTo(CANNON_BOMBLET.scale, 6);
+      expect(new THREE.Vector3().setFromMatrixPosition(m).y).toBeCloseTo(4, 6);
+    }
+    expect(puffs(visuals, PUFF.flash)).toBe(1);
+    expect(puffs(visuals, PUFF.spark)).toBe(cannonAirburstCounts(false).sparks);
+    // The airburst throws no chunk and lays no scorch.
+    expect(drawn(visuals, 'chunk')).toBe(0);
+    expect(piece(visuals, 'scorch').visible).toBe(false);
+    visuals.update(172, 0.6);
+    expect(drawn(visuals, 'shell')).toBe(3);
+    expect(puffs(visuals, PUFF.trailSpark)).toBeGreaterThan(0);
+    shells.getMatrixAt(0, m);
+    expect(new THREE.Vector3().setFromMatrixPosition(m).y).toBeCloseTo(0, 6);
+    // Its blast lands the bomblet, small and with no dust cloud.
+    visuals.landBomblet(1, 0);
+    visuals.impact(
+      { shotId: -99, x: 20, y: 0, z: 0, radius: 3.5, scale: 0.5, cloud: false },
+      0.6,
+      false,
+    );
+    visuals.update(172, 0.61);
+    expect(drawn(visuals, 'shell')).toBe(2);
+    expect(puffs(visuals, PUFF.flash)).toBe(1);
+    expect(piece(visuals, 'scorch').visible).toBe(true);
+    for (const time of [0.8, 1.2, 1.6]) {
+      visuals.update(172, time);
+      expect(puffs(visuals, PUFF.dust)).toBe(0);
+    }
+    // A bomblet whose blast never comes is gone once its hold runs out.
+    visuals.update(177, 1.7);
+    expect(drawn(visuals, 'shell')).toBe(0);
+    visuals.dispose();
+  });
+
+  it('lays a pale cracked mark on the ground mark slot, on the texture second cell, fading over its life', () => {
+    const ground = (x: number, z: number) => 1 + 0.1 * Math.sin(x) * Math.cos(z);
+    const scene = new THREE.Scene();
+    const visuals = new CannonShellVisuals({ blastRadius: RADIUS, groundAt: ground });
+    visuals.prepare(scene);
+    visuals.markGround(4, 5, 1, -2, 4, 10);
+    visuals.update(0, 10.5);
+    const [mark] = scorchSlices(visuals);
+    expect(mark).toBeDefined();
+    for (let v = 0; v < mark.xyz.length; v++) {
+      const [x, y, z] = mark.xyz[v];
+      const layer = CANNON_SCORCH_LAYERS[Math.floor(v / CANNON_SCORCH_VERTS)];
+      expect(y).toBeCloseTo(ground(x, z) + layer.lift, 5);
+      expect(Math.hypot(x - 5, z + 2)).toBeLessThanOrEqual(4 * Math.SQRT2 + 1e-6);
+    }
+    const geometry = piece(visuals, 'scorch').geometry;
+    const color = geometry.getAttribute('color') as THREE.BufferAttribute;
+    const uv = geometry.getAttribute('uv') as THREE.BufferAttribute;
+    const perSlot = CANNON_SCORCH_VERTS * CANNON_SCORCH_LAYERS.length;
+    const last = color.count - perSlot;
+    const [r, g, b] = CANNON_GROUND_MARK.tint;
+    expect(color.getX(last)).toBeCloseTo(r, 6);
+    expect(color.getY(last)).toBeCloseTo(g, 6);
+    expect(color.getZ(last)).toBeCloseTo(b, 6);
+    // The mark samples the cracks, every scorch the char.
+    for (let v = last; v < color.count; v++) expect(uv.getX(v)).toBeGreaterThanOrEqual(0.5);
+    for (let v = 0; v < last; v++) expect(uv.getX(v)).toBeLessThanOrEqual(0.5);
+    const texture = (piece(visuals, 'scorch').material as THREE.MeshBasicMaterial)
+      .map as THREE.DataTexture;
+    expect(texture.image.width).toBe(2 * texture.image.height);
+    visuals.update(0, 10 + CANNON_GROUND_MARK.life - 1);
+    expect(color.getX(last)).toBeCloseTo(r * cannonGroundMarkFade(CANNON_GROUND_MARK.life - 1), 2);
+    // A shell's scorch beside it keeps its own grey char.
+    visuals.impact(landed, 11, false);
+    visuals.update(0, 12);
+    expect(scorchSlices(visuals)).toHaveLength(2);
+    visuals.update(0, 10 + CANNON_GROUND_MARK.life + 0.1);
+    expect(scorchSlices(visuals)).toHaveLength(1);
+    visuals.clear();
+    expect(scorchSlices(visuals)).toHaveLength(0);
+    visuals.dispose();
+  });
+
+  it('draws the frag and the mark on the materials and program keys it built, on every tier', () => {
+    for (const tier of ['low', 'high'] as const) {
+      const visuals = fragWeapon(tier);
+      visuals.setHost(hostStub());
+      const materials = materialsUnder(visuals.root);
+      const built = [...materials].map((m) => m.version);
+      const nodes = visuals.root.children.length;
+      visuals.fire(frag, fallback, 0, false);
+      visuals.update(166, 0.3);
+      visuals.scatter(burst, 168, 0.4);
+      visuals.markGround(1, 0, 0, 0, 4, 0.4);
+      visuals.update(170, 0.5);
+      for (const b of burst.bomblets) {
+        visuals.landBomblet(1, b.index);
+        visuals.impact(
+          { shotId: -100 - b.index, ...b, radius: 3.5, scale: 0.5, cloud: false },
+          0.6,
+          false,
+        );
+      }
+      visuals.update(174, 0.7);
+      expect(materialsUnder(visuals.root)).toEqual(materials);
+      expect([...materials].map((m) => m.version)).toEqual(built);
+      expect(visuals.root.children).toHaveLength(nodes);
+      visuals.dispose();
+    }
   });
 });
