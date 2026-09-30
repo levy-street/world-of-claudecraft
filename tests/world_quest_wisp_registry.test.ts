@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { DEEDS } from '../src/sim/content/deeds';
+import { FIRE_AND_FLY_QUEST_ID } from '../src/sim/content/world_quest_fire_and_fly';
 import { WISP_MAZE_NPC_DEF, WISP_MAZE_QUEST_ID } from '../src/sim/content/world_quest_wisp_maze';
 import { NPCS, WORLD_QUESTS_BY_ID } from '../src/sim/data';
 import { activeWorldQuestsForCycle } from '../src/sim/world_quest_rotation';
@@ -8,18 +9,23 @@ describe('wisp maze content registration', () => {
   it('offers the maze every day beside, never instead of, the rotating Evergarden quest', () => {
     // Evergarden's rotating pool is four deep since the round-2 zone hunts
     // (the Hedge Knights watch plus three hunts), so the watch itself comes
-    // round every fourth day; the maze is on the board every day regardless.
+    // round every fourth day; the maze is on the board every day regardless,
+    // and so is the other always-active Evergarden daily, Fire and Fly.
     const watchDays: number[] = [];
     for (let day = 0; day < 32; day++) {
       const quests = activeWorldQuestsForCycle(`wq1_${day}`);
       const ids = quests.map((quest) => quest.id);
       expect(ids.filter((id) => id === WISP_MAZE_QUEST_ID)).toHaveLength(1);
+      expect(ids.filter((id) => id === FIRE_AND_FLY_QUEST_ID)).toHaveLength(1);
       const evergarden = quests.filter(
-        (quest) => quest.zoneId === 'evergarden' && quest.id !== WISP_MAZE_QUEST_ID,
+        (quest) =>
+          quest.zoneId === 'evergarden' &&
+          quest.id !== WISP_MAZE_QUEST_ID &&
+          quest.id !== FIRE_AND_FLY_QUEST_ID,
       );
       expect(evergarden, `cycle wq1_${day}`).toHaveLength(1);
       if (ids.includes('wq_evergarden_watch')) watchDays.push(day);
-      expect(ids).toHaveLength(16);
+      expect(ids).toHaveLength(17);
     }
     expect(watchDays).toEqual([0, 4, 8, 12, 16, 20, 24, 28]);
   });

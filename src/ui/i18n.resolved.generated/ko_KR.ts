@@ -12588,6 +12588,24 @@ export const ko_KR: EnTranslations = {
           "bronze": "동"
         }
       },
+      "fireAndFly": {
+        "title": "포수의 시련",
+        "objective": "시련 하나의 모든 공격 파도를 견디며 자신의 탑을 지키기",
+        "ready": "포술장 올더에게 말을 걸어 시련을 받으세요.",
+        "complete": "시련 통과! 포술장 올더에게 말을 걸면 연습할 수 있습니다.",
+        "scenarios": {
+          "introduction": "신병의 시련",
+          "standard": "정식 경계 근무",
+          "hard": "고참병의 시험"
+        },
+        "pitch": {
+          "introduction": "신병의 첫 경계 근무",
+          "standard": "성벽 위의 진짜 경계 근무",
+          "hard": "고참병들이 치르는 포위전"
+        },
+        "start": "{name}: {detail} (파도 {count}개)",
+        "practice": "{name} 연습 (파도 {count}개)"
+      },
       "calligraphyTitle": "비전 서예",
       "traceOutline": "발걸음으로 윤곽 따라 그리기",
       "traceRoundInstruction": "{round}/{total}단계: {shape}. {instruction}",
@@ -20261,6 +20279,11 @@ export const ko_KR: EnTranslations = {
         "name": "스카이",
         "title": "제피르의 견습생",
         "greeting": "협곡을 따라 멋지게 날아왔네요. 절단 절벽의 제피르에게 돌아갈 마법 상승 기류가 필요하면 언제든 말을 걸어 주세요."
+      },
+      "fire_and_fly_instructor": {
+        "name": "포술장 올더",
+        "title": "포병 모집관",
+        "greeting": "성벽에는 수비대가 내줄 수 있는 것보다 더 많은 수비병이 필요해서 모집하고 있네. 누구에게든 대포를 맡기기 전에, 자기 탑을 지켜 내는 모습을 보고 싶군. 시련을 받게: 괴물들이 성벽에 닿기 전에 날려 버리게."
       },
       "shadow_cloak_scout": {
         "name": "정찰병 발레리",

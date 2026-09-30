@@ -1,6 +1,8 @@
 import { bagPools, bagsFullError, canAddItem } from './bags';
 import { maybeAwardClueScroll, updateClueHunt } from './clue_scrolls';
+import { TURRET_DEFAULT_SCENARIO } from './content/fire_and_fly_scenarios';
 import { WORLD_QUEST_CALLIGRAPHY_ID } from './content/world_quest_calligraphy';
+import { FIRE_AND_FLY_QUEST_ID } from './content/world_quest_fire_and_fly';
 import { FORGE_QUEST_ID } from './content/world_quest_forging';
 import { GLIDER_APPRENTICE_NPC_DEF, GLIDER_QUEST_ID } from './content/world_quest_glider';
 import { INVESTIGATION_QUEST_ID } from './content/world_quest_investigation';
@@ -34,7 +36,13 @@ import {
 } from './quests/interact_object_credit';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import type { Entity, GatherNodeDef, WorldQuestDef, WorldQuestProgress } from './types';
+import type {
+  Entity,
+  GatherNodeDef,
+  TurretSession,
+  WorldQuestDef,
+  WorldQuestProgress,
+} from './types';
 import { xpForLevel } from './types';
 import { vehicleStationById } from './vehicle_stations';
 import { ensureWeeklyEmissary } from './weekly_quests';
@@ -61,6 +69,7 @@ import {
   takeWorldQuestDeliveryCargo,
   worldQuestDeliverySourceId,
 } from './world_quest_delivery';
+import { ensureFireAndFlyInstructor, startFireAndFly } from './world_quest_fire_and_fly';
 import {
   clearForgeWorkshop,
   ensureForgeWorkshop,
@@ -285,6 +294,7 @@ export function hasActiveWorldQuest(meta: PlayerMeta, questId: string): boolean 
 /** Starts every eligible objective whose area the living player enters. */
 export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Entity): void {
   ensureGliderInstructor(ctx);
+  ensureFireAndFlyInstructor(ctx);
   updateGliderLaunchUpdraft(ctx, meta, player);
   ensureWeeklyEmissary(ctx);
   if (player.level < WORLD_QUEST_MIN_LEVEL) {
@@ -513,10 +523,16 @@ export function talkToWorldQuestInstructor(
         candidate.objective.type === 'forging' ||
         candidate.objective.type === 'wisp_maze' ||
         candidate.objective.type === 'glider' ||
-        candidate.objective.type === 'shadow') &&
+        candidate.objective.type === 'shadow' ||
+        candidate.objective.type === 'turret') &&
       candidate.objective.instructorNpcId === npc.templateId,
   );
   if (!quest) return false;
+  if (quest.objective.type === 'turret') {
+    // The seat puts a rider's mount away itself and gives it back on leaving.
+    startFireAndFly(ctx, meta, player, TURRET_DEFAULT_SCENARIO.id);
+    return true;
+  }
   if (!dismountForWorldQuestInstructor(ctx, player, meta)) return true;
   resetCycleIfNeeded(ctx, meta);
   const progress = meta.worldQuestLog.get(quest.id);
@@ -696,6 +712,7 @@ function creditWorldQuest(
   if (quest.id === INVESTIGATION_QUEST_ID) grantDeed(ctx, meta, 'exp_borrowed_face');
   if (quest.id === FORGE_QUEST_ID) grantDeed(ctx, meta, 'exp_forge_helper');
   if (quest.id === GLIDER_QUEST_ID) grantDeed(ctx, meta, 'exp_windrider_slalom');
+  if (quest.id === FIRE_AND_FLY_QUEST_ID) grantDeed(ctx, meta, 'exp_gunners_oath');
   if (quest.id === WISP_MAZE_QUEST_ID) grantDeed(ctx, meta, 'exp_wisp_maze');
   if (quest.id === WORLD_QUEST_CALLIGRAPHY_ID) {
     grantDeed(ctx, meta, 'exp_arcane_calligraphy');
@@ -768,6 +785,37 @@ export function completeWorldQuestVehicle(
     progress?.state !== 'active' ||
     !hasActiveWorldQuest(meta, quest.id) ||
     !inWorldQuestArea(player, quest)
+  )
+    return;
+  creditWorldQuest(ctx, meta, quest, progress, quest.count);
+}
+
+/**
+ * A won Fire and Fly run pays only the row it was seated for: the run the
+ * instructor captured on the seat (the arena lies far from the quest's area, so
+ * the area check the cannon uses cannot apply). A practice run, a run seated on
+ * another day, or a dev seat pays nothing. The seat's tick calls this on every
+ * won tick, whatever path won the run; the row pays once.
+ */
+export function completeWorldQuestTurret(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  session: TurretSession,
+): void {
+  const run = session.worldQuest;
+  if (!run || run.practice || session.defense.phase !== 'won') return;
+  resetCycleIfNeeded(ctx, meta);
+  const quest = worldQuestById(run.questId);
+  const progress = meta.worldQuestLog.get(run.questId);
+  const player = ctx.entities.get(meta.entityId);
+  if (
+    run.cycle !== meta.worldQuestCycle ||
+    !player ||
+    player.dead ||
+    !quest ||
+    quest.objective.type !== 'turret' ||
+    progress?.state !== 'active' ||
+    !hasActiveWorldQuest(meta, quest.id)
   )
     return;
   creditWorldQuest(ctx, meta, quest, progress, quest.count);

@@ -12588,6 +12588,24 @@ export const ja_JP: EnTranslations = {
           "bronze": "銅"
         }
       },
+      "fireAndFly": {
+        "title": "砲手の試練",
+        "objective": "ひとつの試練のすべての波を耐え、自分の塔を守り抜く",
+        "ready": "砲術長アルダーに話しかけて試練を受ける。",
+        "complete": "試練合格！砲術長アルダーに話しかけると練習できます。",
+        "scenarios": {
+          "introduction": "新兵の試練",
+          "standard": "本番の見張り",
+          "hard": "古参兵の試験"
+        },
+        "pitch": {
+          "introduction": "新兵の初めての見張り",
+          "standard": "城壁での本物の見張り",
+          "hard": "古参兵が試される包囲戦"
+        },
+        "start": "{name}：{detail}（{count}波）",
+        "practice": "{name}を練習する（{count}波）"
+      },
       "calligraphyTitle": "秘術の書道",
       "traceOutline": "足取りで輪郭をなぞる",
       "traceRoundInstruction": "{round}/{total}回目：{shape}。{instruction}",
@@ -20261,6 +20279,11 @@ export const ja_JP: EnTranslations = {
         "name": "スカイ",
         "title": "ゼファーの弟子",
         "greeting": "峡谷を下る見事な飛行だった。魔法の上昇気流でザ・シアーのゼファーのもとへ戻りたくなったら、いつでも声をかけてくれ。"
+      },
+      "fire_and_fly_instructor": {
+        "name": "砲術長アルダー",
+        "title": "砲術隊の募集係",
+        "greeting": "城壁には守備隊が割ける以上の守り手が必要だ。だから募集している。大砲を任せる前に、自分の塔を守り抜けるところを見せてもらおう。試練を受けて、魔物が城壁に届く前に吹き飛ばせ。"
       },
       "shadow_cloak_scout": {
         "name": "斥候ヴァレリー",

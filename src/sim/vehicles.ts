@@ -31,7 +31,7 @@ import {
 import { vehicleStationById } from './vehicle_stations';
 import { activeWorldQuestsForCycle } from './world_quest_rotation';
 import { emitWorldQuestScore } from './world_quest_score_events';
-import { completeWorldQuestVehicle } from './world_quests';
+import { completeWorldQuestTurret, completeWorldQuestVehicle } from './world_quests';
 
 /** Lazily created without consuming allocator IDs or changing terrain anchors. */
 export function ensureVehicleStation(ctx: SimContext): void {
@@ -162,7 +162,10 @@ export function tickVehicle(ctx: SimContext, meta: PlayerMeta, player: Entity): 
   const session = meta.vehicle;
   if (!session) return;
   if (session.kind === 'turret') {
-    if (!tickTurretSeat(ctx, meta, player, session)) leaveVehicle(ctx, meta.entityId);
+    // A world quest run ends with its day, as the glider's flight does (no credit).
+    const dayOver = !!session.worldQuest && session.worldQuest.cycle !== meta.worldQuestCycle;
+    if (dayOver || !tickTurretSeat(ctx, meta, player, session)) leaveVehicle(ctx, meta.entityId);
+    else if (session.defense.phase === 'won') completeWorldQuestTurret(ctx, meta, session);
     return;
   }
   const station = vehicleStationById(session.stationId);

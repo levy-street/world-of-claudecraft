@@ -491,6 +491,18 @@ describe('QuestTrackerController', () => {
     expect(test.html()).not.toContain('Arcane Calligraphy');
   });
 
+  it("rides Fire and Fly's instruction line, never a tally", () => {
+    const test = harness(
+      [],
+      [{ questId: 'wq_evergarden_fire_and_fly', count: 0, state: 'active' }],
+    );
+
+    test.controller.update(0);
+
+    expect(test.html()).toContain('Speak to Master Gunner Alder to take a trial.');
+    expect(test.html()).not.toContain('0/1');
+  });
+
   it('lists a world quest only in its area, keeps it 5 sec after leaving, and keeps its progress', () => {
     const quest = WORLD_QUESTS.find((entry) => entry.id === 'wq_eastbrook_bandits');
     if (!quest) throw new Error('missing Eastbrook bandit fixture');

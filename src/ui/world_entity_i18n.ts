@@ -271,6 +271,7 @@ const MOB_IDS = [
 const NPC_IDS = [
   'glider_instructor',
   'glider_apprentice',
+  'fire_and_fly_instructor',
   'shadow_cloak_scout',
   'shadow_guard_north',
   'shadow_guard_south',

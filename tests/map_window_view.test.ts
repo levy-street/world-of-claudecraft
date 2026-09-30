@@ -1183,9 +1183,11 @@ describe('world-quest zone markers', () => {
       expect(model.worldQuests.length, zone.id).toBe(
         zone.id === 'proving_shore'
           ? 0
-          : zone.id === 'galecrest' || zone.id === 'evergarden'
-            ? 2
-            : 1,
+          : zone.id === 'evergarden'
+            ? 3
+            : zone.id === 'galecrest'
+              ? 2
+              : 1,
       );
       if (model.worldQuests[0]) {
         expect(model.worldQuests[0].radius, zone.id).toBeGreaterThan(0);

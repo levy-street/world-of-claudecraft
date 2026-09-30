@@ -19522,6 +19522,25 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.glider.score': 'Счёт: {score}.',
   'questUi.worldQuest.glider.medals.silver': 'Серебро',
   'questUi.worldQuest.glider.medals.bronze': 'Бронза',
+  'questUi.worldQuest.fireAndFly.title': 'Испытания канонира',
+  'questUi.worldQuest.fireAndFly.objective':
+    'Удержите собственную башню до конца всех волн одного испытания',
+  'questUi.worldQuest.fireAndFly.ready':
+    'Поговорите с мастером-канониром Олдером, чтобы пройти испытание.',
+  'questUi.worldQuest.fireAndFly.complete':
+    'Испытание пройдено! Поговорите с мастером-канониром Олдером, чтобы потренироваться.',
+  'questUi.worldQuest.fireAndFly.scenarios.introduction': 'Испытание новобранца',
+  'questUi.worldQuest.fireAndFly.scenarios.standard': 'Настоящий дозор',
+  'questUi.worldQuest.fireAndFly.scenarios.hard': 'Проверка ветеранов',
+  'questUi.worldQuest.fireAndFly.pitch.introduction': 'первый дозор новобранца',
+  'questUi.worldQuest.fireAndFly.pitch.standard': 'настоящий дозор на стенах',
+  'questUi.worldQuest.fireAndFly.pitch.hard': 'осада, которой проверяют бывалых',
+  'questUi.worldQuest.fireAndFly.start': '{name}: {detail} (волн: {count})',
+  'questUi.worldQuest.fireAndFly.practice': 'Тренировка: {name} (волн: {count})',
+  'entities.npcs.fire_and_fly_instructor.name': 'Мастер-канонир Олдер',
+  'entities.npcs.fire_and_fly_instructor.title': 'Вербовщик канониров',
+  'entities.npcs.fire_and_fly_instructor.greeting':
+    'Валам нужно больше защитников, чем может выделить гарнизон, поэтому я набираю новых. Прежде чем доверить кому-то пушку, я хочу увидеть, как он удержит собственную башню. Пройдите испытание: отбрасывайте чудовищ взрывами, пока они не добрались до ваших стен.',
   'questUi.worldQuest.traceShape.diamond': 'Ромб',
   'questUi.worldQuest.traceShape.pentagon': 'Пятиугольник',
   'questUi.worldQuest.traceShape.arrow': 'Руна стрелы',

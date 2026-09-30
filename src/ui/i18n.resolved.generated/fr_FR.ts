@@ -12588,6 +12588,24 @@ export const fr_FR: EnTranslations = {
           "bronze": "Bronze"
         }
       },
+      "fireAndFly": {
+        "title": "The Gunner's Trials",
+        "objective": "Hold a tower of your own through every wave of one trial",
+        "ready": "Speak to Master Gunner Alder to take a trial.",
+        "complete": "Trial passed! Speak to Master Gunner Alder to practice.",
+        "scenarios": {
+          "introduction": "Recruit's Trial",
+          "standard": "Standing Watch",
+          "hard": "Veterans' Test"
+        },
+        "pitch": {
+          "introduction": "a first watch for a new recruit",
+          "standard": "the real watch on the walls",
+          "hard": "the siege the old hands are tested on"
+        },
+        "start": "{name}: {detail} (waves: {count})",
+        "practice": "Practice the {name} (waves: {count})"
+      },
       "calligraphyTitle": "Calligraphie arcanique",
       "traceOutline": "Tracez le contour avec vos pas",
       "traceRoundInstruction": "Manche {round} sur {total} : {shape}. {instruction}",
@@ -20261,6 +20279,11 @@ export const fr_FR: EnTranslations = {
         "name": "Skye",
         "title": "Apprentie de Zéphyr",
         "greeting": "Beau vol dans le canyon. Parle-moi quand tu as besoin d'un courant ascendant magique pour retourner voir Zéphyr, à l'Escarpement."
+      },
+      "fire_and_fly_instructor": {
+        "name": "Master Gunner Alder",
+        "title": "Gunnery Recruiter",
+        "greeting": "The ramparts need more defenders than the garrison can spare, so I am recruiting. Before I trust anyone with a cannon, I want to see them hold a tower of their own. Take a trial: blast the monsters back before they reach your walls."
       },
       "shadow_cloak_scout": {
         "name": "Éclaireuse Valerie",

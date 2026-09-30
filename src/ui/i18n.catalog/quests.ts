@@ -344,6 +344,27 @@ const questStringsEn = {
         score: 'Score: {score}.',
         medals: { gold: 'Gold', silver: 'Silver', bronze: 'Bronze' },
       },
+      // Fire and Fly at the Evergarden gate: Master Gunner Alder recruits defenders
+      // for the ramparts and tests each one first. The trials are the scenarios:
+      // {name} is a trial's name, {detail} its one-line brief, {count} its wave count.
+      fireAndFly: {
+        title: "The Gunner's Trials",
+        objective: 'Hold a tower of your own through every wave of one trial',
+        ready: 'Speak to Master Gunner Alder to take a trial.',
+        complete: 'Trial passed! Speak to Master Gunner Alder to practice.',
+        scenarios: {
+          introduction: "Recruit's Trial",
+          standard: 'Standing Watch',
+          hard: "Veterans' Test",
+        },
+        pitch: {
+          introduction: 'a first watch for a new recruit',
+          standard: 'the real watch on the walls',
+          hard: 'the siege the old hands are tested on',
+        },
+        start: '{name}: {detail} (waves: {count})',
+        practice: 'Practice the {name} (waves: {count})',
+      },
       calligraphyTitle: 'Arcane Calligraphy',
       traceOutline: 'Trace the outline with your footsteps',
       traceRoundInstruction: 'Round {round} of {total}: {shape}. {instruction}',

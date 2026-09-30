@@ -3597,6 +3597,18 @@ export const DEEDS: Record<string, DeedDef> = {
       ],
     },
   },
+  // Fire and Fly at the Evergarden gate (the wq_evergarden_fire_and_fly world
+  // quest): the first win of any of Master Gunner Alder's trials, granted with the
+  // day's first paid completion (practice runs never pay). Cosmetic exploration at
+  // the world-quest deed value (renown 5), appended at the END.
+  exp_gunners_oath: {
+    id: 'exp_gunners_oath',
+    name: "The Gunner's Oath",
+    desc: "Pass one of Master Gunner Alder's trials at the Evergarden gate.",
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'manual' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

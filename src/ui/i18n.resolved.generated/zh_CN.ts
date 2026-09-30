@@ -12588,6 +12588,24 @@ export const zh_CN: EnTranslations = {
           "bronze": "铜牌"
         }
       },
+      "fireAndFly": {
+        "title": "炮手的试炼",
+        "objective": "在一次试炼的每一波攻势中守住你自己的塔楼",
+        "ready": "与炮术大师奥尔德交谈以接受试炼。",
+        "complete": "试炼通过！与炮术大师奥尔德交谈即可练习。",
+        "scenarios": {
+          "introduction": "新兵试炼",
+          "standard": "正式值守",
+          "hard": "老兵考验"
+        },
+        "pitch": {
+          "introduction": "新兵的第一次值守",
+          "standard": "城墙上真正的值守",
+          "hard": "老兵们要经受的围攻"
+        },
+        "start": "{name}：{detail}（{count}波）",
+        "practice": "练习{name}（{count}波）"
+      },
       "calligraphyTitle": "奥术书法",
       "traceOutline": "用脚步描绘轮廓",
       "traceRoundInstruction": "第{round}/{total}轮：{shape}。{instruction}",
@@ -20261,6 +20279,11 @@ export const zh_CN: EnTranslations = {
         "name": "斯凯",
         "title": "泽菲尔的学徒",
         "greeting": "顺着峡谷飞得真漂亮。什么时候需要一股魔法上升气流送你回断崖的泽菲尔那里，就来找我。"
+      },
+      "fire_and_fly_instructor": {
+        "name": "炮术大师奥尔德",
+        "title": "炮兵征募官",
+        "greeting": "城墙需要的守卫比驻军能抽出的更多，所以我在招募。在把大炮交给任何人之前，我要先看看他们能不能守住自己的塔楼。接受一次试炼吧：在怪物冲到你的城墙前把它们轰飞。"
       },
       "shadow_cloak_scout": {
         "name": "斥候瓦莱丽",

@@ -4883,6 +4883,8 @@ export type WorldQuestObjective =
   | { type: 'shadow'; instructorNpcId: string }
   | { type: 'forging'; instructorNpcId: string }
   | { type: 'wisp_maze'; instructorNpcId: string }
+  /** Fire and Fly: the instructor seats the player in their own arena (turret_defense_session.ts). */
+  | { type: 'turret'; instructorNpcId: string }
   | { type: 'vehicle'; stationId: string }
   | {
       type: 'tracing';
@@ -10351,6 +10353,17 @@ export interface TurretSession {
   /** The newest engine events, oldest first (minigames/turret_feedback.ts). */
   feedback: TurretFeedback[];
   nextFeedbackSeq: number;
+  /** The world quest run this seat is, captured when the instructor seated it; absent on a dev seat. */
+  worldQuest?: TurretWorldQuestRun;
+}
+
+/** Which world quest row a Fire and Fly seat answers to, fixed at the seat. */
+export interface TurretWorldQuestRun {
+  questId: string;
+  /** The character's world quest cycle at the seat; a run from another day never pays. */
+  cycle: string;
+  /** A replay after the day's reward: it never pays and never credits. */
+  practice: boolean;
 }
 
 /** What `PlayerMeta.vehicle` holds: every seat gate keys on its presence, not its kind. */

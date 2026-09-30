@@ -721,6 +721,27 @@ Exact-phrase and coined-token searches against the major game wikis.
 | Cocoon / Cocooned | Vysska's cast and the wrapped player's stun | KEEP. Single common English words. |
 | Draining Silk | her feeding's damage line | KEEP. No match. |
 
+### Fire and Fly world quest at the Evergarden gate (web-verified 2026-09-30)
+
+Scope: the proper nouns the Fire and Fly world quest adds (the instructor, the
+quest, its three trials, the first-win deed). Quoted exact-phrase searches plus
+game-wiki searches (WoW, RuneScape, FFXIV, GW2, ESO, Diablo, Path of Exile). None
+of these is a coined token; every one is ordinary English, so the check is for a
+distinctive full name in the same role. The mini-game's own name, "Fire and Fly", was checked
+when the mini-game was named (borderline: a small free web game is called "Fly &
+Fire", words reversed; generic words, no coined token).
+
+| Name | Where | Verdict |
+|---|---|---|
+| Master Gunner Alder | the instructor NPC (`fire_and_fly_instructor`) | KEEP. No match. "Master gunner" is a real artillery rank used across games; the nearest game character is Guild Wars 2's "Master Gunner Adil", a different name. Alder is a tree and a common name. |
+| Gunnery Recruiter | his title | KEEP. No match. Plain descriptive English. |
+| The Gunner's Trials | the world quest's title | KEEP. No match for the phrase; nearest is Final Fantasy X-2's "Gunner's Gauntlet" minigame, different wording. |
+| Recruit's Trial | the Introduction scenario | KEEP. No match as a quest or activity name; plain English. Nearest is Path of Exile's "Aspirant's Trial", different wording. |
+| Standing Watch | the Standard scenario | KEEP. No match; a naval and military idiom. |
+| Veterans' Test | the Hard scenario | KEEP. No match; nearest are Destiny's "Veteran's Tour" and several quests named "The Veteran", different wording. |
+| The Gunner's Oath | the first-win deed (`exp_gunners_oath`) | KEEP. No match as an achievement or quest. |
+| The Rampart Trials, Rampart Recruiter, Sworn to the Ramparts | REJECTED before shipping | No exact match, but "Rampart" is also Atari's 1990 cannon-and-castle defense game, the same genre and theme as this activity, so the word was dropped from every proper noun (it stays in lowercase prose, "the ramparts"). |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

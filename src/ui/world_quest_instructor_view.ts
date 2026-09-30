@@ -6,14 +6,15 @@ import { GLIDER_APPRENTICE_NPC_DEF, GLIDER_QUEST_ID } from '../sim/content/world
 import { ESCORTS, NPCS, WORLD_QUESTS, WORLD_QUESTS_BY_ID } from '../sim/data';
 import type { Entity } from '../sim/types';
 import {
+  type ActivityChoice,
   WORLD_QUEST_DIFFICULTIES,
-  type WorldQuestDifficulty,
   worldQuestOffersDifficulty,
 } from '../sim/world_quest_activity';
 import { isReplayableWorldQuest } from '../sim/world_quest_practice';
 import type { IWorld } from '../world_api';
 import { tEntity } from './entity_i18n';
 import { formatNumber, t } from './i18n';
+import { fireAndFlyTrialChoices } from './world_quest_fire_and_fly_view';
 import { worldQuestDisplayName, worldQuestObjectiveLabel } from './world_quest_view';
 
 export interface WorldQuestInstructorDialogView {
@@ -27,18 +28,23 @@ export interface WorldQuestInstructorDialogView {
   completed: boolean;
   buttonLabel: string;
   hint?: string;
-  /** Present when the activity offers a difficulty pick: one start button per
-   *  entry replaces the single start button. Order is the display order. */
-  difficulties?: readonly { difficulty: WorldQuestDifficulty; label: string }[];
+  /** Present when the activity offers a pick (the maze's difficulty, Fire and
+   *  Fly's trials): one start button per entry replaces the single start button.
+   *  Order is the display order; `key` is the choice's stable data key. */
+  difficulties?: readonly { difficulty: ActivityChoice; key: string; label: string }[];
   questId?: string;
 }
 
 function difficultyChoices(
   questId: string,
+  completed: boolean,
 ): WorldQuestInstructorDialogView['difficulties'] | undefined {
+  if (WORLD_QUESTS_BY_ID[questId]?.objective.type === 'turret')
+    return fireAndFlyTrialChoices(completed);
   if (!worldQuestOffersDifficulty(questId)) return undefined;
   return WORLD_QUEST_DIFFICULTIES.map((difficulty) => ({
     difficulty,
+    key: difficulty,
     label: t(
       difficulty === 'hard'
         ? 'questUi.worldQuest.wispMaze.startHard'
@@ -161,7 +167,7 @@ export function worldQuestInstructorDialog(
       (progress?.wispMaze && !progress.wispMaze.paused && progress.wispMaze.phase !== 'won'))
   )
     canStart = false;
-  const difficulties = canStart ? difficultyChoices(questId) : undefined;
+  const difficulties = canStart ? difficultyChoices(questId, completed) : undefined;
   return {
     speakerName,
     speakerTitle,

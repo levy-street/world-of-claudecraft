@@ -32,7 +32,14 @@ import type { SimContext } from './sim_context';
 import { arenaMatchFor } from './social/arena';
 import { bgInMatch } from './social/battleground';
 import { claimTurretArena, enterTurretArena, exitTurretArena } from './turret_arena_session';
-import type { CannonPoint, Entity, TurretScenarioDef, TurretSession, Vec3 } from './types';
+import type {
+  CannonPoint,
+  Entity,
+  TurretScenarioDef,
+  TurretSession,
+  TurretWorldQuestRun,
+  Vec3,
+} from './types';
 import { wispMazeActionsLocked } from './wisp_maze_action_lock';
 import { groundHeight, waterLevelAt } from './world';
 import { hasWorldQuestDeliveryCargo } from './world_quest_delivery';
@@ -183,12 +190,14 @@ export function turretSeatRefusal(
  * world rng draw, taken only once the seat is committed and never shown. Only
  * tests and dev tools pass `seed` (a replay, which draws nothing): an entry a
  * player reaches must never forward one, or the player picks their own run.
+ * `worldQuest` is the row the instructor seated this run for; a dev seat has none.
  */
 export function seatTurret(
   ctx: SimContext,
   pid: number,
   scenario: Readonly<TurretScenarioDef> = TURRET_DEFAULT_SCENARIO,
   seed?: number,
+  worldQuest?: Readonly<TurretWorldQuestRun>,
 ): TurretSeatRefusal | null {
   const resolved = ctx.resolve(pid);
   if (!resolved) return 'missing';
@@ -220,6 +229,7 @@ export function seatTurret(
     returnTo,
     feedback: [],
     nextFeedbackSeq: 1,
+    ...(worldQuest ? { worldQuest: { ...worldQuest } } : {}),
   };
   meta.wireRev++;
   return null;

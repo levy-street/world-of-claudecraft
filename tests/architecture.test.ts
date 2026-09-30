@@ -290,6 +290,8 @@ const UI_PURE_CORES = [
   'src/ui/world_quest_shadow_view.ts',
   'src/ui/world_quest_investigation_view.ts',
   'src/ui/world_quest_glider_view.ts',
+  'src/ui/world_quest_fire_and_fly_view.ts',
+  'src/ui/world_quest_marker_anchor.ts',
   'src/ui/world_quest_puzzle_view.ts',
   'src/ui/world_quest_match3_view.ts',
   'src/ui/world_quest_confection_view.ts',
@@ -1166,6 +1168,7 @@ const BARE_NAMED = [
   'src/ui/duration_text.ts',
   'src/ui/realm_builder_name.ts',
   'src/ui/woc_market_reason_text.ts',
+  'src/ui/world_quest_marker_anchor.ts',
   'src/render/foliage_lod.ts',
   'src/render/frame_present.ts',
   'src/render/self_motion_rift_lift.ts',
@@ -2340,6 +2343,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/woc_market_reason_text.ts',
   'src/ui/woc_market_sales_html.ts',
   'src/ui/woc_tokens_text.ts',
+  'src/ui/world_quest_marker_anchor.ts',
   'src/ui/xp_bar.ts',
 ];
 

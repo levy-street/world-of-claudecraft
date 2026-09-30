@@ -256,6 +256,7 @@ import {
   WILLOWFEN_ZONE,
 } from './content/willowfen';
 import { WORLD_QUEST_CALLIGRAPHY_NPCS } from './content/world_quest_calligraphy';
+import { FIRE_AND_FLY_NPC_DEF } from './content/world_quest_fire_and_fly';
 import { FORGE_NPC_DEF } from './content/world_quest_forging';
 import { GLIDER_APPRENTICE_NPC_DEF, GLIDER_NPC_DEF } from './content/world_quest_glider';
 import { WISP_MAZE_NPC_DEF } from './content/world_quest_wisp_maze';
@@ -514,6 +515,7 @@ export const NPCS: Record<string, NpcDef> = {
   ...Object.fromEntries(SHADOW_GUARDS.map(({ npc }) => [npc.id, npc])),
   [GLIDER_NPC_DEF.id]: GLIDER_NPC_DEF,
   [GLIDER_APPRENTICE_NPC_DEF.id]: GLIDER_APPRENTICE_NPC_DEF,
+  [FIRE_AND_FLY_NPC_DEF.id]: FIRE_AND_FLY_NPC_DEF,
   ...Object.fromEntries(INVESTIGATION_NPCS.map((npc) => [npc.id, npc])),
   ...FACTION_VENDOR_NPCS,
   // The Harbormaster's House keeper at the Wyrmwatch cliff harbor

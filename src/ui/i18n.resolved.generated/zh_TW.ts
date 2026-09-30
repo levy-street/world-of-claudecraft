@@ -12588,6 +12588,24 @@ export const zh_TW: EnTranslations = {
           "bronze": "銅牌"
         }
       },
+      "fireAndFly": {
+        "title": "砲手的試煉",
+        "objective": "在一次試煉的每一波攻勢中守住你自己的塔樓",
+        "ready": "與砲術大師奧爾德交談以接受試煉。",
+        "complete": "試煉通過！與砲術大師奧爾德交談即可練習。",
+        "scenarios": {
+          "introduction": "新兵試煉",
+          "standard": "正式值守",
+          "hard": "老兵考驗"
+        },
+        "pitch": {
+          "introduction": "新兵的第一次值守",
+          "standard": "城牆上真正的值守",
+          "hard": "老兵們要經受的圍攻"
+        },
+        "start": "{name}：{detail}（{count}波）",
+        "practice": "練習{name}（{count}波）"
+      },
       "calligraphyTitle": "秘法書法",
       "traceOutline": "用腳步描繪輪廓",
       "traceRoundInstruction": "第{round}/{total}輪：{shape}。{instruction}",
@@ -20261,6 +20279,11 @@ export const zh_TW: EnTranslations = {
         "name": "絲凱",
         "title": "澤菲爾的學徒",
         "greeting": "沿著峽谷飛下來的那一趟真漂亮。需要魔法上升氣流送你回斷崖找澤菲爾時，隨時來找我。"
+      },
+      "fire_and_fly_instructor": {
+        "name": "砲術大師奧爾德",
+        "title": "砲兵徵募官",
+        "greeting": "城牆需要的守衛比駐軍能抽出的更多，所以我在招募。在把大砲交給任何人之前，我要先看看他們能不能守住自己的塔樓。接受一次試煉吧：在怪物衝到你的城牆前把牠們轟飛。"
       },
       "shadow_cloak_scout": {
         "name": "斥候薇拉莉",

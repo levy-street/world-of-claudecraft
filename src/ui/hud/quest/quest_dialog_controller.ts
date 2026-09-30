@@ -915,7 +915,7 @@ export class QuestDialogController {
       for (const choice of view.difficulties) {
         const button = this.makeButton(choice.label);
         button.dataset.startWq = String(npc.id);
-        button.dataset.difficulty = choice.difficulty;
+        button.dataset.difficulty = choice.key;
         button.addEventListener('click', () => {
           this.close();
           this.deps.world().targetEntity(npc.id);
