@@ -1198,6 +1198,44 @@ describe('Fire and Fly monsters on screen', () => {
     }
   });
 
+  it('prewarms the tower, the weapon and the kegs hidden before a seat, and builds them once', async () => {
+    const spans: string[] = [];
+    setBuildSpanSink((kind) => spans.push(kind));
+    try {
+      const source = vi.fn(async () => towerModel());
+      const gated: THREE.Object3D[] = [];
+      const visual = new TurretDefenseVisual(
+        new THREE.Scene(),
+        () => 0,
+        (target) => {
+          gated.push(target);
+          return Promise.resolve();
+        },
+        undefined,
+        source,
+      );
+      visual.prewarmKit(3);
+      visual.prewarmKit(3.05);
+      await flush();
+      expect(source).toHaveBeenCalledTimes(1);
+      expect(gated.map((root) => root.name)).toContain(TURRET_TOWER_NAME);
+      expect(visual.group.visible).toBe(false);
+      expect(visual.group.getObjectByName(TURRET_TOWER_NAME)?.parent).toBe(visual.group);
+      const view = viewOf(engine(0));
+      visual.update(view, 0, 4, 0.016);
+      await flush();
+      expect(visual.group.visible).toBe(true);
+      expect(source).toHaveBeenCalledTimes(1);
+      expect(spans.filter((kind) => kind === 'zone:turret-weapon')).toHaveLength(1);
+      expect(spans.filter((kind) => kind === 'zone:turret-tower')).toHaveLength(1);
+      visual.dispose();
+      visual.prewarmKit(5);
+      expect(source).toHaveBeenCalledTimes(1);
+    } finally {
+      setBuildSpanSink(null);
+    }
+  });
+
   it('files the tower build in the build ledger once, when its model lands', async () => {
     const spans: string[] = [];
     setBuildSpanSink((kind) => spans.push(kind));

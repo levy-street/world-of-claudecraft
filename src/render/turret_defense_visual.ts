@@ -428,20 +428,16 @@ export class TurretDefenseVisual {
     for (const body of this.bodies) body.owner = null;
   }
 
-  /** The commitment: first seen seated, the markers are built and the rig pools start growing. */
-  private commit(plan: TurretPlanView, wave: number): void {
-    if (this.charactersState === 'idle') {
-      this.charactersState = 'loading';
-      charactersReady().then(
-        () => {
-          if (this.charactersState === 'loading') this.charactersState = 'ready';
-        },
-        (error) => {
-          this.charactersState = 'failed';
-          console.error('Fire and Fly monster rigs unavailable, stand-ins only', error);
-        },
-      );
-    }
+  /** The tower, the weapon and the kegs, built ahead of a seat the player means to
+   *  take (the arena prebuild's intent): they link hidden and stay for the page,
+   *  as they do after a first seat. */
+  prewarmKit(time: number): void {
+    if (this.disposed || this.group.visible) return;
+    this.nowMs = time * 1000;
+    this.prepareKit();
+  }
+
+  private prepareKit(): void {
     if (!this.weapon.prepared) {
       timeBuildSpan('zone:turret-weapon', () => this.weapon.prepare(this.group));
     }
@@ -464,6 +460,23 @@ export class TurretDefenseVisual {
         this.barrelRetryAtMs = this.nowMs + RIG_RETRY_MS;
       });
     }
+  }
+
+  /** The commitment: first seen seated, the markers are built and the rig pools start growing. */
+  private commit(plan: TurretPlanView, wave: number): void {
+    if (this.charactersState === 'idle') {
+      this.charactersState = 'loading';
+      charactersReady().then(
+        () => {
+          if (this.charactersState === 'loading') this.charactersState = 'ready';
+        },
+        (error) => {
+          this.charactersState = 'failed';
+          console.error('Fire and Fly monster rigs unavailable, stand-ins only', error);
+        },
+      );
+    }
+    this.prepareKit();
     if (plan !== this.plan) {
       this.plan = plan;
       this.capacities = turretRigCapacities(plan);

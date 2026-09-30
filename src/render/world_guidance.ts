@@ -4,6 +4,7 @@ import type * as THREE from 'three';
 import type { IWorld } from '../world_api';
 import { CannonEncounterVisual } from './cannon_encounter_visual';
 import type { CannonShellHost } from './cannon_shell_visuals';
+import { type ArenaPrebuildQueue, FireAndFlyArenaPrebuild } from './fire_and_fly_arena_prebuild';
 import { GliderCourseVisual } from './glider_course_visual';
 import { IslandGuidance } from './island_guidance';
 import { MountBeacon } from './mount_beacon';
@@ -21,6 +22,7 @@ export class WorldGuidance {
   private readonly trace: WorldQuestTraceVisual;
   private readonly cannon: CannonEncounterVisual;
   private readonly turret: TurretDefenseVisual;
+  private readonly arenaPrebuild: FireAndFlyArenaPrebuild;
   private readonly glider: GliderCourseVisual;
   private readonly shadow: ShadowInfiltrationVisual;
   private readonly wispMaze: WispMazeVisual;
@@ -65,6 +67,12 @@ export class WorldGuidance {
       groundAt,
       compileGate && ((root) => compileGate(root, false)),
     );
+    // The arena behind the turret, built hidden once the player turns to its
+    // instructor, released if they do not take the trial.
+    this.arenaPrebuild = new FireAndFlyArenaPrebuild(
+      scene,
+      compileGate && ((root) => compileGate(root, false)),
+    );
     this.glider = new GliderCourseVisual(
       scene,
       groundAt,
@@ -93,9 +101,11 @@ export class WorldGuidance {
     this.island.npcFizz(...args);
   }
 
-  /** The renderer services the Fire and Fly cannon's shots draw with. */
-  setTurretHost(host: CannonShellHost): void {
+  /** The renderer services the Fire and Fly cannon's shots draw with, and the
+   *  preparation queue its arena prebuild rides. */
+  setTurretHost(host: CannonShellHost & { readonly backgroundGpuWork?: ArenaPrebuildQueue }): void {
     this.turret.setHost(host);
+    this.arenaPrebuild.setQueue(host.backgroundGpuWork ?? null);
   }
 
   update(
@@ -116,6 +126,8 @@ export class WorldGuidance {
     );
     this.trace.update(world);
     this.cannon.update(world.vehicleSession, dt, reducedMotion);
+    this.arenaPrebuild.update(world, time * 1000);
+    if (this.arenaPrebuild.built) this.turret.prewarmKit(time);
     const turret = world.turretSession;
     this.turret.update(turret, world.turretClock, time, dt, reducedMotion, renderedSelf);
     this.glider.update(world, renderedSelf?.group);
@@ -127,6 +139,7 @@ export class WorldGuidance {
     this.trace.dispose();
     this.cannon.dispose();
     this.turret.dispose();
+    this.arenaPrebuild.dispose();
     this.glider.dispose();
     this.shadow.dispose();
     this.wispMaze.dispose();

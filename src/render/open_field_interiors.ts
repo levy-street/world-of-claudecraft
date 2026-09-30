@@ -4,12 +4,13 @@
 // comes back through attachOpenFieldInterior, behind its compile gate, so a new
 // field is one row, never a new branch in the coordinator.
 //
-// No intent hook announces a field before the player lands in it (the Fire and
-// Fly dev command teleports and seats in one tick), so there is nothing to
-// prebuild behind. A field with a stand-in shows it first instead: its first
-// child reveals on its own gate, one program queued ahead of the rest, so the
-// player lands on that ground rather than above an empty sky while the trees
-// and the cover link.
+// The Fire and Fly arena is prebuilt hidden at its instructor
+// (fire_and_fly_arena_prebuild.ts), so the copy the player lands in links as a
+// cache hit. An entry with no intent before it (the dev command teleports and
+// seats in one tick) still links here, so a field with a stand-in shows it
+// first: its first child reveals on its own gate, one program queued ahead of
+// the rest, so the player lands on that ground rather than above an empty sky
+// while the trees and the cover link.
 
 import type * as THREE from 'three';
 import { buildFireAndFlyArenaInterior } from './fire_and_fly_arena';

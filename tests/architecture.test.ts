@@ -984,6 +984,7 @@ const RENDER_PURE_CORES = [
   'src/render/draw_stats_core.ts',
   'src/render/farm_patches_core.ts',
   'src/render/fire_and_fly_arena_core.ts',
+  'src/render/fire_and_fly_arena_intent_core.ts',
   'src/render/fishing_bobber_core.ts',
   'src/render/flower_meadows_core.ts',
   'src/render/foliage_core.ts',

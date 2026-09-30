@@ -15,6 +15,12 @@ const calls = vi.hoisted(() => ({
   turretUpdate: vi.fn(),
   turretDispose: vi.fn(),
   turretHost: vi.fn(),
+  turretPrewarm: vi.fn(),
+  prebuildGate: vi.fn(),
+  prebuildUpdate: vi.fn(),
+  prebuildDispose: vi.fn(),
+  prebuildQueue: vi.fn(),
+  prebuildBuilt: false,
 }));
 vi.mock('../src/render/race_line', () => ({
   RaceLine: class {
@@ -82,7 +88,24 @@ vi.mock('../src/render/turret_defense_visual', () => ({
       calls.turretUpdate(...args);
     }
     setHost = calls.turretHost;
+    prewarmKit = calls.turretPrewarm;
     dispose = calls.turretDispose;
+  },
+}));
+vi.mock('../src/render/fire_and_fly_arena_prebuild', () => ({
+  FireAndFlyArenaPrebuild: class {
+    constructor(scene: THREE.Object3D, gate?: (root: THREE.Object3D) => Promise<unknown>) {
+      if (gate) calls.prebuildGate(gate(scene));
+    }
+    get built() {
+      return calls.prebuildBuilt;
+    }
+    update(...args: unknown[]) {
+      calls.events.push('arena-prebuild');
+      calls.prebuildUpdate(...args);
+    }
+    setQueue = calls.prebuildQueue;
+    dispose = calls.prebuildDispose;
   },
 }));
 vi.mock('../src/render/wisp_maze_visual', () => ({
@@ -147,6 +170,7 @@ describe('personal world guidance coordinator', () => {
         `mount:${!race}`,
         'trace',
         'cannon',
+        'arena-prebuild',
         'turret',
         'wisp-maze',
       ]);
@@ -181,9 +205,43 @@ describe('personal world guidance coordinator', () => {
     const host = { vfx: {}, camera: new THREE.PerspectiveCamera() } as never;
     guidance.setTurretHost(host);
     expect(calls.turretHost).toHaveBeenCalledWith(host);
+    expect(calls.prebuildQueue).toHaveBeenLastCalledWith(null);
+    // The renderer lends itself: its preparation queue carries the arena's warm steps.
+    const queue = { run: vi.fn() };
+    guidance.setTurretHost({ ...(host as object), backgroundGpuWork: queue } as never);
+    expect(calls.prebuildQueue).toHaveBeenLastCalledWith(queue);
     calls.turretDispose.mockClear();
     guidance.dispose();
     expect(calls.turretDispose).toHaveBeenCalledTimes(1);
+  });
+  it('drives the arena prebuild from the world each frame, links it after first paint, and releases it', () => {
+    const gate = vi.fn(() => Promise.resolve());
+    const scene = new THREE.Scene();
+    calls.prebuildGate.mockClear();
+    const guidance = new WorldGuidance(scene, () => 0, gate);
+    expect(calls.prebuildGate).toHaveBeenCalledTimes(1);
+    expect(gate).toHaveBeenCalledWith(scene, false);
+    const world = {
+      mountRaceView: () => null,
+      questState: () => 'none',
+      worldQuestLog: new Map(),
+      player: { dead: false },
+      turretSession: null,
+      turretClock: null,
+    } as unknown as IWorld;
+    calls.turretPrewarm.mockClear();
+    calls.prebuildBuilt = false;
+    guidance.update(world, 12, 0.05);
+    expect(calls.prebuildUpdate).toHaveBeenLastCalledWith(world, 12_000);
+    expect(calls.turretPrewarm).not.toHaveBeenCalled();
+    // A standing copy starts the turret kit too, so the tower is linked by the teleport.
+    calls.prebuildBuilt = true;
+    guidance.update(world, 13, 0.05);
+    expect(calls.turretPrewarm).toHaveBeenCalledWith(13);
+    calls.prebuildBuilt = false;
+    calls.prebuildDispose.mockClear();
+    guidance.dispose();
+    expect(calls.prebuildDispose).toHaveBeenCalledTimes(1);
   });
   it('is lent the renderer as the turret host, once (source pin)', () => {
     const lend = 'this.worldGuidance.setTurretHost(this);';

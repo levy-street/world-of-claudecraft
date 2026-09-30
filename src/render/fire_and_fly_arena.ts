@@ -24,6 +24,7 @@ import {
   type FireAndFlyTree,
 } from '../sim/fire_and_fly_field';
 import {
+  type ArenaBackdropCrown,
   type ArenaCoverSpot,
   type ArenaGrassSpot,
   arenaHash,
@@ -311,6 +312,25 @@ function tuftCard(cards: number): THREE.BufferGeometry {
   return geometry;
 }
 
+// Pure placements, the same for every build: kept, so a later build (and the
+// prebuild's warm steps) pays them once.
+const grassSpotSets = new Map<number, readonly ArenaGrassSpot[]>();
+let flowerSpotSet: readonly ArenaCoverSpot[] | null = null;
+
+function grassSpots(step: number): readonly ArenaGrassSpot[] {
+  let spots = grassSpotSets.get(step);
+  if (!spots) {
+    spots = fireAndFlyGrassSpots(step);
+    grassSpotSets.set(step, spots);
+  }
+  return spots;
+}
+
+function flowerSpots(): readonly ArenaCoverSpot[] {
+  flowerSpotSet ??= fireAndFlyFlowerSpots();
+  return flowerSpotSet;
+}
+
 const GRASS_BASE = new THREE.Color(0xa2ad6c);
 const GRASS_DRY = new THREE.Color(0xc4b36e);
 const GRASS_LUSH = new THREE.Color(0x88a462);
@@ -343,30 +363,35 @@ function coverMesh<Spot extends ArenaCoverSpot>(
   return mesh;
 }
 
+const grassStep = (): number => (GFX.tier === 'medium' ? 1.8 : 1.2);
+const grassMaterial = (): THREE.Material => sharedMaterial('grass', createGrassTuftMaterial);
+
+// Same card program as the grass: only the map differs.
+const flowerMaterial = (): THREE.Material =>
+  sharedMaterial('flowers', () => {
+    const material = createGrassTuftMaterial() as THREE.MeshStandardMaterial;
+    material.map?.dispose();
+    material.map = flowerTuftTexture();
+    return material;
+  });
+
 function buildGrass(): THREE.Group {
   const group = new THREE.Group();
   group.name = 'fireAndFlyGrass';
   const medium = GFX.tier === 'medium';
   group.add(
     coverMesh<ArenaGrassSpot>(
-      fireAndFlyGrassSpots(medium ? 1.8 : 1.2),
+      grassSpots(grassStep()),
       tuftCard(medium ? GRASS_CARDS_MID : GRASS_CARDS_FULL),
-      sharedMaterial('grass', createGrassTuftMaterial),
+      grassMaterial(),
       (s, c) => {
         c.copy(GRASS_BASE).lerp(GRASS_DRY, s.dry).lerp(GRASS_LUSH, s.lush);
         c.offsetHSL((s.h1 - 0.5) * 0.04, (s.h2 - 0.5) * 0.1, (s.h3 - 0.5) * 0.1);
       },
     ),
   );
-  // Same card program as the grass: only the map differs.
-  const flowerMaterial = sharedMaterial('flowers', () => {
-    const material = createGrassTuftMaterial() as THREE.MeshStandardMaterial;
-    material.map?.dispose();
-    material.map = flowerTuftTexture();
-    return material;
-  });
   group.add(
-    coverMesh(fireAndFlyFlowerSpots(), tuftCard(2), flowerMaterial, (s, c) => {
+    coverMesh(flowerSpots(), tuftCard(2), flowerMaterial(), (s, c) => {
       c.copy(WHITE).offsetHSL((s.h1 - 0.5) * 0.03, 0, (s.h3 - 0.5) * 0.08);
     }),
   );
@@ -604,51 +629,49 @@ const CONIFER_DARK = new THREE.Color(0x223a26);
 const CONIFER_LIGHT = new THREE.Color(0x35543a);
 const CANOPY_GOLD = new THREE.Color(0x7a7430);
 
-function backdropGeometry(near: boolean, detail: 0 | 1): THREE.BufferGeometry {
-  const key = `${near}:${detail}`;
-  const cached = backdropGeometries.get(key);
-  if (cached) return cached;
-  const pieces: THREE.BufferGeometry[] = [];
+const backdropKey = (near: boolean, detail: 0 | 1): string => `${near}:${detail}`;
+
+function backdropCrownPiece(crown: ArenaBackdropCrown, detail: 0 | 1): THREE.BufferGeometry {
   const color = new THREE.Color();
-  for (const crown of fireAndFlyBackdropCrowns()) {
-    if (crown.near !== near) continue;
-    // Conifers read as tall narrow ovals, not cones: in the haze a spire's
-    // hard point is what gives a primitive away.
-    const piece = new THREE.IcosahedronGeometry(1, detail);
-    // Sphere normals at every detail: the lean twenty-face crown then shades
-    // as one soft mass instead of a faceted boulder.
-    piece.setAttribute('normal', piece.getAttribute('position').clone());
-    piece.normalizeNormals();
-    piece.translate(0, 1, 0).scale(1, 0.5, 1);
-    const positions = piece.getAttribute('position');
-    // Lumpy, not a primitive: each vertex pushed along a hashed amount.
-    for (let i = 0; i < positions.count; i++) {
-      const px = positions.getX(i);
-      const py = positions.getY(i);
-      const pz = positions.getZ(i);
-      const bump = 1 + (arenaHash(px * 7 + crown.x, pz * 7 + crown.z, py * 5) - 0.5) * 0.26;
-      positions.setXYZ(i, px * bump, py, pz * bump);
-    }
-    piece.scale(crown.radius, crown.height, crown.radius);
-    piece.rotateY(crown.tone * Math.PI * 2);
-    piece.translate(crown.x, crown.y, crown.z);
-    const tones = piece.getAttribute('position');
-    const paint = new Float32Array(tones.count * 3);
-    const base = crown.conifer
-      ? color.copy(CONIFER_DARK).lerp(CONIFER_LIGHT, crown.tone)
-      : color.copy(CANOPY_DARK).lerp(CANOPY_LIGHT, crown.tone);
-    if (!crown.conifer && crown.tone > 0.86) base.lerp(CANOPY_GOLD, 0.55);
-    for (let i = 0; i < tones.count; i++) {
-      const lift = Math.min(1, Math.max(0, (tones.getY(i) - crown.y) / crown.height));
-      const shade = 0.55 + 0.45 * lift;
-      paint[i * 3] = base.r * shade;
-      paint[i * 3 + 1] = base.g * shade;
-      paint[i * 3 + 2] = base.b * shade;
-    }
-    piece.setAttribute('color', new THREE.BufferAttribute(paint, 3));
-    piece.deleteAttribute('uv');
-    pieces.push(piece);
+  // Conifers read as tall narrow ovals, not cones: in the haze a spire's
+  // hard point is what gives a primitive away.
+  const piece = new THREE.IcosahedronGeometry(1, detail);
+  // Sphere normals at every detail: the lean twenty-face crown then shades
+  // as one soft mass instead of a faceted boulder.
+  piece.setAttribute('normal', piece.getAttribute('position').clone());
+  piece.normalizeNormals();
+  piece.translate(0, 1, 0).scale(1, 0.5, 1);
+  const positions = piece.getAttribute('position');
+  // Lumpy, not a primitive: each vertex pushed along a hashed amount.
+  for (let i = 0; i < positions.count; i++) {
+    const px = positions.getX(i);
+    const py = positions.getY(i);
+    const pz = positions.getZ(i);
+    const bump = 1 + (arenaHash(px * 7 + crown.x, pz * 7 + crown.z, py * 5) - 0.5) * 0.26;
+    positions.setXYZ(i, px * bump, py, pz * bump);
   }
+  piece.scale(crown.radius, crown.height, crown.radius);
+  piece.rotateY(crown.tone * Math.PI * 2);
+  piece.translate(crown.x, crown.y, crown.z);
+  const tones = piece.getAttribute('position');
+  const paint = new Float32Array(tones.count * 3);
+  const base = crown.conifer
+    ? color.copy(CONIFER_DARK).lerp(CONIFER_LIGHT, crown.tone)
+    : color.copy(CANOPY_DARK).lerp(CANOPY_LIGHT, crown.tone);
+  if (!crown.conifer && crown.tone > 0.86) base.lerp(CANOPY_GOLD, 0.55);
+  for (let i = 0; i < tones.count; i++) {
+    const lift = Math.min(1, Math.max(0, (tones.getY(i) - crown.y) / crown.height));
+    const shade = 0.55 + 0.45 * lift;
+    paint[i * 3] = base.r * shade;
+    paint[i * 3 + 1] = base.g * shade;
+    paint[i * 3 + 2] = base.b * shade;
+  }
+  piece.setAttribute('color', new THREE.BufferAttribute(paint, 3));
+  piece.deleteAttribute('uv');
+  return piece;
+}
+
+function mergeBackdrop(key: string, pieces: THREE.BufferGeometry[]): THREE.BufferGeometry {
   const merged = mergeGeometries(pieces, false);
   for (const piece of pieces) piece.dispose();
   if (!merged) throw new Error('Fire and Fly backdrop merge failed');
@@ -656,6 +679,17 @@ function backdropGeometry(near: boolean, detail: 0 | 1): THREE.BufferGeometry {
   markSharedGeometry(merged);
   backdropGeometries.set(key, merged);
   return merged;
+}
+
+function backdropGeometry(near: boolean, detail: 0 | 1): THREE.BufferGeometry {
+  const key = backdropKey(near, detail);
+  const cached = backdropGeometries.get(key);
+  if (cached) return cached;
+  const pieces: THREE.BufferGeometry[] = [];
+  for (const crown of fireAndFlyBackdropCrowns()) {
+    if (crown.near === near) pieces.push(backdropCrownPiece(crown, detail));
+  }
+  return mergeBackdrop(key, pieces);
 }
 
 function buildBackdrop(lowGfx: boolean): THREE.Group {
@@ -736,6 +770,50 @@ function buildMotes(): THREE.Points {
   );
   points.name = 'fireAndFlyMotes';
   return points;
+}
+
+/** Hill crowns one warm step shapes: a slice of the backdrop's main-thread cost. */
+export const BACKDROP_CROWNS_PER_WARM_STEP = 64;
+
+/**
+ * The arena's page-lifetime caches (ground mesh, hill canopy, cover cards and
+ * placements, card materials) as small steps a prebuild runs one per idle
+ * slot, so the build that follows is short. A step whose cache is already full
+ * does nothing; the build alone still fills whatever a step never reached.
+ */
+export function fireAndFlyArenaWarmSteps(lowGfx: boolean): (() => void)[] {
+  const steps: (() => void)[] = [() => groundGeometry(usesSplatGround(lowGfx))];
+  const detail: 0 | 1 = lowGfx ? 0 : 1;
+  const crowns = fireAndFlyBackdropCrowns();
+  for (const near of [true, false]) {
+    const key = backdropKey(near, detail);
+    if (backdropGeometries.has(key)) continue;
+    const mine = crowns.filter((crown) => crown.near === near);
+    const pieces: THREE.BufferGeometry[] = [];
+    for (let from = 0; from < mine.length; from += BACKDROP_CROWNS_PER_WARM_STEP) {
+      const slice = mine.slice(from, from + BACKDROP_CROWNS_PER_WARM_STEP);
+      steps.push(() => {
+        if (backdropGeometries.has(key)) return;
+        for (const crown of slice) pieces.push(backdropCrownPiece(crown, detail));
+      });
+    }
+    steps.push(() => {
+      if (backdropGeometries.has(key)) {
+        for (const piece of pieces) piece.dispose();
+        return;
+      }
+      mergeBackdrop(key, pieces);
+    });
+  }
+  if (!lowGfx) {
+    steps.push(
+      () => grassSpots(grassStep()),
+      () => flowerSpots(),
+      () => grassMaterial(),
+      () => flowerMaterial(),
+    );
+  }
+  return steps;
 }
 
 /**
