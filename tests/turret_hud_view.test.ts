@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { turretPlanWireJson, turretStateWireJson } from '../server/turret_self_wire';
 import { decodeTurretPlan, decodeTurretSeat } from '../src/net/turret_session_wire';
 import {
+  TURRET_SCENARIO_HARD,
   TURRET_SCENARIO_INTRODUCTION,
   TURRET_SCENARIO_STANDARD,
 } from '../src/sim/content/fire_and_fly_scenarios';
@@ -121,11 +122,33 @@ describe('the turret HUD view', () => {
     const { labels } = new TurretHudView().tick(turretSessionView(seat()), START);
     expect(labels).toEqual({
       title: 'Fire and Fly',
+      trial: 'Standing Watch',
       meter: 'Tower integrity',
       caption: 'Tower',
       leave: 'Leave the tower',
       leaveShort: 'Leave',
     });
+  });
+
+  it.each([
+    [TURRET_SCENARIO_INTRODUCTION, "Recruit's Trial"],
+    [TURRET_SCENARIO_STANDARD, 'Standing Watch'],
+    [TURRET_SCENARIO_HARD, "Veterans' Test"],
+  ] as const)("names the %# seat's trial for the result card's kicker", (scenario, name) => {
+    const session = seat(START, resolveTurretPlan(scenario));
+    const view = new TurretHudView();
+    expect(view.tick(turretSessionView(session), START).labels.trial).toBe(name);
+    session.defense.phase = 'won';
+    session.defense.rev++;
+    const frame = view.tick(turretSessionView(session), START);
+    expect(frame.labels.trial).toBe(name);
+    expect(frame.labels.title).toBe('Fire and Fly');
+  });
+
+  it('falls back to the title for a scenario without a trial name', () => {
+    const plan = { ...resolveTurretPlan(), scenarioId: 'fire_and_fly_custom' };
+    const { labels } = new TurretHudView().tick(turretSessionView(seat(START, plan)), START);
+    expect(labels.trial).toBe('Fire and Fly');
   });
 
   it('shows the wave and the monsters left during a wave, with no aim hint', () => {

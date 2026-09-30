@@ -2,6 +2,7 @@ import type { TurretEvent } from '../../../sim/minigames/turret_defense';
 import type { TurretMedal } from '../../../sim/minigames/turret_result';
 import { TICK_RATE } from '../../../sim/types';
 import type { TurretSessionView } from '../../../world_api/vehicles';
+import { fireAndFlyTrialName } from '../../fire_and_fly_trial_view';
 import { formatNumber, getI18nRevision, type TranslationKey, t } from '../../i18n';
 import { TurretFeedbackReader } from './turret_feedback_reader_core';
 
@@ -42,8 +43,10 @@ export interface TurretHudResult {
 
 /** The seat's fixed words, resolved with the frame so a language change reaches them. */
 export interface TurretHudLabels {
-  /** The strip's accessible name and the result card's header. */
+  /** The strip's accessible name. */
   title: string;
+  /** The result card's kicker: the trial's name, the title for a scenario without one. */
+  trial: string;
   /** The integrity rail's accessible name. */
   meter: string;
   /** The integrity rail's visible caption. */
@@ -221,7 +224,7 @@ export class TurretHudView {
     pointRows: this.pointRows,
   };
   private readonly frame: TurretHudFrame = {
-    labels: { title: '', meter: '', caption: '', leave: '', leaveShort: '' },
+    labels: { title: '', trial: '', meter: '', caption: '', leave: '', leaveShort: '' },
     wave: '',
     slot: '',
     integrity: 1,
@@ -274,6 +277,7 @@ export class TurretHudView {
     const ended = defense.phase === 'won' || defense.phase === 'lost';
     const labels = frame.labels;
     labels.title = t('hudChrome.turret.title');
+    labels.trial = fireAndFlyTrialName(defense.plan.scenarioId) ?? labels.title;
     labels.meter = t('hudChrome.turret.integrity');
     labels.caption = t('hudChrome.turret.tower');
     labels.leave = t('hudChrome.turret.leave');

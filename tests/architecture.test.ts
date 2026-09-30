@@ -291,6 +291,7 @@ const UI_PURE_CORES = [
   'src/ui/world_quest_investigation_view.ts',
   'src/ui/world_quest_glider_view.ts',
   'src/ui/world_quest_fire_and_fly_view.ts',
+  'src/ui/fire_and_fly_trial_view.ts',
   'src/ui/world_quest_marker_anchor.ts',
   'src/ui/world_quest_puzzle_view.ts',
   'src/ui/world_quest_match3_view.ts',

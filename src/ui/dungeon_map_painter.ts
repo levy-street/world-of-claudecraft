@@ -13,6 +13,7 @@ import {
   type MapAnchor,
 } from './dungeon_map_view';
 import { dungeonDisplayName } from './entity_i18n';
+import { interiorMinimapLabel } from './fire_and_fly_trial_view';
 import type { PainterHostWriters } from './painter_host';
 
 const FULL_CIRCLE = Math.PI * 2;
@@ -291,7 +292,7 @@ export class DungeonMapPainter {
   ): void {
     const model = this.view.minimap(world, size, MINIMAP_BASE_SCALE * zoom);
     if (!model) return;
-    this.writers.setText(zoneLabelEl, dungeonDisplayName(model.dungeonId));
+    this.writers.setText(zoneLabelEl, interiorMinimapLabel(model.dungeonId, world.turretSession));
     const colors = this.resolveColors();
 
     ctx.clearRect(0, 0, size, size);

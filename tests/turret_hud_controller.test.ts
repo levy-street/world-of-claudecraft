@@ -249,7 +249,7 @@ it('unfolds the strip into a won result card', () => {
   expect(hud().classList.contains('ended')).toBe(true);
   const card = hud().querySelector<HTMLElement>('.turret-card')!;
   expect(card.classList.contains('won')).toBe(true);
-  expect(text('.turret-card-kicker')).toBe('Fire and Fly');
+  expect(text('.turret-card-kicker')).toBe('Standing Watch');
   expect(text('.turret-card-verdict')).toBe('Victory!');
   expect(live().textContent).toBe('Victory!');
 });

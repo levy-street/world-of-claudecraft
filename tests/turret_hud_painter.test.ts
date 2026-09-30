@@ -1,6 +1,9 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { TURRET_SCENARIO_INTRODUCTION } from '../src/sim/content/fire_and_fly_scenarios';
+import {
+  TURRET_SCENARIO_HARD,
+  TURRET_SCENARIO_INTRODUCTION,
+} from '../src/sim/content/fire_and_fly_scenarios';
 import { createTurretDefense } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { turretResult } from '../src/sim/minigames/turret_result';
@@ -137,6 +140,27 @@ describe('the turret HUD painter', () => {
     ]);
     leave.click();
     expect(onLeave).toHaveBeenCalledTimes(1);
+  });
+
+  it("heads the card with the seat's trial, written once, and the next seat's in turn", () => {
+    const { painter, writes, view } = rig();
+    painter.show(true);
+    const kicker = painter.strip.querySelector('.turret-card-kicker')!;
+    const standard = seat();
+    standard.defense.phase = 'won';
+    const first = turretSessionView(standard);
+    painter.paint(view.tick(first, START), 'Esc');
+    expect(kicker.textContent).toBe('Standing Watch');
+    expect(kicker.getAttribute('aria-hidden')).toBe('true');
+    expect(painter.strip.getAttribute('aria-label')).toBe('Fire and Fly');
+    writes.mockClear();
+    for (let i = 0; i < 10; i++) painter.paint(view.tick({ ...first }, START), 'Esc');
+    expect(writes).not.toHaveBeenCalled();
+    view.reset();
+    const hard = seat(resolveTurretPlan(TURRET_SCENARIO_HARD));
+    hard.defense.phase = 'lost';
+    painter.paint(view.tick(turretSessionView(hard), START), 'Esc');
+    expect(kicker.textContent).toBe("Veterans' Test");
   });
 
   it('names the medal beside its tinted disc and lists the points, then writes nothing more', () => {

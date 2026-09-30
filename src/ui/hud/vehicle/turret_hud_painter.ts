@@ -1,12 +1,12 @@
 // The Fire and Fly seat HUD's two roots: the status strip at the top centre (the wave,
 // the monsters left or the countdown, Leave), which unfolds into the result card (the
-// verdict, the medal, the run's stats and its points) when the defense ends, and the
-// tower's integrity rail at the bottom centre. Frames come from TurretHudView and every
-// write goes through the shared facet, so an unchanged frame writes nothing. Only Leave
-// takes the pointer (the stylesheet keeps the rest inert), so aim clicks and drags pass
-// through both roots. The polite live line is a third, visually hidden #ui child that
-// stays rendered while the roots hide: a region shown already filled is rarely spoken,
-// and Hide Interface spares only such children.
+// trial's name, the verdict, the medal, the run's stats and its points) when the
+// defense ends, and the tower's integrity rail at the bottom centre. Frames come from
+// TurretHudView and every write goes through the shared facet, so an unchanged frame
+// writes nothing. Only Leave takes the pointer (the stylesheet keeps the rest inert), so
+// aim clicks and drags pass through both roots. The polite live line is a third,
+// visually hidden #ui child that stays rendered while the roots hide: a region shown
+// already filled is rarely spoken, and Hide Interface spares only such children.
 import type { TurretMedal } from '../../../sim/minigames/turret_result';
 import type { PainterHostWriters } from '../../painter_host';
 import { TURRET_POINT_ROWS, TURRET_RESULT_ROWS, type TurretHudFrame } from './turret_hud_view';
@@ -164,7 +164,7 @@ export class TurretHudPainter {
     writers.setText(this.leaveLabel, ended ? labels.leave : labels.leaveShort);
     if (!result) return;
     writers.toggleClass(this.card, 'won', result.won);
-    writers.setText(this.kicker, labels.title);
+    writers.setText(this.kicker, labels.trial);
     writers.setText(this.verdict, result.verdict);
     for (let i = 0; i < this.rows.length; i++) {
       writers.setText(this.rows[i].label, result.rows[i].label);
