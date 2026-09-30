@@ -1,11 +1,13 @@
 // Authoritative session adapter. Private actors never enter the shared roster.
 import { VEHICLE_STATIONS } from './content/vehicle_stations';
 import { createGroundObject } from './entity';
+import { replayFireAndFlySeat } from './fire_and_fly_replay';
 import {
   CANNON_INTERMISSION_TICKS,
   CANNON_RETRY_TICKS,
   createCannonEncounter,
   fireCannon,
+  isCannonActionId,
   tickCannonEncounter,
 } from './minigames/cannon_encounter';
 import { beginCannonEndless } from './minigames/cannon_endless';
@@ -18,6 +20,7 @@ import {
   fireTurretSeat,
   type TurretSessionView,
   tickTurretSeat,
+  turretRunEnded,
   turretSessionView,
 } from './turret_defense_session';
 import {
@@ -142,13 +145,16 @@ export function useVehicleAction(
   const resolved = ctx.resolve(pid);
   const session = resolved?.meta.vehicle;
   if (!resolved || !session) return false;
-  if (session.kind === 'turret')
+  if (session.kind === 'turret') {
+    if (action === 'turret_replay')
+      return replayFireAndFlySeat(ctx, resolved.meta, resolved.e, session);
     return (
       action === 'turret_fire' && fireTurretSeat(ctx, resolved.meta, resolved.e, session, point)
     );
+  }
   const station = vehicleStationById(session.stationId);
   if (
-    action === 'turret_fire' ||
+    !isCannonActionId(action) ||
     !station ||
     !eligible(ctx, resolved.meta, resolved.e, station) ||
     session.cycle !== resolved.meta.worldQuestCycle ||
@@ -162,8 +168,12 @@ export function tickVehicle(ctx: SimContext, meta: PlayerMeta, player: Entity): 
   const session = meta.vehicle;
   if (!session) return;
   if (session.kind === 'turret') {
-    // A world quest run ends with its day, as the glider's flight does (no credit).
-    const dayOver = !!session.worldQuest && session.worldQuest.cycle !== meta.worldQuestCycle;
+    // A world quest run ends with its day, as the glider's flight does (no credit); an
+    // ended run stays on its roof for Replay, which starts on the new day.
+    const dayOver =
+      !!session.worldQuest &&
+      session.worldQuest.cycle !== meta.worldQuestCycle &&
+      !turretRunEnded(session);
     if (dayOver || !tickTurretSeat(ctx, meta, player, session)) leaveVehicle(ctx, meta.entityId);
     else if (session.defense.phase === 'won') completeWorldQuestTurret(ctx, meta, session);
     return;

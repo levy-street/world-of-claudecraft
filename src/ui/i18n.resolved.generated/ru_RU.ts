@@ -584,7 +584,9 @@ export const ru_RU: EnTranslations = {
       "pointsBowled": "Сбито с ног ({count})",
       "pointsTotal": "Всего очков",
       "leave": "Покинуть башню",
-      "leaveShort": "Покинуть"
+      "leaveShort": "Покинуть",
+      "replay": "Ещё раз",
+      "replayHint": "Пройти то же испытание ещё раз, не покидая башни. После получения сегодняшней награды повтор больше не награждается."
     },
     "warlock": {
       "doomLabel": "Осуждение",

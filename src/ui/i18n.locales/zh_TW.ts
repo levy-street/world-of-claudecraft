@@ -18034,6 +18034,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turret.pointsTotal': '總分',
   'hudChrome.turret.leave': '離開塔樓',
   'hudChrome.turret.leaveShort': '離開',
+  'hudChrome.turret.replay': '再來一次',
+  'hudChrome.turret.replayHint': '在塔上再次挑戰同一試煉。領取今日獎勵後，再次挑戰不再給予獎勵。',
   'hudChrome.leaderboard.tabWorldQuests': '世界任務',
   'hudChrome.leaderboard.wqBoardsLabel': '世界任務計分榜',
   'hudChrome.leaderboard.wqMedal': '獎牌',

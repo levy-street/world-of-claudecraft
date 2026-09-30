@@ -11,6 +11,7 @@ interface VehicleCommands {
 // Keyed by every non-cannon action, so tsc flags a `VehicleActionId` this router would drop.
 const SEAT_ACTIONS: Readonly<Record<Exclude<VehicleActionId, CannonActionId>, true>> = {
   turret_fire: true,
+  turret_replay: true,
 };
 
 function vehicleActionId(value: unknown): value is VehicleActionId {

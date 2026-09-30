@@ -108,6 +108,11 @@
   body.mobile-touch .turret-leave .ui-keycap {
     display: none;
   }
+  body.mobile-touch .turret-replay {
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+  }
   body.mobile-touch #turret-hud.ended {
     top: calc(18% + 44px);
     row-gap: 8px;

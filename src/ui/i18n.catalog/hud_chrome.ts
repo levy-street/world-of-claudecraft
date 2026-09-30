@@ -156,6 +156,10 @@ export const hudChromeStrings = {
     pointsTotal: 'Total points',
     leave: 'Leave the tower',
     leaveShort: 'Leave',
+    // The result card's second button: the same trial again, without leaving the tower.
+    replay: 'Replay',
+    replayHint:
+      "Play the same trial again from the tower. Once today's reward is earned, a replay pays no reward.",
   },
   warlock: {
     doomLabel: 'Condemnation',

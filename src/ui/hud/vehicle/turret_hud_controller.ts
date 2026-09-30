@@ -35,8 +35,13 @@ export const TURRET_HIT_OVERLAY_ID = 'turret-hit-vignette';
  * the XP rail step aside, and the vehicle bars' player-frame lift stays off.
  */
 export const TURRET_SEATED_CLASS = 'manning-turret';
+/** Replay aims at nothing; the command still carries a point, as every seat action does. */
+const REPLAY_POINT = { x: 0, z: 0 } as const;
 
-/** The Fire and Fly seat HUD: status strip, result card, tower rail, hit feedback and Leave. */
+/**
+ * The Fire and Fly seat HUD: status strip, result card, tower rail, hit feedback, Replay
+ * and Leave.
+ */
 export class TurretHudController {
   readonly aim: TurretAimCore;
   private readonly painter: TurretHudPainter;
@@ -58,7 +63,11 @@ export class TurretHudController {
     this.numbers = hooks.spawnFct
       ? new TurretDamageNumbers(hooks.spawnFct, () => performance.now())
       : null;
-    this.painter = new TurretHudPainter(writers, () => world.leaveVehicle());
+    this.painter = new TurretHudPainter(
+      writers,
+      () => world.leaveVehicle(),
+      () => world.useVehicleAction('turret_replay', REPLAY_POINT),
+    );
     this.hitVeil.id = TURRET_HIT_OVERLAY_ID;
     writers.setAttr(this.hitVeil, 'aria-hidden', 'true');
     writers.setDisplay(this.hitVeil, 'none');

@@ -584,7 +584,9 @@ export const ko_KR: EnTranslations = {
       "pointsBowled": "넘어뜨리기 ({count})",
       "pointsTotal": "총점",
       "leave": "탑에서 내려가기",
-      "leaveShort": "내려가기"
+      "leaveShort": "내려가기",
+      "replay": "다시 하기",
+      "replayHint": "탑 위에서 같은 시련에 다시 도전하기. 오늘의 보상을 받은 뒤에는 다시 도전해도 보상이 없습니다."
     },
     "warlock": {
       "doomLabel": "단죄",

@@ -26,10 +26,19 @@ function declarationsFor(css: string, selector: string): string {
 }
 
 describe('the Fire and Fly seat HUD stylesheet', () => {
-  it('keeps the strip and the rail pointer-inert, with Leave the one live target', () => {
+  it('keeps the strip and the rail pointer-inert, with Leave and Replay the live targets', () => {
     expect(declarationsFor(hud, `#${TURRET_HUD_ID}`)).toContain('pointer-events: none;');
     expect(declarationsFor(hud, `#${TURRET_RAIL_ID}`)).toContain('pointer-events: none;');
     expect(declarationsFor(hud, '.turret-leave')).toContain('pointer-events: auto;');
+    expect(declarationsFor(hud, '.turret-replay')).toContain('pointer-events: auto;');
+  });
+
+  it('centres Replay and Leave as one pair under the ended card', () => {
+    const ended = declarationsFor(hud, `#${TURRET_HUD_ID}.ended`);
+    expect(ended).toContain('grid-template-columns: minmax(0, 1fr) auto auto minmax(0, 1fr);');
+    expect(ended).toContain('grid-template-areas: "card card card card" ". replay leave .";');
+    expect(declarationsFor(hud, '.turret-replay')).toContain('grid-area: replay;');
+    expect(declarationsFor(hud, '.turret-replay')).not.toContain('justify-self');
   });
 
   it('seats the strip at the top centre and the rail on the action-rail width at the bottom', () => {
@@ -165,6 +174,9 @@ describe('the Fire and Fly seat HUD stylesheet', () => {
     expect(declarationsFor(mobile, 'body.mobile-touch .turret-leave .ui-keycap')).toBe(
       'display: none;',
     );
+    const replay = declarationsFor(mobile, 'body.mobile-touch .turret-replay');
+    expect(replay).toContain('min-width: 40px;');
+    expect(replay).toContain('height: 40px;');
     expect(declarationsFor(mobile, `body.mobile-touch #${TURRET_HUD_ID}.ended`)).toContain(
       'top: calc(18% + 44px);',
     );

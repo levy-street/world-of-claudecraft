@@ -384,6 +384,71 @@ it('shows the result card at the end and leaves through its large Leave button',
   expect(bar.aim.isActive()).toBe(false);
 });
 
+it('replays from the card: the seat action, then the new run fresh, nothing of the old one replayed', () => {
+  vi.mocked(sfx.playAt).mockClear();
+  const { world, bar, showBanner } = rig();
+  const fired = (session: TurretSession, tick: number) => {
+    session.nextFeedbackSeq = recordTurretFeedback(
+      session.feedback,
+      session.nextFeedbackSeq,
+      tick,
+      [
+        {
+          type: 'fired',
+          shotId: 1,
+          fromX: 0,
+          fromZ: 0,
+          x: 20,
+          y: 0,
+          z: 0,
+          flightTicks: 8,
+          impactTick: tick + 8,
+        },
+      ],
+    );
+  };
+  const ended = seat();
+  fired(ended, START);
+  ended.defense.phase = 'lost';
+  ended.defense.integrity = 0;
+  world.turretSession = turretSessionView(ended);
+  world.turretClock = START;
+  bar.update();
+  const replay = hud().querySelector<HTMLButtonElement>('.turret-replay')!;
+  expect(replay.style.display).toBe('');
+  expect(text('.turret-replay-label')).toBe('Replay');
+  const heard = vi.mocked(sfx.playAt).mock.calls.length;
+  const banners = showBanner.mock.calls.length;
+
+  replay.click();
+  expect(world.useVehicleAction).toHaveBeenCalledExactlyOnceWith('turret_replay', { x: 0, z: 0 });
+  expect(world.leaveVehicle).not.toHaveBeenCalled();
+
+  const next = seat();
+  next.defense = createTurretDefense(resolveTurretPlan(), { x: 0, z: 0 }, 6, START + 900);
+  world.turretSession = turretSessionView(next);
+  world.turretClock = START + 900;
+  bar.update();
+  expect(hud().style.display).toBe('');
+  expect(hud().classList.contains('ended')).toBe(false);
+  expect(replay.style.display).toBe('none');
+  expect(text('.turret-leave-label')).toBe('Leave');
+  expect(seatedClass()).toBe(true);
+  expect(vi.mocked(sfx.playAt).mock.calls.length).toBe(heard);
+  expect(showBanner.mock.calls.length).toBe(banners);
+
+  fired(next, START + 960);
+  world.turretSession = turretSessionView(next);
+  world.turretClock = START + 960;
+  bar.update();
+  expect(
+    vi
+      .mocked(sfx.playAt)
+      .mock.calls.slice(heard)
+      .map((call) => call[0]),
+  ).toEqual([TURRET_FIRE_SFX]);
+});
+
 it('drops a stale aim point when the seat changes', () => {
   const { world, bar } = rig();
   world.turretSession = turretSessionView(seat());

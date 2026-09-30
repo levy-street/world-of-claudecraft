@@ -13716,6 +13716,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.turret.pointsKills'
   | 'hudChrome.turret.pointsTotal'
   | 'hudChrome.turret.pointsTower'
+  | 'hudChrome.turret.replay'
+  | 'hudChrome.turret.replayHint'
   | 'hudChrome.turret.statAccuracy'
   | 'hudChrome.turret.statAirtime'
   | 'hudChrome.turret.statKills'

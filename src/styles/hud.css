@@ -382,8 +382,9 @@
      match-strip seat (the wave, the monsters left or the countdown, Leave) that unfolds
      into the result card when the defense ends, clear of the 28 percent banner lane, and
      the tower's integrity rail on the action-rail width at the bottom, where the XP rail
-     it hides sits. Only Leave takes the pointer: aim clicks and drags pass through the
-     rest. The strip keeps one width while its middle slot changes text. */
+     it hides sits. Only Leave and the card's Replay take the pointer: aim clicks and
+     drags pass through the rest. The strip keeps one width while its middle slot
+     changes text. */
   #turret-hud {
     position: absolute;
     top: 8px;
@@ -429,15 +430,21 @@
     height: var(--btn-h-lg);
     padding: 0 10px 0 18px;
   }
+  /* The card's Replay sits left of Leave; the empty outer columns centre the pair. */
+  .turret-replay {
+    grid-area: replay;
+    padding: 0 18px;
+    pointer-events: auto;
+  }
   .turret-card {
     display: none;
     grid-area: card;
   }
   #turret-hud.ended {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto auto minmax(0, 1fr);
     grid-template-areas:
-      "card"
-      "leave";
+      "card card card card"
+      ". replay leave .";
     row-gap: 12px;
     min-width: min(440px, calc(100% - 24px));
     padding: 12px 18px 16px;

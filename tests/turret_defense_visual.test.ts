@@ -1139,6 +1139,31 @@ describe('Fire and Fly monsters on screen', () => {
     visual.dispose();
   });
 
+  it("draws nothing of the ended run on a replayed seat's first frame", () => {
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0);
+    const state = engine(0);
+    const at = (x: number) => stillSegment(150, 40, { x, y: 0, z: 0 });
+    const monsters = [
+      wolf(state, { id: 1, hp: 40, state: 'rise', seg: at(4) }),
+      wolf(state, { id: 2, state: 'windup', seg: at(3) }),
+      wolf(state, { id: 3, hp: 0, state: 'dead', seg: at(12) }),
+    ];
+    const ended = { ...state, phase: 'lost' as const, monsters };
+    visual.update(viewOf(ended, [firedAt160]), 164, 0, 0.016);
+    expect(markers(visual).some((m) => m.visible)).toBe(true);
+    expect(groundMarkerSpots(visual).length).toBeGreaterThan(0);
+    expect(weaponDrawn(visual, 'shell')).toBe(1);
+
+    const replayed = createTurretDefense(state.plan, { x: 0, z: 0 }, 11, 900);
+    visual.update(viewOf(replayed), 900, 0, 0.016);
+    expect(markers(visual).filter((m) => m.visible)).toEqual([]);
+    expect(groundMarkerSpots(visual)).toHaveLength(0);
+    expect(weaponDrawn(visual, 'shell')).toBe(0);
+    expect(weaponDrawn(visual, 'flash')).toBe(0);
+    expect(visual.group.visible).toBe(true);
+    visual.dispose();
+  });
+
   it('draws no shot from an entry already stale when first read', () => {
     const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0);
     const state = engine(0);

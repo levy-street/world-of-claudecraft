@@ -18947,6 +18947,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turret.pointsTotal': '合計ポイント',
   'hudChrome.turret.leave': '塔を降りる',
   'hudChrome.turret.leaveShort': '降りる',
+  'hudChrome.turret.replay': 'もう一度',
+  'hudChrome.turret.replayHint':
+    '塔の上で同じ試練にもう一度挑む。本日の報酬を受け取った後の再挑戦では、報酬は得られない。',
   'hudChrome.leaderboard.tabWorldQuests': 'ワールドクエスト',
   'hudChrome.leaderboard.wqBoardsLabel': 'ワールドクエストのスコアボード',
   'hudChrome.leaderboard.wqMedal': 'メダル',

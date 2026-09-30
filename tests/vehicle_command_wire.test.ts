@@ -47,7 +47,27 @@ describe('vehicle command authority boundary', () => {
     );
   });
 
+  it('routes Replay as a seat action on the same command, for the authenticated player only', () => {
+    const sim = { enterVehicle: vi.fn(), useVehicleAction: vi.fn(), leaveVehicle: vi.fn() };
+    dispatchVehicleCommand(sim, 7, {
+      cmd: 'vehicle_action',
+      action: 'turret_replay',
+      x: 0,
+      z: 0,
+      pid: 99,
+      seed: 1234,
+    });
+    expect(sim.useVehicleAction).toHaveBeenCalledExactlyOnceWith(
+      'turret_replay',
+      { x: 0, z: 0 },
+      7,
+    );
+  });
+
   it.each([
+    { cmd: 'vehicle_action', action: 'turret_replay', x: 0 },
+    { cmd: 'vehicle_action', action: 'turret_Replay', x: 0, z: 0 },
+    { cmd: 'vehicle_replay', x: 0, z: 0 },
     { cmd: 'vehicle_enter', station: '__proto__' },
     { cmd: 'vehicle_action', action: 'constructor', x: 1, z: 2 },
     { cmd: 'vehicle_action', action: 'cannonball', x: NaN, z: 2 },

@@ -18906,6 +18906,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turret.pointsTotal': '총점',
   'hudChrome.turret.leave': '탑에서 내려가기',
   'hudChrome.turret.leaveShort': '내려가기',
+  'hudChrome.turret.replay': '다시 하기',
+  'hudChrome.turret.replayHint':
+    '탑 위에서 같은 시련에 다시 도전하기. 오늘의 보상을 받은 뒤에는 다시 도전해도 보상이 없습니다.',
   'hudChrome.leaderboard.tabWorldQuests': '전역 퀘스트',
   'hudChrome.leaderboard.wqBoardsLabel': '전역 퀘스트 점수판',
   'hudChrome.leaderboard.wqMedal': '메달',

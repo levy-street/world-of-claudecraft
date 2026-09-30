@@ -584,7 +584,9 @@ export const en_XA: EnTranslations = {
       "pointsBowled": "[Ɓóŵļéð óʋéŕ ({count})]",
       "pointsTotal": "[Ţóţáļ þóíñţš]",
       "leave": "[Ļéáʋé ţĥé ţóŵéŕ]",
-      "leaveShort": "[Ļéáʋé]"
+      "leaveShort": "[Ļéáʋé]",
+      "replay": "[Ŕéþļáý]",
+      "replayHint": "[Þļáý ţĥé šáɱé ţŕíáļ áĝáíñ ƒŕóɱ ţĥé ţóŵéŕ. Óñçé ţóðáý'š ŕéŵáŕð íš éáŕñéð, á ŕéþļáý þáýš ñó ŕéŵáŕð.]"
     },
     "warlock": {
       "doomLabel": "[Çóñðéɱñáţíóñ]",

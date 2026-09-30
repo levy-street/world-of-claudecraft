@@ -253,7 +253,12 @@ function isWorldQuestMinigame(quest: WorldQuestDef): boolean {
   return quest.objective.type === 'puzzle' || quest.objective.type === 'match3';
 }
 
-function resetCycleIfNeeded(ctx: SimContext, meta: PlayerMeta, resolvedCycle?: string): void {
+/** Moves the character onto the current world quest day, clearing the old day's rows. */
+export function resetCycleIfNeeded(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  resolvedCycle?: string,
+): void {
   const cycle = resolvedCycle ?? meta.devWorldQuestCycle ?? ctx.currentWorldQuestRotation().cycle;
   if (!cycle || meta.worldQuestCycle === cycle) return;
   const player = ctx.entities.get(meta.entityId);
@@ -437,52 +442,52 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
       meta.worldQuestAreas.delete(quest.id);
       continue;
     }
-    if (!existing) {
-      const progress: WorldQuestProgress = {
-        questId: quest.id,
-        count: 0,
-        state: 'active',
-      };
-      if (quest.objective.type === 'tracing')
-        progress.traceVariant = worldQuestTraceVariantForStudent(
-          meta.worldQuestCycle,
-          meta.entityId,
-        );
-      if (isWorldQuestMinigame(quest) && !meta.devWorldQuestCycle)
-        progress.puzzleDay = worldQuestCycleNumber(meta.worldQuestCycle) ?? 0;
-      if (
-        quest.objective.type === 'puzzle' ||
-        quest.objective.type === 'match3' ||
-        quest.objective.type === 'salvage'
-      ) {
-        const variants =
-          quest.objective.type === 'puzzle'
-            ? quest.objective.puzzles.length
-            : quest.objective.type === 'match3'
-              ? quest.objective.levels.length
-              : quest.objective.layouts.length;
-        progress.puzzleVariant = worldQuestPuzzleVariantForCycle(meta.worldQuestCycle, variants);
-      }
-      if (quest.objective.type === 'puzzle') {
-        const puzzle = beamPuzzle(quest, progress);
-        if (puzzle) progress.puzzleRotations = worldQuestPuzzleInitialRotations(puzzle);
-      } else if (quest.objective.type === 'match3') {
-        const level = match3Level(quest, progress);
-        if (level) {
-          progress.match3Board = worldQuestMatch3InitialBoard(level);
-          progress.match3Moves = 0;
-          progress.match3RefillIndex = 0;
-        }
-      }
-      meta.worldQuestLog.set(quest.id, progress);
-      ctx.emit({
-        type: 'worldQuestStarted',
-        questId: quest.id,
-        pid: meta.entityId,
-      });
-    }
+    if (!existing) mintWorldQuestRow(ctx, meta, quest);
     meta.worldQuestAreas.add(quest.id);
   }
+}
+
+/** Starts the character's row for `quest` on its current day, as the area sweep does. */
+export function mintWorldQuestRow(ctx: SimContext, meta: PlayerMeta, quest: WorldQuestDef): void {
+  const progress: WorldQuestProgress = {
+    questId: quest.id,
+    count: 0,
+    state: 'active',
+  };
+  if (quest.objective.type === 'tracing')
+    progress.traceVariant = worldQuestTraceVariantForStudent(meta.worldQuestCycle, meta.entityId);
+  if (isWorldQuestMinigame(quest) && !meta.devWorldQuestCycle)
+    progress.puzzleDay = worldQuestCycleNumber(meta.worldQuestCycle) ?? 0;
+  if (
+    quest.objective.type === 'puzzle' ||
+    quest.objective.type === 'match3' ||
+    quest.objective.type === 'salvage'
+  ) {
+    const variants =
+      quest.objective.type === 'puzzle'
+        ? quest.objective.puzzles.length
+        : quest.objective.type === 'match3'
+          ? quest.objective.levels.length
+          : quest.objective.layouts.length;
+    progress.puzzleVariant = worldQuestPuzzleVariantForCycle(meta.worldQuestCycle, variants);
+  }
+  if (quest.objective.type === 'puzzle') {
+    const puzzle = beamPuzzle(quest, progress);
+    if (puzzle) progress.puzzleRotations = worldQuestPuzzleInitialRotations(puzzle);
+  } else if (quest.objective.type === 'match3') {
+    const level = match3Level(quest, progress);
+    if (level) {
+      progress.match3Board = worldQuestMatch3InitialBoard(level);
+      progress.match3Moves = 0;
+      progress.match3RefillIndex = 0;
+    }
+  }
+  meta.worldQuestLog.set(quest.id, progress);
+  ctx.emit({
+    type: 'worldQuestStarted',
+    questId: quest.id,
+    pid: meta.entityId,
+  });
 }
 
 /** The plain keeper talk enters the maze on the Normal profile; the dialog's

@@ -10380,4 +10380,4 @@ export interface TurretWorldQuestRun {
 /** What `PlayerMeta.vehicle` holds: every seat gate keys on its presence, not its kind. */
 export type VehicleSeat = VehicleSession | TurretSession;
 
-export type VehicleActionId = CannonActionId | 'turret_fire';
+export type VehicleActionId = CannonActionId | 'turret_fire' | 'turret_replay';

@@ -19274,6 +19274,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turret.pointsTotal': 'Всего очков',
   'hudChrome.turret.leave': 'Покинуть башню',
   'hudChrome.turret.leaveShort': 'Покинуть',
+  'hudChrome.turret.replay': 'Ещё раз',
+  'hudChrome.turret.replayHint':
+    'Пройти то же испытание ещё раз, не покидая башни. После получения сегодняшней награды повтор больше не награждается.',
   'hudChrome.leaderboard.tabWorldQuests': 'Локальные задания',
   'hudChrome.leaderboard.wqBoardsLabel': 'Таблицы рекордов локальных заданий',
   'hudChrome.leaderboard.wqMedal': 'Медаль',

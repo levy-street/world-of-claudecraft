@@ -6,14 +6,17 @@ import {
   TURRET_DEFAULT_SCENARIO,
   TURRET_SCENARIOS,
 } from '../src/sim/content/fire_and_fly_scenarios';
+import { TURRET_TIMING } from '../src/sim/content/turret_defense';
 import { BUILTIN_WORLD, dungeonAt } from '../src/sim/data';
 import { type MotionSegment, positionAt } from '../src/sim/minigames/thrown_body';
+import { turretResult } from '../src/sim/minigames/turret_result';
 import { Sim } from '../src/sim/sim';
 import type { TurretDefenseView, TurretSessionView } from '../src/sim/turret_defense_session';
-import type { SimEvent, WorldContent } from '../src/sim/types';
+import type { SimEvent, TurretSession, WorldContent } from '../src/sim/types';
 import { turretClockFor, turretSessionFor } from '../src/sim/vehicles';
 import { groundHeight } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
+import { TurretFeedbackReader } from '../src/ui/hud/vehicle/turret_feedback_reader_core';
 
 const RUN_BOUND = 20 * 60 * 8;
 const TUR_BYTES_PER_SECOND_CEILING = 15_000;
@@ -268,6 +271,57 @@ describe('Fire and Fly online: the socket-free round trip', () => {
       events.map((e) => (e.type === 'turretDefense' ? e.seq : -1)),
     );
     expect(view.feedback.every((f) => f.seq > lastSeen)).toBe(true);
+  });
+
+  it('mirrors a Replay on the ended seat as a new seat: the old ring dropped, equal every tick', () => {
+    const { sim, pid } = serverPlayer();
+    const client = new WireClient(sim, pid);
+    const sent: Record<string, string> = {};
+    const step = () => {
+      for (const event of sim.tick()) if (event.pid === pid) client.route(event);
+      client.applyQuestSelfSnapshot(wirePass(sent, sim, pid), sim.time, sim.tickCount);
+      expectMirrors(client.turretSession, turretSessionFor(sim.ctx, pid));
+    };
+    sim.chat('/dev turret', pid);
+    for (let i = 0; i < 400; i++) step();
+    const before = sim.meta(pid)?.vehicle as TurretSession;
+    expect(client.turretSession?.feedback.length).toBeGreaterThan(0);
+
+    // The run ends as a breach would end it, and the card's reader has read it all.
+    const defense = before.defense;
+    defense.phase = 'lost';
+    defense.integrity = 0;
+    defense.shots = [];
+    defense.result = turretResult(defense.plan, defense);
+    defense.rev++;
+    step();
+    const reader = new TurretFeedbackReader();
+    reader.read(client.turretSession as TurretSessionView);
+    expect(client.turretSession?.defense.phase).toBe('lost');
+    const plan = sent.turp;
+
+    client.useVehicleAction('turret_replay', { x: 0, z: 0 });
+    const after = sim.meta(pid)?.vehicle as TurretSession;
+    expect(after).not.toBe(before);
+    step();
+    const view = client.turretSession as TurretSessionView;
+    expect(view.defense.startTick).toBe(after.defense.startTick);
+    expect(view.defense.startTick).not.toBe(defense.startTick);
+    expect(view.defense.phase).toBe('intro');
+    expect(view.feedback).toEqual([]);
+    expect(reader.read(view)).toEqual([]);
+    expect(reader.newSeat).toBe(true);
+    // Same scenario, same plan: the `turp` key never moves.
+    expect(sent.turp).toBe(plan);
+
+    const seqs: number[] = [];
+    for (let i = 0; i < TURRET_TIMING.introTicks + 200; i++) {
+      step();
+      for (const entry of reader.read(client.turretSession as TurretSessionView))
+        seqs.push(entry.seq);
+    }
+    expect(seqs.length).toBeGreaterThan(0);
+    expect(seqs).toEqual(seqs.map((_, i) => i + 1));
   });
 
   it("drops the first seat's ring when a spectator switches to another seated player", () => {

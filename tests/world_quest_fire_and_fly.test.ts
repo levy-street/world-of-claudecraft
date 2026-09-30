@@ -324,18 +324,23 @@ describe('the credit', () => {
     expect(sim.copper).toBe(paid);
   });
 
-  it('pays nothing for a win on the tick the day rolls over, then ends the seat', () => {
+  it('pays nothing for a win on the tick the day rolls over, and keeps the ended seat for Replay', () => {
     const { sim, meta } = atTheGate();
     const copper = sim.copper;
     sim.talkToNpc(FIRE_AND_FLY_NPC_ID);
-    turretSeat(meta).defense.phase = 'won';
+    const seat = turretSeat(meta);
+    seat.defense.phase = 'won';
     sim.resetDay = '2026-09-07';
     const events = sim.tick();
     expect(questDone(events)).toBe(0);
     expect(deedUnlocks(events)).toBe(0);
     expect(sim.copper).toBe(copper);
+    const later = [...sim.tick(), ...sim.tick()];
+    expect(questDone(later)).toBe(0);
+    expect(sim.copper).toBe(copper);
+    expect(meta.vehicle).toBe(seat);
+    sim.leaveVehicle();
     sim.tick();
-    expect(meta.vehicle ?? null).toBeNull();
     expect(meta.worldQuestLog.get(FIRE_AND_FLY_QUEST_ID)?.state).toBe('active');
   });
 

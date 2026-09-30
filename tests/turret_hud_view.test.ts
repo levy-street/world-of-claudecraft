@@ -118,7 +118,7 @@ describe('the turret HUD view', () => {
     expect(ended.result?.rows[TURRET_RESULT_ROWS - 1].value).toBe(`30/${intro.integrity}`);
   });
 
-  it('names the seat, its rail and its Leave button in the tower wording', () => {
+  it('names the seat, its rail and its Leave and Replay buttons in the tower wording', () => {
     const { labels } = new TurretHudView().tick(turretSessionView(seat()), START);
     expect(labels).toEqual({
       title: 'Fire and Fly',
@@ -127,6 +127,9 @@ describe('the turret HUD view', () => {
       caption: 'Tower',
       leave: 'Leave the tower',
       leaveShort: 'Leave',
+      replay: 'Replay',
+      replayHint:
+        "Play the same trial again from the tower. Once today's reward is earned, a replay pays no reward.",
     });
   });
 
@@ -418,6 +421,29 @@ describe('the turret HUD live line', () => {
     const frame = view.tick(turretSessionView(again), START);
     expect(frame.announce).toBe(intro);
     expect(TURRET_INTEGRITY_ALERTS).toEqual([0.5, 0.25]);
+  });
+
+  it('closes the card and announces the replayed run with no reset, its cursor starting over', () => {
+    const view = new TurretHudView();
+    const cursor = new TurretFeedbackCursor();
+    const lost = seat();
+    push(lost, START + 60, { type: 'waveStart', wave: 0, count: 8 });
+    lost.defense.phase = 'lost';
+    lost.defense.integrity = 0;
+    lost.defense.result = turretResult(lost.defense.plan, lost.defense);
+    push(lost, START + 400, endedEvent('lost'));
+    const lostView = turretSessionView(lost);
+    expect(view.tick(lostView, START + 400).result).not.toBeNull();
+    expect(cursor.consume(lostView)).toEqual({ text: 'The tower has fallen' });
+
+    const replayed = seat(START + 900);
+    const frame = view.tick(turretSessionView(replayed), START + 900);
+    expect(frame.result).toBeNull();
+    expect(frame.low).toBe(false);
+    expect(frame.announce).toBe(`First wave in ${TURRET_TIMING.introTicks / TICK_RATE} sec`);
+    expect(cursor.consume(turretSessionView(replayed))).toBeNull();
+    push(replayed, START + 960, { type: 'waveStart', wave: 0, count: 8 });
+    expect(cursor.consume(turretSessionView(replayed))).toEqual(firstWaveBanner);
   });
 });
 

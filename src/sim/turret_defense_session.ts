@@ -241,6 +241,56 @@ export function seatTurret(
   return null;
 }
 
+/** The seat's run is over (won or lost): the result card shows. */
+export function turretRunEnded(session: Pick<TurretSession, 'defense'>): boolean {
+  const phase = session.defense.phase;
+  return phase === 'won' || phase === 'lost';
+}
+
+/** Whether Replay may act: the run has ended and the player still stands on its roof. */
+export function turretSeatReplayable(
+  meta: PlayerMeta,
+  player: Entity,
+  session: TurretSession,
+): boolean {
+  return turretRunEnded(session) && stillSeated(meta, player, session);
+}
+
+/**
+ * Starts the ended seat's trial again on the same roof: a fresh run of the same
+ * plan from one world rng draw (keyed by the host's salt, as at the seat), the
+ * arena claim, the tower, the return point and the prior mount kept. The seat is
+ * a new object with an empty ring whose sequence starts again at 1 and a new
+ * start tick, so every mirror, cursor and memo keyed on the seat reads a new
+ * one. `worldQuest` is the replay's own context, decided by the caller under the
+ * current day's rules; a dev seat passes none.
+ */
+export function replayTurretSeat(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  session: TurretSession,
+  worldQuest?: Readonly<TurretWorldQuestRun>,
+): void {
+  const { origin } = session;
+  meta.vehicle = {
+    kind: 'turret',
+    origin: { ...origin },
+    defense: createTurretDefense(
+      session.defense.plan,
+      { x: origin.x, z: origin.z },
+      turretSessionSeed(ctx.rng.next()),
+      ctx.tickCount,
+      ctx.cfg.privateSalt,
+    ),
+    priorMountKey: session.priorMountKey,
+    returnTo: { ...session.returnTo },
+    feedback: [],
+    nextFeedbackSeq: 1,
+    ...(worldQuest ? { worldQuest: { ...worldQuest } } : {}),
+  };
+  meta.wireRev++;
+}
+
 /** False once the seat must end: the same eject rules as the cannon, on foot. */
 function stillSeated(meta: PlayerMeta, player: Entity, session: TurretSession): boolean {
   return (

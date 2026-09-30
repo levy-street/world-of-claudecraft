@@ -1,12 +1,13 @@
 // The Fire and Fly seat HUD's two roots: the status strip at the top centre (the wave,
 // the monsters left or the countdown, Leave), which unfolds into the result card (the
-// trial's name, the verdict, the medal, the run's stats and its points) when the
-// defense ends, and the tower's integrity rail at the bottom centre. Frames come from
-// TurretHudView and every write goes through the shared facet, so an unchanged frame
-// writes nothing. Only Leave takes the pointer (the stylesheet keeps the rest inert), so
-// aim clicks and drags pass through both roots. The polite live line is a third,
-// visually hidden #ui child that stays rendered while the roots hide: a region shown
-// already filled is rarely spoken, and Hide Interface spares only such children.
+// trial's name, the verdict, the medal, the run's stats and its points, then Replay
+// beside Leave) when the defense ends, and the tower's integrity rail at the bottom
+// centre. Frames come from TurretHudView and every write goes through the shared facet,
+// so an unchanged frame writes nothing. Only the two buttons take the pointer (the
+// stylesheet keeps the rest inert), so aim clicks and drags pass through both roots.
+// The polite live line is a third, visually hidden #ui child that stays rendered while
+// the roots hide: a region shown already filled is rarely spoken, and Hide Interface
+// spares only such children.
 import type { TurretMedal } from '../../../sim/minigames/turret_result';
 import type { PainterHostWriters } from '../../painter_host';
 import { TURRET_POINT_ROWS, TURRET_RESULT_ROWS, type TurretHudFrame } from './turret_hud_view';
@@ -74,6 +75,8 @@ export class TurretHudPainter {
   private readonly points = el('dl', 'turret-card-stats turret-card-points');
   private readonly rows: StatRowElements[];
   private readonly pointRows: StatRowElements[];
+  private readonly replay = el('button', 'turret-replay ui-btn ui-btn--lg');
+  private readonly replayLabel = el('span', 'turret-replay-label');
   private readonly leave = el('button', 'turret-leave ui-btn');
   private readonly leaveLabel = el('span', 'turret-leave-label');
   private readonly keycap = el('kbd', 'turret-leave-key ui-keycap');
@@ -84,11 +87,13 @@ export class TurretHudPainter {
   constructor(
     private readonly writers: PainterHostWriters,
     onLeave: () => void,
+    onReplay: () => void,
   ) {
     this.strip.id = TURRET_HUD_ID;
     this.rail.id = TURRET_RAIL_ID;
     this.live.id = TURRET_LIVE_ID;
     this.leave.type = 'button';
+    this.replay.type = 'button';
     writers.setAttr(this.live, 'role', 'status');
     writers.setAttr(this.live, 'aria-live', 'polite');
     writers.setAttr(this.live, 'aria-atomic', 'true');
@@ -100,7 +105,9 @@ export class TurretHudPainter {
     writers.setAttr(this.caption, 'aria-hidden', 'true');
     writers.setAttr(this.value, 'aria-hidden', 'true');
     this.leave.append(this.leaveLabel, this.keycap);
+    this.replay.append(this.replayLabel);
     this.leave.addEventListener('click', onLeave);
+    this.replay.addEventListener('click', onReplay);
     const divider = el('div', 'ui-divider');
     writers.setAttr(divider, 'aria-hidden', 'true');
     writers.setAttr(this.pointsDivider, 'aria-hidden', 'true');
@@ -118,7 +125,7 @@ export class TurretHudPainter {
       this.pointsDivider,
       this.points,
     );
-    this.strip.append(this.wave, this.slot, this.card, this.leave);
+    this.strip.append(this.wave, this.slot, this.card, this.replay, this.leave);
     const bevel = el('div', 'turret-rail-bevel ui-bevel');
     const ticks = el('div', 'ui-bevel-ticks');
     for (let i = 0; i < RAIL_SEGMENTS; i++) ticks.append(document.createElement('span'));
@@ -162,7 +169,10 @@ export class TurretHudPainter {
     writers.toggleClass(this.strip, 'ended', ended);
     writers.toggleClass(this.leave, 'ui-btn--lg', ended);
     writers.setText(this.leaveLabel, ended ? labels.leave : labels.leaveShort);
+    writers.setDisplay(this.replay, ended ? '' : 'none');
     if (!result) return;
+    writers.setText(this.replayLabel, labels.replay);
+    writers.setAttr(this.replay, 'title', labels.replayHint);
     writers.toggleClass(this.card, 'won', result.won);
     writers.setText(this.kicker, labels.trial);
     writers.setText(this.verdict, result.verdict);

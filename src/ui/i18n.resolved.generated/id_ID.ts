@@ -584,7 +584,9 @@ export const id_ID: EnTranslations = {
       "pointsBowled": "Bowled over ({count})",
       "pointsTotal": "Total points",
       "leave": "Leave the tower",
-      "leaveShort": "Leave"
+      "leaveShort": "Leave",
+      "replay": "Replay",
+      "replayHint": "Play the same trial again from the tower. Once today's reward is earned, a replay pays no reward."
     },
     "warlock": {
       "doomLabel": "Kecaman",

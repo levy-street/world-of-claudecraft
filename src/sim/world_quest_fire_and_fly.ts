@@ -16,7 +16,12 @@ import { createNpc } from './entity';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { seatTurret, type TurretSeatRefusal } from './turret_defense_session';
-import { type Entity, INTERACT_RANGE, type TurretScenarioDef } from './types';
+import {
+  type Entity,
+  INTERACT_RANGE,
+  type TurretScenarioDef,
+  type TurretWorldQuestRun,
+} from './types';
 import { playerActiveWorldQuests } from './world_quest_reroll';
 
 /** Why a start was refused: the seat's own reasons, plus the instructor's. */
@@ -97,17 +102,43 @@ function seatForTrial(
   )
     return 'range';
   mintRow?.();
+  const run = trialRun(meta);
+  if (!run) return 'offer';
+  return seatTurret(ctx, meta.entityId, scenario, undefined, run);
+}
+
+/**
+ * The run a trial seats for on the character's current day: practice once the day's
+ * row is completed, a paid run while it is today's active offer, null for neither.
+ */
+function trialRun(meta: PlayerMeta): TurretWorldQuestRun | null {
   const progress = meta.worldQuestLog.get(FIRE_AND_FLY_QUEST_ID);
   const practice = progress?.state === 'completed';
-  const offered =
-    progress?.state === 'active' &&
-    playerActiveWorldQuests(meta).some((quest) => quest.id === FIRE_AND_FLY_QUEST_ID);
-  if (!practice && !offered) return 'offer';
-  return seatTurret(ctx, meta.entityId, scenario, undefined, {
-    questId: FIRE_AND_FLY_QUEST_ID,
-    cycle: meta.worldQuestCycle,
-    practice,
-  });
+  const offered = progress?.state === 'active' && todaysOffer(meta);
+  if (!practice && !offered) return null;
+  return { questId: FIRE_AND_FLY_QUEST_ID, cycle: meta.worldQuestCycle, practice };
+}
+
+function todaysOffer(meta: PlayerMeta): boolean {
+  return playerActiveWorldQuests(meta).some((quest) => quest.id === FIRE_AND_FLY_QUEST_ID);
+}
+
+/**
+ * The run a Replay of an instructor's seat gets, by the start's rules on the day the
+ * caller reconciled: practice after the day's reward, else the day's paid run. A day
+ * that rolled over while the player sat in the arena has no row yet (the area sweep
+ * mints one only beside the instructor, where the player stood to be seated), so
+ * `mintRow` starts it here as the sweep would. Null when the character has no row to
+ * play.
+ */
+export function fireAndFlyReplayRun(
+  meta: PlayerMeta,
+  player: Entity,
+  mintRow: () => void,
+): TurretWorldQuestRun | null {
+  if (player.level < WORLD_QUEST_FIRE_AND_FLY.minLevel) return null;
+  if (!meta.worldQuestLog.has(FIRE_AND_FLY_QUEST_ID) && todaysOffer(meta)) mintRow();
+  return trialRun(meta);
 }
 
 /** The player's line for a refusal they can act on; the rest stay silent (the dialog never offers them). */

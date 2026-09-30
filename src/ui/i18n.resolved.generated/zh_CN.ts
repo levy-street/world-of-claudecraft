@@ -584,7 +584,9 @@ export const zh_CN: EnTranslations = {
       "pointsBowled": "撞倒（{count}）",
       "pointsTotal": "总分",
       "leave": "离开塔楼",
-      "leaveShort": "离开"
+      "leaveShort": "离开",
+      "replay": "再来一次",
+      "replayHint": "在塔上再次挑战同一试炼。领取今日奖励后，再次挑战不再给予奖励。"
     },
     "warlock": {
       "doomLabel": "谴罪",

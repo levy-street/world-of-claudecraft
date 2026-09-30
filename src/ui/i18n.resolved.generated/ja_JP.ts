@@ -584,7 +584,9 @@ export const ja_JP: EnTranslations = {
       "pointsBowled": "なぎ倒し（{count}）",
       "pointsTotal": "合計ポイント",
       "leave": "塔を降りる",
-      "leaveShort": "降りる"
+      "leaveShort": "降りる",
+      "replay": "もう一度",
+      "replayHint": "塔の上で同じ試練にもう一度挑む。本日の報酬を受け取った後の再挑戦では、報酬は得られない。"
     },
     "warlock": {
       "doomLabel": "断罪",

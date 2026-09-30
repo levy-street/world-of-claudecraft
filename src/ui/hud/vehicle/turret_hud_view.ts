@@ -55,6 +55,10 @@ export interface TurretHudLabels {
   leave: string;
   /** Leave's label on the strip. */
   leaveShort: string;
+  /** Replay's label on the result card. */
+  replay: string;
+  /** Replay's tooltip: what the button does. */
+  replayHint: string;
 }
 
 export interface TurretHudFrame {
@@ -224,7 +228,16 @@ export class TurretHudView {
     pointRows: this.pointRows,
   };
   private readonly frame: TurretHudFrame = {
-    labels: { title: '', trial: '', meter: '', caption: '', leave: '', leaveShort: '' },
+    labels: {
+      title: '',
+      trial: '',
+      meter: '',
+      caption: '',
+      leave: '',
+      leaveShort: '',
+      replay: '',
+      replayHint: '',
+    },
     wave: '',
     slot: '',
     integrity: 1,
@@ -282,6 +295,8 @@ export class TurretHudView {
     labels.caption = t('hudChrome.turret.tower');
     labels.leave = t('hudChrome.turret.leave');
     labels.leaveShort = t('hudChrome.turret.leaveShort');
+    labels.replay = t('hudChrome.turret.replay');
+    labels.replayHint = t('hudChrome.turret.replayHint');
     frame.wave = t('hudChrome.turret.wave', {
       wave: formatNumber(Math.min(defense.wave + 1, session.waveCount)),
       total: formatNumber(session.waveCount),

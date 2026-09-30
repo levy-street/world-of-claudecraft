@@ -53,10 +53,11 @@ function tints(line: HTMLElement): string[] {
 function rig() {
   const writes = vi.fn();
   const onLeave = vi.fn();
+  const onReplay = vi.fn();
   const writers = makeWriterFacet(new Map(), new Map(), new Map(), new Map(), writes, () => {});
-  const painter = new TurretHudPainter(writers, onLeave);
+  const painter = new TurretHudPainter(writers, onLeave, onReplay);
   document.body.append(painter.strip, painter.rail, painter.live);
-  return { painter, writes, onLeave, view: new TurretHudView() };
+  return { painter, writes, onLeave, onReplay, view: new TurretHudView() };
 }
 
 beforeEach(() => {
@@ -142,6 +143,43 @@ describe('the turret HUD painter', () => {
     expect(onLeave).toHaveBeenCalledTimes(1);
   });
 
+  it('offers Replay beside Leave only on the ended card, written once, and hides it for the replayed run', () => {
+    const { painter, writes, view, onReplay, onLeave } = rig();
+    painter.show(true);
+    const replay = painter.strip.querySelector<HTMLButtonElement>('.turret-replay')!;
+    const leave = painter.strip.querySelector<HTMLButtonElement>('.turret-leave')!;
+    expect(replay.type).toBe('button');
+    expect(replay.classList.contains('ui-btn')).toBe(true);
+    expect(replay.classList.contains('ui-btn--lg')).toBe(true);
+    expect(replay.nextElementSibling).toBe(leave);
+    painter.paint(view.tick(turretSessionView(seat()), START), 'Esc');
+    expect(replay.style.display).toBe('none');
+
+    const lost = turretSessionView(ended('lost', 0));
+    painter.paint(view.tick(lost, START), 'Esc');
+    expect(replay.style.display).toBe('');
+    expect(replay.textContent).toBe('Replay');
+    expect(replay.getAttribute('title')).toBe(
+      "Play the same trial again from the tower. Once today's reward is earned, a replay pays no reward.",
+    );
+    expect(leave.querySelector('.turret-leave-label')!.textContent).toBe('Leave the tower');
+    writes.mockClear();
+    for (let i = 0; i < 10; i++) painter.paint(view.tick(lost, START + i), 'Esc');
+    expect(writes).not.toHaveBeenCalled();
+    replay.click();
+    expect(onReplay).toHaveBeenCalledTimes(1);
+    expect(onLeave).not.toHaveBeenCalled();
+
+    // The replayed run: a new seat in its intro, the strip back and Replay gone.
+    const next = seat();
+    next.defense = createTurretDefense(next.defense.plan, { x: 0, z: 0 }, 8, START + 900);
+    painter.paint(view.tick(turretSessionView(next), START + 900), 'Esc');
+    expect(replay.style.display).toBe('none');
+    expect(painter.strip.classList.contains('ended')).toBe(false);
+    expect(leave.querySelector('.turret-leave-label')!.textContent).toBe('Leave');
+    expect(painter.live.textContent).toBe('First wave in 3 sec');
+  });
+
   it("heads the card with the seat's trial, written once, and the next seat's in turn", () => {
     const { painter, writes, view } = rig();
     painter.show(true);
@@ -221,7 +259,7 @@ describe('the turret HUD painter', () => {
 
   it('keeps the live line outside both roots, rendered and empty while they hide', () => {
     const writers = makeWriterFacet(new Map(), new Map(), new Map(), new Map(), vi.fn(), () => {});
-    const painter = new TurretHudPainter(writers, vi.fn());
+    const painter = new TurretHudPainter(writers, vi.fn(), vi.fn());
     const live = painter.live;
     expect(live.id).toBe(TURRET_LIVE_ID);
     expect(live.getAttribute('role')).toBe('status');
