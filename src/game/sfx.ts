@@ -10,6 +10,7 @@
 // pool of persistent looping sources for ambience and sustained spell casts.
 
 import { apiUrl } from '../client_origin';
+import { GFX } from '../render/gfx';
 import { ABILITIES } from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { isAbilityMomentRecorded } from './ability_sfx_coverage';
@@ -30,6 +31,12 @@ import {
   SFX_RUNTIME_PACK_URL,
   type SfxEntry,
 } from './sfx_manifest.generated';
+import {
+  audioBufferBytes,
+  isSfxClipEvictable,
+  type SfxResidencyLedger,
+  sfxResidencyFor,
+} from './sfx_residency_core';
 import { loadRuntimeSfxPack } from './sfx_runtime_pack';
 import { type WaterElementalCue, waterElementalSamples } from './water_elemental_audio';
 
@@ -188,6 +195,7 @@ export interface PlayOpts {
 
 interface LoopSlot {
   key: string;
+  cacheKey: string;
   src: AudioBufferSourceNode;
   gain: GainNode;
   panner: PannerNode | null;
@@ -240,6 +248,10 @@ class Sfx {
   private clips: Record<string, SfxEntry> = SFX_CLIPS;
   private clipsReady: Promise<void> | null = null;
   private buffers = new Map<string, AudioBuffer>();
+  // A byte budget over decoded cosmetic clips (pinned clips never count), LRU
+  // eviction of idle ones; null (unbounded) off the iOS memory profile. See
+  // sfx_residency_core.ts.
+  private residency: SfxResidencyLedger | null = null;
   private loading = new Map<string, Promise<AudioBuffer | null>>();
   private failedLoads = new Set<string>();
   private pendingOneShots = new Set<string>();
@@ -316,6 +328,7 @@ class Sfx {
       this.master = this.ctx.createGain();
       this.master.gain.value = SAMPLE_GAIN * this.vol;
       this.master.connect(this.ctx.destination);
+      this.residency = sfxResidencyFor(GFX);
       resumeWhenAllowed(this.ctx);
       const l = this.ctx.listener;
       if (l.upX) {
@@ -414,6 +427,7 @@ class Sfx {
         // without another lossy asset transcode.
         const buf = retainDecodedBuffer(ctx, decoded, entry.spatial);
         this.buffers.set(cacheKey, buf);
+        this.trackResidency(key, cacheKey, buf);
         return buf;
       } catch {
         this.failedLoads.add(cacheKey);
@@ -424,6 +438,25 @@ class Sfx {
     })();
     this.loading.set(cacheKey, request);
     return request;
+  }
+
+  private trackResidency(key: string, cacheKey: string, buf: AudioBuffer): void {
+    const residency = this.residency;
+    if (!residency) return;
+    residency.record(cacheKey, audioBufferBytes(buf), isSfxClipEvictable(key, this.entry(key)));
+    for (const dropped of residency.evict((held) => this.residencyHeld(held))) {
+      this.buffers.delete(dropped);
+    }
+  }
+
+  /** A clip a pending one-shot or loop is about to start, or still loading. */
+  private residencyHeld(cacheKey: string): boolean {
+    if (this.pendingOneShots.has(cacheKey) || this.loading.has(cacheKey)) return true;
+    for (const [id, pending] of this.pendingLoops) {
+      const variant = this.pendingLoopVariants.get(id) ?? 0;
+      if (assetCacheKey(pending.key, variant) === cacheKey) return true;
+    }
+    return false;
   }
 
   private async preloadStartup(): Promise<void> {
@@ -691,8 +724,10 @@ class Sfx {
     }
     src.connect(g).connect(panner).connect(master);
     this.active++;
+    this.residency?.acquire(cacheKey);
     src.onended = () => {
       this.active--;
+      this.residency?.release(cacheKey);
       if (opts?.voiceKey && this.keyedOneShots.get(opts.voiceKey)?.src === src) {
         this.keyedOneShots.delete(opts.voiceKey);
       }
@@ -842,8 +877,10 @@ class Sfx {
     g.gain.value = peak;
     src.connect(g).connect(master);
     this.active++;
+    this.residency?.acquire(cacheKey);
     src.onended = () => {
       this.active--;
+      this.residency?.release(cacheKey);
       src.disconnect();
       g.disconnect();
     };
@@ -948,10 +985,12 @@ class Sfx {
       if (panner) src.connect(g).connect(panner).connect(master);
       else src.connect(g).connect(master);
       src.start();
+      this.residency?.acquire(cacheKey);
       this.commitVariant(key, variantIndex);
       this.pendingLoopVariants.delete(id);
       slot = {
         key,
+        cacheKey,
         src,
         gain: g,
         panner,
@@ -1004,6 +1043,7 @@ class Sfx {
       } catch {
         /* already stopped */
       }
+      this.residency?.release(slot.cacheKey);
       slot.src.disconnect();
       slot.gain.disconnect();
       slot.panner?.disconnect();
@@ -1018,6 +1058,7 @@ class Sfx {
         } catch {
           /* already stopped */
         }
+        this.residency?.release(slot.cacheKey);
         src.disconnect();
         slot.gain.disconnect();
         slot.panner?.disconnect();
