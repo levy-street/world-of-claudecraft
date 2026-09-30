@@ -32,6 +32,7 @@ import { type NoticeboardDef, noticeboardDefByEntityId } from './content/noticeb
 import { currentRealmBuilder, pastRealmBuilders } from './content/realm_builders';
 import { FORGE_INTERACT_RANGE } from './content/world_quest_forging';
 import { corpseInteractionAvailability } from './corpse_interaction';
+import { bodyPoolSharedWithParty, isLootableBody } from './corpse_loot_state';
 import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
 import * as deedsMod from './deeds';
 import {
@@ -92,7 +93,9 @@ function corpseLootRights(
   entityId: number,
   ffaUnlocked: boolean,
 ): { shared: boolean; personal: boolean; open: boolean } {
-  const tapperParty = mob.tappedById !== null ? ctx.partyOf(mob.tappedById) : null;
+  // A World PvP body's gold is the killing blow's alone (bodyPoolSharedWithParty).
+  const tapperParty =
+    mob.tappedById !== null && bodyPoolSharedWithParty(mob) ? ctx.partyOf(mob.tappedById) : null;
   const shared = computeSharedLootRights(
     entityId,
     mob.tappedById,
@@ -128,6 +131,8 @@ export function lootCorpse(
   }
   const mob = ctx.entities.get(mobId);
   if (!mob?.lootable || !mob.loot || corpseHasDecayed(mob.dead, mob.corpseTimer)) return false;
+  // A player is looted only as a body (World PvP spoils), never standing up.
+  if (mob.kind === 'player' && !mob.dead) return false;
   // owner-lock lapses LOOT_FFA_DELAY after the corpse became lootable: then anyone may
   // loot. The flag is threaded into distribution too, so an outside looter keeps what
   // they take instead of it being split by the absent tapping party's strategies.
@@ -190,7 +195,14 @@ export function lootCorpse(
       if (s.instance) {
         ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId, s.count);
       } else {
-        ctx.addItem(s.itemId, s.count, meta.entityId);
+        // A provenance-tracked slot (a World PvP skull naming its victim) keeps
+        // its per-unit source buckets on the way into the bag.
+        ctx.addItem(
+          s.itemId,
+          s.count,
+          meta.entityId,
+          s.materialSources ? { materialSources: s.materialSources } : undefined,
+        );
       }
       s.personalFor = s.personalFor.filter((id) => id !== meta.entityId);
       tookPersonal = true;
@@ -464,7 +476,7 @@ export function interact(
       dist2d(p.pos, target.pos) <=
         (forgeStationForEntity(target) ? FORGE_INTERACT_RANGE : INTERACT_RANGE + 2)
     ) {
-      if (target.kind === 'mob' && target.lootable) {
+      if (isLootableBody(target) || (target.kind === 'mob' && target.lootable)) {
         const availability = corpseInteractionAvailability(ctx, target, p.id, true);
         if (availability.hasLoot) {
           // Ordinary interaction never spends the independent harvest claim.
@@ -547,7 +559,7 @@ export function interact(
   let bestQuestD2 = INTERACT_RANGE * INTERACT_RANGE;
   ctx.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE, (e, d2) => {
     if (
-      e.kind === 'mob' &&
+      (e.kind === 'mob' || isLootableBody(e)) &&
       e.lootable &&
       corpseInteractionAvailability(ctx, e, p.id, true).hasLoot &&
       d2 < bestCorpseD2

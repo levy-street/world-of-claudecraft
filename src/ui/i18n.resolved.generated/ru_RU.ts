@@ -2802,6 +2802,8 @@ export const ru_RU: EnTranslations = {
       "markLine": "Атака игрока без флага поднимает ваш собственный флаг; атака игрока с флагом не поднимает его никогда.",
       "aidLine": "Исцеление, щит или усиление игрока с флагом в мировом бою поднимает и ваш флаг.",
       "stakeLine": "Проигравший платит {cap} или {percent}% от своего кошелька, в зависимости от того, что меньше.",
+      "spoilsLine": "Если у обоих поднят флаг, золото нанёсшего смертельный удар падает на тело вместе с черепом проигравшего.",
+      "skullName": "Череп игрока {name}",
       "noStakeLine": "Игрок без флага, погибший на территории свободного боя, не теряет золота.",
       "noTakeLine": "Боец без флага тоже не получает золота: оно переходит только между двумя игроками с флагом.",
       "honorLine": "{honor} Чести за убийство, разделённых между всеми, кто помог.",
@@ -4436,6 +4438,7 @@ export const ru_RU: EnTranslations = {
       "perfectedBadge": "Доведён до совершенства",
       "perfectingRank": "Совершенствование: ранг {rank} из {ranks}",
       "materialSourceGatherer": "{count} × Сборщик: {name}",
+      "trophySkullSource": "{count} × Взят у игрока {name}",
       "materialSourceGathererSigned": "{count} × Сборщик: {name}, подпись: {signer}",
       "materialSourceUnrecorded": "{count} × Сборщик не указан",
       "materialSourceUnrecordedSigned": "{count} × Сборщик не указан, подпись: {name}",
@@ -18933,6 +18936,9 @@ export const ru_RU: EnTranslations = {
       },
       "emissary_cache": {
         "name": "Тайник эмиссара"
+      },
+      "pvp_trophy_skull": {
+        "name": "Трофейный череп"
       },
       "clue_scroll": {
         "name": "Свиток с подсказкой"

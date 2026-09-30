@@ -175,8 +175,20 @@ function flag(sim: Sim, pid: number, on = true): void {
   sim.setWorldPvpFlag(on, pid);
 }
 
-/** A lethal hit through the real damage hub (the same path every cast ends in). */
+/** A lethal hit through the real damage hub (the same path every cast ends in),
+ *  then the killing blow claims whatever dropped on the body (the World PvP
+ *  spoils, src/sim/pvp/world_pvp_spoils.ts) through the real corpse loot path,
+ *  so the purse assertions read the whole kill. `slayOnly` leaves the drop on
+ *  the body for the spoils block below, which reads it directly. */
 function slay(sim: Sim, killerPid: number, victimPid: number): void {
+  const killer = ent(sim, killerPid);
+  const victim = ent(sim, victimPid);
+  sim.ctx.dealDamage(killer, victim, victim.hp + 1_000, false, 'physical', 'Mortal Strike', 'hit');
+  if (victim.lootable) sim.lootCorpse(victimPid, killerPid);
+}
+
+/** The lethal hit alone: the spoils stay on the body. */
+function slayOnly(sim: Sim, killerPid: number, victimPid: number): void {
   const killer = ent(sim, killerPid);
   const victim = ent(sim, victimPid);
   sim.ctx.dealDamage(killer, victim, victim.hp + 1_000, false, 'physical', 'Mortal Strike', 'hit');
@@ -503,7 +515,11 @@ describe('kill resolution: the stake and the honor pool', () => {
     expect(honorEvents(sim, a)).toEqual([
       { type: 'honor', pid: a, amount: 10, reason: 'world_kill' },
     ]);
-    expect(logLines(sim, a)).toContain('You defeat Bet and take 20s from their purse.');
+    // Both flagged: the blow's share dropped on the body and was looted there.
+    expect(logLines(sim, a)).toEqual(['You defeat Bet.', "Loot Bet's body to claim your spoils."]);
+    expect(
+      sim.events.some((ev) => ev.type === 'loot' && ev.pid === a && ev.text === 'You loot 20s.'),
+    ).toBe(true);
     expect(logLines(sim, b)).toContain('Aleph defeats you and takes 20s from your purse.');
     expect(sim.worldPvpInfoFor(a)).toMatchObject({ kills: 1, deaths: 0 });
     expect(sim.worldPvpInfoFor(b)).toMatchObject({ kills: 0, deaths: 1 });
@@ -515,7 +531,9 @@ describe('kill resolution: the stake and the honor pool', () => {
     slay(sim, a, b);
     expect(sim.meta(b)!.copper).toBe(950_000);
     expect(sim.meta(a)!.copper).toBe(50_000);
-    expect(logLines(sim, a)).toContain('You defeat Bet and take 5g from their purse.');
+    expect(
+      sim.events.some((ev) => ev.type === 'loot' && ev.pid === a && ev.text === 'You loot 5g.'),
+    ).toBe(true);
   });
 
   it('a broke victim pays nothing but the honor still flows', () => {

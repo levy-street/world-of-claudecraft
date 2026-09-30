@@ -809,8 +809,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.record': '戦績：撃破{kills}、死亡{deaths}',
   'hudChrome.worldPvp.repeatLine':
     '同じプレイヤーを繰り返し倒すと、2回目は{second}、3回目は{third}、以降は何も得られません。カウントは最初の撃破から{reset}後にリセットされます。',
+  'hudChrome.worldPvp.skullName': '{name}の頭蓋骨',
   'hudChrome.worldPvp.splitLine':
     '純粋な1対1なら報酬を独占できます。加勢した仲間とそのヒーラーは分配します。',
+  'hudChrome.worldPvp.spoilsLine':
+    '双方がフラグを立てている場合、とどめを刺した者の取り分の金貨が敗者の頭蓋骨と共に遺体に落ちます。',
   'hudChrome.worldPvp.stakeLine': '敗者は所持金の{percent}か{cap}のうち、少ない方を支払います。',
   'hudChrome.worldPvp.statusDisarming':
     'フラグは{time}後、または現在の戦闘が終わり次第下がります。',
@@ -18320,6 +18323,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // Intentional gathering PR2: material provenance and source controls (M16 fills).
   'hudChrome.materialStackSelectionUnavailable': 'この素材の選択は利用できなくなりました。',
   'hudChrome.itemTooltip.materialSourceGatherer': '{count} × {name}が採集',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × {name}から奪取',
   'hudChrome.itemTooltip.materialSourceGathererSigned': '{count} × {name}が採集、{signer}が署名',
   'hudChrome.itemTooltip.materialSourceUnrecorded': '{count} × 採集者の記録なし',
   'hudChrome.itemTooltip.materialSourceUnrecordedSigned':
@@ -18515,6 +18519,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.rift_watchers_band.name': '裂け目の監視者の指輪',
   'entities.items.rift_surveyors_satchel.name': '裂け目測量士の鞄',
   'entities.items.emissary_cache.name': '使者の宝箱',
+  'entities.items.pvp_trophy_skull.name': '戦利品の頭蓋骨',
   'entities.npcs.weekly_emissary.name': 'チャム・ピート',
   'entities.npcs.weekly_emissary.title': '使者',
   'entities.npcs.weekly_emissary.greeting':

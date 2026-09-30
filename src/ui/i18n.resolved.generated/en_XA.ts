@@ -2802,6 +2802,8 @@ export const en_XA: EnTranslations = {
       "markLine": "[Áţţáçķíñĝ áñ úñƒļáĝĝéð þļáýéŕ ţĥéŕé ŕáíšéš ýóúŕ óŵñ ƒļáĝ; áţţáçķíñĝ á ƒļáĝĝéð óñé ñéʋéŕ ðóéš.]",
       "aidLine": "[Ĥéáļíñĝ, šĥíéļðíñĝ óŕ ƀúƒƒíñĝ á ƒļáĝĝéð þļáýéŕ íñ á ŵóŕļð ƒíĝĥţ ŕáíšéš ýóúŕ ƒļáĝ.]",
       "stakeLine": "[Ţĥé ļóšéŕ þáýš {cap} óŕ {percent} óƒ ţĥéíŕ þúŕšé, ŵĥíçĥéʋéŕ íš ļéšš.]",
+      "spoilsLine": "[Ŵĥéñ ƀóţĥ óƒ ýóú áŕé ƒļáĝĝéð, ţĥé ķíļļíñĝ ƀļóŵ'š ĝóļð ðŕóþš óñ ţĥé ƀóðý ŵíţĥ ţĥé ļóšéŕ'š šķúļļ.]",
+      "skullName": "[{name}'š Šķúļļ]",
       "noStakeLine": "[Áñ úñƒļáĝĝéð þļáýéŕ ķíļļéð óñ ƒŕéé-ƒóŕ-áļļ ĝŕóúñð ļóšéš ñó ĝóļð.]",
       "noTakeLine": "[Áñ úñƒļáĝĝéð ƒíĝĥţéŕ ţáķéš ñó ĝóļð éíţĥéŕ: íţ óñļý ɱóʋéš ƀéţŵééñ ţŵó ƒļáĝĝéð þļáýéŕš.]",
       "honorLine": "[{honor} Ĥóñóŕ þéŕ ķíļļ, šþļíţ ƀéţŵééñ éʋéŕýóñé ŵĥó ĥéļþéð.]",
@@ -4436,6 +4438,7 @@ export const en_XA: EnTranslations = {
       "perfectedBadge": "[Þéŕƒéçţéð]",
       "perfectingRank": "[Þéŕƒéçţíñĝ: ŕáñķ {rank} óƒ {ranks}]",
       "materialSourceGatherer": "[{count} × Çóļļéçţéð ƀý {name}]",
+      "trophySkullSource": "[{count} × Ţáķéñ ƒŕóɱ {name}]",
       "materialSourceGathererSigned": "[{count} × Çóļļéçţéð ƀý {name}, šíĝñéð ƀý {signer}]",
       "materialSourceUnrecorded": "[{count} × Ñó ĝáţĥéŕéŕ ŕéçóŕðéð]",
       "materialSourceUnrecordedSigned": "[{count} × Ñó ĝáţĥéŕéŕ ŕéçóŕðéð, šíĝñéð ƀý {name}]",
@@ -18933,6 +18936,9 @@ export const en_XA: EnTranslations = {
       },
       "emissary_cache": {
         "name": "[Éɱíššáŕý'š Çáçĥé]"
+      },
+      "pvp_trophy_skull": {
+        "name": "[Ţŕóþĥý Šķúļļ]"
       },
       "clue_scroll": {
         "name": "[Çļúé Šçŕóļļ]"

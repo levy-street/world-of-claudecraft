@@ -1469,7 +1469,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   if (includeAuras && e.auras.length > 0) {
     out.auras = e.auras.map(wireAura);
   }
-  if (e.kind === 'mob' && e.lootable && e.loot) {
+  if ((e.kind === 'mob' || e.kind === 'player') && e.lootable && e.loot) {
     out.lootList = { copper: e.loot.copper, items: e.loot.items };
   }
   return out;

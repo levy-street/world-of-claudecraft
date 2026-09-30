@@ -17,6 +17,8 @@
 // zone loses nothing) and pays a share of the honor pool to everyone who
 // worked for it: the killing blow, everyone who damaged the victim inside the
 // assist window, and every healer who kept one of those damagers standing.
+// When the killing blow is flagged too, its gold share DROPS on the body with
+// the victim's trophy skull instead (world_pvp_spoils.ts).
 // Healing, shielding or buffing a flagged player who is in a world fight
 // raises the caster's own flag first (the classic rule), so nobody can carry a
 // fight from behind a flag they do not wear. The books that remember who hit,
@@ -60,6 +62,7 @@ import {
   worldPvpStake,
   worldPvpVictimIsGrey,
 } from './world_pvp_rules';
+import { placeWorldPvpSpoils, sweepWorldPvpSpoils, worldPvpSpoilsLine } from './world_pvp_spoils';
 import { worldPvpZonePolicyAt } from './world_pvp_zones';
 
 /** The authoritative per-character flag state (PlayerMeta.worldPvp). */
@@ -121,6 +124,12 @@ export interface WorldPvpBooks {
    *  enter/leave notices fire once per crossing. Rows of players who left the
    *  world are dropped. */
   zoneOf: Map<number, WorldPvpZonePolicy>;
+  /** victim pid -> killer pid for every body holding World PvP spoils
+   *  (world_pvp_spoils.ts): the killing blow's gold and the victim's skull,
+   *  waiting to be looted. A row leaves the moment the body is settled
+   *  (release, revive, or the zone pass noticing it stood up or left), so it
+   *  is bounded by the flagged players lying dead with spoils right now. */
+  spoils: Map<number, number>;
   /** The earliest pending disarm (sim time), Infinity when nobody is switching
    *  off: the per-tick pass is skipped entirely until then, so a realm with no
    *  countdown running pays one comparison per tick, not a roster walk. */
@@ -141,6 +150,7 @@ export function newWorldPvpBooks(): WorldPvpBooks {
     paidDeaths: new Set(),
     killsByPair: new Map(),
     zoneOf: new Map(),
+    spoils: new Map(),
     nextDisarmAt: Number.POSITIVE_INFINITY,
     zonePassTick: Number.NEGATIVE_INFINITY,
     sweptAtTick: 0,
@@ -373,6 +383,9 @@ export function updateWorldPvp(ctx: SimContext): void {
     // WARFARE Vitality rides this pass but not the world switch: battlegrounds
     // and arenas grant it on a realm with world PvP turned off too.
     updatePvpVitality(ctx);
+    // Spoils ride the zone pass but not the world switch either: a body that
+    // dropped spoils before an operator flipped the switch still settles.
+    sweepWorldPvpSpoils(ctx);
     if (!ctx.worldPvpDisabled) noticeZoneChanges(ctx, books);
   }
   if (ctx.tickCount - books.sweptAtTick >= SWEEP_TICKS) {
@@ -693,9 +706,17 @@ export function worldPvpOnPlayerDeath(
     const honorShare = Math.floor((honor.share + (isKiller ? honor.killerBonus : 0)) * c.mult);
     notePairKill(ctx, c.meta, victimMeta);
     ensureState(c.meta).kills++;
-    c.meta.copper += goldShare;
     taken += goldShare;
-    notice(ctx, c.e.id, worldPvpKillLine(victim.name, goldShare, n));
+    if (isKiller && victim.pvpFlag && c.e.pvpFlag) {
+      // Both flagged: the killing blow's share DROPS on the body beside the
+      // victim's skull (world_pvp_spoils.ts), to be looted like any corpse.
+      placeWorldPvpSpoils(ctx, victim, c.e, goldShare);
+      notice(ctx, c.e.id, worldPvpKillLine(victim.name, 0, n));
+      notice(ctx, c.e.id, worldPvpSpoilsLine(victim.name));
+    } else {
+      c.meta.copper += goldShare;
+      notice(ctx, c.e.id, worldPvpKillLine(victim.name, goldShare, n));
+    }
     grantHonor(ctx, c.meta, honorShare, isKiller ? 'world_kill' : 'world_assist');
   }
   victimMeta.copper = Math.max(0, victimMeta.copper - taken);

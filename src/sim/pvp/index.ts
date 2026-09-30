@@ -156,4 +156,14 @@ export {
   worldPvpStake,
   worldPvpVictimIsGrey,
 } from './world_pvp_rules';
+export {
+  placeWorldPvpSpoils,
+  settleAllWorldPvpSpoils,
+  settleWorldPvpSpoils,
+  settleWorldPvpSpoilsOnLeave,
+  sweepWorldPvpSpoils,
+  WORLD_PVP_SKULL_ITEM_ID,
+  worldPvpSkullSources,
+  worldPvpSpoilsLine,
+} from './world_pvp_spoils';
 export { worldPvpFfaZones, worldPvpZonePolicyAt, worldPvpZonePolicyOf } from './world_pvp_zones';

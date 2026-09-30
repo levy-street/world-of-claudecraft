@@ -2802,6 +2802,8 @@ export const ko_KR: EnTranslations = {
       "markLine": "그곳에서 깃발을 올리지 않은 플레이어를 공격하면 자신의 깃발이 올라가지만, 이미 깃발을 올린 상대를 공격할 때는 올라가지 않습니다.",
       "aidLine": "월드 전투 중인 깃발을 올린 플레이어를 치유하거나 보호막을 주거나 강화하면 자신의 깃발도 올라갑니다.",
       "stakeLine": "패자는 {cap}이나 소지금의 {percent} 중 더 적은 쪽을 지불합니다.",
+      "spoilsLine": "둘 다 PvP 상태라면 결정타를 넣은 쪽의 골드가 패자의 해골과 함께 시체에 떨어집니다.",
+      "skullName": "{name}의 해골",
       "noStakeLine": "자유 전투 지역에서 깃발을 올리지 않은 채 죽은 플레이어는 골드를 잃지 않습니다.",
       "noTakeLine": "깃발을 올리지 않은 채 싸운 쪽도 골드를 가져가지 않습니다: 골드는 깃발을 올린 두 플레이어 사이에서만 오갑니다.",
       "honorLine": "처치당 명예 {honor}, 도운 모두가 나눠 받습니다.",
@@ -4436,6 +4438,7 @@ export const ko_KR: EnTranslations = {
       "perfectedBadge": "완전해짐",
       "perfectingRank": "완전화: {ranks}단계 중 {rank}단계",
       "materialSourceGatherer": "{count} × {name} 채집",
+      "trophySkullSource": "{count} × {name}에게서 획득",
       "materialSourceGathererSigned": "{count} × {name} 채집, {signer} 서명",
       "materialSourceUnrecorded": "{count} × 채집자 기록 없음",
       "materialSourceUnrecordedSigned": "{count} × 채집자 기록 없음, {name} 서명",
@@ -18933,6 +18936,9 @@ export const ko_KR: EnTranslations = {
       },
       "emissary_cache": {
         "name": "사절의 보관함"
+      },
+      "pvp_trophy_skull": {
+        "name": "전리품 해골"
       },
       "clue_scroll": {
         "name": "단서 두루마리"

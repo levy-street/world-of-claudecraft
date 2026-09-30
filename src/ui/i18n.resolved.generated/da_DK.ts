@@ -2802,6 +2802,8 @@ export const da_DK: EnTranslations = {
       "markLine": "At angribe en umarkeret spiller der rejser din egen markering; at angribe en markeret gør det aldrig.",
       "aidLine": "Helbredelse, skjold eller buff på en markeret spiller i en verdenskamp rejser din markering.",
       "stakeLine": "Taberen betaler {cap} eller {percent} af deres pengepung, alt efter hvad der er mindre.",
+      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
+      "skullName": "{name}'s Skull",
       "noStakeLine": "En umarkeret spiller drbt på free-for-all-grund mister ingen guld.",
       "noTakeLine": "En umarkeret kæmper tager heller ikke guld: det flytter kun mellem to markerede spillere.",
       "honorLine": "{honor} Ære pr. drab, delt blandt alle der hjalp.",
@@ -4436,6 +4438,7 @@ export const da_DK: EnTranslations = {
       "perfectedBadge": "Forædlet",
       "perfectingRank": "Forædling: rang {rank} af {ranks}",
       "materialSourceGatherer": "{count} × samlet af {name}",
+      "trophySkullSource": "{count} × Taken from {name}",
       "materialSourceGathererSigned": "{count} × samlet af {name}, signeret af {signer}",
       "materialSourceUnrecorded": "{count} × ingen samler registreret",
       "materialSourceUnrecordedSigned": "{count} × ingen samler registreret, signeret af {name}",
@@ -18933,6 +18936,9 @@ export const da_DK: EnTranslations = {
       },
       "emissary_cache": {
         "name": "Sendebudets Gemme"
+      },
+      "pvp_trophy_skull": {
+        "name": "Trophy Skull"
       },
       "clue_scroll": {
         "name": "Vejlednings Rulle"

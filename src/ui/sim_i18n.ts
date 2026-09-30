@@ -666,6 +666,8 @@ const baseEnTable = {
   'worldPvp.killTake': 'You defeat {victim} and take {money} from their purse.',
   'worldPvp.killTakeSplit':
     'You defeat {victim} and take {money} from their purse (split {count} ways).',
+  // The killing blow's spoils dropped on the body (src/sim/pvp/world_pvp_spoils.ts).
+  'worldPvp.spoilsOnBody': "Loot {victim}'s body to claim your spoils.",
   'worldPvp.defeatedPlain': '{killer} defeats you.',
   'worldPvp.defeatedTake': '{killer} defeats you and takes {money} from your purse.',
   'worldPvp.defeatedPairPlain': '{killer} and 1 other defeat you.',
@@ -8561,6 +8563,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.ffaEntered': '你进入了一处自由混战 PvP 地带：这里的任何人都可以攻击你。',
     'worldPvp.ffaLeft': '你已离开自由混战 PvP 地带。',
     'worldPvp.killPlain': '你击败了 {victim}。',
+    'worldPvp.spoilsOnBody': '拾取 {victim} 的尸体以领取你的战利品。',
     'worldPvp.killTake': '你击败了 {victim}，并从对方的钱袋中拿走了 {money}。',
     'worldPvp.killTakeSplit': '你击败了 {victim}，并从对方的钱袋中拿走了 {money}（由 {count} 人平分）。',
     'worldPvp.minLevel': '你必须至少达到等级 {level} 才能开启世界 PvP。',
@@ -9411,6 +9414,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.ffaEntered': '你已進入自由混戰 PvP 地帶：此地任何人都能攻擊你。',
     'worldPvp.ffaLeft': '你已離開自由混戰 PvP 地帶。',
     'worldPvp.killPlain': '你擊敗了 {victim}。',
+    'worldPvp.spoilsOnBody': '拾取 {victim} 的屍體以領取你的戰利品。',
     'worldPvp.killTake': '你擊敗了 {victim}，並從對方的錢袋中拿走了 {money}。',
     'worldPvp.killTakeSplit': '你擊敗了 {victim}，並從對方的錢袋中拿走了 {money}（由 {count} 人平分）。',
     'worldPvp.minLevel': '你必須至少達到 {level} 級才能啟用世界 PvP。',
@@ -10301,6 +10305,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.ffaEntered': '자유 전투 PvP 지역에 들어왔습니다: 이곳에서는 누구나 당신을 공격할 수 있습니다.',
     'worldPvp.ffaLeft': '자유 전투 PvP 지역을 벗어났습니다.',
     'worldPvp.killPlain': '{victim}을(를) 쓰러뜨렸습니다.',
+    'worldPvp.spoilsOnBody': '{victim}의 시체를 뒤져 전리품을 획득하세요.',
     'worldPvp.killTake': '{victim}을(를) 쓰러뜨리고 소지금에서 {money}을(를) 빼앗았습니다.',
     'worldPvp.killTakeSplit': '{victim}을(를) 쓰러뜨리고 소지금에서 {money}을(를) 빼앗았습니다 ({count}명이 분배).',
     'worldPvp.minLevel': '월드 PvP를 활성화하려면 최소 레벨 {level}이어야 합니다.',
@@ -11195,6 +11200,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.ffaEntered': '無差別戦闘地帯に入りました：ここでは誰もがあなたを攻撃できます。',
     'worldPvp.ffaLeft': '無差別戦闘地帯から出ました。',
     'worldPvp.killPlain': '{victim}を倒しました。',
+    'worldPvp.spoilsOnBody': '{victim}の遺体を調べて戦利品を受け取りましょう。',
     'worldPvp.killTake': '{victim}を倒し、所持金から{money}を奪いました。',
     'worldPvp.killTakeSplit': '{victim}を倒し、所持金から{money}を奪いました（{count}人で分配）。',
     'worldPvp.minLevel': 'ワールドPvPを有効化するにはレベル{level}以上である必要があります。',
@@ -13103,6 +13109,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.ffaEntered': 'Вы вошли в зону свободного боя: здесь вас может атаковать кто угодно.',
     'worldPvp.ffaLeft': 'Вы покинули зону свободного боя.',
     'worldPvp.killPlain': 'Вы побеждаете {victim}.',
+    'worldPvp.spoilsOnBody': 'Обыщите тело {victim}, чтобы забрать добычу.',
     'worldPvp.killTake': 'Вы побеждаете {victim} и забираете {money} из их кошелька.',
     'worldPvp.killTakeSplit': 'Вы побеждаете {victim} и забираете {money} из их кошелька (разделено между {count}).',
     'worldPvp.minLevel': 'Чтобы включить мировое PvP, нужен как минимум {level} уровень.',
@@ -21508,6 +21515,10 @@ const RULES: Rule[] = [
   {
     re: /^You defeat (.+)\.$/,
     build: (m) => tSim('worldPvp.killPlain', { victim: m[1] }),
+  },
+  {
+    re: /^Loot (.+)'s body to claim your spoils\.$/,
+    build: (m) => tSim('worldPvp.spoilsOnBody', { victim: m[1] }),
   },
   {
     re: /^(.+) and 1 other defeat you and take (.+) from your purse\.$/,

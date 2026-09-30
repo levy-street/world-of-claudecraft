@@ -780,7 +780,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.record': '战绩：{kills} 杀，{deaths} 死',
   'hudChrome.worldPvp.repeatLine':
     '重复击杀同一名玩家，收益依次为 {second}、{third}，此后归零；计数会在首次击杀 {reset} 后清零。',
+  'hudChrome.worldPvp.skullName': '{name}的头骨',
   'hudChrome.worldPvp.splitLine': '干净的一对一可独得全部奖励；助战者和治疗者共同分享。',
+  'hudChrome.worldPvp.spoilsLine':
+    '双方都开启 PvP 时，致命一击者的金币会与败者的头骨一同掉落在尸体上。',
   'hudChrome.worldPvp.stakeLine': '败者支付 {cap} 或其钱袋 {percent} 中较少的一项。',
   'hudChrome.worldPvp.statusDisarming': '你的旗帜将在 {time} 后降下，或在当前战斗结束时降下。',
   'hudChrome.worldPvp.statusOff': '你的 PvP 旗帜已降下。你无法在开放世界中攻击他人或被攻击。',
@@ -17423,6 +17426,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   // Intentional gathering PR2: material provenance and source controls (M16 fills).
   'hudChrome.materialStackSelectionUnavailable': '该素材选择已失效。',
   'hudChrome.itemTooltip.materialSourceGatherer': '{count} × 由{name}采集',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × 取自{name}',
   'hudChrome.itemTooltip.materialSourceGathererSigned': '{count} × 由{name}采集，由{signer}签名',
   'hudChrome.itemTooltip.materialSourceUnrecorded': '{count} × 未记录采集者',
   'hudChrome.itemTooltip.materialSourceUnrecordedSigned': '{count} × 未记录采集者，由{name}签名',
@@ -17610,6 +17614,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.rift_watchers_band.name': '裂隙守望者指环',
   'entities.items.rift_surveyors_satchel.name': '裂隙勘测员挎包',
   'entities.items.emissary_cache.name': '使者的宝箱',
+  'entities.items.pvp_trophy_skull.name': '战利品头骨',
   'entities.npcs.weekly_emissary.name': '查姆·皮特',
   'entities.npcs.weekly_emissary.title': '使者',
   'entities.npcs.weekly_emissary.greeting':

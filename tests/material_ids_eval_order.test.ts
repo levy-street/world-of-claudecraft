@@ -53,6 +53,7 @@ describe('material_ids evaluation-order probe (pure table leaves keep the regist
     const gathering = await import('../src/sim/professions/gathering_materials');
     const grades = await import('../src/sim/professions/material_grades');
     const salvage = await import('../src/sim/professions/salvage_materials');
+    const trophy = await import('../src/sim/pvp/world_pvp_trophy');
     const rederived = derivation.deriveMaterialItemIds({
       nodeMaterialTable: gathering.NODE_MATERIAL_TABLE,
       materialGrades: grades.MATERIAL_GRADES,
@@ -63,6 +64,7 @@ describe('material_ids evaluation-order probe (pure table leaves keep the regist
       recipes: data.ALL_RECIPES,
       enchants: enchants.ENCHANTS,
       recipePendingMaterialItemIds: crucible.CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS,
+      trophyMaterialItemIds: trophy.WORLD_PVP_TROPHY_MATERIAL_ITEM_IDS,
       items: data.ITEMS,
     });
     expect([...set].sort()).toEqual([...rederived].sort());

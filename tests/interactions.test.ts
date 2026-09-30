@@ -475,6 +475,72 @@ describe('handlePickedEntity', () => {
     expect(hud.openLoot).toHaveBeenCalledWith(2, 10, 20);
   });
 
+  // A dead PLAYER's body carries loot only while it holds World PvP spoils
+  // (src/sim/pvp/world_pvp_spoils.ts); the killer opens it like a corpse, and a
+  // plain dead player (no spoils) still only targets.
+  it.each([0, 2])("opens a World PvP body's spoils with button %i", (button) => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const body = stubEntity({
+      id: 2,
+      kind: 'player',
+      dead: true,
+      lootable: true,
+      tappedById: 1,
+      loot: {
+        copper: 2_000,
+        items: [
+          {
+            itemId: 'pvp_trophy_skull',
+            count: 1,
+            personalFor: [1],
+            materialSources: [
+              { source: { gatherer: { kind: 'character', id: 2, name: 'Bet' } }, count: 1 },
+            ],
+          },
+        ],
+      },
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const plain = stubEntity({ id: 3, kind: 'player', dead: true, pos: { x: 1, y: 0, z: 0 } });
+    const world = {
+      playerId: 1,
+      player,
+      entities: new Map([
+        [1, player],
+        [2, body],
+        [3, plain],
+      ]),
+      targetEntity: vi.fn(),
+    } as unknown as Parameters<typeof handlePickedEntity>[0];
+    const hud = {
+      openLoot: vi.fn(),
+      closeContextMenu: () => {},
+    } as unknown as Parameters<typeof handlePickedEntity>[1];
+
+    expect(handlePickedEntity(world, hud, 2, button, 10, 20)).toBe(true);
+    expect(hud.openLoot).toHaveBeenCalledWith(2, 10, 20);
+    expect(handlePickedEntity(world, hud, 3, button, 10, 20)).toBe(false);
+    expect(hud.openLoot).toHaveBeenCalledTimes(1);
+    expect(world.targetEntity).toHaveBeenCalledWith(3);
+  });
+
+  it('walks toward an out-of-range World PvP body with spoils, never toward a bare dead player', () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const far = { x: 30, y: 0, z: 0 };
+    const body = stubEntity({
+      id: 2,
+      kind: 'player',
+      dead: true,
+      lootable: true,
+      tappedById: 1,
+      loot: { copper: 500, items: [] },
+      pos: far,
+    });
+    const plain = stubEntity({ id: 3, kind: 'player', dead: true, pos: far });
+    expect(shouldApproachPickedEntity(player, body, false)).toBe(true);
+    expect(shouldApproachPickedEntity(player, plain, false)).toBe(false);
+  });
+
   it.each([0, 2])('preserves movement when button %i finds no visible corpse loot', (button) => {
     const player = stubEntity({ id: 1, kind: 'player' });
     const corpse = stubEntity({

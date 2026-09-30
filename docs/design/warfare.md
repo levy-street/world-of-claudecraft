@@ -508,6 +508,22 @@ alone is the owner's stated shape.
   flagged strangers in a free-for-all zone earns the honor and nothing else, so
   gold only ever moves between two players who both carry the stake, and
   hunting flags from behind no flag is never the best play.
+- Spoils (`src/sim/pvp/world_pvp_spoils.ts`): when the victim AND the killing
+  blow are both flagged, the killing blow's gold share does not go straight to
+  their purse; it drops on the victim's body beside a trophy skull
+  (`pvp_trophy_skull`, a vendor-worthless keepsake so skull camping can never
+  mint gold). The killer loots both through the ordinary corpse path. Skulls
+  stack like gathered materials: every skull shares one bag stack, and the stack
+  remembers whose each one is (the victim recorded exactly as a gatherer is), so
+  its tooltip reads "2 x Taken from Bet, 1 x Taken from Gimel" and a stack of one
+  victim's skulls is named "<name>'s Skull". Every other contributor is still paid purse to
+  purse. A player's body lies only until its owner releases or is revived, so
+  the body is SETTLED then: anything unlooted goes to the killer at once (their
+  skull only if it fits their bags), or back to the victim's purse if the killer
+  has left the world. The victim can never deny the drop, and no gold is ever
+  destroyed by an unlooted body. The grey rule, the raid rule and the per-pair
+  diminishing returns gate the drop exactly as they gate the payout: no paid
+  killing blow, no spoils.
 - Honor: `WORLD_PVP_KILL_HONOR` (10) per kill, the whole pool, split as above.
   Deliberately BELOW the instanced faucets: a Thornhollow Fields win pays 120 plus
   its drip and a ranked 1v1 win pays 25, so a player who wants Warfare gear

@@ -8,6 +8,7 @@ import { equipBestInSlotForDev } from './dev/bis_gear';
 import { displacePlayerForDev } from './dev/dev_displace';
 import { handleFerryDevChat } from './dev/ferry_dev';
 import { handleDevHoardTravel } from './dev/hoard_travel';
+import { spawnDevPvpBot } from './dev/pvp_bot';
 import { devTownList, resolveDevTown } from './dev/town_teleport';
 import { prepareWeeklyVaultPlaytest } from './dev/weekly_vault_playtest';
 import { handleDevClueCommand } from './dev_clue_scrolls';
@@ -756,6 +757,20 @@ export function handleDevChat(
     return null;
   }
 
+  const pvpBotMatch = /^\/(?:dev\s+pvpbot|devpvpbot)(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (pvpBotMatch) {
+    const botName = pvpBotMatch[1] ?? 'Sparring';
+    const spawned = spawnDevPvpBot(ctx, pid, botName);
+    if ('error' in spawned) ctx.error(pid, spawned.error);
+    else
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Spawned ${botName}: flagged for World PvP, your level, 10g in its purse. Raise your own flag with /pvp on contested ground, then kill it and loot the body.`,
+      );
+    return null;
+  }
+
   const botMatch = /^\/(?:dev\s+bot|devbot)\s+(\S+)\s*$/i.exec(raw);
   if (botMatch) {
     const botName = botMatch[1];
@@ -1384,7 +1399,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev map [rarity|site|coin], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev map [rarity|site|coin], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev pvpbot [name], /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
     );
     return null;
   }

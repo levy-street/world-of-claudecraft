@@ -9,25 +9,100 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
+  ],
+  "es_ES": [
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
+  ],
+  "fr_FR": [
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
+  ],
+  "fr_CA": [
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
+  ],
+  "de_DE": [
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
+  ],
+  "nl_NL": [
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
+  ],
+  "pl_PL": [
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
+  ],
+  "id_ID": [
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
+  ],
+  "tr_TR": [
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
+  ],
+  "sv_SE": [
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
+  ],
+  "vi_VN": [
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
+  ],
+  "da_DK": [
+    "entities.items.pvp_trophy_skull.name",
+    "hudChrome.itemTooltip.trophySkullSource",
+    "hudChrome.worldPvp.skullName",
+    "hudChrome.worldPvp.spoilsLine"
+  ]
 };

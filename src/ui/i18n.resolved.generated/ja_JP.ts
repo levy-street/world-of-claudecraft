@@ -2802,6 +2802,8 @@ export const ja_JP: EnTranslations = {
       "markLine": "そこでフラグを立てていないプレイヤーを攻撃すると自分のフラグが立ちますが、フラグを立てた相手を攻撃しても立ちません。",
       "aidLine": "フラグを立てたプレイヤーを戦闘中に回復、シールド、強化すると、自分のフラグも立ちます。",
       "stakeLine": "敗者は所持金の{percent}か{cap}のうち、少ない方を支払います。",
+      "spoilsLine": "双方がフラグを立てている場合、とどめを刺した者の取り分の金貨が敗者の頭蓋骨と共に遺体に落ちます。",
+      "skullName": "{name}の頭蓋骨",
       "noStakeLine": "無差別戦闘地帯でフラグを立てていないプレイヤーが倒されても、金貨を一切支払いません。",
       "noTakeLine": "フラグを立てていない戦闘者もゴールドは得られません。ゴールドが動くのはフラグを立てた2人のプレイヤーの間だけです。",
       "honorLine": "撃破ごとに名誉{honor}、貢献した全員で分配。",
@@ -4436,6 +4438,7 @@ export const ja_JP: EnTranslations = {
       "perfectedBadge": "完全化済み",
       "perfectingRank": "完全化：ランク{rank}／{ranks}",
       "materialSourceGatherer": "{count} × {name}が採集",
+      "trophySkullSource": "{count} × {name}から奪取",
       "materialSourceGathererSigned": "{count} × {name}が採集、{signer}が署名",
       "materialSourceUnrecorded": "{count} × 採集者の記録なし",
       "materialSourceUnrecordedSigned": "{count} × 採集者の記録なし、{name}が署名",
@@ -18933,6 +18936,9 @@ export const ja_JP: EnTranslations = {
       },
       "emissary_cache": {
         "name": "使者の宝箱"
+      },
+      "pvp_trophy_skull": {
+        "name": "戦利品の頭蓋骨"
       },
       "clue_scroll": {
         "name": "手がかりの巻物"

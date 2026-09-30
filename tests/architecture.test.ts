@@ -212,6 +212,8 @@ const UI_PURE_CORES = [
   'src/ui/frame_presets_core.ts',
   'src/ui/frame_menu_core.ts',
   'src/ui/loot_quality_view.ts',
+  // A copy's own display name (the World PvP trophy skull's "<name>'s Skull").
+  'src/ui/item_copy_name_core.ts',
   'src/ui/item_combat_tooltip_view.ts',
   'src/ui/trinket_tooltip_view.ts',
   // The trinket auras' tooltip descriptor and their item-icon art map.
