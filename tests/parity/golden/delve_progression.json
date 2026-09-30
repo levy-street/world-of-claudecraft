@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "4e52746e",
+      "state": "468e69be",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -72,6 +72,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -174,7 +175,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1032,
-      "state": "81617122",
+      "state": "8c9ef93c",
       "events": "0a737b49",
       "rng": {
         "draws": 1,
@@ -185,7 +186,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 1032,
-      "state": "8ad80785",
+      "state": "35a05885",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -251,6 +252,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -353,7 +355,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 1032,
-      "state": "075127e2",
+      "state": "51f1d5fc",
       "events": "7b005017",
       "rng": {
         "draws": 3,
@@ -427,6 +429,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -529,7 +532,7 @@
       "tick": 9,
       "time": 0.45,
       "nextId": 1032,
-      "state": "fd1ba591",
+      "state": "395a77ad",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -603,6 +606,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {

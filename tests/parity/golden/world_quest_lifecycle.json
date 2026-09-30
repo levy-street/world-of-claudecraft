@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "4e52746e",
+      "state": "468e69be",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -73,6 +73,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -175,7 +176,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "99116c88",
+      "state": "5eae533a",
       "events": "8c718819",
       "rng": {
         "draws": 0,
@@ -231,6 +232,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -344,7 +346,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "4fd47fea",
+      "state": "db6c6a10",
       "events": "8ff71b03",
       "rng": {
         "draws": 0,
@@ -400,6 +402,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -523,7 +526,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "8f455e4d",
+      "state": "a52159f9",
       "events": "d7fe94b9",
       "rng": {
         "draws": 0,
@@ -581,6 +584,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -698,7 +702,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "0f20b24b",
+      "state": "db8d3ca9",
       "events": "2b3aca11",
       "rng": {
         "draws": 0,
@@ -763,6 +767,7 @@
             "church_order": 80
           },
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -895,7 +900,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "6380d39b",
+      "state": "2c95c8ad",
       "events": "b31d0795",
       "rng": {
         "draws": 0,
@@ -966,6 +971,7 @@
             "rift_watch": 80
           },
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -1120,7 +1126,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "f69c13c8",
+      "state": "a45d7076",
       "events": "bf18640f",
       "rng": {
         "draws": 0,
@@ -1191,6 +1197,7 @@
             "rift_watch": 80
           },
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -1323,7 +1330,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "f69c13c8",
+      "state": "a45d7076",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1394,6 +1401,7 @@
             "rift_watch": 80
           },
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {

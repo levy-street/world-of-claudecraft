@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "117223a0",
+      "state": "750e74a4",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -85,6 +85,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gathererIdentity": {
             "id": 101,
             "kind": "character"
@@ -165,6 +166,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gathererIdentity": {
             "id": 102,
             "kind": "character"
@@ -407,7 +409,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "0f2d21a6",
+      "state": "a4ed32f0",
       "events": "31e5d163",
       "rng": {
         "draws": 8,
@@ -466,6 +468,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gathererIdentity": {
             "id": 101,
             "kind": "character"
@@ -563,6 +566,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gathererIdentity": {
             "id": 102,
             "kind": "character"
@@ -806,7 +810,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "0f2d21a6",
+      "state": "a4ed32f0",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -865,6 +869,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gathererIdentity": {
             "id": 101,
             "kind": "character"
@@ -962,6 +967,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gathererIdentity": {
             "id": 102,
             "kind": "character"

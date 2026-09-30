@@ -29,7 +29,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "68903d18",
+      "state": "f050f688",
       "events": "c4a67856",
       "rng": {
         "draws": 0,
@@ -84,6 +84,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -160,6 +161,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -317,7 +319,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "68903d18",
+      "state": "f050f688",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -372,6 +374,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -448,6 +451,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -605,7 +609,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "e7bf6558",
+      "state": "c44adc6c",
       "events": "1017821d",
       "rng": {
         "draws": 0,
@@ -662,6 +666,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -740,6 +745,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -897,7 +903,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "e9cc2f6c",
+      "state": "821a21a0",
       "events": "aa3602ac",
       "rng": {
         "draws": 0,
@@ -954,6 +960,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -1032,6 +1039,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -1204,7 +1212,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "e7bf6558",
+      "state": "c44adc6c",
       "events": "22e3db96",
       "rng": {
         "draws": 0,
@@ -1261,6 +1269,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -1339,6 +1348,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -1496,7 +1506,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 1012,
-      "state": "30e595ce",
+      "state": "18c608dc",
       "events": "aec333ee",
       "rng": {
         "draws": 0,
@@ -1559,6 +1569,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -1644,6 +1655,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {

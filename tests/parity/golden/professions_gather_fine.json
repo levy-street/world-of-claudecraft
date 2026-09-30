@@ -18,7 +18,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "4e52746e",
+      "state": "468e69be",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -74,6 +74,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -176,7 +177,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 1011,
-      "state": "7539b99c",
+      "state": "b4bb40d2",
       "events": "9a6383ab",
       "rng": {
         "draws": 2,
@@ -254,6 +255,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {
             "herbalism": 40,
             "mining": 70.5
@@ -384,7 +386,7 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 1011,
-      "state": "46d195df",
+      "state": "0e4a9add",
       "events": "42b19fc7",
       "rng": {
         "draws": 4,
@@ -463,6 +465,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {
             "herbalism": 40,
             "mining": 70.75
@@ -606,7 +609,7 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 1011,
-      "state": "58a4946e",
+      "state": "ac11faac",
       "events": "c9390a19",
       "rng": {
         "draws": 6,
@@ -687,6 +690,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {
             "herbalism": 41,
             "mining": 70.75
@@ -843,7 +847,7 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 1011,
-      "state": "27866ffb",
+      "state": "89002717",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -924,6 +928,7 @@
           "factionCurrencies": {},
           "factions": {},
           "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {
             "herbalism": 41,
             "mining": 70.75
