@@ -44,14 +44,28 @@ import {
   turretSpawnBearing,
 } from './turret_barrels';
 import { resolveTurretBowling } from './turret_bowling';
-import type { TurretKind, TurretPlan } from './turret_defense_plan';
+import { type TurretKind, type TurretPlan, turretChargesLeft } from './turret_defense_plan';
 import { TURRET_STREAM, type TurretRunKey, turretDraw, turretRunKey } from './turret_defense_rng';
+import {
+  burstTurretFrag,
+  TURRET_BOMBLETS,
+  type TurretBombletSpot,
+  type TurretFragBurst,
+  turretBombletBlast,
+  turretFragBomblets,
+} from './turret_fragmentation';
 import {
   type TurretMedal,
   type TurretPointsBreakdown,
   type TurretResult,
   turretResult,
 } from './turret_result';
+import {
+  type TurretShockwaveRing,
+  turretShockwaveBlast,
+  turretShockwaveDone,
+  turretShockwaveTargets,
+} from './turret_shockwave';
 
 export type TurretPhase = 'intro' | 'wave' | 'between' | 'won' | 'lost';
 
@@ -96,7 +110,12 @@ export interface TurretShot {
   damage: number;
   firedTick: number;
   impactTick: number;
+  /** Absent on a plain shell; a frag shell bursts into bomblets where a shell would land. */
+  weapon?: 'frag';
 }
+
+/** A shell kind the cannon fires: the plain shell, or a fragmentation shell (a charge). */
+export type TurretShellWeapon = 'shell' | 'frag';
 
 export interface TurretStats {
   shots: number;
@@ -113,6 +132,9 @@ export interface TurretStats {
   barrelsDetonated: number;
   /** Kills whose killing blow was a barrel's blast. */
   barrelKills: number;
+  /** Limited-weapon charges spent: Shockwaves, and fragmentation shells (each also a shot). */
+  shockwaves: number;
+  frags: number;
 }
 
 export interface TurretDefenseState {
@@ -137,6 +159,12 @@ export interface TurretDefenseState {
   nextSpawnTick: number;
   integrity: number;
   readyTick: number;
+  /** The Shockwave rearms on its own clock, apart from the shell's reload. */
+  shockReadyTick: number;
+  /** The Shockwave ring rolling out, null when none. */
+  shockwave: TurretShockwaveRing | null;
+  /** Fragmentation shells that burst and still have bomblets to land. */
+  frags: TurretFragBurst[];
   /** Unit direction of the last aim, reused when an aim point sits on the center. */
   aimX: number;
   aimZ: number;
@@ -196,8 +224,40 @@ export type TurretEvent =
       z: number;
       flightTicks: number;
       impactTick: number;
+      /** Absent on a plain shell. */
+      weapon?: 'frag';
     }
   | { type: 'impact'; shotId: number; x: number; y: number; z: number; hits: TurretHit[] }
+  /** A Shockwave's slam at the tower's foot; its front follows turretShockwaveFront from `startTick`. */
+  | {
+      type: 'shockwave';
+      id: number;
+      x: number;
+      y: number;
+      z: number;
+      startTick: number;
+      reach: number;
+    }
+  /** The bodies a Shockwave's front reached on this tick, each thrown once. */
+  | { type: 'shockwaveHit'; id: number; hits: TurretHit[] }
+  /** A frag shell burst over its point (`y` is the burst's height); its bomblets land in turn. */
+  | {
+      type: 'fragBurst';
+      shotId: number;
+      x: number;
+      y: number;
+      z: number;
+      bomblets: TurretBombletSpot[];
+    }
+  | {
+      type: 'bomblet';
+      shotId: number;
+      index: number;
+      x: number;
+      y: number;
+      z: number;
+      hits: TurretHit[];
+    }
   | {
       type: 'launched';
       id: number;
@@ -257,7 +317,7 @@ export type TurretEvent =
       breakdown: TurretPointsBreakdown;
     };
 
-export type TurretFireRefusal = 'ended' | 'cooldown' | 'invalid';
+export type TurretFireRefusal = 'ended' | 'cooldown' | 'invalid' | 'empty';
 
 export type TurretFireOutcome =
   | { ok: true; shot: TurretShot; events: TurretEvent[] }
@@ -288,6 +348,9 @@ export function createTurretDefense(
     nextSpawnTick: startTick,
     integrity: plan.integrity,
     readyTick: startTick,
+    shockReadyTick: startTick,
+    shockwave: null,
+    frags: [],
     aimX: 0,
     aimZ: 1,
     nextShotId: 1,
@@ -307,6 +370,8 @@ export function createTurretDefense(
       bowled: 0,
       barrelsDetonated: 0,
       barrelKills: 0,
+      shockwaves: 0,
+      frags: 0,
     },
     result: null,
     ...(salt ? { runKey: turretRunKey(salt, seed >>> 0) } : {}),
@@ -391,17 +456,28 @@ function currentWave(state: TurretDefenseState): TurretPlan['waves'][number] | u
   return state.plan.waves[state.wave];
 }
 
+/** The current wave's shell core damage, the last wave's once the waves are done. */
+function shellCoreDamage(state: TurretDefenseState): number {
+  const wave = state.plan.waves[Math.min(state.wave, state.plan.waves.length - 1)];
+  return wave ? wave.coreDamage : 0;
+}
+
+/** Fires a shell at a ground point; a frag shell also spends a charge (refused as `empty` with none left). */
 export function fireTurret(
   state: TurretDefenseState,
   tick: number,
   x: number,
   z: number,
   probe: ThrowProbe,
+  weapon: TurretShellWeapon = 'shell',
 ): TurretFireOutcome {
   if (state.phase === 'won' || state.phase === 'lost')
     return { ok: false, reason: 'ended', events: [] };
   if (!Number.isFinite(x) || !Number.isFinite(z))
     return { ok: false, reason: 'invalid', events: [] };
+  const frag = weapon === 'frag';
+  if (frag && !(turretChargesLeft(state).fragmentation > 0))
+    return { ok: false, reason: 'empty', events: [] };
   if (tick < state.readyTick) return { ok: false, reason: 'cooldown', events: [] };
   const aim = clampTurretAimInto(state.cx, state.cz, state.aimX, state.aimZ, x, z, {
     x: 0,
@@ -416,18 +492,19 @@ export function fireTurret(
   const tx = aim.x;
   const tz = aim.z;
   const flightTicks = turretShellFlightTicks(range);
-  const wave = state.plan.waves[Math.min(state.wave, state.plan.waves.length - 1)];
   const shot: TurretShot = {
     id: state.nextShotId++,
     x: tx,
     z: tz,
-    damage: wave ? wave.coreDamage : 0,
+    damage: shellCoreDamage(state),
     firedTick: tick,
     impactTick: tick + flightTicks,
+    ...(frag ? { weapon: 'frag' as const } : {}),
   };
   state.shots.push(shot);
   state.readyTick = tick + TURRET_WEAPON.cooldownTicks;
   state.stats.shots++;
+  if (frag) state.stats.frags++;
   bump(state);
   return {
     ok: true,
@@ -443,6 +520,7 @@ export function fireTurret(
         z: tz,
         flightTicks,
         impactTick: shot.impactTick,
+        ...(frag ? { weapon: 'frag' as const } : {}),
       },
     ],
   };
@@ -472,6 +550,8 @@ export function tickTurretDefense(
   if (!isLost(state)) {
     resolveTurretBowling(state, tick - 1, tick, tick - 1, world, events);
     resolveImpacts(state, tick, world, events);
+    landDueBomblets(state, tick, world, events);
+    rollShockwave(state, tick, world, events);
     explodeDueBarrels(state, tick, world, events);
   }
   advanceMonsters(state, tick, world, events, false);
@@ -594,9 +674,71 @@ function resolveImpacts(
   let kept = 0;
   for (const shot of state.shots) {
     if (shot.impactTick > tick) state.shots[kept++] = shot;
-    else detonate(state, shot, tick, probe, events);
+    else if (shot.weapon === 'frag') {
+      const burst = burstTurretFrag(shot, state.cx, state.cz, tick, probe);
+      state.frags.push(burst.frag);
+      events.push(burst.event);
+      bump(state);
+    } else detonate(state, shot, tick, probe, events);
   }
   state.shots.length = kept;
+}
+
+/** Each burst frag's bomblets due by `tick` blast in landing order, each lighting the barrels it reaches. */
+function landDueBomblets(
+  state: TurretDefenseState,
+  tick: number,
+  probe: ThrowProbe,
+  events: TurretEvent[],
+): void {
+  if (!state.frags.length) return;
+  let kept = 0;
+  for (const frag of state.frags) {
+    const star = turretFragBomblets(frag.x, frag.z, frag.dirX, frag.dirZ, frag.burstTick);
+    while (frag.landed < TURRET_BOMBLETS && star[frag.landed].landTick <= tick) {
+      const bomblet = star[frag.landed++];
+      const blast = turretBombletBlast(frag, bomblet);
+      const hits: TurretHit[] = [];
+      events.push({
+        type: 'bomblet',
+        shotId: frag.shotId,
+        index: bomblet.index,
+        x: bomblet.x,
+        y: groundOr(probe, bomblet.x, bomblet.z, 0),
+        z: bomblet.z,
+        hits,
+      });
+      blastBodies(state, blast, tick, probe, events, hits);
+      if (hits.length && !frag.hit) {
+        frag.hit = true;
+        state.stats.hits++;
+      }
+      lightTurretBarrelsInBlast(state, blast.x, blast.z, blast.radius, tick, events);
+    }
+    if (frag.landed < TURRET_BOMBLETS) state.frags[kept++] = frag;
+  }
+  state.frags.length = kept;
+}
+
+/** The rolling Shockwave throws the bodies its front reached by `tick`, then ends at its reach. */
+function rollShockwave(
+  state: TurretDefenseState,
+  tick: number,
+  probe: ThrowProbe,
+  events: TurretEvent[],
+): void {
+  const ring = state.shockwave;
+  if (!ring) return;
+  const reached = turretShockwaveTargets(state, ring, tick, probe);
+  if (reached.length) {
+    const hits: TurretHit[] = [];
+    events.push({ type: 'shockwaveHit', id: ring.id, hits });
+    const blast = turretShockwaveBlast(state, ring, shellCoreDamage(state));
+    blastBodies(state, blast, tick, probe, events, hits, (m) => reached.includes(m.id));
+    ring.struck.push(...reached);
+  }
+  // No bump: the ring is off the view, so its end changes nothing a reader sees.
+  if (turretShockwaveDone(ring, tick)) state.shockwave = null;
 }
 
 function detonate(
@@ -667,8 +809,9 @@ function explodeDueBarrels(
 }
 
 /**
- * Damages every living body the blast reaches by its falloff, throws the ones
- * it hits past a graze, and returns how many it killed. Corpses are never moved.
+ * Damages every living body the blast reaches by its falloff (only those `admits`
+ * lets through, when given), throws the ones it hits past a graze, and returns
+ * how many it killed. Corpses are never moved.
  */
 function blastBodies(
   state: TurretDefenseState,
@@ -677,10 +820,11 @@ function blastBodies(
   probe: ThrowProbe,
   events: TurretEvent[],
   hits: TurretHit[],
+  admits?: (m: TurretMonster) => boolean,
 ): number {
   let kills = 0;
   for (const m of state.monsters) {
-    if (m.hp <= 0 || m.state === 'gone') continue;
+    if (m.hp <= 0 || m.state === 'gone' || (admits && !admits(m))) continue;
     const p = positionAt(m.seg, tick, probe);
     const falloff = blastFalloff(
       Math.hypot(p.x - blast.x, p.z - blast.z),
@@ -1007,6 +1151,8 @@ function win(state: TurretDefenseState, events: TurretEvent[]): void {
 function lose(state: TurretDefenseState, events: TurretEvent[]): void {
   state.phase = 'lost';
   state.shots = [];
+  state.frags = [];
+  state.shockwave = null;
   end(state, events);
 }
 

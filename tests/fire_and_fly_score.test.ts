@@ -101,19 +101,19 @@ describe('the score of a won run', () => {
         {
           type: 'worldQuestScore',
           pid: meta.entityId,
-          board: 'fire_and_fly_introduction_v1_lifetime',
+          board: 'fire_and_fly_introduction_v2_lifetime',
           medal: result!.medal,
           metric: result!.points,
           resetDay: DAY,
         },
       ]);
       expect(meta.fireAndFlyRecords).toEqual({
-        fire_and_fly_introduction_v1_daily: {
+        fire_and_fly_introduction_v2_daily: {
           metric: result!.points,
           medal: result!.medal,
           day: DAY,
         },
-        fire_and_fly_introduction_v1_lifetime: {
+        fire_and_fly_introduction_v2_lifetime: {
           metric: result!.points,
           medal: result!.medal,
           day: DAY,
@@ -137,13 +137,13 @@ describe('the score of a won run', () => {
     const practice = sim.tick();
     expect(scores(practice)).toEqual([
       expect.objectContaining({
-        board: 'fire_and_fly_standard_v1_lifetime',
+        board: 'fire_and_fly_standard_v2_lifetime',
         medal: 'silver',
         metric: 70 * 200 + 20 * 20,
       }),
     ]);
     // The day's best stays the gold run.
-    expect(meta.fireAndFlyRecords.fire_and_fly_standard_v1_daily?.medal).toBe('gold');
+    expect(meta.fireAndFlyRecords.fire_and_fly_standard_v2_daily?.medal).toBe('gold');
   });
 
   it('emits once per run however many won ticks follow', () => {
@@ -205,8 +205,8 @@ describe('the score of a won run', () => {
     sim.talkToNpc(FIRE_AND_FLY_NPC_ID);
     forceWin(meta, 97);
     sim.tick();
-    const page = await sim.worldQuestLeaderboard('fire_and_fly_standard_v1_daily');
-    expect(page).toMatchObject({ board: 'fire_and_fly_standard_v1_daily', personal: true });
+    const page = await sim.worldQuestLeaderboard('fire_and_fly_standard_v2_daily');
+    expect(page).toMatchObject({ board: 'fire_and_fly_standard_v2_daily', personal: true });
     expect(page.self).toMatchObject({ rank: 1, medal: 'gold', metric: 97 * 200 + 20 * 20 });
   });
 });

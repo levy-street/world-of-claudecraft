@@ -15,10 +15,15 @@ import {
   TURRET_SCENARIO_STANDARD,
   TURRET_SCENARIOS,
 } from '../src/sim/content/fire_and_fly_scenarios';
+import { TURRET_SHOCKWAVE } from '../src/sim/content/turret_defense';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import { positionAt } from '../src/sim/minigames/thrown_body';
 import type { TurretEvent } from '../src/sim/minigames/turret_defense';
-import { resolveTurretPlan, TURRET_PLAN_LIMITS } from '../src/sim/minigames/turret_defense_plan';
+import {
+  resolveTurretPlan,
+  TURRET_PLAN_LIMITS,
+  turretChargesLeft,
+} from '../src/sim/minigames/turret_defense_plan';
 import { TURRET_BONUS_CAP, turretResult } from '../src/sim/minigames/turret_result';
 import { Sim } from '../src/sim/sim';
 import type { TurretSessionView } from '../src/sim/turret_defense_session';
@@ -54,8 +59,11 @@ interface Run {
   session: TurretSession;
 }
 
-/** A whole seat on the server, aimed at the monster nearest the tower, or left to breach. */
-function playRun(aim: boolean): Run {
+/**
+ * A whole seat on the server, aimed at the monster nearest the tower, or left to breach;
+ * armed, it fires its frag shells first and slams whenever a body stands inside the reach.
+ */
+function playRun(aim: boolean, armed = false): Run {
   const sim = new Sim({
     seed: WORLD_SEED,
     playerClass: 'warrior',
@@ -76,6 +84,9 @@ function playRun(aim: boolean): Run {
       run.revisions.push({ view, json: turretStateWireJson(session, sim.tickCount) });
     }
     if (view.defense.phase === 'won' || view.defense.phase === 'lost') break;
+    if (armed && inReach(view, sim.tickCount)) {
+      sim.useVehicleAction('turret_shockwave', { x: 0, z: 0 }, pid);
+    }
     if (!aim || sim.tickCount < view.defense.readyTick) continue;
     let best: { x: number; z: number } | null = null;
     let bestD = Number.POSITIVE_INFINITY;
@@ -88,13 +99,24 @@ function playRun(aim: boolean): Run {
         best = p;
       }
     }
-    if (best) sim.useVehicleAction('turret_fire', best, pid);
+    if (best && !(armed && sim.useVehicleAction('turret_frag', best, pid))) {
+      sim.useVehicleAction('turret_fire', best, pid);
+    }
   }
   return run;
 }
 
+function inReach(view: TurretSessionView, tick: number): boolean {
+  return view.defense.monsters.some((m) => {
+    if (m.hp <= 0) return false;
+    const p = positionAt(m.seg, tick, ground);
+    return Math.hypot(p.x - view.defense.cx, p.z - view.defense.cz) < TURRET_SHOCKWAVE.reach;
+  });
+}
+
 const won = playRun(true);
 const lost = playRun(false);
+const armed = playRun(true, true);
 const plan = decodeTurretPlan(JSON.parse(turretPlanWireJson(won.session.defense.plan)))!;
 
 /** A mid-wave revision with bodies in flight, on the ground and marching, and barrels standing. */
@@ -130,7 +152,7 @@ describe('the turret plan key', () => {
       expect(decoded).toEqual(resolved);
       expect(decoded?.scenarioId).toBe(scenario.id);
       expect(decoded?.integrity).toBe(scenario.integrity);
-      expect(decoded?.arsenal).toEqual({ shockwave: 0, fragmentation: 0 });
+      expect(decoded?.arsenal).toEqual({ shockwave: 2, fragmentation: 3 });
       expect(decoded?.waves.map((w) => w.arrival)).toEqual(
         scenario.waves.map((w) => w.arrival ?? { kind: 'ring' }),
       );
@@ -290,6 +312,24 @@ describe('the turret seat key', () => {
       expect(states).toContain(state);
     expect(won.revisions.at(-1)!.view.defense.phase).toBe('won');
     expect(lost.revisions.at(-1)!.view.defense.phase).toBe('lost');
+  });
+
+  it('round-trips every revision of a run that spends its limited weapons, its charges left alike', () => {
+    const armedPlan = decodeTurretPlan(JSON.parse(turretPlanWireJson(armed.session.defense.plan)))!;
+    let fragInFlight = false;
+    let slamSpent = false;
+    for (const { view, json } of armed.revisions) {
+      const decoded = decodeTurretSeat(JSON.parse(json), armedPlan);
+      expect(rounded(decoded)).toEqual(rounded(seatOf(view)));
+      expect(turretChargesLeft(decoded!.defense)).toEqual(turretChargesLeft(view.defense));
+      if (view.defense.shots.some((shot) => shot.weapon === 'frag')) fragInFlight = true;
+      if (view.defense.phase === 'wave' && view.defense.stats.shockwaves > 0) slamSpent = true;
+    }
+    expect(fragInFlight).toBe(true);
+    expect(slamSpent).toBe(true);
+    const spent = armed.revisions.at(-1)!.view.defense.stats;
+    expect(spent.frags).toBe(armedPlan.arsenal.fragmentation);
+    expect(spent.shockwaves).toBeGreaterThan(0);
   });
 
   it("carries no result while the run lasts and the sim's own result once it ends", () => {
@@ -455,6 +495,36 @@ describe('the turretDefense event', () => {
         'ended',
       ].sort(),
     );
+  });
+
+  it("round-trips the limited weapons' entries: the frag's shot, burst and bomblets, the slam and its hits", () => {
+    const types = new Set<string>();
+    for (const e of armed.events) {
+      expect(decodeTurretFeedback(wire(e))).toEqual({ seq: e.seq, tick: e.tick, event: e.event });
+      types.add(e.event.type === 'fired' && e.event.weapon ? 'fired frag' : e.event.type);
+    }
+    for (const type of ['fired frag', 'fragBurst', 'bomblet', 'shockwave', 'shockwaveHit']) {
+      expect(types.has(type), type).toBe(true);
+    }
+  });
+
+  const entry = (type: TurretEvent['type']): Wire =>
+    wire(armed.events.find((e) => e.event.type === type));
+
+  it.each([
+    [
+      'a frag burst with a seventh bomblet',
+      'fragBurst',
+      (e: Wire) => e.event.bomblets.push(e.event.bomblets[0]),
+    ],
+    ['a shell kind the wire does not know', 'fired', (e: Wire) => (e.event.weapon = 'shell')],
+    ['a negative Shockwave reach', 'shockwave', (e: Wire) => (e.event.reach = -1)],
+    ['a fractional bomblet index', 'bomblet', (e: Wire) => (e.event.index = 1.5)],
+  ] as [string, TurretEvent['type'], (e: Wire) => unknown][])('rejects %s', (_, type, forge) => {
+    const forged = entry(type);
+    expect(decodeTurretFeedback(wire(forged))).not.toBeNull();
+    forge(forged);
+    expect(decodeTurretFeedback(forged)).toBeNull();
   });
 
   const fired = (): Wire => wire(won.events.find((e) => e.event.type === 'fired'));

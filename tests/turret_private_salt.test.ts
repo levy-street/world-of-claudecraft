@@ -14,7 +14,7 @@ import {
   fireTurret,
   tickTurretDefense,
 } from '../src/sim/minigames/turret_defense';
-import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
+import { resolveTurretPlan, turretChargesLeft } from '../src/sim/minigames/turret_defense_plan';
 import {
   TURRET_STREAM,
   type TurretDrawSource,
@@ -23,6 +23,7 @@ import {
   turretKeyedHash,
   turretRunKey,
 } from '../src/sim/minigames/turret_defense_rng';
+import { startTurretShockwave } from '../src/sim/minigames/turret_shockwave';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import { turretSessionView } from '../src/sim/turret_defense_session';
@@ -64,8 +65,15 @@ function popcount(x: number): number {
 }
 
 /** A run under a steady aimer (the oldest monster, whenever the cannon is ready) and where
- *  each monster stepped onto the field. */
-function run(seed: number, salt?: PrivateSalt, plan = resolveTurretPlan(), maxTicks = 1600) {
+ *  each monster stepped onto the field. With `weapons`, frag shells while they last and a
+ *  Shockwave on a windup. */
+function run(
+  seed: number,
+  salt?: PrivateSalt,
+  plan = resolveTurretPlan(),
+  maxTicks = 1600,
+  weapons = false,
+) {
   const state = createTurretDefense(plan, { x: 0, z: 0 }, seed, 0, salt);
   const spawns = new Map<number, string>();
   for (let tick = 1; tick <= maxTicks && state.phase !== 'won' && state.phase !== 'lost'; tick++) {
@@ -77,9 +85,11 @@ function run(seed: number, salt?: PrivateSalt, plan = resolveTurretPlan(), maxTi
       }
     }
     const target = state.monsters.find((m) => m.state === 'march' || m.state === 'windup');
+    if (weapons && target?.state === 'windup') startTurretShockwave(state, tick, flat);
     if (target && tick >= state.readyTick) {
       const at = horizontalAt(target.seg, tick);
-      fireTurret(state, tick, at.x, at.z, flat);
+      const frag = weapons && turretChargesLeft(state).fragmentation > 0;
+      fireTurret(state, tick, at.x, at.z, flat, frag ? 'frag' : 'shell');
     }
   }
   return { state, spawns: [...spawns.values()] };
@@ -167,7 +177,7 @@ describe('a salted run', () => {
 
   it('keys every engine draw site with the run key, on every stream', () => {
     drawLog.length = 0;
-    const { state } = run(42, SALT, resolveTurretPlan(TURRET_SCENARIO_HARD), 12000);
+    const { state } = run(42, SALT, resolveTurretPlan(TURRET_SCENARIO_HARD), 12000, true);
     const key = state.runKey;
     expect(key).toBeDefined();
     expect(new Set(drawLog.map((d) => d.stream))).toEqual(new Set(Object.values(TURRET_STREAM)));

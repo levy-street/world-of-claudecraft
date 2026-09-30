@@ -17,6 +17,7 @@ import {
   type TurretDefenseState,
   type TurretEvent,
   type TurretMonster,
+  type TurretShellWeapon,
   tickTurretDefense,
   turretMonstersLeft,
 } from './minigames/turret_defense';
@@ -24,6 +25,7 @@ import { resolveTurretPlan } from './minigames/turret_defense_plan';
 import { turretSessionSeed } from './minigames/turret_defense_rng';
 import { recordTurretFeedback, type TurretFeedback } from './minigames/turret_feedback';
 import type { TurretResult } from './minigames/turret_result';
+import { startTurretShockwave } from './minigames/turret_shockwave';
 import { applySeatMount, forceDismount, mountRideAllowed } from './mounts';
 import { shadowActionsLocked } from './shadow_action_lock';
 import { onShipDeck } from './ship_deck_presence';
@@ -66,12 +68,16 @@ type ReadonlyDeep<T> = T extends readonly (infer U)[]
 // Engine bookkeeping no reader draws from (the throw and airtime stats, the bowling pair
 // guard, the spawn and id cursors); the online wire would otherwise carry it every revision.
 type TurretMonsterBookkeeping = 'airSince' | 'throwX' | 'throwZ' | 'throwOpen' | 'knocked';
+// The rolling Shockwave and the landing bomblets too: their feedback entries carry the
+// ring's start and the bomblets' whole schedule, so a reader draws them from the ring.
 type TurretDefenseBookkeeping =
   | 'spawnCursor'
   | 'nextSpawnTick'
   | 'nextShotId'
   | 'nextMonsterId'
-  | 'nextBarrelId';
+  | 'nextBarrelId'
+  | 'shockwave'
+  | 'frags';
 
 export type TurretMonsterView = ReadonlyDeep<Omit<TurretMonster, TurretMonsterBookkeeping>>;
 
@@ -332,19 +338,39 @@ export function tickTurretSeat(
   return true;
 }
 
-/** One shot at a ground point; the player faces its shot. Refusals are silent (the HUD shows the cooldown). */
+/**
+ * One shot at a ground point, a plain shell or a fragmentation shell (a charge);
+ * the player faces its shot. Refusals are silent (the HUD shows the cooldown and
+ * the charges).
+ */
 export function fireTurretSeat(
   ctx: SimContext,
   meta: PlayerMeta,
   player: Entity,
   session: TurretSession,
   point: CannonPoint,
+  weapon: TurretShellWeapon = 'shell',
 ): boolean {
   if (!stillSeated(meta, player, session)) return false;
   const defense = session.defense;
-  const out = fireTurret(defense, ctx.tickCount, point.x, point.z, turretWorldProbe(ctx.cfg.seed));
+  const probe = turretWorldProbe(ctx.cfg.seed);
+  const out = fireTurret(defense, ctx.tickCount, point.x, point.z, probe, weapon);
   if (!out.ok) return false;
   player.facing = Math.atan2(out.shot.x - defense.cx, out.shot.z - defense.cz);
+  emitTurretEvents(ctx, meta.entityId, session, out.events);
+  return true;
+}
+
+/** The tower slams: a Shockwave charge rolls a ring out from its foot. Refusals are silent. */
+export function shockwaveTurretSeat(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  player: Entity,
+  session: TurretSession,
+): boolean {
+  if (!stillSeated(meta, player, session)) return false;
+  const out = startTurretShockwave(session.defense, ctx.tickCount, turretWorldProbe(ctx.cfg.seed));
+  if (!out.ok) return false;
   emitTurretEvents(ctx, meta.entityId, session, out.events);
   return true;
 }
@@ -395,6 +421,8 @@ function cloneView(session: TurretSession): TurretSessionView {
     nextShotId: _nextShot,
     nextMonsterId: _nextMonster,
     nextBarrelId: _nextBarrel,
+    shockwave: _ring,
+    frags: _frags,
     plan,
     shots,
     monsters,

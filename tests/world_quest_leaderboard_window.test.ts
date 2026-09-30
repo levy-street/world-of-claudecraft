@@ -76,22 +76,22 @@ describe('world quest rankings window', () => {
   });
   it("opens the six trial boards on the gunner's records and takes the selected trial", async () => {
     const r = rig();
-    r.window.open('fire_and_fly_hard_v1_daily');
+    r.window.open('fire_and_fly_hard_v2_daily');
     await flush();
     expect(r.worldQuestLeaderboard).toHaveBeenCalledWith(
-      'fire_and_fly_hard_v1_daily',
+      'fire_and_fly_hard_v2_daily',
       0,
       50,
       'Ari',
     );
     const cards = [...r.el.querySelectorAll<HTMLElement>('.wql-card')];
     expect(cards.map((card) => card.dataset.wqlBoard)).toEqual([
-      'fire_and_fly_introduction_v1_daily',
-      'fire_and_fly_introduction_v1_lifetime',
-      'fire_and_fly_standard_v1_daily',
-      'fire_and_fly_standard_v1_lifetime',
-      'fire_and_fly_hard_v1_daily',
-      'fire_and_fly_hard_v1_lifetime',
+      'fire_and_fly_introduction_v2_daily',
+      'fire_and_fly_introduction_v2_lifetime',
+      'fire_and_fly_standard_v2_daily',
+      'fire_and_fly_standard_v2_lifetime',
+      'fire_and_fly_hard_v2_daily',
+      'fire_and_fly_hard_v2_lifetime',
     ]);
     expect(cards[0].querySelector('.wql-card-name')?.textContent).toBe("Recruit's Trial: Today");
     expect(cards[0].querySelector('.wql-card-art')?.getAttribute('style')).toContain(
@@ -256,7 +256,7 @@ describe('leaderboard World Quests tab', () => {
     await flush();
     expect(r.rankings.style.display).toBe('flex');
     expect(r.world.worldQuestLeaderboard).toHaveBeenCalledWith(
-      'fire_and_fly_standard_v1_daily',
+      'fire_and_fly_standard_v2_daily',
       0,
       50,
       'Ari',

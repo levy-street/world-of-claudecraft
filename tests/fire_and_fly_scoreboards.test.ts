@@ -38,8 +38,8 @@ import {
 } from '../src/sim/world_quest_scoreboards';
 
 const INTRO = 'fire_and_fly_introduction';
-const DAILY = 'fire_and_fly_introduction_v1_daily';
-const LIFETIME = 'fire_and_fly_introduction_v1_lifetime';
+const DAILY = 'fire_and_fly_introduction_v2_daily';
+const LIFETIME = 'fire_and_fly_introduction_v2_lifetime';
 
 describe('the trial boards', () => {
   it('versions a daily and a lifetime board per trial, in the order the instructor offers them', () => {
@@ -69,12 +69,12 @@ describe('the trial boards', () => {
   it('registers each board as a medal-first points ladder of the quest, and no quest-wide board', () => {
     const rows = WORLD_QUEST_SCOREBOARDS.filter((board) => fireAndFlyScoreboardInfo(board.id));
     expect(rows.map((board) => board.id)).toEqual([
-      'fire_and_fly_introduction_v1_daily',
-      'fire_and_fly_introduction_v1_lifetime',
-      'fire_and_fly_standard_v1_daily',
-      'fire_and_fly_standard_v1_lifetime',
-      'fire_and_fly_hard_v1_daily',
-      'fire_and_fly_hard_v1_lifetime',
+      'fire_and_fly_introduction_v2_daily',
+      'fire_and_fly_introduction_v2_lifetime',
+      'fire_and_fly_standard_v2_daily',
+      'fire_and_fly_standard_v2_lifetime',
+      'fire_and_fly_hard_v2_daily',
+      'fire_and_fly_hard_v2_lifetime',
     ]);
     for (const board of rows) {
       expect(board).toMatchObject({
@@ -173,7 +173,7 @@ describe('the offline records', () => {
         [LIFETIME]: { metric: 30_000, medal: 'gold', day: '2026-09-23', extra: 1 },
         fire_and_fly_introduction_v0_lifetime: { metric: 1, medal: 'gold', day: '2026-09-23' },
         [DAILY]: { metric: 30_000, medal: null, day: '2026-09-23' },
-        fire_and_fly_hard_v1_daily: { metric: -5, medal: 'gold', day: '2026-09-23' },
+        fire_and_fly_hard_v2_daily: { metric: -5, medal: 'gold', day: '2026-09-23' },
       }),
     ).toEqual({ [LIFETIME]: { metric: 30_000, medal: 'gold', day: '2026-09-23' } });
   });

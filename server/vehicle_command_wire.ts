@@ -12,6 +12,8 @@ interface VehicleCommands {
 const SEAT_ACTIONS: Readonly<Record<Exclude<VehicleActionId, CannonActionId>, true>> = {
   turret_fire: true,
   turret_replay: true,
+  turret_shockwave: true,
+  turret_frag: true,
 };
 
 function vehicleActionId(value: unknown): value is VehicleActionId {

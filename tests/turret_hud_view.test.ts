@@ -63,6 +63,8 @@ const stats = {
   bowled: 0,
   barrelsDetonated: 0,
   barrelKills: 0,
+  shockwaves: 0,
+  frags: 0,
 };
 
 const NO_POINTS = { kills: 0, integrity: 0, kegKills: 0, bowled: 0 };

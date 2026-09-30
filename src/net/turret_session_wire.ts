@@ -24,6 +24,7 @@ import {
   turretScenarioIdValid,
 } from '../sim/minigames/turret_defense_plan';
 import type { TurretFeedback } from '../sim/minigames/turret_feedback';
+import { TURRET_BOMBLETS, type TurretBombletSpot } from '../sim/minigames/turret_fragmentation';
 import {
   TURRET_BONUS_CAP,
   TURRET_POINTS,
@@ -183,6 +184,8 @@ const stats = shape<TurretStats>({
   bowled: count,
   barrelsDetonated: count,
   barrelKills: count,
+  shockwaves: count,
+  frags: count,
 });
 
 const hit = shape<TurretHit>({ id: count, falloff: num, damage: num, ...at });
@@ -218,6 +221,7 @@ const turretEvent = tagged<TurretEvent, 'type'>('type', {
     ...at,
     flightTicks: nonNegative,
     impactTick: tick,
+    weapon: optional(lit('frag')),
   }),
   impact: eventArm({ type: lit('impact'), shotId: count, ...at, hits: list(MAX_HITS, hit) }),
   launched: eventArm({ type: lit('launched'), id: count, ...at, vx: num, vy: num, vz: num }),
@@ -255,6 +259,30 @@ const turretEvent = tagged<TurretEvent, 'type'>('type', {
     hits: list(MAX_HITS, hit),
   }),
   waveCleared: eventArm({ type: lit('waveCleared'), wave: count }),
+  shockwave: eventArm({
+    type: lit('shockwave'),
+    id: count,
+    ...at,
+    startTick: tick,
+    reach: nonNegative,
+  }),
+  shockwaveHit: eventArm({ type: lit('shockwaveHit'), id: count, hits: list(MAX_HITS, hit) }),
+  fragBurst: eventArm({
+    type: lit('fragBurst'),
+    shotId: count,
+    ...at,
+    bomblets: list(
+      TURRET_BOMBLETS,
+      shape<TurretBombletSpot>({ index: count, ...at, landTick: tick }),
+    ),
+  }),
+  bomblet: eventArm({
+    type: lit('bomblet'),
+    shotId: count,
+    index: count,
+    ...at,
+    hits: list(MAX_HITS, hit),
+  }),
   ended: checked(
     eventArm({
       type: lit('ended'),
@@ -321,6 +349,7 @@ const shot = shape<TurretShot>({
   damage: num,
   firedTick: tick,
   impactTick: tick,
+  weapon: optional(lit('frag')),
 });
 
 const barrel = shape<TurretBarrel>({ id: count, ...at, litTick: tick, blowTick: tick });
@@ -335,6 +364,7 @@ const defense = shape<Omit<TurretDefenseView, 'plan'>>({
   wave: count,
   integrity: num,
   readyTick: tick,
+  shockReadyTick: tick,
   aimX: num,
   aimZ: num,
   shots: list(MAX_SHOTS, shot),

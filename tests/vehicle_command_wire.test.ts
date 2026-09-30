@@ -64,7 +64,29 @@ describe('vehicle command authority boundary', () => {
     );
   });
 
+  it.each(['turret_shockwave', 'turret_frag'] as const)(
+    'routes the %s weapon for the authenticated player only, its point and nothing else',
+    (action) => {
+      const sim = { enterVehicle: vi.fn(), useVehicleAction: vi.fn(), leaveVehicle: vi.fn() };
+      dispatchVehicleCommand(sim, 7, {
+        cmd: 'vehicle_action',
+        action,
+        x: 4,
+        z: -9,
+        pid: 99,
+        charges: 99,
+        readyTick: 0,
+      });
+      expect(sim.useVehicleAction).toHaveBeenCalledExactlyOnceWith(action, { x: 4, z: -9 }, 7);
+    },
+  );
+
   it.each([
+    { cmd: 'vehicle_action', action: 'turret_shockwave' },
+    { cmd: 'vehicle_action', action: 'turret_shockwave', x: 0, z: Number.NaN },
+    { cmd: 'vehicle_action', action: 'turret_frag', x: 1, z: Infinity },
+    { cmd: 'vehicle_action', action: 'turret_frag', x: '1', z: 2 },
+    { cmd: 'vehicle_action', action: 'turret_Frag', x: 1, z: 2 },
     { cmd: 'vehicle_action', action: 'turret_replay', x: 0 },
     { cmd: 'vehicle_action', action: 'turret_Replay', x: 0, z: 0 },
     { cmd: 'vehicle_replay', x: 0, z: 0 },

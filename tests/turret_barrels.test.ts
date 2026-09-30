@@ -213,9 +213,13 @@ function fullRun(seed: number, probe: ThrowProbe, maxTicks = 20 * 60 * 15) {
 }
 
 const ENDED_LATER = new Set(['medal', 'points', 'breakdown']);
+const WEAPON_STATS = new Set(['shockwaves', 'frags']);
 
+/** Drops what the engine gained after these digests: the end's medal and points, and the
+ *  limited-weapon stats while they stay 0 (these runs spend no charge; a spent one shows). */
 function dropResultFields(this: object, key: string, value: unknown): unknown {
-  return (this as { type?: string }).type === 'ended' && ENDED_LATER.has(key) ? undefined : value;
+  if ((this as { type?: string }).type === 'ended' && ENDED_LATER.has(key)) return undefined;
+  return 'barrelKills' in this && WEAPON_STATS.has(key) && value === 0 ? undefined : value;
 }
 
 function fnv(text: string): string {
@@ -912,7 +916,7 @@ describe('full runs with barrels', () => {
       expect(r.spawns).toHaveLength(r.state.stats.kills);
       expect(r.spawnsBesideBarrels).toBe(r.spawns.length);
       expect(r.trace).toHaveLength(count);
-      // The end's medal and points came after these digests: dropped, the trace is the same.
+      // The end's medal and points, and the weapon stats, came after these digests: dropped.
       const trace = r.trace.map((s) => JSON.stringify(JSON.parse(s), dropResultFields));
       expect(fnv([...trace, ...r.spawns].join('\n'))).toBe(digest);
     },

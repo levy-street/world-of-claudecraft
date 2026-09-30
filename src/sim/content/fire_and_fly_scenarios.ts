@@ -6,7 +6,8 @@
 // version. The medal bars come from scripted aimers on the arena ground, up to 3 yd
 // off: on Standard, firing within about 0.4 s of each reload keeps gold, 0.8 s gold
 // or silver, 1 s silver, 1.5 s bronze; on Hard, 0.4 s gold, 0.8 s mostly silver, 1 s
-// bronze or a loss.
+// bronze or a loss. Those aimers fired no limited weapon: every trial now carries
+// the same arsenal, and its bars are to re-measure with a weapon policy.
 
 import { DT, type TurretScenarioDef } from '../types';
 import { TURRET_BARREL_RING, TURRET_WAVES } from './turret_defense';
@@ -19,6 +20,8 @@ const HARD_GAP = { gapMinTicks: ticks(0.4), gapMaxTicks: ticks(0.8) } as const;
 /** Inside a pack, the members follow each other closely. */
 const PACK_GAP = { gapMinTicks: ticks(0.2), gapMaxTicks: ticks(0.4) } as const;
 const HARD_HP = 1.8;
+/** One arsenal on every trial: one rule to learn, the difficulty stays in the waves. */
+const TRIAL_ARSENAL = { shockwave: 2, fragmentation: 3 } as const;
 
 /** Three short waves of the smallest monsters on the whole ring, with room for mistakes. */
 export const TURRET_SCENARIO_INTRODUCTION: TurretScenarioDef = {
@@ -28,6 +31,7 @@ export const TURRET_SCENARIO_INTRODUCTION: TurretScenarioDef = {
   // Its small monsters cost 1 or 2 of 150 points a strike, so even a slow aimer keeps
   // most of the tower: gold is a nearly untouched one.
   medals: { gold: { minIntegrityShare: 0.98 }, silver: { minIntegrityShare: 0.9 } },
+  arsenal: TRIAL_ARSENAL,
   waves: [
     {
       entries: [{ templateId: 'forest_wolf', count: 5, level: 1 }],
@@ -61,6 +65,7 @@ export const TURRET_SCENARIO_STANDARD: TurretScenarioDef = {
   boardKey: 'standard',
   integrity: 100,
   medals: { gold: { minIntegrityShare: 0.97 }, silver: { minIntegrityShare: 0.6 } },
+  arsenal: TRIAL_ARSENAL,
   waves: TURRET_WAVES,
 };
 
@@ -75,6 +80,7 @@ export const TURRET_SCENARIO_HARD: TurretScenarioDef = {
   boardKey: 'hard',
   integrity: 100,
   medals: { gold: { minIntegrityShare: 0.95 }, silver: { minIntegrityShare: 0.6 } },
+  arsenal: TRIAL_ARSENAL,
   waves: [
     {
       entries: [
@@ -156,12 +162,12 @@ export const TURRET_DEFAULT_SCENARIO = TURRET_SCENARIO_STANDARD;
 
 /**
  * Each trial's scoreboard version, by board key (fire_and_fly_scoreboards.ts). Any tuning
- * change of a trial (its waves, health, arrivals, integrity or medal bars, or the points
- * in minigames/turret_result.ts, which move every trial) must raise its version, so runs
- * under the old and the new tuning never share a ladder.
+ * change of a trial (its waves, health, arrivals, integrity, medal bars or arsenal, or the
+ * points in minigames/turret_result.ts, which move every trial) must raise its version, so
+ * runs under the old and the new tuning never share a ladder. Version 2: the arsenal.
  */
 export const FIRE_AND_FLY_SCORE_VERSIONS: Readonly<Record<string, number>> = {
-  introduction: 1,
-  standard: 1,
-  hard: 1,
+  introduction: 2,
+  standard: 2,
+  hard: 2,
 };

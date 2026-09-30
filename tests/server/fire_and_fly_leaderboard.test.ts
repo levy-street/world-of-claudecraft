@@ -26,8 +26,8 @@ import {
 import { FIRE_AND_FLY_MAX_POINTS } from '../../src/sim/fire_and_fly_personal_records';
 import { worldQuestScoreboard } from '../../src/sim/world_quest_scoreboards';
 
-const LIFETIME = 'fire_and_fly_hard_v1_lifetime';
-const DAILY = 'fire_and_fly_hard_v1_daily';
+const LIFETIME = 'fire_and_fly_hard_v2_lifetime';
+const DAILY = 'fire_and_fly_hard_v2_daily';
 const who = { characterId: 7, accountId: 3 };
 
 afterEach(async () => {

@@ -164,6 +164,54 @@ export const TURRET_EXPLOSIVE_BARREL = {
 } as const;
 
 /**
+ * The Shockwave, a limited weapon: the tower slams and a ring rolls out from its
+ * wall, throwing every living body it meets on the ground outward, low and flat.
+ * It cancels a windup, lights no barrel itself, and rearms on its own clock,
+ * apart from the shell's reload. First values, to tune by playtest.
+ */
+export const TURRET_SHOCKWAVE = {
+  /** Where the front starts: the tower's wall. */
+  innerRadius: FIRE_AND_FLY_TOWER.radius,
+  reach: 12,
+  /** The front rolls from the wall to the reach in this time, at a steady speed. */
+  rollTicks: ticks(0.4),
+  /** Full strength inside the core, then the shell's linear falloff: 60 percent at the reach. */
+  falloffCore: 8,
+  falloffRadius: 18,
+  /** Feet higher than this over the ground pass over the front. */
+  groundClearance: 1.5,
+  /** Push and pop as multiples of the shell's: a shove, not a launch. */
+  pushScale: 1.2,
+  popScale: 0.6,
+  /** Damage at full strength, as a multiple of the wave's shell core damage. */
+  damageScale: 0.3,
+  rearmTicks: ticks(1.5),
+} as const;
+
+/**
+ * The fragmentation shell, a limited weapon: aimed, flown and reloaded like a
+ * shell, it bursts over its point into a fixed star of bomblets (one on the
+ * point, the rest on a circle turned to the shot's bearing, one straight ahead)
+ * that land in turn and blast like small shells, lighting barrels as a shell
+ * does. No draw anywhere: the pattern is the same every time. First values.
+ */
+export const TURRET_FRAGMENTATION = {
+  /** The burst's height over the aim point (visual only: the bomblets land on the ground). */
+  burstHeight: 4,
+  outerCount: 5,
+  outerRadius: 4.5,
+  /** Ticks from the burst to the centre bomblet, then to the first outer one; one tick apart after. */
+  centreDelayTicks: ticks(0.2),
+  outerDelayTicks: ticks(0.25),
+  blastRadius: 3.5,
+  blastCore: 1,
+  /** A bomblet's damage at full strength, as a multiple of the shot's. */
+  damageScale: 0.5,
+  /** Push and pop as multiples of the shell's. */
+  throwScale: 0.55,
+} as const;
+
+/**
  * Bowling. The reach doubles the standing radii: a tumbling body sweeps about
  * twice its footprint, and at the bare radii a whole run saw only a handful of
  * knocks.

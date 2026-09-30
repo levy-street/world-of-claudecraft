@@ -44,8 +44,8 @@ describe('board families', () => {
     expect(worldQuestBoardFamily('forge')).toBe('quests');
     expect(worldQuestBoardFamily('slalom')).toBe('quests');
     expect(worldQuestBoardFamily('glider_downs_v2_daily')).toBe('glider');
-    expect(worldQuestBoardFamily('fire_and_fly_standard_v1_lifetime')).toBe('fireAndFly');
-    const chips = worldQuestBoardChips('fire_and_fly_standard_v1_lifetime');
+    expect(worldQuestBoardFamily('fire_and_fly_standard_v2_lifetime')).toBe('fireAndFly');
+    const chips = worldQuestBoardChips('fire_and_fly_standard_v2_lifetime');
     expect(chips.map((c) => c.label)).toEqual([
       "Recruit's Trial: Today",
       "Recruit's Trial: All time",
@@ -55,7 +55,7 @@ describe('board families', () => {
       "Veterans' Test: All time",
     ]);
     expect(chips.filter((c) => c.active).map((c) => c.id)).toEqual([
-      'fire_and_fly_standard_v1_lifetime',
+      'fire_and_fly_standard_v2_lifetime',
     ]);
   });
 });

@@ -766,11 +766,15 @@ function fullRun(
 }
 
 const ENDED_LATER = new Set(['medal', 'points', 'breakdown']);
+const LATER_STATS = new Set(['bowled', 'barrelsDetonated', 'barrelKills']);
+const WEAPON_STATS = new Set(['shockwaves', 'frags']);
 
-/** Drops what the engine gained after these digests: the bowled stat, each hit's position
- *  and the end's medal and points. */
+/** Drops what the engine gained after these digests: the bowled and barrel stats, the
+ *  limited-weapon stats while they stay 0 (these runs spend no charge; a spent one shows),
+ *  each hit's position and the end's medal and points. */
 function dropLaterFields(this: object, key: string, value: unknown): unknown {
-  if (key === 'bowled' || key === 'barrelsDetonated' || key === 'barrelKills') return undefined;
+  if (LATER_STATS.has(key)) return undefined;
+  if ('barrelKills' in this && WEAPON_STATS.has(key) && value === 0) return undefined;
   if ((this as { type?: string }).type === 'ended' && ENDED_LATER.has(key)) return undefined;
   if ('falloff' in this && (key === 'x' || key === 'y' || key === 'z')) return undefined;
   return value;

@@ -10,7 +10,7 @@ import { FIRE_AND_FLY_DUNGEON_ID } from '../src/sim/content/fire_and_fly_arena';
 import { TURRET_DEFAULT_SCENARIO } from '../src/sim/content/fire_and_fly_scenarios';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { DEFAULT_MOUNT } from '../src/sim/content/mounts';
-import { TURRET_BOWLING, TURRET_TIMING } from '../src/sim/content/turret_defense';
+import { TURRET_BOWLING, TURRET_SHOCKWAVE, TURRET_TIMING } from '../src/sim/content/turret_defense';
 import { NORTH_WATCH_CANNON } from '../src/sim/content/vehicle_stations';
 import {
   DUNGEONS,
@@ -41,7 +41,7 @@ import {
   type TurretEvent,
   tickTurretDefense,
 } from '../src/sim/minigames/turret_defense';
-import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
+import { resolveTurretPlan, turretChargesLeft } from '../src/sim/minigames/turret_defense_plan';
 import { turretSessionSeed } from '../src/sim/minigames/turret_defense_rng';
 import {
   recordTurretFeedback,
@@ -1290,6 +1290,94 @@ describe('firing', () => {
     expect(sim.useVehicleAction('cannonball', point)).toBe(true);
     expect(cannonSeat(sim).encounter.shotsFired).toBe(1);
     expect(meta.vehicle?.kind).toBe('cannon');
+  });
+});
+
+describe('the limited weapons', () => {
+  it('fires a frag shell through useVehicleAction, turned toward it, spending a charge', () => {
+    const { sim, player } = rig();
+    seat(sim);
+    const defense = turretSeat(sim).defense;
+    expect(turretChargesLeft(defense)).toEqual({ shockwave: 2, fragmentation: 3 });
+    const aim = { x: defense.cx + 18, z: defense.cz - 18 };
+    const drawn = worldDraws(sim, () => {
+      expect(sim.useVehicleAction('turret_frag', aim)).toBe(true);
+    });
+    expect(drawn).toEqual([]);
+    expect(player.facing).toBeCloseTo(Math.atan2(18, -18), 6);
+    expect(defense.stats).toMatchObject({ shots: 1, frags: 1 });
+    expect(turretChargesLeft(defense).fragmentation).toBe(2);
+    expect(sim.useVehicleAction('turret_frag', aim)).toBe(false);
+    const events: SimEvent[] = [];
+    for (let i = 0; i < 40; i++) events.push(...sim.tick());
+    const own = turretEvents(events);
+    expect(own.every((e) => e.pid === player.id)).toBe(true);
+    const kinds = own.map((e) => e.event.type);
+    expect(kinds).toContain('fragBurst');
+    expect(kinds.filter((k) => k === 'bomblet')).toHaveLength(6);
+    expect(kinds).not.toContain('impact');
+  });
+
+  it('slams the Shockwave at the tower whatever the point, rearms, then runs dry', () => {
+    const { sim, player } = rig();
+    seat(sim);
+    const defense = turretSeat(sim).defense;
+    const facing = player.facing;
+    const seq = turretSeat(sim).nextFeedbackSeq;
+    expect(sim.useVehicleAction('turret_shockwave', { x: 1e6, z: -1e6 })).toBe(true);
+    expect(player.facing).toBe(facing);
+    expect(turretSeat(sim).feedback.at(-1)).toMatchObject({
+      seq,
+      event: { type: 'shockwave', x: defense.cx, z: defense.cz, startTick: sim.tickCount },
+    });
+    expect(sim.useVehicleAction('turret_shockwave', { x: 0, z: 0 })).toBe(false);
+    for (let i = 0; i < TURRET_SHOCKWAVE.rearmTicks; i++) sim.tick();
+    expect(sim.useVehicleAction('turret_shockwave', { x: 0, z: 0 })).toBe(true);
+    for (let i = 0; i < TURRET_SHOCKWAVE.rearmTicks; i++) sim.tick();
+    expect(sim.useVehicleAction('turret_shockwave', { x: 0, z: 0 })).toBe(false);
+    expect(defense.stats).toMatchObject({ shockwaves: 2, shots: 0 });
+    expect(turretChargesLeft(defense)).toEqual({ shockwave: 0, fragmentation: 3 });
+  });
+
+  it('refuses off the seat, for another player, once the run has ended and in the cannon', () => {
+    const { sim } = rig();
+    expect(sim.useVehicleAction('turret_shockwave', { x: 0, z: 0 })).toBe(false);
+    expect(sim.useVehicleAction('turret_frag', { x: 0, z: 0 })).toBe(false);
+    seat(sim);
+    const defense = turretSeat(sim).defense;
+    const other = sim.addPlayer('mage', 'Onlooker');
+    const aim = { x: defense.cx + 15, z: defense.cz };
+    expect(sim.useVehicleAction('turret_shockwave', aim, other)).toBe(false);
+    expect(sim.useVehicleAction('turret_frag', aim, other)).toBe(false);
+    expect(defense.stats).toMatchObject({ shockwaves: 0, frags: 0, shots: 0 });
+    defense.phase = 'lost';
+    expect(sim.useVehicleAction('turret_shockwave', aim)).toBe(false);
+    expect(sim.useVehicleAction('turret_frag', aim)).toBe(false);
+    expect(defense.stats).toMatchObject({ shockwaves: 0, frags: 0, shots: 0 });
+    sim.leaveVehicle();
+    const { sim: cannon, station } = cannonRig();
+    expect(cannon.enterVehicle(station.id)).toBe(true);
+    cannonSeat(cannon).encounter.phase = 'wave';
+    const point = { x: station.x, z: station.field.minZ + 10 };
+    expect(cannon.useVehicleAction('turret_shockwave', point)).toBe(false);
+    expect(cannon.useVehicleAction('turret_frag', point)).toBe(false);
+    expect(cannonSeat(cannon).encounter.shotsFired).toBe(0);
+  });
+
+  it('shows the charges through the plan and stats and the rearm, never the ring or the bomblets', () => {
+    const { sim } = rig();
+    seat(sim);
+    const live = turretSeat(sim).defense;
+    sim.useVehicleAction('turret_shockwave', { x: 0, z: 0 });
+    sim.useVehicleAction('turret_frag', { x: live.cx + 3, z: live.cz + 4 });
+    for (let i = 0; i < 5; i++) sim.tick();
+    expect(live.shockwave).not.toBeNull();
+    expect(live.frags).toHaveLength(1);
+    const view = sim.turretSession!;
+    expect(turretChargesLeft(view.defense)).toEqual({ shockwave: 1, fragmentation: 2 });
+    expect(view.defense.shockReadyTick).toBe(live.shockReadyTick);
+    expect(view.defense).not.toHaveProperty('shockwave');
+    expect(view.defense).not.toHaveProperty('frags');
   });
 });
 

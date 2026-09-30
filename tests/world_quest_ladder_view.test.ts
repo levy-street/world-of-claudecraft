@@ -48,7 +48,7 @@ describe('art paths', () => {
     expect(worldQuestBoardArt('glider_downs_v2_daily')).toBe(
       '/ui/world-quests/leaderboard/slalom.webp',
     );
-    expect(worldQuestBoardArt('fire_and_fly_hard_v1_lifetime')).toBe(
+    expect(worldQuestBoardArt('fire_and_fly_hard_v2_lifetime')).toBe(
       '/ui/world-quests/leaderboard/barricade.webp',
     );
     expect(worldQuestMedalArt('silver')).toBe('/ui/world-quests/leaderboard/medal_silver.webp');
@@ -93,8 +93,8 @@ describe('cards and board header', () => {
 
   it("titles the trial boards as the gunner's records, with the offline rules on a personal page", () => {
     const online = buildWorldQuestLadderView(
-      'fire_and_fly_introduction_v1_daily',
-      { kind: 'page', page: page({ board: 'fire_and_fly_introduction_v1_daily' }) },
+      'fire_and_fly_introduction_v2_daily',
+      { kind: 'page', page: page({ board: 'fire_and_fly_introduction_v2_daily' }) },
       'Hero1',
     );
     expect(online.title).toBe("Gunner's trial records");
@@ -103,8 +103,8 @@ describe('cards and board header', () => {
     expect(online.cards).toHaveLength(6);
     expect(online.columns.metric).toBe('Score');
     const offline = buildWorldQuestLadderView(
-      'fire_and_fly_introduction_v1_daily',
-      { kind: 'page', page: page({ board: 'fire_and_fly_introduction_v1_daily', personal: true }) },
+      'fire_and_fly_introduction_v2_daily',
+      { kind: 'page', page: page({ board: 'fire_and_fly_introduction_v2_daily', personal: true }) },
       'Hero1',
     );
     expect(offline.subtitle).toMatch(/^Your offline records/);

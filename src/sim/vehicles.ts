@@ -18,6 +18,7 @@ import type { SimContext } from './sim_context';
 import {
   endTurretSeat,
   fireTurretSeat,
+  shockwaveTurretSeat,
   type TurretSessionView,
   tickTurretSeat,
   turretRunEnded,
@@ -146,11 +147,19 @@ export function useVehicleAction(
   const session = resolved?.meta.vehicle;
   if (!resolved || !session) return false;
   if (session.kind === 'turret') {
-    if (action === 'turret_replay')
-      return replayFireAndFlySeat(ctx, resolved.meta, resolved.e, session);
-    return (
-      action === 'turret_fire' && fireTurretSeat(ctx, resolved.meta, resolved.e, session, point)
-    );
+    const { meta, e } = resolved;
+    switch (action) {
+      case 'turret_replay':
+        return replayFireAndFlySeat(ctx, meta, e, session);
+      case 'turret_fire':
+        return fireTurretSeat(ctx, meta, e, session, point);
+      case 'turret_frag':
+        return fireTurretSeat(ctx, meta, e, session, point, 'frag');
+      case 'turret_shockwave':
+        return shockwaveTurretSeat(ctx, meta, e, session);
+      default:
+        return false;
+    }
   }
   const station = vehicleStationById(session.stationId);
   if (

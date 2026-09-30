@@ -14,8 +14,8 @@ import { FIRE_AND_FLY_MAX_POINTS } from '../../src/sim/fire_and_fly_personal_rec
 import { LEADERBOARD_MAX } from '../../src/sim/leaderboard_page';
 import { WORLD_QUEST_MEDAL_RANK } from '../../src/sim/world_quest_scoreboards';
 
-const LIFETIME = 'fire_and_fly_standard_v1_lifetime';
-const DAILY = 'fire_and_fly_standard_v1_daily';
+const LIFETIME = 'fire_and_fly_standard_v2_lifetime';
+const DAILY = 'fire_and_fly_standard_v2_daily';
 
 function recorder(rowCount = 1, rows: unknown[] = []) {
   const calls: { text: string; values?: unknown[] }[] = [];

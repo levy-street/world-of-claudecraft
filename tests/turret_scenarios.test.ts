@@ -118,7 +118,7 @@ describe('the scenario table', () => {
     expect(TURRET_DEFAULT_SCENARIO).toBe(TURRET_SCENARIO_STANDARD);
     for (const s of TURRET_SCENARIOS) {
       expect(s.boardKey).toMatch(/^[a-z]+$/);
-      expect(s.arsenal).toBeUndefined();
+      expect(s.arsenal).toEqual({ shockwave: 2, fragmentation: 3 });
       expect(s.medals.silver.minIntegrityShare).toBeGreaterThan(0);
       expect(s.medals.silver.minIntegrityShare).toBeLessThan(s.medals.gold.minIntegrityShare);
       expect(s.medals.gold.minIntegrityShare).toBeLessThanOrEqual(1);
@@ -183,7 +183,7 @@ describe('resolving a scenario into a plan', () => {
     expect(resolveTurretPlan(TURRET_SCENARIO_STANDARD)).toEqual(plan);
     expect(plan.scenarioId).toBe('fire_and_fly_standard');
     expect(plan.integrity).toBe(100);
-    expect(plan.arsenal).toEqual({ shockwave: 0, fragmentation: 0 });
+    expect(plan.arsenal).toEqual({ shockwave: 2, fragmentation: 3 });
     for (const wave of plan.waves) expect(wave.arrival).toEqual({ kind: 'ring' });
     // The resolved plan as the resolver built it before scenarios, byte for byte.
     const before = { kinds: plan.kinds, waves: plan.waves.map(({ arrival, ...w }) => w) };
@@ -191,12 +191,12 @@ describe('resolving a scenario into a plan', () => {
   });
 
   it.each(TURRET_SCENARIOS.map((s) => [s.boardKey, s] as const))(
-    'carries %s: its id, tower points and an empty arsenal, deep-frozen',
+    'carries %s: its id, tower points and the trial arsenal, deep-frozen',
     (_key, s) => {
       const plan = resolveTurretPlan(s);
       expect(plan.scenarioId).toBe(s.id);
       expect(plan.integrity).toBe(s.integrity);
-      expect(plan.arsenal).toEqual({ shockwave: 0, fragmentation: 0 });
+      expect(plan.arsenal).toEqual({ shockwave: 2, fragmentation: 3 });
       expect(plan.waves).toHaveLength(s.waves.length);
       expect(Object.isFrozen(plan.arsenal)).toBe(true);
       expect(Object.isFrozen(plan.waves[0].arrival)).toBe(true);
@@ -250,6 +250,10 @@ describe('resolving a scenario into a plan', () => {
   it('carries a scenario arsenal, absent charges as 0', () => {
     const plan = resolveTurretPlan({ ...TURRET_SCENARIO_STANDARD, arsenal: { shockwave: 3 } });
     expect(plan.arsenal).toEqual({ shockwave: 3, fragmentation: 0 });
+    expect(resolveTurretPlan({ ...TURRET_SCENARIO_STANDARD, arsenal: undefined }).arsenal).toEqual({
+      shockwave: 0,
+      fragmentation: 0,
+    });
   });
 
   it('scales health by the entry, rounded, as a kind of its own', () => {

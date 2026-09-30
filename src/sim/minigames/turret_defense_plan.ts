@@ -55,6 +55,22 @@ export interface TurretArsenal {
   readonly fragmentation: number;
 }
 
+/**
+ * Limited-weapon charges left: the arsenal less the charges spent (the run's
+ * `shockwaves` and `frags` stats), so a reader of the view counts them exactly
+ * as the engine does, from the plan and the stats it already holds.
+ */
+export function turretChargesLeft(run: {
+  readonly plan: { readonly arsenal: TurretArsenal };
+  readonly stats: { readonly shockwaves: number; readonly frags: number };
+}): TurretArsenal {
+  const { arsenal } = run.plan;
+  return {
+    shockwave: Math.max(0, arsenal.shockwave - run.stats.shockwaves),
+    fragmentation: Math.max(0, arsenal.fragmentation - run.stats.frags),
+  };
+}
+
 /** Deep-frozen when resolved: sessions and their views share one plan by reference. */
 export interface TurretPlan {
   readonly scenarioId: string;
