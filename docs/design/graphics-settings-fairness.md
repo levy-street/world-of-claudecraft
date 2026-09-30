@@ -217,6 +217,20 @@ COSMETIC (may be tiered down on lower presets):
   device policy (`gfxAaPolicy`) plus the Anti-Aliasing dial, never of the frame-budget
   governor, so it cannot vary between two players standing in the same spot.
 
+- The canvas resolution of the harbor route plates on the iOS memory profile
+  (`harborRouteMarkerPlateCanvasSize` in `src/render/harbor_route_marker_core.ts`). The
+  destination name a player reads to choose a ferry is ACTIONABLE, so it is painted on every
+  tier and every profile; what the iOS memory profile sheds is the resolution it is painted
+  at, half each side, to keep canvas and texture memory under the WebKit page ceiling. Every
+  paint metric (the keyline, the lift under the ink, the fit loop's font floor and step)
+  scales with the canvas (`harborRouteMarkerPlatePaint`), so the lettering fills the same
+  share of the plate and a long localized name shrinks exactly as far on both sizes. On a
+  phone the plate covers fewer render pixels than the half-size canvas at any ordinary
+  reading distance, so what the player sees does not change; on a large iPad close up the
+  name is magnified and softer, never smaller, hidden or clipped. The size is a pure function
+  of the STATIC platform profile (`GFX.iosMemoryProfile`), like the anti-aliasing arm above,
+  never of a preset or the frame-budget governor.
+
 The test for any new tier knob: if a knob hides or delays something a player READS AND REACTS
 TO, it is not allowed. If it only reduces visual richness or redraw smoothness, it is fine.
 
@@ -783,6 +797,12 @@ The choice reads the static preset or the player's own dial, never the FPS gover
   a held world draw and a hidden desktop shell. `tests/frame_cadence_fairness.test.ts`: the
   limit is never an input of the HUD tier resolvers, and the tier resolvers are never an
   input of the limit.
+- `tests/harbor_route_marker_core.test.ts` + `tests/harbor_route_marker_render.test.ts`: the
+  harbor route plate canvas per memory profile, read from the real per-tier profile settings
+  (full size with the authored metrics off the iOS profile, half size with every metric
+  halved on it and on its tight rung), the fit loop equal to the pre-profile loop at full
+  size, and, through the painter's recorded 2D calls, the destination name painted on every
+  tier on both sizes.
 
 ## Resolved: negative-value stat-sap auras now classify as debuffs in both worlds
 
