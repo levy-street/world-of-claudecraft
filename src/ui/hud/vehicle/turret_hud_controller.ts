@@ -1,8 +1,10 @@
 import { type GamepadKind, GP, gamepadButtonLabel } from '../../../game/gamepad_map';
 import { currentInputHintMode } from '../../../game/input_hint_mode';
 import { keyLabel } from '../../../game/keybinds';
+import { TURRET_PAD_WEAPON_BUTTONS } from '../../../game/turret_controls';
 import { TurretDefenseSfx } from '../../../game/turret_defense_sfx';
 import type { IWorldVehicles } from '../../../world_api/vehicles';
+import { t } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
 import { createReducedMotionProbe } from './reduced_motion_probe';
 import { TurretAimCore } from './turret_aim_core';
@@ -11,6 +13,9 @@ import { TurretHitFeedback } from './turret_hit_feedback_core';
 import { TurretHitFlashPainter } from './turret_hit_flash_painter';
 import { TurretHudPainter } from './turret_hud_painter';
 import { type TurretBanner, TurretFeedbackCursor, TurretHudView } from './turret_hud_view';
+import { TurretWeaponBarPainter } from './turret_weapon_bar_painter';
+import { type TurretWeaponBarInput, TurretWeaponBarView } from './turret_weapon_bar_view';
+import { turretWaveCoreDamage, turretWeaponTooltip } from './turret_weapon_tooltip';
 
 type TurretHudWorld = Pick<
   IWorldVehicles,
@@ -27,6 +32,11 @@ export interface TurretHudHooks {
   reducedMotion?(): boolean;
   /** The connected pad's brand, for Leave's Start glyph while the pad is in hand. */
   padKind?(): GamepadKind;
+  /** The player's key for an action-bar slot: the weapon sockets' keycaps (keys 1 and 2). */
+  keyLabel?(slot: number): string;
+  attachTooltip?(element: HTMLElement, html: () => string): void;
+  /** True when a touch only peeked at a tooltip: the socket then does not fire. */
+  consumePeek?(): boolean;
 }
 
 export const TURRET_HIT_OVERLAY_ID = 'turret-hit-vignette';
@@ -39,8 +49,8 @@ export const TURRET_SEATED_CLASS = 'manning-turret';
 const REPLAY_POINT = { x: 0, z: 0 } as const;
 
 /**
- * The Fire and Fly seat HUD: status strip, result card, tower rail, hit feedback, Replay
- * and Leave.
+ * The Fire and Fly seat HUD: status strip, result card, tower rail, weapon sockets, hit
+ * feedback, Replay and Leave.
  */
 export class TurretHudController {
   readonly aim: TurretAimCore;
@@ -52,6 +62,9 @@ export class TurretHudController {
   private readonly numbers: TurretDamageNumbers | null;
   private readonly hits: TurretHitFeedback;
   private readonly hitFlash: TurretHitFlashPainter;
+  private readonly weaponView = new TurretWeaponBarView();
+  private readonly weapons: TurretWeaponBarPainter;
+  private weaponInput: TurretWeaponBarInput | null = null;
   private seated = false;
   constructor(
     private readonly world: TurretHudWorld,
@@ -68,12 +81,29 @@ export class TurretHudController {
       () => world.leaveVehicle(),
       () => world.useVehicleAction('turret_replay', REPLAY_POINT),
     );
+    this.weapons = new TurretWeaponBarPainter(
+      writers,
+      (slot) => {
+        if (hooks.consumePeek?.()) return;
+        this.chooseSlot(slot);
+        // A tap focuses the socket, and a focused socket shows its tooltip over the field.
+        this.weapons.buttons[slot]?.blur();
+      },
+      hooks.attachTooltip,
+      (slot) => this.weaponTooltip(slot),
+    );
     this.hitVeil.id = TURRET_HIT_OVERLAY_ID;
     writers.setAttr(this.hitVeil, 'aria-hidden', 'true');
     writers.setDisplay(this.hitVeil, 'none');
     document
       .getElementById('ui')
-      ?.append(this.painter.strip, this.painter.rail, this.painter.live, this.hitVeil);
+      ?.append(
+        this.painter.strip,
+        this.weapons.root,
+        this.painter.rail,
+        this.painter.live,
+        this.hitVeil,
+      );
     this.hits = new TurretHitFeedback(
       () => performance.now(),
       hooks.reducedMotion ?? createReducedMotionProbe(),
@@ -83,6 +113,12 @@ export class TurretHudController {
 
   get active(): boolean {
     return this.seated;
+  }
+
+  /** A bar slot while seated: slot 0 (key 1, pad Y) slams, slot 1 (key 2, pad LB) arms or disarms. */
+  chooseSlot(slot: number): void {
+    if (slot === 0) this.aim.fireShockwave();
+    else if (slot === 1) this.aim.toggleFrag();
   }
 
   update(): void {
@@ -97,15 +133,66 @@ export class TurretHudController {
       this.painter.show(seated);
       writers.toggleClass(document.body, TURRET_SEATED_CLASS, seated);
     }
-    const banner = this.feedback.consume(session);
+    const banner = this.feedback.consume(session, () => this.weaponKeys());
     if (banner) this.hooks.showBanner?.(banner);
     this.sounds.update(session, this.world.turretClock);
     this.numbers?.update(session, this.world.turretClock);
     const hit = this.hits.update(session, this.world.turretClock);
     this.hitFlash.paint(hit);
     if (hit.cameraShake > 0) this.hooks.addShake?.(hit.cameraShake);
+    this.aim.sync();
     if (!session) return;
-    this.painter.paint(this.view.tick(session, this.world.turretClock), this.leaveKeycap());
+    const clock = this.world.turretClock;
+    const frame = this.view.tick(session, clock);
+    this.painter.paint(frame, this.leaveKeycap());
+    const arsenal = session.defense.plan.arsenal;
+    const armed = frame.result === null && arsenal.shockwave + arsenal.fragmentation > 0;
+    this.weapons.show(armed);
+    if (!armed) return;
+    let input = this.weaponInput;
+    if (!input) {
+      input = {
+        session,
+        clock,
+        shots: this.aim.shots,
+        fragArmed: false,
+        keycap: (slot) => this.weaponKeycap(slot),
+      };
+      this.weaponInput = input;
+    }
+    input.session = session;
+    input.clock = clock;
+    input.fragArmed = this.aim.fragArmed;
+    const state = this.weaponView.tick(input);
+    this.weapons.paint(state, t('hudChrome.turret.weapons'));
+  }
+
+  /** The weapon socket's keycap: the pad glyph while the pad is in hand, else the bound key. */
+  private weaponKeycap(slot: number): string {
+    if (currentInputHintMode() === 'pad') {
+      return gamepadButtonLabel(
+        TURRET_PAD_WEAPON_BUTTONS[slot],
+        this.hooks.padKind?.() ?? 'generic',
+      );
+    }
+    return this.hooks.keyLabel?.(slot) ?? '';
+  }
+
+  /** The keys the first wave's banner names; null on touch, which has none. */
+  private weaponKeys(): { shock: string; frag: string } | null {
+    if (currentInputHintMode() === 'touch') return null;
+    return { shock: this.weaponKeycap(0), frag: this.weaponKeycap(1) };
+  }
+
+  private weaponTooltip(slot: number): string {
+    const session = this.world.turretSession;
+    if (!session) return '';
+    const weapon = slot === 0 ? 'shock' : 'frag';
+    return turretWeaponTooltip(
+      weapon,
+      turretWaveCoreDamage(session),
+      this.aim.shots.chargesLeft(session, this.world.turretClock, weapon),
+    );
   }
 
   /** Escape leaves the seat; on a pad in hand, Start sends the same escape. */

@@ -18028,6 +18028,22 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turret.leaveShort': '离开',
   'hudChrome.turret.replay': '再来一次',
   'hudChrome.turret.replayHint': '在塔上再次挑战同一试炼。领取今日奖励后，再次挑战不再给予奖励。',
+  'hudChrome.turret.weapons': '塔楼武器',
+  'hudChrome.turret.shockwave': '冲击波',
+  'hudChrome.turret.shockwaveTip':
+    '猛击塔楼：一道冲击环在 {seconds} 秒内从塔墙向外扩散至 {reach} 码。它触及的每个地面怪物都会被抛离塔楼，并被打断仍在蓄力的攻击；距塔楼 {core} 码内受到 {damage} 点伤害，更远处伤害降低。空中的怪物会越过冲击环。',
+  'hudChrome.turret.shockwaveRules': '使用后 {seconds} 秒再次就绪。仅在波次进行中可用。',
+  'hudChrome.turret.frag': '破片弹',
+  'hudChrome.turret.fragTip':
+    '先装填，再像普通炮弹一样向地面发射。它在瞄准点上空炸开，化为 {count} 枚子弹：一枚落在瞄准点，{outer} 枚落在其周围 {radius} 码的圆环上。每枚子弹对 {blast} 码内造成最多 {damage} 点伤害，抛飞被击中的怪物，并点燃火药桶。',
+  'hudChrome.turret.fragRules':
+    '使用火炮的装填时间。再次装填或取消会将其收起，不消耗次数。仅在波次进行中可用。',
+  'hudChrome.turret.chargesLeft': '剩余次数：{count}',
+  'hudChrome.turret.weaponsHint':
+    '在怪物抵达塔楼前将它们炸飞。{shockKey}：冲击波。{fragKey}：破片弹。',
+  'hudChrome.turret.weaponsHintTouch': '在怪物抵达塔楼前将它们炸飞。点击插槽使用冲击波或破片弹。',
+  'hudChrome.turret.statShockwaves': '冲击波',
+  'hudChrome.turret.statFrags': '破片弹',
   'hudChrome.leaderboard.tabWorldQuests': '世界任务',
   'hudChrome.leaderboard.wqBoardsLabel': '世界任务排行榜',
   'hudChrome.leaderboard.wqMedal': '奖牌',

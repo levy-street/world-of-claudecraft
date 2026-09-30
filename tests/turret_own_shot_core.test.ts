@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { TURRET_WEAPON } from '../src/sim/content/turret_defense';
+import { TURRET_SHOCKWAVE, TURRET_WEAPON } from '../src/sim/content/turret_defense';
 import type { TurretAim, TurretEvent, TurretPhase } from '../src/sim/minigames/turret_defense';
 import type { TurretFeedback } from '../src/sim/minigames/turret_feedback';
 import {
@@ -270,5 +270,191 @@ describe('the own-shot ledger', () => {
     expect(shots.launchAfter(next, 0)).toBeNull();
     expect(shots.status(last)).toBeNull();
     expect(shots.mark(next, 950, aim(CX, CZ + 30))).toBe(last + 1);
+  });
+});
+
+interface Armory extends Seat {
+  shockReadyTick?: number;
+  phaseEndTick?: number;
+  shockwaves?: number;
+  frags?: number;
+  arsenal?: { shockwave: number; fragmentation: number };
+}
+
+/** A seat view with the limited weapons: 2 Shockwaves and 3 fragmentation shells by default. */
+function armory(seat: Armory = {}): TurretSessionView {
+  const base = view(seat);
+  return {
+    ...base,
+    defense: {
+      ...base.defense,
+      shockReadyTick: seat.shockReadyTick ?? 0,
+      phaseEndTick: seat.phaseEndTick ?? 0,
+      plan: { arsenal: seat.arsenal ?? { shockwave: 2, fragmentation: 3 } },
+      stats: { shockwaves: seat.shockwaves ?? 0, frags: seat.frags ?? 0 },
+    } as unknown as TurretSessionView['defense'],
+  };
+}
+
+function firedFrag(seq: number, tick: number, x: number, z: number): TurretFeedback {
+  const entry = fired(seq, tick, x, z);
+  return {
+    ...entry,
+    event: { ...(entry.event as Extract<TurretEvent, { type: 'fired' }>), weapon: 'frag' },
+  };
+}
+
+function slammed(seq: number, tick: number): TurretFeedback {
+  return {
+    seq,
+    tick,
+    event: { type: 'shockwave', id: 1, x: CX, y: 0, z: CZ, startTick: tick, reach: 12 },
+  };
+}
+
+const CENTER_AIM: TurretAim = { x: CX, z: CZ, dirX: 0, dirZ: 1, range: 0 };
+const REARM = TURRET_SHOCKWAVE.rearmTicks;
+
+describe('the own-shot ledger with the limited weapons', () => {
+  it('plays a weapon click only in a wave, with a charge left and its own clock ready', () => {
+    const shots = new TurretOwnShotLedger();
+    expect(shots.canMark(armory(), 200, 'shock')).toBe(true);
+    expect(shots.canMark(armory(), 200, 'frag')).toBe(true);
+    // The server refuses both silently outside a wave, so a charge is never spent there.
+    for (const phase of ['intro', 'between'] as const) {
+      const lull = armory({ phase, phaseEndTick: 260 });
+      expect(shots.canMark(lull, 200, 'shock')).toBe(false);
+      expect(shots.canMark(lull, 200, 'frag')).toBe(false);
+      expect(shots.classify(lull, 200, 'frag')).toBe('free');
+      // A shell still fires between waves.
+      expect(shots.canMark(lull, 200)).toBe(true);
+    }
+    // No charge left: never played, never held.
+    const empty = armory({ shockwaves: 2, frags: 3 });
+    expect(shots.classify(empty, 200, 'shock')).toBe('free');
+    expect(shots.classify(empty, 200, 'frag')).toBe('free');
+    // The Shockwave rearms on its own clock, apart from the cannon's reload.
+    const rearming = armory({ shockReadyTick: 210, readyTick: 210 });
+    expect(shots.canMark(rearming, 200, 'shock')).toBe(false);
+    expect(shots.canMark(armory({ shockReadyTick: 210 }), 200, 'frag')).toBe(true);
+    expect(shots.canMark(armory({ readyTick: 210 }), 200, 'shock')).toBe(true);
+    expect(shots.canMark(armory({ readyTick: 210 }), 200, 'frag')).toBe(false);
+  });
+
+  it('shows a charge spent on a played click and gives it back when the click is refused', () => {
+    const shots = new TurretOwnShotLedger();
+    const s = armory();
+    expect(shots.chargesLeft(s, 200, 'frag')).toBe(3);
+    const serial = shots.markWeapon(s, 200, aim(CX, CZ + 30), 'frag');
+    expect(shots.status(serial)).toBe('pending');
+    expect(shots.chargesLeft(s, 200, 'frag')).toBe(2);
+    expect(shots.chargesLeft(s, 200, 'shock')).toBe(2);
+    shots.update(s, 200 + shots.confirmWindow + 1);
+    expect(shots.status(serial)).toBe('refused');
+    expect(shots.chargesLeft(s, 200 + shots.confirmWindow + 1, 'frag')).toBe(3);
+  });
+
+  it('never plays the last charge twice while its click waits', () => {
+    // Long trips (18 ticks, trusted): a slam still waits for its entry when the rearm is over.
+    const lastOne = measured(18, 18, 18, 18, 18, 18, 18, 18);
+    const twoLeft = measured(18, 18, 18, 18, 18, 18, 18, 18);
+    const s = armory({ shockwaves: 1 });
+    expect(lastOne.classify(s, 200, 'shock')).toBe('played');
+    lastOne.markWeapon(s, 200, CENTER_AIM, 'shock');
+    twoLeft.markWeapon(armory(), 200, CENTER_AIM, 'shock');
+    expect(lastOne.chargesLeft(s, 200, 'shock')).toBe(0);
+    const ready = 200 + 19 + REARM - 17;
+    expect(twoLeft.classify(armory(), ready, 'shock')).toBe('played');
+    // The waiting slam surely takes the last charge: a click now is surely refused.
+    expect(lastOne.classify(s, ready, 'shock')).toBe('free');
+    expect(lastOne.status(1 + 8)).toBe('pending');
+  });
+
+  it('confirms a fragmentation shell only by a frag entry, and a shell only by a plain one', () => {
+    const shots = new TurretOwnShotLedger();
+    const s = armory();
+    const frag = shots.markWeapon(s, 200, aim(CX, CZ + 30), 'frag');
+    const plain = fired(1, 200, CX, CZ + 30);
+    expect(shots.ownShotOf(armory({ feedback: [plain] }), plain)).toBe(0);
+    expect(shots.status(frag)).toBe('pending');
+    const burst = firedFrag(2, 200, CX, CZ + 30);
+    const both = armory({ feedback: [plain, burst], frags: 1 });
+    expect(shots.ownShotOf(both, burst)).toBe(frag);
+    expect(shots.ownShotOf(both, burst)).toBe(frag);
+    expect(shots.status(frag)).toBe('confirmed');
+    expect(shots.chargesLeft(both, 200, 'frag')).toBe(2);
+    // The other way round: a frag entry at a shell's point is not that shell's.
+    const other = new TurretOwnShotLedger();
+    const shell = other.mark(armory(), 200, aim(CX, CZ + 30));
+    const lone = firedFrag(1, 200, CX, CZ + 30);
+    expect(other.ownShotOf(armory({ feedback: [lone], frags: 1 }), lone)).toBe(0);
+    expect(other.status(shell)).toBe('pending');
+  });
+
+  it('confirms a shell and a Shockwave sent on one tick, entries in command order', () => {
+    for (const shockFirst of [false, true]) {
+      const shots = new TurretOwnShotLedger();
+      const s = armory();
+      const shellMark = () => shots.mark(s, 200, aim(CX, CZ + 30));
+      const slamMark = () => shots.markWeapon(s, 200, CENTER_AIM, 'shock');
+      const first = shockFirst ? slamMark() : shellMark();
+      const second = shockFirst ? shellMark() : slamMark();
+      const shellEntry = fired(shockFirst ? 2 : 1, 203, CX, CZ + 30);
+      const slamEntry = slammed(shockFirst ? 1 : 2, 203);
+      const ring = shockFirst ? [slamEntry, shellEntry] : [shellEntry, slamEntry];
+      const after = armory({ feedback: ring, shockwaves: 1, shockReadyTick: 203 + REARM });
+      for (const entry of ring) {
+        const own =
+          entry === slamEntry ? (shockFirst ? first : second) : shockFirst ? second : first;
+        expect(shots.ownShotOf(after, entry), `shock first: ${shockFirst}`).toBe(own);
+      }
+      expect([shots.status(first), shots.status(second)]).toEqual(['confirmed', 'confirmed']);
+    }
+  });
+
+  it('shares the cannon reload between the shell and the fragmentation shell', () => {
+    const shots = measured(0);
+    const s = armory();
+    shots.markWeapon(s, 200, aim(CX, CZ + 30), 'frag');
+    expect(shots.canMark(s, 200)).toBe(false);
+    expect(shots.canMark(s, 200 + COOLDOWN)).toBe(true);
+    // The Shockwave is not on that clock.
+    expect(shots.canMark(s, 200, 'shock')).toBe(true);
+  });
+
+  it('confirms a Shockwave by its entry, hands its slam to the readers once, and never twice', () => {
+    const shots = new TurretOwnShotLedger();
+    const s = armory();
+    const serial = shots.markWeapon(s, 200, CENTER_AIM, 'shock');
+    const slam = shots.launchAfter(s, 0);
+    expect(slam).toMatchObject({ serial, weapon: 'shock', fromX: CX, fromZ: CZ });
+    expect(shots.launchAfter(s, serial)).toBeNull();
+    const entry = slammed(1, 203);
+    const after = armory({ feedback: [entry], shockwaves: 1, shockReadyTick: 203 + REARM });
+    // Its slam played on the click: every reader of the entry skips it, the ring still plays.
+    expect(shots.ownShotOf(after, entry)).toBe(serial);
+    expect(shots.ownShotOf(after, entry)).toBe(serial);
+    expect(shots.status(serial)).toBe('confirmed');
+    expect(shots.leadTicks).toBe(3);
+    // An unmarked Shockwave (another tab, a replayed ring) plays whole from its entry.
+    const other = slammed(2, 260);
+    expect(shots.ownShotOf(armory({ feedback: [entry, other] }), other)).toBe(0);
+  });
+
+  it('keeps a shell mark launched without a weapon, as its fired entry carries none', () => {
+    const shots = new TurretOwnShotLedger();
+    shots.mark(armory(), 200, aim(CX, CZ + 30));
+    expect(shots.launchAfter(armory(), 0)?.weapon).toBeUndefined();
+  });
+
+  it('refuses a waiting Shockwave the server skipped when a later command confirms', () => {
+    const shots = measured(3);
+    const s = armory();
+    const slam = shots.markWeapon(s, 200, CENTER_AIM, 'shock', 'played');
+    const shell = shots.mark(s, 202, aim(CX, CZ + 30), 'played');
+    const entry = fired(1, 205, CX, CZ + 30);
+    expect(shots.ownShotOf(armory({ feedback: [entry] }), entry)).toBe(shell);
+    expect(shots.status(slam)).toBe('refused');
+    expect(shots.chargesLeft(armory({ feedback: [entry] }), 205, 'shock')).toBe(2);
   });
 });

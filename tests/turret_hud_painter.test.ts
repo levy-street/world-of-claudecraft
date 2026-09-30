@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   TURRET_SCENARIO_HARD,
   TURRET_SCENARIO_INTRODUCTION,
+  TURRET_SCENARIO_STANDARD,
 } from '../src/sim/content/fire_and_fly_scenarios';
 import { createTurretDefense } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
@@ -102,6 +103,38 @@ describe('the turret HUD painter', () => {
     expect(painter.strip.querySelector('.turret-leave-key')!.textContent).toBe('Menu');
   });
 
+  it('hides the result row of a weapon the trial gives none of, and shows it for the next', () => {
+    const { painter, view } = rig();
+    painter.show(true);
+    const statRows = () => [
+      ...painter.strip.querySelectorAll<HTMLElement>(
+        '.turret-card-stats:not(.turret-card-points) .ui-stat-row',
+      ),
+    ];
+    const run = (arsenal: { shockwave: number; fragmentation: number }) => {
+      const session = seat(resolveTurretPlan({ ...TURRET_SCENARIO_STANDARD, arsenal }));
+      session.defense.phase = 'won';
+      session.defense.result = turretResult(session.defense.plan, session.defense);
+      view.reset();
+      painter.paint(view.tick(turretSessionView(session), START), 'Esc');
+    };
+    run({ shockwave: 0, fragmentation: 3 });
+    expect(statRows().map((row) => row.style.display)).toEqual([
+      '',
+      '',
+      '',
+      '',
+      '',
+      'none',
+      '',
+      '',
+    ]);
+    expect(statRows()[6].textContent).toBe('Fragmentation Shells0/3');
+    run({ shockwave: 2, fragmentation: 3 });
+    expect(statRows()[5].style.display).toBe('');
+    expect(statRows()[5].textContent).toBe('Shockwaves0/2');
+  });
+
   it("gives the rail the scenario's maximum, and changes it with the next seat's", () => {
     const { painter, view } = rig();
     painter.show(true);
@@ -137,6 +170,8 @@ describe('the turret HUD painter', () => {
       'Accuracy',
       'Longest throw',
       'Longest airtime',
+      'Shockwaves',
+      'Fragmentation Shells',
       'Tower',
     ]);
     leave.click();

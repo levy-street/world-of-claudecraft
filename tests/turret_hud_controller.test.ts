@@ -158,6 +158,36 @@ it('shows the strip and the rail, hides the action bars and swaps in the turret 
   expect(hud().querySelector('[role="status"]')).toBeNull();
 });
 
+it("names the pad's buttons on the first wave's banner, and the sockets on touch", () => {
+  for (const [mode, subtext] of [
+    [
+      'pad-active',
+      'Blast the monsters before they reach the tower. Y: Shockwave. LB: Fragmentation Shell.',
+    ],
+    [
+      'mobile-touch',
+      'Blast the monsters before they reach the tower. Tap a socket for a Shockwave or a Fragmentation Shell.',
+    ],
+  ] as const) {
+    document.body.innerHTML = '<div id="ui"></div>';
+    document.body.className = mode;
+    const { world, bar, showBanner } = rig();
+    const session = seat();
+    session.nextFeedbackSeq = recordTurretFeedback(
+      session.feedback,
+      session.nextFeedbackSeq,
+      START,
+      [{ type: 'waveStart', wave: 0, count: 8 }],
+    );
+    session.defense.phase = 'wave';
+    session.defense.rev++;
+    world.turretSession = turretSessionView(session);
+    world.turretClock = START;
+    bar.update();
+    expect(showBanner, mode).toHaveBeenCalledWith({ text: 'Wave 1 of 6', subtext });
+  }
+});
+
 it('shows the pad Start glyph on Leave while the pad is in hand', () => {
   const { world, bar } = rig();
   world.turretSession = turretSessionView(seat());
@@ -202,9 +232,11 @@ it('writes nothing on unchanged frames, announces each wave once, and never spea
   bar.update();
   bar.update();
   expect(showBanner).toHaveBeenCalledTimes(1);
+  // The first wave names both weapons by the player's own keys (slots 1 and 2 here).
   expect(showBanner).toHaveBeenCalledWith({
     text: 'Wave 1 of 6',
-    subtext: 'Blast the monsters before they reach the tower',
+    subtext:
+      'Blast the monsters before they reach the tower. 1: Shockwave. 2: Fragmentation Shell.',
   });
   expect(text('.turret-strip-wave')).toBe('Wave 1/6');
   expect(text('.turret-strip-slot')).toBe('Monsters left: 8');

@@ -586,7 +586,20 @@ export const ja_JP: EnTranslations = {
       "leave": "塔を降りる",
       "leaveShort": "降りる",
       "replay": "もう一度",
-      "replayHint": "塔の上で同じ試練にもう一度挑む。本日の報酬を受け取った後の再挑戦では、報酬は得られない。"
+      "replayHint": "塔の上で同じ試練にもう一度挑む。本日の報酬を受け取った後の再挑戦では、報酬は得られない。",
+      "weapons": "塔の兵装",
+      "shockwave": "衝撃波",
+      "shockwaveTip": "塔を叩きつける：輪が塔の壁から {reach} ヤード先まで {seconds} 秒で広がる。輪が届いた地上のモンスターはすべて塔から吹き飛ばされ、溜め中の攻撃は止まる。塔から {core} ヤード以内では {damage} ダメージ、その先では減少する。空中のモンスターは輪を越える。",
+      "shockwaveRules": "使用後 {seconds} 秒で再使用可能。ウェーブ中のみ使える。",
+      "frag": "榴散弾",
+      "fragTip": "装填してから、通常の砲弾と同じく地面に撃つ。狙った地点の上空で {count} 個の子弾に分裂する：1 個は狙った地点に、{outer} 個はその周囲 {radius} ヤードの円に落ちる。各子弾は {blast} ヤード以内に最大 {damage} ダメージを与え、当たったモンスターを吹き飛ばし、火薬樽に火をつける。",
+      "fragRules": "大砲の装填時間を使う。もう一度装填するかキャンセルすると、チャージを消費せずにしまう。ウェーブ中のみ使える。",
+      "chargesLeft": "残りチャージ：{count}",
+      "weaponsHint": "塔にたどり着く前にモンスターを吹き飛ばせ。{shockKey}：衝撃波。{fragKey}：榴散弾。",
+      "weaponsHintTouch": "塔にたどり着く前にモンスターを吹き飛ばせ。ソケットをタップして衝撃波か榴散弾を使う。",
+      "statShockwaves": "衝撃波",
+      "statFrags": "榴散弾",
+      "statUsed": "{used}/{given}"
     },
     "warlock": {
       "doomLabel": "断罪",

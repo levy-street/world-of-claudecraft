@@ -588,6 +588,15 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   // The Fire and Fly hit flash: the edge overlay and the tower rail's glow and swing,
   // every write through the shared facet, none between strikes.
   { file: 'hud/vehicle/turret_hit_flash_painter.ts', allow: {}, reflowAllow: {} },
+  // The Fire and Fly weapon sockets: the one .className is the construction-only element
+  // helper every node is minted through; every frame write (the row's name, the sockets'
+  // charges, sweep, armed and pulse states) goes through the shared facet and the
+  // ActionBarPainter it composes.
+  {
+    file: 'hud/vehicle/turret_weapon_bar_painter.ts',
+    allow: { '.className': 1 },
+    reflowAllow: {},
+  },
   // Both writes are build-time. The .className is the base class stamped on a tick
   // as it is MINTED into the pool (the pool only grows to the high-water tick
   // count), and the .setAttribute is the one aria-hidden on the ring root in

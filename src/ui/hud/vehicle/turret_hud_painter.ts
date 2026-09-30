@@ -35,6 +35,7 @@ function el<K extends keyof HTMLElementTagNameMap>(
 }
 
 interface StatRowElements {
+  row: HTMLElement;
   label: HTMLElement;
   value: HTMLElement;
 }
@@ -51,7 +52,7 @@ function statRows(list: HTMLElement, count: number, lastClass = ''): StatRowElem
     const value = el('dd', 'turret-card-value ui-num');
     row.append(label, value);
     list.append(row);
-    rows.push({ label, value });
+    rows.push({ row, label, value });
   }
   return rows;
 }
@@ -177,6 +178,8 @@ export class TurretHudPainter {
     writers.setText(this.kicker, labels.trial);
     writers.setText(this.verdict, result.verdict);
     for (let i = 0; i < this.rows.length; i++) {
+      // A blank row is one the trial has nothing for (a weapon it gives no charge of).
+      writers.setDisplay(this.rows[i].row, result.rows[i].label ? '' : 'none');
       writers.setText(this.rows[i].label, result.rows[i].label);
       writers.setText(this.rows[i].value, result.rows[i].value);
     }

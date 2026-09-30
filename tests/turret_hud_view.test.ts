@@ -193,6 +193,8 @@ describe('the turret HUD view', () => {
       longestAirtime: 1.84,
       barrelKills: 3,
       bowled: 1234,
+      shockwaves: 1,
+      frags: 3,
     });
     session.defense.result = turretResult(session.defense.plan, session.defense);
     const frame = new TurretHudView().tick(turretSessionView(session), START);
@@ -217,6 +219,9 @@ describe('the turret HUD view', () => {
         { label: 'Accuracy', value: '75%' },
         { label: 'Longest throw', value: '23.5 yd' },
         { label: 'Longest airtime', value: '1.8 sec' },
+        // Used of those given: no points attached (a weapon kill scores as any kill).
+        { label: 'Shockwaves', value: '1/2' },
+        { label: 'Fragmentation Shells', value: '3/3' },
         { label: 'Tower', value: `72/${TURRET_SCENARIO_STANDARD.integrity}` },
       ],
     });
@@ -242,6 +247,22 @@ describe('the turret HUD view', () => {
     ]);
     expect(lostFrame.result?.pointRows[0].label).toBe('Kills (9)');
     expect(lostFrame.result?.pointRows[1].label).toBe('Tower kept (0)');
+  });
+
+  it('leaves the row of a weapon the trial gives none of blank', () => {
+    const session = seat(
+      START,
+      resolveTurretPlan({
+        ...TURRET_SCENARIO_STANDARD,
+        arsenal: { shockwave: 0, fragmentation: 3 },
+      }),
+    );
+    session.defense.phase = 'won';
+    session.defense.stats.frags = 2;
+    session.defense.result = turretResult(session.defense.plan, session.defense);
+    const rows = new TurretHudView().tick(turretSessionView(session), START).result?.rows;
+    expect(rows?.[5]).toEqual({ label: '', value: '' });
+    expect(rows?.[6]).toEqual({ label: 'Fragmentation Shells', value: '2/3' });
   });
 
   it('reads the medal and the points the same off the online seat as off the offline view', () => {
@@ -466,6 +487,30 @@ describe('the turret feedback cursor', () => {
       text: 'Wave 6 of 6',
       subtext: 'Final wave',
     });
+  });
+
+  it("names the weapons on the first wave's banner: by key, by socket on touch, or not at all", () => {
+    const banner = (
+      plan = resolveTurretPlan(),
+      keys?: Parameters<TurretFeedbackCursor['consume']>[1],
+    ) => {
+      const session = seat(START, plan);
+      push(session, START + 60, { type: 'waveStart', wave: 0, count: 8 });
+      return new TurretFeedbackCursor().consume(turretSessionView(session), keys)?.subtext;
+    };
+    expect(banner(undefined, () => ({ shock: 'Y', frag: 'LB' }))).toBe(
+      'Blast the monsters before they reach the tower. Y: Shockwave. LB: Fragmentation Shell.',
+    );
+    expect(banner(undefined, () => null)).toBe(
+      'Blast the monsters before they reach the tower. Tap a socket for a Shockwave or a Fragmentation Shell.',
+    );
+    const unarmed = resolveTurretPlan({
+      ...TURRET_SCENARIO_STANDARD,
+      arsenal: { shockwave: 0, fragmentation: 0 },
+    });
+    const keys = vi.fn(() => ({ shock: '1', frag: '2' }));
+    expect(banner(unarmed, keys)).toBe(firstWaveBanner.subtext);
+    expect(keys).not.toHaveBeenCalled();
   });
 
   it('lets the end outrank the last wave clear it lands with', () => {

@@ -1,10 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
+import { GP } from '../src/game/gamepad_map';
 import { raceOrVehicleMovementLocked } from '../src/game/glider_controls';
 import {
   facingToward,
   leaveTurretOnEscape,
+  TURRET_PAD_WEAPON_BUTTONS,
   turretKeyboardLookYaw,
+  turretPadWeaponSlot,
   turretRenderFacing,
   turretSeated,
 } from '../src/game/turret_controls';
@@ -113,5 +116,16 @@ describe('the turret wiring in main.ts', () => {
       'if (hud.cancelGroundAim()) break; if (!hud.closeAll() && !turretControls.leaveTurretOnEscape(world)) hud.toggleOptionsMenu();';
     pinned(leaveOnEscape);
     pinned(leaveOnEscape.replace('break;', 'return;'));
+  });
+});
+
+describe('the turret pad weapons', () => {
+  it('maps Y to the Shockwave slot and LB to the fragmentation slot, only while seated', () => {
+    expect(TURRET_PAD_WEAPON_BUTTONS).toEqual([GP.Y, GP.LB]);
+    expect(turretPadWeaponSlot({ turretSession: SEATED }, GP.Y)).toBe(0);
+    expect(turretPadWeaponSlot({ turretSession: SEATED }, GP.LB)).toBe(1);
+    expect(turretPadWeaponSlot({ turretSession: SEATED }, GP.A)).toBeNull();
+    expect(turretPadWeaponSlot({ turretSession: null }, GP.Y)).toBeNull();
+    expect(turretPadWeaponSlot({}, GP.LB)).toBeNull();
   });
 });

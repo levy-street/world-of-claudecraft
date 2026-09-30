@@ -586,7 +586,20 @@ export const id_ID: EnTranslations = {
       "leave": "Leave the tower",
       "leaveShort": "Leave",
       "replay": "Replay",
-      "replayHint": "Play the same trial again from the tower. Once today's reward is earned, a replay pays no reward."
+      "replayHint": "Play the same trial again from the tower. Once today's reward is earned, a replay pays no reward.",
+      "weapons": "Tower weapons",
+      "shockwave": "Shockwave",
+      "shockwaveTip": "Slam the tower: a ring rolls from its wall out to {reach} yd in {seconds} sec. Every monster on the ground it reaches is thrown away from the tower, which stops a strike it is still winding up, and takes {damage} damage within {core} yd of the tower, less beyond. Monsters in the air pass over it.",
+      "shockwaveRules": "Ready again {seconds} sec after use. Works only during a wave.",
+      "frag": "Fragmentation Shell",
+      "fragTip": "Arm it, then fire at the ground like a shell. It bursts above the aim point into {count} bomblets: one lands on the point and {outer} land in a ring {radius} yd around it. Each deals up to {damage} damage within {blast} yd, throws the monsters it hits and lights kegs.",
+      "fragRules": "Uses the cannon's reload. Arming it again, or cancelling, puts it away without spending a charge. Works only during a wave.",
+      "chargesLeft": "Charges left: {count}",
+      "weaponsHint": "Blast the monsters before they reach the tower. {shockKey}: Shockwave. {fragKey}: Fragmentation Shell.",
+      "weaponsHintTouch": "Blast the monsters before they reach the tower. Tap a socket for a Shockwave or a Fragmentation Shell.",
+      "statShockwaves": "Shockwaves",
+      "statFrags": "Fragmentation Shells",
+      "statUsed": "{used}/{given}"
     },
     "warlock": {
       "doomLabel": "Kecaman",

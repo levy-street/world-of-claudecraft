@@ -197,6 +197,9 @@ export class VehicleActionBarController {
       spawnFct: deps.spawnFct,
       addShake: (amount) => deps.presentation?.addShake(amount),
       padKind: deps.padKind,
+      keyLabel: deps.keyLabel,
+      attachTooltip: deps.attachTooltip,
+      consumePeek: deps.consumePeek,
     });
   }
 
@@ -224,6 +227,10 @@ export class VehicleActionBarController {
   }
 
   chooseSlot(slot: number): void {
+    if (this.deps.world.turretSession) {
+      this.turret.chooseSlot(slot);
+      return;
+    }
     if (this.gliderActive()) {
       const glider = this.deps.world.worldQuestLog?.get(GLIDER_QUEST_ID)?.glider;
       if (glider?.phase !== 'flying') return;

@@ -1,4 +1,5 @@
 import type { TurretEvent } from '../../../sim/minigames/turret_defense';
+import type { TurretArsenal } from '../../../sim/minigames/turret_defense_plan';
 import type { TurretMedal } from '../../../sim/minigames/turret_result';
 import { TICK_RATE } from '../../../sim/types';
 import type { TurretSessionView } from '../../../world_api/vehicles';
@@ -11,8 +12,12 @@ const LOW_INTEGRITY = 0.25;
 /** The integrity shares the live region speaks when crossed, in the order they fall. */
 export const TURRET_INTEGRITY_ALERTS = [0.5, LOW_INTEGRITY] as const;
 
-/** The result card's stat rows: kills, shots, accuracy, longest throw, longest airtime, tower. */
-export const TURRET_RESULT_ROWS = 6;
+/**
+ * The result card's stat rows: kills, shots, accuracy, longest throw, longest airtime, the
+ * Shockwaves and the fragmentation shells used of those given, tower. A weapon the trial
+ * gives no charge of leaves its row blank (the painter hides it).
+ */
+export const TURRET_RESULT_ROWS = 8;
 /** The result card's points rows: kills, tower kept, keg kills, bowled over, then the total. */
 export const TURRET_POINT_ROWS = 5;
 
@@ -139,8 +144,18 @@ function integrityBand(share: number): number {
   return band;
 }
 
+/** A weapon's "used / given" row; blank when the trial gives none of it (no points attached). */
+function fillWeaponRow(row: TurretStatRow, label: string, used: number, given: number): void {
+  row.label = given > 0 ? label : '';
+  row.value =
+    given > 0
+      ? t('hudChrome.turret.statUsed', { used: formatNumber(used), given: formatNumber(given) })
+      : '';
+}
+
 function fillResultRows(rows: TurretStatRow[], session: TurretSessionView, tower: string): void {
   const stats = session.defense.stats;
+  const arsenal: TurretArsenal = session.defense.plan.arsenal;
   const accuracy = stats.shots > 0 ? stats.hits / stats.shots : 0;
   rows[0].label = t('hudChrome.turret.statKills');
   rows[0].value = formatNumber(stats.kills);
@@ -156,8 +171,10 @@ function fillResultRows(rows: TurretStatRow[], session: TurretSessionView, tower
   rows[4].value = t('hudChrome.turret.statSeconds', {
     seconds: formatNumber(stats.longestAirtime, { maximumFractionDigits: 1 }),
   });
-  rows[5].label = t('hudChrome.turret.tower');
-  rows[5].value = tower;
+  fillWeaponRow(rows[5], t('hudChrome.turret.statShockwaves'), stats.shockwaves, arsenal.shockwave);
+  fillWeaponRow(rows[6], t('hudChrome.turret.statFrags'), stats.frags, arsenal.fragmentation);
+  rows[7].label = t('hudChrome.turret.tower');
+  rows[7].value = tower;
 }
 
 const SIGNED_POINTS: Intl.NumberFormatOptions = { signDisplay: 'exceptZero' };
@@ -360,11 +377,36 @@ const BANNER_RANK: Partial<Record<TurretEvent['type'], number>> = {
   ended: 3,
 };
 
-function bannerFor(event: TurretEvent, waveCount: number): TurretBanner | null {
+/** The keys the first wave's banner names for the two weapons; null where there are none (touch). */
+export interface TurretWeaponKeys {
+  shock: string;
+  frag: string;
+}
+
+/**
+ * The first wave's subtext: the goal, and the weapons (by key, or the sockets on touch)
+ * when the trial gives any and the caller knows the input.
+ */
+function firstWaveHint(
+  arsenal: TurretArsenal,
+  keys: (() => TurretWeaponKeys | null) | undefined,
+): string {
+  if (!keys || arsenal.shockwave + arsenal.fragmentation <= 0) return t('hudChrome.turret.hint');
+  const bound = keys();
+  if (!bound) return t('hudChrome.turret.weaponsHintTouch');
+  return t('hudChrome.turret.weaponsHint', { shockKey: bound.shock, fragKey: bound.frag });
+}
+
+function bannerFor(
+  event: TurretEvent,
+  session: TurretSessionView,
+  keys: (() => TurretWeaponKeys | null) | undefined,
+): TurretBanner | null {
+  const waveCount = session.waveCount;
   if (event.type === 'waveStart') {
     const banner: TurretBanner = { text: waveBannerText(event.wave, waveCount) };
     if (event.wave + 1 === waveCount) banner.subtext = t('hudChrome.turret.finalWave');
-    else if (event.wave === 0) banner.subtext = t('hudChrome.turret.hint');
+    else if (event.wave === 0) banner.subtext = firstWaveHint(session.defense.plan.arsenal, keys);
     return banner;
   }
   if (event.type === 'waveCleared')
@@ -380,14 +422,21 @@ function bannerFor(event: TurretEvent, waveCount: number): TurretBanner | null {
  */
 export class TurretFeedbackCursor {
   private readonly reader = new TurretFeedbackReader();
-  consume(session: TurretSessionView | null): TurretBanner | null {
+  /**
+   * `keys` names the weapons' keys for the first wave's banner (null on touch), asked
+   * only when it shows; without it the banner states the goal alone.
+   */
+  consume(
+    session: TurretSessionView | null,
+    keys?: () => TurretWeaponKeys | null,
+  ): TurretBanner | null {
     if (!session) return null;
     let banner: TurretBanner | null = null;
     let rank = 0;
     for (const entry of this.reader.read(session)) {
       const entryRank = BANNER_RANK[entry.event.type] ?? 0;
       if (entryRank === 0 || entryRank < rank) continue;
-      banner = bannerFor(entry.event, session.waveCount);
+      banner = bannerFor(entry.event, session, keys);
       rank = entryRank;
     }
     return banner;

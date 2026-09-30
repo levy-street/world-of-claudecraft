@@ -17,6 +17,13 @@ function declarationsFor(selector: string): string | null {
 }
 
 describe('vehicle seat click-through', () => {
+  it('keeps the turret weapon row click-through between its sockets, and each socket a target', () => {
+    // A socket that let the press through would also fire a shell at the ground behind it;
+    // the painter stops the press, which needs the socket to be the press's target at all.
+    expect(declarationsFor('#turret-weapons')).toContain('pointer-events: none;');
+    expect(declarationsFor('#turret-weapons .turret-weapon')).toContain('pointer-events: auto;');
+  });
+
   it('makes the three bottom-bar containers click-through while seated', () => {
     expect(
       declarationsFor('body.operating-vehicle :is(#bottom-bar, #actionbar-row, #actionbar-stack)'),

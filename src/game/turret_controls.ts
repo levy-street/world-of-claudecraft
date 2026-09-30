@@ -1,8 +1,10 @@
 // Fire and Fly seat input. Movement is locked while seated, so the tank's heading
 // follows the reticle instead of the camera, the turn keys orbit the view, and
-// Escape with nothing left to close leaves the seat.
+// Escape with nothing left to close leaves the seat. On a pad, Y and LB reach the
+// weapon sockets (the seat has no jump, and LB is unbound by default).
 import { TURN_SPEED } from '../sim/types';
 import type { IWorldVehicles } from '../world_api/vehicles';
+import { GP } from './gamepad_map';
 
 interface FlatPoint {
   x: number;
@@ -51,4 +53,17 @@ export function turretKeyboardLookYaw(
 ): number {
   if (!turretSeated(world)) return 0;
   return input.heldTurnAxis() * TURN_SPEED * Math.min(MAX_LOOK_DT, Math.max(0, frameDt));
+}
+
+/** The seat's pad buttons for the weapon sockets, by bar slot: Y slams (slot 0), LB arms (slot 1). */
+export const TURRET_PAD_WEAPON_BUTTONS = [GP.Y, GP.LB] as const;
+
+/** The weapon socket a pad button presses while seated; null for any other button or off the seat. */
+export function turretPadWeaponSlot(
+  world: { readonly turretSession?: unknown },
+  button: number,
+): number | null {
+  if (!turretSeated(world)) return null;
+  const slot = (TURRET_PAD_WEAPON_BUTTONS as readonly number[]).indexOf(button);
+  return slot >= 0 ? slot : null;
 }

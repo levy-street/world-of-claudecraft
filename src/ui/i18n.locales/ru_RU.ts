@@ -19277,6 +19277,24 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turret.replay': 'Ещё раз',
   'hudChrome.turret.replayHint':
     'Пройти то же испытание ещё раз, не покидая башни. После получения сегодняшней награды повтор больше не награждается.',
+  'hudChrome.turret.weapons': 'Оружие башни',
+  'hudChrome.turret.shockwave': 'Ударная волна',
+  'hudChrome.turret.shockwaveTip':
+    'Удар башней: кольцо за {seconds} сек. расходится от её стены на {reach} ярд. Каждый монстр на земле, которого оно достигает, отбрасывается от башни, что прерывает удар, который он ещё готовит, и получает {damage} ед. урона в пределах {core} ярд. от башни, дальше меньше. Монстры в воздухе пролетают над кольцом.',
+  'hudChrome.turret.shockwaveRules':
+    'Снова готова через {seconds} сек. после применения. Работает только во время волны.',
+  'hudChrome.turret.frag': 'Осколочный снаряд',
+  'hudChrome.turret.fragTip':
+    'Зарядите его, затем стреляйте по земле, как обычным снарядом. Над точкой прицеливания он разрывается на {count} суббоеприпасов: один падает в точку, {outer} ложатся кольцом радиусом {radius} ярд. вокруг неё. Каждый наносит до {damage} ед. урона в пределах {blast} ярд., отбрасывает задетых монстров и поджигает бочки.',
+  'hudChrome.turret.fragRules':
+    'Использует перезарядку пушки. Повторная зарядка или отмена убирает его без траты заряда. Работает только во время волны.',
+  'hudChrome.turret.chargesLeft': 'Осталось зарядов: {count}',
+  'hudChrome.turret.weaponsHint':
+    'Взрывайте монстров, пока они не добрались до башни. {shockKey}: ударная волна. {fragKey}: осколочный снаряд.',
+  'hudChrome.turret.weaponsHintTouch':
+    'Взрывайте монстров, пока они не добрались до башни. Коснитесь ячейки, чтобы применить ударную волну или осколочный снаряд.',
+  'hudChrome.turret.statShockwaves': 'Ударные волны',
+  'hudChrome.turret.statFrags': 'Осколочные снаряды',
   'hudChrome.leaderboard.tabWorldQuests': 'Локальные задания',
   'hudChrome.leaderboard.wqBoardsLabel': 'Таблицы рекордов локальных заданий',
   'hudChrome.leaderboard.wqMedal': 'Медаль',

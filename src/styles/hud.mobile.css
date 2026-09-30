@@ -132,6 +132,27 @@
   body.mobile-touch .turret-rail-bevel {
     height: 14px;
   }
+  /* The tower moves nothing, so its weapon sockets take the move stick's corner (the same
+     anchor as #mobile-move-zone, mirrored for the left-handed layout) at the 48px touch
+     size, with no keycap (touch has no keys); the idle stick steps aside. */
+  body.mobile-touch.manning-turret :is(#mobile-move-zone, #mobile-move-joystick) {
+    display: none;
+  }
+  body.mobile-touch #turret-weapons {
+    left: max(18px, env(safe-area-inset-left));
+    bottom: calc(26px + env(safe-area-inset-bottom));
+    transform: none;
+  }
+  body.mobile-touch.mobile-left-handed #turret-weapons {
+    left: auto;
+    right: max(18px, env(safe-area-inset-right));
+  }
+  body.mobile-touch #turret-weapons .turret-weapon {
+    --ui-socket-size: 48px;
+  }
+  body.mobile-touch #turret-weapons .keybind {
+    display: none;
+  }
   body.mobile-touch .shadow-action-bar .vehicle-bar-hint {
     grid-column: 1 / -1;
   }

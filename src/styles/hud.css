@@ -605,6 +605,24 @@
       var(--outline-shadow),
       0 0 4px var(--color-keyline);
   }
+  /* The tower's limited weapons (turret_weapon_bar_painter.ts): two 44px sockets of the
+     vehicle bar family, centred 6px above the rail (its 26px seat plus its 18px bevel).
+     The row stays pointer-inert like the rail; each socket takes the pointer and stops
+     its press there, so a click or a tap on a socket never also fires at the ground. */
+  #turret-weapons {
+    position: absolute;
+    left: 50%;
+    bottom: 50px;
+    transform: translateX(-50%);
+    z-index: 5;
+    display: flex;
+    gap: 8px;
+    pointer-events: none;
+  }
+  #turret-weapons .turret-weapon {
+    --ui-socket-size: 44px;
+    pointer-events: auto;
+  }
   .turret-rail-bevel {
     --bar-color: var(--color-vehicle-integrity);
     height: 18px;

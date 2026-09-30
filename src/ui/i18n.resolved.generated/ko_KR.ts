@@ -586,7 +586,20 @@ export const ko_KR: EnTranslations = {
       "leave": "탑에서 내려가기",
       "leaveShort": "내려가기",
       "replay": "다시 하기",
-      "replayHint": "탑 위에서 같은 시련에 다시 도전하기. 오늘의 보상을 받은 뒤에는 다시 도전해도 보상이 없습니다."
+      "replayHint": "탑 위에서 같은 시련에 다시 도전하기. 오늘의 보상을 받은 뒤에는 다시 도전해도 보상이 없습니다.",
+      "weapons": "탑 무기",
+      "shockwave": "충격파",
+      "shockwaveTip": "탑을 내리칩니다. 고리가 탑의 벽에서 {reach}야드까지 {seconds}초 동안 퍼져 나갑니다. 고리에 닿은 지상의 몬스터는 모두 탑에서 멀리 날아가고 준비 중인 공격이 멈추며, 탑에서 {core}야드 이내에서는 {damage}의 피해를 입고 그 너머에서는 피해가 줄어듭니다. 공중의 몬스터는 고리를 넘어갑니다.",
+      "shockwaveRules": "사용 후 {seconds}초 뒤에 다시 준비됩니다. 웨이브 중에만 사용할 수 있습니다.",
+      "frag": "파편탄",
+      "fragTip": "장전한 뒤 일반 포탄처럼 지면에 발사합니다. 조준 지점 위에서 {count}개의 자탄으로 터집니다. 하나는 조준 지점에, {outer}개는 그 주위 {radius}야드의 원에 떨어집니다. 각 자탄은 {blast}야드 이내에 최대 {damage}의 피해를 주고, 맞은 몬스터를 날려 보내며, 화약통에 불을 붙입니다.",
+      "fragRules": "대포의 재장전 시간을 사용합니다. 다시 장전하거나 취소하면 충전을 소모하지 않고 해제합니다. 웨이브 중에만 사용할 수 있습니다.",
+      "chargesLeft": "남은 충전: {count}",
+      "weaponsHint": "몬스터가 탑에 닿기 전에 날려 버리세요. {shockKey}: 충격파. {fragKey}: 파편탄.",
+      "weaponsHintTouch": "몬스터가 탑에 닿기 전에 날려 버리세요. 소켓을 눌러 충격파나 파편탄을 사용하세요.",
+      "statShockwaves": "충격파",
+      "statFrags": "파편탄",
+      "statUsed": "{used}/{given}"
     },
     "warlock": {
       "doomLabel": "단죄",

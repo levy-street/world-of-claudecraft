@@ -12,15 +12,22 @@
 // played plays as usual). A mark no `fired` entry confirms in time was refused.
 // The server stays authoritative: nothing here decides a shot.
 //
+// The limited weapons ride the same ledger. A fragmentation shell is a shell
+// mark of its own kind (it shares the cannon's reload and its `fired` entry says
+// so); a Shockwave is a mark on its own clock (its rearm), confirmed by its
+// `shockwave` entry. Both also need a charge the waiting marks leave, and a wave:
+// the server refuses them silently in the intro and between waves.
+//
 // Every tick is IWorld.turretClock's (the last server tick the client has seen), so
 // the window and the lead measure server time as the client sees it; offline the
 // entry lands on the click's own tick. Pure: no DOM, no wall clock.
-import { TURRET_WEAPON } from '../../../sim/content/turret_defense';
+import { TURRET_SHOCKWAVE, TURRET_WEAPON } from '../../../sim/content/turret_defense';
 import type { TurretAim, TurretEvent } from '../../../sim/minigames/turret_defense';
+import { turretChargesLeft } from '../../../sim/minigames/turret_defense_plan';
 import type { TurretFeedback } from '../../../sim/minigames/turret_feedback';
 import type { TurretSessionView } from '../../../world_api/vehicles';
 
-/** Played shots waiting for their `fired` entry at once: a single shooter, a cooldown apart. */
+/** Played marks of one clock (the cannon's, the Shockwave's) waiting for their entry at once. */
 export const TURRET_OWN_SHOT_PENDING_MAX = 2;
 /** Marks kept, the newest ones: every click sent, so each entry finds its own. */
 export const TURRET_OWN_SHOT_RECORDS = 32;
@@ -61,6 +68,9 @@ export type TurretOwnShotPlay = 'played' | 'held' | 'free';
 
 const PLAY_RANK: Readonly<Record<TurretOwnShotPlay, number>> = { played: 0, held: 1, free: 2 };
 
+/** What a click sent: a shell, a fragmentation shell, or a Shockwave. */
+export type TurretOwnShotWeapon = 'shell' | 'frag' | 'shock';
+
 export interface TurretOwnShot {
   /** 0 for an unused record; otherwise unique for the page, growing. */
   serial: number;
@@ -76,6 +86,8 @@ export interface TurretOwnShot {
   range: number;
   status: TurretOwnShotStatus;
   play: TurretOwnShotPlay;
+  /** Absent on a plain shell, as on its `fired` entry. */
+  weapon: Exclude<TurretOwnShotWeapon, 'shell'> | undefined;
 }
 
 type TurretFired = Extract<TurretEvent, { type: 'fired' }>;
@@ -92,6 +104,7 @@ function newRecord(): TurretOwnShot {
     range: 0,
     status: 'refused',
     play: 'free',
+    weapon: undefined,
   };
 }
 
@@ -103,6 +116,34 @@ function rank(shot: TurretOwnShot): number {
 function ended(session: TurretSessionView): boolean {
   const phase = session.defense.phase;
   return phase === 'won' || phase === 'lost';
+}
+
+function weaponOf(shot: TurretOwnShot): TurretOwnShotWeapon {
+  return shot.weapon ?? 'shell';
+}
+
+/** The Shockwave rearms on its own clock; both shells share the cannon's reload. */
+function sameClock(a: TurretOwnShotWeapon, b: TurretOwnShotWeapon): boolean {
+  return (a === 'shock') === (b === 'shock');
+}
+
+/** The charges the mirror says a limited weapon has left; a shell never runs out. */
+function chargesSeen(session: TurretSessionView, weapon: TurretOwnShotWeapon): number {
+  if (weapon === 'shell') return Number.POSITIVE_INFINITY;
+  const left = turretChargesLeft(session.defense);
+  return weapon === 'frag' ? left.fragmentation : left.shockwave;
+}
+
+/**
+ * The tick from which the server takes this weapon, as far as the mirror knows:
+ * its reload or rearm, and for a limited weapon the next wave's first tick (one
+ * past its start, the side of the wave start a command may land on).
+ */
+function readyFor(session: TurretSessionView, weapon: TurretOwnShotWeapon): number {
+  const defense = session.defense;
+  const ready = weapon === 'shock' ? defense.shockReadyTick : defense.readyTick;
+  if (weapon === 'shell' || defense.phase === 'wave') return ready;
+  return Math.max(ready, defense.phaseEndTick + 1);
 }
 
 export class TurretOwnShotLedger {
@@ -130,6 +171,9 @@ export class TurretOwnShotLedger {
   private readyLate = 0;
   private readyEarly = 0;
   private playedWaiting = 0;
+  /** The asked weapon's own played and held marks still waiting: each spends a charge if taken. */
+  private spendPlayed = 0;
+  private spendHeld = 0;
 
   /** The smoothed click-to-`fired` lead in ticks (0 offline, about one round trip online). */
   get leadTicks(): number {
@@ -158,35 +202,63 @@ export class TurretOwnShotLedger {
     return Math.min(WINDOW_MAX, Math.max(WINDOW_MIN, Math.ceil(2 * this.lead) + WINDOW_SLACK));
   }
 
-  /** A click now would be played: the reticle is bright. */
-  canMark(session: TurretSessionView | null, clock: number | null): boolean {
+  /** A click now would be played: the reticle (or the weapon's socket) is bright. */
+  canMark(
+    session: TurretSessionView | null,
+    clock: number | null,
+    weapon: TurretOwnShotWeapon = 'shell',
+  ): boolean {
     if (!session || clock === null || ended(session)) return false;
-    return this.classify(session, clock) === 'played';
+    return this.classify(session, clock, weapon) === 'played';
+  }
+
+  /**
+   * A limited weapon's charges as the player should see them: the mirror's, less
+   * the played marks still waiting (a refused one gives its charge back).
+   */
+  chargesLeft(
+    session: TurretSessionView,
+    clock: number | null,
+    weapon: Exclude<TurretOwnShotWeapon, 'shell'>,
+  ): number {
+    this.update(session, clock);
+    this.waitingInto(session, weapon);
+    return Math.max(0, chargesSeen(session, weapon) - this.spendPlayed);
   }
 
   /**
    * What a click sent now is. Played: seated, the defense running, fewer than two
-   * played clicks waiting, and the click reaches the server, even on the band's
-   * fastest trip, once its cooldown is over, even if every click still waiting
-   * arrived on the slowest. Held: it may reach a ready server. Free otherwise.
+   * played clicks of its clock waiting, and the click reaches the server, even on
+   * the band's fastest trip, once its cooldown is over, even if every click still
+   * waiting arrived on the slowest; a limited weapon also keeps a charge even if
+   * every waiting one is taken. Held: it may reach a ready server with a charge
+   * left. Free otherwise.
    */
-  classify(session: TurretSessionView, clock: number): TurretOwnShotPlay {
+  classify(
+    session: TurretSessionView,
+    clock: number,
+    weapon: TurretOwnShotWeapon = 'shell',
+  ): TurretOwnShotPlay {
     this.update(session, clock);
     if (ended(session)) return 'free';
-    this.waitingInto(session);
+    this.waitingInto(session, weapon);
+    const charges = chargesSeen(session, weapon);
     if (
       this.playedWaiting < TURRET_OWN_SHOT_PENDING_MAX &&
-      clock + this.leadLow >= this.readyLate
+      clock + this.leadLow >= this.readyLate &&
+      charges - this.spendPlayed - this.spendHeld > 0
     ) {
       return 'played';
     }
-    return clock + this.leadHigh >= this.readyEarly ? 'held' : 'free';
+    return clock + this.leadHigh >= this.readyEarly && charges - this.spendPlayed > 0
+      ? 'held'
+      : 'free';
   }
 
   /** Clicks of its own still waiting keep a click now from being played. */
   holding(session: TurretSessionView, clock: number): boolean {
     this.update(session, clock);
-    this.waitingInto(null);
+    this.waitingInto(null, 'shell');
     return (
       this.playedWaiting >= TURRET_OWN_SHOT_PENDING_MAX || clock + this.leadLow < this.readyLate
     );
@@ -202,6 +274,20 @@ export class TurretOwnShotLedger {
     aim: Readonly<TurretAim>,
     play: TurretOwnShotPlay = this.classify(session, clock),
   ): number {
+    return this.markWeapon(session, clock, aim, 'shell', play);
+  }
+
+  /**
+   * Records a click of `weapon` sent at `aim` (clamped; the tower's centre for a
+   * Shockwave), as `play` (classify for that weapon by default). Returns its serial.
+   */
+  markWeapon(
+    session: TurretSessionView,
+    clock: number,
+    aim: Readonly<TurretAim>,
+    weapon: TurretOwnShotWeapon,
+    play: TurretOwnShotPlay = this.classify(session, clock, weapon),
+  ): number {
     this.update(session, clock);
     const shot = this.freeRecord();
     shot.serial = ++this.serial;
@@ -214,10 +300,15 @@ export class TurretOwnShotLedger {
     shot.range = aim.range;
     shot.status = 'pending';
     shot.play = play;
+    shot.weapon = weapon === 'shell' ? undefined : weapon;
     return shot.serial;
   }
 
-  /** The oldest played mark of this seat after `serial` (0 for the first), for a reader to play. */
+  /**
+   * The oldest played mark of this seat after `serial` (0 for the first), for a
+   * reader to play: `weapon` tells a shell (absent), a fragmentation shell and a
+   * Shockwave (its slam) apart.
+   */
   launchAfter(session: TurretSessionView, serial: number): Readonly<TurretOwnShot> | null {
     this.observe(session);
     let next: TurretOwnShot | null = null;
@@ -231,9 +322,11 @@ export class TurretOwnShotLedger {
   }
 
   /**
-   * The played shot a `fired` entry of this session confirms: its serial when the
-   * entry came in time (its shell flies on as this one), minus its serial when it
-   * came after its window (a fresh shell, its report already played), else 0 (play it).
+   * The played shot a `fired` (or `shockwave`) entry of this session confirms: its
+   * serial when the entry came in time (its shell flies on as this one), minus its
+   * serial when it came after its window (a fresh shell, its report already played),
+   * else 0 (play it). A Shockwave's slam and report play on the click; its ring
+   * always plays from the entry.
    */
   ownShotOf(session: TurretSessionView, entry: TurretFeedback): number {
     this.observe(session);
@@ -271,25 +364,33 @@ export class TurretOwnShotLedger {
    * `readyEarly` since every played one fires, on the fastest. From the mirror's
    * ready tick when a session is given.
    */
-  private waitingInto(session: TurretSessionView | null): void {
+  private waitingInto(session: TurretSessionView | null, weapon: TurretOwnShotWeapon): void {
     const low = this.leadLow;
     const high = this.leadHigh;
-    const cooldown = TURRET_WEAPON.cooldownTicks;
-    const ready = session ? session.defense.readyTick : Number.NEGATIVE_INFINITY;
+    const cooldown = weapon === 'shock' ? TURRET_SHOCKWAVE.rearmTicks : TURRET_WEAPON.cooldownTicks;
+    const ready = session ? readyFor(session, weapon) : Number.NEGATIVE_INFINITY;
     let late = ready;
     let early = ready;
     let played = 0;
+    let spendPlayed = 0;
+    let spendHeld = 0;
     for (const shot of this.records) {
       if (shot.serial === 0 || shot.status !== 'pending' || shot.play === 'free') continue;
+      if (!sameClock(weaponOf(shot), weapon)) continue;
       late = Math.max(late, shot.clock + high + cooldown);
       if (shot.play === 'played') {
         played++;
         early = Math.max(early, shot.clock + low + cooldown);
       }
+      if (weaponOf(shot) !== weapon) continue;
+      if (shot.play === 'played') spendPlayed++;
+      else spendHeld++;
     }
     this.readyLate = late;
     this.readyEarly = early;
     this.playedWaiting = played;
+    this.spendPlayed = spendPlayed;
+    this.spendHeld = spendHeld;
   }
 
   /**
@@ -333,6 +434,7 @@ export class TurretOwnShotLedger {
     for (; i < ring.length; i++) {
       const entry = ring[i];
       if (entry.event.type === 'fired') this.resolve(entry, entry.event);
+      else if (entry.event.type === 'shockwave') this.resolve(entry, null);
     }
     if (newest > this.seenSeq) this.seenSeq = newest;
   }
@@ -346,18 +448,30 @@ export class TurretOwnShotLedger {
   }
 
   /**
-   * The mark this entry confirms, among the clicks at its point sent by its tick
-   * and newer than the last confirmed (the server takes commands in order). Older
-   * waiting marks were refused. Only the one click at its point teaches the lead:
-   * among several, the likeliest may be a newer or older click than the server's
-   * own, and a wrong trip would skew the band.
+   * The mark this entry confirms, among the clicks of its weapon (at its point, for
+   * a shell) sent by its tick and newer than the last confirmed (the server takes
+   * commands in order). Older waiting marks were refused. Only the one candidate
+   * teaches the lead: among several, the likeliest may be a newer or older click
+   * than the server's own, and a wrong trip would skew the band. `fired` is null
+   * for a Shockwave's entry.
    */
-  private resolve(entry: TurretFeedback, fired: TurretFired): void {
+  private resolve(entry: TurretFeedback, fired: TurretFired | null): void {
+    const weapon: TurretOwnShotWeapon = !fired
+      ? 'shock'
+      : fired.weapon === 'frag'
+        ? 'frag'
+        : 'shell';
     let match: TurretOwnShot | null = null;
     let candidates = 0;
     for (const shot of this.records) {
       if (shot.serial <= this.confirmedSerial || shot.clock > entry.tick) continue;
-      if (Math.abs(shot.x - fired.x) > MATCH_YD || Math.abs(shot.z - fired.z) > MATCH_YD) continue;
+      if (shot.serial === 0 || weaponOf(shot) !== weapon) continue;
+      if (
+        fired &&
+        (Math.abs(shot.x - fired.x) > MATCH_YD || Math.abs(shot.z - fired.z) > MATCH_YD)
+      ) {
+        continue;
+      }
       candidates++;
       if (!match || this.likelier(shot, match, entry.tick)) match = shot;
     }

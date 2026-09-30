@@ -8,6 +8,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { TURRET_SEATED_CLASS } from '../src/ui/hud/vehicle/turret_hud_controller';
 import { TURRET_HUD_ID, TURRET_RAIL_ID } from '../src/ui/hud/vehicle/turret_hud_painter';
+import { TURRET_WEAPONS_ID } from '../src/ui/hud/vehicle/turret_weapon_bar_painter';
 
 const flat = (path: string) =>
   readFileSync(path, 'utf8')
@@ -179,6 +180,41 @@ describe('the Fire and Fly seat HUD stylesheet', () => {
     expect(replay).toContain('height: 40px;');
     expect(declarationsFor(mobile, `body.mobile-touch #${TURRET_HUD_ID}.ended`)).toContain(
       'top: calc(18% + 44px);',
+    );
+  });
+
+  it('seats the two 44px weapon sockets 6px above the rail, the row inert and each socket live', () => {
+    const row = declarationsFor(hud, `#${TURRET_WEAPONS_ID}`);
+    // The rail sits at 26px with an 18px bevel: 26 + 18 + 6.
+    expect(row).toContain('bottom: 50px;');
+    expect(row).toContain('left: 50%;');
+    expect(row).toContain('transform: translateX(-50%);');
+    expect(row).toContain('gap: 8px;');
+    expect(row).toContain('pointer-events: none;');
+    const socket = declarationsFor(hud, `#${TURRET_WEAPONS_ID} .turret-weapon`);
+    expect(socket).toContain('--ui-socket-size: 44px;');
+    expect(socket).toContain('pointer-events: auto;');
+  });
+
+  it("puts the touch sockets in the idle move stick's corner, at 48px and keyless", () => {
+    expect(
+      declarationsFor(
+        mobile,
+        `body.mobile-touch.${TURRET_SEATED_CLASS} :is(#mobile-move-zone, #mobile-move-joystick)`,
+      ),
+    ).toBe('display: none;');
+    const row = declarationsFor(mobile, `body.mobile-touch #${TURRET_WEAPONS_ID}`);
+    expect(row).toContain('left: max(18px, env(safe-area-inset-left));');
+    expect(row).toContain('bottom: calc(26px + env(safe-area-inset-bottom));');
+    expect(row).toContain('transform: none;');
+    expect(
+      declarationsFor(mobile, `body.mobile-touch.mobile-left-handed #${TURRET_WEAPONS_ID}`),
+    ).toContain('right: max(18px, env(safe-area-inset-right));');
+    expect(
+      declarationsFor(mobile, `body.mobile-touch #${TURRET_WEAPONS_ID} .turret-weapon`),
+    ).toContain('--ui-socket-size: 48px;');
+    expect(declarationsFor(mobile, `body.mobile-touch #${TURRET_WEAPONS_ID} .keybind`)).toBe(
+      'display: none;',
     );
   });
 });

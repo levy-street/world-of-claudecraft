@@ -586,7 +586,20 @@ export const zh_TW: EnTranslations = {
       "leave": "離開塔樓",
       "leaveShort": "離開",
       "replay": "再來一次",
-      "replayHint": "在塔上再次挑戰同一試煉。領取今日獎勵後，再次挑戰不再給予獎勵。"
+      "replayHint": "在塔上再次挑戰同一試煉。領取今日獎勵後，再次挑戰不再給予獎勵。",
+      "weapons": "塔樓武器",
+      "shockwave": "衝擊波",
+      "shockwaveTip": "猛擊塔樓：一道衝擊環在 {seconds} 秒內從塔牆向外擴散至 {reach} 碼。它觸及的每個地面怪物都會被拋離塔樓，並被打斷仍在蓄力的攻擊；距塔樓 {core} 碼內受到 {damage} 點傷害，更遠處傷害降低。空中的怪物會越過衝擊環。",
+      "shockwaveRules": "使用後 {seconds} 秒再次就緒。僅在波次進行中可用。",
+      "frag": "破片彈",
+      "fragTip": "先裝填，再像普通砲彈一樣向地面發射。它在瞄準點上空炸開，化為 {count} 枚子彈：一枚落在瞄準點，{outer} 枚落在其周圍 {radius} 碼的圓環上。每枚子彈對 {blast} 碼內造成最多 {damage} 點傷害，拋飛被擊中的怪物，並點燃火藥桶。",
+      "fragRules": "使用火砲的裝填時間。再次裝填或取消會將其收起，不消耗次數。僅在波次進行中可用。",
+      "chargesLeft": "剩餘次數：{count}",
+      "weaponsHint": "在怪物抵達塔樓前將牠們炸飛。{shockKey}：衝擊波。{fragKey}：破片彈。",
+      "weaponsHintTouch": "在怪物抵達塔樓前將牠們炸飛。點擊插槽使用衝擊波或破片彈。",
+      "statShockwaves": "衝擊波",
+      "statFrags": "破片彈",
+      "statUsed": "{used}/{given}"
     },
     "warlock": {
       "doomLabel": "譴罪",

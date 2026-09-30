@@ -1,5 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
-import { TURRET_WEAPON } from '../src/sim/content/turret_defense';
+import {
+  TURRET_FRAGMENTATION,
+  TURRET_SHOCKWAVE,
+  TURRET_WEAPON,
+} from '../src/sim/content/turret_defense';
 import type { ThrowProbe } from '../src/sim/minigames/thrown_body';
 import {
   clampTurretAimInto,
@@ -11,11 +15,16 @@ import { Sim } from '../src/sim/sim';
 import { turretSessionView } from '../src/sim/turret_defense_session';
 import type { TurretSession } from '../src/sim/types';
 import { WORLD_SEED } from '../src/sim/world_seed';
-import { TurretAimCore, vehicleOwnsAim } from '../src/ui/hud/vehicle/turret_aim_core';
+import {
+  TURRET_FRAG_FOOTPRINT,
+  TurretAimCore,
+  vehicleOwnsAim,
+} from '../src/ui/hud/vehicle/turret_aim_core';
 import { TurretOwnShotLedger } from '../src/ui/hud/vehicle/turret_own_shot_core';
 import type { TurretSessionView } from '../src/world_api/vehicles';
 
 const CENTER = { x: 10, z: 20 };
+const REARM_TICKS = TURRET_SHOCKWAVE.rearmTicks;
 const START = 100;
 
 function seat(): TurretSession {
@@ -78,7 +87,7 @@ describe('the turret aim core', () => {
     expect(world.useVehicleAction).toHaveBeenCalledTimes(2);
   });
 
-  it('keeps the reticle on cancel, so Escape falls through to the seat exit', () => {
+  it('keeps the reticle on cancel with nothing armed, so Escape falls through to the seat exit', () => {
     const { aim } = rig();
     aim.updatePoint({ x: CENTER.x + 10, z: CENTER.z });
     expect(aim.cancel()).toBe(false);
@@ -280,5 +289,217 @@ describe('the turret aim core', () => {
     for (let i = 0; i < TURRET_WEAPON.cooldownTicks; i++) sim.tick();
     aim.updatePoint({ x: center.x + 10, z: center.z });
     expect(aim.reticle()?.dimmed).toBe(false);
+  });
+});
+
+/** A seat in its first wave, with the trial's 2 Shockwaves and 3 fragmentation shells. */
+function waveSeat(): TurretSession {
+  const session = seat();
+  session.defense.phase = 'wave';
+  session.defense.rev++;
+  return session;
+}
+
+describe('the turret aim core with the limited weapons', () => {
+  it('arms the fragmentation shell: an orange reticle the size of its footprint', () => {
+    const { aim } = rig(waveSeat());
+    aim.updatePoint({ x: CENTER.x + 20, z: CENTER.z });
+    expect(aim.reticle()).toMatchObject({ school: 'physical', radius: TURRET_WEAPON.blastRadius });
+    expect(aim.toggleFrag()).toBe(true);
+    expect(aim.fragArmed).toBe(true);
+    expect(aim.reticle()).toMatchObject({ school: 'fire', radius: TURRET_FRAG_FOOTPRINT });
+    expect(TURRET_FRAG_FOOTPRINT).toBe(
+      TURRET_FRAGMENTATION.outerRadius + TURRET_FRAGMENTATION.blastRadius,
+    );
+  });
+
+  it('fires the armed shell on the next click, then goes back to the shell', () => {
+    const { world, aim, shots } = rig(waveSeat());
+    aim.toggleFrag();
+    aim.commitAt({ x: CENTER.x + 20, z: CENTER.z });
+    expect(world.useVehicleAction).toHaveBeenLastCalledWith('turret_frag', {
+      x: CENTER.x + 20,
+      z: CENTER.z,
+    });
+    expect(aim.fragArmed).toBe(false);
+    expect(shots.launchAfter(world.turretSession!, 0)).toMatchObject({ weapon: 'frag' });
+    expect(shots.chargesLeft(world.turretSession!, START, 'frag')).toBe(2);
+    world.turretClock = START + TURRET_WEAPON.cooldownTicks + 20;
+    aim.commitAt({ x: CENTER.x + 20, z: CENTER.z });
+    expect(world.useVehicleAction).toHaveBeenLastCalledWith('turret_fire', {
+      x: CENTER.x + 20,
+      z: CENTER.z,
+    });
+  });
+
+  it('disarms with no charge spent: key 2 again, or cancel (right click, Escape, pad B)', () => {
+    const { world, aim, shots } = rig(waveSeat());
+    aim.toggleFrag();
+    expect(aim.toggleFrag()).toBe(false);
+    expect(aim.fragArmed).toBe(false);
+    aim.toggleFrag();
+    // Cancel reports the disarm, so Escape stops there instead of leaving the tower.
+    expect(aim.cancel()).toBe(true);
+    expect(aim.fragArmed).toBe(false);
+    // With nothing armed it reports nothing: the next Escape leaves.
+    expect(aim.cancel()).toBe(false);
+    expect(world.useVehicleAction).not.toHaveBeenCalled();
+    expect(shots.chargesLeft(world.turretSession!, START, 'frag')).toBe(3);
+  });
+
+  it('keeps the shell armed and sends nothing for a click the server surely refuses', () => {
+    // Reloading past even the widest trip the ledger allows before it measured one.
+    const session = waveSeat();
+    session.defense.readyTick = START + 100;
+    session.defense.rev++;
+    const { world, aim } = rig(session);
+    aim.toggleFrag();
+    aim.updatePoint({ x: CENTER.x + 20, z: CENTER.z });
+    expect(aim.reticle()?.dimmed).toBe(true);
+    expect(aim.commitAt()).toBe(true);
+    expect(world.useVehicleAction).not.toHaveBeenCalled();
+    expect(aim.fragArmed).toBe(true);
+  });
+
+  it('dims the armed reticle by the fragmentation rules, not the shell ones', () => {
+    // Between waves a shell still fires, a fragmentation shell does not.
+    const session = waveSeat();
+    const { world, aim } = rig(session);
+    aim.toggleFrag();
+    session.defense.phase = 'between';
+    session.defense.phaseEndTick = START + 200;
+    session.defense.rev++;
+    world.turretSession = turretSessionView(session);
+    aim.updatePoint({ x: CENTER.x + 20, z: CENTER.z });
+    expect(aim.fragArmed).toBe(true);
+    expect(aim.reticle()?.dimmed).toBe(true);
+    aim.cancel();
+    expect(aim.reticle()?.dimmed).toBe(false);
+  });
+
+  it('sends a weapon click the server may take, playing it from its entry, not the click', () => {
+    // Reloading and rearming for a few ticks: inside the widest trip, outside the fastest.
+    const session = waveSeat();
+    session.defense.readyTick = START + 5;
+    session.defense.shockReadyTick = START + 5;
+    session.defense.rev++;
+    const { world, aim, shots } = rig(session);
+    expect(shots.classify(world.turretSession!, START, 'frag')).toBe('held');
+    expect(shots.classify(world.turretSession!, START, 'shock')).toBe('held');
+    aim.toggleFrag();
+    aim.commitAt({ x: CENTER.x + 20, z: CENTER.z });
+    expect(world.useVehicleAction).toHaveBeenLastCalledWith('turret_frag', {
+      x: CENTER.x + 20,
+      z: CENTER.z,
+    });
+    expect(aim.fragArmed).toBe(false);
+    expect(aim.fireShockwave()).toBe(true);
+    expect(world.useVehicleAction).toHaveBeenLastCalledWith('turret_shockwave', CENTER);
+    // Neither plays on the click, and neither charge drops before the server's word.
+    expect(shots.launchAfter(world.turretSession!, 0)).toBeNull();
+    expect(shots.chargesLeft(world.turretSession!, START, 'frag')).toBe(3);
+    expect(shots.chargesLeft(world.turretSession!, START, 'shock')).toBe(2);
+  });
+
+  it('arms nothing with no charge left, and drops an armed shell when the run ends', () => {
+    const empty = waveSeat();
+    empty.defense.stats.frags = empty.defense.plan.arsenal.fragmentation;
+    empty.defense.rev++;
+    expect(rig(empty).aim.toggleFrag()).toBe(false);
+    const session = waveSeat();
+    const { world, aim } = rig(session);
+    aim.toggleFrag();
+    aim.sync();
+    expect(aim.fragArmed).toBe(true);
+    session.defense.phase = 'won';
+    session.defense.rev++;
+    world.turretSession = turretSessionView(session);
+    aim.sync();
+    expect(aim.fragArmed).toBe(false);
+    aim.toggleFrag();
+    expect(aim.fragArmed).toBe(false);
+    const leaving = rig(waveSeat());
+    leaving.aim.toggleFrag();
+    leaving.world.turretSession = null;
+    leaving.aim.sync();
+    expect(leaving.aim.fragArmed).toBe(false);
+  });
+
+  it('shows where the six bomblets land: the engine star on the aimed bearing', () => {
+    const { aim } = rig(waveSeat());
+    aim.updatePoint({ x: CENTER.x + 20, z: CENTER.z });
+    expect(aim.fragLandingPoints()).toBeNull();
+    aim.toggleFrag();
+    const star = aim.fragLandingPoints()!;
+    expect(star).toHaveLength(1 + TURRET_FRAGMENTATION.outerCount);
+    expect(star[0]).toEqual({ x: CENTER.x + 20, z: CENTER.z });
+    // The first outer bomblet lands straight ahead along the bearing, the rest on the ring.
+    expect(star[1].x).toBeCloseTo(CENTER.x + 20 + TURRET_FRAGMENTATION.outerRadius);
+    expect(star[1].z).toBeCloseTo(CENTER.z);
+    for (const p of star.slice(1)) {
+      expect(Math.hypot(p.x - star[0].x, p.z - star[0].z)).toBeCloseTo(
+        TURRET_FRAGMENTATION.outerRadius,
+      );
+    }
+  });
+
+  it('slams at once with no aim, marking the Shockwave before the send', () => {
+    const { world, aim, shots } = rig(waveSeat());
+    world.useVehicleAction.mockImplementation(() => {
+      expect(shots.launchAfter(world.turretSession!, 0)).toMatchObject({ weapon: 'shock' });
+    });
+    expect(aim.fireShockwave()).toBe(true);
+    expect(world.useVehicleAction).toHaveBeenCalledWith('turret_shockwave', CENTER);
+    expect(shots.chargesLeft(world.turretSession!, START, 'shock')).toBe(1);
+  });
+
+  it('sends no Shockwave the server surely refuses: in the intro, rearming or empty', () => {
+    const intro = rig(seat());
+    expect(intro.aim.fireShockwave()).toBe(false);
+    const rearming = waveSeat();
+    rearming.defense.shockReadyTick = START + 100;
+    rearming.defense.rev++;
+    expect(rig(rearming).aim.fireShockwave()).toBe(false);
+    const empty = waveSeat();
+    empty.defense.stats.shockwaves = 2;
+    empty.defense.rev++;
+    const r = rig(empty);
+    expect(r.aim.fireShockwave()).toBe(false);
+    expect(r.world.useVehicleAction).not.toHaveBeenCalled();
+  });
+
+  it('drives a real seat: both weapons spend a charge each, and refuse between waves', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', devCommands: true });
+    sim.chat('/dev turret');
+    const aim = new TurretAimCore(sim, new TurretOwnShotLedger());
+    const center = sim.turretSession!.origin;
+    // The intro: nothing is sent, nothing is spent.
+    expect(aim.fireShockwave()).toBe(false);
+    while (sim.turretSession!.defense.phase !== 'wave') sim.tick();
+    expect(aim.fireShockwave()).toBe(true);
+    expect(sim.turretSession!.defense.stats.shockwaves).toBe(1);
+    expect(aim.toggleFrag()).toBe(true);
+    for (let i = 0; i < TURRET_WEAPON.cooldownTicks; i++) sim.tick();
+    expect(aim.commitAt({ x: center.x + 20, z: center.z })).toBe(true);
+    expect(sim.turretSession!.defense.stats.frags).toBe(1);
+    expect(sim.turretSession!.feedback.at(-1)?.event).toMatchObject({
+      type: 'fired',
+      weapon: 'frag',
+    });
+    expect(aim.fragArmed).toBe(false);
+    // The pause between waves: neither weapon is sent, nothing is spent.
+    const live = (sim.meta(sim.playerId)!.vehicle as TurretSession).defense;
+    live.phase = 'between';
+    live.phaseEndTick = sim.tickCount + 200;
+    live.rev++;
+    for (let i = 0; i < REARM_TICKS + TURRET_WEAPON.cooldownTicks; i++) sim.tick();
+    expect(sim.turretSession!.defense.phase).toBe('between');
+    const seen = sim.turretSession!.feedback.length;
+    expect(aim.fireShockwave()).toBe(false);
+    expect(aim.toggleFrag()).toBe(true);
+    aim.commitAt({ x: center.x + 20, z: center.z });
+    const after = sim.turretSession!.defense.stats;
+    expect([after.shockwaves, after.frags]).toEqual([1, 1]);
+    expect(sim.turretSession!.feedback).toHaveLength(seen);
   });
 });
