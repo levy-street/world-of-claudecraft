@@ -15670,6 +15670,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paperdoll.hideHelmAria': '兜を隠す',
   'hudChrome.paperdoll.showHelmAria': '兜を表示',
   'hudChrome.options.waterRipples': '水面の波紋（航跡）',
+  'hudChrome.options.spellEffects': '呪文エフェクト',
   'hudChrome.options.actionCam': 'アクションカメラ',
   'hudChrome.options.actionCamShoulder': 'アクションカメラの肩',
   'hudChrome.options.actionCamShoulderLeft': '左 {pct}',
@@ -16885,6 +16886,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '世界が遠くまでどこまで描かれてから霞んでいくかです。自分で動かすまでは、各プリセットが値を決めてくれます。',
   'guide.settingsPage.rowWaterQuality':
     '湖、川、大海原の表現です。平板で軽いものから、完全に反射するものまで選べます。',
+  'guide.settingsPage.rowSpellEffects':
+    'プレイヤーとそのペットが放つ呪文の光、火花、飛翔体、着弾時の炸裂です（自分のものも含みます）。オフにすると画面が落ち着き、大人数の戦闘で数フレーム稼げます。敵が放つものはすべて表示されたままで、離れるべき範囲を示すリング、スタン・恐怖・移動不能状態の対象の頭上マーカー、すべての詠唱バーも残ります。',
   'guide.settingsPage.rowWaterRipples':
     '泳いでいるときに背後へ広がる航跡と波紋です。初期設定はオフで、実際にフレームを食う唯一の水面エフェクトです。水しぶきや泡はどちらの設定でも影響を受けません。',
   'guide.settingsPage.valueUltraOrInsane': 'ウルトラ、すべてを求めるなら極限',

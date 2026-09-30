@@ -3,6 +3,18 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
+// This suite drives the character window's DOM, never a 3D model. Its import
+// graph queues the player rig and animation GLBs on the shared asset queue at
+// import time; in Node those fetches can settle after happy-dom teardown and
+// throw ProgressEvent rejections that red an otherwise green CI shard (the
+// inspect_window and bootcamp_disengage suites met the same class). A model
+// load here stays pending forever instead.
+vi.mock('../src/render/assets/loader', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/render/assets/loader')>()),
+  loadGltf: () => new Promise(() => {}),
+}));
+
 import { CRAFT_RING } from '../src/sim/content/professions';
 import { ITEMS } from '../src/sim/data';
 import { itemCopyPin } from '../src/sim/item_copy_ref';

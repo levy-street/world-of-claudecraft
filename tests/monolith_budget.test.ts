@@ -995,7 +995,10 @@ const MONOLITHS: MonolithRow[] = [
     // RE-PINNED 12687 -> 12688 at the second release merge into the same branch,
     // after PR 3847 landed on the release (its renderer.ts wiring adds one line;
     // the release pin stays 12684): wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 12688,
+    // LOWERED 12688 -> 12676 by the Spell Effects option: the delve rite and
+    // burning-hut cue arms moved to src/render/world_cue_fx.ts, net of the
+    // event-scope wrapper handleEvent gained. Exact count, zero slack.
+    ceiling: 12676,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

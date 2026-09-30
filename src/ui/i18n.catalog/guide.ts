@@ -524,6 +524,8 @@ export const guideStrings = {
     rowTouchLookSpeed:
       'The same thing for swipe-look, and it only appears when you are on a touchscreen.',
     rowFullscreen: 'Fills the whole screen with the game.',
+    rowSpellEffects:
+      'The glow, sparks, projectiles, and impact bursts of spells that players and their pets cast, yours included. Switch it off for a calmer screen or a few extra frames in big group fights. Everything an enemy casts still shows, and so do the rings that mark an area to step out of, the markers over stunned, feared, or rooted targets, and every cast bar.',
     rowWaterRipples:
       'Wakes and ripples that spread out behind you as you swim. Off by default, and the one water effect that costs real frames; splashes and bubbles are unaffected either way.',
     rowOverflowXp:

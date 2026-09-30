@@ -394,6 +394,7 @@ import type { Renderer } from './render/renderer';
 import { hasAuthoritativeSelfPositionDiscontinuity } from './render/self_motion';
 import { MovementPredictionPipeline } from './render/self_prediction';
 import { ensureSkyAssetsAt, navigatorSaveData } from './render/sky';
+import { setSpellEffectsEnabled } from './render/spell_effects_switch';
 import { ARRIVAL_NEIGHBOR_STREAM_RADIUS } from './render/zone_streaming';
 import { desktopBridge } from './runtime';
 import { breathFraction, stepBreathUsedSeconds } from './sim/breath';
@@ -1504,6 +1505,7 @@ async function startGame(
     renderer.showPlayerNameplates = settings.get('showPlayerNameplates');
     setNameplateDotScale(settings.nameplateDotRenderScale());
     renderer.setWaterRipples(settings.get('waterRipples'));
+    setSpellEffectsEnabled(settings.get('spellEffects'));
     // Dev-only: ?targetcone=1 draws the Tab-target front cone on the ground in
     // front of the player, for tuning the targeting angle/radius (tab_target.ts).
     if (import.meta.env.DEV && new URLSearchParams(location.search).get('targetcone') === '1') {
@@ -2384,6 +2386,12 @@ async function startGame(
       // The wake height field lives renderer-side (render modules never read
       // the settings store), so the flip is pushed rather than read live.
       renderer.setWaterRipples(settings.set('waterRipples', !!value));
+      return;
+    }
+    if (key === 'spellEffects') {
+      // Module state (render/spell_effects_switch.ts), so it outlives a
+      // renderer rebuild; the painters read it at their entry points.
+      setSpellEffectsEnabled(settings.set('spellEffects', !!value));
       return;
     }
     if (key === 'partyFrameShowAbsorbs') {

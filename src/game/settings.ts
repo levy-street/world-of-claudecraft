@@ -625,6 +625,14 @@ export const BOOL_SETTINGS = {
   // passes per frame, so the player who wants the quietest water gets it as
   // an opt-in rather than an opt-out.
   waterRipples: { def: false },
+  // on by default: the spell visual effects players and their pets cast in
+  // the 3D world (cast glows, projectiles, impacts, lingers, buff orbits and
+  // shells). Off is a preference for a calmer or cheaper screen that never
+  // hides a read a player acts on: every enemy effect, area telegraph rings,
+  // hard crowd-control bands, windup animations, cast bars and the HUD all
+  // stay. render/spell_effects_switch.ts owns the split; main.ts pushes the
+  // value there (render never reads here).
+  spellEffects: { def: true },
   // off by default: the over-the-shoulder Action Cam (render/action_cam_core.ts).
   // A camera framing preference like the FOV slider; it never changes zoom or
   // hides anything, and the side lives in actionCamShoulder.

@@ -217,6 +217,35 @@ COSMETIC (may be tiered down on lower presets):
   device policy (`gfxAaPolicy`) plus the Anti-Aliasing dial, never of the frame-budget
   governor, so it cannot vary between two players standing in the same spot.
 
+- The Spell Effects option (Graphics, Display card; `src/render/spell_effects_switch.ts`). A
+  player preference rather than a tier knob, held to the same rule. Off drops the cosmetic
+  spell visuals whose CASTER is on the player side (a player, or a pet with an `ownerId`),
+  the viewer's own included: the ability painter's cast, travel, impact and linger
+  compositions, the per-entity holds those casters caused (windup orbs, buff orbits,
+  shells, ground discs, a player's DoT marks on a mob), the pooled spell particles, the
+  class spell visuals outside both, and the spell light pulses. Everything a mob, boss or
+  other creature casts keeps drawing on every setting, because an enemy effect is often
+  the in-world read of a mechanic (a bomber's fuse flash, the beam showing which add heals
+  the boss, a death-throes warning nova, a breath cone). An effect is attributed to the
+  event that caused it, not the body it lands on (`enterSpellEvent` in the renderer's
+  event dispatch). An effect with no attributable caster always draws, so a gap can only
+  show too much: that covers events that name no caster and spell cues whose ability no
+  player class owns (an encounter mechanic that names the player it resolves on, such as
+  the hoard boss's soul catch, is not that player's spell). Per-frame holds are attributed
+  by their own caster (`spellEffectsMutedBy`, an aura's `sourceId`), so a boss's mark on a
+  raider (the Soul Rend sparkle) and an enemy's debuff on a player keep drawing. For a
+  muted caster the painter takes its refused-cast arm (`refusedTelegraphs`,
+  `areaTelegraph`), so the terrain-draped area ring and the rig's windup clip survive,
+  including the ring on every pulse of a lingering zone, which is the footprint a player
+  chooses to stand in or leave once its particles are gone; the hard-crowd-control band
+  and the taunt attention mark are held over every body whoever cast them. A muted
+  player's own proc, ward and queued-swing cues go too; the HUD buff icons and action bar
+  carry the same state. Cast bars, nameplates, floating combat text and every HUD read never consult
+  the option. The shared pooled emitters that also carry non-spell reads (a delve shrine's
+  sequence pulse via `src/render/world_cue_fx.ts`, a lit wardstone, a minigame power-up,
+  melee hit sparks) never consult it either; spell call sites use gated twins
+  (`Vfx.spellNova` and siblings). Pinned by `tests/spell_effects_switch.test.ts`.
+
 The test for any new tier knob: if a knob hides or delays something a player READS AND REACTS
 TO, it is not allowed. If it only reduces visual richness or redraw smoothness, it is fine.
 

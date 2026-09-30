@@ -14940,6 +14940,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paperdoll.hideHelmAria': '隱藏頭盔',
   'hudChrome.paperdoll.showHelmAria': '顯示頭盔',
   'hudChrome.options.waterRipples': '水面漣漪（尾波）',
+  'hudChrome.options.spellEffects': '法術特效',
   'hudChrome.options.actionCam': '動作鏡頭',
   'hudChrome.options.actionCamShoulder': '動作鏡頭肩位',
   'hudChrome.options.actionCamShoulderLeft': '左 {pct}',
@@ -16091,6 +16092,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.rowViewDistance':
     '世界在淡出之前會被繪製到多遠。每個預設都會替你設定好，直到你自己動它為止。',
   'guide.settingsPage.rowWaterQuality': '湖泊、河流與外海的著色方式，從平坦省效能到完全反射。',
+  'guide.settingsPage.rowSpellEffects':
+    '玩家及其寵物施放的法術光芒、火花、飛行彈道與命中爆發，也包括你自己的。關閉後畫面更清爽，大型團隊戰鬥中也能多擠出幾幀。敵人施放的一切仍會顯示，提示你離開區域的範圍圈、被昏迷、恐懼或定身目標頭上的標記，以及每一條施法條也都會保留。',
   'guide.settingsPage.rowWaterRipples':
     '你游泳時在身後擴散開來的尾波與漣漪。預設關閉，也是唯一一項真的會吃掉幀數的水面效果；無論怎麼設定，水花與氣泡都不受影響。',
   'guide.settingsPage.valueUltraOrInsane': '「超高」，若你想要全部拉滿就選「極致」',

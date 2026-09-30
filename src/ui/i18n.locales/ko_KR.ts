@@ -15627,6 +15627,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paperdoll.hideHelmAria': '투구 숨기기',
   'hudChrome.paperdoll.showHelmAria': '투구 표시',
   'hudChrome.options.waterRipples': '수면 물결 (물살)',
+  'hudChrome.options.spellEffects': '주문 효과',
   'hudChrome.options.actionCam': '액션 카메라',
   'hudChrome.options.actionCamShoulder': '액션 카메라 어깨',
   'hudChrome.options.actionCamShoulderLeft': '왼쪽 {pct}',
@@ -16845,6 +16846,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '세계가 흐려지기 전까지 얼마나 멀리까지 그릴지 정합니다. 직접 움직이기 전까지는 각 프리셋이 대신 정해 줍니다.',
   'guide.settingsPage.rowWaterQuality':
     '호수와 강, 그리고 넓은 바다를 어떻게 표현할지 정합니다. 평평하고 가벼운 표현부터 완전한 반사까지 있습니다.',
+  'guide.settingsPage.rowSpellEffects':
+    '플레이어와 그 소환수가 사용하는 주문의 빛, 불꽃, 투사체, 명중 폭발입니다(내 것도 포함). 끄면 화면이 차분해지고 대규모 파티 전투에서 프레임을 조금 더 확보할 수 있습니다. 적이 사용하는 효과는 모두 그대로 보이며, 벗어나야 할 범위를 알리는 원, 기절·공포·이동 불가 상태인 대상 위의 표시, 모든 시전 바도 유지됩니다.',
   'guide.settingsPage.rowWaterRipples':
     '헤엄칠 때 뒤로 번져 나가는 물결과 잔물결입니다. 기본값은 꺼짐이며, 실제로 프레임을 잡아먹는 유일한 물 효과입니다. 물보라와 거품은 어느 쪽이든 영향을 받지 않습니다.',
   'guide.settingsPage.valueUltraOrInsane': '울트라, 전부를 원한다면 극한',

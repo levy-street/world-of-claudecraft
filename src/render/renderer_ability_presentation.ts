@@ -13,6 +13,7 @@ import { createOnrushArrivalHandler } from './characters/warrior_rush_pose';
 import { impactContact } from './impact_contact';
 import type { LightPulses } from './light_pulses';
 import type { EntityView } from './renderer';
+import { bindSpellEffectsWorld, spellEffectsEnabled } from './spell_effects_switch';
 import { TrinketRelics } from './trinket_relics';
 import type { Vfx } from './vfx';
 import type { VfxAnchorResolver } from './vfx_anchor';
@@ -47,6 +48,9 @@ interface PresentationHost {
 /** Existing painter wiring and Warrior equipment/contact reads share one owner.
  * World lookup stays live across world replacement; simulation is never mutated. */
 export function createRendererAbilityPresentation(h: PresentationHost) {
+  // The Spell Effects option judges each effect by its caster, looked up in
+  // the live world (a world replacement is picked up on the next lookup).
+  bindSpellEffectsWorld((id) => h.world().entities.get(id));
   const visual = (id: number) => {
     const view = h.views.get(id);
     return view ? h.visual(view) : null;
@@ -96,7 +100,9 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
     time: () => h.time(),
     // The relics are engine-family programs: ready once the cast gate has
     // linked that family (the release's per-family cast admission).
-    ready: () => h.castGate.ready(CAST_VFX_ENGINE),
+    // Every relic belongs to a player's trinket, so a closed Spell Effects
+    // option holds them all.
+    ready: () => spellEffectsEnabled() && h.castGate.ready(CAST_VFX_ENGINE),
   });
   const painter = new AbilityVfx(
     {

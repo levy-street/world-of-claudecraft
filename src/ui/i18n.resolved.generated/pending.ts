@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "guide.settingsPage.rowSpellEffects",
+    "hudChrome.options.spellEffects"
+  ],
+  "es_ES": [
+    "guide.settingsPage.rowSpellEffects",
+    "hudChrome.options.spellEffects"
+  ],
+  "fr_FR": [
+    "guide.settingsPage.rowSpellEffects",
+    "hudChrome.options.spellEffects"
+  ],
+  "fr_CA": [
+    "guide.settingsPage.rowSpellEffects",
+    "hudChrome.options.spellEffects"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "guide.settingsPage.rowSpellEffects",
+    "hudChrome.options.spellEffects"
+  ],
+  "de_DE": [
+    "guide.settingsPage.rowSpellEffects",
+    "hudChrome.options.spellEffects"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "guide.settingsPage.rowSpellEffects",
+    "hudChrome.options.spellEffects"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "guide.settingsPage.rowSpellEffects",
+    "hudChrome.options.spellEffects"
+  ],
+  "nl_NL": [
+    "guide.settingsPage.rowSpellEffects",
+    "hudChrome.options.spellEffects"
+  ],
+  "pl_PL": [
+    "guide.settingsPage.rowSpellEffects",
+    "hudChrome.options.spellEffects"
+  ],
+  "id_ID": [
+    "guide.settingsPage.rowSpellEffects",
+    "hudChrome.options.spellEffects"
+  ],
+  "tr_TR": [
+    "guide.settingsPage.rowSpellEffects",
+    "hudChrome.options.spellEffects"
+  ],
+  "sv_SE": [
+    "guide.settingsPage.rowSpellEffects",
+    "hudChrome.options.spellEffects"
+  ],
+  "vi_VN": [
+    "guide.settingsPage.rowSpellEffects",
+    "hudChrome.options.spellEffects"
+  ],
+  "da_DK": [
+    "guide.settingsPage.rowSpellEffects",
+    "hudChrome.options.spellEffects"
+  ]
 };

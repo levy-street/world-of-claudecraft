@@ -257,6 +257,12 @@ const SETTING_ROWS: SettingRow[] = [
     impact: 'light',
   },
   {
+    setting: 'hudChrome.options.spellEffects',
+    where: [GFX, 'hudChrome.options.gfxSectionDisplay'],
+    body: 'guide.settingsPage.rowSpellEffects',
+    impact: 'moderate',
+  },
+  {
     setting: 'hudChrome.options.waterRipples',
     where: [GFX, 'hudChrome.options.gfxSectionDisplay'],
     body: 'guide.settingsPage.rowWaterRipples',

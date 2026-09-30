@@ -244,6 +244,8 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       'cameraFov',
       'fullscreen',
       'weather',
+      // Spell Effects is the other "calm the screen" switch beside Weather.
+      'spellEffects',
       // The wake/ripple field is a GPU cost, so it sits with Weather in the
       // Display card rather than with the HUD comfort toggles.
       'waterRipples',
@@ -1620,6 +1622,7 @@ describe('options_view: the desktop display-mode picker replaces the fullscreen 
       'cameraFov',
       'displayMode',
       'weather',
+      'spellEffects',
       'waterRipples',
       'showOverflowXp',
     ]);
@@ -1675,6 +1678,7 @@ describe('options_view: the desktop display-mode picker replaces the fullscreen 
         'cameraFov',
         'fullscreen',
         'weather',
+        'spellEffects',
         'waterRipples',
         'showOverflowXp',
       ]);

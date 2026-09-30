@@ -15940,6 +15940,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paperdoll.hideHelmAria': 'Скрыть шлем',
   'hudChrome.paperdoll.showHelmAria': 'Показать шлем',
   'hudChrome.options.waterRipples': 'Рябь на воде (кильватер)',
+  'hudChrome.options.spellEffects': 'Эффекты заклинаний',
   'hudChrome.options.actionCam': 'Экшен-камера',
   'hudChrome.options.actionCamShoulder': 'Плечо экшен-камеры',
   'hudChrome.options.actionCamShoulderLeft': 'Слева {pct}',
@@ -17172,6 +17173,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Как далеко вдаль отрисовывается мир, прежде чем растаять. Каждый пресет задаёт это за вас, пока вы не сдвинете ползунок сами.',
   'guide.settingsPage.rowWaterQuality':
     'Как затеняются озёра, реки и открытое море, от плоского и дешёвого до полностью отражающего.',
+  'guide.settingsPage.rowSpellEffects':
+    'Свечение, искры, снаряды и вспышки попаданий от заклинаний игроков и их питомцев, включая ваши. Выключите их, чтобы успокоить картинку или выиграть пару кадров в крупных групповых боях. Всё, что применяют враги, по-прежнему видно, как и круги, отмечающие зону, из которой нужно выйти, метки над оглушёнными, испуганными или обездвиженными целями и все полосы чтения.',
   'guide.settingsPage.rowWaterRipples':
     'Следы и круги, что расходятся за вами, пока вы плывёте. По умолчанию выключено, и это единственный водный эффект, который правда стоит кадров; на брызги и пузыри он не влияет никак.',
   'guide.settingsPage.valueUltraOrInsane':

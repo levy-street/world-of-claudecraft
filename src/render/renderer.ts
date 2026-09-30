@@ -764,6 +764,7 @@ import { zoneArrivalReady } from './sky_residency_core';
 import { SkyResidencyDriver } from './sky_residency_driver';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { buildSoulwell, disposeSoulwellVisual, syncSoulwellVisual } from './soulwell';
+import { enterSpellEvent, leaveSpellEvent } from './spell_effects_switch';
 import { SpiritGrade } from './spirit_grade';
 import {
   freezeStaticMatrices,
@@ -852,6 +853,7 @@ import { Weather } from './weather';
 import { precipForBiome } from './weather_field_core';
 import { createRendererWebGL, type WebGLPowerPreference } from './webgl_context_fallback';
 import { buildWorldAmbientSources, footstepSurfaceAt } from './world_audio';
+import { playWorldCueFx } from './world_cue_fx';
 import { WorldGuidance } from './world_guidance';
 import { syncWorldQuestCarryView, type WorldQuestCarryViewState } from './world_quest_carry_visual';
 import { surfaceDetailPrewarmTextures } from './worn_stone';
@@ -7065,6 +7067,17 @@ export class Renderer {
   }
 
   handleEvent(ev: SimEvent): void {
+    // Spell Effects judges each effect by this event's caster; dispatched via
+    // the prototype so a host that borrows handleEvent reaches the switch too.
+    const scope = enterSpellEvent(ev);
+    try {
+      Renderer.prototype.dispatchEvent.call(this, ev);
+    } finally {
+      leaveSpellEvent(scope);
+    }
+  }
+
+  private dispatchEvent(ev: SimEvent): void {
     this.riftDeathZoneVisuals?.handleEvent(ev);
     switch (ev.type) {
       case 'castStart': {
@@ -7356,10 +7369,10 @@ export class Renderer {
         } else if (ev.fx === 'temporalClock') {
           // Audio-only cue. The authoritative Rewind nova is emitted separately.
         } else if (ev.fx === 'temporalRewindNova') {
-          this.vfx.nova(ev.targetId, ev.school);
+          this.vfx.spellNova(ev.targetId, ev.school);
         } else if (ev.fx === 'lightning') this.vfx.lightningProjectile(ev.sourceId, ev.targetId);
         else if (ev.fx === 'tick') this.vfx.tick(ev.targetId, ev.school);
-        else this.vfx.nova(ev.targetId, ev.school);
+        else this.vfx.spellNova(ev.targetId, ev.school);
         // A mob that hurls an instant bolt with NO windup (the warlock
         // demon's bolt) has no cast state for the looping cast channel, and
         // the damage event that animates melee fires on ARRIVAL and only for
@@ -7476,7 +7489,7 @@ export class Renderer {
         // reads, not just its center.
         const gy = groundHeight(ev.x, ev.z, this.sim.cfg.seed);
         const at = new THREE.Vector3(ev.x, gy + 0.4, ev.z);
-        this.vfx.burst(at, ev.school, ev.fx === 'nova' ? 34 : 22, ev.fx === 'nova' ? 1.4 : 1);
+        this.vfx.spellBurst(at, ev.school, ev.fx === 'nova' ? 34 : 22, ev.fx === 'nova' ? 1.4 : 1);
         if (ev.radius) this.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school);
         if (
           ev.ability === 'corpse_explosion' &&
@@ -7543,7 +7556,7 @@ export class Renderer {
           const nowMs = performance.now();
           if (nowMs - (this.healGlowAt.get(ev.targetId) ?? 0) >= 110) {
             this.healGlowAt.set(ev.targetId, nowMs);
-            this.vfx.healGlow(ev.targetId);
+            this.vfx.spellHealGlow(ev.targetId);
           }
         }
         break;
@@ -7556,9 +7569,9 @@ export class Renderer {
         // NOT player-gated). Everything else keeps the generic player swirl.
         const procColor = SET_PROC_FX_BY_NAME.get(ev.name);
         if (ev.gained && procColor !== undefined && tgt) {
-          this.vfx.buffSwirl(ev.targetId, procColor);
+          this.vfx.spellBuffSwirl(ev.targetId, procColor);
         } else if (ev.gained && tgt?.kind === 'player') {
-          this.vfx.buffSwirl(ev.targetId);
+          this.vfx.spellBuffSwirl(ev.targetId);
         }
         break;
       }
@@ -7596,15 +7609,11 @@ export class Renderer {
         this.fishingBobbers.bite(ev.pid);
         break;
       }
-      case 'worldObjectBurning': {
-        // A torched murloc hut (q_deepfen_purge) bursts into flame. First-pass
-        // fire cue: a strong low burst plus a taller follow-up so it reads as
-        // catching, not a single puff. The lingering blaze is iterated in playtest.
-        const gy = groundHeight(ev.x, ev.z, this.sim.cfg.seed);
-        this.vfx.burst(new THREE.Vector3(ev.x, gy + 0.6, ev.z), 'fire', 48, 2.2);
-        this.vfx.burst(new THREE.Vector3(ev.x, gy + 1.4, ev.z), 'fire', 30, 1.6);
+      case 'worldObjectBurning':
+      case 'delveRitePulse':
+      case 'delveRiteFeedback':
+        playWorldCueFx(this.vfx, ev, this.sim.cfg.seed);
         break;
-      }
       case 'yumiTeleport': {
         // Arcane burst at both ends of the cat's blink (the event is personal
         // per participant; ignore copies addressed to other local pids so an
@@ -7619,27 +7628,6 @@ export class Renderer {
         for (const view of this.yumiMazeViews.values()) view.noteTeleport(ev.catId, ev.toX, ev.toZ);
         break;
       }
-      case 'delveRitePulse': {
-        // The Drowned Reliquary Rite plays its sequence by pulsing each shrine
-        // in turn; a school-coloured nova on the shrine entity shows which one
-        // (colour matches the shrine's accent so the sequence is readable).
-        const school =
-          ev.shrineKind === 'rite_shrine_candle'
-            ? 'fire'
-            : ev.shrineKind === 'rite_shrine_reed'
-              ? 'nature'
-              : ev.shrineKind === 'rite_shrine_skull'
-                ? 'shadow'
-                : 'holy';
-        this.vfx.nova(ev.entityId, school);
-        break;
-      }
-      case 'delveRiteFeedback':
-        // A correct touch answers with a green up-glow; a wrong one with a dark
-        // shadow burst on the shrine the player pressed.
-        if (ev.correct) this.vfx.healGlow(ev.shrineId);
-        else this.vfx.nova(ev.shrineId, 'shadow');
-        break;
       case 'fiestaPowerup':
         // Big celebratory pop on grab, plus a lingering coloured glow.
         this.vfx.levelUpPillar(ev.entityId);
@@ -11196,7 +11184,7 @@ export class Renderer {
       }
       if (runCharacterPresentation) {
         if (shouldDrawLegacyCastSparkle(st.casting, e.castingAbility)) {
-          this.vfx.castSparkle(
+          this.vfx.spellCastSparkle(
             e.id,
             waterJetVisualChannel
               ? 'frost'
@@ -11211,21 +11199,21 @@ export class Renderer {
         if (hasSoulRend) {
           this.vfx.castSparkle(e.id, 'shadow', dt * 3.2);
         }
-        if (veilboundState !== 'none') this.vfx.castSparkle(e.id, 'holy', dt * 2.4);
+        if (veilboundState !== 'none') this.vfx.spellCastSparkle(e.id, 'holy', dt * 2.4);
         if (!e.dead && (ferocityStage > 0 || petFrenzy)) {
-          this.vfx.castSparkle(
+          this.vfx.spellCastSparkle(
             e.id,
             'fire',
             dt * (0.45 + ferocityStage * 0.35 + (petFrenzy ? 1 : 0)),
           );
         }
         if (tithefiendEmpoweredActive(e)) {
-          this.vfx.castSparkle(e.id, 'shadow', dt * 2.4);
+          this.vfx.spellCastSparkle(e.id, 'shadow', dt * 2.4);
         }
         if (hasRecklessness) {
           this.vfx.recklessFlame(e.id, dt);
           if (spawnRecklessnessSkulls) {
-            this.recklessSkulls.spawn(v.riderAnchor, active.height * e.scale);
+            this.recklessSkulls.spawn(v.riderAnchor, active.height * e.scale, e.id);
           }
         }
         // Shapeshift-form particle auras riding the tints above: metamorph fire,
