@@ -723,16 +723,16 @@ Exact-phrase and coined-token searches against the major game wikis.
 
 ### Fire and Fly world quest at the Evergarden gate (web-verified 2026-09-30)
 
-Scope: the proper nouns the Fire and Fly world quest adds (the instructor, the
-quest, its three trials, the first-win deed). Quoted exact-phrase searches plus
-game-wiki searches (WoW, RuneScape, FFXIV, GW2, ESO, Diablo, Path of Exile). None
-of these is a coined token; every one is ordinary English, so the check is for a
-distinctive full name in the same role. The mini-game's own name, "Fire and Fly", was checked
-when the mini-game was named (borderline: a small free web game is called "Fly &
-Fire", words reversed; generic words, no coined token).
+Scope: the proper nouns the Fire and Fly world quest adds (the mini-game's name,
+the instructor, the quest, its three trials, the first-win deed and the rankings
+window's title). Quoted exact-phrase searches plus game-wiki searches (WoW,
+RuneScape, FFXIV, GW2, ESO, Diablo, Path of Exile). None of these is a coined
+token; every one is ordinary English, so the check is for a distinctive full name
+in the same role.
 
 | Name | Where | Verdict |
 |---|---|---|
+| Fire and Fly | the mini-game, its arena's display name (`fire_and_fly_arena`) and the seat HUD's title | KEEP, borderline. No game by that exact name (re-searched 2026-09-30); the nearest are "Fly & Fire" (a small free web game, words reversed), the Atari 2600 "Fire Fly" and several "Firefly" puns. Generic words, no coined token. |
 | Master Gunner Alder | the instructor NPC (`fire_and_fly_instructor`) | KEEP. No match. "Master gunner" is a real artillery rank used across games; the nearest game character is Guild Wars 2's "Master Gunner Adil", a different name. Alder is a tree and a common name. |
 | Gunnery Recruiter | his title | KEEP. No match. Plain descriptive English. |
 | The Gunner's Trials | the world quest's title | KEEP. No match for the phrase; nearest is Final Fantasy X-2's "Gunner's Gauntlet" minigame, different wording. |
@@ -740,6 +740,7 @@ Fire", words reversed; generic words, no coined token).
 | Standing Watch | the Standard scenario | KEEP. No match; a naval and military idiom. |
 | Veterans' Test | the Hard scenario | KEEP. No match; nearest are Destiny's "Veteran's Tour" and several quests named "The Veteran", different wording. |
 | The Gunner's Oath | the first-win deed (`exp_gunners_oath`) | KEEP. No match as an achievement or quest. |
+| Gunner's trial records | the rankings window title of the trials' ladders (`hudChrome.leaderboard.fireAndFlyRankings`), opened from the noticeboard beside Alder | KEEP. No match in any game (the exact phrase only finds historical court-martial archives); a descriptive label in the shape of the glider's "Glider course records". |
 | The Rampart Trials, Rampart Recruiter, Sworn to the Ramparts | REJECTED before shipping | No exact match, but "Rampart" is also Atari's 1990 cannon-and-castle defense game, the same genre and theme as this activity, so the word was dropped from every proper noun (it stays in lowercase prose, "the ramparts"). |
 
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
