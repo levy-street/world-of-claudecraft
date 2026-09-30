@@ -398,7 +398,7 @@ import { createGpuTimerProbe, type GpuTimerProbe } from './gpu_timer_probe';
 import { GPU_TIMER_UNAVAILABLE } from './gpu_timer_probe_core';
 import { bakeGrassGroundTexture, setGrassGroundBake } from './grass_ground_bake';
 import { buildGreatTreePrewarmGroup } from './great_tree_prewarm';
-import { GroundAimReticleVisual } from './ground_aim_reticle_visual';
+import { type GroundAimReticleInput, GroundAimReticleVisual } from './ground_aim_reticle_visual';
 import {
   groundObjectPoolKey,
   type PooledObjectView,
@@ -12593,16 +12593,7 @@ export class Renderer {
     this.waterView.setWavesEnabled(enabled);
   }
 
-  setGroundAimReticle(
-    aim: {
-      x: number;
-      z: number;
-      radius: number;
-      school: string;
-      dimmed: boolean;
-      blocked?: boolean;
-    } | null,
-  ): void {
+  setGroundAimReticle(aim: GroundAimReticleInput | null): void {
     this.groundAimReticle.setAim(
       aim
         ? {
@@ -12612,6 +12603,7 @@ export class Renderer {
             color: SCHOOL_COLORS[aim.school] ?? 0xffffff,
             dimmed: aim.dimmed,
             blocked: aim.blocked === true,
+            landing: aim.landing,
           }
         : null,
     );

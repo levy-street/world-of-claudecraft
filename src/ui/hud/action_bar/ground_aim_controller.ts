@@ -32,6 +32,8 @@ export interface GroundAimReticleView {
   dimmed: boolean;
   /** Inside the ability's minimum range: the commit will be refused. */
   blocked: boolean;
+  /** Where each bomblet of an armed fragmentation shell lands; absent for every other aim. */
+  landing?: readonly AimPoint[] | null;
 }
 
 export interface GroundAimControllerDeps {

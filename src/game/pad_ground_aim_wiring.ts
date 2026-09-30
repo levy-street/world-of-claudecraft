@@ -29,6 +29,7 @@ interface GroundAimHudFacet {
     school: string;
     dimmed: boolean;
     blocked: boolean;
+    landing?: readonly { x: number; z: number }[] | null;
   } | null;
 }
 
@@ -128,6 +129,7 @@ export interface GroundAimReticleSyncDeps {
       school: string;
       dimmed: boolean;
       blocked: boolean;
+      landing?: readonly { x: number; z: number }[] | null;
     } | null,
   ) => void;
 }
@@ -161,6 +163,7 @@ export function syncGroundAimReticleFrame(deps: GroundAimReticleSyncDeps): void 
           school: reticle.school,
           dimmed: reticle.dimmed,
           blocked: reticle.blocked,
+          landing: reticle.landing,
         }
       : null,
   );

@@ -702,7 +702,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted for Fire and Fly: the renderer leaf moved (sky painters extracted, the turret
   // host line). No capture was retaken.
-  'a7471bd2c08e7c31db166055158de3b9a5f7ecbd81a541360e682938f956cf3e';
+  // Re-minted for Fire and Fly's fragmentation landing marks (the renderer leaf moved).
+  // No capture was retaken.
+  'acc900b43bf565a4613c43234f6fb750e3d5b4e6136babab65e8364556aa3a6a';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

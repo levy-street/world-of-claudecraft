@@ -998,7 +998,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 12688 -> 12646: the sun, moon and god-ray painters moved to
     // src/render/sky_overlays.ts, paying for the one-line Fire and Fly weapon host
     // (WorldGuidance.setTurretHost). Exact count, zero slack.
-    ceiling: 12646,
+    // LOWERED 12646 -> 12638: the ground-aim reticle input type moved to
+    // src/render/ground_aim_reticle_visual.ts (GroundAimReticleInput). Exact count.
+    ceiling: 12638,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

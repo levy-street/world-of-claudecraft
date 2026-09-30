@@ -1395,7 +1395,8 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted for Fire and Fly (the renderer leaf moved). No capture was retaken.
-  '526ef30c88af35e84fb8126f9b8e97833090261f396409ccbf529944b434aaec';
+  // Re-minted for Fire and Fly's fragmentation landing marks. No capture was retaken.
+  'f28b47e1cb372e6c6c3f583843fe6435e49ee6b78efb25c6997a5eb324bae112';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1419,7 +1420,8 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted for Fire and Fly (the renderer leaf moved). No capture was retaken.
-  'a7471bd2c08e7c31db166055158de3b9a5f7ecbd81a541360e682938f956cf3e';
+  // Re-minted for Fire and Fly's fragmentation landing marks. No capture was retaken.
+  'acc900b43bf565a4613c43234f6fb750e3d5b4e6136babab65e8364556aa3a6a';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2804,7 +2806,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // re-swept evidence. No capture was retaken.
       // Fire and Fly (the renderer leaf moved): recomputed LAST again over the re-swept
       // evidence. No capture was retaken.
-    ).toBe('c115472c92f4bed56ff3540d844e71ded944574f2c6cbe0df7eb8e5875fba4e0');
+      // Fire and Fly's fragmentation landing marks: recomputed LAST again over the
+      // re-swept evidence. No capture was retaken.
+    ).toBe('ea1c4413d2937c0ee539f331a0e3170515acdc6ace1b05ed3603e047f7b822c3');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
