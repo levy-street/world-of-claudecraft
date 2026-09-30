@@ -388,6 +388,13 @@ function inInstancedPvp(ctx: SimContext, pid: number): boolean {
   return ctx.arenaMatches.get(pid)?.state === 'active';
 }
 
+/** A player manning a world-quest cannon (src/sim/vehicles.ts) is frozen at the
+ *  station with no class actions, and entering combat ends the session: letting
+ *  the world arm reach them would only eject a defender who cannot fight back. */
+function inWorldQuestVehicle(ctx: SimContext, pid: number): boolean {
+  return !!ctx.players.get(pid)?.vehicle;
+}
+
 /** Two players mid-duel are under the duel's rules: a consensual duel fought
  *  on free-for-all ground must never mark either duelist or book its blows as
  *  world kills (the duel arm of isHostileTo already makes them hostile). */
@@ -405,10 +412,11 @@ function inSameParty(ctx: SimContext, a: number, b: number): boolean {
 /**
  * The open-world hostility arm isHostileTo consults for two PLAYERS (the
  * coordinator resolves a pet to its owner first). Neither jailed (the jail has
- * its own brawl rule), neither in a live battleground or arena, not mid-duel
- * with each other, the realm's kill switch clear, and then the pure pair rule
- * over the two flags and the two zone policies (world_pvp_rules.ts
- * worldPvpPairHostile). Symmetric. Reads the ground live (rectangle scans
+ * its own brawl rule), neither in a live battleground or arena, neither manning
+ * a world-quest cannon, not mid-duel with each other, the realm's kill switch
+ * clear, and then the pure pair rule over the two flags and the two zone
+ * policies (world_pvp_rules.ts worldPvpPairHostile). Symmetric. Reads the
+ * ground live (rectangle scans
  * over the zone table) rather than the zone pass's cache, so a player who
  * just crossed a line, teleported or was towed is judged where they stand.
  * The early returns before the second scan are each implied by the pure
@@ -424,6 +432,7 @@ export function isWorldPvpHostile(ctx: SimContext, attacker: Entity, target: Ent
   if (attacker.id === target.id || ctx.worldPvpDisabled) return false;
   if (attacker.jailed || target.jailed) return false;
   if (inInstancedPvp(ctx, attacker.id) || inInstancedPvp(ctx, target.id)) return false;
+  if (inWorldQuestVehicle(ctx, attacker.id) || inWorldQuestVehicle(ctx, target.id)) return false;
   if (inActiveDuelTogether(ctx, attacker.id, target.id)) return false;
   const sameParty = inSameParty(ctx, attacker.id, target.id);
   if (worldPvpPairExempt(attacker, target, sameParty)) return false;

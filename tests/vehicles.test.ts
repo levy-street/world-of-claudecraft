@@ -173,8 +173,14 @@ describe('authoritative personal vehicles', () => {
       );
       const awarded = sim.copper;
       // Leaving during endless play ends the session with no second reward and
-      // no retry lockout; a fresh entry starts a fresh authored defense.
-      if (sim.vehicleSession) sim.leaveVehicle();
+      // no retry lockout; a fresh entry starts a fresh authored defense. The
+      // endless run's result and ladder row post once on the way out.
+      if (sim.vehicleSession) {
+        sim.leaveVehicle();
+        const left = sim.tick();
+        expect(left.filter((e) => e.type === 'cannonResult')).toHaveLength(1);
+        expect(left.filter((e) => e.type === 'worldQuestScore')).toHaveLength(1);
+      }
       expect(sim.vehicleSession).toBeNull();
       expect(meta.vehicleRetryAtTick ?? 0).toBeLessThanOrEqual(sim.ctx.tickCount);
       expect(sim.enterVehicle(station.id)).toBe(true);
