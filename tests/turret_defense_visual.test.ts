@@ -21,7 +21,7 @@ import {
   CannonShellVisuals,
   resetCannonShotTexelsForTest,
 } from '../src/render/cannon_shell_visuals';
-import { visualKeyFor } from '../src/render/characters/manifest';
+import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import { drawProgramSignature } from '../src/render/draw_program_signature_core';
 import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
 import type { IdleBudget, IdleScheduler } from '../src/render/idle_queue';
@@ -509,6 +509,26 @@ describe('Fire and Fly monsters on screen', () => {
     expect(drawnRigs(visual)).toHaveLength(later.monsters.length);
     visual.dispose();
     expect(actors.made.every((a) => a.dispose.mock.calls.length === 1)).toBe(true);
+  });
+
+  it('builds the yeti in the pyre colossus body, as tall as its own would stand', async () => {
+    actors.made.length = 0;
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0, undefined, immediate);
+    const state = engine(0);
+    expect(state.plan.kinds.some((k) => k.templateId === 'frostmane_yeti')).toBe(true);
+    await buildAll(visual, viewOf(state), 0);
+    const yetiKey = visualKeyFor({ kind: 'mob', templateId: 'frostmane_yeti' } as Entity);
+    const colossusKey = visualKeyFor({ kind: 'mob', templateId: 'pyre_colossus' } as Entity);
+    expect(actors.made.some((a) => a.key === yetiKey)).toBe(false);
+    const colossi = actors.made.filter((a) => a.key === colossusKey);
+    expect(colossi.length).toBeGreaterThan(0);
+    // The mock rig is 2 tall: the body scale brings it to the yeti's own height.
+    const own = VISUALS[yetiKey].height * (MOBS.frostmane_yeti.scale ?? 1);
+    for (const a of colossi) {
+      expect(a.color).toBe(MOBS.pyre_colossus.color ?? MOBS.frostmane_yeti.color);
+      expect((a.root.parent?.scale.y ?? 0) * 2).toBeCloseTo(own, 9);
+    }
+    visual.dispose();
   });
 
   it('builds the current and next wave on the frame, later waves only in idle slots while seated', async () => {

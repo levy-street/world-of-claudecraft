@@ -40,13 +40,13 @@ const PLAN = {
     kind('forest_wolf', 'small'),
     kind('vale_bandit', 'medium'),
     kind('fen_troll', 'large'),
-    kind('frostmane_yeti', 'huge'),
+    kind('thornpeak_ogre', 'huge'),
   ],
   waves: [],
   bowling: TURRET_BOWLING,
 } as TurretPlan;
 
-/** Monster id n is of kind n - 1 (1 wolf, 2 bandit, 3 troll, 4 yeti), plus two more wolves. */
+/** Monster id n is of kind n - 1 (1 wolf, 2 bandit, 3 troll, 4 ogre), plus two more wolves. */
 function view(ids: number[] = [1, 2, 3, 4, 5, 6]): TurretSessionView {
   return {
     origin: { x: 0, y: 0, z: 0 },
@@ -192,7 +192,7 @@ describe('Fire and Fly cries', () => {
     frame(149, launched(4));
     expect(keys()).toHaveLength(1);
     frame(150, launched(4));
-    expect(keys()).toEqual(['forest_wolf_hurt', 'frostmane_yeti_hurt']);
+    expect(keys()).toEqual(['forest_wolf_hurt', 'thornpeak_ogre_hurt']);
   });
 
   it('lets each monster cry at most once a second', () => {
@@ -276,10 +276,25 @@ describe('Fire and Fly cries', () => {
     ]);
   });
 
+  it('voices a monster in a borrowed body with that body, never its own', () => {
+    const dressed = { ...PLAN, kinds: [kind('frostmane_yeti', 'huge')] } as TurretPlan;
+    const sounds = new TurretMonsterSfx(voices);
+    const session = { ...view([1]), defense: { ...view([1]).defense, plan: dressed } };
+    (session.defense as { monsters: unknown }).monsters = [{ id: 1, kind: 0 }];
+    const played: TurretSfxCue[] = [];
+    sounds.offer(killed(1), session as TurretSessionView, 0);
+    sounds.flush(0, (cue) => played.push({ ...cue }));
+    expect(played.map((c) => c.key)).toEqual(['pyre_colossus_death']);
+    expect(turretVoiceKeys(dressed, voices).sort()).toEqual([
+      'pyre_colossus_death',
+      'pyre_colossus_hurt',
+    ]);
+  });
+
   it('lists every cry the plan can make, once each', () => {
     const plan = { ...PLAN, kinds: [...PLAN.kinds, kind('forest_wolf', 'small')] } as TurretPlan;
     expect(turretVoiceKeys(plan, voices).sort()).toEqual(
-      ['forest_wolf', 'vale_bandit', 'fen_troll', 'frostmane_yeti']
+      ['forest_wolf', 'vale_bandit', 'fen_troll', 'thornpeak_ogre']
         .flatMap((id) => [`${id}_hurt`, `${id}_death`])
         .sort(),
     );

@@ -27,6 +27,7 @@ import {
   TURRET_THUMP_HEAVY_SFX,
   TURRET_THUMP_LIGHT_SFX,
 } from '../src/game/turret_monster_sfx';
+import { fireAndFlyLookTemplate } from '../src/sim/content/fire_and_fly_looks';
 import type { TurretEvent, TurretHit } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import type { TurretFeedback } from '../src/sim/minigames/turret_feedback';
@@ -196,7 +197,7 @@ describe('Fire and Fly sound player', () => {
     expect(s.preload).not.toHaveBeenCalled();
     sounds.update(session([]));
     sounds.update(session([], 40));
-    const templates = [...new Set(PLAN.kinds.map((k) => k.templateId))];
+    const templates = [...new Set(PLAN.kinds.map((k) => fireAndFlyLookTemplate(k.templateId)))];
     expect(s.preload.mock.calls.map((c) => c[0]).sort()).toEqual(
       [
         ...new Set([
@@ -353,7 +354,9 @@ describe('Fire and Fly sound player', () => {
     let now = 0;
     const sounds = player(s, () => now);
     sounds.update(session([entry(1, 10, { type: 'killed', id: 1, x: 100, y: 5, z: 205 })]), 10);
-    expect(s.playAt.mock.calls.map((c) => c[0])).toEqual([`${PLAN.kinds[0].templateId}_death`]);
+    expect(s.playAt.mock.calls.map((c) => c[0])).toEqual([
+      `${fireAndFlyLookTemplate(PLAN.kinds[0].templateId)}_death`,
+    ]);
     now += 5000;
     const reborn: TurretEvent = {
       type: 'launched',
@@ -367,8 +370,8 @@ describe('Fire and Fly sound player', () => {
     };
     sounds.update(session([entry(1, 50, reborn)], 40, [{ id: 1, kind: HUGE }]), 50);
     expect(s.playAt.mock.calls.map((c) => c[0])).toEqual([
-      `${PLAN.kinds[0].templateId}_death`,
-      `${PLAN.kinds[HUGE].templateId}_hurt`,
+      `${fireAndFlyLookTemplate(PLAN.kinds[0].templateId)}_death`,
+      `${fireAndFlyLookTemplate(PLAN.kinds[HUGE].templateId)}_hurt`,
     ]);
   });
 

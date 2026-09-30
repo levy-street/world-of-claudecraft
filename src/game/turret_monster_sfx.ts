@@ -3,6 +3,7 @@
 // Each kind of sound keeps one channel: of the candidates a frame offers, only the
 // strongest plays, and only once the channel's gap has passed, so a wave landing
 // at once is one thump and a blast through a pack is one cry.
+import { fireAndFlyLookTemplate } from '../sim/content/fire_and_fly_looks';
 import { TURRET_BOWLING, TURRET_PHYSICS, TURRET_WEAPON } from '../sim/content/turret_defense';
 import type { TurretEvent } from '../sim/minigames/turret_defense';
 import type { TurretPlan } from '../sim/minigames/turret_defense_plan';
@@ -81,7 +82,7 @@ export function turretVoiceKeys(plan: TurretPlan, voiceCue: TurretVoiceCue): str
   const keys = new Set<string>();
   for (const kind of plan.kinds) {
     for (const action of ['hurt', 'death'] as const) {
-      const key = voiceCue(kind.templateId, action);
+      const key = voiceCue(fireAndFlyLookTemplate(kind.templateId), action);
       if (key) keys.add(key);
     }
   }
@@ -221,7 +222,7 @@ export class TurretMonsterSfx {
     at: { readonly x: number; readonly y: number; readonly z: number },
   ): void {
     const kind = this.kindOf(session, id);
-    const key = kind && this.voiceCue(kind.templateId, action);
+    const key = kind && this.voiceCue(fireAndFlyLookTemplate(kind.templateId), action);
     if (!key) return;
     const cue = claim(this.voice, action === 'death' ? DEATH_RANK : HURT_RANK);
     if (!cue) return;

@@ -27,6 +27,7 @@
 // turret_motion_forecast_core.ts, turret_contact_dust_core.ts,
 // turret_defense_pool_core.ts and turret_tower_core.ts.
 import * as THREE from 'three';
+import { fireAndFlyLookTemplate } from '../sim/content/fire_and_fly_looks';
 import { TURRET_PHYSICS, TURRET_WEAPON } from '../sim/content/turret_defense';
 import { MOBS } from '../sim/data';
 import type { ThrowProbe } from '../sim/minigames/thrown_body';
@@ -555,13 +556,17 @@ export class TurretDefenseVisual {
 
   private mintRig(templateId: string): void {
     const template = MOBS[templateId];
-    const key = visualKeyFor({ kind: 'mob', templateId } as Entity);
-    const actor = new CharacterVisual(key, template?.color ?? 0xffffff);
+    const lookId = fireAndFlyLookTemplate(templateId);
+    const key = visualKeyFor({ kind: 'mob', templateId: lookId } as Entity);
+    const actor = new CharacterVisual(key, MOBS[lookId]?.color ?? template?.color ?? 0xffffff);
     const clips = VISUALS[key]?.clips;
     actor.setShadow(false);
     actor.setProxyShadow(false);
     actor.setFarBakeGate(this.effectGate);
-    const scale = template?.scale ?? 1;
+    // A borrowed look stands as tall as the template's own body would.
+    const ownHeight = VISUALS[visualKeyFor({ kind: 'mob', templateId } as Entity)]?.height;
+    const fit = lookId !== templateId && ownHeight ? ownHeight / actor.height : 1;
+    const scale = (template?.scale ?? 1) * fit;
     const height = actor.height * scale;
     const body = new THREE.Group();
     body.scale.setScalar(scale);
