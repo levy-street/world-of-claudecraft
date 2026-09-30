@@ -13984,6 +13984,11 @@ export const sv_SE: EnTranslations = {
         "description": "Klösa fienden för vapenskada plus {damage}. Ger 1 kombopoäng. Endast i Kattform.",
         "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod (max 3)."
       },
+      "scratch": {
+        "name": "Scratch",
+        "description": "Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+      },
       "ferocious_bite": {
         "name": "Blodsbett",
         "description": "Avslutande drag som orsakar {damage}. Endast i Kattform.",

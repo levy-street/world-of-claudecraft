@@ -5285,6 +5285,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.name': 'Рвущий коготь',
   'entities.abilities.claw.description':
     'Царапает врага, нанося урон оружием плюс {damage}. Дает 1 прием серии. Только в облике кота.',
+  'entities.abilities.scratch.name': 'Царапание',
+  'entities.abilities.scratch.description':
+    'Царапает ближайшие цели в пределах 6 м, нанося урон оружием плюс {damage}. Дает 1 прием серии за каждую пораженную цель. Раскрывает врагов в незаметности в зоне удара. Только в облике кота.',
   'entities.abilities.ferocious_bite.name': 'Кровавый укус',
   'entities.abilities.ferocious_bite.description':
     'Завершающий прием, наносящий {damage}. Только в облике кота.',
@@ -16005,6 +16008,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'На 10 сек. делает кожу твёрдой, как остывший шлак, и снижает весь получаемый урон на 25%.',
   'entities.abilities.cinderhide.name': 'Шлаковая кожа',
   'entities.abilities.claw.specNote_feral':
+    'Каждый попавший удар добавляет 1 стадию Старой крови (максимум 3).',
+  'entities.abilities.scratch.specNote_feral':
     'Каждый попавший удар добавляет 1 стадию Старой крови (максимум 3).',
   'entities.abilities.cold_focus.description':
     'На 12 сек. Выверенный выстрел дает больше концентрации, а Дальний натяг становится быстрее и дешевле. (Фирменная способность Холодного взора)',

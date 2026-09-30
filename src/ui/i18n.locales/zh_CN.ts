@@ -5016,6 +5016,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.name': '裂爪',
   'entities.abilities.claw.description':
     '用利爪攻击敌人，造成武器伤害加 {damage}。奖励 1 个连击点。仅限豹形态。',
+  'entities.abilities.scratch.name': '抓挠',
+  'entities.abilities.scratch.description':
+    '抓挠 6 码内的附近目标，造成武器伤害加 {damage}。每命中一个目标奖励 1 个连击点。使范围内潜行的敌人现形。仅限豹形态。',
   'entities.abilities.ferocious_bite.name': '血噬',
   'entities.abilities.ferocious_bite.description': '终结技，造成 {damage}。仅限豹形态。',
   'entities.abilities.swipe.name': '横扫利爪',
@@ -14998,6 +15001,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '使皮肤硬化为冷却的熔渣，持续10秒，受到的所有伤害降低25%。',
   'entities.abilities.cinderhide.name': '熔渣皮肤',
   'entities.abilities.claw.specNote_feral': '每次命中累积1层古血（最多3层）。',
+  'entities.abilities.scratch.specNote_feral': '每次命中累积1层古血（最多3层）。',
   'entities.abilities.cold_focus.description':
     '持续 12 秒，审慎射击产生更多集中值，蓄力长射的速度更快、消耗更低。（冷视招牌技能）',
   'entities.abilities.cold_focus.name': '冷静专注',

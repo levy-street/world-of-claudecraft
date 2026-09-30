@@ -13984,6 +13984,11 @@ export const nl_NL: EnTranslations = {
         "description": "Klauwt de vijand voor wapenschade plus {damage}. Levert 1 combopunt op. Alleen in Katgedaante.",
         "specNote_feral": "Elke slag die raakt voegt 1 Oud Bloed toe (max 3)."
       },
+      "scratch": {
+        "name": "Scratch",
+        "description": "Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+      },
       "ferocious_bite": {
         "name": "Bloedbeet",
         "description": "Afmaakactie die {damage} veroorzaakt. Alleen in Katgedaante.",

@@ -154,6 +154,7 @@ import { applySetProcs } from './set_procs';
 import { clearSpiritmendCurrents, UNLEASH_WEAPON_GUARD_ID } from './shaman_spiritmend';
 import { clearShamanTalentState, onShamanDamageTaken } from './shaman_talents';
 import { elementalTranceManaFromDamage } from './shaman_warspirit';
+import { fallDamageKeepsStealth } from './stealth_fall';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 import { onTrinketDamage } from './trinkets';
 import { emitRainOfFireStop } from './warlock_meteor_events';
@@ -1097,9 +1098,10 @@ export function dealDamage(
     }
   }
 
-  // taking or dealing real damage breaks stealth
+  // taking or dealing real damage breaks stealth (a fall leaves Stalk and the
+  // rogue stealths up: combat/stealth_fall.ts)
   if (amount > 0) {
-    ctx.breakStealth(target);
+    if (!fallDamageKeepsStealth(source, target, ability)) ctx.breakStealth(target);
     if (source && source.id !== target.id) {
       ctx.breakStealth(source);
     }

@@ -5232,6 +5232,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.name': '裂爪',
   'entities.abilities.claw.description':
     '敵を引っかき、武器ダメージに {damage} を加えたダメージを与えます。コンボポイントを1獲得します。キャットフォーム専用。',
+  'entities.abilities.scratch.name': 'スクラッチ',
+  'entities.abilities.scratch.description':
+    '6ヤード以内の周囲の対象を引っかき、武器ダメージに {damage} を加えたダメージを与えます。命中した対象1体ごとにコンボポイントを1獲得します。範囲内のステルス中の敵を暴きます。キャットフォーム専用。',
   'entities.abilities.ferocious_bite.name': '血噛み',
   'entities.abilities.ferocious_bite.description':
     '{damage}を与えるフィニッシュムーブです。キャットフォーム専用。',
@@ -15735,6 +15738,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '皮膚を冷えた鉱滓のように10秒間硬化させ、受けるすべてのダメージを25%減少させる。',
   'entities.abilities.cinderhide.name': '燼皮',
   'entities.abilities.claw.specNote_feral': '命中した攻撃ごとに古き血を1蓄える（最大3）。',
+  'entities.abilities.scratch.specNote_feral': '命中した攻撃ごとに古き血を1蓄える（最大3）。',
   'entities.abilities.cold_focus.description':
     '12秒間、精密射撃がより多くの集中値を生成し、引き絞りの速度が上がって消費も減ります。（冷眼のシグネチャ）',
   'entities.abilities.cold_focus.name': '冷徹集中',

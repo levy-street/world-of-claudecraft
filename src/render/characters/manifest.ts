@@ -648,6 +648,7 @@ const DRUID_CAT_FORM: ClipMap = {
   attack: ['Attack_Left', 'Attack_Right'],
   attackByAbility: {
     claw: 'Attack_Left',
+    scratch: 'Attack_Left',
     rake: 'Attack_Right',
     ferocious_bite: 'Bite',
     rip: 'Finisher',

@@ -13984,6 +13984,11 @@ export const da_DK: EnTranslations = {
         "description": "Klo fjenden for våbenskade plus {damage}. Giver 1 combopoint. Kun i Katteform.",
         "specNote_feral": "Hvert slag, der rammer, tilføjer 1 Gammelt Blod (maks. 3)."
       },
+      "scratch": {
+        "name": "Scratch",
+        "description": "Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+      },
       "ferocious_bite": {
         "name": "Blodbid",
         "description": "Afsluttende manøvre, der giver {damage}. Kun i Katteform.",

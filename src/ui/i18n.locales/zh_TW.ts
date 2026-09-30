@@ -5018,6 +5018,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.name': '裂爪',
   'entities.abilities.claw.description':
     '用利爪攻擊敵人，造成武器傷害加 {damage}。獎勵 1 個連擊點。僅限貓形態。',
+  'entities.abilities.scratch.name': '抓撓',
+  'entities.abilities.scratch.description':
+    '抓撓 6 碼內的附近目標，造成武器傷害加 {damage}。每命中一個目標獎勵 1 個連擊點。使範圍內潛行的敵人現形。僅限貓形態。',
   'entities.abilities.ferocious_bite.name': '血噬',
   'entities.abilities.ferocious_bite.description': '終結技，造成 {damage}。僅限貓形態。',
   'entities.abilities.swipe.name': '橫掃利爪',
@@ -15002,6 +15005,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '使皮膚硬化為冷卻的熔渣，持續10秒，受到的所有傷害降低25%。',
   'entities.abilities.cinderhide.name': '熔渣皮膚',
   'entities.abilities.claw.specNote_feral': '每次命中的攻擊累積 1 層古血（最多 3 層）。',
+  'entities.abilities.scratch.specNote_feral': '每次命中的攻擊累積 1 層古血（最多 3 層）。',
   'entities.abilities.cold_focus.description':
     '持續 12 秒，審慎射擊產生更多集中值，蓄力長射的速度更快、消耗更低。（冷視招牌技能）',
   'entities.abilities.cold_focus.name': '冷靜專注',

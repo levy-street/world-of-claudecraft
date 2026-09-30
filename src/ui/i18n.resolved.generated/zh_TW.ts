@@ -13984,6 +13984,11 @@ export const zh_TW: EnTranslations = {
         "description": "用利爪攻擊敵人，造成武器傷害加 {damage}。獎勵 1 個連擊點。僅限貓形態。",
         "specNote_feral": "每次命中的攻擊累積 1 層古血（最多 3 層）。"
       },
+      "scratch": {
+        "name": "抓撓",
+        "description": "抓撓 6 碼內的附近目標，造成武器傷害加 {damage}。每命中一個目標獎勵 1 個連擊點。使範圍內潛行的敵人現形。僅限貓形態。",
+        "specNote_feral": "每次命中的攻擊累積 1 層古血（最多 3 層）。"
+      },
       "ferocious_bite": {
         "name": "血噬",
         "description": "終結技，造成 {damage}。僅限貓形態。",

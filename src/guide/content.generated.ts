@@ -2039,6 +2039,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Rendclaw"
       },
       {
+        "id": "scratch",
+        "name": "Scratch"
+      },
+      {
         "id": "regrowth",
         "name": "Second Bloom"
       },

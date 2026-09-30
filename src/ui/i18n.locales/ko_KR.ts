@@ -5197,6 +5197,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.name': '찢는 발톱',
   'entities.abilities.claw.description':
     '적을 할퀴어 무기 피해에 {damage}를 더한 피해를 입힙니다. 연계 점수 1점을 얻습니다. 표범 변신 전용.',
+  'entities.abilities.scratch.name': '할퀴기',
+  'entities.abilities.scratch.description':
+    '6미터 내 주위 대상을 할퀴어 무기 피해에 {damage}를 더한 피해를 입힙니다. 적중한 대상 하나당 연계 점수 1점을 얻습니다. 범위 내 은신 중인 적을 드러냅니다. 표범 변신 전용.',
   'entities.abilities.ferocious_bite.name': '유혈 물어뜯기',
   'entities.abilities.ferocious_bite.description':
     '결정타로 {damage}의 피해를 입힙니다. 표범 변신 전용.',
@@ -15692,6 +15695,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '피부를 식은 용암 찌꺼기처럼 10초 동안 굳혀 받는 모든 피해를 25% 감소시킵니다.',
   'entities.abilities.cinderhide.name': '잿가죽',
   'entities.abilities.claw.specNote_feral': '적중한 공격마다 오랜 피가 1단계 쌓입니다(최대 3단계).',
+  'entities.abilities.scratch.specNote_feral':
+    '적중한 공격마다 오랜 피가 1단계 쌓입니다(최대 3단계).',
   'entities.abilities.cold_focus.description':
     '12초 동안 정밀 사격이 더 많은 집중을 생성하고, 장궁 당기기가 더 빠르고 저렴해집니다. (냉철한 시야 상징)',
   'entities.abilities.cold_focus.name': '냉정한 집중',

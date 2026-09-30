@@ -265,6 +265,8 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       ability: [
         { ability: 'maul', dmgPct: 0.35 },
         { ability: 'claw', dmgPct: 0.15 },
+        // Scratch copies Rendclaw's damage profile, baseline row included.
+        { ability: 'scratch', dmgPct: 0.15 },
         { ability: 'swipe', dmgPct: 0.2 },
       ],
     },

@@ -3074,6 +3074,10 @@ export type AbilityEffect =
       // high-per-hit weapon cannot inflate an energy-gated instant it is pressed
       // at will. Off by default (the un-normalized classic-era behavior).
       normalized?: boolean;
+      // Sweep variant (Scratch, combat/druid_scratch.ts): strike EVERY hostile
+      // within this many yards of the caster instead of one target, each hit
+      // rolling its own swing and awarding the ability's combo points.
+      sweepRadius?: number;
     } // instant special attack (sinister strike, overpower, backstab)
   | {
       type: 'directDamage';

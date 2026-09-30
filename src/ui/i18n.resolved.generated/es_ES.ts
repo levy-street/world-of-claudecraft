@@ -13984,6 +13984,11 @@ export const es_ES: EnTranslations = {
         "description": "Zarpea al enemigo por daño de arma más {damage}. Otorga 1 punto de combo. Solo en Forma de lobo.",
         "specNote_feral": "Cada golpe que conecta añade 1 de Sangre Antigua (máx. 3)."
       },
+      "scratch": {
+        "name": "Scratch",
+        "description": "Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+      },
       "ferocious_bite": {
         "name": "Mordisco Sangriento",
         "description": "Movimiento de remate que inflige {damage}. Solo en Forma de lobo.",

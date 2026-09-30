@@ -45,8 +45,11 @@ export const NATURES_BOON_NAME = "Nature's Boon";
 // Form swings on the equipped weapon's slower speed, so a bear procs it
 // correspondingly less often; the chance is per SWING, not per second.
 export const NATURES_BOON_CHANCE = 1 / 15;
-/** An armed window also makes its spell 25% stronger. */
+/** An armed window also makes its spell stronger: Oakhide by 25%. */
 export const NATURES_BOON_POWER = 1.25;
+/** The Wildbloom arm of the window is 50% stronger (a heal payoff tuned above
+ *  the Oakhide arm), read through naturesBoonPowerFor like the base power. */
+export const NATURES_BOON_WILDBLOOM_POWER = 1.5;
 /** How long the armed window lasts, in seconds. */
 export const NATURES_BOON_DURATION = 10;
 
@@ -100,9 +103,11 @@ export function naturesBoonFormAllows(
 /** The multiplier an armed window puts on its spell's magnitudes, applied to a
  *  COPY of the resolved ability before its effects resolve (the consumeOverload
  *  shape in combat/casting_lifecycle.ts). 1 when no window covers this cast, so
- *  an ordinary Wildbloom or Oakhide is untouched. */
+ *  an ordinary Wildbloom or Oakhide is untouched. Wildbloom takes its own
+ *  stronger multiplier; every other member takes the base power. */
 export function naturesBoonPowerFor(auras: readonly BoonAura[], abilityId: string): number {
-  return naturesBoonArmedFor(auras, abilityId) ? NATURES_BOON_POWER : 1;
+  if (!naturesBoonArmedFor(auras, abilityId)) return 1;
+  return abilityId === 'rejuvenation' ? NATURES_BOON_WILDBLOOM_POWER : NATURES_BOON_POWER;
 }
 
 /** Is a Nature's Boon window armed for this exact ability right now? The one

@@ -13984,6 +13984,11 @@ export const zh_CN: EnTranslations = {
         "description": "用利爪攻击敌人，造成武器伤害加 {damage}。奖励 1 个连击点。仅限豹形态。",
         "specNote_feral": "每次命中累积1层古血（最多3层）。"
       },
+      "scratch": {
+        "name": "抓挠",
+        "description": "抓挠 6 码内的附近目标，造成武器伤害加 {damage}。每命中一个目标奖励 1 个连击点。使范围内潜行的敌人现形。仅限豹形态。",
+        "specNote_feral": "每次命中累积1层古血（最多3层）。"
+      },
       "ferocious_bite": {
         "name": "血噬",
         "description": "终结技，造成 {damage}。仅限豹形态。",

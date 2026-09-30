@@ -3252,6 +3252,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   prowl: r('nature', 'leafGreen', ['paw'], ['arcs']),
   rake: r('nature', 'leafGreen', ['claw_slash'], ['drips']),
   claw: r('nature', 'leafGreen', ['claw_slash'], ['motion']),
+  scratch: r('nature', 'leafGreen', ['claw_slash', { p: 'paw', ...BR }], ['arcs']),
   ferocious_bite: r('blood', 'blood', ['fang'], ['drips']),
   swipe: r('earth', 'earthBrown', ['claw_slash'], ['arcs']),
   regrowth: r('nature', 'leafGreen', ['heart', { p: 'leaf', ...BR }], ['sparkle']),
@@ -4975,6 +4976,8 @@ export const ABILITY_ART_PENDING = new Set<string>([
   // Wildfang kit pass 2: the VFX and art retune owns the final paintings.
   'lunge',
   'hamstring_bite',
+  // Scratch, the Cat Form sweep builder: its procedural glyph until the painting ships.
+  'scratch',
   // Buried Hoards: the Clockwork Shock Bomb's thrown cast draws its glyph until
   // its skill painting ships (the item itself already ships painted art).
   'clockwork_shock_bomb',
