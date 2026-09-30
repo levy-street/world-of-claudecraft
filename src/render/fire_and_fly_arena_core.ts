@@ -5,20 +5,21 @@
 // instance-local with the tower at the origin. Every scatter hashes its cell:
 // no rng, no clock, the same arena in every slot and every session.
 //
-// Past the invisible wall the painter raises a ring of forested hills the sim
-// never reads (nobody stands there): it closes the horizon so the clearing
-// reads as a glade in a wooded valley rather than a disc floating in the sky.
+// Past the forest the painter raises a ring of forested hills the sim never
+// reads (nobody stands there): it closes the horizon so the clearing reads as
+// a glade in a wooded valley rather than a disc floating in the sky.
 
 import { dungeonAt } from '../sim/data';
 import {
   FIRE_AND_FLY_CLEARING_RADIUS,
+  FIRE_AND_FLY_FOREST_RADIUS,
   FIRE_AND_FLY_ROCKS,
-  FIRE_AND_FLY_TREES,
-  FIRE_AND_FLY_WALL_RADIUS,
+  FIRE_AND_FLY_TREE_ROWS,
   type FireAndFlyRock,
   type FireAndFlyTree,
   fireAndFlyFieldHeight,
 } from '../sim/fire_and_fly_field';
+import type { GfxTier } from './gfx';
 
 /** The interior id the sim's arena dungeon carries. */
 export const FIRE_AND_FLY_INTERIOR = 'fire_and_fly';
@@ -31,7 +32,7 @@ export function isFireAndFlyArenaAt(x: number): boolean {
 /** Where the painted ground ends: far enough out that the hill crest closes
  *  every sightline from the tower roof at the widest camera boom. */
 export const FIRE_AND_FLY_GROUND_RADIUS = 236;
-const HILL_START = FIRE_AND_FLY_WALL_RADIUS + 4;
+const HILL_START = FIRE_AND_FLY_FOREST_RADIUS + 4;
 const HILL_CREST = 205;
 
 // Late afternoon: the sun low over the tree line on the same azimuth as the
@@ -181,22 +182,32 @@ function nearRock(x: number, z: number, margin: number): boolean {
 }
 
 // Trunk lookup for the scatters: cell-bucketed so a 9000-cell grass pass does
-// not test every trunk.
+// not test every trunk, and keyed on the drawn trees so a tier that drops a
+// tree leaves no bare ring of ground where its trunk would stand.
 const TRUNK_CELL = 8;
-const trunkCells = new Map<string, FireAndFlyTree[]>();
-for (const tree of FIRE_AND_FLY_TREES) {
-  const key = `${Math.floor(tree.x / TRUNK_CELL)}:${Math.floor(tree.z / TRUNK_CELL)}`;
-  const list = trunkCells.get(key);
-  if (list) list.push(tree);
-  else trunkCells.set(key, [tree]);
+type TrunkCells = Map<string, FireAndFlyTree[]>;
+const trunkCellsByDensity = new Map<ArenaTreeDensity, TrunkCells>();
+
+function trunkCells(density: ArenaTreeDensity): TrunkCells {
+  const cached = trunkCellsByDensity.get(density);
+  if (cached) return cached;
+  const cells: TrunkCells = new Map();
+  for (const tree of fireAndFlyDrawnTrees(density)) {
+    const key = `${Math.floor(tree.x / TRUNK_CELL)}:${Math.floor(tree.z / TRUNK_CELL)}`;
+    const list = cells.get(key);
+    if (list) list.push(tree);
+    else cells.set(key, [tree]);
+  }
+  trunkCellsByDensity.set(density, cells);
+  return cells;
 }
 
-function nearTrunk(x: number, z: number, margin: number): boolean {
+function nearTrunk(cells: TrunkCells, x: number, z: number, margin: number): boolean {
   const cx = Math.floor(x / TRUNK_CELL);
   const cz = Math.floor(z / TRUNK_CELL);
   for (let i = -1; i <= 1; i++) {
     for (let j = -1; j <= 1; j++) {
-      const list = trunkCells.get(`${cx + i}:${cz + j}`);
+      const list = cells.get(`${cx + i}:${cz + j}`);
       if (!list) continue;
       for (const tree of list) {
         if (Math.hypot(x - tree.x, z - tree.z) < 0.55 * tree.scale + margin) return true;
@@ -231,19 +242,25 @@ export const FIRE_AND_FLY_BARE_FOOT = 3.4;
 export const FIRE_AND_FLY_CLEARING_TUFT_MAX = 0.8;
 const COVER_EDGE = 97;
 
-const grassSpotsByStep = new Map<number, readonly ArenaGrassSpot[]>();
+const grassSpotsByKey = new Map<string, readonly ArenaGrassSpot[]>();
 let flowerSpots: readonly ArenaCoverSpot[] | null = null;
-let understorySpots: readonly ArenaUnderstorySpot[] | null = null;
+const understoryByDensity = new Map<ArenaTreeDensity, readonly ArenaUnderstorySpot[]>();
 
 /**
  * Grass tufts on a jittered grid of `step` yards: short and dense in the
  * clearing, thinned where the ground is worn, a taller lush fringe at the
- * forest edge, sparse under the trees, none inside a rock or a trunk. The
- * scatter is the same in every slot, so it is planned once per step.
+ * forest edge, sparse under the trees, none inside a rock or a trunk the
+ * density draws. The scatter is the same in every slot, so it is planned once
+ * per step and density.
  */
-export function fireAndFlyGrassSpots(step: number): readonly ArenaGrassSpot[] {
-  const cached = grassSpotsByStep.get(step);
+export function fireAndFlyGrassSpots(
+  step: number,
+  density: ArenaTreeDensity = 'full',
+): readonly ArenaGrassSpot[] {
+  const key = `${step}:${density}`;
+  const cached = grassSpotsByKey.get(key);
   if (cached) return cached;
+  const trunks = trunkCells(density);
   const spots: ArenaGrassSpot[] = [];
   const paint = createArenaGroundPaint();
   const cells = Math.ceil(COVER_EDGE / step);
@@ -259,7 +276,7 @@ export function fireAndFlyGrassSpots(step: number): readonly ArenaGrassSpot[] {
       const density = under > 0 ? 0.62 - 0.3 * under : 0.9 * (1 - paint.dirt * 1.15) + 0.1 * edge;
       if (arenaHash(i, j, 103) > density) continue;
       if (nearRock(x, z, 0.25)) continue;
-      if (under > 0 && nearTrunk(x, z, 0.5)) continue;
+      if (nearTrunk(trunks, x, z, 0.5)) continue;
       const h1 = arenaHash(i, j, 104);
       const short = 0.5 + 0.3 * h1;
       const tall = 0.85 + 0.6 * h1;
@@ -277,7 +294,7 @@ export function fireAndFlyGrassSpots(step: number): readonly ArenaGrassSpot[] {
       });
     }
   }
-  grassSpotsByStep.set(step, spots);
+  grassSpotsByKey.set(key, spots);
   return spots;
 }
 
@@ -320,9 +337,14 @@ export interface ArenaUnderstorySpot extends ArenaCoverSpot {
   kind: 'fern' | 'bush';
 }
 
-/** Ferns and flowering bushes along the forest edge and under the ring. */
-export function fireAndFlyUnderstorySpots(): readonly ArenaUnderstorySpot[] {
-  if (understorySpots) return understorySpots;
+/** Ferns and flowering bushes along the forest edge and under the ring, clear
+ *  of the trunks the density draws. */
+export function fireAndFlyUnderstorySpots(
+  density: ArenaTreeDensity = 'full',
+): readonly ArenaUnderstorySpot[] {
+  const cached = understoryByDensity.get(density);
+  if (cached) return cached;
+  const trunks = trunkCells(density);
   const spots: ArenaUnderstorySpot[] = [];
   const ringStep = 3.4;
   for (let row = 0; row < 11; row++) {
@@ -335,7 +357,7 @@ export function fireAndFlyUnderstorySpots(): readonly ArenaUnderstorySpot[] {
       const z = Math.cos(angle) * r;
       const density = row < 2 ? 0.55 : 0.34;
       if (arenaHash(row, k, 303) > density) continue;
-      if (nearRock(x, z, 0.6) || nearTrunk(x, z, 0.9)) continue;
+      if (nearRock(x, z, 0.6) || nearTrunk(trunks, x, z, 0.9)) continue;
       const h1 = arenaHash(row, k, 304);
       const bush = row < 3 && arenaHash(row, k, 305) < 0.22;
       spots.push({
@@ -351,11 +373,11 @@ export function fireAndFlyUnderstorySpots(): readonly ArenaUnderstorySpot[] {
       });
     }
   }
-  understorySpots = spots;
+  understoryByDensity.set(density, spots);
   return spots;
 }
 
-/** One distant canopy mass on the hills beyond the wall. */
+/** One distant canopy mass on the hills beyond the forest. */
 export interface ArenaBackdropCrown {
   x: number;
   /** foot of the crown (the ground under it, less a sink) */
@@ -372,15 +394,15 @@ export interface ArenaBackdropCrown {
 
 /**
  * The hills' forest: overlapping crowns (broadleaf domes and conifer spires)
- * from the wall out past the crest, dense enough that no gap shows the bare
+ * from the forest out past the crest, dense enough that no gap shows the bare
  * hillside from the tower. Far rows are bigger and sparser; fog does the rest.
  */
 export function fireAndFlyBackdropCrowns(): ArenaBackdropCrown[] {
   const crowns: ArenaBackdropCrown[] = [];
-  let radius = FIRE_AND_FLY_WALL_RADIUS + 3.5;
+  let radius = FIRE_AND_FLY_FOREST_RADIUS + 3.5;
   let row = 0;
   while (radius < FIRE_AND_FLY_GROUND_RADIUS - 4) {
-    const size = 3.4 + (radius - FIRE_AND_FLY_WALL_RADIUS) * 0.055;
+    const size = 3.4 + (radius - FIRE_AND_FLY_FOREST_RADIUS) * 0.055;
     const spacing = size * 1.3;
     const count = Math.round((2 * Math.PI * radius) / spacing);
     const offset = arenaHash(row, 0, 401) * Math.PI * 2;
@@ -435,6 +457,46 @@ export function fireAndFlyTreePlacement(tree: FireAndFlyTree): ArenaTreePlacemen
     scale,
     heightJitter: 1 + (arenaHash(tree.x, tree.z, 31) - 0.5) * 0.18,
   };
+}
+
+/** How much of the tree ring a tier draws, one keep fraction per row from the
+ *  clearing outward: the inner row is always whole, the far rows thin first
+ *  (the rows in front hide most of them from the tower). */
+export const FIRE_AND_FLY_TREE_ROW_KEEP = {
+  full: [1, 1, 1, 1, 1, 1],
+  medium: [1, 0.85, 0.65, 0.5, 0.42, 0.38],
+  low: [1, 0.55, 0.3, 0.2, 0.15, 0.12],
+} as const;
+
+export type ArenaTreeDensity = keyof typeof FIRE_AND_FLY_TREE_ROW_KEEP;
+
+/** The static preset tier's ring density (never the FPS governor's level). */
+export function fireAndFlyTreeDensity(tier: GfxTier): ArenaTreeDensity {
+  return tier === 'low' ? 'low' : tier === 'medium' ? 'medium' : 'full';
+}
+
+const drawnTrees = new Map<ArenaTreeDensity, readonly FireAndFlyTree[]>();
+
+/**
+ * The trees a density draws. Fairness: the sim's wall stands just behind the
+ * inner row, which every density keeps whole, so every trunk a thrown body can
+ * reach is drawn on every tier; the rows behind the wall are scenery nobody
+ * plays in, with no collider. Each row keeps its share spread evenly around the
+ * circle (no bare arc), from a per-row phase so the gaps of neighbouring rows
+ * do not line up.
+ */
+export function fireAndFlyDrawnTrees(density: ArenaTreeDensity): readonly FireAndFlyTree[] {
+  const cached = drawnTrees.get(density);
+  if (cached) return cached;
+  const keep = FIRE_AND_FLY_TREE_ROW_KEEP[density];
+  const kept: FireAndFlyTree[] = [];
+  FIRE_AND_FLY_TREE_ROWS.forEach((row, k) => {
+    const count = Math.round(row.length * keep[Math.min(k, keep.length - 1)]);
+    const phase = arenaHash(k, 0, 611);
+    for (let i = 0; i < count; i++) kept.push(row[Math.floor(((i + phase) * row.length) / count)]);
+  });
+  drawnTrees.set(density, kept);
+  return kept;
 }
 
 /** True for a tree whose shadow the low sun throws into the clearing: the sun

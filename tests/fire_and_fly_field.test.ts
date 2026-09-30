@@ -34,11 +34,15 @@ import {
 } from '../src/sim/data';
 import {
   FIRE_AND_FLY_CLEARING_RADIUS,
+  FIRE_AND_FLY_EDGE_TREES,
+  FIRE_AND_FLY_FOREST_RADIUS,
   FIRE_AND_FLY_ROCKS,
   FIRE_AND_FLY_TOWER,
   FIRE_AND_FLY_TREE_RING,
+  FIRE_AND_FLY_TREE_ROWS,
   FIRE_AND_FLY_TREES,
   FIRE_AND_FLY_WALL_RADIUS,
+  FIRE_AND_FLY_WALL_REACH,
   FIRE_AND_FLY_WALLS,
   fireAndFlyColliders,
   fireAndFlyFieldHeight,
@@ -88,7 +92,7 @@ describe('the Fire and Fly dungeon record', () => {
     for (let slot = 0; slot < INSTANCE_SLOT_COUNT; slot++) {
       const o = instanceOrigin(ARENA.index, slot);
       expect(o.x).toBe(DUNGEON_OVERFLOW_X_BASE + (ARENA.index - 7) * 600);
-      for (const dx of [-FIRE_AND_FLY_WALL_RADIUS - 2, 0, FIRE_AND_FLY_WALL_RADIUS + 2]) {
+      for (const dx of [-FIRE_AND_FLY_FOREST_RADIUS - 2, 0, FIRE_AND_FLY_FOREST_RADIUS + 2]) {
         const x = o.x + dx;
         expect(dungeonAt(x)?.id).toBe(FIRE_AND_FLY_DUNGEON_ID);
         expect([isArenaPos(x), isDelvePos(x), isRiftPos(x), isYumiMazePos(x), isBgPos(x)]).toEqual([
@@ -123,10 +127,10 @@ describe('the Fire and Fly dungeon record', () => {
 });
 
 describe('the Fire and Fly field', () => {
-  it('pins the clearing, the tree ring and the wall the render draws from', () => {
+  it('pins the clearing, the tree ring and the forest the render draws from', () => {
     expect(FIRE_AND_FLY_CLEARING_RADIUS).toBe(55);
     expect(FIRE_AND_FLY_TREE_RING).toEqual({ inner: 60, outer: 95 });
-    expect(FIRE_AND_FLY_WALL_RADIUS).toBe(100);
+    expect(FIRE_AND_FLY_FOREST_RADIUS).toBe(100);
   });
 
   it('reads through groundHeight in every slot', () => {
@@ -157,7 +161,7 @@ describe('the Fire and Fly field', () => {
   it('is smooth everywhere and rises gently into the forest', () => {
     const h = 0.25;
     let steepest = 0;
-    for (const [x, z] of ringSamples(FIRE_AND_FLY_WALL_RADIUS, 3)) {
+    for (const [x, z] of ringSamples(FIRE_AND_FLY_FOREST_RADIUS, 3)) {
       const gx = (fireAndFlyFieldHeight(x + h, z) - fireAndFlyFieldHeight(x - h, z)) / (2 * h);
       const gz = (fireAndFlyFieldHeight(x, z + h) - fireAndFlyFieldHeight(x, z - h)) / (2 * h);
       steepest = Math.max(steepest, Math.hypot(gx, gz));
@@ -292,15 +296,22 @@ describe('the Fire and Fly dressing and walls', () => {
     }
   });
 
-  it('plants a dense trunk ring from 60 to 95 yd, trunks never touching', () => {
+  it('plants a dense trunk ring from 60 to 95 yd, trunks never touching, the inner row solid', () => {
     expect(FIRE_AND_FLY_TREES.length).toBeGreaterThan(250);
+    expect(FIRE_AND_FLY_TREE_ROWS.flat()).toEqual([...FIRE_AND_FLY_TREES]);
+    expect(FIRE_AND_FLY_EDGE_TREES).toBe(FIRE_AND_FLY_TREE_ROWS[0]);
     for (const tree of FIRE_AND_FLY_TREES) {
       const d = Math.hypot(tree.x, tree.z);
       expect(d).toBeGreaterThanOrEqual(FIRE_AND_FLY_TREE_RING.inner);
       expect(d).toBeLessThanOrEqual(FIRE_AND_FLY_TREE_RING.outer);
       const trunk = circles.find((c) => c.x === tree.x && c.z === tree.z);
-      expect(trunk?.r).toBe(fireAndFlyTrunkRadius(tree));
-      expect(trunk?.moveTopY).toBeUndefined();
+      // Only the inner row is solid: the rows behind the wall are out of reach.
+      if (FIRE_AND_FLY_EDGE_TREES.includes(tree)) {
+        expect(trunk?.r).toBe(fireAndFlyTrunkRadius(tree));
+        expect(trunk?.moveTopY).toBeUndefined();
+      } else {
+        expect(trunk).toBeUndefined();
+      }
       expect(['oak', 'pine']).toContain(tree.kind);
     }
     let closest = Number.POSITIVE_INFINITY;
@@ -314,27 +325,50 @@ describe('the Fire and Fly dressing and walls', () => {
     expect(closest).toBeGreaterThan(3);
   });
 
-  it('closes the arena with full-height walls beyond the ring', () => {
+  it('closes the arena with full-height walls just behind the inner row, before the next', () => {
     const walls = colliders.filter((c) => c.type === 'obb');
     expect(walls).toHaveLength(FIRE_AND_FLY_WALLS.length);
+    const outerEdge = (tree: (typeof FIRE_AND_FLY_TREES)[number]) =>
+      Math.hypot(tree.x, tree.z) + fireAndFlyTrunkRadius(tree);
+    const innerEdge = (tree: (typeof FIRE_AND_FLY_TREES)[number]) =>
+      Math.hypot(tree.x, tree.z) - fireAndFlyTrunkRadius(tree);
+    // The radius is the inner row's layout plus a small clearance, on a hundredth grid.
+    const row = Math.max(...FIRE_AND_FLY_EDGE_TREES.map(outerEdge));
+    expect(FIRE_AND_FLY_WALL_RADIUS - row).toBeGreaterThan(0);
+    expect(FIRE_AND_FLY_WALL_RADIUS - row).toBeLessThan(
+      2 * Math.min(...Object.values(TURRET_SIZE_CLASSES).map((c) => c.radius)),
+    );
+    expect(Math.round(FIRE_AND_FLY_WALL_RADIUS * 100)).toBeCloseTo(
+      FIRE_AND_FLY_WALL_RADIUS * 100,
+      9,
+    );
+    // Even a wall corner stops a body short of the second row's nearest trunk.
+    const next = Math.min(...FIRE_AND_FLY_TREE_ROWS[1].map(innerEdge));
+    expect(FIRE_AND_FLY_WALL_REACH).toBeLessThan(next - 1);
+    for (const rock of FIRE_AND_FLY_ROCKS) {
+      expect(Math.hypot(rock.x, rock.z) + rock.radius).toBeLessThan(FIRE_AND_FLY_WALL_RADIUS);
+    }
     for (const wall of walls) {
       expect(wall.moveTopY).toBeUndefined();
-      expect(Math.hypot(wall.x, wall.z)).toBeGreaterThan(FIRE_AND_FLY_TREE_RING.outer);
+      expect(Math.hypot(wall.x, wall.z)).toBeGreaterThan(row);
+      expect(Math.hypot(wall.x, wall.z)).toBeLessThan(next);
     }
-    // A walker heading straight out at any bearing, corners included, stays inside
-    // the polygon (its corners reach 100 / cos(7.5 deg), under 100.9 yd).
+    // A walker heading straight out at any bearing, between trunks or into one,
+    // corners included, stays inside the polygon.
     const o = instanceOrigin(ARENA.index, 9);
-    for (let i = 0; i < 96; i++) {
-      const a = (i * Math.PI) / 48 + 0.01;
+    for (let i = 0; i < 192; i++) {
+      const a = (i * Math.PI) / 96 + 0.01;
       const out = resolveMovement(
         WORLD_SEED,
-        o.x + Math.sin(a) * 97,
-        o.z + Math.cos(a) * 97,
-        o.x + Math.sin(a) * 112,
-        o.z + Math.cos(a) * 112,
+        o.x + Math.sin(a) * 50,
+        o.z + Math.cos(a) * 50,
+        o.x + Math.sin(a) * 90,
+        o.z + Math.cos(a) * 90,
         0.5,
       );
-      expect(Math.hypot(out.x - o.x, out.z - o.z)).toBeLessThan(FIRE_AND_FLY_WALL_RADIUS + 1);
+      expect(Math.hypot(out.x - o.x, out.z - o.z)).toBeLessThanOrEqual(
+        FIRE_AND_FLY_WALL_REACH - 0.5 + 1e-6,
+      );
     }
   });
 

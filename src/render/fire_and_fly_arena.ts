@@ -18,11 +18,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { ROCK_SINK_UNITS } from '../sim/decoration_dims';
-import {
-  FIRE_AND_FLY_ROCKS,
-  FIRE_AND_FLY_TREES,
-  type FireAndFlyTree,
-} from '../sim/fire_and_fly_field';
+import { FIRE_AND_FLY_ROCKS, type FireAndFlyTree } from '../sim/fire_and_fly_field';
 import {
   type ArenaBackdropCrown,
   type ArenaCoverSpot,
@@ -32,6 +28,7 @@ import {
   FIRE_AND_FLY_GROUND_SEGMENTS,
   FIRE_AND_FLY_SKY_ANCHOR,
   fireAndFlyBackdropCrowns,
+  fireAndFlyDrawnTrees,
   fireAndFlyFlowerSpots,
   fireAndFlyGrassSpots,
   fireAndFlyGroundPaint,
@@ -41,6 +38,7 @@ import {
   fireAndFlyRenderHeight,
   fireAndFlyRockPlacement,
   fireAndFlyTreeCastsIntoClearing,
+  fireAndFlyTreeDensity,
   fireAndFlyTreePlacement,
   fireAndFlyUnderstorySpots,
 } from './fire_and_fly_arena_core';
@@ -312,23 +310,12 @@ function tuftCard(cards: number): THREE.BufferGeometry {
   return geometry;
 }
 
-// Pure placements, the same for every build: kept, so a later build (and the
-// prebuild's warm steps) pays them once.
-const grassSpotSets = new Map<number, readonly ArenaGrassSpot[]>();
-let flowerSpotSet: readonly ArenaCoverSpot[] | null = null;
+const treeDensity = () => fireAndFlyTreeDensity(GFX.tier);
 
+// The core plans each scatter once per key, so a later build (and the
+// prebuild's warm steps) pays it once.
 function grassSpots(step: number): readonly ArenaGrassSpot[] {
-  let spots = grassSpotSets.get(step);
-  if (!spots) {
-    spots = fireAndFlyGrassSpots(step);
-    grassSpotSets.set(step, spots);
-  }
-  return spots;
-}
-
-function flowerSpots(): readonly ArenaCoverSpot[] {
-  flowerSpotSet ??= fireAndFlyFlowerSpots();
-  return flowerSpotSet;
+  return fireAndFlyGrassSpots(step, treeDensity());
 }
 
 const GRASS_BASE = new THREE.Color(0xa2ad6c);
@@ -391,7 +378,7 @@ function buildGrass(): THREE.Group {
     ),
   );
   group.add(
-    coverMesh(flowerSpots(), tuftCard(2), flowerMaterial(), (s, c) => {
+    coverMesh(fireAndFlyFlowerSpots(), tuftCard(2), flowerMaterial(), (s, c) => {
       c.copy(WHITE).offsetHSL((s.h1 - 0.5) * 0.03, 0, (s.h3 - 0.5) * 0.08);
     }),
   );
@@ -480,7 +467,8 @@ function buildTrees(lowGfx: boolean, origin: Origin): THREE.Group {
   for (const kind of ['oak', 'pine'] as const) {
     const urls = treeUrls(kind);
     const byUrl = urls.map(() => [] as FireAndFlyTree[]);
-    for (const tree of FIRE_AND_FLY_TREES) {
+    // Medium and low thin only the rows behind the sim's wall, pure scenery.
+    for (const tree of fireAndFlyDrawnTrees(treeDensity())) {
       if (tree.kind === kind) byUrl[(tree.variant - 1) % urls.length].push(tree);
     }
     urls.forEach((url, u) => {
@@ -581,7 +569,7 @@ function buildRocks(lowGfx: boolean, origin: Origin): THREE.Group {
 function buildUnderstory(origin: Origin): THREE.Group {
   const group = new THREE.Group();
   group.name = 'fireAndFlyUnderstory';
-  const spots = fireAndFlyUnderstorySpots();
+  const spots = fireAndFlyUnderstorySpots(treeDensity());
   const kinds = [
     { kind: 'fern', url: `${FOLIAGE_MODEL_DIR}fern.glb`, tint: 0xc9dca8 },
     { kind: 'bush', url: `${FOLIAGE_MODEL_DIR}bush_flowers.glb`, tint: 0xe6ecd0 },
@@ -808,7 +796,7 @@ export function fireAndFlyArenaWarmSteps(lowGfx: boolean): (() => void)[] {
   if (!lowGfx) {
     steps.push(
       () => grassSpots(grassStep()),
-      () => flowerSpots(),
+      () => fireAndFlyFlowerSpots(),
       () => grassMaterial(),
       () => flowerMaterial(),
     );

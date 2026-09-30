@@ -3,6 +3,10 @@
 // rock and tree-ring placements, the invisible walls, and the static collision
 // set the renderer draws from the same lists. Coordinates are instance-local
 // with the tower at the origin. Placements hash their index: no rng draw.
+//
+// The wall stands just behind the inner tree row, which every graphics tier
+// draws whole: a thrown body bounces off those trunks or the wall between them
+// and never reaches the rows behind, pure scenery a tier may thin.
 
 import type { Collider } from './colliders';
 import { ROCK_HEIGHT_PER_SCALE, rockRadius } from './decoration_dims';
@@ -26,8 +30,8 @@ export const FIRE_AND_FLY_TOWER = {
 
 export const FIRE_AND_FLY_CLEARING_RADIUS = 55;
 export const FIRE_AND_FLY_TREE_RING = { inner: 60, outer: 95 } as const;
-/** Inner face of the invisible wall that closes the arena. */
-export const FIRE_AND_FLY_WALL_RADIUS = 100;
+/** The forest's far edge, where the painted hills begin: scenery, past the wall. */
+export const FIRE_AND_FLY_FOREST_RADIUS = 100;
 
 const HASH_SEED = 0x46a9f1;
 
@@ -105,23 +109,52 @@ export const FIRE_AND_FLY_ROCKS: readonly FireAndFlyRock[] = Array.from(
 const TREE_ROWS = [61.5, 68, 74.5, 81, 87.5, 93.5] as const;
 const TREE_SPACING = 9;
 
-export const FIRE_AND_FLY_TREES: readonly FireAndFlyTree[] = TREE_ROWS.flatMap((row, k) => {
-  const count = Math.round((2 * Math.PI * row) / TREE_SPACING);
-  const offset = unit(k, 20) * 2 * Math.PI;
-  return Array.from({ length: count }, (_, j) => {
-    const index = k * 1000 + j;
-    const angle = offset + ((j + 0.5 + (unit(index, 21) - 0.5) * 0.6) * 2 * Math.PI) / count;
-    const r = row + (unit(index, 22) - 0.5) * 2.4;
-    return {
-      x: Math.sin(angle) * r,
-      z: Math.cos(angle) * r,
-      rot: unit(index, 23) * 2 * Math.PI,
-      scale: 0.95 + 0.5 * unit(index, 24),
-      kind: unit(index, 25) < 0.45 ? ('pine' as const) : ('oak' as const),
-      variant: (1 + Math.floor(unit(index, 26) * 5)) as FireAndFlyTree['variant'],
-    };
-  });
-});
+/** The tree ring row by row from the clearing outward, each row in angular order. */
+export const FIRE_AND_FLY_TREE_ROWS: readonly (readonly FireAndFlyTree[])[] = TREE_ROWS.map(
+  (row, k) => {
+    const count = Math.round((2 * Math.PI * row) / TREE_SPACING);
+    const offset = unit(k, 20) * 2 * Math.PI;
+    return Array.from({ length: count }, (_, j) => {
+      const index = k * 1000 + j;
+      const angle = offset + ((j + 0.5 + (unit(index, 21) - 0.5) * 0.6) * 2 * Math.PI) / count;
+      const r = row + (unit(index, 22) - 0.5) * 2.4;
+      return {
+        x: Math.sin(angle) * r,
+        z: Math.cos(angle) * r,
+        rot: unit(index, 23) * 2 * Math.PI,
+        scale: 0.95 + 0.5 * unit(index, 24),
+        kind: unit(index, 25) < 0.45 ? ('pine' as const) : ('oak' as const),
+        variant: (1 + Math.floor(unit(index, 26) * 5)) as FireAndFlyTree['variant'],
+      };
+    });
+  },
+);
+
+export const FIRE_AND_FLY_TREES: readonly FireAndFlyTree[] = FIRE_AND_FLY_TREE_ROWS.flat();
+
+/** The inner row: the only trunks a thrown body can reach, drawn whole on every tier. */
+export const FIRE_AND_FLY_EDGE_TREES: readonly FireAndFlyTree[] = FIRE_AND_FLY_TREE_ROWS[0];
+
+/** A tree's trunk circle, the open world's scatter rule (decoration_collider.ts). */
+export function fireAndFlyTrunkRadius(tree: FireAndFlyTree): number {
+  return 0.55 * tree.scale;
+}
+
+// Keeps the wall outside every inner-row trunk while its corners stay short of
+// the second row.
+const WALL_CLEARANCE = 0.5;
+
+/** Inner face of the invisible wall that closes the arena, just behind the inner
+ *  row; rounded up to a hundredth so it does not hang on the last digit of the
+ *  engine's hypot, sin and cos. */
+export const FIRE_AND_FLY_WALL_RADIUS =
+  Math.ceil(
+    (Math.max(
+      ...FIRE_AND_FLY_EDGE_TREES.map((t) => Math.hypot(t.x, t.z) + fireAndFlyTrunkRadius(t)),
+    ) +
+      WALL_CLEARANCE) *
+      100,
+  ) / 100;
 
 const WALL_SEGMENTS = 24;
 const WALL_HALF_DEPTH = 1;
@@ -145,10 +178,8 @@ export const FIRE_AND_FLY_WALLS: readonly {
   };
 });
 
-/** A tree's trunk circle, the open world's scatter rule (decoration_collider.ts). */
-export function fireAndFlyTrunkRadius(tree: FireAndFlyTree): number {
-  return 0.55 * tree.scale;
-}
+/** The farthest a body's edge gets from the center: a wall corner, not a face. */
+export const FIRE_AND_FLY_WALL_REACH = FIRE_AND_FLY_WALL_RADIUS / Math.cos(Math.PI / WALL_SEGMENTS);
 
 /** The arena's static collision, every top seated on the interior floor `floorY`. */
 export function fireAndFlyColliders(floorY: number): Collider[] {
@@ -175,7 +206,7 @@ export function fireAndFlyColliders(floorY: number): Collider[] {
         cameraTopY: top,
       };
     }),
-    ...FIRE_AND_FLY_TREES.map(
+    ...FIRE_AND_FLY_EDGE_TREES.map(
       (tree): Collider => ({
         type: 'circle',
         x: tree.x,

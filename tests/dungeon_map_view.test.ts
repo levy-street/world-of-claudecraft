@@ -4,9 +4,9 @@ import { TURRET_ARENA } from '../src/sim/content/turret_defense';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import { CRYPT_LAYOUT } from '../src/sim/dungeon_layout';
 import {
+  FIRE_AND_FLY_FOREST_RADIUS,
   FIRE_AND_FLY_ROCKS,
   FIRE_AND_FLY_TREES,
-  FIRE_AND_FLY_WALL_RADIUS,
 } from '../src/sim/fire_and_fly_field';
 import {
   IGNIVAR_GATE_LOCKED_TEMPLATE,
@@ -215,8 +215,12 @@ describe('the Fire and Fly arena map', () => {
     expect(model?.walls.length).toBe(model?.floors[0].points.length);
     expect(model?.obstacles).toHaveLength(FIRE_AND_FLY_ROCKS.length + FIRE_AND_FLY_TREES.length);
     expect(model?.dais?.r).toBeGreaterThan(0);
-    // The plan fits the whole walled field: its span is the wall's diameter.
-    expect(model?.bounds.maxX).toBeGreaterThanOrEqual(FIRE_AND_FLY_WALL_RADIUS);
+    // The plan frames the whole forest ring, past the invisible wall at its edge, so every
+    // trunk it lists sits inside the outline.
+    expect(model?.bounds.maxX).toBeGreaterThanOrEqual(FIRE_AND_FLY_FOREST_RADIUS);
+    for (const tree of FIRE_AND_FLY_TREES) {
+      expect(Math.hypot(tree.x, tree.z)).toBeLessThan(FIRE_AND_FLY_FOREST_RADIUS);
+    }
     expect(model?.markers.at(-1)).toMatchObject({ kind: 'player' });
   });
 

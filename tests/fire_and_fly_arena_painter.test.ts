@@ -4,7 +4,7 @@
 // per tier, that every slot shares one set of named materials, and what an
 // open-field registry releases with a slot and what it never touches.
 
-import type * as THREE from 'three';
+import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const stubs = vi.hoisted(() => ({
@@ -54,28 +54,43 @@ vi.mock('../src/render/sky', async (importOriginal) => ({
 }));
 
 import { buildFireAndFlyArenaInterior } from '../src/render/fire_and_fly_arena';
-import { gfxInternalsForTest } from '../src/render/gfx';
+import { fireAndFlyDrawnTrees } from '../src/render/fire_and_fly_arena_core';
+import {
+  FIRE_AND_FLY_PREBUILD_NAME,
+  FireAndFlyArenaPrebuild,
+} from '../src/render/fire_and_fly_arena_prebuild';
+import { GFX, gfxInternalsForTest } from '../src/render/gfx';
+import type { IdleScheduler } from '../src/render/idle_queue';
 import { ghostHideAttribute } from '../src/render/instanced_dither_fade';
 import { createOwnedInteriorResourceRegistry } from '../src/render/interior_resource_lifecycle';
 import { setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
 import { collectOpenFieldResources } from '../src/render/open_field_interiors';
 import { FIRE_AND_FLY_DUNGEON_ID } from '../src/sim/content/fire_and_fly_arena';
+import {
+  FIRE_AND_FLY_NPC_DEF,
+  FIRE_AND_FLY_NPC_ID,
+  FIRE_AND_FLY_QUEST_ID,
+} from '../src/sim/content/world_quest_fire_and_fly';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
+import { FIRE_AND_FLY_TREES } from '../src/sim/fire_and_fly_field';
 
 const ARENA_INDEX = DUNGEONS[FIRE_AND_FLY_DUNGEON_ID].index;
 const FULL = { tier: 'high', standardMaterials: true, leanFoliage: false } as const;
 const LEAN_MEDIUM = { tier: 'medium', standardMaterials: true, leanFoliage: true } as const;
+const MEDIUM = { tier: 'medium', standardMaterials: true, leanFoliage: false } as const;
+const LOW = { tier: 'low', standardMaterials: false, leanFoliage: true } as const;
+type Tier = typeof FULL | typeof LEAN_MEDIUM | typeof MEDIUM | typeof LOW;
 
 let restoreGfx: () => void = () => {};
 
-function onTier(settings: typeof FULL | typeof LEAN_MEDIUM): void {
+function onTier(settings: Tier): void {
   restoreGfx();
   restoreGfx = gfxInternalsForTest.overrideSettings(settings);
 }
 
 function build(slot: number): THREE.Group {
   const origin = instanceOrigin(ARENA_INDEX, slot);
-  const group = buildFireAndFlyArenaInterior({ lowGfx: false, origin });
+  const group = buildFireAndFlyArenaInterior({ lowGfx: !GFX.standardMaterials, origin });
   group.position.set(origin.x, 0, origin.z);
   return group;
 }
@@ -100,6 +115,50 @@ function meshes(root: THREE.Object3D): THREE.Mesh[] {
   });
   return found;
 }
+
+/** The sim trees a built arena draws (their indices), matched by trunk position. */
+function drawnTreeSpots(root: THREE.Object3D, slot: number): number[] {
+  const origin = instanceOrigin(ARENA_INDEX, slot);
+  const trees = root.getObjectByName('fireAndFlyTrees');
+  const found = new Set<number>();
+  const at = new THREE.Matrix4();
+  const position = new THREE.Vector3();
+  for (const mesh of trees ? meshes(trees) : []) {
+    const batch = mesh as THREE.InstancedMesh;
+    for (let i = 0; i < batch.count; i++) {
+      batch.getMatrixAt(i, at);
+      position.setFromMatrixPosition(at);
+      // Float32 instance matrices far from the world origin: match within a hand.
+      const index = FIRE_AND_FLY_TREES.findIndex(
+        (tree) =>
+          Math.abs(position.x - origin.x - tree.x) < 0.05 &&
+          Math.abs(position.z - origin.z - tree.z) < 0.05,
+      );
+      expect(index).toBeGreaterThanOrEqual(0);
+      found.add(index);
+    }
+  }
+  return [...found].sort((a, b) => a - b);
+}
+
+function planned(density: 'full' | 'medium' | 'low'): number[] {
+  return fireAndFlyDrawnTrees(density)
+    .map((tree) => FIRE_AND_FLY_TREES.indexOf(tree))
+    .sort((a, b) => a - b);
+}
+
+const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+const talkingToAlder = {
+  player: {
+    pos: { x: FIRE_AND_FLY_NPC_DEF.pos.x + 2, z: FIRE_AND_FLY_NPC_DEF.pos.z },
+    level: 60,
+    dead: false,
+    ghost: false,
+    targetId: FIRE_AND_FLY_NPC_ID,
+  },
+  worldQuestLog: new Map([[FIRE_AND_FLY_QUEST_ID, { state: 'active' as const }]]),
+  turretSession: null,
+};
 
 beforeEach(() => setDitherFadeEnabledForTest(false));
 
@@ -183,5 +242,40 @@ describe('the arena painter on the kit tiers', () => {
       expect((geometry as THREE.BufferGeometry).getAttribute('position')).toBeDefined();
     }
     for (const material of arenaMaterials) expect(disposed.has(material)).toBe(false);
+  });
+
+  it('draws the whole ring on high, about 60 percent on medium and 35 percent on low', () => {
+    onTier(FULL);
+    expect(drawnTreeSpots(build(5), 5)).toEqual(planned('full'));
+    expect(planned('full').length).toBe(FIRE_AND_FLY_TREES.length);
+    onTier(MEDIUM);
+    expect(drawnTreeSpots(build(5), 5)).toEqual(planned('medium'));
+    // The static preset decides, not the foliage lean a weak medium GPU also gets.
+    onTier(LEAN_MEDIUM);
+    expect(drawnTreeSpots(build(6), 6)).toEqual(planned('medium'));
+    onTier(LOW);
+    expect(drawnTreeSpots(build(5), 5)).toEqual(planned('low'));
+  });
+
+  it('prebuilds hidden the very tree set the live arena then draws, on every tier', async () => {
+    const now: IdleScheduler = (callback) => callback();
+    for (const [tier, density] of [
+      [FULL, 'full'],
+      [MEDIUM, 'medium'],
+      [LOW, 'low'],
+    ] as const) {
+      onTier(tier);
+      const scene = new THREE.Scene();
+      const prebuild = new FireAndFlyArenaPrebuild(scene, undefined, { idle: now });
+      prebuild.update(talkingToAlder, 0);
+      prebuild.update(talkingToAlder, 50);
+      for (let i = 0; i < 8; i++) await flush();
+      const holder = scene.getObjectByName(FIRE_AND_FLY_PREBUILD_NAME);
+      if (!holder) throw new Error('no prebuilt copy');
+      const hidden = drawnTreeSpots(holder, 0);
+      expect(hidden).toEqual(planned(density));
+      expect(drawnTreeSpots(build(9), 9)).toEqual(hidden);
+      prebuild.dispose();
+    }
   });
 });

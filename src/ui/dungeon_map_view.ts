@@ -10,10 +10,10 @@ import { MOBS } from '../sim/data';
 import { dungeonInstanceAt } from '../sim/dungeon_floor';
 import { DUNGEON_WALL_HW, type DungeonLayout } from '../sim/dungeon_layout';
 import {
+  FIRE_AND_FLY_FOREST_RADIUS,
   FIRE_AND_FLY_ROCKS,
   FIRE_AND_FLY_TOWER,
   FIRE_AND_FLY_TREES,
-  FIRE_AND_FLY_WALL_RADIUS,
   fireAndFlyTrunkRadius,
 } from '../sim/fire_and_fly_field';
 import { IGNIVAR_GATE_LOCKED_TEMPLATE } from '../sim/ignivar_raid_ids';
@@ -36,10 +36,10 @@ function hasDedicatedCastleMap(interior: string): boolean {
 // trunks and rocks as obstacles, the tower as the highlighted centre.
 const FIRE_AND_FLY_MAP_SIDES = 48;
 const FIRE_AND_FLY_MAP_LAYOUT: DungeonLayout = {
-  zMin: -FIRE_AND_FLY_WALL_RADIUS,
-  zMax: FIRE_AND_FLY_WALL_RADIUS,
+  zMin: -FIRE_AND_FLY_FOREST_RADIUS,
+  zMax: FIRE_AND_FLY_FOREST_RADIUS,
   sideWallZ: 0,
-  sideWallHd: FIRE_AND_FLY_WALL_RADIUS,
+  sideWallHd: FIRE_AND_FLY_FOREST_RADIUS,
   pillars: [],
   tombs: [],
   stubs: [],
@@ -47,8 +47,8 @@ const FIRE_AND_FLY_MAP_LAYOUT: DungeonLayout = {
   shellPolygon: Array.from({ length: FIRE_AND_FLY_MAP_SIDES }, (_, i) => {
     const angle = (i / FIRE_AND_FLY_MAP_SIDES) * Math.PI * 2;
     return {
-      x: Math.cos(angle) * FIRE_AND_FLY_WALL_RADIUS,
-      z: Math.sin(angle) * FIRE_AND_FLY_WALL_RADIUS,
+      x: Math.cos(angle) * FIRE_AND_FLY_FOREST_RADIUS,
+      z: Math.sin(angle) * FIRE_AND_FLY_FOREST_RADIUS,
     };
   }),
   decor: [

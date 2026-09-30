@@ -4,7 +4,7 @@
 // open-field builder registry dungeon.ts dispatches through.
 
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { buildFireAndFlyArenaInterior } from '../src/render/fire_and_fly_arena';
 import {
   arenaHash,
@@ -16,7 +16,9 @@ import {
   FIRE_AND_FLY_SKY_ANCHOR,
   FIRE_AND_FLY_SKY_HOLD,
   FIRE_AND_FLY_SUN_DIRECTION,
+  FIRE_AND_FLY_TREE_ROW_KEEP,
   fireAndFlyBackdropCrowns,
+  fireAndFlyDrawnTrees,
   fireAndFlyFlowerSpots,
   fireAndFlyGrassSpots,
   fireAndFlyGroundPaint,
@@ -26,6 +28,7 @@ import {
   fireAndFlyRenderHeight,
   fireAndFlyRockPlacement,
   fireAndFlyTreeCastsIntoClearing,
+  fireAndFlyTreeDensity,
   fireAndFlyTreePlacement,
   fireAndFlyUnderstorySpots,
   isFireAndFlyArenaAt,
@@ -44,10 +47,14 @@ import { FIRE_AND_FLY_DUNGEON_ID } from '../src/sim/content/fire_and_fly_arena';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
   FIRE_AND_FLY_CLEARING_RADIUS,
+  FIRE_AND_FLY_EDGE_TREES,
+  FIRE_AND_FLY_FOREST_RADIUS,
   FIRE_AND_FLY_ROCKS,
   FIRE_AND_FLY_TREE_RING,
+  FIRE_AND_FLY_TREE_ROWS,
   FIRE_AND_FLY_TREES,
-  FIRE_AND_FLY_WALL_RADIUS,
+  FIRE_AND_FLY_WALL_REACH,
+  fireAndFlyColliders,
   fireAndFlyFieldHeight,
   fireAndFlyTrunkRadius,
 } from '../src/sim/fire_and_fly_field';
@@ -59,8 +66,8 @@ function polar(r: number, angle: number): { x: number; z: number } {
 }
 
 describe('the drawn ground', () => {
-  it('is the sim field everywhere a body can reach, and hills only past the wall', () => {
-    for (let r = 0; r <= FIRE_AND_FLY_WALL_RADIUS; r += 2.5) {
+  it('is the sim field under the whole forest, and hills only past it', () => {
+    for (let r = 0; r <= FIRE_AND_FLY_FOREST_RADIUS; r += 2.5) {
       for (let k = 0; k < 24; k++) {
         const { x, z } = polar(r, (k / 24) * Math.PI * 2);
         expect(fireAndFlyRenderHeight(x, z)).toBe(fireAndFlyFieldHeight(x, z));
@@ -76,7 +83,7 @@ describe('the drawn ground', () => {
   it('lifts into the hills without a step at the hill foot', () => {
     for (let k = 0; k < 36; k++) {
       const angle = (k / 36) * Math.PI * 2;
-      for (let r = FIRE_AND_FLY_WALL_RADIUS; r < 140; r += 0.5) {
+      for (let r = FIRE_AND_FLY_FOREST_RADIUS; r < 140; r += 0.5) {
         const a = polar(r, angle);
         const b = polar(r + 0.5, angle);
         const step = Math.abs(fireAndFlyRenderHeight(b.x, b.z) - fireAndFlyRenderHeight(a.x, a.z));
@@ -136,6 +143,40 @@ describe('the ground cover', () => {
     expect(fireAndFlyGrassSpots(1.8)).not.toBe(grass);
     expect(fireAndFlyFlowerSpots()).toBe(fireAndFlyFlowerSpots());
     expect(fireAndFlyUnderstorySpots()).toBe(fireAndFlyUnderstorySpots());
+    expect(fireAndFlyGrassSpots(1.8, 'medium')).toBe(fireAndFlyGrassSpots(1.8, 'medium'));
+    expect(fireAndFlyUnderstorySpots('medium')).toBe(fireAndFlyUnderstorySpots('medium'));
+    expect(fireAndFlyUnderstorySpots('medium')).not.toBe(fireAndFlyUnderstorySpots());
+  });
+
+  it('leaves no bare patch where a thinner tier drops a tree, and adds none in a drawn trunk', () => {
+    const key = (spot: { x: number; z: number }) => `${spot.x}:${spot.z}`;
+    const nearDropped = (spot: { x: number; z: number }, drawn: Set<unknown>) =>
+      FIRE_AND_FLY_TREES.some(
+        (tree) =>
+          !drawn.has(tree) &&
+          Math.hypot(spot.x - tree.x, spot.z - tree.z) < fireAndFlyTrunkRadius(tree) + 0.9,
+      );
+    for (const density of ['medium', 'low'] as const) {
+      const drawn = new Set<unknown>(fireAndFlyDrawnTrees(density));
+      for (const [full, thin] of [
+        [fireAndFlyGrassSpots(1.8), fireAndFlyGrassSpots(1.8, density)],
+        [fireAndFlyUnderstorySpots(), fireAndFlyUnderstorySpots(density)],
+      ] as const) {
+        const had = new Set(full.map(key));
+        const added = thin.filter((spot) => !had.has(key(spot)));
+        // The thinner scatter is the full one plus cover where a dropped trunk stood.
+        expect(thin.length).toBe(full.length + added.length);
+        expect(added.length).toBeGreaterThan(0);
+        for (const spot of added) {
+          expect(nearDropped(spot, drawn)).toBe(true);
+          for (const tree of fireAndFlyDrawnTrees(density)) {
+            expect(Math.hypot(spot.x - tree.x, spot.z - tree.z)).toBeGreaterThan(
+              fireAndFlyTrunkRadius(tree),
+            );
+          }
+        }
+      }
+    }
   });
 
   it('carries the ground paint under each tuft, so the painter never paints it twice', () => {
@@ -156,6 +197,21 @@ describe('the ground cover', () => {
       for (const rock of FIRE_AND_FLY_ROCKS) {
         expect(Math.hypot(spot.x - rock.x, spot.z - rock.z)).toBeGreaterThan(rock.radius);
       }
+    }
+  });
+
+  it('grows no tuft inside a drawn trunk on any tier, the inner row included', () => {
+    for (const [step, density] of [
+      [1.2, 'full'],
+      [1.8, 'medium'],
+    ] as const) {
+      const trees = fireAndFlyDrawnTrees(density);
+      const inside = fireAndFlyGrassSpots(step, density).filter((spot) =>
+        trees.some(
+          (tree) => Math.hypot(spot.x - tree.x, spot.z - tree.z) <= fireAndFlyTrunkRadius(tree),
+        ),
+      );
+      expect(inside).toEqual([]);
     }
   });
 
@@ -224,7 +280,7 @@ describe('the trees, rocks and hills', () => {
     }
   });
 
-  it('plants the canopy of the hills beyond the wall only, on the drawn hills', () => {
+  it('plants the canopy of the hills beyond the forest only, on the drawn hills', () => {
     const crowns = fireAndFlyBackdropCrowns();
     // Each crown is one merged 80-triangle shape: this bound is the hills' budget.
     expect(crowns.length).toBeLessThan(2600);
@@ -233,7 +289,7 @@ describe('the trees, rocks and hills', () => {
     for (const crown of crowns) {
       const r = Math.hypot(crown.x, crown.z);
       expect(r).toBeGreaterThan(FIRE_AND_FLY_TREE_RING.outer);
-      expect(r).toBeGreaterThan(FIRE_AND_FLY_WALL_RADIUS - 2);
+      expect(r).toBeGreaterThan(FIRE_AND_FLY_FOREST_RADIUS - 2);
       expect(r).toBeLessThan(FIRE_AND_FLY_GROUND_RADIUS);
       expect(crown.y).toBeCloseTo(fireAndFlyRenderHeight(crown.x, crown.z) - 0.6, 9);
       expect(crown.height).toBeGreaterThan(crown.radius);
@@ -256,6 +312,95 @@ describe('the trees, rocks and hills', () => {
       expect(value).toBe(arenaHash(i, i * 3, 7));
       expect(value).toBeGreaterThanOrEqual(0);
       expect(value).toBeLessThan(1);
+    }
+  });
+});
+
+describe('the tree ring per tier', () => {
+  const rows = FIRE_AND_FLY_TREE_ROWS;
+
+  it("groups the sim's trees into their rows, from the clearing outward", () => {
+    expect(rows.length).toBe(FIRE_AND_FLY_TREE_ROW_KEEP.full.length);
+    expect(rows.flat()).toEqual([...FIRE_AND_FLY_TREES]);
+    const mean = (row: readonly { x: number; z: number }[]) =>
+      row.reduce((sum, tree) => sum + Math.hypot(tree.x, tree.z), 0) / row.length;
+    for (let k = 1; k < rows.length; k++)
+      expect(mean(rows[k])).toBeGreaterThan(mean(rows[k - 1]) + 5);
+  });
+
+  it('reads the static preset tier: high and above draw the whole ring, medium and low thin it', () => {
+    expect(fireAndFlyTreeDensity('insane')).toBe('full');
+    expect(fireAndFlyTreeDensity('ultra')).toBe('full');
+    expect(fireAndFlyTreeDensity('high')).toBe('full');
+    expect(fireAndFlyTreeDensity('medium')).toBe('medium');
+    expect(fireAndFlyTreeDensity('low')).toBe('low');
+    expect(fireAndFlyDrawnTrees('full')).toEqual([...FIRE_AND_FLY_TREES]);
+  });
+
+  it('draws about 60 percent of the ring on medium and 35 percent on low', () => {
+    const total = FIRE_AND_FLY_TREES.length;
+    expect(fireAndFlyDrawnTrees('medium').length).toBe(197);
+    expect(fireAndFlyDrawnTrees('low').length).toBe(113);
+    expect(fireAndFlyDrawnTrees('medium').length / total).toBeCloseTo(0.6, 1);
+    expect(fireAndFlyDrawnTrees('low').length / total).toBeCloseTo(0.35, 1);
+    // Both species stay in the mix.
+    for (const density of ['medium', 'low'] as const) {
+      const drawn = fireAndFlyDrawnTrees(density);
+      const pines = drawn.filter((tree) => tree.kind === 'pine').length;
+      expect(pines / drawn.length).toBeGreaterThan(0.35);
+      expect(pines / drawn.length).toBeLessThan(0.6);
+    }
+  });
+
+  it('keeps the inner row whole and thins the far rows first, evenly around each row', () => {
+    for (const density of ['full', 'medium', 'low'] as const) {
+      const drawn = new Set(fireAndFlyDrawnTrees(density));
+      expect(drawn.size).toBe(fireAndFlyDrawnTrees(density).length);
+      const kept = rows.map((row) => row.filter((tree) => drawn.has(tree)));
+      expect(kept[0]).toEqual(rows[0]);
+      for (let k = 1; k < rows.length; k++) {
+        expect(kept[k].length / rows[k].length).toBeLessThanOrEqual(
+          kept[k - 1].length / rows[k - 1].length,
+        );
+        // No bare arc: the widest gap in a row stays within its even spacing
+        // plus the sim's own jitter and one slot of rounding.
+        const angles = kept[k].map((tree) => Math.atan2(tree.x, tree.z)).sort((a, b) => a - b);
+        let widest = 0;
+        for (let i = 0; i < angles.length; i++) {
+          const next = i + 1 < angles.length ? angles[i + 1] : angles[0] + 2 * Math.PI;
+          widest = Math.max(widest, next - angles[i]);
+        }
+        const slot = (2 * Math.PI) / rows[k].length;
+        expect(widest).toBeLessThan((2 * Math.PI) / angles.length + 1.6 * slot);
+      }
+    }
+  });
+
+  it('draws every trunk a thrown body can reach on every tier: no difference inside the wall', () => {
+    const trunks = fireAndFlyColliders(0).filter(
+      (c) => c.type === 'circle' && c.moveTopY === undefined,
+    );
+    expect(trunks).toHaveLength(FIRE_AND_FLY_EDGE_TREES.length);
+    for (const density of ['full', 'medium', 'low'] as const) {
+      const drawn = new Set(fireAndFlyDrawnTrees(density));
+      for (const tree of FIRE_AND_FLY_TREES) {
+        const reachable =
+          Math.hypot(tree.x, tree.z) - fireAndFlyTrunkRadius(tree) <= FIRE_AND_FLY_WALL_REACH;
+        expect(FIRE_AND_FLY_EDGE_TREES.includes(tree)).toBe(reachable);
+        if (reachable) expect(drawn.has(tree)).toBe(true);
+      }
+    }
+  });
+
+  it('is deterministic and planned once per density', async () => {
+    const indices = (trees: readonly { x: number; z: number }[]) =>
+      trees.map((tree) => FIRE_AND_FLY_TREES.findIndex((t) => t.x === tree.x && t.z === tree.z));
+    const planned = { medium: fireAndFlyDrawnTrees('medium'), low: fireAndFlyDrawnTrees('low') };
+    expect(fireAndFlyDrawnTrees('low')).toBe(planned.low);
+    vi.resetModules();
+    const fresh = await import('../src/render/fire_and_fly_arena_core');
+    for (const density of ['medium', 'low'] as const) {
+      expect(indices(fresh.fireAndFlyDrawnTrees(density))).toEqual(indices(planned[density]));
     }
   });
 });
