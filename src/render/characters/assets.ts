@@ -28,6 +28,7 @@ import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
 import { applyRiggedWornDetail, applySurfaceDetail } from '../worn_stone';
 import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor } from './back_grips';
+import { composedVariantBounds, composedVariantEvictions } from './composed_variant_residency_core';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { coalesceFarBakeGroups, farBakeGroupRanges } from './far_bake_groups_core';
 import { padMissingUv } from './far_bake_uv_pad';
@@ -1033,6 +1034,10 @@ interface ModularVariant {
   /** Baked idle-pose far LOD for this part set, minted on first far-band
    *  entry. Shares the entry's lifetime (see evictModularVariants). */
   far: ModularFarBake | null;
+  /** When a character was last composed from this part set or stopped being
+   *  drawn from it (`variantSeenSeq`): the recency the iOS idle bound evicts
+   *  by, least recently seen first (composed_variant_residency_core.ts). */
+  seenAt: number;
 }
 
 // BOUNDED AND REFCOUNTED, and it used to be neither.
@@ -1052,12 +1057,18 @@ interface ModularVariant {
 // CharacterVisual.dispose, and only entries with NO live clone are eligible.
 // When every entry is live the cache is allowed past the cap rather than
 // breaking a body on screen: the bound is on garbage, not on the crowd.
+//
+// WHICH idle entries go, and how many may stay, is composed_variant_residency_
+// core.ts: the total cap on every profile, plus an idle bound on the iOS memory
+// profile, where the looks a session walked past are what the WebContent
+// process runs out of.
 const modularVariantCache = new Map<string, ModularVariant>();
-/** Retained clones over the cap keep their variant; only idle ones are dropped. */
-const MODULAR_VARIANT_CACHE_MAX = 96;
 /** Dev-only tripwire on live (unevictable) variants: the one growth the cap
  *  cannot bound, and the signal that a release site was missed. */
 const MODULAR_VARIANT_WARN_AT = 128;
+/** The recency clock of the cache: a sequence, not a time, stamped whenever a
+ *  part set is composed from or goes idle. */
+let variantSeenSeq = 0;
 
 /** The cache key for a composed part set: the GLB plus the picked node names. */
 function modularVariantKey(url: string, names: readonly string[]): string {
@@ -1123,14 +1134,18 @@ export function sourceGeometries(url: string): Set<THREE.BufferGeometry> {
   return owned;
 }
 
-/** Drop idle variants, least-recently-used first, until the cache is back under
- *  the cap. Map iteration is insertion order and every hit re-inserts, so the
- *  head is the least recently composed. */
+/** Drop the idle variants the profile's bounds say to drop
+ *  (composedVariantEvictions): past the total cap in cache order (Map
+ *  iteration is insertion order and every hit re-inserts, so the head is the
+ *  least recently composed), and on the iOS profile past the idle bound, least
+ *  recently seen first. The bounds are read off the live GFX profile. */
 function evictModularVariants(): void {
-  if (modularVariantCache.size <= MODULAR_VARIANT_CACHE_MAX) return;
-  for (const [key, entry] of modularVariantCache) {
-    if (modularVariantCache.size <= MODULAR_VARIANT_CACHE_MAX) break;
-    if (entry.refs > 0) continue;
+  const bounds = composedVariantBounds(GFX);
+  for (const key of composedVariantEvictions(modularVariantCache, bounds)) {
+    const entry = modularVariantCache.get(key);
+    // The core never names an entry with a live clone; this is the line before
+    // a dispose that would blank a body on screen, so it checks, not trusts.
+    if (!entry || entry.refs > 0) continue;
     modularVariantCache.delete(key);
     // Now provably unreferenced, so the buffers this variant MINTED can go
     // back: dropping the map entry alone would leak them (three.js frees a
@@ -1145,7 +1160,7 @@ function evictModularVariants(): void {
   }
   if (import.meta.env?.DEV && modularVariantCache.size >= MODULAR_VARIANT_WARN_AT) {
     console.warn(
-      `[modular] ${modularVariantCache.size} composed variants live at once (cap ${MODULAR_VARIANT_CACHE_MAX}); every one is still on screen`,
+      `[modular] ${modularVariantCache.size} composed variants live at once (cap ${bounds.maxTotal}); every one is still on screen`,
     );
   }
 }
@@ -1162,8 +1177,13 @@ export function releaseModularVariant(root: THREE.Object3D): void {
   entry.refs--;
   // Sweeping only on a miss leaves a cache that went over the cap while every
   // entry was live sitting there forever if it then only ever hits. Going idle
-  // is the other moment eviction can make progress, so take it.
-  if (entry.refs === 0) evictModularVariants();
+  // is the other moment eviction can make progress, so take it. Going idle is
+  // also the last time anyone SAW this look, the recency the idle bound keeps:
+  // stamped first, so this sweep treats it as the newest idle entry.
+  if (entry.refs === 0) {
+    entry.seenAt = ++variantSeenSeq;
+    evictModularVariants();
+  }
 }
 
 /** Composed-body cache occupancy, for the crowd-perf probe on `window.__game`:
@@ -1183,8 +1203,16 @@ function modularVariant(url: string, names: readonly string[]): ModularVariant {
     // re-insert so the eviction sweep above reads insertion order as recency
     modularVariantCache.delete(key);
     modularVariantCache.set(key, hit);
+    hit.seenAt = ++variantSeenSeq;
     return hit;
   }
+  // The miss is the whole compose (clone of the part library, prune, merge,
+  // rebind): its own ledger kind, so what a look costs when it is seen for the
+  // first time, or again after an eviction, reads apart from the map hits the
+  // `view-part:assemble:variant` span also counts. For a live candidate it
+  // usually runs BEFORE the view build (the look-pieces head lookup), so
+  // `view:composed` alone never showed it.
+  const composeStarted = performance.now();
   const root = cloneSkinned(resolvedGltf(url).scene);
   const keep = new Set(names);
   const drop: THREE.Object3D[] = [];
@@ -1220,6 +1248,9 @@ function modularVariant(url: string, names: readonly string[]): ModularVariant {
   // must leave alone.
   shareRigSkeleton(root, { preferCanonical: isComposedHead });
   primeSkinnedSortSpheres(root);
+  // The clock stops here, before the sweep: the kind prices composing a look,
+  // not freeing the ones the sweep evicts to make room.
+  recordBuildSpan('view-part:variant-compose', performance.now() - composeStarted, composeStarted);
   // Sweep BEFORE inserting, never after. The new entry is born at refs 0 and
   // the caller only retains it once this returns, so a sweep run after the
   // insert reaches the newest entry last, finds it unreferenced, and disposes
@@ -1227,7 +1258,7 @@ function modularVariant(url: string, names: readonly string[]): ModularVariant {
   // root, the far bake writes to an orphaned entry forever, and the release
   // finds nothing. Trimming first cannot see it at all.
   evictModularVariants();
-  const entry: ModularVariant = { root, url, refs: 0, far: null };
+  const entry: ModularVariant = { root, url, refs: 0, far: null, seenAt: ++variantSeenSeq };
   modularVariantCache.set(key, entry);
   return entry;
 }

@@ -402,7 +402,15 @@ per part.
     population of a zone. It is refcounted (retained in `assembleModular`,
     released in `CharacterVisual.dispose`) and evicts idle entries over a cap;
     an entry a live character is drawn from is never dropped, because clones
-    share its geometry.
+    share its geometry. Which idle entries go is
+    `composed_variant_residency_core.ts`: the total cap everywhere (desktop and
+    Android decide exactly as before), plus, on the iOS memory profile, an IDLE
+    bound evicted least recently SEEN first (composed from, or released to idle),
+    so the looks a session walked past stop holding their merged buffers and
+    morph textures (`tests/composed_variant_residency_core.test.ts`, the wiring
+    in `tests/modular_variant_eviction.test.ts`). An eviction frees geometry
+    only, never a material, so a returning look re-composes with no link; the
+    compose is its own ledger kind, `view-part:variant-compose`.
 - Part names are the contract; `tests/modular_character.test.ts` gates the tables
   against the shipped GLB, because a renamed node fails SILENTLY (the body just
   loses a limb). The body's radius tables are SOLVED against the armour at
