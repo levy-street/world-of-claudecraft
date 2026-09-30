@@ -74,6 +74,44 @@ describe('world quest rankings window', () => {
     });
     expect(r.window.isOpen).toBe(false);
   });
+  it("opens the six trial boards on the gunner's records and takes the selected trial", async () => {
+    const r = rig();
+    r.window.open('fire_and_fly_hard_v1_daily');
+    await flush();
+    expect(r.worldQuestLeaderboard).toHaveBeenCalledWith(
+      'fire_and_fly_hard_v1_daily',
+      0,
+      50,
+      'Ari',
+    );
+    const cards = [...r.el.querySelectorAll<HTMLElement>('.wql-card')];
+    expect(cards.map((card) => card.dataset.wqlBoard)).toEqual([
+      'fire_and_fly_introduction_v1_daily',
+      'fire_and_fly_introduction_v1_lifetime',
+      'fire_and_fly_standard_v1_daily',
+      'fire_and_fly_standard_v1_lifetime',
+      'fire_and_fly_hard_v1_daily',
+      'fire_and_fly_hard_v1_lifetime',
+    ]);
+    expect(cards[0].querySelector('.wql-card-name')?.textContent).toBe("Recruit's Trial: Today");
+    expect(cards[0].querySelector('.wql-card-art')?.getAttribute('style')).toContain(
+      '/ui/world-quests/leaderboard/barricade.webp',
+    );
+    expect(r.el.querySelector('#wql-title')?.textContent).toBe("Gunner's trial records");
+    expect(r.el.querySelector('.wql-board-title')?.textContent).toBe("Veterans' Test: Today");
+    expect(r.el.querySelector('.wql-board-rule')?.textContent).toBe(
+      'Ranked by medal, then highest score',
+    );
+    expect(r.el.querySelector('[data-glider-start]')).toBeNull();
+    const start = r.el.querySelector('[data-trial-start]') as HTMLButtonElement;
+    expect(start.textContent).toBe('Take this trial');
+    start.click();
+    expect(r.startWorldQuestActivity).toHaveBeenCalledWith('wq_evergarden_fire_and_fly', {
+      courseId: 'fire_and_fly_hard',
+    });
+    expect(r.window.isOpen).toBe(false);
+  });
+
   it('opens on the default board, asks for the viewer, and paints podium, list, and self', async () => {
     const r = rig();
     r.window.open();
@@ -210,6 +248,20 @@ describe('leaderboard World Quests tab', () => {
     r.lb.toggle();
     expect(r.rankings.style.display).toBe('none');
     expect(r.el.style.display).toBe('none');
+  });
+
+  it("opens the gunner's trial records on the default trial's daily board", async () => {
+    const r = leaderboardRig({ launcher: true, rankingsRoot: true });
+    r.lb.openFireAndFlyRankings();
+    await flush();
+    expect(r.rankings.style.display).toBe('flex');
+    expect(r.world.worldQuestLeaderboard).toHaveBeenCalledWith(
+      'fire_and_fly_standard_v1_daily',
+      0,
+      50,
+      'Ari',
+    );
+    expect(r.rankings.querySelectorAll('.wql-card')).toHaveLength(6);
   });
 
   it('arrowing onto the tab only moves focus, it never opens the window', () => {

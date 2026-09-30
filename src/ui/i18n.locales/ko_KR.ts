@@ -19508,6 +19508,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.leaderboard.gliderRankings': '활공 코스 기록',
   'hudChrome.leaderboard.gliderRules':
     '모든 고리를 통과한 완주 기록 중 가장 빠른 시간이 승리합니다. 일일 기록은 서버 초기화 때 갱신됩니다. 기록은 30초 이내에 반영됩니다.',
+  'hudChrome.leaderboard.fireAndFlyDaily': '{trial}: 오늘',
+  'hudChrome.leaderboard.fireAndFlyLifetime': '{trial}: 전체 기간',
+  'hudChrome.leaderboard.fireAndFlyStart': '이 시련 도전',
+  'hudChrome.leaderboard.fireAndFlyRankings': '포수의 시련 기록',
+  'hudChrome.leaderboard.fireAndFlyPersonalRules':
+    '이 캐릭터에 저장된 오프라인 기록입니다. 가장 좋은 메달이 먼저, 그다음 가장 높은 점수 순으로 순위가 정해집니다. 일일 기록은 매일 초기화됩니다.',
+  'hudChrome.leaderboard.fireAndFlyRules':
+    '가장 좋은 메달이 먼저, 그다음 가장 높은 점수 순으로 순위가 정해집니다. 연습을 포함해 승리한 모든 시련이 기록됩니다. 일일 기록은 서버 초기화 때 갱신됩니다. 기록은 30초 이내에 반영됩니다.',
   'hudChrome.framePresets.apply': '적용',
   'hudChrome.focusTargets.showEmpty': '빈 주시 대상 프레임 표시',
   'hudChrome.focusTargets.assignHint':

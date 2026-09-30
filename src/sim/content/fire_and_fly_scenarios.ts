@@ -153,3 +153,15 @@ export const TURRET_SCENARIOS: readonly TurretScenarioDef[] = [
 ];
 
 export const TURRET_DEFAULT_SCENARIO = TURRET_SCENARIO_STANDARD;
+
+/**
+ * Each trial's scoreboard version, by board key (fire_and_fly_scoreboards.ts). Any tuning
+ * change of a trial (its waves, health, arrivals, integrity or medal bars, or the points
+ * in minigames/turret_result.ts, which move every trial) must raise its version, so runs
+ * under the old and the new tuning never share a ladder.
+ */
+export const FIRE_AND_FLY_SCORE_VERSIONS: Readonly<Record<string, number>> = {
+  introduction: 1,
+  standard: 1,
+  hard: 1,
+};

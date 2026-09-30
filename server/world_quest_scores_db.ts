@@ -16,6 +16,7 @@
 import type { Pool, QueryResult } from 'pg';
 import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 import type { WorldQuestMedal } from '../src/sim/world_quest_scoreboards';
+import { FIRE_AND_FLY_SCORES_SCHEMA } from './fire_and_fly_scores_db';
 import { GLIDER_SCORES_SCHEMA } from './glider_scores_db';
 
 // Both FKs cascade (a deleted character or account takes its rows along; a
@@ -45,6 +46,7 @@ CREATE INDEX IF NOT EXISTS world_quest_scores_character ON world_quest_scores (c
 CREATE INDEX IF NOT EXISTS world_quest_scores_account ON world_quest_scores (account_id);
 CREATE INDEX IF NOT EXISTS world_quest_scores_updated ON world_quest_scores (updated_at);
 ${GLIDER_SCORES_SCHEMA}
+${FIRE_AND_FLY_SCORES_SCHEMA}
 `;
 
 export interface WorldQuestScoreWrite {

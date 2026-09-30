@@ -716,7 +716,6 @@ export type { MarketSave } from './market';
 
 import { updateBreath } from './breath';
 import { updateSwimFatigue } from './fatigue';
-import { personalGliderLeaderboard as gliderRecordsPage } from './glider_personal_records';
 import { spawnStaticWorldObjects } from './ground_object_spawns';
 import { chainPullInstanceOnBossAggro } from './instances/boss_chain_pull';
 import { buyCrucibleVendorItem as buyCrucibleVendorItemImpl } from './instances/crucible_vendor';
@@ -785,6 +784,7 @@ import * as weeklyQuestMod from './weekly_quests';
 import * as questActivity from './world_quest_activity';
 import { worldQuestCreditBindings } from './world_quest_context';
 import { dropWorldQuestDeliveryCargoForPlayer } from './world_quest_delivery';
+import { personalWorldQuestLeaderboard as wqRecordsPage } from './world_quest_personal_records';
 import * as worldQuestState from './world_quest_state';
 import { savedWorldQuestState } from './world_quest_state';
 import * as worldQuestMod from './world_quests';
@@ -8981,7 +8981,7 @@ export class Sim {
     return this.ctx.weeklyRaidResetMs(this.ctx.lockoutNowMs());
   }
   worldQuestLeaderboard(board: string, page = 0, pageSize = LEADERBOARD_PAGE_SIZE) {
-    return Promise.resolve(gliderRecordsPage(this.primary, board, this.resetDay, page, pageSize));
+    return Promise.resolve(wqRecordsPage(this.primary, board, this.resetDay, page, pageSize));
   }
   rotateWorldQuestPuzzleTile(questId: string, tileIndex: number, pid?: number): void {
     worldQuestMod.rotateWorldQuestPuzzleTile(this.ctx, questId, tileIndex, pid);

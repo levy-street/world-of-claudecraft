@@ -25,6 +25,7 @@ import {
   worldQuestFactionCurrencyReward,
   worldQuestStandingReward,
 } from './factions';
+import { reportFireAndFlyScore } from './fire_and_fly_score';
 import { formatMoney } from './format_money';
 import { sanitizeForgeResult } from './minigames/forge_workshop';
 import { applyGliderBoost } from './minigames/glider_boost';
@@ -803,8 +804,10 @@ export function completeWorldQuestTurret(
   session: TurretSession,
 ): void {
   const run = session.worldQuest;
-  if (!run || run.practice || session.defense.phase !== 'won') return;
+  if (!run || session.defense.phase !== 'won') return;
   resetCycleIfNeeded(ctx, meta);
+  reportFireAndFlyScore(ctx, meta, session);
+  if (run.practice) return;
   const quest = worldQuestById(run.questId);
   const progress = meta.worldQuestLog.get(run.questId);
   const player = ctx.entities.get(meta.entityId);

@@ -10373,6 +10373,8 @@ export interface TurretWorldQuestRun {
   cycle: string;
   /** A replay after the day's reward: it never pays and never credits. */
   practice: boolean;
+  /** Set once the won run's score went to the ladders (fire_and_fly_score.ts). */
+  scored?: boolean;
 }
 
 /** What `PlayerMeta.vehicle` holds: every seat gate keys on its presence, not its kind. */

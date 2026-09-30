@@ -19540,6 +19540,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.leaderboard.gliderRankings': '滑空コース記録',
   'hudChrome.leaderboard.gliderRules':
     '全ての輪を通過し、最速で完走した飛行が勝利します。日間記録はサーバーのリセット時に更新されます。記録の反映には最大30秒かかります。',
+  'hudChrome.leaderboard.fireAndFlyDaily': '{trial}：今日',
+  'hudChrome.leaderboard.fireAndFlyLifetime': '{trial}：通算',
+  'hudChrome.leaderboard.fireAndFlyStart': 'この試練を受ける',
+  'hudChrome.leaderboard.fireAndFlyRankings': '砲手の試練の記録',
+  'hudChrome.leaderboard.fireAndFlyPersonalRules':
+    'このキャラクターに保存されたオフライン記録です。最も良いメダルが上位となり、次に最高スコアで順位が決まります。日間記録は毎日リセットされます。',
+  'hudChrome.leaderboard.fireAndFlyRules':
+    '最も良いメダルが上位となり、次に最高スコアで順位が決まります。練習を含め、勝利した試練はすべて記録されます。日間記録はサーバーのリセット時に更新されます。記録の反映には最大30秒かかります。',
   'hudChrome.framePresets.apply': '適用',
   'hudChrome.focusTargets.showEmpty': '空のフォーカスフレームを表示',
   'hudChrome.focusTargets.assignHint':

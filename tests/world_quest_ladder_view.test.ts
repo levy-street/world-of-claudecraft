@@ -45,6 +45,12 @@ describe('art paths', () => {
   it('points every board and medal under the rankings art dir', () => {
     expect(WORLD_QUEST_LADDER_ART_DIR).toBe('/ui/world-quests/leaderboard');
     expect(worldQuestBoardArt('forge')).toBe('/ui/world-quests/leaderboard/forge.webp');
+    expect(worldQuestBoardArt('glider_downs_v2_daily')).toBe(
+      '/ui/world-quests/leaderboard/slalom.webp',
+    );
+    expect(worldQuestBoardArt('fire_and_fly_hard_v1_lifetime')).toBe(
+      '/ui/world-quests/leaderboard/barricade.webp',
+    );
     expect(worldQuestMedalArt('silver')).toBe('/ui/world-quests/leaderboard/medal_silver.webp');
   });
 
@@ -83,6 +89,25 @@ describe('cards and board header', () => {
     });
     expect(view.boardTitle).toBe('A Helping Hammer');
     expect(view.title).toBe('World Quest Rankings');
+  });
+
+  it("titles the trial boards as the gunner's records, with the offline rules on a personal page", () => {
+    const online = buildWorldQuestLadderView(
+      'fire_and_fly_introduction_v1_daily',
+      { kind: 'page', page: page({ board: 'fire_and_fly_introduction_v1_daily' }) },
+      'Hero1',
+    );
+    expect(online.title).toBe("Gunner's trial records");
+    expect(online.subtitle).toMatch(/^The best medal ranks first.*practice included/);
+    expect(online.boardTitle).toBe("Recruit's Trial: Today");
+    expect(online.cards).toHaveLength(6);
+    expect(online.columns.metric).toBe('Score');
+    const offline = buildWorldQuestLadderView(
+      'fire_and_fly_introduction_v1_daily',
+      { kind: 'page', page: page({ board: 'fire_and_fly_introduction_v1_daily', personal: true }) },
+      'Hero1',
+    );
+    expect(offline.subtitle).toMatch(/^Your offline records/);
   });
 
   it('falls back to the default board for an unknown id', () => {

@@ -19886,6 +19886,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.leaderboard.gliderRankings': 'Рекорды полётов',
   'hudChrome.leaderboard.gliderRules':
     'Побеждает самое быстрое полное прохождение. Пройдите все кольца. Дневные рекорды сбрасываются вместе с миром. Рекорды обновляются в течение 30 секунд.',
+  'hudChrome.leaderboard.fireAndFlyDaily': '{trial}: сегодня',
+  'hudChrome.leaderboard.fireAndFlyLifetime': '{trial}: за всё время',
+  'hudChrome.leaderboard.fireAndFlyStart': 'Пройти это испытание',
+  'hudChrome.leaderboard.fireAndFlyRankings': 'Рекорды испытаний канонира',
+  'hudChrome.leaderboard.fireAndFlyPersonalRules':
+    'Ваши офлайн-рекорды, сохранённые с этим персонажем. Сначала решает лучшая медаль, затем наибольший счёт. Дневные рекорды сбрасываются каждый день.',
+  'hudChrome.leaderboard.fireAndFlyRules':
+    'Сначала решает лучшая медаль, затем наибольший счёт. Засчитывается каждое выигранное испытание, включая тренировочные. Дневные рекорды сбрасываются вместе с миром. Рекорды обновляются в течение 30 секунд.',
   'hudChrome.framePresets.apply': 'Применить',
   'hudChrome.focusTargets.showEmpty': 'Показывать пустые рамки фокуса',
   'hudChrome.focusTargets.assignHint': 'Выберите цель. Нажмите {key} или кнопку «{button}».',

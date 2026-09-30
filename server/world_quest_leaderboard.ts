@@ -25,6 +25,8 @@
 // even when the row sits pages away; it never costs a query of its own.
 
 import { resetDayKey } from '../src/reset_calendar';
+import { fireAndFlyScoreValid } from '../src/sim/fire_and_fly_personal_records';
+import { fireAndFlyScoreboardInfo } from '../src/sim/fire_and_fly_scoreboards';
 import { gliderScoreboardInfo } from '../src/sim/glider_scoreboards';
 import { LEADERBOARD_PAGE_SIZE } from '../src/sim/leaderboard_page';
 import { paginateWorldQuestLeaderboard } from '../src/sim/world_quest_leaderboard_page';
@@ -38,6 +40,7 @@ import {
 import type { WorldQuestLeaderboardEntry, WorldQuestLeaderboardPage } from '../src/world_api';
 import { type CachedRead, createCachedRead } from './cached_read';
 import { ELIGIBLE_ACCOUNT_SQL, pool, runWithStatementTimeout } from './db';
+import { fireAndFlyScoreRows, upsertFireAndFlyScore } from './fire_and_fly_scores_db';
 import { gliderScoreRows, upsertGliderScore } from './glider_scores_db';
 import type { Ctx, RouteDef } from './http/types';
 import { json } from './http_util';
@@ -90,9 +93,38 @@ type ScoreDb = {
   rows: typeof worldQuestScoreboardRows;
 };
 
+/** A board with its own daily and lifetime table: the glider's courses, Fire and Fly's trials. */
+interface PeriodicBoard {
+  period: 'daily' | 'lifetime';
+  rows: typeof gliderScoreRows;
+  upsert: typeof upsertGliderScore;
+  /** The sim's own bounds on a submitted run, checked before it is queued. */
+  accepts(ev: WorldQuestScoreObservation): boolean;
+}
+
+function periodicBoard(boardId: string): PeriodicBoard | null {
+  const glider = gliderScoreboardInfo(boardId);
+  if (glider)
+    return {
+      period: glider.period,
+      rows: gliderScoreRows,
+      upsert: upsertGliderScore,
+      accepts: (ev) => ev.metric > 0 && ev.metric < 1000,
+    };
+  const trial = fireAndFlyScoreboardInfo(boardId);
+  if (trial)
+    return {
+      period: trial.period,
+      rows: fireAndFlyScoreRows,
+      upsert: upsertFireAndFlyScore,
+      accepts: (ev) => fireAndFlyScoreValid(ev.medal, ev.metric),
+    };
+  return null;
+}
+
 let db: ScoreDb = { upsert: upsertWorldQuestScore, rows: worldQuestScoreboardRows };
 const caches = new Map<string, CachedRead<WorldQuestScoreRow[]>>();
-const gliderCacheDays = new Map<string, string>();
+const periodicCacheDays = new Map<string, string>();
 let tail: Promise<void> = Promise.resolve();
 let pending = 0;
 let shedRows = 0;
@@ -102,7 +134,7 @@ let lastShedLogAt = 0;
 export function configureWorldQuestScoreDbForTests(next: ScoreDb | null): void {
   db = next ?? { upsert: upsertWorldQuestScore, rows: worldQuestScoreboardRows };
   caches.clear();
-  gliderCacheDays.clear();
+  periodicCacheDays.clear();
   tail = Promise.resolve();
   pending = 0;
   shedRows = 0;
@@ -130,27 +162,27 @@ export function bustWorldQuestLeaderboardCaches(): void {
 }
 
 function cacheFor(board: WorldQuestScoreboard): CachedRead<WorldQuestScoreRow[]> {
-  const glider = gliderScoreboardInfo(board.id);
-  const day = glider?.period === 'daily' ? resetDayKey(Date.now(), REALM_RESET_TIME_ZONE) : '';
-  if (glider && gliderCacheDays.get(board.id) !== day) {
+  const periodic = periodicBoard(board.id);
+  const day = periodic?.period === 'daily' ? resetDayKey(Date.now(), REALM_RESET_TIME_ZONE) : '';
+  if (periodic && periodicCacheDays.get(board.id) !== day) {
     caches.delete(board.id);
-    gliderCacheDays.set(board.id, day);
+    periodicCacheDays.set(board.id, day);
   }
   let cache = caches.get(board.id);
   if (!cache) {
     let retryAt = 0;
     cache = createCachedRead(
       async () => {
-        if (glider && Date.now() < retryAt)
-          throw new Error('Glider rankings temporarily unavailable');
+        if (periodic && Date.now() < retryAt)
+          throw new Error('Periodic rankings temporarily unavailable');
         try {
           return await runWithStatementTimeout(WORLD_QUEST_LEADERBOARD_READ_TIMEOUT_MS, (query) =>
-            glider
-              ? gliderScoreRows({ query }, REALM, board.id, day, ELIGIBLE_ACCOUNT_SQL)
+            periodic
+              ? periodic.rows({ query }, REALM, board.id, day, ELIGIBLE_ACCOUNT_SQL)
               : db.rows({ query }, REALM, board.id, ELIGIBLE_ACCOUNT_SQL),
           );
         } catch (error) {
-          if (glider) retryAt = Date.now() + 5_000;
+          if (periodic) retryAt = Date.now() + 5_000;
           throw error;
         }
       },
@@ -188,13 +220,12 @@ export function recordWorldQuestScore(
 ): void {
   const board = worldQuestScoreboard(ev.board);
   if (!board || !Number.isFinite(ev.metric)) return;
-  const glider = gliderScoreboardInfo(board.id);
+  const periodic = periodicBoard(board.id);
   if (
-    glider &&
-    (glider.period !== 'lifetime' ||
+    periodic &&
+    (periodic.period !== 'lifetime' ||
       !/^\d{4}-\d{2}-\d{2}$/.test(ev.resetDay ?? '') ||
-      ev.metric <= 0 ||
-      ev.metric >= 1000)
+      !periodic.accepts(ev))
   )
     return;
   if (pending >= MAX_PENDING_WORLD_QUEST_SCORES) {
@@ -215,10 +246,10 @@ export function recordWorldQuestScore(
   };
   tail = tail
     .then(async () => {
-      if (glider) {
+      if (periodic) {
         // Refresh at the shared TTL, never once per improving finish.
         await runWithStatementTimeout(WORLD_QUEST_LEADERBOARD_READ_TIMEOUT_MS, (query) =>
-          upsertGliderScore({ query }, { ...row, resetDay }),
+          periodic.upsert({ query }, { ...row, resetDay }),
         );
       } else if (await db.upsert(pool, row)) caches.get(board.id)?.bust();
     })
@@ -241,7 +272,7 @@ export async function worldQuestLeaderboardPage(
   pageSize: number,
   viewer?: string,
 ): Promise<WorldQuestLeaderboardPage> {
-  const daily = gliderScoreboardInfo(board.id)?.period === 'daily';
+  const daily = periodicBoard(board.id)?.period === 'daily';
   const day = daily ? resetDayKey(Date.now(), REALM_RESET_TIME_ZONE) : '';
   const rows = await cacheFor(board).read();
   if (daily && day !== resetDayKey(Date.now(), REALM_RESET_TIME_ZONE))

@@ -1556,6 +1556,16 @@ export const hudChromeStrings = {
       'Your offline records, saved with this character. Pass every ring in order. Daily records reset each day.',
     gliderRules:
       'Fastest complete flight wins. Pass every ring. Daily records reset with the realm. Records refresh within 30 seconds.',
+    // Fire and Fly's ladders (The Gunner's Trials): a daily and an all-time board
+    // per trial; {trial} is the trial's name (questUi.worldQuest.fireAndFly.scenarios).
+    fireAndFlyDaily: '{trial}: Today',
+    fireAndFlyLifetime: '{trial}: All time',
+    fireAndFlyStart: 'Take this trial',
+    fireAndFlyRankings: "Gunner's trial records",
+    fireAndFlyPersonalRules:
+      'Your offline records, saved with this character. The best medal ranks first, then the highest score. Daily records reset each day.',
+    fireAndFlyRules:
+      'The best medal ranks first, then the highest score. Every won trial counts, practice included. Daily records reset with the realm. Records refresh within 30 seconds.',
     wqPoints: 'Score',
     wqSeconds: '{seconds}s',
     wqNoMedal: 'None',

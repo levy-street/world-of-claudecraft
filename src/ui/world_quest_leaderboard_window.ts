@@ -10,6 +10,8 @@
 // open, a card pick, and a page change, never from the per-frame path. It holds
 // no Sim reference and reaches Hud only through its deps.
 
+import { FIRE_AND_FLY_QUEST_ID } from '../sim/content/world_quest_fire_and_fly';
+import { fireAndFlyScoreboardInfo } from '../sim/fire_and_fly_scoreboards';
 import { gliderScoreboardInfo } from '../sim/glider_scoreboards';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { IWorld, WorldQuestLeaderboardPage } from '../world_api';
@@ -138,6 +140,14 @@ export class WorldQuestLeaderboardWindow {
         .startWorldQuestActivity('wq_galecrest_slalom', { courseId: course.courseId });
       this.close();
     });
+    root.querySelector('[data-trial-start]')?.addEventListener('click', () => {
+      const trial = fireAndFlyScoreboardInfo(this.board);
+      if (!trial) return;
+      this.deps
+        .world()
+        .startWorldQuestActivity(FIRE_AND_FLY_QUEST_ID, { courseId: trial.scenarioId });
+      this.close();
+    });
     root.querySelectorAll<HTMLButtonElement>('[data-wql-board]').forEach((button) => {
       button.addEventListener('click', () => {
         const next = button.dataset.wqlBoard ?? '';
@@ -181,7 +191,9 @@ export class WorldQuestLeaderboardWindow {
       .join('');
     const start = gliderScoreboardInfo(view.boardId)
       ? `<button type="button" class="wql-page-btn" data-glider-start>${esc(t('hudChrome.leaderboard.gliderStart'))}</button>`
-      : '';
+      : fireAndFlyScoreboardInfo(view.boardId)
+        ? `<button type="button" class="wql-page-btn" data-trial-start>${esc(t('hudChrome.leaderboard.fireAndFlyStart'))}</button>`
+        : '';
     return `<div class="wql-cards" role="group" aria-label="${esc(view.boardsLabel)}">${cards}</div>${start}`;
   }
 

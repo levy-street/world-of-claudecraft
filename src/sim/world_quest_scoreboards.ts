@@ -8,7 +8,18 @@
 // BEST row per board and serves it back through IWorldQuests. Nothing here
 // grants power: the ladder is bragging rights only.
 
-import { GLIDER_SCOREBOARD_COURSES, gliderScoreboardId } from './glider_scoreboards';
+import { FIRE_AND_FLY_QUEST_ID } from './content/world_quest_fire_and_fly';
+import {
+  FIRE_AND_FLY_SCORE_PERIODS,
+  FIRE_AND_FLY_SCOREBOARD_TRIALS,
+  fireAndFlyScoreboardId,
+  fireAndFlyScoreboardInfo,
+} from './fire_and_fly_scoreboards';
+import {
+  GLIDER_SCOREBOARD_COURSES,
+  gliderScoreboardId,
+  gliderScoreboardInfo,
+} from './glider_scoreboards';
 
 export type WorldQuestMedal = 'bronze' | 'silver' | 'gold';
 
@@ -46,16 +57,27 @@ export const WORLD_QUEST_SCOREBOARDS: readonly WorldQuestScoreboard[] = [
       }),
     ),
   ),
+  ...FIRE_AND_FLY_SCOREBOARD_TRIALS.flatMap(({ scenarioId }) =>
+    FIRE_AND_FLY_SCORE_PERIODS.map(
+      (period): WorldQuestScoreboard => ({
+        id: fireAndFlyScoreboardId(scenarioId, period)!,
+        questId: FIRE_AND_FLY_QUEST_ID,
+        metric: 'points',
+        primary: 'medal',
+      }),
+    ),
+  ),
 ];
 
 export type WorldQuestScoreboardId = (typeof WORLD_QUEST_SCOREBOARDS)[number]['id'];
 
 const BY_ID = new Map(WORLD_QUEST_SCOREBOARDS.map((board) => [board.id, board]));
+// A quest with per-course or per-trial ladders has no quest-wide board: its
+// runs report to their own course's or trial's board, never through the quest.
 const BY_QUEST = new Map(
-  WORLD_QUEST_SCOREBOARDS.filter((board) => !board.id.startsWith('glider_')).map((board) => [
-    board.questId,
-    board,
-  ]),
+  WORLD_QUEST_SCOREBOARDS.filter(
+    (board) => !gliderScoreboardInfo(board.id) && !fireAndFlyScoreboardInfo(board.id),
+  ).map((board) => [board.questId, board]),
 );
 
 export function worldQuestScoreboard(id: string): WorldQuestScoreboard | undefined {

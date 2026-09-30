@@ -6,6 +6,7 @@
 // (world_quest_leaderboard_window.ts) renders exactly what this shapes, and
 // the legacy chip tab in leaderboard_window.ts still reads the row helpers.
 
+import { fireAndFlyScoreboardInfo } from '../sim/fire_and_fly_scoreboards';
 import { gliderScoreboardInfo } from '../sim/glider_scoreboards';
 import {
   WORLD_QUEST_SCOREBOARDS,
@@ -15,11 +16,50 @@ import {
   worldQuestScoreboard,
 } from '../sim/world_quest_scoreboards';
 import type { WorldQuestLeaderboardEntry, WorldQuestLeaderboardPage } from '../world_api';
-import { formatNumber, t } from './i18n';
+import { fireAndFlyTrialName } from './fire_and_fly_trial_view';
+import { formatNumber, type TranslationKey, t } from './i18n';
 import { type PodiumSlot, podiumSplit } from './leaderboard_podium_view';
 import { worldQuestDisplayName } from './world_quest_view';
 
+/** Which ladders a window shows together: the glider's courses, Fire and Fly's
+ *  trials, or the quest-wide boards of every other medal world quest. */
+export type WorldQuestBoardFamily = 'quests' | 'glider' | 'fireAndFly';
+
+export function worldQuestBoardFamily(boardId: string): WorldQuestBoardFamily {
+  if (gliderScoreboardInfo(boardId)) return 'glider';
+  if (fireAndFlyScoreboardInfo(boardId)) return 'fireAndFly';
+  return 'quests';
+}
+
+const FAMILY_TITLE: Record<WorldQuestBoardFamily, TranslationKey> = {
+  quests: 'hudChrome.wqLadder.title',
+  glider: 'hudChrome.leaderboard.gliderRankings',
+  fireAndFly: 'hudChrome.leaderboard.fireAndFlyRankings',
+};
+
+function familySubtitle(family: WorldQuestBoardFamily, personal: boolean): TranslationKey {
+  if (family === 'glider')
+    return personal
+      ? 'hudChrome.leaderboard.gliderPersonalRules'
+      : 'hudChrome.leaderboard.gliderRules';
+  if (family === 'fireAndFly')
+    return personal
+      ? 'hudChrome.leaderboard.fireAndFlyPersonalRules'
+      : 'hudChrome.leaderboard.fireAndFlyRules';
+  return 'hudChrome.wqLadder.subtitle';
+}
+
 export function worldQuestBoardLabel(board: WorldQuestScoreboard): string {
+  const trial = fireAndFlyScoreboardInfo(board.id);
+  if (trial) {
+    const name = fireAndFlyTrialName(trial.scenarioId) ?? worldQuestDisplayName(board.questId);
+    return t(
+      trial.period === 'daily'
+        ? 'hudChrome.leaderboard.fireAndFlyDaily'
+        : 'hudChrome.leaderboard.fireAndFlyLifetime',
+      { trial: name },
+    );
+  }
   const glider = gliderScoreboardInfo(board.id);
   if (!glider) return worldQuestDisplayName(board.questId);
   const course = t(`hudChrome.leaderboard.gliderCourseNames.${glider.key}`);
@@ -39,13 +79,14 @@ export interface WorldQuestBoardChip {
 
 /** The board selector strip above the rows: one chip per scoreboard. */
 export function worldQuestBoardChips(active: WorldQuestScoreboardId): WorldQuestBoardChip[] {
-  return WORLD_QUEST_SCOREBOARDS.filter(
-    (board) => !!gliderScoreboardInfo(board.id) === !!gliderScoreboardInfo(active),
-  ).map((board) => ({
-    id: board.id,
-    label: worldQuestBoardLabel(board),
-    active: board.id === active,
-  }));
+  const family = worldQuestBoardFamily(active);
+  return WORLD_QUEST_SCOREBOARDS.filter((board) => worldQuestBoardFamily(board.id) === family).map(
+    (board) => ({
+      id: board.id,
+      label: worldQuestBoardLabel(board),
+      active: board.id === active,
+    }),
+  );
 }
 
 /** The first board is the default selection (the endless cannon line). */
@@ -123,8 +164,15 @@ export function resolveWorldQuestBoard(id: string): WorldQuestScoreboard {
  *  the dev server injects CSS inline, which is why it only broke once deployed. */
 export const WORLD_QUEST_LADDER_ART_DIR = '/ui/world-quests/leaderboard';
 
+/** A family of per-period ladders shares one piece of art. */
+const FAMILY_ART: Record<Exclude<WorldQuestBoardFamily, 'quests'>, string> = {
+  glider: 'slalom',
+  fireAndFly: 'barricade',
+};
+
 export function worldQuestBoardArt(boardId: string): string {
-  return `${WORLD_QUEST_LADDER_ART_DIR}/${gliderScoreboardInfo(boardId) ? 'slalom' : boardId}.webp`;
+  const family = worldQuestBoardFamily(boardId);
+  return `${WORLD_QUEST_LADDER_ART_DIR}/${family === 'quests' ? boardId : FAMILY_ART[family]}.webp`;
 }
 
 export function worldQuestMedalArt(medal: WorldQuestMedal): string {
@@ -216,15 +264,16 @@ export interface WorldQuestLadderView {
 
 /** The board cards: one per scoreboard, in scoreboard order. */
 export function worldQuestLadderCards(active: WorldQuestScoreboardId): WorldQuestLadderCardView[] {
-  return WORLD_QUEST_SCOREBOARDS.filter(
-    (board) => !!gliderScoreboardInfo(board.id) === !!gliderScoreboardInfo(active),
-  ).map((board) => ({
-    id: board.id,
-    label: worldQuestBoardLabel(board),
-    metricHeader: worldQuestMetricHeader(board),
-    art: worldQuestBoardArt(board.id),
-    active: board.id === active,
-  }));
+  const family = worldQuestBoardFamily(active);
+  return WORLD_QUEST_SCOREBOARDS.filter((board) => worldQuestBoardFamily(board.id) === family).map(
+    (board) => ({
+      id: board.id,
+      label: worldQuestBoardLabel(board),
+      metricHeader: worldQuestMetricHeader(board),
+      art: worldQuestBoardArt(board.id),
+      active: board.id === active,
+    }),
+  );
 }
 
 /** How the board orders its rows, as the player reads it. */
@@ -319,19 +368,10 @@ export function buildWorldQuestLadderView(
 ): WorldQuestLadderView {
   const board = resolveWorldQuestBoard(boardId);
   const metric = worldQuestMetricHeader(board);
+  const family = worldQuestBoardFamily(board.id);
   const base: WorldQuestLadderView = {
-    title: t(
-      gliderScoreboardInfo(board.id)
-        ? 'hudChrome.leaderboard.gliderRankings'
-        : 'hudChrome.wqLadder.title',
-    ),
-    subtitle: t(
-      gliderScoreboardInfo(board.id)
-        ? input.kind === 'page' && input.page.personal
-          ? 'hudChrome.leaderboard.gliderPersonalRules'
-          : 'hudChrome.leaderboard.gliderRules'
-        : 'hudChrome.wqLadder.subtitle',
-    ),
+    title: t(FAMILY_TITLE[family]),
+    subtitle: t(familySubtitle(family, input.kind === 'page' && !!input.page.personal)),
     closeLabel: t('hudChrome.wqLadder.close'),
     boardsLabel: t('hudChrome.leaderboard.wqBoardsLabel'),
     cards: worldQuestLadderCards(board.id),

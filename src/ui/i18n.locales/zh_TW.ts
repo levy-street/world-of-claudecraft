@@ -18594,6 +18594,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.leaderboard.gliderRankings': '滑翔路線紀錄',
   'hudChrome.leaderboard.gliderRules':
     '完整飛行用時最短者獲勝。穿過每個圓環。每日紀錄隨伺服器重置。紀錄會在30秒內更新。',
+  'hudChrome.leaderboard.fireAndFlyDaily': '{trial}：今日',
+  'hudChrome.leaderboard.fireAndFlyLifetime': '{trial}：歷史',
+  'hudChrome.leaderboard.fireAndFlyStart': '接受此試煉',
+  'hudChrome.leaderboard.fireAndFlyRankings': '砲手試煉紀錄',
+  'hudChrome.leaderboard.fireAndFlyPersonalRules':
+    '你的離線紀錄，隨此角色保存。先比獎牌，再比最高得分。每日紀錄每天重置。',
+  'hudChrome.leaderboard.fireAndFlyRules':
+    '先比獎牌，再比最高得分。每次獲勝的試煉都會計入，練習也算。每日紀錄隨伺服器重置。紀錄會在30秒內更新。',
   'hudChrome.framePresets.apply': '套用',
   'hudChrome.focusTargets.showEmpty': '顯示空的焦點框架',
   'hudChrome.focusTargets.assignHint': '選擇一個目標。按 {key} 或點擊 {button}。',
