@@ -87,6 +87,9 @@ function stripComments(src: string): string {
 // precedent: src/sim/guild_bank.ts GUILD_RANKS pinned by tests/guild_bank.test.ts).
 function forbiddenImport(spec: string): string | null {
   if (spec === 'three' || spec.startsWith('three/')) return 'three';
+  // Host entropy (the server's private salt) is handed in through SimConfig; a sim
+  // file that reached the OS random source would break replay and host-only secrets.
+  if (/^(?:node:)?crypto$/.test(spec)) return 'crypto';
   // The trailing slash is not required: `../server` and `../../server.js` are
   // the same ban, and the slash-only form let both through. A layer name must
   // therefore END the specifier, take a `/` (a file inside it), or take a `.js`
@@ -145,6 +148,8 @@ const DOM_GLOBAL_RE = /\b(document|window|navigator|localStorage|sessionStorage)
 const DOM_GLOBAL_VALUE_RE =
   /\btypeof\s+(?:document|window|navigator|localStorage|sessionStorage)\b|\binstanceof\s+(?:Document|Window|Navigator|Storage)\b|(?:[=(]|\breturn\b)\s*(?:document|window|navigator|localStorage|sessionStorage)\s*[),;]/;
 const NONDETERMINISM_RE = /\b(Math\.random|Date\.now|performance\.now)\b/;
+const SIM_HOST_ENTROPY_RE =
+  /\b(?:randomBytes|randomUUID|getRandomValues|randomInt|randomFill|randomFillSync|webcrypto)\b/;
 
 const simFiles = walk(simRoot);
 
@@ -1303,6 +1308,8 @@ describe('src/sim architecture invariants', () => {
       '../game/input',
       'three',
       'three/examples/jsm/x',
+      'crypto',
+      'node:crypto',
     ]) {
       expect(forbiddenImport(spec), spec).not.toBeNull();
     }
@@ -1316,6 +1323,7 @@ describe('src/sim architecture invariants', () => {
       'node:assert',
       './my_server_helper',
       './renderer_notes',
+      './crypto_notes',
     ]) {
       expect(forbiddenImport(spec), spec).toBeNull();
     }
@@ -1335,6 +1343,35 @@ describe('src/sim architecture invariants', () => {
       violations,
       `all sim randomness/time goes through Rng (src/sim/rng.ts) and the sim clock:\n${violations.join('\n')}`,
     ).toEqual([]);
+  });
+
+  it('reaches no host entropy source (a host secret arrives through SimConfig)', () => {
+    const violations = scanLines(simFiles, SIM_HOST_ENTROPY_RE);
+    expect(
+      violations,
+      `src/sim never draws OS entropy; the host passes it in (SimConfig.privateSalt):\n${violations.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it('SIM_HOST_ENTROPY_RE matches OS entropy calls and rejects deterministic lookalikes', () => {
+    for (const positive of [
+      'randomBytes(8)',
+      'crypto.getRandomValues(buf)',
+      'crypto.randomUUID()',
+      'globalThis.crypto.randomUUID()',
+      'webcrypto.getRandomValues(a)',
+      'randomInt(6)',
+    ]) {
+      expect(SIM_HOST_ENTROPY_RE.test(positive), positive).toBe(true);
+    }
+    for (const negative of [
+      'rng.next()',
+      'rng.int(1, 6)',
+      'randomBearing(x)',
+      'turretDraw(s, 1, 2)',
+    ]) {
+      expect(SIM_HOST_ENTROPY_RE.test(negative), negative).toBe(false);
+    }
   });
 });
 

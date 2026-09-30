@@ -2228,10 +2228,10 @@ export class Sim {
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
       weeklyRaidResetMs:
         cfg.weeklyRaidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_WEEKLY_RAID_LOCKOUT_MS),
-      // Carried through so the renderer (which reaches the Sim as IWorld) can read
-      // the same custom world via sim.cfg.world. Undefined for the built-in world.
+      // Carried through for the renderer (it reads sim.cfg.world); unset when built in.
       world: cfg.world,
       perfLap: cfg.perfLap,
+      privateSalt: cfg.privateSalt,
       idleMobTickRadius: cfg.idleMobTickRadius ?? 0,
     };
     const activeWorldContent = getActiveWorldContent();

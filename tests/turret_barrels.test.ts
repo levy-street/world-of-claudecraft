@@ -446,7 +446,7 @@ describe('spawn lanes', () => {
             const side = Math.abs((b.x - x) * dz - (b.z - z) * dx);
             if (along > 0 && along < Math.hypot(x, z)) expect(side).toBeGreaterThanOrEqual(reach);
             // The bearing the same draw gives with no lanes at all.
-            const raw = turretDraw(state.seed, TURRET_STREAM.spawnAngle, m.id) * TAU;
+            const raw = turretDraw(state, TURRET_STREAM.spawnAngle, m.id) * TAU;
             const bearing = Math.atan2(b.x, b.z);
             const off = Math.abs(((raw - bearing + 3 * Math.PI) % TAU) - Math.PI);
             if (off < Math.asin(reach / Math.hypot(b.x, b.z))) rawWouldBrush++;

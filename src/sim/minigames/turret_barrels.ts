@@ -182,19 +182,19 @@ export function placeTurretBarrels(
   const placed: TurretBarrel[] = [];
   const count = Math.min(def.count, TURRET_EXPLOSIVE_BARREL.cap - state.barrels.length);
   if (!(count > 0)) return placed;
-  const { seed, wave } = state;
+  const { wave } = state;
   const tries = TURRET_EXPLOSIVE_BARREL.placementTries;
-  const offset = turretDraw(seed, TURRET_STREAM.barrelBearing, wave, 0) * TAU;
+  const offset = turretDraw(state, TURRET_STREAM.barrelBearing, wave, 0) * TAU;
   const sector = TAU / count;
   for (let i = 0; i < count; i++) {
     for (let attempt = 0; attempt < tries; attempt++) {
       const key = 1 + i * tries + attempt;
       const wander = attempt === 0 ? TURRET_EXPLOSIVE_BARREL.bearingJitter : 0.5;
-      const spread = turretDraw(seed, TURRET_STREAM.barrelBearing, wave, key) * 2 - 1;
+      const spread = turretDraw(state, TURRET_STREAM.barrelBearing, wave, key) * 2 - 1;
       const bearing = offset + (i + 0.5 + spread * wander) * sector;
       const r =
         def.minRadius +
-        turretDraw(seed, TURRET_STREAM.barrelRadius, wave, key) * (def.maxRadius - def.minRadius);
+        turretDraw(state, TURRET_STREAM.barrelRadius, wave, key) * (def.maxRadius - def.minRadius);
       const x = state.cx + Math.sin(bearing) * r;
       const z = state.cz + Math.cos(bearing) * r;
       if (!clearSpot(state, x, z, tick, probe)) continue;

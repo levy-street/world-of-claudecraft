@@ -77,11 +77,15 @@ export type TurretMonsterView = ReadonlyDeep<Omit<TurretMonster, TurretMonsterBo
 
 /**
  * The engine state minus its clock (`tick` advances outside the revision; read
- * `IWorld.turretClock`), its seed (it would predict spawns and throws) and its bookkeeping.
+ * `IWorld.turretClock`), its seed and run key (they would predict spawns and throws) and
+ * its bookkeeping.
  * The result is absent until the run ends, so the wire carries nothing for it before.
  */
 export type TurretDefenseView = ReadonlyDeep<
-  Omit<TurretDefenseState, 'tick' | 'seed' | 'monsters' | 'result' | TurretDefenseBookkeeping>
+  Omit<
+    TurretDefenseState,
+    'tick' | 'seed' | 'runKey' | 'monsters' | 'result' | TurretDefenseBookkeeping
+  >
 > & {
   readonly monsters: readonly TurretMonsterView[];
   readonly result?: ReadonlyDeep<TurretResult>;
@@ -187,7 +191,8 @@ export function turretSeatRefusal(
  * on foot, and seats them there for a run of `scenario`: the tower under their
  * feet is the center. The eligibility is read here, before the move, so the
  * arena itself never has to pass the open-world rule. The run's seed is one
- * world rng draw, taken only once the seat is committed and never shown. Only
+ * world rng draw, taken only once the seat is committed and never shown, keyed
+ * by the host's private salt when it holds one (the server does). Only
  * tests and dev tools pass `seed` (a replay, which draws nothing): an entry a
  * player reaches must never forward one, or the player picks their own run.
  * `worldQuest` is the row the instructor seated this run for; a dev seat has none.
@@ -224,6 +229,7 @@ export function seatTurret(
       { x: origin.x, z: origin.z },
       sessionSeed,
       start,
+      ctx.cfg.privateSalt,
     ),
     priorMountKey,
     returnTo,
@@ -333,6 +339,7 @@ function cloneView(session: TurretSession): TurretSessionView {
   const {
     tick: _clock,
     seed: _seed,
+    runKey: _runKey,
     spawnCursor: _cursor,
     nextSpawnTick: _nextSpawn,
     nextShotId: _nextShot,

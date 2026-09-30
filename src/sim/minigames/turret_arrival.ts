@@ -7,13 +7,13 @@
 import type { TurretArrivalDef } from '../types';
 import type { TurretBearingSector } from './turret_barrels';
 import type { TurretWavePlan } from './turret_defense_plan';
-import { TURRET_STREAM, turretDraw } from './turret_defense_rng';
+import { TURRET_STREAM, type TurretDrawSource, turretDraw } from './turret_defense_rng';
 
 const TAU = Math.PI * 2;
 
 /** A side of the ring: key 0 is the wave's own, a burst's pack `p` is key `p + 1`. */
-function side(seed: number, wave: number, key: number): number {
-  return turretDraw(seed, TURRET_STREAM.arrivalSide, wave, key) * TAU;
+function side(run: TurretDrawSource, wave: number, key: number): number {
+  return turretDraw(run, TURRET_STREAM.arrivalSide, wave, key) * TAU;
 }
 
 function around(center: number, widthTurn: number): TurretBearingSector {
@@ -23,7 +23,7 @@ function around(center: number, widthTurn: number): TurretBearingSector {
 
 /** The bearings the wave's `index`-th spawn arrives through; null for the whole ring. */
 export function turretArrivalSector(
-  seed: number,
+  run: TurretDrawSource,
   wave: number,
   arrival: Readonly<TurretArrivalDef>,
   index: number,
@@ -32,20 +32,20 @@ export function turretArrivalSector(
     case 'ring':
       return null;
     case 'arc':
-      return around(side(seed, wave, 0), arrival.widthTurn);
+      return around(side(run, wave, 0), arrival.widthTurn);
     case 'flanks':
       return around(
-        side(seed, wave, 0) + ((index % arrival.count) / arrival.count) * TAU,
+        side(run, wave, 0) + ((index % arrival.count) / arrival.count) * TAU,
         arrival.widthTurn,
       );
     case 'burst':
-      return around(side(seed, wave, 1 + Math.floor(index / arrival.groupSize)), arrival.widthTurn);
+      return around(side(run, wave, 1 + Math.floor(index / arrival.groupSize)), arrival.widthTurn);
   }
 }
 
 /** Ticks from the wave's `index`-th spawn (monster `id`) to its next one. */
 export function turretArrivalGap(
-  seed: number,
+  run: TurretDrawSource,
   wave: TurretWavePlan,
   index: number,
   id: number,
@@ -55,5 +55,5 @@ export function turretArrivalGap(
     return arrival.groupGapTicks;
   }
   const span = wave.gapMaxTicks - wave.gapMinTicks + 1;
-  return wave.gapMinTicks + Math.floor(turretDraw(seed, TURRET_STREAM.spawnGap, id) * span);
+  return wave.gapMinTicks + Math.floor(turretDraw(run, TURRET_STREAM.spawnGap, id) * span);
 }

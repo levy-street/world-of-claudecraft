@@ -9098,7 +9098,16 @@ export interface SimConfig {
   // Secondary players a host adds later carry their OWN id through
   // addPlayer({ localGathererIdentity }); this field never covers them.
   gathererIdentity?: LocalGathererIdentity;
+  // A host secret keying the private mini-game draws (turret_defense_rng.ts), so a
+  // client cannot rebuild a run from the world seed and a few observed draws. Only
+  // the authoritative server sets it, from a secure random source at boot; offline
+  // and headless omit it and key the draws by the run seed alone. The sim never
+  // generates it and never puts it on a view, a wire key, a save or a log.
+  privateSalt?: PrivateSalt;
 }
+
+/** 64 secret bits as two uint32 lanes (see SimConfig.privateSalt). */
+export type PrivateSalt = readonly [number, number];
 
 export function emptyMoveInput(): MoveInput {
   return {

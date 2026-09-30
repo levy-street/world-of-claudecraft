@@ -11,7 +11,7 @@ import {
   TURRET_WEAPON,
 } from '../content/turret_defense';
 import { deepFreeze } from '../deep_freeze';
-import { DT, TICK_RATE, type Vec3 } from '../types';
+import { DT, type PrivateSalt, TICK_RATE, type Vec3 } from '../types';
 import {
   blastFalloff,
   type FlySegment,
@@ -45,7 +45,7 @@ import {
 } from './turret_barrels';
 import { resolveTurretBowling } from './turret_bowling';
 import type { TurretKind, TurretPlan } from './turret_defense_plan';
-import { TURRET_STREAM, turretDraw } from './turret_defense_rng';
+import { TURRET_STREAM, type TurretRunKey, turretDraw, turretRunKey } from './turret_defense_rng';
 import {
   type TurretMedal,
   type TurretPointsBreakdown,
@@ -118,6 +118,8 @@ export interface TurretStats {
 export interface TurretDefenseState {
   plan: TurretPlan;
   seed: number;
+  /** Present when the host keys the draws with its private salt; never on a view. */
+  runKey?: TurretRunKey;
   cx: number;
   cz: number;
   startTick: number;
@@ -269,6 +271,7 @@ export function createTurretDefense(
   center: { x: number; z: number },
   seed: number,
   startTick: number,
+  salt?: PrivateSalt,
 ): TurretDefenseState {
   return {
     plan,
@@ -306,6 +309,7 @@ export function createTurretDefense(
       barrelKills: 0,
     },
     result: null,
+    ...(salt ? { runKey: turretRunKey(salt, seed >>> 0) } : {}),
   };
 }
 
@@ -546,13 +550,13 @@ function spawnDue(state: TurretDefenseState, tick: number, probe: ThrowProbe): v
     const id = state.nextMonsterId++;
     const angle = turretSpawnBearing(
       state,
-      turretDraw(state.seed, TURRET_STREAM.spawnAngle, id),
+      turretDraw(state, TURRET_STREAM.spawnAngle, id),
       kind.radius,
-      turretArrivalSector(state.seed, state.wave, wave.arrival, index),
+      turretArrivalSector(state, state.wave, wave.arrival, index),
     );
     const x = state.cx + Math.sin(angle) * TURRET_ARENA.spawnRadius;
     const z = state.cz + Math.cos(angle) * TURRET_ARENA.spawnRadius;
-    state.nextSpawnTick = tick + turretArrivalGap(state.seed, wave, index, id);
+    state.nextSpawnTick = tick + turretArrivalGap(state, wave, index, id);
     state.monsters.push({
       id,
       kind: kindIndex,
@@ -723,7 +727,7 @@ function launch(
     state.cz,
     TURRET_WEAPON.deadCenter,
   );
-  const spread = turretDraw(state.seed, blast.stream, blast.key, m.id) * 2 - 1;
+  const spread = turretDraw(state, blast.stream, blast.key, m.id) * 2 - 1;
   const dir = rotateDir(base.x, base.z, spread * TURRET_WEAPON.deviation);
   const v = launchVelocity(
     falloff,

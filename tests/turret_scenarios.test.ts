@@ -367,22 +367,22 @@ describe('resolving a scenario into a plan', () => {
 
 describe('arrival sectors', () => {
   it('opens no sector on the ring, and one drawn side per wave for an arc', () => {
-    expect(turretArrivalSector(9, 0, { kind: 'ring' }, 3)).toBeNull();
+    expect(turretArrivalSector({ seed: 9 }, 0, { kind: 'ring' }, 3)).toBeNull();
     const arc = { kind: 'arc', widthTurn: 0.25 } as const;
-    const w = sectorOf(9, 2, arc, 0);
+    const w = sectorOf({ seed: 9 }, 2, arc, 0);
     expect(w.width).toBeCloseTo(TAU / 4, 12);
-    const side = turretDraw(9, TURRET_STREAM.arrivalSide, 2, 0) * TAU;
+    const side = turretDraw({ seed: 9 }, TURRET_STREAM.arrivalSide, 2, 0) * TAU;
     expect(w.from + w.width / 2).toBeCloseTo(side, 12);
-    expect(turretArrivalSector(9, 2, arc, 7)).toEqual(w);
-    expect(turretArrivalSector(10, 2, arc, 0)).not.toEqual(w);
-    expect(turretArrivalSector(9, 3, arc, 0)).not.toEqual(w);
+    expect(turretArrivalSector({ seed: 9 }, 2, arc, 7)).toEqual(w);
+    expect(turretArrivalSector({ seed: 10 }, 2, arc, 0)).not.toEqual(w);
+    expect(turretArrivalSector({ seed: 9 }, 3, arc, 0)).not.toEqual(w);
   });
 
   it('turns flanks evenly apart, the wave taking them in turn', () => {
     for (const count of [2, 3] as const) {
       const flanks = { kind: 'flanks', count, widthTurn: 0.1 } as const;
       const centers = [0, 1, 2, 3, 4, 5].map((i) => {
-        const w = sectorOf(4, 1, flanks, i);
+        const w = sectorOf({ seed: 4 }, 1, flanks, i);
         return w.from + w.width / 2;
       });
       for (let i = 0; i < centers.length; i++) {
@@ -395,16 +395,16 @@ describe('arrival sectors', () => {
 
   it('gives each pack of a burst its own side and a pause after its last member', () => {
     const burst = { kind: 'burst', groupSize: 3, groupGapTicks: 70, widthTurn: 0.05 } as const;
-    const packOf = (i: number) => sectorOf(5, 0, burst, i);
+    const packOf = (i: number) => sectorOf({ seed: 5 }, 0, burst, i);
     expect(packOf(1)).toEqual(packOf(0));
     expect(packOf(2)).toEqual(packOf(0));
     expect(packOf(3)).not.toEqual(packOf(0));
     expect(packOf(5)).toEqual(packOf(3));
     const wave = resolveTurretPlan(scenario([wolves(9, burst)])).waves[0];
-    expect(turretArrivalGap(5, wave, 2, 3)).toBe(70);
-    expect(turretArrivalGap(5, wave, 5, 6)).toBe(70);
+    expect(turretArrivalGap({ seed: 5 }, wave, 2, 3)).toBe(70);
+    expect(turretArrivalGap({ seed: 5 }, wave, 5, 6)).toBe(70);
     for (const index of [0, 1, 3, 4]) {
-      const gap = turretArrivalGap(5, wave, index, index + 1);
+      const gap = turretArrivalGap({ seed: 5 }, wave, index, index + 1);
       expect(gap).toBeGreaterThanOrEqual(16);
       expect(gap).toBeLessThanOrEqual(32);
     }
@@ -413,8 +413,8 @@ describe('arrival sectors', () => {
   it('keeps the ring gap draw exactly the one the engine always drew', () => {
     const wave = resolveTurretPlan().waves[0];
     for (let id = 1; id < 40; id++) {
-      const draw = turretDraw(3, TURRET_STREAM.spawnGap, id);
-      expect(turretArrivalGap(3, wave, id - 1, id)).toBe(16 + Math.floor(draw * 17));
+      const draw = turretDraw({ seed: 3 }, TURRET_STREAM.spawnGap, id);
+      expect(turretArrivalGap({ seed: 3 }, wave, id - 1, id)).toBe(16 + Math.floor(draw * 17));
     }
   });
 });
@@ -432,7 +432,7 @@ describe('arrival bearings on the field', () => {
     const plan = resolveTurretPlan(scenario([wolves(24, arrival)]));
     for (const seed of [1, 2, 3]) {
       const { seen } = spawns(plan, seed);
-      const sector = sectorOf(seed, 0, arrival, 0);
+      const sector = sectorOf({ seed }, 0, arrival, 0);
       const mid = sector.from + sector.width / 2;
       const offs = seen.map((s) => angleOff(s.bearing, mid));
       for (const off of offs) expect(Math.abs(off)).toBeLessThanOrEqual(sector.width / 2 + 1e-9);
@@ -445,7 +445,7 @@ describe('arrival bearings on the field', () => {
     const plan = resolveTurretPlan(scenario([wolves(12, arrival)]));
     const { seen } = spawns(plan, 8);
     seen.forEach((s, i) => {
-      const w = sectorOf(8, 0, arrival, i);
+      const w = sectorOf({ seed: 8 }, 0, arrival, i);
       expect(Math.abs(angleOff(s.bearing, w.from + w.width / 2))).toBeLessThanOrEqual(
         w.width / 2 + 1e-9,
       );
@@ -462,7 +462,7 @@ describe('arrival bearings on the field', () => {
       if (i % 4 === 0) expect(gap).toBe(60);
       else expect(gap).toBeGreaterThanOrEqual(4);
       if (i % 4 !== 0) expect(gap).toBeLessThanOrEqual(8);
-      const w = sectorOf(6, 0, arrival, i);
+      const w = sectorOf({ seed: 6 }, 0, arrival, i);
       expect(Math.abs(angleOff(seen[i].bearing, w.from + w.width / 2))).toBeLessThanOrEqual(
         w.width / 2 + 1e-9,
       );
@@ -484,7 +484,7 @@ describe('arrival bearings on the field', () => {
     const radius = plan.kinds[0].radius;
     const reach = TURRET_EXPLOSIVE_BARREL.radius + radius + TURRET_EXPLOSIVE_BARREL.laneMargin;
     for (const seed of [2, 5, 11]) {
-      const sector = sectorOf(seed, 0, arrival, 0);
+      const sector = sectorOf({ seed }, 0, arrival, 0);
       const mid = sector.from + sector.width / 2;
       const { state, seen } = spawns(plan, seed, (s) => {
         for (const [i, off] of [-0.3, 0, 0.25].entries()) {
