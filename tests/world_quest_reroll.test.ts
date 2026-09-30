@@ -76,6 +76,24 @@ describe('World Quest Reroll Mechanism', () => {
     expect(checkSingle.reason).toBe('No alternative assignments available in this zone today.');
   });
 
+  it('checks the live reroll against the dev cycle and the player level', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
+    sim.setPlayerLevel(20);
+    const meta = sim.meta(sim.playerId);
+    if (!meta) throw new Error('Expected player meta');
+    meta.devWorldQuestCycle = cycle;
+    meta.worldQuestCycle = cycle;
+    const quest = playerActiveWorldQuests(meta, cycle).find((q) => q.zoneId === 'eastbrook_vale');
+    if (!quest) throw new Error('Expected Eastbrook quest');
+    const live = sim.canRerollWorldQuest(quest.id);
+    expect(live.canReroll).toBe(true);
+    expect(live).toEqual(canRerollWorldQuest(meta, quest.id, cycle, 20));
+    meta.worldQuestRerollCycle = cycle;
+    expect(sim.canRerollWorldQuest(quest.id).reason).toBe(
+      'Daily world quest reroll already used today.',
+    );
+  });
+
   it('enforces one reroll per cycle limit', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
     sim.setPlayerLevel(20);

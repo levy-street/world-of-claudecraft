@@ -17,6 +17,12 @@ import {
   type PersonalFireAndFlyRecords,
   sanitizeFireAndFlyRecords,
 } from './fire_and_fly_personal_records';
+import {
+  type FireAndFlyRecruitment,
+  freshFireAndFlyRecruitment,
+  sanitizeFireAndFlyRecruitment,
+  savedFireAndFlyRecruitment,
+} from './fire_and_fly_recruitment';
 import { type PersonalGliderRecords, sanitizeGliderRecords } from './glider_personal_records';
 import type { PlayerMeta } from './sim';
 import {
@@ -42,6 +48,8 @@ export { nearbyWorldQuestTraces } from './world_quest_trace_public';
 export interface WorldQuestPlayerState {
   gliderRecords: PersonalGliderRecords;
   fireAndFlyRecords: PersonalFireAndFlyRecords;
+  /** Fire and Fly's trials won in order and the recruited flag (fire_and_fly_recruitment.ts). */
+  fireAndFlyRecruitment: FireAndFlyRecruitment;
   worldQuestCycle: string;
   worldQuestLog: Map<string, WorldQuestProgress>;
   /** Session-only cycle override used by focused dev commands; never persisted. */
@@ -94,6 +102,7 @@ export function freshWorldQuestPlayerState(): WorldQuestPlayerState {
   return {
     gliderRecords: {},
     fireAndFlyRecords: {},
+    fireAndFlyRecruitment: freshFireAndFlyRecruitment(),
     worldQuestCycle: '',
     worldQuestLog: new Map(),
     devWorldQuestCycle: null,
@@ -145,6 +154,7 @@ export function restoreWorldQuestState(
 ): void {
   meta.gliderRecords = sanitizeGliderRecords(saved?.gliderRecords);
   meta.fireAndFlyRecords = sanitizeFireAndFlyRecords(saved?.fireAndFlyRecords);
+  meta.fireAndFlyRecruitment = sanitizeFireAndFlyRecruitment(saved?.fireAndFlyRecruitment);
   meta.factions = freshFactionReputation();
   const rawFactions = characterFactions ?? saved?.factions;
   if (rawFactions) {
@@ -220,6 +230,7 @@ export function savedWorldQuestState(meta: PlayerMeta): {
   const hasGliderRecords = Object.keys(gliderRecords).length > 0;
   const fireAndFlyRecords = sanitizeFireAndFlyRecords(meta.fireAndFlyRecords);
   const hasFireAndFlyRecords = Object.keys(fireAndFlyRecords).length > 0;
+  const fireAndFlyRecruitment = savedFireAndFlyRecruitment(meta.fireAndFlyRecruitment);
   const hasTreasureMap = meta.treasureMap !== null && meta.treasureMap !== undefined;
   const hasVaultAttempt = meta.vaultAttempt !== null && meta.vaultAttempt !== undefined;
   const hasVaultAttemptSeq = meta.vaultAttemptSeq > 0;
@@ -235,6 +246,7 @@ export function savedWorldQuestState(meta: PlayerMeta): {
     !hasCaskets &&
     !hasGliderRecords &&
     !hasFireAndFlyRecords &&
+    !fireAndFlyRecruitment &&
     !hasTreasureMap &&
     !hasVaultAttempt &&
     !hasVaultAttemptSeq &&
@@ -249,6 +261,7 @@ export function savedWorldQuestState(meta: PlayerMeta): {
     worldQuests: {
       ...(hasGliderRecords ? { gliderRecords } : {}),
       ...(hasFireAndFlyRecords ? { fireAndFlyRecords } : {}),
+      ...(fireAndFlyRecruitment ? { fireAndFlyRecruitment } : {}),
       cycle: meta.worldQuestCycle,
       progress: [...meta.worldQuestLog.values()].map(
         ({

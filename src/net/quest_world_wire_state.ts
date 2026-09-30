@@ -1,6 +1,11 @@
 import type { TreasureMapRarity } from '../sim/content/treasure_maps';
 import type { FactionId } from '../sim/factions';
 import { freshFactionCurrencies, freshFactionReputation } from '../sim/factions';
+import {
+  type FireAndFlyRecruitment,
+  freshFireAndFlyRecruitment,
+  sanitizeFireAndFlyRecruitment,
+} from '../sim/fire_and_fly_recruitment';
 import type { TurretPlan } from '../sim/minigames/turret_defense_plan';
 import type { TurretSessionView } from '../sim/turret_defense_session';
 import type {
@@ -70,6 +75,10 @@ export class QuestWorldWireState {
   clueHunt: Readonly<{ huntId: string; step: number }> | null = null;
   /** The read treasure map mirrored from the `tmap` self key (null when none). */
   treasureMap: Readonly<{ rarity: TreasureMapRarity; siteId: string }> | null = null;
+  /** Fire and Fly's recruitment from the `ffr` self key; locked until the server says otherwise. */
+  fireAndFlyRecruitment: Readonly<FireAndFlyRecruitment> = Object.freeze(
+    freshFireAndFlyRecruitment(),
+  );
   /** Client clock mirror of the authoritative Buried Hoard boss telegraphs;
    *  the host feeds it every routed event (ClientWorld's event loop). */
   protected readonly hoardBossCueMirror = new HoardBossCueMirror(() => performance.now());
@@ -112,11 +121,14 @@ export class QuestWorldWireState {
       vehicle?: unknown;
       tur?: unknown;
       turp?: unknown;
+      ffr?: unknown;
     },
     simTime?: unknown,
     tick?: unknown,
   ): void {
     applyQuestSelfWire(this, self, simTime);
+    if (self.ffr !== undefined)
+      this.fireAndFlyRecruitment = Object.freeze(sanitizeFireAndFlyRecruitment(self.ffr));
     if (self.wba !== undefined) this.applyWorldBossWire(self.wba);
     if (self.vehicle !== undefined) this.vehicleSession = decodeVehicleSession(self.vehicle);
     this.applyTurretSelfWire(self, tick);
@@ -303,6 +315,7 @@ export class QuestWorldWireState {
     this.weeklyQuestResetAtMs = 0;
     this.clueHunt = null;
     this.treasureMap = null;
+    this.fireAndFlyRecruitment = Object.freeze(freshFireAndFlyRecruitment());
     this.nearbyWorldQuestTraces = [];
     this.activeWorldBossIds = new Set();
   }

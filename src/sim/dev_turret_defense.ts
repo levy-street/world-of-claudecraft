@@ -1,9 +1,10 @@
 // `/dev turret [scenario | leave]`: takes the player from the open world to the
 // Fire and Fly tower in their own arena and seats them for a run of the named
-// scenario (Standard when none is named), or leaves it (back where they stood).
-// Dev-channel text, English.
+// scenario, a trial or a mission (Standard when none is named), or leaves it (back
+// where they stood). A dev seat bypasses the recruitment's locks and never counts
+// toward it. Dev-channel text, English.
 
-import { TURRET_DEFAULT_SCENARIO, TURRET_SCENARIOS } from './content/fire_and_fly_scenarios';
+import { FIRE_AND_FLY_SCENARIOS, TURRET_DEFAULT_SCENARIO } from './content/fire_and_fly_scenarios';
 import type { SimContext } from './sim_context';
 import { seatTurret, type TurretSeatRefusal } from './turret_defense_session';
 import type { TurretScenarioDef } from './types';
@@ -35,7 +36,7 @@ function refuse(ctx: SimContext, pid: number, refusal: TurretSeatRefusal): void 
 
 /** A scenario by its board key or its id. */
 function scenarioNamed(name: string): TurretScenarioDef | null {
-  return TURRET_SCENARIOS.find((s) => s.boardKey === name || s.id === name) ?? null;
+  return FIRE_AND_FLY_SCENARIOS.find((s) => s.boardKey === name || s.id === name) ?? null;
 }
 
 /** True when `raw` is a `/dev turret` command, handled or refused. */
@@ -54,7 +55,7 @@ export function handleDevTurretChat(ctx: SimContext, raw: string, pid: number): 
   }
   const scenario = word === undefined ? TURRET_DEFAULT_SCENARIO : scenarioNamed(word);
   if (!scenario) {
-    const known = TURRET_SCENARIOS.map((s) => s.boardKey).join(', ');
+    const known = FIRE_AND_FLY_SCENARIOS.map((s) => s.boardKey).join(', ');
     devLog(ctx, pid, `[dev] Unknown turret scenario "${word}"; try one of: ${known}.`);
     return true;
   }

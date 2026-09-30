@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { TURRET_SCENARIOS } from '../src/sim/content/fire_and_fly_scenarios';
+import { FIRE_AND_FLY_SCENARIOS } from '../src/sim/content/fire_and_fly_scenarios';
 import { TURRET_EXPLOSIVE_BARREL, TURRET_WEAPON } from '../src/sim/content/turret_defense';
 import type { TurretEvent } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
@@ -28,29 +28,40 @@ describe('the turret feedback ring', () => {
   });
 
   it('holds the worst single-tick burst any scenario can emit, its leading impact included', () => {
-    const plans = TURRET_SCENARIOS.map((s) => resolveTurretPlan(s));
-    const widest = Math.max(...plans.flatMap((p) => p.waves.map((w) => w.spawns.length)));
-    expect(widest).toBe(18);
     // Shells fired a reload apart land on one tick when their flights differ by a reload.
     const w = TURRET_WEAPON;
     const shells = Math.ceil((w.maxFlightTicks - w.minFlightTicks + 1) / w.cooldownTicks);
     expect(shells).toBe(2);
-    // Each frag lands one bomblet a tick, so at most one per frag shell of the arsenal.
-    const bomblets = Math.max(...plans.map((p) => p.arsenal.fragmentation));
-    expect(bomblets).toBe(3);
-    const front = Math.max(...plans.map((p) => p.arsenal.shockwave)) > 0 ? 1 : 0;
-    // Every landing shell's impact (a frag's burst is one event more, with no blast of its
-    // own), every bomblet, the Shockwave's front and every standing barrel's blast on one
-    // tick, each then a launch and a kill per body, every barrel lit once, and per knock a
-    // bowled, launch and kill.
-    const blasts = shells + bomblets + front + TURRET_EXPLOSIVE_BARREL.cap;
-    // A seat's actions between two ticks land in the same read: at most a shot and a slam.
-    const actions = 1 + front;
-    const burst =
-      blasts * (1 + widest * 2) + shells + TURRET_EXPLOSIVE_BARREL.cap + widest * 3 + actions;
-    expect(burst).toBe(508);
+    // Per plan: every landing shell's impact (a frag's burst is one event more, with no blast
+    // of its own), a bomblet of every frag shell of the arsenal (each frag lands one a tick),
+    // the Shockwave's front and every barrel its cap lets stand blasting on one tick, each then
+    // a launch and a kill per body of its widest wave, every barrel lit once, and per knock a
+    // bowled, launch and kill; a seat's actions between two ticks add a shot and a slam.
+    const bursts = FIRE_AND_FLY_SCENARIOS.map((scenario) => {
+      const plan = resolveTurretPlan(scenario);
+      const widest = Math.max(...plan.waves.map((wave) => wave.spawns.length));
+      const cap = Math.max(
+        ...plan.waves.map((wave) => wave.barrels.cap ?? TURRET_EXPLOSIVE_BARREL.cap),
+      );
+      const front = plan.arsenal.shockwave > 0 ? 1 : 0;
+      const blasts = shells + plan.arsenal.fragmentation + front + cap;
+      const burst = blasts * (1 + widest * 2) + shells + cap + widest * 3 + 1 + front;
+      return [scenario.boardKey, burst] as const;
+    });
+    // The Deluge's 24-monster waves set the bound; the Powder Store's 12 standing kegs come next.
+    expect(Object.fromEntries(bursts)).toEqual({
+      introduction: 265,
+      standard: 454,
+      hard: 508,
+      pack: 562,
+      giants: 211,
+      deluge: 670,
+      brittle: 400,
+      powder: 658,
+    });
+    const burst = Math.max(...bursts.map(([, n]) => n));
     expect(TURRET_FEEDBACK_LIMIT).toBeGreaterThanOrEqual(burst);
-    expect(TURRET_FEEDBACK_LIMIT).toBe(512);
+    expect(TURRET_FEEDBACK_LIMIT).toBe(672);
     const ring: TurretFeedback[] = [];
     recordTurretFeedback(
       ring,

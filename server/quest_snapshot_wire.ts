@@ -103,6 +103,8 @@ export function emitQuestSelfKeys(emit: EmitSelfKey, sim: Sim, meta: PlayerMeta)
     'tmap',
     meta.treasureMap ? { rarity: meta.treasureMap.rarity, siteId: meta.treasureMap.siteId } : null,
   );
+  // Fire and Fly's recruitment: a won trial bumps wireRev, so the heavy gate re-diffs it.
+  emit('ffr', meta.fireAndFlyRecruitment);
   emit('wqrr', meta.worldQuestRerollCycle);
   emit('wqrep', meta.worldQuestReplacements ?? {});
   emit('wkq', meta.weeklyQuest);

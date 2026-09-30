@@ -4663,13 +4663,13 @@ export class Sim {
   get treasureMap(): Readonly<TreasureMapProgress> | null {
     return this.primary.treasureMap;
   }
+  get fireAndFlyRecruitment() {
+    return this.primary.fireAndFlyRecruitment;
+  }
   canRerollWorldQuest(questId: string, pid?: number): { canReroll: boolean; reason?: string } {
     const meta = pid !== undefined ? this.players.get(pid) : this.primary;
     if (!meta) return { canReroll: false, reason: 'Player not found.' };
-    const player = this.entities.get(meta.entityId);
-    const level = player?.level ?? 20;
-    const cycle = meta.devWorldQuestCycle ?? this.ctx.currentWorldQuestRotation().cycle;
-    return worldQuestMod.canRerollWorldQuest(meta, questId, cycle, level);
+    return worldQuestMod.canRerollWorldQuestNow(this.ctx, meta, questId);
   }
   rerollWorldQuest(questId: string, pid?: number): boolean {
     const meta = pid !== undefined ? this.players.get(pid) : this.primary;

@@ -15,7 +15,8 @@
 // trim to 1 waits for that aimer turning gold.
 
 import { DT, type TurretScenarioDef } from '../types';
-import { TURRET_BARREL_RING, TURRET_WAVES } from './turret_defense';
+import { TURRET_MISSIONS } from './fire_and_fly_missions';
+import { TURRET_BARREL_RING, TURRET_EXPLOSIVE_BARREL, TURRET_WAVES } from './turret_defense';
 
 const ticks = (seconds: number): number => Math.round(seconds / DT);
 
@@ -156,23 +157,51 @@ export const TURRET_SCENARIO_HARD: TurretScenarioDef = {
   ],
 };
 
-/** In the order an instructor offers them. */
+/** The trials, in the order an instructor offers them: winning each opens the next. */
 export const TURRET_SCENARIOS: readonly TurretScenarioDef[] = [
   TURRET_SCENARIO_INTRODUCTION,
   TURRET_SCENARIO_STANDARD,
   TURRET_SCENARIO_HARD,
 ];
 
+/** Every scenario a seat can run: the trials, then the missions (fire_and_fly_missions.ts). */
+export const FIRE_AND_FLY_SCENARIOS: readonly TurretScenarioDef[] = [
+  ...TURRET_SCENARIOS,
+  ...TURRET_MISSIONS,
+];
+
 export const TURRET_DEFAULT_SCENARIO = TURRET_SCENARIO_STANDARD;
 
+/** The most kegs any scenario lets stand at once: the render pools are sized to it. */
+export const FIRE_AND_FLY_MAX_KEG_CAP = Math.max(
+  ...FIRE_AND_FLY_SCENARIOS.flatMap((scenario) =>
+    scenario.waves.map(
+      (wave) => scenario.kegs?.cap ?? wave.barrels.cap ?? TURRET_EXPLOSIVE_BARREL.cap,
+    ),
+  ),
+);
+
 /**
- * Each trial's scoreboard version, by board key (fire_and_fly_scoreboards.ts). Any tuning
- * change of a trial (its waves, health, arrivals, integrity, medal bars or arsenal, or the
- * points in minigames/turret_result.ts, which move every trial) must raise its version, so
- * runs under the old and the new tuning never share a ladder. Version 2: the arsenal.
+ * Each scenario's scoreboard version, by board key (fire_and_fly_scoreboards.ts). Any
+ * tuning change of a trial or a mission (its waves, health, speed, arrivals, kegs,
+ * integrity, medal bars or arsenal, or the points in minigames/turret_result.ts, which
+ * move every one) must raise its version, so runs under the old and the new tuning never
+ * share a ladder. Trials' version 2: the arsenal.
  */
 export const FIRE_AND_FLY_SCORE_VERSIONS: Readonly<Record<string, number>> = {
   introduction: 2,
   standard: 2,
   hard: 2,
+  pack: 1,
+  giants: 1,
+  deluge: 1,
+  brittle: 1,
+  powder: 1,
 };
+
+/**
+ * The Gunner's Mastery board's version (fire_and_fly_scoreboards.ts). It sums the
+ * missions' current bests, so raise it whenever any mission's version above changes or a
+ * mission is added or removed; never lower it, or an old board id comes back.
+ */
+export const FIRE_AND_FLY_MASTERY_VERSION = 1;

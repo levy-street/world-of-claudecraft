@@ -51,9 +51,9 @@ import type {
 /** The seat as the wire carries it, the plan joined back in: the view minus its feedback ring. */
 export type TurretSeatState = Omit<TurretSessionView, 'feedback'>;
 
-// Bounds on a forged payload, far above the content (the largest wave spawns 16 monsters,
-// the barrel cap is 6, at most 2 shells fly at once). The plan's are the resolver's own
-// limits, so every plan the server resolves decodes.
+// Bounds on a forged payload, far above the content (a mission wave spawns a few dozen
+// monsters, a keg cap is at most the plan's barrel limit, at most 2 shells fly at once).
+// The plan's are the resolver's own limits, so every plan the server resolves decodes.
 const MAX_MONSTERS = 256;
 const MAX_SHOTS = 32;
 const MAX_BARRELS = 64;
@@ -448,7 +448,13 @@ const plan = shape<TurretPlan>({
       coreDamage: num,
       gapMinTicks: count,
       gapMaxTicks: count,
-      barrels: shape<TurretBarrelWaveDef>({ count, minRadius: num, maxRadius: num }),
+      barrels: shape<TurretBarrelWaveDef>({
+        count: within(0, LIMITS.barrels),
+        minRadius: num,
+        maxRadius: num,
+        placement: optional(lit('lanes')),
+        cap: optional(within(1, LIMITS.barrels)),
+      }),
       arrival,
     }),
   ),

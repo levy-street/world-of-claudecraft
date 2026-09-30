@@ -35,7 +35,10 @@ function atTheGate(): { sim: Sim; meta: PlayerMeta } {
   sim.player.prevPos = { ...sim.player.pos };
   sim.tick();
   sim.drainEvents();
-  return { sim, meta: sim.meta(sim.playerId)! };
+  const meta = sim.meta(sim.playerId)!;
+  // A recruited gunner: every trial is open (the locks are fire_and_fly_recruitment.test.ts's).
+  meta.fireAndFlyRecruitment = { trialsWon: 3, recruited: true };
+  return { sim, meta };
 }
 
 function seat(meta: PlayerMeta): TurretSession {

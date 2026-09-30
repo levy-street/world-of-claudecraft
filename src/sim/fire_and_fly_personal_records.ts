@@ -1,12 +1,15 @@
-// The offline host's Fire and Fly records: this character's best daily and lifetime
-// run per trial, saved in the world quest block, ranked like the server's ladders
-// (medal first, then points). Bounded to two rows per trial; unknown boards drop.
+// This character's Fire and Fly records: the best daily and lifetime run per trial and
+// the best lifetime run per mission, saved in the world quest block, ranked like the
+// server's ladders (medal first, then points). Bounded to two rows per trial and one
+// per mission; unknown boards drop. The offline host serves its ladders from them,
+// and every host sums the missions' rows into the Gunner's Mastery.
 
 import {
-  FIRE_AND_FLY_SCORE_PERIODS,
-  FIRE_AND_FLY_SCOREBOARD_TRIALS,
+  FIRE_AND_FLY_SCOREBOARD_MISSIONS,
+  FIRE_AND_FLY_SCOREBOARD_SCENARIOS,
   fireAndFlyScoreboardId,
   fireAndFlyScoreboardInfo,
+  fireAndFlyScorePeriods,
 } from './fire_and_fly_scoreboards';
 import { TURRET_BONUS_CAP, TURRET_POINTS } from './minigames/turret_result';
 import { paginateWorldQuestLeaderboard } from './world_quest_leaderboard_page';
@@ -63,9 +66,9 @@ function validRecord(value: unknown): value is PersonalFireAndFlyRecord {
 export function sanitizeFireAndFlyRecords(value: unknown): PersonalFireAndFlyRecords {
   const records: PersonalFireAndFlyRecords = {};
   if (!value || typeof value !== 'object') return records;
-  for (const trial of FIRE_AND_FLY_SCOREBOARD_TRIALS) {
-    for (const period of FIRE_AND_FLY_SCORE_PERIODS) {
-      const board = fireAndFlyScoreboardId(trial.scenarioId, period)!;
+  for (const entry of FIRE_AND_FLY_SCOREBOARD_SCENARIOS) {
+    for (const period of fireAndFlyScorePeriods(entry.kind)) {
+      const board = fireAndFlyScoreboardId(entry.scenarioId, period)!;
       const row = (value as Record<string, unknown>)[board];
       if (validRecord(row)) records[board] = { metric: row.metric, medal: row.medal, day: row.day };
     }
@@ -73,7 +76,7 @@ export function sanitizeFireAndFlyRecords(value: unknown): PersonalFireAndFlyRec
   return records;
 }
 
-/** Keeps the day's best (a newer day replaces it) and the all-time best of the trial. */
+/** Keeps a trial's day's best (a newer day replaces it) and every scenario's all-time best. */
 export function recordPersonalFireAndFlyScore(
   records: PersonalFireAndFlyRecords,
   scenarioId: string,
@@ -83,7 +86,7 @@ export function recordPersonalFireAndFlyScore(
 ): void {
   const row = { day, metric, medal };
   if (!validRecord(row)) return;
-  for (const period of FIRE_AND_FLY_SCORE_PERIODS) {
+  for (const period of ['daily', 'lifetime'] as const) {
     const board = fireAndFlyScoreboardId(scenarioId, period);
     if (!board) continue;
     const previous = records[board];
@@ -95,6 +98,29 @@ export function recordPersonalFireAndFlyScore(
       records[board] = { ...row };
     }
   }
+}
+
+/** The Gunner's Mastery of a character: their best mission rows summed. */
+export interface FireAndFlyMastery {
+  /** Best medal per mission, gold 3, silver 2, bronze 1, summed. */
+  stars: number;
+  /** The points of those best runs, summed: the tie-break. */
+  points: number;
+  /** Missions with a best run. */
+  missions: number;
+}
+
+export function fireAndFlyMastery(records: PersonalFireAndFlyRecords): FireAndFlyMastery {
+  const mastery = { stars: 0, points: 0, missions: 0 };
+  for (const mission of FIRE_AND_FLY_SCOREBOARD_MISSIONS) {
+    const board = fireAndFlyScoreboardId(mission.scenarioId, 'lifetime');
+    const best = board && Object.hasOwn(records, board) ? records[board] : undefined;
+    if (!best) continue;
+    mastery.stars += WORLD_QUEST_MEDAL_RANK[best.medal];
+    mastery.points += best.metric;
+    mastery.missions++;
+  }
+  return mastery;
 }
 
 export function personalFireAndFlyLeaderboard(

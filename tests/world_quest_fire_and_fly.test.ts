@@ -55,7 +55,7 @@ function standBesideAlder(sim: Sim): void {
   sim.player.facing = 0.75;
 }
 
-/** A level 20 warrior two yards from Master Gunner Alder, today's row minted. */
+/** A recruited level 20 warrior two yards from Master Gunner Alder, today's row minted. */
 function atTheGate(): Gate {
   const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', devCommands: true });
   sim.resetDay = '2026-09-06';
@@ -63,7 +63,10 @@ function atTheGate(): Gate {
   standBesideAlder(sim);
   sim.tick();
   sim.drainEvents();
-  return { sim, meta: sim.meta(sim.playerId)!, player: sim.player };
+  const meta = sim.meta(sim.playerId)!;
+  // A recruited gunner: every trial is open (the locks are fire_and_fly_recruitment.test.ts's).
+  meta.fireAndFlyRecruitment = { trialsWon: 3, recruited: true };
+  return { sim, meta, player: sim.player };
 }
 
 function turretSeat(meta: PlayerMeta): TurretSession {

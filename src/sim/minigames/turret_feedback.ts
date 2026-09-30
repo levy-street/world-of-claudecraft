@@ -6,12 +6,13 @@
 import { deepFreeze } from '../deep_freeze';
 import type { TurretEvent } from './turret_defense';
 
-// Sized for the worst single tick: the two shells a reload lets land together (or their frag
-// bursts), a bomblet of every frag shell a run holds, the Shockwave's front and every standing
-// barrel blowing through the widest wave, each blast pushing its own event first, then a launch
-// and a kill per body, a barrel lit by each, plus knocks; a smaller ring drops a blast before any
-// reader sees it, and with it the blast's damage numbers, sound and visual.
-export const TURRET_FEEDBACK_LIMIT = 512;
+// Sized for the worst single tick of any scenario: the two shells a reload lets land together
+// (or their frag bursts), a bomblet of every frag shell a run holds, the Shockwave's front and
+// every barrel the keg cap lets stand blowing through the widest wave, each blast pushing its own
+// event first, then a launch and a kill per body, a barrel lit by each, plus knocks (the
+// derivation per plan is pinned in tests/turret_feedback.test.ts); a smaller ring drops a blast
+// before any reader sees it, and with it the blast's damage numbers, sound and visual.
+export const TURRET_FEEDBACK_LIMIT = 672;
 
 export interface TurretFeedback {
   /** 1 for a seat's first event, then +1 per event; restarts with every new seat. */

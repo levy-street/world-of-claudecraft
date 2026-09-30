@@ -1,11 +1,13 @@
 // Fire and Fly as a world quest: Master Gunner Alder at the Evergarden gate,
 // spawned lazily like the glider's instructor, and the one start both entries
-// share (the plain talk at the default scenario, the dialog's pick through
-// startWorldQuestActivity). The seat, its arena and its run live in
+// share (the plain talk at the recruitment's next trial, the dialog's pick through
+// startWorldQuestActivity), refusing a trial or a mission the character has not
+// unlocked (fire_and_fly_recruitment.ts). The seat, its arena and its run live in
 // turret_defense_session.ts; a won run is credited by completeWorldQuestTurret
-// in world_quests.ts, from the run this start captured on the seat.
+// in world_quests.ts, from the run this start captured on the seat, and counts
+// toward the recruitment here.
 
-import { TURRET_SCENARIOS } from './content/fire_and_fly_scenarios';
+import { FIRE_AND_FLY_SCENARIOS, TURRET_DEFAULT_SCENARIO } from './content/fire_and_fly_scenarios';
 import {
   FIRE_AND_FLY_NPC_DEF,
   FIRE_AND_FLY_NPC_ID,
@@ -13,6 +15,11 @@ import {
   WORLD_QUEST_FIRE_AND_FLY,
 } from './content/world_quest_fire_and_fly';
 import { createNpc } from './entity';
+import {
+  fireAndFlyNextTrialId,
+  fireAndFlyScenarioUnlocked,
+  recordFireAndFlyRecruitmentWin,
+} from './fire_and_fly_recruitment';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { seatTurret, type TurretSeatRefusal } from './turret_defense_session';
@@ -20,6 +27,7 @@ import {
   type Entity,
   INTERACT_RANGE,
   type TurretScenarioDef,
+  type TurretSession,
   type TurretWorldQuestRun,
 } from './types';
 import { playerActiveWorldQuests } from './world_quest_reroll';
@@ -34,7 +42,9 @@ export type FireAndFlyStartRefusal =
   | 'level'
   | 'range'
   /** Neither today's row to play for nor a completed one to practice. */
-  | 'offer';
+  | 'offer'
+  /** A trial the recruitment has not reached, or a mission before the recruitment. */
+  | 'locked';
 
 const POST_TOLERANCE = 0.1;
 const TALK_HEIGHT = 3;
@@ -47,7 +57,23 @@ export function ensureFireAndFlyInstructor(ctx: SimContext): void {
 }
 
 export function fireAndFlyScenarioById(id: string): Readonly<TurretScenarioDef> | null {
-  return TURRET_SCENARIOS.find((scenario) => scenario.id === id) ?? null;
+  return FIRE_AND_FLY_SCENARIOS.find((scenario) => scenario.id === id) ?? null;
+}
+
+/** What the plain talk seats: the recruitment's next trial, the default one once recruited. */
+export function fireAndFlyTalkScenarioId(meta: Pick<PlayerMeta, 'fireAndFlyRecruitment'>): string {
+  return fireAndFlyNextTrialId(meta.fireAndFlyRecruitment) ?? TURRET_DEFAULT_SCENARIO.id;
+}
+
+/**
+ * A won seat Master Gunner Alder gave (a dev seat has no run) moves the recruitment
+ * on; the owner's mirror re-reads it. Idempotent, like the row's credit.
+ */
+export function creditFireAndFlyRecruitment(meta: PlayerMeta, session: TurretSession): void {
+  const run = session.worldQuest;
+  if (!run || run.questId !== FIRE_AND_FLY_QUEST_ID || session.defense.phase !== 'won') return;
+  const scenarioId = session.defense.plan.scenarioId;
+  if (recordFireAndFlyRecruitmentWin(meta.fireAndFlyRecruitment, scenarioId)) meta.wireRev++;
 }
 
 function atPost(npc: Entity | undefined): npc is Entity {
@@ -101,6 +127,7 @@ function seatForTrial(
     Math.abs(player.pos.y - npc.pos.y) > TALK_HEIGHT
   )
     return 'range';
+  if (!fireAndFlyScenarioUnlocked(meta.fireAndFlyRecruitment, scenario.id)) return 'locked';
   mintRow?.();
   const run = trialRun(meta);
   if (!run) return 'offer';
@@ -161,6 +188,9 @@ function sayRefusal(ctx: SimContext, pid: number, refusal: FireAndFlyStartRefusa
       return;
     case 'full':
       ctx.error(pid, 'Every Fire and Fly tower is manned. Try again in a moment.');
+      return;
+    case 'locked':
+      ctx.error(pid, 'Master Gunner Alder has not cleared you for that yet.');
       return;
     case 'seated':
     case 'match':

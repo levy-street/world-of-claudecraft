@@ -6944,6 +6944,16 @@ export type SimEvent = { pid?: number } & (
       metric: number;
       resetDay?: string;
     }
+  /** A character's Gunner's Mastery moved (src/sim/fire_and_fly_score.ts): the sum of
+   *  their best mission medals and of those runs' points, the whole row of the one
+   *  Mastery board, never a single run. */
+  | {
+      type: 'worldQuestMastery';
+      board: string;
+      stars: number;
+      points: number;
+      missions: number;
+    }
   | {
       type: 'worldQuestProgress';
       questId: string;
@@ -10261,12 +10271,28 @@ export interface TurretWaveEntry {
   bossLast?: boolean;
   /** Multiplies the template's health (absent: 1). */
   hpScale?: number;
+  /** Multiplies the template's march speed (absent: 1). */
+  speedScale?: number;
 }
 /** The explosive barrels a wave's start adds on a ring around the turret (count 0: none). */
 export interface TurretBarrelWaveDef {
   count: number;
   minRadius: number;
   maxRadius: number;
+  /**
+   * 'lanes': inside the sides the wave's monsters arrive through, so they march past
+   * them; absent, spread evenly around the whole circle.
+   */
+  placement?: 'lanes';
+  /** Barrels standing at once, this wave's included (absent: TURRET_EXPLOSIVE_BARREL.cap). */
+  cap?: number;
+}
+/** A scenario's kegs, applied to every wave's barrels when the plan is resolved. */
+export interface TurretKegsDef {
+  placement?: 'lanes';
+  /** Multiplies each wave's count, rounded (absent: 1). */
+  countScale?: number;
+  cap?: number;
 }
 /**
  * Where a wave's monsters come from around the spawn ring. Widths are shares of a
@@ -10320,6 +10346,8 @@ export interface TurretScenarioDef {
   integrity: number;
   medals: TurretMedalBars;
   arsenal?: TurretArsenalDef;
+  /** Absent: every wave's barrels as authored, placed evenly around the circle. */
+  kegs?: TurretKegsDef;
 }
 
 export interface VehicleStationDef {

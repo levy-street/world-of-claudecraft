@@ -1,5 +1,6 @@
 // The Fire and Fly trial table (server/fire_and_fly_scores_db.ts): the boot DDL, the
-// one-statement upsert onto both periods with its guard, and the ranked read. The SQL
+// one-statement upsert onto both of a trial's periods (a mission's lifetime row alone)
+// with its guard, and the ranked read. The SQL
 // is pinned by literal against a recording queryable; the Postgres half runs only
 // with TEST_DATABASE_URL, inside a scratch schema rolled back at the end.
 import { Pool, type QueryResult } from 'pg';
@@ -94,6 +95,25 @@ describe('upsertFireAndFlyScore', () => {
     const bronze = recorder(0);
     expect(await upsertFireAndFlyScore(bronze, row({ medal: 'bronze' }))).toBe(false);
     expect(bronze.calls[0].values?.[7]).toBe(1);
+  });
+
+  it("writes a mission's one lifetime row, the same better-run rule", async () => {
+    const db = recorder();
+    const board = 'fire_and_fly_pack_v1_lifetime';
+    expect(await upsertFireAndFlyScore(db, row({ board }))).toBe(true);
+    expect(flat(db.calls[0].text)).toBe(
+      flat(`INSERT INTO fire_and_fly_trial_bests
+      (realm, board, character_id, account_id, reset_day, medal, medal_rank, points)
+     VALUES ($1,$2,$3,$4,'',$5,$6,$7)
+     ON CONFLICT (realm, board, character_id) DO UPDATE SET
+       reset_day = EXCLUDED.reset_day, medal = EXCLUDED.medal,
+       medal_rank = EXCLUDED.medal_rank, points = EXCLUDED.points, updated_at = now()
+     WHERE EXCLUDED.reset_day > fire_and_fly_trial_bests.reset_day
+        OR (EXCLUDED.reset_day = fire_and_fly_trial_bests.reset_day
+            AND (EXCLUDED.medal_rank, EXCLUDED.points)
+              > (fire_and_fly_trial_bests.medal_rank, fire_and_fly_trial_bests.points))`),
+    );
+    expect(db.calls[0].values).toEqual(['test', board, 1, 2, 'gold', 3, 19_400]);
   });
 
   it.each([

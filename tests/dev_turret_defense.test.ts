@@ -114,7 +114,7 @@ describe('/dev turret', () => {
     const { sim, player, meta } = rig();
     const before = { ...player.pos };
     expect(chat(sim, '/dev turret nightmare')).toEqual([
-      '[dev] Unknown turret scenario "nightmare"; try one of: introduction, standard, hard.',
+      '[dev] Unknown turret scenario "nightmare"; try one of: introduction, standard, hard, pack, giants, deluge, brittle, powder.',
     ]);
     expect(meta.vehicle ?? null).toBeNull();
     expect(player.pos).toEqual(before);
@@ -124,7 +124,7 @@ describe('/dev turret', () => {
     const { sim, meta } = rig();
     expect(handleDevTurretChat(sim.ctx, '/dev turret hard2', sim.playerId)).toBe(true);
     expect(devLogs(sim.drainEvents())).toEqual([
-      '[dev] Unknown turret scenario "hard2"; try one of: introduction, standard, hard.',
+      '[dev] Unknown turret scenario "hard2"; try one of: introduction, standard, hard, pack, giants, deluge, brittle, powder.',
     ]);
     expect(meta.vehicle ?? null).toBeNull();
   });

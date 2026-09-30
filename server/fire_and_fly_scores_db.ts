@@ -13,11 +13,11 @@ import type {
 
 // Additive boot schema; a rollback leaves the table unused and intact. Keep forever:
 // at most two rows per character and versioned trial (the daily row is replaced by a
-// newer day, never one row per run or per day), so the table is bounded by characters
-// times trials times score versions ever minted. A retired version's rows are read by
-// nothing; pruning them is an operator one-off delete, never boot DDL. Character and
-// account deletion cascade their rows away. Ranked by medal, then points: a separate
-// table because the glider's ranks lowest time first.
+// newer day, never one row per run or per day) and one per versioned mission, so the
+// table is bounded by characters times scenarios times score versions ever minted. A
+// retired version's rows are read by nothing; pruning them is an operator one-off delete,
+// never boot DDL. Character and account deletion cascade their rows away. Ranked by
+// medal, then points: a separate table because the glider's ranks lowest time first.
 export const FIRE_AND_FLY_SCORES_SCHEMA = `
 CREATE TABLE IF NOT EXISTS fire_and_fly_trial_bests (
   realm TEXT NOT NULL,
@@ -41,7 +41,18 @@ CREATE INDEX IF NOT EXISTS fire_and_fly_trial_bests_account
   ON fire_and_fly_trial_bests (account_id);
 `;
 
-/** One run onto both of its trial's rows; a late queued day never replaces a newer one. */
+const UPSERT_BETTER = `ON CONFLICT (realm, board, character_id) DO UPDATE SET
+       reset_day = EXCLUDED.reset_day, medal = EXCLUDED.medal,
+       medal_rank = EXCLUDED.medal_rank, points = EXCLUDED.points, updated_at = now()
+     WHERE EXCLUDED.reset_day > fire_and_fly_trial_bests.reset_day
+        OR (EXCLUDED.reset_day = fire_and_fly_trial_bests.reset_day
+            AND (EXCLUDED.medal_rank, EXCLUDED.points)
+              > (fire_and_fly_trial_bests.medal_rank, fire_and_fly_trial_bests.points))`;
+
+/**
+ * One run onto both of its trial's rows, or a mission's one lifetime row; a late
+ * queued day never replaces a newer one.
+ */
 export async function upsertFireAndFlyScore(
   db: WorldQuestScoreQueryable,
   row: WorldQuestScoreWrite & { resetDay: string },
@@ -49,37 +60,38 @@ export async function upsertFireAndFlyScore(
   const info = fireAndFlyScoreboardInfo(row.board);
   const daily = info && fireAndFlyScoreboardId(info.scenarioId, 'daily');
   if (
-    !info ||
-    !daily ||
-    info.period !== 'lifetime' ||
+    info?.period !== 'lifetime' ||
     !/^\d{4}-\d{2}-\d{2}$/.test(row.resetDay) ||
     !row.medal ||
     !fireAndFlyScoreValid(row.medal, row.metric)
   )
     return false;
-  const res = await db.query(
-    `INSERT INTO fire_and_fly_trial_bests
+  const rank = WORLD_QUEST_MEDAL_RANK[row.medal];
+  const res = daily
+    ? await db.query(
+        `INSERT INTO fire_and_fly_trial_bests
       (realm, board, character_id, account_id, reset_day, medal, medal_rank, points)
      VALUES ($1,$2,$4,$5,$6,$7,$8,$9), ($1,$3,$4,$5,'',$7,$8,$9)
-     ON CONFLICT (realm, board, character_id) DO UPDATE SET
-       reset_day = EXCLUDED.reset_day, medal = EXCLUDED.medal,
-       medal_rank = EXCLUDED.medal_rank, points = EXCLUDED.points, updated_at = now()
-     WHERE EXCLUDED.reset_day > fire_and_fly_trial_bests.reset_day
-        OR (EXCLUDED.reset_day = fire_and_fly_trial_bests.reset_day
-            AND (EXCLUDED.medal_rank, EXCLUDED.points)
-              > (fire_and_fly_trial_bests.medal_rank, fire_and_fly_trial_bests.points))`,
-    [
-      row.realm,
-      daily,
-      row.board,
-      row.characterId,
-      row.accountId,
-      row.resetDay,
-      row.medal,
-      WORLD_QUEST_MEDAL_RANK[row.medal],
-      row.metric,
-    ],
-  );
+     ${UPSERT_BETTER}`,
+        [
+          row.realm,
+          daily,
+          row.board,
+          row.characterId,
+          row.accountId,
+          row.resetDay,
+          row.medal,
+          rank,
+          row.metric,
+        ],
+      )
+    : await db.query(
+        `INSERT INTO fire_and_fly_trial_bests
+      (realm, board, character_id, account_id, reset_day, medal, medal_rank, points)
+     VALUES ($1,$2,$3,$4,'',$5,$6,$7)
+     ${UPSERT_BETTER}`,
+        [row.realm, row.board, row.characterId, row.accountId, row.medal, rank, row.metric],
+      );
   return (res.rowCount ?? 0) > 0;
 }
 

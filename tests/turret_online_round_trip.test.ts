@@ -1,15 +1,24 @@
 import { describe, expect, it, vi } from 'vitest';
+import { dispatchWorldQuestWire, isWorldQuestWireCommand } from '../server/quest_command_wire';
+import { emitQuestSelfKeys } from '../server/quest_snapshot_wire';
 import { emitTurretSelfKeys, turretWireNumber } from '../server/turret_self_wire';
 import { dispatchVehicleCommand } from '../server/vehicle_command_wire';
 import { type QuestWorldCommand, QuestWorldWireState } from '../src/net/quest_world_wire_state';
+import { TURRET_MISSIONS } from '../src/sim/content/fire_and_fly_missions';
 import {
   TURRET_DEFAULT_SCENARIO,
   TURRET_SCENARIOS,
 } from '../src/sim/content/fire_and_fly_scenarios';
 import { TURRET_SHOCKWAVE, TURRET_TIMING } from '../src/sim/content/turret_defense';
+import {
+  FIRE_AND_FLY_NPC_DEF,
+  FIRE_AND_FLY_QUEST_ID,
+  WORLD_QUEST_FIRE_AND_FLY,
+} from '../src/sim/content/world_quest_fire_and_fly';
 import { BUILTIN_WORLD, dungeonAt } from '../src/sim/data';
+import { fireAndFlyScoreboardId } from '../src/sim/fire_and_fly_scoreboards';
 import { type MotionSegment, positionAt } from '../src/sim/minigames/thrown_body';
-import { turretChargesLeft } from '../src/sim/minigames/turret_defense_plan';
+import { resolveTurretPlan, turretChargesLeft } from '../src/sim/minigames/turret_defense_plan';
 import { turretResult } from '../src/sim/minigames/turret_result';
 import { Sim } from '../src/sim/sim';
 import type { TurretDefenseView, TurretSessionView } from '../src/sim/turret_defense_session';
@@ -25,6 +34,16 @@ const TUR_BYTES_PER_SECOND_CEILING = 15_000;
 // 7.1 KB/s, the Veterans' Test about 27.5 KB/s with its 99 monsters); all stay under the fleet's
 // mean egress per account (BANDWIDTH_OPINION.md), so no trim is owed, only no silent growth.
 const TUR_BYTES_PER_SECOND_BY_TRIAL: Record<string, number> = { introduction: 8_000, hard: 30_500 };
+// The same guard per mission, about 10 percent over its measured won run (The Pack about
+// 27.6 KB/s and The Deluge about 26.0 with their hundred-odd monsters, as high as the
+// Veterans' Test; Heavy Tread 8.8, The Cracked Tower 13.4, The Powder Store 15.2).
+const TUR_BYTES_PER_SECOND_BY_MISSION: Record<string, number> = {
+  pack: 30_500,
+  giants: 9_700,
+  deluge: 28_700,
+  brittle: 14_800,
+  powder: 16_700,
+};
 const DRIFT_BOUND_YD = 0.005;
 const FORGED_PID = 987_654;
 const ground = { ground: (x: number, z: number) => groundHeight(x, z, WORLD_SEED) };
@@ -42,7 +61,9 @@ class WireClient extends QuestWorldWireState {
 
   protected override sendQuestWorldCommand(command: QuestWorldCommand): void {
     const forged = { ...command, pid: FORGED_PID, damage: 1e6, readyTick: 0 };
-    dispatchVehicleCommand(this.sim, this.pid, JSON.parse(JSON.stringify(forged)));
+    const wire = JSON.parse(JSON.stringify(forged));
+    if (isWorldQuestWireCommand(wire.cmd)) dispatchWorldQuestWire(this.sim, wire, this.pid);
+    else dispatchVehicleCommand(this.sim, this.pid, wire);
   }
 
   route(event: SimEvent): void {
@@ -318,6 +339,124 @@ describe('Fire and Fly online: the socket-free round trip', () => {
     expect(seat.defense.plan.scenarioId).toBe(scenario.id);
     expect(seat.defense.plan.integrity).toBe(scenario.integrity);
     expect(seat.waveCount).toBe(scenario.waves.length);
+  });
+
+  it.each(TURRET_MISSIONS.map((s) => [s.boardKey, s] as const))(
+    'mirrors every tick of a won %s mission, its plan carried to the client',
+    (key, mission) => {
+      const { client, turBytesPerSecond } = playOnline(`/dev turret ${key}`);
+      expect(turBytesPerSecond).toBeLessThan(TUR_BYTES_PER_SECOND_BY_MISSION[key]);
+      const seat = client.turretSession!;
+      expect(seat.defense.phase).toBe('won');
+      expect(seat.defense.plan.scenarioId).toBe(mission.id);
+      expect(seat.defense.plan.waves.map((w) => w.barrels)).toEqual(
+        resolveTurretPlan(mission).waves.map((w) => w.barrels),
+      );
+    },
+  );
+
+  it("carries the instructor's locks, the recruitment and a mission's score through the wire", () => {
+    const sim = new Sim({
+      seed: WORLD_SEED,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: { ...EMPTY_WORLD, npcs: { [FIRE_AND_FLY_NPC_DEF.id]: FIRE_AND_FLY_NPC_DEF } },
+    });
+    sim.resetDay = '2026-09-06';
+    const pid = sim.addPlayer('warrior', 'Gunner', { characterId: 7 });
+    sim.setPlayerLevel(WORLD_QUEST_FIRE_AND_FLY.minLevel, pid);
+    const player = sim.entities.get(pid)!;
+    player.pos = sim.groundPos(FIRE_AND_FLY_NPC_DEF.pos.x - 2, FIRE_AND_FLY_NPC_DEF.pos.z);
+    player.prevPos = { ...player.pos };
+    sim.tick();
+    sim.drainEvents();
+    const meta = sim.meta(pid)!;
+    meta.fireAndFlyRecruitment = { trialsWon: TURRET_SCENARIOS.length - 2, recruited: false };
+    const client = new WireClient(sim, pid);
+    const sent: Record<string, string> = {};
+    let sentRev = -1;
+    // The server re-diffs the heavy self keys only on a wireRev move (server/game.ts).
+    const questPass = () => {
+      if (meta.wireRev === sentRev) return;
+      sentRev = meta.wireRev;
+      const self: Record<string, unknown> = {};
+      emitQuestSelfKeys(
+        (key, value) => {
+          const serialized = JSON.stringify(value);
+          if (sent[key] === serialized) return;
+          sent[key] = serialized;
+          self[key] = JSON.parse(serialized);
+        },
+        sim,
+        meta,
+      );
+      client.applyQuestSelfSnapshot(self, sim.time, sim.tickCount);
+    };
+    const pick = (courseId: string) => {
+      client.startWorldQuestActivity(FIRE_AND_FLY_QUEST_ID, { courseId });
+      const events = sim.drainEvents().filter((e) => e.pid === pid);
+      client.applyQuestSelfSnapshot(wirePass({}, sim, pid), sim.time, sim.tickCount);
+      questPass();
+      return events;
+    };
+    const win = () => {
+      const defense = (meta.vehicle as TurretSession).defense;
+      defense.phase = 'won';
+      defense.result = turretResult(defense.plan, {
+        phase: 'won',
+        integrity: defense.plan.integrity,
+        stats: { kills: 20, barrelKills: 0, bowled: 0 },
+      });
+      const events = [...sim.tick(), ...sim.tick()].filter((e) => e.pid === pid);
+      questPass();
+      sim.leaveVehicle(pid);
+      sim.drainEvents();
+      return events;
+    };
+    questPass();
+    expect(client.fireAndFlyRecruitment).toEqual({
+      trialsWon: TURRET_SCENARIOS.length - 2,
+      recruited: false,
+    });
+
+    const mission = TURRET_MISSIONS[0];
+    const refused = pick(mission.id);
+    expect(meta.vehicle ?? null).toBeNull();
+    expect(refused).toContainEqual(
+      expect.objectContaining({
+        type: 'error',
+        text: 'Master Gunner Alder has not cleared you for that yet.',
+      }),
+    );
+
+    pick(TURRET_SCENARIOS[TURRET_SCENARIOS.length - 2].id);
+    win();
+    expect(client.fireAndFlyRecruitment.trialsWon).toBe(TURRET_SCENARIOS.length - 1);
+
+    // A practice win moves nothing on the row, so only the recruitment moves wireRev.
+    const last = TURRET_SCENARIOS[TURRET_SCENARIOS.length - 1];
+    pick(last.id);
+    expect(client.turretSession?.defense.plan.scenarioId).toBe(last.id);
+    expect((meta.vehicle as TurretSession).worldQuest?.practice).toBe(true);
+    win();
+    expect(client.fireAndFlyRecruitment).toEqual({
+      trialsWon: TURRET_SCENARIOS.length,
+      recruited: true,
+    });
+
+    pick(mission.id);
+    expect(client.turretSession?.defense.plan).toEqual(resolveTurretPlan(mission));
+    const scored = win();
+    expect(scored).toContainEqual(
+      expect.objectContaining({
+        type: 'worldQuestScore',
+        board: fireAndFlyScoreboardId(mission.id, 'lifetime'),
+        medal: 'gold',
+      }),
+    );
+    expect(scored).toContainEqual(
+      expect.objectContaining({ type: 'worldQuestMastery', stars: 3, missions: 1 }),
+    );
   });
 
   it('mirrors every tick of a lost run, its result reaching the client on the last revision', () => {

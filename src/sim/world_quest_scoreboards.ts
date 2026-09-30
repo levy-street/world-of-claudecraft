@@ -10,10 +10,10 @@
 
 import { FIRE_AND_FLY_QUEST_ID } from './content/world_quest_fire_and_fly';
 import {
-  FIRE_AND_FLY_SCORE_PERIODS,
   FIRE_AND_FLY_SCOREBOARD_TRIALS,
   fireAndFlyScoreboardId,
   fireAndFlyScoreboardInfo,
+  fireAndFlyScorePeriods,
 } from './fire_and_fly_scoreboards';
 import {
   GLIDER_SCOREBOARD_COURSES,
@@ -57,8 +57,10 @@ export const WORLD_QUEST_SCOREBOARDS: readonly WorldQuestScoreboard[] = [
       }),
     ),
   ),
-  ...FIRE_AND_FLY_SCOREBOARD_TRIALS.flatMap(({ scenarioId }) =>
-    FIRE_AND_FLY_SCORE_PERIODS.map(
+  // The missions' boards stay out until the rankings window can title them: their
+  // scores are kept by every host's records meanwhile (fire_and_fly_score.ts).
+  ...FIRE_AND_FLY_SCOREBOARD_TRIALS.flatMap(({ scenarioId, kind }) =>
+    fireAndFlyScorePeriods(kind).map(
       (period): WorldQuestScoreboard => ({
         id: fireAndFlyScoreboardId(scenarioId, period)!,
         questId: FIRE_AND_FLY_QUEST_ID,

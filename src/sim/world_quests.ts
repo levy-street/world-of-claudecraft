@@ -1,6 +1,5 @@
 import { bagPools, bagsFullError, canAddItem } from './bags';
 import { maybeAwardClueScroll, updateClueHunt } from './clue_scrolls';
-import { TURRET_DEFAULT_SCENARIO } from './content/fire_and_fly_scenarios';
 import { WORLD_QUEST_CALLIGRAPHY_ID } from './content/world_quest_calligraphy';
 import { FIRE_AND_FLY_QUEST_ID } from './content/world_quest_fire_and_fly';
 import { FORGE_QUEST_ID } from './content/world_quest_forging';
@@ -70,7 +69,12 @@ import {
   takeWorldQuestDeliveryCargo,
   worldQuestDeliverySourceId,
 } from './world_quest_delivery';
-import { ensureFireAndFlyInstructor, startFireAndFly } from './world_quest_fire_and_fly';
+import {
+  creditFireAndFlyRecruitment,
+  ensureFireAndFlyInstructor,
+  fireAndFlyTalkScenarioId,
+  startFireAndFly,
+} from './world_quest_fire_and_fly';
 import {
   clearForgeWorkshop,
   ensureForgeWorkshop,
@@ -159,6 +163,7 @@ import {
 
 export {
   canRerollWorldQuest,
+  canRerollWorldQuestNow,
   playerActiveWorldQuests,
   rerollWorldQuest,
   sanitizeWorldQuestReplacements,
@@ -536,7 +541,7 @@ export function talkToWorldQuestInstructor(
   if (!quest) return false;
   if (quest.objective.type === 'turret') {
     // The seat puts a rider's mount away itself and gives it back on leaving.
-    startFireAndFly(ctx, meta, player, TURRET_DEFAULT_SCENARIO.id);
+    startFireAndFly(ctx, meta, player, fireAndFlyTalkScenarioId(meta));
     return true;
   }
   if (!dismountForWorldQuestInstructor(ctx, player, meta)) return true;
@@ -811,6 +816,7 @@ export function completeWorldQuestTurret(
   const run = session.worldQuest;
   if (!run || session.defense.phase !== 'won') return;
   resetCycleIfNeeded(ctx, meta);
+  creditFireAndFlyRecruitment(meta, session);
   reportFireAndFlyScore(ctx, meta, session);
   if (run.practice) return;
   const quest = worldQuestById(run.questId);

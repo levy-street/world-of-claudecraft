@@ -5733,6 +5733,7 @@ const ALL_DELTA_KEYS = [
   'equip',
   'fac',
   'facCur',
+  'ffr',
   'fplot',
   'ggoal',
   'gprof',
@@ -5873,6 +5874,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   equip: 'equipment',
   fac: 'factions',
   facCur: 'factionCurrencies',
+  ffr: 'fireAndFlyRecruitment',
   fplot: 'myFarmPlots',
   ggoal: 'gatheringGoal',
   gprof: 'gatheringProficiency',
@@ -6059,6 +6061,7 @@ function dirtyEveryDeltaField(): {
   meta.clueHunt = { huntId: CLUE_HUNTS[0].id, step: 1 };
   meta.factionCurrencies = { rift_watch: 17, church_order: 29, automatons: 41 };
   meta.treasureMap = { rarity: 'epic', siteId: TREASURE_SITES[0].id, seed: 78123 };
+  meta.fireAndFlyRecruitment = { trialsWon: 2, recruited: false };
   server.sim.worldQuestExpiresAtMs = FAR_FUTURE_MS;
   meta.worldQuestLog.set('wq_eastbrook_bandits', {
     questId: 'wq_eastbrook_bandits',
@@ -6532,6 +6535,7 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.factionCurrencies).toEqual({ rift_watch: 17, church_order: 29, automatons: 41 });
     expect(client.treasureMap).toEqual({ rarity: 'epic', siteId: TREASURE_SITES[0].id });
     expect(lastSnap(fc.sent).self.tmap).not.toHaveProperty('seed');
+    expect(client.fireAndFlyRecruitment).toEqual({ trialsWon: 2, recruited: false });
 
     // --- fields that decode onto the player ENTITY (client.player), not the client ---
     expect(client.player.cooldowns.get('heroic_strike')).toBe(5); // cds -> e.cooldowns
@@ -7303,9 +7307,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // shared crit core scb (server/self_scalar_wire.ts), at the third
     // release/v0.44.0 base merge, for 111.
     // The Fire and Fly seat's state and plan keys tur and turp
-    // (server/turret_self_wire.ts), for 115.
-    expect(ALL_DELTA_KEYS).toHaveLength(115);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(115);
+    // (server/turret_self_wire.ts), for 115, and its recruitment key ffr, for 116.
+    expect(ALL_DELTA_KEYS).toHaveLength(116);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(116);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7475,8 +7479,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The Weekly Vault's weeklyRewards self key (PR 4052) makes 107.
     // The World PvP readout wpvp and the King of the Hill readout hill make 109.
     // The release batch's pending Town Focus and Spell Crit core keys make 111.
-    // The Fire and Fly seat's tur and turp (server/turret_self_wire.ts) make 115.
-    expect(scraped.size).toBe(115);
+    // The Fire and Fly seat's tur and turp (server/turret_self_wire.ts) make 115, and
+    // its recruitment ffr (server/quest_snapshot_wire.ts) 116.
+    expect(scraped.size).toBe(116);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

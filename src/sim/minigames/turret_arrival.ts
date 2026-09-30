@@ -43,6 +43,32 @@ export function turretArrivalSector(
   }
 }
 
+/**
+ * Every side the wave's monsters arrive through, in spawn order: the arc, each flank,
+ * each burst pack's side. Null for the whole ring.
+ */
+export function turretWaveLanes(
+  run: TurretDrawSource,
+  wave: number,
+  plan: Pick<TurretWavePlan, 'arrival' | 'spawns'>,
+): TurretBearingSector[] | null {
+  const arrival = plan.arrival;
+  const lanes =
+    arrival.kind === 'flanks'
+      ? arrival.count
+      : arrival.kind === 'burst'
+        ? Math.max(1, Math.ceil(plan.spawns.length / arrival.groupSize))
+        : 1;
+  const step = arrival.kind === 'burst' ? arrival.groupSize : 1;
+  const sectors: TurretBearingSector[] = [];
+  for (let lane = 0; lane < lanes; lane++) {
+    const sector = turretArrivalSector(run, wave, arrival, lane * step);
+    if (!sector) return null;
+    sectors.push(sector);
+  }
+  return sectors;
+}
+
 /** Ticks from the wave's `index`-th spawn (monster `id`) to its next one. */
 export function turretArrivalGap(
   run: TurretDrawSource,

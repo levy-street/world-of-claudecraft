@@ -20,6 +20,7 @@ import type {
   TurretArrivalDef,
   TurretBarrelWaveDef,
   TurretBowlingDef,
+  TurretKegsDef,
   TurretMedalBars,
   TurretScenarioDef,
   TurretSizeClass,
@@ -115,6 +116,7 @@ export const TURRET_PLAN_LIMITS = {
   integrity: 100_000,
   charges: 99,
   groupGapTicks: 20 * 60,
+  barrels: 24,
 } as const;
 
 /** Lowercase letters, digits and underscores, at most the id length. */
@@ -167,6 +169,31 @@ function resolveArrival(
   return { ...arrival };
 }
 
+function resolveBarrels(
+  barrels: Readonly<TurretBarrelWaveDef>,
+  kegs: Readonly<TurretKegsDef> | undefined,
+  scenarioId: string,
+): TurretBarrelWaveDef {
+  const scale = kegs?.countScale ?? 1;
+  if (!Number.isFinite(scale) || scale <= 0)
+    throw new Error(`turret plan: bad keg count scale in ${scenarioId}`);
+  const count = Math.round(barrels.count * scale);
+  if (!intWithin(count, 0, TURRET_PLAN_LIMITS.barrels))
+    throw new Error(`turret plan: too many kegs in a wave of ${scenarioId}`);
+  const cap = kegs?.cap ?? barrels.cap;
+  if (cap !== undefined && !intWithin(cap, 1, TURRET_PLAN_LIMITS.barrels))
+    throw new Error(`turret plan: bad keg cap in ${scenarioId}`);
+  const placement = kegs?.placement ?? barrels.placement;
+  if (placement !== undefined && placement !== 'lanes')
+    throw new Error(`turret plan: bad keg placement in ${scenarioId}`);
+  return {
+    ...barrels,
+    count,
+    ...(placement ? { placement } : {}),
+    ...(cap !== undefined ? { cap } : {}),
+  };
+}
+
 export function resolveTurretPlan(
   scenario: Readonly<TurretScenarioDef> = TURRET_DEFAULT_SCENARIO,
   mobs: Readonly<Record<string, MobTemplate>> = MOBS,
@@ -195,7 +222,11 @@ export function resolveTurretPlan(
     const scale = entry.hpScale ?? 1;
     if (!Number.isFinite(scale) || scale <= 0)
       throw new Error(`turret plan: bad health scale for ${entry.templateId}`);
-    const key = `${entry.templateId}@${entry.level}${scale === 1 ? '' : `x${scale}`}`;
+    const speed = entry.speedScale ?? 1;
+    if (!Number.isFinite(speed) || speed <= 0)
+      throw new Error(`turret plan: bad speed scale for ${entry.templateId}`);
+    const scaled = `${scale === 1 ? '' : `x${scale}`}${speed === 1 ? '' : `s${speed}`}`;
+    const key = `${entry.templateId}@${entry.level}${scaled}`;
     const known = kindIndex.get(key);
     if (known !== undefined) return known;
     const template = mobs[entry.templateId];
@@ -209,7 +240,7 @@ export function resolveTurretPlan(
       level: entry.level,
       sizeClass,
       maxHp: scale === 1 ? baseHp : Math.max(1, Math.round(baseHp * scale)),
-      marchSpeed: template.moveSpeed * TURRET_TIMING.marchFactor,
+      marchSpeed: template.moveSpeed * TURRET_TIMING.marchFactor * speed,
       mass: size.mass,
       radius: size.radius,
       breachValue: size.breachValue,
@@ -228,7 +259,7 @@ export function resolveTurretPlan(
       coreDamage: wave.coreDamage,
       gapMinTicks: wave.gapMinTicks,
       gapMaxTicks: wave.gapMaxTicks,
-      barrels: { ...wave.barrels },
+      barrels: resolveBarrels(wave.barrels, scenario.kegs, scenario.id),
       arrival: resolveArrival(wave.arrival, scenario.id),
     };
   });

@@ -56,6 +56,7 @@ describe('the trial boards', () => {
           scenarioId: scenario.id,
           key: scenario.boardKey,
           version,
+          kind: 'trial',
           period,
         });
       }
@@ -66,7 +67,7 @@ describe('the trial boards', () => {
     expect(fireAndFlyScoreboardInfo('glider_downs_v2_daily')).toBeNull();
   });
 
-  it('registers each board as a medal-first points ladder of the quest, and no quest-wide board', () => {
+  it('registers each trial board as a medal-first points ladder of the quest, and no quest-wide board', () => {
     const rows = WORLD_QUEST_SCOREBOARDS.filter((board) => fireAndFlyScoreboardInfo(board.id));
     expect(rows.map((board) => board.id)).toEqual([
       'fire_and_fly_introduction_v2_daily',
