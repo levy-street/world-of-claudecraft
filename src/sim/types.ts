@@ -10362,6 +10362,8 @@ export interface TurretSession {
   /** The newest engine events, oldest first (minigames/turret_feedback.ts). */
   feedback: TurretFeedback[];
   nextFeedbackSeq: number;
+  /** The owner's pet waits in the pet stash for the seat, handed back as it ends. */
+  petParked?: boolean;
   /** The world quest run this seat is, captured when the instructor seated it; absent on a dev seat. */
   worldQuest?: TurretWorldQuestRun;
 }

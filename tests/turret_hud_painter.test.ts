@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   TURRET_SCENARIO_HARD,
@@ -225,7 +227,7 @@ describe('the turret HUD painter', () => {
     painter.paint(view.tick(first, START), 'Esc');
     expect(kicker.textContent).toBe('Standing Watch');
     expect(kicker.getAttribute('aria-hidden')).toBe('true');
-    expect(painter.strip.getAttribute('aria-label')).toBe('Fire and Fly');
+    expect(painter.strip.getAttribute('aria-label')).toBe('Standing Watch');
     writes.mockClear();
     for (let i = 0; i < 10; i++) painter.paint(view.tick({ ...first }, START), 'Esc');
     expect(writes).not.toHaveBeenCalled();
@@ -234,6 +236,7 @@ describe('the turret HUD painter', () => {
     hard.defense.phase = 'lost';
     painter.paint(view.tick(turretSessionView(hard), START), 'Esc');
     expect(kicker.textContent).toBe("Veterans' Test");
+    expect(painter.strip.getAttribute('aria-label')).toBe("Veterans' Test");
   });
 
   it('names the medal beside its tinted disc and lists the points, then writes nothing more', () => {
@@ -319,4 +322,13 @@ describe('the turret HUD painter', () => {
     expect(live.style.display).toBe('');
     expect(painter.strip.style.display).toBe('none');
   });
+});
+
+it('turret_hud_painter carries no literal colour or px value: tokens and classes only', () => {
+  const code = readFileSync(join(process.cwd(), 'src/ui/hud/vehicle/turret_hud_painter.ts'), 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/.*$/gm, '$1');
+  expect(code.match(/#[0-9a-fA-F]{3,8}\b/g) ?? []).toEqual([]);
+  expect(code.match(/\b(?:rgba?|hsla?|oklch)\s*\(/g) ?? []).toEqual([]);
+  expect(code.match(/\b\d+(?:\.\d+)?px\b/g) ?? []).toEqual([]);
 });

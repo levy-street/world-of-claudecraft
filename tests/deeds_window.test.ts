@@ -453,12 +453,12 @@ describe('hud wiring', () => {
         variant?: string,
         subtext?: string,
         durationMs?: number,
-        source?: 'unstuck' | null,
+        source?: 'unstuck' | 'turret' | null,
         bannerClass?: string,
       ): string;
       showCelebrationBanner(text: string, bannerClass: 'levelup' | 'deed'): void;
       hideBannerImmediately(): void;
-      clearUnstuckBanner(): void;
+      clearSourceBanner(source: 'unstuck' | 'turret'): void;
     };
     h.bannerEl = document.createElement('div');
     h.bannerTimer = undefined;
@@ -519,7 +519,7 @@ describe('hud wiring', () => {
     }
   });
 
-  it('clearUnstuckBanner ends the unstuck line early and advances to a waiting celebration', () => {
+  it('clearSourceBanner ends the unstuck line early and advances to a waiting celebration', () => {
     // docs/design/banner-queue.md's contract for the unstuck purge, driven
     // on the real methods (the pure retainQueued arm alone cannot see the
     // Hud half): the live unstuck banner clears and the queued level-up
@@ -530,7 +530,7 @@ describe('hud wiring', () => {
       h.showBanner('Stuck? Hold still.', true, undefined, 'default', undefined, 2600, 'unstuck');
       h.showCelebrationBanner('Level 3!', 'levelup');
       expect(h.bannerEl.textContent).toBe('Stuck? Hold still.');
-      h.clearUnstuckBanner();
+      h.clearSourceBanner('unstuck');
       expect(h.bannerEl.textContent).toBe('Level 3!');
       expect(h.bannerEl.style.opacity).toBe('1');
     } finally {

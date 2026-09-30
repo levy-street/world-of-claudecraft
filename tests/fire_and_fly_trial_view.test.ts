@@ -13,9 +13,14 @@ import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { turretSessionView } from '../src/sim/turret_defense_session';
 import type { TurretScenarioDef, TurretSession } from '../src/sim/types';
 import { dungeonDisplayName } from '../src/ui/entity_i18n';
-import { fireAndFlyTrialName, interiorMinimapLabel } from '../src/ui/fire_and_fly_trial_view';
+import {
+  FIRE_AND_FLY_TRIAL_TEXT,
+  fireAndFlyTrialName,
+  interiorMinimapLabel,
+} from '../src/ui/fire_and_fly_trial_view';
 import { TurretHudView } from '../src/ui/hud/vehicle/turret_hud_view';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
+import { fireAndFlyTrialChoices } from '../src/ui/world_quest_fire_and_fly_view';
 import type { TurretSessionView } from '../src/world_api/vehicles';
 
 function seatFor(scenario: TurretScenarioDef): TurretSession {
@@ -45,6 +50,17 @@ describe('the Fire and Fly trial name', () => {
 
   it('names every scenario the instructor offers', () => {
     for (const scenario of TURRET_SCENARIOS) expect(fireAndFlyTrialName(scenario.id)).toBeTruthy();
+  });
+
+  it("gives the instructor's buttons the same names, from the one table", () => {
+    const choices = fireAndFlyTrialChoices(false);
+    expect(choices.map((c) => c.key)).toEqual(TURRET_SCENARIOS.map((s) => s.boardKey));
+    for (const scenario of TURRET_SCENARIOS) {
+      const text = FIRE_AND_FLY_TRIAL_TEXT[scenario.boardKey];
+      const label = choices.find((c) => c.key === scenario.boardKey)!.label;
+      expect(label).toContain(fireAndFlyTrialName(scenario.id)!);
+      expect(label).toContain(t(text.pitch));
+    }
   });
 
   it('has no name for an unknown scenario or a board key without a trial', () => {

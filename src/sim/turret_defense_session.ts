@@ -33,7 +33,13 @@ import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { arenaMatchFor } from './social/arena';
 import { bgInMatch } from './social/battleground';
-import { claimTurretArena, enterTurretArena, exitTurretArena } from './turret_arena_session';
+import {
+  claimTurretArena,
+  enterTurretArena,
+  exitTurretArena,
+  parkPetForArena,
+  returnPetFromArena,
+} from './turret_arena_session';
 import type {
   CannonPoint,
   Entity,
@@ -215,6 +221,8 @@ export function seatTurret(
   const { meta, e: player } = resolved;
   const refusal = turretSeatRefusal(ctx, meta, player);
   if (refusal) return refusal;
+  // Resolved before any side effect: a plan that throws must leave the player where they stand.
+  const plan = resolveTurretPlan(scenario);
   const arena = claimTurretArena(ctx, meta.entityId);
   if (!arena) return 'full';
   const returnTo = { x: player.pos.x, y: player.pos.y, z: player.pos.z, facing: player.facing };
@@ -224,6 +232,7 @@ export function seatTurret(
   player.vx = player.vy = player.vz = 0;
   const priorMountKey = player.mountKey;
   forceDismount(ctx, player);
+  const petParked = parkPetForArena(ctx, player);
   const origin = enterTurretArena(ctx, meta, player, arena);
   const start = ctx.tickCount;
   const sessionSeed = seed ?? turretSessionSeed(ctx.rng.next());
@@ -231,7 +240,7 @@ export function seatTurret(
     kind: 'turret',
     origin,
     defense: createTurretDefense(
-      resolveTurretPlan(scenario),
+      plan,
       { x: origin.x, z: origin.z },
       sessionSeed,
       start,
@@ -241,6 +250,7 @@ export function seatTurret(
     returnTo,
     feedback: [],
     nextFeedbackSeq: 1,
+    ...(petParked ? { petParked } : {}),
     ...(worldQuest ? { worldQuest: { ...worldQuest } } : {}),
   };
   meta.wireRev++;
@@ -292,6 +302,7 @@ export function replayTurretSeat(
     returnTo: { ...session.returnTo },
     feedback: [],
     nextFeedbackSeq: 1,
+    ...(session.petParked ? { petParked: true } : {}),
     ...(worldQuest ? { worldQuest: { ...worldQuest } } : {}),
   };
   meta.wireRev++;
@@ -381,7 +392,8 @@ export function shockwaveTurretSeat(
  * hold its reins; the dead, the fighting, and anyone whose reins left their
  * bags end on foot. A player some other path took out of the arena (a
  * battleground pop, a teleport) is not remounted where it put them, and a
- * mount some other path put them on is left alone.
+ * mount some other path put them on is left alone. A pet the seat parked comes
+ * back beside its owner wherever they end, once they are alive.
  */
 export function endTurretSeat(
   ctx: SimContext,
@@ -391,6 +403,7 @@ export function endTurretSeat(
 ): void {
   const alive = !player.dead && !player.ghost;
   const home = exitTurretArena(ctx, meta, player, session.returnTo);
+  if (session.petParked) returnPetFromArena(ctx, player);
   const prior = session.priorMountKey;
   if (!home || !alive || player.inCombat || !prior || player.mountKey !== '') return;
   if (!mountRideAllowed(meta, prior)) return;

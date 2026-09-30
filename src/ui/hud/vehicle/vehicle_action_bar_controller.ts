@@ -49,6 +49,8 @@ interface VehicleBarDeps {
   cancelOnEnter: readonly { cancel(): void }[];
   /** The HUD banner slot, for the turret's wave and result announcements. */
   showBanner?(banner: TurretBanner): void;
+  /** A Replay began a fresh run over an ended one (TurretHudHooks.onNewRun). */
+  onNewTurretRun?(): void;
   /** The HUD's floating combat text, for the turret's damage numbers. */
   spawnFct?: TurretFctSpawn;
   /** Flight bar Climb/Dive slots: a held pointer pins the glider pitch (+1 climb,
@@ -194,6 +196,7 @@ export class VehicleActionBarController {
     document.getElementById('ui')?.append(this.root);
     this.turret = new TurretHudController(deps.world, deps.writers, deps.cancelOnEnter, {
       showBanner: deps.showBanner,
+      onNewRun: deps.onNewTurretRun,
       spawnFct: deps.spawnFct,
       addShake: (amount) => deps.presentation?.addShake(amount),
       padKind: deps.padKind,

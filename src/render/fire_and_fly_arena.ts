@@ -16,7 +16,7 @@
 // hour is the `fireAndFly` state of interior_light_rig.ts.
 
 import * as THREE from 'three';
-import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { mergeGeometries, mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { ROCK_SINK_UNITS } from '../sim/decoration_dims';
 import { FIRE_AND_FLY_ROCKS, type FireAndFlyTree } from '../sim/fire_and_fly_field';
 import {
@@ -656,7 +656,11 @@ function backdropCrownPiece(crown: ArenaBackdropCrown, detail: 0 | 1): THREE.Buf
   }
   piece.setAttribute('color', new THREE.BufferAttribute(paint, 3));
   piece.deleteAttribute('uv');
-  return piece;
+  // The icosphere comes unindexed, each corner repeated per face with the same position,
+  // normal and tone: indexing shares them, about a fifth of the vertices for the same crown.
+  const indexed = mergeVertices(piece);
+  piece.dispose();
+  return indexed;
 }
 
 function mergeBackdrop(key: string, pieces: THREE.BufferGeometry[]): THREE.BufferGeometry {

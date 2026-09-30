@@ -89,6 +89,7 @@ function rig() {
   const writes = vi.fn();
   const cancel = vi.fn();
   const showBanner = vi.fn();
+  const onNewTurretRun = vi.fn();
   const bar = new VehicleActionBarController({
     world,
     writers: makeWriterFacet(new Map(), new Map(), new Map(), new Map(), writes, () => {}),
@@ -97,9 +98,10 @@ function rig() {
     cancelOnEnter: [{ cancel }],
     attachTooltip: () => {},
     showBanner,
+    onNewTurretRun,
     padKind: () => 'xbox',
   });
-  return { world, bar, writes, cancel, showBanner };
+  return { world, bar, writes, cancel, showBanner, onNewTurretRun };
 }
 
 const hud = () => document.getElementById(TURRET_HUD_ID)!;
@@ -134,7 +136,7 @@ it('shows the strip and the rail, hides the action bars and swaps in the turret 
   expect(bar.aim.isActive()).toBe(true);
   expect(bar.blocksPlayerActions).toBe(true);
   expect(VehicleActionBarController.blocksPlayerActions({ vehicleSession: null })).toBe(false);
-  expect(hud().getAttribute('aria-label')).toBe('Fire and Fly');
+  expect(hud().getAttribute('aria-label')).toBe('Standing Watch');
   expect(hud().classList.contains('ui-panel-strong')).toBe(true);
   expect(text('.turret-strip-wave')).toBe('Wave 1/6');
   expect(text('.turret-strip-slot')).toBe('First wave in 3 sec');
@@ -296,8 +298,9 @@ function hudHost(renderer?: { setGroundAimReticle(value: null): void; addShake(n
     leaveVehicle: vi.fn(),
   };
   const showBanner = vi.fn();
+  const clearSourceBanner = vi.fn();
   const spawn = vi.fn();
-  const bar = createHudVehicleBar({
+  const host = {
     sim: world,
     writerFacet: makeWriterFacet(new Map(), new Map(), new Map(), new Map(), vi.fn(), () => {}),
     keybinds: { primaryLabel: () => '' },
@@ -309,8 +312,11 @@ function hudHost(renderer?: { setGroundAimReticle(value: null): void; addShake(n
     fctPainter: { spawn },
     attachTooltip: () => {},
     showBanner,
-  });
-  return { world, bar, showBanner, spawn };
+    clearSourceBanner,
+    lastMinimapDrawAt: 1234,
+  };
+  const bar = createHudVehicleBar(host);
+  return { world, bar, showBanner, spawn, clearSourceBanner, host };
 }
 
 it("floats each hit's damage through the HUD floating combat text, once", () => {
@@ -376,7 +382,36 @@ it('hands the HUD banner its text, motion, variant and the final-wave subtext', 
   world.turretClock = START;
   bar.update();
   expect(showBanner).toHaveBeenCalledTimes(1);
-  expect(showBanner).toHaveBeenCalledWith('Wave 6 of 6', true, undefined, 'default', 'Final wave');
+  expect(showBanner).toHaveBeenCalledWith(
+    'Wave 6 of 6',
+    true,
+    undefined,
+    'default',
+    'Final wave',
+    2600,
+    'turret',
+  );
+});
+
+it("drops the ended run's verdict banner and redraws the minimap when a Replay starts afresh", () => {
+  const { world, bar, clearSourceBanner, host } = hudHost();
+  const ended = seat();
+  ended.defense.phase = 'won';
+  world.turretSession = turretSessionView(ended);
+  world.turretClock = START;
+  bar.update();
+  bar.update();
+  expect(clearSourceBanner).not.toHaveBeenCalled();
+  expect(host.lastMinimapDrawAt).toBe(1234);
+  const next = seat();
+  next.defense = createTurretDefense(resolveTurretPlan(), { x: 0, z: 0 }, 6, START + 900);
+  world.turretSession = turretSessionView(next);
+  world.turretClock = START + 900;
+  bar.update();
+  expect(clearSourceBanner).toHaveBeenCalledExactlyOnceWith('turret');
+  expect(host.lastMinimapDrawAt).toBe(0);
+  bar.update();
+  expect(clearSourceBanner).toHaveBeenCalledTimes(1);
 });
 
 it('shows the result card at the end and leaves through its large Leave button', () => {
@@ -418,7 +453,7 @@ it('shows the result card at the end and leaves through its large Leave button',
 
 it('replays from the card: the seat action, then the new run fresh, nothing of the old one replayed', () => {
   vi.mocked(sfx.playAt).mockClear();
-  const { world, bar, showBanner } = rig();
+  const { world, bar, showBanner, onNewTurretRun } = rig();
   const fired = (session: TurretSession, tick: number) => {
     session.nextFeedbackSeq = recordTurretFeedback(
       session.feedback,
@@ -452,6 +487,8 @@ it('replays from the card: the seat action, then the new run fresh, nothing of t
   const heard = vi.mocked(sfx.playAt).mock.calls.length;
   const banners = showBanner.mock.calls.length;
 
+  bar.update();
+  expect(onNewTurretRun).not.toHaveBeenCalled();
   replay.click();
   expect(world.useVehicleAction).toHaveBeenCalledExactlyOnceWith('turret_replay', { x: 0, z: 0 });
   expect(world.leaveVehicle).not.toHaveBeenCalled();
@@ -461,6 +498,8 @@ it('replays from the card: the seat action, then the new run fresh, nothing of t
   world.turretSession = turretSessionView(next);
   world.turretClock = START + 900;
   bar.update();
+  // The host drops the last run's verdict banner and redraws the minimap, once.
+  expect(onNewTurretRun).toHaveBeenCalledTimes(1);
   expect(hud().style.display).toBe('');
   expect(hud().classList.contains('ended')).toBe(false);
   expect(replay.style.display).toBe('none');
@@ -473,6 +512,7 @@ it('replays from the card: the seat action, then the new run fresh, nothing of t
   world.turretSession = turretSessionView(next);
   world.turretClock = START + 960;
   bar.update();
+  expect(onNewTurretRun).toHaveBeenCalledTimes(1);
   expect(
     vi
       .mocked(sfx.playAt)

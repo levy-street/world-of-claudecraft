@@ -5,22 +5,8 @@
 import { TURRET_SCENARIOS } from '../sim/content/fire_and_fly_scenarios';
 import type { TurretScenarioDef, WorldQuestProgress } from '../sim/types';
 import type { ActivityChoice } from '../sim/world_quest_activity';
-import { formatNumber, type TranslationKey, t } from './i18n';
-
-const TRIAL_TEXT: Readonly<Record<string, { name: TranslationKey; pitch: TranslationKey }>> = {
-  introduction: {
-    name: 'questUi.worldQuest.fireAndFly.scenarios.introduction',
-    pitch: 'questUi.worldQuest.fireAndFly.pitch.introduction',
-  },
-  standard: {
-    name: 'questUi.worldQuest.fireAndFly.scenarios.standard',
-    pitch: 'questUi.worldQuest.fireAndFly.pitch.standard',
-  },
-  hard: {
-    name: 'questUi.worldQuest.fireAndFly.scenarios.hard',
-    pitch: 'questUi.worldQuest.fireAndFly.pitch.hard',
-  },
-};
+import { FIRE_AND_FLY_TRIAL_TEXT } from './fire_and_fly_trial_view';
+import { formatNumber, t } from './i18n';
 
 export interface FireAndFlyTrialChoice {
   difficulty: ActivityChoice;
@@ -36,8 +22,8 @@ export function fireAndFlyTrialChoices(
 ): FireAndFlyTrialChoice[] {
   const choices: FireAndFlyTrialChoice[] = [];
   for (const scenario of scenarios) {
-    const text = Object.hasOwn(TRIAL_TEXT, scenario.boardKey)
-      ? TRIAL_TEXT[scenario.boardKey]
+    const text = Object.hasOwn(FIRE_AND_FLY_TRIAL_TEXT, scenario.boardKey)
+      ? FIRE_AND_FLY_TRIAL_TEXT[scenario.boardKey]
       : null;
     if (!text) continue;
     const values = {

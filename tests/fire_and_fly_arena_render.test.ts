@@ -296,6 +296,25 @@ describe('the trees, rocks and hills', () => {
     }
   });
 
+  it('indexes the canopy: each crown shares its corners, a fifth of the unindexed vertices', () => {
+    const crowns = fireAndFlyBackdropCrowns();
+    const origin = instanceOrigin(ARENA_INDEX, 2);
+    const hills = buildFireAndFlyArenaInterior({ lowGfx: true, origin }).getObjectByName(
+      'fireAndFlyBackdrop',
+    )!;
+    let corners = 0;
+    let vertices = 0;
+    for (const mesh of hills.children as THREE.Mesh[]) {
+      const index = mesh.geometry.getIndex();
+      expect(index).not.toBeNull();
+      corners += index!.count;
+      vertices += mesh.geometry.getAttribute('position').count;
+    }
+    // The low tier's crown is a twenty-face icosahedron: 60 corners on 12 shared vertices.
+    expect(corners).toBe(crowns.length * 60);
+    expect(vertices).toBe(crowns.length * 12);
+  });
+
   it('hangs pollen over the meadow and the sunlit forest edge, above the ground', () => {
     const motes = fireAndFlyMotes(300);
     expect(motes).toHaveLength(300);

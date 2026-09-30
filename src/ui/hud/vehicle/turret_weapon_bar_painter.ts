@@ -28,7 +28,8 @@ export class TurretWeaponBarPainter {
 
   constructor(
     private readonly writers: PainterHostWriters,
-    onPress: (slot: number) => void,
+    /** `pointer` is false for a keyboard activation (Enter or Space: click detail 0). */
+    onPress: (slot: number, pointer: boolean) => void,
     attachTooltip?: (element: HTMLElement, html: () => string) => void,
     tooltip?: (slot: number) => string,
   ) {
@@ -48,7 +49,7 @@ export class TurretWeaponBarPainter {
       btn.addEventListener('pointerdown', (event) => event.stopPropagation());
       btn.addEventListener('click', (event) => {
         event.stopPropagation();
-        onPress(index);
+        onPress(index, event.detail > 0);
       });
       if (attachTooltip && tooltip) attachTooltip(btn, () => tooltip(index));
       buttons.push(btn);

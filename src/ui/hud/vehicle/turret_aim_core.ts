@@ -1,6 +1,6 @@
 import { TURRET_FRAGMENTATION, TURRET_WEAPON } from '../../../sim/content/turret_defense';
 import { clampTurretAimInto, type TurretAim } from '../../../sim/minigames/turret_defense';
-import { TURRET_BOMBLETS } from '../../../sim/minigames/turret_fragmentation';
+import { TURRET_BOMBLETS, writeTurretFragStar } from '../../../sim/minigames/turret_fragmentation';
 import type { CannonPoint } from '../../../sim/types';
 import type { IWorldVehicles, TurretSessionView } from '../../../world_api/vehicles';
 import type { GroundAimReticleView } from '../action_bar/ground_aim_controller';
@@ -17,7 +17,6 @@ export const TURRET_FRAG_FOOTPRINT =
 /** The armed reticle's colour, through the reticle's school palette (orange). */
 const FRAG_SCHOOL = 'fire';
 const SHELL_SCHOOL = 'physical';
-const TAU = Math.PI * 2;
 
 /** Either seat owns the HUD's ground aim; a static read, so no bar is built to answer it. */
 export function vehicleOwnsAim(
@@ -198,22 +197,10 @@ export class TurretAimCore {
     this.world.useVehicleAction('turret_frag', { x: this.aimed.x, z: this.aimed.z });
     return true;
   }
-  /**
-   * The engine's star (turretFragBomblets) for the clamped aim, written in place:
-   * the reticle reads it every frame, so no array is allocated per read.
-   */
+  /** The engine's star for the clamped aim, written in place: the reticle reads it every frame. */
   private writeStar(): readonly CannonPoint[] {
-    const f = TURRET_FRAGMENTATION;
     const { x, z, dirX, dirZ } = this.clamp;
-    const bearing = Math.atan2(dirX, dirZ);
-    this.star[0].x = x;
-    this.star[0].z = z;
-    for (let i = 0; i < f.outerCount; i++) {
-      const angle = bearing - (i * TAU) / f.outerCount;
-      this.star[i + 1].x = x + Math.sin(angle) * f.outerRadius;
-      this.star[i + 1].z = z + Math.cos(angle) * f.outerRadius;
-    }
-    return this.star;
+    return writeTurretFragStar(x, z, dirX, dirZ, this.star);
   }
   private setRaw(x: number, z: number): void {
     this.raw.x = x;

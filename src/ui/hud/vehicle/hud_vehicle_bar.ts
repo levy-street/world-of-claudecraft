@@ -30,8 +30,15 @@ interface VehicleBarHost {
     icon?: string,
     variant?: 'default',
     subtext?: string,
+    durationMs?: number,
+    source?: 'turret',
   ): unknown;
+  clearSourceBanner(source: 'turret'): void;
+  lastMinimapDrawAt: number;
 }
+
+/** The HUD's default banner time, passed through so the seat's banners can carry their source. */
+const BANNER_MS = 2600;
 
 export function createHudVehicleBar(hud: object): VehicleActionBarController {
   const h = hud as VehicleBarHost;
@@ -45,7 +52,13 @@ export function createHudVehicleBar(hud: object): VehicleActionBarController {
     cancelOnEnter: [h.playerGroundAim, h.empowerHold],
     attachTooltip: (element, html) => h.attachTooltip(element, html),
     gliderPitchHold: (value) => h.optionsHooks?.gliderPitchHold?.(value),
-    showBanner: (banner) => h.showBanner(banner.text, true, undefined, 'default', banner.subtext),
+    showBanner: (banner) =>
+      h.showBanner(banner.text, true, undefined, 'default', banner.subtext, BANNER_MS, 'turret'),
+    onNewTurretRun: () => {
+      // The last run's verdict must not linger into the replay's intro, nor its bodies on the map.
+      h.clearSourceBanner('turret');
+      h.lastMinimapDrawAt = 0;
+    },
     spawnFct: (event, now) => h.fctPainter.spawn(event, now),
   });
 }

@@ -7,6 +7,8 @@ import {
 import {
   blastFalloff,
   type FlySegment,
+  horizontalAt,
+  horizontalAtInto,
   launchVelocity,
   type MotionSegment,
   marchSegment,
@@ -15,6 +17,7 @@ import {
   positionAt,
   resolveFlightEnd,
   type SweepResult,
+  stillSegment,
   sweepCylinder,
   type ThrowProbe,
   throwDirection,
@@ -468,5 +471,26 @@ describe('dead-center hits', () => {
   it('points away from the blast otherwise', () => {
     const d = throwDirection(0, 0, 3, 4, 50, 50, TURRET_WEAPON.deadCenter);
     expect(d).toEqual({ x: 0.6, z: 0.8 });
+  });
+});
+
+describe('horizontalAtInto', () => {
+  const flat: ThrowProbe = { ground: () => 0, water: () => null };
+  it('writes the same point as horizontalAt into the caller object, for every segment kind', () => {
+    const skid = planSkid(0, 4, 0, 0, 12, 3, 0.6, flat, TURRET_PHYSICS);
+    expect(skid).not.toBeNull();
+    const segs: MotionSegment[] = [
+      marchSegment(0, 10, 0, 0.5, 46, 3, 4.4, 4.1),
+      planFlight(0, 0, 0, 0, { x: 6, y: 9, z: -2 }, 0.6, flat, TURRET_PHYSICS),
+      skid!,
+      stillSegment(0, 20, { x: 3, y: 0, z: -8 }),
+    ];
+    const out = { x: Number.NaN, z: Number.NaN };
+    for (const seg of segs) {
+      for (const tick of [0, 3.5, 11, 400]) {
+        expect(horizontalAtInto(seg, tick, out)).toBe(out);
+        expect(out).toEqual(horizontalAt(seg, tick));
+      }
+    }
   });
 });

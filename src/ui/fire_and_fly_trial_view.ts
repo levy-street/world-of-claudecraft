@@ -9,10 +9,22 @@ import type { TurretSessionView } from '../world_api/vehicles';
 import { dungeonDisplayName } from './entity_i18n';
 import { type TranslationKey, t } from './i18n';
 
-const TRIAL_NAMES: Readonly<Record<string, TranslationKey>> = {
-  introduction: 'questUi.worldQuest.fireAndFly.scenarios.introduction',
-  standard: 'questUi.worldQuest.fireAndFly.scenarios.standard',
-  hard: 'questUi.worldQuest.fireAndFly.scenarios.hard',
+/** Each trial's name and the instructor's pitch for it, by scenario board key: the one table. */
+export const FIRE_AND_FLY_TRIAL_TEXT: Readonly<
+  Record<string, { name: TranslationKey; pitch: TranslationKey }>
+> = {
+  introduction: {
+    name: 'questUi.worldQuest.fireAndFly.scenarios.introduction',
+    pitch: 'questUi.worldQuest.fireAndFly.pitch.introduction',
+  },
+  standard: {
+    name: 'questUi.worldQuest.fireAndFly.scenarios.standard',
+    pitch: 'questUi.worldQuest.fireAndFly.pitch.standard',
+  },
+  hard: {
+    name: 'questUi.worldQuest.fireAndFly.scenarios.hard',
+    pitch: 'questUi.worldQuest.fireAndFly.pitch.hard',
+  },
 };
 
 /** The trial's name for a plan's scenario id; null for a scenario without one. */
@@ -22,7 +34,9 @@ export function fireAndFlyTrialName(
 ): string | null {
   for (const scenario of scenarios) {
     if (scenario.id !== scenarioId) continue;
-    return Object.hasOwn(TRIAL_NAMES, scenario.boardKey) ? t(TRIAL_NAMES[scenario.boardKey]) : null;
+    return Object.hasOwn(FIRE_AND_FLY_TRIAL_TEXT, scenario.boardKey)
+      ? t(FIRE_AND_FLY_TRIAL_TEXT[scenario.boardKey].name)
+      : null;
   }
   return null;
 }

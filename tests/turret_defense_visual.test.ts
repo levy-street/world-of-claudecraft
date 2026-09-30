@@ -62,6 +62,7 @@ import type { TurretFeedback } from '../src/sim/minigames/turret_feedback';
 import { burstTurretFrag, TURRET_BOMBLETS } from '../src/sim/minigames/turret_fragmentation';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
+import { turretSessionView } from '../src/sim/turret_defense_session';
 import { DT, type Entity, type SimEvent, type WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
@@ -154,17 +155,17 @@ function engine(ticks: number): TurretDefenseState {
   return state;
 }
 
+/** The sim's own view of the engine (a fresh seat each call, so no revision memo is reused). */
 function viewOf(state: TurretDefenseState, feedback: TurretFeedback[] = []): TurretSessionView {
-  return {
+  return turretSessionView({
+    kind: 'turret',
     origin: { x: state.cx, y: 0, z: state.cz },
-    defense: {
-      ...state,
-      monsters: state.monsters.map((m) => ({ ...m, seg: { ...m.seg } })),
-    } as unknown as TurretSessionView['defense'],
-    waveCount: state.plan.waves.length,
-    monstersLeft: 0,
+    defense: state,
+    priorMountKey: '',
+    returnTo: { x: 0, y: 0, z: 0, facing: 0 },
     feedback,
-  };
+    nextFeedbackSeq: feedback.length + 1,
+  });
 }
 
 function wolfKind(state: TurretDefenseState): number {

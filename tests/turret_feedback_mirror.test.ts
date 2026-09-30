@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { QuestWorldWireState } from '../src/net/quest_world_wire_state';
+import { describe, expect, it, vi } from 'vitest';
+import { type QuestWorldCommand, QuestWorldWireState } from '../src/net/quest_world_wire_state';
 import { TurretFeedbackMirror } from '../src/net/turret_feedback_mirror';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { TURRET_FEEDBACK_LIMIT } from '../src/sim/minigames/turret_feedback';
@@ -135,6 +135,10 @@ describe('the turret seat on the quest wire state', () => {
   }
 
   class Client extends QuestWorldWireState {
+    readonly commands: QuestWorldCommand[] = [];
+    protected override sendQuestWorldCommand(command: QuestWorldCommand): void {
+      this.commands.push(command);
+    }
     route(event: SimEvent): void {
       this.applyQuestWorldEvent(event);
     }
@@ -189,10 +193,15 @@ describe('the turret seat on the quest wire state', () => {
     client.applyQuestSelfSnapshot({ tur: seat(2) }, 5, 103);
     expect(client.turretSession?.feedback).toEqual([]);
 
+    expect(client.commands).toEqual([]);
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     client.applyQuestSelfSnapshot({ tur: { ...seat(3), waveCount: -1 } }, 5, 104);
     expect(client.turretSession).toBeNull();
     client.applyQuestSelfSnapshot({ turp: null, tur: seat(4) }, 5, 105);
     expect(client.turretSession).toBeNull();
+    // A seat the server holds but this client cannot read: one leave for the whole stretch.
+    expect(client.commands).toEqual([{ cmd: 'vehicle_leave' }]);
+    warn.mockRestore();
 
     seated();
     client.drop();

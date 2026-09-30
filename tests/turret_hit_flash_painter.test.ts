@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import type { TurretHitFrame } from '../src/ui/hud/vehicle/turret_hit_feedback_core';
 import { TurretHitFlashPainter } from '../src/ui/hud/vehicle/turret_hit_flash_painter';
@@ -76,4 +78,16 @@ describe('turret hit flash painter', () => {
     painter.paint(flashing());
     expect(writers.setDisplay.mock.calls).toEqual([[overlay, '']]);
   });
+});
+
+it('turret_hit_flash_painter carries no literal colour or px value: tokens and classes only', () => {
+  const code = readFileSync(
+    join(process.cwd(), 'src/ui/hud/vehicle/turret_hit_flash_painter.ts'),
+    'utf8',
+  )
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/.*$/gm, '$1');
+  expect(code.match(/#[0-9a-fA-F]{3,8}\b/g) ?? []).toEqual([]);
+  expect(code.match(/\b(?:rgba?|hsla?|oklch)\s*\(/g) ?? []).toEqual([]);
+  expect(code.match(/\b\d+(?:\.\d+)?px\b/g) ?? []).toEqual([]);
 });

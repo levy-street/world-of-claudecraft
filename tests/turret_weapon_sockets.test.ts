@@ -2,6 +2,8 @@
 // The Fire and Fly weapon sockets as the seat mounts them: keys 1 and 2 (the bar slots)
 // and the sockets themselves reach the weapons, a socket press never leaks to the ground
 // behind it, the keycaps follow the input in hand, and the row leaves with the run.
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { createTurretDefense } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
@@ -151,6 +153,13 @@ it('ignores a socket tap that only peeked at its tooltip, and keeps the peek ope
   expect(document.activeElement).toBe(sockets()[0]);
 });
 
+/** A pointer press: the click a tap or a mouse makes carries a non-zero detail. */
+const tap = (button: HTMLElement) =>
+  button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
+/** Enter or Space on a focused button: the click it activates carries detail 0. */
+const keyPress = (button: HTMLElement) =>
+  button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 0 }));
+
 it('lets go of the focus a press gave the socket, so its tooltip never stays over the field', () => {
   const { world, seatIn } = rig();
   seatIn(seat());
@@ -158,13 +167,22 @@ it('lets go of the focus a press gave the socket, so its tooltip never stays ove
   sockets()[1].addEventListener('focusout', lost);
   // A tap focuses the button before its click, and a focused socket shows its tooltip.
   sockets()[1].focus();
-  sockets()[1].click();
+  tap(sockets()[1]);
   expect(document.activeElement).not.toBe(sockets()[1]);
   expect(lost).toHaveBeenCalledTimes(1);
   sockets()[0].focus();
-  sockets()[0].click();
+  tap(sockets()[0]);
   expect(world.useVehicleAction).toHaveBeenCalledWith('turret_shockwave', { x: 0, z: 0 });
   expect(document.activeElement).not.toBe(sockets()[0]);
+});
+
+it('keeps the focus a keyboard press activates the socket from', () => {
+  const { world, seatIn } = rig();
+  seatIn(seat());
+  sockets()[0].focus();
+  keyPress(sockets()[0]);
+  expect(world.useVehicleAction).toHaveBeenCalledWith('turret_shockwave', { x: 0, z: 0 });
+  expect(document.activeElement).toBe(sockets()[0]);
 });
 
 it('reads both sockets as not ready in the intro', () => {
@@ -200,4 +218,16 @@ it('leaves with the run: hidden on the result card and off the seat', () => {
   world.turretClock = null;
   bar.update();
   expect(row().style.display).toBe('none');
+});
+
+it('turret_weapon_bar_painter carries no literal colour or px value: tokens and classes only', () => {
+  const code = readFileSync(
+    join(process.cwd(), 'src/ui/hud/vehicle/turret_weapon_bar_painter.ts'),
+    'utf8',
+  )
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/.*$/gm, '$1');
+  expect(code.match(/#[0-9a-fA-F]{3,8}\b/g) ?? []).toEqual([]);
+  expect(code.match(/\b(?:rgba?|hsla?|oklch)\s*\(/g) ?? []).toEqual([]);
+  expect(code.match(/\b\d+(?:\.\d+)?px\b/g) ?? []).toEqual([]);
 });

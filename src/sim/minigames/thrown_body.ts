@@ -251,18 +251,35 @@ export function velocityAt(seg: MotionSegment, tick: number): Vec3 {
 
 /** Horizontal position at any fractional tick, with no ground read. */
 export function horizontalAt(seg: MotionSegment, tick: number): { x: number; z: number } {
+  return horizontalAtInto(seg, tick, { x: 0, z: 0 });
+}
+
+/** horizontalAt written into `out`, for a reader that runs per frame (the minimap). */
+export function horizontalAtInto<P extends { x: number; z: number }>(
+  seg: MotionSegment,
+  tick: number,
+  out: P,
+): P {
   const s = span(seg, tick) * DT;
   switch (seg.kind) {
     case 'march':
-      return { x: seg.x + seg.dx * seg.speed * s, z: seg.z + seg.dz * seg.speed * s };
+      out.x = seg.x + seg.dx * seg.speed * s;
+      out.z = seg.z + seg.dz * seg.speed * s;
+      return out;
     case 'fly':
-      return { x: seg.x + seg.vx * s, z: seg.z + seg.vz * s };
+      out.x = seg.x + seg.vx * s;
+      out.z = seg.z + seg.vz * s;
+      return out;
     case 'skid': {
       const k = skidDistance(seg, s);
-      return { x: seg.x + k.ux * k.d, z: seg.z + k.uz * k.d };
+      out.x = seg.x + k.ux * k.d;
+      out.z = seg.z + k.uz * k.d;
+      return out;
     }
     case 'still':
-      return { x: seg.x, z: seg.z };
+      out.x = seg.x;
+      out.z = seg.z;
+      return out;
   }
 }
 

@@ -26,6 +26,7 @@ import {
   TURRET_BOMBLETS,
   turretBombletBlast,
   turretFragBomblets,
+  writeTurretFragStar,
 } from '../src/sim/minigames/turret_fragmentation';
 import type { PrivateSalt, TurretSizeClass } from '../src/sim/types';
 
@@ -138,6 +139,29 @@ describe('the star', () => {
   it('lands the centre 0.2 s after the burst, then one outer bomblet a tick until 0.45 s', () => {
     const star = turretFragBomblets(0, 0, 0, 1, 300);
     expect(star.map((b) => b.landTick - 300)).toEqual([4, 5, 6, 7, 8, 9]);
+  });
+
+  it('writes the same spots in place for the reticle, reusing the caller array', () => {
+    const out = Array.from({ length: TURRET_BOMBLETS }, () => ({ x: Number.NaN, z: Number.NaN }));
+    for (const bearing of [0, 1.1, -2.4]) {
+      const dirX = Math.sin(bearing);
+      const dirZ = Math.cos(bearing);
+      const written = writeTurretFragStar(-7, 12, dirX, dirZ, out);
+      expect(written).toBe(out);
+      const want = turretFragBomblets(-7, 12, dirX, dirZ, 0).map(({ x, z }) => ({ x, z }));
+      expect(out).toEqual(want);
+    }
+  });
+
+  it("keeps one frag's bomblet draw keys clear of the next shot's", () => {
+    const burst = { x: 0, z: 0, dirX: 0, dirZ: 1, damage: 1, burstTick: 0, landed: 0, hit: false };
+    const keys = (shotId: number) =>
+      turretFragBomblets(0, 0, 0, 1, 0).map((b) => turretBombletBlast({ ...burst, shotId }, b).key);
+    for (const shotId of [1, 2, 40]) {
+      const mine = keys(shotId);
+      expect(new Set(mine).size).toBe(TURRET_BOMBLETS);
+      expect(Math.max(...mine)).toBeLessThan(Math.min(...keys(shotId + 1)));
+    }
   });
 
   it('bursts into the same star whatever the seed or the salt: no draw anywhere', () => {

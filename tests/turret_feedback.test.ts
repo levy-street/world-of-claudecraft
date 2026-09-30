@@ -80,6 +80,8 @@ describe('the turret feedback ring', () => {
     expect(turretFeedbackSince(ring, 2).map((f) => f.seq)).toEqual([3]);
     expect(turretFeedbackSince(ring, 3)).toEqual([]);
     expect(turretFeedbackSince([], 5)).toEqual([]);
+    // Nothing new is the per-frame read: one shared empty batch, never a fresh array.
+    expect(turretFeedbackSince(ring, 3)).toBe(turretFeedbackSince([], 0));
     expect(turretFeedbackSince(ring, 0)).not.toBe(ring);
   });
 

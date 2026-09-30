@@ -34,6 +34,8 @@ export function recordTurretFeedback(
   return seq;
 }
 
+const NOTHING_NEW: readonly TurretFeedback[] = Object.freeze([]);
+
 /**
  * The entries newer than `lastSeq`, oldest first. A consumer keeps the seq of the
  * last entry it handled (0 before the first) and resets it when the seat changes;
@@ -42,8 +44,9 @@ export function recordTurretFeedback(
 export function turretFeedbackSince(
   ring: readonly TurretFeedback[],
   lastSeq: number,
-): TurretFeedback[] {
+): readonly TurretFeedback[] {
   let first = ring.length;
   while (first > 0 && ring[first - 1].seq > lastSeq) first--;
-  return ring.slice(first);
+  // Nothing new is the common read: it allocates nothing.
+  return first === ring.length ? NOTHING_NEW : ring.slice(first);
 }

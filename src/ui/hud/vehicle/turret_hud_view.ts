@@ -269,6 +269,9 @@ export class TurretHudView {
   private lastSession: TurretSessionView | null = null;
   private lastSeconds: number | null = null;
   private lastLanguage = -1;
+  /** The fixed labels change only with the language or the trial, not per session revision. */
+  private labelLanguage = -1;
+  private labelScenario = '';
   /** The phase and wave the live region last spoke for; a change is a phase start. */
   private lastPhase = '';
   private lastWave = -1;
@@ -305,15 +308,20 @@ export class TurretHudView {
     const max = defense.plan.integrity;
     const value = Math.max(0, Math.min(max, defense.integrity));
     const ended = defense.phase === 'won' || defense.phase === 'lost';
-    const labels = frame.labels;
-    labels.title = t('hudChrome.turret.title');
-    labels.trial = fireAndFlyTrialName(defense.plan.scenarioId) ?? labels.title;
-    labels.meter = t('hudChrome.turret.integrity');
-    labels.caption = t('hudChrome.turret.tower');
-    labels.leave = t('hudChrome.turret.leave');
-    labels.leaveShort = t('hudChrome.turret.leaveShort');
-    labels.replay = t('hudChrome.turret.replay');
-    labels.replayHint = t('hudChrome.turret.replayHint');
+    const scenarioId = defense.plan.scenarioId;
+    if (language !== this.labelLanguage || scenarioId !== this.labelScenario) {
+      this.labelLanguage = language;
+      this.labelScenario = scenarioId;
+      const labels = frame.labels;
+      labels.title = t('hudChrome.turret.title');
+      labels.trial = fireAndFlyTrialName(scenarioId) ?? labels.title;
+      labels.meter = t('hudChrome.turret.integrity');
+      labels.caption = t('hudChrome.turret.tower');
+      labels.leave = t('hudChrome.turret.leave');
+      labels.leaveShort = t('hudChrome.turret.leaveShort');
+      labels.replay = t('hudChrome.turret.replay');
+      labels.replayHint = t('hudChrome.turret.replayHint');
+    }
     frame.wave = t('hudChrome.turret.wave', {
       wave: formatNumber(Math.min(defense.wave + 1, session.waveCount)),
       total: formatNumber(session.waveCount),

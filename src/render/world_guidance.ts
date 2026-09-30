@@ -135,13 +135,24 @@ export class WorldGuidance {
     this.wispMaze.update(world, reducedMotion);
   }
 
+  /** Every child disposes even when one throws; the failures are rethrown together at the end. */
   dispose(): void {
-    this.trace.dispose();
-    this.cannon.dispose();
-    this.turret.dispose();
-    this.arenaPrebuild.dispose();
-    this.glider.dispose();
-    this.shadow.dispose();
-    this.wispMaze.dispose();
+    const errors: unknown[] = [];
+    for (const child of [
+      this.trace,
+      this.cannon,
+      this.turret,
+      this.arenaPrebuild,
+      this.glider,
+      this.shadow,
+      this.wispMaze,
+    ]) {
+      try {
+        child.dispose();
+      } catch (error) {
+        errors.push(error);
+      }
+    }
+    if (errors.length > 0) throw new AggregateError(errors, 'World guidance failed to dispose');
   }
 }

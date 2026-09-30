@@ -12,6 +12,7 @@ import {
   markInstanceClaimed,
   soloInstanceKeyFor,
 } from './instances/dungeons';
+import { petOf, restorePetFromDelveStash, stowPetForDelve } from './pet/pet_commands';
 import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
 import type { InstanceSlot, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -125,4 +126,22 @@ export function exitTurretArena(
   const arena = ownArena(ctx, meta.entityId);
   if (arena) freeInstance(ctx, arena);
   return home;
+}
+
+/**
+ * A pet cannot follow its owner onto the roof: it waits in the stash the delves and
+ * the ferry park pets in (a save taken meanwhile still carries it), rather than frozen
+ * and defenceless where the owner stood, where a mob pulling it would pull the owner into
+ * combat and end the run. True when a pet was parked.
+ */
+export function parkPetForArena(ctx: SimContext, player: Entity): boolean {
+  if (!petOf(ctx, player.id, true)) return false;
+  stowPetForDelve(ctx, player.id);
+  return ctx.delvePetStash.has(player.id);
+}
+
+/** Hands a parked pet back beside its owner as the seat ends; never to a corpse or a spirit. */
+export function returnPetFromArena(ctx: SimContext, player: Entity): void {
+  if (player.dead || player.ghost) return;
+  restorePetFromDelveStash(ctx, player.id);
 }

@@ -58,16 +58,34 @@ export function turretFragBomblets(
   burstTick: number,
 ): TurretBomblet[] {
   const f = TURRET_FRAGMENTATION;
+  const out: TurretBomblet[] = [];
+  for (let i = 0; i < TURRET_BOMBLETS; i++) {
+    const landTick = burstTick + (i === 0 ? f.centreDelayTicks : f.outerDelayTicks + i - 1);
+    out.push({ index: i, x: 0, z: 0, landTick });
+  }
+  writeTurretFragStar(x, z, dirX, dirZ, out);
+  return out;
+}
+
+/**
+ * The star's spots written into `out` (at least TURRET_BOMBLETS entries), the same
+ * points as turretFragBomblets with no allocation: the HUD reticle reads it per frame.
+ */
+export function writeTurretFragStar<P extends { x: number; z: number }>(
+  x: number,
+  z: number,
+  dirX: number,
+  dirZ: number,
+  out: readonly P[],
+): readonly P[] {
+  const f = TURRET_FRAGMENTATION;
   const bearing = Math.atan2(dirX, dirZ);
-  const out: TurretBomblet[] = [{ index: 0, x, z, landTick: burstTick + f.centreDelayTicks }];
+  out[0].x = x;
+  out[0].z = z;
   for (let i = 0; i < f.outerCount; i++) {
     const angle = bearing - (i * TAU) / f.outerCount;
-    out.push({
-      index: i + 1,
-      x: x + Math.sin(angle) * f.outerRadius,
-      z: z + Math.cos(angle) * f.outerRadius,
-      landTick: burstTick + f.outerDelayTicks + i,
-    });
+    out[i + 1].x = x + Math.sin(angle) * f.outerRadius;
+    out[i + 1].z = z + Math.cos(angle) * f.outerRadius;
   }
   return out;
 }

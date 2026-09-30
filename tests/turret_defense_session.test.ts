@@ -84,6 +84,9 @@ import { worldQuestCycleOfferingQuest } from '../src/sim/world_quest_rotation';
 import { WORLD_SEED } from '../src/sim/world_seed';
 import type { IWorldVehicles } from '../src/world_api/vehicles';
 
+/** A whole run plays thousands of ticks; under a loaded gate it can pass the default 20 s. */
+const FULL_RUN_TIMEOUT_MS = 60_000;
+
 // The best open-world spot of the site survey: real terrain, trees, no aggressive mob near.
 // The world probe is host-agnostic, so its open-world contract is still pinned here.
 const AMBERFALL = { x: -340, z: 1945 };
@@ -315,7 +318,8 @@ describe('the turret seat', () => {
     sim.startAutoAttack();
     expect(player.autoAttack).toBe(true);
     sim.petAttack();
-    expect(pet.aggroTargetId).toBe(dummy.id);
+    const back = [...sim.entities.values()].find((e) => e.ownerId === player.id)!;
+    expect(back.aggroTargetId).toBe(dummy.id);
     expect(summonMountItem(sim.ctx, player.id, DEFAULT_MOUNT)).toBe(true);
     expect(player.mountKey).toBe('');
   });
@@ -357,21 +361,50 @@ describe('the turret seat', () => {
     expect(sim.countItem('baked_bread')).toBe(4);
   });
 
-  it('stops a pet that has a target and auto-attack when its owner sits', () => {
-    const outcome = (seated: boolean) => {
-      const { sim, player } = rig('warlock');
-      summonPet(sim.ctx, player, 'emberkin');
-      const pet = [...sim.entities.values()].find((e) => e.ownerId === player.id)!;
+  it('parks the pet off the field for the seat, and hands it back beside its owner', () => {
+    for (const [cls, template] of [
+      ['warlock', 'emberkin'],
+      ['hunter', 'forest_wolf'],
+    ] as const) {
+      const { sim, player, meta } = rig(cls);
+      standAtAmberfall(sim);
+      summonPet(sim.ctx, player, template);
+      const pets = () => [...sim.entities.values()].filter((e) => e.ownerId === player.id);
       const dummy = addDummy(sim, 3, 3);
-      pet.targetId = dummy.id;
-      pet.autoAttack = true;
-      if (seated) sim.chat('/dev turret');
-      sim.tick();
-      return { targetId: pet.targetId, autoAttack: pet.autoAttack, dummy: dummy.id };
-    };
-    const control = outcome(false);
-    expect(control).toEqual({ targetId: control.dummy, autoAttack: true, dummy: control.dummy });
-    expect(outcome(true)).toMatchObject({ targetId: null, autoAttack: false });
+      pets()[0].targetId = dummy.id;
+      pets()[0].autoAttack = true;
+      sim.chat('/dev turret');
+      // Not left frozen at the gate, where a mob pulling it would pull its owner into combat.
+      expect(pets(), cls).toEqual([]);
+      expect(turretSeat(sim).petParked, cls).toBe(true);
+      // A save taken on the roof still carries a hunter's beast (a demon is never saved).
+      expect(sim.serializeCharacter(player.id)?.pet?.templateId ?? null, cls).toBe(
+        cls === 'hunter' ? template : null,
+      );
+      for (let i = 0; i < 20; i++) sim.tick();
+      expect(pets(), cls).toEqual([]);
+      sim.leaveVehicle();
+      const [back] = pets();
+      expect(back?.templateId, cls).toBe(template);
+      expect(Math.hypot(back.pos.x - player.pos.x, back.pos.z - player.pos.z), cls).toBeLessThan(6);
+      expect(sim.ctx.delvePetStash.has(meta.entityId), cls).toBe(false);
+    }
+  });
+
+  it('keeps the pet parked across a Replay, and seats a pet-less owner with nothing parked', () => {
+    const { sim, player } = rig('warlock');
+    summonPet(sim.ctx, player, 'emberkin');
+    sim.chat('/dev turret');
+    const pets = () => [...sim.entities.values()].filter((e) => e.ownerId === player.id);
+    turretSeat(sim).defense.phase = 'lost';
+    expect(sim.useVehicleAction('turret_replay', { x: 0, z: 0 })).toBe(true);
+    expect(turretSeat(sim).petParked).toBe(true);
+    expect(pets()).toEqual([]);
+    sim.leaveVehicle();
+    expect(pets().map((p) => p.templateId)).toEqual(['emberkin']);
+    const lone = rig('warrior');
+    lone.sim.chat('/dev turret');
+    expect(turretSeat(lone.sim).petParked).toBeUndefined();
   });
 
   it('lends no mount: a rider is set on foot for the whole seat, a walker stays on foot', () => {
@@ -626,6 +659,16 @@ describe('the arena', () => {
     sim.chat('/dev turret');
     expect(meta.vehicle ?? null).toBeNull();
     expect(player.pos).toEqual(before);
+  });
+
+  it('checks the trial before claiming: a plan that cannot resolve leaves the player untouched', () => {
+    const { sim, player, meta } = rig();
+    const before = { ...player.pos };
+    const broken = { ...TURRET_DEFAULT_SCENARIO, waves: [] };
+    expect(() => seatTurret(sim.ctx, player.id, broken)).toThrow(/bad wave count/);
+    expect(meta.vehicle ?? null).toBeNull();
+    expect(player.pos).toEqual(before);
+    expect(arenaClaims(sim)).toEqual([]);
   });
 
   it('drops an arena queue on entry, so no match pops for a player inside an instance', () => {
@@ -1063,7 +1106,7 @@ describe('the IWorld read', () => {
   });
 });
 
-describe('the feedback ring', () => {
+describe('the feedback ring', { timeout: FULL_RUN_TIMEOUT_MS }, () => {
   it('records every engine event of a won run in order, bounded, consumed once across waves', () => {
     const { sim } = rig();
     seat(sim);
@@ -1404,7 +1447,7 @@ describe('the limited weapons', () => {
   });
 });
 
-describe('determinism', () => {
+describe('determinism', { timeout: FULL_RUN_TIMEOUT_MS }, () => {
   it('draws one world value at the seat and none after: a seated, firing run leaves the world rng where a control run does', () => {
     const draws = (seated: boolean): { count: number; next: number[] } => {
       const { sim } = rig();
@@ -1479,7 +1522,7 @@ describe('determinism', () => {
   });
 });
 
-describe('a headless run in the arena', () => {
+describe('a headless run in the arena', { timeout: FULL_RUN_TIMEOUT_MS }, () => {
   it('a scripted aimer on the IWorld surface wins, bounded, stays seated after, then leaves home', () => {
     const { sim, player, meta } = rig();
     standAtAmberfall(sim);

@@ -9,7 +9,7 @@
 import { TURRET_SHOCKWAVE } from '../../../sim/content/turret_defense';
 import { TICK_RATE } from '../../../sim/types';
 import type { TurretSessionView } from '../../../world_api/vehicles';
-import { formatNumber, getI18nRevision } from '../../i18n';
+import { formatNumber, getI18nRevision, t } from '../../i18n';
 import { type ActionBarState, makeSlotState } from '../action_bar/action_bar_view';
 import type { TurretOwnShotLedger } from './turret_own_shot_core';
 import {
@@ -60,6 +60,19 @@ export class TurretWeaponBarView {
     revision: -1,
     cdSeconds: -1,
   }));
+
+  private groupText = '';
+  private groupRevision = -1;
+
+  /** The sockets' group name, resolved once per language rather than per frame. */
+  groupLabel(): string {
+    const revision = getI18nRevision();
+    if (revision !== this.groupRevision) {
+      this.groupRevision = revision;
+      this.groupText = t('hudChrome.turret.weapons');
+    }
+    return this.groupText;
+  }
 
   /** The charges each slot showed on the last tick. */
   chargesAt(slot: number): number {

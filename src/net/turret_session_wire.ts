@@ -6,6 +6,7 @@
 // value, never a stale half.
 import { TURRET_ARENA } from '../sim/content/turret_defense';
 import { deepFreeze } from '../sim/deep_freeze';
+import { FIRE_AND_FLY_MAX_POINTS } from '../sim/fire_and_fly_personal_records';
 import type { MotionSegment } from '../sim/minigames/thrown_body';
 import type { TurretBarrel } from '../sim/minigames/turret_barrels';
 import type {
@@ -65,7 +66,6 @@ const MAX_SHOCKWAVE_REACH = TURRET_ARENA.spawnRadius;
 // The most each points term can reach on a plan the resolver accepts.
 const MAX_KILL_POINTS = LIMITS.waves * LIMITS.spawnsPerWave * TURRET_POINTS.kill;
 const MAX_TOWER_POINTS = LIMITS.integrity * TURRET_POINTS.integrity;
-const MAX_POINTS = MAX_KILL_POINTS + MAX_TOWER_POINTS + TURRET_BONUS_CAP;
 
 const BAD: unique symbol = Symbol('malformed');
 type Dec<T> = (value: unknown) => T | typeof BAD;
@@ -208,7 +208,7 @@ const stats = checked(
 const hit = shape<TurretHit>({ id: count, falloff: num, damage: num, ...at });
 
 const medal: Dec<TurretMedal | null> = nullable(oneOf('gold', 'silver', 'bronze'));
-const points = within(0, MAX_POINTS);
+const points = within(0, FIRE_AND_FLY_MAX_POINTS);
 const breakdown = checked(
   shape<TurretPointsBreakdown>({
     kills: within(0, MAX_KILL_POINTS),

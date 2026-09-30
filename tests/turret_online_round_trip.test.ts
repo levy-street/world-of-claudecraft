@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { emitTurretSelfKeys, turretWireNumber } from '../server/turret_self_wire';
 import { dispatchVehicleCommand } from '../server/vehicle_command_wire';
 import { type QuestWorldCommand, QuestWorldWireState } from '../src/net/quest_world_wire_state';
@@ -325,6 +325,42 @@ describe('Fire and Fly online: the socket-free round trip', () => {
     const result = client.turretSession!.defense.result;
     expect(result).toMatchObject({ won: false, medal: null });
     expect(result).toEqual(turretSessionFor(sim.ctx, pid)!.defense.result);
+  });
+
+  it('leaves a seat it cannot read, once per unreadable stretch, rather than lock the player in', () => {
+    const { sim, pid } = serverPlayer();
+    const client = new WireClient(sim, pid);
+    const sent: Record<string, string> = {};
+    const before = { ...sim.entities.get(pid)!.pos };
+    sim.chat('/dev turret', pid);
+    client.applyQuestSelfSnapshot(wirePass(sent, sim, pid), sim.time, sim.tickCount);
+    expect(client.turretSession).not.toBeNull();
+    const tur = JSON.parse(sent.tur) as { defense: Record<string, unknown> };
+    // A skewed build's phase: the whole seat fails to decode.
+    const unreadable = { tur: { ...tur, defense: { ...tur.defense, phase: 'overheated' } } };
+    const leaves = vi.spyOn(client, 'leaveVehicle');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      client.applyQuestSelfSnapshot(unreadable, sim.time, sim.tickCount);
+      expect(client.turretSession).toBeNull();
+      expect(leaves).toHaveBeenCalledTimes(1);
+      expect(sim.meta(pid)?.vehicle ?? null).toBeNull();
+      expect(sim.entities.get(pid)!.pos).toEqual(before);
+      // Still unreadable before the server's null lands: no second leave.
+      client.applyQuestSelfSnapshot(unreadable, sim.time, sim.tickCount);
+      expect(leaves).toHaveBeenCalledTimes(1);
+      // The server's cleared seat ends the stretch; a later unreadable seat leaves again.
+      client.applyQuestSelfSnapshot(wirePass(sent, sim, pid), sim.time, sim.tickCount);
+      expect(client.turretSession).toBeNull();
+      sim.chat('/dev turret', pid);
+      client.applyQuestSelfSnapshot(wirePass(sent, sim, pid), sim.time, sim.tickCount);
+      expect(client.turretSession).not.toBeNull();
+      client.applyQuestSelfSnapshot(unreadable, sim.time, sim.tickCount);
+      expect(leaves).toHaveBeenCalledTimes(2);
+      expect(warn).toHaveBeenCalledTimes(2);
+    } finally {
+      warn.mockRestore();
+    }
   });
 
   it('starts a resumed client with an empty ring and replays nothing', () => {

@@ -17,7 +17,7 @@ import {
   fireAndFlyTrunkRadius,
 } from '../sim/fire_and_fly_field';
 import { IGNIVAR_GATE_LOCKED_TEMPLATE } from '../sim/ignivar_raid_ids';
-import { horizontalAt } from '../sim/minigames/thrown_body';
+import { horizontalAt, horizontalAtInto } from '../sim/minigames/thrown_body';
 import { authoredWallSegments } from '../sim/rift/authored';
 import { PLAYER_INTEREST_RADIUS } from '../sim/types';
 import type { IWorld } from '../world_api';
@@ -631,6 +631,8 @@ class DungeonMarkerBuffer {
   readonly markers: DungeonMapMarker[] = [];
   private readonly slots: MutableDungeonMapMarker[] = [];
   private count = 0;
+  /** One arena monster's position, reused across the paint so no point is minted per body. */
+  private readonly monsterAt = { x: 0, z: 0 };
 
   private next(kind: DungeonMapMarker['kind'], cx: number, cy: number): MutableDungeonMapMarker {
     let slot = this.slots[this.count];
@@ -724,7 +726,7 @@ class DungeonMarkerBuffer {
       for (const m of turret.defense.monsters) {
         const templateId = turretMobTemplate(turret, m);
         if (!templateId) continue;
-        const at = horizontalAt(m.seg, tick);
+        const at = horizontalAtInto(m.seg, tick, this.monsterAt);
         const cx = baseX - (at.x - frame.ox) * scale;
         const cy = baseY - (at.z - frame.oz) * scale;
         if (circular) {

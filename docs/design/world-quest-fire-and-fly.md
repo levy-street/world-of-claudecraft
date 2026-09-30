@@ -17,7 +17,12 @@ quest at the Evergarden gate").
 - The arena is a private open-field interior (`FIRE_AND_FLY_DUNGEON_DEFS` in
   `src/sim/content/fire_and_fly_arena.ts`): no overworld door, no spawns, hidden
   from the guide, one slot per player claimed under their solo key (never the
-  party's) by `claimTurretArena` in `src/sim/turret_arena_session.ts`.
+  party's) by `claimTurretArena` in `src/sim/turret_arena_session.ts`. A realm
+  holds `INSTANCE_SLOT_COUNT` (`src/sim/data.ts`) arenas at once, the same pool
+  size as every instanced interior; with all of them manned, the next player is
+  refused with the `full` line ("Every Fire and Fly tower is manned") and stays
+  where they stood. An ended run keeps its slot while its player stays on the
+  roof for Replay.
 - `src/sim/fire_and_fly_field.ts` is the one pure leaf for its shape: a gently
   rolling clearing, flat at the tower's foot, a few rocks, a dense tree ring,
   the tower's body (`FIRE_AND_FLY_TOWER`, measured from
@@ -37,6 +42,11 @@ quest at the Evergarden gate").
   that point. A save taken while seated records the return point
   (`src/sim/turret_save_position.ts`), so a restart never strands a player in
   the arena.
+- A pet cannot follow onto the roof: the seat parks it in the pet stash the delves
+  and the ferry use (`parkPetForArena` in `src/sim/turret_arena_session.ts`; a save
+  meanwhile still carries a hunter's beast) and hands it back beside its owner when
+  the seat ends, once the owner is alive. Left standing where its owner was, a pet
+  a mob pulled would pull the owner into combat and end the run.
 
 ## The engine
 
@@ -301,24 +311,50 @@ Graphics settings stay gameplay-neutral
   `tests/fire_and_fly_arena_prebuild.test.ts` and
   `tests/fire_and_fly_arena_intent_core.test.ts`.
 
-## Planned next: limited weapons
+## The limited weapons
 
-Two limited weapons are decided for the first version and not built yet. The plan
-already carries a per-run `arsenal` of charges (`TurretArsenal` in
-`src/sim/minigames/turret_defense_plan.ts`), zero on every trial today.
+Every trial grants the same per-run arsenal (`TRIAL_ARSENAL` in
+`src/sim/content/fire_and_fly_scenarios.ts`): 2 Shockwaves and 3 fragmentation
+shells. The plan carries it (`TurretArsenal` in
+`src/sim/minigames/turret_defense_plan.ts`), and the charges left are what the run
+has not spent (`turretChargesLeft`). The balance pass with scripted aimers (recorded
+at the top of the scenarios file) found the weapons barely move the medals, so the
+bars stayed.
 
-- **Shockwave.** The tower slams and a ring rolls out from its foot to about 12
-  yd, throwing every grounded monster it meets outward, low and flat, for little
-  damage. It cancels wind-ups, so it answers the monster stuck at the tower's
-  foot, and has its own rearm.
-- **Fragmentation shell.** Aimed like the shell, it bursts into a fixed star of
-  bomblets (one at the centre, the rest on a ring around it) that explode
-  together; the reticle shows every landing point.
-- **Charges.** Each trial grants a few of each per run, with a gold pulse and a
-  banner reminder so they are not forgotten.
-- **Controls.** Keyboard: one key fires the Shockwave; another arms the
-  fragmentation shell for the next click, and the same key, a right click or
-  Escape disarms it. Gamepad and touch get matching buttons and sockets.
+- **Shockwave** (`src/sim/minigames/turret_shockwave.ts`, tuning
+  `TURRET_SHOCKWAVE` in `src/sim/content/turret_defense.ts`). The tower slams and a
+  front rolls from its wall to 12 yd in 0.4 s, shoving every grounded monster it
+  meets outward, low and flat, for 0.3 of the wave's shell damage. It cancels
+  wind-ups, so it answers the monster stuck at the tower's foot. It fires at once,
+  wherever the aim is, and rearms in 1.5 s. Pinned by
+  `tests/turret_shockwave.test.ts` and `tests/turret_shockwave_core.test.ts`.
+- **Fragmentation shell** (`src/sim/minigames/turret_fragmentation.ts`, tuning
+  `TURRET_FRAGMENTATION`). Aimed, flown and reloaded like a shell, it bursts over its
+  point into a fixed star of 6 bomblets: one on the point, 5 on a 4.5 yd circle
+  turned to the shot's bearing, the first straight ahead. They land one tick apart
+  from 0.2 s after the burst, each a small shell blast (half the shot's damage)
+  that also lights kegs; the frag counts one hit if any bomblet lands one. No draw
+  anywhere: the star is the same every time, and the armed reticle shows every
+  landing point from the same function the engine uses (`writeTurretFragStar`).
+  Pinned by `tests/turret_fragmentation.test.ts`,
+  `tests/turret_frag_landing_marks.test.ts` and `tests/cannon_frag_core.test.ts`.
+- **Controls** (`src/game/turret_controls.ts`,
+  `src/ui/hud/vehicle/turret_aim_core.ts`). Keyboard: key 1 slams the Shockwave;
+  key 2 arms the fragmentation shell for the next click, and key 2 again, a right
+  click or Escape disarms it with no charge spent. Gamepad: Y slams, LB arms or
+  disarms, the pad's cancel disarms. Touch and mouse: two weapon sockets beside the
+  tower rail show the charges, the Shockwave's rearm, and a gold pulse once
+  monsters wind up at the foot (`turret_weapon_bar_view.ts`, reusing the action-bar
+  painter); the first wave's banner names the keys. Pinned by
+  `tests/turret_weapon_bar_view.test.ts`, `tests/turret_weapon_sockets.test.ts` and
+  `tests/turret_weapon_tooltip.test.ts`.
+- **Online.** The server checks every weapon action like a shot (a wave running,
+  a charge left, the reload or the rearm done); the charges reach the client in the
+  `tur` stats and the bomblets and the rolling front in the feedback ring.
+- **Look and sound.** The slam's stone ring (`src/render/turret_shockwave_core.ts`)
+  and the burst (`src/render/cannon_frag_core.ts`) draw through the shell visuals
+  (`cannon_shell_visuals.ts`, `turret_weapons_visual.ts`); both have their own sounds. The result card
+  lists the weapons used, and hides a row for a weapon the trial gives none of.
 
 Later candidates, not decided: a perimeter to defend (a chest or an NPC inside
 the dirt ring) instead of the tower itself, a first-person view from the cannon,

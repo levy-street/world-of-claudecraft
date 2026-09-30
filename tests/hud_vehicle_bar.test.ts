@@ -16,7 +16,9 @@ describe('the HUD vehicle bar factory host seam', () => {
       '  private readonly fctPainter = new FctPainter(',
       '  attachTooltip(el: HTMLElement, html: () => string): void {',
       'this.vehicleBar ??= createHudVehicleBar(this);',
-      "  showBanner(\n    text: string,\n    motion = true,\n    decorativeIconUrl?: string,\n    variant: BannerVariant = 'default',\n    subtext?: string | string[],",
+      "  showBanner(\n    text: string,\n    motion = true,\n    decorativeIconUrl?: string,\n    variant: BannerVariant = 'default',\n    subtext?: string | string[],\n    durationMs = 2600,\n    source: 'unstuck' | 'turret' | null = null,",
+      "  private clearSourceBanner(source: 'unstuck' | 'turret'): void {",
+      'private lastMinimapDrawAt = 0;',
     ]) {
       expect(hudSource, anchor).toContain(anchor);
     }

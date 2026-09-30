@@ -5,7 +5,8 @@
 // is turret_defense_visual.ts; the shots' own timeline is cannon_shell_core.ts.
 //
 // Three/DOM/i18n-free (RENDER_PURE_CORES) and allocation-free per frame: the
-// books and pools are fixed arrays refilled in place.
+// books and pools are fixed arrays refilled in place; only a revision that brings
+// new feedback entries slices them out of the ring.
 
 import { type TurretFeedback, turretFeedbackSince } from '../sim/minigames/turret_feedback';
 

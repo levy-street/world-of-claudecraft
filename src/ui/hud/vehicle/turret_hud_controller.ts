@@ -4,7 +4,6 @@ import { keyLabel } from '../../../game/keybinds';
 import { TURRET_PAD_WEAPON_BUTTONS } from '../../../game/turret_controls';
 import { TurretDefenseSfx } from '../../../game/turret_defense_sfx';
 import type { IWorldVehicles } from '../../../world_api/vehicles';
-import { t } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
 import { createReducedMotionProbe } from './reduced_motion_probe';
 import { TurretAimCore } from './turret_aim_core';
@@ -25,6 +24,8 @@ type TurretHudWorld = Pick<
 /** The HUD surfaces the seat reports through: banner slot, floating combat text, camera. */
 export interface TurretHudHooks {
   showBanner?(banner: TurretBanner): void;
+  /** A Replay began a fresh run over an ended one: the host drops what the last run left up. */
+  onNewRun?(): void;
   spawnFct?: TurretFctSpawn;
   /** Camera trauma for a strike on the turret. */
   addShake?(amount: number): void;
@@ -66,6 +67,8 @@ export class TurretHudController {
   private readonly weapons: TurretWeaponBarPainter;
   private weaponInput: TurretWeaponBarInput | null = null;
   private seated = false;
+  /** The seat's run had ended at the last update: a live run after it is a Replay's. */
+  private runEnded = false;
   constructor(
     private readonly world: TurretHudWorld,
     private readonly writers: PainterHostWriters,
@@ -83,11 +86,12 @@ export class TurretHudController {
     );
     this.weapons = new TurretWeaponBarPainter(
       writers,
-      (slot) => {
+      (slot, pointer) => {
         if (hooks.consumePeek?.()) return;
         this.chooseSlot(slot);
-        // A tap focuses the socket, and a focused socket shows its tooltip over the field.
-        this.weapons.buttons[slot]?.blur();
+        // A tap focuses the socket, and a focused socket shows its tooltip over the field;
+        // a keyboard press keeps its focus where the player put it.
+        if (pointer) this.weapons.buttons[slot]?.blur();
       },
       hooks.attachTooltip,
       (slot) => this.weaponTooltip(slot),
@@ -133,6 +137,10 @@ export class TurretHudController {
       this.painter.show(seated);
       writers.toggleClass(document.body, TURRET_SEATED_CLASS, seated);
     }
+    const phase = session?.defense.phase;
+    const runEnded = phase === 'won' || phase === 'lost';
+    if (session && this.runEnded && !runEnded) this.hooks.onNewRun?.();
+    this.runEnded = runEnded;
     const banner = this.feedback.consume(session, () => this.weaponKeys());
     if (banner) this.hooks.showBanner?.(banner);
     this.sounds.update(session, this.world.turretClock);
@@ -164,7 +172,7 @@ export class TurretHudController {
     input.clock = clock;
     input.fragArmed = this.aim.fragArmed;
     const state = this.weaponView.tick(input);
-    this.weapons.paint(state, t('hudChrome.turret.weapons'));
+    this.weapons.paint(state, this.weaponView.groupLabel());
   }
 
   /** The weapon socket's keycap: the pad glyph while the pad is in hand, else the bound key. */

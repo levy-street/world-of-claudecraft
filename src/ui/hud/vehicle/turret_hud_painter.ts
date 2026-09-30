@@ -151,7 +151,7 @@ export class TurretHudPainter {
   paint(frame: TurretHudFrame, keycap: string): void {
     const writers = this.writers;
     const labels = frame.labels;
-    writers.setAttr(this.strip, 'aria-label', labels.title);
+    writers.setAttr(this.strip, 'aria-label', labels.trial);
     writers.setText(this.wave, frame.wave);
     writers.setText(this.slot, frame.slot);
     writers.setText(this.live, frame.announce);

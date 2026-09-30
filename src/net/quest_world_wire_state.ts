@@ -79,6 +79,8 @@ export class QuestWorldWireState {
   private turretPlan: TurretPlan | null = null;
   private turretSeatWire: unknown = null;
   private turretSeat: TurretSeatState | null = null;
+  /** A leave was sent for a seat this client could not read; cleared once it reads one again. */
+  private turretUnreadableLeft = false;
   private questWorldTransport: ((command: QuestWorldCommand) => void) | null = null;
   private questWorldRestBase = '';
 
@@ -146,6 +148,7 @@ export class QuestWorldWireState {
       if (prior && this.turretSeat && !sameTurretSeat(prior, this.turretSeat)) ring.clear();
     }
     const ringMoved = ring.publish();
+    this.leaveUnreadableSeat();
     if (!this.turretSeat) {
       ring.clear();
       this.turretSession = null;
@@ -158,6 +161,23 @@ export class QuestWorldWireState {
         : null;
   }
 
+  /**
+   * The server holds a seat this client cannot decode (a skewed build, a field out of
+   * bounds): no turret HUD means no Leave, while the seat locks the player in place, so
+   * the client leaves it on the player's behalf, once per unreadable stretch.
+   */
+  private leaveUnreadableSeat(): void {
+    const unreadable = this.turretSeatWire != null && !this.turretSeat;
+    if (!unreadable) {
+      this.turretUnreadableLeft = false;
+      return;
+    }
+    if (this.turretUnreadableLeft) return;
+    this.turretUnreadableLeft = true;
+    console.warn('[turret] the server sent a seat this client cannot read; leaving it');
+    this.leaveVehicle();
+  }
+
   /** Drops both seats' mirrors (a closed socket, an ended session, a reconnect). */
   protected clearVehicleMirrors(): void {
     this.vehicleSession = null;
@@ -166,6 +186,7 @@ export class QuestWorldWireState {
     this.turretPlan = null;
     this.turretSeatWire = null;
     this.turretSeat = null;
+    this.turretUnreadableLeft = false;
     this.turretFeedback?.reset();
   }
 

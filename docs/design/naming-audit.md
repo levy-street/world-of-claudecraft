@@ -724,8 +724,8 @@ Exact-phrase and coined-token searches against the major game wikis.
 ### Fire and Fly world quest at the Evergarden gate (web-verified 2026-09-30)
 
 Scope: the proper nouns the Fire and Fly world quest adds (the mini-game's name,
-the instructor, the quest, its three trials, the first-win deed and the rankings
-window's title). Quoted exact-phrase searches plus game-wiki searches (WoW,
+the instructor, the quest, its three trials, the first-win deed, the rankings
+window's title and the two limited weapons). Quoted exact-phrase searches plus game-wiki searches (WoW,
 RuneScape, FFXIV, GW2, ESO, Diablo, Path of Exile). None of these is a coined
 token; every one is ordinary English, so the check is for a distinctive full name
 in the same role.
@@ -741,6 +741,8 @@ in the same role.
 | Veterans' Test | the Hard scenario | KEEP. No match; nearest are Destiny's "Veteran's Tour" and several quests named "The Veteran", different wording. |
 | The Gunner's Oath | the first-win deed (`exp_gunners_oath`) | KEEP. No match as an achievement or quest. |
 | Gunner's trial records | the rankings window title of the trials' ladders (`hudChrome.leaderboard.fireAndFlyRankings`), opened from the noticeboard beside Alder | KEEP. No match in any game (the exact phrase only finds historical court-martial archives); a descriptive label in the shape of the glider's "Glider course records". |
+| Shockwave | the tower's limited area weapon (`hudChrome.turret.shockwave`), added after the audit above; web-checked 2026-09-30 | KEEP, borderline. A dictionary word and one of the most common ability names in games: World of Warcraft's warrior talent, Path of Exile's "Shockwave Support", Warframe's "Rippling Shockwave" and many more share it, so it is generic, not a name distinctive to one game. The mechanic differs too (a rolling ground front that shoves, no stun). |
+| Fragmentation Shell | the tower's limited burst shot (`hudChrome.turret.frag`), added after the audit above; web-checked 2026-09-30 | KEEP. No game ability by that exact name; it is the real artillery term. Nearest are Guild Wars 2's "Fragmentation Shot" and PoE's "Kinetic Bolt of Fragmentation", different wording. |
 | The Rampart Trials, Rampart Recruiter, Sworn to the Ramparts | REJECTED before shipping | No exact match, but "Rampart" is also Atari's 1990 cannon-and-castle defense game, the same genre and theme as this activity, so the word was dropped from every proper noun (it stays in lowercase prose, "the ramparts"). |
 
 ## Recorded for the maintainer (stopping rule: no unilateral rename)

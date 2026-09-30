@@ -243,6 +243,25 @@ describe('personal world guidance coordinator', () => {
     guidance.dispose();
     expect(calls.prebuildDispose).toHaveBeenCalledTimes(1);
   });
+  it('disposes every other visual when the turret throws, then rethrows the failure', () => {
+    const guidance = new WorldGuidance(new THREE.Scene(), () => 0);
+    const broken = new Error('turret rigs');
+    calls.turretDispose.mockImplementationOnce(() => {
+      throw broken;
+    });
+    calls.prebuildDispose.mockClear();
+    calls.dispose.mockClear();
+    let thrown: unknown = null;
+    try {
+      guidance.dispose();
+    } catch (error) {
+      thrown = error;
+    }
+    expect(thrown).toBeInstanceOf(AggregateError);
+    expect((thrown as AggregateError).errors).toEqual([broken]);
+    expect(calls.dispose).toHaveBeenCalledTimes(1);
+    expect(calls.prebuildDispose).toHaveBeenCalledTimes(1);
+  });
   it('is lent the renderer as the turret host, once (source pin)', () => {
     const lend = 'this.worldGuidance.setTurretHost(this);';
     const lends = (source: string) => stripComments(source).split(lend).length - 1;
