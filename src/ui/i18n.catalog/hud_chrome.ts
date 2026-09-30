@@ -145,6 +145,18 @@ export const hudChromeStrings = {
   spectate: {
     banner: 'Spectating {name}',
   },
+  // The realm message of the day (/motd, server/realm_motd.ts): the chat line
+  // every player sees at login and whenever an admin changes it ({text} is the
+  // admin's message, spliced verbatim), plus the admin's command feedback.
+  realmMotd: {
+    line: 'Message of the day: {text}',
+    updated: 'Message of the day updated.',
+    cleared: 'Message of the day cleared.',
+    none: 'No message of the day is set.',
+    usage: 'Usage: /motd "<message>" to set it, /motd clear to remove it.',
+    tooLong: 'The message of the day is limited to {max} characters.',
+    saveFailed: 'The message of the day could not be saved and will not survive a restart.',
+  },
   // Raid/party ready-check prompt (the leader ran /ready). The buttons answer the
   // yes/no prompt; the outcome is announced in chat by the sim.
   readyCheck: {

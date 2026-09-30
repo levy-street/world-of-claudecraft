@@ -423,6 +423,8 @@ import { recordLevelUp } from './progress_events';
 import * as questWire from './quest_command_wire';
 import * as questSnap from './quest_snapshot_wire';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
+import { RealmMotd } from './realm_motd';
+import { realmMotdStore } from './realm_motd_db';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
 import { dispatchRiftCommand } from './rift_forge_dispatch';
@@ -435,6 +437,7 @@ import {
   createKeyedSerialWriter,
   createSerialWriter,
 } from './serial_writer';
+import { findSessionByName } from './session_by_name';
 import { buildRealmSimConfig } from './sim_boot_config';
 import { feedRealmCalendar } from './sim_calendar_feed';
 import {
@@ -1540,6 +1543,10 @@ export class GameServer {
   // beginGuildBankDelete / endGuildBankDelete); removed on every arm.
   private readonly guildBankDeleteWindows = new Set<number>();
   private readonly moderation: ModerationService<ClientSession>;
+  readonly realmMotd = new RealmMotd<ClientSession>(
+    { sessions: () => this.clients.values(), sendRaw: (s, payload) => this.sendRaw(s, payload) },
+    realmMotdStore(() => pool, REALM),
+  );
   private readonly generalChatQuota: GeneralChatQuotaCoordinator;
   private readonly generalChatRateLimitLiveState = new GeneralChatRateLimitLiveState();
   private readonly chatModerationLiveState = new ChatModerationLiveState();
@@ -1971,18 +1978,7 @@ export class GameServer {
   }
 
   private sessionByName(name: string): ClientSession | null {
-    const wanted = name.trim();
-    let ci: ClientSession | null = null;
-    let ciCount = 0;
-    const lower = wanted.toLowerCase();
-    for (const s of this.clients.values()) {
-      if (s.name === wanted) return s; // exact case wins
-      if (s.name.toLowerCase() === lower) {
-        ci = s;
-        ciCount++;
-      }
-    }
-    return ciCount === 1 ? ci : null;
+    return findSessionByName(this.clients.values(), name);
   }
 
   private moderationHost(): ModerationHost<ClientSession> {
@@ -2007,6 +2003,7 @@ export class GameServer {
       isJailed: (session) => session.jailed !== null,
       jail: (moderator, target, minutes) => this.jailSession(moderator, target, minutes),
       unjail: (moderator, target) => this.unjailSession(moderator, target),
+      realmMotd: (actor, command) => this.realmMotd.handle(actor, command),
     };
   }
 
@@ -3573,6 +3570,7 @@ export class GameServer {
       t: 'events',
       list: [{ type: 'log', text: `${name} has entered World of ClaudeCraft.`, color: '#ffd100' }],
     });
+    this.realmMotd.greet(session);
     // firstJoin: the fresh-join path (a resume takes resumeSession, which stamps
     // the guild with firstJoin false since the entity already carries it), so
     // the first guild stamp retro-credits an existing member's soc_guild_joined

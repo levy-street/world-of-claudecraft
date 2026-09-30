@@ -126,6 +126,15 @@ describe('admin permission vocabulary', () => {
     );
   });
 
+  it('keeps realm.motd to admin and superadmin: moderators cannot set the realm message', () => {
+    for (const role of ADMIN_ROLES) {
+      const grants = new Set(ROLE_PERMISSIONS[role]).has('realm.motd');
+      expect(grants, `${role} grants realm.motd`).toBe(
+        role === 'admin' || role === SUPERADMIN_ROLE,
+      );
+    }
+  });
+
   it('keeps the client permission mirror byte-identical to the server vocabulary', () => {
     expect([...CLIENT_ADMIN_PERMISSIONS]).toEqual([...ADMIN_PERMISSIONS]);
   });

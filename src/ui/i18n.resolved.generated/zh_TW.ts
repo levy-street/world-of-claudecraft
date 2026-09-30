@@ -570,6 +570,15 @@ export const zh_TW: EnTranslations = {
     "spectate": {
       "banner": "正在觀察 {name}"
     },
+    "realmMotd": {
+      "line": "今日訊息：{text}",
+      "updated": "今日訊息已更新。",
+      "cleared": "今日訊息已清除。",
+      "none": "目前未設定今日訊息。",
+      "usage": "用法：/motd \"<訊息>\" 設定今日訊息，/motd clear 將其清除。",
+      "tooLong": "今日訊息最多 {max} 個字元。",
+      "saveFailed": "今日訊息未能儲存，伺服器重新啟動後將會遺失。"
+    },
     "readyCheck": {
       "title": "就緒確認",
       "close": "關閉",

@@ -570,6 +570,15 @@ export const ko_KR: EnTranslations = {
     "spectate": {
       "banner": "{name} 관전 중"
     },
+    "realmMotd": {
+      "line": "오늘의 메시지: {text}",
+      "updated": "오늘의 메시지를 업데이트했습니다.",
+      "cleared": "오늘의 메시지를 삭제했습니다.",
+      "none": "설정된 오늘의 메시지가 없습니다.",
+      "usage": "사용법: /motd \"<메시지>\"로 설정하고, /motd clear로 삭제합니다.",
+      "tooLong": "오늘의 메시지는 최대 {max}자까지 입력할 수 있습니다.",
+      "saveFailed": "오늘의 메시지를 저장하지 못했습니다. 서버를 재시작하면 사라집니다."
+    },
     "readyCheck": {
       "title": "준비 확인",
       "close": "닫기",

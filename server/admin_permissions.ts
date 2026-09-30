@@ -21,6 +21,10 @@ export const ADMIN_PERMISSIONS = [
   'ipblocks.manage',
   'chatfilter.manage',
   'content.moderate',
+  // The realm message of the day (/motd, server/realm_motd.ts): a line every
+  // player sees at login and a broadcast to everyone online, so it is an
+  // admin-tier grant, deliberately outside the moderator bundle.
+  'realm.motd',
   'botdetector.read',
   'botdetector.configure',
   // The guild bank dormant-slot escape hatch: remove one permanently

@@ -570,6 +570,15 @@ export const ja_JP: EnTranslations = {
     "spectate": {
       "banner": "{name}を観戦中"
     },
+    "realmMotd": {
+      "line": "本日のお知らせ：{text}",
+      "updated": "本日のお知らせを更新しました。",
+      "cleared": "本日のお知らせを削除しました。",
+      "none": "本日のお知らせは設定されていません。",
+      "usage": "使い方：/motd \"<メッセージ>\" で設定、/motd clear で削除します。",
+      "tooLong": "本日のお知らせは最大{max}文字です。",
+      "saveFailed": "本日のお知らせを保存できませんでした。サーバーを再起動すると失われます。"
+    },
     "readyCheck": {
       "title": "準備確認",
       "close": "閉じる",

@@ -2050,6 +2050,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Запрет на участие в ежедневных наградах действует еще {remaining}. Доступ вернется {until}. Причина: {reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': 'Наблюдение за {name}',
+  'hudChrome.realmMotd.line': 'Сообщение дня: {text}',
+  'hudChrome.realmMotd.updated': 'Сообщение дня обновлено.',
+  'hudChrome.realmMotd.cleared': 'Сообщение дня удалено.',
+  'hudChrome.realmMotd.none': 'Сообщение дня не задано.',
+  'hudChrome.realmMotd.usage':
+    'Использование: /motd "<сообщение>", чтобы задать его, /motd clear, чтобы удалить.',
+  'hudChrome.realmMotd.tooLong': 'Сообщение дня не может быть длиннее {max} символов.',
+  'hudChrome.realmMotd.saveFailed':
+    'Не удалось сохранить сообщение дня: после перезапуска оно будет потеряно.',
   'hudChrome.readyCheck.prompt': '{name} начал проверку готовности. Вы готовы?',
   'hudChrome.readyCheck.ready': 'Готов',
   'hudChrome.readyCheck.notReady': 'Не готов',

@@ -1689,7 +1689,11 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 9827 and the
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 9840,
+    // LOWERED 9840 -> 9838 by the realm message of the day change: its state,
+    // persistence and fan-out live in server/realm_motd.ts, and the moderation
+    // target lookup moved to server/session_by_name.ts, so the wiring landed as
+    // a net shrink. Exact count, zero slack.
+    ceiling: 9838,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

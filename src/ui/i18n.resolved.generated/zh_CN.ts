@@ -570,6 +570,15 @@ export const zh_CN: EnTranslations = {
     "spectate": {
       "banner": "正在观察 {name}"
     },
+    "realmMotd": {
+      "line": "今日消息：{text}",
+      "updated": "今日消息已更新。",
+      "cleared": "今日消息已清除。",
+      "none": "当前未设置今日消息。",
+      "usage": "用法：/motd \"<消息>\" 设置今日消息，/motd clear 将其清除。",
+      "tooLong": "今日消息最多 {max} 个字符。",
+      "saveFailed": "今日消息未能保存，服务器重启后将会丢失。"
+    },
     "readyCheck": {
       "title": "就绪确认",
       "close": "关闭",

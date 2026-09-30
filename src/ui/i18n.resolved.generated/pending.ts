@@ -9,25 +9,145 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.realmMotd.cleared",
+    "hudChrome.realmMotd.line",
+    "hudChrome.realmMotd.none",
+    "hudChrome.realmMotd.saveFailed",
+    "hudChrome.realmMotd.tooLong",
+    "hudChrome.realmMotd.updated",
+    "hudChrome.realmMotd.usage"
+  ],
+  "es_ES": [
+    "hudChrome.realmMotd.cleared",
+    "hudChrome.realmMotd.line",
+    "hudChrome.realmMotd.none",
+    "hudChrome.realmMotd.saveFailed",
+    "hudChrome.realmMotd.tooLong",
+    "hudChrome.realmMotd.updated",
+    "hudChrome.realmMotd.usage"
+  ],
+  "fr_FR": [
+    "hudChrome.realmMotd.cleared",
+    "hudChrome.realmMotd.line",
+    "hudChrome.realmMotd.none",
+    "hudChrome.realmMotd.saveFailed",
+    "hudChrome.realmMotd.tooLong",
+    "hudChrome.realmMotd.updated",
+    "hudChrome.realmMotd.usage"
+  ],
+  "fr_CA": [
+    "hudChrome.realmMotd.cleared",
+    "hudChrome.realmMotd.line",
+    "hudChrome.realmMotd.none",
+    "hudChrome.realmMotd.saveFailed",
+    "hudChrome.realmMotd.tooLong",
+    "hudChrome.realmMotd.updated",
+    "hudChrome.realmMotd.usage"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.realmMotd.cleared",
+    "hudChrome.realmMotd.line",
+    "hudChrome.realmMotd.none",
+    "hudChrome.realmMotd.saveFailed",
+    "hudChrome.realmMotd.tooLong",
+    "hudChrome.realmMotd.updated",
+    "hudChrome.realmMotd.usage"
+  ],
+  "de_DE": [
+    "hudChrome.realmMotd.cleared",
+    "hudChrome.realmMotd.line",
+    "hudChrome.realmMotd.none",
+    "hudChrome.realmMotd.saveFailed",
+    "hudChrome.realmMotd.tooLong",
+    "hudChrome.realmMotd.updated",
+    "hudChrome.realmMotd.usage"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.realmMotd.cleared",
+    "hudChrome.realmMotd.line",
+    "hudChrome.realmMotd.none",
+    "hudChrome.realmMotd.saveFailed",
+    "hudChrome.realmMotd.tooLong",
+    "hudChrome.realmMotd.updated",
+    "hudChrome.realmMotd.usage"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.realmMotd.cleared",
+    "hudChrome.realmMotd.line",
+    "hudChrome.realmMotd.none",
+    "hudChrome.realmMotd.saveFailed",
+    "hudChrome.realmMotd.tooLong",
+    "hudChrome.realmMotd.updated",
+    "hudChrome.realmMotd.usage"
+  ],
+  "nl_NL": [
+    "hudChrome.realmMotd.cleared",
+    "hudChrome.realmMotd.line",
+    "hudChrome.realmMotd.none",
+    "hudChrome.realmMotd.saveFailed",
+    "hudChrome.realmMotd.tooLong",
+    "hudChrome.realmMotd.updated",
+    "hudChrome.realmMotd.usage"
+  ],
+  "pl_PL": [
+    "hudChrome.realmMotd.cleared",
+    "hudChrome.realmMotd.line",
+    "hudChrome.realmMotd.none",
+    "hudChrome.realmMotd.saveFailed",
+    "hudChrome.realmMotd.tooLong",
+    "hudChrome.realmMotd.updated",
+    "hudChrome.realmMotd.usage"
+  ],
+  "id_ID": [
+    "hudChrome.realmMotd.cleared",
+    "hudChrome.realmMotd.line",
+    "hudChrome.realmMotd.none",
+    "hudChrome.realmMotd.saveFailed",
+    "hudChrome.realmMotd.tooLong",
+    "hudChrome.realmMotd.updated",
+    "hudChrome.realmMotd.usage"
+  ],
+  "tr_TR": [
+    "hudChrome.realmMotd.cleared",
+    "hudChrome.realmMotd.line",
+    "hudChrome.realmMotd.none",
+    "hudChrome.realmMotd.saveFailed",
+    "hudChrome.realmMotd.tooLong",
+    "hudChrome.realmMotd.updated",
+    "hudChrome.realmMotd.usage"
+  ],
+  "sv_SE": [
+    "hudChrome.realmMotd.cleared",
+    "hudChrome.realmMotd.line",
+    "hudChrome.realmMotd.none",
+    "hudChrome.realmMotd.saveFailed",
+    "hudChrome.realmMotd.tooLong",
+    "hudChrome.realmMotd.updated",
+    "hudChrome.realmMotd.usage"
+  ],
+  "vi_VN": [
+    "hudChrome.realmMotd.cleared",
+    "hudChrome.realmMotd.line",
+    "hudChrome.realmMotd.none",
+    "hudChrome.realmMotd.saveFailed",
+    "hudChrome.realmMotd.tooLong",
+    "hudChrome.realmMotd.updated",
+    "hudChrome.realmMotd.usage"
+  ],
+  "da_DK": [
+    "hudChrome.realmMotd.cleared",
+    "hudChrome.realmMotd.line",
+    "hudChrome.realmMotd.none",
+    "hudChrome.realmMotd.saveFailed",
+    "hudChrome.realmMotd.tooLong",
+    "hudChrome.realmMotd.updated",
+    "hudChrome.realmMotd.usage"
+  ]
 };
