@@ -243,7 +243,7 @@ describe('the turret HUD view', () => {
     const session = seat();
     session.defense.phase = 'won';
     session.defense.wave = 5;
-    session.defense.integrity = 93;
+    session.defense.integrity = 97;
     Object.assign(session.defense.stats, { kills: 71, barrelKills: 4, bowled: 17 });
     session.defense.result = turretResult(session.defense.plan, session.defense);
     const offline = turretSessionView(session);
@@ -254,7 +254,7 @@ describe('the turret HUD view', () => {
     const onlineResult = new TurretHudView().tick(online, START).result;
     expect(onlineResult?.scored).toBe(true);
     expect(onlineResult?.medalText).toBe('Gold medal');
-    expect(onlineResult?.pointRows[4]).toEqual({ label: 'Total points', value: '20,057' });
+    expect(onlineResult?.pointRows[4]).toEqual({ label: 'Total points', value: '20,857' });
     expect(onlineResult).toEqual(offlineResult);
   });
 
@@ -268,7 +268,7 @@ describe('the turret HUD view', () => {
       const result = view.tick(turretSessionView(session), START).result;
       return [result?.medal, result?.medalText];
     };
-    expect(medalAt(95)).toEqual(['gold', 'Gold medal']);
+    expect(medalAt(97)).toEqual(['gold', 'Gold medal']);
     expect(medalAt(60)).toEqual(['silver', 'Silver medal']);
     expect(medalAt(59)).toEqual(['bronze', 'Bronze medal']);
   });
@@ -403,7 +403,7 @@ describe('the turret HUD live line', () => {
       session.defense.result = turretResult(session.defense.plan, session.defense);
       return new TurretHudView().tick(turretSessionView(session), START).announce;
     };
-    expect(ended('won', 95)).toBe('Victory! Gold medal');
+    expect(ended('won', 97)).toBe('Victory! Gold medal');
     expect(ended('won', 59)).toBe('Victory! Bronze medal');
     expect(ended('lost', 0)).toBe('The tower has fallen');
   });

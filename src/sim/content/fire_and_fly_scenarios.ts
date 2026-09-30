@@ -4,8 +4,9 @@
 // Hard, and every medal bar, are first values to tune by playtest: mini-game tuning,
 // not classic-era formulas. A tuning change after boards open mints a new board
 // version. The medal bars come from scripted aimers on the arena ground, up to 3 yd
-// off: on Standard, firing within about 0.8 s of each reload keeps gold, about 1 s
-// mostly silver, 1.5 s bronze.
+// off: on Standard, firing within about 0.4 s of each reload keeps gold, 0.8 s gold
+// or silver, 1 s silver, 1.5 s bronze; on Hard, 0.4 s gold, 0.8 s mostly silver, 1 s
+// bronze or a loss.
 
 import { DT, type TurretScenarioDef } from '../types';
 import { TURRET_BARREL_RING, TURRET_WAVES } from './turret_defense';
@@ -14,10 +15,10 @@ const ticks = (seconds: number): number => Math.round(seconds / DT);
 
 /** Slower spawns than Standard's 0.8 to 1.6 s: time to aim each one. */
 const INTRO_GAP = { gapMinTicks: ticks(1.4), gapMaxTicks: ticks(2.4) } as const;
-const HARD_GAP = { gapMinTicks: ticks(0.6), gapMaxTicks: ticks(1.2) } as const;
+const HARD_GAP = { gapMinTicks: ticks(0.4), gapMaxTicks: ticks(0.8) } as const;
 /** Inside a pack, the members follow each other closely. */
 const PACK_GAP = { gapMinTicks: ticks(0.2), gapMaxTicks: ticks(0.4) } as const;
-const HARD_HP = 1.4;
+const HARD_HP = 1.8;
 
 /** Three short waves of the smallest monsters on the whole ring, with room for mistakes. */
 export const TURRET_SCENARIO_INTRODUCTION: TurretScenarioDef = {
@@ -59,55 +60,58 @@ export const TURRET_SCENARIO_STANDARD: TurretScenarioDef = {
   id: 'fire_and_fly_standard',
   boardKey: 'standard',
   integrity: 100,
-  medals: { gold: { minIntegrityShare: 0.9 }, silver: { minIntegrityShare: 0.6 } },
+  medals: { gold: { minIntegrityShare: 0.97 }, silver: { minIntegrityShare: 0.6 } },
   waves: TURRET_WAVES,
 };
 
 /**
- * Standard's six waves made meaner: tougher monsters (40 percent more health), more
- * of the large ones, faster spawns, and arrivals from one side, from pincers, or in
- * packs, so the cannon has to swing.
+ * Standard's six waves made meaner: tougher monsters (80 percent more health from the
+ * second wave), more of them and far more of the large and huge ones, faster spawns,
+ * and arrivals from pincers or in packs more often than from one side, so the cannon
+ * has to swing. The kegs stay as many as Standard's.
  */
 export const TURRET_SCENARIO_HARD: TurretScenarioDef = {
   id: 'fire_and_fly_hard',
   boardKey: 'hard',
   integrity: 100,
-  medals: { gold: { minIntegrityShare: 0.85 }, silver: { minIntegrityShare: 0.5 } },
+  medals: { gold: { minIntegrityShare: 0.95 }, silver: { minIntegrityShare: 0.6 } },
   waves: [
     {
       entries: [
-        { templateId: 'forest_wolf', count: 8, level: 2 },
-        { templateId: 'wild_boar', count: 4, level: 3 },
+        { templateId: 'forest_wolf', count: 10, level: 2 },
+        { templateId: 'wild_boar', count: 6, level: 3 },
       ],
       coreDamage: 60,
+      ...HARD_GAP,
+      barrels: { count: 3, ...TURRET_BARREL_RING },
+      arrival: { kind: 'flanks', count: 2, widthTurn: 0.14 },
+    },
+    {
+      entries: [
+        { templateId: 'wild_boar', count: 7, level: 3, hpScale: HARD_HP },
+        { templateId: 'vale_bandit', count: 7, level: 5, hpScale: HARD_HP },
+        { templateId: 'fen_troll', count: 2, level: 11, hpScale: HARD_HP },
+      ],
+      coreDamage: 64,
       ...HARD_GAP,
       barrels: { count: 3, ...TURRET_BARREL_RING },
       arrival: { kind: 'arc', widthTurn: 0.3 },
     },
     {
       entries: [
-        { templateId: 'wild_boar', count: 6, level: 3, hpScale: HARD_HP },
-        { templateId: 'vale_bandit', count: 6, level: 5, hpScale: HARD_HP },
-      ],
-      coreDamage: 64,
-      ...HARD_GAP,
-      barrels: { count: 3, ...TURRET_BARREL_RING },
-      arrival: { kind: 'flanks', count: 2, widthTurn: 0.12 },
-    },
-    {
-      entries: [
-        { templateId: 'webwood_spider', count: 8, level: 4, hpScale: HARD_HP },
-        { templateId: 'fen_troll', count: 4, level: 11, hpScale: HARD_HP },
+        { templateId: 'webwood_spider', count: 10, level: 4, hpScale: HARD_HP },
+        { templateId: 'fen_troll', count: 6, level: 11, hpScale: HARD_HP },
       ],
       coreDamage: 84,
       ...PACK_GAP,
       barrels: { count: 4, ...TURRET_BARREL_RING },
-      arrival: { kind: 'burst', groupSize: 4, groupGapTicks: ticks(3.5), widthTurn: 0.06 },
+      arrival: { kind: 'burst', groupSize: 5, groupGapTicks: ticks(2.5), widthTurn: 0.06 },
     },
     {
       entries: [
-        { templateId: 'tunnel_rat', count: 6, level: 6, hpScale: HARD_HP },
+        { templateId: 'tunnel_rat', count: 9, level: 6, hpScale: HARD_HP },
         { templateId: 'fen_troll', count: 6, level: 12, hpScale: HARD_HP },
+        { templateId: 'thornpeak_ogre', count: 2, level: 16, hpScale: HARD_HP },
       ],
       coreDamage: 100,
       ...HARD_GAP,
@@ -116,26 +120,27 @@ export const TURRET_SCENARIO_HARD: TurretScenarioDef = {
     },
     {
       entries: [
-        { templateId: 'deeprock_kobold', count: 6, level: 15, hpScale: HARD_HP },
-        { templateId: 'thornpeak_ogre', count: 6, level: 16, hpScale: HARD_HP },
-        { templateId: 'boneclad_revenant', count: 4, level: 19, hpScale: HARD_HP },
+        { templateId: 'deeprock_kobold', count: 7, level: 15, hpScale: HARD_HP },
+        { templateId: 'thornpeak_ogre', count: 5, level: 16, hpScale: HARD_HP },
+        { templateId: 'boneclad_revenant', count: 5, level: 19, hpScale: HARD_HP },
+        { templateId: 'frostmane_yeti', count: 1, level: 20, hpScale: HARD_HP },
       ],
       coreDamage: 130,
       ...HARD_GAP,
       barrels: { count: 5, ...TURRET_BARREL_RING },
-      arrival: { kind: 'arc', widthTurn: 0.4 },
+      arrival: { kind: 'flanks', count: 2, widthTurn: 0.12 },
     },
     {
       entries: [
-        { templateId: 'boneclad_revenant', count: 6, level: 19, hpScale: HARD_HP },
-        { templateId: 'thornpeak_ogre', count: 4, level: 16, hpScale: HARD_HP },
+        { templateId: 'boneclad_revenant', count: 7, level: 19, hpScale: HARD_HP },
+        { templateId: 'thornpeak_ogre', count: 5, level: 16, hpScale: HARD_HP },
         { templateId: 'frostmane_yeti', count: 3, level: 20, hpScale: HARD_HP },
         { templateId: 'idol_guardian', count: 1, level: 20, bossLast: true, hpScale: HARD_HP },
       ],
       coreDamage: 220,
       ...PACK_GAP,
       barrels: { count: 5, ...TURRET_BARREL_RING },
-      arrival: { kind: 'burst', groupSize: 3, groupGapTicks: ticks(4), widthTurn: 0.08 },
+      arrival: { kind: 'burst', groupSize: 4, groupGapTicks: ticks(3), widthTurn: 0.08 },
     },
   ],
 };

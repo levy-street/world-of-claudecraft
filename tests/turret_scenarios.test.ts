@@ -154,13 +154,26 @@ describe('the scenario table', () => {
     expect(new Set(hard.waves.map((w) => w.arrival?.kind))).toEqual(
       new Set(['arc', 'flanks', 'burst']),
     );
-    expect(hard.waves.flatMap((w) => w.entries).some((e) => (e.hpScale ?? 1) > 1)).toBe(true);
-    const big = (s: TurretScenarioDef) =>
+    expect(hard.waves.filter((w) => w.arrival?.kind !== 'arc').length).toBeGreaterThan(4);
+    expect(Math.max(...hard.waves.flatMap((w) => w.entries).map((e) => e.hpScale ?? 1))).toBe(1.8);
+    const count = (s: TurretScenarioDef, sizes: readonly string[]) =>
       s.waves
         .flatMap((w) => w.entries)
-        .filter((e) => TURRET_SIZE_CLASSES[TURRET_TEMPLATE_SIZES[e.templateId]].mass >= 3)
+        .filter((e) => sizes.includes(TURRET_TEMPLATE_SIZES[e.templateId]))
         .reduce((n, e) => n + e.count, 0);
-    expect(big(hard)).toBeGreaterThan(big(TURRET_SCENARIO_STANDARD));
+    const all = ['small', 'medium', 'large', 'huge'];
+    const std = TURRET_SCENARIO_STANDARD;
+    expect(count(hard, all)).toBeGreaterThanOrEqual(count(std, all) * 1.3);
+    expect(count(hard, ['large', 'huge'])).toBeGreaterThan(count(std, ['large', 'huge']) * 2.5);
+    expect(count(hard, ['huge'])).toBeGreaterThan(count(std, ['huge']));
+    expect(hard.waves[0].gapMinTicks).toBeLessThan(TURRET_WAVES[0].gapMinTicks);
+    expect(hard.waves[0].gapMaxTicks).toBeLessThan(TURRET_WAVES[0].gapMaxTicks);
+  });
+
+  it("keeps Hard's kegs wave by wave as many as Standard's: they were barely used", () => {
+    expect(TURRET_SCENARIO_HARD.waves.map((w) => w.barrels)).toEqual(
+      TURRET_WAVES.map((w) => w.barrels),
+    );
   });
 });
 
@@ -256,7 +269,7 @@ describe('resolving a scenario into a plan', () => {
     expect(plan.waves[0].spawns).toEqual([0, 1, 0]);
     const hard = resolveTurretPlan(TURRET_SCENARIO_HARD);
     const yeti = hard.kinds.find((k) => k.templateId === 'frostmane_yeti') as TurretKind;
-    expect(yeti.maxHp).toBe(Math.round(mobMaxHp(MOBS.frostmane_yeti, 20) * 1.4));
+    expect(yeti.maxHp).toBe(Math.round(mobMaxHp(MOBS.frostmane_yeti, 20) * 1.8));
     expect(yeti.breachValue).toBe(TURRET_SIZE_CLASSES.huge.breachValue);
   });
 

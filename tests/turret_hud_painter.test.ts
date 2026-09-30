@@ -166,7 +166,7 @@ describe('the turret HUD painter', () => {
   it('names the medal beside its tinted disc and lists the points, then writes nothing more', () => {
     const { painter, writes, view } = rig();
     painter.show(true);
-    const won = ended('won', 95);
+    const won = ended('won', 97);
     painter.paint(view.tick(turretSessionView(won), START), 'Esc');
     const medal = painter.strip.querySelector<HTMLElement>('.turret-card-medal')!;
     const icon = medal.querySelector<HTMLElement>('.turret-card-medal-icon')!;
@@ -184,15 +184,15 @@ describe('the turret HUD painter', () => {
       ]),
     ).toEqual([
       ['Kills (71)', '+1,420'],
-      ['Tower kept (95)', '+19,000'],
+      ['Tower kept (97)', '+19,400'],
       ['Keg kills (0)', '0'],
       ['Bowled over (0)', '0'],
-      ['Total points', '20,420'],
+      ['Total points', '20,820'],
     ]);
     expect(points.lastElementChild!.classList.contains('turret-card-total')).toBe(true);
-    const view95 = turretSessionView(won);
+    const view97 = turretSessionView(won);
     writes.mockClear();
-    for (let i = 0; i < 10; i++) painter.paint(view.tick(view95, START + i), 'Esc');
+    for (let i = 0; i < 10; i++) painter.paint(view.tick(view97, START + i), 'Esc');
     expect(writes).not.toHaveBeenCalled();
 
     painter.paint(view.tick(turretSessionView(ended('won', 70)), START), 'Esc');

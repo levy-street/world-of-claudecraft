@@ -229,7 +229,10 @@ describe('the turret plan key', () => {
     ['too many charges', (p: Wire) => (p.arsenal.fragmentation = 100)],
     ['missing medal bars', (p: Wire) => delete p.medals],
     ['a missing silver bar', (p: Wire) => delete p.medals.silver],
-    ['a silver bar at gold', (p: Wire) => (p.medals.silver.minIntegrityShare = 0.85)],
+    [
+      'a silver bar at gold',
+      (p: Wire) => (p.medals.silver.minIntegrityShare = p.medals.gold.minIntegrityShare),
+    ],
     ['a gold bar past the whole tower', (p: Wire) => (p.medals.gold.minIntegrityShare = 1.2)],
     ['a silver bar at nothing', (p: Wire) => (p.medals.silver.minIntegrityShare = 0)],
     ['a string bar', (p: Wire) => (p.medals.gold.minIntegrityShare = '0.9')],

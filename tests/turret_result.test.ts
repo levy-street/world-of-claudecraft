@@ -47,8 +47,8 @@ describe('the medal bars of each scenario', () => {
     });
     expect(bars).toEqual([
       ['introduction', 147, 135],
-      ['standard', 90, 60],
-      ['hard', 85, 50],
+      ['standard', 97, 60],
+      ['hard', 95, 60],
     ]);
     expect(turretMedalBarPoints(0.9, 100)).toBe(90);
     expect(turretMedalBarPoints(0.901, 100)).toBe(91);
@@ -73,8 +73,8 @@ describe('the medal bars of each scenario', () => {
 
   it('scales with the tower: the same shares ask for more points of a bigger tower', () => {
     const big = resolveTurretPlan({ ...TURRET_SCENARIO_STANDARD, integrity: 400 });
-    expect(turretResult(big, final('won', 360)).medal).toBe('gold');
-    expect(turretResult(big, final('won', 359)).medal).toBe('silver');
+    expect(turretResult(big, final('won', 388)).medal).toBe('gold');
+    expect(turretResult(big, final('won', 387)).medal).toBe('silver');
     expect(turretResult(big, final('won', 239)).medal).toBe('bronze');
   });
 });
@@ -96,14 +96,14 @@ describe('the points', () => {
   const plan = resolveTurretPlan();
 
   it('adds each term: kills, tower points kept, keg kills and bodies bowled over', () => {
-    const r = turretResult(plan, final('won', 93, { kills: 71, barrelKills: 4, bowled: 17 }));
+    const r = turretResult(plan, final('won', 97, { kills: 71, barrelKills: 4, bowled: 17 }));
     expect(r.breakdown).toEqual({
       kills: 71 * TURRET_POINTS.kill,
-      integrity: 93 * TURRET_POINTS.integrity,
+      integrity: 97 * TURRET_POINTS.integrity,
       kegKills: 4 * TURRET_POINTS.kegKill,
       bowled: 17 * TURRET_POINTS.bowled,
     });
-    expect(r.points).toBe(1420 + 18_600 + 20 + 17);
+    expect(r.points).toBe(1420 + 19_400 + 20 + 17);
     expect(r).toMatchObject({ won: true, medal: 'gold' });
   });
 
