@@ -68,10 +68,12 @@ import {
 import {
   nextTurretRig,
   TurretFeedbackCursor,
+  type TurretPlanInput,
   TurretSlotBook,
   turretBodyCapacity,
   turretBuildOrder,
   turretRigCapacities,
+  turretRigPlan,
   turretUrgentTemplates,
 } from './turret_defense_pool_core';
 import { TurretMarkerGround } from './turret_ground_marker_core';
@@ -245,7 +247,11 @@ export class TurretDefenseVisual {
   private startTick = Number.NaN;
   private charactersState: 'idle' | 'loading' | 'ready' | 'failed' = 'idle';
   private disposed = false;
-  private readonly templateOf = (kind: number): string => this.plan?.kinds[kind]?.templateId ?? '';
+  private rigPlan: TurretPlanInput | null = null;
+  /** Each rig id's template and the template whose body it wears. */
+  private readonly rigLooks = new Map<string, { templateId: string; lookId: string }>();
+  private readonly templateOf = (kind: number): string =>
+    this.rigPlan?.kinds[kind]?.templateId ?? '';
 
   constructor(
     scene: THREE.Object3D,
@@ -508,7 +514,14 @@ export class TurretDefenseVisual {
     this.prepareKit();
     if (plan !== this.plan) {
       this.plan = plan;
-      this.capacities = turretRigCapacities(plan);
+      const rigPlan = turretRigPlan(plan);
+      rigPlan.kinds.forEach((kind, k) => {
+        const templateId = plan.kinds[k].templateId;
+        const lookId = fireAndFlyLookTemplate(templateId, plan.scenarioId);
+        this.rigLooks.set(kind.templateId, { templateId, lookId });
+      });
+      this.rigPlan = rigPlan;
+      this.capacities = turretRigCapacities(rigPlan);
       const bodies = turretBodyCapacity(plan);
       this.growMarkers(bodies);
       this.groundMarkers.prepare(this.group, bodies);
@@ -516,8 +529,8 @@ export class TurretDefenseVisual {
     }
     if (wave !== this.orderWave) {
       this.orderWave = wave;
-      this.order = turretBuildOrder(plan, wave);
-      this.urgent = turretUrgentTemplates(plan, wave);
+      this.order = turretBuildOrder(this.rigPlan ?? plan, wave);
+      this.urgent = turretUrgentTemplates(this.rigPlan ?? plan, wave);
     }
     if (this.charactersState !== 'ready') return;
     const templateId = this.nextTemplate();
@@ -554,9 +567,9 @@ export class TurretDefenseVisual {
     }
   }
 
-  private mintRig(templateId: string): void {
+  private mintRig(rigId: string): void {
+    const { templateId, lookId } = this.rigLooks.get(rigId) ?? { templateId: rigId, lookId: rigId };
     const template = MOBS[templateId];
-    const lookId = fireAndFlyLookTemplate(templateId);
     const key = visualKeyFor({ kind: 'mob', templateId: lookId } as Entity);
     const actor = new CharacterVisual(key, MOBS[lookId]?.color ?? template?.color ?? 0xffffff);
     const clips = VISUALS[key]?.clips;
@@ -576,9 +589,9 @@ export class TurretDefenseVisual {
     root.visible = false;
     root.add(body);
     const gate = new THREE.Group();
-    gate.name = `fire-and-fly-rig:${templateId}`;
+    gate.name = `fire-and-fly-rig:${rigId}`;
     gate.add(root);
-    this.book.addRig(templateId);
+    this.book.addRig(rigId);
     this.rigs.push({
       actor,
       gate,
@@ -588,7 +601,7 @@ export class TurretDefenseVisual {
       airClip: !!(clips?.jump || clips?.fall),
       used: false,
     });
-    this.built.set(templateId, (this.built.get(templateId) ?? 0) + 1);
+    this.built.set(rigId, (this.built.get(rigId) ?? 0) + 1);
     void attachSceneGroupGated(this.rigsRoot, gate, this.compileGate, () => this.disposed).catch(
       () => {},
     );

@@ -25,7 +25,11 @@ import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import { drawProgramSignature } from '../src/render/draw_program_signature_core';
 import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
 import type { IdleBudget, IdleScheduler } from '../src/render/idle_queue';
-import { turretBodyCapacity, turretRigCapacities } from '../src/render/turret_defense_pool_core';
+import {
+  turretBodyCapacity,
+  turretRigCapacities,
+  turretRigPlan,
+} from '../src/render/turret_defense_pool_core';
 import { TURRET_MARKER_LIFT, turretMarkerRadius } from '../src/render/turret_ground_marker_core';
 import type { TurretGroundMarkers } from '../src/render/turret_ground_markers';
 import { turretShockwaveCounts } from '../src/render/turret_shockwave_core';
@@ -42,6 +46,7 @@ import {
   buildWorldQuestTraceStandIn,
   worldQuestTraceMaterials,
 } from '../src/render/world_quest_trace_materials';
+import { TURRET_MISSION_DELUGE } from '../src/sim/content/fire_and_fly_missions';
 import { TURRET_EXPLOSIVE_BARREL, TURRET_TIMING } from '../src/sim/content/turret_defense';
 import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
 import { FIRE_AND_FLY_TOWER } from '../src/sim/fire_and_fly_field';
@@ -370,7 +375,7 @@ async function buildAll(visual: TurretDefenseVisual, view: TurretSessionView, cl
 }
 
 function totalRigs(state: TurretDefenseState): number {
-  return [...turretRigCapacities(state.plan).values()].reduce((a, b) => a + b, 0);
+  return [...turretRigCapacities(turretRigPlan(state.plan)).values()].reduce((a, b) => a + b, 0);
 }
 
 describe('Fire and Fly monsters on screen', () => {
@@ -496,7 +501,7 @@ describe('Fire and Fly monsters on screen', () => {
     expect(actors.made.map((a) => a.key)).toEqual([wolfKey, wolfKey]);
     expect(actors.made[0].color).toBe(MOBS.forest_wolf.color);
     await frames(visual, viewOf(state), 0, 200);
-    const capacities = turretRigCapacities(plan);
+    const capacities = turretRigCapacities(turretRigPlan(plan));
     expect(new Map(visual.rigCounts)).toEqual(capacities);
     const total = totalRigs(state);
     expect(actors.made).toHaveLength(total);
@@ -531,6 +536,42 @@ describe('Fire and Fly monsters on screen', () => {
     visual.dispose();
   });
 
+  it("dresses the Deluge's diggers as tunnelers, never on a digger rig built for another seat", async () => {
+    actors.made.length = 0;
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0, undefined, immediate);
+    const watch = engine(0);
+    expect(watch.plan.scenarioId).not.toBe(TURRET_MISSION_DELUGE.id);
+    await buildAll(visual, viewOf(watch), 0);
+    const diggerKey = visualKeyFor({ kind: 'mob', templateId: 'tunnel_rat' } as Entity);
+    const tunnelerKey = visualKeyFor({ kind: 'mob', templateId: 'deeprock_kobold' } as Entity);
+    const plainDiggers = actors.made.filter((a) => a.key === diggerKey).length;
+    expect(plainDiggers).toBeGreaterThan(0);
+    const before = actors.made.length;
+    const deluge = createTurretDefense(
+      resolveTurretPlan(TURRET_MISSION_DELUGE),
+      { x: 0, z: 0 },
+      7,
+      0,
+    );
+    const diggerKind = deluge.plan.kinds.findIndex((k) => k.templateId === 'tunnel_rat');
+    expect(diggerKind).toBeGreaterThanOrEqual(0);
+    const view = viewOf({
+      ...deluge,
+      wave: 1,
+      monsters: [wolf(deluge, { id: 1, kind: diggerKind })],
+    });
+    await buildAll(visual, view, 1);
+    expect(actors.made.filter((a) => a.key === diggerKey)).toHaveLength(plainDiggers);
+    const dressed = actors.made.slice(before).filter((a) => a.key === tunnelerKey);
+    const wanted = turretRigCapacities(turretRigPlan(deluge.plan)).get(
+      'tunnel_rat>deeprock_kobold',
+    );
+    expect(dressed).toHaveLength(wanted ?? -1);
+    expect(dressed.every((a) => a.color === MOBS.deeprock_kobold.color)).toBe(true);
+    expect(drawnRigs(visual).map((a) => a.key)).toEqual([tunnelerKey]);
+    visual.dispose();
+  });
+
   it('builds the current and next wave on the frame, later waves only in idle slots while seated', async () => {
     actors.made.length = 0;
     const slots: ((deadline?: IdleBudget) => void)[] = [];
@@ -543,7 +584,7 @@ describe('Fire and Fly monsters on screen', () => {
     visual.update(view, 0, 0, 0.016);
     await flush();
     for (let i = 0; i < 60; i++) visual.update(view, 0, 0, 0.016);
-    const capacities = turretRigCapacities(state.plan);
+    const capacities = turretRigCapacities(turretRigPlan(state.plan));
     const urgent = (capacities.get('forest_wolf') ?? 0) + (capacities.get('wild_boar') ?? 0);
     expect(actors.made).toHaveLength(urgent);
     expect(new Set(visual.rigCounts.keys())).toEqual(new Set(['forest_wolf', 'wild_boar']));

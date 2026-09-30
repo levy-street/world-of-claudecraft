@@ -8,11 +8,27 @@
 // books and pools are fixed arrays refilled in place; only a revision that brings
 // new feedback entries slices them out of the ring.
 
+import { fireAndFlyRigId } from '../sim/content/fire_and_fly_looks';
 import { type TurretFeedback, turretFeedbackSince } from '../sim/minigames/turret_feedback';
 
 export interface TurretPlanInput {
   readonly kinds: readonly { readonly templateId: string }[];
   readonly waves: readonly { readonly spawns: readonly number[] }[];
+}
+
+/**
+ * The plan as the rig pool sees it: each kind named by its rig, so a template
+ * dressed in another body in one scenario never takes a rig built plain in another.
+ */
+export function turretRigPlan(
+  plan: TurretPlanInput & { readonly scenarioId: string },
+): TurretPlanInput {
+  return {
+    kinds: plan.kinds.map((kind) => ({
+      templateId: fireAndFlyRigId(kind.templateId, plan.scenarioId),
+    })),
+    waves: plan.waves,
+  };
 }
 
 function templateCountsPerWave(plan: TurretPlanInput): Map<string, number>[] {

@@ -6,6 +6,7 @@ import {
   turretBodyCapacity,
   turretBuildOrder,
   turretRigCapacities,
+  turretRigPlan,
   turretUrgentTemplates,
 } from '../src/render/turret_defense_pool_core';
 import type { TurretEvent } from '../src/sim/minigames/turret_defense';
@@ -23,6 +24,23 @@ const plan = {
 };
 
 describe('Fire and Fly rig pool capacity', () => {
+  it('names each kind by its rig, a dressed template apart from its plain self, and keeps the waves', () => {
+    const waves = [{ spawns: [0, 1, 1] }];
+    const kinds = [{ templateId: 'tunnel_rat' }, { templateId: 'forest_wolf' }];
+    const deluge = turretRigPlan({ scenarioId: 'fire_and_fly_deluge', kinds, waves });
+    expect(deluge.kinds.map((k) => k.templateId)).toEqual([
+      'tunnel_rat>deeprock_kobold',
+      'forest_wolf',
+    ]);
+    expect(deluge.waves).toBe(waves);
+    const watch = turretRigPlan({ scenarioId: 'fire_and_fly_standard', kinds, waves });
+    expect(watch.kinds.map((k) => k.templateId)).toEqual(['tunnel_rat', 'forest_wolf']);
+    expect(Object.fromEntries(turretRigCapacities(deluge))).toEqual({
+      'tunnel_rat>deeprock_kobold': 1,
+      forest_wolf: 2,
+    });
+  });
+
   it('sizes each template to its largest wave plus the previous wave corpses of it', () => {
     expect(Object.fromEntries(turretRigCapacities(plan))).toEqual({ wolf: 5, boar: 2, bandit: 2 });
     expect(turretBodyCapacity(plan)).toBe(7);

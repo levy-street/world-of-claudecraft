@@ -197,7 +197,9 @@ describe('Fire and Fly sound player', () => {
     expect(s.preload).not.toHaveBeenCalled();
     sounds.update(session([]));
     sounds.update(session([], 40));
-    const templates = [...new Set(PLAN.kinds.map((k) => fireAndFlyLookTemplate(k.templateId)))];
+    const templates = [
+      ...new Set(PLAN.kinds.map((k) => fireAndFlyLookTemplate(k.templateId, PLAN.scenarioId))),
+    ];
     expect(s.preload.mock.calls.map((c) => c[0]).sort()).toEqual(
       [
         ...new Set([
@@ -355,7 +357,7 @@ describe('Fire and Fly sound player', () => {
     const sounds = player(s, () => now);
     sounds.update(session([entry(1, 10, { type: 'killed', id: 1, x: 100, y: 5, z: 205 })]), 10);
     expect(s.playAt.mock.calls.map((c) => c[0])).toEqual([
-      `${fireAndFlyLookTemplate(PLAN.kinds[0].templateId)}_death`,
+      `${fireAndFlyLookTemplate(PLAN.kinds[0].templateId, PLAN.scenarioId)}_death`,
     ]);
     now += 5000;
     const reborn: TurretEvent = {
@@ -370,8 +372,8 @@ describe('Fire and Fly sound player', () => {
     };
     sounds.update(session([entry(1, 50, reborn)], 40, [{ id: 1, kind: HUGE }]), 50);
     expect(s.playAt.mock.calls.map((c) => c[0])).toEqual([
-      `${fireAndFlyLookTemplate(PLAN.kinds[0].templateId)}_death`,
-      `${fireAndFlyLookTemplate(PLAN.kinds[HUGE].templateId)}_hurt`,
+      `${fireAndFlyLookTemplate(PLAN.kinds[0].templateId, PLAN.scenarioId)}_death`,
+      `${fireAndFlyLookTemplate(PLAN.kinds[HUGE].templateId, PLAN.scenarioId)}_hurt`,
     ]);
   });
 

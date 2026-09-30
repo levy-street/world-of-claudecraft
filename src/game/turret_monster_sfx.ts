@@ -82,7 +82,7 @@ export function turretVoiceKeys(plan: TurretPlan, voiceCue: TurretVoiceCue): str
   const keys = new Set<string>();
   for (const kind of plan.kinds) {
     for (const action of ['hurt', 'death'] as const) {
-      const key = voiceCue(fireAndFlyLookTemplate(kind.templateId), action);
+      const key = voiceCue(fireAndFlyLookTemplate(kind.templateId, plan.scenarioId), action);
       if (key) keys.add(key);
     }
   }
@@ -222,7 +222,8 @@ export class TurretMonsterSfx {
     at: { readonly x: number; readonly y: number; readonly z: number },
   ): void {
     const kind = this.kindOf(session, id);
-    const key = kind && this.voiceCue(fireAndFlyLookTemplate(kind.templateId), action);
+    const look = kind && fireAndFlyLookTemplate(kind.templateId, session.defense.plan.scenarioId);
+    const key = look && this.voiceCue(look, action);
     if (!key) return;
     const cue = claim(this.voice, action === 'death' ? DEATH_RANK : HURT_RANK);
     if (!cue) return;

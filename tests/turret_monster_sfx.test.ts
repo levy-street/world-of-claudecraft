@@ -291,6 +291,29 @@ describe('Fire and Fly cries', () => {
     ]);
   });
 
+  it("voices the Deluge's diggers as tunnelers, and a digger elsewhere as a digger", () => {
+    const cries = (scenarioId: string) => {
+      const plan = { ...PLAN, scenarioId, kinds: [kind('tunnel_rat', 'small')] } as TurretPlan;
+      const sounds = new TurretMonsterSfx(voices);
+      const session = { ...view([1]), defense: { ...view([1]).defense, plan } };
+      (session.defense as { monsters: unknown }).monsters = [{ id: 1, kind: 0 }];
+      const played: TurretSfxCue[] = [];
+      sounds.offer(launched(1), session as TurretSessionView, 0);
+      sounds.flush(0, (cue) => played.push({ ...cue }));
+      return [...played.map((c) => c.key), ...turretVoiceKeys(plan, voices)];
+    };
+    expect(cries('fire_and_fly_deluge')).toEqual([
+      'deeprock_kobold_hurt',
+      'deeprock_kobold_hurt',
+      'deeprock_kobold_death',
+    ]);
+    expect(cries('fire_and_fly_standard')).toEqual([
+      'tunnel_rat_hurt',
+      'tunnel_rat_hurt',
+      'tunnel_rat_death',
+    ]);
+  });
+
   it('lists every cry the plan can make, once each', () => {
     const plan = { ...PLAN, kinds: [...PLAN.kinds, kind('forest_wolf', 'small')] } as TurretPlan;
     expect(turretVoiceKeys(plan, voices).sort()).toEqual(
