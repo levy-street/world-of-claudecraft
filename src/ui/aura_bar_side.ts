@@ -14,8 +14,9 @@ export const AURA_BAR_BELOW_CLASS = 'auras-below-frame';
 /** The target frame's aura strip (#tf-debuffs) sits above the frame by
  *  default, since the stock target seat is directly over the action bar;
  *  targetAurasBelowFrame is the player's own choice to hang it below the
- *  frame instead, the classic layout, for a frame they have moved elsewhere
- *  (src/styles/hud.css keys off this exact class). */
+ *  frame instead, the classic layout (src/styles/hud.css keys off this exact
+ *  class, and lifts the stock seat by one strip row so the strip clears the
+ *  action bar). */
 export const TARGET_AURAS_BELOW_CLASS = 'target-auras-below-frame';
 
 /** Which body class each side setting owns. Keyed by the settings key so the

@@ -68,6 +68,30 @@ describe('target-of-target frame sits BESIDE the target frame', () => {
     expect(hudCss).not.toMatch(/#target-frame\.tf-detached[^{]*#tf-debuffs/);
   });
 
+  // A player report: on the stock seat (directly over the action bar) the
+  // below-frame strip painted across the hotbar, so the setting was only usable
+  // after moving the frame. With the setting on, the stock seat rises by one
+  // strip row (the 8px hang, an own-aura icon, its 13px timer, all under the
+  // children zoom), and every stock-seat variant (one, two, three action rows)
+  // subtracts that lift. The lift is 0 with the setting off, and a moved frame
+  // writes an inline top that outranks the sheet, so neither moves.
+  it('lifts the stock seat by one strip row only when the strip hangs below', () => {
+    const lift = rule(hudCss, 'body.target-auras-below-frame');
+    expect(lift).toContain(
+      '--target-aura-band-lift: calc((8px + var(--aura-size-own) + 13px) * var(--target-frame-scale, 1));',
+    );
+    // The lift var is set nowhere else, so the setting-off seat is unchanged.
+    expect(hudCss.match(/--target-aura-band-lift:/g) ?? []).toHaveLength(1);
+    const seats = hudCss.match(/var\(--pet-row-lift, 0px\) - var\(--target-aura-band-lift, 0px\)/g);
+    expect(seats ?? []).toHaveLength(3);
+    // The hang the lift reserves is the same 8px the below rule hangs the strip by.
+    expect(rule(hudCss, 'body.target-auras-below-frame #target-frame > #tf-debuffs')).toContain(
+      'top: calc(100% + 8px);',
+    );
+    // The mobile seat pins its own top and never reads the desktop lift.
+    expect(hudMobileCss).not.toContain('--target-aura-band-lift');
+  });
+
   // The touch seat pins the target frame to the top edge, so an above-frame
   // strip is off screen there: the mobile sheet hangs it below unconditionally
   // (a device never sheds target debuff timers, a signal a player reacts to).

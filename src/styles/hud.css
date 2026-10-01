@@ -1747,7 +1747,8 @@
       100% -
       var(--unit-frame-seat-offset) -
       var(--stance-row-lift, 0px) -
-      var(--pet-row-lift, 0px)
+      var(--pet-row-lift, 0px) -
+      var(--target-aura-band-lift, 0px)
     );
     display: none;
     z-index: 6;
@@ -1773,7 +1774,8 @@
       var(--socket-size) -
       var(--socket-row-gap) -
       var(--stance-row-lift, 0px) -
-      var(--pet-row-lift, 0px)
+      var(--pet-row-lift, 0px) -
+      var(--target-aura-band-lift, 0px)
     );
   }
   body.show-actionbar2.show-actionbar3 #target-frame {
@@ -1783,7 +1785,8 @@
       2 *
       (var(--socket-size) + var(--socket-row-gap)) -
       var(--stance-row-lift, 0px) -
-      var(--pet-row-lift, 0px)
+      var(--pet-row-lift, 0px) -
+      var(--target-aura-band-lift, 0px)
     );
   }
   /* The target's debuff strip hangs off the frame instead of living inside the
@@ -1818,6 +1821,18 @@
   body.target-auras-below-frame #target-frame > #tf-debuffs {
     bottom: auto;
     top: calc(100% + 8px);
+  }
+  /* The stock seat sits directly over the action bar, so a strip hung below
+     it would paint across the hotbar. With the setting on, the stock seat
+     rises by exactly one strip row (the 8px hang, an own-aura icon and its
+     13px timer, all scaled by the children zoom), so the first row lands in
+     the band the frame vacated and keeps the full bar gap above the hotbar.
+     A moved frame is untouched: its inline top outranks this seat. */
+  body.target-auras-below-frame {
+    --target-aura-band-lift: calc(
+      (8px + var(--aura-size-own) + 13px) *
+      var(--target-frame-scale, 1)
+    );
   }
   /* Target of Target (showTargetOfTarget option): a smaller twin of the target
      frame, a #target-frame child anchored BESIDE the frame's right edge, top
