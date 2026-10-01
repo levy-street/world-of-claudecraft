@@ -2442,7 +2442,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // itemsDiscovered (+2,889), the hoardGoblinKills counter (+26), and the 32
         // hoard gear reliquary.firstFind rows plus the conquerors_buried_hoards page
         // (+1,761), Blaine's itemization; MEASURED on the 2026-09-28 merged tree.
-        4711,
+        4711 +
+        // Plus 26 for the sixth lifetime-XP rung: prog_titan in the deeds row
+        // (10 characters of id plus 16 bytes of quoting, colon, date and comma),
+        // earned by this maximal fixture. MEASURED (77,204 to 77,230).
+        26,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2484,8 +2488,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       knownRecipes: 411,
       // deeds 672 -> 708 and deedStats 5,861 -> 5,979 at the fourth
       // release/v0.44.0 base merge: the ferry deed and its four visit marks
-      // (the +154 above).
-      deeds: 743,
+      // (the +154 above). deeds 743 -> 769 with prog_titan (the +26 above).
+      deeds: 769,
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
       deedStats: 9427,
@@ -2526,7 +2530,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // ferry deed and its visit marks, which this counterfactual keeps).
       // 226,238 -> 231,729 at the 2026-09-28 Buried Hoards merge (+5,491: the
       // +247 knownRecipes, +533 and +4,711 attributed above, all kept here).
-    ).toBe(231729);
+      // 231,729 -> 231,755 with prog_titan in the deeds row (+26, kept here).
+    ).toBe(231755);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2554,7 +2559,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 214,207 -> 227,703 at the second release/v0.44.0 base merge (+13,496).
       // 227,703 -> 227,857 at the fourth release/v0.44.0 base merge (+154).
       // 227,857 -> 233,348 at the 2026-09-28 Buried Hoards merge (+5,491, kept).
-    ).toBe(233348);
+      // 233,348 -> 233,374 with prog_titan in the deeds row (+26, kept).
+    ).toBe(233374);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2645,8 +2651,13 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // attributed in the growth equation above; no container or ceiling changed
     // shape. Floor at measurement minus 380, edge at measurement plus one:
     // 232980..233361.
-    expect(bytes, reMint).toBeGreaterThan(232980);
-    expect(bytes, reMint).toBeLessThan(233361);
+    // RE-BASED for the sixth lifetime-XP rung: 233,386 bytes, up 26 from
+    // 233,360: prog_titan in the deeds row (10 characters of id plus 16 bytes
+    // of quoting, colon, date and comma), attributed in the growth equation
+    // above; no container or ceiling changed shape. Floor at measurement minus
+    // 380, edge at measurement plus one: 233006..233387.
+    expect(bytes, reMint).toBeGreaterThan(233006);
+    expect(bytes, reMint).toBeLessThan(233387);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

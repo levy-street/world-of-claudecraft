@@ -5608,6 +5608,8 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'cmb_coinsack_caught',
   // The ferry round trip (exp_harbor_to_harbor): procedural exploration crest until commissioned.
   'exp_harbor_to_harbor',
+  // The sixth lifetime-XP rung (prog_titan): procedural progression crest until commissioned.
+  'prog_titan',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {
