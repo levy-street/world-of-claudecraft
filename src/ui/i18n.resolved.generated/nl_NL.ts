@@ -2231,6 +2231,7 @@ export const nl_NL: EnTranslations = {
       "confirmVendorSellNote": "Dit uitzetten verkoopt voorwerpen met één klik zonder bevestiging, dus een verschoven tasvak zou het verkeerde voorwerp aan de handelaar kunnen verkopen.",
       "confirmVendorSellMinQuality": "Bevestig de verkoop van kwaliteit",
       "confirmVendorSellMinQualityNote": "Artikelen onder deze kwaliteit worden met een enkele klik verkocht; een verkeerd verkocht artikel kan nog steeds worden teruggekocht bij de verkoper.",
+      "confirmVendorSellMinQualityNoteGray": "Items below this quality sell with a single click. A mis-sold item can be bought back from the vendor, except unsigned gray items.",
       "itemLevelLine": "Itemniveau {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Secundaire actiebalk tonen",
@@ -9020,6 +9021,7 @@ export const nl_NL: EnTranslations = {
       "buyingBody": "Spreek een handelaar aan en kies om zijn waar te bekijken, en zijn winkel opent met drie tabbladen: Bekijken, Verkopen en Terugkopen. Bekijken bevat alles wat ze op voorraad hebben, van jou als je het kunt betalen. Verkopen toont welke spullen uit je tassen zij willen kopen, en een stuk verkopen dat zijn eigen gerolde kwaliteit draagt, vraagt je eerst te bevestigen, zodat een gewild exemplaar nooit per ongeluk wegglipt. Doe je afstand van iets waar je spijt van krijgt, dan houdt het tabblad Terugkopen je recente verkopen vast zodat je ze kunt terugkopen voor de munten die je kreeg.",
       "junkTitle": "Rommel opruimen",
       "junkBody": "Buit waar je niets aan hebt, verkoopt nog steeds aan elke verkoper, dus leeg je tassen telkens wanneer je door de stad komt in plaats van ze vol te laten lopen. Het verkooptabblad heeft zelfs een knop met één klik die alle prullaria van Slechte kwaliteit in één keer verkoopt. Echt waardeloze prullaria kun je ook gewoon weggooien om ruimte te maken.",
+      "junkBodyFinal": "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room. Unsigned gray items sold that way skip the buyback list, so check for anything you meant to keep before you press it.",
       "tradeTitle": "Ruilen met andere spelers",
       "tradeBody": "Je kunt van aangezicht tot aangezicht ruilen met iedereen die bij je in de buurt staat. Jullie zetten beiden voorwerpen en munten in een gedeeld venster en de ruil vindt pas plaats zodra jullie het allebei bevestigen, zodat geen van beide kanten verrast kan worden. Het is de eenvoudige manier om een vriend een buit te geven of een afspraak af te sluiten.",
       "mailTitle": "De Ravenpost",
@@ -12848,7 +12850,8 @@ export const nl_NL: EnTranslations = {
       "sellQuantityCancel": "Annuleren",
       "sellJunk": "Rommel Verkopen",
       "sellJunkAria": "Verkoop alle rommel voor {price}",
-      "sellJunkHint": "Verkoopt elk grijs voorwerp in je tassen behalve questvoorwerpen."
+      "sellJunkHint": "Verkoopt elk grijs voorwerp in je tassen behalve questvoorwerpen.",
+      "sellJunkNoBuyback": "Unsigned gray items skip the buyback list, so selling them cannot be undone."
     },
     "market": {
       "title": "De Wereldmarkt",

@@ -9,25 +9,85 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "guide.economy.junkBodyFinal",
+    "hudChrome.options.confirmVendorSellMinQualityNoteGray",
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "es_ES": [
+    "guide.economy.junkBodyFinal",
+    "hudChrome.options.confirmVendorSellMinQualityNoteGray",
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "fr_FR": [
+    "guide.economy.junkBodyFinal",
+    "hudChrome.options.confirmVendorSellMinQualityNoteGray",
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "fr_CA": [
+    "guide.economy.junkBodyFinal",
+    "hudChrome.options.confirmVendorSellMinQualityNoteGray",
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "guide.economy.junkBodyFinal",
+    "hudChrome.options.confirmVendorSellMinQualityNoteGray",
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "de_DE": [
+    "guide.economy.junkBodyFinal",
+    "hudChrome.options.confirmVendorSellMinQualityNoteGray",
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "guide.economy.junkBodyFinal",
+    "hudChrome.options.confirmVendorSellMinQualityNoteGray",
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "guide.economy.junkBodyFinal",
+    "hudChrome.options.confirmVendorSellMinQualityNoteGray",
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "nl_NL": [
+    "guide.economy.junkBodyFinal",
+    "hudChrome.options.confirmVendorSellMinQualityNoteGray",
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "pl_PL": [
+    "guide.economy.junkBodyFinal",
+    "hudChrome.options.confirmVendorSellMinQualityNoteGray",
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "id_ID": [
+    "guide.economy.junkBodyFinal",
+    "hudChrome.options.confirmVendorSellMinQualityNoteGray",
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "tr_TR": [
+    "guide.economy.junkBodyFinal",
+    "hudChrome.options.confirmVendorSellMinQualityNoteGray",
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "sv_SE": [
+    "guide.economy.junkBodyFinal",
+    "hudChrome.options.confirmVendorSellMinQualityNoteGray",
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "vi_VN": [
+    "guide.economy.junkBodyFinal",
+    "hudChrome.options.confirmVendorSellMinQualityNoteGray",
+    "itemUi.vendor.sellJunkNoBuyback"
+  ],
+  "da_DK": [
+    "guide.economy.junkBodyFinal",
+    "hudChrome.options.confirmVendorSellMinQualityNoteGray",
+    "itemUi.vendor.sellJunkNoBuyback"
+  ]
 };

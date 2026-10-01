@@ -881,7 +881,7 @@ const GENERAL_KEYS = [
   'confirmVendorSell',
   'note:hudChrome.options.confirmVendorSellNote',
   'confirmVendorSellMinQuality',
-  'note:hudChrome.options.confirmVendorSellMinQualityNote',
+  'note:hudChrome.options.confirmVendorSellMinQualityNoteGray',
 ];
 const FRAMES_KEYS = [
   'mouseoverCast',
@@ -1050,7 +1050,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       { control: 'note', textKey: 'hudChrome.options.confirmVendorSellNote', category: 'general' },
       {
         control: 'note',
-        textKey: 'hudChrome.options.confirmVendorSellMinQualityNote',
+        textKey: 'hudChrome.options.confirmVendorSellMinQualityNoteGray',
         category: 'general',
       },
       { control: 'note', textKey: 'hudChrome.options.forceHighPerfGpuNote', category: 'general' },

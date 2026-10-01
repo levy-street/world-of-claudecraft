@@ -1003,7 +1003,7 @@ export function buildInterfaceControls(
       'hudChrome.options.confirmVendorSellMinQuality',
       SELL_CONFIRM_QUALITY_CHOICES,
     ),
-    note('hudChrome.options.confirmVendorSellMinQualityNote'),
+    note('hudChrome.options.confirmVendorSellMinQualityNoteGray'),
   ];
   // The desktop shell's GPU preference, last in the tab so the web arm's row
   // order is untouched. Gated on the bridge CAPABILITY, so it renders only in a

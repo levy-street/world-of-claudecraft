@@ -3688,6 +3688,11 @@ export const guideStrings = {
     junkTitle: 'Clearing out junk',
     junkBody:
       "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room.",
+    // Successor of junkBody (retired in scripts/i18n_retired_keys.mjs): plain
+    // gray junk no longer records a buyback row (items.ts skipsVendorBuyback),
+    // so the Sell Junk sweep is final and the page says so.
+    junkBodyFinal:
+      "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room. Unsigned gray items sold that way skip the buyback list, so check for anything you meant to keep before you press it.",
 
     // Direct player-to-player trading.
     tradeTitle: 'Trading with other players',

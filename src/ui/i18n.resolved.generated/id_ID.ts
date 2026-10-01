@@ -2231,6 +2231,7 @@ export const id_ID: EnTranslations = {
       "confirmVendorSellNote": "Menonaktifkan ini menjual barang dengan sekali klik tanpa konfirmasi, sehingga slot tas yang bergeser dapat menjual barang yang salah ke pedagang.",
       "confirmVendorSellMinQuality": "Konfirmasikan Penjualan Dari Kualitas",
       "confirmVendorSellMinQualityNote": "Barang di bawah kualitas ini dijual dengan satu klik; barang yang salah terjual masih dapat dibeli kembali dari vendor.",
+      "confirmVendorSellMinQualityNoteGray": "Items below this quality sell with a single click. A mis-sold item can be bought back from the vendor, except unsigned gray items.",
       "itemLevelLine": "Level Item {level}",
       "itemScoreLine": "Skor {score}",
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
@@ -9020,6 +9021,7 @@ export const id_ID: EnTranslations = {
       "buyingBody": "Bicaralah dengan seorang pedagang dan pilih untuk menelusuri barangnya, maka tokonya terbuka dengan tiga tab: Telusuri, Jual, dan Beli Ulang. Telusuri memuat semua yang mereka stok, jadi milikmu jika kamu mampu membelinya. Jual mencantumkan apa saja di tasmu yang bersedia mereka bayar, dan menjual sebuah barang yang membawa mutu hasil undiannya sendiri meminta kamu mengonfirmasi lebih dulu, jadi salinan berharga tak pernah lepas karena keliru. Jika kamu melepas sesuatu yang kamu sesali, tab Beli Ulang menyimpan penjualan terakhirmu agar kamu bisa membelinya kembali seharga koin yang kamu terima.",
       "junkTitle": "Membereskan barang rongsokan",
       "junkBody": "Barang rampasan yang tak berguna bagimu tetap bisa dijual ke penjaja mana pun, jadi kosongkan tasmu setiap kali kamu melewati kota daripada membiarkannya penuh. Tab Jual penjaja bahkan menyimpan tombol satu-klik yang menjual setiap barang remeh bermutu Buruk sekaligus. Barang remeh yang benar-benar tak berharga juga bisa langsung dibuang untuk memberi ruang.",
+      "junkBodyFinal": "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room. Unsigned gray items sold that way skip the buyback list, so check for anything you meant to keep before you press it.",
       "tradeTitle": "Berdagang dengan pemain lain",
       "tradeBody": "Kamu bisa berdagang langsung dengan siapa pun yang berdiri di dekatmu. Kalian berdua menaruh barang dan koin ke dalam jendela bersama dan pertukaran baru terjadi setelah kalian berdua mengonfirmasinya, sehingga tak ada pihak yang bisa diperdaya. Inilah cara mudah memberikan barang rampasan pada kawan atau menyelesaikan sebuah kesepakatan.",
       "mailTitle": "Pos Gagak",
@@ -12848,7 +12850,8 @@ export const id_ID: EnTranslations = {
       "sellQuantityCancel": "Batal",
       "sellJunk": "Jual Rongsokan",
       "sellJunkAria": "Jual semua rongsokan seharga {price}",
-      "sellJunkHint": "Menjual setiap barang abu-abu di tasmu kecuali barang misi."
+      "sellJunkHint": "Menjual setiap barang abu-abu di tasmu kecuali barang misi.",
+      "sellJunkNoBuyback": "Unsigned gray items skip the buyback list, so selling them cannot be undone."
     },
     "market": {
       "title": "Pasar Dunia",

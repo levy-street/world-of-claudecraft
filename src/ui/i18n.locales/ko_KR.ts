@@ -3111,6 +3111,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.confirmVendorSellMinQuality': '판매 확인 최소 품질',
   'hudChrome.options.confirmVendorSellMinQualityNote':
     '이 품질 미만의 아이템은 한 번의 클릭으로 판매됩니다. 잘못 판매한 아이템은 상인에게서 되살 수 있습니다.',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    '이 품질 미만의 아이템은 한 번의 클릭으로 판매됩니다. 잘못 판매한 아이템은 상인에게서 되살 수 있지만, 서명이 없는 회색 아이템은 예외입니다.',
   'hudChrome.options.showSecondaryActionBar': '보조 액션 바 표시',
   'hudChrome.options.showThirdActionBar': '세 번째 액션 바 표시',
   'hudChrome.options.hideUnusedActionSlots': '사용하지 않는 행동 칸 숨기기',
@@ -4669,6 +4671,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.sellJunk': '잡동사니 판매',
   'itemUi.vendor.sellJunkAria': '모든 잡동사니를 {price}에 판매',
   'itemUi.vendor.sellJunkHint': '퀘스트 아이템을 제외한 가방의 모든 회색 아이템을 판매합니다.',
+  'itemUi.vendor.sellJunkNoBuyback':
+    '서명이 없는 회색 아이템은 재구매 목록에 들어가지 않으므로 판매를 되돌릴 수 없습니다.',
   'itemUi.market.title': '세계 시장',
   'itemUi.market.subtitle': '상인의 거래소',
   'itemUi.market.close': '시장 닫기',
@@ -8981,6 +8985,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '동전은 온 세계를 움직이는 기름입니다. 장비와 보급품, 여행 장비를 사고, 플레이어들 사이에서 손을 바꿉니다. 이 모든 것은 그저 플레이하는 것만으로 익히게 되니, 이 페이지를 돈이 어디서 들어오고 어디로 나가는지 보여 주는 지도라 여기세요.',
   'guide.economy.junkBody':
     '쓸모없는 전리품도 어느 상인에게나 팔 수 있으니, 마을을 지날 때마다 가방을 가득 채워 두지 말고 비워 두세요. 상인의 판매 탭에는 열등 품질 잡동사니를 한 번에 파는 클릭 한 번짜리 버튼까지 있습니다. 정말로 값어치 없는 잡동사니는 아예 버려서 자리를 마련할 수도 있습니다.',
+  'guide.economy.junkBodyFinal':
+    '쓸모없는 전리품도 어느 상인에게나 팔 수 있으니, 마을을 지날 때마다 가방을 가득 채워 두지 말고 비워 두세요. 상인의 판매 탭에는 열등 품질 잡동사니를 한 번에 파는 클릭 한 번짜리 버튼까지 있습니다. 정말로 값어치 없는 잡동사니는 아예 버려서 자리를 마련할 수도 있습니다. 이렇게 판 서명 없는 회색 아이템은 재구매 목록에 들어가지 않으니, 누르기 전에 남겨 둘 물건이 없는지 확인하세요.',
   'guide.economy.junkTitle': '잡동사니 정리',
   'guide.economy.mailBody':
     '모든 거점 마을에는 조각한 까마귀 석주가 서 있습니다. 왕국의 편지 배달부, 레이븐포스트의 우편함입니다. 그 앞에 서면 접속 중인 친구든 오래 접속하지 않은 이든 어떤 캐릭터에게나 이름으로 편지를 쓸 수 있고, 약간의 우편 요금으로 동전이나 물건을 편지에 첨부할 수 있습니다. 까마귀가 날아가는 데는 잠시 시간이 걸리며, 도착하면 봉투 표시가 받는 이에게 무언가 기다리고 있음을 알려 줍니다.',

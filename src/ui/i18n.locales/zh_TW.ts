@@ -3012,6 +3012,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.confirmVendorSellMinQuality': '確認出售的最低品質',
   'hudChrome.options.confirmVendorSellMinQualityNote':
     '低於此品質的物品單擊即可出售；誤售的物品仍可從商人處買回。',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    '低於此品質的物品單擊即可出售。誤售的物品可從商人處買回，未署名的灰色物品除外。',
   'hudChrome.options.showSecondaryActionBar': '顯示副動作列',
   'hudChrome.options.showThirdActionBar': '顯示第三動作列',
   'hudChrome.options.hideUnusedActionSlots': '隱藏未使用的動作欄位',
@@ -4509,6 +4511,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.sellJunk': '出售雜物',
   'itemUi.vendor.sellJunkAria': '以 {price} 出售所有雜物',
   'itemUi.vendor.sellJunkHint': '出售背包中除任務物品外的所有灰色物品。',
+  'itemUi.vendor.sellJunkNoBuyback': '未署名的灰色物品不會進入回購列表，因此出售後無法撤銷。',
   'itemUi.market.title': '世界市場',
   'itemUi.market.subtitle': '商人的交易所',
   'itemUi.market.close': '關閉市場',
@@ -8642,6 +8645,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '錢幣是整個世界的潤滑劑：它能購買你的裝備、補給與旅行用品，並在玩家之間易手。這一切只要遊玩就能自然取得，所以不妨把這一頁當成一張地圖，看看你的錢從何處來、又往何處去。',
   'guide.economy.junkBody':
     '你用不上的掉落物仍能賣給任何商人，因此每當你經過城鎮時就清空背包，別讓它們塞滿。商人的出售分頁甚至備有一個一鍵按鈕，能一次賣出所有粗劣品質的雜物。真正一文不值的零碎雜物也可以直接丟棄以騰出空間。',
+  'guide.economy.junkBodyFinal':
+    '你用不上的掉落物仍能賣給任何商人，因此每當你經過城鎮時就清空背包，別讓它們塞滿。商人的出售分頁甚至備有一個一鍵按鈕，能一次賣出所有粗劣品質的雜物。真正一文不值的零碎雜物也可以直接丟棄以騰出空間。這樣賣出的未署名灰色物品不會進入回購列表，所以按下之前請確認沒有想留下的東西。',
   'guide.economy.junkTitle': '清理雜物',
   'guide.economy.mailTitle': '渡鴉郵驛',
   'guide.economy.mailBody':

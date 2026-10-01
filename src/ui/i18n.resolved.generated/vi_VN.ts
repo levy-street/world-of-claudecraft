@@ -2231,6 +2231,7 @@ export const vi_VN: EnTranslations = {
       "confirmVendorSellNote": "Tắt tùy chọn này sẽ bán vật phẩm chỉ với một cú nhấp và không cần xác nhận, nên một ô túi bị xê dịch có thể khiến bạn bán nhầm vật phẩm.",
       "confirmVendorSellMinQuality": "Xác nhận bán hàng từ chất lượng",
       "confirmVendorSellMinQualityNote": "Các mặt hàng dưới chất lượng này được bán chỉ với một cú nhấp chuột; một mặt hàng bị bán sai vẫn có thể được mua lại từ nhà cung cấp.",
+      "confirmVendorSellMinQualityNoteGray": "Items below this quality sell with a single click. A mis-sold item can be bought back from the vendor, except unsigned gray items.",
       "itemLevelLine": "Cấp Vật Phẩm {level}",
       "itemScoreLine": "Điểm {score}",
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
@@ -9020,6 +9021,7 @@ export const vi_VN: EnTranslations = {
       "buyingBody": "Hãy nói chuyện với một thương nhân và chọn xem hàng của họ, cửa hàng của họ mở ra với ba thẻ: Xem Hàng, Bán, và Mua Lại. Xem Hàng chứa mọi thứ họ có trong kho, là của bạn nếu bạn đủ tiền. Bán liệt kê những gì trong túi bạn mà họ chịu trả tiền, và bán một món mang phẩm chất tự tung riêng của nó sẽ yêu cầu bạn xác nhận trước, để một bản quý giá không bao giờ lỡ tay tuột mất. Nếu bạn trót chia tay thứ gì đó rồi tiếc, thẻ Mua Lại giữ những món bạn vừa bán để bạn mua lại chúng bằng đúng số tiền bạn được trả.",
       "junkTitle": "Dọn dẹp đồ tạp",
       "junkBody": "Những món rơi ra mà bạn không dùng đến vẫn bán được cho bất kỳ người bán nào, nên hãy dọn trống túi mỗi khi đi qua thị trấn thay vì để chúng đầy ứ. Thẻ Bán của người bán thậm chí có một nút bấm một lần bán sạch mọi món phẩm chất Kém cùng lúc. Những thứ vụn vặt thực sự vô giá trị cũng có thể vứt bỏ hẳn để lấy chỗ.",
+      "junkBodyFinal": "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room. Unsigned gray items sold that way skip the buyback list, so check for anything you meant to keep before you press it.",
       "tradeTitle": "Giao dịch với người chơi khác",
       "tradeBody": "Bạn có thể trao đổi mặt đối mặt với bất kỳ ai đứng gần bạn. Cả hai bên đặt vật phẩm và tiền vào một cửa sổ chung và cuộc đổi chỉ diễn ra một khi cả hai cùng xác nhận, nên không bên nào bị mắc lừa. Đó là cách đơn giản để trao cho bạn bè một món đồ rơi hoặc dàn xếp một thỏa thuận.",
       "mailTitle": "Bưu Quạ",
@@ -12848,7 +12850,8 @@ export const vi_VN: EnTranslations = {
       "sellQuantityCancel": "Hủy",
       "sellJunk": "Bán Đồ Bỏ",
       "sellJunkAria": "Bán tất cả đồ bỏ với giá {price}",
-      "sellJunkHint": "Bán mọi vật phẩm màu xám trong túi trừ vật phẩm nhiệm vụ."
+      "sellJunkHint": "Bán mọi vật phẩm màu xám trong túi trừ vật phẩm nhiệm vụ.",
+      "sellJunkNoBuyback": "Unsigned gray items skip the buyback list, so selling them cannot be undone."
     },
     "market": {
       "title": "Chợ Thế Giới",

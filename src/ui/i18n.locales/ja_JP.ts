@@ -3126,6 +3126,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.confirmVendorSellMinQuality': '確認する売却品質の下限',
   'hudChrome.options.confirmVendorSellMinQualityNote':
     'この品質未満のアイテムはワンクリックで売却されます。誤って売却したアイテムは商人から買い戻せます。',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'この品質未満のアイテムはワンクリックで売却されます。誤って売却したアイテムは商人から買い戻せますが、署名のない灰色アイテムは除きます。',
   'hudChrome.options.showSecondaryActionBar': 'セカンダリアクションバーを表示',
   'hudChrome.options.showThirdActionBar': '3本目のアクションバーを表示',
   'hudChrome.options.hideUnusedActionSlots': '未使用のアクションスロットを非表示',
@@ -4702,6 +4704,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.sellJunkAria': '{price}ですべての不要品を売却',
   'itemUi.vendor.sellJunkHint':
     'クエストアイテムを除くバッグ内のすべての灰色アイテムを売却します。',
+  'itemUi.vendor.sellJunkNoBuyback':
+    '署名のない灰色アイテムは買い戻しリストに入らないため、売却は取り消せません。',
   'itemUi.market.title': 'ワールドマーケット',
   'itemUi.market.subtitle': '商人の取引所',
   'itemUi.market.close': '市場を閉じる',
@@ -9004,6 +9008,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'コインは世界全体の潤滑油です。装備や物資、旅の道具を買い、プレイヤー間でやり取りされます。これらはすべて遊んでいるだけで身につくので、このページはお金がどこから来てどこへ行くのかを示す地図だと思ってください。',
   'guide.economy.junkBody':
     '使い道のないドロップ品も、どの商人にでも売れます。バッグがいっぱいになる前に、町を通るたびに空にしましょう。商人の「売却」タブには、粗悪品の半端物をまとめて一括で売れるワンクリックのボタンまで用意されています。本当に価値のないがらくたは、場所を空けるためにそのまま捨てることもできます。',
+  'guide.economy.junkBodyFinal':
+    '使い道のないドロップ品も、どの商人にでも売れます。バッグがいっぱいになる前に、町を通るたびに空にしましょう。商人の「売却」タブには、粗悪品の半端物をまとめて一括で売れるワンクリックのボタンまで用意されています。本当に価値のないがらくたは、場所を空けるためにそのまま捨てることもできます。こうして売った署名のない灰色アイテムは買い戻しリストに入らないので、押す前に残したい物がないか確かめましょう。',
   'guide.economy.junkTitle': 'がらくたの整理',
   'guide.economy.mailBody':
     'どの拠点の町にも、ワタリガラスを彫った柱が立っています。レルムの手紙配達、レイヴンポストのメールボックスです。その前に立てば、オンラインの友人にも長くオフラインの相手にも、名前を指定してどのキャラクターへも手紙を書け、わずかな郵送料でコインや品物を手紙に添えられます。ワタリガラスが飛ぶには少し時間がかかります。届くと、封筒の印が受取人に何かが待っていると知らせてくれます。',

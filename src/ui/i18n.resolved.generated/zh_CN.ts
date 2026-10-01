@@ -2231,6 +2231,7 @@ export const zh_CN: EnTranslations = {
       "confirmVendorSellNote": "关闭后，出售物品只需单击即可完成，不再确认；如果背包格位发生变化，可能会卖错物品。",
       "confirmVendorSellMinQuality": "确认出售的最低品质",
       "confirmVendorSellMinQualityNote": "低于此品质的物品单击即可出售；误售的物品仍可从商人处回购。",
+      "confirmVendorSellMinQualityNoteGray": "低于此品质的物品单击即可出售。误售的物品可从商人处回购，未署名的灰色物品除外。",
       "itemLevelLine": "物品等级 {level}",
       "itemScoreLine": "评分 {score}",
       "showSecondaryActionBar": "显示副动作条",
@@ -9020,6 +9021,7 @@ export const zh_CN: EnTranslations = {
       "buyingBody": "与商人交谈并选择浏览他的货物，他的商店便会打开，分为三个标签页：浏览、出售和买回。浏览页陈列着他的全部存货，只要付得起钱就归你。出售页列出你背包中他愿意收购的物品，而出售一件带有自身随机品质的物品时会先请你确认，这样一件珍视的物品就绝不会因失误而溜走。若你卖掉了让自己后悔的东西，买回标签页会保留你近期的售出记录，让你能按当初卖出的价钱把它们买回来。",
       "junkTitle": "清理废品",
       "junkBody": "你用不上的掉落物依然能卖给任何商人，所以每次路过城镇都顺手清空背包，别让它们堆满。商人的出售标签页甚至有一个一键按钮，可以一次性卖掉所有劣质品质的零碎物品。真正毫无价值的零碎杂物也可以直接丢弃以腾出空间。",
+      "junkBodyFinal": "你用不上的掉落物依然能卖给任何商人，所以每次路过城镇都顺手清空背包，别让它们堆满。商人的出售标签页甚至有一个一键按钮，可以一次性卖掉所有劣质品质的零碎物品。真正毫无价值的零碎杂物也可以直接丢弃以腾出空间。这样卖出的未署名灰色物品不会进入回购列表，所以按下之前请确认没有想留下的东西。",
       "tradeTitle": "与其他玩家交易",
       "tradeBody": "你可以与站在身旁的任何人面对面交易。双方将物品与钱币放入一个共享窗口，唯有两人都确认后才会完成交换，因此谁也不会吃亏。这是把掉落物递给朋友或敲定一笔买卖最简单的方式。",
       "mailTitle": "渡鸦邮驿",
@@ -12848,7 +12850,8 @@ export const zh_CN: EnTranslations = {
       "sellQuantityCancel": "取消",
       "sellJunk": "出售杂物",
       "sellJunkAria": "以 {price} 出售所有杂物",
-      "sellJunkHint": "出售背包中除任务物品外的所有灰色物品。"
+      "sellJunkHint": "出售背包中除任务物品外的所有灰色物品。",
+      "sellJunkNoBuyback": "未署名的灰色物品不会进入回购列表，因此出售后无法撤销。"
     },
     "market": {
       "title": "世界市场",

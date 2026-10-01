@@ -3010,6 +3010,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.confirmVendorSellMinQuality': '确认出售的最低品质',
   'hudChrome.options.confirmVendorSellMinQualityNote':
     '低于此品质的物品单击即可出售；误售的物品仍可从商人处回购。',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    '低于此品质的物品单击即可出售。误售的物品可从商人处回购，未署名的灰色物品除外。',
   'hudChrome.options.showSecondaryActionBar': '显示副动作条',
   'hudChrome.options.showThirdActionBar': '显示第三动作条',
   'hudChrome.options.hideUnusedActionSlots': '隐藏未使用的动作栏位',
@@ -4507,6 +4509,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.sellJunk': '出售杂物',
   'itemUi.vendor.sellJunkAria': '以 {price} 出售所有杂物',
   'itemUi.vendor.sellJunkHint': '出售背包中除任务物品外的所有灰色物品。',
+  'itemUi.vendor.sellJunkNoBuyback': '未署名的灰色物品不会进入回购列表，因此出售后无法撤销。',
   'itemUi.market.title': '世界市场',
   'itemUi.market.subtitle': '商人的交易所',
   'itemUi.market.close': '关闭市场',
@@ -8641,6 +8644,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '钱币让整个世界运转：它能购买你的装备、补给与旅行用具，还能在玩家之间易手。这一切只需游玩便能逐渐到手，所以不妨把本页看作一张地图，标明你的钱从何而来、又向何处去。',
   'guide.economy.junkBody':
     '你用不上的掉落物依然能卖给任何商人，所以每次路过城镇都顺手清空背包，别让它们堆满。商人的出售标签页甚至有一个一键按钮，可以一次性卖掉所有劣质品质的零碎物品。真正毫无价值的零碎杂物也可以直接丢弃以腾出空间。',
+  'guide.economy.junkBodyFinal':
+    '你用不上的掉落物依然能卖给任何商人，所以每次路过城镇都顺手清空背包，别让它们堆满。商人的出售标签页甚至有一个一键按钮，可以一次性卖掉所有劣质品质的零碎物品。真正毫无价值的零碎杂物也可以直接丢弃以腾出空间。这样卖出的未署名灰色物品不会进入回购列表，所以按下之前请确认没有想留下的东西。',
   'guide.economy.junkTitle': '清理废品',
   'guide.economy.mailBody':
     '每座主城都立着一根雕成渡鸦的石柱：那是渡鸦邮驿的邮箱，这个王国的信件服务。站在柱旁，便可按名字写信给任何角色，无论对方在线还是久未登录，并支付少许邮资，在信中附上钱币或货物。渡鸦要飞上一小段时间；当它降落时，一个信封指示标会提醒收件人有东西在等着。',
