@@ -128,6 +128,15 @@ describe('the recruitment rules', () => {
     for (const trialsWon of [-1, 1.5, 4, '2', Number.NaN])
       expect(sanitizeFireAndFlyRecruitment({ trialsWon }).trialsWon).toBe(0);
     expect(sanitizeFireAndFlyRecruitment({ trialsWon: 0, recruited: 'yes' }).recruited).toBe(false);
+    // A recruit stays one whatever the count says (a trial removed later, say).
+    expect(sanitizeFireAndFlyRecruitment({ trialsWon: 0, recruited: true })).toEqual({
+      trialsWon: 0,
+      recruited: true,
+    });
+    expect(savedFireAndFlyRecruitment({ trialsWon: 0, recruited: true })).toEqual({
+      trialsWon: 0,
+      recruited: true,
+    });
     expect(sanitizeFireAndFlyRecruitment({ trialsWon: 3 })).toEqual({
       trialsWon: 3,
       recruited: true,

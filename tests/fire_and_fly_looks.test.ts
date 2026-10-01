@@ -119,7 +119,10 @@ describe('Fire and Fly monster looks', () => {
   });
 
   it('is never read by the sim, so a look can change no stat', () => {
-    const readers = tsFilesUnder(fileURLToPath(new URL('../src/sim', import.meta.url)))
+    const sim = tsFilesUnder(fileURLToPath(new URL('../src/sim', import.meta.url)));
+    expect(sim.map((f) => f.file)).toContain('content/fire_and_fly_looks.ts');
+    expect(sim.map((f) => f.file)).toContain('minigames/turret_defense.ts');
+    const readers = sim
       .filter((f) => f.file !== 'content/fire_and_fly_looks.ts')
       .filter((f) => readFileSync(f.full, 'utf8').includes('fire_and_fly_looks'))
       .map((f) => f.file);

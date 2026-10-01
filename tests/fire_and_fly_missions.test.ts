@@ -280,24 +280,45 @@ function nearestLive(state: TurretDefenseState, tick: number) {
   return best;
 }
 
+/** One mission run by the clean nearest-first aimer, to the end or the ten-minute bound. */
+function aimedRun(mission: TurretScenarioDef, seed: number) {
+  const plan = resolveTurretPlan(mission);
+  const state = createTurretDefense(plan, { x: 0, z: 0 }, seed, START);
+  let t = START;
+  while (t < START + 20 * 60 * 10 && state.phase !== 'won' && state.phase !== 'lost') {
+    t++;
+    tickTurretDefense(state, t, flat);
+    const target = t >= state.readyTick ? nearestLive(state, t) : null;
+    if (target) fireTurret(state, t, target.x, target.z, flat);
+  }
+  return { plan, state, endTick: t };
+}
+
 describe('full mission runs', () => {
   it.each(TURRET_MISSIONS.map((m) => [m.boardKey, m] as const))(
     'medals the clean nearest-first aimer gold on %s, every monster killed or struck',
     (_key, mission) => {
-      const plan = resolveTurretPlan(mission);
-      const state = createTurretDefense(plan, { x: 0, z: 0 }, 42, START);
-      let t = START;
-      while (t < START + 20 * 60 * 10 && state.phase !== 'won' && state.phase !== 'lost') {
-        t++;
-        tickTurretDefense(state, t, flat);
-        const target = t >= state.readyTick ? nearestLive(state, t) : null;
-        if (target) fireTurret(state, t, target.x, target.z, flat);
-      }
+      const { plan, state } = aimedRun(mission, 42);
       expect(state.phase).toBe('won');
       expect(state.result?.medal).toBe('gold');
       const monsters = plan.waves.reduce((n, w) => n + w.spawns.length, 0);
       expect(state.stats.kills + state.stats.breaches).toBe(monsters);
     },
     60_000,
+  );
+
+  it.each(TURRET_MISSIONS.map((m) => [m.boardKey, m] as const))(
+    'plays %s the same twice from one seed, and differently from another',
+    (_key, mission) => {
+      const first = aimedRun(mission, 7);
+      const again = aimedRun(mission, 7);
+      expect(again.endTick).toBe(first.endTick);
+      expect(again.state.result).toEqual(first.state.result);
+      expect(again.state.stats).toEqual(first.state.stats);
+      expect(again.state.monsters).toEqual(first.state.monsters);
+      const other = aimedRun(mission, 8);
+      expect(other.state.monsters).not.toEqual(first.state.monsters);
+    },
+    120_000,
   );
 });

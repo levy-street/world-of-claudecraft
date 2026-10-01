@@ -249,6 +249,7 @@ describe('Fire and Fly run residency', () => {
     expect(book.rigTemplate).toEqual([]);
     expect(book.rigReady).toEqual([]);
     expect(book.bodyId).toEqual([]);
+    expect(book.rigId).toEqual([]);
     expect(book.rigOf(1)).toBe(-1);
     expect(book.bodyOf(1)).toBe(-1);
     book.addRig('boar');
