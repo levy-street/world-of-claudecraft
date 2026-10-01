@@ -135,6 +135,14 @@ export type { AnimState, BaseState } from './anim_state';
  *  immediately when async compile is unsupported. Mirrors `gateSwapFlagOnCompile`. */
 export type FarBakeGate = (target: THREE.Object3D, settle: (ready?: () => boolean) => void) => void;
 
+/** The compose's options plus what the visual itself builds. */
+export interface CharacterVisualOptions extends AssembleOptions {
+  /** False builds no far LOD (no baked far mesh, no shadow proxy) for a host that
+   *  never draws one, so its rig gate links none of their programs. A setFar on
+   *  such a visual keeps the articulated rig drawing: nothing unlinked can show. */
+  farLod?: boolean;
+}
+
 /** A hidden group of twins carrying each staged clone on its source mesh's
  *  geometry, for the compile gate to link before the clones are mounted. */
 function effectCompileScratch(
@@ -846,7 +854,7 @@ export class CharacterVisual {
     weaponOverride: WeaponLayoutOverride | null = null,
     offhandItemId: string | null = null,
     look: ModularLook | null = null,
-    opts?: AssembleOptions,
+    opts?: CharacterVisualOptions,
   ) {
     const prep = prepareVisual(key);
     // A cosmetic body (the Combat Mech) keeps its model/clips but can adopt the
@@ -976,7 +984,8 @@ export class CharacterVisual {
       // lazily (buildComposedFar), because most of a crowd stands close enough
       // that the mesh would never be drawn.
       const idleGeo = prep.idleGeo;
-      if (idleGeo && !this.look) {
+      if (opts?.farLod === false) this.farBakeTried = true;
+      else if (idleGeo && !this.look) {
         timeBuildSpan('view-part:far-bake', () =>
           this.buildFarMeshes(
             idleGeo,
@@ -2266,25 +2275,19 @@ export class CharacterVisual {
    * so its first trigger swaps in on the frame it lands instead of staging then.
    * Nothing is shown or swapped. `linked` records the clones as linked with no
    * gate, for a caller that knows a rig of the same material shape linked them
-   * already. `far: false` is for a host that never draws the far mesh (it never
-   * calls setFar): its clones are recorded linked without a link, so they never
-   * hold the first swap, and only the rig's own programs link. Resolves true
-   * once they count as linked; false without a gate, on a gate that throws, or
-   * when the visual's effect clones went meanwhile.
+   * already. Resolves true once they count as linked; false without a gate, on
+   * a gate that throws, or when the visual's effect clones went meanwhile.
    */
-  prepareElementResponse(options: { linked?: boolean; far?: boolean } = {}): Promise<boolean> {
-    const { linked = false, far = true } = options;
+  prepareElementResponse(options: { linked?: boolean } = {}): Promise<boolean> {
+    const { linked = false } = options;
     const gate = this.farBakeGate;
     if (this.disposed || !gate) return Promise.resolve(false);
     const staged: { source: THREE.Mesh; material: THREE.Material }[] = [];
-    const undrawn: THREE.Material[] = [];
     this.forEachEffectSource((mesh, source) => {
       const next = this.surfaceResponse.material(source);
       if (next === source || this.linkedEffectMaterials.has(next)) return;
-      if (!far && mesh === this.farMesh) undrawn.push(next);
-      else staged.push({ source: mesh, material: next });
+      staged.push({ source: mesh, material: next });
     });
-    for (const material of undrawn) this.linkedEffectMaterials.add(material);
     const record = (): void => {
       for (const entry of staged) this.linkedEffectMaterials.add(entry.material);
     };

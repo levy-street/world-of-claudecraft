@@ -86,6 +86,7 @@ import { drawsUnder, threeProgramKeys } from './helpers/three_program_keys';
 interface MockActor {
   key: string;
   color: number;
+  opts: unknown;
   root: THREE.Group;
   snaps: Record<string, unknown>[];
   update: ReturnType<typeof vi.fn>;
@@ -144,10 +145,13 @@ vi.mock('../src/render/characters', () => ({
     isMidOneShot = false;
     setShadow = vi.fn();
     setProxyShadow = vi.fn();
+    readonly opts: unknown;
     constructor(
       readonly key: string,
       readonly color: number,
+      ...rest: unknown[]
     ) {
+      this.opts = rest[5];
       const failures = actors.failures.get(key) ?? 0;
       if (failures > 0) {
         actors.failures.set(key, failures - 1);
@@ -536,6 +540,8 @@ describe('Fire and Fly monsters on screen', () => {
     expect(actors.made).toHaveLength(total);
     expect(actors.made.every((a) => a.setShadow.mock.calls[0]?.[0] === false)).toBe(true);
     expect(actors.made.every((a) => a.setProxyShadow.mock.calls[0]?.[0] === false)).toBe(true);
+    // The arena never draws a far LOD: no rig builds one for its gate to link.
+    expect(actors.made.every((a) => (a.opts as { farLod?: boolean })?.farLod === false)).toBe(true);
     const later = engine(400);
     expect(later.monsters.length).toBeGreaterThan(0);
     await frames(visual, viewOf(later), 400, 20);
@@ -1158,11 +1164,10 @@ describe('Fire and Fly monsters on screen', () => {
     const recordedBy = (a: MockActor) =>
       a.prepareElementResponse.mock.calls.some((c) => c[0]?.linked);
     // One stage per shape, from the shape's first rig, on the rig's own gate, the rig in the scene.
-    // The arena never draws a rig's far mesh, so the stage leaves its variant unlinked.
     for (const shape of shapes) {
       const ofShape = made.filter((a) => shapeOf(a) === shape);
       expect(ofShape.filter(stagedBy)).toEqual([ofShape[0]]);
-      expect(ofShape[0].prepareElementResponse.mock.calls).toEqual([[{ far: false }]]);
+      expect(ofShape[0].prepareElementResponse.mock.calls).toEqual([[]]);
       expect(ofShape[0].stagedInScene).toBe(true);
     }
     const stages = () => held.filter((h) => h.target.name === 'scorch-stage');
@@ -1177,7 +1182,7 @@ describe('Fire and Fly monsters on screen', () => {
       const [first, ...rest] = made.filter((a) => shapeOf(a) === shape);
       expect(recordedBy(first)).toBe(false);
       for (const a of rest) {
-        expect(a.prepareElementResponse.mock.calls).toEqual([[{ linked: true, far: false }]]);
+        expect(a.prepareElementResponse.mock.calls).toEqual([[{ linked: true }]]);
       }
     }
     expect(stages()).toHaveLength(0);

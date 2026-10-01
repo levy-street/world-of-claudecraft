@@ -1,8 +1,10 @@
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import type { AnimState } from '../src/render/characters/anim_state';
 import { SURFACE_RESPONSE_PROGRAM } from '../src/render/characters/surface_response';
-import type { CharacterVisual } from '../src/render/characters/visual';
+import type { CharacterVisual, CharacterVisualOptions } from '../src/render/characters/visual';
 import type { Entity } from '../src/sim/types';
 
 // A rig goes translucent (stealth, the spirit run, Shadowform, Moonkin) by
@@ -136,7 +138,7 @@ function scratchOf(visual: CharacterVisual): THREE.Group | null {
 
 type GateCall = { target: THREE.Object3D; settle: () => void };
 
-async function makeVisual(): Promise<CharacterVisual> {
+async function makeVisual(opts?: CharacterVisualOptions): Promise<CharacterVisual> {
   vi.resetModules();
   vi.doMock('../src/render/assets/loader', () => ({
     loadGltf: vi.fn(() => Promise.resolve(stubGltf())),
@@ -147,8 +149,15 @@ async function makeVisual(): Promise<CharacterVisual> {
   }));
   const { preloadTrainingDummyAssets } = await import('../src/render/characters/assets');
   await preloadTrainingDummyAssets();
-  const { createCharacterVisual } = await import('../src/render/characters/index');
-  const visual = createCharacterVisual(dummyEntity);
+  let visual: CharacterVisual | null;
+  if (opts) {
+    const { CharacterVisual: Visual } = await import('../src/render/characters/visual');
+    const { visualKeyFor } = await import('../src/render/characters/manifest');
+    visual = new Visual(visualKeyFor(dummyEntity), 0xffffff, 0, null, null, null, null, opts);
+  } else {
+    const { createCharacterVisual } = await import('../src/render/characters/index');
+    visual = createCharacterVisual(dummyEntity);
+  }
   if (!visual) throw new Error('test harness failed to build a CharacterVisual');
   visual.update(FRAME, anim(), true);
   return visual;
@@ -426,18 +435,18 @@ describe('an element response linked ahead of its first trigger', () => {
     visual.dispose();
   });
 
-  it('links only the rig twins for a host that never draws the far mesh, and still swaps at once', async () => {
-    const visual = await makeVisual();
+  it('links only the rig twins on a visual built with no far LOD, and still swaps at once', async () => {
+    const visual = await makeVisual({ farLod: false });
     const gateCalls: GateCall[] = [];
     visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
-    const farMesh = (visual as unknown as { farMesh: THREE.Mesh | null }).farMesh;
-    expect(farMesh).not.toBeNull();
+    expect((visual as unknown as { farMesh: THREE.Mesh | null }).farMesh).toBeNull();
 
-    const ready = visual.prepareElementResponse({ far: false });
+    const ready = visual.prepareElementResponse();
     expect(gateCalls).toHaveLength(1);
     const twins = gateCalls[0].target.children as THREE.Mesh[];
-    expect(twins.length).toBeGreaterThan(0);
-    expect(twins.some((twin) => twin.geometry === farMesh?.geometry)).toBe(false);
+    expect(new Set(twins.map((twin) => twin.geometry))).toEqual(
+      new Set(sourceIsSkinnedByGeometry(visual).keys()),
+    );
     gateCalls[0].settle();
     await expect(ready).resolves.toBe(true);
 
@@ -516,5 +525,68 @@ describe('an element response linked ahead of its first trigger', () => {
     ).toBeNull();
     warn.mockRestore();
     visual.dispose();
+  });
+});
+
+// A host that never draws a far LOD (the Fire and Fly arena) builds its rigs with
+// none, so the gate that walks the rig at its attach links no far program. The
+// far mesh is the one representation such a rig could otherwise show unlinked:
+// with none built, setFar keeps the articulated rig, whatever calls it.
+describe('a visual built with no far LOD', () => {
+  const farNodes = (visual: CharacterVisual): string[] => {
+    const names: string[] = [];
+    visual.root.traverse((object) => {
+      if (/^character_(far_mesh|far_wrap|shadow_proxy)$/.test(object.name)) names.push(object.name);
+    });
+    return names;
+  };
+  const modelShown = (visual: CharacterVisual): boolean =>
+    (visual as unknown as { modelWrap: THREE.Group }).modelWrap.visible;
+
+  it('carries no far mesh for its gate to link, where a default visual still does', async () => {
+    const plain = await makeVisual();
+    expect(farNodes(plain)).toContain('character_far_mesh');
+    plain.dispose();
+
+    const visual = await makeVisual({ farLod: false });
+    expect(farNodes(visual)).toEqual([]);
+    visual.dispose();
+  });
+
+  it('keeps drawing the articulated rig on a far crossing, before and after a pool re-acquire', async () => {
+    const visual = await makeVisual({ farLod: false });
+    const gateCalls: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
+    visual.setProxyShadow(true);
+    for (let pass = 0; pass < 2; pass++) {
+      visual.setFar(true);
+      visual.update(FRAME, anim(), true);
+      expect(visual.isFar).toBe(true);
+      expect(modelShown(visual)).toBe(true);
+      expect(visual.displayedFarBody).toBeNull();
+      expect(farNodes(visual)).toEqual([]);
+      visual.setFar(false);
+      visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
+    }
+    expect(gateCalls).toHaveLength(0);
+    visual.dispose();
+  });
+
+  it('is asked for by the Fire and Fly rigs only', () => {
+    const users: string[] = [];
+    const walk = (dir: string): void => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const path = join(dir, entry.name);
+        if (entry.isDirectory()) walk(path);
+        else if (
+          /\.ts$/.test(entry.name) &&
+          /\bfarLod\b\s*[:,}]/.test(readFileSync(path, 'utf8'))
+        ) {
+          users.push(path.split('\\').join('/'));
+        }
+      }
+    };
+    walk('src');
+    expect(users).toEqual(['src/render/turret_defense_visual.ts']);
   });
 });

@@ -581,7 +581,8 @@ export class TurretDefenseVisual {
     const template = MOBS[templateId];
     const key = visualKeyFor({ kind: 'mob', templateId: lookId } as Entity);
     const color = MOBS[lookId]?.color ?? template?.color ?? 0xffffff;
-    const actor = new CharacterVisual(key, color);
+    // The arena never draws a far LOD, so the rig's gate links no far programs.
+    const actor = new CharacterVisual(key, color, 0, null, null, null, null, { farLod: false });
     const clips = VISUALS[key]?.clips;
     actor.setShadow(false);
     actor.setProxyShadow(false);
@@ -626,19 +627,18 @@ export class TurretDefenseVisual {
    * The scorch flash's programs link as the rig is built, never on its first hit:
    * the first rig of a material shape stages them through the rig's gate, and
    * every later rig of that shape records them linked once that stage settled.
-   * The arena never calls setFar, so the far mesh's variant is left unlinked.
    * Recording a later rig linked leans on the first rig's materials keeping the
    * program alive: a run's rigs are only disposed together, at releaseRun.
    */
   private prepareScorch(actor: CharacterVisual, shape: string, generation: number): void {
     const staged = this.scorchShapes.get(shape);
     if (!staged) {
-      this.scorchShapes.set(shape, actor.prepareElementResponse({ far: false }));
+      this.scorchShapes.set(shape, actor.prepareElementResponse());
       return;
     }
     void staged.then((linked) => {
       if (linked && !this.disposed && this.generation === generation) {
-        void actor.prepareElementResponse({ linked: true, far: false });
+        void actor.prepareElementResponse({ linked: true });
       }
     });
   }
