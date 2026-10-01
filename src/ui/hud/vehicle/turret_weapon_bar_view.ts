@@ -5,7 +5,9 @@
 // played, so the intro, the pauses between waves, an empty weapon, the Shockwave's
 // rearm and the cannon's reload all read as not ready. The Shockwave's rearm draws
 // the bar's cooldown sweep; the fragmentation shell shows its armed state; the
-// Shockwave pulses gold while enough monsters wind up at the tower. Pure: no DOM.
+// Shockwave pulses gold while enough monsters wind up at the tower (fewer in the
+// first trial). Pure: no DOM.
+import { TURRET_SCENARIO_INTRODUCTION } from '../../../sim/content/fire_and_fly_scenarios';
 import { TURRET_SHOCKWAVE } from '../../../sim/content/turret_defense';
 import { TICK_RATE } from '../../../sim/types';
 import type { TurretSessionView } from '../../../world_api/vehicles';
@@ -23,6 +25,14 @@ import {
 export const TURRET_WEAPON_SLOTS: readonly TurretWeaponKind[] = ['shock', 'frag'];
 /** Monsters winding up a strike at once that make the Shockwave socket pulse. */
 export const TURRET_SHOCK_NUDGE_WINDUPS = 3;
+/** The first trial's few monsters seldom reach three at once, and it is where the Shockwave is learned. */
+export const TURRET_SHOCK_NUDGE_WINDUPS_FIRST_TRIAL = 2;
+
+export function turretShockNudgeWindups(scenarioId: string): number {
+  return scenarioId === TURRET_SCENARIO_INTRODUCTION.id
+    ? TURRET_SHOCK_NUDGE_WINDUPS_FIRST_TRIAL
+    : TURRET_SHOCK_NUDGE_WINDUPS;
+}
 /** The procedural icon keys (src/ui/icons.ts). */
 export const TURRET_WEAPON_ICONS: Readonly<Record<TurretWeaponKind, string>> = {
   shock: 'turret_shockwave',
@@ -53,6 +63,7 @@ export class TurretWeaponBarView {
   private readonly charges: number[] = TURRET_WEAPON_SLOTS.map(() => 0);
   private windupSession: TurretSessionView | null = null;
   private windupCount = 0;
+  private nudgeWindups = TURRET_SHOCK_NUDGE_WINDUPS;
   /** What each slot's text was last built from, so an unchanged frame formats nothing. */
   private readonly built = TURRET_WEAPON_SLOTS.map(() => ({
     charges: -1,
@@ -87,6 +98,7 @@ export class TurretWeaponBarView {
     if (session !== this.windupSession) {
       this.windupSession = session;
       this.windupCount = windups(session);
+      this.nudgeWindups = turretShockNudgeWindups(session.defense.plan.scenarioId);
     }
     for (let i = 0; i < TURRET_WEAPON_SLOTS.length; i++) {
       const weapon = TURRET_WEAPON_SLOTS[i];
@@ -124,7 +136,7 @@ export class TurretWeaponBarView {
           built.cdSeconds = cdSeconds;
         }
         // Only a press that would be played: never while it rearms or outside a wave.
-        slot.procGlow = slot.usable && this.windupCount >= TURRET_SHOCK_NUDGE_WINDUPS;
+        slot.procGlow = slot.usable && this.windupCount >= this.nudgeWindups;
         slot.aiming = false;
       } else {
         slot.cooldownTotal = 0;

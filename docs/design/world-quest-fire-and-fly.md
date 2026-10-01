@@ -344,7 +344,8 @@ bars stayed.
   click or Escape disarms it with no charge spent. Gamepad: Y slams, LB arms or
   disarms, the pad's cancel disarms. Touch and mouse: two weapon sockets beside the
   tower rail show the charges, the Shockwave's rearm, and a gold pulse once
-  monsters wind up at the foot (`turret_weapon_bar_view.ts`, reusing the action-bar
+  three monsters wind up at the foot, two in the Recruit's Trial where the Shockwave
+  is learned (`turret_weapon_bar_view.ts`, reusing the action-bar
   painter); the first wave's banner names the keys. Pinned by
   `tests/turret_weapon_bar_view.test.ts`, `tests/turret_weapon_sockets.test.ts` and
   `tests/turret_weapon_tooltip.test.ts`.

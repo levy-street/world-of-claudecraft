@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { turretPlanWireJson, turretStateWireJson } from '../server/turret_self_wire';
 import { QuestWorldWireState } from '../src/net/quest_world_wire_state';
+import {
+  FIRE_AND_FLY_SCENARIOS,
+  TURRET_SCENARIO_INTRODUCTION,
+} from '../src/sim/content/fire_and_fly_scenarios';
 import { TURRET_SHOCKWAVE, TURRET_WEAPON } from '../src/sim/content/turret_defense';
 import { stillSegment } from '../src/sim/minigames/thrown_body';
 import { createTurretDefense } from '../src/sim/minigames/turret_defense';
@@ -10,8 +14,10 @@ import type { TurretSession } from '../src/sim/types';
 import { TurretOwnShotLedger } from '../src/ui/hud/vehicle/turret_own_shot_core';
 import {
   TURRET_SHOCK_NUDGE_WINDUPS,
+  TURRET_SHOCK_NUDGE_WINDUPS_FIRST_TRIAL,
   TURRET_WEAPON_ICONS,
   TurretWeaponBarView,
+  turretShockNudgeWindups,
 } from '../src/ui/hud/vehicle/turret_weapon_bar_view';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
 import type { TurretSessionView } from '../src/world_api/vehicles';
@@ -168,6 +174,27 @@ describe('the turret weapon sockets view', () => {
     empty.defense.stats.shockwaves = 2;
     empty.defense.rev++;
     expect(tick(view, turretSessionView(empty)).slots[0].procGlow).toBe(false);
+  });
+
+  it('pulses from two windups in the first trial only, where the Shockwave is learned', () => {
+    expect(turretShockNudgeWindups(TURRET_SCENARIO_INTRODUCTION.id)).toBe(
+      TURRET_SHOCK_NUDGE_WINDUPS_FIRST_TRIAL,
+    );
+    expect(TURRET_SHOCK_NUDGE_WINDUPS_FIRST_TRIAL).toBeLessThan(TURRET_SHOCK_NUDGE_WINDUPS);
+    for (const scenario of FIRE_AND_FLY_SCENARIOS) {
+      if (scenario.id === TURRET_SCENARIO_INTRODUCTION.id) continue;
+      expect(turretShockNudgeWindups(scenario.id), scenario.id).toBe(TURRET_SHOCK_NUDGE_WINDUPS);
+    }
+    const first = (count: number): TurretSession => {
+      const session = windingUp(seat(), count);
+      (session.defense as { plan: unknown }).plan = resolveTurretPlan(TURRET_SCENARIO_INTRODUCTION);
+      session.defense.rev++;
+      return session;
+    };
+    const view = new TurretWeaponBarView();
+    expect(tick(view, turretSessionView(first(1))).slots[0].procGlow).toBe(false);
+    expect(tick(view, turretSessionView(first(2))).slots[0].procGlow).toBe(true);
+    expect(tick(view, turretSessionView(windingUp(seat(), 2))).slots[0].procGlow).toBe(false);
   });
 
   it('never pulses a Shockwave a press would not play: rearming, between waves', () => {
