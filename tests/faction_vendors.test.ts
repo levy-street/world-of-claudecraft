@@ -583,4 +583,23 @@ describe('Faction vendor purchase authoritative simulation & UI', () => {
     expect(a4?.requirementUnmet).toBe(true);
     expect(a4?.factionRequirement?.standingTier).toBe('vanguard');
   });
+
+  it('every item in FACTION_VENDOR_STOCK is listed in buildVendorView, including allied conveniences', () => {
+    for (const factionId of FACTION_IDS) {
+      const stock = FACTION_VENDOR_STOCK[factionId];
+      const balances = {
+        copper: 100_000,
+        honor: 0,
+        gatheringProficiency: { mining: 0, logging: 0, herbalism: 0 },
+        factions: { rift_watch: 0, church_order: 0, automatons: 0 },
+        factionCurrencies: { rift_watch: 0, church_order: 0, automatons: 0 },
+        vendorFactionId: factionId,
+      };
+      const view = buildVendorView(stock, [], ITEMS, balances);
+      expect(view.goods.map((g) => g.itemId)).toEqual([...stock]);
+      expect(view.goods.some((g) => g.itemId === 'cartographers_ink')).toBe(true);
+      expect(view.goods.some((g) => g.itemId === 'allied_hearthstone')).toBe(true);
+      expect(view.goods.some((g) => g.itemId === 'allied_vanguard_duffel')).toBe(true);
+    }
+  });
 });
