@@ -588,6 +588,7 @@ export const ko_KR: EnTranslations = {
       "replay": "다시 하기",
       "replayHint": "탑 위에서 같은 시련에 다시 도전하기. 오늘의 보상을 받은 뒤에는 다시 도전해도 보상이 없습니다.",
       "replayHintMission": "탑 위에서 같은 임무에 다시 도전하기. 오늘의 보상을 받은 뒤에는 다시 도전해도 보상이 없습니다.",
+      "leavingIn": "{seconds}초 후 탑에서 내려갑니다",
       "recruitedBanner": "입대!",
       "recruitedLine": "{name}: \"성문 포병대에 온 것을 환영하네, 포수. 이제 내 임무를 맡기겠네.\"",
       "weapons": "탑 무기",
@@ -1564,9 +1565,22 @@ export const ko_KR: EnTranslations = {
       "fireAndFlyDaily": "{trial}: 오늘",
       "fireAndFlyLifetime": "{trial}: 전체 기간",
       "fireAndFlyStart": "이 시련 도전",
-      "fireAndFlyRankings": "포수의 시련 기록",
+      "fireAndFlyRankings": "포수의 기록",
       "fireAndFlyPersonalRules": "이 캐릭터에 저장된 오프라인 기록입니다. 가장 좋은 메달이 먼저, 그다음 가장 높은 점수 순으로 순위가 정해집니다. 일일 기록은 매일 초기화됩니다.",
       "fireAndFlyRules": "가장 좋은 메달이 먼저, 그다음 가장 높은 점수 순으로 순위가 정해집니다. 연습을 포함해 승리한 모든 시련이 기록됩니다. 일일 기록은 서버 초기화 때 갱신됩니다. 기록은 30초 이내에 반영됩니다.",
+      "fireAndFlyGroupsLabel": "포수 기록 분류",
+      "fireAndFlyGroups": {
+        "trials": "시련",
+        "missions": "임무",
+        "mastery": "숙련"
+      },
+      "fireAndFlyMissionStart": "이 임무 도전",
+      "fireAndFlyMissionRules": "가장 좋은 메달이 먼저, 그다음 가장 높은 점수 순으로 순위가 정해집니다. 연습을 포함해 승리한 모든 임무가 기록됩니다. 기록은 30초 이내에 반영됩니다.",
+      "fireAndFlyMissionPersonalRules": "이 캐릭터에 저장된 오프라인 기록입니다. 가장 좋은 메달이 먼저, 그다음 가장 높은 점수 순으로 순위가 정해집니다.",
+      "fireAndFlyMastery": "포수의 숙련",
+      "fireAndFlyMasteryRules": "각 임무의 가장 좋은 메달을 별로 환산해 합산합니다: 금 3, 은 2, 동 1. 별이 많은 순, 그다음 총점 순으로 순위가 정해집니다. 기록은 30초 이내에 반영됩니다.",
+      "fireAndFlyMasteryPersonalRules": "이 캐릭터에 저장된 오프라인 숙련입니다. 각 임무의 가장 좋은 메달을 별로 환산해 합산하고(금 3, 은 2, 동 1), 그다음 총점으로 비교합니다.",
+      "wqStars": "별",
       "wqPoints": "점수",
       "wqSeconds": "{seconds}초",
       "wqNoMedal": "없음",
@@ -1594,6 +1608,7 @@ export const ko_KR: EnTranslations = {
         "seconds": "메달 순, 그다음 가장 빠른 시간",
         "points": "메달 순, 그다음 가장 높은 점수"
       },
+      "rankedByStars": "별 순, 그다음 최고 점수",
       "podiumLabel": "상위 3명",
       "unclaimed": "비어 있음",
       "totalOne": "영웅 1명 순위 등록",
@@ -3216,6 +3231,12 @@ export const ko_KR: EnTranslations = {
         "few": "길드 {count}개 표시 중",
         "many": "길드 {count}개 표시 중",
         "other": "길드 {count}개 표시 중"
+      },
+      "fireAndFlyStars": {
+        "one": "별 {count}개",
+        "few": "별 {count}개",
+        "many": "별 {count}개",
+        "other": "별 {count}개"
       },
       "commissionMasterworks": {
         "one": "걸작 {count}점",

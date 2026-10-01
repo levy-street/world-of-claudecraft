@@ -7,11 +7,12 @@ import {
   TURRET_SCENARIO_INTRODUCTION,
   TURRET_SCENARIO_STANDARD,
 } from '../src/sim/content/fire_and_fly_scenarios';
+import { TURRET_TIMING } from '../src/sim/content/turret_defense';
 import { createTurretDefense } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { turretResult } from '../src/sim/minigames/turret_result';
 import { turretSessionView } from '../src/sim/turret_defense_session';
-import type { TurretSession } from '../src/sim/types';
+import { TICK_RATE, type TurretSession } from '../src/sim/types';
 import {
   TURRET_HUD_ID,
   TURRET_LIVE_ID,
@@ -278,6 +279,29 @@ describe('the turret HUD painter', () => {
     expect(medal.querySelector('.turret-card-medal-text')!.textContent).toBe('No medal');
     expect(tints(medal)).toEqual([]);
     expect(icon.style.display).toBe('none');
+  });
+
+  it("writes the seat's own leave countdown under the points once per second, empty until then", () => {
+    const { painter, writes, view } = rig();
+    painter.show(true);
+    const lost = ended('lost', 0);
+    lost.defense.phaseEndTick = START;
+    const lostView = turretSessionView(lost);
+    const line = painter.strip.querySelector<HTMLElement>('.turret-card-leaving')!;
+    expect(line.parentElement?.lastElementChild).toBe(line);
+    const leaves = START + TURRET_TIMING.endedSeatTicks;
+    painter.paint(view.tick(lostView, START), 'Esc');
+    expect(line.textContent).toBe('');
+    painter.paint(view.tick(lostView, leaves - 30 * TICK_RATE), 'Esc');
+    expect(line.textContent).toBe('Leaving the tower in 30 sec');
+    writes.mockClear();
+    for (let i = 1; i < TICK_RATE; i++) {
+      painter.paint(view.tick(lostView, leaves - 30 * TICK_RATE + i), 'Esc');
+    }
+    expect(writes).not.toHaveBeenCalled();
+    painter.paint(view.tick(lostView, leaves - 29 * TICK_RATE), 'Esc');
+    expect(writes).toHaveBeenCalledTimes(1);
+    expect(line.textContent).toBe('Leaving the tower in 29 sec');
   });
 
   it('hides the medal line and the points while the ended view carries no result', () => {

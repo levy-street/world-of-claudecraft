@@ -178,7 +178,8 @@ export function tickVehicle(ctx: SimContext, meta: PlayerMeta, player: Entity): 
   if (!session) return;
   if (session.kind === 'turret') {
     // A world quest run ends with its day, as the glider's flight does (no credit); an
-    // ended run stays on its roof for Replay, which starts on the new day.
+    // ended run stays on its roof for Replay, which starts on the new day, until
+    // turretSeatExpired leaves it.
     const dayOver =
       !!session.worldQuest &&
       session.worldQuest.cycle !== meta.worldQuestCycle &&

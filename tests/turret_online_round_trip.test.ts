@@ -466,6 +466,27 @@ describe('Fire and Fly online: the socket-free round trip', () => {
     expect(result).toEqual(turretSessionFor(sim.ctx, pid)!.defense.result);
   });
 
+  it('clears the ended seat the client mirrors as a Leave would, once it leaves on its own', () => {
+    const { sim, pid, client, sent, before } = playOnline('/dev turret', false);
+    const ended = client.turretSession!.defense.phaseEndTick;
+    expect(ended).toBe(turretSessionFor(sim.ctx, pid)!.defense.phaseEndTick);
+    const deadline = ended + TURRET_TIMING.endedSeatTicks;
+    const step = () => {
+      for (const event of sim.tick()) if (event.pid === pid) client.route(event);
+      client.applyQuestSelfSnapshot(wirePass(sent, sim, pid), sim.time, sim.tickCount);
+    };
+    while (sim.tickCount < deadline - 1) step();
+    expect(client.turretSession?.defense.phase).toBe('lost');
+    expect(client.turretClock).toBe(deadline - 1);
+    step();
+    expect(sim.meta(pid)?.vehicle ?? null).toBeNull();
+    expect(sent.tur).toBe('null');
+    expect(client.turretSession).toBeNull();
+    expect(client.turretClock).toBeNull();
+    expect(sim.entities.get(pid)!.pos).toEqual(before);
+    expect(dungeonAt(sim.entities.get(pid)!.pos.x)).toBeNull();
+  });
+
   it('leaves a seat it cannot read, once per unreadable stretch, rather than lock the player in', () => {
     const { sim, pid } = serverPlayer();
     const client = new WireClient(sim, pid);
@@ -557,6 +578,7 @@ describe('Fire and Fly online: the socket-free round trip', () => {
     defense.integrity = 0;
     defense.shots = [];
     defense.result = turretResult(defense.plan, defense);
+    defense.phaseEndTick = sim.tickCount;
     defense.rev++;
     step();
     const reader = new TurretFeedbackReader();

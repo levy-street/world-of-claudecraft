@@ -153,6 +153,10 @@ export interface TurretDefenseState {
   /** Bumped by every change of content (spawns, transitions, shots, impacts, phases). */
   rev: number;
   phase: TurretPhase;
+  /**
+   * The intro's and a pause's last tick (the next wave starts on it); once the run has
+   * ended, the tick it ended, from which the seat closes TURRET_TIMING.endedSeatTicks later.
+   */
   phaseEndTick: number;
   wave: number;
   spawnCursor: number;
@@ -1161,6 +1165,7 @@ function lose(state: TurretDefenseState, events: TurretEvent[]): void {
 }
 
 function end(state: TurretDefenseState, events: TurretEvent[]): void {
+  state.phaseEndTick = state.tick;
   const result = deepFreeze(turretResult(state.plan, state));
   state.result = result;
   events.push({

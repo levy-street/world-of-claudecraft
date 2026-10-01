@@ -1,10 +1,11 @@
 // The Fire and Fly seat HUD's two roots: the status strip at the top centre (the wave,
 // the monsters left or the countdown, Leave), which unfolds into the result card (the
-// trial's name, the verdict, the medal, the run's stats and its points, then Replay
-// beside Leave) when the defense ends, and the tower's integrity rail at the bottom
-// centre. Frames come from TurretHudView and every write goes through the shared facet,
-// so an unchanged frame writes nothing. Only the two buttons take the pointer (the
-// stylesheet keeps the rest inert), so aim clicks and drags pass through both roots.
+// trial's name, the verdict, the medal, the run's stats and its points, the seat's own
+// leave counting down over its last half minute, then Replay beside Leave) when the
+// defense ends, and the tower's integrity rail at the bottom centre. Frames come from
+// TurretHudView and every write goes through the shared facet, so an unchanged frame
+// writes nothing. Only the two buttons take the pointer (the stylesheet keeps the rest
+// inert), so aim clicks and drags pass through both roots.
 // The polite live line is a third, visually hidden #ui child that stays rendered while
 // the roots hide: a region shown already filled is rarely spoken, and Hide Interface
 // spares only such children.
@@ -76,6 +77,8 @@ export class TurretHudPainter {
   private readonly points = el('dl', 'turret-card-stats turret-card-points');
   private readonly rows: StatRowElements[];
   private readonly pointRows: StatRowElements[];
+  /** The seat's own leave counting down over the card's last half minute; hidden while empty. */
+  private readonly leaving = el('div', 'turret-card-leaving ui-muted');
   private readonly replay = el('button', 'turret-replay ui-btn ui-btn--lg');
   private readonly replayLabel = el('span', 'turret-replay-label');
   private readonly leave = el('button', 'turret-leave ui-btn');
@@ -125,6 +128,7 @@ export class TurretHudPainter {
       stats,
       this.pointsDivider,
       this.points,
+      this.leaving,
     );
     this.strip.append(this.wave, this.slot, this.card, this.replay, this.leave);
     const bevel = el('div', 'turret-rail-bevel ui-bevel');
@@ -197,5 +201,6 @@ export class TurretHudPainter {
       writers.setText(this.pointRows[i].label, result.pointRows[i].label);
       writers.setText(this.pointRows[i].value, result.pointRows[i].value);
     }
+    writers.setText(this.leaving, result.leaving);
   }
 }

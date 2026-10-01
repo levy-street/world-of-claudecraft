@@ -162,6 +162,8 @@ export const hudChromeStrings = {
       "Play the same trial again from the tower. Once today's reward is earned, a replay pays no reward.",
     replayHintMission:
       "Play the same mission again from the tower. Once today's reward is earned, a replay pays no reward.",
+    // The result card's last half minute: an ended seat left idle leaves the tower on its own.
+    leavingIn: 'Leaving the tower in {seconds} sec',
     // The banner as the last trial's win recruits the character: {name} is Master
     // Gunner Alder, who opens the missions to the new recruit.
     recruitedBanner: 'Recruited!',
@@ -1593,11 +1595,27 @@ export const hudChromeStrings = {
     fireAndFlyDaily: '{trial}: Today',
     fireAndFlyLifetime: '{trial}: All time',
     fireAndFlyStart: 'Take this trial',
-    fireAndFlyRankings: "Gunner's trial records",
+    fireAndFlyRankings: "Gunner's records",
     fireAndFlyPersonalRules:
       'Your offline records, saved with this character. The best medal ranks first, then the highest score. Daily records reset each day.',
     fireAndFlyRules:
       'The best medal ranks first, then the highest score. Every won trial counts, practice included. Daily records reset with the realm. Records refresh within 30 seconds.',
+    // The rankings window's three groups (trials, missions, the Gunner's Mastery), each
+    // mission's all-time board, and the one Mastery board: the best medal of each mission
+    // summed as stars (gold 3, silver 2, bronze 1), ties broken by those runs' scores.
+    fireAndFlyGroupsLabel: "Gunner's record groups",
+    fireAndFlyGroups: { trials: 'Trials', missions: 'Missions', mastery: 'Mastery' },
+    fireAndFlyMissionStart: 'Take this mission',
+    fireAndFlyMissionRules:
+      'The best medal ranks first, then the highest score. Every won mission counts, practice included. Records refresh within 30 seconds.',
+    fireAndFlyMissionPersonalRules:
+      'Your offline records, saved with this character. The best medal ranks first, then the highest score.',
+    fireAndFlyMastery: "Gunner's Mastery",
+    fireAndFlyMasteryRules:
+      'Your best medal on each mission, summed as stars: gold 3, silver 2, bronze 1. More stars rank first, then the higher total score. Records refresh within 30 seconds.',
+    fireAndFlyMasteryPersonalRules:
+      'Your offline Mastery, saved with this character: your best medal on each mission, summed as stars (gold 3, silver 2, bronze 1), then the total score.',
+    wqStars: 'Stars',
     wqPoints: 'Score',
     wqSeconds: '{seconds}s',
     wqNoMedal: 'None',
@@ -1629,6 +1647,7 @@ export const hudChromeStrings = {
       seconds: 'Ranked by medal, then fastest time',
       points: 'Ranked by medal, then highest score',
     },
+    rankedByStars: 'Ranked by stars, then highest score',
     podiumLabel: 'Top three',
     unclaimed: 'Unclaimed',
     totalOne: 'One hero ranked',
@@ -4012,6 +4031,13 @@ export const hudChromeStrings = {
       few: '{count} guilds shown',
       many: '{count} guilds shown',
       other: '{count} guilds shown',
+    },
+    // The Gunner's Mastery row's stars ({count} pre-formatted).
+    fireAndFlyStars: {
+      one: '{count} star',
+      few: '{count} stars',
+      many: '{count} stars',
+      other: '{count} stars',
     },
     // The commission board's crafter's-record counts (Masterwrought phase
     // 14): lifetime masterworks crafted and legendaries forged, off the

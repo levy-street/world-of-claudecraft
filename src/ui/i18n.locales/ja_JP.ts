@@ -18952,6 +18952,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '塔の上で同じ試練にもう一度挑む。本日の報酬を受け取った後の再挑戦では、報酬は得られない。',
   'hudChrome.turret.replayHintMission':
     '塔の上で同じ任務にもう一度挑む。本日の報酬を受け取った後の再挑戦では、報酬は得られない。',
+  'hudChrome.turret.leavingIn': 'あと {seconds} 秒で塔を降ります',
   'hudChrome.turret.recruitedBanner': '入隊！',
   'hudChrome.turret.recruitedLine':
     '{name}：「門の砲兵隊へようこそ、砲手。これからは私の任務を任せる。」',
@@ -19583,11 +19584,31 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.leaderboard.fireAndFlyDaily': '{trial}：今日',
   'hudChrome.leaderboard.fireAndFlyLifetime': '{trial}：通算',
   'hudChrome.leaderboard.fireAndFlyStart': 'この試練を受ける',
-  'hudChrome.leaderboard.fireAndFlyRankings': '砲手の試練の記録',
+  'hudChrome.leaderboard.fireAndFlyRankings': '砲手の記録',
   'hudChrome.leaderboard.fireAndFlyPersonalRules':
     'このキャラクターに保存されたオフライン記録です。最も良いメダルが上位となり、次に最高スコアで順位が決まります。日間記録は毎日リセットされます。',
   'hudChrome.leaderboard.fireAndFlyRules':
     '最も良いメダルが上位となり、次に最高スコアで順位が決まります。練習を含め、勝利した試練はすべて記録されます。日間記録はサーバーのリセット時に更新されます。記録の反映には最大30秒かかります。',
+  'hudChrome.leaderboard.fireAndFlyGroupsLabel': '砲手の記録の分類',
+  'hudChrome.leaderboard.fireAndFlyGroups.trials': '試練',
+  'hudChrome.leaderboard.fireAndFlyGroups.missions': '任務',
+  'hudChrome.leaderboard.fireAndFlyGroups.mastery': '熟達',
+  'hudChrome.leaderboard.fireAndFlyMissionStart': 'この任務を受ける',
+  'hudChrome.leaderboard.fireAndFlyMissionRules':
+    '最も良いメダルが上位となり、次に最高スコアで順位が決まります。練習を含め、勝利した任務はすべて記録されます。記録の反映には最大30秒かかります。',
+  'hudChrome.leaderboard.fireAndFlyMissionPersonalRules':
+    'このキャラクターに保存されたオフライン記録です。最も良いメダルが上位となり、次に最高スコアで順位が決まります。',
+  'hudChrome.leaderboard.fireAndFlyMastery': '砲手の熟達',
+  'hudChrome.leaderboard.fireAndFlyMasteryRules':
+    '各任務の最も良いメダルを星に換算して合計します（金3、銀2、銅1）。星の多い順、次に合計スコアで順位が決まります。記録の反映には最大30秒かかります。',
+  'hudChrome.leaderboard.fireAndFlyMasteryPersonalRules':
+    'このキャラクターに保存されたオフラインの熟達です。各任務の最も良いメダルを星に換算して合計し（金3、銀2、銅1）、次に合計スコアで比べます。',
+  'hudChrome.leaderboard.wqStars': '星',
+  'hudChrome.wqLadder.rankedByStars': '星の数順、次に最高スコア',
+  'hudChrome.plurals.fireAndFlyStars.one': '星{count}',
+  'hudChrome.plurals.fireAndFlyStars.few': '星{count}',
+  'hudChrome.plurals.fireAndFlyStars.many': '星{count}',
+  'hudChrome.plurals.fireAndFlyStars.other': '星{count}',
   'hudChrome.framePresets.apply': '適用',
   'hudChrome.focusTargets.showEmpty': '空のフォーカスフレームを表示',
   'hudChrome.focusTargets.assignHint':

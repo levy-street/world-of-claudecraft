@@ -351,7 +351,7 @@ const questStringsEn = {
         title: "The Gunner's Trials",
         objective: 'Hold a tower of your own through every wave of one trial',
         ready: 'Speak to Master Gunner Alder to take a trial.',
-        complete: 'Trial passed! Speak to Master Gunner Alder to practice.',
+        complete: 'Tower held! Speak to Master Gunner Alder to practice.',
         // The trials, then the missions a recruit takes for the gate (named in
         // docs/design/naming-audit.md); each pitch is Alder's one line for it.
         scenarios: {

@@ -8,6 +8,7 @@
 
 import { resolveMovement } from './colliders';
 import { TURRET_DEFAULT_SCENARIO } from './content/fire_and_fly_scenarios';
+import { TURRET_TIMING } from './content/turret_defense';
 import { DUNGEON_X_THRESHOLD } from './data';
 import { gliderActionsLocked } from './glider_action_lock';
 import type { ThrowProbe } from './minigames/thrown_body';
@@ -263,6 +264,17 @@ export function turretRunEnded(session: Pick<TurretSession, 'defense'>): boolean
   return phase === 'won' || phase === 'lost';
 }
 
+/**
+ * The ended seat's result has stood TURRET_TIMING.endedSeatTicks since the run ended (its
+ * phaseEndTick) with no Replay: the seat leaves as through Leave, so an idle player never
+ * holds an arena slot.
+ */
+export function turretSeatExpired(session: Pick<TurretSession, 'defense'>, tick: number): boolean {
+  return (
+    turretRunEnded(session) && tick >= session.defense.phaseEndTick + TURRET_TIMING.endedSeatTicks
+  );
+}
+
 /** Whether Replay may act: the run has ended and the player still stands on its roof. */
 export function turretSeatReplayable(
   meta: PlayerMeta,
@@ -343,7 +355,8 @@ export function tickTurretSeat(
   player: Entity,
   session: TurretSession,
 ): boolean {
-  if (!stillSeated(meta, player, session)) return false;
+  if (!stillSeated(meta, player, session) || turretSeatExpired(session, ctx.tickCount))
+    return false;
   const events = tickTurretDefense(session.defense, ctx.tickCount, turretWorldProbe(ctx.cfg.seed));
   emitTurretEvents(ctx, meta.entityId, session, events);
   return true;

@@ -7,8 +7,14 @@ import {
   turretBuildOrder,
   turretRigCapacities,
   turretRigPlan,
+  turretRunResidencyOver,
   turretUrgentTemplates,
 } from '../src/render/turret_defense_pool_core';
+import {
+  FIRE_AND_FLY_DUNGEON_DEFS,
+  FIRE_AND_FLY_DUNGEON_ID,
+} from '../src/sim/content/fire_and_fly_arena';
+import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import type { TurretEvent } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import {
@@ -214,5 +220,41 @@ describe('Fire and Fly feedback cursor', () => {
     const taken = cursor.take({ defense: { startTick: 500 }, feedback: flood });
     expect(taken[0].seq).toBe(9);
     expect(cursor.dropped).toBe(7);
+  });
+});
+
+describe('Fire and Fly run residency', () => {
+  const arenaX = instanceOrigin(FIRE_AND_FLY_DUNGEON_DEFS[FIRE_AND_FLY_DUNGEON_ID].index, 0).x;
+  const otherDungeon = Object.values(DUNGEONS).find((d) => d.id !== FIRE_AND_FLY_DUNGEON_ID)!;
+
+  it('releases only once the seat is gone and the player stands outside the arena band', () => {
+    expect(turretRunResidencyOver(false, -340)).toBe(true);
+    expect(turretRunResidencyOver(false, instanceOrigin(otherDungeon.index, 0).x)).toBe(true);
+    expect(turretRunResidencyOver(true, -340)).toBe(false);
+    expect(turretRunResidencyOver(false, arenaX)).toBe(false);
+    expect(turretRunResidencyOver(false, arenaX + 40)).toBe(false);
+    expect(turretRunResidencyOver(false, null)).toBe(false);
+    expect(turretRunResidencyOver(false, Number.NaN)).toBe(false);
+  });
+
+  it('forgets every rig and body slot when the pools they named are released', () => {
+    const book = new TurretSlotBook();
+    book.addRig('wolf');
+    book.setRigReady(0);
+    book.growBodies(2);
+    book.assign([{ id: 1, kind: 0, hp: 5 }], () => 'wolf');
+    expect(book.rigOf(1)).toBe(0);
+    expect(book.bodyOf(1)).toBe(0);
+    book.clear();
+    expect(book.rigTemplate).toEqual([]);
+    expect(book.rigReady).toEqual([]);
+    expect(book.bodyId).toEqual([]);
+    expect(book.rigOf(1)).toBe(-1);
+    expect(book.bodyOf(1)).toBe(-1);
+    book.addRig('boar');
+    book.growBodies(1);
+    book.assign([{ id: 2, kind: 0, hp: 5 }], () => 'boar');
+    expect(book.bodyOf(2)).toBe(0);
+    expect(book.rigOf(2)).toBe(-1);
   });
 });

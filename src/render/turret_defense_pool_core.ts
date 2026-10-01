@@ -8,7 +8,9 @@
 // books and pools are fixed arrays refilled in place; only a revision that brings
 // new feedback entries slices them out of the ring.
 
+import { FIRE_AND_FLY_DUNGEON_ID } from '../sim/content/fire_and_fly_arena';
 import { fireAndFlyRigId } from '../sim/content/fire_and_fly_looks';
+import { dungeonAt } from '../sim/data';
 import { type TurretFeedback, turretFeedbackSince } from '../sim/minigames/turret_feedback';
 
 export interface TurretPlanInput {
@@ -119,6 +121,18 @@ export interface TurretMonsterRef {
 }
 
 /**
+ * The run's rigs and pools may be released: no seat shows and the player (drawn at
+ * world x `playerX`) stands outside the Fire and Fly arena band. A Replay keeps its
+ * seat, a seat that blinks out while the player still stands in the arena (an online
+ * resume) keeps them, and so does a player not drawn yet (null): nowhere known is
+ * never outside.
+ */
+export function turretRunResidencyOver(seated: boolean, playerX: number | null): boolean {
+  if (seated || playerX === null || !Number.isFinite(playerX)) return false;
+  return dungeonAt(playerX)?.id !== FIRE_AND_FLY_DUNGEON_ID;
+}
+
+/**
  * Which rig and which marker body each monster holds. Assignments stick to the
  * monster id; a monster only ever takes a READY rig (the rest draw their
  * stand-in), and a living monster may take a ready rig from a corpse of its
@@ -168,6 +182,19 @@ export class TurretSlotBook {
   releaseAll(): void {
     this.rigId.fill(null);
     this.bodyId.fill(null);
+    this.rigById.clear();
+    this.bodyById.clear();
+  }
+
+  /** Forgets every rig and body slot: the pools they named were released. */
+  clear(): void {
+    this.rigTemplate.length = 0;
+    this.rigReady.length = 0;
+    this.rigId.length = 0;
+    this.bodyId.length = 0;
+    this.rigLiving.length = 0;
+    this.rigStamp.length = 0;
+    this.bodyStamp.length = 0;
     this.rigById.clear();
     this.bodyById.clear();
   }

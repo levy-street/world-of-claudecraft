@@ -18911,6 +18911,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '탑 위에서 같은 시련에 다시 도전하기. 오늘의 보상을 받은 뒤에는 다시 도전해도 보상이 없습니다.',
   'hudChrome.turret.replayHintMission':
     '탑 위에서 같은 임무에 다시 도전하기. 오늘의 보상을 받은 뒤에는 다시 도전해도 보상이 없습니다.',
+  'hudChrome.turret.leavingIn': '{seconds}초 후 탑에서 내려갑니다',
   'hudChrome.turret.recruitedBanner': '입대!',
   'hudChrome.turret.recruitedLine':
     '{name}: "성문 포병대에 온 것을 환영하네, 포수. 이제 내 임무를 맡기겠네."',
@@ -19552,11 +19553,31 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.leaderboard.fireAndFlyDaily': '{trial}: 오늘',
   'hudChrome.leaderboard.fireAndFlyLifetime': '{trial}: 전체 기간',
   'hudChrome.leaderboard.fireAndFlyStart': '이 시련 도전',
-  'hudChrome.leaderboard.fireAndFlyRankings': '포수의 시련 기록',
+  'hudChrome.leaderboard.fireAndFlyRankings': '포수의 기록',
   'hudChrome.leaderboard.fireAndFlyPersonalRules':
     '이 캐릭터에 저장된 오프라인 기록입니다. 가장 좋은 메달이 먼저, 그다음 가장 높은 점수 순으로 순위가 정해집니다. 일일 기록은 매일 초기화됩니다.',
   'hudChrome.leaderboard.fireAndFlyRules':
     '가장 좋은 메달이 먼저, 그다음 가장 높은 점수 순으로 순위가 정해집니다. 연습을 포함해 승리한 모든 시련이 기록됩니다. 일일 기록은 서버 초기화 때 갱신됩니다. 기록은 30초 이내에 반영됩니다.',
+  'hudChrome.leaderboard.fireAndFlyGroupsLabel': '포수 기록 분류',
+  'hudChrome.leaderboard.fireAndFlyGroups.trials': '시련',
+  'hudChrome.leaderboard.fireAndFlyGroups.missions': '임무',
+  'hudChrome.leaderboard.fireAndFlyGroups.mastery': '숙련',
+  'hudChrome.leaderboard.fireAndFlyMissionStart': '이 임무 도전',
+  'hudChrome.leaderboard.fireAndFlyMissionRules':
+    '가장 좋은 메달이 먼저, 그다음 가장 높은 점수 순으로 순위가 정해집니다. 연습을 포함해 승리한 모든 임무가 기록됩니다. 기록은 30초 이내에 반영됩니다.',
+  'hudChrome.leaderboard.fireAndFlyMissionPersonalRules':
+    '이 캐릭터에 저장된 오프라인 기록입니다. 가장 좋은 메달이 먼저, 그다음 가장 높은 점수 순으로 순위가 정해집니다.',
+  'hudChrome.leaderboard.fireAndFlyMastery': '포수의 숙련',
+  'hudChrome.leaderboard.fireAndFlyMasteryRules':
+    '각 임무의 가장 좋은 메달을 별로 환산해 합산합니다: 금 3, 은 2, 동 1. 별이 많은 순, 그다음 총점 순으로 순위가 정해집니다. 기록은 30초 이내에 반영됩니다.',
+  'hudChrome.leaderboard.fireAndFlyMasteryPersonalRules':
+    '이 캐릭터에 저장된 오프라인 숙련입니다. 각 임무의 가장 좋은 메달을 별로 환산해 합산하고(금 3, 은 2, 동 1), 그다음 총점으로 비교합니다.',
+  'hudChrome.leaderboard.wqStars': '별',
+  'hudChrome.wqLadder.rankedByStars': '별 순, 그다음 최고 점수',
+  'hudChrome.plurals.fireAndFlyStars.one': '별 {count}개',
+  'hudChrome.plurals.fireAndFlyStars.few': '별 {count}개',
+  'hudChrome.plurals.fireAndFlyStars.many': '별 {count}개',
+  'hudChrome.plurals.fireAndFlyStars.other': '별 {count}개',
   'hudChrome.framePresets.apply': '적용',
   'hudChrome.focusTargets.showEmpty': '빈 주시 대상 프레임 표시',
   'hudChrome.focusTargets.assignHint':

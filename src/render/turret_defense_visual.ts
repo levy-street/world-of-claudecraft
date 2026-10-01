@@ -1,31 +1,36 @@
-// Fire and Fly on screen: the private monsters' rigs with their stand-ins,
-// health bars and strike rings, the dust they kick up wherever they meet the
-// world (turret_contact_dust_core.ts, launched on the cannon's own puff draw),
-// their hitstop and scorch flash when a shell strikes them, the cannon tower
-// whose head turns toward the aim (turret_tower_visual.ts) with the player
-// standing behind its breech, plus the cannon's shots (cannon_shell_visuals.ts,
-// their muzzle and recoil on the tower's barrel), driven from
-// IWorld.turretSession. Nothing is built until the player
-// is first seen seated in the turret; the rig pools then grow one rig per frame
-// for the current and next wave, and one per idle slot for the others, and live
-// for the rest of the world session. Every rig attaches behind the compile gate while a capsule on a
-// prewarmed material stands in at the monster's exact position: enemy positions
-// are never hidden. An unused rig leaves the scene graph. No lights, no shadows,
-// no per-frame THREE allocation. A rig's scorch flash swaps its materials only
-// once their programs link behind the same compile gate (the rig keeps its own
-// materials meanwhile). A health bar and a strike ring are what a player acts
-// on: they paint over the cannon's dust (a higher rung of the floor ladder than
-// the puff draw) and the bar faces the camera upright over the body, whatever
-// its tumble. Every living monster also carries a red ground marker, drawn by
-// turret_ground_markers.ts, and the explosive barrels are
-// turret_barrel_visual.ts. The player's own shot plays on the click: the seat
+// Fire and Fly on screen: the private monsters' rigs with their stand-ins, health
+// bars and strike rings, the dust they kick up wherever they meet the world
+// (turret_contact_dust_core.ts, launched on the cannon's own puff draw), their
+// hitstop and scorch flash when a shell strikes them, the cannon tower whose head
+// turns toward the aim (turret_tower_visual.ts) with the player standing behind
+// its breech, plus the cannon's shots (cannon_shell_visuals.ts, their muzzle and
+// recoil on the tower's barrel), driven from IWorld.turretSession. Nothing is
+// built until the player is first seen seated in the turret; the rig pools then
+// grow one rig per frame for the current and next wave, and one per idle slot for
+// the others, and live until the player has left both the seat and the arena (a
+// Replay keeps them): the rigs, the marker bodies, the ground markers, the kegs
+// and the weapon's pools are then released (the kegs and the weapon not while the
+// arena prebuild means a seat), each once its own compile gates settled, and a
+// later seat builds them again on the same gated path. The tower stays (see
+// releaseRun). Every rig attaches behind
+// the compile gate while a capsule on a prewarmed material stands in at the
+// monster's exact position: enemy positions are never hidden. An unused rig leaves
+// the scene graph. No lights, no shadows, no per-frame THREE allocation. A rig's
+// scorch flash swaps its materials only once their programs link behind the same
+// compile gate (the rig keeps its own materials meanwhile). A health bar and a
+// strike ring are what a player acts on: they paint over the cannon's dust (a
+// higher rung of the floor ladder than the puff draw) and the bar faces the camera
+// upright over the body, whatever its tumble. Every living monster also carries a
+// red ground marker, drawn by turret_ground_markers.ts, and the explosive barrels
+// are turret_barrel_visual.ts. The player's own shot plays on the click: the seat
 // HUD marks it in the page's own-shot ledger (turret_own_shot_core.ts), the head
 // recoils and the shell leaves at once, and the shot's `fired` entry adopts that
-// shell rather than drawing another. The limited weapons (the Shockwave's slam
-// and front, the fragmentation shell's burst and bomblets) are
-// turret_weapons_visual.ts, on the same draws. Pure halves: turret_monster_pose_core.ts,
-// turret_motion_forecast_core.ts, turret_contact_dust_core.ts,
-// turret_defense_pool_core.ts and turret_tower_core.ts.
+// shell rather than drawing another. The limited weapons (the Shockwave's slam and
+// front, the fragmentation shell's burst and bomblets) are
+// turret_weapons_visual.ts, on the same draws. Pure halves:
+// turret_monster_pose_core.ts, turret_motion_forecast_core.ts,
+// turret_contact_dust_core.ts, turret_defense_pool_core.ts and
+// turret_tower_core.ts.
 import * as THREE from 'three';
 import { fireAndFlyLookTemplate } from '../sim/content/fire_and_fly_looks';
 import { TURRET_PHYSICS, TURRET_WEAPON } from '../sim/content/turret_defense';
@@ -74,8 +79,10 @@ import {
   turretBuildOrder,
   turretRigCapacities,
   turretRigPlan,
+  turretRunResidencyOver,
   turretUrgentTemplates,
 } from './turret_defense_pool_core';
+import { TurretGateTracker } from './turret_gate_tracker';
 import { TurretMarkerGround } from './turret_ground_marker_core';
 import { TURRET_MARKER_ORDER, TurretGroundMarkers } from './turret_ground_markers';
 import {
@@ -176,6 +183,14 @@ export class TurretDefenseVisual {
   private readonly rigsRoot = new THREE.Group();
   private readonly markersRoot = new THREE.Group();
   private readonly book = new TurretSlotBook();
+  /** A seat committed pools that a run grew; released once the player leaves the arena. */
+  private runResident = false;
+  /** The weapon and the kegs were prepared; released outside the arena unless a seat is meant. */
+  private kitResident = false;
+  /** The arena prebuild asked for the kit this frame (prewarmKit runs before update). */
+  private kitWanted = false;
+  /** Bumped by each release: a rig whose gate links after it never attaches. */
+  private generation = 0;
   private readonly rigs: RigSlot[] = [];
   private readonly bodies: BodySlot[] = [];
   private readonly built = new Map<string, number>();
@@ -185,17 +200,27 @@ export class TurretDefenseVisual {
   };
   private readonly clock = new TurretDisplayClock();
   private readonly cursor = new TurretFeedbackCursor();
-  private readonly weapon: CannonShellVisuals;
-  private readonly weapons: TurretWeaponsVisual;
-  private readonly barrels: TurretBarrelVisual;
+  private weapon!: CannonShellVisuals;
+  private weapons!: TurretWeaponsVisual;
+  private barrels!: TurretBarrelVisual;
   private readonly takeBurst = (now: number) => this.weapon.puffBurst(now);
-  private readonly groundMarkers: TurretGroundMarkers;
+  private groundMarkers!: TurretGroundMarkers;
+  private rigGates!: TurretGateTracker;
+  private weaponGates!: TurretGateTracker;
+  private barrelGates!: TurretGateTracker;
+  private markerGates!: TurretGateTracker;
   private readonly tower: TurretTowerVisual;
   private readonly gunner = { x: 0, y: 0, z: 0 };
   private readonly pose = newTurretMonsterPose();
   private readonly probe: ThrowProbe;
   private readonly contact = newTurretContact();
-  private readonly contactCounts: Readonly<TurretContactCounts>;
+  private contactCounts!: Readonly<TurretContactCounts>;
+  private host: CannonShellHost | null = null;
+  private readonly texelSlot = () =>
+    idleSlot(RIG_IDLE_TIMEOUT_MS, {
+      scheduler: this.idleScheduler,
+      maxTimeoutDeferrals: RIG_IDLE_DEFERRALS,
+    });
   private readonly effectGate: FarBakeGate | null;
   /** Ids a shell struck at its core in the feedback being read (their launch freezes on it). */
   private readonly coreHits: number[] = [];
@@ -259,46 +284,17 @@ export class TurretDefenseVisual {
     private readonly compileGate?: CompileGate,
     private readonly idleScheduler?: IdleScheduler,
     towerSource?: TurretTowerSource,
-    barrelSource?: TurretBarrelSource,
+    private readonly barrelSource?: TurretBarrelSource,
     private readonly shots: TurretOwnShotLedger = turretOwnShots,
   ) {
     this.launched = shots.newestSerial;
     this.probe = { ground: groundAt, water: () => null };
     this.tower = new TurretTowerVisual(compileGate, towerSource);
-    this.groundMarkers = new TurretGroundMarkers(this.probe, compileGate);
-    const texelSlot = () =>
-      idleSlot(RIG_IDLE_TIMEOUT_MS, {
-        scheduler: this.idleScheduler,
-        maxTimeoutDeferrals: RIG_IDLE_DEFERRALS,
-      });
-    this.weapon = new CannonShellVisuals({
-      blastRadius: TURRET_WEAPON.blastRadius,
-      groundAt,
-      compileGate,
-      bursts: {
-        slots:
-          TURRET_CONTACT_BURSTS +
-          TURRET_BARREL_BURSTS +
-          turretShockwaveBursts(TURRET_CONTACT_PUFFS),
-        puffs: TURRET_CONTACT_PUFFS,
-      },
-      impacts: TURRET_WEAPON_IMPACTS,
-      bomblets: TURRET_WEAPON_BOMBLETS,
-      texelSlot,
-      holdTicks: TURRET_TICK_LEAD_MAX + TURRET_TICK_LATE_MAX,
-    });
-    this.weapons = new TurretWeaponsVisual(this.weapon, this.tower, groundAt);
-    this.contactCounts = turretContactCounts(this.weapon.lowEffects);
-    this.barrels = new TurretBarrelVisual(
-      groundAt,
-      compileGate,
-      barrelSource,
-      this.weapon.lowEffects,
-      texelSlot,
-    );
+    this.mintKit();
+    this.mintRunPools();
     this.effectGate = compileGate
       ? (target, settle) => {
-          void compileGate(target).then(
+          void (this.rigGates.gate ?? compileGate)(target).then(
             () => settle(),
             () => settle(),
           );
@@ -319,6 +315,7 @@ export class TurretDefenseVisual {
 
   /** The renderer services the shots draw with (particles, camera kick, AoE ring); its camera the health bars face. */
   setHost(host: CannonShellHost | null): void {
+    this.host = host;
     this.weapon.setHost(host);
     this.weapons.setHost(host);
     this.camera = host?.camera ?? null;
@@ -333,8 +330,14 @@ export class TurretDefenseVisual {
     self?: TurretSelfView,
   ): void {
     if (this.disposed) return;
+    const kitWanted = this.kitWanted;
+    this.kitWanted = false;
     if (!session) {
       if (this.group.visible) this.stand();
+      if (turretRunResidencyOver(false, self?.group.position.x ?? null)) {
+        if (this.runResident) this.releaseRun();
+        if (this.kitResident && !kitWanted) this.releaseKit();
+      }
       return;
     }
     this.nowMs = time * 1000;
@@ -464,15 +467,17 @@ export class TurretDefenseVisual {
   }
 
   /** The tower, the weapon and the kegs, built ahead of a seat the player means to
-   *  take (the arena prebuild's intent): they link hidden and stay for the page,
-   *  as they do after a first seat. */
+   *  take (the arena prebuild's intent): they link hidden and stay while that
+   *  intent holds, as after a seat while the player is in the arena. */
   prewarmKit(time: number): void {
+    this.kitWanted = true;
     if (this.disposed || this.group.visible) return;
     this.nowMs = time * 1000;
     this.prepareKit();
   }
 
   private prepareKit(): void {
+    this.kitResident = true;
     if (!this.weapon.prepared) {
       timeBuildSpan('zone:turret-weapon', () => this.weapon.prepare(this.group));
     }
@@ -499,6 +504,7 @@ export class TurretDefenseVisual {
 
   /** The commitment: first seen seated, the markers are built and the rig pools start growing. */
   private commit(plan: TurretPlanView, wave: number): void {
+    this.runResident = true;
     if (this.charactersState === 'idle') {
       this.charactersState = 'loading';
       charactersReady().then(
@@ -602,9 +608,105 @@ export class TurretDefenseVisual {
       used: false,
     });
     this.built.set(rigId, (this.built.get(rigId) ?? 0) + 1);
-    void attachSceneGroupGated(this.rigsRoot, gate, this.compileGate, () => this.disposed).catch(
-      () => {},
+    const generation = this.generation;
+    void attachSceneGroupGated(
+      this.rigsRoot,
+      gate,
+      this.rigGates.gate,
+      () => this.disposed || this.generation !== generation,
+    ).catch(() => {});
+  }
+
+  /** The kit, unprepared: the weapon's shots and puffs, and the kegs. */
+  private mintKit(): void {
+    const groundAt = this.groundAt;
+    this.weaponGates = new TurretGateTracker(this.compileGate);
+    this.barrelGates = new TurretGateTracker(this.compileGate);
+    this.weapon = new CannonShellVisuals({
+      blastRadius: TURRET_WEAPON.blastRadius,
+      groundAt,
+      compileGate: this.weaponGates.gate,
+      bursts: {
+        slots:
+          TURRET_CONTACT_BURSTS +
+          TURRET_BARREL_BURSTS +
+          turretShockwaveBursts(TURRET_CONTACT_PUFFS),
+        puffs: TURRET_CONTACT_PUFFS,
+      },
+      impacts: TURRET_WEAPON_IMPACTS,
+      bomblets: TURRET_WEAPON_BOMBLETS,
+      texelSlot: this.texelSlot,
+      holdTicks: TURRET_TICK_LEAD_MAX + TURRET_TICK_LATE_MAX,
+    });
+    this.weapon.setHost(this.host);
+    const barrel = this.tower.barrelNode;
+    if (barrel)
+      this.weapon.setBarrel(barrel, TURRET_TOWER_MODEL.muzzleTip, TURRET_BARREL.recoilKick);
+    this.weapons = new TurretWeaponsVisual(this.weapon, this.tower, groundAt);
+    this.weapons.setHost(this.host);
+    this.contactCounts = turretContactCounts(this.weapon.lowEffects);
+    this.barrels = new TurretBarrelVisual(
+      groundAt,
+      this.barrelGates.gate,
+      this.barrelSource,
+      this.weapon.lowEffects,
+      this.texelSlot,
     );
+  }
+
+  /** The pools only a seat grows, empty: the rigs' gates and the ground markers. */
+  private mintRunPools(): void {
+    this.rigGates = new TurretGateTracker(this.compileGate);
+    this.markerGates = new TurretGateTracker(this.compileGate);
+    this.groundMarkers = new TurretGroundMarkers(this.probe, this.markerGates.gate);
+  }
+
+  /**
+   * The player left the seat and the arena: every rig (its skeletons' bone textures,
+   * its effect materials, its tinted-material claims), the slot books, the marker
+   * bodies and their geometry and the ground markers go, and empty pools stand in for
+   * the next seat. Kept: the tower (one model whose geometry and atlas belong to the
+   * loader's cache, the player stands on it, and relinking it would show them on air),
+   * the page-lifetime marker materials, the characters' shared assets, and every
+   * program another material still uses. The kit goes in releaseKit.
+   */
+  private releaseRun(): void {
+    this.runResident = false;
+    this.generation++;
+    const rigs = this.rigs.splice(0);
+    for (const rig of rigs) rig.gate.removeFromParent();
+    this.built.clear();
+    this.rigLooks.clear();
+    this.book.clear();
+    this.rigPlan = null;
+    this.plan = null;
+    this.capacities = new Map();
+    this.order = [];
+    this.urgent = new Set();
+    this.orderWave = -1;
+    for (const body of this.bodies) {
+      body.standIn.removeFromParent();
+      body.health.removeFromParent();
+      body.ring.removeFromParent();
+    }
+    this.bodies.length = 0;
+    if (this.geometry) for (const part of Object.values(this.geometry)) part.dispose();
+    this.geometry = null;
+    const markers = this.groundMarkers;
+    disposeAfter(
+      this.rigGates,
+      rigs.map((rig) => rig.actor),
+    );
+    disposeAfter(this.markerGates, [markers]);
+    this.mintRunPools();
+  }
+
+  /** Outside the arena with no seat meant: the weapon's pools and the kegs go, fresh unprepared ones stand in. */
+  private releaseKit(): void {
+    this.kitResident = false;
+    disposeAfter(this.weaponGates, [this.weapon]);
+    disposeAfter(this.barrelGates, [this.barrels]);
+    this.mintKit();
   }
 
   private growMarkers(count: number): void {
@@ -936,4 +1038,20 @@ function monsterById(
 ): TurretDefenseView['monsters'][number] | null {
   for (const m of monsters) if (m.id === id) return m;
   return null;
+}
+
+/** Disposes `parts` once every compile gate `gates` opened has settled, so no queued link meets a disposed material. */
+function disposeAfter(gates: TurretGateTracker, parts: readonly { dispose(): void }[]): void {
+  if (parts.length === 0) return;
+  gates.afterSettled(() => {
+    const errors: unknown[] = [];
+    for (const part of parts) {
+      try {
+        part.dispose();
+      } catch (error) {
+        errors.push(error);
+      }
+    }
+    if (errors.length > 0) console.error('Fire and Fly release failed in part', errors);
+  });
 }

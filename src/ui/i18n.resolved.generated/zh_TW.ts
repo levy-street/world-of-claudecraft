@@ -588,6 +588,7 @@ export const zh_TW: EnTranslations = {
       "replay": "再來一次",
       "replayHint": "在塔上再次挑戰同一試煉。領取今日獎勵後，再次挑戰不再給予獎勵。",
       "replayHintMission": "在塔上再次執行同一任務。領取今日獎勵後，再次挑戰不再給予獎勵。",
+      "leavingIn": "{seconds} 秒後離開塔樓",
       "recruitedBanner": "已入伍！",
       "recruitedLine": "{name}：「歡迎加入城門砲組，砲手。我的任務現在向你開放了。」",
       "weapons": "塔樓武器",
@@ -1564,9 +1565,22 @@ export const zh_TW: EnTranslations = {
       "fireAndFlyDaily": "{trial}：今日",
       "fireAndFlyLifetime": "{trial}：歷史",
       "fireAndFlyStart": "接受此試煉",
-      "fireAndFlyRankings": "砲手試煉紀錄",
+      "fireAndFlyRankings": "砲手紀錄",
       "fireAndFlyPersonalRules": "你的離線紀錄，隨此角色保存。先比獎牌，再比最高得分。每日紀錄每天重置。",
       "fireAndFlyRules": "先比獎牌，再比最高得分。每次獲勝的試煉都會計入，練習也算。每日紀錄隨伺服器重置。紀錄會在30秒內更新。",
+      "fireAndFlyGroupsLabel": "砲手紀錄分組",
+      "fireAndFlyGroups": {
+        "trials": "試煉",
+        "missions": "任務",
+        "mastery": "精通"
+      },
+      "fireAndFlyMissionStart": "接受此任務",
+      "fireAndFlyMissionRules": "先比獎牌，再比最高得分。每次獲勝的任務都會計入，練習也算。紀錄會在30秒內更新。",
+      "fireAndFlyMissionPersonalRules": "你的離線紀錄，隨此角色保存。先比獎牌，再比最高得分。",
+      "fireAndFlyMastery": "砲手精通",
+      "fireAndFlyMasteryRules": "每個任務的最佳獎牌折算為星數相加：金牌3星，銀牌2星，銅牌1星。星數多者在前，再比總得分。紀錄會在30秒內更新。",
+      "fireAndFlyMasteryPersonalRules": "你的離線精通，隨此角色保存：每個任務的最佳獎牌折算為星數相加（金牌3星，銀牌2星，銅牌1星），再比總得分。",
+      "wqStars": "星數",
       "wqPoints": "分數",
       "wqSeconds": "{seconds}秒",
       "wqNoMedal": "無",
@@ -1594,6 +1608,7 @@ export const zh_TW: EnTranslations = {
         "seconds": "依獎牌排名，其次最快時間",
         "points": "依獎牌排名，其次最高分"
       },
+      "rankedByStars": "依星數排名，再比最高得分",
       "podiumLabel": "前三名",
       "unclaimed": "虛位以待",
       "totalOne": "1 位英雄上榜",
@@ -3216,6 +3231,12 @@ export const zh_TW: EnTranslations = {
         "few": "顯示 {count} 個公會",
         "many": "顯示 {count} 個公會",
         "other": "顯示 {count} 個公會"
+      },
+      "fireAndFlyStars": {
+        "one": "{count}星",
+        "few": "{count}星",
+        "many": "{count}星",
+        "other": "{count}星"
       },
       "commissionMasterworks": {
         "one": "{count}件傑作",

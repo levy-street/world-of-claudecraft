@@ -19279,6 +19279,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Пройти то же испытание ещё раз, не покидая башни. После получения сегодняшней награды повтор больше не награждается.',
   'hudChrome.turret.replayHintMission':
     'Пройти то же задание ещё раз, не покидая башни. После получения сегодняшней награды повтор больше не награждается.',
+  'hudChrome.turret.leavingIn': 'Вы покинете башню через {seconds} сек.',
   'hudChrome.turret.recruitedBanner': 'Вы в расчёте!',
   'hudChrome.turret.recruitedLine':
     '{name}: «Добро пожаловать в расчёт ворот, канонир. Мои задания теперь открыты для вас.»',
@@ -19931,11 +19932,31 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.leaderboard.fireAndFlyDaily': '{trial}: сегодня',
   'hudChrome.leaderboard.fireAndFlyLifetime': '{trial}: за всё время',
   'hudChrome.leaderboard.fireAndFlyStart': 'Пройти это испытание',
-  'hudChrome.leaderboard.fireAndFlyRankings': 'Рекорды испытаний канонира',
+  'hudChrome.leaderboard.fireAndFlyRankings': 'Рекорды канонира',
   'hudChrome.leaderboard.fireAndFlyPersonalRules':
     'Ваши офлайн-рекорды, сохранённые с этим персонажем. Сначала решает лучшая медаль, затем наибольший счёт. Дневные рекорды сбрасываются каждый день.',
   'hudChrome.leaderboard.fireAndFlyRules':
     'Сначала решает лучшая медаль, затем наибольший счёт. Засчитывается каждое выигранное испытание, включая тренировочные. Дневные рекорды сбрасываются вместе с миром. Рекорды обновляются в течение 30 секунд.',
+  'hudChrome.leaderboard.fireAndFlyGroupsLabel': 'Разделы рекордов канонира',
+  'hudChrome.leaderboard.fireAndFlyGroups.trials': 'Испытания',
+  'hudChrome.leaderboard.fireAndFlyGroups.missions': 'Задания',
+  'hudChrome.leaderboard.fireAndFlyGroups.mastery': 'Мастерство',
+  'hudChrome.leaderboard.fireAndFlyMissionStart': 'Взяться за задание',
+  'hudChrome.leaderboard.fireAndFlyMissionRules':
+    'Сначала решает лучшая медаль, затем наибольший счёт. Засчитывается каждое выигранное задание, включая тренировочные. Рекорды обновляются в течение 30 секунд.',
+  'hudChrome.leaderboard.fireAndFlyMissionPersonalRules':
+    'Ваши офлайн-рекорды, сохранённые с этим персонажем. Сначала решает лучшая медаль, затем наибольший счёт.',
+  'hudChrome.leaderboard.fireAndFlyMastery': 'Мастерство канонира',
+  'hudChrome.leaderboard.fireAndFlyMasteryRules':
+    'Лучшие медали за каждое задание складываются в звёзды: золото 3, серебро 2, бронза 1. Сначала решает число звёзд, затем общий счёт. Рекорды обновляются в течение 30 секунд.',
+  'hudChrome.leaderboard.fireAndFlyMasteryPersonalRules':
+    'Ваше офлайн-мастерство, сохранённое с этим персонажем: лучшие медали за каждое задание складываются в звёзды (золото 3, серебро 2, бронза 1), затем учитывается общий счёт.',
+  'hudChrome.leaderboard.wqStars': 'Звёзды',
+  'hudChrome.wqLadder.rankedByStars': 'По звёздам, затем по наибольшему счёту',
+  'hudChrome.plurals.fireAndFlyStars.one': '{count} звезда',
+  'hudChrome.plurals.fireAndFlyStars.few': '{count} звезды',
+  'hudChrome.plurals.fireAndFlyStars.many': '{count} звёзд',
+  'hudChrome.plurals.fireAndFlyStars.other': '{count} звезды',
   'hudChrome.framePresets.apply': 'Применить',
   'hudChrome.focusTargets.showEmpty': 'Показывать пустые рамки фокуса',
   'hudChrome.focusTargets.assignHint': 'Выберите цель. Нажмите {key} или кнопку «{button}».',

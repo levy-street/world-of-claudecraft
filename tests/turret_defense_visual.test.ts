@@ -46,9 +46,13 @@ import {
   buildWorldQuestTraceStandIn,
   worldQuestTraceMaterials,
 } from '../src/render/world_quest_trace_materials';
+import {
+  FIRE_AND_FLY_DUNGEON_DEFS,
+  FIRE_AND_FLY_DUNGEON_ID,
+} from '../src/sim/content/fire_and_fly_arena';
 import { TURRET_MISSION_DELUGE } from '../src/sim/content/fire_and_fly_missions';
 import { TURRET_EXPLOSIVE_BARREL, TURRET_TIMING } from '../src/sim/content/turret_defense';
-import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
+import { BUILTIN_WORLD, instanceOrigin, MOBS } from '../src/sim/data';
 import { FIRE_AND_FLY_TOWER } from '../src/sim/fire_and_fly_field';
 import {
   marchSegment,
@@ -2225,6 +2229,194 @@ describe('Fire and Fly limited weapons on screen', () => {
       if ((node as THREE.Light).isLight) lights++;
     });
     expect(lights).toBe(0);
+    visual.dispose();
+  });
+});
+
+describe('Fire and Fly run residency', () => {
+  const ARENA_X = instanceOrigin(FIRE_AND_FLY_DUNGEON_DEFS[FIRE_AND_FLY_DUNGEON_ID].index, 0).x;
+  const AMBERFALL_X = -340;
+  const KIT = ['fire-and-fly-weapon', 'fire-and-fly-ground-markers', 'fire-and-fly-barrels'];
+  const standingAt = (x: number) => {
+    const group = new THREE.Group();
+    group.position.x = x;
+    return { group };
+  };
+  const kitShown = (visual: TurretDefenseVisual) =>
+    KIT.map((name) => visual.group.getObjectByName(name) !== undefined);
+
+  it('releases every rig and pool once the player has left the seat and the arena, and a later seat builds them again', async () => {
+    actors.made.length = 0;
+    const scene = new THREE.Scene();
+    const visual = new TurretDefenseVisual(
+      scene,
+      () => 0,
+      () => Promise.resolve(),
+      immediate,
+      async () => towerModel(),
+    );
+    const weaponOf = () => (visual as unknown as { weapon: CannonShellVisuals }).weapon;
+    const state = engine(160);
+    const view = viewOf(state);
+    await buildAll(visual, view, 160);
+    const first = actors.made.slice();
+    const tower = part(visual, TURRET_TOWER_NAME);
+    expect(weaponOf().hasBarrel).toBe(true);
+    const capacities = turretRigCapacities(turretRigPlan(state.plan));
+    expect(first).toHaveLength(totalRigs(state));
+    expect(kitShown(visual)).toEqual([true, true, true]);
+    const bodies = markers(visual).length;
+    expect(bodies).toBeGreaterThan(0);
+
+    // The seat blinks out while the player still stands in the arena: everything stays.
+    visual.update(null, null, 1, 0.016, false, standingAt(ARENA_X));
+    expect(first.every((a) => a.dispose.mock.calls.length === 0)).toBe(true);
+    expect(new Map(visual.rigCounts)).toEqual(capacities);
+
+    visual.update(null, null, 1, 0.016, false, standingAt(AMBERFALL_X));
+    expect(first.every((a) => a.dispose.mock.calls.length === 1)).toBe(true);
+    expect(first.some((a) => inGraph(a.root, scene))).toBe(false);
+    expect(visual.rigCounts.size).toBe(0);
+    expect(markers(visual)).toHaveLength(0);
+    expect(kitShown(visual)).toEqual([false, false, false]);
+    // The tower stays: the player stands on it, and its model belongs to the loader's cache.
+    expect(part(visual, TURRET_TOWER_NAME)).toBe(tower);
+    expect(weaponOf().prepared).toBe(false);
+    expect(weaponOf().hasBarrel).toBe(true);
+    visual.update(null, null, 2, 0.016, false, standingAt(AMBERFALL_X));
+    expect(first.every((a) => a.dispose.mock.calls.length === 1)).toBe(true);
+
+    await buildAll(visual, view, 160);
+    const second = actors.made.slice(first.length);
+    expect(second).toHaveLength(totalRigs(state));
+    expect(new Map(visual.rigCounts)).toEqual(capacities);
+    expect(markers(visual)).toHaveLength(bodies);
+    expect(kitShown(visual)).toEqual([true, true, true]);
+    expect(drawnRigs(visual)).toHaveLength(state.monsters.length);
+    expect(drawnRigs(visual).every((a) => second.includes(a))).toBe(true);
+    visual.dispose();
+    expect(actors.made.every((a) => a.dispose.mock.calls.length === 1)).toBe(true);
+  });
+
+  it('keeps every rig and pool through a Replay: a new run on the same roof, never a gap', async () => {
+    actors.made.length = 0;
+    const scene = new THREE.Scene();
+    const visual = new TurretDefenseVisual(
+      scene,
+      () => 0,
+      () => Promise.resolve(),
+      immediate,
+    );
+    const state = engine(160);
+    await buildAll(visual, viewOf(state), 160);
+    const first = actors.made.slice();
+    const replay = createTurretDefense(state.plan, { x: 0, z: 0 }, 8, 200);
+    for (let t = 201; t <= 400; t++) tickTurretDefense(replay, t, flat);
+    expect(replay.monsters.length).toBeGreaterThan(0);
+    await frames(visual, viewOf(replay), 400, 20);
+    expect(actors.made).toEqual(first);
+    expect(first.every((a) => a.dispose.mock.calls.length === 0)).toBe(true);
+    expect(kitShown(visual)).toEqual([true, true, true]);
+    expect(drawnRigs(visual)).toHaveLength(replay.monsters.length);
+    visual.dispose();
+  });
+
+  it('disposes a released rig or pool only once its own compile gate has settled', async () => {
+    actors.made.length = 0;
+    const scene = new THREE.Scene();
+    const settle: (() => void)[] = [];
+    const gate = () => new Promise<void>((resolve) => settle.push(resolve));
+    const visual = new TurretDefenseVisual(scene, () => 0, gate, immediate);
+    const view = viewOf(engine(160));
+    visual.update(view, 160, 0, 0.016);
+    await flush();
+    visual.update(view, 160, 0, 0.016);
+    const early = actors.made.slice();
+    expect(early.length).toBeGreaterThan(0);
+    const weapon = (visual as unknown as { weapon: CannonShellVisuals }).weapon;
+    const weaponDispose = vi.spyOn(weapon, 'dispose');
+    visual.update(null, null, 1, 0.016, false, standingAt(AMBERFALL_X));
+    await flush();
+    expect(early.every((a) => a.dispose.mock.calls.length === 0)).toBe(true);
+    expect(weaponDispose).not.toHaveBeenCalled();
+    expect(early.some((a) => inGraph(a.root, scene))).toBe(false);
+    for (const release of settle.splice(0)) release();
+    await flush();
+    expect(early.every((a) => a.dispose.mock.calls.length === 1)).toBe(true);
+    expect(weaponDispose).toHaveBeenCalledTimes(1);
+    visual.dispose();
+  });
+
+  it('keeps the kit while the arena prebuild means a seat, and releases it once that intent lapses', async () => {
+    actors.made.length = 0;
+    const scene = new THREE.Scene();
+    const visual = new TurretDefenseVisual(
+      scene,
+      () => 0,
+      () => Promise.resolve(),
+      immediate,
+    );
+    const weaponOf = () => (visual as unknown as { weapon: CannonShellVisuals }).weapon;
+    await buildAll(visual, viewOf(engine(160)), 160);
+    const rigs = actors.made.slice();
+    const seated = weaponOf();
+    visual.prewarmKit(1);
+    visual.update(null, null, 1, 0.016, false, standingAt(AMBERFALL_X));
+    expect(rigs.every((a) => a.dispose.mock.calls.length === 1)).toBe(true);
+    expect(weaponOf()).toBe(seated);
+    expect(kitShown(visual)).toEqual([true, false, true]);
+    visual.prewarmKit(2);
+    visual.update(null, null, 2, 0.016, false, standingAt(AMBERFALL_X));
+    expect(weaponOf()).toBe(seated);
+    visual.update(null, null, 3, 0.016, false, standingAt(AMBERFALL_X));
+    expect(weaponOf()).not.toBe(seated);
+    expect(weaponOf().prepared).toBe(false);
+    expect(kitShown(visual)).toEqual([false, false, false]);
+    visual.dispose();
+  });
+
+  it('releases a kit built ahead of a seat never taken once the intent lapses, and builds it again on the next', async () => {
+    const scene = new THREE.Scene();
+    const visual = new TurretDefenseVisual(
+      scene,
+      () => 0,
+      () => Promise.resolve(),
+      immediate,
+    );
+    const weaponOf = () => (visual as unknown as { weapon: CannonShellVisuals }).weapon;
+    visual.prewarmKit(1);
+    visual.update(null, null, 1, 0.016, false, standingAt(AMBERFALL_X));
+    await flush();
+    const prebuilt = weaponOf();
+    expect(prebuilt.prepared).toBe(true);
+    // An unknown position never releases.
+    visual.update(null, null, 2, 0.016);
+    expect(weaponOf()).toBe(prebuilt);
+    visual.update(null, null, 3, 0.016, false, standingAt(AMBERFALL_X));
+    expect(weaponOf()).not.toBe(prebuilt);
+    expect(weaponOf().prepared).toBe(false);
+    visual.prewarmKit(4);
+    expect(weaponOf().prepared).toBe(true);
+    visual.dispose();
+  });
+
+  it('never attaches a rig or a pool whose compile gate settles after the release', async () => {
+    actors.made.length = 0;
+    const scene = new THREE.Scene();
+    const settle: (() => void)[] = [];
+    const gate = () => new Promise<void>((resolve) => settle.push(resolve));
+    const visual = new TurretDefenseVisual(scene, () => 0, gate, immediate);
+    const view = viewOf(engine(160));
+    visual.update(view, 160, 0, 0.016);
+    await flush();
+    visual.update(view, 160, 0, 0.016);
+    expect(actors.made.length).toBeGreaterThan(0);
+    const early = actors.made.slice();
+    visual.update(null, null, 1, 0.016, false, standingAt(AMBERFALL_X));
+    for (const release of settle) release();
+    await flush();
+    expect(early.some((a) => inGraph(a.root, scene))).toBe(false);
+    expect(kitShown(visual)).toEqual([false, false, false]);
     visual.dispose();
   });
 });

@@ -15,6 +15,7 @@ import { turretSessionView } from '../src/sim/turret_defense_session';
 import { TICK_RATE, type TurretSession } from '../src/sim/types';
 import {
   TURRET_INTEGRITY_ALERTS,
+  TURRET_LEAVING_COUNTDOWN_SECONDS,
   TURRET_POINT_ROWS,
   TURRET_RESULT_ROWS,
   TurretFeedbackCursor,
@@ -205,6 +206,7 @@ describe('the turret HUD view', () => {
       scored: true,
       medal: 'silver',
       medalText: 'Silver medal',
+      leaving: '',
       pointRows: [
         { label: 'Kills (55)', value: '+1,100' },
         { label: 'Tower kept (72)', value: '+14,400' },
@@ -355,6 +357,35 @@ describe('the turret HUD view', () => {
     );
   });
 
+  it("counts the seat's own leave down on the card over its last half minute only", () => {
+    const ended = seat();
+    const endTick = START + 400;
+    ended.defense.phase = 'lost';
+    ended.defense.integrity = 0;
+    ended.defense.phaseEndTick = endTick;
+    ended.defense.result = turretResult(ended.defense.plan, ended.defense);
+    const endedView = turretSessionView(ended);
+    const leaves = endTick + TURRET_TIMING.endedSeatTicks;
+    const window = TURRET_LEAVING_COUNTDOWN_SECONDS * TICK_RATE;
+    const view = new TurretHudView();
+    const leaving = (clock: number | null) => view.tick(endedView, clock).result?.leaving;
+    expect(TURRET_LEAVING_COUNTDOWN_SECONDS).toBe(30);
+    expect(leaving(endTick)).toBe('');
+    expect(leaving(leaves - window - 1)).toBe('');
+    expect(leaving(leaves - window)).toBe('Leaving the tower in 30 sec');
+    expect(leaving(leaves - 1)).toBe('Leaving the tower in 1 sec');
+    expect(leaving(leaves)).toBe('Leaving the tower in 0 sec');
+    expect(leaving(null)).toBe('');
+    expect(view.tick(endedView, leaves - window).slot).toBe('');
+    const translate = vi.mocked(t);
+    view.tick(endedView, leaves - window);
+    translate.mockClear();
+    view.tick(endedView, leaves - window + 1);
+    expect(translate).not.toHaveBeenCalled();
+    view.tick(endedView, leaves - window + TICK_RATE);
+    expect(translate).toHaveBeenCalledWith('hudChrome.turret.leavingIn', { seconds: '29' });
+  });
+
   it('rebuilds an unchanged view when the language changes', async () => {
     const ended = seat();
     ended.defense.phase = 'won';
@@ -432,6 +463,27 @@ describe('the turret HUD live line', () => {
     expect(ended('won', 97)).toBe('Victory! Gold medal');
     expect(ended('won', 59)).toBe('Victory! Bronze medal');
     expect(ended('lost', 0)).toBe('The tower has fallen');
+  });
+
+  it("speaks the seat's own leave once, as its countdown appears, never each second", () => {
+    const session = seat();
+    const endTick = START + 400;
+    session.defense.phase = 'won';
+    session.defense.phaseEndTick = endTick;
+    session.defense.result = turretResult(session.defense.plan, session.defense);
+    const endedView = turretSessionView(session);
+    const leaves = endTick + TURRET_TIMING.endedSeatTicks;
+    const view = new TurretHudView();
+    expect(view.tick(endedView, endTick).announce).toBe('Victory! Gold medal');
+    const window = TURRET_LEAVING_COUNTDOWN_SECONDS * TICK_RATE;
+    expect(view.tick(endedView, leaves - window).announce).toBe('Leaving the tower in 30 sec');
+    expect(view.tick(endedView, leaves - 5 * TICK_RATE).announce).toBe(
+      'Leaving the tower in 30 sec',
+    );
+    const replayed = seat(leaves - 4 * TICK_RATE);
+    expect(view.tick(turretSessionView(replayed), leaves - 4 * TICK_RATE).announce).toBe(
+      `First wave in ${TURRET_TIMING.introTicks / TICK_RATE} sec`,
+    );
   });
 
   it('forgets the seat on reset, so the next seat is announced again', () => {

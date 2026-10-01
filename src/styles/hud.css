@@ -535,6 +535,13 @@
   .turret-card-total .turret-card-value {
     color: var(--color-accent);
   }
+  /* The seat's own leave, counting down under the points over the card's last half minute. */
+  .turret-card-leaving {
+    font-size: 12px;
+  }
+  .turret-card-leaving:empty {
+    display: none;
+  }
   /* A short screen, a phone on its side or a low desktop window where the card sits
      under the banner lane: the card, its medal and points included, keeps Leave above
      the tower rail by dropping the decorative kicker (the strip's name stays its label)

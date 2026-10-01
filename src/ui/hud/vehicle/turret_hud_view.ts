@@ -1,3 +1,4 @@
+import { TURRET_TIMING } from '../../../sim/content/turret_defense';
 import type { TurretEvent } from '../../../sim/minigames/turret_defense';
 import type { TurretArsenal } from '../../../sim/minigames/turret_defense_plan';
 import type { TurretMedal } from '../../../sim/minigames/turret_result';
@@ -20,6 +21,8 @@ export const TURRET_INTEGRITY_ALERTS = [0.5, LOW_INTEGRITY] as const;
 export const TURRET_RESULT_ROWS = 8;
 /** The result card's points rows: kills, tower kept, keg kills, bowled over, then the total. */
 export const TURRET_POINT_ROWS = 5;
+/** The result card counts down the seat's own leave over its last this many seconds. */
+export const TURRET_LEAVING_COUNTDOWN_SECONDS = 30;
 
 const MEDAL_KEYS = {
   gold: 'hudChrome.turret.medalGold',
@@ -44,6 +47,8 @@ export interface TurretHudResult {
   readonly rows: readonly TurretStatRow[];
   /** TURRET_POINT_ROWS rows, in the order the card lists them. */
   readonly pointRows: readonly TurretStatRow[];
+  /** The seat's own leave counting down, empty until its last half minute. */
+  leaving: string;
 }
 
 /** The seat's fixed words, resolved with the frame so a language change reaches them. */
@@ -95,11 +100,19 @@ export interface TurretBanner {
   subtext?: string;
 }
 
-/** Whole seconds left in a counted phase; null outside one or without a clock to count from. */
+/**
+ * Whole seconds left in a counted phase: the intro, the pause between waves, and an
+ * ended run's last half minute before the seat leaves on its own. Null outside one or
+ * without a clock to count from.
+ */
 function countdownSeconds(session: TurretSessionView, clock: number | null): number | null {
   const { phase, phaseEndTick } = session.defense;
-  if (clock === null || (phase !== 'intro' && phase !== 'between')) return null;
-  return Math.max(0, Math.ceil((phaseEndTick - clock) / TICK_RATE));
+  if (clock === null) return null;
+  const secondsTo = (tick: number) => Math.max(0, Math.ceil((tick - clock) / TICK_RATE));
+  if (phase === 'intro' || phase === 'between') return secondsTo(phaseEndTick);
+  if (phase !== 'won' && phase !== 'lost') return null;
+  const seconds = secondsTo(phaseEndTick + TURRET_TIMING.endedSeatTicks);
+  return seconds <= TURRET_LEAVING_COUNTDOWN_SECONDS ? seconds : null;
 }
 
 function countdownLine(session: TurretSessionView, seconds: number | null): string {
@@ -243,6 +256,7 @@ export class TurretHudView {
     medalText: '',
     rows: this.rows,
     pointRows: this.pointRows,
+    leaving: '',
   };
   private readonly frame: TurretHudFrame = {
     labels: {
@@ -280,6 +294,8 @@ export class TurretHudView {
   /** What the live region currently says: an integrity alert (a band), else the phase start. */
   private spokenBand = 0;
   private spokenSeconds: number | null = null;
+  /** The leave countdown's first second, spoken once as it appears on an ended seat. */
+  private spokenLeaving: number | null = null;
 
   /** Forget the seat: the next read rebuilds, and its phase is announced as new. */
   reset(): void {
@@ -289,6 +305,7 @@ export class TurretHudView {
     this.lastBand = 0;
     this.spokenBand = 0;
     this.spokenSeconds = null;
+    this.spokenLeaving = null;
   }
 
   tick(session: TurretSessionView, clock: number | null): TurretHudFrame {
@@ -352,6 +369,8 @@ export class TurretHudView {
       result.verdict = verdictText(result.won);
       fillResultRows(this.rows, session, frame.integrityText);
       result.scored = fillPoints(result, this.pointRows, session, value);
+      result.leaving =
+        seconds === null ? '' : t('hudChrome.turret.leavingIn', { seconds: formatNumber(seconds) });
       frame.result = result;
     } else {
       frame.result = null;
@@ -367,10 +386,13 @@ export class TurretHudView {
       this.lastBand = band;
       this.spokenBand = 0;
       this.spokenSeconds = seconds;
+      this.spokenLeaving = null;
     } else if (band > this.lastBand) {
       this.lastBand = band;
       this.spokenBand = band;
     }
+    const ended = phase === 'won' || phase === 'lost';
+    if (ended && seconds !== null && this.spokenLeaving === null) this.spokenLeaving = seconds;
     this.frame.announce =
       this.spokenBand > 0
         ? t('hudChrome.turret.integrityBelow', {
@@ -378,7 +400,9 @@ export class TurretHudView {
               style: 'percent',
             }),
           })
-        : phaseAnnouncement(session, this.spokenSeconds);
+        : this.spokenLeaving !== null
+          ? t('hudChrome.turret.leavingIn', { seconds: formatNumber(this.spokenLeaving) })
+          : phaseAnnouncement(session, this.spokenSeconds);
   }
 }
 

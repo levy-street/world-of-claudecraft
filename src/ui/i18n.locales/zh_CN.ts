@@ -18030,6 +18030,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turret.replayHint': '在塔上再次挑战同一试炼。领取今日奖励后，再次挑战不再给予奖励。',
   'hudChrome.turret.replayHintMission':
     '在塔上再次执行同一任务。领取今日奖励后，再次挑战不再给予奖励。',
+  'hudChrome.turret.leavingIn': '{seconds} 秒后离开塔楼',
   'hudChrome.turret.recruitedBanner': '已入伍！',
   'hudChrome.turret.recruitedLine': '{name}：“欢迎加入城门炮组，炮手。我的任务现在向你开放了。”',
   'hudChrome.turret.weapons': '塔楼武器',
@@ -18625,11 +18626,31 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.leaderboard.fireAndFlyDaily': '{trial}：今日',
   'hudChrome.leaderboard.fireAndFlyLifetime': '{trial}：历史',
   'hudChrome.leaderboard.fireAndFlyStart': '接受此试炼',
-  'hudChrome.leaderboard.fireAndFlyRankings': '炮手试炼纪录',
+  'hudChrome.leaderboard.fireAndFlyRankings': '炮手纪录',
   'hudChrome.leaderboard.fireAndFlyPersonalRules':
     '你的离线纪录，随此角色保存。先比奖牌，再比最高得分。每日纪录每天重置。',
   'hudChrome.leaderboard.fireAndFlyRules':
     '先比奖牌，再比最高得分。每次获胜的试炼都会计入，练习也算。每日纪录随服务器重置。纪录会在30秒内更新。',
+  'hudChrome.leaderboard.fireAndFlyGroupsLabel': '炮手纪录分组',
+  'hudChrome.leaderboard.fireAndFlyGroups.trials': '试炼',
+  'hudChrome.leaderboard.fireAndFlyGroups.missions': '任务',
+  'hudChrome.leaderboard.fireAndFlyGroups.mastery': '精通',
+  'hudChrome.leaderboard.fireAndFlyMissionStart': '接受此任务',
+  'hudChrome.leaderboard.fireAndFlyMissionRules':
+    '先比奖牌，再比最高得分。每次获胜的任务都会计入，练习也算。纪录会在30秒内更新。',
+  'hudChrome.leaderboard.fireAndFlyMissionPersonalRules':
+    '你的离线纪录，随此角色保存。先比奖牌，再比最高得分。',
+  'hudChrome.leaderboard.fireAndFlyMastery': '炮手精通',
+  'hudChrome.leaderboard.fireAndFlyMasteryRules':
+    '每个任务的最佳奖牌折算为星数相加：金牌3星，银牌2星，铜牌1星。星数多者在前，再比总得分。纪录会在30秒内更新。',
+  'hudChrome.leaderboard.fireAndFlyMasteryPersonalRules':
+    '你的离线精通，随此角色保存：每个任务的最佳奖牌折算为星数相加（金牌3星，银牌2星，铜牌1星），再比总得分。',
+  'hudChrome.leaderboard.wqStars': '星数',
+  'hudChrome.wqLadder.rankedByStars': '按星数排名，再比最高得分',
+  'hudChrome.plurals.fireAndFlyStars.one': '{count}星',
+  'hudChrome.plurals.fireAndFlyStars.few': '{count}星',
+  'hudChrome.plurals.fireAndFlyStars.many': '{count}星',
+  'hudChrome.plurals.fireAndFlyStars.other': '{count}星',
   'hudChrome.framePresets.apply': '应用',
   'hudChrome.focusTargets.showEmpty': '显示空的焦点框体',
   'hudChrome.focusTargets.assignHint': '选择一个目标。按 {key} 或点击 {button}。',

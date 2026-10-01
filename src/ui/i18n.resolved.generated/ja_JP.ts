@@ -588,6 +588,7 @@ export const ja_JP: EnTranslations = {
       "replay": "もう一度",
       "replayHint": "塔の上で同じ試練にもう一度挑む。本日の報酬を受け取った後の再挑戦では、報酬は得られない。",
       "replayHintMission": "塔の上で同じ任務にもう一度挑む。本日の報酬を受け取った後の再挑戦では、報酬は得られない。",
+      "leavingIn": "あと {seconds} 秒で塔を降ります",
       "recruitedBanner": "入隊！",
       "recruitedLine": "{name}：「門の砲兵隊へようこそ、砲手。これからは私の任務を任せる。」",
       "weapons": "塔の兵装",
@@ -1564,9 +1565,22 @@ export const ja_JP: EnTranslations = {
       "fireAndFlyDaily": "{trial}：今日",
       "fireAndFlyLifetime": "{trial}：通算",
       "fireAndFlyStart": "この試練を受ける",
-      "fireAndFlyRankings": "砲手の試練の記録",
+      "fireAndFlyRankings": "砲手の記録",
       "fireAndFlyPersonalRules": "このキャラクターに保存されたオフライン記録です。最も良いメダルが上位となり、次に最高スコアで順位が決まります。日間記録は毎日リセットされます。",
       "fireAndFlyRules": "最も良いメダルが上位となり、次に最高スコアで順位が決まります。練習を含め、勝利した試練はすべて記録されます。日間記録はサーバーのリセット時に更新されます。記録の反映には最大30秒かかります。",
+      "fireAndFlyGroupsLabel": "砲手の記録の分類",
+      "fireAndFlyGroups": {
+        "trials": "試練",
+        "missions": "任務",
+        "mastery": "熟達"
+      },
+      "fireAndFlyMissionStart": "この任務を受ける",
+      "fireAndFlyMissionRules": "最も良いメダルが上位となり、次に最高スコアで順位が決まります。練習を含め、勝利した任務はすべて記録されます。記録の反映には最大30秒かかります。",
+      "fireAndFlyMissionPersonalRules": "このキャラクターに保存されたオフライン記録です。最も良いメダルが上位となり、次に最高スコアで順位が決まります。",
+      "fireAndFlyMastery": "砲手の熟達",
+      "fireAndFlyMasteryRules": "各任務の最も良いメダルを星に換算して合計します（金3、銀2、銅1）。星の多い順、次に合計スコアで順位が決まります。記録の反映には最大30秒かかります。",
+      "fireAndFlyMasteryPersonalRules": "このキャラクターに保存されたオフラインの熟達です。各任務の最も良いメダルを星に換算して合計し（金3、銀2、銅1）、次に合計スコアで比べます。",
+      "wqStars": "星",
       "wqPoints": "スコア",
       "wqSeconds": "{seconds}秒",
       "wqNoMedal": "なし",
@@ -1594,6 +1608,7 @@ export const ja_JP: EnTranslations = {
         "seconds": "メダル順、次に最速タイム",
         "points": "メダル順、次に最高スコア"
       },
+      "rankedByStars": "星の数順、次に最高スコア",
       "podiumLabel": "トップ3",
       "unclaimed": "空席",
       "totalOne": "1人がランクイン",
@@ -3216,6 +3231,12 @@ export const ja_JP: EnTranslations = {
         "few": "{count} 件のギルドを表示中",
         "many": "{count} 件のギルドを表示中",
         "other": "{count} 件のギルドを表示中"
+      },
+      "fireAndFlyStars": {
+        "one": "星{count}",
+        "few": "星{count}",
+        "many": "星{count}",
+        "other": "星{count}"
       },
       "commissionMasterworks": {
         "one": "傑作{count}点",

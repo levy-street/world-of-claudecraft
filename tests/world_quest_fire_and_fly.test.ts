@@ -548,7 +548,7 @@ describe('the instructor dialog, tracker and map', () => {
       'Speak to Master Gunner Alder to take a trial.',
     ]);
     expect(fireAndFlyInstructionLines({ state: 'completed' })).toEqual([
-      'Trial passed! Speak to Master Gunner Alder to practice.',
+      'Tower held! Speak to Master Gunner Alder to practice.',
     ]);
   });
 

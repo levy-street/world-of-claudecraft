@@ -250,6 +250,8 @@ export const TURRET_TIMING = {
   downTicks: ticks(0.8),
   riseTicks: ticks(0.6),
   corpseTicks: ticks(5),
+  /** An ended run's result stays up this long, then the seat leaves on its own, as through Leave. */
+  endedSeatTicks: ticks(120),
 } as const;
 
 export const TURRET_PHYSICS = {

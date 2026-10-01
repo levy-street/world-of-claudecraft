@@ -588,6 +588,7 @@ export const vi_VN: EnTranslations = {
       "replay": "Replay",
       "replayHint": "Play the same trial again from the tower. Once today's reward is earned, a replay pays no reward.",
       "replayHintMission": "Play the same mission again from the tower. Once today's reward is earned, a replay pays no reward.",
+      "leavingIn": "Leaving the tower in {seconds} sec",
       "recruitedBanner": "Recruited!",
       "recruitedLine": "{name}: \"Welcome to the gate crew, gunner. My missions are open to you now.\"",
       "weapons": "Tower weapons",
@@ -1564,9 +1565,22 @@ export const vi_VN: EnTranslations = {
       "fireAndFlyDaily": "{trial}: Today",
       "fireAndFlyLifetime": "{trial}: All time",
       "fireAndFlyStart": "Take this trial",
-      "fireAndFlyRankings": "Gunner's trial records",
+      "fireAndFlyRankings": "Gunner's records",
       "fireAndFlyPersonalRules": "Your offline records, saved with this character. The best medal ranks first, then the highest score. Daily records reset each day.",
       "fireAndFlyRules": "The best medal ranks first, then the highest score. Every won trial counts, practice included. Daily records reset with the realm. Records refresh within 30 seconds.",
+      "fireAndFlyGroupsLabel": "Gunner's record groups",
+      "fireAndFlyGroups": {
+        "trials": "Trials",
+        "missions": "Missions",
+        "mastery": "Mastery"
+      },
+      "fireAndFlyMissionStart": "Take this mission",
+      "fireAndFlyMissionRules": "The best medal ranks first, then the highest score. Every won mission counts, practice included. Records refresh within 30 seconds.",
+      "fireAndFlyMissionPersonalRules": "Your offline records, saved with this character. The best medal ranks first, then the highest score.",
+      "fireAndFlyMastery": "Gunner's Mastery",
+      "fireAndFlyMasteryRules": "Your best medal on each mission, summed as stars: gold 3, silver 2, bronze 1. More stars rank first, then the higher total score. Records refresh within 30 seconds.",
+      "fireAndFlyMasteryPersonalRules": "Your offline Mastery, saved with this character: your best medal on each mission, summed as stars (gold 3, silver 2, bronze 1), then the total score.",
+      "wqStars": "Stars",
       "wqPoints": "Điểm",
       "wqSeconds": "{seconds}s",
       "wqNoMedal": "Không Có",
@@ -1594,6 +1608,7 @@ export const vi_VN: EnTranslations = {
         "seconds": "Xếp hạng theo huy chương, rồi thời gian nhanh nhất",
         "points": "Xếp hạng theo huy chương, rồi điểm cao nhất"
       },
+      "rankedByStars": "Ranked by stars, then highest score",
       "podiumLabel": "Ba hạng đầu",
       "unclaimed": "Chưa Nhận",
       "totalOne": "Một anh hùng được xếp hạng",
@@ -3216,6 +3231,12 @@ export const vi_VN: EnTranslations = {
         "few": "Đang hiển thị {count} bang hội",
         "many": "Đang hiển thị {count} bang hội",
         "other": "Đang hiển thị {count} bang hội"
+      },
+      "fireAndFlyStars": {
+        "one": "{count} star",
+        "few": "{count} stars",
+        "many": "{count} stars",
+        "other": "{count} stars"
       },
       "commissionMasterworks": {
         "one": "{count} kiệt tác",
@@ -12616,7 +12637,7 @@ export const vi_VN: EnTranslations = {
         "title": "The Gunner's Trials",
         "objective": "Hold a tower of your own through every wave of one trial",
         "ready": "Speak to Master Gunner Alder to take a trial.",
-        "complete": "Trial passed! Speak to Master Gunner Alder to practice.",
+        "complete": "Tower held! Speak to Master Gunner Alder to practice.",
         "scenarios": {
           "introduction": "Recruit's Trial",
           "standard": "Standing Watch",
