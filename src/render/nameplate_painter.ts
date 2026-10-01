@@ -502,6 +502,12 @@ export class NameplatePainter {
         slot.timeValue = quantized;
         slot.timeText = formatNumber(quantized, NAMEPLATE_DOT_NUMBER_OPTIONS[slot.decimals]);
       }
+      // The stack badge only re-formats when the count moves (an application
+      // landing or falling off), never per frame.
+      if (slot.stacks !== slot.stacksValue) {
+        slot.stacksValue = slot.stacks;
+        slot.stacksText = slot.stacks > 0 ? formatNumber(slot.stacks) : '';
+      }
     }
   }
 

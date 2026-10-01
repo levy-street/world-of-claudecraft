@@ -49,6 +49,15 @@ export function nameplateDotTimeFont(scale: number): string {
 // disagreeing with itself across two surfaces.
 const TIME_EXPIRING_FILL = '#ffcf40';
 
+/** The stack count sits INSIDE the icon's bottom-right corner, the corner the
+ *  DOM aura strips badge their stacks in (.stacks.ui-badge--corner), so the
+ *  countdown under the icon keeps its own line. Offsets are plate units at
+ *  100% and scale with the row: the inset centres a single digit on the
+ *  corner and the baseline sits just above the tile's bottom border. */
+const STACKS_INSET_X = 3;
+const STACKS_BASELINE_INSET = 1.5;
+const STACKS_FILL = '#ffffff';
+
 // Magic-school tints for the icon border, byte-identical to the --color-debuff-*
 // tokens the DOM aura strips use (src/styles/tokens.css), so one school reads the
 // same on a nameplate, on the target frame and in the Target dots frame.
@@ -162,6 +171,16 @@ export function drawNameplateDotRow(
         isAuraExpiring(slot.remaining, slot.duration)
           ? TIME_EXPIRING_FILL
           : NAMEPLATE_DOT_TIME_STYLE.fill,
+      );
+    }
+    if (slot.stacksText) {
+      host.drawText(
+        ctx,
+        slot.stacksText,
+        x + size - STACKS_INSET_X * scale,
+        topY + size - STACKS_BASELINE_INSET * scale,
+        nameplateDotTimeFont(scale),
+        STACKS_FILL,
       );
     }
     x += size + gap;
