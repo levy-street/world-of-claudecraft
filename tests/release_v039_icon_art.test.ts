@@ -519,11 +519,13 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     // The Buried Hoards quartermaster consumables (the 2026-09-28 release/v0.44.0
     // merge into feature/buried-hoards: potion_of_invisibility and
     // elixir_of_mana_regeneration) ship committed painted art: 122.
-    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(122);
+    // All usable consumables and recipes now join the production hotbar set,
+    // adding 113 painted identities without changing the sealed v0.39 record.
+    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(235);
     expect(
       artSubjectHotbarItemIds,
       'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
-    ).toHaveLength(122);
+    ).toHaveLength(235);
     expect(pendingHotbarItemIds, 'ITEM_ART_PENDING hotbar items').toHaveLength(0);
     expect(
       pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),

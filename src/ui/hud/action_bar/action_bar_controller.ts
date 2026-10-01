@@ -13,6 +13,7 @@ import {
 } from '../../../world_api/action_bar';
 import { knownItemDef } from '../../known_item';
 import { isStanceBarAbilityGroup } from '../../stance_bar_view';
+import { isActionBarItem } from './action_bar_item_core';
 import { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
 import {
   actionBarFormSeededKey,
@@ -45,7 +46,6 @@ import {
   ownedDruidFormDefaultAbilityIds,
   shouldSeedOwnedSpecDefault,
 } from './owned_class_spec_defaults';
-import { isUsableTrinketId } from './trinket_slot_core';
 
 export { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
 
@@ -535,37 +535,7 @@ export class ActionBarController {
   }
 
   isHotbarItemId(itemId: string): boolean {
-    // Gathering implements (#2343): the simple pole (use.type 'fishing') and
-    // every gatherTool (picks, axes, sickles, tiered rods) are placeable, so
-    // a keybound press works the tool exactly like the bags click.
-    // Reins: the mounts-as-items pivot routes kind 'mount' through the same
-    // useItem dispatch a potion rides (src/sim/items.ts -> summonMountItem), so
-    // reins are placeable for the same reason a potion is. Without this arm the
-    // bag drag never writes a hotbar payload and the bar cannot accept them.
-    // Recipe patterns (kind 'recipe') ride that same dispatch but are DELIBERATELY
-    // not placeable (elixirs, scrolls since phase 06, and flasks since phase 10
-    // are the precedent that riding useItem does not imply a slot, though their
-    // reason differs): a pattern is a one-shot unlock consumed on its first
-    // successful use, so a hotbar slot would hold a dead button from the first
-    // press on; the bags are its home. Scrolls and flasks live on the mobile
-    // consumable tray instead.
-    // Elixirs: same useItem dispatch (kind 'elixir' -> applyAura), usable in
-    // combat with no shared potion cooldown, so they are placeable exactly
-    // like a potion; the view paints no cooldown swipe on their slot.
-    // Trinkets with a use effect: pressed through the same useItem, which uses
-    // the WORN copy (the slot state reads the equipment, trinket_slot_core.ts).
-    const item = ITEMS[itemId];
-    return (
-      isUsableTrinketId(itemId) ||
-      item?.kind === 'food' ||
-      item?.kind === 'drink' ||
-      item?.kind === 'potion' ||
-      item?.kind === 'elixir' ||
-      item?.kind === 'mount' ||
-      item?.use?.type === 'fishing' ||
-      item?.use?.type === 'gatherTool' ||
-      item?.use?.type === 'harvestPreference'
-    );
+    return isActionBarItem(knownItemDef(ITEMS, itemId));
   }
 
   /**

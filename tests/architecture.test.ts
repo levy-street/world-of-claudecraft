@@ -351,6 +351,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/action_bar/item_bags_line_core.ts',
   'src/ui/hud/quest/clue_talk_row_core.ts',
   'src/ui/hud/action_bar/trinket_slot_core.ts',
+  'src/ui/hud/action_bar/action_bar_item_core.ts',
   'src/ui/hud/quest/prof_intro_hint_core.ts',
   'src/ui/hud/quest/clue_step_row_view.ts',
   'src/ui/hud/pet_bar_core.ts',
