@@ -119,6 +119,8 @@ it('shows the strip and the rail, hides the action bars and swaps in the turret 
   expect(hud().parentElement?.id).toBe('ui');
   expect(rail().parentElement?.id).toBe('ui');
   expect(live().parentElement?.id).toBe('ui');
+  // The short-screen stylesheet hides the rail under the ended card with a sibling rule.
+  expect(hud().compareDocumentPosition(rail()) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   expect(live().style.display).toBe('');
   expect(live().textContent).toBe('');
   expect(bar.aim).toBeInstanceOf(VehicleAimCore);

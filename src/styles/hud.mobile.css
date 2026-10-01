@@ -125,6 +125,54 @@
   body.mobile-touch .turret-card-stats .ui-stat-row {
     font-size: 12px;
   }
+  /* A phone on its side: the card under the touch banner lane would run past the tower
+     rail, Replay and Leave sliding under it, so the medal shares the verdict's line
+     (wrapping under it when a long verdict needs the width) and the rows tighten. The
+     card's top follows the height but its rows do not, so under about 345px (a small
+     phone, or a landscape URL bar) it still reaches the rail: the rail steps aside once
+     the run is over, its integrity already on the card's Tower row. The width is capped
+     because a wrapping row's natural width is all its items on one line, which would
+     stretch the card over the minimap's compass. */
+  @media (max-height: 480px) {
+    body.mobile-touch #turret-hud.ended {
+      max-width: min(400px, calc(100% - 24px));
+      row-gap: 6px;
+      padding: 6px 12px 8px;
+    }
+    body.mobile-touch #turret-hud.ended .turret-card {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 3px 12px;
+    }
+    body.mobile-touch
+      #turret-hud.ended
+      .turret-card
+      > :not(.turret-card-verdict, .turret-card-medal) {
+      flex-basis: 100%;
+    }
+    body.mobile-touch #turret-hud.ended .turret-card-verdict {
+      font-size: 17px;
+      line-height: 20px;
+    }
+    body.mobile-touch #turret-hud.ended .turret-card-medal {
+      font-size: 14px;
+    }
+    body.mobile-touch #turret-hud.ended .turret-card-stats {
+      --stat-row-h: 14px;
+    }
+    body.mobile-touch #turret-hud.ended .turret-card-stats .ui-stat-row {
+      line-height: 14px;
+    }
+    body.mobile-touch #turret-hud.ended .turret-card-leaving {
+      font-size: 11px;
+      line-height: 13px;
+    }
+    body.mobile-touch #turret-hud.ended ~ #turret-rail {
+      display: none;
+    }
+  }
   body.mobile-touch #turret-rail {
     bottom: max(10px, env(safe-area-inset-bottom));
     width: clamp(160px, calc(100% - 340px), 300px);

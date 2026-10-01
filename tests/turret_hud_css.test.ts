@@ -183,6 +183,51 @@ describe('the Fire and Fly seat HUD stylesheet', () => {
     );
   });
 
+  it('keeps the whole card, countdown included, on screen and clear of the rail on a phone on its side', () => {
+    const at = mobile.indexOf('@media (max-height: 480px) { body.mobile-touch #turret-hud.ended {');
+    expect(at).toBeGreaterThan(-1);
+    const short = mobile.slice(at, mobile.indexOf('body.mobile-touch #turret-rail {', at));
+    const ended = `body.mobile-touch #${TURRET_HUD_ID}.ended`;
+    const block = declarationsFor(short, ended);
+    expect(block).toContain('max-width: min(400px, calc(100% - 24px));');
+    expect(block).toContain('row-gap: 6px;');
+    expect(block).toContain('padding: 6px 12px 8px;');
+    const card = declarationsFor(short, `${ended} .turret-card`);
+    expect(card).toContain('display: flex;');
+    expect(card).toContain('flex-wrap: wrap;');
+    expect(card).toContain('gap: 3px 12px;');
+    expect(
+      declarationsFor(
+        short,
+        `${ended} .turret-card > :not(.turret-card-verdict, .turret-card-medal)`,
+      ),
+    ).toBe('flex-basis: 100%;');
+    expect(declarationsFor(short, `${ended} .turret-card-verdict`)).toBe(
+      'font-size: 17px; line-height: 20px;',
+    );
+    expect(declarationsFor(short, `${ended} .turret-card-medal`)).toBe('font-size: 14px;');
+    expect(declarationsFor(short, `${ended} .turret-card-stats`)).toBe('--stat-row-h: 14px;');
+    expect(declarationsFor(short, `${ended} .turret-card-stats .ui-stat-row`)).toBe(
+      'line-height: 14px;',
+    );
+    expect(declarationsFor(short, `${ended} .turret-card-leaving`)).toBe(
+      'font-size: 11px; line-height: 13px;',
+    );
+    // The card's top follows the height but its rows do not, so on the shortest phones
+    // it reaches the rail: the rail steps aside once the run is over.
+    expect(declarationsFor(short, `${ended} ~ #${TURRET_RAIL_ID}`)).toBe('display: none;');
+    // Replay and Leave keep the 40px touch floor: the short block never resizes them.
+    expect(short).not.toMatch(/turret-(leave|replay)/);
+    // The card with its countdown line, as the result probe measured it under the
+    // declarations pinned above, stays on screen at 320px, the small-android profile
+    // (scripts/mobile_input_zoom_check.mjs) on its side.
+    const cardWithCountdownPx = 210;
+    const height = 320;
+    const top = /top: calc\((\d+)% \+ (\d+)px\);/.exec(declarationsFor(mobile, ended));
+    const cardBottom = (height * Number(top?.[1])) / 100 + Number(top?.[2]) + cardWithCountdownPx;
+    expect(cardBottom).toBeLessThanOrEqual(height);
+  });
+
   it('seats the two 44px weapon sockets 6px above the rail, the row inert and each socket live', () => {
     const row = declarationsFor(hud, `#${TURRET_WEAPONS_ID}`);
     // The rail sits at 26px with an 18px bevel: 26 + 18 + 6.
