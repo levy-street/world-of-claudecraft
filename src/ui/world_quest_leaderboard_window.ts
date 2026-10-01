@@ -10,14 +10,10 @@
 // open, a card pick, and a page change, never from the per-frame path. It holds
 // no Sim reference and reaches Hud only through its deps.
 
-import { FIRE_AND_FLY_QUEST_ID } from '../sim/content/world_quest_fire_and_fly';
-import { fireAndFlyScoreboardInfo } from '../sim/fire_and_fly_scoreboards';
-import { gliderScoreboardInfo } from '../sim/glider_scoreboards';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { IWorld, WorldQuestLeaderboardPage } from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
-import { t } from './i18n';
 import { type PodiumSlotHtml, podiumHtml } from './leaderboard_podium_html';
 import { svgIcon } from './ui_icons';
 import {
@@ -43,8 +39,8 @@ export interface WorldQuestLeaderboardWindowDeps {
 }
 
 /** Where focus lands after a repaint: the close button on open, the picked
- *  card after a board switch, the pager button just used after a page change. */
-type FocusTarget = 'open' | 'card' | 'prev' | 'next' | null;
+ *  group or card after a board switch, the pager button just used after a page change. */
+type FocusTarget = 'open' | 'group' | 'card' | 'prev' | 'next' | null;
 
 function artStyle(prop: '--wql-art' | '--wql-medal', url: string | null): string {
   return url ? ` style="${prop}:url('${esc(url)}')"` : '';
@@ -103,7 +99,8 @@ export class WorldQuestLeaderboardWindow {
     const world = this.deps.world();
     const viewer = world.player.name;
     const board = resolveWorldQuestBoard(this.board).id;
-    this.paint(buildWorldQuestLadderView(board, { kind: 'loading' }, viewer), focus);
+    const recruitment = world.fireAndFlyRecruitment;
+    this.paint(buildWorldQuestLadderView(board, { kind: 'loading' }, viewer, recruitment), focus);
     let result: WorldQuestLeaderboardPage | null = null;
     try {
       result = await world.worldQuestLeaderboard(board, this.page, LEADERBOARD_PAGE_SIZE, viewer);
@@ -117,6 +114,7 @@ export class WorldQuestLeaderboardWindow {
       board,
       result ? { kind: 'page', page: result } : { kind: 'error' },
       viewer,
+      recruitment,
     );
     this.paint(view, focus);
   }
@@ -128,34 +126,23 @@ export class WorldQuestLeaderboardWindow {
       `<div class="panel-title wql-title"><span id="wql-title">${esc(view.title)}</span>` +
       `<button type="button" class="x-btn" data-close aria-label="${esc(view.closeLabel)}">${svgIcon('close')}</button></div>` +
       `<div class="wql-sub">${esc(view.subtitle)}</div>` +
+      this.groupsHtml(view) +
       this.cardsHtml(view) +
       this.boardHtml(view) +
       this.selfHtml(view.self);
     root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
-    root.querySelector('[data-glider-start]')?.addEventListener('click', () => {
-      const course = gliderScoreboardInfo(this.board);
-      if (!course) return;
-      this.deps
-        .world()
-        .startWorldQuestActivity('wq_galecrest_slalom', { courseId: course.courseId });
-      this.close();
-    });
-    root.querySelector('[data-trial-start]')?.addEventListener('click', () => {
-      const trial = fireAndFlyScoreboardInfo(this.board);
-      if (!trial) return;
-      this.deps
-        .world()
-        .startWorldQuestActivity(FIRE_AND_FLY_QUEST_ID, { courseId: trial.scenarioId });
-      this.close();
-    });
-    root.querySelectorAll<HTMLButtonElement>('[data-wql-board]').forEach((button) => {
-      button.addEventListener('click', () => {
-        const next = button.dataset.wqlBoard ?? '';
-        if (next === this.board) return;
-        this.board = next;
-        this.page = 0;
-        void this.render('card');
+    const start = view.start;
+    if (start) {
+      root.querySelector('[data-wql-start]')?.addEventListener('click', () => {
+        this.deps.world().startWorldQuestActivity(start.questId, { courseId: start.courseId });
+        this.close();
       });
+    }
+    root.querySelectorAll<HTMLButtonElement>('[data-wql-board]').forEach((button) => {
+      button.addEventListener('click', () => this.pick(button.dataset.wqlBoard ?? '', 'card'));
+    });
+    root.querySelectorAll<HTMLButtonElement>('[data-wql-group]').forEach((button) => {
+      button.addEventListener('click', () => this.pick(button.dataset.wqlGroup ?? '', 'group'));
     });
     root.querySelectorAll<HTMLButtonElement>('[data-wql-page]').forEach((button) => {
       button.addEventListener('click', () => {
@@ -168,15 +155,34 @@ export class WorldQuestLeaderboardWindow {
     this.applyFocus(root, focus);
   }
 
+  private pick(board: string, focus: 'card' | 'group'): void {
+    if (board === this.board) return;
+    this.board = board;
+    this.page = 0;
+    void this.render(focus);
+  }
+
   private applyFocus(root: HTMLElement, focus: FocusTarget): void {
     const close = root.querySelector<HTMLElement>('[data-close]');
     if (focus === 'open') close?.focus();
+    if (focus === 'group') root.querySelector<HTMLElement>('.wql-group.is-on')?.focus();
     if (focus === 'card') root.querySelector<HTMLElement>('.wql-card-active')?.focus();
     if (focus === 'prev' || focus === 'next') {
       const wanted = root.querySelector<HTMLButtonElement>(`[data-wql-page="${focus}"]`);
       if (wanted && !wanted.disabled) wanted.focus();
       else close?.focus();
     }
+  }
+
+  private groupsHtml(view: WorldQuestLadderView): string {
+    if (!view.groups.length) return '';
+    const groups = view.groups
+      .map(
+        (group) =>
+          `<button type="button" class="wql-group ui-seg-tab${group.active ? ' is-on' : ''}" data-wql-group="${esc(group.board)}" aria-pressed="${group.active ? 'true' : 'false'}">${esc(group.label)}</button>`,
+      )
+      .join('');
+    return `<div class="wql-groups ui-seg" role="group" aria-label="${esc(view.groupsLabel)}">${groups}</div>`;
   }
 
   private cardsHtml(view: WorldQuestLadderView): string {
@@ -189,11 +195,9 @@ export class WorldQuestLeaderboardWindow {
           `<span class="wql-card-metric">${esc(card.metricHeader)}</span></button>`,
       )
       .join('');
-    const start = gliderScoreboardInfo(view.boardId)
-      ? `<button type="button" class="wql-page-btn" data-glider-start>${esc(t('hudChrome.leaderboard.gliderStart'))}</button>`
-      : fireAndFlyScoreboardInfo(view.boardId)
-        ? `<button type="button" class="wql-page-btn" data-trial-start>${esc(t('hudChrome.leaderboard.fireAndFlyStart'))}</button>`
-        : '';
+    const start = view.start
+      ? `<button type="button" class="wql-page-btn" data-wql-start>${esc(view.start.label)}</button>`
+      : '';
     return `<div class="wql-cards" role="group" aria-label="${esc(view.boardsLabel)}">${cards}</div>${start}`;
   }
 

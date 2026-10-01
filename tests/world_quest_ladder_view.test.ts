@@ -5,6 +5,9 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { TURRET_MISSIONS } from '../src/sim/content/fire_and_fly_missions';
+import { FIRE_AND_FLY_QUEST_ID } from '../src/sim/content/world_quest_fire_and_fly';
+import { FIRE_AND_FLY_MASTERY_BOARD_ID } from '../src/sim/fire_and_fly_scoreboards';
 import type { WorldQuestMedal } from '../src/sim/world_quest_scoreboards';
 import { WORLD_QUEST_SCOREBOARDS } from '../src/sim/world_quest_scoreboards';
 import {
@@ -49,6 +52,12 @@ describe('art paths', () => {
       '/ui/world-quests/leaderboard/slalom.webp',
     );
     expect(worldQuestBoardArt('fire_and_fly_hard_v2_lifetime')).toBe(
+      '/ui/world-quests/leaderboard/barricade.webp',
+    );
+    expect(worldQuestBoardArt('fire_and_fly_pack_v1_lifetime')).toBe(
+      '/ui/world-quests/leaderboard/barricade.webp',
+    );
+    expect(worldQuestBoardArt(FIRE_AND_FLY_MASTERY_BOARD_ID)).toBe(
       '/ui/world-quests/leaderboard/barricade.webp',
     );
     expect(worldQuestMedalArt('silver')).toBe('/ui/world-quests/leaderboard/medal_silver.webp');
@@ -97,7 +106,7 @@ describe('cards and board header', () => {
       { kind: 'page', page: page({ board: 'fire_and_fly_introduction_v2_daily' }) },
       'Hero1',
     );
-    expect(online.title).toBe("Gunner's trial records");
+    expect(online.title).toBe("Gunner's records");
     expect(online.subtitle).toMatch(/^The best medal ranks first.*practice included/);
     expect(online.boardTitle).toBe("Recruit's Trial: Today");
     expect(online.cards).toHaveLength(6);
@@ -287,5 +296,159 @@ describe('your best', () => {
     delete legacy.self;
     const view = buildWorldQuestLadderView('forge', { kind: 'page', page: legacy }, 'Hero5');
     expect(view.self).toMatchObject({ kind: 'ranked', rankText: 'Rank 5', name: 'Hero5' });
+  });
+});
+
+describe("Fire and Fly's groups: trials, missions, Mastery", () => {
+  const MISSION = 'fire_and_fly_giants_v1_lifetime';
+  const MASTERY = FIRE_AND_FLY_MASTERY_BOARD_ID;
+  const RECRUITED = { trialsWon: 3, recruited: true };
+
+  it('switches between the three groups, each opening its first board or keeping the active one', () => {
+    const view = buildWorldQuestLadderView(
+      'fire_and_fly_standard_v2_lifetime',
+      { kind: 'loading' },
+      '',
+      RECRUITED,
+    );
+    expect(view.groupsLabel).toBe("Gunner's record groups");
+    expect(view.groups).toEqual([
+      {
+        group: 'trials',
+        label: 'Trials',
+        board: 'fire_and_fly_standard_v2_lifetime',
+        active: true,
+      },
+      {
+        group: 'missions',
+        label: 'Missions',
+        board: 'fire_and_fly_pack_v1_lifetime',
+        active: false,
+      },
+      { group: 'mastery', label: 'Mastery', board: MASTERY, active: false },
+    ]);
+    expect(view.cards).toHaveLength(6);
+    expect(view.start).toEqual({
+      questId: FIRE_AND_FLY_QUEST_ID,
+      courseId: 'fire_and_fly_standard',
+      label: 'Take this trial',
+    });
+    expect(buildWorldQuestLadderView('forge', { kind: 'loading' }, '').groups).toEqual([]);
+    expect(
+      buildWorldQuestLadderView('glider_downs_v2_daily', { kind: 'loading' }, '').groups,
+    ).toEqual([]);
+  });
+
+  it("lists one all-time card per mission in the instructor's order, and takes the mission", () => {
+    const view = buildWorldQuestLadderView(
+      MISSION,
+      { kind: 'page', page: page({ board: MISSION }) },
+      'Hero1',
+      RECRUITED,
+    );
+    expect(view.title).toBe("Gunner's records");
+    expect(view.cards.map((c) => c.id)).toEqual(
+      TURRET_MISSIONS.map((m) => `fire_and_fly_${m.boardKey}_v1_lifetime`),
+    );
+    expect(view.cards.map((c) => c.label)).toEqual([
+      'The Pack: All time',
+      'Heavy Tread: All time',
+      'The Deluge: All time',
+      'The Cracked Tower: All time',
+      'The Powder Store: All time',
+    ]);
+    expect(view.cards.filter((c) => c.active).map((c) => c.id)).toEqual([MISSION]);
+    expect(view.groups.filter((g) => g.active).map((g) => g.group)).toEqual(['missions']);
+    expect(view.subtitle).toMatch(/^The best medal ranks first.*Every won mission counts/);
+    expect(view.boardRule).toBe('Ranked by medal, then highest score');
+    expect(view.columns.medal).toBe('Medal');
+    expect(view.start).toEqual({
+      questId: FIRE_AND_FLY_QUEST_ID,
+      courseId: 'fire_and_fly_giants',
+      label: 'Take this mission',
+    });
+    const offline = buildWorldQuestLadderView(
+      MISSION,
+      { kind: 'page', page: page({ board: MISSION, personal: true }) },
+      'Hero1',
+    );
+    expect(offline.subtitle).toMatch(/^Your offline records/);
+  });
+
+  it('shows the Mastery as one board of stars and points, with no start button', () => {
+    const leaders: WorldQuestLeaderboardEntry[] = [
+      { rank: 1, name: 'Ace', medal: null, metric: 120_000, stars: 13 },
+      { rank: 2, name: 'Bea', medal: null, metric: 150_000, stars: 12 },
+      { rank: 3, name: 'Cy', medal: null, metric: 9_000, stars: 1 },
+      { rank: 4, name: 'Hero1', medal: null, metric: 8_000, stars: 1 },
+    ];
+    const view = buildWorldQuestLadderView(
+      MASTERY,
+      {
+        kind: 'page',
+        page: page({ board: MASTERY, leaders, total: 4, self: leaders[3] }),
+      },
+      'Hero1',
+      RECRUITED,
+    );
+    expect(view.boardTitle).toBe("Gunner's Mastery");
+    expect(view.cards.map((c) => c.id)).toEqual([MASTERY]);
+    expect(view.groups.filter((g) => g.active).map((g) => g.group)).toEqual(['mastery']);
+    expect(view.boardRule).toBe('Ranked by stars, then highest score');
+    expect(view.subtitle).toMatch(/^Your best medal on each mission, summed as stars/);
+    expect(view.columns).toMatchObject({ medal: 'Stars', metric: 'Score' });
+    expect(view.start).toBeNull();
+    const byPlace = [...view.podium].sort((a, b) => a.place - b.place);
+    expect(byPlace.map((slot) => [slot.name, slot.medalText, slot.metricText])).toEqual([
+      ['Ace', '13 stars', '120,000'],
+      ['Bea', '12 stars', '150,000'],
+      ['Cy', '1 star', '9,000'],
+    ]);
+    expect(view.podium.every((slot) => slot.medalArt === null)).toBe(true);
+    expect(view.rows.map((row) => [row.name, row.medalText, row.metricText, row.me])).toEqual([
+      ['Hero1', '1 star', '8,000', true],
+    ]);
+    expect(view.self).toMatchObject({ kind: 'ranked', medalText: '1 star', metricText: '8,000' });
+    const offline = buildWorldQuestLadderView(
+      MASTERY,
+      { kind: 'page', page: page({ board: MASTERY, leaders: [], total: 0, personal: true }) },
+      'Hero1',
+    );
+    expect(offline.state).toBe('empty');
+    expect(offline.subtitle).toMatch(/^Your offline Mastery/);
+  });
+
+  it('offers no start for a trial or mission the character has not unlocked', () => {
+    const start = (board: string, recruitment = { trialsWon: 0, recruited: false }) =>
+      buildWorldQuestLadderView(board, { kind: 'loading' }, '', recruitment).start;
+    expect(start('fire_and_fly_introduction_v2_daily')?.courseId).toBe('fire_and_fly_introduction');
+    expect(start('fire_and_fly_standard_v2_daily')).toBeNull();
+    expect(start('fire_and_fly_standard_v2_daily', { trialsWon: 1, recruited: false })).toEqual(
+      expect.objectContaining({ courseId: 'fire_and_fly_standard' }),
+    );
+    expect(start(MISSION, { trialsWon: 2, recruited: false })).toBeNull();
+    expect(start(MISSION, RECRUITED)?.courseId).toBe('fire_and_fly_giants');
+    expect(buildWorldQuestLadderView(MISSION, { kind: 'loading' }, '').start).toBeNull();
+    expect(start('glider_valleys_v2_lifetime')).toEqual(
+      expect.objectContaining({
+        questId: 'wq_galecrest_slalom',
+        courseId: 'galecrest_practice_valleys',
+      }),
+    );
+  });
+
+  it('shows no star count, never a false zero, on a Mastery row the server sent without one', () => {
+    const leaders: WorldQuestLeaderboardEntry[] = [
+      { rank: 1, name: 'Ace', medal: null, metric: 120_000 },
+      { rank: 2, name: 'Bea', medal: null, metric: 90_000, stars: 0 },
+    ];
+    const view = buildWorldQuestLadderView(
+      MASTERY,
+      { kind: 'page', page: page({ board: MASTERY, leaders, total: 2, self: leaders[0] }) },
+      'Ace',
+    );
+    const byPlace = [...view.podium].sort((a, b) => a.place - b.place);
+    expect(byPlace.slice(0, 2).map((slot) => slot.medalText)).toEqual(['None', '0 stars']);
+    expect(view.self).toMatchObject({ kind: 'ranked', medalText: 'None' });
   });
 });

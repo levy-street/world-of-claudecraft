@@ -101,3 +101,20 @@ export function fireAndFlyScoreboardInfo(board: string): FireAndFlyScoreboardInf
  * those best runs' points.
  */
 export const FIRE_AND_FLY_MASTERY_BOARD_ID = `fire_and_fly_mastery_v${FIRE_AND_FLY_MASTERY_VERSION}_lifetime`;
+
+/** The rankings window's groups: the recruitment trials, the missions, the Mastery. */
+export type FireAndFlyBoardGroup = 'trials' | 'missions' | 'mastery';
+
+export const FIRE_AND_FLY_BOARD_GROUPS: readonly FireAndFlyBoardGroup[] = [
+  'trials',
+  'missions',
+  'mastery',
+];
+
+/** Which group a Fire and Fly board belongs to; null for any other board. */
+export function fireAndFlyBoardGroup(board: string): FireAndFlyBoardGroup | null {
+  if (board === FIRE_AND_FLY_MASTERY_BOARD_ID) return 'mastery';
+  const info = BY_BOARD.get(board);
+  if (!info) return null;
+  return info.kind === 'trial' ? 'trials' : 'missions';
+}

@@ -290,11 +290,15 @@ describe('the day reward and the mission scores', () => {
         missions: 1,
       },
     ]);
-    // A worse run of the same mission changes no best and no Mastery.
+    // A worse run of the same mission changes no best, but still re-sends the unchanged
+    // Mastery row, so a fresh Mastery board or a shed write fills in again.
     pick(sim, PACK);
     const worse = winSeat(sim, meta, 0.7);
     expect(worse.filter((e) => e.type === 'worldQuestScore')).toHaveLength(1);
-    expect(worse.filter((e) => e.type === 'worldQuestMastery')).toEqual([]);
+    expect(meta.fireAndFlyRecords.fire_and_fly_pack_v1_lifetime.metric).toBe(packPoints);
+    expect(worse.filter((e) => e.type === 'worldQuestMastery')).toEqual([
+      expect.objectContaining({ stars: 3, points: packPoints, missions: 1 }),
+    ]);
     // A second mission adds to the sum; a trial never touches it.
     pick(sim, GIANTS);
     const second = winSeat(sim, meta, 0.6);

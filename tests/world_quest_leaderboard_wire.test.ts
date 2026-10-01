@@ -32,6 +32,14 @@ describe('parseWorldQuestLeaderboardEntry', () => {
     ).toBeNull();
   });
 
+  it("keeps a Mastery row's whole stars and drops a malformed count", () => {
+    const row = { rank: 2, name: 'Ari', medal: null, metric: 90_000 };
+    expect(parseWorldQuestLeaderboardEntry({ ...row, stars: 11 })).toEqual({ ...row, stars: 11 });
+    for (const stars of [-1, 2.5, '11', Number.NaN]) {
+      expect(parseWorldQuestLeaderboardEntry({ ...row, stars })).toEqual(row);
+    }
+  });
+
   it('rejects every malformed field one at a time', () => {
     const good = { rank: 1, name: 'Ari', medal: 'silver', metric: 3 };
     expect(parseWorldQuestLeaderboardEntry(null)).toBeNull();

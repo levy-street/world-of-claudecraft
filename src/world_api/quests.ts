@@ -18,6 +18,8 @@ export interface WorldQuestLeaderboardEntry {
   medal: WorldQuestMedal | null;
   /** The board's number: waves held, seconds, or points (the board says which). */
   metric: number;
+  /** The Gunner's Mastery only: the best mission medals summed (gold 3, silver 2, bronze 1). */
+  stars?: number;
 }
 
 export interface WorldQuestLeaderboardPage {

@@ -29,7 +29,10 @@ function ladderPage(board: string, over: Partial<WorldQuestLeaderboardPage> = {}
   } as WorldQuestLeaderboardPage;
 }
 
-function rig(read?: (board: string, page: number) => Promise<WorldQuestLeaderboardPage>) {
+function rig(
+  read?: (board: string, page: number) => Promise<WorldQuestLeaderboardPage>,
+  fireAndFlyRecruitment = { trialsWon: 3, recruited: true },
+) {
   const el = document.createElement('div');
   el.id = 'world-quest-leaderboard-window';
   el.className = 'window panel';
@@ -38,7 +41,12 @@ function rig(read?: (board: string, page: number) => Promise<WorldQuestLeaderboa
     read ?? ((board: string) => Promise.resolve(ladderPage(board))),
   );
   const startWorldQuestActivity = vi.fn();
-  const world = { player: { name: 'Ari' }, worldQuestLeaderboard, startWorldQuestActivity };
+  const world = {
+    player: { name: 'Ari' },
+    worldQuestLeaderboard,
+    startWorldQuestActivity,
+    fireAndFlyRecruitment,
+  };
   const closeOthers = vi.fn();
   const restoreFocus = vi.fn();
   const opener = document.createElement('button');
@@ -68,7 +76,7 @@ describe('world quest rankings window', () => {
     expect(r.el.querySelectorAll('.wql-card')).toHaveLength(6);
     expect(r.el.querySelector('#wql-title')?.textContent).toBe('Glider course records');
     expect(r.el.querySelector('.wql-board-title')?.textContent).toBe('Valley Circuit: All time');
-    (r.el.querySelector('[data-glider-start]') as HTMLButtonElement).click();
+    (r.el.querySelector('[data-wql-start]') as HTMLButtonElement).click();
     expect(r.startWorldQuestActivity).toHaveBeenCalledWith('wq_galecrest_slalom', {
       courseId: 'galecrest_practice_valleys',
     });
@@ -97,19 +105,92 @@ describe('world quest rankings window', () => {
     expect(cards[0].querySelector('.wql-card-art')?.getAttribute('style')).toContain(
       '/ui/world-quests/leaderboard/barricade.webp',
     );
-    expect(r.el.querySelector('#wql-title')?.textContent).toBe("Gunner's trial records");
+    expect(r.el.querySelector('#wql-title')?.textContent).toBe("Gunner's records");
     expect(r.el.querySelector('.wql-board-title')?.textContent).toBe("Veterans' Test: Today");
     expect(r.el.querySelector('.wql-board-rule')?.textContent).toBe(
       'Ranked by medal, then highest score',
     );
-    expect(r.el.querySelector('[data-glider-start]')).toBeNull();
-    const start = r.el.querySelector('[data-trial-start]') as HTMLButtonElement;
+    const start = r.el.querySelector('[data-wql-start]') as HTMLButtonElement;
     expect(start.textContent).toBe('Take this trial');
     start.click();
     expect(r.startWorldQuestActivity).toHaveBeenCalledWith('wq_evergarden_fire_and_fly', {
       courseId: 'fire_and_fly_hard',
     });
     expect(r.window.isOpen).toBe(false);
+  });
+
+  it('switches between the trials, the missions and the Mastery from the group switch', async () => {
+    const r = rig((board) =>
+      Promise.resolve(
+        board.startsWith('fire_and_fly_mastery')
+          ? ladderPage(board, {
+              leaders: [{ rank: 1, name: 'Ace', medal: null, metric: 120_000, stars: 13 }],
+              total: 1,
+              self: null,
+            })
+          : ladderPage(board),
+      ),
+    );
+    r.window.open('fire_and_fly_hard_v2_daily');
+    await flush();
+    const groups = () => [...r.el.querySelectorAll<HTMLButtonElement>('.wql-groups .wql-group')];
+    expect(r.el.querySelector('.wql-groups')?.getAttribute('role')).toBe('group');
+    expect(r.el.querySelector('.wql-groups')?.getAttribute('aria-label')).toBe(
+      "Gunner's record groups",
+    );
+    expect(groups().map((g) => [g.textContent, g.getAttribute('aria-pressed')])).toEqual([
+      ['Trials', 'true'],
+      ['Missions', 'false'],
+      ['Mastery', 'false'],
+    ]);
+    groups()[1].click();
+    await flush();
+    expect(r.worldQuestLeaderboard).toHaveBeenLastCalledWith(
+      'fire_and_fly_pack_v1_lifetime',
+      0,
+      50,
+      'Ari',
+    );
+    expect(r.el.querySelectorAll('.wql-card')).toHaveLength(5);
+    expect(document.activeElement?.textContent).toBe('Missions');
+    const start = r.el.querySelector('[data-wql-start]') as HTMLButtonElement;
+    expect(start.textContent).toBe('Take this mission');
+    groups()[2].click();
+    await flush();
+    expect(r.worldQuestLeaderboard).toHaveBeenLastCalledWith(
+      'fire_and_fly_mastery_v1_lifetime',
+      0,
+      50,
+      'Ari',
+    );
+    expect(r.el.querySelectorAll('.wql-card')).toHaveLength(1);
+    expect(r.el.querySelector('[data-wql-start]')).toBeNull();
+    expect(r.el.querySelector('.wql-board-title')?.textContent).toBe("Gunner's Mastery");
+    expect(r.el.querySelector('.lbp-slot .wql-medal')?.textContent).toBe('13 stars');
+    groups()[1].click();
+    await flush();
+    (r.el.querySelector('[data-wql-start]') as HTMLButtonElement).click();
+    expect(r.startWorldQuestActivity).toHaveBeenCalledWith('wq_evergarden_fire_and_fly', {
+      courseId: 'fire_and_fly_pack',
+    });
+  });
+
+  it("offers no start button on a mission the character's recruitment has not opened", async () => {
+    const r = rig(undefined, { trialsWon: 1, recruited: false });
+    r.window.open('fire_and_fly_pack_v1_lifetime');
+    await flush();
+    expect(r.el.querySelectorAll('.wql-card')).toHaveLength(5);
+    expect(r.el.querySelector('[data-wql-start]')).toBeNull();
+    r.window.open('fire_and_fly_standard_v2_daily');
+    await flush();
+    expect(r.el.querySelector('[data-wql-start]')?.textContent).toBe('Take this trial');
+  });
+
+  it('shows no group switch outside Fire and Fly', async () => {
+    const r = rig();
+    r.window.open('forge');
+    await flush();
+    expect(r.el.querySelector('.wql-groups')).toBeNull();
   });
 
   it('opens on the default board, asks for the viewer, and paints podium, list, and self', async () => {
@@ -250,7 +331,7 @@ describe('leaderboard World Quests tab', () => {
     expect(r.el.style.display).toBe('none');
   });
 
-  it("opens the gunner's trial records on the default trial's daily board", async () => {
+  it("opens the gunner's records on the default trial's daily board", async () => {
     const r = leaderboardRig({ launcher: true, rankingsRoot: true });
     r.lb.openFireAndFlyRankings();
     await flush();

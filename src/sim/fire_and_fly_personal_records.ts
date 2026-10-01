@@ -5,6 +5,7 @@
 // and every host sums the missions' rows into the Gunner's Mastery.
 
 import {
+  FIRE_AND_FLY_MASTERY_BOARD_ID,
   FIRE_AND_FLY_SCOREBOARD_MISSIONS,
   FIRE_AND_FLY_SCOREBOARD_SCENARIOS,
   fireAndFlyScoreboardId,
@@ -110,6 +111,28 @@ export interface FireAndFlyMastery {
   missions: number;
 }
 
+/** The most stars a Mastery row can hold: a gold on every mission. */
+export const FIRE_AND_FLY_MASTERY_MAX_STARS =
+  FIRE_AND_FLY_SCOREBOARD_MISSIONS.length * WORLD_QUEST_MEDAL_RANK.gold;
+
+/** The most points a Mastery row can hold: the most each mission's best run can hold. */
+export const FIRE_AND_FLY_MASTERY_MAX_POINTS =
+  FIRE_AND_FLY_SCOREBOARD_MISSIONS.length * FIRE_AND_FLY_MAX_POINTS;
+
+/** A Mastery row: whole stars and whole points within the missions' bounds. */
+export function fireAndFlyMasteryValid(stars: unknown, points: unknown): boolean {
+  return (
+    typeof stars === 'number' &&
+    Number.isSafeInteger(stars) &&
+    stars >= 0 &&
+    stars <= FIRE_AND_FLY_MASTERY_MAX_STARS &&
+    typeof points === 'number' &&
+    Number.isSafeInteger(points) &&
+    points >= 0 &&
+    points <= FIRE_AND_FLY_MASTERY_MAX_POINTS
+  );
+}
+
 export function fireAndFlyMastery(records: PersonalFireAndFlyRecords): FireAndFlyMastery {
   const mastery = { stars: 0, points: 0, missions: 0 };
   for (const mission of FIRE_AND_FLY_SCOREBOARD_MISSIONS) {
@@ -130,6 +153,23 @@ export function personalFireAndFlyLeaderboard(
   page: number,
   pageSize: number,
 ) {
+  if (board === FIRE_AND_FLY_MASTERY_BOARD_ID) {
+    const mastery = fireAndFlyMastery(player.fireAndFlyRecords);
+    const self =
+      mastery.missions > 0
+        ? {
+            rank: 1,
+            name: player.name,
+            medal: null,
+            metric: mastery.points,
+            stars: mastery.stars,
+          }
+        : null;
+    return {
+      ...paginateWorldQuestLeaderboard(board, self ? [self] : [], page, pageSize, self),
+      personal: true,
+    };
+  }
   const info = fireAndFlyScoreboardInfo(board);
   const record = player.fireAndFlyRecords[board];
   const self =

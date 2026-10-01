@@ -3,9 +3,10 @@
 // the glider's does), never for a dev seat or a loss. The sim decides the medal and
 // the points; the server only mirrors the event onto the scenario's ladders
 // (server/world_quest_leaderboard.ts), and every host keeps the character's records.
-// A mission's run that moves the character's Gunner's Mastery (their best mission
-// rows summed) also emits the new Mastery row, whole: the server keeps it per
-// character on the one Mastery board, replacing a lower one.
+// Every scored mission run also emits the character's Gunner's Mastery (their best
+// mission rows summed), whole, changed or not: the server keeps it per character on
+// the one Mastery board, replacing only a lower one, so a repeat is a no-op there and
+// a fresh Mastery version or a write the server shed fills in on the next mission win.
 
 import { FIRE_AND_FLY_QUEST_ID } from './content/world_quest_fire_and_fly';
 import {
@@ -39,7 +40,6 @@ export function reportFireAndFlyScore(
   const board = fireAndFlyScoreboardId(scenarioId, 'lifetime');
   if (!board || !fireAndFlyScoreValid(result.medal, result.points)) return false;
   const mission = fireAndFlyScoreboardInfo(board)?.kind === 'mission';
-  const before = mission ? fireAndFlyMastery(meta.fireAndFlyRecords) : null;
   recordPersonalFireAndFlyScore(
     meta.fireAndFlyRecords,
     scenarioId,
@@ -55,13 +55,13 @@ export function reportFireAndFlyScore(
     metric: result.points,
     resetDay: ctx.resetDay,
   });
-  const after = before && fireAndFlyMastery(meta.fireAndFlyRecords);
-  if (before && after && (after.stars !== before.stars || after.points !== before.points)) {
+  const mastery = mission ? fireAndFlyMastery(meta.fireAndFlyRecords) : null;
+  if (mastery && mastery.missions > 0) {
     ctx.emit({
       type: 'worldQuestMastery',
       pid: meta.entityId,
       board: FIRE_AND_FLY_MASTERY_BOARD_ID,
-      ...after,
+      ...mastery,
     });
   }
   return true;

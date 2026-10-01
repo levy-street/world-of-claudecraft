@@ -10,9 +10,10 @@
 
 import { FIRE_AND_FLY_QUEST_ID } from './content/world_quest_fire_and_fly';
 import {
-  FIRE_AND_FLY_SCOREBOARD_TRIALS,
+  FIRE_AND_FLY_MASTERY_BOARD_ID,
+  FIRE_AND_FLY_SCOREBOARD_SCENARIOS,
+  fireAndFlyBoardGroup,
   fireAndFlyScoreboardId,
-  fireAndFlyScoreboardInfo,
   fireAndFlyScorePeriods,
 } from './fire_and_fly_scoreboards';
 import {
@@ -57,9 +58,7 @@ export const WORLD_QUEST_SCOREBOARDS: readonly WorldQuestScoreboard[] = [
       }),
     ),
   ),
-  // The missions' boards stay out until the rankings window can title them: their
-  // scores are kept by every host's records meanwhile (fire_and_fly_score.ts).
-  ...FIRE_AND_FLY_SCOREBOARD_TRIALS.flatMap(({ scenarioId, kind }) =>
+  ...FIRE_AND_FLY_SCOREBOARD_SCENARIOS.flatMap(({ scenarioId, kind }) =>
     fireAndFlyScorePeriods(kind).map(
       (period): WorldQuestScoreboard => ({
         id: fireAndFlyScoreboardId(scenarioId, period)!,
@@ -69,6 +68,14 @@ export const WORLD_QUEST_SCOREBOARDS: readonly WorldQuestScoreboard[] = [
       }),
     ),
   ),
+  // Its medal is the stars (the best medals summed), kept in its own table, never sorted
+  // by worldQuestScoreSortKey.
+  {
+    id: FIRE_AND_FLY_MASTERY_BOARD_ID,
+    questId: FIRE_AND_FLY_QUEST_ID,
+    metric: 'points',
+    primary: 'medal',
+  },
 ];
 
 export type WorldQuestScoreboardId = (typeof WORLD_QUEST_SCOREBOARDS)[number]['id'];
@@ -78,7 +85,7 @@ const BY_ID = new Map(WORLD_QUEST_SCOREBOARDS.map((board) => [board.id, board]))
 // runs report to their own course's or trial's board, never through the quest.
 const BY_QUEST = new Map(
   WORLD_QUEST_SCOREBOARDS.filter(
-    (board) => !gliderScoreboardInfo(board.id) && !fireAndFlyScoreboardInfo(board.id),
+    (board) => !gliderScoreboardInfo(board.id) && !fireAndFlyBoardGroup(board.id),
   ).map((board) => [board.questId, board]),
 );
 
