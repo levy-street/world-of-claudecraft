@@ -399,6 +399,7 @@ export type {
   CivicServiceKind,
   CivicServicePlacement,
   CorpseHarvestInfo,
+  MobInspectInfo,
   WorldInteractionOutcome,
 } from './world_api/interaction';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
@@ -937,6 +938,10 @@ export const COMMAND_NAMES = [
   // Guild custom ranks (docs/prd/guild-custom-ranks.md): the Guild Master
   // replaces the guild's rank ladder (titles, order, permissions).
   'guild_set_ranks',
+  // The mob inspect window's live stat read (IWorldInteraction.mobInspectInfo):
+  // a correlated, non-mutating read (`{id, rid}` in, `{t:'mobInspectInfo', id,
+  // rid, info}` out), the sibling of inspectCorpseHarvest.
+  'inspectMob',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch

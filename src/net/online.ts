@@ -2217,8 +2217,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
       this.worldInteractionRequests = new WorldInteractionRequests({
         canSend: () => typeof this.spectating !== 'string' && this.canSendCommand(),
         sendRawCommand: (payload) => this.rawCmd(payload),
-        sendInspectCorpseHarvest: (id, rid) =>
-          this.rawCmd({ cmd: 'inspectCorpseHarvest', id, rid }),
       });
     }
     return this.worldInteractionRequests;
@@ -2250,8 +2248,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       return;
     }
     const parseMs = performance.now() - parseStart;
-    // A commandOutcome/corpseHarvestInfo reply routes to its owner; anything
-    // else falls through unchanged.
+    // Correlated replies route to their owner; anything else falls through.
     if (this.requests().onMessage(msg)) return;
     if (msg.t === 'hello') {
       this.movementWireVersion = msg.movementWire === 2 ? 2 : 1;
@@ -3547,10 +3544,13 @@ export class ClientWorld extends ReconWireState implements IWorld {
   harvestCorpse(id: number): Promise<boolean> {
     return this.cmdWithOutcome({ cmd: 'harvestCorpse', id });
   }
-  // The selected-corpse status query (corpse-status-contract.md): always a
+  // The selected-corpse status query and the mob inspect stat read: always a
   // Promise here, settled by the correlated reply requests().onMessage routes.
   corpseHarvestInfo(id: number): Promise<CorpseHarvestInfo | null> {
     return this.requests().inspectCorpse(id);
+  }
+  mobInspectInfo(id: number): ReturnType<WorldInteractionRequests['inspectMob']> {
+    return this.requests().inspectMob(id);
   }
   setTownFocus(allocation: Record<string, number>, tier: RespecPaymentTier): void {
     this.cmd({ cmd: 'set_town_focus', allocation, tier });

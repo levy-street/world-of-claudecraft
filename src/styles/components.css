@@ -26457,3 +26457,103 @@
     min-height: 40px;
   }
 }
+
+/* ---------- Mob Inspect ---------- */
+/* Cold window (src/ui/hud/mob_inspect/mob_inspect_window.ts): a targeted
+     creature's live combat stats and its loot table. Composes the library
+     shell (.ui-window + .ui-win-head + one scrolling .ui-win-body) with
+     .ui-card sections, .ui-stat-row stat lines and a .ui-well per exclusive
+     roll group; this section only sets geometry. Tokens only (no raw color),
+     so the ratchet holds it at zero. The body mobile sizing lives in the
+     mobile sheet base section of hud.mobile.css. */
+@layer components {
+  #mob-inspect-window {
+    width: min(90vw, 420px);
+    max-height: min(85vh, 720px);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+  }
+  .mob-inspect-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    overflow-y: auto;
+    min-height: 0;
+  }
+  .mob-inspect-sub {
+    text-align: center;
+  }
+  .mob-inspect-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm);
+  }
+  .mob-inspect-heading {
+    margin: 0 0 var(--spacing-xs);
+    font-size: 14px;
+  }
+  .mob-inspect-stat {
+    column-gap: var(--spacing-sm);
+  }
+  .mob-inspect-stat-sub {
+    font-size: 12px;
+  }
+  .mob-inspect-stats-note,
+  .mob-inspect-empty {
+    font-size: 13px;
+  }
+  .mob-inspect-traits {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 13px;
+  }
+  .mob-inspect-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+  .mob-inspect-group-label {
+    font-size: 12px;
+  }
+  .mob-inspect-drop {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    min-height: 32px;
+  }
+  .mob-inspect-drop .item-icon {
+    flex: none;
+  }
+  .mob-inspect-drop-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .mob-inspect-coins .mob-inspect-drop-name {
+    flex: none;
+  }
+  .mob-inspect-coin-range {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .mob-inspect-drop-name {
+    font-size: 13px;
+    overflow-wrap: anywhere;
+  }
+  .mob-inspect-drop-note {
+    font-size: 12px;
+  }
+  .mob-inspect-drop-chance {
+    flex: none;
+    font-size: 13px;
+  }
+  .mob-inspect-drop:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+}

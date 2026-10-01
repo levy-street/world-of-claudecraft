@@ -201,6 +201,8 @@ const FANOUT_ARMS: readonly string[] = [
   // locale and no flip would re-mint (Phase 14).
   // Rebuilds the open explorer toolbar and results, preserving its focused control.
   'this.lootExplorerWindow.relocalize|',
+  // Rebuilds the open mob inspect card (labels, chances), gated on isOpen inside.
+  'this.mobInspectWindow.relocalize|',
   'this.lootWindow.relocalize|',
   'this.harvestJournalWindow.relocalize|',
   // The shared corpse-harvest preference picker's relocalize gates itself

@@ -33,6 +33,7 @@ const HUD_MOBILE_CSS = readCss('../src/styles/hud.mobile.css');
 const PAINTER_TS = read('../src/ui/bag_item_action_menu.ts');
 const HUD_TS = read('../src/ui/hud.ts');
 const CHAT_TS = read('../src/ui/hud/chat/chat_window_controller.ts');
+const MOB_MENU_TS = read('../src/ui/hud/mob_inspect/mob_target_menu_controller.ts');
 
 function block(css: string, selectorPattern: RegExp): string {
   const match = css.match(selectorPattern);
@@ -139,8 +140,11 @@ describe('#ctx-menu picker sizing (Apply Enchant picker)', () => {
     // so those menus render byte-identically to the pre-amendment popup even
     // when opened without an intervening close (keyboard-activated openers
     // fire click with no pointerdown, skipping the outside-click dismiss).
+    // The marker menu's site moved out of hud.ts with the unowned-mob target
+    // menu (Inspect plus markers), so it is pinned in its controller instead.
     const hudClears = HUD_TS.match(/classList\.remove\(CTX_MENU_PICKER_CLASS\)/g) ?? [];
-    expect(hudClears.length).toBeGreaterThanOrEqual(6);
+    expect(hudClears.length).toBeGreaterThanOrEqual(5);
+    expect(MOB_MENU_TS).toMatch(/classList\.remove\(CTX_MENU_PICKER_CLASS\)/);
     expect(CHAT_TS).toMatch(/classList\.remove\(CTX_MENU_PICKER_CLASS\)/);
   });
 });

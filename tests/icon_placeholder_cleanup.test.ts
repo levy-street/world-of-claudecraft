@@ -32,8 +32,9 @@ describe('placeholder glyph cleanup', () => {
       "closeBtn.innerHTML = svgIcon('close')",
     );
     expect(source('src/ui/store_promo_card.ts')).toContain("close.innerHTML = svgIcon('close')");
-    expect(source('src/ui/hud.ts')).toContain(
-      'current === i ? `<span class="ctx-selected">$' + "{svgIcon('check')}</span>` : ''",
+    // The raid-marker check moved out of hud.ts with the unowned-mob target menu.
+    expect(source('src/ui/hud/mob_inspect/mob_target_menu_controller.ts')).toContain(
+      'row.selected ? `<span class="ctx-selected">$' + "{svgIcon('check')}</span>` : ''",
     );
   });
 });

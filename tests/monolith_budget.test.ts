@@ -537,7 +537,11 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18093,
+    // Lowered from 18093 by the mob inspect window: the target-frame raid
+    // marker menu moved out to hud/mob_inspect/mob_target_menu_controller.ts
+    // (which also carries the new Inspect row), so the coordinator ends 12
+    // lines SMALLER after wiring the window. Extract, then lower.
+    ceiling: 18081,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

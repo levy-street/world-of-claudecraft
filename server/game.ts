@@ -191,7 +191,6 @@ import {
   cancelCorpseHarvestCastOnDisconnect,
   harvestCorpseCommandOutcome,
 } from './corpse_harvest_commands';
-import { dispatchCorpseHarvestInspection } from './corpse_harvest_inspection';
 import {
   type CosmeticOpGuardState,
   consumeCosmeticOpToken,
@@ -317,6 +316,7 @@ import { heavySelfMarkOnAccept, heavySelfMarkOnReceipt, isHeavySelfEvent } from 
 import { type HotbarLayoutState, HotbarLayoutStore, hotbarLayoutState } from './hotbar_layout';
 import { gameMetricsCounters, type WsDropCause } from './http/game_signals';
 import { foldReceivedInputSeq } from './input_seq';
+import { dispatchInspectionCommand, type InspectionSessionState } from './inspection_commands';
 import { buildSharedInterestCandidates } from './interest_candidates';
 import {
   BG_MATCH_DROP_RADIUS,
@@ -884,7 +884,8 @@ const ADMIN_LOCATION_POI_RADIUS = 32;
 export interface ClientSession
   extends MovementInputSessionState,
     HotbarLayoutState,
-    ChatRateLimitState {
+    ChatRateLimitState,
+    InspectionSessionState {
   ws: WebSocket;
   accountId: number;
   accountCosmetics: AccountCosmetics;
@@ -981,8 +982,6 @@ export interface ClientSession
   dungeonEntryFacing: entryFacing.DungeonEntryFacingFence;
   // sim time of the last movement input frame, used to clear stale held input
   lastInputAt: number;
-  // Sim time of the next inspectCorpseHarvest throttle this session may pass.
-  nextCorpseHarvestInspectAt?: number;
   // serialized form of each delta self field as last sent to this client;
   // a field is omitted from a snapshot while its serialization is unchanged
   lastSent: Record<string, string>;
@@ -6349,7 +6348,8 @@ export class GameServer {
         this.sendCommandOutcome(session, msg, harvestCorpseCommandOutcome(sim, msg, pid));
         break;
       case 'inspectCorpseHarvest':
-        dispatchCorpseHarvestInspection(sim, session, msg, pid, (f) => this.send(session, f));
+      case 'inspectMob':
+        dispatchInspectionCommand(command, sim, session, msg, pid, (f) => this.send(session, f));
         break;
       case 'set_town_focus':
         applyTownFocusCommand(sim, msg, pid);

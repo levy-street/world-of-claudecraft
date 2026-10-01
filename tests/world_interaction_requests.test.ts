@@ -4,12 +4,19 @@ import { WorldInteractionRequests } from '../src/net/world_interaction_requests'
 function rig(canSend = true) {
   const commandSends: Record<string, unknown>[] = [];
   const inspectSends: { id: number; rid: number }[] = [];
+  const mobSends: { id: number; rid: number }[] = [];
   const requests = new WorldInteractionRequests({
     canSend: () => canSend,
-    sendRawCommand: (payload) => commandSends.push(payload),
-    sendInspectCorpseHarvest: (id, rid) => inspectSends.push({ id, rid }),
+    // Both inspection reads ride the same raw send; split them out so the
+    // command assertions see only the command-outcome family.
+    sendRawCommand: (payload) => {
+      const read = { id: payload.id as number, rid: payload.rid as number };
+      if (payload.cmd === 'inspectCorpseHarvest') inspectSends.push(read);
+      else if (payload.cmd === 'inspectMob') mobSends.push(read);
+      else commandSends.push(payload);
+    },
   });
-  return { requests, commandSends, inspectSends };
+  return { requests, commandSends, inspectSends, mobSends };
 }
 
 beforeEach(() => {

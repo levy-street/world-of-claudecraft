@@ -21,6 +21,26 @@ export interface CorpseHarvestInfo {
   readonly tierBonus: number;
 }
 
+// The live combat block behind the mob inspect window: what the authoritative
+// sim actually stamped on this spawn (after any heroic, normal-retune or rift
+// scaling), which a client cannot re-derive from the template alone. Read-only
+// and disclosure-bounded: a mob the viewer could already see (same world or
+// instance, inside the interest drop edge), never a pet or player.
+export interface MobInspectInfo {
+  readonly mobId: number;
+  readonly templateId: string;
+  readonly level: number;
+  readonly maxHp: number;
+  readonly weaponMin: number;
+  readonly weaponMax: number;
+  readonly attackSpeed: number;
+  readonly armor: number;
+  // The EFFECTIVE immunities combat applies: the template flag OR the spawn's
+  // own flag (a promoted dungeon miniboss gains both at spawn).
+  readonly ccImmune: boolean;
+  readonly slowImmune: boolean;
+}
+
 /** A stable authored civic interaction point exposed to presentation without
  * relying on the live entity interest radius. */
 export type CivicServiceKind = 'mailbox' | 'noticeboard';
@@ -49,6 +69,10 @@ export interface IWorldInteraction {
   // current answer; a `Promise` on the online world while the correlated
   // `inspectCorpseHarvest` round trip is in flight.
   corpseHarvestInfo(id: number): CorpseHarvestInfo | null | Promise<CorpseHarvestInfo | null>;
+  // The mob inspect window's live stat read (MobInspectInfo above). `null`
+  // means no answer (not a visible, unowned mob); a `Promise` on the online
+  // world while the correlated `inspectMob` round trip is in flight.
+  mobInspectInfo(id: number): MobInspectInfo | null | Promise<MobInspectInfo | null>;
   pickUpObject(id: number): WorldInteractionOutcome;
   // #1143: the caller's persistent town focus allocation (component type ->
   // points spent). Empty when unset.

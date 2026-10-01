@@ -10,6 +10,7 @@ import { canDualWield, isShieldItem } from './equipment_rules';
 import { activeItemInstanceStats } from './item_instance_stats';
 import { meetsLevelRequirement } from './item_level_req';
 import { lootQualityWeapon } from './loot_quality';
+import { mobCombatStats } from './mob/combat_stats';
 import { pvpFractionsFromRatings, pvpVitalityFromRating } from './pvp';
 import type {
   Entity,
@@ -826,23 +827,16 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   e.name = template.name;
   e.level = level;
   e.hostile = true;
-  // Elite scaling, classic-style: ~2.3x health, ~1.5x damage.
-  const hpMult = template.elite ? 2.3 : 1;
-  const dmgMult = template.elite ? 1.5 : 1;
-  e.maxHp = Math.round((template.hpBase + template.hpPerLevel * (level - 1)) * hpMult);
+  // Health, weapon and armor (with the classic elite scaling) come from the
+  // one shared formula owner, mob/combat_stats.ts.
+  const combat = mobCombatStats(template, level);
+  e.maxHp = combat.maxHp;
   e.hp = e.maxHp;
   if (template.damageFloorPct !== undefined) {
     e.damageFloorHp = Math.ceil(e.maxHp * template.damageFloorPct);
   }
-  const dmg = (template.dmgBase + template.dmgPerLevel * (level - 1)) * dmgMult;
-  e.weapon = {
-    min: Math.round(dmg * 0.8),
-    max: Math.round(dmg * 1.25),
-    speed: template.attackSpeed,
-  };
-  // Armor scales from level 1 like hp/dmg above: a template has no armorBase,
-  // so a level-1 mob gets 0 and each level adds armorPerLevel.
-  e.stats.armor = Math.round(template.armorPerLevel * (level - 1));
+  e.weapon = { min: combat.weaponMin, max: combat.weaponMax, speed: combat.attackSpeed };
+  e.stats.armor = combat.armor;
   e.moveSpeed = template.moveSpeed;
   e.scale = template.scale;
   e.color = template.color;

@@ -478,6 +478,12 @@ import {
 import { MapSidebarCollapse } from './hud/map/map_sidebar_collapse';
 import { resolveMapZone } from './hud/map/map_zone_focus_core';
 import { refreshSideButtonLabels } from './hud/menu/side_buttons';
+import {
+  MobInspectWindow,
+  type MobTargetMenuDeps,
+  mobInspectSubjectOf,
+  openMobTargetMenu,
+} from './hud/mob_inspect';
 import { livingSecondaryPet } from './hud/pet_bar_core';
 import { CARD_POSES } from './hud/player_card/player_card';
 import { PlayerCardController } from './hud/player_card/player_card_controller';
@@ -806,7 +812,7 @@ import { RaidBossGuideWindow, raidBossGuideContextFallback } from './raid_boss_g
 import { raidCalloutKey } from './raid_callout';
 import { formatLockoutDuration, raidLockoutDisplayName } from './raid_lockout_format';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
-import { RAID_MARKER_LABEL_KEYS, raidMarkerDisplayName } from './raid_marker_labels_view';
+import { RAID_MARKER_LABEL_KEYS } from './raid_marker_labels_view';
 import { presentRealmBuilder, RealmBuilderPopup } from './realm_builder_popup';
 import { RecipePinStore } from './recipe_pins_store';
 import { RecipeTrackerPainter } from './recipe_tracker_painter';
@@ -3617,6 +3623,9 @@ export class Hud {
       case 'inspect-window':
         this.inspectWindow.close();
         break;
+      case 'mob-inspect-window':
+        this.mobInspectWindow.close();
+        break;
       case 'report-window':
         closeReportWindow();
         this.hideTooltip();
@@ -5483,6 +5492,17 @@ export class Hud {
     hideTooltip: () => this.hideTooltip(),
     ...this.windowFocus('#loot-explorer-window'),
   });
+  // Mob inspect: static loot/family from content plus the live stat read.
+  private readonly mobInspectWindow = new MobInspectWindow({
+    ...this.presentationBag,
+    root: () => $('#mob-inspect-window'),
+    closeOthers: () => this.closeOtherWindows('#mob-inspect-window'),
+    hideTooltip: () => this.hideTooltip(),
+    ...this.windowFocus('#mob-inspect-window'),
+    subject: (id) => mobInspectSubjectOf(this.sim.entities.get(id)),
+    viewerLevel: () => this.sim.player.level,
+    requestStats: (id) => this.sim.mobInspectInfo(id),
+  });
   // Watchlist HUD tracker (#deed-tracker): slow-band painter over the one
   // reused tracker-view container (allocation-light by contract).
   private readonly deedTrackerView = makeDeedTrackerView();
@@ -6958,6 +6978,7 @@ export class Hud {
     if (this.reliquaryWindow.isOpen) this.reliquaryWindow.render();
     if (this.professionsWindow.isOpen) this.professionsWindow.render();
     this.lootExplorerWindow.relocalize();
+    this.mobInspectWindow.relocalize();
     this.lootWindow.relocalize();
     this.harvestJournalWindow.relocalize();
     this.plantSheetWindow.relocalize();
@@ -17205,15 +17226,9 @@ export class Hud {
       this.openContextMenu(t.id, t.name, x, y);
     } else if (t && isControllableOwnedPet(t, this.sim.playerId)) {
       this.openPetMenu(t.id, t.name, t.dead, x, y);
-    } else if (
-      t &&
-      t.kind === 'mob' &&
-      !t.dead &&
-      t.hostile &&
-      t.ownerId === null &&
-      this.sim.partyInfo
-    ) {
-      this.openMarkerMenu(t.id, t.name, x, y);
+    } else if (t && t.kind === 'mob' && t.ownerId === null) {
+      const markable = !t.dead && t.hostile && this.sim.partyInfo !== null;
+      openMobTargetMenu(this.mobTargetMenuDeps, { id: t.id, name: t.name, markable }, x, y);
     }
   }
 
@@ -17485,44 +17500,17 @@ export class Hud {
     );
   }
 
-  // Raid/target marker picker for an enemy, opened from its target unit frame.
-  // Party-only (markers are a coordination feature); shows the 8 symbols with a
-  // check on the one currently on this mob, plus localized clear and cancel actions.
-  openMarkerMenu(entityId: number, name: string, x: number, y: number): void {
-    if (!this.sim.partyInfo) return;
-    const el = $('#ctx-menu');
-    el.classList.remove(CTX_MENU_PICKER_CLASS);
-    const current = this.sim.markerFor(entityId);
-    let html = `<div class="ctx-title">${esc(name)}</div>`;
-    for (let i = 0; i < RAID_MARKER_LABEL_KEYS.length; i++) {
-      const markerName = raidMarkerDisplayName(i);
-      const aria =
-        current === i
-          ? t('hud.markers.markerSelectedAria', { marker: markerName })
-          : t('hud.markers.markerAria', { marker: markerName });
-      const check = current === i ? `<span class="ctx-selected">${svgIcon('check')}</span>` : '';
-      html += `<div class="ctx-item" role="button" tabindex="0" data-act="m${i}" aria-label="${esc(aria)}"><span class="ctx-mark" style="background-image:url(${raidMarkerDataUrl(i)})"></span>${esc(markerName)}${check}</div>`;
-    }
-    html += `<div class="ctx-item" role="button" tabindex="0" data-act="clear">${esc(t('hud.markers.clear'))}</div>`;
-    html += `<div class="ctx-item" role="button" tabindex="0" data-act="close">${esc(t('hud.markers.cancel'))}</div>`;
-    el.innerHTML = html;
-    this.placePopupAt(el, x, y, 170, 340);
-    el.style.display = 'block';
-    el.querySelectorAll('.ctx-item').forEach((item) => {
-      const activate = () => {
-        const act = (item as HTMLElement).dataset.act;
-        el.style.display = 'none';
-        if (act === 'clear') this.sim.clearMarker(entityId);
-        else if (act?.startsWith('m')) this.sim.setMarker(entityId, Number(act.slice(1)));
-      };
-      item.addEventListener('click', activate);
-      item.addEventListener('keydown', (e) => {
-        if (!(e instanceof KeyboardEvent) || (e.key !== 'Enter' && e.key !== ' ')) return;
-        e.preventDefault();
-        activate();
-      });
-    });
-  }
+  // The unowned-mob target menu (Inspect, plus the party-only raid-marker
+  // picker for a live hostile mob): hud/mob_inspect/mob_target_menu_controller.ts.
+  private readonly mobTargetMenuDeps: MobTargetMenuDeps = {
+    menu: () => $('#ctx-menu'),
+    place: (el, x, y) => this.placePopupAt(el, x, y, 170, 340),
+    markerIconUrl: raidMarkerDataUrl,
+    markerFor: (id) => this.sim.markerFor(id),
+    setMarker: (id, marker) => this.sim.setMarker(id, marker),
+    clearMarker: (id) => this.sim.clearMarker(id),
+    inspect: (id) => this.mobInspectWindow.open(id),
+  };
 
   openPetMenu(_entityId: number, name: string, dead: boolean, x: number, y: number): void {
     const el = $('#ctx-menu');

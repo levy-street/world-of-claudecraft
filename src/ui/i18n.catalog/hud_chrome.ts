@@ -5609,6 +5609,48 @@ export const hudChromeStrings = {
     elite: 'Elite',
     boss: 'Boss',
   },
+  // The mob inspect window (src/ui/hud/mob_inspect/): a targeted creature's
+  // live combat stats and its loot table, opened from the target frame menu.
+  mobInspect: {
+    menuInspect: 'Inspect',
+    titleAria: 'Inspect {name}',
+    close: 'Close',
+    rare: 'Rare',
+    worldBoss: 'World boss',
+    statsHeading: 'Combat',
+    health: 'Health',
+    damage: 'Damage',
+    damageRange: '{min} to {max}',
+    attackSpeed: 'Attack speed',
+    seconds: '{seconds} sec',
+    dps: 'Damage per second',
+    armor: 'Armor',
+    // The classic armor mitigation against the VIEWER's level, so a player
+    // reads how much of their own physical damage this armor removes.
+    armorReduction: 'Reduces your physical damage by {pct}%',
+    statsPending: 'Reading combat stats',
+    statsUnavailable: 'Move closer to read its combat stats.',
+    traitsHeading: 'Traits',
+    traitCcImmune: 'Immune to crowd control',
+    traitSlowImmune: 'Immune to slows',
+    traitHarvestable: 'Its corpse can be harvested',
+    dropsHeading: 'Drops',
+    // The whole table a Heroic claim rolls (Heroic variants, the heroic coin
+    // base, and a boss's heroic-only append), shown for mobs a claim can cover.
+    heroicDropsHeading: 'Heroic drops',
+    noDrops: 'Drops nothing',
+    chance: '{pct}%',
+    // An exclusive roll group: one draw, so at most one row of the box drops.
+    exclusiveGroup: 'Only one of these drops per kill',
+    questOnly: 'Quest: {quest}',
+    normalOnly: 'Normal difficulty only',
+    money: 'Coins',
+    rangeTo: 'to',
+    // Several exclusive rolls over one shared list (Nythraxis): each roll
+    // skips an item an earlier roll already won, so up to {count} different
+    // items drop. The chances shown are per kill.
+    sharedRolls: 'Rolled {count} times per kill, never the same item twice',
+  },
   // The player mouseover tooltip (player_tooltip_view.ts): the classic
   // <Guild> line and the chosen specialization with its role, both slots
   // resolved client-side (the spec from its talent name, the role from the

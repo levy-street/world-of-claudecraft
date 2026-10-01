@@ -365,6 +365,7 @@ import { aggroDungeonPackmates } from './mob/dungeon_pack_aggro';
 import { canFlee } from './mob/flee_rules';
 import { forgetLeavingPlayer } from './mob/forget_leaver';
 import { wanderPause } from './mob/idle_rng';
+import { mobInspectInfo as mobInspectInfoQuery } from './mob/inspection';
 import * as lifecycle from './mob/lifecycle';
 import {
   isInertInstanceCorpse,
@@ -8842,6 +8843,11 @@ export class Sim {
   // which owns the disclosure-safe gate and the admission-derived denial.
   corpseHarvestInfo(mobId: number, pid?: number): CorpseHarvestInfo | null {
     return corpseHarvestInfoQuery(this.ctx, mobId, pid);
+  }
+
+  // The mob inspect window's live stat read: a thin delegate (mob/inspection.ts).
+  mobInspectInfo(mobId: number, pid?: number): ReturnType<typeof mobInspectInfoQuery> {
+    return mobInspectInfoQuery(this.ctx, mobId, pid);
   }
 
   pickUpObject(objId: number, pid?: number): boolean {

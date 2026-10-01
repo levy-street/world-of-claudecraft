@@ -6642,6 +6642,27 @@
     );
     overflow-y: auto;
   }
+  /* Mob inspect: a centered sheet like the Loot Explorer but narrower (a stat
+     card plus one drop list); its .ui-win-body stays the one scroll area, so
+     the head and close button never scroll away. Drop rows open an item
+     tooltip on tap, so they keep the 40px touch floor. */
+  body.mobile-touch #mob-inspect-window {
+    left: 50%;
+    right: auto;
+    top: 12px;
+    transform: translateX(-50%);
+    width: clamp(300px, 76vw, 460px);
+    max-width: calc(100vw - 20px);
+    max-height: calc(
+      var(--app-vh) /
+      var(--window-scale, 1) -
+      12px -
+      max(10px, env(safe-area-inset-bottom))
+    );
+  }
+  body.mobile-touch #mob-inspect-window .mob-inspect-drop {
+    min-height: 40px;
+  }
   body.mobile-touch #train-window,
   body.mobile-touch #unbind-window {
     overflow-y: auto;
