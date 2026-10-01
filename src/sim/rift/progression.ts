@@ -13,6 +13,7 @@ import {
 import { ITEMS } from '../data';
 import { refusedWhileDead } from '../dead_gate';
 import { selectedInventorySlot } from '../item_copy_ref';
+import { cloneItemProvenance, isItemGuid, isLoadableItemProvenance } from '../item_provenance';
 import { isEligibleEnemyQualitySource, rollEnemyLootQuality } from '../loot/enemy_quality';
 import { createLootQuality, isEligibleLootQualityItem } from '../loot_quality/core';
 import { cloneLootQuality } from '../loot_quality/types';
@@ -181,6 +182,13 @@ export function sanitizeRiftGearInstance(
   };
   const lootQuality = cloneLootQuality(input.lootQuality);
   if (lootQuality) clean.lootQuality = lootQuality;
+  // The tracked-copy identity (item_provenance.ts) rides the rebuild
+  // VALIDATED: a band is epic, so every band carries a guid and a provenance
+  // record, and dropping either here would re-mint the copy at its next
+  // grant with a fresh id.
+  if (isItemGuid(input.guid)) clean.guid = input.guid;
+  if (isLoadableItemProvenance(input.provenance))
+    clean.provenance = cloneItemProvenance(input.provenance);
   rebuildRolledStats(itemId, clean);
   return clean;
 }

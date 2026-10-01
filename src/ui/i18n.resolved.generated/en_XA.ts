@@ -4435,6 +4435,9 @@ export const en_XA: EnTranslations = {
       "partyTradeWindow": "[Ýóú ɱáý ţŕáðé ţĥíš íţéɱ ţó þļáýéŕš ŵĥó šĥáŕéð íţš ðŕóþ ƒóŕ ţĥé ñéẋţ {time}. Éɋúíþþíñĝ íţ éñðš ţĥé ţŕáðé ŵíñðóŵ.]",
       "perfectedBadge": "[Þéŕƒéçţéð]",
       "perfectingRank": "[Þéŕƒéçţíñĝ: ŕáñķ {rank} óƒ {ranks}]",
+      "lootedBy": "[Ļóóţéð ƀý {name} óñ {date}]",
+      "questRewardTo": "[Ɋúéšţ ŕéŵáŕð ţó {name} óñ {date}]",
+      "obtainedBy": "[Óƀţáíñéð ƀý {name} óñ {date}]",
       "materialSourceGatherer": "[{count} × Çóļļéçţéð ƀý {name}]",
       "materialSourceGathererSigned": "[{count} × Çóļļéçţéð ƀý {name}, šíĝñéð ƀý {signer}]",
       "materialSourceUnrecorded": "[{count} × Ñó ĝáţĥéŕéŕ ŕéçóŕðéð]",
@@ -5621,7 +5624,15 @@ export const en_XA: EnTranslations = {
       "viewSources": "[Ʋíéŵ šóúŕçéš]",
       "separateByGatherer": "[Šéþáŕáţé ƀý ĝáţĥéŕéŕ]",
       "takeChosenQuantity": "[Ţáķé óúţ çĥóšéñ ɋúáñţíţý]",
-      "combine": "[Çóɱƀíñé ɱáţéŕíáļ šţáçķš]"
+      "combine": "[Çóɱƀíñé ɱáţéŕíáļ šţáçķš]",
+      "itemHistory": "[Íţéɱ ĥíšţóŕý]"
+    },
+    "itemHistory": {
+      "title": "[{item}: ĥíšţóŕý]",
+      "passedTo": "[Þáššéð ţó {name} óñ {date}]",
+      "noTransfers": "[Ţĥíš íţéɱ ĥáš ñéʋéŕ çĥáñĝéð ĥáñðš.]",
+      "earlierHidden": "[{count} éáŕļíéŕ ţŕáñšƒéŕš áŕé ñóţ šĥóŵñ.]",
+      "close": "[Çļóšé]"
     },
     "enchanting": {
       "recipeNotLearned": "[Ļéáŕñ ţĥé ƒóŕɱúļá ƀéƒóŕé áþþļýíñĝ ţĥíš éñçĥáñţ.]",

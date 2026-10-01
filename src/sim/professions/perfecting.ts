@@ -50,6 +50,7 @@ import { recalcPlayerStats } from '../entity';
 import { masterwroughtConflictSlot, uniqueEquipConflictSlot } from '../equipment_rules';
 import { selectedInventorySlot } from '../item_copy_ref';
 import { countRawInSlots, countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
+import { ensureTrackedInPlace } from '../item_tracking';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity, EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../types';
@@ -674,6 +675,10 @@ function promotePerfectedCopy(
   // (a copy whose attempt never minted rolled gets a stats-free record).
   payload.rolled = { ...payload.rolled, quality: 'legendary' };
   payload.name = normalized;
+  // The copy just became tracked in place (item_tracking.ts): a legendary
+  // that never passed through the hub as one gets its guid and provenance
+  // now, source 'promotion'. Draw-free; an already-tracked copy keeps its id.
+  ensureTrackedInPlace(ctx, meta, itemId, payload, 'promotion');
   // The discovery ledger at the stamp site (the addItemInstance hub's
   // recipe): the quality:legendary mark (a real deed trigger) lands the
   // moment the promotion mints it, never at the next login's retro pass.

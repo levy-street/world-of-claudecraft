@@ -479,7 +479,7 @@ export function turnInQuestCore(
     });
   }
   const rewardItem = questRewardItemId(quest, meta.cls);
-  if (rewardItem) ctx.addItem(rewardItem, 1, meta.entityId);
+  if (rewardItem) ctx.addItem(rewardItem, 1, meta.entityId, { source: `quest:${quest.id}` });
   grantQuestRecipeReward(ctx, quest, meta);
   ctx.grantXp(quest.xpReward, meta);
   // Arm the repeat-cadence window (work orders): the quest stays

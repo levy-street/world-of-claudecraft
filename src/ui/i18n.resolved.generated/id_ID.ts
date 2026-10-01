@@ -4435,6 +4435,9 @@ export const id_ID: EnTranslations = {
       "partyTradeWindow": "Kamu dapat memperdagangkan barang ini kepada pemain yang berbagi jarahannya selama {time} berikutnya. Memakainya mengakhiri jendela perdagangan.",
       "perfectedBadge": "Disempurnakan",
       "perfectingRank": "Penyempurnaan: peringkat {rank} dari {ranks}",
+      "lootedBy": "Looted by {name} on {date}",
+      "questRewardTo": "Quest reward to {name} on {date}",
+      "obtainedBy": "Obtained by {name} on {date}",
       "materialSourceGatherer": "{count} × Dikumpulkan oleh {name}",
       "materialSourceGathererSigned": "{count} × Dikumpulkan oleh {name}, ditandatangani oleh {signer}",
       "materialSourceUnrecorded": "{count} × Tidak ada pengumpul yang tercatat",
@@ -5621,7 +5624,15 @@ export const id_ID: EnTranslations = {
       "viewSources": "Lihat sumber",
       "separateByGatherer": "Pisahkan berdasarkan pengumpul",
       "takeChosenQuantity": "Keluarkan jumlah yang dipilih",
-      "combine": "Gabungkan tumpukan material"
+      "combine": "Gabungkan tumpukan material",
+      "itemHistory": "Item history"
+    },
+    "itemHistory": {
+      "title": "{item}: history",
+      "passedTo": "Passed to {name} on {date}",
+      "noTransfers": "This item has never changed hands.",
+      "earlierHidden": "{count} earlier transfers are not shown.",
+      "close": "Close"
     },
     "enchanting": {
       "recipeNotLearned": "Pelajari formulanya sebelum menerapkan enchant ini.",

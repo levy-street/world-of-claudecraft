@@ -4435,6 +4435,9 @@ export const vi_VN: EnTranslations = {
       "partyTradeWindow": "Bạn có thể giao dịch vật phẩm này cho những người chơi đã cùng nhận nó rơi ra, trong {time} tới. Trang bị nó sẽ kết thúc khoảng thời gian giao dịch này.",
       "perfectedBadge": "Đã hoàn thiện",
       "perfectingRank": "Hoàn thiện: bậc {rank} trên {ranks}",
+      "lootedBy": "Looted by {name} on {date}",
+      "questRewardTo": "Quest reward to {name} on {date}",
+      "obtainedBy": "Obtained by {name} on {date}",
       "materialSourceGatherer": "{count} × Được {name} thu thập",
       "materialSourceGathererSigned": "{count} × Được {name} thu thập, có chữ ký của {signer}",
       "materialSourceUnrecorded": "{count} × Không ghi nhận người thu thập",
@@ -5621,7 +5624,15 @@ export const vi_VN: EnTranslations = {
       "viewSources": "Xem nguồn",
       "separateByGatherer": "Tách theo người thu thập",
       "takeChosenQuantity": "Lấy số lượng đã chọn",
-      "combine": "Gộp các chồng nguyên liệu"
+      "combine": "Gộp các chồng nguyên liệu",
+      "itemHistory": "Item history"
+    },
+    "itemHistory": {
+      "title": "{item}: history",
+      "passedTo": "Passed to {name} on {date}",
+      "noTransfers": "This item has never changed hands.",
+      "earlierHidden": "{count} earlier transfers are not shown.",
+      "close": "Close"
     },
     "enchanting": {
       "recipeNotLearned": "Hãy học công thức trước khi áp dụng phép cường hóa này.",

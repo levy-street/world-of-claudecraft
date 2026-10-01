@@ -709,6 +709,34 @@ export interface UnstuckHotspot {
   lastUsedAt: string;
 }
 
+/** One item_ledger row (server/item_ledger_db.ts). */
+export interface ItemLedgerEvent {
+  id: number;
+  guid: string;
+  itemId: string;
+  quality: string;
+  kind: 'mint' | 'transfer';
+  characterId: number | null;
+  accountId: number | null;
+  characterName: string;
+  source: string;
+  zone: string | null;
+  occurredAt: string;
+  createdAt: string;
+}
+
+export interface ItemLedgerPage {
+  events: ItemLedgerEvent[];
+  limit: number;
+  hasMore: boolean;
+  nextBeforeId: number | null;
+}
+
+export interface ItemLedgerHistory {
+  guid: string;
+  events: ItemLedgerEvent[];
+}
+
 export interface UnstuckReportsData {
   reports: UnstuckReportRow[];
   hotspots: UnstuckHotspot[];

@@ -4435,6 +4435,9 @@ export const fr_FR: EnTranslations = {
       "partyTradeWindow": "Vous pouvez échanger cet objet aux joueurs qui ont partagé son butin pendant encore {time}. L'équiper met fin à la fenêtre d'échange.",
       "perfectedBadge": "Perfectionné",
       "perfectingRank": "Perfectionnement : rang {rank} sur {ranks}",
+      "lootedBy": "Looted by {name} on {date}",
+      "questRewardTo": "Quest reward to {name} on {date}",
+      "obtainedBy": "Obtained by {name} on {date}",
       "materialSourceGatherer": "{count} × Récolté par {name}",
       "materialSourceGathererSigned": "{count} × Récolté par {name}, signé par {signer}",
       "materialSourceUnrecorded": "{count} × Récolteur non enregistré",
@@ -5621,7 +5624,15 @@ export const fr_FR: EnTranslations = {
       "viewSources": "Voir les sources",
       "separateByGatherer": "Séparer par récolteur",
       "takeChosenQuantity": "Retirer la quantité choisie",
-      "combine": "Combiner les piles de matériaux"
+      "combine": "Combiner les piles de matériaux",
+      "itemHistory": "Item history"
+    },
+    "itemHistory": {
+      "title": "{item}: history",
+      "passedTo": "Passed to {name} on {date}",
+      "noTransfers": "This item has never changed hands.",
+      "earlierHidden": "{count} earlier transfers are not shown.",
+      "close": "Close"
     },
     "enchanting": {
       "recipeNotLearned": "Apprenez la formule avant d’appliquer cet enchantement.",

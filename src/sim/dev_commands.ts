@@ -555,7 +555,7 @@ export function handleDevChat(
     const itemId = giveMatch[1];
     const count = clampInteger(Number(giveMatch[2] ?? 1), 1, 20);
     if (!ITEMS[itemId]) ctx.error(pid, `[dev] Unknown item '${itemId}'.`);
-    else ctx.addItem(itemId, count, pid);
+    else ctx.addItem(itemId, count, pid, { source: 'dev' });
     return null;
   }
 

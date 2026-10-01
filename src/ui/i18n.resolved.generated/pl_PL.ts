@@ -4435,6 +4435,9 @@ export const pl_PL: EnTranslations = {
       "partyTradeWindow": "Możesz wymienić ten przedmiot z graczami, z którymi wypadł, jeszcze przez {time}. Założenie go kończy okno wymiany.",
       "perfectedBadge": "Udoskonalone",
       "perfectingRank": "Doskonalenie: ranga {rank} z {ranks}",
+      "lootedBy": "Looted by {name} on {date}",
+      "questRewardTo": "Quest reward to {name} on {date}",
+      "obtainedBy": "Obtained by {name} on {date}",
       "materialSourceGatherer": "{count} × zebrane przez {name}",
       "materialSourceGathererSigned": "{count} × zebrane przez {name}, podpisane przez {signer}",
       "materialSourceUnrecorded": "{count} × bez zapisanego zbierającego",
@@ -5621,7 +5624,15 @@ export const pl_PL: EnTranslations = {
       "viewSources": "Pokaż źródła",
       "separateByGatherer": "Rozdziel według zbierającego",
       "takeChosenQuantity": "Wyjmij wybraną liczbę",
-      "combine": "Połącz stosy materiałów"
+      "combine": "Połącz stosy materiałów",
+      "itemHistory": "Item history"
+    },
+    "itemHistory": {
+      "title": "{item}: history",
+      "passedTo": "Passed to {name} on {date}",
+      "noTransfers": "This item has never changed hands.",
+      "earlierHidden": "{count} earlier transfers are not shown.",
+      "close": "Close"
     },
     "enchanting": {
       "recipeNotLearned": "Naucz się formuły przed zastosowaniem tego zaklęcia.",

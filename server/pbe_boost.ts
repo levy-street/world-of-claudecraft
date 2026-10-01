@@ -30,7 +30,7 @@
 // derived field (xp, talents unlocked, known abilities, stats) stays exactly
 // consistent with what the game itself would produce.
 
-import { randomInt } from 'node:crypto';
+import { randomInt, randomUUID } from 'node:crypto';
 import { bagSlotsOf, isMaterialsOnlyBag } from '../src/sim/bag_pools';
 import { BAG_SOCKETS } from '../src/sim/bags';
 import { IGNIVAR_DROP_PLACEHOLDER_IDS } from '../src/sim/content/ignivar_drops';
@@ -814,6 +814,7 @@ export function buildBoostedCharacterState(
     playerClass: cls,
     playerName: name,
     lockoutNowMs: () => Date.now(),
+    mintItemGuid: randomUUID,
   });
   const pid = sim.playerId;
   sim.setPlayerSkin(pid, skin);

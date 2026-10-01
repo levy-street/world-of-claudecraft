@@ -4435,6 +4435,9 @@ export const ru_RU: EnTranslations = {
       "partyTradeWindow": "Вы можете передать этот предмет игрокам, разделившим эту добычу, ещё в течение {time}. Надев предмет, вы завершите период обмена.",
       "perfectedBadge": "Доведён до совершенства",
       "perfectingRank": "Совершенствование: ранг {rank} из {ranks}",
+      "lootedBy": "Добыто: {name}, {date}",
+      "questRewardTo": "Награда за задание: {name}, {date}",
+      "obtainedBy": "Получено: {name}, {date}",
       "materialSourceGatherer": "{count} × Сборщик: {name}",
       "materialSourceGathererSigned": "{count} × Сборщик: {name}, подпись: {signer}",
       "materialSourceUnrecorded": "{count} × Сборщик не указан",
@@ -5621,7 +5624,15 @@ export const ru_RU: EnTranslations = {
       "viewSources": "Показать источники",
       "separateByGatherer": "Разделить по сборщикам",
       "takeChosenQuantity": "Взять выбранное количество",
-      "combine": "Объединить стопки материалов"
+      "combine": "Объединить стопки материалов",
+      "itemHistory": "История предмета"
+    },
+    "itemHistory": {
+      "title": "{item}: история",
+      "passedTo": "Передано: {name}, {date}",
+      "noTransfers": "Этот предмет никогда не менял владельца.",
+      "earlierHidden": "Ещё {count} ранних передач не показаны.",
+      "close": "Закрыть"
     },
     "enchanting": {
       "recipeNotLearned": "Изучите формулу, прежде чем накладывать эти чары.",

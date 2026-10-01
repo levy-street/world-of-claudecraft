@@ -4435,6 +4435,9 @@ export const ja_JP: EnTranslations = {
       "partyTradeWindow": "このアイテムはあと{time}の間、同じドロップを分かち合ったプレイヤーと取引できます。装備すると取引期間は終了します。",
       "perfectedBadge": "完全化済み",
       "perfectingRank": "完全化：ランク{rank}／{ranks}",
+      "lootedBy": "{date} に {name} が獲得",
+      "questRewardTo": "{date} に {name} がクエスト報酬として入手",
+      "obtainedBy": "{date} に {name} が入手",
       "materialSourceGatherer": "{count} × {name}が採集",
       "materialSourceGathererSigned": "{count} × {name}が採集、{signer}が署名",
       "materialSourceUnrecorded": "{count} × 採集者の記録なし",
@@ -5621,7 +5624,15 @@ export const ja_JP: EnTranslations = {
       "viewSources": "入手元を見る",
       "separateByGatherer": "採集者別に分ける",
       "takeChosenQuantity": "指定数を取り出す",
-      "combine": "素材スタックを結合"
+      "combine": "素材スタックを結合",
+      "itemHistory": "アイテム履歴"
+    },
+    "itemHistory": {
+      "title": "{item}：履歴",
+      "passedTo": "{date} に {name} へ譲渡",
+      "noTransfers": "このアイテムは一度も持ち主が変わっていません。",
+      "earlierHidden": "それ以前の {count} 件の譲渡は表示されません。",
+      "close": "閉じる"
     },
     "enchanting": {
       "recipeNotLearned": "この付呪を施すには、先に製法書で習得してください。",

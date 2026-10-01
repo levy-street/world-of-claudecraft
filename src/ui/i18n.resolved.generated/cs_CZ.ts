@@ -4435,6 +4435,9 @@ export const cs_CZ: EnTranslations = {
       "partyTradeWindow": "Tento předmět můžeš dalších {time} směňovat s hráči, kteří sdíleli jeho kořist. Nasazení předmětu okno pro směnu ukončí.",
       "perfectedBadge": "Zdokonalené",
       "perfectingRank": "Zdokonalování: hodnost {rank} z {ranks}",
+      "lootedBy": "Looted by {name} on {date}",
+      "questRewardTo": "Quest reward to {name} on {date}",
+      "obtainedBy": "Obtained by {name} on {date}",
       "materialSourceGatherer": "{count} × sebral(a) {name}",
       "materialSourceGathererSigned": "{count} × sebral(a) {name}, podepsal(a) {signer}",
       "materialSourceUnrecorded": "{count} × bez zaznamenaného sběrače",
@@ -5621,7 +5624,15 @@ export const cs_CZ: EnTranslations = {
       "viewSources": "Zobrazit zdroje",
       "separateByGatherer": "Oddělit podle sběrače",
       "takeChosenQuantity": "Vyjmout zvolené množství",
-      "combine": "Sloučit hromádky materiálu"
+      "combine": "Sloučit hromádky materiálu",
+      "itemHistory": "Item history"
+    },
+    "itemHistory": {
+      "title": "{item}: history",
+      "passedTo": "Passed to {name} on {date}",
+      "noTransfers": "This item has never changed hands.",
+      "earlierHidden": "{count} earlier transfers are not shown.",
+      "close": "Close"
     },
     "enchanting": {
       "recipeNotLearned": "Než toto očarování použiješ, nauč se vzorec.",

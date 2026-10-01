@@ -4435,6 +4435,9 @@ export const de_DE: EnTranslations = {
       "partyTradeWindow": "Du kannst diesen Gegenstand noch {time} lang an Spieler weitergeben, die denselben Beutefund erhalten haben. Das Anlegen beendet dieses Handelsfenster.",
       "perfectedBadge": "Perfektioniert",
       "perfectingRank": "Perfektionierung: Rang {rank} von {ranks}",
+      "lootedBy": "Looted by {name} on {date}",
+      "questRewardTo": "Quest reward to {name} on {date}",
+      "obtainedBy": "Obtained by {name} on {date}",
       "materialSourceGatherer": "{count} × Gesammelt von {name}",
       "materialSourceGathererSigned": "{count} × Gesammelt von {name}, signiert von {signer}",
       "materialSourceUnrecorded": "{count} × Kein Sammler verzeichnet",
@@ -5621,7 +5624,15 @@ export const de_DE: EnTranslations = {
       "viewSources": "Quellen anzeigen",
       "separateByGatherer": "Nach Sammler trennen",
       "takeChosenQuantity": "Gewählte Menge herausnehmen",
-      "combine": "Materialstapel zusammenlegen"
+      "combine": "Materialstapel zusammenlegen",
+      "itemHistory": "Item history"
+    },
+    "itemHistory": {
+      "title": "{item}: history",
+      "passedTo": "Passed to {name} on {date}",
+      "noTransfers": "This item has never changed hands.",
+      "earlierHidden": "{count} earlier transfers are not shown.",
+      "close": "Close"
     },
     "enchanting": {
       "recipeNotLearned": "Lerne die Formel, bevor du diese Verzauberung anwendest.",

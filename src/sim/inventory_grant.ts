@@ -14,6 +14,12 @@ export interface InventoryGrantOptions {
   readonly craftedRecipeId?: string;
   readonly movement?: boolean;
   readonly materialSources?: MaterialComposition;
+  /** Where a world-sourced grant came from, for a tracked copy's provenance
+   *  record (item_tracking.ts): a sim-composed id such as "mob:<templateId>"
+   *  or "quest:<questId>". Absent means the hub records the generic source
+   *  ("craft:<recipeId>" when craftedRecipeId is set, else "world", or
+   *  "legacy" for a payload-free copy first seen while changing hands). */
+  readonly source?: string;
 }
 
 export function grantInventoryInstances(

@@ -50,6 +50,27 @@ describe('bag_item_context_menu: enchant reagent detection', () => {
   });
 });
 
+describe('bag_item_context_menu: the tracked-copy history row', () => {
+  it('offers Item history on a copy carrying a provenance record, before the lock row', () => {
+    const tracked: Partial<ItemInstancePayload> = {
+      guid: '3f2504e0-4f89-41d3-9a0c-0305e82c3301',
+      provenance: { at: 1, by: 'Ada', source: 'mob:forest_wolf' },
+    };
+    const withHistory = bagItemNewActions(
+      def('weapon', 'epic'),
+      'sword',
+      tracked as ItemInstancePayload,
+    );
+    expect(withHistory.indexOf('itemHistory')).toBe(withHistory.length - 2);
+    expect(withHistory[withHistory.length - 1]).toBe('lock');
+    // A guid alone (a record the load bound dropped) has nothing to show.
+    expect(bagItemNewActions(def('weapon', 'epic'), 'sword', { guid: tracked.guid })).not.toContain(
+      'itemHistory',
+    );
+    expect(bagItemNewActions(def('weapon', 'epic'), 'sword')).not.toContain('itemHistory');
+  });
+});
+
 describe('bag_item_context_menu: material source actions', () => {
   it('adds source inspection and exact split actions only for an eligible material stack', () => {
     const sources: MaterialComposition = [

@@ -1520,7 +1520,7 @@ export function buyItem(
   }
   meta.copper -= copperCost;
   meta.honor -= honorCost;
-  ctx.addItem(itemId, qty, meta.entityId);
+  ctx.addItem(itemId, qty, meta.entityId, { source: 'vendor' });
   ctx.emit({ type: 'vendor', action: 'buy', itemId, pid: meta.entityId });
 }
 

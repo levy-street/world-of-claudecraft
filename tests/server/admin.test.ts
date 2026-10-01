@@ -936,6 +936,96 @@ describe('page/limit pagination contract', () => {
     });
   });
 
+  it('item-ledger lists recent tracked-item events with bounded, decoded filters', async () => {
+    const listItemLedger = vi.fn(async () => ({
+      rows: [
+        {
+          id: 12,
+          guid: '3f2504e0-4f89-41d3-9a0c-0305e82c3301',
+          itemId: 'duskforged_warblade',
+          quality: 'epic',
+          kind: 'mint',
+          characterId: 5,
+          accountId: 4,
+          characterName: 'Aleph',
+          source: 'mob:forest_wolf',
+          zone: 'eastbrook',
+          occurredAt: '2026-01-01T00:00:00.000Z',
+          createdAt: '2026-01-01T00:00:01.000Z',
+        },
+      ],
+      hasMore: true,
+      nextBeforeId: 12,
+    }));
+    authedAdminDb({ listItemLedger });
+    installAdminRuntime();
+
+    const r = await runRoute('GET', '/admin/api/item-ledger', {
+      url: '/admin/api/item-ledger?limit=999&beforeId=40&characterId=5&itemId=duskforged_warblade',
+      headers: { authorization: BEARER },
+    });
+
+    expect(listItemLedger).toHaveBeenCalledWith({
+      realm: expect.any(String),
+      limit: 200,
+      beforeId: 40,
+      characterId: 5,
+      itemId: 'duskforged_warblade',
+    });
+    expect(r.body).toMatchObject({
+      success: true,
+      data: {
+        events: [{ id: 12, kind: 'mint', characterName: 'Aleph' }],
+        limit: 200,
+        hasMore: true,
+        nextBeforeId: 12,
+      },
+    });
+  });
+
+  it("items/:guid returns one copy's ledger and refuses a malformed guid", async () => {
+    const itemLedgerHistory = vi.fn(async () => [
+      {
+        id: 12,
+        guid: '3f2504e0-4f89-41d3-9a0c-0305e82c3301',
+        itemId: 'duskforged_warblade',
+        quality: 'epic',
+        kind: 'mint',
+        characterId: 5,
+        accountId: 4,
+        characterName: 'Aleph',
+        source: 'mob:forest_wolf',
+        zone: 'eastbrook',
+        occurredAt: '2026-01-01T00:00:00.000Z',
+        createdAt: '2026-01-01T00:00:01.000Z',
+      },
+    ]);
+    authedAdminDb({ itemLedgerHistory });
+    installAdminRuntime();
+
+    const guid = '3F2504E0-4F89-41D3-9A0C-0305E82C3301';
+    const r = await runRoute('GET', '/admin/api/items/:guid', {
+      params: { guid },
+      headers: { authorization: BEARER },
+    });
+    // Lowercased before the read: the ledger stores canonical lowercase.
+    expect(itemLedgerHistory).toHaveBeenCalledWith(expect.any(String), guid.toLowerCase());
+    expect(r.body).toMatchObject({
+      success: true,
+      data: { guid: guid.toLowerCase(), events: [{ id: 12, kind: 'mint' }] },
+    });
+
+    const bad = await runRoute('GET', '/admin/api/items/:guid', {
+      params: { guid: 'not-a-guid' },
+      headers: { authorization: BEARER },
+    });
+    // The central permission gate is fail-closed: a path that is not a
+    // 36-character guid maps to no permission and never reaches the handler
+    // (a 404, the anti-enumeration shape every unmapped admin path gets).
+    expect(bad.status).toBe(404);
+    expect(itemLedgerHistory).toHaveBeenCalledTimes(1);
+  });
+
   it('unstuck-reports returns bounded cursor rows and content-local hotspots', async () => {
     const listUnstuckReports = vi.fn(async () => ({
       rows: [

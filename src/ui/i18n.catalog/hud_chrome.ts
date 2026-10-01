@@ -5997,6 +5997,14 @@ export const hudChromeStrings = {
     // the sim's PERFECTING_RANKS, never literals in copy.
     perfectedBadge: 'Perfected',
     perfectingRank: 'Perfecting: rank {rank} of {ranks}',
+    // Tracked epic/legendary copy provenance (item_history_view.ts): the
+    // origin line keyed by the record's source (a kill, a quest reward, or
+    // anything else), rendered by the right-click Item history dialog.
+    // Owner-only: peers never receive the fields, and the item ID itself
+    // is never shown to a player.
+    lootedBy: 'Looted by {name} on {date}',
+    questRewardTo: 'Quest reward to {name} on {date}',
+    obtainedBy: 'Obtained by {name} on {date}',
     // Per-unit material provenance (item_instance_tooltip.ts
     // materialSourceLines over the pure material_sources_view.ts model): one
     // line per recorded descriptor, stating the surviving unit count first so a
@@ -8165,6 +8173,20 @@ export const hudChromeStrings = {
     separateByGatherer: 'Separate by gatherer',
     takeChosenQuantity: 'Take out chosen quantity',
     combine: 'Combine material stacks',
+    // The tracked epic/legendary copy's history row
+    // (bag_item_context_menu.ts), which opens item_history_dialog.ts.
+    itemHistory: 'Item history',
+  },
+  // The Item history prompt (item_history_dialog.ts, lines from
+  // item_history_view.ts): the item's origin line (the itemTooltip keys
+  // above), one row per later hand, the never-changed-hands note, and the
+  // rolled-off count once the bounded chain has shed its oldest hands.
+  itemHistory: {
+    title: '{item}: history',
+    passedTo: 'Passed to {name} on {date}',
+    noTransfers: 'This item has never changed hands.',
+    earlierHidden: '{count} earlier transfers are not shown.',
+    close: 'Close',
   },
   // Enchanting actions (Professions 2.0): the result toasts for the
   // disenchant / apply-enchant / salvage commands (enchanting_view.ts maps each
