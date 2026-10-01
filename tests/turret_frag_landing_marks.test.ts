@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { syncGroundAimReticleFrame } from '../src/game/pad_ground_aim_wiring';
 import { GroundAimReticleVisual } from '../src/render/ground_aim_reticle_visual';
+import { TURRET_FRAGMENTATION } from '../src/sim/content/turret_defense';
 import { clampTurretAimInto, createTurretDefense } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { TURRET_BOMBLETS, turretFragBomblets } from '../src/sim/minigames/turret_fragmentation';
@@ -79,6 +80,15 @@ describe('the armed fragmentation reticle carries the bomblet star', () => {
         expect(star[i].z).toBeCloseTo(burst[i].z, 9);
       }
     }
+  });
+
+  it("gives every mark its bomblet's own blast radius, the sim's", () => {
+    const { aim } = rig();
+    aim.toggleFrag();
+    aim.updatePoint({ x: CENTER.x + 5, z: CENTER.z + 22 });
+    const landing = aim.reticle()?.landing ?? [];
+    expect(landing).toHaveLength(TURRET_BOMBLETS);
+    for (const mark of landing) expect(mark.blast).toBe(TURRET_FRAGMENTATION.blastRadius);
   });
 
   it('carries nothing unarmed, after disarming, after firing, or past the seat', () => {
@@ -216,6 +226,34 @@ describe('the reticle visual draws the landing marks', () => {
     visual.setAim({ ...aim, landing: star });
     visual.setAim(null);
     expect(lines.visible).toBe(false);
+  });
+
+  it('rings each mark with its blast in the pale guide line, and drops the rings with the marks', () => {
+    const { visual, root } = build();
+    const blasts = root.getObjectByName('ground-aim-landing-blasts') as THREE.LineSegments;
+    const inner = root.getObjectByName('ground-aim-inner-guide') as THREE.LineLoop;
+    expect(blasts).toBeInstanceOf(THREE.LineSegments);
+    expect(blasts.material).toBe(inner.material);
+    expect(blasts.visible).toBe(false);
+    visual.setAim({ ...aim, landing: star });
+    expect(blasts.visible).toBe(false);
+    const blast = TURRET_FRAGMENTATION.blastRadius;
+    const ringed = star.map((p) => ({ ...p, blast }));
+    visual.setAim({ ...aim, landing: ringed });
+    expect(blasts.visible).toBe(true);
+    const count = blasts.geometry.drawRange.count;
+    const perRing = count / TURRET_BOMBLETS;
+    expect(Number.isInteger(perRing)).toBe(true);
+    const positions = blasts.geometry.getAttribute('position') as THREE.BufferAttribute;
+    for (let m = 0; m < TURRET_BOMBLETS; m++) {
+      for (let v = 0; v < perRing; v++) {
+        const i = m * perRing + v;
+        const off = Math.hypot(positions.getX(i) - star[m].x, positions.getZ(i) - star[m].z);
+        expect(off).toBeCloseTo(blast, 4);
+      }
+    }
+    visual.setAim(aim);
+    expect(blasts.visible).toBe(false);
   });
 
   it('rewrites the marks only when a bomblet point moves', () => {

@@ -56,10 +56,11 @@ export class TurretAimCore {
     landing: null,
   };
   private armed = false;
-  private readonly star: CannonPoint[] = Array.from({ length: TURRET_BOMBLETS }, () => ({
-    x: 0,
-    z: 0,
-  }));
+  // Each mark carries its bomblet's blast, drawn as a pale ring around it.
+  private readonly star: (CannonPoint & { blast: number })[] = Array.from(
+    { length: TURRET_BOMBLETS },
+    () => ({ x: 0, z: 0, blast: TURRET_FRAGMENTATION.blastRadius }),
+  );
   constructor(
     private readonly world: TurretAimWorld,
     readonly shots: TurretOwnShotLedger = turretOwnShots,
@@ -198,7 +199,7 @@ export class TurretAimCore {
     return true;
   }
   /** The engine's star for the clamped aim, written in place: the reticle reads it every frame. */
-  private writeStar(): readonly CannonPoint[] {
+  private writeStar(): readonly (CannonPoint & { blast: number })[] {
     const { x, z, dirX, dirZ } = this.clamp;
     return writeTurretFragStar(x, z, dirX, dirZ, this.star);
   }

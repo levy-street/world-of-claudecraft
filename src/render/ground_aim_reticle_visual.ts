@@ -21,10 +21,14 @@ const MARK_CROSS_RATIO = 0.55;
 const MARK_LINE_VERTICES = (MARK_SEGMENTS + 2) * 2;
 const MARK_DISC_VERTICES = MARK_SEGMENTS + 1;
 const MARK_DISC_INDICES = MARK_SEGMENTS * 3;
+const BLAST_SEGMENTS = 24;
+const BLAST_LINE_VERTICES = BLAST_SEGMENTS * 2;
 
 export interface GroundAimMarkPoint {
   x: number;
   z: number;
+  /** The blast this mark's bomblet makes: a pale ring of that radius around the mark. */
+  blast?: number;
 }
 
 export interface GroundAimVisualState {
@@ -59,6 +63,7 @@ export class GroundAimReticleVisual {
   private readonly tickGeometry = tickGeometry();
   private readonly markLineGeometry = markLineGeometry();
   private readonly markDiscGeometry = markDiscGeometry();
+  private readonly markBlastGeometry = markBlastGeometry();
   private readonly outerMaterial = lineMaterial();
   private readonly innerMaterial = lineMaterial();
   private readonly bandMaterial = new THREE.MeshBasicMaterial({
@@ -76,7 +81,8 @@ export class GroundAimReticleVisual {
   // Built with the reticle on its own materials, so arming the shell compiles nothing.
   private readonly markLines: THREE.LineSegments;
   private readonly markDiscs: THREE.Mesh;
-  private readonly markState = new Float64Array(MARK_CAPACITY * 2);
+  private readonly markBlasts: THREE.LineSegments;
+  private readonly markState = new Float64Array(MARK_CAPACITY * 3);
   private markCount = 0;
   private elapsed = 0;
   private dimmed = false;
@@ -107,8 +113,11 @@ export class GroundAimReticleVisual {
     this.markDiscs.name = 'ground-aim-landing-discs';
     this.markLines = new THREE.LineSegments(this.markLineGeometry, this.tickMaterial);
     this.markLines.name = 'ground-aim-landing-marks';
+    this.markBlasts = new THREE.LineSegments(this.markBlastGeometry, this.innerMaterial);
+    this.markBlasts.name = 'ground-aim-landing-blasts';
     this.markDiscs.visible = false;
     this.markLines.visible = false;
+    this.markBlasts.visible = false;
 
     for (const object of [
       this.band,
@@ -117,6 +126,7 @@ export class GroundAimReticleVisual {
       this.ticks,
       this.markDiscs,
       this.markLines,
+      this.markBlasts,
     ]) {
       object.frustumCulled = false;
       object.renderOrder = floorVfxRenderOrder('reticle', 0);
@@ -178,6 +188,7 @@ export class GroundAimReticleVisual {
     this.tickGeometry.dispose();
     this.markLineGeometry.dispose();
     this.markDiscGeometry.dispose();
+    this.markBlastGeometry.dispose();
     this.outerMaterial.dispose();
     this.innerMaterial.dispose();
     this.bandMaterial.dispose();
@@ -197,20 +208,27 @@ export class GroundAimReticleVisual {
     this.markLines.visible = count > 0;
     this.markDiscs.visible = count > 0;
     if (!points || count === 0) {
+      this.markBlasts.visible = false;
       this.markCount = 0;
       return;
     }
     let same = count === this.markCount;
     for (let i = 0; i < count && same; i++) {
-      same = this.markState[i * 2] === points[i].x && this.markState[i * 2 + 1] === points[i].z;
+      same =
+        this.markState[i * 3] === points[i].x &&
+        this.markState[i * 3 + 1] === points[i].z &&
+        this.markState[i * 3 + 2] === (points[i].blast ?? 0);
     }
     if (same) return;
     for (let i = 0; i < count; i++) {
-      this.markState[i * 2] = points[i].x;
-      this.markState[i * 2 + 1] = points[i].z;
+      this.markState[i * 3] = points[i].x;
+      this.markState[i * 3 + 1] = points[i].z;
+      this.markState[i * 3 + 2] = points[i].blast ?? 0;
     }
     this.markCount = count;
     writeMarks(this.markLineGeometry, this.markDiscGeometry, points, count, this.heightAt);
+    this.markBlasts.visible =
+      writeMarkBlasts(this.markBlastGeometry, points, count, this.heightAt) > 0;
   }
 
   private applyOpacity(): void {
@@ -269,6 +287,16 @@ function markLineGeometry(): THREE.BufferGeometry {
   geometry.setAttribute(
     'position',
     new THREE.BufferAttribute(new Float32Array(MARK_CAPACITY * MARK_LINE_VERTICES * 3), 3),
+  );
+  geometry.setDrawRange(0, 0);
+  return geometry;
+}
+
+function markBlastGeometry(): THREE.BufferGeometry {
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute(
+    'position',
+    new THREE.BufferAttribute(new Float32Array(MARK_CAPACITY * BLAST_LINE_VERTICES * 3), 3),
   );
   geometry.setDrawRange(0, 0);
   return geometry;
@@ -342,6 +370,45 @@ function writeMarks(
   disc.needsUpdate = true;
   lines.setDrawRange(0, count * MARK_LINE_VERTICES);
   discs.setDrawRange(0, count * MARK_DISC_INDICES);
+}
+
+/** One blast ring as x, ground y, z triples, so each ground point is sampled once. */
+const blastRing = new Float64Array(BLAST_SEGMENTS * 3);
+
+/** A pale draped ring of each mark's blast radius; the count of rings written. */
+function writeMarkBlasts(
+  geometry: THREE.BufferGeometry,
+  points: readonly GroundAimMarkPoint[],
+  count: number,
+  heightAt: (x: number, z: number) => number,
+): number {
+  const line = geometry.getAttribute('position') as THREE.BufferAttribute;
+  let rings = 0;
+  for (let m = 0; m < count; m++) {
+    const radius = points[m].blast ?? 0;
+    if (!(radius > MARK_RADIUS)) continue;
+    const cx = points[m].x;
+    const cz = points[m].z;
+    for (let i = 0; i < BLAST_SEGMENTS; i++) {
+      const angle = (i / BLAST_SEGMENTS) * Math.PI * 2;
+      const x = cx + Math.cos(angle) * radius;
+      const z = cz + Math.sin(angle) * radius;
+      blastRing[i * 3] = x;
+      blastRing[i * 3 + 1] = heightAt(x, z) + INNER_LIFT;
+      blastRing[i * 3 + 2] = z;
+    }
+    const base = rings * BLAST_LINE_VERTICES;
+    for (let i = 0; i < BLAST_SEGMENTS; i++) {
+      const a = i * 3;
+      const b = ((i + 1) % BLAST_SEGMENTS) * 3;
+      line.setXYZ(base + i * 2, blastRing[a], blastRing[a + 1], blastRing[a + 2]);
+      line.setXYZ(base + i * 2 + 1, blastRing[b], blastRing[b + 1], blastRing[b + 2]);
+    }
+    rings++;
+  }
+  line.needsUpdate = true;
+  geometry.setDrawRange(0, rings * BLAST_LINE_VERTICES);
+  return rings;
 }
 
 function writeCircle(

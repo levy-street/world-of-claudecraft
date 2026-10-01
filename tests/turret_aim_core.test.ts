@@ -432,7 +432,11 @@ describe('the turret aim core with the limited weapons', () => {
     aim.toggleFrag();
     const star = aim.fragLandingPoints()!;
     expect(star).toHaveLength(1 + TURRET_FRAGMENTATION.outerCount);
-    expect(star[0]).toEqual({ x: CENTER.x + 20, z: CENTER.z });
+    expect(star[0]).toEqual({
+      x: CENTER.x + 20,
+      z: CENTER.z,
+      blast: TURRET_FRAGMENTATION.blastRadius,
+    });
     // The first outer bomblet lands straight ahead along the bearing, the rest on the ring.
     expect(star[1].x).toBeCloseTo(CENTER.x + 20 + TURRET_FRAGMENTATION.outerRadius);
     expect(star[1].z).toBeCloseTo(CENTER.z);
