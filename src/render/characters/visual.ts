@@ -135,6 +135,34 @@ export type { AnimState, BaseState } from './anim_state';
  *  immediately when async compile is unsupported. Mirrors `gateSwapFlagOnCompile`. */
 export type FarBakeGate = (target: THREE.Object3D, settle: (ready?: () => boolean) => void) => void;
 
+/** A hidden group of twins carrying each staged clone on its source mesh's
+ *  geometry, for the compile gate to link before the clones are mounted. */
+function effectCompileScratch(
+  staged: readonly { source: THREE.Mesh; material: THREE.Material }[],
+  name: string,
+): THREE.Group {
+  const scratch = new THREE.Group();
+  scratch.name = name;
+  scratch.visible = false;
+  for (const entry of staged) {
+    // Mirror the SOURCE mesh's kind: three keys `skinning` on isSkinnedMesh,
+    // so a SkinnedMesh twin of a plain source (an attached weapon, the class
+    // halo, the baked far mesh) links a variant the real draw never binds and
+    // the commit frame pays the synchronous link anyway. The shadow flags ride
+    // along for the same reason on the depth arm.
+    const source = entry.source;
+    const mesh = (source as THREE.SkinnedMesh).isSkinnedMesh
+      ? new THREE.SkinnedMesh(source.geometry, entry.material)
+      : new THREE.Mesh(source.geometry, entry.material);
+    mesh.castShadow = source.castShadow;
+    mesh.receiveShadow = source.receiveShadow;
+    mesh.visible = false;
+    mesh.frustumCulled = false;
+    scratch.add(mesh);
+  }
+  return scratch;
+}
+
 // Current canvas height in device pixels, pushed by the renderer on resolution
 // changes so newly created weapon-skin VFX rigs size their point sprites right.
 let weaponVfxViewportHeight = 1080;
@@ -629,6 +657,9 @@ export class CharacterVisual {
    *  three counts for a frame belongs on the per-frame path (the
    *  numPointLights hazard the far-bake mint reveal documents). */
   private effectSwapSettled = false;
+  /** The element response's clones linking ahead of their first trigger
+   *  (prepareElementResponse); never mounted on the rig. */
+  private elementResponseScratch: THREE.Group | null = null;
   /** The renderer's per-frame shadow-plan answer for the far shadow proxy,
    *  kept so a proxy that could not show yet (mint still linking) reveals on
    *  settle without waiting for the next plan write. */
@@ -2088,6 +2119,7 @@ export class CharacterVisual {
     // Same reason as the far arm: a settle the old renderer generation dropped
     // must not leave this visual waiting forever on an effect it already wears.
     this.dropPendingEffectSwap();
+    this.dropElementResponseScratch();
   }
 
   /** Route a freshly minted far bake (mesh + shadow proxy) through the compile
@@ -2229,6 +2261,68 @@ export class CharacterVisual {
     if (this.disposed || this.deadLock) return;
     if (this.surfaceResponse.trigger(school, strength, contact)) this.applyVisualMaterials();
   }
+  /**
+   * Link the element response's programs now, hidden, through the compile gate,
+   * so its first trigger swaps in on the frame it lands instead of staging then.
+   * Nothing is shown or swapped. `linked` records the clones as linked with no
+   * gate, for a caller that knows a rig of the same material shape linked them
+   * already. `far: false` is for a host that never draws the far mesh (it never
+   * calls setFar): its clones are recorded linked without a link, so they never
+   * hold the first swap, and only the rig's own programs link. Resolves true
+   * once they count as linked; false without a gate, on a gate that throws, or
+   * when the visual's effect clones went meanwhile.
+   */
+  prepareElementResponse(options: { linked?: boolean; far?: boolean } = {}): Promise<boolean> {
+    const { linked = false, far = true } = options;
+    const gate = this.farBakeGate;
+    if (this.disposed || !gate) return Promise.resolve(false);
+    const staged: { source: THREE.Mesh; material: THREE.Material }[] = [];
+    const undrawn: THREE.Material[] = [];
+    this.forEachEffectSource((mesh, source) => {
+      const next = this.surfaceResponse.material(source);
+      if (next === source || this.linkedEffectMaterials.has(next)) return;
+      if (!far && mesh === this.farMesh) undrawn.push(next);
+      else staged.push({ source: mesh, material: next });
+    });
+    for (const material of undrawn) this.linkedEffectMaterials.add(material);
+    const record = (): void => {
+      for (const entry of staged) this.linkedEffectMaterials.add(entry.material);
+    };
+    if (staged.length === 0) return Promise.resolve(true);
+    if (linked) {
+      record();
+      return Promise.resolve(true);
+    }
+    this.dropElementResponseScratch();
+    const scratch = effectCompileScratch(staged, 'character_element_response_scratch');
+    this.elementResponseScratch = scratch;
+    this.poseWrap.add(scratch);
+    return new Promise((resolve) => {
+      try {
+        gate(scratch, () => {
+          const current = !this.disposed && this.elementResponseScratch === scratch;
+          if (current) {
+            record();
+            this.dropElementResponseScratch();
+          }
+          resolve(current);
+        });
+      } catch (err) {
+        console.warn('character element response compile gate rejected', err);
+        this.dropElementResponseScratch();
+        resolve(false);
+      }
+    });
+  }
+
+  private dropElementResponseScratch(): void {
+    const scratch = this.elementResponseScratch;
+    if (!scratch) return;
+    scratch.removeFromParent();
+    scratch.clear();
+    this.elementResponseScratch = null;
+  }
+
   clearElementResponse(): void {
     this.harvestRecoil.clear();
     this.warriorBody.clearContactRecoil();
@@ -2437,8 +2531,7 @@ export class CharacterVisual {
     // accepted cost, and the encounter prewarm (soulRendPrewarmTargets) is
     // what usually pays it before the first mark.
     if (this.soulRend) return staged;
-    const consider = (mesh: THREE.Mesh | null, source: THREE.Material): void => {
-      if (!mesh?.geometry) return;
+    this.forEachEffectSource((mesh, source) => {
       const next = this.effectSingleMaterial(source);
       if (
         next === source ||
@@ -2447,19 +2540,21 @@ export class CharacterVisual {
         return;
       if (this.linkedEffectMaterials.has(next)) return;
       staged.push({ source: mesh, material: next });
-    };
-    for (const [mesh, original] of this.originalMaterials) {
-      for (const source of Array.isArray(original) ? original : [original]) {
-        consider(mesh, source);
-      }
-    }
-    if (this.farMesh && this.farMaterials) {
-      const farMats = this.farMaterials;
-      for (const source of Array.isArray(farMats) ? farMats : [farMats]) {
-        consider(this.farMesh, source);
-      }
-    }
+    });
     return staged;
+  }
+
+  /** Every source material an effect clones, with the mesh that draws it: the
+   *  rig's own meshes, then the baked far mesh. */
+  private forEachEffectSource(visit: (mesh: THREE.Mesh, source: THREE.Material) => void): void {
+    for (const [mesh, original] of this.originalMaterials) {
+      if (!mesh.geometry) continue;
+      for (const source of Array.isArray(original) ? original : [original]) visit(mesh, source);
+    }
+    const farMesh = this.farMesh;
+    const farMats = this.farMaterials;
+    if (!farMesh?.geometry || !farMats) return;
+    for (const source of Array.isArray(farMats) ? farMats : [farMats]) visit(farMesh, source);
   }
 
   /** Compile the staged clones hidden, on meshes carrying the same geometry and
@@ -2473,25 +2568,7 @@ export class CharacterVisual {
       this.commitVisualMaterials();
       return;
     }
-    const scratch = new THREE.Group();
-    scratch.name = 'character_effect_compile_scratch';
-    scratch.visible = false;
-    for (const entry of staged) {
-      // Mirror the SOURCE mesh's kind: three keys `skinning` on isSkinnedMesh,
-      // so a SkinnedMesh twin of a plain source (an attached weapon, the class
-      // halo, the baked far mesh) links a variant the real draw never binds and
-      // the commit frame pays the synchronous link anyway. The shadow flags ride
-      // along for the same reason on the depth arm.
-      const source = entry.source;
-      const mesh = (source as THREE.SkinnedMesh).isSkinnedMesh
-        ? new THREE.SkinnedMesh(source.geometry, entry.material)
-        : new THREE.Mesh(source.geometry, entry.material);
-      mesh.castShadow = source.castShadow;
-      mesh.receiveShadow = source.receiveShadow;
-      mesh.visible = false;
-      mesh.frustumCulled = false;
-      scratch.add(mesh);
-    }
+    const scratch = effectCompileScratch(staged, 'character_effect_compile_scratch');
     this.effectSwapScratch = scratch;
     this.poseWrap.add(scratch);
     try {
@@ -3254,6 +3331,7 @@ export class CharacterVisual {
     // The scratch set wears clones this sweep is about to dispose, so they are
     // dropped WITHOUT being recorded as linked (a disposed program is not one).
     this.dropPendingEffectSwap(false);
+    this.dropElementResponseScratch();
     const materials = new Set<THREE.Material>([
       ...this.ghostMaterials.values(),
       ...this.soulRendMaterials.values(),

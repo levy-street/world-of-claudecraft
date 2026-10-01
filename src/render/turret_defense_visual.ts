@@ -16,8 +16,9 @@
 // the compile gate while a capsule on a prewarmed material stands in at the
 // monster's exact position: enemy positions are never hidden. An unused rig leaves
 // the scene graph. No lights, no shadows, no per-frame THREE allocation. A rig's
-// scorch flash swaps its materials only once their programs link behind the same
-// compile gate (the rig keeps its own materials meanwhile). A health bar and a
+// scorch flash links its programs behind the same compile gate as the rig is built,
+// once per material shape, so a first hit swaps them in at once (a hit before that
+// link keeps the rig's own materials until it lands). A health bar and a
 // strike ring are what a player acts on: they paint over the cannon's dust (a
 // higher rung of the floor ladder than the puff draw) and the bar faces the camera
 // upright over the body, whatever its tumble. Every living monster also carries a
@@ -275,6 +276,8 @@ export class TurretDefenseVisual {
   private rigPlan: TurretPlanInput | null = null;
   /** Each rig id's template and the template whose body it wears. */
   private readonly rigLooks = new Map<string, { templateId: string; lookId: string }>();
+  /** Each rig material shape's scorch stage this run: true once its programs linked. */
+  private readonly scorchShapes = new Map<string, Promise<boolean>>();
   private readonly templateOf = (kind: number): string =>
     this.rigPlan?.kinds[kind]?.templateId ?? '';
 
@@ -577,7 +580,8 @@ export class TurretDefenseVisual {
     const { templateId, lookId } = this.rigLooks.get(rigId) ?? { templateId: rigId, lookId: rigId };
     const template = MOBS[templateId];
     const key = visualKeyFor({ kind: 'mob', templateId: lookId } as Entity);
-    const actor = new CharacterVisual(key, MOBS[lookId]?.color ?? template?.color ?? 0xffffff);
+    const color = MOBS[lookId]?.color ?? template?.color ?? 0xffffff;
+    const actor = new CharacterVisual(key, color);
     const clips = VISUALS[key]?.clips;
     actor.setShadow(false);
     actor.setProxyShadow(false);
@@ -615,6 +619,28 @@ export class TurretDefenseVisual {
       this.rigGates.gate,
       () => this.disposed || this.generation !== generation,
     ).catch(() => {});
+    this.prepareScorch(actor, `${key}:${color}`, generation);
+  }
+
+  /**
+   * The scorch flash's programs link as the rig is built, never on its first hit:
+   * the first rig of a material shape stages them through the rig's gate, and
+   * every later rig of that shape records them linked once that stage settled.
+   * The arena never calls setFar, so the far mesh's variant is left unlinked.
+   * Recording a later rig linked leans on the first rig's materials keeping the
+   * program alive: a run's rigs are only disposed together, at releaseRun.
+   */
+  private prepareScorch(actor: CharacterVisual, shape: string, generation: number): void {
+    const staged = this.scorchShapes.get(shape);
+    if (!staged) {
+      this.scorchShapes.set(shape, actor.prepareElementResponse({ far: false }));
+      return;
+    }
+    void staged.then((linked) => {
+      if (linked && !this.disposed && this.generation === generation) {
+        void actor.prepareElementResponse({ linked: true, far: false });
+      }
+    });
   }
 
   /** The kit, unprepared: the weapon's shots and puffs, and the kegs. */
@@ -677,6 +703,7 @@ export class TurretDefenseVisual {
     for (const rig of rigs) rig.gate.removeFromParent();
     this.built.clear();
     this.rigLooks.clear();
+    this.scorchShapes.clear();
     this.book.clear();
     this.rigPlan = null;
     this.plan = null;

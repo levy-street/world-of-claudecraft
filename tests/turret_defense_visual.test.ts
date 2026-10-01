@@ -50,7 +50,10 @@ import {
   FIRE_AND_FLY_DUNGEON_DEFS,
   FIRE_AND_FLY_DUNGEON_ID,
 } from '../src/sim/content/fire_and_fly_arena';
-import { TURRET_MISSION_DELUGE } from '../src/sim/content/fire_and_fly_missions';
+import {
+  TURRET_MISSION_DELUGE,
+  TURRET_MISSION_PACK,
+} from '../src/sim/content/fire_and_fly_missions';
 import { TURRET_EXPLOSIVE_BARREL, TURRET_TIMING } from '../src/sim/content/turret_defense';
 import { BUILTIN_WORLD, instanceOrigin, MOBS } from '../src/sim/data';
 import { FIRE_AND_FLY_TOWER } from '../src/sim/fire_and_fly_field';
@@ -92,6 +95,11 @@ interface MockActor {
   holdFrame: ReturnType<typeof vi.fn>;
   respondToElement: ReturnType<typeof vi.fn>;
   setFarBakeGate: ReturnType<typeof vi.fn>;
+  prepareElementResponse: ReturnType<typeof vi.fn>;
+  /** The scorch stage ran with the rig already in the scene graph (the gate's lights). */
+  stagedInScene: boolean;
+  /** What this rig's scorch stage resolves on its settle (false: the link did not land). */
+  stageLinks: boolean;
   setShadow: ReturnType<typeof vi.fn>;
   setProxyShadow: ReturnType<typeof vi.fn>;
 }
@@ -116,6 +124,23 @@ vi.mock('../src/render/characters', () => ({
     holdFrame = vi.fn();
     respondToElement = vi.fn();
     setFarBakeGate = vi.fn();
+    // The real visual's contract: a stage links through the installed gate and resolves on its settle.
+    prepareElementResponse = vi.fn(({ linked = false } = {}): Promise<boolean> => {
+      const gate = this.setFarBakeGate.mock.calls.at(-1)?.[0] as
+        | ((target: THREE.Object3D, settle: () => void) => void)
+        | null
+        | undefined;
+      if (!gate) return Promise.resolve(false);
+      if (linked) return Promise.resolve(true);
+      let top: THREE.Object3D = this.root;
+      while (top.parent) top = top.parent;
+      this.stagedInScene = top instanceof THREE.Scene;
+      const scratch = new THREE.Group();
+      scratch.name = 'scorch-stage';
+      return new Promise<boolean>((resolve) => gate(scratch, () => resolve(this.stageLinks)));
+    });
+    stagedInScene = false;
+    stageLinks = true;
     isMidOneShot = false;
     setShadow = vi.fn();
     setProxyShadow = vi.fn();
@@ -1114,6 +1139,107 @@ describe('Fire and Fly monsters on screen', () => {
     await buildAll(bare, viewOf(engine(0)), 0);
     expect(actors.made[0].setFarBakeGate).toHaveBeenCalledWith(null);
     bare.dispose();
+  });
+
+  it("links each rig material shape's scorch through the rig's gate as the rig is built, once per shape", async () => {
+    actors.made.length = 0;
+    const scene = new THREE.Scene();
+    const held: { target: THREE.Object3D; resolve: () => void }[] = [];
+    const gate = (target: THREE.Object3D) =>
+      new Promise<void>((resolve) => held.push({ target, resolve }));
+    const visual = new TurretDefenseVisual(scene, () => 0, gate, immediate);
+    await buildAll(visual, viewOf(engine(0)), 0);
+    const made = actors.made.slice();
+    const shapeOf = (a: MockActor) => `${a.key}:${a.color}`;
+    const shapes = new Set(made.map(shapeOf));
+    expect(made.length).toBeGreaterThan(shapes.size);
+    const stagedBy = (a: MockActor) =>
+      a.prepareElementResponse.mock.calls.some((c) => !c[0]?.linked);
+    const recordedBy = (a: MockActor) =>
+      a.prepareElementResponse.mock.calls.some((c) => c[0]?.linked);
+    // One stage per shape, from the shape's first rig, on the rig's own gate, the rig in the scene.
+    // The arena never draws a rig's far mesh, so the stage leaves its variant unlinked.
+    for (const shape of shapes) {
+      const ofShape = made.filter((a) => shapeOf(a) === shape);
+      expect(ofShape.filter(stagedBy)).toEqual([ofShape[0]]);
+      expect(ofShape[0].prepareElementResponse.mock.calls).toEqual([[{ far: false }]]);
+      expect(ofShape[0].stagedInScene).toBe(true);
+    }
+    const stages = () => held.filter((h) => h.target.name === 'scorch-stage');
+    expect(stages()).toHaveLength(shapes.size);
+    // Nothing is recorded linked before the shape's stage settled.
+    expect(made.some(recordedBy)).toBe(false);
+    for (const h of held.splice(0)) h.resolve();
+    await flush();
+    await flush();
+    // Every later rig of a shape is recorded linked, with no stage of its own.
+    for (const shape of shapes) {
+      const [first, ...rest] = made.filter((a) => shapeOf(a) === shape);
+      expect(recordedBy(first)).toBe(false);
+      for (const a of rest) {
+        expect(a.prepareElementResponse.mock.calls).toEqual([[{ linked: true, far: false }]]);
+      }
+    }
+    expect(stages()).toHaveLength(0);
+    visual.dispose();
+  });
+
+  it("leaves a shape's later rigs to link on their own first hit when its stage did not link", async () => {
+    actors.made.length = 0;
+    const held: { target: THREE.Object3D; resolve: () => void }[] = [];
+    const gate = (target: THREE.Object3D) =>
+      new Promise<void>((resolve) => held.push({ target, resolve }));
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0, gate, immediate);
+    await buildAll(visual, viewOf(engine(0)), 0);
+    const made = actors.made.slice();
+    expect(made.length).toBeGreaterThan(1);
+    for (const a of made) a.stageLinks = false;
+    for (const h of held.splice(0)) h.resolve();
+    await flush();
+    await flush();
+    expect(made.some((a) => a.prepareElementResponse.mock.calls.some((c) => c[0]?.linked))).toBe(
+      false,
+    );
+    visual.dispose();
+  });
+
+  it('stages one look worn in two colours once per colour', async () => {
+    actors.made.length = 0;
+    const tinted = [MOBS.forest_wolf.color, MOBS.snowdrift_wolf.color];
+    const wolfKey = visualKeyFor({ kind: 'mob', templateId: 'forest_wolf' } as Entity);
+    expect(visualKeyFor({ kind: 'mob', templateId: 'snowdrift_wolf' } as Entity)).toBe(wolfKey);
+    expect(new Set(tinted).size).toBe(2);
+    const resolved = resolveTurretPlan({
+      ...TURRET_MISSION_PACK,
+      waves: [
+        {
+          ...TURRET_MISSION_PACK.waves[0],
+          entries: [
+            { templateId: 'forest_wolf', count: 3, level: 2 },
+            { templateId: 'wild_boar', count: 3, level: 2 },
+          ],
+        },
+      ],
+    });
+    // No mission pairs one body with two colours yet: the second wolf stands in for the boar.
+    const kinds = resolved.kinds.map((k) =>
+      k.templateId === 'wild_boar' ? { ...k, templateId: 'snowdrift_wolf' } : k,
+    );
+    const state = createTurretDefense({ ...resolved, kinds }, { x: 0, z: 0 }, 7, 0);
+    const gate = vi.fn(() => Promise.resolve());
+    const visual = new TurretDefenseVisual(new THREE.Scene(), () => 0, gate, immediate);
+    await buildAll(visual, viewOf(state), 0);
+    await flush();
+    const wolves = actors.made.filter((a) => a.key === wolfKey);
+    for (const color of tinted) {
+      const ofColor = wolves.filter((a) => a.color === color);
+      expect(ofColor.length).toBeGreaterThan(1);
+      const stages = ofColor.filter((a) =>
+        a.prepareElementResponse.mock.calls.some((c) => !c[0]?.linked),
+      );
+      expect(stages).toEqual([ofColor[0]]);
+    }
+    visual.dispose();
   });
 
   it('flies the cannon shell from the fired entry and shows the blast from the impact entry', async () => {
@@ -2344,6 +2470,35 @@ describe('Fire and Fly run residency', () => {
     await flush();
     expect(early.every((a) => a.dispose.mock.calls.length === 1)).toBe(true);
     expect(weaponDispose).toHaveBeenCalledTimes(1);
+    visual.dispose();
+  });
+
+  it('disposes a rig released before its scorch stage settled only once that stage settled', async () => {
+    actors.made.length = 0;
+    const scene = new THREE.Scene();
+    const held: { target: THREE.Object3D; resolve: () => void }[] = [];
+    const gate = (target: THREE.Object3D) =>
+      new Promise<void>((resolve) => held.push({ target, resolve }));
+    const visual = new TurretDefenseVisual(scene, () => 0, gate, immediate);
+    await buildAll(visual, viewOf(engine(160)), 160);
+    const made = actors.made.slice();
+    const isStage = (h: { target: THREE.Object3D }) => h.target.name === 'scorch-stage';
+    expect(held.some(isStage)).toBe(true);
+    // Every other gate settles; only the scorch stages stay in flight.
+    for (const h of held.filter((h) => !isStage(h))) h.resolve();
+    await flush();
+    visual.update(null, null, 1, 0.016, false, standingAt(AMBERFALL_X));
+    await flush();
+    expect(made.some((a) => inGraph(a.root, scene))).toBe(false);
+    expect(made.every((a) => a.dispose.mock.calls.length === 0)).toBe(true);
+    for (const h of held.filter(isStage)) h.resolve();
+    await flush();
+    await flush();
+    expect(made.every((a) => a.dispose.mock.calls.length === 1)).toBe(true);
+    // A stage settling after the release records nothing on the released run's rigs.
+    expect(made.some((a) => a.prepareElementResponse.mock.calls.some((c) => c[0]?.linked))).toBe(
+      false,
+    );
     visual.dispose();
   });
 
