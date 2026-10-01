@@ -5714,7 +5714,9 @@ export const cs_CZ: EnTranslations = {
     },
     "pattern": {
       "teaches": "Použití: Naučí tě vyrobit {item}.",
-      "teachesEnchant": "Použití: Naučí tě použít očarování {enchant}."
+      "teachesEnchant": "Použití: Naučí tě použít očarování {enchant}.",
+      "reagents": "{label} {list}",
+      "reagent": "{name} x{count}"
     },
     "unbind": {
       "title": "Odpoutání: {name}",

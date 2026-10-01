@@ -9131,8 +9131,10 @@
     padding-top: 5px;
     border-top: 1px solid #3a3526;
   }
-  /* item comparison block (hover an equippable item to see the worn one + deltas) */
-  #tooltip .tt-cmp {
+  /* item comparison block (hover an equippable item to see the worn one + deltas),
+     and the crafted product card a recipe pattern embeds under its teaches line */
+  #tooltip .tt-cmp,
+  #tooltip .tt-recipe-product {
     margin-top: 6px;
     padding-top: 5px;
     border-top: 1px solid #3a3526;

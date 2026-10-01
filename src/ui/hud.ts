@@ -6432,7 +6432,7 @@ export class Hud {
   // so those render exactly as before.
   private itemTooltip(
     item: ItemDef,
-    compare = true,
+    compare: boolean | 'embedded' | 'noset' = true,
     instance?: ItemInstancePayload,
     materialSources?: MaterialComposition,
   ): string {
@@ -6626,10 +6626,10 @@ export class Hud {
       item,
       (this.sim as { alliedHearthstoneAttunement?: FactionId }).alliedHearthstoneAttunement,
     );
-    // Recipe patterns (kind 'recipe'): what the pattern teaches, skill req, and already-known line.
-    if (item.kind === 'recipe') {
-      html += recipePatternTooltipLines(item, this.sim.craftingIdentity);
-    }
+    // Recipe patterns: what it teaches, its gates, then each product's card and materials.
+    const card = (p: ItemDef, noSet: boolean) => this.itemTooltip(p, noSet ? 'noset' : 'embedded');
+    if (item.kind === 'recipe')
+      html += recipePatternTooltipLines(item, this.sim.craftingIdentity, card);
     html += feastTooltipLines(item);
     // Quest story block (related quest, progress, rules, orphaned). Replaces the
     // old plain "Quest Item" desc that doubled the kind line.
@@ -6664,14 +6664,14 @@ export class Hud {
     }
     html += itemRequiredLevelLine(item, this.sim.player.level);
     html += this.itemProcBlock(item) + trinketTooltipLines(item, this.sim.player);
-    html += this.itemSetBlock(item);
+    if (compare !== 'noset') html += this.itemSetBlock(item);
     html += materialMakersMarkLines(item, instance, materialSources);
-    // Stackables state their per-slot cap (sim/bags.ts stackSizeOf), so a
-    // player holding a single potion learns more copies will share the slot;
-    // 1-per-slot kinds, mounts, and charge-bearing payloads render nothing.
-    html += stackSizeTooltipLine(item, instance);
-    html += vendorSellTooltipLine(item);
-    if (compare) html += this.itemCompareBlock(item, instance);
+    // Stack cap (sim/bags.ts stackSizeOf) and sell price; a pattern's product card omits both.
+    if (typeof compare === 'boolean') {
+      html += stackSizeTooltipLine(item, instance);
+      html += vendorSellTooltipLine(item);
+    }
+    if (compare === true) html += this.itemCompareBlock(item, instance);
     return html;
   }
 

@@ -5714,7 +5714,9 @@ export const ko_KR: EnTranslations = {
     },
     "pattern": {
       "teaches": "사용: {item} 제작법을 배웁니다.",
-      "teachesEnchant": "사용 효과: {enchant} 부여 방법을 배웁니다."
+      "teachesEnchant": "사용 효과: {enchant} 부여 방법을 배웁니다.",
+      "reagents": "{label} {list}",
+      "reagent": "{name} x{count}"
     },
     "unbind": {
       "title": "귀속 해제: {name}",

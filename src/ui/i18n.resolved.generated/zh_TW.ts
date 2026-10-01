@@ -5714,7 +5714,9 @@ export const zh_TW: EnTranslations = {
     },
     "pattern": {
       "teaches": "使用：教你製作{item}。",
-      "teachesEnchant": "使用：教你如何施加{enchant}。"
+      "teachesEnchant": "使用：教你如何施加{enchant}。",
+      "reagents": "{label} {list}",
+      "reagent": "{name} x{count}"
     },
     "unbind": {
       "title": "解綁：{name}",

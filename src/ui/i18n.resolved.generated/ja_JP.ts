@@ -5714,7 +5714,9 @@ export const ja_JP: EnTranslations = {
     },
     "pattern": {
       "teaches": "使用: {item}の作成法を習得します。",
-      "teachesEnchant": "使用：{enchant}の付与方法を習得する。"
+      "teachesEnchant": "使用：{enchant}の付与方法を習得する。",
+      "reagents": "{label} {list}",
+      "reagent": "{name} x{count}"
     },
     "unbind": {
       "title": "バインド解除：{name}",

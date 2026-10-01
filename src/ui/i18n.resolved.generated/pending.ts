@@ -9,25 +9,85 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.pattern.reagent",
+    "hudChrome.pattern.reagents"
+  ],
+  "es_ES": [
+    "hudChrome.pattern.reagent",
+    "hudChrome.pattern.reagents"
+  ],
+  "fr_FR": [
+    "hudChrome.pattern.reagent",
+    "hudChrome.pattern.reagents"
+  ],
+  "fr_CA": [
+    "hudChrome.pattern.reagent",
+    "hudChrome.pattern.reagents"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.pattern.reagent",
+    "hudChrome.pattern.reagents"
+  ],
+  "de_DE": [
+    "hudChrome.pattern.reagent",
+    "hudChrome.pattern.reagents"
+  ],
+  "zh_CN": [
+    "hudChrome.pattern.reagent",
+    "hudChrome.pattern.reagents"
+  ],
+  "zh_TW": [
+    "hudChrome.pattern.reagent",
+    "hudChrome.pattern.reagents"
+  ],
+  "ko_KR": [
+    "hudChrome.pattern.reagent",
+    "hudChrome.pattern.reagents"
+  ],
+  "ja_JP": [
+    "hudChrome.pattern.reagent",
+    "hudChrome.pattern.reagents"
+  ],
+  "pt_BR": [
+    "hudChrome.pattern.reagent",
+    "hudChrome.pattern.reagents"
+  ],
+  "ru_RU": [
+    "hudChrome.pattern.reagent",
+    "hudChrome.pattern.reagents"
+  ],
+  "cs_CZ": [
+    "hudChrome.pattern.reagent",
+    "hudChrome.pattern.reagents"
+  ],
+  "nl_NL": [
+    "hudChrome.pattern.reagent",
+    "hudChrome.pattern.reagents"
+  ],
+  "pl_PL": [
+    "hudChrome.pattern.reagent",
+    "hudChrome.pattern.reagents"
+  ],
+  "id_ID": [
+    "hudChrome.pattern.reagent",
+    "hudChrome.pattern.reagents"
+  ],
+  "tr_TR": [
+    "hudChrome.pattern.reagent",
+    "hudChrome.pattern.reagents"
+  ],
+  "sv_SE": [
+    "hudChrome.pattern.reagent",
+    "hudChrome.pattern.reagents"
+  ],
+  "vi_VN": [
+    "hudChrome.pattern.reagent",
+    "hudChrome.pattern.reagents"
+  ],
+  "da_DK": [
+    "hudChrome.pattern.reagent",
+    "hudChrome.pattern.reagents"
+  ]
 };

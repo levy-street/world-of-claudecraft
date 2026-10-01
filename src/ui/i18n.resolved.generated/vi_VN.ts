@@ -5714,7 +5714,9 @@ export const vi_VN: EnTranslations = {
     },
     "pattern": {
       "teaches": "Dùng: Dạy bạn cách chế tác {item}.",
-      "teachesEnchant": "Dùng: Dạy bạn cách áp dụng {enchant}."
+      "teachesEnchant": "Dùng: Dạy bạn cách áp dụng {enchant}.",
+      "reagents": "{label} {list}",
+      "reagent": "{name} x{count}"
     },
     "unbind": {
       "title": "Gỡ Ràng Buộc: {name}",

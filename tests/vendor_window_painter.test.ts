@@ -1200,7 +1200,7 @@ describe('vendor window family: hud.ts focus-management wiring (WCAG 2.4.3)', ()
     // unrelated method, and the slice is comment-stripped so a line of prose
     // quoting the call cannot stand in for the call itself.
     const itemTooltipStart = anchor(
-      'private itemTooltip(\n    item: ItemDef,\n    compare = true,\n    instance?: ItemInstancePayload,\n    materialSources?: MaterialComposition,\n  ): string {',
+      "private itemTooltip(\n    item: ItemDef,\n    compare: boolean | 'embedded' | 'noset' = true,\n    instance?: ItemInstancePayload,\n    materialSources?: MaterialComposition,\n  ): string {",
     );
     const itemProcBlockStart = anchor('private itemProcBlock(item: ItemDef): string {');
     expect(itemProcBlockStart).toBeGreaterThan(itemTooltipStart);

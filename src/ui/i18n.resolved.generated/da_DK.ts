@@ -5714,7 +5714,9 @@ export const da_DK: EnTranslations = {
     },
     "pattern": {
       "teaches": "Brug: Lærer dig at fremstille {item}.",
-      "teachesEnchant": "Brug: Lærer dig at anvende {enchant}."
+      "teachesEnchant": "Brug: Lærer dig at anvende {enchant}.",
+      "reagents": "{label} {list}",
+      "reagent": "{name} x{count}"
     },
     "unbind": {
       "title": "Aflæsning: {name}",

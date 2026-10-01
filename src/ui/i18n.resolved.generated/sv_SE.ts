@@ -5714,7 +5714,9 @@ export const sv_SE: EnTranslations = {
     },
     "pattern": {
       "teaches": "Användning: Lär dig tillverka {item}.",
-      "teachesEnchant": "Användning: Lär dig använda {enchant}."
+      "teachesEnchant": "Användning: Lär dig använda {enchant}.",
+      "reagents": "{label} {list}",
+      "reagent": "{name} x{count}"
     },
     "unbind": {
       "title": "Upplösning: {name}",

@@ -5714,7 +5714,9 @@ export const it_IT: EnTranslations = {
     },
     "pattern": {
       "teaches": "Uso: ti insegna a creare {item}.",
-      "teachesEnchant": "Uso: ti insegna ad applicare {enchant}."
+      "teachesEnchant": "Uso: ti insegna ad applicare {enchant}.",
+      "reagents": "{label} {list}",
+      "reagent": "{name} x{count}"
     },
     "unbind": {
       "title": "Scioglimento: {name}",

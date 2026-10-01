@@ -5714,7 +5714,9 @@ export const id_ID: EnTranslations = {
     },
     "pattern": {
       "teaches": "Gunakan: Mengajarimu membuat {item}.",
-      "teachesEnchant": "Gunakan: Mengajarimu menerapkan {enchant}."
+      "teachesEnchant": "Gunakan: Mengajarimu menerapkan {enchant}.",
+      "reagents": "{label} {list}",
+      "reagent": "{name} x{count}"
     },
     "unbind": {
       "title": "Pelepasan Ikat: {name}",

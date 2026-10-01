@@ -5714,7 +5714,9 @@ export const en_XA: EnTranslations = {
     },
     "pattern": {
       "teaches": "[Úšé: Ţéáçĥéš ýóú ĥóŵ ţó çŕáƒţ {item}.]",
-      "teachesEnchant": "[Úšé: Ţéáçĥéš ýóú ĥóŵ ţó áþþļý {enchant}.]"
+      "teachesEnchant": "[Úšé: Ţéáçĥéš ýóú ĥóŵ ţó áþþļý {enchant}.]",
+      "reagents": "[{label} {list}]",
+      "reagent": "[{name} ẋ{count}]"
     },
     "unbind": {
       "title": "[Úñƀíñðíñĝ: {name}]",

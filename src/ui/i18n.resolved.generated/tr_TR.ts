@@ -5714,7 +5714,9 @@ export const tr_TR: EnTranslations = {
     },
     "pattern": {
       "teaches": "Kullan: {item} üretmeyi öğretir.",
-      "teachesEnchant": "Kullan: {enchant} uygulamayı öğretir."
+      "teachesEnchant": "Kullan: {enchant} uygulamayı öğretir.",
+      "reagents": "{label} {list}",
+      "reagent": "{name} x{count}"
     },
     "unbind": {
       "title": "Bağ Çözme: {name}",

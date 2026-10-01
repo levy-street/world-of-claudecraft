@@ -12341,6 +12341,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.partyFrames.styleRaid'
   | 'hudChrome.partyFrames.unlock'
   | 'hudChrome.partyFrames.width'
+  | 'hudChrome.pattern.reagent'
+  | 'hudChrome.pattern.reagents'
   | 'hudChrome.pattern.teaches'
   | 'hudChrome.pattern.teachesEnchant'
   | 'hudChrome.perf.badges.backgrounded'

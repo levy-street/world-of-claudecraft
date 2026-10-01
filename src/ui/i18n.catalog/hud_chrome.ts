@@ -8381,6 +8381,11 @@ export const hudChromeStrings = {
   pattern: {
     teaches: 'Use: Teaches you how to craft {item}.',
     teachesEnchant: 'Use: Teaches you how to apply {enchant}.',
+    // The materials line under each taught product: {label} is the crafting
+    // window's own crafting.reagentsNeeded ("Requires:") and {list} a
+    // formatList of reagent entries, so neither gets a second wording.
+    reagents: '{label} {list}',
+    reagent: '{name} x{count}',
   },
   // Maker's Bond unbind service window + result lines (Professions 2.0):
   // the station master's second gossip service beside training.

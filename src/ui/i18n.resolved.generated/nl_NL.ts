@@ -5714,7 +5714,9 @@ export const nl_NL: EnTranslations = {
     },
     "pattern": {
       "teaches": "Gebruik: leert je hoe je {item} maakt.",
-      "teachesEnchant": "Gebruik: leert je hoe je {enchant} toepast."
+      "teachesEnchant": "Gebruik: leert je hoe je {enchant} toepast.",
+      "reagents": "{label} {list}",
+      "reagent": "{name} x{count}"
     },
     "unbind": {
       "title": "Ontbinden: {name}",
