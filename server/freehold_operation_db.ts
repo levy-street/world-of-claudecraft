@@ -623,8 +623,11 @@ export async function closeFreeholdOperationOnClient(
     // never tells a caller that a closed id it does not own exists. Another
     // account's OPEN intent answers `account` below: a server-side diagnostic,
     // safe only while operation ids are server-minted and crypto-random, never
-    // client-chosen, and collapse before any client sees them: an obligation on
-    // 08 (07a mints none), the manifest's P7.
+    // client-chosen; an id a client sends back (a resume) is client input,
+    // checked against the bearer's account, and every cross-account answer
+    // (this `account`, the prepare's `conflict`) collapses to one refusal
+    // before any client-visible surface. A duty on the change that first
+    // mints operation ids (none is minted yet): the manifest's P7.
     const receipt = await tx.query(FREEHOLD_OPERATION_RECEIPT_READ_SQL, [close.operationId]);
     const closed = receipt.rows?.[0] as { account_id?: unknown } | undefined;
     return closed && closed.account_id !== null && Number(closed.account_id) === close.accountId

@@ -255,13 +255,14 @@ that shape.
   (read `max`, never `p95`: a 30 s stall is two samples in a 60 s ring). That observer is
   `onSaveMs` in `server/game.ts`, which the serial writers receive as `onWrite`. `saves`
   counts ONLY those serial writers plus the Freeholds jobs on the same flush named here,
-  each billing its synchronous part through the same observer: the housing sweep (`saveFreeholds`, its
-  `saveAllDirty`) and the plot-claim renewer's launch (`renewGameFreeholdClaims` in
-  `freehold_persist_wiring.ts`; its per-chunk continuations after the first await bill no
-  phase and land in `lateness`, each O(one renew or release chunk) of work). Per-character
-  blobs and DB round trips are not in it, and a job that reports into no phase shows up as
-  `lateness` with nothing to attribute it to. Rules: a new realm collection never persists
-  as one whole-book `world_state` blob rewritten on the autosave cadence (the market and
+  each billing its synchronous part through the same observer: the housing sweep
+  (`saveFreeholds`, its `saveAllDirty`) and the plot-claim renewer's launch
+  (`renewGameFreeholdClaims` in `freehold_persist_wiring.ts`; its per-chunk continuations
+  after the first await bill no phase and land in `lateness`, each O(one renew or release
+  chunk) of work). Per-character blobs and DB round trips are not in it, and a job that
+  reports into no phase shows up as `lateness` with nothing to attribute it to.
+  Rules: a new realm collection never persists as one whole-book `world_state` blob
+  rewritten on the autosave cadence (the market and
   rift blobs are the legacy shape, not the template; the mail book, partitioned per dirty
   recipient, shows what the fix looks like): write per-row, overlay, or
   dirty-bucket, so a quiet interval writes nothing; a recurring job's cost, or an

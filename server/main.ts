@@ -4437,8 +4437,8 @@ export async function startServer(): Promise<http.Server> {
     // Release this process's plot claims after the housing drain above, so a
     // replacement process can take the plots at once; a crash leaves them to
     // expire after LEASE_TTL_SECONDS. The renewer stops first (bounded by one
-    // chunk's wall), so no renewal still in flight outlives the release. Never
-    // rejects.
+    // chunk's wall), so no renewal whose COMMIT was not yet sent outlives the
+    // release (a sent one can: the touch-set manifest's R-13). Never rejects.
     await stopFreeholdClaimRenewer(heldClaims());
     await releaseAllFreeholdClaims({ pool, holder: PROCESS_LEASE_HOLDER, registry: heldClaims() });
     // Drop every character load lease this process holds so a clean restart can

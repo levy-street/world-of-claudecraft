@@ -631,46 +631,50 @@ no-op `ADD COLUMN IF NOT EXISTS` still takes ACCESS EXCLUSIVE, so EVERY boot hol
 parents exclusively from its first statements to its COMMIT, and the housing DDL adds no
 parent lock the boot does not already hold
 ([qa/mutation-2026-09-30/workload-evidence.md](qa/mutation-2026-09-30/workload-evidence.md)).
-Trigger creation is the operation fragment's last statement. A steady-state boot is catalog-only: the triggers through the
-storage probe, and EVERY housing index (07's plot-id index included) through a
-`to_regclass` probe in a DO block, because a no-op `CREATE INDEX IF NOT EXISTS` still
-takes the table's SHARE lock and holds it to the boot COMMIT (measured), which would block
-every other realm's claim and plot writes through this realm's whole boot. The plot and
-Hearth fragments MOVED with them: 07 applied them earlier in `ensureSchema`, and this work
-places all four in the late block, in the order plots, Hearth, claims, operations
-(`tests/schema_wiring.test.ts` pins them at storage minus four to storage minus one).
-"Catalog-only" means no lock on a housing or parent TABLE: catalog reads, plus the two
-`CREATE OR REPLACE FUNCTION` rewrites of the guard and erase functions, which rewrite their
-`pg_proc` rows on EVERY boot (keeping their oids): a catalog row write, no table lock. The
+Trigger creation is the operation fragment's last statement. A steady-state boot is
+catalog-only: the triggers through the storage probe, and EVERY housing index (07's plot-id
+index included) through a `to_regclass` probe in a DO block, because a no-op `CREATE INDEX
+IF NOT EXISTS` still takes the table's SHARE lock and holds it to the boot COMMIT
+(measured), which would block every other realm's claim and plot writes through this realm's
+whole boot. The plot and Hearth fragments MOVED with them: 07 applied them earlier in
+`ensureSchema`, and this work places all four in the late block, in the order plots, Hearth,
+claims, operations (`tests/schema_wiring.test.ts` pins them at storage minus four to storage
+minus one). "Catalog-only" means no lock on a housing or parent TABLE held to the boot
+COMMIT: catalog reads, plus the two `CREATE OR REPLACE FUNCTION` rewrites of the guard and
+erase functions, which rewrite their `pg_proc` rows on EVERY boot (keeping their oids): a
+catalog row write, no table lock. The one table lock is the Hearth token probe's: deparsing
+the CHECK takes ACCESS SHARE on `account_freehold_hearth` and releases it at once, so the
+boot waits there only behind an ACCESS EXCLUSIVE holder or request on that table and holds
+nothing to its COMMIT (`tests/server/freehold_hearth_db.pg.test.ts` proves both halves). The
 pg suite proves it for all four housing fragments: re-applying them completes inside a 1 s
 `lock_timeout` beside a writer holding ROW EXCLUSIVE on every table they name (the plot,
 Hearth, claims, intents and receipts tables and both parents) and keeps every index,
 trigger, constraint and function oid, while each unprobed statement it replaces times out
 there; and the operation fragment hands the caller's own `search_path` back
 (`tests/server/freehold_mutation.pg.test.ts`, section K). The index probes check a NAME
-only, as `IF NOT EXISTS` does: a same-named index with another definition is never
-repaired, unlike the trigger probe, which checks the exact shape. The Hearth column probe
-checks the column and then its named CHECK: a column whose CHECK is missing gets it back
-`NOT VALID`, so every new token is checked again while no boot scans the table for old
-ones. The CHECK is probed by name, so a same-named constraint of any type satisfies the
-probe (a repair can never fail a boot with 42710); one that is not that CHECK (another
-type, or a CHECK with another body, compared on PostgreSQL's own deparse) is left in place
-and the boot logs a WARNING. THE FIRST ROLLOUT WINDOW: because no 07 build deployed, the first 07a boot on
-production creates five FK-bearing tables and the triggers in ONE `ensureSchema`
-transaction with no `lock_timeout`. It takes no parent lock a steady-state boot does not
-(above): every boot queues behind each in-flight `characters` and `accounts` writer on the
-running fleet, and every later save and account write on every realm queues behind the
-boot until its COMMIT (measured with an old realm serving: about 65 ms for the first
-rollout with plain saves in flight, the same as a steady-state boot). ANY boot can DEADLOCK
-on two paths. The UPGRADE path, one table: the boot's first `characters` lock is SHARE (the
-core `characters_account` index create), upgraded to ACCESS EXCLUSIVE by the next statement,
-against a transaction that took any lock on `characters` beside that SHARE (a save's G2 row
-lock, or a plain read) and then writes it. The ORDER path,
-two tables: a transaction that holds any lock on `accounts` and then asks for one on
-`characters`, this manifest's own G1-then-G2 order (every effect-carrying or hooked save, the
-Hearth trip's included, the operation prepare and the character delete), against the boot's
-`characters`-then-`accounts` order. With G1-shaped saves in flight every bench boot was
-eventually aborted and saves were aborted beside it, and a boot that loses exits and is
+only, as `IF NOT EXISTS` does: a same-named index with another definition is never repaired,
+unlike the trigger probe, which checks the exact shape. The Hearth column probe checks the
+column and then its named CHECK: a column whose CHECK is missing gets it back `NOT VALID`,
+so every new token is checked again while no boot scans the table for old ones. The CHECK is
+probed by name, so a same-named constraint of any type satisfies the probe (a repair can
+never fail a boot with 42710); one that is not that CHECK (another type, or a CHECK with
+another body, compared on PostgreSQL's own deparse) is left in place and the boot logs a
+WARNING. THE FIRST ROLLOUT WINDOW: because no 07 build deployed, the first 07a boot on
+production creates five FK-bearing tables and the triggers in ONE `ensureSchema` transaction
+with no `lock_timeout`. It takes no parent lock a steady-state boot does not (above): every
+boot queues behind each in-flight `characters` and `accounts` writer on the running fleet,
+and every later save and account write on every realm queues behind the boot until its
+COMMIT (measured with an old realm serving: about 65 ms for the first rollout with plain
+saves in flight, the same as a steady-state boot). ANY boot can DEADLOCK on two paths. The
+UPGRADE path, one table: the boot's first `characters` lock is SHARE (the core
+`characters_account` index create), upgraded to ACCESS EXCLUSIVE by the next statement,
+against a transaction that took a lock on `characters` that SHARE does not wait for (a
+save's G2 row lock, ROW SHARE, or a plain read's ACCESS SHARE) and then writes it. The ORDER
+path, two tables: a transaction that holds any lock on `accounts` and then asks for one on
+`characters`, this manifest's own G1-then-G2 order (every effect-carrying or hooked save,
+the Hearth trip's included, the operation prepare and the character delete), against the
+boot's `characters`-then-`accounts` order. With G1-shaped saves in flight every bench boot
+was eventually aborted and saves were aborted beside it, and a boot that loses exits and is
 restarted (R-11). Do the first rollout, any trigger repair boot, and any boot beside other
 realms serving such saves, in a quiet window; `DEPLOY.md` carries the operator note.
 
@@ -1086,12 +1090,11 @@ merge in a `finally`; N4 the server default pin; N5 the log pin; N6 the 15 route
   (`server/leave_character_save.ts`) for a leave save; for a shutdown flush save, one more
   pass only when it carried guild bank books, otherwise nothing, so a realm shutting down
   beside a boot can lose a character's last window. A Hearth trip counts `trip_failed` and
-  the player presses again. It predates housing (the
-  core schema's boot against the storage and ledger saves' G1 and G2 order); 07a adds the
-  Hearth trip's hooked save to the class. Bounded only operationally (boot beside quiet
-  realms, and one realm's shutdown finished before another boots). Owed to the maintainer,
-  both halves: remove the boot's lock upgrade on
-  `characters` (probe the core `characters_account` index the way the housing indexes are
+  the player presses again. It predates housing (the core schema's boot against the storage
+  and ledger saves' G1 and G2 order); 07a adds the Hearth trip's hooked save to the class.
+  Bounded only operationally (boot beside quiet realms, and one realm's shutdown finished
+  before another boots). Owed to the maintainer, both halves: remove the boot's lock upgrade
+  on `characters` (probe the core `characters_account` index the way the housing indexes are
   probed, or take ACCESS EXCLUSIVE on `characters` first), and change the boot's table order
   (which would expose a character INSERT's `characters`-then-`accounts` foreign-key order
   instead).
@@ -1100,22 +1103,25 @@ merge in a `finally`; N4 the server default pin; N5 the log pin; N6 the 15 route
   statement default. The drain ADMITS `FREEHOLD_PERSIST_DRAIN_MAX_ACTIVE_WRITES` plus
   `FREEHOLD_PERSIST_LEAVE_WRITE_RESERVE` for a leave write, but every write first takes a
   background gate permit, so drain writes hold at most the gate's capacity of clients (the
-  pool maximum less `BACKGROUND_DB_MAJOR_PRODUCER_HEADROOM`: seven at the default pool of
-  ten), and one write runs per entry, so one trip's claim row blocks at most one write. The
-  steps after the drain find NO free client only when the clients outside the gate are held
-  too: by blocking trips, login reads, or a statement an earlier drain abandoned. Each has
-  its own bound and none over-runs it, but the claim release and the lease release can then
-  fail their checkout and fall back to expiry: another realm's takeover waits up to the
-  lease TTL rather than getting an immediate release.
-- R-13 (revision 6, the QA): a renew chunk is cut by its OWN wall (its transaction's wall
-  or the pass deadline) on the CLIENT side only; the stop's timeout only bounds how long the
-  stop waits for it. A backend commits only on a COMMIT it received, and a closed socket
-  aborts the transaction at its next read, so only a chunk whose COMMIT was already sent
-  when its wall cut it can still commit after the shutdown release-all passed its locked
-  rows (SKIP LOCKED). Chunks run one at a time and the stop starts no other, which keeps at
-  most one renew chunk of plots (`FREEHOLD_CLAIM_RENEW_CHUNK`) claimed for at most one lease
-  TTL: the crash bound. A chunk that had not reached its statement is cut at its checkout or
-  sends no renewal.
+  pool maximum less `BACKGROUND_DB_MAJOR_PRODUCER_HEADROOM`, and never below one: seven at
+  the default pool of ten; below a pool of four the gate keeps one permit, so the clients
+  outside it shrink to the pool maximum less one), and one write runs per entry, so one
+  trip's claim row blocks at most one write. The steps after the drain find NO free client
+  only when the clients outside the gate are held too: by blocking trips, login reads, or a
+  statement an earlier drain abandoned. Each has its own bound and none over-runs it, but
+  the claim release and the lease release can then fail their checkout and fall back to
+  expiry: another realm's takeover waits up to the lease TTL rather than getting an
+  immediate release.
+- R-13 (revision 6, the QA): a renew chunk is cut by its OWN wall (its transaction's wall or
+  the pass deadline): its socket destroyed, then a best-effort backend cancel through the
+  canceller's own small pool (`server/db_backend_cancel.ts`, never the shared pool); the
+  stop's timeout only bounds how long the stop waits for it. A backend commits only on a
+  COMMIT it received, and a closed socket aborts the transaction at its next read, so only a
+  chunk whose COMMIT was already sent when its wall cut it can still commit after the
+  shutdown release-all passed its locked rows (SKIP LOCKED). Chunks run one at a time and
+  the stop starts no other, which keeps at most one renew chunk of plots
+  (`FREEHOLD_CLAIM_RENEW_CHUNK`) claimed for at most one lease TTL: the crash bound. A chunk
+  that had not reached its statement is cut at its checkout or sends no renewal.
 
 ## 13. The persistence-rollout contract edits this work owes
 

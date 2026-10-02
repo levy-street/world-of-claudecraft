@@ -110,7 +110,9 @@ A server is CAPABLE when all of the following hold.
    `account_freehold_hearth_advance_token_shape` constraint, which a later boot puts back
    `NOT VALID` if the column exists without it), so an ordinary boot takes
    none of the index, trigger or ALTER TABLE locks that would hold another realm's
-   housing statements until its COMMIT. No fragment
+   housing statements until its COMMIT (its one table lock, the token probe's ACCESS
+   SHARE on the Hearth table for the CHECK's deparse, is taken and released at once).
+   No fragment
    references another's table, so their relative order is a convention rather than a
    dependency, and it is fixed as plot, Hearth, claim, operation so the boot-call
    ordering pin in [../../tests/schema_wiring.test.ts](../../tests/schema_wiring.test.ts)
@@ -712,30 +714,31 @@ handoff gates" are signed, this contract included.
 THE FIRST ROLLOUT NEEDS A QUIET WINDOW, even though step 1 is flag-off. On a production
 database, which has never held a housing table, the first capable boot creates FIVE
 foreign-key-bearing tables (`account_freeholds`, `account_freehold_hearth`,
-`freehold_plot_claims`, `freehold_operations`, `freehold_operation_receipts`) plus
-THREE triggers (the two parent-delete guards and the receipt erase) inside the ONE
+`freehold_plot_claims`, `freehold_operations`, `freehold_operation_receipts`) plus THREE
+triggers (the two parent-delete guards and the receipt erase) inside the ONE
 `ensureSchema` transaction, which runs on its dedicated boot client with no
 `lock_timeout`. That DDL needs SHARE ROW EXCLUSIVE on `accounts` and `characters` (a
 later boot that has to repair a trigger takes ACCESS EXCLUSIVE for its DROP TRIGGER),
 but EVERY boot already holds both under ACCESS EXCLUSIVE from the core schema's first
 `ADD COLUMN IF NOT EXISTS` statements to its COMMIT, so the housing DDL adds no wait:
-every boot queues behind every in-flight character save and account write, and every
-one that arrives after it queues behind the boot until that COMMIT. Measured with an old
-realm serving plain saves, the first rollout took about 65 ms, the same as a steady-state
-boot. ANY boot can DEADLOCK on two paths (the touch-set manifest's P12 and R-11): the
-boot's SHARE lock on `characters` upgraded to ACCESS EXCLUSIVE, against a transaction
-that took any lock on `characters` beside it (a save's row lock, or a plain read) and then
-writes it; and the boot's
-`characters`-then-`accounts` order, against a transaction that locks `accounts` first. Every
-effect-carrying or hooked character save (the manifest's G1 then G2, the Hearth trip's save
-included) takes both shapes, and the operation prepare and the character delete take the
-second. With such saves in flight every bench boot was eventually aborted, saves were
-aborted beside it, and a boot that loses exits and is restarted: a hazard of the core
-schema's boot that predates housing
-(`docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md`), to which 07a adds members.
-The first rollout is the one boot that also builds the tables: do it, and any boot beside
-other realms serving those saves, in a quiet window, and never beside a realm that is still
-shutting down (its shutdown flush saves are not written again).
+every boot queues behind every in-flight character save and account write, and every one
+that arrives after it queues behind the boot until that COMMIT. Measured with an old
+realm serving plain saves, the first rollout took about 65 ms, the same as a
+steady-state boot. ANY boot can DEADLOCK on two paths (the touch-set manifest's P12 and
+R-11): the boot's SHARE lock on `characters` upgraded to ACCESS EXCLUSIVE, against a
+transaction that took a lock on `characters` that SHARE does not wait for (a save's row
+lock's ROW SHARE, or a plain read's ACCESS SHARE) and then writes it; and the boot's
+`characters`-then-`accounts` order, against a transaction that locks `accounts` first.
+Every effect-carrying or hooked character save (the manifest's G1 then G2, the Hearth
+trip's save included) takes both shapes, and the operation prepare and the character
+delete take the second. With such saves in flight every bench boot was eventually
+aborted, saves were aborted beside it, and a boot that loses exits and is restarted: a
+hazard of the core schema's boot that predates housing
+(`docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md`), to which 07a adds
+members. The first rollout is the one boot that also builds the tables: do it, and any
+boot beside other realms serving those saves, in a quiet window, and never beside a
+realm that is still shutting down (a shutdown flush save that fails gets one more pass
+only when it carried guild bank books, and otherwise is not written again).
 
 ### The shutdown drain, and why it sits where it sits
 
@@ -762,25 +765,26 @@ again, stops the running one before its next chunk, cuts a chunk still parked at
 checkout, makes one that got its connection send no renewal (only its BEGIN, rolled back),
 and resolves once that pass settles or one chunk's wall
 (`FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs`, 5,000 ms) passes; that timeout bounds only the
-stop's wait, while a chunk is cut by its own wall. So no renewal whose COMMIT was not yet
+stop's wait, while a chunk is cut by its own wall (its socket destroyed, then a
+best-effort backend cancel through the canceller's own pool). So no renewal whose COMMIT was not yet
 sent outlives the release; one whose COMMIT was already sent when its wall cut it client
 side can still land after the release-all passed its rows, which keeps at most one renew
 chunk of plots claimed for at most one lease TTL (the manifest's R-13, the crash bound).
 
 THE SHUTDOWN BUDGET is the whole serial chain in `server/main.ts`, not the housing tail
-alone: after the shutdown save flush (the character, market, mail, rift and housing saves),
-the bounded drains run one after another, the bank ledger's
+alone. Only these awaits in it take a deadline at their call sites: the bank ledger's drain
 (`BANK_LEDGER_SHUTDOWN_DRAIN_MS`, 10,000 ms), the market sold volume's
 (`MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS`, 10,000 ms), the housing drain
 (`FREEHOLD_PERSIST_SHUTDOWN_DRAIN_MS`, 10,000 ms), the unstuck records'
 (`UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS`, 5,000 ms), the Steam and Epic mirror stops (run
-concurrently, 5,000 ms at the call site), the renewer stop (5,000 ms) and the claim release
-(`FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS`, 2,000 ms): 47 s of bounded drains after the save
-flush, inside the game container's 75 s kill grace (`stop_grace_period` in
-`docker-compose.yml`). The sum covers only those: the FIFO drains between them (suspicion
-flags, deeds, relics, progress events, craft rolls, world-quest scores) and the character
-lease release take no deadline at their call sites, and they, the save flush and the
-collector and sweep stops before it spend from the same grace. A new shutdown drain spends from what is left after all of them.
+concurrently, 5,000 ms), the renewer stop (one chunk's wall, 5,000 ms) and the claim release
+(`FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS`, 2,000 ms): 47 s of bounded waits, inside the game
+container's 75 s kill grace (`stop_grace_period` in `docker-compose.yml`). EVERY other await
+in that closure, from the collector and sweep stops before the save flush to `pool.end()` at
+its end, takes no deadline at its call site and spends from the same grace, and `pool.end()`
+also waits for any client a timed-out drain left mid-query. So a new shutdown step spends
+from what is left after all of them, and a new bounded one joins this list in the same
+change.
 
 THE CLAIM RELEASE (07a) sits in the same closure, AFTER `freeholdPersistIdle` and BEFORE
 `releaseAllCharacterLeases`: `releaseAllFreeholdClaims({ pool, holder:

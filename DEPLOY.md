@@ -1068,30 +1068,30 @@ For off-box safety, sync the directory to S3 occasionally:
 - EVERY BOOT LOCKS THE PARENTS: the core schema's `ADD COLUMN IF NOT EXISTS`
   statements take ACCESS EXCLUSIVE on `characters` and then `accounts` even when the
   column exists, and hold both until the boot schema transaction COMMITs (no lock
-  timeout). A boot therefore queues behind every in-flight save and account write,
-  and every later one on every realm queues behind the boot (about 60 ms in the bench
-  with plain saves in flight). A boot can DEADLOCK on two paths: a transaction that
-  holds any lock on `characters` (a row lock's, or a plain read's) and then writes it,
-  against the boot's SHARE lock on `characters` that it upgrades to ACCESS EXCLUSIVE
-  (the core `characters_account` index create, then its first ALTER); and any
-  transaction that holds a lock on `accounts` and then asks for one on `characters`,
-  against the boot's opposite order.
+  timeout). A boot therefore queues behind every in-flight save and account write, and
+  every later one on every realm queues behind the boot (about 60 ms in the bench with
+  plain saves in flight). A boot can DEADLOCK on two paths: a transaction that holds a
+  lock on `characters` the boot's SHARE does not wait for (a plain read's ACCESS
+  SHARE, or a row lock's ROW SHARE) and then writes it, against the boot's SHARE lock
+  on `characters` that it upgrades to ACCESS EXCLUSIVE (the core `characters_account`
+  index create, then its first ALTER); and any transaction that holds a lock on
+  `accounts` and then asks for one on `characters`, against the boot's opposite order.
   Every effect-carrying or hooked character save (storage, bank ledger, the Hearth
   trip) takes both shapes, and the housing operation prepare and the character delete
   take the second. PostgreSQL aborts one side at once or after one or more
   `deadlock_timeout` waits (1 s each). With such saves in flight in the bench, EVERY
-  boot was eventually aborted and saves were aborted beside it: the process exits,
-  the compose policy restarts it, and a restart meets the same race while another
-  realm keeps serving those saves. So boot a realm while the other realms on its
-  database are quiet, and in a rolling restart let one realm finish shutting down
-  before another boots. An aborted save shows as 40P01 in the realm log (one that
-  carried guild bank books also counts `escrow_save_failed`), and what writes it again
-  depends on the save: an autosave is written by the next autosave; a leave save is
-  retried with backoff (`server/leave_character_save.ts`), its guild books reconciled
-  if every attempt fails; a shutdown flush save is retried once only for a character
-  carrying guild bank books, and otherwise not at all. An aborted Hearth trip counts
-  `trip_failed` and is not retried by the server (the player presses the key again). The hazard predates
-  housing; removing both paths is owed
+  boot was eventually aborted and saves were aborted beside it: the process exits, the
+  compose policy restarts it, and a restart meets the same race while another realm
+  keeps serving those saves. So boot a realm while the other realms on its database
+  are quiet, and in a rolling restart let one realm finish shutting down before
+  another boots. An aborted save shows as 40P01 in the realm log (one that carried
+  guild bank books also counts `escrow_save_failed`), and what writes it again depends
+  on the save: an autosave is written by the next autosave; a leave save is retried
+  with backoff (`server/leave_character_save.ts`), its guild books reconciled if every
+  attempt fails; a shutdown flush save is retried once only for a character carrying
+  guild bank books, and otherwise not at all. An aborted Hearth trip counts
+  `trip_failed` and is not retried by the server (the player presses the key again).
+  The hazard predates housing; removing both paths is owed
   (docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md measures it).
 - FIRST ROLLOUT OF THE HOUSING TABLES: the first boot that carries them also creates
   the foreign-key-bearing tables and the delete guards on `accounts` and `characters`
@@ -1120,8 +1120,9 @@ For off-box safety, sync the directory to S3 occasionally:
   they heal by themselves once the clock is back within one cooldown of them, while
   clamping them during a step sets them against the wrong clock: once it is corrected
   their cooldown is shortened or lengthened, and after a backward step of more than one
-  cooldown they are ready at once (a free trip). NEVER repair during a clock step. With the clock correct, a bad row stays bad; repair
-  them in one guarded, idempotent statement, which clamps each to a full cooldown
+  cooldown they are ready at once (a free trip). NEVER repair during a clock step.
+  With the clock correct, a bad row stays bad; repair them in one guarded, idempotent
+  statement, which clamps each to a full cooldown
   from now and so grants no free trip: `UPDATE account_freehold_hearth SET
   ready_at_ms = (EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::bigint + 3600000,
   revision = revision + 1, updated_at = now() WHERE ready_at_ms > (EXTRACT(EPOCH FROM
