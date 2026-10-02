@@ -21,7 +21,7 @@
 //
 // Cost: 0.8 s
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -115,19 +115,6 @@ const STOP_RENEWER_BODY =
   "export async function stopFreeholdClaimRenewer(registry?: FreeholdClaimRegistry): Promise<void> { if (!registry) return; const state = renewers.get(registry); if (!state) { renewers.set(registry, { running: false, cursor: null, stopping: true, stop: new AbortController(), settled: null, }); return; } state.stopping = true; state.stop.abort(); const settled = state.settled; if (!settled) return; const bound = AbortSignal.timeout(FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs); await new Promise<void>((resolve) => { const done = (): void => { bound.removeEventListener('abort', done); resolve(); }; void settled.then(done); bound.addEventListener('abort', done, { once: true }); });";
 const RELEASE_ALL_BODY =
   "export async function releaseAllFreeholdClaims(deps: { readonly pool: FreeholdTxPool; readonly holder: string; readonly registry?: FreeholdClaimRegistry; readonly warn?: (message: string) => void; }): Promise<number> { const deadline = AbortSignal.timeout(FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS); try { const released = await runFreeholdTransaction( deps.pool, { ...FREEHOLD_CLAIM_RENEW_BOUNDS, operation: 'freehold claim release all', wallMs: FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS, }, (tx) => releaseAllFreeholdClaimRows(tx, deps.holder), { signal: deadline }, ); if (deps.registry) { for (const claim of deps.registry.all()) deps.registry.drop(claim.plotId); deps.registry.counters.released += released; } return released; } catch { (deps.warn ?? console.warn)( 'freehold claims were not released at shutdown; they expire after the lease TTL', ); return 0; }";
-/** The words that name a time bound, for the allowlist screen. */
-const DEADLINE_WORDS = new Set(['ms', 'signal', 'deadline', 'timeout']);
-/** Whether an argument text spells a deadline: any digit, or an identifier
- *  word in DEADLINE_WORDS. Identifiers here are camelCase or SCREAMING_SNAKE,
- *  so each splits at its humps and underscores into whole words, in any case
- *  (`heldClaims` is held and claims, never ms). */
-const spellsDeadline = (text: string): boolean =>
-  /\d/.test(text) ||
-  (text.match(/[A-Za-z_$][\w$]*/g) ?? [])
-    .flatMap((id) => id.split('_'))
-    .flatMap((part) => part.match(/[A-Z]+(?![a-z])|[A-Z]?[a-z]+/g) ?? [])
-    .some((word) => DEADLINE_WORDS.has(word.toLowerCase()));
-
 /** server/main.ts with its comments stripped, read once for every case here. */
 let mainSourceCache: string | undefined;
 const mainSource = (): string =>
@@ -1791,38 +1778,25 @@ describe('the claim renewer', () => {
         expect(/^[\w.]+\(\)$/.test(text) || noDeadlineArguments.has(text), text).toBe(true);
       }
     }
-    // The allowlist holds only live, unbounded or callee-bounded entries, and
-    // none of them spells anything a deadline could be.
+    // The allowlist holds only live, unbounded or callee-bounded entries. Each
+    // is an exact call text, read and found to carry no deadline, so a new one
+    // joins only by that review, the boundary this case states. No word list
+    // closes the ways a bound can be spelled (a plural, a unit, an
+    // abbreviation), so none stands in for the review.
     for (const listed of noDeadlineArguments) {
       const entry = closure.find(([text]) => text === listed);
       expect(entry?.[1].kind === 'none' || entry?.[1].kind === 'callee', listed).toBe(true);
-      expect(spellsDeadline(listed), listed).toBe(false);
     }
-    // The screen itself catches each word in each spelling, and passes a
-    // word that only ends in a bound's letters.
-    for (const spelled of [
-      'f(5000)',
-      'f({ signal: s })',
-      'f(ABORT_SIGNAL)',
-      'f(X_MS)',
-      'f(wait_ms)',
-      'f({ waitMs: w })',
-      'f(timeout)',
-      'f(SHUTDOWN_TIMEOUT)',
-      'f(HTTPTimeout)',
-      'f(deadline)',
-      'f(STOP_DEADLINE)',
-    ]) {
-      expect(spellsDeadline(spelled), spelled).toBe(true);
-    }
-    expect(spellsDeadline('f(heldClaims(), forms, SIGNALS_SEEN)')).toBe(false);
     /** The module main.ts imports `name` from, by its own import line. */
     const importedFrom = (name: string): string => {
       const lines = [...main.matchAll(/import\s*\{([^}]*)\}\s*from\s*'\.\/([\w/]+)'/g)].filter(
         (match) => match[1].split(',').some((part) => part.trim() === name),
       );
       expect(lines, name).toHaveLength(1);
-      return `server/${lines[0][2]}.ts`;
+      // A directory barrel is spelled `./dir/index` here, so the path names a file.
+      const path = `server/${lines[0][2]}.ts`;
+      expect(existsSync(path), `${name} is imported from ${path}`).toBe(true);
+      return path;
     };
     /** Whether `source`, the text of `file`, re-exports `name` from `from` in a
      *  named export list, its path resolved from `file`'s own directory. */
@@ -1838,6 +1812,8 @@ describe('the claim renewer', () => {
     const nested = "export { A } from './y';";
     expect(reExportsIn('server/http/x.ts', nested, 'A', 'server/y.ts')).toBe(false);
     expect(reExportsIn('server/http/x.ts', nested, 'A', 'server/http/y.ts')).toBe(true);
+    // A name re-exported is matched whole, never by a longer name holding it.
+    expect(reExportsIn('server/x.ts', "export { AB } from './y';", 'A', 'server/y.ts')).toBe(false);
     /** The members of one `Promise.all([...])` group, a wrapped list's
      *  trailing comma aside. */
     const membersOf = (text: string): string[] =>
@@ -1848,14 +1824,19 @@ describe('the claim renewer', () => {
         .filter(Boolean);
     expect(membersOf('Promise.all([ a(1), b(2), ])')).toEqual(['a(1)', 'b(2)']);
     /** Code with its layout dropped (whitespace collapsed and removed beside
-     *  punctuation, a trailing comma before a closer removed), so a formatter
-     *  reflow is not an edit. */
+     *  punctuation and before a member access, a trailing comma before a closer
+     *  removed), so a formatter reflow is not an edit. A line break that
+     *  changes meaning (a `return` split from its value) never reaches this
+     *  compare: the changed-files format check rewrites it first. */
     const shape = (code: string): string =>
       code
         .replace(/\s+/g, ' ')
         .replace(/\s*([(){}[\],;])\s*/g, '$1')
+        .replace(/\s+(\??\.)(?!\.)/g, '$1')
         .replace(/,([)}\]])/g, '$1');
     expect(shape('f( a, b, ) { x; }')).toBe(shape('f(a,b){x;}'));
+    expect(shape('void settled\n  .then(done);')).toBe(shape('void settled.then(done);'));
+    expect(shape('{ ...x }')).toBe('{...x}');
     // Each bound's value, read from the code that sets it.
     const constantIn = (file: string, name: string): number => {
       const found = stripComments(readFileSync(file, 'utf8')).match(
@@ -1864,8 +1845,13 @@ describe('the claim renewer', () => {
       expect(found, name).not.toBeNull();
       return Number((found as RegExpMatchArray)[1].replaceAll('_', ''));
     };
+    const stripped = new Map<string, string>();
     const bodyOf = (file: string, fn: string) => {
-      const source = stripComments(readFileSync(file, 'utf8'));
+      let source = stripped.get(file);
+      if (source === undefined) {
+        source = stripComments(readFileSync(file, 'utf8'));
+        stripped.set(file, source);
+      }
       const from = source.indexOf(`export async function ${fn}(`);
       expect(from, fn).toBeGreaterThan(-1);
       const to = source.indexOf('\n}\n', from);
@@ -1908,6 +1894,8 @@ describe('the claim renewer', () => {
         expect(text.startsWith(`${bound.fn}(`), bound.fn).toBe(true);
         const via = importedFrom(bound.fn);
         expect(via === bound.file || reExports(via, bound.fn, bound.file), bound.fn).toBe(true);
+        // Named only at its import and its call, so no local shadows it.
+        expect(main.match(new RegExp(`\\b${bound.fn}\\b`, 'g'))?.length, bound.fn).toBe(2);
         expect(shape(bodyOf(bound.file, bound.fn)), bound.fn).toBe(shape(bound.body));
         expect(bound.body).toContain(`AbortSignal.timeout(${bound.name})`);
         counted.push({ name: bound.name, value: bound.value, group: 'callee' });
@@ -1954,12 +1942,35 @@ describe('the claim renewer', () => {
     );
     const stated = [...budget.matchAll(/(?<![\d.])(\d+(?:\.\d+)?) s of bounded waits/g)];
     expect(stated.map((match) => Number(match[1]))).toEqual([totalMs / 1000]);
-    const grace = readFileSync('docker-compose.yml', 'utf8').match(
-      /\n {2}game:\n(?:(?: {4}.*| *#.*)?\n)*? {4}stop_grace_period: (["']?)(\d+)s\1(?: +#.*)?\n/,
-    );
-    expect(grace).not.toBeNull();
-    const graceSeconds = Number((grace as RegExpMatchArray)[2]);
-    expect(totalMs).toBeLessThan(graceSeconds * 1000);
+    /** The game service's kill grace in seconds, or null. Each line inside
+     *  the block takes exactly one shape (indented four or more, or a comment
+     *  indented less), never both, so a failed match stays linear. */
+    const graceOf = (compose: string): number | null => {
+      const found = compose.match(
+        /\n {2}game:\n(?:(?: {4}.*| {0,3}#.*)?\n)*? {4}stop_grace_period: (["']?)(\d+)s\1(?: +#.*)?\n/,
+      );
+      return found ? Number(found[2]) : null;
+    };
+    const service = (grace: string, ...lines: string[]) =>
+      `services:\n  game:\n    image: x\n${lines.join('')}    stop_grace_period: ${grace}\n  bot:\n    stop_grace_period: 15s\n`;
+    expect(graceOf(service('75s'))).toBe(75);
+    expect(graceOf(service('75s', '  # a shallow comment\n', '\n'))).toBe(75);
+    expect(graceOf(service('"75s"'))).toBe(75);
+    expect(graceOf(service("'75s' # why"))).toBe(75);
+    expect(graceOf(service(`"75s'`))).toBeNull();
+    expect(graceOf(service('1m15s'))).toBeNull();
+    expect(
+      graceOf('services:\n  game:\n    image: x\n  bot:\n    stop_grace_period: 15s\n'),
+    ).toBeNull();
+    expect(graceOf('services:\n  game:\n    deploy:\n      stop_grace_period: 75s\n')).toBeNull();
+    // A failing match over many deep comments returns at once: overlapping
+    // line shapes would retry every split of them.
+    const started = performance.now();
+    expect(graceOf(service('1m', ...Array(22).fill('    # a deep comment\n')))).toBeNull();
+    expect(performance.now() - started).toBeLessThan(100);
+    const graceSeconds = graceOf(readFileSync('docker-compose.yml', 'utf8'));
+    expect(graceSeconds).not.toBeNull();
+    expect(totalMs).toBeLessThan(Number(graceSeconds) * 1000);
     expect(
       [...budget.matchAll(/(?<![\d.])(\d+) s kill grace/g)].map((match) => Number(match[1])),
     ).toEqual([graceSeconds]);
