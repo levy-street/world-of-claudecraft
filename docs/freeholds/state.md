@@ -75,6 +75,16 @@ Only what the next session needs. Update at the end of every phase and QA.
 
 ## Current phase
 
+**07a QA, PASS, AWAITING PUSH GO (2026-10-01 TO 10-02).** The paired QA ran sixty rounds of fresh
+readers over the 07a implementation and every fix, until round sixty came back with no blocking and
+no should-fix finding: 2,191 findings, 27 of them blocking, every one of rounds one to fifty-nine
+disposed in [the record](qa/mutation-2026-09-30/qa-findings.md), round sixty's eleven optional
+suggestions owed. The armed gate is green on all 12 steps at `a0a96b047c` (74,634 tests, browser
+550), every pg suite armed (649), the STEP 3 list armed (986). Nothing is pushed: the close stops at
+"PASS, awaiting push go" (D87). Production stays disabled behind `FREEHOLDS_ENABLED`. Detail: [the
+ledger](qa/persistence-2026-09-08/findings.md), 07a QA.
+
+(Superseded 2026-10-02 by the paragraph above: the 07a QA has run.)
 **07a, TRANSACTIONAL MUTATIONS AND GLOBAL CLAIM FENCING, BUILT 2026-09-30 TO 10-01, PUSHED.** Fernando
 ruled both Step 0 questions as recommended ("Light it (Recommended)": the remote Hearth Key is lit on
 a lit realm through the new boundary; "Push after the gate (Recommended)"). Sync `0008427d14`
@@ -715,6 +725,10 @@ was generated in this QA.
 
 ### Current next step
 
+07a's paired QA PASSED (2026-10-02) and awaits Fernando's push go; nothing is pushed. After the
+push: `/home/fernando/Documents/world-of-claudecraft/docs/freeholds/phase-07b-account-lifecycle.md`.
+
+(Superseded 2026-10-02 by the paragraph above.)
 07a is BUILT and pushed (2026-10-01) with its implementation-round review closed. Its paired QA has
 NOT run. Next run, in a fresh session:
 `/home/fernando/Documents/world-of-claudecraft/docs/freeholds/phase-07a-qa.md`.

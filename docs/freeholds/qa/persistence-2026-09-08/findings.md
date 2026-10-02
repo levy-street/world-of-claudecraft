@@ -5529,7 +5529,8 @@ scan, which rounds 41 to 43 settled.
 
 ### OWED, NOT CLAIMED
 
-- The paired QA, `phase-07a-qa.md`: run 2026-10-01, the 07a QA section below.
+- The paired QA, `phase-07a-qa.md`: run 2026-10-01 to 10-02 and closed PASS, the 07a QA section
+  below.
 - The round-39 read's two optional comment tightenings, recorded rather than applied (the
   comment is accurate as written): say "an exclusion that drops any path" above the whole-listing
   count, and say that an exclusion inside the shared `git` wrapper moves both counts and is left
@@ -6087,3 +6088,51 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
     override keys is a maintainer decision (S60R1);
   - three test hardenings: an overlong sample semver rejects (T60R1), table-sample keys out of
     alphabetical order (T60R2), and a byte check on each mutant's restore in the harness (T60R3).
+
+### THE CLOSE, 2026-10-02: PASS, AWAITING PUSH GO
+
+- The verdict is PASS. Sixty rounds of fresh readers (twelve in round one, eight in each after)
+  read the 07a implementation and every fix since, until round sixty came back with no blocking
+  and no should-fix finding. In all, 2,191 findings, 27 of them blocking, the last in round
+  twenty-nine. Every finding of rounds one to fifty-nine is disposed in [the
+  record](../mutation-2026-09-30/qa-findings.md), fixed with its commit or ruled, flagged or owed
+  with its reason; round sixty's eleven optional suggestions are owed above, as the run's rule for
+  a terminal clean read has it.
+- Where a guard kept drawing one more form, the loop replaced it with a whole pin or a stated
+  boundary: section L read whole by digest (round forty-nine), the bot's bundle read by esbuild's
+  own module list (round fifty-one) with its packages held to ws by path (round fifty-four), and
+  every dependency spec that is not a plain version range pinned as written (rounds fifty-eight
+  and fifty-nine).
+- STEP 5:
+  - [x] Every implementation acceptance row has concrete passing evidence: the build's rows in the
+    07a section above (its benches in `workload-evidence.md`, its mutation pass), rerun at the
+    final tip by the STEP 3 list and the armed pg runs below.
+  - [x] All findings were resolved, and a fresh reviewer verified the entire fix round: round
+    sixty's eight fresh readers read round fifty-nine's whole fix round and found nothing blocking
+    or should-fix; its optional suggestions are owed.
+  - [x] Shared gate and mandatory scoped runtime proof passed with exact outcomes: the gate below.
+    No visual surface changed in this QA (tests and records only), so no visual proof applies.
+- The final runs, at `a0a96b047c` (round sixty's record; its code is round fifty-nine's
+  `1b00d9801e`):
+  - `npx tsc --noEmit` exit 0.
+  - The STEP 3 named list armed against PostgreSQL 16.14 on 55433 (`freehold_mutation`,
+    `freehold_persist`, `freehold_db`, `freehold_state`, `architecture`, `monolith_budget`,
+    `api_error_code_parity`, `localization_fixes`, `freehold_mutation.pg`, `freehold_claim.pg`):
+    986 tests in 10 files, 983 passed and 3 skipped (the release-tier rows of
+    `localization_fixes`), the two pg files executed (53 and 25).
+  - Every `*.pg*` file armed: 643 passed in 33 files on 55433 and the growth monitor's 6 on 55432,
+    649 in all, never a skip; `tests/player_metrics_db_integration.test.ts` 8 on 55432.
+  - `npm run ci:changed` exit 0 over 2,091 files, warnings only.
+  - `node scripts/gate_select.mjs` armed through 55433 (the two pg verify databases have distinct
+    names, so one server serves one run): exit 0, all 12 steps green, the planner in full mode
+    (6,213 changed paths against `origin/release/v0.45.0`): 74,634 tests passed, 2 expected fail
+    and 29 skipped in 5,086 files; the browser suite 550 in 67 files; the malware scan 0 high in
+    11,233 files; every build and the typecheck green. The pg suites ran inside it: the 55433
+    server's log holds their statements across the run's window.
+- A reader's command in round fifty-eight loaded the root package's Electron entry by mistake and
+  downloaded Electron into `node_modules/electron` and the user cache; those files were removed
+  and no tracked file changed. Readers from round fifty-nine on were told never to load the root
+  package, install or fetch.
+- Nothing is pushed: `origin/feature/freeholds` stays at `dca9711ab6`, and the QA's commits wait
+  for Fernando's push go. Production stays disabled behind `FREEHOLDS_ENABLED`; every release gate
+  stays unsigned. Next, after the push go: `phase-07b-account-lifecycle.md`.
