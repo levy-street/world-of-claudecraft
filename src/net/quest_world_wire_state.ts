@@ -1,10 +1,18 @@
 import type { TreasureMapRarity } from '../sim/content/treasure_maps';
 import type { FactionId } from '../sim/factions';
 import { freshFactionCurrencies, freshFactionReputation } from '../sim/factions';
+import {
+  type FireAndFlyRecruitment,
+  freshFireAndFlyRecruitment,
+  sanitizeFireAndFlyRecruitment,
+} from '../sim/fire_and_fly_recruitment';
+import type { TurretPlan } from '../sim/minigames/turret_defense_plan';
+import type { TurretSessionView } from '../sim/turret_defense_session';
 import type {
-  CannonActionId,
   CannonPoint,
   QuestProgress,
+  SimEvent,
+  VehicleActionId,
   VehicleSession,
   WeeklyQuestProgress,
   WorldQuestProgress,
@@ -14,6 +22,13 @@ import type { NearbyWorldQuestTrace } from '../sim/world_quest_trace_public';
 import type { HoardBossCueView } from '../world_api/dungeons';
 import { HoardBossCueMirror } from './hoard_boss_cue_mirror';
 import { applyQuestSelfWire } from './quest_snapshot_wire';
+import { TurretFeedbackMirror } from './turret_feedback_mirror';
+import {
+  decodeTurretPlan,
+  decodeTurretSeat,
+  sameTurretSeat,
+  type TurretSeatState,
+} from './turret_session_wire';
 import { decodeVehicleSession } from './vehicle_session_wire';
 import { decodeActiveWorldBossIds } from './world_boss_snapshot_wire';
 import { fetchWorldQuestLeaderboard } from './world_quest_leaderboard_wire';
@@ -21,7 +36,7 @@ import { decodeNearbyWorldQuestTraces } from './world_quest_trace_public_wire';
 
 export type QuestWorldCommand =
   | { cmd: 'vehicle_enter'; station: string }
-  | { cmd: 'vehicle_action'; action: CannonActionId; x: number; z: number }
+  | { cmd: 'vehicle_action'; action: VehicleActionId; x: number; z: number }
   | { cmd: 'vehicle_leave' }
   | { cmd: 'world_quest_puzzle_rotate'; quest: string; tileIndex: number }
   | { cmd: 'world_quest_match3_swap'; quest: string; fromIndex: number; toIndex: number }
@@ -39,6 +54,10 @@ export type QuestWorldCommand =
 /** Cold owner mirrors shared by quest snapshots and world-boss map state. */
 export class QuestWorldWireState {
   vehicleSession: VehicleSession | null = null;
+  /** The `tur` and `turp` keys plus the event-built ring: the same object until one moves. */
+  turretSession: TurretSessionView | null = null;
+  /** The last applied snapshot's tick while seated, else null. */
+  turretClock: number | null = null;
   questLog = new Map<string, QuestProgress>();
   questsDone = new Set<string>();
   worldQuestCycle = '';
@@ -56,10 +75,21 @@ export class QuestWorldWireState {
   clueHunt: Readonly<{ huntId: string; step: number }> | null = null;
   /** The read treasure map mirrored from the `tmap` self key (null when none). */
   treasureMap: Readonly<{ rarity: TreasureMapRarity; siteId: string }> | null = null;
+  /** Fire and Fly's recruitment from the `ffr` self key; locked until the server says otherwise. */
+  fireAndFlyRecruitment: Readonly<FireAndFlyRecruitment> = Object.freeze(
+    freshFireAndFlyRecruitment(),
+  );
   /** Client clock mirror of the authoritative Buried Hoard boss telegraphs;
    *  the host feeds it every routed event (ClientWorld's event loop). */
   protected readonly hoardBossCueMirror = new HoardBossCueMirror(() => performance.now());
   private activeWorldBossIds = new Set<string>();
+  // Lazy like the cue mirror's reads: bare test clients skip field initializers.
+  private turretFeedback?: TurretFeedbackMirror;
+  private turretPlan: TurretPlan | null = null;
+  private turretSeatWire: unknown = null;
+  private turretSeat: TurretSeatState | null = null;
+  /** A leave was sent for a seat this client could not read; cleared once it reads one again. */
+  private turretUnreadableLeft = false;
   private questWorldTransport: ((command: QuestWorldCommand) => void) | null = null;
   private questWorldRestBase = '';
 
@@ -86,19 +116,97 @@ export class QuestWorldWireState {
 
   /** The owner-only quest family plus the world-boss and vehicle mirrors of one self record. */
   applyQuestSelfSnapshot(
-    self: Parameters<typeof applyQuestSelfWire>[1] & { wba?: unknown; vehicle?: unknown },
+    self: Parameters<typeof applyQuestSelfWire>[1] & {
+      wba?: unknown;
+      vehicle?: unknown;
+      tur?: unknown;
+      turp?: unknown;
+      ffr?: unknown;
+    },
     simTime?: unknown,
+    tick?: unknown,
   ): void {
     applyQuestSelfWire(this, self, simTime);
+    if (self.ffr !== undefined)
+      this.fireAndFlyRecruitment = Object.freeze(sanitizeFireAndFlyRecruitment(self.ffr));
     if (self.wba !== undefined) this.applyWorldBossWire(self.wba);
     if (self.vehicle !== undefined) this.vehicleSession = decodeVehicleSession(self.vehicle);
+    this.applyTurretSelfWire(self, tick);
+  }
+
+  /** Every routed event: the hoard telegraph clock and the turret feedback ring. */
+  protected applyQuestWorldEvent(event: SimEvent): void {
+    this.hoardBossCueMirror?.apply(event);
+    if (event.type === 'turretDefense') this.turretRing().apply(event);
+  }
+
+  private turretRing(): TurretFeedbackMirror {
+    this.turretFeedback ??= new TurretFeedbackMirror();
+    return this.turretFeedback;
+  }
+
+  private applyTurretSelfWire(self: { tur?: unknown; turp?: unknown }, tick: unknown): void {
+    const ring = this.turretRing();
+    const planMoved = self.turp !== undefined;
+    const seatMoved = self.tur !== undefined;
+    if (planMoved) this.turretPlan = decodeTurretPlan(self.turp);
+    if (seatMoved) this.turretSeatWire = self.tur;
+    if (planMoved || seatMoved) {
+      const prior = this.turretSeat;
+      this.turretSeat = this.turretPlan
+        ? decodeTurretSeat(this.turretSeatWire, this.turretPlan)
+        : null;
+      // Another seat (a spectator switching targets): its sequence need not go back.
+      if (prior && this.turretSeat && !sameTurretSeat(prior, this.turretSeat)) ring.clear();
+    }
+    const ringMoved = ring.publish();
+    this.leaveUnreadableSeat();
+    if (!this.turretSeat) {
+      ring.clear();
+      this.turretSession = null;
+    } else if (planMoved || seatMoved || ringMoved || !this.turretSession) {
+      this.turretSession = { ...this.turretSeat, feedback: ring.entries };
+    }
+    this.turretClock =
+      this.turretSession && typeof tick === 'number' && Number.isSafeInteger(tick) && tick >= 0
+        ? tick
+        : null;
+  }
+
+  /**
+   * The server holds a seat this client cannot decode (a skewed build, a field out of
+   * bounds): no turret HUD means no Leave, while the seat locks the player in place, so
+   * the client leaves it on the player's behalf, once per unreadable stretch.
+   */
+  private leaveUnreadableSeat(): void {
+    const unreadable = this.turretSeatWire != null && !this.turretSeat;
+    if (!unreadable) {
+      this.turretUnreadableLeft = false;
+      return;
+    }
+    if (this.turretUnreadableLeft) return;
+    this.turretUnreadableLeft = true;
+    console.warn('[turret] the server sent a seat this client cannot read; leaving it');
+    this.leaveVehicle();
+  }
+
+  /** Drops both seats' mirrors (a closed socket, an ended session, a reconnect). */
+  protected clearVehicleMirrors(): void {
+    this.vehicleSession = null;
+    this.turretSession = null;
+    this.turretClock = null;
+    this.turretPlan = null;
+    this.turretSeatWire = null;
+    this.turretSeat = null;
+    this.turretUnreadableLeft = false;
+    this.turretFeedback?.reset();
   }
 
   enterVehicle(stationId: string): void {
     this.sendQuestWorldCommand({ cmd: 'vehicle_enter', station: stationId });
   }
 
-  useVehicleAction(action: CannonActionId, point: CannonPoint): void {
+  useVehicleAction(action: VehicleActionId, point: CannonPoint): void {
     this.sendQuestWorldCommand({ cmd: 'vehicle_action', action, x: point.x, z: point.z });
   }
 
@@ -196,7 +304,7 @@ export class QuestWorldWireState {
   }
 
   resetQuestWorldWireState(): void {
-    this.vehicleSession = null;
+    this.clearVehicleMirrors();
     this.worldQuestCycle = '';
     this.worldQuestExpiresAtMs = 0;
     this.worldQuestTime = 0;
@@ -207,6 +315,7 @@ export class QuestWorldWireState {
     this.weeklyQuestResetAtMs = 0;
     this.clueHunt = null;
     this.treasureMap = null;
+    this.fireAndFlyRecruitment = Object.freeze(freshFireAndFlyRecruitment());
     this.nearbyWorldQuestTraces = [];
     this.activeWorldBossIds = new Set();
   }

@@ -649,8 +649,13 @@ describe('foliage field bark consumers', () => {
     // The Buried Hoard cavern's hero trees (the 2026-09-28 release/v0.44.0 merge
     // into feature/buried-hoards) stand at the field's own scale and share the
     // field's loaded oak_1 and pine_1 sources, so they read the table too rather
-    // than naming a copy.
-    expect(importing.sort()).toEqual(['render/foliage.ts', 'render/hoard_cavern_foliage.ts']);
+    // than naming a copy. The Fire and Fly arena's tree ring draws the field's
+    // own extracted parts (foliage.ts extractParts), keyed by the same table.
+    expect(importing.sort()).toEqual([
+      'render/fire_and_fly_arena.ts',
+      'render/foliage.ts',
+      'render/hoard_cavern_foliage.ts',
+    ]);
   });
 
   it('keeps the Thornhollow dressing and the oakTree prop on the originals', () => {

@@ -324,7 +324,8 @@ describe('world quest content', () => {
       } else if (
         quest.objective.type === 'forging' ||
         quest.objective.type === 'wisp_maze' ||
-        quest.objective.type === 'glider'
+        quest.objective.type === 'glider' ||
+        quest.objective.type === 'turret'
       ) {
         expect(quest.count).toBe(1);
         const instructor = NPCS[quest.objective.instructorNpcId];
@@ -722,19 +723,22 @@ describe('world quest lifecycle', () => {
     expect(nextCycle).toBe('wq1_1');
     expect(nextCycle).not.toBe(firstCycle);
 
+    // 17 a day since Fire and Fly joined the always-active dailies (13 zone
+    // slots, then the maze, the ley puzzle, the slalom and the gunner's trials).
     const firstQuests = activeWorldQuestsForCycle(firstCycle);
     const nextQuests = activeWorldQuestsForCycle(nextCycle);
-    expect(firstQuests).toHaveLength(16);
-    expect(new Set(firstQuests.map((quest) => quest.id)).size).toBe(16);
-    expect(nextQuests).toHaveLength(16);
-    expect(new Set(nextQuests.map((quest) => quest.id)).size).toBe(16);
+    expect(firstQuests).toHaveLength(17);
+    expect(new Set(firstQuests.map((quest) => quest.id)).size).toBe(17);
+    expect(nextQuests).toHaveLength(17);
+    expect(new Set(nextQuests.map((quest) => quest.id)).size).toBe(17);
     expect(nextQuests).not.toEqual(firstQuests);
     expect(activeWorldQuestsForCycle(firstCycle).map((quest) => quest.id)).toEqual(
       firstQuests.map((quest) => quest.id),
     );
 
     for (const zone of WORLD_QUEST_ZONES) {
-      const count = zone === 'galecrest' || zone === 'evergarden' ? 2 : 1;
+      // Evergarden: its rotating slot, the maze and Fire and Fly.
+      const count = zone === 'evergarden' ? 3 : zone === 'galecrest' ? 2 : 1;
       expect(firstQuests.filter((quest) => quest.zoneId === zone)).toHaveLength(count);
       expect(nextQuests.filter((quest) => quest.zoneId === zone)).toHaveLength(count);
     }
@@ -767,8 +771,8 @@ describe('world quest lifecycle', () => {
     for (let cycle = 0; cycle < 84; cycle++) {
       const cycleId = `wq1_${cycle}`;
       const roster = activeWorldQuestsForCycle(cycleId);
-      expect(roster).toHaveLength(16);
-      expect(new Set(roster.map((quest) => quest.id)).size).toBe(16);
+      expect(roster).toHaveLength(17);
+      expect(new Set(roster.map((quest) => quest.id)).size).toBe(17);
       expect(
         roster.filter((quest) => quest.zoneId === 'galecrest').map((quest) => quest.id),
       ).toEqual(['wq_galecrest_wisps', 'wq_galecrest_slalom']);

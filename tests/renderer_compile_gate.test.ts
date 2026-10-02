@@ -430,7 +430,7 @@ describe('Renderer live shader compile rejection recovery', () => {
     );
   });
 
-  it('gates every buildInterior return path, the Wildheart caldera included', () => {
+  it('gates every buildInterior return path, the open fields included', () => {
     // The authored room-graph floors (Last Keep, Dawnhold, the Infernal
     // Citadel) returned early through a bare this.scene.add(group), so those
     // interiors linked their programs on their first visible frame. The
@@ -446,17 +446,38 @@ describe('Renderer live shader compile rejection recovery', () => {
     expect(start).toBeGreaterThan(-1);
     const body = dungeonSource.slice(start, dungeonSource.indexOf('\n  }', start));
     const returns = body.split('return group;').length - 1;
-    const gated = body.split('await attachSceneGroupGated(').length - 1;
+    const gated =
+      body.split('await attachSceneGroupGated(').length -
+      1 +
+      body.split('await attachOpenFieldInterior(').length -
+      1;
     const bareAdds = body.split('this.scene.add(group);').length - 1;
     expect(returns).toBeGreaterThanOrEqual(3);
     expect(bareAdds).toBe(0);
     expect(gated).toBe(returns);
-    const wildheart = body.indexOf("if (interior === 'wildheart')");
-    expect(wildheart).toBeGreaterThan(-1);
-    const wildheartArm = body.slice(wildheart, body.indexOf('return group;', wildheart));
-    expect(wildheartArm).toContain(
-      'await attachSceneGroupGated(this.scene, group, this.compileGate);',
+    // The open fields (the Wildheart caldera, the Fire and Fly arena) build
+    // through open_field_interiors.ts and share one gated arm, whose attach
+    // routes every root through the gate (a stand-in first where the field has
+    // one) and never adds one bare.
+    const openField = body.indexOf('if (openField)');
+    expect(openField).toBeGreaterThan(-1);
+    const openFieldArm = body.slice(openField, body.indexOf('return group;', openField));
+    expect(openFieldArm).toContain(
+      'await attachOpenFieldInterior(this.scene, group, openField, this.compileGate, registry);',
     );
+    const fieldSource = readFileSync(
+      new URL('../src/render/open_field_interiors.ts', import.meta.url),
+      'utf8',
+    );
+    const attach = fieldSource.slice(
+      fieldSource.indexOf('export async function attachOpenFieldInterior('),
+    );
+    expect(attach).not.toMatch(/\.add\(/);
+    expect(attach).toContain('await attachSceneGroupGated(scene, group, compileGate, cancelled);');
+    expect(attach).toContain(
+      'attachSceneGroupGated(scene, group, () => compileGate(standIn), cancelled)',
+    );
+    expect(attach).toContain('attachSceneGroupGated(group, root, compileGate, cancelled)');
   });
 
   it('ignores a rejection after renderer shutdown starts', async () => {

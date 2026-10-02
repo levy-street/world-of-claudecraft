@@ -3,6 +3,7 @@
 
 import { EASTBROOK_LAYOUT } from '../eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from '../fenbridge_layout';
+import { FIRE_AND_FLY_RANKINGS_BOARD_ID } from '../fire_and_fly_scoreboards';
 import { GLIDER_RANKINGS_BOARD_ID } from '../glider_scoreboards';
 import {
   assertCanonicalEastbrookNoticeboardDef,
@@ -159,6 +160,12 @@ export const NOTICEBOARDS: readonly NoticeboardDef[] = Object.freeze([
   hubBoard('wickharbor_noticeboard', 2_000_000_014, GALECREST_ZONE, -5),
   hubBoard('gullhaven_noticeboard', 2_000_000_015, FARSHORE_ZONE, 5),
   townBoard(GLIDER_RANKINGS_BOARD_ID, 2_000_000_016, 201, 560, Math.PI, { x: 201, z: 558.5 }),
+  // Master Gunner Alder's rankings board at the Evergarden gate, facing the road like
+  // him; its reading spot stands within talking range of him.
+  townBoard(FIRE_AND_FLY_RANKINGS_BOARD_ID, 2_000_000_017, 406, 717.5, -Math.PI / 2, {
+    x: 404.5,
+    z: 717.5,
+  }),
 ]);
 
 const fenbridgeMusterBoard = FENBRIDGE_LAYOUT.civic.musterBoard;

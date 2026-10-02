@@ -3,6 +3,7 @@
 // tests/fixes_loot_npcs.test.ts.
 import { describe, expect, it } from 'vitest';
 import { isBlocked, moverHeight, resolvePosition } from '../src/sim/colliders';
+import { FIRE_AND_FLY_DUNGEON_ID } from '../src/sim/content/fire_and_fly_arena';
 import {
   CRYPT_DOOR_POS,
   DUNGEON_LIST,
@@ -740,10 +741,14 @@ describe('dungeon instance placement and targetability', () => {
           (e.objectItemId || e.templateId === 'dungeon_door') &&
           e.pos.x > DUNGEON_X_THRESHOLD,
       );
-      expect(
-        mobs.length + objects.length,
-        `${dungeon.id} spawned no instance encounters`,
-      ).toBeGreaterThan(0);
+      // The Fire and Fly arena's monsters are the turret engine's private actors,
+      // never world entities: the room spawns nothing by design.
+      if (dungeon.id !== FIRE_AND_FLY_DUNGEON_ID) {
+        expect(
+          mobs.length + objects.length,
+          `${dungeon.id} spawned no instance encounters`,
+        ).toBeGreaterThan(0);
+      }
       for (const mob of mobs) {
         expect(mob.hostile, `${dungeon.id} ${mob.name} is not hostile`).toBe(true);
         expect(

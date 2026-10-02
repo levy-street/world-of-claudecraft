@@ -1278,6 +1278,9 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/market_orders.ts'), 'utf8'),
     // Card Duel minigame (Card Master NPC): the queue/match log + error emits.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/social/card_duel.ts'), 'utf8'),
+    // Fire and Fly's instructor refusals (the full arena and the level line are
+    // sim_i18n EXACT rows; the dead, combat, range, water and busy lines are shared).
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/world_quest_fire_and_fly.ts'), 'utf8'),
     // W2: the inventory/vendor command bodies (equip/use/discard + buy/sell/buyback).
     // The "Discarded"/"Equipped"/"Unequipped"/"You sit down to eat|drink"/"You quaff"/
     // "Sold ... for"/"Bought back ... for" emit literals are byte-identical after the

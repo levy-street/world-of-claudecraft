@@ -2,6 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
+import { GP } from '../src/game/gamepad_map';
 import { reticleStickDelta } from '../src/game/pad_ground_aim';
 import {
   padGroundAimCallbacks,
@@ -198,5 +199,32 @@ describe('ground aim lifecycle wiring', () => {
 
     callbacks.onGroundAimSnap(1);
     expect(hud.updateGroundAimPoint).toHaveBeenCalledWith({ x: 10, z: 0 });
+  });
+
+  it("presses the turret's weapon sockets from Y and LB, and nothing else or off the seat", () => {
+    const hud = { ...fakeAimHud(30), pressSlot: vi.fn() };
+    let seated = true;
+    const callbacks = padGroundAimCallbacks({
+      hud,
+      world: () =>
+        ({
+          player: mob(1, 0, 0),
+          playerId: 1,
+          entities: new Map(),
+          turretSession: seated ? {} : null,
+        }) as never,
+      camYaw: () => 0,
+      reticleSpeed: () => 1,
+    });
+    expect(callbacks.onSeatButton(GP.Y)).toBe(true);
+    expect(callbacks.onSeatButton(GP.LB)).toBe(true);
+    expect(hud.pressSlot.mock.calls).toEqual([[0], [1]]);
+    // Confirm and cancel stay with the ground aim (fire, disarm); the rest with the bindings.
+    for (const button of [GP.A, GP.B, GP.X, GP.RB, GP.START]) {
+      expect(callbacks.onSeatButton(button)).toBe(false);
+    }
+    seated = false;
+    expect(callbacks.onSeatButton(GP.Y)).toBe(false);
+    expect(hud.pressSlot).toHaveBeenCalledTimes(2);
   });
 });

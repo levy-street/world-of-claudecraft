@@ -571,6 +571,26 @@ describe('Hud ground aim behavior', () => {
   });
 });
 
+describe('Hud ground aim owner', () => {
+  it('hands the ground aim to the seat for either the cannon or the turret', () => {
+    const hud = makeHud();
+    const seatAim = { isActive: () => true };
+    const seat = hud as unknown as {
+      vehicleBar: { aim: typeof seatAim };
+      sim: { vehicleSession?: unknown; turretSession?: unknown };
+    };
+    seat.vehicleBar = { aim: seatAim };
+    expect(hud.groundAim).toBe(hud.playerGroundAim);
+    seat.sim.turretSession = { waveCount: 6 };
+    expect(hud.groundAim).toBe(seatAim);
+    seat.sim.turretSession = null;
+    seat.sim.vehicleSession = { stationId: 'north_watch_cannon' };
+    expect(hud.groundAim).toBe(seatAim);
+    seat.sim.vehicleSession = null;
+    expect(hud.groundAim).toBe(hud.playerGroundAim);
+  });
+});
+
 describe('Hud ground aim source wiring', () => {
   it('delegates placement projection to the world seam', () => {
     const source = readFileSync(join(process.cwd(), 'src/ui/hud.ts'), 'utf8');

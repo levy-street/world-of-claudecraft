@@ -2442,7 +2442,16 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // itemsDiscovered (+2,889), the hoardGoblinKills counter (+26), and the 32
         // hoard gear reliquary.firstFind rows plus the conquerors_buried_hoards page
         // (+1,761), Blaine's itemization; MEASURED on the 2026-09-28 merged tree.
-        4711,
+        4711 +
+        // Plus 113 for the Fire and Fly arena, a dungeon id like any other in this
+        // maximal fixture's per-dungeon rows: its raid lockout (+35), its normal
+        // and heroic deedStats.dungeonClears (+25, +32) and its heroic daily mark
+        // (+21). MEASURED by stripping those four entries from the settled state.
+        113 +
+        // Plus 32 for Fire and Fly's first-trial deed: exp_gunners_oath in the
+        // deeds row (16 characters of id plus 16 bytes of quoting, colon, date and
+        // comma). MEASURED on the tree that appends it.
+        32,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2484,11 +2493,14 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       knownRecipes: 411,
       // deeds 672 -> 708 and deedStats 5,861 -> 5,979 at the fourth
       // release/v0.44.0 base merge: the ferry deed and its four visit marks
-      // (the +154 above).
-      deeds: 743,
+      // (the +154 above). deeds 743 -> 775 with Fire and Fly's first-trial deed
+      // (the +32 above).
+      deeds: 775,
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
-      deedStats: 9427,
+      // deedStats 9,427 -> 9,484 with the Fire and Fly arena's two dungeonClears
+      // entries (+25, +32 of the +113 above).
+      deedStats: 9484,
       reliquary: 11501,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
@@ -2526,7 +2538,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // ferry deed and its visit marks, which this counterfactual keeps).
       // 226,238 -> 231,729 at the 2026-09-28 Buried Hoards merge (+5,491: the
       // +247 knownRecipes, +533 and +4,711 attributed above, all kept here).
-    ).toBe(231729);
+      // 231,729 -> 231,842 with the Fire and Fly arena's per-dungeon rows (+113,
+      // attributed above, kept here).
+      // 231,842 -> 231,874 with Fire and Fly's first-trial deed (+32, kept here).
+    ).toBe(231874);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2554,7 +2569,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 214,207 -> 227,703 at the second release/v0.44.0 base merge (+13,496).
       // 227,703 -> 227,857 at the fourth release/v0.44.0 base merge (+154).
       // 227,857 -> 233,348 at the 2026-09-28 Buried Hoards merge (+5,491, kept).
-    ).toBe(233348);
+      // 233,348 -> 233,461 with the Fire and Fly arena's per-dungeon rows (+113, kept).
+      // 233,461 -> 233,493 with Fire and Fly's first-trial deed (+32, kept).
+    ).toBe(233493);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2645,8 +2662,18 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // attributed in the growth equation above; no container or ceiling changed
     // shape. Floor at measurement minus 380, edge at measurement plus one:
     // 232980..233361.
-    expect(bytes, reMint).toBeGreaterThan(232980);
-    expect(bytes, reMint).toBeLessThan(233361);
+    // RE-BASED for the Fire and Fly arena: 233,473 bytes, up 113 from 233,360:
+    // the arena is one more dungeon id in the maximal fixture's per-dungeon rows
+    // (raid lockout, normal and heroic dungeonClears, heroic daily mark), all
+    // attributed in the growth equation above; no container or ceiling changed
+    // shape. Floor at measurement minus 380, edge at measurement plus one:
+    // 233093..233474.
+    // RE-BASED for Fire and Fly's first-trial deed: 233,505 bytes, up 32 from
+    // 233,473: exp_gunners_oath in the deeds row, attributed in the growth
+    // equation above; no container or ceiling changed shape. Floor at
+    // measurement minus 380, edge at measurement plus one: 233125..233506.
+    expect(bytes, reMint).toBeGreaterThan(233125);
+    expect(bytes, reMint).toBeLessThan(233506);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

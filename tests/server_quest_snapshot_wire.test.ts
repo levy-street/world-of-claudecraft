@@ -24,6 +24,7 @@ describe('quest snapshot wire', () => {
       worldQuestReplacements: { wq_test: 'wq_other' },
       weeklyQuest: null,
       clueHunt: { huntId: 'hunt_test', step: 2 },
+      fireAndFlyRecruitment: { trialsWon: 2, recruited: false },
     } as unknown as PlayerMeta;
     const sim = {
       worldQuestExpiresAtMs: 1_893_542_400_000,
@@ -43,6 +44,7 @@ describe('quest snapshot wire', () => {
       ['cluh', { huntId: 'hunt_test', step: 2 }],
       // The Buried Hoard treasure map (null until one is read).
       ['tmap', null],
+      ['ffr', meta.fireAndFlyRecruitment],
       ['wqrr', meta.worldQuestRerollCycle],
       ['wqrep', { wq_test: 'wq_other' }],
       ['wkq', null],

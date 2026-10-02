@@ -181,7 +181,9 @@ describe('gamepad dispatch covers every action the controller panel offers', () 
     // never checks it; pin the offer and the dispatch arm directly.
     expect(panel).toContain("{ value: 'escape', label: t('hudChrome.controller.menuAction') }");
     expect(body).toContain("if (id === 'escape') {");
-    expect(body).toContain('if (!hud.closeAll()) hud.toggleOptionsMenu();');
+    expect(body).toContain(
+      'if (!hud.closeAll() && !turretControls.leaveTurretOnEscape(world)) hud.toggleOptionsMenu();',
+    );
   });
 
   it('the rewired actions dispatch to their exact keyboard handlers', () => {

@@ -550,6 +550,61 @@ export const ja_JP: EnTranslations = {
       "shotTiming": "クールダウン：{cooldown}秒。{flight}秒後に着弾。全弾種で{recovery}秒の回復時間を共有する。",
       "shotRules": "印のついた範囲内を狙う。マナ消費なし。ダメージは装備やタレントの影響を受けない。"
     },
+    "turret": {
+      "title": "Fire and Fly",
+      "integrity": "塔の耐久度",
+      "integrityValue": "{value}/{max}",
+      "integrityBelow": "塔の耐久度が {percent} を下回った",
+      "tower": "塔",
+      "wave": "Wave {wave}/{total}",
+      "left": "残りのモンスター：{count}",
+      "firstWave": "最初のウェーブまで {seconds} 秒",
+      "nextWave": "次のウェーブまで {seconds} 秒",
+      "hint": "塔にたどり着く前にモンスターを吹き飛ばせ",
+      "waveBanner": "Wave {wave} of {total}",
+      "finalWave": "最終ウェーブ",
+      "clearedBanner": "ウェーブ {wave} 撃退",
+      "victory": "勝利！",
+      "defeat": "塔が陥落した",
+      "statKills": "撃破数",
+      "statShots": "発射数",
+      "statAccuracy": "命中率",
+      "statThrow": "最長の吹き飛ばし",
+      "statAirtime": "最長の滞空時間",
+      "statYards": "{yards} ヤード",
+      "statSeconds": "{seconds} 秒",
+      "medalGold": "ゴールドメダル",
+      "medalSilver": "シルバーメダル",
+      "medalBronze": "ブロンズメダル",
+      "noMedal": "メダルなし",
+      "endAnnouncement": "{verdict} {medal}",
+      "pointsKills": "撃破（{count}）",
+      "pointsTower": "塔の残り耐久（{points}）",
+      "pointsKegKills": "火薬樽での撃破（{count}）",
+      "pointsBowled": "なぎ倒し（{count}）",
+      "pointsTotal": "合計ポイント",
+      "leave": "塔を降りる",
+      "leaveShort": "降りる",
+      "replay": "もう一度",
+      "replayHint": "塔の上で同じ試練にもう一度挑む。本日の報酬を受け取った後の再挑戦では、報酬は得られない。",
+      "replayHintMission": "塔の上で同じ任務にもう一度挑む。本日の報酬を受け取った後の再挑戦では、報酬は得られない。",
+      "leavingIn": "あと {seconds} 秒で塔を降ります",
+      "recruitedBanner": "入隊！",
+      "recruitedLine": "{name}：「門の砲兵隊へようこそ、砲手。これからは私の任務を任せる。」",
+      "weapons": "塔の兵装",
+      "shockwave": "衝撃波",
+      "shockwaveTip": "塔を叩きつける：輪が塔の壁から {reach} ヤード先まで {seconds} 秒で広がる。輪が届いた地上のモンスターはすべて塔から吹き飛ばされ、溜め中の攻撃は止まる。塔から {core} ヤード以内では {damage} ダメージ、その先では減少する。空中のモンスターは輪を越える。",
+      "shockwaveRules": "使用後 {seconds} 秒で再使用可能。ウェーブ中のみ使える。",
+      "frag": "榴散弾",
+      "fragTip": "装填してから、通常の砲弾と同じく地面に撃つ。狙った地点の上空で {count} 個の子弾に分裂する：1 個は狙った地点に、{outer} 個はその周囲 {radius} ヤードの円に落ちる。各子弾は {blast} ヤード以内に最大 {damage} ダメージを与え、当たったモンスターを吹き飛ばし、火薬樽に火をつける。",
+      "fragRules": "大砲の装填時間を使う。もう一度装填するかキャンセルすると、チャージを消費せずにしまう。ウェーブ中のみ使える。",
+      "chargesLeft": "残りチャージ：{count}",
+      "weaponsHint": "塔にたどり着く前にモンスターを吹き飛ばせ。{shockKey}：衝撃波。{fragKey}：榴散弾。",
+      "weaponsHintTouch": "塔にたどり着く前にモンスターを吹き飛ばせ。ソケットをタップして衝撃波か榴散弾を使う。",
+      "statShockwaves": "衝撃波",
+      "statFrags": "榴散弾",
+      "statUsed": "{used}/{given}"
+    },
     "warlock": {
       "doomLabel": "断罪",
       "fateThreadsLabel": "運命の糸",
@@ -1507,6 +1562,25 @@ export const ja_JP: EnTranslations = {
       "gliderRankings": "滑空コース記録",
       "gliderPersonalRules": "このキャラクターに保存されたオフライン記録です。すべてのリングを順番に通過してください。日別記録は毎日リセットされます。",
       "gliderRules": "全ての輪を通過し、最速で完走した飛行が勝利します。日間記録はサーバーのリセット時に更新されます。記録の反映には最大30秒かかります。",
+      "fireAndFlyDaily": "{trial}：今日",
+      "fireAndFlyLifetime": "{trial}：通算",
+      "fireAndFlyStart": "この試練を受ける",
+      "fireAndFlyRankings": "砲手の記録",
+      "fireAndFlyPersonalRules": "このキャラクターに保存されたオフライン記録です。最も良いメダルが上位となり、次に最高スコアで順位が決まります。日間記録は毎日リセットされます。",
+      "fireAndFlyRules": "最も良いメダルが上位となり、次に最高スコアで順位が決まります。練習を含め、勝利した試練はすべて記録されます。日間記録はサーバーのリセット時に更新されます。記録の反映には最大30秒かかります。",
+      "fireAndFlyGroupsLabel": "砲手の記録の分類",
+      "fireAndFlyGroups": {
+        "trials": "試練",
+        "missions": "任務",
+        "mastery": "熟達"
+      },
+      "fireAndFlyMissionStart": "この任務を受ける",
+      "fireAndFlyMissionRules": "最も良いメダルが上位となり、次に最高スコアで順位が決まります。練習を含め、勝利した任務はすべて記録されます。記録の反映には最大30秒かかります。",
+      "fireAndFlyMissionPersonalRules": "このキャラクターに保存されたオフライン記録です。最も良いメダルが上位となり、次に最高スコアで順位が決まります。",
+      "fireAndFlyMastery": "砲手の熟達",
+      "fireAndFlyMasteryRules": "各任務の最も良いメダルを星に換算して合計します（金3、銀2、銅1）。星の多い順、次に合計スコアで順位が決まります。記録の反映には最大30秒かかります。",
+      "fireAndFlyMasteryPersonalRules": "このキャラクターに保存されたオフラインの熟達です。各任務の最も良いメダルを星に換算して合計し（金3、銀2、銅1）、次に合計スコアで比べます。",
+      "wqStars": "星",
       "wqPoints": "スコア",
       "wqSeconds": "{seconds}秒",
       "wqNoMedal": "なし",
@@ -1534,6 +1608,7 @@ export const ja_JP: EnTranslations = {
         "seconds": "メダル順、次に最速タイム",
         "points": "メダル順、次に最高スコア"
       },
+      "rankedByStars": "星の数順、次に最高スコア",
       "podiumLabel": "トップ3",
       "unclaimed": "空席",
       "totalOne": "1人がランクイン",
@@ -3156,6 +3231,12 @@ export const ja_JP: EnTranslations = {
         "few": "{count} 件のギルドを表示中",
         "many": "{count} 件のギルドを表示中",
         "other": "{count} 件のギルドを表示中"
+      },
+      "fireAndFlyStars": {
+        "one": "星{count}",
+        "few": "星{count}",
+        "many": "星{count}",
+        "other": "星{count}"
       },
       "commissionMasterworks": {
         "one": "傑作{count}点",
@@ -12552,6 +12633,41 @@ export const ja_JP: EnTranslations = {
           "bronze": "銅"
         }
       },
+      "fireAndFly": {
+        "title": "砲手の試練",
+        "objective": "ひとつの試練のすべての波を耐え、自分の塔を守り抜く",
+        "ready": "砲術長アルダーに話しかけて試練を受ける。",
+        "complete": "試練合格！砲術長アルダーに話しかけると練習できます。",
+        "scenarios": {
+          "introduction": "新兵の試練",
+          "standard": "本番の見張り",
+          "hard": "古参兵の試験",
+          "pack": "群れ",
+          "giants": "重い足音",
+          "deluge": "大洪水",
+          "brittle": "ひび割れた塔",
+          "powder": "火薬庫"
+        },
+        "pitch": {
+          "introduction": "新兵の初めての見張り",
+          "standard": "城壁での本物の見張り",
+          "hard": "古参兵が試される包囲戦",
+          "pack": "群れで来る、一発も無駄にするな",
+          "giants": "遠くへは飛ばせない重い巨獣が数体",
+          "deluge": "小さく素早い獣の洪水",
+          "brittle": "数撃で塔が崩れる",
+          "powder": "倍の火薬樽を奴らの通り道に"
+        },
+        "start": "{name}：{detail}（{count}波）",
+        "practice": "{name}を練習する（{count}波）",
+        "practiceMission": "{name}：練習（{count}波）",
+        "sections": {
+          "trials": "試練",
+          "missions": "任務"
+        },
+        "lockedTrial": "{name}：{previous}に合格すると解放",
+        "missionsLocked": "{name}に合格すると入隊し、任務が解放されます。"
+      },
       "calligraphyTitle": "秘術の書道",
       "traceOutline": "足取りで輪郭をなぞる",
       "traceRoundInstruction": "{round}/{total}回目：{shape}。{instruction}",
@@ -20226,6 +20342,11 @@ export const ja_JP: EnTranslations = {
         "title": "ゼファーの弟子",
         "greeting": "峡谷を下る見事な飛行だった。魔法の上昇気流でザ・シアーのゼファーのもとへ戻りたくなったら、いつでも声をかけてくれ。"
       },
+      "fire_and_fly_instructor": {
+        "name": "砲術長アルダー",
+        "title": "砲術隊の募集係",
+        "greeting": "城壁には守備隊が割ける以上の守り手が必要だ。だから募集している。大砲を任せる前に、自分の塔を守り抜けるところを見せてもらおう。試練を受けて、魔物が城壁に届く前に吹き飛ばせ。"
+      },
       "shadow_cloak_scout": {
         "name": "斥候ヴァレリー",
         "title": "隠密作戦",
@@ -23722,6 +23843,11 @@ export const ja_JP: EnTranslations = {
         "name": "ドーンホールド城",
         "enterText": "花の香り漂うドーンホールド城の暖かな広間へ足を踏み入れた。",
         "leaveText": "日差しあふれる庭園の芝生へと戻った。"
+      },
+      "fire_and_fly_arena": {
+        "name": "Fire and Fly",
+        "enterText": "古い砲塔を登った。木々の向こうで、森がざわめき始める。",
+        "leaveText": "塔を降り、闘技場を後にした。"
       },
       "drowned_temple": {
         "name": "溺れし神殿",

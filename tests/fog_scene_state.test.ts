@@ -68,6 +68,9 @@ describe('resolveFogScene (the renderer fog resolution, moved verbatim)', () => 
     expect(resolveFogScene(true, interiorPx('wildheart'), 5, cam, SEED).desired).toBe(
       'wildheartField',
     );
+    expect(resolveFogScene(true, interiorPx('fire_and_fly'), 5, cam, SEED).desired).toBe(
+      'fireAndFly',
+    );
     expect(resolveFogScene(true, interiorPx('lastkeep'), 5, cam, SEED).desired).toBe('lastkeep');
     expect(resolveFogScene(true, interiorPx('dawnhold'), 5, cam, SEED).desired).toBe('dawnhold');
     const approach = resolveFogScene(true, interiorPx('ignivar_approach'), 5, cam, SEED);
@@ -99,6 +102,7 @@ describe('applyFogScenePreset (the renderer fog presets, moved verbatim)', () =>
     ['ignivar', ...raid('ignivar')],
     ['varkhul', ...raid('varkhul')],
     ['wildheartField', 0x8ca786, 105, 430],
+    ['fireAndFly', 0xceb07c, 55, 280],
     ['lastkeep', 0x241610, 30, 150],
     ['dawnhold', 0x3d422a, 40, 190],
     ['delve', 0x0e0705, 14, 74],

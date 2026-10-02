@@ -823,6 +823,25 @@
     font-size: 13px;
     margin: 8px 0 4px;
   }
+  /* An instructor's dialog in sections (Master Gunner Alder's trials and missions): each
+     section opens on the vendor section title's rule, and its start buttons span the
+     dialog and wrap their long labels instead of running past its edge. */
+  #quest-dialog .qd-sub[data-wq-section] {
+    margin: 10px 0 4px;
+    padding-top: 7px;
+    border-top: 1px solid var(--color-border-showcase);
+    font-size: 12px;
+  }
+  #quest-dialog [data-wq-section] ~ button[data-start-wq] {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    height: auto;
+    min-height: var(--btn-h);
+    padding: 6px 14px;
+    white-space: normal;
+    text-align: left;
+  }
   .qd-obj {
     font-size: 12px;
     color: var(--color-text-muted);
@@ -4800,6 +4819,18 @@
     grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: clamp(6px, 1cqw, 16px);
     flex: none;
+  }
+  #world-quest-leaderboard-window .wql-cards:has(> .wql-card:last-child:nth-child(5)) {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  body:not(.mobile-touch) #world-quest-leaderboard-window .wql-cards:has(> .wql-card:only-child) {
+    grid-template-columns: minmax(0, 1fr);
+    width: calc((100% - 5 * clamp(6px, 1cqw, 16px)) / 6);
+    margin-inline: auto;
+  }
+  #world-quest-leaderboard-window .wql-groups {
+    flex: none;
+    margin-bottom: 6px;
   }
   #world-quest-leaderboard-window .wql-card {
     display: grid;

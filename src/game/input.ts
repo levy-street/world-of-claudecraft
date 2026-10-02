@@ -1667,6 +1667,13 @@ export class Input {
     return this.attackMoveEnabled && this.keybinds.codesForAction('attackMove').includes(code);
   }
 
+  /** The held turn keys as a yaw direction (+1 left, -1 right), read even while movement
+   *  is suspended (a seat locks movement, not the view); 0 while a surface owns the keys. */
+  heldTurnAxis(): number {
+    if (this.cb.canUseGameKeys && !this.cb.canUseGameKeys()) return 0;
+    return Number(this.heldAction('turnLeft')) - Number(this.heldAction('turnRight'));
+  }
+
   private heldAction(id: string): boolean {
     // Held movement matches the physical key only: strip any modifier prefix so the
     // bare e.code stored in `this.keys` still matches even if storage holds a stray

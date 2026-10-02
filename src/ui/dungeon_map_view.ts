@@ -5,13 +5,23 @@
 // the authoritative Sim. Position-only instance resolution keeps offline Sim
 // and online ClientWorld mirrors on the same path.
 
+import { FIRE_AND_FLY_DUNGEON_ID } from '../sim/content/fire_and_fly_arena';
 import { MOBS } from '../sim/data';
 import { dungeonInstanceAt } from '../sim/dungeon_floor';
 import { DUNGEON_WALL_HW, type DungeonLayout } from '../sim/dungeon_layout';
+import {
+  FIRE_AND_FLY_FOREST_RADIUS,
+  FIRE_AND_FLY_ROCKS,
+  FIRE_AND_FLY_TOWER,
+  FIRE_AND_FLY_TREES,
+  fireAndFlyTrunkRadius,
+} from '../sim/fire_and_fly_field';
 import { IGNIVAR_GATE_LOCKED_TEMPLATE } from '../sim/ignivar_raid_ids';
+import { horizontalAt, horizontalAtInto } from '../sim/minigames/thrown_body';
 import { authoredWallSegments } from '../sim/rift/authored';
 import { PLAYER_INTEREST_RADIUS } from '../sim/types';
 import type { IWorld } from '../world_api';
+import type { TurretSessionView } from '../world_api/vehicles';
 
 const PLAN_MARGIN_YD = DUNGEON_WALL_HW + 2;
 const MINIMAP_RIM_INSET = 7;
@@ -19,6 +29,49 @@ const NPC_INTEREST_RADIUS = 120;
 
 function hasDedicatedCastleMap(interior: string): boolean {
   return interior === 'lastkeep' || interior === 'dawnhold';
+}
+
+// The Fire and Fly arena has no room plan (the sim frame falls back to the
+// crypt's): its map is the arena itself, a round field closed by the wall, the
+// trunks and rocks as obstacles, the tower as the highlighted centre.
+const FIRE_AND_FLY_MAP_SIDES = 48;
+const FIRE_AND_FLY_MAP_LAYOUT: DungeonLayout = {
+  zMin: -FIRE_AND_FLY_FOREST_RADIUS,
+  zMax: FIRE_AND_FLY_FOREST_RADIUS,
+  sideWallZ: 0,
+  sideWallHd: FIRE_AND_FLY_FOREST_RADIUS,
+  pillars: [],
+  tombs: [],
+  stubs: [],
+  dais: { x: 0, z: 0, r: FIRE_AND_FLY_TOWER.radius },
+  shellPolygon: Array.from({ length: FIRE_AND_FLY_MAP_SIDES }, (_, i) => {
+    const angle = (i / FIRE_AND_FLY_MAP_SIDES) * Math.PI * 2;
+    return {
+      x: Math.cos(angle) * FIRE_AND_FLY_FOREST_RADIUS,
+      z: Math.sin(angle) * FIRE_AND_FLY_FOREST_RADIUS,
+    };
+  }),
+  decor: [
+    ...FIRE_AND_FLY_ROCKS.map((rock, i) => ({
+      key: `rock${i}`,
+      x: rock.x,
+      z: rock.z,
+      yaw: 0,
+      r: rock.radius,
+    })),
+    ...FIRE_AND_FLY_TREES.map((tree, i) => ({
+      key: `tree${i}`,
+      x: tree.x,
+      z: tree.z,
+      yaw: 0,
+      r: fireAndFlyTrunkRadius(tree),
+    })),
+  ],
+};
+
+/** The plan a frame draws: the frame's own layout, or the arena's field. */
+function mapLayoutOf(frame: { dungeonId: string; layout: DungeonLayout }): DungeonLayout {
+  return frame.dungeonId === FIRE_AND_FLY_DUNGEON_ID ? FIRE_AND_FLY_MAP_LAYOUT : frame.layout;
 }
 
 export interface DungeonMapPoint {
@@ -228,7 +281,7 @@ export function dungeonMapLocal(x: number, z: number): DungeonMapLocal | null {
   if (!frame || hasDedicatedCastleMap(frame.interior)) return null;
   return {
     dungeonId: frame.dungeonId,
-    layout: frame.layout,
+    layout: mapLayoutOf(frame),
     originX: frame.ox,
     originZ: frame.oz,
     lx: x - frame.ox,
@@ -240,8 +293,38 @@ export function dungeonMapLocal(x: number, z: number): DungeonMapLocal | null {
  *  coordinates repeat per copy, so a member in another copy of the same dungeon
  *  (or in another dungeon entirely) would otherwise project onto this plan. */
 function sameInstance(local: { originX: number; originZ: number }, x: number, z: number): boolean {
+  return sameInstanceAt(local.originX, local.originZ, x, z);
+}
+
+function sameInstanceAt(originX: number, originZ: number, x: number, z: number): boolean {
   const frame = dungeonInstanceAt(x, z);
-  return frame !== null && frame.ox === local.originX && frame.oz === local.originZ;
+  return frame !== null && frame.ox === originX && frame.oz === originZ;
+}
+
+type TurretMonsterView = TurretSessionView['defense']['monsters'][number];
+
+/**
+ * The local seat's Fire and Fly session when its tower stands in this instance
+ * copy, else null. Its monsters are private to the session, never world
+ * entities, so the plan reads them here and draws them as hostile mobs.
+ */
+function turretSessionIn(
+  world: IWorld,
+  originX: number,
+  originZ: number,
+): TurretSessionView | null {
+  const session = world.turretSession;
+  if (!session || !sameInstanceAt(originX, originZ, session.origin.x, session.origin.z)) {
+    return null;
+  }
+  return session;
+}
+
+/** The mob template a live monster is drawn as; null for a corpse (even one still
+ *  flying) or a monster gone from the field. */
+function turretMobTemplate(session: TurretSessionView, m: TurretMonsterView): string | null {
+  if (!(m.hp > 0) || m.state === 'dead' || m.state === 'gone') return null;
+  return session.defense.plan.kinds[m.kind]?.templateId ?? null;
 }
 
 /** Shared branch guard for the M-map and minimap. */
@@ -296,6 +379,25 @@ function collectMarkers(
       aggro: entity.aggroTargetId === p.id,
       boss: MOBS[entity.templateId]?.boss === true,
     });
+  }
+
+  const turret = turretSessionIn(world, local.originX, local.originZ);
+  const tick = turret ? world.turretClock : null;
+  if (turret && tick !== null) {
+    for (const m of turret.defense.monsters) {
+      const templateId = turretMobTemplate(turret, m);
+      if (!templateId) continue;
+      const at = horizontalAt(m.seg, tick);
+      const point = projection.point(at.x - local.originX, at.z - local.originZ);
+      if (!visible(point)) continue;
+      markers.push({
+        kind: 'mob',
+        ...point,
+        templateId,
+        aggro: m.state === 'windup',
+        boss: MOBS[templateId]?.boss === true,
+      });
+    }
   }
 
   const party = world.partyInfo;
@@ -529,6 +631,8 @@ class DungeonMarkerBuffer {
   readonly markers: DungeonMapMarker[] = [];
   private readonly slots: MutableDungeonMapMarker[] = [];
   private count = 0;
+  /** One arena monster's position, reused across the paint so no point is minted per body. */
+  private readonly monsterAt = { x: 0, z: 0 };
 
   private next(kind: DungeonMapMarker['kind'], cx: number, cy: number): MutableDungeonMapMarker {
     let slot = this.slots[this.count];
@@ -616,6 +720,27 @@ class DungeonMarkerBuffer {
       marker.boss = MOBS[entity.templateId]?.boss === true;
     }
 
+    const turret = turretSessionIn(world, frame.ox, frame.oz);
+    const tick = turret ? world.turretClock : null;
+    if (turret && tick !== null) {
+      for (const m of turret.defense.monsters) {
+        const templateId = turretMobTemplate(turret, m);
+        if (!templateId) continue;
+        const at = horizontalAtInto(m.seg, tick, this.monsterAt);
+        const cx = baseX - (at.x - frame.ox) * scale;
+        const cy = baseY - (at.z - frame.oz) * scale;
+        if (circular) {
+          const dx = cx - half;
+          const dy = cy - half;
+          if (dx * dx + dy * dy > rim2) continue;
+        } else if (cx < 0 || cx > canvasSize || cy < 0 || cy > canvasSize) continue;
+        const marker = this.next('mob', cx, cy);
+        marker.templateId = templateId;
+        marker.aggro = m.state === 'windup';
+        marker.boss = MOBS[templateId]?.boss === true;
+      }
+    }
+
     const party = world.partyInfo;
     if (party) {
       for (const member of party.members) {
@@ -664,12 +789,9 @@ export class DungeonMapViewCore {
     const player = world.player;
     const frame = dungeonInstanceAt(player.pos.x, player.pos.z);
     if (!frame || hasDedicatedCastleMap(frame.interior)) return null;
-    const plan = planFor(frame.layout);
-    if (
-      !this.minimapModel ||
-      this.minimapLayout !== frame.layout ||
-      this.minimapScale !== pxPerYard
-    ) {
+    const layout = mapLayoutOf(frame);
+    const plan = planFor(layout);
+    if (!this.minimapModel || this.minimapLayout !== layout || this.minimapScale !== pxPerYard) {
       const cold = buildDungeonMinimapPaintModel(world, canvasSize, pxPerYard);
       if (!cold) return null;
       if (!this.minimapModel) {
@@ -683,7 +805,7 @@ export class DungeonMapViewCore {
       } else {
         this.minimapModel.staticGeometry = cold.staticGeometry;
       }
-      this.minimapLayout = frame.layout;
+      this.minimapLayout = layout;
       this.minimapScale = pxPerYard;
     }
 
@@ -716,10 +838,11 @@ export class DungeonMapViewCore {
     const at = anchor ?? world.player.pos;
     const frame = dungeonInstanceAt(at.x, at.z);
     if (!frame || hasDedicatedCastleMap(frame.interior)) return null;
-    const plan = planFor(frame.layout);
+    const layout = mapLayoutOf(frame);
+    const plan = planFor(layout);
     if (
       !this.worldModel ||
-      this.worldLayout !== frame.layout ||
+      this.worldLayout !== layout ||
       this.worldSize !== canvasSize ||
       this.worldPad !== pad
     ) {
@@ -739,7 +862,7 @@ export class DungeonMapViewCore {
         this.worldModel.dais = cold.dais;
         this.worldModel.staticGeometry = cold.staticGeometry;
       }
-      this.worldLayout = frame.layout;
+      this.worldLayout = layout;
       this.worldSize = canvasSize;
       this.worldPad = pad;
     }

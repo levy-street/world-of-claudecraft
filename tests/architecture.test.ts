@@ -87,6 +87,9 @@ function stripComments(src: string): string {
 // precedent: src/sim/guild_bank.ts GUILD_RANKS pinned by tests/guild_bank.test.ts).
 function forbiddenImport(spec: string): string | null {
   if (spec === 'three' || spec.startsWith('three/')) return 'three';
+  // Host entropy (the server's private salt) is handed in through SimConfig; a sim
+  // file that reached the OS random source would break replay and host-only secrets.
+  if (/^(?:node:)?crypto$/.test(spec)) return 'crypto';
   // The trailing slash is not required: `../server` and `../../server.js` are
   // the same ban, and the slash-only form let both through. A layer name must
   // therefore END the specifier, take a `/` (a file inside it), or take a `.js`
@@ -145,6 +148,8 @@ const DOM_GLOBAL_RE = /\b(document|window|navigator|localStorage|sessionStorage)
 const DOM_GLOBAL_VALUE_RE =
   /\btypeof\s+(?:document|window|navigator|localStorage|sessionStorage)\b|\binstanceof\s+(?:Document|Window|Navigator|Storage)\b|(?:[=(]|\breturn\b)\s*(?:document|window|navigator|localStorage|sessionStorage)\s*[),;]/;
 const NONDETERMINISM_RE = /\b(Math\.random|Date\.now|performance\.now)\b/;
+const SIM_HOST_ENTROPY_RE =
+  /\b(?:randomBytes|randomUUID|getRandomValues|randomInt|randomFill|randomFillSync|webcrypto)\b/;
 
 const simFiles = walk(simRoot);
 
@@ -248,6 +253,14 @@ const UI_PURE_CORES = [
   'src/ui/hud/vehicle/glider_action_bar_view.ts',
   'src/ui/hud/vehicle/cannon_feedback_core.ts',
   'src/ui/hud/vehicle/cannon_tactics_view.ts',
+  'src/ui/hud/vehicle/turret_aim_core.ts',
+  'src/ui/hud/vehicle/turret_hud_view.ts',
+  'src/ui/hud/vehicle/turret_feedback_reader_core.ts',
+  'src/ui/hud/vehicle/turret_damage_numbers_core.ts',
+  'src/ui/hud/vehicle/turret_hit_feedback_core.ts',
+  'src/ui/hud/vehicle/turret_recruitment_core.ts',
+  'src/ui/hud/vehicle/turret_own_shot_core.ts',
+  'src/ui/hud/vehicle/turret_weapon_bar_view.ts',
   'src/ui/map_entity_disclosure_core.ts',
   'src/ui/map_navigation_landmarks_core.ts',
   'src/ui/map_marker_profile_core.ts',
@@ -284,6 +297,9 @@ const UI_PURE_CORES = [
   'src/ui/world_quest_shadow_view.ts',
   'src/ui/world_quest_investigation_view.ts',
   'src/ui/world_quest_glider_view.ts',
+  'src/ui/world_quest_fire_and_fly_view.ts',
+  'src/ui/fire_and_fly_trial_view.ts',
+  'src/ui/world_quest_marker_anchor.ts',
   'src/ui/world_quest_puzzle_view.ts',
   'src/ui/world_quest_match3_view.ts',
   'src/ui/world_quest_confection_view.ts',
@@ -939,6 +955,19 @@ const RENDER_PURE_CORES = [
   'src/render/program_variant_settle_core.ts',
   'src/render/camera_director_core.ts',
   'src/render/vehicle_camera_core.ts',
+  'src/render/turret_monster_pose_core.ts',
+  'src/render/turret_defense_pool_core.ts',
+  'src/render/cannon_shell_core.ts',
+  'src/render/cannon_puff_core.ts',
+  'src/render/cannon_puff_burst_core.ts',
+  'src/render/cannon_frag_core.ts',
+  'src/render/cannon_ground_mark_core.ts',
+  'src/render/turret_shockwave_core.ts',
+  'src/render/turret_motion_forecast_core.ts',
+  'src/render/turret_contact_dust_core.ts',
+  'src/render/turret_ground_marker_core.ts',
+  'src/render/turret_tower_core.ts',
+  'src/render/turret_barrel_core.ts',
   'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
   'src/render/character_effects_core.ts',
@@ -959,6 +988,8 @@ const RENDER_PURE_CORES = [
   'src/render/weapon_vfx_shed_core.ts',
   'src/render/draw_stats_core.ts',
   'src/render/farm_patches_core.ts',
+  'src/render/fire_and_fly_arena_core.ts',
+  'src/render/fire_and_fly_arena_intent_core.ts',
   'src/render/fishing_bobber_core.ts',
   'src/render/flower_meadows_core.ts',
   'src/render/foliage_core.ts',
@@ -1149,6 +1180,7 @@ const BARE_NAMED = [
   'src/ui/duration_text.ts',
   'src/ui/realm_builder_name.ts',
   'src/ui/woc_market_reason_text.ts',
+  'src/ui/world_quest_marker_anchor.ts',
   'src/render/foliage_lod.ts',
   'src/render/frame_present.ts',
   'src/render/self_motion_rift_lift.ts',
@@ -1282,6 +1314,8 @@ describe('src/sim architecture invariants', () => {
       '../game/input',
       'three',
       'three/examples/jsm/x',
+      'crypto',
+      'node:crypto',
     ]) {
       expect(forbiddenImport(spec), spec).not.toBeNull();
     }
@@ -1295,6 +1329,7 @@ describe('src/sim architecture invariants', () => {
       'node:assert',
       './my_server_helper',
       './renderer_notes',
+      './crypto_notes',
     ]) {
       expect(forbiddenImport(spec), spec).toBeNull();
     }
@@ -1314,6 +1349,35 @@ describe('src/sim architecture invariants', () => {
       violations,
       `all sim randomness/time goes through Rng (src/sim/rng.ts) and the sim clock:\n${violations.join('\n')}`,
     ).toEqual([]);
+  });
+
+  it('reaches no host entropy source (a host secret arrives through SimConfig)', () => {
+    const violations = scanLines(simFiles, SIM_HOST_ENTROPY_RE);
+    expect(
+      violations,
+      `src/sim never draws OS entropy; the host passes it in (SimConfig.privateSalt):\n${violations.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it('SIM_HOST_ENTROPY_RE matches OS entropy calls and rejects deterministic lookalikes', () => {
+    for (const positive of [
+      'randomBytes(8)',
+      'crypto.getRandomValues(buf)',
+      'crypto.randomUUID()',
+      'globalThis.crypto.randomUUID()',
+      'webcrypto.getRandomValues(a)',
+      'randomInt(6)',
+    ]) {
+      expect(SIM_HOST_ENTROPY_RE.test(positive), positive).toBe(true);
+    }
+    for (const negative of [
+      'rng.next()',
+      'rng.int(1, 6)',
+      'randomBearing(x)',
+      'turretDraw(s, 1, 2)',
+    ]) {
+      expect(SIM_HOST_ENTROPY_RE.test(negative), negative).toBe(false);
+    }
   });
 });
 
@@ -2323,6 +2387,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/woc_market_reason_text.ts',
   'src/ui/woc_market_sales_html.ts',
   'src/ui/woc_tokens_text.ts',
+  'src/ui/world_quest_marker_anchor.ts',
   'src/ui/xp_bar.ts',
 ];
 
@@ -2663,6 +2728,9 @@ const UI_DOM_MODULES = [
   'src/ui/hud/treasure/treasure_map_window.ts',
   'src/ui/hud/vehicle/shadow_action_bar_controller.ts',
   'src/ui/hud/vehicle/forge_action_bar_controller.ts',
+  'src/ui/hud/vehicle/turret_hud_controller.ts',
+  // Reads the OS reduced-motion query and the in-game Reduce Motion body class.
+  'src/ui/hud/vehicle/reduced_motion_probe.ts',
   'src/ui/account_portal_dom.ts',
   'src/ui/appearance_customizer.ts',
   // Owns browser state on purpose: it mints the reticle tick ring's root and

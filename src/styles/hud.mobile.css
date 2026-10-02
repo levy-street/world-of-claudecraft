@@ -87,6 +87,120 @@
     min-height: 20px;
     height: 20px;
   }
+  /* The Fire and Fly seat on touch: the strip in the touch scoreboard seat between the
+     Chat trio and the minimap, Leave at the 40px touch floor with no keycap (no Escape
+     key here); the result card below the touch banner lane so the verdict banner never
+     covers it; the rail between the joystick and the menu cluster, on the hidden player
+     frame's seat. */
+  body.mobile-touch #turret-hud {
+    top: max(4px, env(safe-area-inset-top));
+    min-width: min(300px, calc(100% - 24px));
+    min-height: 44px;
+    padding: 2px 2px 2px 10px;
+    column-gap: 8px;
+    font-size: 12px;
+  }
+  body.mobile-touch .turret-leave {
+    min-width: 40px;
+    height: 40px;
+    padding: 0 10px;
+  }
+  body.mobile-touch .turret-leave .ui-keycap {
+    display: none;
+  }
+  body.mobile-touch .turret-replay {
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+  }
+  body.mobile-touch #turret-hud.ended {
+    top: calc(18% + 44px);
+    row-gap: 8px;
+    min-width: min(400px, calc(100% - 24px));
+    padding: 8px 12px 10px;
+  }
+  body.mobile-touch .turret-card-verdict {
+    font-size: 20px;
+  }
+  body.mobile-touch .turret-card-stats .ui-stat-row {
+    font-size: 12px;
+  }
+  /* A phone on its side: the card under the touch banner lane would run past the tower
+     rail, Replay and Leave sliding under it, so the medal shares the verdict's line
+     (wrapping under it when a long verdict needs the width) and the rows tighten. The
+     card's top follows the height but its rows do not, so under about 345px (a small
+     phone, or a landscape URL bar) it still reaches the rail: the rail steps aside once
+     the run is over, its integrity already on the card's Tower row. The width is capped
+     because a wrapping row's natural width is all its items on one line, which would
+     stretch the card over the minimap's compass. */
+  @media (max-height: 480px) {
+    body.mobile-touch #turret-hud.ended {
+      max-width: min(400px, calc(100% - 24px));
+      row-gap: 6px;
+      padding: 6px 12px 8px;
+    }
+    body.mobile-touch #turret-hud.ended .turret-card {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 3px 12px;
+    }
+    body.mobile-touch
+      #turret-hud.ended
+      .turret-card
+      > :not(.turret-card-verdict, .turret-card-medal) {
+      flex-basis: 100%;
+    }
+    body.mobile-touch #turret-hud.ended .turret-card-verdict {
+      font-size: 17px;
+      line-height: 20px;
+    }
+    body.mobile-touch #turret-hud.ended .turret-card-medal {
+      font-size: 14px;
+    }
+    body.mobile-touch #turret-hud.ended .turret-card-stats {
+      --stat-row-h: 14px;
+    }
+    body.mobile-touch #turret-hud.ended .turret-card-stats .ui-stat-row {
+      line-height: 14px;
+    }
+    body.mobile-touch #turret-hud.ended .turret-card-leaving {
+      font-size: 11px;
+      line-height: 13px;
+    }
+    body.mobile-touch #turret-hud.ended ~ #turret-rail {
+      display: none;
+    }
+  }
+  body.mobile-touch #turret-rail {
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: clamp(160px, calc(100% - 340px), 300px);
+  }
+  body.mobile-touch .turret-rail-bevel {
+    height: 14px;
+  }
+  /* The tower moves nothing, so its weapon sockets take the move stick's corner (the same
+     anchor as #mobile-move-zone, mirrored for the left-handed layout) at the 48px touch
+     size, with no keycap (touch has no keys); the idle stick steps aside. */
+  body.mobile-touch.manning-turret :is(#mobile-move-zone, #mobile-move-joystick) {
+    display: none;
+  }
+  body.mobile-touch #turret-weapons {
+    left: max(18px, env(safe-area-inset-left));
+    bottom: calc(26px + env(safe-area-inset-bottom));
+    transform: none;
+  }
+  body.mobile-touch.mobile-left-handed #turret-weapons {
+    left: auto;
+    right: max(18px, env(safe-area-inset-right));
+  }
+  body.mobile-touch #turret-weapons .turret-weapon {
+    --ui-socket-size: 48px;
+  }
+  body.mobile-touch #turret-weapons .keybind {
+    display: none;
+  }
   body.mobile-touch .shadow-action-bar .vehicle-bar-hint {
     grid-column: 1 / -1;
   }
@@ -8181,6 +8295,39 @@
   body.mobile-touch #quest-log-window .ql-empty {
     font-size: 16px;
   }
+  /* A phone on its side: an instructor's sections sit side by side (the first section,
+     Alder's trials, on the left, the next one, his missions, on the right) on a sheet that
+     takes the full height, so the first mission shows without scrolling. The open dialog's
+     inline display (the controller writes block) is the one the grid replaces. */
+  @media (max-height: 480px) {
+    body.mobile-touch #quest-dialog[style*="display: block"]:has(> [data-wq-section]) {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-auto-flow: row dense;
+      align-content: start;
+      column-gap: 12px;
+      max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 24px);
+    }
+    body.mobile-touch #quest-dialog:has(> [data-wq-section]) > * {
+      grid-column: 1 / -1;
+    }
+    body.mobile-touch #quest-dialog > [data-wq-section],
+    body.mobile-touch #quest-dialog > [data-wq-section] ~ * {
+      grid-column: 1;
+    }
+    body.mobile-touch #quest-dialog > [data-wq-section] ~ [data-wq-section],
+    body.mobile-touch #quest-dialog > [data-wq-section] ~ [data-wq-section] ~ * {
+      grid-column: 2;
+    }
+    body.mobile-touch #quest-dialog .qd-sub[data-wq-section] {
+      margin: 6px 0 2px;
+      padding-top: 5px;
+    }
+    body.mobile-touch #quest-dialog [data-wq-section] ~ button[data-start-wq] {
+      padding: 4px 10px;
+      font-size: 14px;
+    }
+  }
   /* height: auto is what keeps the row unbounded here: the components-layer
      rule caps it at `calc(100% - var(--win-head-h))`, which on the sheet would
      clip the columns instead of letting the sheet scroll them (see the
@@ -8504,8 +8651,11 @@
     overscroll-behavior-x: contain;
     padding-bottom: 2px;
   }
+  /* The cards share the strip's width before it scrolls, and a name wraps to a second
+     line rather than truncating. */
   body.mobile-touch #world-quest-leaderboard-window .wql-card {
-    flex: 0 0 132px;
+    flex: 1 1 0;
+    min-width: 104px;
     gap: 2px;
     padding: 4px;
   }
@@ -8516,13 +8666,17 @@
   body.mobile-touch #world-quest-leaderboard-window .wql-card-name {
     font-size: 11px;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow-wrap: normal;
   }
   body.mobile-touch #world-quest-leaderboard-window .wql-card-metric {
     display: none;
   }
   body.mobile-touch #world-quest-leaderboard-window .wql-card,
+  body.mobile-touch #world-quest-leaderboard-window .wql-group,
   body.mobile-touch #world-quest-leaderboard-window .wql-page-btn {
     min-height: 40px;
     box-sizing: border-box;

@@ -1,10 +1,22 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { FIRE_AND_FLY_DUNGEON_ID } from '../src/sim/content/fire_and_fly_arena';
+import {
+  TURRET_SCENARIO_HARD,
+  TURRET_SCENARIO_INTRODUCTION,
+  TURRET_SCENARIO_STANDARD,
+} from '../src/sim/content/fire_and_fly_scenarios';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import { IGNIVAR_MOLTEN_ASSEMBLY_ID } from '../src/sim/ignivar_raid_ids';
+import { createTurretDefense } from '../src/sim/minigames/turret_defense';
+import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
+import { turretSessionView } from '../src/sim/turret_defense_session';
+import type { TurretScenarioDef } from '../src/sim/types';
 import { DungeonMapPainter } from '../src/ui/dungeon_map_painter';
 import { dungeonDisplayName } from '../src/ui/entity_i18n';
-import type { PainterHostWriters } from '../src/ui/painter_host';
+import { setLanguage } from '../src/ui/i18n';
+import { makeWriterFacet, type PainterHostWriters } from '../src/ui/painter_host';
 import type { IWorld } from '../src/world_api';
+import type { TurretSessionView } from '../src/world_api/vehicles';
 
 class RecordingContext {
   fillStyle = '';
@@ -41,6 +53,18 @@ class RecordingContext {
   fillText(text: string): void {
     this.texts.push(text);
   }
+}
+
+function seatView(scenario: TurretScenarioDef): TurretSessionView {
+  return turretSessionView({
+    kind: 'turret',
+    origin: { x: 0, y: 0, z: 0 },
+    defense: createTurretDefense(resolveTurretPlan(scenario), { x: 0, z: 0 }, 9, 100),
+    priorMountKey: '',
+    returnTo: { x: 0, y: 0, z: 0, facing: 0 },
+    feedback: [],
+    nextFeedbackSeq: 1,
+  });
 }
 
 function worldIn(dungeonId: string): IWorld {
@@ -115,4 +139,65 @@ describe('DungeonMapPainter', () => {
       expect(createdContexts.length).toBeGreaterThan(0);
     },
   );
+
+  describe('in the Fire and Fly arena', () => {
+    function arenaRig() {
+      setLanguage('en');
+      const writes = vi.fn();
+      const writers = makeWriterFacet(
+        new Map(),
+        new WeakMap(),
+        new WeakMap(),
+        new WeakMap(),
+        writes,
+        () => {},
+      );
+      const painter = new DungeonMapPainter(writers, (cls) => `class:${cls}`);
+      const label = { textContent: '' } as HTMLElement;
+      const world = worldIn(FIRE_AND_FLY_DUNGEON_ID) as IWorld & {
+        turretSession: TurretSessionView | null;
+      };
+      const paint = () =>
+        painter.paintMinimap(
+          new RecordingContext() as unknown as CanvasRenderingContext2D,
+          world,
+          label,
+          162,
+          1,
+        );
+      return { writes, label, world, paint };
+    }
+
+    it.each([
+      [TURRET_SCENARIO_INTRODUCTION, "Recruit's Trial"],
+      [TURRET_SCENARIO_STANDARD, 'Standing Watch'],
+      [TURRET_SCENARIO_HARD, "Veterans' Test"],
+    ] as const)("labels the minimap with the %# seat's trial", (scenario, name) => {
+      const { label, world, paint } = arenaRig();
+      world.turretSession = seatView(scenario);
+      paint();
+      expect(label.textContent).toBe(name);
+    });
+
+    it('keeps the arena name outside a session, and writes the label only on change', () => {
+      const { writes, label, world, paint } = arenaRig();
+      world.turretSession = null;
+      paint();
+      expect(label.textContent).toBe(dungeonDisplayName(FIRE_AND_FLY_DUNGEON_ID));
+      expect(writes).toHaveBeenCalledTimes(1);
+      writes.mockClear();
+      for (let i = 0; i < 5; i++) paint();
+      expect(writes).not.toHaveBeenCalled();
+      world.turretSession = seatView(TURRET_SCENARIO_HARD);
+      paint();
+      paint();
+      expect(label.textContent).toBe("Veterans' Test");
+      expect(writes).toHaveBeenCalledTimes(1);
+      writes.mockClear();
+      world.turretSession = null;
+      paint();
+      expect(label.textContent).toBe('Fire and Fly');
+      expect(writes).toHaveBeenCalledTimes(1);
+    });
+  });
 });

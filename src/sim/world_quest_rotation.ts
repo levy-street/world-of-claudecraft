@@ -29,7 +29,7 @@ export const WORLD_QUESTS_BY_ZONE: Readonly<Record<string, readonly string[]>> =
   // Round 2 (2026-09): the zone hunts (content/world_quest_zone_hunts.ts) are
   // APPENDED to each pool so the earlier entries keep their day index. A pool's
   // ROTATING entries (the ALWAYS_ACTIVE ids below are filtered out first, so
-  // Evergarden rotates four of its five and Galecrest none) form its cycle
+  // Evergarden rotates four of its six and Galecrest none) form its cycle
   // (index = day mod count); rotating counts are 1, 4 or 7 only:
   // each divides the 84-day roster period, and the legacy three-day cycle ids
   // (wq3_N = day 3N) still reach every entry, which 3 or 6 would not. Palmreach
@@ -117,6 +117,7 @@ export const WORLD_QUESTS_BY_ZONE: Readonly<Record<string, readonly string[]>> =
     'wq_evergarden_wolves',
     'wq_evergarden_gnomes',
     'wq_evergarden_stags',
+    'wq_evergarden_fire_and_fly',
   ]),
   galecrest: Object.freeze(['wq_galecrest_wisps', 'wq_galecrest_slalom']),
   farshore_isle: Object.freeze([
@@ -132,6 +133,7 @@ export const ALWAYS_ACTIVE_WORLD_QUEST_IDS: readonly string[] = Object.freeze([
   'wq_evergarden_wisp_maze',
   'wq_galecrest_wisps',
   'wq_galecrest_slalom',
+  'wq_evergarden_fire_and_fly',
 ]);
 
 export const WORLD_QUESTS_PER_ROTATION =

@@ -6004,6 +6004,13 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "exploration",
     "renown": 5,
     "feat": false
+  },
+  {
+    "id": "exp_gunners_oath",
+    "name": "The Gunner's Oath",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
   }
 ];
 

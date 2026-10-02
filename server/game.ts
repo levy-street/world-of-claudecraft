@@ -651,7 +651,7 @@ export const SELF_WIRE_PHASES = [
   'delve',
   'prof', // prof, cprof, mst
   'corder',
-  'craft', // enchant outcomes, town focus, gathering, tool slots, mounts, renown, title
+  'craft', // enchant, town focus, gathering, tool slots, mounts, renown, title, vehicle, turret
   'heavy', // the wireRev-gated heavy block
   'assemble', // the final base-JSON + extras splice (multi-KB copy on a heavy payload)
 ].map((n) => `self.${n}`);
@@ -8769,7 +8769,7 @@ export class GameServer {
     // Durable riding, the mount lesson and race, the world-quest vehicle
     // session, the Book of Deeds cosmetics and played time: one leaf
     // (quest_snapshot_wire.ts) owns the per-field rules.
-    questSnap.emitActivitySelfKeys(maybe, this.sim, meta, anchorSession.pid);
+    questSnap.emitActivitySelfKeys(maybe, this.sim, meta, anchorSession.pid, maybeRaw);
     selfLap?.('self.craft');
     // Heavy, rarely-changing fields: building + stringifying these every tick for
     // every player is the dominant avoidable broadcast cost. Skip them unless a

@@ -114,6 +114,83 @@ export const hudChromeStrings = {
     shotRules:
       'Aim inside the marked field. No mana cost. Damage does not scale with gear or talents.',
   },
+  // Fire and Fly, the turret-defense mini-game: the seat's status strip, its tower rail,
+  // its banners, its screen-reader announcements and its result card.
+  turret: {
+    title: 'Fire and Fly',
+    integrity: 'Tower integrity',
+    integrityValue: '{value}/{max}',
+    integrityBelow: 'Tower integrity below {percent}',
+    tower: 'Tower',
+    wave: 'Wave {wave}/{total}',
+    left: 'Monsters left: {count}',
+    firstWave: 'First wave in {seconds} sec',
+    nextWave: 'Next wave in {seconds} sec',
+    // The first wave's banner subtext: the goal, in words that hold for every input.
+    hint: 'Blast the monsters before they reach the tower',
+    waveBanner: 'Wave {wave} of {total}',
+    finalWave: 'Final wave',
+    clearedBanner: 'Wave {wave} cleared',
+    victory: 'Victory!',
+    defeat: 'The tower has fallen',
+    statKills: 'Kills',
+    statShots: 'Shots fired',
+    statAccuracy: 'Accuracy',
+    statThrow: 'Longest throw',
+    statAirtime: 'Longest airtime',
+    statYards: '{yards} yd',
+    statSeconds: '{seconds} sec',
+    // The result card's medal line (a loss earns none) and its points rows: what each
+    // part of the run scored ({count} is how many kills, keg kills or knocks, {points}
+    // the tower points kept), then the total.
+    medalGold: 'Gold medal',
+    medalSilver: 'Silver medal',
+    medalBronze: 'Bronze medal',
+    noMedal: 'No medal',
+    // The live region's line as a won run ends: the verdict, then the medal's name.
+    endAnnouncement: '{verdict} {medal}',
+    pointsKills: 'Kills ({count})',
+    pointsTower: 'Tower kept ({points})',
+    pointsKegKills: 'Keg kills ({count})',
+    pointsBowled: 'Bowled over ({count})',
+    pointsTotal: 'Total points',
+    leave: 'Leave the tower',
+    leaveShort: 'Leave',
+    // The result card's second button: the same trial again, without leaving the tower.
+    replay: 'Replay',
+    replayHint:
+      "Play the same trial again from the tower. Once today's reward is earned, a replay pays no reward.",
+    replayHintMission:
+      "Play the same mission again from the tower. Once today's reward is earned, a replay pays no reward.",
+    // The result card's last half minute: an ended seat left idle leaves the tower on its own.
+    leavingIn: 'Leaving the tower in {seconds} sec',
+    // The banner as the last trial's win recruits the character: {name} is Master
+    // Gunner Alder, who opens the missions to the new recruit.
+    recruitedBanner: 'Recruited!',
+    recruitedLine: '{name}: "Welcome to the gate crew, gunner. My missions are open to you now."',
+    // The limited weapons: two sockets above the tower rail (the group's accessible name,
+    // each weapon's name and tooltip, the charges line), the first wave's banner subtext
+    // naming their keys ({shockKey} and {fragKey} are the player's own bindings; touch
+    // has no keys) and the result card's "used / given" rows.
+    weapons: 'Tower weapons',
+    shockwave: 'Shockwave',
+    shockwaveTip:
+      'Slam the tower: a ring rolls from its wall out to {reach} yd in {seconds} sec. Every monster on the ground it reaches is thrown away from the tower, which stops a strike it is still winding up, and takes {damage} damage within {core} yd of the tower, less beyond. Monsters in the air pass over it.',
+    shockwaveRules: 'Ready again {seconds} sec after use. Works only during a wave.',
+    frag: 'Fragmentation Shell',
+    fragTip:
+      'Arm it, then fire at the ground like a shell. It bursts above the aim point into {count} bomblets: one lands on the point and {outer} land in a ring {radius} yd around it. Each deals up to {damage} damage within {blast} yd, throws the monsters it hits and lights kegs.',
+    fragRules:
+      "Uses the cannon's reload. Arming it again, or cancelling, puts it away without spending a charge. Works only during a wave.",
+    chargesLeft: 'Charges left: {count}',
+    weaponsHint:
+      'Blast the monsters before they reach the tower. {shockKey}: Shockwave. {fragKey}: Fragmentation Shell.',
+    weaponsHintTouch:
+      'Blast the monsters before they reach the tower. Tap a socket for a Shockwave or a Fragmentation Shell.',
+    statShockwaves: 'Shockwaves',
+    statFrags: 'Fragmentation Shells',
+    statUsed: '{used}/{given}',
+  },
   warlock: {
     doomLabel: 'Condemnation',
     fateThreadsLabel: 'Fate Threads',
@@ -1513,6 +1590,32 @@ export const hudChromeStrings = {
       'Your offline records, saved with this character. Pass every ring in order. Daily records reset each day.',
     gliderRules:
       'Fastest complete flight wins. Pass every ring. Daily records reset with the realm. Records refresh within 30 seconds.',
+    // Fire and Fly's ladders (The Gunner's Trials): a daily and an all-time board
+    // per trial; {trial} is the trial's name (questUi.worldQuest.fireAndFly.scenarios).
+    fireAndFlyDaily: '{trial}: Today',
+    fireAndFlyLifetime: '{trial}: All time',
+    fireAndFlyStart: 'Take this trial',
+    fireAndFlyRankings: "Gunner's records",
+    fireAndFlyPersonalRules:
+      'Your offline records, saved with this character. The best medal ranks first, then the highest score. Daily records reset each day.',
+    fireAndFlyRules:
+      'The best medal ranks first, then the highest score. Every won trial counts, practice included. Daily records reset with the realm. Records refresh within 30 seconds.',
+    // The rankings window's three groups (trials, missions, the Gunner's Mastery), each
+    // mission's all-time board, and the one Mastery board: the best medal of each mission
+    // summed as stars (gold 3, silver 2, bronze 1), ties broken by those runs' scores.
+    fireAndFlyGroupsLabel: "Gunner's record groups",
+    fireAndFlyGroups: { trials: 'Trials', missions: 'Missions', mastery: 'Mastery' },
+    fireAndFlyMissionStart: 'Take this mission',
+    fireAndFlyMissionRules:
+      'The best medal ranks first, then the highest score. Every won mission counts, practice included. Records refresh within 30 seconds.',
+    fireAndFlyMissionPersonalRules:
+      'Your offline records, saved with this character. The best medal ranks first, then the highest score.',
+    fireAndFlyMastery: "Gunner's Mastery",
+    fireAndFlyMasteryRules:
+      'Your best medal on each mission, summed as stars: gold 3, silver 2, bronze 1. More stars rank first, then the higher total score. Records refresh within 30 seconds.',
+    fireAndFlyMasteryPersonalRules:
+      'Your offline Mastery, saved with this character: your best medal on each mission, summed as stars (gold 3, silver 2, bronze 1), then the total score.',
+    wqStars: 'Stars',
     wqPoints: 'Score',
     wqSeconds: '{seconds}s',
     wqNoMedal: 'None',
@@ -1544,6 +1647,7 @@ export const hudChromeStrings = {
       seconds: 'Ranked by medal, then fastest time',
       points: 'Ranked by medal, then highest score',
     },
+    rankedByStars: 'Ranked by stars, then highest score',
     podiumLabel: 'Top three',
     unclaimed: 'Unclaimed',
     totalOne: 'One hero ranked',
@@ -3927,6 +4031,13 @@ export const hudChromeStrings = {
       few: '{count} guilds shown',
       many: '{count} guilds shown',
       other: '{count} guilds shown',
+    },
+    // The Gunner's Mastery row's stars ({count} pre-formatted).
+    fireAndFlyStars: {
+      one: '{count} star',
+      few: '{count} stars',
+      many: '{count} stars',
+      other: '{count} stars',
     },
     // The commission board's crafter's-record counts (Masterwrought phase
     // 14): lifetime masterworks crafted and legendaries forged, off the

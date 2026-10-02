@@ -344,6 +344,46 @@ const questStringsEn = {
         score: 'Score: {score}.',
         medals: { gold: 'Gold', silver: 'Silver', bronze: 'Bronze' },
       },
+      // Fire and Fly at the Evergarden gate: Master Gunner Alder recruits defenders
+      // for the ramparts and tests each one first. The trials are the scenarios:
+      // {name} is a trial's name, {detail} its one-line brief, {count} its wave count.
+      fireAndFly: {
+        title: "The Gunner's Trials",
+        objective: 'Hold a tower of your own through every wave of one trial',
+        ready: 'Speak to Master Gunner Alder to take a trial.',
+        complete: 'Tower held! Speak to Master Gunner Alder to practice.',
+        // The trials, then the missions a recruit takes for the gate (named in
+        // docs/design/naming-audit.md); each pitch is Alder's one line for it.
+        scenarios: {
+          introduction: "Recruit's Trial",
+          standard: 'Standing Watch',
+          hard: "Veterans' Test",
+          pack: 'The Pack',
+          giants: 'Heavy Tread',
+          deluge: 'The Deluge',
+          brittle: 'The Cracked Tower',
+          powder: 'The Powder Store',
+        },
+        pitch: {
+          introduction: 'a first watch for a new recruit',
+          standard: 'the real watch on the walls',
+          hard: 'the siege the old hands are tested on',
+          pack: 'they run in packs; make each shell count',
+          giants: 'a few brutes too heavy to throw far',
+          deluge: 'a flood of small, quick beasts',
+          brittle: 'a few blows and the tower falls',
+          powder: 'twice the kegs, right on their path',
+        },
+        start: '{name}: {detail} (waves: {count})',
+        practice: 'Practice the {name} (waves: {count})',
+        // A mission's name carries its own article: {name} is a whole title.
+        practiceMission: '{name}: practice run (waves: {count})',
+        sections: { trials: 'Trials', missions: 'Missions' },
+        // {name} is the locked trial, {previous} the trial whose win opens it.
+        lockedTrial: '{name}: pass the {previous} to open it',
+        // {name} is the last trial's name.
+        missionsLocked: 'Pass the {name} to be recruited and open the missions.',
+      },
       calligraphyTitle: 'Arcane Calligraphy',
       traceOutline: 'Trace the outline with your footsteps',
       traceRoundInstruction: 'Round {round} of {total}: {shape}. {instruction}',

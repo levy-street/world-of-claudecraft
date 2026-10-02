@@ -128,12 +128,13 @@ describe('ability icons', () => {
     // 464: 450 plus the fourteen Nythraxis Raid Boss Guide mechanic recipes;
     // 469: plus the Wildfang kit pass 2 glyphs (lunge, hamstring_bite).
     // 473: plus the Buried Hoards Clockwork Shock Bomb glyph (the 2026-09-28
-    // release/v0.44.0 merge into feature/buried-hoards).
-    expect(ids).toHaveLength(473);
+    // release/v0.44.0 merge into feature/buried-hoards); 475: plus the Fire and Fly
+    // tower weapons' two sockets (turret_shockwave, turret_frag).
+    expect(ids).toHaveLength(475);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    expect(hash).toBe('6fa8b2c16d3459d5f09768545d08e8f6778c00a2ac3973cd0d9361ee3d08971c');
+    expect(hash).toBe('88091a31216303047510205010d8d7b13742639cd4750a3b49e10c4e9599aec3');
   });
 });

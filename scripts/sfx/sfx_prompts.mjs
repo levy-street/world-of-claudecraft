@@ -555,6 +555,10 @@ export const SFX = [
       'An arcane missile zapping through the air, a magical electric zip. Single shot, no music.',
   },
   {
+    key: 'proj_groundshaker',
+    custom: true,
+  },
+  {
     key: 'proj_shadow',
     custom: true,
     duration: 0.6,
@@ -615,6 +619,13 @@ export const SFX = [
     duration: 0.7,
     prompt:
       'An earthy nature impact, a wet splat of poison and snapping vines. Single hit, no music.',
+  },
+  {
+    key: 'impact_groundshaker',
+    custom: true,
+    duration: 3,
+    prompt:
+      'A large explosion used when the Terrorspark Groundshaker shell lands. Single blast, no music, no voice.',
   },
   {
     key: 'spell_nova',

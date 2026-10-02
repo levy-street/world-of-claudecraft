@@ -239,9 +239,26 @@
   ) {
     display: none !important;
   }
-  /* Temporary layout only: the saved unit-frame position and action bindings stay intact. */
-  body.operating-vehicle #player-frame:not(.pf-detached) {
+  /* Temporary layout only: the saved unit-frame position and action bindings stay intact.
+     The Fire and Fly seat keeps no bottom panel to clear, so the lift stays off there. */
+  body.operating-vehicle:not(.manning-turret) #player-frame:not(.pf-detached) {
     margin-bottom: 250px;
+  }
+  /* On the Fire and Fly tower the integrity rail takes the vitals seat: nothing seated can
+     change the player's own frame (docked or moved), and the XP rail would read as a second
+     tower bar right under it (turret_hud_controller.ts toggles the class). */
+  body.manning-turret :is(#player-frame, #xpbar) {
+    display: none !important;
+  }
+  /* That lift leaves the stack's box standing empty over the world in front of the seat:
+     let clicks through it so the aim reaches the ground there; its rows stay clickable. */
+  body.operating-vehicle :is(#bottom-bar, #actionbar-row, #actionbar-stack) {
+    pointer-events: none;
+  }
+  body.operating-vehicle
+    :is(#bottom-bar, #actionbar-row, #actionbar-stack)
+    > :not(#actionbar-row, #actionbar-stack) {
+    pointer-events: auto;
   }
   .vehicle-bar {
     position: absolute;
@@ -360,6 +377,311 @@
   }
   .vehicle-bar-hint {
     min-height: 2.4em;
+  }
+  /* The Fire and Fly seat (turret_hud_painter.ts): a status strip in the top-centre
+     match-strip seat (the wave, the monsters left or the countdown, Leave) that unfolds
+     into the result card when the defense ends, clear of the 28 percent banner lane, and
+     the tower's integrity rail on the action-rail width at the bottom, where the XP rail
+     it hides sits. Only Leave and the card's Replay take the pointer: aim clicks and
+     drags pass through the rest. The strip keeps one width while its middle slot
+     changes text. */
+  #turret-hud {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: "wave slot leave";
+    align-items: center;
+    column-gap: 14px;
+    width: max-content;
+    min-width: min(420px, calc(100% - 24px));
+    max-width: min(520px, calc(100% - 24px));
+    min-height: 38px;
+    padding: 4px 4px 4px 14px;
+    font-size: 14px;
+    pointer-events: none;
+  }
+  .turret-strip-wave {
+    grid-area: wave;
+    color: var(--color-accent);
+    white-space: nowrap;
+  }
+  .turret-strip-slot {
+    grid-area: slot;
+    min-width: 0;
+    overflow: hidden;
+    font-weight: 500;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .turret-leave {
+    grid-area: leave;
+    height: 28px;
+    padding: 0 6px 0 12px;
+    pointer-events: auto;
+  }
+  .turret-leave.ui-btn--lg {
+    justify-self: center;
+    height: var(--btn-h-lg);
+    padding: 0 10px 0 18px;
+  }
+  /* The card's Replay sits left of Leave; the empty outer columns centre the pair. */
+  .turret-replay {
+    grid-area: replay;
+    padding: 0 18px;
+    pointer-events: auto;
+  }
+  .turret-card {
+    display: none;
+    grid-area: card;
+  }
+  #turret-hud.ended {
+    grid-template-columns: minmax(0, 1fr) auto auto minmax(0, 1fr);
+    grid-template-areas:
+      "card card card card"
+      ". replay leave .";
+    row-gap: 12px;
+    min-width: min(440px, calc(100% - 24px));
+    padding: 12px 18px 16px;
+  }
+  /* On a short screen the 28 percent banner lane rises into the card, so the card
+     drops under the lane (one banner line and a gap), as on touch, and the verdict
+     banner never covers it. */
+  @media (max-height: 820px) {
+    #turret-hud.ended {
+      top: calc(28% + 56px);
+    }
+  }
+  #turret-hud.ended :is(.turret-strip-wave, .turret-strip-slot) {
+    display: none;
+  }
+  #turret-hud.ended .turret-card {
+    display: grid;
+    gap: 6px;
+    text-align: center;
+    animation: turret-card-in var(--dur-panel) ease-out;
+  }
+  @keyframes turret-card-in {
+    from {
+      opacity: 0;
+    }
+  }
+  .turret-card-kicker {
+    font-size: 12px;
+  }
+  .turret-card-verdict {
+    font-size: 26px;
+    line-height: 1.2;
+    color: var(--color-text-success);
+  }
+  .turret-card:not(.won) .turret-card-verdict {
+    color: var(--color-hostile);
+  }
+  .turret-card-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 24px;
+    margin: 0;
+    text-align: left;
+  }
+  .turret-card-stats .ui-stat-row {
+    gap: 12px;
+    font-size: 14px;
+  }
+  .turret-card-value {
+    margin: 0;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  /* The medal line under the verdict: the name says the medal, the disc's tint and the
+     name's colour (the rankings window's medal colours) only echo it. The points rows
+     follow the stats, their total across both columns. */
+  .turret-card-medal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 16px;
+    color: var(--color-text-muted);
+  }
+  .turret-card-medal-icon {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--color-wq-ranking-medal-ring);
+    border-radius: 50%;
+    background: var(--turret-medal-tint, var(--color-border-default));
+  }
+  .turret-card-medal--gold {
+    --turret-medal-tint: var(--color-wq-ranking-gilt);
+    color: var(--color-wq-ranking-heading);
+  }
+  .turret-card-medal--silver {
+    --turret-medal-tint: var(--color-ranking-place-second);
+    color: var(--color-wq-ranking-silver-text);
+  }
+  .turret-card-medal--bronze {
+    --turret-medal-tint: var(--color-ranking-place-third);
+    color: var(--color-wq-ranking-bronze-text);
+  }
+  .turret-card-total {
+    grid-column: 1 / -1;
+  }
+  .turret-card-total .turret-card-value {
+    color: var(--color-accent);
+  }
+  /* The seat's own leave, counting down under the points over the card's last half minute. */
+  .turret-card-leaving {
+    font-size: 12px;
+  }
+  .turret-card-leaving:empty {
+    display: none;
+  }
+  /* A short screen, a phone on its side or a low desktop window where the card sits
+     under the banner lane: the card, its medal and points included, keeps Leave above
+     the tower rail by dropping the decorative kicker (the strip's name stays its label)
+     and tightening its rows. */
+  @media (max-height: 600px) {
+    #turret-hud.ended .turret-card {
+      gap: 4px;
+    }
+    .turret-card-kicker {
+      display: none;
+    }
+    .turret-card-stats {
+      --stat-row-h: 16px;
+    }
+    .turret-card-stats .ui-stat-row {
+      line-height: 16px;
+    }
+  }
+  #turret-rail {
+    position: absolute;
+    left: 50%;
+    bottom: 26px;
+    transform: translateX(-50%);
+    z-index: 5;
+    width: min(var(--action-rail-w), calc(100% - 200px));
+    color: var(--color-vehicle-text);
+    pointer-events: none;
+  }
+  .turret-rail-caption,
+  .turret-rail-value {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    white-space: nowrap;
+  }
+  .turret-rail-caption {
+    right: calc(100% + 10px);
+    font-size: 12px;
+  }
+  .turret-rail-value {
+    left: calc(100% + 10px);
+    font-size: 13px;
+    font-weight: 700;
+  }
+  /* The chat box is sized to clear only the action-rail band, so on a narrower
+     desktop the caption and the number fold inside the rail's width; the number
+     keeps room for its widest value so the bar never resizes as integrity falls. */
+  @media (max-width: 1600px) {
+    body:not(.mobile-touch) #turret-rail {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    body:not(.mobile-touch) :is(.turret-rail-caption, .turret-rail-value) {
+      position: static;
+      transform: none;
+    }
+    body:not(.mobile-touch) .turret-rail-bar {
+      flex: 1;
+      min-width: 0;
+    }
+    body:not(.mobile-touch) .turret-rail-value {
+      min-width: 7ch;
+    }
+  }
+  body.high-contrast-text :is(.turret-rail-caption, .turret-rail-value) {
+    text-shadow:
+      var(--outline-shadow),
+      0 0 4px var(--color-keyline);
+  }
+  /* The tower's limited weapons (turret_weapon_bar_painter.ts): two 44px sockets of the
+     vehicle bar family, centred 6px above the rail (its 26px seat plus its 18px bevel).
+     The row stays pointer-inert like the rail; each socket takes the pointer and stops
+     its press there, so a click or a tap on a socket never also fires at the ground. */
+  #turret-weapons {
+    position: absolute;
+    left: 50%;
+    bottom: 50px;
+    transform: translateX(-50%);
+    z-index: 5;
+    display: flex;
+    gap: 8px;
+    pointer-events: none;
+  }
+  #turret-weapons .turret-weapon {
+    --ui-socket-size: 44px;
+    pointer-events: auto;
+  }
+  .turret-rail-bevel {
+    --bar-color: var(--color-vehicle-integrity);
+    height: 18px;
+  }
+  #turret-rail.low-integrity .turret-rail-bevel {
+    --bar-color: var(--color-vehicle-danger);
+  }
+  .turret-rail-fill {
+    width: 100%;
+    transform: scaleX(var(--turret-integrity, 1));
+    transform-origin: left;
+  }
+  /* A strike on the tower: the seat HUD (turret_hit_flash_painter.ts) drives these
+     variables per frame for the flash's life and hides the overlay between strikes.
+     The overlay sits where the low-health vignette does and never eats pointer
+     events; the rail glows red and swings sideways from the bevel's wrapper, since
+     the bevel's own clip would cut a glow off. Reduced motion is applied by the
+     controller (a softer flash, no swing). */
+  #turret-hit-vignette {
+    --turret-hit-flash: 0;
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    background: var(--low-health-veil);
+    opacity: var(--turret-hit-flash);
+  }
+  .turret-rail-bar {
+    --turret-hit-glow: 0;
+    --turret-hit-shake: 0;
+    translate: calc(var(--turret-hit-shake) * 6px) 0;
+    box-shadow: 0 0 calc(var(--turret-hit-glow) * 14px) calc(var(--turret-hit-glow) * 3px)
+      var(--color-vehicle-danger);
+  }
+  .turret-rail-bevel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--color-vehicle-danger);
+    opacity: calc(var(--turret-hit-glow) * 0.6);
+    pointer-events: none;
+  }
+  @media (forced-colors: active) {
+    .turret-rail-bevel {
+      forced-color-adjust: none;
+      box-sizing: border-box;
+      border: 1px solid CanvasText;
+      background: Canvas;
+    }
+    .turret-rail-fill {
+      background: Highlight;
+    }
   }
   /* ---------- nameplates ---------- */
   .nameplate {
@@ -10568,12 +10890,7 @@
     pointer-events: none;
     --lhv-opacity: 0;
     --lhv-pulse: 1.6s;
-    background: radial-gradient(
-      ellipse at center,
-      rgba(120, 0, 0, 0) 42%,
-      rgba(150, 0, 0, 0.35) 74%,
-      rgba(190, 0, 0, 0.85) 100%
-    );
+    background: var(--low-health-veil);
     animation: lhv-breathe var(--lhv-pulse) ease-in-out infinite;
   }
   #low-health-vignette.active {

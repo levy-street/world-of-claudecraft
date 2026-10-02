@@ -2,6 +2,10 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  FIRE_AND_FLY_NPC_DEF,
+  FIRE_AND_FLY_QUEST_ID,
+} from '../src/sim/content/world_quest_fire_and_fly';
+import {
   INVESTIGATION_CLUES,
   INVESTIGATION_NPC_IDS,
   INVESTIGATION_NPCS,
@@ -1060,5 +1064,55 @@ describe('investigation quest dialogue', () => {
     progress.investigation.mobId = 500;
     h.controller.refreshIfChanged();
     expect(h.controller.isOpen).toBe(false);
+  });
+});
+
+describe("Master Gunner Alder's sectioned dialog", () => {
+  function alderHarness(recruitment: { trialsWon: number; recruited: boolean }) {
+    const startWorldQuestActivity = vi.fn();
+    const h = harness(
+      npc(77, FIRE_AND_FLY_NPC_DEF.id),
+      'available',
+      {},
+      {
+        player: { id: 1, name: 'Ari', level: 20, dead: false, pos: { x: 0, y: 0, z: 0 } },
+        worldQuestLog: new Map([
+          [FIRE_AND_FLY_QUEST_ID, { questId: FIRE_AND_FLY_QUEST_ID, count: 0, state: 'active' }],
+        ]),
+        fireAndFlyRecruitment: recruitment,
+        startWorldQuestActivity,
+      },
+    );
+    h.controller.open(77);
+    return { ...h, startWorldQuestActivity };
+  }
+
+  it('paints each section title, its start buttons, then its locked lines', () => {
+    const h = alderHarness({ trialsWon: 1, recruited: false });
+    const painted = [
+      ...h.element.querySelectorAll('[data-wq-section], [data-difficulty], [data-wq-locked]'),
+    ];
+    expect(painted.map((el) => el.textContent)).toEqual([
+      'Trials',
+      "Recruit's Trial: a first watch for a new recruit (waves: 3)",
+      'Standing Watch: the real watch on the walls (waves: 6)',
+      "Veterans' Test: pass the Standing Watch to open it",
+      'Missions',
+      "Pass the Veterans' Test to be recruited and open the missions.",
+    ]);
+    for (const locked of h.element.querySelectorAll('[data-wq-locked]'))
+      expect(locked.tagName).toBe('DIV');
+  });
+
+  it("sends a mission's pick as its course once recruited", () => {
+    const h = alderHarness({ trialsWon: 3, recruited: true });
+    expect(h.element.querySelectorAll('[data-wq-locked]')).toHaveLength(0);
+    const powder = h.element.querySelector<HTMLButtonElement>('[data-difficulty="powder"]');
+    expect(powder?.textContent).toContain('The Powder Store');
+    powder?.click();
+    expect(h.targetEntity).toHaveBeenCalledWith(77);
+    expect(h.startWorldQuestActivity).toHaveBeenCalledWith(FIRE_AND_FLY_QUEST_ID, {
+      courseId: 'fire_and_fly_powder',
+    });
   });
 });

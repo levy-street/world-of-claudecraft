@@ -4,15 +4,18 @@
 // command is the dialog's second path: the player picks Normal or Hard before
 // entering, the server revalidates every gate the talk applies (level, an active
 // offer, the work area, the instructor standing at his post, a rider dismounted)
-// and only then starts the kernel with that profile. Today only the Wispwood maze
-// offers a choice; the command is quest-keyed so the next activity adds a row
-// here, never a new wire verb.
+// and only then starts the kernel with that profile. The Wispwood maze offers a
+// difficulty; the glider's courses and Fire and Fly's scenarios ride the
+// `{ courseId }` choice. The command is quest-keyed so the next activity adds a
+// row here, never a new wire verb.
 
+import { FIRE_AND_FLY_QUEST_ID } from './content/world_quest_fire_and_fly';
 import { GLIDER_QUEST_ID } from './content/world_quest_glider';
 import { WISP_MAZE_NPC_ID, WISP_MAZE_QUEST_ID } from './content/world_quest_wisp_maze';
 import { WORLD_QUESTS_BY_ID } from './content/world_quests';
 import { startSelectedGliderCourse } from './glider_course_selection';
 import type { SimContext } from './sim_context';
+import { fireAndFlyScenarioById, startFireAndFly } from './world_quest_fire_and_fly';
 import { dismountForWorldQuestInstructor } from './world_quest_mount_gate';
 import { startWispMaze } from './world_quest_wisp_maze';
 import { hasActiveWorldQuest, updateWorldQuests } from './world_quests';
@@ -56,6 +59,7 @@ export function startWorldQuestActivity(
   if (!isActivityChoice(difficulty)) return;
   if (typeof difficulty === 'object') {
     if (questId === GLIDER_QUEST_ID) startSelectedGliderCourse(ctx, difficulty.courseId, pid);
+    if (questId === FIRE_AND_FLY_QUEST_ID) startSelectedFireAndFly(ctx, difficulty.courseId, pid);
     return;
   }
   if (!isWorldQuestDifficulty(difficulty) || !worldQuestOffersDifficulty(questId)) return;
@@ -79,4 +83,13 @@ export function startWorldQuestActivity(
   if (!npc || npc.kind !== 'npc') return;
   if (!dismountForWorldQuestInstructor(ctx, player, meta)) return;
   startWispMaze(ctx, meta, player, npc, progress, difficulty);
+}
+
+/** The dialog's scenario pick; past the instructor's gates the area sweep mints today's row, as for the glider. */
+function startSelectedFireAndFly(ctx: SimContext, scenarioId: string, pid?: number): void {
+  if (!fireAndFlyScenarioById(scenarioId)) return;
+  const resolved = ctx.resolve(pid);
+  if (!resolved) return;
+  const { meta, e: player } = resolved;
+  startFireAndFly(ctx, meta, player, scenarioId, () => updateWorldQuests(ctx, meta, player));
 }

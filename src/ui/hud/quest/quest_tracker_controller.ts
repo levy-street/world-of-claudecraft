@@ -1,7 +1,11 @@
 import { CLUE_HUNTS_BY_ID } from '../../../sim/content/clue_hunts';
 import { WISP_MAZE_QUEST_ID } from '../../../sim/content/world_quest_wisp_maze';
 import { QUESTS, WORLD_QUESTS_BY_ID } from '../../../sim/data';
-import { questObjectiveRequired } from '../../../sim/types';
+import {
+  questObjectiveRequired,
+  type WorldQuestObjective,
+  type WorldQuestProgress,
+} from '../../../sim/types';
 import { wispMazeActionsLocked } from '../../../sim/wisp_maze_action_lock';
 import { positionInWorldQuestArea } from '../../../sim/world_quest_area';
 import type { IWorld } from '../../../world_api';
@@ -11,6 +15,7 @@ import { ownEntry } from '../../known_item';
 import type { PainterHostWriters } from '../../painter_host';
 import { clueHuntTitle, clueStepText } from '../../quest_event_view';
 import { type QuestTrackingState, sharedQuestTracking } from '../../quest_tracking_core';
+import { fireAndFlyInstructionLines } from '../../world_quest_fire_and_fly_view';
 import { forgeInstructionLines } from '../../world_quest_forge_view';
 import { gliderInstructionLines } from '../../world_quest_glider_view';
 import { investigationInstructionLines } from '../../world_quest_investigation_view';
@@ -29,6 +34,18 @@ import {
 } from './quest_tracker';
 import { buildWispMazeHud, type WispMazeHudController } from './wisp_maze_hud_controller';
 import { createWorldQuestTrackerVisibility } from './world_quest_tracker_visibility';
+
+/** The instructor activities whose tracker row is their instruction lines, not a count. */
+const WORLD_QUEST_INSTRUCTION_LINES: Partial<
+  Record<WorldQuestObjective['type'], (progress: WorldQuestProgress) => string[]>
+> = {
+  forging: forgeInstructionLines,
+  wisp_maze: wispMazeInstructionLines,
+  glider: gliderInstructionLines,
+  shadow: shadowInstructionLines,
+  investigation: investigationInstructionLines,
+  turret: fireAndFlyInstructionLines,
+};
 
 export interface QuestTrackerSettingsPort {
   available(): boolean;
@@ -195,44 +212,31 @@ export class QuestTrackerController {
       )
         continue;
       if (lessonRunning) focusQuestId = progress.questId;
+      const instructionLines = WORLD_QUEST_INSTRUCTION_LINES[quest.objective.type];
       quests.push({
         id: progress.questId,
         number: quests.length + 1,
         worldQuest: true,
         title: worldQuestDisplayName(progress.questId),
         complete,
-        objectives:
-          quest.objective.type === 'forging' ||
-          quest.objective.type === 'wisp_maze' ||
-          quest.objective.type === 'glider' ||
-          quest.objective.type === 'shadow' ||
-          quest.objective.type === 'investigation'
-            ? (quest.objective.type === 'wisp_maze'
-                ? wispMazeInstructionLines(progress)
-                : quest.objective.type === 'forging'
-                  ? forgeInstructionLines(progress)
-                  : quest.objective.type === 'glider'
-                    ? gliderInstructionLines(progress)
-                    : quest.objective.type === 'shadow'
-                      ? shadowInstructionLines(progress)
-                      : investigationInstructionLines(progress)
-              ).map((label) => ({
-                label,
-                current: 0,
-                total: 1,
-                instruction: true,
-              }))
-            : [
-                {
-                  label:
-                    quest.objective.type === 'tracing'
-                      ? worldQuestTraceProgressInstruction(progress, quest)
-                      : worldQuestObjectiveLabel(progress.questId),
-                  current: Math.min(progress.count, quest.count),
-                  total: quest.count,
-                  ...(quest.objective.type === 'tracing' ? { instruction: true } : {}),
-                },
-              ],
+        objectives: instructionLines
+          ? instructionLines(progress).map((label) => ({
+              label,
+              current: 0,
+              total: 1,
+              instruction: true,
+            }))
+          : [
+              {
+                label:
+                  quest.objective.type === 'tracing'
+                    ? worldQuestTraceProgressInstruction(progress, quest)
+                    : worldQuestObjectiveLabel(progress.questId),
+                current: Math.min(progress.count, quest.count),
+                total: quest.count,
+                ...(quest.objective.type === 'tracing' ? { instruction: true } : {}),
+              },
+            ],
       });
     }
     this.worldQuestVisibility.retain(new Set(worldQuestLog.keys()));

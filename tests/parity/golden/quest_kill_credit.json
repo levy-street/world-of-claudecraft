@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "316057a2",
+      "state": "468e69be",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -71,6 +71,8 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -173,7 +175,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "601fb6a8",
+      "state": "2b7da940",
       "events": "a3cf857d",
       "rng": {
         "draws": 0,
@@ -228,6 +230,8 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -346,7 +350,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 1019,
-      "state": "5102fff6",
+      "state": "4a45a50a",
       "events": "02416442",
       "rng": {
         "draws": 40,
@@ -430,6 +434,8 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -550,7 +556,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 1019,
-      "state": "3fa7e17b",
+      "state": "7d1b5697",
       "events": "56a52c4f",
       "rng": {
         "draws": 40,
@@ -637,6 +643,8 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -746,7 +754,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1019,
-      "state": "d527aa8e",
+      "state": "f7cd9d52",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -833,6 +841,8 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {

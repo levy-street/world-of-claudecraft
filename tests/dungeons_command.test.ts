@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { DUNGEON_LIST, zoneAt } from '../src/sim/data';
+import { FIRE_AND_FLY_DUNGEON_ID } from '../src/sim/content/fire_and_fly_arena';
+import { DUNGEON_LIST, DUNGEONS, zoneAt } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 
@@ -17,7 +18,7 @@ describe('/dungeons command', () => {
     const a = sim.addPlayer('warrior', 'Aleph');
     sim.tick();
 
-    const parts = DUNGEON_LIST.map(
+    const parts = DUNGEON_LIST.filter((d) => d.id !== FIRE_AND_FLY_DUNGEON_ID).map(
       (d) => `${d.name} (${zoneAt(d.doorPos.x, d.doorPos.z).name}, ${d.suggestedPlayers} players)`,
     );
     const expected = `Dungeons (${parts.length}): ${parts.join(', ')}.`;
@@ -27,6 +28,10 @@ describe('/dungeons command', () => {
     // feature), then the reset usage line.
     const texts = errorTexts(sim.tick());
     expect(texts[texts.length - 3]).toBe(expected);
+    // The Fire and Fly arena is a private mini-game room, not a dungeon; the
+    // door-less raid rooms around it stay listed.
+    expect(texts[texts.length - 3]).not.toContain(DUNGEONS[FIRE_AND_FLY_DUNGEON_ID].name);
+    expect(texts[texts.length - 3]).toContain('The Forge-Lift (');
     expect(texts[texts.length - 2]).toBe(
       'Dungeon difficulty: Normal. Use /dungeon heroic to change it.',
     );

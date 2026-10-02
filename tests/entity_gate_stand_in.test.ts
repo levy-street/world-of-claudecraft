@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { CannonShellVisuals } from '../src/render/cannon_shell_visuals';
 import { farMeshShown } from '../src/render/characters/far_lod_reveal_core';
 import {
   characterFormReadyMask,
@@ -23,10 +24,15 @@ import {
 } from '../src/render/farm_patches';
 import { gpuPrepEventsSnapshot, resetGpuPrepEventsForTest } from '../src/render/gpu_prep_events';
 import { NAMEPLATE_RANGE, nameplatePlanInto, newNameplatePlan } from '../src/render/nameplate_view';
+import { TurretSlotBook } from '../src/render/turret_defense_pool_core';
+import { TurretGroundMarkers } from '../src/render/turret_ground_markers';
+import { TURRET_TOWER_MODEL } from '../src/render/turret_tower_core';
+import { TurretTowerVisual } from '../src/render/turret_tower_visual';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import type { Entity } from '../src/sim/types';
 import { INTERACT_RANGE } from '../src/sim/types';
 import type { FarmPlotView } from '../src/world_api/farming';
+import { stripComments } from './helpers/strip_comments';
 
 // THE INVERSE INVARIANT of the live compile gates: never leave an entity with
 // no representation. A gate exists so a still-linking program is not drawn; it
@@ -86,6 +92,36 @@ const GATE_CALL_SITES: readonly {
     // The placed mobile-station props: the same helper, its own file.
     gate: 'attachSceneGroupGated',
     file: 'src/render/mobile_stations.ts',
+    marker: 'attachSceneGroupGated(',
+  },
+  {
+    // The Fire and Fly monster rigs: one gated attach per built rig.
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/turret_defense_visual.ts',
+    marker: 'attachSceneGroupGated(',
+  },
+  {
+    // The cannon's shot pieces: one gated attach of the whole weapon root.
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/cannon_shell_visuals.ts',
+    marker: 'attachSceneGroupGated(',
+  },
+  {
+    // The Fire and Fly ground markers: one gated attach of the marker pool.
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/turret_ground_markers.ts',
+    marker: 'attachSceneGroupGated(',
+  },
+  {
+    // The Fire and Fly cannon tower: one gated attach of the built model.
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/turret_tower_visual.ts',
+    marker: 'attachSceneGroupGated(',
+  },
+  {
+    // The Fire and Fly barrels: one gated attach helper for the shards and the kegs.
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/turret_barrel_visual.ts',
     marker: 'attachSceneGroupGated(',
   },
 ];
@@ -543,5 +579,113 @@ describe('entity gate stand-ins actually stand in', () => {
     expect(
       (await import('../src/render/gated_scene_attach')).GATED_ATTACH_WATCHDOG_MS,
     ).toBeGreaterThan(0);
+  });
+
+  it('Fire and Fly rig gate: the capsule draws at the monster until a revealed rig is free', () => {
+    // A monster only ever holds a rig its gate has revealed; until then it keeps
+    // its marker body, whose capsule the painter draws whenever there is no rig.
+    const book = new TurretSlotBook();
+    book.growBodies(1);
+    const rig = book.addRig('forest_wolf');
+    const wolf = [{ id: 7, kind: 0, hp: 40 }];
+    book.assign(wolf, () => 'forest_wolf');
+    expect(book.rigOf(7)).toBe(-1);
+    expect(book.bodyOf(7)).toBe(0);
+    book.setRigReady(rig);
+    book.assign(wolf, () => 'forest_wolf');
+    expect(book.rigOf(7)).toBe(rig);
+    const painter = stripComments(sourceOf('src/render/turret_defense_visual.ts'));
+    expect(painter).toContain('body.standIn.visible = !rig;');
+    expect(painter).toContain('if (!this.book.rigReady[i] && this.rigs[i].gate.visible)');
+  });
+
+  it('Fire and Fly ground marker gate: each monster draws its own body while the marker pool links', async () => {
+    let settle: () => void = () => {};
+    const gate = vi.fn(() => new Promise<void>((resolve) => (settle = resolve)));
+    const markers = new TurretGroundMarkers({ ground: () => 0 }, gate);
+    markers.prepare(new THREE.Scene(), 4);
+    expect(gate).toHaveBeenCalledWith(markers.root);
+    expect(markers.root.visible).toBe(false);
+    // The monster's rig or capsule never waits on the marker: the painter draws
+    // one of the two for every body whatever the marker gate's state.
+    const painter = stripComments(sourceOf('src/render/turret_defense_visual.ts'));
+    expect(painter).toContain('body.standIn.visible = !rig;');
+    expect(painter).not.toMatch(/groundMarkers\.[a-z]+[^;]*standIn/);
+    settle();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(markers.root.visible).toBe(true);
+    markers.dispose();
+  });
+
+  it('Fire and Fly tower gate: the barrel a shot leaves from exists while the tower links', async () => {
+    let settle: () => void = () => {};
+    const gate = vi.fn(() => new Promise<void>((resolve) => (settle = resolve)));
+    const model = new THREE.Group();
+    const head = new THREE.Group();
+    head.name = TURRET_TOWER_MODEL.headNode;
+    const barrel = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial());
+    barrel.name = TURRET_TOWER_MODEL.barrelNode;
+    head.add(barrel);
+    model.add(head);
+    const tower = new TurretTowerVisual(gate, () => Promise.resolve(model));
+    let ready = false;
+    tower.prepare(new THREE.Scene(), () => {
+      ready = true;
+    });
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(ready).toBe(true);
+    expect(gate).toHaveBeenCalledWith(tower.group);
+    expect(tower.group.visible).toBe(false);
+    // The weapon takes its muzzle from this node from the moment it is built:
+    // the shots never wait on the tower's link, and the player's own model is
+    // placed on the roof by the painter whatever the gate's state.
+    expect(tower.barrelNode?.name).toBe(TURRET_TOWER_MODEL.barrelNode);
+    const painter = stripComments(sourceOf('src/render/turret_defense_visual.ts'));
+    expect(painter).toContain('if (self) this.standGunner(');
+    expect(painter).not.toMatch(/standGunner[^;]*visible/);
+    settle();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(tower.group.visible).toBe(true);
+    tower.dispose();
+  });
+
+  it('Fire and Fly weapon gate: the prewarmed particles draw a shot until its pieces link', async () => {
+    let settle: () => void = () => {};
+    const gate = vi.fn(() => new Promise<void>((resolve) => (settle = resolve)));
+    const visuals = new CannonShellVisuals({
+      blastRadius: 6,
+      groundAt: () => 0,
+      compileGate: gate,
+    });
+    const host = {
+      vfx: { burst: vi.fn() },
+      camera: new THREE.PerspectiveCamera(),
+      addShake: vi.fn(),
+      punchFov: vi.fn(),
+    };
+    visuals.setHost(host);
+    visuals.prepare(new THREE.Scene());
+    expect(gate).toHaveBeenCalledWith(visuals.root);
+    expect(visuals.root.visible).toBe(false);
+    const shot = { shotId: 1, x: 20, y: 0, z: 0, flightTicks: 8, impactTick: 168 };
+    visuals.fire(shot, { x: 2, y: 2.2, z: 0 }, 0, false);
+    expect(host.vfx.burst).toHaveBeenCalledTimes(1);
+    visuals.impact(shot, 0.4, false);
+    const atBlast = host.vfx.burst.mock.calls.slice(1);
+    expect(atBlast.length).toBeGreaterThan(0);
+    for (const [at] of atBlast) expect(at.x).toBe(20);
+    // Linked: the weapon draws its own pieces and the stand-in stops.
+    settle();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(visuals.root.visible).toBe(true);
+    host.vfx.burst.mockClear();
+    visuals.fire({ ...shot, shotId: 2 }, { x: 2, y: 2.2, z: 0 }, 1, false);
+    visuals.impact({ ...shot, shotId: 2 }, 1.4, false);
+    expect(host.vfx.burst).not.toHaveBeenCalled();
+    visuals.dispose();
   });
 });

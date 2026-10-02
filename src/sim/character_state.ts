@@ -112,6 +112,8 @@ export interface CharacterState {
   // untouched empty cycle; available quests are implicit and are not stored.
   worldQuests?: {
     gliderRecords?: import('./glider_personal_records').PersonalGliderRecords;
+    fireAndFlyRecords?: import('./fire_and_fly_personal_records').PersonalFireAndFlyRecords;
+    fireAndFlyRecruitment?: import('./fire_and_fly_recruitment').FireAndFlyRecruitment;
     cycle: string;
     progress: WorldQuestProgress[];
     factions?: Partial<Record<string, number>>;

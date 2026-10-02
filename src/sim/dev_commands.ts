@@ -13,6 +13,7 @@ import { prepareWeeklyVaultPlaytest } from './dev/weekly_vault_playtest';
 import { handleDevClueCommand } from './dev_clue_scrolls';
 import { applyDevKit } from './dev_kit';
 import { handleDevTreasureMapCommand } from './dev_treasure_map';
+import { handleDevTurretChat } from './dev_turret_defense';
 import { armWeeklyQuestForDev } from './dev_weekly_quest';
 import { armWorldQuestForDev, listWorldQuestsForDev } from './dev_world_quest';
 import { armWorldQuestCannonForDev } from './dev_world_quest_cannon';
@@ -262,6 +263,7 @@ export function handleDevChat(
     armWorldQuestCannonForDev(ctx, pid, cannonMatch[1]?.toLowerCase());
     return null;
   }
+  if (handleDevTurretChat(ctx, raw, pid)) return null;
   if (/^\/dev\s+calligraphy\s*$/i.test(raw)) {
     armWorldQuestTracingForDev(ctx, pid);
     return null;

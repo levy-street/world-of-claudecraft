@@ -218,4 +218,49 @@ export const ENTITY_GATE_STAND_INS: readonly EntityGateStandIn[] = [
     standIn:
       "the station ENTITY itself, whose own view (the invisible click proxy the feast also gets, quest_objects.ts buildGroundQuestObject with no item) and nameplate (nameplate_view.ts feastNear, which admits a mobile-station templateId within INTERACT_RANGE + 1) never ride this gate, so the owner's name and the tool read on approach whatever the link state; the crafting gate itself reads the sim slot, never the prop, so a held cluster delays decoration only, bounded by GATED_ATTACH_WATCHDOG_MS",
   },
+  {
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/turret_defense_visual.ts',
+    callSite: 'void attachSceneGroupGated(',
+    hides:
+      'a Fire and Fly monster rig from its build (once the player is first seen seated: one per frame for the current and next wave, one per idle slot for the others) until its programs link, under the label live-gate:fire-and-fly-rig:<template>; the slot book (turret_defense_pool_core.ts TurretSlotBook) never hands a monster a rig its gate has not revealed',
+    standIn:
+      "the monster's capsule on the calligraphy blue material (world_quest_trace_materials.ts), its geometry stripped of normals so it draws the very program the world-quest-trace prewarm stages, at the monster's exact position and attitude with its health bar and strike ring, on every graphics tier, until a revealed rig of its template is free (the gate settling or its GATED_ATTACH_WATCHDOG_MS reveal)",
+  },
+  {
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/cannon_shell_visuals.ts',
+    callSite: 'void attachSceneGroupGated(parent, this.root,',
+    hides:
+      "a cannon's shot pieces (the iron shell, the dirt chunks, the draped scorch and the one puff mesh of every muzzle, wake and blast billboard), all minted at once when the player is first seen seated in the Fire and Fly turret, until their programs link, under the label live-gate:fire-and-fly-weapon; nothing of an entity rides it, and the turret's intro countdown runs before the first shot",
+    standIn:
+      "the renderer's boot-prewarmed Vfx particle cloud, which the weapon bursts at the muzzle and the blast only while its own root is still hidden or its page texels have not landed from their idle slot (CannonShellVisuals.revealed), and the camera kick; the thrown monsters themselves (their rigs or capsules) show where the blast landed, on every graphics tier, until the gate settles or its GATED_ATTACH_WATCHDOG_MS reveal",
+  },
+  {
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/turret_tower_visual.ts',
+    callSite: 'void attachSceneGroupGated(parent, this.group,',
+    hides:
+      "the Fire and Fly cannon tower (the stone tower, its turning head and its barrel on one named material of its own), loaded and built when the player is first seen seated in the turret, until its programs link, under the label live-gate:fire-and-fly-tower; nothing of an entity rides it, and the turret's intro countdown runs before the first wave marches in",
+    standIn:
+      "the player's own model, which the painter stands on the roof behind the breech whatever the tower's state (the sim seats the player on the tower's axis), the monsters with their rigs or capsules, health bars, strike rings and ground markers, and the HUD's turret integrity bar; a shot leaves from the hidden barrel's tip as it would from the drawn one (or, before the model has loaded, from the fallback muzzle above the roof, a step out from the axis toward the shot), until the gate settles or its GATED_ATTACH_WATCHDOG_MS reveal",
+  },
+  {
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/turret_ground_markers.ts',
+    callSite: 'void attachSceneGroupGated(parent, this.root,',
+    hides:
+      "the red ground marker under every living Fire and Fly monster (one instanced draw on its own material), minted when the player is first seen seated in the turret, until its program links, under the label live-gate:fire-and-fly-ground-markers; the turret's intro countdown runs before the first wave marches in from the clearing's edge",
+    standIn:
+      "the monsters themselves: each one's rig, or its capsule on the prewarmed calligraphy material (world_quest_trace_materials.ts) at its exact position, with its health bar and, during a windup, its red strike ring, on every graphics tier, until the gate settles or its GATED_ATTACH_WATCHDOG_MS reveal",
+  },
+  {
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/turret_barrel_visual.ts',
+    callSite: 'void attachSceneGroupGated(parent, group,',
+    hides:
+      "the Fire and Fly explosive barrels' powder kegs (the model on named materials of its own, one clone per pooled slot, each with its stencilled bomb mark and wick on one shared named material whose texture the gate uploads, attached once the model and the mark's texels have landed) and the shards a blowing keg throws (one instanced draw, attached when the player is first seen seated in the turret), each until its programs link, under the labels live-gate:fire-and-fly-barrels:kegs and live-gate:fire-and-fly-barrels:shards",
+    standIn:
+      "the barrel's warning ring on the prewarmed calligraphy material (world_quest_trace_materials.ts), its geometry stripped of normals so it draws the very program the world-quest-trace prewarm stages, at the barrel's exact position from the commitment, gold while it stands and red while its fuse burns, on every graphics tier; the blast itself draws on the cannon's revealed shot pieces or their boot-prewarmed particle stand-in, until the gate settles or its GATED_ATTACH_WATCHDOG_MS reveal",
+  },
 ];

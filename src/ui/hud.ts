@@ -591,7 +591,7 @@ import { closeOpenTouchMenu } from './hud/tap_menu';
 import { createTargetDotsView, type TargetDotsInput, TargetDotsPainter } from './hud/target_dots';
 import { FerryHudPainter } from './hud/transport';
 import { TreasureMapWindow } from './hud/treasure';
-import { createHudVehicleBar, VehicleActionBarController } from './hud/vehicle';
+import { createHudVehicleBar, VehicleActionBarController, vehicleOwnsAim } from './hud/vehicle';
 import { dismissBuyQuantityPrompts } from './hud/vendor/buy_quantity_prompt_window';
 import { buildCrucibleVendorView } from './hud/vendor/crucible_vendor_view';
 import { renderCrucibleVendorWindow } from './hud/vendor/crucible_vendor_window';
@@ -1163,7 +1163,7 @@ interface BannerPayload {
    *  stays its own `t()` key on its own line instead of being concatenated. */
   subtext?: string[];
   durationMs: number;
-  source: 'unstuck' | null;
+  source: 'unstuck' | 'turret' | null;
   /** The R38 class, kept on the payload so the advance chain can tell a
    *  deferred AMBIENT (droppable when stale) from a celebration. */
   bannerClass: BannerClass;
@@ -1370,7 +1370,7 @@ export class Hud {
     return this.vehicleBar;
   }
   private get groundAim() {
-    return this.sim.vehicleSession ? this.vehicleControls.aim : this.playerGroundAim;
+    return vehicleOwnsAim(this.sim) ? this.vehicleControls.aim : this.playerGroundAim;
   }
   private readonly playerGroundAim = new GroundAimController({
     player: () => this.sim.player,
@@ -1509,7 +1509,7 @@ export class Hud {
   // stableNodeDeadlines fixture shape.
   private bannerQueue: BannerQueue<BannerPayload> | undefined;
   private mountRaceInstructionTimer: number | undefined;
-  private bannerSource: 'unstuck' | null = null;
+  private bannerSource: 'unstuck' | 'turret' | null = null;
   private pfLevelEl = $('#pf-level');
   // The portrait frame the Book of Deeds border paints on (both entry
   // documents carry the id); the unit_frame painter owns every write to it.
@@ -13234,7 +13234,7 @@ export class Hud {
         case 'unstuck': {
           const feedback = unstuckFeedback(ev);
           const text = t(feedback.key, feedback.values);
-          if (feedback.clearBanner) this.clearUnstuckBanner();
+          if (feedback.clearBanner) this.clearSourceBanner('unstuck');
           if (feedback.kind === 'error') {
             this.showError(text);
             break;
@@ -14337,11 +14337,11 @@ export class Hud {
     }
   }
 
-  private clearUnstuckBanner(): void {
-    // Queued unstuck entries purge unconditionally; the LIVE banner clears
-    // only when it is itself the unstuck one.
-    this.bannerQueue?.retainQueued((p) => p.source !== 'unstuck');
-    if (this.bannerSource !== 'unstuck') return;
+  private clearSourceBanner(source: 'unstuck' | 'turret'): void {
+    // Queued entries of the source purge unconditionally; the LIVE banner
+    // clears only when it is itself that source's (the unstuck line, a seat's).
+    this.bannerQueue?.retainQueued((p) => p.source !== source);
+    if (this.bannerSource !== source) return;
     clearTimeout(this.bannerTimer);
     this.bannerTimer = undefined;
     this.bannerSource = null;
@@ -14360,7 +14360,7 @@ export class Hud {
     variant: BannerVariant = 'default',
     subtext?: string | string[],
     durationMs = 2600,
-    source: 'unstuck' | null = null,
+    source: 'unstuck' | 'turret' | null = null,
     // R38: celebrations queue instead of last-write-wins; ambient (the
     // default: zone names, prompts, countdowns) keeps replace semantics.
     // See src/ui/banner_queue.ts for the whole policy. The outcome returns

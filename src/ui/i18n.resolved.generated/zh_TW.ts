@@ -550,6 +550,61 @@ export const zh_TW: EnTranslations = {
       "shotTiming": "冷卻時間：{cooldown} 秒。{flight} 秒後命中。所有砲彈共用 {recovery} 秒的恢復時間。",
       "shotRules": "在標記區域內瞄準。不消耗法力。傷害不隨裝備或天賦提升。"
     },
+    "turret": {
+      "title": "Fire and Fly",
+      "integrity": "塔樓耐久",
+      "integrityValue": "{value}/{max}",
+      "integrityBelow": "塔樓耐久低於 {percent}",
+      "tower": "塔樓",
+      "wave": "Wave {wave}/{total}",
+      "left": "剩餘怪物：{count}",
+      "firstWave": "第一波將在 {seconds} 秒後到來",
+      "nextWave": "下一波將在 {seconds} 秒後到來",
+      "hint": "在怪物抵達塔樓前將牠們炸飛",
+      "waveBanner": "Wave {wave} of {total}",
+      "finalWave": "最後一波",
+      "clearedBanner": "第 {wave} 波已清除",
+      "victory": "勝利！",
+      "defeat": "塔樓已被攻破",
+      "statKills": "擊殺",
+      "statShots": "開火次數",
+      "statAccuracy": "命中率",
+      "statThrow": "最遠拋飛",
+      "statAirtime": "最長滯空",
+      "statYards": "{yards} 碼",
+      "statSeconds": "{seconds} 秒",
+      "medalGold": "金牌",
+      "medalSilver": "銀牌",
+      "medalBronze": "銅牌",
+      "noMedal": "無獎牌",
+      "endAnnouncement": "{verdict} {medal}",
+      "pointsKills": "擊殺（{count}）",
+      "pointsTower": "塔樓保全（{points}）",
+      "pointsKegKills": "火藥桶擊殺（{count}）",
+      "pointsBowled": "撞倒（{count}）",
+      "pointsTotal": "總分",
+      "leave": "離開塔樓",
+      "leaveShort": "離開",
+      "replay": "再來一次",
+      "replayHint": "在塔上再次挑戰同一試煉。領取今日獎勵後，再次挑戰不再給予獎勵。",
+      "replayHintMission": "在塔上再次執行同一任務。領取今日獎勵後，再次挑戰不再給予獎勵。",
+      "leavingIn": "{seconds} 秒後離開塔樓",
+      "recruitedBanner": "已入伍！",
+      "recruitedLine": "{name}：「歡迎加入城門砲組，砲手。我的任務現在向你開放了。」",
+      "weapons": "塔樓武器",
+      "shockwave": "衝擊波",
+      "shockwaveTip": "猛擊塔樓：一道衝擊環在 {seconds} 秒內從塔牆向外擴散至 {reach} 碼。它觸及的每個地面怪物都會被拋離塔樓，並被打斷仍在蓄力的攻擊；距塔樓 {core} 碼內受到 {damage} 點傷害，更遠處傷害降低。空中的怪物會越過衝擊環。",
+      "shockwaveRules": "使用後 {seconds} 秒再次就緒。僅在波次進行中可用。",
+      "frag": "破片彈",
+      "fragTip": "先裝填，再像普通砲彈一樣向地面發射。它在瞄準點上空炸開，化為 {count} 枚子彈：一枚落在瞄準點，{outer} 枚落在其周圍 {radius} 碼的圓環上。每枚子彈對 {blast} 碼內造成最多 {damage} 點傷害，拋飛被擊中的怪物，並點燃火藥桶。",
+      "fragRules": "使用火砲的裝填時間。再次裝填或取消會將其收起，不消耗次數。僅在波次進行中可用。",
+      "chargesLeft": "剩餘次數：{count}",
+      "weaponsHint": "在怪物抵達塔樓前將牠們炸飛。{shockKey}：衝擊波。{fragKey}：破片彈。",
+      "weaponsHintTouch": "在怪物抵達塔樓前將牠們炸飛。點擊插槽使用衝擊波或破片彈。",
+      "statShockwaves": "衝擊波",
+      "statFrags": "破片彈",
+      "statUsed": "{used}/{given}"
+    },
     "warlock": {
       "doomLabel": "譴罪",
       "fateThreadsLabel": "命運絲線",
@@ -1507,6 +1562,25 @@ export const zh_TW: EnTranslations = {
       "gliderRankings": "滑翔路線紀錄",
       "gliderPersonalRules": "離線紀錄隨此角色儲存。請按順序穿過所有圓環。每日紀錄每天重設。",
       "gliderRules": "完整飛行用時最短者獲勝。穿過每個圓環。每日紀錄隨伺服器重置。紀錄會在30秒內更新。",
+      "fireAndFlyDaily": "{trial}：今日",
+      "fireAndFlyLifetime": "{trial}：歷史",
+      "fireAndFlyStart": "接受此試煉",
+      "fireAndFlyRankings": "砲手紀錄",
+      "fireAndFlyPersonalRules": "你的離線紀錄，隨此角色保存。先比獎牌，再比最高得分。每日紀錄每天重置。",
+      "fireAndFlyRules": "先比獎牌，再比最高得分。每次獲勝的試煉都會計入，練習也算。每日紀錄隨伺服器重置。紀錄會在30秒內更新。",
+      "fireAndFlyGroupsLabel": "砲手紀錄分組",
+      "fireAndFlyGroups": {
+        "trials": "試煉",
+        "missions": "任務",
+        "mastery": "精通"
+      },
+      "fireAndFlyMissionStart": "接受此任務",
+      "fireAndFlyMissionRules": "先比獎牌，再比最高得分。每次獲勝的任務都會計入，練習也算。紀錄會在30秒內更新。",
+      "fireAndFlyMissionPersonalRules": "你的離線紀錄，隨此角色保存。先比獎牌，再比最高得分。",
+      "fireAndFlyMastery": "砲手精通",
+      "fireAndFlyMasteryRules": "每個任務的最佳獎牌折算為星數相加：金牌3星，銀牌2星，銅牌1星。星數多者在前，再比總得分。紀錄會在30秒內更新。",
+      "fireAndFlyMasteryPersonalRules": "你的離線精通，隨此角色保存：每個任務的最佳獎牌折算為星數相加（金牌3星，銀牌2星，銅牌1星），再比總得分。",
+      "wqStars": "星數",
       "wqPoints": "分數",
       "wqSeconds": "{seconds}秒",
       "wqNoMedal": "無",
@@ -1534,6 +1608,7 @@ export const zh_TW: EnTranslations = {
         "seconds": "依獎牌排名，其次最快時間",
         "points": "依獎牌排名，其次最高分"
       },
+      "rankedByStars": "依星數排名，再比最高得分",
       "podiumLabel": "前三名",
       "unclaimed": "虛位以待",
       "totalOne": "1 位英雄上榜",
@@ -3156,6 +3231,12 @@ export const zh_TW: EnTranslations = {
         "few": "顯示 {count} 個公會",
         "many": "顯示 {count} 個公會",
         "other": "顯示 {count} 個公會"
+      },
+      "fireAndFlyStars": {
+        "one": "{count}星",
+        "few": "{count}星",
+        "many": "{count}星",
+        "other": "{count}星"
       },
       "commissionMasterworks": {
         "one": "{count}件傑作",
@@ -12552,6 +12633,41 @@ export const zh_TW: EnTranslations = {
           "bronze": "銅牌"
         }
       },
+      "fireAndFly": {
+        "title": "砲手的試煉",
+        "objective": "在一次試煉的每一波攻勢中守住你自己的塔樓",
+        "ready": "與砲術大師奧爾德交談以接受試煉。",
+        "complete": "試煉通過！與砲術大師奧爾德交談即可練習。",
+        "scenarios": {
+          "introduction": "新兵試煉",
+          "standard": "正式值守",
+          "hard": "老兵考驗",
+          "pack": "獸群",
+          "giants": "沉重步伐",
+          "deluge": "洪流",
+          "brittle": "裂塔",
+          "powder": "火藥庫"
+        },
+        "pitch": {
+          "introduction": "新兵的第一次值守",
+          "standard": "城牆上真正的值守",
+          "hard": "老兵們要經受的圍攻",
+          "pack": "成群奔襲，彈彈都要打準",
+          "giants": "寥寥幾頭巨獸，重得難以轟遠",
+          "deluge": "小而快的獸潮",
+          "brittle": "挨幾下塔就倒了",
+          "powder": "雙倍火藥桶，就在牠們路上"
+        },
+        "start": "{name}：{detail}（{count}波）",
+        "practice": "練習{name}（{count}波）",
+        "practiceMission": "{name}：練習（{count}波）",
+        "sections": {
+          "trials": "試煉",
+          "missions": "任務"
+        },
+        "lockedTrial": "{name}：通過{previous}後開啟",
+        "missionsLocked": "通過{name}即可入伍，並開啟任務。"
+      },
       "calligraphyTitle": "秘法書法",
       "traceOutline": "用腳步描繪輪廓",
       "traceRoundInstruction": "第{round}/{total}輪：{shape}。{instruction}",
@@ -20226,6 +20342,11 @@ export const zh_TW: EnTranslations = {
         "title": "澤菲爾的學徒",
         "greeting": "沿著峽谷飛下來的那一趟真漂亮。需要魔法上升氣流送你回斷崖找澤菲爾時，隨時來找我。"
       },
+      "fire_and_fly_instructor": {
+        "name": "砲術大師奧爾德",
+        "title": "砲兵徵募官",
+        "greeting": "城牆需要的守衛比駐軍能抽出的更多，所以我在招募。在把大砲交給任何人之前，我要先看看他們能不能守住自己的塔樓。接受一次試煉吧：在怪物衝到你的城牆前把牠們轟飛。"
+      },
       "shadow_cloak_scout": {
         "name": "斥候薇拉莉",
         "title": "秘密行動",
@@ -23722,6 +23843,11 @@ export const zh_TW: EnTranslations = {
         "name": "晨曦堡",
         "enterText": "你走進晨曦堡溫暖而花香四溢的廳堂。",
         "leaveText": "你回到陽光灑落的花園草坪上。"
+      },
+      "fire_and_fly_arena": {
+        "name": "Fire and Fly",
+        "enterText": "你登上古老的砲塔。樹林之外，森林開始躁動起來。",
+        "leaveText": "你走下塔樓，將競技場拋在身後。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",

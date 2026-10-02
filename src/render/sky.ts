@@ -736,6 +736,14 @@ function skyBiomeAssetsResident(biome: SkyKey): boolean {
   return Boolean(hdriStore[biome]) && Boolean(envHdriStore[biome]);
 }
 
+/** A fixed cycle grade for SkyView.holdCycle. */
+export interface SkyCycleHold {
+  dayNight: readonly [number, number, number];
+  sunDirection: { readonly x: number; readonly y: number; readonly z: number };
+  duskWarm: number;
+  nightDesat: number;
+}
+
 export interface SkyView {
   dome: THREE.Mesh;
   /** cross-fades the HDRI pair toward the biome band the camera is over */
@@ -751,6 +759,11 @@ export interface SkyView {
   /** set the star-field strength (0 day, 1 deep night) and the current time in
    *  seconds (for star twinkle). The sun/moon discs are sprites, not dome-drawn. */
   setStars(starAmt: number, time: number): void;
+  /** Hold the dome's cycle grade (day/night multiplier, dawn/dusk glow, grey-out,
+   *  stars) at an authored time of day, or release it with null. While held, the
+   *  per-frame setDayNight/setCycle/setStars calls leave the grade alone: an
+   *  open-air interior with a fixed hour keeps its sky whatever the clock says. */
+  holdCycle(hold: SkyCycleHold | null): void;
   /** Raw equirect HDR (unclamped) for PMREM IBL; null on the low tier. */
   envTexture(biome: SkyKey): THREE.Texture | null;
   /** Dome-sampled equirect (the visible sky), for prepare-lane GPU upload. */
@@ -1113,6 +1126,7 @@ export function buildSky(
       setCycle: () => {},
       setFog: () => {},
       setStars: () => {},
+      holdCycle: () => {},
       envTexture: () => null,
       domeTexture: () => null,
       skyBiomeAssetsResident,
@@ -1182,6 +1196,7 @@ export function buildSky(
   // for the rest of a frame (setCameraPos steps the blend, then rebinds), so
   // the binding reports both and nothing in flight can be released underneath.
   const readBinding = (): readonly SkyKey[] => [boundFrom, boundTo, current.from, current.to];
+  let held = false;
   domeBindings.add(readBinding);
   return {
     dome,
@@ -1212,9 +1227,11 @@ export function buildSky(
       uniforms.uMix.value = current.t;
     },
     setDayNight(mul: readonly [number, number, number]): void {
+      if (held) return;
       uniforms.uDayNight.value.set(mul[0], mul[1], mul[2]);
     },
     setCycle(liveSunDir: THREE.Vector3, duskWarm: number, nightDesat: number): void {
+      if (held) return;
       uniforms.uSunDirLive.value.copy(liveSunDir);
       uniforms.uDuskWarm.value = duskWarm;
       uniforms.uNightDesat.value = nightDesat;
@@ -1223,8 +1240,18 @@ export function buildSky(
       uniforms.uFog.value.copy(color);
     },
     setStars(starAmt: number, time: number): void {
-      uniforms.uStarAmt.value = starAmt;
       uniforms.uTime.value = time;
+      if (!held) uniforms.uStarAmt.value = starAmt;
+    },
+    holdCycle(hold: SkyCycleHold | null): void {
+      held = hold !== null;
+      if (!hold) return;
+      uniforms.uDayNight.value.set(hold.dayNight[0], hold.dayNight[1], hold.dayNight[2]);
+      const sunDirection = hold.sunDirection;
+      uniforms.uSunDirLive.value.set(sunDirection.x, sunDirection.y, sunDirection.z);
+      uniforms.uDuskWarm.value = hold.duskWarm;
+      uniforms.uNightDesat.value = hold.nightDesat;
+      uniforms.uStarAmt.value = 0;
     },
     envTexture(biome: SkyKey): THREE.Texture | null {
       return envHdriStore[biome] ?? envDomeFallback(biome);

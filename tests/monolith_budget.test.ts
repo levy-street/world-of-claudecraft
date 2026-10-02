@@ -995,7 +995,12 @@ const MONOLITHS: MonolithRow[] = [
     // RE-PINNED 12687 -> 12688 at the second release merge into the same branch,
     // after PR 3847 landed on the release (its renderer.ts wiring adds one line;
     // the release pin stays 12684): wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 12688,
+    // LOWERED 12688 -> 12646: the sun, moon and god-ray painters moved to
+    // src/render/sky_overlays.ts, paying for the one-line Fire and Fly weapon host
+    // (WorldGuidance.setTurretHost). Exact count, zero slack.
+    // LOWERED 12646 -> 12638: the ground-aim reticle input type moved to
+    // src/render/ground_aim_reticle_visual.ts (GroundAimReticleInput). Exact count.
+    ceiling: 12638,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1911,7 +1916,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 5194 -> 5188 at the merge of release/v0.44.0 into the
     // Eastbrook ferry branch (PR 4225): the release's own extractions plus the
     // ferry's wiring, measured with wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 5188,
+    // LOWERED 5188 -> 5170: the four interior floor branches of groundHeight (Wildheart,
+    // Fire and Fly, the Last Keep, Dawnhold) became one lookup in interior_ground_lift.ts.
+    // wc -l. Exact count.
+    ceiling: 5170,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {
@@ -2181,7 +2189,10 @@ const MONOLITHS: MonolithRow[] = [
     // 2486 to 2513 into the row's slack: the berth gate bookkeeping (setColliderGateOpen,
     // gridIndex-ordered reopen, lazy wishes) needs the grid's private state, net of the
     // decoration collider builder moving out to decoration_collider.ts. wc -l. Exact count.
-    ceiling: 2513,
+    // LOWERED 2513 -> 2484 with the static interior collider table (Wildheart, the
+    // Last Keep, Dawnhold, and the new Fire and Fly arena) moved into
+    // interior_collider_sets.ts. wc -l. Exact count.
+    ceiling: 2484,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

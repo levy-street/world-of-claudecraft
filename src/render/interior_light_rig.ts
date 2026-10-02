@@ -9,6 +9,7 @@
 // arrive here as the outdoor fallbacks); this module owns WHAT each state
 // means in light.
 import * as THREE from 'three';
+import { FIRE_AND_FLY_SUN_DIRECTION } from './fire_and_fly_arena_core';
 import { sharedUniforms } from './gfx';
 import { applyIgnivarRaidLighting, type IgnivarRaidFogState } from './ignivar_raid_environment';
 import { RIM_GLOW_DEFAULT_COLOR } from './pbr_fragment_shader';
@@ -30,18 +31,20 @@ export type FogSceneState =
   | 'rift'
   | 'practice'
   | 'wildheartField'
+  | 'fireAndFly'
   | 'lastkeep'
   | 'dawnhold';
 
-/** The states whose scene is open to the sky: the overworld, Wildheart's field
- *  and the Thornhollow Fields hollow keep the sky dome (hiding it there left a
- *  black void above the ramparts); every interior, the maze, the rift and the
- *  water hide it. */
+/** The states whose scene is open to the sky: the overworld, Wildheart's field,
+ *  the Fire and Fly clearing and the Thornhollow Fields hollow keep the sky dome
+ *  (hiding it there left a black void above the ramparts); every interior, the
+ *  maze, the rift and the water hide it. */
 export function isOpenAirFogState(state: FogSceneState): boolean {
   return (
     state === 'outdoor' ||
     state === 'hoardValley' ||
     state === 'wildheartField' ||
+    state === 'fireAndFly' ||
     state === 'battleground'
   );
 }
@@ -86,6 +89,22 @@ const WILDHEART_RIM_BOOST = 1.5;
 const WILDHEART_SUN_COLOR = 0xffd48c;
 const WILDHEART_HEMI_SKY_COLOR = 0xd8ebca;
 const WILDHEART_HEMI_GROUND_COLOR = 0x5b4a2d;
+// The Fire and Fly clearing holds a fixed late afternoon whatever the world
+// clock says: a low gold key from the tree line (its direction is the arena
+// plan's, so the sky glow and the shadows agree), a cool blue sky fill for the
+// shade side, and a warm bounce off the sunlit meadow.
+const FIRE_AND_FLY_SUN_INTENSITY = 3.1;
+const FIRE_AND_FLY_HEMI_INTENSITY = 0.55;
+const FIRE_AND_FLY_ENV_INTENSITY = 0.3;
+const FIRE_AND_FLY_RIM_BOOST = 1.45;
+const FIRE_AND_FLY_SUN_COLOR = 0xffc68a;
+const FIRE_AND_FLY_HEMI_SKY_COLOR = 0xb7c0cf;
+const FIRE_AND_FLY_HEMI_GROUND_COLOR = 0x7a6440;
+export const FIRE_AND_FLY_KEY_LIGHT_DIRECTION = new THREE.Vector3(
+  FIRE_AND_FLY_SUN_DIRECTION.x,
+  FIRE_AND_FLY_SUN_DIRECTION.y,
+  FIRE_AND_FLY_SUN_DIRECTION.z,
+);
 // The Last Keep is a LIVED-IN castle interior, not a crypt: a higher, warmed
 // ambient floor (over the candle-orange torch lights the interior itself
 // carries) so its halls read golden and inhabited while staying indoors-dim.
@@ -132,9 +151,15 @@ export interface OutdoorLightLegs {
 /** Copy the state's own key-light direction into `out` when it has one; the
  *  outdoor sun and moon keep theirs otherwise. Returns whether it did. */
 export function interiorKeyLightDirection(state: FogSceneState, out: THREE.Vector3): boolean {
-  if (state !== 'wildheartField') return false;
-  out.copy(WILDHEART_KEY_LIGHT_DIRECTION);
-  return true;
+  if (state === 'wildheartField') {
+    out.copy(WILDHEART_KEY_LIGHT_DIRECTION);
+    return true;
+  }
+  if (state === 'fireAndFly') {
+    out.copy(FIRE_AND_FLY_KEY_LIGHT_DIRECTION);
+    return true;
+  }
+  return false;
 }
 
 /**
@@ -150,6 +175,7 @@ export function applyInteriorLightRig(
 ): void {
   const mazeNight = state === 'yumiMaze';
   const wildheartSun = state === 'wildheartField';
+  const goldenHour = state === 'fireAndFly';
   const keepHearth = state === 'lastkeep';
   const dawnholdDay = state === 'dawnhold';
   const ignivarForge = state === 'ignivarApproach' || state === 'ignivar' || state === 'varkhul';
@@ -163,46 +189,54 @@ export function applyInteriorLightRig(
     ? YUMI_MAZE_SUN_INTENSITY
     : wildheartSun
       ? WILDHEART_SUN_INTENSITY
-      : keepHearth
-        ? LASTKEEP_SUN_INTENSITY
-        : dawnholdDay
-          ? DAWNHOLD_SUN_INTENSITY
-          : underground
-            ? DUNGEON_SUN_INTENSITY
-            : outdoor.sunIntensity;
+      : goldenHour
+        ? FIRE_AND_FLY_SUN_INTENSITY
+        : keepHearth
+          ? LASTKEEP_SUN_INTENSITY
+          : dawnholdDay
+            ? DAWNHOLD_SUN_INTENSITY
+            : underground
+              ? DUNGEON_SUN_INTENSITY
+              : outdoor.sunIntensity;
   targets.hemi.intensity = mazeNight
     ? YUMI_MAZE_HEMI_INTENSITY
     : wildheartSun
       ? WILDHEART_HEMI_INTENSITY
-      : keepHearth
-        ? LASTKEEP_HEMI_INTENSITY
-        : dawnholdDay
-          ? DAWNHOLD_HEMI_INTENSITY
-          : underground
-            ? DUNGEON_HEMI_INTENSITY
-            : outdoor.hemiIntensity;
+      : goldenHour
+        ? FIRE_AND_FLY_HEMI_INTENSITY
+        : keepHearth
+          ? LASTKEEP_HEMI_INTENSITY
+          : dawnholdDay
+            ? DAWNHOLD_HEMI_INTENSITY
+            : underground
+              ? DUNGEON_HEMI_INTENSITY
+              : outdoor.hemiIntensity;
   targets.scene.environmentIntensity = mazeNight
     ? YUMI_MAZE_ENV_INTENSITY
     : wildheartSun
       ? WILDHEART_ENV_INTENSITY
-      : keepHearth
-        ? LASTKEEP_ENV_INTENSITY
-        : dawnholdDay
-          ? DAWNHOLD_ENV_INTENSITY
-          : underground
-            ? DUNGEON_ENV_INTENSITY
-            : outdoor.envIntensity;
+      : goldenHour
+        ? FIRE_AND_FLY_ENV_INTENSITY
+        : keepHearth
+          ? LASTKEEP_ENV_INTENSITY
+          : dawnholdDay
+            ? DAWNHOLD_ENV_INTENSITY
+            : underground
+              ? DUNGEON_ENV_INTENSITY
+              : outdoor.envIntensity;
   targets.rim.value = mazeNight
     ? YUMI_MAZE_RIM_BOOST
     : wildheartSun
       ? WILDHEART_RIM_BOOST
-      : keepHearth
-        ? LASTKEEP_RIM_BOOST
-        : dawnholdDay
-          ? DAWNHOLD_RIM_BOOST
-          : underground
-            ? DUNGEON_RIM_BOOST
-            : 1;
+      : goldenHour
+        ? FIRE_AND_FLY_RIM_BOOST
+        : keepHearth
+          ? LASTKEEP_RIM_BOOST
+          : dawnholdDay
+            ? DAWNHOLD_RIM_BOOST
+            : underground
+              ? DUNGEON_RIM_BOOST
+              : 1;
   // The rim tint defaults cool everywhere; the forge applier below re-grades
   // it, and setting it first means leaving the raid restores it in the same
   // settle that restores the legs.
@@ -215,6 +249,10 @@ export function applyInteriorLightRig(
     targets.sun.color.setHex(WILDHEART_SUN_COLOR);
     targets.hemi.color.setHex(WILDHEART_HEMI_SKY_COLOR);
     targets.hemi.groundColor.setHex(WILDHEART_HEMI_GROUND_COLOR);
+  } else if (goldenHour) {
+    targets.sun.color.setHex(FIRE_AND_FLY_SUN_COLOR);
+    targets.hemi.color.setHex(FIRE_AND_FLY_HEMI_SKY_COLOR);
+    targets.hemi.groundColor.setHex(FIRE_AND_FLY_HEMI_GROUND_COLOR);
   } else if (keepHearth) {
     // hearth-gold key and bounce; the outdoor path re-grades these
     // colors every frame once the player steps back outside

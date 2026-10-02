@@ -31,6 +31,7 @@ describe('worldQuestInstructorDialog presentation', () => {
     expect([...new Set(instructorIds), 'glider_apprentice'].sort()).toEqual(
       [
         'calligraphy_instructor',
+        'fire_and_fly_instructor',
         'forge_instructor',
         'glider_apprentice',
         'glider_instructor',

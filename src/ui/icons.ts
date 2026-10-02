@@ -3470,6 +3470,21 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   // Buried Hoards: the Clockwork Shock Bomb's thrown cast (the Automatons
   // quartermaster's engineering item): a clockwork gear crackling with shock.
   clockwork_shock_bomb: r('storm', 'sky', ['gear', { p: 'lightning', ...BR }], ['arcs', 'glow']),
+  // Fire and Fly tower weapons (the seat's two sockets): the Shockwave, a stone slam
+  // rolling a dust ring out; the fragmentation shell, a shell bursting into bomblets.
+  turret_shockwave: r('earth', 'bone', [{ p: 'sunburst', s: 1.2, alpha: 0.6 }, 'fist'], ['crack']),
+  turret_frag: r(
+    'fury',
+    'steel',
+    [
+      { p: 'sunburst', s: 1.15, alpha: 0.45 },
+      { p: 'meteor', s: 0.7 },
+      { p: 'coin', x: -13, y: 13, s: 0.3 },
+      { p: 'coin', x: 13, y: 13, s: 0.3 },
+      { p: 'coin', x: 0, y: 17, s: 0.3 },
+    ],
+    ['sparkle', 'glow'],
+  ),
 };
 
 const ITEM_RECIPES: Record<string, IconRecipe> = {
@@ -5608,6 +5623,8 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'cmb_coinsack_caught',
   // The ferry round trip (exp_harbor_to_harbor): procedural exploration crest until commissioned.
   'exp_harbor_to_harbor',
+  // Fire and Fly's first trial passed (exp_gunners_oath): the exploration crest until commissioned.
+  'exp_gunners_oath',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

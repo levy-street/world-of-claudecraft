@@ -550,6 +550,61 @@ export const cs_CZ: EnTranslations = {
       "shotTiming": "Cooldown: {cooldown} s. Dopad po {flight} s. Všechny výstřely sdílí {recovery} s zotavení.",
       "shotRules": "Miř do vyznačeného pole. Bez nákladů many. Poškození neroste s výbavou ani talenty."
     },
+    "turret": {
+      "title": "Fire and Fly",
+      "integrity": "Tower integrity",
+      "integrityValue": "{value}/{max}",
+      "integrityBelow": "Tower integrity below {percent}",
+      "tower": "Tower",
+      "wave": "Wave {wave}/{total}",
+      "left": "Monsters left: {count}",
+      "firstWave": "First wave in {seconds} sec",
+      "nextWave": "Next wave in {seconds} sec",
+      "hint": "Blast the monsters before they reach the tower",
+      "waveBanner": "Wave {wave} of {total}",
+      "finalWave": "Final wave",
+      "clearedBanner": "Wave {wave} cleared",
+      "victory": "Victory!",
+      "defeat": "The tower has fallen",
+      "statKills": "Kills",
+      "statShots": "Shots fired",
+      "statAccuracy": "Accuracy",
+      "statThrow": "Longest throw",
+      "statAirtime": "Longest airtime",
+      "statYards": "{yards} yd",
+      "statSeconds": "{seconds} sec",
+      "medalGold": "Gold medal",
+      "medalSilver": "Silver medal",
+      "medalBronze": "Bronze medal",
+      "noMedal": "No medal",
+      "endAnnouncement": "{verdict} {medal}",
+      "pointsKills": "Kills ({count})",
+      "pointsTower": "Tower kept ({points})",
+      "pointsKegKills": "Keg kills ({count})",
+      "pointsBowled": "Bowled over ({count})",
+      "pointsTotal": "Total points",
+      "leave": "Leave the tower",
+      "leaveShort": "Leave",
+      "replay": "Replay",
+      "replayHint": "Play the same trial again from the tower. Once today's reward is earned, a replay pays no reward.",
+      "replayHintMission": "Play the same mission again from the tower. Once today's reward is earned, a replay pays no reward.",
+      "leavingIn": "Leaving the tower in {seconds} sec",
+      "recruitedBanner": "Recruited!",
+      "recruitedLine": "{name}: \"Welcome to the gate crew, gunner. My missions are open to you now.\"",
+      "weapons": "Tower weapons",
+      "shockwave": "Shockwave",
+      "shockwaveTip": "Slam the tower: a ring rolls from its wall out to {reach} yd in {seconds} sec. Every monster on the ground it reaches is thrown away from the tower, which stops a strike it is still winding up, and takes {damage} damage within {core} yd of the tower, less beyond. Monsters in the air pass over it.",
+      "shockwaveRules": "Ready again {seconds} sec after use. Works only during a wave.",
+      "frag": "Fragmentation Shell",
+      "fragTip": "Arm it, then fire at the ground like a shell. It bursts above the aim point into {count} bomblets: one lands on the point and {outer} land in a ring {radius} yd around it. Each deals up to {damage} damage within {blast} yd, throws the monsters it hits and lights kegs.",
+      "fragRules": "Uses the cannon's reload. Arming it again, or cancelling, puts it away without spending a charge. Works only during a wave.",
+      "chargesLeft": "Charges left: {count}",
+      "weaponsHint": "Blast the monsters before they reach the tower. {shockKey}: Shockwave. {fragKey}: Fragmentation Shell.",
+      "weaponsHintTouch": "Blast the monsters before they reach the tower. Tap a socket for a Shockwave or a Fragmentation Shell.",
+      "statShockwaves": "Shockwaves",
+      "statFrags": "Fragmentation Shells",
+      "statUsed": "{used}/{given}"
+    },
     "warlock": {
       "doomLabel": "Odsouzení",
       "fateThreadsLabel": "Nitě osudu",
@@ -1507,6 +1562,25 @@ export const cs_CZ: EnTranslations = {
       "gliderRankings": "Rekordy dráhy pro kluzák",
       "gliderPersonalRules": "Tvé offline rekordy, uložené u této postavy. Prolétni všechny kruhy popořadě. Denní rekordy se každý den resetují.",
       "gliderRules": "Vyhrává nejrychlejší dokončený let. Prolétni všechny kruhy. Denní rekordy se resetují spolu s říší. Rekordy se aktualizují do 30 sekund.",
+      "fireAndFlyDaily": "{trial}: Today",
+      "fireAndFlyLifetime": "{trial}: All time",
+      "fireAndFlyStart": "Take this trial",
+      "fireAndFlyRankings": "Gunner's records",
+      "fireAndFlyPersonalRules": "Your offline records, saved with this character. The best medal ranks first, then the highest score. Daily records reset each day.",
+      "fireAndFlyRules": "The best medal ranks first, then the highest score. Every won trial counts, practice included. Daily records reset with the realm. Records refresh within 30 seconds.",
+      "fireAndFlyGroupsLabel": "Gunner's record groups",
+      "fireAndFlyGroups": {
+        "trials": "Trials",
+        "missions": "Missions",
+        "mastery": "Mastery"
+      },
+      "fireAndFlyMissionStart": "Take this mission",
+      "fireAndFlyMissionRules": "The best medal ranks first, then the highest score. Every won mission counts, practice included. Records refresh within 30 seconds.",
+      "fireAndFlyMissionPersonalRules": "Your offline records, saved with this character. The best medal ranks first, then the highest score.",
+      "fireAndFlyMastery": "Gunner's Mastery",
+      "fireAndFlyMasteryRules": "Your best medal on each mission, summed as stars: gold 3, silver 2, bronze 1. More stars rank first, then the higher total score. Records refresh within 30 seconds.",
+      "fireAndFlyMasteryPersonalRules": "Your offline Mastery, saved with this character: your best medal on each mission, summed as stars (gold 3, silver 2, bronze 1), then the total score.",
+      "wqStars": "Stars",
       "wqPoints": "Skóre",
       "wqSeconds": "{seconds} s",
       "wqNoMedal": "Žádná",
@@ -1534,6 +1608,7 @@ export const cs_CZ: EnTranslations = {
         "seconds": "Řazeno podle medaile, poté podle nejrychlejšího času",
         "points": "Řazeno podle medaile, poté podle nejvyššího skóre"
       },
+      "rankedByStars": "Ranked by stars, then highest score",
       "podiumLabel": "Nejlepší tři",
       "unclaimed": "Nevyzvednuto",
       "totalOne": "Jeden zařazený hrdina",
@@ -3156,6 +3231,12 @@ export const cs_CZ: EnTranslations = {
         "few": "Zobrazeny {count} gildy",
         "many": "Zobrazeno {count} gild",
         "other": "Zobrazeno {count} gild"
+      },
+      "fireAndFlyStars": {
+        "one": "{count} star",
+        "few": "{count} stars",
+        "many": "{count} stars",
+        "other": "{count} stars"
       },
       "commissionMasterworks": {
         "one": "{count} mistrovsky kovaný předmět",
@@ -12552,6 +12633,41 @@ export const cs_CZ: EnTranslations = {
           "bronze": "Bronz"
         }
       },
+      "fireAndFly": {
+        "title": "The Gunner's Trials",
+        "objective": "Hold a tower of your own through every wave of one trial",
+        "ready": "Speak to Master Gunner Alder to take a trial.",
+        "complete": "Tower held! Speak to Master Gunner Alder to practice.",
+        "scenarios": {
+          "introduction": "Recruit's Trial",
+          "standard": "Standing Watch",
+          "hard": "Veterans' Test",
+          "pack": "The Pack",
+          "giants": "Heavy Tread",
+          "deluge": "The Deluge",
+          "brittle": "The Cracked Tower",
+          "powder": "The Powder Store"
+        },
+        "pitch": {
+          "introduction": "a first watch for a new recruit",
+          "standard": "the real watch on the walls",
+          "hard": "the siege the old hands are tested on",
+          "pack": "they run in packs; make each shell count",
+          "giants": "a few brutes too heavy to throw far",
+          "deluge": "a flood of small, quick beasts",
+          "brittle": "a few blows and the tower falls",
+          "powder": "twice the kegs, right on their path"
+        },
+        "start": "{name}: {detail} (waves: {count})",
+        "practice": "Practice the {name} (waves: {count})",
+        "practiceMission": "{name}: practice run (waves: {count})",
+        "sections": {
+          "trials": "Trials",
+          "missions": "Missions"
+        },
+        "lockedTrial": "{name}: pass the {previous} to open it",
+        "missionsLocked": "Pass the {name} to be recruited and open the missions."
+      },
       "calligraphyTitle": "Arkánová kaligrafie",
       "traceOutline": "Vyšlápni obrys svými kroky",
       "traceRoundInstruction": "Kolo {round} z {total}: {shape}. {instruction}",
@@ -20226,6 +20342,11 @@ export const cs_CZ: EnTranslations = {
         "title": "Zephyrova učednice",
         "greeting": "Skvělý let kaňonem. Promluv se mnou, kdykoli budeš potřebovat kouzelný vzdušný proud zpátky k Zephyrovi na The Shear."
       },
+      "fire_and_fly_instructor": {
+        "name": "Master Gunner Alder",
+        "title": "Gunnery Recruiter",
+        "greeting": "The ramparts need more defenders than the garrison can spare, so I am recruiting. Before I trust anyone with a cannon, I want to see them hold a tower of their own. Take a trial: blast the monsters back before they reach your walls."
+      },
       "shadow_cloak_scout": {
         "name": "Zvědka Valerie",
         "title": "Tajné operace",
@@ -23722,6 +23843,11 @@ export const cs_CZ: EnTranslations = {
         "name": "Zámek Dawnhold",
         "enterText": "Vstupuješ do teplých, květinami provoněných síní zámku Dawnhold.",
         "leaveText": "Vyklouzneš zpátky na sluncem zalitý zahradní trávník."
+      },
+      "fire_and_fly_arena": {
+        "name": "Fire and Fly",
+        "enterText": "You climb the old cannon tower. Beyond the trees, the woods begin to stir.",
+        "leaveText": "You climb down from the tower and leave the arena behind."
       },
       "drowned_temple": {
         "name": "Utopený chrám",

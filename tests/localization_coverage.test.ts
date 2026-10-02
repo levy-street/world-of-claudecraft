@@ -478,6 +478,8 @@ describe('i18n Localization Key Coverage', () => {
     pct: '85%',
     position: 3,
     power: 'powered',
+    // The Fire and Fly locked trial line (questUi.worldQuest.fireAndFly.lockedTrial).
+    previous: 'Standing Watch',
     price: '1g 20s',
     proceeds: '95s',
     progress: '3 / 5',

@@ -819,6 +819,14 @@ export function characterDerivedStats(
   };
 }
 
+export function mobMaxHp(
+  template: Pick<MobTemplate, 'hpBase' | 'hpPerLevel' | 'elite'>,
+  level: number,
+): number {
+  const hpMult = template.elite ? 2.3 : 1;
+  return Math.round((template.hpBase + template.hpPerLevel * (level - 1)) * hpMult);
+}
+
 export function createMob(id: number, template: MobTemplate, level: number, pos: Vec3): Entity {
   const e = baseEntity(id, pos);
   e.kind = 'mob';
@@ -826,10 +834,9 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   e.name = template.name;
   e.level = level;
   e.hostile = true;
-  // Elite scaling, classic-style: ~2.3x health, ~1.5x damage.
-  const hpMult = template.elite ? 2.3 : 1;
+  // Elite scaling, classic-style: ~2.3x health (mobMaxHp), ~1.5x damage.
   const dmgMult = template.elite ? 1.5 : 1;
-  e.maxHp = Math.round((template.hpBase + template.hpPerLevel * (level - 1)) * hpMult);
+  e.maxHp = mobMaxHp(template, level);
   e.hp = e.maxHp;
   if (template.damageFloorPct !== undefined) {
     e.damageFloorHp = Math.ceil(e.maxHp * template.damageFloorPct);

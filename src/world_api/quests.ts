@@ -1,5 +1,6 @@
 import type { TreasureMapRarity } from '../sim/content/treasure_maps';
 import type { FactionId } from '../sim/factions';
+import type { FireAndFlyRecruitment } from '../sim/fire_and_fly_recruitment';
 import type {
   QuestProgress,
   QuestState,
@@ -17,6 +18,8 @@ export interface WorldQuestLeaderboardEntry {
   medal: WorldQuestMedal | null;
   /** The board's number: waves held, seconds, or points (the board says which). */
   metric: number;
+  /** The Gunner's Mastery only: the best mission medals summed (gold 3, silver 2, bronze 1). */
+  stars?: number;
 }
 
 export interface WorldQuestLeaderboardPage {
@@ -70,6 +73,12 @@ export interface IWorldQuests {
    * null when none.
    */
   readonly treasureMap: Readonly<{ rarity: TreasureMapRarity; siteId: string }> | null;
+  /**
+   * Fire and Fly's recruitment (src/sim/fire_and_fly_recruitment.ts): the trials won in
+   * order and whether the character is recruited; `fireAndFlyScenarioUnlocked` reads
+   * which trials and missions Master Gunner Alder offers.
+   */
+  readonly fireAndFlyRecruitment: Readonly<FireAndFlyRecruitment>;
   canRerollWorldQuest?(questId: string): { canReroll: boolean; reason?: string };
   rerollWorldQuest?(questId: string): boolean;
   questState(questId: string): QuestState;

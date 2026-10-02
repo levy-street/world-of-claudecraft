@@ -910,7 +910,7 @@ const MAT_POLICY: Record<string, MatPolicy> = {
 const DEFAULT_POLICY: MatPolicy = { leaf: false, windMul: 0, roughness: 0.95 };
 const LEAF_ALPHA_TEST = 0.4;
 
-interface ModelPart {
+export interface ModelPart {
   geometry: THREE.BufferGeometry;
   material: THREE.Material;
   isLeaf: boolean;
@@ -1029,7 +1029,7 @@ export function foliageResidencySources(): {
   };
 }
 
-function extractParts(url: string): ModelPart[] {
+export function extractParts(url: string): ModelPart[] {
   const cached = extractedParts.get(url);
   if (cached) return cached;
   const gltf = loadedModels.get(url);

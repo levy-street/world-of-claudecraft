@@ -3,11 +3,14 @@
 import type * as THREE from 'three';
 import type { IWorld } from '../world_api';
 import { CannonEncounterVisual } from './cannon_encounter_visual';
+import type { CannonShellHost } from './cannon_shell_visuals';
+import { type ArenaPrebuildQueue, FireAndFlyArenaPrebuild } from './fire_and_fly_arena_prebuild';
 import { GliderCourseVisual } from './glider_course_visual';
 import { IslandGuidance } from './island_guidance';
 import { MountBeacon } from './mount_beacon';
 import { RaceLine } from './race_line';
 import { ShadowInfiltrationVisual } from './shadow_infiltration_visual';
+import { TurretDefenseVisual, type TurretSelfView } from './turret_defense_visual';
 import { WispMazeVisual } from './wisp_maze_visual';
 import { WorldQuestTraceVisual } from './world_quest_trace_visual';
 
@@ -18,6 +21,8 @@ export class WorldGuidance {
   private readonly island: IslandGuidance;
   private readonly trace: WorldQuestTraceVisual;
   private readonly cannon: CannonEncounterVisual;
+  private readonly turret: TurretDefenseVisual;
+  private readonly arenaPrebuild: FireAndFlyArenaPrebuild;
   private readonly glider: GliderCourseVisual;
   private readonly shadow: ShadowInfiltrationVisual;
   private readonly wispMaze: WispMazeVisual;
@@ -55,6 +60,19 @@ export class WorldGuidance {
       groundAt,
       compileGate && ((root) => compileGate(root, true)),
     );
+    // Built lazily at the seat and linked after first paint: it never joins
+    // readyForEntry, which would hold world entry for every player.
+    this.turret = new TurretDefenseVisual(
+      scene,
+      groundAt,
+      compileGate && ((root) => compileGate(root, false)),
+    );
+    // The arena behind the turret, built hidden once the player turns to its
+    // instructor, released if they do not take the trial.
+    this.arenaPrebuild = new FireAndFlyArenaPrebuild(
+      scene,
+      compileGate && ((root) => compileGate(root, false)),
+    );
     this.glider = new GliderCourseVisual(
       scene,
       groundAt,
@@ -83,12 +101,19 @@ export class WorldGuidance {
     this.island.npcFizz(...args);
   }
 
+  /** The renderer services the Fire and Fly cannon's shots draw with, and the
+   *  preparation queue its arena prebuild rides. */
+  setTurretHost(host: CannonShellHost & { readonly backgroundGpuWork?: ArenaPrebuildQueue }): void {
+    this.turret.setHost(host);
+    this.arenaPrebuild.setQueue(host.backgroundGpuWork ?? null);
+  }
+
   update(
     world: IWorld,
     time: number,
     dt: number,
     reducedMotion = false,
-    renderedSelf?: { group: Pick<THREE.Object3D, 'position' | 'rotation'> },
+    renderedSelf?: TurretSelfView,
   ): void {
     // Racing line (cosmetic; reads the self race view only).
     this.race.update(world.mountRaceView(), time, dt);
@@ -101,16 +126,33 @@ export class WorldGuidance {
     );
     this.trace.update(world);
     this.cannon.update(world.vehicleSession, dt, reducedMotion);
+    this.arenaPrebuild.update(world, time * 1000);
+    if (this.arenaPrebuild.built) this.turret.prewarmKit(time);
+    const turret = world.turretSession;
+    this.turret.update(turret, world.turretClock, time, dt, reducedMotion, renderedSelf);
     this.glider.update(world, renderedSelf?.group);
     this.shadow.update(world);
     this.wispMaze.update(world, reducedMotion);
   }
 
+  /** Every child disposes even when one throws; the failures are rethrown together at the end. */
   dispose(): void {
-    this.trace.dispose();
-    this.cannon.dispose();
-    this.glider.dispose();
-    this.shadow.dispose();
-    this.wispMaze.dispose();
+    const errors: unknown[] = [];
+    for (const child of [
+      this.trace,
+      this.cannon,
+      this.turret,
+      this.arenaPrebuild,
+      this.glider,
+      this.shadow,
+      this.wispMaze,
+    ]) {
+      try {
+        child.dispose();
+      } catch (error) {
+        errors.push(error);
+      }
+    }
+    if (errors.length > 0) throw new AggregateError(errors, 'World guidance failed to dispose');
   }
 }

@@ -202,6 +202,8 @@ const UI_ROOT_TOUCHERS: Record<string, string> = {
     'the world-quest puzzle window (a .window, window_drag governs it; closeManagedWindow closes it), minted at runtime like perfecting_window.ts',
   'src/ui/hud/vehicle/vehicle_action_bar_controller.ts':
     'the cannon vehicle action bar, shown only while the player mans a cannon (transient, activity-scoped)',
+  'src/ui/hud/vehicle/turret_hud_controller.ts':
+    'the Fire and Fly seat HUD, shown only while the player is seated in the turret (transient, activity-scoped): its two roots, the top status strip that unfolds into the result card and the pointer-inert bottom tower rail (turret_hud_painter.ts mints both, beside the visually hidden live line that stays rendered so it can speak), the weapon sockets row above the rail (turret_weapon_bar_painter.ts, hidden once the run ends), plus its hit-flash edge veil, a decorative pointer-inert overlay shown only while a strike flashes',
 };
 
 /** Registry frames whose elements are minted at runtime rather than written

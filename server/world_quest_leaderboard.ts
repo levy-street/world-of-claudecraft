@@ -4,7 +4,9 @@
 //   GET /api/world-quests/leaderboard?board=<id>&page=N&pageSize=M
 //
 // Write side (recordWorldQuestScore): the sim emits `worldQuestScore` once per
-// finished attempt; the observer resolves the board, derives the one sortable
+// finished attempt (and `worldQuestMastery` when a Fire and Fly mission moves a
+// character's Gunner's Mastery, recorded by recordFireAndFlyMastery on the same
+// FIFO); the observer resolves the board, derives the one sortable
 // key (src/sim/world_quest_scoreboards.ts, shared with every host), and queues
 // the best-row upsert on a per-process FIFO tail (the progress_events.ts
 // shape: ONE write in flight at a time, so a burst can never crowd logins and
@@ -25,6 +27,14 @@
 // even when the row sits pages away; it never costs a query of its own.
 
 import { resetDayKey } from '../src/reset_calendar';
+import {
+  fireAndFlyMasteryValid,
+  fireAndFlyScoreValid,
+} from '../src/sim/fire_and_fly_personal_records';
+import {
+  FIRE_AND_FLY_MASTERY_BOARD_ID,
+  fireAndFlyScoreboardInfo,
+} from '../src/sim/fire_and_fly_scoreboards';
 import { gliderScoreboardInfo } from '../src/sim/glider_scoreboards';
 import { LEADERBOARD_PAGE_SIZE } from '../src/sim/leaderboard_page';
 import { paginateWorldQuestLeaderboard } from '../src/sim/world_quest_leaderboard_page';
@@ -38,6 +48,8 @@ import {
 import type { WorldQuestLeaderboardEntry, WorldQuestLeaderboardPage } from '../src/world_api';
 import { type CachedRead, createCachedRead } from './cached_read';
 import { ELIGIBLE_ACCOUNT_SQL, pool, runWithStatementTimeout } from './db';
+import { fireAndFlyMasteryRows, upsertFireAndFlyMastery } from './fire_and_fly_mastery_db';
+import { fireAndFlyScoreRows, upsertFireAndFlyScore } from './fire_and_fly_scores_db';
 import { gliderScoreRows, upsertGliderScore } from './glider_scores_db';
 import type { Ctx, RouteDef } from './http/types';
 import { json } from './http_util';
@@ -80,6 +92,12 @@ export interface WorldQuestScoreObservation {
   resetDay?: string;
 }
 
+export interface FireAndFlyMasteryObservation {
+  board: string;
+  stars: number;
+  points: number;
+}
+
 export interface WorldQuestScoreWho {
   accountId: number;
   characterId: number;
@@ -90,9 +108,47 @@ type ScoreDb = {
   rows: typeof worldQuestScoreboardRows;
 };
 
+/** A board with its own table: the glider's courses, Fire and Fly's trials and missions
+ *  (daily and lifetime rows), and the Gunner's Mastery. */
+interface PeriodicBoard {
+  period: 'daily' | 'lifetime';
+  rows: typeof gliderScoreRows;
+  /** Null when no run's score writes the board (the Mastery has its own event). */
+  upsert: typeof upsertGliderScore | null;
+  /** The sim's own bounds on a submitted run, checked before it is queued. */
+  accepts(ev: WorldQuestScoreObservation): boolean;
+}
+
+function periodicBoard(boardId: string): PeriodicBoard | null {
+  const glider = gliderScoreboardInfo(boardId);
+  if (glider)
+    return {
+      period: glider.period,
+      rows: gliderScoreRows,
+      upsert: upsertGliderScore,
+      accepts: (ev) => ev.metric > 0 && ev.metric < 1000,
+    };
+  const trial = fireAndFlyScoreboardInfo(boardId);
+  if (trial)
+    return {
+      period: trial.period,
+      rows: fireAndFlyScoreRows,
+      upsert: upsertFireAndFlyScore,
+      accepts: (ev) => fireAndFlyScoreValid(ev.medal, ev.metric),
+    };
+  if (boardId === FIRE_AND_FLY_MASTERY_BOARD_ID)
+    return {
+      period: 'lifetime',
+      rows: fireAndFlyMasteryRows,
+      upsert: null,
+      accepts: () => false,
+    };
+  return null;
+}
+
 let db: ScoreDb = { upsert: upsertWorldQuestScore, rows: worldQuestScoreboardRows };
 const caches = new Map<string, CachedRead<WorldQuestScoreRow[]>>();
-const gliderCacheDays = new Map<string, string>();
+const periodicCacheDays = new Map<string, string>();
 let tail: Promise<void> = Promise.resolve();
 let pending = 0;
 let shedRows = 0;
@@ -102,7 +158,7 @@ let lastShedLogAt = 0;
 export function configureWorldQuestScoreDbForTests(next: ScoreDb | null): void {
   db = next ?? { upsert: upsertWorldQuestScore, rows: worldQuestScoreboardRows };
   caches.clear();
-  gliderCacheDays.clear();
+  periodicCacheDays.clear();
   tail = Promise.resolve();
   pending = 0;
   shedRows = 0;
@@ -130,27 +186,27 @@ export function bustWorldQuestLeaderboardCaches(): void {
 }
 
 function cacheFor(board: WorldQuestScoreboard): CachedRead<WorldQuestScoreRow[]> {
-  const glider = gliderScoreboardInfo(board.id);
-  const day = glider?.period === 'daily' ? resetDayKey(Date.now(), REALM_RESET_TIME_ZONE) : '';
-  if (glider && gliderCacheDays.get(board.id) !== day) {
+  const periodic = periodicBoard(board.id);
+  const day = periodic?.period === 'daily' ? resetDayKey(Date.now(), REALM_RESET_TIME_ZONE) : '';
+  if (periodic && periodicCacheDays.get(board.id) !== day) {
     caches.delete(board.id);
-    gliderCacheDays.set(board.id, day);
+    periodicCacheDays.set(board.id, day);
   }
   let cache = caches.get(board.id);
   if (!cache) {
     let retryAt = 0;
     cache = createCachedRead(
       async () => {
-        if (glider && Date.now() < retryAt)
-          throw new Error('Glider rankings temporarily unavailable');
+        if (periodic && Date.now() < retryAt)
+          throw new Error('Periodic rankings temporarily unavailable');
         try {
           return await runWithStatementTimeout(WORLD_QUEST_LEADERBOARD_READ_TIMEOUT_MS, (query) =>
-            glider
-              ? gliderScoreRows({ query }, REALM, board.id, day, ELIGIBLE_ACCOUNT_SQL)
+            periodic
+              ? periodic.rows({ query }, REALM, board.id, day, ELIGIBLE_ACCOUNT_SQL)
               : db.rows({ query }, REALM, board.id, ELIGIBLE_ACCOUNT_SQL),
           );
         } catch (error) {
-          if (glider) retryAt = Date.now() + 5_000;
+          if (periodic) retryAt = Date.now() + 5_000;
           throw error;
         }
       },
@@ -170,15 +226,60 @@ function shed(): void {
   }
 }
 
-/** The server event-loop hook: a pid-scoped worldQuestScore event records for its
- *  connected scorer; every other event, and an unknown pid, is a no-op. */
+/** Queue one write on the FIFO tail, or shed it past the depth bound. */
+function enqueue(write: () => Promise<unknown>): void {
+  if (pending >= MAX_PENDING_WORLD_QUEST_SCORES) {
+    shed();
+    return;
+  }
+  pending += 1;
+  tail = tail
+    .then(async () => {
+      await write();
+    })
+    .catch((err) => {
+      console.error('world quest score write failed:', err);
+    })
+    .finally(() => {
+      pending -= 1;
+    });
+}
+
+/** The server event-loop hook: a pid-scoped worldQuestScore or worldQuestMastery event
+ *  records for its connected scorer; every other event, and an unknown pid, is a no-op. */
 export function recordWorldQuestScoreEvent(
   clients: { get(pid: number): WorldQuestScoreWho | undefined },
   ev: { type: string; pid?: number },
 ): void {
-  if (ev.type !== 'worldQuestScore' || ev.pid === undefined) return;
-  const scorer = clients.get(ev.pid);
-  if (scorer) recordWorldQuestScore(scorer, ev as unknown as WorldQuestScoreObservation);
+  if (ev.type !== 'worldQuestScore' && ev.type !== 'worldQuestMastery') return;
+  const scorer = ev.pid === undefined ? undefined : clients.get(ev.pid);
+  if (!scorer) return;
+  if (ev.type === 'worldQuestMastery')
+    recordFireAndFlyMastery(scorer, ev as unknown as FireAndFlyMasteryObservation);
+  else recordWorldQuestScore(scorer, ev as unknown as WorldQuestScoreObservation);
+}
+
+/** Record a character's new Gunner's Mastery row (fire-and-forget; the table keeps it
+ *  only when it rises). The ladder refreshes at the shared TTL, like the runs' boards. */
+export function recordFireAndFlyMastery(
+  who: WorldQuestScoreWho,
+  ev: FireAndFlyMasteryObservation,
+): void {
+  if (ev.board !== FIRE_AND_FLY_MASTERY_BOARD_ID || !fireAndFlyMasteryValid(ev.stars, ev.points))
+    return;
+  const row = {
+    realm: REALM,
+    board: ev.board,
+    characterId: who.characterId,
+    accountId: who.accountId,
+    stars: ev.stars,
+    points: ev.points,
+  };
+  enqueue(() =>
+    runWithStatementTimeout(WORLD_QUEST_LEADERBOARD_READ_TIMEOUT_MS, (query) =>
+      upsertFireAndFlyMastery({ query }, row),
+    ),
+  );
 }
 
 /** Record one finished attempt (fire-and-forget; never throws, never awaits). */
@@ -188,20 +289,16 @@ export function recordWorldQuestScore(
 ): void {
   const board = worldQuestScoreboard(ev.board);
   if (!board || !Number.isFinite(ev.metric)) return;
-  const glider = gliderScoreboardInfo(board.id);
+  const periodic = periodicBoard(board.id);
+  const upsert = periodic?.upsert;
   if (
-    glider &&
-    (glider.period !== 'lifetime' ||
+    periodic &&
+    (!upsert ||
+      periodic.period !== 'lifetime' ||
       !/^\d{4}-\d{2}-\d{2}$/.test(ev.resetDay ?? '') ||
-      ev.metric <= 0 ||
-      ev.metric >= 1000)
+      !periodic.accepts(ev))
   )
     return;
-  if (pending >= MAX_PENDING_WORLD_QUEST_SCORES) {
-    shed();
-    return;
-  }
-  pending += 1;
   const metric = Math.max(0, ev.metric);
   const resetDay = ev.resetDay ?? '';
   const row = {
@@ -213,21 +310,14 @@ export function recordWorldQuestScore(
     metric,
     sortKey: worldQuestScoreSortKey(board, ev.medal, metric),
   };
-  tail = tail
-    .then(async () => {
-      if (glider) {
-        // Refresh at the shared TTL, never once per improving finish.
-        await runWithStatementTimeout(WORLD_QUEST_LEADERBOARD_READ_TIMEOUT_MS, (query) =>
-          upsertGliderScore({ query }, { ...row, resetDay }),
-        );
-      } else if (await db.upsert(pool, row)) caches.get(board.id)?.bust();
-    })
-    .catch((err) => {
-      console.error('world quest score write failed:', err);
-    })
-    .finally(() => {
-      pending -= 1;
-    });
+  enqueue(async () => {
+    if (upsert) {
+      // Refresh at the shared TTL, never once per improving finish.
+      await runWithStatementTimeout(WORLD_QUEST_LEADERBOARD_READ_TIMEOUT_MS, (query) =>
+        upsert({ query }, { ...row, resetDay }),
+      );
+    } else if (await db.upsert(pool, row)) caches.get(board.id)?.bust();
+  });
 }
 
 /** Longest `viewer` the route looks up; a longer string names no character. */
@@ -241,7 +331,7 @@ export async function worldQuestLeaderboardPage(
   pageSize: number,
   viewer?: string,
 ): Promise<WorldQuestLeaderboardPage> {
-  const daily = gliderScoreboardInfo(board.id)?.period === 'daily';
+  const daily = periodicBoard(board.id)?.period === 'daily';
   const day = daily ? resetDayKey(Date.now(), REALM_RESET_TIME_ZONE) : '';
   const rows = await cacheFor(board).read();
   if (daily && day !== resetDayKey(Date.now(), REALM_RESET_TIME_ZONE))
@@ -251,6 +341,7 @@ export async function worldQuestLeaderboardPage(
     name: row.name,
     medal: row.medal,
     metric: row.metric,
+    ...(row.stars === undefined ? {} : { stars: row.stars }),
   }));
   const wanted = (viewer ?? '').trim().toLowerCase();
   const self =

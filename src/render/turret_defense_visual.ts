@@ -1,0 +1,1084 @@
+// Fire and Fly on screen: the private monsters' rigs with their stand-ins, health
+// bars and strike rings, the dust they kick up wherever they meet the world
+// (turret_contact_dust_core.ts, launched on the cannon's own puff draw), their
+// hitstop and scorch flash when a shell strikes them, the cannon tower whose head
+// turns toward the aim (turret_tower_visual.ts) with the player standing behind
+// its breech, plus the cannon's shots (cannon_shell_visuals.ts, their muzzle and
+// recoil on the tower's barrel), driven from IWorld.turretSession. Nothing is
+// built until the player is first seen seated in the turret; the rig pools then
+// grow one rig per frame for the current and next wave, and one per idle slot for
+// the others, and live until the player has left both the seat and the arena (a
+// Replay keeps them): the rigs, the marker bodies, the ground markers, the kegs
+// and the weapon's pools are then released (the kegs and the weapon not while the
+// arena prebuild means a seat), each once its own compile gates settled, and a
+// later seat builds them again on the same gated path. The tower stays (see
+// releaseRun). Every rig attaches behind
+// the compile gate while a capsule on a prewarmed material stands in at the
+// monster's exact position: enemy positions are never hidden. An unused rig leaves
+// the scene graph. No lights, no shadows, no per-frame THREE allocation. A rig's
+// scorch flash links its programs behind the same compile gate as the rig is built,
+// once per material shape, so a first hit swaps them in at once (a hit before that
+// link keeps the rig's own materials until it lands). A health bar and a
+// strike ring are what a player acts on: they paint over the cannon's dust (a
+// higher rung of the floor ladder than the puff draw) and the bar faces the camera
+// upright over the body, whatever its tumble. Every living monster also carries a
+// red ground marker, drawn by turret_ground_markers.ts, and the explosive barrels
+// are turret_barrel_visual.ts. The player's own shot plays on the click: the seat
+// HUD marks it in the page's own-shot ledger (turret_own_shot_core.ts), the head
+// recoils and the shell leaves at once, and the shot's `fired` entry adopts that
+// shell rather than drawing another. The limited weapons (the Shockwave's slam and
+// front, the fragmentation shell's burst and bomblets) are
+// turret_weapons_visual.ts, on the same draws. Pure halves:
+// turret_monster_pose_core.ts, turret_motion_forecast_core.ts,
+// turret_contact_dust_core.ts, turret_defense_pool_core.ts and
+// turret_tower_core.ts.
+import * as THREE from 'three';
+import { fireAndFlyLookTemplate } from '../sim/content/fire_and_fly_looks';
+import { TURRET_PHYSICS, TURRET_WEAPON } from '../sim/content/turret_defense';
+import { MOBS } from '../sim/data';
+import type { ThrowProbe } from '../sim/minigames/thrown_body';
+import { type TurretEvent, turretShellFlightTicks } from '../sim/minigames/turret_defense';
+import type { TurretFeedback } from '../sim/minigames/turret_feedback';
+import { DT, type Entity } from '../sim/types';
+import type { TurretOwnShotLedger } from '../ui/hud/vehicle/turret_own_shot_core';
+import { turretOwnShots } from '../ui/hud/vehicle/turret_own_shots';
+import type { TurretSessionView } from '../world_api/vehicles';
+import { timeBuildSpan } from './build_spans';
+import type { CannonFiredShot, CannonPoint } from './cannon_shell_core';
+import { type CannonShellHost, CannonShellVisuals } from './cannon_shell_visuals';
+import { type AnimState, CharacterVisual } from './characters';
+import { charactersReady } from './characters/assets';
+import { VISUALS, visualKeyFor } from './characters/manifest';
+import type { FarBakeGate } from './characters/visual';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
+import { attachSceneGroupGated } from './gated_scene_attach';
+import { type IdleScheduler, idleSlot } from './idle_queue';
+import { GAIT_RUN_ENTER } from './locomotion';
+import {
+  TURRET_BARREL_BURSTS,
+  type TurretBarrelSource,
+  TurretBarrelVisual,
+  turretBarrelBlast,
+} from './turret_barrel_visual';
+import {
+  newTurretContact,
+  TURRET_CONTACT_BURSTS,
+  TURRET_CONTACT_PUFFS,
+  type TurretContactCounts,
+  type TurretContactKind,
+  turretContactBurstInto,
+  turretContactCounts,
+  turretContactLag,
+  turretSlideTrailInto,
+} from './turret_contact_dust_core';
+import {
+  nextTurretRig,
+  TurretFeedbackCursor,
+  type TurretPlanInput,
+  TurretSlotBook,
+  turretBodyCapacity,
+  turretBuildOrder,
+  turretRigCapacities,
+  turretRigPlan,
+  turretRunResidencyOver,
+  turretUrgentTemplates,
+} from './turret_defense_pool_core';
+import { TurretGateTracker } from './turret_gate_tracker';
+import { TurretMarkerGround } from './turret_ground_marker_core';
+import { TURRET_MARKER_ORDER, TurretGroundMarkers } from './turret_ground_markers';
+import {
+  newTurretMonsterPose,
+  TURRET_TICK_LATE_MAX,
+  TURRET_TICK_LEAD_MAX,
+  TurretAttitude,
+  TurretDisplayClock,
+  turretMonsterPoseInto,
+  turretPivotHeight,
+} from './turret_monster_pose_core';
+import { TurretMotionForecast } from './turret_motion_forecast_core';
+import {
+  TURRET_BARREL,
+  TURRET_TOWER_MODEL,
+  turretBarrelPitch,
+  turretGunnerInto,
+} from './turret_tower_core';
+import { type TurretTowerSource, TurretTowerVisual } from './turret_tower_visual';
+import {
+  TURRET_WEAPON_BOMBLETS,
+  TURRET_WEAPON_IMPACTS,
+  TurretWeaponsVisual,
+  turretShellEndLift,
+  turretShockwaveBursts,
+} from './turret_weapons_visual';
+import { ViewCreateRetryGate } from './view_create_retry';
+import { worldQuestTraceMaterials } from './world_quest_trace_materials';
+
+type CompileGate = (target: THREE.Object3D) => Promise<unknown>;
+type TurretPlanView = TurretSessionView['defense']['plan'];
+type TurretDefenseView = TurretSessionView['defense'];
+
+/**
+ * The seated player's own view: its facing, already turned toward the aim, is
+ * where the head turns; it is drawn standing behind the breech on the head's yaw.
+ */
+export interface TurretSelfView {
+  readonly group: Pick<THREE.Object3D, 'position' | 'rotation'>;
+}
+
+interface RigSlot {
+  readonly actor: CharacterVisual;
+  /** Visibility owned by the compile gate: false until the rig's programs link. */
+  readonly gate: THREE.Group;
+  /** Pivot position and attitude. */
+  readonly root: THREE.Group;
+  /** Yaw, template scale and the offset from the pivot down to the feet. */
+  readonly body: THREE.Group;
+  /** World height of the scaled rig. */
+  readonly height: number;
+  /** The rig has its own airborne clip (a jump or fall pose). */
+  readonly airClip: boolean;
+  used: boolean;
+}
+
+interface BodySlot {
+  owner: number | null;
+  readonly attitude: TurretAttitude;
+  readonly forecast: TurretMotionForecast;
+  readonly slope: TurretMarkerGround;
+  readonly standIn: THREE.Mesh;
+  readonly health: THREE.Mesh;
+  readonly ring: THREE.Mesh;
+  used: boolean;
+}
+
+const HEALTH_BAR_WIDTH = 1.2;
+/** Yards over the body's reach from its pivot (half its height, in any attitude). */
+const HEALTH_BAR_LIFT = 0.35;
+const RING_LIFT = 0.08;
+/** A corpse sinks at least this far (yd), so a short body still leaves the ground. */
+const SINK_DEPTH = 1.1;
+/** Without the barrel (the tower still loading), the muzzle sits this high over the
+ *  seated feet and this far toward the shot (turret_defense_sfx.ts plays the report there). */
+const MUZZLE_LIFT = 2.2;
+const MUZZLE_REACH = 2;
+/** A shot entry older than this many ticks at its first read (a seat seen late) draws nothing. */
+const SHOT_STALE_TICKS = 10;
+/** The renderer's view retry: a failed rig or tower load (a streamed GLB still arriving) is tried again after it. */
+const RIG_RETRY_MS = 2000;
+/** The retry gate keys (entity, slot): the pool is one entity, each template a slot. */
+const POOL = 0;
+/** A later wave's rig waits for an idle slot, on the renderer's idle prewarm terms. */
+const RIG_IDLE_TIMEOUT_MS = 250;
+const RIG_IDLE_DEFERRALS = 2;
+/** A hit at least this close to the blast's full strength is a core hit: the rig freezes on it. */
+const CORE_HIT_FALLOFF = 0.999;
+/** The core hit's hitstop: the rig's clip at this speed for this long (s). */
+const HITSTOP_SCALE = 0.05;
+const HITSTOP_SECONDS = 0.12;
+/** The scorch a blast leaves on a body, by its falloff: from a graze to a core hit. */
+const FLASH_MIN = 0.35;
+const FLASH_GAIN = 0.55;
+
+export class TurretDefenseVisual {
+  readonly group = new THREE.Group();
+  private readonly rigsRoot = new THREE.Group();
+  private readonly markersRoot = new THREE.Group();
+  private readonly book = new TurretSlotBook();
+  /** A seat committed pools that a run grew; released once the player leaves the arena. */
+  private runResident = false;
+  /** The weapon and the kegs were prepared; released outside the arena unless a seat is meant. */
+  private kitResident = false;
+  /** The arena prebuild asked for the kit this frame (prewarmKit runs before update). */
+  private kitWanted = false;
+  /** Bumped by each release: a rig whose gate links after it never attaches. */
+  private generation = 0;
+  private readonly rigs: RigSlot[] = [];
+  private readonly bodies: BodySlot[] = [];
+  private readonly built = new Map<string, number>();
+  private readonly retry = new ViewCreateRetryGate(RIG_RETRY_MS);
+  private readonly coolingDown = {
+    has: (templateId: string): boolean => !this.retry.canAttempt(POOL, templateId, this.nowMs),
+  };
+  private readonly clock = new TurretDisplayClock();
+  private readonly cursor = new TurretFeedbackCursor();
+  private weapon!: CannonShellVisuals;
+  private weapons!: TurretWeaponsVisual;
+  private barrels!: TurretBarrelVisual;
+  private readonly takeBurst = (now: number) => this.weapon.puffBurst(now);
+  private groundMarkers!: TurretGroundMarkers;
+  private rigGates!: TurretGateTracker;
+  private weaponGates!: TurretGateTracker;
+  private barrelGates!: TurretGateTracker;
+  private markerGates!: TurretGateTracker;
+  private readonly tower: TurretTowerVisual;
+  private readonly gunner = { x: 0, y: 0, z: 0 };
+  private readonly pose = newTurretMonsterPose();
+  private readonly probe: ThrowProbe;
+  private readonly contact = newTurretContact();
+  private contactCounts!: Readonly<TurretContactCounts>;
+  private host: CannonShellHost | null = null;
+  private readonly texelSlot = () =>
+    idleSlot(RIG_IDLE_TIMEOUT_MS, {
+      scheduler: this.idleScheduler,
+      maxTimeoutDeferrals: RIG_IDLE_DEFERRALS,
+    });
+  private readonly effectGate: FarBakeGate | null;
+  /** Ids a shell struck at its core in the feedback being read (their launch freezes on it). */
+  private readonly coreHits: number[] = [];
+  private readonly anim: AnimState = {
+    speed: 0,
+    moving: false,
+    running: false,
+    airborne: false,
+    falling: false,
+    backwards: false,
+    dead: false,
+    casting: false,
+    swimming: false,
+    submerged: false,
+    swimPitch: 0,
+    wading: false,
+    sitting: false,
+  };
+  private readonly muzzle = { x: 0, y: 0, z: 0 };
+  private readonly ownTarget = { x: 0, y: 0, z: 0 };
+  private readonly firedEnd: {
+    shotId: number;
+    x: number;
+    y: number;
+    z: number;
+    flightTicks: number;
+    impactTick: number;
+    weapon?: 'frag';
+  } = { shotId: 0, x: 0, y: 0, z: 0, flightTicks: 0, impactTick: 0 };
+  /** The newest own-shot serial already launched; a rebuilt visual starts past the page's. */
+  private launched: number;
+  private readonly refusedOwn = (serial: number): boolean =>
+    this.shots.status(serial) === 'refused';
+  private camera: THREE.Camera | null = null;
+  private geometry: {
+    capsule: THREE.CapsuleGeometry;
+    box: THREE.BoxGeometry;
+    ring: THREE.RingGeometry;
+  } | null = null;
+  private plan: TurretPlanView | null = null;
+  private capacities = new Map<string, number>();
+  private order: string[] = [];
+  private urgent: ReadonlySet<string> = new Set();
+  private orderWave = -1;
+  private idleBuildPending = false;
+  private nowMs = 0;
+  private towerRetryAtMs = Number.NEGATIVE_INFINITY;
+  private barrelRetryAtMs = Number.NEGATIVE_INFINITY;
+  private startTick = Number.NaN;
+  private charactersState: 'idle' | 'loading' | 'ready' | 'failed' = 'idle';
+  private disposed = false;
+  private rigPlan: TurretPlanInput | null = null;
+  /** Each rig id's template and the template whose body it wears. */
+  private readonly rigLooks = new Map<string, { templateId: string; lookId: string }>();
+  /** Each rig material shape's scorch stage this run: true once its programs linked. */
+  private readonly scorchShapes = new Map<string, Promise<boolean>>();
+  private readonly templateOf = (kind: number): string =>
+    this.rigPlan?.kinds[kind]?.templateId ?? '';
+
+  constructor(
+    scene: THREE.Object3D,
+    private readonly groundAt: (x: number, z: number) => number,
+    private readonly compileGate?: CompileGate,
+    private readonly idleScheduler?: IdleScheduler,
+    towerSource?: TurretTowerSource,
+    private readonly barrelSource?: TurretBarrelSource,
+    private readonly shots: TurretOwnShotLedger = turretOwnShots,
+  ) {
+    this.launched = shots.newestSerial;
+    this.probe = { ground: groundAt, water: () => null };
+    this.tower = new TurretTowerVisual(compileGate, towerSource);
+    this.mintKit();
+    this.mintRunPools();
+    this.effectGate = compileGate
+      ? (target, settle) => {
+          void (this.rigGates.gate ?? compileGate)(target).then(
+            () => settle(),
+            () => settle(),
+          );
+        }
+      : null;
+    this.group.name = 'fire-and-fly';
+    this.rigsRoot.name = 'fire-and-fly-rigs';
+    this.markersRoot.name = 'fire-and-fly-markers';
+    this.group.add(this.rigsRoot, this.markersRoot);
+    this.group.visible = false;
+    scene.add(this.group);
+  }
+
+  /** Rigs built so far, per template (read by tests and diagnostics). */
+  get rigCounts(): ReadonlyMap<string, number> {
+    return this.built;
+  }
+
+  /** The renderer services the shots draw with (particles, camera kick, AoE ring); its camera the health bars face. */
+  setHost(host: CannonShellHost | null): void {
+    this.host = host;
+    this.weapon.setHost(host);
+    this.weapons.setHost(host);
+    this.camera = host?.camera ?? null;
+  }
+
+  update(
+    session: TurretSessionView | null | undefined,
+    clock: number | null | undefined,
+    time: number,
+    dt: number,
+    reducedMotion = false,
+    self?: TurretSelfView,
+  ): void {
+    if (this.disposed) return;
+    const kitWanted = this.kitWanted;
+    this.kitWanted = false;
+    if (!session) {
+      if (this.group.visible) this.stand();
+      if (turretRunResidencyOver(false, self?.group.position.x ?? null)) {
+        if (this.runResident) this.releaseRun();
+        if (this.kitResident && !kitWanted) this.releaseKit();
+      }
+      return;
+    }
+    this.nowMs = time * 1000;
+    const defense = session.defense;
+    const aimYaw = self ? self.group.rotation.y : Math.atan2(defense.aimX, defense.aimZ);
+    if (defense.startTick !== this.startTick) {
+      this.stand();
+      this.startTick = defense.startTick;
+      this.tower.reset(aimYaw);
+    }
+    this.commit(defense.plan, defense.wave);
+    this.group.visible = true;
+    if (this.rigsRoot.parent !== this.group) this.group.add(this.rigsRoot);
+    const tick = this.clock.sample(clock ?? defense.startTick, time);
+    for (let i = 0; i < this.rigs.length; i++) {
+      if (!this.book.rigReady[i] && this.rigs[i].gate.visible) this.book.setRigReady(i);
+    }
+    this.book.assign(defense.monsters, this.templateOf);
+    this.tower.place(defense.cx, session.origin.y, defense.cz);
+    this.tower.aim(aimYaw, dt);
+    this.tower.hop(time);
+    const now = clock ?? defense.startTick;
+    this.shots.update(session, now);
+    this.launchOwnShots(session, now, tick, time, reducedMotion);
+    this.consumeFeedback(session, tick, time, reducedMotion);
+    if (self) this.standGunner(self, defense.cx, session.origin.y, defense.cz);
+    for (const rig of this.rigs) rig.used = false;
+    for (const body of this.bodies) body.used = false;
+    const frozen = defense.phase === 'lost';
+    const step = Math.max(0, Math.min(dt, 0.1));
+    this.groundMarkers.begin();
+    for (const m of defense.monsters) {
+      const b = this.book.bodyOf(m.id);
+      const kind = defense.plan.kinds[m.kind];
+      if (b < 0 || !kind) continue;
+      const body = this.bodies[b];
+      if (body.owner !== m.id) {
+        body.owner = m.id;
+        body.attitude.reset();
+        body.forecast.reset();
+        body.slope.reset();
+      }
+      const motion = body.forecast.resolve(m, kind, defense, tick, this.probe, TURRET_PHYSICS);
+      const pose = turretMonsterPoseInto(
+        this.pose,
+        motion,
+        kind,
+        tick,
+        this.probe,
+        frozen,
+        defense,
+      );
+      body.forecast.blend(pose, tick, this.probe);
+      this.groundMarkers.push(motion, pose, kind.radius, body.slope);
+      body.attitude.step(pose, tick, reducedMotion);
+      const r = this.book.rigOf(m.id);
+      const rig = r >= 0 ? this.rigs[r] : null;
+      const height = rig ? rig.height : kind.height;
+      const pivot = turretPivotHeight(height, body.attitude.upY());
+      const baseY = pose.y - pose.sink * Math.max(height, SINK_DEPTH);
+      const a = body.attitude;
+      if (rig) {
+        rig.used = true;
+        if (rig.root.parent !== rig.gate) rig.gate.add(rig.root);
+        rig.root.visible = true;
+        rig.root.position.set(pose.x, baseY + pivot, pose.z);
+        rig.root.quaternion.set(a.x, a.y, a.z, a.w);
+        this.anim.speed = pose.speed;
+        this.anim.moving = pose.moving;
+        this.anim.running =
+          pose.moving && pose.speed >= (rig.actor.gait?.runEnter ?? GAIT_RUN_ENTER);
+        this.anim.airborne = pose.airborne;
+        this.anim.falling = pose.falling;
+        this.anim.dead = pose.dead;
+        // A rig with no airborne clip keeps flailing through its hit reactions in the air.
+        if (pose.airborne && !rig.airClip && !pose.dead && !rig.actor.isMidOneShot) {
+          rig.actor.playHit();
+        }
+        rig.actor.update(step, this.anim, true, reducedMotion);
+      }
+      body.used = true;
+      body.standIn.visible = !rig;
+      if (!rig) {
+        body.standIn.position.set(pose.x, baseY + pivot, pose.z);
+        body.standIn.quaternion.set(a.x, a.y, a.z, a.w);
+        const width = kind.radius * 1.4;
+        body.standIn.scale.set(width, height / 2, width);
+      }
+      const showHealth = !pose.dead && pose.health > 0 && pose.health < 1;
+      body.health.visible = showHealth;
+      if (showHealth) {
+        body.health.position.set(pose.x, baseY + pivot + height / 2 + HEALTH_BAR_LIFT, pose.z);
+        if (this.camera) body.health.quaternion.copy(this.camera.quaternion);
+        else body.health.rotation.set(0, Math.atan2(pose.x - defense.cx, pose.z - defense.cz), 0);
+        body.health.scale.set(HEALTH_BAR_WIDTH * pose.health, 0.12, 0.12);
+      }
+      body.ring.visible = pose.windup >= 0;
+      if (pose.windup >= 0) {
+        body.ring.position.set(pose.x, pose.y + RING_LIFT, pose.z);
+        body.ring.scale.setScalar((kind.radius + 0.8) * (1.3 - 0.3 * pose.windup));
+      }
+    }
+    // A hidden subtree still pays its matrix walk every frame: a free linked
+    // rig leaves the graph (its programs stay linked, no key changes).
+    for (let i = 0; i < this.rigs.length; i++) {
+      if (!this.rigs[i].used && this.book.rigReady[i]) this.rigs[i].root.removeFromParent();
+    }
+    for (const body of this.bodies) {
+      if (body.used) continue;
+      body.standIn.visible = body.health.visible = body.ring.visible = false;
+    }
+    this.groundMarkers.end();
+    this.barrels.update(defense, frozen, tick, time);
+    this.weapon.update(tick, time, this.refusedOwn);
+  }
+
+  /** Stops showing a session: every slot released, the clock and the shots cleared. */
+  private stand(): void {
+    this.group.visible = false;
+    this.rigsRoot.removeFromParent();
+    this.book.releaseAll();
+    this.clock.reset();
+    this.cursor.reset();
+    this.weapon.clear();
+    this.barrels.clear();
+    for (const body of this.bodies) body.owner = null;
+  }
+
+  /** The tower, the weapon and the kegs, built ahead of a seat the player means to
+   *  take (the arena prebuild's intent): they link hidden and stay while that
+   *  intent holds, as after a seat while the player is in the arena. */
+  prewarmKit(time: number): void {
+    this.kitWanted = true;
+    if (this.disposed || this.group.visible) return;
+    this.nowMs = time * 1000;
+    this.prepareKit();
+  }
+
+  private prepareKit(): void {
+    this.kitResident = true;
+    if (!this.weapon.prepared) {
+      timeBuildSpan('zone:turret-weapon', () => this.weapon.prepare(this.group));
+    }
+    if (!this.tower.prepared && this.nowMs >= this.towerRetryAtMs) {
+      this.tower.prepare(
+        this.group,
+        () =>
+          this.weapon.setBarrel(
+            this.tower.barrelNode,
+            TURRET_TOWER_MODEL.muzzleTip,
+            TURRET_BARREL.recoilKick,
+          ),
+        () => {
+          this.towerRetryAtMs = this.nowMs + RIG_RETRY_MS;
+        },
+      );
+    }
+    if (!this.barrels.prepared && this.nowMs >= this.barrelRetryAtMs) {
+      this.barrels.prepare(this.group, () => {
+        this.barrelRetryAtMs = this.nowMs + RIG_RETRY_MS;
+      });
+    }
+  }
+
+  /** The commitment: first seen seated, the markers are built and the rig pools start growing. */
+  private commit(plan: TurretPlanView, wave: number): void {
+    this.runResident = true;
+    if (this.charactersState === 'idle') {
+      this.charactersState = 'loading';
+      charactersReady().then(
+        () => {
+          if (this.charactersState === 'loading') this.charactersState = 'ready';
+        },
+        (error) => {
+          this.charactersState = 'failed';
+          console.error('Fire and Fly monster rigs unavailable, stand-ins only', error);
+        },
+      );
+    }
+    this.prepareKit();
+    if (plan !== this.plan) {
+      this.plan = plan;
+      const rigPlan = turretRigPlan(plan);
+      rigPlan.kinds.forEach((kind, k) => {
+        const templateId = plan.kinds[k].templateId;
+        const lookId = fireAndFlyLookTemplate(templateId, plan.scenarioId);
+        this.rigLooks.set(kind.templateId, { templateId, lookId });
+      });
+      this.rigPlan = rigPlan;
+      this.capacities = turretRigCapacities(rigPlan);
+      const bodies = turretBodyCapacity(plan);
+      this.growMarkers(bodies);
+      this.groundMarkers.prepare(this.group, bodies);
+      this.orderWave = -1;
+    }
+    if (wave !== this.orderWave) {
+      this.orderWave = wave;
+      this.order = turretBuildOrder(this.rigPlan ?? plan, wave);
+      this.urgent = turretUrgentTemplates(this.rigPlan ?? plan, wave);
+    }
+    if (this.charactersState !== 'ready') return;
+    const templateId = this.nextTemplate();
+    if (templateId === null) return;
+    if (this.urgent.has(templateId)) this.buildRig(templateId);
+    else this.requestIdleBuild();
+  }
+
+  private nextTemplate(): string | null {
+    return nextTurretRig(this.order, this.capacities, this.built, this.coolingDown);
+  }
+
+  /** One later-wave rig per idle slot, so combat frames keep their budget. */
+  private requestIdleBuild(): void {
+    if (this.idleBuildPending) return;
+    this.idleBuildPending = true;
+    void idleSlot(RIG_IDLE_TIMEOUT_MS, {
+      scheduler: this.idleScheduler,
+      maxTimeoutDeferrals: RIG_IDLE_DEFERRALS,
+    }).then(() => {
+      this.idleBuildPending = false;
+      if (this.disposed || !this.group.visible) return;
+      const templateId = this.nextTemplate();
+      if (templateId !== null) this.buildRig(templateId);
+    });
+  }
+
+  private buildRig(templateId: string): void {
+    try {
+      timeBuildSpan('zone:turret-rig', () => this.mintRig(templateId));
+    } catch (error) {
+      this.retry.markFailed(POOL, templateId, this.nowMs);
+      console.error(`Fire and Fly rig ${templateId} unavailable, stand-ins until a retry`, error);
+    }
+  }
+
+  private mintRig(rigId: string): void {
+    const { templateId, lookId } = this.rigLooks.get(rigId) ?? { templateId: rigId, lookId: rigId };
+    const template = MOBS[templateId];
+    const key = visualKeyFor({ kind: 'mob', templateId: lookId } as Entity);
+    const color = MOBS[lookId]?.color ?? template?.color ?? 0xffffff;
+    // The arena never draws a far LOD, so the rig's gate links no far programs.
+    const actor = new CharacterVisual(key, color, 0, null, null, null, null, { farLod: false });
+    const clips = VISUALS[key]?.clips;
+    actor.setShadow(false);
+    actor.setProxyShadow(false);
+    actor.setFarBakeGate(this.effectGate);
+    // A borrowed look stands as tall as the template's own body would.
+    const ownHeight = VISUALS[visualKeyFor({ kind: 'mob', templateId } as Entity)]?.height;
+    const fit = lookId !== templateId && ownHeight ? ownHeight / actor.height : 1;
+    const scale = (template?.scale ?? 1) * fit;
+    const height = actor.height * scale;
+    const body = new THREE.Group();
+    body.scale.setScalar(scale);
+    body.position.y = -height / 2;
+    body.add(actor.root);
+    const root = new THREE.Group();
+    root.visible = false;
+    root.add(body);
+    const gate = new THREE.Group();
+    gate.name = `fire-and-fly-rig:${rigId}`;
+    gate.add(root);
+    this.book.addRig(rigId);
+    this.rigs.push({
+      actor,
+      gate,
+      root,
+      body,
+      height,
+      airClip: !!(clips?.jump || clips?.fall),
+      used: false,
+    });
+    this.built.set(rigId, (this.built.get(rigId) ?? 0) + 1);
+    const generation = this.generation;
+    void attachSceneGroupGated(
+      this.rigsRoot,
+      gate,
+      this.rigGates.gate,
+      () => this.disposed || this.generation !== generation,
+    ).catch(() => {});
+    this.prepareScorch(actor, `${key}:${color}`, generation);
+  }
+
+  /**
+   * The scorch flash's programs link as the rig is built, never on its first hit:
+   * the first rig of a material shape stages them through the rig's gate, and
+   * every later rig of that shape records them linked once that stage settled.
+   * Recording a later rig linked leans on the first rig's materials keeping the
+   * program alive: a run's rigs are only disposed together, at releaseRun.
+   */
+  private prepareScorch(actor: CharacterVisual, shape: string, generation: number): void {
+    const staged = this.scorchShapes.get(shape);
+    if (!staged) {
+      this.scorchShapes.set(shape, actor.prepareElementResponse());
+      return;
+    }
+    void staged.then((linked) => {
+      if (linked && !this.disposed && this.generation === generation) {
+        void actor.prepareElementResponse({ linked: true });
+      }
+    });
+  }
+
+  /** The kit, unprepared: the weapon's shots and puffs, and the kegs. */
+  private mintKit(): void {
+    const groundAt = this.groundAt;
+    this.weaponGates = new TurretGateTracker(this.compileGate);
+    this.barrelGates = new TurretGateTracker(this.compileGate);
+    this.weapon = new CannonShellVisuals({
+      blastRadius: TURRET_WEAPON.blastRadius,
+      groundAt,
+      compileGate: this.weaponGates.gate,
+      bursts: {
+        slots:
+          TURRET_CONTACT_BURSTS +
+          TURRET_BARREL_BURSTS +
+          turretShockwaveBursts(TURRET_CONTACT_PUFFS),
+        puffs: TURRET_CONTACT_PUFFS,
+      },
+      impacts: TURRET_WEAPON_IMPACTS,
+      bomblets: TURRET_WEAPON_BOMBLETS,
+      texelSlot: this.texelSlot,
+      holdTicks: TURRET_TICK_LEAD_MAX + TURRET_TICK_LATE_MAX,
+    });
+    this.weapon.setHost(this.host);
+    const barrel = this.tower.barrelNode;
+    if (barrel)
+      this.weapon.setBarrel(barrel, TURRET_TOWER_MODEL.muzzleTip, TURRET_BARREL.recoilKick);
+    this.weapons = new TurretWeaponsVisual(this.weapon, this.tower, groundAt);
+    this.weapons.setHost(this.host);
+    this.contactCounts = turretContactCounts(this.weapon.lowEffects);
+    this.barrels = new TurretBarrelVisual(
+      groundAt,
+      this.barrelGates.gate,
+      this.barrelSource,
+      this.weapon.lowEffects,
+      this.texelSlot,
+    );
+  }
+
+  /** The pools only a seat grows, empty: the rigs' gates and the ground markers. */
+  private mintRunPools(): void {
+    this.rigGates = new TurretGateTracker(this.compileGate);
+    this.markerGates = new TurretGateTracker(this.compileGate);
+    this.groundMarkers = new TurretGroundMarkers(this.probe, this.markerGates.gate);
+  }
+
+  /**
+   * The player left the seat and the arena: every rig (its skeletons' bone textures,
+   * its effect materials, its tinted-material claims), the slot books, the marker
+   * bodies and their geometry and the ground markers go, and empty pools stand in for
+   * the next seat. Kept: the tower (one model whose geometry and atlas belong to the
+   * loader's cache, the player stands on it, and relinking it would show them on air),
+   * the page-lifetime marker materials, the characters' shared assets, and every
+   * program another material still uses. The kit goes in releaseKit.
+   */
+  private releaseRun(): void {
+    this.runResident = false;
+    this.generation++;
+    const rigs = this.rigs.splice(0);
+    for (const rig of rigs) rig.gate.removeFromParent();
+    this.built.clear();
+    this.rigLooks.clear();
+    this.scorchShapes.clear();
+    this.book.clear();
+    this.rigPlan = null;
+    this.plan = null;
+    this.capacities = new Map();
+    this.order = [];
+    this.urgent = new Set();
+    this.orderWave = -1;
+    for (const body of this.bodies) {
+      body.standIn.removeFromParent();
+      body.health.removeFromParent();
+      body.ring.removeFromParent();
+    }
+    this.bodies.length = 0;
+    if (this.geometry) for (const part of Object.values(this.geometry)) part.dispose();
+    this.geometry = null;
+    const markers = this.groundMarkers;
+    disposeAfter(
+      this.rigGates,
+      rigs.map((rig) => rig.actor),
+    );
+    disposeAfter(this.markerGates, [markers]);
+    this.mintRunPools();
+  }
+
+  /** Outside the arena with no seat meant: the weapon's pools and the kegs go, fresh unprepared ones stand in. */
+  private releaseKit(): void {
+    this.kitResident = false;
+    disposeAfter(this.weaponGates, [this.weapon]);
+    disposeAfter(this.barrelGates, [this.barrels]);
+    this.mintKit();
+  }
+
+  private growMarkers(count: number): void {
+    this.book.growBodies(count);
+    const geometry = this.buildGeometry();
+    const materials = worldQuestTraceMaterials();
+    while (this.bodies.length < count) {
+      const standIn = this.marker(geometry.capsule, materials.blue);
+      const health = this.marker(geometry.box, materials.green);
+      const ring = this.marker(geometry.ring, materials.red);
+      ring.rotation.x = -Math.PI / 2;
+      // The capsule writes no depth: it sorts after the ground marker under it,
+      // or the disc would blend over its lower half.
+      standIn.renderOrder = TURRET_MARKER_ORDER + 1;
+      ring.renderOrder = floorVfxRenderOrder('encounter');
+      health.renderOrder = floorVfxRenderOrder('encounter', 1);
+      this.bodies.push({
+        owner: null,
+        attitude: new TurretAttitude(),
+        forecast: new TurretMotionForecast(),
+        slope: new TurretMarkerGround(),
+        standIn,
+        health,
+        ring,
+        used: false,
+      });
+    }
+  }
+
+  private buildGeometry(): NonNullable<TurretDefenseVisual['geometry']> {
+    if (this.geometry) return this.geometry;
+    const geometry = {
+      capsule: new THREE.CapsuleGeometry(0.5, 1, 4, 10),
+      box: new THREE.BoxGeometry(1, 1, 1),
+      ring: new THREE.RingGeometry(0.86, 1, 32),
+    };
+    // vertexNormals is a program key bit and MeshBasic without an env map reads
+    // no normal: without one, the markers draw the programs the world-quest-trace
+    // prewarm stages (a positions-only ribbon), not a variant nothing links.
+    for (const part of Object.values(geometry)) part.deleteAttribute('normal');
+    this.geometry = geometry;
+    return geometry;
+  }
+
+  private marker(geometry: THREE.BufferGeometry, material: THREE.Material): THREE.Mesh {
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.userData.renderCategory = 'ui3d';
+    mesh.visible = false;
+    this.markersRoot.add(mesh);
+    return mesh;
+  }
+
+  /** The player's own model, drawn behind the breech and facing along the barrel. */
+  private standGunner(self: TurretSelfView, cx: number, roofY: number, cz: number): void {
+    const yaw = this.tower.headYaw;
+    turretGunnerInto(this.gunner, cx, cz, roofY, yaw);
+    self.group.position.set(this.gunner.x, this.gunner.y, this.gunner.z);
+    self.group.rotation.y = yaw;
+  }
+
+  private consumeFeedback(
+    session: TurretSessionView,
+    tick: number,
+    time: number,
+    reducedMotion: boolean,
+  ): void {
+    this.coreHits.length = 0;
+    const defense = session.defense;
+    for (const entry of this.cursor.take(session)) {
+      const ev = entry.event;
+      const stale = entry.tick < tick - SHOT_STALE_TICKS;
+      switch (ev.type) {
+        case 'fired': {
+          // An own shot's report played on the click: its shell carries on as this
+          // one, or a fresh one flies with no second report.
+          const own = this.shots.ownShotOf(session, entry);
+          const shot = this.shellEnd(ev);
+          if (own > 0 && this.weapon.adoptOwn(own, shot, tick)) break;
+          if (stale) break;
+          this.layBarrel(session, ev.fromX, ev.fromZ, shot);
+          this.weapon.fire(shot, this.muzzle, time, reducedMotion, own === 0);
+          break;
+        }
+        case 'impact':
+          if (stale) break;
+          this.weapon.impact(ev, time, reducedMotion);
+          this.scorchRigs(ev.hits);
+          break;
+        case 'barrelLit':
+          if (!stale) this.barrels.light(ev, defense, this.weapon.puffBurst(time), time);
+          break;
+        case 'barrelExploded':
+          if (stale) break;
+          this.weapon.impact(turretBarrelBlast(ev), time, reducedMotion);
+          this.barrels.explode(ev, this.takeBurst, time);
+          this.scorchRigs(ev.hits);
+          break;
+        // The stagger at every contact: playHit's own cooldown spaces a
+        // bounce from its launch, and a corpse's death clip overrides it. The
+        // impact precedes its launches in the ring, so a core hit's stagger
+        // starts frozen on the blast.
+        case 'launched': {
+          const rig = this.rigFor(ev.id);
+          if (!rig) break;
+          rig.actor.playHit(true);
+          if (!reducedMotion && this.coreHits.includes(ev.id)) {
+            rig.actor.holdFrame(HITSTOP_SCALE, HITSTOP_SECONDS);
+          }
+          break;
+        }
+        case 'bounce':
+          this.rigFor(ev.id)?.actor.playHit();
+          if (!stale) {
+            const kind = ev.surface === 'wall' ? 'wall' : 'bounce';
+            this.kickDust(defense, entry, kind, ev.id, ev, ev.speed, tick, time);
+          }
+          break;
+        case 'landed':
+          this.rigFor(ev.id)?.actor.playHit();
+          // A landing is the contact too slow to bounce: its speed into the ground is at most that.
+          if (!stale) {
+            const speed = TURRET_PHYSICS.bounceMinSpeed;
+            this.kickDust(defense, entry, 'land', ev.id, ev, speed, tick, time);
+          }
+          break;
+        case 'bowled':
+          if (!stale) this.kickDust(defense, entry, 'bowl', ev.struckId, ev, ev.speed, tick, time);
+          break;
+        case 'windupStart':
+          this.rigFor(ev.id)?.actor.playAttack();
+          break;
+        // An own Shockwave's slam played on the click; its front always plays from here.
+        case 'shockwave': {
+          const own = this.shots.ownShotOf(session, entry);
+          if (stale) break;
+          if (own === 0) this.weapons.slam(ev.id, ev.x, ev.z, time, reducedMotion);
+          this.weapons.roll(ev, tick, time);
+          break;
+        }
+        case 'fragBurst':
+          if (!stale) this.weapons.burst(ev, entry.tick, time);
+          break;
+        case 'bomblet':
+          this.weapons.bomblet(ev, stale, time, reducedMotion);
+          if (!stale) this.scorchRigs(ev.hits);
+          break;
+      }
+    }
+  }
+
+  /**
+   * The own shots the seat HUD marked since the last frame: the head lies on each,
+   * the muzzle flashes and its shell leaves now, on a flight predicted to land when
+   * its `fired` entry's impact would (the click's clock plus the measured lead).
+   */
+  private launchOwnShots(
+    session: TurretSessionView,
+    clock: number,
+    tick: number,
+    time: number,
+    reducedMotion: boolean,
+  ): void {
+    const shots = this.shots;
+    for (let shot = shots.launchAfter(session, this.launched); shot; ) {
+      this.launched = shot.serial;
+      if (shot.clock >= clock - SHOT_STALE_TICKS && shot.weapon === 'shock') {
+        this.weapons.slam(shot.serial, session.defense.cx, session.defense.cz, time, reducedMotion);
+      } else if (shot.clock >= clock - SHOT_STALE_TICKS) {
+        const target = this.ownTarget;
+        target.x = shot.x;
+        target.y = this.groundAt(shot.x, shot.z) + turretShellEndLift(shot.weapon);
+        target.z = shot.z;
+        this.layBarrel(session, shot.fromX, shot.fromZ, target);
+        const lands =
+          Math.max(tick, shot.clock + shots.leadTicks) + turretShellFlightTicks(shot.range);
+        this.weapon.launchOwn(
+          shot.serial,
+          target,
+          tick,
+          lands,
+          this.muzzle,
+          time,
+          reducedMotion,
+          shot.weapon === 'frag',
+        );
+      }
+      shot = shots.launchAfter(session, this.launched);
+    }
+  }
+
+  /** Where the shell of a `fired` entry ends: its blast point, or a frag's airburst above it. */
+  private shellEnd(ev: Extract<TurretEvent, { type: 'fired' }>): CannonFiredShot {
+    const lift = turretShellEndLift(ev.weapon);
+    if (lift === 0) return ev;
+    const end = this.firedEnd;
+    end.shotId = ev.shotId;
+    end.x = ev.x;
+    end.y = ev.y + lift;
+    end.z = ev.z;
+    end.flightTicks = ev.flightTicks;
+    end.impactTick = ev.impactTick;
+    end.weapon = ev.weapon;
+    return end;
+  }
+
+  /** The head and barrel lie on a shot from (fromX, fromZ) to `at`; sets the fallback muzzle. */
+  private layBarrel(
+    session: TurretSessionView,
+    fromX: number,
+    fromZ: number,
+    at: Readonly<CannonPoint>,
+  ): void {
+    const dx = at.x - fromX;
+    const dz = at.z - fromZ;
+    const dist = Math.hypot(dx, dz);
+    this.tower.fireAt(
+      dist > 1e-6 ? Math.atan2(dx, dz) : this.tower.headYaw,
+      turretBarrelPitch(dist, at.y - session.origin.y),
+    );
+    this.muzzle.x = fromX + (dist > 1e-6 ? dx / dist : 0) * MUZZLE_REACH;
+    this.muzzle.y = session.origin.y + MUZZLE_LIFT;
+    this.muzzle.z = fromZ + (dist > 1e-6 ? dz / dist : 1) * MUZZLE_REACH;
+  }
+
+  /** The scorch a blast leaves on each body it struck; a core hit's launch freezes on it. */
+  private scorchRigs(hits: readonly { readonly id: number; readonly falloff: number }[]): void {
+    for (const hit of hits) {
+      const rig = this.rigFor(hit.id);
+      if (!rig) continue;
+      rig.actor.respondToElement('fire', Math.min(0.95, FLASH_MIN + FLASH_GAIN * hit.falloff));
+      if (hit.falloff >= CORE_HIT_FALLOFF) this.coreHits.push(hit.id);
+    }
+  }
+
+  /**
+   * The dust of one contact, launched on the weapon's puff draw. The segment
+   * the body starts at the contact gives the direction it leaves in, the tick
+   * it touched (a contact read a frame late is aged by the difference) and,
+   * after a landing, the slide the trail follows.
+   */
+  private kickDust(
+    defense: TurretDefenseView,
+    entry: TurretFeedback,
+    kind: TurretContactKind,
+    id: number,
+    at: { readonly x: number; readonly y: number; readonly z: number },
+    speed: number,
+    tick: number,
+    time: number,
+  ): void {
+    const m = monsterById(defense.monsters, id);
+    const size = m ? defense.plan.kinds[m.kind] : undefined;
+    if (!m || !size) return;
+    const burst = this.weapon.puffBurst(time);
+    if (!burst) return;
+    const seg = m.seg;
+    const fromHere = Math.abs(seg.x - at.x) < 1e-3 && Math.abs(seg.z - at.z) < 1e-3;
+    const moving = fromHere && (seg.kind === 'fly' || seg.kind === 'skid');
+    const c = this.contact;
+    c.kind = kind;
+    c.id = id;
+    c.seq = entry.seq;
+    c.x = at.x;
+    c.y = at.y;
+    c.z = at.z;
+    c.speed = speed;
+    c.dirX = moving ? seg.vx : 0;
+    c.dirZ = moving ? seg.vz : 0;
+    c.height = size.height;
+    c.radius = size.radius;
+    const lag = turretContactLag(tick - (fromHere ? seg.start : entry.tick));
+    turretContactBurstInto(burst, c, this.contactCounts, this.groundAt);
+    if (kind === 'land' && fromHere && seg.kind === 'skid') {
+      const seed = Math.imul(id, 0x2545) ^ entry.seq;
+      const from = tick - lag / DT;
+      turretSlideTrailInto(burst, seg, size.height, seed, from, this.contactCounts, this.groundAt);
+    }
+    burst.at = time - lag;
+  }
+
+  private rigFor(id: number): RigSlot | null {
+    const r = this.book.rigOf(id);
+    return r >= 0 ? this.rigs[r] : null;
+  }
+
+  dispose(): void {
+    this.disposed = true;
+    this.group.removeFromParent();
+    const errors: unknown[] = [];
+    for (const rig of this.rigs) {
+      try {
+        rig.actor.dispose();
+      } catch (error) {
+        errors.push(error);
+      }
+    }
+    this.rigs.length = 0;
+    if (this.geometry) for (const part of Object.values(this.geometry)) part.dispose();
+    this.geometry = null;
+    try {
+      this.weapon.dispose();
+    } catch (error) {
+      errors.push(error);
+    }
+    try {
+      this.tower.dispose();
+    } catch (error) {
+      errors.push(error);
+    }
+    try {
+      this.barrels.dispose();
+    } catch (error) {
+      errors.push(error);
+    }
+    try {
+      this.groundMarkers.dispose();
+    } catch (error) {
+      errors.push(error);
+    }
+    // The capsule, bar and ring materials are page-lifetime prewarmed resources,
+    // owned by their cache; the ground markers released their own above.
+    if (errors.length > 0) throw new AggregateError(errors, 'Fire and Fly rigs failed to dispose');
+  }
+}
+
+function monsterById(
+  monsters: TurretDefenseView['monsters'],
+  id: number,
+): TurretDefenseView['monsters'][number] | null {
+  for (const m of monsters) if (m.id === id) return m;
+  return null;
+}
+
+/** Disposes `parts` once every compile gate `gates` opened has settled, so no queued link meets a disposed material. */
+function disposeAfter(gates: TurretGateTracker, parts: readonly { dispose(): void }[]): void {
+  if (parts.length === 0) return;
+  gates.afterSettled(() => {
+    const errors: unknown[] = [];
+    for (const part of parts) {
+      try {
+        part.dispose();
+      } catch (error) {
+        errors.push(error);
+      }
+    }
+    if (errors.length > 0) console.error('Fire and Fly release failed in part', errors);
+  });
+}

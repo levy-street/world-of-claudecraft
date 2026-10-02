@@ -123,6 +123,17 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/umbral_anchor_marker.ts', layer: 'player', strict: true },
   { file: 'src/render/warlock_meteor_fx.ts', layer: 'player', strict: true },
   { file: 'src/render/sentence_vfx.ts', layer: 'player', strict: true },
+  // A cannon shot's shockwave rides the player band; the scorch it leaves is a
+  // mark on the world, under every effect, on the ground band.
+  {
+    file: 'src/render/cannon_shell_visuals.ts',
+    layer: 'player',
+    alsoNames: ['ground'],
+    strict: true,
+  },
+  // Fire and Fly: the red marker under each living monster paints over the
+  // cannon's dust (rung 4) and under the encounter band's strike ring.
+  { file: 'src/render/turret_ground_markers.ts', layer: 'player', strict: true },
   // The player's own click-to-move marker and AoE landing flash: normal-blended
   // feedback, so it rides the TOP of the player band rather than the reticle
   // band, and never covers a telegraph.
@@ -152,6 +163,10 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/varkhul_encounter.ts', layer: 'encounter', strict: true },
   { file: 'src/render/varkhul_frontal_visual.ts', layer: 'encounter', strict: true },
   { file: 'src/render/rift_death_zone.ts', layer: 'encounter', strict: true },
+  // Fire and Fly: a monster's strike windup ring is a mechanic to react to.
+  { file: 'src/render/turret_defense_visual.ts', layer: 'encounter', strict: true },
+  // Fire and Fly: the warning ring under an explosive barrel, red while its fuse burns.
+  { file: 'src/render/turret_barrel_visual.ts', layer: 'encounter', strict: true },
   // Buried Hoard boss mechanics (the 2026-09-28 release/v0.44.0 merge into
   // feature/buried-hoards): the floor telegraphs, their standing pieces and the
   // cosmetic dressing and spell effects drawn over them, all on the encounter

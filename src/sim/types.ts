@@ -11,6 +11,8 @@ import type { RealmBuilderHonour } from './content/realm_builders';
 import type { TreasureMapRarity } from './content/treasure_maps';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { GliderFlightResult, GliderFlightState } from './minigames/glider_flight';
+import type { TurretDefenseState, TurretEvent } from './minigames/turret_defense';
+import type { TurretFeedback } from './minigames/turret_feedback';
 import type { WispMazeState } from './minigames/wisp_maze';
 import type { FishingCatchBand } from './professions/fishing_bands';
 import type { HarvestYield } from './professions/harvest_yields';
@@ -4177,7 +4179,8 @@ export interface DungeonDef {
     | 'ignivar_depths'
     | 'wildheart'
     | 'lastkeep'
-    | 'dawnhold';
+    | 'dawnhold'
+    | 'fire_and_fly';
   /**
    * What dresses this dungeon's wall-side obstacle slots (matches the render
    * variant): coffins get one standable lid, cargo splits into the crate
@@ -4880,6 +4883,8 @@ export type WorldQuestObjective =
   | { type: 'shadow'; instructorNpcId: string }
   | { type: 'forging'; instructorNpcId: string }
   | { type: 'wisp_maze'; instructorNpcId: string }
+  /** Fire and Fly: the instructor seats the player in their own arena (turret_defense_session.ts). */
+  | { type: 'turret'; instructorNpcId: string }
   | { type: 'vehicle'; stationId: string }
   | {
       type: 'tracing';
@@ -6926,6 +6931,10 @@ export type SimEvent = { pid?: number } & (
    *  wording under questUi.worldQuest.banner.<banner>). */
   | { type: 'worldQuestBanner'; banner: WorldQuestBannerId }
   | ({ type: 'cannonResult' } & CannonResult)
+  /** One Fire and Fly engine event for the seated owner, as plain data, with the
+   *  feedback ring entry it was recorded as (turret_feedback.ts): an online mirror
+   *  rebuilds the ring from these. */
+  | { type: 'turretDefense'; pid: number; seq: number; tick: number; event: TurretEvent }
   /** One finished scoreboard attempt (src/sim/world_quest_scoreboards.ts); the
    *  server keeps the character's best row per board. */
   | {
@@ -6934,6 +6943,16 @@ export type SimEvent = { pid?: number } & (
       medal: WorldQuestMedal | null;
       metric: number;
       resetDay?: string;
+    }
+  /** A character's Gunner's Mastery moved (src/sim/fire_and_fly_score.ts): the sum of
+   *  their best mission medals and of those runs' points, the whole row of the one
+   *  Mastery board, never a single run. */
+  | {
+      type: 'worldQuestMastery';
+      board: string;
+      stars: number;
+      points: number;
+      missions: number;
     }
   | {
       type: 'worldQuestProgress';
@@ -9089,7 +9108,16 @@ export interface SimConfig {
   // Secondary players a host adds later carry their OWN id through
   // addPlayer({ localGathererIdentity }); this field never covers them.
   gathererIdentity?: LocalGathererIdentity;
+  // A host secret keying the private mini-game draws (turret_defense_rng.ts), so a
+  // client cannot rebuild a run from the world seed and a few observed draws. Only
+  // the authoritative server sets it, from a secure random source at boot; offline
+  // and headless omit it and key the draws by the run seed alone. The sim never
+  // generates it and never puts it on a view, a wire key, a save or a log.
+  privateSalt?: PrivateSalt;
 }
+
+/** 64 secret bits as two uint32 lanes (see SimConfig.privateSalt). */
+export type PrivateSalt = readonly [number, number];
 
 export function emptyMoveInput(): MoveInput {
   return {
@@ -10204,6 +10232,124 @@ export interface CannonEncounterState {
   victoryMedal?: CannonResult['medal'];
 }
 
+/** Fire and Fly (turret defense) content shapes; data in content/turret_defense.ts. */
+export type TurretSizeClass = 'small' | 'medium' | 'large' | 'huge';
+export interface TurretSizeDef {
+  /** Divides a throw by mass ** TURRET_WEAPON.massExponent: the heavier, the shorter it flies. */
+  mass: number;
+  /** Turret points a full-health strike costs (scaled by remaining health). */
+  breachValue: number;
+  /** Body radius (yd) for the strike distance and swept collider tests. */
+  radius: number;
+  /** Standing height (yd): a flying body whose feet pass below it knocks this one over. */
+  height: number;
+}
+/** A fast, low flying body (a corpse included) knocks the grounded monsters it passes through. */
+export interface TurretBowlingDef {
+  enabled: boolean;
+  /** A flyer knocks only while moving faster than this across (yd/s). */
+  minSpeed: number;
+  /** Contact reach as a multiple of the two body radii summed. */
+  reachScale: number;
+  /** Share of the flyer's horizontal velocity the struck body takes, times sqrt(flyer mass / struck mass). */
+  transfer: number;
+  /** Upward launch of the struck body (yd/s), over sqrt(its mass). */
+  pop: number;
+  /** Knock damage as a share of the wave's core damage (at least 1). */
+  damageShare: number;
+  /** Share of its horizontal speed a flyer keeps through each knock. */
+  flyerKeep: number;
+  /** A lying body's top as a share of its standing height. */
+  lyingHeight: number;
+}
+export interface TurretWaveEntry {
+  templateId: string;
+  count: number;
+  /** Inside the template's own minLevel..maxLevel. */
+  level: number;
+  /** Spawns after every other entry of the wave. */
+  bossLast?: boolean;
+  /** Multiplies the template's health (absent: 1). */
+  hpScale?: number;
+  /** Multiplies the template's march speed (absent: 1). */
+  speedScale?: number;
+}
+/** The explosive barrels a wave's start adds on a ring around the turret (count 0: none). */
+export interface TurretBarrelWaveDef {
+  count: number;
+  minRadius: number;
+  maxRadius: number;
+  /**
+   * 'lanes': inside the sides the wave's monsters arrive through, so they march past
+   * them; absent, spread evenly around the whole circle.
+   */
+  placement?: 'lanes';
+  /** Barrels standing at once, this wave's included (absent: TURRET_EXPLOSIVE_BARREL.cap). */
+  cap?: number;
+}
+/** A scenario's kegs, applied to every wave's barrels when the plan is resolved. */
+export interface TurretKegsDef {
+  placement?: 'lanes';
+  /** Multiplies each wave's count, rounded (absent: 1). */
+  countScale?: number;
+  cap?: number;
+}
+/**
+ * Where a wave's monsters come from around the spawn ring. Widths are shares of a
+ * full turn; every centre is a private draw per wave (per pack for a burst), so a
+ * run keeps its sides secret and a replay of the same seed keeps them.
+ */
+export type TurretArrivalDef =
+  /** Anywhere on the ring. */
+  | { kind: 'ring' }
+  /** One side. */
+  | { kind: 'arc'; widthTurn: number }
+  /** Two or three sides evenly apart, the wave's monsters taking them in turn. */
+  | { kind: 'flanks'; count: 2 | 3; widthTurn: number }
+  /**
+   * Packs of `groupSize` from one side each: inside a pack the wave's own gap,
+   * between packs `groupGapTicks`.
+   */
+  | { kind: 'burst'; groupSize: number; groupGapTicks: number; widthTurn: number };
+export interface TurretWaveDef {
+  entries: readonly TurretWaveEntry[];
+  /** Damage of a core hit. */
+  coreDamage: number;
+  gapMinTicks: number;
+  gapMaxTicks: number;
+  barrels: TurretBarrelWaveDef;
+  /** Absent: the whole ring. */
+  arrival?: TurretArrivalDef;
+}
+/** A medal's bar at the end of a won run: bronze is any win. */
+export interface TurretMedalBar {
+  /** The share of the scenario's tower points still standing, above 0 and at most 1. */
+  minIntegrityShare: number;
+}
+export interface TurretMedalBars {
+  gold: TurretMedalBar;
+  silver: TurretMedalBar;
+}
+/** Limited-weapon charges per run (absent or 0: none). */
+export interface TurretArsenalDef {
+  shockwave?: number;
+  fragmentation?: number;
+}
+/** One Fire and Fly scenario (a difficulty); data in content/fire_and_fly_scenarios.ts. */
+export interface TurretScenarioDef {
+  /** Frozen and player-invisible. */
+  id: string;
+  /** Frozen short key for board ids: fire_and_fly_<key>_v<version>_<period>. */
+  boardKey: string;
+  waves: readonly TurretWaveDef[];
+  /** Tower points at the start. */
+  integrity: number;
+  medals: TurretMedalBars;
+  arsenal?: TurretArsenalDef;
+  /** Absent: every wave's barrels as authored, placed evenly around the circle. */
+  kegs?: TurretKegsDef;
+}
+
 export interface VehicleStationDef {
   id: string;
   entityId: number;
@@ -10221,3 +10367,52 @@ export interface VehicleSession {
   origin: Vec3;
   encounter: CannonEncounterState;
 }
+
+/** Where a player stood, and faced, before a seat moved them away. */
+export interface TurretReturnPoint {
+  x: number;
+  y: number;
+  z: number;
+  facing: number;
+}
+
+/** The Fire and Fly seat on the tower roof of the player's own arena
+ *  (src/sim/turret_defense_session.ts). Never included in character saves. */
+export interface TurretSession {
+  kind: 'turret';
+  /** The player's feet on the roof; the tower (the engine's center) stands under it. */
+  origin: Vec3;
+  defense: TurretDefenseState;
+  /** The mount ridden before the seat ('' on foot), restored on leave while alive and still held. */
+  priorMountKey: string;
+  /** Leaving the seat also leaves the arena, back exactly here. */
+  returnTo: TurretReturnPoint;
+  /** The newest engine events, oldest first (minigames/turret_feedback.ts). */
+  feedback: TurretFeedback[];
+  nextFeedbackSeq: number;
+  /** The owner's pet waits in the pet stash for the seat, handed back as it ends. */
+  petParked?: boolean;
+  /** The world quest run this seat is, captured when the instructor seated it; absent on a dev seat. */
+  worldQuest?: TurretWorldQuestRun;
+}
+
+/** Which world quest row a Fire and Fly seat answers to, fixed at the seat. */
+export interface TurretWorldQuestRun {
+  questId: string;
+  /** The character's world quest cycle at the seat; a run from another day never pays. */
+  cycle: string;
+  /** A replay after the day's reward: it never pays and never credits. */
+  practice: boolean;
+  /** Set once the won run's score went to the ladders (fire_and_fly_score.ts). */
+  scored?: boolean;
+}
+
+/** What `PlayerMeta.vehicle` holds: every seat gate keys on its presence, not its kind. */
+export type VehicleSeat = VehicleSession | TurretSession;
+
+export type VehicleActionId =
+  | CannonActionId
+  | 'turret_fire'
+  | 'turret_replay'
+  | 'turret_shockwave'
+  | 'turret_frag';

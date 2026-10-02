@@ -23,6 +23,10 @@ import { cannonTacticsHint } from './cannon_tactics_view';
 import { ForgeActionBarController, type ForgeBarWorld } from './forge_action_bar_controller';
 import { createGliderActionBarView, gliderBoostDescription } from './glider_action_bar_view';
 import { ShadowActionBarController } from './shadow_action_bar_controller';
+import { type TurretAimCore, vehicleOwnsAim } from './turret_aim_core';
+import type { TurretFctSpawn } from './turret_damage_numbers_core';
+import { TurretHudController } from './turret_hud_controller';
+import type { TurretBanner } from './turret_hud_view';
 import { createVehicleActionBarView } from './vehicle_action_bar_view';
 import { vehicleActionTooltip } from './vehicle_action_tooltip';
 import { VEHICLE_ACTION_SLOTS, VehicleAimCore } from './vehicle_aim_core';
@@ -43,6 +47,12 @@ interface VehicleBarDeps {
   };
   attachTooltip(element: HTMLElement, html: () => string): void;
   cancelOnEnter: readonly { cancel(): void }[];
+  /** The HUD banner slot, for the turret's wave and result announcements. */
+  showBanner?(banner: TurretBanner): void;
+  /** A Replay began a fresh run over an ended one (TurretHudHooks.onNewRun). */
+  onNewTurretRun?(): void;
+  /** The HUD's floating combat text, for the turret's damage numbers. */
+  spawnFct?: TurretFctSpawn;
   /** Flight bar Climb/Dive slots: a held pointer pins the glider pitch (+1 climb,
    *  -1 dive) until release; 0 hands control back to the camera. */
   gliderPitchHold?(value: -1 | 0 | 1): void;
@@ -54,7 +64,7 @@ export const GLIDER_PITCH_SLOTS: Readonly<Record<number, -1 | 1>> = Object.freez
 export const GLIDER_PITCH_TAP_MS = 250;
 
 export class VehicleActionBarController {
-  readonly aim: VehicleAimCore;
+  private readonly cannonAim: VehicleAimCore;
   private readonly root = document.createElement('section');
   private readonly title = document.createElement('div');
   private readonly status = document.createElement('div');
@@ -69,9 +79,11 @@ export class VehicleActionBarController {
   private readonly actionButtons: HTMLElement[] = [];
   private readonly painter: ActionBarPainter;
   private mounted = false;
+  private operating = false;
   private gliderMode: boolean | null = null;
   private readonly shadow: ShadowActionBarController | null;
   private readonly forge: ForgeActionBarController | null;
+  private readonly turret: TurretHudController;
 
   constructor(private readonly deps: VehicleBarDeps) {
     this.shadow =
@@ -101,7 +113,7 @@ export class VehicleActionBarController {
             deps.padKind,
           )
         : null;
-    this.aim = new VehicleAimCore(deps.world, () => {
+    this.cannonAim = new VehicleAimCore(deps.world, () => {
       deps.clearReticle?.();
       deps.presentation?.setGroundAimReticle(null);
     });
@@ -182,6 +194,21 @@ export class VehicleActionBarController {
     );
     deps.writers.setDisplay(this.root, 'none');
     document.getElementById('ui')?.append(this.root);
+    this.turret = new TurretHudController(deps.world, deps.writers, deps.cancelOnEnter, {
+      showBanner: deps.showBanner,
+      onNewRun: deps.onNewTurretRun,
+      spawnFct: deps.spawnFct,
+      addShake: (amount) => deps.presentation?.addShake(amount),
+      padKind: deps.padKind,
+      keyLabel: deps.keyLabel,
+      attachTooltip: deps.attachTooltip,
+      consumePeek: deps.consumePeek,
+    });
+  }
+
+  /** The seat's ground aim: the cannon's per-shot aim, or the turret's standing one. */
+  get aim(): VehicleAimCore | TurretAimCore {
+    return this.deps.world.turretSession ? this.turret.aim : this.cannonAim;
   }
 
   private pitchHeld: -1 | 0 | 1 = 0;
@@ -203,6 +230,10 @@ export class VehicleActionBarController {
   }
 
   chooseSlot(slot: number): void {
+    if (this.deps.world.turretSession) {
+      this.turret.chooseSlot(slot);
+      return;
+    }
     if (this.gliderActive()) {
       const glider = this.deps.world.worldQuestLog?.get(GLIDER_QUEST_ID)?.glider;
       if (glider?.phase !== 'flying') return;
@@ -230,12 +261,13 @@ export class VehicleActionBarController {
       return;
     }
     const action = VEHICLE_ACTION_SLOTS[slot];
-    if (action) this.aim.begin(action, slot);
+    if (action) this.cannonAim.begin(action, slot);
   }
 
   update(): void {
     this.shadow?.update();
     this.forge?.update();
+    this.turret.update();
     const session = this.deps.world.vehicleSession;
     const writers = this.deps.writers;
     const gliderActive = this.gliderActive();
@@ -254,10 +286,14 @@ export class VehicleActionBarController {
     if (impact) sfx.playUi('impact_metal', { gain: 0.5 });
     if (active !== this.mounted) {
       this.mounted = active;
-      this.aim.cancel();
+      this.cannonAim.cancel();
       if (active) for (const controller of this.deps.cancelOnEnter) controller.cancel();
-      writers.toggleClass(document.body, 'operating-vehicle', active);
       writers.setDisplay(this.root, active ? 'grid' : 'none');
+    }
+    const operating = active || this.turret.active;
+    if (operating !== this.operating) {
+      this.operating = operating;
+      writers.toggleClass(document.body, 'operating-vehicle', operating);
     }
     if (active && this.gliderMode !== gliderActive) {
       this.gliderMode = gliderActive;
@@ -312,9 +348,9 @@ export class VehicleActionBarController {
     );
     writers.setText(
       this.hint,
-      this.aim.isActive() ? t('hudChrome.vehicle.aim') : cannonTacticsHint(encounter),
+      this.cannonAim.isActive() ? t('hudChrome.vehicle.aim') : cannonTacticsHint(encounter),
     );
-    this.painter.paint(this.view.tick(session, this.aim.activeSlot(), this.deps.keyLabel));
+    this.painter.paint(this.view.tick(session, this.cannonAim.activeSlot(), this.deps.keyLabel));
   }
 
   /** Action guards read session state without constructing the bar's DOM. */
@@ -325,11 +361,11 @@ export class VehicleActionBarController {
 
   static blocksPlayerActions(
     world: Pick<IWorldVehicles, 'vehicleSession'> &
-      Partial<Pick<ShadowControlWorld, 'worldQuestLog'>>,
+      Partial<Pick<IWorldVehicles, 'turretSession'> & Pick<ShadowControlWorld, 'worldQuestLog'>>,
   ): boolean {
     const worldQuestLog = world.worldQuestLog;
     return (
-      !!world.vehicleSession ||
+      vehicleOwnsAim(world) ||
       (!!worldQuestLog &&
         (gliderControlsActive({ worldQuestLog }) ||
           shadowControlsActive({ worldQuestLog }) ||

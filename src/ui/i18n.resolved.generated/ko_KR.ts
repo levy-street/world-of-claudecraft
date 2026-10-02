@@ -550,6 +550,61 @@ export const ko_KR: EnTranslations = {
       "shotTiming": "재사용 대기시간: {cooldown}초. {flight}초 후 착탄. 모든 포격이 {recovery}초의 회복 시간을 공유합니다.",
       "shotRules": "표시된 구역 안을 조준하세요. 마나 소모 없음. 피해는 장비나 특성의 영향을 받지 않습니다."
     },
+    "turret": {
+      "title": "Fire and Fly",
+      "integrity": "탑 내구도",
+      "integrityValue": "{value}/{max}",
+      "integrityBelow": "탑 내구도 {percent} 미만",
+      "tower": "탑",
+      "wave": "Wave {wave}/{total}",
+      "left": "남은 몬스터: {count}",
+      "firstWave": "첫 번째 웨이브까지 {seconds}초",
+      "nextWave": "다음 웨이브까지 {seconds}초",
+      "hint": "몬스터가 탑에 닿기 전에 날려 버리세요",
+      "waveBanner": "Wave {wave} of {total}",
+      "finalWave": "마지막 웨이브",
+      "clearedBanner": "{wave}번째 웨이브 격퇴",
+      "victory": "승리!",
+      "defeat": "탑이 함락되었습니다",
+      "statKills": "처치",
+      "statShots": "발사 횟수",
+      "statAccuracy": "명중률",
+      "statThrow": "최장 날리기 거리",
+      "statAirtime": "최장 체공 시간",
+      "statYards": "{yards}야드",
+      "statSeconds": "{seconds}초",
+      "medalGold": "금메달",
+      "medalSilver": "은메달",
+      "medalBronze": "동메달",
+      "noMedal": "메달 없음",
+      "endAnnouncement": "{verdict} {medal}",
+      "pointsKills": "처치 ({count})",
+      "pointsTower": "남은 탑 내구도 ({points})",
+      "pointsKegKills": "화약통 처치 ({count})",
+      "pointsBowled": "넘어뜨리기 ({count})",
+      "pointsTotal": "총점",
+      "leave": "탑에서 내려가기",
+      "leaveShort": "내려가기",
+      "replay": "다시 하기",
+      "replayHint": "탑 위에서 같은 시련에 다시 도전하기. 오늘의 보상을 받은 뒤에는 다시 도전해도 보상이 없습니다.",
+      "replayHintMission": "탑 위에서 같은 임무에 다시 도전하기. 오늘의 보상을 받은 뒤에는 다시 도전해도 보상이 없습니다.",
+      "leavingIn": "{seconds}초 후 탑에서 내려갑니다",
+      "recruitedBanner": "입대!",
+      "recruitedLine": "{name}: \"성문 포병대에 온 것을 환영하네, 포수. 이제 내 임무를 맡기겠네.\"",
+      "weapons": "탑 무기",
+      "shockwave": "충격파",
+      "shockwaveTip": "탑을 내리칩니다. 고리가 탑의 벽에서 {reach}야드까지 {seconds}초 동안 퍼져 나갑니다. 고리에 닿은 지상의 몬스터는 모두 탑에서 멀리 날아가고 준비 중인 공격이 멈추며, 탑에서 {core}야드 이내에서는 {damage}의 피해를 입고 그 너머에서는 피해가 줄어듭니다. 공중의 몬스터는 고리를 넘어갑니다.",
+      "shockwaveRules": "사용 후 {seconds}초 뒤에 다시 준비됩니다. 웨이브 중에만 사용할 수 있습니다.",
+      "frag": "파편탄",
+      "fragTip": "장전한 뒤 일반 포탄처럼 지면에 발사합니다. 조준 지점 위에서 {count}개의 자탄으로 터집니다. 하나는 조준 지점에, {outer}개는 그 주위 {radius}야드의 원에 떨어집니다. 각 자탄은 {blast}야드 이내에 최대 {damage}의 피해를 주고, 맞은 몬스터를 날려 보내며, 화약통에 불을 붙입니다.",
+      "fragRules": "대포의 재장전 시간을 사용합니다. 다시 장전하거나 취소하면 충전을 소모하지 않고 해제합니다. 웨이브 중에만 사용할 수 있습니다.",
+      "chargesLeft": "남은 충전: {count}",
+      "weaponsHint": "몬스터가 탑에 닿기 전에 날려 버리세요. {shockKey}: 충격파. {fragKey}: 파편탄.",
+      "weaponsHintTouch": "몬스터가 탑에 닿기 전에 날려 버리세요. 소켓을 눌러 충격파나 파편탄을 사용하세요.",
+      "statShockwaves": "충격파",
+      "statFrags": "파편탄",
+      "statUsed": "{used}/{given}"
+    },
     "warlock": {
       "doomLabel": "단죄",
       "fateThreadsLabel": "운명의 실타래",
@@ -1507,6 +1562,25 @@ export const ko_KR: EnTranslations = {
       "gliderRankings": "활공 코스 기록",
       "gliderPersonalRules": "이 캐릭터에 저장된 오프라인 기록입니다. 모든 고리를 순서대로 통과하세요. 일일 기록은 매일 초기화됩니다.",
       "gliderRules": "모든 고리를 통과한 완주 기록 중 가장 빠른 시간이 승리합니다. 일일 기록은 서버 초기화 때 갱신됩니다. 기록은 30초 이내에 반영됩니다.",
+      "fireAndFlyDaily": "{trial}: 오늘",
+      "fireAndFlyLifetime": "{trial}: 전체 기간",
+      "fireAndFlyStart": "이 시련 도전",
+      "fireAndFlyRankings": "포수의 기록",
+      "fireAndFlyPersonalRules": "이 캐릭터에 저장된 오프라인 기록입니다. 가장 좋은 메달이 먼저, 그다음 가장 높은 점수 순으로 순위가 정해집니다. 일일 기록은 매일 초기화됩니다.",
+      "fireAndFlyRules": "가장 좋은 메달이 먼저, 그다음 가장 높은 점수 순으로 순위가 정해집니다. 연습을 포함해 승리한 모든 시련이 기록됩니다. 일일 기록은 서버 초기화 때 갱신됩니다. 기록은 30초 이내에 반영됩니다.",
+      "fireAndFlyGroupsLabel": "포수 기록 분류",
+      "fireAndFlyGroups": {
+        "trials": "시련",
+        "missions": "임무",
+        "mastery": "숙련"
+      },
+      "fireAndFlyMissionStart": "이 임무 도전",
+      "fireAndFlyMissionRules": "가장 좋은 메달이 먼저, 그다음 가장 높은 점수 순으로 순위가 정해집니다. 연습을 포함해 승리한 모든 임무가 기록됩니다. 기록은 30초 이내에 반영됩니다.",
+      "fireAndFlyMissionPersonalRules": "이 캐릭터에 저장된 오프라인 기록입니다. 가장 좋은 메달이 먼저, 그다음 가장 높은 점수 순으로 순위가 정해집니다.",
+      "fireAndFlyMastery": "포수의 숙련",
+      "fireAndFlyMasteryRules": "각 임무의 가장 좋은 메달을 별로 환산해 합산합니다: 금 3, 은 2, 동 1. 별이 많은 순, 그다음 총점 순으로 순위가 정해집니다. 기록은 30초 이내에 반영됩니다.",
+      "fireAndFlyMasteryPersonalRules": "이 캐릭터에 저장된 오프라인 숙련입니다. 각 임무의 가장 좋은 메달을 별로 환산해 합산하고(금 3, 은 2, 동 1), 그다음 총점으로 비교합니다.",
+      "wqStars": "별",
       "wqPoints": "점수",
       "wqSeconds": "{seconds}초",
       "wqNoMedal": "없음",
@@ -1534,6 +1608,7 @@ export const ko_KR: EnTranslations = {
         "seconds": "메달 순, 그다음 가장 빠른 시간",
         "points": "메달 순, 그다음 가장 높은 점수"
       },
+      "rankedByStars": "별 순, 그다음 최고 점수",
       "podiumLabel": "상위 3명",
       "unclaimed": "비어 있음",
       "totalOne": "영웅 1명 순위 등록",
@@ -3156,6 +3231,12 @@ export const ko_KR: EnTranslations = {
         "few": "길드 {count}개 표시 중",
         "many": "길드 {count}개 표시 중",
         "other": "길드 {count}개 표시 중"
+      },
+      "fireAndFlyStars": {
+        "one": "별 {count}개",
+        "few": "별 {count}개",
+        "many": "별 {count}개",
+        "other": "별 {count}개"
       },
       "commissionMasterworks": {
         "one": "걸작 {count}점",
@@ -12552,6 +12633,41 @@ export const ko_KR: EnTranslations = {
           "bronze": "동"
         }
       },
+      "fireAndFly": {
+        "title": "포수의 시련",
+        "objective": "시련 하나의 모든 공격 파도를 견디며 자신의 탑을 지키기",
+        "ready": "포술장 올더에게 말을 걸어 시련을 받으세요.",
+        "complete": "시련 통과! 포술장 올더에게 말을 걸면 연습할 수 있습니다.",
+        "scenarios": {
+          "introduction": "신병의 시련",
+          "standard": "정식 경계 근무",
+          "hard": "고참병의 시험",
+          "pack": "무리",
+          "giants": "무거운 발걸음",
+          "deluge": "대홍수",
+          "brittle": "금 간 탑",
+          "powder": "화약고"
+        },
+        "pitch": {
+          "introduction": "신병의 첫 경계 근무",
+          "standard": "성벽 위의 진짜 경계 근무",
+          "hard": "고참병들이 치르는 포위전",
+          "pack": "무리로 오니 한 발도 헛되이 쏘지 말게",
+          "giants": "멀리 날려 보내기엔 너무 무거운 거구 몇 마리",
+          "deluge": "작고 빠른 짐승의 홍수",
+          "brittle": "몇 번만 맞아도 탑이 무너진다",
+          "powder": "두 배의 화약통, 놈들 길목에"
+        },
+        "start": "{name}: {detail} (파도 {count}개)",
+        "practice": "{name} 연습 (파도 {count}개)",
+        "practiceMission": "{name} 연습 (파도 {count}개)",
+        "sections": {
+          "trials": "시련",
+          "missions": "임무"
+        },
+        "lockedTrial": "{name}: {previous}을(를) 통과하면 열림",
+        "missionsLocked": "{name}을(를) 통과하면 입대하고 임무가 열립니다."
+      },
       "calligraphyTitle": "비전 서예",
       "traceOutline": "발걸음으로 윤곽 따라 그리기",
       "traceRoundInstruction": "{round}/{total}단계: {shape}. {instruction}",
@@ -20226,6 +20342,11 @@ export const ko_KR: EnTranslations = {
         "title": "제피르의 견습생",
         "greeting": "협곡을 따라 멋지게 날아왔네요. 절단 절벽의 제피르에게 돌아갈 마법 상승 기류가 필요하면 언제든 말을 걸어 주세요."
       },
+      "fire_and_fly_instructor": {
+        "name": "포술장 올더",
+        "title": "포병 모집관",
+        "greeting": "성벽에는 수비대가 내줄 수 있는 것보다 더 많은 수비병이 필요해서 모집하고 있네. 누구에게든 대포를 맡기기 전에, 자기 탑을 지켜 내는 모습을 보고 싶군. 시련을 받게: 괴물들이 성벽에 닿기 전에 날려 버리게."
+      },
       "shadow_cloak_scout": {
         "name": "정찰병 발레리",
         "title": "비밀 작전",
@@ -23722,6 +23843,11 @@ export const ko_KR: EnTranslations = {
         "name": "던홀드 성",
         "enterText": "꽃향기 가득한 던홀드 성의 따뜻한 홀 안으로 들어섭니다.",
         "leaveText": "햇살 가득한 정원 잔디밭으로 다시 나옵니다."
+      },
+      "fire_and_fly_arena": {
+        "name": "Fire and Fly",
+        "enterText": "낡은 대포 탑에 오릅니다. 나무들 너머로 숲이 술렁이기 시작합니다.",
+        "leaveText": "탑에서 내려와 투기장을 뒤로합니다."
       },
       "drowned_temple": {
         "name": "익사한 신전",
