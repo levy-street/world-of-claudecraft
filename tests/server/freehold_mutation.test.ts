@@ -3101,19 +3101,35 @@ describe('the claim renewer', () => {
         ?.inputs ?? {},
     );
     // A package is a module under the root node_modules (.npmrc pins the
-    // hoisted layout); any other path, one with node_modules deeper in it
-    // included, is this repository's and is read.
+    // hoisted layout, each worktree installs its own, and git tracks nothing
+    // there); any other path, one with node_modules deeper in it or above the
+    // working directory included, is read as this repository's and fails until
+    // a read takes it. A package is named by the directory after its last
+    // node_modules, its scope kept, so one nested under another is named.
     const fromPackage = (file: string) => file.startsWith('node_modules/');
     expect(
       [
         'node_modules/ws/lib/a.js',
         'src/x/vendor_node_modules/ws/r.ts',
         'src/x/node_modules/ws/r.ts',
+        'node_modules_x/ws/r.ts',
       ].filter(fromPackage),
     ).toEqual(['node_modules/ws/lib/a.js']);
+    expect(tracked(['node_modules'])).toEqual([]);
+    const packageOf = (file: string) => {
+      const parts = file
+        .slice(file.lastIndexOf('node_modules/') + 'node_modules/'.length)
+        .split('/');
+      return parts[0].startsWith('@') ? `${parts[0]}/${parts[1]}` : parts[0];
+    };
     expect(
-      [...new Set(bundled.filter(fromPackage).map((file) => file.split('/')[1]))].sort(),
-    ).toEqual(['ws']);
+      [
+        'node_modules/ws/lib/a.js',
+        'node_modules/ws/node_modules/x/i.js',
+        'node_modules/@s/p/i.js',
+      ].map(packageOf),
+    ).toEqual(['ws', 'x', '@s/p']);
+    expect([...new Set(bundled.filter(fromPackage).map(packageOf))].sort()).toEqual(['ws']);
     const bundledHere = bundled.filter((file) => !fromPackage(file)).sort();
     expect(bundledHere).toEqual(
       [...botFiles, 'src/sim/discord_roles.ts', 'src/sim/discord_tier.ts'].sort(),
@@ -3178,10 +3194,11 @@ describe('the claim renewer', () => {
     // written, so the section is also read whole, by digest: any change to its
     // code fails until it is reviewed against them, a form inside the section
     // they do not read (a shadowing binding, a computed key) included. Around
-    // the section, every name it reads from there is declared once, the
-    // functions around it bind no name of their own and the suite holds no
-    // `var`, so no binding there shadows another; code around it is read only
-    // where a pin names it.
+    // the section, its scopes are the suite's callback and the module (pinned
+    // by its ancestors' kinds), every name it reads from there is declared
+    // once, the functions around it bind no name of their own and the suite
+    // holds no `var`, so no binding there shadows another; code around it is
+    // read only where a pin names it.
     const pgSuite = parsed('tests/server/freehold_mutation.pg.test.ts');
     const sectionL = nodesIn(pgSuite).filter(
       (node) =>
@@ -3283,7 +3300,9 @@ describe('the claim renewer', () => {
     // the first, fails. The functions around it bind no name of their own (a
     // parameter, a type parameter, a function expression's name), and the
     // suite holds no `var`, which could hoist into them from a nested block.
-    // Each read is proven on a sample first.
+    // The reads of the scopes, the `var` forms and the declarations are each
+    // proven on a sample first; the section's own place is pinned by its
+    // ancestors' kinds.
     const bindings = (name: ts.BindingName): string[] =>
       ts.isIdentifier(name)
         ? [name.text]
@@ -3323,6 +3342,19 @@ describe('the claim renewer', () => {
     ).toEqual([['U', 'b', 'T', 'a', 'named']]);
     const { statements: around, ownNames: aroundOwnNames } = scopesAround(sectionL[0]);
     expect(aroundOwnNames).toEqual([]);
+    // The scopes around it are the suite's callback and the module, read by
+    // the kinds of its ancestors, so a loop, catch, case, class or namespace
+    // wrapped around the section, whose bindings neither read takes, fails.
+    const ancestry: ts.SyntaxKind[] = [];
+    for (let at = sectionL[0].parent; at !== undefined; at = at.parent) ancestry.push(at.kind);
+    expect(ancestry).toEqual([
+      ts.SyntaxKind.ExpressionStatement,
+      ts.SyntaxKind.Block,
+      ts.SyntaxKind.ArrowFunction,
+      ts.SyntaxKind.CallExpression,
+      ts.SyntaxKind.ExpressionStatement,
+      ts.SyntaxKind.SourceFile,
+    ]);
     const hoistable = (root: ts.Node) =>
       nodesIn(root).filter(
         (node) =>
@@ -3377,6 +3409,27 @@ describe('the claim renewer', () => {
         )
         .statements.flatMap(declares),
     ).toEqual(['A', 'B', 'C', 'D', 'G', 'I', 'J', 'K', 'M', 'N', 'P', 'R']);
+    // The statements of every scope around a node are read, the innermost
+    // first, a block that is no function's body included, the node's own
+    // callback not.
+    expect(
+      scopesAround(
+        nodesIn(
+          ts.createSourceFile(
+            'sample.ts',
+            "const a = 1; describe('s', () => { const b = 1; if (b) { const c = 1; describe('L. x', () => { const own = 1; }); } });",
+            ts.ScriptTarget.Latest,
+            true,
+          ),
+        ).filter(
+          (node): node is ts.CallExpression =>
+            ts.isCallExpression(node) &&
+            node.arguments.length > 0 &&
+            ts.isStringLiteralLike(node.arguments[0]) &&
+            node.arguments[0].text.startsWith('L. '),
+        )[0],
+      ).statements.flatMap(declares),
+    ).toEqual(['c', 'b', 'a']);
     const declaredAround = around.flatMap(declares);
     const readAround = new Set(
       nodesIn(sectionL[0])
