@@ -7369,7 +7369,7 @@ describe('the claim renewer', () => {
 
     // The root package.json: its keys (so no `imports`, `exports` or
     // `browser` map); every dependency or override spec but a plain version
-    // range, by its shape; pnpm's keys and the packages it patches;
+    // range, as written; pnpm's keys and the packages it patches;
     // and every resolution flag its scripts pass, as text. The bot's bundle
     // read, earlier in this file, takes node_modules/ws/ as ws's own published
     // code partly on this pin, so a change here for ws needs that read
@@ -7394,62 +7394,80 @@ describe('the claim renewer', () => {
     ]);
     expect(pkg.imports).toBeUndefined();
     expect(pkg.exports).toBeUndefined();
-    // A spec is read by its shape, each run of digits written 0, so a version
-    // bump keeps it. A plain version range has the shape 0.0.0, led by
-    // nothing, ^ or ~; every other spec is listed by name with its shape
-    // whole, so one that names a path, a tarball, git, a tag, a prerelease or
-    // a wider range, or an alias with any tail, fails until it is reviewed
-    // here. A number's value is not read: a leading zero or an overlong
-    // number keeps the shape, and pnpm takes such a spec from the registry or
-    // fails.
+    // A spec is plain when its shape, each run of digits written 0, is
+    // 0.0.0, led by nothing, ^ or ~; every other spec is listed by name as
+    // written, so one that names a path, a tarball, git, a tag, a prerelease
+    // or a wider range, or an alias, fails until it is reviewed here, and a
+    // bump of a listed spec is a review prompt too. A plain spec's numbers are
+    // not read: a leading zero or an overlong number keeps the shape, and pnpm
+    // takes such a spec from the registry or fails.
     const shapeOf = (spec: string) => spec.replace(/\d+/g, '0');
     const nonRange = (spec: string): string | null =>
-      ['0.0.0', '^0.0.0', '~0.0.0'].includes(shapeOf(spec)) ? null : shapeOf(spec);
+      ['0.0.0', '^0.0.0', '~0.0.0'].includes(shapeOf(spec)) ? null : spec;
     const specs = (table: unknown): string[] =>
       Object.entries((table ?? {}) as Record<string, string>).flatMap(([name, spec]) => {
         const kept = nonRange(spec);
         return kept === null ? [] : [`${name}: ${kept}`];
       });
+    // Every table is read, in its order, proven on a sample with one listed
+    // spec in each.
+    const tableSpecs = (from: {
+      dependencies?: unknown;
+      devDependencies?: unknown;
+      optionalDependencies?: unknown;
+      pnpm?: { overrides?: unknown };
+    }): string[] =>
+      [
+        from.dependencies,
+        from.devDependencies,
+        from.optionalDependencies,
+        from.pnpm?.overrides,
+      ].flatMap(specs);
     expect(
-      [pkg.dependencies, pkg.devDependencies, pkg.optionalDependencies, pkg.pnpm.overrides].flatMap(
-        specs,
-      ),
-    ).toEqual([
-      '@typescript/native: npm:typescript@^0.0.0',
-      'typescript: npm:@typescript/typescript0@^0.0.0',
+      tableSpecs({
+        dependencies: { a: 'file:./a', b: '^1.2.3' },
+        devDependencies: { c: 'link:./c' },
+        optionalDependencies: { d: 'github:d/d' },
+        pnpm: { overrides: { e: '1.2.3.tgz' } },
+      }),
+    ).toEqual(['a: file:./a', 'c: link:./c', 'd: github:d/d', 'e: 1.2.3.tgz']);
+    expect(tableSpecs(pkg)).toEqual([
+      '@typescript/native: npm:typescript@^7.0.2',
+      'typescript: npm:@typescript/typescript6@^6.0.2',
     ]);
-    for (const [spec, kept] of [
-      ['^1.19.0', null],
-      ['1.2.3', null],
-      ['~0.10.0', null],
-      ['~1.2.3-beta.1', '~0.0.0-beta.0'],
-      ['1.2.3-.', '0.0.0-.'],
-      ['^1.2.3-..tgz', '^0.0.0-..tgz'],
-      ['^1.2.3+..tgz', '^0.0.0+..tgz'],
-      ['^1.2.3.tgz', '^0.0.0.tgz'],
-      ['1.2.3-x/../ws.tgz', '0.0.0-x/../ws.tgz'],
-      ['1/2.3', '0/0.0'],
-      ['1.2/3', '0.0/0'],
-      ['/1.2.3', '/0.0.0'],
-      ['^^1.2.3', '^^0.0.0'],
-      ['.1.2.3', '.0.0.0'],
-      ['N.N.N', 'N.N.N'],
-      ['>1.2.3', '>0.0.0'],
-      ['>=1.2.3', '>=0.0.0'],
-      ['^1.2', '^0.0'],
-      ['1.2.x', '0.0.x'],
-      ['8/../vendor/ws.tgz', '0/../vendor/ws.tgz'],
-      ['1.2.3/../ws.tgz', '0.0.0/../ws.tgz'],
-      ['~/ws', '~/ws'],
-      ['latest', 'latest'],
-      ['link:./server', 'link:./server'],
-      ['./server/claims', './server/claims'],
-      ['npm:typescript@^7.0.2', 'npm:typescript@^0.0.0'],
-      ['npm:@typescript/typescript6@^6.0.2', 'npm:@typescript/typescript0@^0.0.0'],
-      ['npm:typescript@x:.tgz', 'npm:typescript@x:.tgz'],
-      ['npm:typescript@latest', 'npm:typescript@latest'],
-    ] as const) {
-      expect(nonRange(spec), spec).toBe(kept);
+    for (const spec of ['^1.19.0', '1.2.3', '~0.10.0', '01.2.3', '^1234567890.0.0']) {
+      expect(nonRange(spec), spec).toBe(null);
+    }
+    for (const spec of [
+      '~1.2.3-beta.1',
+      '1.2.3-.',
+      '^1.2.3-..tgz',
+      '^1.2.3+..tgz',
+      '^1.2.3.tgz',
+      '1.2.3-x/../ws.tgz',
+      '1/2.3',
+      '1.2/3',
+      '/1.2.3',
+      '^^1.2.3',
+      '.1.2.3',
+      'N.N.N',
+      '>1.2.3',
+      '>=1.2.3',
+      '^1.2',
+      '1.2.x',
+      '8/../vendor/ws.tgz',
+      '1.2.3/../ws.tgz',
+      '~/ws',
+      'latest',
+      'link:./server',
+      './server/claims',
+      'npm:typescript@^7.0.2',
+      'npm:@typescript/typescript6@^6.0.2',
+      'npm:@typescript/typescript7@^6.0.2',
+      'npm:typescript@x:.tgz',
+      'npm:typescript@latest',
+    ]) {
+      expect(nonRange(spec), spec).toBe(spec);
     }
     expect(Object.keys(pkg.pnpm)).toEqual([
       'overrides',
