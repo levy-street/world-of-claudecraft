@@ -678,8 +678,7 @@ six waiting 1,056 ms; each boot that waited lived, and the bench's "old account 
 account then a character, beside it was aborted). ANY boot can DEADLOCK on two paths, since the
 core schema locks its tables in its statement order, `auth_tokens`, then `characters`, then
 `accounts`, and a row lock counts on either path, since taking one also takes ROW SHARE or ROW
-EXCLUSIVE on its table (and a row the boot itself writes can wait on another transaction's
-uncommitted write of it). The UPGRADE path, one table: on `auth_tokens` and `characters` the
+EXCLUSIVE on its table. The UPGRADE path, one table: on `auth_tokens` and `characters` the
 boot's first lock is SHARE (an index create), upgraded to ACCESS EXCLUSIVE by the next
 statement (on `accounts` it is ACCESS EXCLUSIVE from the first, so no upgrade happens there),
 against a transaction that took a lock on that table that SHARE does not wait for (a save's G2
@@ -692,7 +691,8 @@ trip's included, the operation prepare, the character create and delete, a passw
 against the boot's order. The shapes decide it, not a list. The order, each parent's first
 lock, the boot's missing lock timeout and the one lock it holds behind a dump-shaped hold are
 observed on the real boot, and so is DEPLOY's route for a boot already behind the dump: a
-stopped realm's boot keeps its place in the queue until its backend is ended
+stopped realm's boot keeps its place in the queue until its backend is ended, and a running
+boot queued on the advisory lock behind it takes that place once it is
 (`tests/server/freehold_mutation.pg.test.ts`, section L). With G1-shaped saves in flight every
 bench boot was eventually aborted and saves were aborted beside it, and a boot that loses exits
 and is restarted (R-11). A REPAIR boot is any boot that rebuilds something a probe guards (for
@@ -1378,11 +1378,13 @@ What changed the contract above:
   before the parents and states both deadlock paths as shapes, the character delete and a
   password reset among the examples.
 - A nineteenth round of eight fresh readers: P12 says the boot queues behind any open
-  transaction holding a lock on a table it locks, that only `auth_tokens` and `characters`
-  take SHARE before ACCESS EXCLUSIVE, and that a row lock counts; the order, the first locks
-  and the missing lock timeout are observed on the real boot; R-11's owed fix covers
-  `auth_tokens` too.
+  transaction holding a lock on a table it locks (one conflicting with a lock it takes,
+  corrected in round twenty), that only `auth_tokens` and `characters` take SHARE before
+  ACCESS EXCLUSIVE, and that a row lock counts; the order, the first locks and the missing
+  lock timeout are observed on the real boot; R-11's owed fix covers `auth_tokens` too.
 - A twentieth round of eight fresh readers: P12 says the boot queues behind a lock that
   conflicts with one it takes and that a row lock counts by the table lock it carries, and
   names the observed route for a boot stopped behind the dump: its backend keeps its place in
   the queue until it is ended.
+- A twenty-first round of eight fresh readers: P12 drops the claim about the boot's own row
+  writes, and names the running boot that takes a stopped boot's place once it is ended.

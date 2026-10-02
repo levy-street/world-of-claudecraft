@@ -1073,19 +1073,18 @@ For off-box safety, sync the directory to S3 occasionally:
   IF NOT EXISTS`, which takes it even when the column exists); on `accounts` it is
   ACCESS EXCLUSIVE from the first. A row lock counts as a lock below: taking one also
   takes a lock on its table (ROW SHARE, or ROW EXCLUSIVE for a write), which the boot's
-  ACCESS EXCLUSIVE waits for, and a row the boot itself writes can wait on another
-  transaction's uncommitted write of it. The boot sends no lock timeout of its own, so
-  it waits as long as a lock is held (one set on the role, on the database or in
-  `DATABASE_URL`'s options would still apply, and a boot that hits it exits and
-  restarts).
+  ACCESS EXCLUSIVE waits for. The boot sends no lock timeout of its own, so it waits as
+  long as a lock is held (one set on the role, on the database or in `DATABASE_URL`'s
+  options would still apply, and a boot that hits it exits and restarts).
   - Queueing: a boot queues behind every open transaction, running or idle in
     transaction, that holds a lock conflicting with one the boot takes (any lock at all
-    on `auth_tokens`, `characters` and `accounts`, since ACCESS EXCLUSIVE conflicts with
-    every mode), and every later statement on those tables on every realm queues behind
-    the boot (56 to 59 ms in the bench with plain saves in flight when no deadlock
-    formed; one boot in six waited out `deadlock_timeout`, 1,056 ms, and lived while the
-    bench's "old account create", a transaction that inserts an account and then a
-    character, was aborted).
+    on `auth_tokens`, `characters`, `accounts` or a later table the core schema alters,
+    `play_sessions` and `character_leases` among them, since ACCESS EXCLUSIVE conflicts
+    with every mode), and every later statement on a table it holds or waits for, on
+    every realm, queues behind the boot (56 to 59 ms in the bench with plain saves in
+    flight when no deadlock formed; one boot in six waited out `deadlock_timeout`,
+    1,056 ms, and lived while the bench's "old account create", a transaction that
+    inserts an account and then a character, was aborted).
   - Deadlocks: a boot can DEADLOCK with any transaction of either of two shapes: one
     that holds a lock on a table the boot holds only SHARE on (a plain read's ACCESS
     SHARE, or a row lock's ROW SHARE) and then writes it, against the boot's upgrade of
@@ -1107,12 +1106,15 @@ For off-box safety, sync the directory to S3 occasionally:
     another realm keeps serving those saves.
   - The quiet window: boot a realm while the other realms on its database are quiet and
     outside the nightly `pg_dump`, and in a rolling restart let one realm finish
-    shutting down before another boots; that is the quiet window this file means. Quiet
-    means that, from psql on the realm database, `SELECT backend_type, application_name,
-    client_addr, state, now() - xact_start AS open_for FROM pg_stat_activity WHERE datname
-    = current_database() AND xact_start IS NOT NULL AND pid <> pg_backend_pid();` shows no
-    `client backend` row (an `idle in transaction` row counts; a `pg_dump` row is the
-    nightly dump); one reading is a snapshot, so take several a few seconds apart.
+    shutting down before another boots; that is the quiet window this file means. A
+    realm with players online opens a transaction at any moment, so it is quiet only
+    with no players online, or stopped, whatever a reading shows; a reading then
+    confirms nothing is left open: from psql on the realm database, `SELECT
+    backend_type, application_name, client_addr, state, now() - xact_start AS open_for
+    FROM pg_stat_activity WHERE datname = current_database() AND xact_start IS NOT NULL
+    AND pid <> pg_backend_pid();` shows no `client backend` or `autovacuum worker` row
+    (an `idle in transaction` row counts; a `pg_dump` row is the nightly dump); one
+    reading is a snapshot, so take several a few seconds apart.
   - The nightly dump: it starts at 03:15 UTC (see Backups) and holds ACCESS SHARE on
     every table for its whole run. A boot that starts during it takes SHARE on
     `auth_tokens` and waits for the dump to end to upgrade it, holding nothing on
@@ -1121,22 +1123,28 @@ For off-box safety, sync the directory to S3 occasionally:
     account delete's cascade) queues behind the boot and holds its pool client until
     `DB_STATEMENT_TIMEOUT_MS` (15 s) fails it with 57014. So a realm's pool can fill,
     and then any save or other query that waits `DB_POOL_CONNECT_TIMEOUT_MS` (5 s)
-    without a free client fails with pg-pool's `timeout exceeded when trying to
-    connect` (no SQLSTATE), until the dump ends and the boot COMMITs; a leave save
-    whose retries end first is lost but for its guild books. A boot during the dump's
-    opening locks can instead deadlock it and abort that night's backup. If a boot is
-    already waiting behind the dump, first stop that realm, so the restart policy
-    cannot boot it again (the boot runs before the realm serves anything), and then end
-    the boot's backend from psql on the realm database: stopping the realm does not end
-    it, because a backend waiting for a lock does not read its socket
-    (`client_connection_check_interval` is off by default), so it keeps its place in
-    the queue until the dump ends. `SELECT pg_terminate_backend(pid) FROM pg_locks WHERE
-    locktype = 'relation' AND database = (SELECT oid FROM pg_database WHERE datname =
-    current_database()) AND relation = 'auth_tokens'::regclass AND mode =
-    'AccessExclusiveLock' AND NOT granted;` ends it (the dump never asks for that lock;
-    no row means no boot is waiting there), which rolls its schema transaction back and
-    releases the queue at once. Boot the realm again after the dump ends; never end the
-    dump, and boot no other realm until it ends.
+    without a free client fails with pg-pool's `timeout exceeded when trying to connect`
+    (no SQLSTATE), until the dump ends and the boot COMMITs; a leave save whose retries
+    end first is lost but for its guild books. A boot during the dump's opening locks
+    can instead deadlock it and abort that night's backup. If a boot is already waiting
+    behind the dump, first stop that realm and every other realm whose boot has not
+    finished (its container not yet healthy), so the restart policy cannot boot them
+    again: a boot runs before its realm serves anything, and a running boot queued on
+    the schema advisory lock takes the same place the moment the boot ahead of it ends,
+    while a stopped one exits there instead. Then end the waiting boot's backend from
+    psql on the realm database: stopping its realm does not end it, because a backend
+    waiting for a lock does not read its socket (`client_connection_check_interval` is
+    off by default), so it keeps its place in the queue until the dump ends. `SELECT
+    pg_terminate_backend(pid) FROM pg_locks WHERE locktype = 'relation' AND database =
+    (SELECT oid FROM pg_database WHERE datname = current_database()) AND relation =
+    'public.auth_tokens'::regclass AND mode = 'AccessExclusiveLock' AND NOT granted;`
+    ends it, which rolls its schema transaction back and releases the queue at once (the
+    dump never asks for that lock; the statement also ends any other session waiting for
+    it, such as your own DDL on `auth_tokens`, which rolls back). Run it again a few
+    seconds later: no row means nothing waits there, and a row means a realm still
+    booting took the place, so stop that realm and run it again. Boot the realms again
+    one at a time after the dump ends, then take the After a stall steps below; never
+    end the dump, and boot no realm until it ends.
   - After an abort: an aborted save shows as 40P01 in the realm log (one that carried
     guild bank books also counts `escrow_save_failed`), and what writes it again
     depends on the save: an autosave is written by the next autosave; a leave save is
@@ -1146,22 +1154,31 @@ For off-box safety, sync the directory to S3 occasionally:
     `trip_failed` and is not retried by the server (the player presses the key again),
     and neither is an aborted account or character create or password reset (the
     player tries again).
-  - After a stall: no request that failed while a boot blocked `auth_tokens` (behind
-    the dump or anything else) is retried, a logout or a token revoke included. One
-    that failed before writing changed nothing, and whoever sent it can send it again;
-    one that wrote before its failing token statement keeps those writes and skips
-    every step after it. That matters for an action that writes the account and then
-    revokes its tokens (for example a password change, a staff password reset, a ban, a
-    suspension or a deactivation): it leaves the old tokens valid and the live session
-    connected, and skips what follows (for example a notice email, or a deactivation's
-    housing receipt erase). Most requests check their token in `auth_tokens` before
-    they write, so few land half, but the realm log names no account. So once the boot
-    COMMITs after a stall that began while players or staff were active, sign every
-    account out once (`DELETE FROM auth_tokens WHERE created_at < now();` from psql on
-    the realm database, companion and OAuth tokens included), restart the realms one at
-    a time in the quiet window so no live session outlasts it, and re-run the
-    deactivation housing receipt erase for deactivated accounts that still hold
-    receipts (its warning in `server/account.ts` says how).
+  - After a stall: no request that failed while a boot blocked `auth_tokens` (behind the
+    dump or anything else) is retried, a logout or a token revoke included. One that
+    failed before writing changed nothing and stays undone until it is sent again; one
+    that wrote before its failing statement keeps those writes and skips every step
+    after it. That matters for an action that writes the account and then revokes its
+    tokens (for example a password change, a staff password reset, a ban, a suspension
+    or a deactivation): it leaves the old tokens valid and the live session connected,
+    and skips what follows (for example a notice email, or a deactivation's housing
+    receipt erase). Most requests check their token in `auth_tokens` before they write,
+    so few land half, but the realm log names no account. So once a stall that began
+    while players or staff were active is over (its boot COMMITs, or its backend was
+    ended and its realm booted again after the dump), in the next quiet window and right
+    before the first restart, sign every account out once from psql on the realm
+    database (`DELETE FROM auth_tokens WHERE created_at < now() AND expires_at > now();
+    DELETE FROM oauth_codes; DELETE FROM oauth_device_codes;`, companion and OAuth
+    tokens included, and no pending OAuth code left to mint one; an expired token is
+    refused already; on 40P01 run it again), then restart the realms one at a time, each
+    with a wave of logins, so no live session outlasts it. The sign-out applies no
+    action: whoever saw an action return an error during the stall checks whether it
+    landed and sends it again if not (staff for a ban, a suspension or a staff password
+    reset, which can leave its record without the new password), and nothing sends a
+    skipped notice email again. Re-run the deactivation housing receipt erase for
+    deactivated accounts that still hold receipts by the bullet below that begins "A
+    failed deactivation receipt erase" (a deactivation stopped at its revoke never
+    reached the erase, so it logged no warning).
   - The hazard predates housing; removing both paths is owed
     (docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md measures it).
 - FIRST ROLLOUT OF THE HOUSING TABLES: the first boot that carries them also creates

@@ -25,10 +25,10 @@
 // legacy-effect interleaves, no client across the prepare, the export
 // allowlist, the index every statement reaches, a catalog-only fragment
 // re-apply, and the boot's locks, observed behind a held lock and behind a
-// dump-shaped hold, with no lock timeout sent and DEPLOY's route for a boot
-// stopped behind the dump). The nearest suites do not pin it:
-// tests/server/freehold_mutation.test.ts drives the same decisions with fakes
-// (no transaction to roll back, no row to wait on),
+// dump-shaped hold, with no lock timeout sent, DEPLOY's route for every boot
+// that queues behind the dump, and its sign-out after a stall). The nearest
+// suites do not pin it: tests/server/freehold_mutation.test.ts drives the same
+// decisions with fakes (no transaction to roll back, no row to wait on),
 // tests/server/freehold_hearth_db.pg.test.ts and
 // tests/server/freehold_db.pg.test.ts prove the Hearth and plot statements
 // alone with no character save around them, and
@@ -3195,14 +3195,15 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       return res.rows.map((r: { t: string }) => r.t);
     }
 
-    /** Polls, to a deadline, for the one relation lock some session other
-     *  than `holderPid` is waiting for. */
+    /** Polls, to a deadline, for the one relation lock some session of this
+     *  database other than `holderPid` is waiting for. */
     async function waiter(holderPid: number) {
       const deadline = Date.now() + 5_000;
       while (Date.now() < deadline) {
         const res = await pool.query(
           `SELECT pid, relation::regclass::text AS rel, mode FROM pg_locks
-            WHERE locktype = 'relation' AND NOT granted AND pid <> $1`,
+            WHERE locktype = 'relation' AND NOT granted AND pid <> $1
+              AND database = (SELECT oid FROM pg_database WHERE datname = current_database())`,
           [holderPid],
         );
         if (res.rows.length > 0) {
@@ -3212,6 +3213,30 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         await sleep(20);
       }
       throw new Error('the boot never queued behind the held lock');
+    }
+
+    /** The sessions of this database holding or waiting for the schema
+     *  advisory lock, as `granted` or `waiting`. */
+    async function advisory(): Promise<string[]> {
+      const res = await pool.query(
+        `SELECT CASE WHEN granted THEN 'granted' ELSE 'waiting' END AS s FROM pg_locks
+          WHERE locktype = 'advisory' AND objid = $1
+            AND database = (SELECT oid FROM pg_database WHERE datname = current_database())
+          ORDER BY 1`,
+        [0x57_4f_43_01],
+      );
+      return res.rows.map((r: { s: string }) => r.s);
+    }
+
+    /** Polls, to a deadline, until `read` returns `want`. */
+    async function until<T>(read: () => Promise<T>, want: T): Promise<T> {
+      const deadline = Date.now() + 5_000;
+      let got = await read();
+      while (Date.now() < deadline && JSON.stringify(got) !== JSON.stringify(want)) {
+        await sleep(20);
+        got = await read();
+      }
+      return got;
     }
 
     /** Every lock `pid` holds on a table of the schema, whatever the table
@@ -3230,26 +3255,29 @@ d('the housing mutation boundary (REAL Postgres)', () => {
     }
 
     /** Holds ACCESS SHARE on `tables`, what the nightly pg_dump holds on every
-     *  table for its whole run, runs the REAL boot (`ensureSchema`) beside it,
-     *  and reads the lock it waits for and every table lock it holds. `during`
-     *  runs while the boot still waits; the boot then finishes or fails. */
+     *  table for its whole run, under the dump's own session name, runs the
+     *  REAL boot (`ensureSchema`) beside it, and reads the lock it waits for
+     *  and every table lock it holds. `during` runs while the boot still waits
+     *  and may make it fail; without one the boot must finish. */
     async function bootBehind(
       tables: readonly string[],
-      during?: (seen: { pid: number }, boot: Promise<unknown>) => Promise<void>,
+      during?: (seen: { pid: number; holderPid: number }, boot: Promise<unknown>) => Promise<void>,
     ) {
       const holder = await pool.connect();
       let boot: Promise<unknown> | undefined;
       try {
+        await holder.query("SET application_name = 'pg_dump'");
         await holder.query('BEGIN');
         await holder.query(`LOCK TABLE ${tables.join(', ')} IN ACCESS SHARE MODE`);
         const holderPid = (await holder.query('SELECT pg_backend_pid() AS p')).rows[0].p;
-        boot = db.ensureSchema().catch((error: unknown) => error);
+        boot = during ? db.ensureSchema().catch((error: unknown) => error) : db.ensureSchema();
         const seen = await waiter(holderPid);
         const result = { on: seen.rel, waits: seen.mode, held: await heldBy(seen.pid) };
-        if (during) await during(seen, boot);
+        if (during) await during({ pid: seen.pid, holderPid }, boot);
         return result;
       } finally {
         await holder.query('ROLLBACK').catch(() => {});
+        await holder.query('RESET application_name').catch(() => {});
         holder.release();
         await boot;
       }
@@ -3268,39 +3296,51 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       return sent;
     }
 
+    /** The boot clients, in the order they began: each takes the schema
+     *  advisory lock. */
+    const bootClients = (spy: { mock: { calls: unknown[][]; contexts: unknown[] } }) =>
+      [...sentByClient(spy)]
+        .filter(([, texts]) => texts.includes('SELECT pg_advisory_xact_lock($1)'))
+        .map(([client, texts]) => ({ client, texts }));
+
+    /** Stopping a realm ends its process, which closes its socket. */
+    function stop(client: unknown) {
+      const stopped = client as {
+        on(event: 'error', listener: () => void): void;
+        connection: { stream: { destroy(): void } };
+      };
+      stopped.on('error', () => {});
+      stopped.connection.stream.destroy();
+    }
+
     it('locks auth_tokens, then characters, then accounts, and sends no lock timeout', async () => {
       const { Client } = await import('pg');
       const spy = vi.spyOn(Client.prototype, 'query');
       try {
-        // Behind its first parent the boot holds SHARE (the index create) on
-        // that table alone, and no lock on any other table; behind each later
-        // parent it holds every earlier one and nothing on the later ones. This
-        // is the order DEPLOY states, read off the real statements, whatever
-        // kind of statement takes each lock.
-        expect(await bootBehind(['auth_tokens'])).toEqual({
-          on: 'auth_tokens',
-          waits: 'AccessExclusiveLock',
-          held: ['auth_tokens ShareLock'],
-        });
-        expect(await bootBehind(['characters'])).toEqual({
-          on: 'characters',
-          waits: 'AccessExclusiveLock',
-          held: [
-            'auth_tokens AccessExclusiveLock',
-            'auth_tokens ShareLock',
-            'characters ShareLock',
-          ],
-        });
-        expect(await bootBehind(['accounts'])).toEqual({
-          on: 'accounts',
-          waits: 'AccessExclusiveLock',
-          held: [
+        // Behind each parent the boot holds every earlier parent and nothing
+        // on a later one; on the first two it holds SHARE (the index create)
+        // already, on `accounts` nothing, and no lock on any other table of
+        // the schema. The order is PARENTS' own, read off the real
+        // statements, whatever kind of statement takes each lock, and DEPLOY
+        // states it.
+        const modes = [
+          ['auth_tokens ShareLock'],
+          ['auth_tokens AccessExclusiveLock', 'auth_tokens ShareLock', 'characters ShareLock'],
+          [
             'auth_tokens AccessExclusiveLock',
             'auth_tokens ShareLock',
             'characters AccessExclusiveLock',
             'characters ShareLock',
           ],
-        });
+        ];
+        for (const [i, parent] of PARENTS.entries()) {
+          const seen = await bootBehind([parent]);
+          expect(seen).toEqual({ on: parent, waits: 'AccessExclusiveLock', held: modes[i] });
+          const tables = new Set(seen.held.map((lock) => lock.split(' ')[0]));
+          for (const earlier of PARENTS.slice(0, i))
+            expect(tables.has(earlier), earlier).toBe(true);
+          for (const later of PARENTS.slice(i + 1)) expect(tables.has(later), later).toBe(false);
+        }
         expect(bootBullet()).toContain(
           `first on ${PARENTS.map((table) => `\`${table}\``).join(', then ')}`,
         );
@@ -3318,19 +3358,21 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         // the statement timeout first and sends no lock timeout, neither as a
         // statement nor as a startup parameter (the config key or `-c` in its
         // options), so each wait above lasts as long as the lock is held.
-        const sent = sentByClient(spy);
         expect(
-          [...sent.values()].filter((texts) => texts.some((text) => /lock_timeout/.test(text))),
+          [...sentByClient(spy).values()].filter((texts) =>
+            texts.some((text) => /lock_timeout/.test(text)),
+          ),
         ).toHaveLength(1);
-        const boots = [...sent].filter(([, texts]) =>
-          texts.includes('SELECT pg_advisory_xact_lock($1)'),
-        );
+        const boots = bootClients(spy);
         expect(boots).toHaveLength(3);
         type Startup = { connectionParameters: { lock_timeout?: unknown; options?: unknown } };
-        expect(new Client({ lock_timeout: 1000 }) as unknown as Startup).toMatchObject({
-          connectionParameters: { lock_timeout: 1000 },
-        });
-        for (const [client, texts] of boots) {
+        const startupOf = (config: object) =>
+          (new Client(config) as unknown as Startup).connectionParameters;
+        expect(startupOf({ lock_timeout: 1000 }).lock_timeout).toBe(1000);
+        expect(String(startupOf({ options: '-c lock_timeout=1s' }).options)).toMatch(
+          /lock_timeout/,
+        );
+        for (const { client, texts } of boots) {
           expect(texts.slice(0, 3)).toEqual([
             'BEGIN',
             'SET LOCAL statement_timeout = 0',
@@ -3347,14 +3389,14 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       }
     });
 
-    it('behind the dump: SHARE on auth_tokens alone, and a stopped boot waits until DEPLOY ends it', async () => {
+    it('behind the dump: SHARE on auth_tokens alone, and DEPLOY ends every boot that queues there', async () => {
       const { Client } = await import('pg');
       const spy = vi.spyOn(Client.prototype, 'query');
-      const tokenRead = async (budget: string) => {
+      const tokenRead = async () => {
         const client = await pool.connect();
         try {
           await client.query('BEGIN');
-          await client.query(`SET LOCAL statement_timeout = '${budget}'`);
+          await client.query("SET LOCAL statement_timeout = '200ms'");
           await client.query('SELECT count(*) FROM auth_tokens');
           return 'ran';
         } catch (error) {
@@ -3364,52 +3406,102 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           client.release();
         }
       };
+      const quiet = async () =>
+        (await pool.query(operatorSql('SELECT backend_type, application_name'))).rows
+          .filter((r: { backend_type: string }) => r.backend_type === 'client backend')
+          .map((r: { application_name: string; state: string }) => [r.application_name, r.state])
+          .sort();
+      const terminate = async () =>
+        (await pool.query(operatorSql('SELECT pg_terminate_backend(pid)'))).rows;
       try {
         const tables = await everyTable();
         expect(tables.length).toBeGreaterThan(100);
-        let outcome: unknown;
-        const seen = await bootBehind(tables, async ({ pid }, boot) => {
-          // DEPLOY's quiet check sees the dump-shaped holder, idle in its
-          // transaction, and the waiting boot.
-          const quiet = await pool.query(operatorSql('SELECT backend_type, application_name'));
-          expect(quiet.rows.map((r: { state: string }) => r.state).sort()).toEqual([
-            'active',
-            'idle in transaction',
+        const outcomes: unknown[] = [];
+        const seen = await bootBehind(tables, async ({ pid, holderPid }, boot) => {
+          // DEPLOY's quiet check sees the dump-shaped holder idle in its
+          // transaction and the waiting boot, and no idle session.
+          const idle = await pool.connect();
+          try {
+            expect(await quiet()).toEqual([
+              ['', 'active'],
+              ['pg_dump', 'idle in transaction'],
+            ]);
+          } finally {
+            idle.release();
+          }
+          // A second realm, still running, queues on the advisory lock behind
+          // the waiting boot, and a third one, stopped, queues there too.
+          const second = db.ensureSchema().catch((error: unknown) => error);
+          expect(await until(advisory, ['granted', 'waiting'])).toEqual(['granted', 'waiting']);
+          const third = db.ensureSchema().catch((error: unknown) => error);
+          expect(await until(advisory, ['granted', 'waiting', 'waiting'])).toEqual([
+            'granted',
+            'waiting',
+            'waiting',
           ]);
-          // Stopping the realm ends its process: its socket closes, and the
-          // boot's backend, waiting for a lock, never reads it.
-          const [bootClient] = [...sentByClient(spy)].find(([, texts]) =>
-            texts.includes('SELECT pg_advisory_xact_lock($1)'),
-          ) ?? [undefined];
-          const stopped = bootClient as {
-            on(event: 'error', listener: () => void): void;
-            connection: { stream: { destroy(): void } };
-          };
-          stopped.on('error', () => {});
-          stopped.connection.stream.destroy();
-          outcome = await boot;
+          const [first, running, stopped] = bootClients(spy);
+          stop(stopped.client);
+          // Stopping the waiting boot's realm leaves its backend in the queue.
+          stop(first.client);
+          outcomes.push(await boot);
           await sleep(300);
-          expect((await waiter(-1)).pid).toBe(pid);
-          expect(await tokenRead('200ms')).toBe('57014');
-          // DEPLOY's statement ends it, and the queue is released at once.
-          const ended = await pool.query(operatorSql('SELECT pg_terminate_backend(pid)'));
-          expect(ended.rows).toEqual([{ pg_terminate_backend: true }]);
-          const deadline = Date.now() + 5_000;
-          while (Date.now() < deadline && (await heldBy(pid)).length > 0) await sleep(20);
-          expect(await heldBy(pid)).toEqual([]);
-          expect(await tokenRead('2s')).toBe('ran');
+          expect((await waiter(holderPid)).pid).toBe(pid);
+          expect(await tokenRead()).toBe('57014');
+          // DEPLOY's statement ends it; the running realm's boot takes its place.
+          expect(await terminate()).toEqual([{ pg_terminate_backend: true }]);
+          const next = await waiter(holderPid);
+          expect(next.pid).not.toBe(pid);
+          expect(next).toMatchObject({ rel: 'auth_tokens', mode: 'AccessExclusiveLock' });
+          // So it is stopped and ended too; the stopped third boot exits once
+          // it gets the advisory lock, and the next run names nothing.
+          stop(running.client);
+          outcomes.push(await second);
+          expect(await terminate()).toEqual([{ pg_terminate_backend: true }]);
+          outcomes.push(await third);
+          expect(await until(advisory, [])).toEqual([]);
+          expect(await until(() => heldBy(next.pid), [])).toEqual([]);
+          expect(await terminate()).toEqual([]);
+          // The queue is released, and the dump-shaped holder was spared.
+          expect(await tokenRead()).toBe('ran');
+          const holderState = await pool.query(
+            'SELECT state FROM pg_stat_activity WHERE pid = $1',
+            [holderPid],
+          );
+          expect(holderState.rows).toEqual([{ state: 'idle in transaction' }]);
         });
         expect(seen).toEqual({
           on: 'auth_tokens',
           waits: 'AccessExclusiveLock',
           held: ['auth_tokens ShareLock'],
         });
-        expect(outcome).toBeInstanceOf(Error);
+        expect(outcomes).toHaveLength(3);
+        for (const outcome of outcomes) expect(outcome).toBeInstanceOf(Error);
+        // With the hold gone and nothing open, the quiet check is quiet.
+        expect(await quiet()).toEqual([]);
       } finally {
         spy.mockRestore();
       }
       // Booted again after the dump, the realm comes up.
       await db.ensureSchema();
+    });
+
+    it("DEPLOY's sign-out ends every live token, companion tokens included", async () => {
+      const accountId = await makeAccount();
+      const full = randomUUID().replaceAll('-', '').repeat(2);
+      const read = randomUUID().replaceAll('-', '').repeat(2);
+      await db.saveToken(full, accountId);
+      await db.saveToken(read, accountId, 24, 'read');
+      expect(await db.accountAndScopeForToken(full)).toEqual({ accountId, scope: 'full' });
+      expect(await db.accountAndScopeForToken(read)).toEqual({ accountId, scope: 'read' });
+      await pool.query(operatorSql('DELETE FROM auth_tokens'));
+      expect(await db.accountAndScopeForToken(full)).toBeNull();
+      expect(await db.accountAndScopeForToken(read)).toBeNull();
+      expect(
+        Number(
+          (await pool.query('SELECT count(*) AS n FROM auth_tokens WHERE expires_at > now()'))
+            .rows[0].n,
+        ),
+      ).toBe(0);
     });
   });
 });

@@ -732,19 +732,19 @@ of six waited 1,056 ms); each boot that waited lived, and the bench's "old accou
 create", a transaction that inserts an account and then a character, was aborted beside
 it. ANY boot can DEADLOCK on two paths (the touch-set manifest's P12 and R-11), since
 the core schema locks its tables in its statement order, `auth_tokens`, then
-`characters`, then `accounts`, and a row lock counts on either path, since taking one
-also takes a lock on its table: the boot's SHARE lock on `auth_tokens` or `characters`
-(an index create) upgraded to ACCESS EXCLUSIVE (on `accounts` its first lock is ACCESS
-EXCLUSIVE already), against a transaction that took a lock on that table that SHARE does
-not wait for (a row lock's ROW SHARE, or a plain read's ACCESS SHARE) and then writes
-it; and the boot's order, against a transaction that locks a later table first (for
-example `accounts`, then `characters` or `auth_tokens`). The shapes decide it, not a
-list: effect-carrying and hooked character saves (the manifest's G1 then G2, the Hearth
-trip's save included), a character create and the character delete take both, and the
-operation prepare, a password reset and an account create while community test accounts
-are on take the second. With such saves in flight every bench boot was eventually
-aborted, saves were aborted beside it, and a boot that loses exits and is restarted: a
-hazard of the core schema's boot that predates housing
+`characters`, then `accounts`, and a row lock counts on either path, because taking one
+also takes a lock on its table. The paths: the boot's SHARE lock on `auth_tokens` or
+`characters` (an index create) upgraded to ACCESS EXCLUSIVE (on `accounts` its first
+lock is ACCESS EXCLUSIVE already), against a transaction that took a lock on that table
+that SHARE does not wait for (a row lock's ROW SHARE, or a plain read's ACCESS SHARE)
+and then writes it; and the boot's order, against a transaction that locks a later table
+first (for example `accounts`, then `characters` or `auth_tokens`). The shapes decide
+it, not a list: effect-carrying and hooked character saves (the manifest's G1 then G2,
+the Hearth trip's save included), a character create and the character delete take both,
+and the operation prepare, a password reset and an account create while community test
+accounts are on take the second. With such saves in flight every bench boot was
+eventually aborted, saves were aborted beside it, and a boot that loses exits and is
+restarted: a hazard of the core schema's boot that predates housing
 (`docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md`), to which 07a adds
 members. The first rollout is the one boot that also builds the tables: do it, and any
 boot beside other realms serving such saves, in a quiet window (as `DEPLOY.md` defines
