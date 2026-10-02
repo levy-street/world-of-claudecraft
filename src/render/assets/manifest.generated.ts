@@ -1673,6 +1673,8 @@ export const MEDIA_ASSETS: Record<string, string> =
   "textures/skins/rogue/base.png": "/media/textures/skins/rogue/base.2e2fc741e20e.png",
   "textures/skins/rogue/fernando.ktx2": "/media/textures/skins/rogue/fernando.2a423a0b9be2.ktx2",
   "textures/skins/rogue/fernando.png": "/media/textures/skins/rogue/fernando.64f0ff1d0a43.png",
+  "textures/skins/rogue/monk.ktx2": "/media/textures/skins/rogue/monk.23559cb14bb9.ktx2",
+  "textures/skins/rogue/monk.png": "/media/textures/skins/rogue/monk.dc9573674622.png",
   "textures/structures/Bark012_AmbientOcclusion.jpg": "/media/textures/structures/Bark012_AmbientOcclusion.4f695890ad51.jpg",
   "textures/structures/Bark012_AmbientOcclusion.ktx2": "/media/textures/structures/Bark012_AmbientOcclusion.e85a0f77449e.ktx2",
   "textures/structures/Bark012_Displacement.jpg": "/media/textures/structures/Bark012_Displacement.ba9f34d58b68.jpg",

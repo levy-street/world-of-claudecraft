@@ -1454,6 +1454,7 @@ export const SKINS: Record<string, (string | null)[]> = {
     `${SKINS_DIR}/rogue/alt_c.png`,
     `${SKINS_DIR}/rogue/alt_suit_prismatic.png`,
     `${SKINS_DIR}/rogue/alt_suit_chrome.png`,
+    `${SKINS_DIR}/rogue/monk.png`,
   ],
   player_priest: [
     null,

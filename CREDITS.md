@@ -223,6 +223,7 @@ than free, so ask before you rely on it.
 | Infernal Citadel props (`public/models/props/infernal_brazier.glb`, `infernal_altar.glb`, `demon_idol.glb`, `hell_forge.glb`, `hanging_cage.glb`, `bone_pile.glb`, `obsidian_fang.glb`, `infernal_statue.glb`, `slag_cauldron.glb`, `bone_throne.glb`) | World of ClaudeCraft | Project-generated via `scripts/asset_pipeline` (Tripo AI text-to-3D), owned under the Tripo paid-plan license | Project asset | With the project only |
 | Generated class skin-suit set "Prismatic Vanguard" (suit_prismatic, all classes, `public/textures/skins/<class>/alt_suit_prismatic.png`) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (procedural gradient-map atlas) | Project asset | With the project only |
 | Generated class skin-suit set "Liquid Chrome" (suit_chrome, all classes, `public/textures/skins/<class>/alt_suit_chrome.png`) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (procedural gradient-map atlas) | Project asset | With the project only |
+| Rogue skin "Saffron Monk" (`public/textures/skins/rogue/monk.png` + `.ktx2`) | World of ClaudeCraft | Project-generated (procedural recolor of the rogue base atlas: saffron robe, maroon sash, gold trim) | Project asset | With the project only |
 ## Brand marks
 
 The four streamer-platform marks inlined as SVG paths in `src/ui/ui_icons.ts`
