@@ -5603,6 +5603,12 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   to no COMMIT, now stated and proved), the shutdown budget now names its bounded awaits
   and says every other await has no deadline, and DEPLOY quotes the whole CHECK the boot
   compares. Fixed in `cd03d3045f` through `e714944344`.
+- ROUND SIX, eight fresh readers over round five: 38 findings, none blocking, 9 should-fix.
+  The token runbook would still have dropped a CHECK a deparse change trips (it now decides
+  by what a constraint tests, and renames an impostor instead of dropping it), the probe's
+  lock is proved by mode, place and queue, and the shutdown budget, which drew a new gap
+  three rounds running, is now pinned whole against `server/main.ts`. Fixed in `b8c7a3e8ca`
+  through `f0490968e4`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5622,7 +5628,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 
 - `npx tsc --noEmit` exit 0 at every round's tip.
 - Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then 641,
-  then 642, then 643 passed, never a skip.
+  then 642, then 643, then 643 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
@@ -5640,6 +5646,9 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   fixed for the operation fragment).
 - The storage refusal's message in the federated cleanup carries an account id; its typed
   id-free class belongs to the storage path.
+- The storage fragment's `ADD COLUMN IF NOT EXISTS` and index creates on `storage_purchases`
+  run unprobed, so every boot holds ACCESS EXCLUSIVE there to its COMMIT; probing them as the
+  housing fragments do belongs to the storage path.
 - A golden for the Hearth admission's pending and deny arms.
 - The receipts gauge's rate budget (08, 15).
 - The maintainer's rulings on three items:

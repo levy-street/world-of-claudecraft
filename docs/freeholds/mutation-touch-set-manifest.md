@@ -1314,3 +1314,7 @@ What changed the contract above:
   the Hearth token probe's deparse takes a brief ACCESS SHARE on its table, held to no
   COMMIT (P12 says so, proved on PostgreSQL); R-12 keeps the gate's floor of one and R-13
   names the cancel.
+- A sixth round of eight fresh readers: P12 names the probe's wait cases, the storage
+  fragment's own locks and every repair boot; R-13 adds a chunk cut mid-statement whose rows
+  the release passes by; the operator renames a token impostor instead of dropping it; and
+  the shutdown budget is pinned whole against `server/main.ts`.

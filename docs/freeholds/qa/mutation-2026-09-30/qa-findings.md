@@ -286,7 +286,8 @@ fresh one with the same brief.
 33 findings: none blocking, 7 should-fix (S5R1, C5R1, H5R1, L5R1, T5R1, D5R1, D5R2), 26
 nice-to-have.
 
-- C5R1 FIXED `e872a45953`: deparsing the CHECK opens the Hearth table under ACCESS SHARE (a
+- C5R1 FIXED `e872a45953` (the fragment comment, DEPLOY, the pg case) and `e714944344` (P12,
+  the contract): deparsing the CHECK opens the Hearth table under ACCESS SHARE (a
   probe on PostgreSQL 16.14 answered 55P03 behind an ACCESS EXCLUSIVE holder for a CHECK and
   at once for a UNIQUE; the database and migration readers had said it takes no lock). The
   fragment comment, DEPLOY, P12 and the contract now say a steady boot's one table lock is
@@ -306,7 +307,8 @@ nice-to-have.
   FIXED `e714944344`. H5R4 FIXED `cd03d3045f` (one helper).
 - S5R1 FIXED `e714944344` (the close comment states P7's sent-back and collapse duties).
   S5R2 FIXED `e872a45953` (the DROP runs under a lock timeout, retried on 55P03). S5R3 FIXED
-  `cd03d3045f` (the in-flight fact reads the preload's own account).
+  `cd03d3045f` as a defensive change, not a reachable defect: a loaded entry always carries
+  its asker's account (round six, C6R1).
 - D5R1 FIXED `e872a45953` (see Q5R1). D5R2 FIXED `e714944344` (with L5R4: the abort at once
   rests on its timing, a 10 ms `DELETE FROM accounts` sample in its round included). D5R3
   FIXED `e714944344` (R-13 and the contract name the socket close and the cancel, which runs
@@ -323,3 +325,63 @@ nice-to-have.
 - Outside this round, noted for the librarian sweep: the Part 5 record in
   `docs/freeholds/qa/persistence-2026-09-08/findings.md` cites two hashes that are not
   objects in this repository.
+
+## Round six: eight fresh readers over round five (`b915d30173..f14d77d5a0`)
+
+Round six's commits: `b8c7a3e8ca` (the probe's lock proved by mode, place and queue),
+`d4b292e105` (the token runbook decides by what a constraint tests and renames an impostor),
+`a8470bd1fe` (a whole pin on the shutdown closure's awaits), `f0490968e4` (P12, R-13 and the
+comments), and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C6R1 to C6R5 |
+| qa-checklist | PASS | Q6R1 to Q6R4 |
+| server hot path | PASS | H6R1 to H6R5 |
+| privacy and security | PASS | S6R1 to S6R3 |
+| database performance | PASS | D6R1 to D6R3 |
+| test coverage | PASS | T6R1 to T6R7 |
+| docs librarian | PASS | L6R1 to L6R5 |
+| migration safety | PASS | M6R1 to M6R6 |
+
+38 findings: none blocking, 9 should-fix (H6R1, Q6R1, S6R1, D6R1, T6R1, T6R2, M6R1, L6R1,
+L6R2; S6R1, M6R1 and L6R2 are one defect, as are H6R1 and L6R1), 29 nice-to-have.
+
+- C6R1 RULED (with S6R3 and T6R3): a loaded entry always carries its asker's account
+  (`ensureEntry` sets it before the read loads the entry, and the one production `retain`
+  passes the account), so the preload's key and the entry's agree on every reachable path and
+  re-keying by owner key buys nothing; the decision's comment now says the key is defensive
+  (`f0490968e4`). C6R2 FIXED `b8c7a3e8ca` (nested client release). C6R3 FIXED `b8c7a3e8ca`
+  (the waiting mode read from `pg_locks`). C6R4 FIXED `f0490968e4` (R-13 and the stop comment
+  add a chunk cut mid-statement whose rows the release passes by). C6R5 FIXED `f0490968e4`.
+- Q6R1 FIXED `f0490968e4` (see C6R1). Q6R2 FIXED in this record (the C5R1 disposition names
+  both commits). Q6R3 NOTED: the two order lines `e872a45953` removed are subsumed by the
+  whole-arm pin, the single RAISE and the single END IF. Q6R4 FIXED `d4b292e105`.
+- H6R1 FIXED `a8470bd1fe` (with L6R1 and L6R5): the prose drew a new gap three rounds running,
+  so a whole pin in `tests/server/freehold_mutation.test.ts` now lists every await of the
+  shutdown closure and checks that the contract names each bounded one with its value read
+  from the code, the sum and the 75 s grace; the contract splits call-site and callee bounds.
+  H6R2 FIXED `a8470bd1fe` (what `pool.end()` waits for). H6R3 FIXED `f0490968e4`. H6R4
+  COVERED: the round-four and round-five hot-path readers each measured, on Node 26.10.0
+  (the Dockerfile's `node:26-slim`), zero dependants left on the long-lived stop signal after
+  GC. H6R5 FIXED `f0490968e4` (with L6R4).
+- S6R1 FIXED `d4b292e105` (with M6R1 and L6R2): the runbook decides by what the constraint
+  tests, so a CHECK a deparse change trips is kept. S6R2 FIXED `f0490968e4`. S6R3 RULED (see
+  C6R1).
+- D6R1 FIXED `d4b292e105` (with M6R3): an impostor is renamed, not dropped; a probe on
+  PostgreSQL 16.14 showed a foreign key's RENAME locks only its own table while its DROP also
+  locks the referenced one, so the lock timeout bounds the one wait. D6R2 FIXED `d4b292e105`
+  and `f0490968e4` (the boot's stall behind Hearth DDL, and no DDL while a realm boots or
+  restarts). D6R3 FIXED `b8c7a3e8ca` (a queued-request case and the steady precondition) and
+  `f0490968e4` (what P12 says the case proves).
+- T6R1 FIXED `b8c7a3e8ca` (the same read sees a lock that is held). T6R2 FIXED `a8470bd1fe` (a
+  mutant dropping the underscore fails the kept-punctuation arm). T6R3 RULED (see C6R1).
+  T6R4 FIXED `b8c7a3e8ca` (the 55P03's context names the deparse in the DO block). T6R5 FIXED
+  (see C6R2). T6R6 FIXED `b8c7a3e8ca`. T6R7 FIXED `d4b292e105`.
+- M6R1 FIXED (see S6R1). M6R2 FIXED `d4b292e105`, `a8470bd1fe` and `f0490968e4`: the housing
+  claims are scoped to the housing fragments and the storage fragment's own locks on
+  `storage_purchases` are named; probing them is OWED (outside 07a). M6R3 FIXED (see D6R1).
+  M6R4 FIXED `d4b292e105` (a rename keeps a key's index). M6R5 FIXED `d4b292e105` and
+  `f0490968e4` (every repair boot named). M6R6 FIXED `d4b292e105`.
+- L6R1, L6R2 FIXED (see H6R1, S6R1). L6R3 FIXED `a8470bd1fe`. L6R4 FIXED (see H6R5). L6R5
+  FIXED (see H6R1).
