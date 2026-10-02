@@ -54,9 +54,9 @@ export const FREEHOLD_OPERATION_MAX_COPY_REFS = 64;
 export const FREEHOLD_OPERATION_OPEN_MESSAGE = 'freehold_operation_open';
 export const FREEHOLD_OPERATION_OPEN_CONSTRAINT = 'freehold_operations_open_delete_guard';
 
-export const FREEHOLD_OPERATION_ID_RE = /^[A-Za-z0-9_:.-]{1,96}$/;
-export const FREEHOLD_OPERATION_KIND_RE = /^[a-z][a-z0-9_]{0,47}$/;
-export const FREEHOLD_OPERATION_FINGERPRINT_RE = /^[0-9a-f]{64}$/;
+const FREEHOLD_OPERATION_ID_RE = /^[A-Za-z0-9_:.-]{1,96}$/;
+const FREEHOLD_OPERATION_KIND_RE = /^[a-z][a-z0-9_]{0,47}$/;
+const FREEHOLD_OPERATION_FINGERPRINT_RE = /^[0-9a-f]{64}$/;
 
 export type FreeholdOperationCloseOutcome = 'cancelled' | 'refused';
 export type FreeholdOperationOutcome = 'applied' | FreeholdOperationCloseOutcome;
@@ -422,9 +422,8 @@ function requireIntent(intent: FreeholdOperationIntent): FreeholdOperationIntent
   return intent;
 }
 
-export const FREEHOLD_OPERATION_ACCOUNT_LOCK_SQL = 'SELECT pg_advisory_xact_lock($1::int, $2::int)';
-export const FREEHOLD_OPERATION_ID_LOCK_SQL =
-  'SELECT pg_advisory_xact_lock($1::int, hashtext($2::text))';
+const FREEHOLD_OPERATION_ACCOUNT_LOCK_SQL = 'SELECT pg_advisory_xact_lock($1::int, $2::int)';
+const FREEHOLD_OPERATION_ID_LOCK_SQL = 'SELECT pg_advisory_xact_lock($1::int, hashtext($2::text))';
 export const FREEHOLD_OPERATION_RECEIPT_READ_SQL =
   'SELECT outcome, fingerprint, account_id FROM freehold_operation_receipts WHERE operation_id = $1';
 export const FREEHOLD_OPERATION_INTENT_READ_SQL =
@@ -786,8 +785,7 @@ export const FREEHOLD_OPERATION_RECEIPTS_ERASE_SQL =
  *  G1 KEY SHARE every receipt writer holds, so a receipt writer already in
  *  flight finishes before the erase reads, and the erase's UPDATE (a fresh
  *  snapshot after that wait) sees and nulls it. */
-export const FREEHOLD_OPERATION_ERASE_ACCOUNT_LOCK_SQL =
-  'SELECT 1 FROM accounts WHERE id = $1 FOR UPDATE';
+const FREEHOLD_OPERATION_ERASE_ACCOUNT_LOCK_SQL = 'SELECT 1 FROM accounts WHERE id = $1 FOR UPDATE';
 
 export const FREEHOLD_OPERATION_ERASE_BOUNDS = Object.freeze({
   operation: 'freehold receipt erase',

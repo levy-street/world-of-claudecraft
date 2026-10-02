@@ -62,7 +62,10 @@ import {
   type FreeholdQueryable,
   type FreeholdUpsert,
 } from '../../server/freehold_db';
-import { createFreeholdFencedWriter } from '../../server/freehold_fenced_write';
+import {
+  createFreeholdFencedWriter,
+  FREEHOLD_FENCED_WRITE_BOUNDS,
+} from '../../server/freehold_fenced_write';
 import {
   createFreeholdHearthTrips,
   FREEHOLD_HEARTH_TRIP_MEMO_MS,
@@ -83,7 +86,11 @@ import {
   boundFreeholdHookStatementsOnClient,
   FREEHOLD_VERIFY_WAIT_SQL,
 } from '../../server/freehold_mutation_db';
-import type { OpenFreeholdOperation } from '../../server/freehold_operation_db';
+import {
+  FREEHOLD_OPERATION_ERASE_BOUNDS,
+  FREEHOLD_OPERATION_PREPARE_BOUNDS,
+  type OpenFreeholdOperation,
+} from '../../server/freehold_operation_db';
 import {
   createFreeholdOperationRecovery,
   FREEHOLD_OPERATION_RECONCILERS,
@@ -6301,6 +6308,31 @@ describe('the Hearth trip admission', () => {
       wallMs: 30_000,
     });
     expect(FREEHOLD_HOOK_STATEMENT_TIMEOUT_MS).toBe(15_000);
+  });
+
+  it('pins the fenced write, the operation prepare and the receipt erase bounds literally', () => {
+    // The values docs/freeholds/persistence-rollout-contract.md states.
+    expect(FREEHOLD_FENCED_WRITE_BOUNDS).toEqual({
+      operation: 'freehold fenced plot write',
+      statementMs: 15_000,
+      lockMs: 2_000,
+      idleMs: 2_000,
+      wallMs: 30_000,
+    });
+    expect(FREEHOLD_OPERATION_PREPARE_BOUNDS).toEqual({
+      operation: 'freehold operation prepare',
+      statementMs: 2_000,
+      lockMs: 2_000,
+      idleMs: 2_000,
+      wallMs: 5_000,
+    });
+    expect(FREEHOLD_OPERATION_ERASE_BOUNDS).toEqual({
+      operation: 'freehold receipt erase',
+      statementMs: 15_000,
+      lockMs: 5_000,
+      idleMs: 2_000,
+      wallMs: 30_000,
+    });
   });
 
   /** A host over one live session map, every port a recorder. */

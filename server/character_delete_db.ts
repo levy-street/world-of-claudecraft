@@ -58,7 +58,7 @@ export class CharacterFreeholdOperationOpen extends Error {
 }
 
 /** The SQLSTATE both parent-delete guards raise (object_in_use). */
-export const PARENT_DELETE_GUARD_SQLSTATE = '55006';
+const PARENT_DELETE_GUARD_SQLSTATE = '55006';
 
 export type ParentDeleteGuard = 'freehold_operation' | 'storage_purchase';
 

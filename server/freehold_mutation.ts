@@ -410,7 +410,7 @@ function verifyCheckout(client: DbTransactionDeadlineClient): {
  * FREEHOLD_VERIFY_BOUNDS walls (2 x 30 s), 65 s in all, where a second checkout
  * would have made it 2 x (5 + 30) s.
  */
-export async function verifyFreeholdMutation(
+async function verifyFreeholdMutation(
   pool: FreeholdTxPool,
   characterId: number,
   evidence: {
