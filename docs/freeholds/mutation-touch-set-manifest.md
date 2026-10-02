@@ -538,7 +538,11 @@ id itself must never be a cross-account handle, and they must collapse to one
 indistinguishable refusal before any client-visible surface. 08, which registers the first
 kind, mints ids server-side and crypto-random, or keys them by account, and never accepts a
 client-chosen one (a client could otherwise probe for another account's ids, or take an id
-another account will use and leave it `conflict` forever).
+another account will use and leave it `conflict` forever). An id the server minted that a
+client later sends BACK (a resume after a reconnect) is client-supplied input all the same:
+such an id is crypto-random, never the keyed-by-account form a client could guess, it is
+checked against the bearer's account before any answer, and every cross-account answer
+collapses as above. 07a mints none: its one caller, the Hearth trip, carries no operation.
 
 **P8. Operation apply** (a hook participant inside P1; the intent's account is a declared
 account participant, so it was locked at G1): G5b · G6 `SELECT ... FROM
@@ -648,7 +652,10 @@ only, as `IF NOT EXISTS` does: a same-named index with another definition is nev
 repaired, unlike the trigger probe, which checks the exact shape. The Hearth column probe
 checks the column and then its named CHECK: a column whose CHECK is missing gets it back
 `NOT VALID`, so every new token is checked again while no boot scans the table for old
-ones. THE FIRST ROLLOUT WINDOW: because no 07 build deployed, the first 07a boot on
+ones. The CHECK is probed by name, so a same-named constraint of any type satisfies the
+probe (a repair can never fail a boot with 42710); one that is not that CHECK (another
+type, or a CHECK with another body, compared on PostgreSQL's own deparse) is left in place
+and the boot logs a WARNING. THE FIRST ROLLOUT WINDOW: because no 07 build deployed, the first 07a boot on
 production creates five FK-bearing tables and the triggers in ONE `ensureSchema`
 transaction with no `lock_timeout`. It takes no parent lock a steady-state boot does not
 (above): every boot queues behind each in-flight `characters` and `accounts` writer on the
@@ -657,7 +664,8 @@ boot until its COMMIT (measured with an old realm serving: about 65 ms for the f
 rollout with plain saves in flight, the same as a steady-state boot). ANY boot can DEADLOCK
 on two paths. The UPGRADE path, one table: the boot's first `characters` lock is SHARE (the
 core `characters_account` index create), upgraded to ACCESS EXCLUSIVE by the next statement,
-against a save that took its G2 row lock beside that SHARE and then UPDATEs. The ORDER path,
+against a transaction that took any lock on `characters` beside that SHARE (a save's G2 row
+lock, or a plain read) and then writes it. The ORDER path,
 two tables: a transaction that holds any lock on `accounts` and then asks for one on
 `characters`, this manifest's own G1-then-G2 order (every effect-carrying or hooked save, the
 Hearth trip's included, the operation prepare and the character delete), against the boot's
@@ -1073,30 +1081,41 @@ merge in a `finally`; N4 the server default pin; N5 the log pin; N6 the 15 route
   SHARE-then-upgrade on `characters`, and its `characters`-then-`accounts` order against a
   transaction that locks `accounts` first). With effect-carrying or hooked saves in flight,
   every bench boot was eventually aborted, so the realm exits and is restarted, and saves on
-  the serving realms were aborted beside it (a save is written again by the next autosave;
-  a Hearth trip counts `trip_failed` and the player presses again). It predates housing (the
+  the serving realms were aborted beside it. What writes an aborted save again depends on
+  the save: the next autosave for an autosave; the leave save's bounded retry
+  (`server/leave_character_save.ts`) for a leave save; for a shutdown flush save, one more
+  pass only when it carried guild bank books, otherwise nothing, so a realm shutting down
+  beside a boot can lose a character's last window. A Hearth trip counts `trip_failed` and
+  the player presses again. It predates housing (the
   core schema's boot against the storage and ledger saves' G1 and G2 order); 07a adds the
   Hearth trip's hooked save to the class. Bounded only operationally (boot beside quiet
-  realms). Owed to the maintainer, both halves: remove the boot's lock upgrade on
+  realms, and one realm's shutdown finished before another boots). Owed to the maintainer,
+  both halves: remove the boot's lock upgrade on
   `characters` (probe the core `characters_account` index the way the housing indexes are
   probed, or take ACCESS EXCLUSIVE on `characters` first), and change the boot's table order
   (which would expose a character INSERT's `characters`-then-`accounts` foreign-key order
   instead).
 - R-12 (revision 6, the QA): at shutdown the drain stops awaiting a P2 write blocked on a
   claim row a trip holds, but that statement keeps its pool client for up to the pool's
-  statement default. The drain admits `FREEHOLD_PERSIST_DRAIN_MAX_ACTIVE_WRITES` plus
-  `FREEHOLD_PERSIST_LEAVE_WRITE_RESERVE` for a leave write, which together can fill
-  `DB_POOL_MAX_CLIENTS`, and the blocking trip, a renew chunk or a login read may hold one
-  more, so the steps after the drain can find NO free client. Each has its own bound and
-  none over-runs it, but the claim release and the lease release can then fail their
-  checkout and fall back to expiry: another realm's takeover waits up to the lease TTL rather
-  than getting an immediate release.
-- R-13 (revision 6, the QA): the renewer stop's wall ends a renew chunk on the CLIENT side
-  only. A chunk already at its COMMIT, or whose backend has not yet seen its socket close,
-  can still commit after the shutdown release-all passed its locked rows (SKIP LOCKED), which
-  keeps at most one renew chunk of plots (`FREEHOLD_CLAIM_RENEW_CHUNK`) claimed for at most
-  one lease TTL: the crash bound. A chunk that had not reached its statement is cut at its
-  checkout or sends no renewal.
+  statement default. The drain ADMITS `FREEHOLD_PERSIST_DRAIN_MAX_ACTIVE_WRITES` plus
+  `FREEHOLD_PERSIST_LEAVE_WRITE_RESERVE` for a leave write, but every write first takes a
+  background gate permit, so drain writes hold at most the gate's capacity of clients (the
+  pool maximum less `BACKGROUND_DB_MAJOR_PRODUCER_HEADROOM`: seven at the default pool of
+  ten), and one write runs per entry, so one trip's claim row blocks at most one write. The
+  steps after the drain find NO free client only when the clients outside the gate are held
+  too: by blocking trips, login reads, or a statement an earlier drain abandoned. Each has
+  its own bound and none over-runs it, but the claim release and the lease release can then
+  fail their checkout and fall back to expiry: another realm's takeover waits up to the
+  lease TTL rather than getting an immediate release.
+- R-13 (revision 6, the QA): a renew chunk is cut by its OWN wall (its transaction's wall
+  or the pass deadline) on the CLIENT side only; the stop's timeout only bounds how long the
+  stop waits for it. A backend commits only on a COMMIT it received, and a closed socket
+  aborts the transaction at its next read, so only a chunk whose COMMIT was already sent
+  when its wall cut it can still commit after the shutdown release-all passed its locked
+  rows (SKIP LOCKED). Chunks run one at a time and the stop starts no other, which keeps at
+  most one renew chunk of plots (`FREEHOLD_CLAIM_RENEW_CHUNK`) claimed for at most one lease
+  TTL: the crash bound. A chunk that had not reached its statement is cut at its checkout or
+  sends no renewal.
 
 ## 13. The persistence-rollout contract edits this work owes
 
@@ -1267,3 +1286,11 @@ What changed the contract above:
   its checkout; the Hearth token probe warns on a same-named constraint that is not a CHECK.
   The boot deadlock was re-measured on true steady-state boots and found to have two paths
   (P12, R-11), and R-13 is new.
+- A fourth round of eight fresh readers: a read in flight is joined without asking the claim
+  at all (the read records the claim before its row lands); the Hearth token probe warns on
+  any same-named constraint that is not that CHECK, a CHECK with another body included; the
+  launch observer's warning is said once per registry. P12's upgrade path is any lock on
+  `characters` then a write, the G2 bench shape no longer counts as isolating it, R-11 says
+  which save each retry reaches, R-12 counts gate permits rather than admission slots, and
+  R-13 names the chunk's own wall as its cut. P7 states the id duty for an id a client
+  sends back.

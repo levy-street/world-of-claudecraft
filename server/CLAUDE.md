@@ -254,8 +254,8 @@ that shape.
   and the gap BETWEEN callbacks is the `lateness` phase; both ride `woc_sim_tick_phase_seconds`
   (read `max`, never `p95`: a 30 s stall is two samples in a 60 s ring). That observer is
   `onSaveMs` in `server/game.ts`, which the serial writers receive as `onWrite`. `saves`
-  counts ONLY those two writers plus two Freeholds jobs on the same flush, each billing
-  its synchronous part through the same observer: the housing sweep (`saveFreeholds`, its
+  counts ONLY those serial writers plus the Freeholds jobs on the same flush named here,
+  each billing its synchronous part through the same observer: the housing sweep (`saveFreeholds`, its
   `saveAllDirty`) and the plot-claim renewer's launch (`renewGameFreeholdClaims` in
   `freehold_persist_wiring.ts`; its per-chunk continuations after the first await bill no
   phase and land in `lateness`, each O(one renew or release chunk) of work). Per-character
@@ -271,7 +271,7 @@ that shape.
   durable", the retired `persistMailBlob` per-parcel shape, is the same
   defect on a different clock); and a new recurring job bills its cost to
   a profiler phase in the same change (an observer into `saves` for a new shared-blob
-  writer or a synchronous launch on the autosave flush, as the two Freeholds jobs are, and
+  writer or a synchronous launch on the autosave flush, as the Freeholds jobs are, and
   named in the `saves` list above in the same change; a registered phase of its own
   otherwise), never silently.
 

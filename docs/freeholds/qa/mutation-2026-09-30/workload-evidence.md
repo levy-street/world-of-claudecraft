@@ -99,7 +99,7 @@ latency includes the other pool's JavaScript work.
 | the renewer at 5,000 wanted claims BESIDE the autosave burst (5,000 saves and 5,000 fenced writes, 4 workers each) | 3 cycles | pass 165, 203, 173 ms; renewed 5,000 each, missed 0, lost 0, lock timeouts 0, abandoned 0; saves p99 at most 0.8 ms | none, none |
 | two processes racing for 1,000 plots for 15 s (A's sessions end over the first 10 s, B logs each in at a random moment and retries a busy answer after 1 s; both renew every 1 s and flush every 3 s) | 3,071 B login reads | B acquired all 1,000 after 2,071 busy answers (at most 11 for one plot); A released 1,000, lost 0, missed 3; B login p50 0.7 ms, p99 1.8 ms | fenced write about 40 ms per process in total; none thrown, no 55P03, no 57014 |
 | the P9 verify (`FREEHOLD_VERIFY_WAIT_SQL` under `FREEHOLD_VERIFY_BOUNDS`) behind an in-flight save holding the row 20 ms, with the next save queued 5 ms later | 500 characters, 3 at a time | verify wait p50 15.3 ms, p99 16.4 ms; the queued save p50 10.7 ms, p99 11.6 ms, the SAME as the no-verify control (10.7, 11.6) | the waits the hold explains; none thrown |
-| the renewer's SYNCHRONOUS launch (what the flush bills to the profiler's `saves` bucket), the REAL `renewFreeholdClaims` against a checkout that never answers, its wanted predicate a stand-in of the wiring's shape (map reads, the store's `wantsClaim` among them) | 5,000 held claims, 2,500 of them unwanted (the release partition too); the cold FIRST launch, then 200 warm ones after 20 more | the cold first 4.5 to 4.7 ms over three runs; warm p50 2.3 ms, p99 2.9 to 4.2 ms; inside one 50 ms tick either way | not a database path |
+| the renewer's SYNCHRONOUS launch (what the flush bills to the profiler's `saves` bucket), the REAL `renewFreeholdClaims` against a checkout that never answers, its wanted predicate a stand-in of the wiring's shape (map reads, the store's `wantsClaim` among them) | 5,000 held claims, 2,500 of them unwanted (the release partition too); the cold FIRST launch, then 200 warm ones after 20 more | the cold first 4.7 to 4.9 ms over three runs; warm p50 2.3 ms, p99 3.7 to 4.2 ms; inside one 50 ms tick either way | not a database path |
 
 The boot runs used the REAL `ensureSchema()` in a throwaway database while an old realm served
 8 save workers and one account create-then-delete cycle every 20 ms. Three save shapes, because
@@ -110,7 +110,9 @@ the other half save plain:
   `accounts` FOR KEY SHARE, then the `characters` row FOR NO KEY UPDATE, then the UPDATE plus
   5 ms.
 - G2: the `characters` row FOR NO KEY UPDATE, then the UPDATE plus 5 ms, with no `accounts`
-  lock at all, which isolates the single-table path below.
+  lock in the save. It does NOT isolate the single-table path: the account create-then-delete
+  cycle runs in every shape and takes `accounts` before `characters`, so the order path below
+  is present in every run.
 
 The workers save as fast as they can, hundreds of saves a second, far above a realm's rate, so
 the runs bound the hazard from above rather than model a realm. Two modes:
@@ -123,15 +125,15 @@ the runs bound the hazard from above rather than model a realm. Two modes:
 |---|---|---|---|---|
 | rollout, plain (two runs) | 16 | 16, about 55 to 66 ms each when no deadlock formed | 3 old account creates (each boot waited out `deadlock_timeout` and lived) | p99 at most 63.6 ms outside the deadlocked boots (the queue behind the boot) |
 | rollout, G1 | 10 | NONE. No boot committed, so each "second" boot of a round was another first-rollout attempt: 10 consecutive first-rollout attempts, each aborted (5 at once, in 11 to 15 ms; 5 after one or two `deadlock_timeout` waits, 1 to 2 s) | 10 boots, 29 G1 saves, 3 account creates | p99 up to 1,010 ms; the slowest save of the run 2,011 ms |
-| steady, plain | 6 | 6 (55 to 59 ms; one waited out `deadlock_timeout`, 1,056 ms) | 1 old account create | |
-| steady, G2 (no `accounts` lock) | 6 | 4, each after waiting out `deadlock_timeout` (about 1,070 ms) | 2 boots (one at once, in 13 ms; one after 2 s), 19 G2 saves, 4 account creates | |
+| steady, plain | 6 | 6 (56 to 59 ms; one waited out `deadlock_timeout`, 1,056 ms) | 1 old account create | |
+| steady, G2 (no `accounts` lock in the save) | 6 | 4, each after waiting out `deadlock_timeout` (about 1,070 ms) | 2 boots (one at once, in 13 ms; one after 2 s), 19 G2 saves, 4 account creates | |
 | steady, G1 | 6 | NONE (4 at once, in 12 to 13 ms; 2 after about 2 s) | 6 boots, 14 G1 saves, 1 account create | |
 
 Readings:
 
 - **No path threw a lock or statement timeout.** No 55P03 and no 57014 on any path in any phase;
   the only SQLSTATE in any run is the boot deadlock below.
-- **The renewer's main-thread launch is a few milliseconds at 5,000 claims.** About 4.5 ms cold
+- **The renewer's main-thread launch is a few milliseconds at 5,000 claims.** About 4.8 ms cold
   (the first flush after a boot) and a p99 near 4 ms warm, with half the claims unwanted, is what
   the flush bills to `saves` for this job. The per-chunk continuations after its first await
   bill no profiler phase (they land in `lateness`), each O(one renew or release chunk) of work.
@@ -153,11 +155,16 @@ Readings:
 - **Any boot can deadlock on two paths.** The boot takes `characters` and then `accounts`, and
   its first lock on `characters` is SHARE (the core `CREATE INDEX IF NOT EXISTS
   characters_account`), upgraded to ACCESS EXCLUSIVE by the very next statement:
-  - THE UPGRADE PATH, one table: a save that takes its `characters` row lock (FOR NO KEY UPDATE,
-    the G2 step) beside the boot's SHARE, then UPDATEs, waits on the SHARE while the boot's
-    upgrade waits on that row lock. No `accounts` lock takes part: the G2 shape alone aborted 2
-    of 6 steady boots, one of them at once, which only this path explains (PostgreSQL's
-    immediate check, as a backend joins a lock's queue, sees only that one lock's waiters).
+  - THE UPGRADE PATH, one table: a transaction that holds any lock on `characters` (the ROW
+    SHARE a FOR NO KEY UPDATE row lock takes, the G2 step, or a plain read's ACCESS SHARE)
+    beside the boot's SHARE, then writes it, waits on the SHARE while the boot's upgrade to
+    ACCESS EXCLUSIVE waits on that table lock. No `accounts` lock takes part. Under G2 saves 2
+    of 6 steady boots were aborted: the one aborted at once, in 13 ms, only this path explains
+    (PostgreSQL's immediate check, as a backend joins a lock's queue, sees only that one lock's
+    waiters); the one aborted after 2 s is not attributed, since a `DELETE FROM accounts` of the
+    account cycle waited beside it and the order path can close the same way. Each of the 4 G2
+    boots that committed waited out `deadlock_timeout` beside a waiting `INSERT INTO
+    characters` of that cycle, and 4 account creates were aborted.
   - THE ORDER PATH, two tables: ACCESS EXCLUSIVE conflicts with every lock mode, so ANY lock
     held on `accounts` (a plain read's, the G1 FOR KEY SHARE) by a transaction that then asks
     for ANY lock on `characters` closes the cycle once the boot holds `characters` and waits on
@@ -1050,7 +1057,8 @@ const PLAYERS = 5_000;
 // account FOR KEY SHARE (G1) first, then the character row (G2), then the
 // UPDATE.
 // SAVE_SHAPE=g2: the same workers take only the character row lock (G2) before
-// the UPDATE, no account lock, which isolates the single-table upgrade path.
+// the UPDATE, no account lock in the save (the account cycle below still
+// takes accounts before characters, so the order path stays in every run).
 const SAVE_SHAPE = (['g1', 'g2'] as const).find((s) => s === process.env.SAVE_SHAPE) ?? 'plain';
 // MODE=steady: no 07a removal; every boot is a steady-state boot against the
 // committed schema (checked before each one), under the same load.

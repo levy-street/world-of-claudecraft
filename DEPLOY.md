@@ -1071,10 +1071,11 @@ For off-box safety, sync the directory to S3 occasionally:
   timeout). A boot therefore queues behind every in-flight save and account write,
   and every later one on every realm queues behind the boot (about 60 ms in the bench
   with plain saves in flight). A boot can DEADLOCK on two paths: a transaction that
-  row-locks a `characters` row and then writes it, against the boot's SHARE lock on
-  `characters` that it upgrades to ACCESS EXCLUSIVE (the core `characters_account`
-  index create, then its first ALTER); and any transaction that holds a lock on
-  `accounts` and then asks for one on `characters`, against the boot's opposite order.
+  holds any lock on `characters` (a row lock's, or a plain read's) and then writes it,
+  against the boot's SHARE lock on `characters` that it upgrades to ACCESS EXCLUSIVE
+  (the core `characters_account` index create, then its first ALTER); and any
+  transaction that holds a lock on `accounts` and then asks for one on `characters`,
+  against the boot's opposite order.
   Every effect-carrying or hooked character save (storage, bank ledger, the Hearth
   trip) takes both shapes, and the housing operation prepare and the character delete
   take the second. PostgreSQL aborts one side at once or after one or more
@@ -1082,9 +1083,14 @@ For off-box safety, sync the directory to S3 occasionally:
   boot was eventually aborted and saves were aborted beside it: the process exits,
   the compose policy restarts it, and a restart meets the same race while another
   realm keeps serving those saves. So boot a realm while the other realms on its
-  database are quiet. An aborted save shows as 40P01 in the realm log and is written
-  again by the next autosave; an aborted Hearth trip counts `trip_failed` and is not
-  retried by the server (the player presses the key again). The hazard predates
+  database are quiet, and in a rolling restart let one realm finish shutting down
+  before another boots. An aborted save shows as 40P01 in the realm log (one that
+  carried guild bank books also counts `escrow_save_failed`), and what writes it again
+  depends on the save: an autosave is written by the next autosave; a leave save is
+  retried with backoff (`server/leave_character_save.ts`), its guild books reconciled
+  if every attempt fails; a shutdown flush save is retried once only for a character
+  carrying guild bank books, and otherwise not at all. An aborted Hearth trip counts
+  `trip_failed` and is not retried by the server (the player presses the key again). The hazard predates
   housing; removing both paths is owed
   (docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md measures it).
 - FIRST ROLLOUT OF THE HOUSING TABLES: the first boot that carries them also creates
@@ -1105,18 +1111,24 @@ For off-box safety, sync the directory to S3 occasionally:
   them with `SELECT account_id, ready_at_ms FROM account_freehold_hearth WHERE
   ready_at_ms > (EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::bigint + 3600000`
   (3,600,000 ms is `HEARTH_KEY_COOLDOWN_MS`). FIRST confirm the database clock is
-  correct: a backward clock step makes healthy rows read as corrupt, and they heal by
-  themselves once the clock is back within one cooldown of them, while clamping them
-  during the step would shorten their cooldown once the clock is corrected. NEVER
-  repair during a clock step. With the clock correct, a bad row stays bad; repair
+  correct: compare `SELECT clock_timestamp()` with a trusted time source (for example
+  `chronyc tracking` or `timedatectl` on the database host), and treat a step in either
+  direction as a step. A backward clock step makes healthy rows read as corrupt, and
+  they heal by themselves once the clock is back within one cooldown of them, while
+  clamping them during a step sets them against the wrong clock: once it is corrected
+  their cooldown is shortened or lengthened, and after a backward step of more than one
+  cooldown they are ready at once (a free trip). NEVER repair during a clock step. With the clock correct, a bad row stays bad; repair
   them in one guarded, idempotent statement, which clamps each to a full cooldown
   from now and so grants no free trip: `UPDATE account_freehold_hearth SET
   ready_at_ms = (EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::bigint + 3600000,
   revision = revision + 1, updated_at = now() WHERE ready_at_ms > (EXTRACT(EPOCH FROM
   clock_timestamp()) * 1000)::bigint + 3600000 RETURNING account_id`. The realm's
   copy of the clock moves forward by REVISION, and the repair bumps it, so a repair
-  reaches the realm at that entry's next login read: a fresh entry once the account
-  has left the realm, a lost-claim re-read on rejoin, or a restart.
+  reaches the realm at that entry's next login read: a fresh entry once every character
+  of the account has left the realm AND the realm has dropped the entry (its leave save
+  landed, or the orphan sweep collected it, so a quick relog can still read the old
+  cooldown), a lost-claim re-read on rejoin for an account that holds a plot, or a
+  restart. Re-running the repair is harmless: its guard no longer matches the row.
 - THE ADVANCE TOKEN CHECK: a boot that finds `account_freehold_hearth.advance_token`
   without any constraint of that name puts the CHECK back `NOT VALID` (new tokens are
   checked, old rows are not scanned), and a same-named constraint that is not that

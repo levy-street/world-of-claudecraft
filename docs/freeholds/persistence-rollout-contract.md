@@ -723,8 +723,9 @@ every boot queues behind every in-flight character save and account write, and e
 one that arrives after it queues behind the boot until that COMMIT. Measured with an old
 realm serving plain saves, the first rollout took about 65 ms, the same as a steady-state
 boot. ANY boot can DEADLOCK on two paths (the touch-set manifest's P12 and R-11): the
-boot's SHARE lock on `characters` upgraded to ACCESS EXCLUSIVE, against a save that
-row-locked a `characters` row beside it and then writes it; and the boot's
+boot's SHARE lock on `characters` upgraded to ACCESS EXCLUSIVE, against a transaction
+that took any lock on `characters` beside it (a save's row lock, or a plain read) and then
+writes it; and the boot's
 `characters`-then-`accounts` order, against a transaction that locks `accounts` first. Every
 effect-carrying or hooked character save (the manifest's G1 then G2, the Hearth trip's save
 included) takes both shapes, and the operation prepare and the character delete take the
@@ -733,7 +734,8 @@ aborted beside it, and a boot that loses exits and is restarted: a hazard of the
 schema's boot that predates housing
 (`docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md`), to which 07a adds members.
 The first rollout is the one boot that also builds the tables: do it, and any boot beside
-other realms serving those saves, in a quiet window.
+other realms serving those saves, in a quiet window, and never beside a realm that is still
+shutting down (its shutdown flush saves are not written again).
 
 ### The shutdown drain, and why it sits where it sits
 
@@ -759,11 +761,11 @@ THE RENEWER STOP comes first in that slot: `stopFreeholdClaimRenewer` starts no 
 again, stops the running one before its next chunk, cuts a chunk still parked at its pool
 checkout, makes one that got its connection send no renewal (only its BEGIN, rolled back),
 and resolves once that pass settles or one chunk's wall
-(`FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs`, 5,000 ms) passes. So no renewal that had not
-reached its COMMIT outlives the release; one already at its COMMIT when the wall cuts it
-client side can still land after the release-all passed its rows, which keeps at most one
-renew chunk of plots claimed for at most one lease TTL (the manifest's R-13, the crash
-bound).
+(`FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs`, 5,000 ms) passes; that timeout bounds only the
+stop's wait, while a chunk is cut by its own wall. So no renewal whose COMMIT was not yet
+sent outlives the release; one whose COMMIT was already sent when its wall cut it client
+side can still land after the release-all passed its rows, which keeps at most one renew
+chunk of plots claimed for at most one lease TTL (the manifest's R-13, the crash bound).
 
 THE SHUTDOWN BUDGET is the whole serial chain in `server/main.ts`, not the housing tail
 alone: after the shutdown save flush (the character, market, mail, rift and housing saves),
@@ -771,10 +773,14 @@ the bounded drains run one after another, the bank ledger's
 (`BANK_LEDGER_SHUTDOWN_DRAIN_MS`, 10,000 ms), the market sold volume's
 (`MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS`, 10,000 ms), the housing drain
 (`FREEHOLD_PERSIST_SHUTDOWN_DRAIN_MS`, 10,000 ms), the unstuck records'
-(`UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS`, 5,000 ms), the renewer stop (5,000 ms) and the claim
-release (`FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS`, 2,000 ms): 42 s of bounded drains after
-the save flush, inside the game container's 75 s kill grace (`stop_grace_period` in
-`docker-compose.yml`). A new shutdown drain spends from what is left after all of them.
+(`UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS`, 5,000 ms), the Steam and Epic mirror stops (run
+concurrently, 5,000 ms at the call site), the renewer stop (5,000 ms) and the claim release
+(`FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS`, 2,000 ms): 47 s of bounded drains after the save
+flush, inside the game container's 75 s kill grace (`stop_grace_period` in
+`docker-compose.yml`). The sum covers only those: the FIFO drains between them (suspicion
+flags, deeds, relics, progress events, craft rolls, world-quest scores) and the character
+lease release take no deadline at their call sites, and they, the save flush and the
+collector and sweep stops before it spend from the same grace. A new shutdown drain spends from what is left after all of them.
 
 THE CLAIM RELEASE (07a) sits in the same closure, AFTER `freeholdPersistIdle` and BEFORE
 `releaseAllCharacterLeases`: `releaseAllFreeholdClaims({ pool, holder:
