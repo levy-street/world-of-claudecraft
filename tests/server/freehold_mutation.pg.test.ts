@@ -47,7 +47,7 @@
 // tests/guild_bank_pg_integration.test.ts and
 // tests/server/storage_purchase_db.pg.test.ts prove the legacy halves with no
 // housing participant.
-// Cost: 13.8 s
+// Cost: 14.0 s
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import type { Pool as PgPool, PoolClient } from 'pg';
@@ -3336,7 +3336,8 @@ d('the housing mutation boundary (REAL Postgres)', () => {
      *  while the boot still waits and gets the boot's outcome (`'finished'` or
      *  its error). The boot must settle within ten seconds of the hold's release
      *  and finish unless `mayFail`; after a failure it is read for a second, and
-     *  a boot still waiting then is cancelled and read for up to a second more. */
+     *  a boot still waiting then has its cancel sent for up to a second more,
+     *  each cancel followed by a read of at most 100 ms. */
     async function bootBehind(
       tables: readonly string[],
       opts: {
@@ -3415,8 +3416,16 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       const late = sleep(200).then(() => new Error('settled after the deadline'));
       expect(await settled(late, 50)).toBe('still waiting');
       expect(await late).toBeInstanceOf(Error);
-      // Work that never settles is let go once the cancel's grace is spent.
-      expect(await settled(new Promise(() => {}), 50, 200)).toBe('still waiting');
+      // Work that never settles is let go once the cancel's grace is spent: a
+      // 300 ms grace sends two or three cancels, each followed by a 100 ms read.
+      const cancels = vi.spyOn(pool, 'query');
+      try {
+        expect(await settled(new Promise(() => {}), 50, 300)).toBe('still waiting');
+        expect(cancels.mock.calls.length).toBeGreaterThanOrEqual(2);
+        expect(cancels.mock.calls.length).toBeLessThanOrEqual(3);
+      } finally {
+        cancels.mockRestore();
+      }
     });
 
     it('locks auth_tokens, then characters, then accounts, and sends no lock timeout', async () => {
@@ -3666,8 +3675,8 @@ d('the housing mutation boundary (REAL Postgres)', () => {
               .rows[0].n,
           0,
         );
-      let second: Promise<unknown> | undefined;
-      let third: Promise<unknown> | undefined;
+      let secondBoot: Promise<unknown> | undefined;
+      let thirdBoot: Promise<unknown> | undefined;
       // A stopped realm's boot ends with an error, checked where it is read, so
       // a boot that never ends fails at that read.
       const stoppedBoot = async (work: Promise<unknown> | undefined) => {
@@ -3697,9 +3706,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
             }
             // A second realm, still running, queues on the advisory lock behind
             // the waiting boot, and a third one, stopped, queues there too.
-            second = startBoot();
+            secondBoot = startBoot();
             expect(await until(advisory, ['granted', 'waiting'])).toEqual(['granted', 'waiting']);
-            third = startBoot();
+            thirdBoot = startBoot();
             expect(await until(advisory, ['granted', 'waiting', 'waiting'])).toEqual([
               'granted',
               'waiting',
@@ -3778,9 +3787,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
             // So it is stopped and ended too; the stopped third boot exits once
             // it gets the advisory lock, and the next run names nothing.
             stop(running.client);
-            outcomes.push(await stoppedBoot(second));
+            outcomes.push(await stoppedBoot(secondBoot));
             expect(await terminate()).toEqual([[next.pid, true, true]]);
-            outcomes.push(await stoppedBoot(third));
+            outcomes.push(await stoppedBoot(thirdBoot));
             expect(await gone(next.pid)).toBe(0);
             expect(await until(advisory, [])).toEqual([]);
             expect(await terminate()).toEqual([]);
@@ -3803,7 +3812,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         expect(await quiet()).toEqual([]);
       } finally {
         spy.mockRestore();
-        await settled(Promise.allSettled([second, third]));
+        await settled(Promise.allSettled([secondBoot, thirdBoot]));
         await rerunner.end().catch(() => {});
       }
       // Booted again after the dump, the realm comes up.

@@ -3001,16 +3001,19 @@ describe('the claim renewer', () => {
     ]);
     // Every tracked bot code file still on disk is parsed, so a route is read
     // as its literal's value (an escape in its text included), never as raw
-    // text. Each listing is NUL-separated, so git quotes no name (a quoted name
-    // fails existsSync and would drop from both), and the list is checked
+    // text. Each listing is NUL-separated, so git quotes no name, and skips
+    // only what git reports deleted, so a name that does not decode is kept and
+    // fails at the parse rather than dropping from both; the list is checked
     // against a second listing of the whole directory, so a narrowed pathspec
     // cannot drop a file.
-    const tracked = (pathspecs: string[]) => {
-      const listed = spawnSync('git', ['ls-files', '-z', '--', ...pathspecs], {
-        encoding: 'utf8',
-      });
+    const lsFiles = (args: string[]) => {
+      const listed = spawnSync('git', ['ls-files', '-z', ...args], { encoding: 'utf8' });
       expect(listed.status).toBe(0);
-      return listed.stdout.split('\0').filter((file) => file !== '' && existsSync(file));
+      return listed.stdout.split('\0').filter((file) => file !== '');
+    };
+    const tracked = (pathspecs: string[]) => {
+      const deleted = new Set(lsFiles(['--deleted', '--', ...pathspecs]));
+      return lsFiles(['--', ...pathspecs]).filter((file) => !deleted.has(file));
     };
     const botFiles = tracked(botCode);
     expect(botFiles).toEqual(tracked(['bot']).filter((file) => /\.[mc]?[jt]s$/.test(file)));
@@ -3035,11 +3038,13 @@ describe('the claim renewer', () => {
       'bot/server_client.ts: flairedIds',
     ]);
     // Section L of the pg suite reads every boot through `settled`, which cancels
-    // a boot still waiting at its deadline; so every boot the section runs
-    // starts in `startBoot`, its one call of `ensureSchema`, and every
-    // `startBoot` result is read by `settled`, directly or through the name it
-    // is assigned to (a call by another name, through element access, or
-    // through .call or .apply is not read).
+    // a boot still waiting at its deadline. So every boot the section runs
+    // starts in `startBoot`, its one call of `ensureSchema` (a call of
+    // `ensureSchema` by another name or through element access is not read);
+    // `startBoot` is only ever called by name; each result goes to `settled` or
+    // to a name; every read of a boot's name is pinned by the expression it
+    // sits in, so a boot read beside or instead of `settled` fails until
+    // reviewed; and `settled`'s calls and parameters are pinned as written.
     const pgSuite = parsed('tests/server/freehold_mutation.pg.test.ts');
     const sectionL = nodesIn(pgSuite).filter(
       (node) =>
@@ -3078,10 +3083,50 @@ describe('the claim renewer', () => {
       callsOf('startBoot').map((call) => {
         const at = call.parent;
         if (ts.isCallExpression(at) && ts.isIdentifier(at.expression)) return at.expression.text;
-        if (ts.isBinaryExpression(at) && ts.isIdentifier(at.left)) return `= ${at.left.text}`;
+        if (
+          ts.isBinaryExpression(at) &&
+          at.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+          ts.isIdentifier(at.left)
+        )
+          return `= ${at.left.text}`;
         return ts.SyntaxKind[at.kind];
       }),
-    ).toEqual(['= boot', '= second', '= third', 'settled']);
+    ).toEqual(['= boot', '= secondBoot', '= thirdBoot', 'settled']);
+    const named = (text: string) =>
+      nodesIn(sectionL[0]).filter(
+        (node): node is ts.Identifier => ts.isIdentifier(node) && node.text === text,
+      );
+    // Every other mention of `startBoot` is its declaration.
+    expect(
+      named('startBoot')
+        .filter((node) => !(ts.isCallExpression(node.parent) && node.parent.expression === node))
+        .map((node) => ts.SyntaxKind[node.parent.kind]),
+    ).toEqual(['VariableDeclaration']);
+    // Every read of a boot's name, by the expression it sits in.
+    expect(
+      ['boot', 'secondBoot', 'thirdBoot', 'work']
+        .flatMap(named)
+        .filter((node) => {
+          const at = node.parent;
+          return !((ts.isVariableDeclaration(at) || ts.isParameter(at)) && at.name === node);
+        })
+        .sort((a, b) => a.getStart() - b.getStart())
+        .map((node) => node.parent.getText()),
+    ).toEqual([
+      'Promise.resolve(work)',
+      'Promise.resolve(work)',
+      'boot = startBoot()',
+      'during({ pid: seen.pid, holderPid }, boot)',
+      'settled(boot, ran ? 10_000 : 1_000)',
+      'settled(work)',
+      'secondBoot = startBoot()',
+      'thirdBoot = startBoot()',
+      'stoppedBoot(boot)',
+      'stoppedBoot(secondBoot)',
+      'stoppedBoot(thirdBoot)',
+      '[secondBoot, thirdBoot]',
+      '[secondBoot, thirdBoot]',
+    ]);
     // Every `settled` call in the section, its arguments as written.
     expect(
       callsOf('settled').map((call) => call.arguments.map((arg) => arg.getText()).join(', ')),
@@ -3089,11 +3134,20 @@ describe('the claim renewer', () => {
       'boot, ran ? 10_000 : 1_000',
       "Promise.resolve('finished'), 50",
       'late, 50',
-      'new Promise(() => {}), 50, 200',
+      'new Promise(() => {}), 50, 300',
       'work',
-      'Promise.allSettled([second, third])',
+      'Promise.allSettled([secondBoot, thirdBoot])',
       'startBoot(), 10_000',
     ]);
+    // `settled`'s deadline and the cancel's grace, as written.
+    expect(
+      nodesIn(sectionL[0])
+        .filter(
+          (node): node is ts.FunctionDeclaration =>
+            ts.isFunctionDeclaration(node) && node.name?.text === 'settled',
+        )
+        .map((node) => node.parameters.map((param) => param.getText()).join(', ')),
+    ).toEqual(['work: Promise<unknown> | undefined, ms = 5_000, grace = 1_000']);
     // The link-change feed's heal is the bot's resyncs, which DEPLOY gives no
     // cadence; the bot's own suites pin them (tests/discord_bot_linked_sweep.test.ts,
     // tests/discord_bot_member_writes.test.ts and
