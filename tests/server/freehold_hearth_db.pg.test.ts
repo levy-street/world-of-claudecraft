@@ -12,6 +12,7 @@
 // an entry and the verify read, not the core schema, and the production
 // parents exist long before ensureSchema reaches this module.
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { isIdempotentSchemaSkipNotice } from '../../server/schema_notices';
 
 const url = process.env.TEST_DATABASE_URL ?? '';
 const d = url === '' ? describe.skip : describe;
@@ -409,47 +410,81 @@ d('account_freehold_hearth against real PostgreSQL', () => {
     await pool.query(`DELETE FROM ${legacyTable} WHERE account_id = $1`, [CHECK_ACCOUNT]);
   });
 
-  it('warns, never fails the boot, when a same-named constraint is not a CHECK', async () => {
+  it('warns, never fails the boot, when a same-named constraint is not THIS check, and only then', async () => {
     const legacy = db.freeholdHearthSchema(LEGACY_SCHEMA);
     const legacyTable = `${LEGACY_SCHEMA}.account_freehold_hearth`;
-    await pool.query(
-      `ALTER TABLE ${legacyTable} DROP CONSTRAINT account_freehold_hearth_advance_token_shape`,
-    );
-    await pool.query(
-      `ALTER TABLE ${legacyTable} ADD CONSTRAINT account_freehold_hearth_advance_token_shape UNIQUE (advance_token)`,
-    );
-    const client = await pool.connect();
-    const notices: string[] = [];
-    const onNotice = (notice: { severity?: string; message?: string }) =>
-      notices.push(`${notice.severity}: ${notice.message}`);
-    client.on('notice', onNotice);
-    try {
-      // The boot completes (no 42710) and says the shape is unchecked.
-      await client.query(legacy);
-    } finally {
-      client.off('notice', onNotice);
-      client.release();
+    const WARNING =
+      'account_freehold_hearth_advance_token_shape is not the 32-hex token CHECK, so the advance token shape is unchecked';
+    const VALID_DEF =
+      "CHECK (((advance_token IS NULL) OR (advance_token ~ '^[0-9a-f]{32}$'::text)))";
+    /** One boot on its own client, every notice it raised kept whole. */
+    const boot = async (sql: string) => {
+      const client = await pool.connect();
+      const notices: Array<{
+        severity?: string;
+        message?: string;
+        code?: string;
+        routine?: string;
+      }> = [];
+      const onNotice = (notice: (typeof notices)[number]) => notices.push(notice);
+      client.on('notice', onNotice);
+      try {
+        await client.query(sql);
+      } finally {
+        client.off('notice', onNotice);
+        client.release();
+      }
+      return notices.filter((notice) => notice.severity === 'WARNING');
+    };
+    /** The named constraint's whole definition, whatever it mentions. */
+    const namedDefs = async () =>
+      (
+        await pool.query(
+          `SELECT pg_get_constraintdef(oid) AS def FROM pg_constraint
+            WHERE conrelid = $1::regclass
+              AND conname = 'account_freehold_hearth_advance_token_shape'`,
+          [legacyTable],
+        )
+      ).rows.map((row: { def: string }) => row.def);
+    const replaceWith = async (definition: string) => {
+      await pool.query(
+        `ALTER TABLE ${legacyTable} DROP CONSTRAINT account_freehold_hearth_advance_token_shape`,
+      );
+      await pool.query(
+        `ALTER TABLE ${legacyTable} ADD CONSTRAINT account_freehold_hearth_advance_token_shape ${definition}`,
+      );
+    };
+
+    // Each impostor alone: another type, then a CHECK with another body. The
+    // boot completes (no 42710), says the shape is unchecked, and leaves it.
+    for (const definition of ['UNIQUE (advance_token)', 'CHECK (true)']) {
+      await replaceWith(definition);
+      const warnings = await boot(legacy);
+      expect(
+        warnings.map((notice) => notice.message),
+        definition,
+      ).toEqual([WARNING]);
+      // The boot log's own filter forwards it (server/schema_notices.ts drops
+      // only the idempotent-DDL skips, by code and reporting routine).
+      expect(isIdempotentSchemaSkipNotice(warnings[0]), definition).toBe(false);
+      expect(await namedDefs()).toEqual([definition]);
     }
-    expect(notices).toContain(
-      'WARNING: account_freehold_hearth_advance_token_shape is not a CHECK constraint, so the advance token shape is unchecked',
-    );
-    expect((await tokenShape(LEGACY_SCHEMA)).constraints).toEqual([
-      {
-        conname: 'account_freehold_hearth_advance_token_shape',
-        def: 'UNIQUE (advance_token)',
-      },
-    ]);
-    // The control: with the impostor gone, the next boot puts the CHECK back.
+    // The controls, each SILENT: with the impostor gone the next boot puts the
+    // CHECK back NOT VALID, and a boot over that repaired CHECK, or over the
+    // validated one the table was created with, warns about nothing. The last
+    // two prove the arm's literal is PostgreSQL's own text for the real CHECK.
     await pool.query(
       `ALTER TABLE ${legacyTable} DROP CONSTRAINT account_freehold_hearth_advance_token_shape`,
     );
-    await pool.query(legacy);
+    expect(await boot(legacy)).toEqual([]);
     expect((await tokenShape(LEGACY_SCHEMA)).constraints).toEqual([
-      {
-        conname: 'account_freehold_hearth_advance_token_shape',
-        def: "CHECK (((advance_token IS NULL) OR (advance_token ~ '^[0-9a-f]{32}$'::text))) NOT VALID",
-      },
+      { conname: 'account_freehold_hearth_advance_token_shape', def: `${VALID_DEF} NOT VALID` },
     ]);
+    expect(await boot(legacy)).toEqual([]);
+    expect((await tokenShape(SCHEMA)).constraints).toEqual([
+      { conname: 'account_freehold_hearth_advance_token_shape', def: VALID_DEF },
+    ]);
+    expect(await boot(hearthSchema)).toEqual([]);
   });
 
   it("restores the caller's in-flight search_path after the fragment", async () => {

@@ -122,8 +122,13 @@ CREATE TABLE IF NOT EXISTS "__woc_freehold_hearth_schema__".account_freehold_hea
 -- of any type counts, so the repair can never fail a boot with 42710): a column
 -- that exists without it (added by hand) gets it back NOT VALID, so every new
 -- token is checked again while no boot scans the table to re-validate old rows
--- (the advance only ever wrote hex tokens). A same-named constraint that is NOT
--- a CHECK leaves the shape unchecked, so the boot says so (a WARNING notice).
+-- (the advance only ever wrote hex tokens). A same-named constraint that is not
+-- THIS check (another type, or a CHECK with another body) leaves the shape
+-- unchecked, so the boot says so (a WARNING notice). It compares PostgreSQL's
+-- own deparse of the definition, a NOT VALID suffix stripped, to the CHECK's
+-- whole text: one catalog read, no table lock. A major upgrade that deparsed
+-- this CHECK differently would warn on a correct one; the pre-check in
+-- DEPLOY.md tells the two apart.
 DO $freehold_hearth_advance_token$
 BEGIN
   IF NOT EXISTS (
@@ -148,9 +153,10 @@ BEGIN
     SELECT 1 FROM pg_catalog.pg_constraint
      WHERE conrelid = to_regclass('"__woc_freehold_hearth_schema__".account_freehold_hearth')
        AND conname = 'account_freehold_hearth_advance_token_shape'
-       AND contype <> 'c'
+       AND pg_catalog.regexp_replace(pg_catalog.pg_get_constraintdef(oid), ' NOT VALID$', '')
+           IS DISTINCT FROM 'CHECK (((advance_token IS NULL) OR (advance_token ~ ''^[0-9a-f]{32}$''::text)))'
   ) THEN
-    RAISE WARNING 'account_freehold_hearth_advance_token_shape is not a CHECK constraint, so the advance token shape is unchecked';
+    RAISE WARNING 'account_freehold_hearth_advance_token_shape is not the 32-hex token CHECK, so the advance token shape is unchecked';
   END IF;
 END;
 $freehold_hearth_advance_token$;

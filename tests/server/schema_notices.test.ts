@@ -65,6 +65,16 @@ describe('isIdempotentSchemaSkipNotice', () => {
           'storage_purchases: removed 3 legacy refused row(s) before installing the closed status constraint',
       }),
     ).toBe(false);
+    // And a RAISE WARNING, the Hearth token probe's shape (01000, the same
+    // routine): the one boot line that says the token shape is unchecked.
+    expect(
+      isIdempotentSchemaSkipNotice({
+        code: '01000',
+        routine: 'exec_stmt_raise',
+        message:
+          'account_freehold_hearth_advance_token_shape is not the 32-hex token CHECK, so the advance token shape is unchecked',
+      }),
+    ).toBe(false);
   });
 
   it('fails open: an unrecognized notice is forwarded, never dropped', () => {

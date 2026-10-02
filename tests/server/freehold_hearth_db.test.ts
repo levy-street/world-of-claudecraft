@@ -181,11 +181,18 @@ describe('the DDL', () => {
     const constraintProbeAt = code.indexOf(constraintProbe);
     const repairAt = code.indexOf('ADD CONSTRAINT account_freehold_hearth_advance_token_shape');
     expect(code.slice(repairAt).indexOf('NOT VALID;')).toBeGreaterThan(0);
-    // The last arm only WARNS, for a same-named constraint that is not a CHECK.
-    const notCheckAt = code.indexOf("AND contype <> 'c'");
+    // The last arm only WARNS, for a same-named constraint that is not THIS
+    // check (another type, or a CHECK with another body): the whole arm, so its
+    // name filter, its compare and its message cannot drift apart. Its literal
+    // is the column CHECK's own text as PostgreSQL deparses it.
+    const notThisCheck =
+      "ELSIF EXISTS (\n    SELECT 1 FROM pg_catalog.pg_constraint\n     WHERE conrelid = to_regclass('\"public\".account_freehold_hearth')\n       AND conname = 'account_freehold_hearth_advance_token_shape'\n       AND pg_catalog.regexp_replace(pg_catalog.pg_get_constraintdef(oid), ' NOT VALID$', '')\n           IS DISTINCT FROM 'CHECK (((advance_token IS NULL) OR (advance_token ~ ''^[0-9a-f]{32}$''::text)))'\n  ) THEN\n    RAISE WARNING 'account_freehold_hearth_advance_token_shape is not the 32-hex token CHECK, so the advance token shape is unchecked';\n  END IF;";
+    expect(count(code, notThisCheck)).toBe(1);
+    expect(count(code, 'RAISE WARNING')).toBe(1);
+    const notCheckAt = code.indexOf(notThisCheck);
     expect(notCheckAt).toBeGreaterThan(repairAt);
-    expect(code.indexOf('RAISE WARNING', notCheckAt)).toBeGreaterThan(notCheckAt);
     const endIfAt = code.indexOf('END IF;');
+    expect(code.indexOf('RAISE WARNING')).toBeLessThan(endIfAt);
     expect(endIfAt).toBeGreaterThan(notCheckAt);
     expect(probeAt).toBeGreaterThan(code.indexOf('DO $freehold_hearth_advance_token$'));
     expect(alterAt).toBeGreaterThan(probeAt);
@@ -961,5 +968,19 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
       `SELECT account_id, ready_at_ms FROM account_freehold_hearth WHERE ready_at_ms > ${clock} + ${HEARTH_KEY_COOLDOWN_MS}`,
     );
     expect(bullet).toContain('NEVER repair during a clock step');
+  });
+
+  it('quotes the token warning exactly as the boot log prints it', () => {
+    // An operator greps or alerts on that line, so DEPLOY must carry the
+    // fragment's own RAISE text behind the forwarder's `[schema] ` prefix.
+    const raised = [...FREEHOLD_HEARTH_SCHEMA.matchAll(/RAISE WARNING '([^']+)'/g)].map(
+      (match) => match[1],
+    );
+    expect(raised).toHaveLength(1);
+    const deploy = readFileSync('DEPLOY.md', 'utf8');
+    const start = deploy.indexOf('- THE ADVANCE TOKEN CHECK');
+    expect(start).toBeGreaterThan(-1);
+    const bullet = deploy.slice(start, deploy.indexOf('\n- ', start + 1)).replace(/\s+/g, ' ');
+    expect(bullet).toContain(`\`[schema] ${raised[0]}\``);
   });
 });

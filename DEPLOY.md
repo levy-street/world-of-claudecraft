@@ -1119,14 +1119,23 @@ For off-box safety, sync the directory to S3 occasionally:
   has left the realm, a lost-claim re-read on rejoin, or a restart.
 - THE ADVANCE TOKEN CHECK: a boot that finds `account_freehold_hearth.advance_token`
   without any constraint of that name puts the CHECK back `NOT VALID` (new tokens are
-  checked, old rows are not scanned), and a same-named constraint that is not a CHECK
-  makes the boot log a WARNING instead. To finish a repair, first confirm what the
-  name holds: `SELECT contype, convalidated, pg_get_constraintdef(oid) FROM
-  pg_constraint WHERE conrelid = 'account_freehold_hearth'::regclass AND conname =
-  'account_freehold_hearth_advance_token_shape'` must show `c` and the 32-hex
-  pattern (anything else: drop it and reboot, and the boot puts the real CHECK back).
-  Then null any non-hex token (`UPDATE account_freehold_hearth SET advance_token =
-  NULL WHERE advance_token !~ '^[0-9a-f]{32}$'`), then run `ALTER TABLE
+  checked, old rows are not scanned), and a same-named constraint that is not that
+  CHECK (another type, or a CHECK with another body) leaves the shape unchecked and
+  makes every boot log `[schema] account_freehold_hearth_advance_token_shape is not the
+  32-hex token CHECK, so the advance token shape is unchecked` instead. The statements
+  below name the table unqualified: run them with the realm's `search_path`. To finish
+  a repair, first confirm what the name holds: `SELECT contype, convalidated,
+  pg_get_constraintdef(oid) FROM pg_constraint WHERE conrelid =
+  'account_freehold_hearth'::regclass AND conname =
+  'account_freehold_hearth_advance_token_shape'` must show `c` and the 32-hex pattern.
+  Anything else: `ALTER TABLE account_freehold_hearth DROP CONSTRAINT
+  account_freehold_hearth_advance_token_shape`, which takes ACCESS EXCLUSIVE on the
+  table, so it waits behind in-flight trips and blocks every realm's Hearth reads while
+  it waits; then reboot in a quiet window, since that boot is a repair boot (it holds
+  ACCESS EXCLUSIVE on the table to its COMMIT and shares every boot's deadlock above)
+  and puts the real CHECK back. Then null any non-hex token (`UPDATE
+  account_freehold_hearth SET advance_token = NULL WHERE advance_token !~
+  '^[0-9a-f]{32}$'`), then run `ALTER TABLE
   account_freehold_hearth VALIDATE CONSTRAINT
   account_freehold_hearth_advance_token_shape`, which takes SHARE UPDATE EXCLUSIVE and
   does not block writes.
