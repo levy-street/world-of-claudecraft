@@ -2910,8 +2910,8 @@ describe('the claim renewer', () => {
     // fetch or fetchImpl, each with the member it sits in; and every literal in
     // the bot's code that writes a game API route sits in the client member that
     // sends it. So a new route, a second sender of one, or a route requested
-    // outside call() by any means fails here until DEPLOY's overview and lever 3
-    // are checked (a route assembled from parts is not read).
+    // outside call() fails here until DEPLOY's overview and lever 3 are checked
+    // (a route assembled from parts is not read).
     const serverClient = parsed('bot/server_client.ts');
     const memberOf = (node: ts.Node): string => {
       for (let at = node.parent; at !== undefined; at = at.parent) {
@@ -2961,17 +2961,45 @@ describe('the claim renewer', () => {
       "flairedIds: 'GET', '/internal/discord/flaired-ids'",
     ]);
     const botCode = ['bot/*.ts', 'bot/*.mts', 'bot/*.cts', 'bot/*.js', 'bot/*.mjs', 'bot/*.cjs'];
+    const writesRoute = (node: ts.Node) =>
+      (ts.isStringLiteralLike(node) ||
+        ts.isTemplateHead(node) ||
+        ts.isTemplateMiddle(node) ||
+        ts.isTemplateTail(node)) &&
+      node.text.includes('internal/discord/');
+    // Every literal shape a route can sit in, on a sample.
+    expect(
+      nodesIn(
+        ts.createSourceFile(
+          'routes.ts',
+          [
+            "a('/internal/discord/one');",
+            'b(`/internal/discord/two`);',
+            // Split at the placeholder, so the literal is plain text.
+            'c(`/internal/discord/three/$' + '{x}`);',
+            'd(`$' + '{base}/internal/discord/four/$' + '{x}/tail`);',
+            'e(`$' + '{base}/internal/discord/five`);',
+            "f(new URL('internal/discord/six', base));",
+            "g('/api/elsewhere');",
+          ].join('\n'),
+          ts.ScriptTarget.Latest,
+          true,
+        ),
+      )
+        .filter(writesRoute)
+        .map((node) => node.kind),
+    ).toEqual([
+      ts.SyntaxKind.StringLiteral,
+      ts.SyntaxKind.NoSubstitutionTemplateLiteral,
+      ts.SyntaxKind.TemplateHead,
+      ts.SyntaxKind.TemplateMiddle,
+      ts.SyntaxKind.TemplateTail,
+      ts.SyntaxKind.StringLiteral,
+    ]);
     expect(
       gitGrep('internal/discord/', botCode).flatMap((file) =>
         nodesIn(parsed(file))
-          .filter(
-            (node) =>
-              (ts.isStringLiteralLike(node) ||
-                ts.isTemplateHead(node) ||
-                ts.isTemplateMiddle(node) ||
-                ts.isTemplateTail(node)) &&
-              node.text.includes('/internal/discord/'),
-          )
+          .filter(writesRoute)
           .map((node) => `${file}: ${memberOf(node)}`),
       ),
     ).toEqual([

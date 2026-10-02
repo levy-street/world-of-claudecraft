@@ -3299,6 +3299,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       const holder = await pool.connect();
       let boot: Promise<unknown> | undefined;
       let result: { on: string; waits: string; held: string[] } | undefined;
+      let outcome: unknown;
       try {
         if (mode === 'ACCESS SHARE') await holder.query("SET application_name = 'pg_dump'");
         await holder.query('BEGIN');
@@ -3315,9 +3316,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         await holder.query('ROLLBACK').catch(() => {});
         await holder.query('RESET application_name').catch(() => {});
         holder.release();
-        await boot;
+        outcome = await within(Promise.resolve(boot), 10_000);
       }
-      const outcome = await boot;
+      if (outcome === 'still waiting') throw new Error('the boot behind the hold never settled');
       if (!mayFail && outcome !== 'finished') throw outcome;
       return result;
     }
@@ -3601,6 +3602,13 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         );
       let second: Promise<unknown> | undefined;
       let third: Promise<unknown> | undefined;
+      // A stopped realm's boot ends with its socket's error, read where it is
+      // read, so a boot that never ends fails there.
+      const stoppedBoot = async (work: Promise<unknown> | undefined) => {
+        const outcome = await within(Promise.resolve(work));
+        expect(outcome).toBeInstanceOf(Error);
+        return outcome;
+      };
       // Installed here, where the finally below restores it.
       const spy = vi.spyOn(Client.prototype, 'query');
       try {
@@ -3637,7 +3645,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
             stop(stopped.client);
             // Stopping the waiting boot's realm leaves its backend in the queue.
             stop(first.client);
-            outcomes.push(await boot);
+            outcomes.push(await stoppedBoot(boot));
             await sleep(300);
             expect((await waiter(holderPid)).pid).toBe(pid);
             expect(await tokenRead()).toBe('57014');
@@ -3704,9 +3712,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
             // So it is stopped and ended too; the stopped third boot exits once
             // it gets the advisory lock, and the next run names nothing.
             stop(running.client);
-            outcomes.push(await within(Promise.resolve(second)));
+            outcomes.push(await stoppedBoot(second));
             expect(await terminate()).toEqual([[next.pid, true, true]]);
-            outcomes.push(await within(Promise.resolve(third)));
+            outcomes.push(await stoppedBoot(third));
             expect(await gone(next.pid)).toBe(0);
             expect(await until(advisory, [])).toEqual([]);
             expect(await terminate()).toEqual([]);
@@ -3725,12 +3733,11 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           held: ['auth_tokens ShareLock'],
         });
         expect(outcomes).toHaveLength(3);
-        for (const outcome of outcomes) expect(outcome).toBeInstanceOf(Error);
         // With the hold gone and nothing open, the quiet check is quiet.
         expect(await quiet()).toEqual([]);
       } finally {
         spy.mockRestore();
-        await Promise.allSettled([second, third]);
+        await within(Promise.allSettled([second, third]));
         await rerunner.end().catch(() => {});
       }
       // Booted again after the dump, the realm comes up.
