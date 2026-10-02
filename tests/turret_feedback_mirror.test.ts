@@ -127,6 +127,7 @@ describe('the turret seat on the quest wire state', () => {
           barrelKills: 0,
           shockwaves: 0,
           frags: 0,
+          resupplies: 0,
         },
       },
       waveCount: planJson.waves.length,

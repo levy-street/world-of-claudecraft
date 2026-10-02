@@ -36,6 +36,7 @@ import { isWarfareVendorNpc } from '../vendor/warfare_vendor_view';
 import { clueStepRowFor, clueStepRowSig } from './clue_step_row_view';
 import { clueReplyKey, clueTalkFor } from './clue_talk_row_core';
 import { gossipMenuIsEmpty } from './gossip_menu';
+import { GunneryBoardWindow } from './gunnery_board_window';
 import { masterCraftTarget } from './master_craft_core';
 import { PROF_INTRO_QUEST_ID, professionIntroHintVisible } from './prof_intro_hint_core';
 
@@ -132,8 +133,16 @@ export class QuestDialogController {
   private openedAt = 0;
   private voiceNpcId: number | null = null;
   private openState = false;
+  private readonly gunneryBoard: GunneryBoardWindow;
+  private gunneryStart: { npcId: number; questId: string } | null = null;
 
-  constructor(private readonly deps: QuestDialogControllerDeps) {}
+  constructor(private readonly deps: QuestDialogControllerDeps) {
+    this.gunneryBoard = new GunneryBoardWindow({
+      world: () => this.deps.world(),
+      start: (scenarioId) => this.startGunnery(scenarioId),
+      close: () => this.close(),
+    });
+  }
 
   get isOpen(): boolean {
     return this.openState;
@@ -169,6 +178,7 @@ export class QuestDialogController {
     this.openedAt = this.deps.now();
     this.ensureFocusTrap();
     this.deps.closeTransient();
+    this.gunneryBoard.reset();
     this.deps.voice.play(`greeting__${npc.templateId}`);
     this.voiceNpcId = npc.id;
     this.renderGossip(npc);
@@ -229,6 +239,7 @@ export class QuestDialogController {
 
   close(restoreFocus = true): void {
     this.deps.element.style.display = 'none';
+    this.gunneryBoard.reset();
     this.npcId = null;
     this.clueReplyOpen = false;
     this.detailQuestId = null;
@@ -890,6 +901,18 @@ export class QuestDialogController {
     if (!view) return false;
     this.npcId = npc.id;
     this.detailQuestId = null;
+    if (view.gunneryBoard && view.questId) {
+      this.gunneryStart = { npcId: npc.id, questId: view.questId };
+      this.deps.element.style.display = 'block';
+      this.gunneryBoard.paint(this.deps.element, {
+        speakerName: view.speakerName,
+        speakerTitle: view.speakerTitle,
+        greeting: view.greeting,
+        rewardCollected: view.completed,
+      });
+      return true;
+    }
+    this.gunneryBoard.reset();
     markDialogRoot(this.deps.element, { labelledBy: 'quest-dialog-title' });
     const subtitle = view.speakerTitle
       ? `<span class="quest-muted"> &lt;${esc(view.speakerTitle)}&gt;</span>`
@@ -923,26 +946,7 @@ export class QuestDialogController {
         });
         this.deps.element.appendChild(button);
       };
-      if (view.sections) {
-        for (const section of view.sections) {
-          const doc = this.deps.document;
-          const title = doc.createElement('div');
-          title.className = 'qd-sub';
-          title.dataset.wqSection = section.key;
-          title.textContent = section.title;
-          this.deps.element.appendChild(title);
-          for (const choice of section.choices) startButton(choice);
-          for (const text of section.locked) {
-            const locked = doc.createElement('div');
-            locked.className = 'qd-obj';
-            locked.dataset.wqLocked = section.key;
-            locked.textContent = text;
-            this.deps.element.appendChild(locked);
-          }
-        }
-      } else {
-        for (const choice of view.difficulties) startButton(choice);
-      }
+      for (const choice of view.difficulties) startButton(choice);
     } else if (view.canStart) {
       const button = this.makeButton(view.buttonLabel);
       button.dataset.startWq = String(npc.id);
@@ -956,6 +960,15 @@ export class QuestDialogController {
     this.bindClose();
     this.showAndFocus();
     return true;
+  }
+
+  /** The Gunnery Board's one action: the same start command the dialog's buttons send. */
+  private startGunnery(scenarioId: string): void {
+    const from = this.gunneryStart;
+    if (!from) return;
+    this.close();
+    this.deps.world().targetEntity(from.npcId);
+    this.deps.world().startWorldQuestActivity(from.questId, { courseId: scenarioId });
   }
 
   /** The NPC's answer to a solved clue talk or delivery, then back to the gossip

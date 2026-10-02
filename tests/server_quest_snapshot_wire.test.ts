@@ -25,6 +25,9 @@ describe('quest snapshot wire', () => {
       weeklyQuest: null,
       clueHunt: { huntId: 'hunt_test', step: 2 },
       fireAndFlyRecruitment: { trialsWon: 2, recruited: false },
+      fireAndFlyRecords: {
+        fire_and_fly_pack_lifetime_v1: { metric: 20_900, medal: 'gold', day: '2030-01-01' },
+      },
     } as unknown as PlayerMeta;
     const sim = {
       worldQuestExpiresAtMs: 1_893_542_400_000,
@@ -45,6 +48,8 @@ describe('quest snapshot wire', () => {
       // The Buried Hoard treasure map (null until one is read).
       ['tmap', null],
       ['ffr', meta.fireAndFlyRecruitment],
+      // The character's own records, so the Gunnery Board needs no ladder request.
+      ['ffrec', meta.fireAndFlyRecords],
       ['wqrr', meta.worldQuestRerollCycle],
       ['wqrep', { wq_test: 'wq_other' }],
       ['wkq', null],

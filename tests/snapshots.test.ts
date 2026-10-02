@@ -77,6 +77,7 @@ import { NORTH_WATCH_CANNON } from '../src/sim/content/vehicle_stations';
 import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS, WORLD_QUESTS } from '../src/sim/data';
 import { IGNIVAR_JUDGMENT_CAST_ID } from '../src/sim/encounters/ignivar';
 import { createGroundObject, createMob } from '../src/sim/entity';
+import { fireAndFlyScoreboardId } from '../src/sim/fire_and_fly_scoreboards';
 import { emptySaleLog } from '../src/sim/market_sale_log';
 import { createCannonEncounter } from '../src/sim/minigames/cannon_encounter';
 import { positionAt } from '../src/sim/minigames/thrown_body';
@@ -5734,6 +5735,7 @@ const ALL_DELTA_KEYS = [
   'fac',
   'facCur',
   'ffr',
+  'ffrec',
   'fplot',
   'ggoal',
   'gprof',
@@ -5875,6 +5877,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   fac: 'factions',
   facCur: 'factionCurrencies',
   ffr: 'fireAndFlyRecruitment',
+  ffrec: 'fireAndFlyRecords',
   fplot: 'myFarmPlots',
   ggoal: 'gatheringGoal',
   gprof: 'gatheringProficiency',
@@ -5935,6 +5938,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
 // Year ~2223 in epoch ms. Beats selfWireJson's `until > Date.now()` lockout
 // filter without a wall-clock read in test scaffolding.
 const FAR_FUTURE_MS = 8_000_000_000_000;
+const FF_PACK_BOARD = fireAndFlyScoreboardId('fire_and_fly_pack', 'lifetime') as string;
 
 // Dirty every one of the registered `maybe()` delta fields with a distinguishable,
 // non-default value so the round-trip + no-op-omission assertions are meaningful
@@ -6062,6 +6066,9 @@ function dirtyEveryDeltaField(): {
   meta.factionCurrencies = { rift_watch: 17, church_order: 29, automatons: 41 };
   meta.treasureMap = { rarity: 'epic', siteId: TREASURE_SITES[0].id, seed: 78123 };
   meta.fireAndFlyRecruitment = { trialsWon: 2, recruited: false };
+  meta.fireAndFlyRecords = {
+    [FF_PACK_BOARD]: { metric: 20_900, medal: 'gold', day: '2026-08-31' },
+  };
   server.sim.worldQuestExpiresAtMs = FAR_FUTURE_MS;
   meta.worldQuestLog.set('wq_eastbrook_bandits', {
     questId: 'wq_eastbrook_bandits',
@@ -6536,6 +6543,9 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.treasureMap).toEqual({ rarity: 'epic', siteId: TREASURE_SITES[0].id });
     expect(lastSnap(fc.sent).self.tmap).not.toHaveProperty('seed');
     expect(client.fireAndFlyRecruitment).toEqual({ trialsWon: 2, recruited: false });
+    expect(client.fireAndFlyRecords).toEqual({
+      [FF_PACK_BOARD]: { metric: 20_900, medal: 'gold', day: '2026-08-31' },
+    });
 
     // --- fields that decode onto the player ENTITY (client.player), not the client ---
     expect(client.player.cooldowns.get('heroic_strike')).toBe(5); // cds -> e.cooldowns
@@ -7248,7 +7258,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 115 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 117 unique keys in sorted order', () => {
     // 109 plus the release batch's pending Town Focus and Spell Crit core keys.
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
@@ -7307,9 +7317,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // shared crit core scb (server/self_scalar_wire.ts), at the third
     // release/v0.44.0 base merge, for 111.
     // The Fire and Fly seat's state and plan keys tur and turp
-    // (server/turret_self_wire.ts), for 115, and its recruitment key ffr, for 116.
-    expect(ALL_DELTA_KEYS).toHaveLength(116);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(116);
+    // (server/turret_self_wire.ts), for 115, its recruitment key ffr, for 116,
+    // and the character's own records ffrec, for 117.
+    expect(ALL_DELTA_KEYS).toHaveLength(117);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(117);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7480,8 +7491,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The World PvP readout wpvp and the King of the Hill readout hill make 109.
     // The release batch's pending Town Focus and Spell Crit core keys make 111.
     // The Fire and Fly seat's tur and turp (server/turret_self_wire.ts) make 115, and
-    // its recruitment ffr (server/quest_snapshot_wire.ts) 116.
-    expect(scraped.size).toBe(116);
+    // its recruitment ffr (server/quest_snapshot_wire.ts) 116, and its records ffrec 117.
+    expect(scraped.size).toBe(117);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

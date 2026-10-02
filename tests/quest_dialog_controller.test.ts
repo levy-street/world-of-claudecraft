@@ -13,6 +13,7 @@ import {
 } from '../src/sim/content/world_quest_investigation';
 import { DELVES, ITEMS, NPCS, QUESTS, STATIONS } from '../src/sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../src/sim/deeds';
+import { fireAndFlyScoreboardId } from '../src/sim/fire_and_fly_scoreboards';
 import type { Entity } from '../src/sim/types';
 import { WEEKLY_KEEPER_ENTITY_ID, WEEKLY_KEEPER_ID } from '../src/sim/weekly_rewards';
 import { craftNameText } from '../src/ui/char_window';
@@ -1067,8 +1068,13 @@ describe('investigation quest dialogue', () => {
   });
 });
 
-describe("Master Gunner Alder's sectioned dialog", () => {
-  function alderHarness(recruitment: { trialsWon: number; recruited: boolean }) {
+describe("Master Gunner Alder's Gunnery Board", () => {
+  function alderHarness(
+    recruitment: { trialsWon: number; recruited: boolean },
+    state: 'active' | 'completed' = 'active',
+    fireAndFlyRecords: IWorld['fireAndFlyRecords'] = {},
+  ) {
+    const worldQuestLeaderboard = vi.fn();
     const startWorldQuestActivity = vi.fn();
     const h = harness(
       npc(77, FIRE_AND_FLY_NPC_DEF.id),
@@ -1077,42 +1083,146 @@ describe("Master Gunner Alder's sectioned dialog", () => {
       {
         player: { id: 1, name: 'Ari', level: 20, dead: false, pos: { x: 0, y: 0, z: 0 } },
         worldQuestLog: new Map([
-          [FIRE_AND_FLY_QUEST_ID, { questId: FIRE_AND_FLY_QUEST_ID, count: 0, state: 'active' }],
+          [FIRE_AND_FLY_QUEST_ID, { questId: FIRE_AND_FLY_QUEST_ID, count: 0, state }],
         ]),
         fireAndFlyRecruitment: recruitment,
+        fireAndFlyRecords,
         startWorldQuestActivity,
+        worldQuestLeaderboard,
       },
     );
     h.controller.open(77);
-    return { ...h, startWorldQuestActivity };
+    return { ...h, startWorldQuestActivity, worldQuestLeaderboard };
   }
+  const rows = (root: HTMLElement) => [...root.querySelectorAll<HTMLElement>('[data-gb-row]')];
+  const action = (root: HTMLElement) =>
+    root.querySelector<HTMLButtonElement>('[data-gb-take]') as HTMLButtonElement;
+  const row = (root: HTMLElement, match: (el: HTMLElement) => boolean) => {
+    const found = rows(root).find(match);
+    if (!found) throw new Error('row not painted');
+    return found;
+  };
+  const press = (el: HTMLElement, key: string) =>
+    el.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
 
-  it('paints each section title, its start buttons, then its locked lines', () => {
+  it('paints the board instead of listing the scenarios as start buttons', () => {
     const h = alderHarness({ trialsWon: 1, recruited: false });
-    const painted = [
-      ...h.element.querySelectorAll('[data-wq-section], [data-difficulty], [data-wq-locked]'),
-    ];
-    expect(painted.map((el) => el.textContent)).toEqual([
-      'Trials',
-      "Recruit's Trial: a first watch for a new recruit (waves: 3)",
-      'Standing Watch: the real watch on the walls (waves: 6)',
-      "Veterans' Test: pass the Standing Watch to open it",
-      'Missions',
-      "Pass the Veterans' Test to be recruited and open the missions.",
+    expect(h.element.querySelector('#quest-dialog-title')?.textContent).toBe('Gunnery Board');
+    expect(h.element.querySelectorAll('[data-start-wq], [data-difficulty]')).toHaveLength(0);
+    expect(rows(h.element).map((row) => row.querySelector('.gb-row-name')?.textContent)).toEqual([
+      "Recruit's Trial",
+      'Standing Watch',
+      "Veterans' Test",
+      'The Pack',
+      'Heavy Tread',
+      'The Deluge',
+      'The Cracked Tower',
+      'The Powder Store',
     ]);
-    for (const locked of h.element.querySelectorAll('[data-wq-locked]'))
-      expect(locked.tagName).toBe('DIV');
+    expect(h.element.querySelectorAll('[data-gb-take]')).toHaveLength(1);
+    expect(h.element.textContent?.match(/practice run/gi) ?? []).toHaveLength(0);
+    expect(h.element.getAttribute('role')).toBe('dialog');
+    expect(h.element.getAttribute('aria-labelledby')).toBe('quest-dialog-title');
   });
 
-  it("sends a mission's pick as its course once recruited", () => {
+  it('opens on the next trial, and a locked pick disables the action with its reason', () => {
+    const h = alderHarness({ trialsWon: 1, recruited: false });
+    const selected = rows(h.element).filter((row) => row.getAttribute('aria-selected') === 'true');
+    expect(selected.map((row) => row.dataset.gbRow)).toEqual(['fire_and_fly_standard']);
+    expect(selected[0].tabIndex).toBe(0);
+    rows(h.element)[3].click();
+    expect(action(h.element).disabled).toBe(true);
+    expect(action(h.element).getAttribute('aria-describedby')).toBe('gb-locked');
+    expect(h.element.querySelector('#gb-locked')?.textContent).toBe(
+      "Win the Veterans' Test to be recruited and open the missions.",
+    );
+    // In the foot, right above the button it disables: a phone pins the foot, so the
+    // reason is never left below the fold of the scrolling brief.
+    expect(h.element.querySelector('.gb-foot > #gb-locked + [data-gb-take]')).not.toBeNull();
+    action(h.element).click();
+    expect(h.startWorldQuestActivity).not.toHaveBeenCalled();
+  });
+
+  it("takes the picked mission through the instructor's start command", () => {
     const h = alderHarness({ trialsWon: 3, recruited: true });
-    expect(h.element.querySelectorAll('[data-wq-locked]')).toHaveLength(0);
-    const powder = h.element.querySelector<HTMLButtonElement>('[data-difficulty="powder"]');
-    expect(powder?.textContent).toContain('The Powder Store');
-    powder?.click();
+    rows(h.element)
+      .find((row) => row.dataset.gbRow === 'fire_and_fly_powder')
+      ?.click();
+    expect(action(h.element).textContent).toBe('Take the mission');
+    action(h.element).click();
     expect(h.targetEntity).toHaveBeenCalledWith(77);
     expect(h.startWorldQuestActivity).toHaveBeenCalledWith(FIRE_AND_FLY_QUEST_ID, {
       courseId: 'fire_and_fly_powder',
     });
+    expect(h.controller.isOpen).toBe(false);
+  });
+
+  it('moves the pick with the arrows, keeps them from the game, and takes it on Enter', () => {
+    const h = alderHarness({ trialsWon: 3, recruited: true }, 'completed');
+    const seen = vi.fn();
+    window.addEventListener('keydown', seen);
+    const first = row(h.element, (el) => el.dataset.gbRow === 'fire_and_fly_pack');
+    press(first, 'ArrowDown');
+    const next = row(h.element, (el) => el.getAttribute('aria-selected') === 'true');
+    expect(next.dataset.gbRow).toBe('fire_and_fly_giants');
+    expect(document.activeElement).toBe(next);
+    expect(action(h.element).textContent).toBe('Practice');
+    press(next, 'Enter');
+    window.removeEventListener('keydown', seen);
+    expect(seen).not.toHaveBeenCalled();
+    expect(h.startWorldQuestActivity).toHaveBeenCalledWith(FIRE_AND_FLY_QUEST_ID, {
+      courseId: 'fire_and_fly_giants',
+    });
+  });
+
+  it("paints the medals from the character's own records, with no ladder request", () => {
+    const pack = fireAndFlyScoreboardId('fire_and_fly_pack', 'lifetime') as string;
+    const h = alderHarness({ trialsWon: 3, recruited: true }, 'active', {
+      [pack]: { metric: 20_900, medal: 'gold', day: '2030-01-01' },
+    });
+    expect(h.worldQuestLeaderboard).not.toHaveBeenCalled();
+    const packRow = row(h.element, (el) => el.dataset.gbRow === 'fire_and_fly_pack');
+    expect(packRow.querySelector('.gb-medal-gold')?.getAttribute('title')).toBe('Gold medal');
+    expect(h.element.querySelector('.gb-mastery')?.textContent).toBe(
+      "Gunner's Mastery: 3 of 15 stars",
+    );
+    // The pack has its medal: the board opens on the first mission without one.
+    expect(
+      rows(h.element).find((row) => row.getAttribute('aria-selected') === 'true')?.dataset.gbRow,
+    ).toBe('fire_and_fly_giants');
+    rows(h.element)
+      .find((row) => row.dataset.gbRow === 'fire_and_fly_pack')
+      ?.click();
+    expect(h.element.querySelector('.gb-fact-best dd')?.textContent).toBe(
+      'Gold medal, 20,900 points',
+    );
+  });
+
+  it('keeps focus on the close button across a quest-event repaint', () => {
+    const h = alderHarness({ trialsWon: 3, recruited: true });
+    h.element.querySelector<HTMLButtonElement>('[data-close]')?.focus();
+    h.controller.refresh();
+    expect(document.activeElement).toBe(h.element.querySelector('[data-close]'));
+  });
+
+  it('keeps the pick across a quest-event repaint and drops it on a fresh open', () => {
+    const h = alderHarness({ trialsWon: 3, recruited: true });
+    rows(h.element)
+      .find((row) => row.dataset.gbRow === 'fire_and_fly_deluge')
+      ?.click();
+    h.controller.refresh();
+    const picked = () =>
+      rows(h.element).find((row) => row.getAttribute('aria-selected') === 'true')?.dataset.gbRow;
+    expect(picked()).toBe('fire_and_fly_deluge');
+    h.controller.close();
+    h.controller.open(77);
+    expect(picked()).toBe('fire_and_fly_pack');
+  });
+
+  it('closes from its own close button', () => {
+    const h = alderHarness({ trialsWon: 0, recruited: false });
+    rows(h.element)[1].click();
+    h.element.querySelector<HTMLButtonElement>('[data-close]')?.click();
+    expect(h.controller.isOpen).toBe(false);
   });
 });

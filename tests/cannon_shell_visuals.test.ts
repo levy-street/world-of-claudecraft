@@ -28,6 +28,7 @@ import {
   resetCannonShotTexelsForTest,
 } from '../src/render/cannon_shell_visuals';
 import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
+import { TURRET_BOMBLETS } from '../src/sim/minigames/turret_fragmentation';
 
 const RADIUS = 6;
 const fired = { shotId: 1, x: 20, y: 0, z: 0, flightTicks: 8, impactTick: 168 };
@@ -962,7 +963,7 @@ describe('cannon fragmentation shell and ground mark', () => {
       blastRadius: RADIUS,
       groundAt: () => 0,
       effectsTier: tier,
-      bomblets: 6,
+      bomblets: TURRET_BOMBLETS,
       holdTicks: 2,
     });
     visuals.prepare(scene);

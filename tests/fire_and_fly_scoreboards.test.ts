@@ -140,7 +140,8 @@ describe('the trial boards', () => {
     expect(FIRE_AND_FLY_MAX_POINTS).toBe(
       TURRET_PLAN_LIMITS.waves * TURRET_PLAN_LIMITS.spawnsPerWave * TURRET_POINTS.kill +
         TURRET_PLAN_LIMITS.integrity * TURRET_POINTS.integrity +
-        TURRET_BONUS_CAP,
+        TURRET_BONUS_CAP +
+        2 * (TURRET_PLAN_LIMITS.charges + TURRET_PLAN_LIMITS.waves) * TURRET_POINTS.unusedCharge,
     );
     expect(fireAndFlyScoreValid('gold', 0)).toBe(true);
     expect(fireAndFlyScoreValid('bronze', FIRE_AND_FLY_MAX_POINTS)).toBe(true);

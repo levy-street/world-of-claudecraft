@@ -278,6 +278,7 @@ interface Armory extends Seat {
   phaseEndTick?: number;
   shockwaves?: number;
   frags?: number;
+  resupplies?: number;
   arsenal?: { shockwave: number; fragmentation: number };
 }
 
@@ -291,7 +292,11 @@ function armory(seat: Armory = {}): TurretSessionView {
       shockReadyTick: seat.shockReadyTick ?? 0,
       phaseEndTick: seat.phaseEndTick ?? 0,
       plan: { arsenal: seat.arsenal ?? { shockwave: 2, fragmentation: 3 } },
-      stats: { shockwaves: seat.shockwaves ?? 0, frags: seat.frags ?? 0 },
+      stats: {
+        shockwaves: seat.shockwaves ?? 0,
+        frags: seat.frags ?? 0,
+        resupplies: seat.resupplies ?? 0,
+      },
     } as unknown as TurretSessionView['defense'],
   };
 }
@@ -316,6 +321,47 @@ const CENTER_AIM: TurretAim = { x: CX, z: CZ, dirX: 0, dirZ: 1, range: 0 };
 const REARM = TURRET_SHOCKWAVE.rearmTicks;
 
 describe('the own-shot ledger with the limited weapons', () => {
+  it("counts a mission's resupplies in the charges a click sees, and never a weapon it lacks", () => {
+    const shots = new TurretOwnShotLedger();
+    const spent = { arsenal: { shockwave: 1, fragmentation: 0 }, shockwaves: 1 };
+    const empty = armory({ ...spent, phase: 'between', phaseEndTick: 100 });
+    expect(shots.chargesLeft(empty, 90, 'shock')).toBe(0);
+    expect(shots.classify(empty, 90, 'shock')).toBe('free');
+    // The wave's end resupplied it: one Shockwave more, still no fragmentation shell.
+    const resupplied = armory({ ...spent, resupplies: 1, phase: 'between', phaseEndTick: 100 });
+    expect(shots.chargesLeft(resupplied, 95, 'shock')).toBe(1);
+    expect(shots.chargesLeft(resupplied, 95, 'frag')).toBe(0);
+    const wave = armory({ ...spent, resupplies: 1, phase: 'wave' });
+    expect(shots.classify(wave, 120, 'shock')).toBe('played');
+    expect(shots.classify(wave, 120, 'frag')).toBe('free');
+    shots.markWeapon(wave, 120, CENTER_AIM, 'shock');
+    // The played click spends the resupplied charge as the player sees it: none twice.
+    expect(shots.chargesLeft(wave, 120, 'shock')).toBe(0);
+    expect(shots.classify(wave, 121, 'shock')).toBe('free');
+  });
+
+  it('keeps a waiting click spent across the resupply it lands with, and gives it back refused', () => {
+    const shots = new TurretOwnShotLedger();
+    const arsenal = { shockwave: 0, fragmentation: 2 };
+    const wave = armory({ arsenal, frags: 1, phase: 'wave' });
+    const serial = shots.markWeapon(wave, 200, aim(CX, CZ + 30), 'frag');
+    expect(shots.chargesLeft(wave, 200, 'frag')).toBe(0);
+    // The wave ends with the click still waiting: 2 given, 1 resupplied, 1 spent, 1 waiting.
+    const cleared = armory({
+      arsenal,
+      frags: 1,
+      resupplies: 1,
+      phase: 'between',
+      phaseEndTick: 400,
+    });
+    expect(shots.chargesLeft(cleared, 201, 'frag')).toBe(1);
+    const late = 200 + shots.confirmWindow + 1;
+    shots.update(cleared, late);
+    expect(shots.status(serial)).toBe('refused');
+    expect(shots.chargesLeft(cleared, late, 'frag')).toBe(2);
+    expect(shots.chargesLeft(cleared, late, 'shock')).toBe(0);
+  });
+
   it('plays a weapon click only in a wave, with a charge left and its own clock ready', () => {
     const shots = new TurretOwnShotLedger();
     expect(shots.canMark(armory(), 200, 'shock')).toBe(true);

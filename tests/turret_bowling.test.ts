@@ -70,6 +70,8 @@ function plan(
     integrity: 100,
     medals: TURRET_SCENARIO_STANDARD.medals,
     arsenal: { shockwave: 0, fragmentation: 0 },
+    resupplyWaves: [],
+    chargeBonus: false,
     kinds,
     waves: cores.map((coreDamage) => ({
       spawns,
@@ -767,7 +769,7 @@ function fullRun(
 
 const ENDED_LATER = new Set(['medal', 'points', 'breakdown']);
 const LATER_STATS = new Set(['bowled', 'barrelsDetonated', 'barrelKills']);
-const WEAPON_STATS = new Set(['shockwaves', 'frags']);
+const WEAPON_STATS = new Set(['shockwaves', 'frags', 'resupplies']);
 
 /** Drops what the engine gained after these digests: the bowled and barrel stats, the
  *  limited-weapon stats while they stay 0 (these runs spend no charge; a spent one shows),

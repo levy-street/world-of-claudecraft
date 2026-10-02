@@ -146,9 +146,15 @@ not a classic-era formula. Pinned by `tests/turret_scenarios.test.ts` and
   monsters bowled over. The bonus is capped below one tower point
   (`TURRET_BONUS_CAP`), so the fun parts separate runs that defended equally well
   and never lift one above a cleaner defense.
+- **Charges kept** (missions only, a won run only): each limited-weapon charge left
+  unused at the end scores `TURRET_POINTS.unusedCharge` (60, three kills' worth,
+  under a third of a tower point). Spending a charge that saves even one tower point
+  still pays; spending it where it saves nothing costs those three kills. It never
+  moves the medal, and every score bound counts it (`FIRE_AND_FLY_MAX_POINTS`, the
+  wire decoder's breakdown, hence the ladders and the Mastery).
 
-The result card shows the medal, the points breakdown and the run's records
-(longest throw, longest airtime, accuracy). Pinned by `tests/turret_result.test.ts`
+The result card shows the medal, the points breakdown (a mission's charges kept on
+its own row) and the run's records (longest throw, longest airtime, accuracy). Pinned by `tests/turret_result.test.ts`
 and `tests/fire_and_fly_score.test.ts`.
 
 ## The world quest
@@ -313,13 +319,45 @@ Graphics settings stay gameplay-neutral
 
 ## The limited weapons
 
-Every trial grants the same per-run arsenal (`TRIAL_ARSENAL` in
-`src/sim/content/fire_and_fly_scenarios.ts`): 2 Shockwaves and 3 fragmentation
-shells. The plan carries it (`TurretArsenal` in
-`src/sim/minigames/turret_defense_plan.ts`), and the charges left are what the run
-has not spent (`turretChargesLeft`). The balance pass with scripted aimers (recorded
-at the top of the scenarios file) found the weapons barely move the medals, so the
-bars stayed.
+Each scenario sets its own per-run arsenal (`arsenal` on the scenario), part of its
+level design: the trials bring in one weapon each, generously the first time, and
+each mission carries the weapon its idea asks for. The plan carries it
+(`TurretArsenal` in `src/sim/minigames/turret_defense_plan.ts`); a weapon with no
+charge has no socket, no key and no banner mention.
+
+| Scenario | Shockwaves | Fragmentation shells | Why |
+|---|---|---|---|
+| Recruit's Trial | 0 | 0 | the cannon and the kegs only |
+| Standing Watch | 4 | 0 | brings in the Shockwave |
+| Veterans' Test | 2 | 4 | brings in the fragmentation shell, beside fewer Shockwaves |
+| The Pack | 0 | 5 | tight packs: a fragmentation shell into each |
+| Heavy Tread | 4 | 1 | giants reaching the tower together |
+| The Deluge | 3 | 2 | swarms from everywhere |
+| The Cracked Tower | 3 | 1 | 10 tower points: no strike may land |
+| The Powder Store | 1 | 3 | keg lanes and groups |
+
+**Resupply** (missions only, `supply` on the scenario): as a mission's third and
+fifth waves end, every weapon its arsenal holds gains one charge
+(`turretResupplyAfter`); a weapon it starts without never gets any. The run counts
+its resupplies in its stats (`resupplies`), so the charges left are the arsenal plus
+the resupplies less the charges spent (`turretChargesGiven`, `turretChargesLeft` in
+`src/sim/minigames/turret_charges.ts`), the same count on the server, in the online
+mirror (the `tur` stats, bounded by the decoder against the plan's resupply waves)
+and in the own-shot ledger's click-time charges. A `resupply` feedback entry puts
+"Resupply: +1 ..." under the cleared wave's banner. Pinned by
+`tests/turret_defense_engine.test.ts`, `tests/turret_session_wire.test.ts`,
+`tests/turret_online_round_trip.test.ts` and `tests/turret_own_shot_core.test.ts`.
+
+The waves, shell damage and medal bars were set with scripted aimers and one plain
+weapon policy (recorded at the top of the scenarios and missions files; the armed
+figures hold for that policy only). With the weapons, gold comes more often in
+Standing Watch and every mission for the aimers firing 0.8 s after each reload, and
+for the 1 s aimer in Standing Watch, Heavy Tread, The Cracked Tower and The Powder
+Store, not in The Pack or The Deluge. The Veterans' Test stays the hardest trial:
+gold for the fastest gunners only, armed or not; the Shockwaves turn a few of the
+0.8 s aimers' bronzes into silvers, the fragmentation shell alone does not help
+them, and it does not yet make gold need both weapons. The clean aimer still golds
+every mission (`tests/fire_and_fly_missions.test.ts`).
 
 - **Shockwave** (`src/sim/minigames/turret_shockwave.ts`, tuning
   `TURRET_SHOCKWAVE` in `src/sim/content/turret_defense.ts`). The tower slams and a
@@ -330,10 +368,10 @@ bars stayed.
   `tests/turret_shockwave.test.ts` and `tests/turret_shockwave_core.test.ts`.
 - **Fragmentation shell** (`src/sim/minigames/turret_fragmentation.ts`, tuning
   `TURRET_FRAGMENTATION`). Aimed, flown and reloaded like a shell, it bursts over its
-  point into a fixed star of 6 bomblets: one on the point, 5 on a 4.5 yd circle
-  turned to the shot's bearing, the first straight ahead. They land one tick apart
-  from 0.2 s after the burst, each a small shell blast (half the shot's damage)
-  that also lights kegs; the frag counts one hit if any bomblet lands one. No draw
+  point into a fixed star of 8 bomblets: one on the point, 7 on a 7 yd circle turned
+  to the shot's bearing, the first straight ahead. The centre lands 0.2 s after the
+  burst and the ring from 0.25 s, one tick apart, each a 4.5 yd blast at the shot's
+  full damage that also lights kegs; the frag counts one hit if any bomblet lands one. No draw
   anywhere: the star is the same every time, and the armed reticle shows every
   landing point from the same function the engine uses (`writeTurretFragStar`).
   Pinned by `tests/turret_fragmentation.test.ts`,
@@ -342,11 +380,15 @@ bars stayed.
   `src/ui/hud/vehicle/turret_aim_core.ts`). Keyboard: key 1 slams the Shockwave;
   key 2 arms the fragmentation shell for the next click, and key 2 again, a right
   click or Escape disarms it with no charge spent. Gamepad: Y slams, LB arms or
-  disarms, the pad's cancel disarms. Touch and mouse: two weapon sockets beside the
-  tower rail show the charges, the Shockwave's rearm, and a gold pulse once
-  three monsters wind up at the foot, two in the Recruit's Trial where the Shockwave
-  is learned (`turret_weapon_bar_view.ts`, reusing the action-bar
-  painter); the first wave's banner names the keys. Pinned by
+  disarms, the pad's cancel disarms. A key or button of a weapon the scenario does
+  not give does nothing and says nothing. Touch and mouse: a weapon socket beside
+  the tower rail for each weapon the scenario gives (the row closes up around a
+  missing one) shows the charges, the Shockwave's rearm, and a gold pulse once three
+  monsters wind up at the foot, two in Standing Watch where the Shockwave is learned
+  (`turret_weapon_bar_view.ts`, reusing the action-bar painter). The first wave's
+  banner presents the weapon a trial brings in with its key, or names the keys of
+  the weapons a mission gives (`turret_arsenal_banner.ts`); the tooltips add a
+  mission's resupply waves and points per charge kept. Pinned by
   `tests/turret_weapon_bar_view.test.ts`, `tests/turret_weapon_sockets.test.ts` and
   `tests/turret_weapon_tooltip.test.ts`.
 - **Online.** The server checks every weapon action like a shot (a wave running,
@@ -355,7 +397,8 @@ bars stayed.
 - **Look and sound.** The slam's stone ring (`src/render/turret_shockwave_core.ts`)
   and the burst (`src/render/cannon_frag_core.ts`) draw through the shell visuals
   (`cannon_shell_visuals.ts`, `turret_weapons_visual.ts`); both have their own sounds. The result card
-  lists the weapons used, and hides a row for a weapon the trial gives none of.
+  lists the weapons used of those given (resupplies included), and hides a row for a
+  weapon the scenario gives none of.
 
 Later candidates, not decided: a perimeter to defend (a chest or an NPC inside
 the dirt ring) instead of the tower itself, a first-person view from the cannon,

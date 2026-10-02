@@ -2,6 +2,10 @@ import type { TreasureMapRarity } from '../sim/content/treasure_maps';
 import type { FactionId } from '../sim/factions';
 import { freshFactionCurrencies, freshFactionReputation } from '../sim/factions';
 import {
+  type PersonalFireAndFlyRecords,
+  sanitizeFireAndFlyRecords,
+} from '../sim/fire_and_fly_personal_records';
+import {
   type FireAndFlyRecruitment,
   freshFireAndFlyRecruitment,
   sanitizeFireAndFlyRecruitment,
@@ -79,6 +83,8 @@ export class QuestWorldWireState {
   fireAndFlyRecruitment: Readonly<FireAndFlyRecruitment> = Object.freeze(
     freshFireAndFlyRecruitment(),
   );
+  /** This character's Fire and Fly records from the `ffrec` self key. */
+  fireAndFlyRecords: Readonly<PersonalFireAndFlyRecords> = Object.freeze({});
   /** Client clock mirror of the authoritative Buried Hoard boss telegraphs;
    *  the host feeds it every routed event (ClientWorld's event loop). */
   protected readonly hoardBossCueMirror = new HoardBossCueMirror(() => performance.now());
@@ -122,6 +128,7 @@ export class QuestWorldWireState {
       tur?: unknown;
       turp?: unknown;
       ffr?: unknown;
+      ffrec?: unknown;
     },
     simTime?: unknown,
     tick?: unknown,
@@ -129,6 +136,8 @@ export class QuestWorldWireState {
     applyQuestSelfWire(this, self, simTime);
     if (self.ffr !== undefined)
       this.fireAndFlyRecruitment = Object.freeze(sanitizeFireAndFlyRecruitment(self.ffr));
+    if (self.ffrec !== undefined)
+      this.fireAndFlyRecords = Object.freeze(sanitizeFireAndFlyRecords(self.ffrec));
     if (self.wba !== undefined) this.applyWorldBossWire(self.wba);
     if (self.vehicle !== undefined) this.vehicleSession = decodeVehicleSession(self.vehicle);
     this.applyTurretSelfWire(self, tick);
@@ -316,6 +325,7 @@ export class QuestWorldWireState {
     this.clueHunt = null;
     this.treasureMap = null;
     this.fireAndFlyRecruitment = Object.freeze(freshFireAndFlyRecruitment());
+    this.fireAndFlyRecords = Object.freeze({});
     this.nearbyWorldQuestTraces = [];
     this.activeWorldBossIds = new Set();
   }

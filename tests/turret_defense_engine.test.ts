@@ -34,6 +34,8 @@ import {
   resolveTurretPlan,
   type TurretKind,
   type TurretPlan,
+  turretChargesGiven,
+  turretChargesLeft,
 } from '../src/sim/minigames/turret_defense_plan';
 import { turretSessionSeed } from '../src/sim/minigames/turret_defense_rng';
 import { turretResult } from '../src/sim/minigames/turret_result';
@@ -75,6 +77,8 @@ function plan(kinds: TurretKind[], spawns: number[][], coreDamage = 60): TurretP
     integrity: 100,
     medals: TURRET_SCENARIO_STANDARD.medals,
     arsenal: { shockwave: 0, fragmentation: 0 },
+    resupplyWaves: [],
+    chargeBonus: false,
     kinds,
     waves: spawns.map((s) => ({
       spawns: s,
@@ -1327,5 +1331,67 @@ describe('full scripted runs', () => {
     expect(r.state.integrity).toBe(0);
     expect(r.state.stats.pointsLost).toBeGreaterThanOrEqual(r.state.plan.integrity);
     expect(r.ticks).toBeLessThan(20 * 60 * 5);
+  });
+});
+
+describe("a mission's resupply", () => {
+  /** Spawns the current wave, fells it on the spot and ticks once: the wave clears. */
+  function clearWave(state: TurretDefenseState): TurretEvent[] {
+    spawnAll(state);
+    for (const m of state.monsters) m.hp = 0;
+    return run(state, state.tick + 1);
+  }
+
+  function resupplied(arsenal: TurretPlan['arsenal'], resupplyWaves: number[]) {
+    const p = { ...plan([kind('small', 50)], [[0], [0], [0]]), arsenal, resupplyWaves };
+    const state = createTurretDefense(p, { x: 0, z: 0 }, 7, START);
+    run(state, INTRO_END);
+    return state;
+  }
+
+  it('gives one charge of each weapon its arsenal holds as a resupply wave ends', () => {
+    const state = resupplied({ shockwave: 2, fragmentation: 0 }, [0]);
+    const events = clearWave(state);
+    const types = events.map((e) => e.type);
+    expect(types.slice(types.indexOf('waveCleared'))).toEqual(['waveCleared', 'resupply']);
+    expect(events.at(-1)).toEqual({ type: 'resupply', wave: 0, shockwave: 1, fragmentation: 0 });
+    expect(state.stats.resupplies).toBe(1);
+    expect(state.phase).toBe('between');
+    expect(turretChargesLeft(state)).toEqual({ shockwave: 3, fragmentation: 0 });
+    run(state, state.phaseEndTick);
+    expect(state.wave).toBe(1);
+    expect(clearWave(state).some((e) => e.type === 'resupply')).toBe(false);
+    expect(state.stats.resupplies).toBe(1);
+  });
+
+  it('resupplies both weapons together, and neither on a plan with no resupply wave', () => {
+    const both = resupplied({ shockwave: 1, fragmentation: 3 }, [0, 1]);
+    clearWave(both);
+    run(both, both.phaseEndTick);
+    const second = clearWave(both);
+    expect(second.at(-1)).toEqual({ type: 'resupply', wave: 1, shockwave: 1, fragmentation: 1 });
+    expect(turretChargesGiven(both.plan, both.stats.resupplies)).toEqual({
+      shockwave: 3,
+      fragmentation: 5,
+    });
+    const none = resupplied({ shockwave: 1, fragmentation: 3 }, []);
+    expect(clearWave(none).some((e) => e.type === 'resupply')).toBe(false);
+    expect(none.stats.resupplies).toBe(0);
+    // A resupply wave of an unarmed plan counts, but gives nothing and says nothing.
+    const unarmed = resupplied({ shockwave: 0, fragmentation: 0 }, [0]);
+    expect(clearWave(unarmed).some((e) => e.type === 'resupply')).toBe(false);
+    expect(unarmed.stats.resupplies).toBe(1);
+    expect(turretChargesLeft(unarmed)).toEqual({ shockwave: 0, fragmentation: 0 });
+  });
+
+  it('resolves the resupply waves from 1 into waves from 0, and refuses any it cannot reach', () => {
+    const base = { ...TURRET_SCENARIO_STANDARD, arsenal: { shockwave: 1 } };
+    const supplied = (resupplyAfterWaves: number[]) =>
+      resolveTurretPlan({ ...base, supply: { resupplyAfterWaves, unusedChargeBonus: true } });
+    expect(supplied([3, 5])).toMatchObject({ resupplyWaves: [2, 4], chargeBonus: true });
+    expect(resolveTurretPlan(base)).toMatchObject({ resupplyWaves: [], chargeBonus: false });
+    for (const waves of [[0], [6], [5, 3], [3, 3], [2.5]]) {
+      expect(() => supplied(waves), String(waves)).toThrow(/bad resupply waves/);
+    }
   });
 });

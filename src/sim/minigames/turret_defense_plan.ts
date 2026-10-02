@@ -26,7 +26,10 @@ import type {
   TurretSizeClass,
   TurretWaveEntry,
 } from '../types';
+import { type TurretArsenal, turretChargesGiven } from './turret_charges';
 import { turretMedalBarPoints } from './turret_result';
+
+export { type TurretArsenal, turretChargesGiven, turretChargesLeft } from './turret_charges';
 
 export interface TurretKind {
   readonly templateId: string;
@@ -50,25 +53,19 @@ export interface TurretWavePlan {
   readonly arrival: Readonly<TurretArrivalDef>;
 }
 
-/** Limited-weapon charges per run, 0 for none. */
-export interface TurretArsenal {
-  readonly shockwave: number;
-  readonly fragmentation: number;
-}
-
 /**
- * Limited-weapon charges left: the arsenal less the charges spent (the run's
- * `shockwaves` and `frags` stats), so a reader of the view counts them exactly
- * as the engine does, from the plan and the stats it already holds.
+ * The charges the end of `wave` (from 0) gives (none of a weapon the arsenal lacks),
+ * null off a resupply wave.
  */
-export function turretChargesLeft(run: {
-  readonly plan: { readonly arsenal: TurretArsenal };
-  readonly stats: { readonly shockwaves: number; readonly frags: number };
-}): TurretArsenal {
-  const { arsenal } = run.plan;
+export function turretResupplyAfter(
+  plan: Pick<TurretPlan, 'arsenal' | 'resupplyWaves'>,
+  wave: number,
+): TurretArsenal | null {
+  if (!plan.resupplyWaves.includes(wave)) return null;
+  const grant = turretChargesGiven(plan, 1);
   return {
-    shockwave: Math.max(0, arsenal.shockwave - run.stats.shockwaves),
-    fragmentation: Math.max(0, arsenal.fragmentation - run.stats.frags),
+    shockwave: grant.shockwave - plan.arsenal.shockwave,
+    fragmentation: grant.fragmentation - plan.arsenal.fragmentation,
   };
 }
 
@@ -80,6 +77,10 @@ export interface TurretPlan {
   /** The medal bars, as shares of `integrity` kept at a win (turret_result.ts). */
   readonly medals: Readonly<TurretMedalBars>;
   readonly arsenal: TurretArsenal;
+  /** Waves (from 0) whose end resupplies the arsenal, ascending; none on a trial. */
+  readonly resupplyWaves: readonly number[];
+  /** A won run scores its unused charges (turret_result.ts). */
+  readonly chargeBonus: boolean;
   readonly kinds: readonly TurretKind[];
   readonly waves: readonly TurretWavePlan[];
   readonly bowling: Readonly<TurretBowlingDef>;
@@ -150,6 +151,16 @@ export function turretMedalBarsValid(
   return silverPoints >= 2 && silverPoints < turretMedalBarPoints(gold, integrity);
 }
 
+/**
+ * Resupply waves from 0, strictly ascending, each before the last wave (the last one's
+ * end is the run's).
+ */
+export function turretResupplyWavesValid(waves: readonly number[], waveCount: number): boolean {
+  return waves.every(
+    (wave, i) => intWithin(wave, 0, waveCount - 2) && (i === 0 || wave > waves[i - 1]),
+  );
+}
+
 function resolveArrival(
   arrival: TurretArrivalDef | undefined,
   scenarioId: string,
@@ -216,6 +227,9 @@ export function resolveTurretPlan(
     throw new Error(`turret plan: bad fragmentation charges in ${scenario.id}`);
   if (!intWithin(scenario.waves.length, 1, limits.waves))
     throw new Error(`turret plan: bad wave count in ${scenario.id}`);
+  const resupplyWaves = (scenario.supply?.resupplyAfterWaves ?? []).map((wave) => wave - 1);
+  if (!turretResupplyWavesValid(resupplyWaves, scenario.waves.length))
+    throw new Error(`turret plan: bad resupply waves in ${scenario.id}`);
   const kinds: TurretKind[] = [];
   const kindIndex = new Map<string, number>();
   const kindOf = (entry: TurretWaveEntry): number => {
@@ -273,6 +287,8 @@ export function resolveTurretPlan(
       silver: { minIntegrityShare: scenario.medals.silver.minIntegrityShare },
     },
     arsenal,
+    resupplyWaves,
+    chargeBonus: scenario.supply?.unusedChargeBonus === true,
     kinds,
     waves: planned,
     bowling: { ...bowling },

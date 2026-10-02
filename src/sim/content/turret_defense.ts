@@ -192,23 +192,23 @@ export const TURRET_SHOCKWAVE = {
  * The fragmentation shell, a limited weapon: aimed, flown and reloaded like a
  * shell, it bursts over its point into a fixed star of bomblets (one on the
  * point, the rest on a circle turned to the shot's bearing, one straight ahead)
- * that land in turn and blast like small shells, lighting barrels as a shell
- * does. No draw anywhere: the pattern is the same every time. First values.
+ * that land in turn and each blast like a shell of a shorter reach, lighting
+ * barrels as a shell does. No draw anywhere: the pattern is the same every time. First values.
  */
 export const TURRET_FRAGMENTATION = {
   /** The burst's height over the aim point (visual only: the bomblets land on the ground). */
   burstHeight: 4,
-  outerCount: 5,
-  outerRadius: 4.5,
+  outerCount: 7,
+  outerRadius: 7,
   /** Ticks from the burst to the centre bomblet, then to the first outer one; one tick apart after. */
   centreDelayTicks: ticks(0.2),
   outerDelayTicks: ticks(0.25),
-  blastRadius: 3.5,
+  blastRadius: 4.5,
   blastCore: 1,
-  /** A bomblet's damage at full strength, as a multiple of the shot's. */
-  damageScale: 0.5,
+  /** A bomblet's damage at full strength, as a multiple of the shot's: each one hits like a shell. */
+  damageScale: 1,
   /** Push and pop as multiples of the shell's. */
-  throwScale: 0.55,
+  throwScale: 0.9,
 } as const;
 
 /**

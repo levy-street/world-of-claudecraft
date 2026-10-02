@@ -10335,6 +10335,13 @@ export interface TurretArsenalDef {
   shockwave?: number;
   fragmentation?: number;
 }
+/** A mission's supply (absent on the trials: no resupply, no bonus). */
+export interface TurretSupplyDef {
+  /** Waves (from 1) whose end gives one charge more of every weapon the arsenal holds. */
+  resupplyAfterWaves: readonly number[];
+  /** A won run scores every charge it leaves unused (minigames/turret_result.ts). */
+  unusedChargeBonus: boolean;
+}
 /** One Fire and Fly scenario (a difficulty); data in content/fire_and_fly_scenarios.ts. */
 export interface TurretScenarioDef {
   /** Frozen and player-invisible. */
@@ -10346,6 +10353,7 @@ export interface TurretScenarioDef {
   integrity: number;
   medals: TurretMedalBars;
   arsenal?: TurretArsenalDef;
+  supply?: TurretSupplyDef;
   /** Absent: every wave's barrels as authored, placed evenly around the circle. */
   kegs?: TurretKegsDef;
 }

@@ -27,10 +27,7 @@ import { completeWorldQuestTurret } from '../src/sim/world_quests';
 import { WORLD_SEED } from '../src/sim/world_seed';
 import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 import { localizeSimText } from '../src/ui/sim_i18n';
-import {
-  fireAndFlyInstructionLines,
-  fireAndFlyTrialChoices,
-} from '../src/ui/world_quest_fire_and_fly_view';
+import { fireAndFlyInstructionLines } from '../src/ui/world_quest_fire_and_fly_view';
 import { worldQuestInstructorDialog } from '../src/ui/world_quest_instructor_view';
 import { worldQuestInstructorAnchor } from '../src/ui/world_quest_marker_anchor';
 import { worldQuestDisplayName, worldQuestObjectiveLabel } from '../src/ui/world_quest_view';
@@ -492,8 +489,8 @@ describe('online', () => {
 });
 
 describe('the instructor dialog, tracker and map', () => {
-  // Every trial won: the whole recruitment is open (fire_and_fly_dialog_sections.test.ts
-  // covers the locks).
+  // Every trial won: the whole recruitment is open (gunnery_board_view.test.ts covers the
+  // board itself and its locks).
   function world(state: 'active' | 'completed', level = 20) {
     return {
       worldQuestLog: new Map([
@@ -505,37 +502,27 @@ describe('the instructor dialog, tracker and map', () => {
   }
   const alder = { id: 9, kind: 'npc', templateId: FIRE_AND_FLY_NPC_DEF.id } as Entity;
 
-  it('offers every trial by name, with its brief and wave count', () => {
+  it("opens Alder's Gunnery Board instead of listing the trials as buttons", () => {
     const view = worldQuestInstructorDialog(world('active'), alder);
     expect(view?.speakerName).toBe('Master Gunner Alder');
     expect(view?.speakerTitle).toBe('Gunnery Recruiter');
     expect(view?.questTitle).toBe("The Gunner's Trials");
     expect(view?.canStart).toBe(true);
-    const trials = view?.sections?.[0]?.choices;
-    expect(trials?.map((c) => c.difficulty)).toEqual(
-      TURRET_SCENARIOS.map((s) => ({ courseId: s.id })),
-    );
-    expect(trials?.map((c) => c.key)).toEqual(['introduction', 'standard', 'hard']);
-    expect(trials?.map((c) => c.label)).toEqual([
-      "Recruit's Trial: a first watch for a new recruit (waves: 3)",
-      'Standing Watch: the real watch on the walls (waves: 6)',
-      "Veterans' Test: the siege the old hands are tested on (waves: 6)",
-    ]);
-    expect(view?.difficulties?.slice(0, 3)).toEqual(trials);
+    expect(view?.gunneryBoard).toBe(true);
+    expect(view?.difficulties).toBeUndefined();
   });
 
-  it('turns every trial into practice after the paid win, and offers nothing under the level', () => {
+  it('keeps the board after the paid win, and offers nothing under the level', () => {
     const view = worldQuestInstructorDialog(world('completed'), alder);
     expect(view?.canStart).toBe(true);
+    expect(view?.completed).toBe(true);
     expect(view?.hint).toBe(
       'Practice: play again without earning more coins, experience or reputation.',
     );
-    expect(view?.sections?.[0]?.choices.map((c) => c.label)).toEqual(
-      fireAndFlyTrialChoices(true).map((c) => c.label),
-    );
-    expect(view?.difficulties?.[0]?.label).toBe("Practice the Recruit's Trial (waves: 3)");
+    expect(view?.gunneryBoard).toBe(true);
     const young = worldQuestInstructorDialog(world('active', 19), alder);
     expect(young?.canStart).toBe(false);
+    expect(young?.gunneryBoard).toBeUndefined();
     expect(young?.difficulties).toBeUndefined();
   });
 

@@ -15,7 +15,12 @@ import { TurretHudPainter } from './turret_hud_painter';
 import { type TurretBanner, TurretFeedbackCursor, TurretHudView } from './turret_hud_view';
 import { FireAndFlyRecruitmentWatch, fireAndFlyRecruitedBanner } from './turret_recruitment_core';
 import { TurretWeaponBarPainter } from './turret_weapon_bar_painter';
-import { type TurretWeaponBarInput, TurretWeaponBarView } from './turret_weapon_bar_view';
+import {
+  TURRET_WEAPON_SLOTS,
+  type TurretWeaponBarInput,
+  TurretWeaponBarView,
+  turretWeaponInArsenal,
+} from './turret_weapon_bar_view';
 import { turretWaveCoreDamage, turretWeaponTooltip } from './turret_weapon_tooltip';
 
 type TurretHudWorld = Pick<
@@ -123,8 +128,14 @@ export class TurretHudController {
     return this.seated;
   }
 
-  /** A bar slot while seated: slot 0 (key 1, pad Y) slams, slot 1 (key 2, pad LB) arms or disarms. */
+  /**
+   * A bar slot while seated: slot 0 (key 1, pad Y) slams, slot 1 (key 2, pad LB) arms or
+   * disarms. A weapon the scenario does not give does nothing, and says nothing.
+   */
   chooseSlot(slot: number): void {
+    const weapon = TURRET_WEAPON_SLOTS[slot];
+    const arsenal = this.world.turretSession?.defense.plan.arsenal;
+    if (!weapon || !arsenal || !turretWeaponInArsenal(arsenal, weapon)) return;
     if (slot === 0) this.aim.fireShockwave();
     else if (slot === 1) this.aim.toggleFrag();
   }
@@ -178,7 +189,7 @@ export class TurretHudController {
     input.clock = clock;
     input.fragArmed = this.aim.fragArmed;
     const state = this.weaponView.tick(input);
-    this.weapons.paint(state, this.weaponView.groupLabel());
+    this.weapons.paint(state, this.weaponView.groupLabel(), this.weaponView.presence);
   }
 
   /** The weapon socket's keycap: the pad glyph while the pad is in hand, else the bound key. */
@@ -206,6 +217,7 @@ export class TurretHudController {
       weapon,
       turretWaveCoreDamage(session),
       this.aim.shots.chargesLeft(session, this.world.turretClock, weapon),
+      session.defense.plan,
     );
   }
 

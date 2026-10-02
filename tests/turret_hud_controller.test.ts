@@ -13,7 +13,6 @@ import {
 } from '../src/game/turret_monster_sfx';
 import { TURRET_SCENARIO_STANDARD } from '../src/sim/content/fire_and_fly_scenarios';
 import { createTurretDefense } from '../src/sim/minigames/turret_defense';
-import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { recordTurretFeedback } from '../src/sim/minigames/turret_feedback';
 import { turretSessionView } from '../src/sim/turret_defense_session';
 import type { TurretSession, VehicleSession } from '../src/sim/types';
@@ -37,6 +36,7 @@ import { VehicleAimCore } from '../src/ui/hud/vehicle/vehicle_aim_core';
 import { setLanguage } from '../src/ui/i18n';
 import { makeWriterFacet } from '../src/ui/painter_host';
 import type { TurretSessionView } from '../src/world_api/vehicles';
+import { resolveArmedTurretPlan } from './helpers/turret_armed_plan';
 
 vi.mock('../src/ui/icons', () => ({ iconDataUrl: (_kind: string, key: string) => `/${key}.webp` }));
 vi.mock('../src/game/sfx', () => ({
@@ -66,7 +66,7 @@ function seat(): TurretSession {
   return {
     kind: 'turret',
     origin: { x: 0, y: 0, z: 0 },
-    defense: createTurretDefense(resolveTurretPlan(), { x: 0, z: 0 }, 5, START),
+    defense: createTurretDefense(resolveArmedTurretPlan(), { x: 0, z: 0 }, 5, START),
     priorMountKey: '',
     returnTo: { x: 0, y: 0, z: 0, facing: 0 },
     feedback: [],
@@ -162,15 +162,16 @@ it('shows the strip and the rail, hides the action bars and swaps in the turret 
   expect(hud().querySelector('[role="status"]')).toBeNull();
 });
 
+// The seat's Standing Watch brings in the Shockwave: its first wave presents it by its key.
 it("names the pad's buttons on the first wave's banner, and the sockets on touch", () => {
   for (const [mode, subtext] of [
     [
       'pad-active',
-      'Blast the monsters before they reach the tower. Y: Shockwave. LB: Fragmentation Shell.',
+      'New weapon: the Shockwave, on Y. It slams the tower and throws back every monster at its foot.',
     ],
     [
       'mobile-touch',
-      'Blast the monsters before they reach the tower. Tap a socket for a Shockwave or a Fragmentation Shell.',
+      "New weapon: the Shockwave. Tap its socket to throw back every monster at the tower's foot.",
     ],
   ] as const) {
     document.body.innerHTML = '<div id="ui"></div>';
@@ -236,11 +237,11 @@ it('writes nothing on unchanged frames, announces each wave once, and never spea
   bar.update();
   bar.update();
   expect(showBanner).toHaveBeenCalledTimes(1);
-  // The first wave names both weapons by the player's own keys (slots 1 and 2 here).
+  // The first wave presents the weapon the trial brings in by the player's own key (slot 1).
   expect(showBanner).toHaveBeenCalledWith({
     text: 'Wave 1 of 6',
     subtext:
-      'Blast the monsters before they reach the tower. 1: Shockwave. 2: Fragmentation Shell.',
+      'New weapon: the Shockwave, on 1. It slams the tower and throws back every monster at its foot.',
   });
   expect(text('.turret-strip-wave')).toBe('Wave 1/6');
   expect(text('.turret-strip-slot')).toBe('Monsters left: 8');
@@ -406,7 +407,7 @@ it("drops the ended run's verdict banner and redraws the minimap when a Replay s
   expect(clearSourceBanner).not.toHaveBeenCalled();
   expect(host.lastMinimapDrawAt).toBe(1234);
   const next = seat();
-  next.defense = createTurretDefense(resolveTurretPlan(), { x: 0, z: 0 }, 6, START + 900);
+  next.defense = createTurretDefense(resolveArmedTurretPlan(), { x: 0, z: 0 }, 6, START + 900);
   world.turretSession = turretSessionView(next);
   world.turretClock = START + 900;
   bar.update();
@@ -496,7 +497,7 @@ it('replays from the card: the seat action, then the new run fresh, nothing of t
   expect(world.leaveVehicle).not.toHaveBeenCalled();
 
   const next = seat();
-  next.defense = createTurretDefense(resolveTurretPlan(), { x: 0, z: 0 }, 6, START + 900);
+  next.defense = createTurretDefense(resolveArmedTurretPlan(), { x: 0, z: 0 }, 6, START + 900);
   world.turretSession = turretSessionView(next);
   world.turretClock = START + 900;
   bar.update();

@@ -18,7 +18,11 @@ import {
 import { BUILTIN_WORLD, dungeonAt } from '../src/sim/data';
 import { fireAndFlyScoreboardId } from '../src/sim/fire_and_fly_scoreboards';
 import { type MotionSegment, positionAt } from '../src/sim/minigames/thrown_body';
-import { resolveTurretPlan, turretChargesLeft } from '../src/sim/minigames/turret_defense_plan';
+import {
+  resolveTurretPlan,
+  turretChargesGiven,
+  turretChargesLeft,
+} from '../src/sim/minigames/turret_defense_plan';
 import { turretResult } from '../src/sim/minigames/turret_result';
 import { Sim } from '../src/sim/sim';
 import type { TurretDefenseView, TurretSessionView } from '../src/sim/turret_defense_session';
@@ -31,15 +35,20 @@ import { TurretFeedbackReader } from '../src/ui/hud/vehicle/turret_feedback_read
 const RUN_BOUND = 20 * 60 * 8;
 const TUR_BYTES_PER_SECOND_CEILING = 15_000;
 // Regression guards per trial, set about 10 percent over the measured won runs (introduction about
-// 7.1 KB/s, the Veterans' Test about 27.5 KB/s with its 99 monsters); all stay under the fleet's
-// mean egress per account (BANDWIDTH_OPINION.md), so no trim is owed, only no silent growth.
-const TUR_BYTES_PER_SECOND_BY_TRIAL: Record<string, number> = { introduction: 8_000, hard: 30_500 };
+// 14.0 KB/s since its last waves crowd 17 monsters in, the Veterans' Test about 27.5 KB/s with
+// its 99 monsters); all stay under the fleet's mean egress per account (BANDWIDTH_OPINION.md),
+// so no trim is owed, only no silent growth.
+const TUR_BYTES_PER_SECOND_BY_TRIAL: Record<string, number> = {
+  introduction: 15_500,
+  hard: 30_500,
+};
 // The same guard per mission, about 10 percent over its measured won run (The Pack about
 // 27.6 KB/s and The Deluge about 26.0 with their hundred-odd monsters, as high as the
-// Veterans' Test; Heavy Tread 8.8, The Cracked Tower 13.4, The Powder Store 15.2).
+// Veterans' Test; Heavy Tread 10.0 since its giants come closer together, The Cracked Tower
+// 13.4, The Powder Store 15.2).
 const TUR_BYTES_PER_SECOND_BY_MISSION: Record<string, number> = {
   pack: 30_500,
-  giants: 9_700,
+  giants: 11_000,
   deluge: 28_700,
   brittle: 14_800,
   powder: 16_700,
@@ -306,28 +315,42 @@ describe('Fire and Fly online: the socket-free round trip', () => {
     expect(dungeonAt(sim.entities.get(pid)!.pos.x)).toBeNull();
   });
 
-  it("mirrors every tick of a won run that spends its limited weapons: charges, rearm and every weapon's entries", () => {
+  it("mirrors every tick of a won mission that spends its limited weapons: charges, resupplies, rearm and every weapon's entries", () => {
+    // The Cracked Tower gives both weapons and resupplies them after waves 3 and 5.
     const { sim, pid, client, slams, routed, turBytesPerSecond } = playOnline(
-      '/dev turret',
+      '/dev turret brittle',
       true,
       true,
     );
     const truth = turretSessionFor(sim.ctx, pid)!;
     const plan = truth.defense.plan;
-    expect(truth.defense.stats.frags).toBe(plan.arsenal.fragmentation);
-    expect(truth.defense.stats.shockwaves).toBe(plan.arsenal.shockwave);
-    expect(slams).toBeGreaterThanOrEqual(plan.arsenal.shockwave);
+    expect(truth.defense.stats.resupplies).toBe(plan.resupplyWaves.length);
+    const given = turretChargesGiven(plan, truth.defense.stats.resupplies);
+    expect(given).toEqual({
+      shockwave: plan.arsenal.shockwave + 2,
+      fragmentation: plan.arsenal.fragmentation + 2,
+    });
+    expect(truth.defense.stats.frags).toBe(given.fragmentation);
+    expect(truth.defense.stats.shockwaves).toBe(given.shockwave);
+    expect(slams).toBeGreaterThanOrEqual(given.shockwave);
     expect(client.turretSession!.defense.stats).toEqual(truth.defense.stats);
     expect(turretChargesLeft(client.turretSession!.defense)).toEqual({
       shockwave: 0,
       fragmentation: 0,
     });
     // Each weapon's entries reached the client and matched the server's ring every tick.
-    for (const kind of ['fired frag', 'fragBurst', 'bomblet', 'shockwave', 'shockwaveHit'])
+    for (const kind of [
+      'fired frag',
+      'fragBurst',
+      'bomblet',
+      'shockwave',
+      'shockwaveHit',
+      'resupply',
+    ])
       expect(routed.has(kind), kind).toBe(true);
-    // 14.6 KB/s over this run: the ring and the bomblets never ride `tur`, only the charges
-    // spent (in the stats) and the Shockwave's rearm tick do.
-    expect(turBytesPerSecond).toBeLessThan(TUR_BYTES_PER_SECOND_CEILING);
+    // The ring and the bomblets never ride `tur`, only the charges spent and resupplied (in
+    // the stats) and the Shockwave's rearm tick do.
+    expect(turBytesPerSecond).toBeLessThan(TUR_BYTES_PER_SECOND_BY_MISSION.brittle);
   });
 
   it.each(
@@ -405,7 +428,7 @@ describe('Fire and Fly online: the socket-free round trip', () => {
       defense.result = turretResult(defense.plan, {
         phase: 'won',
         integrity: defense.plan.integrity,
-        stats: { kills: 20, barrelKills: 0, bowled: 0 },
+        stats: { kills: 20, barrelKills: 0, bowled: 0, shockwaves: 0, frags: 0, resupplies: 0 },
       });
       const events = [...sim.tick(), ...sim.tick()].filter((e) => e.pid === pid);
       questPass();

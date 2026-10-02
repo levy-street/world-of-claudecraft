@@ -12,8 +12,8 @@ const INNER_LIFT = 0.075;
 const BAND_LIFT = 0.055;
 const TICK_LIFT = 0.09;
 const PULSE_HZ = 2;
-/** Enough for any star a reticle carries (the fragmentation shell's six). */
-const MARK_CAPACITY = 8;
+/** Any star a reticle carries (the fragmentation shell's eight), with room for a retune. */
+export const GROUND_AIM_MARK_CAPACITY = 12;
 const MARK_SEGMENTS = 12;
 const MARK_RADIUS = 0.75;
 const MARK_CROSS_RATIO = 0.55;
@@ -82,7 +82,7 @@ export class GroundAimReticleVisual {
   private readonly markLines: THREE.LineSegments;
   private readonly markDiscs: THREE.Mesh;
   private readonly markBlasts: THREE.LineSegments;
-  private readonly markState = new Float64Array(MARK_CAPACITY * 3);
+  private readonly markState = new Float64Array(GROUND_AIM_MARK_CAPACITY * 3);
   private markCount = 0;
   private elapsed = 0;
   private dimmed = false;
@@ -204,7 +204,7 @@ export class GroundAimReticleVisual {
 
   /** Rewrites the marks only when a point moved; hides them with no star. */
   private setMarks(points: readonly GroundAimMarkPoint[] | null): void {
-    const count = points ? Math.min(points.length, MARK_CAPACITY) : 0;
+    const count = points ? Math.min(points.length, GROUND_AIM_MARK_CAPACITY) : 0;
     this.markLines.visible = count > 0;
     this.markDiscs.visible = count > 0;
     if (!points || count === 0) {
@@ -286,7 +286,10 @@ function markLineGeometry(): THREE.BufferGeometry {
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute(
     'position',
-    new THREE.BufferAttribute(new Float32Array(MARK_CAPACITY * MARK_LINE_VERTICES * 3), 3),
+    new THREE.BufferAttribute(
+      new Float32Array(GROUND_AIM_MARK_CAPACITY * MARK_LINE_VERTICES * 3),
+      3,
+    ),
   );
   geometry.setDrawRange(0, 0);
   return geometry;
@@ -296,7 +299,10 @@ function markBlastGeometry(): THREE.BufferGeometry {
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute(
     'position',
-    new THREE.BufferAttribute(new Float32Array(MARK_CAPACITY * BLAST_LINE_VERTICES * 3), 3),
+    new THREE.BufferAttribute(
+      new Float32Array(GROUND_AIM_MARK_CAPACITY * BLAST_LINE_VERTICES * 3),
+      3,
+    ),
   );
   geometry.setDrawRange(0, 0);
   return geometry;
@@ -306,10 +312,13 @@ function markDiscGeometry(): THREE.BufferGeometry {
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute(
     'position',
-    new THREE.BufferAttribute(new Float32Array(MARK_CAPACITY * MARK_DISC_VERTICES * 3), 3),
+    new THREE.BufferAttribute(
+      new Float32Array(GROUND_AIM_MARK_CAPACITY * MARK_DISC_VERTICES * 3),
+      3,
+    ),
   );
-  const indices = new Uint16Array(MARK_CAPACITY * MARK_DISC_INDICES);
-  for (let m = 0; m < MARK_CAPACITY; m++) {
+  const indices = new Uint16Array(GROUND_AIM_MARK_CAPACITY * MARK_DISC_INDICES);
+  for (let m = 0; m < GROUND_AIM_MARK_CAPACITY; m++) {
     const base = m * MARK_DISC_VERTICES;
     for (let i = 0; i < MARK_SEGMENTS; i++) {
       const offset = m * MARK_DISC_INDICES + i * 3;

@@ -19,12 +19,14 @@ import {
   tickTurretDefense,
 } from '../src/sim/minigames/turret_defense';
 import type { TurretKind, TurretPlan } from '../src/sim/minigames/turret_defense_plan';
+import { TURRET_POINTS } from '../src/sim/minigames/turret_result';
 import { startTurretShockwave } from '../src/sim/minigames/turret_shockwave';
 import { turretSessionView } from '../src/sim/turret_defense_session';
 import type { TurretSession } from '../src/sim/types';
 import {
   turretBombletHitDamage,
   turretShockwaveHitDamage,
+  turretSupplyLines,
   turretWaveCoreDamage,
   turretWeaponDescription,
   turretWeaponTooltip,
@@ -49,6 +51,8 @@ function plan(coreDamage: number, ...later: number[]): TurretPlan {
     integrity: 100,
     medals: TURRET_SCENARIO_STANDARD.medals,
     arsenal: { shockwave: 2, fragmentation: 3 },
+    resupplyWaves: [],
+    chargeBonus: false,
     kinds: [KIND],
     waves: [coreDamage, ...later].map((damage) => ({
       spawns: [0],
@@ -141,7 +145,7 @@ describe('the turret weapon tooltips', () => {
     );
     expect(turretWeaponDescription('frag', 61)).toBe(
       [
-        `Arm it, then fire at the ground like a shell. It bursts above the aim point into 6 bomblets: one lands on the point and ${TURRET_FRAGMENTATION.outerCount} land in a ring ${TURRET_FRAGMENTATION.outerRadius} yd around it. Each deals up to 31 damage within ${TURRET_FRAGMENTATION.blastRadius} yd, throws the monsters it hits and lights kegs.`,
+        `Arm it, then fire at the ground like a shell. It bursts above the aim point into 8 bomblets: one lands on the point and ${TURRET_FRAGMENTATION.outerCount} land in a ring ${TURRET_FRAGMENTATION.outerRadius} yd around it. Each deals up to 61 damage within ${TURRET_FRAGMENTATION.blastRadius} yd, throws the monsters it hits and lights kegs.`,
         "Uses the cannon's reload. Arming it again, or cancelling, puts it away without spending a charge. Works only during a wave.",
       ].join('\n'),
     );
@@ -152,5 +156,19 @@ describe('the turret weapon tooltips', () => {
     expect(html).toContain('<div class="tt-title">Fragmentation Shell</div>');
     expect(html).toContain('Charges left: 2');
     expect(html).toContain('cannon&#39;s reload');
+  });
+
+  it("closes a mission's tooltip with its resupply waves and its points per charge left", () => {
+    expect(turretSupplyLines({ resupplyWaves: [], chargeBonus: false })).toEqual([]);
+    const lines = turretSupplyLines({ resupplyWaves: [2, 4], chargeBonus: true });
+    expect(lines).toEqual([
+      'Each weapon of the mission gains one charge as waves 3 and 5 end.',
+      `A won mission scores ${TURRET_POINTS.unusedCharge} points for each charge left unused.`,
+    ]);
+    const html = turretWeaponTooltip('shock', 61, 3, { resupplyWaves: [2, 4], chargeBonus: true });
+    expect(html.endsWith(`<div class="tt-desc">${lines.join('<br>')}</div>`)).toBe(true);
+    expect(turretWeaponTooltip('shock', 61, 3, { resupplyWaves: [], chargeBonus: false })).toBe(
+      turretWeaponTooltip('shock', 61, 3),
+    );
   });
 });

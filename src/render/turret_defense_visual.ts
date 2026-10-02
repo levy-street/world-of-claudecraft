@@ -874,7 +874,7 @@ export class TurretDefenseVisual {
           break;
         }
         case 'fragBurst':
-          if (!stale) this.weapons.burst(ev, entry.tick, time);
+          if (!stale) this.weapons.burst(ev, entry.tick, time, reducedMotion);
           break;
         case 'bomblet':
           this.weapons.bomblet(ev, stale, time, reducedMotion);

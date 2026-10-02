@@ -1,7 +1,7 @@
 // Fire and Fly fragmentation shell, the half the engine (turret_defense.ts)
 // drives: the burst a frag shell makes where a shell would land, the fixed star
 // its bomblets land on (turned to the shot's bearing, no draw), when each lands,
-// and the small blast each makes. The blasts themselves are the engine's, on the
+// and the blast each makes. The blasts themselves are the engine's, on the
 // shell's falloff and launch rules. Pure: private stateless draws only, no clock.
 
 import { TURRET_FRAGMENTATION, TURRET_WEAPON } from '../content/turret_defense';
@@ -10,8 +10,6 @@ import type { TurretBlast, TurretEvent, TurretShot } from './turret_defense';
 import { TURRET_STREAM } from './turret_defense_rng';
 
 const TAU = Math.PI * 2;
-/** Draw keys per frag: one per bomblet, never shared with the next shot's. */
-const KEYS_PER_FRAG = 8;
 
 /** A frag shell that burst, its bomblets landing in turn. */
 export interface TurretFragBurst {
@@ -130,7 +128,7 @@ export function burstTurretFrag(
   };
 }
 
-/** A bomblet's blast: a small shell's, on the frag's core damage. */
+/** A bomblet's blast: a shell's of a shorter reach, on the frag's core damage. */
 export function turretBombletBlast(frag: TurretFragBurst, bomblet: TurretBomblet): TurretBlast {
   const f = TURRET_FRAGMENTATION;
   return {
@@ -142,6 +140,6 @@ export function turretBombletBlast(frag: TurretFragBurst, bomblet: TurretBomblet
     push: TURRET_WEAPON.push * f.throwScale,
     pop: TURRET_WEAPON.pop * f.throwScale,
     stream: TURRET_STREAM.bombletThrow,
-    key: frag.shotId * KEYS_PER_FRAG + bomblet.index,
+    key: frag.shotId * TURRET_BOMBLETS + bomblet.index,
   };
 }

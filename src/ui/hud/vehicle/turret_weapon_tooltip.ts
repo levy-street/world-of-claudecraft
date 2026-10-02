@@ -1,12 +1,15 @@
 // The Fire and Fly limited weapons' tooltips: every number is resolved from the
 // weapon content and the current wave's shell damage, the one the engine's blasts
-// scale from (the Shockwave's ring, each bomblet). Cached per language and damage.
+// scale from (the Shockwave's ring, each bomblet), then a mission's supply rules (its
+// resupply waves, the points per charge left). Cached per language and damage.
 import { TURRET_FRAGMENTATION, TURRET_SHOCKWAVE } from '../../../sim/content/turret_defense';
+import type { TurretPlan } from '../../../sim/minigames/turret_defense_plan';
 import { TURRET_BOMBLETS } from '../../../sim/minigames/turret_fragmentation';
+import { TURRET_POINTS } from '../../../sim/minigames/turret_result';
 import { TICK_RATE } from '../../../sim/types';
 import type { TurretSessionView } from '../../../world_api/vehicles';
 import { esc } from '../../esc';
-import { formatNumber, getI18nRevision, t } from '../../i18n';
+import { formatList, formatNumber, getI18nRevision, t } from '../../i18n';
 
 export type TurretWeaponKind = 'shock' | 'frag';
 
@@ -79,17 +82,43 @@ export function turretWeaponDescription(weapon: TurretWeaponKind, coreDamage: nu
   return text;
 }
 
+/** What a run's plan adds to every weapon: when it resupplies, and what a charge left scores. */
+export type TurretSupplyPlan = Pick<TurretPlan, 'resupplyWaves' | 'chargeBonus'>;
+
+/** The plan's supply rules, one line each; empty on a trial. */
+export function turretSupplyLines(plan: TurretSupplyPlan): string[] {
+  const lines: string[] = [];
+  if (plan.resupplyWaves.length > 0) {
+    const waves = formatList(plan.resupplyWaves.map((wave) => formatNumber(wave + 1)));
+    lines.push(t('hudChrome.turretArsenal.resupplyRule', { waves }));
+  }
+  if (plan.chargeBonus) {
+    lines.push(
+      t('hudChrome.turretArsenal.bonusRule', { points: formatNumber(TURRET_POINTS.unusedCharge) }),
+    );
+  }
+  return lines;
+}
+
 export function turretWeaponName(weapon: TurretWeaponKind): string {
   return t(weapon === 'shock' ? 'hudChrome.turret.shockwave' : 'hudChrome.turret.frag');
 }
 
-/** The socket's tooltip: the name, the rules, then the charges left as the player sees them. */
+/**
+ * The socket's tooltip: the name, the rules, the charges left as the player sees them,
+ * then the plan's supply rules (a mission's resupplies and its points per charge left).
+ */
 export function turretWeaponTooltip(
   weapon: TurretWeaponKind,
   coreDamage: number,
   charges: number,
+  plan?: TurretSupplyPlan,
 ): string {
   const rules = esc(turretWeaponDescription(weapon, coreDamage)).replace(/\n/g, '<br>');
   const left = esc(t('hudChrome.turret.chargesLeft', { count: formatNumber(charges) }));
-  return `<div class="tt-title">${esc(turretWeaponName(weapon))}</div><div class="tt-desc">${rules}</div><div class="tt-desc">${left}</div>`;
+  const supply = plan ? turretSupplyLines(plan) : [];
+  const extra = supply.length
+    ? `<div class="tt-desc">${supply.map((line) => esc(line)).join('<br>')}</div>`
+    : '';
+  return `<div class="tt-title">${esc(turretWeaponName(weapon))}</div><div class="tt-desc">${rules}</div><div class="tt-desc">${left}</div>${extra}`;
 }

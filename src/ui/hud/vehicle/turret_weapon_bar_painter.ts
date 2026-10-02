@@ -69,9 +69,15 @@ export class TurretWeaponBarPainter {
     this.writers.setDisplay(this.root, shown ? '' : 'none');
   }
 
-  /** `label` is the row's accessible name. */
-  paint(state: ActionBarState, label: string): void {
+  /**
+   * `label` is the row's accessible name; `present` says, per slot, whether the scenario
+   * gives that weapon: an absent one has no socket, and the row closes up around it.
+   */
+  paint(state: ActionBarState, label: string, present: readonly boolean[]): void {
     this.writers.setAttr(this.root, 'aria-label', label);
+    for (let i = 0; i < this.buttons.length; i++) {
+      this.writers.setDisplay(this.buttons[i], present[i] ? '' : 'none');
+    }
     this.bar.paint(state);
   }
 }

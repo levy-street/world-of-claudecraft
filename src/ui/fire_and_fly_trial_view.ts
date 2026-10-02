@@ -11,41 +11,41 @@ import type { TurretSessionView } from '../world_api/vehicles';
 import { dungeonDisplayName } from './entity_i18n';
 import { type TranslationKey, t } from './i18n';
 
-/** Each trial's and mission's name and the instructor's pitch for it, by scenario board key: the one table. */
+/** Each trial's and mission's name and Alder's brief for it, by scenario board key: the one table. */
 export const FIRE_AND_FLY_TRIAL_TEXT: Readonly<
-  Record<string, { name: TranslationKey; pitch: TranslationKey }>
+  Record<string, { name: TranslationKey; brief: TranslationKey }>
 > = {
   introduction: {
     name: 'questUi.worldQuest.fireAndFly.scenarios.introduction',
-    pitch: 'questUi.worldQuest.fireAndFly.pitch.introduction',
+    brief: 'questUi.worldQuest.fireAndFly.brief.introduction',
   },
   standard: {
     name: 'questUi.worldQuest.fireAndFly.scenarios.standard',
-    pitch: 'questUi.worldQuest.fireAndFly.pitch.standard',
+    brief: 'questUi.worldQuest.fireAndFly.brief.standard',
   },
   hard: {
     name: 'questUi.worldQuest.fireAndFly.scenarios.hard',
-    pitch: 'questUi.worldQuest.fireAndFly.pitch.hard',
+    brief: 'questUi.worldQuest.fireAndFly.brief.hard',
   },
   pack: {
     name: 'questUi.worldQuest.fireAndFly.scenarios.pack',
-    pitch: 'questUi.worldQuest.fireAndFly.pitch.pack',
+    brief: 'questUi.worldQuest.fireAndFly.brief.pack',
   },
   giants: {
     name: 'questUi.worldQuest.fireAndFly.scenarios.giants',
-    pitch: 'questUi.worldQuest.fireAndFly.pitch.giants',
+    brief: 'questUi.worldQuest.fireAndFly.brief.giants',
   },
   deluge: {
     name: 'questUi.worldQuest.fireAndFly.scenarios.deluge',
-    pitch: 'questUi.worldQuest.fireAndFly.pitch.deluge',
+    brief: 'questUi.worldQuest.fireAndFly.brief.deluge',
   },
   brittle: {
     name: 'questUi.worldQuest.fireAndFly.scenarios.brittle',
-    pitch: 'questUi.worldQuest.fireAndFly.pitch.brittle',
+    brief: 'questUi.worldQuest.fireAndFly.brief.brittle',
   },
   powder: {
     name: 'questUi.worldQuest.fireAndFly.scenarios.powder',
-    pitch: 'questUi.worldQuest.fireAndFly.pitch.powder',
+    brief: 'questUi.worldQuest.fireAndFly.brief.powder',
   },
 };
 

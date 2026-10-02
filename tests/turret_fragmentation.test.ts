@@ -56,6 +56,8 @@ function plan(k: TurretKind, count: number, fragmentation = 3): TurretPlan {
     integrity: 100,
     medals: TURRET_SCENARIO_STANDARD.medals,
     arsenal: { shockwave: 0, fragmentation },
+    resupplyWaves: [],
+    chargeBonus: false,
     kinds: [k],
     waves: [
       {
@@ -117,28 +119,29 @@ function fireFrag(state: TurretDefenseState, x: number, z: number, probe = flat)
 
 describe('the star', () => {
   it.each([0, 0.7, Math.PI / 2, 2.5, -2, Math.PI])(
-    'puts one bomblet on the point and five on a 4.5 yd circle, the first straight ahead (bearing %f)',
+    'puts one bomblet on the point and seven on a 7 yd circle, the first straight ahead (bearing %f)',
     (bearing) => {
       const dirX = Math.sin(bearing);
       const dirZ = Math.cos(bearing);
       const star = turretFragBomblets(10, -4, dirX, dirZ, 500);
       expect(star).toHaveLength(TURRET_BOMBLETS);
-      expect(TURRET_BOMBLETS).toBe(6);
-      expect(star.map((b) => b.index)).toEqual([0, 1, 2, 3, 4, 5]);
+      expect(TURRET_BOMBLETS).toBe(8);
+      expect(TURRET_FRAGMENTATION.outerRadius).toBe(7);
+      expect(star.map((b) => b.index)).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
       expect(star[0]).toMatchObject({ x: 10, z: -4 });
       star.slice(1).forEach((b, i) => {
         expect(Math.hypot(b.x - 10, b.z + 4)).toBeCloseTo(TURRET_FRAGMENTATION.outerRadius, 9);
         const at = Math.atan2(b.x - 10, b.z + 4);
-        // Clockwise seen from above: each one a fifth of a turn less than the one before.
-        const want = bearing - (i * TAU) / 5;
+        // Clockwise seen from above: each one a seventh of a turn less than the one before.
+        const want = bearing - (i * TAU) / 7;
         expect(Math.cos(at - want)).toBeCloseTo(1, 9);
       });
     },
   );
 
-  it('lands the centre 0.2 s after the burst, then one outer bomblet a tick until 0.45 s', () => {
+  it('lands the centre 0.2 s after the burst, then one outer bomblet a tick until 0.55 s', () => {
     const star = turretFragBomblets(0, 0, 0, 1, 300);
-    expect(star.map((b) => b.landTick - 300)).toEqual([4, 5, 6, 7, 8, 9]);
+    expect(star.map((b) => b.landTick - 300)).toEqual([4, 5, 6, 7, 8, 9, 10, 11]);
   });
 
   it('writes the same spots in place for the reticle, reusing the caller array', () => {
@@ -186,14 +189,14 @@ describe('the star', () => {
   it('keeps its first values, so a tuning change is a deliberate edit here', () => {
     expect(TURRET_FRAGMENTATION).toEqual({
       burstHeight: 4,
-      outerCount: 5,
-      outerRadius: 4.5,
+      outerCount: 7,
+      outerRadius: 7,
       centreDelayTicks: 4,
       outerDelayTicks: 5,
-      blastRadius: 3.5,
+      blastRadius: 4.5,
       blastCore: 1,
-      damageScale: 0.5,
-      throwScale: 0.55,
+      damageScale: 1,
+      throwScale: 0.9,
     });
   });
 });
@@ -331,16 +334,22 @@ describe('the burst and the bomblets', () => {
     );
   });
 
-  it('hits with a small blast: half the core damage, a 3.5 yd reach and 0.55 of the throw', () => {
+  it('hits like a shell on a shorter reach: the full core damage, 4.5 yd and 0.9 of the throw', () => {
     const { state, ms } = field(kind('small', 5000), 2);
     lay(state, ms[0], 0, 20);
-    lay(state, ms[1], 0, 20 + 4.5 + TURRET_FRAGMENTATION.blastRadius + 0.2);
+    lay(
+      state,
+      ms[1],
+      0,
+      20 + TURRET_FRAGMENTATION.outerRadius + TURRET_FRAGMENTATION.blastRadius + 0.2,
+    );
     const out = fireFrag(state, 0, 20);
     const events = run(state, (out.ok ? out.shot.impactTick : 0) + 12);
     const blasts = ofType(events, 'bomblet');
     const centre = blasts.find((e) => e.index === 0)!;
     expect(centre.hits.map((h) => h.id)).toEqual([ms[0].id]);
     expect(centre.hits[0].damage).toBe(Math.round(CORE * TURRET_FRAGMENTATION.damageScale));
+    expect(centre.hits[0].damage).toBe(CORE);
     expect(blasts.flatMap((e) => e.hits).some((h) => h.id === ms[1].id)).toBe(false);
     const launch = ofType(events, 'launched').find((e) => e.id === ms[0].id)!;
     expect(Math.hypot(launch.vx, launch.vz)).toBeCloseTo(
@@ -367,8 +376,8 @@ describe('the burst and the bomblets', () => {
 
   it('juggles a body between two bomblets, and counts one hit for the whole frag', () => {
     const { state, ms } = field(kind('small', 5000), 1);
-    // Between the centre and the bomblet straight ahead.
-    lay(state, ms[0], 0, 22.2);
+    // Between the centre and the bomblet straight ahead, inside both blasts.
+    lay(state, ms[0], 0, 23.5);
     const out = fireFrag(state, 0, 20);
     const events = run(state, (out.ok ? out.shot.impactTick : 0) + 12);
     const struck = ofType(events, 'bomblet').filter((e) => e.hits.length);

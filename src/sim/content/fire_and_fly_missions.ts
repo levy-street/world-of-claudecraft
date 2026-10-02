@@ -1,21 +1,24 @@
 // Fire and Fly missions, data only: the five runs a recruited gunner can take any
-// day (fire_and_fly_recruitment.ts unlocks them), each built around one idea. Every
-// number here is a first value: mini-game tuning, not classic-era formulas. A tuning
-// change after boards open mints a new board version. Measured with the scripted
-// aimers on the arena ground (24 seeds each): the clean and the quick aimers take gold
-// on every mission; an aimer firing 0.8 s after each reload keeps gold on The Pack, Heavy
-// Tread and The Powder Store, about half its runs on The Deluge and The Cracked
-// Tower; 1 s splits gold and silver on the first three, silver or bronze on the other
-// two; 1.5 s lands silver or bronze, and loses The Cracked Tower. The weapons barely
-// move these, as on the trials.
+// day (fire_and_fly_recruitment.ts unlocks them), each built around one idea and
+// carrying the weapon that idea asks for. Every number here is a first value:
+// mini-game tuning, not classic-era formulas. A tuning change after boards open mints
+// a new board version. Measured with the scripted aimers of the scenarios file (12
+// seeds each): the clean aimer golds every mission bare; with the weapons, the 0.8 s
+// aimer's gold rate rises on every mission (by about half its runs on The Cracked
+// Tower and The Powder Store, a quarter on Heavy Tread, The Deluge and The Pack), and
+// the 1 s aimer's from none or one to most runs on Heavy Tread and The Cracked Tower,
+// while it gains nothing on The Pack or The Deluge.
 
 import { DT, type TurretScenarioDef } from '../types';
 import { TURRET_BARREL_RING } from './turret_defense';
 
 const ticks = (seconds: number): number => Math.round(seconds / DT);
 
-/** Every mission carries the trials' arsenal: one rule to learn, the idea stays in the waves. */
-const MISSION_ARSENAL = { shockwave: 2, fragmentation: 3 } as const;
+/**
+ * Every mission is resupplied as its third and fifth waves end, and a won one scores the
+ * charges it leaves: each mission's arsenal is its signature, the weapon its idea asks for.
+ */
+const MISSION_SUPPLY = { resupplyAfterWaves: [3, 5], unusedChargeBonus: true } as const;
 const KEGS = (count: number) => ({ count, ...TURRET_BARREL_RING });
 
 /** A pack's members walk nearly in each other's steps. */
@@ -28,8 +31,9 @@ export const TURRET_MISSION_PACK: TurretScenarioDef = {
   id: 'fire_and_fly_pack',
   boardKey: 'pack',
   integrity: 100,
-  medals: { gold: { minIntegrityShare: 0.97 }, silver: { minIntegrityShare: 0.6 } },
-  arsenal: MISSION_ARSENAL,
+  medals: { gold: { minIntegrityShare: 0.99 }, silver: { minIntegrityShare: 0.6 } },
+  arsenal: { fragmentation: 5 },
+  supply: MISSION_SUPPLY,
   waves: [
     {
       entries: [{ templateId: 'forest_wolf', count: 12, level: 2 }],
@@ -94,24 +98,27 @@ export const TURRET_MISSION_PACK: TurretScenarioDef = {
   ],
 };
 
-const GIANT_GAP = { gapMinTicks: ticks(2), gapMaxTicks: ticks(3.2) } as const;
-const SLOW = 0.75;
+const GIANT_GAP = { gapMinTicks: ticks(1), gapMaxTicks: ticks(1.8) } as const;
+const SLOW = 0.9;
 
 /**
- * Few monsters, every one large or huge, slow and very tough: it takes many shells each.
- * Toughness was cut by a fifth (floored above each template's own) so a slow run stays
- * near four and a half minutes rather than five and a half.
+ * Few monsters, every one large or huge, slow and very tough: it takes many shells each,
+ * and they come close behind each other, so several reach the tower together and the
+ * Shockwave is what throws them back. Toughness was cut by a fifth (floored above each
+ * template's own) and the shells hit 15 percent softer, so a run by an aimer firing 1 s
+ * after each reload lasts about five minutes.
  */
 export const TURRET_MISSION_GIANTS: TurretScenarioDef = {
   id: 'fire_and_fly_giants',
   boardKey: 'giants',
   integrity: 100,
-  medals: { gold: { minIntegrityShare: 0.98 }, silver: { minIntegrityShare: 0.6 } },
-  arsenal: MISSION_ARSENAL,
+  medals: { gold: { minIntegrityShare: 0.99 }, silver: { minIntegrityShare: 0.6 } },
+  arsenal: { shockwave: 4, fragmentation: 1 },
+  supply: MISSION_SUPPLY,
   waves: [
     {
       entries: [{ templateId: 'fen_troll', count: 4, level: 11, hpScale: 1.05, speedScale: SLOW }],
-      coreDamage: 100,
+      coreDamage: 85,
       ...GIANT_GAP,
       barrels: KEGS(3),
       arrival: { kind: 'arc', widthTurn: 0.3 },
@@ -121,7 +128,7 @@ export const TURRET_MISSION_GIANTS: TurretScenarioDef = {
         { templateId: 'fen_troll', count: 4, level: 12, hpScale: 1.16, speedScale: SLOW },
         { templateId: 'thornpeak_ogre', count: 2, level: 15, hpScale: 1.16, speedScale: SLOW },
       ],
-      coreDamage: 110,
+      coreDamage: 94,
       ...GIANT_GAP,
       barrels: KEGS(3),
       arrival: { kind: 'flanks', count: 2, widthTurn: 0.14 },
@@ -131,7 +138,7 @@ export const TURRET_MISSION_GIANTS: TurretScenarioDef = {
         { templateId: 'thornpeak_ogre', count: 5, level: 16, hpScale: 1.28, speedScale: SLOW },
         { templateId: 'fen_troll', count: 2, level: 12, hpScale: 1.28, speedScale: SLOW },
       ],
-      coreDamage: 130,
+      coreDamage: 111,
       ...GIANT_GAP,
       barrels: KEGS(4),
       arrival: { kind: 'flanks', count: 3, widthTurn: 0.1 },
@@ -141,7 +148,7 @@ export const TURRET_MISSION_GIANTS: TurretScenarioDef = {
         { templateId: 'thornpeak_ogre', count: 4, level: 16, hpScale: 1.28, speedScale: SLOW },
         { templateId: 'frostmane_yeti', count: 2, level: 19, hpScale: 1.05, speedScale: SLOW },
       ],
-      coreDamage: 180,
+      coreDamage: 153,
       ...GIANT_GAP,
       barrels: KEGS(4),
       arrival: { kind: 'arc', widthTurn: 0.35 },
@@ -151,7 +158,7 @@ export const TURRET_MISSION_GIANTS: TurretScenarioDef = {
         { templateId: 'thornpeak_ogre', count: 4, level: 16, hpScale: 1.4, speedScale: SLOW },
         { templateId: 'frostmane_yeti', count: 3, level: 20, hpScale: 1.16, speedScale: SLOW },
       ],
-      coreDamage: 220,
+      coreDamage: 187,
       ...GIANT_GAP,
       barrels: KEGS(5),
       arrival: { kind: 'flanks', count: 2, widthTurn: 0.12 },
@@ -169,7 +176,7 @@ export const TURRET_MISSION_GIANTS: TurretScenarioDef = {
           speedScale: SLOW,
         },
       ],
-      coreDamage: 260,
+      coreDamage: 221,
       ...GIANT_GAP,
       barrels: KEGS(5),
       arrival: { kind: 'flanks', count: 3, widthTurn: 0.1 },
@@ -190,7 +197,8 @@ export const TURRET_MISSION_DELUGE: TurretScenarioDef = {
   boardKey: 'deluge',
   integrity: 100,
   medals: { gold: { minIntegrityShare: 0.9 }, silver: { minIntegrityShare: 0.5 } },
-  arsenal: MISSION_ARSENAL,
+  arsenal: { shockwave: 3, fragmentation: 2 },
+  supply: MISSION_SUPPLY,
   waves: [
     {
       entries: [{ templateId: 'forest_wolf', count: 14, level: 2, speedScale: FAST }],
@@ -258,7 +266,8 @@ export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
   boardKey: 'brittle',
   integrity: 10,
   medals: { gold: { minIntegrityShare: 1 }, silver: { minIntegrityShare: 0.6 } },
-  arsenal: MISSION_ARSENAL,
+  arsenal: { shockwave: 3, fragmentation: 1 },
+  supply: MISSION_SUPPLY,
   waves: [
     {
       entries: [{ templateId: 'forest_wolf', count: 8, level: 2 }],
@@ -323,8 +332,9 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
   id: 'fire_and_fly_powder',
   boardKey: 'powder',
   integrity: 100,
-  medals: { gold: { minIntegrityShare: 0.97 }, silver: { minIntegrityShare: 0.6 } },
-  arsenal: MISSION_ARSENAL,
+  medals: { gold: { minIntegrityShare: 0.99 }, silver: { minIntegrityShare: 0.6 } },
+  arsenal: { shockwave: 1, fragmentation: 3 },
+  supply: MISSION_SUPPLY,
   kegs: { placement: 'lanes', countScale: 2, cap: 12 },
   waves: [
     {

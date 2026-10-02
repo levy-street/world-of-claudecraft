@@ -550,6 +550,22 @@ export const zh_TW: EnTranslations = {
       "shotTiming": "冷卻時間：{cooldown} 秒。{flight} 秒後命中。所有砲彈共用 {recovery} 秒的恢復時間。",
       "shotRules": "在標記區域內瞄準。不消耗法力。傷害不隨裝備或天賦提升。"
     },
+    "turretArsenal": {
+      "introShock": "新武器：衝擊波，按 {shockKey}。重擊塔樓，把塔腳下的怪物全部震飛。",
+      "introShockTouch": "新武器：衝擊波。點擊其插槽，把塔腳下的怪物全部震飛。",
+      "introFrag": "新武器：破片彈，按 {fragKey}。裝填後朝怪物群開火，它會在其上空炸裂成小炸彈。",
+      "introFragTouch": "新武器：破片彈。點擊其插槽裝填，再點擊怪物群，它會在其上空炸裂成小炸彈。",
+      "shockHint": "在怪物抵達塔樓前將牠們炸飛。{shockKey}：衝擊波。",
+      "shockHintTouch": "在怪物抵達塔樓前將牠們炸飛。點擊插槽使用衝擊波。",
+      "fragHint": "在怪物抵達塔樓前將牠們炸飛。{fragKey}：破片彈。",
+      "fragHintTouch": "在怪物抵達塔樓前將牠們炸飛。點擊插槽使用破片彈。",
+      "resupplyBoth": "補給：衝擊波 {shock}，破片彈 {frag}",
+      "resupplyShock": "補給：衝擊波 {shock}",
+      "resupplyFrag": "補給：破片彈 {frag}",
+      "resupplyRule": "第 {waves} 波結束時，本任務的每種武器各增加一次次數。",
+      "bonusRule": "贏下任務時，每剩餘一次未用次數得 {points} 分。",
+      "pointsCharges": "保留次數（{count}）"
+    },
     "turret": {
       "title": "Fire and Fly",
       "integrity": "塔樓耐久",
@@ -603,7 +619,39 @@ export const zh_TW: EnTranslations = {
       "weaponsHintTouch": "在怪物抵達塔樓前將牠們炸飛。點擊插槽使用衝擊波或破片彈。",
       "statShockwaves": "衝擊波",
       "statFrags": "破片彈",
-      "statUsed": "{used}/{given}"
+      "statUsed": "{used}/{given}",
+      "fragMultiHit": "x{count}"
+    },
+    "gunneryBoard": {
+      "title": "砲術告示板",
+      "listLabel": "試煉與任務",
+      "trials": "入伍考核",
+      "missions": "任務",
+      "trialKicker": "試煉",
+      "missionKicker": "任務",
+      "recruitProgress": "已通過試煉：{won}/{total}",
+      "recruited": "已入伍",
+      "mastery": "砲手精通：{stars}/{max}星",
+      "won": "已獲勝",
+      "notWon": "尚未獲勝",
+      "locked": "未解鎖",
+      "arsenal": "武器庫",
+      "charges": "{weapon}×{count}",
+      "gold": "金牌",
+      "goldBar": "保住塔樓的{percent}",
+      "waves": "波數",
+      "best": "個人最佳",
+      "bestRun": "{medal}，{points}分",
+      "notPlayed": "尚未挑戰",
+      "reward": "今日獎勵",
+      "rewardAvailable": "可領取",
+      "rewardCollected": "已領取：僅可練習",
+      "takeTrial": "接受試煉",
+      "takeMission": "接受任務",
+      "practice": "練習",
+      "actionAria": "{action}：{name}",
+      "lockedTrial": "通過{previous}後開啟此試煉。",
+      "lockedMission": "通過{name}即可入伍，並開啟任務。"
     },
     "warlock": {
       "doomLabel": "譴罪",
@@ -12648,25 +12696,16 @@ export const zh_TW: EnTranslations = {
           "brittle": "裂塔",
           "powder": "火藥庫"
         },
-        "pitch": {
-          "introduction": "新兵的第一次值守",
-          "standard": "城牆上真正的值守",
-          "hard": "老兵們要經受的圍攻",
-          "pack": "成群奔襲，彈彈都要打準",
-          "giants": "寥寥幾頭巨獸，重得難以轟遠",
-          "deluge": "小而快的獸潮",
-          "brittle": "挨幾下塔就倒了",
-          "powder": "雙倍火藥桶，就在牠們路上"
-        },
-        "start": "{name}：{detail}（{count}波）",
-        "practice": "練習{name}（{count}波）",
-        "practiceMission": "{name}：練習（{count}波）",
-        "sections": {
-          "trials": "試煉",
-          "missions": "任務"
-        },
-        "lockedTrial": "{name}：通過{previous}後開啟",
-        "missionsLocked": "通過{name}即可入伍，並開啟任務。"
+        "brief": {
+          "introduction": "每個砲手都從這裡起步，新兵。三小波小獸，狼、野豬、老鼠和蜘蛛，從塔樓四周慢悠悠地晃過來。這座塔剛出石匠之手，挨得住不少啃咬。",
+          "standard": "這是我的砲組每晚在城牆上的值守。六波敵人從四面八方湧來，先是狼和野豬，再到強盜和巨魔，然後是食人魔、行屍和活岩巨像，最後一波壓陣的是個遠比其他怪物龐大的傢伙。",
+          "hard": "這是我讓老兵們經受的圍攻，過了這關我才會把砲台交給他們。六波敵人，比正式值守更強悍，大塊頭更多，來得更密，同時從兩三個方向或成群撲來。最後一波，那個巨物又會出現。",
+          "pack": "野外的野獸成群狩獵，這些也一樣。六波敵人，每波都一簇一簇地從同一個方向撲來：先是狼和野豬，然後是塗著彩繪的部落獵手和他們的野獸，最後是一頭大如乾草車的灰狼。",
+          "giants": "這次來的不多，但個個都是龐然大物：青銅哨衛、熔岩巨獸和活岩巨像，步履遲緩，極難放倒。六波敵人，只要有一個衝到塔下，那一擊就像城牆倒塌。",
+          "deluge": "幾十隻又小又快的野獸，狼、野豬、蜘蛛和深岩掘地者，從四面八方湧來，幾乎沒有間隙。整整六波，像山上傾瀉的雨水：沒有一隻經打，但牠們源源不絕。",
+          "brittle": "這座塔上個季節挨了重擊，裂縫一直沒合上：最多十下就會倒。六波不得安息的亡者，骷髏士兵、戴兜帽的蹣跚者和暗影獵犬，節奏平穩：沒有大傢伙，但每一擊都算數。",
+          "powder": "火藥庫堆滿到了屋梁，所以我在外面擺了平常兩倍的火藥桶，就放在怪物必經的路上。熔爐裡的東西會為此分六波而來：餘燼小鬼、青銅機關、熔岩巨獸，還有一個背著口袋的小偷，從一側、兩翼或成群而來。"
+        }
       },
       "calligraphyTitle": "秘法書法",
       "traceOutline": "用腳步描繪輪廓",

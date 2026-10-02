@@ -22,6 +22,7 @@ import {
 } from '../src/ui/hud/vehicle/turret_aim_core';
 import { TurretOwnShotLedger } from '../src/ui/hud/vehicle/turret_own_shot_core';
 import type { TurretSessionView } from '../src/world_api/vehicles';
+import { resolveArmedTurretPlan } from './helpers/turret_armed_plan';
 
 const CENTER = { x: 10, z: 20 };
 const REARM_TICKS = TURRET_SHOCKWAVE.rearmTicks;
@@ -31,7 +32,7 @@ function seat(): TurretSession {
   return {
     kind: 'turret',
     origin: { x: CENTER.x, y: 0, z: CENTER.z },
-    defense: createTurretDefense(resolveTurretPlan(), CENTER, 7, START),
+    defense: createTurretDefense(resolveArmedTurretPlan(), CENTER, 7, START),
     priorMountKey: '',
     returnTo: { x: 0, y: 0, z: 0, facing: 0 },
     feedback: [],
@@ -425,7 +426,7 @@ describe('the turret aim core with the limited weapons', () => {
     expect(leaving.aim.fragArmed).toBe(false);
   });
 
-  it('shows where the six bomblets land: the engine star on the aimed bearing', () => {
+  it('shows where the bomblets land: the engine star on the aimed bearing', () => {
     const { aim } = rig(waveSeat());
     aim.updatePoint({ x: CENTER.x + 20, z: CENTER.z });
     expect(aim.fragLandingPoints()).toBeNull();
@@ -474,7 +475,8 @@ describe('the turret aim core with the limited weapons', () => {
 
   it('drives a real seat: both weapons spend a charge each, and refuse between waves', () => {
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', devCommands: true });
-    sim.chat('/dev turret');
+    // The Veterans' Test gives both weapons.
+    sim.chat('/dev turret hard');
     const aim = new TurretAimCore(sim, new TurretOwnShotLedger());
     const center = sim.turretSession!.origin;
     // The intro: nothing is sent, nothing is spent.

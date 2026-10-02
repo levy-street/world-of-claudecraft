@@ -1,10 +1,12 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { syncGroundAimReticleFrame } from '../src/game/pad_ground_aim_wiring';
-import { GroundAimReticleVisual } from '../src/render/ground_aim_reticle_visual';
+import {
+  GROUND_AIM_MARK_CAPACITY,
+  GroundAimReticleVisual,
+} from '../src/render/ground_aim_reticle_visual';
 import { TURRET_FRAGMENTATION } from '../src/sim/content/turret_defense';
 import { clampTurretAimInto, createTurretDefense } from '../src/sim/minigames/turret_defense';
-import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { TURRET_BOMBLETS, turretFragBomblets } from '../src/sim/minigames/turret_fragmentation';
 import { turretSessionView } from '../src/sim/turret_defense_session';
 import type { TurretSession } from '../src/sim/types';
@@ -12,6 +14,7 @@ import { GroundAimController } from '../src/ui/hud/action_bar/ground_aim_control
 import { TurretAimCore } from '../src/ui/hud/vehicle/turret_aim_core';
 import { TurretOwnShotLedger } from '../src/ui/hud/vehicle/turret_own_shot_core';
 import type { TurretSessionView } from '../src/world_api/vehicles';
+import { resolveArmedTurretPlan } from './helpers/turret_armed_plan';
 
 const CENTER = { x: 10, z: 20 };
 const START = 100;
@@ -20,7 +23,7 @@ function waveSeat(): TurretSession {
   const session: TurretSession = {
     kind: 'turret',
     origin: { x: CENTER.x, y: 0, z: CENTER.z },
-    defense: createTurretDefense(resolveTurretPlan(), CENTER, 7, START),
+    defense: createTurretDefense(resolveArmedTurretPlan(), CENTER, 7, START),
     priorMountKey: '',
     returnTo: { x: 0, y: 0, z: 0, facing: 0 },
     feedback: [],
@@ -200,6 +203,9 @@ describe('the reticle visual draws the landing marks', () => {
     visual.setAim({ ...aim, landing: star });
     expect(lines.visible).toBe(true);
     expect(discs.visible).toBe(true);
+    // The whole star of eight, with room left in the prepared buffers.
+    expect(star).toHaveLength(8);
+    expect(GROUND_AIM_MARK_CAPACITY).toBeGreaterThan(TURRET_BOMBLETS);
     const lineCount = lines.geometry.drawRange.count;
     const perMark = lineCount / TURRET_BOMBLETS;
     expect(Number.isInteger(perMark)).toBe(true);

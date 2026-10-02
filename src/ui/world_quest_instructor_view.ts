@@ -4,10 +4,6 @@
 import { WISP_MAZE_PROFILES } from '../sim/content/wisp_maze_layouts';
 import { GLIDER_APPRENTICE_NPC_DEF, GLIDER_QUEST_ID } from '../sim/content/world_quest_glider';
 import { ESCORTS, NPCS, WORLD_QUESTS, WORLD_QUESTS_BY_ID } from '../sim/data';
-import {
-  type FireAndFlyRecruitment,
-  freshFireAndFlyRecruitment,
-} from '../sim/fire_and_fly_recruitment';
 import type { Entity } from '../sim/types';
 import {
   type ActivityChoice,
@@ -18,10 +14,6 @@ import { isReplayableWorldQuest } from '../sim/world_quest_practice';
 import type { IWorld } from '../world_api';
 import { tEntity } from './entity_i18n';
 import { formatNumber, t } from './i18n';
-import {
-  type FireAndFlyDialogSection,
-  fireAndFlyDialogSections,
-} from './world_quest_fire_and_fly_view';
 import { worldQuestDisplayName, worldQuestObjectiveLabel } from './world_quest_view';
 
 export interface WorldQuestInstructorDialogView {
@@ -35,25 +27,21 @@ export interface WorldQuestInstructorDialogView {
   completed: boolean;
   buttonLabel: string;
   hint?: string;
-  /** Present when the activity offers a pick (the maze's difficulty, Fire and
-   *  Fly's trials): one start button per entry replaces the single start button.
-   *  Order is the display order; `key` is the choice's stable data key. */
+  /** Present when the activity offers a pick (the maze's difficulty): one start
+   *  button per entry replaces the single start button. Order is the display
+   *  order; `key` is the choice's stable data key. */
   difficulties?: readonly { difficulty: ActivityChoice; key: string; label: string }[];
-  /** Present when the picks come in titled groups (Fire and Fly's trials and missions):
-   *  the dialog paints these instead, and `difficulties` lists their buttons in order. */
-  sections?: readonly FireAndFlyDialogSection[];
+  /** True when the pick is Fire and Fly's: the dialog paints Alder's Gunnery Board
+   *  (src/ui/hud/quest/gunnery_board_window.ts) instead of start buttons. */
+  gunneryBoard?: boolean;
   questId?: string;
 }
 
-type InstructorWorld = Pick<IWorld, 'worldQuestLog' | 'player'> &
-  Partial<Pick<IWorld, 'fireAndFlyRecruitment'>>;
+type InstructorWorld = Pick<IWorld, 'worldQuestLog' | 'player'>;
 
 function difficultyChoices(
   questId: string,
-  completed: boolean,
-  sections: readonly FireAndFlyDialogSection[] | undefined,
 ): WorldQuestInstructorDialogView['difficulties'] | undefined {
-  if (sections) return sections.flatMap((section) => section.choices);
   if (!worldQuestOffersDifficulty(questId)) return undefined;
   return WORLD_QUEST_DIFFICULTIES.map((difficulty) => ({
     difficulty,
@@ -180,11 +168,8 @@ export function worldQuestInstructorDialog(
       (progress?.wispMaze && !progress.wispMaze.paused && progress.wispMaze.phase !== 'won'))
   )
     canStart = false;
-  const sections =
-    canStart && quest.objective.type === 'turret'
-      ? fireAndFlyDialogSections(completed, recruitmentOf(world))
-      : undefined;
-  const difficulties = canStart ? difficultyChoices(questId, completed, sections) : undefined;
+  const gunneryBoard = canStart && quest.objective.type === 'turret';
+  const difficulties = canStart && !gunneryBoard ? difficultyChoices(questId) : undefined;
   return {
     speakerName,
     speakerTitle,
@@ -198,11 +183,6 @@ export function worldQuestInstructorDialog(
     hint,
     questId,
     ...(difficulties ? { difficulties } : {}),
-    ...(sections ? { sections } : {}),
+    ...(gunneryBoard ? { gunneryBoard } : {}),
   };
-}
-
-/** A world without the read (a narrow test double) is a character that has won nothing. */
-function recruitmentOf(world: InstructorWorld): Readonly<FireAndFlyRecruitment> {
-  return world.fireAndFlyRecruitment ?? freshFireAndFlyRecruitment();
 }

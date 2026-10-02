@@ -22,7 +22,10 @@ import {
   type TurretKind,
   type TurretPlan,
   type TurretWavePlan,
+  turretChargesGiven,
+  turretChargesLeft,
   turretMedalBarsValid,
+  turretResupplyWavesValid,
   turretScenarioIdValid,
 } from '../sim/minigames/turret_defense_plan';
 import type { TurretFeedback } from '../sim/minigames/turret_feedback';
@@ -33,6 +36,7 @@ import {
   type TurretMedal,
   type TurretPointsBreakdown,
   type TurretResult,
+  turretPointsTotal,
 } from '../sim/minigames/turret_result';
 import type {
   TurretDefenseView,
@@ -66,6 +70,8 @@ const MAX_SHOCKWAVE_REACH = TURRET_ARENA.spawnRadius;
 // The most each points term can reach on a plan the resolver accepts.
 const MAX_KILL_POINTS = LIMITS.waves * LIMITS.spawnsPerWave * TURRET_POINTS.kill;
 const MAX_TOWER_POINTS = LIMITS.integrity * TURRET_POINTS.integrity;
+// Both weapons at their most charges, resupplied after every wave, none spent.
+const MAX_CHARGE_POINTS = 2 * (LIMITS.charges + LIMITS.waves) * TURRET_POINTS.unusedCharge;
 
 const BAD: unique symbol = Symbol('malformed');
 type Dec<T> = (value: unknown) => T | typeof BAD;
@@ -176,10 +182,15 @@ const arrivalArm = <K extends TurretArrivalDef['kind']>(spec: Arm<TurretArrivalD
 const at = { x: num, y: num, z: num };
 const vec3 = shape<Vec3>(at);
 
-/** Charges spent: at most the most any plan the resolver accepts can hold (the seat checks its own). */
-const charges = within(0, LIMITS.charges);
+/**
+ * Charges spent: at most the most any plan the resolver accepts can hold, resupplied after
+ * every wave (the seat checks its own).
+ */
+const charges = within(0, LIMITS.charges + LIMITS.waves);
+/** A resupply gives one charge of a weapon the arsenal holds, none of one it does not. */
+const grant = within(0, 1);
 /** A run's Shockwaves are numbered from 1, one per charge spent. */
-const shockwaveId = within(1, LIMITS.charges);
+const shockwaveId = within(1, LIMITS.charges + LIMITS.waves);
 /** Shell ids start at 1. */
 const shotId = int(1);
 /** A whole sim tick, capped like every other wire number. */
@@ -201,6 +212,7 @@ const stats = checked(
     barrelKills: count,
     shockwaves: charges,
     frags: charges,
+    resupplies: within(0, LIMITS.waves - 1),
   }),
   (st) => st.frags <= st.shots,
 );
@@ -215,8 +227,9 @@ const breakdown = checked(
     integrity: within(0, MAX_TOWER_POINTS),
     kegKills: within(0, TURRET_BONUS_CAP),
     bowled: within(0, TURRET_BONUS_CAP),
+    charges: within(0, MAX_CHARGE_POINTS),
   }),
-  (b) => b.kegKills + b.bowled <= TURRET_BONUS_CAP,
+  (b) => b.kegKills + b.bowled <= TURRET_BONUS_CAP && b.charges % TURRET_POINTS.unusedCharge === 0,
 );
 
 /** The whole star in landing order: every bomblet once, by index, none before the one ahead. */
@@ -227,10 +240,16 @@ function bombletSchedule(star: readonly TurretBombletSpot[]): boolean {
   );
 }
 
-/** A run's result as the sim builds it: its terms sum to its points, only a win holds a medal. */
+/**
+ * A run's result as the sim builds it: its terms sum to its points, only a win holds a
+ * medal, and only a win scores the charges it left.
+ */
 function resultConsistent(won: boolean, r: Omit<TurretResult, 'won'>): boolean {
-  const b = r.breakdown;
-  return r.points === b.kills + b.integrity + b.kegKills + b.bowled && won === (r.medal !== null);
+  return (
+    r.points === turretPointsTotal(r.breakdown) &&
+    won === (r.medal !== null) &&
+    (won || r.breakdown.charges === 0)
+  );
 }
 
 const result = checked(shape<TurretResult>({ won: bool, medal, points, breakdown }), (r) =>
@@ -284,6 +303,10 @@ const turretEvent = tagged<TurretEvent, 'type'>('type', {
     hits: list(MAX_HITS, hit),
   }),
   waveCleared: eventArm({ type: lit('waveCleared'), wave: count }),
+  resupply: checked(
+    eventArm({ type: lit('resupply'), wave: count, shockwave: grant, fragmentation: grant }),
+    (e) => e.shockwave + e.fragmentation > 0,
+  ),
   shockwave: eventArm({
     type: lit('shockwave'),
     id: shockwaveId,
@@ -427,6 +450,8 @@ const plan = shape<TurretPlan>({
     shockwave: within(0, LIMITS.charges),
     fragmentation: within(0, LIMITS.charges),
   }),
+  resupplyWaves: list(LIMITS.waves, within(0, LIMITS.waves - 1)),
+  chargeBonus: bool,
   kinds: list(
     LIMITS.kinds,
     shape<TurretKind>({
@@ -490,25 +515,51 @@ export function decodeTurretPlan(value: unknown): TurretPlan | null {
   const decoded = plan(value);
   if (decoded === BAD || decoded.waves.length === 0) return null;
   if (!turretMedalBarsValid(decoded.medals, decoded.integrity)) return null;
+  if (!turretResupplyWavesValid(decoded.resupplyWaves, decoded.waves.length)) return null;
   const kinds = decoded.kinds.length;
   for (const wave of decoded.waves) if (wave.spawns.some((kind) => kind >= kinds)) return null;
   return deepFreeze(decoded);
 }
 
 /**
- * The limited weapons against the plan: never more charges spent than it gave,
- * no more frag shells flying than were spent, and the Shockwave's rearm at the
- * seat's start until the first one, after it since.
+ * The resupplies a run has had where it stands: one per resupply wave already behind
+ * it, the current wave's too once it is cleared (the pause after it, or the win).
+ */
+function resupplyCount(defense: Omit<TurretDefenseView, 'plan'>, turretPlan: TurretPlan): number {
+  const { phase, wave } = defense;
+  const cleared = phase === 'between' || phase === 'won';
+  return turretPlan.resupplyWaves.filter((at) => at < wave || (cleared && at === wave)).length;
+}
+
+/**
+ * The limited weapons against the plan: the resupplies its waves gave so far, never
+ * more charges spent than the arsenal and those gave, no more frag shells flying than
+ * were spent, and the Shockwave's rearm at the seat's start until the first one, after
+ * it since.
  */
 function armsConsistent(defense: Omit<TurretDefenseView, 'plan'>, turretPlan: TurretPlan): boolean {
   const { stats, startTick, shockReadyTick } = defense;
   const flying = defense.shots.filter((shot) => shot.weapon === 'frag').length;
+  const given = turretChargesGiven(turretPlan, stats.resupplies);
   return (
-    stats.shockwaves <= turretPlan.arsenal.shockwave &&
-    stats.frags <= turretPlan.arsenal.fragmentation &&
+    stats.resupplies === resupplyCount(defense, turretPlan) &&
+    stats.shockwaves <= given.shockwave &&
+    stats.frags <= given.fragmentation &&
     flying <= stats.frags &&
     (stats.shockwaves === 0 ? shockReadyTick === startTick : shockReadyTick > startTick)
   );
+}
+
+/**
+ * A result's charges term against the plan and the run: a won mission's charges left,
+ * nothing on a trial or a loss.
+ */
+function chargesScored(defense: Omit<TurretDefenseView, 'plan'>, turretPlan: TurretPlan): boolean {
+  const { result: outcome } = defense;
+  if (outcome === undefined) return true;
+  const left = turretChargesLeft({ plan: turretPlan, stats: defense.stats });
+  const kept = outcome.won && turretPlan.chargeBonus ? left.shockwave + left.fragmentation : 0;
+  return outcome.breakdown.charges === kept * TURRET_POINTS.unusedCharge;
 }
 
 /** The `tur` key against its plan: the seat minus the feedback ring, or null. */
@@ -520,6 +571,7 @@ export function decodeTurretSeat(value: unknown, turretPlan: TurretPlan): Turret
   const ended = phase === 'won' || phase === 'lost';
   if (
     !armsConsistent(decoded.defense, turretPlan) ||
+    !chargesScored(decoded.defense, turretPlan) ||
     decoded.waveCount !== waves.length ||
     decoded.defense.wave >= waves.length ||
     decoded.defense.monsters.some((m) => m.kind >= kinds.length) ||

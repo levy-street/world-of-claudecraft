@@ -105,6 +105,11 @@ export function emitQuestSelfKeys(emit: EmitSelfKey, sim: Sim, meta: PlayerMeta)
   );
   // Fire and Fly's recruitment: a won trial bumps wireRev, so the heavy gate re-diffs it.
   emit('ffr', meta.fireAndFlyRecruitment);
+  // Its records: bounded by the content table FIRE_AND_FLY_SCOREBOARD_SCENARIOS (two rows
+  // per trial, one per mission; sanitizeFireAndFlyRecords drops any other board on load,
+  // and recordPersonalFireAndFlyScore only writes fireAndFlyScoreboardId boards); a scored
+  // run emits a worldQuest* event, which marks the session heavy dirty.
+  emit('ffrec', meta.fireAndFlyRecords);
   emit('wqrr', meta.worldQuestRerollCycle);
   emit('wqrep', meta.worldQuestReplacements ?? {});
   emit('wkq', meta.weeklyQuest);

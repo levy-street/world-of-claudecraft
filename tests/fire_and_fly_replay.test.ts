@@ -60,7 +60,7 @@ function forceEnd(meta: PlayerMeta, phase: 'won' | 'lost', integrity = 20): void
   defense.result = turretResult(defense.plan, {
     phase,
     integrity: defense.integrity,
-    stats: { kills: 10, barrelKills: 0, bowled: 0 },
+    stats: { kills: 10, barrelKills: 0, bowled: 0, shockwaves: 0, frags: 0, resupplies: 0 },
   });
 }
 

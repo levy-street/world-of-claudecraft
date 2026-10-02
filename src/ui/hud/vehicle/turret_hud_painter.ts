@@ -198,6 +198,8 @@ export class TurretHudPainter {
     writers.setDisplay(this.medalIcon, result.medal ? '' : 'none');
     writers.setText(this.medalText, result.medalText);
     for (let i = 0; i < this.pointRows.length; i++) {
+      // A blank row is a term the scenario does not score (a trial's charges kept).
+      writers.setDisplay(this.pointRows[i].row, result.pointRows[i].label ? '' : 'none');
       writers.setText(this.pointRows[i].label, result.pointRows[i].label);
       writers.setText(this.pointRows[i].value, result.pointRows[i].value);
     }

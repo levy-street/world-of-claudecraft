@@ -3,8 +3,8 @@
 // bomblets it scatters, each a small dark shell on a short arc from the burst to
 // its landing point, landing on the tick its blast resolves, with a spark trail
 // of a few motes. Each bomblet's blast is the cannon's own
-// (cannon_shell_core.ts), smaller and with no lingering dust cloud, so the six
-// of them never stack past the smoke cap. The painter is cannon_shell_visuals.ts.
+// (cannon_shell_core.ts), smaller and with no lingering dust cloud, so a whole
+// star of them never stacks past the smoke cap. The painter is cannon_shell_visuals.ts.
 //
 // Three/DOM/i18n-free (RENDER_PURE_CORES), deterministic (every spread is a hash
 // of the shot and the puff's index) and allocation-free per frame.
@@ -29,7 +29,23 @@ export const CANNON_BOMBLET = {
   motes: 3,
   moteSpacing: 0.035,
   /** Its blast against a shell's: sizes and camera shake. */
-  blastScale: 0.5,
+  blastScale: 0.65,
+} as const;
+
+/**
+ * The airburst's flash and the camera's kick on the burst: a frag reads bigger
+ * than a shell, so its kick outweighs a shell blast's at its strongest (the
+ * shake is trauma the renderer squares; it fades with distance as a blast's).
+ */
+export const CANNON_AIRBURST = {
+  flashSize0: 4.6,
+  flashSize1: 6.4,
+  flashLife: 0.14,
+  /** Its ring of sparks: the slowest, and how much faster the fastest go (yd/s). */
+  sparkSpeed: 9,
+  sparkSpread: 6,
+  shake: 0.9,
+  fovPunch: 2.6,
 } as const;
 
 /** Cosmetic counts of an airburst (the low preset sheds these; the flash stays). */
@@ -91,9 +107,9 @@ export function cannonAirburstPuffs(
     0,
     0,
     0,
-    2.6,
-    3.4,
-    0.1,
+    CANNON_AIRBURST.flashSize0,
+    CANNON_AIRBURST.flashSize1,
+    CANNON_AIRBURST.flashLife,
     0,
     h(0, 0) * TAU,
     0,
@@ -132,7 +148,7 @@ export function cannonAirburstPuffs(
   for (let i = 0; i < counts.sparks; i++) {
     const idx = 20 + i;
     const a = ((i + 0.6 * h(idx, 0)) / Math.max(1, counts.sparks)) * TAU;
-    const speed = 7 + 5 * h(idx, 1);
+    const speed = CANNON_AIRBURST.sparkSpeed + CANNON_AIRBURST.sparkSpread * h(idx, 1);
     cannonPuffLaunch(
       out[n++],
       PUFF.spark,

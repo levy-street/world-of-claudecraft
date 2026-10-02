@@ -19245,6 +19245,31 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Восстановление: {cooldown} сек. Попадание через {flight} сек. Общее восстановление всех выстрелов: {recovery} сек.',
   'hudChrome.vehicle.shotRules':
     'Цельтесь внутри отмеченного поля. Не расходует ману. Урон не зависит от снаряжения и талантов.',
+  'hudChrome.turretArsenal.introShock':
+    'Новое оружие: ударная волна, клавиша {shockKey}. Башня содрогается и отбрасывает всех монстров у своего подножия.',
+  'hudChrome.turretArsenal.introShockTouch':
+    'Новое оружие: ударная волна. Коснитесь её ячейки, чтобы отбросить всех монстров у подножия башни.',
+  'hudChrome.turretArsenal.introFrag':
+    'Новое оружие: осколочный снаряд, клавиша {fragKey}. Зарядите его и стреляйте по группе: он разорвётся над ней на мелкие бомбы.',
+  'hudChrome.turretArsenal.introFragTouch':
+    'Новое оружие: осколочный снаряд. Коснитесь его ячейки, чтобы зарядить, затем коснитесь группы: он разорвётся над ней на мелкие бомбы.',
+  'hudChrome.turretArsenal.shockHint':
+    'Взрывайте монстров, пока они не добрались до башни. {shockKey}: ударная волна.',
+  'hudChrome.turretArsenal.shockHintTouch':
+    'Взрывайте монстров, пока они не добрались до башни. Коснитесь ячейки, чтобы применить ударную волну.',
+  'hudChrome.turretArsenal.fragHint':
+    'Взрывайте монстров, пока они не добрались до башни. {fragKey}: осколочный снаряд.',
+  'hudChrome.turretArsenal.fragHintTouch':
+    'Взрывайте монстров, пока они не добрались до башни. Коснитесь ячейки, чтобы применить осколочный снаряд.',
+  'hudChrome.turretArsenal.resupplyBoth':
+    'Пополнение: ударная волна {shock}, осколочный снаряд {frag}',
+  'hudChrome.turretArsenal.resupplyShock': 'Пополнение: ударная волна {shock}',
+  'hudChrome.turretArsenal.resupplyFrag': 'Пополнение: осколочный снаряд {frag}',
+  'hudChrome.turretArsenal.resupplyRule':
+    'В конце волн {waves} каждое оружие задания получает ещё один заряд.',
+  'hudChrome.turretArsenal.bonusRule':
+    'Победа в задании приносит {points} очков за каждый неиспользованный заряд.',
+  'hudChrome.turretArsenal.pointsCharges': 'Сохранённые заряды ({count})',
   'hudChrome.turret.integrity': 'Прочность башни',
   'hudChrome.turret.integrityBelow': 'Прочность башни ниже {percent}',
   'hudChrome.turret.tower': 'Башня',
@@ -19301,6 +19326,36 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Взрывайте монстров, пока они не добрались до башни. Коснитесь ячейки, чтобы применить ударную волну или осколочный снаряд.',
   'hudChrome.turret.statShockwaves': 'Ударные волны',
   'hudChrome.turret.statFrags': 'Осколочные снаряды',
+  'hudChrome.gunneryBoard.title': 'Доска канониров',
+  'hudChrome.gunneryBoard.listLabel': 'Испытания и задания',
+  'hudChrome.gunneryBoard.trials': 'Набор',
+  'hudChrome.gunneryBoard.missions': 'Задания',
+  'hudChrome.gunneryBoard.trialKicker': 'Испытание',
+  'hudChrome.gunneryBoard.missionKicker': 'Задание',
+  'hudChrome.gunneryBoard.recruitProgress': 'Пройдено испытаний: {won} из {total}',
+  'hudChrome.gunneryBoard.recruited': 'В расчёте',
+  'hudChrome.gunneryBoard.mastery': 'Мастерство канонира: {stars} из {max} звёзд',
+  'hudChrome.gunneryBoard.won': 'Пройдено',
+  'hudChrome.gunneryBoard.notWon': 'Ещё не пройдено',
+  'hudChrome.gunneryBoard.locked': 'Закрыто',
+  'hudChrome.gunneryBoard.arsenal': 'Арсенал',
+  'hudChrome.gunneryBoard.charges': '{weapon} ×{count}',
+  'hudChrome.gunneryBoard.gold': 'Золото',
+  'hudChrome.gunneryBoard.goldBar': 'Сохранить {percent} башни',
+  'hudChrome.gunneryBoard.waves': 'Волны',
+  'hudChrome.gunneryBoard.best': 'Ваш рекорд',
+  'hudChrome.gunneryBoard.bestRun': '{medal}, очков: {points}',
+  'hudChrome.gunneryBoard.notPlayed': 'Ещё не сыграно',
+  'hudChrome.gunneryBoard.reward': 'Награда за сегодня',
+  'hudChrome.gunneryBoard.rewardAvailable': 'Доступна',
+  'hudChrome.gunneryBoard.rewardCollected': 'Получена: только тренировка',
+  'hudChrome.gunneryBoard.takeTrial': 'Пройти испытание',
+  'hudChrome.gunneryBoard.takeMission': 'Взяться за задание',
+  'hudChrome.gunneryBoard.practice': 'Тренировка',
+  'hudChrome.gunneryBoard.actionAria': '{action}: {name}',
+  'hudChrome.gunneryBoard.lockedTrial': 'Пройдите «{previous}», чтобы открыть это испытание.',
+  'hudChrome.gunneryBoard.lockedMission':
+    'Пройдите «{name}», чтобы вступить в расчёт и открыть задания.',
   'hudChrome.leaderboard.tabWorldQuests': 'Локальные задания',
   'hudChrome.leaderboard.wqBoardsLabel': 'Таблицы рекордов локальных заданий',
   'hudChrome.leaderboard.wqMedal': 'Медаль',
@@ -19559,27 +19614,27 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.fireAndFly.scenarios.introduction': 'Испытание новобранца',
   'questUi.worldQuest.fireAndFly.scenarios.standard': 'Настоящий дозор',
   'questUi.worldQuest.fireAndFly.scenarios.hard': 'Проверка ветеранов',
-  'questUi.worldQuest.fireAndFly.pitch.introduction': 'первый дозор новобранца',
-  'questUi.worldQuest.fireAndFly.pitch.standard': 'настоящий дозор на стенах',
-  'questUi.worldQuest.fireAndFly.pitch.hard': 'осада, которой проверяют бывалых',
-  'questUi.worldQuest.fireAndFly.start': '{name}: {detail} (волн: {count})',
-  'questUi.worldQuest.fireAndFly.practice': 'Тренировка: {name} (волн: {count})',
   'questUi.worldQuest.fireAndFly.scenarios.pack': 'Стая',
   'questUi.worldQuest.fireAndFly.scenarios.giants': 'Тяжёлая поступь',
   'questUi.worldQuest.fireAndFly.scenarios.deluge': 'Потоп',
   'questUi.worldQuest.fireAndFly.scenarios.brittle': 'Треснувшая башня',
   'questUi.worldQuest.fireAndFly.scenarios.powder': 'Пороховой склад',
-  'questUi.worldQuest.fireAndFly.pitch.pack': 'бегут стаями, берегите снаряды',
-  'questUi.worldQuest.fireAndFly.pitch.giants': 'громилы, которых не отбросить',
-  'questUi.worldQuest.fireAndFly.pitch.deluge': 'поток мелких быстрых тварей',
-  'questUi.worldQuest.fireAndFly.pitch.brittle': 'пара ударов, и башня падёт',
-  'questUi.worldQuest.fireAndFly.pitch.powder': 'вдвое больше бочек на их пути',
-  'questUi.worldQuest.fireAndFly.practiceMission': 'Тренировка: {name} (волн: {count})',
-  'questUi.worldQuest.fireAndFly.sections.trials': 'Испытания',
-  'questUi.worldQuest.fireAndFly.sections.missions': 'Задания',
-  'questUi.worldQuest.fireAndFly.lockedTrial': '{name}: откроется после «{previous}»',
-  'questUi.worldQuest.fireAndFly.missionsLocked':
-    'Пройдите «{name}», чтобы вступить в расчёт и открыть задания.',
+  'questUi.worldQuest.fireAndFly.brief.introduction':
+    'С этого начинает каждый канонир, новобранец. Три короткие волны мелкого зверья, волки, кабаны, крысы и пауки, неспешно бредут к башне со всех сторон. Башня только что из рук каменщиков и выдержит немало укусов.',
+  'questUi.worldQuest.fireAndFly.brief.standard':
+    'Это дозор, который мои расчёты несут на стенах каждую ночь. Шесть волн со всех сторон: сперва волки и кабаны, потом разбойники и тролли, затем огры, ходячие мертвецы и громады из живого камня, а последнюю волну замыкает нечто куда крупнее остальных.',
+  'questUi.worldQuest.fireAndFly.brief.hard':
+    'Осада, через которую я прогоняю старых вояк, прежде чем доверить им батарею. Шесть волн, крепче, чем в настоящем дозоре, громил куда больше, и идут они плотнее, с двух-трёх сторон разом или тесными стаями. В последней волне снова появится тот великан.',
+  'questUi.worldQuest.fireAndFly.brief.pack':
+    'В дикой природе звери охотятся стаями, и эти тоже. Шесть волн, и каждая накатывает тесными кучками с одной стороны за раз: сначала волки и кабаны, потом раскрашенные охотники племён со своим зверьём, а под самый конец серый волк размером с телегу сена.',
+  'questUi.worldQuest.fireAndFly.brief.giants':
+    'На этот раз их немного, но каждый огромен: бронзовые стражи, громилы из расплавленной породы и колоссы из живого камня, медлительные и очень живучие. Шесть волн, и если кто-то из них дойдёт до башни, ударит он как рухнувшая стена.',
+  'questUi.worldQuest.fireAndFly.brief.deluge':
+    'Десятки мелких быстрых тварей, волки, кабаны, пауки и глубинные проходчики, валят со всех сторон почти без просвета. Шесть таких волн, как дождь с холмов: ни одна тварь не крепка, но они не кончаются.',
+  'questUi.worldQuest.fireAndFly.brief.brittle':
+    'Эту башню в прошлом сезоне крепко приложило, и трещина так и не сошлась: от силы десять ударов, и она рухнет. Шесть волн неупокоенных мертвецов, костяных солдат, ковыляющих в капюшонах и теневых гончих, в ровном темпе: никого крупного, но каждый дошедший удар на счету.',
+  'questUi.worldQuest.fireAndFly.brief.powder':
+    'Пороховой склад забит под самые стропила, так что я выставил вдвое больше бочонков, прямо на тропах, по которым идут чудища. За ними явятся порождения кузни, шесть волн: угольные бесенята, бронзовые механизмы, громилы из расплавленной породы и один воришка с мешком, с одной стороны, с двух флангов или стаями.',
   'entities.npcs.fire_and_fly_instructor.name': 'Мастер-канонир Олдер',
   'entities.npcs.fire_and_fly_instructor.title': 'Вербовщик канониров',
   'entities.npcs.fire_and_fly_instructor.greeting':

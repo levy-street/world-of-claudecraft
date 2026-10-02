@@ -18918,6 +18918,30 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'クールダウン：{cooldown}秒。{flight}秒後に着弾。全弾種で{recovery}秒の回復時間を共有する。',
   'hudChrome.vehicle.shotRules':
     '印のついた範囲内を狙う。マナ消費なし。ダメージは装備やタレントの影響を受けない。',
+  'hudChrome.turretArsenal.introShock':
+    '新兵器：衝撃波（{shockKey}）。塔を打ち鳴らし、足元のモンスターをすべて吹き飛ばす。',
+  'hudChrome.turretArsenal.introShockTouch':
+    '新兵器：衝撃波。ソケットをタップすると、塔の足元のモンスターをすべて吹き飛ばす。',
+  'hudChrome.turretArsenal.introFrag':
+    '新兵器：榴散弾（{fragKey}）。装填してから群れに撃つと、その頭上で子弾に炸裂する。',
+  'hudChrome.turretArsenal.introFragTouch':
+    '新兵器：榴散弾。ソケットをタップして装填し、群れをタップすると、その頭上で子弾に炸裂する。',
+  'hudChrome.turretArsenal.shockHint':
+    '塔にたどり着く前にモンスターを吹き飛ばせ。{shockKey}：衝撃波。',
+  'hudChrome.turretArsenal.shockHintTouch':
+    '塔にたどり着く前にモンスターを吹き飛ばせ。ソケットをタップして衝撃波を使う。',
+  'hudChrome.turretArsenal.fragHint':
+    '塔にたどり着く前にモンスターを吹き飛ばせ。{fragKey}：榴散弾。',
+  'hudChrome.turretArsenal.fragHintTouch':
+    '塔にたどり着く前にモンスターを吹き飛ばせ。ソケットをタップして榴散弾を使う。',
+  'hudChrome.turretArsenal.resupplyBoth': '補給：衝撃波 {shock}、榴散弾 {frag}',
+  'hudChrome.turretArsenal.resupplyShock': '補給：衝撃波 {shock}',
+  'hudChrome.turretArsenal.resupplyFrag': '補給：榴散弾 {frag}',
+  'hudChrome.turretArsenal.resupplyRule':
+    'ウェーブ {waves} の終わりに、この任務の各兵器のチャージが一つ増える。',
+  'hudChrome.turretArsenal.bonusRule':
+    '任務に勝利すると、未使用のチャージ一つにつき{points}ポイント。',
+  'hudChrome.turretArsenal.pointsCharges': '残したチャージ（{count}）',
   'hudChrome.turret.integrity': '塔の耐久度',
   'hudChrome.turret.integrityBelow': '塔の耐久度が {percent} を下回った',
   'hudChrome.turret.tower': '塔',
@@ -18973,6 +18997,35 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '塔にたどり着く前にモンスターを吹き飛ばせ。ソケットをタップして衝撃波か榴散弾を使う。',
   'hudChrome.turret.statShockwaves': '衝撃波',
   'hudChrome.turret.statFrags': '榴散弾',
+  'hudChrome.gunneryBoard.title': '砲術掲示板',
+  'hudChrome.gunneryBoard.listLabel': '試練と任務',
+  'hudChrome.gunneryBoard.trials': '入隊試験',
+  'hudChrome.gunneryBoard.missions': '任務',
+  'hudChrome.gunneryBoard.trialKicker': '試練',
+  'hudChrome.gunneryBoard.missionKicker': '任務',
+  'hudChrome.gunneryBoard.recruitProgress': '合格した試練：{won}/{total}',
+  'hudChrome.gunneryBoard.recruited': '入隊済み',
+  'hudChrome.gunneryBoard.mastery': '砲手の熟達：{stars}/{max}つ星',
+  'hudChrome.gunneryBoard.won': '合格済み',
+  'hudChrome.gunneryBoard.notWon': '未獲得',
+  'hudChrome.gunneryBoard.locked': 'ロック中',
+  'hudChrome.gunneryBoard.arsenal': '兵装',
+  'hudChrome.gunneryBoard.charges': '{weapon}×{count}',
+  'hudChrome.gunneryBoard.gold': '金',
+  'hudChrome.gunneryBoard.goldBar': '塔の{percent}を守る',
+  'hudChrome.gunneryBoard.waves': '波の数',
+  'hudChrome.gunneryBoard.best': '自己ベスト',
+  'hudChrome.gunneryBoard.bestRun': '{medal}、{points}点',
+  'hudChrome.gunneryBoard.notPlayed': '未挑戦',
+  'hudChrome.gunneryBoard.reward': '本日の報酬',
+  'hudChrome.gunneryBoard.rewardAvailable': '受け取り可能',
+  'hudChrome.gunneryBoard.rewardCollected': '受け取り済み：練習のみ',
+  'hudChrome.gunneryBoard.takeTrial': '試練を受ける',
+  'hudChrome.gunneryBoard.takeMission': '任務を受ける',
+  'hudChrome.gunneryBoard.practice': '練習',
+  'hudChrome.gunneryBoard.actionAria': '{action}：{name}',
+  'hudChrome.gunneryBoard.lockedTrial': '{previous}に合格するとこの試練が解放されます。',
+  'hudChrome.gunneryBoard.lockedMission': '{name}に合格すると入隊し、任務が解放されます。',
   'hudChrome.leaderboard.tabWorldQuests': 'ワールドクエスト',
   'hudChrome.leaderboard.wqBoardsLabel': 'ワールドクエストのスコアボード',
   'hudChrome.leaderboard.wqMedal': 'メダル',
@@ -19216,26 +19269,27 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.fireAndFly.scenarios.introduction': '新兵の試練',
   'questUi.worldQuest.fireAndFly.scenarios.standard': '本番の見張り',
   'questUi.worldQuest.fireAndFly.scenarios.hard': '古参兵の試験',
-  'questUi.worldQuest.fireAndFly.pitch.introduction': '新兵の初めての見張り',
-  'questUi.worldQuest.fireAndFly.pitch.standard': '城壁での本物の見張り',
-  'questUi.worldQuest.fireAndFly.pitch.hard': '古参兵が試される包囲戦',
-  'questUi.worldQuest.fireAndFly.start': '{name}：{detail}（{count}波）',
-  'questUi.worldQuest.fireAndFly.practice': '{name}を練習する（{count}波）',
   'questUi.worldQuest.fireAndFly.scenarios.pack': '群れ',
   'questUi.worldQuest.fireAndFly.scenarios.giants': '重い足音',
   'questUi.worldQuest.fireAndFly.scenarios.deluge': '大洪水',
   'questUi.worldQuest.fireAndFly.scenarios.brittle': 'ひび割れた塔',
   'questUi.worldQuest.fireAndFly.scenarios.powder': '火薬庫',
-  'questUi.worldQuest.fireAndFly.pitch.pack': '群れで来る、一発も無駄にするな',
-  'questUi.worldQuest.fireAndFly.pitch.giants': '遠くへは飛ばせない重い巨獣が数体',
-  'questUi.worldQuest.fireAndFly.pitch.deluge': '小さく素早い獣の洪水',
-  'questUi.worldQuest.fireAndFly.pitch.brittle': '数撃で塔が崩れる',
-  'questUi.worldQuest.fireAndFly.pitch.powder': '倍の火薬樽を奴らの通り道に',
-  'questUi.worldQuest.fireAndFly.practiceMission': '{name}：練習（{count}波）',
-  'questUi.worldQuest.fireAndFly.sections.trials': '試練',
-  'questUi.worldQuest.fireAndFly.sections.missions': '任務',
-  'questUi.worldQuest.fireAndFly.lockedTrial': '{name}：{previous}に合格すると解放',
-  'questUi.worldQuest.fireAndFly.missionsLocked': '{name}に合格すると入隊し、任務が解放されます。',
+  'questUi.worldQuest.fireAndFly.brief.introduction':
+    'どの砲手もここから始めるんだ、新兵。狼に猪、鼠に蜘蛛といった小さな獣が、短い三つの波で塔の四方からのんびり寄ってくる。塔は石工の手を離れたばかりで、多少かじられてもびくともしない。',
+  'questUi.worldQuest.fireAndFly.brief.standard':
+    'これはうちの砲手たちが毎晩城壁で務める見張りだ。六つの波が四方から押し寄せる。始めは狼と猪、やがて山賊とトロール、オーガ、歩く死者、生きた岩の巨体へと続き、最後の波はほかの何よりもずっと大きなものが締めくくる。',
+  'questUi.worldQuest.fireAndFly.brief.hard':
+    '砲台を任せる前に古参兵に課す包囲戦だ。六つの波は本番の見張りより手強く、大物が多く、間を置かずに二方向か三方向から同時に、あるいは固まった群れで来る。最後の波には、あの巨体がまた現れる。',
+  'questUi.worldQuest.fireAndFly.brief.pack':
+    '野生の獣は群れで狩るが、こいつらも同じだ。六つの波、どれも一方向からひと塊ずつやって来る。始めは狼と猪、次に化粧を施した部族の狩人とその獣たち、そして最後には荷車ほどもある灰色の狼だ。',
+  'questUi.worldQuest.fireAndFly.brief.giants':
+    '今回は数こそ少ないが、どれも巨体だ。青銅の番兵、溶岩の怪物、生きた岩の巨人、足は遅いが、倒すのは至難の業だ。六つの波、一体でも塔にたどり着けば、その一撃は崩れ落ちる城壁のようだ。',
+  'questUi.worldQuest.fireAndFly.brief.deluge':
+    '小さくてすばしこい獣が何十匹も、狼に猪、蜘蛛に深岩のトンネル掘りが、ほとんど切れ目なく四方から流れ込んでくる。それが六つの波、山から降る雨のようにな。どれも打たれ弱いが、決して途切れない。',
+  'questUi.worldQuest.fireAndFly.brief.brittle':
+    'この塔は前の季節に手ひどくやられて、ひびが塞がらないままだ。せいぜい十発で崩れる。眠れぬ死者ども、骨の兵士、頭巾をかぶった屍、影の猟犬が、六つの波で一定の調子でやって来る。大物は来ないが、届いた一撃はどれも響く。',
+  'questUi.worldQuest.fireAndFly.brief.powder':
+    '火薬庫は梁まで満杯でな、いつもの倍の樽を外に置いた。怪物どもが通る道の真上にだ。それを狙って鍛冶場の連中が六つの波でやって来る。燃えさしの小鬼、青銅のからくり、溶岩の怪物、それに袋を担いだ盗人が一匹、一方向から、両翼から、あるいは群れで。',
   'entities.npcs.fire_and_fly_instructor.name': '砲術長アルダー',
   'entities.npcs.fire_and_fly_instructor.title': '砲術隊の募集係',
   'entities.npcs.fire_and_fly_instructor.greeting':

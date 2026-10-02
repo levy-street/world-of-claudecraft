@@ -29,11 +29,11 @@ import {
 } from '../src/game/turret_monster_sfx';
 import { fireAndFlyLookTemplate } from '../src/sim/content/fire_and_fly_looks';
 import type { TurretEvent, TurretHit } from '../src/sim/minigames/turret_defense';
-import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import type { TurretFeedback } from '../src/sim/minigames/turret_feedback';
 import { TURRET_BOMBLETS } from '../src/sim/minigames/turret_fragmentation';
 import { TurretOwnShotLedger } from '../src/ui/hud/vehicle/turret_own_shot_core';
 import type { TurretSessionView } from '../src/world_api/vehicles';
+import { resolveArmedTurretPlan } from './helpers/turret_armed_plan';
 
 const origin = { x: 100, y: 5, z: 200 };
 const fired: TurretEvent = {
@@ -68,7 +68,8 @@ function cue(): TurretSfxCue {
   return { key: '', x: 0, y: 0, z: 0, gain: 0, rate: 0, jitter: true };
 }
 
-const PLAN = resolveTurretPlan();
+/** Standing Watch's waves with both limited weapons. */
+const PLAN = resolveArmedTurretPlan();
 /** Monster 1 is a wolf (kind 0), monster 2 the plan's first huge kind. */
 const HUGE = PLAN.kinds.findIndex((k) => k.sizeClass === 'huge');
 const monsters = [
@@ -666,7 +667,7 @@ describe('Fire and Fly weapon sound player', () => {
         readyTick: 0,
         shockReadyTick: 0,
         phaseEndTick: 0,
-        stats: { shockwaves: 0, frags: 0 },
+        stats: { shockwaves: 0, frags: 0, resupplies: 0 },
       } as unknown as TurretSessionView['defense'],
     };
   };

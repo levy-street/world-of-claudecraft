@@ -22,10 +22,11 @@ import type { TurretEvent } from '../src/sim/minigames/turret_defense';
 import {
   resolveTurretPlan,
   TURRET_PLAN_LIMITS,
+  turretChargesGiven,
   turretChargesLeft,
 } from '../src/sim/minigames/turret_defense_plan';
 import { TURRET_BOMBLETS } from '../src/sim/minigames/turret_fragmentation';
-import { TURRET_BONUS_CAP, turretResult } from '../src/sim/minigames/turret_result';
+import { TURRET_BONUS_CAP, TURRET_POINTS, turretResult } from '../src/sim/minigames/turret_result';
 import { Sim } from '../src/sim/sim';
 import type { TurretSessionView } from '../src/sim/turret_defense_session';
 import type { SimEvent, TurretSession, TurretWaveDef, WorldContent } from '../src/sim/types';
@@ -63,7 +64,8 @@ interface Run {
 
 /**
  * A whole seat on the server, aimed at the monster nearest the tower, or left to breach;
- * armed, it fires its frag shells first and slams whenever a body stands inside the reach.
+ * armed, it plays The Powder Store (both weapons, resupplied after waves 3 and 5), fires
+ * its frag shells first and slams whenever a body stands inside the reach.
  */
 function playRun(aim: boolean, armed = false): Run {
   const sim = new Sim({
@@ -74,7 +76,7 @@ function playRun(aim: boolean, armed = false): Run {
     world: EMPTY_WORLD,
   });
   const pid = sim.addPlayer('warrior', 'Gunner', { characterId: 7 });
-  sim.chat('/dev turret', pid);
+  sim.chat(armed ? '/dev turret powder' : '/dev turret', pid);
   const session = sim.meta(pid)!.vehicle as TurretSession;
   const run: Run = { revisions: [], events: [], session };
   let rev = -1;
@@ -154,7 +156,12 @@ describe('the turret plan key', () => {
       expect(decoded).toEqual(resolved);
       expect(decoded?.scenarioId).toBe(scenario.id);
       expect(decoded?.integrity).toBe(scenario.integrity);
-      expect(decoded?.arsenal).toEqual({ shockwave: 2, fragmentation: 3 });
+      expect(decoded?.arsenal).toEqual({
+        shockwave: scenario.arsenal?.shockwave ?? 0,
+        fragmentation: scenario.arsenal?.fragmentation ?? 0,
+      });
+      expect(decoded?.resupplyWaves).toEqual([]);
+      expect(decoded?.chargeBonus).toBe(false);
       expect(decoded?.waves.map((w) => w.arrival)).toEqual(
         scenario.waves.map((w) => w.arrival ?? { kind: 'ring' }),
       );
@@ -285,6 +292,12 @@ describe('the turret plan key', () => {
     ['a missing bowling rule', (p: Wire) => delete p.bowling.enabled],
     ['a non-finite gap', (p: Wire) => (p.waves[0].gapMinTicks = Number.POSITIVE_INFINITY)],
     ['oversized kinds', (p: Wire) => (p.kinds = Array.from({ length: 65 }, () => p.kinds[0]))],
+    ['resupply waves out of order', (p: Wire) => (p.resupplyWaves = [4, 2])],
+    ['a resupply wave twice', (p: Wire) => (p.resupplyWaves = [2, 2])],
+    ['a resupply after the last wave', (p: Wire) => (p.resupplyWaves = [p.waves.length - 1])],
+    ['a fractional resupply wave', (p: Wire) => (p.resupplyWaves = [1.5])],
+    ['a missing resupply list', (p: Wire) => delete p.resupplyWaves],
+    ['a charge bonus that is not a flag', (p: Wire) => (p.chargeBonus = 1)],
   ])('rejects %s', (_, forge) => {
     const forged = wire(resolveTurretPlan());
     forge(forged);
@@ -330,8 +343,33 @@ describe('the turret seat key', () => {
     expect(fragInFlight).toBe(true);
     expect(slamSpent).toBe(true);
     const spent = armed.revisions.at(-1)!.view.defense.stats;
-    expect(spent.frags).toBe(armedPlan.arsenal.fragmentation);
+    expect(spent.frags).toBe(turretChargesGiven(armedPlan, spent.resupplies).fragmentation);
     expect(spent.shockwaves).toBeGreaterThan(0);
+  });
+
+  it("round-trips a mission's resupplies: the granted count, its entries, the charges after", () => {
+    const armedPlan = decodeTurretPlan(JSON.parse(turretPlanWireJson(armed.session.defense.plan)))!;
+    expect(armedPlan.resupplyWaves).toEqual([2, 4]);
+    expect(armedPlan.chargeBonus).toBe(true);
+    const counts = new Set<number>();
+    for (const { view, json } of armed.revisions) {
+      const decoded = decodeTurretSeat(JSON.parse(json), armedPlan)!;
+      expect(decoded.defense.stats.resupplies).toBe(view.defense.stats.resupplies);
+      counts.add(decoded.defense.stats.resupplies);
+    }
+    expect([...counts].sort()).toEqual([0, 1, 2]);
+    const entries = armed.events.filter((e) => e.event.type === 'resupply');
+    expect(entries.map((e) => e.event)).toEqual([
+      { type: 'resupply', wave: 2, shockwave: 1, fragmentation: 1 },
+      { type: 'resupply', wave: 4, shockwave: 1, fragmentation: 1 },
+    ]);
+    for (const entry of entries) {
+      expect(decodeTurretFeedback(wire(entry))).toEqual({
+        seq: entry.seq,
+        tick: entry.tick,
+        event: entry.event,
+      });
+    }
   });
 
   it("carries no result while the run lasts and the sim's own result once it ends", () => {
@@ -445,10 +483,12 @@ describe('the turret seat key', () => {
   const armedPlan = (): TurretPlanOf =>
     decodeTurretPlan(JSON.parse(turretPlanWireJson(armed.session.defense.plan)))!;
   /** An armed revision in a wave with a Shockwave spent and a shell in flight. */
+  /** A revision in a wave after a resupply, a Shockwave spent and a shell in flight. */
   function armedMidWave(): Wire {
     const found = armed.revisions.find(
       ({ view }) =>
         view.defense.phase === 'wave' &&
+        view.defense.stats.resupplies > 0 &&
         view.defense.stats.shockwaves > 0 &&
         view.defense.shots.length > 0,
     );
@@ -458,13 +498,15 @@ describe('the turret seat key', () => {
 
   it.each([
     [
-      "Shockwaves past the plan's arsenal",
-      (s: Wire, p: TurretPlanOf) => (s.defense.stats.shockwaves = p.arsenal.shockwave + 1),
+      "Shockwaves past the plan's arsenal and its resupplies",
+      (s: Wire, p: TurretPlanOf) =>
+        (s.defense.stats.shockwaves =
+          turretChargesGiven(p, s.defense.stats.resupplies).shockwave + 1),
     ],
     [
-      "frag shells past the plan's arsenal",
+      "frag shells past the plan's arsenal and its resupplies",
       (s: Wire, p: TurretPlanOf) => {
-        s.defense.stats.frags = p.arsenal.fragmentation + 1;
+        s.defense.stats.frags = turretChargesGiven(p, s.defense.stats.resupplies).fragmentation + 1;
         s.defense.stats.shots = Math.max(s.defense.stats.shots, s.defense.stats.frags);
       },
     ],
@@ -477,7 +519,8 @@ describe('the turret seat key', () => {
     ],
     [
       'charges past any plan',
-      (s: Wire) => (s.defense.stats.shockwaves = TURRET_PLAN_LIMITS.charges + 1),
+      (s: Wire) =>
+        (s.defense.stats.shockwaves = TURRET_PLAN_LIMITS.charges + TURRET_PLAN_LIMITS.waves + 1),
     ],
     ['negative charges', (s: Wire) => (s.defense.stats.frags = -1)],
     [
@@ -504,6 +547,10 @@ describe('the turret seat key', () => {
     ['a shell in flight numbered 0', (s: Wire) => (s.defense.shots[0].id = 0)],
     ['a missing rearm tick', (s: Wire) => delete s.defense.shockReadyTick],
     ['a missing charge count', (s: Wire) => delete s.defense.stats.shockwaves],
+    ['a resupply its waves did not give', (s: Wire) => s.defense.stats.resupplies++],
+    ['a resupply its waves gave, missing', (s: Wire) => (s.defense.stats.resupplies = 0)],
+    ['a missing resupply count', (s: Wire) => delete s.defense.stats.resupplies],
+    ['a fractional resupply count', (s: Wire) => (s.defense.stats.resupplies += 0.5)],
   ] as [string, (s: Wire, p: TurretPlanOf) => unknown][])(
     'rejects the whole armed seat for %s',
     (_, forge) => {
@@ -518,11 +565,30 @@ describe('the turret seat key', () => {
   it("reads the plan's own arsenal as the charge bound, not the resolver's limit", () => {
     const forged = armedMidWave();
     const p = armedPlan();
-    forged.defense.stats.shockwaves = p.arsenal.shockwave;
+    forged.defense.stats.shockwaves = turretChargesGiven(
+      p,
+      forged.defense.stats.resupplies,
+    ).shockwave;
     expect(decodeTurretSeat(wire(forged), p)).not.toBeNull();
     const poorer = { ...p, arsenal: { ...p.arsenal, shockwave: p.arsenal.shockwave - 1 } };
     expect(decodeTurretSeat(forged, poorer)).toBeNull();
   });
+
+  it.each([
+    ['a won mission scoring a charge it spent', () => armed, armedPlan],
+    ['a won trial scoring a charge', () => won, () => plan],
+  ] as [string, () => Run, () => TurretPlanOf][])(
+    'rejects the ended seat for %s',
+    (_, run, planOf) => {
+      const forged = wire(seatOf(run().revisions.at(-1)!.view));
+      const p = planOf();
+      expect(forged.defense.result.won).toBe(true);
+      expect(decodeTurretSeat(wire(forged), p)).not.toBeNull();
+      forged.defense.result.breakdown.charges += TURRET_POINTS.unusedCharge;
+      forged.defense.result.points += TURRET_POINTS.unusedCharge;
+      expect(decodeTurretSeat(forged, p)).toBeNull();
+    },
+  );
 
   it('rejects a lost seat whose result holds a medal, or a running one with a result', () => {
     const forged = wire(seatOf(lost.revisions.at(-1)!.view));
@@ -597,7 +663,7 @@ describe('the turretDefense event', () => {
 
   it.each([
     [
-      'a frag burst with a seventh bomblet',
+      'a frag burst with one bomblet too many',
       'fragBurst',
       (e: Wire) => e.event.bomblets.push(e.event.bomblets[0]),
     ],
@@ -629,7 +695,7 @@ describe('the turretDefense event', () => {
     [
       'a Shockwave numbered past any arsenal',
       'shockwave',
-      (e: Wire) => (e.event.id = TURRET_PLAN_LIMITS.charges + 1),
+      (e: Wire) => (e.event.id = TURRET_PLAN_LIMITS.charges + TURRET_PLAN_LIMITS.waves + 1),
     ],
     ['a Shockwave starting off its entry tick', 'shockwave', (e: Wire) => e.event.startTick++],
     ['a fractional Shockwave start', 'shockwave', (e: Wire) => (e.event.startTick += 0.5)],
@@ -653,7 +719,11 @@ describe('the turretDefense event', () => {
       (e: Wire) => (e.event.bomblets[0].landTick = e.tick),
     ],
     ['a fractional landing tick', 'fragBurst', (e: Wire) => (e.event.bomblets[5].landTick += 0.5)],
-    ['a star index past its bomblets', 'fragBurst', (e: Wire) => (e.event.bomblets[5].index = 6)],
+    [
+      'a star index past its bomblets',
+      'fragBurst',
+      (e: Wire) => (e.event.bomblets[TURRET_BOMBLETS - 1].index = TURRET_BOMBLETS),
+    ],
     ['a frag burst of shot 0', 'fragBurst', (e: Wire) => (e.event.shotId = 0)],
     ['a fractional bomblet index', 'bomblet', (e: Wire) => (e.event.index = 1.5)],
     ['a bomblet past the star', 'bomblet', (e: Wire) => (e.event.index = TURRET_BOMBLETS)],
@@ -667,7 +737,8 @@ describe('the turretDefense event', () => {
     [
       'an end with Shockwaves past any arsenal',
       'ended',
-      (e: Wire) => (e.event.stats.shockwaves = TURRET_PLAN_LIMITS.charges + 1),
+      (e: Wire) =>
+        (e.event.stats.shockwaves = TURRET_PLAN_LIMITS.charges + TURRET_PLAN_LIMITS.waves + 1),
     ],
     ['an end with fractional charges', 'ended', (e: Wire) => (e.event.stats.frags = 1.5)],
   ] as [string, TurretEvent['type'], (e: Wire) => unknown][])('rejects %s', (_, type, forge) => {
@@ -740,5 +811,54 @@ describe('the turretDefense event', () => {
     expect(decodeTurretFeedback(wire(ended))).not.toBeNull();
     forge(ended);
     expect(decodeTurretFeedback(ended)).toBeNull();
+  });
+
+  it("carries a won mission's charges kept as their own term", () => {
+    const end = armed.events.find((e) => e.event.type === 'ended')!;
+    const result = armed.session.defense.result!;
+    expect(result.won).toBe(true);
+    expect(result.breakdown.charges % TURRET_POINTS.unusedCharge).toBe(0);
+    expect(decodeTurretFeedback(wire(end))?.event).toMatchObject({ breakdown: result.breakdown });
+  });
+
+  it.each([
+    [
+      'charges off the points per charge',
+      (e: Wire) => {
+        e.event.breakdown.charges += 1;
+        e.event.points += 1;
+      },
+    ],
+    [
+      'charges kept by a loss',
+      (e: Wire) => {
+        e.event.result = 'lost';
+        e.event.medal = null;
+        e.event.points += TURRET_POINTS.unusedCharge - e.event.breakdown.charges;
+        e.event.breakdown.charges = TURRET_POINTS.unusedCharge;
+      },
+    ],
+    ['a missing charges term', (e: Wire) => delete e.event.breakdown.charges],
+    [
+      'a resupply count past any plan',
+      (e: Wire) => (e.event.stats.resupplies = TURRET_PLAN_LIMITS.waves),
+    ],
+  ])("rejects a mission's end entry with %s", (_, forge) => {
+    const ended = wire(armed.events.find((e) => e.event.type === 'ended'));
+    expect(decodeTurretFeedback(wire(ended))).not.toBeNull();
+    forge(ended);
+    expect(decodeTurretFeedback(ended)).toBeNull();
+  });
+
+  it.each([
+    ['two charges of a weapon', (e: Wire) => (e.event.shockwave = 2)],
+    ['no charge at all', (e: Wire) => (e.event.shockwave = e.event.fragmentation = 0)],
+    ['a negative charge', (e: Wire) => (e.event.fragmentation = -1)],
+    ['a missing weapon', (e: Wire) => delete e.event.fragmentation],
+  ])('rejects a resupply entry with %s', (_, forge) => {
+    const entry = wire(armed.events.find((e) => e.event.type === 'resupply'));
+    expect(decodeTurretFeedback(wire(entry))).not.toBeNull();
+    forge(entry);
+    expect(decodeTurretFeedback(entry)).toBeNull();
   });
 });

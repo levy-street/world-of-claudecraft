@@ -1,5 +1,6 @@
 import type { TreasureMapRarity } from '../sim/content/treasure_maps';
 import type { FactionId } from '../sim/factions';
+import type { PersonalFireAndFlyRecords } from '../sim/fire_and_fly_personal_records';
 import type { FireAndFlyRecruitment } from '../sim/fire_and_fly_recruitment';
 import type {
   QuestProgress,
@@ -79,6 +80,12 @@ export interface IWorldQuests {
    * which trials and missions Master Gunner Alder offers.
    */
   readonly fireAndFlyRecruitment: Readonly<FireAndFlyRecruitment>;
+  /**
+   * This character's own Fire and Fly records (src/sim/fire_and_fly_personal_records.ts),
+   * keyed by scoreboard id: the best run per trial (day and all time) and per mission.
+   * Owner-only, so the Gunnery Board reads its medals without a ladder request.
+   */
+  readonly fireAndFlyRecords: Readonly<PersonalFireAndFlyRecords>;
   canRerollWorldQuest?(questId: string): { canReroll: boolean; reason?: string };
   rerollWorldQuest?(questId: string): boolean;
   questState(questId: string): QuestState;

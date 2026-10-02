@@ -1,11 +1,16 @@
 import { TURRET_TIMING } from '../../../sim/content/turret_defense';
 import type { TurretEvent } from '../../../sim/minigames/turret_defense';
-import type { TurretArsenal } from '../../../sim/minigames/turret_defense_plan';
-import type { TurretMedal } from '../../../sim/minigames/turret_result';
+import { turretChargesGiven } from '../../../sim/minigames/turret_defense_plan';
+import { TURRET_POINTS, type TurretMedal } from '../../../sim/minigames/turret_result';
 import { TICK_RATE } from '../../../sim/types';
 import type { TurretSessionView } from '../../../world_api/vehicles';
 import { fireAndFlyTrialName, isFireAndFlyMission } from '../../fire_and_fly_trial_view';
 import { formatNumber, getI18nRevision, type TranslationKey, t } from '../../i18n';
+import {
+  type TurretWeaponKeys,
+  turretFirstWaveHint,
+  turretResupplyLine,
+} from './turret_arsenal_banner';
 import { TurretFeedbackReader } from './turret_feedback_reader_core';
 
 /** Below this share of the bar, the rail turns to its danger colour. */
@@ -19,10 +24,15 @@ export const TURRET_INTEGRITY_ALERTS = [0.5, LOW_INTEGRITY] as const;
  * gives no charge of leaves its row blank (the painter hides it).
  */
 export const TURRET_RESULT_ROWS = 8;
-/** The result card's points rows: kills, tower kept, keg kills, bowled over, then the total. */
-export const TURRET_POINT_ROWS = 5;
+/**
+ * The result card's points rows: kills, tower kept, keg kills, bowled over, the charges a
+ * mission kept (blank on a trial: the painter hides it), then the total.
+ */
+export const TURRET_POINT_ROWS = 6;
 /** The result card counts down the seat's own leave over its last this many seconds. */
 export const TURRET_LEAVING_COUNTDOWN_SECONDS = 30;
+
+export type { TurretWeaponKeys } from './turret_arsenal_banner';
 
 const MEDAL_KEYS = {
   gold: 'hudChrome.turret.medalGold',
@@ -157,7 +167,10 @@ function integrityBand(share: number): number {
   return band;
 }
 
-/** A weapon's "used / given" row; blank when the trial gives none of it (no points attached). */
+/**
+ * A weapon's "used / given" row (given counts the resupplies so far); blank when the
+ * scenario gives none of it.
+ */
 function fillWeaponRow(row: TurretStatRow, label: string, used: number, given: number): void {
   row.label = given > 0 ? label : '';
   row.value =
@@ -168,7 +181,7 @@ function fillWeaponRow(row: TurretStatRow, label: string, used: number, given: n
 
 function fillResultRows(rows: TurretStatRow[], session: TurretSessionView, tower: string): void {
   const stats = session.defense.stats;
-  const arsenal: TurretArsenal = session.defense.plan.arsenal;
+  const given = turretChargesGiven(session.defense.plan, stats.resupplies);
   const accuracy = stats.shots > 0 ? stats.hits / stats.shots : 0;
   rows[0].label = t('hudChrome.turret.statKills');
   rows[0].value = formatNumber(stats.kills);
@@ -184,8 +197,8 @@ function fillResultRows(rows: TurretStatRow[], session: TurretSessionView, tower
   rows[4].value = t('hudChrome.turret.statSeconds', {
     seconds: formatNumber(stats.longestAirtime, { maximumFractionDigits: 1 }),
   });
-  fillWeaponRow(rows[5], t('hudChrome.turret.statShockwaves'), stats.shockwaves, arsenal.shockwave);
-  fillWeaponRow(rows[6], t('hudChrome.turret.statFrags'), stats.frags, arsenal.fragmentation);
+  fillWeaponRow(rows[5], t('hudChrome.turret.statShockwaves'), stats.shockwaves, given.shockwave);
+  fillWeaponRow(rows[6], t('hudChrome.turret.statFrags'), stats.frags, given.fragmentation);
   rows[7].label = t('hudChrome.turret.tower');
   rows[7].value = tower;
 }
@@ -229,8 +242,14 @@ function fillPoints(
   rows[2].value = addedPoints(breakdown.kegKills);
   rows[3].label = t('hudChrome.turret.pointsBowled', { count: formatNumber(stats.bowled) });
   rows[3].value = addedPoints(breakdown.bowled);
-  rows[4].label = t('hudChrome.turret.pointsTotal');
-  rows[4].value = formatNumber(scored.points);
+  const bonus = session.defense.plan.chargeBonus && scored.won;
+  const charges = breakdown.charges / TURRET_POINTS.unusedCharge;
+  rows[4].label = bonus
+    ? t('hudChrome.turretArsenal.pointsCharges', { count: formatNumber(charges) })
+    : '';
+  rows[4].value = bonus ? addedPoints(breakdown.charges) : '';
+  rows[5].label = t('hudChrome.turret.pointsTotal');
+  rows[5].value = formatNumber(scored.points);
   return true;
 }
 
@@ -406,32 +425,14 @@ export class TurretHudView {
   }
 }
 
-// A later-ranked event wins a batch: the end outranks the last wave's clear it lands with.
+// A later-ranked event wins a batch: the end outranks the last wave's clear it lands with,
+// and a resupply (after its clear) carries the clear's line with its own beneath.
 const BANNER_RANK: Partial<Record<TurretEvent['type'], number>> = {
   waveCleared: 1,
+  resupply: 1,
   waveStart: 2,
   ended: 3,
 };
-
-/** The keys the first wave's banner names for the two weapons; null where there are none (touch). */
-export interface TurretWeaponKeys {
-  shock: string;
-  frag: string;
-}
-
-/**
- * The first wave's subtext: the goal, and the weapons (by key, or the sockets on touch)
- * when the trial gives any and the caller knows the input.
- */
-function firstWaveHint(
-  arsenal: TurretArsenal,
-  keys: (() => TurretWeaponKeys | null) | undefined,
-): string {
-  if (!keys || arsenal.shockwave + arsenal.fragmentation <= 0) return t('hudChrome.turret.hint');
-  const bound = keys();
-  if (!bound) return t('hudChrome.turret.weaponsHintTouch');
-  return t('hudChrome.turret.weaponsHint', { shockKey: bound.shock, fragKey: bound.frag });
-}
 
 function bannerFor(
   event: TurretEvent,
@@ -442,11 +443,17 @@ function bannerFor(
   if (event.type === 'waveStart') {
     const banner: TurretBanner = { text: waveBannerText(event.wave, waveCount) };
     if (event.wave + 1 === waveCount) banner.subtext = t('hudChrome.turret.finalWave');
-    else if (event.wave === 0) banner.subtext = firstWaveHint(session.defense.plan.arsenal, keys);
+    else if (event.wave === 0) banner.subtext = turretFirstWaveHint(session.defense.plan, keys);
     return banner;
   }
   if (event.type === 'waveCleared')
     return { text: t('hudChrome.turret.clearedBanner', { wave: formatNumber(event.wave + 1) }) };
+  if (event.type === 'resupply') {
+    return {
+      text: t('hudChrome.turret.clearedBanner', { wave: formatNumber(event.wave + 1) }),
+      subtext: turretResupplyLine(event),
+    };
+  }
   if (event.type === 'ended') return { text: verdictText(event.result === 'won') };
   return null;
 }

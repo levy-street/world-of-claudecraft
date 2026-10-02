@@ -550,6 +550,22 @@ export const cs_CZ: EnTranslations = {
       "shotTiming": "Cooldown: {cooldown} s. Dopad po {flight} s. Všechny výstřely sdílí {recovery} s zotavení.",
       "shotRules": "Miř do vyznačeného pole. Bez nákladů many. Poškození neroste s výbavou ani talenty."
     },
+    "turretArsenal": {
+      "introShock": "New weapon: the Shockwave, on {shockKey}. It slams the tower and throws back every monster at its foot.",
+      "introShockTouch": "New weapon: the Shockwave. Tap its socket to throw back every monster at the tower's foot.",
+      "introFrag": "New weapon: the Fragmentation Shell, on {fragKey}. Arm it, then fire at a group: it bursts into bomblets over them.",
+      "introFragTouch": "New weapon: the Fragmentation Shell. Tap its socket to arm it, then tap a group: it bursts into bomblets over them.",
+      "shockHint": "Blast the monsters before they reach the tower. {shockKey}: Shockwave.",
+      "shockHintTouch": "Blast the monsters before they reach the tower. Tap the socket for a Shockwave.",
+      "fragHint": "Blast the monsters before they reach the tower. {fragKey}: Fragmentation Shell.",
+      "fragHintTouch": "Blast the monsters before they reach the tower. Tap the socket for a Fragmentation Shell.",
+      "resupplyBoth": "Resupply: {shock} Shockwave, {frag} Fragmentation Shell",
+      "resupplyShock": "Resupply: {shock} Shockwave",
+      "resupplyFrag": "Resupply: {frag} Fragmentation Shell",
+      "resupplyRule": "Each weapon of the mission gains one charge as waves {waves} end.",
+      "bonusRule": "A won mission scores {points} points for each charge left unused.",
+      "pointsCharges": "Charges kept ({count})"
+    },
     "turret": {
       "title": "Fire and Fly",
       "integrity": "Tower integrity",
@@ -603,7 +619,39 @@ export const cs_CZ: EnTranslations = {
       "weaponsHintTouch": "Blast the monsters before they reach the tower. Tap a socket for a Shockwave or a Fragmentation Shell.",
       "statShockwaves": "Shockwaves",
       "statFrags": "Fragmentation Shells",
-      "statUsed": "{used}/{given}"
+      "statUsed": "{used}/{given}",
+      "fragMultiHit": "x{count}"
+    },
+    "gunneryBoard": {
+      "title": "Gunnery Board",
+      "listLabel": "Trials and missions",
+      "trials": "Recruitment",
+      "missions": "Missions",
+      "trialKicker": "Trial",
+      "missionKicker": "Mission",
+      "recruitProgress": "Trials won: {won} of {total}",
+      "recruited": "Recruited",
+      "mastery": "Gunner's Mastery: {stars} of {max} stars",
+      "won": "Won",
+      "notWon": "Not won yet",
+      "locked": "Locked",
+      "arsenal": "Arsenal",
+      "charges": "{weapon} x{count}",
+      "gold": "Gold",
+      "goldBar": "Keep {percent} of the tower",
+      "waves": "Waves",
+      "best": "Your best",
+      "bestRun": "{medal}, {points} points",
+      "notPlayed": "Not played yet",
+      "reward": "Today's reward",
+      "rewardAvailable": "Available",
+      "rewardCollected": "Collected: practice runs only",
+      "takeTrial": "Take the trial",
+      "takeMission": "Take the mission",
+      "practice": "Practice",
+      "actionAria": "{action}: {name}",
+      "lockedTrial": "Win the {previous} to open this trial.",
+      "lockedMission": "Win the {name} to be recruited and open the missions."
     },
     "warlock": {
       "doomLabel": "Odsouzení",
@@ -12648,25 +12696,16 @@ export const cs_CZ: EnTranslations = {
           "brittle": "The Cracked Tower",
           "powder": "The Powder Store"
         },
-        "pitch": {
-          "introduction": "a first watch for a new recruit",
-          "standard": "the real watch on the walls",
-          "hard": "the siege the old hands are tested on",
-          "pack": "they run in packs; make each shell count",
-          "giants": "a few brutes too heavy to throw far",
-          "deluge": "a flood of small, quick beasts",
-          "brittle": "a few blows and the tower falls",
-          "powder": "twice the kegs, right on their path"
-        },
-        "start": "{name}: {detail} (waves: {count})",
-        "practice": "Practice the {name} (waves: {count})",
-        "practiceMission": "{name}: practice run (waves: {count})",
-        "sections": {
-          "trials": "Trials",
-          "missions": "Missions"
-        },
-        "lockedTrial": "{name}: pass the {previous} to open it",
-        "missionsLocked": "Pass the {name} to be recruited and open the missions."
+        "brief": {
+          "introduction": "Every gunner starts here, recruit. Three short waves of small game, wolves, boars, rats and spiders, amble in from all around the tower without much hurry. The tower is fresh from the masons and can take a good many bites.",
+          "standard": "This is the watch my crews stand on the walls every night. Six waves from every side, opening with wolves and boars and climbing through bandits and trolls to ogres, the walking dead and hulks of living stone, and the last one closes on something far bigger than the rest.",
+          "hard": "The siege I put the old hands through before I trust them with a battery. Six waves, tougher than the Standing Watch and heavier on the big brutes, arriving closer together from two or three sides at once or in tight packs. The last one ends on the giant again.",
+          "pack": "In the wild they hunt in packs, and so do these. Six waves, each one coming in tight bunches from one side at a time: wolves and boars first, then painted tribal hunters with their beasts, and at the very end a grey wolf the size of a hay cart.",
+          "giants": "Not many of them this time, but every one is huge: bronze sentinels, brutes of molten rock and colossi of living stone, slow on their feet and very hard to bring down. Six waves, and when one of them reaches the tower it hits like a falling wall.",
+          "deluge": "Dozens of small, quick beasts, wolves, boars, spiders and deeprock tunnelers, pouring in from every side with hardly a gap between them. Six waves of it, like rain off the hills: none of them is tough, but they never stop coming.",
+          "brittle": "This tower took a bad hit last season and the crack never closed: ten blows at most and it comes down. Six waves of the restless dead, bone soldiers, hooded shamblers and shadow hounds, at a steady pace: nothing large, but every strike that lands counts.",
+          "powder": "The powder store is full to the rafters, so I have set twice the usual kegs out there, right on the paths the monsters take. The forge's own come for it over six waves, ember imps, bronze automatons, brutes of molten rock and one thief with a sack, from one side, from two flanks, or in packs."
+        }
       },
       "calligraphyTitle": "Arkánová kaligrafie",
       "traceOutline": "Vyšlápni obrys svými kroky",

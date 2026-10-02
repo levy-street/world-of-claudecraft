@@ -3,6 +3,7 @@
 // loss), and the points that rank runs holding the same medal. Mini-game tuning, not
 // classic-era formulas; a change after boards open mints a new board version.
 
+import { turretChargesLeft } from './turret_charges';
 import type { TurretPhase, TurretStats } from './turret_defense';
 import type { TurretPlan } from './turret_defense_plan';
 
@@ -14,6 +15,8 @@ export interface TurretPointsBreakdown {
   integrity: number;
   kegKills: number;
   bowled: number;
+  /** A won mission's charges left unused; 0 on a trial and on any loss. */
+  charges: number;
 }
 
 export interface TurretResult {
@@ -24,12 +27,21 @@ export interface TurretResult {
 }
 
 /**
- * Points per kill, per tower point still standing, per keg kill and per monster
- * bowled over. Every kill counts the same: a won run killed every monster that did
- * not strike the tower, so the kill term only tells runs apart by their strikes, and
- * the tower term already weighs each strike by the striker's size and health.
+ * Points per kill, per tower point still standing, per keg kill, per monster bowled
+ * over and per charge a won mission leaves unused. Every kill counts the same: a won
+ * run killed every monster that did not strike the tower, so the kill term only tells
+ * runs apart by their strikes, and the tower term already weighs each strike by the
+ * striker's size and health. A charge kept is worth three kills, under a third of a
+ * tower point: spending it where it saves even one tower point pays, spending it where
+ * it saves nothing costs those three kills.
  */
-export const TURRET_POINTS = { kill: 20, integrity: 200, kegKill: 5, bowled: 1 } as const;
+export const TURRET_POINTS = {
+  kill: 20,
+  integrity: 200,
+  kegKill: 5,
+  bowled: 1,
+  unusedCharge: 60,
+} as const;
 
 /**
  * The keg and bowling bonus together stay under one tower point: the fun parts rank
@@ -45,12 +57,21 @@ export function turretMedalBarPoints(share: number, integrity: number): number {
 export interface TurretFinal {
   phase: TurretPhase;
   integrity: number;
-  stats: Pick<TurretStats, 'kills' | 'barrelKills' | 'bowled'>;
+  stats: Pick<
+    TurretStats,
+    'kills' | 'barrelKills' | 'bowled' | 'shockwaves' | 'frags' | 'resupplies'
+  >;
+}
+
+/** The charges a run left unused, the points term a won mission scores. */
+function unusedCharges(plan: Pick<TurretPlan, 'arsenal'>, final: TurretFinal): number {
+  const left = turretChargesLeft({ plan, stats: final.stats });
+  return left.shockwave + left.fragmentation;
 }
 
 /** The medal and the points of a run as it stands; only a won run holds a medal. */
 export function turretResult(
-  plan: Pick<TurretPlan, 'integrity' | 'medals'>,
+  plan: Pick<TurretPlan, 'integrity' | 'medals' | 'arsenal' | 'chargeBonus'>,
   final: TurretFinal,
 ): TurretResult {
   const kept = Math.max(0, Math.min(plan.integrity, final.integrity));
@@ -68,7 +89,13 @@ export function turretResult(
     integrity: kept * TURRET_POINTS.integrity,
     kegKills,
     bowled: Math.min(TURRET_BONUS_CAP - kegKills, final.stats.bowled * TURRET_POINTS.bowled),
+    charges: won && plan.chargeBonus ? unusedCharges(plan, final) * TURRET_POINTS.unusedCharge : 0,
   };
-  const points = breakdown.kills + breakdown.integrity + breakdown.kegKills + breakdown.bowled;
+  const points = turretPointsTotal(breakdown);
   return { won, medal, points, breakdown };
+}
+
+/** The sum of a breakdown's terms: a result's points. */
+export function turretPointsTotal(b: Readonly<TurretPointsBreakdown>): number {
+  return b.kills + b.integrity + b.kegKills + b.bowled + b.charges;
 }

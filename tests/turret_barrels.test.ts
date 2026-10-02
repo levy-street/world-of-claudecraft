@@ -74,6 +74,8 @@ function plan(kinds: TurretKind[], spawns: number[][], barrels = NO_BARRELS): Tu
     integrity: 100,
     medals: TURRET_SCENARIO_STANDARD.medals,
     arsenal: { shockwave: 0, fragmentation: 0 },
+    resupplyWaves: [],
+    chargeBonus: false,
     kinds,
     waves: spawns.map((s) => ({
       spawns: s,
@@ -213,7 +215,7 @@ function fullRun(seed: number, probe: ThrowProbe, maxTicks = 20 * 60 * 15) {
 }
 
 const ENDED_LATER = new Set(['medal', 'points', 'breakdown']);
-const WEAPON_STATS = new Set(['shockwaves', 'frags']);
+const WEAPON_STATS = new Set(['shockwaves', 'frags', 'resupplies']);
 
 /** Drops what the engine gained after these digests: the end's medal and points, and the
  *  limited-weapon stats while they stay 0 (these runs spend no charge; a spent one shows). */

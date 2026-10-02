@@ -149,9 +149,9 @@ describe('fragmentation shell bomblets', () => {
 });
 
 describe('fragmentation shell smoke fairness', () => {
-  // The whole frag burst is one source: the airburst and all six bomblet blasts,
+  // The whole frag burst is one source: the airburst and every bomblet blast,
   // each on the landing schedule the sim's star carries. Without a lingering
-  // cloud of their own, six small blasts never stack past the cap; with the
+  // cloud of their own, the small blasts never stack past the cap; with the
   // shell's cloud each, they would.
   const whole = (low: boolean, cloud: boolean, d: number, hit: number): number => {
     const all: CannonPuff[] = [];

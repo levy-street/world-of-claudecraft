@@ -1,18 +1,21 @@
 // The Fire and Fly weapon sockets' view core: the Shockwave (slot 0) and the
-// fragmentation shell (slot 1) as ActionBarPainter slot states. Charges are the
+// fragmentation shell (slot 1) as ActionBarPainter slot states, each present only
+// when the scenario's arsenal holds that weapon (an absent one has no socket and
+// its key does nothing). Charges are the
 // ones the player should see (the mirror's, less the played clicks still waiting,
 // from the own-shot ledger); a socket is ready only when a click now would be
 // played, so the intro, the pauses between waves, an empty weapon, the Shockwave's
 // rearm and the cannon's reload all read as not ready. The Shockwave's rearm draws
 // the bar's cooldown sweep; the fragmentation shell shows its armed state; the
 // Shockwave pulses gold while enough monsters wind up at the tower (fewer in the
-// first trial). Pure: no DOM.
-import { TURRET_SCENARIO_INTRODUCTION } from '../../../sim/content/fire_and_fly_scenarios';
+// trial that brings it in). Pure: no DOM.
 import { TURRET_SHOCKWAVE } from '../../../sim/content/turret_defense';
+import type { TurretArsenal, TurretPlan } from '../../../sim/minigames/turret_defense_plan';
 import { TICK_RATE } from '../../../sim/types';
 import type { TurretSessionView } from '../../../world_api/vehicles';
 import { formatNumber, getI18nRevision, t } from '../../i18n';
 import { type ActionBarState, makeSlotState } from '../action_bar/action_bar_view';
+import { turretIntroducedWeapon } from './turret_arsenal_banner';
 import type { TurretOwnShotLedger } from './turret_own_shot_core';
 import {
   type TurretWeaponKind,
@@ -25,12 +28,17 @@ import {
 export const TURRET_WEAPON_SLOTS: readonly TurretWeaponKind[] = ['shock', 'frag'];
 /** Monsters winding up a strike at once that make the Shockwave socket pulse. */
 export const TURRET_SHOCK_NUDGE_WINDUPS = 3;
-/** The first trial's few monsters seldom reach three at once, and it is where the Shockwave is learned. */
-export const TURRET_SHOCK_NUDGE_WINDUPS_FIRST_TRIAL = 2;
+/** The trial that brings in the Shockwave is where it is learned: it pulses sooner there. */
+export const TURRET_SHOCK_NUDGE_WINDUPS_LEARNING = 2;
 
-export function turretShockNudgeWindups(scenarioId: string): number {
-  return scenarioId === TURRET_SCENARIO_INTRODUCTION.id
-    ? TURRET_SHOCK_NUDGE_WINDUPS_FIRST_TRIAL
+/** The scenario's arsenal holds this weapon: its socket shows and its key works. */
+export function turretWeaponInArsenal(arsenal: TurretArsenal, weapon: TurretWeaponKind): boolean {
+  return (weapon === 'shock' ? arsenal.shockwave : arsenal.fragmentation) > 0;
+}
+
+export function turretShockNudgeWindups(plan: Pick<TurretPlan, 'scenarioId' | 'arsenal'>): number {
+  return turretIntroducedWeapon(plan) === 'shock'
+    ? TURRET_SHOCK_NUDGE_WINDUPS_LEARNING
     : TURRET_SHOCK_NUDGE_WINDUPS;
 }
 /** The procedural icon keys (src/ui/icons.ts). */
@@ -61,6 +69,7 @@ export class TurretWeaponBarView {
     manySpells: false,
   };
   private readonly charges: number[] = TURRET_WEAPON_SLOTS.map(() => 0);
+  private readonly present: boolean[] = TURRET_WEAPON_SLOTS.map(() => false);
   private windupSession: TurretSessionView | null = null;
   private windupCount = 0;
   private nudgeWindups = TURRET_SHOCK_NUDGE_WINDUPS;
@@ -85,6 +94,11 @@ export class TurretWeaponBarView {
     return this.groupText;
   }
 
+  /** Per slot, the arsenal holds its weapon (as of the last tick): its socket shows. */
+  get presence(): readonly boolean[] {
+    return this.present;
+  }
+
   /** The charges each slot showed on the last tick. */
   chargesAt(slot: number): number {
     return this.charges[slot] ?? 0;
@@ -98,12 +112,13 @@ export class TurretWeaponBarView {
     if (session !== this.windupSession) {
       this.windupSession = session;
       this.windupCount = windups(session);
-      this.nudgeWindups = turretShockNudgeWindups(session.defense.plan.scenarioId);
+      this.nudgeWindups = turretShockNudgeWindups(session.defense.plan);
     }
     for (let i = 0; i < TURRET_WEAPON_SLOTS.length; i++) {
       const weapon = TURRET_WEAPON_SLOTS[i];
       const slot = this.state.slots[i];
       const built = this.built[i];
+      this.present[i] = turretWeaponInArsenal(session.defense.plan.arsenal, weapon);
       const charges = shots.chargesLeft(session, clock, weapon);
       this.charges[i] = charges;
       slot.kind = 'ability';

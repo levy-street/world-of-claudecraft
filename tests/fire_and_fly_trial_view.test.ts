@@ -30,7 +30,6 @@ import {
 } from '../src/ui/fire_and_fly_trial_view';
 import { TurretHudView } from '../src/ui/hud/vehicle/turret_hud_view';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
-import { fireAndFlyTrialChoices } from '../src/ui/world_quest_fire_and_fly_view';
 import type { TurretSessionView } from '../src/world_api/vehicles';
 
 function seatFor(scenario: TurretScenarioDef): TurretSession {
@@ -75,20 +74,9 @@ describe('the Fire and Fly trial name', () => {
     expect(FIRE_AND_FLY_SCENARIOS).toHaveLength(TURRET_SCENARIOS.length + TURRET_MISSIONS.length);
     for (const scenario of FIRE_AND_FLY_SCENARIOS) {
       expect(fireAndFlyTrialName(scenario.id)).toBeTruthy();
-      expect(t(FIRE_AND_FLY_TRIAL_TEXT[scenario.boardKey].pitch)).toBeTruthy();
+      expect(t(FIRE_AND_FLY_TRIAL_TEXT[scenario.boardKey].brief)).toBeTruthy();
     }
     for (const scenario of TURRET_SCENARIOS) expect(isFireAndFlyMission(scenario.id)).toBe(false);
-  });
-
-  it("gives the instructor's buttons the same names, from the one table", () => {
-    const choices = fireAndFlyTrialChoices(false);
-    expect(choices.map((c) => c.key)).toEqual(TURRET_SCENARIOS.map((s) => s.boardKey));
-    for (const scenario of TURRET_SCENARIOS) {
-      const text = FIRE_AND_FLY_TRIAL_TEXT[scenario.boardKey];
-      const label = choices.find((c) => c.key === scenario.boardKey)!.label;
-      expect(label).toContain(fireAndFlyTrialName(scenario.id)!);
-      expect(label).toContain(t(text.pitch));
-    }
   });
 
   it('has no name for an unknown scenario or a board key without a trial', () => {

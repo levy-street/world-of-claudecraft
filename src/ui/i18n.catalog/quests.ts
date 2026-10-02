@@ -345,15 +345,14 @@ const questStringsEn = {
         medals: { gold: 'Gold', silver: 'Silver', bronze: 'Bronze' },
       },
       // Fire and Fly at the Evergarden gate: Master Gunner Alder recruits defenders
-      // for the ramparts and tests each one first. The trials are the scenarios:
-      // {name} is a trial's name, {detail} its one-line brief, {count} its wave count.
+      // for the ramparts and tests each one first. The trials are the scenarios.
       fireAndFly: {
         title: "The Gunner's Trials",
         objective: 'Hold a tower of your own through every wave of one trial',
         ready: 'Speak to Master Gunner Alder to take a trial.',
         complete: 'Tower held! Speak to Master Gunner Alder to practice.',
         // The trials, then the missions a recruit takes for the gate (named in
-        // docs/design/naming-audit.md); each pitch is Alder's one line for it.
+        // docs/design/naming-audit.md).
         scenarios: {
           introduction: "Recruit's Trial",
           standard: 'Standing Watch',
@@ -364,25 +363,24 @@ const questStringsEn = {
           brittle: 'The Cracked Tower',
           powder: 'The Powder Store',
         },
-        pitch: {
-          introduction: 'a first watch for a new recruit',
-          standard: 'the real watch on the walls',
-          hard: 'the siege the old hands are tested on',
-          pack: 'they run in packs; make each shell count',
-          giants: 'a few brutes too heavy to throw far',
-          deluge: 'a flood of small, quick beasts',
-          brittle: 'a few blows and the tower falls',
-          powder: 'twice the kegs, right on their path',
+        // Alder's brief for each, on the Gunnery Board: what to expect (the monsters,
+        // how they arrive, the tower's state, the special rule), never advice.
+        brief: {
+          introduction:
+            'Every gunner starts here, recruit. Three short waves of small game, wolves, boars, rats and spiders, amble in from all around the tower without much hurry. The tower is fresh from the masons and can take a good many bites.',
+          standard:
+            'This is the watch my crews stand on the walls every night. Six waves from every side, opening with wolves and boars and climbing through bandits and trolls to ogres, the walking dead and hulks of living stone, and the last one closes on something far bigger than the rest.',
+          hard: 'The siege I put the old hands through before I trust them with a battery. Six waves, tougher than the Standing Watch and heavier on the big brutes, arriving closer together from two or three sides at once or in tight packs. The last one ends on the giant again.',
+          pack: 'In the wild they hunt in packs, and so do these. Six waves, each one coming in tight bunches from one side at a time: wolves and boars first, then painted tribal hunters with their beasts, and at the very end a grey wolf the size of a hay cart.',
+          giants:
+            'Not many of them this time, but every one is huge: bronze sentinels, brutes of molten rock and colossi of living stone, slow on their feet and very hard to bring down. Six waves, and when one of them reaches the tower it hits like a falling wall.',
+          deluge:
+            'Dozens of small, quick beasts, wolves, boars, spiders and deeprock tunnelers, pouring in from every side with hardly a gap between them. Six waves of it, like rain off the hills: none of them is tough, but they never stop coming.',
+          brittle:
+            'This tower took a bad hit last season and the crack never closed: ten blows at most and it comes down. Six waves of the restless dead, bone soldiers, hooded shamblers and shadow hounds, at a steady pace: nothing large, but every strike that lands counts.',
+          powder:
+            "The powder store is full to the rafters, so I have set twice the usual kegs out there, right on the paths the monsters take. The forge's own come for it over six waves, ember imps, bronze automatons, brutes of molten rock and one thief with a sack, from one side, from two flanks, or in packs.",
         },
-        start: '{name}: {detail} (waves: {count})',
-        practice: 'Practice the {name} (waves: {count})',
-        // A mission's name carries its own article: {name} is a whole title.
-        practiceMission: '{name}: practice run (waves: {count})',
-        sections: { trials: 'Trials', missions: 'Missions' },
-        // {name} is the locked trial, {previous} the trial whose win opens it.
-        lockedTrial: '{name}: pass the {previous} to open it',
-        // {name} is the last trial's name.
-        missionsLocked: 'Pass the {name} to be recruited and open the missions.',
       },
       calligraphyTitle: 'Arcane Calligraphy',
       traceOutline: 'Trace the outline with your footsteps',

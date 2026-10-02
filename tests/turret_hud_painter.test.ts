@@ -22,10 +22,11 @@ import {
 import { TurretHudView } from '../src/ui/hud/vehicle/turret_hud_view';
 import { setLanguage } from '../src/ui/i18n';
 import { makeWriterFacet } from '../src/ui/painter_host';
+import { resolveArmedTurretPlan } from './helpers/turret_armed_plan';
 
 const START = 300;
 
-function seat(plan = resolveTurretPlan()): TurretSession {
+function seat(plan = resolveArmedTurretPlan()): TurretSession {
   return {
     kind: 'turret',
     origin: { x: 0, y: 0, z: 0 },
@@ -243,7 +244,7 @@ describe('the turret HUD painter', () => {
   it('names the medal beside its tinted disc and lists the points, then writes nothing more', () => {
     const { painter, writes, view } = rig();
     painter.show(true);
-    const won = ended('won', 97);
+    const won = ended('won', 99);
     painter.paint(view.tick(turretSessionView(won), START), 'Esc');
     const medal = painter.strip.querySelector<HTMLElement>('.turret-card-medal')!;
     const icon = medal.querySelector<HTMLElement>('.turret-card-medal-icon')!;
@@ -261,15 +262,19 @@ describe('the turret HUD painter', () => {
       ]),
     ).toEqual([
       ['Kills (71)', '+1,420'],
-      ['Tower kept (97)', '+19,400'],
+      ['Tower kept (99)', '+19,800'],
       ['Keg kills (0)', '0'],
       ['Bowled over (0)', '0'],
-      ['Total points', '20,820'],
+      ['', ''],
+      ['Total points', '21,220'],
     ]);
+    // A trial scores no charge kept: its row is hidden, the total stays the last row.
+    const rows = [...points.querySelectorAll<HTMLElement>('.ui-stat-row')];
+    expect(rows.map((row) => row.style.display)).toEqual(['', '', '', '', 'none', '']);
     expect(points.lastElementChild!.classList.contains('turret-card-total')).toBe(true);
-    const view97 = turretSessionView(won);
+    const view99 = turretSessionView(won);
     writes.mockClear();
-    for (let i = 0; i < 10; i++) painter.paint(view.tick(view97, START + i), 'Esc');
+    for (let i = 0; i < 10; i++) painter.paint(view.tick(view99, START + i), 'Esc');
     expect(writes).not.toHaveBeenCalled();
 
     painter.paint(view.tick(turretSessionView(ended('won', 70)), START), 'Esc');

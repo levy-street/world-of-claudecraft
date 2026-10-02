@@ -1,13 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
 import { FCT_MAX_CONCURRENT_LOW } from '../src/game/ui_tier_knobs';
-import { TURRET_SIZE_CLASSES } from '../src/sim/content/turret_defense';
+import { TURRET_FRAGMENTATION, TURRET_SIZE_CLASSES } from '../src/sim/content/turret_defense';
 import type { TurretEvent, TurretHit } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import type { TurretFeedback } from '../src/sim/minigames/turret_feedback';
+import { TURRET_BOMBLETS } from '../src/sim/minigames/turret_fragmentation';
 import { describeFct, FCT_ANCHOR_HEAD_OFFSET, type FctEvent } from '../src/ui/fct_core';
 import {
+  TURRET_MULTI_HIT_MIN,
   TurretDamageNumbers,
   turretDamageText,
+  turretMultiHitText,
 } from '../src/ui/hud/vehicle/turret_damage_numbers_core';
 import type { TurretSessionView } from '../src/world_api/vehicles';
 
@@ -192,5 +195,111 @@ describe('Fire and Fly damage numbers', () => {
     const largest = Math.max(...PLAN.waves.map((w) => w.spawns.length));
     expect(largest).toBeGreaterThan(1);
     expect(largest).toBeLessThanOrEqual(FCT_MAX_CONCURRENT_LOW);
+  });
+});
+
+describe('the fragmentation shell multi-hit callout', () => {
+  const BURST = { x: 6, y: 9, z: 30 };
+  const fragBurst = (shotId: number): TurretEvent => ({
+    type: 'fragBurst',
+    shotId,
+    ...BURST,
+    bomblets: [],
+  });
+  const bomblet = (shotId: number, index: number, ...ids: number[]): TurretEvent => ({
+    type: 'bomblet',
+    shotId,
+    index,
+    x: BURST.x,
+    y: 0,
+    z: BURST.z,
+    hits: ids.map((id) => hit(id, 0.5, 10)),
+  });
+  /** A frag's whole feedback: its burst, then each bomblet striking the ids given for it. */
+  function frag(shotId: number, struck: number[][], seq = 1, tick = 10): TurretFeedback[] {
+    const out = [entry(seq, tick, fragBurst(shotId))];
+    for (let i = 0; i < TURRET_BOMBLETS; i++) {
+      out.push(entry(seq + 1 + i, tick + 4 + i, bomblet(shotId, i, ...(struck[i] ?? []))));
+    }
+    return out;
+  }
+  const callouts = (spawned: { event: FctEvent }[]) =>
+    spawned.filter((s) => s.event.text.startsWith('x'));
+
+  it('pops one xN over the burst once its last bomblet lands, for six distinct monsters or more', () => {
+    expect(TURRET_MULTI_HIT_MIN).toBe(6);
+    const { numbers, spawned } = rig();
+    const ring = frag(5, [[1, 2], [2, 3], [], [4], [1], [5, 6]]);
+    numbers.update(session(ring.slice(0, -1)), 20);
+    expect(callouts(spawned)).toEqual([]);
+    numbers.update(session(ring), 21);
+    const pops = callouts(spawned);
+    expect(pops).toHaveLength(1);
+    expect(pops[0].event).toMatchObject({
+      kind: 'damage-done-ability',
+      text: turretMultiHitText(6),
+      crit: true,
+      isSelf: false,
+    });
+    expect(turretMultiHitText(4)).toBe('x4');
+    const anchor = describeFct(pops[0].event, 0.5).anchor;
+    expect(anchor.x).toBe(BURST.x);
+    expect(anchor.y).toBeCloseTo(BURST.y, 12);
+    expect(anchor.z).toBe(BURST.z);
+    expect(BURST.y - TURRET_FRAGMENTATION.burstHeight).toBe(5);
+  });
+
+  it('counts each monster once, however many bomblets struck it', () => {
+    const { numbers, spawned } = rig();
+    numbers.update(session(frag(5, [[1], [1, 2], [2, 3], [3, 4], [1, 2, 5]])), 30);
+    expect(callouts(spawned)).toEqual([]);
+  });
+
+  it('pops once per shell, however often the same view is read', () => {
+    const { numbers, spawned } = rig();
+    const ring = frag(5, [[1, 2, 3, 4, 5, 6]]);
+    numbers.update(session(ring), 30);
+    numbers.update(session(ring), 30);
+    numbers.update(session(ring), 31);
+    expect(callouts(spawned).map((s) => s.event.text)).toEqual(['x6']);
+  });
+
+  it('keeps two frags apart, each with its own tally', () => {
+    const { numbers, spawned } = rig();
+    const a = frag(5, [
+      [1, 2],
+      [3, 4],
+      [5, 6],
+    ]);
+    const b = frag(6, [[7, 8, 9, 10, 11, 12, 13]], a.length + 1);
+    // Interleaved, as two frags a reload apart land.
+    numbers.update(session([...a.slice(0, 3), ...b.slice(0, 2), ...a.slice(3), ...b.slice(2)]), 30);
+    expect(callouts(spawned).map((s) => s.event.text)).toEqual(['x6', 'x7']);
+  });
+
+  it('pops nothing for a shell whose last bomblet is stale at its first read, or never landed', () => {
+    const { numbers, spawned } = rig();
+    numbers.update(session(frag(5, [[1, 2, 3, 4, 5, 6]])), 40);
+    expect(callouts(spawned)).toEqual([]);
+    // A run that ended between bomblets drops the rest: no callout, and the tally is let go.
+    const cut = frag(6, [[1, 2, 3, 4, 5, 6]], 1, 100).slice(0, 3);
+    numbers.update(session(cut, 1), 106);
+    const next = frag(7, [[1, 2, 3, 4, 5, 6]], 4, 200);
+    numbers.update(session([...cut, ...next], 1), 211);
+    expect(callouts(spawned).map((s) => s.event.text)).toEqual(['x6']);
+    // Shot 6's tally was let go at shot 7's burst: its last bomblet, read fresh, pops nothing.
+    const last = entry(4 + next.length, 212, bomblet(6, TURRET_BOMBLETS - 1));
+    numbers.update(session([...cut, ...next, last], 1), 212);
+    expect(callouts(spawned).map((s) => s.event.text)).toEqual(['x6']);
+  });
+
+  it('starts over with a new seat', () => {
+    const { numbers, spawned } = rig();
+    const old = frag(5, [[1, 2, 3, 4]]).slice(0, 4);
+    numbers.update(session(old), 14);
+    // The new seat joined after its frag burst: the old seat's tally of shot 5 is gone.
+    const fresh = frag(5, [[], [], [], [], [], [], [], [5, 6, 7]], 1, 60).slice(1);
+    numbers.update(session(fresh, 50), 71);
+    expect(callouts(spawned)).toEqual([]);
   });
 });

@@ -34,6 +34,7 @@ import {
 import {
   FIRE_AND_FLY_MASTERY_BOARD_ID,
   FIRE_AND_FLY_SCOREBOARD_MISSIONS,
+  fireAndFlyScoreboardId,
 } from '../src/sim/fire_and_fly_scoreboards';
 import { turretResult } from '../src/sim/minigames/turret_result';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
@@ -73,7 +74,7 @@ function winSeat(sim: Sim, meta: PlayerMeta, share = 1, kills = 20): SimEvent[] 
   defense.result = turretResult(defense.plan, {
     phase: 'won',
     integrity,
-    stats: { kills, barrelKills: 0, bowled: 0 },
+    stats: { kills, barrelKills: 0, bowled: 0, shockwaves: 0, frags: 0, resupplies: 0 },
   });
   const events = [...sim.tick(), ...sim.tick()];
   sim.leaveVehicle();
@@ -191,7 +192,7 @@ describe('the instructor enforces the recruitment', () => {
     defense.result = turretResult(defense.plan, {
       phase: 'lost',
       integrity: 0,
-      stats: { kills: 1, barrelKills: 0, bowled: 0 },
+      stats: { kills: 1, barrelKills: 0, bowled: 0, shockwaves: 0, frags: 0, resupplies: 0 },
     });
     sim.tick();
     sim.leaveVehicle();
@@ -249,6 +250,24 @@ describe('the recruitment is kept', () => {
     client.resetQuestWorldWireState();
     expect(client.fireAndFlyRecruitment).toEqual(freshFireAndFlyRecruitment());
   });
+
+  it("mirrors the owner's records from the ffrec self key, as the offline world reads them", () => {
+    const board = fireAndFlyScoreboardId(TURRET_MISSIONS[0].id, 'lifetime')!;
+    const row = { metric: 20_900, medal: 'gold' as const, day: '2030-01-02' };
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    sim.meta(sim.playerId)!.fireAndFlyRecords[board] = { ...row };
+    expect(sim.fireAndFlyRecords).toEqual({ [board]: row });
+
+    const client = new QuestWorldWireState();
+    expect(client.fireAndFlyRecords).toEqual({});
+    client.applyQuestSelfSnapshot({ ffrec: { [board]: row, not_a_board: row } });
+    expect(client.fireAndFlyRecords).toEqual({ [board]: row });
+    expect(Object.isFrozen(client.fireAndFlyRecords)).toBe(true);
+    client.applyQuestSelfSnapshot({});
+    expect(client.fireAndFlyRecords).toEqual({ [board]: row });
+    client.resetQuestWorldWireState();
+    expect(client.fireAndFlyRecords).toEqual({});
+  });
 });
 
 describe('the day reward and the mission scores', () => {
@@ -282,7 +301,7 @@ describe('the day reward and the mission scores', () => {
   it("scores a mission on its lifetime board only and sums the character's Gunner's Mastery", () => {
     const { sim, meta } = recruited();
     pick(sim, PACK);
-    const first = winSeat(sim, meta, 0.97);
+    const first = winSeat(sim, meta, 0.99);
     const scored = first.filter((e) => e.type === 'worldQuestScore');
     expect(scored).toEqual([
       expect.objectContaining({ board: 'fire_and_fly_pack_v1_lifetime', medal: 'gold' }),

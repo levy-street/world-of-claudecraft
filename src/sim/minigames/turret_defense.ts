@@ -44,7 +44,12 @@ import {
   turretSpawnBearing,
 } from './turret_barrels';
 import { resolveTurretBowling } from './turret_bowling';
-import { type TurretKind, type TurretPlan, turretChargesLeft } from './turret_defense_plan';
+import {
+  type TurretKind,
+  type TurretPlan,
+  turretChargesLeft,
+  turretResupplyAfter,
+} from './turret_defense_plan';
 import { TURRET_STREAM, type TurretRunKey, turretDraw, turretRunKey } from './turret_defense_rng';
 import {
   burstTurretFrag,
@@ -135,6 +140,8 @@ export interface TurretStats {
   /** Limited-weapon charges spent: Shockwaves, and fragmentation shells (each also a shot). */
   shockwaves: number;
   frags: number;
+  /** Resupplies the run has had: each gave one charge of every weapon its arsenal holds. */
+  resupplies: number;
 }
 
 export interface TurretDefenseState {
@@ -312,6 +319,8 @@ export type TurretEvent =
   | { type: 'barrelLit'; id: number; x: number; y: number; z: number; fuseTicks: number }
   | { type: 'barrelExploded'; id: number; x: number; y: number; z: number; hits: TurretHit[] }
   | { type: 'waveCleared'; wave: number }
+  /** A cleared wave's resupply: the charges each weapon gained. */
+  | { type: 'resupply'; wave: number; shockwave: number; fragmentation: number }
   | {
       type: 'ended';
       result: 'won' | 'lost';
@@ -376,6 +385,7 @@ export function createTurretDefense(
       barrelKills: 0,
       shockwaves: 0,
       frags: 0,
+      resupplies: 0,
     },
     result: null,
     ...(salt ? { runKey: turretRunKey(salt, seed >>> 0) } : {}),
@@ -1146,6 +1156,12 @@ function checkWaveCleared(state: TurretDefenseState, tick: number, events: Turre
   if (state.wave >= state.plan.waves.length - 1) {
     win(state, events);
     return;
+  }
+  const grant = turretResupplyAfter(state.plan, state.wave);
+  if (grant) {
+    state.stats.resupplies++;
+    if (grant.shockwave + grant.fragmentation > 0)
+      events.push({ type: 'resupply', wave: state.wave, ...grant });
   }
   state.phase = 'between';
   state.phaseEndTick = tick + TURRET_TIMING.betweenTicks;

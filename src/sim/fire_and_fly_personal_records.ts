@@ -25,12 +25,16 @@ export type PersonalFireAndFlyRecords = Record<string, PersonalFireAndFlyRecord>
 
 /**
  * The most points a run can hold on a plan the resolver accepts: every kill of the
- * most spawns a plan may carry, the whole of the largest tower, and the bonus cap.
- * Mirrors TURRET_PLAN_LIMITS (minigames/turret_defense_plan.ts), kept as literals so
- * the ladder modules stay clear of the content tables that plan module reads.
+ * most spawns a plan may carry, the whole of the largest tower, the bonus cap, and
+ * both weapons' most charges plus a resupply after every wave, all unused. Mirrors
+ * TURRET_PLAN_LIMITS (minigames/turret_defense_plan.ts), kept as literals so the
+ * ladder modules stay clear of the content tables that plan module reads.
  */
 export const FIRE_AND_FLY_MAX_POINTS =
-  64 * 256 * TURRET_POINTS.kill + 100_000 * TURRET_POINTS.integrity + TURRET_BONUS_CAP;
+  64 * 256 * TURRET_POINTS.kill +
+  100_000 * TURRET_POINTS.integrity +
+  TURRET_BONUS_CAP +
+  2 * (99 + 64) * TURRET_POINTS.unusedCharge;
 
 /** A scored run: a medal (only a win scores) and whole points within the bound. */
 export function fireAndFlyScoreValid(medal: unknown, points: unknown): boolean {

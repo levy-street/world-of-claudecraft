@@ -114,6 +114,35 @@ export const hudChromeStrings = {
     shotRules:
       'Aim inside the marked field. No mana cost. Damage does not scale with gear or talents.',
   },
+  // Fire and Fly's arsenals per scenario: the first wave's banner subtext presenting the
+  // weapon a trial brings in or naming the keys of the weapons a scenario gives
+  // ({shockKey} and {fragKey} are the player's own bindings; touch has no keys), a
+  // mission's resupply line under a cleared wave ({shock} and {frag} are the charges
+  // gained, signed), the weapon tooltips' supply rules ({waves} a list of wave numbers,
+  // {points} the points per charge) and the result card's row for the charges a won
+  // mission kept ({count} of them).
+  turretArsenal: {
+    introShock:
+      'New weapon: the Shockwave, on {shockKey}. It slams the tower and throws back every monster at its foot.',
+    introShockTouch:
+      "New weapon: the Shockwave. Tap its socket to throw back every monster at the tower's foot.",
+    introFrag:
+      'New weapon: the Fragmentation Shell, on {fragKey}. Arm it, then fire at a group: it bursts into bomblets over them.',
+    introFragTouch:
+      'New weapon: the Fragmentation Shell. Tap its socket to arm it, then tap a group: it bursts into bomblets over them.',
+    shockHint: 'Blast the monsters before they reach the tower. {shockKey}: Shockwave.',
+    shockHintTouch:
+      'Blast the monsters before they reach the tower. Tap the socket for a Shockwave.',
+    fragHint: 'Blast the monsters before they reach the tower. {fragKey}: Fragmentation Shell.',
+    fragHintTouch:
+      'Blast the monsters before they reach the tower. Tap the socket for a Fragmentation Shell.',
+    resupplyBoth: 'Resupply: {shock} Shockwave, {frag} Fragmentation Shell',
+    resupplyShock: 'Resupply: {shock} Shockwave',
+    resupplyFrag: 'Resupply: {frag} Fragmentation Shell',
+    resupplyRule: 'Each weapon of the mission gains one charge as waves {waves} end.',
+    bonusRule: 'A won mission scores {points} points for each charge left unused.',
+    pointsCharges: 'Charges kept ({count})',
+  },
   // Fire and Fly, the turret-defense mini-game: the seat's status strip, its tower rail,
   // its banners, its screen-reader announcements and its result card.
   turret: {
@@ -190,6 +219,46 @@ export const hudChromeStrings = {
     statShockwaves: 'Shockwaves',
     statFrags: 'Fragmentation Shells',
     statUsed: '{used}/{given}',
+    // The pop over a fragmentation shell's burst when its bomblets struck {count} distinct
+    // monsters (four or more): a multiplier, like a combo counter.
+    fragMultiHit: 'x{count}',
+  },
+  // Master Gunner Alder's Gunnery Board (src/ui/hud/quest/gunnery_board_*): the trials
+  // and missions on its left with their best medal, the picked one's brief and facts on
+  // its right, one action under them. {won}/{total} count trials, {stars}/{max} the
+  // Gunner's Mastery stars, {weapon} a tower weapon's name, {percent} the share of the
+  // tower a gold run keeps, {medal} a medal's name, {name} a trial or mission.
+  gunneryBoard: {
+    title: 'Gunnery Board',
+    listLabel: 'Trials and missions',
+    trials: 'Recruitment',
+    missions: 'Missions',
+    trialKicker: 'Trial',
+    missionKicker: 'Mission',
+    recruitProgress: 'Trials won: {won} of {total}',
+    recruited: 'Recruited',
+    mastery: "Gunner's Mastery: {stars} of {max} stars",
+    // A trial the recruitment counts as won with no ladder row to name its medal.
+    won: 'Won',
+    notWon: 'Not won yet',
+    locked: 'Locked',
+    arsenal: 'Arsenal',
+    charges: '{weapon} x{count}',
+    gold: 'Gold',
+    goldBar: 'Keep {percent} of the tower',
+    waves: 'Waves',
+    best: 'Your best',
+    bestRun: '{medal}, {points} points',
+    notPlayed: 'Not played yet',
+    reward: "Today's reward",
+    rewardAvailable: 'Available',
+    rewardCollected: 'Collected: practice runs only',
+    takeTrial: 'Take the trial',
+    takeMission: 'Take the mission',
+    practice: 'Practice',
+    actionAria: '{action}: {name}',
+    lockedTrial: 'Win the {previous} to open this trial.',
+    lockedMission: 'Win the {name} to be recruited and open the missions.',
   },
   warlock: {
     doomLabel: 'Condemnation',

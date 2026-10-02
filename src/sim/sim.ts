@@ -298,6 +298,7 @@ import { applyKnockback as applyKnockbackImpl } from './knockback';
 import {
   type DeedsLeaderboardPage,
   type DevLeaderboardPage,
+  emptyDailyRewardLeaderboardPage,
   type GuildLeaderboardPage,
   type GuildRosterInfo,
   LEADERBOARD_PAGE_SIZE,
@@ -4604,14 +4605,7 @@ export class Sim {
     page = 0,
     pageSize = LEADERBOARD_PAGE_SIZE,
   ): Promise<DailyRewardLeaderboardPage> {
-    return Promise.resolve({
-      day: '1970-01-01',
-      leaders: [],
-      page: Math.max(0, Math.floor(page)),
-      pageCount: 1,
-      total: 0,
-      pageSize,
-    });
+    return Promise.resolve(emptyDailyRewardLeaderboardPage(page, pageSize));
   }
   async spinDailyReward(): Promise<DailyRewardSpinResult> {
     const status = await this.dailyRewards();
@@ -4665,6 +4659,9 @@ export class Sim {
   }
   get fireAndFlyRecruitment() {
     return this.primary.fireAndFlyRecruitment;
+  }
+  get fireAndFlyRecords() {
+    return this.primary.fireAndFlyRecords;
   }
   canRerollWorldQuest(questId: string, pid?: number): { canReroll: boolean; reason?: string } {
     const meta = pid !== undefined ? this.players.get(pid) : this.primary;

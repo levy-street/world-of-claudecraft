@@ -2,13 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { FIRE_AND_FLY_SCENARIOS } from '../src/sim/content/fire_and_fly_scenarios';
 import { TURRET_EXPLOSIVE_BARREL, TURRET_WEAPON } from '../src/sim/content/turret_defense';
 import type { TurretEvent } from '../src/sim/minigames/turret_defense';
-import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
+import { resolveTurretPlan, turretChargesGiven } from '../src/sim/minigames/turret_defense_plan';
 import {
   recordTurretFeedback,
   TURRET_FEEDBACK_LIMIT,
   type TurretFeedback,
   turretFeedbackSince,
 } from '../src/sim/minigames/turret_feedback';
+import { TURRET_BOMBLETS, turretFragBomblets } from '../src/sim/minigames/turret_fragmentation';
 
 const event = (wave: number): TurretEvent => ({ type: 'waveStart', wave, count: 1 });
 
@@ -32,11 +33,16 @@ describe('the turret feedback ring', () => {
     const w = TURRET_WEAPON;
     const shells = Math.ceil((w.maxFlightTicks - w.minFlightTicks + 1) / w.cooldownTicks);
     expect(shells).toBe(2);
+    // A frag's star lands one bomblet a tick, however many it holds: one per frag per tick.
+    const landings = turretFragBomblets(0, 0, 0, 1, 0).map((b) => b.landTick);
+    expect(new Set(landings).size).toBe(TURRET_BOMBLETS);
     // Per plan: every landing shell's impact (a frag's burst is one event more, with no blast
-    // of its own), a bomblet of every frag shell of the arsenal (each frag lands one a tick),
+    // of its own), a bomblet of every frag shell a run holds, its resupplies included (each
+    // frag lands one a tick),
     // the Shockwave's front and every barrel its cap lets stand blasting on one tick, each then
     // a launch and a kill per body of its widest wave, every barrel lit once, and per knock a
-    // bowled, launch and kill; a seat's actions between two ticks add a shot and a slam.
+    // bowled, launch and kill; a seat's actions between two ticks add a shot and a slam, and
+    // the blast that clears the wave adds its clear and the resupply or the end after it.
     const bursts = FIRE_AND_FLY_SCENARIOS.map((scenario) => {
       const plan = resolveTurretPlan(scenario);
       const widest = Math.max(...plan.waves.map((wave) => wave.spawns.length));
@@ -44,24 +50,26 @@ describe('the turret feedback ring', () => {
         ...plan.waves.map((wave) => wave.barrels.cap ?? TURRET_EXPLOSIVE_BARREL.cap),
       );
       const front = plan.arsenal.shockwave > 0 ? 1 : 0;
-      const blasts = shells + plan.arsenal.fragmentation + front + cap;
-      const burst = blasts * (1 + widest * 2) + shells + cap + widest * 3 + 1 + front;
+      const frags = turretChargesGiven(plan, plan.resupplyWaves.length).fragmentation;
+      const blasts = shells + frags + front + cap;
+      const burst = blasts * (1 + widest * 2) + shells + cap + widest * 3 + 1 + front + 2;
       return [scenario.boardKey, burst] as const;
     });
-    // The Deluge's 24-monster waves set the bound; the Powder Store's 12 standing kegs come next.
+    // The Powder Store's 12 standing kegs set the bound beside its resupplied frags; The
+    // Deluge's 24-monster waves come next.
     expect(Object.fromEntries(bursts)).toEqual({
-      introduction: 265,
-      standard: 454,
-      hard: 508,
-      pack: 562,
-      giants: 211,
-      deluge: 670,
-      brittle: 400,
-      powder: 658,
+      introduction: 342,
+      standard: 357,
+      hard: 547,
+      pack: 686,
+      giants: 213,
+      deluge: 721,
+      brittle: 402,
+      powder: 726,
     });
     const burst = Math.max(...bursts.map(([, n]) => n));
     expect(TURRET_FEEDBACK_LIMIT).toBeGreaterThanOrEqual(burst);
-    expect(TURRET_FEEDBACK_LIMIT).toBe(672);
+    expect(TURRET_FEEDBACK_LIMIT).toBe(726);
     const ring: TurretFeedback[] = [];
     recordTurretFeedback(
       ring,

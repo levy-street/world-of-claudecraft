@@ -61,6 +61,8 @@ function plan(k: TurretKind, count: number, shockwave = 2): TurretPlan {
     integrity: 100,
     medals: TURRET_SCENARIO_STANDARD.medals,
     arsenal: { shockwave, fragmentation: 0 },
+    resupplyWaves: [],
+    chargeBonus: false,
     kinds: [k],
     waves: [
       {
@@ -398,11 +400,15 @@ describe('charges and the rearm', () => {
 
   it('counts no charge below zero, whatever the stats claim', () => {
     const base = { plan: { arsenal: { shockwave: 2, fragmentation: 3 } } };
-    expect(turretChargesLeft({ ...base, stats: { shockwaves: 5, frags: 4 } })).toEqual({
+    expect(
+      turretChargesLeft({ ...base, stats: { shockwaves: 5, frags: 4, resupplies: 0 } }),
+    ).toEqual({
       shockwave: 0,
       fragmentation: 0,
     });
-    expect(turretChargesLeft({ ...base, stats: { shockwaves: 1, frags: 0 } })).toEqual({
+    expect(
+      turretChargesLeft({ ...base, stats: { shockwaves: 1, frags: 0, resupplies: 0 } }),
+    ).toEqual({
       shockwave: 1,
       fragmentation: 3,
     });

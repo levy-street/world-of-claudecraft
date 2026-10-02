@@ -2,17 +2,22 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { turretPlanWireJson, turretStateWireJson } from '../server/turret_self_wire';
 import { decodeTurretPlan, decodeTurretSeat } from '../src/net/turret_session_wire';
 import {
+  TURRET_MISSION_DELUGE,
+  TURRET_MISSION_GIANTS,
+  TURRET_MISSION_PACK,
+} from '../src/sim/content/fire_and_fly_missions';
+import {
   TURRET_SCENARIO_HARD,
   TURRET_SCENARIO_INTRODUCTION,
   TURRET_SCENARIO_STANDARD,
 } from '../src/sim/content/fire_and_fly_scenarios';
 import { TURRET_TIMING } from '../src/sim/content/turret_defense';
 import { createTurretDefense, type TurretEvent } from '../src/sim/minigames/turret_defense';
-import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
+import { resolveTurretPlan, type TurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { recordTurretFeedback, TURRET_FEEDBACK_LIMIT } from '../src/sim/minigames/turret_feedback';
 import { turretResult } from '../src/sim/minigames/turret_result';
 import { turretSessionView } from '../src/sim/turret_defense_session';
-import { TICK_RATE, type TurretSession } from '../src/sim/types';
+import { TICK_RATE, type TurretScenarioDef, type TurretSession } from '../src/sim/types';
 import {
   TURRET_INTEGRITY_ALERTS,
   TURRET_LEAVING_COUNTDOWN_SECONDS,
@@ -23,6 +28,7 @@ import {
 } from '../src/ui/hud/vehicle/turret_hud_view';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
 import type { TurretSessionView } from '../src/world_api/vehicles';
+import { resolveArmedTurretPlan } from './helpers/turret_armed_plan';
 import { probeAllocationStability } from './util/alloc_probe';
 
 vi.mock('../src/ui/i18n', async (importOriginal) => {
@@ -32,7 +38,7 @@ vi.mock('../src/ui/i18n', async (importOriginal) => {
 
 const START = 200;
 
-function seat(start = START, plan = resolveTurretPlan()): TurretSession {
+function seat(start = START, plan = resolveArmedTurretPlan()): TurretSession {
   return {
     kind: 'turret',
     origin: { x: 0, y: 0, z: 0 },
@@ -66,9 +72,10 @@ const stats = {
   barrelKills: 0,
   shockwaves: 0,
   frags: 0,
+  resupplies: 0,
 };
 
-const NO_POINTS = { kills: 0, integrity: 0, kegKills: 0, bowled: 0 };
+const NO_POINTS = { kills: 0, integrity: 0, kegKills: 0, bowled: 0, charges: 0 };
 
 function endedEvent(result: 'won' | 'lost'): TurretEvent {
   const medal = result === 'won' ? 'bronze' : null;
@@ -213,6 +220,8 @@ describe('the turret HUD view', () => {
         { label: 'Keg kills (3)', value: '+15' },
         // The bonus stops under one tower point, however many bodies were bowled over.
         { label: 'Bowled over (1,234)', value: '+184' },
+        // A trial scores no charge kept: the painter hides the blank row.
+        { label: '', value: '' },
         { label: 'Total points', value: '15,699' },
       ],
       rows: [
@@ -245,6 +254,7 @@ describe('the turret HUD view', () => {
       '0',
       '0',
       '0',
+      '',
       '180',
     ]);
     expect(lostFrame.result?.pointRows[0].label).toBe('Kills (9)');
@@ -271,7 +281,7 @@ describe('the turret HUD view', () => {
     const session = seat();
     session.defense.phase = 'won';
     session.defense.wave = 5;
-    session.defense.integrity = 97;
+    session.defense.integrity = 99;
     Object.assign(session.defense.stats, { kills: 71, barrelKills: 4, bowled: 17 });
     session.defense.result = turretResult(session.defense.plan, session.defense);
     const offline = turretSessionView(session);
@@ -282,7 +292,7 @@ describe('the turret HUD view', () => {
     const onlineResult = new TurretHudView().tick(online, START).result;
     expect(onlineResult?.scored).toBe(true);
     expect(onlineResult?.medalText).toBe('Gold medal');
-    expect(onlineResult?.pointRows[4]).toEqual({ label: 'Total points', value: '20,857' });
+    expect(onlineResult?.pointRows[5]).toEqual({ label: 'Total points', value: '21,257' });
     expect(onlineResult).toEqual(offlineResult);
   });
 
@@ -296,7 +306,7 @@ describe('the turret HUD view', () => {
       const result = view.tick(turretSessionView(session), START).result;
       return [result?.medal, result?.medalText];
     };
-    expect(medalAt(97)).toEqual(['gold', 'Gold medal']);
+    expect(medalAt(99)).toEqual(['gold', 'Gold medal']);
     expect(medalAt(60)).toEqual(['silver', 'Silver medal']);
     expect(medalAt(59)).toEqual(['bronze', 'Bronze medal']);
   });
@@ -460,7 +470,7 @@ describe('the turret HUD live line', () => {
       session.defense.result = turretResult(session.defense.plan, session.defense);
       return new TurretHudView().tick(turretSessionView(session), START).announce;
     };
-    expect(ended('won', 97)).toBe('Victory! Gold medal');
+    expect(ended('won', 99)).toBe('Victory! Gold medal');
     expect(ended('won', 59)).toBe('Victory! Bronze medal');
     expect(ended('lost', 0)).toBe('The tower has fallen');
   });
@@ -541,28 +551,96 @@ describe('the turret feedback cursor', () => {
     });
   });
 
-  it("names the weapons on the first wave's banner: by key, by socket on touch, or not at all", () => {
-    const banner = (
-      plan = resolveTurretPlan(),
-      keys?: Parameters<TurretFeedbackCursor['consume']>[1],
-    ) => {
+  it("presents the weapon a trial brings in, else names only the scenario's weapons", () => {
+    const banner = (plan: TurretPlan, keys?: Parameters<TurretFeedbackCursor['consume']>[1]) => {
       const session = seat(START, plan);
       push(session, START + 60, { type: 'waveStart', wave: 0, count: 8 });
       return new TurretFeedbackCursor().consume(turretSessionView(session), keys)?.subtext;
     };
-    expect(banner(undefined, () => ({ shock: 'Y', frag: 'LB' }))).toBe(
+    const pad = () => ({ shock: 'Y', frag: 'LB' });
+    const touch = () => null;
+    const plan = (scenario: TurretScenarioDef) => resolveTurretPlan(scenario);
+    // The Recruit's Trial gives no weapon: the goal alone, and no key is asked for.
+    const keys = vi.fn(pad);
+    expect(banner(plan(TURRET_SCENARIO_INTRODUCTION), keys)).toBe(firstWaveBanner.subtext);
+    expect(keys).not.toHaveBeenCalled();
+    // Standing Watch brings in the Shockwave, the Veterans' Test the fragmentation shell.
+    expect(banner(plan(TURRET_SCENARIO_STANDARD), pad)).toBe(
+      'New weapon: the Shockwave, on Y. It slams the tower and throws back every monster at its foot.',
+    );
+    expect(banner(plan(TURRET_SCENARIO_STANDARD), touch)).toBe(
+      "New weapon: the Shockwave. Tap its socket to throw back every monster at the tower's foot.",
+    );
+    expect(banner(plan(TURRET_SCENARIO_HARD), pad)).toBe(
+      'New weapon: the Fragmentation Shell, on LB. Arm it, then fire at a group: it bursts into bomblets over them.',
+    );
+    expect(banner(plan(TURRET_SCENARIO_HARD), touch)).toBe(
+      'New weapon: the Fragmentation Shell. Tap its socket to arm it, then tap a group: it bursts into bomblets over them.',
+    );
+    // A mission brings in nothing: the keys of the weapons it gives, and only those.
+    expect(banner(plan(TURRET_MISSION_DELUGE), pad)).toBe(
       'Blast the monsters before they reach the tower. Y: Shockwave. LB: Fragmentation Shell.',
     );
-    expect(banner(undefined, () => null)).toBe(
+    expect(banner(plan(TURRET_MISSION_DELUGE), touch)).toBe(
       'Blast the monsters before they reach the tower. Tap a socket for a Shockwave or a Fragmentation Shell.',
     );
-    const unarmed = resolveTurretPlan({
-      ...TURRET_SCENARIO_STANDARD,
-      arsenal: { shockwave: 0, fragmentation: 0 },
+    expect(banner(plan(TURRET_MISSION_PACK), pad)).toBe(
+      'Blast the monsters before they reach the tower. LB: Fragmentation Shell.',
+    );
+    expect(banner(plan(TURRET_MISSION_PACK), touch)).toBe(
+      'Blast the monsters before they reach the tower. Tap the socket for a Fragmentation Shell.',
+    );
+    const shockOnly = plan({ ...TURRET_MISSION_GIANTS, arsenal: { shockwave: 2 } });
+    expect(banner(shockOnly, pad)).toBe(
+      'Blast the monsters before they reach the tower. Y: Shockwave.',
+    );
+    expect(banner(shockOnly, touch)).toBe(
+      'Blast the monsters before they reach the tower. Tap the socket for a Shockwave.',
+    );
+    expect(banner(plan(TURRET_MISSION_PACK))).toBe(firstWaveBanner.subtext);
+  });
+
+  it("announces a mission's resupply under the cleared wave, naming only the weapons it gave", () => {
+    const resupplied = (shockwave: number, fragmentation: number) => {
+      const session = seat(START, resolveTurretPlan(TURRET_MISSION_DELUGE));
+      const cursor = new TurretFeedbackCursor();
+      push(
+        session,
+        START + 60,
+        { type: 'waveCleared', wave: 2 },
+        { type: 'resupply', wave: 2, shockwave, fragmentation },
+      );
+      return cursor.consume(turretSessionView(session));
+    };
+    expect(resupplied(1, 1)).toEqual({
+      text: 'Wave 3 cleared',
+      subtext: 'Resupply: +1 Shockwave, +1 Fragmentation Shell',
     });
-    const keys = vi.fn(() => ({ shock: '1', frag: '2' }));
-    expect(banner(unarmed, keys)).toBe(firstWaveBanner.subtext);
-    expect(keys).not.toHaveBeenCalled();
+    expect(resupplied(1, 0)).toEqual({ text: 'Wave 3 cleared', subtext: 'Resupply: +1 Shockwave' });
+    expect(resupplied(0, 1)).toEqual({
+      text: 'Wave 3 cleared',
+      subtext: 'Resupply: +1 Fragmentation Shell',
+    });
+  });
+
+  it("scores a won mission's charges kept on their own row, none on a loss, and counts the resupplies as given", () => {
+    const session = seat(START, resolveTurretPlan(TURRET_MISSION_DELUGE));
+    session.defense.phase = 'won';
+    session.defense.wave = 5;
+    Object.assign(session.defense.stats, { kills: 40, shockwaves: 4, frags: 1, resupplies: 2 });
+    session.defense.result = turretResult(session.defense.plan, session.defense);
+    const result = new TurretHudView().tick(turretSessionView(session), START).result!;
+    // 3 Shockwaves and 2 frags, plus 2 of each resupplied: 1 and 3 left of 5 and 4.
+    expect(result.rows[5]).toEqual({ label: 'Shockwaves', value: '4/5' });
+    expect(result.rows[6]).toEqual({ label: 'Fragmentation Shells', value: '1/4' });
+    expect(result.pointRows[4]).toEqual({ label: 'Charges kept (4)', value: '+240' });
+    expect(result.pointRows[5].label).toBe('Total points');
+    const lost = seat(START, resolveTurretPlan(TURRET_MISSION_DELUGE));
+    lost.defense.phase = 'lost';
+    lost.defense.integrity = 0;
+    lost.defense.result = turretResult(lost.defense.plan, lost.defense);
+    const lostRow = new TurretHudView().tick(turretSessionView(lost), START).result!.pointRows[4];
+    expect(lostRow).toEqual({ label: '', value: '' });
   });
 
   it('lets the end outrank the last wave clear it lands with', () => {

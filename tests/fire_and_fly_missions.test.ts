@@ -39,7 +39,12 @@ import {
   type TurretDefenseState,
   tickTurretDefense,
 } from '../src/sim/minigames/turret_defense';
-import { resolveTurretPlan, TURRET_PLAN_LIMITS } from '../src/sim/minigames/turret_defense_plan';
+import {
+  resolveTurretPlan,
+  TURRET_PLAN_LIMITS,
+  turretChargesGiven,
+} from '../src/sim/minigames/turret_defense_plan';
+import { TURRET_POINTS } from '../src/sim/minigames/turret_result';
 import type { TurretScenarioDef } from '../src/sim/types';
 
 const TAU = Math.PI * 2;
@@ -56,6 +61,15 @@ function angleOff(a: number, b: number): number {
 function variant(over: Partial<TurretScenarioDef>): TurretScenarioDef {
   return { ...TURRET_SCENARIO_STANDARD, id: 'test_scenario', boardKey: 'test', ...over };
 }
+
+/** Each mission's signature weapon: the one its idea asks for, in charges at the start. */
+const MISSION_ARSENALS: Record<string, { shockwave: number; fragmentation: number }> = {
+  pack: { shockwave: 0, fragmentation: 5 },
+  giants: { shockwave: 4, fragmentation: 1 },
+  deluge: { shockwave: 3, fragmentation: 2 },
+  brittle: { shockwave: 3, fragmentation: 1 },
+  powder: { shockwave: 1, fragmentation: 3 },
+};
 
 describe('the mission table', () => {
   it('offers five missions after the trials, with frozen ids, board keys and one version each', () => {
@@ -77,11 +91,13 @@ describe('the mission table', () => {
   });
 
   it.each(TURRET_MISSIONS.map((m) => [m.boardKey, m] as const))(
-    'resolves %s with the trials arsenal, every template sized and inside its level band',
-    (_key, mission) => {
+    'resolves %s with its signature arsenal and supply, every template sized and inside its level band',
+    (key, mission) => {
       const plan = resolveTurretPlan(mission);
       expect(plan.scenarioId).toBe(mission.id);
-      expect(plan.arsenal).toEqual({ shockwave: 2, fragmentation: 3 });
+      expect(plan.arsenal).toEqual(MISSION_ARSENALS[key]);
+      expect(plan.resupplyWaves).toEqual([2, 4]);
+      expect(plan.chargeBonus).toBe(true);
       for (const wave of mission.waves) {
         for (const entry of wave.entries) {
           const template = MOBS[entry.templateId];
@@ -303,6 +319,12 @@ describe('full mission runs', () => {
       expect(state.result?.medal).toBe('gold');
       const monsters = plan.waves.reduce((n, w) => n + w.spawns.length, 0);
       expect(state.stats.kills + state.stats.breaches).toBe(monsters);
+      // Resupplied twice, and this aimer spends nothing: every charge given scores.
+      expect(state.stats.resupplies).toBe(2);
+      const given = turretChargesGiven(plan, 2);
+      expect(state.result?.breakdown.charges).toBe(
+        (given.shockwave + given.fragmentation) * TURRET_POINTS.unusedCharge,
+      );
     },
     60_000,
   );

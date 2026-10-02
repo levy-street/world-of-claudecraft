@@ -8,17 +8,18 @@
 // entry, timed on its start tick against the display tick the monsters are drawn
 // on, the dust wall and the spark line roll out on the sim's own front
 // (turret_shockwave_core.ts) and a pale cracked mark is laid around the foot.
-// The fragmentation shell: its `fragBurst` entry flashes the airburst and flies
-// the bomblets to their points, each `bomblet` entry lands one into a small blast
+// The fragmentation shell: its `fragBurst` entry flashes the airburst, kicks the
+// camera harder than a shell's blast (not under reduced motion) and flies the
+// bomblets to their points, each `bomblet` entry lands one into a small blast
 // with no dust cloud.
 import { FIRE_AND_FLY_MAX_KEG_CAP } from '../sim/content/fire_and_fly_scenarios';
 import { TURRET_FRAGMENTATION } from '../sim/content/turret_defense';
 import type { TurretEvent } from '../sim/minigames/turret_defense';
 import { TURRET_BOMBLETS } from '../sim/minigames/turret_fragmentation';
 import { DT } from '../sim/types';
-import { CANNON_BOMBLET, cannonBombletBlastId } from './cannon_frag_core';
+import { CANNON_AIRBURST, CANNON_BOMBLET, cannonBombletBlastId } from './cannon_frag_core';
 import { type CannonPuff, newCannonPuff } from './cannon_puff_core';
-import { CANNON_IMPACT_POOL } from './cannon_shell_core';
+import { CANNON_IMPACT_POOL, cannonShakeFalloff } from './cannon_shell_core';
 import type { CannonBlast, CannonShellHost, CannonShellVisuals } from './cannon_shell_visuals';
 import {
   TURRET_SHOCKWAVE_CHIP_LIFE,
@@ -44,12 +45,27 @@ export function turretShockwaveBursts(perBurst: number): number {
   );
 }
 
-/** Blasts the cannon keeps on the ground at once: the shells' own, a whole keg chain's, and a frag's airburst and bomblets. */
-export const TURRET_WEAPON_IMPACTS =
-  CANNON_IMPACT_POOL + FIRE_AND_FLY_MAX_KEG_CAP + 1 + TURRET_BOMBLETS;
+/**
+ * Frag shells whose bomblets fly at once: fired a reload apart, a later one on a short
+ * flight bursts while an earlier long one still ripples, up to the most a run holds
+ * (its resupplies included; the derivation is pinned in tests/turret_weapons_visual.test.ts).
+ */
+export const TURRET_WEAPON_FRAGS = 4;
 
-/** Bomblets in flight at once: two frag shells' worth, fired a reload apart on different ranges. */
-export const TURRET_WEAPON_BOMBLETS = 2 * TURRET_BOMBLETS;
+/**
+ * Frag shells whose blasts linger on the ground at once: a blast holds longer than a
+ * reload, so every frag shell a run holds can (its resupplies included).
+ */
+export const TURRET_WEAPON_LINGERING_FRAGS = 7;
+
+/** Blasts the cannon keeps on the ground at once: the shells' own, a whole keg chain's, and every lingering frag's airburst and bomblets. */
+export const TURRET_WEAPON_IMPACTS =
+  CANNON_IMPACT_POOL +
+  FIRE_AND_FLY_MAX_KEG_CAP +
+  TURRET_WEAPON_LINGERING_FRAGS * (1 + TURRET_BOMBLETS);
+
+/** Bomblets in flight at once. */
+export const TURRET_WEAPON_BOMBLETS = TURRET_WEAPON_FRAGS * TURRET_BOMBLETS;
 
 /** How far above its ground point a shell of `weapon` ends its flight: a frag's airburst height. */
 export function turretShellEndLift(weapon: string | undefined): number {
@@ -132,8 +148,20 @@ export class TurretWeaponsVisual {
   }
 
   /** The frag shell's burst, seen at display tick `burstTick`. */
-  burst(ev: Extract<TurretEvent, { type: 'fragBurst' }>, burstTick: number, time: number): void {
+  burst(
+    ev: Extract<TurretEvent, { type: 'fragBurst' }>,
+    burstTick: number,
+    time: number,
+    reducedMotion: boolean,
+  ): void {
     this.weapon.scatter(ev, burstTick, time);
+    const host = this.host;
+    if (!host || reducedMotion) return;
+    const eye = host.camera.position;
+    const falloff = cannonShakeFalloff(Math.hypot(ev.x - eye.x, ev.y - eye.y, ev.z - eye.z));
+    if (falloff <= 0) return;
+    host.addShake(CANNON_AIRBURST.shake * falloff);
+    host.punchFov(CANNON_AIRBURST.fovPunch * falloff);
   }
 
   /** A bomblet lands: its flight ends, and unless its entry is stale its blast shows. */

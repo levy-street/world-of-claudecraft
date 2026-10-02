@@ -1216,6 +1216,7 @@ describe('Fire and Fly monsters on screen', () => {
     expect(new Set(tinted).size).toBe(2);
     const resolved = resolveTurretPlan({
       ...TURRET_MISSION_PACK,
+      supply: undefined,
       waves: [
         {
           ...TURRET_MISSION_PACK.waves[0],

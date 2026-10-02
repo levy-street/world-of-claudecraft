@@ -18877,6 +18877,28 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '재사용 대기시간: {cooldown}초. {flight}초 후 착탄. 모든 포격이 {recovery}초의 회복 시간을 공유합니다.',
   'hudChrome.vehicle.shotRules':
     '표시된 구역 안을 조준하세요. 마나 소모 없음. 피해는 장비나 특성의 영향을 받지 않습니다.',
+  'hudChrome.turretArsenal.introShock':
+    '새 무기: 충격파, {shockKey}. 탑을 내리쳐 탑 발치의 몬스터를 모두 날려 버립니다.',
+  'hudChrome.turretArsenal.introShockTouch':
+    '새 무기: 충격파. 소켓을 눌러 탑 발치의 몬스터를 모두 날려 버리세요.',
+  'hudChrome.turretArsenal.introFrag':
+    '새 무기: 파편탄, {fragKey}. 장전한 뒤 무리를 향해 쏘면 그 위에서 자탄으로 터집니다.',
+  'hudChrome.turretArsenal.introFragTouch':
+    '새 무기: 파편탄. 소켓을 눌러 장전한 뒤 무리를 누르면 그 위에서 자탄으로 터집니다.',
+  'hudChrome.turretArsenal.shockHint': '몬스터가 탑에 닿기 전에 날려 버리세요. {shockKey}: 충격파.',
+  'hudChrome.turretArsenal.shockHintTouch':
+    '몬스터가 탑에 닿기 전에 날려 버리세요. 소켓을 눌러 충격파를 사용하세요.',
+  'hudChrome.turretArsenal.fragHint': '몬스터가 탑에 닿기 전에 날려 버리세요. {fragKey}: 파편탄.',
+  'hudChrome.turretArsenal.fragHintTouch':
+    '몬스터가 탑에 닿기 전에 날려 버리세요. 소켓을 눌러 파편탄을 사용하세요.',
+  'hudChrome.turretArsenal.resupplyBoth': '보급: 충격파 {shock}, 파편탄 {frag}',
+  'hudChrome.turretArsenal.resupplyShock': '보급: 충격파 {shock}',
+  'hudChrome.turretArsenal.resupplyFrag': '보급: 파편탄 {frag}',
+  'hudChrome.turretArsenal.resupplyRule':
+    '{waves}번째 웨이브가 끝나면 이 임무의 각 무기 충전이 하나씩 늘어납니다.',
+  'hudChrome.turretArsenal.bonusRule':
+    '임무에서 승리하면 쓰지 않고 남긴 충전 하나당 {points}점을 얻습니다.',
+  'hudChrome.turretArsenal.pointsCharges': '남긴 충전 ({count})',
   'hudChrome.turret.integrity': '탑 내구도',
   'hudChrome.turret.integrityBelow': '탑 내구도 {percent} 미만',
   'hudChrome.turret.tower': '탑',
@@ -18933,6 +18955,35 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '몬스터가 탑에 닿기 전에 날려 버리세요. 소켓을 눌러 충격파나 파편탄을 사용하세요.',
   'hudChrome.turret.statShockwaves': '충격파',
   'hudChrome.turret.statFrags': '파편탄',
+  'hudChrome.gunneryBoard.title': '포술 게시판',
+  'hudChrome.gunneryBoard.listLabel': '시련과 임무',
+  'hudChrome.gunneryBoard.trials': '입대 시험',
+  'hudChrome.gunneryBoard.missions': '임무',
+  'hudChrome.gunneryBoard.trialKicker': '시련',
+  'hudChrome.gunneryBoard.missionKicker': '임무',
+  'hudChrome.gunneryBoard.recruitProgress': '통과한 시련: {won}/{total}',
+  'hudChrome.gunneryBoard.recruited': '입대 완료',
+  'hudChrome.gunneryBoard.mastery': '포수의 숙련: 별 {stars}/{max}개',
+  'hudChrome.gunneryBoard.won': '승리함',
+  'hudChrome.gunneryBoard.notWon': '아직 승리하지 못함',
+  'hudChrome.gunneryBoard.locked': '잠김',
+  'hudChrome.gunneryBoard.arsenal': '무장',
+  'hudChrome.gunneryBoard.charges': '{weapon} ×{count}',
+  'hudChrome.gunneryBoard.gold': '금',
+  'hudChrome.gunneryBoard.goldBar': '탑을 {percent} 지키기',
+  'hudChrome.gunneryBoard.waves': '웨이브',
+  'hudChrome.gunneryBoard.best': '최고 기록',
+  'hudChrome.gunneryBoard.bestRun': '{medal}, {points}점',
+  'hudChrome.gunneryBoard.notPlayed': '아직 도전하지 않음',
+  'hudChrome.gunneryBoard.reward': '오늘의 보상',
+  'hudChrome.gunneryBoard.rewardAvailable': '받을 수 있음',
+  'hudChrome.gunneryBoard.rewardCollected': '받음: 연습만 가능',
+  'hudChrome.gunneryBoard.takeTrial': '시련 도전',
+  'hudChrome.gunneryBoard.takeMission': '임무 도전',
+  'hudChrome.gunneryBoard.practice': '연습',
+  'hudChrome.gunneryBoard.actionAria': '{action}: {name}',
+  'hudChrome.gunneryBoard.lockedTrial': '{previous}을(를) 통과하면 이 시련이 열립니다.',
+  'hudChrome.gunneryBoard.lockedMission': '{name}을(를) 통과하면 입대하고 임무가 열립니다.',
   'hudChrome.leaderboard.tabWorldQuests': '전역 퀘스트',
   'hudChrome.leaderboard.wqBoardsLabel': '전역 퀘스트 점수판',
   'hudChrome.leaderboard.wqMedal': '메달',
@@ -19185,26 +19236,27 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.fireAndFly.scenarios.introduction': '신병의 시련',
   'questUi.worldQuest.fireAndFly.scenarios.standard': '정식 경계 근무',
   'questUi.worldQuest.fireAndFly.scenarios.hard': '고참병의 시험',
-  'questUi.worldQuest.fireAndFly.pitch.introduction': '신병의 첫 경계 근무',
-  'questUi.worldQuest.fireAndFly.pitch.standard': '성벽 위의 진짜 경계 근무',
-  'questUi.worldQuest.fireAndFly.pitch.hard': '고참병들이 치르는 포위전',
-  'questUi.worldQuest.fireAndFly.start': '{name}: {detail} (파도 {count}개)',
-  'questUi.worldQuest.fireAndFly.practice': '{name} 연습 (파도 {count}개)',
   'questUi.worldQuest.fireAndFly.scenarios.pack': '무리',
   'questUi.worldQuest.fireAndFly.scenarios.giants': '무거운 발걸음',
   'questUi.worldQuest.fireAndFly.scenarios.deluge': '대홍수',
   'questUi.worldQuest.fireAndFly.scenarios.brittle': '금 간 탑',
   'questUi.worldQuest.fireAndFly.scenarios.powder': '화약고',
-  'questUi.worldQuest.fireAndFly.pitch.pack': '무리로 오니 한 발도 헛되이 쏘지 말게',
-  'questUi.worldQuest.fireAndFly.pitch.giants': '멀리 날려 보내기엔 너무 무거운 거구 몇 마리',
-  'questUi.worldQuest.fireAndFly.pitch.deluge': '작고 빠른 짐승의 홍수',
-  'questUi.worldQuest.fireAndFly.pitch.brittle': '몇 번만 맞아도 탑이 무너진다',
-  'questUi.worldQuest.fireAndFly.pitch.powder': '두 배의 화약통, 놈들 길목에',
-  'questUi.worldQuest.fireAndFly.practiceMission': '{name} 연습 (파도 {count}개)',
-  'questUi.worldQuest.fireAndFly.sections.trials': '시련',
-  'questUi.worldQuest.fireAndFly.sections.missions': '임무',
-  'questUi.worldQuest.fireAndFly.lockedTrial': '{name}: {previous}을(를) 통과하면 열림',
-  'questUi.worldQuest.fireAndFly.missionsLocked': '{name}을(를) 통과하면 입대하고 임무가 열립니다.',
+  'questUi.worldQuest.fireAndFly.brief.introduction':
+    '모든 포수는 여기서 시작하네, 신병. 늑대, 멧돼지, 쥐, 거미 같은 작은 짐승들이 짧은 세 번의 웨이브로 탑 사방에서 느긋하게 다가오지. 탑은 석공 손을 막 떠난 참이라 꽤 많이 물어뜯겨도 버틴다네.',
+  'questUi.worldQuest.fireAndFly.brief.standard':
+    '내 포수들이 매일 밤 성벽에서 서는 경계 근무일세. 여섯 번의 웨이브가 사방에서 몰려오지. 늑대와 멧돼지로 시작해 산적과 트롤을 거쳐 오우거, 걸어 다니는 시체, 살아 있는 바위 거인까지 이어지고, 마지막 웨이브는 다른 놈들보다 훨씬 거대한 것이 장식하지.',
+  'questUi.worldQuest.fireAndFly.brief.hard':
+    '포대를 맡기기 전에 고참병들에게 치르게 하는 포위전일세. 여섯 번의 웨이브는 정식 경계 근무보다 억세고 덩치 큰 놈이 더 많으며, 더 촘촘히 두세 방향에서 동시에 오거나 떼 지어 몰려오지. 마지막 웨이브에는 그 거구가 다시 나온다네.',
+  'questUi.worldQuest.fireAndFly.brief.pack':
+    '야생의 짐승은 무리 지어 사냥하는데, 이놈들도 마찬가지일세. 여섯 번의 웨이브가 저마다 한 방향에서 한 덩어리씩 몰려오지. 처음엔 늑대와 멧돼지, 다음엔 몸에 칠을 한 부족 사냥꾼과 그 짐승들, 그리고 맨 끝엔 건초 수레만 한 회색 늑대일세.',
+  'questUi.worldQuest.fireAndFly.brief.giants':
+    '이번엔 수는 적지만 하나같이 거대하네. 청동 파수꾼, 용암 괴수, 살아 있는 바위 거인, 발은 느려도 쓰러뜨리기가 무척 힘들지. 여섯 번의 웨이브, 그중 하나라도 탑에 닿으면 무너지는 성벽처럼 들이받는다네.',
+  'questUi.worldQuest.fireAndFly.brief.deluge':
+    '작고 날랜 짐승 수십 마리가, 늑대, 멧돼지, 거미, 깊은바위 굴착꾼이 거의 틈도 없이 사방에서 쏟아져 들어오지. 그런 웨이브가 여섯 번, 언덕에서 쏟아지는 비처럼 말일세. 하나하나는 약하지만 끝없이 몰려온다네.',
+  'questUi.worldQuest.fireAndFly.brief.brittle':
+    '이 탑은 지난 철에 크게 얻어맞고 금이 아물지 않았네. 많아야 열 번 맞으면 무너지지. 잠들지 못한 망자들, 뼈 병사, 두건 쓴 시체, 그림자 사냥개가 일정한 속도로 여섯 번의 웨이브를 이루어 오네. 큰 놈은 없지만, 닿는 일격 하나하나가 뼈아프다네.',
+  'questUi.worldQuest.fireAndFly.brief.powder':
+    '화약고가 들보까지 꽉 차서, 바깥에 평소의 두 배나 되는 화약통을 놓아두었네. 괴물들이 지나는 길목 바로 위에 말일세. 대장간의 무리가 그걸 노리고 여섯 번의 웨이브로 오지. 잉걸불 꼬마 악마, 청동 기계, 용암 괴수, 그리고 자루를 멘 도둑 하나가, 한쪽에서, 양옆에서, 혹은 무리 지어 온다네.',
   'entities.npcs.fire_and_fly_instructor.name': '포술장 올더',
   'entities.npcs.fire_and_fly_instructor.title': '포병 모집관',
   'entities.npcs.fire_and_fly_instructor.greeting':

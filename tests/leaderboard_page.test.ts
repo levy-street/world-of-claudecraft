@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
+  emptyDailyRewardLeaderboardPage,
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
   paginateGuildLeaderboard,
   paginateLeaderboard,
   paginateRanked,
 } from '../src/sim/leaderboard_page';
+import { Sim } from '../src/sim/sim';
 import type { GuildLeaderboardEntry, LeaderboardEntry } from '../src/world_api';
 
 function makeEntries(n: number): LeaderboardEntry[] {
@@ -134,5 +136,23 @@ describe('paginateGuildLeaderboard', () => {
     expect(players.total).toBe(60);
     expect(guilds.total).toBe(60);
     expect(players.pageCount).toBe(guilds.pageCount);
+  });
+});
+
+describe("the offline world's daily-reward board", () => {
+  it('is empty, on the requested page floored at 0, with the requested size', async () => {
+    expect(emptyDailyRewardLeaderboardPage(2.7, 25)).toEqual({
+      day: '1970-01-01',
+      leaders: [],
+      page: 2,
+      pageCount: 1,
+      total: 0,
+      pageSize: 25,
+    });
+    expect(emptyDailyRewardLeaderboardPage(-3, 10).page).toBe(0);
+    const sim = new Sim({ seed: 1, playerClass: 'warrior' });
+    expect(await sim.dailyRewardLeaderboard(1)).toEqual(
+      emptyDailyRewardLeaderboardPage(1, LEADERBOARD_PAGE_SIZE),
+    );
   });
 });

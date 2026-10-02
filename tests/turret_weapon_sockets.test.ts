@@ -5,15 +5,26 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import {
+  TURRET_MISSION_DELUGE,
+  TURRET_MISSION_PACK,
+} from '../src/sim/content/fire_and_fly_missions';
+import {
+  TURRET_SCENARIO_HARD,
+  TURRET_SCENARIO_INTRODUCTION,
+  TURRET_SCENARIO_STANDARD,
+} from '../src/sim/content/fire_and_fly_scenarios';
 import { createTurretDefense } from '../src/sim/minigames/turret_defense';
-import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
+import { resolveTurretPlan, type TurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { turretSessionView } from '../src/sim/turret_defense_session';
 import type { TurretSession, VehicleSession } from '../src/sim/types';
+import type { TurretAimCore } from '../src/ui/hud/vehicle/turret_aim_core';
 import { TURRET_WEAPONS_ID } from '../src/ui/hud/vehicle/turret_weapon_bar_painter';
 import { VehicleActionBarController } from '../src/ui/hud/vehicle/vehicle_action_bar_controller';
 import { setLanguage } from '../src/ui/i18n';
 import { makeWriterFacet } from '../src/ui/painter_host';
 import type { TurretSessionView } from '../src/world_api/vehicles';
+import { resolveArmedTurretPlan } from './helpers/turret_armed_plan';
 
 vi.mock('../src/ui/icons', () => ({ iconDataUrl: (_kind: string, key: string) => `/${key}.webp` }));
 vi.mock('../src/game/sfx', () => ({
@@ -41,11 +52,14 @@ afterEach(() => {
   document.body.className = '';
 });
 
-function seat(phase: 'intro' | 'wave' | 'won' = 'wave'): TurretSession {
+function seat(
+  phase: 'intro' | 'wave' | 'won' = 'wave',
+  plan: TurretPlan = resolveArmedTurretPlan(),
+): TurretSession {
   const session: TurretSession = {
     kind: 'turret',
     origin: { x: 0, y: 0, z: 0 },
-    defense: createTurretDefense(resolveTurretPlan(), { x: 0, z: 0 }, 5, START),
+    defense: createTurretDefense(plan, { x: 0, z: 0 }, 5, START),
     priorMountKey: '',
     returnTo: { x: 0, y: 0, z: 0, facing: 0 },
     feedback: [],
@@ -207,6 +221,49 @@ it('attaches each tooltip with the charges left as the player sees them', () => 
   expect(html).toContain('Shockwave');
   expect(html).toContain('Charges left: 1');
   expect(tooltips.get(sockets()[1])!()).toContain('Charges left: 3');
+});
+
+it('shows no socket for a weapon the scenario does not give, and its key does nothing', () => {
+  const { world, bar, seatIn } = rig();
+  const armed = () => (bar.aim as TurretAimCore).fragArmed;
+  // Standing Watch gives the Shockwave alone: its frag socket goes, the row closes up.
+  seatIn(seat('wave', resolveTurretPlan(TURRET_SCENARIO_STANDARD)));
+  expect(row().style.display).toBe('');
+  expect(sockets().map((b) => b.style.display)).toEqual(['', 'none']);
+  bar.chooseSlot(1);
+  bar.update();
+  expect(armed()).toBe(false);
+  expect(world.useVehicleAction).not.toHaveBeenCalled();
+  bar.chooseSlot(0);
+  expect(world.useVehicleAction).toHaveBeenLastCalledWith('turret_shockwave', { x: 0, z: 0 });
+  // The Pack gives fragmentation shells alone: the Shockwave socket goes, key 1 is silent.
+  world.useVehicleAction.mockClear();
+  seatIn(seat('wave', resolveTurretPlan(TURRET_MISSION_PACK)));
+  expect(sockets().map((b) => b.style.display)).toEqual(['none', '']);
+  bar.chooseSlot(0);
+  expect(world.useVehicleAction).not.toHaveBeenCalled();
+  bar.chooseSlot(1);
+  expect(armed()).toBe(true);
+  // The Recruit's Trial gives none: no row at all, and neither key sends anything.
+  bar.aim.cancel();
+  seatIn(seat('wave', resolveTurretPlan(TURRET_SCENARIO_INTRODUCTION)));
+  expect(row().style.display).toBe('none');
+  bar.chooseSlot(0);
+  bar.chooseSlot(1);
+  expect(armed()).toBe(false);
+  expect(world.useVehicleAction).not.toHaveBeenCalled();
+});
+
+it("adds a mission's resupply waves and points per charge left to each tooltip", () => {
+  const { tooltips, seatIn } = rig();
+  seatIn(seat('wave', resolveTurretPlan(TURRET_MISSION_DELUGE)));
+  for (const socket of sockets()) {
+    const html = tooltips.get(socket)!();
+    expect(html).toContain('Each weapon of the mission gains one charge as waves 3 and 5 end.');
+    expect(html).toContain('A won mission scores 60 points for each charge left unused.');
+  }
+  seatIn(seat('wave', resolveTurretPlan(TURRET_SCENARIO_HARD)));
+  for (const socket of sockets()) expect(tooltips.get(socket)!()).not.toContain('mission');
 });
 
 it('leaves with the run: hidden on the result card and off the seat', () => {

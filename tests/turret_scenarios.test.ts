@@ -108,6 +108,16 @@ function spawns(plan: TurretPlan, seed: number, setup?: (s: TurretDefenseState) 
   return { state, seen };
 }
 
+/**
+ * One weapon brought in per trial, generously the first time: the cannon and the kegs
+ * alone, then the Shockwave, then the fragmentation shell beside fewer Shockwaves.
+ */
+const TRIAL_ARSENALS: Record<string, { shockwave: number; fragmentation: number }> = {
+  introduction: { shockwave: 0, fragmentation: 0 },
+  standard: { shockwave: 4, fragmentation: 0 },
+  hard: { shockwave: 2, fragmentation: 4 },
+};
+
 describe('the scenario table', () => {
   it('offers Introduction, Standard and Hard, with frozen unique ids and board keys', () => {
     expect(TURRET_SCENARIOS.map((s) => [s.id, s.boardKey])).toEqual([
@@ -118,7 +128,7 @@ describe('the scenario table', () => {
     expect(TURRET_DEFAULT_SCENARIO).toBe(TURRET_SCENARIO_STANDARD);
     for (const s of TURRET_SCENARIOS) {
       expect(s.boardKey).toMatch(/^[a-z]+$/);
-      expect(s.arsenal).toEqual({ shockwave: 2, fragmentation: 3 });
+      expect(s.supply).toBeUndefined();
       expect(s.medals.silver.minIntegrityShare).toBeGreaterThan(0);
       expect(s.medals.silver.minIntegrityShare).toBeLessThan(s.medals.gold.minIntegrityShare);
       expect(s.medals.gold.minIntegrityShare).toBeLessThanOrEqual(1);
@@ -183,7 +193,7 @@ describe('resolving a scenario into a plan', () => {
     expect(resolveTurretPlan(TURRET_SCENARIO_STANDARD)).toEqual(plan);
     expect(plan.scenarioId).toBe('fire_and_fly_standard');
     expect(plan.integrity).toBe(100);
-    expect(plan.arsenal).toEqual({ shockwave: 2, fragmentation: 3 });
+    expect(plan.arsenal).toEqual({ shockwave: 4, fragmentation: 0 });
     for (const wave of plan.waves) expect(wave.arrival).toEqual({ kind: 'ring' });
     // The resolved plan as the resolver built it before scenarios, byte for byte.
     const before = { kinds: plan.kinds, waves: plan.waves.map(({ arrival, ...w }) => w) };
@@ -191,12 +201,14 @@ describe('resolving a scenario into a plan', () => {
   });
 
   it.each(TURRET_SCENARIOS.map((s) => [s.boardKey, s] as const))(
-    'carries %s: its id, tower points and the trial arsenal, deep-frozen',
-    (_key, s) => {
+    'carries %s: its id, tower points and the arsenal it brings in, deep-frozen',
+    (key, s) => {
       const plan = resolveTurretPlan(s);
       expect(plan.scenarioId).toBe(s.id);
       expect(plan.integrity).toBe(s.integrity);
-      expect(plan.arsenal).toEqual({ shockwave: 2, fragmentation: 3 });
+      expect(plan.arsenal).toEqual(TRIAL_ARSENALS[key]);
+      expect(plan.resupplyWaves).toEqual([]);
+      expect(plan.chargeBonus).toBe(false);
       expect(plan.waves).toHaveLength(s.waves.length);
       expect(Object.isFrozen(plan.arsenal)).toBe(true);
       expect(Object.isFrozen(plan.waves[0].arrival)).toBe(true);

@@ -58,7 +58,7 @@ function forceWin(meta: PlayerMeta, integrity: number, kills = 20): void {
   defense.result = turretResult(defense.plan, {
     phase: 'won',
     integrity,
-    stats: { kills, barrelKills: 0, bowled: 0 },
+    stats: { kills, barrelKills: 0, bowled: 0, shockwaves: 0, frags: 0, resupplies: 0 },
   });
 }
 
@@ -129,7 +129,7 @@ describe('the score of a won run', () => {
   it('scores a practice win after the day reward, as the glider practice feeds its ladders', () => {
     const { sim, meta } = atTheGate();
     sim.talkToNpc(FIRE_AND_FLY_NPC_ID);
-    forceWin(meta, 97);
+    forceWin(meta, 99);
     const paid = sim.tick();
     expect(scores(paid)).toHaveLength(1);
     expect(meta.worldQuestLog.get(FIRE_AND_FLY_QUEST_ID)?.state).toBe('completed');
@@ -175,7 +175,7 @@ describe('the score of a won run', () => {
     defense.result = turretResult(defense.plan, {
       phase: 'lost',
       integrity: 0,
-      stats: { kills: 5, barrelKills: 0, bowled: 0 },
+      stats: { kills: 5, barrelKills: 0, bowled: 0, shockwaves: 0, frags: 0, resupplies: 0 },
     });
     expect(scores([...sim.tick(), ...sim.tick()])).toEqual([]);
     expect(meta.fireAndFlyRecords).toEqual({});
@@ -193,7 +193,7 @@ describe('the score of a won run', () => {
   it('keeps the records in the world quest save and restores them', () => {
     const { sim, meta } = atTheGate();
     sim.startWorldQuestActivity(FIRE_AND_FLY_QUEST_ID, { courseId: TURRET_SCENARIO_STANDARD.id });
-    forceWin(meta, 97);
+    forceWin(meta, 99);
     sim.tick();
     const saved = savedWorldQuestState(meta).worldQuests;
     expect(saved?.fireAndFlyRecords).toEqual(meta.fireAndFlyRecords);
@@ -206,10 +206,10 @@ describe('the score of a won run', () => {
   it('serves the offline personal page through IWorld', async () => {
     const { sim, meta } = atTheGate();
     sim.talkToNpc(FIRE_AND_FLY_NPC_ID);
-    forceWin(meta, 97);
+    forceWin(meta, 99);
     sim.tick();
     const page = await sim.worldQuestLeaderboard('fire_and_fly_standard_v2_daily');
     expect(page).toMatchObject({ board: 'fire_and_fly_standard_v2_daily', personal: true });
-    expect(page.self).toMatchObject({ rank: 1, medal: 'gold', metric: 97 * 200 + 20 * 20 });
+    expect(page.self).toMatchObject({ rank: 1, medal: 'gold', metric: 99 * 200 + 20 * 20 });
   });
 });

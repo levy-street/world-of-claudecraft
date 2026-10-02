@@ -1337,9 +1337,13 @@ describe('firing', () => {
 });
 
 describe('the limited weapons', () => {
-  /** Seats the player and plays the intro out: the weapons fire only during a wave. */
+  /**
+   * Seats the player in the Veterans' Test (both weapons: 2 Shockwaves, 4 fragmentation
+   * shells) and plays the intro out: the weapons fire only during a wave.
+   */
   function seatInWave(sim: Sim): void {
-    seat(sim);
+    sim.chat('/dev turret hard');
+    expect(sim.turretSession).not.toBeNull();
     for (let i = 0; i <= TURRET_TIMING.introTicks; i++) sim.tick();
     expect(turretSeat(sim).defense.phase).toBe('wave');
   }
@@ -1348,7 +1352,7 @@ describe('the limited weapons', () => {
     const { sim, player } = rig();
     seatInWave(sim);
     const defense = turretSeat(sim).defense;
-    expect(turretChargesLeft(defense)).toEqual({ shockwave: 2, fragmentation: 3 });
+    expect(turretChargesLeft(defense)).toEqual({ shockwave: 2, fragmentation: 4 });
     const aim = { x: defense.cx + 18, z: defense.cz - 18 };
     const drawn = worldDraws(sim, () => {
       expect(sim.useVehicleAction('turret_frag', aim)).toBe(true);
@@ -1356,7 +1360,7 @@ describe('the limited weapons', () => {
     expect(drawn).toEqual([]);
     expect(player.facing).toBeCloseTo(Math.atan2(18, -18), 6);
     expect(defense.stats).toMatchObject({ shots: 1, frags: 1 });
-    expect(turretChargesLeft(defense).fragmentation).toBe(2);
+    expect(turretChargesLeft(defense).fragmentation).toBe(3);
     expect(sim.useVehicleAction('turret_frag', aim)).toBe(false);
     const events: SimEvent[] = [];
     for (let i = 0; i < 40; i++) events.push(...sim.tick());
@@ -1364,7 +1368,7 @@ describe('the limited weapons', () => {
     expect(own.every((e) => e.pid === player.id)).toBe(true);
     const kinds = own.map((e) => e.event.type);
     expect(kinds).toContain('fragBurst');
-    expect(kinds.filter((k) => k === 'bomblet')).toHaveLength(6);
+    expect(kinds.filter((k) => k === 'bomblet')).toHaveLength(8);
     expect(kinds).not.toContain('impact');
   });
 
@@ -1386,12 +1390,12 @@ describe('the limited weapons', () => {
     for (let i = 0; i < TURRET_SHOCKWAVE.rearmTicks; i++) sim.tick();
     expect(sim.useVehicleAction('turret_shockwave', { x: 0, z: 0 })).toBe(false);
     expect(defense.stats).toMatchObject({ shockwaves: 2, shots: 0 });
-    expect(turretChargesLeft(defense)).toEqual({ shockwave: 0, fragmentation: 3 });
+    expect(turretChargesLeft(defense)).toEqual({ shockwave: 0, fragmentation: 4 });
   });
 
   it('refuses both weapons in the intro, spending nothing and recording no entry', () => {
     const { sim } = rig();
-    seat(sim);
+    sim.chat('/dev turret hard');
     const session = turretSeat(sim);
     const defense = session.defense;
     expect(defense.phase).toBe('intro');
@@ -1400,7 +1404,7 @@ describe('the limited weapons', () => {
     expect(sim.useVehicleAction('turret_shockwave', aim)).toBe(false);
     expect(sim.useVehicleAction('turret_frag', aim)).toBe(false);
     expect(defense.stats).toMatchObject({ shockwaves: 0, frags: 0, shots: 0 });
-    expect(turretChargesLeft(defense)).toEqual({ shockwave: 2, fragmentation: 3 });
+    expect(turretChargesLeft(defense)).toEqual({ shockwave: 2, fragmentation: 4 });
     expect(session.nextFeedbackSeq).toBe(seq);
     expect(sim.useVehicleAction('turret_fire', aim)).toBe(true);
   });
@@ -1440,7 +1444,7 @@ describe('the limited weapons', () => {
     expect(live.shockwave).not.toBeNull();
     expect(live.frags).toHaveLength(1);
     const view = sim.turretSession!;
-    expect(turretChargesLeft(view.defense)).toEqual({ shockwave: 1, fragmentation: 2 });
+    expect(turretChargesLeft(view.defense)).toEqual({ shockwave: 1, fragmentation: 3 });
     expect(view.defense.shockReadyTick).toBe(live.shockReadyTick);
     expect(view.defense).not.toHaveProperty('shockwave');
     expect(view.defense).not.toHaveProperty('frags');

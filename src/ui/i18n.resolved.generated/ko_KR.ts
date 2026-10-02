@@ -550,6 +550,22 @@ export const ko_KR: EnTranslations = {
       "shotTiming": "재사용 대기시간: {cooldown}초. {flight}초 후 착탄. 모든 포격이 {recovery}초의 회복 시간을 공유합니다.",
       "shotRules": "표시된 구역 안을 조준하세요. 마나 소모 없음. 피해는 장비나 특성의 영향을 받지 않습니다."
     },
+    "turretArsenal": {
+      "introShock": "새 무기: 충격파, {shockKey}. 탑을 내리쳐 탑 발치의 몬스터를 모두 날려 버립니다.",
+      "introShockTouch": "새 무기: 충격파. 소켓을 눌러 탑 발치의 몬스터를 모두 날려 버리세요.",
+      "introFrag": "새 무기: 파편탄, {fragKey}. 장전한 뒤 무리를 향해 쏘면 그 위에서 자탄으로 터집니다.",
+      "introFragTouch": "새 무기: 파편탄. 소켓을 눌러 장전한 뒤 무리를 누르면 그 위에서 자탄으로 터집니다.",
+      "shockHint": "몬스터가 탑에 닿기 전에 날려 버리세요. {shockKey}: 충격파.",
+      "shockHintTouch": "몬스터가 탑에 닿기 전에 날려 버리세요. 소켓을 눌러 충격파를 사용하세요.",
+      "fragHint": "몬스터가 탑에 닿기 전에 날려 버리세요. {fragKey}: 파편탄.",
+      "fragHintTouch": "몬스터가 탑에 닿기 전에 날려 버리세요. 소켓을 눌러 파편탄을 사용하세요.",
+      "resupplyBoth": "보급: 충격파 {shock}, 파편탄 {frag}",
+      "resupplyShock": "보급: 충격파 {shock}",
+      "resupplyFrag": "보급: 파편탄 {frag}",
+      "resupplyRule": "{waves}번째 웨이브가 끝나면 이 임무의 각 무기 충전이 하나씩 늘어납니다.",
+      "bonusRule": "임무에서 승리하면 쓰지 않고 남긴 충전 하나당 {points}점을 얻습니다.",
+      "pointsCharges": "남긴 충전 ({count})"
+    },
     "turret": {
       "title": "Fire and Fly",
       "integrity": "탑 내구도",
@@ -603,7 +619,39 @@ export const ko_KR: EnTranslations = {
       "weaponsHintTouch": "몬스터가 탑에 닿기 전에 날려 버리세요. 소켓을 눌러 충격파나 파편탄을 사용하세요.",
       "statShockwaves": "충격파",
       "statFrags": "파편탄",
-      "statUsed": "{used}/{given}"
+      "statUsed": "{used}/{given}",
+      "fragMultiHit": "x{count}"
+    },
+    "gunneryBoard": {
+      "title": "포술 게시판",
+      "listLabel": "시련과 임무",
+      "trials": "입대 시험",
+      "missions": "임무",
+      "trialKicker": "시련",
+      "missionKicker": "임무",
+      "recruitProgress": "통과한 시련: {won}/{total}",
+      "recruited": "입대 완료",
+      "mastery": "포수의 숙련: 별 {stars}/{max}개",
+      "won": "승리함",
+      "notWon": "아직 승리하지 못함",
+      "locked": "잠김",
+      "arsenal": "무장",
+      "charges": "{weapon} ×{count}",
+      "gold": "금",
+      "goldBar": "탑을 {percent} 지키기",
+      "waves": "웨이브",
+      "best": "최고 기록",
+      "bestRun": "{medal}, {points}점",
+      "notPlayed": "아직 도전하지 않음",
+      "reward": "오늘의 보상",
+      "rewardAvailable": "받을 수 있음",
+      "rewardCollected": "받음: 연습만 가능",
+      "takeTrial": "시련 도전",
+      "takeMission": "임무 도전",
+      "practice": "연습",
+      "actionAria": "{action}: {name}",
+      "lockedTrial": "{previous}을(를) 통과하면 이 시련이 열립니다.",
+      "lockedMission": "{name}을(를) 통과하면 입대하고 임무가 열립니다."
     },
     "warlock": {
       "doomLabel": "단죄",
@@ -12648,25 +12696,16 @@ export const ko_KR: EnTranslations = {
           "brittle": "금 간 탑",
           "powder": "화약고"
         },
-        "pitch": {
-          "introduction": "신병의 첫 경계 근무",
-          "standard": "성벽 위의 진짜 경계 근무",
-          "hard": "고참병들이 치르는 포위전",
-          "pack": "무리로 오니 한 발도 헛되이 쏘지 말게",
-          "giants": "멀리 날려 보내기엔 너무 무거운 거구 몇 마리",
-          "deluge": "작고 빠른 짐승의 홍수",
-          "brittle": "몇 번만 맞아도 탑이 무너진다",
-          "powder": "두 배의 화약통, 놈들 길목에"
-        },
-        "start": "{name}: {detail} (파도 {count}개)",
-        "practice": "{name} 연습 (파도 {count}개)",
-        "practiceMission": "{name} 연습 (파도 {count}개)",
-        "sections": {
-          "trials": "시련",
-          "missions": "임무"
-        },
-        "lockedTrial": "{name}: {previous}을(를) 통과하면 열림",
-        "missionsLocked": "{name}을(를) 통과하면 입대하고 임무가 열립니다."
+        "brief": {
+          "introduction": "모든 포수는 여기서 시작하네, 신병. 늑대, 멧돼지, 쥐, 거미 같은 작은 짐승들이 짧은 세 번의 웨이브로 탑 사방에서 느긋하게 다가오지. 탑은 석공 손을 막 떠난 참이라 꽤 많이 물어뜯겨도 버틴다네.",
+          "standard": "내 포수들이 매일 밤 성벽에서 서는 경계 근무일세. 여섯 번의 웨이브가 사방에서 몰려오지. 늑대와 멧돼지로 시작해 산적과 트롤을 거쳐 오우거, 걸어 다니는 시체, 살아 있는 바위 거인까지 이어지고, 마지막 웨이브는 다른 놈들보다 훨씬 거대한 것이 장식하지.",
+          "hard": "포대를 맡기기 전에 고참병들에게 치르게 하는 포위전일세. 여섯 번의 웨이브는 정식 경계 근무보다 억세고 덩치 큰 놈이 더 많으며, 더 촘촘히 두세 방향에서 동시에 오거나 떼 지어 몰려오지. 마지막 웨이브에는 그 거구가 다시 나온다네.",
+          "pack": "야생의 짐승은 무리 지어 사냥하는데, 이놈들도 마찬가지일세. 여섯 번의 웨이브가 저마다 한 방향에서 한 덩어리씩 몰려오지. 처음엔 늑대와 멧돼지, 다음엔 몸에 칠을 한 부족 사냥꾼과 그 짐승들, 그리고 맨 끝엔 건초 수레만 한 회색 늑대일세.",
+          "giants": "이번엔 수는 적지만 하나같이 거대하네. 청동 파수꾼, 용암 괴수, 살아 있는 바위 거인, 발은 느려도 쓰러뜨리기가 무척 힘들지. 여섯 번의 웨이브, 그중 하나라도 탑에 닿으면 무너지는 성벽처럼 들이받는다네.",
+          "deluge": "작고 날랜 짐승 수십 마리가, 늑대, 멧돼지, 거미, 깊은바위 굴착꾼이 거의 틈도 없이 사방에서 쏟아져 들어오지. 그런 웨이브가 여섯 번, 언덕에서 쏟아지는 비처럼 말일세. 하나하나는 약하지만 끝없이 몰려온다네.",
+          "brittle": "이 탑은 지난 철에 크게 얻어맞고 금이 아물지 않았네. 많아야 열 번 맞으면 무너지지. 잠들지 못한 망자들, 뼈 병사, 두건 쓴 시체, 그림자 사냥개가 일정한 속도로 여섯 번의 웨이브를 이루어 오네. 큰 놈은 없지만, 닿는 일격 하나하나가 뼈아프다네.",
+          "powder": "화약고가 들보까지 꽉 차서, 바깥에 평소의 두 배나 되는 화약통을 놓아두었네. 괴물들이 지나는 길목 바로 위에 말일세. 대장간의 무리가 그걸 노리고 여섯 번의 웨이브로 오지. 잉걸불 꼬마 악마, 청동 기계, 용암 괴수, 그리고 자루를 멘 도둑 하나가, 한쪽에서, 양옆에서, 혹은 무리 지어 온다네."
+        }
       },
       "calligraphyTitle": "비전 서예",
       "traceOutline": "발걸음으로 윤곽 따라 그리기",

@@ -1212,7 +1212,10 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 11642,
+    // LOWERED 11642 -> 11639 for Fire and Fly's records read (IWorld
+    // fireAndFlyRecords, one getter): the offline daily-reward ladder page moved
+    // into src/sim/leaderboard_page.ts beside the other boards. Exact count.
+    ceiling: 11639,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
