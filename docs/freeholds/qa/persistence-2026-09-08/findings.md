@@ -5652,7 +5652,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - ROUND FOURTEEN, eight fresh readers over round thirteen: 39 findings, one blocking, twelve
   should-fix. The blocking finding was round thirteen's own pool-fill sentence, which a save's
   2 s lock timeout contradicts; it now states each bound by its setting (the stall waits on
-  `auth_tokens`, corrected in round eighteen). HOLDER may run at any point and the pg suite
+  `auth_tokens`, corrected in round nineteen). HOLDER may run at any point and the pg suite
   shows it a holder, a waiter and an idle runbook session; every resend is capped; the bench
   ranges say which boots deadlocked; and the compose grace is read line by line, so no pattern
   can hang (its comment strip still could, corrected in round fifteen). Fixed in `6a7e3cd49d`
@@ -5661,7 +5661,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   should-fix. The bench's deadlocked boots had aborted an account-then-character transaction,
   which the docs now name, with the account create on the order path (only while community test
   accounts are on, corrected in round sixteen); every stuck client's bound is named and read
-  from the code (the stuck clients are token statements, corrected in round eighteen); the
+  from the code (the stuck clients are token statements, corrected in round nineteen); the
   shutdown closure's SIGTERM registration and the compose stop signal are pinned; the dump wait
   has a measure (taken from yesterday's backup since round sixteen); and the grace parse's
   comment strip, which could still backtrack, is a plain search. Fixed in `6c91150321` through
@@ -5672,7 +5672,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   fifteen had read the account create without its community test branch, and the docs now say
   when it takes the order path. The signal registrations and the image's stop signal are pinned
   whole, and each stuck client fails at its own bound (token statements at the statement timeout
-  and other queries at the pool's acquire timeout, corrected in round eighteen). Fixed in
+  and other queries at the pool's acquire timeout, corrected in round nineteen). Fixed in
   `8661efb1c3` through `b1d103a36c`.
 - ROUND SEVENTEEN, eight fresh readers over round sixteen: 39 findings, none blocking, five
   should-fix. A character create takes both deadlock paths, and the docs say so. The dump wait
@@ -5691,6 +5691,13 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   every statement a boot sends and finds no lock timeout. DEPLOY's boot bullet is split by
   concern and says what to redo after the dump: an account write whose token revoke failed.
   Fixed in `80ee2487aa` through `2323737f77`.
+- ROUND TWENTY, eight fresh readers over round nineteen: 46 findings, three blocking (one
+  defect, which five readers found), 20 should-fix. Round nineteen's own route was wrong:
+  stopping a realm whose boot waits behind the dump leaves its backend in the queue, since a
+  backend waiting for a lock never reads its socket; DEPLOY now ends the backend, and section L
+  runs that statement against a stopped boot. The dump-shaped hold and the startup channel are
+  observed too, a row lock counts by the table lock it carries, and the stall's redo list became
+  one sign-out. Fixed in `7c8509713b`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5711,7 +5718,8 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - `npx tsc --noEmit` exit 0 at every round's tip.
 - Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then
   641, then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
-  then 644, then 644, then 644, then 644, then 644, then 644, then 645 passed, never a skip.
+  then 644, then 644, then 644, then 644, then 644, then 644, then 645, then 646 passed, never a
+  skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
@@ -5724,6 +5732,11 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 ### OWED, NOT CLAIMED
 
 - Both halves of the boot's deadlock fix (R-11), a maintainer decision.
+- A boot that queues behind the nightly dump with no operator awake (a crash restart at night)
+  stalls every realm's token traffic until the dump ends, and DEPLOY's route needs an operator
+  to end its backend. Bounding the boot instead (a boot lock timeout with a retry, or
+  `client_connection_check_interval` so a stopped realm's backend ends itself) is a maintainer
+  decision.
 - A login-time clamp for a corrupt Hearth row; it needs a clock-skew margin no constant names.
 - The storage fragment still names `pg_catalog` second in its DDL path (the decoy exposure M4
   fixed for the operation fragment).
