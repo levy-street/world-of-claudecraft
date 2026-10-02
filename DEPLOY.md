@@ -1092,22 +1092,22 @@ For off-box safety, sync the directory to S3 occasionally:
   blocking every realm's saves and logins while it waits (a stuck character save fails
   at its save transaction's 2 s lock timeout, `server/character_save_transaction.ts`,
   with 55P03, and every attempt fails so for the dump's remaining run, so a leave save
-  whose retries end first is lost but for its guild books; a stuck read holds its
-  realm's pool client until its statement timeout fails it with 57014,
-  `DB_STATEMENT_TIMEOUT_MS` (15 s) for an ordinary read such as a login and
-  `DB_HEAVY_STATEMENT_TIMEOUT_MS` (60 s) for the heavy reads `runWithStatementTimeout`
-  raises, so a realm's pool can fill), and a boot during the dump's opening locks can
-  deadlock it and abort that night's backup), and in a rolling restart let one realm
-  finish shutting down before another boots; that is the quiet window this file means.
-  An aborted save shows as 40P01 in the realm log (one that carried guild bank books
-  also counts `escrow_save_failed`), and what writes it again depends on the save: an
-  autosave is written by the next autosave; a leave save is retried with backoff
-  (`server/leave_character_save.ts`), its guild books reconciled if every attempt
-  fails; a shutdown flush save is retried once only for a character carrying guild
-  bank books, and otherwise not at all. An aborted Hearth trip counts `trip_failed`
-  and is not retried by the server (the player presses the key again), and neither is
-  an aborted account create (the player tries again). The hazard predates housing;
-  removing both paths is owed
+  whose retries end first is lost but for its guild books; a stuck read, or a write
+  other than a save such as a character create, holds its realm's pool client until
+  its statement timeout fails it with 57014, `DB_STATEMENT_TIMEOUT_MS` (15 s) for an
+  ordinary read such as a login and `DB_HEAVY_STATEMENT_TIMEOUT_MS` (60 s) for the
+  heavy reads `runWithStatementTimeout` raises, so a realm's pool can fill), and a
+  boot during the dump's opening locks can deadlock it and abort that night's backup),
+  and in a rolling restart let one realm finish shutting down before another boots;
+  that is the quiet window this file means. An aborted save shows as 40P01 in the
+  realm log (one that carried guild bank books also counts `escrow_save_failed`), and
+  what writes it again depends on the save: an autosave is written by the next
+  autosave; a leave save is retried with backoff (`server/leave_character_save.ts`),
+  its guild books reconciled if every attempt fails; a shutdown flush save is retried
+  once only for a character carrying guild bank books, and otherwise not at all. An
+  aborted Hearth trip counts `trip_failed` and is not retried by the server (the
+  player presses the key again), and neither is an aborted account create (the player
+  tries again). The hazard predates housing; removing both paths is owed
   (docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md measures it).
 - FIRST ROLLOUT OF THE HOUSING TABLES: the first boot that carries them also creates
   the foreign-key-bearing tables and the delete guards on `accounts` and `characters`
