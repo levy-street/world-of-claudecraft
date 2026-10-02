@@ -61,6 +61,11 @@ const at = (calls: readonly Captured[], fragment: string): number =>
 
 const count = (haystack: string, needle: string): number => haystack.split(needle).length - 1;
 
+/** A line break that leaves a markdown bullet: one followed by a line that is
+ *  neither indented nor blank. A blank line (CRLF too) and the end of the text
+ *  stay inside it. */
+const OUTSIDE_BULLET = /\n(?![ \r\n]|$)/;
+
 // The vault_craft_gate.test.ts idiom: a block comment or a leading -- carrying
 // the pinned text must never keep a pin green while the statement is dead.
 const codeOnly = (sql: string): string =>
@@ -997,8 +1002,9 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
     const raw = deploy.slice(start, end);
     // Every line after the first is the bullet's own (indented or blank), so
     // the slice never runs into a following paragraph or section.
-    expect('- a\n  b\nPara\n').toMatch(/\n(?![ \n])/);
-    expect(raw).not.toMatch(/\n(?![ \n])/);
+    expect('- a\n  b\nPara\n').toMatch(OUTSIDE_BULLET);
+    expect('- a\r\n  b\r\n\r\n  c\n').not.toMatch(OUTSIDE_BULLET);
+    expect(raw).not.toMatch(OUTSIDE_BULLET);
     const bullet = raw.replace(/\n\s*/g, ' ');
     expect(bullet).toContain(`\`[schema] ${raised[0]}\``);
     expect(bullet).toContain(`\`${compared[0]}\``);
@@ -1114,8 +1120,11 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
     // The dump window is the backup job's: a nightly cron at 03:15, and a
     // `pg_dump` that names no session, so HOLDER shows it as `pg_dump`.
     // Each checked as a boolean, so a failure prints its message, never the
-    // whole script; the cron runs in the host's zone, which the script never
-    // sets, and the dump inherits the db service's environment.
+    // whole script. The cron runs in the host's zone, UTC on the stock image,
+    // and the dump inherits the db service's environment; the script names no
+    // zone in any spelling (every way to set one names a zone, a `TZ` or the
+    // `localtime` file), and a zone set by hand on the host is beyond what
+    // repo text pins.
     const backup = readFileSync('deploy/user-data.sh', 'utf8');
     const holds = (pattern: RegExp, what: string) => expect(pattern.test(backup), what).toBe(true);
     holds(
@@ -1126,12 +1135,23 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
       /^docker exec eastbrook-db pg_dump -U eastbrook eastbrook \\\r?$/m,
       'the backup pg_dump line in deploy/user-data.sh',
     );
+    const namesSession = /PGAPPNAME|application_name/;
+    const namesZone = /tz|zone|localtime/i;
+    for (const line of ['export PGAPPNAME=x', "psql 'application_name=x'"])
+      expect(namesSession.test(line), line).toBe(true);
+    for (const line of [
+      'timedatectl set-timezone America/New_York',
+      'ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime',
+      'echo America/New_York > /etc/timezone',
+      'export TZ=America/New_York',
+      'CRON_TZ=America/New_York',
+      'dpkg-reconfigure tzdata',
+    ])
+      expect(namesZone.test(line), line).toBe(true);
+    expect(namesSession.test(backup), 'deploy/user-data.sh names no session').toBe(false);
+    expect(namesZone.test(backup), 'deploy/user-data.sh names no time zone').toBe(false);
     expect(
-      /PGAPPNAME|application_name|timedatectl|set-timezone|CRON_TZ|^\s*TZ=/m.test(backup),
-      'deploy/user-data.sh names no session and sets no time zone',
-    ).toBe(false);
-    expect(
-      /PGAPPNAME|application_name/.test(readFileSync('docker-compose.yml', 'utf8')),
+      namesSession.test(readFileSync('docker-compose.yml', 'utf8')),
       'docker-compose.yml names no session',
     ).toBe(false);
     expect(bullet).toContain('or shows before 03:15 UTC or after 04:15 UTC');
@@ -1179,7 +1199,7 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
       '42703 from DISPLACE',
     ]);
     expect(bullet).toContain(
-      "on 55P03 or 40P01 send HOLDER: if it shows a `pg_dump` session, wait for the dump to end and never end it (send HOLDER about once a minute until it shows none; stop and report HOLDER's rows if a `pg_dump` row shows `granted` false, which is a dump waiting for the Hearth table, or shows before 03:15 UTC or after 04:15 UTC, which is no nightly dump on time: the window is fixed, since waiting longer only delays the repair and never risks it), then, if the last HOLDER, the one that shows no `pg_dump`, shows another `advance_token_runbook` session, take the lost connection route, and otherwise send the same file again, counting attempts afresh; if it shows another `advance_token_runbook` session, take the lost connection route; otherwise wait about 10 s and send the same file again, at most about five times in all, then stop and report HOLDER's rows",
+      "on 55P03 or 40P01 send HOLDER: if it shows a `pg_dump` session, wait for the dump to end and never end it (send HOLDER about once a minute until it shows none; stop and report HOLDER's rows if a `pg_dump` row shows `granted` false, which is a dump waiting for the Hearth table, or shows before 03:15 UTC or after 04:15 UTC, which is no nightly dump on time: the window is fixed, since waiting longer only delays the repair and never risks it), then, if the last HOLDER, the one that shows no `pg_dump`, shows another `advance_token_runbook` session, take the lost connection route, and otherwise send the same file again, counting attempts afresh; if it shows no `pg_dump` session but another `advance_token_runbook` session, take the lost connection route; otherwise wait about 10 s and send the same file again, at most about five times in all, then stop and report HOLDER's rows",
     );
     expect(bullet).toContain(
       'on 42710 from RESTORE the name was taken since the read, so re-run the read',
@@ -1188,7 +1208,7 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
       'a repair boot (above), so stop the other realms and run it in the next quiet window',
     );
     expect(bullet).toContain(
-      'on 42710 or 42P07 from DISPLACE an earlier displacement holds the name, so settle it by the drop rule and send DISPLACE again',
+      "on 42710 or 42P07 from DISPLACE an earlier displacement holds the name, so settle it by the drop rule and send DISPLACE again, and if the drop rule's read, before any DROP, finds no row, a bare relation holds the name: stop and report it",
     );
     expect(bullet).toContain(
       'on 42703 from DISPLACE the column itself is missing while a constraint holds the name, so every boot fails as above: stop the realms, keep them stopped, and report it',

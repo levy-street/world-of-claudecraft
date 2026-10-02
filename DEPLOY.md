@@ -1280,16 +1280,16 @@ For off-box safety, sync the directory to S3 occasionally:
     fixed, since waiting longer only delays the repair and never risks it), then, if
     the last HOLDER, the one that shows no `pg_dump`, shows another
     `advance_token_runbook` session, take the lost connection route, and otherwise
-    send the same file again, counting attempts afresh; if it shows another
-    `advance_token_runbook` session, take the lost connection route; otherwise wait
-    about 10 s and send the same file again, at most about five times in all, then
-    stop and report HOLDER's rows; on 42710 from RESTORE the name was taken since the
+    send the same file again, counting attempts afresh; if it shows no `pg_dump`
+    session but another `advance_token_runbook` session, take the lost connection
+    route; otherwise wait about 10 s and send the same file again, at most about five
+    times in all, then stop and report HOLDER's rows; on 42710 from RESTORE the name was taken since the
     read, so re-run the read; on 42703 from RESTORE the column itself is missing and
     every Hearth trip fails until the next boot re-adds it with its CHECK, a repair
     boot (above), so stop the other realms and run it in the next quiet window; on
     42710 or 42P07 from DISPLACE an earlier displacement holds the name, so settle it
     by the drop rule and send DISPLACE again, and if the drop rule's read, before any
-    DROP, finds no row a bare relation holds the name, so stop and report it; on 42703
+    DROP, finds no row, a bare relation holds the name: stop and report it; on 42703
     from DISPLACE the column itself is missing while a constraint holds the name, so
     every boot fails as above: stop the realms, keep them stopped, and report it; on a
     code starting 23 (an integrity error) from NULL AND VALIDATE, see the drop rule;
