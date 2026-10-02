@@ -378,9 +378,11 @@ export interface SimContextPrimitives {
   // in; the realm maps it from its env. Read-only, exactly the resolved Sim.cfg field.
   readonly freeholdsEnabled: boolean;
   // Re-typed in place, the one sanctioned exception to "members are added,
-  // never repurposed": the boolean became the FreeholdKeyAdmission answer
-  // (admit, pending, deny), every host moved with it, and an untyped
-  // host still returning true now fails closed (`busy`), never admits.
+  // never repurposed": a new member beside the boolean would have let a host
+  // still answering true keep admitting, so the boolean became the
+  // FreeholdKeyAdmission answer (admit, pending, deny), every host moved with
+  // it, and a host still returning true fails closed (`busy`) in useHearthKey,
+  // never admits.
   readonly freeholdKeyAdmission: (ownerKey: string, pid: number) => FreeholdKeyAdmission;
   readonly freeholdKeyReadyAtMs: Map<string, number>;
   readonly instanceScanCounters: {

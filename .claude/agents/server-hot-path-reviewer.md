@@ -79,10 +79,11 @@ code gets the full checklist).
    hot path that cannot be measured in production. A new `selfWireJson` key joins a
    `SELF_WIRE_PHASES` bucket (`tests/self_wire_phase_breakdown.test.ts`); a recurring
    main-thread job (autosave, sweeps, self-clocked loops) bills its cost to a profiler
-   phase: the `saves` phase counts ONLY the market (market + mail books) and rift
-   writers through the serial writers' `onWrite` observer, so a new shared-blob writer wires
-   that observer and any other job registers a phase of its own; a job that reports
-   into no phase shows up as `lateness` with nothing to attribute it to.
+   phase: the `saves` phase counts ONLY the members `server/CLAUDE.md` "Hot paths" names
+   (the shared-blob writers through the serial writers' `onWrite` observer, and the
+   synchronous launches on the autosave flush through `onSaveMs`), so a new shared-blob
+   writer or flush launch reports there and any other job registers a phase of its own; a
+   job that reports into no phase shows up as `lateness` with nothing to attribute it to.
 7. **No O(realm-collection) read on the per-tick self path.** Every `maybe(...)` key in
    `selfWireJson` is rebuilt per session per pass (the delta cache suppresses the send,
    never the rebuild). A new or changed read there whose cost scales with a collection

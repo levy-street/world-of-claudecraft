@@ -256,7 +256,9 @@ that shape.
   ONLY those two writers plus two Freeholds jobs on the same flush, each billing its
   synchronous part through the same `onSaveMs` observer: the housing sweep
   (`saveFreeholds`, its `saveAllDirty`) and the plot-claim renewer's launch
-  (`renewGameFreeholdClaims` in `freehold_persist_wiring.ts`). Per-character blobs and
+  (`renewGameFreeholdClaims` in `freehold_persist_wiring.ts`; its per-chunk continuations
+  after the first await run off the tick, each bounded by one renew chunk). Per-character
+  blobs and
   DB round trips are not in it, and a
   job that reports into no phase shows up as `lateness` with nothing to attribute it
   to. Rules: a new realm collection never persists as one whole-book `world_state` blob
@@ -270,7 +272,8 @@ that shape.
   durable", the `persistMailBlob` per-parcel shape PR #3663 retired, is the same
   defect on a different clock); and a new recurring job bills its cost to
   a profiler phase in the same change (an observer into `saves` for a new shared-blob
-  writer, a registered phase of its own otherwise), never silently.
+  writer or a synchronous launch on the autosave flush, as the two Freeholds jobs are; a
+  registered phase of its own otherwise), never silently.
 
 - **Fresh-bot load tests cannot see this bug class.** Fresh characters carry empty
   books, boards, and inboxes, so a bot fleet proves interest-scan and movement cost,

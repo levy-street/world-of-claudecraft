@@ -117,8 +117,9 @@ carries an opaque plot id only.
   even on non-sweep ticks; no RNG or clock enters their accounting. The server's
   freehold-record gauge reads `ctx.freeholds.size` directly, not a map walk.
   Record counts and public `freehold` presence labels must never include owner
-  keys or become gameplay authority. The account Hearth's future private mirror
-  belongs to account state, never transferable plot state or its descriptor.
+  keys or become gameplay authority. The account Hearth's clock, and any private
+  client mirror of it, belong to account state, never transferable plot state or
+  its descriptor.
 - THE LIGHTING RULING: the realm remains dark by default. The shared slot
   capacity and empty hold, physical-entry broadcast cost, durable ownership
   and remote-key authority remain unsigned deployment prerequisites. The
@@ -142,8 +143,8 @@ carries an opaque plot id only.
   ONE gate; no command body re-checks `ctx.freeholdsEnabled`. The sim honors
   the flag in one place, the two record INSERTERS in `state.ts`
   (`loadFreehold`, `ensureFreeholdRecord`): both insert nothing on a dark
-  host, so neither the `addPlayer` seed today nor a persistence loader later
-  can seed a dark realm, every dark enter answers `no_freehold`, and there is
+  host, so neither the `addPlayer` seed nor a persistence loader can seed a
+  dark realm, every dark enter answers `no_freehold`, and there is
   no second gate to drift. `seedFreeholdOnJoin` still applies the host stamp
   on a dark host, so a later lit read sees the right key.
 - RETENTION: `seedFreeholdOnJoin` is the first record inserter, and
@@ -181,7 +182,7 @@ carries an opaque plot id only.
   drop). It must stay pure: no SQL, no rng, no clock; the server owns rows.
   Retention: the map is keyed by owner and grows with every load, so the
   first `loadFreehold` caller pairs with `evictFreehold` at account or
-  character unload in the same change. Today that pairing is
+  character unload in the same change. That pairing is
   `server/freehold_persist.ts`, which retains on the join path and releases on
   leave, and `releaseFreeholdOnLeave`, which evicts at the last same-key session
   out. The table itself is KEEP-FOREVER and deliberately
@@ -254,10 +255,10 @@ carries an opaque plot id only.
   `professions/gathering.ts` and `mounts_training.ts` do (not
   `professions/farming.ts`: its Sim delegate resolves the caller first) and
   then returns. `freeholdEnter` confirms through `gate.ts` and `freeholdLeave` delegates
-  to `instance.ts`; for the eight others the numbered later work named
+  to `instance.ts`; for the others the numbered later work named
   on each body puts the real decision there, re-validating the payload shape
   in the module so the offline host enforces what the server guard enforces.
-  None of those eight may mutate state, emit an event or draw rng until its
+  None of those may mutate state, emit an event or draw rng until its
   owner lands it, so a host that runs them is indistinguishable from one that
   does not.
 - `Sim` keeps thin same-named delegates for the facet (the `IWorldHousing`
@@ -277,8 +278,8 @@ carries an opaque plot id only.
 - `ClientWorld.buildPresenceSeq` (the online half, `src/net/online.ts`) is
   RESERVED for C03 and carries two properties later work must not overread. No
   server-side ordering or drop logic exists yet: `server/freehold_wire.ts`
-  type-guards the field and discards it, so nothing is reordered or dropped
-  today. And it is advisory rather than dense: the counter advances even when
+  type-guards the field and discards it, so nothing is reordered or dropped.
+  And it is advisory rather than dense: the counter advances even when
   the frame is not actually sent (spectating, or a closed socket), so C03 must
   treat it as monotonic-WITH-GAPS and never as a contiguous count.
 - The host opt-in is `SimConfig.freeholdsEnabled` (D85: optional, default
