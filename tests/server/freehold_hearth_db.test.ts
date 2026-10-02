@@ -1090,7 +1090,7 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
     // name settled before DISPLACE again, the live name never dropped, and
     // every statement naming the table the boot checks.
     expect(bullet).toContain(
-      'Send the read and each block below as its own file through this one command, never pasted into an interactive session: all but HOLDER and the version read with no realm booting or restarting and outside the nightly `pg_dump` (it starts at 03:15 UTC, see Backups), and those two, which take no lock on any user table, at any point:',
+      'Send the read and each block below as its own file through this one command, never pasted into an interactive session: all but HOLDER and the version read (`SHOW server_version`, below) with no realm booting or restarting and outside the nightly `pg_dump` (it starts at 03:15 UTC, see Backups), and those two, which take no lock on any user table, at any point:',
     );
     // The command is one line in the bullet's one shell fence, so it is copied
     // whole. psql names its session from PGAPPNAME (a `-c application_name`
@@ -1105,12 +1105,13 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
       "A report gives the read's `contype`, `convalidated`, `keys` and `columns` and whether the definition matched the text above or PRINT's, never the definition itself, which can carry a literal from a hand-made constraint; when a case below asks for the probe's literal to be updated, it also gives PRINT's output, which is only the fixed CHECK, and the major version from the version read, `SHOW server_version`, sent as its own file through the same command",
     );
     expect(bullet).toContain('every block but PRINT and HOLDER locks the table to its COMMIT');
-    // The dump wait reads the directory the backup job writes.
-    const backupDirs = [
-      ...readFileSync('deploy/user-data.sh', 'utf8').matchAll(/^BACKUP_DIR="([^"]+)"$/gm),
-    ].map((match) => match[1]);
-    expect(new Set(backupDirs)).toEqual(new Set(['/var/backups/eastbrook']));
-    expect(bullet).toContain(`yesterday's file in \`${backupDirs[0]}/\``);
+    // The dump window is the backup job's: a nightly cron at 03:15, and a
+    // `pg_dump` that names no session, so HOLDER shows it as `pg_dump`.
+    const backup = readFileSync('deploy/user-data.sh', 'utf8');
+    expect(backup).toContain('echo "15 3 * * * root /usr/local/bin/eastbrook-backup"');
+    expect(backup).toContain('docker exec eastbrook-db pg_dump -U eastbrook eastbrook \\\n');
+    expect(backup).not.toMatch(/PGAPPNAME|application_name/);
+    expect(bullet).toContain('or shows before 03:15 UTC or after 04:15 UTC');
     // A boot that cannot re-add the column, its name held, loops: stop.
     expect(bullet).toContain(
       'if a constraint already holds that name (on other columns or none), every boot fails with 42710, rolls back, exits and is restarted, and every restart repeats the stall (above), so stop the realms, keep them stopped, and report it',
@@ -1136,7 +1137,9 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
       '42P07',
       '42703',
       '55P03',
+      '40P01',
       '55P03',
+      '40P01',
     ]);
     expect([...bullet.matchAll(/code starting (\d\d)/g)].map((match) => match[1])).toEqual([
       '23',
@@ -1153,7 +1156,7 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
       '42703 from DISPLACE',
     ]);
     expect(bullet).toContain(
-      "on 55P03 or 40P01 send HOLDER: if it shows a `pg_dump` session, wait for the dump to end and never end it (send HOLDER about once a minute until it shows none; stop and report HOLDER's rows if a `pg_dump` row shows `granted` false, which is a dump waiting for the Hearth table, if one still shows more than twice as long after 03:15 UTC as the previous night's dump ran, read as the last write of yesterday's file in `/var/backups/eastbrook/` less 03:15 UTC, since tonight's file, named for today's date, is the one the running dump is still writing, or if there is no file from yesterday), then take the lost connection route if HOLDER had also shown another `advance_token_runbook` session, and otherwise send the same file again, counting attempts afresh; if it shows another `advance_token_runbook` session, take the lost connection route; otherwise wait about 10 s and send the same file again, at most about five times in all, then stop and report HOLDER's rows",
+      "on 55P03 or 40P01 send HOLDER: if it shows a `pg_dump` session, wait for the dump to end and never end it (send HOLDER about once a minute until it shows none; stop and report HOLDER's rows if a `pg_dump` row shows `granted` false, which is a dump waiting for the Hearth table, or shows before 03:15 UTC or after 04:15 UTC, which is no nightly dump on time: the window is fixed, since waiting longer only delays the repair and never risks it), then take the lost connection route if HOLDER had also shown another `advance_token_runbook` session, and otherwise send the same file again, counting attempts afresh; if it shows another `advance_token_runbook` session, take the lost connection route; otherwise wait about 10 s and send the same file again, at most about five times in all, then stop and report HOLDER's rows",
     );
     expect(bullet).toContain(
       'on 42710 from RESTORE the name was taken since the read, so re-run the read',
@@ -1171,7 +1174,7 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
       'on a code starting 23 (an integrity error) from NULL AND VALIDATE, see the drop rule',
     );
     expect(bullet).toContain(
-      "on a lost connection (psql exits saying the connection was lost, whatever code it printed first), send HOLDER, and if it shows a `pg_dump` session, first wait the dump out by the waits and stops above, never their resend; then send HOLDER until it shows no other `advance_token_runbook` session, for up to about a minute (if one remains, stop and report it); then send the file that brought you here (from the 55P03 route, the file that failed, never HOLDER) again once if it was the read, PRINT, HOLDER or the version read, since they change nothing, or for any other block re-run the read (after DROP, the drop rule's read): if the block landed, go on from the step after it (a report of a NULL AND VALIDATE that landed this way gives its count as unknown), and if not, send it again once; if any send made on this route loses its connection, stop and report it, and a resend made on this route counts toward the five above, which start afresh after any dump wait, on this route or the 55P03 one; on anything else, stop",
+      "on a lost connection (psql exits saying the connection was lost, whatever code it printed first), send HOLDER, and if it shows a `pg_dump` session, first wait the dump out by the waits and stops above, never their resend; then send HOLDER until it shows no other `advance_token_runbook` session, for up to about a minute (if one remains, stop and report it); then send the file that brought you here (from the 55P03 or 40P01 route, the file that failed, never HOLDER) again once if it was the read, the drop rule's read, PRINT or the version read, since they change nothing, or for any other block re-run the read (after DROP, the drop rule's read): if the block landed, go on from the step after it (a report of a NULL AND VALIDATE that landed this way gives its count as unknown), and if not, send it again once; if any send made on this route loses its connection, stop and report it, and a resend made on this route counts toward the five above, which start afresh after any dump wait, on this route or the 55P03 or 40P01 one; on anything else, stop",
     );
     const readAt = bullet.indexOf('First read what the name holds');
     expect(readAt).toBeGreaterThan(-1);

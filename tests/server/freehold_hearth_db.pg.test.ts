@@ -799,6 +799,17 @@ d('account_freehold_hearth against real PostgreSQL', () => {
         const pidOf = async (client: typeof dump) =>
           Number((await client.query('SELECT pg_backend_pid() AS pid')).rows[0].pid);
         const [dumpPid, waiterPid, idlePid] = await Promise.all([dump, waiter, idle].map(pidOf));
+        // A dump that holds no Hearth lock yet still shows, by its name.
+        expect((await send(block.HOLDER)).filter((row) => row.pid === dumpPid)).toEqual([
+          {
+            pid: dumpPid,
+            application_name: 'pg_dump',
+            backend_type: 'client backend',
+            state: 'idle',
+            mode: null,
+            granted: null,
+          },
+        ]);
         await dump.query('BEGIN');
         await dump.query(`LOCK TABLE ${legacyTable} IN ACCESS SHARE MODE`);
         await waiter.query('BEGIN');
@@ -850,6 +861,8 @@ d('account_freehold_hearth against real PostgreSQL', () => {
         await waiter.query('ROLLBACK').catch(() => {});
         await Promise.all([dump.end(), waiter.end(), idle.end(), other.end()]);
       }
+      // Client sessions only: an autovacuum worker on the table is a row
+      // HOLDER should show, and it can start at any moment.
       expect(
         (await send(block.HOLDER)).filter((row) => row.backend_type === 'client backend'),
       ).toEqual([]);
