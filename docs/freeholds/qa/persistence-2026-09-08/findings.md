@@ -5832,10 +5832,17 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   round forty-three, C43R1); the bot's grant comments name the ledger's account and the key's
   three parts. Fixed in `08e04fb5dc`; L42R4 flagged.
 - ROUND FORTY-THREE, eight fresh readers over round forty-two: 21 findings, none blocking, 8
+  should-fix, every reader passing, two with no should-fix. Section L reads every boot it stops or
+  holds behind with a deadline, its cleanup's wait included, a stopped boot checked at its read;
+  the bot route pin filters on the text its grep finds and proves every literal shape on a sample;
+  the client comment's claim stops at its boundary; the rest were record slips (worded so in round
+  forty-four, C44R1 and Q44R2). Fixed in `47c18284f6`.
+- ROUND FORTY-FOUR, eight fresh readers over round forty-three: 35 findings, none blocking, 14
   should-fix, every reader passing, two with no should-fix. Section L reads every boot it waits on
-  with a deadline, a stopped boot checked at its read; the bot route pin filters on the text its
-  grep finds and proves every literal shape on a sample; the rest were record slips. Fixed in
-  `47c18284f6`.
+  through one helper that cancels a boot still waiting at its deadline (a terminate, the fix the
+  readers offered, drops the connection under a client with no error listener), and no path stacks
+  past the case's timeout; the bot route pin parses every bot code file; the rest were record and
+  comment slips. Fixed in `5aa9f3730d`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5867,7 +5874,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then 647,
   then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then
   648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648,
-  then 648, then 648 passed, never a skip.
+  then 648, then 648, then 648 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
