@@ -2307,7 +2307,7 @@ describe('the claim renewer', () => {
     for (const sentence of [
       "and after any rollback run the bot's guarded line below, which moves a running bot to the image the game now runs and skips one that does not run.",
       'The guard skips a host that runs no bot, or one stopped by the third escalation lever.',
-      "With `discord` in `COMPOSE_PROFILES` in `.env` (as `COMPOSE_PROFILES=discord` sets it), every `up -d` that names no service starts the bot too, a bot stopped by that lever included: step 6's has already started it on the new image before the verification, and a rollback started that way starts it on the older one. On such a host, if that lever still holds, stop the bot again by it right after each such start, before the guarded line.",
+      "With `discord` in `COMPOSE_PROFILES` in `.env` (as `COMPOSE_PROFILES=discord` sets it), every `up -d` that names no service starts the bot too, a bot stopped by that lever included: step 6's has already started it on the new image before the verification, and a rollback started that way starts it on the older one. On such a host, if that lever held before such a start (which lifts it), stop the bot again by it right after the start, before the guarded line.",
       "Without the `discord` profile (no `--profile discord`, no `discord` in `COMPOSE_PROFILES` in `.env`, and no command that names `discord-bot`, which enables its profile by itself) the service simply never starts, which is the supported way to run a realm with no Discord integration; with `discord` in `COMPOSE_PROFILES`, every `up -d` that names no service starts it too, a release's step 6 included.",
       "While the third escalation lever (below) holds, either edit is made without the bot's `up`, which would lift that lever: the `up` that lifts it runs the bot with the edit.",
       "so once the realm is verified run the bot's guarded line under the release steps (a restart keeps its old image, and a bot the third escalation lever stopped stays stopped), or those cards post",
@@ -2318,13 +2318,27 @@ describe('the claim renewer', () => {
     ]) {
       expect(flatDeploy).toContain(sentence);
     }
+    // The compose example says what the profile starts, pointing at DEPLOY.
+    const envExample = readFileSync('.env.example', 'utf8')
+      .replace(/^# ?/gm, '')
+      .replace(/\s+/g, ' ');
+    expect(envExample).toContain(
+      'enable it with COMPOSE_PROFILES=discord after setting the bot env (every up -d that names no service then starts it, a stopped one included; see DEPLOY.md, "Enabling it").',
+    );
+    expect(deploy).toContain('\n**Enabling it.**');
     // The third lever is the stop, and it names every start of the bot as
     // lifting it, whichever site gives that start.
     const leverAt = deploy.indexOf(
       '\n3. **Stop the bot** as the definitive lever:\n\n   ```bash\n   sudo docker compose --profile discord stop discord-bot\n   ```\n',
     );
     expect(leverAt).toBeGreaterThan(-1);
-    const lever = deploy.slice(leverAt, deploy.indexOf('\n## ', leverAt)).replace(/\s+/g, ' ');
+    const leverItem = deploy.slice(leverAt + 1);
+    const leverEnd = leverItem.search(/\n\n(?! {3})/);
+    expect(leverEnd).toBeGreaterThan(-1);
+    const lever = leverItem.slice(0, leverEnd).replace(/\s+/g, ' ');
+    expect(lever).toContain(
+      "Queued outbox items wait in the game process (the winner days excepted, which the game reads from the database) and are delivered when it comes back, so a recreate of the game while it holds (a shared key's edit, a release) drops the relay, activity, link-change and queue-pop items queued since the stop.",
+    );
     expect(lever).toContain(
       "While it holds, every start of the bot lifts it: any `up` of the bot (the first two levers', an Environment keys edit's, the Enabling block's), a `start` or `restart`, and, with `discord` in `COMPOSE_PROFILES` in `.env`, every `up -d` that names no service (stop it again after one, as the release steps say). So while it holds, start the bot only to lift it: an `.env` edit for the bot reaches it then. Lift it only as the first two levers run it, with `sudo docker compose --profile discord up -d --no-deps discord-bot` (not while an image built for a coming release waits), never with `start` or `restart`, which revive the stopped container on the image it was created from, which need not be the one the game runs once a release or a rollback has run since.",
     );
@@ -2382,22 +2396,27 @@ describe('the claim renewer', () => {
     // is read, never dropped.
     const uncommented = (text: string) =>
       text.replace(/^[ \t]*#.*$/gm, '').replace(/^([^'"\n]*?)[ \t]#.*$/gm, '$1');
-    // Nothing reaches either block from outside it: no `env_file`, no
-    // `extends`, and no YAML merge key or alias at any depth.
-    const pulledIn =
-      /\n {4}(?:env_file|extends):|<<[ \t]*:|:[ \t]+\*[\w.-]|\n[ \t]*-[ \t]+\*[\w.-]/;
-    for (const control of [
-      '\n  game:\n    env_file:\n      - .env\n',
-      '\n  game:\n    extends:\n      service: base\n',
-      '\n  game:\n    <<: *defaults\n',
-      '\n    environment:\n      <<: *bot-env\n',
-      '\n    environment: *bot-env\n',
-      '\n    volumes:\n      - *data\n',
-    ]) {
-      expect(control).toMatch(pulledIn);
+    // Nothing reaches either block from outside it: neither names an
+    // `env_file` or `extends`, and the file defines no YAML anchor, so no
+    // alias or merge key, in any form, can bring a value in.
+    const pulledIn = /\n {4}(?:env_file|extends):/;
+    expect('\n  game:\n    env_file:\n      - .env\n').toMatch(pulledIn);
+    expect('\n  game:\n    extends:\n      service: base\n').toMatch(pulledIn);
+    const anchor = /(?:^|[\s[{,:-])&[\w.-]/m;
+    for (const control of ['x-env: &shared\n', '  - &first a\n', 'env: [&a x]\n']) {
+      expect(control).toMatch(anchor);
     }
+    for (const literal of ['run: a && b\n', 'url: http://x/?a=1&b=2\n']) {
+      expect(literal).not.toMatch(anchor);
+    }
+    expect(uncommented(compose)).not.toMatch(anchor);
+    // A comment line inside a block scalar is text Compose reads, so neither
+    // block holds one.
+    const blockScalar = /:[ \t]*[|>][-+0-9]*[ \t]*(?:#.*)?$/m;
+    expect('\n    command: |\n      run\n').toMatch(blockScalar);
     for (const name of ['game', 'discord-bot']) {
-      expect(uncommented(serviceBlock(name)), name).not.toMatch(pulledIn);
+      expect(serviceBlock(name), name).not.toMatch(pulledIn);
+      expect(serviceBlock(name), name).not.toMatch(blockScalar);
     }
     const refsIn = (text: string) => [
       ...new Set(

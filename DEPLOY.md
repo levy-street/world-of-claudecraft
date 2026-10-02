@@ -193,8 +193,8 @@ escalation lever. With `discord` in `COMPOSE_PROFILES` in `.env` (as
 `COMPOSE_PROFILES=discord` sets it), every `up -d` that names no service starts the
 bot too, a bot stopped by that lever included: step 6's has already started it on the
 new image before the verification, and a rollback started that way starts it on the
-older one. On such a host, if that lever still holds, stop the bot again by it right
-after each such start, before the guarded line.
+older one. On such a host, if that lever held before such a start (which lifts it),
+stop the bot again by it right after the start, before the guarded line.
 
 ```bash
 if [ "$(sudo docker inspect -f '{{.State.Running}}' eastbrook-discord-bot 2>/dev/null)" = true ]; then
@@ -1213,53 +1213,56 @@ For off-box safety, sync the directory to S3 occasionally:
     current_database()) AND relation = 'public.auth_tokens'::regclass AND mode IN
     ('ShareLock', 'ShareRowExclusiveLock', 'ExclusiveLock', 'AccessExclusiveLock');`
     from psql on the realm database returns 0 on two readings a few seconds apart, taken
-    while every realm container on the database shows `healthy` or `Exited` in
-    `sudo docker compose ps --all` (a `healthy` realm has committed its boot, its health
-    probe answering only once the boot's schema transaction has committed and the realm
-    listens; a boot that lost a deadlock reads 0 until its restart reaches that table
-    again, and the restart policy waits longer before each restart of a container that
-    keeps exiting). Then staff send again each ban, suspension or staff password reset
-    made during it, in the order made and skipping one a later unban or unsuspend
-    reversed or a suspension whose end time has passed, whether or not it returned an
-    error or shows landed (a repeat runs its revoke, disconnect and notice email again
-    and writes a second audit row; resend a suspension with its original end time and a
-    staff password reset with the same password), and players redo what returned an
-    error and did not land; nothing else sends a skipped notice email again. A token a
-    skipped revoke left valid stays valid until a sign-out, so then stop every realm on
-    the database, one after another, each stop finishing before the next, which drops
-    every live session and the in-memory desktop login codes in
-    `server/desktop_login.ts` (the sign-out cannot reach them, and a desktop app could
-    still trade one for a fresh token); sign every account out once from psql on the
-    realm database, in psql's default autocommit with no BEGIN so that it has committed
-    before any realm starts (`DELETE FROM auth_tokens WHERE created_at < now() AND
-    expires_at > now(); DELETE FROM oauth_codes; DELETE FROM oauth_device_codes; DELETE
-    FROM discord_oauth_states; DELETE FROM github_oauth_states;`, companion and OAuth
-    tokens included, no pending OAuth code left to mint one, and no Discord or GitHub
-    link a leftover token started left to finish; an expired token is refused already;
-    on 40P01 run it again); then from a new psql session `SELECT (SELECT count(*) FROM
-    auth_tokens WHERE expires_at > now()) + (SELECT count(*) FROM oauth_codes) + (SELECT
-    count(*) FROM oauth_device_codes) + (SELECT count(*) FROM discord_oauth_states) +
-    (SELECT count(*) FROM github_oauth_states) AS left;` returns 0 while
-    `sudo docker compose ps --all` shows every realm container on the database `Exited`,
-    or `Created` for one never started (else it has not committed, or a realm on the
-    database still runs: COMMIT in the sign-out's own session a transaction still open
-    there (its psql prompt then shows `*` or `!`), stop every realm still running, run
-    in one psql session in its default autocommit `SELECT pg_backend_pid();` and then
-    the sign-out again, either way, then read both again, the count from a new psql
-    session; a rerun that does not return waits, directly or behind a stopped realm's
-    statement queued on the same rows or table, on an earlier sign-out still open in
-    another session: from another psql session on the realm database, the naming
-    statement under Index builds below, given the rerun's pid, names the session the
-    rerun waits on, and given in turn the pid of each named session that reads `active`,
-    reaches the open sign-out, which the rule there ends); and, once the dump has ended
-    if the stall was behind one, start the realms again by Index builds below. Re-run
-    the deactivation housing receipt erase for deactivated accounts that still hold
-    receipts by the bullet below that begins "A failed deactivation receipt erase" (a
-    deactivation stopped at its revoke never reached the erase, so it logged no
-    warning). A sign-out undoes nothing a leftover token did before it (for example a
-    sign-in link it added, a recovery email it set, or anything its live session did in
-    game): this bullet does not recover an account the stall left open to whoever held
-    such a token, and that recovery is owed.
+    while every realm container on the database shows `healthy` or `Exited`, or
+    `Created` for one never started, in `sudo docker compose ps --all` (a `healthy`
+    realm has committed its boot, its health probe answering only once the boot's schema
+    transaction has committed and the realm listens; a boot that lost a deadlock reads 0
+    until its restart reaches that table again, and the restart policy waits longer
+    before each restart of a container that keeps exiting). Then staff send again each
+    ban, suspension or staff password reset made during it, in the order made and
+    skipping one a later unban or unsuspend reversed or a suspension whose end time has
+    passed, whether or not it returned an error or shows landed (a repeat runs its
+    revoke, disconnect and notice email again and writes a second audit row; resend a
+    suspension with its original end time and a staff password reset with the same
+    password), and players redo what returned an error and did not land; nothing else
+    sends a skipped notice email again. A token a skipped revoke left valid stays valid
+    until a sign-out, so then stop every realm on the database, one after another, each
+    stop finishing before the next, which drops every live session and the in-memory
+    desktop login codes in `server/desktop_login.ts` (the sign-out cannot reach them,
+    and a desktop app could still trade one for a fresh token); sign every account out
+    once from psql on the realm database, in psql's default autocommit with no BEGIN so
+    that it has committed before any realm starts (`DELETE FROM auth_tokens WHERE
+    created_at < now() AND expires_at > now(); DELETE FROM oauth_codes; DELETE FROM
+    oauth_device_codes; DELETE FROM discord_oauth_states; DELETE FROM
+    github_oauth_states;`, companion and OAuth tokens included, no pending OAuth code
+    left to mint one, and no Discord or GitHub link a leftover token started left to
+    finish; an expired token is refused already; on 40P01 run it again); then from a new
+    psql session `SELECT (SELECT count(*) FROM auth_tokens WHERE expires_at > now()) +
+    (SELECT count(*) FROM oauth_codes) + (SELECT count(*) FROM oauth_device_codes) +
+    (SELECT count(*) FROM discord_oauth_states) + (SELECT count(*) FROM
+    github_oauth_states) AS left;` returns 0 while `sudo docker compose ps --all` shows
+    every realm container on the database `Exited`, or `Created` for one never started
+    (else it has not committed, or a realm on the database still runs: COMMIT in the
+    sign-out's own session a transaction still open there (its psql prompt then shows
+    `*` or `!`), stop every realm still running, run in one psql session in its default
+    autocommit `SELECT pg_backend_pid();` and then the sign-out again, either way, then
+    read both again, the count from a new psql session; a rerun that does not return
+    waits, directly or behind sessions queued ahead of it, on a session that itself
+    waits on nothing: from another psql session on the realm database, give the naming
+    statement under Index builds below the rerun's pid, then each pid it names in turn,
+    until it names none, and the last session named decides: an earlier sign-out left
+    open (`psql`, `idle in transaction`) the rule there ends; the nightly dump
+    (`pg_dump`) is never ended, but a stopped realm's boot waiting behind it is, by The
+    nightly dump above; anything else is working: wait; then give it the rerun's pid
+    again, until the rerun returns); and, once the dump has ended if the stall was
+    behind one, start the realms again by Index builds below. Re-run the deactivation
+    housing receipt erase for deactivated accounts that still hold receipts by the
+    bullet below that begins "A failed deactivation receipt erase" (a deactivation
+    stopped at its revoke never reached the erase, so it logged no warning). A sign-out
+    undoes nothing a leftover token did before it (for example a sign-in link it added,
+    a recovery email it set, or anything its live session did in game): this bullet does
+    not recover an account the stall left open to whoever held such a token, and that
+    recovery is owed.
   - Index builds: after it listens, a realm's runner takes the schema advisory lock,
     then for each index of `server/concurrent_indexes.ts` in turn drops it if INVALID,
     builds it if missing, with CREATE INDEX CONCURRENTLY, and drops any index it
@@ -2474,13 +2477,16 @@ no image and is open even then:
 
    The game is unaffected. The bot is a pure consumer, so stopping it costs role,
    nickname, presence, relay, and activity sync until it is started again, and nothing
-   else. Queued outbox items stay on the server and are delivered when it comes back.
-   While it holds, every start of the bot lifts it: any `up` of the bot (the first two
-   levers', an Environment keys edit's, the Enabling block's), a `start` or `restart`,
-   and, with `discord` in `COMPOSE_PROFILES` in `.env`, every `up -d` that names no
-   service (stop it again after one, as the release steps say). So while it holds,
-   start the bot only to lift it: an `.env` edit for the bot reaches it then. Lift it
-   only as the first two levers run it, with
+   else. Queued outbox items wait in the game process (the winner days excepted, which
+   the game reads from the database) and are delivered when it comes back, so a
+   recreate of the game while it holds (a shared key's edit, a release) drops the
+   relay, activity, link-change and queue-pop items queued since the stop. While it
+   holds, every start of the bot lifts it: any `up` of the bot (the first two levers',
+   an Environment keys edit's, the Enabling block's), a `start` or `restart`, and, with
+   `discord` in `COMPOSE_PROFILES` in `.env`, every `up -d` that names no service (stop
+   it again after one, as the release steps say). So while it holds, start the bot only
+   to lift it: an `.env` edit for the bot reaches it then. Lift it only as the first
+   two levers run it, with
    `sudo docker compose --profile discord up -d --no-deps discord-bot` (not while an
    image built for a coming release waits), never with `start` or `restart`, which
    revive the stopped container on the image it was created from, which need not be the

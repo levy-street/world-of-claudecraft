@@ -1430,3 +1430,9 @@ What changed the contract above:
   the bot as lifting it, leaves a lever-stopped bot stopped through a key edit and the release
   caveat, acts on a red bot health probe for a running bot only, recreates rather than restarts
   the bot for a fatal-close fix, and reads the profile as `discord` in `COMPOSE_PROFILES`.
+- A thirty-fourth round of eight fresh readers: no P12 change; `DEPLOY.md` follows a waiting
+  sign-out rerun to the session that waits on nothing and lets that session decide (an open
+  sign-out, or the nightly dump with a stopped boot behind it), reads a realm container left
+  `Created` as stopped in the stall-over reading too, has the release steps re-stop a bot the
+  third lever held before a start, and says the bot's queued outbox items wait in the game
+  process.
