@@ -5634,8 +5634,15 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   The allowlist screen round ten had narrowed now matches identifier words rather than
   spellings, and each shutdown callee is traced to where `server/main.ts` imports it. The
   runbook's one unstated step, how a block is sent, became one psql command whose session
-  bounds and names itself and prints a code, never a DETAIL, and the drop rule reads the
-  constraint's key count. Fixed in `5d5912617f` through `4373df398d`.
+  bounds itself and prints a code, never a DETAIL, and the drop rule reads the constraint's
+  key count. Fixed in `5d5912617f` through `4373df398d`.
+- ROUND TWELVE, eight fresh readers over round eleven: 46 findings, two blocking, 11
+  should-fix. Five readers found that psql sends its own application name after PGOPTIONS, so
+  the runbook's session never carried its name: it is set through PGAPPNAME now, and the pg
+  case connects as psql does. The grace parse round eleven loosened could hang the worker on a
+  failed match; each line now takes one shape. The spelling screen, missing a new spelling for
+  the third round, is removed for the stated boundary. Fixed in `ce340075f5` through
+  `2b19063caa`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5655,8 +5662,8 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 
 - `npx tsc --noEmit` exit 0 at every round's tip.
 - Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then 641,
-  then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644 passed, never
-  a skip.
+  then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644
+  passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):

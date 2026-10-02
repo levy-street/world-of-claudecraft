@@ -1340,7 +1340,10 @@ What changed the contract above:
   the runbook's drop rule takes only a token-only displacement, a failed unique rebuild
   escalates with no row changed, and both shutdown callees that fix their own bound are pinned
   whole.
-- An eleventh round of eight fresh readers: P12 says steady-state boot throughout and that the
-  column's repair, unlike the CHECK's, can fail on a hand-made constraint of the token's name;
-  the runbook sends each block as one psql session that prints a code, never a DETAIL, and its
-  drop rule needs one key.
+- An eleventh round of eight fresh readers: the schema notes say steady-state boot throughout,
+  and P12 says the column's repair, unlike the CHECK's, can fail on a hand-made constraint of
+  the CHECK's name; the runbook sends each block as one psql session that prints a code, never
+  a DETAIL, and its drop rule needs one key.
+- A twelfth round of eight fresh readers: P12 says a constraint of the CHECK's name on other
+  columns or none fails the column repair, and the runbook names its session through
+  PGAPPNAME, which psql's own name cannot override.

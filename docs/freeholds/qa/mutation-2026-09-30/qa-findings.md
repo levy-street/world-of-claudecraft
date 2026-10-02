@@ -670,7 +670,8 @@ the column repair's 42710 stated), and the commit that adds this section.
 Q11R3, M11R1, M11R2, D11R1, L11R1 to L11R4), 35 nice-to-have, and one note outside the diff.
 Four readers found the same regression: round ten's screen fix had narrowed the screen. The
 runbook's one unstated step, how a block is sent, became one command rather than another
-route.
+route. Round twelve found that the session's name, set in PGOPTIONS, lost to psql's own
+(C12R1); it is set through PGAPPNAME since.
 
 - C11R1 FIXED (see H11R1). C11R2 FIXED `8d56b42d43` (with M11R4 and S11R2: after DROP, the
   drop rule's read shows whether it landed). C11R3 FIXED `8d56b42d43` (with Q11R4, S11R3,
@@ -732,3 +733,82 @@ route.
   outside the diff FIXED `4373df398d`: the fragment's comment and P12 say the column's repair
   names its CHECK unprobed, so a hand-made constraint of that name on other columns fails that
   boot with 42710 (confirmed on PostgreSQL 16).
+
+## Round twelve: eight fresh readers over round eleven (`952be30c6b..43efccfbdd`)
+
+Round twelve's commits: `ce340075f5` (the spelling screen removed for the stated boundary, the
+grace parse linear with fixtures for every arm, each callee named only at its import and
+call), `6e268de9cc` (the runbook session named through PGAPPNAME, the command one line in a
+shell fence, the pg case connecting as psql does; the boot's 42710 loop, the dump as a lock
+holder, a lost connection's next step and the database log's DETAIL routed; kept whole with
+its tests for bisect), `2b19063caa` (the dump stall spelled out, the contract's quiet window
+pointed at DEPLOY's, the column repair's name on other columns or none), and the commit that
+adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C12R1 to C12R6 |
+| qa-checklist | PASS | Q12R1 to Q12R5 |
+| server hot path | FAIL | H12R1 to H12R6 |
+| privacy and security | PASS | S12R1 to S12R3 |
+| database performance | FAIL | D12R1 to D12R5 |
+| test coverage | PASS | T12R1 to T12R9 |
+| docs librarian | PASS | L12R1 to L12R6 |
+| migration safety | PASS | M12R1 to M12R6 |
+
+46 findings: two blocking (D12R1, H12R1), 11 should-fix (C12R1, Q12R1, S12R1, L12R1, M12R1,
+M12R2, T12R1 to T12R4, H12R2), 33 nice-to-have. Five readers found one defect: psql sends its
+own application name after PGOPTIONS, so the runbook's session never carried its name. The
+spelling screen drew a new missed spelling for the third round running, so it was removed for
+the stated boundary rather than extended.
+
+- C12R1 FIXED `6e268de9cc` (with D12R1, L12R1, Q12R1, S12R1 and M12R1): the session is named
+  through PGAPPNAME. A probe on PostgreSQL 16 showed a startup `application_name` beats a `-c
+  application_name` in the options; the pg case now connects as psql does (PGAPPNAME as the
+  name, `psql` as the fallback), a control reads `psql` for a name given in PGOPTIONS, and a
+  mutant restoring the old form fails both suites. C12R2 FIXED `6e268de9cc` (with M12R3 and
+  D12R4: a lost connection takes its route whatever code psql printed first, and its wait is
+  bounded at about a minute). C12R3 FIXED `6e268de9cc` (with D12R2: the runbook runs outside
+  the nightly `pg_dump`, and a dump holding the lock is waited out, never ended). C12R4 FIXED
+  `2b19063caa` (with L12R2 and D12R3). C12R5 FIXED `ce340075f5` (with H12R2, H12R3, T12R2,
+  T12R4 and Q12R2): the screen is removed; each allowlist entry is an exact call text whose
+  review is the boundary the case states, since no word list closes the spellings of a bound.
+  C12R6 FIXED `ce340075f5` (the helper says the format check rewrites a meaning-bearing break
+  before the compare).
+- Q12R1 FIXED (see C12R1). Q12R2 FIXED (see C12R5). Q12R3 FIXED `6e268de9cc` (each send
+  connects inside its `try`, with an error listener). Q12R4 FIXED `2b19063caa` (with L12R4:
+  P12's paragraph reflowed). Q12R5 NOTED: `4373df398d`'s "its runbook" is the storage runbook
+  the ledger lists as OWED, and `5d5912617f`'s body leaves out the grace parse and the empty
+  set's removal, which round eleven's section names; the bodies stay, as for Q11R6.
+- H12R1 FIXED `ce340075f5` (with T12R1): each line inside the game block takes one shape,
+  indented four or more or a comment indented less, so a failed match stays linear. Fixtures
+  cover a shallow comment, a blank line, both quotes, a trailing comment, mismatched quotes, a
+  compound duration, a sibling's grace and a deeper key; a timed case over 22 deep comments
+  returns at once, where the overlapping form took 812 ms against its 100 ms bound. H12R2,
+  H12R3 FIXED (see C12R5). H12R4 FIXED `ce340075f5` (each callee is named only at its import
+  and its call; a mutant adding a second mention fails). H12R5 FIXED `ce340075f5` (a
+  member-access break is layout, with fixtures for it and a spread). H12R6 FIXED `ce340075f5`
+  (an import path must name a file, so a directory barrel fails with its path).
+- S12R1 FIXED (see C12R1). S12R2 FIXED `6e268de9cc` (the database's own log keeps the DETAIL,
+  so it is never attached to a report). S12R3 FIXED `6e268de9cc` (the command is one line in
+  the bullet's one shell fence, pinned whole and parsed by the pg case).
+- D12R1 FIXED (see C12R1). D12R2 FIXED (see C12R3). D12R3 FIXED `2b19063caa` (saves and logins
+  wait behind the boot's queued lock, and a boot in the dump's opening locks can deadlock it).
+  D12R4 FIXED (see C12R2). D12R5 FIXED (see M12R2).
+- T12R1 FIXED (see H12R1). T12R2 FIXED (see C12R5). T12R3 FIXED `6e268de9cc` (every
+  SQLSTATE-shaped token, letter-led or not, and every class routed are pinned as ordered
+  lists). T12R4 FIXED (see C12R5). T12R5 FIXED `6e268de9cc` (a real leftover fails PRINT with
+  42P07 in its own session and is gone in the next). T12R6 FIXED `ce340075f5` (a longer
+  re-exported name holding the one sought is no match). T12R7 FIXED `6e268de9cc` (23514
+  exactly). T12R8 FIXED `ce340075f5` (each file is stripped once). T12R9 FIXED in the evidence
+  summary (each mutant with its failing test and counts).
+- L12R1 FIXED (see C12R1). L12R2 FIXED (see C12R4). L12R3 FIXED `2b19063caa` (the contract's
+  quiet window points at DEPLOY's, the dump included). L12R4 FIXED (see Q12R4). L12R5 FIXED
+  (see M12R2). L12R6 FIXED in this record's manifest line.
+- M12R1 FIXED (see C12R1). M12R2 FIXED `6e268de9cc` (with L12R5 and D12R5): the bullet says a
+  boot that finds the column missing and its name held fails with 42710 at every restart, so
+  the realms stop and stay stopped, and 42703 from DISPLACE routes to the same stop. M12R3
+  FIXED (see C12R2). M12R4 FIXED `6e268de9cc` (a landed block goes on from the next step, and
+  a DISPLACE re-read that shows anything else stops). M12R5 FIXED `2b19063caa` (the columns
+  come from the index's `CREATE UNIQUE INDEX`, found by searching `server/` for the name).
+  M12R6 FIXED `2b19063caa` (on other columns or none).
