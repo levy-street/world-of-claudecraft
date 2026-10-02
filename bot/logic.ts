@@ -975,9 +975,10 @@ export interface DailyActiveState {
  * safe precisely because a key carries its day, so nothing still live is ever
  * dropped.
  *
- * Bot-side dedupe only. The server's grant dedupe key is what makes the reward
- * exactly-once, so even a clock stepping backwards over UTC midnight cannot
- * double-grant; this only decides whether the request is worth sending.
+ * Bot-side dedupe only. The server's grant dedupe key is what keeps the reward to
+ * at most once a day, so even a clock stepping backwards over UTC midnight cannot
+ * double-grant; this only decides whether the request is worth sending, and a
+ * claimed key is never released, so a failed grant call is not retried.
  */
 export function claimDailyActive(state: DailyActiveState, day: string, userId: string): boolean {
   if (day !== state.day) {

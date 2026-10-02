@@ -2483,9 +2483,9 @@ no image and is open even then:
    The game keeps running, and stopping the bot stops everything it does until it is
    started again. The role, nickname, presence, relay, activity, winner, link-change and
    queue-pop delivery it makes waits, and what the outbox drops meanwhile never comes.
-   Discord does not resend the events the bot missed, so what it does only in answer to
-   an event, the daily-active points it grants a linked member among it, is never done
-   for one during the stop. The outbox holds its relay, activity, link-change and
+   Discord does not resend the events the bot missed, so nothing it does only in answer
+   to an event, the daily-active points it grants a linked member included, is done for
+   an event that fell in the stop. The outbox holds its relay, activity, link-change and
    queue-pop items in the memory of the game process the bot polls (the one
    `GAME_SERVER_URL` names); the winner days stay in the database, where the game reads
    them. Each feed holds at most its cap (`RELAY_MAX_QUEUE`, `ACTIVITY_MAX_QUEUE`,

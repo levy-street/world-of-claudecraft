@@ -1458,3 +1458,6 @@ What changed the contract above:
   points to both places that say what a stop costs, the restart note and lever 3 say the bot's
   resyncs heal a lost link change with no cadence promised, and lever 3 states the daily-active
   rule without a list of the events that grant.
+- A fortieth round of eight fresh readers: no P12 change; `DEPLOY.md`'s lever 3 says the
+  daily-active rule without pronouns to untangle, and `bot/logic.ts`'s `claimDailyActive` comment
+  says at most once, matching `bot/CLAUDE.md`.

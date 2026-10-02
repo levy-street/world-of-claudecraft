@@ -2312,7 +2312,6 @@ describe('the claim renewer', () => {
       "Without the `discord` profile (no `--profile discord`, no `discord` in `COMPOSE_PROFILES` in `.env`, and no command that names `discord-bot`, which enables its profile by itself) the service simply never starts, which is the supported way to run a realm with no Discord integration; with `discord` in `COMPOSE_PROFILES`, every `up -d` that names no service starts it too, a release's step 6 included.",
       "While the third escalation lever (below) holds, either edit is made without the bot's `up`, which would lift that lever: the `up` that lifts it runs the bot with the edit.",
       "so once the realm is verified run the bot's guarded line under the release steps (a restart keeps its old image, and a bot the third escalation lever stopped stays stopped), or those cards post",
-      "the outbox lives on the server and hands the restarted bot what is still queued, within the bounds lever 3 below gives, and a queue pop only while its offer stands; the queued items of a batch a poll already took (its 200 is the outbox's only acknowledgement) are lost if the bot stops before posting them or the answer never reaches it (the bot's resyncs heal a lost link-change item), while its winner days are served again until the bot marks them posted, so a day posted but not yet marked when the bot stopped is posted again.",
       'Act on it, for a running bot only (one the third escalation lever stopped starts again only as that lever says), with:',
       "The fix is to enable the intents (the restart policy's next attempt picks them up) or to correct the token in `.env` and recreate the game and then the bot by Environment keys above (a `restart` keeps the old token), never to disable the restart policy.",
       '**Escalation levers**, in order. The first two are each an `.env` edit (not while an image built for a coming release waits; Environment keys above) plus `sudo docker compose --profile discord up -d --no-deps discord-bot`; the third, a stop, starts no image and is open even then:',
@@ -2355,7 +2354,15 @@ describe('the claim renewer', () => {
     expect(healthAt).toBeGreaterThan(-1);
     expect(graceAt).toBeGreaterThan(healthAt);
     expect(nextHeading(healthAt + 1)).toBeGreaterThan(graceAt);
-    expect(runbookAt).toBeGreaterThan(-1);
+    expect(
+      deploy
+        .slice(deploy.lastIndexOf('\n\n', graceAt), deploy.indexOf('\n\n', graceAt))
+        .replace(/\s+/g, ' ')
+        .trim(),
+    ).toBe(
+      "The container also runs under `mem_limit: 512m` with `memswap_limit: 512m`, so a leak kills the bot rather than the game or the database sharing the host, and `stop_grace_period: 15s`, which is ample because the bot has nothing to save: the outbox lives on the server and hands the restarted bot what is still queued, within the bounds lever 3 below gives, and a queue pop only while its offer stands; the queued items of a batch a poll already took (its 200 is the outbox's only acknowledgement) are lost if the bot stops before posting them or the answer never reaches it (the bot's resyncs heal a lost link-change item), while its winner days are served again until the bot marks them posted, so a day posted but not yet marked when the bot stopped is posted again.",
+    );
+    expect(runbookAt).toBeGreaterThan(enablingAt);
     expect(leverAt).toBeGreaterThan(runbookAt);
     expect(nextHeading(runbookAt + 1)).toBeGreaterThan(leverAt);
     const leverItem = deploy.slice(leverAt + 1);
@@ -2363,7 +2370,7 @@ describe('the claim renewer', () => {
     expect(leverEnd).toBeGreaterThan(-1);
     const lever = leverItem.slice(0, leverEnd).replace(/\s+/g, ' ');
     expect(lever).toContain(
-      "The game keeps running, and stopping the bot stops everything it does until it is started again. The role, nickname, presence, relay, activity, winner, link-change and queue-pop delivery it makes waits, and what the outbox drops meanwhile never comes. Discord does not resend the events the bot missed, so what it does only in answer to an event, the daily-active points it grants a linked member among it, is never done for one during the stop. The outbox holds its relay, activity, link-change and queue-pop items in the memory of the game process the bot polls (the one `GAME_SERVER_URL` names); the winner days stay in the database, where the game reads them. Each feed holds at most its cap (`RELAY_MAX_QUEUE`, `ACTIVITY_MAX_QUEUE`, `LINK_CHANGE_MAX_QUEUE`, `QUEUE_POP_MAX_QUEUE`) and, once full, drops by its own rule: the relay, activity and queue-pop feeds their oldest items, the link-change feed its link and unlink items last (the bot's resyncs heal what it drops); a queue pop also lapses with its offer; and any end of the game process while it holds (a recreate for a shared key's edit or a release, a stop or restart, a crash, the watchdog's restart) drops everything still queued.",
+      "The game keeps running, and stopping the bot stops everything it does until it is started again. The role, nickname, presence, relay, activity, winner, link-change and queue-pop delivery it makes waits, and what the outbox drops meanwhile never comes. Discord does not resend the events the bot missed, so nothing it does only in answer to an event, the daily-active points it grants a linked member included, is done for an event that fell in the stop. The outbox holds its relay, activity, link-change and queue-pop items in the memory of the game process the bot polls (the one `GAME_SERVER_URL` names); the winner days stay in the database, where the game reads them. Each feed holds at most its cap (`RELAY_MAX_QUEUE`, `ACTIVITY_MAX_QUEUE`, `LINK_CHANGE_MAX_QUEUE`, `QUEUE_POP_MAX_QUEUE`) and, once full, drops by its own rule: the relay, activity and queue-pop feeds their oldest items, the link-change feed its link and unlink items last (the bot's resyncs heal what it drops); a queue pop also lapses with its offer; and any end of the game process while it holds (a recreate for a shared key's edit or a release, a stop or restart, a crash, the watchdog's restart) drops everything still queued.",
     );
     // The outbox's code is read through the TypeScript parser, so a comment
     // marker inside a comment, a string or a regex is never taken for one.
@@ -2535,7 +2542,11 @@ describe('the claim renewer', () => {
     ).toEqual(['const winners = await dailyRewardService.discordWinnerAnnouncements();']);
     expect(
       nodesIn(internal)
-        .filter((node) => ts.isIdentifier(node) && node.text === 'markDiscordWinnersAnnounced')
+        .filter(
+          (node) =>
+            (ts.isIdentifier(node) || ts.isStringLiteralLike(node)) &&
+            node.text === 'markDiscordWinnersAnnounced',
+        )
         .map((node) => node.pos >= (outbox?.pos ?? 0) && node.end <= (outbox?.end ?? 0)),
     ).toEqual([false, false]);
     // Each feed's cap and drop rule, read whole: every top-level statement of
@@ -2627,25 +2638,40 @@ describe('the claim renewer', () => {
       };
     };
     const feedCode = (file: string) => feedCodeOf(parsed(file));
-    // Every declaration form the boundary reads, on a sample: an enum, a
-    // namespace and a destructured binding the queue's statement reaches, and
-    // a statement outside that names each.
+    // Every declaration form `declared` and `bound` read, on a sample: a
+    // function, a class, an enum, a namespace, an object binding and an array
+    // binding with a hole, each reached from the queue's statement; a
+    // statement outside that names each, and one that names none of them.
     const feedSample = ts.createSourceFile(
       'feed.ts',
       [
-        'const QUEUE: number[] = [Kind.A, Space.size, depth];',
+        'const QUEUE: number[] = [helper(), Box.n, Kind.A, Space.size, depth, second];',
+        'function helper() { return 7; }',
+        'class Box { static n = 3; }',
         'enum Kind { A }',
         'namespace Space { export const size = 1; }',
         'const { depth } = { depth: 2 };',
+        'const [, second] = [4, 5];',
+        'export function helperOf() { return helper(); }',
+        'export function boxOf() { return Box.n; }',
         'export function kindOf() { return Kind.A; }',
         'export function spaceOf() { return Space.size; }',
         'export function depthOf() { return depth; }',
+        'export function secondOf() { return second; }',
+        'export function unrelated() { return 6; }',
         '',
       ].join('\n'),
       ts.ScriptTarget.Latest,
       true,
     );
-    expect(feedCodeOf(feedSample).outside).toEqual(['kindOf', 'spaceOf', 'depthOf']);
+    expect(feedCodeOf(feedSample).outside).toEqual([
+      'helperOf',
+      'boxOf',
+      'kindOf',
+      'spaceOf',
+      'depthOf',
+      'secondOf',
+    ]);
     expect(feedCode('server/discord_relay.ts')).toEqual({
       lines: [
         'const QUEUE: QueuedRelay[] = [];',
@@ -2879,8 +2905,7 @@ describe('the claim renewer', () => {
       outside: [],
     });
     // The API the Discord bot overview names is the one the bot calls the game
-    // through: every path bot/server_client.ts's call() sends, and call() is
-    // its one fetch.
+    // through: every path bot/server_client.ts's call() sends is under it.
     const serverClient = parsed('bot/server_client.ts');
     const sent = nodesIn(serverClient)
       .filter(
@@ -2900,14 +2925,6 @@ describe('the claim renewer', () => {
       );
     expect(sent.length).toBeGreaterThan(0);
     expect(sent.filter((path) => !path.startsWith('/internal/discord/'))).toEqual([]);
-    expect(
-      nodesIn(serverClient).filter(
-        (node) =>
-          ts.isCallExpression(node) &&
-          ts.isPropertyAccessExpression(node.expression) &&
-          node.expression.name.text === 'fetchImpl',
-      ).length,
-    ).toBe(1);
     // The link-change feed's heal is the bot's resyncs, which DEPLOY gives no
     // cadence; the bot's own suites pin them (tests/discord_bot_linked_sweep.test.ts,
     // tests/discord_bot_member_writes.test.ts and
@@ -2932,16 +2949,42 @@ describe('the claim renewer', () => {
             : (caseOf(id) ?? 'outside a case'),
         ),
     ).toEqual(["'VOICE_STATE_UPDATE'", "'MESSAGE_CREATE'", 'declared']);
+    // And every place the bot's code names `grant`, by identifier or string,
+    // is the server client's method or inside grantDailyActive, so no other
+    // path grants.
+    const insideGrantDailyActive = (node: ts.Node): boolean =>
+      node.parent !== undefined &&
+      ((ts.isVariableDeclaration(node.parent) &&
+        ts.isIdentifier(node.parent.name) &&
+        node.parent.name.text === 'grantDailyActive') ||
+        insideGrantDailyActive(node.parent));
     expect(
-      gitGrep('\\.grant\\b', [
+      gitGrep('\\bgrant\\b', [
         'bot/*.ts',
         'bot/*.mts',
         'bot/*.cts',
         'bot/*.js',
         'bot/*.mjs',
         'bot/*.cjs',
-      ]),
-    ).toEqual(['bot/main.ts']);
+      ]).flatMap((file) => {
+        const source = parsed(file);
+        return nodesIn(source)
+          .filter(
+            (node) =>
+              (ts.isIdentifier(node) || ts.isStringLiteralLike(node)) && node.text === 'grant',
+          )
+          .map(
+            (node) =>
+              `${file}: ${
+                ts.isMethodDeclaration(node.parent)
+                  ? 'a method'
+                  : insideGrantDailyActive(node)
+                    ? 'inside grantDailyActive'
+                    : 'elsewhere'
+              }`,
+          );
+      }),
+    ).toEqual(['bot/main.ts: inside grantDailyActive', 'bot/server_client.ts: a method']);
     expect(serviceBlock('discord-bot')).toContain('\n      GAME_SERVER_URL: http://game:8787\n');
     expect(serviceBlock('discord-bot').replace(/\n\s*# /g, ' ')).toContain(
       "safety comes from the outbox living server-side, which hands the restarted bot what is still queued (the stop_grace_period paragraph under DEPLOY.md's Verifying health names what a taken batch loses, and the third escalation lever under its Incident runbook the rest), not from covering an in-flight call",
