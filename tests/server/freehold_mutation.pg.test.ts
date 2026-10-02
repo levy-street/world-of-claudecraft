@@ -35,7 +35,7 @@
 // tests/guild_bank_pg_integration.test.ts and
 // tests/server/storage_purchase_db.pg.test.ts prove the legacy halves with no
 // housing participant.
-// Cost: 4.5 s
+// Cost: 4.6 s
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import type { Pool as PgPool, PoolClient } from 'pg';
@@ -3220,7 +3220,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
     async function advisory(): Promise<string[]> {
       const res = await pool.query(
         `SELECT CASE WHEN granted THEN 'granted' ELSE 'waiting' END AS s FROM pg_locks
-          WHERE locktype = 'advisory' AND objid = $1
+          WHERE locktype = 'advisory' AND classid = 0 AND objid = $1 AND objsubid = 1
             AND database = (SELECT oid FROM pg_database WHERE datname = current_database())
           ORDER BY 1`,
         [0x57_4f_43_01],
@@ -3344,6 +3344,15 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         expect(bootBullet()).toContain(
           `first on ${PARENTS.map((table) => `\`${table}\``).join(', then ')}`,
         );
+        // The later tables DEPLOY names lock too: behind each the boot waits
+        // for ACCESS EXCLUSIVE.
+        for (const later of ['play_sessions', 'character_leases']) {
+          expect(bootBullet()).toContain(`\`${later}\``);
+          expect(await bootBehind([later])).toMatchObject({
+            on: later,
+            waits: 'AccessExclusiveLock',
+          });
+        }
         // The control for the stream read below: a lock timeout a client
         // sends is seen.
         const control = await pool.connect();
@@ -3364,7 +3373,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           ),
         ).toHaveLength(1);
         const boots = bootClients(spy);
-        expect(boots).toHaveLength(3);
+        expect(boots).toHaveLength(PARENTS.length + 2);
         type Startup = { connectionParameters: { lock_timeout?: unknown; options?: unknown } };
         const startupOf = (config: object) =>
           (new Client(config) as unknown as Startup).connectionParameters;
@@ -3406,13 +3415,37 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           client.release();
         }
       };
+      // DEPLOY's quiet reading, pinned whole: its open-transaction filter, its
+      // session kinds (an `autovacuum worker` row among them) and its own
+      // session left out.
+      const quietSql = operatorSql('SELECT backend_type, application_name');
+      expect(quietSql).toBe(
+        'SELECT backend_type, application_name, client_addr, state, now() - xact_start AS open_for FROM pg_stat_activity WHERE datname = current_database() AND xact_start IS NOT NULL AND pid <> pg_backend_pid();',
+      );
       const quiet = async () =>
-        (await pool.query(operatorSql('SELECT backend_type, application_name'))).rows
+        (await pool.query(quietSql)).rows
           .filter((r: { backend_type: string }) => r.backend_type === 'client backend')
           .map((r: { application_name: string; state: string }) => [r.application_name, r.state])
           .sort();
+      // DEPLOY's terminate: each row names the backend it ended.
       const terminate = async () =>
-        (await pool.query(operatorSql('SELECT pg_terminate_backend(pid)'))).rows;
+        (await pool.query(operatorSql('SELECT a.pid, a.client_addr'))).rows.map(
+          (r: { pid: number; client_addr: string | null; pg_terminate_backend: boolean }) => [
+            r.pid,
+            r.client_addr !== null,
+            r.pg_terminate_backend,
+          ],
+        );
+      // A terminated backend leaves pg_locks only once it has exited.
+      const gone = (pid: number) =>
+        until(
+          async () =>
+            (await pool.query('SELECT count(*)::int AS n FROM pg_locks WHERE pid = $1', [pid]))
+              .rows[0].n,
+          0,
+        );
+      let second: Promise<unknown> | undefined;
+      let third: Promise<unknown> | undefined;
       try {
         const tables = await everyTable();
         expect(tables.length).toBeGreaterThan(100);
@@ -3431,15 +3464,17 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           }
           // A second realm, still running, queues on the advisory lock behind
           // the waiting boot, and a third one, stopped, queues there too.
-          const second = db.ensureSchema().catch((error: unknown) => error);
+          second = db.ensureSchema().catch((error: unknown) => error);
           expect(await until(advisory, ['granted', 'waiting'])).toEqual(['granted', 'waiting']);
-          const third = db.ensureSchema().catch((error: unknown) => error);
+          third = db.ensureSchema().catch((error: unknown) => error);
           expect(await until(advisory, ['granted', 'waiting', 'waiting'])).toEqual([
             'granted',
             'waiting',
             'waiting',
           ]);
-          const [first, running, stopped] = bootClients(spy);
+          const clients = bootClients(spy);
+          expect(clients).toHaveLength(3);
+          const [first, running, stopped] = clients;
           stop(stopped.client);
           // Stopping the waiting boot's realm leaves its backend in the queue.
           stop(first.client);
@@ -3447,19 +3482,25 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           await sleep(300);
           expect((await waiter(holderPid)).pid).toBe(pid);
           expect(await tokenRead()).toBe('57014');
-          // DEPLOY's statement ends it; the running realm's boot takes its place.
-          expect(await terminate()).toEqual([{ pg_terminate_backend: true }]);
+          // DEPLOY's statement ends it, naming it; the running realm's boot
+          // takes its place, and the stopped one still waits behind that.
+          expect(await terminate()).toEqual([[pid, true, true]]);
+          expect(await gone(pid)).toBe(0);
           const next = await waiter(holderPid);
-          expect(next.pid).not.toBe(pid);
-          expect(next).toMatchObject({ rel: 'auth_tokens', mode: 'AccessExclusiveLock' });
+          expect(next).toMatchObject({
+            pid: (running.client as { processID: number }).processID,
+            rel: 'auth_tokens',
+            mode: 'AccessExclusiveLock',
+          });
+          expect(await advisory()).toEqual(['granted', 'waiting']);
           // So it is stopped and ended too; the stopped third boot exits once
           // it gets the advisory lock, and the next run names nothing.
           stop(running.client);
           outcomes.push(await second);
-          expect(await terminate()).toEqual([{ pg_terminate_backend: true }]);
+          expect(await terminate()).toEqual([[next.pid, true, true]]);
           outcomes.push(await third);
+          expect(await gone(next.pid)).toBe(0);
           expect(await until(advisory, [])).toEqual([]);
-          expect(await until(() => heldBy(next.pid), [])).toEqual([]);
           expect(await terminate()).toEqual([]);
           // The queue is released, and the dump-shaped holder was spared.
           expect(await tokenRead()).toBe('ran');
@@ -3480,28 +3521,60 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         expect(await quiet()).toEqual([]);
       } finally {
         spy.mockRestore();
+        await Promise.allSettled([second, third]);
       }
       // Booted again after the dump, the realm comes up.
       await db.ensureSchema();
     });
 
-    it("DEPLOY's sign-out ends every live token, companion tokens included", async () => {
+    it("DEPLOY's sign-out ends every live token and pending OAuth code", async () => {
       const accountId = await makeAccount();
-      const full = randomUUID().replaceAll('-', '').repeat(2);
-      const read = randomUUID().replaceAll('-', '').repeat(2);
+      const hex = () => randomUUID().replaceAll('-', '');
+      const full = hex().repeat(2);
+      const read = hex().repeat(2);
       await db.saveToken(full, accountId);
       await db.saveToken(read, accountId, 24, 'read');
       expect(await db.accountAndScopeForToken(full)).toEqual({ accountId, scope: 'full' });
       expect(await db.accountAndScopeForToken(read)).toEqual({ accountId, scope: 'read' });
+      // A pending authorization code and a pending device code, each able to
+      // mint a token after the sign-out if it survived it.
+      const oauth = await import('../../server/oauth_db');
+      const clientId = `fmverify_${hex()}`;
+      await oauth.upsertOAuthClient(pool, clientId, 'verify', ['https://example.test/cb']);
+      const code = hex();
+      await oauth.createAuthCode(pool, {
+        code,
+        clientId,
+        accountId,
+        redirectUri: 'https://example.test/cb',
+        codeChallenge: hex(),
+        codeChallengeMethod: 'S256',
+        scope: 'character:read',
+        ttlSeconds: 300,
+      });
+      await oauth.createDeviceCode(pool, {
+        deviceCode: hex(),
+        userCode: hex().slice(0, 8),
+        clientId,
+        scope: 'character:read',
+        ttlSeconds: 300,
+      });
+      const count = async (table: string) =>
+        (await pool.query(`SELECT count(*)::int AS n FROM ${table}`)).rows[0].n;
+      expect(await count('oauth_codes')).toBe(1);
+      expect(await count('oauth_device_codes')).toBe(1);
       await pool.query(operatorSql('DELETE FROM auth_tokens'));
       expect(await db.accountAndScopeForToken(full)).toBeNull();
       expect(await db.accountAndScopeForToken(read)).toBeNull();
-      expect(
-        Number(
-          (await pool.query('SELECT count(*) AS n FROM auth_tokens WHERE expires_at > now()'))
-            .rows[0].n,
-        ),
-      ).toBe(0);
+      expect(await count('auth_tokens WHERE expires_at > now()')).toBe(0);
+      expect(await count('oauth_codes')).toBe(0);
+      expect(await count('oauth_device_codes')).toBe(0);
+      expect(await oauth.consumeAuthCode(pool, code)).toBeNull();
+      // The stall's remedy points at DEPLOY's receipt-erase repair by its
+      // opening words, and that bullet exists.
+      const opening = /begins "([^"]+)"/.exec(bootBullet())?.[1];
+      expect(opening).toBe('A failed deactivation receipt erase');
+      expect(readFileSync('DEPLOY.md', 'utf8').replace(/\s+/g, ' ')).toContain(`- ${opening}`);
     });
   });
 });

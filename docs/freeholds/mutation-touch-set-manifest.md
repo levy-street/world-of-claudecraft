@@ -692,7 +692,7 @@ against the boot's order. The shapes decide it, not a list. The order, each pare
 lock, the boot's missing lock timeout and the one lock it holds behind a dump-shaped hold are
 observed on the real boot, and so is DEPLOY's route for a boot already behind the dump: a
 stopped realm's boot keeps its place in the queue until its backend is ended, and a running
-boot queued on the advisory lock behind it takes that place once it is
+boot queued on the advisory lock behind it takes that place once that backend is ended
 (`tests/server/freehold_mutation.pg.test.ts`, section L). With G1-shaped saves in flight every
 bench boot was eventually aborted and saves were aborted beside it, and a boot that loses exits
 and is restarted (R-11). A REPAIR boot is any boot that rebuilds something a probe guards (for
@@ -1388,3 +1388,5 @@ What changed the contract above:
   the queue until it is ended.
 - A twenty-first round of eight fresh readers: P12 drops the claim about the boot's own row
   writes, and names the running boot that takes a stopped boot's place once it is ended.
+- A twenty-second round of eight fresh readers: P12 says a queued boot takes an ended boot's
+  place once that backend is ended.
