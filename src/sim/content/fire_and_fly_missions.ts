@@ -97,16 +97,20 @@ export const TURRET_MISSION_PACK: TurretScenarioDef = {
 const GIANT_GAP = { gapMinTicks: ticks(2), gapMaxTicks: ticks(3.2) } as const;
 const SLOW = 0.75;
 
-/** Few monsters, every one large or huge, slow and very tough: it takes many shells each. */
+/**
+ * Few monsters, every one large or huge, slow and very tough: it takes many shells each.
+ * Toughness was cut by a fifth (floored above each template's own) so a slow run stays
+ * near four and a half minutes rather than five and a half.
+ */
 export const TURRET_MISSION_GIANTS: TurretScenarioDef = {
   id: 'fire_and_fly_giants',
   boardKey: 'giants',
   integrity: 100,
-  medals: { gold: { minIntegrityShare: 0.95 }, silver: { minIntegrityShare: 0.6 } },
+  medals: { gold: { minIntegrityShare: 0.98 }, silver: { minIntegrityShare: 0.6 } },
   arsenal: MISSION_ARSENAL,
   waves: [
     {
-      entries: [{ templateId: 'fen_troll', count: 4, level: 11, hpScale: 1.2, speedScale: SLOW }],
+      entries: [{ templateId: 'fen_troll', count: 4, level: 11, hpScale: 1.05, speedScale: SLOW }],
       coreDamage: 100,
       ...GIANT_GAP,
       barrels: KEGS(3),
@@ -114,8 +118,8 @@ export const TURRET_MISSION_GIANTS: TurretScenarioDef = {
     },
     {
       entries: [
-        { templateId: 'fen_troll', count: 4, level: 12, hpScale: 1.45, speedScale: SLOW },
-        { templateId: 'thornpeak_ogre', count: 2, level: 15, hpScale: 1.45, speedScale: SLOW },
+        { templateId: 'fen_troll', count: 4, level: 12, hpScale: 1.16, speedScale: SLOW },
+        { templateId: 'thornpeak_ogre', count: 2, level: 15, hpScale: 1.16, speedScale: SLOW },
       ],
       coreDamage: 110,
       ...GIANT_GAP,
@@ -124,8 +128,8 @@ export const TURRET_MISSION_GIANTS: TurretScenarioDef = {
     },
     {
       entries: [
-        { templateId: 'thornpeak_ogre', count: 5, level: 16, hpScale: 1.6, speedScale: SLOW },
-        { templateId: 'fen_troll', count: 2, level: 12, hpScale: 1.6, speedScale: SLOW },
+        { templateId: 'thornpeak_ogre', count: 5, level: 16, hpScale: 1.28, speedScale: SLOW },
+        { templateId: 'fen_troll', count: 2, level: 12, hpScale: 1.28, speedScale: SLOW },
       ],
       coreDamage: 130,
       ...GIANT_GAP,
@@ -134,8 +138,8 @@ export const TURRET_MISSION_GIANTS: TurretScenarioDef = {
     },
     {
       entries: [
-        { templateId: 'thornpeak_ogre', count: 4, level: 16, hpScale: 1.6, speedScale: SLOW },
-        { templateId: 'frostmane_yeti', count: 2, level: 19, hpScale: 1.3, speedScale: SLOW },
+        { templateId: 'thornpeak_ogre', count: 4, level: 16, hpScale: 1.28, speedScale: SLOW },
+        { templateId: 'frostmane_yeti', count: 2, level: 19, hpScale: 1.05, speedScale: SLOW },
       ],
       coreDamage: 180,
       ...GIANT_GAP,
@@ -144,8 +148,8 @@ export const TURRET_MISSION_GIANTS: TurretScenarioDef = {
     },
     {
       entries: [
-        { templateId: 'thornpeak_ogre', count: 4, level: 16, hpScale: 1.75, speedScale: SLOW },
-        { templateId: 'frostmane_yeti', count: 3, level: 20, hpScale: 1.45, speedScale: SLOW },
+        { templateId: 'thornpeak_ogre', count: 4, level: 16, hpScale: 1.4, speedScale: SLOW },
+        { templateId: 'frostmane_yeti', count: 3, level: 20, hpScale: 1.16, speedScale: SLOW },
       ],
       coreDamage: 220,
       ...GIANT_GAP,
@@ -154,14 +158,14 @@ export const TURRET_MISSION_GIANTS: TurretScenarioDef = {
     },
     {
       entries: [
-        { templateId: 'thornpeak_ogre', count: 3, level: 16, hpScale: 2, speedScale: SLOW },
-        { templateId: 'frostmane_yeti', count: 3, level: 20, hpScale: 1.6, speedScale: SLOW },
+        { templateId: 'thornpeak_ogre', count: 3, level: 16, hpScale: 1.6, speedScale: SLOW },
+        { templateId: 'frostmane_yeti', count: 3, level: 20, hpScale: 1.28, speedScale: SLOW },
         {
           templateId: 'idol_guardian',
           count: 1,
           level: 20,
           bossLast: true,
-          hpScale: 1.6,
+          hpScale: 1.28,
           speedScale: SLOW,
         },
       ],
