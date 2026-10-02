@@ -1839,6 +1839,7 @@ describe('the claim renewer', () => {
     expect(shape('f( a, b, ) { x; }')).toBe(shape('f(a,b){x;}'));
     expect(shape('void settled\n  .then(done);')).toBe(shape('void settled.then(done);'));
     expect(shape('deps.registry\n  ?.drop(id);')).toBe(shape('deps.registry?.drop(id);'));
+    expect(shape('void settled\n  .then( done ) ;')).toBe('void settled.then(done);');
     // Each bound's value, read from the code that sets it.
     const constantIn = (file: string, name: string): number => {
       const found = stripComments(readFileSync(file, 'utf8')).match(
@@ -1944,26 +1945,39 @@ describe('the claim renewer', () => {
     );
     const stated = [...budget.matchAll(/(?<![\d.])(\d+(?:\.\d+)?) s of bounded waits/g)];
     expect(stated.map((match) => Number(match[1]))).toEqual([totalMs / 1000]);
-    /** The game service's kill grace in seconds, or null, read inside the
-     *  top-level `services:` block only. Each line there takes exactly one
-     *  shape (indented four or more, a comment indented less, or empty),
-     *  never two, so a failed match stays linear. */
+    /** The game service's kill grace in seconds, or null: inside the top-level
+     *  `services:` block, the `  game:` service's own four-space
+     *  `stop_grace_period`. Read line by line, so no input can make it
+     *  backtrack; a comment, a blank line or trailing space changes nothing. */
     const graceOf = (compose: string): number | null => {
-      const at = compose.search(/(?:^|\n)services:\n/);
-      if (at < 0) return null;
-      const rest = compose.slice(at);
-      const next = rest.slice(1).search(/\n[^\s#]/);
-      const found = (next < 0 ? rest : rest.slice(0, next + 2)).match(
-        /\n {2}game:\n(?:(?: {4}.*| {0,3}#.*)?\n)*? {4}stop_grace_period: (["']?)(\d+)s\1(?: +#.*)?\n/,
-      );
-      return found ? Number(found[2]) : null;
+      let inServices = false;
+      let inGame = false;
+      for (const line of compose.split(/\r?\n/)) {
+        const content = line.replace(/(?:^|\s)#.*$/, '').trimEnd();
+        if (content === '') continue;
+        const indent = content.length - content.trimStart().length;
+        if (indent === 0) {
+          inServices = content === 'services:';
+          inGame = false;
+        } else if (inServices && indent === 2) {
+          inGame = content === '  game:';
+        } else if (inGame && indent === 4 && content.startsWith('    stop_grace_period:')) {
+          const value = content.slice('    stop_grace_period:'.length).trim();
+          const found = value.match(/^(["']?)(\d+)s\1$/);
+          return found ? Number(found[2]) : null;
+        }
+      }
+      return null;
     };
     const service = (grace: string, ...lines: string[]) =>
       `services:\n  game:\n    image: x\n${lines.join('')}    stop_grace_period: ${grace}\n  bot:\n    stop_grace_period: 15s\n`;
     expect(graceOf(service('75s'))).toBe(75);
-    expect(graceOf(service('75s', '  # a shallow comment\n', '\n'))).toBe(75);
+    expect(graceOf(service('75s', '  # a shallow comment\n', '\n', '  \n'))).toBe(75);
     expect(graceOf(service('"75s"'))).toBe(75);
     expect(graceOf(service("'75s' # why"))).toBe(75);
+    expect(graceOf(service('75s '))).toBe(75);
+    expect(graceOf(service('75s').replaceAll('\n', '\r\n'))).toBe(75);
+    expect(graceOf(service('75s').replace('services:', 'services: # all'))).toBe(75);
     expect(graceOf(service(`"75s'`))).toBeNull();
     expect(graceOf(service('1m15s'))).toBeNull();
     expect(
@@ -1973,19 +1987,12 @@ describe('the claim renewer', () => {
     expect(graceOf(`x-defaults:\n  game:\n    stop_grace_period: 300s\n${service('75s')}`)).toBe(
       75,
     );
-    // A failing match over many deep lines, comments or blank ones, returns at
-    // once: overlapping line shapes would retry every split of them. The
-    // fastest of three runs is timed, so one stall cannot fail it.
-    const deep = (line: string) => service('1m', ...Array(25).fill(line));
-    const runs = [0, 1, 2].map(() => {
-      const started = performance.now();
-      expect(graceOf(deep('    # a deep comment\n'))).toBeNull();
-      expect(graceOf(deep('    \n'))).toBeNull();
-      return performance.now() - started;
-    });
-    expect(Math.min(...runs)).toBeLessThan(1000);
+    expect(
+      graceOf('services:\n  bot:\n    image: x\nx-after:\n  game:\n    stop_grace_period: 300s\n'),
+    ).toBeNull();
+    expect(graceOf('services:\n  game:\n    stop_grace_period: 75s\nvolumes:\n  db:\n')).toBe(75);
     const graceSeconds = graceOf(readFileSync('docker-compose.yml', 'utf8'));
-    expect(graceSeconds).not.toBeNull();
+    expect(graceSeconds, 'the game service stop_grace_period in docker-compose.yml').not.toBeNull();
     expect(totalMs).toBeLessThan(Number(graceSeconds) * 1000);
     expect(
       [...budget.matchAll(/(?<![\d.])(\d+) s kill grace/g)].map((match) => Number(match[1])),
