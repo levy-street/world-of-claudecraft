@@ -1083,24 +1083,27 @@ For off-box safety, sync the directory to S3 occasionally:
   boot was eventually aborted and saves were aborted beside it: the process exits, the
   compose policy restarts it, and a restart meets the same race while another realm
   keeps serving those saves. So boot a realm while the other realms on its database
-  are quiet, and in a rolling restart let one realm finish shutting down before
-  another boots. An aborted save shows as 40P01 in the realm log (one that carried
-  guild bank books also counts `escrow_save_failed`), and what writes it again depends
-  on the save: an autosave is written by the next autosave; a leave save is retried
-  with backoff (`server/leave_character_save.ts`), its guild books reconciled if every
-  attempt fails; a shutdown flush save is retried once only for a character carrying
-  guild bank books, and otherwise not at all. An aborted Hearth trip counts
-  `trip_failed` and is not retried by the server (the player presses the key again).
-  The hazard predates housing; removing both paths is owed
+  are quiet and outside the nightly `pg_dump` (it holds ACCESS SHARE on every table
+  for its whole run, so a boot that starts then waits to upgrade its lock while it
+  blocks every realm's saves), and in a rolling restart let one realm finish shutting
+  down before another boots; that is the quiet window this file means. An aborted save
+  shows as 40P01 in the realm log (one that carried guild bank books also counts
+  `escrow_save_failed`), and what writes it again depends on the save: an autosave is
+  written by the next autosave; a leave save is retried with backoff
+  (`server/leave_character_save.ts`), its guild books reconciled if every attempt
+  fails; a shutdown flush save is retried once only for a character carrying guild
+  bank books, and otherwise not at all. An aborted Hearth trip counts `trip_failed`
+  and is not retried by the server (the player presses the key again). The hazard
+  predates housing; removing both paths is owed
   (docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md measures it).
 - FIRST ROLLOUT OF THE HOUSING TABLES: the first boot that carries them also creates
   the foreign-key-bearing tables and the delete guards on `accounts` and `characters`
-  inside that same transaction. It takes no parent lock a steady boot does not already
-  hold (about 65 ms with plain saves in flight, the same as a steady boot; it shares
-  every boot's deadlock above), but it is the one boot that builds the tables, so roll
-  it out in a quiet window. A steady boot's housing fragments read the catalog,
-  rewrite the guard and erase functions' catalog rows, and hold no table lock to their
-  COMMIT: their one table lock is the Hearth token probe's ACCESS SHARE on
+  inside that same transaction. It takes no parent lock a steady-state boot does not
+  already hold (about 65 ms with plain saves in flight, as for a steady-state boot; it
+  shares every boot's deadlock above), but it is the one boot that builds the tables,
+  so roll it out in a quiet window. A steady-state boot's housing fragments read the
+  catalog, rewrite the guard and erase functions' catalog rows, and hold no table lock
+  to their COMMIT: their one table lock is the Hearth token probe's ACCESS SHARE on
   `account_freehold_hearth`, taken and released at once, so it waits only behind an
   ACCESS EXCLUSIVE holder or request on that table. The boot waits there while it
   holds ACCESS EXCLUSIVE on `characters` and `accounts`, so DDL on that table stalls
@@ -1111,16 +1114,19 @@ For off-box safety, sync the directory to S3 occasionally:
   holds that statement's lock on that object's table to its COMMIT and builds a
   rebuilt index or a re-added column while it holds both parents, for as long as the
   build takes, which grows with the table, so stop the other realms first and boot one
-  in a quiet window. A rebuilt unique index that meets duplicate rows fails the boot,
-  which rolls back whole, exits and is restarted, and every restart repeats the stall.
-  Stop the realms and change no rows: escalate with the index name from the error,
-  never the key values in its DETAIL (the boot's own statement for that index names
-  its columns; the failed build rolled back, so `pg_indexes` has no row for it). The
-  duplicates are the defect the index exists to prevent, and resolving them is a
-  ruling, never a runbook step. (The storage fragment, which is not housing, holds its
-  own tables: some of its DDL runs unprobed and holds those tables' locks to every
-  boot's COMMIT, its probed repairs make a boot a repair boot like any other, and its
-  trigger repairs also touch both parents, which the boot already holds.)
+  in a quiet window. A rebuilt housing unique index that meets duplicate rows fails
+  the boot, which rolls back whole, exits and is restarted, and every restart repeats
+  the stall. Stop the realms and change no rows: escalate with the index name from the
+  error, never the key values in its DETAIL, which the fatal log line prints too, and
+  take its columns only from the boot's own statement for that index (the failed build
+  rolled back, so `pg_indexes` has no row for it). The duplicates are the defect the
+  index exists to prevent, and resolving them is a ruling, never a runbook step. (The
+  storage fragment, which is not housing, holds its own tables: some of its DDL runs
+  unprobed and holds those tables' locks to every boot's COMMIT, and its trigger
+  repairs also touch both parents, which the boot already holds. Its own repairs and
+  their failures, its duplicate open-purchase guard among them, are outside this
+  bullet; a boot that repairs it is still a repair boot, so the other realms stop
+  first.)
 - A CORRUPT Hearth row (a `ready_at_ms` past the database clock plus a whole cooldown,
   which only a backward database clock step or a bad row produces) is never honored. A
   read is the only detector: a row already bad when its account logs in reaches the

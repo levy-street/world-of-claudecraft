@@ -117,13 +117,15 @@ CREATE TABLE IF NOT EXISTS "__woc_freehold_hearth_schema__".account_freehold_hea
 -- The same column for a database whose table predates it. PROBED FIRST: an
 -- ALTER TABLE takes ACCESS EXCLUSIVE before it ever checks IF NOT EXISTS, and
 -- held through the rest of the boot transaction that lock would block every
--- other realm's Hearth reads, so an ordinary boot holds no lock to its COMMIT. The
--- column's CHECK is probed by NAME too, by name alone (a same-named constraint
--- of any type counts, so the repair can never fail a boot with 42710): a column
--- that exists without it (added by hand) gets it back NOT VALID, so every new
--- token is checked again while no boot scans the table to re-validate old rows
--- (the advance only ever wrote hex tokens). A same-named constraint that is not
--- THIS check (another type, or a CHECK with another body) leaves the shape
+-- other realm's Hearth reads, so a steady-state boot holds no lock to its
+-- COMMIT. The column's CHECK is probed by NAME too, by name alone (a same-named
+-- constraint of any type counts, so this repair can never fail a boot with
+-- 42710; the column's repair names its CHECK unprobed, so a hand-made
+-- constraint of that name on other columns fails it): a column that exists
+-- without it (added by hand) gets it back NOT VALID, so every new token is
+-- checked again while no boot scans the table to re-validate old rows (the
+-- advance only ever wrote hex tokens). A same-named constraint that is not THIS
+-- check (another type, or a CHECK with another body) leaves the shape
 -- unchecked, so the boot says so (a WARNING notice). It compares PostgreSQL's
 -- own deparse of the definition, a NOT VALID suffix stripped, to the CHECK's
 -- whole text: one catalog read, plus the ACCESS SHARE on the table that the

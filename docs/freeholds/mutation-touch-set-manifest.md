@@ -662,8 +662,9 @@ only, as `IF NOT EXISTS` does: a same-named index with another definition is nev
 unlike the trigger probe, which checks the exact shape. The Hearth column probe checks the
 column and then its named CHECK: a column whose CHECK is missing gets it back `NOT VALID`,
 so every new token is checked again while no boot scans the table for old ones. The CHECK is
-probed by name, so a same-named constraint of any type satisfies the probe (a repair can
-never fail a boot with 42710); one that is not that CHECK (another type, or a CHECK with
+probed by name, so a same-named constraint of any type satisfies the probe (that repair can
+never fail a boot with 42710, though the column's repair, which names its CHECK unprobed, fails
+on a hand-made constraint of that name on other columns); one that is not that CHECK (another type, or a CHECK with
 another body, compared on PostgreSQL's own deparse) is left in place and the boot logs a
 WARNING. THE FIRST ROLLOUT WINDOW: because no 07 build deployed, the first 07a boot on
 production creates five FK-bearing tables and the triggers in ONE `ensureSchema` transaction
@@ -836,7 +837,7 @@ CREATE INDEX IF NOT EXISTS freehold_operation_receipts_account
 
 -- 07's Hearth row gains the per-advance token the verify reads, inside
 -- FREEHOLD_HEARTH_SCHEMA: in the CREATE TABLE for a fresh database, and for an existing
--- one a DO block that probes pg_attribute first, so an ordinary boot reads the catalog and
+-- one a DO block that probes pg_attribute first, so a steady-state boot reads the catalog and
 -- never takes ALTER TABLE's ACCESS EXCLUSIVE lock (which would block every other realm's
 -- Hearth reads through the boot's backfills):
 --   ALTER TABLE ... ADD COLUMN IF NOT EXISTS advance_token TEXT
