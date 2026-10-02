@@ -18,9 +18,10 @@ security); every finding of all three rounds is applied below and in the code, a
 (section 14). The real-PG suites prove the manifest (section 10).
 
 Scope ruled at the 07a Step 0 (Fernando, 2026-09-30): the remote Hearth Key is LIT on a lit
-realm through this boundary (production stays dark behind `FREEHOLDS_ENABLED`); the
-operation machinery ships with NO production kind (tests reach it; 08 registers the first,
-the 07 `advanceFreeholdHearthOnClient` precedent).
+realm through this boundary (production stays dark behind `FREEHOLDS_ENABLED`). Separately,
+and by the packet's own scope rather than a Step 0 ruling, the operation machinery ships
+with NO production kind (tests reach it; 08 registers the first, the 07
+`advanceFreeholdHearthOnClient` precedent).
 
 ## 1. Participants
 
@@ -491,7 +492,9 @@ autosave burst of 5,000 saves and 5,000 fenced writes, with SKIP LOCKED passing 
 of: the store holds the owner's entry with a session reference or owed work, the Sim holds
 its live record, a mutation or recovery pass is in flight for it, or the claim was acquired
 less than `FREEHOLD_PERSIST_LOGIN_BUDGET_MS` ago (a handshake between its first ask and its
-join bind). Nothing else renews; 18's visitor reference joins this predicate later and must
+join bind). That grace counts from the ACQUIRE, not the join: a handshake slower than the
+budget can see its claim released before it joins, and the joined session is then the R-3
+class (its first write answers `fenced` and quiesces; the next login re-reads). Nothing else renews; 18's visitor reference joins this predicate later and must
 never outrank the owner's own authenticated entry on another realm. A completed renew that
 did not return a wanted plot means a takeover: the claim leaves the registry and the store's
 next write answers `fenced` and quiesces. A THROWN or timed-out renew is a missed heartbeat
@@ -1020,7 +1023,8 @@ merge in a `finally`; N4 the server default pin; N5 the log pin; N6 the 15 route
   spectating, jailed, dark) is the same class, counted `trip_dropped_after_commit`; each
   answers as the frame path's precheck would.
 - R-3: a realm that lost its claim keeps showing its live view until relog; every write is
-  fenced, so durable truth is never overwritten.
+  fenced, so durable truth is never overwritten. A handshake that joins later than the login
+  grace after its acquire is one way in (P5).
 - R-4: a handshake refused after its first ask holds its own account's claim until the
   renewer's first pass after the login budget (P4).
 - R-5 (revision 5, the hot-path review): the sim's last-session clock eviction walks the
