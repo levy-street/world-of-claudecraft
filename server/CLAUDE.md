@@ -252,28 +252,28 @@ that shape.
   AND mail books, and the rift writer) bill their thunk's synchronous cost to the
   `saves` phase through the serial writers' `onWrite` observer (`serial_writer.ts`),
   and the gap BETWEEN callbacks is the `lateness` phase; both ride `woc_sim_tick_phase_seconds`
-  (read `max`, never `p95`: a 30 s stall is two samples in a 60 s ring). `saves` counts
-  ONLY those two writers plus two Freeholds jobs on the same flush, each billing its
-  synchronous part through the same `onSaveMs` observer: the housing sweep
-  (`saveFreeholds`, its `saveAllDirty`) and the plot-claim renewer's launch
-  (`renewGameFreeholdClaims` in `freehold_persist_wiring.ts`; its per-chunk continuations
-  after the first await run off the tick, each bounded by one renew chunk). Per-character
-  blobs and
-  DB round trips are not in it, and a
-  job that reports into no phase shows up as `lateness` with nothing to attribute it
-  to. Rules: a new realm collection never persists as one whole-book `world_state` blob
-  rewritten on the autosave cadence (the market and rift blobs are the legacy shape,
-  not the template; the mail book was the third until PR #3613 partitioned it per
-  dirty recipient, which is what the fix looks like): write per-row, overlay, or
+  (read `max`, never `p95`: a 30 s stall is two samples in a 60 s ring). That observer is
+  `onSaveMs` in `server/game.ts`, which the serial writers receive as `onWrite`. `saves`
+  counts ONLY those two writers plus two Freeholds jobs on the same flush, each billing
+  its synchronous part through the same observer: the housing sweep (`saveFreeholds`, its
+  `saveAllDirty`) and the plot-claim renewer's launch (`renewGameFreeholdClaims` in
+  `freehold_persist_wiring.ts`; its per-chunk continuations after the first await bill no
+  phase and land in `lateness`, each O(one renew or release chunk) of work). Per-character
+  blobs and DB round trips are not in it, and a job that reports into no phase shows up as
+  `lateness` with nothing to attribute it to. Rules: a new realm collection never persists
+  as one whole-book `world_state` blob rewritten on the autosave cadence (the market and
+  rift blobs are the legacy shape, not the template; the mail book, partitioned per dirty
+  recipient, shows what the fix looks like): write per-row, overlay, or
   dirty-bucket, so a quiet interval writes nothing; a recurring job's cost, or an
   event-driven durability write's, must not scale with total book size, only with what
   changed or with the bounded result it produces (aggregate inside Postgres when the
   input is a stored blob; a handler that awaits a whole-book save "so the grant is
-  durable", the `persistMailBlob` per-parcel shape PR #3663 retired, is the same
+  durable", the retired `persistMailBlob` per-parcel shape, is the same
   defect on a different clock); and a new recurring job bills its cost to
   a profiler phase in the same change (an observer into `saves` for a new shared-blob
-  writer or a synchronous launch on the autosave flush, as the two Freeholds jobs are; a
-  registered phase of its own otherwise), never silently.
+  writer or a synchronous launch on the autosave flush, as the two Freeholds jobs are, and
+  named in the `saves` list above in the same change; a registered phase of its own
+  otherwise), never silently.
 
 - **Fresh-bot load tests cannot see this bug class.** Fresh characters carry empty
   books, boards, and inboxes, so a bot fleet proves interest-scan and movement cost,

@@ -251,10 +251,10 @@ headline rules here:
   self-clocked loop) and event-driven durability writes (a handler persisting a shared book
   for one mutation) cost O(what changed), never O(the stored book); no new realm collection
   persists as one whole-book `world_state` blob on the autosave cadence; the job bills its
-  cost to a profiler phase (the `saves` phase's members, the shared-blob writers and the
-  synchronous launches on the autosave flush, are the ones `server/CLAUDE.md` "Hot paths"
-  names; anything else needs a phase of its own, or it shows up only as unattributed
-  `lateness`).
+  cost to a profiler phase (a new shared-blob writer or synchronous launch on the autosave
+  flush joins the `saves` phase through `onSaveMs` and is added, in the same change, to the
+  members `server/CLAUDE.md` "Hot paths" lists; any other job needs a phase of its own, or it
+  shows up only as unattributed `lateness`).
 - A "cheap" claim for a new snapshot read or recurring job rests on a grown-collection bench
   (1,000+ seeded rows) or a Tick Profiler capture on a long-lived realm, recorded in the PR.
   A fresh-world or fresh-bot measurement alone is `[VERIFY]`, never `[PASS]`.

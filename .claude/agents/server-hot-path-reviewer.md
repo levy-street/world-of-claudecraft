@@ -82,7 +82,8 @@ code gets the full checklist).
    phase: the `saves` phase counts ONLY the members `server/CLAUDE.md` "Hot paths" names
    (the shared-blob writers through the serial writers' `onWrite` observer, and the
    synchronous launches on the autosave flush through `onSaveMs`), so a new shared-blob
-   writer or flush launch reports there and any other job registers a phase of its own; a
+   writer or flush launch reports there and is added to that list in the same change, and
+   any other job registers a phase of its own; a
    job that reports into no phase shows up as `lateness` with nothing to attribute it to.
 7. **No O(realm-collection) read on the per-tick self path.** Every `maybe(...)` key in
    `selfWireJson` is rebuilt per session per pass (the delta cache suppresses the send,
