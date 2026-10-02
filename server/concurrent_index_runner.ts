@@ -74,8 +74,10 @@ export async function runConcurrentIndexMigrations(): Promise<void> {
       // session advisory lock: ensureSchema re-adds a drifted constraint as
       // NOT VALID so boot never scans the keep-forever table; this VALIDATE
       // (SHARE UPDATE EXCLUSIVE, inserts keep flowing) proves the rows here.
-      // In-lock on purpose: a concurrently booting realm waits at
-      // pg_advisory_lock holding NOTHING, while post-unlock it would run its
+      // In-lock on purpose: a concurrently booting realm waits at the schema
+      // advisory lock holding no table lock (its waiting statement still holds a
+      // snapshot, which a concurrent index build waits on: DEPLOY.md, Index
+      // builds), while post-unlock it would run its
       // boot DDL (IF NOT EXISTS still takes ACCESS EXCLUSIVE/SHARE locks)
       // and block mid-DDL behind the scan, freezing logins and saves. The
       // helper bounds the scan in its own SET LOCAL transaction and swallows

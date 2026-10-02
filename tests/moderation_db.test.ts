@@ -611,7 +611,7 @@ describe('moderation report helpers', () => {
     expect(stmts).toEqual(['BEGIN', expect.stringMatching(/chat_strikes = 0/), 'COMMIT']);
   });
 
-  it('a repeat ban or suspension of one account writes again, with no already-applied guard', async () => {
+  it('a repeat ban or suspension sends its whole UPDATE and its audit INSERT again', async () => {
     // DEPLOY's stall remedy resends a ban or suspension that shows landed, so
     // a repeat must land like the first: its UPDATE and its audit row, again.
     const expiresAt = new Date(Date.now() + 3600_000).toISOString();
@@ -627,8 +627,12 @@ describe('moderation report helpers', () => {
       });
       const statements = client.query.mock.calls.map((call) => String(call[0]));
       expect(statements[0]).toBe('BEGIN');
-      expect(statements[1]).toMatch(/UPDATE accounts/);
-      expect(statements[1]).not.toMatch(/banned_at IS NULL|suspended_until IS NULL/);
+      // The whole statement: any already-applied guard would change it.
+      expect(statements[1].replace(/\s+/g, ' ').trim()).toBe(
+        action === 'ban'
+          ? 'UPDATE accounts SET banned_at = now(), suspended_until = NULL, moderation_reason = $2 WHERE id = $1'
+          : 'UPDATE accounts SET banned_at = NULL, suspended_until = $2, moderation_reason = $3 WHERE id = $1',
+      );
       expect(statements.some((sql) => /INSERT INTO account_moderation_actions/.test(sql))).toBe(
         true,
       );

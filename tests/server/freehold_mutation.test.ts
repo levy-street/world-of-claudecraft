@@ -2181,7 +2181,18 @@ describe('the claim renewer', () => {
     expect(main.indexOf('void runConcurrentIndexMigrations()')).toBeGreaterThan(
       main.indexOf('server.listen('),
     );
-    expect(bullet).toContain("after it listens, a realm's runner builds");
+    expect(bullet).toContain("after it listens, a realm's runner takes the schema advisory lock");
+    // A runner that loses logs it and its realm keeps serving: the start
+    // catches the runner's failure instead of letting it end the process.
+    expect(main).toMatch(
+      /void runConcurrentIndexMigrations\(\)\.catch\(\(err\) => \{\s*console\.error\(/,
+    );
+    // The places that send an operator here resolve.
+    expect(bullet).toContain('that is the quiet window this file means');
+    expect(bullet).toContain('- Index builds: after it listens');
+    expect(deploy.replace(/\s+/g, ' ')).toContain(
+      'start each realm by Index builds under the EVERY BOOT LOCKS THE PARENTS bullet below',
+    );
     const seconds = (file: string, name: string): number => {
       const found = source(file).match(new RegExp(`export const ${name} = ([0-9_]+);`));
       expect(found, name).not.toBeNull();

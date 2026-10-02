@@ -1395,3 +1395,6 @@ What changed the contract above:
   build waiting on the schema advisory lock deadlocks with a concurrent index build under it.
 - A twenty-fourth round of eight fresh readers: no P12 change; `DEPLOY.md` gates each realm's
   start on the schema advisory lock and states which side an index-build deadlock aborts.
+- A twenty-fifth round of eight fresh readers: no P12 change; `DEPLOY.md` applies the start
+  gate to every realm start it gives, the first included, and states the stall's account
+  recovery as owed.
