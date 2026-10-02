@@ -5711,13 +5711,19 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   deletes on empty tables; section L now seeds a code of each kind. The stall's remedy sends
   security actions again at once, even when they show landed, then stops every realm, signs
   every account out and starts every realm together, so each boot stays quiet and the in-memory
-  desktop login codes go too. Fixed in `9704a64ebf`.
+  desktop login codes go too (the start replaced in round twenty-three). Fixed in `9704a64ebf`.
 - ROUND TWENTY-THREE, eight fresh readers over round twenty-two: 49 findings, none blocking, 18
   should-fix. The stall remedy's prose had drawn a new precision fix every round, so its timing
   claims are gone: its restart waits for the dump's end and says what a boot that is not quiet
   risks, and the terminate and every credential-shaped table are pinned whole. A probe confirmed
   a pre-existing deadlock between a boot waiting on the schema advisory lock and an index build
   under it; DEPLOY notes it, section L pins it, and the code fix is owed. Fixed in `d7f5c83f66`.
+- ROUND TWENTY-FOUR, eight fresh readers over round twenty-three: 50 findings, two blocking, 21
+  should-fix. Both blocking findings were round twenty-three's own gate: the build-progress view
+  reads 0 before a build, between builds and during a drop, so every realm's start is now gated
+  on the schema advisory lock itself, which section L reads on both sides. The credential pin
+  reads secret-shaped columns, the sign-out clears Discord link states, and the index-build
+  deadlock runs in two forced orders. Fixed in `9458280c1f`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5747,7 +5753,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then
   641, then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
   then 644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then
-  647, then 648 passed, never a skip.
+  647, then 648, then 648 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
@@ -5762,8 +5768,10 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - Both halves of the boot's deadlock fix (R-11), a maintainer decision.
 - The index-build deadlock: the runner and every boot take the schema advisory lock with a
   blocking call that holds a snapshot while it waits, which a concurrent build then waits on.
-  Taking it with a try loop that holds no snapshot between tries, in both, is a maintainer
-  decision.
+  Making a waiter wait with no transaction open (polling a session-level try-lock between its
+  own short statements, then opening the schema transaction under it) is a maintainer decision;
+  the runner's comment that a waiting boot holds nothing is what the probe refutes, and that fix
+  corrects it.
 - A boot that queues behind the nightly dump with no operator awake (a crash restart at night)
   stalls every realm's token traffic until the dump ends, and DEPLOY's route needs an operator
   to end its backend. Bounding the boot instead (a boot lock timeout with a retry, or
