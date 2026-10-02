@@ -891,15 +891,15 @@ place, with the round that corrected them named.
 
 ## Round fourteen: eight fresh readers over round thirteen (`57408b6542..53694e42cf`)
 
-Round fourteen's commits: `6a7e3cd49d` (the compose grace read line by line, which cannot
-backtrack, the timed case gone, fixtures for every edge), `02bbf3d438` (HOLDER sendable at any
-point, scoped to this database and naming each session's kind, the dump polled through it,
-every send on the lost connection route capped, PRINT's output allowed in a literal report,
-every fence pinned at any indent, and the pg case running HOLDER against a holder, a waiter
-and an idle runbook session; kept whole with its tests for bisect), `8c5fa7fc28` (the stuck
-save's real bound and the bench's deadlocked boots, in DEPLOY, the contract and P12),
-`fe0f331dfd` (the test URL checked without printing it), and the commit that adds this
-section.
+Round fourteen's commits: `6a7e3cd49d` (the compose grace read line by line, the timed case
+gone, fixtures for every edge; its comment strip could still backtrack, corrected in round
+fifteen), `02bbf3d438` (HOLDER sendable at any point, scoped to this database and naming each
+session's kind, the dump polled through it, every send on the lost connection route capped,
+PRINT's output allowed in a literal report, every fence pinned at any indent, and the pg case
+running HOLDER against a holder, a waiter and an idle runbook session; kept whole with its
+tests for bisect), `8c5fa7fc28` (the stuck save's real bound, in DEPLOY, and the bench's
+deadlocked boots, in DEPLOY, the contract and P12), `fe0f331dfd` (the test URL checked without
+printing it), and the commit that adds this section.
 
 | Reader | Verdict | Findings |
 |---|---|---|
@@ -932,9 +932,10 @@ guard drew a new slow pattern for the third round, so the parse became line by l
   setting or file beside its number). Q14R4 FIXED (see C14R4; the nightly dump's command sets
   no application name, so it shows as `pg_dump`).
 - H14R1 FIXED `6a7e3cd49d`: the timed guard drew a new slow pattern for the third round, so
-  the grace is read line by line and cannot backtrack; mutants that read a deeper key or leave
-  the services block open fail. H14R2 FIXED `6a7e3cd49d` (whitespace-only lines, a trailing
-  space, CRLF and a commented services line parse, and the null check names what it reads).
+  the grace is read line by line (its comment strip could still backtrack, corrected in round
+  fifteen); mutants that read a deeper key or leave the services block open fail. H14R2 FIXED
+  `6a7e3cd49d` (whitespace-only lines, a trailing space, CRLF and a commented services line
+  parse, and the null check names what it reads).
 - S14R1 FIXED `fe0f331dfd` (the URL check is a boolean with a message). S14R2 FIXED (see
   C14R2). S14R3 FIXED (see C14R4). S14R4 FIXED (see C14R3).
 - D14R1 FIXED (see C14R1). D14R2 FIXED `8c5fa7fc28` (with L14R4 and M14R3: the ranges say no
@@ -956,3 +957,72 @@ guard drew a new slow pattern for the third round, so the parse became line by l
 - M14R1 FIXED (see L14R2). M14R2 FIXED `02bbf3d438` (the lost file is resent once whatever it
   was, any send on the route that loses its connection stops, and a resend counts toward the
   five). M14R3 FIXED (see D14R2). M14R4 FIXED (see C14R4 and D14R3).
+
+## Round fifteen: eight fresh readers over round fourteen (`53694e42cf..e47d1c29cd`)
+
+Round fifteen's commits: `6c91150321` (the bench's deadlock victim, an account create, named
+and placed on the order path in DEPLOY, the contract and P12, and every read's statement bound
+named), `25b04a58a8` (SIGTERM and SIGINT pinned to the closure, the compose stop signal
+checked, a comment found by a search that cannot backtrack, DEPLOY's bounds read from the
+code, fixtures for each branch of the parse), `412ed5c9a1` (the dump's usual length read from
+the newest backup, a waiting dump row as a stop, HOLDER locking no user table, the lost
+connection route's file and count named, and the pg case keeping another database's runbook
+session out of HOLDER; kept whole with its tests for bisect), `9224b3c02e` (a write other than
+a save among the stuck clients), and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C15R1 to C15R3 |
+| qa-checklist | PASS | Q15R1 to Q15R6 |
+| server hot path | PASS | H15R1 to H15R4 |
+| privacy and security | PASS | S15R1 to S15R3 |
+| database performance | FAIL | D15R1 to D15R6 |
+| test coverage | PASS | T15R1 to T15R11 |
+| docs librarian | PASS | L15R1 to L15R5 |
+| migration safety | PASS | M15R1 to M15R7 |
+
+45 findings: none blocking, eight should-fix (M15R1, H15R1, H15R2, D15R1, D15R2, Q15R1, T15R1,
+T15R2), 37 nice-to-have. The database reader fails a round on any open should-fix, which is
+the only FAIL. The parse that round fourteen called unable to backtrack still could, through
+its comment strip; that claim is corrected in place.
+
+- C15R1 FIXED `6c91150321` and `9224b3c02e` (with D15R2 and M15R6): a stuck read, or a write
+  other than a save, holds its client to its statement timeout, 15 s for an ordinary one and
+  60 s for the heavy reads `runWithStatementTimeout` raises. C15R2 FIXED `412ed5c9a1` (with
+  L15R3 and M15R5: the route resends "the file that brought you here"). C15R3 FIXED
+  `25b04a58a8` (a column-zero comment fixture).
+- Q15R1 FIXED `25b04a58a8` (with H15R3 and T15R7): the comment's start is found by a
+  two-character search, so the parse holds no pattern that can backtrack; the round fourteen
+  lines that claimed it before are corrected here and in the ledger. Q15R2 NOTED: the record
+  states the cap as DEPLOY does, and the body stays, as for Q11R6. Q15R3 FIXED (see T15R2).
+  Q15R4 FIXED `412ed5c9a1` (with T15R9: the waiter's promise is settled where it is made).
+  Q15R5 FIXED `25b04a58a8` (DEPLOY's 2, 15 and 60 s are read from the code; a mutant changing
+  15 to 16 fails). Q15R6 FIXED `412ed5c9a1` (only client sessions are pinned whole, so an
+  autovacuum row cannot fail the case).
+- H15R1 FIXED `25b04a58a8`: the closure's SIGINT and SIGTERM registrations are each pinned
+  once, and a game service whose `stop_signal` is not SIGTERM reads as no grace; both mutants
+  fail. H15R2 FIXED `25b04a58a8` (with T15R1). H15R3 FIXED (see Q15R1). H15R4 NOTED: a grace
+  in minutes fails loudly with a named message, and the contract states the grace in seconds.
+- S15R1 FIXED (see M15R1). S15R2 FIXED `412ed5c9a1` (with M15R4: the major version, sent as
+  its own file through the same command). S15R3 FIXED `412ed5c9a1` (with M15R3 and D15R5: no
+  lock on any user table, only brief ones on system catalogs).
+- D15R1 FIXED `6c91150321` (with L15R2 and M15R7): each deadlocked bench boot lived while an
+  account create was aborted, an account create takes the order path (it inserts the account,
+  then its first character), and an aborted one is not retried. D15R2 FIXED (see C15R1). D15R3
+  FIXED `412ed5c9a1` (with M15R1: the dump's usual length is the gap from 03:15 UTC to the
+  newest backup's last write, and a dump row waiting for a lock stops at once). D15R4 FIXED
+  `6c91150321` (every save attempt fails for the dump's run, and a leave save whose retries
+  end first is lost but for its guild books). D15R5 FIXED (see S15R3). D15R6 NOTED: as D11R3,
+  no statement timeout is added, since a cut VALIDATE only sends the operator to stop.
+- T15R1 FIXED `25b04a58a8` (a game service left open at a later top-level key; its mutant
+  fails). T15R2 FIXED `412ed5c9a1` (a runbook session in another database on the server stays
+  out of HOLDER; a mutant without the database filter fails at runtime). T15R3 to T15R6 and
+  T15R11 FIXED `25b04a58a8`. T15R7 FIXED (see Q15R1). T15R8 FIXED `412ed5c9a1` (the poll ends
+  only once the waiter is active). T15R9 FIXED (see Q15R4). T15R10 FIXED `412ed5c9a1` (the URL
+  pattern has a positive control).
+- L15R1 FIXED (see M15R1). L15R2 FIXED (see D15R1). L15R3 FIXED (see C15R2). L15R4 FIXED in
+  this record. L15R5 FIXED in the ledger.
+- M15R1 FIXED `412ed5c9a1` (with S15R1, L15R1 and D15R3). M15R2 FIXED `412ed5c9a1` (a dump
+  seen on the lost connection route is waited out first). M15R3 FIXED (see S15R3). M15R4 FIXED
+  (see S15R2). M15R5 FIXED (see C15R2; after a dump wait the five start afresh on either
+  branch). M15R6 FIXED (see C15R1). M15R7 FIXED (see D15R1).

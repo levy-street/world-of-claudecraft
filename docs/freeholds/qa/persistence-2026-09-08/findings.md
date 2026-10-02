@@ -5636,8 +5636,8 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   runbook's one unstated step, how a block is sent, became one psql command whose session
   bounds itself and prints a code, never a DETAIL, and the drop rule reads the constraint's
   key count. Fixed in `5d5912617f` through `4373df398d`.
-- ROUND TWELVE, eight fresh readers over round eleven: 46 findings, two blocking,
-  eleven should-fix. Six readers found (as corrected in round thirteen) that psql always sends a
+- ROUND TWELVE, eight fresh readers over round eleven: 46 findings, two blocking, eleven
+  should-fix. Six readers found (as corrected in round thirteen) that psql always sends a
   startup application name, which the server applies after PGOPTIONS, so the runbook's session
   never carried its name: it is set through PGAPPNAME now, and the pg case connects as psql
   does. The grace parse round eleven loosened could hang the worker on a failed match; each
@@ -5654,7 +5654,14 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   2 s lock timeout contradicts; it now states each bound by its setting. HOLDER may run at any
   point and the pg suite shows it a holder, a waiter and an idle runbook session; every resend
   is capped; the bench ranges say which boots deadlocked; and the compose grace is read line
-  by line, so no pattern can hang. Fixed in `6a7e3cd49d` through `fe0f331dfd`.
+  by line, so no pattern can hang (its comment strip still could, corrected in round fifteen).
+  Fixed in `6a7e3cd49d` through `fe0f331dfd`.
+- ROUND FIFTEEN, eight fresh readers over round fourteen: 45 findings, none blocking, eight
+  should-fix. The bench's deadlocked boots had aborted an account create, which the docs now
+  name and place on the order path; every stuck client's bound is named and read from the
+  code; the shutdown closure's SIGTERM registration and the compose stop signal are pinned;
+  the dump wait has a measure; and the grace parse's comment strip, which could still
+  backtrack, is a plain search. Fixed in `6c91150321` through `9224b3c02e`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5675,7 +5682,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - `npx tsc --noEmit` exit 0 at every round's tip.
 - Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then 641,
   then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
-  then 644, then 644 passed, never a skip.
+  then 644, then 644, then 644 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
