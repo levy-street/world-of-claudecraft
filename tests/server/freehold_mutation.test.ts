@@ -3104,8 +3104,11 @@ describe('the claim renewer', () => {
     // hoisted layout, each worktree installs its own, and git tracks nothing
     // there); any other path, one with node_modules deeper in it or above the
     // working directory included, is read as this repository's and fails until
-    // a read takes it. A package is named by the directory after its last
-    // node_modules, its scope kept, so one nested under another is named.
+    // a read takes it. The bot bundles one package, ws: every module from a
+    // package lies under node_modules/ws/ and holds no node_modules further
+    // along its path, so a second package, one nested in ws, or a ws module
+    // under any directory whose name holds node_modules fails until a read
+    // takes it.
     const fromPackage = (file: string) => file.startsWith('node_modules/');
     expect(
       [
@@ -3115,21 +3118,24 @@ describe('the claim renewer', () => {
         'node_modules_x/ws/r.ts',
       ].filter(fromPackage),
     ).toEqual(['node_modules/ws/lib/a.js']);
-    expect(tracked(['node_modules'])).toEqual([]);
-    const packageOf = (file: string) => {
-      const parts = file
-        .slice(file.lastIndexOf('node_modules/') + 'node_modules/'.length)
-        .split('/');
-      return parts[0].startsWith('@') ? `${parts[0]}/${parts[1]}` : parts[0];
-    };
+    expect(lsFiles(['--', 'node_modules'])).toEqual([]);
+    const fromWs = (file: string) =>
+      file.startsWith('node_modules/ws/') &&
+      !file.slice('node_modules/ws/'.length).includes('node_modules');
     expect(
       [
         'node_modules/ws/lib/a.js',
+        'node_modules/wsx/i.js',
+        'node_modules/@s/ws/i.js',
         'node_modules/ws/node_modules/x/i.js',
-        'node_modules/@s/p/i.js',
-      ].map(packageOf),
-    ).toEqual(['ws', 'x', '@s/p']);
-    expect([...new Set(bundled.filter(fromPackage).map(packageOf))].sort()).toEqual(['ws']);
+        'node_modules/ws/lib/x_node_modules/y/i.js',
+        'node_modules/e/node_modules/ws/i.js',
+        'node_modules/e/lib/x_node_modules/ws/i.js',
+      ].filter(fromWs),
+    ).toEqual(['node_modules/ws/lib/a.js']);
+    const packaged = bundled.filter(fromPackage);
+    expect(packaged.length).toBeGreaterThan(0);
+    expect(packaged.filter((file) => !fromWs(file))).toEqual([]);
     const bundledHere = bundled.filter((file) => !fromPackage(file)).sort();
     expect(bundledHere).toEqual(
       [...botFiles, 'src/sim/discord_roles.ts', 'src/sim/discord_tier.ts'].sort(),
