@@ -1065,56 +1065,56 @@ For off-box safety, sync the directory to S3 occasionally:
   `freehold_operation_receipt_erase` ON `freehold_operation_receipts`, then the
   functions `guard_open_freehold_operation_parent_delete()` and
   `erase_freehold_operation_receipt()`, and only then the tables.
-- EVERY BOOT LOCKS THE PARENTS: the core schema's `ADD COLUMN IF NOT EXISTS`
-  statements take ACCESS EXCLUSIVE on `characters` and then `accounts` even when the
-  column exists, and hold both until the boot schema transaction COMMITs (no lock
-  timeout). A boot therefore queues behind every in-flight save and account write, and
-  every later one on every realm queues behind the boot (56 to 59 ms in the bench with
-  plain saves in flight when no deadlock formed; one boot in six waited out
-  `deadlock_timeout`, 1,056 ms, and lived while the bench's "old account create", a
-  transaction that inserts an account and then a character, was aborted). A boot can
-  DEADLOCK on two paths: a transaction that holds a lock on `characters` the boot's
-  SHARE does not wait for (a plain read's ACCESS SHARE, or a row lock's ROW SHARE) and
-  then writes it, against the boot's SHARE lock on `characters` that it upgrades to
-  ACCESS EXCLUSIVE (the core `characters_account` index create, then its first ALTER);
-  and any transaction that holds a lock on `accounts` and then asks for one on
-  `characters`, against the boot's opposite order. Every effect-carrying or hooked
-  character save (storage, bank ledger, the Hearth trip) takes both shapes, and so
-  does a character create (it locks the account row, then counts characters and
-  inserts one); the housing operation prepare, the character delete and an account
-  create while community test accounts are on (`createAccount` in `server/db.ts` then
-  inserts the account and its test roster in one transaction; with them off it is one
-  INSERT into `accounts`, which only queues behind the boot) take the second.
-  PostgreSQL aborts one side at once or after one or more `deadlock_timeout` waits (1
-  s each). With such saves in flight in the bench, EVERY boot was eventually aborted
-  and saves were aborted beside it: the process exits, the compose policy restarts it,
-  and a restart meets the same race while another realm keeps serving those saves. So
-  boot a realm while the other realms on its database are quiet and outside the
-  nightly `pg_dump` (it starts at 03:15 UTC, see Backups, and holds ACCESS SHARE on
-  every table for its whole run, so a boot that starts during it takes its first lock
-  on `characters` and then waits for the dump to end to upgrade that lock, blocking
-  every realm's saves and logins while it waits (a stuck character save fails at its
-  save transaction's 2 s lock timeout, `server/character_save_transaction.ts`, with
-  55P03, and every attempt fails that way until the dump ends, so a leave save whose
-  retries end first is lost but for its guild books; a stuck read or a write other
-  than a save holds its realm's pool client until its own bound fails it, its lock
-  timeout where it sets one (55P03) and otherwise its statement timeout (57014),
-  `DB_STATEMENT_TIMEOUT_MS` (15 s) for an ordinary statement such as a login's
-  character read or a character create, and for a statement run through
-  `runWithStatementTimeout` the bound it sets, `DB_HEAVY_STATEMENT_TIMEOUT_MS` (60 s)
-  for the heavy reads and writes and 2 s or 10 s for bounded ones such as a login's
-  housing reads, so a realm's pool can fill), and a boot during the dump's opening
-  locks can deadlock it and abort that night's backup), and in a rolling restart let
-  one realm finish shutting down before another boots; that is the quiet window this
-  file means. An aborted save shows as 40P01 in the realm log (one that carried guild
-  bank books also counts `escrow_save_failed`), and what writes it again depends on
-  the save: an autosave is written by the next autosave; a leave save is retried with
-  backoff (`server/leave_character_save.ts`), its guild books reconciled if every
-  attempt fails; a shutdown flush save is retried once only for a character carrying
-  guild bank books, and otherwise not at all. An aborted Hearth trip counts
-  `trip_failed` and is not retried by the server (the player presses the key again),
-  and neither is an aborted account or character create (the player tries again). The
-  hazard predates housing; removing both paths is owed
+- EVERY BOOT LOCKS THE PARENTS: the core schema (`SCHEMA` in `server/db.ts`) runs its
+  index creates, which take SHARE, and its `ADD COLUMN IF NOT EXISTS` statements,
+  which take ACCESS EXCLUSIVE even when the column exists, table by table in its
+  statement order, first on `auth_tokens`, then `characters`, then `accounts` and the
+  tables after them, and holds every lock until the boot schema transaction COMMITs
+  (no lock timeout). A boot therefore queues behind every in-flight statement on those
+  tables, and every later one on every realm queues behind the boot (56 to 59 ms in
+  the bench with plain saves in flight when no deadlock formed; one boot in six waited
+  out `deadlock_timeout`, 1,056 ms, and lived while the bench's "old account create",
+  a transaction that inserts an account and then a character, was aborted). A boot can
+  DEADLOCK with any transaction of either of two shapes: one that holds a lock on a
+  table the boot holds only SHARE on (a plain read's ACCESS SHARE, or a row lock's ROW
+  SHARE) and then writes it, against the boot's upgrade of that SHARE to ACCESS
+  EXCLUSIVE; and one that holds a lock on a table and then asks for one on a table the
+  boot locks earlier in its order (`accounts` and then `characters` or `auth_tokens`),
+  against the boot's own order. The shapes decide it, not a list; among the
+  transactions that take one or both are every effect-carrying or hooked character
+  save (storage, bank ledger, the Hearth trip), a character create (it locks the
+  account row, then counts characters and inserts one), the character delete (it locks
+  the account row, then the character row, then deletes it), a password reset (it
+  updates the account, then deletes its tokens), the housing operation prepare, and an
+  account create while community test accounts are on (`createAccount` in
+  `server/db.ts` then inserts the account and its test roster in one transaction; with
+  them off it is one INSERT into `accounts`, which only queues behind the boot).
+  PostgreSQL aborts one side at once or after one or more `deadlock_timeout` waits
+  (1 s each). With such saves in flight in the bench, EVERY boot was eventually
+  aborted and saves were aborted beside it: the process exits, the compose policy
+  restarts it, and a restart meets the same race while another realm keeps serving
+  those saves. So boot a realm while the other realms on its database are quiet and
+  outside the nightly `pg_dump` (it starts at 03:15 UTC, see Backups, and holds ACCESS
+  SHARE on every table for its whole run, so a boot that starts during it takes SHARE
+  on `auth_tokens`, its first table, and then waits for the dump to end to upgrade
+  that lock, holding nothing on the parents yet; meanwhile every realm's token
+  statement, a login, a token check, a revoke or a password reset, queues behind it
+  and holds its pool client until its statement timeout, `DB_STATEMENT_TIMEOUT_MS` (15
+  s), fails it with 57014, so a realm's pool can fill, and then its saves and other
+  queries fail at the pool's acquire timeout, `DB_POOL_CONNECT_TIMEOUT_MS` (5 s),
+  until the dump ends, so a leave save whose retries end first is lost but for its
+  guild books; and a boot during the dump's opening locks can deadlock it and abort
+  that night's backup), and in a rolling restart let one realm finish shutting down
+  before another boots; that is the quiet window this file means. An aborted save
+  shows as 40P01 in the realm log (one that carried guild bank books also counts
+  `escrow_save_failed`), and what writes it again depends on the save: an autosave is
+  written by the next autosave; a leave save is retried with backoff
+  (`server/leave_character_save.ts`), its guild books reconciled if every attempt
+  fails; a shutdown flush save is retried once only for a character carrying guild
+  bank books, and otherwise not at all. An aborted Hearth trip counts `trip_failed`
+  and is not retried by the server (the player presses the key again), and neither is
+  an aborted account or character create or password reset (the player tries again).
+  The hazard predates housing; removing both paths is owed
   (docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md measures it).
 - FIRST ROLLOUT OF THE HOUSING TABLES: the first boot that carries them also creates
   the foreign-key-bearing tables and the delete guards on `accounts` and `characters`

@@ -721,8 +721,8 @@ triggers (the two parent-delete guards and the receipt erase) inside the ONE
 `ensureSchema` transaction, which runs on its dedicated boot client with no
 `lock_timeout`. That DDL needs SHARE ROW EXCLUSIVE on `accounts` and `characters` (a
 later boot that has to repair a trigger takes ACCESS EXCLUSIVE for its DROP TRIGGER),
-but EVERY boot already holds both under ACCESS EXCLUSIVE from the core schema's first
-`ADD COLUMN IF NOT EXISTS` statements to its COMMIT, so the housing DDL adds no wait:
+but EVERY boot already holds both under ACCESS EXCLUSIVE from the core schema's
+`ADD COLUMN IF NOT EXISTS` statements on them to its COMMIT, so the housing DDL adds no wait:
 every boot queues behind every in-flight character save and account write, and every one
 that arrives after it queues behind the boot until that COMMIT. Measured with an old
 realm serving plain saves, the first rollout took 55 to 66 ms when no deadlock formed
@@ -730,18 +730,20 @@ realm serving plain saves, the first rollout took 55 to 66 ms when no deadlock f
 56 to 59 ms (one of six waited 1,056 ms); each boot that waited lived, and the bench's
 "old account create", a transaction that inserts an account and then a character, was
 aborted beside it. ANY boot can DEADLOCK on two paths (the touch-set manifest's P12 and
-R-11): the boot's SHARE lock on `characters` upgraded to ACCESS EXCLUSIVE, against a
-transaction that took a lock on `characters` that SHARE does not wait for (a save's row
-lock's ROW SHARE, or a plain read's ACCESS SHARE) and then writes it; and the boot's
-`characters`-then-`accounts` order, against a transaction that locks `accounts` first.
-Every effect-carrying or hooked character save (the manifest's G1 then G2, the Hearth
-trip's save included) and a character create (an account row lock, then a count and an
-insert on `characters`) take both shapes, and the operation prepare, the character
-delete and an account create while community test accounts are on take the second. With
-such saves in flight every bench boot was eventually aborted, saves were aborted beside
-it, and a boot that loses exits and is restarted: a hazard of the core schema's boot
-that predates housing (`docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md`), to
-which 07a adds members. The first rollout is the one boot that also builds the tables:
+R-11), since the core schema locks its tables in its statement order, `auth_tokens`,
+then `characters`, then `accounts`: the boot's SHARE lock on a table upgraded to ACCESS
+EXCLUSIVE, against a transaction that took a lock on that table that SHARE does not wait
+for (a row lock's ROW SHARE, or a plain read's ACCESS SHARE) and then writes it; and the
+boot's order, against a transaction that locks a later table first (`accounts`, then
+`characters` or `auth_tokens`). The shapes decide it, not a list: effect-carrying and
+hooked character saves (the manifest's G1 then G2, the Hearth trip's save included), a
+character create and the character delete take both, and the operation prepare, a
+password reset and an account create while community test accounts are on take the
+second. With such saves in flight every bench boot was eventually aborted, saves were
+aborted beside it, and a boot that loses exits and is restarted: a hazard of the core
+schema's boot that predates housing
+(`docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md`), to which 07a adds
+members. The first rollout is the one boot that also builds the tables:
 do it, and any boot beside other realms serving those saves, in a quiet window (as
 `DEPLOY.md` defines it, outside the nightly `pg_dump` too), and never beside a realm
 that is still shutting down (a shutdown flush save that fails gets one more pass only

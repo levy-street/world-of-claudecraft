@@ -1357,9 +1357,19 @@ describe('commitFreeholdMutation', () => {
 const VITE_AND_BUNDLE_ALIAS_WORDS = { vite: 2, bundle: 5 };
 
 /** Every module under a root, in every spelling the toolchain resolves (the
- *  shared source walker's policy): the one walk both server/ scans in this
- *  file read, driven over a fixture in the renewer's mention count. */
+ *  shared source walker's policy): the one walk every server/ scan in this
+ *  file reads, driven over a fixture in the renewer's mention count. */
 const modulesUnder = (root: string) => sourceFilesUnder(root);
+
+/** Every module under server/ with its raw text, walked and read once for the
+ *  file's server/ scans. */
+let serverModuleCache: Array<{ file: string; full: string; text: string }> | undefined;
+const serverModules = () =>
+  (serverModuleCache ??= modulesUnder('server').map(({ file, full }) => ({
+    file,
+    full,
+    text: readFileSync(full, 'utf8'),
+  })));
 
 describe('the claim renewer', () => {
   const claim = (plotId: string, accountId: number) => ({
@@ -1673,20 +1683,29 @@ describe('the claim renewer', () => {
     expect(start).toBeGreaterThan(0);
     expect(end).toBeGreaterThan(start);
     // Both signals run the closure: its two registrations follow it as one
-    // block, and no other line of main.ts, nor any other file under server/,
-    // names either signal, so no second listener, wrapper or removal can
-    // stand beside them in the process.
+    // block, no other line of main.ts and no other file under server/ names
+    // either signal, and no file under server/ removes every listener at once.
+    // That is this pin's reach: a listener in a dependency is beyond what repo
+    // text pins.
     expect(
       main.match(/\};\s*process\.on\('SIGINT', shutdown\);\s*process\.on\('SIGTERM', shutdown\);/g)
         ?.length,
       'the SIGINT and SIGTERM registrations right after the closure',
     ).toBe(1);
     expect(main.match(/\bSIG(?:INT|TERM)\b/g)).toEqual(['SIGINT', 'SIGTERM']);
+    // The walk reaches nested modules, so neither scan passes on a short list.
+    expect(serverModules().length).toBeGreaterThan(500);
+    expect(serverModules().map(({ file }) => file)).toContain('http/game_metrics.ts');
     expect(
-      sourceFilesUnder('server')
-        .filter((source) => /\bSIG(?:INT|TERM)\b/.test(readFileSync(source.full, 'utf8')))
-        .map((source) => source.file),
+      serverModules()
+        .filter(({ text }) => /\bSIG(?:INT|TERM)\b/.test(text))
+        .map(({ file }) => file),
     ).toEqual(['main.ts']);
+    expect(
+      serverModules()
+        .filter(({ text }) => /\bremoveAllListeners\(\s*\)/.test(text))
+        .map(({ file }) => file),
+    ).toEqual([]);
     const awaits = [...main.slice(start, end).matchAll(/await\s+([^;]+);/g)].map((match) =>
       match[1].replace(/\s+/g, ' ').trim(),
     );
@@ -2065,6 +2084,14 @@ describe('the claim renewer', () => {
     expect(
       graceOf('services:\n  gameserver:\n    stop_grace_period: 300s\n  game:\n    image: x\n'),
     ).toBeNull();
+    // `docker compose` with no `-f` reads every compose file it finds in the
+    // directory, an override among them; the repo tracks exactly one.
+    expect(
+      spawnSync('git', ['ls-files', '--', '*compose*.yml', '*compose*.yaml'], { encoding: 'utf8' })
+        .stdout.split('\n')
+        .filter((file) => /^(?:docker-)?compose(?:\.override)?\.ya?ml$/.test(file)),
+      'the compose files docker compose reads',
+    ).toEqual(['docker-compose.yml']);
     const stop = gameStopOf(readFileSync('docker-compose.yml', 'utf8'));
     expect(stop, 'the game service in docker-compose.yml').not.toBeNull();
     // The game service's keys, whole: a new one (an `extends` that would pull
@@ -2103,15 +2130,19 @@ describe('the claim renewer', () => {
     ).toEqual([graceSeconds]);
   });
 
-  it("states DEPLOY's save and read bounds as the code sets them", () => {
-    // The boot bullet names each bound beside its number, so a change to either
-    // side fails here until the other follows.
+  it("states DEPLOY's boot lock order and stall bounds as the code sets them", () => {
+    // The boot bullet names the core schema's first tables in its order and
+    // each bound beside its number, so a change to either side fails here
+    // until the other follows.
     const deploy = readFileSync('DEPLOY.md', 'utf8');
     const at = deploy.indexOf('- EVERY BOOT LOCKS THE PARENTS');
     expect(at).toBeGreaterThan(-1);
     const next = deploy.indexOf('\n- ', at + 1);
     expect(next).toBeGreaterThan(at);
-    expect(deploy.slice(at, next)).not.toMatch(/\n#/);
+    // Every line after the first is the bullet's own (indented or blank), so
+    // the slice never runs into a following paragraph or section.
+    expect('- a\n  b\nPara\n').toMatch(/\n(?![ \n])/);
+    expect(deploy.slice(at, next)).not.toMatch(/\n(?![ \n])/);
     const bullet = deploy.slice(at, next).replace(/\s+/g, ' ');
     const source = (file: string) => stripComments(readFileSync(file, 'utf8'));
     const seconds = (file: string, name: string): number => {
@@ -2119,21 +2150,20 @@ describe('the claim renewer', () => {
       expect(found, name).not.toBeNull();
       return Number((found as RegExpMatchArray)[1].replaceAll('_', '')) / 1000;
     };
-    const lock = [
-      ...source('server/character_save_transaction.ts').matchAll(/lock_timeout = '(\d+)s'/g),
-    ].map((match) => match[1]);
-    expect(lock).toHaveLength(1);
-    expect(bullet).toContain(
-      `save transaction's ${lock[0]} s lock timeout, \`server/character_save_transaction.ts\``,
-    );
+    const db = source('server/db.ts');
+    const from = db.indexOf('export const SCHEMA = `');
+    expect(from).toBeGreaterThan(-1);
+    const schema = db.slice(from, db.indexOf('\n`;', from));
+    const altered = [
+      ...new Set([...schema.matchAll(/^ALTER TABLE (\w+)/gm)].map((match) => match[1])),
+    ].slice(0, 3);
+    expect(altered).toEqual(['auth_tokens', 'characters', 'accounts']);
+    expect(bullet).toContain('first on `auth_tokens`, then `characters`, then `accounts`');
     expect(bullet).toContain(
       `\`DB_STATEMENT_TIMEOUT_MS\` (${seconds('server/db.ts', 'DB_STATEMENT_TIMEOUT_MS')} s)`,
     );
-    expect(source('server/db.ts')).toContain(
-      'export const DB_HEAVY_STATEMENT_TIMEOUT_MS = CHARACTER_SAVE_STATEMENT_TIMEOUT_MS;',
-    );
     expect(bullet).toContain(
-      `\`DB_HEAVY_STATEMENT_TIMEOUT_MS\` (${seconds('server/character_save_transaction.ts', 'CHARACTER_SAVE_STATEMENT_TIMEOUT_MS')} s)`,
+      `\`DB_POOL_CONNECT_TIMEOUT_MS\` (${seconds('server/db.ts', 'DB_POOL_CONNECT_TIMEOUT_MS')} s)`,
     );
   });
 
@@ -4652,8 +4682,7 @@ describe('the claim renewer', () => {
     // Every module under server/, in every spelling the toolchain resolves
     // (the shared source walker's policy), so a call site in a `.mjs` or
     // `.cjs` module is counted like one in a `.ts` file.
-    const files = modulesUnder('server').map(({ file, full }) => {
-      const source = readFileSync(full, 'utf8');
+    const files = serverModules().map(({ file, text: source }) => {
       return { file: `server/${file}`, source, texts: textsOf(source) };
     });
     // A walk that found little would pass the counts below vacuously.
@@ -4689,9 +4718,9 @@ describe('the claim renewer', () => {
     } finally {
       rmSync(fixtureRoot, { recursive: true, force: true });
     }
-    // Both scans read that one walk: no string in this file spells the
+    // Every server/ scan reads that one walk: no string in this file spells the
     // `.ts`-only walker's path in path characters alone (an import, a dynamic
-    // import, a mock), so neither scan can be swapped back to it. A filter on
+    // import, a mock), so no scan can be swapped back to it. A filter on
     // a walk is an edit in plain sight; the renewer count's walk is also
     // backed by the unread list below.
     const tsOnlyWalker = /['"`][./\w-]*helpers\/ts_files_under(?:\.[jt]s)?['"`]/;
@@ -7738,9 +7767,9 @@ describe('the Hearth use precheck the re-dispatch replays', () => {
 describe('the housing authority boundary', () => {
   // Through the shared walker (tests/CLAUDE.md): server/ has subdirectories.
   const serverSources = () => {
-    const files = modulesUnder('server').map((f) => ({
+    const files = serverModules().map((f) => ({
       name: `server/${f.file}`,
-      code: stripComments(readFileSync(f.full, 'utf8')),
+      code: stripComments(f.text),
     }));
     // A walker that found nothing would pass every scan below vacuously.
     expect(files.length).toBeGreaterThan(500);
