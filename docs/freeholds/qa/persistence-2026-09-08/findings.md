@@ -5756,8 +5756,14 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - ROUND THIRTY, eight fresh readers over round twenty-nine: 44 findings, none blocking, 9
   should-fix, every reader passing. The sign-out is now checked from a new session before any
   realm starts; a left-open session is measured by its `open_for`; the bot moves to a release's
-  image only once the realm is verified and only where it already runs; and the `.env` variables
-  the bot and the game share are pinned. Fixed in `74d696701d`.
+  image only once the realm is verified and only where it already runs (step 6's `up -d` moves it
+  first where `.env` sets `COMPOSE_PROFILES=discord`, worded so in round thirty-one); and the
+  `.env` variables the bot and the game share are pinned. Fixed in `74d696701d`.
+- ROUND THIRTY-ONE, eight fresh readers over round thirty: 38 findings, none blocking, 13
+  should-fix, every reader passing. After any rollback the bot follows the game's image; a host
+  that enables the discord profile in `.env` is told step 6 already started the bot; the third
+  escalation lever stays open while a release image waits; and the sign-out check is read against
+  a sign-out still open in its own session. Fixed in `ffc36d2487`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5787,8 +5793,8 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then
   641, then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
   then 644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then
-  647, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648 passed,
-  never a skip.
+  647, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648
+  passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):

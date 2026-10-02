@@ -2171,6 +2171,7 @@ the terminate rule needs no case for it.
   Q28R2; listed in round twenty-nine, Q29R5). L28R5 FIXED in this record (six readers; round
   twenty-seven's summary notes it (round twenty-nine, L29R2)). L28R6 FIXED `5c37d09029` (the dump
   route's statement ends any other waiter for that lock with it).
+
 ## Round twenty-nine: eight fresh readers over round twenty-eight (`a430d838ad..84ea7d4b8d`)
 
 Round twenty-nine's commits: `e8582aacc9` (DEPLOY: the sign-out runs in psql's default autocommit
@@ -2179,15 +2180,15 @@ from the stop of every realm; a hand drop's pid comes from DEPLOY's own lookup f
 session; `idle_for` must grow by the whole time between the two readings; the bot's first start
 recreates the game first, by the gate, then starts the bot alone; step 6 recreates the bot on the
 new image, and the bot's own recreate, which runs the game's image, is barred while an image built
-for a coming release waits (worded so in round thirty, L30R7); the key order gives its reason; the
-step 6 fallback runs a rebuilt service on its new image; a recreate may stop the game before its
-readings, and its rule covers an `.env` edit outside a release; the community bullet drops the
-retired flag's history and the portal clause; section L reads `idle_for` grow and start over,
-finds the hand drop's pid by DEPLOY's lookup, takes every session inside its try and catches the
-running statement; the unit suite reads each compose service's own block for the shared Discord
-keys, the shared image, the wiki's one dependency and the game's `/livez` probe, and exempts a
-`--no-deps` start of any service but the game; the change log with it; kept whole for bisect), and
-the commit that adds this section.
+for a coming release waits (worded so in round thirty, L30R7; moved after the verification in
+round thirty, H30R1); the key order gives its reason; the step 6 fallback runs a rebuilt service
+on its new image; a recreate may stop the game before its readings, and its rule covers an `.env`
+edit outside a release; the community bullet drops the retired flag's history and the portal
+clause; section L reads `idle_for` grow and start over, finds the hand drop's pid by DEPLOY's
+lookup, takes every session inside its try and catches the running statement; the unit suite reads
+each compose service's own block for the shared Discord keys, the shared image, the wiki's one
+dependency and the game's `/livez` probe, and exempts a `--no-deps` start of any service but the
+game; the change log with it; kept whole for bisect), and the commit that adds this section.
 
 | Reader | Verdict | Findings |
 |---|---|---|
@@ -2309,34 +2310,121 @@ safety) came back with no should-fix.
 - H30R1 FIXED `74d696701d` (with H30R2, H30R7, M30R1, M30R4 and L30R4: the bot's recreate leaves
   step 6 for after the verification, guarded by the bot container's running state, so it never
   starts a bot where none runs; the rollback says a rollback before it leaves the bot on the older
-  image, and with `COMPOSE_PROFILES=discord` runs that line again after it). H30R2 FIXED (see
-  H30R1). H30R3 FIXED (see S30R2). H30R4 FIXED (see D30R1). H30R5 FIXED `74d696701d` (with L30R5:
-  the escalation levers carry the image bar). H30R6 FIXED (see T30R3). H30R7 FIXED (see H30R1).
+  image, and with `COMPOSE_PROFILES=discord` runs that line again after it; C29R7's disposition
+  notes it (round thirty-one, L31R2); the line runs after any rollback, and a profile host stops a
+  lever-stopped bot again, from round thirty-one, H31R2 and M31R1). H30R2 FIXED (see H30R1). H30R3
+  FIXED (see S30R2). H30R4 FIXED (see D30R1). H30R5 FIXED `74d696701d` (with L30R5: the escalation
+  levers carry the image bar; the third, a stop, open even then from round thirty-one, H31R3).
+  H30R6 FIXED (see T30R3). H30R7 FIXED (see H30R1).
 - S30R1 FIXED `74d696701d` (DEPLOY reads, from a new psql session, one count over every table the
   sign-out clears and requires 0 before any realm starts, else the sign-out is committed or run
-  again; section L pins the statement whole, reading above 0 before the sign-out and 0 after).
-  S30R2 FIXED `74d696701d` (with C30R2, D30R2, H30R3, M30R3 and Q30R7: the drop lookup reads only
-  this database's `psql` sessions; section L names its hand drop `psql` and takes the drop's pid
-  from the polled lookup).
+  again; section L pins the statement whole, reading above 0 before the sign-out and 0 after;
+  S29R1's disposition notes it (round thirty-one, L31R2); read against a sign-out still open in
+  its own session from round thirty-one, T31R2). S30R2 FIXED `74d696701d` (with C30R2, D30R2,
+  H30R3, M30R3 and Q30R7: the drop lookup reads only this database's `psql` sessions; section L
+  names its hand drop `psql` and takes the drop's pid from the polled lookup; H29R1's disposition
+  notes it (round thirty-one, L31R2); run on the realm database, D31R3, and shown to leave a
+  runner's drop out, C31R5, in round thirty-one).
 - D30R1 FIXED `74d696701d` (with C30R1, H30R4 and T30R4: a session is ended only when, on two
   readings taken in psql's default autocommit, its `idle_for` grew by exactly as much as its
   `open_for`; section L reads the exact gap between them unchanged across two readings and moved
-  once the session runs a statement, its `idle_for` then above 0 and below the first reading).
-  D30R2 FIXED (see S30R2). D30R3 FIXED `74d696701d` (the test comment says a virtualxid wait lasts
-  until the transaction ends).
+  once the session runs a statement, its `idle_for` then above 0 and below the first reading;
+  T29R1's disposition notes it (round thirty-one, L31R2); worded as `open_for` less `idle_for` the
+  same on both readings in round thirty-one, D31R2). D30R2 FIXED (see S30R2). D30R3 FIXED
+  `74d696701d` (the test comment says a virtualxid wait lasts until the transaction ends).
 - T30R1 FIXED `74d696701d` (with Q30R5: the `.env` variables both compose blocks read are pinned,
-  the image tag and the same four, with a bot-only control). T30R2 FIXED `74d696701d` (the
-  community pin refuses the retired flag's name in any form and reads the Rift sentence whole).
-  T30R3 FIXED `74d696701d` (with Q30R6, H30R6 and M30R2: the exemption names only the bot and the
-  wiki, with a negative control for postgres). T30R4 FIXED (see D30R1). T30R5 FIXED `74d696701d`
-  (the bot block runs `node dist-bot/bot.cjs`, pinned). T30R6 FIXED `74d696701d` (the wiki's block
-  is read to stop before the top-level `volumes:`).
+  the image tag and the same four, with a bot-only control; T29R2's disposition notes it (round
+  thirty-one, L31R2)). T30R2 FIXED `74d696701d` (the community pin refuses the retired flag's name
+  in any form and reads the Rift sentence whole). T30R3 FIXED `74d696701d` (with Q30R6, H30R6 and
+  M30R2: the exemption names only the bot and the wiki, with a negative control for postgres;
+  H29R2's disposition notes it (round thirty-one, L31R2)). T30R4 FIXED (see D30R1). T30R5 FIXED
+  `74d696701d` (the bot block runs `node dist-bot/bot.cjs`, pinned). T30R6 FIXED `74d696701d` (the
+  wiki's block is read to stop before the top-level `volumes:`).
 - M30R1 FIXED (see H30R1). M30R2 FIXED (see T30R3). M30R3 FIXED (see S30R2). M30R4 FIXED (see
   H30R1). M30R5 FIXED (see L30R2).
 - L30R1 FIXED in this record (round twenty-nine's dispositions name the round twenty-eight text
   they edited). L30R2 FIXED `74d696701d` (with C30R3, M30R5 and Q30R8: a release's step 6 starts
-  every service outside a profile with `up -d`, and the bot once the realm is verified; the
-  recreate's stop-first form is no longer a second parenthetical). L30R3 FIXED in this record
-  (with Q30R2: seven readers). L30R4 FIXED (see H30R1). L30R5 FIXED (see H30R5). L30R6 FIXED (see
-  Q30R1). L30R7 FIXED in this record (with C30R6: the round twenty-nine paragraph says step 6
-  recreates the bot on the new image and only the bot's own recreate is barred).
+  every service outside a profile with `up -d`, and the bot once the realm is verified (the
+  profile host named in round thirty-one, L31R3); the recreate's stop-first form is no longer a
+  second parenthetical). L30R3 FIXED in this record (with Q30R2: seven readers). L30R4 FIXED (see
+  H30R1). L30R5 FIXED (see H30R5). L30R6 FIXED (see Q30R1). L30R7 FIXED in this record (with
+  C30R6: the round twenty-nine paragraph says step 6 recreates the bot on the new image and only
+  the bot's own recreate is barred).
+
+## Round thirty-one: eight fresh readers over round thirty (`af61694c86..77e279a5da`)
+
+Round thirty-one's commits: `ffc36d2487` (DEPLOY: after any rollback the bot's guarded line runs,
+moving a running bot to the image the game now runs; the bot paragraph says it runs the older
+image beside the new game until the verification, and that on a host whose `.env` sets
+`COMPOSE_PROFILES=discord` step 6's `up -d` has already started it, a lever-stopped one included,
+to stop again by that lever; the first two escalation levers carry the image bar and the third, a
+stop, is open even then; the recreate rule's parenthetical names the profile host; a sign-out
+check above 0 also means a realm still runs, and the count is read again; the yardstick reads
+`open_for` less `idle_for` the same on both; the lookup runs on the realm database; section L
+holds a sign-out open in its own session against a new session, pins the check's and the
+yardstick's wording, and shows the scoped lookup leaves a runner's drop out; the unit suite pins
+the bot line's place after the verification, its guard, its container, the new sentences and the
+absence of an `env_file`, and reads unbraced variables too; the change log with it; kept whole for
+bisect), and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C31R1 to C31R6 |
+| qa-checklist | PASS | Q31R1 to Q31R7 |
+| server hot path | PASS | H31R1 to H31R5 |
+| privacy and security | PASS | S31R1 to S31R2 |
+| database performance | PASS | D31R1 to D31R3 |
+| test coverage | PASS | T31R1 to T31R6 |
+| docs librarian | PASS | L31R1 to L31R6 |
+| migration safety | PASS | M31R1 to M31R3 |
+
+38 findings: none blocking, 13 should-fix (C31R1, Q31R1, H31R1 to H31R3, S31R1, D31R1, L31R1,
+L31R2, M31R1, T31R1 to T31R3), 25 nice-to-have, every reader passing. Five readers found the
+profile host's step 6 starting a lever-stopped bot; DEPLOY now says so where the bot is moved. One
+reader noted, outside 07a, that no server code prunes expired `auth_tokens` rows, which belongs to
+that table's owner.
+
+- C31R1 FIXED (see M31R1). C31R2 FIXED (see L31R3). C31R3 FIXED (see S31R2). C31R4 FIXED (see
+  T31R2). C31R5 FIXED `ffc36d2487` (with T31R5: the scoped lookup returns no row while a runner's
+  drop waits, which the same lookup without its `psql` scope finds). C31R6 FIXED (see D31R2).
+- Q31R1 FIXED (see T31R1). Q31R2 FIXED `ffc36d2487` and in the ledger (the manifest's and the
+  ledger's round thirty entries say step 6's `up -d` moves the bot first where `.env` sets
+  `COMPOSE_PROFILES=discord`). Q31R3 FIXED (see M31R1). Q31R4 FIXED (see H31R2). Q31R5 FIXED (see
+  T31R2 and T31R3). Q31R6 FIXED in this record (the round twenty-nine paragraph notes the move
+  after the verification). Q31R7 FIXED in this record: `77e279a5da`'s body leaves out its Q30R1,
+  L30R3, L30R7 and C30R5 edits; the commit stays as it is.
+- H31R1 FIXED (see M31R1). H31R2 FIXED `ffc36d2487` (with Q31R4: after any rollback the bot's
+  guarded line runs, moving a running bot to the image the game now runs and skipping one that
+  does not run). H31R3 FIXED `ffc36d2487` (with L31R4: the first two levers carry the image bar,
+  and the third, a stop, starts no image and is open even then). H31R4 FIXED (see S31R2). H31R5
+  FIXED `ffc36d2487` (the bot paragraph says the bot runs the older image beside the new game
+  until the realm is verified).
+- S31R1 NO CHANGE: starting an email change re-checks the account's current password
+  (`handleAccountEmailChange` in `server/account.ts`), which a leftover token's holder after a
+  password change or a staff reset does not have, so a leftover token alone starts no such
+  request; the credential pin already classifies `email_change_requests` so. S31R2 FIXED
+  `ffc36d2487` (with C31R3 and H31R4: a check above 0 means the sign-out has not committed or a
+  realm on the database still runs; that realm is stopped, the sign-out committed in its own
+  session if it is still open or else run again, and the count read again).
+- D31R1 FIXED (see T31R2). D31R2 FIXED `ffc36d2487` (with C31R6 and L31R6: the rule reads
+  `open_for` grown by those seconds and `open_for` less `idle_for` the same on both readings, the
+  form section L reads, with no dangling "a few seconds"). D31R3 FIXED `ffc36d2487` (the lookup
+  runs from a psql session on the realm database).
+- T31R1 FIXED `ffc36d2487` (with Q31R1 and T31R4: the unit case pins that step 6's block names no
+  bot, that the guarded line sits after the verify block, the bot's container name, the rollback,
+  profile-host, lever and parenthetical sentences whole, and the Environment keys heading above
+  the levers). T31R2 FIXED `ffc36d2487` (with D31R1, C31R4, M31R2 and Q31R5: section L holds the
+  sign-out open in its own session, which reads 0, while a new session reads the full count and
+  then 0 once it commits, and pins the check's wording; round thirty-one's evidence said the old
+  read came from another session, which the pool did not guarantee). T31R3 FIXED `ffc36d2487`
+  (with Q31R5: section L pins the yardstick sentence). T31R4 FIXED (see T31R1). T31R5 FIXED (see
+  C31R5). T31R6 FIXED `ffc36d2487` (neither block has an `env_file`, and the variable reader also
+  sees an unbraced `$VAR`, with a control).
+- M31R1 FIXED `ffc36d2487` (with C31R1, H31R1, L31R1 and Q31R3: the bot paragraph says that on a
+  host whose `.env` sets `COMPOSE_PROFILES=discord` step 6's `up -d` has already started the bot
+  on the new image, a lever-stopped one included, and to stop it again by that lever right after
+  step 6 while the lever holds). M31R2 FIXED (see T31R2). M31R3 FIXED (see L31R3).
+- L31R1 FIXED (see M31R1). L31R2 FIXED in this record (round thirty's dispositions name the round
+  twenty-nine text they edited). L31R3 FIXED `ffc36d2487` (with C31R2 and M31R3: the recreate
+  rule's parenthetical names the profile host). L31R4 FIXED (see H31R3). L31R5 FIXED in this
+  record (the blank line before the round twenty-nine heading is back). L31R6 FIXED (see D31R2).
