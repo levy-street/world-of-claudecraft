@@ -1350,3 +1350,5 @@ What changed the contract above:
   PGAPPNAME, which psql's own name cannot override.
 - A thirteenth round of eight fresh readers: P12 gives the bench's boot times, and the runbook
   gains a HOLDER read that never shows a query, a client address or its own session.
+- A fourteenth round of eight fresh readers: P12's bench figures say which boots waited out
+  `deadlock_timeout`, and the runbook's HOLDER read runs at any point, in this database only.

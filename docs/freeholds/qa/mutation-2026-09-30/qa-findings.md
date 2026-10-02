@@ -649,11 +649,12 @@ variant of DROP); each option was removed rather than specified further.
 Round eleven's commits: `5d5912617f` (the allowlist screen matches identifier words, each
 callee is traced to where `server/main.ts` imports it, its body pinned with layout aside),
 `8d56b42d43` (the read and every block are sent as one non-interactive psql session that
-bounds itself and prints a code, never a DETAIL; the drop rule needs one key; the routes
-follow the rule they name; the pg case sends each block so and runs every stop shape and the
-integrity route; kept whole with its tests for bisect), `4373df398d` (one steady-state term, a
-quiet window outside the nightly `pg_dump`, the duplicate recovery scoped to housing, the
-column repair's 42710 stated), and the commit that adds this section.
+bounds itself (the name it set never took, corrected in round thirteen) and prints a code,
+never a DETAIL; the drop rule needs one key; the routes follow the rule they name; the pg case
+sends each block so and runs every stop shape and the integrity route; kept whole with its
+tests for bisect), `4373df398d` (one steady-state term, a quiet window outside the nightly
+`pg_dump`, the duplicate recovery scoped to housing, the column repair's 42710 stated), and
+the commit that adds this section.
 
 | Reader | Verdict | Findings |
 |---|---|---|
@@ -702,16 +703,16 @@ route. Round twelve found that the session's name, set in PGOPTIONS, lost to psq
   `4373df398d` (the bullet says the boot's fatal log line prints the DETAIL too; trimming that
   log is OWED). S11R5 FIXED (see D11R1). S11R6 FIXED (see Q11R3).
 - D11R1 FIXED `8d56b42d43` (with S11R5 and C11R5): one non-interactive psql command, whose
-  PGOPTIONS bound every lock wait and pause, with ON_ERROR_STOP and VERBOSITY sqlstate (terse
-  would hide the code every route keys on); pasting into an interactive session is ruled out,
-  and the pg case sends each block under the command's own options, so an error ends the
-  session with no ROLLBACK sent. D11R2 FIXED `8d56b42d43` (a lost connection waits until no
-  other `advance_token_runbook` session remains). D11R3 FIXED `8d56b42d43` (NULL AND
-  VALIDATE's row locks last for VALIDATE's scan, which grows with the table; no statement
-  timeout was added, since a cut VALIDATE only sends the operator to stop). D11R4 FIXED
-  `8d56b42d43` (the read's brief ACCESS SHARE is stated, and the command's lock timeout bounds
-  it). D11R5 FIXED (see C11R3). D11R6 FIXED `4373df398d` (the quiet window is defined once,
-  outside the nightly `pg_dump`).
+  PGOPTIONS bound every lock wait and pause (the name they set never took, corrected in round
+  thirteen), with ON_ERROR_STOP and VERBOSITY sqlstate (terse would hide the code every route
+  keys on); pasting into an interactive session is ruled out, and the pg case sends each block
+  under the command's own options, so an error ends the session with no ROLLBACK sent. D11R2
+  FIXED `8d56b42d43` (a lost connection waits until no other `advance_token_runbook` session
+  remains). D11R3 FIXED `8d56b42d43` (NULL AND VALIDATE's row locks last for VALIDATE's scan,
+  which grows with the table; no statement timeout was added, since a cut VALIDATE only sends
+  the operator to stop). D11R4 FIXED `8d56b42d43` (the read's brief ACCESS SHARE is stated,
+  and the command's lock timeout bounds it). D11R5 FIXED (see C11R3). D11R6 FIXED `4373df398d`
+  (the quiet window is defined once, outside the nightly `pg_dump`).
 - T11R1 FIXED (see H11R1). T11R2 FIXED (see Q11R3). T11R3 FIXED `8d56b42d43` (with Q11R7: four
   stop shapes, each through the bullet's own read and each failing the rule: another column,
   the whole row beside the token, a foreign key, and a key over the account and the token).
@@ -756,12 +757,13 @@ adds this section.
 | docs librarian | PASS | L12R1 to L12R6 |
 | migration safety | PASS | M12R1 to M12R6 |
 
-46 findings: two blocking (D12R1, H12R1), 11 should-fix (C12R1, Q12R1, S12R1, L12R1, M12R1,
-M12R2, T12R1 to T12R4, H12R2), 33 nice-to-have. Six readers found one defect: psql always
-sends a startup application name (`psql` by default), which the server applies after the
-options string, so the runbook's `-c application_name` in PGOPTIONS never named its session.
-The spelling screen drew a new missed spelling for the third round running, so it was removed
-for the stated boundary rather than extended.
+46 findings: two blocking (D12R1, H12R1), eleven should-fix (C12R1, Q12R1, S12R1, L12R1, M12R1,
+M12R2, T12R1 to T12R4, H12R2), 33 nice-to-have. Six readers found one defect (its count and
+cause corrected in round thirteen): psql always sends a startup application name (`psql` by
+default), which the server applies after the options string, so the runbook's `-c
+application_name` in PGOPTIONS never named its session. The spelling screen drew a new missed
+spelling for the third round running, so it was removed for the stated boundary rather than
+extended.
 
 - C12R1 FIXED `6e268de9cc` (with D12R1, L12R1, Q12R1, S12R1 and M12R1): the session is named
   through PGAPPNAME. A probe on PostgreSQL 16 showed a startup `application_name` beats a `-c
@@ -835,8 +837,8 @@ cost to every pool), and the commit that adds this section.
 | docs librarian | PASS | L13R1 to L13R7 |
 | migration safety | PASS | M13R1 to M13R3 |
 
-38 findings: one blocking (T13R1), 6 should-fix (C13R1, S13R1, D13R1, L13R1, T13R2, T13R3), 31
-nice-to-have. Naming the session made an unscripted check find itself, which four readers
+38 findings: one blocking (T13R1), six should-fix (C13R1, S13R1, D13R1, L13R1, T13R2, T13R3),
+31 nice-to-have. Naming the session made an unscripted check find itself, which four readers
 caught; the checks became one read that excludes its sender. Earlier records are corrected in
 place, with the round that corrected them named.
 
@@ -867,8 +869,9 @@ place, with the round that corrected them named.
   logs eastbrook-db` named). S13R4 FIXED `09e8a44f19` (HOLDER runs at the first 55P03, and a
   dump is waited out before any retry).
 - D13R1 FIXED `09e8a44f19` (a lost send is resent once; a second loss stops). D13R2 FIXED (see
-  C13R1). D13R3 FIXED `fae6b76048` (each stuck save and login holds its pool client to the 15
-  s statement timeout, so every pool fills; both dump mentions give 03:15 UTC).
+  C13R1). D13R3 FIXED `fae6b76048` (both dump mentions give 03:15 UTC; its stuck-save bound
+  was wrong, a save failing at its 2 s lock timeout, and was corrected in round fourteen,
+  C14R1).
 - T13R1 FIXED `09e8a44f19`: the code pattern is one constant with a control that must yield
   P0001, XX000 and 42P07 and neither CHECK nor PRINT; a digit-led mutant fails it. T13R2 FIXED
   (see Q13R2). T13R3 FIXED `09e8a44f19`: the pg case drops the column; with the name free
@@ -885,3 +888,71 @@ place, with the round that corrected them named.
   `fae6b76048` (55 to 66 ms and 56 to 59 ms from the bench, in DEPLOY, the contract and P12).
 - M13R1 FIXED (see C13R1). M13R2 FIXED (see C13R2). M13R3 FIXED `09e8a44f19` (after a dump,
   attempts are counted afresh).
+
+## Round fourteen: eight fresh readers over round thirteen (`57408b6542..53694e42cf`)
+
+Round fourteen's commits: `6a7e3cd49d` (the compose grace read line by line, which cannot
+backtrack, the timed case gone, fixtures for every edge), `02bbf3d438` (HOLDER sendable at any
+point, scoped to this database and naming each session's kind, the dump polled through it,
+every send on the lost connection route capped, PRINT's output allowed in a literal report,
+every fence pinned at any indent, and the pg case running HOLDER against a holder, a waiter
+and an idle runbook session; kept whole with its tests for bisect), `8c5fa7fc28` (the stuck
+save's real bound and the bench's deadlocked boots, in DEPLOY, the contract and P12),
+`fe0f331dfd` (the test URL checked without printing it), and the commit that adds this
+section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C14R1 to C14R4 |
+| qa-checklist | PASS | Q14R1 to Q14R4 |
+| server hot path | PASS | H14R1, H14R2 |
+| privacy and security | PASS | S14R1 to S14R4 |
+| database performance | FAIL | D14R1 to D14R5 |
+| test coverage | PASS | T14R1 to T14R8 |
+| docs librarian | PASS | L14R1 to L14R8 |
+| migration safety | PASS | M14R1 to M14R4 |
+
+39 findings: one blocking (D14R1), twelve should-fix (C14R1, D14R2, L14R1 to L14R3, H14R1,
+M14R1 to M14R3, T14R1 to T14R3), 26 nice-to-have. The blocking finding was round thirteen's
+own: a pool-fill sentence that a save's 2 s lock timeout contradicts. The grace parse's timed
+guard drew a new slow pattern for the third round, so the parse became line by line.
+
+- C14R1 FIXED `8c5fa7fc28` (with D14R1 and L14R1): a stuck save fails at its 2 s lock timeout
+  with 55P03 and is written again as an aborted save; only a read with no tighter bound holds
+  its client to the 15 s statement timeout, so a realm's pool can fill. The D13R3 line is
+  corrected in this record. C14R2 FIXED `02bbf3d438` (with D14R4 and S14R2: the dump is polled
+  through HOLDER about once a minute, one still there well past its usual length stops, and a
+  runbook session seen beside it goes to the lost connection route). C14R3 FIXED `02bbf3d438`
+  (with S14R4: a report asking for the literal also gives PRINT's output and the server
+  version). C14R4 FIXED `02bbf3d438` (with S14R3, M14R4 and Q14R4: HOLDER reads only this
+  database's locks and sessions).
+- Q14R1 FIXED `02bbf3d438` (with T14R6: the environment stub is undone in a `finally`). Q14R2
+  NO CHANGE: the case's `finally` already restores a missing column, dropping a held name and
+  booting the fragment, which re-adds it. Q14R3 FIXED `8c5fa7fc28` (each bound is named by its
+  setting or file beside its number). Q14R4 FIXED (see C14R4; the nightly dump's command sets
+  no application name, so it shows as `pg_dump`).
+- H14R1 FIXED `6a7e3cd49d`: the timed guard drew a new slow pattern for the third round, so
+  the grace is read line by line and cannot backtrack; mutants that read a deeper key or leave
+  the services block open fail. H14R2 FIXED `6a7e3cd49d` (whitespace-only lines, a trailing
+  space, CRLF and a commented services line parse, and the null check names what it reads).
+- S14R1 FIXED `fe0f331dfd` (the URL check is a boolean with a message). S14R2 FIXED (see
+  C14R2). S14R3 FIXED (see C14R4). S14R4 FIXED (see C14R3).
+- D14R1 FIXED (see C14R1). D14R2 FIXED `8c5fa7fc28` (with L14R4 and M14R3: the ranges say no
+  deadlock formed, and give the deadlocked boots, one of six steady at 1,056 ms and three of
+  16 rollout at about 1 s). D14R3 FIXED `02bbf3d438` (HOLDER shows each session's kind, so an
+  autovacuum worker is named). D14R4 FIXED (see C14R2). D14R5 FIXED `02bbf3d438` (HOLDER's
+  label says it takes no table lock and answers behind a queued lock).
+- T14R1 FIXED `02bbf3d438` (every fence line at any indent, with its indent, is one pinned
+  list). T14R2 FIXED `6a7e3cd49d` (fixtures for a block after services and a key after it).
+  T14R3 FIXED `02bbf3d438` (HOLDER runs with a holder, a waiter queued behind it and an idle
+  runbook session, each by its own pid; three runs in a row passed). T14R4, T14R7 and T14R8
+  FIXED `02bbf3d438`. T14R5 FIXED `6a7e3cd49d` (shape checked against a literal). T14R6 FIXED
+  (see Q14R1).
+- L14R1 FIXED (see C14R1). L14R2 FIXED `02bbf3d438` (with M14R1: every block but PRINT and
+  HOLDER locks the table, and HOLDER is sent at any point). L14R3 FIXED in this record and the
+  ledger (each site rewritten in round thirteen names it). L14R4 FIXED (see D14R2). L14R5
+  FIXED in this record and the ledger. L14R6 and L14R7 FIXED `02bbf3d438`. L14R8 NOTED: the
+  report sentence stays before the read so the cases keep their lead-in.
+- M14R1 FIXED (see L14R2). M14R2 FIXED `02bbf3d438` (the lost file is resent once whatever it
+  was, any send on the route that loses its connection stops, and a resend counts toward the
+  five). M14R3 FIXED (see D14R2). M14R4 FIXED (see C14R4 and D14R3).
