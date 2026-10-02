@@ -47,7 +47,7 @@
 // tests/guild_bank_pg_integration.test.ts and
 // tests/server/storage_purchase_db.pg.test.ts prove the legacy halves with no
 // housing participant.
-// Cost: 12.9 s
+// Cost: 11.0 s
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import type { Pool as PgPool, PoolClient } from 'pg';
@@ -3723,7 +3723,10 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       expect(await count('github_oauth_states')).toBe(1);
       // DEPLOY's check that the sign-out committed, pinned whole with its
       // wording: a sign-out still open in its own session reads 0 there and
-      // the full count from a new session, which reads 0 once it commits.
+      // the full count from a new session, which reads 0 once it commits. A
+      // realm still running can sign in after it, which only running the
+      // sign-out again ends, and a rerun that waits on an earlier sign-out
+      // left open elsewhere is named by DEPLOY's naming statement.
       const signedOut = operatorSql('SELECT (SELECT count(*) FROM auth_tokens');
       expect(signedOut).toBe(
         'SELECT (SELECT count(*) FROM auth_tokens WHERE expires_at > now()) + (SELECT count(*) FROM oauth_codes) + (SELECT count(*) FROM oauth_device_codes) + (SELECT count(*) FROM discord_oauth_states) + (SELECT count(*) FROM github_oauth_states) AS left;',
@@ -3732,7 +3735,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         'then from a new psql session `SELECT (SELECT count(*) FROM auth_tokens',
       );
       expect(bootBullet()).toContain(
-        'returns 0 (else it has not committed, or a realm on the database still runs: stop that realm, COMMIT the sign-out in its own session if that session is still open or else run it again, then read the count again)',
+        "returns 0 while `sudo docker compose ps --all` shows every realm container on the database `Exited` (else it has not committed, or a realm on the database still runs: COMMIT in the sign-out's own session a transaction still open there (its psql prompt then shows `*` or `!`), stop every realm still running, run the sign-out again in psql's default autocommit either way, then read both again, the count from a new psql session; a rerun that does not return waits on an earlier sign-out still open in another session, which the naming statement under Index builds below, given the rerun's pid (`SELECT pg_backend_pid();` in its session before it), names, and the rule there ends)",
       );
       const { Client } = await import('pg');
       const { materialSourceConnection } = await import('../../server/material_source_connection');
@@ -3741,25 +3744,78 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         client.on('error', () => {});
         return client;
       };
+      const signOut = operatorSql('DELETE FROM auth_tokens');
       const signer = session();
       const fresh = session();
+      const holder = session();
+      let open = false;
       try {
         await signer.connect();
         await fresh.connect();
+        await holder.connect();
         const leftOn = async (client: typeof signer) =>
           Number((await client.query(signedOut)).rows[0].left);
         const before = await leftOn(fresh);
         expect(before).toBeGreaterThan(0);
         await signer.query('BEGIN');
-        await signer.query(operatorSql('DELETE FROM auth_tokens'));
+        open = true;
+        await signer.query(signOut);
         expect(await leftOn(signer)).toBe(0);
         expect(await leftOn(fresh)).toBe(before);
         await signer.query('COMMIT');
+        open = false;
         expect(await leftOn(fresh)).toBe(0);
+        // A realm missed by the stop signs a player in after the sign-out
+        // committed: a COMMIT with no transaction open changes nothing, and
+        // the sign-out run again in autocommit ends the new token.
+        const late = hex().repeat(2);
+        await db.saveToken(late, accountId);
+        expect(await leftOn(fresh)).toBe(1);
+        await signer.query('COMMIT');
+        expect(await leftOn(fresh)).toBe(1);
+        await signer.query(signOut);
+        expect(await leftOn(fresh)).toBe(0);
+        expect(await db.accountAndScopeForToken(late)).toBeNull();
+        // An earlier sign-out left open in an operator's psql session holds
+        // the rows a rerun deletes: the rerun waits on it, the naming
+        // statement given the rerun's pid names that session, and ending it
+        // lets the rerun delete them.
+        const stale = hex().repeat(2);
+        await db.saveToken(stale, accountId);
+        await holder.query("SET application_name = 'psql'");
+        await holder.query('BEGIN');
+        await holder.query(signOut);
+        const holderPid = (holder as unknown as { processID: number }).processID;
+        const rerunPid: number = (await signer.query('SELECT pg_backend_pid() AS p')).rows[0].p;
+        const rerun = signer.query(signOut).then(
+          () => 'ran',
+          (error: { code?: string }) => error.code,
+        );
+        const waitOf = async () =>
+          (await pool.query('SELECT wait_event FROM pg_stat_activity WHERE pid = $1', [rerunPid]))
+            .rows[0]?.wait_event;
+        expect(await until(waitOf, 'transactionid')).toBe('transactionid');
+        const named = await pool.query(
+          operatorSql('SELECT pid, application_name, state').replace('<pid>', String(rerunPid)),
+        );
+        expect(
+          named.rows.map((r: { pid: number; application_name: string; state: string }) => ({
+            pid: r.pid,
+            application_name: r.application_name,
+            state: r.state,
+          })),
+        ).toEqual([{ pid: holderPid, application_name: 'psql', state: 'idle in transaction' }]);
+        await pool.query(
+          operatorSql('SELECT pg_terminate_backend(').replace('<pid>', String(holderPid)),
+        );
+        expect(await rerun).toBe('ran');
+        expect(await leftOn(fresh)).toBe(0);
+        expect(await db.accountAndScopeForToken(stale)).toBeNull();
       } finally {
-        await signer.query('ROLLBACK').catch(() => {});
+        if (open) await signer.query('ROLLBACK').catch(() => {});
         await signer.end().catch(() => {});
         await fresh.end().catch(() => {});
+        await holder.end().catch(() => {});
       }
       expect(await db.accountAndScopeForToken(full)).toBeNull();
       expect(await db.accountAndScopeForToken(read)).toBeNull();
@@ -4278,6 +4334,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         expect(lookup).toBe(
           "SELECT pid FROM pg_stat_activity WHERE datname = current_database() AND application_name = 'psql' AND state = 'active' AND query LIKE 'DROP INDEX CONCURRENTLY%';",
         );
+        expect(bootBullet()).toContain(
+          "'DROP INDEX CONCURRENTLY%';` from another psql session on the realm database gives the drop's pid",
+        );
         let reader: Awaited<ReturnType<typeof psqlSession>> | undefined;
         const hand = dedicated();
         try {
@@ -4295,6 +4354,18 @@ d('the housing mutation boundary (REAL Postgres)', () => {
             (await pool.query(lookup)).rows.map((r: { pid: number }) => r.pid);
           const found = await until(looked, [handPid]);
           expect(found).toEqual([handPid]);
+          // Run on another database of the server, the lookup finds no drop.
+          const elsewhere = new Client({ ...materialSourceConnection(ADMIN_URL) });
+          elsewhere.on('error', () => {});
+          try {
+            await elsewhere.connect();
+            expect((await elsewhere.query('SELECT current_database() AS d')).rows[0].d).not.toBe(
+              (await pool.query('SELECT current_database() AS d')).rows[0].d,
+            );
+            expect((await elsewhere.query(lookup)).rows).toEqual([]);
+          } finally {
+            await elsewhere.end().catch(() => {});
+          }
           const [dropPid] = found;
           expect(await until(() => waitEventOf(dropPid), 'virtualxid')).toBe('virtualxid');
           expect(await gate()).toBe(0);

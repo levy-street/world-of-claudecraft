@@ -1415,7 +1415,12 @@ What changed the contract above:
 - A thirtieth round of eight fresh readers: no P12 change; `DEPLOY.md` checks from a new session
   that the sign-out committed, measures a left-open session by its `open_for`, and runs the bot
   on a release's image only once the realm is verified and only where it already runs (step 6's
-  `up -d` moves it first where `.env` sets `COMPOSE_PROFILES=discord`).
+  `up -d` moves it first where `.env` sets `COMPOSE_PROFILES=discord`, worded so in round
+  thirty-one).
 - A thirty-first round of eight fresh readers: no P12 change; `DEPLOY.md` runs the bot's guarded
   line after any rollback, tells a host with `COMPOSE_PROFILES=discord` to stop a lever-stopped
   bot again after step 6, and keeps the third escalation lever open while a release image waits.
+- A thirty-second round of eight fresh readers: no P12 change; `DEPLOY.md` runs the sign-out
+  again in autocommit after any count above 0 and names the session a rerun waits on, has a
+  lever-stopped bot stopped again after every `up -d` that names no service, and lifts the third
+  escalation lever only by the levers' own `up`.
