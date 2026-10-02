@@ -1439,10 +1439,11 @@ stall's redo list drew new members from three readers and became one whole remed
 Round twenty-one's commits: `41abd4f842` (every boot that queues behind the dump stopped and
 ended, by a statement section L runs until no row is left, a running boot taking the place and a
 stopped one exiting; the quiet window as no players online, its check pinned on both sides and by
-session kind and name; the stall's remedy with its timing, the pending OAuth codes, failed
-actions sent again, the lost notice emails and a runnable receipt erase, the sign-out run in
-section L; the row-write clause dropped; the contract, P12 and the change log with it; kept whole
-for bisect, since section L reads the bullet), and the commit that adds this section.
+session kind and name; the stall's remedy with its timing (replaced in round twenty-two, C22R1),
+the pending OAuth codes, failed actions sent again, the lost notice emails and a runnable receipt
+erase, the sign-out run in section L; the row-write clause dropped; the contract, P12 and the
+change log with it; kept whole for bisect, since section L reads the bullet), and the commit that
+adds this section.
 
 | Reader | Verdict | Findings |
 |---|---|---|
@@ -1481,8 +1482,9 @@ realm still booting and runs the statement until no row is left.
 - S21R1 FIXED `41abd4f842` (a request that failed before writing stays undone until it is sent
   again, and the sign-out applies no action: whoever saw an error checks whether the action
   landed and sends it again, a staff password reset that can leave its record without the new
-  password among them). S21R2 FIXED `41abd4f842` (with C21R4: nothing sends a skipped notice
-  email again). S21R3 FIXED (see M21R2). S21R4 FIXED (see D21R1).
+  password among them; staff send a ban, suspension or staff password reset again even when it
+  shows landed, corrected in round twenty-two, S22R1). S21R2 FIXED `41abd4f842` (with C21R4:
+  nothing sends a skipped notice email again). S21R3 FIXED (see M21R2). S21R4 FIXED (see D21R1).
 - D21R1 FIXED `41abd4f842` (with M21R1, C21R5, S21R4 and H21R2: stop every realm whose boot has
   not finished, then run the statement until it returns no row; section L queues a running boot
   and a stopped boot on the advisory lock behind the waiting one, ends it, sees the running one
@@ -1513,8 +1515,9 @@ realm still booting and runs the statement until no row is left.
   (L20R5 names the reflowed token line).
 - M21R1 FIXED (see D21R1). M21R2 FIXED `41abd4f842` (with C21R3, S21R3, H21R7 and L21R6: the
   remedy follows a stall that is over, its boot committed or its backend ended and its realm
-  booted again after the dump, and the dump route points to it; the C20R1 correction is D21R1's,
-  corrected in round twenty-two, Q22R2).
+  booted again after the dump (the remedy starts the stopped realms itself, corrected in round
+  twenty-two, M22R1), and the dump route points to it; the C20R1 correction is D21R1's, corrected
+  in round twenty-two, Q22R2).
 
 ## Round twenty-two: eight fresh readers over round twenty-one (`91462b8464..73967af7c6`)
 
@@ -1523,8 +1526,10 @@ whether or not they show landed, then every realm stopped, every account signed 
 realm started together, so the in-memory desktop login codes go too and each boot is quiet; the
 stopped realms wait for the dump's end and then a quiet window or that remedy; the terminate
 names what it ends; the sign-out's OAuth deletes pinned on seeded codes; the quiet statement
-pinned whole; the race after a terminate closed; P12 and the change log with it; kept whole for
-bisect, since section L reads the bullet), and the commit that adds this section.
+pinned whole; the race after a terminate closed; boots behind the later tables observed, the
+queueing clause narrowed and the receipt-erase pointer read (named in round twenty-three,
+Q23R11); P12 and the change log with it; kept whole for bisect, since section L reads the
+bullet), and the commit that adds this section.
 
 | Reader | Verdict | Findings |
 |---|---|---|
@@ -1544,11 +1549,11 @@ a sign-out without them passed; it now seeds a code of each kind. Five readers f
 own boots outside the quiet window round twenty-one tightened, so the remedy now stops every
 realm and starts them together.
 
-- C22R1 FIXED `9704a64ebf` (with H22R1, D22R1 and S22R2: the remedy stops every realm and lets
-  each finish shutting down, signs every account out, and starts every realm together; their
-  boots line up on the schema advisory lock and finish before a signed-out client is back, so
-  each boots quiet). C22R2 FIXED (see M22R1). C22R3 FIXED `9704a64ebf` (with D22R2: a later
-  statement queues when its lock conflicts with one the boot holds or waits for, unless its
+- C22R1 FIXED `9704a64ebf` (with H22R1, D22R1, S22R2, Q22R6 and L22R3: the remedy stops every
+  realm and lets each finish shutting down, signs every account out, and starts every realm
+  together; their boots line up on the schema advisory lock and finish before a signed-out client
+  is back, so each boots quiet). C22R2 FIXED (see M22R1). C22R3 FIXED `9704a64ebf` (with D22R2: a
+  later statement queues when its lock conflicts with one the boot holds or waits for, unless its
   transaction already holds a lock on that table). C22R4 FIXED (see T22R2).
 - Q22R1 FIXED in this record (round twenty's commits paragraph and summary name round
   twenty-one's corrections). Q22R2 FIXED in this record (D21R1 claims C20R1's correction, and
@@ -1586,9 +1591,94 @@ realm and starts them together.
   pointer and finds that bullet). T22R6 FIXED `9704a64ebf` (three boot clients, and the next
   waiter is the running one's backend by its pid).
 - L22R1 FIXED (see M22R1). L22R2 FIXED `9704a64ebf` ("releases the queue for now"). L22R3 FIXED
-  (see C22R1). L22R4 FIXED `9704a64ebf`. L22R5 FIXED `9704a64ebf`. L22R6 FIXED in this record.
-  L22R7 FIXED in the ledger.
+  (see C22R1). L22R4 FIXED `9704a64ebf` (the quiet window reads "a realm opens a transaction at
+  any moment while players are online"). L22R5 FIXED `9704a64ebf` (P12 ends "once that backend is
+  ended"; both described in round twenty-three, Q23R10). L22R6 FIXED in this record. L22R7 FIXED
+  in the ledger.
 - M22R1 FIXED `9704a64ebf` (with C22R2, Q22R7 and L22R1: the stopped realms stay stopped until
   the dump ends, then boot in a quiet window or by the stall remedy, which starts every realm).
   M22R2 FIXED (see T22R1). M22R3 FIXED `9704a64ebf` (a boot has not finished while its container
   status is anything but `healthy`). M22R4 FIXED (see S22R3).
+
+## Round twenty-three: eight fresh readers over round twenty-two (`73967af7c6..393ac1a7b2`)
+
+Round twenty-three's commits: `d7f5c83f66` (the stall remedy without timing claims: the stall is
+over when its boot COMMITs or its backend is ended, staff resend every ban, suspension or staff
+reset made during it, players redo what failed, and the restart waits for the dump's end and says
+what a boot that is not quiet risks; the queueing clause cut to "can queue"; the terminate shows
+an address without claiming it names a realm; an index-build caveat, with a progress check, for a
+deadlock a probe confirmed; section L pins the terminate whole, every credential-shaped table,
+the desktop codes' place, the receipt-erase pointer's place and the index-build deadlock; the
+unit bounds case pins boot before listen; the admin suite pins a repeat ban, suspension and staff
+reset; the change log with it; kept whole for bisect), and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C23R1 to C23R5 |
+| qa-checklist | PASS | Q23R1 to Q23R11 |
+| server hot path | PASS | H23R1 to H23R6 |
+| privacy and security | PASS | S23R1 to S23R2 |
+| database performance | PASS | D23R1 to D23R4 |
+| test coverage | PASS | T23R1 to T23R9 |
+| docs librarian | FAIL (should-fix only) | L23R1 to L23R9 |
+| migration safety | PASS | M23R1 to M23R3 |
+
+49 findings: none blocking, 18 should-fix (C23R1, Q23R1, Q23R2, M23R1, M23R2, H23R1, H23R2,
+D23R1, D23R2, T23R1 to T23R5, L23R1 to L23R4), 31 nice-to-have. The stall remedy's prose had
+drawn a new precision fix every round since round nineteen, so its timing claims and its
+conflict-rule exception are gone rather than refined again, and what remains is pinned or stated
+as a boundary. A probe confirmed one pre-existing defect the round surfaced: a boot waiting on
+the schema advisory lock deadlocks with a concurrent index build under it.
+
+- C23R1 FIXED `d7f5c83f66` (with S23R1, Q23R7, L23R1 and T23R8: players redo what returned an
+  error; the password detail is gone). C23R2 FIXED `d7f5c83f66` (a repeat runs its revoke and
+  disconnect again, and a staff password reset repeats with the same password). C23R3 FIXED
+  `d7f5c83f66` (with M23R1, H23R1, H23R4, D23R2, Q23R9 and L23R5: the restart waits for the
+  dump's end and no longer claims to be quiet; each boot after the first can meet the realms
+  started before it, and a boot that loses exits and is restarted). C23R4 NO CHANGE: stopping a
+  realm that has just finished its boot errs on the safe side for the queue, and its shutdown
+  saves are the After an abort bullet's. C23R5 FIXED `d7f5c83f66` (staff resend every ban,
+  suspension or staff password reset made during the stall, whether or not it returned an error,
+  so an in-game one is covered).
+- S23R1 FIXED (see C23R1). S23R2 FIXED `d7f5c83f66` (a sign-out undoes nothing a leftover token
+  did before it, a login link it added among them).
+- Q23R1 FIXED in the ledger (round twenty-one's line names round twenty-two). Q23R2 FIXED in this
+  record (C22R1 lists Q22R6 and L22R3). Q23R3 FIXED in this record: a relabelled verdict row is
+  named in the correcting round's disposition (Q22R4), as earlier rounds did. Q23R4 FIXED in this
+  record: `393ac1a7b2`'s body names only the lines of rounds twenty and twenty-one it superseded;
+  it also adds round twenty's notes of round twenty-one, moves the C20R1 claim, relabels rounds
+  fifteen and sixteen's rows and corrects the ledger's round twenty-one line; the commit stays as
+  it is. Q23R5 FIXED `d7f5c83f66` (with L23R6: the twenty-second change-log entry names the
+  running boot). Q23R6 FIXED `d7f5c83f66` (with M23R2 and L23R9: the stall is over when its boot
+  COMMITs or its backend is ended). Q23R7 FIXED (see C23R1). Q23R8 FIXED `d7f5c83f66` (with
+  L23R2: a desktop app could still trade a code for a fresh token). Q23R9 FIXED (see C23R3).
+  Q23R10 FIXED in this record (with L23R7). Q23R11 FIXED in this record.
+- H23R1 FIXED (see C23R3). H23R2 FIXED `d7f5c83f66` in part: a probe on a scratch database and
+  section L confirm that a concurrent index build under the schema advisory lock and a boot
+  waiting on that lock deadlock, one of them aborted with 40P01; DEPLOY says so and gives a
+  progress check before the next realm starts on a release that adds such an index; the code fix,
+  a waiter that holds no snapshot, is owed to the maintainer (the ledger's OWED list). H23R3
+  FIXED `d7f5c83f66` (the realms are stopped one after another, each stop finishing before the
+  next). H23R4 FIXED (see C23R3). H23R5 NO CHANGE: the remedy no longer starts every realm at one
+  moment. H23R6 NO CHANGE: each pg file runs on its own database, so the OAuth counts see only
+  this file's rows.
+- D23R1 FIXED `d7f5c83f66` (with T23R1: the clause is gone; later statements "can queue" behind
+  the boot, which states no rule to misapply). D23R2 FIXED (see C23R3). D23R3 FIXED `d7f5c83f66`
+  (with M23R3 and T23R5: the terminate shows its address without claiming it names a realm, and a
+  row means stop every realm whose container is still not `healthy`). D23R4 FIXED (see H23R2).
+- T23R1 FIXED (see D23R1). T23R2 FIXED `d7f5c83f66` (the terminate is pinned whole). T23R3 FIXED
+  `d7f5c83f66` (every credential-shaped table is classified whole, and the desktop login codes
+  are pinned to the process, with a control). T23R4 FIXED `d7f5c83f66` (tests/admin.test.ts
+  repeats a ban, a suspension and a staff reset and sees each run its revoke and disconnect
+  again). T23R5 FIXED (see D23R3). T23R6 NO CHANGE: tests/server/freehold_hearth_db.test.ts
+  already pins that deploy/user-data.sh names no session. T23R7 FIXED `d7f5c83f66` (the pointer's
+  bullet exists once, below the boot bullet). T23R8 FIXED (see C23R1). T23R9 FIXED `d7f5c83f66`
+  (the unit bounds case pins that server/main.ts awaits ensureSchema before it listens, and
+  DEPLOY's sentence saying so).
+- L23R1 FIXED (see C23R1). L23R2 FIXED (see Q23R8). L23R3 FIXED in this record (S21R1 names
+  S22R1). L23R4 FIXED in this record (M21R2 names M22R1). L23R5 FIXED (see C23R3). L23R6 FIXED
+  (see Q23R5). L23R7 FIXED (see Q23R10). L23R8 FIXED in this record and the ledger (round
+  twenty-one's timing lines name round twenty-two). L23R9 FIXED (see Q23R6).
+- M23R1 FIXED (see C23R3; the deliberate hold it proposed is not added, since the remedy no
+  longer claims the boots line up). M23R2 FIXED (see C23R3 and Q23R6: the start waits for the
+  dump's end). M23R3 FIXED (see D23R3).
