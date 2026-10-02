@@ -3489,10 +3489,11 @@ no should-fix, database performance with no finding at all. Four readers found t
 first boot read with no deadline while the record and the ledger said the deadline covered the
 dump case's boots; every boot section L stops or holds behind now has one (worded so in round
 forty-four, C44R1). Four found the bot route pin filtering on a leading slash its grep does not
-need; it now filters on the grep's text, a sample proving every literal shape. The rest were the
-cleanup's unbounded wait, a stopped boot checked only at a later count, a comment claim past its
-boundary, and four record slips: a count, a one-way cross-reference, a mutants bullet's case count
-and a change log entry edited in place without a note (counted so in round forty-four, Q44R2).
+need; the fix then filtered on the grep's text (worded so in round forty-five, Q45R3), a sample
+proving every literal shape. The rest were the cleanup's unbounded wait, a stopped boot checked
+only at a later count, a comment claim past its boundary, and four record slips: a count, a
+one-way cross-reference, a mutants bullet's case count and a change log entry edited in place
+without a note (counted so in round forty-four, Q44R2).
 
 - C43R1 FIXED `47c18284f6` (with H43R1, T43R1 and M43R1: the dump case reads every boot it stops
   through the five second deadline and checks at the read that it ended with an error, the boot
@@ -3534,14 +3535,16 @@ and a change log entry edited in place without a note (counted so in round forty
 
 Round forty-four's commits: `5aa9f3730d` (section L starts every boot in one place and reads each
 through one helper, `settled`: a boot still waiting at its deadline has every session on the
-schema advisory lock cancelled, so it rolls back and closes its own client, and `bootBehind` reads
-its boot again after a failure for one second only, so no path stacks past the case's timeout; the
-reboot after the dump is read that way; the bot route pin parses every tracked bot code file
-rather than the files a raw-text grep finds, its sample adds an escaped route, and the client's
-comment names a route URL parsing rewrites as outside its read; the placeholder-split comments
-name Biome's rule; `bootBehind`'s and the stopped boots' comments say what they check; the
-manifest's forty-first and forty-third entries reworded and a forty-fourth added; kept whole for
-bisect), and the commit that adds this section.
+schema advisory lock cancelled, so a boot left waiting on a lock rolls back and closes its own
+client (worded so in round forty-five, H45R1), and `bootBehind` reads its boot again after a
+failure for one second only, so no failure path stacks past the case's timeout (worded so in round
+forty-five, T45R3: six slow boots in the first case could still sum past it, failing as a
+timeout); the reboot after the dump is read that way; the bot route pin parses every tracked bot
+code file rather than the files a raw-text grep finds, its sample adds an escaped route, and the
+client's comment names a route URL parsing rewrites as outside its read; the placeholder-split
+comments name Biome's rule; `bootBehind`'s and the stopped boots' comments say what they check;
+the manifest's forty-first and forty-third entries reworded and a forty-fourth added; kept whole
+for bisect), and the commit that adds this section.
 
 | Reader | Verdict | Findings |
 |---|---|---|
@@ -3582,7 +3585,8 @@ code file is now parsed. The rest were record and comment slips.
   comment and four record slips, and the ledger's ROUND FORTY-THREE names the comment trim and the
   cleanup's wait). Q44R3 FIXED `5aa9f3730d` (with C44R3 and L44R9: the manifest's forty-first
   entry says `bot/logic.ts` named the key's three parts in that round and the other two gained the
-  reason in round forty-two, and its forty-third entry and L43R1's disposition say round forty-two
+  reason in round forty-two, its forty-third entry says the forty-first names the round that
+  reworded it (worded so in round forty-five, Q45R1), and L43R1's disposition says round forty-two
   reworded it; `47c18284f6`'s body, which says the entry names the round that gave the key its
   three parts, stays as it is). Q44R4 FIXED in this record (`43b0bfc152`'s body names the first
   boot's read and four record slips and leaves out the route pin's filter, the cleanup's wait, the
@@ -3597,7 +3601,9 @@ code file is now parsed. The rest were record and comment slips.
   terminate each reader proposed was not used: a probe of a boot-shaped client with no error
   listener, against PostgreSQL 16, showed a terminate raising "Connection terminated unexpectedly"
   as an uncaught exception, while a cancel ended its statement with 57014, its own catch rolled
-  back, and the lock and the backend were gone). H44R2 FIXED (see C44R2).
+  back, and the lock and the backend were gone; sent again for up to a second, and a boot idle in
+  its transaction past that named as outside it, from round forty-five, H45R1). H44R2 FIXED (see
+  C44R2).
 - S44R1 FIXED (see T44R1).
 - D44R1 FIXED (see H44R1). D44R2 FIXED (see C44R2).
 - T44R1 FIXED `5aa9f3730d` (with T44R2 and S44R1: the route pin parses every tracked bot code
@@ -3622,3 +3628,70 @@ code file is now parsed. The rest were record and comment slips.
   at the boot behind its hold after eleven seconds and the dump case at its first stopped boot's
   read after fourteen, under the timeout. A mutant that drops the cancel passes by construction,
   since no boot hangs on a green run; H44R1's probe shows what the cancel does.
+
+## Round forty-five: eight fresh readers over round forty-four (`43b0bfc152..8d54e1f9b3`)
+
+Round forty-five's commits: `bbd3b6e4cf` (a section L case pins that `settled` returns what its
+deadline saw, never what a cancel made of the boot; the cancel is sent again for up to a second,
+and `settled`'s comment says what it ends; the section's lock key is one constant, pinned to the
+server's; the unit suite pins section L's one `ensureSchema` call inside `startBoot`, and checks
+the bot file list against a second listing of the whole directory, keeping only files still on
+disk; `bootBehind`'s comment says the read after a failure is there to end the boot; both Cost
+headers remeasured, 13.6 s and 1.1 s; the manifest's forty-fourth entry names the forty-third
+entry's rewording, and a forty-fifth entry records it; kept whole for bisect), and the commit that
+adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C45R1, C45R2 |
+| qa-checklist | PASS | Q45R1 to Q45R4 |
+| server hot path | PASS | H45R1 |
+| privacy and security | PASS | none |
+| database performance | PASS | D45R1 |
+| test coverage | PASS | T45R1 to T45R6 |
+| docs librarian | PASS | L45R1, L45R2 |
+| migration safety | PASS | M45R1 |
+
+17 findings: none blocking, 1 should-fix (T45R1), 16 nice-to-have, every reader passing, and seven
+(all but test coverage) with no should-fix, privacy and security with no finding at all. The test
+coverage auditor found nothing pinning that `settled` reports what its deadline saw, so a mutant
+returning what a cancel made of the boot passed; a case now pins it. Four readers found
+`settled`'s comment claiming more than one cancel ends, since PostgreSQL drops a cancel that
+reaches a session between statements; the cancel repeats for a second, and the comment names a
+boot idle past that as outside it. The rest were two prose-only claims made whole pins, a key
+written twice, a local papercut, a comment and record slips.
+
+- C45R1 FIXED `bbd3b6e4cf` (with Q45R2: the manifest's forty-fourth entry names the forty-third
+  entry's rewording, worded so in round forty-five, and a forty-fifth entry records it). C45R2
+  FIXED in this record (the ledger's ROUND FORTY-FOUR says every tracked bot code file).
+- Q45R1 FIXED in this record (Q44R3's disposition says the forty-third entry names no round, the
+  forty-first naming the round that reworded it). Q45R2 FIXED (see C45R1). Q45R3 FIXED in this
+  record (with L45R2: round forty-three's summary says the fix then filtered on the grep's text).
+  Q45R4 FIXED `bbd3b6e4cf` (the bot file list keeps only tracked files still on disk, so a file
+  deleted but not yet staged is skipped rather than failing the parse).
+- H45R1 FIXED `bbd3b6e4cf` (with M45R1, D45R1 and L45R1: the cancel is sent again, each time
+  followed by a tenth of a second's read, until the work settles or a second has passed;
+  `settled`'s comment says a boot left waiting on a lock holds none into a later case, and that a
+  boot idle in its transaction past the second, as during its pool probe, reads as still waiting
+  and ends at the pool's own deadlines; H44R1's disposition notes it).
+- D45R1 FIXED (see H45R1).
+- T45R1 FIXED `bbd3b6e4cf` (a section L case pins `settled`: work already settled reads as itself,
+  and work that settles 200 ms in, past a 50 ms deadline, reads as still waiting, its own error
+  notwithstanding). T45R2 FIXED `bbd3b6e4cf` (one constant, `SCHEMA_LOCK_KEY`, feeds both reads of
+  the advisory lock, and the index build case pins the server's key to it). T45R3 FIXED in this
+  record (round forty-four's intro says no failure path stacks past the case's timeout, and that
+  six slow boots in the first case could still sum past it, failing as a timeout; `5aa9f3730d`'s
+  body stays as it is). T45R4 FIXED `bbd3b6e4cf` (`bootBehind`'s comment says the boot must settle
+  within ten seconds of the hold's release and finish unless `mayFail`, and is read for a second
+  after a failure, to end it). T45R5 FIXED `bbd3b6e4cf` (the unit suite reads the pg suite with
+  the TypeScript parser and pins section L's calls of `ensureSchema` to exactly one, inside
+  `startBoot`; a call by another name is outside the read). T45R6 FIXED `bbd3b6e4cf` (the bot file
+  list must equal a second listing of the whole `bot` directory filtered to the code extensions,
+  beside the three named files).
+- L45R1 FIXED (see H45R1). L45R2 FIXED (see Q45R3).
+- M45R1 FIXED (see H45R1).
+- Mutants on this round's new guards, each killed and its source restored: a boot started outside
+  `startBoot` in section L; the bot file pathspec narrowed to three files; `settled` returning
+  what the cancel made of the boot, which fails the new case; and the section's lock key off the
+  server's, which fails the index build case's pin and the dump case's advisory reads. A mutant
+  sending the cancel once passes by construction, as one dropping it does.

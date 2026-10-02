@@ -5841,8 +5841,14 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   should-fix, every reader passing, two with no should-fix. Section L reads every boot it waits on
   through one helper that cancels a boot still waiting at its deadline (a terminate, the fix the
   readers offered, drops the connection under a client with no error listener), and no path stacks
-  past the case's timeout; the bot route pin parses every bot code file; the rest were record and
-  comment slips. Fixed in `5aa9f3730d`.
+  past the case's timeout; the bot route pin parses every tracked bot code file (worded so in
+  round forty-five, C45R2); the rest were record and comment slips. Fixed in `5aa9f3730d`.
+- ROUND FORTY-FIVE, eight fresh readers over round forty-four: 17 findings, none blocking, 1
+  should-fix, every reader passing, seven with no should-fix. A case pins that section L reads a
+  boot by what its deadline saw, never by what a cancel made of it; the cancel repeats for a
+  second and its comment says what it ends; section L's one boot entry, its lock key and the bot
+  file list are each pinned whole; the rest were a local papercut, a comment and record slips.
+  Fixed in `bbd3b6e4cf`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5874,7 +5880,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then 647,
   then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then
   648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648,
-  then 648, then 648, then 648 passed, never a skip.
+  then 648, then 648, then 648, then 649 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
