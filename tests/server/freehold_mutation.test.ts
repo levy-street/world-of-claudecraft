@@ -7369,7 +7369,7 @@ describe('the claim renewer', () => {
 
     // The root package.json: its keys (so no `imports`, `exports` or
     // `browser` map); every dependency or override spec but a plain version
-    // range, without its version; pnpm's keys and the packages it patches;
+    // range, by its shape; pnpm's keys and the packages it patches;
     // and every resolution flag its scripts pass, as text. The bot's bundle
     // read, earlier in this file, takes node_modules/ws/ as ws's own published
     // code partly on this pin, so a change here for ws needs that read
@@ -7394,14 +7394,17 @@ describe('the claim renewer', () => {
     ]);
     expect(pkg.imports).toBeUndefined();
     expect(pkg.exports).toBeUndefined();
-    // A plain version range is an exact version, three numbers of at most
-    // nine digits with no leading zero, or one led by ^ or ~; any other spec,
-    // a prerelease included, is listed, so one that names a path, a tarball, a
-    // tag or a wider range fails until it is reviewed here.
+    // A spec is read by its shape, each run of digits written 0, so a version
+    // bump keeps it. A plain version range has the shape 0.0.0, led by
+    // nothing, ^ or ~; every other spec is listed by name with its shape
+    // whole, so one that names a path, a tarball, git, a tag, a prerelease or
+    // a wider range, or an alias with any tail, fails until it is reviewed
+    // here. A number's value is not read: a leading zero or an overlong
+    // number keeps the shape, and pnpm takes such a spec from the registry or
+    // fails.
+    const shapeOf = (spec: string) => spec.replace(/\d+/g, '0');
     const nonRange = (spec: string): string | null =>
-      /^[\^~]?(?:0|[1-9]\d{0,8})\.(?:0|[1-9]\d{0,8})\.(?:0|[1-9]\d{0,8})$/.test(spec)
-        ? null
-        : spec.replace(/@[^@/]*$/, '');
+      ['0.0.0', '^0.0.0', '~0.0.0'].includes(shapeOf(spec)) ? null : shapeOf(spec);
     const specs = (table: unknown): string[] =>
       Object.entries((table ?? {}) as Record<string, string>).flatMap(([name, spec]) => {
         const kept = nonRange(spec);
@@ -7411,29 +7414,40 @@ describe('the claim renewer', () => {
       [pkg.dependencies, pkg.devDependencies, pkg.optionalDependencies, pkg.pnpm.overrides].flatMap(
         specs,
       ),
-    ).toEqual(['@typescript/native: npm:typescript', 'typescript: npm:@typescript/typescript6']);
+    ).toEqual([
+      '@typescript/native: npm:typescript@^0.0.0',
+      'typescript: npm:@typescript/typescript0@^0.0.0',
+    ]);
     for (const [spec, kept] of [
       ['^1.19.0', null],
       ['1.2.3', null],
-      ['^0.10.0', null],
-      ['~1.2.3-beta.1', '~1.2.3-beta.1'],
-      ['1.2.3-.', '1.2.3-.'],
-      ['^1.2.3-..tgz', '^1.2.3-..tgz'],
-      ['1.2.3-x/../ws.tgz', '1.2.3-x/../ws.tgz'],
-      ['^1234567890.0.0', '^1234567890.0.0'],
-      ['01.2.3', '01.2.3'],
-      ['>1.2.3', '>1.2.3'],
-      ['^1.2', '^1.2'],
-      ['1.2.x', '1.2.x'],
-      ['8/../vendor/ws.tgz', '8/../vendor/ws.tgz'],
-      ['1.2.3/../ws.tgz', '1.2.3/../ws.tgz'],
+      ['~0.10.0', null],
+      ['~1.2.3-beta.1', '~0.0.0-beta.0'],
+      ['1.2.3-.', '0.0.0-.'],
+      ['^1.2.3-..tgz', '^0.0.0-..tgz'],
+      ['^1.2.3+..tgz', '^0.0.0+..tgz'],
+      ['^1.2.3.tgz', '^0.0.0.tgz'],
+      ['1.2.3-x/../ws.tgz', '0.0.0-x/../ws.tgz'],
+      ['1/2.3', '0/0.0'],
+      ['1.2/3', '0.0/0'],
+      ['/1.2.3', '/0.0.0'],
+      ['^^1.2.3', '^^0.0.0'],
+      ['.1.2.3', '.0.0.0'],
+      ['N.N.N', 'N.N.N'],
+      ['>1.2.3', '>0.0.0'],
+      ['>=1.2.3', '>=0.0.0'],
+      ['^1.2', '^0.0'],
+      ['1.2.x', '0.0.x'],
+      ['8/../vendor/ws.tgz', '0/../vendor/ws.tgz'],
+      ['1.2.3/../ws.tgz', '0.0.0/../ws.tgz'],
       ['~/ws', '~/ws'],
-      ['>=1.2.3', '>=1.2.3'],
       ['latest', 'latest'],
       ['link:./server', 'link:./server'],
       ['./server/claims', './server/claims'],
-      ['npm:typescript@^7.0.2', 'npm:typescript'],
-      ['npm:@typescript/typescript6@^6.0.2', 'npm:@typescript/typescript6'],
+      ['npm:typescript@^7.0.2', 'npm:typescript@^0.0.0'],
+      ['npm:@typescript/typescript6@^6.0.2', 'npm:@typescript/typescript0@^0.0.0'],
+      ['npm:typescript@x:.tgz', 'npm:typescript@x:.tgz'],
+      ['npm:typescript@latest', 'npm:typescript@latest'],
     ] as const) {
       expect(nonRange(spec), spec).toBe(kept);
     }
