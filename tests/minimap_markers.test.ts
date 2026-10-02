@@ -320,6 +320,35 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     expect(worldQuestMarkers()).toEqual([]);
   });
 
+  it.each(['sim', 'client'] as const)(
+    'shows the rerolled-in quest in place of the one it replaced (%s)',
+    (shape) => {
+      const replaced = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
+      const replacement = WORLD_QUESTS_BY_ID.wq_eastbrook_calligraphy;
+      const world = makeWorld(shape) as unknown as {
+        player: { level: number; pos: { x: number; z: number } };
+        worldQuestCycle: string;
+        worldQuestLog: ReadonlyMap<string, never>;
+        worldQuestReplacements: Readonly<Record<string, string>>;
+      };
+      world.player.level = 20;
+      world.worldQuestCycle = '2026-08-31';
+      world.worldQuestLog = new Map<string, never>();
+      world.worldQuestReplacements = { [replaced.id]: replacement.id };
+      const questIds = () =>
+        buildMarkers(world as unknown as IWorld).flatMap((marker) =>
+          marker.kind === 'world-quest' ? [marker.questId] : [],
+        );
+
+      world.player.pos.x = replacement.area.x;
+      world.player.pos.z = replacement.area.z;
+      expect(questIds()).toContain(replacement.id);
+      world.player.pos.x = replaced.area.x;
+      world.player.pos.z = replaced.area.z;
+      expect(questIds()).not.toContain(replaced.id);
+    },
+  );
+
   it('marks an entered objective active while keeping the same small emblem', () => {
     const quest = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
     const world = makeWorld('client') as unknown as {

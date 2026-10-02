@@ -166,9 +166,6 @@ export class QuestWorldWireState {
     ) {
       return { canReroll: false, reason: 'Completed world quests cannot be rerolled.' };
     }
-    if (progress && progress.count > 0) {
-      return { canReroll: false, reason: 'In-progress world quests cannot be rerolled.' };
-    }
     return { canReroll: true };
   }
 

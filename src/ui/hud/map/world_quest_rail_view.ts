@@ -67,6 +67,8 @@ const REASON_BY_TEXT: ReadonlyMap<string, WorldQuestRerollReason> = new Map([
   ['No active world quest cycle.', 'noCycle'],
   ['Daily world quest reroll already used today.', 'usedToday'],
   ['Completed world quests cannot be rerolled.', 'completed'],
+  // Retired: in-progress quests can be replaced now, so neither host sends this.
+  // The row and its catalog key stay until the locale overlays drop the key.
   ['In-progress world quests cannot be rerolled.', 'inProgress'],
   ['This world quest is not currently active for you.', 'notActive'],
   ['No alternative assignments available in this zone today.', 'noAlternative'],

@@ -22,7 +22,7 @@ import {
   type VehicleStationDef,
 } from './types';
 import { vehicleStationById } from './vehicle_stations';
-import { activeWorldQuestsForCycle } from './world_quest_rotation';
+import { playerActiveWorldQuests } from './world_quest_reroll';
 import { emitWorldQuestScore } from './world_quest_score_events';
 import { completeWorldQuestVehicle } from './world_quests';
 
@@ -43,7 +43,7 @@ export function ensureVehicleStation(ctx: SimContext): void {
 }
 
 export function ensureActiveVehicleStations(ctx: SimContext, meta: PlayerMeta): void {
-  if (activeWorldQuestsForCycle(meta.worldQuestCycle).some((q) => q.objective.type === 'vehicle'))
+  if (playerActiveWorldQuests(meta).some((q) => q.objective.type === 'vehicle'))
     ensureVehicleStation(ctx);
 }
 
@@ -61,7 +61,7 @@ function eligible(
     !player.inCombat &&
     meta.worldQuestCycle === cycle &&
     player.level >= 10 &&
-    activeWorldQuestsForCycle(meta.worldQuestCycle).some(
+    playerActiveWorldQuests(meta).some(
       (q) => q.id === station.questId && player.level >= q.minLevel,
     ) &&
     ['active', 'completed'].includes(meta.worldQuestLog.get(station.questId)?.state ?? '')
