@@ -5854,8 +5854,14 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   should-fix, every reader passing, seven with no should-fix. Round forty-five's skip of files not
   on disk let a bot file whose name git quotes drop from both listings, failing open; the listings
   are NUL-separated. Every session in section L takes the lock key through its constant, what
-  takes each boot's result and every `settled` call are pinned whole, and the cancel's grace is
-  pinned; the rest were comments and record notes. Fixed in `0aa155dbc3`.
+  takes each boot's result and every `settled` call are pinned whole, and the cancel loop's time
+  bound is pinned (worded so in round forty-seven, C47R2); the rest were comments and record
+  notes. Fixed in `0aa155dbc3`.
+- ROUND FORTY-SEVEN, eight fresh readers over round forty-six: 23 findings, none blocking, 3
+  should-fix, every reader passing, five with no should-fix. Every read of a section L boot's name
+  and `settled`'s parameters are pinned whole, the cancels a grace sends are counted, and a bot
+  file whose name does not decode fails closed; the rest were a comment, record wording and two
+  commit bodies. Fixed in `0cf1e2f6f9`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5887,7 +5893,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then 647,
   then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then
   648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648,
-  then 648, then 648, then 648, then 649, then 649 passed, never a skip.
+  then 648, then 648, then 648, then 649, then 649, then 649 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
