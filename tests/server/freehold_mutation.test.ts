@@ -1672,6 +1672,13 @@ describe('the claim renewer', () => {
     const end = main.indexOf("process.on('SIGINT', shutdown);", start);
     expect(start).toBeGreaterThan(0);
     expect(end).toBeGreaterThan(start);
+    // Both signals run the closure, and `docker stop` sends SIGTERM.
+    for (const signal of ['SIGINT', 'SIGTERM']) {
+      expect(
+        main.slice(end).match(new RegExp(`process\\.on\\('${signal}', shutdown\\);`, 'g'))?.length,
+        signal,
+      ).toBe(1);
+    }
     const awaits = [...main.slice(start, end).matchAll(/await\s+([^;]+);/g)].map((match) =>
       match[1].replace(/\s+/g, ' ').trim(),
     );
@@ -1840,6 +1847,7 @@ describe('the claim renewer', () => {
     expect(shape('void settled\n  .then(done);')).toBe(shape('void settled.then(done);'));
     expect(shape('deps.registry\n  ?.drop(id);')).toBe(shape('deps.registry?.drop(id);'));
     expect(shape('void settled\n  .then( done ) ;')).toBe('void settled.then(done);');
+    expect(shape('await\n    settled;')).toBe('await settled;');
     // Each bound's value, read from the code that sets it.
     const constantIn = (file: string, name: string): number => {
       const found = stripComments(readFileSync(file, 'utf8')).match(
@@ -1945,15 +1953,20 @@ describe('the claim renewer', () => {
     );
     const stated = [...budget.matchAll(/(?<![\d.])(\d+(?:\.\d+)?) s of bounded waits/g)];
     expect(stated.map((match) => Number(match[1]))).toEqual([totalMs / 1000]);
-    /** The game service's kill grace in seconds, or null: inside the top-level
+    /** The game service's kill grace in seconds: inside the top-level
      *  `services:` block, the `  game:` service's own four-space
-     *  `stop_grace_period`. Read line by line, so no input can make it
-     *  backtrack; a comment, a blank line or trailing space changes nothing. */
+     *  `stop_grace_period`, or null when it is unreadable or the service stops
+     *  on a signal other than SIGTERM. Read line by line with no pattern that
+     *  can backtrack, so a comment, a blank line or trailing space changes
+     *  nothing and no input is slow. */
     const graceOf = (compose: string): number | null => {
       let inServices = false;
       let inGame = false;
+      let grace: number | null = null;
+      let signal: string | undefined;
       for (const line of compose.split(/\r?\n/)) {
-        const content = line.replace(/(?:^|\s)#.*$/, '').trimEnd();
+        const hash = line.search(/(?:^|\s)#/);
+        const content = (hash < 0 ? line : line.slice(0, hash)).trimEnd();
         if (content === '') continue;
         const indent = content.length - content.trimStart().length;
         if (indent === 0) {
@@ -1961,13 +1974,20 @@ describe('the claim renewer', () => {
           inGame = false;
         } else if (inServices && indent === 2) {
           inGame = content === '  game:';
-        } else if (inGame && indent === 4 && content.startsWith('    stop_grace_period:')) {
-          const value = content.slice('    stop_grace_period:'.length).trim();
-          const found = value.match(/^(["']?)(\d+)s\1$/);
-          return found ? Number(found[2]) : null;
+        } else if (inGame && indent === 4) {
+          const colon = content.indexOf(':');
+          const key = content.slice(4, colon);
+          const value = content.slice(colon + 1).trim();
+          if (key === 'stop_grace_period') {
+            const found = value.match(/^(["']?)(\d+)s\1$/);
+            if (!found) return null;
+            grace = Number(found[2]);
+          } else if (key === 'stop_signal') {
+            signal = value.replace(/^(["'])(.*)\1$/, '$2');
+          }
         }
       }
-      return null;
+      return signal === undefined || signal === 'SIGTERM' ? grace : null;
     };
     const service = (grace: string, ...lines: string[]) =>
       `services:\n  game:\n    image: x\n${lines.join('')}    stop_grace_period: ${grace}\n  bot:\n    stop_grace_period: 15s\n`;
@@ -1977,6 +1997,13 @@ describe('the claim renewer', () => {
     expect(graceOf(service("'75s' # why"))).toBe(75);
     expect(graceOf(service('75s '))).toBe(75);
     expect(graceOf(service('75s').replaceAll('\n', '\r\n'))).toBe(75);
+    expect(graceOf(service("'75s' # why").replaceAll('\n', '\r\n'))).toBe(75);
+    expect(graceOf(service('75s', '# a column-zero comment\n'))).toBe(75);
+    expect(graceOf(service('75s', `${' #'.repeat(20_000)}\rz\n`))).toBe(75);
+    expect(graceOf(service('75s', '    stop_signal: SIGTERM\n'))).toBe(75);
+    expect(graceOf(service('75s', '    stop_signal: SIGQUIT\n'))).toBeNull();
+    expect(graceOf(service('75sx'))).toBeNull();
+    expect(graceOf(service('"75s"#x'))).toBeNull();
     expect(graceOf(service('75s').replace('services:', 'services: # all'))).toBe(75);
     expect(graceOf(service(`"75s'`))).toBeNull();
     expect(graceOf(service('1m15s'))).toBeNull();
@@ -1991,12 +2018,51 @@ describe('the claim renewer', () => {
       graceOf('services:\n  bot:\n    image: x\nx-after:\n  game:\n    stop_grace_period: 300s\n'),
     ).toBeNull();
     expect(graceOf('services:\n  game:\n    stop_grace_period: 75s\nvolumes:\n  db:\n')).toBe(75);
+    expect(
+      graceOf(
+        'services:\n  game:\n    image: x\nx-after:\n  other:\n    stop_grace_period: 300s\n',
+      ),
+    ).toBeNull();
+    expect(
+      graceOf('services:\n  gameserver:\n    stop_grace_period: 300s\n  game:\n    image: x\n'),
+    ).toBeNull();
     const graceSeconds = graceOf(readFileSync('docker-compose.yml', 'utf8'));
     expect(graceSeconds, 'the game service stop_grace_period in docker-compose.yml').not.toBeNull();
     expect(totalMs).toBeLessThan(Number(graceSeconds) * 1000);
     expect(
       [...budget.matchAll(/(?<![\d.])(\d+) s kill grace/g)].map((match) => Number(match[1])),
     ).toEqual([graceSeconds]);
+  });
+
+  it("states DEPLOY's save and read bounds as the code sets them", () => {
+    // The boot bullet names each bound beside its number, so a change to either
+    // side fails here until the other follows.
+    const deploy = readFileSync('DEPLOY.md', 'utf8');
+    const at = deploy.indexOf('- EVERY BOOT LOCKS THE PARENTS');
+    expect(at).toBeGreaterThan(-1);
+    const bullet = deploy.slice(at, deploy.indexOf('\n- ', at + 1)).replace(/\s+/g, ' ');
+    const source = (file: string) => stripComments(readFileSync(file, 'utf8'));
+    const seconds = (file: string, name: string): number => {
+      const found = source(file).match(new RegExp(`export const ${name} = ([0-9_]+);`));
+      expect(found, name).not.toBeNull();
+      return Number((found as RegExpMatchArray)[1].replaceAll('_', '')) / 1000;
+    };
+    const lock = [
+      ...source('server/character_save_transaction.ts').matchAll(/lock_timeout = '(\d+)s'/g),
+    ].map((match) => match[1]);
+    expect(lock).toHaveLength(1);
+    expect(bullet).toContain(
+      `save transaction's ${lock[0]} s lock timeout, \`server/character_save_transaction.ts\``,
+    );
+    expect(bullet).toContain(
+      `\`DB_STATEMENT_TIMEOUT_MS\` (${seconds('server/db.ts', 'DB_STATEMENT_TIMEOUT_MS')} s)`,
+    );
+    expect(source('server/db.ts')).toContain(
+      'export const DB_HEAVY_STATEMENT_TIMEOUT_MS = CHARACTER_SAVE_STATEMENT_TIMEOUT_MS;',
+    );
+    expect(bullet).toContain(
+      `\`DB_HEAVY_STATEMENT_TIMEOUT_MS\` (${seconds('server/character_save_transaction.ts', 'CHARACTER_SAVE_STATEMENT_TIMEOUT_MS')} s)`,
+    );
   });
 
   it('chunks at the bound, one transaction per chunk', async () => {
