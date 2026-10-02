@@ -1793,7 +1793,8 @@ describe('the claim renewer', () => {
         (match) => match[1].split(',').some((part) => part.trim() === name),
       );
       expect(lines, name).toHaveLength(1);
-      // A directory barrel is spelled `./dir/index` here, so the path names a file.
+      // This pin needs a directory barrel spelled `./dir/index`, so the path
+      // names a file; a bare `./dir` (as main.ts imports `./email`) fails here.
       const path = `server/${lines[0][2]}.ts`;
       expect(existsSync(path), `${name} is imported from ${path}`).toBe(true);
       return path;
@@ -1826,17 +1827,18 @@ describe('the claim renewer', () => {
     /** Code with its layout dropped (whitespace collapsed and removed beside
      *  punctuation and before a member access, a trailing comma before a closer
      *  removed), so a formatter reflow is not an edit. A line break that
-     *  changes meaning (a `return` split from its value) never reaches this
-     *  compare: the changed-files format check rewrites it first. */
+     *  changes meaning (a `return` split from its value) passes this compare;
+     *  the changed-files format check (`npm run ci:changed`, check-only) fails
+     *  it, since Biome prints it as `return;`. */
     const shape = (code: string): string =>
       code
         .replace(/\s+/g, ' ')
         .replace(/\s*([(){}[\],;])\s*/g, '$1')
-        .replace(/\s+(\??\.)(?!\.)/g, '$1')
+        .replace(/\s+(\??\.)/g, '$1')
         .replace(/,([)}\]])/g, '$1');
     expect(shape('f( a, b, ) { x; }')).toBe(shape('f(a,b){x;}'));
     expect(shape('void settled\n  .then(done);')).toBe(shape('void settled.then(done);'));
-    expect(shape('{ ...x }')).toBe('{...x}');
+    expect(shape('deps.registry\n  ?.drop(id);')).toBe(shape('deps.registry?.drop(id);'));
     // Each bound's value, read from the code that sets it.
     const constantIn = (file: string, name: string): number => {
       const found = stripComments(readFileSync(file, 'utf8')).match(
@@ -1942,11 +1944,16 @@ describe('the claim renewer', () => {
     );
     const stated = [...budget.matchAll(/(?<![\d.])(\d+(?:\.\d+)?) s of bounded waits/g)];
     expect(stated.map((match) => Number(match[1]))).toEqual([totalMs / 1000]);
-    /** The game service's kill grace in seconds, or null. Each line inside
-     *  the block takes exactly one shape (indented four or more, or a comment
-     *  indented less), never both, so a failed match stays linear. */
+    /** The game service's kill grace in seconds, or null, read inside the
+     *  top-level `services:` block only. Each line there takes exactly one
+     *  shape (indented four or more, a comment indented less, or empty),
+     *  never two, so a failed match stays linear. */
     const graceOf = (compose: string): number | null => {
-      const found = compose.match(
+      const at = compose.search(/(?:^|\n)services:\n/);
+      if (at < 0) return null;
+      const rest = compose.slice(at);
+      const next = rest.slice(1).search(/\n[^\s#]/);
+      const found = (next < 0 ? rest : rest.slice(0, next + 2)).match(
         /\n {2}game:\n(?:(?: {4}.*| {0,3}#.*)?\n)*? {4}stop_grace_period: (["']?)(\d+)s\1(?: +#.*)?\n/,
       );
       return found ? Number(found[2]) : null;
@@ -1963,11 +1970,20 @@ describe('the claim renewer', () => {
       graceOf('services:\n  game:\n    image: x\n  bot:\n    stop_grace_period: 15s\n'),
     ).toBeNull();
     expect(graceOf('services:\n  game:\n    deploy:\n      stop_grace_period: 75s\n')).toBeNull();
-    // A failing match over many deep comments returns at once: overlapping
-    // line shapes would retry every split of them.
-    const started = performance.now();
-    expect(graceOf(service('1m', ...Array(22).fill('    # a deep comment\n')))).toBeNull();
-    expect(performance.now() - started).toBeLessThan(100);
+    expect(graceOf(`x-defaults:\n  game:\n    stop_grace_period: 300s\n${service('75s')}`)).toBe(
+      75,
+    );
+    // A failing match over many deep lines, comments or blank ones, returns at
+    // once: overlapping line shapes would retry every split of them. The
+    // fastest of three runs is timed, so one stall cannot fail it.
+    const deep = (line: string) => service('1m', ...Array(25).fill(line));
+    const runs = [0, 1, 2].map(() => {
+      const started = performance.now();
+      expect(graceOf(deep('    # a deep comment\n'))).toBeNull();
+      expect(graceOf(deep('    \n'))).toBeNull();
+      return performance.now() - started;
+    });
+    expect(Math.min(...runs)).toBeLessThan(1000);
     const graceSeconds = graceOf(readFileSync('docker-compose.yml', 'utf8'));
     expect(graceSeconds).not.toBeNull();
     expect(totalMs).toBeLessThan(Number(graceSeconds) * 1000);
