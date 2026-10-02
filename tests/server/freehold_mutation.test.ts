@@ -2962,6 +2962,7 @@ describe('the claim renewer', () => {
       "flairedIds: 'GET', '/internal/discord/flaired-ids'",
     ]);
     const botCode = ['bot/*.ts', 'bot/*.mts', 'bot/*.cts', 'bot/*.js', 'bot/*.mjs', 'bot/*.cjs'];
+    botCode.push('bot/*.tsx', 'bot/*.jsx');
     const writesRoute = (node: ts.Node) =>
       (ts.isStringLiteralLike(node) ||
         ts.isTemplateHead(node) ||
@@ -3001,22 +3002,32 @@ describe('the claim renewer', () => {
     ]);
     // Every tracked bot code file still on disk is parsed, so a route is read
     // as its literal's value (an escape in its text included), never as raw
-    // text. Each listing is NUL-separated, so git quotes no name, and skips
-    // only what git reports deleted, so a name that does not decode is kept and
-    // fails at the parse rather than dropping from both; the list is checked
-    // against a second listing of the whole directory, so a narrowed pathspec
-    // cannot drop a file.
+    // text. Each listing is NUL-separated, so git quotes no name, and is read
+    // as raw bytes, so two names that decode alike stay apart; it skips only
+    // what git reports deleted, each checked missing from disk, so a name that
+    // does not decode is kept and fails at the parse rather than dropping from
+    // both. The list is checked against a second listing of the whole
+    // directory, so a narrowed pathspec cannot drop a file.
     const lsFiles = (args: string[]) => {
-      const listed = spawnSync('git', ['ls-files', '-z', ...args], { encoding: 'utf8' });
+      const listed = spawnSync('git', ['ls-files', '-z', ...args]);
       expect(listed.status).toBe(0);
-      return listed.stdout.split('\0').filter((file) => file !== '');
+      return listed.stdout
+        .toString('latin1')
+        .split('\0')
+        .filter((file) => file !== '');
     };
+    const utf8 = (file: string) => Buffer.from(file, 'latin1').toString('utf8');
     const tracked = (pathspecs: string[]) => {
       const deleted = new Set(lsFiles(['--deleted', '--', ...pathspecs]));
-      return lsFiles(['--', ...pathspecs]).filter((file) => !deleted.has(file));
+      expect([...deleted].map(utf8).filter((file) => existsSync(file))).toEqual([]);
+      return lsFiles(['--', ...pathspecs])
+        .filter((file) => !deleted.has(file))
+        .map(utf8);
     };
     const botFiles = tracked(botCode);
-    expect(botFiles).toEqual(tracked(['bot']).filter((file) => /\.[mc]?[jt]s$/.test(file)));
+    expect(botFiles).toEqual(
+      tracked(['bot']).filter((file) => /\.(?:[mc]?[jt]s|[jt]sx)$/.test(file)),
+    );
     expect(botFiles).toEqual(
       expect.arrayContaining(['bot/logic.ts', 'bot/main.ts', 'bot/server_client.ts']),
     );
@@ -3039,12 +3050,14 @@ describe('the claim renewer', () => {
     ]);
     // Section L of the pg suite reads every boot through `settled`, which cancels
     // a boot still waiting at its deadline. So every boot the section runs
-    // starts in `startBoot`, its one call of `ensureSchema` (a call of
-    // `ensureSchema` by another name or through element access is not read);
-    // `startBoot` is only ever called by name; each result goes to `settled` or
-    // to a name; every read of a boot's name is pinned by the expression it
-    // sits in, so a boot read beside or instead of `settled` fails until
-    // reviewed; and `settled`'s calls and parameters are pinned as written.
+    // starts in `startBoot`, its one call of `ensureSchema` (only a call written
+    // `ensureSchema(...)` or `x.ensureSchema(...)` is read); `startBoot` is only
+    // ever called by name; each
+    // result goes to `settled` or to a name; every `during` callback names the
+    // boot it is handed `boot`; every read of a boot's name is pinned by the
+    // expression it sits in, so a boot read beside or instead of `settled`
+    // fails until reviewed; and the section's lock key, its lock filter,
+    // `startBoot`, `settled` and every `settled` call are pinned as written.
     const pgSuite = parsed('tests/server/freehold_mutation.pg.test.ts');
     const sectionL = nodesIn(pgSuite).filter(
       (node) =>
@@ -3134,20 +3147,91 @@ describe('the claim renewer', () => {
       'boot, ran ? 10_000 : 1_000',
       "Promise.resolve('finished'), 50",
       'late, 50',
-      'new Promise(() => {}), 50, 300',
+      'new Promise(() => {}), 50, 250',
       'work',
       'Promise.allSettled([secondBoot, thirdBoot])',
       'startBoot(), 10_000',
     ]);
-    // `settled`'s deadline and the cancel's grace, as written.
+    // Every mention of `during` by where it sits, and each callback passed as
+    // one by its parameters as written.
     expect(
-      nodesIn(sectionL[0])
-        .filter(
-          (node): node is ts.FunctionDeclaration =>
-            ts.isFunctionDeclaration(node) && node.name?.text === 'settled',
+      named('during').map((node) => {
+        const at = node.parent;
+        if (
+          ts.isPropertyAssignment(at) &&
+          (ts.isArrowFunction(at.initializer) || ts.isFunctionExpression(at.initializer))
         )
-        .map((node) => node.parameters.map((param) => param.getText()).join(', ')),
-    ).toEqual(['work: Promise<unknown> | undefined, ms = 5_000, grace = 1_000']);
+          return at.initializer.parameters.map((param) => param.getText()).join(', ');
+        return ts.SyntaxKind[at.kind];
+      }),
+    ).toEqual([
+      'PropertySignature',
+      'BindingElement',
+      'IfStatement',
+      'CallExpression',
+      '{ pid, holderPid }',
+      '',
+      '{ pid, holderPid }, boot',
+    ]);
+    // The section's lock key, its lock filter, `startBoot` and `settled`, each
+    // read whole, comments dropped.
+    const declared = (name: string) =>
+      nodesIn(sectionL[0]).filter(
+        (node) =>
+          (ts.isVariableStatement(node) &&
+            node.declarationList.declarations.some(
+              (decl) => ts.isIdentifier(decl.name) && decl.name.text === name,
+            )) ||
+          (ts.isFunctionDeclaration(node) && node.name?.text === name),
+      );
+    expect(
+      ['SCHEMA_LOCK_KEY', 'ON_SCHEMA_LOCK', 'startBoot', 'settled'].map((name) =>
+        declared(name).map((node) => linesOf(node, pgSuite)),
+      ),
+    ).toEqual([
+      [['const SCHEMA_LOCK_KEY = 0x57_4f_43_01;']],
+      [
+        [
+          "const ON_SCHEMA_LOCK = `locktype = 'advisory' AND classid = 0 AND objid = $1 AND objsubid = 1",
+          'AND database = (SELECT oid FROM pg_database WHERE datname = current_database())`;',
+        ],
+      ],
+      [
+        [
+          'const startBoot = (): Promise<unknown> =>',
+          'db.ensureSchema().then(',
+          "() => 'finished',",
+          '(error: unknown) => error,',
+          ');',
+        ],
+      ],
+      [
+        [
+          'async function settled(',
+          'work: Promise<unknown> | undefined,',
+          'ms = 5_000,',
+          'grace = 1_000,',
+          '): Promise<unknown> {',
+          'const outcome = await within(Promise.resolve(work), ms);',
+          "if (outcome === 'still waiting') {",
+          'const end = Date.now() + grace;',
+          'do {',
+          'await pool',
+          // Split at each placeholder, for Biome's noTemplateCurlyInString.
+          '.query(`SELECT pg_cancel_backend(pid) FROM pg_locks WHERE $' + '{ON_SCHEMA_LOCK}`, [',
+          'SCHEMA_LOCK_KEY,',
+          '])',
+          '.catch(() => {});',
+          '} while (',
+          "(await within(Promise.resolve(work), 100)) === 'still waiting' &&",
+          'Date.now() < end',
+          ');',
+          '}',
+          'return outcome;',
+          '}',
+        ],
+      ],
+    ]);
     // The link-change feed's heal is the bot's resyncs, which DEPLOY gives no
     // cadence; the bot's own suites pin them (tests/discord_bot_linked_sweep.test.ts,
     // tests/discord_bot_member_writes.test.ts and

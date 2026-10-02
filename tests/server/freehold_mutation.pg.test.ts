@@ -47,7 +47,7 @@
 // tests/guild_bank_pg_integration.test.ts and
 // tests/server/storage_purchase_db.pg.test.ts prove the legacy halves with no
 // housing participant.
-// Cost: 14.0 s
+// Cost: 13.9 s
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import type { Pool as PgPool, PoolClient } from 'pg';
@@ -3417,12 +3417,19 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       expect(await settled(late, 50)).toBe('still waiting');
       expect(await late).toBeInstanceOf(Error);
       // Work that never settles is let go once the cancel's grace is spent: a
-      // 300 ms grace sends two or three cancels, each followed by a 100 ms read.
+      // 250 ms grace sends two or three cancels, each followed by a 100 ms read,
+      // and each is the cancel of the schema lock's sessions.
       const cancels = vi.spyOn(pool, 'query');
       try {
-        expect(await settled(new Promise(() => {}), 50, 300)).toBe('still waiting');
+        expect(await settled(new Promise(() => {}), 50, 250)).toBe('still waiting');
         expect(cancels.mock.calls.length).toBeGreaterThanOrEqual(2);
         expect(cancels.mock.calls.length).toBeLessThanOrEqual(3);
+        for (const call of cancels.mock.calls) {
+          expect(call).toEqual([
+            `SELECT pg_cancel_backend(pid) FROM pg_locks WHERE ${ON_SCHEMA_LOCK}`,
+            [SCHEMA_LOCK_KEY],
+          ]);
+        }
       } finally {
         cancels.mockRestore();
       }
