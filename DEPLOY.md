@@ -1102,66 +1102,79 @@ For off-box safety, sync the directory to S3 occasionally:
   rewrites the guard and erase functions' catalog rows, and holds no table lock of its
   own to its COMMIT: the one table lock it takes is the Hearth token probe's ACCESS
   SHARE on `account_freehold_hearth`, taken and released at once, so it waits only
-  behind an ACCESS EXCLUSIVE holder or request on that table (run no DDL on it while
-  a realm boots). A boot that REPAIRS a missing or disabled guard drops and recreates
-  it under ACCESS EXCLUSIVE, so treat a repair boot the same way.
-- A CORRUPT Hearth row (a `ready_at_ms` past the database clock plus a whole
-  cooldown, which only a backward database clock step or a bad row produces) is never
-  honored. A read is the only detector: a row already bad when its account logs in
-  reaches the realm as an ordinary cooldown (the login installs it and the realm's
-  own clock refuses the key first), so nothing counts or warns; only a key the realm
-  admits and the database then refuses counts `trip_corrupt` with a warn line. Find
-  them with `SELECT account_id, ready_at_ms FROM account_freehold_hearth WHERE
+  behind an ACCESS EXCLUSIVE holder or request on that table. The boot waits there
+  while it holds ACCESS EXCLUSIVE on `characters` and `accounts`, so DDL on that table
+  stalls every realm's saves and logins for as long as the DDL waits, and DDL that
+  also wants a parent can deadlock the boot: run none while a realm boots. (The
+  storage fragment, which is not housing, still holds ACCESS EXCLUSIVE on
+  `storage_purchases` to every boot's COMMIT.) A boot that REPAIRS a missing or
+  disabled guard, or puts the advance token column or its CHECK back, takes ACCESS
+  EXCLUSIVE on that table to its COMMIT, so treat a repair boot the same way.
+- A CORRUPT Hearth row (a `ready_at_ms` past the database clock plus a whole cooldown,
+  which only a backward database clock step or a bad row produces) is never honored. A
+  read is the only detector: a row already bad when its account logs in reaches the
+  realm as an ordinary cooldown (the login installs it and the realm's own clock
+  refuses the key first), so nothing counts or warns; only a key the realm admits and
+  the database then refuses counts `trip_corrupt` with a warn line. Find them with
+  `SELECT account_id, ready_at_ms FROM public.account_freehold_hearth WHERE
   ready_at_ms > (EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::bigint + 3600000`
   (3,600,000 ms is `HEARTH_KEY_COOLDOWN_MS`). FIRST confirm the database clock is
   correct: compare `SELECT clock_timestamp()` with a trusted time source (for example
-  `chronyc tracking` or `timedatectl` on the database host), and treat a step in either
-  direction as a step. A backward clock step makes healthy rows read as corrupt, and
-  they heal by themselves once the clock is back within one cooldown of them, while
-  clamping them during a step sets them against the wrong clock: once it is corrected
-  their cooldown is shortened or lengthened, and after a backward step of more than one
-  cooldown they are ready at once (a free trip). NEVER repair during a clock step.
-  With the clock correct, a bad row stays bad; repair them in one guarded, idempotent
-  statement, which clamps each to a full cooldown
-  from now and so grants no free trip: `UPDATE account_freehold_hearth SET
-  ready_at_ms = (EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::bigint + 3600000,
-  revision = revision + 1, updated_at = now() WHERE ready_at_ms > (EXTRACT(EPOCH FROM
-  clock_timestamp()) * 1000)::bigint + 3600000 RETURNING account_id`. The realm's
-  copy of the clock moves forward by REVISION, and the repair bumps it, so a repair
-  reaches the realm at that entry's next login read: a fresh entry once every character
-  of the account has left the realm AND the realm has dropped the entry (its leave save
-  landed, or the orphan sweep collected it, so a quick relog can still read the old
-  cooldown), a lost-claim re-read on rejoin for an account that holds a plot, or a
-  restart. Re-running the repair is harmless: its guard no longer matches the row.
+  `chronyc tracking` or `timedatectl` on the database host), and treat a step in
+  either direction as a step. A backward clock step makes healthy rows read as
+  corrupt, and they heal by themselves once the clock is back within one cooldown of
+  them, while clamping them during a step sets them against the wrong clock: once it
+  is corrected their cooldown is shortened or lengthened, and after a backward step of
+  more than one cooldown they are ready at once (a free trip). NEVER repair during a
+  clock step. With the clock correct, a bad row stays bad; repair them in one guarded,
+  idempotent statement, which clamps each to a full cooldown from now and so grants no
+  free trip: `UPDATE public.account_freehold_hearth SET ready_at_ms = (EXTRACT(EPOCH
+  FROM clock_timestamp()) * 1000)::bigint + 3600000, revision = revision + 1,
+  updated_at = now() WHERE ready_at_ms > (EXTRACT(EPOCH FROM clock_timestamp()) *
+  1000)::bigint + 3600000 RETURNING account_id`. The realm's copy of the clock moves
+  forward by REVISION, and the repair bumps it, so a repair reaches the realm at that
+  entry's next login read: a fresh entry once every character of the account has left
+  the realm AND the realm has dropped the entry (its leave save landed, or the orphan
+  sweep collected it, so a quick relog can still read the old cooldown), a lost-claim
+  re-read on rejoin for an account that holds a plot, or a restart. Re-running the
+  repair is harmless: its guard no longer matches the row.
 - THE ADVANCE TOKEN CHECK: a boot that finds `account_freehold_hearth.advance_token`
   without any constraint of that name puts the CHECK back `NOT VALID` (new tokens are
   checked, old rows are not scanned), and a same-named constraint that is not that
   CHECK (another type, or a CHECK with another body) leaves the shape unchecked and
-  makes every boot log `[schema] account_freehold_hearth_advance_token_shape is not the
-  32-hex token CHECK, so the advance token shape is unchecked` instead. The boot checks
-  `public.account_freehold_hearth`, and the statements below name it so. To finish a
-  repair, first read what the name holds: `SELECT contype, convalidated,
+  makes every boot log `[schema] account_freehold_hearth_advance_token_shape is not
+  the 32-hex token CHECK, so the advance token shape is unchecked` instead. The boot
+  checks `public.account_freehold_hearth`, and the statements below name it so. To
+  finish a repair, first read what the name holds: `SELECT contype, convalidated,
   pg_get_constraintdef(oid) FROM pg_constraint WHERE conrelid =
   'public.account_freehold_hearth'::regclass AND conname =
   'account_freehold_hearth_advance_token_shape'`. The boot compares the whole
   definition, a ` NOT VALID` suffix aside, to `CHECK (((advance_token IS NULL) OR
-  (advance_token ~ '^[0-9a-f]{32}$'::text)))`; compare it the same way. If it matches,
-  null any non-hex token (`UPDATE public.account_freehold_hearth SET advance_token =
-  NULL WHERE advance_token !~ '^[0-9a-f]{32}$'`), then run `ALTER TABLE
-  public.account_freehold_hearth VALIDATE CONSTRAINT
-  account_freehold_hearth_advance_token_shape`, which takes SHARE UPDATE EXCLUSIVE and
-  does not block writes. If it matches and the boot still warns, the shape IS checked
-  and PostgreSQL deparses it differently (a major upgrade): do not drop it; report it,
-  so the probe's literal in `server/freehold_hearth_db.ts` is updated. Anything else:
-  in a quiet window, run `SET lock_timeout = '2s'` and then `ALTER TABLE
-  public.account_freehold_hearth DROP CONSTRAINT
-  account_freehold_hearth_advance_token_shape` in one session, retrying on 55P03. It
-  takes ACCESS EXCLUSIVE on the table (and, when `contype` is `f`, on the table it
-  references), so it waits behind in-flight trips and blocks every realm's Hearth
-  reads while it waits, for at most the lock timeout. Then reboot in the same quiet
-  window: that boot is a repair boot (it holds ACCESS EXCLUSIVE on the table to its
-  COMMIT and shares every boot's deadlock above) and puts the CHECK back `NOT VALID`;
-  then null and validate as above.
+  (advance_token ~ '^[0-9a-f]{32}$'::text)))`. Decide by what it tests, not only by
+  its text:
+  - If `contype` is `c` and it is that text, the shape is checked and the boot is
+    silent on it. When `convalidated` is false, null any non-hex token (`UPDATE
+    public.account_freehold_hearth SET advance_token = NULL WHERE advance_token !~
+    '^[0-9a-f]{32}$'`), then run `ALTER TABLE public.account_freehold_hearth VALIDATE
+    CONSTRAINT account_freehold_hearth_advance_token_shape`, which takes SHARE UPDATE
+    EXCLUSIVE and does not block writes.
+  - If `contype` is `c` and it tests the same thing written differently (only
+    parentheses, spacing or a cast differ, as when a PostgreSQL major upgrade changes
+    how it prints the CHECK), the shape IS checked though every boot warns: do not
+    displace it. Validate it as above if `convalidated` is false, and report it so the
+    probe's literal in `server/freehold_hearth_db.ts` is updated.
+  - Anything else (another `contype`, or a CHECK that tests something else): in a
+    quiet window with no realm booting or restarting, run `SET lock_timeout = '2s'`
+    and then `ALTER TABLE public.account_freehold_hearth RENAME CONSTRAINT
+    account_freehold_hearth_advance_token_shape TO
+    account_freehold_hearth_advance_token_shape_displaced` in one session, retrying on
+    55P03. A rename, never a drop: it keeps whatever the displaced constraint enforces
+    (a key's index, a foreign key) and takes ACCESS EXCLUSIVE on the Hearth table
+    alone, so it waits behind in-flight trips and blocks every realm's Hearth reads
+    for at most the lock timeout. Then reboot in the same quiet window: that boot is a
+    repair boot (it holds ACCESS EXCLUSIVE on the table to its COMMIT and shares every
+    boot's deadlock above) and puts the CHECK back `NOT VALID`; validate it as above.
+    Drop the displaced constraint later only if nothing needs it.
 - A failed deactivation receipt erase logs `deactivation housing receipt erase
   failed` with no account id. The erase is idempotent; find the accounts to re-run
   with `SELECT DISTINCT r.account_id FROM freehold_operation_receipts r JOIN accounts

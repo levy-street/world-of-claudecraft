@@ -952,7 +952,9 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
     const deploy = readFileSync('DEPLOY.md', 'utf8');
     const start = deploy.indexOf('- A CORRUPT Hearth row');
     expect(start).toBeGreaterThan(-1);
-    const bullet = deploy.slice(start, deploy.indexOf('\n- ', start + 1)).replace(/\s+/g, ' ');
+    // Only a line break and its indent fold: spacing inside a code span renders
+    // as written.
+    const bullet = deploy.slice(start, deploy.indexOf('\n- ', start + 1)).replace(/\n\s*/g, ' ');
     expect(HEARTH_KEY_COOLDOWN_MS).toBe(3_600_000);
     const clock = '(EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::bigint';
     // SET and WHERE both use the clock plus the one cooldown, so a re-run or a
@@ -963,7 +965,7 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
     // A read finds them first, and the repair is refused during a clock step,
     // when healthy rows read as corrupt and clamping them would shorten them.
     expect(bullet).toContain(
-      `SELECT account_id, ready_at_ms FROM account_freehold_hearth WHERE ready_at_ms > ${clock} + ${HEARTH_KEY_COOLDOWN_MS}`,
+      `SELECT account_id, ready_at_ms FROM public.account_freehold_hearth WHERE ready_at_ms > ${clock} + ${HEARTH_KEY_COOLDOWN_MS}`,
     );
     expect(bullet).toContain('NEVER repair during a clock step');
   });
@@ -990,5 +992,15 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
     const bullet = deploy.slice(start, deploy.indexOf('\n- ', start + 1)).replace(/\n\s*/g, ' ');
     expect(bullet).toContain(`\`[schema] ${raised[0]}\``);
     expect(bullet).toContain(`\`${compared[0]}\``);
+    // The procedure's safety rules: a CHECK the boot misreads is kept, and an
+    // impostor is RENAMED (keeping what it enforces, one table locked) under a
+    // lock timeout, never dropped.
+    expect(bullet).toContain('do not displace it');
+    expect(bullet).toContain("`SET lock_timeout = '2s'`");
+    expect(bullet).toContain(
+      '`ALTER TABLE public.account_freehold_hearth RENAME CONSTRAINT account_freehold_hearth_advance_token_shape TO account_freehold_hearth_advance_token_shape_displaced`',
+    );
+    expect(bullet).toContain('A rename, never a drop');
+    expect(bullet).not.toContain('DROP CONSTRAINT');
   });
 });
