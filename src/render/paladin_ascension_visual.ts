@@ -127,8 +127,6 @@ export class PaladinAscensionVisual {
   private readonly solarCrownMaterial: THREE.Material;
   private readonly size: number;
   private readonly crownBaseY: number;
-  private hoverTarget: THREE.Object3D | null = null;
-  private hoverBaseY = 0;
 
   constructor(characterHeight: number) {
     this.group.name = 'paladin-ascension-visual';
@@ -154,40 +152,38 @@ export class PaladinAscensionVisual {
     this.crown.add(this.solarCrown);
   }
 
+  /**
+   * Show or hide the seal and crown, and lift the rig (`hoverTarget`, the
+   * rider root) by the hover while Ascension is up.
+   *
+   * The lift is ADDED to the height the renderer placed the rig at THIS frame,
+   * so call it after the rider placement (placeRider, or the mount attitude
+   * pass in updateMountPresentation), which rewrites that height every frame.
+   * It must never latch a base height of its own: the visual lives for the
+   * whole view once built, and a latched height pinned the paladin to wherever
+   * the first Ascension caught them, on the ground under every later mount or
+   * floating at seat height after a dismount.
+   */
   update(
     plan: PaladinAscensionVisualPlan,
     _dt: number,
     _reducedMotion: boolean,
     hoverTarget: THREE.Object3D | null = null,
   ): void {
-    this.setHoverTarget(hoverTarget);
     this.group.visible = plan.active;
     this.crown.visible = plan.active;
     const hoverOffset = plan.active ? HOVER_HEIGHT * this.size : 0;
-    if (this.hoverTarget) this.hoverTarget.position.y = this.hoverBaseY + hoverOffset;
+    if (hoverTarget && hoverOffset !== 0) hoverTarget.position.y += hoverOffset;
     this.solarCrown.position.y = this.crownBaseY + hoverOffset;
   }
 
   dispose(): void {
-    this.restoreHoverTarget();
     this.group.removeFromParent();
     this.crown.removeFromParent();
     this.groundSeal.material.dispose();
     // The crown wears the surfaceMat cache's shared instance: every other
     // crown in view and the boot stand-in draw with it too.
     if (!isSharedMaterial(this.solarCrownMaterial)) this.solarCrownMaterial.dispose();
-  }
-
-  private setHoverTarget(target: THREE.Object3D | null): void {
-    if (target === this.hoverTarget) return;
-    this.restoreHoverTarget();
-    this.hoverTarget = target;
-    this.hoverBaseY = target?.position.y ?? 0;
-  }
-
-  private restoreHoverTarget(): void {
-    if (this.hoverTarget) this.hoverTarget.position.y = this.hoverBaseY;
-    this.hoverTarget = null;
   }
 }
 
