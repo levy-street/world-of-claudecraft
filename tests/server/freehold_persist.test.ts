@@ -1577,8 +1577,9 @@ describe('preload admission', () => {
       ).toBe(false);
     }
     expect(asked).toBe(0);
-    // A read in flight joins even once the claim reads held (its acquire
-    // records the claim before its row lands), and never asks the claim.
+    // A read in flight joins even once the claim reads held (the read records
+    // the claim once its COMMIT is proved, before its row lands), and never
+    // asks the claim.
     let heldAsked = 0;
     const heldClaim = () => {
       heldAsked += 1;
@@ -1614,8 +1615,9 @@ describe('preload admission', () => {
     // The re-read really is parked at its gate before the second preload, or
     // this case would pass without ever reaching the join.
     expect(reads).toBe(2);
-    // Its claim acquire records the claim before the row lands: the second
-    // preload must still join rather than ask the now-held claim and replay.
+    // The read records the claim once its COMMIT is proved, before the row
+    // lands: the second preload must still join rather than ask the now-held
+    // claim and replay.
     held = true;
     const second = h.store.preload(ACCOUNT_ID);
     open();
@@ -9497,8 +9499,9 @@ describe("the store's claim seam the 07a renewer, trip and mutation read", () =>
     expect(h.store.authority(OWNER_KEY)?.durableRev).toBe('9007199254740993');
     h.store.adoptCommittedRevision(OWNER_KEY, '9007199254740992');
     expect(h.store.authority(OWNER_KEY)?.durableRev).toBe('9007199254740993');
-    // The guard's upper bound from below: BIGINT's largest value, 19 digits,
-    // is still a revision the database can return, so it is adopted.
+    // The largest BIGINT, 19 digits, is inside the guard's 19-digit bound, so
+    // it is adopted (the guard bounds digits, not the BIGINT range; a revision
+    // comes from the database's RETURNING, which cannot exceed it).
     h.store.adoptCommittedRevision(OWNER_KEY, '9223372036854775807');
     expect(h.store.authority(OWNER_KEY)?.durableRev).toBe('9223372036854775807');
   });

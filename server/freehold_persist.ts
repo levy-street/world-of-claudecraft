@@ -308,6 +308,8 @@ export function createFreeholdPersistStore(ports: FreeholdPersistPorts): Freehol
     return created;
   }
 
+  const readInFlight = (accountId: number): boolean =>
+    accountId > 0 && inFlightLoads.has(accountId);
   /**
    * ONE predicate for "this entry still owes durable work", shared by BOTH
    * removal paths. They used to differ: maybeRemove checked the deferred set
@@ -339,12 +341,12 @@ export function createFreeholdPersistStore(ports: FreeholdPersistPorts): Freehol
     // the same "entry went missing under a live session" class that retain's
     // reload exists to repair. It belongs in the SHARED predicate, or the
     // unification is only half true.
-    (entry.accountId > 0 && inFlightLoads.has(entry.accountId)) ||
+    readInFlight(entry.accountId) ||
     entry.pending ||
     deferredWrites.has(entry) ||
     deferredRetries.has(entry) ||
     (isDirty(entry) && !blocked(entry));
-  const rereadsLostClaim = (entry: FreeholdPersistEntry): boolean =>
+  const rereadsLostClaim = (entry: FreeholdPersistEntry, accountId: number): boolean =>
     freeholdRereadsLostClaim(
       {
         durableRev: entry.durableRev,
@@ -353,17 +355,15 @@ export function createFreeholdPersistStore(ports: FreeholdPersistPorts): Freehol
         retrying: deferredRetries.has(entry),
         dirty: isDirty(entry),
         leaveCaptured: entry.leaveDocument !== null,
-        readInFlight: entry.accountId > 0 && inFlightLoads.has(entry.accountId),
+        readInFlight: readInFlight(accountId),
       },
       () => ports.claimHeld?.(entry.plotId) ?? true,
     );
-  // NOT a clause of its own for the retained leave document, deliberately, and
-  // the reason is worth writing down because it is the shape of a defect this
-  // packet has already made once. `settle` clears the capture only when the
-  // entry NO LONGER owes work, so a `leaveDocument !== null` clause here would
-  // make the capture its own reason to be kept and it could never be released.
-  // The accounting gap it was reaching for is closed at the two DELETE sites
-  // instead, through releaseCapture below.
+  // NOT a clause of its own for the retained leave document, deliberately:
+  // `settle` clears the capture only when the entry NO LONGER owes work, so a
+  // `leaveDocument !== null` clause here would make the capture its own reason
+  // to be kept and it could never be released. The accounting gap it was
+  // reaching for is closed at the two DELETE sites, through releaseCapture.
 
   /** Drop a retained leave document and its accounting together. `leave_captures`
    *  is the ONLY published bound on that retention, and a bound that can only
@@ -765,7 +765,7 @@ export function createFreeholdPersistStore(ports: FreeholdPersistPorts): Freehol
     // (so a rejoin after the sim evicted the record re-installs the real
     // house) and never mints a second plot id; the one re-read is a clean
     // entry's lost claim (freeholdRereadsLostClaim), which joins a read in flight.
-    if (entry?.loaded && !rereadsLostClaim(entry)) {
+    if (entry?.loaded && !rereadsLostClaim(entry, accountId)) {
       entry.accountId = accountId;
       entry.orphanPasses = 0;
       // blocked(), not `hold === null`. A QUIESCED entry has no hold and yet is

@@ -268,9 +268,9 @@ export interface FreeholdRereadFacts {
  * deliberately NOT owed work here: the re-read joins it (the store's load is
  * single-flight per account), so a second preload during a lost-claim re-read
  * answers that read's newer row, never the stale entry. It joins WITHOUT asking
- * the claim, because that read records the claim as held at its acquire, before
- * its row lands on the entry: asked in that gap, the claim would replay the
- * stale entry.
+ * the claim, because that read records the claim as held once its COMMIT is
+ * proved, before its row lands on the entry: asked in that gap, the claim would
+ * replay the stale entry.
  */
 export function freeholdRereadsLostClaim(
   facts: FreeholdRereadFacts,
