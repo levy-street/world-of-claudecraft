@@ -23,7 +23,7 @@
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { join, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 import { LEASE_TTL_SECONDS } from '../../server/character_lease_db';
@@ -115,8 +115,18 @@ const STOP_RENEWER_BODY =
   "export async function stopFreeholdClaimRenewer(registry?: FreeholdClaimRegistry): Promise<void> { if (!registry) return; const state = renewers.get(registry); if (!state) { renewers.set(registry, { running: false, cursor: null, stopping: true, stop: new AbortController(), settled: null, }); return; } state.stopping = true; state.stop.abort(); const settled = state.settled; if (!settled) return; const bound = AbortSignal.timeout(FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs); await new Promise<void>((resolve) => { const done = (): void => { bound.removeEventListener('abort', done); resolve(); }; void settled.then(done); bound.addEventListener('abort', done, { once: true }); });";
 const RELEASE_ALL_BODY =
   "export async function releaseAllFreeholdClaims(deps: { readonly pool: FreeholdTxPool; readonly holder: string; readonly registry?: FreeholdClaimRegistry; readonly warn?: (message: string) => void; }): Promise<number> { const deadline = AbortSignal.timeout(FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS); try { const released = await runFreeholdTransaction( deps.pool, { ...FREEHOLD_CLAIM_RENEW_BOUNDS, operation: 'freehold claim release all', wallMs: FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS, }, (tx) => releaseAllFreeholdClaimRows(tx, deps.holder), { signal: deadline }, ); if (deps.registry) { for (const claim of deps.registry.all()) deps.registry.drop(claim.plotId); deps.registry.counters.released += released; } return released; } catch { (deps.warn ?? console.warn)( 'freehold claims were not released at shutdown; they expire after the lease TTL', ); return 0; }";
-/** What an argument spelling a deadline looks like, for the allowlist screen. */
-const DEADLINE_SPELLING = /\d|_MS\b|[a-z]Ms\b|[Ss]ignal|[Dd]eadline|[Tt]imeout/;
+/** The words that name a time bound, for the allowlist screen. */
+const DEADLINE_WORDS = new Set(['ms', 'signal', 'deadline', 'timeout']);
+/** Whether an argument text spells a deadline: any digit, or an identifier
+ *  word in DEADLINE_WORDS. Identifiers here are camelCase or SCREAMING_SNAKE,
+ *  so each splits at its humps and underscores into whole words, in any case
+ *  (`heldClaims` is held and claims, never ms). */
+const spellsDeadline = (text: string): boolean =>
+  /\d/.test(text) ||
+  (text.match(/[A-Za-z_$][\w$]*/g) ?? [])
+    .flatMap((id) => id.split('_'))
+    .flatMap((part) => part.match(/[A-Z]+(?![a-z])|[A-Z]?[a-z]+/g) ?? [])
+    .some((word) => DEADLINE_WORDS.has(word.toLowerCase()));
 
 /** server/main.ts with its comments stripped, read once for every case here. */
 let mainSourceCache: string | undefined;
@@ -1685,6 +1695,8 @@ describe('the claim renewer', () => {
       | {
           readonly kind: 'callee';
           readonly fn: string;
+          /** The module that defines `fn`. */
+          readonly file: string;
           readonly name: string;
           readonly value: number;
           /** The callee's whole body, whitespace-normalized. */
@@ -1738,6 +1750,7 @@ describe('the claim renewer', () => {
         {
           kind: 'callee',
           fn: 'stopFreeholdClaimRenewer',
+          file: 'server/freehold_claim_registry.ts',
           name: 'FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs',
           value: FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs,
           body: STOP_RENEWER_BODY,
@@ -1748,6 +1761,7 @@ describe('the claim renewer', () => {
         {
           kind: 'callee',
           fn: 'releaseAllFreeholdClaims',
+          file: 'server/freehold_claim_registry.ts',
           name: 'FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS',
           value: FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS,
           body: RELEASE_ALL_BODY,
@@ -1782,18 +1796,26 @@ describe('the claim renewer', () => {
     for (const listed of noDeadlineArguments) {
       const entry = closure.find(([text]) => text === listed);
       expect(entry?.[1].kind === 'none' || entry?.[1].kind === 'callee', listed).toBe(true);
-      expect(listed, listed).not.toMatch(DEADLINE_SPELLING);
+      expect(spellsDeadline(listed), listed).toBe(false);
     }
-    // The screen itself catches each deadline spelling it is there for.
+    // The screen itself catches each word in each spelling, and passes a
+    // word that only ends in a bound's letters.
     for (const spelled of [
       'f(5000)',
       'f({ signal: s })',
+      'f(ABORT_SIGNAL)',
       'f(X_MS)',
+      'f(wait_ms)',
       'f({ waitMs: w })',
       'f(timeout)',
+      'f(SHUTDOWN_TIMEOUT)',
+      'f(HTTPTimeout)',
+      'f(deadline)',
+      'f(STOP_DEADLINE)',
     ]) {
-      expect(spelled, spelled).toMatch(DEADLINE_SPELLING);
+      expect(spellsDeadline(spelled), spelled).toBe(true);
     }
+    expect(spellsDeadline('f(heldClaims(), forms, SIGNALS_SEEN)')).toBe(false);
     /** The module main.ts imports `name` from, by its own import line. */
     const importedFrom = (name: string): string => {
       const lines = [...main.matchAll(/import\s*\{([^}]*)\}\s*from\s*'\.\/([\w/]+)'/g)].filter(
@@ -1802,17 +1824,38 @@ describe('the claim renewer', () => {
       expect(lines, name).toHaveLength(1);
       return `server/${lines[0][2]}.ts`;
     };
-    /** Whether `file` re-exports `name` from `from` in a named export list. */
-    const reExports = (file: string, name: string, from: string): boolean =>
-      [
-        ...stripComments(readFileSync(file, 'utf8')).matchAll(
-          /export\s*\{([^}]*)\}\s*from\s*'\.\/([\w/]+)'/g,
-        ),
-      ].some(
+    /** Whether `source`, the text of `file`, re-exports `name` from `from` in a
+     *  named export list, its path resolved from `file`'s own directory. */
+    const reExportsIn = (file: string, source: string, name: string, from: string): boolean =>
+      [...stripComments(source).matchAll(/export\s*\{([^}]*)\}\s*from\s*'\.\/([\w/]+)'/g)].some(
         (match) =>
-          join(dirname(file), `${match[2]}.ts`) === from &&
+          posix.join(posix.dirname(file), `${match[2]}.ts`) === from &&
           match[1].split(',').some((part) => part.trim() === name),
       );
+    const reExports = (file: string, name: string, from: string): boolean =>
+      reExportsIn(file, readFileSync(file, 'utf8'), name, from);
+    // A re-export in a subdirectory resolves there, never beside main.ts.
+    const nested = "export { A } from './y';";
+    expect(reExportsIn('server/http/x.ts', nested, 'A', 'server/y.ts')).toBe(false);
+    expect(reExportsIn('server/http/x.ts', nested, 'A', 'server/http/y.ts')).toBe(true);
+    /** The members of one `Promise.all([...])` group, a wrapped list's
+     *  trailing comma aside. */
+    const membersOf = (text: string): string[] =>
+      text
+        .slice('Promise.all(['.length, -'])'.length)
+        .split(',')
+        .map((member) => member.trim())
+        .filter(Boolean);
+    expect(membersOf('Promise.all([ a(1), b(2), ])')).toEqual(['a(1)', 'b(2)']);
+    /** Code with its layout dropped (whitespace collapsed and removed beside
+     *  punctuation, a trailing comma before a closer removed), so a formatter
+     *  reflow is not an edit. */
+    const shape = (code: string): string =>
+      code
+        .replace(/\s+/g, ' ')
+        .replace(/\s*([(){}[\],;])\s*/g, '$1')
+        .replace(/,([)}\]])/g, '$1');
+    expect(shape('f( a, b, ) { x; }')).toBe(shape('f(a,b){x;}'));
     // Each bound's value, read from the code that sets it.
     const constantIn = (file: string, name: string): number => {
       const found = stripComments(readFileSync(file, 'utf8')).match(
@@ -1821,13 +1864,13 @@ describe('the claim renewer', () => {
       expect(found, name).not.toBeNull();
       return Number((found as RegExpMatchArray)[1].replaceAll('_', ''));
     };
-    const registrySource = stripComments(readFileSync('server/freehold_claim_registry.ts', 'utf8'));
-    const bodyOf = (fn: string) => {
-      const from = registrySource.indexOf(`export async function ${fn}(`);
+    const bodyOf = (file: string, fn: string) => {
+      const source = stripComments(readFileSync(file, 'utf8'));
+      const from = source.indexOf(`export async function ${fn}(`);
       expect(from, fn).toBeGreaterThan(-1);
-      const to = registrySource.indexOf('\n}\n', from);
+      const to = source.indexOf('\n}\n', from);
       expect(to, fn).toBeGreaterThan(from);
-      return registrySource.slice(from, to);
+      return source.slice(from, to);
     };
     const counted: Array<{ name: string; value: number; group: 'call site' | 'callee' }> = [];
     const concurrent: number[] = [];
@@ -1848,11 +1891,7 @@ describe('the claim renewer', () => {
       } else if (bound.kind === 'concurrent literals') {
         // Every member of the group is one call with one literal bound.
         expect(text.startsWith('Promise.all([') && text.endsWith('])')).toBe(true);
-        const members = text
-          .slice('Promise.all(['.length, -'])'.length)
-          .split(',')
-          .map((member) => member.trim())
-          .filter(Boolean);
+        const members = membersOf(text);
         expect(members.length).toBeGreaterThan(1);
         const values = members.map((member) => {
           const found = member.match(/^[\w.]+\((\d[\d_]*)\)$/);
@@ -1861,12 +1900,15 @@ describe('the claim renewer', () => {
         });
         concurrent.push(Math.max(...values));
       } else if (bound.kind === 'callee') {
-        // The callee's WHOLE body is pinned, whitespace aside: its bound, the
+        // The callee's WHOLE body is pinned, layout aside: its bound, the
         // variable that holds it, the one wait on that variable and everything
         // around it. Any edit to a shutdown-critical callee fails here until
-        // it is re-read against the contract.
+        // it is re-read against the contract. The body is read where main.ts
+        // takes the callee from, directly or through one named re-export.
         expect(text.startsWith(`${bound.fn}(`), bound.fn).toBe(true);
-        expect(bodyOf(bound.fn).replace(/\s+/g, ' '), bound.fn).toBe(bound.body);
+        const via = importedFrom(bound.fn);
+        expect(via === bound.file || reExports(via, bound.fn, bound.file), bound.fn).toBe(true);
+        expect(shape(bodyOf(bound.file, bound.fn)), bound.fn).toBe(shape(bound.body));
         expect(bound.body).toContain(`AbortSignal.timeout(${bound.name})`);
         counted.push({ name: bound.name, value: bound.value, group: 'callee' });
       }
@@ -1896,14 +1938,10 @@ describe('the claim renewer', () => {
     expect(named.sort()).toEqual(
       counted.map(({ name, value }) => `${name}=${value.toLocaleString('en-US')}`).sort(),
     );
-    // No other bound is named in another spelling (a capitalised token that
-    // names no bound would join this list by name, never by loosening it).
-    const notBounds = new Set<string>([]);
+    // No other bound is named in another spelling: every capitalised
+    // backticked token in the budget is a counted bound.
     expect(
-      [...budget.matchAll(/`([A-Z][A-Z0-9_]*(?:\.\w+)?)`/g)]
-        .map((match) => match[1])
-        .filter((token) => !notBounds.has(token))
-        .sort(),
+      [...budget.matchAll(/`([A-Z][A-Z0-9_]*(?:\.\w+)?)`/g)].map((match) => match[1]).sort(),
     ).toEqual(counted.map(({ name }) => name).sort());
     // Each concurrent group said once, counted once at its longest member.
     const concurrently = [...groups['call site'].matchAll(/run concurrently, ([\d,]+) ms/g)].map(
@@ -1917,10 +1955,10 @@ describe('the claim renewer', () => {
     const stated = [...budget.matchAll(/(?<![\d.])(\d+(?:\.\d+)?) s of bounded waits/g)];
     expect(stated.map((match) => Number(match[1]))).toEqual([totalMs / 1000]);
     const grace = readFileSync('docker-compose.yml', 'utf8').match(
-      /\n {2}game:\n(?:(?: {4}.*)?\n)*? {4}stop_grace_period: (\d+)s\n/,
+      /\n {2}game:\n(?:(?: {4}.*| *#.*)?\n)*? {4}stop_grace_period: (["']?)(\d+)s\1(?: +#.*)?\n/,
     );
     expect(grace).not.toBeNull();
-    const graceSeconds = Number((grace as RegExpMatchArray)[1]);
+    const graceSeconds = Number((grace as RegExpMatchArray)[2]);
     expect(totalMs).toBeLessThan(graceSeconds * 1000);
     expect(
       [...budget.matchAll(/(?<![\d.])(\d+) s kill grace/g)].map((match) => Number(match[1])),
