@@ -108,7 +108,7 @@ A server is CAPABLE when all of the following hold.
    Hearth row's `advance_token` column behind a `pg_attribute` probe (in the CREATE TABLE
    for a fresh database, otherwise one ADD COLUMN, shape-checked by the named
    `account_freehold_hearth_advance_token_shape` constraint, which a later boot puts back
-   `NOT VALID` if the column exists without it), so a steady boot's housing fragments
+   `NOT VALID` if the column exists without it), so a steady-state boot's housing fragments
    take none of the index, trigger or ALTER TABLE locks that would hold another realm's
    housing statements until its COMMIT (their one table lock, the token probe's ACCESS
    SHARE on the Hearth table for the CHECK's deparse, is taken and released at once; the

@@ -683,12 +683,12 @@ boot's `characters`-then-`accounts` order. With G1-shaped saves in flight every 
 was eventually aborted and saves were aborted beside it, and a boot that loses exits and is
 restarted (R-11). A REPAIR boot is any boot that rebuilds something a probe guards (for
 example an index, a guard or trigger, or the advance token column or its CHECK): it holds
-that statement's lock on that object's table to its COMMIT, builds a rebuilt index while it
-holds both parents, for as long as the build takes, which grows with the table; a rebuilt
-unique index that meets duplicate rows fails the boot, which exits and is restarted into the
-same stall until the duplicates are resolved. Stop the other realms before a repair boot,
-and do the first rollout, any repair boot, and any boot beside other realms serving such
-saves, in a quiet window; `DEPLOY.md` carries the operator note.
+that statement's lock on that object's table to its COMMIT, builds a rebuilt index or a
+re-added column while it holds both parents, for as long as the build takes, which grows
+with the table; a rebuilt unique index that meets duplicate rows fails the boot, which exits
+and is restarted into the same stall until the duplicates are resolved. Stop the other
+realms before a repair boot, and do the first rollout, any repair boot, and any boot beside
+other realms serving such saves, in a quiet window; `DEPLOY.md` carries the operator note.
 
 ## 6. Pairwise deadlock review
 

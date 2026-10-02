@@ -1095,12 +1095,12 @@ For off-box safety, sync the directory to S3 occasionally:
   (docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md measures it).
 - FIRST ROLLOUT OF THE HOUSING TABLES: the first boot that carries them also creates
   the foreign-key-bearing tables and the delete guards on `accounts` and `characters`
-  inside that same transaction. It takes no parent lock an ordinary boot does not
-  already hold (about 65 ms with plain saves in flight, the same as a steady boot; it
-  shares every boot's deadlock above), but it is the one boot that builds the tables,
-  so roll it out in a quiet window. A steady boot's housing fragments read the
-  catalog, rewrite the guard and erase functions' catalog rows, and hold no table lock
-  to their COMMIT: their one table lock is the Hearth token probe's ACCESS SHARE on
+  inside that same transaction. It takes no parent lock a steady boot does not already
+  hold (about 65 ms with plain saves in flight, the same as a steady boot; it shares
+  every boot's deadlock above), but it is the one boot that builds the tables, so roll
+  it out in a quiet window. A steady boot's housing fragments read the catalog,
+  rewrite the guard and erase functions' catalog rows, and hold no table lock to their
+  COMMIT: their one table lock is the Hearth token probe's ACCESS SHARE on
   `account_freehold_hearth`, taken and released at once, so it waits only behind an
   ACCESS EXCLUSIVE holder or request on that table. The boot waits there while it
   holds ACCESS EXCLUSIVE on `characters` and `accounts`, so DDL on that table stalls
@@ -1110,18 +1110,17 @@ For off-box safety, sync the directory to S3 occasionally:
   a housing index, a guard or trigger, or the advance token column or its CHECK): it
   holds that statement's lock on that object's table to its COMMIT and builds a
   rebuilt index or a re-added column while it holds both parents, for as long as the
-  table makes it take, so stop the other realms first and boot one in a quiet window.
-  A rebuilt unique index that meets duplicate rows fails the boot, which rolls back
-  whole, exits and is restarted, and every restart repeats the stall. Stop the realms;
-  copy the duplicate rows to an access-restricted side table before anything changes
-  (they hold account ids; drop the copy after the ruling); count them with an
-  aggregate for any ticket or log (the index name from the error, its columns from
-  `pg_indexes`, never the key values in its DETAIL); resolve them as the defect the
-  index exists to prevent, never by deleting a row just to make the build pass; then
-  boot. (The storage fragment, which is not housing, holds its own tables: some of its
-  DDL runs unprobed and holds those tables' locks to every boot's COMMIT, its probed
-  repairs make a boot a repair boot like any other, and its trigger repairs also touch
-  both parents, which the boot already holds.)
+  build takes, which grows with the table, so stop the other realms first and boot one
+  in a quiet window. A rebuilt unique index that meets duplicate rows fails the boot,
+  which rolls back whole, exits and is restarted, and every restart repeats the stall.
+  Stop the realms and change no rows: escalate with the index name from the error,
+  never the key values in its DETAIL (the boot's own statement for that index names
+  its columns; the failed build rolled back, so `pg_indexes` has no row for it). The
+  duplicates are the defect the index exists to prevent, and resolving them is a
+  ruling, never a runbook step. (The storage fragment, which is not housing, holds its
+  own tables: some of its DDL runs unprobed and holds those tables' locks to every
+  boot's COMMIT, its probed repairs make a boot a repair boot like any other, and its
+  trigger repairs also touch both parents, which the boot already holds.)
 - A CORRUPT Hearth row (a `ready_at_ms` past the database clock plus a whole cooldown,
   which only a backward database clock step or a bad row produces) is never honored. A
   read is the only detector: a row already bad when its account logs in reaches the
