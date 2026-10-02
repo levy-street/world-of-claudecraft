@@ -928,40 +928,52 @@ describe('src/sim/freehold/ source scan', () => {
     const second = guide.indexOf('SECOND, the CLIENT modules');
     expect(first, 'the server exception paragraph must be findable').toBeGreaterThan(-1);
     expect(second).toBeGreaterThan(first);
-    const paragraph = guide.slice(first, second);
+    // Whitespace collapsed, so a list the prose WRAPS onto the next line is
+    // still the list right after its name: the earlier adjacency test counted
+    // raw characters, and every wrapped list was skipped as list-less, which is
+    // how a missing `owner_key.ts` passed.
+    const paragraph = guide.slice(first, second).replace(/\s+/g, ' ');
+    const realLeaves = (importer: string) =>
+      [
+        ...new Set(
+          [
+            ...readFileSync(importer, 'utf8').matchAll(
+              /from '[./]*\/src\/sim\/freehold\/([a-z_]+)'/g,
+            ),
+          ].map((m) => m[1]),
+        ),
+      ].sort();
+    // The ONE importer the paragraph describes in prose rather than with a
+    // list, and the prose says which leaf: held to that claim instead.
+    const PROSE = new Map([['server/game.ts', ['gate_rules']]]);
     let checked = 0;
     for (const importer of importers) {
-      const at = paragraph.indexOf(`\`${importer}\``);
-      if (at < 0) continue;
-      const open = paragraph.indexOf('(', at);
-      // `server/game.ts` is described in prose because it reaches one leaf, so a
-      // list that is not adjacent belongs to a LATER importer and is not its own.
-      if (open < 0 || open - at > `\`${importer}\``.length + 2) continue;
-      const close = paragraph.indexOf(')', open);
-      const claimed = new Set(
-        [...paragraph.slice(open, close).matchAll(/`([a-z_]+)\.ts`/g)].map((m) => m[1]),
+      const name = `\`${importer}\``;
+      const at = paragraph.indexOf(name);
+      expect(at, `${importer} is not named in the server exception paragraph`).toBeGreaterThan(-1);
+      const after = paragraph.slice(at + name.length);
+      const prose = PROSE.get(importer);
+      if (prose) {
+        expect(after.startsWith(' ('), `${importer} is described in prose`).toBe(false);
+        expect(realLeaves(importer), `${importer} reaches more than its prose says`).toEqual(prose);
+        continue;
+      }
+      // No skip: every other importer carries its list right after its name.
+      expect(after.startsWith(' ('), `${importer} must carry its leaf list after its name`).toBe(
+        true,
       );
-      const real = new Set(
-        [
-          ...readFileSync(importer, 'utf8').matchAll(
-            /from '[./]*\/src\/sim\/freehold\/([a-z_]+)'/g,
-          ),
-        ].map((m) => m[1]),
+      const close = after.indexOf(')');
+      expect(close, `${importer}'s leaf list is never closed`).toBeGreaterThan(0);
+      const claimed = [
+        ...new Set([...after.slice(0, close).matchAll(/`([a-z_]+)\.ts`/g)].map((m) => m[1])),
+      ].sort();
+      expect(claimed, `${importer}: the guide's leaf list against its real imports`).toEqual(
+        realLeaves(importer),
       );
-      for (const leaf of claimed)
-        expect([...real], `${importer} is credited with ${leaf}.ts it does not import`).toContain(
-          leaf,
-        );
-      for (const leaf of real)
-        expect([...claimed], `${importer} imports ${leaf}.ts and the guide omits it`).toContain(
-          leaf,
-        );
       checked += 1;
     }
-    // AND IT ACTUALLY CHECKED SOMETHING. Every guard above is a `continue`, so
-    // without this the whole loop is one silent skip away from vacuous, which is
-    // how its first cut passed over the defect it exists for.
-    expect(checked, 'no importer leaf list was compared').toBeGreaterThan(4);
+    // Every importer was compared: a list or the one prose claim, never a skip.
+    expect(checked).toBe(importers.length - PROSE.size);
   });
 
   it('carries no store or ledger-service vocabulary in any file, comments included', () => {

@@ -253,9 +253,11 @@ that shape.
   `saves` phase through the serial writers' `onWrite` observer (`serial_writer.ts`),
   and the gap BETWEEN callbacks is the `lateness` phase; both ride `woc_sim_tick_phase_seconds`
   (read `max`, never `p95`: a 30 s stall is two samples in a 60 s ring). `saves` counts
-  ONLY those two writers plus the Freeholds housing sweep (`saveFreeholds`, which bills
-  its synchronous `saveAllDirty` through the same `onSaveMs` observer): per-character
-  blobs and DB round trips are not in it, and a
+  ONLY those two writers plus two Freeholds jobs on the same flush, each billing its
+  synchronous part through the same `onSaveMs` observer: the housing sweep
+  (`saveFreeholds`, its `saveAllDirty`) and the plot-claim renewer's launch
+  (`renewGameFreeholdClaims` in `freehold_persist_wiring.ts`). Per-character blobs and
+  DB round trips are not in it, and a
   job that reports into no phase shows up as `lateness` with nothing to attribute it
   to. Rules: a new realm collection never persists as one whole-book `world_state` blob
   rewritten on the autosave cadence (the market and rift blobs are the legacy shape,

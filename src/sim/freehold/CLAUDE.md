@@ -84,7 +84,8 @@ carries an opaque plot id only.
   so nothing outside this directory may write it: the source scan in
   `tests/freehold_module.test.ts` lets only `hearth_key.ts` set it and only `state.ts`
   delete it, and refuses any other reference that is not a read, a declaration or a
-  forwarding getter (an alias, an optional chain or a bracket call). It is outside the
+  forwarding getter (an alias, an optional chain, a bracket call, a `clear()`, the map
+  passed as an argument, or the map returned from a function). It is outside the
   serialized plot, so changing tier cannot reset it; online the eviction is safe
   because the login merge reinstalls the durable clock, and offline and headless
   keys are per entity.
@@ -93,7 +94,7 @@ carries an opaque plot id only.
   admit one. The host's `freeholdKeyAdmission` answers `'admit' | 'deny' | 'pending'`
   (`FreeholdKeyAdmission`, `../types.ts`): offline and headless default `'admit'`;
   a lit realm answers from the DURABLE account cooldown through
-  `server/freehold_hearth_trip.ts` (07a): `'pending'` (silent, the server
+  `server/freehold_hearth_trip.ts`: `'pending'` (silent, the server
   re-dispatches the use once the advance commits or refuses), `'admit'` only for that
   committed re-dispatch, `'deny'` (`busy`) for anything else. An isolated ready value
   never authorizes a realm trip.
@@ -155,7 +156,7 @@ carries an opaque plot id only.
   host every leave walks the roster once (every joining player holds a
   record, bots and RL agents included, which `ctx.freeholds.size` counts);
   an owner-key to live-session-count index kept by the same two hooks is the
-  named O(1) shape for the persistence slice, which reshapes both hooks. The
+  named O(1) shape if that walk ever shows up in the leave cost. The
   server's linkdead displacement seeds the replacement BEFORE the evict of
   the displaced session runs (its leave awaits twice before removePlayer),
   and the evict is a no-op only because the sibling scan finds the new
@@ -180,10 +181,10 @@ carries an opaque plot id only.
   drop). It must stay pure: no SQL, no rng, no clock; the server owns rows.
   Retention: the map is keyed by owner and grows with every load, so the
   first `loadFreehold` caller pairs with `evictFreehold` at account or
-  character unload in the same change. That pairing landed with the
-  persistence slice: `server/freehold_persist.ts` retains on the join path and
-  releases on leave, and `releaseFreeholdOnLeave` evicts at the last
-  same-key session out. The table itself is KEEP-FOREVER and deliberately
+  character unload in the same change. Today that pairing is
+  `server/freehold_persist.ts`, which retains on the join path and releases on
+  leave, and `releaseFreeholdOnLeave`, which evicts at the last same-key session
+  out. The table itself is KEEP-FOREVER and deliberately
   absent from the swept-table list `server/main.ts` hands
   `server/retention_sweep.ts`: it is bounded at a small number of
   plots per account and never grows per event, session or day, so the reverse
@@ -199,8 +200,8 @@ carries an opaque plot id only.
   capacity), both handshake asks throwing with no loaded entry to answer for
   them, a minted name the install refuses as inadmissible, a loaded QUIESCED
   entry over a row (its replay carries no document, so the entry installs
-  nothing; a run of thrown writes no longer quiesces since R1, so its entry
-  replays its kept edits instead), or a join answer WITHHELD at install
+  nothing; a run of thrown writes does not quiesce, so its entry replays its
+  kept edits instead), or a join answer WITHHELD at install
   (`server/freehold_join_answer.ts`: nothing loaded could vouch for it).
   OFFLINE AND HEADLESS
   there is no store and no minter, so every record on those hosts carries the
@@ -216,9 +217,9 @@ carries an opaque plot id only.
   class of fork the parity gate only catches once a record exists. Carried as a
   named gate in `docs/freeholds/persistence-rollout-contract.md` section 8a.
   DETERMINISM, before anyone iterates it: `ctx.freeholds` is a `Map`, so it
-  walks in INSERTION order, and once 07 feeds it that order is host-dependent
-  (server: per-account login arrival; offline: one record; headless: whatever
-  the env seeds). Sim code that iterates the map MUST sort by owner key first.
+  walks in INSERTION order, and that order is host-dependent (server:
+  per-account login arrival; offline: one record; headless: whatever the env
+  seeds). Sim code that iterates the map MUST sort by owner key first.
   Relying on Map order forks the three hosts on one seed, and it is the kind
   of fork the parity gate only catches once a record actually exists.
 - `persisted.ts` owns the durable SHAPE and the versioned load. It is the one
@@ -260,10 +261,10 @@ carries an opaque plot id only.
   owner lands it, so a host that runs them is indistinguishable from one that
   does not.
 - `Sim` keeps thin same-named delegates for the facet (the `IWorldHousing`
-  members right after the farming block in `sim.ts`). TWELVE of the thirteen
-  delegate into this directory, the two descriptors included, so lighting those
-  at 05/08a is an edit HERE and never a growing body inside the zero-slack
-  `sim.ts` coordinator. The thirteenth, `housingNowMs`, deliberately has no
+  members right after the farming block in `sim.ts`). Every one but
+  `housingNowMs` delegates into this directory, the two descriptors included, so
+  lighting a member is an edit HERE and never a growing body inside the
+  zero-slack `sim.ts` coordinator. `housingNowMs` deliberately has no
   module counterpart: it is a one-line alias for the host clock the coordinator
   already owns, and it stays that way. If it ever needs a decision, it moves
   into this directory first rather than growing a body on the coordinator.
@@ -320,9 +321,9 @@ carries an opaque plot id only.
   The server files below reach these leaves by path, and they are ONE consumer
   split across files as the store was extracted, not separate decisions:
   `server/freehold_persist.ts` (`persisted.ts`, `state.ts`, `load_report.ts`),
-  `server/freehold_persist_wiring.ts`, the
-  composition root beside it (`persisted.ts` and `FREEHOLD_VISIT_POLICIES`
-  from `./types`), the module that came off the root:
+  `server/freehold_persist_wiring.ts` (`persisted.ts`, `types.ts` for
+  `FREEHOLD_VISIT_POLICIES`), the composition root beside it, the module that
+  came off the root:
   `server/freehold_liveness.ts` (`persisted.ts`, `state.ts`), which binds the
   store's four liveness reads to the live map for the root and the store's
   suite alike, and the modules that came off the store:
@@ -334,12 +335,13 @@ carries an opaque plot id only.
   `server/freehold_persist_types.ts` (`persisted.ts`, type-only, for the ports
   and the entry record) and `server/freehold_wire.ts`
   (`gate_rules.ts`, `types.ts`).
-  The realm's remote Hearth trip (07a) adds two more, one consumer split
-  across its core and the binding to the game pieces:
-  `server/freehold_hearth_trip.ts` (`hearth_key.ts`, type-only, for the
-  three-valued admission answer) and `server/freehold_hearth_trip_host.ts`
-  (`gate_rules.ts`, `hearth_key.ts`), which merges the durable clock forward
-  through `mergeFreeholdKeyReadyAt` and re-dispatches the use by item id.
+  The realm's remote Hearth trip is one more consumer split across its core
+  and the binding to the game pieces: `server/freehold_hearth_trip.ts`
+  (`hearth_key.ts`, type-only, for the three-valued admission answer) and
+  `server/freehold_hearth_trip_host.ts` (`gate_rules.ts`, `hearth_key.ts`,
+  `owner_key.ts`), which matches a session to the account by its owner key,
+  merges the durable clock forward through `mergeFreeholdKeyReadyAt` and
+  re-dispatches the use by item id.
   An extraction inherits the exception rather than creating one, which is why
   they are listed together; `server/freehold_revision_probe.ts` deliberately
   imports NOTHING from the sim, which is what makes it three integers and a
@@ -350,9 +352,9 @@ carries an opaque plot id only.
   putting a server-facing durable vocabulary on the surface every UI and sim
   caller reads, for one consumer, is the cost the rule above exists to avoid.
   `server/game.ts` is a by-path importer of a different kind: it
-  reaches `gate_rules.ts` only, as `server/freehold_wire.ts` does, for the one
-  item id the dark-realm gate, the jail gate and the coordinator's dispatch key
-  on, which the sim dispatches on by use type rather than by id.
+  reaches `gate_rules.ts` only, for the one item id the dark-realm gate, the
+  jail gate and the coordinator's dispatch key on, which the sim dispatches on
+  by use type rather than by id.
   SECOND, the CLIENT modules import `gate_rules.ts` by path for its value
   constants: `src/ui/hud/housing/gate_prompt_controller.ts`,
   `src/ui/hud/housing/hearth_key_tooltip.ts`, `src/game/nearby_interaction.ts`,
@@ -373,8 +375,12 @@ carries an opaque plot id only.
   refusals, the reap, the relog, the busy pool, determinism),
   `tests/freehold_offline_default.test.ts` (the default record, the dark host,
   the save, the paired evict), `tests/freehold_dev_grant.test.ts` (the
-  permission matrix, the chat arm, the one tier writer), the `freehold_claim`
-  parity scenario, `tests/freehold_state.test.ts` (the durable record: the
+  permission matrix, the chat arm, the one tier writer),
+  `tests/freehold_gate_and_key.test.ts` (the gate confirmation, the forward-only
+  durable clock merge, the remote use with its local clock and the host
+  admission), the `freehold_claim`
+  and `freehold_hearth_key` parity scenarios, `tests/freehold_state.test.ts` (the
+  durable record: the
   five load arms, the two measured byte ceilings and their fixtures, the
   save-path refusal and the writable-implies-readable property), and
   `tests/sim_context.test.ts` (the `freeholds` live view and the
