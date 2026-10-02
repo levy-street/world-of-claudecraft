@@ -2174,6 +2174,7 @@ the terminate rule needs no case for it.
   Q28R2; listed in round twenty-nine, Q29R5). L28R5 FIXED in this record (six readers; round
   twenty-seven's summary notes it (round twenty-nine, L29R2)). L28R6 FIXED `5c37d09029` (the dump
   route's statement ends any other waiter for that lock with it).
+
 ## Round twenty-nine: eight fresh readers over round twenty-eight (`a430d838ad..84ea7d4b8d`)
 
 Round twenty-nine's commits: `e8582aacc9` (DEPLOY: the sign-out runs in psql's default autocommit
@@ -3631,6 +3632,7 @@ code file is now parsed. The rest were record and comment slips.
   the dump case at its first stopped boot's read after fourteen, under the timeout. A mutant that
   drops the cancel passes by construction, since no boot hangs on a green run; H44R1's probe shows
   what the cancel does.
+
 ## Round forty-five: eight fresh readers over round forty-four (`43b0bfc152..8d54e1f9b3`)
 
 Round forty-five's commits: `bbd3b6e4cf` (a section L case pins that `settled` returns what its
@@ -3686,16 +3688,16 @@ written twice, a local papercut, a comment and record slips.
   section L takes the key through it, from round forty-six, C46R1). T45R3 FIXED in this record
   (round forty-four's intro says no failure path stacks past the case's timeout, and that six slow
   boots in the lock order case (named so in round forty-six, L46R6) could still sum past it,
-  failing as a timeout; `5aa9f3730d`'s body stays as it is; the ledger's ROUND FORTY-FOUR says so
-  too (worded so in round forty-seven, L47R3), from round forty-six, Q46R3). T45R4 FIXED
-  `bbd3b6e4cf` (`bootBehind`'s comment says the boot must settle within ten seconds of the hold's
-  release and finish unless `mayFail`, and is read for a second after a failure, to end it;
-  C44R4's disposition notes it, named so in round forty-six, Q46R4; a second of cancels after that
-  read, from round forty-six, Q46R7). T45R5 FIXED `bbd3b6e4cf` (the unit suite reads the pg suite
-  with the TypeScript parser and pins section L's calls of `ensureSchema` to exactly one, inside
-  `startBoot`; a call by another name is outside the read). T45R6 FIXED `bbd3b6e4cf` (the bot file
-  list must equal a second listing of the whole `bot` directory filtered to the code extensions,
-  beside the three named files).
+  failing as a timeout; `5aa9f3730d`'s body stays as it is; the ledger's ROUND FORTY-FOUR says no
+  failure path stacks past it too (worded so in round forty-seven, L47R3, and round forty-eight,
+  C48R5), from round forty-six, Q46R3). T45R4 FIXED `bbd3b6e4cf` (`bootBehind`'s comment says the
+  boot must settle within ten seconds of the hold's release and finish unless `mayFail`, and is
+  read for a second after a failure, to end it; C44R4's disposition notes it, named so in round
+  forty-six, Q46R4; a second of cancels after that read, from round forty-six, Q46R7). T45R5 FIXED
+  `bbd3b6e4cf` (the unit suite reads the pg suite with the TypeScript parser and pins section L's
+  calls of `ensureSchema` to exactly one, inside `startBoot`; a call by another name is outside
+  the read). T45R6 FIXED `bbd3b6e4cf` (the bot file list must equal a second listing of the whole
+  `bot` directory filtered to the code extensions, beside the three named files).
 - L45R1 FIXED (see H45R1). L45R2 FIXED (see Q45R3).
 - M45R1 FIXED (see H45R1).
 - Mutants on this round's new guards, each killed and its source restored: a boot started outside
@@ -3763,15 +3765,17 @@ each reworded.
 - T46R1 FIXED (see C46R2). T46R2 FIXED `0aa155dbc3` (`settled` takes the cancel's grace as a
   parameter, a second by default, and the first case pins that work which never settles is let go
   after its cancels (worded so in round forty-seven, C47R2), so a loop without its time bound
-  hangs the case; the grace's value pinned by a count of its cancels and its default by the unit
-  suite, from round forty-seven, C47R2). T46R3 FIXED `0aa155dbc3` (with M46R2: the unit suite pins
-  what takes each `startBoot` result, three assignments and one `settled` call, and every
-  `settled` call in section L with its arguments as written, so a boot whose `startBoot` or
-  `settled` call changes fails until reviewed (worded so in round forty-seven, Q47R1); every read
-  of a boot's name pinned whole, from round forty-seven, Q47R1). T46R4 FIXED (see Q46R1). T46R5
-  FIXED `0aa155dbc3` (with L46R8: the pin's comment names a call through element access, .call or
-  .apply as outside its read; every other mention of `startBoot` pinned to its declaration, so the
-  boundary now names only `ensureSchema`, from round forty-seven, C47R1). T46R6 FIXED (see Q46R7).
+  hangs the case; the grace bounded by a count of its cancels and its default pinned as written by
+  the unit suite (worded so in round forty-eight, T48R1), from round forty-seven, C47R2). T46R3
+  FIXED `0aa155dbc3` (with M46R2: the unit suite pins what takes each `startBoot` result, three
+  assignments and one `settled` call, and every `settled` call in section L with its arguments as
+  written, so a boot whose `startBoot` or `settled` call changes fails until reviewed (worded so
+  in round forty-seven, Q47R1); every read of a boot's name pinned whole, from round forty-seven,
+  Q47R1). T46R4 FIXED (see Q46R1). T46R5 FIXED `0aa155dbc3` (with L46R8: the pin's comment names a
+  call through element access, .call or .apply as outside its read; every other mention of
+  `startBoot` pinned to its declaration, so the boundary now names only `ensureSchema`, from round
+  forty-seven, C47R1; stated as which calls are read, from round forty-eight, C48R4). T46R6 FIXED
+  (see Q46R7).
 - L46R1 FIXED (see Q46R5). L46R2 FIXED (see Q46R1). L46R3 FIXED (see Q46R3). L46R4 FIXED (see
   Q46R2). L46R5 FIXED in this record (C45R2 says its fix is in the ledger). L46R6 FIXED in this
   record (round forty-four's intro and T45R3 name the lock order case, the section's first case
@@ -3818,35 +3822,42 @@ cancel's grace unpinned beyond the loop ending; the first case now counts the ca
 grace sends, and the unit suite pins the default. Three found a bot file whose name does not
 decode dropping from both listings; only what git reports deleted is skipped now, so such a name
 fails closed. The rest were a comment on the read after the cancels, an operator the readers pin
-did not check, record wording and two commit bodies.
+did not check, record wording and two commit bodies, and two readings ruled, Q47R6 and L47R5
+(named so in round forty-eight, Q48R4).
 
 - C47R1 FIXED `0cf1e2f6f9` (with Q47R4 and T47R2: the readers pin counts a binary expression as an
   assignment only when its operator is `=`, and every mention of `startBoot` in section L other
   than a call is pinned to be its declaration, so a boot started through another reference fails;
   T46R5's disposition notes it). C47R2 FIXED `0cf1e2f6f9` (with Q47R5 and T47R1: the first case
   counts the cancels a 300 ms grace sends, two or three, each followed by a 100 ms read, so a
-  grace ignored or taken from the deadline fails; the unit suite pins `settled`'s parameters as
-  written, its one-second default among them; the ledger's ROUND FORTY-SIX says the loop's time
-  bound is what round forty-six pinned; T46R2's disposition notes it). C47R3 FIXED `0cf1e2f6f9`
-  (with D47R1, H47R1, L47R4 and M47R1: `bootBehind`'s comment says a boot still waiting after a
-  failure's read has its cancel sent for up to a second more, each cancel followed by a read of at
-  most 100 ms).
+  grace ignored for a second or taken from the deadline fails (worded so in round forty-eight,
+  T48R1); the unit suite pins `settled`'s parameters as written, its one-second default among
+  them; the ledger's ROUND FORTY-SIX says the loop's time bound is what round forty-six pinned;
+  T46R2's disposition says the first case lets go of such work after its cancels, and notes it
+  (named so in round forty-eight, L48R5); `settled` read whole, so the grace's use and the read
+  after each cancel are pinned as written, from round forty-eight, T48R1, and a 250 ms grace,
+  H48R1). C47R3 FIXED `0cf1e2f6f9` (with D47R1, H47R1, L47R4 and M47R1: `bootBehind`'s comment
+  says a boot still waiting after a failure's read has its cancel sent for up to a second more,
+  each cancel followed by a read of at most 100 ms).
 - Q47R1 FIXED `0cf1e2f6f9` (with L47R1: the dump case's later boots are named `secondBoot` and
   `thirdBoot`, and the unit suite pins every read of `boot`, `secondBoot`, `thirdBoot` and `work`
   in section L by the expression it sits in, so a boot read beside or instead of `settled` fails
-  until reviewed; the pin's comment says so; T46R3's disposition notes it). Q47R2 FIXED in this
-  record (round forty-six's summary says the literals became the constant with no pin reading for
-  one; `f198465d44`'s body, which says now pinned, stays as it is). Q47R3 FIXED in this record
-  (`0aa155dbc3`'s subject says every boot read is pinned and its body that the cancel lets go of a
-  boot that never settles, where the case's work is no boot and `settled`'s bound lets it go; both
-  stay as they are). Q47R4 FIXED (see C47R1). Q47R5 FIXED (see C47R2). Q47R6 RULED, no change:
-  round forty-four's intro describes `5aa9f3730d`, whose `settled` sent one cancel and then read
-  for a second; the repeated cancels came in `bbd3b6e4cf`, which round forty-five's record
-  describes.
+  until reviewed; the pin's comment says so; T46R3's disposition says a boot whose `startBoot` or
+  `settled` call changes fails until reviewed, and notes it (named so in round forty-eight,
+  L48R5); every `during` callback's parameters pinned, so a boot handed to one is named `boot`,
+  from round forty-eight, C48R1). Q47R2 FIXED in this record (round forty-six's summary says the
+  literals became the constant with no pin reading for one; `f198465d44`'s body, which says now
+  pinned, stays as it is). Q47R3 FIXED in this record (`0aa155dbc3`'s subject says every boot read
+  is pinned and its body that the cancel lets go of a boot that never settles, where the case's
+  work is no boot and `settled`'s bound lets it go; both stay as they are). Q47R4 FIXED (see
+  C47R1). Q47R5 FIXED (see C47R2). Q47R6 RULED, no change: round forty-four's intro describes
+  `5aa9f3730d`, whose `settled` sent one cancel and then read for a second; the repeated cancels
+  came in `bbd3b6e4cf`, which round forty-five's record describes.
 - H47R1 FIXED (see C47R3). H47R2 FIXED `0cf1e2f6f9` (with S47R1 and T47R3: each bot listing skips
   only what `git ls-files -z --deleted` reports, so a tracked name that does not decode is kept
   and fails at the parse, as a tracked `bot/` file whose name is not UTF-8 did, rather than
-  dropping from both; C46R2's disposition notes it).
+  dropping from both; C46R2's disposition notes it; read as raw bytes, from round forty-eight,
+  S48R1, and each skipped name checked missing from disk, T48R2).
 - S47R1 FIXED (see H47R2).
 - D47R1 FIXED (see C47R3).
 - T47R1 FIXED (see C47R2). T47R2 FIXED (see C47R1). T47R3 FIXED (see H47R2). T47R4 FIXED in this
@@ -3865,3 +3876,76 @@ did not check, record wording and two commit bodies.
   and, with intent-to-add files removed after, a tracked bot file named `bot/naïve_feed.ts`
   holding a route no other grep reads, which the route pin lists, and one whose name is not UTF-8,
   which fails at the parse.
+
+## Round forty-eight: eight fresh readers over round forty-seven (`f198465d44..a9114ed955`)
+
+Round forty-eight's commits: `75daea653c` (the unit suite reads section L's lock key, lock filter,
+`startBoot` and `settled` whole, comments dropped, and pins every mention of `during` by where it
+sits and each callback passed as one by its parameters; the boundary comment states which calls of
+`ensureSchema` are read; the first case checks that each counted call is the cancel and uses a
+250 ms grace; the bot listings are read as raw bytes, check that each skipped name is missing from
+disk, and take `.tsx` and `.jsx` files; the pg Cost header remeasured, 13.9 s; the manifest's
+forty-eighth entry; kept whole for bisect), and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C48R1 to C48R5 |
+| qa-checklist | PASS | Q48R1 to Q48R4 |
+| server hot path | PASS | H48R1 |
+| privacy and security | PASS | S48R1, S48R2 |
+| database performance | PASS | D48R1 |
+| test coverage | PASS | T48R1 to T48R3 |
+| docs librarian | PASS | L48R1 to L48R6 |
+| migration safety | PASS | M48R1 |
+
+23 findings: none blocking, 5 should-fix (C48R1, Q48R1, T48R1, L48R1, L48R2), 18 nice-to-have,
+every reader passing, and four (server hot path, privacy and security, database performance,
+migration safety) with no should-fix. Five readers found that a `during` callback could take the
+boot under a name the reads pin does not list; every `during` callback's parameters are now
+pinned. One found `settled`'s use of the grace and its read after each cancel held only to a band
+by the count, and one its cancel statement unpinned; the section's lock key, lock filter,
+`startBoot` and `settled` are now read whole. Two found the boundary comment no longer naming
+every call of `ensureSchema` it misses; it now states which calls are read. The rest were the
+listings' decoding, deleted-file and JSX edges, a grace on a timer's edge, record wording, two
+dropped blank lines and two commit bodies.
+
+- C48R1 FIXED `75daea653c` (with Q48R1, T48R3, L48R1 and M48R1: the unit suite pins every mention
+  of `during` in section L by where it sits, and each callback passed as one by its parameters as
+  written, so a boot handed to a callback under a name other than `boot` fails until reviewed; the
+  pin block's comment says so; `0cf1e2f6f9`'s body, which says a boot read beside or instead of
+  `settled` fails until reviewed, stays as it is; Q47R1's disposition notes it). C48R2 FIXED in
+  this record (with Q48R2 and L48R4: the blank line before round forty-five's heading is back, and
+  before round twenty-nine's, which the same rewrap fault had dropped). C48R3 FIXED in the ledger
+  (with Q48R3 and L48R3: its ROUND FORTY-SEVEN names the operator the readers pin did not check;
+  `a9114ed955`'s body, which leaves it out, stays as it is). C48R4 FIXED `75daea653c` (with L48R2:
+  the pin block's comment says only a call written `ensureSchema(...)` or `x.ensureSchema(...)` is
+  read; T46R5's disposition notes it). C48R5 FIXED in this record (with L48R6: T45R3 says the
+  ledger's ROUND FORTY-FOUR says no failure path stacks past the timeout).
+- Q48R1 FIXED (see C48R1). Q48R2 FIXED (see C48R2). Q48R3 FIXED (see C48R3). Q48R4 FIXED in this
+  record (round forty-seven's summary names its two rulings).
+- H48R1 FIXED `75daea653c` (the first case's grace is 250 ms, so its third read always ends past
+  it and a fourth cancel cannot start, whatever a timer's millisecond edge; the count stays two or
+  three; C47R2's disposition notes it).
+- S48R1 FIXED `75daea653c` (each bot listing is read as raw bytes and compared before decoding, so
+  two names that decode alike stay apart; H47R2's disposition notes it). S48R2 FIXED `75daea653c`
+  (the bot pathspecs and the second listing's filter take `.tsx` and `.jsx` files, which the bot's
+  bundler resolves; a tracked `bot/feed.tsx` holding a route is listed by the route pin).
+- D48R1 FIXED `75daea653c` (the first case checks that each counted call is the cancel of the
+  schema lock's sessions, statement and key as `settled` sends them).
+- T48R1 FIXED `75daea653c` (the unit suite reads the section's lock key, lock filter, `startBoot`
+  and `settled` whole, comments dropped, so the grace's use, the read after each cancel and the
+  cancel statement are pinned as written; C47R2's and T46R2's dispositions say what the count
+  bounds; C47R2's disposition notes it). T48R2 FIXED `75daea653c` (every name a listing skips is
+  checked missing from disk, so a listing that skips anything else fails; H47R2's disposition
+  notes it). T48R3 FIXED (see C48R1).
+- L48R1 FIXED (see C48R1). L48R2 FIXED (see C48R4). L48R3 FIXED (see C48R3). L48R4 FIXED (see
+  C48R2). L48R5 FIXED in this record (C47R2 and Q47R1 say how they reworded T46R2 and T46R3).
+  L48R6 FIXED (see C48R5).
+- M48R1 FIXED (see C48R1).
+- Mutants on this round's new guards, each killed and its source restored: a `during` callback
+  taking the boot under another name, at the `during` pin; the grace halved, the read after each
+  cancel lengthened, and the cancel made a terminate, each at the whole read of `settled`, the
+  last also at the first case's check of each counted call; `--modified` listed for `--deleted`
+  with a bot file edited, at the check that each skipped name is missing from disk; and a tracked
+  `bot/feed.tsx` holding a route, added with intent-to-add and removed after, which the route pin
+  lists.

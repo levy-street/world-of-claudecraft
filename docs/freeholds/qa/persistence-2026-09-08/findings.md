@@ -5860,8 +5860,15 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - ROUND FORTY-SEVEN, eight fresh readers over round forty-six: 23 findings, none blocking, 3
   should-fix, every reader passing, five with no should-fix. Every read of a section L boot's name
   and `settled`'s parameters are pinned whole, the cancels a grace sends are counted, and a bot
-  file whose name does not decode fails closed; the rest were a comment, record wording and two
-  commit bodies. Fixed in `0cf1e2f6f9`.
+  file whose name does not decode fails closed; the rest were a comment, an operator the readers
+  pin did not check, record wording and two commit bodies (worded so in round forty-eight, C48R3).
+  Fixed in `0cf1e2f6f9`.
+- ROUND FORTY-EIGHT, eight fresh readers over round forty-seven: 23 findings, none blocking, 5
+  should-fix, every reader passing, four with no should-fix. Section L's boot helpers are read
+  whole and every `during` callback's parameters pinned, so a boot handed to one under another
+  name fails until reviewed; the cancel count checks each statement; the bot listings compare raw
+  bytes, check what they skip and take JSX files; the rest were record wording, two dropped blank
+  lines and two commit bodies. Fixed in `75daea653c`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5893,7 +5900,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then 647,
   then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then
   648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648,
-  then 648, then 648, then 648, then 649, then 649, then 649 passed, never a skip.
+  then 648, then 648, then 648, then 649, then 649, then 649, then 649 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
