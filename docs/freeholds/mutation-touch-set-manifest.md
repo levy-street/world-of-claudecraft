@@ -529,12 +529,16 @@ CONFLICT (operation_id) DO NOTHING RETURNING` · C. Answers `prepared`, `duplica
 id and fingerprint, still open), `closed` (a receipt holds the id with the SAME
 fingerprint, with its outcome), `conflict` (same id, different fingerprint, open or
 closed: a closed id never reports "applied" for a different request; and ANOTHER account's
-id, open or closed, whatever its fingerprint) or `capacity`. A close never tells a caller
-that an id it does not own exists either: with no open intent, only the caller's own
-receipt answers `already_closed`, any other `missing`. The id itself must not be a
-cross-account handle: 08, which registers the first kind, mints ids server-side and
-crypto-random, or keys them by account, never accepting a client-chosen one (a client could
-otherwise take an id another account will use and leave it `conflict` forever).
+id, open or closed, whatever its fingerprint) or `capacity`. With no open intent, a close
+answers `already_closed` only for the caller's own receipt and `missing` for any other.
+These answers still tell an id that exists from one that does not (the prepare's
+`conflict` against `prepared`, the close's `account` for another account's open intent),
+because `operation_id` is unique across accounts, so they are SERVER-SIDE DIAGNOSTICS: the
+id itself must never be a cross-account handle, and they must collapse to one
+indistinguishable refusal before any client-visible surface. 08, which registers the first
+kind, mints ids server-side and crypto-random, or keys them by account, and never accepts a
+client-chosen one (a client could otherwise probe for another account's ids, or take an id
+another account will use and leave it `conflict` forever).
 
 **P8. Operation apply** (a hook participant inside P1; the intent's account is a declared
 account participant, so it was locked at G1): G5b · G6 `SELECT ... FROM
@@ -650,16 +654,17 @@ transaction with no `lock_timeout`. It takes no parent lock a steady-state boot 
 (above): every boot queues behind each in-flight `characters` and `accounts` writer on the
 running fleet, and every later save and account write on every realm queues behind the
 boot until its COMMIT (measured with an old realm serving: about 65 ms for the first
-rollout, the same as a steady-state boot). ANY boot can DEADLOCK with a transaction that
-holds any lock on `accounts` and then asks for one on `characters`, which is this
-manifest's own G1-then-G2 order: every effect-carrying or hooked save (the Hearth trip
-included), the operation prepare and the character delete. A second path: the boot's first
-`characters` lock is SHARE (the core `characters_account` index create), upgraded to ACCESS
-EXCLUSIVE by the next statement, against a save that took its G2 row lock beside it. With
-G1-shaped saves in flight the bench's boot was the victim every time, and a boot that loses
-exits and is restarted (R-11). Do the first rollout, any trigger repair boot, and any boot
-beside other realms serving such saves, in a quiet window; `DEPLOY.md` carries the operator
-note.
+rollout with plain saves in flight, the same as a steady-state boot). ANY boot can DEADLOCK
+on two paths. The UPGRADE path, one table: the boot's first `characters` lock is SHARE (the
+core `characters_account` index create), upgraded to ACCESS EXCLUSIVE by the next statement,
+against a save that took its G2 row lock beside that SHARE and then UPDATEs. The ORDER path,
+two tables: a transaction that holds any lock on `accounts` and then asks for one on
+`characters`, this manifest's own G1-then-G2 order (every effect-carrying or hooked save, the
+Hearth trip's included, the operation prepare and the character delete), against the boot's
+`characters`-then-`accounts` order. With G1-shaped saves in flight every bench boot was
+eventually aborted and saves were aborted beside it, and a boot that loses exits and is
+restarted (R-11). Do the first rollout, any trigger repair boot, and any boot beside other
+realms serving such saves, in a quiet window; `DEPLOY.md` carries the operator note.
 
 ## 6. Pairwise deadlock review
 
@@ -1064,17 +1069,34 @@ merge in a `finally`; N4 the server default pin; N5 the log pin; N6 the 15 route
   3,600,000 ms cooldown. Deliberate: one epoch per entry keeps the counters and the
   cooldown judgment consistent, and the corrupt test already reads `clock_timestamp()`.
 
-- R-11 (revision 6, the QA): ANY boot can deadlock with a transaction that locks `accounts`
-  before `characters` (P12), and with effect-carrying or hooked saves in flight the boot is
-  the side PostgreSQL aborts, so the realm exits and is restarted. It predates housing (the
-  core schema's lock order against the storage and ledger saves' G1 order); 07a adds the
+- R-11 (revision 6, the QA): ANY boot can deadlock on the two paths P12 names (the boot's
+  SHARE-then-upgrade on `characters`, and its `characters`-then-`accounts` order against a
+  transaction that locks `accounts` first). With effect-carrying or hooked saves in flight,
+  every bench boot was eventually aborted, so the realm exits and is restarted, and saves on
+  the serving realms were aborted beside it (a save is written again by the next autosave;
+  a Hearth trip counts `trip_failed` and the player presses again). It predates housing (the
+  core schema's boot against the storage and ledger saves' G1 and G2 order); 07a adds the
   Hearth trip's hooked save to the class. Bounded only operationally (boot beside quiet
-  realms); changing the boot's lock order is owed to the maintainer.
+  realms). Owed to the maintainer, both halves: remove the boot's lock upgrade on
+  `characters` (probe the core `characters_account` index the way the housing indexes are
+  probed, or take ACCESS EXCLUSIVE on `characters` first), and change the boot's table order
+  (which would expose a character INSERT's `characters`-then-`accounts` foreign-key order
+  instead).
 - R-12 (revision 6, the QA): at shutdown the drain stops awaiting a P2 write blocked on a
   claim row a trip holds, but that statement keeps its pool client for up to the pool's
-  15 s statement default; at the drain's concurrency of 8 on a 10-client pool that can
-  leave two clients for the renewer stop, the claim release and the lease release, each of
-  which has its own bound and none of which can then over-run it.
+  statement default. The drain admits `FREEHOLD_PERSIST_DRAIN_MAX_ACTIVE_WRITES` plus
+  `FREEHOLD_PERSIST_LEAVE_WRITE_RESERVE` for a leave write, which together can fill
+  `DB_POOL_MAX_CLIENTS`, and the blocking trip, a renew chunk or a login read may hold one
+  more, so the steps after the drain can find NO free client. Each has its own bound and
+  none over-runs it, but the claim release and the lease release can then fail their
+  checkout and fall back to expiry: another realm's takeover waits up to the lease TTL rather
+  than getting an immediate release.
+- R-13 (revision 6, the QA): the renewer stop's wall ends a renew chunk on the CLIENT side
+  only. A chunk already at its COMMIT, or whose backend has not yet seen its socket close,
+  can still commit after the shutdown release-all passed its locked rows (SKIP LOCKED), which
+  keeps at most one renew chunk of plots (`FREEHOLD_CLAIM_RENEW_CHUNK`) claimed for at most
+  one lease TTL: the crash bound. A chunk that had not reached its statement is cut at its
+  checkout or sends no renewal.
 
 ## 13. The persistence-rollout contract edits this work owes
 
@@ -1180,7 +1202,7 @@ other finding is applied or recorded here.
 ## 16. What the QA of the built code refined (revision 6)
 
 The 07a QA (2026-10-01) read `0008427d14..11316ac3cd` with fresh domain reviewers and fixed
-in the code what they found. Every finding of both rounds, with what became of it (fixed
+in the code what they found. Every finding of each round, with what became of it (fixed
 with its commit, ruled, residual or flagged for the maintainer), is in
 [qa/mutation-2026-09-30/qa-findings.md](qa/mutation-2026-09-30/qa-findings.md), and the
 run's record in the 07a QA section of `docs/freeholds/qa/persistence-2026-09-08/findings.md`.
@@ -1204,8 +1226,9 @@ What changed the contract above:
   steps are caught and counted; its ticket is bound to the character and the lease nonce.
 - The renewer bills its synchronous launch to the profiler's `saves` bucket (p99 4 ms at
   5,000 claims, measured), stops before the shutdown release (bounded by one renew chunk's
-  wall, `FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs`, and a chunk that reaches its connection after
-  the stop sends nothing), and lock timeouts in a fenced write, a renew chunk or a release
+  wall, `FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs`; a chunk still at its checkout is cut there and
+  one that got its connection sends no renewal; R-13 is the one case left), and lock
+  timeouts in a fenced write, a renew chunk or a release
   chunk are counted; the login's busy arm is 55P03 only, counted with busy in one place
   (P4).
 - The fragments' DDL path names no `pg_catalog`, so a same-named decoy in the target schema
@@ -1235,3 +1258,12 @@ What changed the contract above:
   beside `housingStats` would buy nothing. The storage fragment still names `pg_catalog`
   second (its decoy exposure is owed against that fragment, not changed here). R-11 and
   R-12 are new.
+- A third round of eight fresh readers refined it again: the lost-claim re-read joins a read
+  already in flight instead of replaying the stale entry (its predicate is now a pure
+  function, `freeholdRereadsLostClaim`, tested clause by clause); a reload after a retryable
+  hold keeps a proved Hearth clock; the trip's identity check compares the session's
+  character and lease nonce as they were when the trip started; the live apply and its
+  report are one binding (`live: { apply, threw }`); the renewer stop cuts a chunk parked at
+  its checkout; the Hearth token probe warns on a same-named constraint that is not a CHECK.
+  The boot deadlock was re-measured on true steady-state boots and found to have two paths
+  (P12, R-11), and R-13 is new.

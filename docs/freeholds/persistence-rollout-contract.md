@@ -721,16 +721,19 @@ but EVERY boot already holds both under ACCESS EXCLUSIVE from the core schema's 
 `ADD COLUMN IF NOT EXISTS` statements to its COMMIT, so the housing DDL adds no wait:
 every boot queues behind every in-flight character save and account write, and every
 one that arrives after it queues behind the boot until that COMMIT. Measured with an old
-realm serving, the first rollout took about 65 ms, the same as a steady-state boot. ANY
-boot can DEADLOCK with a transaction that holds any lock on `accounts` and then asks for
-one on `characters`, which is the order every effect-carrying or hooked character save
-takes (the touch-set manifest's G1 then G2, the Hearth trip's save included), and the
-operation prepare's and the character delete's. With such saves in flight the bench's
-boot was the side PostgreSQL aborted every time, and a boot that loses exits and is
-restarted (the manifest's R-11): a hazard of the core schema's lock order that predates
-housing (`docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md`), to which 07a adds
-members. The first rollout is the one boot that also builds the tables: do it, and any
-boot beside other realms serving those saves, in a quiet window.
+realm serving plain saves, the first rollout took about 65 ms, the same as a steady-state
+boot. ANY boot can DEADLOCK on two paths (the touch-set manifest's P12 and R-11): the
+boot's SHARE lock on `characters` upgraded to ACCESS EXCLUSIVE, against a save that
+row-locked a `characters` row beside it and then writes it; and the boot's
+`characters`-then-`accounts` order, against a transaction that locks `accounts` first. Every
+effect-carrying or hooked character save (the manifest's G1 then G2, the Hearth trip's save
+included) takes both shapes, and the operation prepare and the character delete take the
+second. With such saves in flight every bench boot was eventually aborted, saves were
+aborted beside it, and a boot that loses exits and is restarted: a hazard of the core
+schema's boot that predates housing
+(`docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md`), to which 07a adds members.
+The first rollout is the one boot that also builds the tables: do it, and any boot beside
+other realms serving those saves, in a quiet window.
 
 ### The shutdown drain, and why it sits where it sits
 
@@ -753,12 +756,25 @@ the durable compare-and-set refuses a stale write rather than corrupting a good 
 The drain never throws; a missed deadline logs one line and the shutdown continues.
 
 THE RENEWER STOP comes first in that slot: `stopFreeholdClaimRenewer` starts no pass
-again, stops the running one before its next chunk, makes a chunk that reaches its
-connection after the stop send nothing, and resolves once that pass settles or one
-chunk's wall (`FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs`, 5,000 ms) passes, so no renewal
-outlives the release. The housing tail of the shutdown is therefore at most the drain's
-10,000 ms, the stop's 5,000 ms and the release's 2,000 ms, well inside the game
-container's 75 s kill grace (`stop_grace_period` in `docker-compose.yml`).
+again, stops the running one before its next chunk, cuts a chunk still parked at its pool
+checkout, makes one that got its connection send no renewal (only its BEGIN, rolled back),
+and resolves once that pass settles or one chunk's wall
+(`FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs`, 5,000 ms) passes. So no renewal that had not
+reached its COMMIT outlives the release; one already at its COMMIT when the wall cuts it
+client side can still land after the release-all passed its rows, which keeps at most one
+renew chunk of plots claimed for at most one lease TTL (the manifest's R-13, the crash
+bound).
+
+THE SHUTDOWN BUDGET is the whole serial chain in `server/main.ts`, not the housing tail
+alone: after the shutdown save flush (the character, market, mail, rift and housing saves),
+the bounded drains run one after another, the bank ledger's
+(`BANK_LEDGER_SHUTDOWN_DRAIN_MS`, 10,000 ms), the market sold volume's
+(`MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS`, 10,000 ms), the housing drain
+(`FREEHOLD_PERSIST_SHUTDOWN_DRAIN_MS`, 10,000 ms), the unstuck records'
+(`UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS`, 5,000 ms), the renewer stop (5,000 ms) and the claim
+release (`FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS`, 2,000 ms): 42 s of bounded drains after
+the save flush, inside the game container's 75 s kill grace (`stop_grace_period` in
+`docker-compose.yml`). A new shutdown drain spends from what is left after all of them.
 
 THE CLAIM RELEASE (07a) sits in the same closure, AFTER `freeholdPersistIdle` and BEFORE
 `releaseAllCharacterLeases`: `releaseAllFreeholdClaims({ pool, holder:

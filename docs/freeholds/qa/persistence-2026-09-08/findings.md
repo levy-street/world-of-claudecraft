@@ -5529,7 +5529,7 @@ scan, which rounds 41 to 43 settled.
 
 ### OWED, NOT CLAIMED
 
-- The paired QA, `phase-07a-qa.md`, in a fresh session.
+- The paired QA, `phase-07a-qa.md`: run 2026-10-01, the 07a QA section below.
 - The round-39 read's two optional comment tightenings, recorded rather than applied (the
   comment is accurate as written): say "an exclusion that drops any path" above the whole-listing
   count, and say that an exclusion inside the shared `git` wrapper moves both counts and is left
@@ -5553,3 +5553,87 @@ scan, which rounds 41 to 43 settled.
   monitor use a fixed verify-database name, so two runs against ONE server collide (CI runs each
   once per service); run them against separate servers.
 - Production stays disabled behind `FREEHOLDS_ENABLED`; every release gate stays unsigned.
+
+## 07a QA, 2026-10-01
+
+### THE RUN
+
+The paired QA (`docs/freeholds/phase-07a-qa.md`) ran in this checkout on `feature/freeholds`,
+scoped to the 07a implementation `0008427d14..11316ac3cd` (52 commits, 130 files); the
+AI-architecture commits `941f926251..dca9711ab6` were out of scope. Fernando's host adaptations
+governed. There is no Docker on the host, so PostgreSQL 16.14 ran in userspace on 55432 and
+55433 (database `wocc_ci`), proved by `tests/server/freehold_db.pg.test.ts` at 16 of 16 before
+any other suite. `freehold_mutation.pg` and the bank-ledger growth monitor ran against separate
+servers (they share one fixed verify-database name). A skipped pg suite was never counted: every
+run recorded its executed totals. Every finding of every round, with its disposition and
+commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-findings.md).
+
+### THE ROUNDS
+
+- ROUND ONE, twelve readers over the built code (privacy and security, server hot path, database
+  performance, migration safety, cross-platform, the test-coverage auditor, architecture, the
+  qa-checklist, a test-coverage reader, correctness, hygiene and the docs librarian): 136
+  findings (8 blocking, 38 should-fix, 90 nice-to-have, several the same defect seen twice) plus
+  12 gaps from the STEP 1 coverage matrix. The fixes landed in `c77fd01be4` through
+  `a2a969d13b`: among them a throw after a proved COMMIT now reports committed, a prepare answers
+  only its own account, the renewer bills its launch and stops before the shutdown release,
+  every new statement is plan-pinned in real PostgreSQL, and the contention, P9, renewer and
+  first-rollout benches ran.
+- ROUND TWO, eight fresh readers over that fix round: 85 findings, one blocking (the export's
+  release-in-finally pin passed with no `finally`). Fixed in `fddc60bf6c` through `54ac963ce0`.
+  The boot bench found that EVERY boot already holds `characters` and then `accounts` under
+  ACCESS EXCLUSIVE (a no-op `ADD COLUMN IF NOT EXISTS` takes it), so the first rollout adds no
+  boot lock.
+- ROUND THREE, eight fresh readers over round two: 61 findings, three blocking. The rejoin
+  predicate round two added replayed a stale entry while its lost-claim re-read was still in
+  flight (it now joins that read, and the predicate is a pure function tested clause by
+  clause); a throwing-report case could not see a double live apply; and the ledger pointers
+  named this section before it existed. The deadlock re-measured on TRUE steady-state boots has
+  two paths: the boot's SHARE-to-ACCESS-EXCLUSIVE upgrade on `characters` (no `accounts` lock
+  needed), and its `characters`-then-`accounts` order. With saves of the G1 shape in flight every
+  bench boot was eventually aborted (R-11).
+
+### WHAT IT FOUND THAT WAS NOT A COMMENT
+
+- A cross-realm lost update the round-two fix introduced and round three caught (above), with a
+  mutant that reproduces it.
+- The boot deadlock class (R-11), predating housing, with both halves of its fix owed to the
+  maintainer.
+- A renew chunk cut at COMMIT by the stop's wall can still land after the release-all (R-13, the
+  crash bound); a chunk parked at its checkout is now cut there.
+- At shutdown the housing drain can fill the whole pool, so the claim and lease releases can
+  fall back to expiry (R-12).
+- The operator's corrupt-Hearth repair could shorten a healthy cooldown if run during a database
+  clock step; DEPLOY.md now has a read-only detector first and forbids the repair during a step.
+
+### EVIDENCE
+
+- `npx tsc --noEmit` exit 0 at every round's tip.
+- Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then 641
+  passed, never a skip.
+- Mutants on each round's new guards, each killed and its source restored.
+- Benches, recorded with their scripts in
+  [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
+  - Two realms racing for 1,000 plots: no 55P03 and no 57014 on any path.
+  - The renewer at 5,000 claims beside a full autosave burst: 165 to 203 ms, no row skipped.
+  - The claimed login read on a 198,500-row claims table: p99 2.4 ms.
+  - The renewer's synchronous launch: about 4.5 ms cold, p99 near 4 ms warm.
+  - The boot deadlock under plain, G2 and G1 saves.
+
+### OWED, NOT CLAIMED
+
+- Both halves of the boot's deadlock fix (R-11), a maintainer decision.
+- A login-time clamp for a corrupt Hearth row; it needs a clock-skew margin no constant names.
+- The storage fragment still names `pg_catalog` second in its DDL path (the decoy exposure M4
+  fixed for the operation fragment).
+- The storage refusal's message in the federated cleanup carries an account id; its typed
+  id-free class belongs to the storage path.
+- A golden for the Hearth admission's pending and deny arms.
+- The receipts gauge's rate budget (08, 15).
+- The maintainer's rulings on three items:
+  - L4: widening the `saves` profiler bucket to the two Freeholds flush jobs.
+  - L13: whether THE LIGHTING RULING still lists remote-key authority as unsigned.
+  - The remaining delivery labels in code comments.
+- The `.npmrc` pin is a maintainer decision. Recommendation: a content rule in the malware scan,
+  pinned in `tests/malware_scan.test.ts`, refusing any `node-options`, `registry` or script hook
+  line in `.npmrc`. That is cheaper and narrower than exempting a test that reads the file.

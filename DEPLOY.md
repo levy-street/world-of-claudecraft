@@ -1069,52 +1069,67 @@ For off-box safety, sync the directory to S3 occasionally:
   statements take ACCESS EXCLUSIVE on `characters` and then `accounts` even when the
   column exists, and hold both until the boot schema transaction COMMITs (no lock
   timeout). A boot therefore queues behind every in-flight save and account write,
-  and every later one on every realm queues behind the boot (measured with a realm
-  serving: about 60 ms). ANY transaction that holds any lock on `accounts` and then
-  asks for one on `characters` can DEADLOCK with a boot, which takes them the other
-  way round: every effect-carrying or hooked character save (storage, bank ledger,
-  the Hearth trip) locks its account first, and so do the housing operation prepare
-  and the character delete. PostgreSQL aborts one side at once or after
-  `deadlock_timeout` (1 s). When such saves were in flight in the bench, the BOOT was
-  the side aborted every time: the process exits, the compose policy restarts it, and
-  a restart meets the same race while another realm keeps serving those saves. So
-  boot a realm while the other realms on its database are quiet, and expect the
-  aborted saves (40P01 in the realm log, `trip_failed` for a Hearth trip) to retry.
-  The hazard predates housing; changing the boot's lock order is owed
+  and every later one on every realm queues behind the boot (about 60 ms in the bench
+  with plain saves in flight). A boot can DEADLOCK on two paths: a transaction that
+  row-locks a `characters` row and then writes it, against the boot's SHARE lock on
+  `characters` that it upgrades to ACCESS EXCLUSIVE (the core `characters_account`
+  index create, then its first ALTER); and any transaction that holds a lock on
+  `accounts` and then asks for one on `characters`, against the boot's opposite order.
+  Every effect-carrying or hooked character save (storage, bank ledger, the Hearth
+  trip) takes both shapes, and the housing operation prepare and the character delete
+  take the second. PostgreSQL aborts one side at once or after one or more
+  `deadlock_timeout` waits (1 s each). With such saves in flight in the bench, EVERY
+  boot was eventually aborted and saves were aborted beside it: the process exits,
+  the compose policy restarts it, and a restart meets the same race while another
+  realm keeps serving those saves. So boot a realm while the other realms on its
+  database are quiet. An aborted save shows as 40P01 in the realm log and is written
+  again by the next autosave; an aborted Hearth trip counts `trip_failed` and is not
+  retried by the server (the player presses the key again). The hazard predates
+  housing; removing both paths is owed
   (docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md measures it).
 - FIRST ROLLOUT OF THE HOUSING TABLES: the first boot that carries them also creates
   the foreign-key-bearing tables and the delete guards on `accounts` and `characters`
   inside that same transaction. It takes no parent lock an ordinary boot does not
-  already hold (measured: about 65 ms with a realm serving, the same as a steady
-  boot), but it is the one boot that builds the tables, so roll it out in a quiet
-  window. A later boot's housing schema reads the catalog and rewrites the guard and
-  erase functions' catalog rows, and takes no table lock of its own; a boot that
-  REPAIRS a missing or disabled guard drops and recreates it under ACCESS EXCLUSIVE,
-  so treat a repair boot the same way.
+  already hold (about 65 ms with plain saves in flight, the same as a steady boot; it
+  shares every boot's deadlock above), but it is the one boot that builds the tables,
+  so roll it out in a quiet window. A later boot's housing schema reads the catalog
+  and rewrites the guard and erase functions' catalog rows, and takes no table lock of
+  its own; a boot that REPAIRS a missing or disabled guard drops and recreates it
+  under ACCESS EXCLUSIVE, so treat a repair boot the same way.
 - A CORRUPT Hearth row (a `ready_at_ms` past the database clock plus a whole
   cooldown, which only a backward database clock step or a bad row produces) is never
-  honored. THE QUERY IS THE DETECTOR: a row already bad when its account logs in
+  honored. A read is the only detector: a row already bad when its account logs in
   reaches the realm as an ordinary cooldown (the login installs it and the realm's
   own clock refuses the key first), so nothing counts or warns; only a key the realm
-  admits and the database then refuses counts `trip_corrupt` with a warn line. A
-  database clock step heals by itself once the clock is back within one cooldown of
-  the row (it then reads as an ordinary cooldown until `ready_at_ms`); a bad row
-  stays. Find and repair them in one guarded, idempotent statement, which clamps
-  each to a full cooldown from now and so grants no free trip: `UPDATE
-  account_freehold_hearth SET ready_at_ms = (EXTRACT(EPOCH FROM clock_timestamp()) *
-  1000)::bigint + 3600000, revision = revision + 1, updated_at = now() WHERE
-  ready_at_ms > (EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::bigint + 3600000
-  RETURNING account_id` (3,600,000 ms is `HEARTH_KEY_COOLDOWN_MS`). A repair reaches a
-  player still online only after every character of the account has left that
-  realm and the realm has dropped the entry, or after a restart: the realm's copy of
-  the clock only ever moves forward.
+  admits and the database then refuses counts `trip_corrupt` with a warn line. Find
+  them with `SELECT account_id, ready_at_ms FROM account_freehold_hearth WHERE
+  ready_at_ms > (EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::bigint + 3600000`
+  (3,600,000 ms is `HEARTH_KEY_COOLDOWN_MS`). FIRST confirm the database clock is
+  correct: a backward clock step makes healthy rows read as corrupt, and they heal by
+  themselves once the clock is back within one cooldown of them, while clamping them
+  during the step would shorten their cooldown once the clock is corrected. NEVER
+  repair during a clock step. With the clock correct, a bad row stays bad; repair
+  them in one guarded, idempotent statement, which clamps each to a full cooldown
+  from now and so grants no free trip: `UPDATE account_freehold_hearth SET
+  ready_at_ms = (EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::bigint + 3600000,
+  revision = revision + 1, updated_at = now() WHERE ready_at_ms > (EXTRACT(EPOCH FROM
+  clock_timestamp()) * 1000)::bigint + 3600000 RETURNING account_id`. The realm's
+  copy of the clock moves forward by REVISION, and the repair bumps it, so a repair
+  reaches the realm at that entry's next login read: a fresh entry once the account
+  has left the realm, a lost-claim re-read on rejoin, or a restart.
 - THE ADVANCE TOKEN CHECK: a boot that finds `account_freehold_hearth.advance_token`
-  without its named CHECK puts it back `NOT VALID` (new tokens are checked, old rows
-  are not scanned). To finish that repair, null any non-hex token (`UPDATE
-  account_freehold_hearth SET advance_token = NULL WHERE advance_token !~
-  '^[0-9a-f]{32}$'`), then run `ALTER TABLE account_freehold_hearth VALIDATE
-  CONSTRAINT account_freehold_hearth_advance_token_shape`, which takes SHARE UPDATE
-  EXCLUSIVE and does not block writes.
+  without any constraint of that name puts the CHECK back `NOT VALID` (new tokens are
+  checked, old rows are not scanned), and a same-named constraint that is not a CHECK
+  makes the boot log a WARNING instead. To finish a repair, first confirm what the
+  name holds: `SELECT contype, convalidated, pg_get_constraintdef(oid) FROM
+  pg_constraint WHERE conrelid = 'account_freehold_hearth'::regclass AND conname =
+  'account_freehold_hearth_advance_token_shape'` must show `c` and the 32-hex
+  pattern (anything else: drop it and reboot, and the boot puts the real CHECK back).
+  Then null any non-hex token (`UPDATE account_freehold_hearth SET advance_token =
+  NULL WHERE advance_token !~ '^[0-9a-f]{32}$'`), then run `ALTER TABLE
+  account_freehold_hearth VALIDATE CONSTRAINT
+  account_freehold_hearth_advance_token_shape`, which takes SHARE UPDATE EXCLUSIVE and
+  does not block writes.
 - A failed deactivation receipt erase logs `deactivation housing receipt erase
   failed` with no account id. The erase is idempotent; find the accounts to re-run
   with `SELECT DISTINCT r.account_id FROM freehold_operation_receipts r JOIN accounts
