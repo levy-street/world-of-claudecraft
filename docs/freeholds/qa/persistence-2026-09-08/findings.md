@@ -5651,26 +5651,29 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   `27261249b0` through `fae6b76048`.
 - ROUND FOURTEEN, eight fresh readers over round thirteen: 39 findings, one blocking, twelve
   should-fix. The blocking finding was round thirteen's own pool-fill sentence, which a save's
-  2 s lock timeout contradicts; it now states each bound by its setting. HOLDER may run at any
-  point and the pg suite shows it a holder, a waiter and an idle runbook session; every resend
-  is capped; the bench ranges say which boots deadlocked; and the compose grace is read line
-  by line, so no pattern can hang (its comment strip still could, corrected in round fifteen).
-  Fixed in `6a7e3cd49d` through `fe0f331dfd`.
+  2 s lock timeout contradicts; it now states each bound by its setting (the stall waits on
+  `auth_tokens`, corrected in round eighteen). HOLDER may run at any point and the pg suite
+  shows it a holder, a waiter and an idle runbook session; every resend is capped; the bench
+  ranges say which boots deadlocked; and the compose grace is read line by line, so no pattern
+  can hang (its comment strip still could, corrected in round fifteen). Fixed in `6a7e3cd49d`
+  through `fe0f331dfd`.
 - ROUND FIFTEEN, eight fresh readers over round fourteen: 45 findings, none blocking, eight
   should-fix. The bench's deadlocked boots had aborted an account-then-character transaction,
-  which the docs now name, with the account create on the order path (only while community
-  test accounts are on, corrected in round sixteen); every stuck client's bound is named and
-  read from the code; the shutdown closure's SIGTERM registration and the compose stop signal
-  are pinned; the dump wait has a measure (taken from yesterday's backup since round sixteen);
-  and the grace parse's comment strip, which could still backtrack, is a plain search. Fixed
-  in `6c91150321` through `9224b3c02e`.
+  which the docs now name, with the account create on the order path (only while community test
+  accounts are on, corrected in round sixteen); every stuck client's bound is named and read
+  from the code (the stuck clients are token statements, corrected in round eighteen); the
+  shutdown closure's SIGTERM registration and the compose stop signal are pinned; the dump wait
+  has a measure (taken from yesterday's backup since round sixteen); and the grace parse's
+  comment strip, which could still backtrack, is a plain search. Fixed in `6c91150321` through
+  `9224b3c02e`.
 - ROUND SIXTEEN, eight fresh readers over round fifteen: 48 findings, none blocking, 16
   should-fix. The dump measure read tonight's file, the one the running dump writes; it read
   yesterday's with a fixed stop, and since round seventeen the wait is a fixed window. Round
   fifteen had read the account create without its community test branch, and the docs now say
-  when it takes the order path. The signal registrations and the image's stop signal are
-  pinned whole, and each stuck client fails at its own bound. Fixed in `8661efb1c3` through
-  `b1d103a36c`.
+  when it takes the order path. The signal registrations and the image's stop signal are pinned
+  whole, and each stuck client fails at its own bound (token statements at the statement timeout
+  and other queries at the pool's acquire timeout, corrected in round eighteen). Fixed in
+  `8661efb1c3` through `b1d103a36c`.
 - ROUND SEVENTEEN, eight fresh readers over round sixteen: 39 findings, none blocking, five
   should-fix. A character create takes both deadlock paths, and the docs say so. The dump wait
   drew a new edge case for the third round and became a fixed window, pinned to the backup
@@ -5682,6 +5685,12 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   confirmed; DEPLOY now says what stalls then, from bounds read from the code. Both deadlock
   paths are stated as shapes rather than lists, and the shutdown pin also holds the compose
   file set and every server module. Fixed in `57c5db022b` through `4dfbb51a07`.
+- ROUND NINETEEN, eight fresh readers over round eighteen: 47 findings, none blocking, 13
+  should-fix. The boot's lock order is observed on the real boot rather than derived from the
+  schema text, which five readers widened by one more statement kind; the same case reads
+  every statement a boot sends and finds no lock timeout. DEPLOY's boot bullet is split by
+  concern and says what to redo after the dump: an account write whose token revoke failed.
+  Fixed in `80ee2487aa` through `2323737f77`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5702,7 +5711,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - `npx tsc --noEmit` exit 0 at every round's tip.
 - Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then
   641, then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
-  then 644, then 644, then 644, then 644, then 644, then 644 passed, never a skip.
+  then 644, then 644, then 644, then 644, then 644, then 644, then 645 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):

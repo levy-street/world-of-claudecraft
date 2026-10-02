@@ -900,7 +900,7 @@ PRINT's output allowed in a literal report, every fence pinned at any indent, an
 running HOLDER against a holder, a waiter and an idle runbook session; kept whole with its
 tests for bisect), `8c5fa7fc28` (the stuck save's real bound, in DEPLOY, and the bench's
 deadlocked boots, in DEPLOY, the contract and P12; where the bound landed corrected in round
-fifteen), `fe0f331dfd` (the test URL checked without printing it), and the commit that adds
+fifteen, and the stall, which waits on `auth_tokens`, in round nineteen, L19R4), `fe0f331dfd` (the test URL checked without printing it), and the commit that adds
 this section.
 
 | Reader | Verdict | Findings |
@@ -916,7 +916,9 @@ this section.
 
 39 findings: one blocking (D14R1), twelve should-fix (C14R1, D14R2, L14R1 to L14R3, H14R1,
 M14R1 to M14R3, T14R1 to T14R3), 26 nice-to-have. The blocking finding was round thirteen's
-own: a pool-fill sentence that a save's 2 s lock timeout contradicts. The grace parse's timed
+own: a pool-fill sentence that a save's 2 s lock timeout contradicts (behind the dump token
+statements fill the pool and no save waits on a lock, D18R1, corrected in round nineteen,
+L19R4). The grace parse's timed
 guard drew a new slow pattern for the third round, so the parse became line by line.
 
 - C14R1 FIXED `8c5fa7fc28` (with D14R1 and L14R1) (a boot behind the dump waits on
@@ -972,7 +974,8 @@ code, fixtures for each branch of the parse), `412ed5c9a1` (the dump's usual len
 the newest backup, a waiting dump row as a stop, HOLDER locking no user table, the lost
 connection route's file and count named, and the pg case keeping another database's runbook
 session out of HOLDER; kept whole with its tests for bisect), `9224b3c02e` (a write other than
-a save among the stuck clients), and the commit that adds this section.
+a save among the stuck clients; the stuck clients are token statements, corrected in round
+nineteen, L19R4), and the commit that adds this section.
 
 | Reader | Verdict | Findings |
 |---|---|---|
@@ -1042,7 +1045,8 @@ Round sixteen's commits: `8661efb1c3` (an account create on the order path only 
 community test accounts are on, a character create always, the bench's victim named by its
 shape, in DEPLOY, the contract and P12, and every stuck client failing at its own bound, in
 DEPLOY; where that bound landed, the character create's paths and the victim's name corrected
-in round seventeen), `b107b08e95` (the signal registrations pinned whole with no other mention
+in round seventeen, and the stall itself, which waits on `auth_tokens`, in round nineteen,
+L19R3), `b107b08e95` (the signal registrations pinned whole with no other mention
 of either signal, no STOPSIGNAL in the Dockerfile, the compose grace and signal read apart
 with odd keys unread, the fixture that decided nothing removed), `b1d103a36c` (the dump wait
 measured from yesterday's backup with a fixed stop, HOLDER listing every dump, the lost
@@ -1159,7 +1163,7 @@ server file.
   reads, and a base image's STOPSIGNAL is beyond what repo text can pin. H17R5 FIXED
   `95612ad273` (the block is matched across any whitespace, with a named message). H17R6 FIXED
   `95612ad273` and `c991771d8c` (with Q17R4: that match spans `\r\n`, and the `BACKUP_DIR`
-  read it named is gone).
+  read it named is gone; the second commit named in round eighteen, Q18R4).
 - S17R1 FIXED (see C17R3).
 - D17R1 FIXED (see C17R3). D17R2 FIXED `c991771d8c` (the backup script's `pg_dump` line is
   pinned and the script names no session). D17R3 FIXED `f8276ca1e9` (the evidence says its
@@ -1207,8 +1211,8 @@ checks as booleans), and the commit that adds this section.
 32 findings: one blocking (D18R1), six should-fix (C18R1, D18R2, H18R1, M18R1, Q18R1, L18R1),
 25 nice-to-have. The blocking finding was round thirteen's own: a boot behind the dump waits
 on `auth_tokens`, the core schema's first table, not on `characters`, which a lock probe
-confirmed. The deadlock lists had drawn a new member three rounds running (the account create,
-the character create, the character delete), so both paths are now stated as shapes.
+confirmed. The deadlock lists had drawn a new member or path every round since round fifteen
+(corrected in round nineteen, L19R12), so both paths are now stated as shapes.
 
 - C18R1 FIXED `57c5db022b` (with M18R1 and L18R1): the character delete takes both paths, and
   both paths are stated as shapes, the shapes deciding and the transactions named only as
@@ -1232,7 +1236,8 @@ the character create, the character delete), so both paths are now stated as sha
   statement timeout and, once a pool fills, other queries fail at the 5 s acquire timeout; the
   test reads the schema's first altered tables and both bounds from the code; the evidence
   records the probe; the record lines of rounds thirteen to seventeen that described the stall
-  are corrected in place. D18R2 FIXED `57c5db022b` (the order path is any transaction holding
+  are corrected in this record (not in `57c5db022b`, and the rest in round nineteen: Q19R1,
+  L19R3, L19R4). D18R2 FIXED `57c5db022b` (the order path is any transaction holding
   a later table and asking for an earlier one, a password reset's `accounts` then
   `auth_tokens` named; the evidence says that path is stated from the code). D18R3 FIXED (see
   Q18R1).
@@ -1249,3 +1254,89 @@ the character create, the character delete), so both paths are now stated as sha
 - M18R1 FIXED (see C18R1). M18R2 FIXED `4dfbb51a07` (the last HOLDER read decides). M18R3
   FIXED `4dfbb51a07` (a spent count stops the lost connection route). M18R4 FIXED `4dfbb51a07`
   (the bare-relation stop applies before any DROP). M18R5 FIXED in the manifest's change log.
+
+## Round nineteen: eight fresh readers over round eighteen (`897cdc04e7..c6ae5cfb2b`)
+
+Round nineteen's commits: `80ee2487aa` (the boot's locks on the parents observed on the real boot
+behind a held lock on each parent in turn, with every statement each boot sends read for a
+lock timeout), `7c7ddd961c` (DEPLOY's boot bullet split by concern: the boot queues behind any open
+transaction holding a lock it needs, only `auth_tokens` and `characters` take SHARE first, a
+row lock counts, a role or database lock timeout would still apply, a boot already behind the
+dump is stopped, and an account write whose token revoke failed is redone; the contract, P12,
+R-11 and the evidence with it; the test pinning the doc's order and bounds to the code and to
+section L, and the shutdown scans widened; kept whole with its test for bisect, since the old
+bounds case read the text it replaces), `2323737f77` (the token route's second HOLDER clause read
+plainly, the bare-relation stop pinned, and the backup script's zone screen over any zone
+word), and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C19R1 to C19R5 |
+| qa-checklist | PASS | Q19R1 to Q19R6 |
+| server hot path | PASS | H19R1 to H19R7 |
+| privacy and security | PASS | S19R1 to S19R2 |
+| database performance | PASS | D19R1 to D19R2 |
+| test coverage | PASS | T19R1 to T19R7 |
+| docs librarian | FAIL | L19R1 to L19R12 |
+| migration safety | PASS | M19R1 to M19R6 |
+
+47 findings: none blocking, 13 should-fix (S19R1, C19R1, C19R2, T19R1 to T19R3, L19R1 to
+L19R4, H19R1, H19R2, M19R1), 34 nice-to-have. Five readers drew a new statement kind for the
+text derivation of the boot's lock order (an index create, a DROP, a DO block, a row write),
+so the order is now observed on the real boot instead; the backup script's zone screen drew
+new spellings from three readers and now refuses any zone word.
+
+- C19R1 FIXED `7c7ddd961c` (a boot already waiting behind the dump: stop that realm, which has
+  served nothing yet and whose schema transaction rolls back, boot it again after the dump,
+  never end the dump, and boot no other realm until it ends). C19R2 FIXED `80ee2487aa` and `7c7ddd961c`
+  (with Q19R2, T19R2, L19R8 and H19R1: section L of the mutation pg suite holds ACCESS SHARE
+  on each parent in turn and reads the real boot's locks once it queues, SHARE on
+  `auth_tokens` alone behind the first and every earlier parent behind each later one; the
+  text derivation is gone; a mutant adding an index create on `accounts` ahead of
+  `auth_tokens` fails). C19R3 FIXED (see M19R1). C19R4 FIXED (see M19R2). C19R5 FIXED (see
+  T19R7).
+- Q19R1 FIXED in this record (D18R1's record corrections are named as this record's, not
+  `57c5db022b`'s). Q19R2 FIXED (see C19R2). Q19R3 FIXED (see T19R1). Q19R4 FIXED `2323737f77` (the
+  bare-relation stop is pinned whole and reads "finds no row, a bare relation holds the name:
+  stop"). Q19R5 FIXED (see T19R6). Q19R6 FIXED `80ee2487aa` (the boot runs on its own client and
+  lifts the statement timeout first; section L reads both from each boot's statements).
+- H19R1 FIXED (see C19R2). H19R2 FIXED (see T19R3). H19R3 FIXED `7c7ddd961c` (the pool's options
+  are pinned to both constants). H19R4 FIXED `7c7ddd961c` (both server scans carry a message, and
+  any mention of `removeAllListeners` fails). H19R5 FIXED `7c7ddd961c` (the nested-walk control
+  asks for any module in a subdirectory). H19R6 FIXED `7c7ddd961c` (the schema slice went with the
+  derivation). H19R7 FIXED (see T19R1).
+- S19R1 FIXED `7c7ddd961c`: a password change, a staff password reset, a ban or a suspension writes
+  the account and then revokes its tokens in a second statement, so during the dump the write
+  lands and the revoke fails, leaving the old tokens valid and the live session connected;
+  DEPLOY says no action but the listed saves is retried and to redo each one after the dump.
+  S19R2 FIXED (see T19R7).
+- D19R1 FIXED (see M19R1). D19R2 FIXED `7c7ddd961c` (a query fails once it waits 5 s without a free
+  client, until the dump ends and the boot COMMITs).
+- T19R1 FIXED `2323737f77` (with Q19R3 and H19R7: the script names no zone word, `tz`, `zone` or
+  `localtime`, in any spelling, with a control for each reader's spelling, and both session
+  screens have controls). T19R2 FIXED (see C19R2). T19R3 FIXED `80ee2487aa` and `7c7ddd961c` (with H19R2
+  and M19R5: section L reads every statement each boot sends and finds no lock timeout, with
+  a control; a mutant adding one to `ensureSchema` fails; DEPLOY says a lock timeout on the
+  role, the database or `DATABASE_URL` would still apply). T19R4 FIXED (see H19R4). T19R5
+  FIXED (see H19R6). T19R6 FIXED `7c7ddd961c` and `2323737f77` (with Q19R5: one bullet-exit pattern per
+  file keeps a blank line, CRLF and the end of the text inside the bullet, with controls).
+  T19R7 FIXED `7c7ddd961c` (with S19R2 and C19R5: compose picks one primary file by name plus its
+  override, and a `-f` or `COMPOSE_FILE` on the host is beyond repo text).
+- L19R1 FIXED `7c7ddd961c` (R-11 names the `auth_tokens` upgrade and the whole order, and the owed
+  fix covers both core indexes; the fix's scope stays the maintainer's). L19R2 FIXED `7c7ddd961c`
+  (the evidence's two boot bullets and its owed fix, each correction named). L19R3 and L19R4
+  FIXED in this record. L19R5 FIXED in the ledger. L19R6 FIXED `7c7ddd961c` ("(15 s)" on one line).
+  L19R7 FIXED (see M19R2). L19R8 FIXED (see C19R2). L19R9 FIXED (see M19R1). L19R10 FIXED
+  `7c7ddd961c` (the contract paragraph and P12's tail reflowed). L19R11 FIXED `2323737f77` (the clause
+  reads "if it shows no `pg_dump` session but another `advance_token_runbook` session", and
+  the pin with it). L19R12 FIXED in this record.
+- M19R1 FIXED `7c7ddd961c` (with C19R3, D19R1 and L19R9: the boot queues behind every open
+  transaction, running or idle in transaction, that holds a lock on a table it locks, in
+  DEPLOY, the contract and P12, and the quiet check counts `idle in transaction`). M19R2
+  FIXED `7c7ddd961c` (with C19R4 and L19R7: only `auth_tokens` and `characters` take SHARE first,
+  and `accounts` is ACCESS EXCLUSIVE from its first statement, as section L observes). M19R3
+  FIXED `7c7ddd961c` (the order example is marked as one). M19R4 FIXED `7c7ddd961c` (every boot writes
+  rows, so a row lock counts on both paths). M19R5 FIXED (see T19R3). M19R6 FIXED `7c7ddd961c` (any
+  statement that reads or writes `auth_tokens`, an account delete's cascade among the
+  examples, and pg-pool's `timeout exceeded when trying to connect`, with no SQLSTATE, named
+  as the failure).
