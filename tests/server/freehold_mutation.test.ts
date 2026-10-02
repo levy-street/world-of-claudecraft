@@ -2232,7 +2232,6 @@ describe('the claim renewer', () => {
       'docker compose up -d',
       'docker compose --profile discord up -d --no-deps discord-bot',
       'docker compose up -d --no-deps game',
-      'docker compose --profile discord up -d --no-deps discord-bot',
       'docker compose up -d --no-deps game',
       'docker compose up -d --no-deps game',
       'docker compose up -d --no-deps game',
@@ -2308,16 +2307,26 @@ describe('the claim renewer', () => {
     for (const sentence of [
       "and after any rollback run the bot's guarded line below, which moves a running bot to the image the game now runs and skips one that does not run.",
       'The guard skips a host that runs no bot, or one stopped by the third escalation lever.',
-      "With `COMPOSE_PROFILES=discord` in `.env`, every `up -d` that names no service starts the bot too, a bot stopped by that lever included: step 6's has already started it on the new image before the verification, and a rollback started that way starts it on the older one. On such a host, if that lever still holds, stop the bot again by it right after each such start, before the guarded line.",
-      "Without the `discord` profile (no `--profile discord` and no `COMPOSE_PROFILES=discord` in `.env`) the service simply never starts, which is the supported way to run a realm with no Discord integration; with `COMPOSE_PROFILES=discord`, every `up -d` that names no service starts it too, a release's step 6 included.",
+      "With `discord` in `COMPOSE_PROFILES` in `.env` (as `COMPOSE_PROFILES=discord` sets it), every `up -d` that names no service starts the bot too, a bot stopped by that lever included: step 6's has already started it on the new image before the verification, and a rollback started that way starts it on the older one. On such a host, if that lever still holds, stop the bot again by it right after each such start, before the guarded line.",
+      "Without the `discord` profile (no `--profile discord`, no `discord` in `COMPOSE_PROFILES` in `.env`, and no command that names `discord-bot`, which enables its profile by itself) the service simply never starts, which is the supported way to run a realm with no Discord integration; with `discord` in `COMPOSE_PROFILES`, every `up -d` that names no service starts it too, a release's step 6 included.",
+      "While the third escalation lever (below) holds, either edit is made without the bot's `up`, which would lift that lever: the `up` that lifts it runs the bot with the edit.",
+      "so once the realm is verified run the bot's guarded line under the release steps (a restart keeps its old image, and a bot the third escalation lever stopped stays stopped), or those cards post",
+      'Act on it, for a running bot only (one the third escalation lever stopped starts again only as that lever says), with:',
+      "The fix is to enable the intents (the restart policy's next attempt picks them up) or to correct the token in `.env` and recreate the game and then the bot by Environment keys above (a `restart` keeps the old token), never to disable the restart policy.",
       '**Escalation levers**, in order. The first two are each an `.env` edit (not while an image built for a coming release waits; Environment keys above) plus `sudo docker compose --profile discord up -d --no-deps discord-bot`; the third, a stop, starts no image and is open even then:',
-      '(whose step 6 starts with `up -d` every service outside a profile, the bot too where `.env` sets `COMPOSE_PROFILES=discord`, and whose guarded line moves a running bot elsewhere once the realm is verified)',
-      'Start it again only as the first two levers run it, with `sudo docker compose --profile discord up -d --no-deps discord-bot` (not while an image built for a coming release waits), never with `start` or `restart`, which revive the stopped container on the image it was created from, not the one the game runs once a release or a rollback has run since.',
+      "(whose step 6 starts with `up -d` every service outside a profile, the bot too where `.env` puts `discord` in `COMPOSE_PROFILES`, and whose guarded line moves a running bot to the game's image after the verification and any rollback)",
     ]) {
       expect(flatDeploy).toContain(sentence);
     }
-    expect(deploy).toContain(
+    // The third lever is the stop, and it names every start of the bot as
+    // lifting it, whichever site gives that start.
+    const leverAt = deploy.indexOf(
       '\n3. **Stop the bot** as the definitive lever:\n\n   ```bash\n   sudo docker compose --profile discord stop discord-bot\n   ```\n',
+    );
+    expect(leverAt).toBeGreaterThan(-1);
+    const lever = deploy.slice(leverAt, deploy.indexOf('\n## ', leverAt)).replace(/\s+/g, ' ');
+    expect(lever).toContain(
+      "While it holds, every start of the bot lifts it: any `up` of the bot (the first two levers', an Environment keys edit's, the Enabling block's), a `start` or `restart`, and, with `discord` in `COMPOSE_PROFILES` in `.env`, every `up -d` that names no service (stop it again after one, as the release steps say). So while it holds, start the bot only to lift it: an `.env` edit for the bot reaches it then. Lift it only as the first two levers run it, with `sudo docker compose --profile discord up -d --no-deps discord-bot` (not while an image built for a coming release waits), never with `start` or `restart`, which revive the stopped container on the image it was created from, which need not be the one the game runs once a release or a rollback has run since.",
     );
     const keysAt = deploy.indexOf('\n### Environment keys\n');
     expect(keysAt).toBeGreaterThan(-1);
@@ -2368,21 +2377,42 @@ describe('the claim renewer', () => {
     );
     // And the `.env` variables both blocks read are the image tag and the same
     // four, so an `.env` edit reaches both containers only through those.
-    const pulledIn = /\n {4}(?:env_file|extends|<<):/;
-    expect('\n  game:\n    env_file:\n      - .env\n').toMatch(pulledIn);
-    expect('\n  game:\n    <<: *defaults\n').toMatch(pulledIn);
-    for (const name of ['game', 'discord-bot']) {
-      expect(serviceBlock(name), name).not.toMatch(pulledIn);
+    // Compose reads no variable in a comment, and `$$` is a literal dollar. A
+    // line with a quote keeps its text whole, so a ` #` inside a quoted value
+    // is read, never dropped.
+    const uncommented = (text: string) =>
+      text.replace(/^[ \t]*#.*$/gm, '').replace(/^([^'"\n]*?)[ \t]#.*$/gm, '$1');
+    // Nothing reaches either block from outside it: no `env_file`, no
+    // `extends`, and no YAML merge key or alias at any depth.
+    const pulledIn =
+      /\n {4}(?:env_file|extends):|<<[ \t]*:|:[ \t]+\*[\w.-]|\n[ \t]*-[ \t]+\*[\w.-]/;
+    for (const control of [
+      '\n  game:\n    env_file:\n      - .env\n',
+      '\n  game:\n    extends:\n      service: base\n',
+      '\n  game:\n    <<: *defaults\n',
+      '\n    environment:\n      <<: *bot-env\n',
+      '\n    environment: *bot-env\n',
+      '\n    volumes:\n      - *data\n',
+    ]) {
+      expect(control).toMatch(pulledIn);
     }
-    // Compose reads no variable in a comment, and `$$` is a literal dollar.
+    for (const name of ['game', 'discord-bot']) {
+      expect(uncommented(serviceBlock(name)), name).not.toMatch(pulledIn);
+    }
     const refsIn = (text: string) => [
       ...new Set(
-        [
-          ...text.replace(/(^|\s)#.*$/gm, '$1').matchAll(/(?<!\$)\$\{?([_A-Za-z][_A-Za-z0-9]*)/g),
-        ].map((m) => m[1]),
+        [...uncommented(text).matchAll(/(?<!\$)(?:\$\$)*\$\{?([_A-Za-z][_A-Za-z0-9]*)/g)].map(
+          (m) => m[1],
+        ),
       ),
     ];
-    expect(refsIn(`a $${'{'}B_1:-x} $c2 $$D $_e # $F\n# $G`)).toEqual(['B_1', 'c2', '_e']);
+    expect(refsIn(`a $${'{'}B_1:-x} $c2 $$D $_e $$$H # $F\nx: "y #$I"\n  # $G`)).toEqual([
+      'B_1',
+      'c2',
+      '_e',
+      'H',
+      'I',
+    ]);
     const envRefs = (name: string) => refsIn(serviceBlock(name));
     expect(envRefs('discord-bot')).toContain('PUBLIC_GAME_URL');
     expect(envRefs('game')).not.toContain('PUBLIC_GAME_URL');

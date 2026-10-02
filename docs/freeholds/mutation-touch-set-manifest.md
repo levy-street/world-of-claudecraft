@@ -1420,7 +1420,13 @@ What changed the contract above:
 - A thirty-first round of eight fresh readers: no P12 change; `DEPLOY.md` runs the bot's guarded
   line after any rollback, tells a host with `COMPOSE_PROFILES=discord` to stop a lever-stopped
   bot again after step 6, and keeps the third escalation lever open while a release image waits.
-- A thirty-second round of eight fresh readers: no P12 change; `DEPLOY.md` runs the sign-out
-  again in autocommit after any count above 0 and names the session a rerun waits on, has a
-  lever-stopped bot stopped again after every `up -d` that names no service, and lifts the third
+- A thirty-second round of eight fresh readers: no P12 change; `DEPLOY.md` runs the sign-out again
+  in autocommit after any count above 0 and names the session a rerun waits on, has a
+  lever-stopped bot stopped again after every `up -d` that names no service where `.env` puts
+  `discord` in `COMPOSE_PROFILES` (worded so in round thirty-three), and lifts the third
   escalation lever only by the levers' own `up`.
+- A thirty-third round of eight fresh readers: no P12 change; `DEPLOY.md` follows a waiting
+  sign-out rerun's queue to the open sign-out, has the third escalation lever name every start of
+  the bot as lifting it, leaves a lever-stopped bot stopped through a key edit and the release
+  caveat, acts on a red bot health probe for a running bot only, recreates rather than restarts
+  the bot for a fatal-close fix, and reads the profile as `discord` in `COMPOSE_PROFILES`.

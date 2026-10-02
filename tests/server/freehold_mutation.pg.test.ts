@@ -47,7 +47,7 @@
 // tests/guild_bank_pg_integration.test.ts and
 // tests/server/storage_purchase_db.pg.test.ts prove the legacy halves with no
 // housing participant.
-// Cost: 11.0 s
+// Cost: 13.3 s
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import type { Pool as PgPool, PoolClient } from 'pg';
@@ -3724,9 +3724,10 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       // DEPLOY's check that the sign-out committed, pinned whole with its
       // wording: a sign-out still open in its own session reads 0 there and
       // the full count from a new session, which reads 0 once it commits. A
-      // realm still running can sign in after it, which only running the
-      // sign-out again ends, and a rerun that waits on an earlier sign-out
-      // left open elsewhere is named by DEPLOY's naming statement.
+      // realm still running can sign in after it, and a failed sign-out's
+      // COMMIT rolls back, which only running the sign-out again ends; a
+      // rerun that waits on an earlier sign-out left open elsewhere, behind a
+      // stopped realm's statement, reaches it by DEPLOY's naming statement.
       const signedOut = operatorSql('SELECT (SELECT count(*) FROM auth_tokens');
       expect(signedOut).toBe(
         'SELECT (SELECT count(*) FROM auth_tokens WHERE expires_at > now()) + (SELECT count(*) FROM oauth_codes) + (SELECT count(*) FROM oauth_device_codes) + (SELECT count(*) FROM discord_oauth_states) + (SELECT count(*) FROM github_oauth_states) AS left;',
@@ -3735,7 +3736,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         'then from a new psql session `SELECT (SELECT count(*) FROM auth_tokens',
       );
       expect(bootBullet()).toContain(
-        "returns 0 while `sudo docker compose ps --all` shows every realm container on the database `Exited` (else it has not committed, or a realm on the database still runs: COMMIT in the sign-out's own session a transaction still open there (its psql prompt then shows `*` or `!`), stop every realm still running, run the sign-out again in psql's default autocommit either way, then read both again, the count from a new psql session; a rerun that does not return waits on an earlier sign-out still open in another session, which the naming statement under Index builds below, given the rerun's pid (`SELECT pg_backend_pid();` in its session before it), names, and the rule there ends)",
+        "returns 0 while `sudo docker compose ps --all` shows every realm container on the database `Exited`, or `Created` for one never started (else it has not committed, or a realm on the database still runs: COMMIT in the sign-out's own session a transaction still open there (its psql prompt then shows `*` or `!`), stop every realm still running, run in one psql session in its default autocommit `SELECT pg_backend_pid();` and then the sign-out again, either way, then read both again, the count from a new psql session; a rerun that does not return waits, directly or behind a stopped realm's statement queued on the same rows or table, on an earlier sign-out still open in another session: from another psql session on the realm database, the naming statement under Index builds below, given the rerun's pid, names the session the rerun waits on, and given in turn the pid of each named session that reads `active`, reaches the open sign-out, which the rule there ends)",
       );
       const { Client } = await import('pg');
       const { materialSourceConnection } = await import('../../server/material_source_connection');
@@ -3748,11 +3749,13 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       const signer = session();
       const fresh = session();
       const holder = session();
+      const realm = session();
       let open = false;
       try {
         await signer.connect();
         await fresh.connect();
         await holder.connect();
+        await realm.connect();
         const leftOn = async (client: typeof signer) =>
           Number((await client.query(signedOut)).rows[0].left);
         const before = await leftOn(fresh);
@@ -3776,38 +3779,85 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         await signer.query(signOut);
         expect(await leftOn(fresh)).toBe(0);
         expect(await db.accountAndScopeForToken(late)).toBeNull();
+        // A sign-out typed after a BEGIN that then failed (psql's `!`): its
+        // COMMIT rolls back, so the count still reads the token, and the
+        // sign-out run again in autocommit ends it.
+        const failed = hex().repeat(2);
+        await db.saveToken(failed, accountId);
+        await signer.query('BEGIN');
+        open = true;
+        await signer.query(signOut);
+        await expect(signer.query('SELECT 1/0')).rejects.toMatchObject({ code: '22012' });
+        expect((await signer.query('COMMIT')).command).toBe('ROLLBACK');
+        open = false;
+        expect(await leftOn(fresh)).toBe(1);
+        await signer.query(signOut);
+        expect(await leftOn(fresh)).toBe(0);
+        expect(await db.accountAndScopeForToken(failed)).toBeNull();
         // An earlier sign-out left open in an operator's psql session holds
-        // the rows a rerun deletes: the rerun waits on it, the naming
-        // statement given the rerun's pid names that session, and ending it
-        // lets the rerun delete them.
+        // the rows a rerun deletes, and a stopped realm's statement on one of
+        // them queued first: the rerun waits behind that statement. Given the
+        // rerun's pid, the naming statement names that `active` statement;
+        // given its pid in turn, the open sign-out, which reads left open on
+        // two readings. Ending it lets both delete.
         const stale = hex().repeat(2);
         await db.saveToken(stale, accountId);
         await holder.query("SET application_name = 'psql'");
         await holder.query('BEGIN');
         await holder.query(signOut);
-        const holderPid = (holder as unknown as { processID: number }).processID;
-        const rerunPid: number = (await signer.query('SELECT pg_backend_pid() AS p')).rows[0].p;
+        const pidOf = async (client: typeof signer): Promise<number> =>
+          (await client.query('SELECT pg_backend_pid() AS p')).rows[0].p;
+        const holderPid = await pidOf(holder);
+        const realmPid = await pidOf(realm);
+        const waitOf = async (pid: number) =>
+          (await pool.query('SELECT wait_event FROM pg_stat_activity WHERE pid = $1', [pid]))
+            .rows[0]?.wait_event;
+        const queued = realm.query('DELETE FROM auth_tokens WHERE token = $1', [stale]).then(
+          () => 'ran',
+          (error: { code?: string }) => error.code,
+        );
+        expect(await until(() => waitOf(realmPid), 'transactionid')).toBe('transactionid');
+        const rerunPid = await pidOf(signer);
         const rerun = signer.query(signOut).then(
           () => 'ran',
           (error: { code?: string }) => error.code,
         );
-        const waitOf = async () =>
-          (await pool.query('SELECT wait_event FROM pg_stat_activity WHERE pid = $1', [rerunPid]))
-            .rows[0]?.wait_event;
-        expect(await until(waitOf, 'transactionid')).toBe('transactionid');
-        const named = await pool.query(
-          operatorSql('SELECT pid, application_name, state').replace('<pid>', String(rerunPid)),
-        );
-        expect(
-          named.rows.map((r: { pid: number; application_name: string; state: string }) => ({
-            pid: r.pid,
-            application_name: r.application_name,
-            state: r.state,
-          })),
-        ).toEqual([{ pid: holderPid, application_name: 'psql', state: 'idle in transaction' }]);
+        expect(await until(() => waitOf(rerunPid), 'tuple')).toBe('tuple');
+        const naming = operatorSql('SELECT pid, application_name, state');
+        const named = async (pid: number) =>
+          (await pool.query(naming.replace('<pid>', String(pid)))).rows.map(
+            (r: { pid: number; application_name: string; state: string }) => ({
+              pid: r.pid,
+              application_name: r.application_name,
+              state: r.state,
+            }),
+          );
+        expect(await named(rerunPid)).toEqual([
+          { pid: realmPid, application_name: '', state: 'active' },
+        ]);
+        expect(await named(realmPid)).toEqual([
+          { pid: holderPid, application_name: 'psql', state: 'idle in transaction' },
+        ]);
+        const reading = async () => {
+          const row = (
+            await pool.query(
+              `SELECT EXTRACT(EPOCH FROM n.open_for) AS open, EXTRACT(EPOCH FROM n.open_for - n.idle_for)::text AS gap FROM (${naming
+                .replace('<pid>', String(realmPid))
+                .replace(/;$/, '')}) n WHERE n.pid = $1`,
+              [holderPid],
+            )
+          ).rows[0];
+          return { open: Number(row.open), gap: String(row.gap) };
+        };
+        const first = await reading();
+        await sleep(300);
+        const second = await reading();
+        expect(second.open - first.open).toBeGreaterThanOrEqual(0.25);
+        expect(second.gap).toBe(first.gap);
         await pool.query(
           operatorSql('SELECT pg_terminate_backend(').replace('<pid>', String(holderPid)),
         );
+        expect(await queued).toBe('ran');
         expect(await rerun).toBe('ran');
         expect(await leftOn(fresh)).toBe(0);
         expect(await db.accountAndScopeForToken(stale)).toBeNull();
@@ -3816,6 +3866,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         await signer.end().catch(() => {});
         await fresh.end().catch(() => {});
         await holder.end().catch(() => {});
+        await realm.end().catch(() => {});
       }
       expect(await db.accountAndScopeForToken(full)).toBeNull();
       expect(await db.accountAndScopeForToken(read)).toBeNull();
@@ -4363,6 +4414,11 @@ d('the housing mutation boundary (REAL Postgres)', () => {
               (await pool.query('SELECT current_database() AS d')).rows[0].d,
             );
             expect((await elsewhere.query(lookup)).rows).toEqual([]);
+            expect(
+              (
+                await elsewhere.query(lookup.replace('datname = current_database() AND ', ''))
+              ).rows.map((r: { pid: number }) => r.pid),
+            ).toEqual([handPid]);
           } finally {
             await elsewhere.end().catch(() => {});
           }
