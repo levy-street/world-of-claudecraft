@@ -109,6 +109,11 @@ import { hearthKeyUseRefusal } from '../../server/freehold_wire';
 import { SOURCE_EXTENSIONS, sourceFilesUnder } from '../helpers/source_files_under';
 import { stripComments } from '../helpers/strip_comments';
 
+/** server/main.ts with its comments stripped, read once for every case here. */
+let mainSourceCache: string | undefined;
+const mainSource = (): string =>
+  (mainSourceCache ??= stripComments(readFileSync('server/main.ts', 'utf8')));
+
 // ---------------------------------------------------------------------------
 // A scripted pg client: answers by the first matching rule, records every
 // statement, and can be told to lose a COMMIT's answer.
@@ -239,7 +244,7 @@ describe('runFreeholdTransaction', () => {
       setFreeholdTxBackendCanceller(undefined);
     }
     // And the realm registers the process-wide canceller once, at boot.
-    const main = stripComments(readFileSync('server/main.ts', 'utf8'));
+    const main = mainSource();
     expect(main.split('setFreeholdTxBackendCanceller(').length - 1).toBe(1);
     expect(main).toContain('setFreeholdTxBackendCanceller(cancelDetachedBackend);');
   });
@@ -1641,7 +1646,7 @@ describe('the claim renewer', () => {
       'freehold claim renew pass stopped for shutdown; 1 chunks are left to the shutdown release',
     );
     // And the realm stops it right before the shutdown release, never after.
-    const main = stripComments(readFileSync('server/main.ts', 'utf8'));
+    const main = mainSource();
     const stopAt = main.indexOf('await stopFreeholdClaimRenewer(heldClaims());');
     const releaseAt = main.indexOf('await releaseAllFreeholdClaims(');
     expect(stopAt).toBeGreaterThan(0);
@@ -1653,7 +1658,7 @@ describe('the claim renewer', () => {
     // names the bounded awaits and says every other one carries no deadline. A
     // step added, removed or newly bounded in server/main.ts fails here until
     // that paragraph (and this list) says so.
-    const main = stripComments(readFileSync('server/main.ts', 'utf8'));
+    const main = mainSource();
     const start = main.indexOf('const shutdown = async () => {');
     const end = main.indexOf("process.on('SIGINT', shutdown);", start);
     expect(start).toBeGreaterThan(0);
@@ -1696,50 +1701,84 @@ describe('the claim renewer', () => {
       'closeBackendCancelPool()',
       'pool.end()',
     ]);
-    // The bounded awaits and their values, read from the code: four constants
-    // passed at the call site, the mirrors' literal, and two bounds fixed
-    // inside the callee. The contract names each with its value and the sum.
+    // The bounded awaits, DERIVED from that list: every SCREAMING `_MS`
+    // constant an await passes, and every numeric literal it passes (the two
+    // mirror stops, one shared value). A step newly bounded at its call site
+    // therefore changes this set, and the contract must name it.
     const constantIn = (file: string, name: string): number => {
-      const found = readFileSync(file, 'utf8').match(
+      const found = stripComments(readFileSync(file, 'utf8')).match(
         new RegExp(`export const ${name} = ([0-9_]+);`),
       );
       expect(found, name).not.toBeNull();
       return Number((found as RegExpMatchArray)[1].replaceAll('_', ''));
     };
-    const bounded: Array<[string, number]> = [
-      [
-        'BANK_LEDGER_SHUTDOWN_DRAIN_MS',
-        constantIn('server/bank_ledger.ts', 'BANK_LEDGER_SHUTDOWN_DRAIN_MS'),
-      ],
-      [
-        'MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS',
-        constantIn('server/market_sold_volume.ts', 'MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS'),
-      ],
-      [
-        'FREEHOLD_PERSIST_SHUTDOWN_DRAIN_MS',
-        constantIn('server/freehold_persist_bounds.ts', 'FREEHOLD_PERSIST_SHUTDOWN_DRAIN_MS'),
-      ],
-      [
-        'UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS',
-        constantIn('server/unstuck_records.ts', 'UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS'),
-      ],
+    const callSiteNames = awaits.flatMap((call) =>
+      [...call.matchAll(/\b([A-Z][A-Z0-9_]*_MS)\b/g)].map((match) => match[1]),
+    );
+    expect(callSiteNames).toEqual([
+      'BANK_LEDGER_SHUTDOWN_DRAIN_MS',
+      'MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS',
+      'FREEHOLD_PERSIST_SHUTDOWN_DRAIN_MS',
+      'UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS',
+    ]);
+    const definedIn: Record<string, string> = {
+      BANK_LEDGER_SHUTDOWN_DRAIN_MS: 'server/bank_ledger.ts',
+      MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS: 'server/market_sold_volume.ts',
+      FREEHOLD_PERSIST_SHUTDOWN_DRAIN_MS: 'server/freehold_persist_bounds.ts',
+      UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS: 'server/unstuck_records.ts',
+    };
+    const callSite: Array<[string, number]> = callSiteNames.map((name) => [
+      name,
+      constantIn(definedIn[name], name),
+    ]);
+    const literals = awaits.flatMap((call) =>
+      [...call.matchAll(/\((\d[\d_]*)\)/g)].map((match) => Number(match[1].replaceAll('_', ''))),
+    );
+    expect(literals).toHaveLength(2);
+    expect(new Set(literals).size).toBe(1);
+    const mirrorsMs = literals[0];
+    // The two bounds fixed INSIDE their callees, which no await text shows:
+    // each callee must really arm its constant.
+    const registrySource = stripComments(readFileSync('server/freehold_claim_registry.ts', 'utf8'));
+    const bodyOf = (name: string) => {
+      const start = registrySource.indexOf(`export async function ${name}(`);
+      expect(start, name).toBeGreaterThan(-1);
+      const next = registrySource.indexOf('\nexport ', start + 1);
+      return registrySource.slice(start, next === -1 ? undefined : next);
+    };
+    expect(bodyOf('stopFreeholdClaimRenewer')).toContain(
+      'AbortSignal.timeout(FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs)',
+    );
+    expect(bodyOf('releaseAllFreeholdClaims')).toContain(
+      'AbortSignal.timeout(FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS)',
+    );
+    const inCallee: Array<[string, number]> = [
       ['FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs', FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs],
       ['FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS', FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS],
     ];
-    const mirrorsMs = 5000;
+    // The contract names each in its own group, with its value, the sum and
+    // the grace, and the sum fits inside the game service's grace.
     const contract = readFileSync('docs/freeholds/persistence-rollout-contract.md', 'utf8');
     const at = contract.indexOf('THE SHUTDOWN BUDGET');
     expect(at).toBeGreaterThan(-1);
     const budget = contract.slice(at, contract.indexOf('\n\n', at)).replace(/\s+/g, ' ');
+    const split = budget.indexOf('Inside the callee:');
+    expect(split).toBeGreaterThan(budget.indexOf('At the call site:'));
+    const [callSiteText, calleeText] = [budget.slice(0, split), budget.slice(split)];
     const ms = (value: number) => `${value.toLocaleString('en-US')} ms`;
-    for (const [name, value] of bounded) expect(budget).toContain(`\`${name}\`, ${ms(value)}`);
-    expect(budget).toContain(`run concurrently, ${ms(mirrorsMs)}`);
-    const totalMs = bounded.reduce((sum, [, value]) => sum + value, mirrorsMs);
+    for (const [name, value] of callSite)
+      expect(callSiteText).toContain(`\`${name}\`, ${ms(value)}`);
+    expect(callSiteText).toContain(`run concurrently, ${ms(mirrorsMs)}`);
+    for (const [name, value] of inCallee) expect(calleeText).toContain(`\`${name}\`, ${ms(value)}`);
+    const totalMs = [...callSite, ...inCallee].reduce((sum, [, value]) => sum + value, mirrorsMs);
     expect(budget).toContain(`${totalMs / 1000} s of bounded waits`);
-    expect(budget).toContain('75 s kill grace');
-    expect(readFileSync('docker-compose.yml', 'utf8')).toMatch(
-      /\n {2}game:\n(?: {4}.*\n)*? {4}stop_grace_period: 75s\n/,
+    const grace = readFileSync('docker-compose.yml', 'utf8').match(
+      /\n {2}game:\n(?: {4}.*\n)*? {4}stop_grace_period: (\d+)s\n/,
     );
+    expect(grace).not.toBeNull();
+    const graceSeconds = Number((grace as RegExpMatchArray)[1]);
+    expect(totalMs).toBeLessThan(graceSeconds * 1000);
+    expect(budget).toContain(`${graceSeconds} s kill grace`);
   });
 
   it('chunks at the bound, one transaction per chunk', async () => {
