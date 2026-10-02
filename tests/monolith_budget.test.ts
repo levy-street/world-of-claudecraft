@@ -2105,8 +2105,9 @@ const MONOLITHS: MonolithRow[] = [
     // both parents' additions combine, so keep the exact merged count.
     // Lowered after extracting the world trees' camera-occluder fade (the
     // hideable records, the trunk hit test, the gated instance/ghost swap)
-    // into src/render/tree_hide_fade.ts.
-    ceiling: 3996,
+    // into src/render/tree_hide_fade.ts. Lowered again when the Evergarden
+    // scatter curation moved to the sim generator (decoration_exclusions.ts).
+    ceiling: 3992,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

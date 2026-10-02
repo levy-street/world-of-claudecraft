@@ -94,7 +94,6 @@ import { foliageShoreSkip } from './foliage_shore_gate_core';
 import {
   gardenLushGrassAt,
   gardenMeadowTintAt,
-  inParterrePlot,
   parterreBushSpots,
   parterreFlowerTintAt,
 } from './garden_parterre_core';
@@ -1690,13 +1689,10 @@ function buildTrees(
   session: ImpostorSession | null,
 ): void {
   const modelUrls = foliageModelUrls();
-  // The Evergarden curates its trees: no random trees or boulders inside a
-  // parterre bed, and NO wild pines anywhere on the lawns (kind 'tree' is
-  // the pine; the realm keeps its oaks, topiary, and specimen elders)
-  const decos = generateDecorations(seed).filter(
-    (d) =>
-      !inParterrePlot(d.x, d.z, 6) && !(d.kind === 'tree' && zoneBiomeAt(d.x, d.z) === 'garden'),
-  );
+  // The Evergarden's curated scatter (no wild pines, nothing by a parterre
+  // bed) is dropped at the source by the sim (decoration_exclusions.ts
+  // isCuratedGardenScatter), so every decoration here also collides.
+  const decos = generateDecorations(seed);
   const sourceDecos = !GFX.leanFoliage
     ? decos
     : decos.filter((d) => survivesLeanDecimation(d, hashAt(d.x, d.z, 83), GFX.standardMaterials));
