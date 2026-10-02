@@ -3994,12 +3994,13 @@ commit body (counted so in round fifty, Q50R1).
 
 - C49R1 FIXED `b9789aa5ad` (with Q49R3, S49R2, T49R3 and L49R3: each listing's names are probed by
   their raw bytes, and a listed name must be on disk exactly when git does not report it deleted,
-  so a skip of a present file fails whatever its name, the kept files the positive arm and U98
-  below the other, which a clean tree never reaches (named so in round fifty, T50R2); T48R2's
-  disposition notes it). C49R2 FIXED `b9789aa5ad` (with H49R2, Q49R5, T49R5 and L49R2: the pin
-  block's comment is rewrapped and says a `during` callback that takes the boot it is handed names
-  it `boot`, and Q47R1's note says the same). C49R3 FIXED in the ledger (with Q49R1: its ROUND
-  FORTY-EIGHT names the 250 ms grace and the boundary comment).
+  so a skip of a present file fails whatever its name, the kept files the positive arm and the
+  mutant below whose bot file name is not UTF-8, `--modified` listed for `--deleted`, the other
+  (named so in round fifty-one, C51R4), which a clean tree never reaches (named so in round fifty,
+  T50R2); T48R2's disposition notes it). C49R2 FIXED `b9789aa5ad` (with H49R2, Q49R5, T49R5 and
+  L49R2: the pin block's comment is rewrapped and says a `during` callback that takes the boot it
+  is handed names it `boot`, and Q47R1's note says the same). C49R3 FIXED in the ledger (with
+  Q49R1: its ROUND FORTY-EIGHT names the 250 ms grace and the boundary comment).
 - Q49R1 FIXED (see C49R3). Q49R2 FIXED in this record (`6b38b121f2`'s body leaves out D48R1's
   per-call check, which round forty-eight's summary names; the commit stays as it is). Q49R3 FIXED
   (see C49R1). Q49R4 FIXED `b9789aa5ad` (with H49R1, D49R1, M49R1 and T49R4: the `during` pin
@@ -4041,11 +4042,12 @@ Round fifty's commits: `e448b6d828` (the unit suite pins every name section L re
 scopes around it, the suite's callback and the module, with how many times those scopes declare
 it, once each; the bot's directory holds no module but code and `bot/CLAUDE.md`; the bot's imports
 from outside its directory are pinned and those modules read for routes; kept bot names are
-distinct; each bot file is parsed once; the JSX check is proven on a sample of each JSX root; the
-grant pin reads `botCode`; the pin block's comment names the module-level `within` and says code
-around the section is read only where a pin names it, and the digest's comment says how `linesOf`
-reads; the manifest's fiftieth entry; kept whole for bisect), and the commit that adds this
-section.
+distinct; each bot code file is parsed once for the JSX check, the outside-import read and the
+route read (worded so in round fifty-one, C51R5); the JSX check is proven on a sample of each JSX
+root; the grant pin reads `botCode`; the pin block's comment names the module-level `within` and
+says code around the section is read only where a pin names it, and the digest's comment says how
+`linesOf` reads; the manifest's fiftieth entry; kept whole for bisect), and the commit that adds
+this section.
 
 | Reader | Verdict | Findings |
 |---|---|---|
@@ -4064,15 +4066,19 @@ with no should-fix. Three readers found that a `within` bound in the suite's cal
 section L, would shadow the one read whole, past every pin and the digest; every name the section
 reads from around it is now pinned with how often those scopes declare it. Two found the no-JSX
 check proven on one root only; it is proven on a sample of each now. The rest were modules the
-bot's bundler loads beside its code, the grant pin's copy of the pathspecs, a second parse of each
-bot file, comment and record wording, and a commit body.
+bot's bundler loads beside its code, two kept bot names that decode alike, the grant pin's copy of
+the pathspecs, a second parse of each bot file, comment and record wording, and a commit body
+(counted so in round fifty-one, Q51R4).
 
 - C50R1 FIXED `e448b6d828` (with D50R1 and M50R1: every name section L reads that the suite's
   callback or the module declares is pinned with how many times those scopes declare it, once
   each, so a second binding of `within`, or of any other such name, fails; T49R2's disposition
-  notes it). C50R2 FIXED in this record (Q49R4 says a callback moved under a computed key fails at
-  the `during` pin and one added under one fails at the digest). C50R3 FIXED in the ledger (with
-  Q50R2 and L50R2: its ROUND FORTY-EIGHT note follows the clauses round forty-nine reworded).
+  notes it; the scopes' parameters and a hoisted `var` pinned out and types counted, from round
+  fifty-one, C51R2, and `e448b6d828`'s body, which says a second binding that would shadow one
+  fails, stays as it is). C50R2 FIXED in this record (Q49R4 says a callback moved under a computed
+  key fails at the `during` pin and one added under one fails at the digest). C50R3 FIXED in the
+  ledger (with Q50R2 and L50R2: its ROUND FORTY-EIGHT note follows the clauses round forty-nine
+  reworded).
 - Q50R1 FIXED in this record and the ledger (round forty-nine's summary and the ledger's ROUND
   FORTY-NINE name `within` read by no pin; `376b3c0122`'s body, which leaves it out, stays as it
   is). Q50R2 FIXED (see C50R3). Q50R3 FIXED `e448b6d828` (with T50R3: the grant pin greps
@@ -4081,19 +4087,24 @@ bot file, comment and record wording, and a commit body.
   `e448b6d828` (with T50R1: the JSX check's predicate is proven on a sample holding an element, a
   self-closing element and a fragment, each found, before it reads the bot's files).
 - H50R1 FIXED `e448b6d828` (with T50R5: each bot code file is parsed once and its nodes shared by
-  the JSX check, the outside-import read and the route read).
+  the JSX check, the outside-import read and the route read; the grant pin still parses the files
+  its grep finds, and `e448b6d828`'s body, which says each file is parsed once, stays as it is,
+  noted so in round fifty-one, C51R5).
 - S50R1 FIXED `e448b6d828` (every tracked file in the bot's directory that is not code is named,
   `bot/CLAUDE.md` alone, so a module the bundler loads beside code fails until a read takes it).
   S50R2 FIXED `e448b6d828` (every string in bot code that starts `../` is pinned with its file,
   the three imports of `src/sim/discord_roles` and `src/sim/discord_tier`, and those two modules
-  are read for routes, none found). S50R3 FIXED `e448b6d828` (the kept bot names are checked
-  distinct, so two names that decode alike fail).
+  are read for routes, none found; in their place the bot's bundle read as esbuild builds it, from
+  round fifty-one, C51R3). S50R3 FIXED `e448b6d828` (the kept bot names are checked distinct, so
+  two names that decode alike fail).
 - D50R1 FIXED (see C50R1). D50R2 FIXED `e448b6d828` (the pin block's comment says the digest
   covers forms inside the section, every name read from around it is declared once there, and code
   around it is read only where a pin names it).
-- T50R1 FIXED (see Q50R5). T50R2 FIXED in this record (C49R1 names U98 as the proof of the
-  direction a clean tree never reaches). T50R3 FIXED (see Q50R3). T50R4 FIXED `e448b6d828` (the
-  comment names the `within` it pins as the module-level one). T50R5 FIXED (see H50R1).
+- T50R1 FIXED (see Q50R5). T50R2 FIXED in this record (C49R1 names round forty-nine's mutant whose
+  bot file name is not UTF-8, `--modified` listed for `--deleted`, worded so in round fifty-one,
+  C51R4, as the proof of the direction a clean tree never reaches). T50R3 FIXED (see Q50R3). T50R4
+  FIXED `e448b6d828` (the comment names the `within` it pins as the module-level one). T50R5 FIXED
+  (see H50R1).
 - L50R1 FIXED in this record (Q47R1 says a binding that shadows `settled` passed its pin and names
   T49R1, which names it back). L50R2 FIXED (see C50R3). L50R3 FIXED in this record (S48R2 names
   the no-JSX pin from S49R1, which names it back).
@@ -4104,3 +4115,77 @@ bot file, comment and record wording, and a commit body.
   read of the bot's outside modules; a new import from outside the bot's directory, at the import
   pin; and, added with intent-to-add and removed after, a tracked `bot/routes.json` holding a
   route, at the list of the bot's non-code files.
+
+## Round fifty-one: eight fresh readers over round fifty (`376b3c0122..c6e7f080f9`)
+
+Round fifty-one's commits: `33eff5391f` (the bot route read takes its modules from esbuild's own
+list of the bot's bundle, built with the build script's options, which are pinned whole, and names
+the bundle's one package; the relative-import pin and the fixed read of the two sim modules give
+way to it; `botCode` is one eight-entry list, and the bot's directory is listed once; a module
+lookup outside the bundle throws; the scopes around section L must take no parameters, the pg
+suite may hold no `var`, proven on a sample, and type declarations count among the names declared
+there; the pin block's comment says so; the unit Cost header remeasured, 1.3 s; the manifest's
+fifty-first entry; kept whole for bisect), and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C51R1 to C51R6 |
+| qa-checklist | PASS | Q51R1 to Q51R4 |
+| server hot path | PASS | H51R1 to H51R3 |
+| privacy and security | PASS | S51R1 to S51R3 |
+| database performance | PASS | D51R1 |
+| test coverage | PASS | T51R1 to T51R4 |
+| docs librarian | PASS | L51R1 to L51R3 |
+| migration safety | PASS | M51R1 |
+
+25 findings: none blocking, 7 should-fix (C51R1, Q51R1, S51R1, T51R1, T51R2, L51R1, L51R2), 18
+nice-to-have, every reader passing, and three (server hot path, database performance, migration
+safety) with no should-fix. Seven readers found the names-around pin blind to a parameter of the
+scopes around section L, a `var` hoisted into them from a nested block, or a type declared there;
+those scopes must now take no parameters, the suite may hold no `var`, and types are counted.
+Three found the bot reaching modules outside its directory by the tsconfig alias or a `./..` path
+the import pin did not read; the route read now takes its modules from esbuild's own list of the
+bot's bundle, the build script's options pinned whole. Three found the record naming a mutant by
+an id only the evidence holds. One should-fix rested on a misread: `botCode` held the JSX
+pathspecs by a `push` on the next line, now one list. The rest were the parse-once wording, round
+fifty's summaries, a second listing and a lookup that failed open.
+
+- C51R1 RULED, no change to the record: `botCode` gained `bot/*.tsx` and `bot/*.jsx` by a `push`
+  on the line after its declaration, so the grant pin greps all eight pathspecs and L49R1 stands;
+  `botCode` is now one eight-entry list (`33eff5391f`) so it reads at once. C51R2 FIXED
+  `33eff5391f` (with Q51R1, H51R3, D51R1, T51R1, L51R2 and M51R1: the scopes around section L must
+  take no parameters; the pg suite may hold no `var`, which could hoist into them from a nested
+  block, a `for` head or a label, the count proven on a sample; and type aliases, interfaces,
+  enums, namespaces and import-equals count among the names declared there; the pin block's
+  comment says so, and the ledger's ROUND FIFTY says what round fifty's pin held; C50R1's
+  disposition notes it). C51R3 FIXED `33eff5391f` (with S51R1, T51R2, S51R2 and T51R3: the route
+  read takes its modules from esbuild's own list of the bot's bundle, built with the options of
+  `scripts/build_bot.mjs`, which are read whole; the bundle's modules from this repository must be
+  the bot's code files and the two shared sim modules, and its packages `ws` alone, so the
+  tsconfig alias, a `./..` path, a `.tsx` esbuild prefers or a `.json` import fails until a read
+  takes it; S50R2's disposition notes it). C51R4 FIXED in this record (with Q51R2 and L51R1: C49R1
+  and T50R2 describe the mutant they name rather than an id only the evidence holds). C51R5 FIXED
+  in this record (with H51R1 and Q51R3: round fifty's intro and H50R1 say which reads share the
+  one parse, the grant pin parsing its own). C51R6 RULED, no change: round forty-nine's mutant of
+  a tracked `bot/feed.tsx` ran with `botCode` holding `.tsx`, and its log shows the no-JSX pin
+  failing, the listing check passing.
+- Q51R1 FIXED (see C51R2). Q51R2 FIXED (see C51R4). Q51R3 FIXED (see C51R5). Q51R4 FIXED in this
+  record and the ledger (with L51R3: round fifty's summary and the ledger's ROUND FIFTY name the
+  check that kept bot names are distinct; `c6e7f080f9`'s body, which leaves it out, stays as it
+  is).
+- H51R1 FIXED (see C51R5). H51R2 FIXED `33eff5391f` (the bot's directory is listed once and the
+  list shared by both of its checks). H51R3 FIXED (see C51R2).
+- S51R1 FIXED (see C51R3). S51R2 FIXED (see C51R3). S51R3 FIXED `33eff5391f` (with T51R4: a module
+  lookup outside the bundle throws, so no read can pass on an empty list).
+- D51R1 FIXED (see C51R2).
+- T51R1 FIXED (see C51R2). T51R2 FIXED (see C51R3). T51R3 FIXED (see C51R3). T51R4 FIXED (see
+  S51R3).
+- L51R1 FIXED (see C51R4). L51R2 FIXED (see C51R2). L51R3 FIXED (see Q51R4).
+- M51R1 FIXED (see C51R2).
+- Mutants on this round's new guards, each killed and its source restored: a `var within` hoisted
+  from a nested block of the suite's callback, at the `var` count; a `within` parameter on the
+  suite's callback, at the parameters pin; a type alias shadowing a type section L reads, at the
+  names-around pin; the bot reaching a module through the tsconfig alias, and a new module through
+  `./..`, at the bundle's module list; a build option added to the bot's build script, at its
+  whole read; and, added with intent-to-add and removed after, a tracked `bot/routes.json`
+  imported by `bot/main.ts`, at the list of the bot's non-code files.
