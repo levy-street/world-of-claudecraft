@@ -470,8 +470,8 @@ describe('the hearth clock map has two setters and one evictor, all in src/sim/f
     // only. Leaving the sim out was the gap: a third writer added in sim.ts or
     // another freehold leaf would have passed both arms of this describe.
     // THE SETTERS live in hearth_key.ts (useHearthKey, mergeFreeholdKeyReadyAt);
-    // THE ONE EVICTOR is releaseFreeholdOnLeave in state.ts (07a: the owner's
-    // last session out drops its live clock beside the record eviction). So
+    // THE ONE EVICTOR is releaseFreeholdOnLeave in state.ts (the owner's last
+    // session out drops its live clock beside the record eviction). So
     // hearth_key.ts may not delete, state.ts may not set, and nothing clears.
     const roots = ['server', 'src/sim', 'src/net', 'src/game', 'src/ui', 'src/render', 'headless'];
     const setter = join(__dirname, '..', 'src', 'sim', 'freehold', 'hearth_key.ts');
@@ -904,8 +904,13 @@ describe('src/sim/freehold/ source scan', () => {
     // rather than creating one. DERIVED from the tree, so the next extraction
     // reds this instead of going unnoticed.
     const guide = readFileSync(join(dir, 'CLAUDE.md'), 'utf8');
+    // Static or dynamic, with or without a `.js` specifier, a leaf or the bare
+    // barrel: each is a by-path importer this list must name.
+    const reach = /(?:from|import\()\s*'[./]*\/src\/sim\/freehold(?:\/([a-z_]+))?(?:\.js)?'/g;
+    expect([...`import('../src/sim/freehold/state.js')`.matchAll(reach)][0]?.[1]).toBe('state');
+    expect([...`from '../src/sim/freehold'`.matchAll(reach)][0]?.[1]).toBeUndefined();
     const importers = tsFilesUnder(join(__dirname, '..', 'server'))
-      .filter(({ full }) => /from '[./]*\/src\/sim\/freehold\//.test(readFileSync(full, 'utf8')))
+      .filter(({ full }) => [...readFileSync(full, 'utf8').matchAll(reach)].length > 0)
       .map(({ file }) => `server/${file}`)
       .sort();
     // Anti-vacuity: a walker that found nothing would pass this loop empty.
@@ -933,15 +938,11 @@ describe('src/sim/freehold/ source scan', () => {
     // raw characters, and every wrapped list was skipped as list-less, which is
     // how a missing `owner_key.ts` passed.
     const paragraph = guide.slice(first, second).replace(/\s+/g, ' ');
+    // A bare barrel import reads as the leaf `index`, which no list names, so
+    // it fails here rather than passing unlisted.
     const realLeaves = (importer: string) =>
       [
-        ...new Set(
-          [
-            ...readFileSync(importer, 'utf8').matchAll(
-              /from '[./]*\/src\/sim\/freehold\/([a-z_]+)'/g,
-            ),
-          ].map((m) => m[1]),
-        ),
+        ...new Set([...readFileSync(importer, 'utf8').matchAll(reach)].map((m) => m[1] ?? 'index')),
       ].sort();
     // The ONE importer the paragraph describes in prose rather than with a
     // list, and the prose says which leaf: held to that claim instead.

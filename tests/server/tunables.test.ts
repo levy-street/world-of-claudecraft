@@ -1143,7 +1143,11 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     // Every read on ONE checked-out client, released in a finally.
     expect(loaderBody).toContain('const client = await pool.connect();');
     expect(loaderBody).toContain('client.release();');
-    expect(loaderBody.indexOf('finally')).toBeLessThan(loaderBody.indexOf('client.release();'));
+    // The release sits INSIDE a finally: a missing finally is -1, which must
+    // fail, never pass as "earlier than the release".
+    const fin = loaderBody.indexOf('} finally {');
+    expect(fin).toBeGreaterThan(-1);
+    expect(loaderBody.indexOf('client.release();', fin)).toBeGreaterThan(fin);
     for (const call of [
       'freeholdsForExport(client, accountId)',
       'freeholdHearthForExport(client, accountId)',
@@ -1715,19 +1719,16 @@ describe('WORLD_PVP_DISABLED (the World PvP realm kill switch)', () => {
   });
 });
 
-describe('the pool headroom covers the clients outside the background gate at the flush', () => {
-  it('leaves room for the claim renewer, the lease heartbeat and one request-path client', () => {
-    // The literal first (the constant-self-comparison trap), then the relation
-    // the claim renewer's wiring states (server/freehold_persist_wiring.ts):
-    // both periodic writers run OUTSIDE the gate, one client each, on the same
-    // 30 s flush, so the headroom must cover them plus at least one request.
+describe('the pool headroom beside the clients outside the background gate at the flush', () => {
+  it('states the flush arithmetic as literals: a 10-client pool, 3 outside the gate', () => {
+    // The arithmetic the claim renewer's wiring states
+    // (server/freehold_persist_wiring.ts), as literals: the realm pool's
+    // default is 10 clients and the gate admits all but 3. The clients outside
+    // the gate at the flush (the renewer's one, the lease heartbeat's one and
+    // the bank-ledger FIFO tail's one) can take all 3 at that instant: it is
+    // composition headroom, not a reserve (server/background_db_gate.ts).
+    expect(codeOnly(read('server/db.ts'))).toContain('const DB_POOL_MAX_CLIENTS_DEFAULT = 10;');
     expect(BACKGROUND_DB_MAJOR_PRODUCER_HEADROOM).toBe(3);
-    const claimRenewer = 1;
-    const leaseHeartbeat = 1;
-    const requestPath = 1;
-    expect(BACKGROUND_DB_MAJOR_PRODUCER_HEADROOM).toBeGreaterThanOrEqual(
-      claimRenewer + leaseHeartbeat + requestPath,
-    );
     // And the wiring that states that arithmetic still says the renewer runs on
     // the raw pool outside the gate, one client at a time.
     const wiring = read('server/freehold_persist_wiring.ts');

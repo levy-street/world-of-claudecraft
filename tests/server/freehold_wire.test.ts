@@ -47,6 +47,7 @@ vi.mock('../../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
   saveCharacterAndMarketState: vi.fn(async () => {}),
+  saveCharacterAndGuildBankState: vi.fn(async () => {}),
   saveMarketState: vi.fn(async () => {}),
   saveMailState: vi.fn(async () => {}),
   loadMarketState: vi.fn(async () => null),
@@ -2124,6 +2125,21 @@ describe('Freehold Gate and Hearth Key real server dispatch', () => {
         purchasedSlotsAfter: 1,
       };
       session.pendingStorageAppliedEffects.push(effect);
+      server.sim.loadGuildBank(9001, { treasury: 1000, inventory: [], purchasedSlots: 24 });
+      session.dirtyGuildBanks.set(9001, 3);
+      // And a dirty guild book with one unflushed op, so the save carries the
+      // escrow shape (the market writer's queue, the book delta).
+      session.unflushedGuildBankOps.set(9001, [
+        {
+          op: 'deposit_gold',
+          itemId: null,
+          count: null,
+          instance: null,
+          copperDelta: 5,
+          purchasedSlotsBefore: 0,
+          purchasedSlotsAfter: 0,
+        },
+      ]);
       const ledgerRows = session.bankLedgerJournal.outbox.snapshot().rowCount;
       expect(ledgerRows).toBeGreaterThan(0);
       const saveState = vi.mocked(db.saveCharacterState);
@@ -2146,23 +2162,58 @@ describe('Freehold Gate and Hearth Key real server dispatch', () => {
               }
             : undefined,
       };
+      // The cancellation itself, named per arm, so a save that threw for any
+      // other reason before reaching either wait cannot pass as cancelled.
       await expect(
         saveSurface(server).saveCharacter(session, { housing, backgroundDbPermit: true }),
-      ).rejects.toThrow();
-      // Nothing was written and nothing owed was consumed.
+      ).rejects.toMatchObject(
+        at === 'queue'
+          ? {
+              name: 'KeyedSerialWriteAborted',
+              message: 'keyed serial write aborted before starting',
+            }
+          : { name: 'AbortError', message: 'background database save cancelled' },
+      );
+      // Nothing was written and nothing owed was consumed: the ledger batch,
+      // the storage effect and the dirty guild book are all still owed, and
+      // no book op is in flight.
+      const escrowSave = vi.mocked(db.saveCharacterAndGuildBankState);
       expect(saveState).not.toHaveBeenCalled();
+      expect(escrowSave).not.toHaveBeenCalled();
       expect(run).not.toHaveBeenCalled();
       expect(session.pendingStorageAppliedEffects).toEqual([effect]);
       expect(session.bankLedgerJournal.outbox.snapshot().rowCount).toBe(ledgerRows);
-      // The next ordinary save carries exactly that work, and only then is it
-      // consumed.
-      saveState.mockResolvedValueOnce(true as never);
+      expect([...session.dirtyGuildBanks]).toEqual([[9001, 3]]);
+      expect(session.unflushedGuildBankOps.get(9001)).toHaveLength(1);
+      expect(session.inFlightGuildBankOps.size).toBe(0);
+      // The next ordinary save carries exactly that work (the book rides the
+      // escrow save with the effects), and only then is it consumed.
       await expect(saveSurface(server).saveCharacter(session)).resolves.toBe(true);
-      expect(saveState).toHaveBeenCalledTimes(1);
-      const call = saveState.mock.calls[0] as unknown[];
-      expect(call[4]).toEqual([effect]);
+      expect(saveState).not.toHaveBeenCalled();
+      expect(escrowSave).toHaveBeenCalledTimes(1);
+      const call = escrowSave.mock.calls[0] as unknown[];
+      expect(call[3]).toEqual([
+        {
+          guildId: 9001,
+          deltas: [
+            {
+              op: 'deposit_gold',
+              itemId: null,
+              count: null,
+              instance: null,
+              copperDelta: 5,
+              purchasedSlotsBefore: 0,
+              purchasedSlotsAfter: 0,
+            },
+          ],
+        },
+      ]);
+      expect(call[6]).toEqual([effect]);
       expect(session.pendingStorageAppliedEffects).toEqual([]);
       expect(session.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
+      // The book is consumed only by an ACKNOWLEDGED guild write, which this
+      // mock returns none of, so it stays owed rather than being dropped.
+      expect([...session.dirtyGuildBanks]).toEqual([[9001, 3]]);
     },
   );
 

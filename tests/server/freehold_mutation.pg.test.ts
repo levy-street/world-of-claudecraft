@@ -1653,6 +1653,16 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           outcome: 'cancelled',
         }),
       ).toBe('already_closed');
+      // The stranger again, now that only the receipt remains: `missing`, never
+      // `already_closed`, so a close cannot tell it the id exists.
+      expect(
+        await ops.cancelFreeholdOperation(pool, {
+          operationId: t.intent.operationId,
+          accountId: stranger,
+          fingerprint: t.intent.fingerprint,
+          outcome: 'cancelled',
+        }),
+      ).toBe('missing');
 
       const u = await transferFixture();
       await pool.query('UPDATE accounts SET deactivated_at = now() WHERE id = $1', [u.acct]);
@@ -1876,18 +1886,32 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         const blocker = await pool.connect();
         try {
           await blocker.query('BEGIN');
+          const blockerPid = Number(
+            (await blocker.query('SELECT pg_backend_pid() AS pid')).rows[0].pid,
+          );
           await blocker.query('SELECT pg_advisory_xact_lock($1::int, $2::int)', [
             ops.FREEHOLD_ADVISORY_ACCOUNT_CLASS,
             p.acct,
           ]);
           const open = intentOf(p.acct, p.ch, null);
           const prepared = ops.prepareFreeholdOperation(pool, open);
-          await waitForLockWaiters('SELECT pg_advisory_xact_lock($1::int, $2::int)');
+          // Each wait is the one THIS case made: blocked by the named backend.
+          await waitForLockWaiters('SELECT pg_advisory_xact_lock($1::int, $2::int)', 1, blockerPid);
+          const preparePid = Number(
+            (
+              await pool.query(
+                `SELECT pid FROM pg_stat_activity
+                  WHERE datname = $1 AND wait_event_type = 'Lock'
+                    AND $2::int = ANY(pg_blocking_pids(pid))`,
+                [VERIFY_DB, blockerPid],
+              )
+            ).rows[0].pid,
+          );
           const deleted = pool.query('DELETE FROM characters WHERE id = $1', [p.ch]).then(
             () => null,
             (error: unknown) => error,
           );
-          await waitForLockWaiters('DELETE FROM characters%');
+          await waitForLockWaiters('DELETE FROM characters%', 1, preparePid);
           await blocker.query('COMMIT');
           expect(await prepared).toEqual({ kind: 'prepared' });
           expect(await deleted).toMatchObject({
@@ -1912,11 +1936,16 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         const deleter = await pool.connect();
         try {
           await deleter.query('BEGIN');
+          const deleterPid = Number(
+            (await deleter.query('SELECT pg_backend_pid() AS pid')).rows[0].pid,
+          );
           await deleter.query('DELETE FROM characters WHERE id = $1', [p.ch]);
           const open = intentOf(p.acct, p.ch, null);
           const prepared = ops.prepareFreeholdOperation(pool, open);
           await waitForLockWaiters(
             'SELECT id FROM characters WHERE id = $1 AND account_id = $2 FOR KEY SHARE',
+            1,
+            deleterPid,
           );
           await deleter.query('COMMIT');
           expect(await prepared).toEqual({ kind: 'parent_missing' });
@@ -2745,7 +2774,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         return check.ok ? index : (check.reason ?? 'refused');
       });
 
-    it('pins each statement to its index on production-shaped tables, never a sequential scan', async () => {
+    it('pins that each statement can reach its index on production-shaped tables (seqscan off)', async () => {
       const p = await player();
       const other = await player();
       const client = await pool.connect();
@@ -2793,7 +2822,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           ['open count', ops.FREEHOLD_OPERATION_OPEN_COUNT_SQL, [p.acct]],
           ['discover', ops.FREEHOLD_OPERATION_DISCOVER_SQL, [p.acct, 8]],
           ['export intents', ops.FREEHOLD_OPERATION_EXPORT_INTENTS_SQL, [p.acct]],
-          // The account guard trigger's own query, by its literal text.
+          // The account guard trigger's own query, as the predicate its plpgsql
+          // body runs (pinned to the DDL below); PostgreSQL's own RI and trigger
+          // statements are not reachable from EXPLAIN, so these are equivalents.
           [
             'account guard',
             'SELECT operation_id FROM freehold_operations WHERE account_id = $1 LIMIT 1',
@@ -2912,6 +2943,28 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           const index = relation === 'accounts' ? 'accounts_pkey' : 'account_freehold_hearth_pkey';
           expect(reach(await explain(text, [p.acct]), relation, index)).toEqual([index]);
         }
+        // The advance's UPDATE on the account key, the lazy init's conflict
+        // arbiter, and the ambiguous-COMMIT verify's FOR SHARE wait on the
+        // character key.
+        expect(
+          reach(
+            await explain(hearthDb.FREEHOLD_HEARTH_ADVANCE_SQL, [
+              p.acct,
+              '1',
+              String(COOLDOWN_MS),
+              'f'.repeat(32),
+            ]),
+            'account_freehold_hearth',
+            'account_freehold_hearth_pkey',
+          ),
+        ).toEqual(['account_freehold_hearth_pkey']);
+        const initPlan = await explain(hearthDb.FREEHOLD_HEARTH_INIT_SQL, [p.acct]);
+        expect(
+          (initPlan as unknown as Record<string, unknown>)['Conflict Arbiter Indexes'],
+        ).toEqual(['account_freehold_hearth_pkey']);
+        expect(
+          reach(await explain(VERIFY_WAIT_TEXT, [p.ch]), 'characters', 'characters_pkey'),
+        ).toEqual(['characters_pkey']);
         // Negative control: a predicate no index serves still scans, and the
         // reader refuses it.
         expect(
@@ -2942,9 +2995,12 @@ d('the housing mutation boundary (REAL Postgres)', () => {
   // K. A steady-state boot re-applies the claim and operation fragments as
   //    catalog reads: no lock any live housing or parent writer conflicts with.
   // ---------------------------------------------------------------------------
-  describe('K. a steady-state re-apply of the claim and operation fragments is catalog-only', () => {
-    /** Every table the two fragments create, index or attach a trigger to. */
+  describe('K. a steady-state re-apply of the housing fragments is catalog-only', () => {
+    /** Every table the four housing fragments create, index, alter or attach a
+     *  trigger to. */
     const TABLES = [
+      'account_freeholds',
+      'account_freehold_hearth',
       'freehold_plot_claims',
       'freehold_operations',
       'freehold_operation_receipts',
@@ -2979,7 +3035,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
 
     /** Runs `sql` while another transaction holds ROW EXCLUSIVE (what every
      *  live claim write, operation write, character save and account update
-     *  holds) on all five tables, under `lockTimeout`. Returns the
+     *  holds) on every one of those tables, under `lockTimeout`. Returns the
      *  strongest relation lock the applier itself took on them, or the code
      *  it failed with. */
     async function applyBesideWriters(sql: string, commit: boolean, lockTimeout = '1s') {
@@ -3013,7 +3069,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       }
     }
 
-    it('re-applies both fragments beside live writers on every table, and keeps every object it owns', async () => {
+    it('re-applies all four fragments beside live writers on every table, and keeps every object they own', async () => {
       const before = await owned();
       // The catalog the fragments own is all present (a vacuous snapshot
       // would compare two empty lists).
@@ -3035,9 +3091,15 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         expect.stringMatching(/^trigger freehold_operation_receipt_erase \d+ O$/),
       ]);
       expect(before.filter((o) => o.startsWith('function '))).toHaveLength(2);
+      const hearth = await import('../../server/freehold_hearth_db');
       expect(
         await applyBesideWriters(
-          `${claims.FREEHOLD_CLAIM_SCHEMA}\n${ops.FREEHOLD_OPERATION_SCHEMA}`,
+          [
+            plots.FREEHOLD_SCHEMA,
+            hearth.FREEHOLD_HEARTH_SCHEMA,
+            claims.FREEHOLD_CLAIM_SCHEMA,
+            ops.FREEHOLD_OPERATION_SCHEMA,
+          ].join('\n'),
           true,
         ),
       ).toEqual({ stronger: [] });
@@ -3058,9 +3120,29 @@ d('the housing mutation boundary (REAL Postgres)', () => {
            WHERE account_id IS NOT NULL`,
         'DROP TRIGGER IF EXISTS freehold_operation_guard_character_delete ON characters',
         'DROP TRIGGER IF EXISTS freehold_operation_guard_account_delete ON accounts',
+        'CREATE UNIQUE INDEX IF NOT EXISTS account_freeholds_plot_id ON account_freeholds (plot_id)',
+        'ALTER TABLE account_freehold_hearth ADD COLUMN IF NOT EXISTS advance_token TEXT',
       ]) {
         // A short bound: the control only has to show the statement queues.
         expect(await applyBesideWriters(sql, false, '150ms'), sql).toEqual({ code: '55P03' });
+      }
+    });
+
+    it("puts the caller's own search_path back after the operation fragment", async () => {
+      // ensureSchema applies the fragments one after another in ONE
+      // transaction, so a fragment that left its own fixed path in force would
+      // hand it to the next fragment's capture (the storage fragment's).
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN');
+        await client.query("SET LOCAL search_path = 'fhqa_probe', public");
+        const before = (await client.query('SHOW search_path')).rows[0].search_path;
+        expect(before).toBe('fhqa_probe, public');
+        await client.query(ops.FREEHOLD_OPERATION_SCHEMA);
+        expect((await client.query('SHOW search_path')).rows[0].search_path).toBe(before);
+      } finally {
+        await client.query('ROLLBACK').catch(() => {});
+        client.release();
       }
     });
   });

@@ -36,6 +36,12 @@ describe('countsAsEscrowSaveFailure', () => {
   it('is the one rule the save path consults', () => {
     const game = stripComments(readFileSync('server/game.ts', 'utf8'));
     expect(game.split('countsAsEscrowSaveFailure(err, carriesGuildBooks)').length - 1).toBe(1);
-    expect(game).not.toContain("guildBankIncident('escrow_save_failed');\n            }");
+    // ONE increment of the incident in the whole coordinator, and it is the
+    // statement the rule gates: no second, ungated path can count a refusal.
+    expect(game.split("guildBankIncident('escrow_save_failed')").length - 1).toBe(1);
+    const rule = game.indexOf('countsAsEscrowSaveFailure(err, carriesGuildBooks)');
+    const count = game.indexOf("guildBankIncident('escrow_save_failed')");
+    expect(count).toBeGreaterThan(rule);
+    expect(game.slice(rule, count)).not.toMatch(/[;}]/);
   });
 });

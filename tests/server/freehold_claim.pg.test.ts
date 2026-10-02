@@ -1128,10 +1128,11 @@ d('the global plot claim against real PostgreSQL', () => {
     // The abandoned checkout is handed back, not leaked: the pool's ONE client
     // is idle again (a leak would leave it checked out, and the read below
     // would only fail by its own timeout), and the pool still serves.
-    await sleep(20);
+    // Polled, never slept: the hand-back is one settled promise away, and a
+    // loaded runner must not turn that into a flake.
+    await vi.waitFor(() => expect(tight.idleCount).toBe(1));
     expect(tight.waitingCount).toBe(0);
     expect(tight.totalCount).toBe(1);
-    expect(tight.idleCount).toBe(1);
     expect((await tight.query('SELECT 1 AS one')).rows).toEqual([{ one: 1 }]);
     await tight.end();
   });
@@ -1496,9 +1497,8 @@ d('the global plot claim against real PostgreSQL', () => {
       // client, which the refused read's checkout received when the hog let
       // go, so this read can only succeed (inside its own 400 ms budget) once
       // that checkout released it.
-      await sleep(20);
+      await vi.waitFor(() => expect(tight.idleCount).toBe(1));
       expect(tight.totalCount).toBe(1);
-      expect(tight.idleCount).toBe(1);
       const answer = await loginMod.readClaimedLoginDurables(starved, 31);
       expect(answer.row).toMatchObject({ kind: 'row', row: { plotId, durableRev: '1' } });
       expect(tight.totalCount).toBe(1);
@@ -1637,12 +1637,17 @@ d('the global plot claim against real PostgreSQL', () => {
       const pkey = 'freehold_plot_claims_pkey';
       const holderIdx = 'freehold_plot_claims_holder';
       const accountIdx = 'freehold_plot_claims_account';
+      // A FULL chunk, as production sends it: 256 of the bulk ids above (the
+      // chunk bound, FREEHOLD_CLAIM_RENEW_CHUNK), never a one-element array the
+      // planner treats as a point lookup.
+      expect(reg.FREEHOLD_CLAIM_RENEW_CHUNK).toBe(256);
+      const chunk = Array.from({ length: 256 }, (_, i) => `plot:plansbulk${i + 1}`);
       const chunked: [string, string, unknown[]][] = [
-        ['renew', claimDb.FREEHOLD_CLAIM_RENEW_SQL, [HOLDER_A, LONG_TTL_SECONDS, [plotId]]],
-        ['release', claimDb.FREEHOLD_CLAIM_RELEASE_SQL, [HOLDER_A, [plotId]]],
-        ['still held', claimDb.FREEHOLD_CLAIM_STILL_HELD_SQL, [HOLDER_A, [plotId]]],
-        ['release read', claimDb.FREEHOLD_CLAIM_RELEASE_READ_SQL, [HOLDER_A, [plotId]]],
-        ['release wait', claimDb.FREEHOLD_CLAIM_RELEASE_WAIT_SQL, [HOLDER_A, [plotId]]],
+        ['renew', claimDb.FREEHOLD_CLAIM_RENEW_SQL, [HOLDER_A, LONG_TTL_SECONDS, chunk]],
+        ['release', claimDb.FREEHOLD_CLAIM_RELEASE_SQL, [HOLDER_A, chunk]],
+        ['still held', claimDb.FREEHOLD_CLAIM_STILL_HELD_SQL, [HOLDER_A, chunk]],
+        ['release read', claimDb.FREEHOLD_CLAIM_RELEASE_READ_SQL, [HOLDER_A, chunk]],
+        ['release wait', claimDb.FREEHOLD_CLAIM_RELEASE_WAIT_SQL, [HOLDER_A, chunk]],
       ];
       for (const [name, text, values] of chunked) {
         const reads = scansReachOneOf(await explain(text, values), 'freehold_plot_claims', [
