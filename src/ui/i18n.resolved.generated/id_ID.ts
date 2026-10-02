@@ -513,6 +513,48 @@ export const id_ID: EnTranslations = {
       "sailing": "Berlayar ke {dest}"
     },
     "materialStackSelectionUnavailable": "Pilihan material itu tidak lagi tersedia.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Barrowglass Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "braceTooltipLean": "Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: each pushes the marker toward its side. The beam drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Lower the pike and step out of the brace, the same as jumping. You lose the set but pay no penalty: you can couch it again right away. Only a thrust, a fumble, a broken stance or a missed window rests the pike, for {rest} seconds.",
+      "whyResting": "The pike is being re-set after a thrust, a fumble, a broken stance or a missed window. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptFindBossMuster": "The muster's Shardpike: put out the Foreman's eye with it",
+      "promptTakePike": "Press {key} or click the rack to take a Shardpike",
+      "promptTakePikeClick": "Click the rack to take a Shardpike",
+      "promptTakePikeTap": "Tap the rack to take a Shardpike",
+      "promptPikeLevelCap": "The muster lends its pikes only to level {level} or lower",
+      "promptHoldSteadyLean": "Hold the pike steady: lean with {left} and {right}",
+      "leanLeft": "Lean left",
+      "leanRight": "Lean right",
+      "leanLeftKey": "Lean left ({key})",
+      "leanRightKey": "Lean right ({key})",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN",
+      "effigyBanner": "BLINDED! NOW THE WHOLE RAID HITS HARD",
+      "promptStrikeLantern": "STRIKE THE LANTERN now, {seconds}s",
+      "promptLanternOut": "The lantern is out, {seconds}s: hit it with your own weapon",
+      "promptCloserEffigy": "Get within reach of the Straw Foreman, {yards} yards out"
+    },
     "vehicle": {
       "title": "Meriam Pengawasan Utara",
       "objective": "Pertahankan pengawasan utara",
@@ -3112,8 +3154,10 @@ export const id_ID: EnTranslations = {
         "storm": "Setiap mantra yang kamu baca menambah muatan, hingga {max}. Muatan bertahan {duration} detik, disegarkan setiap kali kamu mendapat muatan.",
         "heat": "Setiap pukulan senjata jarak dekat dan jarak jauh kamu menambah tumpukan panas, hingga {max}. Panas berlangsung {duration} detik, disegarkan setiap kali kamu mendapat tumpukan.",
         "ignite": "Pukulan kritis senjata jarak dekat dan jarak jauh kamu menyalakan target, memberikan {tick} kerusakan Api setiap {every} detik selama {duration} detik. Pukulan kritis baru menyegarkannya. Kerusakan meningkat dengan Kekuatan Serangan atau Kekuatan Serangan Jarak Jauh, mana yang lebih tinggi.",
-        "guardHeat": "Setiap serangan yang kamu hindari, elak atau blok menambah tumpukan panas, hingga {max}. Panas berlangsung {duration} detik, disegarkan setiap kali kamu mendapat tumpukan."
+        "guardHeat": "Setiap serangan yang kamu hindari, elak atau blok menambah tumpukan panas, hingga {max}. Panas berlangsung {duration} detik, disegarkan setiap kali kamu mendapat tumpukan.",
+        "stoneHeart": "When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow."
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "Selama {duration} detik, musuh yang langsung menghantammu mengalami kerusakan Fisik sama dengan {pct}% kesehatan yang ditikamnya dari dirimu. Kerusakan berkala tidak memicunya.",
         "anchor": "Selama {duration} detik, terima {reduction}% lebih sedikit kerusakan tetapi bergerak dengan kecepatan {speed}%. Menghilangkan pingsang, akar, kelambatan, ketakutan, polimorf, keheningan, kebutaan, kutukan, lepaskan senjata dan efek mengacaukan pada dirimu, dan kamu mengabaikan yang baru dan dorongan mundur selama berlangsung.",
@@ -3132,7 +3176,11 @@ export const id_ID: EnTranslations = {
         "kindlingOrb": "Panggil bola ember di sebelahmu selama {duration} detik. Setiap mantra yang kamu baca pada musuh membuatnya menembakkan baut pada musuh itu untuk {damage} kerusakan Api. Kerusakan meningkat dengan Kekuatan Mantra.",
         "pierce": "Selama {duration} detik, serangan otomatis, tembakan dan kemampuan fisik kamu (bukan pendarahan) juga menyerang musuh terdekat target kamu dalam jarak {reach} yard untuk {share}% dari kerusakan yang diberikan.",
         "lantern": "Letakkan lentera di kakimu selama {duration} detik. Penyembuh langsung dari siapa pun padamu atau anggota kelompok dalam jarak {radius} yard darinya juga menyembuhkan anggota kelompok lain yang paling terluka dalam cahayanya untuk {share}% dari penyembuhan.",
-        "heartNova": "Habiskan semua tumpukan panas pada ledakan api yang memberikan {perHeat} kerusakan Api per tumpukan ({max} di {maxHeat} tumpukan) ke setiap musuh dalam jarak {radius} yard dan mengejek setiap makhluk yang terkena. Kerusakan meningkat dengan Kekuatan Serangan. Memerlukan tumpukan panas."
+        "heartNova": "Habiskan semua tumpukan panas pada ledakan api yang memberikan {perHeat} kerusakan Api per tumpukan ({max} di {maxHeat} tumpukan) ke setiap musuh dalam jarak {radius} yard dan mengejek setiap makhluk yang terkena. Kerusakan meningkat dengan Kekuatan Serangan. Memerlukan tumpukan panas.",
+        "foremanShape": "Take the Shape of the Foreman for {duration} sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain {armorPct}% armor and cannot be knocked back. Dismounts you.",
+        "musterStandard": "Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers march at your side and fight your target in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, and only once it is already in combat. Each has {hpPct}% of your maximum health. Left more than {leash} yd behind, they rejoin you at once. They leave when the standard falls or when you die. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.",
+        "gutteredGlare": "Channel for {duration} sec: a beam {length} yd long bursts from you the way you face and deals {tick} Arcane damage every {every} sec to up to {max} enemies in its path ({total} to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power.",
+        "grapnel": "Hook a party or raid member within {range} yd that you can see and haul them through the air to your side, healing them for {heal} when they land. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken. Healing increases with Healing Power."
       }
     },
     "questShare": {
@@ -3950,6 +3998,8 @@ export const id_ID: EnTranslations = {
       "cooldownCap": "{used} dari {cap} dtk pengurangan jeda terpakai dalam jendela ini",
       "bruinRushWindow": "Wujud Serigala tidak memakai mana dan menjepit target Terjangan Bruin-mu, memperlambatnya {pct}% selama {sec} dtk",
       "funeralHarvestLock": "Funeral Harvest belum bisa menciptakan Serpihan Jiwa lagi",
+      "effigyPlankHide": "Turns away {pct}% of every blow, until a Shardpike thrust puts out the lantern in its eye",
+      "effigyLanternOut": "The Straw Foreman's lantern is out for you: your blows and your pet's ignore its Plank Hide and land in full",
       "leadenHexLock": "Kutuk Timah belum bisa mengakar target ini lagi",
       "forbiddenReflectionReady": "Jeda Penyihir Iblis berikutnya yang memenuhi syarat dapat dirapal kembali",
       "forbiddenReflectionLock": "Pantulan Terlarang belum bisa disiapkan lagi",
@@ -4036,6 +4086,10 @@ export const id_ID: EnTranslations = {
         "moltenIgnite": "Menimbulkan {damage} kerusakan Api setiap {every} detik. Pukulan kritis senjata lain memperpanjangnya.",
         "pierce": "Serangan otomatis, tembakan dan kemampuan fisik Anda (bukan pendarahan) juga menyerang musuh terdekat target Anda dalam {reach} yard sebesar {pct}% dari kerusakan yang ditimbulkan.",
         "lantern": "Penyembuhan langsung dari siapa pun pada Anda atau anggota pihak dalam {radius} yard dari lentera juga menyembuhkan anggota pihak lain yang paling terluka dalam cahayanya sebesar {pct}% dari penyembuhan.",
+        "foremanShape": "You are the Foreman: {armorPct}% more armor and immune to knockbacks.",
+        "musterStandard": "Your Muster Standard is planted. Its soldiers march with you and fight your target.",
+        "gutteredGlare": "The beam deals {tick} Arcane damage every {every} sec to enemies in its path. Moving or casting ends it.",
+        "stoneStatue": "Turned to stone: immune to damage and unable to act. You return with {pct}% of your maximum health.",
         "crucibleHeat": "Panas: {stacks}/{max}. Gunakan Jantung Cekungan untuk menghabiskan semuanya pada ledakan api yang menimbulkan {damage} kerusakan Api ke setiap musuh dalam {radius} yard dan menggoda setiap makhluk yang terkena.",
         "crucibleHeatOther": "Panas: {stacks}/{max}. Jantung Cekungan menghabiskan semuanya pada ledakan api dalam {radius} yard yang menimbulkan kerusakan Api lebih banyak untuk setiap tumpukan dan menggoda setiap makhluk yang terkena."
       },
@@ -4071,6 +4125,7 @@ export const id_ID: EnTranslations = {
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "damageReduction": "Mengurangi semua kerusakan yang diterima sebesar {pct}%",
+      "slumber": "Tertidur hingga fajar. Tidak dapat diserang dan tidak akan bangun untuk siapa pun.",
       "guardianWard": "Serangan musuh mematikan berikutnya memulihkanmu menjadi {pct}% kesehatan",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
@@ -4147,7 +4202,9 @@ export const id_ID: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} bangkit di atas Dataran Tinggi Thornpeak!"
+      "spawn": "{name} bangkit di atas {zone}!",
+      "wake": "{name} terbangun di atas {zone}!",
+      "sleep": "{name} tertidur hingga fajar."
     },
     "auth": {
       "appleLoginCta": "Lanjutkan dengan Apple",
@@ -4291,6 +4348,7 @@ export const id_ID: EnTranslations = {
         "menu": "Menu",
         "minimap": "Peta Mini",
         "stanceBar": "Bilah Kuda-kuda",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "Bilah XP",
         "chat": "Obrolan",
         "actionBarGroup": "Bilah Aksi",
@@ -7428,6 +7486,7 @@ export const id_ID: EnTranslations = {
       "framesGovernedAuraTracks": "Edit Bingkai juga melonggarkan enam jalur aura pilihan setelah kamu menyalakannya dari tab Tempur pada opsi Antarmuka yang sama: jalur Buffku, jalur Masa Tunggu Defensif, jalur Perisaiku, jalur Masa Tunggu Ofensif, jalur Pergerakan dan Sembunyi, serta jalur Buffku pada Sekutu. Semua jalur mati secara bawaan, dan masing-masing memakai chip nama sendiri saat dilonggarkan.",
       "frameGroups": "{trackers} dapat menggabungkan pencarian, jasa, celah, menggali, tujuan pengumpulan, dan pelacakan Relikuari. {auras} dapat menggabungkan Target dot dan enam lagu aura. Aktifkan grup apa pun di Pengaturan Bingkai, atau biarkan tetap mati untuk memindahkan setiap bingkai secara terpisah. {tot} mencakup bilah sumber daya. {focus} memiliki tiga target yang dapat dipindahkan secara independen: Shift+F1 hingga Shift+F3 menetapkannya; Ctrl+F1 hingga Ctrl+F3 memilihnya. Seret meter kerusakan atau ancaman ke mana saja di luar tombolnya untuk memindahkannya, dan seret tepinya untuk mengubah ukurannya, bahkan saat bingkai terkunci. Saat bingkai terbuka, Tampilkan atau Sembunyikan Bingkai memiliki menu bergroupe sendiri. Klik kanan bingkai yang terbuka untuk Ukuran Reset atau Opsi Bingkai. Antarmuka > Bingkai juga berisi Pengaturan Bingkai dan Opsi Bingkai Pesta yang dapat runtuh. Kunci Target dari Target ke Target menjaga bingkai-bingkai tersebut bersama. Matikan untuk memindahkan Target dari Target secara terpisah; menyalakannya kembali menyimpan posisi terpisah untuk nanti. Bingkai fokus yang ditetapkan menyembunyikan kontrol penyiapannya; klik kanan dan pilih Batalkan Atur Fokus untuk mengembalikannya. Penyiaran mouseover juga bekerja pada bingkai fokus.",
       "framesGovernedTalkingHead": "Edit Frames juga melonggarkan panel Dialog, yang membawa kalimat lisan NPC saat NPC tersebut berada di luar pandangan Anda; ia memakai chip namanya saat longgar.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Bilah, penghitung waktu, dan teks pertarungan",
       "barsBody": "Bilah rapalanmu muncul di tengah layar, tepat di atas bilah aksimu, setiap kali kamu merapal atau menyalurkan mantra, dan menampilkan nama mantra serta waktu yang tersisa. Targetmu mendapatkan bilah rapalannya sendiri pada bingkainya, sehingga kamu bisa melihat apa yang akan datang dan meresponsnya.\n\nSebuah bilah ayunan tipis berada di bawah bilah rapalanmu dan terisi di antara ayunan senjatamu, sehingga penyerang jarak dekat atau jarak jauh bisa melihat kapan pukulan otomatis berikutnya akan mendarat.\n\nBilah pengalamanmu membentang selebar penuh di bawah bilah aksimu, terbagi menjadi segmen-segmen, dengan sebuah bagian yang lebih terang menunjukkan pengalaman istirahat yang telah kamu tabung.\n\nBerenang di bawah air dan sebuah bilah napas biru muncul di bagian atas layar. Bilah itu berkurang selama kepalamu terendam, berkedip merah begitu habis dan kamu mulai tenggelam, lalu terisi cepat begitu kamu muncul ke permukaan. Space membuatmu berenang ke atas, dan tombol Berenang Turun, Ctrl secara bawaan, membawamu lebih dalam.\n\nKerusakan dan penyembuhan melayang ke atas dari apa pun yang menerimanya sebagai angka-angka kecil, sehingga kamu bisa membaca sebuah pertarungan tanpa membaca teks. Tab Catatan Tempur di kotak obrolanmu menyimpan catatan tertulis yang lengkap.",
@@ -11227,6 +11286,7 @@ export const id_ID: EnTranslations = {
     "lockoutRaids": "Penyerbuan",
     "lockoutDungeons": "Penggudangan",
     "lockoutWorldBosses": "Bos Dunia",
+    "lockoutWeeklyQuests": "Weekly quests",
     "takeOverConfirm": "Ini akan memutus karakter ini dari sesi lain dan membawanya ke sini. Lanjutkan?",
     "renameRequired": "wajib ganti nama",
     "delete": "Hapus",
@@ -15829,6 +15889,30 @@ export const id_ID: EnTranslations = {
       "fenshadow_maul": {
         "name": "Gada Bayangan Rawa"
       },
+      "foremans_barrowmaul": {
+        "name": "Godam Gundukan Sang Mandor"
+      },
+      "skerrits_shardpike": {
+        "name": "Tombak Serpih Skerrit"
+      },
+      "loomshard_eye": {
+        "name": "The Barrowglass Eye"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Bahuan Gundukan"
+      },
+      "mirestone_stride": {
+        "name": "Langkah Batu Rawa"
+      },
+      "foremans_wage_band": {
+        "name": "Cincin Upah Mandor"
+      },
+      "mirelight_locket": {
+        "name": "Liontin Cahaya Rawa"
+      },
+      "fenwright_grips": {
+        "name": "Genggaman Tukang Rawa"
+      },
       "wildgrove_cinch": {
         "name": "Sabuk Rumpun Liar"
       },
@@ -18451,6 +18535,27 @@ export const id_ID: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Tongkat Perang Vanguard"
       },
+      "muster_shardpike": {
+        "name": "Muster Shardpike"
+      },
+      "knucklebone_of_balgath": {
+        "name": "Knucklebone of Balgath"
+      },
+      "muster_standard": {
+        "name": "Muster Standard"
+      },
+      "guttered_eye": {
+        "name": "The Guttered Eye"
+      },
+      "barrowstone_heart": {
+        "name": "Barrowstone Heart"
+      },
+      "muster_grapnel": {
+        "name": "Muster Grapnel"
+      },
+      "craterglass_stave": {
+        "name": "Craterglass Stave"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },
@@ -19725,8 +19830,26 @@ export const id_ID: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, Puncak yang Terjaga"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Anak Badai Terjaga"
+      },
+      "muster_footman": {
+        "name": "Muster Footman"
+      },
+      "muster_chaplain": {
+        "name": "Muster Chaplain"
+      },
+      "muster_sergeant": {
+        "name": "Muster Sergeant"
+      },
+      "muster_drillmaster": {
+        "name": "Muster Drillmaster"
+      },
+      "muster_effigy": {
+        "name": "Straw Foreman"
       },
       "stable_horse": {
         "name": "Kuda Kandang"
@@ -20375,6 +20498,16 @@ export const id_ID: EnTranslations = {
         "name": "Penjaga Fenwick",
         "title": "Penjaga Fenbridge",
         "greeting": "Bertahan di gerbang, {className}. Di balik gelagah itu, rawa yang membunuh demi kita."
+      },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
+      },
+      "muster_commander": {
+        "name": "Muster Commander",
+        "title": "Fenbridge Muster",
+        "greeting": "Pikes first, {className}, then everyone. That is the whole of it, and it has kept this camp alive."
       },
       "brother_aldric_fen": {
         "name": "Bruder Aldric",
@@ -21114,6 +21247,52 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Perintah Pengerahan Fenbridge"
+          }
+        }
+      },
+      "q_muster_summons": {
+        "title": "The Muster's Summons",
+        "text": "Every spear I could spare is dug in around the Starfall Crater, {playerName}, ringing the thing that walks out of it. The Muster Commander holds the camp on the southern rise above the crater, south-east of here. Report to the Commander. You will be told how we fight him, and you will listen, because the ones who did not are in the reeds.",
+        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Barrowglass blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. The rack lends its pikes to recruits of level 19 or lower: the young ones put the eye out, the veterans make the window count. Pikes first, {playerName}, then everyone.",
+        "objectives": {
+          "0": {
+            "label": "Report to the Muster Commander"
+          }
+        }
+      },
+      "q_muster_pike_drill": {
+        "title": "Pikes First",
+        "text": "Talk is cheap and pikes are not, and the rack lends them only to recruits of level 19 or lower. Take a Shardpike off the rack beside me, then walk to the Straw Foreman at the west end of camp: the lads built him out of planks and straw, half the size of the real one, with a lantern where the eye goes. Couch the pike and hold the point true while the drillmaster pounds the ground, because the real one shakes it harder. When your arms are sure, put the point through the lantern. His planks will come off: then hit him with your own weapon, {playerName}, and feel the difference.",
+        "completion": "You felt it bite, did you? On the real one that is fourteen breaths with the whole raid swinging, and then his hide closes over again. Keep the lesson. The Foreman will test it.",
+        "objectives": {
+          "0": {
+            "label": "Shardpike taken from the muster rack"
+          },
+          "1": {
+            "label": "Straw Foreman's lantern put out"
+          },
+          "2": {
+            "label": "Blows landed while its planks are down"
+          }
+        }
+      },
+      "q_muster_trophy": {
+        "title": "A Chip Off the Foreman",
+        "text": "Every week he stands back up, and every week we knock him down again. That takes a raid, and the muster cannot raise one on its own. Find the next raid that goes after Balgath and help bring him down, {playerName}. Strike him, shield the ones who do, or mend them: every hand that fights him counts. When he falls, come back and report to me. The muster pays for every kill.",
+        "completion": "Down again, and you were in the fight that did it. Fenbridge will have my report tonight. The purse is thin this far out, but it is yours. Come back when he is up again.",
+        "objectives": {
+          "0": {
+            "label": "Balgath slain"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Barrowglass in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -23298,6 +23477,12 @@ export const id_ID: EnTranslations = {
           },
           "7": {
             "label": "Benteng Karam"
+          },
+          "8": {
+            "label": "Wilayah Gundukan"
+          },
+          "9": {
+            "label": "Kawah Bintang Jatuh"
           }
         }
       },
@@ -24381,6 +24566,7 @@ export const id_ID: EnTranslations = {
     "mailboxName": "Kotak Surat",
     "noticeboardName": "Papan Pengumuman",
     "farmPatchName": "Petak Kebun",
-    "realmBuilderMonumentName": "Monumen Pembangun Alam"
+    "realmBuilderMonumentName": "Monumen Pembangun Alam",
+    "musterRackName": "Muster Weapon Rack"
   }
 };

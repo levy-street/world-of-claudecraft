@@ -17,3 +17,8 @@ export function inputSignature(mi: MoveInput, mouselookFacing: number | null): s
     facing,
   ].join(',');
 }
+
+/** Two facings are the same heading (wrap-aware, to float noise): the input sender's
+ *  "did the facing change" test (moved out of online.ts under the monolith ratchet). */
+export const inputFacingsMatch = (a: number, b: number): boolean =>
+  Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b))) <= 1e-12;

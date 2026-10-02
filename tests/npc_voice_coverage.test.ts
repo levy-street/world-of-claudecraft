@@ -99,13 +99,20 @@ describe('yell clip keys', () => {
   // the HUD's other voice-clip key resolvers). If that derivation and the generator's
   // yellKey ever drift, every yell goes silent with no other symptom, so pin them
   // together.
+  //
+  // The path matters more than it looks: this used to read hud.ts, and when the function
+  // moved out the `indexOf` returned -1, the slice came back EMPTY, and every `toContain`
+  // below passed vacuously against ''. A scrape that cannot find its subject has to fail,
+  // which is what the explicit non-empty assertion is for.
   const voiceCuesSrc = readFileSync(join(repoRoot, 'src/ui/hud_voice_cues.ts'), 'utf8');
 
   it('keeps yellVoiceKey byte-identical in shape to the generator', () => {
-    const body = voiceCuesSrc.slice(
-      voiceCuesSrc.indexOf('function yellVoiceKey'),
-      voiceCuesSrc.indexOf('}', voiceCuesSrc.indexOf('function yellVoiceKey')),
+    const at = voiceCuesSrc.indexOf('function yellVoiceKey');
+    expect(at, 'yellVoiceKey moved again: re-point this scrape at its new home').toBeGreaterThan(
+      -1,
     );
+    const body = voiceCuesSrc.slice(at, voiceCuesSrc.indexOf('}', at));
+    expect(body.length).toBeGreaterThan(40);
     expect(body).toContain('.toLowerCase()');
     expect(body).toContain("replace(/[^a-z0-9]+/g, '_')");
     expect(body).toContain("replace(/^_+|_+$/g, '')");

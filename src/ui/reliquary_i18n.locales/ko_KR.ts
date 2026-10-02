@@ -71,6 +71,10 @@ export const table: ReliquaryLocaleTable = {
     name: '천자르, 깨어나는 봉우리',
     desc: '깨어나는 봉우리의 월드 보스에게서 나오는 개인 서사 전리품.',
   },
+  conquerors_balgath: {
+    name: '발가스, 묻힌 감독관',
+    desc: '마이어펜 봉분에서 끌어낸 전리품.',
+  },
   conquerors_collapsed_reliquary: {
     name: '무너진 성물실',
     desc: '무너진 성물고의 자물쇠 상자에서 나오는 상징적인 희귀 물품.',

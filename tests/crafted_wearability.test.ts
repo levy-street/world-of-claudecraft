@@ -178,6 +178,13 @@ describe('crafted wearability: the level-20 shelf is unmoved (masterwrought R5 s
     // gap-fill drops at normal+heroic): 28 new gated equippables sourced at
     // the level-29/33 raid rungs, every one deriving the same level-20 gate;
     // no existing shelf row moved.
+    // Re-pinned 515 -> 519 for Balgath, the One-Eyed Foreman (the Mirefen world
+    // boss): his four ungated spoils (foremans_barrowmaul, loomshard_eye,
+    // barrowhide_pauldrons, mirestone_stride) are epics sourced at the level-20
+    // boss, so they join this population and derive the same level-20 gate the
+    // sweep below asserts. His three Foreman's Wage rares do NOT: their rows carry
+    // LootEntry.maxPlayerLevel 13, so item_level.ts sources them at 13 and they
+    // stay level-13 content outside this shelf. No existing shelf row moved.
     // The Crucible crafting tier adds 33 items without moving any old shelf gate.
     expect(Object.keys(CRUCIBLE_COLLECTION_ITEMS)).toHaveLength(33);
     // Re-pinned 515 -> 533 by the trinket slot (PR 4173): 18 trinkets sourced
@@ -188,7 +195,9 @@ describe('crafted wearability: the level-20 shelf is unmoved (masterwrought R5 s
     // deriving the same level-20 gate; no existing shelf row moved.
     // Re-pinned 672 -> 768 at the release/v0.44.0 merge into feature/buried-hoards (2026-09-28): the 96 Buried Hoard boss
     // loot pieces (content/hoard_loot.ts) join on the same level-20 gate.
-    expect(shelf.length).toBe(768);
+    // 778 with the Mirefen world boss's four level-20 drops plus Balgath's loot (five
+    // trinkets and the Craterglass Stave), at the release/v0.45.0 merge.
+    expect(shelf.length).toBe(778);
     for (const def of shelf) {
       expect(requiredLevelFor(def), `${def.id} shelf gate`).toBe(20);
     }

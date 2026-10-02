@@ -199,6 +199,12 @@ describe('swim animation stability', () => {
     expect(isSwimmingAtDepth(false, false, SWIM_ENTER_FEET_DEPTH, 0.8)).toBe(true);
     expect(isSwimmingAtDepth(true, false, SWIM_EXIT_FEET_DEPTH + 0.01, 0.61)).toBe(true);
     expect(isSwimmingAtDepth(true, false, SWIM_EXIT_FEET_DEPTH - 0.01, 2)).toBe(false);
+    // A wading body (MobTemplate.wadeDepth) swims only past ITS depth: feet two yards
+    // under in two yards of water is a wade for a giant who can walk nine, and the same
+    // giant in ten yards of water swims like anyone else.
+    expect(isSwimmingAtDepth(false, false, 2, 2, 9)).toBe(false);
+    expect(isSwimmingAtDepth(true, false, 2, 2, 9)).toBe(false);
+    expect(isSwimmingAtDepth(false, false, 10, 10, 9)).toBe(true);
     expect(isSwimmingAtDepth(true, true, 2, 2)).toBe(false);
   });
 

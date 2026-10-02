@@ -1394,7 +1394,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '3703e50946207ae92ff2b46d1e14673cca6c363993661222a778c5f11d56f6ce';
+  // Re-minted at the Mirefen world-boss branch's release/v0.45.0 merge
+  // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
+  '735fc3a63c1458f9b4776e1de7a6d42a97c16deb7beecd74cafdfe775f0e2f96';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1417,7 +1419,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '164b585f770570b773faa8e35c466bcd4ab2840a6572507aa9528bc52572cbc5';
+  // Re-minted at the Mirefen world-boss branch's release/v0.45.0 merge
+  // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
+  '1e3517a7b12c450078a9ced4c9ed766cf63d6e166300cb4be0c283ea7eeda1d3';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2800,7 +2804,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // LAST again over the re-swept evidence. No capture was retaken.
       // release/v0.44.0 base merge into PR 4193: recomputed LAST again over the
       // re-swept evidence. No capture was retaken.
-    ).toBe('55abc96a5aead82eb4096d7915be530c7731d95d07bbc9b1181704092cff1db3');
+      // Mirefen world-boss branch's release/v0.45.0 merge: recomputed LAST again
+      // over the re-swept evidence. No capture was retaken.
+    ).toBe('cab476e8bc7321aa0766df05380837a3bc54f47b7ab38f169adf0ba20251eb3a');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

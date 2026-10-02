@@ -824,7 +824,9 @@ describe('Masterwrought art completion evidence', () => {
     // 17 (faction-ladder-icons-2026-09-23): 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323.
     // + the trinket slot's 18 (trinket-slot-icons-2026-09-23, PR 4173): 1,341. Warfare Season 2's four painted
     // weapons (warfare-season2-weapons-2026-09-25): 1,345, likewise outside it.
-    expect(currentOwnerIds).toHaveLength(1464);
+    // Plus the Mirefen world-boss branch (nine items: the boss spoils, both Shardpikes
+    // and the Wage rares) and Balgath's loot (six items): 1,464 + 15 = 1,479.
+    expect(currentOwnerIds).toHaveLength(1479);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -858,6 +860,42 @@ describe('Masterwrought art completion evidence', () => {
     const bramblehideIds = bramblehideBatches[0].itemIds;
     expect(bramblehideIds).toHaveLength(22);
     expect(duplicateValues(bramblehideIds)).toEqual([]);
+
+    // The Mirefen world boss's three batches: another later additive wave, pinned the same
+    // way (batch identity and size asserted, ids stripped by exact value) so a rename,
+    // split or merge of any of them fails loudly rather than quietly changing the frozen
+    // completion union below.
+    const balgathBatchIds = [
+      'balgath-boss-icons-2026-08-18',
+      'shardpike-mechanic-icons-2026-08-20',
+      'foremans-wage-icons-2026-08-25',
+    ];
+    const balgathIds = new Set<string>();
+    for (const batchId of balgathBatchIds) {
+      const batches = mapping.generatedBatches.filter(({ batchId: id }) => id === batchId);
+      expect(batches, batchId).toHaveLength(1);
+      for (const id of batches[0].itemIds) balgathIds.add(id);
+    }
+    expect(balgathIds.size).toBe(8);
+    expect(datedIds.filter((id) => balgathIds.has(id))).toEqual([]);
+
+    // The Mirefen muster rework's lent pike: one more later additive batch, pinned the
+    // same way and stripped by exact id below.
+    const musterBatches = mapping.generatedBatches.filter(
+      ({ batchId: id }) => id === 'muster-shardpike-icon-2026-09-26',
+    );
+    expect(musterBatches).toHaveLength(1);
+    const musterIds = new Set(musterBatches[0].itemIds);
+    expect([...musterIds]).toEqual(['muster_shardpike']);
+    // ...and Balgath's own loot (five trinkets and the Craterglass Stave), one more
+    // additive batch, stripped by its exact ids the same way.
+    const balgathLootBatches = mapping.generatedBatches.filter(
+      ({ batchId: id }) => id === 'balgath-loot-icons-2026-09-28',
+    );
+    expect(balgathLootBatches).toHaveLength(1);
+    expect(balgathLootBatches[0].itemIds).toHaveLength(6);
+    for (const id of balgathLootBatches[0].itemIds) musterIds.add(id);
+    expect(datedIds.filter((id) => musterIds.has(id))).toEqual([]);
 
     // These 25 ids are a later additive wave that never appears in the dated file's own
     // 1,255-item passIds union at all: confirm that up front (no overlap with datedIds)
@@ -962,8 +1000,8 @@ describe('Masterwrought art completion evidence', () => {
     // Strip all six later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
     // the OSSBrain mount reins, the Valestrider's reins, the world-quest,
-    // faction quartermaster, and Clue Scroll batches, and the Buried Hoards
-    // branch's three batches)
+    // faction quartermaster, and Clue Scroll batches, the Buried Hoards
+    // branch's three batches, and the Mirefen world boss's icon batches)
     // back out of the live mapping by their EXACT ids, so the underlying 1,209-item
     // completion union equation below stays isolated to exactly the same set as
     // completionDatedIds above. This filters by the exact ids of those additions only,
@@ -985,7 +1023,9 @@ describe('Masterwrought art completion evidence', () => {
         id !== 'emissary_cache' &&
         id !== 'reins_avian_strider' &&
         !season2WeaponIds.has(id) &&
-        !hoardBranchIds.has(id),
+        !hoardBranchIds.has(id) &&
+        !balgathIds.has(id) &&
+        !musterIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

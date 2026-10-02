@@ -145,8 +145,13 @@ const build = await buildItemArtAudit({
     // feature/buried-hoards: the release's faction ladder, trinket slot and
     // Warfare Season 2 compose with the hoard paintings: 1464 / 1482, with the
     // release's 135 pending rows (trinkets and Season 2), on 36 sheet pages.
-    catalogCount: 1464,
-    liveItemCount: 1482,
+    // The Mirefen world-boss branch at its release/v0.45.0 merge: fifteen disjoint
+    // item definitions, each with its own shipping WebP (the balgath-boss,
+    // shardpike-mechanic, foremans-wage, muster-shardpike and balgath-loot batches in
+    // public/ui/items/mapping.json): 1464 + 15 = 1479, 1482 + 15 = 1497, re-measured
+    // with `node scripts/item_art_audit.mjs --verify-only` on the merged tree.
+    catalogCount: 1479,
+    liveItemCount: 1497,
     pendingArtCount: 135,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,

@@ -1359,6 +1359,49 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.interfacePage.framePetTitle': 'Ваш питомец',
   'guide.interfacePage.winBagsTitle': 'Сумки (B)',
   'guide.riftsPage.rankFmt': 'Ранг {rank}',
+  'hudChrome.shardpike.braceLabel': 'Упереть Осколочную пику',
+  'hudChrome.shardpike.braceTooltip':
+    'Воткните пятку в землю и поднимите острие. Клавиши шага в сторону  это балансир: луч сам уходит в сторону, и каждый удар великана его подбивает. Удержите его вне рельсов {set} с, и пика встанет. Нужна твёрдая земля, и не из седла.',
+  'hudChrome.shardpike.thrustLabel': 'Удар Курганного стекла',
+  'hudChrome.shardpike.thrustTooltip':
+    'Вгоните упёртую пику в глаз, нанося {damage} ед. урона. Ничто его не масштабирует: ни уровень, ни сила атаки, ни сама пика. Ослепляет Смотрителя и срывает Курганную шкуру, так что любое другое оружие в топях наконец начинает кусать. Нанести его может только упёртая пика, в пределах {reach} м, а окно длится {seconds} с.',
+  'hudChrome.shardpike.releaseLabel': 'Опустить Осколочную пику',
+  'hudChrome.shardpike.releaseTooltip':
+    'Убрать пику. За отказ нет наказания: вы теряете упор, а не саму попытку, и через {rest} с можно упереть её снова.',
+  'hudChrome.shardpike.whyResting':
+    'Вы только что опустили пику. Дождитесь конца отсчёта на значке.',
+  'hudChrome.shardpike.whyAlreadyCouched':
+    'Пика уже упёрта. Опустите её, прежде чем упирать снова.',
+  'hudChrome.shardpike.whyNotSet': 'Пика не встала. Сначала уприте её и держите ровно.',
+  'hudChrome.shardpike.whyNothingCouched': 'Опускать нечего: пика не упёрта.',
+  'hudChrome.shardpike.beamLabel': 'Равновесие Осколочной пики',
+  'hudChrome.shardpike.beamStatus': 'Равновесие пики {balance}, упор {set} процентов.',
+  'hudChrome.shardpike.beamDanger': 'Равновесие пики {balance}, вот-вот сорвётся.',
+  'hudChrome.shardpike.promptHoldSteady': 'Держите пику ровно клавишами шага в сторону',
+  'hudChrome.shardpike.promptCatchIt': 'Выровняйте, пика уходит',
+  'hudChrome.shardpike.promptEyeOut': 'Глаз выбит, {seconds} с: бейте изо всех сил',
+  'hudChrome.shardpike.promptSealed': 'Его глаз закрыт. Откроется через {seconds} с',
+  'hudChrome.shardpike.promptResetting': 'Пика встаёт заново, {seconds} с',
+  'hudChrome.shardpike.promptCloser': 'Подойдите к Смотрителю, ещё {yards} м',
+  'hudChrome.shardpike.promptBrace': 'Уприте Осколочную пику и держите её ровно',
+  'hudChrome.shardpike.promptFindBoss': 'Осколочная пика Скеррита: выбейте ею глаз Смотрителя',
+  'hudChrome.shardpike.leanRightKey': 'Наклон вправо ({key})',
+  'hudChrome.shardpike.leanLeftKey': 'Наклон влево ({key})',
+  'hudChrome.shardpike.leanRight': 'Наклон вправо',
+  'hudChrome.shardpike.leanLeft': 'Наклон влево',
+  'hudChrome.shardpike.promptHoldSteadyLean':
+    'Держите пику ровно: наклоняйте клавишами {left} и {right}',
+  'hudChrome.shardpike.promptFindBossMuster':
+    'Осколочная пика ополчения: выбейте ею глаз Смотрителя',
+  'hudChrome.shardpike.promptTakePike':
+    'Нажмите {key} или щёлкните по стойке, чтобы взять осколочную пику',
+  'hudChrome.shardpike.promptTakePikeClick': 'Щёлкните по стойке, чтобы взять осколочную пику',
+  'hudChrome.shardpike.promptTakePikeTap': 'Коснитесь стойки, чтобы взять осколочную пику',
+  'hudChrome.shardpike.promptPikeLevelCap':
+    'Ополчение выдаёт копья только новобранцам до {level}-го уровня включительно',
+  'hudChrome.shardpike.braceTooltipLean':
+    'Воткните пятку в землю и поднимите острие. Наклоняйте клавишами шага в сторону или поворота либо удерживайте две клавиши над лучом: он сам уходит в сторону, и каждый удар великана его подбивает. Удержите его вне рельсов {set} с, и пика встанет. Нужна твёрдая земля, и не из седла.',
+  'hudChrome.shardpike.promptLabel': 'Указание Осколочной пики',
   'hudChrome.comboMeter.label': 'ОС',
   'hudChrome.bg.clock': '{minutes}:{seconds}',
   'hudChrome.controller.zoomIn': 'Приблизить',
@@ -2134,6 +2177,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.steamWishlist': 'Напоминание о списке желаемого',
   'hudChrome.interfaceUnlock.frameNames.minimap': 'Мини-карта',
   'hudChrome.interfaceUnlock.frameNames.stanceBar': 'Панель стоек',
+  'hudChrome.interfaceUnlock.frameNames.shardpikeBar': 'Панель Осколочной пики',
   'hudChrome.interfaceUnlock.frameNames.playerFrame': 'Игрок',
   'hudChrome.interfaceUnlock.frameNames.targetFrame': 'Цель',
   'hudChrome.interfaceUnlock.frameNames.partyFrames': 'Группа',
@@ -6472,6 +6516,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Курганы троллей',
   'entities.zones.mirefen_marsh.pois.6.label': 'Лагерь Могильного Зова',
   'entities.zones.mirefen_marsh.pois.7.label': 'Затонувший бастион',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Курганные Владения',
+  'entities.zones.mirefen_marsh.pois.9.label': 'Кратер Упавшей Звезды',
   'entities.zones.thornpeak_heights.name': 'Терновые высоты',
   'entities.zones.thornpeak_heights.welcome': 'Капитан Тессали едва удерживает стену Хайвотча.',
   'entities.zones.thornpeak_heights.welcomeDone':
@@ -8129,9 +8175,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.soulflame_cord.name': 'Шнур Пламени души',
   'entities.items.stormcallers_waistguard.name': 'Поясная защита призывателя бурь',
   'entities.mobs.thunzharr_waking_peak.name': 'Тунзарр, Пробуждающийся пик',
+  'entities.mobs.balgath_cyclops.name': 'Балгат, Одноглазый Десятник',
+  'entities.npcs.muster_commander.name': 'Командир ополчения',
+  'entities.mobs.muster_sergeant.name': 'Сержант ополчения',
+  'entities.mobs.muster_chaplain.name': 'Капеллан ополчения',
+  'entities.mobs.muster_footman.name': 'Пехотинец ополчения',
   'entities.mobs.thunzharr_stormling.name': 'Пробуждённый элементаль бури',
   'entities.mobs.stable_horse.name': 'Конюшенная лошадь',
-  'hudChrome.worldBoss.spawn': '{name} поднимается над Терновыми высотами!',
+  'hudChrome.worldBoss.spawn': '{name} восстаёт над {zone}!',
+  'hudChrome.worldBoss.wake': '{name} пробуждается над {zone}!',
+  'hudChrome.worldBoss.sleep': '{name} спит до рассвета.',
   'entities.items.stormcallers_spaulders.name': 'Наплечники Зова Бури',
   'entities.items.bonewrought_greatsword.name': 'Костокованый двуручный меч',
   'entities.items.direfang_greatblade.name': 'Великий клинок Лютого Клыка',
@@ -10283,6 +10336,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Следующий критический удар огненного заклинания в серии дает «Полосу везения»; некритический удар снимает «Разогрев»',
   'hudChrome.auraEffect.tongues': 'Увеличивает время произнесения заклинаний на {pct}%',
   'hudChrome.auraEffect.damageReduction': 'Уменьшает весь получаемый урон на {pct}%',
+  'hudChrome.auraEffect.slumber':
+    'Спит до рассвета. Его нельзя атаковать, и он не проснется ни для кого.',
   'hudChrome.auraEffect.guardianWard':
     'Следующий смертельный удар противника вместо этого восстанавливает здоровье до {pct}%',
   'hudChrome.auraEffect.increase.ap': 'Повышает силу атаки на {value}',
@@ -14376,6 +14431,25 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.marshlight_hauberk.name': 'Хауберк болотного света',
   'entities.items.duskthorn_mantle.name': 'Оплечье сумеречного терна',
   'entities.items.fenshadow_maul.name': 'Молот болотной тени',
+  'entities.items.skerrits_shardpike.name': 'Осколочная пика Скеррита',
+  'entities.items.muster_shardpike.name': 'Осколочная пика ополчения',
+  'entities.npcs.socketwright_skerrit.name': 'Мабен Скеррит',
+  'entities.npcs.socketwright_skerrit.title': 'Гнездовщик',
+  'entities.npcs.socketwright_skerrit.greeting':
+    'Сорок лет с тех пор, как я огранил тот глаз и посадил его в глазницу, и ни дня оплаты. Хочешь сделать Смотрителю больно, {className}? Тогда бей по моей работе.',
+  'entities.quests.q_socketwrights_due.title': 'Долг Гнездовщика',
+  'entities.quests.q_socketwrights_due.text':
+    'Курганное стекло в эту глазницу посадил я сам: огранил линзу, усадил, заклинил ровно. Хозяева курганов не заплатили мне и медяка, а теперь моя работа ходит по топям и всё вытаптывает. Возьми мою Осколочную пику. Воткни пятку, держи острие ровно, сколько бы это ни заняло, и когда руки будут уверены  проведи её через глаз. Шкура, что он носит, привязана к тому осколку, {playerName}: ослепи его, и любой клинок в топях наконец начнёт кусать.',
+  'entities.quests.q_socketwrights_due.completion':
+    'Почувствовал, как поддалось? Сорок лет процентов, выплачено через глазницу. Пика твоя, друг. Он исцелится, он всегда исцеляется, так что заходи получать снова, когда захочется.',
+  'entities.quests.q_socketwrights_due.objectives.0.label': 'Глаз Смотрителя выбит',
+  'entities.items.foremans_barrowmaul.name': 'Курганный молот Десятника',
+  'entities.items.loomshard_eye.name': 'Око из курганного стекла',
+  'entities.items.barrowhide_pauldrons.name': 'Курганные наплечники',
+  'entities.items.mirestone_stride.name': 'Поступь Топьекамня',
+  'entities.items.foremans_wage_band.name': 'Кольцо жалованья Старшины',
+  'entities.items.mirelight_locket.name': 'Медальон болотного света',
+  'entities.items.fenwright_grips.name': 'Рукавицы болотного мастера',
   'entities.items.wildgrove_cinch.name': 'Пояс Дикой рощи',
   'entities.items.cragward_pauldrons.name': 'Наплечники скального стража',
   'entities.items.cragthorn_greatstaff.name': 'Большой посох скального терна',
@@ -18613,6 +18687,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     '«Редактирование фреймов» также отпускает стопку трекеров под ним (отслеживаемые задания и их цели, ход ваших деяний, ваши страницы Реликвария, рецепты, закреплённые вами при крафте, вылазка, в которой вы находитесь, любой разлом, в котором вы участвуете, и рецепт или заказ, который вы отслеживаете), панель действий питомца рядом с рамкой питомца, рамку «Эффекты на целях» для ваших ослабляющих эффектов на ближних врагах, медальон «Преданность» паладина, «Шкалу ресурсов Колдовства» чернокнижника, оверлей срабатывания заклинаний, полосу замаха оружия в левой руке для тех, кто дерётся с оружием в каждой руке, и окно счётчика урона с вкладками, и у каждого из них, пока он отпущен, есть ярлычок с его названием.',
   'guide.interfacePage.framesGovernedTalkingHead':
     '«Редактировать фреймы» также освобождает панель диалога: она показывает реплику NPC, пока тот находится вне вашего поля зрения, и носит свою табличку с именем, пока откреплена.',
+  'guide.interfacePage.framesGovernedShardpike':
+    '«Редактировать фреймы» также освобождает панель Осколочной пики: это короткий ряд действий квестового предмета, который появляется рядом с панелями команд, только пока вы несёте саму Осколочную пику. Она носит свою табличку с именем, пока откреплена, так что её можно поставить на место до боя, а не во время него.',
   'guide.interfacePage.framesGovernedUnitTooltip':
     '«Редактирование фреймов» также освобождает фрейм подсказки: место, где появляется карточка того, на что наведён курсор. Для существа это уровень и вид, для другого игрока: звание, гильдия, уровень и класс, а также специализация с её ролью. Перетащите фрейм куда угодно, и карточка будет раскрываться оттуда в сторону от ближайших краёв экрана. Снимите флажок «Подсказка» в разделе «Показать или скрыть фреймы» в «Настройках фреймов», чтобы совсем скрыть эту карточку.',
   'guide.interfacePage.framesGovernedAuraTracks':
@@ -18673,6 +18749,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.realmBuilder.pastEmpty': 'В списке пока нет имён.',
   'hudChrome.realmBuilder.close': 'Закрыть',
   'worldContent.realmBuilderMonumentName': 'Памятник зодчим королевства',
+  'worldContent.musterRackName': 'Оружейная стойка ополчения',
   'hudChrome.talkingHead.label': 'Диалог',
   'hudChrome.hubLesson.target': 'Сначала возьми манекен в цель.',
   'hudChrome.hubLesson.openWindow': 'Открой {meters}.',
@@ -19196,6 +19273,42 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.farmgrow.label': 'Ускорить созревание',
   'devCommand.fields.bed': 'ID грядки (необязательно)',
   'guide.profPages.oncePerDay': 'Раз в день',
+  // The Mirefen muster: the drill yard and the muster quests (M16 fills).
+  'hudChrome.shardpike.effigyBanner': 'ОСЛЕПЛЁН! ТЕПЕРЬ ВЕСЬ РЕЙД БЬЁТ В ПОЛНУЮ СИЛУ',
+  'hudChrome.shardpike.promptStrikeLantern': 'БЕЙТЕ В ФОНАРЬ сейчас, {seconds} с',
+  'hudChrome.shardpike.promptLanternOut': 'Фонарь погас, {seconds} с: бейте своим оружием',
+  'hudChrome.shardpike.promptCloserEffigy': 'Подойдите к Соломенному Десятнику, ещё {yards} м',
+  'hudChrome.auraEffect.effigyPlankHide':
+    'Отводит {pct}% каждого удара, пока удар Осколочной пики не погасит фонарь в его глазу',
+  'hudChrome.auraEffect.effigyLanternOut':
+    'Для вас фонарь Соломенного Десятника погас: ваши удары и удары питомца пробивают Дощатую шкуру и проходят в полную силу',
+  'character.lockoutWeeklyQuests': 'Еженедельные задания',
+  'entities.mobs.muster_drillmaster.name': 'Муштровщик ополчения',
+  'entities.mobs.muster_effigy.name': 'Соломенный Десятник',
+  'entities.npcs.muster_commander.title': 'Ополчение Фенбриджа',
+  'entities.npcs.muster_commander.greeting':
+    'Сначала пики, {className}, потом все остальные. В этом всё дело, и это держит лагерь в живых.',
+  'entities.quests.q_muster_summons.title': 'Зов ополчения',
+  'entities.quests.q_muster_summons.text':
+    'Все копья, что я мог выделить, окопались вокруг кратера Звездопада, {playerName}, чтобы окружить то, что из него выходит. Командир ополчения держит лагерь на южном склоне над кратером, к юго-востоку отсюда. Доложи Командиру. Тебе расскажут, как мы с ним бьёмся, и ты выслушаешь, потому что те, кто не слушал, лежат в камышах.',
+  'entities.quests.q_muster_summons.completion':
+    'Гонец Фенвика? Хорошо. Слушай, скажу один раз, а он и вовсе не скажет. Балгат обходит наши заставы: край кратера, западные пустоши, южный склон, брешь на юго-западном краю, и снова по кругу, и каждую заставу, где он остановится, он сравнивает с землёй. Сталь его не берёт. Шкура её отводит, и рейд, который просто рубит его, лишь умирает уставшим. Единственная слабость у него глаз. Упёртая пика сквозь Курганное стекло ослепляет его, и пока он слеп, шкура с него сходит: вот тогда весь рейд бьёт его, и бьёт в полную силу. Потом она смыкается, и мы ждём следующего шанса. Сначала пики, {playerName}, потом все остальные. Стойка выдаёт пики только новобранцам до 19-го уровня включительно: молодые выбивают глаз, ветераны используют это окно.',
+  'entities.quests.q_muster_summons.objectives.0.label': 'Доложить Командиру ополчения',
+  'entities.quests.q_muster_pike_drill.title': 'Сначала пики',
+  'entities.quests.q_muster_pike_drill.text':
+    'Слова дёшевы, пики нет. Возьми Осколочную пику со стойки рядом со мной, потом иди к Соломенному Десятнику в западном конце лагеря: ребята собрали его из досок и соломы, вполовину меньше настоящего, с фонарём там, где глаз. Упри пику и держи острие ровно, пока муштровщик бьёт в землю, потому что настоящий трясёт её сильнее. Когда руки будут уверены, проведи острие сквозь фонарь. Доски с него слетят: тогда бей его своим оружием, {playerName}, и почувствуй разницу. Стойка выдаёт пики только новобранцам до 19-го уровня включительно.',
+  'entities.quests.q_muster_pike_drill.completion':
+    'Почувствовал, как проходит? На настоящем это четырнадцать вдохов, пока машет весь рейд, а потом шкура снова смыкается. Запомни урок. Десятник его проверит.',
+  'entities.quests.q_muster_pike_drill.objectives.0.label':
+    'Осколочная пика взята со стойки ополчения',
+  'entities.quests.q_muster_pike_drill.objectives.1.label': 'Фонарь Соломенного Десятника погашен',
+  'entities.quests.q_muster_pike_drill.objectives.2.label': 'Удары, пока доски сняты',
+  'entities.quests.q_muster_trophy.title': 'Кусок Десятника',
+  'entities.quests.q_muster_trophy.text':
+    'Каждую неделю он встаёт, и каждую неделю мы снова его валим. Для этого нужен рейд, а ополчению одному его не собрать. Найди следующий рейд, что пойдёт на Балгата, и помоги его свалить, {playerName}. Руби его, прикрывай тех, кто рубит, или лечи их: в счёт идёт каждая рука, что с ним билась. Когда он падёт, возвращайся и доложи мне. Ополчение платит за каждое убийство.',
+  'entities.quests.q_muster_trophy.completion':
+    'Опять повален, и ты был в том бою. Сегодня же ночью Фенбридж получит мой доклад. Кошель так далеко от дома тонкий, но это твоё. Возвращайся, когда он снова встанет.',
+  'entities.quests.q_muster_trophy.objectives.0.label': 'Балгат: убито',
   'hudChrome.vehicle.title': 'Пушка Северного Дозора',
   'hudChrome.vehicle.objective': 'Защитите Северный Дозор',
   'hudChrome.vehicle.lastKeepTitle': 'Пушка Последнего оплота',
@@ -19978,4 +20091,28 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Время применения Хватких корней сокращается на 0,5 сек.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'После применения Хватких корней вы можете произносить заклинания на ходу, а ваша скорость передвижения повышается на 20% на 4 сек. Срабатывает не чаще одного раза в 20 сек.',
+  'entities.items.knucklebone_of_balgath.name': 'Костяшка Балгата',
+  'entities.items.muster_standard.name': 'Знамя ополчения',
+  'entities.items.guttered_eye.name': 'Угасшее Око',
+  'entities.items.barrowstone_heart.name': 'Сердце из курганного камня',
+  'entities.items.muster_grapnel.name': 'Абордажный крюк ополчения',
+  'entities.items.craterglass_stave.name': 'Посох из кратерного стекла',
+  'hudChrome.trinkets.equip.stoneHeart':
+    'Когда удар должен убить вас, вы вместо этого превращаетесь в камень на {statue} сек.: не получаете урона и не можете двигаться или действовать, затем возвращаетесь с {restore} ед. здоровья ({restorePct}% от максимального запаса). Срабатывает не чаще раза в {icd}. Не действует в дуэлях и на арене, где бой заканчивается смертельным ударом.',
+  'hudChrome.trinkets.use.foremanShape':
+    'Принять Облик Десятника на {duration} сек.: вы становитесь одноглазым циклопом и сражаетесь кулаками, сохраняя все способности и их урон. Броня увеличивается на {armorPct}%, и вас нельзя отбросить. Спешивает вас.',
+  'hudChrome.trinkets.use.musterStandard':
+    'Водрузить у ног Знамя ополчения. В течение {duration} сек. {soldiers} ополченца идут рядом с вами и сражаются с вашей целью врукопашную, каждый нанося {damage} ед. физического урона раз в {every} сек. Они атакуют только вашу цель и только когда она уже в бою. У каждого {hpPct}% вашего максимального здоровья. Отстав больше чем на {leash} м, они сразу возвращаются к вам. Они уходят, когда знамя падает или вы погибаете. Урон зависит от силы атаки или силы атаки дальнего боя (что выше) на момент установки.',
+  'hudChrome.trinkets.use.gutteredGlare':
+    'Поддерживать луч {duration} сек.: из вас в сторону взгляда бьёт луч длиной {length} м, нанося {tick} ед. тайного урона раз в {every} сек. до {max} противникам на его пути ({total} каждому за всё время). Поворачивайтесь, чтобы вести луч; движение или произнесение заклинания прерывает его. Урон зависит от силы заклинаний.',
+  'hudChrome.trinkets.use.grapnel':
+    'Зацепить крюком видимого участника группы или рейда в пределах {range} м и перетянуть его по воздуху к себе; при приземлении он восстанавливает {heal} ед. здоровья. Не действует на противников и на союзников в транспорте, на корабле, обращённых в камень или удерживаемых эффектом, который нельзя снять. Лечение зависит от силы исцеления.',
+  'hudChrome.auraEffect.trinket.foremanShape':
+    'Вы Десятник: броня увеличена на {armorPct}%, вас нельзя отбросить.',
+  'hudChrome.auraEffect.trinket.musterStandard':
+    'Ваше Знамя ополчения водружено. Его воины идут за вами и сражаются с вашей целью.',
+  'hudChrome.auraEffect.trinket.gutteredGlare':
+    'Луч наносит {tick} ед. тайного урона раз в {every} сек. противникам на своём пути. Движение или произнесение заклинания прерывает его.',
+  'hudChrome.auraEffect.trinket.stoneStatue':
+    'Обращены в камень: не получаете урона и не можете действовать. Вы вернётесь с {pct}% максимального здоровья.',
 };

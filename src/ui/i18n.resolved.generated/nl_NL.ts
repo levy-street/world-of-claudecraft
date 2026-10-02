@@ -513,6 +513,48 @@ export const nl_NL: EnTranslations = {
       "sailing": "Vaart naar {dest}"
     },
     "materialStackSelectionUnavailable": "Die materiaalkeuze is niet langer beschikbaar.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Barrowglass Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "braceTooltipLean": "Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: each pushes the marker toward its side. The beam drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Lower the pike and step out of the brace, the same as jumping. You lose the set but pay no penalty: you can couch it again right away. Only a thrust, a fumble, a broken stance or a missed window rests the pike, for {rest} seconds.",
+      "whyResting": "The pike is being re-set after a thrust, a fumble, a broken stance or a missed window. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptFindBossMuster": "The muster's Shardpike: put out the Foreman's eye with it",
+      "promptTakePike": "Press {key} or click the rack to take a Shardpike",
+      "promptTakePikeClick": "Click the rack to take a Shardpike",
+      "promptTakePikeTap": "Tap the rack to take a Shardpike",
+      "promptPikeLevelCap": "The muster lends its pikes only to level {level} or lower",
+      "promptHoldSteadyLean": "Hold the pike steady: lean with {left} and {right}",
+      "leanLeft": "Lean left",
+      "leanRight": "Lean right",
+      "leanLeftKey": "Lean left ({key})",
+      "leanRightKey": "Lean right ({key})",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN",
+      "effigyBanner": "BLINDED! NOW THE WHOLE RAID HITS HARD",
+      "promptStrikeLantern": "STRIKE THE LANTERN now, {seconds}s",
+      "promptLanternOut": "The lantern is out, {seconds}s: hit it with your own weapon",
+      "promptCloserEffigy": "Get within reach of the Straw Foreman, {yards} yards out"
+    },
     "vehicle": {
       "title": "Geschut van de Noordwacht",
       "objective": "Verdedig de noordnacht-wacht",
@@ -3112,8 +3154,10 @@ export const nl_NL: EnTranslations = {
         "storm": "Elke spreuk die je cast voegt een lading toe, tot {max}. Ladingen duren {duration} sec, vernieuwd wanneer je er een krijgt.",
         "heat": "Je melee en ranged wapen hits voegen elk een hittestapel toe, tot {max}. Hitte duurt {duration} sec, vernieuwd wanneer je een stapel krijgt.",
         "ignite": "Je melee en ranged wapen kritieke treffen steken het doelwit in lichtelaaie, voor {tick} Vuur schade elke {every} sec voor {duration} sec. Een nieuwe kritieke treffer vernieuwt het. Schade neemt toe met Attack Power of Ranged Attack Power, wat het hoogste is.",
-        "guardHeat": "Elke aanval die je pareerd, ontwijkt of blokkeert, voegt een hittestapel toe, tot {max}. Hitte duurt {duration} sec, vernieuwd wanneer je een stapel krijgt."
+        "guardHeat": "Elke aanval die je pareerd, ontwijkt of blokkeert, voegt een hittestapel toe, tot {max}. Hitte duurt {duration} sec, vernieuwd wanneer je een stapel krijgt.",
+        "stoneHeart": "When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow."
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "Voor {duration} sec, een vijand die je rechtstreeks raakt, neemt Physical schade gelijk aan {pct}% van de gezondheid die die klap van je afnam. Periodieke schade triggert het niet.",
         "anchor": "Voor {duration} sec, neem {reduction}% minder schade maar beweeg op {speed}% snelheid. Verwijdert stuns, roots, slows, fears, polymorphs, silences, blinds, hexes, disarms en incapacitating effects op jou, en je negeert nieuwe en knockbacks terwijl het duurt.",
@@ -3132,7 +3176,11 @@ export const nl_NL: EnTranslations = {
         "kindlingOrb": "Roep een asmborb naast je op voor {duration} sec. Elke spreuk die je op een vijand cast laat hem een pijl op die vijand afvuren voor {damage} Vuur schade. Schade neemt toe met Spell Power.",
         "pierce": "Voor {duration} sec, je auto-attacks, shots en fysieke vaardigheden (geen bloeds) slaan ook de vijand dichtst bij je doelwit binnen {reach} yd voor {share}% van de toegebrachte schade.",
         "lantern": "Zet een lantaarn aan je voeten voor {duration} sec. Een directe genezing van iemand op je of een partylidmaatje binnen {radius} yd ervan geneest ook het meest gewonde andere partylidmaatje in het licht voor {share}% van de genezing.",
-        "heartNova": "Breng alle hittestapels uit op een vuurvuur die {perHeat} Vuur schade per stapel ({max} op {maxHeat} stapels) aan elke vijand binnen {radius} yd doet en elke vijand die het raakt daagt uit. Schade neemt toe met Attack Power. Vereist een hittestapel."
+        "heartNova": "Breng alle hittestapels uit op een vuurvuur die {perHeat} Vuur schade per stapel ({max} op {maxHeat} stapels) aan elke vijand binnen {radius} yd doet en elke vijand die het raakt daagt uit. Schade neemt toe met Attack Power. Vereist een hittestapel.",
+        "foremanShape": "Take the Shape of the Foreman for {duration} sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain {armorPct}% armor and cannot be knocked back. Dismounts you.",
+        "musterStandard": "Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers march at your side and fight your target in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, and only once it is already in combat. Each has {hpPct}% of your maximum health. Left more than {leash} yd behind, they rejoin you at once. They leave when the standard falls or when you die. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.",
+        "gutteredGlare": "Channel for {duration} sec: a beam {length} yd long bursts from you the way you face and deals {tick} Arcane damage every {every} sec to up to {max} enemies in its path ({total} to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power.",
+        "grapnel": "Hook a party or raid member within {range} yd that you can see and haul them through the air to your side, healing them for {heal} when they land. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken. Healing increases with Healing Power."
       }
     },
     "questShare": {
@@ -3950,6 +3998,8 @@ export const nl_NL: EnTranslations = {
       "cooldownCap": "{used} van {cap} sec afkoeltijdvermindering gebruikt in dit venster",
       "bruinRushWindow": "Wolfsgedaante kost geen mana en pint het doelwit van uw Bruin-stormloop vast, wat het {sec} sec lang {pct}% vertraagt",
       "funeralHarvestLock": "Funeral Harvest kan nog geen ander Zielfragment creëren",
+      "effigyPlankHide": "Turns away {pct}% of every blow, until a Shardpike thrust puts out the lantern in its eye",
+      "effigyLanternOut": "The Straw Foreman's lantern is out for you: your blows and your pet's ignore its Plank Hide and land in full",
       "leadenHexLock": "Loden vloek kan dit doelwit nog niet opnieuw vastwortelen",
       "forbiddenReflectionReady": "Je volgende in aanmerking komende Heksenmeester-afkoeltijd kan opnieuw worden ingezet",
       "forbiddenReflectionLock": "Verboden Weerspiegeling kan nog niet opnieuw worden voorbereid",
@@ -4036,6 +4086,10 @@ export const nl_NL: EnTranslations = {
         "moltenIgnite": "Toebrengen {damage} Vuurschade elke {every} sec. Een ander wapenkritiek raakt het.",
         "pierce": "Je automatische slagen, schoten en fysieke vaardigheden (geen bloedingen) slaan ook de vijand het dichtst bij je doelwit in {reach} yard voor {pct}% van de toegebrachte schade.",
         "lantern": "Een directe genezing van iedereen op jou of een partijlid in {radius} yard van de lantaarn genest ook het meest verwonde andere partijlid in het licht voor {pct}% van de genezing.",
+        "foremanShape": "You are the Foreman: {armorPct}% more armor and immune to knockbacks.",
+        "musterStandard": "Your Muster Standard is planted. Its soldiers march with you and fight your target.",
+        "gutteredGlare": "The beam deals {tick} Arcane damage every {every} sec to enemies in its path. Moving or casting ends it.",
+        "stoneStatue": "Turned to stone: immune to damage and unable to act. You return with {pct}% of your maximum health.",
         "crucibleHeat": "Hitte: {stacks}/{max}. Gebruik Hart van de Smeltkroes om alles te besteden aan een vuurnovaan die {damage} Vuurschade toebrengt aan elke vijand in {radius} yard en intimideer alle wezens die het raakt.",
         "crucibleHeatOther": "Hitte: {stacks}/{max}. Hart van de Smeltkroes besteedt alles aan een vuurnovaan in {radius} yard die meer Vuurschade toebrengt per stapel en intimideer alle wezens die het raakt."
       },
@@ -4071,6 +4125,7 @@ export const nl_NL: EnTranslations = {
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "damageReduction": "Vermindert alle schade die je oploopt met {pct}%",
+      "slumber": "Slaapt tot de dageraad. Kan niet worden aangevallen en wordt voor niemand wakker.",
       "guardianWard": "De volgende dodelijke vijandelijke treffer herstelt je in plaats daarvan naar {pct}% gezondheid",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
@@ -4147,7 +4202,9 @@ export const nl_NL: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} verrijst boven Doorntop-Hoogten!"
+      "spawn": "{name} verrijst boven {zone}!",
+      "wake": "{name} ontwaakt boven {zone}!",
+      "sleep": "{name} slaapt tot de dageraad."
     },
     "auth": {
       "appleLoginCta": "Ga verder met Apple",
@@ -4291,6 +4348,7 @@ export const nl_NL: EnTranslations = {
         "menu": "Menu",
         "minimap": "Minimap",
         "stanceBar": "Houdingsbalk",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "XP-balk",
         "chat": "Chat",
         "actionBarGroup": "Actiebalken",
@@ -7428,6 +7486,7 @@ export const nl_NL: EnTranslations = {
       "framesGovernedAuraTracks": "Frames bewerken maakt ook de zes optionele aurastromen los zodra je ze hebt ingeschakeld op het tabblad Gevecht van dezelfde Interface-opties: de stroom Mijn buffs, de stroom Verdedigingsafkoelingen, de stroom Mijn schilden, de stroom Aanvalsafkoelingen, de stroom Beweging en sluipen, en de stroom Mijn buffs op bondgenoten. Elke stroom staat standaard uit en draagt zijn eigen naamlabel zolang hij losstaat.",
       "frameGroups": "{trackers} kunnen quests, daden, riften, delves, verzameldoelen en Reliquarium-tracking combineren. {auras} kunnen Target dots en de zes aura-paden combineren. Schakel beide groepen in via Frame-instellingen, of laat het uit om elk frame afzonderlijk te verplaatsen. {tot} bevat een bronnenbalk. {focus} heeft drie onafhankelijk verplaatsbare doelen: Shift+F1 tot Shift+F3 wijzen ze toe; Ctrl+F1 tot Ctrl+F3 selecteert ze. Sleep de schade- of bedreiging meter overal buiten de knoppen om het te verplaatsen, en sleep de randen om het grootte aan te passen, zelfs terwijl frames zijn vergrendeld. Terwijl frames ontgrendeld zijn, Show or Hide Frames heeft zijn eigen gegroepeerde menu. Rechtsklik op een ontgrendeld frame voor Grootte resetten of Frame-opties. Interface > Frames bevat ook Frame-instellingen en opvouwbare Partijframe-opties. Target van Target aan Target vergrendelen houdt die frames samen. Zet het uit om Target van Target afzonderlijk te verplaatsen; teruginschakelen bewaart de afzonderlijke positie voor later. Toegewezen focus frames verbergen hun instellingscontroles; rechtsklik en kies Instellen van Focus ontdoen om ze terug te krijgen. Mouseover-casting werkt ook op focus frames.",
       "framesGovernedTalkingHead": "Edit Frames maakt ook het dialoogpaneel losser, waarin de gesproken lijn van een NPC wordt weergegeven terwijl die NPC buiten je zicht is; het draagt ​​zijn naamchip terwijl het los zit.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Balken, timers en gevechtstekst",
       "barsBody": "Je spreukbalk verschijnt in het midden van het scherm, net boven je actiebalken, telkens wanneer je een spreuk uitspreekt of kanaliseert, en toont de naam van de spreuk en de resterende tijd. Je doelwit krijgt een eigen spreukbalk op zijn frame, zodat je kunt zien wat eraan komt en erop kunt reageren.\n\nEen dunne wapenslagbalk zit onder je spreukbalk en vult zich tussen je wapenslagen, zodat een nabij- of afstandsaanvaller kan zien wanneer de volgende automatische treffer landt.\n\nJe ervaringsbalk loopt over de volle breedte onder je actiebalken, verdeeld in segmenten, met een lichter stuk dat de uitgeruste ervaring toont die je hebt opgespaard.\n\nZwem onder water en een blauwe adembalk verschijnt bovenaan het scherm. Hij loopt leeg terwijl je hoofd onder water is, knippert rood zodra hij leeg is en je begint te verdrinken, en vult zich snel weer zodra je boven water komt. Spatie zwemt je omhoog, en de toets Omlaag Zwemmen, standaard Ctrl, brengt je dieper.\n\nSchade en genezing zweven als kleine getallen omhoog boven wat ze raken, zodat je een gevecht kunt lezen zonder tekst te lezen. Het tabblad Gevecht in je chatbox houdt het volledige geschreven verslag bij.",
@@ -11227,6 +11286,7 @@ export const nl_NL: EnTranslations = {
     "lockoutRaids": "Raids",
     "lockoutDungeons": "Dungeons",
     "lockoutWorldBosses": "Wereldbazen",
+    "lockoutWeeklyQuests": "Weekly quests",
     "takeOverConfirm": "Hiermee wordt dit personage losgekoppeld van een andere sessie en hierheen gehaald. Doorgaan?",
     "renameRequired": "hernoemen vereist",
     "delete": "Verwijderen",
@@ -15829,6 +15889,30 @@ export const nl_NL: EnTranslations = {
       "fenshadow_maul": {
         "name": "Moeraschaduw-Knuppel"
       },
+      "foremans_barrowmaul": {
+        "name": "Grafheuvelhamer van de Opzichter"
+      },
+      "skerrits_shardpike": {
+        "name": "Skerrits Splinterpiek"
+      },
+      "loomshard_eye": {
+        "name": "The Barrowglass Eye"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Grafheuvelschouderstukken"
+      },
+      "mirestone_stride": {
+        "name": "Moersteentred"
+      },
+      "foremans_wage_band": {
+        "name": "Loonring van de Voorman"
+      },
+      "mirelight_locket": {
+        "name": "Moeraslicht-medaillon"
+      },
+      "fenwright_grips": {
+        "name": "Grepen van de Moerasbouwer"
+      },
       "wildgrove_cinch": {
         "name": "Wildwoud-Gordel"
       },
@@ -18451,6 +18535,27 @@ export const nl_NL: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Voortocht Krijgsstaf"
       },
+      "muster_shardpike": {
+        "name": "Muster Shardpike"
+      },
+      "knucklebone_of_balgath": {
+        "name": "Knucklebone of Balgath"
+      },
+      "muster_standard": {
+        "name": "Muster Standard"
+      },
+      "guttered_eye": {
+        "name": "The Guttered Eye"
+      },
+      "barrowstone_heart": {
+        "name": "Barrowstone Heart"
+      },
+      "muster_grapnel": {
+        "name": "Muster Grapnel"
+      },
+      "craterglass_stave": {
+        "name": "Craterglass Stave"
+      },
       "conjured_water4": {
         "name": "Getoverd bronwater"
       },
@@ -19725,8 +19830,26 @@ export const nl_NL: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, de Ontwakende Piek"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Gewekte Stormling"
+      },
+      "muster_footman": {
+        "name": "Muster Footman"
+      },
+      "muster_chaplain": {
+        "name": "Muster Chaplain"
+      },
+      "muster_sergeant": {
+        "name": "Muster Sergeant"
+      },
+      "muster_drillmaster": {
+        "name": "Muster Drillmaster"
+      },
+      "muster_effigy": {
+        "name": "Straw Foreman"
       },
       "stable_horse": {
         "name": "Stalpaard"
@@ -20375,6 +20498,16 @@ export const nl_NL: EnTranslations = {
         "name": "Wachter Fenwick",
         "title": "Wachter van Fenbridge",
         "greeting": "Houd halt bij de poort, {className}. Voorbij dat riet doet het veen het doden voor ons."
+      },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
+      },
+      "muster_commander": {
+        "name": "Muster Commander",
+        "title": "Fenbridge Muster",
+        "greeting": "Pikes first, {className}, then everyone. That is the whole of it, and it has kept this camp alive."
       },
       "brother_aldric_fen": {
         "name": "Broeder Aldric",
@@ -21114,6 +21247,52 @@ export const nl_NL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Fenbridge-Oproepbevel"
+          }
+        }
+      },
+      "q_muster_summons": {
+        "title": "The Muster's Summons",
+        "text": "Every spear I could spare is dug in around the Starfall Crater, {playerName}, ringing the thing that walks out of it. The Muster Commander holds the camp on the southern rise above the crater, south-east of here. Report to the Commander. You will be told how we fight him, and you will listen, because the ones who did not are in the reeds.",
+        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Barrowglass blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. The rack lends its pikes to recruits of level 19 or lower: the young ones put the eye out, the veterans make the window count. Pikes first, {playerName}, then everyone.",
+        "objectives": {
+          "0": {
+            "label": "Report to the Muster Commander"
+          }
+        }
+      },
+      "q_muster_pike_drill": {
+        "title": "Pikes First",
+        "text": "Talk is cheap and pikes are not, and the rack lends them only to recruits of level 19 or lower. Take a Shardpike off the rack beside me, then walk to the Straw Foreman at the west end of camp: the lads built him out of planks and straw, half the size of the real one, with a lantern where the eye goes. Couch the pike and hold the point true while the drillmaster pounds the ground, because the real one shakes it harder. When your arms are sure, put the point through the lantern. His planks will come off: then hit him with your own weapon, {playerName}, and feel the difference.",
+        "completion": "You felt it bite, did you? On the real one that is fourteen breaths with the whole raid swinging, and then his hide closes over again. Keep the lesson. The Foreman will test it.",
+        "objectives": {
+          "0": {
+            "label": "Shardpike taken from the muster rack"
+          },
+          "1": {
+            "label": "Straw Foreman's lantern put out"
+          },
+          "2": {
+            "label": "Blows landed while its planks are down"
+          }
+        }
+      },
+      "q_muster_trophy": {
+        "title": "A Chip Off the Foreman",
+        "text": "Every week he stands back up, and every week we knock him down again. That takes a raid, and the muster cannot raise one on its own. Find the next raid that goes after Balgath and help bring him down, {playerName}. Strike him, shield the ones who do, or mend them: every hand that fights him counts. When he falls, come back and report to me. The muster pays for every kill.",
+        "completion": "Down again, and you were in the fight that did it. Fenbridge will have my report tonight. The purse is thin this far out, but it is yours. Come back when he is up again.",
+        "objectives": {
+          "0": {
+            "label": "Balgath slain"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Barrowglass in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -23298,6 +23477,12 @@ export const nl_NL: EnTranslations = {
           },
           "7": {
             "label": "Het Verzonken Bastion"
+          },
+          "8": {
+            "label": "Grafheuvelgebied"
+          },
+          "9": {
+            "label": "Sterrenvalkrater"
           }
         }
       },
@@ -24381,6 +24566,7 @@ export const nl_NL: EnTranslations = {
     "mailboxName": "Brievenbus",
     "noticeboardName": "Mededelingenbord",
     "farmPatchName": "Tuinbedden",
-    "realmBuilderMonumentName": "Rijksbouwer Monument"
+    "realmBuilderMonumentName": "Rijksbouwer Monument",
+    "musterRackName": "Muster Weapon Rack"
   }
 };

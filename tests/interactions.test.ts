@@ -94,6 +94,18 @@ describe('hoverCursorKind', () => {
     expect(hoverCursorKind(npc, 1, new Set())).toBe('friendly');
   });
 
+  it("returns friendly (the gauntlet) for the muster's weapon rack, and only while it lends", () => {
+    const rack = stubEntity({ id: 9, kind: 'object', templateId: 'muster_weapon_rack' });
+    rack.lootable = true;
+    expect(hoverCursorKind(rack, 1, new Set())).toBe('friendly');
+    rack.lootable = false;
+    expect(hoverCursorKind(rack, 1, new Set())).toBe('default');
+    // Any other ground object keeps the plain arrow it always had.
+    const crate = stubEntity({ id: 10, kind: 'object', templateId: 'supply_crate' });
+    crate.lootable = true;
+    expect(hoverCursorKind(crate, 1, new Set())).toBe('default');
+  });
+
   it('returns friendly for other players', () => {
     const ally = stubEntity({ id: 4, kind: 'player' });
     const stranger = stubEntity({ id: 5, kind: 'player' });

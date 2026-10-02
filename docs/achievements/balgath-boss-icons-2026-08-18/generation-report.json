@@ -1,0 +1,38 @@
+{
+  "batchId": "balgath-boss-icons-2026-08-18",
+  "owner": "World of ClaudeCraft",
+  "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+  "styleContract": "woc-item-icon-v1",
+  "model": "gpt-image-2 (image edit)",
+  "references": ["public/ui/items/fenshadow_maul.webp", "public/ui/items/marshlight_hauberk.webp"],
+  "referenceRoles": "house style, lighting, material and composition only; subject identity from the item definition",
+  "masterSize": "1024x1024 generated, normalized to a reviewed 512x512 sRGB master before conversion",
+  "processing": "npm run assets:items (128px sRGB WebP, q82); masters retained in ignored staging, not committed",
+  "review": "Reviewed at master, 128px and in-catalog thumbnail scale for silhouette, opacity, fill and legibility.",
+  "items": [
+    {
+      "itemId": "foremans_barrowmaul",
+      "shipped": "public/ui/items/foremans_barrowmaul.webp",
+      "bytes": 1638,
+      "sha256": "48951779bed84ac619b0f98134ccc87ceb98eee816a5c896837877ac66cac669"
+    },
+    {
+      "itemId": "loomshard_eye",
+      "shipped": "public/ui/items/loomshard_eye.webp",
+      "bytes": 1926,
+      "sha256": "4c93316e1457e33019df8bd1a43ee8843f77baf6e26b83cbf21212cbb646526c"
+    },
+    {
+      "itemId": "barrowhide_pauldrons",
+      "shipped": "public/ui/items/barrowhide_pauldrons.webp",
+      "bytes": 2546,
+      "sha256": "d0bb9d80f6924ace620e67b585f9a0674ab0b4dc630c4b57e658d08203f779a1"
+    },
+    {
+      "itemId": "mirestone_stride",
+      "shipped": "public/ui/items/mirestone_stride.webp",
+      "bytes": 2522,
+      "sha256": "84c829a57ec92b129cac9326c6f86392b67490723ccd5c7b188bb0cd436228f3"
+    }
+  ]
+}

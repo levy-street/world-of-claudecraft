@@ -6577,6 +6577,7 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       auraTrack_utility: `the ${t('hudChrome.auraTracks.utility')} track`,
       auraTrack_friendly: `the ${t('hudChrome.auraTracks.friendly')} track`,
       talkingHead: 'the Dialogue panel',
+      shardpikeBar: 'the Shardpike bar',
       // guide.interfacePage.framesGovernedUnitTooltip, named by its live chip.
       unitTooltip: `the ${t('hudChrome.interfaceUnlock.frameNames.unitTooltip')} frame`,
     };

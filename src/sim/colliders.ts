@@ -82,6 +82,7 @@ import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
 import { forgefatherFortressColliders, forgefatherStreetlampSites } from './forgefather_fortress';
 import { harborStructureColliders } from './harbor_structures';
 import { derivedInteriorColliders } from './interior_collider_sets';
+import { musterCampColliders, musterPocketSeals } from './muster_camp_colliders';
 import {
   benchDrawnHeight,
   CHAPEL_HALL,
@@ -113,7 +114,12 @@ import {
   TOWN_WALL_TALL_PILLAR_ALONG,
 } from './prop_layout';
 import { riftRegionAt } from './rift_regions';
-import { type PlacedStreetlamp, planStreetlamps, styleStreetlampSites } from './streetlamp_layout';
+import {
+  lampAreaAt,
+  type PlacedStreetlamp,
+  planStreetlamps,
+  styleStreetlampSites,
+} from './streetlamp_layout';
 import { STREETLAMP_COLLIDER_RADIUS, STREETLAMP_FIXTURE_HEIGHT } from './streetlamp_style';
 import { townPropPlacements } from './town_props';
 import { transportBerthColliders, transportGatesClosedAtBuild } from './transport_gates';
@@ -774,6 +780,8 @@ function staticWorldColliders(seed: number): Collider[] {
         cameraTopY: topY(seed, board.x, board.z, board.height),
       });
     }
+    // The Mirefen muster camps' structure pieces, off the plan the art draws.
+    for (const c of musterCampColliders(seed)) out.push(c);
   }
 
   // Hand-placed GLB decor (src/sim/decor_prop_colliders.ts): a circle or box per
@@ -1512,7 +1520,23 @@ function gridFor(seed: number): ColliderGrid {
   // against buildings, props and decorations, never against another lamp
   // (spacing between lamps is the layout's own minSeparation).
   addStreetlampColliders(grid, seed);
+  // The muster camps' pocket seals, vetted against the finished grid the same way.
+  if (content === BUILTIN_WORLD) addLateColliders(grid, musterPocketSeals(seed, isBlocked));
   return grid;
+}
+
+/**
+ * Register colliders built after the grid was published (streetlamps, the muster's
+ * pocket seals). Vetting them ran resolvePosition, which caches a combined
+ * authored-plus-decoration list per cell that predates them, so the combined view
+ * is dropped (the expensive decoration cells stay) and rebuilds with them in it.
+ */
+function addLateColliders(grid: ColliderGrid, late: readonly Collider[]): void {
+  for (const c of late) {
+    assignLateGridIndex(grid, c);
+    registerInCells(grid, c);
+  }
+  if (late.length > 0) grid.combinedCells.clear();
 }
 
 /**
@@ -1590,27 +1614,6 @@ const LAMP_CLEARANCE_EPSILON = 0.05;
 // (and the same reason) as bankerChestSpotsByGrid above.
 const streetlampsByGrid = new WeakMap<object, PlacedStreetlamp[]>();
 
-/** Strict authored-area identity at a point, or null outside every zone. This
- *  decides which fixture style a stretch of road is lit with, so it must not
- *  fall back to a nearest zone: a lamp just outside every rect is genuinely
- *  wilderness and takes the default. */
-function lampAreaAt(x: number, z: number, zones: readonly WorldZoneRect[]): string | null {
-  for (const zone of zones) {
-    const xMin = zone.xMin ?? STRIP_MIN_X;
-    const xMax = zone.xMax ?? STRIP_MAX_X;
-    if (x >= xMin && x < xMax && z >= zone.zMin && z < zone.zMax) return zone.id;
-  }
-  return null;
-}
-
-interface WorldZoneRect {
-  id: string;
-  zMin: number;
-  zMax: number;
-  xMin?: number;
-  xMax?: number;
-}
-
 /**
  * Plan the whole world's streetlamps for `seed`, with each site's fixture
  * identity resolved. The ONE list: colliders below plant a post on it and
@@ -1632,7 +1635,7 @@ function buildStreetlampPlacements(seed: number): PlacedStreetlamp[] {
         );
       },
       roadClear: roadDistance,
-      areaAt: (x, z) => lampAreaAt(x, z, content.zones),
+      areaAt: (x, z) => lampAreaAt(x, z, content.zones, STRIP_MIN_X, STRIP_MAX_X),
     },
     {
       authoredClearMin: MAX_BODY_RADIUS + Math.max(...Object.values(STREETLAMP_COLLIDER_RADIUS)),
@@ -1660,26 +1663,19 @@ function addStreetlampColliders(grid: ColliderGrid, seed: number): void {
   streetlampsByGrid.set(grid, placements);
   if (placements.length === 0) return;
   const npcSpots = townNpcPositions();
-  let planted = 0;
+  const posts: Collider[] = [];
   for (const lamp of placements) {
     const r = STREETLAMP_COLLIDER_RADIUS[lamp.style];
     if (standsOnNpcSpot(lamp.x, lamp.z, r, npcSpots)) continue;
-    const post: Collider = {
+    posts.push({
       type: 'circle',
       x: lamp.x,
       z: lamp.z,
       r,
       cameraTopY: lamp.y + STREETLAMP_FIXTURE_HEIGHT,
-    };
-    assignLateGridIndex(grid, post);
-    registerInCells(grid, post);
-    planted++;
+    });
   }
-  // Vetting the sites above ran resolvePosition, which caches a combined
-  // authored-plus-decoration list per cell. Those entries predate the posts
-  // just registered, so drop the combined view (the expensive decoration
-  // cells stay) and let it rebuild with the lamps in it.
-  if (planted > 0) grid.combinedCells.clear();
+  addLateColliders(grid, posts);
 }
 
 /**

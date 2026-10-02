@@ -115,6 +115,7 @@ const view = source('src/ui/bags_view.ts');
 const promptDialog = source('src/ui/prompt_dialog.ts');
 const tokens = source('src/styles/tokens.css');
 const hud = source('src/ui/hud.ts');
+const bagCurrency = source('src/ui/bag_currency_html.ts');
 const components = source('src/styles/components.css');
 
 describe('bags_window: no magic values', () => {
@@ -157,7 +158,12 @@ describe('bags_window: accessibility contract', () => {
 
 describe('bags_window: load-bearing behaviors preserved', () => {
   it('uses the branded Claudium icon and shared money-row primitives', () => {
-    expect(hud).toContain('src="/claudium/icons/claudium_coin_64.webp"');
+    // The markup moved out of hud.ts into bag_currency_html.ts (the two bag-header currency
+    // chips are pure value-to-markup and needed nothing from the coordinator). Scraped from
+    // its new home rather than deleted: the point of the pin is that the BRANDED asset is
+    // the one referenced, and a scrape of a file that no longer contains the string passes
+    // vacuously the moment it goes missing.
+    expect(bagCurrency).toContain('src="/claudium/icons/claudium_coin_64.webp"');
     // W7 hands wallet color and interaction paint to the shared button and chip primitives.
     expect(painter).toContain("'[data-wallet-action], [data-claudium-launcher]'");
     expect(painter).toContain("control.classList.add('ui-btn')");

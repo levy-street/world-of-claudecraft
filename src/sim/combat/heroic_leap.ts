@@ -237,19 +237,36 @@ export function advanceHeroicLeap(ctx: SimContext, entity: Entity): boolean {
   entity.jumping = false;
   entity.fallStartY = entity.pos.y;
   entity.leap = null;
-  ctx.emit({
-    type: 'spellfxAt',
-    x: entity.pos.x,
-    z: entity.pos.z,
-    school: flight.school,
-    fx: 'nova',
-    radius: flight.landingAoe.radius,
-    ability: flight.abilityId,
-  });
-  for (const target of ctx.hostilesInRadius(entity, entity.pos, flight.landingAoe.radius)) {
-    if (!ctx.hasLineOfSight(entity, target)) continue;
-    const damage = Math.round(ctx.rng.range(flight.landingAoe.min, flight.landingAoe.max));
-    ctx.dealDamage(entity, target, damage, false, flight.school, flight.abilityName, 'hit');
+  // A flight with no landing blast (the Muster Grapnel's haul, balgath_trinkets.ts)
+  // lands quietly: no nova, no damage sweep, no draw.
+  if (flight.landingAoe.radius > 0) {
+    ctx.emit({
+      type: 'spellfxAt',
+      x: entity.pos.x,
+      z: entity.pos.z,
+      school: flight.school,
+      fx: 'nova',
+      radius: flight.landingAoe.radius,
+      ability: flight.abilityId,
+    });
+    for (const target of ctx.hostilesInRadius(entity, entity.pos, flight.landingAoe.radius)) {
+      if (!ctx.hasLineOfSight(entity, target)) continue;
+      const damage = Math.round(ctx.rng.range(flight.landingAoe.min, flight.landingAoe.max));
+      ctx.dealDamage(entity, target, damage, false, flight.school, flight.abilityName, 'hit');
+    }
+  }
+  // The Muster Grapnel's haul lands with a heal from whoever threw it (never crits, so
+  // the tooltip's number is the number healed; draws no rng).
+  if (flight.landingHeal) {
+    const healer = ctx.entities.get(flight.landingHeal.sourceId) ?? entity;
+    ctx.applyHeal(
+      healer,
+      entity,
+      flight.landingHeal.amount,
+      flight.landingHeal.name,
+      flight.abilityId,
+      false,
+    );
   }
   enrageOnVaultingLanding(ctx, entity, flight.abilityId);
   return true;

@@ -113,6 +113,32 @@ const baseEnTable = {
   'error.vaultMaxUpgrades': 'Your vault cannot be upgraded further.',
   'log.vaultUnlocked': 'You unlock the Materials Vault.',
   'log.vaultUpgraded': 'You upgrade the Materials Vault.',
+  // The Shardpike trial (src/sim/lance_trial.ts): the brace/thrust refusals and the
+  // set/fumble/blind notices. Placeholder-free, so all register in the EXACT matcher.
+  'error.lanceNeedPike': 'You need a Shardpike in hand.',
+  'error.lanceResting': 'The pike needs a moment to be re-set.',
+  'error.lanceNeedGround': 'You need solid ground under you.',
+  'error.lanceMounted': 'Not from the saddle.',
+  'error.lanceNotSet': 'The pike is not set.',
+  'error.lanceNoTarget': 'Nothing worth the point in reach.',
+  'error.lanceShoved': 'The stance is broken!',
+  'error.lanceFumbled': 'You fumble the Shardpike!',
+  'error.lanceWindowOver': 'The moment passes.',
+  'log.lanceBraced': 'You couch the Shardpike. Hold it true.',
+  'log.lanceSet': 'The pike is set. STRIKE!',
+  'log.lanceBlinded': 'Your thrust finds the Barrowglass. The Barrowhide sloughs away!',
+  // The muster pike (src/sim/muster_pike.ts): the rack's refusal, the loan and its end,
+  // and the bank's refusal of lent gear (src/sim/bank.ts). Placeholder-free: EXACT matcher.
+  'error.musterPikeHeld': 'You already hold a Shardpike.',
+  'error.musterPikeLevel': 'The muster lends its pikes only to recruits of level 19 or lower.',
+  'log.musterPikeTaken': 'You take a Shardpike from the muster rack.',
+  'log.musterPikeReclaimed': 'The muster reclaims its Shardpike.',
+  // The drill yard (src/sim/muster_effigy.ts, src/sim/muster_pike.ts): the lantern going
+  // out on the Straw Foreman, and the lent pike going back to the rack after it.
+  'log.effigyLanternOut':
+    'The lantern gutters out and the planks fall away! Hit it with your own weapon: every blow lands in full.',
+  'log.musterPikeDrillReturn': 'The drillmaster takes the pike back to the rack.',
+  'error.bankBorrowedGear': 'You cannot store borrowed gear in the bank.',
   // Guild Bank (src/sim/guild_bank.ts): the officer-plus shared treasury +
   // item store. The error.* lines are the refusal toasts (too-far, quest-item,
   // and "Not enough money." reuse the existing rows above / the hud arm); the
@@ -1190,6 +1216,18 @@ const baseEnTable = {
   // Nature's Boon, the Wildfang autoattack window (combat/druid_natures_boon.ts).
   'aura.naturesBoon': "Nature's Boon",
   'aura.marrowbreak': 'Marrowbreak',
+  // Balgath's shared soak mark (mob/boss_ranged_mechanics.ts).
+  'aura.barrowBurden': 'Barrow Burden',
+  // Balgath's Wake of the Fallen Star: the cast bar and eruption, and the pools it leaves
+  // (mob/boss_starwake.ts).
+  'mechanic.balgathStarwake': 'Wake of the Fallen Star',
+  'mechanic.balgathMoltenFen': 'Molten Fen',
+  // The meteor volley the eruption calls down (mob/boss_starwake_meteors.ts).
+  'mechanic.balgathStarDebris': 'Star Debris',
+  // The drill yard's effigy: its plank hide, and a player's own open window on it
+  // (src/sim/muster_effigy.ts EFFIGY_WARD_NAME / EFFIGY_OPENED_NAME).
+  'aura.effigyPlankHide': 'Plank Hide',
+  'aura.effigyLanternOut': 'Lantern Out',
   'aura.pin': 'Pin',
   // Coldsight's banked Fevered Draw opportunity (combat/hunter_coldsight_read.ts).
   'aura.coldsightRead': 'Coldsight Read',
@@ -1283,6 +1321,17 @@ const baseEnTable = {
   'aura.trinketMoltenIgnite': 'Molten Ignite',
   'aura.trinketCrucibleHeat': 'Crucible Heat',
   'error.trinketNoHeat': 'Your heart holds no heat.',
+  // Balgath's trinkets (src/sim/combat/balgath_trinkets.ts): their auras, the
+  // Muster Standard's two soldiers (owned mobs name through this aura map), the
+  // passive-only Heart's refusal, the Grapnel's refusal and the Heart's notice.
+  'aura.trinketShapeOfTheForeman': 'Shape of the Foreman',
+  'aura.trinketGutteredGlare': 'Guttered Glare',
+  'aura.trinketStoneStatue': 'Stone Statue',
+  'aura.trinketMusterFootman': 'Muster Footman',
+  'aura.trinketMusterSergeant': 'Muster Sergeant',
+  'error.trinketPassiveOnly': 'It works on its own.',
+  'error.trinketCannotMove': "They can't be moved right now.",
+  'log.trinketBarrowstone': 'Your Barrowstone Heart turns you to stone!',
 } as const;
 
 const petEnTable = {
@@ -17383,6 +17432,11 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Forge Heat': 'aura.trinketForgeHeat',
   'Molten Ignite': 'aura.trinketMoltenIgnite',
   'Crucible Heat': 'aura.trinketCrucibleHeat',
+  'Shape of the Foreman': 'aura.trinketShapeOfTheForeman',
+  'Guttered Glare': 'aura.trinketGutteredGlare',
+  'Stone Statue': 'aura.trinketStoneStatue',
+  'Muster Footman': 'aura.trinketMusterFootman',
+  'Muster Sergeant': 'aura.trinketMusterSergeant',
   'Crafted Momentum': 'aura.craftedMomentum',
   'Crafted Shelter': 'aura.craftedShelter',
   'Crafted Preservation': 'aura.craftedPreservation',
@@ -17401,6 +17455,17 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   "Nature's Boon": 'aura.naturesBoon',
   'Coldsight Read': 'aura.coldsightRead',
   Marrowbreak: 'aura.marrowbreak',
+  // Balgath's shared soak mark; byte-identical to the template's burden.name.
+  'Barrow Burden': 'aura.barrowBurden',
+  // Balgath's Wake of the Fallen Star and its pools; byte-identical to the template's
+  // starwake.name, starwake.pool.name and starwake.meteors.name.
+  'Wake of the Fallen Star': 'mechanic.balgathStarwake',
+  'Molten Fen': 'mechanic.balgathMoltenFen',
+  'Star Debris': 'mechanic.balgathStarDebris',
+  // The Straw Foreman's plank hide and a player's window on it (muster_effigy.ts);
+  // byte-identical to EFFIGY_WARD_NAME and EFFIGY_OPENED_NAME.
+  'Plank Hide': 'aura.effigyPlankHide',
+  'Lantern Out': 'aura.effigyLanternOut',
   // Pin, the Bruin Rush to Cat Form rider's slow (combat/druid_engines.ts).
   Pin: 'aura.pin',
   // Bladed Gyre's armed echo buff (whirlwind's selfBuff auraName in
@@ -17856,6 +17921,7 @@ const TRINKET_NAMED_AURA_ITEM_IDS: Readonly<Record<string, string>> = {
   'Molten Fletching': 'molten_fletching',
   'Last Flame Lantern': 'last_flame_lantern',
   'Heart of the Crucible': 'heart_of_the_crucible',
+  'Muster Standard': 'muster_standard',
 };
 
 export function localizeSimAuraName(name: string): string | null {
@@ -20255,8 +20321,17 @@ const RULES: Rule[] = [
   },
   { re: /^(.+) awakens!$/, build: (m) => tQuestExtra('awakens', { name: locMob(m[1]) }) },
   {
-    re: /^(.+) rises over Thornpeak Heights!$/,
-    build: (m) => t('hudChrome.worldBoss.spawn', { name: locMob(m[1]) }),
+    re: /^(.+) rises over (.+)!$/,
+    build: (m) => t('hudChrome.worldBoss.spawn', { name: locMob(m[1]), zone: locZone(m[2]) }),
+  },
+  // A slumbering world boss's dawn wake and dusk lie-down (src/sim/mob/slumber.ts).
+  {
+    re: /^(.+) wakes over (.+)!$/,
+    build: (m) => t('hudChrome.worldBoss.wake', { name: locMob(m[1]), zone: locZone(m[2]) }),
+  },
+  {
+    re: /^(.+) sleeps until dawn\.$/,
+    build: (m) => t('hudChrome.worldBoss.sleep', { name: locMob(m[1]) }),
   },
   {
     re: /^Fallen Captain Aldren yells, "None shall disturb the king's rest! For Thornpeak!"$/,

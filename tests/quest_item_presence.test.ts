@@ -273,3 +273,32 @@ describe('the real seams', () => {
     expect(playerHoldsQuestItem(sim.ctx, meta, LISTABLE)).toBe(false);
   });
 });
+
+describe('worn counts as held', () => {
+  // The store this predicate used to leave uncovered on purpose, because the equip gate
+  // fenced it: no required item was equippable. The world boss's Shardpike is, and it is
+  // MEANT to be wielded, so without this arm a player holding it in hand read as not holding
+  // it: abandon, re-accept, and the fallback mints a second pike.
+  it('counts an item in an equipment slot, and only the right item', () => {
+    const meta = fakeMeta();
+    meta.equipment = { mainhand: 'skerrits_shardpike' } as typeof meta.equipment;
+    expect(playerHoldsQuestItem(fakeCtx(), meta, 'skerrits_shardpike')).toBe(true);
+    expect(playerHoldsQuestItem(fakeCtx(), meta, 'iron_sword')).toBe(false);
+  });
+
+  it('scans every slot, not a hardcoded list', () => {
+    // Object.values over the paperdoll is what keeps a NEW equip slot from silently falling
+    // out of the scan and re-opening the mint through it.
+    const meta = fakeMeta();
+    meta.equipment = { offhand: 'skerrits_shardpike' } as typeof meta.equipment;
+    expect(playerHoldsQuestItem(fakeCtx(), meta, 'skerrits_shardpike')).toBe(true);
+  });
+
+  it('degrades to not-worn on a meta with no paperdoll instead of throwing', () => {
+    // This runs inside the accept path; a narrower meta must not take a quest hand-over down.
+    const meta = fakeMeta();
+    (meta as { equipment?: unknown }).equipment = undefined;
+    expect(() => playerHoldsQuestItem(fakeCtx(), meta, 'skerrits_shardpike')).not.toThrow();
+    expect(playerHoldsQuestItem(fakeCtx(), meta, 'skerrits_shardpike')).toBe(false);
+  });
+});

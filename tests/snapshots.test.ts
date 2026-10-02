@@ -99,6 +99,7 @@ import {
 } from '../src/sim/varkhul_shared_pyre';
 import { terrainHeight } from '../src/sim/world';
 import { WORLD_BOSSES, worldBossLockoutId } from '../src/sim/world_boss';
+import { spawnWorldBoss } from '../src/sim/world_boss_spawn';
 import { onMobKilledForWorldQuests, worldQuestCycleForResetDay } from '../src/sim/world_quests';
 import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
@@ -5741,8 +5742,11 @@ const ALL_DELTA_KEYS = [
   'hpw',
   'hrat',
   'inv',
+  'lance',
+  'lguide',
   'lhonor',
   'lockouts',
+  'lrest',
   'lroll',
   'lrollg',
   'lxp',
@@ -5876,8 +5880,10 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   hpref: 'harvestPreference',
   hrat: 'hasteRating',
   inv: 'inventory',
+  lance: 'lanceTrial',
   lhonor: 'lifetimeHonor',
   lockouts: 'selfLockouts',
+  lrest: 'lanceRestRemaining',
   lroll: 'lootRollPrompts',
   lrollg: 'lootRollGroup',
   lxp: 'lifetimeXp',
@@ -5976,6 +5982,13 @@ function dirtyEveryDeltaField(): {
   // `cbt`: the authoritative in-combat bit; a fresh character is out of combat,
   // so the fixture flags it the way the sim's engaged pass would.
   p.inCombat = true;
+
+  // The Shardpike trial (lance + lrest): pike in hand, brace live, rest stamp set.
+  // Brace FIRST (the verb refuses while resting), then stamp the rest window.
+  meta.equipment.mainhand = 'skerrits_shardpike';
+  p.onGround = true;
+  sim.lanceBrace(lp);
+  meta.lanceRestUntil = sim.time + 3;
 
   // Poke the encoder's exact sources for the mutually-exclusive cases.
   const run = sim.delveRunForPlayer(lp) as any;
@@ -6329,7 +6342,8 @@ function dirtyEveryDeltaField(): {
   // Realm-wide world-boss liveness (`wba`), intentionally separate from the
   // viewer's personal loot lockout. Spawn through the real Sim primitive while
   // leaving the scheduler clocks alone so the rest of this codec fixture stays still.
-  (sim as any).worldBossEntityIds[0] = (sim as any).spawnWorldBoss(WORLD_BOSSES[0]);
+  // (the primitive lives in src/sim/world_boss_spawn.ts behind the SimContext seam).
+  (sim as any).worldBossEntityIds[0] = spawnWorldBoss((sim as any).ctx, WORLD_BOSSES[0]);
 
   return { server, fc, leader, memberPid: mp };
 }
@@ -6356,7 +6370,9 @@ describe('world-boss realm liveness snapshot', () => {
     fc.sent.length = 0;
     broadcast(server);
     snap = lastSnap(fc.sent);
-    expect(snap.self.wba).toEqual([bossId]);
+    // The Mirefen boss (Balgath) keeps his own dawn clock and may be up in the same
+    // tick, so the pin is on THIS boss's membership, not the whole list.
+    expect(snap.self.wba).toContain(bossId);
     (client as any).applySnapshot(snap);
     expect(client.worldBossActive(bossId)).toBe(true);
     expect(client.raidLockouts().map((lockout) => lockout.id)).toContain(
@@ -6369,7 +6385,7 @@ describe('world-boss realm liveness snapshot', () => {
     fc.sent.length = 0;
     broadcast(server);
     snap = lastSnap(fc.sent);
-    expect(snap.self.wba).toEqual([]);
+    expect(snap.self.wba).not.toContain(bossId);
     (client as any).applySnapshot(snap);
     expect(client.worldBossActive(bossId)).toBe(false);
   });
@@ -7151,8 +7167,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 113 unique keys in sorted order', () => {
-    // 109 plus the release batch's pending Town Focus and Spell Crit core keys.
+  it('ALL_DELTA_KEYS contains exactly 116 unique keys in sorted order', () => {
+    // 109 plus the release batch's pending Town Focus and Spell Crit core keys (113),
+    // plus the Shardpike trial's lance, lrest and lguide (116).
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -7160,7 +7177,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) moved off the always-present
     // self record and behind this same delta gate, for 83, then +1 reliq
     // (Reliquary Phase 3 sparse blob), +1 aborder (the Book of Deeds nameplate
-    // border echo, atitle's sibling), and +1 `app` (the release's authored
+    // border echo, atitle's sibling), +2 lance/lrest (the Shardpike trial's
+    // self view + rest cooldown), and +1 `app` (the release's authored
     // modular look, which cannot come from the entity list because the
     // broadcast loop skips the viewer's own entity, and which is heavy and
     // immutable so it rides this channel instead of re-serializing per tick),
@@ -7209,8 +7227,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The release batch's pending Town Focus and the Spell Crit sheet cell's
     // shared crit core scb (server/self_scalar_wire.ts), at the third
     // release/v0.44.0 base merge, for 111.
-    expect(ALL_DELTA_KEYS).toHaveLength(113);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(113);
+    // The Mirefen world-boss branch's Shardpike self keys (lance, lrest, lguide): 116.
+    expect(ALL_DELTA_KEYS).toHaveLength(116);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(116);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7380,7 +7399,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The Weekly Vault's weeklyRewards self key (PR 4052) makes 107.
     // The World PvP readout wpvp and the King of the Hill readout hill make 109.
     // The release batch's pending Town Focus and Spell Crit core keys make 111.
-    expect(scraped.size).toBe(113);
+    // The Shardpike trial's lance, lrest and lguide self emits make 116.
+    expect(scraped.size).toBe(116);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

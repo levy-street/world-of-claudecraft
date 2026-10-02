@@ -33,6 +33,9 @@ import {
   SPELL_POWER_PER_INT,
 } from './types';
 
+/** The Shape of the Foreman's body scale (a little taller than a player). */
+export const FOREMAN_SHAPE_SCALE = 1.1;
+
 function baseEntity(id: number, pos: Vec3): Entity {
   return {
     id,
@@ -470,6 +473,12 @@ export function recalcPlayerStats(
     else if (a.kind === 'buff_scale') scaleMul *= a.value;
     // Metamorphosis: a temporary demon transform that also makes the caster larger.
     else if (a.kind === 'form_metamorph') scaleMul *= 1.35;
+    // The Shape of the Foreman (combat/balgath_trinkets.ts): the cyclops's body, a head
+    // taller than a player rather than raid-boss sized, and value percent more armor.
+    else if (a.kind === 'form_foreman') {
+      scaleMul *= FOREMAN_SHAPE_SCALE;
+      buffArmorPct += a.value / 100;
+    }
     // Percent raid buffs store integer percent POINTS (5 = +5%) so they survive the
     // integer-rounding talent value multiplier; converted to a fraction here.
     else if (a.kind === 'buff_stats_pct') allStatsPct += a.value / 100;
@@ -847,6 +856,13 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   e.scale = template.scale;
   e.color = template.color;
   e.swingTimer = 0;
+  // An authored boss that opts into telegraphed mechanics carries the same per-spawn
+  // spacing a rift stamps on its bosses, which is also what arms the ground-ring windup.
+  // Set ONLY when the template asks for it: defining the field on every mob would churn
+  // the parity golden's entity samples for mobs whose behaviour has not changed.
+  if (template.telegraphedMechanics !== undefined) {
+    e.riftMechanicSpacing = template.telegraphedMechanics;
+  }
   // Telegraph the first War Stomp: delay it one full interval after engage.
   if (template.stomp) e.stompTimer = template.stomp.every;
   // Telegraph the first pulse blast the same way: one full interval after engage.

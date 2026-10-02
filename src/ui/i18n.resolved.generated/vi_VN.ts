@@ -513,6 +513,48 @@ export const vi_VN: EnTranslations = {
       "sailing": "Đang Buồn Đến {dest}"
     },
     "materialStackSelectionUnavailable": "Lựa chọn nguyên liệu đó không còn khả dụng.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Barrowglass Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "braceTooltipLean": "Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: each pushes the marker toward its side. The beam drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Lower the pike and step out of the brace, the same as jumping. You lose the set but pay no penalty: you can couch it again right away. Only a thrust, a fumble, a broken stance or a missed window rests the pike, for {rest} seconds.",
+      "whyResting": "The pike is being re-set after a thrust, a fumble, a broken stance or a missed window. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptFindBossMuster": "The muster's Shardpike: put out the Foreman's eye with it",
+      "promptTakePike": "Press {key} or click the rack to take a Shardpike",
+      "promptTakePikeClick": "Click the rack to take a Shardpike",
+      "promptTakePikeTap": "Tap the rack to take a Shardpike",
+      "promptPikeLevelCap": "The muster lends its pikes only to level {level} or lower",
+      "promptHoldSteadyLean": "Hold the pike steady: lean with {left} and {right}",
+      "leanLeft": "Lean left",
+      "leanRight": "Lean right",
+      "leanLeftKey": "Lean left ({key})",
+      "leanRightKey": "Lean right ({key})",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN",
+      "effigyBanner": "BLINDED! NOW THE WHOLE RAID HITS HARD",
+      "promptStrikeLantern": "STRIKE THE LANTERN now, {seconds}s",
+      "promptLanternOut": "The lantern is out, {seconds}s: hit it with your own weapon",
+      "promptCloserEffigy": "Get within reach of the Straw Foreman, {yards} yards out"
+    },
     "vehicle": {
       "title": "Pháo Canh Giữ Phía Bắc",
       "objective": "Bảo vệ canh giữ phía bắc",
@@ -3112,8 +3154,10 @@ export const vi_VN: EnTranslations = {
         "storm": "Mỗi phép thuật bạn thi triển sẽ thêm một sạc, tối đa {max}. Sạc kéo dài {duration} giây, làm mới bất cứ khi nào bạn đạt được sạc.",
         "heat": "Các cú đánh vũ khí cận chiến và tầm xa của bạn mỗi cái sẽ thêm một chồng nhiệt, tối đa {max}. Nhiệt kéo dài {duration} giây, làm mới bất cứ khi nào bạn đạt được chồng.",
         "ignite": "Các cú đánh tấn công quan trọng vũ khí cận chiến và tầm xa của bạn làm mục tiêu bốc cháy, gây {tick} sát thương Lửa mỗi {every} giây trong {duration} giây. Một cú đánh tấn công quan trọng mới làm mới nó. Sát thương tăng theo Sức Mạnh Tấn Công hoặc Sức Mạnh Tấn Công Tầm Xa, cái nào cao hơn.",
-        "guardHeat": "Mỗi lần bạn chặn, né tránh hoặc khóa một cuộc tấn công sẽ thêm một chồng nhiệt, tối đa {max}. Nhiệt kéo dài {duration} giây, làm mới bất cứ khi nào bạn đạt được chồng."
+        "guardHeat": "Mỗi lần bạn chặn, né tránh hoặc khóa một cuộc tấn công sẽ thêm một chồng nhiệt, tối đa {max}. Nhiệt kéo dài {duration} giây, làm mới bất cứ khi nào bạn đạt được chồng.",
+        "stoneHeart": "When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow."
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "Trong {duration} giây, kẻ thù tấn công bạn trực tiếp nhận sát thương Vật Lý bằng {pct}% sức khỏe mà tấn công đó cướp từ bạn. Sát thương Định Kỳ không kích hoạt nó.",
         "anchor": "Trong {duration} giây, nhận {reduction}% ít sát thương hơn nhưng di chuyển ở tốc độ {speed}%. Loại bỏ bất kỳ sự sửng sốt, bị cột, chậm, sợ hãi, biến hóa, im lặng, mù, bị nguyền rủa, bị tước vũ khí và những tác động gây tê liệt trên bạn, và bạn bỏ qua những cái mới và lực đẩy trong khi nó tồn tại.",
@@ -3132,7 +3176,11 @@ export const vi_VN: EnTranslations = {
         "kindlingOrb": "Triệu hồi một quả cầu tro than bên cạnh bạn trong {duration} giây. Mỗi phép thuật bạn thi triển ở kẻ thù làm nó bắn một tia ở kẻ thù đó {damage} sát thương Lửa. Sát thương tăng theo Sức Mạnh Phép Thuật.",
         "pierce": "Trong {duration} giây, các tấn công tự động, bắn và khả năng vật lý của bạn (không chảy máu) cũng tấn công kẻ thù gần mục tiêu nhất của bạn trong {reach} thước {share}% sát thương gây ra.",
         "lantern": "Đặt một chiếc lụp ở chân bạn trong {duration} giây. Một chữa lành trực tiếp từ bất kỳ ai trên bạn hoặc thành viên nhóm trong {radius} thước của nó cũng chữa lành thành viên nhóm khác bị thương nhất khác trong ánh sáng của nó {share}% chữa lành.",
-        "heartNova": "Dùng hết tất cả chồng nhiệt trên một nova lửa gây {perHeat} sát thương Lửa mỗi chồng ({max} tại {maxHeat} chồng) cho mỗi kẻ thù trong {radius} thước và chế áp mọi sinh vật nó đánh trúng. Sát thương tăng theo Sức Mạnh Tấn Công. Yêu cầu một chồng nhiệt."
+        "heartNova": "Dùng hết tất cả chồng nhiệt trên một nova lửa gây {perHeat} sát thương Lửa mỗi chồng ({max} tại {maxHeat} chồng) cho mỗi kẻ thù trong {radius} thước và chế áp mọi sinh vật nó đánh trúng. Sát thương tăng theo Sức Mạnh Tấn Công. Yêu cầu một chồng nhiệt.",
+        "foremanShape": "Take the Shape of the Foreman for {duration} sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain {armorPct}% armor and cannot be knocked back. Dismounts you.",
+        "musterStandard": "Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers march at your side and fight your target in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, and only once it is already in combat. Each has {hpPct}% of your maximum health. Left more than {leash} yd behind, they rejoin you at once. They leave when the standard falls or when you die. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.",
+        "gutteredGlare": "Channel for {duration} sec: a beam {length} yd long bursts from you the way you face and deals {tick} Arcane damage every {every} sec to up to {max} enemies in its path ({total} to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power.",
+        "grapnel": "Hook a party or raid member within {range} yd that you can see and haul them through the air to your side, healing them for {heal} when they land. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken. Healing increases with Healing Power."
       }
     },
     "questShare": {
@@ -3950,6 +3998,8 @@ export const vi_VN: EnTranslations = {
       "cooldownCap": "{used} trên {cap} giây giảm thời gian hồi chiêu đã dùng trong khung này",
       "bruinRushWindow": "Hình Sói không tốn mana và ghim mục tiêu Cú Lao Bruin của bạn, làm chậm nó {pct}% trong {sec} giây",
       "funeralHarvestLock": "Thu Hoạch Tang Lễ chưa thể tạo thêm Mảnh Linh Hồn",
+      "effigyPlankHide": "Turns away {pct}% of every blow, until a Shardpike thrust puts out the lantern in its eye",
+      "effigyLanternOut": "The Straw Foreman's lantern is out for you: your blows and your pet's ignore its Plank Hide and land in full",
       "leadenHexLock": "Bùa Trì Trệ chưa thể trói mục tiêu này lại",
       "forbiddenReflectionReady": "Kỹ năng hồi chiêu Thuật Sĩ Hắc Ám hợp lệ tiếp theo của bạn có thể được thi triển lại",
       "forbiddenReflectionLock": "Phản Chiếu Cấm Kỵ chưa thể chuẩn bị lại",
@@ -4036,6 +4086,10 @@ export const vi_VN: EnTranslations = {
         "moltenIgnite": "Gây {damage} sát thương Lửa mỗi {every} giây. Một cú chí mạng vũ khí khác làm tươi nó.",
         "pierce": "Các cú tấn công tự động, bắn và khả năng Vật Lý của bạn (không chứng chảy máu) cũng tấn công kẻ thù gần mục tiêu của bạn nhất trong vòng {reach} thước với {pct}% sát thương gây ra.",
         "lantern": "Một chữa lành trực tiếp từ bất kỳ ai trên bạn hoặc thành viên nhóm trong vòng {radius} thước của chiếc đèn cũng chữa lành cho thành viên nhóm khác bị thương nhất khác trong ánh sáng của nó {pct}% chữa lành.",
+        "foremanShape": "You are the Foreman: {armorPct}% more armor and immune to knockbacks.",
+        "musterStandard": "Your Muster Standard is planted. Its soldiers march with you and fight your target.",
+        "gutteredGlare": "The beam deals {tick} Arcane damage every {every} sec to enemies in its path. Moving or casting ends it.",
+        "stoneStatue": "Turned to stone: immune to damage and unable to act. You return with {pct}% of your maximum health.",
         "crucibleHeat": "Nhiệt: {stacks}/{max}. Sử dụng Trái Tim Lò Luyện để tiêu tệm tất cả trên một vụ nổ lửa gây {damage} sát thương Lửa với mỗi kẻ thù trong vòng {radius} thước và người điều khiển tất cả sinh vật nó trúng.",
         "crucibleHeatOther": "Nhiệt: {stacks}/{max}. Trái Tim Lò Luyện tiêu tệm tất cả trên một vụ nổ lửa trong vòng {radius} thước gây sát thương Lửa nhiều hơn với mỗi chồng và người điều khiển tất cả sinh vật nó trúng."
       },
@@ -4071,6 +4125,7 @@ export const vi_VN: EnTranslations = {
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "damageReduction": "Giảm {pct}% toàn bộ sát thương nhận vào",
+      "slumber": "Ngủ đến bình minh. Không thể bị tấn công và sẽ không thức giấc vì bất kỳ ai.",
       "guardianWard": "Đòn chí mạng tiếp theo của kẻ địch thay vào đó hồi bạn lên {pct}% máu",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
@@ -4147,7 +4202,9 @@ export const vi_VN: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} trỗi dậy trên Cao Nguyên Đỉnh Gai!"
+      "spawn": "{name} trỗi dậy trên {zone}!",
+      "wake": "{name} thức giấc trên {zone}!",
+      "sleep": "{name} ngủ đến bình minh."
     },
     "auth": {
       "appleLoginCta": "Tiếp Tục với Apple",
@@ -4291,6 +4348,7 @@ export const vi_VN: EnTranslations = {
         "menu": "Menu",
         "minimap": "Bản Đồ Nhỏ",
         "stanceBar": "Thanh Thế Đứng",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "Thanh Kinh Nghiệm",
         "chat": "Trò Chuyện",
         "actionBarGroup": "Các Thanh Hành Động",
@@ -7428,6 +7486,7 @@ export const vi_VN: EnTranslations = {
       "framesGovernedAuraTracks": "Chỉnh Khung cũng mở khóa sáu thanh hào quang tùy chọn sau khi bạn bật chúng trong thẻ Chiến Đấu của cùng cửa sổ tùy chọn Giao Diện: Bùa Lợi Của Tôi, Hồi Chiêu Phòng Thủ, Lá Chắn Của Tôi, Hồi Chiêu Tấn Công, Di Chuyển Và Tàng Hình, và Bùa Lợi Của Tôi Trên Đồng Minh. Mặc định mọi thanh đều tắt; mỗi thanh hiện nhãn tên riêng khi được mở khóa.",
       "frameGroups": "{trackers} có thể kết hợp các nhiệm vụ, công tích, vết nứt, đào sâu, mục tiêu thu thập, và theo dõi Reliquary. {auras} có thể kết hợp các chấm Mục tiêu và sáu rãnh hào quang. Bật một trong hai nhóm trong Cài đặt Khung, hoặc bỏ nó để di chuyển từng khung riêng biệt. {tot} bao gồm một thanh tài nguyên. {focus} có ba mục tiêu có thể di chuyển độc lập: Shift+F1 qua Shift+F3 gán chúng; Ctrl+F1 qua Ctrl+F3 chọn chúng. Kéo mét thiệt hại hoặc mối đe dọa bất kỳ nơi nào bên ngoài các nút của nó để di chuyển nó, và kéo các cạnh của nó để thay đổi kích thước nó, thậm chí khi các khung bị khóa. Trong khi các khung bị mở khóa, Hiển thị hoặc Ẩn Khung có trình đơn được nhóm riêng. Nhấp chuột phải một khung bị mở khóa để Kích thước Đặt lại hoặc Tùy chọn Khung. Giao diện > Khung cũng chứa Cài đặt Khung và Tùy chọn Khung Đảng có thể thu gọn. Khóa Mục tiêu Mục tiêu với Mục tiêu giữ các khung đó cùng nhau. Tắt nó để di chuyển Mục tiêu của Mục tiêu riêng biệt; bật nó trở lại bảo tồn vị trí riêng biệt cho sau này. Các khung tiêu điểm được gán ẩn các điều khiển thiết lập của chúng; nhấp chuột phải và chọn Bỏ đặt Tiêu điểm để khôi phục chúng. Khả năng đúc chuột qua cũng hoạt động trên các khung tiêu điểm.",
       "framesGovernedTalkingHead": "Chỉnh sửa Khung cũng nới lỏng bảng Đối thoại, bảng này mang lời thoại của NPC trong khi NPC đó nằm ngoài tầm nhìn của bạn; nó đeo chip tên khi nó bị lỏng.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Các thanh, bộ đếm giờ, và chữ chiến đấu",
       "barsBody": "Thanh niệm chú của bạn xuất hiện giữa màn hình, ngay phía trên thanh kỹ năng, bất cứ khi nào bạn niệm hoặc duy trì một phép, và hiển thị tên phép cùng thời gian còn lại. Mục tiêu của bạn cũng có thanh niệm chú riêng trên khung của nó, để bạn biết điều gì sắp xảy ra và đối phó kịp thời.\n\nMột thanh vung đòn mảnh nằm dưới thanh niệm chú và đầy dần giữa hai lần vung vũ khí, để một người đánh cận chiến hay tầm xa biết khi nào đòn đánh tự động tiếp theo sẽ trúng.\n\nThanh kinh nghiệm của bạn chạy suốt chiều rộng bên dưới thanh kỹ năng, chia thành từng đoạn, với một dải sáng hơn cho biết lượng kinh nghiệm nghỉ ngơi bạn đã tích lũy.\n\nBơi xuống dưới nước và một thanh hơi thở màu xanh sẽ xuất hiện ở đầu màn hình. Nó cạn dần khi đầu bạn còn ở dưới nước, chớp đỏ khi cạn hết và bạn bắt đầu chết đuối, rồi đầy lại nhanh chóng ngay khi bạn nổi lên mặt nước. Phím Nhảy đưa bạn bơi lên, còn phím Bơi Xuống, mặc định là Ctrl, đưa bạn xuống sâu hơn.\n\nSát thương và hồi máu bay lên trên bất cứ thứ gì chúng vừa tác động, dưới dạng những con số nhỏ, để bạn có thể đọc hiểu một trận đánh mà không cần đọc chữ. Tab Chiến Đấu trong khung trò chuyện của bạn giữ lại toàn bộ ghi chép bằng văn bản.",
@@ -11227,6 +11286,7 @@ export const vi_VN: EnTranslations = {
     "lockoutRaids": "Cuộc Đột Kích",
     "lockoutDungeons": "Hầm Ngục",
     "lockoutWorldBosses": "Giám Hộ Thế Giới",
+    "lockoutWeeklyQuests": "Weekly quests",
     "takeOverConfirm": "Thao tác này sẽ ngắt nhân vật khỏi phiên khác và đưa về đây. Tiếp tục?",
     "renameRequired": "cần đổi tên",
     "delete": "Xóa",
@@ -15829,6 +15889,30 @@ export const vi_VN: EnTranslations = {
       "fenshadow_maul": {
         "name": "Búa Bóng Đầm Lầy"
       },
+      "foremans_barrowmaul": {
+        "name": "Búa Gò Mộ của Đốc Công"
+      },
+      "skerrits_shardpike": {
+        "name": "Giáo Mảnh của Skerrit"
+      },
+      "loomshard_eye": {
+        "name": "The Barrowglass Eye"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Giáp Vai Gò Mộ"
+      },
+      "mirestone_stride": {
+        "name": "Bước Đá Đầm Lầy"
+      },
+      "foremans_wage_band": {
+        "name": "Nhẫn Tiền Công của Đốc Công"
+      },
+      "mirelight_locket": {
+        "name": "Mặt Dây Ánh Đầm Lầy"
+      },
+      "fenwright_grips": {
+        "name": "Bao Tay Thợ Đầm Lầy"
+      },
       "wildgrove_cinch": {
         "name": "Đai Lưng Rừng Hoang"
       },
@@ -18451,6 +18535,27 @@ export const vi_VN: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Trượng Chiến Vanguard"
       },
+      "muster_shardpike": {
+        "name": "Muster Shardpike"
+      },
+      "knucklebone_of_balgath": {
+        "name": "Knucklebone of Balgath"
+      },
+      "muster_standard": {
+        "name": "Muster Standard"
+      },
+      "guttered_eye": {
+        "name": "The Guttered Eye"
+      },
+      "barrowstone_heart": {
+        "name": "Barrowstone Heart"
+      },
+      "muster_grapnel": {
+        "name": "Muster Grapnel"
+      },
+      "craterglass_stave": {
+        "name": "Craterglass Stave"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },
@@ -19725,8 +19830,26 @@ export const vi_VN: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, Đỉnh Núi Thức Giấc"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Tinh Linh Bão Trỗi Dậy"
+      },
+      "muster_footman": {
+        "name": "Muster Footman"
+      },
+      "muster_chaplain": {
+        "name": "Muster Chaplain"
+      },
+      "muster_sergeant": {
+        "name": "Muster Sergeant"
+      },
+      "muster_drillmaster": {
+        "name": "Muster Drillmaster"
+      },
+      "muster_effigy": {
+        "name": "Straw Foreman"
       },
       "stable_horse": {
         "name": "Ngựa chuồng"
@@ -20375,6 +20498,16 @@ export const vi_VN: EnTranslations = {
         "name": "Vệ Quan Fenwick",
         "title": "Vệ Quan của Fenbridge",
         "greeting": "Hãy dừng lại ở cổng, {className}. Vượt qua đám lau sậy kia, đầm lầy sẽ thay ta giết chóc."
+      },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
+      },
+      "muster_commander": {
+        "name": "Muster Commander",
+        "title": "Fenbridge Muster",
+        "greeting": "Pikes first, {className}, then everyone. That is the whole of it, and it has kept this camp alive."
       },
       "brother_aldric_fen": {
         "name": "Tu Huynh Aldric",
@@ -21114,6 +21247,52 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Lệnh Tập Hợp Fenbridge"
+          }
+        }
+      },
+      "q_muster_summons": {
+        "title": "The Muster's Summons",
+        "text": "Every spear I could spare is dug in around the Starfall Crater, {playerName}, ringing the thing that walks out of it. The Muster Commander holds the camp on the southern rise above the crater, south-east of here. Report to the Commander. You will be told how we fight him, and you will listen, because the ones who did not are in the reeds.",
+        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Barrowglass blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. The rack lends its pikes to recruits of level 19 or lower: the young ones put the eye out, the veterans make the window count. Pikes first, {playerName}, then everyone.",
+        "objectives": {
+          "0": {
+            "label": "Report to the Muster Commander"
+          }
+        }
+      },
+      "q_muster_pike_drill": {
+        "title": "Pikes First",
+        "text": "Talk is cheap and pikes are not, and the rack lends them only to recruits of level 19 or lower. Take a Shardpike off the rack beside me, then walk to the Straw Foreman at the west end of camp: the lads built him out of planks and straw, half the size of the real one, with a lantern where the eye goes. Couch the pike and hold the point true while the drillmaster pounds the ground, because the real one shakes it harder. When your arms are sure, put the point through the lantern. His planks will come off: then hit him with your own weapon, {playerName}, and feel the difference.",
+        "completion": "You felt it bite, did you? On the real one that is fourteen breaths with the whole raid swinging, and then his hide closes over again. Keep the lesson. The Foreman will test it.",
+        "objectives": {
+          "0": {
+            "label": "Shardpike taken from the muster rack"
+          },
+          "1": {
+            "label": "Straw Foreman's lantern put out"
+          },
+          "2": {
+            "label": "Blows landed while its planks are down"
+          }
+        }
+      },
+      "q_muster_trophy": {
+        "title": "A Chip Off the Foreman",
+        "text": "Every week he stands back up, and every week we knock him down again. That takes a raid, and the muster cannot raise one on its own. Find the next raid that goes after Balgath and help bring him down, {playerName}. Strike him, shield the ones who do, or mend them: every hand that fights him counts. When he falls, come back and report to me. The muster pays for every kill.",
+        "completion": "Down again, and you were in the fight that did it. Fenbridge will have my report tonight. The purse is thin this far out, but it is yours. Come back when he is up again.",
+        "objectives": {
+          "0": {
+            "label": "Balgath slain"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Barrowglass in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -23298,6 +23477,12 @@ export const vi_VN: EnTranslations = {
           },
           "7": {
             "label": "Pháo Đài Chìm"
+          },
+          "8": {
+            "label": "Lãnh Địa Gò Mộ"
+          },
+          "9": {
+            "label": "Hố Sao Rơi"
           }
         }
       },
@@ -24381,6 +24566,7 @@ export const vi_VN: EnTranslations = {
     "mailboxName": "Hòm Thư",
     "noticeboardName": "Bảng Thông Báo",
     "farmPatchName": "Luống Vườn",
-    "realmBuilderMonumentName": "Đài tưởng niệm người xây dựng vương quốc"
+    "realmBuilderMonumentName": "Đài tưởng niệm người xây dựng vương quốc",
+    "musterRackName": "Muster Weapon Rack"
   }
 };

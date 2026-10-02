@@ -513,6 +513,48 @@ export const zh_TW: EnTranslations = {
       "sailing": "正在駛往{dest}"
     },
     "materialStackSelectionUnavailable": "此素材選擇已失效。",
+    "shardpike": {
+      "braceLabel": "架起碎晶長矛",
+      "braceTooltip": "將矛尾插入地面，矛尖朝上。你的橫移鍵就是平衡桿：光束會自行漂移，他每次砸地都會把它踢偏。讓它離開兩端軌道並保持 {set} 秒即可架穩長矛。需要堅實的地面，且不能在坐騎上。",
+      "thrustLabel": "塚琉璃突刺",
+      "thrustTooltip": "將架穩的長矛刺入眼中，造成 {damage} 點傷害。沒有任何東西能加成它：等級、攻擊強度、長矛本身都不行。它會使工頭失明並剝離石塚之皮，讓泥沼中其他所有武器終於能咬進去。只有架穩的長矛才能送出這一擊，射程 {reach} 碼，窗口持續 {seconds} 秒。",
+      "braceTooltipLean": "將矛尾抵地，矛尖上舉。用橫移鍵或轉向鍵傾斜，或按住橫樑上方的兩個按鍵：橫樑會自行偏移，他每落下一擊都會把它震歪。讓它遠離兩端{set}秒，長矛即告架穩。需要堅實的地面，且不能在坐騎上。",
+      "releaseLabel": "放下碎晶長矛",
+      "releaseTooltip": "把長矛收起。中途放棄沒有懲罰：你失去的是架勢，不是這次機會，{rest} 秒後即可重新架起。",
+      "whyResting": "你剛剛放下了長矛。等圖示上的計時走完。",
+      "whyAlreadyCouched": "長矛已經架起。重新架矛前先把它放下。",
+      "whyNotSet": "長矛尚未架穩。先架起它並穩住。",
+      "whyNothingCouched": "沒有可放下的：長矛並未架起。",
+      "beamLabel": "碎晶長矛平衡",
+      "beamStatus": "長矛平衡 {balance}，架穩 {set}%。",
+      "beamDanger": "長矛平衡 {balance}，即將脫手。",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "用橫移鍵穩住長矛",
+      "promptCatchIt": "接住，長矛快要倒了",
+      "promptEyeOut": "眼睛已經瞎了，還有 {seconds} 秒：全力打他",
+      "promptSealed": "他的眼睛閉上了。{seconds} 秒後重新睜開",
+      "promptResetting": "正在重新架矛，{seconds} 秒",
+      "promptCloser": "靠近工頭，還差 {yards} 碼",
+      "promptBrace": "架起碎晶長矛，然後穩住它",
+      "promptFindBoss": "斯克里特的碎晶長矛：用它戳瞎工頭的眼睛",
+      "promptFindBossMuster": "徵召軍的碎晶長矛：用它戳瞎工頭的眼睛",
+      "promptTakePike": "按 {key} 或點擊武器架，取一把碎晶長矛",
+      "promptTakePikeClick": "點擊武器架，取一把碎晶長矛",
+      "promptTakePikeTap": "輕觸武器架，取一把碎晶長矛",
+      "promptPikeLevelCap": "徵召營只把長矛借給 {level} 級以下的新兵",
+      "promptHoldSteadyLean": "穩住長矛：用{left}和{right}傾斜",
+      "leanLeft": "向左傾斜",
+      "leanRight": "向右傾斜",
+      "leanLeftKey": "向左傾斜（{key}）",
+      "leanRightKey": "向右傾斜（{key}）",
+      "promptTally": "{count} put out",
+      "promptLabel": "碎晶長矛指示",
+      "blindBanner": "BARROWHIDE BROKEN",
+      "effigyBanner": "已致盲！現在全團一起狠狠地打",
+      "promptStrikeLantern": "現在刺燈籠，{seconds} 秒",
+      "promptLanternOut": "燈籠滅了，還有 {seconds} 秒：用你自己的武器打它",
+      "promptCloserEffigy": "靠近稻草工頭，還差 {yards} 碼"
+    },
     "vehicle": {
       "title": "北方哨站砲台",
       "objective": "守衛北方哨站",
@@ -3112,8 +3154,10 @@ export const zh_TW: EnTranslations = {
         "storm": "你每施放一個法術便增加一層充能，最多 {max} 層。充能持續 {duration} 秒，每獲得一層便會刷新。",
         "heat": "你的近戰和遠程武器每次命中增加一層熱量，最多 {max} 層。熱量持續 {duration} 秒，每獲得一層便會刷新。",
         "ignite": "你的近戰和遠程武器致命一擊會點燃目標，每 {every} 秒造成 {tick} 點火焰傷害，持續 {duration} 秒。新的致命一擊會刷新該效果。傷害隨攻擊強度或遠程攻擊強度中較高者提高。",
-        "guardHeat": "你每招架、閃躲或格擋一次攻擊，便增加一層熱量，最多 {max} 層。熱量持續 {duration} 秒，每獲得一層便會刷新。"
+        "guardHeat": "你每招架、閃躲或格擋一次攻擊，便增加一層熱量，最多 {max} 層。熱量持續 {duration} 秒，每獲得一層便會刷新。",
+        "stoneHeart": "受到致命一擊時，你改為化作石像{statue}秒：不受傷害，無法移動或行動，隨後以{restore}點生命值（最大生命值的{restorePct}%）恢復。每{icd}只能觸發一次。決鬥和競技場比賽中不會觸發，這些戰鬥在致命一擊時結束。"
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "在 {duration} 秒內，直接擊中你的敵人會受到相當於該次攻擊令你損失生命值 {pct}% 的物理傷害。週期性傷害不會觸發此效果。",
         "anchor": "在 {duration} 秒內，受到的傷害降低 {reduction}%，但移動速度變為 {speed}%。移除你身上的昏迷、定身、緩速、恐懼、變形、沉默、致盲、妖術、繳械和失去行動能力效果，並在持續期間無視新的此類效果和擊退。",
@@ -3132,7 +3176,11 @@ export const zh_TW: EnTranslations = {
         "kindlingOrb": "在你身旁召喚一顆餘燼寶珠，持續 {duration} 秒。你每對敵人施放一個法術，它便向該敵人射出一道火焰彈，造成 {damage} 點火焰傷害。傷害隨法術強度提高。",
         "pierce": "在 {duration} 秒內，你的自動攻擊、射擊和物理技能（流血除外）命中還會打擊距離你的目標最近的、{reach} 碼內的一個敵人，造成所造成傷害的 {share}%。",
         "lantern": "在你腳下放置一盞提燈，持續 {duration} 秒。任何人對提燈 {radius} 碼內的你或隊伍成員施放的直接治療，還會以該治療量的 {share}% 治療燈光中受傷最重的另一名隊伍成員。",
-        "heartNova": "消耗所有熱量釋放一道火焰新星，對 {radius} 碼內的每個敵人每層熱量造成 {perHeat} 點火焰傷害（{maxHeat} 層時為 {max} 點），並嘲諷其命中的每個生物。傷害隨攻擊強度提高。需要至少一層熱量。"
+        "heartNova": "消耗所有熱量釋放一道火焰新星，對 {radius} 碼內的每個敵人每層熱量造成 {perHeat} 點火焰傷害（{maxHeat} 層時為 {max} 點），並嘲諷其命中的每個生物。傷害隨攻擊強度提高。需要至少一層熱量。",
+        "foremanShape": "化身工頭之形，持續{duration}秒：你變成獨眼巨人，以拳頭作戰，保留所有技能及其傷害。護甲提高{armorPct}%，且無法被擊退。會使你解除坐騎。",
+        "musterStandard": "在腳下插下徵召軍旗。{duration}秒內，{soldiers}名徵召士兵跟隨在你身邊，並與你的目標進行近戰，每人每{every}秒造成{damage}點物理傷害。他們只攻擊你的目標，且只在目標已進入戰鬥時出手。每人擁有你最大生命值的{hpPct}%。落後你超過{leash}碼時，他們會立即回到你身邊。軍旗倒下或你死亡時，他們會離開。傷害隨攻擊強度或遠程攻擊強度中較高者提高，在插旗時決定。",
+        "gutteredGlare": "引導{duration}秒：一道{length}碼長的光束從你面朝的方向射出，每{every}秒對路徑上最多{max}個敵人造成{tick}點秘法傷害（整個引導期間對每個敵人共{total}點）。轉身即可橫掃光束；移動或施法會使其結束。傷害隨法術強度提高。",
+        "grapnel": "用鉤索鉤住{range}碼內你能看見的一名小隊或團隊成員，將其從空中拉到你身邊，並在其落地時為其恢復{heal}點生命值。無法拉動敵人，也無法拉動在載具中、在船上、化作石像或被無法打破的效果控制的盟友。治療量隨治療強度提高。"
       }
     },
     "questShare": {
@@ -3950,6 +3998,8 @@ export const zh_TW: EnTranslations = {
       "cooldownCap": "此時間窗已使用 {used}/{cap} 秒冷卻縮減",
       "bruinRushWindow": "狼形態無需法力，並釘制你的巨熊衝鋒目標，使其減速 {pct}%，持續 {sec} 秒",
       "funeralHarvestLock": "葬禮收割暫時無法再次產生靈魂碎片",
+      "effigyPlankHide": "擋掉每次攻擊的 {pct}%，直到碎晶長矛的突刺熄滅它眼中的燈籠",
+      "effigyLanternOut": "對你而言，稻草工頭的燈籠已經熄滅：你和你寵物的攻擊無視其木板之皮，全額命中",
       "leadenHexLock": "鉛沉妖術暫時無法再次定身此目標",
       "forbiddenReflectionReady": "下一個符合條件的術士冷卻技能可再次施放",
       "forbiddenReflectionLock": "禁忌映像暫時無法再次準備",
@@ -4036,6 +4086,10 @@ export const zh_TW: EnTranslations = {
         "moltenIgnite": "每 {every} 秒造成 {damage} 點火焰傷害。新的武器致命一擊會刷新該效果。",
         "pierce": "你的自動攻擊、射擊和物理技能（流血除外）命中還會打擊距離你的目標最近的、{reach} 碼內的一個敵人，造成所造成傷害的 {pct}%。",
         "lantern": "任何人對提燈 {radius} 碼內的你或隊伍成員施放的直接治療，還會以該治療量的 {pct}% 治療燈光中受傷最重的另一名隊伍成員。",
+        "foremanShape": "你就是工頭：護甲提高{armorPct}%，免疫擊退。",
+        "musterStandard": "你的徵召軍旗已插下。士兵們跟隨你，並與你的目標作戰。",
+        "gutteredGlare": "光束每{every}秒對路徑上的敵人造成{tick}點秘法傷害。移動或施法會使其結束。",
+        "stoneStatue": "已化作石像：免疫傷害且無法行動。你將以最大生命值的{pct}%恢復。",
         "crucibleHeat": "熱量：{stacks}/{max}。使用熔爐之心可消耗所有熱量釋放一道火焰新星，對 {radius} 碼內的每個敵人造成 {damage} 點火焰傷害，並嘲諷其命中的每個生物。",
         "crucibleHeatOther": "熱量：{stacks}/{max}。熔爐之心會消耗所有熱量在 {radius} 碼內釋放一道火焰新星，每層熱量都會提高火焰傷害，並嘲諷其命中的每個生物。"
       },
@@ -4071,6 +4125,7 @@ export const zh_TW: EnTranslations = {
       "dodge": "閃躲機率提高 {pct}%",
       "dodgeReduce": "閃避機率降低 {pct}%",
       "damageReduction": "受到的所有傷害降低 {pct}%",
+      "slumber": "沉睡至黎明。無法被攻擊，任何人都無法將其喚醒。",
       "guardianWard": "下一次敵人的致命攻擊會改為將你的生命值恢復至 {pct}%",
       "armorFlat": "護甲降低 {value}",
       "armorFlatStacks": "護甲降低 {value}（{stacks} 層）",
@@ -4147,7 +4202,9 @@ export const zh_TW: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}在荊峰高地崛起！"
+      "spawn": "{name}在{zone}上空崛起！",
+      "wake": "{name}在{zone}上空甦醒！",
+      "sleep": "{name}沉睡至黎明。"
     },
     "auth": {
       "appleLoginCta": "透過 Apple 繼續",
@@ -4291,6 +4348,7 @@ export const zh_TW: EnTranslations = {
         "menu": "選單",
         "minimap": "小地圖",
         "stanceBar": "姿態欄",
+        "shardpikeBar": "碎晶長矛欄",
         "xpBar": "經驗條",
         "chat": "聊天",
         "actionBarGroup": "動作列群組",
@@ -7428,6 +7486,7 @@ export const zh_TW: EnTranslations = {
       "framesGovernedAuraTracks": "「編輯框體」也會鬆開六條可選的光環軌道，前提是你已在同一「介面」選項的「戰鬥」分頁中開啟它們：「我的增益」軌道、「防禦性冷卻」軌道、「我的護盾」軌道、「攻擊性冷卻」軌道、「移動與潛行」軌道，以及「我給隊友的增益」軌道。所有軌道預設關閉，每一條在鬆開期間都掛著一枚名稱標籤。",
       "frameGroups": "{trackers}可合併任務、功績、裂隙、地下探索、採集目標及聖物匣追蹤。{auras}可合併目標持續傷害與六種光環追蹤。在框架設定中分別啟用合併，關閉後可個別移動。{tot}具有資源條。{focus}的三個目標可獨立移動：Shift+F1至F3設定，Ctrl+F1至F3選取。傷害與威脅統計即使在框架鎖定時，也可拖曳按鈕以外的區域移動，拖曳邊緣調整大小。解鎖後，獨立的框架顯示選單依群組控制顯示。右鍵點擊框架可重設大小或開啟相關設定。介面中的框架頁也包含共用設定及可摺疊的隊伍設定。關閉「將目標的目標鎖定至目標」即可獨立移動，重新啟用仍會保留獨立位置。設定焦點後，設定按鈕與說明會隱藏。右鍵選擇「清除焦點」可恢復預設狀態。滑鼠懸停施法同樣適用於焦點框架。",
       "framesGovernedTalkingHead": "「編輯框體」也會解鎖對話面板：當某個 NPC 不在你的視野內時，它承載該 NPC 說出的台詞；處於解鎖狀態時它會顯示自己的名稱標籤。",
+      "framesGovernedShardpike": "「編輯框體」也會解鎖碎晶長矛欄：這一小排任務道具動作只在你攜帶碎晶長矛時才會出現在動作列旁；處於解鎖狀態時它會顯示自己的名稱標籤，因此你可以在戰鬥開始前就把它撺好，而不必臨陣調整。",
       "framesGovernedUnitTooltip": "「編輯框體」也會解鎖提示框框體，也就是滑鼠所停留對象的資訊卡出現的位置：生物的等級與種類，或其他玩家的頭銜、公會、等級與職業，以及專精和對應定位。把它拖到任意位置，資訊卡就會從那裡朝遠離螢幕最近邊緣的方向展開。在「框體設定」的「顯示或隱藏框體」中取消勾選「提示框」，即可完全隱藏這張資訊卡。",
       "barsTitle": "各種條、計時與戰鬥文字",
       "barsBody": "你的施法條會在你施法或引導時出現在畫面中央、動作列的正上方，上頭帶著法術的名稱與剩餘時間。你的目標在自己的框架上也有一條施法條，讓你看清接下來要來的是什麼，並做出回應。\n\n施法條下方還有一條細細的揮擊條，會在兩次武器揮擊之間逐漸填滿，讓近戰或遠程攻擊者看出下一次自動攻擊何時落下。\n\n你的經驗條橫貫動作列下方的整個寬度，切分成一段一段，其中較亮的一段顯示你已經存下的充分休息經驗。\n\n潛到水面下時，畫面上方會出現一條藍色的呼吸條。頭部沒入水中時它會逐漸消耗，耗盡並開始溺水時會閃成紅色，而你一浮出水面便會迅速回滿。空白鍵讓你往上游，下潛鍵（預設是 Ctrl）則帶你潛得更深。\n\n傷害與治療會化作小小的數字，從它們落下之處往上浮起，讓你不必讀文字也能看懂一場戰鬥。聊天框中的「戰鬥」分頁則保留完整的文字紀錄。",
@@ -11227,6 +11286,7 @@ export const zh_TW: EnTranslations = {
     "lockoutRaids": "團隊副本",
     "lockoutDungeons": "地城",
     "lockoutWorldBosses": "世界首領",
+    "lockoutWeeklyQuests": "每週任務",
     "takeOverConfirm": "這會使該角色從另一個工作階段中斷並切換到此處。是否繼續？",
     "renameRequired": "需要更名",
     "delete": "刪除",
@@ -15829,6 +15889,30 @@ export const zh_TW: EnTranslations = {
       "fenshadow_maul": {
         "name": "沼影重錘"
       },
+      "foremans_barrowmaul": {
+        "name": "工頭的塚錘"
+      },
+      "skerrits_shardpike": {
+        "name": "斯克里特的碎晶長矛"
+      },
+      "loomshard_eye": {
+        "name": "塚琉璃之眼"
+      },
+      "barrowhide_pauldrons": {
+        "name": "古塚護肩"
+      },
+      "mirestone_stride": {
+        "name": "沼石步履"
+      },
+      "foremans_wage_band": {
+        "name": "工頭的工錢指環"
+      },
+      "mirelight_locket": {
+        "name": "沼光吊墜"
+      },
+      "fenwright_grips": {
+        "name": "沼澤工匠握手"
+      },
       "wildgrove_cinch": {
         "name": "野林束帶"
       },
@@ -18451,6 +18535,27 @@ export const zh_TW: EnTranslations = {
       "vanguard_warstaff": {
         "name": "先鋒之戰杖"
       },
+      "muster_shardpike": {
+        "name": "徵召碎晶長矛"
+      },
+      "knucklebone_of_balgath": {
+        "name": "巴爾加斯的指節骨"
+      },
+      "muster_standard": {
+        "name": "徵召軍旗"
+      },
+      "guttered_eye": {
+        "name": "殘燼之眼"
+      },
+      "barrowstone_heart": {
+        "name": "塚石之心"
+      },
+      "muster_grapnel": {
+        "name": "徵召鉤索"
+      },
+      "craterglass_stave": {
+        "name": "隕坑琉璃法杖"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -19725,8 +19830,26 @@ export const zh_TW: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "桑扎爾，覺醒之峰"
       },
+      "balgath_cyclops": {
+        "name": "巴爾加斯，獨眼工頭"
+      },
       "thunzharr_stormling": {
         "name": "被驚醒的風暴元素"
+      },
+      "muster_footman": {
+        "name": "徵召步兵"
+      },
+      "muster_chaplain": {
+        "name": "徵召隨軍牧師"
+      },
+      "muster_sergeant": {
+        "name": "徵召軍士"
+      },
+      "muster_drillmaster": {
+        "name": "徵召操練官"
+      },
+      "muster_effigy": {
+        "name": "稻草工頭"
       },
       "stable_horse": {
         "name": "廄馬"
@@ -20375,6 +20498,16 @@ export const zh_TW: EnTranslations = {
         "name": "芬威克守望者",
         "title": "芬橋守望者",
         "greeting": "在門口停下，{className}。蘆葦後面的沼澤會替我們殺人。"
+      },
+      "socketwright_skerrit": {
+        "name": "馬本·斯克里特",
+        "title": "鑲嵌匠",
+        "greeting": "四十年前我磨好那顆眼珠，把它嵌進他的眼窩，一天工錢都沒拿到。你想讓工頭吃點苦頭，{className}？那就衝著我的手藝去。"
+      },
+      "muster_commander": {
+        "name": "徵召指揮官",
+        "title": "芬橋徵召軍",
+        "greeting": "先長矛，{className}，再所有人。這就是全部，也是這座營地活到現在的原因。"
       },
       "brother_aldric_fen": {
         "name": "奧德里克修士",
@@ -21114,6 +21247,52 @@ export const zh_TW: EnTranslations = {
         "objectives": {
           "0": {
             "label": "芬橋集結令"
+          }
+        }
+      },
+      "q_muster_summons": {
+        "title": "徵召令",
+        "text": "我能抽出的每一桿長矛都在星隕坑周圍紮了營，{playerName}，就為了圍住從坑裡走出來的那東西。徵召指揮官守在俯瞰火山坑的南坡營地，在這裡的東南方。去向指揮官報到。你會聽到我們怎麼對付他，好好聽著，因為沒聽的人都躺在蘆葦裡了。",
+        "completion": "芬威克派來的？很好。聽著，這話我只說一遍，而他一句都不會說。巴爾加斯沿著我們的哨站巡行：坑沿、西邊的平地、南坡、西南坑沿上的缺口，然後再繞一圈，他停下的每一個哨站都會被夷平。鋼鐵傷不了他。他的皮會把刀刃彈開，只會砍他的團隊最後只會累死。他唯一的弱點是眼睛。一桿撐穩的長矛刺穿塚琉璃就能讓他失明，而他失明時皮會剝落：那時全團一起打他，狠狠地打。之後皮會重新合上，我們等下一次機會。先長矛，{playerName}，再所有人。兵器架只把長矛借給19級以下的新兵：年輕人刺瞎他的眼睛，老兵們抓住這個窗口。",
+        "objectives": {
+          "0": {
+            "label": "向徵召指揮官報到"
+          }
+        }
+      },
+      "q_muster_pike_drill": {
+        "title": "長矛先行",
+        "text": "說話不值錢，長矛可值錢。從我旁邊的兵器架上拿一桿碎晶長矛，然後去營地西頭找稻草工頭：小伙子們用木板和稻草紮的，只有真傢伙一半大，眼睛的位置放著一盞燈籠。架起長矛，操練官砸地的時候也要穩住矛尖，因為真傢伙晃得更厲害。等你手臂篤定了，就把矛尖刺進燈籠。他的木板會掉下來：然後用你自己的武器打他，{playerName}，感受一下差別。兵器架只把長矛借給19級以下的新兵。",
+        "completion": "感覺到打進去了吧？在真傢伙身上，那是全團揮砍的十四口氣，然後他的皮又會合上。記住這一課。工頭會來考你的。",
+        "objectives": {
+          "0": {
+            "label": "從徵召兵器架上取下碎晶長矛"
+          },
+          "1": {
+            "label": "熄滅稻草工頭的燈籠"
+          },
+          "2": {
+            "label": "木板脫落時命中的攻擊"
+          }
+        }
+      },
+      "q_muster_trophy": {
+        "title": "工頭的碎塊",
+        "text": "他每週都會重新站起來，我們每週都會再把他打倒。這需要一支團隊，而徵召軍單憑自己湊不齊。去找下一支討伐巴爾加斯的團隊，幫忙把他打倒，{playerName}。砍他也好，保護砍他的人也好，治療他們也好：每一雙與他作戰的手都算數。等他倒下，回來向我報告。徵召軍每擊倒他一次都付錢。",
+        "completion": "又倒下了，而且你就在那場戰鬥裡。今晚芬橋就會收到我的報告。離家這麼遠，錢袋很薄，但這是你的。等他再站起來就回來。",
+        "objectives": {
+          "0": {
+            "label": "擊敗巴爾加斯"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "鑲嵌匠的欠帳",
+        "text": "塚琉璃是我親手嵌進那眼窩的：磨好透鏡，安放到位，楔緊對齊。塚主們一個銅板都沒付過我，如今我的手藝卻在泥沼裡四處踏平一切。拿走我的碎晶長矛。矛尾插地，穩住矛尖，需要多久就撐多久，等你手臂篤定了，就把它送進那隻眼睛。他披的那層皮與那塊晶石相連，{playerName}：戳瞎他，泥沼裡的每一把刀刃終於都能咬進去。",
+        "completion": "你感覺到它鬆了，是吧？四十年的利息，從那眼窩裡付清了。長矛歸你了，朋友。他會復原的，他總是會，所以你什麼時候想再來收帳都行。",
+        "objectives": {
+          "0": {
+            "label": "戳瞎工頭的眼睛"
           }
         }
       },
@@ -23298,6 +23477,12 @@ export const zh_TW: EnTranslations = {
           },
           "7": {
             "label": "沉沒堡壘"
+          },
+          "8": {
+            "label": "塚丘領地"
+          },
+          "9": {
+            "label": "星隕坑"
           }
         }
       },
@@ -24381,6 +24566,7 @@ export const zh_TW: EnTranslations = {
     "mailboxName": "郵箱",
     "noticeboardName": "告示板",
     "farmPatchName": "菜畦",
-    "realmBuilderMonumentName": "王國建造者紀念碑"
+    "realmBuilderMonumentName": "王國建造者紀念碑",
+    "musterRackName": "徵召兵器架"
   }
 };

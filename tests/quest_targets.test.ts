@@ -914,7 +914,10 @@ describe('questGiverNpcMarkers (the world-map quest-giver glyphs, resolved from 
 
   it('skips a dynamic NPC (spawned on demand by its owning system) even when it lists a matching turn-in quest', () => {
     const dynamicNpc = Object.values(NPCS).find(
-      (n) => n.dynamic && n.questIds.some((q) => QUESTS[q] && isQuestTurnInNpc(QUESTS[q], n.id)),
+      (n) =>
+        n.dynamic &&
+        !n.fixedPost &&
+        n.questIds.some((q) => QUESTS[q] && isQuestTurnInNpc(QUESTS[q], n.id)),
     );
     if (!dynamicNpc) throw new Error('expected a dynamic NPC carrying a turn-in quest');
     const questId = dynamicNpc.questIds.find((q) => isQuestTurnInNpc(QUESTS[q], dynamicNpc.id));
@@ -925,6 +928,18 @@ describe('questGiverNpcMarkers (the world-map quest-giver glyphs, resolved from 
     );
     expect(markers.some((m) => m.pos.x === dynamicNpc.pos.x && m.pos.z === dynamicNpc.pos.z)).toBe(
       false,
+    );
+  });
+
+  it('marks a fixed-post dynamic NPC (the Muster Commander, always raised at his post)', () => {
+    const commander = NPCS.muster_commander;
+    expect(commander?.dynamic && commander.fixedPost).toBe(true);
+    const markers = questGiverNpcMarkers(
+      (q) => (q === 'q_muster_summons' ? 'ready' : 'unavailable'),
+      NO_HISTORY,
+    );
+    expect(markers.some((m) => m.pos.x === commander.pos.x && m.pos.z === commander.pos.z)).toBe(
+      true,
     );
   });
 });

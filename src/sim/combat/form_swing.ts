@@ -106,7 +106,9 @@ export function normalizedInstantSpeed(weapon: WeaponInfo): number {
 // form and Moonwing Form (`form_moonkin`) keep the wand. Deliberately a
 // blocklist of the druid melee/travel forms, so the priest's `form_shadow` and
 // the warlock's `form_metamorph` keep their existing wand behavior.
-const WANDLESS_FORMS = new Set(['form_bear', 'form_cat', 'form_travel']);
+// The Shape of the Foreman (a trinket's cyclops body) fights with its fists: no wand in
+// those hands, while every class ability still works.
+const WANDLESS_FORMS = new Set(['form_bear', 'form_cat', 'form_travel', 'form_foreman']);
 
 export function wandAllowedInForm(e: Entity): boolean {
   for (const a of e.auras) if (WANDLESS_FORMS.has(a.kind)) return false;

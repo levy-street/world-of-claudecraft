@@ -250,9 +250,16 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       // The release's Eastbrook ferry round trip rides the deed_cat_exploration crest
       // until its commissioned art lands (docs/design/deeds.md, Icons).
       'exp_harbor_to_harbor',
+      // The Mirefen world boss's own combat pair, appended at the DEED_ORDER
+      // tail by the world-boss forward-port; both ride the deed_cat_combat
+      // crest until their commissioned art lands.
+      'cmb_balgath',
+      'cmb_balgath_ten',
+      // The muster's pike drill deed, on the same combat crest.
+      'cmb_point_taken',
     ]);
-    // RE-PINNED at this merge of release/v0.42.0 into feature/masterwrought:
-    // 300 live (counted directly off the resolved src/sim/content/deeds.ts
+    // RE-PINNED at the Mirefen world-boss forward-port onto release/v0.44.0:
+    // 302 live (counted directly off the resolved src/sim/content/deeds.ts
     // DEEDS table, matching the same pin in tests/deed_icons.test.ts and
     // tests/deed_i18n.test.ts) - 11 explicitly pending = 289 painted.
     // 308 at the release/v0.43.0 merge: plus the eight world-quest deeds.
@@ -261,8 +268,9 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // ledger above, so the painted count holds at 289.
     // 318 with the release's ferry round trip, the pending ledger's last row,
     // so the painted count still holds at 289. 319 with the Buried Hoards Coinsack
-    // catch (2026-09-28 merge), also pending: still 289 painted.
-    expect(DEED_ORDER).toHaveLength(319);
+    // catch (2026-09-28 merge), also pending: still 289 painted. 322 with the
+    // Mirefen world-boss branch's three combat deeds, all pending.
+    expect(DEED_ORDER).toHaveLength(322);
     expect(DEED_IMAGE_IDS.size).toBe(289);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

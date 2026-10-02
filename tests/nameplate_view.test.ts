@@ -447,6 +447,9 @@ describe('nameplate_view - import absence (two-controller + purity, source scan)
     const froms = [...code.matchAll(/\bimport\b[^;]*\bfrom\s*['"]([^'"]+)['"]/g)].map((m) => m[1]);
     // unique modules, robust to biome merging/splitting the type vs value sim import
     expect([...new Set(froms)].sort()).toEqual([
+      // The muster weapon rack's template id (a sim CONTENT leaf, like the feast
+      // one below), so its near-label rule cannot drift from the id the sim spawns.
+      '../sim/content/mirefen_muster',
       // The feast template-id constant (Phase 12): a sim CONTENT leaf, not
       // three/painter/gfx; imported so the discriminator cannot drift from
       // the sim's own id (the frontend-seam review's ask).

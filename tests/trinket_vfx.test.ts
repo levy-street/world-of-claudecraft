@@ -12,7 +12,10 @@ import { ABILITIES } from '../src/sim/data';
 
 // The display ids the sim stamps on its trinket cues, read from the emitter
 // source so a new trinket cue without a visual fails here.
-const SIM_SOURCE = readFileSync(new URL('../src/sim/combat/trinkets.ts', import.meta.url), 'utf8');
+// Balgath's five emit from their own module (combat/balgath_trinkets.ts).
+const SIM_SOURCE = ['trinkets.ts', 'balgath_trinkets.ts']
+  .map((file) => readFileSync(new URL(`../src/sim/combat/${file}`, import.meta.url), 'utf8'))
+  .join(' ');
 const EMITTED_IDS = [...new Set([...SIM_SOURCE.matchAll(/'(trinket_[a-z_]+)'/g)].map((m) => m[1]))]
   .filter((id) => !id.endsWith('_icd'))
   .sort();
@@ -87,7 +90,8 @@ function harness(admit = true, trinketRelics?: TrinketRelicsHook) {
 
 describe('trinket VFX specs', () => {
   it('gives every sim trinket cue id its own authored spec through the registry', () => {
-    expect(EMITTED_IDS).toHaveLength(21);
+    // 21 from the trinket slot, 6 from Balgath's five (the Heart's statue and its release).
+    expect(EMITTED_IDS).toHaveLength(27);
     expect(Object.keys(TRINKET_VFX_SPECS).sort()).toEqual(EMITTED_IDS);
     for (const id of EMITTED_IDS) {
       const spec = abilityVfxSpec(id);

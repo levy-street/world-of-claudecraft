@@ -1291,6 +1291,43 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.interfacePage.framePetTitle': '你的宠物',
   'guide.interfacePage.winBagsTitle': '背包（B）',
   'guide.riftsPage.rankFmt': '{rank} 级',
+  'hudChrome.shardpike.braceLabel': '架起碎晶长矛',
+  'hudChrome.shardpike.braceTooltip':
+    '将矛尾插入地面，矛尖朝上。你的横移键就是平衡杆：光束会自行漂移，他每次砸地都会把它踢偏。让它离开两端轨道并保持 {set} 秒即可架稳长矛。需要坚实的地面，且不能在坐骑上。',
+  'hudChrome.shardpike.thrustLabel': '冢琉璃突刺',
+  'hudChrome.shardpike.thrustTooltip':
+    '将架稳的长矛刺入眼中，造成 {damage} 点伤害。没有任何东西能加成它：等级、攻击强度、长矛本身都不行。它会使工头失明并剥离石冢之皮，让泥沼中其他所有武器终于能咬进去。只有架稳的长矛才能送出这一击，射程 {reach} 码，窗口持续 {seconds} 秒。',
+  'hudChrome.shardpike.releaseLabel': '放下碎晶长矛',
+  'hudChrome.shardpike.releaseTooltip':
+    '把长矛收起。中途放弃没有惩罚：你失去的是架势，不是这次机会，{rest} 秒后即可重新架起。',
+  'hudChrome.shardpike.whyResting': '你刚刚放下了长矛。等图标上的计时走完。',
+  'hudChrome.shardpike.whyAlreadyCouched': '长矛已经架起。重新架矛前先把它放下。',
+  'hudChrome.shardpike.whyNotSet': '长矛尚未架稳。先架起它并稳住。',
+  'hudChrome.shardpike.whyNothingCouched': '没有可放下的：长矛并未架起。',
+  'hudChrome.shardpike.beamLabel': '碎晶长矛平衡',
+  'hudChrome.shardpike.beamStatus': '长矛平衡 {balance}，架稳 {set}%。',
+  'hudChrome.shardpike.beamDanger': '长矛平衡 {balance}，即将脱手。',
+  'hudChrome.shardpike.promptHoldSteady': '用横移键稳住长矛',
+  'hudChrome.shardpike.promptCatchIt': '接住，长矛快要倒了',
+  'hudChrome.shardpike.promptEyeOut': '眼睛已经瞎了，还有 {seconds} 秒：全力打他',
+  'hudChrome.shardpike.promptSealed': '他的眼睛闭上了。{seconds} 秒后重新睁开',
+  'hudChrome.shardpike.promptResetting': '正在重新架矛，{seconds} 秒',
+  'hudChrome.shardpike.promptCloser': '靠近工头，还差 {yards} 码',
+  'hudChrome.shardpike.promptBrace': '架起碎晶长矛，然后稳住它',
+  'hudChrome.shardpike.promptFindBoss': '斯克里特的碎晶长矛：用它戳瞎工头的眼睛',
+  'hudChrome.shardpike.leanRightKey': '向右倾斜（{key}）',
+  'hudChrome.shardpike.leanLeftKey': '向左倾斜（{key}）',
+  'hudChrome.shardpike.leanRight': '向右倾斜',
+  'hudChrome.shardpike.leanLeft': '向左倾斜',
+  'hudChrome.shardpike.promptHoldSteadyLean': '稳住长矛：用{left}和{right}倾斜',
+  'hudChrome.shardpike.promptFindBossMuster': '征召军的碎晶长矛：用它戳瞎工头的眼睛',
+  'hudChrome.shardpike.promptTakePike': '按 {key} 或点击武器架，取一把碎晶长矛',
+  'hudChrome.shardpike.promptTakePikeClick': '点击武器架，取一把碎晶长矛',
+  'hudChrome.shardpike.promptTakePikeTap': '轻触武器架，取一把碎晶长矛',
+  'hudChrome.shardpike.promptPikeLevelCap': '征召营只把长矛借给 {level} 级及以下的新兵',
+  'hudChrome.shardpike.braceTooltipLean':
+    '将矛尾抵地，矛尖上举。用横移键或转向键倾斜，或按住横梁上方的两个按键：横梁会自行偏移，他每落下一击都会把它震歪。让它远离两端{set}秒，长矛即告架稳。需要坚实的地面，且不能在坐骑上。',
+  'hudChrome.shardpike.promptLabel': '碎晶长矛指示',
   'hudChrome.comboMeter.label': '连击点',
   'hudChrome.bg.clock': '{minutes}:{seconds}',
   'hudChrome.controller.zoomIn': '放大',
@@ -2041,6 +2078,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.steamWishlist': '愿望单提醒',
   'hudChrome.interfaceUnlock.frameNames.minimap': '小地图',
   'hudChrome.interfaceUnlock.frameNames.stanceBar': '姿态栏',
+  'hudChrome.interfaceUnlock.frameNames.shardpikeBar': '碎晶长矛栏',
   'hudChrome.interfaceUnlock.frameNames.playerFrame': '玩家',
   'hudChrome.interfaceUnlock.frameNames.targetFrame': '目标',
   'hudChrome.interfaceUnlock.frameNames.partyFrames': '队伍',
@@ -6165,6 +6203,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': '巨魔坟丘',
   'entities.zones.mirefen_marsh.pois.6.label': '唤墓者营地',
   'entities.zones.mirefen_marsh.pois.7.label': '沉没堡垒',
+  'entities.zones.mirefen_marsh.pois.8.label': '冢丘领地',
+  'entities.zones.mirefen_marsh.pois.9.label': '星陨坑',
   'entities.zones.thornpeak_heights.name': '荆峰高地',
   'entities.zones.thornpeak_heights.welcome': '瑟萨莉队长勉强守住高望城墙。',
   'entities.zones.thornpeak_heights.welcomeDone':
@@ -7699,9 +7739,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.soulflame_cord.name': '魂焰腰绳',
   'entities.items.stormcallers_waistguard.name': '唤雷者腰甲',
   'entities.mobs.thunzharr_waking_peak.name': '桑扎尔，觉醒之峰',
+  'entities.mobs.balgath_cyclops.name': '巴尔加斯，独眼工头',
+  'entities.npcs.muster_commander.name': '征召指挥官',
+  'entities.mobs.muster_sergeant.name': '征召军士',
+  'entities.mobs.muster_chaplain.name': '征召随军牧师',
+  'entities.mobs.muster_footman.name': '征召步兵',
   'entities.mobs.thunzharr_stormling.name': '被惊醒的风暴元素',
   'entities.mobs.stable_horse.name': '厩马',
-  'hudChrome.worldBoss.spawn': '{name}在荆峰高地崛起！',
+  'hudChrome.worldBoss.spawn': '{name}在{zone}上空崛起！',
+  'hudChrome.worldBoss.wake': '{name}在{zone}上空苏醒！',
+  'hudChrome.worldBoss.sleep': '{name}沉睡至黎明。',
   'entities.items.stormcallers_spaulders.name': '唤风肩甲',
   'entities.items.bonewrought_greatsword.name': '骨铸巨剑',
   'entities.items.direfang_greatblade.name': '恐牙巨刃',
@@ -9690,6 +9737,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '你的下一个火焰生成技能若连续造成暴击，会获得炽热连击；未造成暴击则移除热力迸发',
   'hudChrome.auraEffect.tongues': '施法时间延长 {pct}%',
   'hudChrome.auraEffect.damageReduction': '受到的所有伤害降低 {pct}%',
+  'hudChrome.auraEffect.slumber': '沉睡至黎明。无法被攻击，任何人都无法将其唤醒。',
   'hudChrome.auraEffect.guardianWard': '下一次敌人的致命攻击会改为将你的生命值恢复至 {pct}%',
   'hudChrome.auraEffect.increase.ap': '攻击强度提高 {value}',
   'hudChrome.auraEffect.increase.armor': '护甲提高 {value}',
@@ -13458,6 +13506,25 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.marshlight_hauberk.name': '沼光锁甲',
   'entities.items.duskthorn_mantle.name': '暮棘披肩',
   'entities.items.fenshadow_maul.name': '沼影重锤',
+  'entities.items.skerrits_shardpike.name': '斯克里特的碎晶长矛',
+  'entities.items.muster_shardpike.name': '征召碎晶长矛',
+  'entities.npcs.socketwright_skerrit.name': '马本·斯克里特',
+  'entities.npcs.socketwright_skerrit.title': '镶嵌匠',
+  'entities.npcs.socketwright_skerrit.greeting':
+    '四十年前我磨好那颗眼珠，把它嵌进他的眼窝，一天工钱都没拿到。你想让工头吃点苦头，{className}？那就冲着我的手艺去。',
+  'entities.quests.q_socketwrights_due.title': '镶嵌匠的欠账',
+  'entities.quests.q_socketwrights_due.text':
+    '冢琉璃是我亲手嵌进那眼窝的：磨好透镜，安放到位，楔紧对齐。冢主们一个铜板都没付过我，如今我的手艺却在泥沼里四处踏平一切。拿走我的碎晶长矛。矛尾插地，稳住矛尖，需要多久就撑多久，等你手臂笃定了，就把它送进那只眼睛。他披的那层皮与那块晶石相连，{playerName}：戳瞎他，泥沼里的每一把刀刃终于都能咬进去。',
+  'entities.quests.q_socketwrights_due.completion':
+    '你感觉到它松了，是吧？四十年的利息，从那眼窝里付清了。长矛归你了，朋友。他会复原的，他总是会，所以你什么时候想再来收账都行。',
+  'entities.quests.q_socketwrights_due.objectives.0.label': '戳瞎工头的眼睛',
+  'entities.items.foremans_barrowmaul.name': '工头的冢锤',
+  'entities.items.loomshard_eye.name': '冢琉璃之眼',
+  'entities.items.barrowhide_pauldrons.name': '古冢护肩',
+  'entities.items.mirestone_stride.name': '沼石步履',
+  'entities.items.foremans_wage_band.name': '工头的工钱指环',
+  'entities.items.mirelight_locket.name': '沼光吊坠',
+  'entities.items.fenwright_grips.name': '沼泽工匠握手',
   'entities.items.wildgrove_cinch.name': '野林束带',
   'entities.items.cragward_pauldrons.name': '岩卫肩甲',
   'entities.items.cragthorn_greatstaff.name': '岩棘巨杖',
@@ -17404,6 +17471,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '“编辑框体”还会一并松开下方的追踪器堆栈(你追踪的任务及其目标、你的功绩进度、你的圣物库页面、你从制作中置顶的配方、你所在的探秘、你正在参与的任何裂隙，以及你正在追踪的配方或委托)、宠物框体旁的宠物动作条、显示你对附近敌人所施减益的“目标减益”框体、圣骑士的“虔诚”勋章、术士的“痛苦资源条”、法术触发浮层、双持武器时的副手挥击条，以及带标签页的伤害统计窗口，松开期间每一件都挂着自己的名牌。',
   'guide.interfacePage.framesGovernedTalkingHead':
     '“编辑框体”也会解锁对话面板：当某个 NPC 不在你的视野内时，它承载该 NPC 说出的台词；处于解锁状态时它会显示自己的名称标签。',
+  'guide.interfacePage.framesGovernedShardpike':
+    '“编辑框体”也会解锁碎晶长矛栏：这一小排任务道具动作只在你携带碎晶长矛时才会出现在动作条旁；处于解锁状态时它会显示自己的名称标签，因此你可以在战斗开始前就把它摆好，而不必临阵调整。',
   'guide.interfacePage.framesGovernedUnitTooltip':
     '“编辑框体”也会解锁提示框框体，也就是鼠标所停留对象的信息卡出现的位置：生物的等级与种类，或其他玩家的头衔、公会、等级与职业，以及专精和对应定位。把它拖到任意位置，信息卡就会从那里朝远离屏幕最近边缘的方向展开。在“框体设置”的“显示或隐藏框体”中取消勾选“提示框”，即可完全隐藏这张信息卡。',
   'guide.interfacePage.framesGovernedAuraTracks':
@@ -17462,6 +17531,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.realmBuilder.pastEmpty': '荣誉榜上还没有名字。',
   'hudChrome.realmBuilder.close': '关闭',
   'worldContent.realmBuilderMonumentName': '王国建造者纪念碑',
+  'worldContent.musterRackName': '征召兵器架',
   'hudChrome.talkingHead.label': '对话',
   'hudChrome.hubLesson.target': '先将假人设为目标。',
   'hudChrome.hubLesson.openWindow': '打开{meters}。',
@@ -18297,6 +18367,41 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '按名字传送到城镇中心。',
   'devCommand.actions.town.label': '城镇中心',
   'devCommand.fields.town': '镇',
+  // The Mirefen muster: the drill yard and the muster quests (M16 fills).
+  'hudChrome.shardpike.effigyBanner': '已致盲！现在全团一起狠狠地打',
+  'hudChrome.shardpike.promptStrikeLantern': '现在刺灯笼，{seconds} 秒',
+  'hudChrome.shardpike.promptLanternOut': '灯笼灭了，还有 {seconds} 秒：用你自己的武器打它',
+  'hudChrome.shardpike.promptCloserEffigy': '靠近稻草工头，还差 {yards} 码',
+  'hudChrome.auraEffect.effigyPlankHide':
+    '挡掉每次攻击的 {pct}%，直到碎晶长矛的突刺熄灭它眼中的灯笼',
+  'hudChrome.auraEffect.effigyLanternOut':
+    '对你而言，稻草工头的灯笼已经熄灭：你和你宠物的攻击无视其木板之皮，全额命中',
+  'character.lockoutWeeklyQuests': '每周任务',
+  'entities.mobs.muster_drillmaster.name': '征召操练官',
+  'entities.mobs.muster_effigy.name': '稻草工头',
+  'entities.npcs.muster_commander.title': '芬桥征召军',
+  'entities.npcs.muster_commander.greeting':
+    '先长矛，{className}，再所有人。这就是全部，也是这座营地活到现在的原因。',
+  'entities.quests.q_muster_summons.title': '征召令',
+  'entities.quests.q_muster_summons.text':
+    '我能抽出的每一杆长矛都在星陨坑周围扎了营，{playerName}，就为了围住从坑里走出来的那东西。征召指挥官守在俯瞰火山坑的南坡营地，在这里的东南方。去向指挥官报到。你会听到我们怎么对付他，好好听着，因为没听的人都躺在芦苇里了。',
+  'entities.quests.q_muster_summons.completion':
+    '芬威克派来的？很好。听着，这话我只说一遍，而他一句都不会说。巴尔加斯沿着我们的哨站巡行：坑沿、西边的平地、南坡、西南坑沿上的缺口，然后再绕一圈，他停下的每一个哨站都会被夷平。钢铁伤不了他。他的皮会把刀刃弹开，只会砍他的团队最后只会累死。他唯一的弱点是眼睛。一杆撑稳的长矛刺穿冢琉璃就能让他失明，而他失明时皮会剥落：那时全团一起打他，狠狠地打。之后皮会重新合上，我们等下一次机会。先长矛，{playerName}，再所有人。兵器架只把长矛借给19级及以下的新兵：年轻人刺瞎他的眼睛，老兵们抓住这个窗口。',
+  'entities.quests.q_muster_summons.objectives.0.label': '向征召指挥官报到',
+  'entities.quests.q_muster_pike_drill.title': '长矛先行',
+  'entities.quests.q_muster_pike_drill.text':
+    '说话不值钱，长矛可值钱。从我旁边的兵器架上拿一杆碎晶长矛，然后去营地西头找稻草工头：小伙子们用木板和稻草扎的，只有真家伙一半大，眼睛的位置放着一盏灯笼。架起长矛，操练官砸地的时候也要稳住矛尖，因为真家伙晃得更厉害。等你手臂笃定了，就把矛尖刺进灯笼。他的木板会掉下来：然后用你自己的武器打他，{playerName}，感受一下差别。兵器架只把长矛借给19级及以下的新兵。',
+  'entities.quests.q_muster_pike_drill.completion':
+    '感觉到打进去了吧？在真家伙身上，那是全团挥砍的十四口气，然后他的皮又会合上。记住这一课。工头会来考你的。',
+  'entities.quests.q_muster_pike_drill.objectives.0.label': '从征召兵器架上取下碎晶长矛',
+  'entities.quests.q_muster_pike_drill.objectives.1.label': '熄灭稻草工头的灯笼',
+  'entities.quests.q_muster_pike_drill.objectives.2.label': '木板脱落时命中的攻击',
+  'entities.quests.q_muster_trophy.title': '工头的碎块',
+  'entities.quests.q_muster_trophy.text':
+    '他每周都会重新站起来，我们每周都会再把他打倒。这需要一支团队，而征召军单凭自己凑不齐。去找下一支讨伐巴尔加斯的团队，帮忙把他打倒，{playerName}。砍他也好，保护砍他的人也好，治疗他们也好：每一双与他作战的手都算数。等他倒下，回来向我报告。征召军每击倒他一次都付钱。',
+  'entities.quests.q_muster_trophy.completion':
+    '又倒下了，而且你就在那场战斗里。今晚芬桥就会收到我的报告。离家这么远，钱袋很薄，但这是你的。等他再站起来就回来。',
+  'entities.quests.q_muster_trophy.objectives.0.label': '击败巴尔加斯',
   'entities.items.bastion_sigil.name': '堡垒徽印',
   'entities.items.mooring_stone.name': '系泊之石',
   'entities.items.menders_hourglass.name': '愈者沙漏',
@@ -18644,4 +18749,27 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '缠缚根须的施法时间缩短0.5秒。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '施放缠缚根须后，你可以在移动中施法，并使移动速度提高20%，持续4秒。每20秒最多触发一次。',
+  'entities.items.knucklebone_of_balgath.name': '巴尔加斯的指节骨',
+  'entities.items.muster_standard.name': '征召军旗',
+  'entities.items.guttered_eye.name': '残烬之眼',
+  'entities.items.barrowstone_heart.name': '冢石之心',
+  'entities.items.muster_grapnel.name': '征召钩索',
+  'entities.items.craterglass_stave.name': '陨坑琉璃法杖',
+  'hudChrome.trinkets.equip.stoneHeart':
+    '受到致命一击时，你改为化作石像{statue}秒：不受伤害，无法移动或行动，随后以{restore}点生命值（最大生命值的{restorePct}%）恢复。每{icd}只能触发一次。决斗和竞技场比赛中不会触发，这些战斗在致命一击时结束。',
+  'hudChrome.trinkets.use.foremanShape':
+    '化身工头之形，持续{duration}秒：你变成独眼巨人，以拳头作战，保留所有技能及其伤害。护甲提高{armorPct}%，且无法被击退。会使你解除坐骑。',
+  'hudChrome.trinkets.use.musterStandard':
+    '在脚下插下征召军旗。{duration}秒内，{soldiers}名征召士兵跟随在你身边，并与你的目标进行近战，每人每{every}秒造成{damage}点物理伤害。他们只攻击你的目标，且只在目标已进入战斗时出手。每人拥有你最大生命值的{hpPct}%。落后你超过{leash}码时，他们会立即回到你身边。军旗倒下或你死亡时，他们会离开。伤害随攻击强度或远程攻击强度中较高者提高，在插旗时确定。',
+  'hudChrome.trinkets.use.gutteredGlare':
+    '引导{duration}秒：一道{length}码长的光束从你面朝的方向射出，每{every}秒对路径上最多{max}个敌人造成{tick}点奥术伤害（整个引导期间对每个敌人共{total}点）。转身即可横扫光束；移动或施法会使其结束。伤害随法术强度提高。',
+  'hudChrome.trinkets.use.grapnel':
+    '用钩索钩住{range}码内你能看见的一名小队或团队成员，将其从空中拉到你身边，并在其落地时为其恢复{heal}点生命值。无法拉动敌人，也无法拉动在载具中、在船上、化作石像或被无法打破的效果控制的盟友。治疗量随治疗强度提高。',
+  'hudChrome.auraEffect.trinket.foremanShape': '你就是工头：护甲提高{armorPct}%，免疫击退。',
+  'hudChrome.auraEffect.trinket.musterStandard':
+    '你的征召军旗已插下。士兵们跟随你，并与你的目标作战。',
+  'hudChrome.auraEffect.trinket.gutteredGlare':
+    '光束每{every}秒对路径上的敌人造成{tick}点奥术伤害。移动或施法会使其结束。',
+  'hudChrome.auraEffect.trinket.stoneStatue':
+    '已化作石像：免疫伤害且无法行动。你将以最大生命值的{pct}%恢复。',
 };

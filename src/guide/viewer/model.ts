@@ -184,12 +184,18 @@ export async function buildModel(spec: GuideModelSpec, tint: number | null): Pro
   const sphere = finalBox.getBoundingSphere(new THREE.Sphere());
   const height = finalBox.max.y - finalBox.min.y;
 
-  // Idle animation (or the first clip the rig ships).
+  // Idle animation (or the rig's own Idle, or the first clip it ships). A body whose
+  // authored idle lives in an extra animation GLB (VisualDef.animUrls, e.g. the muster
+  // drillmaster's Drill_Rest) is not in this base file: pose the shared Idle rather than
+  // whichever one-shot happens to be first.
   let mixer: THREE.AnimationMixer | null = null;
   const clips = gltf.animations ?? [];
   if (clips.length > 0) {
     mixer = new THREE.AnimationMixer(model);
-    const idle = (spec.idle && THREE.AnimationClip.findByName(clips, spec.idle)) || clips[0];
+    const idle =
+      (spec.idle && THREE.AnimationClip.findByName(clips, spec.idle)) ||
+      THREE.AnimationClip.findByName(clips, 'Idle') ||
+      clips[0];
     if (idle) mixer.clipAction(idle).play();
   }
 

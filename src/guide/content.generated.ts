@@ -2176,7 +2176,9 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "Drowned Chapel",
       "Troll Mounds",
       "Gravecaller Encampment",
-      "The Sunken Bastion"
+      "The Sunken Bastion",
+      "Barrowmound Reach",
+      "Starfall Crater"
     ],
     "welcome": "Report to Warden Fenwick at the Fenbridge gate.",
     "families": [
@@ -6004,6 +6006,27 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "exploration",
     "renown": 5,
     "feat": false
+  },
+  {
+    "id": "cmb_balgath",
+    "name": "Foreman No More",
+    "category": "combat",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "cmb_balgath_ten",
+    "name": "The Mound Keeps Nothing",
+    "category": "combat",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "cmb_point_taken",
+    "name": "Point Taken",
+    "category": "combat",
+    "renown": 5,
+    "feat": false
   }
 ];
 
@@ -6652,6 +6675,65 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Vestments of the Waking Grove"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_balgath",
+    "shelf": "conquerors",
+    "name": "Starfall Crater (World Boss)",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Foreman's Barrowmaul"
+      },
+      {
+        "kind": "item",
+        "name": "Barrowhide Pauldrons"
+      },
+      {
+        "kind": "item",
+        "name": "Mirestone Stride"
+      },
+      {
+        "kind": "item",
+        "name": "The Barrowglass Eye"
+      },
+      {
+        "kind": "item",
+        "name": "Foreman's Wage Band"
+      },
+      {
+        "kind": "item",
+        "name": "Mirelight Locket"
+      },
+      {
+        "kind": "item",
+        "name": "Fenwright Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Craterglass Stave"
+      },
+      {
+        "kind": "item",
+        "name": "Knucklebone of Balgath"
+      },
+      {
+        "kind": "item",
+        "name": "Muster Standard"
+      },
+      {
+        "kind": "item",
+        "name": "The Guttered Eye"
+      },
+      {
+        "kind": "item",
+        "name": "Barrowstone Heart"
+      },
+      {
+        "kind": "item",
+        "name": "Muster Grapnel"
       }
     ]
   },

@@ -129,11 +129,14 @@ describe('ability icons', () => {
     // 469: plus the Wildfang kit pass 2 glyphs (lunge, hamstring_bite).
     // 473: plus the Buried Hoards Clockwork Shock Bomb glyph (the 2026-09-28
     // release/v0.44.0 merge into feature/buried-hoards).
-    expect(ids).toHaveLength(473);
+    // 476: plus the Mirefen world boss's Shardpike bar verbs (lance_brace,
+    // lance_thrust, lance_release), at the release/v0.45.0 merge.
+    expect(ids).toHaveLength(476);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    expect(hash).toBe('6fa8b2c16d3459d5f09768545d08e8f6778c00a2ac3973cd0d9361ee3d08971c');
+    // Re-minted over the merged ABILITY_RECIPES literal (release/v0.45.0 merge).
+    expect(hash).toBe('94c1895e54a18a8c965c92e499d148476185ade4dbd5b140e31af16b3f2ff202');
   });
 });

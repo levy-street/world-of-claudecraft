@@ -365,7 +365,9 @@ describe('isHarvestableCorpse', () => {
     // (hub_training_dummy, hub_healing_dummy): struck or healed, never
     // harvested, the same untagged shape as the Bone Spike above: 191. Plus
     // the five Eastbrook healing-training role dummies, which are friendly
-    // practice targets rather than harvestable corpses: 196.
+    // practice targets rather than harvestable corpses: 196. Plus the Mirefen
+    // world boss balgath_cyclops: carved stone, so he carries no componentTags
+    // and is not skinnable, the same reason every other boss sits here: 197.
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
     // Three caravan enemies and the undead Fenbridge infiltrator add no components:
     // 200. Plus the sixteen Buried Hoards templates (content/rift/mobs.ts, the
@@ -374,7 +376,9 @@ describe('isHarvestableCorpse', () => {
     // the Coinsack Scurrier and the rest) and the Boneyard's rift_marrow_golem,
     // all rift-instance templates that ship untagged like every rift template
     // the release already carries: 216.
-    expect(untagged).toHaveLength(216);
+    // The Mirefen world-boss branch adds six untagged templates (the boss, three muster
+    // soldiers, the drillmaster and the Straw Foreman effigy): 222.
+    expect(untagged).toHaveLength(222);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

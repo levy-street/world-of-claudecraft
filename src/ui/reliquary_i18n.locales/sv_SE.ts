@@ -62,6 +62,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Thunzharr, den vaknande toppen',
     desc: 'Personligt episkt byte från den vaknande toppens världsboss.',
   },
+  conquerors_balgath: {
+    name: 'Balgath, den Begravde Förmannen',
+    desc: 'Byte som släpats upp ur gravhögarna i Mirefen.',
+  },
   conquerors_collapsed_reliquary: {
     name: 'Det rasade relikvariet',
     desc: 'Utmärkande sällsyntheter ur den dyrkbara kistan i Det rasade relikvariet.',

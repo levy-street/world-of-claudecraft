@@ -112,6 +112,10 @@ export interface AbilityVfxDeps {
   vfx: AbilityVfxPrimitives;
   // The gallery-ported primitive engine (rings, ribbons, decals, overlays).
   fx: AbilityVfxFx;
+  // The Shardpike throw's own presentation (it lives on the engine for update and
+  // dispose, but is asked here as a dep so a spellfx cue never touches the engine
+  // before the cast gate has had its say). Optional for tests.
+  shardpikeThrow?: { handleEvent(ev: AbilityVfxSpellfxEvent): boolean };
   // The renderer's entity anchor (same closure Vfx homes on): world position at
   // a height fraction, or null when the entity has no view yet.
   anchor: (id: number, heightFrac: number) => VfxPoint | null;
@@ -711,6 +715,7 @@ export class AbilityVfx {
   }
 
   handleSpellfx(ev: AbilityVfxSpellfxEvent): boolean {
+    if (this.deps.shardpikeThrow?.handleEvent(ev)) return true;
     // Physical Warrior ticks are wounds. The wire's tick companion has no
     // ability label, so preserve its recipient cue without an ivory magic puff.
     if (ev.fx === 'tick' && ev.school === 'physical' && this.deps.isWarrior?.(ev.sourceId)) {

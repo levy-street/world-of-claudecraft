@@ -463,6 +463,12 @@ export function bankDeposit(
     ctx.error(meta.entityId, 'You cannot store quest items in the bank.');
     return;
   }
+  // Lent gear (the muster pike, src/sim/muster_pike.ts) is not the player's to store: the
+  // lender takes it back, and a banked copy would outlive the loan.
+  if (ITEMS[slot.itemId]?.lentGear) {
+    ctx.error(meta.entityId, 'You cannot store borrowed gear in the bank.');
+    return;
+  }
   let selectedSources: MaterialComposition | undefined;
   if (selection !== undefined) {
     if (selection.itemId !== slot.itemId || selection.target.slotIndex !== slotIndex) return;
