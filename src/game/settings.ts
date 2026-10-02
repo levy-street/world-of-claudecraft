@@ -397,8 +397,9 @@ export const BOOL_SETTINGS = {
   auraBarBelowFrame: { def: false },
   // off by default (the target's aura strip sits above the frame, since the
   // stock target seat is directly over the action bar): hangs the strip below
-  // the frame instead, the classic layout. On the stock seat the frame rises by
-  // one strip row (--target-aura-band-lift) so the strip clears the hotbar; a
+  // the frame instead, the classic layout. On the desktop stock seat the frame
+  // (and the player's cast bar and swing timers) rises by one strip row
+  // (--target-aura-band-lift) so the strip's first row clears the hotbar; a
   // moved frame keeps its own position. Purely presentational (main.ts toggles
   // body.target-auras-below-frame via src/ui/aura_bar_side.ts; hud.css keys
   // off it) and a deliberate player choice, never inferred from the frame's

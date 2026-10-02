@@ -3604,7 +3604,7 @@ describe('the stock unit-frame seats sit side by side above the action bar', () 
       'left: calc(50% + var(--action-rail-w) / 2 - var(--target-frame-box-w));',
     );
     expect(hudCss).toContain(
-      'top: calc(\n      100% -\n      var(--unit-frame-seat-offset) -\n      var(--stance-row-lift, 0px) -\n      var(--pet-row-lift, 0px) -\n      var(--target-aura-band-lift, 0px)\n    );',
+      'top: calc(\n      100% -\n      var(--unit-frame-seat-offset) -\n      var(--stance-row-lift, 0px) -\n      var(--pet-row-lift, 0px)\n    );',
     );
     expect(hudCss).not.toContain('#target-frame {\n    left: 12px;\n    top: 12px;');
   });

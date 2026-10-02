@@ -18,6 +18,7 @@ const hudCss = flat(readFileSync(new URL('../src/styles/hud.css', import.meta.ur
 const hudMobileCss = flat(
   readFileSync(new URL('../src/styles/hud.mobile.css', import.meta.url), 'utf8'),
 );
+const tokensCss = flat(readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8'));
 
 const rule = (css: string, selector: string): string => {
   const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -70,26 +71,75 @@ describe('target-of-target frame sits BESIDE the target frame', () => {
 
   // A player report: on the stock seat (directly over the action bar) the
   // below-frame strip painted across the hotbar, so the setting was only usable
-  // after moving the frame. With the setting on, the stock seat rises by one
-  // strip row (the 8px hang, an own-aura icon, its 13px timer, all under the
-  // children zoom), and every stock-seat variant (one, two, three action rows)
-  // subtracts that lift. The lift is 0 with the setting off, and a moved frame
-  // writes an inline top that outranks the sheet, so neither moves.
-  it('lifts the stock seat by one strip row only when the strip hangs below', () => {
-    const lift = rule(hudCss, 'body.target-auras-below-frame');
-    expect(lift).toContain(
-      '--target-aura-band-lift: calc((8px + var(--aura-size-own) + 13px) * var(--target-frame-scale, 1));',
-    );
-    // The lift var is set nowhere else, so the setting-off seat is unchanged.
-    expect(hudCss.match(/--target-aura-band-lift:/g) ?? []).toHaveLength(1);
-    const seats = hudCss.match(/var\(--pet-row-lift, 0px\) - var\(--target-aura-band-lift, 0px\)/g);
-    expect(seats ?? []).toHaveLength(3);
-    // The hang the lift reserves is the same 8px the below rule hangs the strip by.
-    expect(rule(hudCss, 'body.target-auras-below-frame #target-frame > #tf-debuffs')).toContain(
-      'top: calc(100% + 8px);',
-    );
-    // The mobile seat pins its own top and never reads the desktop lift.
-    expect(hudMobileCss).not.toContain('--target-aura-band-lift');
+  // after moving the frame. With the setting on (desktop), the stock seat rises
+  // by one strip row (the 8px hang, an own-aura icon, its 13px timer, all under
+  // the children zoom) and anchors by its BOTTOM edge, so the target's in-flow
+  // cast bar grows the frame upward instead of pushing the strip onto the bar.
+  // A moved frame writes inline top plus bottom: auto, which outrank the sheet.
+  describe('below-frame strip on the stock seat', () => {
+    const BELOW = 'body.target-auras-below-frame:not(.mobile-touch)';
+
+    it('defines the one-row lift only with the setting on, never on touch', () => {
+      expect(rule(hudCss, BELOW)).toContain(
+        '--target-aura-band-lift: calc((8px + var(--aura-size-own) + 13px) * var(--target-frame-scale, 1));',
+      );
+      // Set nowhere else, so the setting-off layout reads it as unset.
+      expect(hudCss.match(/--target-aura-band-lift:/g) ?? []).toHaveLength(1);
+      expect(hudMobileCss).not.toContain('--target-aura-band-lift');
+      // The hang the lift reserves is the same 8px the below rule hangs by.
+      expect(rule(hudCss, 'body.target-auras-below-frame #target-frame > #tf-debuffs')).toContain(
+        'top: calc(100% + 8px);',
+      );
+    });
+
+    it('bottom-anchors every stock seat variant one strip row above the pair floor', () => {
+      const one = rule(hudCss, `${BELOW} #target-frame`);
+      expect(one).toContain('top: auto;');
+      expect(one).toContain(
+        'bottom: calc(var(--unit-frame-seat-floor) + var(--stance-row-lift, 0px) + var(--pet-row-lift, 0px) + var(--target-aura-band-lift));',
+      );
+      expect(
+        rule(
+          hudCss,
+          'body.target-auras-below-frame.show-actionbar2:not(.mobile-touch) #target-frame',
+        ),
+      ).toContain(
+        'bottom: calc(var(--unit-frame-seat-floor) + var(--socket-size) + var(--socket-row-gap) + var(--stance-row-lift, 0px) + var(--pet-row-lift, 0px) + var(--target-aura-band-lift));',
+      );
+      expect(
+        rule(
+          hudCss,
+          'body.target-auras-below-frame.show-actionbar2.show-actionbar3:not(.mobile-touch) #target-frame',
+        ),
+      ).toContain(
+        'bottom: calc(var(--unit-frame-seat-floor) + 2 * (var(--socket-size) + var(--socket-row-gap)) + var(--stance-row-lift, 0px) + var(--pet-row-lift, 0px) + var(--target-aura-band-lift));',
+      );
+      // The floor is the player frame's bottom edge: the seat offset minus the
+      // docked player frame's 64px height (the offset's own 70px is that height
+      // plus the 6px bottom-bar inset).
+      expect(tokensCss).toContain(
+        '--unit-frame-seat-floor: calc(var(--unit-frame-seat-offset) - 64px);',
+      );
+    });
+
+    it('lifts the player cast bar and swing timers by the same step', () => {
+      // Without this the lifted frame parks on the centred swing timers in
+      // every stance-bar or two-bar layout (warriors always show the stance
+      // row), hiding a timer the player acts on.
+      const seats: [string, number][] = [
+        ['#castbar', 260],
+        ['#swingbar', 234],
+        ['#swingbar-offhand', 220],
+      ];
+      for (const [id, px] of seats) {
+        expect(rule(hudCss, `${BELOW} ${id}`)).toContain(
+          `bottom: calc(${px}px + var(--target-aura-band-lift));`,
+        );
+        expect(
+          rule(hudCss, `body.target-auras-below-frame.show-actionbar3:not(.mobile-touch) ${id}`),
+        ).toContain(`bottom: calc(${px + 52}px + var(--target-aura-band-lift));`);
+      }
+    });
   });
 
   // The touch seat pins the target frame to the top edge, so an above-frame
