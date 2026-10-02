@@ -15,7 +15,7 @@
 // under the account participant lock, so a cached or forged client value cannot
 // buy a trip.
 //
-// PERFORMED SINCE 07a, on a LIT realm only: the remote Hearth trip
+// PERFORMED on a LIT realm only: the remote Hearth trip
 // (server/freehold_hearth_trip.ts) commits `advanceFreeholdHearthOnClient` in
 // the same transaction as the character save that carries the trip, through
 // the housing hook (server/freehold_mutation.ts), and a dark realm still never
@@ -104,7 +104,7 @@ CREATE TABLE IF NOT EXISTS "__woc_freehold_hearth_schema__".account_freehold_hea
   ready_at_ms BIGINT NOT NULL DEFAULT 0,
   revision BIGINT NOT NULL DEFAULT 0,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  -- The per-advance token the ambiguous-COMMIT verify reads (07a): 16 random
+  -- The per-advance token the ambiguous-COMMIT verify reads: 16 random
   -- bytes as hex, written by the advance itself, so a verify that waited out a
   -- hung transaction can tell THAT attempt's advance from any other.
   advance_token TEXT
@@ -118,10 +118,11 @@ CREATE TABLE IF NOT EXISTS "__woc_freehold_hearth_schema__".account_freehold_hea
 -- ALTER TABLE takes ACCESS EXCLUSIVE before it ever checks IF NOT EXISTS, and
 -- held through the rest of the boot transaction that lock would block every
 -- other realm's Hearth reads, so an ordinary boot only reads the catalog. The
--- column's CHECK is probed by NAME too: a column that exists without it (added
--- by hand) gets it back NOT VALID, so every new token is checked again while
--- no boot scans the table to re-validate old rows (the advance only ever wrote
--- hex tokens).
+-- column's CHECK is probed by NAME too, by name alone (a same-named constraint
+-- of any type counts, so a hand-made one can never fail a boot): a column that
+-- exists without it (added by hand) gets it back NOT VALID, so every new token
+-- is checked again while no boot scans the table to re-validate old rows (the
+-- advance only ever wrote hex tokens).
 DO $freehold_hearth_advance_token$
 BEGIN
   IF NOT EXISTS (
@@ -138,7 +139,6 @@ BEGIN
     SELECT 1 FROM pg_catalog.pg_constraint
      WHERE conrelid = to_regclass('"__woc_freehold_hearth_schema__".account_freehold_hearth')
        AND conname = 'account_freehold_hearth_advance_token_shape'
-       AND contype = 'c'
   ) THEN
     ALTER TABLE "__woc_freehold_hearth_schema__".account_freehold_hearth
       ADD CONSTRAINT account_freehold_hearth_advance_token_shape
@@ -245,10 +245,11 @@ export type FreeholdHearthAdvance =
   /** A stored ready time past `now + cooldown`: no accepted advance can write
    *  that, so only a backward database clock step or a bad row produced it.
    *  Refused and written nothing (the rollout contract's fail-closed rule): the
-   *  refusal does NOT unlock the key, which stays refused until the row is
-   *  repaired, but it is counted and warned (trip_corrupt) instead of being
-   *  honored silently, and no advance ever builds on the bad value. DEPLOY.md
-   *  carries the operator's query and repair. */
+   *  refusal does NOT unlock the key, and no advance ever builds on the bad
+   *  value. Counted and warned (trip_corrupt) only when a trip reaches this
+   *  read: a row already bad at login reaches the realm as an ordinary cooldown
+   *  its own clock refuses first, so DEPLOY.md's query is the detector, and its
+   *  guarded repair the remedy. */
   | {
       readonly kind: 'corrupt';
       readonly readyAtMs: string;
@@ -413,15 +414,17 @@ export async function advanceFreeholdHearthOnClient(
 /** The subject-access read (exportAccountData): the account's one cooldown row,
  *  or null when it has never travelled. Counters ship as text for the same
  *  reason they are read as text everywhere else here. */
+/** The export's ALLOWLIST: the clock and its revision, never the advance token
+ *  (a per-attempt server internal). Pinned to a literal in
+ *  tests/server/freehold_sql_contract.test.ts with the other housing exports. */
+export const FREEHOLD_HEARTH_EXPORT_SQL = `SELECT ready_at_ms::text AS ready_at_ms, revision::text AS revision, updated_at
+  FROM account_freehold_hearth
+ WHERE account_id = $1`;
+
 export async function freeholdHearthForExport(
   db: FreeholdQueryable,
   accountId: number,
 ): Promise<Record<string, unknown> | null> {
-  const res = await db.query(
-    `SELECT ready_at_ms::text AS ready_at_ms, revision::text AS revision, updated_at
-       FROM account_freehold_hearth
-      WHERE account_id = $1`,
-    [accountId],
-  );
+  const res = await db.query(FREEHOLD_HEARTH_EXPORT_SQL, [accountId]);
   return res.rows?.[0] ?? null;
 }

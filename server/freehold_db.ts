@@ -955,6 +955,44 @@ export const FREEHOLD_EXPORT_DETOAST_GATE_BYTES = FREEHOLD_STORED_DETOAST_GATE_B
  *  named limit in docs/freeholds/persistence-rollout-contract.md section 8a. */
 export const FREEHOLD_EXPORT_MAX_RENDERED_BYTES = 425_984;
 
+/** The plot export's statement: its column ALLOWLIST (the plot, its durable
+ *  shape and the two byte-bounded content columns) is pinned by name in
+ *  tests/server/freehold_sql_contract.test.ts beside the other housing
+ *  exports. */
+export const FREEHOLD_PLOT_EXPORT_SQL = `SELECT plot_index, plot_id, schema_version, durable_rev, wire_rev, tier,
+            condition, visit_policy, upkeep_binding,
+            -- THE TWO UPKEEP COLUMNS ARE JSONB AND ARE SELECTED RAW, past both
+            -- bounds above, which is safe only because of the DDL: 07a is the
+            -- release that starts writing them, this build writes NULL, and
+            -- the unbound-carries-no-upkeep CHECK holds them NULL for every row
+            -- this build can produce. The release that writes them owes them
+            -- the same pre-gate and measure the two content columns carry.
+            upkeep_checkpoint, upkeep_credit, created_at, updated_at,
+            b.disk_bytes,
+            b.owned_bytes,
+            CASE WHEN b.owned_bytes <= ${FREEHOLD_EXPORT_MAX_RENDERED_BYTES}
+                 THEN f.layout ELSE NULL END AS layout,
+            CASE WHEN b.owned_bytes <= ${FREEHOLD_EXPORT_MAX_RENDERED_BYTES}
+                 THEN f.trophies ELSE NULL END AS trophies
+       FROM account_freeholds f
+       LEFT JOIN LATERAL (
+         SELECT disk_bytes, owned_bytes FROM (
+           SELECT d.disk_bytes,
+                  CASE
+                    WHEN d.disk_bytes > ${FREEHOLD_EXPORT_DETOAST_GATE_BYTES} THEN NULL
+                    ELSE COALESCE(octet_length(f.layout::text), 0)
+                       + COALESCE(octet_length(f.trophies::text), 0)
+                  END AS owned_bytes
+             FROM (
+               SELECT COALESCE(pg_column_size(f.layout), 0)
+                    + COALESCE(pg_column_size(f.trophies), 0) AS disk_bytes
+             ) d
+         ) m OFFSET 0
+       ) b ON true
+      WHERE f.account_id = $1
+      ORDER BY f.plot_index
+      LIMIT ${FREEHOLD_EXPORT_ROW_LIMIT}`;
+
 /** The subject-access read (exportAccountData): every persisted plot row this
  *  account owns, in stable plot_index order, or an empty array when it owns
  *  none. Keep-forever rows, so this is the owner's ONLY readback of them, and
@@ -993,42 +1031,7 @@ export async function freeholdsForExport(
   // a non-integer sent anyway raises 22P02 and aborts whatever transaction the
   // export composition is holding.
   requireAccountId(accountId);
-  const res = await db.query(
-    `SELECT plot_index, plot_id, schema_version, durable_rev, wire_rev, tier,
-            condition, visit_policy, upkeep_binding,
-            -- THE TWO UPKEEP COLUMNS ARE JSONB AND ARE SELECTED RAW, past both
-            -- bounds above, which is safe only because of the DDL: 07a is the
-            -- release that starts writing them, this build writes NULL, and
-            -- the unbound-carries-no-upkeep CHECK holds them NULL for every row
-            -- this build can produce. The release that writes them owes them
-            -- the same pre-gate and measure the two content columns carry.
-            upkeep_checkpoint, upkeep_credit, created_at, updated_at,
-            b.disk_bytes,
-            b.owned_bytes,
-            CASE WHEN b.owned_bytes <= ${FREEHOLD_EXPORT_MAX_RENDERED_BYTES}
-                 THEN f.layout ELSE NULL END AS layout,
-            CASE WHEN b.owned_bytes <= ${FREEHOLD_EXPORT_MAX_RENDERED_BYTES}
-                 THEN f.trophies ELSE NULL END AS trophies
-       FROM account_freeholds f
-       LEFT JOIN LATERAL (
-         SELECT disk_bytes, owned_bytes FROM (
-           SELECT d.disk_bytes,
-                  CASE
-                    WHEN d.disk_bytes > ${FREEHOLD_EXPORT_DETOAST_GATE_BYTES} THEN NULL
-                    ELSE COALESCE(octet_length(f.layout::text), 0)
-                       + COALESCE(octet_length(f.trophies::text), 0)
-                  END AS owned_bytes
-             FROM (
-               SELECT COALESCE(pg_column_size(f.layout), 0)
-                    + COALESCE(pg_column_size(f.trophies), 0) AS disk_bytes
-             ) d
-         ) m OFFSET 0
-       ) b ON true
-      WHERE f.account_id = $1
-      ORDER BY f.plot_index
-      LIMIT ${FREEHOLD_EXPORT_ROW_LIMIT}`,
-    [accountId],
-  );
+  const res = await db.query(FREEHOLD_PLOT_EXPORT_SQL, [accountId]);
   const rows = res.rows ?? [];
   // SAY SO WHEN IT STOPS. Reaching the limit exactly is indistinguishable from
   // having exactly that many rows, and the account that reaches it is the

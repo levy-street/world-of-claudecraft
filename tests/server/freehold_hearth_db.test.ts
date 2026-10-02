@@ -10,6 +10,7 @@
 // Every anchor is a contiguous clause with its occurrence pinned, never a lone
 // keyword, and SQL comments are stripped before any source match so a commented
 // out statement can never keep a pin green.
+import { readFileSync } from 'node:fs';
 import type { Pool } from 'pg';
 import { describe, expect, it } from 'vitest';
 import {
@@ -26,6 +27,7 @@ import {
   freeholdHearthSchema,
   loadFreeholdHearth,
 } from '../../server/freehold_hearth_db';
+import { HEARTH_KEY_COOLDOWN_MS } from '../../src/sim/freehold/gate_rules';
 
 interface Captured {
   text: string;
@@ -169,10 +171,12 @@ describe('the DDL', () => {
     // would take ACCESS EXCLUSIVE at every boot, probe or no probe.
     const probeAt = code.indexOf(probe);
     const alterAt = code.indexOf('ALTER TABLE "public".account_freehold_hearth');
-    // The constraint repair's own probe reads pg_constraint by NAME for THIS
-    // table, and its ALTER adds the check NOT VALID (no boot scans old rows).
+    // The constraint repair's own probe reads pg_constraint by NAME ONLY for
+    // THIS table (any constraint of that name counts, so a same-named one of
+    // another type can never fail a boot with 42710), and its ALTER adds the
+    // check NOT VALID (no boot scans old rows).
     const constraintProbe =
-      "ELSIF NOT EXISTS (\n    SELECT 1 FROM pg_catalog.pg_constraint\n     WHERE conrelid = to_regclass('\"public\".account_freehold_hearth')\n       AND conname = 'account_freehold_hearth_advance_token_shape'\n       AND contype = 'c'\n  ) THEN";
+      "ELSIF NOT EXISTS (\n    SELECT 1 FROM pg_catalog.pg_constraint\n     WHERE conrelid = to_regclass('\"public\".account_freehold_hearth')\n       AND conname = 'account_freehold_hearth_advance_token_shape'\n  ) THEN";
     expect(count(code, constraintProbe)).toBe(1);
     const constraintProbeAt = code.indexOf(constraintProbe);
     const repairAt = code.indexOf('ADD CONSTRAINT account_freehold_hearth_advance_token_shape');
@@ -929,5 +933,22 @@ describe('the account id is refused before a byte reaches the database', () => {
   it('still admits a legitimate account id (the contrast arm)', async () => {
     const { client } = makeClient([{ rows: [] }]);
     expect(await loadFreeholdHearth(client, ACCOUNT_ID)).toEqual({ kind: 'absent' });
+  });
+});
+
+describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
+  it('clamps by the real cooldown, only rows past it, idempotently', () => {
+    // The repair hand-writes the cooldown in milliseconds; it must be the sim's.
+    const deploy = readFileSync('DEPLOY.md', 'utf8');
+    const start = deploy.indexOf('- A CORRUPT Hearth row');
+    expect(start).toBeGreaterThan(-1);
+    const bullet = deploy.slice(start, deploy.indexOf('\n- ', start + 1)).replace(/\s+/g, ' ');
+    expect(HEARTH_KEY_COOLDOWN_MS).toBe(3_600_000);
+    const clock = '(EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::bigint';
+    // SET and WHERE both use the clock plus the one cooldown, so a re-run or a
+    // late run touches no healthy row.
+    expect(bullet).toContain(`SET ready_at_ms = ${clock} + ${HEARTH_KEY_COOLDOWN_MS}`);
+    expect(bullet).toContain(`WHERE ready_at_ms > ${clock} + ${HEARTH_KEY_COOLDOWN_MS}`);
+    expect(bullet).not.toContain('$1');
   });
 });

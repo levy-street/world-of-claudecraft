@@ -91,6 +91,10 @@ export function freeholdOperationFingerprint(request: {
  * search_path ceremony (server/storage_purchase_db.ts): capture the caller's
  * in-flight path, run under a fixed one, schema-qualify every function body,
  * pin each function's own path, and replay the captured value at the end.
+ * ONE DELIBERATE DIVERGENCE: its fixed path leaves pg_catalog UNNAMED, so
+ * PostgreSQL searches it first and a same-named decoy in the target schema can
+ * never bind into a CHECK; the storage fragment still names pg_catalog second,
+ * an exposure recorded as owed against that fragment, not changed here.
  */
 export function freeholdOperationSchema(schemaName = 'public'): string {
   if (!/^[a-z_][a-z0-9_]*$/.test(schemaName)) {
@@ -389,9 +393,17 @@ function requireMatch(name: string, value: string, re: RegExp): string {
   return value;
 }
 
+/** The bigint column's ceiling: a 19-digit text past it would pass the shape
+ *  check and fail later in the statement (22003) instead of here. */
+const PG_BIGINT_MAX = 9_223_372_036_854_775_807n;
+
 function requireRevOrNull(name: string, value: string | null): string | null {
   if (value === null) return null;
-  return requireMatch(name, value, FREEHOLD_GENERATION_TEXT_RE);
+  requireMatch(name, value, FREEHOLD_GENERATION_TEXT_RE);
+  if (BigInt(value) > PG_BIGINT_MAX) {
+    throw new RangeError(`freehold operation ${name} has the wrong shape`);
+  }
+  return value;
 }
 
 function requireIntent(intent: FreeholdOperationIntent): FreeholdOperationIntent {
@@ -606,8 +618,14 @@ export async function closeFreeholdOperationOnClient(
       }
     | undefined;
   if (!intent) {
+    // Only the caller's OWN receipt is `already_closed`: another account's (or
+    // an erased tombstone) answers `missing`, so a close never tells a caller
+    // that an id it does not own exists.
     const receipt = await tx.query(FREEHOLD_OPERATION_RECEIPT_READ_SQL, [close.operationId]);
-    return (receipt.rows?.length ?? 0) > 0 ? 'already_closed' : 'missing';
+    const closed = receipt.rows?.[0] as { account_id?: unknown } | undefined;
+    return closed && closed.account_id !== null && Number(closed.account_id) === close.accountId
+      ? 'already_closed'
+      : 'missing';
   }
   if (Number(intent.account_id) !== close.accountId) return 'account';
   if (intent.fingerprint !== close.fingerprint) return 'fingerprint';

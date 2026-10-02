@@ -152,11 +152,11 @@ export const WOC_FREEHOLD_LOAD_FAILURES_TOTAL = 'woc_freehold_load_failures_tota
  *  server/freehold_receipt_growth_monitor.ts: observed, because it is never
  *  swept. */
 export const WOC_FREEHOLD_RECEIPT_GROWTH = 'woc_freehold_receipt_growth';
-/** 07a: global plot claims this process holds right now. */
+/** Global plot claims this process holds right now. */
 export const WOC_FREEHOLD_CLAIMS_HELD = 'woc_freehold_claims_held';
-/** 07a: the housing authority's cumulative COUNTS (claims and Hearth trips). */
+/** The housing authority's cumulative COUNTS (claims and Hearth trips). */
 export const WOC_FREEHOLD_AUTHORITY_TOTAL = 'woc_freehold_authority_total';
-/** 07a: the housing authority's cumulative summed MILLISECONDS, a family of its
+/** The housing authority's cumulative summed MILLISECONDS, a family of its
  *  own so no sum across measures ever mixes a duration with a count. */
 export const WOC_FREEHOLD_AUTHORITY_MS_TOTAL = 'woc_freehold_authority_ms_total';
 
@@ -470,7 +470,7 @@ export interface GameStateSource {
   /** Live in-memory owner records, read without querying storage. */
   freeholdRecords(): number;
   freeholdPersist(): FreeholdPersistStats;
-  /** 07a: the claim and Hearth trip counters (server/freehold_authority_registry.ts).
+  /** The claim and Hearth trip counters (server/freehold_authority_registry.ts).
    *  Optional so a host without housing authority scrapes zeros. */
   freeholdAuthority?(): FreeholdAuthorityStats;
   /** Achieved sim Hz, or null while the rate meter is still warming up. */
@@ -769,7 +769,7 @@ export function registerGameStateMetrics(
 
   new Gauge({
     name: WOC_FREEHOLD_CLAIMS_HELD,
-    help: 'Global plot claims (07a) this realm process holds right now: the plots it is the one authority for. A count only, never a plot or account identity.',
+    help: 'Global plot claims this realm process holds right now: the plots it is the one authority for. A count only, never a plot or account identity.',
     registers: [registry],
     collect() {
       this.set(source.freeholdAuthority?.().claimsHeld ?? 0);
@@ -778,7 +778,7 @@ export function registerGameStateMetrics(
 
   new Counter({
     name: WOC_FREEHOLD_AUTHORITY_TOTAL,
-    help: "Housing authority CUMULATIVE counts by fixed measure (07a). claim_*: global plot claims acquired, taken over (the fence advanced over an existing row: another holder's expired claim, or a released claim, this realm's own re-acquire after its release included), refused busy (another realm holds them, or the claim row was locked past the acquire's lock bound), the busy subset that was that lock contention, renewed, missed heartbeats (a renewal that threw or skipped a locked row, never a loss), lost to another holder, released, writes fenced, this realm's own ambiguous writes adopted, and the lock or statement bounds that ran out in a fenced write or a renew or release chunk; the renewer's passes, the triggers skipped because a pass still ran, the chunks its deadline abandoned, the newer claims a landed release killed (a same-generation re-login it raced), the wanted tests that threw, the onLost host hooks that threw (no production host binds one in this release, so zero), and the stranded pending tokens it retired; the claimed login reads. trip_*: remote Hearth trips started, advanced (and the subset whose lost COMMIT answer the verify proved landed), refused on the durable cooldown, refused on a corrupt or unsupported clock, refused by a participant, failed (proved not committed), lost COMMIT answers the verify proved did not land, never reaching the hook, left unresolved after a lost commit, committed but refused by the sim on re-dispatch, committed but dropped on re-dispatch by a realm precheck (draining, a fenced vault, spectating, jailed or dark), denied before any queue, metered by the per-account refusal memo, abandoned because the session left, and trips whose step after their counted outcome threw. recovery_*: the operation recovery passes run, skipped for want of an immediate background permit, the open intents they discovered, applied, closed and held, those of a kind with no reconciler, and the passes or reconciles that threw (all zero while no operation kind is registered). Counts only: their durations are woc_freehold_authority_ms_total.",
+    help: "Housing authority CUMULATIVE counts by fixed measure. claim_*: global plot claims acquired, taken over (the fence advanced over an existing row: another holder's expired claim, or a released claim, this realm's own re-acquire after its release included), refused busy (another realm holds them, or the claim row was locked past the acquire's lock bound), the busy subset that was that lock contention, renewed, missed heartbeats (a renewal that threw or skipped a locked row, never a loss), lost to another holder, released, writes fenced, this realm's own ambiguous writes adopted, and the lock or statement bounds that ran out in a fenced write or a renew or release chunk; the renewer's passes, the triggers skipped because a pass still ran, the chunks its deadline abandoned, the newer claims a landed release killed (a same-generation re-login it raced), the wanted tests that threw, the onLost host hooks that threw (no production host binds one in this release, so zero), and the stranded pending tokens it retired; the claimed login reads. trip_*: remote Hearth trips started, advanced (and the subset whose lost COMMIT answer the verify proved landed), refused on the durable cooldown, refused on a corrupt or unsupported clock, refused by a participant, failed (proved not committed), lost COMMIT answers the verify proved did not land, never reaching the hook, left unresolved after a lost commit, committed but refused by the sim on re-dispatch, committed but dropped on re-dispatch by a realm precheck (draining, a fenced vault, spectating, jailed or dark), denied before any queue, metered by the per-account refusal memo, abandoned because the session left, and trips whose step after their counted outcome threw. recovery_*: the operation recovery passes run, skipped for want of an immediate background permit, the open intents they discovered, applied, closed and held, those of a kind with no reconciler, and the passes or reconciles that threw (all zero while no operation kind is registered). Counts only: their durations are woc_freehold_authority_ms_total.",
     labelNames: ['measure'],
     registers: [registry],
     collect() {
@@ -837,7 +837,7 @@ export function registerGameStateMetrics(
 
   new Counter({
     name: WOC_FREEHOLD_AUTHORITY_MS_TOTAL,
-    help: 'Housing authority CUMULATIVE summed wall time in milliseconds by fixed measure (07a): claim_renew_pass the claim renewer passes, claim_login_read the claimed login reads, trip the remote Hearth trips from start to outcome. Divided by its count on woc_freehold_authority_total (claim_renew_passes, claim_login_reads, trip_started) it is the mean, except that a claim renew pass whose clock gave no usable duration (a throwing or non-number reading, a non-finite or negative duration, or one that would overflow the total) counts but adds nothing. Milliseconds only, never summed with a count.',
+    help: 'Housing authority CUMULATIVE summed wall time in milliseconds by fixed measure: claim_renew_pass the claim renewer passes, claim_login_read the claimed login reads, trip the remote Hearth trips from start to outcome. Divided by its count on woc_freehold_authority_total (claim_renew_passes, claim_login_reads, trip_started) it is the mean, except that a claim renew pass whose clock gave no usable duration (a throwing or non-number reading, a non-finite or negative duration, or one that would overflow the total) counts but adds nothing. Milliseconds only, never summed with a count.',
     labelNames: ['measure'],
     registers: [registry],
     collect() {
@@ -863,7 +863,7 @@ export function registerGameStateMetrics(
       this.inc({ measure: 'writes' }, state.writes);
       this.inc({ measure: 'write_failures' }, state.writeFailures);
       this.inc({ measure: 'stale_writes' }, state.staleWrites);
-      // 07a: writes refused because another realm now holds the plot's claim.
+      // Writes refused because another realm now holds the plot's claim.
       this.inc({ measure: 'fenced_writes' }, state.fencedWrites);
       this.inc({ measure: 'permit_wait_ms' }, state.permitWaitMsTotal);
       this.inc({ measure: 'queue_wait_ms' }, state.queueWaitMsTotal);

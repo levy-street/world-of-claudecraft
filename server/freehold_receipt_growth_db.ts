@@ -12,8 +12,9 @@
 // the session's search_path, exactly as every runtime housing statement names
 // its tables unqualified, so a realm whose housing tables live in another
 // schema is observed where it writes; a database that has not applied a table
-// yet reads it as ABSENT rather than failing the pass. It is not lock-free: pg_total_relation_size opens each
-// relation with AccessShareLock (held only while that size is read), so it can
+// yet reads it as ABSENT rather than failing the pass. It is not lock-free:
+// pg_total_relation_size opens each relation with AccessShareLock (held only
+// while that size is read), so it can
 // wait behind an ACCESS EXCLUSIVE holder such as a boot DDL transaction; the
 // statement timeout below bounds that to one missed telemetry beat.
 //

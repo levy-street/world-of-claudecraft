@@ -12,7 +12,8 @@
 //
 // Cost: 27 ms
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { freeholdAccountExport } from '../../server/freehold_account_export';
 import {
   FREEHOLD_CLAIM_EXPORT_SQL,
   FREEHOLD_CLAIM_FENCE_SQL,
@@ -20,6 +21,8 @@ import {
   lockFreeholdClaimFenceOnClient,
 } from '../../server/freehold_claim_db';
 import { FREEHOLD_CLAIM_RENEW_CHUNK } from '../../server/freehold_claim_registry';
+import { FREEHOLD_PLOT_EXPORT_SQL } from '../../server/freehold_db';
+import { FREEHOLD_HEARTH_EXPORT_SQL } from '../../server/freehold_hearth_db';
 import {
   FREEHOLD_ADVISORY_ACCOUNT_CLASS,
   FREEHOLD_ADVISORY_OPERATION_CLASS,
@@ -39,6 +42,7 @@ import type { FreeholdTxPool } from '../../server/freehold_tx';
 import { GENERAL_CHAT_QUOTA_ADVISORY_NAMESPACE } from '../../server/general_chat_quota_config';
 import { WOC_MARKET_SWEEP_ADVISORY_LOCK_KEY } from '../../server/woc_market_sweep';
 import { sourceFilesUnder } from '../helpers/source_files_under';
+import { stripComments } from '../helpers/strip_comments';
 
 describe('the claim statements a mutant of their text must fail', () => {
   it('pins the hook write fence: plot, holder AND generation, stamping the attempt token', () => {
@@ -81,14 +85,84 @@ describe('the account export allowlists', () => {
   FROM freehold_operation_receipts WHERE account_id = $1
  ORDER BY closed_at DESC, operation_id DESC
  LIMIT $2`);
+    expect(
+      FREEHOLD_HEARTH_EXPORT_SQL,
+    ).toBe(`SELECT ready_at_ms::text AS ready_at_ms, revision::text AS revision, updated_at
+  FROM account_freehold_hearth
+ WHERE account_id = $1`);
     for (const sql of [
       FREEHOLD_CLAIM_EXPORT_SQL,
       FREEHOLD_OPERATION_EXPORT_INTENTS_SQL,
       FREEHOLD_OPERATION_EXPORT_RECEIPTS_SQL,
+      FREEHOLD_HEARTH_EXPORT_SQL,
+      FREEHOLD_PLOT_EXPORT_SQL,
     ]) {
       const selected = sql.slice(0, sql.indexOf('FROM'));
       for (const internal of INTERNAL) expect(selected, internal).not.toContain(internal);
     }
+  });
+
+  it("names the plot export's columns: the row, its shape, and the two bounded content columns", () => {
+    // The plot statement carries its byte gates inline, so its column list is
+    // pinned by name rather than as one literal: the top-level SELECT list,
+    // comments and the gate expressions taken out, is exactly these.
+    const head = FREEHOLD_PLOT_EXPORT_SQL.slice(
+      0,
+      FREEHOLD_PLOT_EXPORT_SQL.indexOf('FROM account_freeholds f'),
+    )
+      .replace(/--[^\n]*/g, '')
+      .replace(/CASE WHEN[\s\S]*?END AS (\w+)/g, '$1');
+    const columns = head
+      .replace(/^\s*SELECT\s+/, '')
+      .split(',')
+      .map((column) => column.trim())
+      .filter((column) => column !== '');
+    expect(columns).toEqual([
+      'plot_index',
+      'plot_id',
+      'schema_version',
+      'durable_rev',
+      'wire_rev',
+      'tier',
+      'condition',
+      'visit_policy',
+      'upkeep_binding',
+      'upkeep_checkpoint',
+      'upkeep_credit',
+      'created_at',
+      'updated_at',
+      'b.disk_bytes',
+      'b.owned_bytes',
+      'layout',
+      'trophies',
+    ]);
+  });
+});
+
+describe('the housing account export', () => {
+  it('reads on ONE client and releases it once, on a throwing read as on success', async () => {
+    const run = async (failAt: number | null) => {
+      let reads = 0;
+      const release = vi.fn();
+      const client = {
+        query: vi.fn(async () => {
+          reads += 1;
+          if (reads === failAt) throw new Error('the read failed');
+          return { rows: [], rowCount: 0 };
+        }),
+        release,
+      };
+      const connect = vi.fn(async () => client);
+      const out = await freeholdAccountExport({ connect } as never, 7).then(
+        () => 'ok',
+        (error: unknown) => (error as Error).message,
+      );
+      return { out, connects: connect.mock.calls.length, releases: release.mock.calls.length };
+    };
+    expect(await run(null)).toEqual({ out: 'ok', connects: 1, releases: 1 });
+    // A read that throws mid-export (a lock or statement timeout, a lost
+    // socket) still hands the client back, once.
+    expect(await run(2)).toEqual({ out: 'the read failed', connects: 1, releases: 1 });
   });
 });
 
@@ -211,6 +285,8 @@ describe('the intent bounds, one dimension at a time', () => {
     ['a non-string copy ref', { copyRefs: [7 as unknown as string] }],
     ['a zero expected revision', { expectedDurableRev: '0' }],
     ['a 20-digit expected revision', { expectedDurableRev: '12345678901234567890' }],
+    ['a revision past the bigint range', { expectedDurableRev: '9223372036854775808' }],
+    ['a fence past the bigint range', { fenceGeneration: '9999999999999999999' }],
     ['a zero fence', { fenceGeneration: '0' }],
     ['a plot without a fence', { fenceGeneration: null }],
     ['a fence without a plot', { plotId: null, expectedDurableRev: null }],
@@ -219,6 +295,17 @@ describe('the intent bounds, one dimension at a time', () => {
     await expect(prepareFreeholdOperation(reachedPool(), { ...MAXIMAL, ...over })).rejects.toThrow(
       RangeError,
     );
+  });
+
+  it('admits a plot-less intent (no plot, no fence, no revision): the coupling control', async () => {
+    await expect(
+      prepareFreeholdOperation(reachedPool(), {
+        ...MAXIMAL,
+        plotId: null,
+        fenceGeneration: null,
+        expectedDurableRev: null,
+      }),
+    ).rejects.toThrow('reached the pool');
   });
 });
 
@@ -319,6 +406,9 @@ describe('the read-fence lock refuses a malformed fence before any statement', (
     // the driver hands no rows array.
     await expect(lockFreeholdClaimFenceOnClient(tx, good)).resolves.toBe(true);
     expect(seen).toHaveLength(1);
+    // And it READS the count: no row locked (the fence missed) answers false.
+    const missed = { query: async () => ({ rowCount: 0 }) };
+    await expect(lockFreeholdClaimFenceOnClient(missed, good)).resolves.toBe(false);
   });
 });
 
@@ -341,10 +431,28 @@ describe('the operation DDL', () => {
 
 describe('the boot identity leaf', () => {
   it('is what the index runner imports, never db.ts (no import cycle)', () => {
-    const runner = readFileSync('server/concurrent_index_runner.ts', 'utf8');
+    // Comment-stripped: a commented-out import is no importer.
+    const runner = stripComments(readFileSync('server/concurrent_index_runner.ts', 'utf8'));
     expect(runner).toContain(
       "import { SCHEMA_ADVISORY_LOCK_KEY, SOURCE_WRITER_CONNECTION } from './db_boot_connection';",
     );
     expect(runner).not.toMatch(/^import [^;]* from '\.\/db';$/m);
+  });
+
+  it('hands the writer-capability connection to exactly the two boot clients', () => {
+    // SOURCE_WRITER_CONNECTION carries the material-source writer capability:
+    // only db.ts (the pool and the boot schema client) and the concurrent
+    // index runner may take it. Any other importer is a new writer.
+    const importers = sourceFilesUnder('server')
+      .filter(({ full }) =>
+        /\bSOURCE_WRITER_CONNECTION\b/.test(stripComments(readFileSync(full, 'utf8'))),
+      )
+      .map(({ file }) => `server/${file}`)
+      .sort();
+    expect(importers).toEqual([
+      'server/concurrent_index_runner.ts',
+      'server/db.ts',
+      'server/db_boot_connection.ts',
+    ]);
   });
 });
