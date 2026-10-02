@@ -5773,9 +5773,14 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - ROUND THIRTY-THREE, eight fresh readers over round thirty-two: 33 findings, none blocking, 7
   should-fix, every reader passing, two with no should-fix. A waiting sign-out rerun is followed
   through a stopped realm's queued statement to the open sign-out; the third escalation lever
-  names every start of the bot as lifting it; a bot key edit no longer restarts a lever-stopped
-  bot, and a fatal-close fix no longer keeps an old token; and the pg file's Cost is read as the
-  documented command reports it. Fixed in `d987076ce9`.
+  names every start of the bot as lifting it; a bot key edit no longer starts a lever-stopped bot
+  (worded so in round thirty-four), and a fatal-close fix no longer keeps an old token; and the pg
+  file's Cost is read as the documented command reports it. Fixed in `d987076ce9`.
+- ROUND THIRTY-FOUR, eight fresh readers over round thirty-three: 29 findings, none blocking, 10
+  should-fix, every reader passing, two with no should-fix. A waiting sign-out rerun is followed
+  to the session that waits on nothing, which decides, the nightly dump included; the compose file
+  may define no YAML anchor; the stall-over reading accepts a realm container left `Created`; and
+  the release steps re-stop a bot the third lever held before a start. Fixed in `8d7ad08a07`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5806,7 +5811,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   641, then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
   then 644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then
   647, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648,
-  then 648, then 648 passed, never a skip.
+  then 648, then 648, then 648 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
