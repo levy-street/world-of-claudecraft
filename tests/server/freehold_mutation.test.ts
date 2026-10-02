@@ -19,7 +19,7 @@
 // TimeoutOverflowWarning to stderr; it is that case's subject, not a fault to
 // chase.
 //
-// Cost: 1.0 s
+// Cost: 1.1 s
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -2999,11 +2999,17 @@ describe('the claim renewer', () => {
       ts.SyntaxKind.StringLiteral,
       ts.SyntaxKind.StringLiteral,
     ]);
-    // Every tracked bot code file is parsed, so a route is read as its
-    // literal's value (an escape in its text included), never as raw text.
-    const listed = spawnSync('git', ['ls-files', '--', ...botCode], { encoding: 'utf8' });
-    expect(listed.status).toBe(0);
-    const botFiles = listed.stdout.split('\n').filter((file) => file !== '');
+    // Every tracked bot code file still on disk is parsed, so a route is read
+    // as its literal's value (an escape in its text included), never as raw
+    // text. The list is checked against a second listing of the whole
+    // directory, so a narrowed pathspec cannot drop a file.
+    const tracked = (pathspecs: string[]) => {
+      const listed = spawnSync('git', ['ls-files', '--', ...pathspecs], { encoding: 'utf8' });
+      expect(listed.status).toBe(0);
+      return listed.stdout.split('\n').filter((file) => file !== '' && existsSync(file));
+    };
+    const botFiles = tracked(botCode);
+    expect(botFiles).toEqual(tracked(['bot']).filter((file) => /\.[mc]?[jt]s$/.test(file)));
     expect(botFiles).toEqual(
       expect.arrayContaining(['bot/logic.ts', 'bot/main.ts', 'bot/server_client.ts']),
     );
@@ -3024,6 +3030,36 @@ describe('the claim renewer', () => {
       'bot/server_client.ts: pushMembersMeta',
       'bot/server_client.ts: flairedIds',
     ]);
+    // Section L of the pg suite reads every boot through `settled`, which ends
+    // a boot still waiting at its deadline; so every boot the section runs
+    // starts in `startBoot`, its one call of `ensureSchema` (a call by another
+    // name is not read).
+    const pgSuite = parsed('tests/server/freehold_mutation.pg.test.ts');
+    const sectionL = nodesIn(pgSuite).filter(
+      (node) =>
+        ts.isCallExpression(node) &&
+        ts.isIdentifier(node.expression) &&
+        node.expression.text === 'describe' &&
+        node.arguments.length > 0 &&
+        ts.isStringLiteralLike(node.arguments[0]) &&
+        node.arguments[0].text.startsWith('L. '),
+    );
+    expect(sectionL).toHaveLength(1);
+    const bootCalls = nodesIn(sectionL[0]).filter(
+      (node) =>
+        ts.isCallExpression(node) &&
+        ((ts.isPropertyAccessExpression(node.expression) &&
+          node.expression.name.text === 'ensureSchema') ||
+          (ts.isIdentifier(node.expression) && node.expression.text === 'ensureSchema')),
+    );
+    const declaredIn = (node: ts.Node): string => {
+      for (let at = node.parent; at !== undefined; at = at.parent) {
+        if (ts.isVariableDeclaration(at) && ts.isIdentifier(at.name)) return at.name.text;
+        if (ts.isFunctionDeclaration(at) && at.name !== undefined) return at.name.text;
+      }
+      return '(top level)';
+    };
+    expect(bootCalls.map(declaredIn)).toEqual(['startBoot']);
     // The link-change feed's heal is the bot's resyncs, which DEPLOY gives no
     // cadence; the bot's own suites pin them (tests/discord_bot_linked_sweep.test.ts,
     // tests/discord_bot_member_writes.test.ts and

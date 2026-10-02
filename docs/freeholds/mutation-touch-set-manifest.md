@@ -1473,4 +1473,7 @@ What changed the contract above:
   Q44R3).
 - A forty-fourth round of eight fresh readers: no P12 change and no change to `DEPLOY.md` or the
   bot; the forty-first entry here says `bot/logic.ts` named the key's three parts in that round
-  and the other two gained the reason in round forty-two.
+  and the other two gained the reason in round forty-two, and the forty-third entry says the
+  forty-first names the round that reworded it (worded so in round forty-five, C45R1).
+- A forty-fifth round of eight fresh readers: no P12 change and no change to `DEPLOY.md` or the
+  bot; the forty-fourth entry here names the forty-third entry's rewording.

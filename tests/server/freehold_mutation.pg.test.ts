@@ -47,7 +47,7 @@
 // tests/guild_bank_pg_integration.test.ts and
 // tests/server/storage_purchase_db.pg.test.ts prove the legacy halves with no
 // housing participant.
-// Cost: 13.3 s
+// Cost: 13.6 s
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import type { Pool as PgPool, PoolClient } from 'pg';
@@ -3240,6 +3240,10 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       throw new Error('the boot never queued behind the held lock');
     }
 
+    /** The schema advisory lock's key, the server's own (pinned in the index
+     *  build case below). */
+    const SCHEMA_LOCK_KEY = 0x57_4f_43_01;
+
     /** The pg_locks rows of this database's sessions holding or waiting for
      *  the schema advisory lock (its key is $1). */
     const ON_SCHEMA_LOCK = `locktype = 'advisory' AND classid = 0 AND objid = $1 AND objsubid = 1
@@ -3252,7 +3256,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         `SELECT CASE WHEN granted THEN 'granted' ELSE 'waiting' END AS s FROM pg_locks
           WHERE ${ON_SCHEMA_LOCK}
           ORDER BY 1`,
-        [0x57_4f_43_01],
+        [SCHEMA_LOCK_KEY],
       );
       return res.rows.map((r: { s: string }) => r.s);
     }
@@ -3266,22 +3270,30 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       );
 
     /** Reads a boot (or several, settled together) through a deadline, and
-     *  every boot this section waits on is read here. A boot still waiting at
-     *  it has every session on the schema advisory lock cancelled, not
-     *  terminated: its statement ends with 57014 and its own catch rolls back
-     *  and closes its client, so no boot outlives its case and no connection
-     *  drops under a client with no error listener. The read after the cancel
-     *  is a second at most. */
+     *  every boot this section waits on is read here; it returns what that
+     *  read saw, never what a cancel made of the boot. A boot still waiting at
+     *  the deadline has every session on the schema advisory lock cancelled,
+     *  not terminated: a statement waiting on a lock ends with 57014 and the
+     *  boot's own catch rolls back and closes its client, so no boot left
+     *  waiting on a lock holds one into a later case, and no connection drops
+     *  under a client with no error listener. PostgreSQL drops a cancel that
+     *  reaches a session between statements, so it is sent again for up to a
+     *  second; a boot idle in its transaction longer than that (its pool probe,
+     *  say) reads as still waiting and ends at the pool's own deadlines. */
     async function settled(work: Promise<unknown> | undefined, ms = 5_000): Promise<unknown> {
       const outcome = await within(Promise.resolve(work), ms);
       if (outcome === 'still waiting') {
-        await pool
-          .query(
-            `SELECT pg_cancel_backend(pid) FROM pg_locks WHERE ${ON_SCHEMA_LOCK}`,
-            [0x57_4f_43_01],
-          )
-          .catch(() => {});
-        await within(Promise.resolve(work), 1_000);
+        const end = Date.now() + 1_000;
+        do {
+          await pool
+            .query(`SELECT pg_cancel_backend(pid) FROM pg_locks WHERE ${ON_SCHEMA_LOCK}`, [
+              SCHEMA_LOCK_KEY,
+            ])
+            .catch(() => {});
+        } while (
+          (await within(Promise.resolve(work), 100)) === 'still waiting' &&
+          Date.now() < end
+        );
       }
       return outcome;
     }
@@ -3318,7 +3330,8 @@ d('the housing mutation boundary (REAL Postgres)', () => {
      *  reads the lock it waits for and every table lock it holds. `during` runs
      *  while the boot still waits and gets the boot's outcome (`'finished'` or
      *  its error). The boot must settle within ten seconds of the hold's release
-     *  (a second, after a failure), and finish unless `mayFail`. */
+     *  and finish unless `mayFail`; after a failure it is read for a second, to
+     *  end it. */
     async function bootBehind(
       tables: readonly string[],
       opts: {
@@ -3388,6 +3401,15 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       stopped.on('error', () => {});
       stopped.connection.stream.destroy();
     }
+
+    it('reads a boot by what its deadline saw, never by what a cancel made of it', async () => {
+      expect(await settled(Promise.resolve('finished'), 50)).toBe('finished');
+      // Settling only after the deadline, as a cancelled boot does, it still
+      // reads as still waiting.
+      const late = sleep(200).then(() => new Error('settled after the deadline'));
+      expect(await settled(late, 50)).toBe('still waiting');
+      expect(await late).toBeInstanceOf(Error);
+    });
 
     it('locks auth_tokens, then characters, then accounts, and sends no lock timeout', async () => {
       const { Client } = await import('pg');
@@ -4286,7 +4308,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       expect(validate).toBeGreaterThan(loop);
       expect(release).toBeGreaterThan(validate);
       const { SCHEMA_ADVISORY_LOCK_KEY } = await import('../../server/db_boot_connection');
-      expect(SCHEMA_ADVISORY_LOCK_KEY).toBe(0x57_4f_43_01);
+      expect(SCHEMA_ADVISORY_LOCK_KEY).toBe(SCHEMA_LOCK_KEY);
       const valid = async () =>
         (
           await pool.query(
