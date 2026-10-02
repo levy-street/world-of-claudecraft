@@ -4702,3 +4702,51 @@ samples of the boundary on a number's value.
   restored: the dependencies, optionalDependencies and overrides tables each dropped, the tables
   read out of order, and a listed spec shaped again, each at the table sample; and the shape
   reading a leading zero, at the plain samples.
+
+## Round sixty: eight fresh readers over round fifty-nine (`c73737285c..61519ac091`)
+
+Round sixty's readers read round fifty-nine's two commits (`1b00d9801e`, the pin taking a spec
+that is not plain as written and every dependency table proven read; and `61519ac091`, its
+record). This round changes nothing but this section and the ledger: it is the loop's terminal
+clean read, so its suggestions, all optional, are recorded under the ledger's OWED, NOT CLAIMED
+rather than applied, since applying them would need a fresh read of its own.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C60R1, C60R2 |
+| qa-checklist | PASS | Q60R1 to Q60R3 |
+| server hot path | PASS | none |
+| privacy and security | PASS | S60R1 |
+| database performance | PASS | none |
+| test coverage | PASS | T60R1 to T60R3 |
+| docs librarian | PASS | L60R1, L60R2 |
+| migration safety | PASS | none |
+
+11 findings: none blocking, none should-fix, 11 nice-to-have, every reader passing, and every
+reader with no should-fix, three of them (server hot path, database performance, migration safety)
+with no finding at all. The first round of the loop with no should-fix. Six of the suggestions are
+ledger and record wording: the ledger's account of round fifty-seven's alias finding says more
+than the old pin let through, its ROUND FIFTY-EIGHT and ROUND FIFTY-NINE each leave a kind of
+finding out of the rest (as `61519ac091`'s body does), and two round fifty-nine dispositions do
+not name the ledger's item that states their fix. One is a boundary: an override keyed to a listed
+alias's name, with a plain value, replaces the alias at install and is not read. Three are test
+hardenings: an overlong sample semver rejects, table-sample keys out of alphabetical order, and a
+byte check on each mutant's restore.
+
+- C60R1 OWED (the ledger's item under WHAT IT FOUND THAT WAS NOT A COMMENT says an alias with any
+  tail read as a pinned alias; the old pin cut a tail only when it held no slash or `@`, and kept
+  the package name; round fifty-eight's summary says the same). C60R2 OWED (with L60R2, Q60R1 and
+  Q60R2: the ledger's ROUND FIFTY-NINE and `61519ac091`'s body leave the two notes on how far the
+  shape read reaches out of the rest).
+- Q60R1 OWED (see C60R2). Q60R2 OWED (see C60R2). Q60R3 OWED (the ledger's ROUND FIFTY-EIGHT says
+  comment and record wording where ledger wording was among them).
+- S60R1 OWED (an override keyed to a listed alias's name, with a plain value, replaces the alias
+  at install and the pin, which reads override values only, does not see it; a stated boundary or
+  a pin of override keys is a maintainer decision).
+- T60R1 OWED (the overlong sample `^1234567890.0.0` is a range semver accepts, so a digit cap of
+  sixteen survives; a twenty-digit sample would kill it). T60R2 OWED (the table sample's keys run
+  alphabetically in table order, so a sort added to the read survives; reversed keys would kill
+  it). T60R3 OWED (the mutant harness records the tree's status after each restore, not the file's
+  bytes; a hash before and after would prove each restore).
+- L60R1 OWED (S59R1's and T59R1's dispositions name T58R1 but not the ledger's item that states
+  their fix, which names S59R1 but not T59R1). L60R2 OWED (see C60R2).

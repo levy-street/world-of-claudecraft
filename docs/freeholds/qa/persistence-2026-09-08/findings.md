@@ -5945,6 +5945,10 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   four dependency tables were unproven, so every table is now proven read on a sample. The rest
   were record and ledger wording, a commit body and samples of the boundary on a number's value.
   Fixed in `1b00d9801e`.
+- ROUND SIXTY, eight fresh readers over round fifty-nine: 11 findings, none blocking, none
+  should-fix, every reader passing, the loop's terminal clean read. Its eleven optional
+  suggestions (ledger and record wording, an override keyed to an alias's name, three test
+  hardenings) are recorded under OWED, NOT CLAIMED below, not applied. No commit of code.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5988,8 +5992,8 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then
   648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648,
   then 648, then 648, then 648, then 649, then 649, then 649, then 649, then 649, then 649, then
-  649, then 649, then 649, then 649, then 649, then 649, then 649, then 649, then 649 passed,
-  never a skip.
+  649, then 649, then 649, then 649, then 649, then 649, then 649, then 649, then 649, then 649
+  passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
@@ -6069,3 +6073,17 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - The `.npmrc` pin is a maintainer decision. Recommendation: a content rule in the malware scan,
   pinned in `tests/malware_scan.test.ts`, refusing any `node-options`, `registry` or script hook
   line in `.npmrc`. That is cheaper and narrower than exempting a test that reads the file.
+- Round sixty's optional suggestions, from the terminal clean read, recorded rather than applied
+  (each in its record section, C60R1 to L60R2):
+  - the ledger's own wording: its item under WHAT IT FOUND THAT WAS NOT A COMMENT says an alias
+    with any tail read as a pinned alias, where the old pin cut a tail only when it held no slash
+    or `@` (C60R1); its ROUND FIFTY-EIGHT says comment and record wording where ledger wording was
+    among them (Q60R3); its ROUND FIFTY-NINE, like `61519ac091`'s body, leaves the two notes on
+    how far the shape read reaches out of the rest (C60R2, L60R2, Q60R1, Q60R2);
+  - S59R1's and T59R1's dispositions name T58R1 but not the ledger's item that states their fix
+    (L60R1);
+  - an override keyed to a listed alias's name, with a plain value, replaces the alias at install
+    and is not read by the pin, which reads override values only; a stated boundary or a pin of
+    override keys is a maintainer decision (S60R1);
+  - three test hardenings: an overlong sample semver rejects (T60R1), table-sample keys out of
+    alphabetical order (T60R2), and a byte check on each mutant's restore in the harness (T60R3).
