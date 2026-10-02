@@ -671,9 +671,9 @@ deployed, the first 07a boot on production creates five FK-bearing tables and th
 ONE `ensureSchema` transaction with no `lock_timeout`. It takes no parent lock a steady-state
 boot does not (above): every boot queues behind each in-flight `characters` and `accounts`
 writer on the running fleet, and every later save and account write on every realm queues
-behind the boot until its COMMIT (measured with an old realm serving: about 65 ms for the
-first rollout with plain saves in flight, the same as a steady-state boot). ANY boot can
-DEADLOCK on two paths. The UPGRADE path, one table: the boot's first `characters` lock is
+behind the boot until its COMMIT (measured with an old realm serving: 55 to 66 ms for the
+first rollout with plain saves in flight, near a steady-state boot's 56 to 59 ms). ANY boot
+can DEADLOCK on two paths. The UPGRADE path, one table: the boot's first `characters` lock is
 SHARE (the core `characters_account` index create), upgraded to ACCESS EXCLUSIVE by the next
 statement, against a transaction that took a lock on `characters` that SHARE does not wait for
 (a save's G2 row lock, ROW SHARE, or a plain read's ACCESS SHARE) and then writes it. The

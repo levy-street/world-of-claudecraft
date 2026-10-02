@@ -725,8 +725,8 @@ but EVERY boot already holds both under ACCESS EXCLUSIVE from the core schema's 
 `ADD COLUMN IF NOT EXISTS` statements to its COMMIT, so the housing DDL adds no wait:
 every boot queues behind every in-flight character save and account write, and every one
 that arrives after it queues behind the boot until that COMMIT. Measured with an old
-realm serving plain saves, the first rollout took about 65 ms, the same as a
-steady-state boot. ANY boot can DEADLOCK on two paths (the touch-set manifest's P12 and
+realm serving plain saves, the first rollout took 55 to 66 ms, near a steady-state
+boot's 56 to 59 ms. ANY boot can DEADLOCK on two paths (the touch-set manifest's P12 and
 R-11): the boot's SHARE lock on `characters` upgraded to ACCESS EXCLUSIVE, against a
 transaction that took a lock on `characters` that SHARE does not wait for (a save's row
 lock's ROW SHARE, or a plain read's ACCESS SHARE) and then writes it; and the boot's
@@ -740,8 +740,8 @@ hazard of the core schema's boot that predates housing
 members. The first rollout is the one boot that also builds the tables: do it, and any
 boot beside other realms serving those saves, in a quiet window (as `DEPLOY.md` defines
 it, outside the nightly `pg_dump` too), and never beside a realm that is still shutting
-down (a shutdown flush save that fails gets one more pass
-only when it carried guild bank books, and otherwise is not written again).
+down (a shutdown flush save that fails gets one more pass only when it carried guild
+bank books, and otherwise is not written again).
 
 ### The shutdown drain, and why it sits where it sits
 
