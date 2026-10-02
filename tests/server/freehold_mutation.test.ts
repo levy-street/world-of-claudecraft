@@ -1653,11 +1653,12 @@ describe('the claim renewer', () => {
     expect(releaseAt).toBeGreaterThan(stopAt);
   });
 
-  it("pins every await of the shutdown closure to the rollout contract's budget", () => {
+  it("classifies every await of the shutdown closure against the rollout contract's budget", () => {
     // THE SHUTDOWN BUDGET in docs/freeholds/persistence-rollout-contract.md
-    // names the bounded awaits and says every other one carries no deadline. A
-    // step added, removed or newly bounded in server/main.ts fails here until
-    // that paragraph (and this list) says so.
+    // counts the bounded awaits. Every await of server/main.ts's shutdown
+    // closure is CLASSIFIED here, so a step added, removed or newly bounded
+    // fails until it is classified, and an unbounded one may pass only a bare
+    // call or an argument shape listed below as carrying no deadline.
     const main = mainSource();
     const start = main.indexOf('const shutdown = async () => {');
     const end = main.indexOf("process.on('SIGINT', shutdown);", start);
@@ -1666,45 +1667,105 @@ describe('the claim renewer', () => {
     const awaits = [...main.slice(start, end).matchAll(/await\s+([^;]+);/g)].map((match) =>
       match[1].replace(/\s+/g, ' ').trim(),
     );
-    expect(awaits).toEqual([
-      'businessMetrics.stop()',
-      'bankLedgerGrowthMonitor.stop()',
-      'freeholdReceiptGrowthMonitor.stop()',
-      'stopStoragePurchaseRecovery()',
-      'retentionSweep.stop()',
-      'wocMarketSweep.stop()',
-      'wocMarketMonitor.stop()',
-      'generalChatQuotaListener.stop()',
+    type Bound =
+      | { readonly kind: 'none' }
+      | { readonly kind: 'constant'; readonly name: string; readonly file: string }
+      | { readonly kind: 'concurrent literals' }
+      | {
+          readonly kind: 'callee';
+          readonly fn: string;
+          readonly name: string;
+          readonly value: number;
+          readonly wired: string;
+        };
+    const none: Bound = { kind: 'none' };
+    const drain = (name: string, file: string): Bound => ({ kind: 'constant', name, file });
+    const closure: ReadonlyArray<readonly [string, Bound]> = [
+      ['businessMetrics.stop()', none],
+      ['bankLedgerGrowthMonitor.stop()', none],
+      ['freeholdReceiptGrowthMonitor.stop()', none],
+      ['stopStoragePurchaseRecovery()', none],
+      ['retentionSweep.stop()', none],
+      ['wocMarketSweep.stop()', none],
+      ['wocMarketMonitor.stop()', none],
+      ['generalChatQuotaListener.stop()', none],
+      ["game.saveAll('shutdown')", none],
+      ['game.saveMarket()', none],
+      ['game.saveMail()', none],
+      ['game.saveRifts()', none],
+      ['game.saveFreeholds()', none],
+      ['game.endAllPlaySessions()', none],
+      [
+        'bankLedgerIdle(BANK_LEDGER_SHUTDOWN_DRAIN_MS)',
+        drain('BANK_LEDGER_SHUTDOWN_DRAIN_MS', 'server/bank_ledger.ts'),
+      ],
+      ['suspicionFlagsIdle()', none],
+      ['deedRecordsIdle()', none],
+      ['relicRecordsIdle()', none],
+      ['progressEventsIdle()', none],
+      ['craftRollEventsIdle()', none],
+      [
+        'soldVolumeWriterIdle(MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS)',
+        drain('MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS', 'server/market_sold_volume.ts'),
+      ],
+      [
+        'freeholdPersistIdle(FREEHOLD_PERSIST_SHUTDOWN_DRAIN_MS)',
+        drain('FREEHOLD_PERSIST_SHUTDOWN_DRAIN_MS', 'server/freehold_persist_bounds.ts'),
+      ],
+      ['worldQuestScoresIdle()', none],
+      [
+        'stopUnstuckRecords(UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS)',
+        drain('UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS', 'server/unstuck_records.ts'),
+      ],
+      [
+        'Promise.all([stopSteamMirror(5000), stopEpicMirror(5000)])',
+        { kind: 'concurrent literals' },
+      ],
+      [
+        'stopFreeholdClaimRenewer(heldClaims())',
+        {
+          kind: 'callee',
+          fn: 'stopFreeholdClaimRenewer',
+          name: 'FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs',
+          value: FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs,
+          wired: "bound.addEventListener('abort', done",
+        },
+      ],
+      [
+        'releaseAllFreeholdClaims({ pool, holder: PROCESS_LEASE_HOLDER, registry: heldClaims() })',
+        {
+          kind: 'callee',
+          fn: 'releaseAllFreeholdClaims',
+          name: 'FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS',
+          value: FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS,
+          wired: '{ signal: deadline }',
+        },
+      ],
+      [
+        "releaseAllCharacterLeases().catch((err) => console.error('lease release-all failed:', err), )",
+        none,
+      ],
+      ['game.parseCapture.stop()', none],
+      ['game.chatLog.stop()', none],
+      ['closeGeneralChatQuotaPool()', none],
+      ['closeBackendCancelPool()', none],
+      ['pool.end()', none],
+    ];
+    expect(awaits).toEqual(closure.map(([text]) => text));
+    // An unbounded await passes nothing that could be a deadline: a bare call,
+    // or one of these argument shapes, each read and found to carry none.
+    const noDeadlineArguments = new Set([
       "game.saveAll('shutdown')",
-      'game.saveMarket()',
-      'game.saveMail()',
-      'game.saveRifts()',
-      'game.saveFreeholds()',
-      'game.endAllPlaySessions()',
-      'bankLedgerIdle(BANK_LEDGER_SHUTDOWN_DRAIN_MS)',
-      'suspicionFlagsIdle()',
-      'deedRecordsIdle()',
-      'relicRecordsIdle()',
-      'progressEventsIdle()',
-      'craftRollEventsIdle()',
-      'soldVolumeWriterIdle(MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS)',
-      'freeholdPersistIdle(FREEHOLD_PERSIST_SHUTDOWN_DRAIN_MS)',
-      'worldQuestScoresIdle()',
-      'stopUnstuckRecords(UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS)',
-      'Promise.all([stopSteamMirror(5000), stopEpicMirror(5000)])',
       'stopFreeholdClaimRenewer(heldClaims())',
       'releaseAllFreeholdClaims({ pool, holder: PROCESS_LEASE_HOLDER, registry: heldClaims() })',
       "releaseAllCharacterLeases().catch((err) => console.error('lease release-all failed:', err), )",
-      'game.parseCapture.stop()',
-      'game.chatLog.stop()',
-      'closeGeneralChatQuotaPool()',
-      'closeBackendCancelPool()',
-      'pool.end()',
     ]);
-    // The bounded awaits, DERIVED from that list: every SCREAMING `_MS`
-    // constant an await passes, and every numeric literal it passes (the two
-    // mirror stops, one shared value). A step newly bounded at its call site
-    // therefore changes this set, and the contract must name it.
+    for (const [text, bound] of closure) {
+      if (bound.kind === 'none' || bound.kind === 'callee') {
+        expect(/^[\w.]+\(\)$/.test(text) || noDeadlineArguments.has(text), text).toBe(true);
+      }
+    }
+    // Each bound's value, read from the code that sets it.
     const constantIn = (file: string, name: string): number => {
       const found = stripComments(readFileSync(file, 'utf8')).match(
         new RegExp(`export const ${name} = ([0-9_]+);`),
@@ -1712,65 +1773,68 @@ describe('the claim renewer', () => {
       expect(found, name).not.toBeNull();
       return Number((found as RegExpMatchArray)[1].replaceAll('_', ''));
     };
-    const callSiteNames = awaits.flatMap((call) =>
-      [...call.matchAll(/\b([A-Z][A-Z0-9_]*_MS)\b/g)].map((match) => match[1]),
-    );
-    expect(callSiteNames).toEqual([
-      'BANK_LEDGER_SHUTDOWN_DRAIN_MS',
-      'MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS',
-      'FREEHOLD_PERSIST_SHUTDOWN_DRAIN_MS',
-      'UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS',
-    ]);
-    const definedIn: Record<string, string> = {
-      BANK_LEDGER_SHUTDOWN_DRAIN_MS: 'server/bank_ledger.ts',
-      MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS: 'server/market_sold_volume.ts',
-      FREEHOLD_PERSIST_SHUTDOWN_DRAIN_MS: 'server/freehold_persist_bounds.ts',
-      UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS: 'server/unstuck_records.ts',
-    };
-    const callSite: Array<[string, number]> = callSiteNames.map((name) => [
-      name,
-      constantIn(definedIn[name], name),
-    ]);
-    const literals = awaits.flatMap((call) =>
-      [...call.matchAll(/\((\d[\d_]*)\)/g)].map((match) => Number(match[1].replaceAll('_', ''))),
-    );
-    expect(literals).toHaveLength(2);
-    expect(new Set(literals).size).toBe(1);
-    const mirrorsMs = literals[0];
-    // The two bounds fixed INSIDE their callees, which no await text shows:
-    // each callee must really arm its constant.
     const registrySource = stripComments(readFileSync('server/freehold_claim_registry.ts', 'utf8'));
-    const bodyOf = (name: string) => {
-      const start = registrySource.indexOf(`export async function ${name}(`);
-      expect(start, name).toBeGreaterThan(-1);
-      const next = registrySource.indexOf('\nexport ', start + 1);
-      return registrySource.slice(start, next === -1 ? undefined : next);
+    const bodyOf = (fn: string) => {
+      const from = registrySource.indexOf(`export async function ${fn}(`);
+      expect(from, fn).toBeGreaterThan(-1);
+      const to = registrySource.indexOf('\n}\n', from);
+      expect(to, fn).toBeGreaterThan(from);
+      return registrySource.slice(from, to);
     };
-    expect(bodyOf('stopFreeholdClaimRenewer')).toContain(
-      'AbortSignal.timeout(FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs)',
-    );
-    expect(bodyOf('releaseAllFreeholdClaims')).toContain(
-      'AbortSignal.timeout(FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS)',
-    );
-    const inCallee: Array<[string, number]> = [
-      ['FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs', FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs],
-      ['FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS', FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS],
-    ];
-    // The contract names each in its own group, with its value, the sum and
-    // the grace, and the sum fits inside the game service's grace.
+    const counted: Array<{ name: string; value: number; group: 'call site' | 'callee' }> = [];
+    let concurrentMs = 0;
+    for (const [text, bound] of closure) {
+      if (bound.kind === 'constant') {
+        expect(text).toContain(`(${bound.name})`);
+        // main.ts passes the defining module's binding, never a local one.
+        expect(main).not.toMatch(new RegExp(`\\b(?:const|let|var) ${bound.name}\\b`));
+        counted.push({
+          name: bound.name,
+          value: constantIn(bound.file, bound.name),
+          group: 'call site',
+        });
+      } else if (bound.kind === 'concurrent literals') {
+        expect(text.startsWith('Promise.all([')).toBe(true);
+        const literals = [...text.matchAll(/(?<![\w.])\d[\d_]*(?![\w.])/g)].map((match) =>
+          Number(match[0].replaceAll('_', '')),
+        );
+        expect(literals.length).toBeGreaterThan(1);
+        concurrentMs = Math.max(...literals);
+      } else if (bound.kind === 'callee') {
+        // The callee arms its bound AND waits on it, inside its own body.
+        const body = bodyOf(bound.fn);
+        expect(body).toContain(`AbortSignal.timeout(${bound.name})`);
+        expect(body).toContain(bound.wired);
+        counted.push({ name: bound.name, value: bound.value, group: 'callee' });
+      }
+    }
+    // The contract names exactly these bounds, each in its group with its
+    // value, the concurrent pair once, the sum and the game service's grace,
+    // and the sum fits inside that grace.
     const contract = readFileSync('docs/freeholds/persistence-rollout-contract.md', 'utf8');
     const at = contract.indexOf('THE SHUTDOWN BUDGET');
     expect(at).toBeGreaterThan(-1);
     const budget = contract.slice(at, contract.indexOf('\n\n', at)).replace(/\s+/g, ' ');
-    const split = budget.indexOf('Inside the callee:');
-    expect(split).toBeGreaterThan(budget.indexOf('At the call site:'));
-    const [callSiteText, calleeText] = [budget.slice(0, split), budget.slice(split)];
+    const callSiteAt = budget.indexOf('At the call site:');
+    const calleeAt = budget.indexOf('Inside the callee:');
+    expect(callSiteAt).toBeGreaterThan(-1);
+    expect(calleeAt).toBeGreaterThan(callSiteAt);
+    const groups = {
+      'call site': budget.slice(callSiteAt, calleeAt),
+      callee: budget.slice(calleeAt),
+    };
     const ms = (value: number) => `${value.toLocaleString('en-US')} ms`;
-    for (const [name, value] of callSite)
-      expect(callSiteText).toContain(`\`${name}\`, ${ms(value)}`);
-    expect(callSiteText).toContain(`run concurrently, ${ms(mirrorsMs)}`);
-    for (const [name, value] of inCallee) expect(calleeText).toContain(`\`${name}\`, ${ms(value)}`);
-    const totalMs = [...callSite, ...inCallee].reduce((sum, [, value]) => sum + value, mirrorsMs);
+    for (const { name, value, group } of counted) {
+      expect(groups[group]).toContain(`\`${name}\`, ${ms(value)}`);
+    }
+    const named = [...budget.matchAll(/`([A-Z][\w.]*)`, ([\d,]+) ms/g)].map(
+      (match) => `${match[1]}=${match[2]}`,
+    );
+    expect(named.sort()).toEqual(
+      counted.map(({ name, value }) => `${name}=${value.toLocaleString('en-US')}`).sort(),
+    );
+    expect(groups['call site']).toContain(`run concurrently, ${ms(concurrentMs)}`);
+    const totalMs = counted.reduce((sum, { value }) => sum + value, concurrentMs);
     expect(budget).toContain(`${totalMs / 1000} s of bounded waits`);
     const grace = readFileSync('docker-compose.yml', 'utf8').match(
       /\n {2}game:\n(?: {4}.*\n)*? {4}stop_grace_period: (\d+)s\n/,
