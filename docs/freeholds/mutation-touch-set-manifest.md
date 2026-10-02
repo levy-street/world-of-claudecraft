@@ -686,9 +686,9 @@ example an index, a guard or trigger, or the advance token column or its CHECK):
 that statement's lock on that object's table to its COMMIT, builds a rebuilt index while it
 holds both parents, for as long as the build takes, which grows with the table; a rebuilt
 unique index that meets duplicate rows fails the boot, which exits and is restarted into the
-same stall until the duplicates are resolved. Do the first rollout, any repair boot, and any
-boot beside other realms serving such saves, in a quiet window; `DEPLOY.md` carries the
-operator note.
+same stall until the duplicates are resolved. Stop the other realms before a repair boot,
+and do the first rollout, any repair boot, and any boot beside other realms serving such
+saves, in a quiet window; `DEPLOY.md` carries the operator note.
 
 ## 6. Pairwise deadlock review
 
@@ -1328,7 +1328,8 @@ What changed the contract above:
 - A seventh round of eight fresh readers: P12 defines a repair boot instead of listing one,
   says the storage fragment holds its own tables, and R-13 says when the backend aborts; the
   operator's token runbook is SQL the pg suite executes.
-- An eighth round of eight fresh readers: P12 and R-11 say what a repair boot costs and how a
-  failed unique rebuild is cleared, the storage fragment's locks are stated exactly, R-13
-  says when a cut backend aborts, and every runbook step and every shutdown await is now
-  mechanical (SQL the suite runs, or an explicit classification).
+- An eighth round of eight fresh readers: P12 says what a repair boot costs and that a
+  failed unique rebuild restarts into the same stall until its duplicates are resolved
+  (`DEPLOY.md` says how), the storage fragment's probed repairs are repair boots, R-13
+  bounds a cut backend's abort by its statement timeout, the runbook's five blocks are SQL
+  the suite runs, and every shutdown await carries an explicit classification.

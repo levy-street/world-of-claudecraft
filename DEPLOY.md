@@ -1109,16 +1109,19 @@ For off-box safety, sync the directory to S3 occasionally:
   boots. A REPAIR boot is any boot that rebuilds something a probe guards (for example
   a housing index, a guard or trigger, or the advance token column or its CHECK): it
   holds that statement's lock on that object's table to its COMMIT and builds a
-  rebuilt index while it holds both parents, for as long as the build takes, which
-  grows with the table, so roll a repair boot out in a quiet window, with the other
-  realms stopped first for a large table. A rebuilt unique index that meets duplicate
-  rows fails the boot, which rolls back whole, exits and is restarted, and every
-  restart repeats the stall: stop the realms, count the duplicate keys with an
-  aggregate only, resolve them as the defect the index exists to prevent (never by
-  deleting a receipt or claim row blind), then boot. (The storage fragment, which is
-  not housing, holds its own tables: some of its DDL runs unprobed and holds those
-  tables' locks to every boot's COMMIT, and its probed repairs make a boot a repair
-  boot like any other.)
+  rebuilt index or a re-added column while it holds both parents, for as long as the
+  table makes it take, so stop the other realms first and boot one in a quiet window.
+  A rebuilt unique index that meets duplicate rows fails the boot, which rolls back
+  whole, exits and is restarted, and every restart repeats the stall. Stop the realms;
+  copy the duplicate rows to an access-restricted side table before anything changes
+  (they hold account ids; drop the copy after the ruling); count them with an
+  aggregate for any ticket or log (the index name from the error, its columns from
+  `pg_indexes`, never the key values in its DETAIL); resolve them as the defect the
+  index exists to prevent, never by deleting a row just to make the build pass; then
+  boot. (The storage fragment, which is not housing, holds its own tables: some of its
+  DDL runs unprobed and holds those tables' locks to every boot's COMMIT, its probed
+  repairs make a boot a repair boot like any other, and its trigger repairs also touch
+  both parents, which the boot already holds.)
 - A CORRUPT Hearth row (a `ready_at_ms` past the database clock plus a whole cooldown,
   which only a backward database clock step or a bad row produces) is never honored. A
   read is the only detector: a row already bad when its account logs in reaches the
