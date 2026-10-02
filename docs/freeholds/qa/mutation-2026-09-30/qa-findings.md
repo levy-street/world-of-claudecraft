@@ -2977,34 +2977,43 @@ and each feed's queue code reaches every declaration it names, `forgetPending` a
   daily-active points that day; the outbox holds its relay, activity, link-change and queue-pop
   items in the polled process and the winner days stay in the database; the link-change feed's
   heal is the bot's hourly full resync, its `FULL_RESYNC_INTERVAL_MS` pinned; C36R1's disposition
-  notes it). C37R2 FIXED `2afa2c6f0a` (with T37R1, C37R4 and Q37R2: each feed's queue code is read
-  through the TypeScript parser as every top-level statement that names its queue or a cap and
-  every declaration of the module such a statement names, until none is left, so `claimDedupeKey`,
-  `forgetPending`, the ladder and its rungs, the pending indexes and a bare `MAX_QUEUE` alias are
-  read by the rule rather than by a list; the names another module supplies are pinned (only the
-  queue pops' test reset), and every statement outside the read set that names a state it declares
-  is pinned by name (the activity feed's `releaseDedupeKey` and six watch and batch functions of
-  the queue pops); C36R1's disposition notes it). C37R3 FIXED (see D37R1). C37R4 FIXED (see
+  notes it; the overview's pure-consumer claim dropped and the example counting every voice state
+  change, from round thirty-eight, L38R1 and H38R1; the daily-active grant's cases and the
+  resync's calls and defaults tied, from round thirty-eight, T38R3 and T38R5). C37R2 FIXED
+  `2afa2c6f0a` (with T37R1, C37R4 and Q37R2: each feed's queue code is read through the TypeScript
+  parser as every top-level statement that names its queue or a cap and every declaration of the
+  module such a statement names, until none is left, so `claimDedupeKey`, `forgetPending`, the
+  ladder and its rungs, the pending indexes and a bare `MAX_QUEUE` alias are read by the rule
+  rather than by a list; the names another module supplies are pinned (only the queue pops' test
+  reset), and every statement outside the read set that names a state it declares is pinned by
+  name (the activity feed's `releaseDedupeKey` and six watch and batch functions of the queue
+  pops); C36R1's disposition notes it; every statement naming any read declaration listed,
+  functions included, from round thirty-eight, Q38R1). C37R3 FIXED (see D37R1). C37R4 FIXED (see
   C37R2).
 - Q37R1 FIXED `2afa2c6f0a` (with T37R4 and T37R5: server/internal.ts is read through the
   TypeScript parser, every `drain<Name>` it names, called or not, each drain call pinned whole
   (`drainQueuePops(Date.now())`, so a pop lapses against the clock), and the four requeues the
   only ones, all in the one catch whose try holds every drain; a line comment holding `/*` inside
-  a feed function leaves the pin unchanged, a control; T36R2's disposition notes it). Q37R2 FIXED
-  (see C37R2). Q37R3 FIXED in this record (C36R1's disposition says the four feeds' suites are
-  named from `eb59d4a243`, noted there). Q37R4 FIXED `2afa2c6f0a` (with T37R7: the compose file
-  may hold no `&` at all, so it defines no anchor of any name or form, a later `&&` in a command
-  included; T36R4's disposition notes it).
+  a feed function leaves the pin unchanged, a control; T36R2's disposition notes it; every comment
+  dropped, read at every token's start and end, and no other file draining or requeueing a feed,
+  from round thirty-eight, T38R4 and T38R6). Q37R2 FIXED (see C37R2). Q37R3 FIXED in this record
+  (C36R1's disposition says the four feeds' suites are named from `eb59d4a243`, noted there).
+  Q37R4 FIXED `2afa2c6f0a` (with T37R7: the compose file may hold no `&` at all, so it defines no
+  anchor of any name or form, a later `&&` in a command included; T36R4's disposition notes it).
 - H37R1 FIXED (see D37R2). H37R2 FIXED (see C37R1).
 - S37R1 FIXED `2afa2c6f0a` (with L37R2: the restart note says the queued items of a batch a poll
   already took are lost if the bot stops before posting them, while its winner days are served
-  again until the bot marks them posted; C36R2's disposition notes it). S37R2 FIXED (see C37R1).
+  again until the bot marks them posted; C36R2's disposition notes it; a batch whose answer never
+  reaches the bot, the resync's heal of a lost link change and a winner day posted twice, and the
+  winner read and its marks tied, from round thirty-eight, L38R2 and T38R2). S37R2 FIXED (see
+  C37R1).
 - D37R1 FIXED `2afa2c6f0a` (with C37R3, M37R2 and T37R2: section L waits for the ended sign-out's
   backend to be gone, reads the rerun still waiting, and walks again to exactly one leaf, the
   dump; T36R3's disposition notes it). D37R2 FIXED `2afa2c6f0a` (with D37R3, H37R1, T37R3 and
   M37R1: the working session sleeps 30 s behind a rejection handler, names none while a second
   read shows it still active, and is then cancelled, its query answering 57014, its backend in the
-  failure path's terminate list; T36R5's disposition notes it). D37R3 FIXED (see D37R2).
+  failure path's terminate list; T36R5's disposition notes it; that list's comment naming a
+  working backend, from round thirty-eight, D38R1). D37R3 FIXED (see D37R2).
 - T37R1 FIXED (see C37R2). T37R2 FIXED (see D37R1). T37R3 FIXED (see D37R2). T37R4 FIXED (see
   Q37R1). T37R5 FIXED (see Q37R1). T37R6 FIXED (see C37R1). T37R7 FIXED (see Q37R4).
 - L37R1 FIXED (see C37R1). L37R2 FIXED (see S37R1). L37R3 FIXED in the ledger (round thirty-six's
@@ -3013,7 +3022,8 @@ and each feed's queue code reaches every declaration it names, `forgetPending` a
   installs no SIGTERM handler; whether node then ends at once, as the comment beside
   `stop_grace_period` says, or as PID 1 ignores SIGTERM until the 15 s SIGKILL and so may post or
   take a batch meanwhile, this host could not run; a maintainer decision, under OWED in the
-  ledger; that comment's redelivery clause now points to DEPLOY's restart note).
+  ledger; that comment's redelivery clause now points to DEPLOY's restart note, named by its
+  section and pinned from round thirty-eight, L38R4).
 - M37R1 FIXED (see D37R2). M37R2 FIXED (see D37R1).
 - Mutants on this round's new guards, each killed and its source restored: in the unit suite, a
   drain call after a line comment holding `/*`, the queue pops drained against a fixed clock, a
@@ -3021,5 +3031,92 @@ and each feed's queue code reaches every declaration it names, `forgetPending` a
   function naming only the relay's `MAX_QUEUE` alias, the bot's full resync made two-hourly, an
   `&&` in a compose comment, and a new writer of the link-change pending index; in section L, a
   naming statement that names a working session (failing at that arm) and one that hides a
-  `pg_dump` session (failing at the two-leaf walk). A control, a line comment holding `/*` inside
-  a feed function, leaves the unit suite green.
+  `pg_dump` session (failing at the two-leaf walk); no mutant reaches the walk to the dump alone
+  once the sign-out is gone, P3 failing first at the two-leaf walk (noted in round thirty-eight,
+  Q38R5). A control, a line comment holding `/*` inside a feed function, leaves the unit suite
+  green.
+
+## Round thirty-eight: eight fresh readers over round thirty-seven (`b8109600b0..b7e5193cf3`)
+
+Round thirty-eight's commits: `41db868baa` (DEPLOY: the Discord bot overview no longer calls the
+bot a pure consumer whose stop never affects the realm and points to lever 3 for what a stop
+costs; the restart note says a taken batch is lost too when its answer never reaches the bot, a
+lost link-change item heals at the hourly full resync, and a winner day posted but not yet marked
+is posted again; lever 3's daily-active example counts every post and voice state change; the
+compose file's bot comment names the stop_grace_period paragraph under Verifying health and the
+third escalation lever; the unit suite's `linesOf` reads leading and trailing comments at every
+token's start and end, with a sample control, its boundary list names every statement reaching a
+read declaration, functions included, and new ties pin the winner read and its marks, the
+daily-active grant's cases, the resync's defaults and calls, the files that drain or requeue a
+feed and the compose comment; section L's failure-path list comment; the unit file's Cost 1.1 s;
+the change log with it; kept whole for bisect), and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C38R1 to C38R4 |
+| qa-checklist | PASS | Q38R1 to Q38R5 |
+| server hot path | PASS | H38R1 to H38R3 |
+| privacy and security | PASS | S38R1 |
+| database performance | PASS | D38R1 |
+| test coverage | PASS | T38R1 to T38R7 |
+| docs librarian | PASS | L38R1 to L38R4 |
+| migration safety | PASS | M38R1 to M38R2 |
+
+27 findings: none blocking, 5 should-fix (Q38R1, T38R1, T38R2, T38R3, L38R1), 22 nice-to-have,
+every reader passing, and five (correctness, server hot path, privacy and security, database
+performance, migration safety) with no should-fix. The Discord bot overview still called the bot a
+pure consumer whose stop never affects the realm; it now points to lever 3. Two readers found the
+queue-code boundary list blind to a statement that only calls a read function; it now lists every
+statement that names a read declaration, and DEPLOY's new winner and daily-active claims are tied
+to the code.
+
+- C38R1 FIXED (see H38R1). C38R2 FIXED (see L38R4). C38R3 FIXED (see T38R4). C38R4 FIXED (see
+  T38R2; its daily-active half with T38R3).
+- Q38R1 FIXED `41db868baa` (with T38R1: the boundary list names every statement outside the read
+  set that names any declaration the read set holds, a state or a function, so the queue pops'
+  list gains `enqueueCandidate`, and a declaration's names include an enum's, a namespace's and a
+  destructured binding's; C37R2's disposition notes it). Q38R2 FIXED (see T38R4). Q38R3 FIXED (see
+  T38R5). Q38R4 FIXED (see L38R4). Q38R5 FIXED in this record (round thirty-seven's mutants bullet
+  says no mutant reaches the walk to the dump alone once the sign-out is gone, P3 failing first at
+  the two-leaf walk).
+- H38R1 FIXED `41db868baa` (with C38R1 and L38R3: lever 3's example is a linked member whose every
+  post and voice state change of a day, a join, a move, a mute, fell in the stop; C37R1's
+  disposition notes it). H38R2 FIXED (see L38R2). H38R3 RULED (the TypeScript API stays a
+  top-level import: it loads once per run of the file, the whole file is what the gate runs and
+  the Cost header measures, 1.1 s, and a `-t` filtered local run is no cost a guard counts).
+- S38R1 FIXED (see L38R2).
+- D38R1 FIXED `41db868baa` (the comment over section L's failure-path list says it holds backends
+  a failed order could leave waiting on a lock, or working; D37R2's disposition notes it).
+- T38R1 FIXED (see Q38R1). T38R2 FIXED `41db868baa` (with C38R4: `outboxHandler`'s first statement
+  is the winners read, pinned whole, and neither `markDiscordWinnersAnnounced` call lies in it; no
+  test runs the read's own filter, a day not yet marked, against a real database, the
+  daily-rewards owner's gap, under OWED in the ledger; S37R1's disposition notes it). T38R3 FIXED
+  `41db868baa` (`grantDailyActive` is named only by its declaration and its calls in the
+  `VOICE_STATE_UPDATE` and `MESSAGE_CREATE` cases of bot/main.ts; C37R1's disposition notes it).
+  T38R4 FIXED `41db868baa` (with C38R3 and Q38R2: `linesOf` reads leading and trailing comment
+  ranges at every token's start and end, JSDoc aside, with a sample control holding a trailing
+  comment, an inline block comment, a regex and a string; the space beside a comment dropped from
+  inside a line stays, so such a comment trips a pin, which its comment says; Q37R1's disposition
+  notes it). T38R5 FIXED `41db868baa` (with M38R2 and Q38R3: the `everyMs` defaults of
+  `dueForFullResync` and `fullResyncIfDue`, and every call to either in bot/, none passing an
+  interval of its own; C37R1's disposition notes it). T38R6 FIXED `41db868baa` (the tracked code
+  outside tests/ that names a feed's drain or requeue is exactly the four feed modules and
+  server/internal.ts; Q37R1's disposition notes it). T38R7 FIXED (see L38R4).
+- L38R1 FIXED `41db868baa` (DEPLOY's Discord bot overview says the bot holds nothing durable and
+  reads and writes the game only through the internal API, so a stop leaves the game running, and
+  points to the third escalation lever for what a stop costs; C37R1's disposition notes it). L38R2
+  FIXED `41db868baa` (with M38R1, S38R1 and H38R2: the restart note says a taken batch's queued
+  items are lost if the bot stops before posting them or the answer never reaches it, a lost
+  link-change item heals at the hourly full resync, and a winner day posted but not yet marked
+  when the bot stopped is posted again; S37R1's disposition notes it). L38R3 FIXED (see H38R1).
+  L38R4 FIXED `41db868baa` (with C38R2, Q38R4 and T38R7: the compose comment names the
+  stop_grace_period paragraph under DEPLOY.md's Verifying health for what of the outbox a stop
+  loses and the third escalation lever for the rest, pinned; L37R4's disposition notes it).
+- M38R1 FIXED (see L38R2). M38R2 FIXED (see T38R5).
+- Mutants on this round's new guards, each killed and its source restored: a new function that
+  drains the relay through a read function; the poll marking the winner days it serves; the
+  winners read changed; a catch-up daily-active grant on the guild seed; the full resync called
+  with a six-hour interval; the resync's default doubled; another server module draining the
+  relay; the compose comment's pointer reworded. Two controls: a trailing comment after a pinned
+  relay line leaves the unit suite green, and an inline block comment inside one trips its pin, as
+  `linesOf`'s comment says.

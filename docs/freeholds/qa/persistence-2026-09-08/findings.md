@@ -5801,6 +5801,12 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   outbox's own items; the outbox's code is read through the TypeScript parser, each feed's with
   every declaration it names; the compose file may hold no `&`; section L walks again once the
   ended sign-out is gone. Fixed in `2afa2c6f0a`; L37R4 flagged.
+- ROUND THIRTY-EIGHT, eight fresh readers over round thirty-seven: 27 findings, none blocking, 5
+  should-fix, every reader passing, five with no should-fix. The Discord bot overview drops its
+  pure-consumer claim and the restart note names every loss; the unit suite ties the winner read
+  and its marks, the daily-active grant's cases, the resync's defaults and calls and the files
+  that drain a feed, drops every comment, and lists every statement reaching a read declaration.
+  Fixed in `41db868baa`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5831,7 +5837,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   641, then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
   then 644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then
   647, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648,
-  then 648, then 648, then 648, then 648, then 648, then 648 passed, never a skip.
+  then 648, then 648, then 648, then 648, then 648, then 648, then 648 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
@@ -5897,6 +5903,15 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   or ignores SIGTERM as PID 1 until the 15 s SIGKILL (and so may post, or take and lose, a batch
   meanwhile) is unverified on this host, which runs no container; `init: true` or a handler is a
   maintainer decision (L37R4).
+- The winner days' own filter, a day not yet marked (`discord_announced_at IS NULL` in
+  `server/daily_rewards_db.ts`), is run by no test against a real database
+  (`tests/daily_rewards_winner_days_db.test.ts` mocks the pool); a real-database case belongs to
+  the daily-rewards owner (T38R2).
+- Two feed-owner comments the readers found stale, outside 07a: `server/internal.ts`'s outbox doc
+  comment still says three in-memory feeds and three requeues, where there are four;
+  `server/discord_link_changes.ts`'s `isEvictableFlexNoise` comment says the bot can never
+  re-learn a link transition's id from a resync, against the same file's header and the bot's
+  hourly reconciliation (round thirty-eight's reports).
 - The `.npmrc` pin is a maintainer decision. Recommendation: a content rule in the malware scan,
   pinned in `tests/malware_scan.test.ts`, refusing any `node-options`, `registry` or script hook
   line in `.npmrc`. That is cheaper and narrower than exempting a test that reads the file.
