@@ -470,7 +470,12 @@ export class NameplatePainter {
    * rogue's poisons and a druid's Lunar Tempest land here exactly like a warlock's
    * Blackrot, with no ability or class list anywhere on the path.
    */
-  private resolveDots(state: NameplateCanvasState, entity: Entity, player: Entity): void {
+  private resolveDots(
+    state: NameplateCanvasState,
+    entity: Entity,
+    player: Entity,
+    languageChanged: boolean,
+  ): void {
     const scale = this.nameplateDotScale();
     if (scale <= 0 || entity.kind !== 'mob' || entity.dead) {
       state.dots.count = 0;
@@ -492,6 +497,13 @@ export class NameplatePainter {
       if (!slot.iconUrl) {
         const source = entity.auras.find((aura) => aura.id === slot.iconKey);
         slot.iconUrl = nameplateDotIconUrl(slot.iconKey, source?.kind ?? '');
+      }
+      // A language switch re-formats both cached numbers: a steady stack count
+      // (unlike the countdown) would otherwise keep the old locale's digits
+      // until it next moved.
+      if (languageChanged) {
+        slot.timeValue = Number.NaN;
+        slot.stacksValue = Number.NaN;
       }
       // Re-format only when the number actually moves at the drawn precision:
       // above ten seconds that is once a second rather than once a frame, and
@@ -529,7 +541,7 @@ export class NameplatePainter {
     state.threat = plan.threat;
     state.comboPips = Math.max(0, Math.min(COMBO_PIP_MAX, plan.comboPips));
     state.hpFill = entity.hp / Math.max(1, entity.maxHp);
-    this.resolveDots(state, entity, player);
+    this.resolveDots(state, entity, player, languageChanged);
 
     const cast = castBarState(entity);
     state.castVisible = cast.visible;

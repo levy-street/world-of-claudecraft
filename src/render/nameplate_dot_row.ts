@@ -55,7 +55,12 @@ const TIME_EXPIRING_FILL = '#ffcf40';
  *  100% and scale with the row: the inset centres a single digit on the
  *  corner and the baseline sits just above the tile's bottom border. */
 const STACKS_INSET_X = 3;
+/** A two-digit count is about twice as wide, so its centre steps further in
+ *  to keep both digits inside the tile. */
+const STACKS_INSET_X_WIDE = 4.5;
 const STACKS_BASELINE_INSET = 1.5;
+// White over the icon art; under forced colors the host's drawText swaps every
+// fill for CanvasText (and the stroke for Canvas), the countdown's path too.
 const STACKS_FILL = '#ffffff';
 
 // Magic-school tints for the icon border, byte-identical to the --color-debuff-*
@@ -177,7 +182,7 @@ export function drawNameplateDotRow(
       host.drawText(
         ctx,
         slot.stacksText,
-        x + size - STACKS_INSET_X * scale,
+        x + size - (slot.stacksText.length > 1 ? STACKS_INSET_X_WIDE : STACKS_INSET_X) * scale,
         topY + size - STACKS_BASELINE_INSET * scale,
         nameplateDotTimeFont(scale),
         STACKS_FILL,

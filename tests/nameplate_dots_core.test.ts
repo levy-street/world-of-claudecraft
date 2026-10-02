@@ -438,6 +438,20 @@ describe('drawNameplateDotRow stack badge', () => {
     expect(stacks?.y).toBeLessThan(50 + size);
   });
 
+  it('steps a two-digit count further in so both digits stay on the tile', () => {
+    const one = host();
+    drawNameplateDotRow(ctx, planWith('5'), 100, 50, one);
+    const two = host();
+    drawNameplateDotRow(ctx, planWith('12'), 100, 50, two);
+    const single = one.texts.find((entry) => entry.text === '5');
+    const double = two.texts.find((entry) => entry.text === '12');
+    expect(double?.x).toBeLessThan(single?.x ?? 0);
+    // Centred text about 4 plate units per digit at 100%: the pair's right
+    // edge stays inside the tile's right border.
+    const right = 100 + NAMEPLATE_DOT_SIZE / 2;
+    expect((double?.x ?? 0) + 4).toBeLessThanOrEqual(right);
+  });
+
   it('draws no badge for an aura that does not stack', () => {
     const h = host();
     drawNameplateDotRow(ctx, planWith(''), 100, 50, h);
