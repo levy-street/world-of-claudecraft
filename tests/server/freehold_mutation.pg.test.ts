@@ -31,7 +31,7 @@
 // with no character save around them, and tests/guild_bank_pg_integration.test.ts
 // and tests/server/storage_purchase_db.pg.test.ts prove the legacy halves with
 // no housing participant.
-// Cost: 3.4 s
+// Cost: 3.7 s
 import { randomUUID } from 'node:crypto';
 import type { Pool as PgPool, PoolClient } from 'pg';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';

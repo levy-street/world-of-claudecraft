@@ -13,7 +13,7 @@
 // release, the G4 before G7 lock order, the login reader, clock_timestamp and the plans); the
 // nearest suites that do not are tests/server/freehold_db.pg.test.ts (the plot table and its
 // unfenced CAS) and tests/server/freehold_hearth_db.pg.test.ts (the Hearth table).
-// Cost: 8.1 s
+// Cost: 8.2 s
 //
 // Two pools stand in for two realm processes, each with its own holder string,
 // and the lease runs on a SHORT TTL passed through the ttlSeconds parameter.
