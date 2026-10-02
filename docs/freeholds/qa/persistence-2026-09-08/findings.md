@@ -5879,18 +5879,26 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   extensions, comment and ledger wording and a commit body. Fixed in `b9789aa5ad`.
 - ROUND FIFTY, eight fresh readers over round forty-nine: 23 findings, none blocking, 4
   should-fix, every reader passing, four with no should-fix. Every name section L reads from the
-  scopes around it is pinned with how often they declare it, once each, so no binding a statement
-  there makes shadows another (worded so in round fifty-one, C51R2); the JSX check is proven on a
-  sample of each root; the bot's non-code files and its imports from outside its directory are
-  pinned; kept bot names are checked distinct (named so in round fifty-one, Q51R4); the rest were
-  a second parse, the grant pin's pathspecs, comment and record wording and a commit body. Fixed
-  in `e448b6d828`.
+  scopes around it is pinned with how often they declare it, once each, so no second variable,
+  function, class or import binding there shadows another (worded so in round fifty-one, C51R2,
+  and round fifty-two, C52R1; the other declarations counted from round fifty-one); the JSX check
+  is proven on a sample of each root; the bot's non-code files and its imports from outside its
+  directory are pinned; kept bot names are checked distinct (named so in round fifty-one, Q51R4);
+  the rest were a second parse, the grant pin's pathspecs, comment and record wording and a commit
+  body. Fixed in `e448b6d828`.
 - ROUND FIFTY-ONE, eight fresh readers over round fifty: 25 findings, none blocking, 7 should-fix,
   one ruled on a misread, every reader passing, three with no should-fix. The bot route read takes
   its modules from esbuild's own list of the bot's bundle, the build options pinned whole; the
   scopes around section L take no parameters, the pg suite holds no `var`, and types count among
   the names declared there; the rest were a mutant named by an id only the evidence held, wording,
-  a second listing and a lookup that failed open. Fixed in `33eff5391f`.
+  a second listing, a lookup that failed open and a reading of a mutant that its log rules out
+  (counted so in round fifty-two, C52R2). Fixed in `33eff5391f`.
+- ROUND FIFTY-TWO, eight fresh readers over round fifty-one: 16 findings, none blocking, 4
+  should-fix, every reader passing, five with no should-fix. The bundle read takes a package only
+  from the root node_modules; the reads of the scopes around section L and of the declarations
+  there are proven on samples, and the functions around it bind no name of their own; the rest
+  were ledger and record wording, a comment, a lookup's throw, the build options' copy and the
+  package order. Fixed in `e4cf5bb85e`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5923,7 +5931,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then
   648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648,
   then 648, then 648, then 648, then 649, then 649, then 649, then 649, then 649, then 649, then
-  649 passed, never a skip.
+  649, then 649 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):

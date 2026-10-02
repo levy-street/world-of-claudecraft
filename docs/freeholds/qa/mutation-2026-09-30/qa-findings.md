@@ -4148,7 +4148,8 @@ the import pin did not read; the route read now takes its modules from esbuild's
 bot's bundle, the build script's options pinned whole. Three found the record naming a mutant by
 an id only the evidence holds. One should-fix rested on a misread: `botCode` held the JSX
 pathspecs by a `push` on the next line, now one list. The rest were the parse-once wording, round
-fifty's summaries, a second listing and a lookup that failed open.
+fifty's summaries, a second listing, a lookup that failed open, and a reading of round
+forty-nine's `.tsx` mutant that its log rules out (counted so in round fifty-two, C52R2).
 
 - C51R1 RULED, no change to the record: `botCode` gained `bot/*.tsx` and `bot/*.jsx` by a `push`
   on the line after its declaration, so the grant pin greps all eight pathspecs and L49R1 stands;
@@ -4158,17 +4159,19 @@ fifty's summaries, a second listing and a lookup that failed open.
   block, a `for` head or a label, the count proven on a sample; and type aliases, interfaces,
   enums, namespaces and import-equals count among the names declared there; the pin block's
   comment says so, and the ledger's ROUND FIFTY says what round fifty's pin held; C50R1's
-  disposition notes it). C51R3 FIXED `33eff5391f` (with S51R1, T51R2, S51R2 and T51R3: the route
+  disposition notes it; type parameters and a function expression's name pinned out too, from
+  round fifty-two, D52R1). C51R3 FIXED `33eff5391f` (with S51R1, T51R2, S51R2 and T51R3: the route
   read takes its modules from esbuild's own list of the bot's bundle, built with the options of
   `scripts/build_bot.mjs`, which are read whole; the bundle's modules from this repository must be
   the bot's code files and the two shared sim modules, and its packages `ws` alone, so the
   tsconfig alias, a `./..` path, a `.tsx` esbuild prefers or a `.json` import fails until a read
-  takes it; S50R2's disposition notes it). C51R4 FIXED in this record (with Q51R2 and L51R1: C49R1
-  and T50R2 describe the mutant they name rather than an id only the evidence holds). C51R5 FIXED
-  in this record (with H51R1 and Q51R3: round fifty's intro and H50R1 say which reads share the
-  one parse, the grant pin parsing its own). C51R6 RULED, no change: round forty-nine's mutant of
-  a tracked `bot/feed.tsx` ran with `botCode` holding `.tsx`, and its log shows the no-JSX pin
-  failing, the listing check passing.
+  takes it; S50R2's disposition notes it; a package taken only from the root `node_modules`, from
+  round fifty-two, S52R1). C51R4 FIXED in this record (with Q51R2 and L51R1: C49R1 and T50R2
+  describe the mutant they name rather than an id only the evidence holds). C51R5 FIXED in this
+  record (with H51R1 and Q51R3: round fifty's intro and H50R1 say which reads share the one parse,
+  the grant pin parsing its own). C51R6 RULED, no change: round forty-nine's mutant of a tracked
+  `bot/feed.tsx` ran with `botCode` holding `.tsx`, and its log shows the no-JSX pin failing, the
+  listing check passing.
 - Q51R1 FIXED (see C51R2). Q51R2 FIXED (see C51R4). Q51R3 FIXED (see C51R5). Q51R4 FIXED in this
   record and the ledger (with L51R3: round fifty's summary and the ledger's ROUND FIFTY name the
   check that kept bot names are distinct; `c6e7f080f9`'s body, which leaves it out, stays as it
@@ -4189,3 +4192,66 @@ fifty's summaries, a second listing and a lookup that failed open.
   `./..`, at the bundle's module list; a build option added to the bot's build script, at its
   whole read; and, added with intent-to-add and removed after, a tracked `bot/routes.json`
   imported by `bot/main.ts`, at the list of the bot's non-code files.
+
+## Round fifty-two: eight fresh readers over round fifty-one (`c6e7f080f9..17478cc191`)
+
+Round fifty-two's commits: `e4cf5bb85e` (the bundle read takes a package only from the root
+`node_modules`, proven on a sample, sorts its packages, ties its build options to the script's
+pinned lines and proves its lookup throws outside the bundle; the reads of the scopes around
+section L and of the declarations there are each proven on a sample, and the functions around the
+section may bind no name of their own, type parameters and a function expression's name included;
+the parse map's comment says which reads take it; the manifest's fifty-second entry; kept whole
+for bisect), and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C52R1, C52R2 |
+| qa-checklist | PASS | Q52R1, Q52R2 |
+| server hot path | PASS | none |
+| privacy and security | PASS | S52R1 |
+| database performance | PASS | D52R1 |
+| test coverage | PASS | T52R1 to T52R6 |
+| docs librarian | PASS | L52R1, L52R2 |
+| migration safety | PASS | M52R1, M52R2 |
+
+16 findings: none blocking, 4 should-fix (C52R1, S52R1, T52R1, T52R2), 12 nice-to-have, every
+reader passing, and five (qa-checklist, server hot path, database performance, docs librarian,
+migration safety) with no should-fix, server hot path with no finding at all. One reader found the
+bundle read taking any path with `node_modules/` in it for a package, so a module of this
+repository under such a directory went unread; only the root `node_modules` counts now, proven on
+a sample. One found two reads the last round added never exercised on the tree, the declarations
+around section L and the parameters of the functions around it; each is now proven on a sample,
+and the functions may bind no name of their own, type parameters and a function expression's name
+included, which two readers named. One found the ledger crediting round fifty's pin with
+declarations it did not count. The rest were the parse map's comment, round fifty-one's summaries,
+a lookup's throw, the build options' copy and the package order.
+
+- C52R1 FIXED in the ledger (its ROUND FIFTY says round fifty's pin counted variable, function,
+  class and import bindings, the other declarations from round fifty-one). C52R2 FIXED in this
+  record and the ledger (with Q52R2 and L52R2: round fifty-one's summary and the ledger's ROUND
+  FIFTY-ONE name C51R6's ruling; `17478cc191`'s body, which leaves it out, stays as it is).
+- Q52R1 FIXED `e4cf5bb85e` (with T52R5 and L52R1: the parse map's comment says the reads below
+  take it, not that no other read parses a file). Q52R2 FIXED (see C52R2).
+- S52R1 FIXED `e4cf5bb85e` (a module is a package only under the root `node_modules`, which
+  `.npmrc` keeps hoisted, proven on a sample that a deeper `node_modules` or a
+  `vendor_node_modules` directory is this repository's; C51R3's disposition notes it).
+- D52R1 FIXED `e4cf5bb85e` (with M52R1 and M52R2: the functions around section L may bind no name
+  of their own, type parameters and a function expression's name counted beside its parameters,
+  and the pin block's comment says so; C51R2's disposition notes it).
+- T52R1 FIXED `e4cf5bb85e` (the declarations read is one function, proven on a sample of each
+  statement form it counts, type alias, interface, enum, import-equals and namespace among them).
+  T52R2 FIXED `e4cf5bb85e` (the read of the scopes around a node is one function, proven on a
+  sample whose arrow and named function expression each bind names). T52R3 FIXED `e4cf5bb85e` (a
+  lookup of a file outside the bundle is shown to throw). T52R4 FIXED `e4cf5bb85e` (the test's
+  build options are written as the script writes them and compared with the script's pinned lines,
+  its outfile aside). T52R5 FIXED (see Q52R1). T52R6 FIXED `e4cf5bb85e` (the bundle's packages are
+  sorted before they are compared).
+- L52R1 FIXED (see Q52R1). L52R2 FIXED (see C52R2).
+- M52R1 FIXED (see D52R1). M52R2 FIXED (see D52R1).
+- Mutants on this round's new guards, each killed and its source restored: a module of this
+  repository under a `vendor_node_modules` directory, added with intent-to-add and imported by
+  `bot/main.ts`, removed after, at the bundle's module list; the scopes read narrowed to function
+  declarations, and the interface arm dropped from the declarations read, each at its sample; a
+  type parameter on the suite's callback, and the callback as a function expression named
+  `within`, at the pin of names the functions around bind; the test's build options drifting from
+  the script, at their tie; and the bundle lookup failing open again, at its throw.
