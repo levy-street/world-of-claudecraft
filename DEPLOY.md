@@ -1161,21 +1161,24 @@ For off-box safety, sync the directory to S3 occasionally:
   `public.account_freehold_hearth`, and every statement below names it so. Send each
   block below whole, with no realm booting or restarting: every block but PRINT locks
   the Hearth table, and a boot that waits behind one holds both parents. On any error,
-  send ROLLBACK first. Then: on 55P03 wait about 10 s and send the same block again,
-  at most about five times before finding the holder in `pg_stat_activity` and
-  `pg_locks`; on 42710 from RESTORE a boot put the CHECK back first, so re-run the
-  read; on 42P07 from PRINT send `DROP TABLE pg_temp.advance_token_print;` and PRINT
-  again; on 42710 or 42P07 from DISPLACE an earlier displacement holds the name: read
-  it (the read with `conname` set to the displaced name), send DROP if its definition
-  names `advance_token`, else rename it out of the way, and send DISPLACE again; on an
-  integrity error (SQLSTATE class 23) from NULL AND VALIDATE, see the drop rule; on
-  anything else, stop. First read what the name holds: `SELECT contype, convalidated,
-  pg_get_constraintdef(oid) FROM pg_constraint WHERE conrelid =
+  send ROLLBACK first. Then: on 55P03 or 40P01 wait about 10 s and send the same block
+  again, at most about five times before finding the holder in `pg_stat_activity` and
+  `pg_locks`; on 42710 from RESTORE the name was taken since the read, so re-run the
+  read; on 42703 from RESTORE the column itself is missing, so the next boot re-adds
+  it with its CHECK, a repair boot (above), and every Hearth trip fails until then, so
+  run that boot in the next quiet window; on 42P07 from PRINT send `DROP TABLE
+  pg_temp.advance_token_print;` and PRINT again; on 42710 or 42P07 from DISPLACE an
+  earlier displacement holds the name, so settle it by the drop rule and send DISPLACE
+  again, and if the drop rule's read finds no row a bare relation holds the name, so
+  stop and report it; on an integrity error (SQLSTATE class 23) from NULL AND
+  VALIDATE, see the drop rule; on 25P03 or a lost connection, reconnect and re-run the
+  read, which shows whether the block landed; on anything else, stop. First read what
+  the name holds: `SELECT contype, convalidated, pg_get_constraintdef(oid), (SELECT
+  array_agg(attname) FROM pg_attribute WHERE attrelid = conrelid AND attnum = ANY
+  (conkey)) AS columns FROM pg_constraint WHERE conrelid =
   'public.account_freehold_hearth'::regclass AND conname =
   'account_freehold_hearth_advance_token_shape'`, then:
-  - No row: send RESTORE, then NULL AND VALIDATE; no repair boot is needed. A 42703
-    from RESTORE means the column itself is missing: the next boot re-adds it with its
-    CHECK, a repair boot (above).
+  - No row: send RESTORE, then NULL AND VALIDATE; no repair boot is needed.
   - `contype` is `c` and the definition, a ` NOT VALID` suffix aside, is exactly
     `CHECK (((advance_token IS NULL) OR (advance_token ~ '^[0-9a-f]{32}$'::text)))`:
     the shape is checked and the boot is silent. If `convalidated` is false, send NULL
@@ -1194,17 +1197,19 @@ For off-box safety, sync the directory to S3 occasionally:
     The next boot finds the real CHECK and is silent if PRINT showed the exact text
     above; if PRINT differed, every boot keeps warning, so report it as in the case
     above.
-  - The drop rule for the displaced constraint: read it (the same read with `conname`
-    set to `account_freehold_hearth_advance_token_shape_displaced`). Once the CHECK is
-    validated, send DROP if its definition names `advance_token` (only the real CHECK
-    should constrain the token the server writes), and keep any other until nothing
-    needs it, or rename it out of the way if DISPLACE needs the name. If NULL AND
-    VALIDATE fails with an integrity error naming it and its definition names
-    `advance_token`, send DROP for it first; for any other, stop. In DROP for a
-    foreign key, add `LOCK TABLE` on the table it references `IN ACCESS EXCLUSIVE
-    MODE` right after the `SET LOCAL` lines, so the parent is taken before the Hearth
-    table as a trip takes them; a parent there stalls every realm's saves and logins
-    for at most the lock timeout plus the block, per attempt.
+  - The drop rule for a displaced constraint: read it (the same read with `conname`
+    set to `account_freehold_hearth_advance_token_shape_displaced`). Send DROP only
+    when its `columns` are exactly `{advance_token}` and its `contype` is not `f`:
+    only the real CHECK should constrain the token the server writes. For anything
+    else, stop and report it: dropping a constraint on other columns loses what it
+    guards, and a foreign key's drop also locks the table it references. Send that
+    DROP once the CHECK is validated, or earlier on the DISPLACE collision route (the
+    server writes only hex tokens, so the moment between that DROP and DISPLACE checks
+    nothing the writer does not). If NULL AND VALIDATE fails with an integrity error,
+    read the constraint's name from the error's first line, never copying its DETAIL,
+    which carries the row's account id; if it is the displaced constraint and this
+    rule allows its DROP, send DROP and then NULL AND VALIDATE again; for any other,
+    stop.
 
   RESTORE (the boot's own CHECK, NOT VALID, with no repair boot):
 
@@ -1218,8 +1223,9 @@ For off-box safety, sync the directory to S3 occasionally:
   COMMIT;
   ```
 
-  NULL AND VALIDATE (report the count it prints, never the tokens; VALIDATE takes
-  SHARE UPDATE EXCLUSIVE and does not block writes):
+  NULL AND VALIDATE (report the count it prints, never the tokens; the rows it nulls
+  stay locked to its COMMIT, and VALIDATE takes SHARE UPDATE EXCLUSIVE, which does not
+  block writes):
 
   ```sql
   BEGIN;

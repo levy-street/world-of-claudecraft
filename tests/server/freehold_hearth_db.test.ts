@@ -1071,23 +1071,52 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
     // dropped, and every statement naming the table the boot checks.
     expect(bullet).toContain('Send each block below whole, with no realm booting or restarting');
     expect(bullet).toContain('On any error, send ROLLBACK first');
+    // The error routes are a CLOSED set, each code tied to the block that
+    // raises it, plus the lock retry, the integrity route, the lost session
+    // and the stop for anything else.
+    expect(
+      [...bullet.matchAll(/on ([0-9A-Z]{5}(?: or [0-9A-Z]{5})*) from ([A-Z][A-Z ]*[A-Z])\b/g)].map(
+        (match) => `${match[1]} from ${match[2]}`,
+      ),
+    ).toEqual([
+      '42710 from RESTORE',
+      '42703 from RESTORE',
+      '42P07 from PRINT',
+      '42710 or 42P07 from DISPLACE',
+    ]);
+    expect(bullet).toContain('on 55P03 or 40P01 wait about 10 s and send the same block again');
     expect(bullet).toContain(
-      'on 42710 from RESTORE a boot put the CHECK back first, so re-run the read',
+      'on 42710 from RESTORE the name was taken since the read, so re-run the read',
     );
+    expect(bullet).toContain('on 42703 from RESTORE the column itself is missing');
     expect(bullet).toContain('on 42P07 from PRINT send `DROP TABLE pg_temp.advance_token_print;`');
     expect(bullet).toContain(
-      'on 42710 or 42P07 from DISPLACE an earlier displacement holds the name: read it (the read with `conname` set to the displaced name), send DROP if its definition names `advance_token`, else rename it out of the way, and send DISPLACE again',
+      'on 42710 or 42P07 from DISPLACE an earlier displacement holds the name, so settle it by the drop rule and send DISPLACE again',
     );
-    expect(bullet.indexOf('First read what the name holds')).toBeLessThan(
-      bullet.indexOf('No row: send RESTORE'),
+    expect(bullet).toContain(
+      'on an integrity error (SQLSTATE class 23) from NULL AND VALIDATE, see the drop rule',
     );
+    expect(bullet).toContain('on 25P03 or a lost connection, reconnect and re-run the read');
+    expect(bullet).toContain('on anything else, stop');
+    const readAt = bullet.indexOf('First read what the name holds');
+    expect(readAt).toBeGreaterThan(-1);
+    expect(readAt).toBeLessThan(bullet.indexOf('No row: send RESTORE'));
     expect(bullet).toContain('do not displace it');
     expect(bullet).toContain('Report it whatever `convalidated` says');
     expect(bullet).toContain('DISPLACE renames the impostor, never a drop');
-    expect(bullet).toContain('send DROP for it first; for any other, stop');
-    for (const name of ['RESTORE', 'NULL AND VALIDATE', 'PRINT', 'DISPLACE', 'DROP']) {
-      expect(bullet, name).toContain(`send ${name}`);
-    }
+    // The drop rule drops only a constraint on the token alone, never a
+    // foreign key, and an integrity error is read by its first line only.
+    expect(bullet).toContain(
+      'Send DROP only when its `columns` are exactly `{advance_token}` and its `contype` is not `f`',
+    );
+    expect(bullet).toContain('For anything else, stop and report it');
+    expect(bullet).toContain('never copying its DETAIL');
+    expect(bullet).toContain('send DROP and then NULL AND VALIDATE again; for any other, stop');
+    // Every name the prose sends an operator to heads a block (or is ROLLBACK),
+    // and every block is sent to.
+    expect(
+      new Set([...bullet.matchAll(/send ([A-Z][A-Z ]*[A-Z])\b/g)].map((match) => match[1])),
+    ).toEqual(new Set([...Object.keys(block), 'ROLLBACK']));
     expect(bullet).not.toMatch(
       /DROP CONSTRAINT (?:IF EXISTS )?"?account_freehold_hearth_advance_token_shape(?!_)/,
     );

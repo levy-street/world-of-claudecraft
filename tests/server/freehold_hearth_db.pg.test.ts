@@ -560,28 +560,57 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       expect(rowsOf(await session.query(block.PRINT))).toEqual([
         { pg_get_constraintdef: VALID_DEF },
       ]);
-      // An impostor under the name, an earlier displacement still holding the
-      // displaced name, and a non-hex token stored: the boot warns.
+      // The bullet's own read, run as written: by the probed name, and with
+      // `conname` set to the displaced name for the drop rule.
+      const flat = raw.replace(/\n\s*/g, ' ');
+      const readSql = (flat.match(/`(SELECT contype, convalidated, [^`]+)`/) ?? [
+        '',
+        '',
+      ])[1].replaceAll('public.account_freehold_hearth', legacyTable);
+      expect(readSql).toContain('array_agg(attname)');
+      const read = async (displaced: boolean) =>
+        rowsOf(
+          await session.query(
+            displaced
+              ? readSql.replace(`conname = '${NAME}'`, `conname = '${NAME}_displaced'`)
+              : readSql,
+          ),
+        );
+      // An impostor under the name and a non-hex token stored: the boot warns.
       await pool.query(`ALTER TABLE ${legacyTable} DROP CONSTRAINT IF EXISTS ${NAME}`);
       await pool.query(`ALTER TABLE ${legacyTable} ADD CONSTRAINT ${NAME} UNIQUE (advance_token)`);
-      await pool.query(
-        `ALTER TABLE ${legacyTable} ADD CONSTRAINT ${NAME}_displaced CHECK (advance_token IS NULL OR length(advance_token) = 32)`,
-      );
       await pool.query(`INSERT INTO ${legacyTable} (account_id, advance_token) VALUES ($1, $2)`, [
         CHECK_ACCOUNT,
-        // 32 characters, so the earlier displacement's length CHECK admits it,
+        // 32 characters, so an earlier displacement's length CHECK admits it,
         // and not hex, so the real CHECK would not.
         'z'.repeat(32),
       ]);
       expect(await boot()).toEqual([expect.stringContaining('is not the 32-hex token CHECK')]);
-      // DISPLACE meets the taken name (42710) and changes nothing; ROLLBACK
-      // first, then the earlier displacement names advance_token, so DROP it,
-      // and DISPLACE again.
-      await expect(session.query(block.DISPLACE)).rejects.toMatchObject({ code: '42710' });
-      await session.query('ROLLBACK');
-      expect((await named(NAME)).map((row) => row.def)).toEqual(['UNIQUE (advance_token)']);
-      await session.query(block.DROP);
-      expect(await named(`${NAME}_displaced`)).toEqual([]);
+      expect(await read(false)).toEqual([
+        expect.objectContaining({ contype: 'u', pg_get_constraintdef: 'UNIQUE (advance_token)' }),
+      ]);
+      // An earlier displacement holding the displaced name, in each shape: a
+      // key, whose index collides first (42P07), and a CHECK, whose name does
+      // (42710). DISPLACE changes nothing; ROLLBACK first; the drop rule's read
+      // shows the token alone and no foreign key, so DROP it; then go on.
+      for (const [earlier, code, contype] of [
+        ['UNIQUE (advance_token)', '42P07', 'u'],
+        ['CHECK (advance_token IS NULL OR length(advance_token) = 32)', '42710', 'c'],
+      ] as const) {
+        await pool.query(`ALTER TABLE ${legacyTable} ADD CONSTRAINT ${NAME}_displaced ${earlier}`);
+        await expect(session.query(block.DISPLACE), earlier).rejects.toMatchObject({ code });
+        await session.query('ROLLBACK');
+        expect(
+          (await named(NAME)).map((row) => row.def),
+          earlier,
+        ).toEqual(['UNIQUE (advance_token)']);
+        const settled = await read(true);
+        expect(settled, earlier).toHaveLength(1);
+        expect(settled[0].contype, earlier).toBe(contype);
+        expect(String(settled[0].columns), earlier).toMatch(/^\{?advance_token\}?$/);
+        await session.query(block.DROP);
+        expect(await named(`${NAME}_displaced`), earlier).toEqual([]);
+      }
       await session.query(block.DISPLACE);
       // The impostor kept under the displaced name, the real CHECK back NOT
       // VALID (the stored bad token not scanned); the next boot is silent and
