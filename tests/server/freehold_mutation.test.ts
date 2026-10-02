@@ -1529,8 +1529,17 @@ describe('the claim renewer', () => {
       stopped = true;
     });
     // The stop does not wait out a chunk's wall for a checkout that never
-    // answers: it resolves with the gate still shut.
-    await stop;
+    // answers: it resolves with the gate still shut, well inside that wall
+    // (raced against a timer, so a lost cut fails here rather than by timeout).
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const first = await Promise.race([
+      stop.then(() => 'stop' as const),
+      new Promise<'wall'>((resolve) => {
+        timer = setTimeout(() => resolve('wall'), FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs / 5);
+      }),
+    ]);
+    clearTimeout(timer);
+    expect(first).toBe('stop');
     await pass;
     expect(stopped).toBe(true);
     expect(f.statements).toEqual([]);
@@ -6557,7 +6566,8 @@ describe('the Hearth trip admission', () => {
   });
 
   it('never re-dispatches to the same session object once its character or lease nonce changed in place', async () => {
-    for (const change of ['leaseNonce', 'characterId'] as const) {
+    // 'none' is the control: the same object, unchanged, IS re-dispatched.
+    for (const change of ['none', 'leaseNonce', 'characterId'] as const) {
       const session: { pid: number; characterId: number; accountId: number; leaseNonce: string } = {
         pid: 1,
         characterId: 10,
@@ -6590,11 +6600,11 @@ describe('the Hearth trip admission', () => {
       trips.admission('account:7', 1);
       // The SAME object, its identity rewritten while the trip was in flight.
       if (change === 'leaseNonce') session.leaseNonce = 'n2';
-      else session.characterId = 11;
+      if (change === 'characterId') session.characterId = 11;
       release();
       await drain();
-      expect(redispatched, change).toEqual([]);
-      expect(trips.counters.abandoned, change).toBe(1);
+      expect(redispatched, change).toEqual(change === 'none' ? [1] : []);
+      expect(trips.counters.abandoned, change).toBe(change === 'none' ? 0 : 1);
     }
   });
 
@@ -6615,6 +6625,53 @@ describe('the Hearth trip admission', () => {
     expect(trips.counters.threwAfterOutcome).toBe(1);
     // The error's class, never its message.
     expect(warnings).toEqual(['freehold hearth trip threw after its outcome was counted (Error)']);
+  });
+
+  it('writes only a cleaned, bounded error class into that line, and a hostile name stays inside', async () => {
+    const sessions = new Map([[1, { pid: 1, characterId: 10, accountId: 7, leaseNonce: 'n1' }]]);
+    const named = (name: unknown) => Object.assign(new Error('a value'), { name });
+    const hostile = new Error('a value');
+    Object.defineProperty(hostile, 'name', {
+      get() {
+        throw new Error('the name getter threw');
+      },
+    });
+    const line = (kind: string) =>
+      `freehold hearth trip threw after its outcome was counted (${kind})`;
+    const cases: Array<[string, unknown, string[]]> = [
+      // A newline or any other character outside [\w.$-] becomes '?'.
+      ['a control character', named('Bad\nName'), [line('Bad?Name')]],
+      ['a long class', named('E'.repeat(100)), [line('E'.repeat(64))]],
+      // A name that is not a string is reported by the thrown value's type.
+      ['a numeric name', named(5), [line('object')]],
+      ['a thrown string', 'a value', [line('string')]],
+      // A name getter that throws: counted, no line, no unhandled rejection.
+      ['a throwing name', hostile, []],
+    ];
+    const unhandled: unknown[] = [];
+    const onUnhandled = (reason: unknown) => unhandled.push(reason);
+    process.on('unhandledRejection', onUnhandled);
+    try {
+      for (const [label, thrown, expected] of cases) {
+        const warnings: string[] = [];
+        const trips = createFreeholdHearthTrips(
+          hostOver(sessions, {
+            redispatch: () => {
+              throw thrown;
+            },
+            warn: (message) => warnings.push(message),
+          }),
+        );
+        trips.admission('account:7', 1);
+        await drain();
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        expect(trips.counters.threwAfterOutcome, label).toBe(1);
+        expect(warnings, label).toEqual(expected);
+      }
+    } finally {
+      process.off('unhandledRejection', onUnhandled);
+    }
+    expect(unhandled).toEqual([]);
   });
 
   it('keeps a throwing warn port and a throwing clock inside the trip: counted, the flag cleared', async () => {
