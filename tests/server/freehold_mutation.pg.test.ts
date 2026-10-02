@@ -47,7 +47,7 @@
 // tests/guild_bank_pg_integration.test.ts and
 // tests/server/storage_purchase_db.pg.test.ts prove the legacy halves with no
 // housing participant.
-// Cost: 13.3 s
+// Cost: 13.8 s
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import type { Pool as PgPool, PoolClient } from 'pg';
@@ -3810,6 +3810,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       const tableHolder = session();
       const tableRealm = session();
       const secondRealm = session();
+      const leafHolder = session();
+      const dumpShaped = session();
+      const leafRealm = session();
       let open = false;
       // Backends a failed order could leave waiting to commit after the test.
       const waiting: number[] = [];
@@ -3822,6 +3825,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         await tableHolder.connect();
         await tableRealm.connect();
         await secondRealm.connect();
+        await leafHolder.connect();
+        await dumpShaped.connect();
+        await leafRealm.connect();
         const leftOn = async (client: typeof signer) =>
           Number((await client.query(signedOut)).rows[0].left);
         const before = await leftOn(fresh);
@@ -3980,18 +3986,28 @@ d('the housing mutation boundary (REAL Postgres)', () => {
             { pid: secondRealmPid, application_name: '', state: 'active' },
           ]),
         );
+        expect(byPid(await named(secondRealmPid))).toEqual(
+          byPid([
+            { pid: tableRealmPid, application_name: '', state: 'active' },
+            { pid: tableHolderPid, application_name: 'psql', state: 'idle in transaction' },
+          ]),
+        );
         // Every pid named, in turn, until each names none.
-        const leaves: Awaited<ReturnType<typeof named>> = [];
-        const reached = new Set<number>([rerunPid]);
-        const next = [...(await named(rerunPid))];
-        while (next.length > 0 && reached.size < 10) {
-          const at = next.shift() as (typeof next)[number];
-          if (reached.has(at.pid)) continue;
-          reached.add(at.pid);
-          const onward = await named(at.pid);
-          if (onward.length === 0) leaves.push(at);
-          next.push(...onward);
-        }
+        const walk = async (from: number) => {
+          const leaves: Awaited<ReturnType<typeof named>> = [];
+          const reached = new Set<number>([from]);
+          const next = [...(await named(from))];
+          while (next.length > 0 && reached.size < 10) {
+            const at = next.shift() as (typeof next)[number];
+            if (reached.has(at.pid)) continue;
+            reached.add(at.pid);
+            const onward = await named(at.pid);
+            if (onward.length === 0) leaves.push(at);
+            next.push(...onward);
+          }
+          return { leaves, reached };
+        };
+        const { leaves, reached } = await walk(rerunPid);
         expect(leaves).toEqual([
           { pid: tableHolderPid, application_name: 'psql', state: 'idle in transaction' },
         ]);
@@ -4004,6 +4020,67 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         expect(await until(() => gone(secondRealmPid), 0)).toBe(0);
         expect(await leftOn(fresh)).toBe(0);
         expect(await db.accountAndScopeForToken(held)).toBeNull();
+        // A walk that ends at two sessions naming none: a stopped realm's
+        // statement queued for ACCESS EXCLUSIVE behind both an open sign-out
+        // and a dump-shaped ACCESS SHARE. Each decides by its own rule: the
+        // sign-out is ended, the dump never is, and the realm's statement
+        // behind it is ended by The nightly dump's statement.
+        const twice = hex().repeat(2);
+        await db.saveToken(twice, accountId);
+        await dumpShaped.query("SET application_name = 'pg_dump'");
+        await dumpShaped.query('BEGIN ISOLATION LEVEL REPEATABLE READ');
+        await dumpShaped.query('LOCK TABLE auth_tokens IN ACCESS SHARE MODE');
+        await leafHolder.query("SET application_name = 'psql'");
+        await leafHolder.query('BEGIN');
+        await leafHolder.query(signOut);
+        const dumpPid = await pidOf(dumpShaped);
+        const leafHolderPid = await pidOf(leafHolder);
+        const leafRealmPid = await pidOf(leafRealm);
+        waiting.push(leafRealmPid);
+        void leafRealm
+          .query('BEGIN; LOCK TABLE auth_tokens IN ACCESS EXCLUSIVE MODE')
+          .catch(() => {});
+        expect(await until(() => waitOf(leafRealmPid), 'relation')).toBe('relation');
+        stop(leafRealm);
+        const leafRerun = signer.query(signOut).then(
+          () => 'ran',
+          (error: { code?: string }) => error.code,
+        );
+        expect(await until(() => waitOf(rerunPid), 'relation')).toBe('relation');
+        const both = await walk(rerunPid);
+        expect(byPid(both.leaves)).toEqual(
+          byPid([
+            { pid: leafHolderPid, application_name: 'psql', state: 'idle in transaction' },
+            { pid: dumpPid, application_name: 'pg_dump', state: 'idle in transaction' },
+          ]),
+        );
+        await pool.query(terminateSql.replace('<pid>', String(leafHolderPid)));
+        expect(await waitOf(rerunPid)).toBe('relation');
+        const nightly = operatorSql('SELECT a.pid, a.client_addr');
+        expect((await pool.query(nightly)).rows.map((r: { pid: number }) => r.pid)).toEqual([
+          leafRealmPid,
+        ]);
+        expect(await leafRerun).toBe('ran');
+        expect(await until(() => gone(leafRealmPid), 0)).toBe(0);
+        expect(
+          (await pool.query('SELECT state FROM pg_stat_activity WHERE pid = $1', [dumpPid])).rows,
+        ).toEqual([{ state: 'idle in transaction' }]);
+        await dumpShaped.query('ROLLBACK');
+        expect(await leftOn(fresh)).toBe(0);
+        expect(await db.accountAndScopeForToken(twice)).toBeNull();
+        // A session that is working, waiting on no lock, names none.
+        const freshPid = await pidOf(fresh);
+        const sleeping = fresh.query('SELECT pg_sleep(0.5)');
+        expect(
+          await until(
+            async () =>
+              (await pool.query('SELECT state FROM pg_stat_activity WHERE pid = $1', [freshPid]))
+                .rows[0]?.state,
+            'active',
+          ),
+        ).toBe('active');
+        expect(await named(freshPid)).toEqual([]);
+        await sleeping;
         done = true;
       } finally {
         if (open) await signer.query('ROLLBACK').catch(() => {});
@@ -4022,6 +4099,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         await tableHolder.end().catch(() => {});
         await tableRealm.end().catch(() => {});
         await secondRealm.end().catch(() => {});
+        await leafHolder.end().catch(() => {});
+        await dumpShaped.end().catch(() => {});
+        await leafRealm.end().catch(() => {});
       }
       expect(await db.accountAndScopeForToken(full)).toBeNull();
       expect(await db.accountAndScopeForToken(read)).toBeNull();

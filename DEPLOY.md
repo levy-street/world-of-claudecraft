@@ -2399,8 +2399,10 @@ sudo docker compose --profile discord restart discord-bot
 The container also runs under `mem_limit: 512m` with `memswap_limit: 512m`, so a leak
 kills the bot rather than the game or the database sharing the host, and
 `stop_grace_period: 15s`, which is ample because the bot has nothing to save: the
-outbox lives on the server and redelivers anything unacknowledged on the next poll,
-within each feed's cap (lever 3 below).
+outbox lives on the server and hands the restarted bot what is still queued, within
+the bounds lever 3 below gives, and a queue pop only while its offer stands; a batch a
+poll already took (its 200 is the outbox's only acknowledgement) is lost if the bot
+stops before posting it.
 
 ### Fatal gateway close: the crash loop is by design
 
@@ -2476,25 +2478,28 @@ no image and is open even then:
    sudo docker compose --profile discord stop discord-bot
    ```
 
-   The game is unaffected. The bot is a pure consumer, so stopping it costs role,
-   nickname, presence, relay, and activity sync until it is started again, and nothing
-   else. Queued outbox items wait in the game process (the winner days excepted, which
-   the game reads from the database), and only within bounds: each feed keeps only its
-   newest items once full (`RELAY_MAX_QUEUE`, `ACTIVITY_MAX_QUEUE`,
-   `LINK_CHANGE_MAX_QUEUE`, `QUEUE_POP_MAX_QUEUE`), and a queue pop lapses with its
-   offer, so a long stop delivers only the newest of each feed and no pop that lapsed
-   meanwhile; any end of the game process while it holds (a recreate for a shared key's
-   edit or a release, a stop or restart, a crash, the watchdog's restart) drops
-   everything queued since the stop. While it holds, every start of the bot lifts it:
-   any `up` of the bot (the first two levers', an Environment keys edit's, the Enabling
-   block's), a `start` or `restart`, and, with `discord` in `COMPOSE_PROFILES` in
-   `.env`, every `up -d` that names no service (stop it again after one, as the release
-   steps say). So while it holds, start the bot only to lift it: an `.env` edit for the
-   bot reaches it then. Lift it only as the first two levers run it, with
-   `sudo docker compose --profile discord up -d --no-deps discord-bot` (not while an
-   image built for a coming release waits), never with `start` or `restart`, which
-   revive the stopped container on the image it was created from, which need not be the
-   one the game runs once a release or a rollback has run since.
+   The game is unaffected. The bot is a pure consumer, so stopping it costs
+   Discord-side work alone: the role, nickname, presence, relay, activity, link-change
+   and queue-pop delivery it makes waits until it is started again, and what the outbox
+   drops meanwhile never comes. The outbox holds those items in the memory of the game
+   process the bot polls (the one `GAME_SERVER_URL` names), the winner days excepted,
+   which the game reads from the database. Each feed holds at most its cap
+   (`RELAY_MAX_QUEUE`, `ACTIVITY_MAX_QUEUE`, `LINK_CHANGE_MAX_QUEUE`,
+   `QUEUE_POP_MAX_QUEUE`) and, once full, drops by its own rule: the relay, activity
+   and queue-pop feeds their oldest items, the link-change feed its link and unlink
+   items last (the bot's periodic re-read of the linked set heals what it drops); a
+   queue pop also lapses with its offer; and any end of the game process while it holds
+   (a recreate for a shared key's edit or a release, a stop or restart, a crash, the
+   watchdog's restart) drops everything still queued. While it holds, every start of
+   the bot lifts it: any `up` of the bot (the first two levers', an Environment keys
+   edit's, the Enabling block's), a `start` or `restart`, and, with `discord` in
+   `COMPOSE_PROFILES` in `.env`, every `up -d` that names no service (stop it again
+   after one, as the release steps say). So while it holds, start the bot only to lift
+   it: an `.env` edit for the bot reaches it then. Lift it only as the first two levers
+   run it, with `sudo docker compose --profile discord up -d --no-deps discord-bot`
+   (not while an image built for a coming release waits), never with `start` or
+   `restart`, which revive the stopped container on the image it was created from,
+   which need not be the one the game runs once a release or a rollback has run since.
 
 ## Deploying an SFX Studio export
 

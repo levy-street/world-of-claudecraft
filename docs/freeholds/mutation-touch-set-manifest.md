@@ -1440,3 +1440,7 @@ What changed the contract above:
   bounds (each feed capped, a queue pop lapsing with its offer, any end of the game process
   dropping what is queued) and has every session a waiting rerun's walk reaches that names none
   decide, a step that names several included.
+- A thirty-sixth round of eight fresh readers: no P12 change; `DEPLOY.md` states lever 3's cost
+  whole (what waits for the bot, what the outbox drops for good, each feed's own drop rule, the
+  polled process alone) and says a batch a poll already took is lost if the bot stops before
+  posting it.
