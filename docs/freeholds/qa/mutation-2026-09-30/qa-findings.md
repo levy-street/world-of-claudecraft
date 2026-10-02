@@ -4402,10 +4402,11 @@ tracked-files check skipping a file deleted on disk, M53R1's comment and an evid
 
 Round fifty-five's commits: `37affe1ec3` (the bundle read's opening comment says its packages are
 held to ws by path; the package rule's comment names any other directory whose name holds
-`node_modules`, says the ws rule rests on the root `package.json` pin, and says where the lockfile
-fetches ws from is not read; the ws rule's sample holds a ws file whose own name holds
-`node_modules`; the manifest's fifty-fifth entry; kept whole for bisect), and the commit that adds
-this section.
+`node_modules`, says that `node_modules/ws/` holding ws's own published code rests on the root
+`package.json` pin (worded so in round fifty-six, L56R2; `37affe1ec3`'s body, which says the ws
+rule does, stays as it is), and says where the lockfile fetches ws from is not read; the ws rule's
+sample holds a ws file whose own name holds `node_modules`; the manifest's fifty-fifth entry; kept
+whole for bisect), and the commit that adds this section.
 
 | Reader | Verdict | Findings |
 |---|---|---|
@@ -4437,12 +4438,75 @@ finding a note names.
 - S55R1 FIXED `37affe1ec3` (the package rule's comment says that `node_modules/ws/` holding ws's
   own published code rests on the root `package.json` pin, no patch of ws and no ws spec or
   override but a version range, so a change there for ws needs the bundle read reviewed too, and
-  that where the lockfile fetches that range from is not read).
+  that where the lockfile fetches that range from is not read; the premise stated as one the read
+  takes and does not check, with what holds part of it and what is not read, from round fifty-six,
+  C56R1, and the pin's comment naming the bundle read back, from round fifty-six, L56R1).
 - T55R1 FIXED (see C55R1). T55R2 FIXED `37affe1ec3` (the ws rule's sample holds
   `node_modules/ws/lib/x_node_modules.js`, so a check that reads `node_modules` only as a
   directory fails). T55R3 FIXED in this record (with L55R2: round fifty-four's intro says its
   sample holds ws nested in another package).
 - L55R1 FIXED (see C55R1). L55R2 FIXED (see T55R3). L55R3 FIXED in this record (round fifty-four's
   summary says two more readers named it in three nice-to-haves).
-- Mutants on this round's new guard, killed and its source restored: the ws rule reading
-  `node_modules` only as a directory, with its slash, at the ws rule's sample.
+- A mutant on this round's new sample entry, killed and its source restored (worded so in round
+  fifty-six, L56R3): the ws rule reading `node_modules` only as a directory, with its slash, at
+  the ws rule's sample.
+
+## Round fifty-six: eight fresh readers over round fifty-five (`3848d46123..5c98f5a6f8`)
+
+Round fifty-six's commits: `d2873d8e4a` (the root `package.json` pin takes a spec as a range only
+in its plain form, an exact version or one led by `^` or `~`, and lists any other, proven on
+samples of a prerelease, a tarball path led by a digit and one led by an exact version, a tilde
+path, a wider range and a tag; the pin's comment names the bot's bundle read; the bundle read's
+package rule states that `node_modules/ws/` holding ws's own published code is a premise it does
+not check, names the pin and the two checks after it as holding part of it, and lists what else is
+not read; the ws rule's sample holds a directory whose name begins with `node_modules`; the
+manifest's fifty-sixth entry; kept whole for bisect), and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C56R1 |
+| qa-checklist | PASS | Q56R1 |
+| server hot path | PASS | H56R1 |
+| privacy and security | PASS | S56R1 |
+| database performance | PASS | none |
+| test coverage | PASS | T56R1 to T56R3 |
+| docs librarian | PASS | L56R1 to L56R3 |
+| migration safety | PASS | none |
+
+10 findings: none blocking, 2 should-fix (T56R1, L56R1), 8 nice-to-have, every reader passing, and
+six (correctness, qa-checklist, server hot path, privacy and security, database performance,
+migration safety) with no should-fix, two of them with no finding at all. One reader found the
+`package.json` pin, which the last round named as part of the ws rule's premise, reading a spec as
+a version range by its first character, so a tarball or path spec led by a digit or a tilde, which
+pnpm installs from this repository, passed as one; a range is now only its plain form. One found
+the tie to that pin stated only at the read that stays green, which one more named as a
+nice-to-have; the pin's comment now names the bundle read. Four found the premise's sentence
+leaving out what else holds or could change it (the checks on a pnpm workspace file and a
+pnpmfile, an install script); it is now stated as a premise the read does not check. The rest were
+a sample entry and two record wordings.
+
+- C56R1 FIXED `d2873d8e4a` (with Q56R1, S56R1 and T56R3: the package rule's comment states that
+  `node_modules/ws/` holding ws's own published code is the read's premise, not one it checks,
+  that the root `package.json` pin and the two checks after it, on a pnpm workspace file and a
+  pnpmfile, hold part of it, and that an install script, a build step and where the lockfile
+  fetches the range from are not read; S55R1's disposition notes it).
+- Q56R1 FIXED (see C56R1).
+- H56R1 FIXED (see L56R1).
+- S56R1 FIXED (see C56R1).
+- T56R1 FIXED `d2873d8e4a` (the `package.json` pin takes a spec as a range only when it is an
+  exact version or one led by `^` or `~`, a prerelease allowed, and lists any other, proven on
+  samples of a prerelease, a tarball path led by a digit and one led by an exact version, a tilde
+  path, a wider range and a tag; a comment says so). T56R2 FIXED `d2873d8e4a` (the ws rule's
+  sample holds `node_modules/ws/lib/node_modules_x/y/i.js`, so a check that reads `node_modules`
+  only before a slash or a dot fails). T56R3 FIXED (see C56R1).
+- L56R1 FIXED `d2873d8e4a` (with H56R1: the `package.json` pin's comment names the bot's bundle
+  read, which takes `node_modules/ws/` as ws's own published code partly on that pin, so a change
+  there for ws needs that read reviewed too; S55R1's disposition notes it). L56R2 FIXED in this
+  record (round fifty-five's intro says that `node_modules/ws/` holding ws's own published code
+  rests on the pin). L56R3 FIXED in this record (round fifty-five's mutant line names one mutant
+  on a sample entry).
+- Mutants on this round's new guards, each killed and its source restored: the range read by its
+  first character again, and the range grammar without its end anchor and without its tilde, each
+  at the classifier's samples; the grammar without its start anchor, at the pin over the real
+  specs; and the ws rule reading `node_modules` only before a slash or a dot, at the ws rule's
+  sample.

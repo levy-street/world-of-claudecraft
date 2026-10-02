@@ -5919,6 +5919,12 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   one stale comment: the bundle read's opening comment still said it named its packages; the rest
   were the package rule's comment and its tie to the root `package.json` pin, a sample entry and
   record wording. Fixed in `37affe1ec3`.
+- ROUND FIFTY-SIX, eight fresh readers over round fifty-five: 10 findings, none blocking, 2
+  should-fix, every reader passing, six with no should-fix. The `package.json` pin took a tarball
+  or path spec led by a digit or a tilde for a version range; a range is now only an exact version
+  or one led by `^` or `~`. The pin's comment names the bot's bundle read, and the bundle read
+  states ws's own code as a premise it does not check; the rest were a sample entry and record
+  wording. Fixed in `d2873d8e4a`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5941,6 +5947,10 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   (R-12).
 - The operator's corrupt-Hearth repair could shorten a healthy cooldown if run during a database
   clock step; DEPLOY.md now has a read-only detector first and forbids the repair during a step.
+- The renewer guard's `package.json` pin read a dependency spec as a version range by its first
+  character, so a tarball or path spec led by a digit or a tilde, which pnpm installs from this
+  repository, passed as one (round fifty-six, T56R1); a range is now only an exact version or one
+  led by `^` or `~`.
 
 ### EVIDENCE
 
@@ -5951,7 +5961,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then
   648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648,
   then 648, then 648, then 648, then 649, then 649, then 649, then 649, then 649, then 649, then
-  649, then 649, then 649, then 649, then 649 passed, never a skip.
+  649, then 649, then 649, then 649, then 649, then 649 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
