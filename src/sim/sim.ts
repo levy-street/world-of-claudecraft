@@ -767,6 +767,7 @@ import {
 } from './rift/rift_lockpick';
 import {
   advanceRiftRollers as advanceRiftRollersImpl,
+  emitRiftDeparture as emitRiftDepartureImpl,
   enterRift as enterRiftImpl,
   hoardBossCueViewsForPlayer,
   leaveRift as leaveRiftImpl,
@@ -5406,6 +5407,7 @@ export class Sim {
       leaveDungeon: sim.leaveDungeon.bind(sim),
       enterRift: sim.enterRift.bind(sim),
       leaveRift: sim.leaveRift.bind(sim),
+      emitRiftDeparture: (pid, from) => emitRiftDepartureImpl(sim.ctx, pid, from),
       riftOpenTreasure: sim.riftOpenTreasure.bind(sim),
       resetDungeonInstances: sim.resetDungeonInstances.bind(sim),
       inheritDungeonResetLocks: sim.inheritDungeonResetLocks.bind(sim),
