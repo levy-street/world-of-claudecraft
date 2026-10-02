@@ -2311,6 +2311,7 @@ describe('the claim renewer', () => {
       "Without the `discord` profile (no `--profile discord`, no `discord` in `COMPOSE_PROFILES` in `.env`, and no command that names `discord-bot`, which enables its profile by itself) the service simply never starts, which is the supported way to run a realm with no Discord integration; with `discord` in `COMPOSE_PROFILES`, every `up -d` that names no service starts it too, a release's step 6 included.",
       "While the third escalation lever (below) holds, either edit is made without the bot's `up`, which would lift that lever: the `up` that lifts it runs the bot with the edit.",
       "so once the realm is verified run the bot's guarded line under the release steps (a restart keeps its old image, and a bot the third escalation lever stopped stays stopped), or those cards post",
+      "the outbox lives on the server and redelivers anything unacknowledged on the next poll, within each feed's cap (lever 3 below).",
       'Act on it, for a running bot only (one the third escalation lever stopped starts again only as that lever says), with:',
       "The fix is to enable the intents (the restart policy's next attempt picks them up) or to correct the token in `.env` and recreate the game and then the bot by Environment keys above (a `restart` keeps the old token), never to disable the restart policy.",
       '**Escalation levers**, in order. The first two are each an `.env` edit (not while an image built for a coming release waits; Environment keys above) plus `sudo docker compose --profile discord up -d --no-deps discord-bot`; the third, a stop, starts no image and is open even then:',
@@ -2337,7 +2338,27 @@ describe('the claim renewer', () => {
     expect(leverEnd).toBeGreaterThan(-1);
     const lever = leverItem.slice(0, leverEnd).replace(/\s+/g, ' ');
     expect(lever).toContain(
-      "Queued outbox items wait in the game process (the winner days excepted, which the game reads from the database) and are delivered when it comes back, so a recreate of the game while it holds (a shared key's edit, a release) drops the relay, activity, link-change and queue-pop items queued since the stop.",
+      "Queued outbox items wait in the game process (the winner days excepted, which the game reads from the database), and only within bounds: each feed keeps only its newest items once full (`RELAY_MAX_QUEUE`, `ACTIVITY_MAX_QUEUE`, `LINK_CHANGE_MAX_QUEUE`, `QUEUE_POP_MAX_QUEUE`), and a queue pop lapses with its offer, so a long stop delivers only the newest of each feed and no pop that lapsed meanwhile; any end of the game process while it holds (a recreate for a shared key's edit or a release, a stop or restart, a crash, the watchdog's restart) drops everything queued since the stop.",
+    );
+    // Those are the feeds the outbox drains from memory, each capped by the
+    // constant DEPLOY names, and a queue pop is dropped at the drain once its
+    // offer lapses: a new in-memory feed fails here until DEPLOY names it.
+    const internal = readFileSync('server/internal.ts', 'utf8');
+    expect(
+      [...new Set([...internal.matchAll(/\bdrain([A-Z]\w*)\(/g)].map((m) => m[1]))].sort(),
+    ).toEqual(['Activity', 'LinkChanges', 'QueuePops', 'Relay']);
+    for (const [file, cap] of [
+      ['server/discord_relay.ts', 'RELAY_MAX_QUEUE'],
+      ['server/discord_activity.ts', 'ACTIVITY_MAX_QUEUE'],
+      ['server/discord_link_changes.ts', 'LINK_CHANGE_MAX_QUEUE'],
+      ['server/discord_queue_pops.ts', 'QUEUE_POP_MAX_QUEUE'],
+    ]) {
+      expect(readFileSync(file, 'utf8'), file).toMatch(
+        new RegExp(`\\nexport const ${cap} = \\d+;\\n`),
+      );
+    }
+    expect(readFileSync('server/discord_queue_pops.ts', 'utf8')).toContain(
+      'return all.filter((item) => item.expiresAtMs > now);',
     );
     expect(lever).toContain(
       "While it holds, every start of the bot lifts it: any `up` of the bot (the first two levers', an Environment keys edit's, the Enabling block's), a `start` or `restart`, and, with `discord` in `COMPOSE_PROFILES` in `.env`, every `up -d` that names no service (stop it again after one, as the release steps say). So while it holds, start the bot only to lift it: an `.env` edit for the bot reaches it then. Lift it only as the first two levers run it, with `sudo docker compose --profile discord up -d --no-deps discord-bot` (not while an image built for a coming release waits), never with `start` or `restart`, which revive the stopped container on the image it was created from, which need not be the one the game runs once a release or a rollback has run since.",
@@ -2402,18 +2423,37 @@ describe('the claim renewer', () => {
     const pulledIn = /\n {4}(?:env_file|extends):/;
     expect('\n  game:\n    env_file:\n      - .env\n').toMatch(pulledIn);
     expect('\n  game:\n    extends:\n      service: base\n').toMatch(pulledIn);
-    const anchor = /(?:^|[\s[{,:-])&[\w.-]/m;
-    for (const control of ['x-env: &shared\n', '  - &first a\n', 'env: [&a x]\n']) {
+    const anchor = /(?:^|[\s[{,:-])&(?![&>])[^\s,[\]{}]/m;
+    for (const control of [
+      'x-env: &shared\n',
+      '  - &first a\n',
+      'env: [&a x]\n',
+      'x-env: &$shared\n',
+      uncommented('x-env: &shared # note\n'),
+    ]) {
       expect(control).toMatch(anchor);
     }
-    for (const literal of ['run: a && b\n', 'url: http://x/?a=1&b=2\n']) {
+    for (const literal of ['run: a && b\n', 'url: http://x/?a=1&b=2\n', 'run: x 2>&1 &> y\n']) {
       expect(literal).not.toMatch(anchor);
     }
     expect(uncommented(compose)).not.toMatch(anchor);
     // A comment line inside a block scalar is text Compose reads, so neither
     // block holds one.
-    const blockScalar = /:[ \t]*[|>][-+0-9]*[ \t]*(?:#.*)?$/m;
-    expect('\n    command: |\n      run\n').toMatch(blockScalar);
+    const blockScalar = /(?:^|[\s:])[|>][-+0-9]*[ \t]*(?:#.*)?$/m;
+    for (const control of [
+      '\n    command: |\n      run\n',
+      '\n    command:\n      - |\n        run\n',
+      '\n    command: !!str >-\n      run\n',
+    ]) {
+      expect(control).toMatch(blockScalar);
+    }
+    for (const literal of [
+      '\n    test: ["CMD", "a|b"]\n',
+      '\n    test: ["CMD-SHELL", "a || b"]\n',
+      '\n    command: x > /tmp/log\n',
+    ]) {
+      expect(literal).not.toMatch(blockScalar);
+    }
     for (const name of ['game', 'discord-bot']) {
       expect(serviceBlock(name), name).not.toMatch(pulledIn);
       expect(serviceBlock(name), name).not.toMatch(blockScalar);

@@ -1247,22 +1247,22 @@ For off-box safety, sync the directory to S3 occasionally:
     `*` or `!`), stop every realm still running, run in one psql session in its default
     autocommit `SELECT pg_backend_pid();` and then the sign-out again, either way, then
     read both again, the count from a new psql session; a rerun that does not return
-    waits, directly or behind sessions queued ahead of it, on a session that itself
-    waits on nothing: from another psql session on the realm database, give the naming
-    statement under Index builds below the rerun's pid, then each pid it names in turn,
-    until it names none, and the last session named decides: an earlier sign-out left
-    open (`psql`, `idle in transaction`) the rule there ends; the nightly dump
-    (`pg_dump`) is never ended, but a stopped realm's boot waiting behind it is, by The
-    nightly dump above; anything else is working: wait; then give it the rerun's pid
-    again, until the rerun returns); and, once the dump has ended if the stall was
-    behind one, start the realms again by Index builds below. Re-run the deactivation
-    housing receipt erase for deactivated accounts that still hold receipts by the
-    bullet below that begins "A failed deactivation receipt erase" (a deactivation
-    stopped at its revoke never reached the erase, so it logged no warning). A sign-out
-    undoes nothing a leftover token did before it (for example a sign-in link it added,
-    a recovery email it set, or anything its live session did in game): this bullet does
-    not recover an account the stall left open to whoever held such a token, and that
-    recovery is owed.
+    waits, directly or through sessions that themselves wait, on a session that waits on
+    nothing: from another psql session on the realm database, give the naming statement
+    under Index builds below the rerun's pid, then each pid it names, in turn, until
+    each names none, and every session reached that names none decides: an earlier
+    sign-out left open (`psql`, `idle in transaction`) is ended by the rule there; the
+    nightly dump (`pg_dump`) is never ended, but a stopped realm's boot waiting behind
+    it is, by The nightly dump above; anything else, or no session named for the rerun
+    at all, is working: wait; then give it the rerun's pid again, until the rerun
+    returns); and, once the dump has ended if the stall was behind one, start the realms
+    again by Index builds below. Re-run the deactivation housing receipt erase for
+    deactivated accounts that still hold receipts by the bullet below that begins "A
+    failed deactivation receipt erase" (a deactivation stopped at its revoke never
+    reached the erase, so it logged no warning). A sign-out undoes nothing a leftover
+    token did before it (for example a sign-in link it added, a recovery email it set,
+    or anything its live session did in game): this bullet does not recover an account
+    the stall left open to whoever held such a token, and that recovery is owed.
   - Index builds: after it listens, a realm's runner takes the schema advisory lock,
     then for each index of `server/concurrent_indexes.ts` in turn drops it if INVALID,
     builds it if missing, with CREATE INDEX CONCURRENTLY, and drops any index it
@@ -2399,7 +2399,8 @@ sudo docker compose --profile discord restart discord-bot
 The container also runs under `mem_limit: 512m` with `memswap_limit: 512m`, so a leak
 kills the bot rather than the game or the database sharing the host, and
 `stop_grace_period: 15s`, which is ample because the bot has nothing to save: the
-outbox lives on the server and redelivers anything unacknowledged on the next poll.
+outbox lives on the server and redelivers anything unacknowledged on the next poll,
+within each feed's cap (lever 3 below).
 
 ### Fatal gateway close: the crash loop is by design
 
@@ -2478,15 +2479,18 @@ no image and is open even then:
    The game is unaffected. The bot is a pure consumer, so stopping it costs role,
    nickname, presence, relay, and activity sync until it is started again, and nothing
    else. Queued outbox items wait in the game process (the winner days excepted, which
-   the game reads from the database) and are delivered when it comes back, so a
-   recreate of the game while it holds (a shared key's edit, a release) drops the
-   relay, activity, link-change and queue-pop items queued since the stop. While it
-   holds, every start of the bot lifts it: any `up` of the bot (the first two levers',
-   an Environment keys edit's, the Enabling block's), a `start` or `restart`, and, with
-   `discord` in `COMPOSE_PROFILES` in `.env`, every `up -d` that names no service (stop
-   it again after one, as the release steps say). So while it holds, start the bot only
-   to lift it: an `.env` edit for the bot reaches it then. Lift it only as the first
-   two levers run it, with
+   the game reads from the database), and only within bounds: each feed keeps only its
+   newest items once full (`RELAY_MAX_QUEUE`, `ACTIVITY_MAX_QUEUE`,
+   `LINK_CHANGE_MAX_QUEUE`, `QUEUE_POP_MAX_QUEUE`), and a queue pop lapses with its
+   offer, so a long stop delivers only the newest of each feed and no pop that lapsed
+   meanwhile; any end of the game process while it holds (a recreate for a shared key's
+   edit or a release, a stop or restart, a crash, the watchdog's restart) drops
+   everything queued since the stop. While it holds, every start of the bot lifts it:
+   any `up` of the bot (the first two levers', an Environment keys edit's, the Enabling
+   block's), a `start` or `restart`, and, with `discord` in `COMPOSE_PROFILES` in
+   `.env`, every `up -d` that names no service (stop it again after one, as the release
+   steps say). So while it holds, start the bot only to lift it: an `.env` edit for the
+   bot reaches it then. Lift it only as the first two levers run it, with
    `sudo docker compose --profile discord up -d --no-deps discord-bot` (not while an
    image built for a coming release waits), never with `start` or `restart`, which
    revive the stopped container on the image it was created from, which need not be the

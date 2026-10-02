@@ -1436,3 +1436,7 @@ What changed the contract above:
   `Created` as stopped in the stall-over reading too, has the release steps re-stop a bot the
   third lever held before a start, and says the bot's queued outbox items wait in the game
   process.
+- A thirty-fifth round of eight fresh readers: no P12 change; `DEPLOY.md` states the bot outbox's
+  bounds (each feed capped, a queue pop lapsing with its offer, any end of the game process
+  dropping what is queued) and has every session a waiting rerun's walk reaches that names none
+  decide, a step that names several included.
