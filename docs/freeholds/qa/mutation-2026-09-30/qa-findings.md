@@ -390,8 +390,7 @@ L6R2; S6R1, M6R1 and L6R2 are one defect, as are H6R1 and L6R1), 29 nice-to-have
 
 Round seven's commits: `b3f184beb6` (the token runbook's SQL as two fenced blocks the pg suite
 executes, DEPLOY's first-rollout bullet, and the lock case's holder-first cleanup),
-`71c4d79cfa` (the shutdown pin derives its bounds from the closure), `17c95d6a45` (P12 and the
-contract, structural), and the commit that adds this section.
+`71c4d79cfa` (the shutdown pin derives its bounds from the closure), `17c95d6a45` (P12, R-13 and the contract, structural), and the commit that adds this section.
 
 | Reader | Verdict | Findings |
 |---|---|---|
@@ -420,7 +419,7 @@ round replaced each with a structural statement or a whole pin rather than a lon
   and fails red against the whole list, never green. C7R5, C7R6 FIXED `b3f184beb6`.
 - H7R2 FIXED `71c4d79cfa` (with T7R2): every `_MS` constant and numeric literal an await
   passes is derived from the captured list, so a newly bounded call site changes the set the
-  contract must name. H7R3 FIXED `71c4d79cfa` (each callee is checked to arm its bound; the
+  contract must name. H7R3 FIXED `71c4d79cfa` and `17c95d6a45` (each callee is checked to arm its bound; the
   contract no longer claims what the callees of the other awaits do). H7R4 FIXED `71c4d79cfa`
   (the call-site and callee groups are checked apart). H7R5 FIXED `17c95d6a45` (with Q7R3 and
   D7R6). H7R6 FIXED `71c4d79cfa` (main.ts read once).
@@ -445,10 +444,77 @@ round replaced each with a structural statement or a whole pin rather than a lon
   T7R5: both bullets refuse an unqualified statement, with a positive count). Q7R6 FIXED (see
   S7R3).
 - T7R1, T7R2 FIXED (see C7R2, H7R2). T7R3 FIXED (see C7R1). T7R4 FIXED `b3f184beb6` (the block
-  is pinned whole, in order). T7R5 FIXED (see Q7R5). T7R6 FIXED in the evidence record: the
+  is pinned whole, in order). T7R5 FIXED (see Q7R5). T7R6 FIXED in the out-of-tree evidence summary, which is not tracked: the
   underscore mutant was applied through a quoted heredoc, but its summary line was written
   through an unquoted one that expanded the shell's `$-`; the line is corrected. T7R7 FIXED
   `71c4d79cfa`. T7R8 FIXED (see L7R4).
 - M7R1, M7R7 FIXED (see L7R1). M7R2 FIXED `b3f184beb6` and `17c95d6a45` (the storage fragment
   holds its locks on its own tables, unenumerated). M7R3, M7R4, M7R5, M7R6 FIXED
   `b3f184beb6`. M7R8 FIXED `17c95d6a45`.
+
+## Round eight: eight fresh readers over round seven (`94c0a55853..0fa9abd430`)
+
+Round eight's commits: `8568019ac5` (every shutdown await classified), `8a12a46be9` (the lock
+case's waiters outlast their polls), `bad933db50` (the token runbook as five named SQL blocks
+the pg suite runs), `52bd1cc535` (repair boots, storage, the budget's opening and R-13), and
+the commit that adds this section. The round-seven record commit was amended before them
+(Q8R2), so it is `2d0c81144b`.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C8R1 to C8R6 |
+| qa-checklist | PASS | Q8R1 to Q8R8 |
+| server hot path | PASS | H8R1 to H8R8 |
+| privacy and security | PASS | S8R1 to S8R5 |
+| database performance | PASS | D8R1 to D8R6 |
+| test coverage | PASS | T8R1 to T8R9 |
+| docs librarian | PASS | L8R1 to L8R7 |
+| migration safety | PASS | M8R1 to M8R8 |
+
+57 findings: none blocking, 19 should-fix (S8R1, S8R2, H8R1, H8R2, H8R3, Q8R1, Q8R2, T8R1,
+T8R2, C8R1, C8R2, D8R1, L8R1, L8R2, L8R3, L8R4, L8R5, M8R1, M8R2; most are three shapes seen
+by several readers), 38 nice-to-have. The two shapes that kept drawing one more form, the
+runbook's judgment calls and the pin's spelling-based derivation, are now mechanical: the
+runbook's every step is SQL the pg suite executes, and every shutdown await is classified.
+
+- C8R1 FIXED `bad933db50` (with M8R1): a correct CHECK the probe misreads is reported whatever
+  `convalidated` says. C8R2 FIXED `8568019ac5` (with H8R1, Q8R1, T8R1): every await carries an
+  explicit bound kind and an unbounded one may pass only listed argument shapes; binding
+  `deedRecordsIdle(3000)` while leaving it unbounded fails the pin. C8R3 FIXED `52bd1cc535`
+  (with L8R2: the storage fragment holds its own tables, some DDL unprobed, its probed repairs
+  repair boots). C8R4 RULED: it needs a hand-dropped column and a hand-made constraint under
+  the probed name together, the case M4R8 already ruled. C8R5 FIXED `bad933db50` (DROP is its
+  own block naming only the displaced constraint, and the live name may never be dropped).
+  C8R6 FIXED `8568019ac5` (with H8R6, Q8R7, T8R4).
+- Q8R2 FIXED by amending the round-seven record commit (now `2d0c81144b`) and by the T7R6
+  disposition naming the out-of-tree evidence summary. Q8R3 FIXED in this record (with L8R5).
+  Q8R4 FIXED from this round on: commits split by type, with partial staging where one file
+  carried both. Q8R5, Q8R6 FIXED `bad933db50` (setup inside the case, a `finally` that
+  restores the CHECK, and the next boot's CHECK oid unchanged). Q8R8 FIXED (see S8R2).
+- H8R2 FIXED `8568019ac5` (the concurrent pair is one classified entry, summed once; sequential
+  stops would be two). H8R3 FIXED `8568019ac5` (each callee sliced to its own closing brace,
+  its bound both armed and waited on). H8R4, H8R5 FIXED `8568019ac5` (the contract names
+  exactly the classified bounds). H8R7 FIXED `8568019ac5` (`main.ts` declares none of them).
+  H8R8 OWED: a measured reserve for the unbounded shutdown chain on a grown realm, so the
+  sum's margin under the grace is evidence rather than an inequality.
+- S8R1 FIXED `bad933db50` (with M8R2): PRINT shows how this server prints the real CHECK, so
+  "the same tests" is an exact text match, not a judgment. S8R2 FIXED `bad933db50` (with
+  L8R3, Q8R8, M8R3: a missing CHECK is put back by RESTORE, with no repair boot). S8R3 FIXED
+  `bad933db50` (the read comes first). S8R4 FIXED `bad933db50` (with D8R2, M8R5: on any
+  error ROLLBACK first, and a fresh suffix within 63 bytes). S8R5 FIXED `52bd1cc535` (with
+  D8R1).
+- D8R1 FIXED `52bd1cc535`: a unique rebuild over duplicates fails, restarts into the same
+  stall, and is cleared by counting with an aggregate and resolving as the defect, never by
+  deleting evidence blind. D8R3 FIXED `bad933db50` (with M8R6: a foreign key's referenced
+  table is locked first, as a trip takes it). D8R4 FIXED `52bd1cc535`. D8R5 FIXED
+  `bad933db50`. D8R6 FIXED `52bd1cc535`.
+- T8R2 FIXED `bad933db50` (the `regclass` read is pinned qualified). T8R3 FIXED `bad933db50`
+  (the null step's pattern is the fragment's). T8R5 FIXED `bad933db50` (the listener sees the
+  impostor's warning before it sees silence). T8R6 FIXED `8a12a46be9`. T8R7 RULED: the
+  file's legacy-table cases share the upgrade case's setup by design, as its other legacy
+  cases do. T8R8 FIXED (see H8R3). T8R9 NOTED: the clamp warning is an earlier case's
+  deliberate `AbortSignal.timeout(2 ** 31)`, which asserts the event.
+- L8R1, L8R4 FIXED `52bd1cc535`. L8R5 FIXED in this record. L8R6 FIXED (see S8R3). L8R7 FIXED
+  in this record.
+- M8R4 FIXED (see S8R3). M8R7 FIXED `bad933db50` (a displaced constraint that blocks the null
+  step is dropped first). M8R8 FIXED `bad933db50` (re-read after DISPLACE).

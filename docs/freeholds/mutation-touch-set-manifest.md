@@ -1328,3 +1328,7 @@ What changed the contract above:
 - A seventh round of eight fresh readers: P12 defines a repair boot instead of listing one,
   says the storage fragment holds its own tables, and R-13 says when the backend aborts; the
   operator's token runbook is SQL the pg suite executes.
+- An eighth round of eight fresh readers: P12 and R-11 say what a repair boot costs and how a
+  failed unique rebuild is cleared, the storage fragment's locks are stated exactly, R-13
+  says when a cut backend aborts, and every runbook step and every shutdown await is now
+  mechanical (SQL the suite runs, or an explicit classification).
