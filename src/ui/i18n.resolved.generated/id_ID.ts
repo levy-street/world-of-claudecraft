@@ -665,7 +665,8 @@ export const id_ID: EnTranslations = {
       "bow": "Membungkuk",
       "clap": "Bertepuk",
       "roar": "Mengaum",
-      "kneel": "Berlutut"
+      "kneel": "Berlutut",
+      "kata": "Kata"
     },
     "emoteWheel": {
       "edit": "Sunting",
@@ -4434,6 +4435,8 @@ export const id_ID: EnTranslations = {
       "enchantedFallback": "Dimantrai",
       "partyTradeWindow": "Kamu dapat memperdagangkan barang ini kepada pemain yang berbagi jarahannya selama {time} berikutnya. Memakainya mengakhiri jendela perdagangan.",
       "perfectedBadge": "Disempurnakan",
+      "katanaKills": "Enemies slain: {count}",
+      "katanaKanji": "Engraved kanji: {glyph}",
       "perfectingRank": "Penyempurnaan: peringkat {rank} dari {ranks}",
       "materialSourceGatherer": "{count} × Dikumpulkan oleh {name}",
       "materialSourceGathererSigned": "{count} × Dikumpulkan oleh {name}, ditandatangani oleh {signer}",
@@ -10196,6 +10199,7 @@ export const id_ID: EnTranslations = {
     "paladin": "Paladin",
     "hunter": "Pemburu",
     "rogue": "Penyamun",
+    "ninja": "Ninja",
     "priest": "Pendeta",
     "shaman": "Dukun",
     "mage": "Penyihir",
@@ -11285,6 +11289,7 @@ export const id_ID: EnTranslations = {
       "paladin": "Penyembuh / Tank / DPS Jarak Dekat",
       "hunter": "DPS Jarak Jauh",
       "rogue": "DPS Jarak Dekat",
+      "ninja": "Melee DPS",
       "priest": "Penyembuh / DPS Jarak Jauh",
       "shaman": "Penyembuh / DPS Jarak Dekat atau Jauh",
       "mage": "DPS Jarak Jauh",
@@ -11309,6 +11314,7 @@ export const id_ID: EnTranslations = {
       "paladin": "Paladin adalah ksatria suci yang mendukung sekutu dengan berkah, menyembuhkan luka dengan Cahaya Pemulih, dan melindungi yang lemah dengan zirah berat.",
       "hunter": "Pemburu adalah spesialis jarak jauh yang bertarung berdampingan dengan binatang buas jinak, menghujani musuh dengan tembakan terarah dan beruntun, memperlambat mereka dengan sengat dan tembakan pengguncang, serta berganti Aspek sesuai keadaan pertempuran.",
       "rogue": "Penyamun adalah pembunuh siluman yang menghabiskan Energi dan Poin Kombo untuk tikaman belakang dan jurus penutup dari balik bayangan.",
+      "ninja": "A shadow-trained blade of the Blossom Temple: a fast, stealthy energy fighter who strikes with katana and shuriken, then vanishes in smoke.",
       "priest": "Pendeta memanggil Cahaya Pemulih untuk menyembuhkan dan melindungi sekutu, sementara sihir Bayangan memungkinkan mereka menyedot nyawa musuh.",
       "shaman": "Dukun memerintah unsur-unsur alam, mengisi senjata dengan kekuatan, mengejutkan musuh dengan petir, dan memulihkan sekutu.",
       "mage": "Penyihir menundukkan kekuatan Api, Beku, dan Arkana untuk membinasakan musuh, memanggil air, dan membekukan ancaman di tempat.",
@@ -14761,6 +14767,18 @@ export const id_ID: EnTranslations = {
       "choir_of_deliverance": {
         "name": "Paduan Suara Pembebasan",
         "description": "Merapal selama 6 dtk, menyembuhkan anggota grup dalam radius 30 meter sebesar {damage} setiap 2 dtk. Penyembuhan meningkat dengan kekuatan mantra."
+      },
+      "shuriken_toss": {
+        "name": "Shuriken Toss",
+        "description": "Throw a spinning shuriken for {damage} Physical damage. Awards 1 combo point."
+      },
+      "shadow_slash": {
+        "name": "Shadow Slash",
+        "description": "A quick katana cut for weapon damage plus {damage}. Awards 1 combo point."
+      },
+      "smoke_bomb": {
+        "name": "Smoke Bomb",
+        "description": "Burst a smoke bomb in the target's face for {damage} Physical damage, incapacitating it for 4 sec. Any damage breaks the effect. Awards 1 combo point."
       },
       "bear_charge": {
         "name": "Terjangan Bruin",
@@ -18451,6 +18469,18 @@ export const id_ID: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Tongkat Perang Vanguard"
       },
+      "katana_a": {
+        "name": "Blossom Katana"
+      },
+      "katana_b": {
+        "name": "Moonsteel Katana"
+      },
+      "katana_c": {
+        "name": "Crimson Petal Katana"
+      },
+      "blossom_training_mat": {
+        "name": "Temple Training Mat"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },
@@ -20421,6 +20451,11 @@ export const id_ID: EnTranslations = {
         "title": "Ahli Penempa Zirah",
         "greeting": "Tungku menyala dan batu asah berputar. Kalau bisa menebas, aku menjualnya."
       },
+      "swordsmith_ren": {
+        "name": "Swordsmith Ren",
+        "title": "Katana Maker",
+        "greeting": "Folded a thousand times under the blossoms. Each blade remembers the hand that made it."
+      },
       "heroic_quartermaster": {
         "name": "Kepala Perbekalan Vex",
         "title": "Kepala Perbekalan Heroik",
@@ -20890,6 +20925,31 @@ export const id_ID: EnTranslations = {
         "name": "Pelatih Hale",
         "title": "Master Latihan Dermaga",
         "greeting": "Boneka di belakangku itu tak pernah membalas pukulan dan tak pernah tumbang, {className}. Yang penting adalah hitungannya: Meter Kerusakanmu menghitung setiap hantaman yang mendarat padanya. Jadikan ia sasaran dan buka meternya, lalu akan kujelaskan sisanya."
+      },
+      "master_monk_sora": {
+        "name": "Master Sora",
+        "title": "Keeper of the Blossom Temple",
+        "greeting": "The petals fall the same way every spring, and still each one is new. So it is with the kata."
+      },
+      "monk_trainee_a": {
+        "name": "Trainee Hiro",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_b": {
+        "name": "Trainee Mei",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_c": {
+        "name": "Trainee Kenji",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_d": {
+        "name": "Trainee Aiko",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -23156,6 +23216,16 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Penyembuhan efektif mengenai Boneka Latihan Penyembuhan"
+          }
+        }
+      },
+      "q_blossom_kata": {
+        "title": "The Way of the Blossom",
+        "text": "You watch my students the way a cat watches a pond, {playerName}. Good. Watching is the first lesson. The second is the mat: step onto it, empty your mind, and let the kata move you. Come back when your feet remember it.",
+        "completion": "Your stance was crooked and your breath was loud. And still the blossoms leaned toward you. Welcome, monk of the Blossom Temple.",
+        "objectives": {
+          "0": {
+            "label": "Practice the kata on the training mat"
           }
         }
       },

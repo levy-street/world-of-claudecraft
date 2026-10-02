@@ -342,7 +342,7 @@ describe('weekly vault choices', () => {
           // heroic unlock beside three Normal clears cannot cover the overlap
           // either; the same exhaustion regression covers it.
           expect(pool.ids.length, `${cls} ${unlocks} ${pool.pool}`).toBeGreaterThanOrEqual(
-            (cls === 'warlock' || cls === 'rogue') && pool.pool === 'raid_heroic'
+            (cls === 'warlock' || cls === 'rogue' || cls === 'ninja') && pool.pool === 'raid_heroic'
               ? 1
               : pool.pool === 'world' || pool.pool === 'raid'
                 ? pool.maximum

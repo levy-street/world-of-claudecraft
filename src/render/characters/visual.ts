@@ -85,6 +85,7 @@ import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
 import { HarvestRecoil } from './harvest_recoil';
 import { disposeHeldPropIdles, updateHeldPropIdles } from './held_prop_idle';
+import { type KatanaLookColors, katanaLookSignature, paintKatanaLook } from './katana_look_paint';
 import { noteLookAttached } from './look_pieces';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
 import { createMetamorphWingPose, metamorphWingPoseInto } from './metamorph_wing_motion_core';
@@ -472,6 +473,9 @@ export class CharacterVisual {
   private entityColor: number;
   private skinIndex: number;
   private weaponItemId: string | null;
+  // Katana Table look of the held katana (katana_look_paint.ts); null for none.
+  private katanaLook: KatanaLookColors | null = null;
+  private katanaLookSig: string | null = null;
   private offhandItemId: string | null;
   /** Composition inputs for a `modular` def (null for a fixed class rig).
    *  Changing a look means changing GEOMETRY, so callers rebuild the visual
@@ -2716,6 +2720,16 @@ export class CharacterVisual {
    *  active ghost/soul-rend overlay. Cheap (one prop clone) and keeps the mixer/
    *  animation state, unlike a full visual rebuild. Returns the newly attached
    *  payload(s) (for the caller's compile gate), or null on a no-op. */
+  /** Apply a Katana Table look to the held katana; re-attaches only on a change. */
+  setKatanaLook(look: KatanaLookColors | null): THREE.Object3D[] | null {
+    const sig = katanaLookSignature(look);
+    if (sig === this.katanaLookSig) return null;
+    this.katanaLookSig = sig;
+    this.katanaLook = look;
+    if (!this.def.weaponSlots?.length) return null;
+    return this.reattachHeldWeapon();
+  }
+
   setWeapon(weaponItemId: string | null): THREE.Object3D[] | null {
     if (weaponItemId === this.weaponItemId) return null;
     this.weaponItemId = weaponItemId;
@@ -2883,6 +2897,8 @@ export class CharacterVisual {
       this.tintedRigClaims,
     );
     releaseTintedMaterials(prevRigClaims);
+    // Katana Table colors and the sheathed scabbard (a uniform-only recolor).
+    paintKatanaLook(payloads, this.katanaLook, this.stow.attached);
     // A VFX-tier skin's emissive derive mutates its payload materials in place,
     // so give each payload exclusive clones BEFORE the caster snapshot: the
     // shared tinted-material cache must never carry derived state (two players

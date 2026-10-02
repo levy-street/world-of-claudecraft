@@ -665,7 +665,8 @@ export const zh_CN: EnTranslations = {
       "bow": "鞠躬",
       "clap": "鼓掌",
       "roar": "咆哮",
-      "kneel": "下跪"
+      "kneel": "下跪",
+      "kata": "Kata"
     },
     "emoteWheel": {
       "edit": "编辑",
@@ -4434,6 +4435,8 @@ export const zh_CN: EnTranslations = {
       "enchantedFallback": "已附魔",
       "partyTradeWindow": "在接下来的{time}内，你可以将此物品交易给共同获得该掉落的玩家。装备后交易期限即告结束。",
       "perfectedBadge": "臻至完美",
+      "katanaKills": "已斩敌人：{count}",
+      "katanaKanji": "刻印汉字：{glyph}",
       "perfectingRank": "完美化：第{rank}阶，共{ranks}阶",
       "materialSourceGatherer": "{count} × 由{name}采集",
       "materialSourceGathererSigned": "{count} × 由{name}采集，由{signer}签名",
@@ -10196,6 +10199,7 @@ export const zh_CN: EnTranslations = {
     "paladin": "圣骑士",
     "hunter": "猎人",
     "rogue": "潜行者",
+    "ninja": "忍者",
     "priest": "牧师",
     "shaman": "萨满祭司",
     "mage": "法师",
@@ -11285,6 +11289,7 @@ export const zh_CN: EnTranslations = {
       "paladin": "治疗 / 坦克 / 近战 DPS",
       "hunter": "远程 DPS",
       "rogue": "近战 DPS",
+      "ninja": "近战输出",
       "priest": "治疗 / 远程 DPS",
       "shaman": "治疗 / 近战或远程 DPS",
       "mage": "远程 DPS",
@@ -11309,6 +11314,7 @@ export const zh_CN: EnTranslations = {
       "paladin": "圣骑士是神圣的十字军，以祝福支援盟友，用愈疗之光治愈伤口，并身披重甲保护弱者。",
       "hunter": "猎人是远程专家，与驯服的野兽并肩作战，用瞄准与急速射击向敌人倾泻箭矢，以钉刺和震荡射击减速对手，并随机应变地切换守护形态。",
       "rogue": "潜行者是隐秘刺客，消耗能量和连击点，从阴影中发动背刺与终结技。",
+      "ninja": "樱花寺院中受暗影训练的利刃：迅捷而隐秘的能量战士，以武士刀和手里剑出击，随后消失于烟雾之中。",
       "priest": "牧师召唤愈疗之光来治疗并保护盟友，也能用暗影魔法汲取敌人的生命。",
       "shaman": "萨满掌控元素，强化武器，以闪电震击敌人，并恢复盟友。",
       "mage": "法师操纵火焰、冰霜与奥术之力来毁灭敌人，召唤清水，并冻结威胁。",
@@ -14761,6 +14767,18 @@ export const zh_CN: EnTranslations = {
       "choir_of_deliverance": {
         "name": "救赎圣咏团",
         "description": "引导6秒，每2秒为30码内的队伍成员恢复{damage}点生命值。治疗量随法术强度提高。"
+      },
+      "shuriken_toss": {
+        "name": "投掷手里剑",
+        "description": "掷出旋转的手里剑，造成{damage}点物理伤害。获得1个连击点。"
+      },
+      "shadow_slash": {
+        "name": "暗影斩",
+        "description": "迅速的武士刀斩击，造成武器伤害外加{damage}点伤害。获得1个连击点。"
+      },
+      "smoke_bomb": {
+        "name": "烟雾弹",
+        "description": "在目标面前引爆烟雾弹，造成{damage}点物理伤害，并使其失去行动能力4秒。任何伤害都会打断该效果。获得1个连击点。"
       },
       "bear_charge": {
         "name": "巨熊冲锋",
@@ -18451,6 +18469,18 @@ export const zh_CN: EnTranslations = {
       "vanguard_warstaff": {
         "name": "先锋之战杖"
       },
+      "katana_a": {
+        "name": "樱花武士刀"
+      },
+      "katana_b": {
+        "name": "月钢武士刀"
+      },
+      "katana_c": {
+        "name": "绯红花瓣武士刀"
+      },
+      "blossom_training_mat": {
+        "name": "寺院训练垫"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -20421,6 +20451,11 @@ export const zh_CN: EnTranslations = {
         "title": "护甲大师",
         "greeting": "炉火正旺，砂轮正转。能砍的东西，我都卖。"
       },
+      "swordsmith_ren": {
+        "name": "铸剑师莲",
+        "title": "武士刀匠",
+        "greeting": "在花下千锤百炼。每一把刀都记得锻造它的那双手。"
+      },
       "heroic_quartermaster": {
         "name": "军需官维克斯",
         "title": "英雄军需官",
@@ -20890,6 +20925,31 @@ export const zh_CN: EnTranslations = {
         "name": "操练官黑尔",
         "title": "码头陪练师",
         "greeting": "我身后那具假人从不还手，也永远打不倒，{className}。真正重要的是账目：你的伤害统计会记下你落在它身上的每一击。把它设为目标，打开伤害统计窗口，剩下的交给我来教你。"
+      },
+      "master_monk_sora": {
+        "name": "空大师",
+        "title": "樱花寺院守护者",
+        "greeting": "每年春天花瓣都以同样的方式飘落，而每一片依然是新的。套路也是如此。"
+      },
+      "monk_trainee_a": {
+        "name": "学徒宏",
+        "title": "寺院学徒",
+        "greeting": "随花吸气，随风出拳。再来。"
+      },
+      "monk_trainee_b": {
+        "name": "学徒美",
+        "title": "寺院学徒",
+        "greeting": "随花吸气，随风出拳。再来。"
+      },
+      "monk_trainee_c": {
+        "name": "学徒健二",
+        "title": "寺院学徒",
+        "greeting": "随花吸气，随风出拳。再来。"
+      },
+      "monk_trainee_d": {
+        "name": "学徒爱子",
+        "title": "寺院学徒",
+        "greeting": "随花吸气，随风出拳。再来。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
@@ -23156,6 +23216,16 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "在治疗假人身上打出一次有效治疗"
+          }
+        }
+      },
+      "q_blossom_kata": {
+        "title": "花之道",
+        "text": "你看着我的弟子们，就像猫盯着池塘，{playerName}。很好。观察是第一课。第二课是训练垫：踏上去，清空心神，让套路带动你。等你的双脚记住它时再回来。",
+        "completion": "你的架势歪了，呼吸也很重。但花瓣依然向你倾斜。欢迎你，樱花寺院的武僧。",
+        "objectives": {
+          "0": {
+            "label": "在训练垫上练习套路"
           }
         }
       },

@@ -69,7 +69,7 @@ function score(item: ItemDef, line: readonly ('str' | 'agi' | 'sta' | 'int' | 's
 // spec that never thrusts and prefers raw weapon damage). A spec-less rogue
 // running /dev bis before picking must not be locked out of half the kit.
 function wantsDaggerMainhand(cls: string, spec: string | null): boolean {
-  return cls === 'rogue' && spec !== 'combat';
+  return (cls === 'rogue' || cls === 'ninja') && spec !== 'combat';
 }
 
 export function bestEpicGearFor(

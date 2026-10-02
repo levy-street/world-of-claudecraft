@@ -25,7 +25,7 @@ describe('starter rations', () => {
 
   it('non-mana classes are exactly the waterless ones', () => {
     const waterless = ALL_CLASSES.filter((c) => CLASSES[c].resourceType !== 'mana').sort();
-    expect(waterless).toEqual(['hunter', 'rogue', 'warrior']);
+    expect(waterless).toEqual(['hunter', 'ninja', 'rogue', 'warrior']);
   });
 
   it('a saved character keeps its bags as-is (no re-grant on load)', () => {

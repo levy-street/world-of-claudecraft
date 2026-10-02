@@ -409,6 +409,7 @@ import { emitGroundPuff } from './ground_puff';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { usedJsHeapMb } from './heap_sample';
+import { type HeldItemSyncHost, syncHeldItems } from './held_item_sync';
 import { HillRingVisuals } from './hill_ring';
 import { createHitchFrameAligner } from './hitch_frame_align_core';
 import { HOARD_BODY_IDS, hoardEntrance } from './hoard_entrance';
@@ -8355,6 +8356,13 @@ export class Renderer {
   // a node nothing else drives the visibility of per frame (a weapon/offhand
   // payload, once attached, is left alone); for one the per-frame loop
   // recomputes every tick, use gateSwapFlagOnCompile instead.
+  private readonly heldItemHost: HeldItemSyncHost<EntityView> = {
+    gateSwapOnCompile: (node) => this.gateSwapOnCompile(node as THREE.Object3D),
+    reconcileViewLights: (v) => this.reconcileViewLights(v),
+    requeueSoulRendPrewarm: (visual, v, kind) =>
+      encounterPrewarm.queueLiveSoulRendPrewarm(this, visual, v, kind as Entity['kind']),
+  };
+
   private gateSwapOnCompile(target: THREE.Object3D): void {
     if (!this.asyncCompileSupported || !target.visible) return;
     const generation = this.lifecycleGeneration;
@@ -10394,30 +10402,8 @@ export class Renderer {
         v.visual.setSkin(e.skin);
       }
 
-      // live held-weapon swap, equipped mainhand changed (self equip or a peer's
-      // gear update); setWeapon no-ops on classes with a fixed weapon (hunter).
-      // Gated per newly attached payload: nothing else in this loop drives its own
-      // .visible, so first-sight materials link off-thread instead of freezing the
-      // frame the gear lands on (#2571).
-      // Both held swaps re-run finishWeaponAttach, which re-snapshots the
-      // original-material map with the new weapon's meshes, so the encounter
-      // mark's warmed clones no longer describe this body: re-queue on the new
-      // held look (the identity carries it, so a sheathe toggle warms nothing).
-      if (e.mainhandItemId !== v.mainhandItemId) {
-        v.mainhandItemId = e.mainhandItemId;
-        const changed = v.visual.setWeapon(e.mainhandItemId);
-        if (changed) for (const node of changed) this.gateSwapOnCompile(node);
-        this.reconcileViewLights(v);
-        encounterPrewarm.queueLiveSoulRendPrewarm(this, v.visual, v, e.kind);
-      }
-
-      if (e.offhandItemId !== v.offhandItemId) {
-        v.offhandItemId = e.offhandItemId;
-        const changed = v.visual.setOffhand(e.offhandItemId);
-        if (changed) for (const node of changed) this.gateSwapOnCompile(node);
-        this.reconcileViewLights(v);
-        encounterPrewarm.queueLiveSoulRendPrewarm(this, v.visual, v, e.kind);
-      }
+      // live held-item swaps: mainhand, offhand, Katana Table look (held_item_sync.ts)
+      syncHeldItems(this.heldItemHost, v, e);
 
       // live weapon-skin swap: a Season 1 Armory cosmetic applied/detached (self
       // or a peer, via the identity wire); replaces the held model + rarity VFX.
@@ -11168,8 +11154,7 @@ export class Renderer {
         mountShown && !v.mountCompilePending && runCharacterPresentation ? this.vfx : null,
       );
 
-      const emoteId =
-        e.kind === 'player' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
+      const emoteId = e.kind !== 'mob' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
       const emoteKey = emoteId ? `${emoteId}:${e.overheadEmoteSeq}` : null;
       if (emoteKey !== v.lastOverheadEmoteKey) {
         const canPlayEmote =

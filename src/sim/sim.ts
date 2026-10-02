@@ -226,6 +226,7 @@ import {
 } from './data';
 import { refusedWhileDead } from './dead_gate';
 import { deckFloorHeight } from './deck_floor';
+import { updateMonkTraining } from './monk_training';
 import * as deedsMod from './deeds';
 import {
   createDeedRuntime,
@@ -4814,7 +4815,7 @@ export class Sim {
   }
 
   playerGcdFor(cls: PlayerClass): number {
-    return cls === 'rogue' ? 1.0 : GCD; // rogue GCD is 1.0 sec
+    return cls === 'rogue' || cls === 'ninja' ? 1.0 : GCD; // rogue GCD is 1.0 sec
   }
   get playerGcd(): number {
     return this.playerGcdFor(this.primary.cls);
@@ -6203,6 +6204,7 @@ export class Sim {
     // position cannot fork the draw order (the Vale Cup tail precedent).
     deedsMod.updateDeeds(this.ctx);
     lap?.('deeds');
+    updateMonkTraining(this.ctx); // zero-rng cosmetic drill, appended last
 
     // movement re-bucketing: queries during the next tick and the server's
     // snapshot broadcast right after this one see fresh cells

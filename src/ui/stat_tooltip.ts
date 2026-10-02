@@ -214,7 +214,7 @@ export function strApPerPoint(cls: PlayerClass): number {
 
 /** Melee attack power gained per point of Agility: 1 for rogue/hunter, else 0. */
 export function agiMeleeApPerPoint(cls: PlayerClass): number {
-  return cls === 'rogue' || cls === 'hunter' ? 1 : 0;
+  return cls === 'rogue' || cls === 'ninja' || cls === 'hunter' ? 1 : 0;
 }
 
 /** First 20 stamina give 1 hp each, the rest 10 (entity.ts hpFromStamina). */

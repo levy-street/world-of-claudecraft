@@ -148,7 +148,7 @@ const REROLL_NOT_AVAILABLE = {
 const CHARACTER_RESOURCE = 'character';
 /** Per-account character cap (mirrors the legacy createCharacterCapped default). */
 const CHARACTER_LIMIT = 10;
-/** The nine playable classes accepted by create (mirrors the legacy inline list). */
+/** The playable classes accepted by create (mirrors the legacy inline list). */
 const VALID_CLASSES: readonly string[] = [
   'warrior',
   'paladin',
@@ -159,6 +159,7 @@ const VALID_CLASSES: readonly string[] = [
   'mage',
   'warlock',
   'druid',
+  'ninja',
 ];
 /** Highest selectable skin index (mirrors the legacy Math.min(7, ...) clamp). */
 const MAX_SKIN = 7;

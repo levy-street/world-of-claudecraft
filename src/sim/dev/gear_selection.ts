@@ -1,6 +1,7 @@
 // Ordered kit selection for balance harnesses. Candidate ranking belongs to
 // each caller; this leaf applies the real equip rules before accepting a pick,
 // so a rejected crafted piece falls back instead of silently leaving a hole.
+import { classListAdmits } from '../equipment_rules';
 import {
   type CrucibleCollectionRole,
   crucibleCollectionForItem,
@@ -33,7 +34,7 @@ export function collectionFitsRole(
   const collection = crucibleCollectionForItem(item.id);
   if (!collection) return true;
   return (
-    (!item.requiredClass || item.requiredClass.includes(cls)) &&
+    (!item.requiredClass || classListAdmits(item.requiredClass, cls)) &&
     (role === undefined || collection.role === role)
   );
 }

@@ -16,7 +16,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1010,
+      "nextId": 1016,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -30,9 +30,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1020,
-      "state": "30ea90aa",
-      "events": "bc873d79",
+      "nextId": 1026,
+      "state": "0a364b17",
+      "events": "76a94328",
       "rng": {
         "draws": 1,
         "digest": "84017fb6"
@@ -79,7 +79,7 @@
           "delveClears": {},
           "delveDaily": {},
           "dungeonDifficulty": "heroic",
-          "entityId": 1010,
+          "entityId": 1016,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -162,7 +162,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1017,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -244,7 +244,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1018,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -326,7 +326,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1013,
+          "entityId": 1019,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -408,7 +408,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1014,
+          "entityId": 1020,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -464,7 +464,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1016
             }
           ],
           "blockChance": 0.05,
@@ -477,7 +477,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1062,
-          "id": 1010,
+          "id": 1016,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -526,7 +526,7 @@
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 665,
-          "id": 1011,
+          "id": 1017,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -575,7 +575,7 @@
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 665,
-          "id": 1012,
+          "id": 1018,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -624,7 +624,7 @@
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 665,
-          "id": 1013,
+          "id": 1019,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -673,7 +673,7 @@
           "fiveSecondRule": 99,
           "healPower": 41,
           "hp": 665,
-          "id": 1014,
+          "id": 1020,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -723,7 +723,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 192000,
-          "id": 1015,
+          "id": 1021,
           "kind": "mob",
           "level": 22,
           "lootFfaTimer": "Infinity",
@@ -759,9 +759,9 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 1020,
-      "state": "445286af",
-      "events": "3b126ae3",
+      "nextId": 1026,
+      "state": "08318bf8",
+      "events": "15dc9afa",
       "rng": {
         "draws": 14,
         "digest": "31372acd"
@@ -884,7 +884,7 @@
           "delveClears": {},
           "delveDaily": {},
           "dungeonDifficulty": "heroic",
-          "entityId": 1010,
+          "entityId": 1016,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1082,7 +1082,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1017,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1279,7 +1279,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1018,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1476,7 +1476,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1013,
+          "entityId": 1019,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1673,7 +1673,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1014,
+          "entityId": 1020,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1775,7 +1775,7 @@
               "name": "Battle Stance",
               "remaining": 3599.95,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1016
             }
           ],
           "blockChance": 0.05,
@@ -1788,7 +1788,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 5,
           "hp": 1062,
-          "id": 1010,
+          "id": 1016,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1838,7 +1838,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1011,
+          "id": 1017,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1887,7 +1887,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1012,
+          "id": 1018,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1936,7 +1936,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1013,
+          "id": 1019,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1985,7 +1985,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1014,
+          "id": 1020,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2030,11 +2030,11 @@
           "corpseHarvestState": {
             "priorityEndsAt": 10,
             "priorityMemberKeys": [
-              "entity:1010",
-              "entity:1011",
-              "entity:1012",
-              "entity:1013",
-              "entity:1014"
+              "entity:1016",
+              "entity:1017",
+              "entity:1018",
+              "entity:1019",
+              "entity:1020"
             ],
             "token": {}
           },
@@ -2046,7 +2046,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1015,
+          "id": 1021,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -2078,11 +2078,11 @@
             ]
           },
           "lootRecipientIds": [
-            1010,
-            1011,
-            1012,
-            1013,
-            1014
+            1016,
+            1017,
+            1018,
+            1019,
+            1020
           ],
           "lootable": true,
           "maxHp": 192000,
@@ -2106,7 +2106,7 @@
           "stats": {
             "armor": 1058
           },
-          "tappedById": 1010,
+          "tappedById": 1016,
           "templateId": "nythraxis_scourge_of_thornpeak",
           "weapon": {
             "max": 573,
@@ -2119,8 +2119,8 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 1020,
-      "state": "445286af",
+      "nextId": 1026,
+      "state": "08318bf8",
       "events": "741638a5",
       "rng": {
         "draws": 14,
@@ -2244,7 +2244,7 @@
           "delveClears": {},
           "delveDaily": {},
           "dungeonDifficulty": "heroic",
-          "entityId": 1010,
+          "entityId": 1016,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2442,7 +2442,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1017,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2639,7 +2639,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1018,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2836,7 +2836,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1013,
+          "entityId": 1019,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -3033,7 +3033,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1014,
+          "entityId": 1020,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -3135,7 +3135,7 @@
               "name": "Battle Stance",
               "remaining": 3599.95,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1016
             }
           ],
           "blockChance": 0.05,
@@ -3148,7 +3148,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 5,
           "hp": 1062,
-          "id": 1010,
+          "id": 1016,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -3198,7 +3198,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1011,
+          "id": 1017,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3247,7 +3247,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1012,
+          "id": 1018,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3296,7 +3296,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1013,
+          "id": 1019,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3345,7 +3345,7 @@
           "fiveSecondRule": 99.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1014,
+          "id": 1020,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3390,11 +3390,11 @@
           "corpseHarvestState": {
             "priorityEndsAt": 10,
             "priorityMemberKeys": [
-              "entity:1010",
-              "entity:1011",
-              "entity:1012",
-              "entity:1013",
-              "entity:1014"
+              "entity:1016",
+              "entity:1017",
+              "entity:1018",
+              "entity:1019",
+              "entity:1020"
             ],
             "token": {}
           },
@@ -3406,7 +3406,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1015,
+          "id": 1021,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -3438,11 +3438,11 @@
             ]
           },
           "lootRecipientIds": [
-            1010,
-            1011,
-            1012,
-            1013,
-            1014
+            1016,
+            1017,
+            1018,
+            1019,
+            1020
           ],
           "lootable": true,
           "maxHp": 192000,
@@ -3466,7 +3466,7 @@
           "stats": {
             "armor": 1058
           },
-          "tappedById": 1010,
+          "tappedById": 1016,
           "templateId": "nythraxis_scourge_of_thornpeak",
           "weapon": {
             "max": 573,

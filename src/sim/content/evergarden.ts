@@ -14,6 +14,7 @@
 // give the sim its solid trunk colliders).
 
 import { DAWNHOLD_BUILDINGS, DAWNHOLD_COURT_STATUE } from '../dawnhold_layout';
+import { CHERRY_GROVE_COLLIDERS } from './cherry_grove';
 import type {
   CampDef,
   GroundObjectDef,
@@ -697,6 +698,8 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
   // against terrain, roads, camps, and the parterre plan by
   // tests/garden_parterre.test.ts.
   decorProps: [
+    // the Blossom Temple grove (layout and render in cherry_grove.ts)
+    ...CHERRY_GROVE_COLLIDERS,
     // the mill lawn: three windmills turning over their own ring beds at the
     // end of the lakeshore walk (garden_parterre_core skips their center
     // bushes; the Old Mill at 504,760 stands tallest)

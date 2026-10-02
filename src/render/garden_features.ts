@@ -18,6 +18,7 @@ import {
   type MazePieceSpot,
   planGardenMazePieces,
 } from './garden_maze_core';
+import { buildCherryGrove } from './cherry_grove';
 import { GFX } from './gfx';
 import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from './worn_stone';
 
@@ -297,11 +298,16 @@ export function buildGardenFeatures(seed: number): GardenFeaturesView {
     }
   }
 
+  // --- the Blossom Temple grove (cherry forest, temple, gate, koi pond) ---
+  const grove = buildCherryGrove(seed);
+  group.add(grove.group);
+
   return {
     group,
-    update(): void {
-      // still air over still water: the fountain holds its pose, the global
-      // wind shader sways the modeled foliage
+    update(time: number): void {
+      // the fountain holds its pose and the wind shader sways the foliage;
+      // only the grove's petals and koi move
+      grove.update(time);
     },
   };
 }

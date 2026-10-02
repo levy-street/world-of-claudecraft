@@ -33,6 +33,9 @@ export const SPEC_ART_IDS: ReadonlySet<string> = new Set([
   'druid/balance',
   'druid/feral',
   'druid/restoration',
+  'ninja/assassination',
+  'ninja/combat',
+  'ninja/subtlety',
 ]);
 
 export function specArtId(spec: Pick<SpecDef, 'class' | 'id'>): string {

@@ -37,6 +37,7 @@ export type AuraOverlayTheme =
   | 'paladin'
   | 'hunter'
   | 'rogue'
+  | 'ninja'
   | 'priest'
   | 'shaman'
   | 'warlock'
@@ -327,6 +328,7 @@ function availableClassProcDefs(
           ]
         : [];
     case 'rogue':
+    case 'ninja':
       return has(ids, 'cold_blood')
         ? [
             {

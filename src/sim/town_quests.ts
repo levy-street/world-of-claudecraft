@@ -35,6 +35,7 @@
 // (ZoneDef.welcomeDone, authored only for the zones whose welcome names the
 // town's questgiver) once every counted town quest is turned in, nothing in
 // between. A zone without welcomeDone never reads town_done.
+import { classListAdmits } from './equipment_rules';
 import { PROFESSION_TRAINERS } from './content/profession_trainers';
 import { DUNGEONS, NPCS, QUESTS, zoneAt, zoneWelcomeText } from './data';
 import { isInTownZone } from './professions/focus';
@@ -124,7 +125,7 @@ export function townQuestIds(zone: ZoneDef, tables: Partial<TownQuestTables> = {
  *  other-class quests cannot be, so they never hold a town open). */
 function questReachableFor(quest: QuestDef, playerClass: PlayerClass | undefined): boolean {
   if (quest.retired) return false;
-  if (quest.requiredClass && (!playerClass || !quest.requiredClass.includes(playerClass))) {
+  if (quest.requiredClass && (!playerClass || !classListAdmits(quest.requiredClass, playerClass))) {
     return false;
   }
   return true;

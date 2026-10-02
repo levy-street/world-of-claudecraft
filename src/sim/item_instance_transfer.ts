@@ -16,6 +16,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no rng, no clock
 // (enforced by tests/architecture.test.ts). Pure bookkeeping, zero draws.
 
+import { isValidKatanaLook } from './katana_look';
 import { sanitizeItemInstancePayloadOnLoad } from './item_instance_load';
 import { itemInstancePayloadsEqual } from './item_instance_merge';
 import { cloneLootQuality } from './loot_quality/types';
@@ -74,6 +75,7 @@ export function publicInstanceView(instance: ItemInstancePayload): ItemInstanceP
   }
   if (instance.name !== undefined) pub.name = instance.name;
   if (instance.perfected === true) pub.perfected = instance.perfected;
+  if (isValidKatanaLook(instance.katana)) pub.katana = { ...instance.katana };
   // Guard on the validated clone, not the source: a present-but-malformed
   // descriptor must not materialize `lootQuality: undefined` as an own key,
   // since itemInstancePayloadsEqual compares every present key and the

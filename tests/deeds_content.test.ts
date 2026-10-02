@@ -146,8 +146,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // 10 and the tenth at 25: +35).
     // 318 / 3535 with the release's Eastbrook ferry round trip
     // (exp_harbor_to_harbor at renown 5) at the fourth release/v0.44.0 base merge.
-    expect(DEED_ORDER.length).toBe(319);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3545);
+    expect(DEED_ORDER.length).toBe(320);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3555);
   });
 
   it('ships the audited per-category counts', () => {
@@ -166,7 +166,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +1 the Phase 13 promotion capstone prog_legendmaker, then
       // +7 the faction standing ladder (a Trusted and a Champion deed per
       // allied faction plus the all-factions meta).
-      progression: 75,
+      progression: 76,
       // +1 the Buried Hoard goblin catch (cmb_coinsack_caught).
       combat: 11,
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank), +5 Crucible raid
@@ -409,6 +409,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // The release's Eastbrook ferry round trip, appended last at the fourth
       // release/v0.44.0 base merge.
       'exp_harbor_to_harbor',
+      // the Blossom Temple kata (q_blossom_kata), appended last
+      'prog_blossom_temple_monk',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -806,11 +808,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // faction standing Champion titles (Riftwarden, Dawnkeeper, Forgemaster)
     // three more, and the Clue Scroll tenth-casket title (Treasure Hunter)
     // one more.
-    expect(titles.length).toBe(51);
+    expect(titles.length).toBe(52);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(51);
+    expect(new Set(titleTexts).size).toBe(52);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -1040,7 +1042,7 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // shipped trigger or renown value was touched.
   // Re-baselined at the 2026-09-28 release merge into feature/buried-hoards: one NEW
   // deed (cmb_coinsack_caught) joins; no existing trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = '765c2ea13a8a87d5b43a3f725ab56e1c58464f850dc2ec0e10048adc12f67829';
+  const FROZEN_CATALOG_SHA256 = '0f9a34e23696dbf4925c6c8388abb3bb85559e0593bb172c9167d9b760be5378';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1108,8 +1110,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // previous mint is the clue pair's 0d91bc68... literal (rotated down here),
   // and stripping the one id must reproduce it exactly.
   const PRE_APPEND_CATALOG_SHA256 =
-    '0d91bc68e18b88a6b0c4dc7088c118d556b3bbec0be1617506b36b8172123eb6';
-  const APPENDED_SINCE: readonly string[] = ['cmb_coinsack_caught', 'exp_harbor_to_harbor'];
+    '765c2ea13a8a87d5b43a3f725ab56e1c58464f850dc2ec0e10048adc12f67829';
+  const APPENDED_SINCE: readonly string[] = ['prog_blossom_temple_monk'];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
@@ -1121,8 +1123,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // known seat, never a scattered insert or a retro-edit (the digest below
     // proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'exp_clue_first_casket',
-      'exp_clue_ten_caskets',
+      'cmb_coinsack_caught',
+      'exp_harbor_to_harbor',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1343,7 +1345,7 @@ describe('table shape', () => {
     // then the world-quest block, then the faction standing ladder, then the
     // Clue Scroll casket pair, then the release's ferry round trip as the
     // final entry.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_harbor_to_harbor');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_blossom_temple_monk');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
@@ -2321,14 +2323,14 @@ describe('col_junk_drawer stays completable after the phase 11l trophy promotion
   const unreachable = [...livePoor].filter((id) => !reachable.has(id)).sort();
 
   it('the chest walk visits every entry of both tables (a count that cannot rot silently)', () => {
-    // 3 tiers x 9 classes x 2 bountiful arms x 2 stubs = 108 calls per table:
+    // 3 tiers x 10 classes (the Ninja joined at 9) x 2 bountiful arms x 2 stubs = 108 calls per table:
     // 189 Litany entries and 166 lockpick entries at the 11l QA, pinned PER
     // TABLE so a drift in one cannot hide behind a compensating drift in the
     // other. A table that stopped contributing (a renamed export, a tier the
     // satisfies clause missed) shrinks its own count before it could hide a
     // poor id.
-    expect(litanyEntries).toBe(189);
-    expect(lockpickEntries).toBe(166);
+    expect(litanyEntries).toBe(210);
+    expect(lockpickEntries).toBe(186);
   });
 
   it('the reachable poor set is exactly the thirteen survivors with an acquisition route', () => {

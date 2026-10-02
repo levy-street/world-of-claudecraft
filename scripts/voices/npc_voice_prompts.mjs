@@ -1073,6 +1073,13 @@ export const VOICE_PROMPTS = [
 // Recurring NPC records → the base voice that speaks for them. gen_npc_lines.mjs
 // consults this so every Aldric/Maren/Halven zone variant reuses one designed voice.
 export const VOICE_ALIAS = {
+  // The Blossom Temple grove, cast by ROLE onto existing voices.
+  swordsmith_ren: 'smith_haldren',
+  master_monk_sora: 'brother_aldric',
+  monk_trainee_a: 'apprentice_wren',
+  monk_trainee_b: 'apprentice_wren',
+  monk_trainee_c: 'apprentice_wren',
+  monk_trainee_d: 'apprentice_wren',
   glider_instructor: 'trader_wilkes',
   glider_apprentice: 'apprentice_wren',
   // Valerie borrows the existing scout performance for this covert operation.

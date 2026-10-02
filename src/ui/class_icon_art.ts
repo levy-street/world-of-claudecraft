@@ -30,6 +30,7 @@ export const CLASS_ART_IDS: ReadonlySet<PlayerClass> = new Set<PlayerClass>([
   'mage',
   'warlock',
   'druid',
+  'ninja',
 ]);
 
 /** True when `id` is a class that ships painted emblem art. */

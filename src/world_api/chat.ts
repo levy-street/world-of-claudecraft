@@ -14,6 +14,7 @@ export const OVERHEAD_EMOTES = [
   { id: 'clap', label: 'Clap' },
   { id: 'roar', label: 'Roar' },
   { id: 'kneel', label: 'Kneel' },
+  { id: 'kata', label: 'Kata' },
 ] as const satisfies readonly { id: OverheadEmoteId; label: string }[];
 
 // Sourced from the local OVERHEAD_EMOTES (not sim/types' OVERHEAD_EMOTE_IDS): the

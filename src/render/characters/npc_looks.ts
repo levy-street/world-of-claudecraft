@@ -1052,6 +1052,107 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     worn: kit('rogue'),
     props: 'none',
   },
+  // Master Sora: shaved head, saffron leathers, empty hands.
+  master_monk_sora: {
+    app: {
+      gender: 'male',
+      hair: 'bald',
+      ...hair(4, 0.2, 0.2),
+      brows: 'soft',
+      eyeShape: 'almond',
+      ...eyes(30, 0.4, 0.2),
+      ...skin(22, 0.4, 0.55),
+      face: face({}),
+      body: body({}),
+      outfit: 'ember',
+    },
+    worn: kit('rogue'),
+    props: 'none',
+  },
+  // Blossom Temple trainee.
+  monk_trainee_a: {
+    app: {
+      gender: 'male',
+      hair: 'bald',
+      ...hair(4, 0.2, 0.2),
+      brows: 'soft',
+      eyeShape: 'almond',
+      ...eyes(30, 0.4, 0.2),
+      ...skin(18, 0.4, 0.55),
+      face: face({}),
+      body: body({}),
+      outfit: 'ember',
+    },
+    worn: kit('rogue'),
+    props: 'none',
+  },
+  // Blossom Temple trainee.
+  monk_trainee_b: {
+    app: {
+      gender: 'female',
+      hair: 'highbun',
+      ...hair(4, 0.2, 0.2),
+      brows: 'soft',
+      eyeShape: 'almond',
+      ...eyes(30, 0.4, 0.2),
+      ...skin(26, 0.4, 0.55),
+      face: face({}),
+      body: body({}),
+      outfit: 'ember',
+    },
+    worn: kit('rogue'),
+    props: 'none',
+  },
+  // Blossom Temple trainee.
+  monk_trainee_c: {
+    app: {
+      gender: 'male',
+      hair: 'buzz',
+      ...hair(4, 0.2, 0.2),
+      brows: 'soft',
+      eyeShape: 'almond',
+      ...eyes(30, 0.4, 0.2),
+      ...skin(30, 0.4, 0.55),
+      face: face({}),
+      body: body({}),
+      outfit: 'ember',
+    },
+    worn: kit('rogue'),
+    props: 'none',
+  },
+  // Blossom Temple trainee.
+  monk_trainee_d: {
+    app: {
+      gender: 'female',
+      hair: 'halfbun',
+      ...hair(4, 0.2, 0.2),
+      brows: 'soft',
+      eyeShape: 'almond',
+      ...eyes(30, 0.4, 0.2),
+      ...skin(20, 0.4, 0.55),
+      face: face({}),
+      body: body({}),
+      outfit: 'ember',
+    },
+    worn: kit('rogue'),
+    props: 'none',
+  },
+  // Swordsmith Ren: the Blossom Temple grove's katana maker, in rogue leathers.
+  swordsmith_ren: {
+    app: {
+      gender: 'male',
+      hair: 'buzz',
+      ...hair(4, 0.2, 0.2),
+      brows: 'bushy',
+      eyeShape: 'almond',
+      ...eyes(30, 0.4, 0.2),
+      ...skin(20, 0.4, 0.55),
+      face: face({ jaw: 0.2 }),
+      body: body({ shoulders: 0.2 }),
+    },
+    worn: kit('rogue'),
+    props: 'sword',
+  },
   // Armorer Hode: viking beard, knight plate over smith leathers.
   armorer_hode: {
     app: {

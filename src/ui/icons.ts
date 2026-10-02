@@ -3362,6 +3362,10 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   thieves_chorus: r('shadow', 'gold', ['roar', { p: 'dagger', ...BR }], ['sparkle']),
   venomrend: r('nature', 'venom', ['dagger', { p: 'flame', ...BR }], ['glow']),
   venom_dart: r('nature', 'venom', ['arrow', { p: 'droplet', ...BR }], ['motion']),
+  // ninja (painted art in public/ui/skills/ninja; these are the procedural fallbacks)
+  shuriken_toss: r('steel', 'shadowPurple', ['sunburst', { p: 'dagger', ...BR }], ['motion']),
+  shadow_slash: r('shadow', 'silverWhite', ['sword', { p: 'eye', ...BR }], ['motion']),
+  smoke_bomb: r('shadow', 'steel', ['skull', { p: 'sunburst', ...BR }], ['glow']),
   body_blow: r('steel', 'blood', ['fist', { p: 'sunburst', ...BR }], ['motion']),
   knockout_blow: r('steel', 'gold', ['fist', { p: 'skull', ...BR }], ['glow']),
   veilstrike: r('shadow', 'shadowPurple', ['eye', { p: 'dagger', ...BR }], ['motion']),
@@ -4652,6 +4656,10 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'melting_acid',
   'nightshade_coating',
   'stealth',
+  // ninja (project-original procedural art, public/ui/skills/ninja/mapping.json)
+  'shuriken_toss',
+  'shadow_slash',
+  'smoke_bomb',
   // warrior (CraftPix premium "RPG Warrior" + "RPG Berserker" packs; rage/fury abilities
   // drew from berserker). taunt has no provoke art and stays procedural.
   'heroic_strike',
@@ -5608,6 +5616,8 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'cmb_coinsack_caught',
   // The ferry round trip (exp_harbor_to_harbor): procedural exploration crest until commissioned.
   'exp_harbor_to_harbor',
+  // the Blossom Temple kata title (no painted crest yet)
+  'prog_blossom_temple_monk',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

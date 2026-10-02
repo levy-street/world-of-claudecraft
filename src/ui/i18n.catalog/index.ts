@@ -851,6 +851,7 @@ export const en = {
     paladin: 'Paladin',
     hunter: 'Hunter',
     rogue: 'Rogue',
+    ninja: 'Ninja',
     priest: 'Priest',
     shaman: 'Shaman',
     mage: 'Mage',

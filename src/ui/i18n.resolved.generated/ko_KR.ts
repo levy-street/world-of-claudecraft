@@ -665,7 +665,8 @@ export const ko_KR: EnTranslations = {
       "bow": "절",
       "clap": "박수",
       "roar": "포효",
-      "kneel": "무릎 꿇기"
+      "kneel": "무릎 꿇기",
+      "kata": "Kata"
     },
     "emoteWheel": {
       "edit": "편집",
@@ -4434,6 +4435,8 @@ export const ko_KR: EnTranslations = {
       "enchantedFallback": "마법부여됨",
       "partyTradeWindow": "앞으로 {time} 동안 이 아이템을 같은 전리품을 함께 획득한 플레이어와 거래할 수 있습니다. 착용하면 거래 기간이 끝납니다.",
       "perfectedBadge": "완전해짐",
+      "katanaKills": "처치한 적: {count}",
+      "katanaKanji": "새긴 한자: {glyph}",
       "perfectingRank": "완전화: {ranks}단계 중 {rank}단계",
       "materialSourceGatherer": "{count} × {name} 채집",
       "materialSourceGathererSigned": "{count} × {name} 채집, {signer} 서명",
@@ -10196,6 +10199,7 @@ export const ko_KR: EnTranslations = {
     "paladin": "성기사",
     "hunter": "사냥꾼",
     "rogue": "도적",
+    "ninja": "닌자",
     "priest": "사제",
     "shaman": "주술사",
     "mage": "마법사",
@@ -11285,6 +11289,7 @@ export const ko_KR: EnTranslations = {
       "paladin": "치유 / 탱커 / 근접 DPS",
       "hunter": "원거리 DPS",
       "rogue": "근접 DPS",
+      "ninja": "근접 딜러",
       "priest": "치유 / 원거리 DPS",
       "shaman": "치유 / 근접 또는 원거리 DPS",
       "mage": "원거리 DPS",
@@ -11309,6 +11314,7 @@ export const ko_KR: EnTranslations = {
       "paladin": "성기사는 축복으로 아군을 돕고 치유의 빛으로 상처를 치유하며 중갑으로 약자를 보호하는 성전사입니다.",
       "hunter": "사냥꾼은 길들인 야수와 함께 싸우는 원거리 전문가로, 일격 사격과 속사를 퍼부어 적을 공략하고 맹독과 충격 사격으로 적의 발을 묶으며 상황에 맞춰 화신을 전환합니다.",
       "rogue": "도적은 기력과 연계 점수를 사용해 그림자 속에서 기습과 마무리 일격을 가하는 암살자입니다.",
+      "ninja": "벚꽃 사원에서 그림자 수련을 받은 칼날. 빠르고 은밀한 기력 전사로, 카타나와 수리검으로 공격한 뒤 연기 속으로 사라진다.",
       "priest": "사제는 치유의 빛으로 아군을 치유하고 보호하며, 암흑 마법으로 적의 생명력을 흡수합니다.",
       "shaman": "주술사는 정령을 다루고 무기에 힘을 불어넣으며 번개로 적을 충격시키고 아군을 회복시킵니다.",
       "mage": "마법사는 화염, 냉기, 비전의 힘으로 적을 파괴하고 물을 만들어내며 위협을 얼립니다.",
@@ -14761,6 +14767,18 @@ export const ko_KR: EnTranslations = {
       "choir_of_deliverance": {
         "name": "구원의 성가대",
         "description": "6초 동안 정신을 집중해 30야드 안의 파티원을 2초마다 {damage}만큼 치유합니다. 치유량은 주문력에 따라 증가합니다."
+      },
+      "shuriken_toss": {
+        "name": "수리검 투척",
+        "description": "회전하는 수리검을 던져 {damage}의 물리 피해를 입힙니다. 연계 점수 1을 얻습니다."
+      },
+      "shadow_slash": {
+        "name": "그림자 베기",
+        "description": "재빠른 카타나 베기로 무기 피해에 더해 {damage}의 피해를 입힙니다. 연계 점수 1을 얻습니다."
+      },
+      "smoke_bomb": {
+        "name": "연막탄",
+        "description": "대상의 얼굴 앞에서 연막탄을 터뜨려 {damage}의 물리 피해를 입히고 4초 동안 행동 불가 상태로 만듭니다. 피해를 받으면 효과가 풀립니다. 연계 점수 1을 얻습니다."
       },
       "bear_charge": {
         "name": "큰곰 돌진",
@@ -18451,6 +18469,18 @@ export const ko_KR: EnTranslations = {
       "vanguard_warstaff": {
         "name": "선봉대의 전투지팡이"
       },
+      "katana_a": {
+        "name": "벚꽃 카타나"
+      },
+      "katana_b": {
+        "name": "월강 카타나"
+      },
+      "katana_c": {
+        "name": "진홍 꽃잎 카타나"
+      },
+      "blossom_training_mat": {
+        "name": "사원 수련 매트"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -20421,6 +20451,11 @@ export const ko_KR: EnTranslations = {
         "title": "장인 방어구 제작자",
         "greeting": "화덕은 뜨겁고 숫돌은 돌고 있습니다. 베는 물건이라면 팝니다."
       },
+      "swordsmith_ren": {
+        "name": "도공 렌",
+        "title": "카타나 장인",
+        "greeting": "꽃 아래에서 천 번을 접어 단련했지. 모든 칼날은 자신을 만든 손을 기억한다."
+      },
       "heroic_quartermaster": {
         "name": "병참장교 벡스",
         "title": "영웅 병참장교",
@@ -20890,6 +20925,31 @@ export const ko_KR: EnTranslations = {
         "name": "교관 헤일",
         "title": "부두 대련 사범",
         "greeting": "내 뒤에 있는 허수아비는 되받아치지도, 쓰러지지도 않는다, {className}. 중요한 건 장부다. 네가 저기에 꽂은 일격은 하나도 빠짐없이 피해량 미터가 세어 준다. 저것을 대상으로 삼고 미터를 열어라, 나머지는 내가 알려주마."
+      },
+      "master_monk_sora": {
+        "name": "소라 사범",
+        "title": "벚꽃 사원의 수호자",
+        "greeting": "꽃잎은 매년 봄 같은 방식으로 떨어지지만, 하나하나는 언제나 새롭다. 품새도 그러하다."
+      },
+      "monk_trainee_a": {
+        "name": "수련생 히로",
+        "title": "사원 수련생",
+        "greeting": "꽃과 함께 숨을 들이쉬고, 바람과 함께 내질러라. 다시."
+      },
+      "monk_trainee_b": {
+        "name": "수련생 메이",
+        "title": "사원 수련생",
+        "greeting": "꽃과 함께 숨을 들이쉬고, 바람과 함께 내질러라. 다시."
+      },
+      "monk_trainee_c": {
+        "name": "수련생 켄지",
+        "title": "사원 수련생",
+        "greeting": "꽃과 함께 숨을 들이쉬고, 바람과 함께 내질러라. 다시."
+      },
+      "monk_trainee_d": {
+        "name": "수련생 아이코",
+        "title": "사원 수련생",
+        "greeting": "꽃과 함께 숨을 들이쉬고, 바람과 함께 내질러라. 다시."
       },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",
@@ -23156,6 +23216,16 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "치유용 허수아비에게 유효한 치유 명중"
+          }
+        }
+      },
+      "q_blossom_kata": {
+        "title": "꽃의 길",
+        "text": "고양이가 연못을 바라보듯 내 제자들을 지켜보는구나, {playerName}. 좋다. 바라보는 것이 첫 번째 가르침이다. 두 번째는 매트다. 올라서서 마음을 비우고 품새가 너를 움직이게 하라. 발이 기억하면 돌아오너라.",
+        "completion": "자세는 비뚤고 숨소리도 거칠었다. 그래도 꽃잎은 너를 향해 기울었다. 벚꽃 사원의 수도승이여, 환영한다.",
+        "objectives": {
+          "0": {
+            "label": "수련 매트에서 품새 연습하기"
           }
         }
       },

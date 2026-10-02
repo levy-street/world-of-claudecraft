@@ -821,7 +821,8 @@ describe('stock rows: the phase 11n pulls', () => {
       farmer_hollis: 6,
       farmer_verbena: 6,
       provisioner_fenna: 7,
-      armorer_hode: 5,
+      armorer_hode: 8,
+      swordsmith_ren: 1,
       // The two honor trinkets (WARFARE_TRINKET_STOCK) joined both honor
       // counters: 47 to 49 each.
       // Plus the 139 Warfare Season 2 rows (second release/v0.44.0 base merge): 188.

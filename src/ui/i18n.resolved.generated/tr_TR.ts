@@ -665,7 +665,8 @@ export const tr_TR: EnTranslations = {
       "bow": "Eğil",
       "clap": "Alkışla",
       "roar": "Kükre",
-      "kneel": "Diz Çök"
+      "kneel": "Diz Çök",
+      "kata": "Kata"
     },
     "emoteWheel": {
       "edit": "Düzenle",
@@ -4434,6 +4435,8 @@ export const tr_TR: EnTranslations = {
       "enchantedFallback": "Büyülü",
       "partyTradeWindow": "Bu eşyayı, düşüşünü paylaşan oyunculara önümüzdeki {time} boyunca takas edebilirsin. Kuşanmak takas penceresini sona erdirir.",
       "perfectedBadge": "Kusursuzlaştırılmış",
+      "katanaKills": "Enemies slain: {count}",
+      "katanaKanji": "Engraved kanji: {glyph}",
       "perfectingRank": "Kusursuzlaştırma: {ranks} içinden {rank}. kademe",
       "materialSourceGatherer": "{count} × {name} tarafından toplandı",
       "materialSourceGathererSigned": "{count} × {name} tarafından toplandı, {signer} imzalı",
@@ -10196,6 +10199,7 @@ export const tr_TR: EnTranslations = {
     "paladin": "Paladin",
     "hunter": "Avcı",
     "rogue": "Hırsız",
+    "ninja": "Ninja",
     "priest": "Rahip",
     "shaman": "Şaman",
     "mage": "Büyücü",
@@ -11285,6 +11289,7 @@ export const tr_TR: EnTranslations = {
       "paladin": "Şifacı / Tank / Yakın DPS",
       "hunter": "Menzilli DPS",
       "rogue": "Yakın DPS",
+      "ninja": "Melee DPS",
       "priest": "Şifacı / Menzilli DPS",
       "shaman": "Şifacı / Yakın veya Menzilli DPS",
       "mage": "Menzilli DPS",
@@ -11309,6 +11314,7 @@ export const tr_TR: EnTranslations = {
       "paladin": "Paladinler, müttefiklerini kutsamalarla destekleyen, yaraları Onaran Işık'la iyileştiren ve ağır zırhları içinde güçsüzü koruyan kutsal şövalyelerdir.",
       "hunter": "Avcılar, evcilleştirdikleri bir canavarın yanında savaşan menzilli uzmanlardır; düşmanları nişanlı ve seri atış yağmuruna tutar, sokmalar ve sersemletici atışlarla yavaşlatır ve ana uygun suretlere bürünürler.",
       "rogue": "Hırsızlar, gölgelerden sırttan bıçaklamalar ve bitirici hamleler için Enerji ile Kombo Puanı harcayan gizli suikastçılardır.",
+      "ninja": "A shadow-trained blade of the Blossom Temple: a fast, stealthy energy fighter who strikes with katana and shuriken, then vanishes in smoke.",
       "priest": "Rahipler müttefikleri iyileştirmek ve korumak için Onaran Işık'a başvurur; Gölge büyüsü ise düşmanlarının canını emmelerine olanak tanır.",
       "shaman": "Şamanlar elementlere komuta eder; silahlara güç katar, düşmanları yıldırımla sarsar ve müttefikleri iyileştirir.",
       "mage": "Büyücüler Ateş, Buz ve gizem gücünü bükerek düşmanları yok eder, su çağırır ve tehditleri olduğu yerde dondurur.",
@@ -14761,6 +14767,18 @@ export const tr_TR: EnTranslations = {
       "choir_of_deliverance": {
         "name": "Kurtuluş Korosu",
         "description": "6 sn kanalize eder, 30 metre içindeki grup üyelerini her 2 saniyede {damage} kadar iyileştirir. İyileştirme büyü gücüyle artar."
+      },
+      "shuriken_toss": {
+        "name": "Shuriken Toss",
+        "description": "Throw a spinning shuriken for {damage} Physical damage. Awards 1 combo point."
+      },
+      "shadow_slash": {
+        "name": "Shadow Slash",
+        "description": "A quick katana cut for weapon damage plus {damage}. Awards 1 combo point."
+      },
+      "smoke_bomb": {
+        "name": "Smoke Bomb",
+        "description": "Burst a smoke bomb in the target's face for {damage} Physical damage, incapacitating it for 4 sec. Any damage breaks the effect. Awards 1 combo point."
       },
       "bear_charge": {
         "name": "Bruin Hücumu",
@@ -18451,6 +18469,18 @@ export const tr_TR: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Öncü'nün Savaş Asası"
       },
+      "katana_a": {
+        "name": "Blossom Katana"
+      },
+      "katana_b": {
+        "name": "Moonsteel Katana"
+      },
+      "katana_c": {
+        "name": "Crimson Petal Katana"
+      },
+      "blossom_training_mat": {
+        "name": "Temple Training Mat"
+      },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
       },
@@ -20421,6 +20451,11 @@ export const tr_TR: EnTranslations = {
         "title": "Usta Zırhçı",
         "greeting": "Ocak kızgın, bileği taşı dönüyor. Kesiyorsa, satarım."
       },
+      "swordsmith_ren": {
+        "name": "Swordsmith Ren",
+        "title": "Katana Maker",
+        "greeting": "Folded a thousand times under the blossoms. Each blade remembers the hand that made it."
+      },
       "heroic_quartermaster": {
         "name": "Levazımcı Vex",
         "title": "Kahramanca Levazımcı",
@@ -20890,6 +20925,31 @@ export const tr_TR: EnTranslations = {
         "name": "Talimbası Hale",
         "title": "Rıhtım Talim Ustası",
         "greeting": "Arkamdaki talim mankeni asla karşılık vermez ve asla devrilmez, {className}. Önemli olan sayımdır: Hasar Sayaçların ona indirdiğin her darbeyi sayar. Onu hedefleyip sayaçları aç, gerisini sana göstereyim."
+      },
+      "master_monk_sora": {
+        "name": "Master Sora",
+        "title": "Keeper of the Blossom Temple",
+        "greeting": "The petals fall the same way every spring, and still each one is new. So it is with the kata."
+      },
+      "monk_trainee_a": {
+        "name": "Trainee Hiro",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_b": {
+        "name": "Trainee Mei",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_c": {
+        "name": "Trainee Kenji",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_d": {
+        "name": "Trainee Aiko",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -23156,6 +23216,16 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "İyileştirme Mankenine etkili iyileştirme yapıldı"
+          }
+        }
+      },
+      "q_blossom_kata": {
+        "title": "The Way of the Blossom",
+        "text": "You watch my students the way a cat watches a pond, {playerName}. Good. Watching is the first lesson. The second is the mat: step onto it, empty your mind, and let the kata move you. Come back when your feet remember it.",
+        "completion": "Your stance was crooked and your breath was loud. And still the blossoms leaned toward you. Welcome, monk of the Blossom Temple.",
+        "objectives": {
+          "0": {
+            "label": "Practice the kata on the training mat"
           }
         }
       },

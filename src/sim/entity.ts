@@ -660,7 +660,7 @@ export function recalcPlayerStats(
   const apFromStats =
     cls === 'warrior' || cls === 'paladin' || cls === 'shaman' || cls === 'druid'
       ? s.str * 2
-      : cls === 'rogue' || cls === 'hunter'
+      : cls === 'rogue' || cls === 'ninja' || cls === 'hunter'
         ? s.str + s.agi
         : s.str;
   // Floor at 0 so a heavy debuff_ap stack can never bake a negative attack power

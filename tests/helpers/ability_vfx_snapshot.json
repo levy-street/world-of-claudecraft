@@ -1112,6 +1112,10 @@
       "spec": "ab010752affc23ed5d9ca07072c2f455df3c847e29fb6198554c6da9522ad4e8",
       "full": "5b812fa5ffb959eb1ad1e8ebc1f0a1a35560faef0d28c6fe0c74292c5031e90f"
     },
+    "shadow_slash": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
     "shadow_word_pain": {
       "spec": "20b2833e483fb3751f6e94508dd31df65b629cdee68b3b38d78125a10075c32b",
       "full": "3260fb6baa5e7f479a768cbee144a0e4c8ecaf3d5c1b515ff0a2da28c149a8e1"
@@ -1140,6 +1144,10 @@
       "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
       "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
     },
+    "shuriken_toss": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
     "silence": {
       "spec": "4a89fc340aa495c73e948503947cbc078ec4474f1244aeaf2139209a8b1128a7",
       "full": "43d3a07d77bfd6970308a17e3e3ff7ef136f0c3bc439589008f5bacd15829777"
@@ -1163,6 +1171,10 @@
     "smite": {
       "spec": "53a4a11d494b31d11c9baf8f93306fa3b758fab25fd2997d31d025e00bd18bd0",
       "full": "d8da2971e59a00e7808feccd5fd935d7c20e9e4b8b55f03047837e1b54688e34"
+    },
+    "smoke_bomb": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
     },
     "smoke_screen": {
       "spec": "b168c1643179a8593366a004b50b1e1ce256caae9624f82a52261bbd4d53aad3",

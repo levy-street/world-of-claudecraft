@@ -435,6 +435,12 @@ export const ROGUE_TALENTS: ClassTalents = {
   class: 'rogue',
   specs: ROGUE_SPECS,
 };
+// The Ninja runs on the rogue engine (energy, combo points, stealth), so it
+// shares the rogue specializations re-homed to its own class id.
+export const NINJA_TALENTS: ClassTalents = {
+  class: 'ninja',
+  specs: ROGUE_SPECS.map((spec) => ({ ...spec, class: 'ninja' as const })),
+};
 export const PRIEST_TALENTS: ClassTalents = {
   class: 'priest',
   specs: PRIEST_SPECS,

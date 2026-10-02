@@ -45,6 +45,12 @@ export const CLASS_DETAILS: Record<PlayerClass, ClassDetails> = {
     armorKey: 'classDetails.armor.leatherCloth',
     weaponsKey: 'classDetails.weapons.daggersSwords',
   },
+  ninja: {
+    roleKey: 'classDetails.roles.rogue',
+    roleType: 'dps',
+    armorKey: 'classDetails.armor.leatherCloth',
+    weaponsKey: 'classDetails.weapons.daggersSwords',
+  },
   priest: {
     roleKey: 'classDetails.roles.priest',
     roleType: 'healer',
@@ -85,6 +91,7 @@ export const SIGNATURE_ABILITIES: Record<PlayerClass, string[]> = {
   paladin: ['holy_light', 'hammer_of_grace', 'divine_ascension'],
   hunter: ['pack_command', 'measured_shot', 'raptor_strike'],
   rogue: ['sinister_strike', 'eviscerate', 'evasion'],
+  ninja: ['shadow_slash', 'shuriken_toss', 'smoke_bomb'],
   priest: ['smite', 'power_word_shield', 'shadow_word_pain'],
   shaman: ['lightning_bolt', 'rockbiter_weapon', 'ghost_wolf'],
   mage: ['fireball', 'frostbolt', 'polymorph'],
@@ -175,6 +182,23 @@ export const SPEC_CARD_INFO: Record<PlayerClass, Record<string, SpecCardInfo>> =
       primaryStat: 'agi',
       complexity: 'high',
       examples: ['hemorrhage', 'cheap_shot', 'vanish', 'sap'],
+    },
+  },
+  ninja: {
+    assassination: {
+      primaryStat: 'agi',
+      complexity: 'medium',
+      examples: ['shadow_slash', 'shuriken_toss', 'smoke_bomb'],
+    },
+    combat: {
+      primaryStat: 'agi',
+      complexity: 'low',
+      examples: ['shadow_slash', 'shuriken_toss', 'smoke_bomb'],
+    },
+    subtlety: {
+      primaryStat: 'agi',
+      complexity: 'high',
+      examples: ['shadow_slash', 'shuriken_toss', 'smoke_bomb'],
     },
   },
   priest: {

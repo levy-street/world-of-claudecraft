@@ -2178,6 +2178,22 @@ const classAbilityNamesEn = {
         'Choir of Deliverance',
         'Channel for 6 sec, healing party members within 30 yards for {damage} every 2 sec. Healing increases with Spell Power.',
       ],
+      // the Ninja's own buttons (src/sim/content/ninja_abilities.ts)
+      [
+        'shuriken_toss',
+        'Shuriken Toss',
+        'Throw a spinning shuriken for {damage} Physical damage. Awards 1 combo point.',
+      ],
+      [
+        'shadow_slash',
+        'Shadow Slash',
+        'A quick katana cut for weapon damage plus {damage}. Awards 1 combo point.',
+      ],
+      [
+        'smoke_bomb',
+        'Smoke Bomb',
+        "Burst a smoke bomb in the target's face for {damage} Physical damage, incapacitating it for 4 sec. Any damage breaks the effect. Awards 1 combo point.",
+      ],
     ]),
   },
 };

@@ -49,6 +49,7 @@ export const ROW_TREES = {
   mage: MAGE_CHOICE_ROWS.rows,
   warlock: WARLOCK_CHOICE_ROWS.rows,
   druid: DRUID_CHOICE_ROWS.rows,
+  ninja: ROGUE_CHOICE_ROWS.rows,
 } satisfies Record<PlayerClass, RowTree>;
 
 const ROW_LEVEL_SET = new Set<number>(ROW_LEVELS);

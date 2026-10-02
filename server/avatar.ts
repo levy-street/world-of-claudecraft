@@ -21,6 +21,7 @@ export const PLAYER_CLASSES: readonly PlayerClass[] = [
   'mage',
   'warlock',
   'druid',
+  'ninja',
 ];
 
 export const MAX_SKIN = 7;

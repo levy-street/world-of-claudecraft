@@ -44,6 +44,7 @@ import { interactIgnivarRaidLore } from './ignivar_raid_lore';
 import { isInRaidInstance } from './instances/dungeons';
 import { FERRY_BELL_OBJECT_ID, tryRingFerryBell } from './interactions/ferry_bell';
 import { HUT_OBJECT_ID, tryBurnHut } from './interactions/firebottle_hut';
+import { practiceOnTrainingMat } from './interactions/training_mat';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
   awardSharedLootItem,
@@ -310,6 +311,7 @@ export function pickUpObject(
     ctx.error(meta.entityId, 'Too far away.');
     return false;
   }
+  practiceOnTrainingMat(ctx, obj.objectItemId, meta.entityId);
   if (isRealmBuilderMonument) {
     // The whole roll travels with the event so the card reads identically
     // offline and online, and so pointing content/realm_builders.ts at a live

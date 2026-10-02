@@ -35,6 +35,7 @@
 // no rng, no clock. Total on `unknown`, so a corrupt row can never throw
 // inside a character load.
 
+import { isValidKatanaLook } from './katana_look';
 import { isLoadablePartyTradeMarker } from './loot/bop_trade_window';
 import { isValidLootQuality } from './loot_quality/types';
 import { PERFECTING_RANKS } from './professions/perfecting';
@@ -300,6 +301,15 @@ export function sanitizeItemInstancePayloadOnLoad(payload: unknown): SanitizedIt
         !isLoadablePartyTradeMarker(value, MAX_INSTANCE_STRING_LENGTH) ||
         savedJsonLength(value) > MAX_INSTANCE_SUBTREE_JSON_LENGTH
       ) {
+        delete record[key];
+        dropped.push(key);
+      }
+      continue;
+    }
+    if (key === 'katana') {
+      // The Katana Table record (katana_look.ts): kept only when every key is
+      // known and legal; anything else drops whole (drop-only doctrine).
+      if (!isValidKatanaLook(value)) {
         delete record[key];
         dropped.push(key);
       }

@@ -310,6 +310,7 @@ const NPC_IDS = [
   'scout_maren_highwatch',
   'quartermaster_bree',
   'armorer_hode',
+  'swordsmith_ren', // katana vendor (Blossom Temple grove, Evergarden)
   'heroic_quartermaster', // Heroic Marks vendor (Highwatch, zone 3)
   'fury', // Honor Quartermaster and WARFARE vendor (Eastbrook, zone 1)
   'warmarshal_draven_kole', // Master of the Warfare Stores, the WARFARE vendor (Highwatch, zone 3)
@@ -421,6 +422,12 @@ const NPC_IDS = [
   'tidewarden_nel',
   // the Eastbrook quay's sparring master (content/practice_dummies.ts)
   'drillmaster_hale',
+  // the Blossom Temple grove (content/blossom_temple.ts)
+  'master_monk_sora',
+  'monk_trainee_a',
+  'monk_trainee_b',
+  'monk_trainee_c',
+  'monk_trainee_d',
 ] as const;
 
 const QUEST_IDS = [
@@ -655,6 +662,7 @@ const QUEST_IDS = [
   // the Eastbrook hub dummy lesson (content/practice_dummies.ts)
   'q_hub_know_your_numbers',
   'q_hub_healing_numbers',
+  'q_blossom_kata',
 ] as const;
 
 const ZONE_IDS = [

@@ -19,6 +19,7 @@
 // Deterministic: a pure argmax over the static content tables. No rng, no clock, so
 // the same spec always yields byte-identical gear and a balance run is repeatable.
 
+import { classListAdmits } from './equipment_rules';
 import { isMaterialsOnlyBag } from './bag_pools';
 import { BAG_SOCKETS } from './bags';
 import { type DevKitRole, devKitRole } from './content/dev_kit_roles';
@@ -173,7 +174,7 @@ export function isFreshTwentyItem(cls: PlayerClass, item: ItemDef): boolean {
   // canEquipItem returns on the armor-rank check for anything with an armorType, so
   // a class-locked plate piece never reaches its own requiredClass test. Re-check it
   // here or a mail class ends up wearing warrior-only tier pieces.
-  if (item.requiredClass && !item.requiredClass.includes(cls)) return false;
+  if (item.requiredClass && !classListAdmits(item.requiredClass, cls)) return false;
   return meetsLevelRequirement(DEV_KIT_LEVEL, item);
 }
 

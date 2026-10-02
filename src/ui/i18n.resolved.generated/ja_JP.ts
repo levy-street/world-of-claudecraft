@@ -665,7 +665,8 @@ export const ja_JP: EnTranslations = {
       "bow": "お辞儀",
       "clap": "拍手",
       "roar": "雄叫び",
-      "kneel": "ひざまずく"
+      "kneel": "ひざまずく",
+      "kata": "Kata"
     },
     "emoteWheel": {
       "edit": "編集",
@@ -4434,6 +4435,8 @@ export const ja_JP: EnTranslations = {
       "enchantedFallback": "エンチャント済み",
       "partyTradeWindow": "このアイテムはあと{time}の間、同じドロップを分かち合ったプレイヤーと取引できます。装備すると取引期間は終了します。",
       "perfectedBadge": "完全化済み",
+      "katanaKills": "倒した敵：{count}",
+      "katanaKanji": "刻まれた漢字：{glyph}",
       "perfectingRank": "完全化：ランク{rank}／{ranks}",
       "materialSourceGatherer": "{count} × {name}が採集",
       "materialSourceGathererSigned": "{count} × {name}が採集、{signer}が署名",
@@ -10196,6 +10199,7 @@ export const ja_JP: EnTranslations = {
     "paladin": "パラディン",
     "hunter": "ハンター",
     "rogue": "ローグ",
+    "ninja": "忍者",
     "priest": "プリースト",
     "shaman": "シャーマン",
     "mage": "メイジ",
@@ -11285,6 +11289,7 @@ export const ja_JP: EnTranslations = {
       "paladin": "ヒーラー / タンク / 近接DPS",
       "hunter": "遠隔DPS",
       "rogue": "近接DPS",
+      "ninja": "近接DPS",
       "priest": "ヒーラー / 遠隔DPS",
       "shaman": "ヒーラー / 近接または遠隔DPS",
       "mage": "遠隔DPS",
@@ -11309,6 +11314,7 @@ export const ja_JP: EnTranslations = {
       "paladin": "パラディンは祝福で味方を支え、癒しの光で傷を癒やし、重装備で弱き者を守る聖騎士です。",
       "hunter": "ハンターはテイムした獣を従えて戦う遠距離戦の専門家で、エイムショットやラピッドファイアで敵を撃ち抜き、スティングやコンカッシブショットで足を止め、状況に応じて相を切り替えます。",
       "rogue": "ローグはエネルギーとコンボポイントを使い、影から奇襲と決め技を放つ隠密の暗殺者です。",
+      "ninja": "桜の寺で影の修行を積んだ刃。素早く隠密に動くエネルギーの戦士で、刀と手裏剣で攻め、煙の中へ消える。",
       "priest": "プリーストは癒しの光で味方を癒やして守り、影の魔法で敵の生命力を吸い取ります。",
       "shaman": "シャーマンは元素を操り、武器に力を宿し、稲妻で敵を打ち、味方を回復します。",
       "mage": "メイジは火炎、氷霜、秘術の力で敵を破壊し、水を召喚し、脅威をその場で凍りつかせます。",
@@ -14761,6 +14767,18 @@ export const ja_JP: EnTranslations = {
       "choir_of_deliverance": {
         "name": "救済の聖歌隊",
         "description": "6秒間チャネルし、30ヤード以内のパーティメンバーを2秒ごとに{damage}回復します。回復量はスペルパワーで増加します。"
+      },
+      "shuriken_toss": {
+        "name": "手裏剣投げ",
+        "description": "回転する手裏剣を投げ、{damage}の物理ダメージを与える。コンボポイントを1獲得する。"
+      },
+      "shadow_slash": {
+        "name": "影斬り",
+        "description": "素早い刀の一閃で、武器ダメージに加えて{damage}のダメージを与える。コンボポイントを1獲得する。"
+      },
+      "smoke_bomb": {
+        "name": "煙玉",
+        "description": "目標の顔前で煙玉を炸裂させ、{damage}の物理ダメージを与えて4秒間行動不能にする。ダメージを受けると効果は解除される。コンボポイントを1獲得する。"
       },
       "bear_charge": {
         "name": "ブルーインラッシュ",
@@ -18451,6 +18469,18 @@ export const ja_JP: EnTranslations = {
       "vanguard_warstaff": {
         "name": "ヴァンガードの戦杖"
       },
+      "katana_a": {
+        "name": "桜の刀"
+      },
+      "katana_b": {
+        "name": "月鋼の刀"
+      },
+      "katana_c": {
+        "name": "紅花弁の刀"
+      },
+      "blossom_training_mat": {
+        "name": "寺の稽古畳"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -20421,6 +20451,11 @@ export const ja_JP: EnTranslations = {
         "title": "熟練防具師",
         "greeting": "炉は熱く、砥石は回っています。切れるものなら売ります。"
       },
+      "swordsmith_ren": {
+        "name": "刀鍛冶レン",
+        "title": "刀匠",
+        "greeting": "花の下で千度折り返した刃だ。どの刃も、打った手を覚えている。"
+      },
       "heroic_quartermaster": {
         "name": "補給係ヴェックス",
         "title": "英雄補給係",
@@ -20890,6 +20925,31 @@ export const ja_JP: EnTranslations = {
         "name": "教練官ヘイル",
         "title": "波止場の稽古師範",
         "greeting": "後ろのダミーは打ち返しもしなければ倒れもしない、{className}。大事なのは記録だ。お前が当てた一撃は残らずダメージメーターが数えてくれる。あれを標的にしてメーターを開け、あとは俺が教えてやる。"
+      },
+      "master_monk_sora": {
+        "name": "空師範",
+        "title": "桜の寺の守り手",
+        "greeting": "花びらは毎年同じように散る。それでも一枚一枚は新しい。型もまた同じだ。"
+      },
+      "monk_trainee_a": {
+        "name": "修行僧ヒロ",
+        "title": "寺の修行僧",
+        "greeting": "花とともに息を吸い、風とともに打て。もう一度。"
+      },
+      "monk_trainee_b": {
+        "name": "修行僧メイ",
+        "title": "寺の修行僧",
+        "greeting": "花とともに息を吸い、風とともに打て。もう一度。"
+      },
+      "monk_trainee_c": {
+        "name": "修行僧ケンジ",
+        "title": "寺の修行僧",
+        "greeting": "花とともに息を吸い、風とともに打て。もう一度。"
+      },
+      "monk_trainee_d": {
+        "name": "修行僧アイコ",
+        "title": "寺の修行僧",
+        "greeting": "花とともに息を吸い、風とともに打て。もう一度。"
       },
       "tidewatcher_ondrel": {
         "name": "オンドレル・ヴェイン",
@@ -23156,6 +23216,16 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "治療用ダミーに有効な治療が当たった"
+          }
+        }
+      },
+      "q_blossom_kata": {
+        "title": "花の道",
+        "text": "猫が池を見つめるように、弟子たちを見ているな、{playerName}。よい。見ることが最初の教えだ。二つ目は畳だ。上に立ち、心を空にして、型に身を任せよ。足が覚えたら戻ってきなさい。",
+        "completion": "構えは歪み、息も荒かった。それでも花びらはお前の方へ傾いた。ようこそ、桜の寺の僧よ。",
+        "objectives": {
+          "0": {
+            "label": "稽古畳で型を練習する"
           }
         }
       },

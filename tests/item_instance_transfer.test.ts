@@ -103,6 +103,7 @@ describe('publicInstanceView: the display trim', () => {
     const projected = [...game.matchAll(/pub\.(\w+) = inst\.(\w+);/g)].map((m) => m[1]);
     expect(projected.sort()).toEqual([
       'enchant',
+      'katana',
       'lootQuality',
       'name',
       'perfected',
@@ -117,6 +118,7 @@ describe('publicInstanceView: the display trim', () => {
     const trimmed = [...transfer.matchAll(/pub\.(\w+) = /g)].map((m) => m[1]);
     expect([...new Set(trimmed)].sort()).toEqual([
       'enchant',
+      'katana',
       'lootQuality',
       'name',
       'perfected',

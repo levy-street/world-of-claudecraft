@@ -119,6 +119,7 @@ describe('weapon type classification', () => {
       if (variant === 'purple_sword') return 'sword';
       if (variant === 'purple_axe') return 'axe';
       if (/^(adv_)?sword/.test(variant)) return 'sword';
+      if (/^katana_sword/.test(variant)) return 'sword';
       // The bespoke dagger skins carry thematic names; assets.ts tags each of
       // these variants VAR_DAGGER, which is the render-side family authority.
       if (/^(ice_fang|redskull_dagger|purple_dagger|whittler_s_knife)$/.test(variant))

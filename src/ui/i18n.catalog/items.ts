@@ -3374,6 +3374,10 @@ const ITEM_ENTITY_IDS = [
   'vanguard_oath_blade',
   'vanguard_fang_dagger',
   'vanguard_warstaff',
+  'katana_a',
+  'katana_b',
+  'katana_c',
+  'blossom_training_mat',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -4309,6 +4313,10 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   vanguard_oath_blade: "Vanguard's Oath",
   vanguard_fang_dagger: "Vanguard's Fang",
   vanguard_warstaff: "Vanguard's Warstaff",
+  katana_a: 'Blossom Katana',
+  katana_b: 'Moonsteel Katana',
+  katana_c: 'Crimson Petal Katana',
+  blossom_training_mat: 'Temple Training Mat',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

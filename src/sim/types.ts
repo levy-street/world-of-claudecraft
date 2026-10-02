@@ -282,7 +282,8 @@ export type PlayerClass =
   | 'shaman'
   | 'mage'
   | 'warlock'
-  | 'druid';
+  | 'druid'
+  | 'ninja';
 
 // Sanguine Aura's class-level melee recipient filter. It excludes the pure
 // casters and Hunter, whose primary attack loop is ranged.
@@ -292,6 +293,7 @@ export const MELEE_CLASSES: ReadonlySet<PlayerClass> = new Set([
   'rogue',
   'shaman',
   'druid',
+  'ninja',
 ]);
 
 // Classes that command a persistent pet (hunter beast, warlock demon, the
@@ -337,6 +339,7 @@ export const ALL_CLASSES: PlayerClass[] = [
   'mage',
   'warlock',
   'druid',
+  'ninja',
 ];
 export type ResourceType = 'rage' | 'mana' | 'energy' | 'focus';
 export const OVERHEAD_EMOTE_IDS = [
@@ -353,6 +356,7 @@ export const OVERHEAD_EMOTE_IDS = [
   'clap',
   'roar',
   'kneel',
+  'kata',
 ] as const;
 export type OverheadEmoteId = (typeof OVERHEAD_EMOTE_IDS)[number];
 
@@ -1713,6 +1717,17 @@ export interface ItemInstancePayload {
    *  good. Additive and JSONB-safe: an absent or expired window is an
    *  ordinary soulbound copy. */
   partyTrade?: { untilMs: number; eligible: string[]; eligibleIds?: number[] };
+  /** The Katana Table record (katana_look.ts): kill count plus the chosen
+   *  blade/guard/wrap/scabbard colors and engraved kanji. Cosmetic and
+   *  progress-only; the stats always come from the katana def. */
+  katana?: {
+    kills?: number;
+    blade?: string;
+    guard?: string;
+    wrap?: string;
+    saya?: string;
+    kanji?: string;
+  };
   /** Long-term Rift gear progression. `rolled.stats` is the authoritative
    * aggregate consumed by recalcPlayerStats (the band's whole stat line plus
    * its gem ratings); this record is the bounded input it is rebuilt from
@@ -1751,6 +1766,7 @@ export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstance
   const lootQuality = cloneLootQuality(src.lootQuality);
   if (lootQuality) instance.lootQuality = lootQuality;
   if (src.charges) instance.charges = { ...src.charges };
+  if (src.katana) instance.katana = { ...src.katana };
   if (
     src.perfectingBonus &&
     typeof src.perfectingBonus === 'object' &&

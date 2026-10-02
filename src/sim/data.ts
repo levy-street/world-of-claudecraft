@@ -93,6 +93,14 @@ import {
 } from './content/evergarden';
 import { FACTION_VENDOR_ITEMS, FACTION_VENDOR_NPCS } from './content/faction_vendors';
 import {
+  BLOSSOM_TEMPLE_ITEMS,
+  BLOSSOM_TEMPLE_NPCS,
+  BLOSSOM_TEMPLE_OBJECTS,
+  BLOSSOM_TEMPLE_QUEST_ORDER,
+  BLOSSOM_TEMPLE_QUESTS,
+} from './content/blossom_temple';
+import { KATANA_ITEMS, KATANA_NPCS } from './content/katanas';
+import {
   FARSHORE_CAMPS,
   FARSHORE_ESCORTS,
   FARSHORE_ITEMS,
@@ -426,6 +434,8 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   WORLD_QUEST_ITEMS,
   FACTION_VENDOR_ITEMS,
   HOARD_ITEMS,
+  KATANA_ITEMS,
+  BLOSSOM_TEMPLE_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -515,6 +525,8 @@ export const NPCS: Record<string, NpcDef> = {
   [GLIDER_APPRENTICE_NPC_DEF.id]: GLIDER_APPRENTICE_NPC_DEF,
   ...Object.fromEntries(INVESTIGATION_NPCS.map((npc) => [npc.id, npc])),
   ...FACTION_VENDOR_NPCS,
+  ...KATANA_NPCS,
+  ...BLOSSOM_TEMPLE_NPCS,
   // The Harbormaster's House keeper at the Wyrmwatch cliff harbor
   // (content/wyrmwatch_harbor_house.ts), appended last so every NPC placed
   // before her keeps its entity id.
@@ -551,6 +563,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...PROVING_SHORE_QUESTS,
   ...IGNIVAR_RAID_LORE_QUESTS,
   ...HUB_PRACTICE_QUESTS,
+  ...BLOSSOM_TEMPLE_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -572,6 +585,7 @@ export const QUEST_ORDER: string[] = [
   ...PROVING_SHORE_QUEST_ORDER,
   ...IGNIVAR_RAID_LORE_QUEST_ORDER,
   ...HUB_PRACTICE_QUEST_ORDER,
+  ...BLOSSOM_TEMPLE_QUEST_ORDER,
 ];
 
 // The Book of Deeds catalog (content/deeds.ts) is deliberately NOT re-exported
@@ -666,6 +680,7 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...FARSHORE_OBJECTS,
   ...PROVING_SHORE_OBJECTS,
   ...WORLD_QUEST_OBJECTS,
+  ...BLOSSOM_TEMPLE_OBJECTS,
 ];
 
 export const GATHER_NODES: GatherNodeDef[] = [...GATHER_NODES_CONTENT];
@@ -765,6 +780,7 @@ export const REWARD_ARCHETYPE: Record<PlayerClass, PlayerClass> = {
   paladin: 'warrior',
   shaman: 'warrior',
   rogue: 'rogue',
+  ninja: 'rogue',
   hunter: 'rogue',
   mage: 'mage',
   priest: 'mage',

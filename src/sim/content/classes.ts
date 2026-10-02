@@ -36,6 +36,7 @@ import {
 import { PALADIN_CORE_ABILITIES } from './paladin_core_abilities';
 import { PRIEST_ABILITIES } from './priest';
 import { MENDING_WATERS_MANA_COST, TIDECALL_MANA_COST } from './shaman_tuning';
+import { NINJA_ABILITIES, NINJA_SIGNATURE_IDS } from './ninja_abilities';
 import { TALENT_ABILITIES_V2 } from './talent_abilities_v2';
 import type { TalentModifiers } from './talents';
 
@@ -284,6 +285,50 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'venom_dart',
     ],
     color: 0xfcee58,
+  },
+  ninja: {
+    id: 'ninja',
+    name: 'Ninja',
+    baseStats: { str: 17, agi: 25, sta: 17, int: 11, spi: 12, armor: 40 },
+    statsPerLevel: { str: 1, agi: 3, sta: 2, int: 0, spi: 0, armor: 8 },
+    baseHp: 45,
+    hpPerLevel: 15,
+    baseMana: 100, // energy cap
+    manaPerLevel: 0,
+    resourceType: 'energy',
+    startWeapon: 'rusty_dagger',
+    startOffhand: 'rusty_dagger',
+    startChest: 'footpad_jerkin',
+    startItems: START_RATIONS,
+    abilities: [
+      ...NINJA_SIGNATURE_IDS,
+      'sinister_strike',
+      'eviscerate',
+      'garrote',
+      'backstab',
+      'gouge',
+      'cheap_shot',
+      'evasion',
+      'sap',
+      'slice_and_dice',
+      'sprint',
+      'crippling_poison',
+      'kidney_shot',
+      'expose_armor',
+      'ambush',
+      'rupture',
+      'vanish',
+      'instant_poison',
+      'adrenaline_rush',
+      'deadly_poison',
+      'melting_acid',
+      'nightshade_coating',
+      'blind',
+      'stealth',
+      'kick',
+      'venom_dart',
+    ],
+    color: 0x5a4f8c,
   },
   paladin: {
     id: 'paladin',
@@ -8705,6 +8750,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // Canonical Talents V2 active grants. These are absent from baseline class kits
   // and become known only through the selected row's `grant` effect.
   ...TALENT_ABILITIES_V2,
+  ...NINJA_ABILITIES,
   ...PRIEST_ABILITIES,
 
   // The Vale Cup sport kit (class-agnostic; docs/prd/vale-cup.md). Merged here

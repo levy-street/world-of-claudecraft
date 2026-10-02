@@ -410,6 +410,7 @@ const CLASS_LABELS: Record<PlayerClass, string> = {
   paladin: 'Paladin',
   hunter: 'Hunter',
   rogue: 'Rogue',
+  ninja: 'Ninja',
   priest: 'Priest',
   shaman: 'Shaman',
   mage: 'Mage',

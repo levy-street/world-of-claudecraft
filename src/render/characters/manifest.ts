@@ -370,6 +370,13 @@ const KAYKIT_EMOTES: Partial<Record<OverheadEmoteId, EmoteClipSpec>> = {
     timeScale: 0.9,
   },
   kneel: { clips: ['Sit_Floor_Down'], timeScale: 0.85 },
+  // martial-arts drill: strikes every KayKit rig carries (the clap and roar
+  // emotes ride the same two), so no rig resolves a missing clip
+  kata: {
+    clips: ['1H_Melee_Attack_Slice_Diagonal', '1H_Melee_Attack_Chop'],
+    timeScale: 1.1,
+    repeats: 3,
+  },
 };
 
 const kaykit = (attack: string[], idle = 'Idle'): ClipMap => ({
@@ -1256,6 +1263,10 @@ export const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
  *  polish it always had. Keyed by held-model key (ITEM_WEAPON_VARIANTS /
  *  ITEM_OFFHAND_MODELS values). */
 export const AUTHORED_HELD_MODELS: ReadonlySet<string> = new Set([
+  // procedural katanas (scripts/assets/katana/): per-part metal/wrap materials
+  'katana_sword_a',
+  'katana_sword_b',
+  'katana_sword_c',
   'hammer_varkhul', // Varkhul Forgebreaker (Ignivar raid legendary)
   'varkhul_emberward', // Varkhul Emberward (Ignivar raid legendary)
   // Harbormaster Tamsin's worn gear (scripts/assets/harbormaster_gear/): felt, brass and
@@ -1448,6 +1459,14 @@ export const SKINS: Record<string, (string | null)[]> = {
     `${SKINS_DIR}/ranger/alt_suit_chrome.png`,
   ],
   player_rogue: [
+    null,
+    `${SKINS_DIR}/rogue/alt_a.png`,
+    `${SKINS_DIR}/rogue/alt_b.png`,
+    `${SKINS_DIR}/rogue/alt_c.png`,
+    `${SKINS_DIR}/rogue/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/rogue/alt_suit_chrome.png`,
+  ],
+  player_ninja: [
     null,
     `${SKINS_DIR}/rogue/alt_a.png`,
     `${SKINS_DIR}/rogue/alt_b.png`,
@@ -1802,6 +1821,74 @@ export const VISUALS: Record<string, VisualDef> = {
     // Ability-specific attack clips (scripts/build_rogue_ability_anims.mjs).
     animUrls: [`${PLAYERS}/rogue_hit_variety_anims.glb`, `${PLAYERS}/rogue_ability_anims.glb`],
     show: ['Rogue_Cape'],
+    attach: [
+      { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.l' },
+    ],
+    weaponSlots: [0],
+    offhandSlot: 1,
+  }),
+  player_ninja: swims({
+    // the hooded rig: hood, face mask and cape, the ninja silhouette
+    url: `${PLAYERS}/rogue_hooded.glb`,
+    height: HUMANOID_H,
+    clips: {
+      ...kaykit(['Dualwield_Melee_Attack_Chop']),
+      attackByAbility: {
+        // Throat Wire is a wire strangle, not a dagger swing: the synthesized
+        // two-handed choke (scripts/_add_garrote_choke_anim.mjs) reaches to
+        // neck height and yanks back to the chest with a brief hold.
+        // Boot is a kick, not a swing: the synthesized snap kick
+        // (scripts/_add_boot_kick_anim.mjs) chambers the knee and fires the
+        // leg forward at gut height.
+        // Dirt Toss throws dirt, not daggers: the synthesized crouch-scoop
+        // and underhand fling (scripts/_add_dirt_throw_anim.mjs).
+        // Rest of the kit (scripts/build_rogue_ability_anims.mjs, issue
+        // #2889): pose-sample-and-blend clips off rogue.glb's own donor
+        // poses. Wicked Slash is the combo-builder poke; Eye Jab and Sap
+        // share its silhouette since both are instant single-target
+        // debilitating strikes with no unique read of their own.
+        sinister_strike: 'Rogue_Quick_Strike',
+        gouge: 'Rogue_Quick_Strike',
+        sap: 'Rogue_Quick_Strike',
+        // Craven Thrust drives the dagger in from behind.
+        backstab: 'Rogue_Backstab',
+        // Lurker's Strike is the kit's biggest single hit (2.5x weapon,
+        // stealth-gated): its own bigger, more telegraphed lunge.
+        ambush: 'Rogue_Ambush',
+        // Gut Punch and Low Blow both land at gut/kidney height.
+        cheap_shot: 'Rogue_Low_Blow',
+        kidney_shot: 'Rogue_Low_Blow',
+        // Combo-spending finishers read as one decisive two-blade cut.
+        eviscerate: 'Rogue_Finisher_Slash',
+        rupture: 'Rogue_Finisher_Slash',
+        expose_armor: 'Rogue_Finisher_Slash',
+        // Ghostfoot is a defensive dodge buff: rogue.glb's own already-baked
+        // 'Block' guard, no bake needed (the pattern player_warrior's
+        // raised_guard already uses).
+        evasion: 'Block',
+        // Cutthroat Tempo, Smokefade, Quickened Blood, and Duskveil are all
+        // self-buff/stealth toggles with no combat swing to author: rogue.
+        // glb's own already-baked 'Spellcast_Raise', the pattern player_
+        // warrior's sanguine_aura and the hunter batch's aspect toggles both
+        // use. Adder's Bite and Festering Venom (the poison weapon imbues)
+        // are excluded, the same call the mage batch made for its own
+        // utility/summon abilities.
+        slice_and_dice: 'Spellcast_Raise',
+        vanish: 'Spellcast_Raise',
+        adrenaline_rush: 'Spellcast_Raise',
+        stealth: 'Spellcast_Raise',
+        // the Ninja's own buttons (content/ninja_abilities.ts)
+        shadow_slash: 'Rogue_Quick_Strike',
+        shuriken_toss: 'Rogue_Quick_Strike',
+        smoke_bomb: 'Rogue_Quick_Strike',
+      },
+    },
+    // Ability-specific attack clips (scripts/build_rogue_ability_anims.mjs).
+    animUrls: [
+      `${PLAYERS}/rogue_hooded_hit_variety_anims.glb`,
+      `${PLAYERS}/rogue_ability_anims.glb`,
+    ],
     attach: [
       { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.r' },
       { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.l' },

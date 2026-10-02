@@ -78,6 +78,13 @@ export const ENGINE_AURAS: Readonly<Record<PlayerClass, readonly EngineRow[]>> =
     { kind: 'dusk_economy', name: 'Dusk Economy' },
     { kind: 'veiled_edge', name: 'Shadow Veil' },
   ],
+  ninja: [
+    { kind: 'venom_ritual', name: 'Venom Ritual' },
+    { kind: 'gloam', name: 'Gloam' },
+    { kind: 'redline', name: 'Redline' },
+    { kind: 'dusk_economy', name: 'Dusk Economy' },
+    { kind: 'veiled_edge', name: 'Shadow Veil' },
+  ],
   priest: [
     { kind: 'doctrine', name: 'Doctrine' },
     { kind: 'gloomtithe', name: 'Gloomtithe' },

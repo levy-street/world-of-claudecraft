@@ -665,7 +665,8 @@ export const da_DK: EnTranslations = {
       "bow": "Buk",
       "clap": "Klap",
       "roar": "Brøl",
-      "kneel": "Knæl"
+      "kneel": "Knæl",
+      "kata": "Kata"
     },
     "emoteWheel": {
       "edit": "Rediger",
@@ -4434,6 +4435,8 @@ export const da_DK: EnTranslations = {
       "enchantedFallback": "Fortryllet",
       "partyTradeWindow": "Du kan handle denne genstand til spillere, der delte dens bytte, i de næste {time}. Udstyrer du den, afsluttes handelsvinduet.",
       "perfectedBadge": "Forædlet",
+      "katanaKills": "Enemies slain: {count}",
+      "katanaKanji": "Engraved kanji: {glyph}",
       "perfectingRank": "Forædling: rang {rank} af {ranks}",
       "materialSourceGatherer": "{count} × samlet af {name}",
       "materialSourceGathererSigned": "{count} × samlet af {name}, signeret af {signer}",
@@ -10196,6 +10199,7 @@ export const da_DK: EnTranslations = {
     "paladin": "Paladin",
     "hunter": "Jæger",
     "rogue": "Slyngel",
+    "ninja": "Ninja",
     "priest": "Præst",
     "shaman": "Shaman",
     "mage": "Magiker",
@@ -11285,6 +11289,7 @@ export const da_DK: EnTranslations = {
       "paladin": "Healer / Tank / Nærkamps-DPS",
       "hunter": "Afstands-DPS",
       "rogue": "Nærkamps-DPS",
+      "ninja": "Melee DPS",
       "priest": "Healer / Afstands-DPS",
       "shaman": "Healer / Nærkamps- eller Afstands-DPS",
       "mage": "Afstands-DPS",
@@ -11309,6 +11314,7 @@ export const da_DK: EnTranslations = {
       "paladin": "Paladiner er hellige korsfarere, der støtter allierede med velsignelser, helbreder sår med Lægende Lys og beskytter de svage i tung rustning.",
       "hunter": "Jægere er afstandsspecialister, der kæmper side om side med et tæmmet bæst, overøser fjender med sigtede og hurtige skud, sinker dem med stik og rystende beskydning og skifter aspekter, så de passer til øjeblikket.",
       "rogue": "Slyngler er snigende snigmordere, der bruger Energi og Combo-point på dolkestød og afsluttende manøvrer fra skyggerne.",
+      "ninja": "A shadow-trained blade of the Blossom Temple: a fast, stealthy energy fighter who strikes with katana and shuriken, then vanishes in smoke.",
       "priest": "Præster påkalder Lægende Lys for at helbrede og skærme allierede, mens Skyggemagi lader dem dræne livet af deres fjender.",
       "shaman": "Shamaner befaler elementerne, gennemtrænger våben med kraft, chokerer fjender med lyn og genopretter allierede.",
       "mage": "Magikere bøjer Ild-, Frost- og arkankraft for at tilintetgøre fjender, frembringe vand og fryse trusler på stedet.",
@@ -14761,6 +14767,18 @@ export const da_DK: EnTranslations = {
       "choir_of_deliverance": {
         "name": "Befrielsens Kor",
         "description": "Kanaliserer i 6 sek. og helbreder gruppemedlemmer inden for 30 meter for {damage} hvert 2. sek. Helbredelsen øges med besværgelseskraft."
+      },
+      "shuriken_toss": {
+        "name": "Shuriken Toss",
+        "description": "Throw a spinning shuriken for {damage} Physical damage. Awards 1 combo point."
+      },
+      "shadow_slash": {
+        "name": "Shadow Slash",
+        "description": "A quick katana cut for weapon damage plus {damage}. Awards 1 combo point."
+      },
+      "smoke_bomb": {
+        "name": "Smoke Bomb",
+        "description": "Burst a smoke bomb in the target's face for {damage} Physical damage, incapacitating it for 4 sec. Any damage breaks the effect. Awards 1 combo point."
       },
       "bear_charge": {
         "name": "Bruin-storm",
@@ -18451,6 +18469,18 @@ export const da_DK: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Fortropsens Krigsdragt"
       },
+      "katana_a": {
+        "name": "Blossom Katana"
+      },
+      "katana_b": {
+        "name": "Moonsteel Katana"
+      },
+      "katana_c": {
+        "name": "Crimson Petal Katana"
+      },
+      "blossom_training_mat": {
+        "name": "Temple Training Mat"
+      },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
       },
@@ -20421,6 +20451,11 @@ export const da_DK: EnTranslations = {
         "title": "Mesterrustningssmed",
         "greeting": "Essen er varm og slibestenen drejer. Hvis det skærer, sælger jeg det."
       },
+      "swordsmith_ren": {
+        "name": "Swordsmith Ren",
+        "title": "Katana Maker",
+        "greeting": "Folded a thousand times under the blossoms. Each blade remembers the hand that made it."
+      },
       "heroic_quartermaster": {
         "name": "Kvartermester Vex",
         "title": "Heroisk Kvartermester",
@@ -20890,6 +20925,31 @@ export const da_DK: EnTranslations = {
         "name": "Øvelsesmester Hale",
         "title": "Kamptræner ved kajen",
         "greeting": "Dukken bag mig slår aldrig igen og går aldrig ned, {className}. Det vigtige er optællingen: Dine skademålere tæller hvert slag, du rammer den med. Målret den og åbn målerne, så fører jeg dig gennem resten."
+      },
+      "master_monk_sora": {
+        "name": "Master Sora",
+        "title": "Keeper of the Blossom Temple",
+        "greeting": "The petals fall the same way every spring, and still each one is new. So it is with the kata."
+      },
+      "monk_trainee_a": {
+        "name": "Trainee Hiro",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_b": {
+        "name": "Trainee Mei",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_c": {
+        "name": "Trainee Kenji",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_d": {
+        "name": "Trainee Aiko",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -23156,6 +23216,16 @@ export const da_DK: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Effektiv heling ramt på helbredelsesdukken"
+          }
+        }
+      },
+      "q_blossom_kata": {
+        "title": "The Way of the Blossom",
+        "text": "You watch my students the way a cat watches a pond, {playerName}. Good. Watching is the first lesson. The second is the mat: step onto it, empty your mind, and let the kata move you. Come back when your feet remember it.",
+        "completion": "Your stance was crooked and your breath was loud. And still the blossoms leaned toward you. Welcome, monk of the Blossom Temple.",
+        "objectives": {
+          "0": {
+            "label": "Practice the kata on the training mat"
           }
         }
       },

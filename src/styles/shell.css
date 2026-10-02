@@ -2797,6 +2797,9 @@
   .mini-class[data-class="rogue"] {
     --class-color: #fcee58;
   }
+  .mini-class[data-class="ninja"] {
+    --class-color: #5a4f8c;
+  }
   .mini-class[data-class="priest"] {
     --class-color: #c6d4f0;
   }
@@ -6324,6 +6327,9 @@
   }
   [data-class="rogue"] {
     --class-color: #fcee58;
+  }
+  [data-class="ninja"] {
+    --class-color: #5a4f8c;
   }
   [data-class="priest"] {
     --class-color: #c6d4f0;

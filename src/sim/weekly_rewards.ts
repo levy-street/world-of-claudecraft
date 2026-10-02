@@ -1,5 +1,6 @@
 // Weekly choices. The host supplies the same calendar used by the Crucible.
 // A completed week earns unopened slots; opening fixes an item after host persistence.
+import { classListAdmits } from './equipment_rules';
 import { bagsFullError } from './bags';
 import { HEROIC_DUNGEON_TUNING } from './content/dungeon_difficulty';
 import { HEROIC_BOSS_LOOT } from './content/heroic_loot';
@@ -484,7 +485,7 @@ export function claimWeeklyReward(
   const choice = batch.choices[index];
   if (!choice?.itemId) return;
   const item = ITEMS[choice.itemId];
-  if (!item || (item.requiredClass && !item.requiredClass.includes(r.meta.cls))) return;
+  if (!item || (item.requiredClass && !classListAdmits(item.requiredClass, r.meta.cls))) return;
   // Candidates are already fixed. Failed claims cannot reroll or consume the week.
   if (!ctx.canAddItem(choice.itemId, 1, r.e.id)) {
     bagsFullError(ctx, r.e.id);

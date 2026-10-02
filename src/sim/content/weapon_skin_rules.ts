@@ -19,6 +19,9 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   // Swords
   thornpeak_wardblade: 'sword', // EPIC: Nythraxis gap-fill tank one-hander
   worn_sword: 'sword',
+  katana_a: 'sword',
+  katana_b: 'sword',
+  katana_c: 'sword',
   ironedge_longsword: 'sword',
   thorium_warblade: 'sword',
   redbrook_blade: 'sword',

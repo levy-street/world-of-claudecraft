@@ -120,6 +120,7 @@ export const SKIN_COUNTS: Record<PlayerClass, number> = {
   paladin: 4,
   hunter: 6,
   rogue: 6,
+  ninja: 6,
   priest: 6,
   mage: 6,
   warlock: 6,

@@ -1641,6 +1641,8 @@ export function buildProps(
       }
       continue;
     }
+    // collider-only entries: a zone feature module draws them itself
+    if (d.key.startsWith('collider:')) continue;
     if (!(d.key in PROP_ASSET_DEFS)) {
       console.warn(`decorProps: unknown prop key "${d.key}" skipped`);
       continue;

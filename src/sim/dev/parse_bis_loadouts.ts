@@ -207,6 +207,53 @@ const LOADOUTS: Readonly<Record<PlayerClass, ClassParseGear>> = Object.freeze({
       shoulder: 'heroic_nighttalon_shoulderguards',
     }),
   }),
+  ninja: Object.freeze({
+    // Heroic DPS rank 1, build 0.40.1, fight 51152.
+    assassination: Object.freeze({
+      feet: 'wyrmshadow_treads',
+      legs: 'wyrmshadow_legguards',
+      neck: 'swiftfang_talisman',
+      chest: 'wyrmshadow_harness',
+      ring1: 'sutils_gambit',
+      ring2: 'sutils_gambit',
+      waist: 'nighttalon_waistband',
+      gloves: 'nighttalon_grips',
+      helmet: 'heroic_nighttalon_crown',
+      offhand: 'heroic_duskwhisper',
+      mainhand: 'heroic_duskwhisper',
+      shoulder: 'heroic_nighttalon_shoulderguards',
+    }),
+    // Heroic DPS rank 1, build 0.40.1, fight 51162.
+    combat: Object.freeze({
+      feet: 'heroic_wyrmshadow_treads',
+      legs: 'heroic_wyrmshadow_legguards',
+      neck: 'swiftfang_talisman',
+      chest: 'heroic_wyrmshadow_harness',
+      ring1: 'sutils_gambit',
+      ring2: 'sutils_gambit',
+      waist: 'nighttalon_waistband',
+      gloves: 'heroic_wyrmshadow_talongrips',
+      helmet: 'heroic_nighttalon_crown',
+      offhand: 'heroic_duskwhisper',
+      mainhand: 'kingsbane_last_oath',
+      shoulder: 'heroic_nighttalon_shoulderguards',
+    }),
+    // Heroic DPS rank 1, build 0.40.1, fight 51621.
+    subtlety: Object.freeze({
+      feet: 'wyrmshadow_treads',
+      legs: 'wyrmshadow_legguards',
+      neck: 'swiftfang_talisman',
+      chest: 'wyrmshadow_harness',
+      ring1: 'sutils_gambit',
+      ring2: 'sutils_gambit',
+      waist: 'nighttalon_waistband',
+      gloves: 'wyrmshadow_talongrips',
+      helmet: 'heroic_nighttalon_crown',
+      offhand: 'heroic_duskwhisper',
+      mainhand: 'heroic_duskwhisper',
+      shoulder: 'heroic_nighttalon_shoulderguards',
+    }),
+  }),
   priest: Object.freeze({
     // Heroic HPS rank 1, build 0.39.1, fight 34968.
     discipline: Object.freeze({

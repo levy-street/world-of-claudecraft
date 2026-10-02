@@ -2,6 +2,7 @@
 // without an NPC. Existing NPC quest paths remain valid for in-flight saves.
 // Reuse the normal quest accept/reward cores, never mint a replacement Ember
 // or re-teach a recipe whose recovery quest has already paid out.
+import { classListAdmits } from '../equipment_rules';
 import { CRUCIBLE_HAMMER_QUEST_IDS } from '../content/ignivar_raid_lore';
 import { QUESTS } from '../data';
 import type { PlayerMeta } from '../sim';
@@ -18,7 +19,7 @@ export function useForgebreakerEmber(ctx: SimContext, player: Entity, meta: Play
   if (
     player.dead ||
     player.level < (recovery.minLevel ?? 0) ||
-    !recovery.requiredClass?.includes(meta.cls) ||
+    !(recovery.requiredClass && classListAdmits(recovery.requiredClass, meta.cls)) ||
     meta.questsDone.has(forgingId)
   ) {
     ctx.error(meta.entityId, 'That quest is not available.');

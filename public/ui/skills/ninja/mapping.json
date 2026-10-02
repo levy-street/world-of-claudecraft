@@ -1,0 +1,24 @@
+{
+  "class": "ninja",
+  "license": "World of ClaudeCraft original art (project-owned, created for this game)",
+  "iconSize": 128,
+  "sourcePack": "procedural PIL renders (shuriken, katana arc, smoke bomb)",
+  "runtimeDir": "public/ui/skills/ninja",
+  "abilities": [
+    {
+      "abilityId": "shuriken_toss",
+      "sourceFile": "procedural",
+      "output": "shuriken_toss.webp"
+    },
+    {
+      "abilityId": "shadow_slash",
+      "sourceFile": "procedural",
+      "output": "shadow_slash.webp"
+    },
+    {
+      "abilityId": "smoke_bomb",
+      "sourceFile": "procedural",
+      "output": "smoke_bomb.webp"
+    }
+  ]
+}

@@ -665,7 +665,8 @@ export const nl_NL: EnTranslations = {
       "bow": "Buigen",
       "clap": "Klappen",
       "roar": "Brullen",
-      "kneel": "Knielen"
+      "kneel": "Knielen",
+      "kata": "Kata"
     },
     "emoteWheel": {
       "edit": "Bewerken",
@@ -4434,6 +4435,8 @@ export const nl_NL: EnTranslations = {
       "enchantedFallback": "Betoverd",
       "partyTradeWindow": "Je kunt dit voorwerp de komende {time} ruilen met spelers die deze buit deelden. Uitrusten beëindigt het ruilvenster.",
       "perfectedBadge": "Geperfectioneerd",
+      "katanaKills": "Enemies slain: {count}",
+      "katanaKanji": "Engraved kanji: {glyph}",
       "perfectingRank": "Perfecteren: rang {rank} van {ranks}",
       "materialSourceGatherer": "{count} × Verzameld door {name}",
       "materialSourceGathererSigned": "{count} × Verzameld door {name}, gesigneerd door {signer}",
@@ -10196,6 +10199,7 @@ export const nl_NL: EnTranslations = {
     "paladin": "Paladijn",
     "hunter": "Jager",
     "rogue": "Schurk",
+    "ninja": "Ninja",
     "priest": "Priester",
     "shaman": "Sjamaan",
     "mage": "Magiër",
@@ -11285,6 +11289,7 @@ export const nl_NL: EnTranslations = {
       "paladin": "Genezer / Tank / Melee-DPS",
       "hunter": "Ranged-DPS",
       "rogue": "Melee-DPS",
+      "ninja": "Melee DPS",
       "priest": "Genezer / Ranged-DPS",
       "shaman": "Genezer / Melee- of Ranged-DPS",
       "mage": "Ranged-DPS",
@@ -11309,6 +11314,7 @@ export const nl_NL: EnTranslations = {
       "paladin": "Paladijnen zijn heilige kruisvaarders die bondgenoten steunen met zegeningen, wonden helen met Helend Licht en de zwakken beschermen in zwaar pantser.",
       "hunter": "Jagers zijn afstandsspecialisten die aan de zijde van een getemd beest vechten, vijanden bestoken met gerichte en snelle schoten, hen vertragen met steken en verdovend vuur, en van aspect wisselen om zich aan het moment aan te passen.",
       "rogue": "Schurken zijn sluipende sluipmoordenaars die Energie en Combopunten besteden aan rugsteken en finishers vanuit de schaduwen.",
+      "ninja": "A shadow-trained blade of the Blossom Temple: a fast, stealthy energy fighter who strikes with katana and shuriken, then vanishes in smoke.",
       "priest": "Priesters roepen Helend Licht aan om bondgenoten te genezen en te beschutten, terwijl Schaduwmagie hen het leven van hun vijanden laat aftappen.",
       "shaman": "Sjamanen gebieden de elementen, doordringen wapens met kracht, schokken vijanden met bliksem en herstellen bondgenoten.",
       "mage": "Magiërs buigen Vuur-, Vorst- en arcane kracht om vijanden te vernietigen, water op te roepen en dreigingen ter plaatse te bevriezen.",
@@ -14761,6 +14767,18 @@ export const nl_NL: EnTranslations = {
       "choir_of_deliverance": {
         "name": "Koor der Verlossing",
         "description": "Kanaliseer 6 sec en genees groepsleden binnen 30 meter voor {damage} elke 2 sec. De genezing neemt toe met spreukkracht."
+      },
+      "shuriken_toss": {
+        "name": "Shuriken Toss",
+        "description": "Throw a spinning shuriken for {damage} Physical damage. Awards 1 combo point."
+      },
+      "shadow_slash": {
+        "name": "Shadow Slash",
+        "description": "A quick katana cut for weapon damage plus {damage}. Awards 1 combo point."
+      },
+      "smoke_bomb": {
+        "name": "Smoke Bomb",
+        "description": "Burst a smoke bomb in the target's face for {damage} Physical damage, incapacitating it for 4 sec. Any damage breaks the effect. Awards 1 combo point."
       },
       "bear_charge": {
         "name": "Bruin-stormloop",
@@ -18451,6 +18469,18 @@ export const nl_NL: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Voortocht Krijgsstaf"
       },
+      "katana_a": {
+        "name": "Blossom Katana"
+      },
+      "katana_b": {
+        "name": "Moonsteel Katana"
+      },
+      "katana_c": {
+        "name": "Crimson Petal Katana"
+      },
+      "blossom_training_mat": {
+        "name": "Temple Training Mat"
+      },
       "conjured_water4": {
         "name": "Getoverd bronwater"
       },
@@ -20421,6 +20451,11 @@ export const nl_NL: EnTranslations = {
         "title": "Meester-Pantsersmid",
         "greeting": "De smidse is heet en de slijpsteen draait. Als het snijdt, verkoop ik het."
       },
+      "swordsmith_ren": {
+        "name": "Swordsmith Ren",
+        "title": "Katana Maker",
+        "greeting": "Folded a thousand times under the blossoms. Each blade remembers the hand that made it."
+      },
       "heroic_quartermaster": {
         "name": "Kwartiermeester Vex",
         "title": "Heroïsche Kwartiermeester",
@@ -20890,6 +20925,31 @@ export const nl_NL: EnTranslations = {
         "name": "Oefenmeester Hale",
         "title": "Meester van het Muurduel",
         "greeting": "Die pop achter me slaat nooit terug en gaat nooit neer, {className}. Wat telt is de telling: je schademeters tellen elke klap die je erop uitdeelt. Richt hem aan en open de meters, dan leg ik de rest uit."
+      },
+      "master_monk_sora": {
+        "name": "Master Sora",
+        "title": "Keeper of the Blossom Temple",
+        "greeting": "The petals fall the same way every spring, and still each one is new. So it is with the kata."
+      },
+      "monk_trainee_a": {
+        "name": "Trainee Hiro",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_b": {
+        "name": "Trainee Mei",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_c": {
+        "name": "Trainee Kenji",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_d": {
+        "name": "Trainee Aiko",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -23156,6 +23216,16 @@ export const nl_NL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Effectieve genezing op de Genezingspop"
+          }
+        }
+      },
+      "q_blossom_kata": {
+        "title": "The Way of the Blossom",
+        "text": "You watch my students the way a cat watches a pond, {playerName}. Good. Watching is the first lesson. The second is the mat: step onto it, empty your mind, and let the kata move you. Come back when your feet remember it.",
+        "completion": "Your stance was crooked and your breath was loud. And still the blossoms leaned toward you. Welcome, monk of the Blossom Temple.",
+        "objectives": {
+          "0": {
+            "label": "Practice the kata on the training mat"
           }
         }
       },

@@ -665,7 +665,8 @@ export const vi_VN: EnTranslations = {
       "bow": "Cúi Chào",
       "clap": "Vỗ Tay",
       "roar": "Gầm Thét",
-      "kneel": "Quỳ Gối"
+      "kneel": "Quỳ Gối",
+      "kata": "Kata"
     },
     "emoteWheel": {
       "edit": "Chỉnh Sửa",
@@ -4434,6 +4435,8 @@ export const vi_VN: EnTranslations = {
       "enchantedFallback": "Đã Pháp Khắc",
       "partyTradeWindow": "Bạn có thể giao dịch vật phẩm này cho những người chơi đã cùng nhận nó rơi ra, trong {time} tới. Trang bị nó sẽ kết thúc khoảng thời gian giao dịch này.",
       "perfectedBadge": "Đã hoàn thiện",
+      "katanaKills": "Enemies slain: {count}",
+      "katanaKanji": "Engraved kanji: {glyph}",
       "perfectingRank": "Hoàn thiện: bậc {rank} trên {ranks}",
       "materialSourceGatherer": "{count} × Được {name} thu thập",
       "materialSourceGathererSigned": "{count} × Được {name} thu thập, có chữ ký của {signer}",
@@ -10196,6 +10199,7 @@ export const vi_VN: EnTranslations = {
     "paladin": "Thánh Kỵ Sĩ",
     "hunter": "Thợ Săn",
     "rogue": "Đạo Tặc",
+    "ninja": "Ninja",
     "priest": "Tu Sĩ",
     "shaman": "Shaman",
     "mage": "Pháp Sư",
@@ -11285,6 +11289,7 @@ export const vi_VN: EnTranslations = {
       "paladin": "Trị Liệu / Đỡ Đòn / DPS Cận Chiến",
       "hunter": "DPS Tầm Xa",
       "rogue": "DPS Cận Chiến",
+      "ninja": "Melee DPS",
       "priest": "Trị Liệu / DPS Tầm Xa",
       "shaman": "Trị Liệu / DPS Cận Chiến hoặc Tầm Xa",
       "mage": "DPS Tầm Xa",
@@ -11309,6 +11314,7 @@ export const vi_VN: EnTranslations = {
       "paladin": "Thánh Kỵ Sĩ là những thập tự quân thần thánh, hỗ trợ đồng minh bằng các phúc lành, chữa lành vết thương bằng Thánh Quang Chữa Lành, và bảo vệ kẻ yếu trong bộ giáp nặng.",
       "hunter": "Thợ Săn là những chuyên gia tầm xa chiến đấu bên cạnh một mãnh thú đã thuần hóa, dội vào kẻ thù những phát bắn nhắm chuẩn và liên hồi, làm chậm chúng bằng các đòn chích nọc và hỏa lực chấn động, và chuyển đổi Linh Khí để thích ứng với từng khoảnh khắc.",
       "rogue": "Đạo Tặc là những sát thủ ẩn mình, tiêu hao Năng Lượng và Điểm Liên Hoàn cho những đòn đâm lén và đòn kết liễu từ trong bóng tối.",
+      "ninja": "A shadow-trained blade of the Blossom Temple: a fast, stealthy energy fighter who strikes with katana and shuriken, then vanishes in smoke.",
       "priest": "Tu Sĩ kêu gọi Thánh Quang Chữa Lành để chữa lành và che chắn cho đồng minh, trong khi ma thuật Bóng Tối cho phép họ hút sinh lực của kẻ thù.",
       "shaman": "Shaman điều khiển các nguyên tố, ban sức mạnh cho vũ khí, gây choáng kẻ thù bằng sấm sét, và hồi phục cho đồng minh.",
       "mage": "Pháp Sư điều khiển sức mạnh Hỏa, Băng và uy lực bí thuật để tiêu diệt kẻ thù, triệu hồi nước, và đóng băng các mối đe dọa tại chỗ.",
@@ -14761,6 +14767,18 @@ export const vi_VN: EnTranslations = {
       "choir_of_deliverance": {
         "name": "Hợp Xướng Giải Thoát",
         "description": "Vận phép trong 6 giây, hồi máu cho các thành viên trong nhóm trong phạm vi 30 mét {damage} mỗi 2 giây. Lượng hồi tăng theo sức mạnh phép thuật."
+      },
+      "shuriken_toss": {
+        "name": "Shuriken Toss",
+        "description": "Throw a spinning shuriken for {damage} Physical damage. Awards 1 combo point."
+      },
+      "shadow_slash": {
+        "name": "Shadow Slash",
+        "description": "A quick katana cut for weapon damage plus {damage}. Awards 1 combo point."
+      },
+      "smoke_bomb": {
+        "name": "Smoke Bomb",
+        "description": "Burst a smoke bomb in the target's face for {damage} Physical damage, incapacitating it for 4 sec. Any damage breaks the effect. Awards 1 combo point."
       },
       "bear_charge": {
         "name": "Cú Lao Bruin",
@@ -18451,6 +18469,18 @@ export const vi_VN: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Trượng Chiến Vanguard"
       },
+      "katana_a": {
+        "name": "Blossom Katana"
+      },
+      "katana_b": {
+        "name": "Moonsteel Katana"
+      },
+      "katana_c": {
+        "name": "Crimson Petal Katana"
+      },
+      "blossom_training_mat": {
+        "name": "Temple Training Mat"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },
@@ -20421,6 +20451,11 @@ export const vi_VN: EnTranslations = {
         "title": "Thợ Giáp Bậc Thầy",
         "greeting": "Lò rèn đang nóng và đá mài đang quay. Cái gì chém được, ta bán."
       },
+      "swordsmith_ren": {
+        "name": "Swordsmith Ren",
+        "title": "Katana Maker",
+        "greeting": "Folded a thousand times under the blossoms. Each blade remembers the hand that made it."
+      },
       "heroic_quartermaster": {
         "name": "Quân Nhu Trưởng Vex",
         "title": "Quân Nhu Trưởng Anh Hùng",
@@ -20890,6 +20925,31 @@ export const vi_VN: EnTranslations = {
         "name": "Huấn Luyện Viên Hale",
         "title": "Thầy Đấu Tập Bến Cảng",
         "greeting": "Hình nhân sau lưng ta chẳng bao giờ đánh trả và cũng chẳng bao giờ ngã, {className}. Điều đáng quan tâm là số liệu: Bảng Thống Kê Sát Thương ghi lại mọi đòn đánh bạn giáng lên nó. Chọn nó làm mục tiêu rồi mở bảng thống kê, ta sẽ chỉ tiếp cho bạn."
+      },
+      "master_monk_sora": {
+        "name": "Master Sora",
+        "title": "Keeper of the Blossom Temple",
+        "greeting": "The petals fall the same way every spring, and still each one is new. So it is with the kata."
+      },
+      "monk_trainee_a": {
+        "name": "Trainee Hiro",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_b": {
+        "name": "Trainee Mei",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_c": {
+        "name": "Trainee Kenji",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_d": {
+        "name": "Trainee Aiko",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -23156,6 +23216,16 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Hồi máu thực tế cho Hình Nhân Hồi Máu"
+          }
+        }
+      },
+      "q_blossom_kata": {
+        "title": "The Way of the Blossom",
+        "text": "You watch my students the way a cat watches a pond, {playerName}. Good. Watching is the first lesson. The second is the mat: step onto it, empty your mind, and let the kata move you. Come back when your feet remember it.",
+        "completion": "Your stance was crooked and your breath was loud. And still the blossoms leaned toward you. Welcome, monk of the Blossom Temple.",
+        "objectives": {
+          "0": {
+            "label": "Practice the kata on the training mat"
           }
         }
       },

@@ -328,7 +328,11 @@ export class ActionBarController {
         return 'cat';
       }
     }
-    if (this.deps.playerClass === 'rogue' && this.deps.hasAura('stealth')) return 'stealth';
+    if (
+      (this.deps.playerClass === 'rogue' || this.deps.playerClass === 'ninja') &&
+      this.deps.hasAura('stealth')
+    )
+      return 'stealth';
     return 'normal';
   }
 

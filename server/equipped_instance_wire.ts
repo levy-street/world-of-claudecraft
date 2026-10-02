@@ -1,3 +1,4 @@
+import { isValidKatanaLook } from '../src/sim/katana_look';
 import { isValidLootQuality } from '../src/sim/loot_quality/types';
 import type { Entity } from '../src/sim/types';
 
@@ -20,6 +21,7 @@ export function equippedInstanceWire(e: Pick<Entity, 'equippedInstances'>) {
     if (inst.name !== undefined) pub.name = inst.name;
     if (inst.perfected === true) pub.perfected = inst.perfected;
     if (inst.rift !== undefined) pub.rift = inst.rift;
+    if (isValidKatanaLook(inst.katana)) pub.katana = inst.katana;
     // Validated like publicInstanceView, so a malformed descriptor never rides
     // the wire; copied by reference (not cloned) because the projection is
     // serialized immediately and the pins above want the dotted own-field copy.

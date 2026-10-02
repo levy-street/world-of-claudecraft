@@ -16,6 +16,7 @@ import {
   MAGE_TALENTS,
   PALADIN_TALENTS,
   PRIEST_TALENTS,
+  NINJA_TALENTS,
   ROGUE_TALENTS,
   SHAMAN_TALENTS,
   WARLOCK_TALENTS,
@@ -431,6 +432,7 @@ export const TALENTS = {
   mage: MAGE_TALENTS,
   warlock: WARLOCK_TALENTS,
   druid: DRUID_TALENTS,
+  ninja: NINJA_TALENTS,
 } satisfies Record<PlayerClass, ClassTalents>;
 
 export function talentsFor(cls: PlayerClass): ClassTalents | null {

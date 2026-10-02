@@ -3,6 +3,7 @@
 // the equipment rules, the class's own armor weight, scoring for at least one of
 // its specs. The slot coverage matrix is pinned so a thin cell is a visible
 // authoring decision (docs/prd/world-quests/rewards-brief.md, section 9).
+import { classListAdmits } from '../src/sim/equipment_rules';
 import { describe, expect, it } from 'vitest';
 import { DEV_KIT_ROLES } from '../src/sim/content/dev_kit_roles';
 import { WORLD_QUEST_CLASS_LOOT } from '../src/sim/content/world_quest_loot';
@@ -19,7 +20,7 @@ const SHELF_MAX_ITEM_LEVEL = 26;
 
 function isAppropriate(cls: PlayerClass, item: ItemDef): boolean {
   if (!canEquipItem(cls, item)) return false;
-  if (item.requiredClass && !item.requiredClass.includes(cls)) return false;
+  if (item.requiredClass && !classListAdmits(item.requiredClass, cls)) return false;
   const weight = armorTypeForItem(item);
   if (weight && weight !== maxArmorTypeForClass(cls)) return false;
   return DEV_KIT_ROLES[cls].some((role) => roleItemScore(role, item) > 0);
@@ -119,6 +120,7 @@ describe('world quest class loot tables', () => {
       mage: 28,
       warlock: 27,
       druid: 28,
+      ninja: 42,
     });
   });
 });

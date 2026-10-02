@@ -3597,6 +3597,15 @@ export const DEEDS: Record<string, DeedDef> = {
       ],
     },
   },
+  prog_blossom_temple_monk: {
+    id: 'prog_blossom_temple_monk',
+    name: 'Monk of the Blossom Temple',
+    desc: 'Learn the kata from Master Sora on the Blossom Temple training mat.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'quest', questId: 'q_blossom_kata' },
+    reward: { kind: 'title', text: 'Blossom Monk' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

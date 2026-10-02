@@ -23,6 +23,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { creditKatanaKill } from '../katana_forge';
 import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
@@ -1855,6 +1856,7 @@ export function handleDeath(
         if (xpGain > 0) grantXp(ctx, xpGain, member, { fromKill: true });
         ctx.onMobKilledForQuests(e, member);
         ctx.onMobKilledForWorldQuests(e, member);
+        creditKatanaKill(member);
       }
       // A destroyed Broodmother egg may hatch a widow that swarms the killer.
       if (e.templateId === 'spider_egg' && killer) spawnWidowHatchlingOnEggDeath(ctx, e, killer);

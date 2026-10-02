@@ -234,6 +234,10 @@ export const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   tome_sunpetal: 'VAR_BOOK',
   tome_voidbound: 'VAR_BOOK',
   hammer_varkhul: 'VAR_HAMMER', // Ignivar raid legendary (Varkhul drop)
+  // the procedural katanas (scripts/assets/katana/build_katana.mjs)
+  katana_sword_a: 'VAR_SWORD',
+  katana_sword_b: 'VAR_SWORD',
+  katana_sword_c: 'VAR_SWORD',
   ...KAYKIT_SHIELD_ACCESSORIES,
 };
 

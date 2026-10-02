@@ -841,6 +841,7 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
     // perfected, rift).
     expect(projected.sort()).toEqual([
       'enchant',
+      'katana',
       'lootQuality',
       'name',
       'perfected',

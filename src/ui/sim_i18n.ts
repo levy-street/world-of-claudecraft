@@ -1283,6 +1283,25 @@ const baseEnTable = {
   'aura.trinketMoltenIgnite': 'Molten Ignite',
   'aura.trinketCrucibleHeat': 'Crucible Heat',
   'error.trinketNoHeat': 'Your heart holds no heat.',
+  // the Katana Table (src/sim/katana_forge.ts)
+  'katana.usage':
+    'Katana Table: /katana status | /katana evolve | /katana color <blade|guard|wrap|saya> <color> | /katana kanji <name> | /katana name <text>',
+  'katana.needKatana': 'Equip a katana in your main hand first.',
+  'katana.kills': 'Your katana has slain {count} enemies.',
+  'katana.finalForm': 'This katana has reached its final form.',
+  'katana.ready': 'Your katana is ready to evolve at the Katana Table.',
+  'katana.killsNeeded': 'Kills still needed to evolve: {count}.',
+  'katana.atTable': 'You must stand at the Katana Table.',
+  'katana.badColor': 'Unknown katana part or color.',
+  'katana.refinished': 'Your katana has been refinished.',
+  'katana.badKanji': 'Unknown kanji.',
+  'katana.kanjiDone': 'A kanji has been engraved on your blade.',
+  'katana.badName': 'That is not a valid katana name.',
+  'katana.nameDone': 'A name has been engraved on your blade.',
+  'katana.notEnoughKills': 'Your katana has not slain enough enemies to evolve.',
+  'katana.noMaterials': 'You lack the materials to evolve your katana.',
+  'katana.noCopper': 'You cannot afford to evolve your katana.',
+  'katana.evolved': 'Your katana has evolved!',
 } as const;
 
 const petEnTable = {
@@ -20117,6 +20136,15 @@ function localizeSimMoneyText(text: string): string {
 }
 
 const RULES: Rule[] = [
+  // Katana Table readouts (src/sim/katana_forge.ts)
+  {
+    re: /^Your katana has slain (\d+) enemies\.$/,
+    build: (m) => tSim('katana.kills', { count: m[1] }),
+  },
+  {
+    re: /^Kills still needed to evolve: (\d+)\.$/,
+    build: (m) => tSim('katana.killsNeeded', { count: m[1] }),
+  },
   // Standing-gated vendor row (src/sim/items.ts buyItem): the sim names the
   // tier and the faction by their English identifiers; resolve both back to
   // their ids so the catalog carries the words (hudChrome.reputation.*).

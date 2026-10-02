@@ -23,6 +23,7 @@
 // render/ui/game/net/DOM/Three, no Math.random/Date.now), so it runs unchanged in
 // Node, the browser, and the headless RL env.
 
+import { classListAdmits } from '../equipment_rules';
 import { bagPools, bagsFullError, consumeOneScratch, countFit, countStacked } from '../bags';
 import { WISP_MAZE_QUEST_ID } from '../content/world_quest_wisp_maze';
 import { ITEMS, QUESTS, questRewardItemId } from '../data';
@@ -83,7 +84,7 @@ export function computeQuestState(
   if (quest.retired) return 'unavailable';
   // Class-locked quest (the paladin-only Divine Tome chain): invisible to any
   // other class. A missing class fails closed so a class-less caller never opens it.
-  if (quest.requiredClass && (!playerClass || !quest.requiredClass.includes(playerClass)))
+  if (quest.requiredClass && (!playerClass || !classListAdmits(quest.requiredClass, playerClass)))
     return 'unavailable';
   // The hub's optional healing lesson: unavailable until the SAME resolver its
   // credit arm and the UI coach read (hub_healing_lesson.ts) says this class

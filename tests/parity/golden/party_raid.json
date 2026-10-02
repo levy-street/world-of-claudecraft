@@ -15,7 +15,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1010,
+      "nextId": 1016,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -29,9 +29,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1017,
-      "state": "3458bb73",
-      "events": "96e1af1d",
+      "nextId": 1023,
+      "state": "e0ee1404",
+      "events": "6fb79028",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -77,7 +77,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1016,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -155,7 +155,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1017,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -235,7 +235,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1018,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -312,7 +312,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1013,
+          "entityId": 1019,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -389,7 +389,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1014,
+          "entityId": 1020,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -469,7 +469,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1015,
+          "entityId": 1021,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "training_mace",
@@ -549,7 +549,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1016,
+          "entityId": 1022,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -590,339 +590,6 @@
         }
       ],
       "entities": [
-        {
-          "aiState": "idle",
-          "attackPower": 46,
-          "auras": [
-            {
-              "duration": 3600,
-              "id": "battle_stance",
-              "kind": "battle_stance",
-              "name": "Battle Stance",
-              "remaining": 3600,
-              "school": "physical",
-              "sourceId": 1010
-            }
-          ],
-          "blockChance": 0.05,
-          "blockValue": 6,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.06,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.06,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 5,
-          "hp": 100,
-          "id": 1010,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 100,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "offhandItemId": "eastbrook_buckler",
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resourceType": "rage",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 5,
-          "stats": {
-            "agi": 20,
-            "armor": 144,
-            "int": 10,
-            "spi": 11,
-            "sta": 23,
-            "str": 23
-          },
-          "templateId": "warrior",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 10,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.056,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.056,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 13,
-          "hp": 54,
-          "id": 1011,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 54,
-          "maxResource": 195,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 195,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 13,
-          "stats": {
-            "agi": 12,
-            "armor": 57,
-            "int": 25,
-            "spi": 22,
-            "sta": 14,
-            "str": 10
-          },
-          "templateId": "mage",
-          "weapon": {
-            "max": 6,
-            "min": 3,
-            "speed": 2.9
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 42,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0625,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0625,
-          "dualWielding": true,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 6,
-          "hp": 62,
-          "id": 1012,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 62,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "offhandItemId": "rusty_dagger",
-          "offhandWeapon": {
-            "dagger": true,
-            "max": 4,
-            "min": 2,
-            "speed": 1.8
-          },
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 100,
-          "resourceType": "energy",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 6,
-          "stats": {
-            "agi": 25,
-            "armor": 104,
-            "int": 11,
-            "spi": 12,
-            "sta": 17,
-            "str": 17
-          },
-          "templateId": "rogue",
-          "weapon": {
-            "dagger": true,
-            "max": 4,
-            "min": 2,
-            "speed": 1.8
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 39,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0625,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0625,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 7,
-          "hp": 69,
-          "id": 1013,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 69,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "rangedPower": 50,
-          "resource": 100,
-          "resourceType": "focus",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 7,
-          "stats": {
-            "agi": 25,
-            "armor": 109,
-            "int": 13,
-            "spi": 14,
-            "sta": 19,
-            "str": 14
-          },
-          "templateId": "hunter",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2.2
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 11,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.056,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.056,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 11,
-          "hp": 57,
-          "id": 1014,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 57,
-          "maxResource": 155,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 155,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 11,
-          "stats": {
-            "agi": 12,
-            "armor": 54,
-            "int": 22,
-            "spi": 21,
-            "sta": 15,
-            "str": 11
-          },
-          "templateId": "warlock",
-          "weapon": {
-            "max": 6,
-            "min": 3,
-            "speed": 2.9
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 44,
-          "blockChance": 0.05,
-          "blockValue": 6,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0585,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0585,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 7,
-          "hp": 105,
-          "id": 1015,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 105,
-          "maxResource": 93,
-          "moveSpeed": 7,
-          "offhandItemId": "eastbrook_buckler",
-          "onGround": true,
-          "overpowerUntil": -1,
-          "paladinDevotion": {},
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 93,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 7,
-          "stats": {
-            "agi": 17,
-            "armor": 133,
-            "int": 13,
-            "spi": 14,
-            "sta": 23,
-            "str": 22
-          },
-          "templateId": "paladin",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2.6
-          }
-        },
         {
           "aiState": "idle",
           "attackPower": 46,
@@ -986,15 +653,348 @@
             "min": 2,
             "speed": 2
           }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 13,
+          "hp": 54,
+          "id": 1017,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 54,
+          "maxResource": 195,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 195,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 13,
+          "stats": {
+            "agi": 12,
+            "armor": 57,
+            "int": 25,
+            "spi": 22,
+            "sta": 14,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 42,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "dualWielding": true,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 6,
+          "hp": 62,
+          "id": 1018,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 62,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 6,
+          "stats": {
+            "agi": 25,
+            "armor": 104,
+            "int": 11,
+            "spi": 12,
+            "sta": 17,
+            "str": 17
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 39,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 7,
+          "hp": 69,
+          "id": 1019,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 69,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "rangedPower": 50,
+          "resource": 100,
+          "resourceType": "focus",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 7,
+          "stats": {
+            "agi": 25,
+            "armor": 109,
+            "int": 13,
+            "spi": 14,
+            "sta": 19,
+            "str": 14
+          },
+          "templateId": "hunter",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.2
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 11,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 11,
+          "hp": 57,
+          "id": 1020,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 57,
+          "maxResource": 155,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 155,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 11,
+          "stats": {
+            "agi": 12,
+            "armor": 54,
+            "int": 22,
+            "spi": 21,
+            "sta": 15,
+            "str": 11
+          },
+          "templateId": "warlock",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 44,
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0585,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0585,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 7,
+          "hp": 105,
+          "id": 1021,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 105,
+          "maxResource": 93,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "paladinDevotion": {},
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 93,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 7,
+          "stats": {
+            "agi": 17,
+            "armor": 133,
+            "int": 13,
+            "spi": 14,
+            "sta": 23,
+            "str": 22
+          },
+          "templateId": "paladin",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 1022
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 5,
+          "hp": 100,
+          "id": 1022,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
         }
       ]
     },
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1017,
-      "state": "3458bb73",
-      "events": "daa1071d",
+      "nextId": 1023,
+      "state": "e0ee1404",
+      "events": "b03c95e5",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1040,7 +1040,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1016,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1118,7 +1118,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1017,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1198,7 +1198,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1018,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -1275,7 +1275,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1013,
+          "entityId": 1019,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -1352,7 +1352,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1014,
+          "entityId": 1020,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1432,7 +1432,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1015,
+          "entityId": 1021,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "training_mace",
@@ -1512,7 +1512,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1016,
+          "entityId": 1022,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1553,339 +1553,6 @@
         }
       ],
       "entities": [
-        {
-          "aiState": "idle",
-          "attackPower": 46,
-          "auras": [
-            {
-              "duration": 3600,
-              "id": "battle_stance",
-              "kind": "battle_stance",
-              "name": "Battle Stance",
-              "remaining": 3600,
-              "school": "physical",
-              "sourceId": 1010
-            }
-          ],
-          "blockChance": 0.05,
-          "blockValue": 6,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.06,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.06,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 5,
-          "hp": 100,
-          "id": 1010,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 100,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "offhandItemId": "eastbrook_buckler",
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resourceType": "rage",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 5,
-          "stats": {
-            "agi": 20,
-            "armor": 144,
-            "int": 10,
-            "spi": 11,
-            "sta": 23,
-            "str": 23
-          },
-          "templateId": "warrior",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 10,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.056,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.056,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 13,
-          "hp": 54,
-          "id": 1011,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 54,
-          "maxResource": 195,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 195,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 13,
-          "stats": {
-            "agi": 12,
-            "armor": 57,
-            "int": 25,
-            "spi": 22,
-            "sta": 14,
-            "str": 10
-          },
-          "templateId": "mage",
-          "weapon": {
-            "max": 6,
-            "min": 3,
-            "speed": 2.9
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 42,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0625,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0625,
-          "dualWielding": true,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 6,
-          "hp": 62,
-          "id": 1012,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 62,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "offhandItemId": "rusty_dagger",
-          "offhandWeapon": {
-            "dagger": true,
-            "max": 4,
-            "min": 2,
-            "speed": 1.8
-          },
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 100,
-          "resourceType": "energy",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 6,
-          "stats": {
-            "agi": 25,
-            "armor": 104,
-            "int": 11,
-            "spi": 12,
-            "sta": 17,
-            "str": 17
-          },
-          "templateId": "rogue",
-          "weapon": {
-            "dagger": true,
-            "max": 4,
-            "min": 2,
-            "speed": 1.8
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 39,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0625,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0625,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 7,
-          "hp": 69,
-          "id": 1013,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 69,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "rangedPower": 50,
-          "resource": 100,
-          "resourceType": "focus",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 7,
-          "stats": {
-            "agi": 25,
-            "armor": 109,
-            "int": 13,
-            "spi": 14,
-            "sta": 19,
-            "str": 14
-          },
-          "templateId": "hunter",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2.2
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 11,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.056,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.056,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 11,
-          "hp": 57,
-          "id": 1014,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 57,
-          "maxResource": 155,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 155,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 11,
-          "stats": {
-            "agi": 12,
-            "armor": 54,
-            "int": 22,
-            "spi": 21,
-            "sta": 15,
-            "str": 11
-          },
-          "templateId": "warlock",
-          "weapon": {
-            "max": 6,
-            "min": 3,
-            "speed": 2.9
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 44,
-          "blockChance": 0.05,
-          "blockValue": 6,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0585,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0585,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 7,
-          "hp": 105,
-          "id": 1015,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 105,
-          "maxResource": 93,
-          "moveSpeed": 7,
-          "offhandItemId": "eastbrook_buckler",
-          "onGround": true,
-          "overpowerUntil": -1,
-          "paladinDevotion": {},
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 93,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 7,
-          "stats": {
-            "agi": 17,
-            "armor": 133,
-            "int": 13,
-            "spi": 14,
-            "sta": 23,
-            "str": 22
-          },
-          "templateId": "paladin",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2.6
-          }
-        },
         {
           "aiState": "idle",
           "attackPower": 46,
@@ -1949,15 +1616,348 @@
             "min": 2,
             "speed": 2
           }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 13,
+          "hp": 54,
+          "id": 1017,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 54,
+          "maxResource": 195,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 195,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 13,
+          "stats": {
+            "agi": 12,
+            "armor": 57,
+            "int": 25,
+            "spi": 22,
+            "sta": 14,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 42,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "dualWielding": true,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 6,
+          "hp": 62,
+          "id": 1018,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 62,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 6,
+          "stats": {
+            "agi": 25,
+            "armor": 104,
+            "int": 11,
+            "spi": 12,
+            "sta": 17,
+            "str": 17
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 39,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 7,
+          "hp": 69,
+          "id": 1019,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 69,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "rangedPower": 50,
+          "resource": 100,
+          "resourceType": "focus",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 7,
+          "stats": {
+            "agi": 25,
+            "armor": 109,
+            "int": 13,
+            "spi": 14,
+            "sta": 19,
+            "str": 14
+          },
+          "templateId": "hunter",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.2
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 11,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 11,
+          "hp": 57,
+          "id": 1020,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 57,
+          "maxResource": 155,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 155,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 11,
+          "stats": {
+            "agi": 12,
+            "armor": 54,
+            "int": 22,
+            "spi": 21,
+            "sta": 15,
+            "str": 11
+          },
+          "templateId": "warlock",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 44,
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0585,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0585,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 7,
+          "hp": 105,
+          "id": 1021,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 105,
+          "maxResource": 93,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "paladinDevotion": {},
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 93,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 7,
+          "stats": {
+            "agi": 17,
+            "armor": 133,
+            "int": 13,
+            "spi": 14,
+            "sta": 23,
+            "str": 22
+          },
+          "templateId": "paladin",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 1022
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 5,
+          "hp": 100,
+          "id": 1022,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
         }
       ]
     },
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1017,
-      "state": "8c8bc4a5",
-      "events": "b11a5ab5",
+      "nextId": 1023,
+      "state": "494505e4",
+      "events": "332feec8",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -2003,7 +2003,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1016,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2081,7 +2081,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1017,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2161,7 +2161,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1018,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -2238,7 +2238,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1013,
+          "entityId": 1019,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -2315,7 +2315,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1014,
+          "entityId": 1020,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2397,7 +2397,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1015,
+          "entityId": 1021,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "training_mace",
@@ -2479,7 +2479,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1016,
+          "entityId": 1022,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2520,339 +2520,6 @@
         }
       ],
       "entities": [
-        {
-          "aiState": "idle",
-          "attackPower": 46,
-          "auras": [
-            {
-              "duration": 3600,
-              "id": "battle_stance",
-              "kind": "battle_stance",
-              "name": "Battle Stance",
-              "remaining": 3600,
-              "school": "physical",
-              "sourceId": 1010
-            }
-          ],
-          "blockChance": 0.05,
-          "blockValue": 6,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.06,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.06,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 5,
-          "hp": 100,
-          "id": 1010,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 100,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "offhandItemId": "eastbrook_buckler",
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resourceType": "rage",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 5,
-          "stats": {
-            "agi": 20,
-            "armor": 144,
-            "int": 10,
-            "spi": 11,
-            "sta": 23,
-            "str": 23
-          },
-          "templateId": "warrior",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 10,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.056,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.056,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 13,
-          "hp": 54,
-          "id": 1011,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 54,
-          "maxResource": 195,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 195,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 13,
-          "stats": {
-            "agi": 12,
-            "armor": 57,
-            "int": 25,
-            "spi": 22,
-            "sta": 14,
-            "str": 10
-          },
-          "templateId": "mage",
-          "weapon": {
-            "max": 6,
-            "min": 3,
-            "speed": 2.9
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 42,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0625,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0625,
-          "dualWielding": true,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 6,
-          "hp": 62,
-          "id": 1012,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 62,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "offhandItemId": "rusty_dagger",
-          "offhandWeapon": {
-            "dagger": true,
-            "max": 4,
-            "min": 2,
-            "speed": 1.8
-          },
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 100,
-          "resourceType": "energy",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 6,
-          "stats": {
-            "agi": 25,
-            "armor": 104,
-            "int": 11,
-            "spi": 12,
-            "sta": 17,
-            "str": 17
-          },
-          "templateId": "rogue",
-          "weapon": {
-            "dagger": true,
-            "max": 4,
-            "min": 2,
-            "speed": 1.8
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 39,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0625,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0625,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 7,
-          "hp": 69,
-          "id": 1013,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 69,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "rangedPower": 50,
-          "resource": 100,
-          "resourceType": "focus",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 7,
-          "stats": {
-            "agi": 25,
-            "armor": 109,
-            "int": 13,
-            "spi": 14,
-            "sta": 19,
-            "str": 14
-          },
-          "templateId": "hunter",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2.2
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 11,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.056,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.056,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 11,
-          "hp": 57,
-          "id": 1014,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 57,
-          "maxResource": 155,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 155,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 11,
-          "stats": {
-            "agi": 12,
-            "armor": 54,
-            "int": 22,
-            "spi": 21,
-            "sta": 15,
-            "str": 11
-          },
-          "templateId": "warlock",
-          "weapon": {
-            "max": 6,
-            "min": 3,
-            "speed": 2.9
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 44,
-          "blockChance": 0.05,
-          "blockValue": 6,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0585,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0585,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 7,
-          "hp": 105,
-          "id": 1015,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 105,
-          "maxResource": 93,
-          "moveSpeed": 7,
-          "offhandItemId": "eastbrook_buckler",
-          "onGround": true,
-          "overpowerUntil": -1,
-          "paladinDevotion": {},
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 93,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 7,
-          "stats": {
-            "agi": 17,
-            "armor": 133,
-            "int": 13,
-            "spi": 14,
-            "sta": 23,
-            "str": 22
-          },
-          "templateId": "paladin",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2.6
-          }
-        },
         {
           "aiState": "idle",
           "attackPower": 46,
@@ -2916,15 +2583,348 @@
             "min": 2,
             "speed": 2
           }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 13,
+          "hp": 54,
+          "id": 1017,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 54,
+          "maxResource": 195,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 195,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 13,
+          "stats": {
+            "agi": 12,
+            "armor": 57,
+            "int": 25,
+            "spi": 22,
+            "sta": 14,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 42,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "dualWielding": true,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 6,
+          "hp": 62,
+          "id": 1018,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 62,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 6,
+          "stats": {
+            "agi": 25,
+            "armor": 104,
+            "int": 11,
+            "spi": 12,
+            "sta": 17,
+            "str": 17
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 39,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 7,
+          "hp": 69,
+          "id": 1019,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 69,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "rangedPower": 50,
+          "resource": 100,
+          "resourceType": "focus",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 7,
+          "stats": {
+            "agi": 25,
+            "armor": 109,
+            "int": 13,
+            "spi": 14,
+            "sta": 19,
+            "str": 14
+          },
+          "templateId": "hunter",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.2
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 11,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 11,
+          "hp": 57,
+          "id": 1020,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 57,
+          "maxResource": 155,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 155,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 11,
+          "stats": {
+            "agi": 12,
+            "armor": 54,
+            "int": 22,
+            "spi": 21,
+            "sta": 15,
+            "str": 11
+          },
+          "templateId": "warlock",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 44,
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0585,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0585,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 7,
+          "hp": 105,
+          "id": 1021,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 105,
+          "maxResource": 93,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "paladinDevotion": {},
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 93,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 7,
+          "stats": {
+            "agi": 17,
+            "armor": 133,
+            "int": 13,
+            "spi": 14,
+            "sta": 23,
+            "str": 22
+          },
+          "templateId": "paladin",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 1022
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 5,
+          "hp": 100,
+          "id": 1022,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
         }
       ]
     },
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1017,
-      "state": "8c8bc4a5",
-      "events": "a698f9a9",
+      "nextId": 1023,
+      "state": "494505e4",
+      "events": "5b07bc16",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -2970,7 +2970,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1016,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -3048,7 +3048,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1017,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -3128,7 +3128,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1018,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -3205,7 +3205,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1013,
+          "entityId": 1019,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -3282,7 +3282,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1014,
+          "entityId": 1020,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -3364,7 +3364,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1015,
+          "entityId": 1021,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "training_mace",
@@ -3446,7 +3446,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1016,
+          "entityId": 1022,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -3487,339 +3487,6 @@
         }
       ],
       "entities": [
-        {
-          "aiState": "idle",
-          "attackPower": 46,
-          "auras": [
-            {
-              "duration": 3600,
-              "id": "battle_stance",
-              "kind": "battle_stance",
-              "name": "Battle Stance",
-              "remaining": 3600,
-              "school": "physical",
-              "sourceId": 1010
-            }
-          ],
-          "blockChance": 0.05,
-          "blockValue": 6,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.06,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.06,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 5,
-          "hp": 100,
-          "id": 1010,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 100,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "offhandItemId": "eastbrook_buckler",
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resourceType": "rage",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 5,
-          "stats": {
-            "agi": 20,
-            "armor": 144,
-            "int": 10,
-            "spi": 11,
-            "sta": 23,
-            "str": 23
-          },
-          "templateId": "warrior",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 10,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.056,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.056,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 13,
-          "hp": 54,
-          "id": 1011,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 54,
-          "maxResource": 195,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 195,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 13,
-          "stats": {
-            "agi": 12,
-            "armor": 57,
-            "int": 25,
-            "spi": 22,
-            "sta": 14,
-            "str": 10
-          },
-          "templateId": "mage",
-          "weapon": {
-            "max": 6,
-            "min": 3,
-            "speed": 2.9
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 42,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0625,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0625,
-          "dualWielding": true,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 6,
-          "hp": 62,
-          "id": 1012,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 62,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "offhandItemId": "rusty_dagger",
-          "offhandWeapon": {
-            "dagger": true,
-            "max": 4,
-            "min": 2,
-            "speed": 1.8
-          },
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 100,
-          "resourceType": "energy",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 6,
-          "stats": {
-            "agi": 25,
-            "armor": 104,
-            "int": 11,
-            "spi": 12,
-            "sta": 17,
-            "str": 17
-          },
-          "templateId": "rogue",
-          "weapon": {
-            "dagger": true,
-            "max": 4,
-            "min": 2,
-            "speed": 1.8
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 39,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0625,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0625,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 7,
-          "hp": 69,
-          "id": 1013,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 69,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "rangedPower": 50,
-          "resource": 100,
-          "resourceType": "focus",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 7,
-          "stats": {
-            "agi": 25,
-            "armor": 109,
-            "int": 13,
-            "spi": 14,
-            "sta": 19,
-            "str": 14
-          },
-          "templateId": "hunter",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2.2
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 11,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.056,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.056,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 11,
-          "hp": 57,
-          "id": 1014,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 57,
-          "maxResource": 155,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 155,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 11,
-          "stats": {
-            "agi": 12,
-            "armor": 54,
-            "int": 22,
-            "spi": 21,
-            "sta": 15,
-            "str": 11
-          },
-          "templateId": "warlock",
-          "weapon": {
-            "max": 6,
-            "min": 3,
-            "speed": 2.9
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 44,
-          "blockChance": 0.05,
-          "blockValue": 6,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0585,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0585,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 7,
-          "hp": 105,
-          "id": 1015,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 105,
-          "maxResource": 93,
-          "moveSpeed": 7,
-          "offhandItemId": "eastbrook_buckler",
-          "onGround": true,
-          "overpowerUntil": -1,
-          "paladinDevotion": {},
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 93,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 7,
-          "stats": {
-            "agi": 17,
-            "armor": 133,
-            "int": 13,
-            "spi": 14,
-            "sta": 23,
-            "str": 22
-          },
-          "templateId": "paladin",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2.6
-          }
-        },
         {
           "aiState": "idle",
           "attackPower": 46,
@@ -3883,15 +3550,348 @@
             "min": 2,
             "speed": 2
           }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 13,
+          "hp": 54,
+          "id": 1017,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 54,
+          "maxResource": 195,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 195,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 13,
+          "stats": {
+            "agi": 12,
+            "armor": 57,
+            "int": 25,
+            "spi": 22,
+            "sta": 14,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 42,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "dualWielding": true,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 6,
+          "hp": 62,
+          "id": 1018,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 62,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 6,
+          "stats": {
+            "agi": 25,
+            "armor": 104,
+            "int": 11,
+            "spi": 12,
+            "sta": 17,
+            "str": 17
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 39,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 7,
+          "hp": 69,
+          "id": 1019,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 69,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "rangedPower": 50,
+          "resource": 100,
+          "resourceType": "focus",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 7,
+          "stats": {
+            "agi": 25,
+            "armor": 109,
+            "int": 13,
+            "spi": 14,
+            "sta": 19,
+            "str": 14
+          },
+          "templateId": "hunter",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.2
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 11,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 11,
+          "hp": 57,
+          "id": 1020,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 57,
+          "maxResource": 155,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 155,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 11,
+          "stats": {
+            "agi": 12,
+            "armor": 54,
+            "int": 22,
+            "spi": 21,
+            "sta": 15,
+            "str": 11
+          },
+          "templateId": "warlock",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 44,
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0585,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0585,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 7,
+          "hp": 105,
+          "id": 1021,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 105,
+          "maxResource": 93,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "paladinDevotion": {},
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 93,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 7,
+          "stats": {
+            "agi": 17,
+            "armor": 133,
+            "int": 13,
+            "spi": 14,
+            "sta": 23,
+            "str": 22
+          },
+          "templateId": "paladin",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 1022
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 5,
+          "hp": 100,
+          "id": 1022,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
         }
       ]
     },
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1017,
-      "state": "8c8bc4a5",
-      "events": "872bd0ab",
+      "nextId": 1023,
+      "state": "494505e4",
+      "events": "5b1d94e1",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -3937,7 +3937,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1016,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -4015,7 +4015,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1017,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -4095,7 +4095,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1018,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -4172,7 +4172,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1013,
+          "entityId": 1019,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -4249,7 +4249,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1014,
+          "entityId": 1020,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -4331,7 +4331,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1015,
+          "entityId": 1021,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "training_mace",
@@ -4413,7 +4413,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1016,
+          "entityId": 1022,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -4454,339 +4454,6 @@
         }
       ],
       "entities": [
-        {
-          "aiState": "idle",
-          "attackPower": 46,
-          "auras": [
-            {
-              "duration": 3600,
-              "id": "battle_stance",
-              "kind": "battle_stance",
-              "name": "Battle Stance",
-              "remaining": 3600,
-              "school": "physical",
-              "sourceId": 1010
-            }
-          ],
-          "blockChance": 0.05,
-          "blockValue": 6,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.06,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.06,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 5,
-          "hp": 100,
-          "id": 1010,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 100,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "offhandItemId": "eastbrook_buckler",
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resourceType": "rage",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 5,
-          "stats": {
-            "agi": 20,
-            "armor": 144,
-            "int": 10,
-            "spi": 11,
-            "sta": 23,
-            "str": 23
-          },
-          "templateId": "warrior",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 10,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.056,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.056,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 13,
-          "hp": 54,
-          "id": 1011,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 54,
-          "maxResource": 195,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 195,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 13,
-          "stats": {
-            "agi": 12,
-            "armor": 57,
-            "int": 25,
-            "spi": 22,
-            "sta": 14,
-            "str": 10
-          },
-          "templateId": "mage",
-          "weapon": {
-            "max": 6,
-            "min": 3,
-            "speed": 2.9
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 42,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0625,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0625,
-          "dualWielding": true,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 6,
-          "hp": 62,
-          "id": 1012,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 62,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "offhandItemId": "rusty_dagger",
-          "offhandWeapon": {
-            "dagger": true,
-            "max": 4,
-            "min": 2,
-            "speed": 1.8
-          },
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 100,
-          "resourceType": "energy",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 6,
-          "stats": {
-            "agi": 25,
-            "armor": 104,
-            "int": 11,
-            "spi": 12,
-            "sta": 17,
-            "str": 17
-          },
-          "templateId": "rogue",
-          "weapon": {
-            "dagger": true,
-            "max": 4,
-            "min": 2,
-            "speed": 1.8
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 39,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0625,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0625,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 7,
-          "hp": 69,
-          "id": 1013,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 69,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "rangedPower": 50,
-          "resource": 100,
-          "resourceType": "focus",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 7,
-          "stats": {
-            "agi": 25,
-            "armor": 109,
-            "int": 13,
-            "spi": 14,
-            "sta": 19,
-            "str": 14
-          },
-          "templateId": "hunter",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2.2
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 11,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.056,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.056,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 11,
-          "hp": 57,
-          "id": 1014,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 57,
-          "maxResource": 155,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 155,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 11,
-          "stats": {
-            "agi": 12,
-            "armor": 54,
-            "int": 22,
-            "spi": 21,
-            "sta": 15,
-            "str": 11
-          },
-          "templateId": "warlock",
-          "weapon": {
-            "max": 6,
-            "min": 3,
-            "speed": 2.9
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 44,
-          "blockChance": 0.05,
-          "blockValue": 6,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0585,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0585,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 7,
-          "hp": 105,
-          "id": 1015,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 105,
-          "maxResource": 93,
-          "moveSpeed": 7,
-          "offhandItemId": "eastbrook_buckler",
-          "onGround": true,
-          "overpowerUntil": -1,
-          "paladinDevotion": {},
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 93,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 7,
-          "stats": {
-            "agi": 17,
-            "armor": 133,
-            "int": 13,
-            "spi": 14,
-            "sta": 23,
-            "str": 22
-          },
-          "templateId": "paladin",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2.6
-          }
-        },
         {
           "aiState": "idle",
           "attackPower": 46,
@@ -4850,15 +4517,348 @@
             "min": 2,
             "speed": 2
           }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 13,
+          "hp": 54,
+          "id": 1017,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 54,
+          "maxResource": 195,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 195,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 13,
+          "stats": {
+            "agi": 12,
+            "armor": 57,
+            "int": 25,
+            "spi": 22,
+            "sta": 14,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 42,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "dualWielding": true,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 6,
+          "hp": 62,
+          "id": 1018,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 62,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 6,
+          "stats": {
+            "agi": 25,
+            "armor": 104,
+            "int": 11,
+            "spi": 12,
+            "sta": 17,
+            "str": 17
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 39,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 7,
+          "hp": 69,
+          "id": 1019,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 69,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "rangedPower": 50,
+          "resource": 100,
+          "resourceType": "focus",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 7,
+          "stats": {
+            "agi": 25,
+            "armor": 109,
+            "int": 13,
+            "spi": 14,
+            "sta": 19,
+            "str": 14
+          },
+          "templateId": "hunter",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.2
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 11,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 11,
+          "hp": 57,
+          "id": 1020,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 57,
+          "maxResource": 155,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 155,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 11,
+          "stats": {
+            "agi": 12,
+            "armor": 54,
+            "int": 22,
+            "spi": 21,
+            "sta": 15,
+            "str": 11
+          },
+          "templateId": "warlock",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 44,
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0585,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0585,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 7,
+          "hp": 105,
+          "id": 1021,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 105,
+          "maxResource": 93,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "paladinDevotion": {},
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 93,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 7,
+          "stats": {
+            "agi": 17,
+            "armor": 133,
+            "int": 13,
+            "spi": 14,
+            "sta": 23,
+            "str": 22
+          },
+          "templateId": "paladin",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 1022
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 5,
+          "hp": 100,
+          "id": 1022,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
         }
       ]
     },
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1017,
-      "state": "8c8bc4a5",
-      "events": "6697e1ce",
+      "nextId": 1023,
+      "state": "494505e4",
+      "events": "6f758264",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -4904,7 +4904,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1016,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -4982,7 +4982,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1017,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -5062,7 +5062,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1018,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -5139,7 +5139,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1013,
+          "entityId": 1019,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -5216,7 +5216,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1014,
+          "entityId": 1020,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -5298,7 +5298,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1015,
+          "entityId": 1021,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "training_mace",
@@ -5380,7 +5380,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1016,
+          "entityId": 1022,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -5421,339 +5421,6 @@
         }
       ],
       "entities": [
-        {
-          "aiState": "idle",
-          "attackPower": 46,
-          "auras": [
-            {
-              "duration": 3600,
-              "id": "battle_stance",
-              "kind": "battle_stance",
-              "name": "Battle Stance",
-              "remaining": 3600,
-              "school": "physical",
-              "sourceId": 1010
-            }
-          ],
-          "blockChance": 0.05,
-          "blockValue": 6,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.06,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.06,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 5,
-          "hp": 100,
-          "id": 1010,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 100,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "offhandItemId": "eastbrook_buckler",
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resourceType": "rage",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 5,
-          "stats": {
-            "agi": 20,
-            "armor": 144,
-            "int": 10,
-            "spi": 11,
-            "sta": 23,
-            "str": 23
-          },
-          "templateId": "warrior",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 10,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.056,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.056,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 13,
-          "hp": 54,
-          "id": 1011,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 54,
-          "maxResource": 195,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 195,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 13,
-          "stats": {
-            "agi": 12,
-            "armor": 57,
-            "int": 25,
-            "spi": 22,
-            "sta": 14,
-            "str": 10
-          },
-          "templateId": "mage",
-          "weapon": {
-            "max": 6,
-            "min": 3,
-            "speed": 2.9
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 42,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0625,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0625,
-          "dualWielding": true,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 6,
-          "hp": 62,
-          "id": 1012,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 62,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "offhandItemId": "rusty_dagger",
-          "offhandWeapon": {
-            "dagger": true,
-            "max": 4,
-            "min": 2,
-            "speed": 1.8
-          },
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 100,
-          "resourceType": "energy",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 6,
-          "stats": {
-            "agi": 25,
-            "armor": 104,
-            "int": 11,
-            "spi": 12,
-            "sta": 17,
-            "str": 17
-          },
-          "templateId": "rogue",
-          "weapon": {
-            "dagger": true,
-            "max": 4,
-            "min": 2,
-            "speed": 1.8
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 39,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0625,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0625,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 7,
-          "hp": 69,
-          "id": 1013,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 69,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "rangedPower": 50,
-          "resource": 100,
-          "resourceType": "focus",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 7,
-          "stats": {
-            "agi": 25,
-            "armor": 109,
-            "int": 13,
-            "spi": 14,
-            "sta": 19,
-            "str": 14
-          },
-          "templateId": "hunter",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2.2
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 11,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.056,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.056,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 11,
-          "hp": 57,
-          "id": 1014,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 57,
-          "maxResource": 155,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 155,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 11,
-          "stats": {
-            "agi": 12,
-            "armor": 54,
-            "int": 22,
-            "spi": 21,
-            "sta": 15,
-            "str": 11
-          },
-          "templateId": "warlock",
-          "weapon": {
-            "max": 6,
-            "min": 3,
-            "speed": 2.9
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 44,
-          "blockChance": 0.05,
-          "blockValue": 6,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0585,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0585,
-          "fallStartY": -2,
-          "fiveSecondRule": 99,
-          "healPower": 7,
-          "hp": 105,
-          "id": 1015,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 105,
-          "maxResource": 93,
-          "moveSpeed": 7,
-          "offhandItemId": "eastbrook_buckler",
-          "onGround": true,
-          "overpowerUntil": -1,
-          "paladinDevotion": {},
-          "petMode": "defensive",
-          "pos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "potionCooldownUntil": -1,
-          "resource": 93,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": -94,
-            "y": -2,
-            "z": -58
-          },
-          "spellPower": 7,
-          "stats": {
-            "agi": 17,
-            "armor": 133,
-            "int": 13,
-            "spi": 14,
-            "sta": 23,
-            "str": 22
-          },
-          "templateId": "paladin",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2.6
-          }
-        },
         {
           "aiState": "idle",
           "attackPower": 46,
@@ -5817,14 +5484,347 @@
             "min": 2,
             "speed": 2
           }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 13,
+          "hp": 54,
+          "id": 1017,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 54,
+          "maxResource": 195,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 195,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 13,
+          "stats": {
+            "agi": 12,
+            "armor": 57,
+            "int": 25,
+            "spi": 22,
+            "sta": 14,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 42,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "dualWielding": true,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 6,
+          "hp": 62,
+          "id": 1018,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 62,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 6,
+          "stats": {
+            "agi": 25,
+            "armor": 104,
+            "int": 11,
+            "spi": 12,
+            "sta": 17,
+            "str": 17
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 39,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 7,
+          "hp": 69,
+          "id": 1019,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 69,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "rangedPower": 50,
+          "resource": 100,
+          "resourceType": "focus",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 7,
+          "stats": {
+            "agi": 25,
+            "armor": 109,
+            "int": 13,
+            "spi": 14,
+            "sta": 19,
+            "str": 14
+          },
+          "templateId": "hunter",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.2
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 11,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 11,
+          "hp": 57,
+          "id": 1020,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 57,
+          "maxResource": 155,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 155,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 11,
+          "stats": {
+            "agi": 12,
+            "armor": 54,
+            "int": 22,
+            "spi": 21,
+            "sta": 15,
+            "str": 11
+          },
+          "templateId": "warlock",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 44,
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0585,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0585,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 7,
+          "hp": 105,
+          "id": 1021,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 105,
+          "maxResource": 93,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "paladinDevotion": {},
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resource": 93,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 7,
+          "stats": {
+            "agi": 17,
+            "armor": 133,
+            "int": 13,
+            "spi": 14,
+            "sta": 23,
+            "str": 22
+          },
+          "templateId": "paladin",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 1022
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 5,
+          "hp": 100,
+          "id": 1022,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
         }
       ]
     },
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1017,
-      "state": "8c8bc4a5",
+      "nextId": 1023,
+      "state": "494505e4",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -5871,7 +5871,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1010,
+          "entityId": 1016,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -5949,7 +5949,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1011,
+          "entityId": 1017,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -6029,7 +6029,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1018,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -6106,7 +6106,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1013,
+          "entityId": 1019,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -6183,7 +6183,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1014,
+          "entityId": 1020,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -6265,7 +6265,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1015,
+          "entityId": 1021,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "training_mace",
@@ -6347,7 +6347,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1016,
+          "entityId": 1022,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -6399,7 +6399,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1010
+              "sourceId": 1016
             }
           ],
           "blockChance": 0.05,
@@ -6413,7 +6413,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1010,
+          "id": 1016,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -6464,7 +6464,7 @@
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 54,
-          "id": 1011,
+          "id": 1017,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -6516,7 +6516,7 @@
           "fiveSecondRule": 99,
           "healPower": 6,
           "hp": 62,
-          "id": 1012,
+          "id": 1018,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -6575,7 +6575,7 @@
           "fiveSecondRule": 99,
           "healPower": 7,
           "hp": 69,
-          "id": 1013,
+          "id": 1019,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -6627,7 +6627,7 @@
           "fiveSecondRule": 99,
           "healPower": 11,
           "hp": 57,
-          "id": 1014,
+          "id": 1020,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -6680,7 +6680,7 @@
           "fiveSecondRule": 99,
           "healPower": 7,
           "hp": 105,
-          "id": 1015,
+          "id": 1021,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -6732,7 +6732,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1016
+              "sourceId": 1022
             }
           ],
           "blockChance": 0.05,
@@ -6746,7 +6746,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1016,
+          "id": 1022,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

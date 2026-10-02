@@ -1,3 +1,4 @@
+import { classListAdmits } from '../src/sim/equipment_rules';
 import { describe, expect, it } from 'vitest';
 import { WEAPON_TYPE_BY_ITEM } from '../src/sim/content/weapon_skin_rules';
 import { CLASSES, ITEMS } from '../src/sim/data';
@@ -128,7 +129,8 @@ describe('weapon requiredClass is representative of who can equip', () => {
     for (const item of Object.values(ITEMS)) {
       if (item.kind !== 'weapon' || !item.requiredClass) continue;
       const equippable = ALL_CLASSES.filter((c) => canEquipItem(c, item)).sort();
-      const listed = [...item.requiredClass].sort();
+      // an authored 'rogue' entry also admits the Ninja (equipment_rules withNinja)
+      const listed = ALL_CLASSES.filter((c) => classListAdmits(item.requiredClass ?? [], c)).sort();
       expect(listed, `${item.id}: requiredClass must match its equippable classes`).toEqual(
         equippable,
       );

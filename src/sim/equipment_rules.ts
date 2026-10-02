@@ -14,7 +14,7 @@ import {
 type WeaponArchetype = 'warrior' | 'caster' | 'rogue';
 
 const MAIL_CLASSES = new Set<PlayerClass>(['warrior', 'paladin', 'shaman']);
-const LEATHER_CLASSES = new Set<PlayerClass>(['druid', 'rogue', 'hunter']);
+const LEATHER_CLASSES = new Set<PlayerClass>(['druid', 'rogue', 'ninja', 'hunter']);
 const WARRIOR_WEAPON_CLASSES = new Set<PlayerClass>([
   'warrior',
   'rogue',
@@ -30,7 +30,7 @@ const CASTER_WEAPON_CLASSES = new Set<PlayerClass>([
   'paladin',
   'druid',
 ]);
-const ROGUE_WEAPON_CLASSES = new Set<PlayerClass>(['rogue', 'hunter']);
+const ROGUE_WEAPON_CLASSES = new Set<PlayerClass>(['rogue', 'ninja', 'hunter']);
 
 const ARMOR_RANK: Record<ArmorType, number> = {
   cloth: 0,
@@ -39,8 +39,20 @@ const ARMOR_RANK: Record<ArmorType, number> = {
 };
 
 // True when `classes` names exactly the members of `allowed` (order-independent).
+// The Ninja runs on the rogue engine, so it is admitted wherever the rogue is:
+// an authored list naming 'rogue' implies 'ninja' (content predates the class).
+function withNinja(classes: readonly PlayerClass[]): readonly PlayerClass[] {
+  return classes.includes('rogue') && !classes.includes('ninja') ? [...classes, 'ninja'] : classes;
+}
+
 function sameClassSet(classes: readonly PlayerClass[], allowed: ReadonlySet<PlayerClass>): boolean {
-  return classes.length === allowed.size && classes.every((cls) => allowed.has(cls));
+  const list = withNinja(classes);
+  return list.length === allowed.size && list.every((cls) => allowed.has(cls));
+}
+
+/** True when an authored class list admits `cls` (the rogue entry admits the Ninja). */
+export function classListAdmits(classes: readonly PlayerClass[], cls: PlayerClass): boolean {
+  return withNinja(classes).includes(cls);
 }
 
 export function armorTypeForItem(item: ItemDef): ArmorType | null {
@@ -399,6 +411,7 @@ export function classesThatCanEquipArmorType(armorType: ArmorType): PlayerClass[
 export function canDualWield(cls: PlayerClass, spec?: string | null): boolean {
   return (
     cls === 'rogue' ||
+    cls === 'ninja' ||
     (cls === 'warrior' && spec === 'fury') ||
     (cls === 'shaman' && spec === 'enhancement')
   );
@@ -415,28 +428,32 @@ export function weaponHand(item: WeaponItemDef): WeaponItemDef['hand'] {
 export function canEquipItem(cls: PlayerClass, item: ItemDef): boolean {
   // Class-locked gear (Warfare Season 2 spec sets) honors its class list before
   // any armor-type or weapon rule, so another class can never wear it.
-  if (item.classLocked && !(item.requiredClass ?? []).includes(cls)) return false;
+  if (item.classLocked && !classListAdmits(item.requiredClass ?? [], cls)) return false;
   if (isShieldItem(item)) {
-    return !item.requiredClass || item.requiredClass.includes(cls);
+    return !item.requiredClass || classListAdmits(item.requiredClass, cls);
   }
   // Held offhands (caster orbs/tomes) carry no armor class or weapon proficiency:
   // the literal requiredClass list is the whole rule, like shields.
   if (item.kind === 'held_offhand') {
-    return !item.requiredClass || item.requiredClass.includes(cls);
+    return !item.requiredClass || classListAdmits(item.requiredClass, cls);
   }
   const armorType = armorTypeForItem(item);
   if (armorType) return ARMOR_RANK[armorType] <= ARMOR_RANK[maxArmorTypeForClass(cls)];
   // Rogues may dual wield one-handed weapons, but can never equip a two-hander.
   // Keep this at the equipment boundary so future items cannot bypass it through
   // a missing or overly broad requiredClass list.
-  if (cls === 'rogue' && item.kind === 'weapon' && weaponHand(item) === 'twohand') {
+  if (
+    (cls === 'rogue' || cls === 'ninja') &&
+    item.kind === 'weapon' &&
+    weaponHand(item) === 'twohand'
+  ) {
     return false;
   }
   const weaponArchetype = weaponArchetypeForItem(item);
   if (weaponArchetype === 'warrior') return WARRIOR_WEAPON_CLASSES.has(cls);
   if (weaponArchetype === 'caster') return CASTER_WEAPON_CLASSES.has(cls);
   if (weaponArchetype === 'rogue') return ROGUE_WEAPON_CLASSES.has(cls);
-  if (item.requiredClass) return item.requiredClass.includes(cls);
+  if (item.requiredClass) return classListAdmits(item.requiredClass, cls);
   return true;
 }
 

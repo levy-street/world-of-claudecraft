@@ -16,7 +16,7 @@ import {
   QUALITY_TIE_RANK,
   QUALITY_TIE_SCALE,
 } from '../src/sim/dev_kit';
-import { canDualWield, isShieldItem } from '../src/sim/equipment_rules';
+import { canDualWield, classListAdmits, isShieldItem } from '../src/sim/equipment_rules';
 import { itemFromRaid } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, type PlayerClass } from '../src/sim/types';
@@ -34,7 +34,7 @@ function everySpec(): { cls: PlayerClass; spec: string }[] {
 }
 
 describe('dev kit role table', () => {
-  it('covers all 27 class-and-spec pairs', () => {
+  it('covers all 30 class-and-spec pairs', () => {
     expect(everySpec()).toHaveLength(DEV_KIT_ROLE_COUNT);
     const missing = everySpec().filter(({ cls, spec }) => devKitRole(cls, spec) === null);
     expect(missing).toEqual([]);
@@ -173,7 +173,8 @@ describe('fresh-20 item pool', () => {
     expect(locked.length).toBeGreaterThan(0);
     for (const item of locked) {
       for (const cls of ALL_CLASSES) {
-        if (!item.requiredClass?.includes(cls)) expect(isFreshTwentyItem(cls, item)).toBe(false);
+        if (!classListAdmits(item.requiredClass ?? [], cls))
+          expect(isFreshTwentyItem(cls, item)).toBe(false);
       }
     }
   });
@@ -294,6 +295,9 @@ describe('kit construction', () => {
       'rogue/assassination',
       'rogue/combat',
       'rogue/subtlety',
+      'ninja/assassination',
+      'ninja/combat',
+      'ninja/subtlety',
       'shaman/enhancement',
     ];
     const CASTER_SPECS = [

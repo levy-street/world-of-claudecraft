@@ -337,6 +337,7 @@ export const shellStrings = {
         paladin: 'Healer / Tank / Melee DPS',
         hunter: 'Ranged DPS',
         rogue: 'Melee DPS',
+        ninja: 'Melee DPS',
         priest: 'Healer / Ranged DPS',
         shaman: 'Healer / Melee or Ranged DPS',
         mage: 'Ranged DPS',
@@ -365,6 +366,8 @@ export const shellStrings = {
           'Hunters are ranged specialists who fight beside a tamed beast, peppering enemies with aimed and rapid shots, slowing them with stings and concussive fire, and shifting aspects to suit the moment.',
         rogue:
           'Rogues are stealthy assassins who spend Energy and Combo Points on backstabs and finishing moves from the shadows.',
+        ninja:
+          'A shadow-trained blade of the Blossom Temple: a fast, stealthy energy fighter who strikes with katana and shuriken, then vanishes in smoke.',
         priest:
           'Priests call on Mending Light to heal and shield allies, while Shadow magic lets them drain the life of their enemies.',
         shaman:

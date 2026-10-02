@@ -665,7 +665,8 @@ export const en_CA: EnTranslations = {
       "bow": "Bow",
       "clap": "Clap",
       "roar": "Roar",
-      "kneel": "Kneel"
+      "kneel": "Kneel",
+      "kata": "Kata"
     },
     "emoteWheel": {
       "edit": "Edit",
@@ -4434,6 +4435,8 @@ export const en_CA: EnTranslations = {
       "enchantedFallback": "Enchanted",
       "partyTradeWindow": "You may trade this item to players who shared its drop for the next {time}. Equipping it ends the trade window.",
       "perfectedBadge": "Perfected",
+      "katanaKills": "Enemies slain: {count}",
+      "katanaKanji": "Engraved kanji: {glyph}",
       "perfectingRank": "Perfecting: rank {rank} of {ranks}",
       "materialSourceGatherer": "{count} × Collected by {name}",
       "materialSourceGathererSigned": "{count} × Collected by {name}, signed by {signer}",
@@ -10196,6 +10199,7 @@ export const en_CA: EnTranslations = {
     "paladin": "Paladin",
     "hunter": "Hunter",
     "rogue": "Rogue",
+    "ninja": "Ninja",
     "priest": "Priest",
     "shaman": "Shaman",
     "mage": "Mage",
@@ -11285,6 +11289,7 @@ export const en_CA: EnTranslations = {
       "paladin": "Healer / Tank / Melee DPS",
       "hunter": "Ranged DPS",
       "rogue": "Melee DPS",
+      "ninja": "Melee DPS",
       "priest": "Healer / Ranged DPS",
       "shaman": "Healer / Melee or Ranged DPS",
       "mage": "Ranged DPS",
@@ -11309,6 +11314,7 @@ export const en_CA: EnTranslations = {
       "paladin": "Paladins are holy crusaders who support allies with blessings, heal wounds with Mending Light, and protect the weak in heavy armour.",
       "hunter": "Hunters are ranged specialists who fight beside a tamed beast, peppering enemies with aimed and rapid shots, slowing them with stings and concussive fire, and shifting aspects to suit the moment.",
       "rogue": "Rogues are stealthy assassins who spend Energy and Combo Points on backstabs and finishing moves from the shadows.",
+      "ninja": "A shadow-trained blade of the Blossom Temple: a fast, stealthy energy fighter who strikes with katana and shuriken, then vanishes in smoke.",
       "priest": "Priests call on Mending Light to heal and shield allies, while Shadow magic lets them drain the life of their enemies.",
       "shaman": "Shaman command the elements, imbuing weapons with power, shocking enemies with lightning, and restoring allies.",
       "mage": "Mages bend Fire, Frost, and arcane force to destroy enemies, summon water, and freeze threats in place.",
@@ -14761,6 +14767,18 @@ export const en_CA: EnTranslations = {
       "choir_of_deliverance": {
         "name": "Choir of Deliverance",
         "description": "Channel for 6 sec, healing party members within 30 yards for {damage} every 2 sec. Healing increases with Spell Power."
+      },
+      "shuriken_toss": {
+        "name": "Shuriken Toss",
+        "description": "Throw a spinning shuriken for {damage} Physical damage. Awards 1 combo point."
+      },
+      "shadow_slash": {
+        "name": "Shadow Slash",
+        "description": "A quick katana cut for weapon damage plus {damage}. Awards 1 combo point."
+      },
+      "smoke_bomb": {
+        "name": "Smoke Bomb",
+        "description": "Burst a smoke bomb in the target's face for {damage} Physical damage, incapacitating it for 4 sec. Any damage breaks the effect. Awards 1 combo point."
       },
       "bear_charge": {
         "name": "Bruin Rush",
@@ -18451,6 +18469,18 @@ export const en_CA: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Vanguard's Warstaff"
       },
+      "katana_a": {
+        "name": "Blossom Katana"
+      },
+      "katana_b": {
+        "name": "Moonsteel Katana"
+      },
+      "katana_c": {
+        "name": "Crimson Petal Katana"
+      },
+      "blossom_training_mat": {
+        "name": "Temple Training Mat"
+      },
       "conjured_water4": {
         "name": "Conjured Springwater"
       },
@@ -20421,6 +20451,11 @@ export const en_CA: EnTranslations = {
         "title": "Master Armorer",
         "greeting": "Forge is hot and the grindstone is turning. If it cuts, I sell it."
       },
+      "swordsmith_ren": {
+        "name": "Swordsmith Ren",
+        "title": "Katana Maker",
+        "greeting": "Folded a thousand times under the blossoms. Each blade remembers the hand that made it."
+      },
       "heroic_quartermaster": {
         "name": "Quartermaster Vex",
         "title": "Heroic Quartermaster",
@@ -20890,6 +20925,31 @@ export const en_CA: EnTranslations = {
         "name": "Drillmaster Hale",
         "title": "Quay Sparring Master",
         "greeting": "That dummy behind me never swings back and never goes down, {className}. What matters is the tally: your Damage Meters count every blow you land on it. Target it and open the meters, and I will walk you through the rest."
+      },
+      "master_monk_sora": {
+        "name": "Master Sora",
+        "title": "Keeper of the Blossom Temple",
+        "greeting": "The petals fall the same way every spring, and still each one is new. So it is with the kata."
+      },
+      "monk_trainee_a": {
+        "name": "Trainee Hiro",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_b": {
+        "name": "Trainee Mei",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_c": {
+        "name": "Trainee Kenji",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_d": {
+        "name": "Trainee Aiko",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -23156,6 +23216,16 @@ export const en_CA: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Effective heal landed on the Healing Dummy"
+          }
+        }
+      },
+      "q_blossom_kata": {
+        "title": "The Way of the Blossom",
+        "text": "You watch my students the way a cat watches a pond, {playerName}. Good. Watching is the first lesson. The second is the mat: step onto it, empty your mind, and let the kata move you. Come back when your feet remember it.",
+        "completion": "Your stance was crooked and your breath was loud. And still the blossoms leaned toward you. Welcome, monk of the Blossom Temple.",
+        "objectives": {
+          "0": {
+            "label": "Practice the kata on the training mat"
           }
         }
       },

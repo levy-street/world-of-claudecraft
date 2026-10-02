@@ -9,6 +9,7 @@
 // state is NOT a badge of its own: it is attributed inline on the bonus stat
 // lines it actually caused (instanceBonusStatLines), which is the fact a player
 // is reading the tooltip for.
+import { KATANA_KANJI } from '../sim/content/katana_forge';
 import { ENCHANTS } from '../sim/content/enchants';
 import { effectiveQuality } from '../sim/equipment_rules';
 import { activeItemInstanceStats, isItemEnchantActive } from '../sim/item_instance_stats';
@@ -111,6 +112,8 @@ export function wornTooltipInstance(
   if (instance.perfected !== undefined) worn.perfected = instance.perfected;
   if (instance.rift !== undefined) worn.rift = instance.rift;
   if (instance.lootQuality !== undefined) worn.lootQuality = instance.lootQuality;
+  // The Katana Table look and kill count: cosmetic, shown on the paperdoll.
+  if (instance.katana !== undefined) worn.katana = instance.katana;
   return worn;
 }
 
@@ -258,6 +261,25 @@ export function instanceBadgeLines(instance?: ItemInstancePayload): string {
         rank: itemNumber(instance.perfecting),
         ranks: itemNumber(PERFECTING_RANKS),
       }),
+    )}</div>`;
+  }
+  html += katanaTooltipLines(instance);
+  return html;
+}
+
+/** The Katana Table record: kill count and the engraved kanji (a symbol, not text). */
+export function katanaTooltipLines(instance: ItemInstancePayload): string {
+  const look = instance.katana;
+  if (!look) return '';
+  let html = '';
+  if (typeof look.kills === 'number' && Number.isInteger(look.kills) && look.kills >= 0) {
+    html += `<div class="tt-sub">${esc(
+      t('hudChrome.itemTooltip.katanaKills', { count: itemNumber(look.kills) }),
+    )}</div>`;
+  }
+  if (look.kanji && Object.hasOwn(KATANA_KANJI, look.kanji)) {
+    html += `<div class="tt-sub" style="color:var(--gold)">${esc(
+      t('hudChrome.itemTooltip.katanaKanji', { glyph: KATANA_KANJI[look.kanji] }),
     )}</div>`;
   }
   return html;

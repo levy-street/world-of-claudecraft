@@ -260,6 +260,7 @@ export const CLASS_ROLES: Record<PlayerClass, readonly BoostRole[]> = {
   ],
   hunter: [{ id: 'marksmanship', weights: { agi: 1, sta: 0.6, int: 0.2 }, melee: true }],
   rogue: [{ id: 'combat', weights: { agi: 1, sta: 0.6, str: 0.4 }, melee: true }],
+  ninja: [{ id: 'combat', weights: { agi: 1, sta: 0.6, str: 0.4 }, melee: true }],
   priest: [
     { id: 'holy', weights: { int: 1, spi: 0.8, sta: 0.4 }, melee: false, healer: true },
     // The heroic/raid cloth pool differentiates healer (spi-heavy) from

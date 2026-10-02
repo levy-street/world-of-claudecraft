@@ -665,7 +665,8 @@ export const cs_CZ: EnTranslations = {
       "bow": "Poklona",
       "clap": "Tleskat",
       "roar": "Zařvat",
-      "kneel": "Pokleknout"
+      "kneel": "Pokleknout",
+      "kata": "Kata"
     },
     "emoteWheel": {
       "edit": "Upravit",
@@ -4434,6 +4435,8 @@ export const cs_CZ: EnTranslations = {
       "enchantedFallback": "Okouzlený",
       "partyTradeWindow": "Tento předmět můžeš dalších {time} směňovat s hráči, kteří sdíleli jeho kořist. Nasazení předmětu okno pro směnu ukončí.",
       "perfectedBadge": "Zdokonalené",
+      "katanaKills": "Enemies slain: {count}",
+      "katanaKanji": "Engraved kanji: {glyph}",
       "perfectingRank": "Zdokonalování: hodnost {rank} z {ranks}",
       "materialSourceGatherer": "{count} × sebral(a) {name}",
       "materialSourceGathererSigned": "{count} × sebral(a) {name}, podepsal(a) {signer}",
@@ -10196,6 +10199,7 @@ export const cs_CZ: EnTranslations = {
     "paladin": "Paladin",
     "hunter": "Lovec",
     "rogue": "Tulák",
+    "ninja": "Ninja",
     "priest": "Kněz",
     "shaman": "Šaman",
     "mage": "Mág",
@@ -11285,6 +11289,7 @@ export const cs_CZ: EnTranslations = {
       "paladin": "Léčitel / tank / DPS na blízko",
       "hunter": "DPS na dálku",
       "rogue": "DPS na blízko",
+      "ninja": "Melee DPS",
       "priest": "Léčitel / DPS na dálku",
       "shaman": "Léčitel / DPS na blízko nebo na dálku",
       "mage": "DPS na dálku",
@@ -11309,6 +11314,7 @@ export const cs_CZ: EnTranslations = {
       "paladin": "Paladinové jsou svatí křižáci, kteří podporují spojence požehnáními, léčí zranění Hojivým světlem a chrání slabé v těžké zbroji.",
       "hunter": "Lovci jsou specialisté na boj z dálky, kteří bojují po boku ochočené šelmy, zasypávají nepřátele mířenými a rychlými střelami, zpomalují je bodnutím a omračující palbou a mění aspekty podle situace.",
       "rogue": "Tuláci jsou nenápadní zabijáci, kteří utrácejí energii a combo body za bodnutí do zad a dokončovací útoky ze stínů.",
+      "ninja": "A shadow-trained blade of the Blossom Temple: a fast, stealthy energy fighter who strikes with katana and shuriken, then vanishes in smoke.",
       "priest": "Kněží povolávají Hojivé světlo, aby léčili a chránili spojence, zatímco stínová magie jim umožňuje vysávat život z nepřátel.",
       "shaman": "Šamani ovládají živly, naplňují zbraně silou, zasahují nepřátele blesky a obnovují spojence.",
       "mage": "Mágové ohýbají oheň, mráz a arkánní sílu, aby ničili nepřátele, vyvolávali vodu a zmrazovali hrozby na místě.",
@@ -14761,6 +14767,18 @@ export const cs_CZ: EnTranslations = {
       "choir_of_deliverance": {
         "name": "Sbor vysvobození",
         "description": "Kanalizuje po dobu 6 s a každé 2 s léčí členy skupiny do 30 metrů za {damage}. Léčení roste se silou kouzel."
+      },
+      "shuriken_toss": {
+        "name": "Shuriken Toss",
+        "description": "Throw a spinning shuriken for {damage} Physical damage. Awards 1 combo point."
+      },
+      "shadow_slash": {
+        "name": "Shadow Slash",
+        "description": "A quick katana cut for weapon damage plus {damage}. Awards 1 combo point."
+      },
+      "smoke_bomb": {
+        "name": "Smoke Bomb",
+        "description": "Burst a smoke bomb in the target's face for {damage} Physical damage, incapacitating it for 4 sec. Any damage breaks the effect. Awards 1 combo point."
       },
       "bear_charge": {
         "name": "Medvědí výpad",
@@ -18451,6 +18469,18 @@ export const cs_CZ: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Bojová hůl Předvoje"
       },
+      "katana_a": {
+        "name": "Blossom Katana"
+      },
+      "katana_b": {
+        "name": "Moonsteel Katana"
+      },
+      "katana_c": {
+        "name": "Crimson Petal Katana"
+      },
+      "blossom_training_mat": {
+        "name": "Temple Training Mat"
+      },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
       },
@@ -20421,6 +20451,11 @@ export const cs_CZ: EnTranslations = {
         "title": "Mistr zbrojíř",
         "greeting": "Výheň je rozpálená a brusný kámen se točí. Pokud to řeže, prodávám to."
       },
+      "swordsmith_ren": {
+        "name": "Swordsmith Ren",
+        "title": "Katana Maker",
+        "greeting": "Folded a thousand times under the blossoms. Each blade remembers the hand that made it."
+      },
       "heroic_quartermaster": {
         "name": "Zásobovač Vex",
         "title": "Hrdinský zásobovač",
@@ -20890,6 +20925,31 @@ export const cs_CZ: EnTranslations = {
         "name": "Mistr výcviku Hale",
         "title": "Mistr přístavního sparingu",
         "greeting": "Ten cvičný terč za mnou nikdy nevrací úder a nikdy nepadne, {className}. Důležitý je součet: měřiče poškození počítají každý úder, který do něj zasadíš. Zaměř ho a otevři měřiče, zbytek ti vysvětlím."
+      },
+      "master_monk_sora": {
+        "name": "Master Sora",
+        "title": "Keeper of the Blossom Temple",
+        "greeting": "The petals fall the same way every spring, and still each one is new. So it is with the kata."
+      },
+      "monk_trainee_a": {
+        "name": "Trainee Hiro",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_b": {
+        "name": "Trainee Mei",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_c": {
+        "name": "Trainee Kenji",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_d": {
+        "name": "Trainee Aiko",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -23156,6 +23216,16 @@ export const cs_CZ: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Účinné léčení zasazeno do Léčicího cvičného terče"
+          }
+        }
+      },
+      "q_blossom_kata": {
+        "title": "The Way of the Blossom",
+        "text": "You watch my students the way a cat watches a pond, {playerName}. Good. Watching is the first lesson. The second is the mat: step onto it, empty your mind, and let the kata move you. Come back when your feet remember it.",
+        "completion": "Your stance was crooked and your breath was loud. And still the blossoms leaned toward you. Welcome, monk of the Blossom Temple.",
+        "objectives": {
+          "0": {
+            "label": "Practice the kata on the training mat"
           }
         }
       },

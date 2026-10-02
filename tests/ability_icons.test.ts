@@ -127,13 +127,13 @@ describe('ability icons', () => {
     expect(ids).toEqual([...new Set(ids)].sort((left, right) => left.localeCompare(right)));
     // 464: 450 plus the fourteen Nythraxis Raid Boss Guide mechanic recipes;
     // 469: plus the Wildfang kit pass 2 glyphs (lunge, hamstring_bite).
-    // 473: plus the Buried Hoards Clockwork Shock Bomb glyph (the 2026-09-28
+    // 476: plus the three Ninja signature fallbacks; 473: plus the Buried Hoards Clockwork Shock Bomb glyph (the 2026-09-28
     // release/v0.44.0 merge into feature/buried-hoards).
-    expect(ids).toHaveLength(473);
+    expect(ids).toHaveLength(476);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    expect(hash).toBe('6fa8b2c16d3459d5f09768545d08e8f6778c00a2ac3973cd0d9361ee3d08971c');
+    expect(hash).toBe('ed6218dd494da62eefb9a69c4da1a628b042f9668d824ed8f11459eb1b2712db');
   });
 });

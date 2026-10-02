@@ -665,7 +665,8 @@ export const es: EnTranslations = {
       "bow": "Reverencia",
       "clap": "Aplaudir",
       "roar": "Rugir",
-      "kneel": "Arrodillarse"
+      "kneel": "Arrodillarse",
+      "kata": "Kata"
     },
     "emoteWheel": {
       "edit": "Editar",
@@ -4434,6 +4435,8 @@ export const es: EnTranslations = {
       "enchantedFallback": "Encantado",
       "partyTradeWindow": "Puedes intercambiar este objeto con jugadores que compartieron su botín durante los próximos {time}. Equiparlo termina la ventana de intercambio.",
       "perfectedBadge": "Perfeccionado",
+      "katanaKills": "Enemies slain: {count}",
+      "katanaKanji": "Engraved kanji: {glyph}",
       "perfectingRank": "Perfeccionamiento: rango {rank} de {ranks}",
       "materialSourceGatherer": "{count} × Recolectado por {name}",
       "materialSourceGathererSigned": "{count} × Recolectado por {name}, firmado por {signer}",
@@ -10196,6 +10199,7 @@ export const es: EnTranslations = {
     "paladin": "Paladín",
     "hunter": "Cazador",
     "rogue": "Pícaro",
+    "ninja": "Ninja",
     "priest": "Sacerdote",
     "shaman": "Chamán",
     "mage": "Mago",
@@ -11285,6 +11289,7 @@ export const es: EnTranslations = {
       "paladin": "Sanador / Tanque / DPS cuerpo a cuerpo",
       "hunter": "DPS a distancia",
       "rogue": "DPS cuerpo a cuerpo",
+      "ninja": "Melee DPS",
       "priest": "Sanador / DPS a distancia",
       "shaman": "Sanador / DPS cuerpo a cuerpo o a distancia",
       "mage": "DPS a distancia",
@@ -11309,6 +11314,7 @@ export const es: EnTranslations = {
       "paladin": "Los paladines son cruzados sagrados que apoyan con bendiciones, curan con Luz Reparadora y protegen a los débiles con armadura pesada.",
       "hunter": "Los cazadores son especialistas a distancia que combaten junto a una bestia domada, acribillando a los enemigos con disparos certeros y rápidos, ralentizándolos con picaduras y disparos conmocionantes, y alternando aspectos según convenga al momento.",
       "rogue": "Los pícaros son asesinos sigilosos que gastan energía y puntos de combo en puñaladas y remates desde las sombras.",
+      "ninja": "A shadow-trained blade of the Blossom Temple: a fast, stealthy energy fighter who strikes with katana and shuriken, then vanishes in smoke.",
       "priest": "Los sacerdotes invocan la Luz Reparadora para sanar y proteger aliados, mientras la magia de las Sombras drena la vida enemiga.",
       "shaman": "Los chamanes ordenan los elementos, imbuyen sus armas, golpean con relámpagos y restauran a sus aliados.",
       "mage": "Los magos moldean Fuego, Escarcha y fuerza Arcana para destruir enemigos, invocar agua y congelar amenazas.",
@@ -14761,6 +14767,18 @@ export const es: EnTranslations = {
       "choir_of_deliverance": {
         "name": "Coro de Liberación",
         "description": "Canaliza durante 6 s y sana a los miembros del grupo en un radio de 30 metros por {damage} cada 2 s. La sanación aumenta con el poder con hechizos."
+      },
+      "shuriken_toss": {
+        "name": "Shuriken Toss",
+        "description": "Throw a spinning shuriken for {damage} Physical damage. Awards 1 combo point."
+      },
+      "shadow_slash": {
+        "name": "Shadow Slash",
+        "description": "A quick katana cut for weapon damage plus {damage}. Awards 1 combo point."
+      },
+      "smoke_bomb": {
+        "name": "Smoke Bomb",
+        "description": "Burst a smoke bomb in the target's face for {damage} Physical damage, incapacitating it for 4 sec. Any damage breaks the effect. Awards 1 combo point."
       },
       "bear_charge": {
         "name": "Embestida de Bruin",
@@ -18451,6 +18469,18 @@ export const es: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Bastón de Guerra de la Vanguardia"
       },
+      "katana_a": {
+        "name": "Blossom Katana"
+      },
+      "katana_b": {
+        "name": "Moonsteel Katana"
+      },
+      "katana_c": {
+        "name": "Crimson Petal Katana"
+      },
+      "blossom_training_mat": {
+        "name": "Temple Training Mat"
+      },
       "conjured_water4": {
         "name": "Agua de Manantial Conjurada"
       },
@@ -20421,6 +20451,11 @@ export const es: EnTranslations = {
         "title": "Maestro armero",
         "greeting": "La forja está caliente y la piedra gira. Si corta, lo vendo."
       },
+      "swordsmith_ren": {
+        "name": "Swordsmith Ren",
+        "title": "Katana Maker",
+        "greeting": "Folded a thousand times under the blossoms. Each blade remembers the hand that made it."
+      },
       "heroic_quartermaster": {
         "name": "Intendente Vex",
         "title": "Intendente Heroico",
@@ -20890,6 +20925,31 @@ export const es: EnTranslations = {
         "name": "Maestro de instrucción Hale",
         "title": "Maestro de duelos del muelle",
         "greeting": "Ese muñeco detrás de mí nunca devuelve el golpe ni cae, {className}. Lo que importa es el recuento: tus medidores de daño cuentan cada golpe que le asestas. Selecciónalo y abre los medidores, y te explicaré el resto."
+      },
+      "master_monk_sora": {
+        "name": "Master Sora",
+        "title": "Keeper of the Blossom Temple",
+        "greeting": "The petals fall the same way every spring, and still each one is new. So it is with the kata."
+      },
+      "monk_trainee_a": {
+        "name": "Trainee Hiro",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_b": {
+        "name": "Trainee Mei",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_c": {
+        "name": "Trainee Kenji",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
+      },
+      "monk_trainee_d": {
+        "name": "Trainee Aiko",
+        "title": "Temple Trainee",
+        "greeting": "Breathe in with the blossoms. Strike out with the wind. Again."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -23156,6 +23216,16 @@ export const es: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Curación efectiva sobre el muñeco de sanación"
+          }
+        }
+      },
+      "q_blossom_kata": {
+        "title": "The Way of the Blossom",
+        "text": "You watch my students the way a cat watches a pond, {playerName}. Good. Watching is the first lesson. The second is the mat: step onto it, empty your mind, and let the kata move you. Come back when your feet remember it.",
+        "completion": "Your stance was crooked and your breath was loud. And still the blossoms leaned toward you. Welcome, monk of the Blossom Temple.",
+        "objectives": {
+          "0": {
+            "label": "Practice the kata on the training mat"
           }
         }
       },

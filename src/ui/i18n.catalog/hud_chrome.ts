@@ -295,6 +295,7 @@ export const hudChromeStrings = {
     clap: 'Clap',
     roar: 'Roar',
     kneel: 'Kneel',
+    kata: 'Kata',
   },
   emoteWheel: {
     edit: 'Edit',
@@ -5996,6 +5997,9 @@ export const hudChromeStrings = {
     // full-payload surfaces. {rank}/{ranks} interpolate from the payload and
     // the sim's PERFECTING_RANKS, never literals in copy.
     perfectedBadge: 'Perfected',
+    // Katana Table record (src/sim/katana_look.ts)
+    katanaKills: 'Enemies slain: {count}',
+    katanaKanji: 'Engraved kanji: {glyph}',
     perfectingRank: 'Perfecting: rank {rank} of {ranks}',
     // Per-unit material provenance (item_instance_tooltip.ts
     // materialSourceLines over the pure material_sources_view.ts model): one

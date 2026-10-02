@@ -38,6 +38,7 @@ export const CLASS_CHIPS: ClassChip[] = [
   { id: 'paladin', nameKey: 'classes.paladin', color: '#f58ca0' },
   { id: 'hunter', nameKey: 'classes.hunter', color: '#a6d84f' },
   { id: 'rogue', nameKey: 'classes.rogue', color: '#fcee58' },
+  { id: 'ninja', nameKey: 'classes.ninja', color: '#5a4f8c' },
   { id: 'priest', nameKey: 'classes.priest', color: '#c6d4f0' },
   { id: 'shaman', nameKey: 'classes.shaman', color: '#4e8aea' },
   { id: 'mage', nameKey: 'classes.mage', color: '#33c1f1' },

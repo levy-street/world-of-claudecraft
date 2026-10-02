@@ -2,6 +2,7 @@
 // the agreed item levels, every number on a piece is derived from the budget
 // formulas and shipped precedent (never hand-picked), each boss pays its own table
 // at the tier the map rarity buys, and the payout odds favour the owner of the map.
+import { classListAdmits } from '../src/sim/equipment_rules';
 import { describe, expect, it } from 'vitest';
 import {
   HOARD_ARMOR_PER_ILVL,
@@ -222,7 +223,9 @@ describe('the boss tables', () => {
 
   it('across the eight bosses every class has pieces aimed at it', () => {
     for (const cls of ALL_CLASSES) {
-      const aimed = HOARD_BASE_ITEM_IDS.filter((id) => ITEMS[id].requiredClass?.includes(cls));
+      const aimed = HOARD_BASE_ITEM_IDS.filter((id) =>
+        classListAdmits(ITEMS[id].requiredClass ?? [], cls),
+      );
       expect(aimed.length, cls).toBeGreaterThanOrEqual(4);
     }
   });

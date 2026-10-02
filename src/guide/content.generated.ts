@@ -2125,6 +2125,176 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     ],
     "model": "player_druid",
     "still": "/guide-stills/player_druid.webp"
+  },
+  {
+    "id": "ninja",
+    "color": "#5a4f8c",
+    "resource": "energy",
+    "roles": [
+      "dps"
+    ],
+    "specs": [
+      {
+        "id": "assassination",
+        "name": "Knifework",
+        "role": "dps",
+        "signature": "cold_blood"
+      },
+      {
+        "id": "combat",
+        "name": "Thuggery",
+        "role": "dps",
+        "signature": "blade_flurry"
+      },
+      {
+        "id": "subtlety",
+        "name": "Skulduggery",
+        "role": "dps",
+        "signature": "hemorrhage"
+      }
+    ],
+    "signatureAbilities": [
+      {
+        "id": "sinister_strike",
+        "name": "Wicked Slash"
+      },
+      {
+        "id": "eviscerate",
+        "name": "Dirt Nap"
+      },
+      {
+        "id": "garrote",
+        "name": "Throat Wire"
+      },
+      {
+        "id": "backstab",
+        "name": "Craven Thrust"
+      },
+      {
+        "id": "gouge",
+        "name": "Eye Jab"
+      },
+      {
+        "id": "cheap_shot",
+        "name": "Gut Punch"
+      }
+    ],
+    "abilities": [
+      {
+        "id": "shuriken_toss",
+        "name": "Shuriken Toss"
+      },
+      {
+        "id": "shadow_slash",
+        "name": "Shadow Slash"
+      },
+      {
+        "id": "smoke_bomb",
+        "name": "Smoke Bomb"
+      },
+      {
+        "id": "sinister_strike",
+        "name": "Wicked Slash"
+      },
+      {
+        "id": "eviscerate",
+        "name": "Dirt Nap"
+      },
+      {
+        "id": "garrote",
+        "name": "Throat Wire"
+      },
+      {
+        "id": "backstab",
+        "name": "Craven Thrust"
+      },
+      {
+        "id": "gouge",
+        "name": "Eye Jab"
+      },
+      {
+        "id": "cheap_shot",
+        "name": "Gut Punch"
+      },
+      {
+        "id": "evasion",
+        "name": "Ghostfoot"
+      },
+      {
+        "id": "sap",
+        "name": "Sap"
+      },
+      {
+        "id": "slice_and_dice",
+        "name": "Cutthroat Tempo"
+      },
+      {
+        "id": "sprint",
+        "name": "Swift Heels"
+      },
+      {
+        "id": "crippling_poison",
+        "name": "Leaden Venom"
+      },
+      {
+        "id": "kidney_shot",
+        "name": "Low Blow"
+      },
+      {
+        "id": "expose_armor",
+        "name": "Armor Breach"
+      },
+      {
+        "id": "ambush",
+        "name": "Lurker's Strike"
+      },
+      {
+        "id": "rupture",
+        "name": "Bleed Out"
+      },
+      {
+        "id": "vanish",
+        "name": "Smokefade"
+      },
+      {
+        "id": "instant_poison",
+        "name": "Adder's Bite"
+      },
+      {
+        "id": "adrenaline_rush",
+        "name": "Quickened Blood"
+      },
+      {
+        "id": "deadly_poison",
+        "name": "Festering Venom"
+      },
+      {
+        "id": "melting_acid",
+        "name": "Melting Acid"
+      },
+      {
+        "id": "nightshade_coating",
+        "name": "Nightshade Coating"
+      },
+      {
+        "id": "blind",
+        "name": "Dirt Toss"
+      },
+      {
+        "id": "stealth",
+        "name": "Duskveil"
+      },
+      {
+        "id": "kick",
+        "name": "Boot"
+      },
+      {
+        "id": "venom_dart",
+        "name": "Venom Dart"
+      }
+    ],
+    "model": "player_ninja",
+    "still": "/guide-stills/player_ninja.webp"
   }
 ];
 
@@ -6004,6 +6174,14 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "exploration",
     "renown": 5,
     "feat": false
+  },
+  {
+    "id": "prog_blossom_temple_monk",
+    "name": "Monk of the Blossom Temple",
+    "category": "progression",
+    "renown": 10,
+    "feat": false,
+    "rewardTitle": "Blossom Monk"
   }
 ];
 
@@ -21522,6 +21700,21 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       {
         "url": "models/weapons/staff.glb",
         "bone": "handslot.r"
+      }
+    ]
+  },
+  "player_ninja": {
+    "url": "models/chars/players/rogue_hooded.glb",
+    "idle": "Idle",
+    "height": 2.6,
+    "attach": [
+      {
+        "url": "models/weapons/dagger.glb",
+        "bone": "handslot.r"
+      },
+      {
+        "url": "models/weapons/dagger.glb",
+        "bone": "handslot.l"
       }
     ]
   },

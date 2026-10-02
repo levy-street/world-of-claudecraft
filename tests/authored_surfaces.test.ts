@@ -204,7 +204,7 @@ describe('authored surfaces', () => {
     // a creature or player GLB can never match the held-model set
     expect(isAuthoredHeldModelUrl('models/creatures/ogre.glb')).toBe(false);
     expect(isAuthoredHeldModelUrl('')).toBe(false);
-    expect(AUTHORED_HELD_MODELS.size).toBe(4);
+    expect(AUTHORED_HELD_MODELS.size).toBe(7);
   });
 
   it('flags exactly the replaced creature and mount rigs, never a player body', () => {
