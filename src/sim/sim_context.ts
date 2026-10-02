@@ -483,6 +483,9 @@ export interface SimContextCallbacks {
     portal?: Entity,
   ): void;
   leaveRift(pid?: number): void;
+  /** Tell the client a member is being moved off the rift floor at `from` by a
+   *  non-exit teleport (spirit release, /unstuck); spirit.ts cannot import rift/runs. */
+  emitRiftDeparture(pid: number, from: Vec3): void;
   /** Open an off-path hidden rift treasure chest (interact -> loot, no lockpick). */
   riftOpenTreasure(objectId: number, pid?: number): void;
   dungeonDifficulty(pid?: number): DungeonDifficulty;
@@ -1599,6 +1602,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     leaveDungeon: host.leaveDungeon,
     enterRift: host.enterRift,
     leaveRift: host.leaveRift,
+    emitRiftDeparture: host.emitRiftDeparture,
     riftOpenTreasure: host.riftOpenTreasure,
     resetDungeonInstances: host.resetDungeonInstances,
     inheritDungeonResetLocks: host.inheritDungeonResetLocks,

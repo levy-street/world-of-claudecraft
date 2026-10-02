@@ -19,7 +19,7 @@ import {
 import { type AccountEarner, type AccountLedger, freshAccountLedger } from '../sim/account_ledger';
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
-import { allocRiftCollisionToken, clearRiftRegion, setRiftRegion } from '../sim/colliders';
+import { allocRiftCollisionToken } from '../sim/colliders';
 import { applyAbilityCostTail, resolveAbilityChain } from '../sim/combat/ability_resolution';
 import { heroicLeapPlacementPreview } from '../sim/combat/heroic_leap';
 import { FARM_PATCHES } from '../sim/content/farm_patches';
@@ -71,7 +71,6 @@ import {
   pageCompletion,
   RELIQUARY_PAGES_BY_ID,
 } from '../sim/reliquary';
-import { riftFloorColliders } from '../sim/rift/rift_gen';
 import type { ResolvedAbility } from '../sim/sim';
 import {
   cloneItemInstancePayload,
@@ -251,6 +250,7 @@ import { decodePlayerIdentityWire } from './player_identity_wire';
 import { applyProfessionsSelfMirror } from './professions_self_mirror';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
+import { type RiftStateEvent, swapMirroredRiftFloor } from './rift_floor_mirror';
 import { isInputSendBackpressured } from './send_backpressure';
 import { snapshotAlpha } from './snapshot_alpha';
 import {
@@ -1926,11 +1926,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // mirroring a floor would otherwise strand that region under a token
     // nothing queries again once this ClientWorld is dropped, on every close/
     // logout/reconnect-exhausted path that reaches here.
-    if (this.riftFloor) {
-      clearRiftRegion(this.riftCollisionToken, this.riftFloor.origin.x, this.riftFloor.origin.z);
-    }
-    // Clear the descriptor too; late riftState frames after teardown are ignored below.
-    this.riftFloor = null;
+    // Clears the descriptor too; late riftState frames after teardown are ignored below.
+    this.riftFloor = swapMirroredRiftFloor(this.riftCollisionToken, this.riftFloor, null);
     clearInterval(this.sendTimer);
     if (this.reconnectTimer !== undefined) clearTimeout(this.reconnectTimer);
     if (typeof document !== 'undefined') {
@@ -2295,6 +2292,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
         // the server exits spectate at grace start, so undo the whole client
         // spectate swap too (playerId is already restored from this hello)
         this.spectateFacingPending = this.spectating !== null || this.spectateExitPending;
+        // no floor until resumeSession resends ours: the old stream may have ended unseen
+        this.mirrorRiftFloor(null);
         this.spectating = null;
         this.spectateExitPending = false;
         this.cfg.playerClass = this.ownPlayerClass;
@@ -2335,6 +2334,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
       if (!this.spectateExitPending) this.spectating = msg.name as string;
       this.spectateFacingPending = true;
       this.pendingSpectateFacing = null;
+      // a different pid's riftState stream routes here from now on; the server
+      // follows this frame with the new view's live floor, if any
+      this.mirrorRiftFloor(null);
       // the spectate swap changes whose record the self-decode writes; a hold
       // armed for the previous identity must not shadow the new one's target
       this.pendingTargetEcho = null;
@@ -4936,50 +4938,20 @@ export class ClientWorld extends ReconWireState implements IWorld {
   private applyRiftStateEvent(ev: SimEvent): void {
     if (ev.type !== 'riftState') return;
     if (this.sessionEnded) return;
-    // Mirror the server's floor collision lifecycle (spawnRiftFloor /
-    // freeRiftFloorEntities in src/sim/rift/runs.ts): the previously mirrored
-    // floor's region is always cleared before a new one is registered, whether
-    // this event is a descent (a new floor replacing the old one) or a real
-    // exit (no new floor to replace it with).
-    if (this.riftFloor) {
-      clearRiftRegion(this.riftCollisionToken, this.riftFloor.origin.x, this.riftFloor.origin.z);
-    }
-    this.riftFloor = ev.active
-      ? {
-          eventId: ev.eventId,
-          instanceId: ev.instanceId,
-          seed: ev.seed,
-          baseLevel: ev.baseLevel,
-          floorIndex: ev.floorIndex,
-          floorCount: ev.floorCount,
-          origin: ev.origin,
-          contentId: ev.contentId,
-          contentHash: ev.contentHash,
-          upgrade: ev.upgrade,
-          name: ev.name,
-          themeName: ev.themeName,
-          tier: ev.tier,
-        }
-      : null;
-    if (this.riftFloor) {
-      setRiftRegion(
-        this.riftCollisionToken,
-        this.riftFloor.origin.x,
-        this.riftFloor.origin.z,
-        riftFloorColliders(
-          this.riftFloor.seed,
-          this.riftFloor.baseLevel,
-          this.riftFloor.floorIndex,
-          this.riftFloor.upgrade,
-        ),
-      );
-    }
-    this.riftEventExpiresAtMs = ev.active ? ev.expiresAtMs : null;
+    this.mirrorRiftFloor(ev);
+  }
+
+  // `ev` null resets the mirror: the riftState stream changed owner (a spectate
+  // frame, or a reconnect; rift_floor_mirror.ts).
+  private mirrorRiftFloor(ev: RiftStateEvent | null): void {
+    this.riftFloor = swapMirroredRiftFloor(this.riftCollisionToken, this.riftFloor, ev);
+    this.riftEventExpiresAtMs = ev?.active ? ev.expiresAtMs : null;
     // Clear death zones on rift exit so stale rings from a previous run never
     // bleed into a new one. Mid-run cancellations (boss death, evade, floor
     // descent) arrive as riftDeathZoneClear events instead: descent keeps
     // riftState active, so this arm never sees them.
-    if (!ev.active) this.activeBossDeathZones = [];
+    if (!ev?.active) this.activeBossDeathZones = [];
+    if (!ev) this.hoardBossCueMirror?.clear();
   }
 
   // Mirror a spawned lethal boss death zone so riftBossDeathZones() returns

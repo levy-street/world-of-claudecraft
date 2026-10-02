@@ -67,7 +67,6 @@ import {
 } from '../src/sim/reliquary';
 import { corpseHasDecayed } from '../src/sim/respawn_policy';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
-import { riftStateEventFor } from '../src/sim/rift/runs';
 import type { CharacterState, MailSave, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { drainBgOutcomes } from '../src/sim/social/battleground_outcomes';
@@ -357,6 +356,15 @@ import {
   muteAccountChat,
   recordInGameAction,
 } from './moderation_db';
+import {
+  describeRiftFloor,
+  jailReturnPoint,
+  leaveRiftForModeration,
+  moderationReturnSpot,
+  type RiftExitSpot,
+  riftExitSpotAt,
+  teleportForModeration,
+} from './moderation_moves';
 import {
   canAttemptModerationCommands,
   type ModerationHost,
@@ -1154,6 +1162,7 @@ export interface ClientSession
     savedPos: { x: number; y: number; z: number };
     priorGm: boolean;
     stowedPet: PetState | null;
+    riftExit?: RiftExitSpot | null;
   } | null;
   jailed: JailState | null;
   jailVisit: {
@@ -1161,6 +1170,7 @@ export interface ClientSession
     savedFacing: number;
     priorGm: boolean;
     stowedPet: PetState | null;
+    riftExit?: RiftExitSpot | null;
   } | null;
 }
 
@@ -2023,6 +2033,10 @@ export class GameServer {
       const priorGm = !!moderatorEntity.gm;
       const stowedPet = this.sim.stowPetForSpectate(moderator.pid);
       const limbo = this.sim.groundPos(SPECTATE_LIMBO_X, SPECTATE_LIMBO_Z);
+      const riftExit = riftExitSpotAt(this.sim, moderatorEntity.pos);
+      leaveRiftForModeration(this.sim, moderator.pid, (ev) =>
+        this.send(moderator, { t: 'events', list: [ev] }),
+      );
       cancelProfessionSessionOnDisplacement(this.sim.ctx, moderatorEntity);
       moderatorEntity.pos = limbo;
       moderatorEntity.prevPos = { ...limbo };
@@ -2037,6 +2051,7 @@ export class GameServer {
         savedPos,
         priorGm,
         stowedPet,
+        riftExit,
       };
     }
 
@@ -2062,6 +2077,8 @@ export class GameServer {
     // without this the target's heavy fields can silently fail to resend.
     moderator.selfHeavyDirty = true;
     this.send(moderator, { t: 'spectate', name: target.name });
+    // after the frame: it resets the client's mirrored rift floor
+    describeRiftFloor(this.sim, target.pid, (frame) => this.send(moderator, frame));
     this.sendSystemNotice(moderator, `Now spectating ${target.name}.`);
   }
 
@@ -2074,8 +2091,9 @@ export class GameServer {
     const moderatorEntity = this.sim.entities.get(moderator.pid);
     if (moderatorEntity) {
       cancelProfessionSessionOnDisplacement(this.sim.ctx, moderatorEntity);
-      moderatorEntity.pos = { ...state.savedPos };
-      moderatorEntity.prevPos = { ...state.savedPos };
+      const back = moderationReturnSpot(this.sim, moderator.pid, state.savedPos, state.riftExit);
+      moderatorEntity.pos = { ...back };
+      moderatorEntity.prevPos = { ...back };
       this.sim.grid.update(moderatorEntity);
       this.sim.playerGrid.update(moderatorEntity);
       this.sim.setGm(moderator.pid, state.priorGm);
@@ -2102,26 +2120,9 @@ export class GameServer {
     // instead of staying stuck on the spectated target's last-sent values.
     moderator.selfHeavyDirty = true;
     this.send(moderator, { t: 'spectate', name: null });
+    // after the frame like enterSpectate's, never queued: a snapshot could overtake it
+    describeRiftFloor(this.sim, moderator.pid, (frame) => this.send(moderator, frame));
     if (announce) this.sendSystemNotice(moderator, 'Stopped spectating.');
-  }
-
-  private teleportSessionEntity(session: ClientSession, pos: { x: number; z: number }): void {
-    const entity = this.sim.entities.get(session.pid);
-    if (!entity) return;
-    // Server-side teleports bypass the sim's own paths, so the shared
-    // displacement teardown runs here too: a jailed or moderated angler's
-    // live session never travels with them.
-    cancelProfessionSessionOnDisplacement(this.sim.ctx, entity);
-    const ground = this.sim.groundPos(pos.x, pos.z);
-    entity.pos = ground;
-    entity.prevPos = { ...ground };
-    entity.vy = 0;
-    entity.onGround = true;
-    entity.fallStartY = ground.y;
-    this.sim.grid.update(entity);
-    this.sim.playerGrid.update(entity);
-    const meta = this.sim.meta(session.pid);
-    if (meta) Object.assign(meta.moveInput, emptyMoveInput());
   }
 
   private jailSpawnFor(session: ClientSession): { x: number; z: number } {
@@ -2133,8 +2134,7 @@ export class GameServer {
     const targetEntity = this.sim.entities.get(target.pid);
     if (!targetEntity) return;
     target.jailed = {
-      returnPos: { x: targetEntity.pos.x, z: targetEntity.pos.z },
-      returnFacing: targetEntity.facing,
+      ...jailReturnPoint(this.sim, targetEntity),
       until: sentencedAtMs + minutes * 60_000,
     };
     // Drop the target out of any match queues (a match popping later would
@@ -2176,10 +2176,7 @@ export class GameServer {
     if (!state) return false;
     target.jailed = null;
     this.sim.setJailed(false, target.pid);
-    const pos = this.sim.groundPos(state.returnPos.x, state.returnPos.z);
-    const entity = this.sim.entities.get(target.pid);
-    if (entity?.dead || entity?.ghost) this.sim.revivePlayerAt(target.pid, pos, 1);
-    else this.teleportSessionEntity(target, state.returnPos);
+    teleportForModeration(this.sim, target.pid, state.returnPos, true);
     const updated = this.sim.entities.get(target.pid);
     if (updated) {
       updated.facing = state.returnFacing;
@@ -2198,11 +2195,7 @@ export class GameServer {
     // enforcement), so this is where the sim-side prisoner flag (the jail
     // brawl hostility, isHostileTo) is stamped. Idempotent.
     this.sim.setJailed(true, session.pid);
-    const spawn = this.jailSpawnFor(session);
-    const pos = this.sim.groundPos(spawn.x, spawn.z);
-    const entity = this.sim.entities.get(session.pid);
-    if (entity?.dead || entity?.ghost) this.sim.revivePlayerAt(session.pid, pos, 1);
-    else this.teleportSessionEntity(session, spawn);
+    teleportForModeration(this.sim, session.pid, this.jailSpawnFor(session), true);
     const updated = this.sim.entities.get(session.pid);
     if (updated) {
       updated.facing = 0;
@@ -2224,9 +2217,10 @@ export class GameServer {
         savedFacing: entity.facing,
         priorGm: !!entity.gm,
         stowedPet: this.sim.stowPetForSpectate(moderator.pid),
+        riftExit: riftExitSpotAt(this.sim, entity.pos),
       };
     }
-    this.teleportSessionEntity(moderator, JAIL_VISITOR_POS);
+    teleportForModeration(this.sim, moderator.pid, JAIL_VISITOR_POS);
     this.sim.setGm(moderator.pid);
     this.sendSystemNotice(moderator, 'Moved to jail visitor area.');
   }
@@ -2238,9 +2232,8 @@ export class GameServer {
       return;
     }
     moderator.jailVisit = null;
-    const entity = this.sim.entities.get(moderator.pid);
-    if (entity?.dead || entity?.ghost) this.sim.revivePlayerAt(moderator.pid, state.savedPos, 1);
-    else this.teleportSessionEntity(moderator, state.savedPos);
+    const back = moderationReturnSpot(this.sim, moderator.pid, state.savedPos, state.riftExit);
+    teleportForModeration(this.sim, moderator.pid, back, true);
     const updated = this.sim.entities.get(moderator.pid);
     if (updated) {
       updated.facing = state.savedFacing;
@@ -2754,7 +2747,7 @@ export class GameServer {
     const entity = this.sim.entities.get(session.pid);
     if (!entity || entity.dead || entity.ghost) return;
     const target = jailGateTeleport(entity.pos);
-    if (target) this.teleportSessionEntity(session, target);
+    if (target) teleportForModeration(this.sim, session.pid, target);
   }
 
   private isInJailRoom(pos: { x: number; z: number }): boolean {
@@ -3730,10 +3723,8 @@ export class GameServer {
     // No self "entered the world" notice here: on a seamless reconnect the
     // player never saw themselves leave (and friends never got a presence
     // flap), so the fresh join notice would read as a glitch.
-    // A resumed session's fresh ClientWorld starts with riftFloor null (only
-    // enter/descend/exit emit riftState); re-send it so a resume is not blind.
-    const riftState = riftStateEventFor(this.sim.ctx, session.pid);
-    if (riftState) this.send(session, { t: 'events', list: [riftState] });
+    // Only enter/descend/exit emit riftState: re-send the floor so a resume is not blind.
+    describeRiftFloor(this.sim, session.pid, (frame) => this.send(session, frame));
     if (session.jailed) this.teleportJailedSession(session);
     void this.sendSocialSnapshot(session.characterId);
     return session;

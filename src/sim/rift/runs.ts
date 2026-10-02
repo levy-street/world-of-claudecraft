@@ -242,7 +242,7 @@ export function riftRecoveryPointSafe(ctx: SimContext, p: Entity, pos: Vec3): bo
   return true;
 }
 
-type RiftStateEvent = Extract<SimEvent, { type: 'riftState' }>;
+export type RiftStateEvent = Extract<SimEvent, { type: 'riftState' }>;
 
 function buildRiftStateEvent(
   ctx: SimContext,
@@ -304,6 +304,44 @@ export function riftStateEventFor(ctx: SimContext, pid: number): RiftStateEvent 
   const inst = riftInstanceAtPos(ctx, p.pos);
   if (!inst?.memberIds.has(pid)) return null;
   return buildRiftStateEvent(ctx, pid, inst, true);
+}
+
+/** Emit the riftState exit for a member about to be teleported off the floor at
+ * `from` by something other than the rift exit (a spirit release or an /unstuck
+ * to a graveyard). ClientWorld mirrors its floor from these events alone, so
+ * without the exit a ghost running back from a rift kept the rift map, minimap,
+ * and floor tracker the whole way. A no-op for a position on no member floor. */
+export function emitRiftDeparture(ctx: SimContext, pid: number, from: Vec3): void {
+  const inst = riftInstanceAtPos(ctx, from);
+  if (inst?.memberIds.has(pid)) emitRiftState(ctx, pid, inst, false);
+}
+
+/** Detach `p` from the rift floor they stand on ahead of a teleport somewhere
+ * else entirely (a Thornhollow Fields seat): the lockpick and session teardown
+ * leaveRift runs, minus the move, plus the riftState exit the online client
+ * mirrors its floor from (members only, like emitRiftDeparture). An unclaimed
+ * hoard share is left for clearHoardRewardChest at teardown, as a release or a
+ * hearth leaves it, so the seat never pulls that rng draw forward. Returns the
+ * run's own exit spot and facing as the caller's return point, so a match that
+ * ends after the run is gone never sends the player back onto its floor. The
+ * rift twin of instances/dungeons.ts detachFromDungeon; null when `p` stands on
+ * no rift floor. `deliver` replaces the event queue for a caller whose own queued
+ * events would not reach the client (server/moderation_moves.ts: a moderator
+ * entering spectate, whose router drops their own pid's events). */
+export function detachFromRift(
+  ctx: SimContext,
+  p: Entity,
+  deliver: (ev: RiftStateEvent) => void = (ev) => ctx.emit(ev),
+): { x: number; z: number; facing: number } | null {
+  const inst = riftInstanceAtPos(ctx, p.pos);
+  if (!inst) return null;
+  if (inst.lockpick) riftLockpickAbort(ctx, inst, p.id);
+  cancelProfessionSessionOnDisplacement(ctx, p);
+  p.riftSliding = false;
+  p.riftSlideDirX = 0;
+  p.riftSlideDirZ = 0;
+  if (inst.memberIds.has(p.id)) deliver(buildRiftStateEvent(ctx, p.id, inst, false));
+  return { x: inst.returnPos.x, z: inst.returnPos.z, facing: inst.returnFacing ?? 0 };
 }
 
 export function hoardBossCueViewsForPlayer(ctx: SimContext, pid: number) {

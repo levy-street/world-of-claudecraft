@@ -1689,7 +1689,10 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 9827 and the
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 9840,
+    // LOWERED 9840 -> 9831 by the rift-floor fix for moderation moves: the
+    // jail / visit / cage-gate teleport body and its revive branches moved to
+    // server/moderation_moves.ts (wc -l after biome). Exact count, zero slack.
+    ceiling: 9831,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1868,7 +1871,11 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 5354 and the
     // branch 5426; the two sides' additions compose to 5356 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 5356,
+    // LOWERED 5356 -> 5328 by the spectate rift-floor fix: the floor mirror and
+    // its collision-region swap moved to src/net/rift_floor_mirror.ts, which the
+    // event arm, the spectate frame, the reconnect, and endSession now share
+    // (wc -l after biome). Exact count, zero slack.
+    ceiling: 5328,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

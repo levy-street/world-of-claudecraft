@@ -166,6 +166,21 @@ function ghostGraveyard(
   return nearestOverworldGraveyard(p.pos.x, p.pos.z, graveyards, fallback);
 }
 
+// The graveyard a release or /unstuck is about to move `p` to, resolved while the
+// player still stands in their instance band. A move off a rift floor also emits
+// the rift exit leaveRift would have: the online client mirrors the floor from
+// that event alone, so it otherwise kept the rift map at the graveyard.
+function graveyardForMove(
+  ctx: SimContext,
+  p: Entity,
+  graveyards?: readonly { x: number; z: number }[],
+  fallback?: { x: number; z: number },
+): { x: number; z: number } {
+  const gy = ghostGraveyard(ctx, p, graveyards, fallback);
+  ctx.emitRiftDeparture(p.id, p.pos);
+  return gy;
+}
+
 // --- release / resurrect ----------------------------------------------------
 
 // Release the spirit: leave the body where it fell and rise as a ghost at the
@@ -228,7 +243,7 @@ export function moveToGraveyardForUnstuck(
   // stops riding castingAbility.
   cancelProfessionSessionOnDisplacement(ctx, p);
   // Resolve the graveyard before the move takes the player out of its instance band.
-  const gy = ghostGraveyard(ctx, p);
+  const gy = graveyardForMove(ctx, p);
   p.pos = ctx.groundPos(gy.x, gy.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
@@ -282,7 +297,7 @@ export function reviveAtGraveyardForUnstuck(
   if (!r?.e.dead) return false;
   const { meta, e: p } = r;
   // Resolve the graveyard before the revive moves the body out of its instance band.
-  const gy = ghostGraveyard(ctx, p);
+  const gy = graveyardForMove(ctx, p);
   const charged = reviveAt(
     ctx,
     meta,
@@ -303,7 +318,7 @@ function releaseAtNearestGraveyard(
   fallback: { x: number; z: number } = PLAYER_START,
 ): void {
   // Resolve the graveyard before moving the entity out of its instance band.
-  const gy = ghostGraveyard(ctx, p, graveyards, fallback);
+  const gy = graveyardForMove(ctx, p, graveyards, fallback);
   p.corpsePos = { x: p.pos.x, y: p.pos.y, z: p.pos.z };
   p.corpseInstanceId = ctx.instanceClaimIdAt(p.pos);
   p.ghost = true; // p.dead stays true
