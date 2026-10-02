@@ -5914,6 +5914,11 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   under `node_modules/ws/` with no `node_modules` further along its path; the check that git
   tracks nothing under `node_modules` reads the index; the rest were record and ledger wording for
   rounds fifty-two and fifty-three, a comment note and an evidence line. Fixed in `f667650406`.
+- ROUND FIFTY-FIVE, eight fresh readers over round fifty-four: 12 findings, none blocking, 4
+  should-fix, one ruled, every reader passing, four with no should-fix. The four should-fix are
+  one stale comment: the bundle read's opening comment still said it named its packages; the rest
+  were the package rule's comment and its tie to the root `package.json` pin, a sample entry and
+  record wording. Fixed in `37affe1ec3`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5946,7 +5951,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then
   648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648,
   then 648, then 648, then 648, then 649, then 649, then 649, then 649, then 649, then 649, then
-  649, then 649, then 649, then 649 passed, never a skip.
+  649, then 649, then 649, then 649, then 649 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
