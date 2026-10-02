@@ -477,12 +477,12 @@ export interface FreeholdMutationDeps {
  * `serialize` is the plot store's owner FIFO, REQUIRED for a mutation that
  * writes a plot row (taken inside the character FIFO, before the market writer:
  * the manifest's Q3): the verify reads the plot's write token, which is sound
- * only while no store write can re-stamp it. `onCommitted` runs synchronously
+ * only while no store write can re-stamp it. `live.apply` runs synchronously
  * inside it right after a proved COMMIT, so a live plan applied there is
  * visible to the store's next write; it must not throw, and a throw is
- * swallowed (reported through `onCommittedThrew`, which the caller that binds
- * the apply binds to count it) so it can never rewrite a proved commit into a
- * failure. A save
+ * swallowed (reported through `live.threw`, which the type makes every caller
+ * that binds the apply bind beside it, to count it) so it can never rewrite a
+ * proved commit into a failure. A save
  * that throws AFTER a proved COMMIT (a legacy tail, a host hook) is still
  * `committed`: the durable halves stand. The verify runs inside the same
  * character-FIFO job.
@@ -493,12 +493,13 @@ export async function commitFreeholdMutation(
   opts: {
     readonly waitSignal?: AbortSignal;
     readonly serialize?: <T>(job: () => Promise<T>) => Promise<T>;
-    readonly onCommitted?: (
-      outcome: Extract<FreeholdMutationOutcome, { kind: 'committed' }>,
-    ) => void;
-    /** Told when onCommitted threw, so the caller that binds the live apply
-     *  also counts its failure; it must not throw either. */
-    readonly onCommittedThrew?: (error: unknown) => void;
+    /** The live apply after a proved COMMIT, and its failure report: one
+     *  binding, so no caller can bind the apply and leave its throw unseen.
+     *  Neither may throw. */
+    readonly live?: {
+      readonly apply: (outcome: Extract<FreeholdMutationOutcome, { kind: 'committed' }>) => void;
+      readonly threw: (error: unknown) => void;
+    };
   } = {},
 ): Promise<FreeholdMutationOutcome> {
   if (request.plots.length > 0 && !opts.serialize) {
@@ -529,14 +530,14 @@ export async function commitFreeholdMutation(
   };
   const runOnCommitted = (verified: boolean) => {
     try {
-      opts.onCommitted?.(committedOutcome(verified));
+      opts.live?.apply(committedOutcome(verified));
     } catch (error) {
-      // Contract: onCommitted does not throw. The durable halves committed, so
+      // Contract: the live apply does not throw. The durable halves committed, so
       // a live apply that throws is the caller's to repair on its next
       // authoritative reload; it never turns the outcome into a failure, and
       // the caller hears of it to count it.
       try {
-        opts.onCommittedThrew?.(error);
+        opts.live?.threw(error);
       } catch {}
     }
   };

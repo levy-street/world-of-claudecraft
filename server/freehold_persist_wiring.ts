@@ -268,9 +268,12 @@ export function renewGameFreeholdClaims(
     warn: (message) => console.warn(message),
   });
   // The observer only times the launch: one that throws must never cost the
-  // flush its handle on the pass (whose own rejection the flush reports).
+  // flush its handle on the pass (whose own rejection the flush reports), and
+  // it says so once, in fixed text.
   try {
     onSyncMs?.(performance.now() - launchedAt);
-  } catch {}
+  } catch {
+    console.warn('freehold claim renewer launch observer threw; the pass runs on');
+  }
   return pass;
 }

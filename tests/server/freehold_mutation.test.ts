@@ -1066,7 +1066,12 @@ describe('commitFreeholdMutation', () => {
     const out = await commitFreeholdMutation(
       { save, pool: fakePool().pool, characterId: 1 },
       HEARTH_ONLY,
-      { onCommitted: (outcome) => applied.push(`${outcome.kind}:${outcome.verified}`) },
+      {
+        live: {
+          apply: (outcome) => applied.push(`${outcome.kind}:${outcome.verified}`),
+          threw: () => {},
+        },
+      },
     );
     expect(out.kind).toBe('committed');
     expect((out as Extract<FreeholdMutationOutcome, { kind: 'committed' }>).verified).toBe(false);
@@ -1086,7 +1091,7 @@ describe('commitFreeholdMutation', () => {
     const proved = await commitFreeholdMutation(
       { save: before, pool: fakePool().pool, characterId: 1 },
       HEARTH_ONLY,
-      { onCommitted: (outcome) => failed.push(outcome.kind) },
+      { live: { apply: (outcome) => failed.push(outcome.kind), threw: () => {} } },
     );
     expect(proved.kind).toBe('failed');
     expect(failed).toEqual([]);
@@ -1099,37 +1104,45 @@ describe('commitFreeholdMutation', () => {
       { save: saveThatRuns(), pool: fakePool().pool, characterId: 1 },
       HEARTH_ONLY,
       {
-        onCommitted: () => {
-          calls++;
-          throw new Error('the live apply threw');
+        live: {
+          apply: () => {
+            calls++;
+            throw new Error('the live apply threw');
+          },
+          threw: (error) => threw.push(error),
         },
-        onCommittedThrew: (error) => threw.push(error),
       },
     );
     expect(out.kind).toBe('committed');
     // Once: a throwing apply is never retried by the throw path.
     expect(calls).toBe(1);
     expect(threw).toEqual([new Error('the live apply threw')]);
-    // A report port that throws too still leaves the commit committed, and a
+    // A report port that throws too still leaves the commit committed and the
+    // apply run ONCE (its throw never re-enters the throw path's apply), and a
     // clean apply reports nothing.
     const quiet: unknown[] = [];
+    let loudCalls = 0;
     const loud = await commitFreeholdMutation(
       { save: saveThatRuns(), pool: fakePool().pool, characterId: 1 },
       HEARTH_ONLY,
       {
-        onCommitted: () => {
-          throw new Error('the live apply threw');
-        },
-        onCommittedThrew: () => {
-          throw new Error('the counter threw');
+        live: {
+          apply: () => {
+            loudCalls++;
+            throw new Error('the live apply threw');
+          },
+          threw: () => {
+            throw new Error('the counter threw');
+          },
         },
       },
     );
     expect(loud.kind).toBe('committed');
+    expect(loudCalls).toBe(1);
     await commitFreeholdMutation(
       { save: saveThatRuns(), pool: fakePool().pool, characterId: 1 },
       HEARTH_ONLY,
-      { onCommitted: () => {}, onCommittedThrew: (error) => quiet.push(error) },
+      { live: { apply: () => {}, threw: (error) => quiet.push(error) } },
     );
     expect(quiet).toEqual([]);
   });
@@ -1309,14 +1322,14 @@ describe('commitFreeholdMutation', () => {
     await commitFreeholdMutation(
       { save: saveThatRuns(), pool: fakePool().pool, characterId: 1 },
       HEARTH_ONLY,
-      { serialize, onCommitted: () => events.push('apply') },
+      { serialize, live: { apply: () => events.push('apply'), threw: () => {} } },
     );
     expect(events).toEqual(['enter', 'apply', 'exit']);
     events.length = 0;
     await commitFreeholdMutation(
       { save: saveThatRuns({ refuse: true }), pool: fakePool().pool, characterId: 1 },
       HEARTH_ONLY,
-      { serialize, onCommitted: () => events.push('apply') },
+      { serialize, live: { apply: () => events.push('apply'), threw: () => {} } },
     );
     expect(events).toEqual(['enter']);
   });
@@ -1486,9 +1499,9 @@ describe('the claim renewer', () => {
     await renewFreeholdClaims(renewDeps(idle, idlePool.pool));
     expect(idlePool.counts().connects).toBe(0);
     expect(idle.counters.renewPasses).toBe(0);
-    // PARKED AT ITS CHECKOUT when the stop comes: the chunk reaches its
-    // connection only after the stop, so it sends nothing and rolls back, and
-    // no renewal is left to outlive the release.
+    // PARKED AT ITS CHECKOUT when the stop comes: the stop cuts that checkout,
+    // so the pass settles at once, nothing is sent, and the client that
+    // arrives later is handed straight back.
     const registry = createFreeholdClaimRegistry();
     for (let i = 0; i < FREEHOLD_CLAIM_RENEW_CHUNK + 1; i++) registry.record(claim(pad(i), i + 1));
     const f = fakePool([renewAll]);
@@ -1515,17 +1528,56 @@ describe('the claim renewer', () => {
     const stop = stopFreeholdClaimRenewer(registry).then(() => {
       stopped = true;
     });
-    for (let i = 0; i < 10; i++) await Promise.resolve();
-    // The stop waits for the running pass, which is parked on its checkout.
-    expect(stopped).toBe(false);
-    open();
-    await pass;
+    // The stop does not wait out a chunk's wall for a checkout that never
+    // answers: it resolves with the gate still shut.
     await stop;
+    await pass;
     expect(stopped).toBe(true);
-    expect(f.statements.filter((st) => st.text.includes('SET heartbeat_at'))).toHaveLength(0);
-    expect(f.statements.map((st) => st.text)).toContain('ROLLBACK');
+    expect(f.statements).toEqual([]);
     expect(registry.counters.renewed).toBe(0);
     expect(registry.all()).toHaveLength(FREEHOLD_CLAIM_RENEW_CHUNK + 1);
+    open();
+    await vi.waitFor(() => expect(f.counts().releases).toBe(1));
+    expect(f.statements).toEqual([]);
+
+    // CONNECTED, ITS BEGIN STILL ON THE WIRE when the stop comes: the
+    // transaction re-checks the stop first, so it sends no renewal, only its
+    // BEGIN and the ROLLBACK.
+    const begun = createFreeholdClaimRegistry();
+    for (let i = 0; i < FREEHOLD_CLAIM_RENEW_CHUNK + 1; i++) begun.record(claim(pad(i), i + 1));
+    const b = fakePool([renewAll]);
+    let beginAnswered = () => {};
+    const beginGate = new Promise<void>((resolve) => {
+      beginAnswered = resolve;
+    });
+    let beginSent = () => {};
+    const sentBegin = new Promise<void>((resolve) => {
+      beginSent = resolve;
+    });
+    const beginning = {
+      async connect() {
+        const client = await b.pool.connect();
+        return {
+          ...client,
+          async query(text: string, values?: unknown[]) {
+            if (text.startsWith('BEGIN')) {
+              beginSent();
+              await beginGate;
+            }
+            return client.query(text, values);
+          },
+        };
+      },
+    } as unknown as FreeholdTxPool;
+    const begunPass = renewFreeholdClaims(renewDeps(begun, beginning));
+    await sentBegin;
+    const begunStop = stopFreeholdClaimRenewer(begun);
+    beginAnswered();
+    await begunPass;
+    await begunStop;
+    expect(b.statements.filter((st) => st.text.includes('SET heartbeat_at'))).toHaveLength(0);
+    expect(b.statements.map((st) => st.text)).toContain('ROLLBACK');
+    expect(begun.counters.renewed).toBe(0);
 
     // MID-STATEMENT when the stop comes (the control): the chunk holds its
     // connection and its renew is on the wire, so it finishes, the stop waits
@@ -6504,6 +6556,48 @@ describe('the Hearth trip admission', () => {
     }
   });
 
+  it('never re-dispatches to the same session object once its character or lease nonce changed in place', async () => {
+    for (const change of ['leaseNonce', 'characterId'] as const) {
+      const session: { pid: number; characterId: number; accountId: number; leaseNonce: string } = {
+        pid: 1,
+        characterId: 10,
+        accountId: 7,
+        leaseNonce: 'n1',
+      };
+      const sessions = new Map([[1, session]]);
+      const redispatched: number[] = [];
+      let release = () => {};
+      const gate = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      const trips = createFreeholdHearthTrips(
+        hostOver(sessions, {
+          commit: async () => {
+            await gate;
+            return {
+              kind: 'committed',
+              plots: [],
+              hearth: { kind: 'advanced', readyAtMs: '5', revision: '1', nowMs: '1' },
+              verified: false,
+            };
+          },
+          redispatch: (live) => {
+            redispatched.push(live.pid);
+            return undefined;
+          },
+        }),
+      );
+      trips.admission('account:7', 1);
+      // The SAME object, its identity rewritten while the trip was in flight.
+      if (change === 'leaseNonce') session.leaseNonce = 'n2';
+      else session.characterId = 11;
+      release();
+      await drain();
+      expect(redispatched, change).toEqual([]);
+      expect(trips.counters.abandoned, change).toBe(1);
+    }
+  });
+
   it('counts a throw AFTER the outcome was counted and warns once, never an unhandled rejection', async () => {
     const warnings: string[] = [];
     const sessions = new Map([[1, { pid: 1, characterId: 10, accountId: 7, leaseNonce: 'n1' }]]);
@@ -6525,7 +6619,11 @@ describe('the Hearth trip admission', () => {
 
   it('keeps a throwing warn port and a throwing clock inside the trip: counted, the flag cleared', async () => {
     const sessions = new Map([[1, { pid: 1, characterId: 10, accountId: 7, leaseNonce: 'n1' }]]);
-    // A warn port that throws after the outcome: still one count, no rejection.
+    // A warn port that throws after the outcome: still one count, and no
+    // unhandled rejection reaches the process.
+    const unhandled: unknown[] = [];
+    const onUnhandled = (reason: unknown) => unhandled.push(reason);
+    process.on('unhandledRejection', onUnhandled);
     const loud = createFreeholdHearthTrips(
       hostOver(sessions, {
         redispatch: () => {
@@ -6536,9 +6634,15 @@ describe('the Hearth trip admission', () => {
         },
       }),
     );
-    loud.admission('account:7', 1);
-    await drain();
+    try {
+      loud.admission('account:7', 1);
+      await drain();
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    } finally {
+      process.off('unhandledRejection', onUnhandled);
+    }
     expect(loud.counters).toMatchObject({ advanced: 1, threwAfterOutcome: 1 });
+    expect(unhandled).toEqual([]);
     // A clock that throws only TIMES nothing: the outcome is counted, nothing
     // is booked as a throw, and the account's in-flight flag is cleared.
     let reads = 0;
@@ -6555,6 +6659,23 @@ describe('the Hearth trip admission', () => {
     await drain();
     expect(timeless.counters).toMatchObject({ advanced: 1, threwAfterOutcome: 0, tripMsTotal: 0 });
     expect(timeless.inFlight(7)).toBe(false);
+    // And a clock that throws on EVERY read, the trip's start included: the
+    // outcome is still counted, nothing is booked as a throw, the flag clears.
+    const clockless = createFreeholdHearthTrips(
+      hostOver(sessions, {
+        nowMs: () => {
+          throw new Error('the clock port threw');
+        },
+      }),
+    );
+    clockless.admission('account:7', 1);
+    await drain();
+    expect(clockless.counters).toMatchObject({
+      advanced: 1,
+      threwAfterOutcome: 0,
+      tripMsTotal: 0,
+    });
+    expect(clockless.inFlight(7)).toBe(false);
   });
 
   it("bounds the trip save's waits through the host's signal port at the player-waiting bound", async () => {

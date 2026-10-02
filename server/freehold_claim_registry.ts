@@ -354,6 +354,9 @@ interface RenewerState {
    *  one stops before its next chunk, so the shutdown's release-all never
    *  races a renew that would push released rows out by a whole TTL. */
   stopping: boolean;
+  /** Aborted by the stop: cuts a chunk still parked at its pool checkout (a
+   *  checkout-only signal, so a transaction that has its client is never cut). */
+  readonly stop: AbortController;
   /** Resolves once the running pass's finally has run; null while none runs. */
   settled: Promise<void> | null;
 }
@@ -462,7 +465,13 @@ export async function renewFreeholdClaims(deps: FreeholdClaimRenewerDeps): Promi
   const deadlineMs = passDeadlineOf(deps);
   let state = renewers.get(deps.registry);
   if (!state) {
-    state = { running: false, cursor: null, stopping: false, settled: null };
+    state = {
+      running: false,
+      cursor: null,
+      stopping: false,
+      stop: new AbortController(),
+      settled: null,
+    };
     renewers.set(deps.registry, state);
   }
   if (state.stopping) return;
@@ -544,22 +553,34 @@ export async function renewFreeholdClaims(deps: FreeholdClaimRenewerDeps): Promi
 /**
  * Stop the renewer for shutdown (server/main.ts, right before
  * releaseAllFreeholdClaims): no pass starts again (a stopped registry stays
- * stopped), the running one stops before its next chunk, a chunk that reaches
- * its connection after the stop sends nothing, and this resolves once that pass
- * has settled or one chunk's wall (FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs) has
- * passed, whichever is first; a chunk already mid-statement ends by that same
- * wall. Without it, a renew chunk still holding its rows when the release-all
- * runs is passed over by SKIP LOCKED, then commits a renewal that keeps those
- * plots claimed by a dead process for a whole TTL. Never rejects.
+ * stopped), the running one stops before its next chunk, a chunk still parked
+ * at its pool checkout is cut there (it sends nothing), one that got its
+ * connection just before the stop sends no renewal (only its BEGIN, rolled
+ * back), and this resolves once that pass has settled or one chunk's wall
+ * (FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs) has passed, whichever is first. Without
+ * it, a renew chunk still holding its rows when the release-all runs is passed
+ * over by SKIP LOCKED, then commits a renewal that keeps those plots claimed by
+ * a dead process for a whole TTL. One case is left (the manifest's R-13): a
+ * chunk already mid-statement or at its COMMIT when the wall cuts it client
+ * side may still commit on the server after the release-all passed its rows,
+ * which keeps at most one chunk of plots claimed for at most one TTL, the crash
+ * bound. Never rejects.
  */
 export async function stopFreeholdClaimRenewer(registry?: FreeholdClaimRegistry): Promise<void> {
   if (!registry) return;
   const state = renewers.get(registry);
   if (!state) {
-    renewers.set(registry, { running: false, cursor: null, stopping: true, settled: null });
+    renewers.set(registry, {
+      running: false,
+      cursor: null,
+      stopping: true,
+      stop: new AbortController(),
+      settled: null,
+    });
     return;
   }
   state.stopping = true;
+  state.stop.abort();
   const settled = state.settled;
   if (!settled) return;
   const bound = AbortSignal.timeout(FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs);
@@ -574,7 +595,7 @@ export async function stopFreeholdClaimRenewer(registry?: FreeholdClaimRegistry)
 }
 
 /** Thrown inside a renew chunk's transaction that started after the stop, so
- *  it rolls back having sent nothing. Never escapes this module. */
+ *  it rolls back having sent no renewal. Never escapes this module. */
 class RenewerStopped extends Error {}
 
 async function renewPass(
@@ -686,8 +707,9 @@ async function renewPass(
         deps.pool,
         FREEHOLD_CLAIM_RENEW_BOUNDS,
         async (tx) => {
-          // A chunk that reached its connection after the stop sends nothing:
-          // a renewal parked at its checkout must not outlive the release.
+          // A chunk that reached its connection after the stop sends no
+          // renewal (only its BEGIN, rolled back): a renewal parked at its
+          // checkout must not outlive the release.
           if (state.stopping) throw new RenewerStopped();
           const ids = chunk.map((claim) => claim.plotId);
           // SKIP LOCKED: a row a trip or a write holds right now is passed
@@ -700,7 +722,7 @@ async function renewPass(
             stillHeld: await freeholdClaimsStillHeldOnClient(tx, deps.holder, skipped),
           };
         },
-        { signal: deadline },
+        { signal: deadline, checkoutSignal: state.stop.signal },
       ));
     } catch (error) {
       if (freeholdLockTimeout(error)) counters.lockTimeouts++;
@@ -755,7 +777,7 @@ async function renewPass(
             claims.map((claim) => claim.plotId),
             { wait },
           ),
-        { checkoutSignal: deadline },
+        { checkoutSignal: AbortSignal.any([deadline, state.stop.signal]) },
       );
     } catch {
       return expired() ? 'deadline' : 'kept';
@@ -842,7 +864,7 @@ async function renewPass(
             sent.map((claim) => claim.plotId),
           );
         },
-        { checkoutSignal: deadline },
+        { checkoutSignal: AbortSignal.any([deadline, state.stop.signal]) },
       );
     } catch (error) {
       if (freeholdLockTimeout(error)) counters.lockTimeouts++;

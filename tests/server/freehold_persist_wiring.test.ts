@@ -95,13 +95,22 @@ describe('renewGameFreeholdClaims', () => {
     // Control: without an observer it still runs.
     await renewGameFreeholdClaims(sim, { wantsClaim: () => false }, registry);
     expect(registry.counters.renewPasses).toBe(2);
-    // An observer that throws still hands back the pass, which runs.
-    const kept = renewGameFreeholdClaims(sim, { wantsClaim: () => false }, registry, () => {
-      throw new Error('the profiler observer threw');
-    });
-    expect(kept).toBeInstanceOf(Promise);
-    await kept;
-    expect(registry.counters.renewPasses).toBe(3);
+    // An observer that throws still hands back the pass, which runs, and the
+    // throw is said once in fixed text.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const kept = renewGameFreeholdClaims(sim, { wantsClaim: () => false }, registry, () => {
+        throw new Error('the profiler observer threw');
+      });
+      expect(kept).toBeInstanceOf(Promise);
+      await kept;
+      expect(registry.counters.renewPasses).toBe(3);
+      expect(warn.mock.calls).toEqual([
+        ['freehold claim renewer launch observer threw; the pass runs on'],
+      ]);
+    } finally {
+      warn.mockRestore();
+    }
   });
 });
 

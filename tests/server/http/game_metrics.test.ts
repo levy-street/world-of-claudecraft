@@ -2663,7 +2663,7 @@ describe('the housing authority families (07a)', () => {
     // counted on claim_renew_passes and adds nothing here, with every kind of
     // reading that gives none named (a backward step included).
     expect(help).toContain(
-      'a claim renew pass whose clock gave no usable duration (a throwing or non-number reading, a non-finite or negative duration, or one that would overflow the total) counts but adds nothing',
+      'a claim renew pass whose clock gave no usable duration (a throwing or non-number reading, a non-finite or negative duration, or one that would overflow the total) counts but adds nothing, and so does a remote Hearth trip whose clock threw or gave no positive finite duration',
     );
     expect(text).toContain('# TYPE woc_freehold_authority_ms_total counter');
   });

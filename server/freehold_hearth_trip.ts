@@ -163,12 +163,21 @@ export interface FreeholdHearthTripHost {
 
 type TicketVerdict = 'admit' | 'deny';
 
-/** Bound to the session object it was minted for, and so to its (ownerKey,
- *  pid, characterId, leaseNonce) (the manifest's section 4): consumed only by
- *  that same live session, under the one identity rule `sameSession` states. */
+/** The session a trip started for, with its character and lease nonce read at
+ *  that moment, so a later in-place change to either is caught, never inherited. */
+interface SessionMark {
+  readonly session: FreeholdHearthTripSession;
+  readonly characterId: number;
+  readonly leaseNonce: string | undefined;
+}
+
+/** Bound to the mark of the session the trip started for, and so to its
+ *  (ownerKey, pid, characterId, leaseNonce) (the manifest's section 4): consumed
+ *  only by that same live session, under the one identity rule `sameSession`
+ *  states. */
 interface Ticket {
   readonly ownerKey: string;
-  readonly session: FreeholdHearthTripSession;
+  readonly mark: SessionMark;
   readonly verdict: TicketVerdict;
   consumed: boolean;
 }
@@ -204,12 +213,13 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
   let ticket: Ticket | null = null;
   let nextTrip = 0;
 
-  // The SAME live session object (the frame path's own first gate), and still
-  // the same character under the same lease nonce and not leaving: a takeover
-  // that reused a pid or a nonce can never inherit the trip's re-dispatch.
-  const sameSession = (a: FreeholdHearthTripSession, b: FreeholdHearthTripSession | undefined) =>
+  // The SAME live session object (the frame path's own first gate), still
+  // carrying the character and lease nonce it had when the trip started, and
+  // not leaving: a takeover that reused a pid or a nonce, or a session whose
+  // nonce rotated in place, can never inherit the trip's re-dispatch.
+  const sameSession = (a: SessionMark, b: FreeholdHearthTripSession | undefined) =>
     b !== undefined &&
-    b === a &&
+    b === a.session &&
     b.characterId === a.characterId &&
     b.leaseNonce === a.leaseNonce &&
     b.left !== true &&
@@ -218,14 +228,14 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
   /** The ONE ticket setter, and its ONE call site is below. */
   function redispatchWithTicket(
     ownerKey: string,
-    session: FreeholdHearthTripSession,
+    mark: SessionMark,
     verdict: TicketVerdict,
   ): 'consumed' | 'dropped' | 'refused' {
-    const minted: Ticket = { ownerKey, session, verdict, consumed: false };
+    const minted: Ticket = { ownerKey, mark, verdict, consumed: false };
     ticket = minted;
     let met: FreeholdHearthRedispatch;
     try {
-      met = host.redispatch(session, verdict === 'admit');
+      met = host.redispatch(mark.session, verdict === 'admit');
     } finally {
       ticket = null;
     }
@@ -236,10 +246,11 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
   async function run(
     ownerKey: string,
     accountId: number,
-    session: FreeholdHearthTripSession,
+    mark: SessionMark,
     claim: FreeholdClaimFence | undefined,
     trip: number,
   ): Promise<void> {
+    const session = mark.session;
     // The clock only times the trip: a reading that throws times nothing, and
     // never escapes before the outcome is counted and the flag cleared.
     const clock = (): number => {
@@ -325,7 +336,7 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
       memo.set(accountId, host.nowMs() + FREEHOLD_HEARTH_TRIP_MEMO_MS);
     }
     const live = host.sessionForPid(session.pid);
-    if (!sameSession(session, live)) {
+    if (!sameSession(mark, live)) {
       // Gone or changed: no re-dispatch. The clock is the ACCOUNT's, so a
       // durable value still merges while any session of the owner is live (a
       // sibling must not keep a stale clock), and never once none is: the last
@@ -336,7 +347,7 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
     }
     if (verdict === 'deny' && readyAtMs !== null) host.mergeReadyAt(ownerKey, readyAtMs);
     try {
-      const answer = redispatchWithTicket(ownerKey, session, verdict);
+      const answer = redispatchWithTicket(ownerKey, mark, verdict);
       // Both are residual R-2 (a committed advance whose trip does not happen):
       // the key stays spent. A precheck drop (the host answered it as the
       // frame path would, a fenced vault busy) is counted apart and logs no
@@ -353,10 +364,10 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
 
   return {
     admission(ownerKey, pid) {
-      if (ticket !== null && ticket.ownerKey === ownerKey && ticket.session.pid === pid) {
+      if (ticket !== null && ticket.ownerKey === ownerKey && ticket.mark.session.pid === pid) {
         // The ticket names its session; any other session on that pid (a
         // takeover inside the re-dispatch) is refused and never consumes it.
-        if (!sameSession(ticket.session, host.sessionForPid(pid))) return 'deny';
+        if (!sameSession(ticket.mark, host.sessionForPid(pid))) return 'deny';
         ticket.consumed = true;
         return ticket.verdict;
       }
@@ -398,7 +409,7 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
       void run(
         ownerKey,
         accountId,
-        session,
+        { session, characterId: session.characterId, leaseNonce: session.leaseNonce },
         authority.durableRev !== null ? claim : undefined,
         trip,
       )
@@ -409,8 +420,11 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
           counters.threwAfterOutcome++;
           // The error's CLASS only (code-defined, bounded), never its message,
           // which may carry a value; and a warn port that throws stays here.
-          const kind = error instanceof Error ? error.name.slice(0, 64) : typeof error;
           try {
+            const kind =
+              error instanceof Error && typeof error.name === 'string'
+                ? error.name.slice(0, 64).replace(/[^\w.$-]/g, '?')
+                : typeof error;
             host.warn(`freehold hearth trip threw after its outcome was counted (${kind})`);
           } catch {}
         });

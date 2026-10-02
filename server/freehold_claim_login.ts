@@ -168,8 +168,8 @@ async function claimedLoginRead(
     return deps.readRow(db);
   };
   // Both counts at the ONE place a busy answer is made, so the contention
-  // count stays a subset of busy even when a failed rollback replaces the
-  // ClaimBusy with another error (that login then holds, never answers busy).
+  // count is a subset of busy by construction (a failed ROLLBACK never
+  // replaces the ClaimBusy: the transaction wrapper's rollback is best-effort).
   const busy = (refusal: ClaimBusy): FreeholdRowLoad => {
     registry.counters.busy++;
     if (refusal.contention) registry.counters.busyContention++;
