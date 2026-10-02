@@ -1071,17 +1071,21 @@ For off-box safety, sync the directory to S3 occasionally:
   transaction COMMITs. On `auth_tokens` and `characters` its first lock is SHARE (an
   index create), which the next statement upgrades to ACCESS EXCLUSIVE (an `ADD COLUMN
   IF NOT EXISTS`, which takes it even when the column exists); on `accounts` it is
-  ACCESS EXCLUSIVE from the first. Every boot also writes rows (an UPDATE of `accounts`
-  and an INSERT into `account_weapon_cosmetics`), so a row lock counts as a lock below.
-  The boot sends no lock timeout of its own, so it waits as long as a lock is held (one
-  set on the role, on the database or in `DATABASE_URL`'s options would still apply,
-  and a boot that hits it exits and restarts).
+  ACCESS EXCLUSIVE from the first. A row lock counts as a lock below: taking one also
+  takes a lock on its table (ROW SHARE, or ROW EXCLUSIVE for a write), which the boot's
+  ACCESS EXCLUSIVE waits for, and a row the boot itself writes can wait on another
+  transaction's uncommitted write of it. The boot sends no lock timeout of its own, so
+  it waits as long as a lock is held (one set on the role, on the database or in
+  `DATABASE_URL`'s options would still apply, and a boot that hits it exits and
+  restarts).
   - Queueing: a boot queues behind every open transaction, running or idle in
-    transaction, that holds a lock on a table it locks, and every later statement on
-    those tables on every realm queues behind the boot (56 to 59 ms in the bench with
-    plain saves in flight when no deadlock formed; one boot in six waited out
-    `deadlock_timeout`, 1,056 ms, and lived while the bench's "old account create", a
-    transaction that inserts an account and then a character, was aborted).
+    transaction, that holds a lock conflicting with one the boot takes (any lock at all
+    on `auth_tokens`, `characters` and `accounts`, since ACCESS EXCLUSIVE conflicts with
+    every mode), and every later statement on those tables on every realm queues behind
+    the boot (56 to 59 ms in the bench with plain saves in flight when no deadlock
+    formed; one boot in six waited out `deadlock_timeout`, 1,056 ms, and lived while the
+    bench's "old account create", a transaction that inserts an account and then a
+    character, was aborted).
   - Deadlocks: a boot can DEADLOCK with any transaction of either of two shapes: one
     that holds a lock on a table the boot holds only SHARE on (a plain read's ACCESS
     SHARE, or a row lock's ROW SHARE) and then writes it, against the boot's upgrade of
@@ -1101,14 +1105,18 @@ For off-box safety, sync the directory to S3 occasionally:
     EVERY boot was eventually aborted and saves were aborted beside it: the process
     exits, the compose policy restarts it, and a restart meets the same race while
     another realm keeps serving those saves.
-  - The quiet window: so boot a realm while the other realms on its database are quiet
-    (no transaction open on them in `pg_stat_activity`, `idle in transaction` included)
-    and outside the nightly `pg_dump`, and in a rolling restart let one realm finish
-    shutting down before another boots; that is the quiet window this file means.
+  - The quiet window: boot a realm while the other realms on its database are quiet and
+    outside the nightly `pg_dump`, and in a rolling restart let one realm finish
+    shutting down before another boots; that is the quiet window this file means. Quiet
+    means that, from psql on the realm database, `SELECT backend_type, application_name,
+    client_addr, state, now() - xact_start AS open_for FROM pg_stat_activity WHERE datname
+    = current_database() AND xact_start IS NOT NULL AND pid <> pg_backend_pid();` shows no
+    `client backend` row (an `idle in transaction` row counts; a `pg_dump` row is the
+    nightly dump); one reading is a snapshot, so take several a few seconds apart.
   - The nightly dump: it starts at 03:15 UTC (see Backups) and holds ACCESS SHARE on
     every table for its whole run. A boot that starts during it takes SHARE on
-    `auth_tokens` and then waits for the dump to end to upgrade that lock, holding
-    nothing on the parents yet. Meanwhile every realm's statement that reads or writes
+    `auth_tokens` and waits for the dump to end to upgrade it, holding nothing on
+    `characters` or `accounts` yet, and every realm's statement that reads or writes
     `auth_tokens` (for example a login, a token check, a revoke, a password reset, or an
     account delete's cascade) queues behind the boot and holds its pool client until
     `DB_STATEMENT_TIMEOUT_MS` (15 s) fails it with 57014. So a realm's pool can fill,
@@ -1117,10 +1125,18 @@ For off-box safety, sync the directory to S3 occasionally:
     connect` (no SQLSTATE), until the dump ends and the boot COMMITs; a leave save
     whose retries end first is lost but for its guild books. A boot during the dump's
     opening locks can instead deadlock it and abort that night's backup. If a boot is
-    already waiting behind the dump, stop that realm (the boot runs before the realm
-    serves anything, and ending it rolls its schema transaction back, which releases
-    the queue) and boot it again after the dump ends; never end the dump, and boot no
-    other realm until it ends.
+    already waiting behind the dump, first stop that realm, so the restart policy
+    cannot boot it again (the boot runs before the realm serves anything), and then end
+    the boot's backend from psql on the realm database: stopping the realm does not end
+    it, because a backend waiting for a lock does not read its socket
+    (`client_connection_check_interval` is off by default), so it keeps its place in
+    the queue until the dump ends. `SELECT pg_terminate_backend(pid) FROM pg_locks WHERE
+    locktype = 'relation' AND database = (SELECT oid FROM pg_database WHERE datname =
+    current_database()) AND relation = 'auth_tokens'::regclass AND mode =
+    'AccessExclusiveLock' AND NOT granted;` ends it (the dump never asks for that lock;
+    no row means no boot is waiting there), which rolls its schema transaction back and
+    releases the queue at once. Boot the realm again after the dump ends; never end the
+    dump, and boot no other realm until it ends.
   - After an abort: an aborted save shows as 40P01 in the realm log (one that carried
     guild bank books also counts `escrow_save_failed`), and what writes it again
     depends on the save: an autosave is written by the next autosave; a leave save is
@@ -1129,12 +1145,23 @@ For off-box safety, sync the directory to S3 occasionally:
     carrying guild bank books, and otherwise not at all. An aborted Hearth trip counts
     `trip_failed` and is not retried by the server (the player presses the key again),
     and neither is an aborted account or character create or password reset (the
-    player tries again). No other action that fails is retried, and one that writes in
-    two steps can land its first step alone: a password change, a staff password
-    reset, a ban or a suspension writes the account and then revokes its tokens, so
-    during the dump it lands the account write and fails at the revoke, leaving the old
-    tokens valid and the live session connected. Redo each one made during the dump
-    once it ends.
+    player tries again).
+  - After a stall: no request that failed while a boot blocked `auth_tokens` (behind
+    the dump or anything else) is retried, a logout or a token revoke included. One
+    that failed before writing changed nothing, and whoever sent it can send it again;
+    one that wrote before its failing token statement keeps those writes and skips
+    every step after it. That matters for an action that writes the account and then
+    revokes its tokens (for example a password change, a staff password reset, a ban, a
+    suspension or a deactivation): it leaves the old tokens valid and the live session
+    connected, and skips what follows (for example a notice email, or a deactivation's
+    housing receipt erase). Most requests check their token in `auth_tokens` before
+    they write, so few land half, but the realm log names no account. So once the boot
+    COMMITs after a stall that began while players or staff were active, sign every
+    account out once (`DELETE FROM auth_tokens WHERE created_at < now();` from psql on
+    the realm database, companion and OAuth tokens included), restart the realms one at
+    a time in the quiet window so no live session outlasts it, and re-run the
+    deactivation housing receipt erase for deactivated accounts that still hold
+    receipts (its warning in `server/account.ts` says how).
   - The hazard predates housing; removing both paths is owed
     (docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md measures it).
 - FIRST ROLLOUT OF THE HOUSING TABLES: the first boot that carries them also creates
@@ -1283,11 +1310,11 @@ For off-box safety, sync the directory to S3 occasionally:
     send the same file again, counting attempts afresh; if it shows no `pg_dump`
     session but another `advance_token_runbook` session, take the lost connection
     route; otherwise wait about 10 s and send the same file again, at most about five
-    times in all, then stop and report HOLDER's rows; on 42710 from RESTORE the name was taken since the
-    read, so re-run the read; on 42703 from RESTORE the column itself is missing and
-    every Hearth trip fails until the next boot re-adds it with its CHECK, a repair
-    boot (above), so stop the other realms and run it in the next quiet window; on
-    42710 or 42P07 from DISPLACE an earlier displacement holds the name, so settle it
+    times in all, then stop and report HOLDER's rows; on 42710 from RESTORE the name was
+    taken since the read, so re-run the read; on 42703 from RESTORE the column itself is
+    missing and every Hearth trip fails until the next boot re-adds it with its CHECK, a
+    repair boot (above), so stop the other realms and run it in the next quiet window;
+    on 42710 or 42P07 from DISPLACE an earlier displacement holds the name, so settle it
     by the drop rule and send DISPLACE again, and if the drop rule's read, before any
     DROP, finds no row, a bare relation holds the name: stop and report it; on 42703
     from DISPLACE the column itself is missing while a constraint holds the name, so

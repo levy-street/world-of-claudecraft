@@ -2150,10 +2150,10 @@ describe('the claim renewer', () => {
   it("states DEPLOY's boot lock order and stall bounds as the code sets them", () => {
     // The boot bullet names the parents in the boot's lock order, the lock
     // each one takes first, and each stall bound beside its number. The order,
-    // the first locks and the missing lock timeout are observed on the real
-    // boot in tests/server/freehold_mutation.pg.test.ts (section L), which
-    // pins the same names; the bounds are read here from the pool that
-    // applies them.
+    // the first locks, the missing lock timeout and the operator's SQL are
+    // observed on the real boot in tests/server/freehold_mutation.pg.test.ts
+    // (section L), which reads the order sentence and runs the SQL from this
+    // bullet; the bounds are read here from the pool that applies them.
     const deploy = readFileSync('DEPLOY.md', 'utf8');
     const at = deploy.indexOf('- EVERY BOOT LOCKS THE PARENTS');
     expect(at).toBeGreaterThan(-1);
@@ -2176,8 +2176,13 @@ describe('the claim renewer', () => {
       return Number((found as RegExpMatchArray)[1].replaceAll('_', '')) / 1000;
     };
     const db = source('server/db.ts');
-    expect(db).toContain('connectionTimeoutMillis: DB_POOL_CONNECT_TIMEOUT_MS,');
-    expect(db).toContain('statement_timeout: DB_STATEMENT_TIMEOUT_MS,');
+    const poolAt = db.indexOf('export const pool = new Pool({');
+    expect(poolAt).toBeGreaterThan(-1);
+    const poolEnd = db.indexOf('\n});', poolAt);
+    expect(poolEnd).toBeGreaterThan(poolAt);
+    const poolOptions = db.slice(poolAt, poolEnd);
+    expect(poolOptions).toContain('connectionTimeoutMillis: DB_POOL_CONNECT_TIMEOUT_MS,');
+    expect(poolOptions).toContain('statement_timeout: DB_STATEMENT_TIMEOUT_MS,');
     expect(bullet).toContain(
       `\`DB_STATEMENT_TIMEOUT_MS\` (${seconds('server/db.ts', 'DB_STATEMENT_TIMEOUT_MS')} s)`,
     );

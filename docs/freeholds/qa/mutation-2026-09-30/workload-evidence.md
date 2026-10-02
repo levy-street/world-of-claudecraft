@@ -155,11 +155,12 @@ Readings:
   the verify.
 - **The first rollout adds no boot lock.** Every boot, steady state included, already takes ACCESS
   EXCLUSIVE on `auth_tokens`, then `characters`, then `accounts` (`auth_tokens` named in round
-  nineteen, from the probe note above) and holds them to its COMMIT: the core `SCHEMA` runs `ALTER
-  TABLE characters ADD COLUMN IF NOT EXISTS` before `ALTER TABLE accounts ADD COLUMN IF NOT
-  EXISTS`, and a no-op `ADD COLUMN IF NOT EXISTS` still takes ACCESS EXCLUSIVE (probed on this
-  server). So the housing fragments' trigger creation runs under locks the boot already holds, and
-  a first-rollout boot measures the same as a steady one.
+  nineteen, from the probe note above) and holds them to its COMMIT: the core `SCHEMA` runs an
+  `ADD COLUMN IF NOT EXISTS` on `auth_tokens`, then on `characters`, then on `accounts` (that
+  sentence named only the last two until round twenty), and a no-op `ADD COLUMN IF NOT EXISTS`
+  still takes ACCESS EXCLUSIVE (probed on this server). So the housing fragments' trigger creation
+  runs under locks the boot already holds, and a first-rollout boot measures the same as a steady
+  one.
 - **Any boot can deadlock on two paths.** The boot takes `auth_tokens`, then `characters`, then
   `accounts` (the order above, corrected in round nineteen), and its first lock on `characters`,
   as on `auth_tokens`, is SHARE (the core `CREATE INDEX IF NOT EXISTS characters_account`),

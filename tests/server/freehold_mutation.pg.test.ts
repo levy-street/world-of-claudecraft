@@ -24,8 +24,9 @@
 // cap, the D88 parent-delete guard, its races and receipt erasure, the
 // legacy-effect interleaves, no client across the prepare, the export
 // allowlist, the index every statement reaches, a catalog-only fragment
-// re-apply, and the boot's locks on the parents, observed behind a held lock,
-// with no lock timeout sent). The nearest suites do not pin it:
+// re-apply, and the boot's locks, observed behind a held lock and behind a
+// dump-shaped hold, with no lock timeout sent and DEPLOY's route for a boot
+// stopped behind the dump). The nearest suites do not pin it:
 // tests/server/freehold_mutation.test.ts drives the same decisions with fakes
 // (no transaction to roll back, no row to wait on),
 // tests/server/freehold_hearth_db.pg.test.ts and
@@ -34,8 +35,9 @@
 // tests/guild_bank_pg_integration.test.ts and
 // tests/server/storage_purchase_db.pg.test.ts prove the legacy halves with no
 // housing participant.
-// Cost: 3.9 s
+// Cost: 4.5 s
 import { randomUUID } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import type { Pool as PgPool, PoolClient } from 'pg';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import type { BankLedgerSaveEffects } from '../../server/bank_ledger_save_effects_db';
@@ -3161,40 +3163,91 @@ d('the housing mutation boundary (REAL Postgres)', () => {
 
   describe("L. the boot's locks on the parents, observed", () => {
     /** The parents DEPLOY's "EVERY BOOT LOCKS THE PARENTS" bullet names, in
-     *  the order it states them (tests/server/freehold_mutation.test.ts pins
-     *  that sentence). */
+     *  the order it states them. */
     const PARENTS = ['auth_tokens', 'characters', 'accounts'];
 
-    /** Holds ACCESS SHARE on `table`, what the nightly pg_dump holds on every
-     *  table for its whole run, then runs the REAL boot (`ensureSchema`)
-     *  beside it. Once the boot queues, reads the lock it waits for and every
-     *  lock it already holds on the parents, then lets it finish. */
-    async function bootBehind(table: string) {
+    /** That bullet, its whitespace collapsed, and a statement it gives an
+     *  operator, read by its opening words so the case runs the doc's own SQL. */
+    function bootBullet(): string {
+      const deploy = readFileSync('DEPLOY.md', 'utf8');
+      const at = deploy.indexOf('- EVERY BOOT LOCKS THE PARENTS');
+      const next = deploy.indexOf('\n- ', at + 1);
+      expect(at).toBeGreaterThan(-1);
+      expect(next).toBeGreaterThan(at);
+      return deploy.slice(at, next).replace(/\s+/g, ' ');
+    }
+    function operatorSql(opening: string): string {
+      const found = bootBullet()
+        .split('`')
+        .filter((_, i) => i % 2 === 1)
+        .filter((span) => span.startsWith(opening));
+      expect(found, opening).toHaveLength(1);
+      return found[0];
+    }
+
+    /** Every table in the schema, as the nightly pg_dump locks them. */
+    async function everyTable(): Promise<string[]> {
+      const res = await pool.query(
+        `SELECT c.oid::regclass::text AS t FROM pg_class c
+           JOIN pg_namespace n ON n.oid = c.relnamespace
+          WHERE n.nspname = 'public' AND c.relkind IN ('r', 'p') ORDER BY 1`,
+      );
+      return res.rows.map((r: { t: string }) => r.t);
+    }
+
+    /** Polls, to a deadline, for the one relation lock some session other
+     *  than `holderPid` is waiting for. */
+    async function waiter(holderPid: number) {
+      const deadline = Date.now() + 5_000;
+      while (Date.now() < deadline) {
+        const res = await pool.query(
+          `SELECT pid, relation::regclass::text AS rel, mode FROM pg_locks
+            WHERE locktype = 'relation' AND NOT granted AND pid <> $1`,
+          [holderPid],
+        );
+        if (res.rows.length > 0) {
+          expect(res.rows, 'one waiting lock').toHaveLength(1);
+          return res.rows[0] as { pid: number; rel: string; mode: string };
+        }
+        await sleep(20);
+      }
+      throw new Error('the boot never queued behind the held lock');
+    }
+
+    /** Every lock `pid` holds on a table of the schema, whatever the table
+     *  (the catalog reads a DO block makes are not the schema's). */
+    async function heldBy(pid: number): Promise<string[]> {
+      const res = await pool.query(
+        `SELECT l.relation::regclass::text || ' ' || l.mode AS lock FROM pg_locks l
+           JOIN pg_class c ON c.oid = l.relation
+           JOIN pg_namespace n ON n.oid = c.relnamespace
+          WHERE l.pid = $1 AND l.locktype = 'relation' AND l.granted
+            AND n.nspname = 'public' AND c.relkind IN ('r', 'p')
+          ORDER BY 1`,
+        [pid],
+      );
+      return res.rows.map((r: { lock: string }) => r.lock);
+    }
+
+    /** Holds ACCESS SHARE on `tables`, what the nightly pg_dump holds on every
+     *  table for its whole run, runs the REAL boot (`ensureSchema`) beside it,
+     *  and reads the lock it waits for and every table lock it holds. `during`
+     *  runs while the boot still waits; the boot then finishes or fails. */
+    async function bootBehind(
+      tables: readonly string[],
+      during?: (seen: { pid: number }, boot: Promise<unknown>) => Promise<void>,
+    ) {
       const holder = await pool.connect();
-      let boot: Promise<void> | undefined;
+      let boot: Promise<unknown> | undefined;
       try {
         await holder.query('BEGIN');
-        await holder.query(`LOCK TABLE ${table} IN ACCESS SHARE MODE`);
-        boot = db.ensureSchema();
-        let waiting: { pid: number; mode: string } | undefined;
-        for (let i = 0; i < 500 && waiting === undefined; i++) {
-          const res = await pool.query(
-            `SELECT pid, mode FROM pg_locks
-              WHERE locktype = 'relation' AND relation = $1::regclass AND NOT granted`,
-            [table],
-          );
-          waiting = res.rows[0];
-          if (waiting === undefined) await sleep(20);
-        }
-        expect(waiting, `the boot never queued behind ${table}`).toBeDefined();
-        const held = await pool.query(
-          `SELECT relation::regclass::text || ' ' || mode AS lock FROM pg_locks
-            WHERE pid = $1 AND locktype = 'relation' AND granted
-              AND relation = ANY($2::regclass[])
-            ORDER BY 1`,
-          [waiting?.pid, PARENTS],
-        );
-        return { waits: waiting?.mode, held: held.rows.map((r: { lock: string }) => r.lock) };
+        await holder.query(`LOCK TABLE ${tables.join(', ')} IN ACCESS SHARE MODE`);
+        const holderPid = (await holder.query('SELECT pg_backend_pid() AS p')).rows[0].p;
+        boot = db.ensureSchema().catch((error: unknown) => error);
+        const seen = await waiter(holderPid);
+        const result = { on: seen.rel, waits: seen.mode, held: await heldBy(seen.pid) };
+        if (during) await during(seen, boot);
+        return result;
       } finally {
         await holder.query('ROLLBACK').catch(() => {});
         holder.release();
@@ -3202,20 +3255,35 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       }
     }
 
+    /** The statements each pg Client sent, by client, in order. */
+    function sentByClient(spy: { mock: { calls: unknown[][]; contexts: unknown[] } }) {
+      const sent = new Map<unknown, string[]>();
+      spy.mock.calls.forEach((args, i) => {
+        const first = args[0] as unknown;
+        const text =
+          typeof first === 'string' ? first : String((first as { text?: unknown })?.text ?? '');
+        const context = spy.mock.contexts[i];
+        sent.set(context, [...(sent.get(context) ?? []), text]);
+      });
+      return sent;
+    }
+
     it('locks auth_tokens, then characters, then accounts, and sends no lock timeout', async () => {
       const { Client } = await import('pg');
       const spy = vi.spyOn(Client.prototype, 'query');
       try {
         // Behind its first parent the boot holds SHARE (the index create) on
-        // that table alone; behind each later parent it holds every earlier
-        // one and nothing on the later ones. This is the order and the
-        // "holding nothing on the parents yet" that DEPLOY states, read off
-        // the real statements, whatever kind of statement takes each lock.
-        expect(await bootBehind('auth_tokens')).toEqual({
+        // that table alone, and no lock on any other table; behind each later
+        // parent it holds every earlier one and nothing on the later ones. This
+        // is the order DEPLOY states, read off the real statements, whatever
+        // kind of statement takes each lock.
+        expect(await bootBehind(['auth_tokens'])).toEqual({
+          on: 'auth_tokens',
           waits: 'AccessExclusiveLock',
           held: ['auth_tokens ShareLock'],
         });
-        expect(await bootBehind('characters')).toEqual({
+        expect(await bootBehind(['characters'])).toEqual({
+          on: 'characters',
           waits: 'AccessExclusiveLock',
           held: [
             'auth_tokens AccessExclusiveLock',
@@ -3223,7 +3291,8 @@ d('the housing mutation boundary (REAL Postgres)', () => {
             'characters ShareLock',
           ],
         });
-        expect(await bootBehind('accounts')).toEqual({
+        expect(await bootBehind(['accounts'])).toEqual({
+          on: 'accounts',
           waits: 'AccessExclusiveLock',
           held: [
             'auth_tokens AccessExclusiveLock',
@@ -3232,6 +3301,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
             'characters ShareLock',
           ],
         });
+        expect(bootBullet()).toContain(
+          `first on ${PARENTS.map((table) => `\`${table}\``).join(', then ')}`,
+        );
         // The control for the stream read below: a lock timeout a client
         // sends is seen.
         const control = await pool.connect();
@@ -3242,35 +3314,102 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           await control.query('ROLLBACK').catch(() => {});
           control.release();
         }
-        // Every statement each client sent, in order. A boot is the client
-        // that takes the schema advisory lock: it lifts the statement timeout
-        // first and sends no lock timeout at all, so each wait above lasts as
-        // long as the lock is held.
-        const sent = new Map<unknown, string[]>();
-        spy.mock.calls.forEach((args, i) => {
-          const first = args[0] as unknown;
-          const text =
-            typeof first === 'string' ? first : String((first as { text?: unknown })?.text ?? '');
-          const context = spy.mock.contexts[i];
-          sent.set(context, [...(sent.get(context) ?? []), text]);
-        });
-        const all = [...sent.values()];
-        expect(all.filter((texts) => texts.some((text) => /lock_timeout/.test(text)))).toHaveLength(
-          1,
+        // A boot is the client that takes the schema advisory lock: it lifts
+        // the statement timeout first and sends no lock timeout, neither as a
+        // statement nor as a startup parameter (the config key or `-c` in its
+        // options), so each wait above lasts as long as the lock is held.
+        const sent = sentByClient(spy);
+        expect(
+          [...sent.values()].filter((texts) => texts.some((text) => /lock_timeout/.test(text))),
+        ).toHaveLength(1);
+        const boots = [...sent].filter(([, texts]) =>
+          texts.includes('SELECT pg_advisory_xact_lock($1)'),
         );
-        const boots = all.filter((texts) => texts.includes('SELECT pg_advisory_xact_lock($1)'));
         expect(boots).toHaveLength(3);
-        for (const texts of boots) {
+        type Startup = { connectionParameters: { lock_timeout?: unknown; options?: unknown } };
+        expect(new Client({ lock_timeout: 1000 }) as unknown as Startup).toMatchObject({
+          connectionParameters: { lock_timeout: 1000 },
+        });
+        for (const [client, texts] of boots) {
           expect(texts.slice(0, 3)).toEqual([
             'BEGIN',
             'SET LOCAL statement_timeout = 0',
             'SELECT pg_advisory_xact_lock($1)',
           ]);
           expect(texts.filter((text) => /lock_timeout/i.test(text))).toEqual([]);
+          const startup = (client as Startup).connectionParameters;
+          // pg sends the startup lock_timeout only when it is truthy.
+          expect(Boolean(startup.lock_timeout)).toBe(false);
+          expect(String(startup.options ?? '')).not.toMatch(/lock_timeout/i);
         }
       } finally {
         spy.mockRestore();
       }
+    });
+
+    it('behind the dump: SHARE on auth_tokens alone, and a stopped boot waits until DEPLOY ends it', async () => {
+      const { Client } = await import('pg');
+      const spy = vi.spyOn(Client.prototype, 'query');
+      const tokenRead = async (budget: string) => {
+        const client = await pool.connect();
+        try {
+          await client.query('BEGIN');
+          await client.query(`SET LOCAL statement_timeout = '${budget}'`);
+          await client.query('SELECT count(*) FROM auth_tokens');
+          return 'ran';
+        } catch (error) {
+          return (error as { code?: string }).code;
+        } finally {
+          await client.query('ROLLBACK').catch(() => {});
+          client.release();
+        }
+      };
+      try {
+        const tables = await everyTable();
+        expect(tables.length).toBeGreaterThan(100);
+        let outcome: unknown;
+        const seen = await bootBehind(tables, async ({ pid }, boot) => {
+          // DEPLOY's quiet check sees the dump-shaped holder, idle in its
+          // transaction, and the waiting boot.
+          const quiet = await pool.query(operatorSql('SELECT backend_type, application_name'));
+          expect(quiet.rows.map((r: { state: string }) => r.state).sort()).toEqual([
+            'active',
+            'idle in transaction',
+          ]);
+          // Stopping the realm ends its process: its socket closes, and the
+          // boot's backend, waiting for a lock, never reads it.
+          const [bootClient] = [...sentByClient(spy)].find(([, texts]) =>
+            texts.includes('SELECT pg_advisory_xact_lock($1)'),
+          ) ?? [undefined];
+          const stopped = bootClient as {
+            on(event: 'error', listener: () => void): void;
+            connection: { stream: { destroy(): void } };
+          };
+          stopped.on('error', () => {});
+          stopped.connection.stream.destroy();
+          outcome = await boot;
+          await sleep(300);
+          expect((await waiter(-1)).pid).toBe(pid);
+          expect(await tokenRead('200ms')).toBe('57014');
+          // DEPLOY's statement ends it, and the queue is released at once.
+          const ended = await pool.query(operatorSql('SELECT pg_terminate_backend(pid)'));
+          expect(ended.rows).toEqual([{ pg_terminate_backend: true }]);
+          const deadline = Date.now() + 5_000;
+          while (Date.now() < deadline && (await heldBy(pid)).length > 0) await sleep(20);
+          expect(await heldBy(pid)).toEqual([]);
+          expect(await tokenRead('2s')).toBe('ran');
+        });
+        expect(seen).toEqual({
+          on: 'auth_tokens',
+          waits: 'AccessExclusiveLock',
+          held: ['auth_tokens ShareLock'],
+        });
+        expect(outcome).toBeInstanceOf(Error);
+      } finally {
+        spy.mockRestore();
+      }
+      // Booted again after the dump, the realm comes up.
+      await db.ensureSchema();
     });
   });
 });

@@ -670,26 +670,29 @@ left in place and the boot logs a WARNING. THE FIRST ROLLOUT WINDOW: because no 
 deployed, the first 07a boot on production creates five FK-bearing tables and the triggers in
 ONE `ensureSchema` transaction with no `lock_timeout`. It takes no parent lock a steady-state
 boot does not (above): every boot queues behind each open transaction, running or idle, that
-holds a lock on a table it locks, and every later statement on those tables on every realm
-queues behind the boot until its COMMIT (measured with an old realm serving: 55 to 66 ms for
-the first rollout with plain saves in flight when no deadlock formed, three boots of 16 waiting
-out `deadlock_timeout` for about 1 s, near a steady-state boot's 56 to 59 ms, one of six
-waiting 1,056 ms; each boot that waited lived, and the bench's "old account create", an account
-then a character, beside it was aborted). ANY boot can DEADLOCK on two paths, since the core
-schema locks its tables in its statement order, `auth_tokens`, then `characters`, then
-`accounts`, and also writes rows every boot (an UPDATE of `accounts`, an INSERT into
-`account_weapon_cosmetics`), so a row lock counts as a lock on both. The UPGRADE path, one
-table: on `auth_tokens` and `characters` the boot's first lock is SHARE (an index create),
-upgraded to ACCESS EXCLUSIVE by the next statement (on `accounts` it is ACCESS EXCLUSIVE from
-the first, so no upgrade happens there), against a transaction that took a lock on that table
-that SHARE does not wait for (a save's G2 row lock or the character delete's, ROW SHARE, or a
-plain read's ACCESS SHARE, a character create's count among them) and then writes it. The ORDER
-path, two tables: a transaction that holds any lock on a table and then asks for one on a table
-the boot locks earlier, this manifest's own G1-then-G2 order among them (every effect-carrying
-or hooked save, the Hearth trip's included, the operation prepare, the character create and
-delete, a password reset's `accounts` then `auth_tokens`, and an account create while community
-test accounts are on), against the boot's order. The shapes decide it, not a list. The order,
-each parent's first lock and the boot's missing lock timeout are observed on the real boot
+holds a lock conflicting with one it takes, and every later statement on those tables on every
+realm queues behind the boot until its COMMIT (measured with an old realm serving: 55 to 66 ms
+for the first rollout with plain saves in flight when no deadlock formed, three boots of 16
+waiting out `deadlock_timeout` for about 1 s, near a steady-state boot's 56 to 59 ms, one of
+six waiting 1,056 ms; each boot that waited lived, and the bench's "old account create", an
+account then a character, beside it was aborted). ANY boot can DEADLOCK on two paths, since the
+core schema locks its tables in its statement order, `auth_tokens`, then `characters`, then
+`accounts`, and a row lock counts on either path, since taking one also takes ROW SHARE or ROW
+EXCLUSIVE on its table (and a row the boot itself writes can wait on another transaction's
+uncommitted write of it). The UPGRADE path, one table: on `auth_tokens` and `characters` the
+boot's first lock is SHARE (an index create), upgraded to ACCESS EXCLUSIVE by the next
+statement (on `accounts` it is ACCESS EXCLUSIVE from the first, so no upgrade happens there),
+against a transaction that took a lock on that table that SHARE does not wait for (a save's G2
+row lock or the character delete's, ROW SHARE, or a plain read's ACCESS SHARE, a character
+create's count among them) and then writes it. The ORDER path, two tables: a transaction that
+holds any lock on a table and then asks for one on a table the boot locks earlier, this
+manifest's own G1-then-G2 order among them (every effect-carrying or hooked save, the Hearth
+trip's included, the operation prepare, the character create and delete, a password reset's
+`accounts` then `auth_tokens`, and an account create while community test accounts are on),
+against the boot's order. The shapes decide it, not a list. The order, each parent's first
+lock, the boot's missing lock timeout and the one lock it holds behind a dump-shaped hold are
+observed on the real boot, and so is DEPLOY's route for a boot already behind the dump: a
+stopped realm's boot keeps its place in the queue until its backend is ended
 (`tests/server/freehold_mutation.pg.test.ts`, section L). With G1-shaped saves in flight every
 bench boot was eventually aborted and saves were aborted beside it, and a boot that loses exits
 and is restarted (R-11). A REPAIR boot is any boot that rebuilds something a probe guards (for
@@ -1379,3 +1382,7 @@ What changed the contract above:
   take SHARE before ACCESS EXCLUSIVE, and that a row lock counts; the order, the first locks
   and the missing lock timeout are observed on the real boot; R-11's owed fix covers
   `auth_tokens` too.
+- A twentieth round of eight fresh readers: P12 says the boot queues behind a lock that
+  conflicts with one it takes and that a row lock counts by the table lock it carries, and
+  names the observed route for a boot stopped behind the dump: its backend keeps its place in
+  the queue until it is ended.
