@@ -34,10 +34,11 @@
 // stalled boot, on a build at its wait and on a runner's drop, a stopped
 // realm's build shown holding the lock until DEPLOY's terminate ends each
 // session it waits for, named one at a time (a READ COMMITTED one whose
-// statement was running among them), DEPLOY's cancel ending a stopped or a
-// serving realm's build at once, an early end leaving its index INVALID and not
-// ready or none, and its listing and a hand drop the gate does not see removing
-// the carcass a runner then builds again). The nearest suites do not pin it:
+// statement was running among them) with its `idle_for` growing while it sits
+// idle, DEPLOY's cancel ending a stopped or a serving realm's build at once, an
+// early end leaving its index INVALID and not ready or none, and its listing
+// and a hand drop the gate does not see, found by DEPLOY's lookup, removing the
+// carcass a runner then builds again). The nearest suites do not pin it:
 // tests/server/freehold_mutation.test.ts drives the same decisions with fakes
 // (no transaction to roll back, no row to wait on),
 // tests/server/freehold_hearth_db.pg.test.ts and
@@ -3962,11 +3963,16 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       };
       const psqlSession = async (isolation = 'REPEATABLE READ') => {
         const client = dedicated();
-        await client.connect();
-        await client.query("SET application_name = 'psql'");
-        await client.query(`BEGIN ISOLATION LEVEL ${isolation}`);
-        const pid: number = (await client.query('SELECT pg_backend_pid() AS p')).rows[0].p;
-        return { client, pid };
+        try {
+          await client.connect();
+          await client.query("SET application_name = 'psql'");
+          await client.query(`BEGIN ISOLATION LEVEL ${isolation}`);
+          const pid: number = (await client.query('SELECT pg_backend_pid() AS p')).rows[0].p;
+          return { client, pid };
+        } catch (error) {
+          await client.end().catch(() => {});
+          throw error;
+        }
       };
       const waitEventOf = async (pid: number) =>
         (await pool.query('SELECT wait_event FROM pg_stat_activity WHERE pid = $1', [pid])).rows[0]
@@ -3975,6 +3981,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         then: (build: {
           pid: number;
           snapshotPid: number;
+          session: InstanceType<typeof Client>;
           stop: () => Promise<unknown>;
           finish: () => Promise<unknown>;
         }) => Promise<void>,
@@ -3984,15 +3991,18 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         const realm = dedicated();
         const gatekeeper = await pool.connect();
         let held: { client: InstanceType<typeof Client>; pid: number } | undefined;
+        // The running statement waits on an advisory key of its own, so it
+        // holds its snapshot until `finish` frees the key.
+        const key = 0x52_32_38;
+        let statement: Promise<unknown> = Promise.resolve();
         try {
-          // The running statement waits on an advisory key of its own, so it
-          // holds its snapshot until `finish` frees the key.
-          const key = 0x52_32_38;
-          let statement: Promise<unknown> = Promise.resolve();
           if (running) {
             await gatekeeper.query('SELECT pg_advisory_lock($1)', [key]);
             held = await psqlSession('READ COMMITTED');
-            statement = held.client.query('SELECT pg_advisory_lock($1)', [key]);
+            statement = held.client.query('SELECT pg_advisory_lock($1)', [key]).then(
+              () => 'locked',
+              (error: { code?: string }) => error.code,
+            );
             const heldPid = held.pid;
             expect(await until(() => waitEventOf(heldPid), 'advisory')).toBe('advisory');
           } else {
@@ -4005,6 +4015,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           await then({
             pid: (realm as unknown as { processID: number }).processID,
             snapshotPid: held.pid,
+            session: held.client,
             stop: () => {
               (
                 realm as unknown as { connection: { stream: { destroy(): void } } }
@@ -4013,12 +4024,13 @@ d('the housing mutation boundary (REAL Postgres)', () => {
             },
             finish: async () => {
               await gatekeeper.query('SELECT pg_advisory_unlock($1)', [key]);
-              await statement;
+              expect(await statement).toBe('locked');
             },
           });
         } finally {
           await gatekeeper.query('SELECT pg_advisory_unlock_all()').catch(() => {});
           gatekeeper.release();
+          await statement.catch(() => {});
           await held?.client.end().catch(() => {});
           await realm.end().catch(() => {});
         }
@@ -4105,15 +4117,19 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         // its wait and one session it waits for, of two open psql sessions (an
         // idle READ COMMITTED transaction beside them holds no snapshot and is
         // never named); with the check on the socket off, the build still
-        // holds the lock after its socket closes. A cancel leaves the idle
-        // session as it was; DEPLOY's terminate ends it, the naming statement
-        // then names the other, and once that is ended the build ends, valid.
+        // holds the lock after its socket closes. The named session's
+        // `idle_for` grows by the time between two readings and starts over
+        // once it runs a statement; a cancel leaves it as it was; DEPLOY's
+        // terminate ends it, the naming statement then names the other, and
+        // once that is ended the build ends, valid.
         const idle = await pool.connect();
-        const second = await psqlSession();
+        let second: Awaited<ReturnType<typeof psqlSession>> | undefined;
         try {
+          second = await psqlSession();
+          const other = second;
           await idle.query('BEGIN');
           await idle.query('SELECT 1');
-          await heldBuild(async ({ pid, snapshotPid, stop }) => {
+          await heldBuild(async ({ pid, snapshotPid, session, stop }) => {
             const rows = await decides();
             expect(rows).toHaveLength(1);
             const { blocked_by: first, ...holder } = rows[0];
@@ -4124,9 +4140,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
               wait_event: 'virtualxid',
               phase: 'waiting for old snapshots',
             });
-            expect([[snapshotPid], [second.pid]]).toContainEqual(first);
+            expect([[snapshotPid], [other.pid]]).toContainEqual(first);
             const firstPid = (first as number[])[0];
-            const nextPid = firstPid === snapshotPid ? second.pid : snapshotPid;
+            const nextPid = firstPid === snapshotPid ? other.pid : snapshotPid;
             expect(
               (await pool.query('SHOW client_connection_check_interval')).rows[0]
                 .client_connection_check_interval,
@@ -4134,9 +4150,25 @@ d('the housing mutation boundary (REAL Postgres)', () => {
             expect(await stop()).toBe('stopped');
             await sleep(300);
             expect(await gate()).toBe(1);
-            expect(
-              (await pool.query(named.replace('<pid>', String(pid)))).rows[0].idle_for,
-            ).not.toBeNull();
+            // DEPLOY's naming statement, its `idle_for` in seconds.
+            const idleSeconds = async () =>
+              Number(
+                (
+                  await pool.query(
+                    `SELECT EXTRACT(EPOCH FROM n.idle_for) AS s FROM (${named
+                      .replace('<pid>', String(pid))
+                      .replace(/;$/, '')}) n WHERE n.pid = $1`,
+                    [firstPid],
+                  )
+                ).rows[0].s,
+              );
+            const before = await idleSeconds();
+            await sleep(300);
+            const after = await idleSeconds();
+            expect(after - before).toBeGreaterThanOrEqual(0.25);
+            // A statement in its REPEATABLE READ transaction keeps its snapshot.
+            await (firstPid === other.pid ? other.client : session).query('SELECT 1');
+            expect(await idleSeconds()).toBeLessThan(after);
             await pool.query(cancel.replace('<pid>', String(firstPid)));
             await sleep(200);
             expect(await sessionsOf(pid)).toEqual([
@@ -4153,20 +4185,19 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         } finally {
           await idle.query('ROLLBACK').catch(() => {});
           idle.release();
-          await second.client.end().catch(() => {});
+          await second?.client.end().catch(() => {});
         }
         // A READ COMMITTED session whose statement was running when the wait
-        // began is waited for until its transaction ends, idle or not: once
-        // its statement ends the naming statement still names it, and the
-        // build ends only after DEPLOY's terminate.
+        // began can be waited for until its transaction ends, idle or not
+        // (here its snapshot is the only old one, so the wait reaches it while
+        // it runs): once its statement ends the naming statement still names
+        // it, and the build ends only after DEPLOY's terminate.
         await heldBuild(async ({ pid, snapshotPid, stop, finish }) => {
           await finish();
           expect(await sessionsOf(pid)).toEqual([
             { pid: snapshotPid, application_name: 'psql', state: 'idle in transaction' },
           ]);
           expect(await stop()).toBe('stopped');
-          await sleep(300);
-          expect(await gate()).toBe(1);
           await pool.query(terminate.replace('<pid>', String(snapshotPid)));
           expect(await until(gate, 0)).toBe(0);
           expect(await valid()).toEqual([true]);
@@ -4187,29 +4218,39 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           migration.name,
         ]);
         // DEPLOY's drop by hand: the gate does not see it, and while it does
-        // not return the naming statement with its pid names the session it
-        // waits for, an operator's open psql one, which DEPLOY's terminate
-        // ends; the drop then returns, and a runner that names the index
-        // builds it again.
-        const reader = await psqlSession('READ COMMITTED');
+        // not return DEPLOY's lookup from another session gives its pid, with
+        // which the naming statement names the session it waits for, an
+        // operator's open psql one, which DEPLOY's terminate ends; the drop
+        // then returns, and a runner that names the index builds it again.
+        const lookup = operatorSql('SELECT pid FROM pg_stat_activity');
+        expect(lookup).toBe(
+          "SELECT pid FROM pg_stat_activity WHERE state = 'active' AND query LIKE 'DROP INDEX CONCURRENTLY%';",
+        );
+        let reader: Awaited<ReturnType<typeof psqlSession>> | undefined;
         const hand = dedicated();
         try {
-          await reader.client.query('SELECT 1 FROM guilds LIMIT 1');
+          reader = await psqlSession('READ COMMITTED');
+          const open = reader;
+          await open.client.query('SELECT 1 FROM guilds LIMIT 1');
           await hand.connect();
-          const handPid = (hand as unknown as { processID: number }).processID;
           const dropped = hand.query(drop.replace('<name>', migration.name)).then(
             () => 'dropped',
             (error: { code?: string }) => error.code,
           );
-          expect(await until(() => waitEventOf(handPid), 'virtualxid')).toBe('virtualxid');
+          const handPid = (hand as unknown as { processID: number }).processID;
+          const looked = async () =>
+            (await pool.query(lookup)).rows.map((r: { pid: number }) => r.pid);
+          expect(await until(looked, [handPid])).toEqual([handPid]);
+          const [dropPid] = await looked();
+          expect(await until(() => waitEventOf(dropPid), 'virtualxid')).toBe('virtualxid');
           expect(await gate()).toBe(0);
-          expect(await sessionsOf(handPid)).toEqual([
-            { pid: reader.pid, application_name: 'psql', state: 'idle in transaction' },
+          expect(await sessionsOf(dropPid)).toEqual([
+            { pid: open.pid, application_name: 'psql', state: 'idle in transaction' },
           ]);
-          await pool.query(terminate.replace('<pid>', String(reader.pid)));
+          await pool.query(terminate.replace('<pid>', String(open.pid)));
           expect(await dropped).toBe('dropped');
         } finally {
-          await reader.client.end().catch(() => {});
+          await reader?.client.end().catch(() => {});
           await hand.end().catch(() => {});
         }
         expect(await valid()).toEqual([]);

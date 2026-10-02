@@ -2228,14 +2228,17 @@ describe('the claim renewer', () => {
       ];
     });
     expect(sites.filter((s) => s.kind === 'command').map((s) => s.site)).toEqual([
+      'docker compose up -d --no-deps mediawiki',
       'docker compose up -d',
+      'docker compose --profile discord up -d --no-deps discord-bot',
       'docker compose up -d --no-deps game',
       'docker compose --profile discord up -d --no-deps discord-bot',
       'docker compose up -d --no-deps game',
       'docker compose up -d --no-deps game',
       'docker compose up -d --no-deps game',
       'docker compose up -d --no-deps game',
-      'docker compose --profile discord up -d',
+      'docker compose up -d --no-deps game',
+      'docker compose --profile discord up -d --no-deps discord-bot',
       'docker compose --profile discord up -d --no-deps discord-bot',
       'docker compose up -d --no-deps game',
       'docker compose --profile discord restart discord-bot',
@@ -2245,27 +2248,36 @@ describe('the claim renewer', () => {
       'needs a restart',
       'restart the process',
     ]);
-    // The bot's dependency, which is why only those two bot forms are exempt.
+    // The compose file, one service's block at a time: its lines sit below the
+    // service key, up to the next service or top-level key.
     const compose = readFileSync('docker-compose.yml', 'utf8');
-    const botAt = compose.indexOf('\n  discord-bot:\n');
-    expect(botAt).toBeGreaterThan(-1);
-    // Read inside the bot's own block: its lines are indented past the service key.
-    const inBotBlock = /^ {2}discord-bot:\n(?: {4}.*\n|\n)*? {4}depends_on:\n {6}game:\n/;
-    expect('  discord-bot:\n    image: x\n    depends_on:\n      game:\n').toMatch(inBotBlock);
-    expect('  discord-bot:\n    image: x\n  other:\n    depends_on:\n      game:\n').not.toMatch(
-      inBotBlock,
-    );
-    expect(compose.slice(botAt + 1)).toMatch(inBotBlock);
-    const botOnly = /^docker compose --profile discord (?:up -d --no-deps|restart) discord-bot$/;
-    expect(botOnly.test('docker compose --profile discord up -d discord-bot')).toBe(false);
-    expect(botOnly.test('docker compose --profile discord up -d --no-deps discord-bot')).toBe(true);
+    const serviceBlock = (name: string): string => {
+      const at = compose.indexOf(`\n  ${name}:\n`);
+      expect(at, name).toBeGreaterThan(-1);
+      const rest = compose.slice(at + 1);
+      const end = rest.slice(1).search(/\n {2}[\w-]+:\s*\n|\n\S/);
+      return end === -1 ? rest : rest.slice(0, end + 2);
+    };
+    expect(serviceBlock('discord-bot')).not.toContain('\n  mediawiki-db:\n');
+    // A `--no-deps` start of a service but the game's, and the bot's restart,
+    // start no realm: the bot depends on the game, so only its `--no-deps` up
+    // keeps the game out, and the wiki depends on its own database alone.
+    expect(serviceBlock('discord-bot')).toMatch(/\n {4}depends_on:\n {6}game:\n/);
+    const wikiDeps = /\n {4}depends_on:\n((?: {6}.*\n)+)/.exec(serviceBlock('mediawiki'));
+    expect(wikiDeps?.[1].match(/^ {6}([\w-]+):/gm)).toEqual(['      mediawiki-db:']);
+    const noRealm =
+      /^docker compose (?:--profile [\w-]+ )?up -d --no-deps (?!game$)[\w-]+$|^docker compose --profile discord restart discord-bot$/;
+    expect(noRealm.test('docker compose up -d --no-deps game')).toBe(false);
+    expect(noRealm.test('docker compose --profile discord up -d discord-bot')).toBe(false);
+    expect(noRealm.test('docker compose --profile discord up -d --no-deps discord-bot')).toBe(true);
+    expect(noRealm.test('docker compose up -d --no-deps mediawiki')).toBe(true);
     // The gate's own bullet states the recreate once; every other site points to it.
     const ownGate = (flat: string) => flat.trimStart().startsWith('- Index builds: ');
     expect(sites.filter(({ flat }) => ownGate(flat)).map(({ site }) => site)).toEqual([
       'docker compose up -d --no-deps game',
     ]);
     for (const { site, flat } of sites) {
-      if (botOnly.test(site) || ownGate(flat)) continue;
+      if (noRealm.test(site) || ownGate(flat)) continue;
       expect(flat, site).toContain('Index builds under EVERY BOOT LOCKS THE PARENTS');
     }
     // Release step 6 builds every service with a build section, and those are
@@ -2280,10 +2292,43 @@ describe('the claim renewer', () => {
       else if (/^\S/.test(line)) service = '';
     }
     expect(builtServices).toEqual(['game', 'mediawiki']);
-    // A `healthy` realm has committed its boot: the game's health probe asks
-    // /livez, which answers only once the realm listens, after its boot.
+    // The bot runs the game's image, so its recreate starts what the game's tag names.
+    const imageOf = (name: string) => /\n {4}image: (\S+)\n/.exec(serviceBlock(name))?.[1];
+    expect(imageOf('game')).toMatch(/^eastbrook-game:\$\{EASTBROOK_IMAGE_TAG:-local\}$/);
+    expect(imageOf('discord-bot')).toBe(imageOf('game'));
+    // The Discord keys the bot and the game both read are exactly the four
+    // DEPLOY names, each service's own keys read from its environment block.
+    const envOf = (name: string): string[] => {
+      const keys: string[] = [];
+      let inEnv = false;
+      for (const line of serviceBlock(name).split('\n')) {
+        if (/^ {4}[^\s#]/.test(line)) inEnv = /^ {4}environment:\s*$/.test(line);
+        else if (inEnv) {
+          const env = /^ {6}([A-Z][A-Z0-9_]*):/.exec(line);
+          if (env) keys.push(env[1]);
+        }
+      }
+      return keys;
+    };
+    expect(envOf('game')).toContain('DISCORD_CLIENT_SECRET');
+    expect(envOf('discord-bot')).not.toContain('DISCORD_CLIENT_SECRET');
+    expect(envOf('discord-bot')).toContain('PUBLIC_GAME_URL');
+    expect(envOf('game')).not.toContain('PUBLIC_GAME_URL');
+    const gameKeys = new Set(envOf('game'));
+    expect(envOf('discord-bot').filter((key) => gameKeys.has(key))).toEqual([
+      'DISCORD_BOT_TOKEN',
+      'DISCORD_CLIENT_ID',
+      'DISCORD_GUILD_ID',
+      'DISCORD_BOT_SECRET',
+    ]);
+    expect(deploy.replace(/\s+/g, ' ')).toContain(
+      '`DISCORD_BOT_TOKEN`, `DISCORD_CLIENT_ID`, `DISCORD_GUILD_ID` and `DISCORD_BOT_SECRET` reach the game container too',
+    );
+    // A `healthy` realm has committed its boot: the game's own health probe
+    // asks /livez, which answers only once the realm listens, after its boot.
     expect(bullet).toContain('a `healthy` realm has committed its boot');
-    expect(compose).toContain("require('http').get('http://127.0.0.1:8787/livez'");
+    const gameHealth = /\n {4}healthcheck:\n {6}test: (.*)\n/.exec(serviceBlock('game'))?.[1];
+    expect(gameHealth).toContain("require('http').get('http://127.0.0.1:8787/livez'");
     const seconds = (file: string, name: string): number => {
       const found = source(file).match(new RegExp(`export const ${name} = ([0-9_]+);`));
       expect(found, name).not.toBeNull();

@@ -1409,3 +1409,6 @@ What changed the contract above:
   sessions one at a time and ends an operator's open `psql` one only on two readings, recreates
   the game with `up -d --no-deps game`, and has the game recreated before the bot when a key both
   read changes.
+- A twenty-ninth round of eight fresh readers: no P12 change; `DEPLOY.md` commits the sign-out
+  before any realm starts, finds a hand drop's pid by its own lookup, starts the bot only after
+  the game it shares keys and an image with, and runs a rebuilt wiki on its new image.

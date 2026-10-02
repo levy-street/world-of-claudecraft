@@ -152,13 +152,17 @@ sudo docker compose stop game
 #    outage: the images are then ready the moment the countdown ends). It builds every
 #    service with a build section, the wiki's among them, so `up -d` below runs each on
 #    its new image; if a build other than the game's fails, run
-#    `sudo docker compose build game`, start by the gate below, and build the rest
-#    afterwards.
+#    `sudo docker compose build game`, start by the gate below, and once the failed
+#    build succeeds, run that service on its new image (for the wiki, which starts no
+#    realm: `sudo docker compose up -d --no-deps mediawiki`).
 sudo docker compose build
 #    Then start only by the gate in Index builds under EVERY BOOT LOCKS THE PARENTS,
 #    its readings taken just before: an index build the stopped process began runs on
 #    and holds the schema advisory lock until it ends.
 sudo docker compose up -d
+#    A host running the Discord bot then runs it on the new image too (it runs the
+#    game's image, and a plain `up -d` leaves it on the old one):
+sudo docker compose --profile discord up -d --no-deps discord-bot
 ```
 
 Then verify, before you walk away:
@@ -1211,19 +1215,21 @@ For off-box safety, sync the directory to S3 occasionally:
     every live session and the in-memory desktop login codes in
     `server/desktop_login.ts` (the sign-out cannot reach them, and a desktop app could
     still trade one for a fresh token); sign every account out once from psql on the
-    realm database (`DELETE FROM auth_tokens WHERE created_at < now() AND expires_at >
-    now(); DELETE FROM oauth_codes; DELETE FROM oauth_device_codes; DELETE FROM
-    discord_oauth_states; DELETE FROM github_oauth_states;`, companion and OAuth tokens
-    included, no pending OAuth code left to mint one, and no Discord or GitHub link a
-    leftover token started left to finish; an expired token is refused already; on 40P01
-    run it again); and, once the dump has ended if the stall was behind one, start the
-    realms again by Index builds below. Re-run the deactivation housing receipt erase
-    for deactivated accounts that still hold receipts by the bullet below that begins "A
-    failed deactivation receipt erase" (a deactivation stopped at its revoke never
-    reached the erase, so it logged no warning). A sign-out undoes nothing a leftover
-    token did before it (for example a sign-in link it added, a recovery email it set,
-    or anything its live session did in game): this bullet does not recover an account
-    the stall left open to whoever held such a token, and that recovery is owed.
+    realm database, in psql's default autocommit with no BEGIN so that it has committed
+    before any realm starts (`DELETE FROM auth_tokens WHERE created_at < now() AND
+    expires_at > now(); DELETE FROM oauth_codes; DELETE FROM oauth_device_codes; DELETE
+    FROM discord_oauth_states; DELETE FROM github_oauth_states;`, companion and OAuth
+    tokens included, no pending OAuth code left to mint one, and no Discord or GitHub
+    link a leftover token started left to finish; an expired token is refused already;
+    on 40P01 run it again); and, once the dump has ended if the stall was behind one,
+    start the realms again by Index builds below. Re-run the deactivation housing
+    receipt erase for deactivated accounts that still hold receipts by the bullet below
+    that begins "A failed deactivation receipt erase" (a deactivation stopped at its
+    revoke never reached the erase, so it logged no warning). A sign-out undoes nothing
+    a leftover token did before it (for example a sign-in link it added, a recovery
+    email it set, or anything its live session did in game): this bullet does not
+    recover an account the stall left open to whoever held such a token, and that
+    recovery is owed.
   - Index builds: after it listens, a realm's runner takes the schema advisory lock,
     then for each index of `server/concurrent_indexes.ts` in turn drops it if INVALID,
     builds it if missing, with CREATE INDEX CONCURRENTLY, and drops any index it
@@ -1244,34 +1250,38 @@ For off-box safety, sync the directory to S3 occasionally:
     FROM pg_index WHERE NOT indisvalid;` from psql on the realm database lists them, and
     `DROP INDEX CONCURRENTLY IF EXISTS <name>;` drops each, the gate read 0 again just
     before; start no realm until it returns (the gate does not see a drop run by hand;
-    if it does not return, the naming statement below with the drop's pid names the
-    session it waits for, and the same rule decides). A realm's own stop or crash does
-    not end a build already running (a backend running a statement does not read its
-    socket while `client_connection_check_interval` is off, the default), which runs on,
-    holding the lock, until it ends. A boot or another realm's runner that waits on that
-    lock while a build runs can deadlock with it, and then one of the two is aborted
-    (40P01): the build when it reaches its last wait, for old snapshots, more than
-    `deadlock_timeout` after the waiter began waiting (on a large table, usually), whose
-    index then stays INVALID and whose runner's later indexes and VALIDATE stay undone
-    until a later runner redoes them; else the waiter (a boot that loses exits and is
-    restarted; a runner that loses logs it and its realm keeps serving). So every start
-    of a realm an operator makes by this file, wherever it says to start, boot or
-    restart one, the first included, goes one at a time (a restart by the compose
-    restart policy or the watchdog cannot wait for this, and can meet the deadlock
-    above): start a realm only once the realm started before it, if any, is `healthy`
-    and `SELECT count(*) FROM pg_locks WHERE locktype = 'advisory' AND classid = 0 AND
-    objid = 1464812289 AND objsubid = 1 AND database = (SELECT oid FROM pg_database
-    WHERE datname = current_database());` from psql on the realm database returns 0 on
-    two readings a few seconds apart, the last just before the start (no runner or boot
-    holds or waits on the schema advisory lock, `SCHEMA_ADVISORY_LOCK_KEY`;
+    if it does not return, `SELECT pid FROM pg_stat_activity WHERE state = 'active' AND
+    query LIKE 'DROP INDEX CONCURRENTLY%';` from another psql session gives the drop's
+    pid, with which the naming statement below names the session it waits for, and the
+    same rule decides). A realm's own stop or crash does not end a build already running
+    (a backend running a statement does not read its socket while
+    `client_connection_check_interval` is off, the default), which runs on, holding the
+    lock, until it ends. A boot or another realm's runner that waits on that lock while
+    a build runs can deadlock with it, and then one of the two is aborted (40P01): the
+    build when it reaches its last wait, for old snapshots, more than `deadlock_timeout`
+    after the waiter began waiting (on a large table, usually), whose index then stays
+    INVALID and whose runner's later indexes and VALIDATE stay undone until a later
+    runner redoes them; else the waiter (a boot that loses exits and is restarted; a
+    runner that loses logs it and its realm keeps serving). So every start of a realm an
+    operator makes by this file, wherever it says to start, boot or restart one, the
+    first included, goes one at a time (a restart by the compose restart policy or the
+    watchdog cannot wait for this, and can meet the deadlock above): start a realm only
+    once the realm started before it, if any, is `healthy` and `SELECT count(*) FROM
+    pg_locks WHERE locktype = 'advisory' AND classid = 0 AND objid = 1464812289 AND
+    objsubid = 1 AND database = (SELECT oid FROM pg_database WHERE datname =
+    current_database());` from psql on the realm database returns 0 on two readings a
+    few seconds apart, the last just before the start (no runner or boot holds or waits
+    on the schema advisory lock, `SCHEMA_ADVISORY_LOCK_KEY`;
     `pg_stat_progress_create_index` reads 0 before a build starts, during a drop and
     between two builds). A start that recreates the game container after an `.env` edit
-    is `sudo docker compose up -d --no-deps game`, its readings just before it, since it
-    stops and starts the realm in one step (`--no-deps` keeps `up` from recreating the
-    database the game depends on, and `up` starts whatever image the tag names now, so
-    never while an image built for a coming release waits). A start after the first runs
-    beside the realms already serving, so outside the quiet window, though still outside
-    the nightly `pg_dump` (The nightly dump above), and its boot can be aborted and
+    outside a release (whose step 6 starts every service with `up -d`) is
+    `sudo docker compose up -d --no-deps game`, its readings just before it, since it
+    stops and starts the realm in one step (or `sudo docker compose stop game`, then the
+    readings, then that `up`) (`--no-deps` keeps `up` from recreating the database the
+    game depends on, and `up` starts whatever image the tag names now, so never while an
+    image built for a coming release waits). A start after the first runs beside the
+    realms already serving, so outside the quiet window, though still outside the
+    nightly `pg_dump` (The nightly dump above), and its boot can be aborted and
     restarted (Deadlocks above). If a reading stays above 0, `SELECT l.pid, l.granted,
     a.wait_event_type, a.wait_event, p.phase, pg_blocking_pids(l.pid) AS blocked_by,
     now() - a.query_start AS waited FROM pg_locks l JOIN pg_stat_activity a USING (pid)
@@ -1295,15 +1305,18 @@ For off-box safety, sync the directory to S3 occasionally:
     until its transaction ends). Otherwise it is working: wait. End one of those
     sessions, by the `pid` the naming statement returns for it, never the holder's, only
     if it reads `psql` and `idle in transaction` on two readings a few seconds apart,
-    its `idle_for` growing: an operator's session left open. If it is yours
+    its `idle_for` grown by the whole time between them (it ran no statement in
+    between): an operator's session left open. If it is yours
     (`SELECT pg_backend_pid();` in each psql session you have open names its pid),
-    COMMIT or ROLLBACK it instead, knowing what it holds; else end it with `SELECT
-    pg_terminate_backend(<pid>);`, which rolls its transaction back (a cancel does
-    nothing to an idle session), so whoever left it open runs again what it had not
-    committed, a sign-out above included. A build may instead be ended, which changes no
-    table rows: `SELECT pg_cancel_backend(<pid>);` ends it, one a stopped realm left
-    included, freeing the lock and leaving its index INVALID or none (above); wait for a
-    build rather than end it, unless the start cannot wait (a rollback) and the nightly
+    COMMIT or ROLLBACK it instead, knowing what it holds (COMMIT a sign-out above); else
+    end it with `SELECT pg_terminate_backend(<pid>);`, which rolls its transaction back
+    (a cancel does nothing to an idle session), so whoever left it open runs again what
+    it had not committed. A sign-out above that a terminate or a ROLLBACK undid runs
+    again from that bullet's stop of every realm, since the realm whose boot waited on
+    it starts serving first. A build may instead be ended, which changes no table rows:
+    `SELECT pg_cancel_backend(<pid>);` ends it, one a stopped realm left included,
+    freeing the lock and leaving its index INVALID or none (above); wait for a build
+    rather than end it, unless the start cannot wait (a rollback) and the nightly
     `pg_dump` is not running (a start during the dump queues its boot behind it whatever
     the gate reads). End nothing else: not the nightly dump, and no realm's session but
     a build ended so or a boot The nightly dump above ends (its statement ends any other
@@ -1603,11 +1616,10 @@ For off-box safety, sync the directory to S3 occasionally:
   the old `.env` value) by Index builds under EVERY BOOT LOCKS THE PARENTS.
   The flag gives newly created accounts nine level-20 characters, one per
   class, with complete Warfare gear and four maximum-size bags. It does not
-  backfill existing accounts. (Rift portal density no longer needs a flag:
-  every realm keeps one portal per eligible zone on an hourly rotation, so the
-  former `COMMUNITY_TEST_RIFTS` toggle is gone.) The flag is off by default
-  and does not enable dev commands, so keep `ALLOW_DEV_COMMANDS=0` on a public
-  realm.
+  backfill existing accounts. (Rift portal density needs no flag: every realm
+  keeps one portal per eligible zone on an hourly rotation.) The flag is off
+  by default and does not enable dev commands, so keep `ALLOW_DEV_COMMANDS=0`
+  on a public realm.
 
   For the initial community test, leave `RIFT_UPGRADER_URL` and
   `RIFT_UPGRADER_MODEL` unset and keep `RIFT_RUNTIME_ASSETS=0` unless remote
@@ -1616,8 +1628,7 @@ For off-box safety, sync the directory to S3 occasionally:
   `PROVISION_TEST_ACCOUNTS=0` and recreate the game container with
   `sudo docker compose up -d --no-deps game` by Index builds under EVERY BOOT
   LOCKS THE PARENTS. Disabling stops future roster seeding; characters already
-  created remain, and persisted portals close through their normal clear or
-  expiry lifecycle.
+  created remain.
 - **Bot detector (implementation)**: the open-source tree ships with a no-op stub
   (`server/bot_detector/stub.ts`). Detection hooks are wired in, but they observe
   nothing and never act. To bundle the real behavioral detector, clone the private
@@ -2217,10 +2228,11 @@ affects the realm.
 it needs no separate build:
 
 ```bash
-# This also starts or recreates the game service when it is stopped or its config
-# changed: take the gate's readings in Index builds under EVERY BOOT LOCKS THE
-# PARENTS just before it.
-sudo docker compose --profile discord up -d
+# The bot's required keys reach the game too (Environment keys below), so after
+# setting them recreate the game first by Index builds under EVERY BOOT LOCKS THE
+# PARENTS, then start the bot alone:
+sudo docker compose up -d --no-deps game
+sudo docker compose --profile discord up -d --no-deps discord-bot
 ```
 
 Without `--profile discord` the service simply never starts, which is the supported
@@ -2234,13 +2246,16 @@ exception is `GAME_SERVER_URL`, which compose pins to the in-network address, so
 repointing it is a `docker-compose.yml` edit), so changing a tunable is an edit plus
 `sudo docker compose --profile discord up -d --no-deps discord-bot`, never an image
 rebuild (`--no-deps` keeps `up` from starting or recreating the game service the bot
-depends on). `DISCORD_BOT_TOKEN`, `DISCORD_CLIENT_ID`, `DISCORD_GUILD_ID` and
-`DISCORD_BOT_SECRET` reach the game container too, so after changing one, first
-recreate the game with `sudo docker compose up -d --no-deps game` by Index builds
-under EVERY BOOT LOCKS THE PARENTS, then the bot (a bot holding a `DISCORD_BOT_SECRET`
-the game does not has every call rejected). Every numeric key falls back to its
-built-in default on an empty or non-positive value, so an unset key is always safe and
-a blank line in `.env` never means zero.
+depends on). The bot runs the game's image, so its `up` starts whatever image the tag
+names now: not while an image built for a coming release waits. `DISCORD_BOT_TOKEN`,
+`DISCORD_CLIENT_ID`, `DISCORD_GUILD_ID` and `DISCORD_BOT_SECRET` reach the game
+container too, so after changing one, first recreate the game with
+`sudo docker compose up -d --no-deps game` by Index builds under EVERY BOOT LOCKS THE
+PARENTS, then the bot at once (while only one of them runs with a new
+`DISCORD_BOT_SECRET`, every call the bot makes is rejected; the game goes first
+because its start waits on the gate and the bot's does not). Every numeric key falls
+back to its built-in default on an empty or non-positive value, so an unset key is
+always safe and a blank line in `.env` never means zero.
 
 **Required** (the bot throws at boot without them):
 
