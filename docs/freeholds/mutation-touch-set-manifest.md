@@ -1354,5 +1354,8 @@ What changed the contract above:
   gains a HOLDER read that never shows a query, a client address or its own session.
 - A fourteenth round of eight fresh readers: P12's bench figures say which boots waited out
   `deadlock_timeout`, and the runbook's HOLDER read runs at any point, in this database only.
-- A fifteenth round of eight fresh readers: P12 names the account create the bench's
-  deadlocked boots aborted and places it on the order path.
+- A fifteenth round of eight fresh readers: P12 names the transaction the bench's deadlocked
+  boots aborted and places the account create on the order path (only while community test
+  accounts are on, corrected in round sixteen).
+- A sixteenth round of eight fresh readers: P12 says an account create takes the order path
+  only while community test accounts are on, and a character create always does.

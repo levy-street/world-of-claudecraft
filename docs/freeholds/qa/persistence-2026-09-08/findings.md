@@ -5657,11 +5657,19 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   by line, so no pattern can hang (its comment strip still could, corrected in round fifteen).
   Fixed in `6a7e3cd49d` through `fe0f331dfd`.
 - ROUND FIFTEEN, eight fresh readers over round fourteen: 45 findings, none blocking, eight
-  should-fix. The bench's deadlocked boots had aborted an account create, which the docs now
-  name and place on the order path; every stuck client's bound is named and read from the
-  code; the shutdown closure's SIGTERM registration and the compose stop signal are pinned;
-  the dump wait has a measure; and the grace parse's comment strip, which could still
-  backtrack, is a plain search. Fixed in `6c91150321` through `9224b3c02e`.
+  should-fix. The bench's deadlocked boots had aborted an account-then-character transaction,
+  which the docs now name, with the account create on the order path (only while community
+  test accounts are on, corrected in round sixteen); every stuck client's bound is named and
+  read from the code; the shutdown closure's SIGTERM registration and the compose stop signal
+  are pinned; the dump wait has a measure (taken from yesterday's backup since round sixteen);
+  and the grace parse's comment strip, which could still backtrack, is a plain search. Fixed
+  in `6c91150321` through `9224b3c02e`.
+- ROUND SIXTEEN, eight fresh readers over round fifteen: 48 findings, none blocking, 16
+  should-fix. The dump measure read tonight's file, the one the running dump writes; it now
+  reads yesterday's with a fixed stop. Round fifteen had read the account create without its
+  community test branch, and the docs now say when it takes the order path. The signal
+  registrations and the image's stop signal are pinned whole, and each stuck client fails at
+  its own bound. Fixed in `8661efb1c3` through `b1d103a36c`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5682,7 +5690,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - `npx tsc --noEmit` exit 0 at every round's tip.
 - Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then 641,
   then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
-  then 644, then 644, then 644 passed, never a skip.
+  then 644, then 644, then 644, then 644 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
@@ -5712,6 +5720,8 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   housing's change-no-rows rule; it belongs to the storage path.
 - The boot's fatal log prints a pg error whole, its DETAIL included; logging only its code,
   message, table and constraint belongs to the boot path.
+- The backup script writes its dumps with the default umask, so any local account on the host
+  can read them; a `umask 077` and a private directory belong to the deploy path (S16R4).
 - A ruling on a rename-only block that frees the advance token CHECK's name for the column's
   repair boot, so a missing column with its name held need not keep the realms down until the
   report is answered (C13R3).
