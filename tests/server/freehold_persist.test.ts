@@ -218,6 +218,10 @@ interface HarnessOptions {
    *  advances the clock inside the codec bracket. It must only move the clock:
    *  the answer comes from the live map like every other liveness read. */
   onSerialize?: () => void;
+  /** 07a: whether this process still holds a plot's global claim (the realm
+   *  binds the claim registry). Left out, the port is unbound, as on a host
+   *  with no claims, and every replay proceeds. */
+  claimHeld?: (plotId: string) => boolean;
 }
 
 interface DeadlineJob {
@@ -412,6 +416,15 @@ function harness(options: HarnessOptions = {}) {
       minted += 1;
       return `plot:minted${minted}`;
     },
+    ...(options.claimHeld
+      ? {
+          claimHeld: (plotId: string) => {
+            calls.push('claimHeld');
+            // biome-ignore lint/style/noNonNullAssertion: guarded by the spread.
+            return options.claimHeld!(plotId);
+          },
+        }
+      : {}),
     async acquirePermit(signal: AbortSignal): Promise<{ release(): void } | null> {
       calls.push('permit');
       permitSignals.push(signal);
@@ -1414,6 +1427,61 @@ describe('preload admission', () => {
     expect(h.calls.filter((call) => call === 'readRow')).toHaveLength(1);
     expect(again.state).toEqual(first.state);
     expect(again.durableRev).toBe('7');
+  });
+
+  it('re-reads instead of replaying a plot whose claim this process no longer holds', async () => {
+    // A handshake slower than the login grace, a renew pass between its ask and
+    // its join: the renewer released the claim, so a replay would install a
+    // house every write then answers `fenced` for. The claimed read decides
+    // again (and re-claims, or answers claim_busy if another realm took it).
+    let held = true;
+    const h = harness({ rowLoad: { kind: 'row', row: rowFixture() }, claimHeld: () => held });
+    await h.store.preload(ACCOUNT_ID);
+    // Control: the claim still held, the retry replays with no second read.
+    await h.store.preload(ACCOUNT_ID);
+    expect(h.calls.filter((call) => call === 'readRow')).toHaveLength(1);
+    expect(h.calls.filter((call) => call === 'claimHeld')).toHaveLength(1);
+    held = false;
+    const again = await h.store.preload(ACCOUNT_ID);
+    expect(h.calls.filter((call) => call === 'readRow')).toHaveLength(2);
+    expect(again.durableRev).toBe('7');
+  });
+
+  it('replays a plot with NO durable row without asking the claim, which only a row has', async () => {
+    const h = harness({ rowLoad: { kind: 'absent' }, claimHeld: () => false });
+    const first = await h.store.preload(ACCOUNT_ID);
+    const again = await h.store.preload(ACCOUNT_ID);
+    expect(again.plotId).toBe(first.plotId);
+    expect(h.calls.filter((call) => call === 'readRow')).toHaveLength(1);
+    expect(h.calls).not.toContain('claimHeld');
+  });
+
+  it('replays the newest durable Hearth clock a trip proved, forward only by revision', async () => {
+    const h = harness({
+      rowLoad: { kind: 'row', row: rowFixture() },
+      hearthLoad: { kind: 'state', state: { readyAtMs: '1700000000000', revision: '4' } },
+    });
+    await h.store.preload(ACCOUNT_ID);
+    // A trip committed an advance at revision 5 after the login read.
+    h.store.adoptHearthReading(OWNER_KEY, 1_700_003_600_000, '5');
+    const rejoin = await h.store.preload(ACCOUNT_ID);
+    expect(rejoin.hearthReadyAtMs).toBe(1_700_003_600_000);
+    expect(rejoin.hearthRevision).toBe('5');
+    // An older or equal revision never replaces it, and a malformed reading
+    // changes nothing.
+    h.store.adoptHearthReading(OWNER_KEY, 1_800_000_000_000, '5');
+    h.store.adoptHearthReading(OWNER_KEY, 1_800_000_000_000, '4');
+    h.store.adoptHearthReading(OWNER_KEY, 1_800_000_000_000, 'x');
+    h.store.adoptHearthReading(OWNER_KEY, Number.NaN, '9');
+    h.store.adoptHearthReading(OWNER_KEY, 0, '9');
+    const still = await h.store.preload(ACCOUNT_ID);
+    expect(still.hearthReadyAtMs).toBe(1_700_003_600_000);
+    expect(still.hearthRevision).toBe('5');
+    // No entry: a no-op, never a fresh entry.
+    h.store.adoptHearthReading('account:1', 5, '9');
+    expect(h.store.authority('account:1')).toBeNull();
+    // Still exactly one read of the clock: adoption issues none.
+    expect(h.calls.filter((call) => call === 'readHearth')).toHaveLength(1);
   });
 
   it('replays a fresh account without minting it a second identity', async () => {
@@ -9101,7 +9169,10 @@ describe("the store's claim seam the 07a renewer, trip and mutation read", () =>
     h.store.save(OTHER_OWNER_KEY);
     await tick(30);
     expect(log).toEqual([`write:${OTHER_ACCOUNT_ID}`]);
-    // A second job queued behind the first is cancelled before it starts.
+    // A second job queued behind the first is cancelled before it starts,
+    // while this owner holds an edit nothing has written yet.
+    h.edit(OWNER_KEY);
+    h.store.markDirty(OWNER_KEY);
     const controller = new AbortController();
     let cancelledRan = false;
     const cancelled = h.store.runExclusive(OWNER_KEY, controller.signal, async () => {
@@ -9113,6 +9184,13 @@ describe("the store's claim seam the 07a renewer, trip and mutation read", () =>
     await held;
     await tick(30);
     expect(cancelledRan).toBe(false);
+    // THE CANCELLATION CLEARED NO DIRTY WORK: the owner's edit is still owed
+    // and its next save writes it.
+    expect(h.store.stats().dirty).toBeGreaterThanOrEqual(1);
+    log.length = 0;
+    h.store.save(OWNER_KEY);
+    await tick(30);
+    expect(log).toEqual([`write:${ACCOUNT_ID}`]);
   });
 
   it('adoptCommittedRevision: the next write CASes on the adopted revision', async () => {

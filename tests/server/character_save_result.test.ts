@@ -54,6 +54,16 @@ describe('characterSaveLanded: whose zero rows mean "persist nothing"', () => {
     expect(characterSaveLanded(undefined, NO_EFFECTS, LEDGER, 0)).toBe(false);
     expect(characterSaveLanded(undefined, NO_EFFECTS, LEDGER, 1)).toBe(true);
   });
+
+  it('judges a save carrying a housing hook on its row count even with no fence or effects', () => {
+    // An unfenced, effect-free save that matched no row must not commit a
+    // housing half with no character half beside it.
+    expect(characterSaveLanded(undefined, NO_EFFECTS, undefined, 0, true)).toBe(false);
+    expect(characterSaveLanded(undefined, NO_EFFECTS, undefined, null, true)).toBe(false);
+    expect(characterSaveLanded(undefined, NO_EFFECTS, undefined, 1, true)).toBe(true);
+    // Control: the same zero-row save without the hook is the unconditional write.
+    expect(characterSaveLanded(undefined, NO_EFFECTS, undefined, 0, false)).toBe(true);
+  });
 });
 
 describe('characterSaveFailure: the error a failed save throws', () => {

@@ -18,7 +18,6 @@ import {
 import { FREEHOLD_INN_ROOM_DUNGEON_ID } from '../../src/sim/content/freehold';
 import { HEROIC_BOSS_LOOT } from '../../src/sim/content/heroic_loot';
 import { DUNGEONS, ITEMS, MOBS } from '../../src/sim/data';
-import { HEARTH_KEY_COOLDOWN_MS } from '../../src/sim/freehold/gate_rules';
 import { countRawInSlots, countUnlockedInSlots } from '../../src/sim/item_lock';
 import { RIFT_IMPAIRED_FUSE_CAP } from '../../src/sim/mob/rift_escape_window';
 import {
@@ -1456,7 +1455,9 @@ export function coverageCasesD(it: CoverageIt): void {
     expect(typeof rec.notes.slotInside).toBe('number');
     expect(rec.notes.keysAfterUse).toBe(1);
     // The clock the use wrote: the sim-time lockout clock plus one hour exactly.
-    expect(rec.notes.clockAfterUse).toBe((rec.notes.useNowMs as number) + HEARTH_KEY_COOLDOWN_MS);
+    // The literal hour, never the production constant: the golden cannot see
+    // the clock (notes are not serialized), so this is its only size pin.
+    expect(rec.notes.clockAfterUse).toBe((rec.notes.useNowMs as number) + 3_600_000);
     // One entry and one leave through the real door lines.
     const logs = rec.allEvents.filter((ev) => ev.type === 'log');
     expect(logs.filter((ev) => ev.text === inn.enterText)).toHaveLength(1);

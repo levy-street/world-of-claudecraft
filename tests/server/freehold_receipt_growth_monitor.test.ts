@@ -521,6 +521,36 @@ describe('freehold receipt growth monitor: lifecycle and admission', () => {
     expect(release).toHaveBeenCalledTimes(1);
   });
 
+  it('a clock port that throws is a reported failure whose permit still returns', async () => {
+    const release = vi.fn();
+    const onError = vi.fn();
+    const read = vi.fn(async () => pass(presentRow(1, '1')));
+    let broken = true;
+    const monitor = createFreeholdReceiptGrowthMonitor({
+      ...PORTS,
+      nowMs: () => {
+        if (broken) throw new Error('the clock port threw');
+        return 7_000;
+      },
+      pool: availablePool(),
+      tryAcquireBackgroundPermit: () => ({ release }),
+      read,
+      onError,
+    });
+    await monitor.refresh();
+    expect(onError).toHaveBeenCalledTimes(1);
+    expect(read).not.toHaveBeenCalled();
+    expect(release).toHaveBeenCalledTimes(1);
+    // The abort handle cleared with it: the next pass on a sane clock runs and
+    // lands, and stop() has nothing left to drain.
+    broken = false;
+    await monitor.refresh();
+    expect(read).toHaveBeenCalledTimes(1);
+    expect(freeholdReceiptGrowthReadout().observedAtMs).toBe(7_000);
+    expect(release).toHaveBeenCalledTimes(2);
+    await monitor.stop();
+  });
+
   it('a missing table is a healthy pass, not a monitor failure', async () => {
     const release = vi.fn();
     const onError = vi.fn();

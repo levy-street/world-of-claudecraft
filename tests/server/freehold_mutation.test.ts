@@ -14,7 +14,12 @@
 // tests/server/freehold_claim.pg.test.ts, which cannot drive these arms
 // deterministically (a lost COMMIT answer, a renewer chunk that throws).
 //
-// Cost: 0.6 s
+// One case reads Node's own clamp on purpose (AbortSignal.timeout(2^31), the
+// premise of the renewer's deadline cap), so every run prints Node's
+// TimeoutOverflowWarning to stderr; it is that case's subject, not a fault to
+// chase.
+//
+// Cost: 0.8 s
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -50,6 +55,7 @@ import {
   FREEHOLD_CLAIM_RENEW_PASS_DEADLINE_MS,
   releaseAllFreeholdClaims,
   renewFreeholdClaims,
+  stopFreeholdClaimRenewer,
 } from '../../server/freehold_claim_registry';
 import {
   FREEHOLD_FENCED_CAS_SQL,
@@ -57,8 +63,13 @@ import {
   type FreeholdUpsert,
 } from '../../server/freehold_db';
 import { createFreeholdFencedWriter } from '../../server/freehold_fenced_write';
-import { createFreeholdHearthTrips } from '../../server/freehold_hearth_trip';
+import {
+  createFreeholdHearthTrips,
+  FREEHOLD_HEARTH_TRIP_MEMO_MS,
+  FREEHOLD_HEARTH_TRIP_WAIT_MS,
+} from '../../server/freehold_hearth_trip';
 import { createGameFreeholdHearthTrips } from '../../server/freehold_hearth_trip_host';
+import { FREEHOLD_PERSIST_LOAD_PERMIT_WAIT_MS } from '../../server/freehold_login_bounds';
 import {
   commitFreeholdMutation,
   createFreeholdSaveHook,
@@ -81,8 +92,10 @@ import {
   FreeholdCommitAmbiguous,
   type FreeholdTxPool,
   freeholdCommitMayHaveLanded,
+  freeholdLockTimeout,
   freeholdTxBeginSql,
   runFreeholdTransaction,
+  setFreeholdTxBackendCanceller,
 } from '../../server/freehold_tx';
 import { hearthKeyUseRefusal } from '../../server/freehold_wire';
 import { SOURCE_EXTENSIONS, sourceFilesUnder } from '../helpers/source_files_under';
@@ -162,6 +175,73 @@ describe('runFreeholdTransaction', () => {
       'COMMIT',
     ]);
     expect(f.counts()).toEqual({ connects: 1, releases: 1 });
+  });
+
+  it('hands a deadline-cut backend to the registered canceller, a per-call one first, none when unregistered', async () => {
+    // A client whose statement never answers until its socket is destroyed.
+    const hanging = (pid: number) => {
+      let fail: ((error: Error) => void) | null = null;
+      const client = {
+        processID: pid,
+        async query(text: string) {
+          if (text.startsWith('BEGIN') || text === 'ROLLBACK')
+            return { rows: [], rowCount: 0, command: 'BEGIN' };
+          return new Promise((_resolve, reject) => {
+            fail = reject;
+          });
+        },
+        release(error?: Error) {
+          if (error) fail?.(error);
+        },
+        on: () => client,
+        removeListener: () => client,
+      };
+      return {
+        async connect() {
+          return client;
+        },
+      } as unknown as FreeholdTxPool;
+    };
+    const tight = { ...BOUNDS, wallMs: 25 };
+    const registered = vi.fn(async (_pid: number) => {});
+    const perCall = vi.fn(async (_pid: number) => {});
+    try {
+      setFreeholdTxBackendCanceller(registered);
+      await expect(
+        runFreeholdTransaction(hanging(4242), tight, (tx) => tx.query('SELECT 1')),
+      ).rejects.toBeInstanceOf(DbTransactionDeadlineExceeded);
+      expect(registered.mock.calls).toEqual([[4242]]);
+      // A per-call canceller wins over the registered one.
+      await expect(
+        runFreeholdTransaction(hanging(4343), tight, (tx) => tx.query('SELECT 1'), {
+          cancelBackend: perCall,
+        }),
+      ).rejects.toBeInstanceOf(DbTransactionDeadlineExceeded);
+      expect(perCall.mock.calls).toEqual([[4343]]);
+      expect(registered.mock.calls).toEqual([[4242]]);
+      // Unregistered (a test host): the cut backend is left to its own
+      // statement_timeout and nothing is called.
+      setFreeholdTxBackendCanceller(undefined);
+      await expect(
+        runFreeholdTransaction(hanging(4444), tight, (tx) => tx.query('SELECT 1')),
+      ).rejects.toBeInstanceOf(DbTransactionDeadlineExceeded);
+      expect(registered.mock.calls).toEqual([[4242]]);
+      expect(perCall.mock.calls).toEqual([[4343]]);
+    } finally {
+      setFreeholdTxBackendCanceller(undefined);
+    }
+    // And the realm registers the process-wide canceller once, at boot.
+    const main = stripComments(readFileSync('server/main.ts', 'utf8'));
+    expect(main.split('setFreeholdTxBackendCanceller(').length - 1).toBe(1);
+    expect(main).toContain('setFreeholdTxBackendCanceller(cancelDetachedBackend);');
+  });
+
+  it('classifies a lock or statement bound running out, and nothing else, as a lock timeout', () => {
+    expect(freeholdLockTimeout(sqlError('55P03'))).toBe(true);
+    expect(freeholdLockTimeout(sqlError('57014'))).toBe(true);
+    for (const other of [sqlError('40P01'), sqlError('23505'), new Error('plain'), null, 'x']) {
+      expect(freeholdLockTimeout(other), String(other)).toBe(false);
+    }
   });
 
   it('refuses a missing bound before it checks out a client', () => {
@@ -604,12 +684,185 @@ describe('the housing hook', () => {
   ] as const) {
     it(`refuses on ${name} by THROWING, so the save rolls every half back`, async () => {
       const { hook } = createFreeholdSaveHook(REQUEST);
-      const { tx } = recordingTx((t, v) => broken(t) ?? happy(t));
+      const { tx, seen } = recordingTx((t, v) => broken(t) ?? happy(t));
       const err = await hook.run(tx).catch((e: unknown) => e);
       expect(err).toBeInstanceOf(FreeholdMutationRefused);
       expect((err as FreeholdMutationRefused).refusal.kind).toBe(kind);
+      // The throw is AT the refusing participant: no later participant ran, so
+      // the refusal never rides behind effects the rollback must undo.
+      const later: Record<typeof kind, readonly string[]> = {
+        claim: ['G4 read', 'G5b', 'G6', 'G7', 'G8'],
+        operation: ['G7', 'G8'],
+        plot: ['G8'],
+        hearth: [],
+      };
+      const kinds = seen.map((s) => kindOf(s.text));
+      for (const after of later[kind]) expect(kinds, `${name}: ${after}`).not.toContain(after);
+      // Control: the happy request reaches every one of those participants.
+      const happyRun = recordingTx(happy);
+      await createFreeholdSaveHook(REQUEST).hook.run(happyRun.tx);
+      const reached = happyRun.seen.map((s) => kindOf(s.text));
+      for (const after of later[kind]) expect(reached, `control: ${after}`).toContain(after);
     });
   }
+
+  it('sorts the operations at G5b and G6 and the plot rows at G7 by id, across several of each', async () => {
+    // Handed DESCENDING, so an unsorted participant fails the order below.
+    const plotOf: Record<string, string> = { 'fop:b': 'plot:d', 'fop:a': 'plot:c' };
+    const request: FreeholdMutationRequest = {
+      accountIds: [7],
+      claimProofs: [],
+      // Each plot's layout names it: the CAS keys on (account, plot index), so
+      // the layout value is how the G7 statements say which plot each one is.
+      plots: ['plot:d', 'plot:c'].map((plotId) => ({
+        upsert: { ...UPSERT(plotId), layoutJson: JSON.stringify([plotId]) },
+        fence: { plotId, holder: HOLDER, generation: '2' },
+      })),
+      operations: ['fop:b', 'fop:a'].map((operationId) => ({
+        operationId,
+        accountId: 7,
+        fingerprint: 'f'.repeat(64),
+        plotId: plotOf[operationId],
+        fenceGeneration: '2',
+        expectedDurableRev: '4',
+      })),
+      hearth: null,
+    };
+    const { hook } = createFreeholdSaveHook(request);
+    const { tx, seen } = recordingTx((t, v) =>
+      t.includes('FROM freehold_operations WHERE operation_id = $1 FOR UPDATE')
+        ? [{ ...happy(t)[0], plot_id: plotOf[String(v?.[0])] }]
+        : happy(t),
+    );
+    await hook.run(tx);
+    const valuesOf = (kind: string) =>
+      seen.filter((s) => kindOf(s.text) === kind).map((s) => s.values?.[0]);
+    expect(valuesOf('G4 write')).toEqual(['plot:c', 'plot:d']);
+    // The advisory lock's second value is the operation id (hashtext($2)).
+    expect(seen.filter((s) => kindOf(s.text) === 'G5b').map((s) => s.values?.[1])).toEqual([
+      'fop:a',
+      'fop:b',
+    ]);
+    expect(
+      seen
+        .filter((s) =>
+          s.text.includes('FROM freehold_operations WHERE operation_id = $1 FOR UPDATE'),
+        )
+        .map((s) => s.values?.[0]),
+    ).toEqual(['fop:a', 'fop:b']);
+    // The CAS's fifth value is the layout, which names the plot.
+    expect(seen.filter((s) => kindOf(s.text) === 'G7').map((s) => s.values?.[4])).toEqual([
+      '["plot:c"]',
+      '["plot:d"]',
+    ]);
+  });
+
+  it('refuses an operation apply that does not write its own plot under the same fence and revision, before any SQL', () => {
+    const op = REQUEST.operations[0];
+    for (const [name, operations] of [
+      ['a plot the request does not write', [{ ...op, plotId: 'plot:z' }]],
+      ['another fence generation', [{ ...op, fenceGeneration: '3' }]],
+      ['another expected revision', [{ ...op, expectedDurableRev: '5' }]],
+      ['a plot-less apply carrying a fence', [{ ...op, plotId: null }]],
+      ['a plot-less apply carrying a revision', [{ ...op, plotId: null, fenceGeneration: null }]],
+    ] as const) {
+      expect(() => createFreeholdSaveHook({ ...REQUEST, operations }), name).toThrow(
+        /operation apply/,
+      );
+    }
+    // Controls: the request's own apply, and a plot-less apply with neither.
+    expect(() => createFreeholdSaveHook(REQUEST)).not.toThrow();
+    expect(() =>
+      createFreeholdSaveHook({
+        ...REQUEST,
+        operations: [{ ...op, plotId: null, fenceGeneration: null, expectedDurableRev: null }],
+      }),
+    ).not.toThrow();
+  });
+
+  it('refuses at G6 an intent prepared for ANOTHER plot than the apply names', async () => {
+    const { hook } = createFreeholdSaveHook(REQUEST);
+    const { tx, seen } = recordingTx((t) =>
+      t.includes('FROM freehold_operations WHERE operation_id = $1 FOR UPDATE')
+        ? [{ ...happy(t)[0], plot_id: 'plot:z' }]
+        : happy(t),
+    );
+    const err = await hook.run(tx).catch((e: unknown) => e);
+    expect((err as FreeholdMutationRefused).refusal).toEqual({
+      kind: 'operation',
+      operationId: 'fop:x',
+      reason: 'plot',
+    });
+    // No receipt was attempted for the wrong plot.
+    expect(seen.some((s) => s.text.startsWith('INSERT INTO freehold_operation_receipts'))).toBe(
+      false,
+    );
+  });
+
+  it('throws rather than commit a receipt whose revision is not the one its plot write answered', async () => {
+    const { hook } = createFreeholdSaveHook(REQUEST);
+    // The CAS answers 7 where expected + 1 is 5: a receipt naming 5 would name a
+    // revision nobody wrote.
+    const { tx } = recordingTx((t) =>
+      t.startsWith('UPDATE account_freeholds') ? [{ durable_rev: '7' }] : happy(t),
+    );
+    await expect(hook.run(tx)).rejects.toThrow(/receipt revision disagrees with its plot write/);
+    // Control: the CAS answering expected + 1 runs through.
+    await expect(createFreeholdSaveHook(REQUEST).hook.run(recordingTx(happy).tx)).resolves.toBe(
+      undefined,
+    );
+  });
+
+  it('refuses a claim proof that disagrees with the same plot write fence, and folds an agreeing one', async () => {
+    const fence = REQUEST.plots[0].fence;
+    for (const proof of [
+      { ...fence, generation: '3' },
+      { ...fence, holder: 'other#holder' },
+    ]) {
+      expect(() => createFreeholdSaveHook({ ...REQUEST, claimProofs: [proof] })).toThrow(
+        /claim proof and a write fence for one plot must agree/,
+      );
+    }
+    const agreeing = createFreeholdSaveHook({ ...REQUEST, claimProofs: [{ ...fence }] });
+    const { tx, seen } = recordingTx(happy);
+    await agreeing.hook.run(tx);
+    // Folded into the write fence: plot:a is fenced once, never read-proved too.
+    expect(
+      seen.filter((s) => s.values?.[0] === 'plot:a' && kindOf(s.text).startsWith('G4')),
+    ).toHaveLength(1);
+  });
+
+  it('refuses a request with no per-attempt evidence the verify could read, before any SQL', () => {
+    const proofOnly: FreeholdMutationRequest = {
+      ...REQUEST,
+      plots: [],
+      operations: [],
+      hearth: null,
+    };
+    expect(() => createFreeholdSaveHook(proofOnly)).toThrow(/Hearth advance or a plot write/);
+    // An operation alone is not evidence: any attempt that closed it leaves the
+    // same `applied` receipt.
+    expect(() =>
+      createFreeholdSaveHook({
+        ...proofOnly,
+        operations: [
+          {
+            ...REQUEST.operations[0],
+            plotId: null,
+            fenceGeneration: null,
+            expectedDurableRev: null,
+          },
+        ],
+      }),
+    ).toThrow(/Hearth advance or a plot write/);
+    // Controls: a Hearth advance alone, and a plot write alone, each build.
+    expect(() =>
+      createFreeholdSaveHook({ ...proofOnly, hearth: { accountId: 7, cooldownMs: 1 } }),
+    ).not.toThrow();
+    expect(() =>
+      createFreeholdSaveHook({ ...proofOnly, plots: REQUEST.plots, claimProofs: [] }),
+    ).not.toThrow();
+  });
 });
 
 describe('commitWithHousing', () => {
@@ -785,6 +1038,99 @@ describe('commitFreeholdMutation', () => {
       HEARTH_ONLY,
     );
     expect(out.kind).toBe('not_landed');
+  });
+
+  it('answers committed when the save throws AFTER a proved COMMIT, and still runs the live apply', async () => {
+    const applied: string[] = [];
+    // A legacy tail (a custody-ref confirm, a host hook) throwing after the
+    // tag-checked COMMIT: the durable halves stand.
+    const save: SaveScript = async (hook) => {
+      const job = async () => {
+        await housingPersist(hook, async () => {
+          await hook.run(recordingTx(happy).tx);
+          hook.commitSent();
+          hook.committed();
+          return true;
+        })();
+        throw new Error('a legacy tail threw after COMMIT');
+      };
+      return hook.wrap ? hook.wrap(job) : job();
+    };
+    const out = await commitFreeholdMutation(
+      { save, pool: fakePool().pool, characterId: 1 },
+      HEARTH_ONLY,
+      { onCommitted: (outcome) => applied.push(`${outcome.kind}:${outcome.verified}`) },
+    );
+    expect(out.kind).toBe('committed');
+    expect((out as Extract<FreeholdMutationOutcome, { kind: 'committed' }>).verified).toBe(false);
+    expect((out as Extract<FreeholdMutationOutcome, { kind: 'committed' }>).hearth?.revision).toBe(
+      '4',
+    );
+    expect(applied).toEqual(['committed:false']);
+    // Control: the same throw BEFORE the commit is a proved failure, no apply.
+    const before: SaveScript = async (hook) => {
+      const job = async () => {
+        await hook.run(recordingTx(happy).tx);
+        throw new Error('a legacy half threw before COMMIT');
+      };
+      return hook.wrap ? hook.wrap(job) : job();
+    };
+    const failed: string[] = [];
+    const proved = await commitFreeholdMutation(
+      { save: before, pool: fakePool().pool, characterId: 1 },
+      HEARTH_ONLY,
+      { onCommitted: (outcome) => failed.push(outcome.kind) },
+    );
+    expect(proved.kind).toBe('failed');
+    expect(failed).toEqual([]);
+  });
+
+  it('keeps a proved commit committed when its live apply throws, applying it once', async () => {
+    let calls = 0;
+    const out = await commitFreeholdMutation(
+      { save: saveThatRuns(), pool: fakePool().pool, characterId: 1 },
+      HEARTH_ONLY,
+      {
+        onCommitted: () => {
+          calls++;
+          throw new Error('the live apply threw');
+        },
+      },
+    );
+    expect(out.kind).toBe('committed');
+    // Once: a throwing apply is never retried by the throw path.
+    expect(calls).toBe(1);
+  });
+
+  it('refuses a plot-writing mutation that is not given the plot store FIFO', async () => {
+    const plotWrite: FreeholdMutationRequest = { ...REQUEST, claimProofs: [], hearth: null };
+    await expect(
+      commitFreeholdMutation(
+        { save: saveThatRuns(), pool: fakePool().pool, characterId: 1 },
+        plotWrite,
+      ),
+    ).rejects.toThrow(/inside the plot store FIFO/);
+    // Control: the same request inside a FIFO commits, and a Hearth-only
+    // request needs none.
+    const serialized: string[] = [];
+    const out = await commitFreeholdMutation(
+      { save: saveThatRuns(), pool: fakePool().pool, characterId: 1 },
+      plotWrite,
+      {
+        serialize: async (job) => {
+          serialized.push('in');
+          return job();
+        },
+      },
+    );
+    expect(out.kind).toBe('committed');
+    expect(serialized).toEqual(['in']);
+    await expect(
+      commitFreeholdMutation(
+        { save: saveThatRuns(), pool: fakePool().pool, characterId: 1 },
+        HEARTH_ONLY,
+      ),
+    ).resolves.toMatchObject({ kind: 'committed' });
   });
 
   it('answers unresolved when the verify itself cannot read', async () => {
@@ -1065,6 +1411,97 @@ describe('the claim renewer', () => {
     expect(registry.counters.missedHeartbeats).toBe(1);
     expect(registry.counters.lost).toBe(0);
     expect(registry.forPlot('plot:a')).toBeDefined();
+  });
+
+  it('counts a chunk whose lock or statement bound ran out as a lock timeout, apart from other throws', async () => {
+    const run = async (renewError: Error, releaseError: Error) => {
+      const registry = createFreeholdClaimRegistry();
+      registry.record(claim('plot:a', 1));
+      registry.record(claim('plot:z', 2));
+      const f = fakePool([
+        { match: (t) => t.includes('SET heartbeat_at'), answer: () => renewError },
+        { match: (t) => t.includes("holder || '#released'"), answer: () => releaseError },
+      ]);
+      await renewFreeholdClaims({
+        registry,
+        pool: f.pool,
+        holder: HOLDER,
+        ttlSeconds: 90,
+        // plot:a renews, plot:z releases: one chunk of each kind throws.
+        wanted: (held) => held.plotId === 'plot:a',
+        nowMs: () => 0,
+        warn: () => {},
+      });
+      return registry.counters;
+    };
+    const timedOut = await run(sqlError('57014'), sqlError('55P03'));
+    expect(timedOut.lockTimeouts).toBe(2);
+    // The renew chunk's claim is still a missed heartbeat, as before.
+    expect(timedOut.missedHeartbeats).toBe(1);
+    // Control: other throws are never a lock timeout.
+    const other = await run(sqlError('40P01'), sqlError('23505'));
+    expect(other.lockTimeouts).toBe(0);
+    expect(other.missedHeartbeats).toBe(1);
+  });
+
+  it('stops for shutdown: no pass starts again, a running one stops before its next chunk, and the stop waits it out', async () => {
+    // Nothing running: the stop resolves at once and every later trigger is a
+    // no-op that checks nothing out.
+    const idle = createFreeholdClaimRegistry();
+    idle.record(claim('plot:a', 1));
+    const idlePool = fakePool([renewAll]);
+    await stopFreeholdClaimRenewer(idle);
+    await renewFreeholdClaims(renewDeps(idle, idlePool.pool));
+    expect(idlePool.counts().connects).toBe(0);
+    expect(idle.counters.renewPasses).toBe(0);
+    // A pass mid-chunk: two chunks, the first checkout held open by hand.
+    const registry = createFreeholdClaimRegistry();
+    for (let i = 0; i < FREEHOLD_CLAIM_RENEW_CHUNK + 1; i++) registry.record(claim(pad(i), i + 1));
+    const f = fakePool([renewAll]);
+    let open = () => {};
+    const gate = new Promise<void>((resolve) => {
+      open = resolve;
+    });
+    let firstCheckout = true;
+    const pool = {
+      async connect() {
+        if (firstCheckout) {
+          firstCheckout = false;
+          await gate;
+        }
+        return f.pool.connect();
+      },
+    } as unknown as FreeholdTxPool;
+    const warnings: string[] = [];
+    const pass = renewFreeholdClaims({
+      ...renewDeps(registry, pool),
+      warn: (m) => warnings.push(m),
+    });
+    let stopped = false;
+    const stop = stopFreeholdClaimRenewer(registry).then(() => {
+      stopped = true;
+    });
+    for (let i = 0; i < 10; i++) await Promise.resolve();
+    // The stop waits for the running pass, which is parked on its checkout.
+    expect(stopped).toBe(false);
+    open();
+    await pass;
+    await stop;
+    expect(stopped).toBe(true);
+    // The chunk in flight finished; the next one never started.
+    const renews = f.statements.filter((st) => st.text.includes('SET heartbeat_at'));
+    expect(renews).toHaveLength(1);
+    expect(registry.counters.renewed).toBe(FREEHOLD_CLAIM_RENEW_CHUNK);
+    expect(registry.counters.missedHeartbeats).toBe(1);
+    expect(warnings).toContain(
+      'freehold claim renew pass stopped for shutdown; 1 chunks are left to the shutdown release',
+    );
+    // And the realm stops it right before the shutdown release, never after.
+    const main = stripComments(readFileSync('server/main.ts', 'utf8'));
+    const stopAt = main.indexOf('await stopFreeholdClaimRenewer(heldClaims());');
+    const releaseAt = main.indexOf('await releaseAllFreeholdClaims(');
+    expect(stopAt).toBeGreaterThan(0);
+    expect(releaseAt).toBeGreaterThan(stopAt);
   });
 
   it('chunks at the bound, one transaction per chunk', async () => {
@@ -4806,6 +5243,74 @@ describe('the fenced plot writer', () => {
     expect(proved.registry.pendingToken('plot:a')).toBeNull();
   });
 
+  it('drops only the claim the write was fenced UNDER: a newer one recorded meanwhile stays', async () => {
+    let registry!: ReturnType<typeof createFreeholdClaimRegistry>;
+    const raced = writerOn([
+      {
+        match: (t) => t.startsWith('WITH fence'),
+        answer: () => {
+          // A re-login recorded a newer generation while this write was out.
+          registry.record({ plotId: 'plot:a', accountId: 7, generation: '4', acquiredAtMs: 1 });
+          return [{ fenced: 0, durable_rev: null, stamped: 0 }];
+        },
+      },
+    ]);
+    registry = raced.registry;
+    registry.record({ plotId: 'plot:a', accountId: 7, generation: '3', acquiredAtMs: 0 });
+    expect(await raced.write(UPSERT('plot:a'))).toEqual({ kind: 'fenced' });
+    expect(registry.forPlot('plot:a')?.generation).toBe('4');
+    expect(registry.counters.fencedWrites).toBe(1);
+  });
+
+  it('counts a self-adoption only once its COMMIT is proved', async () => {
+    const registry = createFreeholdClaimRegistry();
+    const f = fakePool(
+      [
+        {
+          match: (t) => t.startsWith('SELECT write_token'),
+          answer: () => [{ write_token: 'a'.repeat(32) }],
+        },
+        { match: (t) => t.startsWith('SELECT durable_rev'), answer: () => [{ durable_rev: '9' }] },
+        {
+          match: (t) => t.startsWith('WITH fence'),
+          answer: () => [{ fenced: 1, durable_rev: '10', stamped: 1 }],
+        },
+      ],
+      // An earlier statement aborted the transaction: COMMIT answers ROLLBACK.
+      { commitTag: 'ROLLBACK' },
+    );
+    const write = createFreeholdFencedWriter({
+      pool: f.pool,
+      registry,
+      holder: HOLDER,
+      realm: 'test',
+      ttlSeconds: 90,
+      nowMs: () => 0,
+    });
+    registry.record({ plotId: 'plot:a', accountId: 7, generation: '3', acquiredAtMs: 0 });
+    registry.notePending({
+      plotId: 'plot:a',
+      accountId: 7,
+      writeToken: 'a'.repeat(32),
+      notedAtMs: 0,
+    });
+    await expect(write(UPSERT('plot:a'))).rejects.toBeInstanceOf(DbTransactionRolledBack);
+    expect(registry.counters.selfAdopted).toBe(0);
+  });
+
+  it('counts a lock or statement bound that ran out in a write as a lock timeout, and rethrows', async () => {
+    for (const [error, counted] of [
+      [sqlError('57014'), 1],
+      [sqlError('55P03'), 1],
+      [new Error('socket gone'), 0],
+    ] as const) {
+      const w = writerOn([{ match: (t) => t.startsWith('WITH fence'), answer: () => error }]);
+      w.registry.record({ plotId: 'plot:a', accountId: 7, generation: '3', acquiredAtMs: 0 });
+      await expect(w.write(UPSERT('plot:a'))).rejects.toBe(error);
+      expect(w.registry.counters.lockTimeouts, String(error)).toBe(counted);
+    }
+  });
+
   it('ADOPTS the row revision when the locked token proves its earlier write landed', async () => {
     const { f, write, registry } = writerOn([
       {
@@ -5721,6 +6226,211 @@ describe('the Hearth trip admission', () => {
     expect(r.trips.counters.cooldown).toBe(1);
     // A cooldown arms no refusal memo.
     expect(r.trips.admission('account:7', 1)).toBe('pending');
+  });
+
+  it('hands the store the newest PROVED clock: the committed advance, or the clock a cooldown read', async () => {
+    const committed = tripRig();
+    committed.trips.admission('account:7', 1);
+    await committed.settle();
+    expect(committed.adopted).toEqual([[3_601_000, '4']]);
+    const cooldown = tripRig({
+      outcome: () => ({
+        kind: 'refused',
+        refusal: {
+          kind: 'hearth',
+          result: { kind: 'cooldown', readyAtMs: '9000', revision: '4', nowMs: '1000' },
+        },
+      }),
+    });
+    cooldown.trips.admission('account:7', 1);
+    await cooldown.settle();
+    expect(cooldown.adopted).toEqual([[9_000, '4']]);
+    // Even when the session left before the outcome: the store's memory is the
+    // account's, and a relog on this process replays it.
+    const gone = tripRig();
+    gone.trips.admission('account:7', 1);
+    gone.sessions.delete(1);
+    await gone.settle();
+    expect(gone.adopted).toEqual([[3_601_000, '4']]);
+    // Controls: a failure proves no clock, so nothing is handed over.
+    const failed = tripRig({ outcome: () => ({ kind: 'failed', error: null }) });
+    failed.trips.admission('account:7', 1);
+    await failed.settle();
+    expect(failed.adopted).toEqual([]);
+  });
+
+  it('counts a lost COMMIT the verify proved landed, and one it proved did not, each apart', async () => {
+    const landed = tripRig({
+      outcome: () => ({
+        kind: 'committed',
+        plots: [],
+        hearth: { kind: 'advanced', readyAtMs: '3601000', revision: '4', nowMs: '1000' },
+        verified: true,
+      }),
+    });
+    landed.trips.admission('account:7', 1);
+    await landed.settle();
+    expect(landed.trips.counters.advanced).toBe(1);
+    expect(landed.trips.counters.verifiedLanded).toBe(1);
+    const notLanded = tripRig({ outcome: () => ({ kind: 'not_landed', error: null }) });
+    notLanded.trips.admission('account:7', 1);
+    await notLanded.settle();
+    expect(notLanded.trips.counters.verifiedNotLanded).toBe(1);
+    expect(notLanded.trips.counters.failed).toBe(0);
+    // Controls: an ordinary commit and an ordinary failure count neither.
+    const plain = tripRig();
+    plain.trips.admission('account:7', 1);
+    await plain.settle();
+    expect(plain.trips.counters.verifiedLanded).toBe(0);
+    const failed = tripRig({ outcome: () => ({ kind: 'failed', error: null }) });
+    failed.trips.admission('account:7', 1);
+    await failed.settle();
+    expect(failed.trips.counters.failed).toBe(1);
+    expect(failed.trips.counters.verifiedNotLanded).toBe(0);
+  });
+
+  it('reuses the player-waiting bound for the memo and the trip wait, both pinned literally', () => {
+    expect(FREEHOLD_PERSIST_LOAD_PERMIT_WAIT_MS).toBe(5_000);
+    expect(FREEHOLD_HEARTH_TRIP_MEMO_MS).toBe(5_000);
+    expect(FREEHOLD_HEARTH_TRIP_WAIT_MS).toBe(5_000);
+    expect(FREEHOLD_VERIFY_BOUNDS).toEqual({
+      operation: 'freehold mutation verify',
+      statementMs: 15_000,
+      lockMs: 10_000,
+      idleMs: 2_000,
+      wallMs: 30_000,
+    });
+    expect(FREEHOLD_HOOK_STATEMENT_TIMEOUT_MS).toBe(15_000);
+  });
+
+  /** A host over one live session map, every port a recorder. */
+  const hostOver = (
+    sessions: Map<
+      number,
+      { pid: number; characterId: number; accountId: number; leaseNonce: string | undefined }
+    >,
+    over: Partial<Parameters<typeof createFreeholdHearthTrips>[0]> = {},
+  ): Parameters<typeof createFreeholdHearthTrips>[0] => ({
+    sessionForPid: (pid) => sessions.get(pid),
+    authority: () => ({ loaded: true, blocked: false, plotId: 'plot:a', durableRev: null }),
+    claimFor: () => undefined,
+    commit: async () => ({
+      kind: 'committed',
+      plots: [],
+      hearth: { kind: 'advanced', readyAtMs: '5', revision: '1', nowMs: '1' },
+      verified: false,
+    }),
+    redispatch: () => undefined,
+    mergeReadyAt: () => {},
+    adoptDurable: () => {},
+    ownerOnline: () => true,
+    accountOf: () => 7,
+    cooldownMs: 1,
+    nowMs: () => 0,
+    warn: () => {},
+    ...over,
+  });
+  const drain = async () => {
+    for (let i = 0; i < 20; i++) await Promise.resolve();
+  };
+
+  it('consumes its ticket only for the session it was minted for: a takeover inside the re-dispatch is denied', async () => {
+    for (const takeover of [true, false]) {
+      const sessions = new Map([[1, { pid: 1, characterId: 10, accountId: 7, leaseNonce: 'n1' }]]);
+      const answers: string[] = [];
+      const trips: ReturnType<typeof createFreeholdHearthTrips> = createFreeholdHearthTrips(
+        hostOver(sessions, {
+          redispatch: (session) => {
+            // A takeover on the same pid, inside the synchronous re-dispatch.
+            if (takeover) sessions.set(1, { ...sessions.get(1)!, leaseNonce: 'n2' });
+            answers.push(trips.admission(`account:${session.accountId}`, session.pid));
+            return undefined;
+          },
+        }),
+      );
+      trips.admission('account:7', 1);
+      await drain();
+      // Control (no takeover): the minted session consumes its admit.
+      expect(answers, String(takeover)).toEqual([takeover ? 'deny' : 'admit']);
+      expect(trips.counters.refusedAfterCommit, String(takeover)).toBe(takeover ? 1 : 0);
+    }
+  });
+
+  it('re-dispatches only to the SAME session object, never an equal-looking replacement', async () => {
+    for (const replaced of [true, false]) {
+      const original = { pid: 1, characterId: 10, accountId: 7, leaseNonce: 'n1' };
+      const sessions = new Map([[1, original]]);
+      const redispatched: number[] = [];
+      let release = () => {};
+      const gate = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      const trips = createFreeholdHearthTrips(
+        hostOver(sessions, {
+          commit: async () => {
+            await gate;
+            return {
+              kind: 'committed',
+              plots: [],
+              hearth: { kind: 'advanced', readyAtMs: '5', revision: '1', nowMs: '1' },
+              verified: false,
+            };
+          },
+          redispatch: (session) => {
+            redispatched.push(session.pid);
+            return undefined;
+          },
+        }),
+      );
+      trips.admission('account:7', 1);
+      // Every field equal, but a different session object (a new join).
+      if (replaced) sessions.set(1, { ...original });
+      release();
+      await drain();
+      expect(redispatched, String(replaced)).toEqual(replaced ? [] : [1]);
+      expect(trips.counters.abandoned, String(replaced)).toBe(replaced ? 1 : 0);
+    }
+  });
+
+  it('counts a throw AFTER the outcome was counted and warns once, never an unhandled rejection', async () => {
+    const warnings: string[] = [];
+    const sessions = new Map([[1, { pid: 1, characterId: 10, accountId: 7, leaseNonce: 'n1' }]]);
+    const trips = createFreeholdHearthTrips(
+      hostOver(sessions, {
+        redispatch: () => {
+          throw new Error('the sim threw on the re-dispatch');
+        },
+        warn: (message) => warnings.push(message),
+      }),
+    );
+    trips.admission('account:7', 1);
+    await drain();
+    expect(trips.counters.advanced).toBe(1);
+    expect(trips.counters.threwAfterOutcome).toBe(1);
+    expect(warnings).toEqual(['freehold hearth trip threw after its outcome was counted']);
+  });
+
+  it("bounds the trip save's waits through the host's signal port at the player-waiting bound", async () => {
+    const controller = new AbortController();
+    const asked: number[] = [];
+    let handed: AbortSignal | null = null;
+    const sessions = new Map([[1, { pid: 1, characterId: 10, accountId: 7, leaseNonce: 'n1' }]]);
+    const trips = createFreeholdHearthTrips(
+      hostOver(sessions, {
+        waitSignal: (ms) => {
+          asked.push(ms);
+          return controller.signal;
+        },
+        commit: async (_session, _request, waitSignal) => {
+          handed = waitSignal;
+          return { kind: 'failed', error: null };
+        },
+      }),
+    );
+    trips.admission('account:7', 1);
+    await drain();
+    expect(asked).toEqual([5_000]);
+    expect(handed).toBe(controller.signal);
   });
 
   it('meters every other outcome for its OWN account only', async () => {

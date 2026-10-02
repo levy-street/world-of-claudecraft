@@ -223,12 +223,36 @@ describe('Freehold Gate authoritative confirmation', () => {
     expect(dungeonAt(sim.player.pos.x)?.id).toBe('freehold_inn_room');
   });
   it('physical entry ignores the remote cooldown and unavailable key participant', () => {
-    const { sim, pid, near } = setup({ freeholdKeyAdmission: () => 'deny' });
+    const admission = vi.fn((): FreeholdKeyAdmission => 'deny');
+    const { sim, pid, near } = setup({ freeholdKeyAdmission: admission });
     sim.freeholdKeyReadyAtMs.set(`entity:${pid}`, 9999999);
     near();
     sim.freeholdEnter();
     expect(dungeonAt(sim.player.pos.x)?.id).toBe('freehold_inn_room');
     expect(sim.freeholdKeyReadyAtMs.get(`entity:${pid}`)).toBe(9999999);
+    // The physical gate never asks the remote participant at all.
+    expect(admission).not.toHaveBeenCalled();
+  });
+});
+
+describe('the durable clock merge', () => {
+  it('moves the live clock FORWARD only: an older, equal or clockless reading changes nothing', () => {
+    const { sim } = setup();
+    const key = 'account:41';
+    mergeFreeholdKeyReadyAt(sim.ctx, key, 9000);
+    expect(sim.freeholdKeyReadyAtMs.get(key)).toBe(9000);
+    // A stale durable read must never hand out a free trip.
+    mergeFreeholdKeyReadyAt(sim.ctx, key, 5000);
+    expect(sim.freeholdKeyReadyAtMs.get(key)).toBe(9000);
+    mergeFreeholdKeyReadyAt(sim.ctx, key, 9000);
+    expect(sim.freeholdKeyReadyAtMs.get(key)).toBe(9000);
+    for (const none of [Number.NaN, 0, -1, Number.POSITIVE_INFINITY]) {
+      mergeFreeholdKeyReadyAt(sim.ctx, key, none);
+      expect(sim.freeholdKeyReadyAtMs.get(key), String(none)).toBe(9000);
+    }
+    // Control: a later reading does move it.
+    mergeFreeholdKeyReadyAt(sim.ctx, key, 9001);
+    expect(sim.freeholdKeyReadyAtMs.get(key)).toBe(9001);
   });
 });
 

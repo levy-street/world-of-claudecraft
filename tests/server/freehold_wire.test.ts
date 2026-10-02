@@ -70,6 +70,7 @@ vi.mock('../../server/db', () => ({
 
 import type { BotDetector } from '../../server/bot_detector/contract';
 import type { CharacterSaveHousingHook } from '../../server/character_save_housing';
+import * as db from '../../server/db';
 import { freeholdsEnabled } from '../../server/freehold_config';
 import {
   FREEHOLD_HEARTH_ACCOUNT_LOCK_SQL,
@@ -1837,6 +1838,34 @@ describe('Freehold Gate and Hearth Key real server dispatch', () => {
     expect(warn).not.toHaveBeenCalledWith(REFUSED_AFTER_COMMIT_WARN);
   });
 
+  it('a committed advance whose re-dispatch the SIM refuses warns once with the literal line (R-2)', async () => {
+    const { server, session, pid, trips } = tripSession();
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    let release!: () => void;
+    hearthSaveAnswering(
+      server,
+      { readyAtMs: '0', nowMs: '5000' },
+      new Promise<void>((r) => {
+        release = r;
+      }),
+    );
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'use', item: 'hearth_key' }));
+    expect(trips.counters.started).toBe(1);
+    // The player entered combat inside the commit window: the sim refuses the
+    // re-dispatch before it ever asks admission.
+    server.sim.entities.get(pid)!.inCombat = true;
+    server.sim.drainEvents();
+    release();
+    await vi.waitFor(() => expect(trips.counters.advanced).toBe(1));
+    expect(trips.counters).toMatchObject({ refusedAfterCommit: 1, droppedAfterCommit: 0 });
+    expect(warn.mock.calls.filter((call) => call[0] === REFUSED_AFTER_COMMIT_WARN)).toHaveLength(1);
+    expect(server.sim.drainEvents()).toContainEqual({
+      type: 'freeholdDenied',
+      pid,
+      reason: 'combat',
+    });
+  });
+
   it('a re-dispatch after a committed advance whose vault loot is fenced answers busy, counted as a drop (R-2)', async () => {
     const { server, session, pid, fc, trips } = tripSession();
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -2052,6 +2081,90 @@ describe('Freehold Gate and Hearth Key real server dispatch', () => {
     ).resolves.toBe(false);
     expect(maySave).toHaveBeenCalledTimes(1);
   });
+
+  it.each([
+    ['the character queue (Q1)', 'queue'],
+    ['the background permit (Q4)', 'permit'],
+  ] as const)(
+    'a hooked save cancelled at %s keeps every pending legacy effect for the next save',
+    async (_label, at) => {
+      // Q4 needs a gate: one that grants at once unless the wait is aborted.
+      const gate = {
+        acquire: async (signal?: AbortSignal) => (signal?.aborted ? null : { release() {} }),
+        tryAcquire: () => ({ release() {} }),
+        stats: () => ({
+          inFlight: 0,
+          waiting: 0,
+          max: 1,
+          configuredHeadroom: 0,
+          acquired: 0,
+          refused: 0,
+          cancelled: 0,
+        }),
+      };
+      const server = new GameServer(undefined, gate);
+      const session = joinServer(server, fakeWs(), 7201, 'Freeholder');
+      // A committed ledger batch and an applied storage purchase, both owed to
+      // the next character save.
+      const reservation = session.bankLedgerJournal.reserveVaultConsumption(
+        [{ itemId: 'copper_ore', count: 1 }],
+        0,
+      );
+      if (!reservation) throw new Error('expected a ledger reservation');
+      reservation.commit();
+      const effect = {
+        realm: 'test',
+        accountId: 7201,
+        characterId: session.characterId,
+        itemId: 'bank_slot',
+        expectedCostClaudium: 1,
+        idempotencyKey: 'fhqa-cancel-1',
+        spendClaimToken: 'claim-1',
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 1,
+      };
+      session.pendingStorageAppliedEffects.push(effect);
+      const ledgerRows = session.bankLedgerJournal.outbox.snapshot().rowCount;
+      expect(ledgerRows).toBeGreaterThan(0);
+      const saveState = vi.mocked(db.saveCharacterState);
+      saveState.mockClear();
+      const controller = new AbortController();
+      if (at === 'queue') controller.abort();
+      const run = vi.fn(async () => {});
+      const housing: CharacterSaveHousingHook = {
+        accountIds: [7201],
+        run,
+        commitSent() {},
+        committed() {},
+        waitSignal: controller.signal,
+        // Inside the started queue job: the abort lands before the permit wait.
+        wrap:
+          at === 'permit'
+            ? async (job) => {
+                controller.abort();
+                return job();
+              }
+            : undefined,
+      };
+      await expect(
+        saveSurface(server).saveCharacter(session, { housing, backgroundDbPermit: true }),
+      ).rejects.toThrow();
+      // Nothing was written and nothing owed was consumed.
+      expect(saveState).not.toHaveBeenCalled();
+      expect(run).not.toHaveBeenCalled();
+      expect(session.pendingStorageAppliedEffects).toEqual([effect]);
+      expect(session.bankLedgerJournal.outbox.snapshot().rowCount).toBe(ledgerRows);
+      // The next ordinary save carries exactly that work, and only then is it
+      // consumed.
+      saveState.mockResolvedValueOnce(true as never);
+      await expect(saveSurface(server).saveCharacter(session)).resolves.toBe(true);
+      expect(saveState).toHaveBeenCalledTimes(1);
+      const call = saveState.mock.calls[0] as unknown[];
+      expect(call[4]).toEqual([effect]);
+      expect(session.pendingStorageAppliedEffects).toEqual([]);
+      expect(session.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
+    },
+  );
 
   it.each([
     ['admit', true],
