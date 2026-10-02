@@ -8651,8 +8651,11 @@
     overscroll-behavior-x: contain;
     padding-bottom: 2px;
   }
+  /* The cards share the strip's width before it scrolls, and a name wraps to a second
+     line rather than truncating. */
   body.mobile-touch #world-quest-leaderboard-window .wql-card {
-    flex: 0 0 132px;
+    flex: 1 1 0;
+    min-width: 104px;
     gap: 2px;
     padding: 4px;
   }
@@ -8663,8 +8666,11 @@
   body.mobile-touch #world-quest-leaderboard-window .wql-card-name {
     font-size: 11px;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow-wrap: normal;
   }
   body.mobile-touch #world-quest-leaderboard-window .wql-card-metric {
     display: none;
