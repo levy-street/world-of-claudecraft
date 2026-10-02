@@ -5766,10 +5766,16 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   a sign-out still open in its own session. Fixed in `ffc36d2487`.
 - ROUND THIRTY-TWO, eight fresh readers over round thirty-one: 39 findings, none blocking, 15
   should-fix, every reader passing. A sign-out check above 0 runs the sign-out again in autocommit
-  whatever its session shows, and a rerun that waits is named; on a host that enables the discord
-  profile in `.env` a lever-stopped bot is stopped again after every start that names no service,
-  a rollback's included; and the third escalation lever lifts only by the levers' own `up`. Fixed
-  in `9dea958302`.
+  whatever its session shows, and the session a waiting rerun waits on is named (worded so in
+  round thirty-three); on a host that enables the discord profile in `.env` a lever-stopped bot is
+  stopped again after every start that names no service, a rollback's included; and the third
+  escalation lever lifts only by the levers' own `up`. Fixed in `9dea958302`.
+- ROUND THIRTY-THREE, eight fresh readers over round thirty-two: 33 findings, none blocking, 7
+  should-fix, every reader passing, two with no should-fix. A waiting sign-out rerun is followed
+  through a stopped realm's queued statement to the open sign-out; the third escalation lever
+  names every start of the bot as lifting it; a bot key edit no longer restarts a lever-stopped
+  bot, and a fatal-close fix no longer keeps an old token; and the pg file's Cost is read as the
+  documented command reports it. Fixed in `d987076ce9`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5800,7 +5806,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   641, then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
   then 644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then
   647, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648,
-  then 648 passed, never a skip.
+  then 648, then 648 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
