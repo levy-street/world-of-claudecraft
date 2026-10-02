@@ -19,8 +19,9 @@
 // TimeoutOverflowWarning to stderr; it is that case's subject, not a fault to
 // chase.
 //
-// Cost: 1.1 s
+// Cost: 1.2 s
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, posix } from 'node:path';
@@ -3019,10 +3020,15 @@ describe('the claim renewer', () => {
     const utf8 = (file: string) => Buffer.from(file, 'latin1').toString('utf8');
     const tracked = (pathspecs: string[]) => {
       const deleted = new Set(lsFiles(['--deleted', '--', ...pathspecs]));
-      expect([...deleted].map(utf8).filter((file) => existsSync(file))).toEqual([]);
-      return lsFiles(['--', ...pathspecs])
-        .filter((file) => !deleted.has(file))
-        .map(utf8);
+      const listed = lsFiles(['--', ...pathspecs]);
+      // A listed name is on disk exactly when git does not report it deleted,
+      // probed by its raw bytes.
+      expect(
+        listed
+          .filter((file) => existsSync(Buffer.from(file, 'latin1')) === deleted.has(file))
+          .map(utf8),
+      ).toEqual([]);
+      return listed.filter((file) => !deleted.has(file)).map(utf8);
     };
     const botFiles = tracked(botCode);
     expect(botFiles).toEqual(
@@ -3031,6 +3037,17 @@ describe('the claim renewer', () => {
     expect(botFiles).toEqual(
       expect.arrayContaining(['bot/logic.ts', 'bot/main.ts', 'bot/server_client.ts']),
     );
+    // The bot writes no JSX: a route in JSX text, or in an attribute spelled
+    // with an HTML entity, is not a literal the route read takes, so any JSX in
+    // the bot's code fails here until that read takes it.
+    expect(
+      botFiles.filter((file) =>
+        nodesIn(parsed(file)).some(
+          (node) =>
+            ts.isJsxElement(node) || ts.isJsxSelfClosingElement(node) || ts.isJsxFragment(node),
+        ),
+      ),
+    ).toEqual([]);
     expect(
       botFiles.flatMap((file) =>
         nodesIn(parsed(file))
@@ -3051,13 +3068,16 @@ describe('the claim renewer', () => {
     // Section L of the pg suite reads every boot through `settled`, which cancels
     // a boot still waiting at its deadline. So every boot the section runs
     // starts in `startBoot`, its one call of `ensureSchema` (only a call written
-    // `ensureSchema(...)` or `x.ensureSchema(...)` is read); `startBoot` is only
-    // ever called by name; each
-    // result goes to `settled` or to a name; every `during` callback names the
-    // boot it is handed `boot`; every read of a boot's name is pinned by the
-    // expression it sits in, so a boot read beside or instead of `settled`
-    // fails until reviewed; and the section's lock key, its lock filter,
-    // `startBoot`, `settled` and every `settled` call are pinned as written.
+    // `ensureSchema(...)` or `x.ensureSchema(...)`, optional chains included, is
+    // read); `startBoot` and `settled` are only ever called by name; each result
+    // goes to `settled` or to a name; every `during` callback is an arrow, and
+    // one that takes the boot it is handed names it `boot`; every read of a
+    // boot's name is pinned by the expression it sits in; and the section's lock
+    // key, its lock filter, `startBoot`, `settled`, `within` and every `settled`
+    // call are pinned as written. These pins read names as written, so the
+    // section is also read whole, by digest: any change to its code fails until
+    // it is reviewed against them, a form they do not read (a shadowing binding,
+    // a computed key) included.
     const pgSuite = parsed('tests/server/freehold_mutation.pg.test.ts');
     const sectionL = nodesIn(pgSuite).filter(
       (node) =>
@@ -3115,6 +3135,44 @@ describe('the claim renewer', () => {
         .filter((node) => !(ts.isCallExpression(node.parent) && node.parent.expression === node))
         .map((node) => ts.SyntaxKind[node.parent.kind]),
     ).toEqual(['VariableDeclaration']);
+    // Every other mention of `settled` is its declaration, so no binding shadows
+    // it.
+    expect(
+      named('settled')
+        .filter((node) => !(ts.isCallExpression(node.parent) && node.parent.expression === node))
+        .map((node) => ts.SyntaxKind[node.parent.kind]),
+    ).toEqual(['FunctionDeclaration']);
+    // `within`, which every `settled` read goes through, read whole, and every
+    // mention of it in the section a call.
+    expect(
+      pgSuite.statements
+        .filter(
+          (statement) =>
+            ts.isVariableStatement(statement) &&
+            statement.declarationList.declarations.some(
+              (decl) => ts.isIdentifier(decl.name) && decl.name.text === 'within',
+            ),
+        )
+        .map((statement) => linesOf(statement, pgSuite)),
+    ).toEqual([
+      [
+        "const within = <T>(work: Promise<T>, ms = 5_000): Promise<T | 'still waiting'> => {",
+        'let timer: ReturnType<typeof setTimeout> | undefined;',
+        'return Promise.race([',
+        'work,',
+        "new Promise<'still waiting'>((resolve) => {",
+        "timer = setTimeout(() => resolve('still waiting'), ms);",
+        '}),',
+        ']).finally(() => clearTimeout(timer));',
+        '};',
+      ],
+    ]);
+    expect(named('within').length).toBeGreaterThan(0);
+    expect(
+      named('within').filter(
+        (node) => !(ts.isCallExpression(node.parent) && node.parent.expression === node),
+      ),
+    ).toEqual([]);
     // Every read of a boot's name, by the expression it sits in.
     expect(
       ['boot', 'secondBoot', 'thirdBoot', 'work']
@@ -3152,15 +3210,13 @@ describe('the claim renewer', () => {
       'Promise.allSettled([secondBoot, thirdBoot])',
       'startBoot(), 10_000',
     ]);
-    // Every mention of `during` by where it sits, and each callback passed as
-    // one by its parameters as written.
+    // Every mention of `during` by where it sits, and each arrow passed as one by
+    // its parameters as written (a function expression, which could read the
+    // boot through `arguments`, fails as its PropertyAssignment until reviewed).
     expect(
       named('during').map((node) => {
         const at = node.parent;
-        if (
-          ts.isPropertyAssignment(at) &&
-          (ts.isArrowFunction(at.initializer) || ts.isFunctionExpression(at.initializer))
-        )
+        if (ts.isPropertyAssignment(at) && ts.isArrowFunction(at.initializer))
           return at.initializer.parameters.map((param) => param.getText()).join(', ');
         return ts.SyntaxKind[at.kind];
       }),
@@ -3232,6 +3288,14 @@ describe('the claim renewer', () => {
         ],
       ],
     ]);
+    // Section L read whole, comments dropped, by digest: a change to its code
+    // fails here until it is reviewed against the pins above, then the digest is
+    // updated.
+    expect(
+      createHash('sha256').update(linesOf(sectionL[0], pgSuite).join('\n')).digest('hex'),
+      'section L changed: check that every boot still starts in startBoot and is read ' +
+        'through settled under the names pinned above, then update this digest',
+    ).toBe('45e997312d3ce5e3c6e4f5bd7b1044d1a9d404626b4110f8d59907da873a9ebc');
     // The link-change feed's heal is the bot's resyncs, which DEPLOY gives no
     // cadence; the bot's own suites pin them (tests/discord_bot_linked_sweep.test.ts,
     // tests/discord_bot_member_writes.test.ts and
@@ -3308,6 +3372,8 @@ describe('the claim renewer', () => {
         'bot/*.js',
         'bot/*.mjs',
         'bot/*.cjs',
+        'bot/*.tsx',
+        'bot/*.jsx',
       ]).flatMap((file) => {
         const source = parsed(file);
         return nodesIn(source)
