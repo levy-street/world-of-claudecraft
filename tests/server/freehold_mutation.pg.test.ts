@@ -47,7 +47,7 @@
 // tests/guild_bank_pg_integration.test.ts and
 // tests/server/storage_purchase_db.pg.test.ts prove the legacy halves with no
 // housing participant.
-// Cost: 13.4 s
+// Cost: 13.3 s
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import type { Pool as PgPool, PoolClient } from 'pg';
@@ -119,6 +119,17 @@ function gate(at: 'before' | 'after'): Gate {
 }
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+// A rerun the case expects to have returned, read with a deadline, so a hang
+// fails the case in time for its cleanup to run.
+const within = <T>(work: Promise<T>, ms = 5_000): Promise<T | 'still waiting'> => {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  return Promise.race([
+    work,
+    new Promise<'still waiting'>((resolve) => {
+      timer = setTimeout(() => resolve('still waiting'), ms);
+    }),
+  ]).finally(() => clearTimeout(timer));
+};
 
 function bagsState(marker: string, chairs: number): never {
   return {
@@ -3669,7 +3680,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
               // waits behind that.
               expect(await terminate()).toEqual([[pid, true, true]]);
               expect(await gone(pid)).toBe(0);
-              expect(await rerun).toBe('ran');
+              expect(await within(rerun)).toBe('ran');
               reran = true;
             } finally {
               if (!reran) {
@@ -3945,7 +3956,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         expect(second.open - first.open).toBeGreaterThanOrEqual(0.25);
         expect(second.gap).toBe(first.gap);
         await pool.query(terminateSql.replace('<pid>', String(holderPid)));
-        expect(await rerun).toBe('ran');
+        expect(await within(rerun)).toBe('ran');
         expect(await until(() => gone(realmPid), 0)).toBe(0);
         expect(await leftOn(fresh)).toBe(0);
         expect(await db.accountAndScopeForToken(stale)).toBeNull();
@@ -4016,7 +4027,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           [rerunPid, tableRealmPid, secondRealmPid, tableHolderPid].sort((x, y) => x - y),
         );
         await pool.query(terminateSql.replace('<pid>', String(tableHolderPid)));
-        expect(await tableRerun).toBe('ran');
+        expect(await within(tableRerun)).toBe('ran');
         expect(await until(() => gone(tableRealmPid), 0)).toBe(0);
         expect(await until(() => gone(secondRealmPid), 0)).toBe(0);
         expect(await leftOn(fresh)).toBe(0);
@@ -4066,7 +4077,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         expect((await pool.query(nightly)).rows.map((r: { pid: number }) => r.pid)).toEqual([
           leafRealmPid,
         ]);
-        expect(await leafRerun).toBe('ran');
+        expect(await within(leafRerun)).toBe('ran');
         expect(await until(() => gone(leafRealmPid), 0)).toBe(0);
         expect(
           (await pool.query('SELECT state FROM pg_stat_activity WHERE pid = $1', [dumpPid])).rows,

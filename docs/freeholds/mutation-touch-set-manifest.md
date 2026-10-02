@@ -1461,3 +1461,6 @@ What changed the contract above:
 - A fortieth round of eight fresh readers: no P12 change; `DEPLOY.md`'s lever 3 says the
   daily-active rule without pronouns to untangle, and `bot/logic.ts`'s `claimDailyActive` comment
   says at most once, matching `bot/CLAUDE.md`.
+- A forty-first round of eight fresh readers: no P12 change; `bot/CLAUDE.md`, `bot/main.ts` and
+  `bot/logic.ts` say what the daily grant's dedupe keys on (the Discord id and the day) and claim
+  no more about it.

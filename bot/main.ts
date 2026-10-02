@@ -682,8 +682,8 @@ async function main(): Promise<void> {
 
   // Daily Discord-engagement reward: the first time a linked member posts a message
   // or sends a voice state with a channel each day, grant the daily-active points.
-  // Deduped here (per user per day) AND server-side (the grant dedupe key); a failed
-  // grant call is not retried, so it is at most once.
+  // Deduped here (per user per day) AND server-side (the grant dedupe key, which
+  // carries the Discord id and the day).
   // Bot-side dedupe, emptied on the day rollover by claimDailyActive so it does
   // not accumulate an entry per member per day for the life of the process.
   const dailyActive: DailyActiveState = { seen: new Set<string>(), day: '' };

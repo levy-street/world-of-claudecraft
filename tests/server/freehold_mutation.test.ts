@@ -2640,7 +2640,8 @@ describe('the claim renewer', () => {
     const feedCode = (file: string) => feedCodeOf(parsed(file));
     // Every declaration form `declared` and `bound` read, on a sample: a
     // function, a class, an enum, a namespace, an object binding and an array
-    // binding with a hole, each reached from the queue's statement; a
+    // binding with a hole that nests an object binding, each reached from the
+    // queue's statement; a
     // statement outside that names each, and one that names none of them.
     const feedSample = ts.createSourceFile(
       'feed.ts',
@@ -2651,7 +2652,7 @@ describe('the claim renewer', () => {
         'enum Kind { A }',
         'namespace Space { export const size = 1; }',
         'const { depth } = { depth: 2 };',
-        'const [, second] = [4, 5];',
+        'const [, { second }] = [4, { second: 5 }];',
         'export function helperOf() { return helper(); }',
         'export function boxOf() { return Box.n; }',
         'export function kindOf() { return Kind.A; }',
@@ -2905,26 +2906,58 @@ describe('the claim renewer', () => {
       outside: [],
     });
     // The API the Discord bot overview names is the one the bot calls the game
-    // through: every path bot/server_client.ts's call() sends is under it.
+    // through. The client is read whole: every request it makes and every name
+    // of the fetch it makes them with, each with the member it sits in, so a new
+    // route, a second sender of one, or a request made outside call() fails here
+    // until DEPLOY's overview and lever 3 are checked.
     const serverClient = parsed('bot/server_client.ts');
-    const sent = nodesIn(serverClient)
-      .filter(
-        (node): node is ts.CallExpression =>
-          ts.isCallExpression(node) &&
-          ts.isPropertyAccessExpression(node.expression) &&
-          node.expression.expression.kind === ts.SyntaxKind.ThisKeyword &&
-          node.expression.name.text === 'call',
-      )
-      .map((call) => call.arguments[1])
-      .map((path) =>
-        path !== undefined && ts.isStringLiteralLike(path)
-          ? path.text
-          : path !== undefined && ts.isTemplateExpression(path)
-            ? path.head.text
-            : '',
-      );
-    expect(sent.length).toBeGreaterThan(0);
-    expect(sent.filter((path) => !path.startsWith('/internal/discord/'))).toEqual([]);
+    const memberOf = (node: ts.Node): string => {
+      for (let at = node.parent; at !== undefined; at = at.parent) {
+        if (ts.isConstructorDeclaration(at)) return 'constructor';
+        if (
+          (ts.isMethodDeclaration(at) || ts.isPropertyDeclaration(at)) &&
+          ts.isIdentifier(at.name)
+        ) {
+          return at.name.text;
+        }
+      }
+      return 'outside a member';
+    };
+    expect(
+      nodesIn(serverClient)
+        .filter(
+          (node) =>
+            (ts.isIdentifier(node) && /^fetch(Impl)?$/.test(node.text)) ||
+            (ts.isCallExpression(node) &&
+              ts.isPropertyAccessExpression(node.expression) &&
+              node.expression.expression.kind === ts.SyntaxKind.ThisKeyword &&
+              node.expression.name.text === 'call'),
+        )
+        .map((node) =>
+          ts.isCallExpression(node)
+            ? `${memberOf(node)}: ${node.arguments
+                .slice(0, 2)
+                .map((arg) => arg.getText(serverClient))
+                .join(', ')}`
+            : `${memberOf(node)}: ${(node as ts.Identifier).text}`,
+        ),
+    ).toEqual([
+      'constructor: fetchImpl',
+      'constructor: fetch',
+      'constructor: fetch',
+      'call: fetchImpl',
+      "flexBatch: 'POST', '/internal/discord/flex-batch'",
+      "drainOutbox: 'GET', '/internal/discord/outbox'",
+      // Split at the placeholder, so the literal is plain text.
+      "roles: 'GET', `/internal/discord/roles?discord_user_id=$" +
+        '{encodeURIComponent(discordUserId)}`',
+      "pushPresence: 'POST', '/internal/discord/presence'",
+      "grant: 'POST', '/internal/discord/grant'",
+      "setMember: 'POST', '/internal/discord/member'",
+      "markDailyRewardWinners: 'POST', '/internal/discord/daily-rewards-winners/mark'",
+      "pushMembersMeta: 'POST', '/internal/discord/members-meta'",
+      "flairedIds: 'GET', '/internal/discord/flaired-ids'",
+    ]);
     // The link-change feed's heal is the bot's resyncs, which DEPLOY gives no
     // cadence; the bot's own suites pin them (tests/discord_bot_linked_sweep.test.ts,
     // tests/discord_bot_member_writes.test.ts and
@@ -2933,12 +2966,23 @@ describe('the claim renewer', () => {
     // named only by its declaration and its calls in the voice-state and
     // message dispatch cases.
     const botMain = parsed('bot/main.ts');
-    const caseOf = (node: ts.Node): string | undefined =>
-      node.parent === undefined
-        ? undefined
-        : ts.isCaseClause(node.parent)
-          ? node.parent.expression.getText(botMain)
-          : caseOf(node.parent);
+    const caseOf = (node: ts.Node): string | undefined => {
+      for (let at = node.parent; at !== undefined; at = at.parent) {
+        if (ts.isCaseClause(at) || ts.isDefaultClause(at)) {
+          // An empty clause above falls into this one, so its label counts too.
+          const clauses = at.parent.clauses;
+          let first = clauses.indexOf(at);
+          while (first > 0 && clauses[first - 1].statements.length === 0) first -= 1;
+          return clauses
+            .slice(first, clauses.indexOf(at) + 1)
+            .map((clause) =>
+              ts.isCaseClause(clause) ? clause.expression.getText(botMain) : 'default',
+            )
+            .join(' | ');
+        }
+      }
+      return undefined;
+    };
     expect(
       nodesIn(botMain)
         .filter((node): node is ts.Identifier => ts.isIdentifier(node))
@@ -2950,8 +2994,10 @@ describe('the claim renewer', () => {
         ),
     ).toEqual(["'VOICE_STATE_UPDATE'", "'MESSAGE_CREATE'", 'declared']);
     // And every place the bot's code names `grant`, by identifier or string,
-    // is the server client's method or inside grantDailyActive, so no other
-    // path grants.
+    // is the server client's method or inside grantDailyActive, so that method,
+    // the daily-active grant's one sender (the client's surface above), has one
+    // caller. The member reward setMember earns is the server's own grant, not
+    // this one.
     const insideGrantDailyActive = (node: ts.Node): boolean =>
       node.parent !== undefined &&
       ((ts.isVariableDeclaration(node.parent) &&
@@ -2959,7 +3005,7 @@ describe('the claim renewer', () => {
         node.parent.name.text === 'grantDailyActive') ||
         insideGrantDailyActive(node.parent));
     expect(
-      gitGrep('\\bgrant\\b', [
+      gitGrep('grant', [
         'bot/*.ts',
         'bot/*.mts',
         'bot/*.cts',
