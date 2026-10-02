@@ -774,6 +774,7 @@ export function meleeSwing(
     'weaponHit',
     procWeaponId,
     opts.autoAttackHand === 'offhand' ? 'offhand' : 'mainhand',
+    opts.autoAttack === true,
   );
   return true;
 }

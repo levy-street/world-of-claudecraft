@@ -132,7 +132,7 @@ import {
   resolveDruidOverbloom,
 } from './druid_engines';
 import { consumeNextAttackCrit } from './empower_next';
-import { runWeaponProcs } from './equip_procs';
+import { rollFeralStrikeEnchant, runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 import { fireGuaranteedCrit, personalBarrierIdForSpec } from './fire_mage';
 import { isFormAuraKind, isTravelFormAuraKind } from './forms';
@@ -938,6 +938,9 @@ export function runEffects(
         // The crit rolled above is plumbed through as one argument (Coldsight
         // 4pc observes it; no extra roll happens anywhere downstream).
         onHunterPrimaryDamage(ctx, p, target, res, finalDamage, crit);
+        // A landed feral form strike (Marrowbreak) rolls the mainhand's melee
+        // enchant; a no-op for every other ability (combat/equip_procs.ts).
+        rollFeralStrikeEnchant(ctx, p, ability);
         if (ability.id === 'arcane_shot') runFrenzyFellShotCleave(ctx, p, target);
         if (ability.id === 'lightning_bolt') {
           thundercallOnArcBoltImpact(ctx, p);
@@ -1113,6 +1116,9 @@ export function runEffects(
           ability.id,
         );
         druidEngineOnLandedStrike(ctx, p, ability.id);
+        // A landed feral finisher is a melee strike: it rolls the mainhand's
+        // melee enchant like a weaponStrike would (combat/equip_procs.ts).
+        rollFeralStrikeEnchant(ctx, p, ability);
         // Second Shadow (rogue capstone, docs/design/rogue-v029-class-design.md):
         // a full 5-combo finisher strikes again as a shadow echo at a fraction of
         // the resolved damage. No extra rng (never crits); the amount is already
@@ -2660,7 +2666,12 @@ export function runEffects(
           ctx.awardCombo(p, aoeTargets[0], ability.awardsCombo);
           comboAwarded = true;
         }
-        if (aoeTargets.length > 0) druidEngineOnLandedStrike(ctx, p, ability.id);
+        if (aoeTargets.length > 0) {
+          druidEngineOnLandedStrike(ctx, p, ability.id);
+          // Sweeping Claws: ONE melee-enchant roll per cast that struck
+          // anything, never one per target (combat/equip_procs.ts).
+          rollFeralStrikeEnchant(ctx, p, ability);
+        }
         break;
       }
       case 'chainDamage': {

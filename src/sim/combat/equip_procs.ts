@@ -19,7 +19,7 @@ import { ITEMS } from '../data';
 import { meetsLevelRequirement } from '../item_level_req';
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
-import type { Entity, WeaponProc, WeaponProcEffect, WeaponProcTrigger } from '../types';
+import type { AbilityDef, Entity, WeaponProc, WeaponProcEffect, WeaponProcTrigger } from '../types';
 import { baseSwingSpeed, isCatForm } from './form_swing';
 import { runTrinketTrigger } from './trinkets';
 
@@ -33,6 +33,7 @@ export function runWeaponProcs(
   trigger: WeaponProcTrigger,
   weaponItemId?: string | null,
   meleeHand?: 'mainhand' | 'offhand',
+  autoAttack = false,
 ): void {
   // A worn trinket's on-hit passives ride every weapon hit (combat/trinkets.ts).
   if (trigger === 'weaponHit') runTrinketTrigger(ctx, wielder, target, 'weaponHit');
@@ -76,14 +77,45 @@ export function runWeaponProcs(
   // Explicit hand comes only from the melee hit path. The historical ranged
   // weaponHit call keeps legendary behavior but cannot trigger a melee enchant.
   if (trigger !== 'weaponHit' || !meleeHand || wielder.dead || wielder.kind !== 'player') return;
+  rollMeleeEnchant(ctx, wielder, meleeHand, item.weapon.speed, autoAttack);
+}
+
+// The weapon speed a melee enchant's per-hit chance reads (chance = ppm * speed
+// / 60, the classic procs-per-minute shape). Cat Form swings its auto-attacks
+// at the fixed 1.0 sec paw cadence (combat/form_swing.ts), so a cat AUTO rolls
+// at that cadence: rolling the carried stat stick's slow speed on every fast
+// paw swing would multiply the enchant's frequency. A SPECIAL is different: its
+// rate is gated by energy and the global cooldown, never by swing speed, so it
+// rolls at the carried weapon's own speed exactly like every other class's
+// specials (a Bloodrush warrior's Twinstrike rolls at its greatsword's speed).
+// Rolling feral specials at the paw speed too was the Zeal uptime gap: a
+// third the chance per Flense of a same-weapon warrior strike.
+export function meleeEnchantRollSpeed(
+  wielder: Entity,
+  meleeHand: 'mainhand' | 'offhand',
+  weaponSpeed: number,
+  autoAttack: boolean,
+): number {
+  return meleeHand === 'mainhand' && autoAttack && isCatForm(wielder)
+    ? baseSwingSpeed(wielder)
+    : weaponSpeed;
+}
+
+// Roll the self-only melee enchant (Last Flame's Zeal and the faction weapon
+// formulas) on one hand for one landed melee hit. Guards short-circuit BEFORE
+// the rng draw, so a hand with no proc enchant draws nothing.
+function rollMeleeEnchant(
+  ctx: SimContext,
+  wielder: Entity,
+  meleeHand: 'mainhand' | 'offhand',
+  weaponSpeed: number,
+  autoAttack: boolean,
+): void {
   const enchantId = ctx.players.get(wielder.id)?.equipmentInstance[meleeHand]?.enchant;
   const enchant = enchantId ? ENCHANTS[enchantId] : undefined;
   const enchantProc = enchant?.weaponProc;
   if (!enchant || !enchantProc) return;
-  // Cat Form has a fixed natural cadence; a slow carried stat stick must not
-  // multiply its proc frequency. Bear and ordinary swings keep item base speed.
-  const baseSpeed =
-    meleeHand === 'mainhand' && isCatForm(wielder) ? baseSwingSpeed(wielder) : item.weapon.speed;
+  const baseSpeed = meleeEnchantRollSpeed(wielder, meleeHand, weaponSpeed, autoAttack);
   const chance = Math.min(1, Math.max(0, (enchantProc.ppm * baseSpeed) / 60));
   if (!ctx.rng.chance(chance)) return;
   // ONE buff per wielder, keyed by the enchant alone: a dual-wielder with both
@@ -123,6 +155,31 @@ export function runWeaponProcs(
   if (enchantProc.heal !== undefined && enchantProc.heal > 0) {
     ctx.applyHeal(wielder, wielder, enchantProc.heal, enchant.name, enchant.id, false, false);
   }
+}
+
+// Feral strikes that resolve OUTSIDE the meleeSwing shell are still landed melee
+// attacks, so they roll the mainhand's melee enchant once per landed cast: the
+// cat finishers (Ferocious Bite, Redharvest: finisherDamage), Marrowbreak
+// (directDamage) and Sweeping Claws (aoeDamage, once per cast that struck
+// anything, never once per target, so a pack cannot multiply it). Before this
+// only autos and weaponStrike specials rolled, which left a bear rolling on its
+// auto swings alone. Scoped to the feral form kit (an ability that requires Bear
+// or Cat Form) and to physical strikes. A special, so it rolls at the carried
+// weapon's speed (meleeEnchantRollSpeed). Draws no rng for a player whose
+// mainhand carries no proc enchant, so every unenchanted stream is unchanged.
+export function rollFeralStrikeEnchant(
+  ctx: SimContext,
+  wielder: Entity,
+  ability: Pick<AbilityDef, 'requiresForm' | 'school'>,
+): void {
+  if (ability.requiresForm === undefined || ability.school !== 'physical') return;
+  if (wielder.dead || wielder.kind !== 'player') return;
+  const id = wielder.mainhandItemId;
+  if (!id) return;
+  const item = ITEMS[id];
+  if (item?.kind !== 'weapon') return;
+  if (!meetsLevelRequirement(wielder.level, item)) return;
+  rollMeleeEnchant(ctx, wielder, 'mainhand', item.weapon.speed, false);
 }
 
 function fireEffect(

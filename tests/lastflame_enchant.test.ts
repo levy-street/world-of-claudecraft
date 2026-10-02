@@ -97,12 +97,17 @@ describe("Last Flame's Zeal", () => {
     },
   );
 
+  // Cat autos roll at the fixed paw cadence (a slow stat stick must not
+  // multiply the frequency of the fast paw swings); a cat SPECIAL rolls at the
+  // carried weapon's own speed like every other class's specials, since its
+  // rate is gated by energy, never by swing speed. Bear does both at the
+  // weapon speed. Hasted either way: the roll reads the un-hasted base.
   it.each([
-    ['form_cat', 1],
-    ['form_bear', 3.4],
+    ['form_cat', 1, 3.4],
+    ['form_bear', 3.4, 3.4],
   ] as const)(
-    'uses the un-hasted natural weapon speed for %s autos and specials',
-    (form, speed) => {
+    'uses the un-hasted roll speed for %s autos (%s) and specials (%s)',
+    (form, speed, specialSpeed) => {
       const sim = new Sim({ seed: 44, playerClass: 'druid', autoEquip: false });
       sim.setPlayerLevel(20);
       const source = sim.player;
@@ -150,7 +155,7 @@ describe("Last Flame's Zeal", () => {
         abilityId: 'claw',
         normalizedInstant: true,
       });
-      expect(chance.mock.calls.at(-1)?.[0]).toBe(speed / 60);
+      expect(chance.mock.calls.at(-1)?.[0]).toBe(specialSpeed / 60);
       next.mockRestore();
       chance.mockRestore();
     },
