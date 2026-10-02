@@ -121,6 +121,13 @@ describe('rift ranks: zone mapping and tuning', () => {
         ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights'].includes(zone.id),
       ).every((zone) => !zone.riftPortalEligible),
     ).toBe(true);
+    // The northern row of the map never hosts a natural rift (maintainer
+    // decision): pinned by id against the scheduler's own eligibility list.
+    const eligibleIds = eligibleRiftZones().map((zone) => zone.id);
+    for (const id of ['amberfall', 'frostveil', 'drakelands']) {
+      expect(ZONES.some((zone) => zone.id === id)).toBe(true);
+      expect(eligibleIds).not.toContain(id);
+    }
     const farshore = eligible.find((zone) => zone.id === 'farshore_isle')!;
     const nightbloom = eligible.find((zone) => zone.id === 'nightbloom')!;
     expect(riftTierForZone(farshore, 0)).toBe('C');
@@ -152,7 +159,7 @@ describe('rift portals: one-per-zone rotation scheduler', () => {
     const events = spawnDuePortal(sim);
     // One portal per eligible zone, all distinct zones, in a single pass.
     const zones = eligibleRiftZones();
-    expect(zones.length).toBe(11);
+    expect(zones.length).toBe(8);
     expect(sim.naturalRiftPortals.length).toBe(zones.length);
     expect(new Set(sim.naturalRiftPortals.map((q) => q.zoneId)).size).toBe(zones.length);
     for (const p of sim.naturalRiftPortals) {
