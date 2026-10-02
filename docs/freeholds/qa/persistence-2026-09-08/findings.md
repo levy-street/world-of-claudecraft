@@ -5783,9 +5783,18 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   the release steps re-stop a bot the third lever held before a start. Fixed in `8d7ad08a07`.
 - ROUND THIRTY-FIVE, eight fresh readers over round thirty-four: 28 findings, none blocking, 11
   should-fix, every reader passing, one with no should-fix. Lever 3 states the bot outbox's bounds
-  as the code sets them, tied to the code by the unit suite; a waiting rerun's walk visits every
-  pid named, each session it reaches that names none deciding; a block scalar in any position and
-  an anchor of any name are refused. Fixed in `72daa3ee3a`.
+  as the code sets them (the link-change feed's drop rule corrected in round thirty-six, C36R1),
+  tied to the code by the unit suite; a waiting rerun's walk visits every pid named, each session
+  it reaches that names none deciding; a block scalar in any position and an anchor of any name
+  are refused. Fixed in `72daa3ee3a`.
+- ROUND THIRTY-SIX, eight fresh readers over round thirty-five: 23 findings, none blocking, 9
+  should-fix, every reader passing and every one with a should-fix. Lever 3 states a stop's cost
+  whole: each feed's own drop rule (the link-change feed spends its link and unlink items last,
+  where round thirty-five's entry had every feed keep its newest), the polled process alone, and a
+  batch a poll already took lost if the bot stops before posting it; the unit suite reads each
+  feed's queue code whole after the round's mutants found a one-site trim change passing its ties;
+  section L walks a rerun to two leaves, each decided by its own rule. Fixed in `d300324c33` and
+  `eb59d4a243`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5816,7 +5825,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   641, then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
   then 644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then
   647, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648,
-  then 648, then 648, then 648, then 648 passed, never a skip.
+  then 648, then 648, then 648, then 648, then 648 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):

@@ -2759,8 +2759,10 @@ rerun, the rerun is working; section L walks a step that names two stopped realm
 sign-out, pins the first stall-over reading, scopes its failure-path terminate to this database's
 live sessions, and ends the dump case's rerun before the holder is released on a failed order; the
 unit suite ties the outbox to `server/internal.ts`'s drains and each feed's cap, bans a block
-scalar in any position and an anchor of any name; the change log with it; kept whole for bisect),
-and the commit that adds this section.
+scalar in any position and an anchor of any name; the change log with it; kept whole for bisect;
+this paragraph's feed clause, like the commit's body, holds for three feeds and not the
+link-change feed, and the body has five sentences, one past the commit rule, both noted in round
+thirty-six, C36R1 and Q36R2), and the commit that adds this section.
 
 | Reader | Verdict | Findings |
 |---|---|---|
@@ -2775,8 +2777,11 @@ and the commit that adds this section.
 
 28 findings: none blocking, 11 should-fix (C35R1, C35R2, Q35R1 to Q35R3, H35R1, S35R1, D35R1,
 L35R1, T35R1, T35R2), 17 nice-to-have, every reader passing, and one (migration safety) with no
-should-fix. Six readers found lever 3's outbox sentence promising more than the capped, expiring,
-in-memory feeds give; it now states their bounds, with the feeds and their caps tied to the code.
+should-fix. Six readers (C35R1, Q35R1, H35R1, S35R1, D35R1 and L35R1) found lever 3's outbox
+sentence promising more than the capped, expiring, in-memory feeds give, and two more (M35R1 and
+T35R4) asked in nice-to-haves for parts of its fix, any end of the game process and the tie to the
+code (named so in round thirty-six, Q36R3); it now states their bounds, with the feeds and their
+caps tied to the code (the link-change feed's drop rule corrected in round thirty-six, C36R1).
 Round thirty-four edited five of round thirty-three's dispositions in place (four forward notes
 and S33R2's back-pointer), not four as its evidence said.
 
@@ -2788,7 +2793,8 @@ and S33R2's back-pointer), not four as its evidence said.
   round thirty-four, Q34R2). Q35R3 FIXED in this record (L28R1 notes C34R1's `Created`, and C34R1
   names it back). Q35R4 FIXED (see T35R2). Q35R5 FIXED (see T35R2). Q35R6 FIXED `72daa3ee3a` (the
   anchor ban reads an anchor of any name, `&$shared` among its controls, and still passes `&&`,
-  `2>&1` and `&>`; T34R3's disposition notes it). Q35R7 FIXED in this record (with L35R4: round
+  `2>&1` and `&>`; T34R3's disposition notes it; a name that starts with `&` too, `&&shared` among
+  the controls, from round thirty-six, T36R4). Q35R7 FIXED in this record (with L35R4: round
   thirty-four edited five of round thirty-three's dispositions in place).
 - H35R1 FIXED (see S35R1).
 - S35R1 FIXED `72daa3ee3a` (with C35R1, Q35R1, H35R1, D35R1, L35R1, M35R1 and T35R4: lever 3 says
@@ -2798,7 +2804,11 @@ and S33R2's back-pointer), not four as its evidence said.
   its offer, and any end of the game process while the lever holds drops everything queued; the
   bot restart note says redelivery is within each feed's cap; the unit suite holds
   `server/internal.ts`'s drains to exactly the four feeds, each file's cap to its exported
-  constant, and the queue pops' lapse to its filter; M34R1's disposition notes it).
+  constant, and the queue pops' lapse to its filter; M34R1's disposition notes it; lever 3's cost
+  stated whole, each feed's own drop rule (the link-change feed spends its link and unlink items
+  last) and the polled process alone, from round thirty-six, C36R1 and H36R3, each feed's queue
+  code read whole from that round's mutants; the restart note's taken batch, from round
+  thirty-six, C36R2; the drains read with comments stripped, from round thirty-six, T36R2).
 - D35R1 FIXED (see S35R1). D35R2 FIXED `72daa3ee3a` (with C35R3 and T35R6: the dump case's rerun
   is ended, on a failed order, before the dump-shaped holder is released, so it commits no
   sign-out after the test). D35R3 FIXED (see T35R2).
@@ -2807,8 +2817,10 @@ and S33R2's back-pointer), not four as its evidence said.
   every session reached that names none decides, the open sign-out "is ended by the rule there",
   and with no session named for the rerun at all it is working; section L queues two stopped
   realms on the table, so the first step names both, and the walk over every pid named reaches
-  exactly one session that names none, the open sign-out; D34R1's disposition notes it). T35R3
-  FIXED `72daa3ee3a` (section L pins the first stall-over reading with `Created`; C34R1's
+  exactly one session that names none, the open sign-out; D34R1's disposition notes it; the second
+  realm's own step pinned, a walk to two leaves, an open sign-out and a dump, each decided by its
+  own rule, and a working session naming none, from round thirty-six, D36R2, T36R3 and T36R5).
+  T35R3 FIXED `72daa3ee3a` (section L pins the first stall-over reading with `Created`; C34R1's
   disposition notes it). T35R4 FIXED (see S35R1). T35R5 FIXED `72daa3ee3a` (an anchor followed by
   a comment, read through the comment stripper, is among the anchor controls). T35R6 FIXED (see
   D35R2).
@@ -2820,3 +2832,94 @@ and S33R2's back-pointer), not four as its evidence said.
 - Mutants on this round's new guards, each killed and its source restored: a list-item block
   scalar in the game block; a fifth outbox drain in `server/internal.ts`; the relay cap renamed;
   an anchor named with a sigil; the stall-over reading without `Created`.
+
+## Round thirty-six: eight fresh readers over round thirty-five (`b23acc2b44..597d697861`)
+
+Round thirty-six's commits: `d300324c33` (DEPLOY: lever 3 states a stop's cost whole, what waits
+for the bot and what the outbox drops for good, each feed's own drop rule once full (the relay,
+activity and queue-pop feeds their oldest items, the link-change feed its link and unlink items
+last), and that the outbox lives in the process the bot polls, the one `GAME_SERVER_URL` names;
+the bot restart note says the restarted bot gets what is still queued, a queue pop only while its
+offer stands, and that a batch a poll already took is lost if the bot stops before posting it;
+section L pins the second realm's own step, walks a rerun to two leaves, an open sign-out and a
+dump-shaped ACCESS SHARE, each decided by its own rule, and pins that a working session names
+none; the unit suite reads the drains and the feeds with comments stripped, ties each feed's drop
+rule and the queue pops' lapse to the code and the bot's `GAME_SERVER_URL` to the compose file,
+and reads an anchor whose name starts with `&`; the pg file's Cost 13.8 s; the change log with it;
+kept whole for bisect), `eb59d4a243` (the unit suite reads each feed's queue code whole, after
+this round's mutants found a one-site trim change passing the ties), and the commit that adds this
+section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C36R1 to C36R2 |
+| qa-checklist | PASS | Q36R1 to Q36R4 |
+| server hot path | PASS | H36R1 to H36R3 |
+| privacy and security | PASS | S36R1 to S36R2 |
+| database performance | PASS | D36R1 to D36R2 |
+| test coverage | PASS | T36R1 to T36R5 |
+| docs librarian | PASS | L36R1 to L36R4 |
+| migration safety | PASS | M36R1 |
+
+23 findings: none blocking, 9 should-fix (C36R1, Q36R1, H36R1, S36R1, D36R1, T36R1, L36R1, L36R2,
+M36R1), 14 nice-to-have, every reader passing and every one with a should-fix. All eight readers
+found that lever 3's drop clause holds for three feeds and not the link-change feed, which spends
+its link and unlink items last; lever 3 now states a stop's cost whole, each feed's own drop rule
+tied to the code. This round's mutants found those ties passing a one-site trim change; the unit
+suite now reads each feed's queue code whole (`eb59d4a243`).
+
+- C36R1 FIXED `d300324c33` (with Q36R1, H36R1, S36R1, D36R1, T36R1, L36R1, L36R2 and M36R1: lever
+  3 states a stop's cost whole: the bot's role, nickname, presence, relay, activity, link-change
+  and queue-pop delivery waits until it is started again, and what the outbox drops meanwhile
+  never comes; each feed holds at most its cap and, once full, drops by its own rule, the relay,
+  activity and queue-pop feeds their oldest items, the link-change feed its link and unlink items
+  last, which the bot's periodic re-read of the linked set heals; the unit suite ties each rule to
+  its code, the relay and activity trims, the queue pops' `shift` and the link-change feed's
+  `EVICTION_LADDER` whole, read whole at every site from `eb59d4a243` (the mutants below), and
+  names the feeds' own suites as the rules' behavior pins; S35R1's disposition, round
+  thirty-five's intro and summary, and the ledger's round thirty-five entry note it). C36R2 FIXED
+  `d300324c33` (with L36R3 and H36R2: the bot restart note says the outbox hands the restarted bot
+  what is still queued, within the bounds lever 3 gives, a queue pop only while its offer stands,
+  and that a batch a poll already took, whose 200 is the outbox's only acknowledgement, is lost if
+  the bot stops before posting it; S35R1's disposition notes it).
+- Q36R1 FIXED (see C36R1). Q36R2 FIXED in this record (`72daa3ee3a`'s body has five sentences, one
+  past the commit rule, and repeats the drop clause C36R1 corrects; the commit stays, since
+  rewording it would change the hashes this record names after it, and round thirty-five's intro
+  notes it). Q36R3 FIXED in this record (with L36R4: round thirty-five's summary names the six
+  readers whose should-fix was the outbox sentence, C35R1, Q35R1, H35R1, S35R1, D35R1 and L35R1,
+  and the two whose nice-to-haves asked for parts of its fix, M35R1 and T35R4). Q36R4 FIXED (see
+  T36R2).
+- H36R1 FIXED (see C36R1). H36R2 FIXED (see C36R2). H36R3 FIXED `d300324c33` (lever 3 says the
+  outbox holds the items in the memory of the game process the bot polls, the one
+  `GAME_SERVER_URL` names, and the unit suite pins the bot's `GAME_SERVER_URL` in the compose
+  file; S35R1's disposition notes it).
+- S36R1 FIXED (see C36R1). S36R2 FIXED `d300324c33` (any end of the game process while lever 3
+  holds drops everything still queued, not only what was queued since the stop).
+- D36R1 FIXED (see C36R1). D36R2 FIXED `d300324c33` (section L pins the second realm's own step:
+  it names the first realm and the open sign-out; T35R2's disposition notes it).
+- T36R1 FIXED (see C36R1). T36R2 FIXED `d300324c33` (with Q36R4: the drain scan and the feeds are
+  read with comments stripped, the lapse filter inside `drainQueuePops`, now within its feed's
+  whole pin from `eb59d4a243`, and the comment says a feed drained by a `drain<Name>(` call fails
+  until DEPLOY names it; S35R1's disposition notes it). T36R3 FIXED `d300324c33` (section L queues
+  a stopped realm behind an open sign-out and a dump-shaped ACCESS SHARE, so the walk from the
+  rerun reaches two sessions that name none; the sign-out is ended by the rule, the dump never is,
+  and the realm's statement behind it is ended by The nightly dump's statement; T35R2's
+  disposition notes it). T36R4 FIXED `d300324c33` (the anchor ban reads a name that starts with
+  `&`, `&&shared` among its controls, and still passes `a && b`, `2>&1` and `&>`; Q35R6's
+  disposition notes it). T36R5 FIXED `d300324c33` (section L pins that a working session, one in
+  `pg_sleep`, names none; T35R2's disposition notes it).
+- L36R1 FIXED (see C36R1). L36R2 FIXED (see C36R1). L36R3 FIXED (see C36R2). L36R4 FIXED (see
+  Q36R3).
+- M36R1 FIXED (see C36R1).
+- Mutants on this round's new guards, each killed and its source restored: in the unit suite, a
+  one-site change to the relay's enqueue trim and to the queue pops' requeue trim, a link-change
+  ladder that spends flex noise before playtime noise, a `drainQueuePops` that keeps lapsed pops
+  with its filter left in a comment, a relay drain left only in a comment, the bot polling another
+  URL, and an anchor whose name starts with `&`; in section L, a naming statement that hides a
+  `pg_dump` session (failing at the two-leaf walk) and one that names a working session (failing
+  at its arm). The two one-site trims first passed the unit suite, whose ties read only that each
+  rule's line was present, and failed only in the feeds' own suites; `eb59d4a243` reads each
+  feed's queue code whole, and both now fail in the unit suite, as do five more aimed at it: a
+  pops trim that stops early, a link-change requeue without its trim, a playtime rung that takes a
+  link item, a new function that hands the relay queue out, and a trim that walks the queue newest
+  first.
