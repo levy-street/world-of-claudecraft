@@ -5729,6 +5729,11 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   stated boundary with its recovery owed; the start gate is one rule for every realm start the
   file gives, the first included; section L crosses both waiter kinds with both timings and
   shows a stopped build holding the lock to its end. Fixed in `7171f7717a`.
+- ROUND TWENTY-SIX, eight fresh readers over round twenty-five: 44 findings, none blocking, 15
+  should-fix. The stall-over reading missed a boot still queued for SHARE, so its modes are now
+  read off PostgreSQL's own conflicts with a token write; the gate's diagnosis decides by the
+  holder's wait rather than never ending it, and a stopped realm's build may be cancelled; every
+  realm start the file gives is listed whole and points to the gate. Fixed in `5df3f2f243`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5758,7 +5763,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then
   641, then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
   then 644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then
-  647, then 648, then 648, then 648 passed, never a skip.
+  647, then 648, then 648, then 648, then 648 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
@@ -5772,9 +5777,9 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 
 - Both halves of the boot's deadlock fix (R-11), a maintainer decision.
 - Recovering an account a stall left open: a leftover token that a skipped revoke kept valid
-  can, before the sign-out, add a sign-in link or set a recovery email, and DEPLOY's stall
-  bullet undoes neither. A recovery procedure (finding such accounts and their changes) is a
-  maintainer decision.
+  can, before the sign-out, add a sign-in link, set a recovery email or act in game, and
+  DEPLOY's stall bullet undoes none of it. A recovery procedure (finding such accounts and their
+  changes) is a maintainer decision.
 - The index-build deadlock: the runner and every boot take the schema advisory lock with a
   blocking call that holds a snapshot while it waits, which a concurrent build then waits on.
   Making a waiter wait with no transaction open (polling a session-level try-lock in short

@@ -1725,10 +1725,10 @@ now reads secret-shaped columns.
   owner did not add from each account a password change or staff reset named during the stall;
   replaced by a stated boundary and an owed recovery in round twenty-five, S25R1). C24R3 FIXED
   (see D24R3). C24R4 FIXED (see T24R1). C24R5 FIXED `9458280c1f` (the stall is over once its boot
-  COMMITs or the dump route's terminate, run again, returns no row). C24R6 FIXED `9458280c1f`
-  (with S24R3: resends go in the order made, skipping one a later reversal undid; a repeat sends
-  its notice email again and writes a second audit row; a suspension is resent with its original
-  end time).
+  COMMITs or the dump route's terminate, run again, returns no row; replaced by the stall-over
+  reading in round twenty-five, C25R1). C24R6 FIXED `9458280c1f` (with S24R3: resends go in the
+  order made, skipping one a later reversal undid; a repeat sends its notice email again and
+  writes a second audit row; a suspension is resent with its original end time).
 - S24R1 FIXED `9458280c1f` (with T24R6: the sign-out deletes `discord_oauth_states`, section L
   seeds a link row and sees it gone, and the credential pin reads secret-shaped columns, so that
   table and three more are classified). S24R2 FIXED `9458280c1f` (the wallet challenge is spent
@@ -1807,45 +1807,49 @@ email, how to find the accounts), so it is now a stated boundary with its recove
 than another list. The gate had been applied site by site, so it is now one rule for every start
 the file gives, the first included.
 
-- S25R1 FIXED `7171f7717a` (with C25R2 and C25R3: the stall bullet states that a sign-out undoes
-  nothing a leftover token did before it, a sign-in link it added or a recovery email it set
-  among them, that the bullet does not recover such an account, and that this recovery is owed;
-  the ledger's OWED list carries it). S25R2 FIXED (see S25R1). S25R3 FIXED `7171f7717a` (the
+- S25R1 FIXED `7171f7717a` (with S25R2, C25R2 and C25R3: the stall bullet states that a sign-out
+  undoes nothing a leftover token did before it, a sign-in link it added or a recovery email it
+  set among them, that the bullet does not recover such an account, and that this recovery is
+  owed; the ledger's OWED list carries it). S25R2 FIXED (see S25R1). S25R3 FIXED `7171f7717a` (the
   accounts reason names its unsubscribe token). S25R4 FIXED `7171f7717a` (with C25R7 and M25R3: a
   suspension whose end time has passed is skipped).
 - Q25R1 FIXED in this record (H24R1 names L24R8). Q25R2 FIXED `7171f7717a` (with L25R1: the quiet
-  window and the dump route's quiet branch start each realm by Index builds). Q25R3 FIXED
-  `7171f7717a` ("the runner's later indexes and VALIDATE"). Q25R4 FIXED `7171f7717a` (with H25R4:
-  each quick order gets one retry). Q25R5 FIXED `7171f7717a` (with T25R5 and C25R8: no dynamic
-  import or require, with a control; a store behind ./auth is stated as beyond the pin). Q25R6
-  FIXED (see T25R2). Q25R7 FIXED in this record: `83cfd9c546`'s body says each finding was
-  disposed with its commit, where Q24R8 is NO CHANGE and four were fixed in the record; the
-  commit stays as it is.
+  window and the dump route's quiet branch start each realm by Index builds; the quiet window
+  reworded in round twenty-six, L26R3, and only the dump route's first boot in a quiet window,
+  L26R2). Q25R3 FIXED `7171f7717a` ("the runner's later indexes and VALIDATE"). Q25R4 FIXED
+  `7171f7717a` (with H25R4: each quick order gets one retry). Q25R5 FIXED `7171f7717a` (with T25R5
+  and C25R8: no dynamic import or require, with a control; a store behind ./auth is stated as
+  beyond the pin). Q25R6 FIXED (see T25R2). Q25R7 FIXED in this record: `83cfd9c546`'s body says
+  each finding was disposed with its commit, where Q24R8 is NO CHANGE and four were fixed in the
+  record; the commit stays as it is.
 - M25R1 FIXED `7171f7717a` (with C25R5, D25R1 and L25R5: every start of a realm the file gives,
   the first included, goes by the gate; release step 6 and the rollback say so). M25R2 FIXED
   `7171f7717a` (the case rebuilds its index in a finally). M25R3 FIXED (see S25R4).
-- L25R1 FIXED (see Q25R2). L25R2 FIXED `7171f7717a` (the ledger ceiling's start goes one at a
-  time by Index builds). L25R3 FIXED `7171f7717a` (with C25R4, D25R2 and T25R6: a realm's stop or
-  crash does not end a build already running, and an early end is this deadlock, a cancelled or
-  terminated backend or a database restart; section L closes a waiting build's client and sees
-  the build hold the lock to its end, valid). L25R4 FIXED `7171f7717a` and in the ledger (with
-  T25R9: the runner's and the receipts helper's comments say a waiting boot holds a snapshot; the
-  growth budget's note sits inside a SQL fragment's function body, where a comment change would
-  change the boot's DDL, so it stays, named in the OWED item). L25R5 FIXED (see M25R1). L25R6
-  FIXED `7171f7717a` (a start after the first runs beside the realms already serving, outside the
-  quiet window, and the Realms bullet points to it).
+- L25R1 FIXED (see Q25R2). L25R2 FIXED `7171f7717a` (the ledger ceiling's start goes one at a time
+  by Index builds). L25R3 FIXED `7171f7717a` (with C25R4, D25R2 and T25R6: a realm's stop or crash
+  does not end a build already running, and an early end is this deadlock, a cancelled or
+  terminated backend or a database restart; section L closes a waiting build's client and sees the
+  build hold the lock to its end, valid; four server comments still said a stop or crash ends a
+  build until round twenty-six, L26R1). L25R4 FIXED `7171f7717a` and in the ledger (with T25R9:
+  the runner's and the receipts helper's comments say a waiting boot holds a snapshot; the growth
+  budget's note sits inside a SQL fragment's function body, where a comment change would change
+  the boot's DDL, so it stays, named in the OWED item). L25R5 FIXED (see M25R1). L25R6 FIXED
+  `7171f7717a` (a start after the first runs beside the realms already serving, outside the quiet
+  window, and the Realms bullet points to it).
 - H25R1 FIXED `7171f7717a` (a diagnosis statement lists the holder and the waiter and what they
   wait on: never end the holder; a build waiting for old snapshots waits for the oldest open
-  transaction; section L reads it at a holder and a waiter). H25R2 FIXED `7171f7717a` (the runner
+  transaction; section L reads it at a holder and a waiter; the advice replaced in round
+  twenty-six by a decision on the holder's wait, C26R2). H25R2 FIXED `7171f7717a` (the runner
   holds the lock through its drops, builds and the VALIDATE, with their bounds). H25R3 NO CHANGE:
   setting `deadlock_timeout` per session needs a superuser, which the CI role need not be. H25R4
   FIXED (see Q25R4). H25R5 FIXED `7171f7717a` (the waiter's client is taken inside the try).
 - C25R1 FIXED `7171f7717a` (the stall is over once no session holds or waits for ACCESS EXCLUSIVE
-  on `auth_tokens`; section L reads that statement at 1 behind a held `characters` lock and
-  behind a held `auth_tokens` lock, and at 0 with no boot). C25R2 FIXED (see S25R1). C25R3 FIXED
-  (see S25R1). C25R4 FIXED (see L25R3). C25R5 FIXED (see M25R1). C25R6 FIXED `7171f7717a` ("can
-  deadlock"; a waiter that began before the build's last wait does). C25R7 FIXED (see S25R4).
-  C25R8 FIXED (see Q25R5).
+  on `auth_tokens`; section L reads that statement at 1 behind a held `characters` lock and behind
+  a held `auth_tokens` lock, and at 0 with no boot; widened in round twenty-six to every mode that
+  blocks a token write, C26R1). C25R2 FIXED (see S25R1). C25R3 FIXED (see S25R1). C25R4 FIXED (see
+  L25R3). C25R5 FIXED (see M25R1). C25R6 FIXED `7171f7717a` ("can deadlock"; a waiter that began
+  before the build's last wait does, a clause removed in round twenty-six, C26R3). C25R7 FIXED
+  (see S25R4). C25R8 FIXED (see Q25R5).
 - D25R1 FIXED (see M25R1). D25R2 FIXED (see L25R3). D25R3 FIXED `7171f7717a` and in the ledger
   (the owed fix polls in short statements of its own, idle between them, and the gate would then
   see a waiter only once it holds the lock).
@@ -1859,3 +1863,104 @@ the file gives, the first included.
   T25R7 FIXED `7171f7717a` (the progress view reads 0 while the gate reads 2). T25R8 FIXED
   `7171f7717a` (the bounds case pins the quiet window line, the Index builds line and the Realms
   pointer). T25R9 FIXED (see L25R4).
+
+## Round twenty-six: eight fresh readers over round twenty-five (`83cfd9c546..da3685142b`)
+
+Round twenty-six's commits: `5df3f2f243` (the stall is over once no session holds or waits for a
+lock on `auth_tokens` that blocks a token write, every mode that conflicts with a write's ROW
+EXCLUSIVE, on two readings; the sign-out also clears GitHub link states; the boundary's items are
+examples; the gate's diagnosis adds each holder's phase, the sessions it waits for and their
+address, and the holder's wait decides what to do; a build, a stopped realm's included, may be
+cancelled, and after a rollback a carcass no runner names is dropped by hand; the runner's bounds
+name their waits and its retire step; the stop-or-crash claim names
+`client_connection_check_interval`; the gate covers every operator start, the last reading just
+before it; release step 6 builds before its readings; every realm start the file gives points to
+the gate, and the dump route's first boot is the quiet one; four server comments, two test
+comments and two desktop docs corrected, two comments rewrapped; section L reads the stall
+reading's modes off the server and reads it behind a writer, reads the diagnosis on a stalled boot
+and on a build at its wait, cancels a stopped build and drops the carcass, rebuilds a lost build's
+index through the runner, times a run with nothing to build and counts retries; the unit case
+lists every start site whole; the change log with it; kept whole for bisect), and the commit that
+adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C26R1 to C26R6 |
+| qa-checklist | PASS | Q26R1 to Q26R5 |
+| server hot path | PASS | H26R1 to H26R6 |
+| privacy and security | PASS | S26R1 to S26R3 |
+| database performance | PASS | D26R1 to D26R5 |
+| test coverage | PASS | T26R1 to T26R9 |
+| docs librarian | FAIL (should-fix only) | L26R1 to L26R7 |
+| migration safety | PASS | M26R1 to M26R3 |
+
+44 findings: none blocking, 15 should-fix (C26R1, C26R2, Q26R1, Q26R2, L26R1, L26R2, H26R1, H26R2,
+M26R1, M26R2, T26R1 to T26R3, D26R1, D26R2), 29 nice-to-have. The stall-over reading had missed a
+lock mode, so its modes are now read off PostgreSQL's own conflicts with a token write and pinned
+whole; the restart sites had drawn one more each round, so the unit case now lists every start
+site the file gives, whole, and fails a new one until it points to the gate. Every runtime claim
+the readers asked to see was observed on PostgreSQL 16 first: a boot queued for SHARE behind an
+open write, a revoke failing 57014 behind it, the widened reading at 1 where the old one read 0,
+the diagnosis on that boot and on a build at its wait for old snapshots (blocked by a REPEATABLE
+READ session and never by an idle READ COMMITTED writer, which holds no snapshot), and a stopped
+realm's build cancelled, the lock freed and the index INVALID.
+
+- C26R1 FIXED `5df3f2f243` (with Q26R1, H26R2, D26R1, L26R6 and S26R3: the stall is over once no
+  session holds or waits for a lock on `auth_tokens` that blocks a token write, the modes that
+  conflict with ROW EXCLUSIVE, on two readings a few seconds apart; section L holds each mode in
+  turn and tries a write's lock to read those modes off the server, pins the statement's list to
+  them, reads 2 behind each parent and 1 behind an open write, where counting ACCESS EXCLUSIVE
+  alone reads 0, and sees a token write fail 57014 there). C26R2 FIXED `5df3f2f243` (with H26R1,
+  M26R1, M26R2 and D26R2: the diagnosis adds `phase`, `blocked_by` and `client_addr`, and the
+  holder's wait decides: on `relation` a boot behind the dump goes by The nightly dump, else its
+  `blocked_by` sessions end; on `virtualxid` a build or a drop waits for its `blocked_by`
+  sessions, each a writer or locker of its table or an older snapshot, never an idle READ
+  COMMITTED transaction; only an `idle in transaction` session from no realm's address is ended; a
+  build may be cancelled, a stopped realm's included, changing no rows and leaving its index
+  INVALID; after a rollback DEPLOY's drop removes a carcass no runner names; section L reads the
+  diagnosis on a stalled boot and on a build at its wait, cancels a stopped build with DEPLOY's
+  statement, and runs the drop). C26R3 FIXED `5df3f2f243` (with D26R4: the clause on which waiter
+  deadlocks is gone, and the losing build is named by its last wait). C26R4 FIXED `5df3f2f243`
+  (the runner drops any index it replaces). C26R5 FIXED (see T26R2). C26R6 FIXED `5df3f2f243`
+  (release step 6 builds, then takes the readings just before `up -d`, and the gate's last reading
+  comes just before every start).
+- Q26R1 FIXED (see C26R1; C25R1's disposition notes the widening). Q26R2 FIXED in this record
+  (S25R1's list names S25R2). Q26R3 FIXED in this record (C24R5 notes its replacement in round
+  twenty-five, C25R1). Q26R4 FIXED `5df3f2f243` (the unit case pins the quiet window's new
+  clause). Q26R5 FIXED (see L26R7).
+- L26R1 FIXED `5df3f2f243` (the runner's, the registry's, the metrics and the admin index
+  comments, and two test comments, name the early ends DEPLOY names and say a realm's own stop or
+  crash leaves its build running; L25R3's disposition notes it). L26R2 FIXED `5df3f2f243` (the
+  dump route boots the first stopped realm in a quiet window). L26R3 FIXED `5df3f2f243` (the quiet
+  window is quiet realms outside the dump, one shutdown before the next boot, and a start in it
+  still goes by Index builds). L26R4 FIXED (see T26R3). L26R5 FIXED `5df3f2f243` (the gate covers
+  every start an operator makes by the file; a restart by the restart policy or the watchdog
+  cannot wait for it and can meet the deadlock). L26R6 FIXED (see C26R1). L26R7 FIXED `5df3f2f243`
+  (with Q26R5: both comments rewrapped).
+- H26R1 FIXED (see C26R2). H26R2 FIXED (see C26R1). H26R3 FIXED `5df3f2f243` (with D26R3: the
+  bounds name each create's wait behind a VACUUM, an ANALYZE or DDL, a build's waits for writers
+  and older snapshots, the dump among them, and a drop's wait for every locker). H26R4 FIXED
+  `5df3f2f243` (a start after the first is still outside the nightly dump). H26R5 FIXED
+  `5df3f2f243` (the stall-over readings ride the parents loop, two boots fewer, and bootBehind
+  keeps its must-finish check unless its caller lets the boot fail). H26R6 FIXED `5df3f2f243` (the
+  snapshot client is taken inside the try, and the cleanup runner runs only once the gate reads 0,
+  so a lock still held fails the reads after it instead of hanging).
+- M26R1 FIXED (see C26R2). M26R2 FIXED (see C26R2). M26R3 FIXED (see T26R3).
+- T26R1 FIXED `5df3f2f243` (after the four orders the index a lost build left reads INVALID, the
+  gate 0, and the runner drops it and builds it again). T26R2 FIXED `5df3f2f243` (with C26R5: the
+  diagnosis on a build at its wait reads `Lock`, `virtualxid`, the phase and the snapshot's pid).
+  T26R3 FIXED `5df3f2f243` (with L26R4 and M26R3: every `docker compose` start of the game service
+  and every operator restart in DEPLOY's phrasings is listed whole, and its paragraph, bullet or
+  code block points to Index builds; the SES, community test, API dispatch, Freeholds flag,
+  storage price and bot start sites gained the pointer). T26R4 FIXED `5df3f2f243` (both quick
+  orders needing their retry fails). T26R5 FIXED `5df3f2f243` (with D26R5: the stopped-build order
+  reads `client_connection_check_interval` as 0, and DEPLOY names it). T26R6 FIXED `5df3f2f243` (a
+  runner run with nothing to build takes under 5 s). T26R7 FIXED `5df3f2f243` (the unsubscribe
+  handler and the two statements it runs are pinned whole). T26R8 FIXED `5df3f2f243` (the late
+  orders wait `deadlock_timeout` plus 500 ms). T26R9 FIXED `5df3f2f243` (the screen sees
+  `createRequire`, with a control).
+- D26R1 FIXED (see C26R1). D26R2 FIXED (see C26R2). D26R3 FIXED (see H26R3). D26R4 FIXED (see
+  C26R3). D26R5 FIXED (see T26R5).
+- S26R1 FIXED `5df3f2f243` (the boundary's items are examples, what the live session did in game
+  among them). S26R2 FIXED `5df3f2f243` (the sign-out clears `github_oauth_states`; section L
+  seeds a row and sees it cleared, and the classification says so). S26R3 FIXED (see C26R1).
