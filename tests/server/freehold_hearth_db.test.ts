@@ -955,5 +955,11 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
     expect(bullet).toContain(`SET ready_at_ms = ${clock} + ${HEARTH_KEY_COOLDOWN_MS}`);
     expect(bullet).toContain(`WHERE ready_at_ms > ${clock} + ${HEARTH_KEY_COOLDOWN_MS}`);
     expect(bullet).not.toContain('$1');
+    // A read finds them first, and the repair is refused during a clock step,
+    // when healthy rows read as corrupt and clamping them would shorten them.
+    expect(bullet).toContain(
+      `SELECT account_id, ready_at_ms FROM account_freehold_hearth WHERE ready_at_ms > ${clock} + ${HEARTH_KEY_COOLDOWN_MS}`,
+    );
+    expect(bullet).toContain('NEVER repair during a clock step');
   });
 });
