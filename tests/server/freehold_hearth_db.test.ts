@@ -1013,8 +1013,15 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
       'PRINT',
       'DISPLACE',
       'DROP',
+      'HOLDER',
     ]);
-    expect([...raw.matchAll(/```sql/g)]).toHaveLength(5);
+    // Every fence in the bullet, opening and closing: the one shell command,
+    // then the six SQL blocks, and nothing else.
+    expect([...raw.matchAll(/\n {2}```(\w*)(?=\n|$)/g)].map((match) => match[1])).toEqual([
+      'sh',
+      '',
+      ...Array.from({ length: 6 }, () => ['sql', '']).flat(),
+    ]);
     const block = Object.fromEntries(labelled);
     const fragment = codeOnly(FREEHOLD_HEARTH_SCHEMA);
     const repair = (fragment.match(
@@ -1063,6 +1070,11 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
         'ALTER TABLE public.account_freehold_hearth DROP CONSTRAINT account_freehold_hearth_advance_token_shape_displaced;',
       ),
     );
+    // HOLDER names sessions by pid, name, state and lock only: never a query
+    // text or a client address, and never its own session.
+    expect(block.HOLDER).toBe(
+      "SELECT a.pid, a.application_name, a.state, l.mode, l.granted FROM pg_stat_activity a LEFT JOIN pg_locks l ON l.pid = a.pid AND l.relation = 'public.account_freehold_hearth'::regclass WHERE a.pid <> pg_backend_pid() AND (l.pid IS NOT NULL OR a.application_name = 'advance_token_runbook');",
+    );
     // The procedure's safety rules in its prose: the read and every block sent
     // through one command, as one named non-interactive session with no realm
     // booting and outside the nightly dump, under the blocks' own lock and
@@ -1072,30 +1084,45 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
     // name settled before DISPLACE again, the live name never dropped, and
     // every statement naming the table the boot checks.
     expect(bullet).toContain(
-      'Send the read and each block below as its own file through this one command, never pasted into an interactive session, with no realm booting or restarting and outside the nightly `pg_dump`:',
+      'Send the read and each block below as its own file through this one command, never pasted into an interactive session, with no realm booting or restarting and outside the nightly `pg_dump` (it starts at 03:15 UTC, see Backups):',
     );
     // The command is one line in the bullet's one shell fence, so it is copied
     // whole. psql names its session from PGAPPNAME (a `-c application_name`
     // in PGOPTIONS loses to psql's own name), and PGOPTIONS bounds every wait.
-    expect([...raw.matchAll(/```sh/g)]).toHaveLength(1);
     expect((raw.match(/\n {2}```sh\n {2}(.*)\n {2}```\n/) ?? ['', ''])[1]).toBe(
       "sudo docker exec -i -e PGAPPNAME=advance_token_runbook -e PGOPTIONS='-c lock_timeout=2s -c idle_in_transaction_session_timeout=5s' eastbrook-db psql -X -v ON_ERROR_STOP=1 -v VERBOSITY=sqlstate -U eastbrook eastbrook < block.sql",
     );
     expect(bullet).toContain(
-      "Each send is one session named `advance_token_runbook`: it stops at the first error and exits on a lost connection rather than reconnecting, its lock waits and pauses are bounded, it prints an error as its SQLSTATE code alone, never a message or a DETAIL (a DETAIL can carry an account id; the database's own log still records it, so never attach that log to a report), and an error ends the session, which rolls the block back",
+      "Each send is one session named `advance_token_runbook`: it stops at the first error and exits on a lost connection rather than reconnecting, its lock waits and pauses are bounded, it prints an error as its SQLSTATE code alone, never a message or a DETAIL (a DETAIL can carry an account id; the database's own log, `docker logs eastbrook-db`, still records it, so never attach that log to a report), and an error ends the session, which rolls the block back",
+    );
+    expect(bullet).toContain(
+      "A report gives the read's `contype`, `convalidated`, `keys` and `columns` and whether the definition matched the text above or PRINT's, never the definition itself",
     );
     // A boot that cannot re-add the column, its name held, loops: stop.
     expect(bullet).toContain(
-      'if a constraint of that name already holds it (on other columns or none), every boot fails with 42710, rolls back, exits and is restarted, and every restart repeats the stall (above), so stop the realms, keep them stopped, and report it',
+      'if a constraint already holds that name (on other columns or none), every boot fails with 42710, rolls back, exits and is restarted, and every restart repeats the stall (above), so stop the realms, keep them stopped, and report it',
     );
     // The error routes are a CLOSED set, each code tied to the block that
     // raises it, plus the lock retry, the integrity route, the lost session
     // and the stop for anything else. Every SQLSTATE-shaped token the prose
-    // names, letter-led or not, and every class it routes, is in these
-    // ordered lists, so a route added in any wording must join them.
+    // names, letter-led or not, and every class it routes as `code starting
+    // NN`, is in these ordered lists, so a route keyed by a code or such a
+    // class, in any wording, must join them; a route keyed by no code (the
+    // lost connection) is pinned by its own text below.
+    const code = /\b(?=[0-9A-Z]{5}\b)[A-Z]*\d[0-9A-Z]*\b/g;
     expect(
-      [...bullet.matchAll(/\b(?=[0-9A-Z]{5}\b)[A-Z]*\d[0-9A-Z]*\b/g)].map((match) => match[0]),
-    ).toEqual(['42710', '55P03', '40P01', '42710', '42703', '42710', '42P07', '42703']);
+      [...'on P0001 or XX000 or 42P07, not CHECK or PRINT'.matchAll(code)].map((match) => match[0]),
+    ).toEqual(['P0001', 'XX000', '42P07']);
+    expect([...bullet.matchAll(code)].map((match) => match[0])).toEqual([
+      '42710',
+      '55P03',
+      '40P01',
+      '42710',
+      '42703',
+      '42710',
+      '42P07',
+      '42703',
+    ]);
     expect([...bullet.matchAll(/code starting (\d\d)/g)].map((match) => match[1])).toEqual([
       '23',
       '23',
@@ -1110,9 +1137,8 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
       '42710 or 42P07 from DISPLACE',
       '42703 from DISPLACE',
     ]);
-    expect(bullet).toContain('on 55P03 or 40P01 wait about 10 s and send the same file again');
     expect(bullet).toContain(
-      '(if it is the nightly `pg_dump`, wait for the dump to end and never end it; if it is another `advance_token_runbook` session, take the lost connection route; for any other holder, stop and report it)',
+      "on 55P03 or 40P01 send HOLDER: if it shows a `pg_dump` session, wait for the dump to end and never end it, then send the same file again, counting attempts afresh; if it shows another `advance_token_runbook` session, take the lost connection route; otherwise wait about 10 s and send the same file again, at most about five times in all, then stop and report HOLDER's rows",
     );
     expect(bullet).toContain(
       'on 42710 from RESTORE the name was taken since the read, so re-run the read',
@@ -1130,7 +1156,7 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
       'on a code starting 23 (an integrity error) from NULL AND VALIDATE, see the drop rule',
     );
     expect(bullet).toContain(
-      "on a lost connection (psql exits saying the connection was lost, whatever code it printed first), wait up to about a minute until `pg_stat_activity` shows no other `advance_token_runbook` session (if one remains, stop and report it), then re-run the read (after DROP, the drop rule's read): if the block landed, go on from the step after it, and if not, send it again",
+      "on a lost connection (psql exits saying the connection was lost, whatever code it printed first), send HOLDER until it shows no `advance_token_runbook` session, for up to about a minute (if one remains, stop and report it); then send the read or PRINT again, since they change nothing, or for any other block re-run the read (after DROP, the drop rule's read): if the block landed, go on from the step after it (a NULL AND VALIDATE that landed so reports its count as unknown), and if not, send it again once, and if that send also loses its connection, stop and report it; on anything else, stop",
     );
     expect(bullet).toContain('on anything else, stop');
     const readAt = bullet.indexOf('First read what the name holds');

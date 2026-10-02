@@ -496,8 +496,8 @@ d('account_freehold_hearth against real PostgreSQL', () => {
     expect(await boot(hearthSchema)).toEqual([]);
   });
 
-  it("runs the operator's own runbook SQL, every block, against a real impostor, a taken displaced name and a missing CHECK", async () => {
-    // The five labelled blocks of DEPLOY.md's advance-token bullet, each sent
+  it("runs the operator's own runbook SQL, every block, against a real impostor, a taken displaced name, a missing CHECK and a missing column", async () => {
+    // The six labelled blocks of DEPLOY.md's advance-token bullet, each sent
     // as the bullet's psql command sends it (one file, one session), against a
     // table whose probed name holds an impostor, one whose name holds nothing,
     // and one whose displaced impostor fails NULL AND VALIDATE.
@@ -522,6 +522,7 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       'PRINT',
       'DISPLACE',
       'DROP',
+      'HOLDER',
     ]);
     const named = async (name: string) =>
       (
@@ -591,10 +592,14 @@ d('account_freehold_hearth against real PostgreSQL', () => {
           "SELECT current_setting('application_name') AS app, current_setting('lock_timeout') AS lock, current_setting('idle_in_transaction_session_timeout') AS idle",
         ),
       ).toEqual([{ app: 'advance_token_runbook', lock: '2s', idle: '5s' }]);
-      // The control: a name given in PGOPTIONS loses to psql's own.
+      // The control: a name given in PGOPTIONS loses to psql's own. Neither
+      // the URL nor the environment may name the session for it.
+      expect(url).not.toMatch(/[?&](?:application_name|options)=/);
+      vi.stubEnv('PGAPPNAME', '');
       const namedInOptions = await asPsql({
         options: `${pgoptions} -c application_name=advance_token_runbook`,
       });
+      vi.unstubAllEnvs();
       try {
         await namedInOptions.connect();
         expect(
@@ -751,6 +756,46 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       await send(block.DROP);
       expect(await send(block['NULL AND VALIDATE'])).toEqual([{ non_hex: '1' }]);
       expect(await token()).toEqual([{ advance_token: null }]);
+      expect((await named(NAME)).map((row) => row.def)).toEqual([VALID_DEF]);
+      // HOLDER shows another session's lock on the table by name and mode,
+      // and never the session that sends it.
+      const dump = await asPsql({ options: '', application_name: 'pg_dump' });
+      try {
+        await dump.connect();
+        await dump.query('BEGIN');
+        await dump.query(`LOCK TABLE ${legacyTable} IN ACCESS SHARE MODE`);
+        expect(await send(block.HOLDER)).toEqual([
+          {
+            pid: expect.any(Number),
+            application_name: 'pg_dump',
+            state: 'idle in transaction',
+            mode: 'AccessShareLock',
+            granted: true,
+          },
+        ]);
+      } finally {
+        await dump.query('ROLLBACK').catch(() => {});
+        await dump.end();
+      }
+      expect(await send(block.HOLDER)).toEqual([]);
+      // A missing column. With its name free, RESTORE fails 42703 and the next
+      // boot re-adds the column with its CHECK; with the name held on another
+      // column or none, DISPLACE fails 42703 and changes nothing, and every
+      // boot fails 42710.
+      await pool.query(`ALTER TABLE ${legacyTable} DROP COLUMN advance_token`);
+      expect(await named(NAME)).toEqual([]);
+      await expect(send(block.RESTORE)).rejects.toMatchObject({ code: '42703' });
+      for (const holding of ['UNIQUE (account_id)', 'CHECK (true)']) {
+        await pool.query(`ALTER TABLE ${legacyTable} ADD CONSTRAINT ${NAME} ${holding}`);
+        await expect(send(block.DISPLACE), holding).rejects.toMatchObject({ code: '42703' });
+        expect(
+          (await named(NAME)).map((row) => row.def),
+          holding,
+        ).toEqual([holding]);
+        await expect(boot(), holding).rejects.toMatchObject({ code: '42710' });
+        await pool.query(`ALTER TABLE ${legacyTable} DROP CONSTRAINT ${NAME}`);
+      }
+      expect(await boot()).toEqual([]);
       expect((await named(NAME)).map((row) => row.def)).toEqual([VALID_DEF]);
     } finally {
       // Whatever failed, the legacy table ends with the real CHECK and no

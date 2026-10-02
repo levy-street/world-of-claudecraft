@@ -1165,14 +1165,14 @@ For off-box safety, sync the directory to S3 occasionally:
   advance token shape is unchecked` instead. The log judges the text only, so it also
   fires on a correct CHECK a newer PostgreSQL prints differently; the cases below tell
   them apart by text, never by judgment. A boot that finds the column itself missing
-  re-adds it with its CHECK by that name, unprobed: if a constraint of that name
-  already holds it (on other columns or none), every boot fails with 42710, rolls
-  back, exits and is restarted, and every restart repeats the stall (above), so stop
-  the realms, keep them stopped, and report it. The boot checks
-  `public.account_freehold_hearth`, and every statement below names it so. Send the
-  read and each block below as its own file through this one command, never pasted
-  into an interactive session, with no realm booting or restarting and outside the
-  nightly `pg_dump`:
+  re-adds it with its CHECK by that name, unprobed: if a constraint already holds that
+  name (on other columns or none), every boot fails with 42710, rolls back, exits and
+  is restarted, and every restart repeats the stall (above), so stop the realms, keep
+  them stopped, and report it. The boot checks `public.account_freehold_hearth`, and
+  every statement below names it so. Send the read and each block below as its own
+  file through this one command, never pasted into an interactive session, with no
+  realm booting or restarting and outside the nightly `pg_dump` (it starts at 03:15
+  UTC, see Backups):
 
   ```sh
   sudo docker exec -i -e PGAPPNAME=advance_token_runbook -e PGOPTIONS='-c lock_timeout=2s -c idle_in_transaction_session_timeout=5s' eastbrook-db psql -X -v ON_ERROR_STOP=1 -v VERBOSITY=sqlstate -U eastbrook eastbrook < block.sql
@@ -1181,14 +1181,17 @@ For off-box safety, sync the directory to S3 occasionally:
   Each send is one session named `advance_token_runbook`: it stops at the first error
   and exits on a lost connection rather than reconnecting, its lock waits and pauses
   are bounded, it prints an error as its SQLSTATE code alone, never a message or a
-  DETAIL (a DETAIL can carry an account id; the database's own log still records it,
-  so never attach that log to a report), and an error ends the session, which rolls
-  the block back. The read deparses under a brief ACCESS SHARE on the Hearth table, as
-  the boot's probe does; every block but PRINT locks the table to its COMMIT, and a
-  boot that waits behind one holds both parents. First read what the name holds:
-  `SELECT contype, convalidated, pg_get_constraintdef(oid), cardinality(conkey) AS
-  keys, (SELECT array_agg(attname) FROM pg_attribute WHERE attrelid = conrelid AND
-  attnum = ANY (conkey)) AS columns FROM pg_constraint WHERE conrelid =
+  DETAIL (a DETAIL can carry an account id; the database's own log, `docker logs
+  eastbrook-db`, still records it, so never attach that log to a report), and an error
+  ends the session, which rolls the block back. The read deparses under a brief ACCESS
+  SHARE on the Hearth table, as the boot's probe does; every block but PRINT locks the
+  table to its COMMIT, and a boot that waits behind one holds both parents. A report
+  gives the read's `contype`, `convalidated`, `keys` and `columns` and whether the
+  definition matched the text above or PRINT's, never the definition itself, which can
+  carry a literal from a hand-made constraint. First read what the name holds: `SELECT
+  contype, convalidated, pg_get_constraintdef(oid), cardinality(conkey) AS keys,
+  (SELECT array_agg(attname) FROM pg_attribute WHERE attrelid = conrelid AND attnum =
+  ANY (conkey)) AS columns FROM pg_constraint WHERE conrelid =
   'public.account_freehold_hearth'::regclass AND conname =
   'account_freehold_hearth_advance_token_shape'`, then:
   - No row: send RESTORE, then NULL AND VALIDATE; no repair boot is needed.
@@ -1224,11 +1227,11 @@ For off-box safety, sync the directory to S3 occasionally:
     and if this rule allows its DROP, send DROP and then NULL AND VALIDATE again; if
     there is no displaced constraint, this rule does not allow its DROP, or NULL AND
     VALIDATE fails again, stop.
-  - Route an error on its code: on 55P03 or 40P01 wait about 10 s and send the same
-    file again, at most about five times before finding the holder in
-    `pg_stat_activity` and `pg_locks` (if it is the nightly `pg_dump`, wait for the
-    dump to end and never end it; if it is another `advance_token_runbook` session,
-    take the lost connection route; for any other holder, stop and report it); on
+  - Route an error on its code: on 55P03 or 40P01 send HOLDER: if it shows a `pg_dump`
+    session, wait for the dump to end and never end it, then send the same file again,
+    counting attempts afresh; if it shows another `advance_token_runbook` session,
+    take the lost connection route; otherwise wait about 10 s and send the same file
+    again, at most about five times in all, then stop and report HOLDER's rows; on
     42710 from RESTORE the name was taken since the read, so re-run the read; on 42703
     from RESTORE the column itself is missing and every Hearth trip fails until the
     next boot re-adds it with its CHECK, a repair boot (above), so stop the other
@@ -1239,11 +1242,13 @@ For off-box safety, sync the directory to S3 occasionally:
     while a constraint holds the name, so every boot fails as above: stop the realms,
     keep them stopped, and report it; on a code starting 23 (an integrity error) from
     NULL AND VALIDATE, see the drop rule; on a lost connection (psql exits saying the
-    connection was lost, whatever code it printed first), wait up to about a minute
-    until `pg_stat_activity` shows no other `advance_token_runbook` session (if one
-    remains, stop and report it), then re-run the read (after DROP, the drop rule's
-    read): if the block landed, go on from the step after it, and if not, send it
-    again; on anything else, stop.
+    connection was lost, whatever code it printed first), send HOLDER until it shows
+    no `advance_token_runbook` session, for up to about a minute (if one remains, stop
+    and report it); then send the read or PRINT again, since they change nothing, or
+    for any other block re-run the read (after DROP, the drop rule's read): if the
+    block landed, go on from the step after it (a NULL AND VALIDATE that landed so
+    reports its count as unknown), and if not, send it again once, and if that send
+    also loses its connection, stop and report it; on anything else, stop.
 
   RESTORE (the boot's own CHECK, NOT VALID, with no repair boot):
 
@@ -1308,6 +1313,19 @@ For off-box safety, sync the directory to S3 occasionally:
   ALTER TABLE public.account_freehold_hearth
     DROP CONSTRAINT account_freehold_hearth_advance_token_shape_displaced;
   COMMIT;
+  ```
+
+  HOLDER (every other session that holds or waits for a lock on the Hearth table, and
+  any other runbook session; it never selects a query text or a client address, so
+  report only its rows):
+
+  ```sql
+  SELECT a.pid, a.application_name, a.state, l.mode, l.granted
+    FROM pg_stat_activity a
+    LEFT JOIN pg_locks l
+      ON l.pid = a.pid AND l.relation = 'public.account_freehold_hearth'::regclass
+   WHERE a.pid <> pg_backend_pid()
+     AND (l.pid IS NOT NULL OR a.application_name = 'advance_token_runbook');
   ```
 - A failed deactivation receipt erase logs `deactivation housing receipt erase
   failed` with no account id. The erase is idempotent; find the accounts to re-run
