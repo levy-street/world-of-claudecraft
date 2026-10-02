@@ -4476,11 +4476,12 @@ manifest's fifty-sixth entry; kept whole for bisect), and the commit that adds t
 10 findings: none blocking, 2 should-fix (T56R1, L56R1), 8 nice-to-have, every reader passing, and
 six (correctness, qa-checklist, server hot path, privacy and security, database performance,
 migration safety) with no should-fix, two of them with no finding at all. One reader found the
-`package.json` pin, which the last round named as part of the ws rule's premise, reading a spec as
-a version range by its first character, so a tarball or path spec led by a digit or a tilde, which
-pnpm installs from this repository, passed as one; a range is now only its plain form. One found
-the tie to that pin stated only at the read that stays green, which one more named as a
-nice-to-have; the pin's comment now names the bundle read. Four found the premise's sentence
+`package.json` pin, which the last round named as holding part of the ws rule's premise (worded so
+in round fifty-seven, L57R4), reading a spec as a version range by its first character, so a
+tarball or path spec led by a digit or a tilde, which pnpm installs from a local path rather than
+the registry (worded so in round fifty-seven, L57R2), passed as one; a range is now only its plain
+form. One found the tie to that pin stated only at the read that stays green, which one more named
+as a nice-to-have; the pin's comment now names the bundle read. Four found the premise's sentence
 leaving out what else holds or could change it (the checks on a pnpm workspace file and a
 pnpmfile, an install script); it is now stated as a premise the read does not check. The rest were
 a sample entry and two record wordings.
@@ -4496,17 +4497,77 @@ a sample entry and two record wordings.
 - T56R1 FIXED `d2873d8e4a` (the `package.json` pin takes a spec as a range only when it is an
   exact version or one led by `^` or `~`, a prerelease allowed, and lists any other, proven on
   samples of a prerelease, a tarball path led by a digit and one led by an exact version, a tilde
-  path, a wider range and a tag; a comment says so). T56R2 FIXED `d2873d8e4a` (the ws rule's
-  sample holds `node_modules/ws/lib/node_modules_x/y/i.js`, so a check that reads `node_modules`
-  only before a slash or a dot fails). T56R3 FIXED (see C56R1).
+  path, a wider range and a tag; a comment says so; a prerelease and a number semver rejects
+  listed too, from round fifty-seven, C57R1). T56R2 FIXED `d2873d8e4a` (the ws rule's sample holds
+  `node_modules/ws/lib/node_modules_x/y/i.js`, so a check that reads `node_modules` only before a
+  slash or a dot fails). T56R3 FIXED (see C56R1).
 - L56R1 FIXED `d2873d8e4a` (with H56R1: the `package.json` pin's comment names the bot's bundle
   read, which takes `node_modules/ws/` as ws's own published code partly on that pin, so a change
   there for ws needs that read reviewed too; S55R1's disposition notes it). L56R2 FIXED in this
   record (round fifty-five's intro says that `node_modules/ws/` holding ws's own published code
   rests on the pin). L56R3 FIXED in this record (round fifty-five's mutant line names one mutant
   on a sample entry).
-- Mutants on this round's new guards, each killed and its source restored: the range read by its
-  first character again, and the range grammar without its end anchor and without its tilde, each
-  at the classifier's samples; the grammar without its start anchor, at the pin over the real
-  specs; and the ws rule reading `node_modules` only before a slash or a dot, at the ws rule's
-  sample.
+- Mutants on this round's range grammar and the ws rule's new sample entry, each killed and its
+  source restored (worded so in round fifty-seven, L57R3): the range read by its first character
+  again, and the range grammar without its end anchor and without its tilde, each at the
+  classifier's samples; the grammar without its start anchor, at the pin over the real specs; and
+  the ws rule reading `node_modules` only before a slash or a dot, at the ws rule's sample.
+
+## Round fifty-seven: eight fresh readers over round fifty-six (`5c98f5a6f8..d9225b5fb6`)
+
+Round fifty-seven's commits: `138e7bd758` (the `package.json` pin's plain range is three numbers
+of at most nine digits with no leading zero, led by nothing, `^` or `~`, so a prerelease, an
+overlong number and a wider range are listed, proven on samples of each, of a prerelease ending in
+a tarball name and of one holding a path; the renewer guard's summary names override specs and
+plain ranges; the bundle read's package rule comment says two tracked-file checks after the pin;
+the ws rule's sample holds a file named `node_modules`; the manifest's fifty-seventh entry; kept
+whole for bisect), and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C57R1, C57R2 |
+| qa-checklist | PASS | Q57R1 to Q57R4 |
+| server hot path | PASS | none |
+| privacy and security | PASS | S57R1, S57R2 |
+| database performance | PASS | none |
+| test coverage | PASS | T57R1 to T57R5 |
+| docs librarian | PASS | L57R1 to L57R4 |
+| migration safety | PASS | none |
+
+17 findings: none blocking, 3 should-fix (C57R1, T57R1, L57R1), 14 nice-to-have, every reader
+passing, and five (qa-checklist, server hot path, privacy and security, database performance,
+migration safety) with no should-fix, three of them with no finding at all. Two readers found the
+last round's plain range still taking a spec semver rejects, a prerelease with an empty identifier
+or an overlong number ending in a tarball name, or a prerelease holding a path, which pnpm then
+installs from a local path; three more named the prerelease or the wider ranges in four
+nice-to-haves. A plain range now takes no prerelease and bounds each number. One found the renewer
+guard's summary still naming the old range rule. The rest were the record's account of where a
+tilde path installs from, two record wordings, the comment's pointer to the checks after the pin,
+and a sample entry.
+
+- C57R1 FIXED `138e7bd758` (with T57R1, S57R1, S57R2, Q57R2 and T57R2: a plain range is three
+  numbers of at most nine digits with no leading zero, led by nothing, `^` or `~`, so a
+  prerelease, an overlong number and a wider range are listed, proven on samples of a prerelease
+  with an empty identifier, one ending in a tarball name, one holding a path, an overlong number,
+  a leading zero, a `>` range, a missing patch number and an `x` patch, and the comment says so;
+  T56R1's disposition notes it). C57R2 FIXED (see L57R2).
+- Q57R1 FIXED (see L57R2). Q57R2 FIXED (see C57R1). Q57R3 FIXED (see L57R3). Q57R4 FIXED
+  `138e7bd758` (with T57R5: the package rule's comment says two tracked-file checks after the pin,
+  which its parenthesis names).
+- S57R1 FIXED (see C57R1). S57R2 FIXED (see C57R1).
+- T57R1 FIXED (see C57R1). T57R2 FIXED (see C57R1). T57R3 FIXED `138e7bd758` (the ws rule's sample
+  holds `node_modules/ws/lib/node_modules`, so a check that needs a character after `node_modules`
+  fails). T57R4 FIXED (see L57R2). T57R5 FIXED (see Q57R4).
+- L57R1 FIXED `138e7bd758` (the renewer guard's summary says it pins the root `package.json`'s
+  dependency and override specs but plain ranges). L57R2 FIXED in this record and the ledger (with
+  Q57R1, C57R2 and T57R4: round fifty-six's summary and the ledger's item under WHAT IT FOUND THAT
+  WAS NOT A COMMENT say pnpm installs such a spec from a local path rather than the registry,
+  since a tilde path resolves against the home directory). L57R3 FIXED in this record (with Q57R3:
+  round fifty-six's mutant line names its range grammar and the ws rule's new sample entry). L57R4
+  FIXED in this record (round fifty-six's summary says the last round named the pin as holding
+  part of the ws rule's premise).
+- Mutants on this round's range grammar and the ws rule's new sample entry, each killed and its
+  source restored: the grammar taking a prerelease again, with unbounded numbers, allowing a
+  leading zero, with its prefix widened to `>` and `<`, and with its patch number optional, each
+  at the classifier's samples; and the ws rule reading `node_modules` only before a non-letter, at
+  the ws rule's sample.
