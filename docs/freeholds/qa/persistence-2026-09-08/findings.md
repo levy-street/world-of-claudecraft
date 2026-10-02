@@ -5733,7 +5733,14 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   should-fix. The stall-over reading missed a boot still queued for SHARE, so its modes are now
   read off PostgreSQL's own conflicts with a token write; the gate's diagnosis decides by the
   holder's wait rather than never ending it, and a stopped realm's build may be cancelled; every
-  realm start the file gives is listed whole and points to the gate. Fixed in `5df3f2f243`.
+  realm start the file gives, in the phrasings the scan reads, is listed whole and points to the
+  gate. Fixed in `5df3f2f243`.
+- ROUND TWENTY-SEVEN, eight fresh readers over round twenty-six: 44 findings, one blocking, 14
+  should-fix. The bot's own `up` started a stopped realm past the gate and the scan let it
+  through; it now runs `--no-deps`. The diagnosis now names the sessions a held build waits for
+  and ends only an operator's open `psql` one, with `pg_terminate_backend`; the stall readings
+  wait for every realm `healthy` or stopped; release step 6 builds every service again. Fixed in
+  `9a729218d5`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5763,7 +5770,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then
   641, then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
   then 644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then
-  647, then 648, then 648, then 648, then 648 passed, never a skip.
+  647, then 648, then 648, then 648, then 648, then 648 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
@@ -5792,6 +5799,10 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   to end its backend. Bounding the boot instead (a boot lock timeout with a retry, or
   `client_connection_check_interval` so a stopped realm's backend ends itself) is a maintainer
   decision.
+- `docker-compose.yml` passes neither `FREEHOLDS_ENABLED` nor `API_DISPATCH` to the game
+  container and has no `env_file`, so a `.env` edit and a recreate change neither; DEPLOY's
+  restart for each assumes they reach it. Wiring them (the Freeholds flag with the lighting gate)
+  is a maintainer decision.
 - A login-time clamp for a corrupt Hearth row; it needs a clock-skew margin no constant names.
 - The storage fragment still names `pg_catalog` second in its DDL path (the decoy exposure M4
   fixed for the operation fragment).
