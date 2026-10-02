@@ -48,12 +48,14 @@ import {
 import { PENDING_FREEHOLD_PLOT_ID } from '../src/sim/freehold/state';
 import { boundedDatabaseError } from './freehold_bounded_error';
 import { createFreeholdCapacityWarn } from './freehold_capacity_warn';
+import { FREEHOLD_GENERATION_TEXT_RE } from './freehold_claim_db';
 import { FREEHOLD_PRIMARY_PLOT_INDEX, type FreeholdFencedUpsertResult } from './freehold_db';
 import {
   ABSENT_HEARTH_REVISION,
   adoptFreeholdHearthReading,
   COLD_HEARTH,
   readFreeholdLoginPair,
+  settleFreeholdHearthReading,
 } from './freehold_hearth_load';
 import { freeholdJoinAnswer } from './freehold_join_answer';
 import {
@@ -62,6 +64,7 @@ import {
   freeholdBudgetRefusal,
   freeholdHoldAnswer,
   freeholdHoldIsTerminal,
+  freeholdLoadedAnswer,
   type LoadedFreehold,
   freeholdSnapshotOf as snapshotOf,
 } from './freehold_load_outcome';
@@ -341,6 +344,16 @@ export function createFreeholdPersistStore(ports: FreeholdPersistPorts): Freehol
     deferredWrites.has(entry) ||
     deferredRetries.has(entry) ||
     (isDirty(entry) && !blocked(entry));
+  // A loaded entry the preload RE-READS instead of replaying: a durable row,
+  // nothing held or owed (no hold, no quiesce, no dirty edit, no write or read
+  // in flight, no leave capture), and a claim this process no longer holds.
+  const rereadsLostClaim = (entry: FreeholdPersistEntry): boolean =>
+    entry.durableRev !== null &&
+    !isHeld(entry) &&
+    !owesWork(entry) &&
+    !isDirty(entry) &&
+    entry.leaveDocument === null &&
+    !(ports.claimHeld?.(entry.plotId) ?? true);
   // NOT a clause of its own for the retained leave document, deliberately, and
   // the reason is worth writing down because it is the shape of a defect this
   // packet has already made once. `settle` clears the capture only when the
@@ -454,12 +467,11 @@ export function createFreeholdPersistStore(ports: FreeholdPersistPorts): Freehol
     // text PostgreSQL renders back out of jsonb, which is wider than the JSON
     // that went in. Handing it FREEHOLD_MAX_OWNED_BYTES would refuse the
     // maximal record this realm is allowed to write.
-    const { rowLoad, hearth } = await readFreeholdLoginPair(ports, accountId);
+    const { rowLoad, hearth: read } = await readFreeholdLoginPair(ports, accountId);
     const entry = ensureEntry(ownerKey, accountId);
-    // Remembered on the entry, not only returned: every later replay of this
-    // entry has to answer with the same clock, and none of them reads again.
-    entry.hearthReadyAtMs = hearth.readyAtMs;
-    entry.hearthRevision = hearth.revision;
+    // Remembered on the entry, not only returned: every later replay answers
+    // with it, and a lost-claim re-read only moves it forward.
+    const hearth = settleFreeholdHearthReading(entry, read);
 
     if (rowLoad.kind === 'absent') {
       // No durable row: the sim's default record IS the truth, and this store
@@ -468,15 +480,14 @@ export function createFreeholdPersistStore(ports: FreeholdPersistPorts): Freehol
       entry.loaded = true;
       entry.hold = null;
       entry.plotIndex = FREEHOLD_PRIMARY_PLOT_INDEX;
-      // MINT ONCE PER ENTRY, and unreachable defence rather than a live guard:
-      // classify runs at most once per entry (beginLoad is single-flight per
-      // account and every later preload replays a loaded entry), so nothing
-      // today can reach this line twice for one entry. A mutation pass
-      // confirms it: minting unconditionally leaves the suite green. It stays
-      // because the alternative failure is a second identity on a row that
-      // already has one, and it is named here so a later reader does not delete
-      // it as dead weight or write a test around a state the store cannot
-      // produce.
+      // MINT ONCE PER ENTRY, an unreachable defence rather than a live guard:
+      // this arm runs at most once per entry (beginLoad is single-flight per
+      // account, a later preload replays a loaded entry, and the lost-claim
+      // re-read reaches only an entry whose row exists, which leaves only with
+      // its account). A mutation pass confirms it: minting unconditionally
+      // leaves the suite green. It stays because the alternative failure is a
+      // second identity on a row that already has one, named here so a later
+      // reader neither deletes it nor tests a state the store cannot produce.
       //
       // PER ENTRY IS NOT PER OWNER, which is why the live record is consulted
       // first. An entry collected while its record is still live (a blocked
@@ -538,17 +549,7 @@ export function createFreeholdPersistStore(ports: FreeholdPersistPorts): Freehol
       }
       entry.durableRev = null;
       entry.state = null;
-      return {
-        accountId,
-        plotIndex: entry.plotIndex,
-        plotId: entry.plotId,
-        durableRev: null,
-        state: null,
-        hearthReadyAtMs: hearth.readyAtMs,
-        hearthRevision: hearth.revision,
-        hold: null,
-        recordWithheld: false,
-      };
+      return freeholdLoadedAnswer(accountId, entry, hearth);
     }
 
     if (rowLoad.kind === 'oversize') {
@@ -640,17 +641,7 @@ export function createFreeholdPersistStore(ports: FreeholdPersistPorts): Freehol
       entry.plotId = row.plotId;
       entry.durableRev = row.durableRev;
       entry.state = normalized.state;
-      return {
-        accountId,
-        plotIndex: row.plotIndex,
-        plotId: row.plotId,
-        durableRev: row.durableRev,
-        state: normalized.state,
-        hearthReadyAtMs: hearth.readyAtMs,
-        hearthRevision: hearth.revision,
-        hold: null,
-        recordWithheld: false,
-      };
+      return freeholdLoadedAnswer(accountId, entry, hearth);
     }
 
     // The DETAIL comes from the sim's reporter, never from this module. Its
@@ -770,10 +761,11 @@ export function createFreeholdPersistStore(ports: FreeholdPersistPorts): Freehol
     }
     // Load-once, like loadFreehold: a re-preload replays what the entry knows
     // (so a rejoin after the sim evicted the record re-installs the real
-    // house) and never mints a second plot id or reads the row twice, while
-    // this process still holds the plot's claim; without it (released or
-    // taken: claimHeld), the claimed read below decides again.
-    if (entry?.loaded && (entry.durableRev === null || (ports.claimHeld?.(entry.plotId) ?? true))) {
+    // house) and never mints a second plot id or reads the row twice. Only a
+    // CLEAN entry whose claim this process lost re-reads (rereadsLostClaim);
+    // one that owes anything replays, since a re-read would rebase its
+    // unwritten edits onto another realm's newer row.
+    if (entry?.loaded && !rereadsLostClaim(entry)) {
       entry.accountId = accountId;
       entry.orphanPasses = 0;
       // blocked(), not `hold === null`. A QUIESCED entry has no hold and yet is
@@ -1792,7 +1784,7 @@ export function createFreeholdPersistStore(ports: FreeholdPersistPorts): Freehol
 
     adoptCommittedRevision(ownerKey: string, durableRev: string): void {
       const entry = entries.get(ownerKey);
-      if (!entry || blocked(entry) || !/^[1-9][0-9]*$/.test(durableRev)) return;
+      if (!entry || blocked(entry) || !FREEHOLD_GENERATION_TEXT_RE.test(durableRev)) return;
       if (entry.durableRev !== null && BigInt(durableRev) <= BigInt(entry.durableRev)) return;
       entry.durableRev = durableRev;
     },

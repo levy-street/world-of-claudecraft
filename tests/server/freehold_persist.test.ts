@@ -1477,11 +1477,107 @@ describe('preload admission', () => {
     const still = await h.store.preload(ACCOUNT_ID);
     expect(still.hearthReadyAtMs).toBe(1_700_003_600_000);
     expect(still.hearthRevision).toBe('5');
+    // Compared as integers, never as text: '10' is newer than '9' though it
+    // sorts first, and '9' never replaces '10'.
+    h.store.adoptHearthReading(OWNER_KEY, 1_700_009_000_000, '9');
+    h.store.adoptHearthReading(OWNER_KEY, 1_700_010_000_000, '10');
+    expect((await h.store.preload(ACCOUNT_ID)).hearthRevision).toBe('10');
+    h.store.adoptHearthReading(OWNER_KEY, 1_700_090_000_000, '9');
+    const tenth = await h.store.preload(ACCOUNT_ID);
+    expect(tenth).toMatchObject({ hearthReadyAtMs: 1_700_010_000_000, hearthRevision: '10' });
     // No entry: a no-op, never a fresh entry.
     h.store.adoptHearthReading('account:1', 5, '9');
     expect(h.store.authority('account:1')).toBeNull();
     // Still exactly one read of the clock: adoption issues none.
     expect(h.calls.filter((call) => call === 'readHearth')).toHaveLength(1);
+  });
+
+  it('replays, never re-reads, an entry that owes or holds anything once its claim is gone', async () => {
+    // Reachable only after the last session left (a live record answers every
+    // preload first) while the entry stayed. A re-read would take the plot back
+    // at a newer row's revision and rebase the entry's unwritten work onto it,
+    // so its next write would pass the compare-and-swap over another realm's
+    // edits. Each arm on its own, beside the clean control that DOES re-read
+    // under the same lost claim.
+    let held = true;
+    const claimHeld = () => held;
+    // THE CONTROL: a clean entry (a handshake that read and never joined).
+    const clean = harness({ rowLoad: { kind: 'row', row: rowFixture() }, claimHeld });
+    await clean.store.preload(ACCOUNT_ID);
+    held = false;
+    await clean.store.preload(ACCOUNT_ID);
+    expect(clean.calls.filter((call) => call === 'readRow')).toHaveLength(2);
+
+    // OWED: the leave write was refused a permit, so the capture is outstanding
+    // and the entry still owes its write.
+    held = true;
+    let granted = 0;
+    const owed = await loadedStore({
+      rowLoad: { kind: 'row', row: rowFixture() },
+      claimHeld,
+      acquirePermit: async () => {
+        granted += 1;
+        return granted === 1 ? { release: () => {} } : null;
+      },
+    });
+    owed.edit(OWNER_KEY, { rev: 6, condition: 42 });
+    await owed.leave();
+    await tick(20);
+    expect(owed.store.stats()).toMatchObject({ leaveCaptures: 1, entries: 1 });
+    expect(owed.record()).toBeUndefined();
+    held = false;
+    owed.calls.length = 0;
+    const rejoin = await owed.store.preload(ACCOUNT_ID);
+    expect(owed.calls).not.toContain('readRow');
+    expect(rejoin.state).toMatchObject({ rev: 6, condition: 42 });
+
+    // QUIESCED: the leave write was fenced, so the entry knew another writer
+    // moved the row. It does not survive the leave (nothing is owed and nothing
+    // refers to it), so a rejoin reads afresh and can never re-claim the plot on
+    // that stale knowledge; the predicate's held clause is defence for a held
+    // entry that some later path keeps.
+    held = true;
+    const fenced = await loadedStore({
+      rowLoad: { kind: 'row', row: rowFixture() },
+      claimHeld,
+      writeRow: async () => ({ kind: 'fenced' }),
+    });
+    fenced.edit(OWNER_KEY, { rev: 6 });
+    await fenced.leave();
+    await tick(20);
+    expect(fenced.store.stats()).toMatchObject({ fencedWrites: 1, entries: 0 });
+  });
+
+  it('a lost-claim re-read moves the Hearth clock forward only: a cold fallback never undoes a proved one', async () => {
+    let held = true;
+    let clock: 'fails' | number = 4;
+    const h = harness({
+      rowLoad: { kind: 'row', row: rowFixture() },
+      claimHeld: () => held,
+      readHearth: async (): Promise<FreeholdHearthLoad> => {
+        if (clock === 'fails') throw new Error('clock read failed');
+        return {
+          kind: 'state',
+          state: { readyAtMs: String(1_700_000_000_000 + clock), revision: String(clock) },
+        };
+      },
+    });
+    await h.store.preload(ACCOUNT_ID);
+    h.store.adoptHearthReading(OWNER_KEY, 1_700_003_600_000, '5');
+    held = false;
+    clock = 'fails';
+    const cold = await h.store.preload(ACCOUNT_ID);
+    // It did re-read, and the cold fallback left the proved clock in place.
+    expect(h.calls.filter((call) => call === 'readRow')).toHaveLength(2);
+    expect(cold).toMatchObject({ hearthReadyAtMs: 1_700_003_600_000, hearthRevision: '5' });
+    // An OLDER durable reading changes nothing; a NEWER one moves it.
+    clock = 3;
+    expect(await h.store.preload(ACCOUNT_ID)).toMatchObject({ hearthRevision: '5' });
+    clock = 6;
+    expect(await h.store.preload(ACCOUNT_ID)).toMatchObject({
+      hearthReadyAtMs: 1_700_000_000_006,
+      hearthRevision: '6',
+    });
   });
 
   it('replays a fresh account without minting it a second identity', async () => {

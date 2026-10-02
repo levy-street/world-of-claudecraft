@@ -2035,10 +2035,13 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 1854 -> 1828 at the 07a paired QA: the entry census behind
     // stats() moved whole to server/freehold_persist_stats.ts
     // (censusFreeholdEntries, the store's own predicates handed in), paying
-    // the Hearth adoption delegator and the replay's claim check. wc -l. Exact
-    // count, zero slack.
+    // the Hearth adoption delegator and the replay's claim check. Then the
+    // loaded answer moved to server/freehold_load_outcome.ts
+    // (freeholdLoadedAnswer) and the clock settle to
+    // server/freehold_hearth_load.ts (settleFreeholdHearthReading), paying the
+    // lost-claim re-read's owed-work predicate. wc -l. Exact count, zero slack.
     file: 'server/freehold_persist.ts',
-    ceiling: 1828,
+    ceiling: 1820,
     seam: 'a sibling server module behind the store ports; see server/CLAUDE.md',
   },
   {

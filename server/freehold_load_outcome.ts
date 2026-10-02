@@ -240,6 +240,35 @@ export function freeholdSnapshotOf(
 export const freeholdHoldIsTerminal = (kind: FreeholdRecoveryHold['kind']): boolean =>
   !FREEHOLD_RETRYABLE_HOLD_KINDS.has(kind);
 
+/**
+ * A LOADED answer: what the entry now knows (its plot index, plot id, durable
+ * revision and state) with the settled clock and no hold. Both loaded arms of
+ * the store's classify, the absent row and a normalized row, answer through it
+ * after writing those fields onto the entry, so the answer and the entry agree.
+ */
+export function freeholdLoadedAnswer(
+  accountId: number,
+  entry: {
+    readonly plotIndex: number;
+    readonly plotId: string;
+    readonly durableRev: string | null;
+    readonly state: PersistedFreehold | null;
+  },
+  hearth: { readonly readyAtMs: number; readonly revision: string },
+): LoadedFreehold {
+  return {
+    accountId,
+    plotIndex: entry.plotIndex,
+    plotId: entry.plotId,
+    durableRev: entry.durableRev,
+    state: entry.state,
+    hearthReadyAtMs: hearth.readyAtMs,
+    hearthRevision: hearth.revision,
+    hold: null,
+    recordWithheld: false,
+  };
+}
+
 /** The answer a held load returns. No state and no durable revision, ever: a
  *  hold means install nothing and write nothing, so the caller keeps whatever
  *  the sim seeds and the row on disk is left exactly as it was. */
