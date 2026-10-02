@@ -1256,35 +1256,37 @@ For off-box safety, sync the directory to S3 occasionally:
     minute until it shows none; stop and report HOLDER's rows if a `pg_dump` row shows
     `granted` false, which is a dump waiting for the Hearth table, or shows before
     03:15 UTC or after 04:15 UTC, which is no nightly dump on time: the window is
-    fixed, since waiting longer only delays the repair and never risks it), then take
-    the lost connection route if HOLDER had also shown another `advance_token_runbook`
-    session, and otherwise send the same file again, counting attempts afresh; if it
-    shows another `advance_token_runbook` session, take the lost connection route;
-    otherwise wait about 10 s and send the same file again, at most about five times
-    in all, then stop and report HOLDER's rows; on 42710 from RESTORE the name was
-    taken since the read, so re-run the read; on 42703 from RESTORE the column itself
-    is missing and every Hearth trip fails until the next boot re-adds it with its
-    CHECK, a repair boot (above), so stop the other realms and run it in the next
-    quiet window; on 42710 or 42P07 from DISPLACE an earlier displacement holds the
-    name, so settle it by the drop rule and send DISPLACE again, and if the drop
-    rule's read finds no row a bare relation holds the name, so stop and report it; on
-    42703 from DISPLACE the column itself is missing while a constraint holds the
-    name, so every boot fails as above: stop the realms, keep them stopped, and report
-    it; on a code starting 23 (an integrity error) from NULL AND VALIDATE, see the
-    drop rule; on a lost connection (psql exits saying the connection was lost,
-    whatever code it printed first), send HOLDER, and if it shows a `pg_dump` session,
-    first wait the dump out by the waits and stops above, never their resend; then
-    send HOLDER until it shows no other `advance_token_runbook` session, for up to
-    about a minute (if one remains, stop and report it); then send the file that
-    brought you here (from the 55P03 or 40P01 route, the file that failed, never
-    HOLDER) again once if it was the read, the drop rule's read, PRINT or the version
-    read, since they change nothing, or for any other block re-run the read (after
-    DROP, the drop rule's read): if the block landed, go on from the step after it (a
-    report of a NULL AND VALIDATE that landed this way gives its count as unknown),
-    and if not, send it again once; if any send made on this route loses its
-    connection, stop and report it, and a resend made on this route counts toward the
-    five above, which start afresh after any dump wait, on this route or the 55P03 or
-    40P01 one; on anything else, stop.
+    fixed, since waiting longer only delays the repair and never risks it), then, if
+    the last HOLDER, the one that shows no `pg_dump`, shows another
+    `advance_token_runbook` session, take the lost connection route, and otherwise
+    send the same file again, counting attempts afresh; if it shows another
+    `advance_token_runbook` session, take the lost connection route; otherwise wait
+    about 10 s and send the same file again, at most about five times in all, then
+    stop and report HOLDER's rows; on 42710 from RESTORE the name was taken since the
+    read, so re-run the read; on 42703 from RESTORE the column itself is missing and
+    every Hearth trip fails until the next boot re-adds it with its CHECK, a repair
+    boot (above), so stop the other realms and run it in the next quiet window; on
+    42710 or 42P07 from DISPLACE an earlier displacement holds the name, so settle it
+    by the drop rule and send DISPLACE again, and if the drop rule's read, before any
+    DROP, finds no row a bare relation holds the name, so stop and report it; on 42703
+    from DISPLACE the column itself is missing while a constraint holds the name, so
+    every boot fails as above: stop the realms, keep them stopped, and report it; on a
+    code starting 23 (an integrity error) from NULL AND VALIDATE, see the drop rule;
+    on a lost connection (psql exits saying the connection was lost, whatever code it
+    printed first), send HOLDER, and if it shows a `pg_dump` session, first wait the
+    dump out by the waits and stops above, never their resend; then send HOLDER until
+    it shows no other `advance_token_runbook` session, for up to about a minute (if
+    one remains, stop and report it); then send the file that brought you here (from
+    the 55P03 or 40P01 route, the file that failed, never HOLDER) again once if it was
+    the read, the drop rule's read, PRINT or the version read, since they change
+    nothing, or for any other block re-run the read (after DROP, the drop rule's
+    read): if the block landed, go on from the step after it (a report of a NULL AND
+    VALIDATE that landed this way gives its count as unknown), and if not, send it
+    again once; if any send made on this route loses its connection, stop and report
+    it, and a resend made on this route counts toward the five above, which start
+    afresh after any dump wait, on this route or the 55P03 or 40P01 one, and once the
+    five are spent, stop and report HOLDER's rows instead of resending; on anything
+    else, stop.
 
   RESTORE (the boot's own CHECK, NOT VALID, with no repair boot):
 

@@ -992,7 +992,13 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
     const deploy = readFileSync('DEPLOY.md', 'utf8');
     const start = deploy.indexOf('- THE ADVANCE TOKEN CHECK');
     expect(start).toBeGreaterThan(-1);
-    const raw = deploy.slice(start, deploy.indexOf('\n- ', start + 1));
+    const end = deploy.indexOf('\n- ', start + 1);
+    expect(end).toBeGreaterThan(start);
+    const raw = deploy.slice(start, end);
+    // Every line after the first is the bullet's own (indented or blank), so
+    // the slice never runs into a following paragraph or section.
+    expect('- a\n  b\nPara\n').toMatch(/\n(?![ \n])/);
+    expect(raw).not.toMatch(/\n(?![ \n])/);
     const bullet = raw.replace(/\n\s*/g, ' ');
     expect(bullet).toContain(`\`[schema] ${raised[0]}\``);
     expect(bullet).toContain(`\`${compared[0]}\``);
@@ -1107,10 +1113,27 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
     expect(bullet).toContain('every block but PRINT and HOLDER locks the table to its COMMIT');
     // The dump window is the backup job's: a nightly cron at 03:15, and a
     // `pg_dump` that names no session, so HOLDER shows it as `pg_dump`.
+    // Each checked as a boolean, so a failure prints its message, never the
+    // whole script; the cron runs in the host's zone, which the script never
+    // sets, and the dump inherits the db service's environment.
     const backup = readFileSync('deploy/user-data.sh', 'utf8');
-    expect(backup).toContain('echo "15 3 * * * root /usr/local/bin/eastbrook-backup"');
-    expect(backup).toContain('docker exec eastbrook-db pg_dump -U eastbrook eastbrook \\\n');
-    expect(backup).not.toMatch(/PGAPPNAME|application_name/);
+    const holds = (pattern: RegExp, what: string) => expect(pattern.test(backup), what).toBe(true);
+    holds(
+      /^echo "15 3 \* \* \* root \/usr\/local\/bin\/eastbrook-backup" > \/etc\/cron\.d\/eastbrook-backup\r?$/m,
+      'the backup cron line in deploy/user-data.sh',
+    );
+    holds(
+      /^docker exec eastbrook-db pg_dump -U eastbrook eastbrook \\\r?$/m,
+      'the backup pg_dump line in deploy/user-data.sh',
+    );
+    expect(
+      /PGAPPNAME|application_name|timedatectl|set-timezone|CRON_TZ|^\s*TZ=/m.test(backup),
+      'deploy/user-data.sh names no session and sets no time zone',
+    ).toBe(false);
+    expect(
+      /PGAPPNAME|application_name/.test(readFileSync('docker-compose.yml', 'utf8')),
+      'docker-compose.yml names no session',
+    ).toBe(false);
     expect(bullet).toContain('or shows before 03:15 UTC or after 04:15 UTC');
     // A boot that cannot re-add the column, its name held, loops: stop.
     expect(bullet).toContain(
@@ -1156,7 +1179,7 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
       '42703 from DISPLACE',
     ]);
     expect(bullet).toContain(
-      "on 55P03 or 40P01 send HOLDER: if it shows a `pg_dump` session, wait for the dump to end and never end it (send HOLDER about once a minute until it shows none; stop and report HOLDER's rows if a `pg_dump` row shows `granted` false, which is a dump waiting for the Hearth table, or shows before 03:15 UTC or after 04:15 UTC, which is no nightly dump on time: the window is fixed, since waiting longer only delays the repair and never risks it), then take the lost connection route if HOLDER had also shown another `advance_token_runbook` session, and otherwise send the same file again, counting attempts afresh; if it shows another `advance_token_runbook` session, take the lost connection route; otherwise wait about 10 s and send the same file again, at most about five times in all, then stop and report HOLDER's rows",
+      "on 55P03 or 40P01 send HOLDER: if it shows a `pg_dump` session, wait for the dump to end and never end it (send HOLDER about once a minute until it shows none; stop and report HOLDER's rows if a `pg_dump` row shows `granted` false, which is a dump waiting for the Hearth table, or shows before 03:15 UTC or after 04:15 UTC, which is no nightly dump on time: the window is fixed, since waiting longer only delays the repair and never risks it), then, if the last HOLDER, the one that shows no `pg_dump`, shows another `advance_token_runbook` session, take the lost connection route, and otherwise send the same file again, counting attempts afresh; if it shows another `advance_token_runbook` session, take the lost connection route; otherwise wait about 10 s and send the same file again, at most about five times in all, then stop and report HOLDER's rows",
     );
     expect(bullet).toContain(
       'on 42710 from RESTORE the name was taken since the read, so re-run the read',
@@ -1174,7 +1197,7 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
       'on a code starting 23 (an integrity error) from NULL AND VALIDATE, see the drop rule',
     );
     expect(bullet).toContain(
-      "on a lost connection (psql exits saying the connection was lost, whatever code it printed first), send HOLDER, and if it shows a `pg_dump` session, first wait the dump out by the waits and stops above, never their resend; then send HOLDER until it shows no other `advance_token_runbook` session, for up to about a minute (if one remains, stop and report it); then send the file that brought you here (from the 55P03 or 40P01 route, the file that failed, never HOLDER) again once if it was the read, the drop rule's read, PRINT or the version read, since they change nothing, or for any other block re-run the read (after DROP, the drop rule's read): if the block landed, go on from the step after it (a report of a NULL AND VALIDATE that landed this way gives its count as unknown), and if not, send it again once; if any send made on this route loses its connection, stop and report it, and a resend made on this route counts toward the five above, which start afresh after any dump wait, on this route or the 55P03 or 40P01 one; on anything else, stop",
+      "on a lost connection (psql exits saying the connection was lost, whatever code it printed first), send HOLDER, and if it shows a `pg_dump` session, first wait the dump out by the waits and stops above, never their resend; then send HOLDER until it shows no other `advance_token_runbook` session, for up to about a minute (if one remains, stop and report it); then send the file that brought you here (from the 55P03 or 40P01 route, the file that failed, never HOLDER) again once if it was the read, the drop rule's read, PRINT or the version read, since they change nothing, or for any other block re-run the read (after DROP, the drop rule's read): if the block landed, go on from the step after it (a report of a NULL AND VALIDATE that landed this way gives its count as unknown), and if not, send it again once; if any send made on this route loses its connection, stop and report it, and a resend made on this route counts toward the five above, which start afresh after any dump wait, on this route or the 55P03 or 40P01 one, and once the five are spent, stop and report HOLDER's rows instead of resending; on anything else, stop",
     );
     const readAt = bullet.indexOf('First read what the name holds');
     expect(readAt).toBeGreaterThan(-1);
