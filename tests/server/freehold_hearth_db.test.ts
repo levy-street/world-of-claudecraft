@@ -968,6 +968,9 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
       `SELECT account_id, ready_at_ms FROM public.account_freehold_hearth WHERE ready_at_ms > ${clock} + ${HEARTH_KEY_COOLDOWN_MS}`,
     );
     expect(bullet).toContain('NEVER repair during a clock step');
+    // Every statement names the table the boot checks.
+    expect(bullet).not.toMatch(/\b(?:UPDATE|FROM|ALTER TABLE) account_freehold_hearth\b/);
+    expect(bullet.match(/\b(?:UPDATE|FROM) public\.account_freehold_hearth\b/g)?.length).toBe(2);
   });
 
   it('quotes the token warning and the expected CHECK exactly as the boot uses them', () => {
@@ -989,18 +992,47 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
     const deploy = readFileSync('DEPLOY.md', 'utf8');
     const start = deploy.indexOf('- THE ADVANCE TOKEN CHECK');
     expect(start).toBeGreaterThan(-1);
-    const bullet = deploy.slice(start, deploy.indexOf('\n- ', start + 1)).replace(/\n\s*/g, ' ');
+    const raw = deploy.slice(start, deploy.indexOf('\n- ', start + 1));
+    const bullet = raw.replace(/\n\s*/g, ' ');
     expect(bullet).toContain(`\`[schema] ${raised[0]}\``);
     expect(bullet).toContain(`\`${compared[0]}\``);
-    // The procedure's safety rules: a CHECK the boot misreads is kept, and an
-    // impostor is RENAMED (keeping what it enforces, one table locked) under a
-    // lock timeout, never dropped.
-    expect(bullet).toContain('do not displace it');
-    expect(bullet).toContain("`SET lock_timeout = '2s'`");
-    expect(bullet).toContain(
-      '`ALTER TABLE public.account_freehold_hearth RENAME CONSTRAINT account_freehold_hearth_advance_token_shape TO account_freehold_hearth_advance_token_shape_displaced`',
+    // The runbook's SQL is two fenced blocks, pinned whole (the pg suite runs
+    // both against a real impostor): null and validate; and the one short
+    // transaction that renames an impostor and puts back the boot's OWN repair
+    // statement, under a lock timeout set first.
+    const blocks = [...raw.matchAll(/```sql\n([\s\S]*?)```/g)].map((match) =>
+      match[1].replace(/\s+/g, ' ').trim(),
     );
-    expect(bullet).toContain('A rename, never a drop');
+    expect(blocks).toHaveLength(2);
+    expect(blocks[0]).toBe(
+      "UPDATE public.account_freehold_hearth SET advance_token = NULL WHERE advance_token !~ '^[0-9a-f]{32}$'; ALTER TABLE public.account_freehold_hearth VALIDATE CONSTRAINT account_freehold_hearth_advance_token_shape;",
+    );
+    const repair = (codeOnly(FREEHOLD_HEARTH_SCHEMA).match(
+      /ALTER TABLE "public"\.account_freehold_hearth\s+ADD CONSTRAINT account_freehold_hearth_advance_token_shape\s+CHECK \([^;]+\) NOT VALID;/,
+    ) ?? [''])[0]
+      .replace('"public".', 'public.')
+      .replace(/\s+/g, ' ');
+    expect(repair).toContain('ADD CONSTRAINT');
+    expect(blocks[1]).toBe(
+      [
+        'BEGIN;',
+        "SET LOCAL lock_timeout = '2s';",
+        'ALTER TABLE public.account_freehold_hearth RENAME CONSTRAINT account_freehold_hearth_advance_token_shape TO account_freehold_hearth_advance_token_shape_displaced;',
+        repair,
+        'COMMIT;',
+      ].join(' '),
+    );
+    // The procedure's safety rules in its prose: a CHECK the boot misreads is
+    // kept, an impostor is renamed and never dropped, a later drop of a
+    // displaced constraint is as guarded, and every statement names the table
+    // the boot checks.
+    expect(bullet).toContain('do not displace it');
+    expect(bullet).toContain('a rename, never a drop');
+    expect(bullet).toContain('the same way, one short transaction under `SET LOCAL lock_timeout`');
     expect(bullet).not.toContain('DROP CONSTRAINT');
+    expect(bullet).not.toMatch(/\b(?:UPDATE|FROM|ALTER TABLE) account_freehold_hearth\b/);
+    expect(
+      bullet.match(/\b(?:UPDATE|ALTER TABLE) public\.account_freehold_hearth\b/g)?.length,
+    ).toBe(4);
   });
 });

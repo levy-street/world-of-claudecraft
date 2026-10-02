@@ -1098,18 +1098,21 @@ For off-box safety, sync the directory to S3 occasionally:
   inside that same transaction. It takes no parent lock an ordinary boot does not
   already hold (about 65 ms with plain saves in flight, the same as a steady boot; it
   shares every boot's deadlock above), but it is the one boot that builds the tables,
-  so roll it out in a quiet window. A later boot's housing schema reads the catalog,
-  rewrites the guard and erase functions' catalog rows, and holds no table lock of its
-  own to its COMMIT: the one table lock it takes is the Hearth token probe's ACCESS
-  SHARE on `account_freehold_hearth`, taken and released at once, so it waits only
-  behind an ACCESS EXCLUSIVE holder or request on that table. The boot waits there
-  while it holds ACCESS EXCLUSIVE on `characters` and `accounts`, so DDL on that table
-  stalls every realm's saves and logins for as long as the DDL waits, and DDL that
-  also wants a parent can deadlock the boot: run none while a realm boots. (The
-  storage fragment, which is not housing, still holds ACCESS EXCLUSIVE on
-  `storage_purchases` to every boot's COMMIT.) A boot that REPAIRS a missing or
-  disabled guard, or puts the advance token column or its CHECK back, takes ACCESS
-  EXCLUSIVE on that table to its COMMIT, so treat a repair boot the same way.
+  so roll it out in a quiet window. A later boot's housing fragments read the catalog,
+  rewrite the guard and erase functions' catalog rows, and hold no table lock to their
+  COMMIT: their one table lock is the Hearth token probe's ACCESS SHARE on
+  `account_freehold_hearth`, taken and released at once, so it waits only behind an
+  ACCESS EXCLUSIVE holder or request on that table. The boot waits there while it
+  holds ACCESS EXCLUSIVE on `characters` and `accounts`, so DDL on that table stalls
+  every realm's saves and logins for as long as the DDL waits and then holds its lock,
+  and DDL that also wants a parent can deadlock the boot: run none while a realm
+  boots. A REPAIR boot is any boot that rebuilds something a probe guards (for example
+  a housing index, a guard or trigger, or the advance token column or its CHECK): it
+  holds that statement's lock on that object's table to its COMMIT, builds a rebuilt
+  index while it holds both parents, and fails if a rebuilt unique index meets
+  duplicate rows, so roll a repair boot out in a quiet window too. (The storage
+  fragment, which is not housing, runs its DDL unprobed and holds its locks on its own
+  tables to every boot's COMMIT.)
 - A CORRUPT Hearth row (a `ready_at_ms` past the database clock plus a whole cooldown,
   which only a backward database clock step or a bad row produces) is never honored. A
   read is the only detector: a row already bad when its account logs in reaches the
@@ -1140,41 +1143,65 @@ For off-box safety, sync the directory to S3 occasionally:
   repair is harmless: its guard no longer matches the row.
 - THE ADVANCE TOKEN CHECK: a boot that finds `account_freehold_hearth.advance_token`
   without any constraint of that name puts the CHECK back `NOT VALID` (new tokens are
-  checked, old rows are not scanned), and a same-named constraint that is not that
-  CHECK (another type, or a CHECK with another body) leaves the shape unchecked and
-  makes every boot log `[schema] account_freehold_hearth_advance_token_shape is not
-  the 32-hex token CHECK, so the advance token shape is unchecked` instead. The boot
-  checks `public.account_freehold_hearth`, and the statements below name it so. To
-  finish a repair, first read what the name holds: `SELECT contype, convalidated,
-  pg_get_constraintdef(oid) FROM pg_constraint WHERE conrelid =
-  'public.account_freehold_hearth'::regclass AND conname =
-  'account_freehold_hearth_advance_token_shape'`. The boot compares the whole
-  definition, a ` NOT VALID` suffix aside, to `CHECK (((advance_token IS NULL) OR
-  (advance_token ~ '^[0-9a-f]{32}$'::text)))`. Decide by what it tests, not only by
-  its text:
-  - If `contype` is `c` and it is that text, the shape is checked and the boot is
-    silent on it. When `convalidated` is false, null any non-hex token (`UPDATE
-    public.account_freehold_hearth SET advance_token = NULL WHERE advance_token !~
-    '^[0-9a-f]{32}$'`), then run `ALTER TABLE public.account_freehold_hearth VALIDATE
-    CONSTRAINT account_freehold_hearth_advance_token_shape`, which takes SHARE UPDATE
-    EXCLUSIVE and does not block writes.
-  - If `contype` is `c` and it tests the same thing written differently (only
-    parentheses, spacing or a cast differ, as when a PostgreSQL major upgrade changes
-    how it prints the CHECK), the shape IS checked though every boot warns: do not
-    displace it. Validate it as above if `convalidated` is false, and report it so the
-    probe's literal in `server/freehold_hearth_db.ts` is updated.
-  - Anything else (another `contype`, or a CHECK that tests something else): in a
-    quiet window with no realm booting or restarting, run `SET lock_timeout = '2s'`
-    and then `ALTER TABLE public.account_freehold_hearth RENAME CONSTRAINT
-    account_freehold_hearth_advance_token_shape TO
-    account_freehold_hearth_advance_token_shape_displaced` in one session, retrying on
-    55P03. A rename, never a drop: it keeps whatever the displaced constraint enforces
-    (a key's index, a foreign key) and takes ACCESS EXCLUSIVE on the Hearth table
-    alone, so it waits behind in-flight trips and blocks every realm's Hearth reads
-    for at most the lock timeout. Then reboot in the same quiet window: that boot is a
-    repair boot (it holds ACCESS EXCLUSIVE on the table to its COMMIT and shares every
-    boot's deadlock above) and puts the CHECK back `NOT VALID`; validate it as above.
-    Drop the displaced constraint later only if nothing needs it.
+  checked, old rows are not scanned), and a same-named constraint whose text is not
+  that CHECK's makes every boot log `[schema]
+  account_freehold_hearth_advance_token_shape is not the 32-hex token CHECK, so the
+  advance token shape is unchecked` instead. The log judges the text only, so it also
+  fires on an equivalent CHECK PostgreSQL prints differently; the cases below tell
+  them apart. The boot checks `public.account_freehold_hearth`, and every statement
+  below names it so. To null the non-hex tokens and validate the CHECK, send:
+
+  ```sql
+  UPDATE public.account_freehold_hearth SET advance_token = NULL
+    WHERE advance_token !~ '^[0-9a-f]{32}$';
+  ALTER TABLE public.account_freehold_hearth
+    VALIDATE CONSTRAINT account_freehold_hearth_advance_token_shape;
+  ```
+
+  VALIDATE takes SHARE UPDATE EXCLUSIVE and does not block writes. First read what the
+  name holds: `SELECT contype, convalidated, pg_get_constraintdef(oid) FROM
+  pg_constraint WHERE conrelid = 'public.account_freehold_hearth'::regclass AND
+  conname = 'account_freehold_hearth_advance_token_shape'`, then:
+  - No row: the next boot puts the CHECK back `NOT VALID`; then null and validate.
+  - `contype` is `c` and the definition, a ` NOT VALID` suffix aside, is exactly
+    `CHECK (((advance_token IS NULL) OR (advance_token ~ '^[0-9a-f]{32}$'::text)))`:
+    the shape is checked and the boot is silent. If `convalidated` is false, null and
+    validate.
+  - `contype` is `c`, the boot warns, and the definition makes the same two tests
+    (`advance_token IS NULL`, or `advance_token ~ '^[0-9a-f]{32}$'` on the token
+    itself, with no cast but to `text`) in another order or print, as after a
+    PostgreSQL major upgrade: the shape IS checked, so do not displace it. If
+    `convalidated` is false, null and validate, and report it so the probe's literal
+    in `server/freehold_hearth_db.ts` is updated.
+  - Anything else: displace it by a rename, never a drop, and put the real CHECK back
+    in one short transaction, sent as one block in a quiet window with no realm
+    booting or restarting:
+
+    ```sql
+    BEGIN;
+    SET LOCAL lock_timeout = '2s';
+    ALTER TABLE public.account_freehold_hearth
+      RENAME CONSTRAINT account_freehold_hearth_advance_token_shape
+      TO account_freehold_hearth_advance_token_shape_displaced;
+    ALTER TABLE public.account_freehold_hearth
+      ADD CONSTRAINT account_freehold_hearth_advance_token_shape
+      CHECK (advance_token IS NULL OR advance_token ~ '^[0-9a-f]{32}$') NOT VALID;
+    COMMIT;
+    ```
+
+    It takes ACCESS EXCLUSIVE on the Hearth table alone and holds it only to that
+    COMMIT, so every realm's Hearth reads wait at most the lock timeout plus the
+    block. On 55P03, ROLLBACK, wait about 10 s and send it again, at most about five
+    times, then find the holder in `pg_stat_activity` and `pg_locks` before trying
+    again. If the `_displaced` name is taken (42710, or 42P07 for a key, whose index
+    the rename renames too), use a fresh suffix. The rename keeps whatever the
+    displaced constraint enforced, and the next boot finds the real CHECK and is
+    silent; then null and validate. Once the CHECK is validated, drop a displaced
+    constraint whose definition names `advance_token` (only this CHECK should
+    constrain the token the server writes), and any other only when nothing needs it,
+    each the same way, one short transaction under `SET LOCAL lock_timeout` in a quiet
+    window: a foreign key's drop also takes ACCESS EXCLUSIVE on the table it
+    references.
 - A failed deactivation receipt erase logs `deactivation housing receipt erase
   failed` with no account id. The erase is idempotent; find the accounts to re-run
   with `SELECT DISTINCT r.account_id FROM freehold_operation_receipts r JOIN accounts
