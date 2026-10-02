@@ -14,7 +14,9 @@ guard it targets.
 A small harness (its rules below) applied one mutant at a time in a SEPARATE git worktree on
 disk at the commit under test, so the main tree was never mutated while a fresh reader or a
 worker was reading or testing it; PostgreSQL mutants ran against a second scratch server on
-another port for the same reason.
+another port for the same reason. The harness itself is NOT committed: it was a session
+scratch script, so this record states its rules instead, and [mutants.json](mutants.json)
+carries every input it took. Re-running the pass means rebuilding a harness to these rules.
 - A must-pass CONTROL first, for every distinct (suite, filter, PostgreSQL) target: the target
   must pass unmutated, or every mutant behind it is reported `CONTROL_NOT_GREEN`.
 - The mutated file is verified equal to HEAD (`git diff --quiet HEAD -- <file>`) before each

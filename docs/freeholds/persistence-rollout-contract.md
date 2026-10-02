@@ -99,12 +99,16 @@ A server is CAPABLE when all of the following hold.
    operation fragment's trigger DDL take SHARE ROW EXCLUSIVE on `accounts` and
    `characters` (and a trigger repair's DROP TRIGGER takes ACCESS EXCLUSIVE), held until
    the boot COMMIT, so they must not sit in front of the seed and the backfills; and
-   nothing separates storage from the material-source writer guard that follows it. A
-   steady-state boot is catalog-only: every housing index behind a `to_regclass` probe,
-   the triggers behind the storage probe's exact predicate, and the Hearth row's
-   `advance_token` column behind a `pg_attribute` probe (in the CREATE TABLE for a fresh
-   database, otherwise one ADD COLUMN, shape-checked by the named
-   `account_freehold_hearth_advance_token_shape` constraint), so an ordinary boot takes
+   nothing separates storage from the material-source writer guard that follows it.
+   (Measured in the 07a QA: every boot already holds both parents under ACCESS EXCLUSIVE
+   from the core schema's `ADD COLUMN IF NOT EXISTS` statements, `characters` first, so
+   the housing DDL adds no parent lock; the slot is kept for the precedent.) A
+   steady-state boot's housing schema is catalog-only: every housing index behind a
+   `to_regclass` probe, the triggers behind the storage probe's exact predicate, and the
+   Hearth row's `advance_token` column behind a `pg_attribute` probe (in the CREATE TABLE
+   for a fresh database, otherwise one ADD COLUMN, shape-checked by the named
+   `account_freehold_hearth_advance_token_shape` constraint, which a later boot puts back
+   `NOT VALID` if the column exists without it), so an ordinary boot takes
    none of the index, trigger or ALTER TABLE locks that would hold another realm's
    housing statements until its COMMIT. No fragment
    references another's table, so their relative order is a convention rather than a
@@ -711,12 +715,18 @@ foreign-key-bearing tables (`account_freeholds`, `account_freehold_hearth`,
 `freehold_plot_claims`, `freehold_operations`, `freehold_operation_receipts`) plus
 THREE triggers (the two parent-delete guards and the receipt erase) inside the ONE
 `ensureSchema` transaction, which runs on its dedicated boot client with no
-`lock_timeout`. That DDL takes SHARE ROW EXCLUSIVE on `accounts` and `characters` and
-holds it to the boot COMMIT (a later boot that has to repair a trigger takes ACCESS
-EXCLUSIVE for its DROP TRIGGER), so it queues behind every in-flight character save,
-and every character save that arrives after it queues behind it until that COMMIT. The
-late slot section 2 fixes keeps that hold short, and a steady-state boot afterwards is
-catalog-only, but the first one is not: do it in a quiet window.
+`lock_timeout`. That DDL needs SHARE ROW EXCLUSIVE on `accounts` and `characters` (a
+later boot that has to repair a trigger takes ACCESS EXCLUSIVE for its DROP TRIGGER),
+but EVERY boot already holds both under ACCESS EXCLUSIVE from the core schema's first
+`ADD COLUMN IF NOT EXISTS` statements to its COMMIT, so the housing DDL adds no wait:
+every boot queues behind every in-flight character save and account write, and every
+one that arrives after it queues behind the boot until that COMMIT. Measured with an old
+realm serving, the first rollout took about 65 ms, the same as a steady-state boot. A
+transaction that writes `accounts` and then `characters` can DEADLOCK with any boot
+(PostgreSQL aborts one side after `deadlock_timeout`, 1 s; a boot that loses fails and
+the realm restarts), a hazard of the core schema's lock order that predates housing
+(`docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md`). The first rollout is the
+one boot that also builds the tables: do it in a quiet window.
 
 ### The shutdown drain, and why it sits where it sits
 
@@ -852,6 +862,11 @@ What a rollback to an incapable release leaves behind:
   old binary has no statement that names any of them, but the triggers and the foreign
   keys keep firing on the statements it does issue, so every character and account
   delete it runs pays the guard's one SELECT on `freehold_operations` (section 3).
+  NEVER DROP `freehold_operations` while those guard triggers exist: the guard function
+  reads it, so every character and account DELETE would fail with 42P01 on every
+  binary. Removing the objects by hand goes triggers first (the two guards, then the
+  erase trigger), then the two functions, then the tables (DEPLOY.md carries the
+  statements' order for the operator).
 - The claims UNRENEWED. They expire after `LEASE_TTL_SECONDS` and the rows are kept, so
   the fencing generations survive the round trip: a roll forward takes each plot as a
   takeover and advances its generation.

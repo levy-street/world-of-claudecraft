@@ -1023,15 +1023,26 @@ For off-box safety, sync the directory to S3 occasionally:
   `woc_freehold_receipt_growth`). On a lit realm a login CLAIMS its account's plot
   before reading it: a second realm of one account answers the repairable
   `claim_busy` hold (the login proceeds, the house stays on the first realm) until
-  that realm releases it at its last leave or shutdown, or its claim expires after
-  the character lease's 90 s TTL. The renewer rides the autosave beside the lease
-  heartbeat, and a realm that lost a claim quiesces that plot's writes
-  (`fenced_writes` on `woc_freehold_persist_total`). Read
+  that realm releases it, or its claim expires after the character lease's 90 s TTL.
+  A realm releases at shutdown, and after the account's last leave at its renewer's
+  next pass (the next 30 s autosave), not at the leave itself. The renewer rides the
+  autosave beside the lease heartbeat, and a realm that lost a claim quiesces that
+  plot's writes (`fenced_writes` on `woc_freehold_persist_total`). Read
   `woc_freehold_claims_held` and `woc_freehold_authority_total{measure}` (claim
-  acquires, takeovers, busy, renewals, missed heartbeats, losses, releases, and the
-  remote Hearth trip outcomes): counts only; the summed milliseconds of the renew
-  passes, the claimed login reads and the trips are `woc_freehold_authority_ms_total{measure}`
-  (divide by the matching count for a mean). An OPEN intent refuses a character
+  acquires, takeovers, busy and its lock-contention subset, renewals, missed
+  heartbeats, losses, releases, the lock or statement bounds run out in a fenced write
+  or a renew or release chunk, the remote Hearth trip outcomes with the lost-COMMIT
+  verify's landed and not-landed counts, and the operation recovery passes): counts
+  only; the summed milliseconds of the renew passes, the claimed login reads and the
+  trips are `woc_freehold_authority_ms_total{measure}` (divide by the matching count
+  for a mean). `woc_freehold_receipt_growth{table, measure}` observes BOTH
+  keep-forever authority tables, the receipts and `freehold_plot_claims`, by
+  estimated rows and bytes. The claims table rewrites every live row on the 30 s
+  cadence on columns no index covers, so those updates are HOT (fillfactor 80);
+  a release or a takeover rewrites the indexed holder and is not. If its dead tuples
+  climb, read `SELECT n_tup_upd, n_tup_hot_upd, n_dead_tup, last_autovacuum FROM
+  pg_stat_user_tables WHERE relname = 'freehold_plot_claims'`: a falling HOT share
+  or a dead-tuple count that autovacuum never brings down is the signal. An OPEN intent refuses a character
   DELETE (409 `character.freehold_operation_open`) and an account delete (SQLSTATE
   55006) until it closes; no production operation kind exists yet, so in this
   release the intent table stays empty. The shutdown closure releases this
@@ -1043,15 +1054,44 @@ For off-box safety, sync the directory to S3 occasionally:
   conditions (zero open intents, never a DELETE of a claim or receipt). The
   rollback target is the PRE-HOUSING release (no 07 build ever deployed), and the
   open-operation delete guards and the receipts erase trigger stay installed after
-  it, which is harmless only while `freehold_operations` holds zero rows.
-- FIRST ROLLOUT OF THE HOUSING TABLES: the first boot that carries them creates the
-  foreign-key-bearing tables and the delete guards on `accounts` and `characters` in
-  the ONE boot schema transaction, holding SHARE ROW EXCLUSIVE on both parents until
-  its COMMIT with no lock timeout: it queues behind any in-flight character save, and
-  every later save and account write on every realm queues behind it. Roll it out in
-  a quiet window. A later boot is catalog-only and takes no relation lock; a boot that
+  it, which is harmless only while `freehold_operations` holds zero rows. NEVER
+  drop `freehold_operations` while those guard triggers exist: the guard function
+  reads it, so every character and account DELETE on every realm would then fail
+  (42P01). To remove the housing authority objects by hand, drop in this order: the
+  triggers `freehold_operation_guard_character_delete` ON `characters` and
+  `freehold_operation_guard_account_delete` ON `accounts`, then
+  `freehold_operation_receipt_erase` ON `freehold_operation_receipts`, then the
+  functions `guard_open_freehold_operation_parent_delete()` and
+  `erase_freehold_operation_receipt()`, and only then the tables.
+- EVERY BOOT LOCKS THE PARENTS: the core schema's `ADD COLUMN IF NOT EXISTS`
+  statements take ACCESS EXCLUSIVE on `characters` and then `accounts` even when the
+  column exists, and hold both until the boot schema transaction COMMITs (no lock
+  timeout). A boot therefore queues behind every in-flight save and account write,
+  and every later one on every realm queues behind the boot (measured with a realm
+  serving: about 60 ms). A transaction that writes `accounts` and then `characters`
+  can DEADLOCK with any boot, which takes the two the other way round; PostgreSQL
+  aborts one side after `deadlock_timeout` (1 s), and if the boot is the one aborted
+  the realm fails to start and is restarted. That hazard predates housing
+  (docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md measures it).
+- FIRST ROLLOUT OF THE HOUSING TABLES: the first boot that carries them also creates
+  the foreign-key-bearing tables and the delete guards on `accounts` and `characters`
+  inside that same transaction. It takes no parent lock an ordinary boot does not
+  already hold (measured: about 65 ms with a realm serving, the same as a steady
+  boot), but it is the one boot that builds the tables, so roll it out in a quiet
+  window. A later boot's housing schema reads the catalog and rewrites the guard and
+  erase functions' catalog rows, and takes no table lock of its own; a boot that
   REPAIRS a missing or disabled guard drops and recreates it under ACCESS EXCLUSIVE,
   so treat a repair boot the same way.
+- A CORRUPT Hearth row (a `ready_at_ms` past the database clock plus a whole
+  cooldown, which only a backward database clock step or a bad row produces) refuses
+  that account's remote key and counts `trip_corrupt` with a warn line; it is never
+  honored, and it stays refused until repaired. Find them with `SELECT account_id,
+  ready_at_ms FROM account_freehold_hearth WHERE ready_at_ms >
+  (EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::bigint + 3600000` (3,600,000 ms is
+  `HEARTH_KEY_COOLDOWN_MS`), and repair each by clamping it to a full cooldown from
+  now, which grants no free trip: `UPDATE account_freehold_hearth SET ready_at_ms =
+  (EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::bigint + 3600000, revision =
+  revision + 1, updated_at = now() WHERE account_id = $1`.
 - A failed deactivation receipt erase logs `deactivation housing receipt erase
   failed` with no account id. The erase is idempotent; find the accounts to re-run
   with `SELECT DISTINCT r.account_id FROM freehold_operation_receipts r JOIN accounts

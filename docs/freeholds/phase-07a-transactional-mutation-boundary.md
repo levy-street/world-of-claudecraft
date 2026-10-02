@@ -69,6 +69,11 @@ Deliverables (at most five):
    busy/retry on foreign claim/pool pressure. Lease policy/timing reuses that verified
    authority infrastructure, never a sim clock or a guessed housing timeout. No live
    client/transaction spans a player visit.
+   AS BUILT (the 07a QA, recorded in the manifest's section 16): no
+   `releaseFreeholdClaim` export exists. A per-plot release is the renewer's unwanted arm
+   (`FREEHOLD_CLAIM_RELEASE_SQL`, chunked) and the shutdown release
+   (`releaseAllFreeholdClaims`); the renewer is `renewFreeholdClaims` in
+   `server/freehold_claim_registry.ts`.
 2. NEW server/freehold_mutation.ts::commitFreeholdMutation composes exact item/gold
    transfers with housing effects in ONE bounded character-save transaction. Acquire
    character FIFO before plot/shared-resource serialization and admission; no queue wait
@@ -90,6 +95,12 @@ Deliverables (at most five):
    (and 07b's history table) with a keep-forever comment at the DDL. Bind opaque
    plot ID, internal account/character or guild authority, operation kind, immutable
    fingerprint, exact-copy references, expected durable revision and fence generation.
+   AS BUILT (the 07a QA, recorded in the manifest's section 16): no
+   `applyFreeholdOperation` export exists; an apply is the housing hook's operation
+   participant inside `commitFreeholdMutation` (a `FreeholdOperationApply` on the
+   request), and later packets that name `applyFreeholdOperation` mean that participant.
+   An intent binds an ACCOUNT only (`account_id` NOT NULL): guild authority arrives with
+   28's owner column, a recorded deviation.
    Intent is committed before external spend; apply identity and housing/inventory effect
    commit together; the applied-identity guard is a unique constraint, never a
    SELECT-then-INSERT. Applied receipt identity is permanent replay authority unless

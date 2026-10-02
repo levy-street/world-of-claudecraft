@@ -1830,19 +1830,43 @@ ambiguous commits, real PostgreSQL participants and exact no-leak capacity total
   leaves the server), SKU ids `freehold_charter_cottage` (03) and
   `freehold_master_builders_call` (15), a `freeholdForAccount` read at fresh join beside
   `bankBonusFactsForAccount`.
-- Server, 07a rows (NEW, named so 07a, 13, 15, 28, 37 and 42 cite one vocabulary):
-  `server/freehold_claim_db.ts` (`FREEHOLD_CLAIM_SCHEMA`, table `freehold_plot_claims`,
-  one active claim per `plot_id`) and `server/freehold_operation_db.ts`
-  (`FREEHOLD_OPERATION_SCHEMA`, tables `freehold_operations` for intent and
-  `freehold_operation_receipts` for applied tombstones), both placed in `ensureSchema`
-  after `FREEHOLD_SCHEMA` and before `STORAGE_PURCHASE_SCHEMA`; the claim renewer
-  `renewFreeholdClaims` is a `PeriodicSaveWrites` member registered in
-  `PERIODIC_SAVE_WRITE_NAMES` beside `heartbeatLeases` (expiry plus heartbeat, the
-  `LEASE_TTL_SECONDS` policy); the open-operation deletion guard raises the NEW
-  `CharacterFreeholdOperationOpen` class in `server/character_delete_db.ts` beside
-  `CharacterStoragePurchaseOpen` (D88); receipts growth rides a gauge modelled on
-  `server/bank_ledger_growth_monitor.ts` and pinned in
-  `tests/server/main_retention_wiring.test.ts`.
+- Server, 07a rows (BUILT 2026-10-01, QA'd 2026-10-01; named so 07a, 13, 15, 28, 37 and
+  42 cite one vocabulary; the manifest `mutation-touch-set-manifest.md` is the design of
+  record): `server/freehold_claim_db.ts` (`FREEHOLD_CLAIM_SCHEMA`, table
+  `freehold_plot_claims`, KEEP-FOREVER, one active claim per `plot_id`, a release renames
+  the holder `#released`; `acquireFreeholdClaim`, the fence and renew/release statements),
+  `server/freehold_claim_registry.ts` (`createFreeholdClaimRegistry`,
+  `renewFreeholdClaims` in chunks of `FREEHOLD_CLAIM_RENEW_CHUNK` 256 under a
+  `FREEHOLD_CLAIM_RENEW_PASS_DEADLINE_MS` 20,000 pass, `stopFreeholdClaimRenewer`,
+  `releaseAllFreeholdClaims` bounded by `FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS` 2,000),
+  `server/freehold_claim_login.ts` (`readClaimedLoginDurables`, one budget,
+  `FREEHOLD_CLAIM_LOGIN_BOUNDS` statement 2 s, lock 1 s), `server/freehold_fenced_write.ts`
+  (`createFreeholdFencedWriter`; the ordinary write is one statement,
+  `FREEHOLD_FENCED_WRITE_BOUNDS` bound the first insert and the ambiguous retry),
+  `server/freehold_operation_db.ts` (`FREEHOLD_OPERATION_SCHEMA`, tables
+  `freehold_operations` for intent, at most `FREEHOLD_OPERATION_OPEN_PER_ACCOUNT` 8 open
+  per account, and `freehold_operation_receipts` for applied tombstones, KEEP-FOREVER;
+  `prepareFreeholdOperation`, `cancelFreeholdOperation`,
+  `eraseFreeholdOperationReceiptsForAccount`), `server/freehold_mutation.ts`
+  (`commitFreeholdMutation`, `createFreeholdSaveHook`, `FREEHOLD_VERIFY_BOUNDS`),
+  `server/freehold_hearth_trip.ts` with its host binding `server/freehold_hearth_trip_host.ts`
+  (the lit remote Hearth trip), `server/freehold_operation_recovery.ts`,
+  `server/freehold_tx.ts` (`runFreeholdTransaction`), and the growth pair
+  `server/freehold_receipt_growth_db.ts` and `server/freehold_receipt_growth_monitor.ts`.
+  `server/freehold_persist_types.ts` is an EXTRACTION from the store (its ports and entry
+  record), not a new seam. `ensureSchema` applies plots, Hearth, claims, operations in
+  the late block immediately before `STORAGE_PURCHASE_SCHEMA`. The claim renewer is a
+  `PeriodicSaveWrites` member registered in `PERIODIC_SAVE_WRITE_NAMES` beside
+  `heartbeatLeases` (expiry plus heartbeat, the `LEASE_TTL_SECONDS` 90 s policy), its
+  synchronous launch billed to the `saves` phase. The open-operation deletion guard raises
+  the NEW `CharacterFreeholdOperationOpen` class in `server/character_delete_db.ts` beside
+  `CharacterStoragePurchaseOpen` (D88; 409 `character.freehold_operation_open`). Metrics:
+  `woc_freehold_claims_held` (gauge), `woc_freehold_authority_total{measure}` (the claim_*,
+  trip_* and recovery_* counts), `woc_freehold_authority_ms_total{measure}`,
+  `fenced_writes` on `woc_freehold_persist_total`, and
+  `woc_freehold_receipt_growth{table, measure}` over the receipts and the claims tables
+  (that watched list, `FREEHOLD_RECEIPT_GROWTH_TABLES`, is pinned whole in
+  `tests/server/main_retention_wiring.test.ts` beside the retention absences).
 - Guild roster (origin/release/v0.42.0, verified 2026-09-06, re-verify at every guild
   phase start): GUILD_MEMBER_LIMIT is removed; the cap is per guild, base 100 plus
   20-seat pages up to `GUILD_ROSTER_MAX_MEMBERS` (1,000) in `src/sim/guild_roster.ts`;

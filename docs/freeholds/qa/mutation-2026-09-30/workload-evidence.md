@@ -28,9 +28,10 @@ the REAL server modules. The script is below, so the run is repeatable.
 - Login floor: the added statements are about 1 ms at p99 here; the contract's re-derived floor
   counts them by their statement bound, not by this measurement.
 
-Not measured here, and named as such: the P9 hold against a concurrent `characters` UPDATE
-under load, and a first-rollout boot against a populated database with a second realm serving.
-The renewer against a GROWN claims table is measured in the next section.
+The renewer against a GROWN claims table is measured in the next section; the P9 hold
+against a concurrent `characters` UPDATE, two admitted processes racing, the renewer beside the
+autosave burst, the claimed login read on the grown table, and a first-rollout boot with an old
+realm serving are measured in "Contention and the first-rollout boot" below.
 
 ## Grown claims table (201,000 rows, 61 holders)
 
@@ -76,6 +77,62 @@ Readings:
   a few hundred times inside the pass deadline (`FREEHOLD_CLAIM_RENEW_PASS_DEADLINE_MS`) and the
   30 s cadence. The pass is single-flight and holds one pool client at a time, so a brownout
   that stretches it skips triggers (counted) rather than stacking clients.
+
+## Contention and the first-rollout boot (2026-10-01)
+
+Measured in the 07a QA on the same host and server, each run in its own throwaway schema or
+database. Two pools of 10 (the realm's `DB_POOL_MAX_CLIENTS`) stand in for two admitted realm
+processes, each with its own holder, over a claims table grown to 198,500 rows (62 MB). Every
+path reports three things: lock-wait samples (`pg_stat_activity` polled every 10 ms, attributed
+by statement text and process, so a sample is about 10 ms of one backend waiting), every
+SQLSTATE it threw, and the registry's own contention counters. A character save is modeled as
+its row UPDATE plus, where stated, a hold standing in for its other statements.
+
+| Path | Load | Measured | Lock waits, errors |
+|---|---|---|---|
+| the claimed login read over a RELEASED row (a re-claim) | 2,500 reads at the store's load cap of 4, grown table | p50 1.2 ms, p99 2.4 ms, max 10.5 ms | none, none |
+| the claimed login read, a first claim (insert) | 2,500 reads, same | p50 1.0 ms, p99 1.4 ms, max 2.6 ms | none, none |
+| the renewer at 5,000 wanted claims BESIDE the autosave burst (5,000 saves and 5,000 fenced writes, 4 workers each) | 3 cycles | pass 165, 203, 173 ms; renewed 5,000 each, missed 0, lost 0, lock timeouts 0, abandoned 0; saves p99 at most 0.8 ms | none, none |
+| two processes racing for 1,000 plots for 15 s (A's sessions end over the first 10 s, B logs each in at a random moment and retries a busy answer after 1 s; both renew every 1 s and flush every 3 s) | 3,071 B login reads | B acquired all 1,000 after 2,071 busy answers (at most 11 for one plot); A released 1,000, lost 0, missed 3; B login p50 0.7 ms, p99 1.8 ms | fenced write about 40 ms per process in total; none thrown, no 55P03, no 57014 |
+| the P9 verify (`FREEHOLD_VERIFY_WAIT_SQL` under `FREEHOLD_VERIFY_BOUNDS`) behind an in-flight save holding the row 20 ms, with the next save queued 5 ms later | 500 characters, 3 at a time | verify wait p50 15.3 ms, p99 16.4 ms; the queued save p50 10.7 ms, p99 11.6 ms, the SAME as the no-verify control (10.7, 11.6) | the waits the hold explains; none thrown |
+
+The first-rollout boot ran the REAL `ensureSchema()` against a database built by an earlier
+`ensureSchema()` with the 07a objects then removed (a 07 realm's database), while an old realm
+served 8 save workers (row UPDATE plus 5 ms) and one account create-then-delete cycle every
+20 ms. Three rounds, each a first-rollout boot followed by a steady-state boot:
+
+| Boot | Wall | Old-realm saves finishing in the boot window | Lock waits |
+|---|---|---|---|
+| first rollout, rounds 1 to 3 | 64, 66, 66 ms | p99 at most 61.3 ms | the old realm's writers queue behind the boot for its duration |
+| steady state, rounds 2 and 3 | 59, 61 ms | p99 at most 8.9 ms | the same queue |
+| steady state, round 1 | 1,057 ms | max 1,053.8 ms | a DEADLOCK: the boot waited about 920 ms on `accounts`, then the old realm's create transaction was aborted with 40P01 |
+
+Readings:
+
+- **No path threw a lock or statement timeout.** No 55P03 and no 57014 on any path in any phase;
+  the only SQLSTATE in either run is the boot deadlock below.
+- **The renewer and the autosave do not collide.** SKIP LOCKED passed over no row in three
+  cycles beside a full burst, and the pass took 165 to 203 ms against the 30 s cadence.
+- **The race resolves through release, not takeover.** B's busy answers end when A's renewer
+  releases an unwanted claim, B never takes a live one, and A loses nothing. The three heartbeats
+  A missed were rows another statement held at that instant (SKIP LOCKED passed them over), each
+  renewed on the next pass.
+- **The P9 hold costs the next save nothing.** The verify waits only as long as the save it is
+  verifying holds the row, and the save queued behind both finishes exactly when it does without
+  the verify.
+- **The first rollout adds no boot lock.** Every boot, steady state included, already takes
+  ACCESS EXCLUSIVE on `characters` and then `accounts` and holds both to its COMMIT: the core
+  `SCHEMA` runs `ALTER TABLE characters ADD COLUMN IF NOT EXISTS` before
+  `ALTER TABLE accounts ADD COLUMN IF NOT EXISTS`, and a no-op `ADD COLUMN IF NOT EXISTS` still
+  takes ACCESS EXCLUSIVE (probed on this server). So the housing fragments' trigger creation runs
+  under locks the boot already holds, and the first-rollout boot measures the same as a steady
+  one.
+- **The boot deadlock is pre-existing, not 07a's.** A transaction that writes `accounts` and then
+  `characters` (the bench's account create) can deadlock with ANY boot, because the boot takes the
+  two in the other order. It happened once in six boots, on a STEADY-STATE boot, and PostgreSQL
+  resolved it at `deadlock_timeout` (1 s) by aborting the old realm's transaction. In general
+  either side can be the one aborted; a boot that loses fails, and the realm is restarted.
+  Recorded for the rollout docs, with any change to the boot's lock order left to the maintainer.
 
 ## The script
 
@@ -398,6 +455,737 @@ async function main() {
     const cleanup = new Pool({ connectionString: URL, max: 1 });
     await cleanup.query(`DROP SCHEMA IF EXISTS ${SCHEMA} CASCADE`);
     await cleanup.end();
+  }
+}
+
+main().then(
+  () => process.exit(0),
+  (e) => {
+    console.error(e);
+    process.exit(1);
+  },
+);
+```
+
+## The contention script
+
+Built and run the same way as the scripts above (the first-rollout boot script below loads
+`server/db` dynamically, so bundle it with a `node_modules` reachable from the bundle's own
+directory: Node's ESM loader ignores `NODE_PATH`).
+
+```ts
+// 07a contention evidence against the scratch PostgreSQL 16 (never a shared
+// DB; its own schema, dropped after). Two pools of 10 stand in for two admitted
+// realm processes, each with its own holder. Drives the REAL claim, login,
+// renewer, fenced-write, verify and transaction modules over a claims table
+// grown to about 200,000 rows, and reports per path: the lock-wait samples
+// (pg_stat_activity polled every 10 ms, attributed by statement text), every
+// SQLSTATE a path threw, and the registry's own contention counters.
+import { Pool, type PoolClient } from 'pg';
+import {
+  FREEHOLD_CLAIM_ACQUIRE_SQL,
+  FREEHOLD_CLAIM_BUSY_SQL,
+  FREEHOLD_CLAIM_INSERT_SQL,
+  FREEHOLD_CLAIM_RELEASE_SQL,
+  FREEHOLD_CLAIM_RENEW_SQL,
+  FREEHOLD_CLAIM_STILL_HELD_SQL,
+  freeholdClaimSchema,
+  mintFreeholdWriteToken,
+} from '../../../../server/freehold_claim_db';
+import { readClaimedLoginDurables } from '../../../../server/freehold_claim_login';
+import {
+  createFreeholdClaimRegistry,
+  type FreeholdClaimRegistry,
+  renewFreeholdClaims,
+} from '../../../../server/freehold_claim_registry';
+import {
+  FREEHOLD_FENCED_CAS_SQL,
+  FREEHOLD_PRIMARY_PLOT_ID_SQL,
+  freeholdForAccount,
+  freeholdSchema,
+  upsertFencedFreehold,
+  upsertFreehold,
+} from '../../../../server/freehold_db';
+import { freeholdHearthSchema, loadFreeholdHearth } from '../../../../server/freehold_hearth_db';
+import { FREEHOLD_VERIFY_BOUNDS } from '../../../../server/freehold_mutation';
+import { FREEHOLD_VERIFY_WAIT_SQL } from '../../../../server/freehold_mutation_db';
+import { freeholdOperationSchema } from '../../../../server/freehold_operation_db';
+import { runFreeholdTransaction } from '../../../../server/freehold_tx';
+
+const URL = process.env.BENCH_URL ?? 'postgres://postgres:postgres@127.0.0.1:55432/wocc_ci';
+const SCHEMA = 'bench07a_race';
+const N = 5_000;
+const RELEASED_OTHER = 190_000;
+const OTHER_HOLDERS = 60;
+const OTHER_LIVE_EACH = 100;
+const TTL = 90;
+const HOLDER_A = 'realma#0b8d5c1e-8f3c-4c55-9a51-6a0f5d1c2b01';
+const HOLDER_B = 'realmb#5e1f2a4b-1d7c-4e0a-8a1e-2c9b7d3f4a02';
+const SAVE_SQL = `UPDATE characters SET state = jsonb_build_object('tick', $2::int), level = level, updated_at = now() WHERE id = $1`;
+const SAVE_HOLD_SQL = 'SELECT pg_sleep($1::float8)';
+
+const plot = (i: number) => `plot:bench${String(i).padStart(6, '0')}`;
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+const pct = (xs: number[], p: number) => {
+  if (xs.length === 0) return 0;
+  const s = [...xs].sort((a, b) => a - b);
+  return s[Math.min(s.length - 1, Math.floor((p / 100) * s.length))];
+};
+const fmt = (xs: number[]) =>
+  `n ${xs.length}, p50 ${pct(xs, 50).toFixed(1)} ms, p99 ${pct(xs, 99).toFixed(1)} ms, max ${(xs.length ? Math.max(...xs) : 0).toFixed(1)} ms`;
+
+// ---- per-path accounting ---------------------------------------------------
+const LABELS: [string, string][] = [
+  ['claim acquire', FREEHOLD_CLAIM_ACQUIRE_SQL],
+  ['claim insert', FREEHOLD_CLAIM_INSERT_SQL],
+  ['claim busy pre-check', FREEHOLD_CLAIM_BUSY_SQL],
+  ['plot-id pre-read', FREEHOLD_PRIMARY_PLOT_ID_SQL],
+  ['renew', FREEHOLD_CLAIM_RENEW_SQL],
+  ['renew follow-up', FREEHOLD_CLAIM_STILL_HELD_SQL],
+  ['release', FREEHOLD_CLAIM_RELEASE_SQL],
+  ['fenced write', FREEHOLD_FENCED_CAS_SQL],
+  ['P9 verify wait', FREEHOLD_VERIFY_WAIT_SQL],
+  ['character save', SAVE_SQL],
+];
+const labelOf = (query: string): string => {
+  for (const [label, sql] of LABELS) if (query.trim() === sql.trim()) return label;
+  return `other: ${query.replace(/\s+/g, ' ').slice(0, 60)}`;
+};
+const waits = new Map<string, number>();
+const errors = new Map<string, number>();
+const tally = (map: Map<string, number>, key: string) => map.set(key, (map.get(key) ?? 0) + 1);
+const failed = (path: string, err: unknown) => {
+  const code = (err as { code?: unknown })?.code;
+  tally(errors, `${path}: ${typeof code === 'string' ? code : (err as Error)?.name ?? 'unknown'}`);
+};
+
+async function monitor(probe: Pool, stop: { done: boolean }) {
+  while (!stop.done) {
+    const res = await probe.query(
+      `SELECT application_name AS app, query FROM pg_stat_activity
+        WHERE application_name LIKE 'bench07a_%' AND wait_event_type = 'Lock'`,
+    );
+    for (const row of res.rows) tally(waits, `${row.app}: ${labelOf(String(row.query))}`);
+    await sleep(10);
+  }
+}
+
+function report(title: string) {
+  console.log(`\n== ${title}`);
+  const w = [...waits.entries()].sort();
+  console.log(
+    w.length
+      ? w.map(([k, v]) => `  lock-wait samples ${k}: ${v} (about ${v * 10} ms)`).join('\n')
+      : '  lock-wait samples: none',
+  );
+  const e = [...errors.entries()].sort();
+  console.log(e.length ? e.map(([k, v]) => `  thrown ${k}: ${v}`).join('\n') : '  thrown: none');
+  waits.clear();
+  errors.clear();
+}
+
+// ---- one realm process -----------------------------------------------------
+interface Realm {
+  name: string;
+  pool: Pool;
+  holder: string;
+  registry: FreeholdClaimRegistry;
+  wanted: Set<number>;
+  revs: Map<number, string>;
+}
+
+function realm(name: string, holder: string): Realm {
+  return {
+    name,
+    holder,
+    pool: new Pool({
+      connectionString: URL,
+      max: 10,
+      application_name: `bench07a_${name}`,
+      options: `-c search_path=${SCHEMA}`,
+    }),
+    registry: createFreeholdClaimRegistry(),
+    wanted: new Set(),
+    revs: new Map(),
+  };
+}
+
+async function login(r: Realm, accountId: number) {
+  const started = performance.now();
+  const answer = await readClaimedLoginDurables(
+    {
+      pool: r.pool,
+      registry: r.registry,
+      holder: r.holder,
+      realm: r.name,
+      ttlSeconds: TTL,
+      readRow: (db) => freeholdForAccount(db, accountId, 106_496),
+      readHearth: (db) => loadFreeholdHearth(db, accountId),
+      nowMs: () => Date.now(),
+    },
+    accountId,
+  );
+  return { ms: performance.now() - started, kind: answer.row.kind };
+}
+
+const renewDeps = (r: Realm) => ({
+  registry: r.registry,
+  pool: r.pool,
+  holder: r.holder,
+  ttlSeconds: TTL,
+  wanted: (claim: { accountId: number }) => r.wanted.has(claim.accountId),
+  nowMs: () => Date.now(),
+  warn: () => {},
+});
+
+async function renewPass(r: Realm) {
+  const started = performance.now();
+  try {
+    await renewFreeholdClaims(renewDeps(r));
+  } catch (err) {
+    failed(`${r.name} renewer`, err);
+  }
+  return performance.now() - started;
+}
+
+/** The store's flush shape: one fenced CAS per held, wanted plot. */
+async function fencedWrite(r: Realm, accountId: number, tick: number) {
+  const claim = r.registry.forPlot(plot(accountId));
+  if (!claim) return 'unheld';
+  const expected = r.revs.get(accountId) ?? '1';
+  try {
+    const out = await upsertFencedFreehold(
+      r.pool,
+      {
+        accountId,
+        plotIndex: 0,
+        plotId: plot(accountId),
+        tier: 'inn_room',
+        layoutJson: JSON.stringify([{ tick }]),
+        trophiesJson: '[]',
+        condition: 100,
+        visitPolicy: 'closed',
+        wireRev: tick,
+        schemaVersion: 1,
+        expectedDurableRev: expected,
+      },
+      {
+        plotId: plot(accountId),
+        holder: r.holder,
+        generation: claim.generation,
+        writeToken: mintFreeholdWriteToken(),
+      },
+    );
+    if (out.kind === 'updated') r.revs.set(accountId, out.durableRev);
+    return out.kind;
+  } catch (err) {
+    failed(`${r.name} fenced write`, err);
+    return 'threw';
+  }
+}
+
+/** A character save: the row UPDATE, then `holdMs` of the save's other
+ *  statements, then COMMIT. */
+async function save(r: Realm, characterId: number, tick: number, holdMs = 0) {
+  const started = performance.now();
+  let client: PoolClient | undefined;
+  try {
+    client = await r.pool.connect();
+    await client.query('BEGIN');
+    await client.query("SET LOCAL lock_timeout = '10s'");
+    await client.query(SAVE_SQL, [characterId, tick]);
+    if (holdMs > 0) await client.query(SAVE_HOLD_SQL, [holdMs / 1000]);
+    await client.query('COMMIT');
+  } catch (err) {
+    failed(`${r.name} character save`, err);
+    await client?.query('ROLLBACK').catch(() => {});
+  } finally {
+    client?.release();
+  }
+  return performance.now() - started;
+}
+
+async function inParallel<T>(items: T[], width: number, run: (item: T) => Promise<unknown>) {
+  let next = 0;
+  await Promise.all(
+    Array.from({ length: width }, async () => {
+      while (next < items.length) await run(items[next++]);
+    }),
+  );
+}
+
+async function main() {
+  const admin = new Pool({ connectionString: URL, max: 1 });
+  await admin.query(`DROP SCHEMA IF EXISTS ${SCHEMA} CASCADE`);
+  await admin.query(`CREATE SCHEMA ${SCHEMA}`);
+  await admin.end();
+  const setup = new Pool({ connectionString: URL, max: 2, options: `-c search_path=${SCHEMA}` });
+  const probe = new Pool({ connectionString: URL, max: 1 });
+  const A = realm('A', HOLDER_A);
+  const B = realm('B', HOLDER_B);
+  try {
+    // ---- setup: N players, a plot each, and a grown claims table ----------
+    const extra = RELEASED_OTHER + OTHER_HOLDERS * OTHER_LIVE_EACH;
+    await setup.query('CREATE TABLE accounts (id SERIAL PRIMARY KEY, deactivated_at TIMESTAMPTZ)');
+    await setup.query(`CREATE TABLE characters (
+      id SERIAL PRIMARY KEY,
+      account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+      level INT NOT NULL DEFAULT 1,
+      state JSONB NOT NULL DEFAULT '{}'::jsonb,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now())`);
+    for (const ddl of [
+      freeholdSchema(SCHEMA),
+      freeholdHearthSchema(SCHEMA),
+      freeholdClaimSchema(SCHEMA),
+      freeholdOperationSchema(SCHEMA),
+    ]) {
+      await setup.query(ddl);
+    }
+    await setup.query(`INSERT INTO accounts (id) SELECT g FROM generate_series(1, ${N + extra}) g`);
+    await setup.query(`INSERT INTO characters (id, account_id) SELECT g, g FROM generate_series(1, ${N}) g`);
+    for (let i = 1; i <= N; i++) {
+      await upsertFreehold(setup, {
+        accountId: i,
+        plotIndex: 0,
+        plotId: plot(i),
+        tier: 'inn_room',
+        layoutJson: '[]',
+        trophiesJson: '[]',
+        condition: 100,
+        visitPolicy: 'closed',
+        wireRev: 0,
+        schemaVersion: 1,
+        expectedDurableRev: null,
+      });
+    }
+    // Half the players' own plots carry a RELEASED claim row from an earlier
+    // session (the keep-forever table); the other half were never claimed.
+    await setup.query(
+      `INSERT INTO freehold_plot_claims
+         (plot_id, account_id, realm, holder, generation, acquired_at, heartbeat_at, expires_at)
+       SELECT 'plot:bench' || lpad(g::text, 6, '0'), g, 'old', 'old#' || md5('h' || (g % 7))::uuid || '#released',
+              1 + (g % 4), now() - interval '9 days', now() - interval '2 days', now() - interval '2 days'
+         FROM generate_series(1, ${N / 2}) g`,
+    );
+    const holderExpr = (g: string) =>
+      `'realm' || ((${g}) % 6) || '#' || md5('holder' || ((${g}) % ${OTHER_HOLDERS}))::uuid`;
+    await setup.query(
+      `INSERT INTO freehold_plot_claims
+         (plot_id, account_id, realm, holder, generation, acquired_at, heartbeat_at, expires_at)
+       SELECT 'plot:' || md5('released' || g), ${N} + g, 'realm' || (g % 6),
+              ${holderExpr('g')} || '#released', 1 + (g % 5),
+              now() - interval '30 days', now() - interval '1 day', now() - interval '1 day'
+         FROM generate_series(1, ${RELEASED_OTHER}) g`,
+    );
+    await setup.query(
+      `INSERT INTO freehold_plot_claims
+         (plot_id, account_id, realm, holder, generation, acquired_at, heartbeat_at, expires_at)
+       SELECT 'plot:' || md5('other' || g), ${N + RELEASED_OTHER} + g, 'realm' || (g % 6),
+              ${holderExpr('g')}, 1, now(), now(), now() + interval '90 seconds'
+         FROM generate_series(1, ${OTHER_HOLDERS * OTHER_LIVE_EACH}) g`,
+    );
+    await setup.query('ANALYZE');
+    const size = (
+      await setup.query(
+        `SELECT count(*)::int AS rows, pg_size_pretty(pg_total_relation_size('freehold_plot_claims')) AS size
+           FROM freehold_plot_claims`,
+      )
+    ).rows[0];
+    console.log(`seeded: ${N} players, claims table ${JSON.stringify(size)}`);
+
+    const stop = { done: false };
+    const watching = monitor(probe, stop);
+
+    // ---- HP3: the claimed login read on the grown table --------------------
+    const reacquire: number[] = [];
+    const first: number[] = [];
+    const kinds = new Map<string, number>();
+    const all = Array.from({ length: N }, (_, i) => i + 1);
+    await inParallel(all, 4, async (accountId) => {
+      try {
+        const out = await login(A, accountId);
+        (accountId <= N / 2 ? reacquire : first).push(out.ms);
+        tally(kinds, out.kind);
+        if (A.registry.forPlot(plot(accountId))) A.wanted.add(accountId);
+      } catch (err) {
+        failed('A login', err);
+      }
+    });
+    console.log(`\nHP3, ${N} claimed login reads at the store's load cap of 4, on the grown table:`);
+    console.log(`  over a RELEASED row (re-claim): ${fmt(reacquire)}`);
+    console.log(`  first claim (insert): ${fmt(first)}`);
+    console.log(`  answers: ${JSON.stringify(Object.fromEntries(kinds))}; A holds ${A.registry.all().length}`);
+    console.log(`  A counters: ${JSON.stringify(A.registry.counters)}`);
+    report('HP3 login phase');
+
+    // ---- DB2 (a): the renewer at 5,000 beside the autosave burst -----------
+    const ids = [...A.wanted].sort((a, b) => a - b);
+    for (let cycle = 1; cycle <= 3; cycle++) {
+      const before = { ...A.registry.counters };
+      const started = performance.now();
+      const saves: number[] = [];
+      const [renewMs] = await Promise.all([
+        renewPass(A),
+        inParallel(ids, 4, async (id) => {
+          saves.push(await save(A, id, cycle));
+        }),
+        inParallel(ids, 4, (id) => fencedWrite(A, id, cycle)),
+      ]);
+      const c = A.registry.counters;
+      console.log(
+        `\nDB2 (a) cycle ${cycle}: burst of ${ids.length} saves + ${ids.length} fenced writes beside one renewer pass, wall ${(performance.now() - started).toFixed(0)} ms`,
+      );
+      console.log(
+        `  renewer pass ${renewMs.toFixed(0)} ms: renewed ${c.renewed - before.renewed}, missed ${c.missedHeartbeats - before.missedHeartbeats}, lost ${c.lost - before.lost}, lock timeouts ${c.lockTimeouts - before.lockTimeouts}, abandoned ${c.renewChunksAbandoned - before.renewChunksAbandoned}`,
+      );
+      console.log(`  character saves: ${fmt(saves)}`);
+      report(`DB2 (a) cycle ${cycle}`);
+    }
+
+    // ---- DB2 (b): two admitted processes racing for the same plots ---------
+    // A's sessions end for accounts 1..1000 over the first 10 s (A's renewer,
+    // every 1 s here against production's 30 s, releases each at its next
+    // pass); B logs each of them in at a random moment of the 15 s window and
+    // retries a busy answer 1 s later. Both flush every 3 s and renew every 1 s.
+    const contested = Array.from({ length: 1_000 }, (_, i) => i + 1);
+    const windowMs = 15_000;
+    const t0 = Date.now();
+    const busy = new Map<number, number>();
+    const acquiredAfter: number[] = [];
+    const bLogins: number[] = [];
+    const loopUntil = async (everyMs: number, body: () => Promise<unknown>) => {
+      while (Date.now() - t0 < windowMs) {
+        const tick = Date.now();
+        await body();
+        await sleep(Math.max(0, everyMs - (Date.now() - tick)));
+      }
+    };
+    let flushTick = 10;
+    const aBefore = { ...A.registry.counters };
+    await Promise.all([
+      ...contested.map(async (id) => {
+        await sleep(Math.random() * 10_000);
+        A.wanted.delete(id);
+      }),
+      ...contested.map(async (id) => {
+        await sleep(Math.random() * 12_000);
+        while (Date.now() - t0 < windowMs) {
+          try {
+            const out = await login(B, id);
+            bLogins.push(out.ms);
+            if (out.kind === 'claim_busy') {
+              busy.set(id, (busy.get(id) ?? 0) + 1);
+              await sleep(1_000);
+              continue;
+            }
+            B.wanted.add(id);
+            acquiredAfter.push(Date.now() - t0);
+          } catch (err) {
+            failed('B login', err);
+          }
+          break;
+        }
+      }),
+      loopUntil(1_000, () => renewPass(A)),
+      loopUntil(1_000, () => renewPass(B)),
+      loopUntil(3_000, async () => {
+        const tick = ++flushTick;
+        await inParallel([...A.wanted], 4, (id) => fencedWrite(A, id, tick));
+      }),
+      loopUntil(3_000, async () => {
+        const tick = ++flushTick;
+        await inParallel([...B.wanted], 4, (id) => fencedWrite(B, id, tick));
+      }),
+    ]);
+    const held = await setup.query(
+      `SELECT holder, count(*)::int AS n FROM freehold_plot_claims
+        WHERE plot_id = ANY($1::text[]) GROUP BY holder ORDER BY holder`,
+      [contested.map(plot)],
+    );
+    const busyCounts = [...busy.values()];
+    console.log(`\nDB2 (b) two processes racing for ${contested.length} plots over ${windowMs} ms:`);
+    console.log(
+      `  B acquired ${B.registry.all().length}, busy answers ${busyCounts.reduce((a, b) => a + b, 0)} over ${busy.size} plots (max ${busyCounts.length ? Math.max(...busyCounts) : 0} per plot)`,
+    );
+    console.log(`  B login reads: ${fmt(bLogins)}`);
+    console.log(`  rows at the end by holder: ${JSON.stringify(held.rows)}`);
+    const ac = A.registry.counters;
+    console.log(
+      `  A: released ${ac.released - aBefore.released}, lost ${ac.lost - aBefore.lost}, missed ${ac.missedHeartbeats - aBefore.missedHeartbeats}, lock timeouts ${ac.lockTimeouts - aBefore.lockTimeouts}, busy contention ${ac.busyContention - aBefore.busyContention}`,
+    );
+    console.log(`  B counters: ${JSON.stringify(B.registry.counters)}`);
+    report('DB2 (b) race');
+
+    // ---- DB2 (c): the P9 verify wait beside concurrent character saves -----
+    // Per character: an in-flight save holds the row 20 ms; 5 ms in, the
+    // ambiguous-COMMIT verify waits on it FOR SHARE (the real bounds); 5 ms
+    // later the next save's UPDATE queues. The control runs the same two
+    // saves with no verify between them.
+    const p9 = Array.from({ length: 500 }, (_, i) => N - i);
+    for (const withVerify of [false, true]) {
+      const verifies: number[] = [];
+      const seconds: number[] = [];
+      await inParallel(p9, 3, async (id) => {
+        const first = save(A, id, 100, 20);
+        await sleep(5);
+        const verify = withVerify
+          ? (async () => {
+              const started = performance.now();
+              try {
+                await runFreeholdTransaction(A.pool, FREEHOLD_VERIFY_BOUNDS, (tx) =>
+                  tx.query(FREEHOLD_VERIFY_WAIT_SQL, [id]),
+                );
+              } catch (err) {
+                failed('A P9 verify', err);
+              }
+              verifies.push(performance.now() - started);
+            })()
+          : Promise.resolve();
+        await sleep(5);
+        const second = save(A, id, 101);
+        const [, , s] = await Promise.all([first, verify, second]);
+        seconds.push(s);
+      });
+      console.log(`\nDB2 (c) P9 ${withVerify ? 'WITH' : 'without (control)'} the verify, 500 characters:`);
+      if (withVerify) console.log(`  verify wait: ${fmt(verifies)}`);
+      console.log(`  the queued second save: ${fmt(seconds)}`);
+      report(`DB2 (c) ${withVerify ? 'with verify' : 'control'}`);
+    }
+
+    stop.done = true;
+    await watching;
+  } finally {
+    await A.pool.end();
+    await B.pool.end();
+    await probe.end();
+    await setup.end();
+    const cleanup = new Pool({ connectionString: URL, max: 1 });
+    await cleanup.query(`DROP SCHEMA IF EXISTS ${SCHEMA} CASCADE`);
+    await cleanup.end();
+  }
+}
+
+main().then(
+  () => process.exit(0),
+  (e) => {
+    console.error(e);
+    process.exit(1);
+  },
+);
+```
+
+## The first-rollout boot script
+
+```ts
+// 07a first-rollout boot evidence against the scratch PostgreSQL 16, in a
+// THROWAWAY DATABASE (created and dropped here, never a shared one): the REAL
+// ensureSchema() boots once, the 07a objects are then removed so the database
+// looks like a 07 realm's, and an "old realm" pool serves character saves and
+// account create-then-delete cycles while the REAL ensureSchema() boots again
+// (the first rollout), then once more (a steady-state boot), three times over.
+// Reports each boot's wall time, its lock-wait samples, the old realm's
+// latency through the boot window, and every SQLSTATE either side threw.
+import { Pool, type PoolClient } from 'pg';
+
+const ADMIN_URL = process.env.BENCH_URL ?? 'postgres://postgres:postgres@127.0.0.1:55432/wocc_ci';
+const DB = 'wocc_bench07a_boot';
+const dbUrl = (() => {
+  const u = new URL(ADMIN_URL);
+  u.pathname = `/${DB}`;
+  return u.toString();
+})();
+const PLAYERS = 5_000;
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+const pct = (xs: number[], p: number) => {
+  if (xs.length === 0) return 0;
+  const s = [...xs].sort((a, b) => a - b);
+  return s[Math.min(s.length - 1, Math.floor((p / 100) * s.length))];
+};
+const fmt = (xs: number[]) =>
+  `n ${xs.length}, p50 ${pct(xs, 50).toFixed(1)} ms, p99 ${pct(xs, 99).toFixed(1)} ms, max ${(xs.length ? Math.max(...xs) : 0).toFixed(1)} ms`;
+
+/** What 07a added that a 07 database does not have. */
+const UNDO_07A = `
+DROP TRIGGER IF EXISTS freehold_operation_guard_character_delete ON characters;
+DROP TRIGGER IF EXISTS freehold_operation_guard_account_delete ON accounts;
+DROP TABLE IF EXISTS freehold_operations;
+DROP TABLE IF EXISTS freehold_operation_receipts;
+DROP FUNCTION IF EXISTS guard_open_freehold_operation_parent_delete();
+DROP FUNCTION IF EXISTS erase_freehold_operation_receipt();
+DROP TABLE IF EXISTS freehold_plot_claims;
+ALTER TABLE account_freehold_hearth DROP COLUMN IF EXISTS advance_token;
+`;
+
+async function main() {
+  const admin = new Pool({ connectionString: ADMIN_URL, max: 1 });
+  await admin.query(
+    'SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = $1 AND pid <> pg_backend_pid()',
+    [DB],
+  );
+  await admin.query(`DROP DATABASE IF EXISTS ${DB}`);
+  await admin.query(`CREATE DATABASE ${DB}`);
+  // server/db.ts reads both at module load; the boot's client is then named.
+  process.env.DATABASE_URL = dbUrl;
+  process.env.PGAPPNAME = 'bench07a_boot';
+  const db = await import('../../../../server/db');
+  // The old realm writes characters as a realm does: with the material source
+  // writer capability its connection carries.
+  const { materialSourceConnection } = await import('../../../../server/material_source_connection');
+  const old = new Pool({
+    ...materialSourceConnection(dbUrl),
+    max: 10,
+    application_name: 'bench07a_old',
+  });
+  const probe = new Pool({ connectionString: dbUrl, max: 1, application_name: 'bench07a_probe' });
+  try {
+    await db.ensureSchema();
+    await old.query(
+      `INSERT INTO accounts (username, password_hash)
+       SELECT 'bench' || g, 'x' FROM generate_series(1, ${PLAYERS}) g`,
+    );
+    await old.query(
+      `INSERT INTO characters (account_id, name, class, realm, level, state)
+       SELECT id, 'Bench' || id, 'warrior', 'bench', 5, '{}'::jsonb FROM accounts`,
+    );
+    const ids = (await old.query('SELECT id FROM characters ORDER BY id')).rows.map((r) =>
+      Number(r.id),
+    );
+    await old.query('ANALYZE');
+
+    const errors = new Map<string, number>();
+    const tally = (key: string) => errors.set(key, (errors.get(key) ?? 0) + 1);
+    const failed = (path: string, err: unknown) => {
+      const code = (err as { code?: unknown })?.code;
+      tally(`${path}: ${typeof code === 'string' ? code : (err as Error)?.name ?? 'unknown'}`);
+    };
+
+    // The old realm: 8 save workers (row UPDATE, 5 ms of other statements,
+    // COMMIT) and 1 account lifecycle worker (create an account and its
+    // character, then delete the account, which cascades to the character).
+    const load = { on: true };
+    const saveMs: { at: number; ms: number }[] = [];
+    let seq = 0;
+    const tx = async (path: string, body: (c: PoolClient) => Promise<unknown>) => {
+      let client: PoolClient | undefined;
+      try {
+        client = await old.connect();
+        await client.query('BEGIN');
+        await body(client);
+        await client.query('COMMIT');
+      } catch (err) {
+        failed(path, err);
+        await client?.query('ROLLBACK').catch(() => {});
+      } finally {
+        client?.release();
+      }
+    };
+    const workers = [
+      ...Array.from({ length: 8 }, async () => {
+        while (load.on) {
+          const id = ids[Math.floor(Math.random() * ids.length)];
+          const started = performance.now();
+          await tx('old save', async (c) => {
+            await c.query(
+              `UPDATE characters SET state = jsonb_build_object('t', $2::int), level = level WHERE id = $1`,
+              [id, ++seq],
+            );
+            await c.query('SELECT pg_sleep(0.005)');
+          });
+          saveMs.push({ at: Date.now(), ms: performance.now() - started });
+        }
+      }),
+      (async () => {
+        while (load.on) {
+          let acct = 0;
+          await tx('old account create', async (c) => {
+            acct = Number(
+              (
+                await c.query(
+                  `INSERT INTO accounts (username, password_hash) VALUES ($1, 'x') RETURNING id`,
+                  [`life${++seq}`],
+                )
+              ).rows[0].id,
+            );
+            await c.query(
+              `INSERT INTO characters (account_id, name, class, realm, level, state)
+               VALUES ($1, $2, 'warrior', 'bench', 1, '{}'::jsonb)`,
+              [acct, `Life${seq}`],
+            );
+          });
+          if (acct > 0) await tx('old account delete', (c) => c.query('DELETE FROM accounts WHERE id = $1', [acct]));
+          await sleep(20);
+        }
+      })(),
+    ];
+
+    const boot = async (label: string) => {
+      const samples = new Map<string, number>();
+      const watch = { on: true };
+      const watching = (async () => {
+        while (watch.on) {
+          const res = await probe.query(
+            `SELECT application_name AS app, left(regexp_replace(query, '\\s+', ' ', 'g'), 50) AS q
+               FROM pg_stat_activity
+              WHERE datname = current_database() AND wait_event_type = 'Lock'
+                AND application_name LIKE 'bench07a_%'`,
+          );
+          for (const row of res.rows) {
+            const key = `${row.app}: ${row.q}`;
+            samples.set(key, (samples.get(key) ?? 0) + 1);
+          }
+          await sleep(10);
+        }
+      })();
+      const from = Date.now();
+      const started = performance.now();
+      try {
+        await db.ensureSchema();
+      } catch (err) {
+        failed(`${label} boot`, err);
+      }
+      const wall = performance.now() - started;
+      const to = Date.now();
+      watch.on = false;
+      await watching;
+      const during = saveMs.filter((s) => s.at >= from && s.at <= to + 50).map((s) => s.ms);
+      console.log(`\n${label}: ensureSchema ${wall.toFixed(0)} ms`);
+      console.log(`  old-realm saves finishing in the boot window: ${fmt(during)}`);
+      const w = [...samples.entries()].sort((a, b) => b[1] - a[1]);
+      console.log(
+        w.length
+          ? w.map(([k, v]) => `  lock-wait samples ${k}: ${v} (about ${v * 10} ms)`).join('\n')
+          : '  lock-wait samples: none',
+      );
+    };
+
+    await sleep(1_000);
+    for (let round = 1; round <= 3; round++) {
+      await old.query(UNDO_07A);
+      const shape = await old.query(
+        `SELECT to_regclass('freehold_plot_claims') IS NULL AND to_regclass('freehold_operations') IS NULL AS is07`,
+      );
+      if (!shape.rows[0].is07) throw new Error('the 07a objects are still present');
+      await sleep(500);
+      await boot(`round ${round}, FIRST-ROLLOUT boot (07 database, old realm serving)`);
+      await sleep(500);
+      await boot(`round ${round}, steady-state boot`);
+    }
+    load.on = false;
+    await Promise.all(workers);
+    const all = saveMs.map((s) => s.ms);
+    console.log(`\nold-realm saves over the whole run: ${fmt(all)}`);
+    const e = [...errors.entries()].sort();
+    console.log(e.length ? e.map(([k, v]) => `thrown ${k}: ${v}`).join('\n') : 'thrown: none');
+  } finally {
+    await old.end();
+    await probe.end();
+    await db.pool.end().catch(() => {});
+    await admin.query(
+      'SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = $1 AND pid <> pg_backend_pid()',
+      [DB],
+    );
+    await admin.query(`DROP DATABASE IF EXISTS ${DB}`);
+    await admin.end();
   }
 }
 

@@ -6,9 +6,11 @@ per-row-class deletion policy, and what each added statement costs. It is a LIVI
 manifest: 08 (placement), 13/13a (the calendar head), 15 (paid effects), 28/29 (Hall Fund)
 and the wards extend THIS document and never fork a second order.
 
-Status: revision 5 (2026-09-30), the domain review of the BUILT code (database
-performance, migration safety, server hot path, architecture, test coverage, cross-platform
-and privacy and security): every finding is applied in the code or recorded in section 15.
+Status: revision 6 (2026-10-01), the 07a QA of the built code: every finding is applied in
+the code or recorded in section 16. Revision 5 (2026-09-30), the domain review of the BUILT
+code (database performance, migration safety, server hot path, architecture, test coverage,
+cross-platform and privacy and security): every finding is applied in the code or recorded
+in section 15.
 Revision 4 (2026-09-30): Revisions 1, 2 and 3 each drew ACCEPT-WITH-CHANGES from
 all three acceptance readers (database performance, migration safety, privacy and
 security); every finding of all three rounds is applied below and in the code, and section
@@ -120,7 +122,7 @@ manufactured an ambiguous commit exactly under load):
   (measured on the scratch server), so COMMIT is bounded by `lock_timeout` (2 s, for the
   growth budget's lock wait) and the 65 s wall with its backend cancel; a WAL-flush stall
   has no server-side bound, and the verify's answer for a stall inside COMMIT is expected
-  to be `ambiguous_unresolved`.
+  to be `unresolved` (counted `trip_unresolved` for a trip).
 - The remaining waits, stated: the pool checkout inside the save function (up to the
   pool's 5,000 ms connect timeout after admission), and a trip in flight at SIGTERM, which
   runs to its 65 s wall ahead of that character's shutdown save.
@@ -128,8 +130,10 @@ manufactured an ambiguous commit exactly under load):
 ## 4. The Hearth trip contract (server authority)
 
 The sim's admission seam becomes three-valued: `freeholdKeyAdmission(ownerKey, pid)` answers
-`'admit' | 'deny' | 'pending'` (offline and headless default `'admit'`, so both run
-`useHearthKey` exactly as today). `useHearthKey` checks its LOCAL clock BEFORE admission:
+`'admit' | 'deny' | 'pending'` (offline and headless default `'admit'`, so both admit
+every use the local clock passes, as before; their one change is that the owner's last
+leave now evicts the clock map entry, harmless there because offline and headless keys are
+per entity). `useHearthKey` checks its LOCAL clock BEFORE admission:
 `now < readyAt` denies `cooldown` with no host call, so a key spammed through its cooldown
 costs nothing, and every durable `ready_at_ms` the server learns (at login, after a trip,
 on a `cooldown` answer) merges forward through `mergeFreeholdKeyReadyAt` (a durable value
@@ -201,13 +205,13 @@ set; the use is instant (no cast), so the ticket is still set when the sim asks,
 admitted entry changes no heavy self field, so the re-dispatch needs no heavy-self mark of
 its own (the `use` frame took its receipt mark; pinned in `tests/server/freehold_wire.test.ts`). If the sim then refuses
 (the player died or entered combat in the commit window), the advance stays spent: named
-residual R-2, counted `refused_after_commit` and logged with no token or holder. A
+residual R-2, counted `trip_refused_after_commit` and logged with no token or holder. A
 precheck DROP after a committed advance (the realm began draining, the vault guard locked
 the character, the player began spectating, was jailed, or the realm went dark, in the
 trip's seconds) is the same residual class, decided by the realm before the sim sees the
 use: each answers as the frame path's precheck would (the vault lock and the jail
 `freeholdDenied busy`, dark `no_freehold`, draining and spectating silent), and all five
-count `dropped_after_commit` with no warn line; under a deny ticket every drop stays as
+count `trip_dropped_after_commit` with no warn line; under a deny ticket every drop stays as
 the frame path's and nothing is counted.
 
 `pending` is cleared when its trip ends, on EVERY exit (commit, rollback, throw, fence miss,
@@ -348,8 +352,11 @@ concurrent release committed would otherwise read the released row as live and r
 `$5` is `LEASE_TTL_SECONDS`, the character lease policy reused. The same holder keeps its
 generation (re-synced from `RETURNING`, never trusted from memory), so a relog never fences
 its own in-flight write; a different holder advances it, fencing every write of the previous
-holder from that statement on. No same-account steal arm. 55P03 and 57014 on the acquire
-answer `claim_busy` (repairable), never the generic read hold. ONE BUDGET (revision 5):
+holder from that statement on. No same-account steal arm. A 55P03 on the acquire (its 1 s
+lock bound) answers `claim_busy` (repairable, counted `claim_busy_contention`), never the
+generic read hold; a 57014 is a slow database, not a held row, and takes the throw arm
+(`read_threw`), as a full pool does (the login's one budget runs out in the checkout).
+ONE BUDGET (revision 5):
 the whole read, both pool checkouts and the clock-fault retry included, runs under ONE
 `AbortSignal.timeout` of the login wall, so a slow pool can no longer stretch one login
 past the store's budget; a cut before COMMIT is a plain throw, a cut at COMMIT is ambiguous,
@@ -478,7 +485,9 @@ renewer runs, so a `tryAcquire` would let claims lapse): single-flight makes its
 pool client per realm, pinned by a fake-pool test. A wanted predicate that throws keeps the
 claim (counted), and a pending write token on a plot with no claim whose owner nothing wants
 is retired (counted). Measured on a 201,000-row claims table across 61 holders: 138 ms per
-pass at 5,000 wanted claims, 1.4 ms of it synchronous (workload evidence). WANTED means any
+pass at 5,000 wanted claims, 1.4 ms of it synchronous, and 165 to 203 ms beside a full
+autosave burst of 5,000 saves and 5,000 fenced writes, with SKIP LOCKED passing over no row
+(workload evidence). WANTED means any
 of: the store holds the owner's entry with a session reference or owed work, the Sim holds
 its live record, a mutation or recovery pass is in flight for it, or the claim was acquired
 less than `FREEHOLD_PERSIST_LOGIN_BUDGET_MS` ago (a handshake between its first ask and its
@@ -562,7 +571,7 @@ code checked out twice, which the database review of the built code caught). Two
 Revision 1's per-row FOR SHARE was unsound for rows the hung transaction inserted (an
 account's first Hearth row, a first claim): an invisible tuple is never waited for. Nothing
 re-applies until the verify answers. A wait that runs out its 10 s lock bound while the
-hung statement still runs (its own bound is 15 s) answers `ambiguous_unresolved`, counted
+hung statement still runs (its own bound is 15 s) answers `unresolved` (counted `trip_unresolved` for a trip), counted
 apart, which the trip refuses and recovery re-verifies. P2 and P3 resolve their own
 ambiguity on the retry (above), inside Q3.
 
@@ -585,7 +594,10 @@ against a concurrent store write of the same account; the DELETE's own predicate
 impossible (no token, so never a session, a plot or a store entry). Its 55006 handler
 switches on the CONSTRAINT field exactly (the two guard names; anything else rethrown raw)
 and throws a typed refusal class per guard (there is no HTTP surface on this path; the
-`character.freehold_operation_open` code is the character DELETE route's). DEVIATION from
+`character.freehold_operation_open` code is the character DELETE route's). Driven in real
+PG against an open intent under each guard, account-level and through the characters
+cascade, with the closed-intent control (`tests/server/freehold_mutation.pg.test.ts`,
+section F). DEVIATION from
 the packet text, deliberate: "trigger name in the error detail"; PostgreSQL does not put a
 trigger name on the error and the storage raise carries no DETAIL, while CONSTRAINT is a
 first-class field both raises set.
@@ -593,12 +605,16 @@ first-class field both raises set.
 **P12. `ensureSchema`**: `FREEHOLD_CLAIM_SCHEMA` then `FREEHOLD_OPERATION_SCHEMA` in the
 LATE block, immediately before `STORAGE_PURCHASE_SCHEMA` (still after `FREEHOLD_SCHEMA` and
 `FREEHOLD_HEARTH_SCHEMA`, after `accounts` and `characters`, and never between storage and
-the material-source guard pinned at storage+1 and +2). Late on purpose, the storage
-precedent: on a first rollout or a repair boot the new foreign keys and trigger DDL take
-SHARE ROW EXCLUSIVE (and the repair's DROP TRIGGER takes ACCESS EXCLUSIVE) on `accounts`
-and `characters`, held until the boot COMMIT, so they must not sit in front of the chat
-filter seed and the market and mail backfills. Trigger creation is the operation
-fragment's last statement. A steady-state boot is catalog-only: the triggers through the
+the material-source guard pinned at storage+1 and +2). Late by the storage precedent, which
+reasoned that the new foreign keys and trigger DDL take SHARE ROW EXCLUSIVE (and a repair's
+DROP TRIGGER ACCESS EXCLUSIVE) on `accounts` and `characters` to the boot COMMIT. Measured
+in the 07a QA, the boot already holds more: the core `SCHEMA` runs `ALTER TABLE characters
+ADD COLUMN IF NOT EXISTS` and then `ALTER TABLE accounts ADD COLUMN IF NOT EXISTS`, and a
+no-op `ADD COLUMN IF NOT EXISTS` still takes ACCESS EXCLUSIVE, so EVERY boot holds both
+parents exclusively from its first statements to its COMMIT, and the housing DDL adds no
+parent lock the boot does not already hold
+([qa/mutation-2026-09-30/workload-evidence.md](qa/mutation-2026-09-30/workload-evidence.md)).
+Trigger creation is the operation fragment's last statement. A steady-state boot is catalog-only: the triggers through the
 storage probe, and EVERY housing index (07's plot-id index included) through a
 `to_regclass` probe in a DO block, because a no-op `CREATE INDEX IF NOT EXISTS` still
 takes the table's SHARE lock and holds it to the boot COMMIT (measured), which would block
@@ -606,24 +622,40 @@ every other realm's claim and plot writes through this realm's whole boot. The p
 Hearth fragments MOVED with them: 07 applied them earlier in `ensureSchema`, and this work
 places all four in the late block, in the order plots, Hearth, claims, operations
 (`tests/schema_wiring.test.ts` pins them at storage minus four to storage minus one).
-"Catalog-only" means catalog READS plus the two `CREATE OR REPLACE FUNCTION` rewrites of
-the guard and erase functions (two `pg_proc` rows, no relation lock; measured on the
-scratch server, the storage precedent). The index and column probes check a NAME only, as
-`IF NOT EXISTS` does: a same-named index with another definition, or an `advance_token`
-column without its CHECK, is never repaired, unlike the trigger probe, which checks the
-exact shape. THE FIRST ROLLOUT WINDOW: because no 07 build deployed, the first 07a boot on
+"Catalog-only" means no lock on a housing or parent TABLE: catalog reads, plus the two
+`CREATE OR REPLACE FUNCTION` rewrites of the guard and erase functions, which rewrite their
+`pg_proc` rows on EVERY boot (keeping their oids) and lock only those function objects. The
+pg suite proves it: re-applying both fragments completes inside a 1 s `lock_timeout` beside
+a writer holding ROW EXCLUSIVE on all five tables and keeps every index, trigger,
+constraint and function oid, while each unprobed statement it replaces times out there
+(`tests/server/freehold_mutation.pg.test.ts`, section K). The index probes check a NAME
+only, as `IF NOT EXISTS` does: a same-named index with another definition is never
+repaired, unlike the trigger probe, which checks the exact shape. The Hearth column probe
+checks the column and then its named CHECK: a column whose CHECK is missing gets it back
+`NOT VALID`, so every new token is checked again while no boot scans the table for old
+ones. THE FIRST ROLLOUT WINDOW: because no 07 build deployed, the first 07a boot on
 production creates five FK-bearing tables and the triggers in ONE `ensureSchema`
-transaction with no `lock_timeout`, holding SHARE ROW EXCLUSIVE on `accounts` and
-`characters` to its COMMIT; the foreign-key build first queues behind any in-flight
-character save on the running fleet, and every later save and account write on every
-realm then queues behind it. Do the first rollout (and any trigger repair boot, whose DROP
-TRIGGER takes ACCESS EXCLUSIVE) in a quiet window; `DEPLOY.md` carries the operator note.
+transaction with no `lock_timeout`. It takes no parent lock a steady-state boot does not
+(above): every boot queues behind each in-flight `characters` and `accounts` writer on the
+running fleet, and every later save and account write on every realm queues behind the
+boot until its COMMIT (measured with an old realm serving: about 65 ms for the first
+rollout, the same as a steady-state boot). A transaction that writes `accounts` and then
+`characters` can DEADLOCK with ANY boot, because the boot takes the two in the other order:
+PostgreSQL aborts one side at `deadlock_timeout` (1 s), measured once in six boots on a
+STEADY-STATE boot, so the hazard is the core schema's, not 07a's; a boot that loses fails
+and the realm is restarted. Do the first rollout (and any trigger repair boot) in a quiet
+window anyway, since it is the one boot that also builds the new tables; `DEPLOY.md`
+carries the operator note.
 
 ## 6. Pairwise deadlock review
 
 - P1 against P2 (a trip and a store write of one plot): both take G4 first on the one claim
-  row; the second waits under its lock timeout (P2 retries as a thrown blip, P1 answers a
-  refused trip). No cycle.
+  row, and the second waits. P1 waits under its 2 s lock bound (a timeout answers a refused
+  trip). The ordinary P2 statement carries NO lock bound: it waits under the pool's 15 s
+  statement default, so its real bound is the trip transaction's own walls, and at
+  shutdown the 10 s drain deadline gives up on it first (the ambiguous-retry and
+  first-insert transactions carry a 2 s lock bound, `FREEHOLD_FENCED_WRITE_BOUNDS`, and a
+  timeout there is a thrown blip the store retries). No cycle.
 - P1 against P4 (a trip and a takeover): the takeover's upsert waits on the trip's G4 lock;
   when the trip commits, the upsert re-evaluates its WHERE on the latest version and, if
   the old claim is still expired, advances the generation. The trip is ordered BEFORE the
@@ -879,8 +911,8 @@ soft-delete gate.
 | P1 hook bound | none | 0 | 1 | per hooked save |
 | P1 Hearth G4 read fence | `freehold_plot_claims` PK | 1 | 1 | per trip with a claim |
 | P2 fenced CTE | claims PK, then `account_freeholds` PK | 1 + 1 | 1 (+1 diagnosis) | per dirty plot write |
-| P5 renew / release | a sequential scan of the claims table under the ordered subselect at today's sizes (measured; the plan is recorded, not pinned, and re-measured on a grown table before the claim count reaches the hundred thousands) | at most 256 per statement | 3 per chunk (4 when a row was skipped) | per realm per 30 s |
-| P6 release all | as P5 (measured 58 ms at 5,000 claims) | the process's live claims | 3 | per shutdown |
+| P5 renew / release | the ordered subselect reaches the claims PK or `freehold_plot_claims_holder` (pinned under `enable_seqscan = off`, `tests/server/freehold_claim.pg.test.ts`; on the grown 201,000-row table the planner chose a BitmapAnd of both, measured) | at most 256 per statement | 3 per chunk (4 when a row was skipped) | per realm per 30 s |
+| P6 release all | as P5, with the outer update qualified on the holder (pinned; 118 ms at 5,000 claims on the grown table) | the process's live claims | 3 | per shutdown |
 | P7 receipt read, cap count, intent insert | receipts PK; `freehold_operations_account`; operations PK | 0 to 1; at most 8; 1 | 3 | per prepare |
 | P8 intent lock, receipt insert, intent delete | operations PK; receipts PK | 1 each | 3 | per apply |
 | P9 character lock, participant reads | `characters` PK; each participant's PK | 1 each | 2 to 4 | per ambiguous commit |
@@ -903,7 +935,11 @@ holding 10,000 receipts; the first-rollout boot against a populated database wit
 realm serving; and the shutdown drain at 5,000 owners on the P2 statement, PASS when it
 drains inside `FREEHOLD_PERSIST_SHUTDOWN_DRAIN_MS` (10,000 ms) on this host. The contract's
 104,000 ms login floor (now with P4's statements and the fault arm's fresh checkout) and the
-store's dirty-owner ceiling are re-derived on the measured counts.
+store's dirty-owner ceiling are re-derived on the measured counts. Every item above is
+proved or measured as of the 07a QA: the plan pins in the two pg suites
+(`tests/server/freehold_claim.pg.test.ts`, `tests/server/freehold_mutation.pg.test.ts`
+section J), and the drain, renewer, contention, P9 and first-rollout evidence in
+[qa/mutation-2026-09-30/workload-evidence.md](qa/mutation-2026-09-30/workload-evidence.md).
 
 ## 11. Where each acceptance finding landed
 
@@ -963,7 +999,7 @@ merge in a `finally`; N4 the server default pin; N5 the log pin; N6 the 15 route
 - R-2: a committed Hearth advance whose re-dispatch the Sim then refuses (death or combat
   inside the commit window, one save round trip) spends the cooldown without a trip.
   Counted and logged. A precheck drop in that window (draining, the vault lock,
-  spectating, jailed, dark) is the same class, counted `dropped_after_commit`; each
+  spectating, jailed, dark) is the same class, counted `trip_dropped_after_commit`; each
   answers as the frame path's precheck would.
 - R-3: a realm that lost its claim keeps showing its live view until relog; every write is
   fenced, so durable truth is never overwritten.
@@ -999,6 +1035,12 @@ merge in a `finally`; N4 the server default pin; N5 the log pin; N6 the 15 route
   the no-kind tripwire in `tests/server/freehold_mutation.test.ts` names all three as owed
   by the change that registers the first kind. DEPLOY.md carries the operator re-run
   query.
+
+- R-10 (revision 6, the QA): the Hearth advance stamps `ready_at_ms` from the save
+  transaction's START (`now()`, observed once with the counters under the row lock), so a
+  hooked save that ran long shortens that cooldown by at most its own 65 s wall, against a
+  3,600,000 ms cooldown. Deliberate: one epoch per entry keeps the counters and the
+  cooldown judgment consistent, and the corrupt test already reads `clock_timestamp()`.
 
 ## 13. The persistence-rollout contract edits this work owes
 
@@ -1052,7 +1094,7 @@ Round three's findings and the code that answers them, beyond the sections above
   revision 5: the draining and vault-lock drops joined) through ONE predicate,
   `hearthKeyUseRefusal` (`server/freehold_wire.ts`), pinned against the frame path's
   order (security round three S5); every sim refusal after a committed advance counts
-  `refused_after_commit` (S6); the merge after an advance sits in a `finally`.
+  `trip_refused_after_commit` (S6); the merge after an advance sits in a `finally`.
 - The admission seam is wired on every server realm (a REQUIRED `buildRealmSimConfig`
   argument whose closure answers `'deny'` when the trip machinery is absent), never the
   sim's offline default (security round three N1).
@@ -1100,3 +1142,43 @@ other finding is applied or recorded here.
   before any queue; the re-dispatch replays the draining and vault-lock drops too; the
   receipt monitor logs a bounded error; refusal messages carry no ids; the storage
   constraint name has one source; R-8.
+
+## 16. What the QA of the built code refined (revision 6)
+
+The 07a QA (2026-10-01) read `0008427d14..11316ac3cd` with fresh domain reviewers and fixed
+in the code what they found; the record is in `docs/freeholds/qa/persistence-2026-09-08/findings.md`.
+What changed the contract above:
+- AS BUILT, two names the packet used were never built as exports, on purpose:
+  `releaseFreeholdClaim` (a per-plot release is the renewer's unwanted arm, P6, and the
+  shutdown release) and `applyFreeholdOperation` (an apply is the hook's operation
+  participant inside `commitFreeholdMutation`, a `FreeholdOperationApply` on the request,
+  G5b and G6). A downstream doc that names `applyFreeholdOperation` means that
+  participant.
+- DEVIATION, recorded: an intent and a receipt carry `account_id` (NOT NULL on intents),
+  so no operation can carry guild authority in this release; a guild-owned operation
+  arrives with 28's owner column, as the claims table's nullable `account_id` already
+  anticipates.
+- The prepare answers an existing id only for its OWN account: a foreign account sending
+  the identical request under that id is `conflict`, open or closed (P7).
+- An apply must write its own plot under the same fence and revision, a request must carry
+  a Hearth advance or a plot write, and a claim proof must agree with a write fence on the
+  same plot; a plot-writing mutation must run inside the store's FIFO.
+- A throw after a PROVED COMMIT reports `committed`, never `failed`; the trip's post-COMMIT
+  steps are caught and counted; its ticket is bound to the character and the lease nonce.
+- The renewer bills its synchronous launch to the `saves` phase, stops (bounded by its pass
+  wall) before the shutdown release, and lock timeouts in a fenced write, a renew chunk or
+  a release chunk are counted; the login's busy arm is 55P03 only (P4).
+- The fragments' DDL path names no `pg_catalog`, so a same-named decoy in the target schema
+  cannot bind into a CHECK (proved in real PG with a control that names it); the Hearth
+  token CHECK is repaired by name, `NOT VALID` (P12).
+- Metrics: the verify's landed and not-landed counts, recovery's counters, and the claims
+  table on `woc_freehold_receipt_growth`; the export reads on one client.
+- Evidence: every new statement is plan-pinned; the contention, P9 and first-rollout
+  measurements are recorded (section 10); the boot deadlock hazard is the core schema's
+  (P12).
+- R-6 stands as written: a cooldown answer memo or a `cooldown` admission value was tried
+  and taken back, since R-6 is an accepted residual and the memo changed the pre-dispatch
+  merge. R-10 is new.
+- Takeover counts every generation advance over an existing row, a realm's own re-acquire
+  after its release included (P6 says so, and so does the metric's help); a re-claim over a
+  released row is the common case (the QA's login bench: 2,500 of 5,000).
