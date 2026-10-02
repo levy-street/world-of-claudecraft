@@ -240,6 +240,41 @@ export function freeholdSnapshotOf(
 export const freeholdHoldIsTerminal = (kind: FreeholdRecoveryHold['kind']): boolean =>
   !FREEHOLD_RETRYABLE_HOLD_KINDS.has(kind);
 
+/** What the store knows about a loaded entry when a preload asks whether to
+ *  re-read it, each fact computed by the store from its own state. */
+export interface FreeholdRereadFacts {
+  readonly durableRev: string | null;
+  /** A recovery hold or a quiesce. */
+  readonly held: boolean;
+  /** A write running, pending or waiting for a slot. */
+  readonly writeOwed: boolean;
+  /** A write waiting on the thrown-run retry clock. */
+  readonly retrying: boolean;
+  readonly dirty: boolean;
+  /** A leave capture not yet written. */
+  readonly leaveCaptured: boolean;
+}
+
+/**
+ * Whether a preload RE-READS a loaded entry (the claimed read decides again)
+ * rather than replaying it: only an entry with a durable row that holds and owes
+ * nothing, and only once this process no longer holds the plot's claim (asked
+ * last, and only then). Any owed work replays, because a re-read would take the
+ * plot back at a newer row's revision and rebase that work onto another realm's
+ * edits. A READ already in flight is deliberately NOT owed work here: the
+ * re-read joins it (the store's load is single-flight per account), so a second
+ * preload during a lost-claim re-read answers that read's newer row, never the
+ * stale entry.
+ */
+export function freeholdRereadsLostClaim(
+  facts: FreeholdRereadFacts,
+  claimHeld: () => boolean,
+): boolean {
+  if (facts.durableRev === null || facts.held || facts.writeOwed || facts.retrying) return false;
+  if (facts.dirty || facts.leaveCaptured) return false;
+  return !claimHeld();
+}
+
 /**
  * A LOADED answer: what the entry now knows (its plot index, plot id, durable
  * revision and state) with the settled clock and no hold. Both loaded arms of

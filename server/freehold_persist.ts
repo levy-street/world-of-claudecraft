@@ -65,6 +65,7 @@ import {
   freeholdHoldAnswer,
   freeholdHoldIsTerminal,
   freeholdLoadedAnswer,
+  freeholdRereadsLostClaim,
   type LoadedFreehold,
   freeholdSnapshotOf as snapshotOf,
 } from './freehold_load_outcome';
@@ -344,16 +345,18 @@ export function createFreeholdPersistStore(ports: FreeholdPersistPorts): Freehol
     deferredWrites.has(entry) ||
     deferredRetries.has(entry) ||
     (isDirty(entry) && !blocked(entry));
-  // A loaded entry the preload RE-READS instead of replaying: a durable row,
-  // nothing held or owed (no hold, no quiesce, no dirty edit, no write or read
-  // in flight, no leave capture), and a claim this process no longer holds.
   const rereadsLostClaim = (entry: FreeholdPersistEntry): boolean =>
-    entry.durableRev !== null &&
-    !isHeld(entry) &&
-    !owesWork(entry) &&
-    !isDirty(entry) &&
-    entry.leaveDocument === null &&
-    !(ports.claimHeld?.(entry.plotId) ?? true);
+    freeholdRereadsLostClaim(
+      {
+        durableRev: entry.durableRev,
+        held: isHeld(entry),
+        writeOwed: entry.running || entry.pending || deferredWrites.has(entry),
+        retrying: deferredRetries.has(entry),
+        dirty: isDirty(entry),
+        leaveCaptured: entry.leaveDocument !== null,
+      },
+      () => ports.claimHeld?.(entry.plotId) ?? true,
+    );
   // NOT a clause of its own for the retained leave document, deliberately, and
   // the reason is worth writing down because it is the shape of a defect this
   // packet has already made once. `settle` clears the capture only when the
@@ -469,8 +472,7 @@ export function createFreeholdPersistStore(ports: FreeholdPersistPorts): Freehol
     // maximal record this realm is allowed to write.
     const { rowLoad, hearth: read } = await readFreeholdLoginPair(ports, accountId);
     const entry = ensureEntry(ownerKey, accountId);
-    // Remembered on the entry, not only returned: every later replay answers
-    // with it, and a lost-claim re-read only moves it forward.
+    // Remembered on the entry for every replay; a re-read moves it forward only.
     const hearth = settleFreeholdHearthReading(entry, read);
 
     if (rowLoad.kind === 'absent') {
@@ -761,10 +763,8 @@ export function createFreeholdPersistStore(ports: FreeholdPersistPorts): Freehol
     }
     // Load-once, like loadFreehold: a re-preload replays what the entry knows
     // (so a rejoin after the sim evicted the record re-installs the real
-    // house) and never mints a second plot id or reads the row twice. Only a
-    // CLEAN entry whose claim this process lost re-reads (rereadsLostClaim);
-    // one that owes anything replays, since a re-read would rebase its
-    // unwritten edits onto another realm's newer row.
+    // house) and never mints a second plot id; the one re-read is a clean
+    // entry's lost claim (freeholdRereadsLostClaim), which joins a read in flight.
     if (entry?.loaded && !rereadsLostClaim(entry)) {
       entry.accountId = accountId;
       entry.orphanPasses = 0;

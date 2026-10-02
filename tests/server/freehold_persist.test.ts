@@ -30,7 +30,11 @@ import type {
 import type { FreeholdHearthLoad } from '../../server/freehold_hearth_db';
 import { installLoadedFreehold } from '../../server/freehold_install';
 import { freeholdLivenessPorts } from '../../server/freehold_liveness';
-import { FREEHOLD_LOAD_FAILURE_KINDS } from '../../server/freehold_load_outcome';
+import {
+  FREEHOLD_LOAD_FAILURE_KINDS,
+  type FreeholdRereadFacts,
+  freeholdRereadsLostClaim,
+} from '../../server/freehold_load_outcome';
 import { freeholdReaskBudgetMs } from '../../server/freehold_login_bounds';
 import {
   createFreeholdPersistStore,
@@ -1492,7 +1496,103 @@ describe('preload admission', () => {
     expect(h.calls.filter((call) => call === 'readHearth')).toHaveLength(1);
   });
 
-  it('replays, never re-reads, an entry that owes or holds anything once its claim is gone', async () => {
+  it('keeps a proved clock through a retryable hold and a cold reload after it', async () => {
+    // A lost-claim re-read that THROWS leaves a retryable hold (the entry is no
+    // longer loaded); the reload after it reads the row but its clock falls
+    // back cold. The entry already held revision 5, so that reload must not
+    // install the cold '0'.
+    let held = true;
+    let row: 'ok' | 'throws' = 'ok';
+    let clock: 'ok' | 'fails' = 'ok';
+    const h = harness({
+      claimHeld: () => held,
+      readRow: async () => {
+        if (row === 'throws') throw new Error('the row read failed');
+        return { kind: 'row', row: rowFixture() };
+      },
+      readHearth: async (): Promise<FreeholdHearthLoad> => {
+        if (clock === 'fails') throw new Error('clock read failed');
+        return { kind: 'state', state: { readyAtMs: '1700000000004', revision: '4' } };
+      },
+    });
+    await h.store.preload(ACCOUNT_ID);
+    h.store.adoptHearthReading(OWNER_KEY, 1_700_003_600_000, '5');
+    held = false;
+    row = 'throws';
+    expect((await h.store.preload(ACCOUNT_ID)).hold?.kind).toBe('read_threw');
+    row = 'ok';
+    clock = 'fails';
+    const reloaded = await h.store.preload(ACCOUNT_ID);
+    expect(reloaded.hold).toBeNull();
+    expect(reloaded).toMatchObject({ hearthReadyAtMs: 1_700_003_600_000, hearthRevision: '5' });
+  });
+
+  it('re-reads a lost claim only for an entry that owes nothing: each clause on its own', () => {
+    const clean: FreeholdRereadFacts = {
+      durableRev: '7',
+      held: false,
+      writeOwed: false,
+      retrying: false,
+      dirty: false,
+      leaveCaptured: false,
+    };
+    let asked = 0;
+    const lost = () => {
+      asked += 1;
+      return false;
+    };
+    // The control: clean, claim lost, re-reads; and a held claim never does.
+    expect(freeholdRereadsLostClaim(clean, lost)).toBe(true);
+    expect(freeholdRereadsLostClaim(clean, () => true)).toBe(false);
+    // Each owed or held fact alone replays, without asking about the claim.
+    asked = 0;
+    for (const over of [
+      { durableRev: null },
+      { held: true },
+      { writeOwed: true },
+      { retrying: true },
+      { dirty: true },
+      { leaveCaptured: true },
+    ] as const) {
+      expect(freeholdRereadsLostClaim({ ...clean, ...over }, lost), JSON.stringify(over)).toBe(
+        false,
+      );
+    }
+    expect(asked).toBe(0);
+  });
+
+  it('a second preload during a lost-claim re-read JOINS that read and answers its newer row', async () => {
+    // Another realm wrote revision 9 while this realm's claim lapsed. The
+    // re-read is held open; a second handshake (a reconnect, a second
+    // character) must not replay the stale revision-7 entry meanwhile.
+    let held = true;
+    let open = () => {};
+    const gate = new Promise<void>((resolve) => {
+      open = resolve;
+    });
+    let reads = 0;
+    const h = harness({
+      claimHeld: () => held,
+      readRow: async () => {
+        reads += 1;
+        if (reads === 1) return { kind: 'row', row: rowFixture() };
+        await gate;
+        return { kind: 'row', row: rowFixture({ durableRev: '9' }) };
+      },
+    });
+    expect((await h.store.preload(ACCOUNT_ID)).durableRev).toBe('7');
+    held = false;
+    const first = h.store.preload(ACCOUNT_ID);
+    await tick(5);
+    const second = h.store.preload(ACCOUNT_ID);
+    open();
+    const [a, b] = await Promise.all([first, second]);
+    expect(reads).toBe(2);
+    expect(a.durableRev).toBe('9');
+    expect(b.durableRev).toBe('9');
+  });
+
+  it('replays, never re-reads, an entry that still owes work once its claim is gone', async () => {
     // Reachable only after the last session left (a live record answers every
     // preload first) while the entry stayed. A re-read would take the plot back
     // at a newer row's revision and rebase the entry's unwritten work onto it,
@@ -7614,6 +7714,7 @@ describe('the claimed login read the realm binds, executed on a recording client
     readonly busy?: boolean;
     readonly acquireError?: { readonly code: string };
     readonly commitTag?: string;
+    readonly rollbackFails?: boolean;
   }) {
     const checkouts: string[][] = [];
     const pool = {
@@ -7627,7 +7728,10 @@ describe('the claimed login read the realm binds, executed on a recording client
             if (text === 'COMMIT') {
               return { command: script.commitTag ?? 'COMMIT', rows: [], rowCount: null };
             }
-            if (text === 'ROLLBACK') return { command: 'ROLLBACK', rows: [], rowCount: null };
+            if (text === 'ROLLBACK') {
+              if (script.rollbackFails) throw new Error('the connection dropped at ROLLBACK');
+              return { command: 'ROLLBACK', rows: [], rowCount: null };
+            }
             const which = label(text);
             if (which === 'plot_id') {
               return { command: 'SELECT', rows: [{ plot_id: ROW_PLOT_ID }], rowCount: 1 };
@@ -7790,6 +7894,17 @@ describe('the claimed login read the realm binds, executed on a recording client
     expect(login.registry.forAccount(ACCOUNT_ID)).toBeUndefined();
     expect(login.registry.counters.busy).toBe(0);
     expect(login.registry.counters.busyContention).toBe(0);
+  });
+
+  it('a 55P03 whose ROLLBACK then fails still answers busy, both counts together', async () => {
+    // The failed rollback never replaces the primary error (the transaction
+    // wrapper's rollback is best-effort), so the answer is still busy and the
+    // contention count stays inside it.
+    const login = claimedLogin({ acquireError: { code: '55P03' }, rollbackFails: true });
+    const got = await login.run();
+    expect(got.row).toEqual({ kind: 'claim_busy', plotIndex: 0, plotId: ROW_PLOT_ID });
+    expect(login.registry.counters.busy).toBe(1);
+    expect(login.registry.counters.busyContention).toBe(1);
   });
 
   it("another realm's live claim is busy without the contention count", async () => {
@@ -9315,7 +9430,20 @@ describe("the store's claim seam the 07a renewer, trip and mutation read", () =>
         durableRev: String(Number(input.expectedDurableRev) + 1),
       }),
     });
-    for (const backwards of ['6', '7', '1', '0', '07', '-8', '8.5', '', 'eight']) {
+    // The last two: past the bigint column's 19 digits, never a revision.
+    for (const backwards of [
+      '6',
+      '7',
+      '1',
+      '0',
+      '07',
+      '-8',
+      '8.5',
+      '',
+      'eight',
+      '1'.padEnd(20, '0'),
+      '9'.repeat(20),
+    ]) {
       h.store.adoptCommittedRevision(OWNER_KEY, backwards);
       expect(h.store.authority(OWNER_KEY)?.durableRev, backwards).toBe('7');
     }

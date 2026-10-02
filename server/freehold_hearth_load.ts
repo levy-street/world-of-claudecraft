@@ -53,16 +53,17 @@ export function adoptFreeholdHearthReading(
 
 /**
  * The login read's clock, settled onto its entry. A FIRST read installs it as
- * read. A RE-READ of a loaded entry (the store re-reads a clean entry whose
- * claim it lost) only moves it forward by revision, so a cold fallback or an
- * older reading never undoes a newer clock a trip proved. Answers the clock
- * the entry now holds, which is the one the load must answer with.
+ * read. Any later read (a lost-claim re-read of a loaded entry, or a reload
+ * after a retryable hold cleared `loaded` on an entry that already held a
+ * clock) only moves it forward by revision, so a cold fallback or an older
+ * reading never undoes a newer clock a trip proved. Answers the clock the entry
+ * now holds, which is the one the load must answer with.
  */
 export function settleFreeholdHearthReading(
   entry: { loaded: boolean; hearthReadyAtMs: number; hearthRevision: string },
   reading: FreeholdHearthReading,
 ): FreeholdHearthReading {
-  if (entry.loaded) {
+  if (entry.loaded || entry.hearthRevision !== ABSENT_HEARTH_REVISION) {
     adoptFreeholdHearthReading(entry, reading.readyAtMs, reading.revision);
   } else {
     entry.hearthReadyAtMs = reading.readyAtMs;
