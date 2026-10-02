@@ -5825,6 +5825,11 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   so the grant route has one sender and no request leaves `call()`; section L reads each rerun
   with a deadline; the bot's grant comments say what the dedupe keys on and no more. Fixed in
   `799052ee16`.
+- ROUND FORTY-TWO, eight fresh readers over round forty-one: 21 findings, none blocking, 7
+  should-fix, every reader passing, four with no should-fix. Every game route literal in the bot's
+  code is pinned to the client member that sends it and the daily grant is read whole; section L's
+  deadline covers the dump case's boots and the cancelled sleep; the bot's grant comments name the
+  ledger's account and the key's three parts. Fixed in `08e04fb5dc`; L42R4 flagged.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5855,8 +5860,8 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644, then
   644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then 647,
   then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then
-  648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648
-  passed, never a skip.
+  648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648,
+  then 648 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
@@ -5926,12 +5931,13 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   `server/daily_rewards_db.ts`), is run by no test against a real database
   (`tests/daily_rewards_winner_days_db.test.ts` mocks the pool); a real-database case belongs to
   the daily-rewards owner (T38R2).
-- Two feed-owner comments the readers found stale, outside 07a: `server/internal.ts`'s outbox doc
+- Three owner comments the readers found stale, outside 07a: `server/internal.ts`'s outbox doc
   comment still says three in-memory feeds and three requeues, where there are four;
   `server/discord_link_changes.ts`'s `isEvictableFlexNoise` comment says the bot can never
   re-learn a link transition's id from a resync, against the same file's header and the bot's
   hourly reconciliation (round thirty-eight, outside its findings, noted in its section in round
-  thirty-nine, L39R2).
+  thirty-nine, L39R2); and `server/internal.ts`'s grant route comment names booster grants, which
+  no bot code sends through that route (round forty-two, L42R4).
 - The `.npmrc` pin is a maintainer decision. Recommendation: a content rule in the malware scan,
   pinned in `tests/malware_scan.test.ts`, refusing any `node-options`, `registry` or script hook
   line in `.npmrc`. That is cheaper and narrower than exempting a test that reads the file.

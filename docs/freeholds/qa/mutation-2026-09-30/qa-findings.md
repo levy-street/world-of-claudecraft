@@ -3218,8 +3218,9 @@ only-in-answer-to-an-event rule, with no list of events; what DEPLOY still claim
 - L39R1 FIXED `a5b04edb93` (bot/CLAUDE.md and two bot/main.ts comments say a guild message or a
   voice state carrying a channel grants the daily-active points, at most once a UTC day, since a
   failed grant call is not retried, which answers the reader's aside too; `claimDailyActive`'s
-  comment as well, from round forty, L40R1; each claiming only what the dedupe keys on, from round
-  forty-one, D41R1). L39R2 FIXED in this record (round thirty-eight's section names the two stale
+  comment as well, from round forty, L40R1; the bullet and the daily grant's bot/main.ts comment
+  claiming only what the dedupe keys on, from round forty-one, D41R1, worded so in round
+  forty-two, L42R3). L39R2 FIXED in this record (round thirty-eight's section names the two stale
   feed-owner comments outside its findings, and the ledger's OWED item points to it). L39R3 FIXED
   (see T39R1). L39R4 FIXED `a5b04edb93` (with H39R2, M39R1, C39R4 and Q39R8: the compose comment
   says the stop_grace_period paragraph names what a taken batch loses and the third escalation
@@ -3344,38 +3345,111 @@ for another; they now say what the dedupe keys on and nothing about its count.
 - C41R1 FIXED (see T41R1). C41R2 FIXED (see T41R1). C41R3 FIXED (see L41R1). C41R4 FIXED (see
   Q41R2).
 - Q41R1 FIXED (see T41R1). Q41R2 FIXED in this record (with L41R2 and C41R4: round forty's summary
-  counts six readers, T40R3's own and the five beside it). Q41R3 FIXED in this record (C39R1's
-  back-pointer now names its round and finding, so the nine notes `c6d8366c12`'s body counts are
-  there). Q41R4 FIXED `799052ee16` (the grant rule's git grep runs the plain prefilter `grant`,
-  the parser deciding, so no regex extension git builds differ on is needed). Q41R5 FIXED in the
-  ledger (round thirty-eight's entry says this entry was worded so in rounds thirty-nine and
-  forty).
+  counts six readers, T40R3's own and the five beside it). Q41R3 FIXED in this record (with L41R3,
+  named so in round forty-two, Q42R1: C39R1's back-pointer now names its round and finding, so the
+  nine notes `c6d8366c12`'s body counts are there). Q41R4 FIXED `799052ee16` (the grant rule's git
+  grep runs the plain prefilter `grant`, the parser deciding, so no regex extension git builds
+  differ on is needed). Q41R5 FIXED in the ledger (round thirty-eight's entry says this entry was
+  worded so in rounds thirty-nine and forty).
 - H41R1 FIXED (see T41R1).
 - S41R1 FIXED (see T41R1).
 - D41R1 FIXED `799052ee16` (with L41R1's bot/CLAUDE.md and bot/main.ts halves: they say the dedupe
-  keys on the Discord id and the day, and claim no count; L39R1's disposition notes it).
+  key carries the reason, the Discord id and the day (worded so in round forty-two, Q42R4), and
+  claim no count; L39R1's disposition notes it).
 - T41R1 FIXED `799052ee16` (with C41R1, C41R2, Q41R1, H41R1 and S41R1: bot/server_client.ts is
   read whole, every `this.call` with its member, method and path, and every name of `fetch` or
   `fetchImpl` with its member, so the grant route's one sender is the `grant` method, which the
   grant rule gives one caller; the rule's comment says the member reward `setMember` earns is the
-  server's own grant, outside it; T40R1's disposition notes it). T41R2 FIXED `799052ee16` (the
-  same whole read shows `fetchImpl` called in `call()` alone, its default the constructor's one
-  bare `fetch`, so a request outside `call()` fails; T40R3's disposition notes it). T41R3 FIXED
-  `799052ee16` (the sample's array binding nests an object binding, so `bound` reading one level
-  only fails it, a guard mutant; T40R2's disposition notes it). T41R4 FIXED `799052ee16` (each
-  `grantDailyActive` call's case reads every empty clause falling into it, so a new label above
-  either fails; T38R3's disposition notes it).
+  server's own grant, outside it; T40R1's disposition notes it; every route literal in the bot's
+  code pinned to the client member that sends it, from round forty-two, C42R1). T41R2 FIXED
+  `799052ee16` (the same whole read shows `fetchImpl` called in `call()` alone, its default the
+  constructor's one bare `fetch`, so a request outside `call()` fails; T40R3's disposition notes
+  it). T41R3 FIXED `799052ee16` (the sample's array binding nests an object binding, so `bound`
+  reading one level only fails it, a guard mutant; T40R2's disposition notes it). T41R4 FIXED
+  `799052ee16` (each `grantDailyActive` call's case reads every empty clause falling into it, so a
+  new empty label above either fails (worded so in round forty-two, C42R3); T38R3's disposition
+  notes it; a clause with statements falling through left to Biome's noFallthroughSwitchClause,
+  from round forty-two, T42R2).
 - L41R1 FIXED `799052ee16` (with C41R3 and M41R2: `claimDailyActive`'s comment says it only
   decides whether the request is worth sending and that the server's key, the reason, the Discord
-  id and the day, stops a repeat for that key; L40R1's disposition notes it). L41R2 FIXED (see
-  Q41R2). L41R3 FIXED (see Q41R3).
+  id and the day, stops a repeat for that key; its bot/CLAUDE.md and bot/main.ts halves landed
+  with D41R1 (named so in round forty-two, Q42R3); L40R1's disposition notes it; the ledger unique
+  on the linked account and the key, from round forty-two, L42R1). L41R2 FIXED (see Q41R2). L41R3
+  FIXED (see Q41R3).
 - M41R1 FIXED `799052ee16` (section L reads each rerun it expects to have returned, `rerun`,
   `tableRerun` and `leafRerun`, through a 5 s deadline, so a rerun that never returns fails the
-  case with time left for its cleanup, and later cases are not held behind it). M41R2 FIXED (see
-  L41R1).
+  case with time left for its cleanup, and later cases are not held behind it; the dump case's
+  boots and the cancelled sleep too, from round forty-two, T42R3). M41R2 FIXED (see L41R1).
 - Mutants on this round's new guards, each killed and its source restored: a second client method
   sending the grant route; a request made outside `call()`; an empty case falling into the
   voice-state case; `bound` reading one level of pattern only, a guard mutant; and, in section L,
   DEPLOY's nightly statement naming the waiting realm but ending nothing, which fails case 3 at
-  its deadline with "still waiting" and the dump case at its text pin, the two later cases
-  passing.
+  its deadline with "still waiting" and the dump case at its text pin, the first and the last
+  cases passing (worded so in round forty-two, L42R2).
+
+## Round forty-two: eight fresh readers over round forty-one (`c6d8366c12..6a9dc9cdb1`)
+
+Round forty-two's commits: `08e04fb5dc` (the unit suite pins every literal in the bot's code that
+writes a game API route to the client member that sends it, so a route requested from another file
+or by an aliased sender fails, and reads `grantDailyActive` whole, its dedupe key's template
+included; the client's comment says what its read covers, and the fall-through case read names
+Biome's rule as its boundary; section L installs the dump case's spy where its finally restores it
+and reads the dump case's boots and the cancelled sleep through its deadline; bot/logic.ts says
+the server's ledger is unique on the linked account and the grant dedupe key, and bot/CLAUDE.md
+and bot/main.ts name the key's three parts; the change log with it; kept whole for bisect), and
+the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C42R1 to C42R3 |
+| qa-checklist | PASS | Q42R1 to Q42R6 |
+| server hot path | PASS | H42R1 |
+| privacy and security | PASS | S42R1 |
+| database performance | PASS | D42R1 |
+| test coverage | PASS | T42R1 to T42R4 |
+| docs librarian | PASS | L42R1 to L42R4 |
+| migration safety | PASS | M42R1 |
+
+21 findings: none blocking, 7 should-fix (C42R1, Q42R1 to Q42R3, T42R1, L42R1, L42R2), 14
+nice-to-have, every reader passing, and four (server hot path, privacy and security, database
+performance, migration safety) with no should-fix. Two readers found the grant route's one sender
+pinned only inside the client; every route literal in the bot's code is now pinned to the member
+that sends it. Four found the `claimDailyActive` comment's dedupe claim narrower than the ledger's
+account and key; it now names them. Three record slips were fixed in place.
+
+- C42R1 FIXED `08e04fb5dc` (with T42R1, S42R1 and Q42R5: every string or template part in the
+  bot's code that writes `/internal/discord/` is listed with its file and member, and is exactly
+  the nine client members, so a route requested from another file, through another transport or by
+  an aliased sender in the client fails, a route assembled from parts left unread as the comment
+  says; the client's comment says its read covers every `this.call` and every name of `fetch` or
+  `fetchImpl`; T41R1's disposition notes it). C42R2 FIXED (see L42R1). C42R3 FIXED in this record
+  (T41R4 says a new empty label, what the read reads; T41R4's disposition notes it).
+- Q42R1 FIXED in this record (Q41R3 names L41R3). Q42R2 FIXED (see L42R2). Q42R3 FIXED in this
+  record (L41R1 names D41R1, which landed its bot/CLAUDE.md and bot/main.ts halves). Q42R4 FIXED
+  `08e04fb5dc` (with M42R1: bot/CLAUDE.md, bot/main.ts and the manifest's round forty-one entry
+  name the key's three parts, the reason, the Discord id and the day, as bot/logic.ts does, and
+  D41R1's disposition says so). Q42R5 FIXED (see C42R1). Q42R6 FIXED (see T42R2).
+- H42R1 FIXED (see L42R1).
+- S42R1 FIXED (see C42R1).
+- D42R1 FIXED (see L42R1). Beside its findings, the report noted that the dump case installed its
+  query spy before the statement pins that precede the try whose finally restores it, so a pin's
+  failure left the spy for later cases; it is installed at the try now (`08e04fb5dc`).
+- T42R1 FIXED (see C42R1). T42R2 FIXED `08e04fb5dc` (the fall-through read's comment says a clause
+  with statements that falls through is refused by Biome's noFallthroughSwitchClause, an error
+  under the recommended preset; T41R4's disposition notes it). T42R3 FIXED `08e04fb5dc` (the dump
+  case's two boots and the working session's cancelled sleep are read through the deadline too, so
+  a cancel that never lands fails the case in time; M41R1's disposition notes it). T42R4 FIXED
+  `08e04fb5dc` (`grantDailyActive` is read whole: the claim before the call, the server call and
+  the dedupe key's template).
+- L42R1 FIXED `08e04fb5dc` (with H42R1, D42R1 and C42R2: `claimDailyActive`'s comment says the
+  server dedupes too, its reward ledger unique on the linked account and the grant dedupe key, and
+  claims no outcome past that; L41R1's disposition notes it). L42R2 FIXED in this record (with
+  Q42R2: round forty-one's mutants bullet says the first and the last cases passed). L42R3 FIXED
+  in this record (L39R1's note credits D41R1 with the bullet and the daily grant's bot/main.ts
+  comment). L42R4 FLAGGED (server/internal.ts's grant route comment names booster grants, which no
+  bot code sends through that route; the server owner's, under OWED in the ledger).
+- M42R1 FIXED (see Q42R4).
+- Mutants on this round's new guards, each killed and its source restored: a game route requested
+  from another bot file; an aliased sender in the client; the dedupe key without its day; the
+  claim made after the call; and, in section L, the cancel never sent to the working session,
+  which fails case 3 at its deadline, the later case passing.
