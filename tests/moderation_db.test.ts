@@ -611,6 +611,31 @@ describe('moderation report helpers', () => {
     expect(stmts).toEqual(['BEGIN', expect.stringMatching(/chat_strikes = 0/), 'COMMIT']);
   });
 
+  it('a repeat ban or suspension of one account writes again, with no already-applied guard', async () => {
+    // DEPLOY's stall remedy resends a ban or suspension that shows landed, so
+    // a repeat must land like the first: its UPDATE and its audit row, again.
+    const expiresAt = new Date(Date.now() + 3600_000).toISOString();
+    for (const action of ['ban', 'ban', 'suspend', 'suspend'] as const) {
+      const client = clientStub();
+      connect.mockResolvedValue(client as unknown as PoolClient);
+      await moderateAccount({
+        accountId: 2,
+        adminAccountId: 1,
+        action,
+        reason: 'abuse',
+        expiresAt,
+      });
+      const statements = client.query.mock.calls.map((call) => String(call[0]));
+      expect(statements[0]).toBe('BEGIN');
+      expect(statements[1]).toMatch(/UPDATE accounts/);
+      expect(statements[1]).not.toMatch(/banned_at IS NULL|suspended_until IS NULL/);
+      expect(statements.some((sql) => /INSERT INTO account_moderation_actions/.test(sql))).toBe(
+        true,
+      );
+      expect(statements[statements.length - 1]).toBe('COMMIT');
+    }
+  });
+
   it('requires a moderation reason for suspend and ban actions', async () => {
     await expect(
       moderateAccount({

@@ -409,7 +409,9 @@ For off-box safety, sync the directory to S3 occasionally:
   simply leaves it behind as-is; a NOT VALID survivor still enforces new
   writes, and the next new-binary boot resumes its post-listen VALIDATE
   (bounded, inside the concurrent-index session advisory lock, where a
-  concurrently booting realm waits holding nothing). Only a build cut from
+  concurrently booting realm waits holding no table lock; its waiting
+  statement still holds a snapshot, which an index build waits on: see Index
+  builds under EVERY BOOT LOCKS THE PARENTS). Only a build cut from
   THIS branch before the fix re-applies the pre-fix receipts fragment, whose
   converge re-adds the constraint VALIDATED: that re-fires the full scan of
   the keep-forever table inside the boot transaction, under the boot advisory
@@ -660,9 +662,10 @@ For off-box safety, sync the directory to S3 occasionally:
   friends, guilds, presence, and the World Market are realm-scoped, so the
   worlds are fully isolated: players on different realms can't see, whisper,
   friend, guild, or share an auction house with each other. Concurrent boots
-  serialize their schema setup behind a
-  Postgres advisory lock, so starting several at once is safe. Character and
-  guild names remain globally unique across realms.
+  serialize their schema setup behind a Postgres advisory lock, but that does
+  not make starting several at once safe: start each realm by the EVERY BOOT
+  LOCKS THE PARENTS bullet below (its quiet window and Index builds). Character
+  and guild names remain globally unique across realms.
 - **Raid reset time zone**: raid lockouts end at the next 3 AM (03:00, the classic daily
   reset) in the realm's civil time zone. Set `REALM_RESET_TZ` to an IANA zone per
   realm process (e.g. `America/New_York`, `Europe/Paris`); it defaults to
@@ -1166,37 +1169,57 @@ For off-box safety, sync the directory to S3 occasionally:
     reset, a ban, a suspension or a deactivation) that leaves the old tokens valid and
     the live session connected, and skips what follows (for example its disconnect, its
     notice email, or a deactivation's housing receipt erase); the realm log names no
-    account. So once the stall is over (its boot COMMITs, or its backend is ended),
-    staff send again each ban, suspension or staff password reset made during it,
-    whether or not it returned an error or shows landed (a repeat runs its revoke and
-    disconnect again; repeat a staff password reset with the same password), and players
-    redo what returned an error; nothing else sends a skipped notice email again. A
-    token a skipped revoke left valid stays valid until a sign-out, and a sign-out
-    undoes nothing such a token did before it (a login link it added among them). So
-    then stop every realm on the database, one after another, each stop finishing before
-    the next, which drops every live session and the in-memory desktop login codes in
+    account. So once the stall is over (its boot COMMITs, or the dump route's terminate,
+    run again, returns no row), staff send again each ban, suspension or staff password
+    reset made during it, in the order made and skipping one a later unban or unsuspend
+    reversed, whether or not it returned an error or shows landed (a repeat runs its
+    revoke, disconnect and notice email again and writes a second audit row; resend a
+    suspension with its original end time and a staff password reset with the same
+    password), and players redo what returned an error and did not land; nothing else
+    sends a skipped notice email again. A token a skipped revoke left valid stays valid
+    until a sign-out, and a sign-out undoes nothing such a token did before it, so staff
+    also remove any sign-in link its owner did not add from each account a password
+    change or staff password reset named during the stall. So then stop every realm on
+    the database, one after another, each stop finishing before the next, which drops
+    every live session and the in-memory desktop login codes in
     `server/desktop_login.ts` (the sign-out cannot reach them, and a desktop app could
     still trade one for a fresh token); sign every account out once from psql on the
     realm database (`DELETE FROM auth_tokens WHERE created_at < now() AND expires_at >
-    now(); DELETE FROM oauth_codes; DELETE FROM oauth_device_codes;`, companion and
-    OAuth tokens included, and no pending OAuth code left to mint one; an expired token
-    is refused already; on 40P01 run it again); and, once the dump has ended, start the
-    realms again. Each boot after the first can meet the realms started before it, their
-    startup work or their returning players, and a boot that loses exits and is
-    restarted (Deadlocks above). Re-run the deactivation housing receipt erase for
-    deactivated accounts that still hold receipts by the bullet below that begins "A
-    failed deactivation receipt erase" (a deactivation stopped at its revoke never
-    reached the erase, so it logged no warning).
-  - Index builds: after it listens, a realm builds each missing index of
-    `server/concurrent_indexes.ts` concurrently while it holds the schema advisory lock,
-    and a boot or another realm's build that waits on that lock meanwhile deadlocks with
-    it, so one of the two is aborted (40P01): the build, whose index then stays INVALID
-    until a later realm's build drops and rebuilds it, or the waiter (a boot that loses
-    exits and is restarted). So on a release that adds such an index, start the next
-    realm only once `SELECT count(*) FROM pg_stat_progress_create_index WHERE datname =
-    current_database();` from psql on the realm database returns 0; making a waiter hold
-    no snapshot, so that neither is aborted, is owed.
-  - The hazard predates housing; removing both paths is owed
+    now(); DELETE FROM oauth_codes; DELETE FROM oauth_device_codes; DELETE FROM
+    discord_oauth_states;`, companion and OAuth tokens included, no pending OAuth code
+    left to mint one, and no Discord link a leftover token started left to finish; an
+    expired token is refused already; on 40P01 run it again); and, once the dump has
+    ended if the stall was behind one, start the realms again one at a time by Index
+    builds below (an index build a stopped realm began runs on, holding the schema
+    advisory lock, until it ends). Each boot after the first can meet the realms started
+    before it, their startup work or their returning players, and a boot that loses
+    exits and is restarted (Deadlocks above). Re-run the deactivation housing receipt
+    erase for deactivated accounts that still hold receipts by the bullet below that
+    begins "A failed deactivation receipt erase" (a deactivation stopped at its revoke
+    never reached the erase, so it logged no warning).
+  - Index builds: after it listens, a realm's runner builds each missing or INVALID
+    index of `server/concurrent_indexes.ts`, one after another with CREATE INDEX
+    CONCURRENTLY, while it holds the schema advisory lock from before its first build to
+    after its last (a release can add an index, and a build that a stop, a crash or this
+    deadlock ended leaves one INVALID). A boot or another realm's runner that begins
+    waiting on that lock before a build's last wait (for old snapshots) deadlocks with
+    it, so one of the two is aborted (40P01): the build when it reaches that wait more
+    than `deadlock_timeout` after the waiter began waiting (on a large table, usually),
+    whose index then stays INVALID, still maintained by every write and used by no read,
+    and whose later indexes stay unbuilt, until a later realm's runner drops and
+    rebuilds it; else the waiter (a boot that loses exits and is restarted; a runner
+    that loses logs it and its realm keeps serving). So start the realms on one database
+    one at a time, each only once the realm started before it is `healthy` and `SELECT
+    count(*) FROM pg_locks WHERE locktype = 'advisory' AND classid = 0 AND objid =
+    1464812289 AND objsubid = 1 AND database = (SELECT oid FROM pg_database WHERE
+    datname = current_database());` from psql on the realm database returns 0 on two
+    readings a few seconds apart (no runner or boot holds or waits on the schema
+    advisory lock, `SCHEMA_ADVISORY_LOCK_KEY`; `pg_stat_progress_create_index` would
+    read 0 before a build starts, during the drop of an INVALID index and between two
+    builds); making a waiter wait with no transaction open (polling a session-level
+    try-lock between its own short statements, then opening the schema transaction under
+    it), so that neither is aborted, is owed.
+  - The hazard predates housing; removing both deadlock paths (Deadlocks above) is owed
     (docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md measures it).
 - FIRST ROLLOUT OF THE HOUSING TABLES: the first boot that carries them also creates
   the foreign-key-bearing tables and the delete guards on `accounts` and `characters`
@@ -1897,7 +1920,7 @@ For off-box safety, sync the directory to S3 occasionally:
   SHARE ROW EXCLUSIVE and REPLACES `committed_rows` with an exact recount of both. That
   boot costs one count pass per counted table (the journal is empty at cutover). Every
   later boot reads the revision marker and does nothing: no ALTER, no COUNT, no
-  source-table lock. Concurrent realms park at the advisory acquire holding nothing.
+  source-table lock. Concurrent realms park at the advisory acquire holding no table lock.
   Deploy it with every realm stopped, like any seeding boot. `bank_ledger` PREDATES this
   budget (it has been accumulating since 2026-07-06), so the first install seeds over
   the real production history, never an empty table. Know the real blocked window:

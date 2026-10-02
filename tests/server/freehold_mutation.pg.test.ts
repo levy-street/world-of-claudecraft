@@ -27,16 +27,18 @@
 // re-apply, and the boot's locks, observed behind a held lock and behind a
 // dump-shaped hold, with no lock timeout sent, DEPLOY's route for every boot
 // that queues behind the dump, its sign-out after a stall, and the deadlock
-// between a boot waiting on the schema advisory lock and an index build under
-// it). The nearest suites do not pin it: tests/server/freehold_mutation.test.ts
-// drives the same decisions with fakes (no transaction to roll back, no row to
-// wait on), tests/server/freehold_hearth_db.pg.test.ts and
+// between a boot or a runner waiting on the schema advisory lock and an index
+// build under it, each side losing in its order, with DEPLOY's gate read on
+// both sides). The nearest suites do not pin it:
+// tests/server/freehold_mutation.test.ts drives the same decisions with fakes
+// (no transaction to roll back, no row to wait on),
+// tests/server/freehold_hearth_db.pg.test.ts and
 // tests/server/freehold_db.pg.test.ts prove the Hearth and plot statements
 // alone with no character save around them, and
 // tests/guild_bank_pg_integration.test.ts and
 // tests/server/storage_purchase_db.pg.test.ts prove the legacy halves with no
 // housing participant.
-// Cost: 5.6 s
+// Cost: 7.9 s
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import type { Pool as PgPool, PoolClient } from 'pg';
@@ -3566,30 +3568,57 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         scope: 'character:read',
         ttlSeconds: 300,
       });
+      // A Discord link a leftover token started: its callback needs no bearer.
+      await pool.query(
+        `INSERT INTO discord_oauth_states (state, code_verifier, mode, account_id, expires_at)
+         VALUES ($1, $2, 'link', $3, now() + interval '10 minutes')`,
+        [hex(), hex(), accountId],
+      );
       const count = async (table: string) =>
         (await pool.query(`SELECT count(*)::int AS n FROM ${table}`)).rows[0].n;
       expect(await count('oauth_codes')).toBe(1);
       expect(await count('oauth_device_codes')).toBe(1);
+      expect(await count('discord_oauth_states')).toBe(1);
       await pool.query(operatorSql('DELETE FROM auth_tokens'));
       expect(await db.accountAndScopeForToken(full)).toBeNull();
       expect(await db.accountAndScopeForToken(read)).toBeNull();
       expect(await count('auth_tokens WHERE expires_at > now()')).toBe(0);
       expect(await count('oauth_codes')).toBe(0);
       expect(await count('oauth_device_codes')).toBe(0);
+      expect(await count('discord_oauth_states')).toBe(0);
       expect(await oauth.consumeAuthCode(pool, code)).toBeNull();
-      // Every credential-shaped table, whole: the sign-out clears it, or no
-      // bearer alone can trade it for a token. A new one fails here until it
-      // is classified.
-      expect(
-        (await everyTable()).filter((t) => /token|code|login|reset|challenge/.test(t)),
-      ).toEqual([
+      // Every table with a secret-shaped column (a token, secret, verifier,
+      // nonce, challenge, code, hash or state), whole: the sign-out clears it,
+      // or it is no credential a bearer alone can trade for a token. A new
+      // such column fails here until its table is classified; a credential
+      // kept under another column name is beyond this pin.
+      const secretShaped = await pool.query(
+        `SELECT table_name AS t FROM information_schema.columns
+          WHERE table_schema = 'public'
+            AND column_name ~ '(token|secret|verifier|nonce|challenge|(^|_)code(_hash)?$|_hash$|(^|_)state$)'
+          GROUP BY table_name ORDER BY 1`,
+      );
+      expect(secretShaped.rows.map((r: { t: string }) => r.t)).toEqual([
+        'account_freehold_hearth', // an advance token: a save's idempotency key
+        'account_totp_recovery', // spent only at a login that already proved the password
+        'accounts', // the account's own password and second factor; the sign-out leaves them
         'apple_pending_logins', // a provider identity: linking one needs the account password
         'auth_tokens', // signed out
+        'character_leases', // a realm's lease fence
+        'characters', // game state
+        'discord_oauth_states', // signed out: a link row's callback needs no bearer
         'discord_pending_logins', // as Apple's
+        'email_change_requests', // creating one needs the account password; verifying mints no token
+        'freehold_plot_claims', // a claim's write fence
+        'github_oauth_states', // link only, and a GitHub link signs nobody in
         'oauth_codes', // signed out
         'oauth_device_codes', // signed out
         'password_reset_requests', // created and redeemed by email
-        'wallet_link_challenges', // a wallet link needs the account password
+        'site_presence_sessions', // analytics hashes
+        'storage_purchases', // a purchase's spend claim
+        'wallet_link_challenges', // spent only with a live bearer, and a wallet link signs nobody in
+        'woc_market_bids', // market state
+        'woc_market_settlements', // market state
         'woc_market_stepup_challenges', // needs a wallet signature
       ]);
       // The desktop login codes live in the realm process alone, so stopping
@@ -3601,6 +3630,13 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       expect('await pool.query(sql)').toMatch(touchesDatabase);
       expect(desktop.match(/new Map</g)).toHaveLength(1);
       expect(desktop).not.toMatch(touchesDatabase);
+      // Its imports, whole: a store reached through another module would add one.
+      expect(desktop.match(/from '[^']+'/g)).toEqual([
+        "from 'node:crypto'",
+        "from 'node:http'",
+        "from './auth'",
+        "from './ratelimit'",
+      ]);
       // The stall's remedy points at DEPLOY's receipt-erase repair by its
       // opening words, and that bullet exists once, below it.
       const opening = /begins "([^"]+)"/.exec(bootBullet())?.[1];
@@ -3612,12 +3648,20 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       );
     });
 
-    it('a boot that waits on the schema advisory lock deadlocks with an index build under it', async () => {
+    it('a boot or a runner waiting on the schema advisory lock deadlocks with an index build under it', async () => {
       const { CONCURRENT_INDEX_MIGRATIONS } = await import('../../server/concurrent_indexes');
       const migration = CONCURRENT_INDEX_MIGRATIONS.find(
         (m) => m.name === 'guilds_realm_created_id',
       );
       if (migration === undefined) throw new Error('the guilds_realm_created_id migration is gone');
+      // The runner takes the boot's key with the blocking session lock and
+      // builds under it; the case below plays it by hand with the same text.
+      const runnerSource = readFileSync('server/concurrent_index_runner.ts', 'utf8');
+      expect(runnerSource).toContain(
+        "await client.query('SELECT pg_advisory_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);",
+      );
+      const { SCHEMA_ADVISORY_LOCK_KEY } = await import('../../server/db_boot_connection');
+      expect(SCHEMA_ADVISORY_LOCK_KEY).toBe(0x57_4f_43_01);
       const valid = async () =>
         (
           await pool.query(
@@ -3625,52 +3669,76 @@ d('the housing mutation boundary (REAL Postgres)', () => {
             [migration.name],
           )
         ).rows.map((r: { v: boolean }) => r.v);
-      expect(await valid()).toEqual([true]);
-      await pool.query(`DROP INDEX ${migration.name}`);
-      const runner = await pool.connect();
-      const waiting = await pool.connect();
-      try {
-        // A realm's post-listen runner holds the schema advisory lock, as
-        // server/concurrent_index_runner.ts does, and another realm's boot
-        // waits on it before the build starts.
-        await runner.query('SELECT pg_advisory_lock($1)', [0x57_4f_43_01]);
-        await waiting.query('BEGIN');
-        const boot = waiting.query('SELECT pg_advisory_xact_lock($1)', [0x57_4f_43_01]).then(
-          () => 'granted',
-          (error: { code?: string }) => error.code,
-        );
-        expect(await until(advisory, ['granted', 'waiting'])).toEqual(['granted', 'waiting']);
-        const build = runner.query(migration.createSql).then(
-          () => 'built',
-          (error: { code?: string }) => error.code,
-        );
-        // The build waits for the waiter's snapshot while the waiter waits for
-        // the build's lock: one of the two is aborted.
-        const first = await Promise.race([
-          build.then((r) => ({ by: 'build', r })),
-          boot.then((r) => ({ by: 'boot', r })),
-        ]);
-        expect(first.r).toBe('40P01');
-        if (first.by === 'boot') {
-          await waiting.query('ROLLBACK');
-          expect(await build).toBe('built');
-        } else {
-          await runner.query('SELECT pg_advisory_unlock($1)', [0x57_4f_43_01]);
-          expect(await boot).toBe('granted');
+      // DEPLOY's gate before the next realm starts: any holder or waiter of
+      // the schema advisory lock in this database.
+      const gate = async () =>
+        Number((await pool.query(operatorSql('SELECT count(*) FROM pg_locks'))).rows[0].count);
+      // The deadlock check's delay, in milliseconds (pg_settings keeps it in ms).
+      const timeoutMs = Number(
+        (await pool.query("SELECT setting FROM pg_settings WHERE name = 'deadlock_timeout'"))
+          .rows[0].setting,
+      );
+      expect(timeoutMs).toBeGreaterThan(0);
+      expect(await gate()).toBe(0);
+      // One round: the runner holds the lock, the waiter (a boot in its
+      // transaction, or another runner outside one) queues on it, and after
+      // `delayMs` the build starts. Returns which side was aborted.
+      const round = async (waiterSql: string, inTransaction: boolean, delayMs: number) => {
+        await pool.query(`DROP INDEX IF EXISTS ${migration.name}`);
+        const runner = await pool.connect();
+        const waiting = await pool.connect();
+        try {
+          await runner.query('SELECT pg_advisory_lock($1)', [0x57_4f_43_01]);
+          if (inTransaction) await waiting.query('BEGIN');
+          const waited = waiting.query(waiterSql, [0x57_4f_43_01]).then(
+            () => 'granted',
+            (error: { code?: string }) => error.code,
+          );
+          expect(await until(advisory, ['granted', 'waiting'])).toEqual(['granted', 'waiting']);
+          // The gate reads the holder and the waiter.
+          expect(await gate()).toBe(2);
+          if (delayMs > 0) await sleep(delayMs);
+          const build = runner.query(migration.createSql).then(
+            () => 'built',
+            (error: { code?: string }) => error.code,
+          );
+          const first = await Promise.race([
+            build.then((r) => ({ by: 'build', r })),
+            waited.then((r) => ({ by: 'waiter', r })),
+          ]);
+          expect(first.r).toBe('40P01');
+          if (first.by === 'waiter') {
+            if (inTransaction) await waiting.query('ROLLBACK');
+            expect(await build).toBe('built');
+            expect(await valid()).toEqual([true]);
+          } else {
+            // The aborted build leaves its index INVALID.
+            expect(await valid()).toEqual([false]);
+            await runner.query('SELECT pg_advisory_unlock($1)', [0x57_4f_43_01]);
+            expect(await waited).toBe('granted');
+          }
+          return first.by;
+        } finally {
+          // The runner's lock first: a waiter's ROLLBACK queues behind its lock wait.
+          await runner.query('SELECT pg_advisory_unlock_all()').catch(() => {});
+          if (inTransaction) await waiting.query('ROLLBACK').catch(() => {});
+          await waiting.query('SELECT pg_advisory_unlock_all()').catch(() => {});
+          waiting.release();
+          runner.release();
         }
-      } finally {
-        await waiting.query('ROLLBACK').catch(() => {});
-        await runner.query('SELECT pg_advisory_unlock_all()').catch(() => {});
-        waiting.release();
-        runner.release();
-      }
-      // DEPLOY's check reads no build in progress, and the next realm's
-      // runner leaves the index valid.
-      expect(
-        (await pool.query(operatorSql('SELECT count(*) FROM pg_stat_progress_create_index'))).rows,
-      ).toEqual([{ count: '0' }]);
+      };
+      // A boot already waiting when a quick build reaches its last wait: the
+      // boot's own deadlock check sees the cycle first, and the boot loses.
+      expect(await round('SELECT pg_advisory_xact_lock($1)', true, 0)).toBe('waiter');
+      // A runner that has waited past its one deadlock check before the build
+      // reaches that wait: the build's check finds the cycle, and the build loses.
+      expect(await round('SELECT pg_advisory_lock($1)', false, timeoutMs + 200)).toBe('build');
+      // The gate reads 0 once both have let go, and the next realm's runner
+      // drops the INVALID index and rebuilds it.
+      expect(await until(gate, 0)).toBe(0);
       await db.runConcurrentIndexMigrations();
       expect(await valid()).toEqual([true]);
+      expect(await gate()).toBe(0);
     });
   });
 });

@@ -2177,6 +2177,11 @@ describe('the claim renewer', () => {
     const booted = main.indexOf('await ensureSchema();');
     expect(booted).toBeGreaterThan(-1);
     expect(main.indexOf('server.listen(')).toBeGreaterThan(booted);
+    // And it builds its indexes only after it listens (DEPLOY's Index builds).
+    expect(main.indexOf('void runConcurrentIndexMigrations()')).toBeGreaterThan(
+      main.indexOf('server.listen('),
+    );
+    expect(bullet).toContain("after it listens, a realm's runner builds");
     const seconds = (file: string, name: string): number => {
       const found = source(file).match(new RegExp(`export const ${name} = ([0-9_]+);`));
       expect(found, name).not.toBeNull();
