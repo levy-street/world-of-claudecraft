@@ -19,7 +19,7 @@
 // TimeoutOverflowWarning to stderr; it is that case's subject, not a fault to
 // chase.
 //
-// Cost: 0.9 s
+// Cost: 1.1 s
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -2312,7 +2312,7 @@ describe('the claim renewer', () => {
       "Without the `discord` profile (no `--profile discord`, no `discord` in `COMPOSE_PROFILES` in `.env`, and no command that names `discord-bot`, which enables its profile by itself) the service simply never starts, which is the supported way to run a realm with no Discord integration; with `discord` in `COMPOSE_PROFILES`, every `up -d` that names no service starts it too, a release's step 6 included.",
       "While the third escalation lever (below) holds, either edit is made without the bot's `up`, which would lift that lever: the `up` that lifts it runs the bot with the edit.",
       "so once the realm is verified run the bot's guarded line under the release steps (a restart keeps its old image, and a bot the third escalation lever stopped stays stopped), or those cards post",
-      "the outbox lives on the server and hands the restarted bot what is still queued, within the bounds lever 3 below gives, and a queue pop only while its offer stands; the queued items of a batch a poll already took (its 200 is the outbox's only acknowledgement) are lost if the bot stops before posting them, while its winner days are served again until the bot marks them posted.",
+      "the outbox lives on the server and hands the restarted bot what is still queued, within the bounds lever 3 below gives, and a queue pop only while its offer stands; the queued items of a batch a poll already took (its 200 is the outbox's only acknowledgement) are lost if the bot stops before posting them or the answer never reaches it (a lost link-change item heals at the bot's hourly full resync), while its winner days are served again until the bot marks them posted, so a day posted but not yet marked when the bot stopped is posted again.",
       'Act on it, for a running bot only (one the third escalation lever stopped starts again only as that lever says), with:',
       "The fix is to enable the intents (the restart policy's next attempt picks them up) or to correct the token in `.env` and recreate the game and then the bot by Environment keys above (a `restart` keeps the old token), never to disable the restart policy.",
       '**Escalation levers**, in order. The first two are each an `.env` edit (not while an image built for a coming release waits; Environment keys above) plus `sudo docker compose --profile discord up -d --no-deps discord-bot`; the third, a stop, starts no image and is open even then:',
@@ -2339,7 +2339,7 @@ describe('the claim renewer', () => {
     expect(leverEnd).toBeGreaterThan(-1);
     const lever = leverItem.slice(0, leverEnd).replace(/\s+/g, ' ');
     expect(lever).toContain(
-      "The game keeps running, and stopping the bot stops everything it does until it is started again. The role, nickname, presence, relay, activity, winner, link-change and queue-pop delivery it makes waits, and what the outbox drops meanwhile never comes. Discord does not resend the events the bot missed, so what it does only in answer to an event is never done for one during the stop: a linked member whose only post or voice join of a day fell in the stop gets no daily-active points for that day. The outbox holds its relay, activity, link-change and queue-pop items in the memory of the game process the bot polls (the one `GAME_SERVER_URL` names); the winner days stay in the database, where the game reads them. Each feed holds at most its cap (`RELAY_MAX_QUEUE`, `ACTIVITY_MAX_QUEUE`, `LINK_CHANGE_MAX_QUEUE`, `QUEUE_POP_MAX_QUEUE`) and, once full, drops by its own rule: the relay, activity and queue-pop feeds their oldest items, the link-change feed its link and unlink items last (the bot's hourly full resync heals what it drops); a queue pop also lapses with its offer; and any end of the game process while it holds (a recreate for a shared key's edit or a release, a stop or restart, a crash, the watchdog's restart) drops everything still queued.",
+      "The game keeps running, and stopping the bot stops everything it does until it is started again. The role, nickname, presence, relay, activity, winner, link-change and queue-pop delivery it makes waits, and what the outbox drops meanwhile never comes. Discord does not resend the events the bot missed, so what it does only in answer to an event is never done for one during the stop: a linked member whose every post and voice state change of a day (a join, a move, a mute) fell in the stop gets no daily-active points for that day. The outbox holds its relay, activity, link-change and queue-pop items in the memory of the game process the bot polls (the one `GAME_SERVER_URL` names); the winner days stay in the database, where the game reads them. Each feed holds at most its cap (`RELAY_MAX_QUEUE`, `ACTIVITY_MAX_QUEUE`, `LINK_CHANGE_MAX_QUEUE`, `QUEUE_POP_MAX_QUEUE`) and, once full, drops by its own rule: the relay, activity and queue-pop feeds their oldest items, the link-change feed its link and unlink items last (the bot's hourly full resync heals what it drops); a queue pop also lapses with its offer; and any end of the game process while it holds (a recreate for a shared key's edit or a release, a stop or restart, a crash, the watchdog's restart) drops everything still queued.",
     );
     // The outbox's code is read through the TypeScript parser, so a comment
     // marker inside a comment, a string or a regex is never taken for one.
@@ -2355,15 +2355,27 @@ describe('the claim renewer', () => {
       return all;
     };
     // A node's text with every comment in it dropped (each lies in the trivia
-    // at some node's start or end), each line trimmed, blank lines left out.
+    // that leads or trails some token, so every token's start and end is
+    // read), each line trimmed, blank lines left out. The space beside a
+    // comment dropped from inside a line stays, so such a comment trips a pin.
     const linesOf = (node: ts.Node, source: ts.SourceFile): string[] => {
       const start = node.getStart(source);
+      const bounds: number[] = [];
+      const visit = (at: ts.Node) => {
+        if (at.kind >= ts.SyntaxKind.FirstJSDocNode && at.kind <= ts.SyntaxKind.LastJSDocNode) {
+          return;
+        }
+        bounds.push(at.pos, at.end);
+        for (const child of at.getChildren(source)) visit(child);
+      };
+      visit(node);
       const comments = new Map<number, number>();
-      for (const at of nodesIn(node)) {
-        for (const pos of [at.pos, at.end]) {
-          for (const range of ts.getLeadingCommentRanges(source.text, pos) ?? []) {
-            if (range.pos >= start && range.end <= node.end) comments.set(range.pos, range.end);
-          }
+      for (const pos of bounds) {
+        for (const range of [
+          ...(ts.getLeadingCommentRanges(source.text, pos) ?? []),
+          ...(ts.getTrailingCommentRanges(source.text, pos) ?? []),
+        ]) {
+          if (range.pos >= start && range.end <= node.end) comments.set(range.pos, range.end);
         }
       }
       let text = '';
@@ -2378,6 +2390,19 @@ describe('the claim renewer', () => {
         .map((line) => line.trim())
         .filter((line) => line !== '');
     };
+    const sample = ts.createSourceFile(
+      'sample.ts',
+      "function f() {\n  a(); // x\n  g(/* y */);\n  return /[/*]/.test('//');\n}\n",
+      ts.ScriptTarget.Latest,
+      true,
+    );
+    expect(linesOf(sample.statements[0], sample)).toEqual([
+      'function f() {',
+      'a();',
+      'g();',
+      "return /[/*]/.test('//');",
+      '}',
+    ]);
     // Those are the feeds the outbox drains from memory: every `drain<Name>`
     // that server/internal.ts names, called or not, so a new feed drained
     // through one fails here until DEPLOY names it. Each drain call is pinned
@@ -2440,6 +2465,55 @@ describe('the claim renewer', () => {
     for (const call of drains) {
       expect(call.pos >= (tryBlock?.pos ?? 0) && call.end <= (tryBlock?.end ?? 0)).toBe(true);
     }
+    // No other tracked code outside tests/ names a feed's drain or requeue.
+    const feedVerbs = '(drain|requeue)(Relay|Activity|LinkChanges|QueuePops)';
+    const gitGrep = (pattern: string, paths: string[]) =>
+      spawnSync('git', ['grep', '-lE', pattern, '--', ...paths], { encoding: 'utf8' })
+        .stdout.split('\n')
+        .filter((file) => file !== '');
+    expect(
+      gitGrep(feedVerbs, ['*.ts', '*.mts', '*.cts', '*.js', '*.mjs', '*.cjs', ':!tests'])
+        .filter((file) =>
+          nodesIn(parsed(file)).some(
+            (node) => ts.isIdentifier(node) && new RegExp(`^${feedVerbs}$`).test(node.text),
+          ),
+        )
+        .sort(),
+    ).toEqual([
+      'server/discord_activity.ts',
+      'server/discord_link_changes.ts',
+      'server/discord_queue_pops.ts',
+      'server/discord_relay.ts',
+      'server/internal.ts',
+    ]);
+    // The winner days: read from the database before any drain, and marked
+    // posted only by the bot's mark call, never by the poll, so a taken
+    // batch's winner days are served again until that call is made. The
+    // read's own filter (a day not yet marked) is the daily-rewards owner's.
+    const outbox = internal.statements.find(
+      (statement): statement is ts.VariableStatement =>
+        ts.isVariableStatement(statement) &&
+        statement.declarationList.declarations.some(
+          (declaration) =>
+            ts.isIdentifier(declaration.name) && declaration.name.text === 'outboxHandler',
+        ),
+    );
+    const outboxBody = (
+      outbox?.declarationList.declarations[0]?.initializer as ts.ArrowFunction | undefined
+    )?.body;
+    expect(
+      outboxBody && ts.isBlock(outboxBody) ? linesOf(outboxBody.statements[0], internal) : [],
+    ).toEqual(['const winners = await dailyRewardService.discordWinnerAnnouncements();']);
+    expect(
+      nodesIn(internal)
+        .filter(
+          (node) =>
+            ts.isCallExpression(node) &&
+            ts.isPropertyAccessExpression(node.expression) &&
+            node.expression.name.text === 'markDiscordWinnersAnnounced',
+        )
+        .map((call) => call.pos >= (outbox?.pos ?? 0) && call.end <= (outbox?.end ?? 0)),
+    ).toEqual([false, false]);
     // Each feed's cap and drop rule, read whole: every top-level statement of
     // the feed's module that names its queue or a cap, and every declaration
     // of the module such a statement names, until none is left (the ladder,
@@ -2452,8 +2526,8 @@ describe('the claim renewer', () => {
     // tests/server/discord_queue_pops.test.ts and
     // tests/server/discord_link_changes.test.ts. Not read: types, and another
     // module's code, whose names the read code uses are pinned; and a statement
-    // outside the read set, of which every one naming a state the read set
-    // declares is pinned by name.
+    // outside the read set, of which every one naming a declaration the read
+    // set holds (a state or a function) is pinned by name.
     const feedCode = (file: string) => {
       const source = parsed(file);
       const statements = source.statements.filter(
@@ -2473,15 +2547,22 @@ describe('the claim renewer', () => {
         ]),
       );
       const namesOf = (statement: ts.Statement) => [...(names.get(statement) ?? [])];
+      const bound = (name: ts.BindingName): string[] =>
+        ts.isIdentifier(name)
+          ? [name.text]
+          : name.elements.flatMap((element) =>
+              ts.isOmittedExpression(element) ? [] : bound(element.name),
+            );
       const declared = (statement: ts.Statement): string[] =>
-        ts.isFunctionDeclaration(statement) || ts.isClassDeclaration(statement)
-          ? statement.name
+        ts.isVariableStatement(statement)
+          ? statement.declarationList.declarations.flatMap((declaration) => bound(declaration.name))
+          : (ts.isFunctionDeclaration(statement) ||
+                ts.isClassDeclaration(statement) ||
+                ts.isEnumDeclaration(statement) ||
+                ts.isModuleDeclaration(statement)) &&
+              statement.name !== undefined &&
+              ts.isIdentifier(statement.name)
             ? [statement.name.text]
-            : []
-          : ts.isVariableStatement(statement)
-            ? statement.declarationList.declarations.flatMap((declaration) =>
-                ts.isIdentifier(declaration.name) ? [declaration.name.text] : [],
-              )
             : [];
       const read = new Set(
         statements.filter((statement) =>
@@ -2499,9 +2580,7 @@ describe('the claim renewer', () => {
         }
       }
       const kept = statements.filter((statement) => read.has(statement));
-      const state = new Set(
-        kept.flatMap((statement) => (ts.isVariableStatement(statement) ? declared(statement) : [])),
-      );
+      const held = new Set(kept.flatMap(declared));
       const imported = new Set(
         source.statements.filter(ts.isImportDeclaration).flatMap((statement) =>
           nodesIn(statement)
@@ -2519,7 +2598,7 @@ describe('the claim renewer', () => {
         outside: statements
           .filter(
             (statement) =>
-              !read.has(statement) && namesOf(statement).some((name) => state.has(name)),
+              !read.has(statement) && namesOf(statement).some((name) => held.has(name)),
           )
           .map((statement) => declared(statement).join(', ') || linesOf(statement, source)[0]),
       };
@@ -2662,6 +2741,7 @@ describe('the claim renewer', () => {
         'delayedQueuePopCandidateCount',
         'queueWatchTrackedAccountCount',
         'nextBatchIds',
+        'enqueueCandidate',
         'startBatch',
         'observeQueuePops',
       ],
@@ -2755,7 +2835,9 @@ describe('the claim renewer', () => {
       imports: [],
       outside: [],
     });
-    // The link-change feed's heal, the bot's hourly full resync.
+    // The link-change feed's heal, the bot's hourly full resync: the interval,
+    // the parameter defaults that carry it, and every call in bot/, none of
+    // which passes an interval of its own.
     const memberWrites = parsed('bot/member_writes.ts');
     expect(
       memberWrites.statements
@@ -2770,7 +2852,68 @@ describe('the claim renewer', () => {
         )
         .flatMap((statement) => linesOf(statement, memberWrites)),
     ).toEqual(['export const FULL_RESYNC_INTERVAL_MS = 60 * 60_000;']);
+    const resyncNames = /^(fullResyncIfDue|dueForFullResync)$/;
+    expect(
+      memberWrites.statements
+        .filter(
+          (statement): statement is ts.FunctionDeclaration =>
+            ts.isFunctionDeclaration(statement) &&
+            statement.name !== undefined &&
+            resyncNames.test(statement.name.text),
+        )
+        .map(
+          (declaration) =>
+            `${declaration.name?.text}: ${declaration.parameters
+              .filter((parameter) => parameter.name.getText(memberWrites) === 'everyMs')
+              .map((parameter) => linesOf(parameter, memberWrites).join(' '))
+              .join('')}`,
+        ),
+    ).toEqual([
+      'dueForFullResync: everyMs: number = FULL_RESYNC_INTERVAL_MS',
+      'fullResyncIfDue: everyMs: number = FULL_RESYNC_INTERVAL_MS',
+    ]);
+    expect(
+      gitGrep('(fullResyncIfDue|dueForFullResync)', ['bot'])
+        .flatMap((file) => {
+          const source = parsed(file);
+          return nodesIn(source)
+            .filter(
+              (node): node is ts.CallExpression =>
+                ts.isCallExpression(node) &&
+                ts.isIdentifier(node.expression) &&
+                resyncNames.test(node.expression.text),
+            )
+            .map((call) => `${file}: ${linesOf(call, source).join(' ')}`);
+        })
+        .sort(),
+    ).toEqual([
+      'bot/main.ts: fullResyncIfDue(lastFullMetaResyncMs, Date.now(), lastPushedMeta)',
+      'bot/member_writes.ts: dueForFullResync(lastFullAtMs, nowMs, everyMs)',
+    ]);
+    // What the bot does only in answer to an event: the daily-active grant,
+    // named only by its declaration and its calls in the voice-state and
+    // message dispatch cases.
+    const botMain = parsed('bot/main.ts');
+    const caseOf = (node: ts.Node): string | undefined =>
+      node.parent === undefined
+        ? undefined
+        : ts.isCaseClause(node.parent)
+          ? node.parent.expression.getText(botMain)
+          : caseOf(node.parent);
+    expect(
+      nodesIn(botMain)
+        .filter((node): node is ts.Identifier => ts.isIdentifier(node))
+        .filter((id) => id.text === 'grantDailyActive')
+        .map((id) =>
+          ts.isVariableDeclaration(id.parent) && id.parent.name === id
+            ? 'declared'
+            : (caseOf(id) ?? 'outside a case'),
+        ),
+    ).toEqual(["'VOICE_STATE_UPDATE'", "'MESSAGE_CREATE'", 'declared']);
     expect(serviceBlock('discord-bot')).toContain('\n      GAME_SERVER_URL: http://game:8787\n');
+    expect(serviceBlock('discord-bot').replace(/\n\s*# /g, ' ')).toContain(
+      "safety comes from the outbox living server-side, which hands the restarted bot what is still queued (the stop_grace_period paragraph under DEPLOY.md's Verifying health names what of the outbox a stop loses, and its third escalation lever the rest), not from covering an in-flight call",
+    );
     expect(lever).toContain(
       "While it holds, every start of the bot lifts it: any `up` of the bot (the first two levers', an Environment keys edit's, the Enabling block's), a `start` or `restart`, and, with `discord` in `COMPOSE_PROFILES` in `.env`, every `up -d` that names no service (stop it again after one, as the release steps say). So while it holds, start the bot only to lift it: an `.env` edit for the bot reaches it then. Lift it only as the first two levers run it, with `sudo docker compose --profile discord up -d --no-deps discord-bot` (not while an image built for a coming release waits), never with `start` or `restart`, which revive the stopped container on the image it was created from, which need not be the one the game runs once a release or a rollback has run since.",
     );

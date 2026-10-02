@@ -386,9 +386,10 @@ services:
     # process, and it installs no SIGTERM handler, so node's default disposition ends
     # it immediately and the grace window is rarely consumed at all. Any positive
     # value is therefore enough; safety comes from the outbox living server-side, which
-    # hands the restarted bot what is still queued (DEPLOY's bot restart note names what
-    # a stop loses), not from covering an in-flight call (a Discord call can ride
-    # DISCORD_CALL_TIMEOUT_MS for 15s on its own).
+    # hands the restarted bot what is still queued (the stop_grace_period paragraph under
+    # DEPLOY.md's Verifying health names what of the outbox a stop loses, and its third
+    # escalation lever the rest), not from covering an in-flight call (a Discord call can
+    # ride DISCORD_CALL_TIMEOUT_MS for 15s on its own).
     stop_grace_period: 15s
     # Container memory ceiling. A relay bot's working set is tens of MiB, so 512m is
     # generous headroom rather than a tight fit; the ceiling exists for the neighbours,

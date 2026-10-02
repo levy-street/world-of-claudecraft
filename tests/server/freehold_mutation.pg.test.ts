@@ -3814,7 +3814,8 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       const dumpShaped = session();
       const leafRealm = session();
       let open = false;
-      // Backends a failed order could leave waiting to commit after the test.
+      // Backends a failed order could leave waiting on a lock, or working, after
+      // the test.
       const waiting: number[] = [];
       let done = false;
       try {

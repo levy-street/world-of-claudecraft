@@ -2248,17 +2248,16 @@ For off-box safety, sync the directory to S3 occasionally:
 
 ## Discord bot
 
-The Discord bot (`bot/`) is a standalone Node process that bridges the official
-Discord server and the game: status-tier roles plus a level-on-name nickname synced
-from in-game data, presence (the online count and the featured voice room) pushed
-into the HUD widget, in-game "!" community posts relayed as embeds, a
-significant-activity feed (max level, rare drops, duels, arena), daily-rewards
-winner posts, opt-in queue-pop direct messages (a player's battleground offer or
-arena seat, DMed to their linked account; no channel id to configure), and the
-consumer for the game's Discord outbox. It is a pure consumer
-of the game server: it reads and writes through the secret-gated
-`/internal/discord/*` API and holds nothing durable of its own, so stopping it never
-affects the realm.
+The Discord bot (`bot/`) is a standalone Node process that bridges the official Discord
+server and the game: status-tier roles plus a level-on-name nickname synced from in-game
+data, presence (the online count and the featured voice room) pushed into the HUD
+widget, in-game "!" community posts relayed as embeds, a significant-activity feed (max
+level, rare drops, duels, arena), daily-rewards winner posts, opt-in queue-pop direct
+messages (a player's battleground offer or arena seat, DMed to their linked account; no
+channel id to configure), and the consumer for the game's Discord outbox. It holds
+nothing durable of its own and reads and writes the game server only through the
+secret-gated `/internal/discord/*` API, so stopping it leaves the game running; the
+third escalation lever (Incident runbook below) says what a stop costs.
 
 **Enabling it.** The bot is the `discord-bot` compose service (container
 `eastbrook-discord-bot`), behind the `discord` profile and sharing the game image, so
@@ -2402,8 +2401,10 @@ kills the bot rather than the game or the database sharing the host, and
 lives on the server and hands the restarted bot what is still queued, within the bounds
 lever 3 below gives, and a queue pop only while its offer stands; the queued items of a
 batch a poll already took (its 200 is the outbox's only acknowledgement) are lost if the
-bot stops before posting them, while its winner days are served again until the bot
-marks them posted.
+bot stops before posting them or the answer never reaches it (a lost link-change item
+heals at the bot's hourly full resync), while its winner days are served again until the
+bot marks them posted, so a day posted but not yet marked when the bot stopped is posted
+again.
 
 ### Fatal gateway close: the crash loop is by design
 
@@ -2483,27 +2484,27 @@ no image and is open even then:
    started again. The role, nickname, presence, relay, activity, winner, link-change and
    queue-pop delivery it makes waits, and what the outbox drops meanwhile never comes.
    Discord does not resend the events the bot missed, so what it does only in answer to
-   an event is never done for one during the stop: a linked member whose only post or
-   voice join of a day fell in the stop gets no daily-active points for that day. The
-   outbox holds its relay, activity, link-change and queue-pop items in the memory of
-   the game process the bot polls (the one `GAME_SERVER_URL` names); the winner days
-   stay in the database, where the game reads them. Each feed holds at most its cap
-   (`RELAY_MAX_QUEUE`, `ACTIVITY_MAX_QUEUE`, `LINK_CHANGE_MAX_QUEUE`,
-   `QUEUE_POP_MAX_QUEUE`) and, once full, drops by its own rule: the relay, activity and
-   queue-pop feeds their oldest items, the link-change feed its link and unlink items
-   last (the bot's hourly full resync heals what it drops); a queue pop also lapses with
-   its offer; and any end of the game process while it holds (a recreate for a shared
-   key's edit or a release, a stop or restart, a crash, the watchdog's restart) drops
-   everything still queued. While it holds, every start of the bot lifts it: any `up` of
-   the bot (the first two levers', an Environment keys edit's, the Enabling block's), a
-   `start` or `restart`, and, with `discord` in `COMPOSE_PROFILES` in `.env`, every
-   `up -d` that names no service (stop it again after one, as the release steps say). So
-   while it holds, start the bot only to lift it: an `.env` edit for the bot reaches it
-   then. Lift it only as the first two levers run it, with
-   `sudo docker compose --profile discord up -d --no-deps discord-bot` (not while an
-   image built for a coming release waits), never with `start` or `restart`, which
-   revive the stopped container on the image it was created from, which need not be the
-   one the game runs once a release or a rollback has run since.
+   an event is never done for one during the stop: a linked member whose every post and
+   voice state change of a day (a join, a move, a mute) fell in the stop gets no
+   daily-active points for that day. The outbox holds its relay, activity, link-change
+   and queue-pop items in the memory of the game process the bot polls (the one
+   `GAME_SERVER_URL` names); the winner days stay in the database, where the game reads
+   them. Each feed holds at most its cap (`RELAY_MAX_QUEUE`, `ACTIVITY_MAX_QUEUE`,
+   `LINK_CHANGE_MAX_QUEUE`, `QUEUE_POP_MAX_QUEUE`) and, once full, drops by its own
+   rule: the relay, activity and queue-pop feeds their oldest items, the link-change
+   feed its link and unlink items last (the bot's hourly full resync heals what it
+   drops); a queue pop also lapses with its offer; and any end of the game process while
+   it holds (a recreate for a shared key's edit or a release, a stop or restart, a
+   crash, the watchdog's restart) drops everything still queued. While it holds, every
+   start of the bot lifts it: any `up` of the bot (the first two levers', an Environment
+   keys edit's, the Enabling block's), a `start` or `restart`, and, with `discord` in
+   `COMPOSE_PROFILES` in `.env`, every `up -d` that names no service (stop it again
+   after one, as the release steps say). So while it holds, start the bot only to lift
+   it: an `.env` edit for the bot reaches it then. Lift it only as the first two levers
+   run it, with `sudo docker compose --profile discord up -d --no-deps discord-bot` (not
+   while an image built for a coming release waits), never with `start` or `restart`,
+   which revive the stopped container on the image it was created from, which need not
+   be the one the game runs once a release or a rollback has run since.
 
 ## Deploying an SFX Studio export
 

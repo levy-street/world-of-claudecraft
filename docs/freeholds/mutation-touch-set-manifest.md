@@ -1449,3 +1449,8 @@ What changed the contract above:
   one during the stop (the daily-active points among it), which items the outbox holds and that
   the winner days stay in the database and are served again until marked, and names the hourly
   full resync as the link-change feed's heal.
+- A thirty-eighth round of eight fresh readers: no P12 change; `DEPLOY.md`'s Discord bot overview
+  no longer calls the bot a pure consumer whose stop never affects the realm, the restart note
+  adds a batch whose answer never reaches the bot, the hourly full resync's heal of a lost link
+  change and the winner day posted twice, and lever 3's daily-active example counts every voice
+  state change.
