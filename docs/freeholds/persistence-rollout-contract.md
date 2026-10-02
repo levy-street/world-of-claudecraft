@@ -725,17 +725,18 @@ but EVERY boot already holds both under ACCESS EXCLUSIVE from the core schema's 
 `ADD COLUMN IF NOT EXISTS` statements to its COMMIT, so the housing DDL adds no wait:
 every boot queues behind every in-flight character save and account write, and every one
 that arrives after it queues behind the boot until that COMMIT. Measured with an old
-realm serving plain saves, the first rollout took 55 to 66 ms, near a steady-state
-boot's 56 to 59 ms. ANY boot can DEADLOCK on two paths (the touch-set manifest's P12 and
-R-11): the boot's SHARE lock on `characters` upgraded to ACCESS EXCLUSIVE, against a
-transaction that took a lock on `characters` that SHARE does not wait for (a save's row
-lock's ROW SHARE, or a plain read's ACCESS SHARE) and then writes it; and the boot's
-`characters`-then-`accounts` order, against a transaction that locks `accounts` first.
-Every effect-carrying or hooked character save (the manifest's G1 then G2, the Hearth
-trip's save included) takes both shapes, and the operation prepare and the character
-delete take the second. With such saves in flight every bench boot was eventually
-aborted, saves were aborted beside it, and a boot that loses exits and is restarted: a
-hazard of the core schema's boot that predates housing
+realm serving plain saves, the first rollout took 55 to 66 ms when no deadlock formed
+(three boots of 16 waited out `deadlock_timeout`, about 1 s), near a steady-state boot's
+56 to 59 ms (one of six waited 1,056 ms). ANY boot can DEADLOCK on two paths (the
+touch-set manifest's P12 and R-11): the boot's SHARE lock on `characters` upgraded to
+ACCESS EXCLUSIVE, against a transaction that took a lock on `characters` that SHARE does
+not wait for (a save's row lock's ROW SHARE, or a plain read's ACCESS SHARE) and then
+writes it; and the boot's `characters`-then-`accounts` order, against a transaction that
+locks `accounts` first. Every effect-carrying or hooked character save (the manifest's
+G1 then G2, the Hearth trip's save included) takes both shapes, and the operation
+prepare and the character delete take the second. With such saves in flight every bench
+boot was eventually aborted, saves were aborted beside it, and a boot that loses exits
+and is restarted: a hazard of the core schema's boot that predates housing
 (`docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md`), to which 07a adds
 members. The first rollout is the one boot that also builds the tables: do it, and any
 boot beside other realms serving those saves, in a quiet window (as `DEPLOY.md` defines

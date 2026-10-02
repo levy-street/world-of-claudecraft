@@ -1070,40 +1070,45 @@ For off-box safety, sync the directory to S3 occasionally:
   column exists, and hold both until the boot schema transaction COMMITs (no lock
   timeout). A boot therefore queues behind every in-flight save and account write, and
   every later one on every realm queues behind the boot (56 to 59 ms in the bench with
-  plain saves in flight). A boot can DEADLOCK on two paths: a transaction that holds a
-  lock on `characters` the boot's SHARE does not wait for (a plain read's ACCESS
-  SHARE, or a row lock's ROW SHARE) and then writes it, against the boot's SHARE lock
-  on `characters` that it upgrades to ACCESS EXCLUSIVE (the core `characters_account`
-  index create, then its first ALTER); and any transaction that holds a lock on
-  `accounts` and then asks for one on `characters`, against the boot's opposite order.
-  Every effect-carrying or hooked character save (storage, bank ledger, the Hearth
-  trip) takes both shapes, and the housing operation prepare and the character delete
-  take the second. PostgreSQL aborts one side at once or after one or more
-  `deadlock_timeout` waits (1 s each). With such saves in flight in the bench, EVERY
-  boot was eventually aborted and saves were aborted beside it: the process exits, the
-  compose policy restarts it, and a restart meets the same race while another realm
-  keeps serving those saves. So boot a realm while the other realms on its database
-  are quiet and outside the nightly `pg_dump` (it starts at 03:15 UTC, see Backups,
-  and holds ACCESS SHARE on every table for its whole run, so a boot that starts
-  during it takes its first lock on `characters` and then waits for the dump to end to
-  upgrade that lock, blocking every realm's saves and logins while it waits (each
-  stuck one holds its realm's pool client until the 15 s statement timeout fails it,
-  so every realm's pool fills), and a boot during the dump's opening locks can
-  deadlock it and abort that night's backup), and in a rolling restart let one realm
-  finish shutting down before another boots; that is the quiet window this file means.
-  An aborted save shows as 40P01 in the realm log (one that carried guild bank books
-  also counts `escrow_save_failed`), and what writes it again depends on the save: an
-  autosave is written by the next autosave; a leave save is retried with backoff
-  (`server/leave_character_save.ts`), its guild books reconciled if every attempt
-  fails; a shutdown flush save is retried once only for a character carrying guild
-  bank books, and otherwise not at all. An aborted Hearth trip counts `trip_failed`
-  and is not retried by the server (the player presses the key again). The hazard
-  predates housing; removing both paths is owed
+  plain saves in flight when no deadlock formed; one boot in six waited out
+  `deadlock_timeout`, 1,056 ms). A boot can DEADLOCK on two paths: a transaction that
+  holds a lock on `characters` the boot's SHARE does not wait for (a plain read's
+  ACCESS SHARE, or a row lock's ROW SHARE) and then writes it, against the boot's
+  SHARE lock on `characters` that it upgrades to ACCESS EXCLUSIVE (the core
+  `characters_account` index create, then its first ALTER); and any transaction that
+  holds a lock on `accounts` and then asks for one on `characters`, against the boot's
+  opposite order. Every effect-carrying or hooked character save (storage, bank
+  ledger, the Hearth trip) takes both shapes, and the housing operation prepare and
+  the character delete take the second. PostgreSQL aborts one side at once or after
+  one or more `deadlock_timeout` waits (1 s each). With such saves in flight in the
+  bench, EVERY boot was eventually aborted and saves were aborted beside it: the
+  process exits, the compose policy restarts it, and a restart meets the same race
+  while another realm keeps serving those saves. So boot a realm while the other
+  realms on its database are quiet and outside the nightly `pg_dump` (it starts at
+  03:15 UTC, see Backups, and holds ACCESS SHARE on every table for its whole run, so
+  a boot that starts during it takes its first lock on `characters` and then waits for
+  the dump to end to upgrade that lock, blocking every realm's saves and logins while
+  it waits (a stuck character save fails at its save transaction's 2 s lock timeout,
+  `server/character_save_transaction.ts`, with 55P03 and is written again as for an
+  aborted save below, and a stuck login or other read with no tighter bound holds its
+  realm's pool client until the pool's statement timeout, `DB_STATEMENT_TIMEOUT_MS`
+  (15 s), fails it with 57014, so a realm's pool can fill), and a boot during the
+  dump's opening locks can deadlock it and abort that night's backup), and in a
+  rolling restart let one realm finish shutting down before another boots; that is the
+  quiet window this file means. An aborted save shows as 40P01 in the realm log (one
+  that carried guild bank books also counts `escrow_save_failed`), and what writes it
+  again depends on the save: an autosave is written by the next autosave; a leave save
+  is retried with backoff (`server/leave_character_save.ts`), its guild books
+  reconciled if every attempt fails; a shutdown flush save is retried once only for a
+  character carrying guild bank books, and otherwise not at all. An aborted Hearth
+  trip counts `trip_failed` and is not retried by the server (the player presses the
+  key again). The hazard predates housing; removing both paths is owed
   (docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md measures it).
 - FIRST ROLLOUT OF THE HOUSING TABLES: the first boot that carries them also creates
   the foreign-key-bearing tables and the delete guards on `accounts` and `characters`
   inside that same transaction. It takes no parent lock a steady-state boot does not
-  already hold (55 to 66 ms in the bench with plain saves in flight, near a
+  already hold (55 to 66 ms in the bench with plain saves in flight when no deadlock
+  formed, three boots of 16 waiting out `deadlock_timeout` for about 1 s, near a
   steady-state boot's 56 to 59 ms; it shares every boot's deadlock above), but it is
   the one boot that builds the tables, so roll it out in a quiet window. A
   steady-state boot's housing fragments read the catalog, rewrite the guard and erase
