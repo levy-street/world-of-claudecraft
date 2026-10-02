@@ -623,6 +623,26 @@ describe('cannon shell visuals', () => {
     });
   });
 
+  it('draws and uploads only the live blasts of a large pool, never the whole pool', () => {
+    const pool = 40;
+    const visuals = new CannonShellVisuals({
+      blastRadius: RADIUS,
+      groundAt: () => 0,
+      impacts: pool,
+    });
+    visuals.prepare(new THREE.Scene());
+    const chunks = piece(visuals, 'chunk') as THREE.InstancedMesh;
+    expect(chunks.instanceMatrix.count).toBe(pool * CANNON_CHUNKS_PER_IMPACT);
+    visuals.impact({ ...landed, shotId: 1 }, 0.1, false);
+    visuals.update(160, 0.3);
+    expect(drawn(visuals, 'chunk')).toBe(CANNON_CHUNKS_PER_IMPACT);
+    const ranges = chunks.instanceMatrix.updateRanges;
+    expect(ranges).toHaveLength(1);
+    expect(ranges[0].start).toBe(0);
+    expect(ranges[0].count).toBe(CANNON_CHUNKS_PER_IMPACT * 16);
+    visuals.dispose();
+  });
+
   it('holds no shot pool until prepared, so a player never seated pays for none', () => {
     // Every player builds the turret visual at boot; only the one who sits
     // in it needs the pools of launched puffs and frames.

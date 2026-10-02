@@ -195,6 +195,7 @@ interface Parts {
   readonly scorchColor: THREE.BufferAttribute;
   readonly scorchPositionUpload: BufferUpdateRange;
   readonly scorchColorUpload: BufferUpdateRange;
+  readonly chunkUpload: BufferUpdateRange;
   readonly puffs: CannonPuffMesh;
 }
 
@@ -793,6 +794,7 @@ export class CannonShellVisuals {
       scorchColor,
       scorchPositionUpload: new BufferUpdateRange(scorchPosition),
       scorchColorUpload: new BufferUpdateRange(scorchColor),
+      chunkUpload: new BufferUpdateRange(chunks.instanceMatrix),
       puffs,
     };
   }
@@ -1088,8 +1090,11 @@ export class CannonShellVisuals {
 
   private drawChunks(parts: Parts, pools: Pools, time: number): void {
     const impacts = pools.timeline.impacts;
-    let any = false;
-    let wrote = false;
+    // Only the slots written are uploaded, and only up to the last live one is drawn:
+    // a pool sized for a whole frag ripple must not cost its full size per blast.
+    let lastLive = -1;
+    let firstWritten = -1;
+    let lastWritten = -1;
     for (let s = 0; s < impacts.length; s++) {
       if (!this.liveChunks[s]) continue;
       const slot = impacts[s];
@@ -1111,13 +1116,19 @@ export class CannonShellVisuals {
         this.matrix.compose(this.pos, this.quat, this.scale);
         parts.chunks.setMatrixAt(base + i, this.matrix);
       }
-      wrote = true;
+      if (firstWritten < 0) firstWritten = s;
+      lastWritten = s;
       this.liveChunks[s] = live;
-      any ||= live;
+      if (live) lastLive = s;
     }
-    if (wrote) parts.chunks.instanceMatrix.needsUpdate = true;
-    parts.chunks.count = any ? parts.chunks.instanceMatrix.count : 0;
-    parts.chunks.visible = any;
+    if (firstWritten >= 0) {
+      parts.chunkUpload.mark(
+        firstWritten * CANNON_CHUNKS_PER_IMPACT * 16,
+        (lastWritten - firstWritten + 1) * CANNON_CHUNKS_PER_IMPACT * 16,
+      );
+    }
+    parts.chunks.count = lastLive < 0 ? 0 : (lastLive + 1) * CANNON_CHUNKS_PER_IMPACT;
+    parts.chunks.visible = lastLive >= 0;
   }
 
   private drawScorches(parts: Parts, pools: Pools, time: number): void {
