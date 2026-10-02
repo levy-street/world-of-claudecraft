@@ -5687,17 +5687,24 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   file set and every server module. Fixed in `57c5db022b` through `4dfbb51a07`.
 - ROUND NINETEEN, eight fresh readers over round eighteen: 47 findings, none blocking, 13
   should-fix. The boot's lock order is observed on the real boot rather than derived from the
-  schema text, which five readers widened by one more statement kind; the same case reads
-  every statement a boot sends and finds no lock timeout. DEPLOY's boot bullet is split by
-  concern and says what to redo after the dump: an account write whose token revoke failed.
-  Fixed in `80ee2487aa` through `2323737f77`.
+  schema text, which five readers widened by one more statement kind; the same case reads every
+  statement a boot sends and finds no lock timeout. DEPLOY's boot bullet is split by concern and
+  says what to redo after the dump: an account write whose token revoke failed (one sign-out of
+  every account, corrected in round twenty). Fixed in `80ee2487aa` through `2323737f77`.
 - ROUND TWENTY, eight fresh readers over round nineteen: 46 findings, three blocking (one
   defect, which five readers found), 20 should-fix. Round nineteen's own route was wrong:
   stopping a realm whose boot waits behind the dump leaves its backend in the queue, since a
-  backend waiting for a lock never reads its socket; DEPLOY now ends the backend, and section L
-  runs that statement against a stopped boot. The dump-shaped hold and the startup channel are
-  observed too, a row lock counts by the table lock it carries, and the stall's redo list became
-  one sign-out. Fixed in `7c8509713b`.
+  backend waiting for a lock never reads its socket; DEPLOY now ends the backend (and every boot
+  that takes its place, corrected in round twenty-one), and section L runs that statement
+  against a stopped boot. The dump-shaped hold and the startup channel are observed too, a row
+  lock counts by the table lock it carries, and the stall's redo list became one sign-out. Fixed
+  in `7c8509713b`.
+- ROUND TWENTY-ONE, eight fresh readers over round twenty: 47 findings, one blocking, 22
+  should-fix. Round twenty's route ended one stalled boot, but a realm still booting takes its
+  place; the route now stops every realm still booting and runs the statement until no row is
+  left, which section L shows with a running and a stopped second boot. The quiet window means
+  no players online, the stall's remedy covers its timing, pending OAuth codes, failed actions
+  and lost notice emails, and section L runs the sign-out. Fixed in `41abd4f842`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5718,8 +5725,8 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - `npx tsc --noEmit` exit 0 at every round's tip.
 - Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then
   641, then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
-  then 644, then 644, then 644, then 644, then 644, then 644, then 645, then 646 passed, never a
-  skip.
+  then 644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647
+  passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):

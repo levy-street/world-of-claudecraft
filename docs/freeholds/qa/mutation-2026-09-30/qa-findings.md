@@ -1061,7 +1061,7 @@ database checks; kept whole with its tests for bisect), and the commit that adds
 | privacy and security | PASS | S16R1 to S16R4 |
 | database performance | FAIL | D16R1 to D16R4 |
 | test coverage | PASS | T16R1 to T16R8 |
-| docs librarian | FAIL | L16R1 to L16R9 |
+| docs librarian | FAIL (should-fix only) | L16R1 to L16R9 |
 | migration safety | FAIL | M16R1 to M16R7 |
 
 48 findings: none blocking, 16 should-fix (S16R1, S16R2, M16R1, M16R2, C16R1, H16R1, H16R2,
@@ -1140,7 +1140,7 @@ and the commit that adds this section.
 | privacy and security | PASS | S17R1 |
 | database performance | PASS | D17R1 to D17R3 |
 | test coverage | PASS | T17R1 to T17R6 |
-| docs librarian | FAIL | L17R1 to L17R9 |
+| docs librarian | FAIL (should-fix only) | L17R1 to L17R9 |
 | migration safety | PASS | M17R1 to M17R6 |
 
 39 findings: none blocking, five should-fix (T17R1, H17R1 to H17R3, L17R1), 34 nice-to-have.
@@ -1205,7 +1205,7 @@ checks as booleans), and the commit that adds this section.
 | privacy and security | PASS | S18R1 |
 | database performance | FAIL | D18R1 to D18R3 |
 | test coverage | PASS | T18R1 to T18R5 |
-| docs librarian | FAIL | L18R1 to L18R6 |
+| docs librarian | FAIL (should-fix only) | L18R1 to L18R6 |
 | migration safety | PASS | M18R1 to M18R5 |
 
 32 findings: one blocking (D18R1), six should-fix (C18R1, D18R2, H18R1, M18R1, Q18R1, L18R1),
@@ -1262,13 +1262,14 @@ behind a held lock on each parent in turn, with every statement each boot sends 
 timeout), `7c7ddd961c` (DEPLOY's boot bullet split by concern: the boot queues behind any open
 transaction holding a lock it needs, only `auth_tokens` and `characters` take SHARE first, a row
 lock counts, a role or database lock timeout would still apply, a boot already behind the dump is
-stopped, and an account write whose token revoke failed is redone; the contract, P12, R-11 and
-the evidence with it; the test pinning the doc's order and bounds to the code and to section L
-(the order only by literals section L mirrored, corrected in round twenty, Q20R3), and the
-shutdown scans widened; kept whole with its test for bisect, since the old bounds case read the
-text it replaces), `2323737f77` (the token route's second HOLDER clause read plainly, the
-bare-relation stop pinned, and the backup script's zone screen over any zone word), and the
-commit that adds this section.
+stopped (its backend ended too, corrected in round twenty, C20R1), and an account write whose
+token revoke failed is redone (one sign-out of every account, corrected in round twenty, S20R3);
+the contract, P12, R-11 and the evidence with it; the test pinning the doc's order and bounds to
+the code and to section L (the order only by literals section L mirrored, corrected in round
+twenty, Q20R3), and the shutdown scans widened; kept whole with its test for bisect, since the
+old bounds case read the text it replaces), `2323737f77` (the token route's second HOLDER clause
+read plainly, the bare-relation stop pinned, and the backup script's zone screen over any zone
+word), and the commit that adds this section.
 
 | Reader | Verdict | Findings |
 |---|---|---|
@@ -1337,15 +1338,16 @@ new spellings from three readers and now refuses any zone word.
   session", and the pin with it). L19R12 FIXED in this record.
 - M19R1 FIXED `7c7ddd961c` (with C19R3, D19R1 and L19R9: the boot queues behind every open
   transaction, running or idle in transaction, that holds a lock on a table it locks, in DEPLOY,
-  the contract and P12, and the quiet check counts `idle in transaction`). M19R2 FIXED
-  `7c7ddd961c` (with C19R4 and L19R7: only `auth_tokens` and `characters` take SHARE first, and
-  `accounts` is ACCESS EXCLUSIVE from its first statement, as section L observes). M19R3 FIXED
-  `7c7ddd961c` (the order example is marked as one). M19R4 FIXED `7c7ddd961c` (every boot writes
-  rows, so a row lock counts on both paths; a row lock counts by the table lock it carries, and
-  most boots write no row, corrected in round twenty, Q20R1). M19R5 FIXED (see T19R3). M19R6
-  FIXED `7c7ddd961c` (any statement that reads or writes `auth_tokens`, an account delete's
-  cascade among the examples, and pg-pool's `timeout exceeded when trying to connect`, with no
-  SQLSTATE, named as the failure).
+  the contract and P12, and the quiet check counts `idle in transaction`; a lock conflicting with
+  one it takes, corrected in round twenty, H20R6). M19R2 FIXED `7c7ddd961c` (with C19R4 and
+  L19R7: only `auth_tokens` and `characters` take SHARE first, and `accounts` is ACCESS EXCLUSIVE
+  from its first statement, as section L observes). M19R3 FIXED `7c7ddd961c` (the order example
+  is marked as one). M19R4 FIXED `7c7ddd961c` (every boot writes rows, so a row lock counts on
+  both paths; a row lock counts by the table lock it carries, and most boots write no row,
+  corrected in round twenty, Q20R1). M19R5 FIXED (see T19R3). M19R6 FIXED `7c7ddd961c` (any
+  statement that reads or writes `auth_tokens`, an account delete's cascade among the examples,
+  and pg-pool's `timeout exceeded when trying to connect`, with no SQLSTATE, named as the
+  failure).
 
 ## Round twenty: eight fresh readers over round nineteen (`c6ae5cfb2b..30588ebb50`)
 
@@ -1381,22 +1383,23 @@ remedy.
   the ungranted ACCESS EXCLUSIVE request on `auth_tokens`, ends the boot's backend; section L
   closes a boot's socket behind a dump-shaped hold, sees its backend keep its place and a token
   read fail with 57014, runs DEPLOY's statement and sees the queue clear; a mutant that names the
-  granted lock instead fails; C19R1's disposition is corrected in this record). C20R2 and C20R3
-  FIXED (see S20R2). C20R4 FIXED (see Q20R1). C20R5 FIXED (see L20R1).
+  granted lock instead fails; C19R1's disposition is corrected in this record; every realm still
+  booting is stopped and the statement run until no row is left, corrected in round twenty-one,
+  D21R1). C20R2 and C20R3 FIXED (see S20R2). C20R4 FIXED (see Q20R1). C20R5 FIXED (see L20R1).
 - Q20R1 FIXED `7c8509713b` (with C20R4, M20R2, D20R5, L20R3 and T20R3: a row lock counts because
   taking one also takes a lock on its table, and a row the boot writes can wait on another
-  transaction's uncommitted write of it; the row-write claim is gone from DEPLOY, the contract
-  and P12, and M19R4's disposition is corrected in this record). Q20R2 FIXED (see L20R1). Q20R3
-  FIXED `7c8509713b` (section L reads DEPLOY's order sentence, built from its own PARENTS list;
-  the round-nineteen commits paragraph is corrected in this record). Q20R4 FIXED in the ledger
-  (with L20R4: the three lines name round nineteen, when they changed). Q20R5 FIXED (see T20R1).
-  Q20R6 and Q20R7 FIXED in this record: `80ee2487aa`'s body says the text derivation is replaced,
-  which the next commit did, and `2323737f77`'s calls the bare-relation stop a sentence where it
-  is a clause; both commits stay as they are. Q20R8 FIXED `7c8509713b` and in this record
-  (DEPLOY's long token line and this record's long lines reflowed). Q20R9 FIXED in this record
-  (round nineteen's table names the librarian's FAIL as should-fix only). Q20R10 NO CHANGE: only
-  comments sit between the `auth_tokens` index create and its ALTER, so "the next statement"
-  holds.
+  transaction's uncommitted write of it (that clause dropped in round twenty-one, T21R8); the
+  row-write claim is gone from DEPLOY, the contract and P12, and M19R4's disposition is corrected
+  in this record). Q20R2 FIXED (see L20R1). Q20R3 FIXED `7c8509713b` (section L reads DEPLOY's
+  order sentence, built from its own PARENTS list; the round-nineteen commits paragraph is
+  corrected in this record). Q20R4 FIXED in the ledger (with L20R4: the three lines name round
+  nineteen, when they changed). Q20R5 FIXED (see T20R1). Q20R6 and Q20R7 FIXED in this record:
+  `80ee2487aa`'s body says the text derivation is replaced, which the next commit did, and
+  `2323737f77`'s calls the bare-relation stop a sentence where it is a clause; both commits stay
+  as they are. Q20R8 FIXED `7c8509713b` and in this record (DEPLOY's long token line and this
+  record's long lines reflowed). Q20R9 FIXED in this record (round nineteen's table names the
+  librarian's FAIL as should-fix only). Q20R10 NO CHANGE: only comments sit between the
+  `auth_tokens` index create and its ALTER, so "the next statement" holds.
 - H20R1 FIXED (see T20R1). H20R2 FIXED (see T20R2). H20R3 FIXED (see L20R1). H20R4 FIXED (see
   S20R2). H20R5 FIXED `7c8509713b` (the poll runs to a 5 s deadline). H20R6 FIXED `7c8509713b`
   (the boot queues behind a lock that conflicts with one it takes, any lock at all on the three
@@ -1421,8 +1424,89 @@ remedy.
   gone). T20R4 FIXED `7c8509713b` (the pool pins read the pool's own options).
 - L20R1 FIXED `7c8509713b` (with Q20R2, C20R5, H20R3 and D20R4: "holding nothing on `characters`
   or `accounts` yet", and section L's comment reworded). L20R2 FIXED (see C20R1). L20R3 FIXED
-  (see Q20R1). L20R4 FIXED (see Q20R4). L20R5 FIXED `7c8509713b`. L20R6 FIXED in this record.
-  L20R7 FIXED `7c8509713b` (the dangling "so" is gone). L20R8 FIXED `7c8509713b` (the evidence
-  names the `ADD COLUMN` on all three tables, the correction named). L20R9 FIXED `7c8509713b`
-  (the stall has its own sub-bullet).
+  (see Q20R1). L20R4 FIXED (see Q20R4). L20R5 FIXED `7c8509713b` (DEPLOY's long token-runbook
+  line reflowed; described in round twenty-one, L21R7). L20R6 FIXED in this record. L20R7 FIXED
+  `7c8509713b` (the dangling "so" is gone). L20R8 FIXED `7c8509713b` (the evidence names the `ADD
+  COLUMN` on all three tables, the correction named). L20R9 FIXED `7c8509713b` (the stall has its
+  own sub-bullet).
 - M20R1 FIXED (see C20R1). M20R2 FIXED (see Q20R1).
+
+## Round twenty-one: eight fresh readers over round twenty (`30588ebb50..91462b8464`)
+
+Round twenty-one's commits: `41abd4f842` (every boot that queues behind the dump stopped and
+ended, by a statement section L runs until no row is left, a running boot taking the place and a
+stopped one exiting; the quiet window as no players online, its check pinned on both sides and by
+session kind and name; the stall's remedy with its timing, the pending OAuth codes, failed
+actions sent again, the lost notice emails and a runnable receipt erase, the sign-out run in
+section L; the row-write clause dropped; the contract, P12 and the change log with it; kept whole
+for bisect, since section L reads the bullet), and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C21R1 to C21R6 |
+| qa-checklist | PASS | Q21R1 to Q21R6 |
+| server hot path | PASS | H21R1 to H21R8 |
+| privacy and security | PASS | S21R1 to S21R4 |
+| database performance | FAIL | D21R1 to D21R6 |
+| test coverage | PASS | T21R1 to T21R8 |
+| docs librarian | FAIL (should-fix only) | L21R1 to L21R7 |
+| migration safety | PASS | M21R1 to M21R2 |
+
+47 findings: one blocking (D21R1), 22 should-fix (C21R1, Q21R1 to Q21R4, H21R1 to H21R5, S21R1,
+D21R2, D21R3, T21R1 to T21R4, L21R1 to L21R4, M21R1), 24 nice-to-have. The blocking finding was
+round twenty's own route: ending one stalled boot hands the schema lock to the next realm still
+booting, which queues in the same place; five readers found it, and the route now stops every
+realm still booting and runs the statement until no row is left.
+
+- C21R1 FIXED `41abd4f842` (with Q21R1 and H21R1: the step names DEPLOY's bullet that begins "A
+  failed deactivation receipt erase", which gives the statements, and says a deactivation stopped
+  at its revoke logged no warning). C21R2 FIXED (see D21R3). C21R3 FIXED (see M21R2). C21R4 FIXED
+  (see S21R2). C21R5 FIXED (see D21R1). C21R6 FIXED (see T21R3).
+- Q21R1 FIXED (see C21R1). Q21R2 FIXED `41abd4f842` (without a step beside it the boot is awaited
+  unguarded, so a late failure fails the case). Q21R3 FIXED in this record (with L21R1: round
+  nineteen's commits paragraph names round twenty's two corrections). Q21R4 FIXED in the ledger
+  (with L21R3). Q21R5 FIXED (see T21R2). Q21R6 FIXED `41abd4f842` (the contract's two paths
+  follow their own sentence).
+- H21R1 FIXED (see C21R1). H21R2 FIXED (see D21R1). H21R3 FIXED `41abd4f842` (the poll reads this
+  database's waits only). H21R4 NO CHANGE: `deleteUnusedFederatedProvision` runs only on the
+  account a federated login provisioned in the same request and lost the link race for, so a
+  sign-out makes no other account its candidate. H21R5 FIXED `41abd4f842` (the sign-out runs in
+  the next quiet window, right before the first restart, and each restart brings a wave of
+  logins). H21R6 FIXED `41abd4f842` (the sign-out also deletes the pending OAuth and device
+  codes). H21R7 FIXED (see M21R2). H21R8 FIXED (see T21R3).
+- S21R1 FIXED `41abd4f842` (a request that failed before writing stays undone until it is sent
+  again, and the sign-out applies no action: whoever saw an error checks whether the action
+  landed and sends it again, a staff password reset that can leave its record without the new
+  password among them). S21R2 FIXED `41abd4f842` (with C21R4: nothing sends a skipped notice
+  email again). S21R3 FIXED (see M21R2). S21R4 FIXED (see D21R1).
+- D21R1 FIXED `41abd4f842` (with M21R1, C21R5, S21R4 and H21R2: stop every realm whose boot has
+  not finished, then run the statement until it returns no row; section L queues a running boot
+  and a stopped boot on the advisory lock behind the waiting one, sees the running one take its
+  place once that is ended and the stopped one exit, and ends each). D21R2 FIXED `41abd4f842` (a
+  realm with players online is quiet only with none online, or stopped, whatever a reading
+  shows). D21R3 FIXED `41abd4f842` (with C21R2: a later table the core schema alters counts,
+  `play_sessions` and `character_leases` among them). D21R4 FIXED `41abd4f842` (the sign-out
+  deletes live tokens only and runs again on 40P01). D21R5 FIXED `41abd4f842` (the statement
+  names `public.auth_tokens` and says it also ends any other session waiting for that lock).
+  D21R6 FIXED `41abd4f842` (an `autovacuum worker` row counts too).
+- T21R1 FIXED `41abd4f842` (the dump-shaped holder is still idle in its transaction after every
+  terminate, and the last run returns no row). T21R2 FIXED `41abd4f842` (with Q21R5: section L
+  mints a full and a companion token and runs DEPLOY's sign-out; a mutant that matches no live
+  token fails). T21R3 FIXED `41abd4f842` (with C21R6 and H21R8: the check runs beside an idle
+  session and under the dump's own name, reads session kind, name and state, and shows no row
+  once the hold ends; a mutant without the open-transaction filter fails). T21R4 FIXED
+  `41abd4f842` (the observations run over PARENTS: behind each, every earlier parent is held and
+  no later one). T21R5 FIXED `41abd4f842` (the options read has a positive control). T21R6 FIXED
+  `41abd4f842` (both token reads have the same 200 ms budget). T21R7 NO CHANGE: the bounds case
+  reads `server/db.ts` with its comments stripped, so a comment cannot satisfy the pool pins.
+  T21R8 FIXED `41abd4f842` (the clause about the boot's own row writes is dropped; the order
+  shape covers a row the boot waits on; Q20R1's disposition is corrected in this record).
+- L21R1 FIXED (see Q21R3). L21R2 FIXED in this record (M19R1 names H20R6's correction). L21R3
+  FIXED (see Q21R4). L21R4 FIXED `41abd4f842` (the change log's nineteenth entry names round
+  twenty's correction). L21R5 FIXED in this record (rounds sixteen to eighteen label the
+  librarian's FAIL as should-fix only). L21R6 FIXED (see M21R2). L21R7 FIXED in this record
+  (L20R5 names the reflowed token line).
+- M21R1 FIXED (see D21R1). M21R2 FIXED `41abd4f842` (with C21R3, S21R3, H21R7 and L21R6: the
+  remedy follows a stall that is over, its boot committed or its backend ended and its realm
+  booted again after the dump, and the dump route points to it; C20R1's disposition is corrected
+  in this record).
