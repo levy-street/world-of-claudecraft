@@ -1658,7 +1658,9 @@ describe('the claim renewer', () => {
     // counts the bounded awaits. Every await of server/main.ts's shutdown
     // closure is CLASSIFIED here, so a step added, removed or newly bounded
     // fails until it is classified, and an unbounded one may pass only a bare
-    // call or an argument shape listed below as carrying no deadline.
+    // call or an argument shape listed below as carrying no deadline. The
+    // classification is reviewed code: this guards the closure and the
+    // contract against drift from it, not a reviewer who misclassifies.
     const main = mainSource();
     const start = main.indexOf('const shutdown = async () => {');
     const end = main.indexOf("process.on('SIGINT', shutdown);", start);
@@ -1676,7 +1678,8 @@ describe('the claim renewer', () => {
           readonly fn: string;
           readonly name: string;
           readonly value: number;
-          readonly wired: string;
+          /** How the callee waits on its bound, given the variable holding it. */
+          readonly wired: (binding: string) => string;
         };
     const none: Bound = { kind: 'none' };
     const drain = (name: string, file: string): Bound => ({ kind: 'constant', name, file });
@@ -1728,7 +1731,7 @@ describe('the claim renewer', () => {
           fn: 'stopFreeholdClaimRenewer',
           name: 'FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs',
           value: FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs,
-          wired: "bound.addEventListener('abort', done",
+          wired: (binding) => `${binding}.addEventListener('abort', done`,
         },
       ],
       [
@@ -1738,7 +1741,7 @@ describe('the claim renewer', () => {
           fn: 'releaseAllFreeholdClaims',
           name: 'FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS',
           value: FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS,
-          wired: '{ signal: deadline }',
+          wired: (binding) => `{ signal: ${binding} }`,
         },
       ],
       [
@@ -1765,6 +1768,32 @@ describe('the claim renewer', () => {
         expect(/^[\w.]+\(\)$/.test(text) || noDeadlineArguments.has(text), text).toBe(true);
       }
     }
+    // The allowlist holds only live, unbounded or callee-bounded entries, and
+    // none of them spells anything a deadline could be.
+    for (const listed of noDeadlineArguments) {
+      const entry = closure.find(([text]) => text === listed);
+      expect(entry?.[1].kind === 'none' || entry?.[1].kind === 'callee', listed).toBe(true);
+      expect(listed, listed).not.toMatch(/\d|_MS\b|signal|deadline|timeout/i);
+    }
+    /** The module main.ts imports `name` from, by its own import line. */
+    const importedFrom = (name: string): string => {
+      const lines = [...main.matchAll(/import\s*\{([^}]*)\}\s*from\s*'\.\/([\w/]+)'/g)].filter(
+        (match) => match[1].split(',').some((part) => part.trim() === name),
+      );
+      expect(lines, name).toHaveLength(1);
+      return `server/${lines[0][2]}.ts`;
+    };
+    /** Whether `file` re-exports `name` from `from` in a named export list. */
+    const reExports = (file: string, name: string, from: string): boolean =>
+      [
+        ...stripComments(readFileSync(file, 'utf8')).matchAll(
+          /export\s*\{([^}]*)\}\s*from\s*'\.\/([\w/]+)'/g,
+        ),
+      ].some(
+        (match) =>
+          `server/${match[2]}.ts` === from &&
+          match[1].split(',').some((part) => part.trim() === name),
+      );
     // Each bound's value, read from the code that sets it.
     const constantIn = (file: string, name: string): number => {
       const found = stripComments(readFileSync(file, 'utf8')).match(
@@ -1782,29 +1811,46 @@ describe('the claim renewer', () => {
       return registrySource.slice(from, to);
     };
     const counted: Array<{ name: string; value: number; group: 'call site' | 'callee' }> = [];
-    let concurrentMs = 0;
+    const concurrent: number[] = [];
     for (const [text, bound] of closure) {
       if (bound.kind === 'constant') {
-        expect(text).toContain(`(${bound.name})`);
-        // main.ts passes the defining module's binding, never a local one.
-        expect(main).not.toMatch(new RegExp(`\\b(?:const|let|var) ${bound.name}\\b`));
+        // The whole call is the drain with the bare constant, and main.ts
+        // takes that constant from its defining module, directly or through
+        // one named re-export, and names it nowhere else.
+        expect(text).toMatch(new RegExp(`^[\\w.]+\\(${bound.name}\\)$`));
+        const via = importedFrom(bound.name);
+        expect(via === bound.file || reExports(via, bound.name, bound.file), bound.name).toBe(true);
+        expect(main.match(new RegExp(`\\b${bound.name}\\b`, 'g'))?.length, bound.name).toBe(2);
         counted.push({
           name: bound.name,
           value: constantIn(bound.file, bound.name),
           group: 'call site',
         });
       } else if (bound.kind === 'concurrent literals') {
-        expect(text.startsWith('Promise.all([')).toBe(true);
-        const literals = [...text.matchAll(/(?<![\w.])\d[\d_]*(?![\w.])/g)].map((match) =>
-          Number(match[0].replaceAll('_', '')),
-        );
-        expect(literals.length).toBeGreaterThan(1);
-        concurrentMs = Math.max(...literals);
+        // Every member of the group is one call with one literal bound.
+        expect(text.startsWith('Promise.all([') && text.endsWith('])')).toBe(true);
+        const members = text.slice('Promise.all(['.length, -'])'.length).split(', ');
+        expect(members.length).toBeGreaterThan(1);
+        const values = members.map((member) => {
+          const found = member.match(/^[\w.]+\((\d[\d_]*)\)$/);
+          expect(found, member).not.toBeNull();
+          return Number((found as RegExpMatchArray)[1].replaceAll('_', ''));
+        });
+        concurrent.push(Math.max(...values));
       } else if (bound.kind === 'callee') {
-        // The callee arms its bound AND waits on it, inside its own body.
+        // The entry calls the callee whose body is read; that body arms its
+        // bound into one variable, waits on THAT variable, and awaits nothing
+        // else, so no unbounded wait sits ahead of its deadline.
+        expect(text.startsWith(`${bound.fn}(`), bound.fn).toBe(true);
         const body = bodyOf(bound.fn);
-        expect(body).toContain(`AbortSignal.timeout(${bound.name})`);
-        expect(body).toContain(bound.wired);
+        const armed = body.match(
+          new RegExp(
+            `const (\\w+) = AbortSignal\\.timeout\\(${bound.name.replace('.', '\\.')}\\);`,
+          ),
+        );
+        expect(armed, bound.fn).not.toBeNull();
+        expect(body).toContain(bound.wired((armed as RegExpMatchArray)[1]));
+        expect(body.match(/\bawait\b/g)?.length, bound.fn).toBe(1);
         counted.push({ name: bound.name, value: bound.value, group: 'callee' });
       }
     }
@@ -1833,16 +1879,28 @@ describe('the claim renewer', () => {
     expect(named.sort()).toEqual(
       counted.map(({ name, value }) => `${name}=${value.toLocaleString('en-US')}`).sort(),
     );
-    expect(groups['call site']).toContain(`run concurrently, ${ms(concurrentMs)}`);
-    const totalMs = counted.reduce((sum, { value }) => sum + value, concurrentMs);
-    expect(budget).toContain(`${totalMs / 1000} s of bounded waits`);
+    // No other bound is named in another spelling.
+    expect(
+      [...budget.matchAll(/`([A-Z][A-Z0-9_]*(?:\.\w+)?)`/g)].map((match) => match[1]).sort(),
+    ).toEqual(counted.map(({ name }) => name).sort());
+    // Each concurrent group said once, counted once at its longest member.
+    const concurrently = [...groups['call site'].matchAll(/run concurrently, ([\d,]+) ms/g)].map(
+      (match) => Number(match[1].replaceAll(',', '')),
+    );
+    expect(concurrently).toEqual(concurrent);
+    const totalMs = counted.reduce(
+      (sum, { value }) => sum + value,
+      concurrent.reduce((sum, value) => sum + value, 0),
+    );
+    const stated = budget.match(/(?<![\d.])(\d+(?:\.\d+)?) s of bounded waits/);
+    expect(Number(stated?.[1])).toBe(totalMs / 1000);
     const grace = readFileSync('docker-compose.yml', 'utf8').match(
       /\n {2}game:\n(?: {4}.*\n)*? {4}stop_grace_period: (\d+)s\n/,
     );
     expect(grace).not.toBeNull();
     const graceSeconds = Number((grace as RegExpMatchArray)[1]);
     expect(totalMs).toBeLessThan(graceSeconds * 1000);
-    expect(budget).toContain(`${graceSeconds} s kill grace`);
+    expect(Number(budget.match(/(?<![\d.])(\d+) s kill grace/)?.[1])).toBe(graceSeconds);
   });
 
   it('chunks at the bound, one transaction per chunk', async () => {
