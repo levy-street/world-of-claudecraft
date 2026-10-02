@@ -5803,16 +5803,23 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   ended sign-out is gone. Fixed in `2afa2c6f0a`; L37R4 flagged.
 - ROUND THIRTY-EIGHT, eight fresh readers over round thirty-seven: 27 findings, none blocking, 5
   should-fix, every reader passing, five with no should-fix. The Discord bot overview drops its
-  pure-consumer claim and the restart note names what of the outbox a stop loses (worded so in
-  round thirty-nine, Q39R2); the unit suite ties the winner read and its marks, the daily-active
-  grant's cases, the resync's defaults and calls and the files that drain a feed, drops every
-  comment, and lists every statement reaching a read declaration. Fixed in `41db868baa`.
+  pure-consumer claim and the restart note names what a taken batch loses and lever 3 the rest
+  (worded so in round thirty-nine, Q39R2, and round forty, L40R2); the unit suite ties the winner
+  read and its marks, the daily-active grant's cases, the resync's defaults and calls and the
+  files that drain a feed, drops every comment, and lists every statement reaching a read
+  declaration. Fixed in `41db868baa`.
 - ROUND THIRTY-NINE, eight fresh readers over round thirty-eight: 33 findings, none blocking, 5
   should-fix, every reader passing, five with no should-fix. DEPLOY states rules where precision
   kept drawing new ties: the bot's resyncs heal with no cadence promised, and the daily-active
   points follow the only-in-answer-to-an-event rule with no list of events; the overview points to
   both places that say what a stop costs; the unit suite pins the overview, its pointers' sections
   and the bot's internal API. Fixed in `a5b04edb93`.
+- ROUND FORTY, eight fresh readers over round thirty-nine: 28 findings, none blocking, 7
+  should-fix, every reader passing, five with no should-fix. The ties that drew a further form
+  read their subject whole: the stop_grace_period paragraph, every place the bot's code names
+  `grant`, and every arm of the declaration reader on a sample; the fetch count went with the
+  claim DEPLOY never made; lever 3's daily-active rule reads plainly and `claimDailyActive` says
+  at most once. Fixed in `1fe98e4a80`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5843,7 +5850,8 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644, then
   644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then 647,
   then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then
-  648, then 648, then 648, then 648, then 648, then 648, then 648, then 648 passed, never a skip.
+  648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648 passed,
+  never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
