@@ -108,16 +108,16 @@ A server is CAPABLE when all of the following hold.
    Hearth row's `advance_token` column behind a `pg_attribute` probe (in the CREATE TABLE
    for a fresh database, otherwise one ADD COLUMN, shape-checked by the named
    `account_freehold_hearth_advance_token_shape` constraint, which a later boot puts back
-   `NOT VALID` if the column exists without it), so an ordinary boot takes
-   none of the index, trigger or ALTER TABLE locks that would hold another realm's
-   housing statements until its COMMIT (the housing fragments' one table lock, the token
-   probe's ACCESS SHARE on the Hearth table for the CHECK's deparse, is taken and released
-   at once; the storage fragment's unprobed `ADD COLUMN IF NOT EXISTS` and index creates
-   still hold ACCESS EXCLUSIVE and SHARE on `storage_purchases` to every boot's COMMIT).
-   No fragment references another's table, so their relative order is a convention
-   rather than a dependency, and it is fixed as plot, Hearth, claim, operation so the boot-call
-   ordering pin in [../../tests/schema_wiring.test.ts](../../tests/schema_wiring.test.ts)
-   (by index, never containment) has one stable answer. All four are applied
+   `NOT VALID` if the column exists without it), so an ordinary boot's housing
+   fragments take none of the index, trigger or ALTER TABLE locks that would hold
+   another realm's housing statements until its COMMIT (their one table lock, the token
+   probe's ACCESS SHARE on the Hearth table for the CHECK's deparse, is taken and
+   released at once; the storage fragment, which is not housing, runs its DDL unprobed
+   and holds its locks on its own tables to every boot's COMMIT). No fragment references
+   another's table, so their relative order is a convention rather than a dependency,
+   and it is fixed as plot, Hearth, claim, operation so the boot-call ordering pin in
+   [../../tests/schema_wiring.test.ts](../../tests/schema_wiring.test.ts) (by index,
+   never containment) has one stable answer. All four are applied
    UNCONDITIONALLY, never behind `freeholdsEnabled`: the tables exist before the feature
    does, so enabling is a flag change and never a migration. `freeholdSchema(schemaName)`,
    `freeholdClaimSchema(schemaName)` and `freeholdOperationSchema(schemaName)` exist only
@@ -769,12 +769,15 @@ and resolves once that pass settles or one chunk's wall
 stop's wait, while a chunk is cut by its own wall (its socket destroyed, then a best-effort
 backend cancel through the canceller's own pool). So no renewal whose COMMIT was not yet
 sent outlives the release; one whose COMMIT was already sent when its wall cut it client
-side can still land after the release-all passed its rows, which keeps at most one renew
-chunk of plots claimed for at most one lease TTL (the manifest's R-13, the crash bound).
+side can still land after the release-all passed its rows, and one cut mid-statement may
+still hold its rows as the release passes them by (SKIP LOCKED), which keeps at most one
+renew chunk of plots claimed for at most one lease TTL (the manifest's R-13, the crash
+bound).
 
 THE SHUTDOWN BUDGET is the whole serial chain in `server/main.ts`, not the housing tail
 alone, and `tests/server/freehold_mutation.test.ts` pins every await in it against this
-paragraph, so a step added, removed or newly bounded fails there until it is said here.
+paragraph, so a step added, removed or newly bounded at its call site fails there until
+the pin lists it and, when it is bounded, this paragraph names it.
 Only these awaits carry a deadline. At the call site: the bank ledger's drain
 (`BANK_LEDGER_SHUTDOWN_DRAIN_MS`, 10,000 ms), the market sold volume's
 (`MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS`, 10,000 ms), the housing drain
@@ -785,11 +788,11 @@ concurrently, 5,000 ms). Inside the callee: the renewer stop
 (`FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS`, 2,000 ms). That is 47 s of bounded waits, inside
 the game container's 75 s kill grace (`stop_grace_period` in `docker-compose.yml`). EVERY
 other await in that closure, from the collector and sweep stops before the save flush to
-`pool.end()` at its end, carries no deadline and spends from the same grace, and
-`pool.end()` also waits for every client still checked out: one a timed-out drain left
-mid-query, or one an account-wealth sweep pass in flight still holds
-(`accountWealthSweep.stop()` is not awaited). A new shutdown step spends from what is left
-after all of them.
+`pool.end()` at its end, passes no deadline and is not counted here, whatever its callee
+does inside, and spends from the same grace; `pool.end()` also waits for every client
+still checked out, whatever holds it (a timed-out drain's mid-query client, an un-awaited
+account-wealth sweep pass, a request still in flight). A new shutdown step spends from
+what is left after all of them.
 
 THE CLAIM RELEASE (07a) sits in the same closure, AFTER `freeholdPersistIdle` and BEFORE
 `releaseAllCharacterLeases`: `releaseAllFreeholdClaims({ pool, holder:
