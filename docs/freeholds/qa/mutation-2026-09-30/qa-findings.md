@@ -194,6 +194,70 @@ live binding, the stop's checkout cut), `4ca51f5114` (the token probe warning), 
 - L3R1 (blocking) FIXED `ffbe38eb94`: the ledger's 07a QA section now exists. L3R2 to L3R4,
   L3R6 to L3R11 FIXED `ffbe38eb94`. L3R5, L3R12, L3R13 FIXED `46d12cca49`.
 - M3R1, M3R2 FIXED `ffbe38eb94`, pinned in `87169095d0` (a read-only detector first and no
-  repair during a clock step; both sides of the deadlock and its save-side cost). M3R3 FIXED `ffbe38eb94`. M3R4 FIXED
-  `4ca51f5114` (the comment claims only the repair branch). M3R5 FIXED `ffbe38eb94`. M3R6 FIXED
-  `95eadbea2f`. M3R7 FIXED `4ca51f5114`. M3R8 FIXED `ffbe38eb94`.
+  repair during a clock step; both sides of the deadlock and its save-side cost). M3R3 FIXED
+  `ffbe38eb94`. M3R4 FIXED `4ca51f5114` (the comment claims only the repair branch). M3R5
+  FIXED `ffbe38eb94`. M3R6 FIXED `95eadbea2f`. M3R7 FIXED `4ca51f5114`. M3R8 FIXED
+  `ffbe38eb94`.
+
+## Round four: eight fresh readers over round three (`54ac963ce0..a299a3bc58`)
+
+Round four's commits: `226841c7cc` (the in-flight join without the claim), `a655364f13` (the
+token CHECK warning on any other definition), `b197b681b0` (one release cut per pass, the
+launch warning once), `5b2d557380` (the stop and trip pins), `ce11607af0` (the boot, shutdown
+and residual records), and the commit that adds this section. Q4R1 was fixed by rewriting
+the unpushed range before them (below), so every round-three hash from `4ca51f5114` on is
+the rewrite's.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C4R1 to C4R4 |
+| qa-checklist | PASS | Q4R1 to Q4R4 |
+| server hot path | PASS | H4R1, H4R2 |
+| privacy and security | PASS | S4R1 to S4R5 |
+| database performance | FAIL (doc readings) | D4R1 to D4R4 |
+| test coverage | PASS | T4R1 to T4R10 |
+| docs librarian | FAIL (one blocking) | L4R1 to L4R5 |
+| migration safety | PASS | M4R1 to M4R8 |
+
+42 findings: one blocking (L4R1, the same defect as H4R1), 12 should-fix, 29 nice-to-have.
+
+- C4R1 FIXED `226841c7cc`: a read in flight is its own fact and joins without asking the
+  claim; a mutant dropping it fails the clause table and the join case, whose claim now
+  reads held while the read is parked. C4R2 FIXED `b197b681b0`. C4R3 FIXED `a655364f13` (with
+  S4R4 and M4R4: the probe compares the whole deparsed definition, so a CHECK with another
+  body warns too). C4R4 FIXED `b197b681b0` (with H4R2 and Q4R3: once per registry).
+- H4R1 FIXED `ce11607af0` (with L4R1): the shutdown budget adds the concurrent Steam and Epic
+  mirror stop, 47 s of bounded drains, and names the drains with no deadline at their call
+  sites; this corrects H3R2's 42 s, which stands above as round three wrote it.
+- Q4R1 FIXED by rewriting the unpushed range: the two DEPLOY pins left the token-probe commit
+  for their own commit, `87169095d0`, right after the DEPLOY text they read (`ffbe38eb94`), so
+  no commit is red on that case; the tree at the tip was unchanged. Q4R2 FIXED in this record
+  (the ledger lists every tip's pg total). Q4R4 FIXED `ce11607af0` (the counts dropped from
+  the `saves` rule).
+- S4R1 FIXED `ce11607af0` (a repair reaches a relog only once the realm dropped the entry).
+  S4R2 FIXED `ce11607af0` (with M4R3: the clock check named, a step either way, the free trip
+  after a backward step past one cooldown). S4R3 FIXED `ce11607af0` (P7 and the close comment
+  state the duty for an id a client sends back). S4R5 FIXED `a655364f13` (the `search_path`,
+  and the quiet-window reboot with M4R7).
+- D4R1 FIXED `ce11607af0` (with L4R2): the account cycle takes `accounts` first in every
+  shape, so G2 no longer counts as isolating the upgrade path; only the abort at once is
+  attributed to it. D4R2 FIXED `ce11607af0`. D4R3 FIXED `ce11607af0` (R-12 counts gate
+  permits: seven of the default ten). D4R4 FIXED `ce11607af0` (R-13 and the contract name the
+  chunk's own wall and a COMMIT already sent).
+- T4R1 FIXED `a655364f13`: the whole warning arm pinned, and healthy boots proved silent; a
+  mutant dropping the arm's name filter fails them. T4R2 FIXED `b197b681b0`. T4R3 FIXED
+  `5b2d557380`: dropping the cleanup and hoisting the class read out of the `try` each fail.
+  T4R4, T4R5, T4R7 FIXED `226841c7cc`. T4R6 FIXED `5b2d557380`: a mutant dropping the stop's
+  abort fails by assertion, not timeout. T4R8 FIXED `226841c7cc`: a mutant freezing the clock
+  in the hold branch fails. T4R9 COVERED: the clause table drives each fact alone on the pure
+  function, and the store's mapping is exercised by the leave-capture, quiesce, join and hold
+  cases. T4R10 FIXED `5b2d557380`.
+- L4R3, L4R4 FIXED `ce11607af0`. L4R5 FIXED `ce11607af0`: the launch bench re-ran three times
+  on this tip with its output kept beside the boot outputs (cold first 4.7 to 4.9 ms, warm p99
+  3.7 to 4.2 ms), and the figures follow it.
+- M4R1, M4R2, M4R5 FIXED `ce11607af0`. M4R6 FIXED `a655364f13`: the pg case passes the real
+  notice through the boot log's filter, a unit case covers the WARNING shape, and DEPLOY quotes
+  the line, pinned to the RAISE text. M4R7 FIXED `a655364f13`. M4R8 RULED: only hand-built DDL
+  reaches it (a same-named constraint with the column missing), probing the name first would
+  make every fresh install's CHECK `NOT VALID`, and the comment's claim is scoped to the
+  repair branch.

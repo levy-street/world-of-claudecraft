@@ -5592,6 +5592,12 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   two paths: the boot's SHARE-to-ACCESS-EXCLUSIVE upgrade on `characters` (no `accounts` lock
   needed), and its `characters`-then-`accounts` order. With saves of the G1 shape in flight every
   bench boot was eventually aborted (R-11).
+- ROUND FOUR, eight fresh readers over round three: 42 findings, one blocking (the shutdown
+  budget missed the 5 s storefront mirror stop: 47 s of bounded drains, not 42). Also: a
+  read in flight is now joined without asking the claim, the token probe warns on a CHECK
+  with another body, three commits were red on a pin that landed before its DEPLOY text (the
+  unpushed range was rewritten so none is), and the G2 bench shape was found not to isolate
+  the upgrade path. Fixed in `226841c7cc` through `ce11607af0`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5599,25 +5605,26 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   mutant that reproduces it.
 - The boot deadlock class (R-11), predating housing, with both halves of its fix owed to the
   maintainer.
-- A renew chunk cut at COMMIT by the stop's wall can still land after the release-all (R-13, the
-  crash bound); a chunk parked at its checkout is now cut there.
-- At shutdown the housing drain can fill the whole pool, so the claim and lease releases can
-  fall back to expiry (R-12).
+- A renew chunk whose COMMIT was already sent when its own wall cut it can still land after the
+  release-all (R-13, the crash bound); a chunk parked at its checkout is now cut there.
+- At shutdown a drain write blocked on a trip's claim row keeps its client; with the clients
+  outside the background gate held too, the claim and lease releases can fall back to expiry
+  (R-12).
 - The operator's corrupt-Hearth repair could shorten a healthy cooldown if run during a database
   clock step; DEPLOY.md now has a read-only detector first and forbids the repair during a step.
 
 ### EVIDENCE
 
 - `npx tsc --noEmit` exit 0 at every round's tip.
-- Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then 641
-  passed, never a skip.
+- Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then 641,
+  then 642 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
   - Two realms racing for 1,000 plots: no 55P03 and no 57014 on any path.
   - The renewer at 5,000 claims beside a full autosave burst: 165 to 203 ms, no row skipped.
   - The claimed login read on a 198,500-row claims table: p99 2.4 ms.
-  - The renewer's synchronous launch: about 4.5 ms cold, p99 near 4 ms warm.
+  - The renewer's synchronous launch: about 4.8 ms cold, p99 near 4 ms warm.
   - The boot deadlock under plain, G2 and G1 saves.
 
 ### OWED, NOT CLAIMED
