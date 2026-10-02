@@ -102,7 +102,10 @@ latency includes the other pool's JavaScript work.
 | the renewer's SYNCHRONOUS launch (what the flush bills to the profiler's `saves` bucket), the REAL `renewFreeholdClaims` against a checkout that never answers, its wanted predicate a stand-in of the wiring's shape (map reads, the store's `wantsClaim` among them) | 5,000 held claims, 2,500 of them unwanted (the release partition too); the cold FIRST launch, then 200 warm ones after 20 more | the cold first 4.7 to 4.9 ms over three runs (4.5 to 4.7 ms a round earlier: within the run-to-run spread, not attributed); warm p50 2.3 ms, p99 3.7 to 4.2 ms; inside one 50 ms tick either way | not a database path |
 
 The boot runs used the REAL `ensureSchema()` in a throwaway database while an old realm served
-8 save workers and one account create-then-delete cycle every 20 ms. Three save shapes, because
+8 save workers and one account create-then-delete cycle every 20 ms (its "old account create"
+inserts an account and then a character in one transaction: the order path's shape, as a character
+create or an account create with community test accounts on takes it, not the default
+one-INSERT account create). Three save shapes, because
 the deadlock below depends on which locks a save takes first; half the workers take the shape,
 the other half save plain:
 - PLAIN: every save is its row UPDATE plus 5 ms.

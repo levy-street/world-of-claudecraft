@@ -728,23 +728,24 @@ that arrives after it queues behind the boot until that COMMIT. Measured with an
 realm serving plain saves, the first rollout took 55 to 66 ms when no deadlock formed
 (three boots of 16 waited out `deadlock_timeout`, about 1 s), near a steady-state boot's
 56 to 59 ms (one of six waited 1,056 ms); each boot that waited lived, and the bench's
-account-then-character transaction beside it was aborted. ANY boot can DEADLOCK on two
-paths (the touch-set manifest's P12 and R-11): the boot's SHARE lock on `characters`
-upgraded to ACCESS EXCLUSIVE, against a transaction that took a lock on `characters`
-that SHARE does not wait for (a save's row lock's ROW SHARE, or a plain read's ACCESS
-SHARE) and then writes it; and the boot's `characters`-then-`accounts` order, against a
-transaction that locks `accounts` first. Every effect-carrying or hooked character save
-(the manifest's G1 then G2, the Hearth trip's save included) takes both shapes, and the
-operation prepare, the character delete, a character create and an account create while
-community test accounts are on take the second. With such saves in flight every bench
-boot was eventually aborted, saves were aborted beside it, and a boot that loses exits
-and is restarted: a hazard of the core schema's boot that predates housing
-(`docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md`), to which 07a adds
-members. The first rollout is the one boot that also builds the tables: do it, and any
-boot beside other realms serving those saves, in a quiet window (as `DEPLOY.md` defines
-it, outside the nightly `pg_dump` too), and never beside a realm that is still shutting
-down (a shutdown flush save that fails gets one more pass only when it carried guild
-bank books, and otherwise is not written again).
+"old account create", a transaction that inserts an account and then a character, was
+aborted beside it. ANY boot can DEADLOCK on two paths (the touch-set manifest's P12 and
+R-11): the boot's SHARE lock on `characters` upgraded to ACCESS EXCLUSIVE, against a
+transaction that took a lock on `characters` that SHARE does not wait for (a save's row
+lock's ROW SHARE, or a plain read's ACCESS SHARE) and then writes it; and the boot's
+`characters`-then-`accounts` order, against a transaction that locks `accounts` first.
+Every effect-carrying or hooked character save (the manifest's G1 then G2, the Hearth
+trip's save included) and a character create (an account row lock, then a count and an
+insert on `characters`) take both shapes, and the operation prepare, the character
+delete and an account create while community test accounts are on take the second. With
+such saves in flight every bench boot was eventually aborted, saves were aborted beside
+it, and a boot that loses exits and is restarted: a hazard of the core schema's boot
+that predates housing (`docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md`), to
+which 07a adds members. The first rollout is the one boot that also builds the tables:
+do it, and any boot beside other realms serving those saves, in a quiet window (as
+`DEPLOY.md` defines it, outside the nightly `pg_dump` too), and never beside a realm
+that is still shutting down (a shutdown flush save that fails gets one more pass only
+when it carried guild bank books, and otherwise is not written again).
 
 ### The shutdown drain, and why it sits where it sits
 

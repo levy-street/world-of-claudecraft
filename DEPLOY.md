@@ -1071,83 +1071,84 @@ For off-box safety, sync the directory to S3 occasionally:
   timeout). A boot therefore queues behind every in-flight save and account write, and
   every later one on every realm queues behind the boot (56 to 59 ms in the bench with
   plain saves in flight when no deadlock formed; one boot in six waited out
-  `deadlock_timeout`, 1,056 ms, and lived while the bench's account-then-character
-  transaction, the order path's shape, was aborted). A boot can DEADLOCK on two paths:
-  a transaction that holds a lock on `characters` the boot's SHARE does not wait for
-  (a plain read's ACCESS SHARE, or a row lock's ROW SHARE) and then writes it, against
-  the boot's SHARE lock on `characters` that it upgrades to ACCESS EXCLUSIVE (the core
-  `characters_account` index create, then its first ALTER); and any transaction that
-  holds a lock on `accounts` and then asks for one on `characters`, against the boot's
-  opposite order. Every effect-carrying or hooked character save (storage, bank
-  ledger, the Hearth trip) takes both shapes, and the housing operation prepare, the
-  character delete, a character create (it locks the account row, then counts and
-  inserts characters) and an account create while community test accounts are on
-  (`createAccount` in `server/db.ts` then inserts the account and its test roster in
-  one transaction; with them off it is one INSERT into `accounts`, which only queues
-  behind the boot) take the second. PostgreSQL aborts one side at once or after one or
-  more `deadlock_timeout` waits (1 s each). With such saves in flight in the bench,
-  EVERY boot was eventually aborted and saves were aborted beside it: the process
-  exits, the compose policy restarts it, and a restart meets the same race while
-  another realm keeps serving those saves. So boot a realm while the other realms on
-  its database are quiet and outside the nightly `pg_dump` (it starts at 03:15 UTC,
-  see Backups, and holds ACCESS SHARE on every table for its whole run, so a boot that
-  starts during it takes its first lock on `characters` and then waits for the dump to
-  end to upgrade that lock, blocking every realm's saves and logins while it waits (a
-  stuck character save fails at its save transaction's 2 s lock timeout,
-  `server/character_save_transaction.ts`, with 55P03, and every attempt fails that way
-  until the dump ends, so a leave save whose retries end first is lost but for its
-  guild books; a stuck read or a write other than a save holds its realm's pool client
-  until its own bound fails it, its lock timeout where it sets one (55P03) and
-  otherwise its statement timeout (57014), `DB_STATEMENT_TIMEOUT_MS` (15 s) for an
-  ordinary statement such as a login or a character create and
-  `DB_HEAVY_STATEMENT_TIMEOUT_MS` (60 s) for the reads and writes
-  `runWithStatementTimeout` raises, so a realm's pool can fill), and a boot during the
-  dump's opening locks can deadlock it and abort that night's backup), and in a
-  rolling restart let one realm finish shutting down before another boots; that is the
-  quiet window this file means. An aborted save shows as 40P01 in the realm log (one
-  that carried guild bank books also counts `escrow_save_failed`), and what writes it
-  again depends on the save: an autosave is written by the next autosave; a leave save
-  is retried with backoff (`server/leave_character_save.ts`), its guild books
-  reconciled if every attempt fails; a shutdown flush save is retried once only for a
-  character carrying guild bank books, and otherwise not at all. An aborted Hearth
-  trip counts `trip_failed` and is not retried by the server (the player presses the
-  key again), and neither is an aborted account or character create (the player tries
-  again). The hazard predates housing; removing both paths is owed
+  `deadlock_timeout`, 1,056 ms, and lived while the bench's "old account create", a
+  transaction that inserts an account and then a character, was aborted). A boot can
+  DEADLOCK on two paths: a transaction that holds a lock on `characters` the boot's
+  SHARE does not wait for (a plain read's ACCESS SHARE, or a row lock's ROW SHARE) and
+  then writes it, against the boot's SHARE lock on `characters` that it upgrades to
+  ACCESS EXCLUSIVE (the core `characters_account` index create, then its first ALTER);
+  and any transaction that holds a lock on `accounts` and then asks for one on
+  `characters`, against the boot's opposite order. Every effect-carrying or hooked
+  character save (storage, bank ledger, the Hearth trip) takes both shapes, and so
+  does a character create (it locks the account row, then counts characters and
+  inserts one); the housing operation prepare, the character delete and an account
+  create while community test accounts are on (`createAccount` in `server/db.ts` then
+  inserts the account and its test roster in one transaction; with them off it is one
+  INSERT into `accounts`, which only queues behind the boot) take the second.
+  PostgreSQL aborts one side at once or after one or more `deadlock_timeout` waits (1
+  s each). With such saves in flight in the bench, EVERY boot was eventually aborted
+  and saves were aborted beside it: the process exits, the compose policy restarts it,
+  and a restart meets the same race while another realm keeps serving those saves. So
+  boot a realm while the other realms on its database are quiet and outside the
+  nightly `pg_dump` (it starts at 03:15 UTC, see Backups, and holds ACCESS SHARE on
+  every table for its whole run, so a boot that starts during it takes its first lock
+  on `characters` and then waits for the dump to end to upgrade that lock, blocking
+  every realm's saves and logins while it waits (a stuck character save fails at its
+  save transaction's 2 s lock timeout, `server/character_save_transaction.ts`, with
+  55P03, and every attempt fails that way until the dump ends, so a leave save whose
+  retries end first is lost but for its guild books; a stuck read or a write other
+  than a save holds its realm's pool client until its own bound fails it, its lock
+  timeout where it sets one (55P03) and otherwise its statement timeout (57014),
+  `DB_STATEMENT_TIMEOUT_MS` (15 s) for an ordinary statement such as a login's
+  character read or a character create, and for a statement run through
+  `runWithStatementTimeout` the bound it sets, `DB_HEAVY_STATEMENT_TIMEOUT_MS` (60 s)
+  for the heavy reads and writes and 2 s or 10 s for bounded ones such as a login's
+  housing reads, so a realm's pool can fill), and a boot during the dump's opening
+  locks can deadlock it and abort that night's backup), and in a rolling restart let
+  one realm finish shutting down before another boots; that is the quiet window this
+  file means. An aborted save shows as 40P01 in the realm log (one that carried guild
+  bank books also counts `escrow_save_failed`), and what writes it again depends on
+  the save: an autosave is written by the next autosave; a leave save is retried with
+  backoff (`server/leave_character_save.ts`), its guild books reconciled if every
+  attempt fails; a shutdown flush save is retried once only for a character carrying
+  guild bank books, and otherwise not at all. An aborted Hearth trip counts
+  `trip_failed` and is not retried by the server (the player presses the key again),
+  and neither is an aborted account or character create (the player tries again). The
+  hazard predates housing; removing both paths is owed
   (docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md measures it).
 - FIRST ROLLOUT OF THE HOUSING TABLES: the first boot that carries them also creates
   the foreign-key-bearing tables and the delete guards on `accounts` and `characters`
   inside that same transaction. It takes no parent lock a steady-state boot does not
   already hold (55 to 66 ms in the bench with plain saves in flight when no deadlock
   formed, three boots of 16 waiting out `deadlock_timeout` for about 1 s and living
-  while the bench's account-then-character transaction was aborted each time, near a
-  steady-state boot's 56 to 59 ms; it shares every boot's deadlock above), but it is
-  the one boot that builds the tables, so roll it out in a quiet window. A
-  steady-state boot's housing fragments read the catalog, rewrite the guard and erase
-  functions' catalog rows, and hold no table lock to their COMMIT: their one table
-  lock is the Hearth token probe's ACCESS SHARE on `account_freehold_hearth`, taken
-  and released at once, so it waits only behind an ACCESS EXCLUSIVE holder or request
-  on that table. The boot waits there while it holds ACCESS EXCLUSIVE on `characters`
-  and `accounts`, so DDL on that table stalls every realm's saves and logins for as
-  long as the DDL waits and then holds its lock, and DDL that also wants a parent can
-  deadlock the boot: run none while a realm boots. A REPAIR boot is any boot that
-  rebuilds something a probe guards (for example a housing index, a guard or trigger,
-  or the advance token column or its CHECK): it holds that statement's lock on that
-  object's table to its COMMIT and builds a rebuilt index or a re-added column while
-  it holds both parents, for as long as the build takes, which grows with the table,
-  so stop the other realms first and boot one in a quiet window. A rebuilt housing
-  unique index that meets duplicate rows fails the boot, which rolls back whole, exits
-  and is restarted, and every restart repeats the stall. Stop the realms and change no
-  rows: escalate with the index name from the error, never the key values in its
-  DETAIL, which the fatal log line prints too, and take its columns only from the
-  boot's own `CREATE UNIQUE INDEX` of that name, found by searching `server/` for it
-  (the failed build rolled back, so `pg_indexes` has no row for it). The duplicates
-  are the defect the index exists to prevent, and resolving them is a ruling, never a
-  runbook step. (The storage fragment, which is not housing, holds its own tables:
-  some of its DDL runs unprobed and holds those tables' locks to every boot's COMMIT,
-  and its trigger repairs also touch both parents, which the boot already holds. Its
-  own repairs and their failures, its duplicate open-purchase guard among them, are
-  outside this bullet; a boot that repairs it is still a repair boot, so the other
-  realms stop first.)
+  while the bench's "old account create" was aborted each time, near a steady-state
+  boot's 56 to 59 ms; it shares every boot's deadlock above), but it is the one boot
+  that builds the tables, so roll it out in a quiet window. A steady-state boot's
+  housing fragments read the catalog, rewrite the guard and erase functions' catalog
+  rows, and hold no table lock to their COMMIT: their one table lock is the Hearth
+  token probe's ACCESS SHARE on `account_freehold_hearth`, taken and released at once,
+  so it waits only behind an ACCESS EXCLUSIVE holder or request on that table. The
+  boot waits there while it holds ACCESS EXCLUSIVE on `characters` and `accounts`, so
+  DDL on that table stalls every realm's saves and logins for as long as the DDL waits
+  and then holds its lock, and DDL that also wants a parent can deadlock the boot: run
+  none while a realm boots. A REPAIR boot is any boot that rebuilds something a probe
+  guards (for example a housing index, a guard or trigger, or the advance token column
+  or its CHECK): it holds that statement's lock on that object's table to its COMMIT
+  and builds a rebuilt index or a re-added column while it holds both parents, for as
+  long as the build takes, which grows with the table, so stop the other realms first
+  and boot one in a quiet window. A rebuilt housing unique index that meets duplicate
+  rows fails the boot, which rolls back whole, exits and is restarted, and every
+  restart repeats the stall. Stop the realms and change no rows: escalate with the
+  index name from the error, never the key values in its DETAIL, which the fatal log
+  line prints too, and take its columns only from the boot's own `CREATE UNIQUE INDEX`
+  of that name, found by searching `server/` for it (the failed build rolled back, so
+  `pg_indexes` has no row for it). The duplicates are the defect the index exists to
+  prevent, and resolving them is a ruling, never a runbook step. (The storage
+  fragment, which is not housing, holds its own tables: some of its DDL runs unprobed
+  and holds those tables' locks to every boot's COMMIT, and its trigger repairs also
+  touch both parents, which the boot already holds. Its own repairs and their
+  failures, its duplicate open-purchase guard among them, are outside this bullet; a
+  boot that repairs it is still a repair boot, so the other realms stop first.)
 - A CORRUPT Hearth row (a `ready_at_ms` past the database clock plus a whole cooldown,
   which only a backward database clock step or a bad row produces) is never honored. A
   read is the only detector: a row already bad when its account logs in reaches the

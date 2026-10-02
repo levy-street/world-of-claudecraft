@@ -672,16 +672,17 @@ ONE `ensureSchema` transaction with no `lock_timeout`. It takes no parent lock a
 boot does not (above): every boot queues behind each in-flight `characters` and `accounts`
 writer on the running fleet, and every later save and account write on every realm queues
 behind the boot until its COMMIT (measured with an old realm serving: 55 to 66 ms for the
-first rollout with plain saves in flight when no deadlock formed, three boots of 16 waiting out
-`deadlock_timeout` for about 1 s, near a steady-state boot's 56 to 59 ms, one of six waiting
-1,056 ms; each boot that waited lived, and the bench's account-then-character transaction
-beside it was aborted). ANY boot can DEADLOCK on two paths. The UPGRADE path, one table: the
-boot's first `characters` lock is SHARE (the core `characters_account` index create), upgraded
-to ACCESS EXCLUSIVE by the next statement, against a transaction that took a lock on
-`characters` that SHARE does not wait for (a save's G2 row lock, ROW SHARE, or a plain read's
-ACCESS SHARE) and then writes it. The ORDER path, two tables: a transaction that holds any
-lock on `accounts` and then asks for one on `characters`, this manifest's own G1-then-G2 order
-(every effect-carrying or hooked save, the Hearth trip's included, the operation prepare, the
+first rollout with plain saves in flight when no deadlock formed, three boots of 16 waiting
+out `deadlock_timeout` for about 1 s, near a steady-state boot's 56 to 59 ms, one of six
+waiting 1,056 ms; each boot that waited lived, and the bench's "old account create", an
+account then a character, beside it was aborted). ANY boot can DEADLOCK on two paths. The
+UPGRADE path, one table: the boot's first `characters` lock is SHARE (the core
+`characters_account` index create), upgraded to ACCESS EXCLUSIVE by the next statement,
+against a transaction that took a lock on `characters` that SHARE does not wait for (a save's
+G2 row lock, ROW SHARE, or a plain read's ACCESS SHARE, a character create's count among them)
+and then writes it. The ORDER path, two tables: a transaction that holds any lock on
+`accounts` and then asks for one on `characters`, this manifest's own G1-then-G2 order (every
+effect-carrying or hooked save, the Hearth trip's included, the operation prepare, the
 character delete, a character create and an account create while community test accounts are
 on), against the boot's `characters`-then-`accounts` order. With G1-shaped saves in flight
 every bench boot was eventually aborted and saves were aborted beside it, and a boot that
@@ -1356,6 +1357,7 @@ What changed the contract above:
   `deadlock_timeout`, and the runbook's HOLDER read runs at any point, in this database only.
 - A fifteenth round of eight fresh readers: P12 names the transaction the bench's deadlocked
   boots aborted and places the account create on the order path (only while community test
-  accounts are on, corrected in round sixteen).
+  accounts are on; the victim's name and that scope corrected in round sixteen).
 - A sixteenth round of eight fresh readers: P12 says an account create takes the order path
-  only while community test accounts are on, and a character create always does.
+  only while community test accounts are on, and a character create always does (on both
+  paths, corrected in round seventeen).
