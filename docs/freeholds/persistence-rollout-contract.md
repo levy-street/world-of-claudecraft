@@ -110,11 +110,12 @@ A server is CAPABLE when all of the following hold.
    `account_freehold_hearth_advance_token_shape` constraint, which a later boot puts back
    `NOT VALID` if the column exists without it), so an ordinary boot takes
    none of the index, trigger or ALTER TABLE locks that would hold another realm's
-   housing statements until its COMMIT (its one table lock, the token probe's ACCESS
-   SHARE on the Hearth table for the CHECK's deparse, is taken and released at once).
-   No fragment
-   references another's table, so their relative order is a convention rather than a
-   dependency, and it is fixed as plot, Hearth, claim, operation so the boot-call
+   housing statements until its COMMIT (the housing fragments' one table lock, the token
+   probe's ACCESS SHARE on the Hearth table for the CHECK's deparse, is taken and released
+   at once; the storage fragment's unprobed `ADD COLUMN IF NOT EXISTS` and index creates
+   still hold ACCESS EXCLUSIVE and SHARE on `storage_purchases` to every boot's COMMIT).
+   No fragment references another's table, so their relative order is a convention
+   rather than a dependency, and it is fixed as plot, Hearth, claim, operation so the boot-call
    ordering pin in [../../tests/schema_wiring.test.ts](../../tests/schema_wiring.test.ts)
    (by index, never containment) has one stable answer. All four are applied
    UNCONDITIONALLY, never behind `freeholdsEnabled`: the tables exist before the feature
@@ -765,26 +766,30 @@ again, stops the running one before its next chunk, cuts a chunk still parked at
 checkout, makes one that got its connection send no renewal (only its BEGIN, rolled back),
 and resolves once that pass settles or one chunk's wall
 (`FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs`, 5,000 ms) passes; that timeout bounds only the
-stop's wait, while a chunk is cut by its own wall (its socket destroyed, then a
-best-effort backend cancel through the canceller's own pool). So no renewal whose COMMIT was not yet
+stop's wait, while a chunk is cut by its own wall (its socket destroyed, then a best-effort
+backend cancel through the canceller's own pool). So no renewal whose COMMIT was not yet
 sent outlives the release; one whose COMMIT was already sent when its wall cut it client
 side can still land after the release-all passed its rows, which keeps at most one renew
 chunk of plots claimed for at most one lease TTL (the manifest's R-13, the crash bound).
 
 THE SHUTDOWN BUDGET is the whole serial chain in `server/main.ts`, not the housing tail
-alone. Only these awaits in it take a deadline at their call sites: the bank ledger's drain
+alone, and `tests/server/freehold_mutation.test.ts` pins every await in it against this
+paragraph, so a step added, removed or newly bounded fails there until it is said here.
+Only these awaits carry a deadline. At the call site: the bank ledger's drain
 (`BANK_LEDGER_SHUTDOWN_DRAIN_MS`, 10,000 ms), the market sold volume's
 (`MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS`, 10,000 ms), the housing drain
 (`FREEHOLD_PERSIST_SHUTDOWN_DRAIN_MS`, 10,000 ms), the unstuck records'
-(`UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS`, 5,000 ms), the Steam and Epic mirror stops (run
-concurrently, 5,000 ms), the renewer stop (one chunk's wall, 5,000 ms) and the claim release
-(`FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS`, 2,000 ms): 47 s of bounded waits, inside the game
-container's 75 s kill grace (`stop_grace_period` in `docker-compose.yml`). EVERY other await
-in that closure, from the collector and sweep stops before the save flush to `pool.end()` at
-its end, takes no deadline at its call site and spends from the same grace, and `pool.end()`
-also waits for any client a timed-out drain left mid-query. So a new shutdown step spends
-from what is left after all of them, and a new bounded one joins this list in the same
-change.
+(`UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS`, 5,000 ms) and the Steam and Epic mirror stops (run
+concurrently, 5,000 ms). Inside the callee: the renewer stop
+(`FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs`, 5,000 ms) and the claim release
+(`FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS`, 2,000 ms). That is 47 s of bounded waits, inside
+the game container's 75 s kill grace (`stop_grace_period` in `docker-compose.yml`). EVERY
+other await in that closure, from the collector and sweep stops before the save flush to
+`pool.end()` at its end, carries no deadline and spends from the same grace, and
+`pool.end()` also waits for every client still checked out: one a timed-out drain left
+mid-query, or one an account-wealth sweep pass in flight still holds
+(`accountWealthSweep.stop()` is not awaited). A new shutdown step spends from what is left
+after all of them.
 
 THE CLAIM RELEASE (07a) sits in the same closure, AFTER `freeholdPersistIdle` and BEFORE
 `releaseAllCharacterLeases`: `releaseAllFreeholdClaims({ pool, holder:

@@ -50,6 +50,7 @@ import {
 import { readClaimedLoginDurables } from '../../server/freehold_claim_login';
 import {
   createFreeholdClaimRegistry,
+  FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS,
   FREEHOLD_CLAIM_RENEW_BOUNDS,
   FREEHOLD_CLAIM_RENEW_CHUNK,
   FREEHOLD_CLAIM_RENEW_PASS_DEADLINE_MS,
@@ -1645,6 +1646,100 @@ describe('the claim renewer', () => {
     const releaseAt = main.indexOf('await releaseAllFreeholdClaims(');
     expect(stopAt).toBeGreaterThan(0);
     expect(releaseAt).toBeGreaterThan(stopAt);
+  });
+
+  it("pins every await of the shutdown closure to the rollout contract's budget", () => {
+    // THE SHUTDOWN BUDGET in docs/freeholds/persistence-rollout-contract.md
+    // names the bounded awaits and says every other one carries no deadline. A
+    // step added, removed or newly bounded in server/main.ts fails here until
+    // that paragraph (and this list) says so.
+    const main = stripComments(readFileSync('server/main.ts', 'utf8'));
+    const start = main.indexOf('const shutdown = async () => {');
+    const end = main.indexOf("process.on('SIGINT', shutdown);", start);
+    expect(start).toBeGreaterThan(0);
+    expect(end).toBeGreaterThan(start);
+    const awaits = [...main.slice(start, end).matchAll(/await\s+([^;]+);/g)].map((match) =>
+      match[1].replace(/\s+/g, ' ').trim(),
+    );
+    expect(awaits).toEqual([
+      'businessMetrics.stop()',
+      'bankLedgerGrowthMonitor.stop()',
+      'freeholdReceiptGrowthMonitor.stop()',
+      'stopStoragePurchaseRecovery()',
+      'retentionSweep.stop()',
+      'wocMarketSweep.stop()',
+      'wocMarketMonitor.stop()',
+      'generalChatQuotaListener.stop()',
+      "game.saveAll('shutdown')",
+      'game.saveMarket()',
+      'game.saveMail()',
+      'game.saveRifts()',
+      'game.saveFreeholds()',
+      'game.endAllPlaySessions()',
+      'bankLedgerIdle(BANK_LEDGER_SHUTDOWN_DRAIN_MS)',
+      'suspicionFlagsIdle()',
+      'deedRecordsIdle()',
+      'relicRecordsIdle()',
+      'progressEventsIdle()',
+      'craftRollEventsIdle()',
+      'soldVolumeWriterIdle(MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS)',
+      'freeholdPersistIdle(FREEHOLD_PERSIST_SHUTDOWN_DRAIN_MS)',
+      'worldQuestScoresIdle()',
+      'stopUnstuckRecords(UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS)',
+      'Promise.all([stopSteamMirror(5000), stopEpicMirror(5000)])',
+      'stopFreeholdClaimRenewer(heldClaims())',
+      'releaseAllFreeholdClaims({ pool, holder: PROCESS_LEASE_HOLDER, registry: heldClaims() })',
+      "releaseAllCharacterLeases().catch((err) => console.error('lease release-all failed:', err), )",
+      'game.parseCapture.stop()',
+      'game.chatLog.stop()',
+      'closeGeneralChatQuotaPool()',
+      'closeBackendCancelPool()',
+      'pool.end()',
+    ]);
+    // The bounded awaits and their values, read from the code: four constants
+    // passed at the call site, the mirrors' literal, and two bounds fixed
+    // inside the callee. The contract names each with its value and the sum.
+    const constantIn = (file: string, name: string): number => {
+      const found = readFileSync(file, 'utf8').match(
+        new RegExp(`export const ${name} = ([0-9_]+);`),
+      );
+      expect(found, name).not.toBeNull();
+      return Number((found as RegExpMatchArray)[1].replaceAll('_', ''));
+    };
+    const bounded: Array<[string, number]> = [
+      [
+        'BANK_LEDGER_SHUTDOWN_DRAIN_MS',
+        constantIn('server/bank_ledger.ts', 'BANK_LEDGER_SHUTDOWN_DRAIN_MS'),
+      ],
+      [
+        'MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS',
+        constantIn('server/market_sold_volume.ts', 'MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS'),
+      ],
+      [
+        'FREEHOLD_PERSIST_SHUTDOWN_DRAIN_MS',
+        constantIn('server/freehold_persist_bounds.ts', 'FREEHOLD_PERSIST_SHUTDOWN_DRAIN_MS'),
+      ],
+      [
+        'UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS',
+        constantIn('server/unstuck_records.ts', 'UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS'),
+      ],
+      ['FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs', FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs],
+      ['FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS', FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS],
+    ];
+    const mirrorsMs = 5000;
+    const contract = readFileSync('docs/freeholds/persistence-rollout-contract.md', 'utf8');
+    const at = contract.indexOf('THE SHUTDOWN BUDGET');
+    expect(at).toBeGreaterThan(-1);
+    const budget = contract.slice(at, contract.indexOf('\n\n', at)).replace(/\s+/g, ' ');
+    const ms = (value: number) => `${value.toLocaleString('en-US')} ms`;
+    for (const [name, value] of bounded) expect(budget).toContain(`\`${name}\`, ${ms(value)}`);
+    expect(budget).toContain(`run concurrently, ${ms(mirrorsMs)}`);
+    const totalMs = bounded.reduce((sum, [, value]) => sum + value, mirrorsMs);
+    expect(budget).toContain(`${totalMs / 1000} s of bounded waits`);
+    expect(budget).toContain('75 s kill grace');
+    expect(readFileSync('docker-compose.yml', 'utf8')).toMatch(
+      /\n {2}game:\n(?: {4}.*\n)*? {4}stop_grace_period: 75s\n/,
+    );
   });
 
   it('chunks at the bound, one transaction per chunk', async () => {
@@ -6643,7 +6738,7 @@ describe('the Hearth trip admission', () => {
       ['a control character', named('Bad\nName'), [line('Bad?Name')]],
       // The kept punctuation stays, and every other character outside the set
       // (a parenthesis, a space, a Unicode line separator) becomes '?'.
-      ['kept punctuation', named('Freehold.Trip$Error-2'), [line('Freehold.Trip$Error-2')]],
+      ['kept punctuation', named('Freehold_Trip.Error$-2'), [line('Freehold_Trip.Error$-2')]],
       ['other disallowed characters', named('A) B\u2028C'), [line('A??B?C')]],
       ['a long class', named('E'.repeat(100)), [line('E'.repeat(64))]],
       // A name that is not a string is reported by the thrown value's type.
