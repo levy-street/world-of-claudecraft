@@ -283,8 +283,9 @@ not stay phase-locked, and repeated event kicks coalesce into exactly one follow
   fresh; the IO deadlines on both shells are the defense there. An unwritable path is
   logged and the run still settles, so a bad mount degrades the healthcheck and never the
   bot.
-- Daily engagement grant: first message or voice-join per member per day, deduped
-  bot-side AND server-side (grant dedupe key), so it is exactly-once.
+- Daily engagement grant: a member's first guild message or voice state update carrying a
+  channel (a join, a move, a mute) per UTC day, deduped bot-side AND server-side (grant
+  dedupe key), so it is granted at most once a day (a failed grant call is not retried).
 - The adaptive active-to-idle backoff has two consumers: the outbox poll (D1: active
   decaying to idle) and the role sweep (slice interval decaying to the pass interval).
   Every other task sets `activeMs` only, so its cadence is constant. Backoff is only safe

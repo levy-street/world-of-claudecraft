@@ -385,7 +385,7 @@ async function main(): Promise<void> {
           if (channelId === null) voiceStates.delete(userId);
           else {
             voiceStates.set(userId, { userId, channelId, selfMute: d.self_mute === true });
-            grantDailyActive(userId); // joining voice counts as daily engagement
+            grantDailyActive(userId); // a voice state with a channel is daily engagement
           }
           schedulePresencePush();
           break;
@@ -681,8 +681,9 @@ async function main(): Promise<void> {
   };
 
   // Daily Discord-engagement reward: the first time a linked member posts a message
-  // or joins voice each day, grant the daily-active points. Deduped here (per user
-  // per day) AND server-side (the grant dedupe key), so it is exactly-once.
+  // or sends a voice state with a channel each day, grant the daily-active points.
+  // Deduped here (per user per day) AND server-side (the grant dedupe key); a failed
+  // grant call is not retried, so it is at most once.
   // Bot-side dedupe, emptied on the day rollover by claimDailyActive so it does
   // not accumulate an entry per member per day for the life of the process.
   const dailyActive: DailyActiveState = { seen: new Set<string>(), day: '' };

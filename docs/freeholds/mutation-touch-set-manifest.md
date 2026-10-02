@@ -1454,3 +1454,7 @@ What changed the contract above:
   adds a batch whose answer never reaches the bot, the hourly full resync's heal of a lost link
   change and the winner day posted twice, and lever 3's daily-active example counts every voice
   state change.
+- A thirty-ninth round of eight fresh readers: no P12 change; `DEPLOY.md`'s Discord bot overview
+  points to both places that say what a stop costs, the restart note and lever 3 say the bot's
+  resyncs heal a lost link change with no cadence promised, and lever 3 states the daily-active
+  rule without a list of the events that grant.

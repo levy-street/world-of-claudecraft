@@ -2255,9 +2255,10 @@ widget, in-game "!" community posts relayed as embeds, a significant-activity fe
 level, rare drops, duels, arena), daily-rewards winner posts, opt-in queue-pop direct
 messages (a player's battleground offer or arena seat, DMed to their linked account; no
 channel id to configure), and the consumer for the game's Discord outbox. It holds
-nothing durable of its own and reads and writes the game server only through the
-secret-gated `/internal/discord/*` API, so stopping it leaves the game running; the
-third escalation lever (Incident runbook below) says what a stop costs.
+nothing durable of its own and reads and writes the game server through the secret-gated
+`/internal/discord/*` API, so stopping it leaves the game running; the stop_grace_period
+paragraph under Verifying health and the third escalation lever (Incident runbook below)
+say what a stop costs.
 
 **Enabling it.** The bot is the `discord-bot` compose service (container
 `eastbrook-discord-bot`), behind the `discord` profile and sharing the game image, so
@@ -2401,10 +2402,9 @@ kills the bot rather than the game or the database sharing the host, and
 lives on the server and hands the restarted bot what is still queued, within the bounds
 lever 3 below gives, and a queue pop only while its offer stands; the queued items of a
 batch a poll already took (its 200 is the outbox's only acknowledgement) are lost if the
-bot stops before posting them or the answer never reaches it (a lost link-change item
-heals at the bot's hourly full resync), while its winner days are served again until the
-bot marks them posted, so a day posted but not yet marked when the bot stopped is posted
-again.
+bot stops before posting them or the answer never reaches it (the bot's resyncs heal a
+lost link-change item), while its winner days are served again until the bot marks them
+posted, so a day posted but not yet marked when the bot stopped is posted again.
 
 ### Fatal gateway close: the crash loop is by design
 
@@ -2484,20 +2484,19 @@ no image and is open even then:
    started again. The role, nickname, presence, relay, activity, winner, link-change and
    queue-pop delivery it makes waits, and what the outbox drops meanwhile never comes.
    Discord does not resend the events the bot missed, so what it does only in answer to
-   an event is never done for one during the stop: a linked member whose every post and
-   voice state change of a day (a join, a move, a mute) fell in the stop gets no
-   daily-active points for that day. The outbox holds its relay, activity, link-change
-   and queue-pop items in the memory of the game process the bot polls (the one
+   an event, the daily-active points it grants a linked member among it, is never done
+   for one during the stop. The outbox holds its relay, activity, link-change and
+   queue-pop items in the memory of the game process the bot polls (the one
    `GAME_SERVER_URL` names); the winner days stay in the database, where the game reads
    them. Each feed holds at most its cap (`RELAY_MAX_QUEUE`, `ACTIVITY_MAX_QUEUE`,
    `LINK_CHANGE_MAX_QUEUE`, `QUEUE_POP_MAX_QUEUE`) and, once full, drops by its own
    rule: the relay, activity and queue-pop feeds their oldest items, the link-change
-   feed its link and unlink items last (the bot's hourly full resync heals what it
-   drops); a queue pop also lapses with its offer; and any end of the game process while
-   it holds (a recreate for a shared key's edit or a release, a stop or restart, a
-   crash, the watchdog's restart) drops everything still queued. While it holds, every
-   start of the bot lifts it: any `up` of the bot (the first two levers', an Environment
-   keys edit's, the Enabling block's), a `start` or `restart`, and, with `discord` in
+   feed its link and unlink items last (the bot's resyncs heal what it drops); a queue
+   pop also lapses with its offer; and any end of the game process while it holds (a
+   recreate for a shared key's edit or a release, a stop or restart, a crash, the
+   watchdog's restart) drops everything still queued. While it holds, every start of the
+   bot lifts it: any `up` of the bot (the first two levers', an Environment keys edit's,
+   the Enabling block's), a `start` or `restart`, and, with `discord` in
    `COMPOSE_PROFILES` in `.env`, every `up -d` that names no service (stop it again
    after one, as the release steps say). So while it holds, start the bot only to lift
    it: an `.env` edit for the bot reaches it then. Lift it only as the first two levers
