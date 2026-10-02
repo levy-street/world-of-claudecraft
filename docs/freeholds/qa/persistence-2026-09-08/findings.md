@@ -5733,14 +5733,19 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   should-fix. The stall-over reading missed a boot still queued for SHARE, so its modes are now
   read off PostgreSQL's own conflicts with a token write; the gate's diagnosis decides by the
   holder's wait rather than never ending it, and a stopped realm's build may be cancelled; every
-  realm start the file gives, in the phrasings the scan reads, is listed whole and points to the
-  gate. Fixed in `5df3f2f243`.
+  realm start the file gives, in the phrasings the scan reads (narrowed in round twenty-seven), is
+  listed whole and points to the gate. Fixed in `5df3f2f243`.
 - ROUND TWENTY-SEVEN, eight fresh readers over round twenty-six: 44 findings, one blocking, 14
   should-fix. The bot's own `up` started a stopped realm past the gate and the scan let it
   through; it now runs `--no-deps`. The diagnosis now names the sessions a held build waits for
   and ends only an operator's open `psql` one, with `pg_terminate_backend`; the stall readings
   wait for every realm `healthy` or stopped; release step 6 builds every service again. Fixed in
   `9a729218d5`.
+- ROUND TWENTY-EIGHT, eight fresh readers over round twenty-seven: 48 findings, none blocking, 7
+  should-fix, every reader passing. Four Discord keys the game reads too now have the game
+  recreated first; every recreate runs `up -d --no-deps game`; the terminate rule goes by the
+  named session's pid on two readings; and the test-coverage reader's five gaps are each a real
+  PostgreSQL order or a unit pin. Fixed in `5c37d09029`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5770,7 +5775,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then
   641, then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
   then 644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then
-  647, then 648, then 648, then 648, then 648, then 648 passed, never a skip.
+  647, then 648, then 648, then 648, then 648, then 648, then 648 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
