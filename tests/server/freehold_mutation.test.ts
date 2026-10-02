@@ -1092,8 +1092,9 @@ describe('commitFreeholdMutation', () => {
     expect(failed).toEqual([]);
   });
 
-  it('keeps a proved commit committed when its live apply throws, applying it once', async () => {
+  it('keeps a proved commit committed when its live apply throws, applying it once and reporting it', async () => {
     let calls = 0;
+    const threw: unknown[] = [];
     const out = await commitFreeholdMutation(
       { save: saveThatRuns(), pool: fakePool().pool, characterId: 1 },
       HEARTH_ONLY,
@@ -1102,11 +1103,35 @@ describe('commitFreeholdMutation', () => {
           calls++;
           throw new Error('the live apply threw');
         },
+        onCommittedThrew: (error) => threw.push(error),
       },
     );
     expect(out.kind).toBe('committed');
     // Once: a throwing apply is never retried by the throw path.
     expect(calls).toBe(1);
+    expect(threw).toEqual([new Error('the live apply threw')]);
+    // A report port that throws too still leaves the commit committed, and a
+    // clean apply reports nothing.
+    const quiet: unknown[] = [];
+    const loud = await commitFreeholdMutation(
+      { save: saveThatRuns(), pool: fakePool().pool, characterId: 1 },
+      HEARTH_ONLY,
+      {
+        onCommitted: () => {
+          throw new Error('the live apply threw');
+        },
+        onCommittedThrew: () => {
+          throw new Error('the counter threw');
+        },
+      },
+    );
+    expect(loud.kind).toBe('committed');
+    await commitFreeholdMutation(
+      { save: saveThatRuns(), pool: fakePool().pool, characterId: 1 },
+      HEARTH_ONLY,
+      { onCommitted: () => {}, onCommittedThrew: (error) => quiet.push(error) },
+    );
+    expect(quiet).toEqual([]);
   });
 
   it('refuses a plot-writing mutation that is not given the plot store FIFO', async () => {
@@ -1461,7 +1486,9 @@ describe('the claim renewer', () => {
     await renewFreeholdClaims(renewDeps(idle, idlePool.pool));
     expect(idlePool.counts().connects).toBe(0);
     expect(idle.counters.renewPasses).toBe(0);
-    // A pass mid-chunk: two chunks, the first checkout held open by hand.
+    // PARKED AT ITS CHECKOUT when the stop comes: the chunk reaches its
+    // connection only after the stop, so it sends nothing and rolls back, and
+    // no renewal is left to outlive the release.
     const registry = createFreeholdClaimRegistry();
     for (let i = 0; i < FREEHOLD_CLAIM_RENEW_CHUNK + 1; i++) registry.record(claim(pad(i), i + 1));
     const f = fakePool([renewAll]);
@@ -1495,12 +1522,60 @@ describe('the claim renewer', () => {
     await pass;
     await stop;
     expect(stopped).toBe(true);
-    // The chunk in flight finished; the next one never started.
-    const renews = f.statements.filter((st) => st.text.includes('SET heartbeat_at'));
-    expect(renews).toHaveLength(1);
-    expect(registry.counters.renewed).toBe(FREEHOLD_CLAIM_RENEW_CHUNK);
-    expect(registry.counters.missedHeartbeats).toBe(1);
-    expect(warnings).toContain(
+    expect(f.statements.filter((st) => st.text.includes('SET heartbeat_at'))).toHaveLength(0);
+    expect(f.statements.map((st) => st.text)).toContain('ROLLBACK');
+    expect(registry.counters.renewed).toBe(0);
+    expect(registry.all()).toHaveLength(FREEHOLD_CLAIM_RENEW_CHUNK + 1);
+
+    // MID-STATEMENT when the stop comes (the control): the chunk holds its
+    // connection and its renew is on the wire, so it finishes, the stop waits
+    // for it, and the next chunk never starts.
+    const busy = createFreeholdClaimRegistry();
+    for (let i = 0; i < FREEHOLD_CLAIM_RENEW_CHUNK + 1; i++) busy.record(claim(pad(i), i + 1));
+    const g = fakePool([renewAll]);
+    let answer = () => {};
+    const onWire = new Promise<void>((resolve) => {
+      answer = resolve;
+    });
+    let sent = () => {};
+    const wasSent = new Promise<void>((resolve) => {
+      sent = resolve;
+    });
+    const slow = {
+      async connect() {
+        const client = await g.pool.connect();
+        return {
+          ...client,
+          async query(text: string, values?: unknown[]) {
+            if (text.includes('SET heartbeat_at')) {
+              sent();
+              await onWire;
+            }
+            return client.query(text, values);
+          },
+        };
+      },
+    } as unknown as FreeholdTxPool;
+    const busyWarnings: string[] = [];
+    const running = renewFreeholdClaims({
+      ...renewDeps(busy, slow),
+      warn: (m) => busyWarnings.push(m),
+    });
+    await wasSent;
+    let busyStopped = false;
+    const busyStop = stopFreeholdClaimRenewer(busy).then(() => {
+      busyStopped = true;
+    });
+    for (let i = 0; i < 10; i++) await Promise.resolve();
+    expect(busyStopped).toBe(false);
+    answer();
+    await running;
+    await busyStop;
+    expect(busyStopped).toBe(true);
+    expect(g.statements.filter((st) => st.text.includes('SET heartbeat_at'))).toHaveLength(1);
+    expect(busy.counters.renewed).toBe(FREEHOLD_CLAIM_RENEW_CHUNK);
+    expect(busy.counters.missedHeartbeats).toBe(1);
+    expect(busyWarnings).toContain(
       'freehold claim renew pass stopped for shutdown; 1 chunks are left to the shutdown release',
     );
     // And the realm stops it right before the shutdown release, never after.
@@ -6279,21 +6354,26 @@ describe('the Hearth trip admission', () => {
     await landed.settle();
     expect(landed.trips.counters.advanced).toBe(1);
     expect(landed.trips.counters.verifiedLanded).toBe(1);
+    expect(landed.trips.counters.verifiedNotLanded).toBe(0);
     const notLanded = tripRig({ outcome: () => ({ kind: 'not_landed', error: null }) });
     notLanded.trips.admission('account:7', 1);
     await notLanded.settle();
     expect(notLanded.trips.counters.verifiedNotLanded).toBe(1);
     expect(notLanded.trips.counters.failed).toBe(0);
+    expect(notLanded.trips.counters.verifiedLanded).toBe(0);
+    expect(notLanded.trips.counters.advanced).toBe(0);
     // Controls: an ordinary commit and an ordinary failure count neither.
     const plain = tripRig();
     plain.trips.admission('account:7', 1);
     await plain.settle();
     expect(plain.trips.counters.verifiedLanded).toBe(0);
+    expect(plain.trips.counters.verifiedNotLanded).toBe(0);
     const failed = tripRig({ outcome: () => ({ kind: 'failed', error: null }) });
     failed.trips.admission('account:7', 1);
     await failed.settle();
     expect(failed.trips.counters.failed).toBe(1);
     expect(failed.trips.counters.verifiedNotLanded).toBe(0);
+    expect(failed.trips.counters.verifiedLanded).toBe(0);
   });
 
   it('reuses the player-waiting bound for the memo and the trip wait, both pinned literally', () => {
@@ -6439,7 +6519,42 @@ describe('the Hearth trip admission', () => {
     await drain();
     expect(trips.counters.advanced).toBe(1);
     expect(trips.counters.threwAfterOutcome).toBe(1);
-    expect(warnings).toEqual(['freehold hearth trip threw after its outcome was counted']);
+    // The error's class, never its message.
+    expect(warnings).toEqual(['freehold hearth trip threw after its outcome was counted (Error)']);
+  });
+
+  it('keeps a throwing warn port and a throwing clock inside the trip: counted, the flag cleared', async () => {
+    const sessions = new Map([[1, { pid: 1, characterId: 10, accountId: 7, leaseNonce: 'n1' }]]);
+    // A warn port that throws after the outcome: still one count, no rejection.
+    const loud = createFreeholdHearthTrips(
+      hostOver(sessions, {
+        redispatch: () => {
+          throw new Error('the sim threw on the re-dispatch');
+        },
+        warn: () => {
+          throw new Error('the log sink is gone');
+        },
+      }),
+    );
+    loud.admission('account:7', 1);
+    await drain();
+    expect(loud.counters).toMatchObject({ advanced: 1, threwAfterOutcome: 1 });
+    // A clock that throws only TIMES nothing: the outcome is counted, nothing
+    // is booked as a throw, and the account's in-flight flag is cleared.
+    let reads = 0;
+    const timeless = createFreeholdHearthTrips(
+      hostOver(sessions, {
+        nowMs: () => {
+          reads += 1;
+          if (reads > 1) throw new Error('the clock port threw');
+          return 1;
+        },
+      }),
+    );
+    timeless.admission('account:7', 1);
+    await drain();
+    expect(timeless.counters).toMatchObject({ advanced: 1, threwAfterOutcome: 0, tripMsTotal: 0 });
+    expect(timeless.inFlight(7)).toBe(false);
   });
 
   it("bounds the trip save's waits through the host's signal port at the player-waiting bound", async () => {

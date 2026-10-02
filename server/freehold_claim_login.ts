@@ -65,7 +65,11 @@ export const FREEHOLD_CLAIM_LOGIN_BOUNDS = Object.freeze({
 /** Carries the claim-busy answer out of the transaction (so it commits nothing
  *  further and the row is never read). */
 class ClaimBusy extends Error {
-  constructor(readonly plotId: string) {
+  constructor(
+    readonly plotId: string,
+    /** The acquire's lock bound ran out (55P03), rather than a live claim. */
+    readonly contention = false,
+  ) {
     super('freehold claim busy');
   }
 }
@@ -155,10 +159,7 @@ async function claimedLoginRead(
           ttlSeconds: deps.ttlSeconds,
         });
       } catch (error) {
-        if (contentionCode(error)) {
-          registry.counters.busyContention++;
-          throw new ClaimBusy(plotId);
-        }
+        if (contentionCode(error)) throw new ClaimBusy(plotId, true);
         throw error;
       }
       if (claim.kind === 'busy') throw new ClaimBusy(plotId);
@@ -166,9 +167,13 @@ async function claimedLoginRead(
     }
     return deps.readRow(db);
   };
-  const busy = (plotId: string): FreeholdRowLoad => {
+  // Both counts at the ONE place a busy answer is made, so the contention
+  // count stays a subset of busy even when a failed rollback replaces the
+  // ClaimBusy with another error (that login then holds, never answers busy).
+  const busy = (refusal: ClaimBusy): FreeholdRowLoad => {
     registry.counters.busy++;
-    return { kind: 'claim_busy', plotIndex: 0, plotId };
+    if (refusal.contention) registry.counters.busyContention++;
+    return { kind: 'claim_busy', plotIndex: 0, plotId: refusal.plotId };
   };
   const record = () => {
     if (acquired === null) return;
@@ -210,7 +215,7 @@ async function claimedLoginRead(
     return { row, hearth: hearth as FreeholdHearthAnswer };
   } catch (error) {
     if (error instanceof ClaimBusy) {
-      return { row: busy(error.plotId), hearth: hearth ?? { kind: 'threw', error } };
+      return { row: busy(error), hearth: hearth ?? { kind: 'threw', error } };
     }
     // A clock fault: the plot half again, alone, with the clock answered cold.
     if (hearth !== undefined && hearth.kind === 'threw' && acquired === null) {
@@ -226,7 +231,7 @@ async function claimedLoginRead(
         record();
         return { row, hearth: clock };
       } catch (retryError) {
-        if (retryError instanceof ClaimBusy) return { row: busy(retryError.plotId), hearth: clock };
+        if (retryError instanceof ClaimBusy) return { row: busy(retryError), hearth: clock };
         throw retryError;
       }
     }

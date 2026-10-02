@@ -543,10 +543,12 @@ export async function renewFreeholdClaims(deps: FreeholdClaimRenewerDeps): Promi
 
 /**
  * Stop the renewer for shutdown (server/main.ts, right before
- * releaseAllFreeholdClaims): no pass starts again, the running one stops
- * before its next chunk, and this resolves once that pass has settled or one
- * chunk's wall (FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs) has passed, whichever is
- * first. Without it, a renew chunk still holding its rows when the release-all
+ * releaseAllFreeholdClaims): no pass starts again (a stopped registry stays
+ * stopped), the running one stops before its next chunk, a chunk that reaches
+ * its connection after the stop sends nothing, and this resolves once that pass
+ * has settled or one chunk's wall (FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs) has
+ * passed, whichever is first; a chunk already mid-statement ends by that same
+ * wall. Without it, a renew chunk still holding its rows when the release-all
  * runs is passed over by SKIP LOCKED, then commits a renewal that keeps those
  * plots claimed by a dead process for a whole TTL. Never rejects.
  */
@@ -562,10 +564,18 @@ export async function stopFreeholdClaimRenewer(registry?: FreeholdClaimRegistry)
   if (!settled) return;
   const bound = AbortSignal.timeout(FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs);
   await new Promise<void>((resolve) => {
-    void settled.then(resolve);
-    bound.addEventListener('abort', () => resolve(), { once: true });
+    const done = (): void => {
+      bound.removeEventListener('abort', done);
+      resolve();
+    };
+    void settled.then(done);
+    bound.addEventListener('abort', done, { once: true });
   });
 }
+
+/** Thrown inside a renew chunk's transaction that started after the stop, so
+ *  it rolls back having sent nothing. Never escapes this module. */
+class RenewerStopped extends Error {}
 
 async function renewPass(
   deps: FreeholdClaimRenewerDeps,
@@ -676,6 +686,9 @@ async function renewPass(
         deps.pool,
         FREEHOLD_CLAIM_RENEW_BOUNDS,
         async (tx) => {
+          // A chunk that reached its connection after the stop sends nothing:
+          // a renewal parked at its checkout must not outlive the release.
+          if (state.stopping) throw new RenewerStopped();
           const ids = chunk.map((claim) => claim.plotId);
           // SKIP LOCKED: a row a trip or a write holds right now is passed
           // over rather than waited for, so one contended plot cannot fail its

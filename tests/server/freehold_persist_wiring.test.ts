@@ -2,12 +2,13 @@
 // port binding (server/freehold_persist_wiring.ts): which held claims the realm
 // still WANTS (each of the four arms on its own, against a control), the
 // recovery pass's admission (no gate admits, a gate without an immediate
-// permit skips), and the renewer's synchronous launch reaching the save
-// observer that bills the Tick Profiler. The nearest suite,
+// permit skips), the renewer's synchronous launch reaching the save observer
+// that bills the Tick Profiler, and the lease TTL its renew statement carries.
+// The nearest suite,
 // tests/server/freehold_mutation.test.ts, drives renewFreeholdClaims with its
 // own injected `wanted` and never reaches the realm's predicate.
 //
-// Cost: 5 ms
+// Cost: 7 ms
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../server/db', () => ({
@@ -20,6 +21,7 @@ vi.mock('../../server/db', () => ({
   runWithStatementTimeout: vi.fn(),
 }));
 
+import { pool } from '../../server/db';
 import { createFreeholdClaimRegistry } from '../../server/freehold_claim_registry';
 import { FREEHOLD_PERSIST_LOGIN_BUDGET_MS } from '../../server/freehold_persist';
 import {
@@ -93,5 +95,42 @@ describe('renewGameFreeholdClaims', () => {
     // Control: without an observer it still runs.
     await renewGameFreeholdClaims(sim, { wantsClaim: () => false }, registry);
     expect(registry.counters.renewPasses).toBe(2);
+    // An observer that throws still hands back the pass, which runs.
+    const kept = renewGameFreeholdClaims(sim, { wantsClaim: () => false }, registry, () => {
+      throw new Error('the profiler observer threw');
+    });
+    expect(kept).toBeInstanceOf(Promise);
+    await kept;
+    expect(registry.counters.renewPasses).toBe(3);
+  });
+});
+
+describe('the renewer the realm launches', () => {
+  it('sends its renew statement the realm lease TTL, 90 s, read from the statement itself', async () => {
+    // The pg suite proves the database keeps a claim alive at 90 s; this pins
+    // that the realm's renewer is the one handed it.
+    const statements: { text: string; values?: readonly unknown[] }[] = [];
+    const client = {
+      query: vi.fn(async (text: string, values?: readonly unknown[]) => {
+        statements.push({ text, values });
+        if (text.includes('SET heartbeat_at')) {
+          return { rows: [{ plot_id: 'plot:a' }], rowCount: 1, command: 'UPDATE' };
+        }
+        return { rows: [], rowCount: 0, command: text === 'COMMIT' ? 'COMMIT' : 'SELECT' };
+      }),
+      release: vi.fn(),
+      on: vi.fn(),
+      removeListener: vi.fn(),
+    };
+    vi.mocked(pool.connect).mockImplementationOnce(async () => client as never);
+    const registry = createFreeholdClaimRegistry();
+    registry.record(claim);
+    const sim = { ctx: { freeholds: new Map([[OWNER, {}]]) } } as never;
+    await renewGameFreeholdClaims(sim, { wantsClaim: () => false }, registry);
+    const renew = statements.find((st) => st.text.includes('SET heartbeat_at'));
+    // [holder, TTL seconds, the chunk's ids]: the TTL is the literal 90.
+    expect(renew?.values?.[1]).toBe(90);
+    expect(renew?.values?.[2]).toEqual(['plot:a']);
+    expect(registry.counters.renewed).toBe(1);
   });
 });

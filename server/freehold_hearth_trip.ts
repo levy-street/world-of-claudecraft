@@ -163,13 +163,12 @@ export interface FreeholdHearthTripHost {
 
 type TicketVerdict = 'admit' | 'deny';
 
-/** Bound to the (ownerKey, pid, characterId, leaseNonce) of the session it was
- *  minted for (the manifest's section 4): consumed only by that session. */
+/** Bound to the session object it was minted for, and so to its (ownerKey,
+ *  pid, characterId, leaseNonce) (the manifest's section 4): consumed only by
+ *  that same live session, under the one identity rule `sameSession` states. */
 interface Ticket {
   readonly ownerKey: string;
-  readonly pid: number;
-  readonly characterId: number;
-  readonly leaseNonce: string | undefined;
+  readonly session: FreeholdHearthTripSession;
   readonly verdict: TicketVerdict;
   consumed: boolean;
 }
@@ -190,7 +189,7 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
   // One entry per account with a trip in flight: the trip's identity and the
   // pid it re-dispatches. Bounded by the trip's save, never by a leave: the
   // save's WAITS (the character FIFO, the market writer, the background permit)
-  // take the trip's wait signal (FREEHOLD_HEARTH_TRIP_MEMO_MS), its transaction
+  // take the trip's wait signal (FREEHOLD_HEARTH_TRIP_WAIT_MS), its transaction
   // its own wall deadline and the verify FREEHOLD_VERIFY_BOUNDS, so the commit
   // always settles and run()'s finally always clears its entry.
   const pending = new Map<number, { readonly trip: number; readonly pid: number }>();
@@ -222,14 +221,7 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
     session: FreeholdHearthTripSession,
     verdict: TicketVerdict,
   ): 'consumed' | 'dropped' | 'refused' {
-    const minted: Ticket = {
-      ownerKey,
-      pid: session.pid,
-      characterId: session.characterId,
-      leaseNonce: session.leaseNonce,
-      verdict,
-      consumed: false,
-    };
+    const minted: Ticket = { ownerKey, session, verdict, consumed: false };
     ticket = minted;
     let met: FreeholdHearthRedispatch;
     try {
@@ -248,7 +240,16 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
     claim: FreeholdClaimFence | undefined,
     trip: number,
   ): Promise<void> {
-    const startedAtMs = host.nowMs();
+    // The clock only times the trip: a reading that throws times nothing, and
+    // never escapes before the outcome is counted and the flag cleared.
+    const clock = (): number => {
+      try {
+        return host.nowMs();
+      } catch {
+        return Number.NaN;
+      }
+    };
+    const startedAtMs = clock();
     let outcome: FreeholdMutationOutcome;
     try {
       outcome = await host.commit(
@@ -269,7 +270,8 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
     } finally {
       // Compare-and-delete: only THIS trip may clear the account's flag.
       if (pending.get(accountId)?.trip === trip) pending.delete(accountId);
-      counters.tripMsTotal += Math.max(0, host.nowMs() - startedAtMs);
+      const tookMs = clock() - startedAtMs;
+      if (Number.isFinite(tookMs) && tookMs > 0) counters.tripMsTotal += tookMs;
     }
     let verdict: TicketVerdict = 'deny';
     let readyAtMs: number | null = null;
@@ -351,17 +353,10 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
 
   return {
     admission(ownerKey, pid) {
-      if (ticket !== null && ticket.ownerKey === ownerKey && ticket.pid === pid) {
+      if (ticket !== null && ticket.ownerKey === ownerKey && ticket.session.pid === pid) {
         // The ticket names its session; any other session on that pid (a
         // takeover inside the re-dispatch) is refused and never consumes it.
-        const live = host.sessionForPid(pid);
-        if (
-          !live ||
-          live.characterId !== ticket.characterId ||
-          live.leaseNonce !== ticket.leaseNonce
-        ) {
-          return 'deny';
-        }
+        if (!sameSession(ticket.session, host.sessionForPid(pid))) return 'deny';
         ticket.consumed = true;
         return ticket.verdict;
       }
@@ -410,9 +405,14 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
         // Every outcome was counted before anything that can throw runs (the
         // re-dispatch into the sim, a merge), so a throw here is its own count
         // and line, never an unhandled rejection.
-        .catch(() => {
+        .catch((error: unknown) => {
           counters.threwAfterOutcome++;
-          host.warn('freehold hearth trip threw after its outcome was counted');
+          // The error's CLASS only (code-defined, bounded), never its message,
+          // which may carry a value; and a warn port that throws stays here.
+          const kind = error instanceof Error ? error.name.slice(0, 64) : typeof error;
+          try {
+            host.warn(`freehold hearth trip threw after its outcome was counted (${kind})`);
+          } catch {}
         });
       return 'pending';
     },

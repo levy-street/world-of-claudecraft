@@ -267,6 +267,10 @@ export function renewGameFreeholdClaims(
     nowMs: Date.now,
     warn: (message) => console.warn(message),
   });
-  onSyncMs?.(performance.now() - launchedAt);
+  // The observer only times the launch: one that throws must never cost the
+  // flush its handle on the pass (whose own rejection the flush reports).
+  try {
+    onSyncMs?.(performance.now() - launchedAt);
+  } catch {}
   return pass;
 }

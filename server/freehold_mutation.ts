@@ -96,7 +96,8 @@ export interface FreeholdOperationApply {
   readonly fingerprint: string;
   /** The plot the intent was prepared for (null for a plot-less one). A
    *  plot-scoped apply writes that plot in the SAME request under the same
-   *  fence and revision, so the receipt's applied revision is that write's. */
+   *  fence and revision, so for an UPDATE the receipt's applied revision is
+   *  that write's; an insert-first apply (no expected revision) records none. */
   readonly plotId: string | null;
   readonly fenceGeneration: string | null;
   readonly expectedDurableRev: string | null;
@@ -479,7 +480,9 @@ export interface FreeholdMutationDeps {
  * only while no store write can re-stamp it. `onCommitted` runs synchronously
  * inside it right after a proved COMMIT, so a live plan applied there is
  * visible to the store's next write; it must not throw, and a throw is
- * swallowed so it can never rewrite a proved commit into a failure. A save
+ * swallowed (reported through `onCommittedThrew`, which the caller that binds
+ * the apply binds to count it) so it can never rewrite a proved commit into a
+ * failure. A save
  * that throws AFTER a proved COMMIT (a legacy tail, a host hook) is still
  * `committed`: the durable halves stand. The verify runs inside the same
  * character-FIFO job.
@@ -493,6 +496,9 @@ export async function commitFreeholdMutation(
     readonly onCommitted?: (
       outcome: Extract<FreeholdMutationOutcome, { kind: 'committed' }>,
     ) => void;
+    /** Told when onCommitted threw, so the caller that binds the live apply
+     *  also counts its failure; it must not throw either. */
+    readonly onCommittedThrew?: (error: unknown) => void;
   } = {},
 ): Promise<FreeholdMutationOutcome> {
   if (request.plots.length > 0 && !opts.serialize) {
@@ -524,10 +530,14 @@ export async function commitFreeholdMutation(
   const runOnCommitted = (verified: boolean) => {
     try {
       opts.onCommitted?.(committedOutcome(verified));
-    } catch {
+    } catch (error) {
       // Contract: onCommitted does not throw. The durable halves committed, so
       // a live apply that throws is the caller's to repair on its next
-      // authoritative reload; it never turns the outcome into a failure.
+      // authoritative reload; it never turns the outcome into a failure, and
+      // the caller hears of it to count it.
+      try {
+        opts.onCommittedThrew?.(error);
+      } catch {}
     }
   };
   // Around the whole FIFO job: the live apply right after a proved commit,
