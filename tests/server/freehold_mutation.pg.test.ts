@@ -3721,16 +3721,46 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       expect(await count('oauth_device_codes')).toBe(1);
       expect(await count('discord_oauth_states')).toBe(1);
       expect(await count('github_oauth_states')).toBe(1);
-      // DEPLOY's check that the sign-out committed, pinned whole: above 0
-      // before it, 0 after it, read from another session.
+      // DEPLOY's check that the sign-out committed, pinned whole with its
+      // wording: a sign-out still open in its own session reads 0 there and
+      // the full count from a new session, which reads 0 once it commits.
       const signedOut = operatorSql('SELECT (SELECT count(*) FROM auth_tokens');
       expect(signedOut).toBe(
         'SELECT (SELECT count(*) FROM auth_tokens WHERE expires_at > now()) + (SELECT count(*) FROM oauth_codes) + (SELECT count(*) FROM oauth_device_codes) + (SELECT count(*) FROM discord_oauth_states) + (SELECT count(*) FROM github_oauth_states) AS left;',
       );
-      const left = async () => Number((await pool.query(signedOut)).rows[0].left);
-      expect(await left()).toBeGreaterThan(0);
-      await pool.query(operatorSql('DELETE FROM auth_tokens'));
-      expect(await left()).toBe(0);
+      expect(bootBullet()).toContain(
+        'then from a new psql session `SELECT (SELECT count(*) FROM auth_tokens',
+      );
+      expect(bootBullet()).toContain(
+        'returns 0 (else it has not committed, or a realm on the database still runs: stop that realm, COMMIT the sign-out in its own session if that session is still open or else run it again, then read the count again)',
+      );
+      const { Client } = await import('pg');
+      const { materialSourceConnection } = await import('../../server/material_source_connection');
+      const session = () => {
+        const client = new Client({ ...materialSourceConnection(verifyUrl(ADMIN_URL)) });
+        client.on('error', () => {});
+        return client;
+      };
+      const signer = session();
+      const fresh = session();
+      try {
+        await signer.connect();
+        await fresh.connect();
+        const leftOn = async (client: typeof signer) =>
+          Number((await client.query(signedOut)).rows[0].left);
+        const before = await leftOn(fresh);
+        expect(before).toBeGreaterThan(0);
+        await signer.query('BEGIN');
+        await signer.query(operatorSql('DELETE FROM auth_tokens'));
+        expect(await leftOn(signer)).toBe(0);
+        expect(await leftOn(fresh)).toBe(before);
+        await signer.query('COMMIT');
+        expect(await leftOn(fresh)).toBe(0);
+      } finally {
+        await signer.query('ROLLBACK').catch(() => {});
+        await signer.end().catch(() => {});
+        await fresh.end().catch(() => {});
+      }
       expect(await db.accountAndScopeForToken(full)).toBeNull();
       expect(await db.accountAndScopeForToken(read)).toBeNull();
       expect(await count('auth_tokens WHERE expires_at > now()')).toBe(0);
@@ -4173,7 +4203,11 @@ d('the housing mutation boundary (REAL Postgres)', () => {
               ).rows[0];
               return { idle: Number(row.idle), open: Number(row.open), gap: String(row.gap) };
             };
-            // Left open, it grows by exactly as much as its transaction did.
+            // Left open, it grows by exactly as much as its transaction did,
+            // as DEPLOY's rule reads.
+            expect(bootBullet()).toContain(
+              "taken in psql's default autocommit, its `open_for` grown by those seconds and its `open_for` less its `idle_for` the same on both (the same transaction, and it ran no statement in between): an operator's session left open.",
+            );
             const before = await reading();
             await sleep(300);
             const after = await reading();
@@ -4335,6 +4369,16 @@ d('the housing mutation boundary (REAL Postgres)', () => {
               blocked_by: [lockerPid],
             },
           ]);
+          // DEPLOY's hand-drop lookup leaves this runner's drop out, though the
+          // same lookup without its `psql` scope finds it.
+          expect((await pool.query(lookup)).rows).toEqual([]);
+          expect(
+            (
+              await pool.query(
+                "SELECT pid FROM pg_stat_activity WHERE datname = current_database() AND state = 'active' AND query LIKE 'DROP INDEX CONCURRENTLY%'",
+              )
+            ).rows.map((r: { pid: number }) => r.pid),
+          ).toEqual([dropperPid]);
           await locker.query('COMMIT');
           await dropping;
           await dropper.query('SELECT pg_advisory_unlock($1)', [0x57_4f_43_01]);

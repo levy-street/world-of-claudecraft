@@ -2284,6 +2284,31 @@ describe('the claim renewer', () => {
       if (noRealm.test(site) || ownGate(flat)) continue;
       expect(flat, site).toContain('Index builds under EVERY BOOT LOCKS THE PARENTS');
     }
+    // The bot moves to a release's image only after the verification, behind
+    // its guard: step 6's block names no bot, the guarded line sits after the
+    // verify block, and the rollback and the profile-host caveat say so.
+    const step6At = deploy.indexOf('\nsudo docker compose build\n');
+    const verifyAt = deploy.indexOf('\nThen verify, before you walk away:\n');
+    expect(step6At).toBeGreaterThan(-1);
+    expect(verifyAt).toBeGreaterThan(step6At);
+    expect(deploy.slice(step6At, verifyAt)).not.toContain('discord-bot');
+    const guardedAt = deploy.indexOf(
+      `\nif [ "$(sudo docker inspect -f '{{.State.Running}}' eastbrook-discord-bot 2>/dev/null)" = true ]; then\n  sudo docker compose --profile discord up -d --no-deps discord-bot\nfi\n`,
+    );
+    expect(guardedAt).toBeGreaterThan(verifyAt);
+    expect(serviceBlock('discord-bot')).toContain('\n    container_name: eastbrook-discord-bot\n');
+    const flatDeploy = deploy.replace(/\s+/g, ' ');
+    for (const sentence of [
+      "and after any rollback run the bot's guarded line below, which moves a running bot to the image the game now runs and skips one that does not run.",
+      "With `COMPOSE_PROFILES=discord` in `.env`, step 6's `up -d` has already started the bot on the new image before the verification, a bot stopped by that lever included: on such a host, if that lever still holds, stop the bot again by it right after step 6.",
+      '**Escalation levers**, in order. The first two are each an `.env` edit (not while an image built for a coming release waits; Environment keys above) plus `sudo docker compose --profile discord up -d --no-deps discord-bot`; the third, a stop, starts no image and is open even then:',
+      '(whose step 6 starts with `up -d` every service outside a profile, the bot too where `.env` sets `COMPOSE_PROFILES=discord`, and the bot elsewhere once the realm is verified)',
+    ]) {
+      expect(flatDeploy).toContain(sentence);
+    }
+    const keysAt = deploy.indexOf('\n### Environment keys\n');
+    expect(keysAt).toBeGreaterThan(-1);
+    expect(keysAt).toBeLessThan(deploy.indexOf('**Escalation levers**'));
     // Release step 6 builds every service with a build section, and those are
     // the game's and the wiki's.
     expect(deploy).toContain('\nsudo docker compose build\n');
@@ -2330,9 +2355,17 @@ describe('the claim renewer', () => {
     );
     // And the `.env` variables both blocks read are the image tag and the same
     // four, so an `.env` edit reaches both containers only through those.
+    for (const name of ['game', 'discord-bot']) {
+      expect(serviceBlock(name), name).not.toMatch(/\n {4}env_file:/);
+    }
     const envRefs = (name: string) => [
-      ...new Set([...serviceBlock(name).matchAll(/\$\{([A-Z][A-Z0-9_]*)/g)].map((m) => m[1])),
+      ...new Set(
+        [...serviceBlock(name).matchAll(/(?<!\$)\$\{?([A-Z][A-Z0-9_]*)/g)].map((m) => m[1]),
+      ),
     ];
+    expect(
+      [...`a $${'{'}B_1:-x} $C2 $$D`.matchAll(/(?<!\$)\$\{?([A-Z][A-Z0-9_]*)/g)].map((m) => m[1]),
+    ).toEqual(['B_1', 'C2']);
     expect(envRefs('discord-bot')).toContain('PUBLIC_GAME_URL');
     expect(envRefs('game')).not.toContain('PUBLIC_GAME_URL');
     const gameRefs = new Set(envRefs('game'));

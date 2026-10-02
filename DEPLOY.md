@@ -179,16 +179,19 @@ sudo docker inspect -f '{{.State.Health.Status}}' eastbrook-game
 sudo docker compose logs game --since 10m
 ```
 
-A container that never leaves `starting`, or that flips to `unhealthy`, is telling
-you the world loop is not completing passes: roll back rather than leaving it up,
-starting the older build by the same gate (Index builds under EVERY BOOT LOCKS THE
-PARENTS). The bot's line below runs only once the realm is verified, so a rollback
-before it leaves the bot on the older image; with `COMPOSE_PROFILES=discord` in `.env`,
-step 6's `up -d` moved the bot too, so after the rollback run that line again.
+A container that never leaves `starting`, or that flips to `unhealthy`, is telling you
+the world loop is not completing passes: roll back rather than leaving it up, starting
+the older build by the same gate (Index builds under EVERY BOOT LOCKS THE PARENTS),
+and after any rollback run the bot's guarded line below, which moves a running bot to
+the image the game now runs and skips one that does not run.
 
-Once the realm is verified, run the Discord bot on the new image too where it runs (it
-runs the game's image, and an `up -d` without its profile leaves it on the old one); the
-guard skips a host that runs no bot, or one stopped as an escalation lever:
+Once the realm is verified, run the Discord bot on the new image too where it runs: it
+runs the game's image, and an `up -d` without its profile leaves it on the older one,
+so until then it runs that one beside the new game. The guard skips a host that runs
+no bot, or one stopped by the third escalation lever. With `COMPOSE_PROFILES=discord`
+in `.env`, step 6's `up -d` has already started the bot on the new image before the
+verification, a bot stopped by that lever included: on such a host, if that lever
+still holds, stop the bot again by it right after step 6.
 
 ```bash
 if [ "$(sudo docker inspect -f '{{.State.Running}}' eastbrook-discord-bot 2>/dev/null)" = true ]; then
@@ -1233,16 +1236,18 @@ For off-box safety, sync the directory to S3 occasionally:
     on 40P01 run it again); then from a new psql session `SELECT (SELECT count(*) FROM
     auth_tokens WHERE expires_at > now()) + (SELECT count(*) FROM oauth_codes) + (SELECT
     count(*) FROM oauth_device_codes) + (SELECT count(*) FROM discord_oauth_states) +
-    (SELECT count(*) FROM github_oauth_states) AS left;` returns 0 (else the sign-out
-    has not committed: COMMIT it in its own session, or run it again); and, once the
-    dump has ended if the stall was behind one, start the realms again by Index builds
-    below. Re-run the deactivation housing receipt erase for deactivated accounts that
-    still hold receipts by the bullet below that begins "A failed deactivation receipt
-    erase" (a deactivation stopped at its revoke never reached the erase, so it logged
-    no warning). A sign-out undoes nothing a leftover token did before it (for example a
-    sign-in link it added, a recovery email it set, or anything its live session did in
-    game): this bullet does not recover an account the stall left open to whoever held
-    such a token, and that recovery is owed.
+    (SELECT count(*) FROM github_oauth_states) AS left;` returns 0 (else it has not
+    committed, or a realm on the database still runs: stop that realm, COMMIT the
+    sign-out in its own session if that session is still open or else run it again, then
+    read the count again); and, once the dump has ended if the stall was behind one,
+    start the realms again by Index builds below. Re-run the deactivation housing
+    receipt erase for deactivated accounts that still hold receipts by the bullet below
+    that begins "A failed deactivation receipt erase" (a deactivation stopped at its
+    revoke never reached the erase, so it logged no warning). A sign-out undoes nothing
+    a leftover token did before it (for example a sign-in link it added, a recovery
+    email it set, or anything its live session did in game): this bullet does not
+    recover an account the stall left open to whoever held such a token, and that
+    recovery is owed.
   - Index builds: after it listens, a realm's runner takes the schema advisory lock,
     then for each index of `server/concurrent_indexes.ts` in turn drops it if INVALID,
     builds it if missing, with CREATE INDEX CONCURRENTLY, and drops any index it
@@ -1265,10 +1270,10 @@ For off-box safety, sync the directory to S3 occasionally:
     before; start no realm until it returns (the gate does not see a drop run by hand;
     if it does not return, `SELECT pid FROM pg_stat_activity WHERE datname =
     current_database() AND application_name = 'psql' AND state = 'active' AND query LIKE
-    'DROP INDEX CONCURRENTLY%';` from another psql session gives the drop's pid, with
-    which the naming statement below names the session it waits for, and the same rule
-    decides). A realm's own stop or crash does not end a build already running (a
-    backend running a statement does not read its socket while
+    'DROP INDEX CONCURRENTLY%';` from another psql session on the realm database gives
+    the drop's pid, with which the naming statement below names the session it waits
+    for, and the same rule decides). A realm's own stop or crash does not end a build
+    already running (a backend running a statement does not read its socket while
     `client_connection_check_interval` is off, the default), which runs on, holding the
     lock, until it ends. A boot or another realm's runner that waits on that lock while
     a build runs can deadlock with it, and then one of the two is aborted (40P01): the
@@ -1288,59 +1293,59 @@ For off-box safety, sync the directory to S3 occasionally:
     on the schema advisory lock, `SCHEMA_ADVISORY_LOCK_KEY`;
     `pg_stat_progress_create_index` reads 0 before a build starts, during a drop and
     between two builds). A start that recreates the game container after an `.env` edit
-    outside a release (whose step 6 starts every service outside a profile with `up -d`,
-    and the bot once the realm is verified) is
-    `sudo docker compose up -d --no-deps game`, its readings just before it, since it
-    stops and starts the realm in one step, or after `sudo docker compose stop game` and
-    then the readings (`--no-deps` keeps `up` from recreating the database the game
-    depends on, and `up` starts whatever image the tag names now, so never while an
-    image built for a coming release waits). A start after the first runs beside the
-    realms already serving, so outside the quiet window, though still outside the
-    nightly `pg_dump` (The nightly dump above), and its boot can be aborted and
-    restarted (Deadlocks above). If a reading stays above 0, `SELECT l.pid, l.granted,
-    a.wait_event_type, a.wait_event, p.phase, pg_blocking_pids(l.pid) AS blocked_by,
-    now() - a.query_start AS waited FROM pg_locks l JOIN pg_stat_activity a USING (pid)
-    LEFT JOIN pg_stat_progress_create_index p USING (pid) WHERE l.locktype = 'advisory'
-    AND l.classid = 0 AND l.objid = 1464812289 AND l.objsubid = 1 AND l.database =
-    (SELECT oid FROM pg_database WHERE datname = current_database());` lists the lock's
-    holder (`granted`) and its waiters, what each waits on, and the pids each waits for
-    (`blocked_by`), and `SELECT pid, application_name, state, now() - xact_start AS
-    open_for, now() - state_change AS idle_for FROM pg_stat_activity WHERE pid =
-    ANY(pg_blocking_pids(<pid>));` names the sessions the holder `<pid>` waits for now
-    (on `virtualxid` a build or a drop waits for them one at a time, so it names one;
-    read it again once that one ends). The holder's wait decides. On `relation` it is a
-    boot, or a runner's create, drop or receipts VALIDATE (which gives up at its own
-    lock timeout), queued for a table lock: if one of those sessions is the nightly dump
-    (`pg_dump`), follow The nightly dump above; otherwise it waits for them to end their
-    transactions. On `virtualxid` it is a build (`phase` names its wait) or a drop,
-    waiting for each of those sessions to end its transaction: each wrote or locked its
-    table, or held an older snapshot when the wait began (a REPEATABLE READ transaction
-    such as the nightly dump, or a statement running then; an idle READ COMMITTED
-    transaction holds none, but one whose statement was running then can be waited for
-    until its transaction ends). Otherwise it is working: wait. End one of those
-    sessions, by the `pid` the naming statement returns for it, never the holder's, only
-    if it reads `psql` and `idle in transaction` on two readings a few seconds apart,
-    taken in psql's default autocommit, its `idle_for` grown by exactly as much as its
-    `open_for`, a few seconds (the same transaction, and it ran no statement in
-    between): an operator's session left open. If it is yours
-    (`SELECT pg_backend_pid();` in each psql session you have open names its pid),
-    COMMIT or ROLLBACK it instead, knowing what it holds (COMMIT a sign-out above); else
-    end it with `SELECT pg_terminate_backend(<pid>);`, which rolls its transaction back
-    (a cancel does nothing to an idle session), so whoever left it open runs again what
-    it had not committed. A sign-out above that a terminate or a ROLLBACK undid runs
-    again from that bullet's stop of every realm, since the realm whose boot waited on
-    it starts serving first. A build may instead be ended, which changes no table rows:
-    `SELECT pg_cancel_backend(<pid>);` ends it, one a stopped realm left included,
-    freeing the lock and leaving its index INVALID or none (above); wait for a build
-    rather than end it, unless the start cannot wait (a rollback) and the nightly
-    `pg_dump` is not running (a start during the dump queues its boot behind it whatever
-    the gate reads). End nothing else: not the nightly dump, and no realm's session but
-    a build ended so or a boot The nightly dump above ends (its statement ends any other
-    session waiting for that lock with it). Making a waiter wait with no transaction
-    open (polling a session-level try-lock in short statements of its own, idle between
-    them, then opening the schema transaction under the lock it took and unlocking after
-    COMMIT or ROLLBACK; the gate above would then see a waiter only once it holds the
-    lock), so that neither is aborted, is owed.
+    outside a release (whose step 6 starts with `up -d` every service outside a profile,
+    the bot too where `.env` sets `COMPOSE_PROFILES=discord`, and the bot elsewhere once
+    the realm is verified) is `sudo docker compose up -d --no-deps game`, its readings
+    just before it, since it stops and starts the realm in one step, or after
+    `sudo docker compose stop game` and then the readings (`--no-deps` keeps `up` from
+    recreating the database the game depends on, and `up` starts whatever image the tag
+    names now, so never while an image built for a coming release waits). A start after
+    the first runs beside the realms already serving, so outside the quiet window,
+    though still outside the nightly `pg_dump` (The nightly dump above), and its boot
+    can be aborted and restarted (Deadlocks above). If a reading stays above 0, `SELECT
+    l.pid, l.granted, a.wait_event_type, a.wait_event, p.phase, pg_blocking_pids(l.pid)
+    AS blocked_by, now() - a.query_start AS waited FROM pg_locks l JOIN pg_stat_activity
+    a USING (pid) LEFT JOIN pg_stat_progress_create_index p USING (pid) WHERE l.locktype
+    = 'advisory' AND l.classid = 0 AND l.objid = 1464812289 AND l.objsubid = 1 AND
+    l.database = (SELECT oid FROM pg_database WHERE datname = current_database());`
+    lists the lock's holder (`granted`) and its waiters, what each waits on, and the
+    pids each waits for (`blocked_by`), and `SELECT pid, application_name, state, now()
+    - xact_start AS open_for, now() - state_change AS idle_for FROM pg_stat_activity
+    WHERE pid = ANY(pg_blocking_pids(<pid>));` names the sessions the holder `<pid>`
+    waits for now (on `virtualxid` a build or a drop waits for them one at a time, so it
+    names one; read it again once that one ends). The holder's wait decides. On
+    `relation` it is a boot, or a runner's create, drop or receipts VALIDATE (which
+    gives up at its own lock timeout), queued for a table lock: if one of those sessions
+    is the nightly dump (`pg_dump`), follow The nightly dump above; otherwise it waits
+    for them to end their transactions. On `virtualxid` it is a build (`phase` names its
+    wait) or a drop, waiting for each of those sessions to end its transaction: each
+    wrote or locked its table, or held an older snapshot when the wait began (a
+    REPEATABLE READ transaction such as the nightly dump, or a statement running then;
+    an idle READ COMMITTED transaction holds none, but one whose statement was running
+    then can be waited for until its transaction ends). Otherwise it is working: wait.
+    End one of those sessions, by the `pid` the naming statement returns for it, never
+    the holder's, only if it reads `psql` and `idle in transaction` on two readings a
+    few seconds apart, taken in psql's default autocommit, its `open_for` grown by those
+    seconds and its `open_for` less its `idle_for` the same on both (the same
+    transaction, and it ran no statement in between): an operator's session left open.
+    If it is yours (`SELECT pg_backend_pid();` in each psql session you have open names
+    its pid), COMMIT or ROLLBACK it instead, knowing what it holds (COMMIT a sign-out
+    above); else end it with `SELECT pg_terminate_backend(<pid>);`, which rolls its
+    transaction back (a cancel does nothing to an idle session), so whoever left it open
+    runs again what it had not committed. A sign-out above that a terminate or a
+    ROLLBACK undid runs again from that bullet's stop of every realm, since the realm
+    whose boot waited on it starts serving first. A build may instead be ended, which
+    changes no table rows: `SELECT pg_cancel_backend(<pid>);` ends it, one a stopped
+    realm left included, freeing the lock and leaving its index INVALID or none (above);
+    wait for a build rather than end it, unless the start cannot wait (a rollback) and
+    the nightly `pg_dump` is not running (a start during the dump queues its boot behind
+    it whatever the gate reads). End nothing else: not the nightly dump, and no realm's
+    session but a build ended so or a boot The nightly dump above ends (its statement
+    ends any other session waiting for that lock with it). Making a waiter wait with no
+    transaction open (polling a session-level try-lock in short statements of its own,
+    idle between them, then opening the schema transaction under the lock it took and
+    unlocking after COMMIT or ROLLBACK; the gate above would then see a waiter only once
+    it holds the lock), so that neither is aborted, is owed.
   - The hazard predates housing; removing both deadlock paths (Deadlocks above) is owed
     (docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md measures it).
 - FIRST ROLLOUT OF THE HOUSING TABLES: the first boot that carries them also creates
@@ -2428,9 +2433,10 @@ sudo ss -tn state established '( dport = :8787 )' | wc -l
 
 Healthy: low tens, against roughly 110 held continuously during the incident.
 
-**Escalation levers**, in order. Each is an `.env` edit (not while an image built for a
-coming release waits; Environment keys above) plus
-`sudo docker compose --profile discord up -d --no-deps discord-bot`:
+**Escalation levers**, in order. The first two are each an `.env` edit (not while an image
+built for a coming release waits; Environment keys above) plus
+`sudo docker compose --profile discord up -d --no-deps discord-bot`; the third, a stop, starts
+no image and is open even then:
 
 1. **Lower `DISCORD_MAX_RPS`** (8 down to 2 to 4). This is the direct brake on
    Discord-side volume and the one that stops a ban from recurring.
