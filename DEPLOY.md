@@ -1173,9 +1173,10 @@ For off-box safety, sync the directory to S3 occasionally:
   is restarted, and every restart repeats the stall (above), so stop the realms, keep
   them stopped, and report it. The boot checks `public.account_freehold_hearth`, and
   every statement below names it so. Send the read and each block below as its own
-  file through this one command, never pasted into an interactive session, with no
-  realm booting or restarting and outside the nightly `pg_dump` (it starts at 03:15
-  UTC, see Backups):
+  file through this one command, never pasted into an interactive session: all but
+  HOLDER with no realm booting or restarting and outside the nightly `pg_dump` (it
+  starts at 03:15 UTC, see Backups), and HOLDER, which takes no table lock, at any
+  point:
 
   ```sh
   sudo docker exec -i -e PGAPPNAME=advance_token_runbook -e PGOPTIONS='-c lock_timeout=2s -c idle_in_transaction_session_timeout=5s' eastbrook-db psql -X -v ON_ERROR_STOP=1 -v VERBOSITY=sqlstate -U eastbrook eastbrook < block.sql
@@ -1187,14 +1188,16 @@ For off-box safety, sync the directory to S3 occasionally:
   DETAIL (a DETAIL can carry an account id; the database's own log, `docker logs
   eastbrook-db`, still records it, so never attach that log to a report), and an error
   ends the session, which rolls the block back. The read deparses under a brief ACCESS
-  SHARE on the Hearth table, as the boot's probe does; every block but PRINT locks the
-  table to its COMMIT, and a boot that waits behind one holds both parents. A report
-  gives the read's `contype`, `convalidated`, `keys` and `columns` and whether the
-  definition matched the text above or PRINT's, never the definition itself, which can
-  carry a literal from a hand-made constraint. First read what the name holds: `SELECT
-  contype, convalidated, pg_get_constraintdef(oid), cardinality(conkey) AS keys,
-  (SELECT array_agg(attname) FROM pg_attribute WHERE attrelid = conrelid AND attnum =
-  ANY (conkey)) AS columns FROM pg_constraint WHERE conrelid =
+  SHARE on the Hearth table, as the boot's probe does; every block but PRINT and
+  HOLDER locks the table to its COMMIT, and a boot that waits behind one holds both
+  parents. A report gives the read's `contype`, `convalidated`, `keys` and `columns`
+  and whether the definition matched the text above or PRINT's, never the definition
+  itself, which can carry a literal from a hand-made constraint; when a case below
+  asks for the probe's literal to be updated, it also gives PRINT's output, which is
+  only the fixed CHECK, and `SHOW server_version`. First read what the name holds:
+  `SELECT contype, convalidated, pg_get_constraintdef(oid), cardinality(conkey) AS
+  keys, (SELECT array_agg(attname) FROM pg_attribute WHERE attrelid = conrelid AND
+  attnum = ANY (conkey)) AS columns FROM pg_constraint WHERE conrelid =
   'public.account_freehold_hearth'::regclass AND conname =
   'account_freehold_hearth_advance_token_shape'`, then:
   - No row: send RESTORE, then NULL AND VALIDATE; no repair boot is needed.
@@ -1231,27 +1234,32 @@ For off-box safety, sync the directory to S3 occasionally:
     there is no displaced constraint, this rule does not allow its DROP, or NULL AND
     VALIDATE fails again, stop.
   - Route an error on its code: on 55P03 or 40P01 send HOLDER: if it shows a `pg_dump`
-    session, wait for the dump to end and never end it, then send the same file again,
-    counting attempts afresh; if it shows another `advance_token_runbook` session,
-    take the lost connection route; otherwise wait about 10 s and send the same file
-    again, at most about five times in all, then stop and report HOLDER's rows; on
-    42710 from RESTORE the name was taken since the read, so re-run the read; on 42703
-    from RESTORE the column itself is missing and every Hearth trip fails until the
-    next boot re-adds it with its CHECK, a repair boot (above), so stop the other
-    realms and run it in the next quiet window; on 42710 or 42P07 from DISPLACE an
-    earlier displacement holds the name, so settle it by the drop rule and send
-    DISPLACE again, and if the drop rule's read finds no row a bare relation holds the
-    name, so stop and report it; on 42703 from DISPLACE the column itself is missing
-    while a constraint holds the name, so every boot fails as above: stop the realms,
-    keep them stopped, and report it; on a code starting 23 (an integrity error) from
-    NULL AND VALIDATE, see the drop rule; on a lost connection (psql exits saying the
-    connection was lost, whatever code it printed first), send HOLDER until it shows
-    no `advance_token_runbook` session, for up to about a minute (if one remains, stop
-    and report it); then send the read or PRINT again, since they change nothing, or
-    for any other block re-run the read (after DROP, the drop rule's read): if the
-    block landed, go on from the step after it (a NULL AND VALIDATE that landed so
-    reports its count as unknown), and if not, send it again once, and if that send
-    also loses its connection, stop and report it; on anything else, stop.
+    session, wait for the dump to end and never end it (send HOLDER about once a
+    minute until it shows none, and if one still shows well past the dump's usual
+    length, stop and report HOLDER's rows), then take the lost connection route if
+    HOLDER had also shown another `advance_token_runbook` session, and otherwise send
+    the same file again, counting attempts afresh; if it shows another
+    `advance_token_runbook` session, take the lost connection route; otherwise wait
+    about 10 s and send the same file again, at most about five times in all, then
+    stop and report HOLDER's rows; on 42710 from RESTORE the name was taken since the
+    read, so re-run the read; on 42703 from RESTORE the column itself is missing and
+    every Hearth trip fails until the next boot re-adds it with its CHECK, a repair
+    boot (above), so stop the other realms and run it in the next quiet window; on
+    42710 or 42P07 from DISPLACE an earlier displacement holds the name, so settle it
+    by the drop rule and send DISPLACE again, and if the drop rule's read finds no row
+    a bare relation holds the name, so stop and report it; on 42703 from DISPLACE the
+    column itself is missing while a constraint holds the name, so every boot fails as
+    above: stop the realms, keep them stopped, and report it; on a code starting 23
+    (an integrity error) from NULL AND VALIDATE, see the drop rule; on a lost
+    connection (psql exits saying the connection was lost, whatever code it printed
+    first), send HOLDER until it shows no `advance_token_runbook` session, for up to
+    about a minute (if one remains, stop and report it); then send the lost file again
+    once if it was the read, PRINT or HOLDER, since they change nothing, or for any
+    other block re-run the read (after DROP, the drop rule's read): if the block
+    landed, go on from the step after it (a report of a NULL AND VALIDATE that landed
+    this way gives its count as unknown), and if not, send it again once; if any send
+    made on this route loses its connection, stop and report it, and a resend made on
+    this route counts toward the five above; on anything else, stop.
 
   RESTORE (the boot's own CHECK, NOT VALID, with no repair boot):
 
@@ -1318,16 +1326,20 @@ For off-box safety, sync the directory to S3 occasionally:
   COMMIT;
   ```
 
-  HOLDER (every other session that holds or waits for a lock on the Hearth table, and
-  any other runbook session; it never selects a query text or a client address, so
-  report only its rows):
+  HOLDER (every other session in this database that holds or waits for a lock on the
+  Hearth table, and any other runbook session; it takes no table lock, so it answers
+  at any point, behind a queued lock included, and it never selects a query text or a
+  client address, so report only its rows):
 
   ```sql
-  SELECT a.pid, a.application_name, a.state, l.mode, l.granted
+  SELECT a.pid, a.application_name, a.backend_type, a.state, l.mode, l.granted
     FROM pg_stat_activity a
     LEFT JOIN pg_locks l
-      ON l.pid = a.pid AND l.relation = 'public.account_freehold_hearth'::regclass
+      ON l.pid = a.pid
+     AND l.database = (SELECT oid FROM pg_database WHERE datname = current_database())
+     AND l.relation = 'public.account_freehold_hearth'::regclass
    WHERE a.pid <> pg_backend_pid()
+     AND a.datname = current_database()
      AND (l.pid IS NOT NULL OR a.application_name = 'advance_token_runbook');
   ```
 - A failed deactivation receipt erase logs `deactivation housing receipt erase

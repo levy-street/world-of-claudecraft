@@ -996,12 +996,13 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
     const bullet = raw.replace(/\n\s*/g, ' ');
     expect(bullet).toContain(`\`[schema] ${raised[0]}\``);
     expect(bullet).toContain(`\`${compared[0]}\``);
-    // The runbook's SQL is five named fenced blocks, pinned whole and tied to
+    // The runbook's SQL is six named fenced blocks, pinned whole and tied to
     // the fragment wherever the fragment holds the same text (the pg suite runs
     // every one): RESTORE and DISPLACE put back the boot's OWN repair statement
     // under a lock timeout set first; PRINT builds the CREATE TABLE's own CHECK;
     // NULL AND VALIDATE nulls with the CHECK's own pattern; DROP names only the
-    // displaced constraint.
+    // displaced constraint; HOLDER lists other sessions by pid, name, kind,
+    // state and lock, never itself.
     // Each block is read WITH the label above it, so a block an operator is
     // sent to by name is the block the name heads.
     const labelled = [
@@ -1015,12 +1016,17 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
       'DROP',
       'HOLDER',
     ]);
-    // Every fence in the bullet, opening and closing: the one shell command,
-    // then the six SQL blocks, and nothing else.
-    expect([...raw.matchAll(/\n {2}```(\w*)(?=\n|$)/g)].map((match) => match[1])).toEqual([
-      'sh',
-      '',
-      ...Array.from({ length: 6 }, () => ['sql', '']).flat(),
+    // Every fence line in the bullet at any indent, opening and closing, with
+    // its indent: the one shell command, then the six SQL blocks, and nothing
+    // else.
+    expect(
+      [...raw.matchAll(/\n([ \t]*)(`{3,}|~{3,})([^\n]*)/g)].map(
+        (match) => `${match[1].length}:${match[2]}${match[3]}`,
+      ),
+    ).toEqual([
+      '2:```sh',
+      '2:```',
+      ...Array.from({ length: 6 }, () => ['2:```sql', '2:```']).flat(),
     ]);
     const block = Object.fromEntries(labelled);
     const fragment = codeOnly(FREEHOLD_HEARTH_SCHEMA);
@@ -1070,10 +1076,10 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
         'ALTER TABLE public.account_freehold_hearth DROP CONSTRAINT account_freehold_hearth_advance_token_shape_displaced;',
       ),
     );
-    // HOLDER names sessions by pid, name, state and lock only: never a query
-    // text or a client address, and never its own session.
+    // HOLDER names sessions of this database by pid, name, kind, state and
+    // lock only: never a query text or a client address, and never its own.
     expect(block.HOLDER).toBe(
-      "SELECT a.pid, a.application_name, a.state, l.mode, l.granted FROM pg_stat_activity a LEFT JOIN pg_locks l ON l.pid = a.pid AND l.relation = 'public.account_freehold_hearth'::regclass WHERE a.pid <> pg_backend_pid() AND (l.pid IS NOT NULL OR a.application_name = 'advance_token_runbook');",
+      "SELECT a.pid, a.application_name, a.backend_type, a.state, l.mode, l.granted FROM pg_stat_activity a LEFT JOIN pg_locks l ON l.pid = a.pid AND l.database = (SELECT oid FROM pg_database WHERE datname = current_database()) AND l.relation = 'public.account_freehold_hearth'::regclass WHERE a.pid <> pg_backend_pid() AND a.datname = current_database() AND (l.pid IS NOT NULL OR a.application_name = 'advance_token_runbook');",
     );
     // The procedure's safety rules in its prose: the read and every block sent
     // through one command, as one named non-interactive session with no realm
@@ -1084,7 +1090,7 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
     // name settled before DISPLACE again, the live name never dropped, and
     // every statement naming the table the boot checks.
     expect(bullet).toContain(
-      'Send the read and each block below as its own file through this one command, never pasted into an interactive session, with no realm booting or restarting and outside the nightly `pg_dump` (it starts at 03:15 UTC, see Backups):',
+      'Send the read and each block below as its own file through this one command, never pasted into an interactive session: all but HOLDER with no realm booting or restarting and outside the nightly `pg_dump` (it starts at 03:15 UTC, see Backups), and HOLDER, which takes no table lock, at any point:',
     );
     // The command is one line in the bullet's one shell fence, so it is copied
     // whole. psql names its session from PGAPPNAME (a `-c application_name`
@@ -1096,8 +1102,9 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
       "Each send is one session named `advance_token_runbook`: it stops at the first error and exits on a lost connection rather than reconnecting, its lock waits and pauses are bounded, it prints an error as its SQLSTATE code alone, never a message or a DETAIL (a DETAIL can carry an account id; the database's own log, `docker logs eastbrook-db`, still records it, so never attach that log to a report), and an error ends the session, which rolls the block back",
     );
     expect(bullet).toContain(
-      "A report gives the read's `contype`, `convalidated`, `keys` and `columns` and whether the definition matched the text above or PRINT's, never the definition itself",
+      "A report gives the read's `contype`, `convalidated`, `keys` and `columns` and whether the definition matched the text above or PRINT's, never the definition itself, which can carry a literal from a hand-made constraint; when a case below asks for the probe's literal to be updated, it also gives PRINT's output, which is only the fixed CHECK, and `SHOW server_version`",
     );
+    expect(bullet).toContain('every block but PRINT and HOLDER locks the table to its COMMIT');
     // A boot that cannot re-add the column, its name held, loops: stop.
     expect(bullet).toContain(
       'if a constraint already holds that name (on other columns or none), every boot fails with 42710, rolls back, exits and is restarted, and every restart repeats the stall (above), so stop the realms, keep them stopped, and report it',
@@ -1138,7 +1145,7 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
       '42703 from DISPLACE',
     ]);
     expect(bullet).toContain(
-      "on 55P03 or 40P01 send HOLDER: if it shows a `pg_dump` session, wait for the dump to end and never end it, then send the same file again, counting attempts afresh; if it shows another `advance_token_runbook` session, take the lost connection route; otherwise wait about 10 s and send the same file again, at most about five times in all, then stop and report HOLDER's rows",
+      "on 55P03 or 40P01 send HOLDER: if it shows a `pg_dump` session, wait for the dump to end and never end it (send HOLDER about once a minute until it shows none, and if one still shows well past the dump's usual length, stop and report HOLDER's rows), then take the lost connection route if HOLDER had also shown another `advance_token_runbook` session, and otherwise send the same file again, counting attempts afresh; if it shows another `advance_token_runbook` session, take the lost connection route; otherwise wait about 10 s and send the same file again, at most about five times in all, then stop and report HOLDER's rows",
     );
     expect(bullet).toContain(
       'on 42710 from RESTORE the name was taken since the read, so re-run the read',
@@ -1156,9 +1163,8 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
       'on a code starting 23 (an integrity error) from NULL AND VALIDATE, see the drop rule',
     );
     expect(bullet).toContain(
-      "on a lost connection (psql exits saying the connection was lost, whatever code it printed first), send HOLDER until it shows no `advance_token_runbook` session, for up to about a minute (if one remains, stop and report it); then send the read or PRINT again, since they change nothing, or for any other block re-run the read (after DROP, the drop rule's read): if the block landed, go on from the step after it (a NULL AND VALIDATE that landed so reports its count as unknown), and if not, send it again once, and if that send also loses its connection, stop and report it; on anything else, stop",
+      "on a lost connection (psql exits saying the connection was lost, whatever code it printed first), send HOLDER until it shows no `advance_token_runbook` session, for up to about a minute (if one remains, stop and report it); then send the lost file again once if it was the read, PRINT or HOLDER, since they change nothing, or for any other block re-run the read (after DROP, the drop rule's read): if the block landed, go on from the step after it (a report of a NULL AND VALIDATE that landed this way gives its count as unknown), and if not, send it again once; if any send made on this route loses its connection, stop and report it, and a resend made on this route counts toward the five above; on anything else, stop",
     );
-    expect(bullet).toContain('on anything else, stop');
     const readAt = bullet.indexOf('First read what the name holds');
     expect(readAt).toBeGreaterThan(-1);
     expect(readAt).toBeLessThan(bullet.indexOf('No row: send RESTORE'));

@@ -595,11 +595,16 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       // The control: a name given in PGOPTIONS loses to psql's own. Neither
       // the URL nor the environment may name the session for it.
       expect(url).not.toMatch(/[?&](?:application_name|options)=/);
-      vi.stubEnv('PGAPPNAME', '');
-      const namedInOptions = await asPsql({
-        options: `${pgoptions} -c application_name=advance_token_runbook`,
-      });
-      vi.unstubAllEnvs();
+      const namedInOptions = await (async () => {
+        vi.stubEnv('PGAPPNAME', '');
+        try {
+          return await asPsql({
+            options: `${pgoptions} -c application_name=advance_token_runbook`,
+          });
+        } finally {
+          vi.unstubAllEnvs();
+        }
+      })();
       try {
         await namedInOptions.connect();
         expect(
@@ -757,25 +762,62 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       expect(await send(block['NULL AND VALIDATE'])).toEqual([{ non_hex: '1' }]);
       expect(await token()).toEqual([{ advance_token: null }]);
       expect((await named(NAME)).map((row) => row.def)).toEqual([VALID_DEF]);
-      // HOLDER shows another session's lock on the table by name and mode,
-      // and never the session that sends it.
+      // HOLDER lists, in this database, a holder by name, kind and mode, a
+      // waiter queued behind it, and a runbook session that holds nothing, and
+      // never the session that sends it.
       const dump = await asPsql({ options: '', application_name: 'pg_dump' });
+      const waiter = await asPsql({ options: '-c lock_timeout=10s', application_name: 'realm' });
+      const idle = await asPsql({ options: '', application_name: 'advance_token_runbook' });
+      let waiting: Promise<unknown> | undefined;
       try {
-        await dump.connect();
+        await Promise.all([dump.connect(), waiter.connect(), idle.connect()]);
+        const pidOf = async (client: typeof dump) =>
+          Number((await client.query('SELECT pg_backend_pid() AS pid')).rows[0].pid);
+        const [dumpPid, waiterPid, idlePid] = await Promise.all([dump, waiter, idle].map(pidOf));
         await dump.query('BEGIN');
         await dump.query(`LOCK TABLE ${legacyTable} IN ACCESS SHARE MODE`);
-        expect(await send(block.HOLDER)).toEqual([
-          {
-            pid: expect.any(Number),
-            application_name: 'pg_dump',
-            state: 'idle in transaction',
-            mode: 'AccessShareLock',
-            granted: true,
-          },
-        ]);
+        await waiter.query('BEGIN');
+        waiting = waiter.query(`LOCK TABLE ${legacyTable} IN ACCESS EXCLUSIVE MODE`);
+        let rows: Array<Record<string, unknown>> = [];
+        for (let poll = 0; poll < 100; poll++) {
+          rows = await send(block.HOLDER);
+          if (rows.some((row) => row.pid === waiterPid)) break;
+          await new Promise<void>((resolve) => setTimeout(resolve, 20));
+        }
+        expect(rows).toHaveLength(3);
+        expect(rows).toEqual(
+          expect.arrayContaining([
+            {
+              pid: dumpPid,
+              application_name: 'pg_dump',
+              backend_type: 'client backend',
+              state: 'idle in transaction',
+              mode: 'AccessShareLock',
+              granted: true,
+            },
+            {
+              pid: waiterPid,
+              application_name: 'realm',
+              backend_type: 'client backend',
+              state: 'active',
+              mode: 'AccessExclusiveLock',
+              granted: false,
+            },
+            {
+              pid: idlePid,
+              application_name: 'advance_token_runbook',
+              backend_type: 'client backend',
+              state: 'idle',
+              mode: null,
+              granted: null,
+            },
+          ]),
+        );
       } finally {
         await dump.query('ROLLBACK').catch(() => {});
-        await dump.end();
+        await waiting?.catch(() => {});
+        await waiter.query('ROLLBACK').catch(() => {});
+        await Promise.all([dump.end(), waiter.end(), idle.end()]);
       }
       expect(await send(block.HOLDER)).toEqual([]);
       // A missing column. With its name free, RESTORE fails 42703 and the next
