@@ -5676,6 +5676,12 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   drew a new edge case for the third round and became a fixed window, pinned to the backup
   cron; the signal pin's new forms became whole pins on the game service's keys and on every
   server file. Fixed in `f8276ca1e9` through `c991771d8c`.
+- ROUND EIGHTEEN, eight fresh readers over round seventeen: 32 findings, one blocking, six
+  should-fix. The blocking finding was round thirteen's: a boot behind the dump waits on
+  `auth_tokens`, the core schema's first table, not on the parents, which a lock probe
+  confirmed; DEPLOY now says what stalls then, from bounds read from the code. Both deadlock
+  paths are stated as shapes rather than lists, and the shutdown pin also holds the compose
+  file set and every server module. Fixed in `57c5db022b` through `4dfbb51a07`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5694,9 +5700,9 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 ### EVIDENCE
 
 - `npx tsc --noEmit` exit 0 at every round's tip.
-- Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then 641,
-  then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
-  then 644, then 644, then 644, then 644, then 644 passed, never a skip.
+- Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then
+  641, then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
+  then 644, then 644, then 644, then 644, then 644, then 644 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):

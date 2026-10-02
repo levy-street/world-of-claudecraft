@@ -1359,9 +1359,13 @@ What changed the contract above:
   `deadlock_timeout`, and the runbook's HOLDER read runs at any point, in this database only.
 - A fifteenth round of eight fresh readers: P12 names the transaction the bench's deadlocked
   boots aborted and places the account create on the order path (only while community test
-  accounts are on; the victim's name and that scope corrected in round sixteen).
+  accounts are on; that scope corrected in round sixteen, the victim's name in rounds sixteen
+  and seventeen).
 - A sixteenth round of eight fresh readers: P12 says an account create takes the order path
   only while community test accounts are on, and a character create always does (on both
   paths, corrected in round seventeen).
 - A seventeenth round of eight fresh readers: P12 puts a character create on both deadlock
   paths and calls the bench's victim by the evidence's own label.
+- An eighteenth round of eight fresh readers: P12 says the core schema locks `auth_tokens`
+  before the parents and states both deadlock paths as shapes, the character delete and a
+  password reset among the examples.
