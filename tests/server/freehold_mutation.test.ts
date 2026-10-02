@@ -3054,11 +3054,11 @@ describe('the claim renewer', () => {
     ]);
     // The bot's bundle as its build script makes it, by esbuild's own list of
     // the modules it takes: the build's options are read whole, its packages
-    // named, and its modules from this repository must be the bot's code files
-    // and the two shared sim modules, so a module reached by an alias, a relative
-    // path of any spelling, an extension esbuild prefers or a non-code import
-    // fails until a read takes it. Each is parsed once into the map the reads
-    // below take.
+    // held to ws by path, and its modules from this repository must be the
+    // bot's code files and the two shared sim modules, so a module reached by
+    // an alias, a relative path of any spelling, an extension esbuild prefers
+    // or a non-code import fails until a read takes it. Each is parsed once
+    // into the map the reads below take.
     const buildScript = parsed('scripts/build_bot.mjs');
     const buildCalls = nodesIn(buildScript)
       .filter(
@@ -3107,8 +3107,12 @@ describe('the claim renewer', () => {
     // a read takes it. The bot bundles one package, ws: every module from a
     // package lies under node_modules/ws/ and holds no node_modules further
     // along its path, so a second package, one nested in ws, or a ws module
-    // under any directory whose name holds node_modules fails until a read
-    // takes it.
+    // under any other directory whose name holds node_modules fails until a
+    // read takes it. That node_modules/ws/ holds ws's own published code rests
+    // on the root package.json pin later in this file (no patch of ws, and no
+    // ws spec or override but a version range), so a change there for ws needs
+    // this read reviewed too; where the lockfile fetches that range from is
+    // not read.
     const fromPackage = (file: string) => file.startsWith('node_modules/');
     expect(
       [
@@ -3129,6 +3133,7 @@ describe('the claim renewer', () => {
         'node_modules/@s/ws/i.js',
         'node_modules/ws/node_modules/x/i.js',
         'node_modules/ws/lib/x_node_modules/y/i.js',
+        'node_modules/ws/lib/x_node_modules.js',
         'node_modules/e/node_modules/ws/i.js',
         'node_modules/e/lib/x_node_modules/ws/i.js',
       ].filter(fromWs),
