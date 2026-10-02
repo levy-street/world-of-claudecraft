@@ -554,17 +554,31 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       );
     const VALID_DEF =
       "CHECK (((advance_token IS NULL) OR (advance_token ~ '^[0-9a-f]{32}$'::text)))";
-    // The bullet's own send command: its PGOPTIONS become each send's startup
-    // options, so every send below is one session under exactly the bounds
-    // and the name the operator's psql carries, and an error ends it (the
-    // client closes; nothing sends ROLLBACK), which rolls the block back.
+    // The bullet's own send command, its one shell fence: each send connects
+    // as psql does (libpq takes PGAPPNAME as the session's name, falling back
+    // to `psql`, and PGOPTIONS as the startup options), so every send below is
+    // one session under exactly the bounds and the name the operator's psql
+    // carries, and an error ends it (the client closes; nothing sends
+    // ROLLBACK), which rolls the block back.
     const flat = raw.replace(/\n\s*/g, ' ');
-    const pgoptions = (flat.match(/PGOPTIONS='([^']+)'/) ?? ['', ''])[1];
-    const send = async (sql: string) => {
+    const command = (raw.match(/\n {2}```sh\n {2}(.*)\n {2}```\n/) ?? ['', ''])[1];
+    const pgoptions = (command.match(/-e PGOPTIONS='([^']+)'/) ?? ['', ''])[1];
+    const appname = (command.match(/-e PGAPPNAME=(\S+)/) ?? [])[1];
+    const asPsql = async (config: { options: string; application_name?: string }) => {
       const { Client } = await import('pg');
-      const client = new Client({ connectionString: url, options: pgoptions });
-      await client.connect();
+      const client = new Client({
+        connectionString: url,
+        fallback_application_name: 'psql',
+        ...config,
+      });
+      // A session the server ends (its idle bound) must not crash the worker.
+      client.on('error', () => {});
+      return client;
+    };
+    const send = async (sql: string) => {
+      const client = await asPsql({ options: pgoptions, application_name: appname });
       try {
+        await client.connect();
         return rowsOf(await client.query(sql));
       } finally {
         await client.end();
@@ -577,12 +591,31 @@ d('account_freehold_hearth against real PostgreSQL', () => {
           "SELECT current_setting('application_name') AS app, current_setting('lock_timeout') AS lock, current_setting('idle_in_transaction_session_timeout') AS idle",
         ),
       ).toEqual([{ app: 'advance_token_runbook', lock: '2s', idle: '5s' }]);
-      // PRINT shows this server's print of the real CHECK: the boot's literal.
-      // Its temp table ends with its session, so PRINT sent again cannot meet
-      // its own leftover.
-      for (let round = 0; round < 2; round++) {
-        expect(await send(block.PRINT)).toEqual([{ pg_get_constraintdef: VALID_DEF }]);
+      // The control: a name given in PGOPTIONS loses to psql's own.
+      const namedInOptions = await asPsql({
+        options: `${pgoptions} -c application_name=advance_token_runbook`,
+      });
+      try {
+        await namedInOptions.connect();
+        expect(
+          (await namedInOptions.query("SELECT current_setting('application_name') AS app")).rows,
+        ).toEqual([{ app: 'psql' }]);
+      } finally {
+        await namedInOptions.end();
       }
+      // PRINT shows this server's print of the real CHECK: the boot's literal.
+      expect(await send(block.PRINT)).toEqual([{ pg_get_constraintdef: VALID_DEF }]);
+      // A leftover of its temp table fails PRINT in that session (42P07), and
+      // ends with it, so PRINT in its own session never meets one.
+      const leftover = await asPsql({ options: pgoptions, application_name: appname });
+      try {
+        await leftover.connect();
+        await leftover.query(`${block.PRINT.split(';')[0]};`);
+        await expect(leftover.query(block.PRINT)).rejects.toMatchObject({ code: '42P07' });
+      } finally {
+        await leftover.end();
+      }
+      expect(await send(block.PRINT)).toEqual([{ pg_get_constraintdef: VALID_DEF }]);
       // The bullet's own read, run as written: by the probed name, and with
       // `conname` set to the displaced name for the drop rule.
       const readSql = (flat.match(/`(SELECT contype, convalidated, [^`]+)`/) ?? [
@@ -706,7 +739,7 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       );
       await send(block.DISPLACE);
       await expect(send(block['NULL AND VALIDATE'])).rejects.toMatchObject({
-        code: expect.stringMatching(/^23/),
+        code: '23514',
       });
       expect(await token()).toEqual([{ advance_token: 'z'.repeat(32) }]);
       expect((await named(NAME)).map((row) => row.def)).toEqual([`${VALID_DEF} NOT VALID`]);

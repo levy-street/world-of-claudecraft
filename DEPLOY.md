@@ -1162,23 +1162,32 @@ For off-box safety, sync the directory to S3 occasionally:
   account_freehold_hearth_advance_token_shape is not the 32-hex token CHECK, so the
   advance token shape is unchecked` instead. The log judges the text only, so it also
   fires on a correct CHECK a newer PostgreSQL prints differently; the cases below tell
-  them apart by text, never by judgment. The boot checks
+  them apart by text, never by judgment. A boot that finds the column itself missing
+  re-adds it with its CHECK by that name, unprobed: if a constraint of that name
+  already holds it (on other columns or none), every boot fails with 42710, rolls
+  back, exits and is restarted, and every restart repeats the stall (above), so stop
+  the realms, keep them stopped, and report it. The boot checks
   `public.account_freehold_hearth`, and every statement below names it so. Send the
-  read and each block below as its own file through non-interactive psql, never pasted
-  into an interactive session, with no realm booting or restarting: `sudo docker exec
-  -i -e PGOPTIONS='-c lock_timeout=2s -c idle_in_transaction_session_timeout=5s -c
-  application_name=advance_token_runbook' eastbrook-db psql -X -v ON_ERROR_STOP=1 -v
-  VERBOSITY=sqlstate -U eastbrook eastbrook < block.sql`. Each send is one session: it
-  stops at the first error and exits on a lost connection rather than reconnecting,
-  its lock waits and pauses are bounded, it prints an error as its SQLSTATE code
-  alone, never a message or a DETAIL (a DETAIL can carry an account id), and an error
-  ends the session, which rolls the block back. The read deparses under a brief ACCESS
-  SHARE on the Hearth table, as the boot's probe does; every block but PRINT locks the
-  table to its COMMIT, and a boot that waits behind one holds both parents. First read
-  what the name holds: `SELECT contype, convalidated, pg_get_constraintdef(oid),
-  cardinality(conkey) AS keys, (SELECT array_agg(attname) FROM pg_attribute WHERE
-  attrelid = conrelid AND attnum = ANY (conkey)) AS columns FROM pg_constraint WHERE
-  conrelid = 'public.account_freehold_hearth'::regclass AND conname =
+  read and each block below as its own file through this one command, never pasted
+  into an interactive session, with no realm booting or restarting and outside the
+  nightly `pg_dump`:
+
+  ```sh
+  sudo docker exec -i -e PGAPPNAME=advance_token_runbook -e PGOPTIONS='-c lock_timeout=2s -c idle_in_transaction_session_timeout=5s' eastbrook-db psql -X -v ON_ERROR_STOP=1 -v VERBOSITY=sqlstate -U eastbrook eastbrook < block.sql
+  ```
+
+  Each send is one session named `advance_token_runbook`: it stops at the first error
+  and exits on a lost connection rather than reconnecting, its lock waits and pauses
+  are bounded, it prints an error as its SQLSTATE code alone, never a message or a
+  DETAIL (a DETAIL can carry an account id; the database's own log still records it,
+  so never attach that log to a report), and an error ends the session, which rolls
+  the block back. The read deparses under a brief ACCESS SHARE on the Hearth table, as
+  the boot's probe does; every block but PRINT locks the table to its COMMIT, and a
+  boot that waits behind one holds both parents. First read what the name holds:
+  `SELECT contype, convalidated, pg_get_constraintdef(oid), cardinality(conkey) AS
+  keys, (SELECT array_agg(attname) FROM pg_attribute WHERE attrelid = conrelid AND
+  attnum = ANY (conkey)) AS columns FROM pg_constraint WHERE conrelid =
+  'public.account_freehold_hearth'::regclass AND conname =
   'account_freehold_hearth_advance_token_shape'`, then:
   - No row: send RESTORE, then NULL AND VALIDATE; no repair boot is needed.
   - `contype` is `c` and the definition, a ` NOT VALID` suffix aside, is exactly
@@ -1192,13 +1201,14 @@ For off-box safety, sync the directory to S3 occasionally:
     `server/freehold_hearth_db.ts` is updated, and if `convalidated` is false, send
     NULL AND VALIDATE.
   - Anything else: send DISPLACE, re-run the read (expect `contype` `c` and the text
-    PRINT showed, with ` NOT VALID`), send NULL AND VALIDATE, then settle the
-    displaced impostor by the drop rule. DISPLACE renames the impostor, never a drop,
-    so whatever it enforced is kept, and adds the boot's own CHECK in one short
-    transaction holding ACCESS EXCLUSIVE on the Hearth table alone: every realm's
-    Hearth reads wait at most the lock timeout plus the block. The next boot finds the
-    real CHECK and is silent if PRINT showed the exact text above; if PRINT differed,
-    every boot keeps warning, so report it as in the case above.
+    PRINT showed, with ` NOT VALID`; on anything else, stop and report it), send NULL
+    AND VALIDATE, then settle the displaced impostor by the drop rule. DISPLACE
+    renames the impostor, never a drop, so whatever it enforced is kept, and adds the
+    boot's own CHECK in one short transaction holding ACCESS EXCLUSIVE on the Hearth
+    table alone: every realm's Hearth reads wait at most the lock timeout plus the
+    block. The next boot finds the real CHECK and is silent if PRINT showed the exact
+    text above; if PRINT differed, every boot keeps warning, so report it as in the
+    case above.
   - The drop rule for a displaced constraint: read it (the same read with `conname`
     set to `account_freehold_hearth_advance_token_shape_displaced`). Send DROP only
     when its `keys` is 1, its `columns` are exactly `{advance_token}` and its
@@ -1214,17 +1224,24 @@ For off-box safety, sync the directory to S3 occasionally:
     VALIDATE fails again, stop.
   - Route an error on its code: on 55P03 or 40P01 wait about 10 s and send the same
     file again, at most about five times before finding the holder in
-    `pg_stat_activity` and `pg_locks`; on 42710 from RESTORE the name was taken since
-    the read, so re-run the read; on 42703 from RESTORE the column itself is missing
-    and every Hearth trip fails until the next boot re-adds it with its CHECK, a
-    repair boot (above), so stop the other realms and run it in the next quiet window;
-    on 42710 or 42P07 from DISPLACE an earlier displacement holds the name, so settle
-    it by the drop rule and send DISPLACE again, and if the drop rule's read finds no
-    row a bare relation holds the name, so stop and report it; on a code starting 23
-    (an integrity error) from NULL AND VALIDATE, see the drop rule; on a lost
-    connection, wait until `pg_stat_activity` shows no other `advance_token_runbook`
-    session, then re-run the read (after DROP, the drop rule's read), which shows
-    whether the block landed; on anything else, stop.
+    `pg_stat_activity` and `pg_locks` (if it is the nightly `pg_dump`, wait for the
+    dump to end and never end it; if it is another `advance_token_runbook` session,
+    take the lost connection route; for any other holder, stop and report it); on
+    42710 from RESTORE the name was taken since the read, so re-run the read; on 42703
+    from RESTORE the column itself is missing and every Hearth trip fails until the
+    next boot re-adds it with its CHECK, a repair boot (above), so stop the other
+    realms and run it in the next quiet window; on 42710 or 42P07 from DISPLACE an
+    earlier displacement holds the name, so settle it by the drop rule and send
+    DISPLACE again, and if the drop rule's read finds no row a bare relation holds the
+    name, so stop and report it; on 42703 from DISPLACE the column itself is missing
+    while a constraint holds the name, so every boot fails as above: stop the realms,
+    keep them stopped, and report it; on a code starting 23 (an integrity error) from
+    NULL AND VALIDATE, see the drop rule; on a lost connection (psql exits saying the
+    connection was lost, whatever code it printed first), wait up to about a minute
+    until `pg_stat_activity` shows no other `advance_token_runbook` session (if one
+    remains, stop and report it), then re-run the read (after DROP, the drop rule's
+    read): if the block landed, go on from the step after it, and if not, send it
+    again; on anything else, stop.
 
   RESTORE (the boot's own CHECK, NOT VALID, with no repair boot):
 
