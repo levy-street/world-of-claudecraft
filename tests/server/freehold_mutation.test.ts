@@ -3037,20 +3037,62 @@ describe('the claim renewer', () => {
     expect(botFiles).toEqual(
       expect.arrayContaining(['bot/logic.ts', 'bot/main.ts', 'bot/server_client.ts']),
     );
+    // Two kept names that decode alike would be read as one file.
+    expect(new Set(botFiles).size).toBe(botFiles.length);
+    // Every other tracked file in the bot's directory is named, so a module the
+    // bundler loads beside code (a .json import, say) fails until a read takes it.
+    expect(tracked(['bot']).filter((file) => !/\.(?:[mc]?[jt]s|[jt]sx)$/.test(file))).toEqual([
+      'bot/CLAUDE.md',
+    ]);
+    const botNodes = new Map(botFiles.map((file) => [file, nodesIn(parsed(file))] as const));
+    const nodesOf = (file: string) => botNodes.get(file) ?? [];
     // The bot writes no JSX: a route in JSX text, or in an attribute spelled
     // with an HTML entity, is not a literal the route read takes, so any JSX in
-    // the bot's code fails here until that read takes it.
+    // the bot's code fails here until that read takes it. Each JSX root is
+    // proven on a sample first.
+    const holdsJsx = (node: ts.Node) =>
+      ts.isJsxElement(node) || ts.isJsxSelfClosingElement(node) || ts.isJsxFragment(node);
     expect(
-      botFiles.filter((file) =>
-        nodesIn(parsed(file)).some(
-          (node) =>
-            ts.isJsxElement(node) || ts.isJsxSelfClosingElement(node) || ts.isJsxFragment(node),
+      nodesIn(
+        ts.createSourceFile(
+          'sample.tsx',
+          [
+            'a(<b href="&#47;internal&#47;discord&#47;one">two</b>);',
+            'c(<d />);',
+            'e(<>/internal/discord/three</>);',
+          ].join('\n'),
+          ts.ScriptTarget.Latest,
+          true,
         ),
+      )
+        .filter(holdsJsx)
+        .map((node) => ts.SyntaxKind[node.kind]),
+    ).toEqual(['JsxElement', 'JsxSelfClosingElement', 'JsxFragment']);
+    expect(botFiles.filter((file) => nodesOf(file).some(holdsJsx))).toEqual([]);
+    // The bot's code reaches outside its directory only through these modules,
+    // each read for routes too, so a route moved into one fails until reviewed.
+    expect(
+      botFiles.flatMap((file) =>
+        nodesOf(file)
+          .filter(
+            (node): node is ts.StringLiteralLike =>
+              ts.isStringLiteralLike(node) && node.text.startsWith('../'),
+          )
+          .map((node) => `${file}: ${node.text}`),
+      ),
+    ).toEqual([
+      'bot/logic.ts: ../src/sim/discord_roles',
+      'bot/logic.ts: ../src/sim/discord_tier',
+      'bot/main.ts: ../src/sim/discord_tier',
+    ]);
+    expect(
+      ['src/sim/discord_roles.ts', 'src/sim/discord_tier.ts'].filter((file) =>
+        nodesIn(parsed(file)).some(writesRoute),
       ),
     ).toEqual([]);
     expect(
       botFiles.flatMap((file) =>
-        nodesIn(parsed(file))
+        nodesOf(file)
           .filter(writesRoute)
           .map((node) => `${file}: ${memberOf(node)}`),
       ),
@@ -3073,11 +3115,13 @@ describe('the claim renewer', () => {
     // goes to `settled` or to a name; every `during` callback is an arrow, and
     // one that takes the boot it is handed names it `boot`; every read of a
     // boot's name is pinned by the expression it sits in; and the section's lock
-    // key, its lock filter, `startBoot`, `settled`, `within` and every `settled`
-    // call are pinned as written. These pins read names as written, so the
-    // section is also read whole, by digest: any change to its code fails until
-    // it is reviewed against them, a form they do not read (a shadowing binding,
-    // a computed key) included.
+    // key, its lock filter, `startBoot`, `settled`, every `settled` call and the
+    // module-level `within` are pinned as written. These pins read names as
+    // written, so the section is also read whole, by digest: any change to its
+    // code fails until it is reviewed against them, a form inside the section
+    // they do not read (a shadowing binding, a computed key) included. Around
+    // the section, every name it reads is declared once, so no binding there
+    // shadows another; code around it is read only where a pin names it.
     const pgSuite = parsed('tests/server/freehold_mutation.pg.test.ts');
     const sectionL = nodesIn(pgSuite).filter(
       (node) =>
@@ -3173,6 +3217,69 @@ describe('the claim renewer', () => {
         (node) => !(ts.isCallExpression(node.parent) && node.parent.expression === node),
       ),
     ).toEqual([]);
+    // Every name the section reads from the scopes around it (the suite's
+    // callback and the module), with how many times those scopes declare it,
+    // so a second binding there, which would shadow the first, fails.
+    const around: ts.Statement[] = [];
+    for (let at = sectionL[0].parent; at !== undefined; at = at.parent) {
+      if (ts.isBlock(at) || ts.isSourceFile(at)) around.push(...at.statements);
+    }
+    const bindings = (name: ts.BindingName): string[] =>
+      ts.isIdentifier(name)
+        ? [name.text]
+        : name.elements.flatMap((element) =>
+            ts.isOmittedExpression(element) ? [] : bindings(element.name),
+          );
+    const declaredAround = around.flatMap((statement): string[] => {
+      if (ts.isVariableStatement(statement))
+        return statement.declarationList.declarations.flatMap((decl) => bindings(decl.name));
+      if (
+        (ts.isFunctionDeclaration(statement) || ts.isClassDeclaration(statement)) &&
+        statement.name
+      )
+        return [statement.name.text];
+      if (ts.isImportDeclaration(statement) && statement.importClause) {
+        const clause = statement.importClause;
+        const imported = clause.namedBindings;
+        return [
+          ...(clause.name ? [clause.name.text] : []),
+          ...(imported && ts.isNamespaceImport(imported) ? [imported.name.text] : []),
+          ...(imported && ts.isNamedImports(imported)
+            ? imported.elements.map((element) => element.name.text)
+            : []),
+        ];
+      }
+      return [];
+    });
+    const readAround = new Set(
+      nodesIn(sectionL[0])
+        .filter((node): node is ts.Identifier => ts.isIdentifier(node))
+        .map((node) => node.text)
+        .filter((name) => declaredAround.includes(name)),
+    );
+    expect(
+      [...readAround]
+        .sort()
+        .map((name) => `${name}: ${declaredAround.filter((other) => other === name).length}`),
+    ).toEqual([
+      'ADMIN_URL: 1',
+      'PoolClient: 1',
+      'd: 1',
+      'db: 1',
+      'describe: 1',
+      'expect: 1',
+      'gate: 1',
+      'it: 1',
+      'makeAccount: 1',
+      'pool: 1',
+      'randomUUID: 1',
+      'readFileSync: 1',
+      'realm: 1',
+      'sleep: 1',
+      'verifyUrl: 1',
+      'vi: 1',
+      'within: 1',
+    ]);
     // Every read of a boot's name, by the expression it sits in.
     expect(
       ['boot', 'secondBoot', 'thirdBoot', 'work']
@@ -3288,9 +3395,9 @@ describe('the claim renewer', () => {
         ],
       ],
     ]);
-    // Section L read whole, comments dropped, by digest: a change to its code
-    // fails here until it is reviewed against the pins above, then the digest is
-    // updated.
+    // Section L read whole by digest, as linesOf reads it (comments dropped,
+    // lines trimmed, blank lines left out): a change to its code fails here until
+    // it is reviewed against the pins above, then the digest is updated.
     expect(
       createHash('sha256').update(linesOf(sectionL[0], pgSuite).join('\n')).digest('hex'),
       'section L changed: check that every boot still starts in startBoot and is read ' +
@@ -3365,16 +3472,7 @@ describe('the claim renewer', () => {
         node.parent.name.text === 'grantDailyActive') ||
         insideGrantDailyActive(node.parent));
     expect(
-      gitGrep('grant', [
-        'bot/*.ts',
-        'bot/*.mts',
-        'bot/*.cts',
-        'bot/*.js',
-        'bot/*.mjs',
-        'bot/*.cjs',
-        'bot/*.tsx',
-        'bot/*.jsx',
-      ]).flatMap((file) => {
+      gitGrep('grant', botCode).flatMap((file) => {
         const source = parsed(file);
         return nodesIn(source)
           .filter(
