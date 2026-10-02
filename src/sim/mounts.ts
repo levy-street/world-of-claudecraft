@@ -163,8 +163,19 @@ export function forceTrainingMount(ctx: SimContext, e: Entity): boolean {
   e.mountKey = TRAINING_MOUNT_KEY;
   e.mountCastRemaining = 0;
   e.mountCastKey = '';
+  stopArmedSwing(e);
   recalcFor(ctx, e, meta);
   return true;
+}
+
+/** Climbing into the saddle puts the weapon away (the same flag stopAutoAttack
+ *  clears). Auto-attack stays armed out of combat while its target lives (a pull
+ *  that never landed, a mob that reset), and the swing loop force-dismounts a
+ *  rider whose swing is armed BEFORE any range check (combat/auto_attack.ts
+ *  tryPlayerSwing), so a summon that landed with it still on was undone the next
+ *  tick: the bar filled and the player stayed on foot. */
+function stopArmedSwing(e: Entity): void {
+  e.autoAttack = false;
 }
 
 // Thornhollow Fields is fought on foot, start to finish. This replaced the
@@ -305,6 +316,7 @@ export function summonMountItem(ctx: SimContext, pid: number, key: string): bool
     e.mountKey = def.key;
     e.mountCastRemaining = 0;
     e.mountCastKey = '';
+    stopArmedSwing(e);
     recalcFor(ctx, e, meta);
     return true;
   }
@@ -454,6 +466,7 @@ export function updateMountTransition(ctx: SimContext, e: Entity, swimming: bool
         // simultaneously mounted and shapeshifted at completion.
         cancelFormsAndGhostWolf(ctx, e);
         e.mountKey = target;
+        stopArmedSwing(e);
       }
       // A summon whose reins vanished mid-channel leaves the player unmounted.
       e.mountCastRemaining = 0;
