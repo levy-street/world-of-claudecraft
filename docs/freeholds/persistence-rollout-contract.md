@@ -108,14 +108,15 @@ A server is CAPABLE when all of the following hold.
    Hearth row's `advance_token` column behind a `pg_attribute` probe (in the CREATE TABLE
    for a fresh database, otherwise one ADD COLUMN, shape-checked by the named
    `account_freehold_hearth_advance_token_shape` constraint, which a later boot puts back
-   `NOT VALID` if the column exists without it), so an ordinary boot's housing
-   fragments take none of the index, trigger or ALTER TABLE locks that would hold
-   another realm's housing statements until its COMMIT (their one table lock, the token
-   probe's ACCESS SHARE on the Hearth table for the CHECK's deparse, is taken and
-   released at once; the storage fragment, which is not housing, runs its DDL unprobed
-   and holds its locks on its own tables to every boot's COMMIT). No fragment references
-   another's table, so their relative order is a convention rather than a dependency,
-   and it is fixed as plot, Hearth, claim, operation so the boot-call ordering pin in
+   `NOT VALID` if the column exists without it), so an ordinary boot's housing fragments
+   take none of the index, trigger or ALTER TABLE locks that would hold another realm's
+   housing statements until its COMMIT (their one table lock, the token probe's ACCESS
+   SHARE on the Hearth table for the CHECK's deparse, is taken and released at once; the
+   storage fragment, which is not housing, holds its own tables: some of its DDL runs
+   unprobed and holds those tables' locks to every boot's COMMIT, and its probed repairs
+   make a boot a repair boot like any other). No fragment references another's table, so
+   their relative order is a convention rather than a dependency, and it is fixed as
+   plot, Hearth, claim, operation so the boot-call ordering pin in
    [../../tests/schema_wiring.test.ts](../../tests/schema_wiring.test.ts) (by index,
    never containment) has one stable answer. All four are applied
    UNCONDITIONALLY, never behind `freeholdsEnabled`: the tables exist before the feature
@@ -778,7 +779,7 @@ THE SHUTDOWN BUDGET is the whole serial chain in `server/main.ts`, not the housi
 alone, and `tests/server/freehold_mutation.test.ts` pins every await in it against this
 paragraph, so a step added, removed or newly bounded at its call site fails there until
 the pin lists it and, when it is bounded, this paragraph names it.
-Only these awaits carry a deadline. At the call site: the bank ledger's drain
+The budget counts these deadlines. At the call site: the bank ledger's drain
 (`BANK_LEDGER_SHUTDOWN_DRAIN_MS`, 10,000 ms), the market sold volume's
 (`MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS`, 10,000 ms), the housing drain
 (`FREEHOLD_PERSIST_SHUTDOWN_DRAIN_MS`, 10,000 ms), the unstuck records'

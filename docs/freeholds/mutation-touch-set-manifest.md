@@ -649,9 +649,10 @@ EXCLUSIVE request on that table, never behind a writer, and holds nothing to its
 (`tests/server/freehold_hearth_db.pg.test.ts` proves the wait's mode and place, the holder
 and queued-request cases, a writer's case, and the nothing-held case with a positive
 control). It waits there while holding both parents, so DDL on that table stalls every
-realm's saves and logins too. The storage fragment, which is not housing, runs its DDL
-unprobed and holds its locks on its own tables to every boot's COMMIT. The pg suite proves
-the housing claim for all four housing fragments: re-applying them completes inside a 1 s
+realm's saves and logins too. The storage fragment, which is not housing, holds its own
+tables: some of its DDL runs unprobed and holds those tables' locks to every boot's COMMIT,
+and its probed repairs make a boot a repair boot like any other. The pg suite proves the
+housing claim for all four housing fragments: re-applying them completes inside a 1 s
 `lock_timeout` beside a writer holding ROW EXCLUSIVE on every table they name (the plot,
 Hearth, claims, intents and receipts tables and both parents) and keeps every index,
 trigger, constraint and function oid, while each unprobed statement it replaces times out
@@ -683,9 +684,11 @@ was eventually aborted and saves were aborted beside it, and a boot that loses e
 restarted (R-11). A REPAIR boot is any boot that rebuilds something a probe guards (for
 example an index, a guard or trigger, or the advance token column or its CHECK): it holds
 that statement's lock on that object's table to its COMMIT, builds a rebuilt index while it
-holds both parents, and fails if a rebuilt unique index meets duplicate rows. Do the first
-rollout, any repair boot, and any boot beside other realms serving such saves, in a quiet
-window; `DEPLOY.md` carries the operator note.
+holds both parents, for as long as the build takes, which grows with the table; a rebuilt
+unique index that meets duplicate rows fails the boot, which exits and is restarted into the
+same stall until the duplicates are resolved. Do the first rollout, any repair boot, and any
+boot beside other realms serving such saves, in a quiet window; `DEPLOY.md` carries the
+operator note.
 
 ## 6. Pairwise deadlock review
 
@@ -1132,9 +1135,10 @@ merge in a `finally`; N4 the server default pin; N5 the log pin; N6 the 15 route
   (`FREEHOLD_CLAIM_RENEW_CHUNK`) claimed for at most one lease TTL: the crash bound. A chunk
   that had not reached its statement is cut at its checkout or sends no renewal. A chunk cut
   mid-statement may also still hold its rows when the release-all passes by (the backend
-  aborts at the cancel if it lands, else at its next read of the closed socket), so SKIP
-  LOCKED leaves those plots to wait out their current lease: within the same bound, at most
-  one chunk for at most one TTL.
+  aborts at the cancel if it lands, else when its statement ends, its statement timeout at
+  the latest, and it next touches the closed socket), so SKIP LOCKED leaves those plots to
+  wait out their current lease: within the same bound, at most one chunk for at most one
+  TTL.
 
 ## 13. The persistence-rollout contract edits this work owes
 
