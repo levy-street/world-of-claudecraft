@@ -1335,3 +1335,6 @@ What changed the contract above:
   the suite runs, and every shutdown await carries an explicit classification.
 - A ninth round of eight fresh readers: P12 stops the other realms before every repair boot,
   and the runbook routes each error by the block that raised it.
+- A tenth round of eight fresh readers: P12 names a re-added column in a repair boot's cost;
+  the runbook drops only a token-only displacement and changes no rows on a failed unique
+  rebuild, and both shutdown callees that fix their own bound are pinned whole.

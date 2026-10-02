@@ -491,9 +491,10 @@ classified.
 - Q8R2 FIXED by amending the round-seven record commit (now `2d0c81144b`) and by the T7R6
   disposition naming the out-of-tree evidence summary. Q8R3 FIXED in this record (with L8R5).
   Q8R4 FIXED from this round on: commits split by type, with partial staging where one file
-  carried both, save `bad933db50`, which keeps the runbook with the tests that execute its
-  blocks from `DEPLOY.md` (either half alone fails at its own commit). Q8R5, Q8R6 FIXED `bad933db50` (setup inside the case, a `finally` that
-  restores the CHECK, and the next boot's CHECK oid unchanged). Q8R8 FIXED (see S8R2).
+  carried both, save `bad933db50` and round nine's `50374c36fc`, which keep the runbook with
+  the tests that execute its blocks from `DEPLOY.md` (either half alone fails at its own
+  commit). Q8R5, Q8R6 FIXED `bad933db50` (setup inside the case, a `finally` that restores the
+  CHECK, and the next boot's CHECK oid unchanged). Q8R8 FIXED (see S8R2).
 - H8R2 FIXED `8568019ac5` (the concurrent pair is one classified entry, summed once; sequential
   stops would be two). H8R3 FIXED `8568019ac5` (each callee sliced to its own closing brace,
   its bound both armed and waited on). H8R4, H8R5 FIXED `8568019ac5` (the contract names
@@ -552,12 +553,13 @@ and run on its collision path, and the pin states its boundary (drift, not miscl
 - Q9R1 FIXED in this record (with L9R4). Q9R2 FIXED in this record (with L9R1). Q9R3 FIXED in
   this record (with L9R6: the round-seven lines rewrapped, their words unchanged). Q9R4 NOTED:
   the round-eight record commit's body omits its manifest lines; later commits followed it.
-- H9R1 FIXED `a40e7d3dee`: each member of a concurrent group must be one call with one literal,
-  groups are summed per entry, and the contract states each group once. H9R2 FIXED
-  `a40e7d3dee`: the callee waits on the very variable its timeout fills and awaits nothing else;
-  an extra await ahead of the renewer stop's deadline fails the pin. H9R3 FIXED `a40e7d3dee`
-  (with C9R4: the constant is the call's whole argument, and `main.ts` imports it from its
-  defining module or a named re-export, naming it nowhere else). H9R4, H9R5 FIXED `a40e7d3dee`.
+- H9R1 FIXED `a40e7d3dee`: each member of a concurrent group must be one call with one
+  literal, groups are summed per entry, and the contract states each group once. H9R2 FIXED
+  `a40e7d3dee` (with C9R5 and T9R2): the callee waits on the very variable its timeout fills
+  and awaits nothing else; an extra await ahead of the renewer stop's deadline fails the pin.
+  H9R3 FIXED `a40e7d3dee` (with C9R4: the constant is the call's whole argument, and `main.ts`
+  imports it from its defining module or a named re-export, naming it nowhere else). H9R4,
+  H9R5 FIXED `a40e7d3dee`.
 - S9R1 FIXED (see M9R3). S9R2 FIXED `4d2a51e2b6`: duplicate rows are copied to an
   access-restricted side table before anything changes and are never deleted to pass the build.
   S9R3 FIXED `50374c36fc` (PRINT's read and drop name `pg_temp`). S9R4 FIXED (see D9R1). S9R5
@@ -578,8 +580,65 @@ and run on its collision path, and the pin states its boundary (drift, not miscl
 - L9R1, L9R4, L9R5, L9R6 FIXED in this record. L9R2 FIXED `4d2a51e2b6`. L9R3 FIXED (see D9R4).
   L9R7 FIXED (see D9R3). L9R8 FIXED (see M9R5). L9R9 FIXED `4d2a51e2b6`. L9R10 FIXED
   `4d2a51e2b6`. L9R11 FIXED (see D9R5).
-- M9R1, M9R2 FIXED (see D9R4, D9R1). M9R3 FIXED `50374c36fc` (with S9R1): a taken displaced name
-  is settled (read, DROP if it names `advance_token`, else rename) before DISPLACE again, so
-  DROP always names `_displaced`; the pg suite runs that path (42710, ROLLBACK, DROP, DISPLACE).
-  M9R4 FIXED `50374c36fc`. M9R5 FIXED `50374c36fc` (with C9R2 and L9R8: the re-read expects
-  PRINT's text). M9R6 FIXED `50374c36fc` (a 42703 from RESTORE). M9R7 FIXED (see D9R2).
+- M9R1, M9R2 FIXED (see D9R4, D9R1). M9R3 FIXED `50374c36fc` (with S9R1): a taken displaced
+  name is settled (read, DROP if it names `advance_token`, else rename) before DISPLACE again,
+  so DROP always names `_displaced`; the pg suite runs that path (42710, ROLLBACK, DROP,
+  DISPLACE). M9R4 FIXED `50374c36fc` (with C9R3). M9R5 FIXED `50374c36fc` (with C9R2 and L9R8:
+  the re-read expects PRINT's text). M9R6 FIXED `50374c36fc` (a 42703 from RESTORE). M9R7
+  FIXED (see D9R2).
+
+## Round ten: eight fresh readers over round nine (`41e0465720..09d329c2cb`)
+
+Round ten's commits: `a2dd8eb879` (both shutdown callees pinned whole), `5122865156` (the drop
+rule drops only a token-only displacement, every error code routed and pinned as a closed set,
+both collision arms run; kept whole with its tests for bisect), `6479a603bf` (a failed unique
+rebuild changes no rows; P12's re-added column; one term for a steady-state boot), and the
+commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C10R1 to C10R6 |
+| qa-checklist | PASS | Q10R1 to Q10R4 |
+| server hot path | PASS | H10R1 to H10R5 |
+| privacy and security | PASS | S10R1 to S10R5 |
+| database performance | PASS | D10R1 to D10R6 |
+| test coverage | PASS | T10R1 to T10R8 |
+| docs librarian | PASS | L10R1 to L10R7 |
+| migration safety | PASS | M10R1 to M10R6 |
+
+47 findings: none blocking, 17 should-fix (S10R1, S10R2, H10R1, L10R1, L10R2, Q10R1, D10R1,
+D10R2, M10R1, M10R2, C10R1, C10R2, T10R1 to T10R5), 30 nice-to-have. Most were options the
+last two rounds added (a side copy of duplicate rows, a rename with no block, a foreign-key
+variant of DROP); each option was removed rather than specified further.
+
+- C10R1 FIXED (see S10R1). C10R2 FIXED (see S10R2). C10R3 FIXED (see D10R2). C10R4 FIXED (see
+  D10R4). C10R5 FIXED (see H10R2). C10R6 FIXED (see H10R1).
+- Q10R1, Q10R2 FIXED in this record (with L10R1: the Q8R4 line names both commits kept whole,
+  rewrapped). Q10R3 FIXED (see S10R3). Q10R4 FIXED (see S10R2).
+- H10R1 FIXED `a2dd8eb879` (with T10R1 and C10R6): both callees that fix their own bound are
+  pinned whole, whitespace aside; the reviewer's trailing `return settled;` fails the pin.
+  H10R2 FIXED `a2dd8eb879` (with C10R5). H10R3, H10R4, H10R5 FIXED `a2dd8eb879`.
+- S10R1 FIXED `6479a603bf` (with D10R1, M10R1, C10R1 and L10R6): a failed unique rebuild
+  stops the realms, changes no rows and escalates with the index name; the boot's own
+  statement names its columns, since a rolled-back rebuild leaves `pg_indexes` empty. S10R2
+  FIXED `5122865156` (with M10R2, C10R2, L10R4 and Q10R4): the unblocked rename is gone. S10R3
+  FIXED `5122865156` (with Q10R3 and M10R4: the collision route's early DROP is the stated
+  exception, then NULL AND VALIDATE again). S10R4 FIXED `5122865156` (an integrity error is
+  read by its first line, never its DETAIL). S10R5 FIXED `5122865156` (the read reports the
+  constraint's columns, and DROP needs exactly the token, not a foreign key).
+- D10R2 FIXED `5122865156` (with C10R3: a displaced foreign key is no runbook DROP; the rule
+  stops on it). D10R3 FIXED `5122865156` (40P01 is retried as 55P03 is). D10R4 FIXED
+  `5122865156` (with M10R3 and C10R4: a read that finds no row means a bare relation holds the
+  name, so stop and report it). D10R5 FIXED `5122865156`. D10R6 OWED: a read-only preflight
+  before a deploy, or a boot line naming the repair it performs, so a repair boot is known
+  before it starts.
+- T10R2 FIXED `5122865156` (the error routes are a closed pinned set). T10R3 FIXED
+  `5122865156` (the 42P07 arm runs, a key's index colliding first). T10R4 FIXED `5122865156`.
+  T10R5 FIXED `5122865156` (the names sent to equal the labels plus ROLLBACK). T10R6, T10R7
+  FIXED `a2dd8eb879` (the screen is tested on its own spellings, and a re-export resolves from
+  its own directory). T10R8 FIXED `5122865156` (the drop rule's own read, taken from the
+  bullet, runs before each DROP).
+- L10R2, L10R3 FIXED `6479a603bf`. L10R5 FIXED `5122865156`. L10R7 FIXED in this record.
+- M10R5 FIXED `5122865156` (25P03 or a lost connection re-reads). M10R6 FIXED `5122865156`
+  (every Hearth trip fails until the missing column's repair boot, so it runs in the next
+  quiet window).
