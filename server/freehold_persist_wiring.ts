@@ -269,11 +269,19 @@ export function renewGameFreeholdClaims(
   });
   // The observer only times the launch: one that throws must never cost the
   // flush its handle on the pass (whose own rejection the flush reports), and
-  // it says so once, in fixed text.
+  // it says so in fixed text ONCE per registry, not once per 30 s flush.
   try {
     onSyncMs?.(performance.now() - launchedAt);
   } catch {
-    console.warn('freehold claim renewer launch observer threw; the pass runs on');
+    if (!launchObserverWarned.has(claims)) {
+      launchObserverWarned.add(claims);
+      console.warn(
+        'freehold claim renewer launch observer threw; the pass runs on, and later throws are not logged',
+      );
+    }
   }
   return pass;
 }
+
+/** The registries whose launch observer has already thrown once. */
+const launchObserverWarned = new WeakSet<FreeholdClaimRegistry>();

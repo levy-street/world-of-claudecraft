@@ -649,6 +649,9 @@ async function renewPass(
     warn(`freehold claim wanted check threw: ${threw}; those claims are kept and renewed`);
   }
   const deadline = deps.deadlineSignal?.() ?? AbortSignal.timeout(deadlineMs);
+  // The release side's checkout cut, the deadline or the stop: one composite
+  // per pass, shared by every release chunk and re-read.
+  const passCut = AbortSignal.any([deadline, state.stop.signal]);
   // Checked before EVERY transaction starts: the signal, and its clock half
   // through the nowMs port. The signal alone bounds the checkouts themselves.
   // The clock half uses only a reading that is a finite number: anything else
@@ -777,7 +780,7 @@ async function renewPass(
             claims.map((claim) => claim.plotId),
             { wait },
           ),
-        { checkoutSignal: AbortSignal.any([deadline, state.stop.signal]) },
+        { checkoutSignal: passCut },
       );
     } catch {
       return expired() ? 'deadline' : 'kept';
@@ -864,7 +867,7 @@ async function renewPass(
             sent.map((claim) => claim.plotId),
           );
         },
-        { checkoutSignal: AbortSignal.any([deadline, state.stop.signal]) },
+        { checkoutSignal: passCut },
       );
     } catch (error) {
       if (freeholdLockTimeout(error)) counters.lockTimeouts++;

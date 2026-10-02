@@ -96,18 +96,31 @@ describe('renewGameFreeholdClaims', () => {
     await renewGameFreeholdClaims(sim, { wantsClaim: () => false }, registry);
     expect(registry.counters.renewPasses).toBe(2);
     // An observer that throws still hands back the pass, which runs, and the
-    // throw is said once in fixed text.
+    // throw is said once per registry in fixed text; an observer that does
+    // not throw says nothing at all.
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     try {
-      const kept = renewGameFreeholdClaims(sim, { wantsClaim: () => false }, registry, () => {
+      await renewGameFreeholdClaims(sim, { wantsClaim: () => false }, registry, () => {});
+      expect(warn.mock.calls).toEqual([]);
+      const throwing = () => {
         throw new Error('the profiler observer threw');
-      });
+      };
+      const kept = renewGameFreeholdClaims(sim, { wantsClaim: () => false }, registry, throwing);
       expect(kept).toBeInstanceOf(Promise);
       await kept;
-      expect(registry.counters.renewPasses).toBe(3);
-      expect(warn.mock.calls).toEqual([
-        ['freehold claim renewer launch observer threw; the pass runs on'],
-      ]);
+      expect(registry.counters.renewPasses).toBe(4);
+      const line = [
+        'freehold claim renewer launch observer threw; the pass runs on, and later throws are not logged',
+      ];
+      expect(warn.mock.calls).toEqual([line]);
+      // The next flush's throw on the SAME registry is not logged again, and a
+      // fresh registry's first throw is.
+      await renewGameFreeholdClaims(sim, { wantsClaim: () => false }, registry, throwing);
+      expect(registry.counters.renewPasses).toBe(5);
+      expect(warn.mock.calls).toEqual([line]);
+      const fresh = createFreeholdClaimRegistry();
+      await renewGameFreeholdClaims(sim, { wantsClaim: () => false }, fresh, throwing);
+      expect(warn.mock.calls).toEqual([line, line]);
     } finally {
       warn.mockRestore();
     }
