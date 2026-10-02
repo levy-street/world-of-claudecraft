@@ -19,12 +19,13 @@ CREATE INDEX CONCURRENTLY IF NOT EXISTS play_sessions_ended_account
   ON play_sessions(ended_at, account_id);
 `;
 
-// A CREATE INDEX CONCURRENTLY killed mid-build (a deploy-watchdog restart, a
-// crash) strands the index INVALID, and IF NOT EXISTS then treats it as
-// existing on every later boot: never rebuilt, unusable to the planner, yet
-// maintained on every play_sessions write. The boot coordinator checks for
-// that carcass and drops it (CONCURRENTLY, so peer realms' session writes
-// never stall behind the drop) before running the create above.
+// A CREATE INDEX CONCURRENTLY killed mid-build (an index-build deadlock, a
+// cancelled or terminated backend, a database restart; a realm's own stop or
+// crash leaves it running) strands the index INVALID, and IF NOT EXISTS then
+// treats it as existing on every later boot: never rebuilt, unusable to the
+// planner, yet maintained on every play_sessions write. The boot coordinator
+// checks for that carcass and drops it (CONCURRENTLY, so peer realms' session
+// writes never stall behind the drop) before running the create above.
 export const ADMIN_OVERVIEW_ACTIVE_SESSIONS_INVALID_INDEX_CHECK_SQL = `
 SELECT 1
   FROM pg_index i

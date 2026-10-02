@@ -27,11 +27,14 @@
 // re-apply, and the boot's locks, observed behind a held lock and behind a
 // dump-shaped hold, with no lock timeout sent, DEPLOY's route for every boot
 // that queues behind the dump, its sign-out after a stall, DEPLOY's stall-over
-// reading, and the deadlock between a boot or a runner waiting on the schema
+// reading (its lock modes read off the server, a boot still queued for SHARE
+// counted), and the deadlock between a boot or a runner waiting on the schema
 // advisory lock and an index build under it, timing alone deciding the side
-// that loses, with DEPLOY's gate and its diagnosis read on both sides and a
-// stopped realm's build shown holding the lock to its end). The nearest suites
-// do not pin it: tests/server/freehold_mutation.test.ts drives the same
+// that loses, with DEPLOY's gate read on both sides, its diagnosis read on a
+// stalled boot and on a build at its wait, a stopped realm's build shown
+// holding the lock to its end, DEPLOY's cancel ending one at once and its
+// rollback drop removing the carcass a runner then builds again). The nearest
+// suites do not pin it: tests/server/freehold_mutation.test.ts drives the same
 // decisions with fakes (no transaction to roll back, no row to wait on),
 // tests/server/freehold_hearth_db.pg.test.ts and
 // tests/server/freehold_db.pg.test.ts prove the Hearth and plot statements
@@ -39,7 +42,7 @@
 // tests/guild_bank_pg_integration.test.ts and
 // tests/server/storage_purchase_db.pg.test.ts prove the legacy halves with no
 // housing participant.
-// Cost: 11.5 s
+// Cost: 12.3 s
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import type { Pool as PgPool, PoolClient } from 'pg';
@@ -3258,33 +3261,48 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       return res.rows.map((r: { lock: string }) => r.lock);
     }
 
-    /** Holds ACCESS SHARE on `tables`, what the nightly pg_dump holds on every
-     *  table for its whole run, under the dump's own session name, runs the
-     *  REAL boot (`ensureSchema`) beside it, and reads the lock it waits for
-     *  and every table lock it holds. `during` runs while the boot still waits
-     *  and may make it fail; without one the boot must finish. */
+    /** Holds `mode` on `tables` (by default ACCESS SHARE, what the nightly
+     *  pg_dump holds on every table for its whole run, then under the dump's
+     *  own session name), runs the REAL boot (`ensureSchema`) beside it, and
+     *  reads the lock it waits for and every table lock it holds. `during` runs
+     *  while the boot still waits and gets the boot's outcome (`'finished'` or
+     *  its error); the boot must finish unless `mayFail`. */
     async function bootBehind(
       tables: readonly string[],
-      during?: (seen: { pid: number; holderPid: number }, boot: Promise<unknown>) => Promise<void>,
+      opts: {
+        mode?: string;
+        during?: (
+          seen: { pid: number; holderPid: number },
+          boot: Promise<unknown>,
+        ) => Promise<void>;
+        mayFail?: boolean;
+      } = {},
     ) {
+      const { mode = 'ACCESS SHARE', during, mayFail = false } = opts;
       const holder = await pool.connect();
       let boot: Promise<unknown> | undefined;
+      let result: { on: string; waits: string; held: string[] } | undefined;
       try {
-        await holder.query("SET application_name = 'pg_dump'");
+        if (mode === 'ACCESS SHARE') await holder.query("SET application_name = 'pg_dump'");
         await holder.query('BEGIN');
-        await holder.query(`LOCK TABLE ${tables.join(', ')} IN ACCESS SHARE MODE`);
+        await holder.query(`LOCK TABLE ${tables.join(', ')} IN ${mode} MODE`);
         const holderPid = (await holder.query('SELECT pg_backend_pid() AS p')).rows[0].p;
-        boot = during ? db.ensureSchema().catch((error: unknown) => error) : db.ensureSchema();
+        boot = db.ensureSchema().then(
+          () => 'finished',
+          (error: unknown) => error,
+        );
         const seen = await waiter(holderPid);
-        const result = { on: seen.rel, waits: seen.mode, held: await heldBy(seen.pid) };
+        result = { on: seen.rel, waits: seen.mode, held: await heldBy(seen.pid) };
         if (during) await during({ pid: seen.pid, holderPid }, boot);
-        return result;
       } finally {
         await holder.query('ROLLBACK').catch(() => {});
         await holder.query('RESET application_name').catch(() => {});
         holder.release();
         await boot;
       }
+      const outcome = await boot;
+      if (!mayFail && outcome !== 'finished') throw outcome;
+      return result;
     }
 
     /** The statements each pg Client sent, by client, in order. */
@@ -3337,8 +3355,87 @@ d('the housing mutation boundary (REAL Postgres)', () => {
             'characters ShareLock',
           ],
         ];
+        // DEPLOY's stall-over reading counts every mode that blocks a token
+        // write, whole: each mode PostgreSQL makes the ROW EXCLUSIVE a write
+        // takes wait for, read off the server by holding each mode in turn.
+        const stallSql = operatorSql("SELECT count(*) FROM pg_locks WHERE locktype = 'relation'");
+        const counted = /mode IN \(([^)]*)\);$/
+          .exec(stallSql)?.[1]
+          .split(', ')
+          .map((mode) => mode.slice(1, -1));
+        const MODES: Record<string, string> = {
+          AccessShareLock: 'ACCESS SHARE',
+          RowShareLock: 'ROW SHARE',
+          RowExclusiveLock: 'ROW EXCLUSIVE',
+          ShareUpdateExclusiveLock: 'SHARE UPDATE EXCLUSIVE',
+          ShareLock: 'SHARE',
+          ShareRowExclusiveLock: 'SHARE ROW EXCLUSIVE',
+          ExclusiveLock: 'EXCLUSIVE',
+          AccessExclusiveLock: 'ACCESS EXCLUSIVE',
+        };
+        const blocksWrite: string[] = [];
+        for (const [mode, sql] of Object.entries(MODES)) {
+          const holder = await pool.connect();
+          const writer = await pool.connect();
+          try {
+            await holder.query('BEGIN');
+            await holder.query(`LOCK TABLE auth_tokens IN ${sql} MODE`);
+            const held = await holder.query(
+              "SELECT mode FROM pg_locks WHERE pid = pg_backend_pid() AND locktype = 'relation' AND relation = 'auth_tokens'::regclass",
+            );
+            expect(held.rows.map((r: { mode: string }) => r.mode)).toEqual([mode]);
+            await writer.query('BEGIN');
+            const waits = await writer
+              .query('LOCK TABLE auth_tokens IN ROW EXCLUSIVE MODE NOWAIT')
+              .then(
+                () => false,
+                (error: { code?: string }) => error.code === '55P03' || Promise.reject(error),
+              );
+            if (waits) blocksWrite.push(mode);
+          } finally {
+            await writer.query('ROLLBACK').catch(() => {});
+            await holder.query('ROLLBACK').catch(() => {});
+            writer.release();
+            holder.release();
+          }
+        }
+        expect(blocksWrite).toHaveLength(4);
+        expect(counted).toEqual(blocksWrite);
+        const stall = async (sql = stallSql) => Number((await pool.query(sql)).rows[0].count);
+        expect(await stall()).toBe(0);
+        // DEPLOY's diagnosis, read on a stalled boot: it holds the schema
+        // advisory lock, waits on `relation`, and names the dump-shaped holder.
+        const diagnosis = async () =>
+          (await pool.query(operatorSql('SELECT l.pid, l.granted'))).rows.map(
+            (r: Record<string, unknown>) => ({
+              pid: r.pid,
+              granted: r.granted,
+              wait_event_type: r.wait_event_type,
+              wait_event: r.wait_event,
+              phase: r.phase,
+              blocked_by: r.blocked_by,
+            }),
+          );
         for (const [i, parent] of PARENTS.entries()) {
-          const seen = await bootBehind([parent]);
+          const seen = await bootBehind([parent], {
+            during: async ({ pid, holderPid }) => {
+              // Behind each parent the boot holds `auth_tokens` SHARE and
+              // either holds or waits for its ACCESS EXCLUSIVE: the reading
+              // counts both.
+              expect(await stall(), parent).toBe(2);
+              if (i === 0)
+                expect(await diagnosis()).toEqual([
+                  {
+                    pid,
+                    granted: true,
+                    wait_event_type: 'Lock',
+                    wait_event: 'relation',
+                    phase: null,
+                    blocked_by: [holderPid],
+                  },
+                ]);
+            },
+          });
           expect(seen).toEqual({ on: parent, waits: 'AccessExclusiveLock', held: modes[i] });
           const tables = new Set(seen.held.map((lock) => lock.split(' ')[0]));
           for (const earlier of PARENTS.slice(0, i))
@@ -3348,24 +3445,34 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         expect(bootBullet()).toContain(
           `first on ${PARENTS.map((table) => `\`${table}\``).join(', then ')}`,
         );
-        // DEPLOY's stall-over reading counts a boot that holds `auth_tokens`
-        // ACCESS EXCLUSIVE while it waits on a later table, as well as one
-        // waiting for it there; with no boot it reads 0.
-        const stall = async () =>
-          Number(
-            (
-              await pool.query(
-                operatorSql("SELECT count(*) FROM pg_locks WHERE locktype = 'relation'"),
-              )
-            ).rows[0].count,
-          );
-        expect(await stall()).toBe(0);
-        await bootBehind(['characters'], async () => {
-          expect(await stall()).toBe(1);
+        // Behind an open write on `auth_tokens` the boot is still queued for
+        // SHARE, and a token write queues behind it: the reading counts it,
+        // where counting ACCESS EXCLUSIVE alone would read 0.
+        const exclusiveOnly = stallSql.replace(/mode IN \([^)]*\)/, "mode = 'AccessExclusiveLock'");
+        expect(exclusiveOnly).not.toBe(stallSql);
+        const tokenWrite = async () => {
+          const client = await pool.connect();
+          try {
+            await client.query('BEGIN');
+            await client.query("SET LOCAL statement_timeout = '200ms'");
+            await client.query("DELETE FROM auth_tokens WHERE token = 'none'");
+            return 'ran';
+          } catch (error) {
+            return (error as { code?: string }).code;
+          } finally {
+            await client.query('ROLLBACK').catch(() => {});
+            client.release();
+          }
+        };
+        const queued = await bootBehind(['auth_tokens'], {
+          mode: 'ROW EXCLUSIVE',
+          during: async () => {
+            expect(await stall()).toBe(1);
+            expect(await stall(exclusiveOnly)).toBe(0);
+            expect(await tokenWrite()).toBe('57014');
+          },
         });
-        await bootBehind(['auth_tokens'], async () => {
-          expect(await stall()).toBe(1);
-        });
+        expect(queued).toEqual({ on: 'auth_tokens', waits: 'ShareLock', held: [] });
         expect(await stall()).toBe(0);
         // The later tables DEPLOY names lock too: behind each the boot waits
         // for ACCESS EXCLUSIVE.
@@ -3396,7 +3503,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           ),
         ).toHaveLength(1);
         const boots = bootClients(spy);
-        expect(boots).toHaveLength(PARENTS.length + 4);
+        expect(boots).toHaveLength(PARENTS.length + 3);
         type Startup = { connectionParameters: { lock_timeout?: unknown; options?: unknown } };
         const startupOf = (config: object) =>
           (new Client(config) as unknown as Startup).connectionParameters;
@@ -3479,65 +3586,68 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         const tables = await everyTable();
         expect(tables.length).toBeGreaterThan(100);
         const outcomes: unknown[] = [];
-        const seen = await bootBehind(tables, async ({ pid, holderPid }, boot) => {
-          // DEPLOY's quiet check sees the dump-shaped holder idle in its
-          // transaction and the waiting boot, and no idle session.
-          const idle = await pool.connect();
-          try {
-            expect(await quiet()).toEqual([
-              ['', 'active'],
-              ['pg_dump', 'idle in transaction'],
+        const seen = await bootBehind(tables, {
+          mayFail: true,
+          during: async ({ pid, holderPid }, boot) => {
+            // DEPLOY's quiet check sees the dump-shaped holder idle in its
+            // transaction and the waiting boot, and no idle session.
+            const idle = await pool.connect();
+            try {
+              expect(await quiet()).toEqual([
+                ['', 'active'],
+                ['pg_dump', 'idle in transaction'],
+              ]);
+            } finally {
+              idle.release();
+            }
+            // A second realm, still running, queues on the advisory lock behind
+            // the waiting boot, and a third one, stopped, queues there too.
+            second = db.ensureSchema().catch((error: unknown) => error);
+            expect(await until(advisory, ['granted', 'waiting'])).toEqual(['granted', 'waiting']);
+            third = db.ensureSchema().catch((error: unknown) => error);
+            expect(await until(advisory, ['granted', 'waiting', 'waiting'])).toEqual([
+              'granted',
+              'waiting',
+              'waiting',
             ]);
-          } finally {
-            idle.release();
-          }
-          // A second realm, still running, queues on the advisory lock behind
-          // the waiting boot, and a third one, stopped, queues there too.
-          second = db.ensureSchema().catch((error: unknown) => error);
-          expect(await until(advisory, ['granted', 'waiting'])).toEqual(['granted', 'waiting']);
-          third = db.ensureSchema().catch((error: unknown) => error);
-          expect(await until(advisory, ['granted', 'waiting', 'waiting'])).toEqual([
-            'granted',
-            'waiting',
-            'waiting',
-          ]);
-          const clients = bootClients(spy);
-          expect(clients).toHaveLength(3);
-          const [first, running, stopped] = clients;
-          stop(stopped.client);
-          // Stopping the waiting boot's realm leaves its backend in the queue.
-          stop(first.client);
-          outcomes.push(await boot);
-          await sleep(300);
-          expect((await waiter(holderPid)).pid).toBe(pid);
-          expect(await tokenRead()).toBe('57014');
-          // DEPLOY's statement ends it, naming it; the running realm's boot
-          // takes its place, and the stopped one still waits behind that.
-          expect(await terminate()).toEqual([[pid, true, true]]);
-          expect(await gone(pid)).toBe(0);
-          const next = await waiter(holderPid);
-          expect(next).toMatchObject({
-            pid: (running.client as { processID: number }).processID,
-            rel: 'auth_tokens',
-            mode: 'AccessExclusiveLock',
-          });
-          expect(await advisory()).toEqual(['granted', 'waiting']);
-          // So it is stopped and ended too; the stopped third boot exits once
-          // it gets the advisory lock, and the next run names nothing.
-          stop(running.client);
-          outcomes.push(await second);
-          expect(await terminate()).toEqual([[next.pid, true, true]]);
-          outcomes.push(await third);
-          expect(await gone(next.pid)).toBe(0);
-          expect(await until(advisory, [])).toEqual([]);
-          expect(await terminate()).toEqual([]);
-          // The queue is released, and the dump-shaped holder was spared.
-          expect(await tokenRead()).toBe('ran');
-          const holderState = await pool.query(
-            'SELECT state FROM pg_stat_activity WHERE pid = $1',
-            [holderPid],
-          );
-          expect(holderState.rows).toEqual([{ state: 'idle in transaction' }]);
+            const clients = bootClients(spy);
+            expect(clients).toHaveLength(3);
+            const [first, running, stopped] = clients;
+            stop(stopped.client);
+            // Stopping the waiting boot's realm leaves its backend in the queue.
+            stop(first.client);
+            outcomes.push(await boot);
+            await sleep(300);
+            expect((await waiter(holderPid)).pid).toBe(pid);
+            expect(await tokenRead()).toBe('57014');
+            // DEPLOY's statement ends it, naming it; the running realm's boot
+            // takes its place, and the stopped one still waits behind that.
+            expect(await terminate()).toEqual([[pid, true, true]]);
+            expect(await gone(pid)).toBe(0);
+            const next = await waiter(holderPid);
+            expect(next).toMatchObject({
+              pid: (running.client as { processID: number }).processID,
+              rel: 'auth_tokens',
+              mode: 'AccessExclusiveLock',
+            });
+            expect(await advisory()).toEqual(['granted', 'waiting']);
+            // So it is stopped and ended too; the stopped third boot exits once
+            // it gets the advisory lock, and the next run names nothing.
+            stop(running.client);
+            outcomes.push(await second);
+            expect(await terminate()).toEqual([[next.pid, true, true]]);
+            outcomes.push(await third);
+            expect(await gone(next.pid)).toBe(0);
+            expect(await until(advisory, [])).toEqual([]);
+            expect(await terminate()).toEqual([]);
+            // The queue is released, and the dump-shaped holder was spared.
+            expect(await tokenRead()).toBe('ran');
+            const holderState = await pool.query(
+              'SELECT state FROM pg_stat_activity WHERE pid = $1',
+              [holderPid],
+            );
+            expect(holderState.rows).toEqual([{ state: 'idle in transaction' }]);
+          },
         });
         expect(seen).toEqual({
           on: 'auth_tokens',
@@ -3588,17 +3698,24 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         scope: 'character:read',
         ttlSeconds: 300,
       });
-      // A Discord link a leftover token started: its callback needs no bearer.
+      // A Discord link and a GitHub link a leftover token started: each
+      // callback needs no bearer.
       await pool.query(
         `INSERT INTO discord_oauth_states (state, code_verifier, mode, account_id, expires_at)
          VALUES ($1, $2, 'link', $3, now() + interval '10 minutes')`,
         [hex(), hex(), accountId],
+      );
+      await pool.query(
+        `INSERT INTO github_oauth_states (state, account_id, expires_at)
+         VALUES ($1, $2, now() + interval '10 minutes')`,
+        [hex(), accountId],
       );
       const count = async (table: string) =>
         (await pool.query(`SELECT count(*)::int AS n FROM ${table}`)).rows[0].n;
       expect(await count('oauth_codes')).toBe(1);
       expect(await count('oauth_device_codes')).toBe(1);
       expect(await count('discord_oauth_states')).toBe(1);
+      expect(await count('github_oauth_states')).toBe(1);
       await pool.query(operatorSql('DELETE FROM auth_tokens'));
       expect(await db.accountAndScopeForToken(full)).toBeNull();
       expect(await db.accountAndScopeForToken(read)).toBeNull();
@@ -3606,6 +3723,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       expect(await count('oauth_codes')).toBe(0);
       expect(await count('oauth_device_codes')).toBe(0);
       expect(await count('discord_oauth_states')).toBe(0);
+      expect(await count('github_oauth_states')).toBe(0);
       expect(await oauth.consumeAuthCode(pool, code)).toBeNull();
       // Every table with a secret-shaped column (a token, secret, verifier,
       // nonce, challenge, code, hash or state), whole: the sign-out clears it,
@@ -3621,7 +3739,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       expect(secretShaped.rows.map((r: { t: string }) => r.t)).toEqual([
         'account_freehold_hearth', // an advance token: a save's idempotency key
         'account_totp_recovery', // spent only at a login that already proved the password
-        'accounts', // its own password, second factor and an unsubscribe token that mints nothing
+        'accounts', // its own password, second factor and an unsubscribe token that mints nothing (below)
         'apple_pending_logins', // a provider identity: linking one needs the account password
         'auth_tokens', // signed out
         'character_leases', // a realm's lease fence
@@ -3630,7 +3748,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         'discord_pending_logins', // as Apple's
         'email_change_requests', // creating one needs the account password; verifying mints no token
         'freehold_plot_claims', // a claim's write fence
-        'github_oauth_states', // link only, and a GitHub link signs nobody in
+        'github_oauth_states', // signed out: a link row's callback needs no bearer
         'oauth_codes', // signed out
         'oauth_device_codes', // signed out
         'password_reset_requests', // created and redeemed by email
@@ -3653,8 +3771,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       // Its static imports, whole, and no dynamic import or require: a store
       // reached through a new module would show here (one behind ./auth would
       // not, a boundary of this pin).
-      const loadsAtRuntime = /\bimport\s*\(|\brequire\s*\(/;
+      const loadsAtRuntime = /\bimport\s*\(|\brequire\s*\(|\bcreateRequire\b/;
       expect("await import('./db')").toMatch(loadsAtRuntime);
+      expect('const load = createRequire(import.meta.url);').toMatch(loadsAtRuntime);
       expect(desktop).not.toMatch(loadsAtRuntime);
       expect(desktop.match(/from '[^']+'/g)).toEqual([
         "from 'node:crypto'",
@@ -3662,6 +3781,24 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         "from './auth'",
         "from './ratelimit'",
       ]);
+      // The unsubscribe token mints nothing: its handler and the two
+      // statements it runs, whole, read the account by the token, turn
+      // marketing mail off, and answer ok.
+      const wholeFunction = (file: string, name: string) => {
+        const source = readFileSync(file, 'utf8');
+        const at = source.indexOf(`export async function ${name}(`);
+        expect(at, name).toBeGreaterThan(-1);
+        return source.slice(at, source.indexOf('\n}\n', at) + 2).replace(/\s+/g, ' ');
+      };
+      expect(wholeFunction('server/db.ts', 'accountByUnsubscribeToken')).toBe(
+        "export async function accountByUnsubscribeToken(token: string): Promise<number | null> { const res = await pool.query('SELECT id FROM accounts WHERE unsubscribe_token = $1', [token]); return res.rows[0]?.id ?? null; }",
+      );
+      expect(wholeFunction('server/db.ts', 'setAccountMarketingOptIn')).toBe(
+        "export async function setAccountMarketingOptIn(accountId: number, optIn: boolean): Promise<void> { await pool.query('UPDATE accounts SET marketing_opt_in = $2 WHERE id = $1', [accountId, optIn]); }",
+      );
+      expect(wholeFunction('server/account.ts', 'handleEmailUnsubscribe')).toBe(
+        "export async function handleEmailUnsubscribe( res: http.ServerResponse, token: string, ): Promise<void> { const raw = typeof token === 'string' ? token.trim() : ''; if (raw) { const accountId = await accountByUnsubscribeToken(raw); if (accountId !== null) await setAccountMarketingOptIn(accountId, false); } return json(res, 200, { ok: true }); }",
+      );
       // The stall's remedy points at DEPLOY's receipt-erase repair by its
       // opening words, and that bullet exists once, below it.
       const opening = /begins "([^"]+)"/.exec(bootBullet())?.[1];
@@ -3790,12 +3927,79 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         }
       };
       // A quick order is a race on a loaded host (the build must reach its
-      // last wait inside the waiter's one check), so it gets one retry.
-      const quick = async (waiterSql: string, inTransaction: boolean) =>
-        (await round(waiterSql, inTransaction, 0)) === 'waiter'
-          ? 'waiter'
-          : round(waiterSql, inTransaction, 0);
-      const late = timeoutMs + 200;
+      // last wait inside the waiter's one check), so it gets one retry, and
+      // both quick orders needing theirs fails.
+      let retried = 0;
+      const quick = async (waiterSql: string, inTransaction: boolean) => {
+        if ((await round(waiterSql, inTransaction, 0)) === 'waiter') return 'waiter';
+        retried += 1;
+        return round(waiterSql, inTransaction, 0);
+      };
+      const late = timeoutMs + 500;
+      const oldSnapshotWaits = async () =>
+        (
+          await pool.query(
+            "SELECT count(*)::int AS n FROM pg_stat_progress_create_index WHERE datname = current_database() AND phase LIKE 'waiting for old snapshots%'",
+          )
+        ).rows[0].n;
+      // A realm's runner building the index on its own client, held at its
+      // wait for old snapshots by an open REPEATABLE READ transaction (the
+      // kind the nightly dump holds); `then` runs there, and `stop` closes
+      // the realm's socket as its stop or crash would.
+      const heldBuild = async (
+        then: (build: {
+          pid: number;
+          snapshotPid: number;
+          stop: () => Promise<unknown>;
+          release: () => Promise<unknown>;
+        }) => Promise<void>,
+      ) => {
+        await pool.query(`DROP INDEX IF EXISTS ${migration.name}`);
+        const { Client } = await import('pg');
+        const { materialSourceConnection } = await import(
+          '../../server/material_source_connection'
+        );
+        const realm = new Client({ ...materialSourceConnection(verifyUrl(ADMIN_URL)) });
+        realm.on('error', () => {});
+        let snapshot: PoolClient | undefined;
+        try {
+          snapshot = await pool.connect();
+          const open = snapshot;
+          await open.query('BEGIN ISOLATION LEVEL REPEATABLE READ');
+          const snapshotPid = (await open.query('SELECT pg_backend_pid() AS p')).rows[0].p;
+          await realm.connect();
+          await realm.query('SELECT pg_advisory_lock($1)', [0x57_4f_43_01]);
+          const building = realm.query(migration.createSql).catch(() => 'stopped');
+          expect(await until(oldSnapshotWaits, 1)).toBe(1);
+          await then({
+            pid: (realm as unknown as { processID: number }).processID,
+            snapshotPid,
+            stop: () => {
+              (
+                realm as unknown as { connection: { stream: { destroy(): void } } }
+              ).connection.stream.destroy();
+              return building;
+            },
+            release: () => open.query('COMMIT'),
+          });
+        } finally {
+          await snapshot?.query('ROLLBACK').catch(() => {});
+          snapshot?.release();
+          await realm.end().catch(() => {});
+        }
+      };
+      // DEPLOY's diagnosis, each row's columns that decide what to do.
+      const decides = async () =>
+        (await pool.query(operatorSql('SELECT l.pid, l.granted'))).rows.map(
+          (r: Record<string, unknown>) => ({
+            pid: r.pid,
+            granted: r.granted,
+            wait_event_type: r.wait_event_type,
+            wait_event: r.wait_event,
+            phase: r.phase,
+            blocked_by: r.blocked_by,
+          }),
+        );
       try {
         // Which side loses turns on timing alone, whichever kind of waiter:
         // already waiting when a quick build reaches its last wait, the waiter
@@ -3804,52 +4008,65 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         expect(await quick('SELECT pg_advisory_lock($1)', false)).toBe('waiter');
         expect(await round('SELECT pg_advisory_xact_lock($1)', true, late)).toBe('build');
         expect(await round('SELECT pg_advisory_lock($1)', false, late)).toBe('build');
-        // A realm's stop does not end its build: with the build waiting on an
-        // old snapshot, its client's socket closes, and the build still holds
-        // the lock until it ends, valid.
-        await pool.query(`DROP INDEX IF EXISTS ${migration.name}`);
-        const snapshot = await pool.connect();
-        const { Client } = await import('pg');
-        const { materialSourceConnection } = await import(
-          '../../server/material_source_connection'
-        );
-        const stopped = new Client({ ...materialSourceConnection(verifyUrl(ADMIN_URL)) });
-        stopped.on('error', () => {});
-        try {
-          await snapshot.query('BEGIN ISOLATION LEVEL REPEATABLE READ');
-          await snapshot.query('SELECT 1');
-          await stopped.connect();
-          await stopped.query('SELECT pg_advisory_lock($1)', [0x57_4f_43_01]);
-          const building = stopped.query(migration.createSql).catch(() => 'stopped');
+        expect(retried).toBeLessThan(2);
+        // The build that lost left its index INVALID; the next runner drops
+        // it and builds it again, and a run with nothing to build is quick.
+        expect(await valid()).toEqual([false]);
+        expect(await until(gate, 0)).toBe(0);
+        await db.runConcurrentIndexMigrations();
+        expect(await valid()).toEqual([true]);
+        const nothingToBuild = Date.now();
+        await db.runConcurrentIndexMigrations();
+        expect(Date.now() - nothingToBuild).toBeLessThan(5_000);
+        // A realm's stop does not end its build: the diagnosis names the build,
+        // its wait and the snapshot it waits for; with the check on the socket
+        // off, the build still holds the lock after its socket closes, until
+        // it ends, valid.
+        await heldBuild(async ({ pid, snapshotPid, stop, release }) => {
+          expect(await decides()).toEqual([
+            {
+              pid,
+              granted: true,
+              wait_event_type: 'Lock',
+              wait_event: 'virtualxid',
+              phase: 'waiting for old snapshots',
+              blocked_by: [snapshotPid],
+            },
+          ]);
           expect(
-            await until(
-              async () =>
-                (
-                  await pool.query(
-                    "SELECT count(*)::int AS n FROM pg_stat_progress_create_index WHERE datname = current_database() AND phase LIKE 'waiting for old snapshots%'",
-                  )
-                ).rows[0].n,
-              1,
-            ),
-          ).toBe(1);
-          (
-            stopped as unknown as { connection: { stream: { destroy(): void } } }
-          ).connection.stream.destroy();
-          expect(await building).toBe('stopped');
+            (await pool.query('SHOW client_connection_check_interval')).rows[0]
+              .client_connection_check_interval,
+          ).toBe('0');
+          expect(await stop()).toBe('stopped');
           await sleep(300);
           expect(await gate()).toBe(1);
-          await snapshot.query('COMMIT');
+          await release();
           expect(await until(gate, 0)).toBe(0);
           expect(await valid()).toEqual([true]);
-        } finally {
-          await snapshot.query('ROLLBACK').catch(() => {});
-          snapshot.release();
-          await stopped.end().catch(() => {});
-        }
-      } finally {
-        // Whatever an order left, the next realm's runner rebuilds the index.
-        await until(gate, 0);
+        });
+        // DEPLOY's cancel ends a stopped realm's build at once: the lock is
+        // free and the index INVALID. After a rollback no runner names it, and
+        // DEPLOY's drop removes it; a runner that names it builds it again.
+        await heldBuild(async ({ pid, stop }) => {
+          expect(await stop()).toBe('stopped');
+          const cancel = operatorSql('SELECT pg_cancel_backend(');
+          expect(cancel).toBe('SELECT pg_cancel_backend(<pid>);');
+          const holders = (await decides()).filter((row) => row.granted).map((row) => row.pid);
+          expect(holders).toEqual([pid]);
+          await pool.query(cancel.replace('<pid>', String(holders[0])));
+          expect(await until(gate, 0)).toBe(0);
+          expect(await valid()).toEqual([false]);
+        });
+        const drop = operatorSql('DROP INDEX CONCURRENTLY IF EXISTS');
+        expect(drop).toBe('DROP INDEX CONCURRENTLY IF EXISTS <name>;');
+        await pool.query(drop.replace('<name>', migration.name));
+        expect(await valid()).toEqual([]);
         await db.runConcurrentIndexMigrations();
+      } finally {
+        // Cleanup after a failed order: with the lock free, a runner rebuilds
+        // whatever the order left (a lock still held would block it for good,
+        // so the reads below fail instead).
+        if ((await until(gate, 0)) === 0) await db.runConcurrentIndexMigrations();
       }
       expect(await valid()).toEqual([true]);
       expect(await gate()).toBe(0);

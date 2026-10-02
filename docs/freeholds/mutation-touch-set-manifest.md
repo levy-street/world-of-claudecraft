@@ -1398,3 +1398,6 @@ What changed the contract above:
 - A twenty-fifth round of eight fresh readers: no P12 change; `DEPLOY.md` applies the start
   gate to every realm start it gives, the first included, and states the stall's account
   recovery as owed.
+- A twenty-sixth round of eight fresh readers: no P12 change; `DEPLOY.md` counts every lock
+  mode that blocks a token write in the stall-over reading, decides by the holder's wait in the
+  gate's diagnosis, and points every realm start it gives at the gate.

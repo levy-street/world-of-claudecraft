@@ -52,10 +52,12 @@ export async function runConcurrentIndexMigrations(): Promise<void> {
       await client.query('SET statement_timeout = 0');
       await client.query('SELECT pg_advisory_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
       locked = true;
-      // A prior build may have died mid-CONCURRENTLY (a deploy-watchdog restart,
-      // a crash), stranding an INVALID index that IF NOT EXISTS would treat as
-      // existing forever, so the reader would sequential-scan for good. Each
-      // entry drops its carcass first; the list and its order live in
+      // A prior build may have died mid-CONCURRENTLY (an index-build deadlock,
+      // a cancelled or terminated backend, a database restart; a realm's own
+      // stop or crash leaves its build running: DEPLOY.md, Index builds),
+      // stranding an INVALID index that IF NOT EXISTS would treat as existing
+      // forever, so the reader would sequential-scan for good. Each entry drops
+      // its carcass first; the list and its order live in
       // server/concurrent_indexes.ts.
       for (const migration of CONCURRENT_INDEX_MIGRATIONS) {
         const invalidIndex = await client.query(migration.checkSql);
@@ -71,18 +73,18 @@ export async function runConcurrentIndexMigrations(): Promise<void> {
         }
       }
       // The out-of-boot half of the receipts key-shape converge, INSIDE the
-      // session advisory lock: ensureSchema re-adds a drifted constraint as
-      // NOT VALID so boot never scans the keep-forever table; this VALIDATE
-      // (SHARE UPDATE EXCLUSIVE, inserts keep flowing) proves the rows here.
-      // In-lock on purpose: a concurrently booting realm waits at the schema
-      // advisory lock holding no table lock (its waiting statement still holds a
+      // session advisory lock: ensureSchema re-adds a drifted constraint as NOT
+      // VALID so boot never scans the keep-forever table; this VALIDATE (SHARE
+      // UPDATE EXCLUSIVE, inserts keep flowing) proves the rows here. In-lock
+      // on purpose: a concurrently booting realm waits at the schema advisory
+      // lock holding no table lock (its waiting statement still holds a
       // snapshot, which a concurrent index build waits on: DEPLOY.md, Index
-      // builds), while post-unlock it would run its
-      // boot DDL (IF NOT EXISTS still takes ACCESS EXCLUSIVE/SHARE locks)
-      // and block mid-DDL behind the scan, freezing logins and saves. The
-      // helper bounds the scan in its own SET LOCAL transaction and swallows
-      // failure loudly (NOT VALID survives, next boot retries); the index
-      // loop's own throw skips it for the same next-boot retry.
+      // builds), while post-unlock it would run its boot DDL (IF NOT EXISTS
+      // still takes ACCESS EXCLUSIVE/SHARE locks) and block mid-DDL behind the
+      // scan, freezing logins and saves. The helper bounds the scan in its own
+      // SET LOCAL transaction and swallows failure loudly (NOT VALID survives,
+      // next boot retries); the index loop's own throw skips it for the same
+      // next-boot retry.
       await validateBankLedgerBatchReceiptsKeyShape(client);
     } finally {
       if (locked) {

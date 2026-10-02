@@ -142,16 +142,19 @@ curl -fsS -X POST -H "x-woc-deploy-secret: <RESTART_COUNTDOWN_SECRET>" \
 sudo docker compose stop game
 #    On an older checkout whose compose file has no stop_grace_period, pass the
 #    window explicitly: sudo docker compose stop -t 60 game
-#    This normal stop followed by up -d --build replaces the process. It also
+#    This normal stop followed by step 6's start replaces the process. It also
 #    terminates authenticated and linkdead sessions held in process memory, so an
 #    auth rollout needs no separate session cleanup. Do not leave an old game
 #    process serving alongside the rebuilt one.
 
-# 6. Rebuild and start. (`sudo docker compose build game` before step 4 shortens the
-#    outage: the image is then ready the moment the countdown ends.) Start only by the
-#    gate in Index builds under EVERY BOOT LOCKS THE PARENTS: an index build the
-#    stopped process began runs on and holds the schema advisory lock until it ends.
-sudo docker compose up -d --build
+# 6. Rebuild, then start. Build first, so the gate's readings below are not minutes
+#    old when the realm starts (running this build before step 4 also shortens the
+#    outage: the image is then ready the moment the countdown ends).
+sudo docker compose build game
+#    Then start only by the gate in Index builds under EVERY BOOT LOCKS THE PARENTS,
+#    its readings taken just before: an index build the stopped process began runs on
+#    and holds the schema advisory lock until it ends.
+sudo docker compose up -d
 ```
 
 Then verify, before you walk away:
@@ -202,8 +205,10 @@ EMAIL_FROM="World of ClaudeCraft <noreply@worldofclaudecraft.com>"
 EMAIL_BASE_URL=https://worldofclaudecraft.com
 ```
 
-Then `docker compose up -d game`. The startup log line
-`email transport selected` confirms which transport is live; every send
+Then `docker compose up -d game`, which stops and starts the realm in one step:
+take the gate's readings in Index builds under EVERY BOOT LOCKS THE PARENTS just
+before it. The startup log line `email transport selected` confirms which
+transport is live; every send
 attempt is audited in the `email_log` table. A provider with a plain HTTP
 API works too: set `EMAIL_API_URL`, `EMAIL_API_KEY`, and `EMAIL_FROM`
 instead (see `.env.example`).
@@ -1001,8 +1006,9 @@ For off-box safety, sync the directory to S3 occasionally:
 - `FREEHOLDS_ENABLED` defaults off, is read live as the strict '1', and
   production never enables it before the release gates in
   docs/freeholds/state.md "Tracked release and handoff gates" are signed
-  (`server/freehold_config.ts`). A running realm needs a restart to pick up
-  a change, because the realm Sim boots with the value
+  (`server/freehold_config.ts`). A running realm needs a restart (by Index
+  builds under EVERY BOOT LOCKS THE PARENTS) to pick up a change, because the
+  realm Sim boots with the value
   (`server/sim_boot_config.ts`); only the wire verdict and the status route
   read it live.
 - Enabling `FREEHOLDS_ENABLED` starts writing two account-scoped tables,
@@ -1113,17 +1119,17 @@ For off-box safety, sync the directory to S3 occasionally:
     exits, the compose policy restarts it, and a restart meets the same race while
     another realm keeps serving those saves.
   - The quiet window: boot a realm while the other realms on its database are quiet and
-    outside the nightly `pg_dump`, in a rolling restart let one realm finish shutting
-    down before another boots, and start each realm only as Index builds below allows;
-    that is the quiet window this file means. A realm opens a transaction at any moment
-    while players are online, so it is quiet only with no players online, or stopped,
-    whatever a reading shows; a reading then confirms nothing is left open: from psql on
-    the realm database, `SELECT backend_type, application_name, client_addr, state,
-    now() - xact_start AS open_for FROM pg_stat_activity WHERE datname =
-    current_database() AND xact_start IS NOT NULL AND pid <> pg_backend_pid();` shows no
-    `client backend` or `autovacuum worker` row (an `idle in transaction` row counts; a
-    `pg_dump` row is the nightly dump); one reading is a snapshot, so take several a few
-    seconds apart.
+    outside the nightly `pg_dump`, and in a rolling restart let one realm finish
+    shutting down before another boots; that is the quiet window this file means, and a
+    start in it still goes by Index builds below. A realm opens a transaction at any
+    moment while players are online, so it is quiet only with no players online, or
+    stopped, whatever a reading shows; a reading then confirms nothing is left open:
+    from psql on the realm database, `SELECT backend_type, application_name,
+    client_addr, state, now() - xact_start AS open_for FROM pg_stat_activity WHERE
+    datname = current_database() AND xact_start IS NOT NULL AND pid <>
+    pg_backend_pid();` shows no `client backend` or `autovacuum worker` row (an `idle in
+    transaction` row counts; a `pg_dump` row is the nightly dump); one reading is a
+    snapshot, so take several a few seconds apart.
   - The nightly dump: it starts at 03:15 UTC (see Backups) and holds ACCESS SHARE on
     every table for its whole run. A boot that starts during it takes SHARE on
     `auth_tokens` and waits for the dump to end to upgrade it, holding nothing on
@@ -1155,9 +1161,9 @@ For off-box safety, sync the directory to S3 occasionally:
     nothing waits there, and a row means a realm still booting took the place, so stop
     every realm whose container is still not `healthy` and run it again. Leave the
     stopped realms stopped until the dump ends (the quiet reading shows no `pg_dump`
-    row), then boot them one at a time by Index builds below in a quiet window, or,
-    after a stall that began while players or staff were active, by the After a stall
-    steps below; never end the dump, and boot no realm until it ends.
+    row), then boot them one at a time by Index builds below, the first in a quiet
+    window, or, after a stall that began while players or staff were active, by the
+    After a stall steps below; never end the dump, and boot no realm until it ends.
   - After an abort: an aborted save shows as 40P01 in the realm log (one that carried
     guild bank books also counts `escrow_save_failed`), and what writes it again
     depends on the save: an autosave is written by the next autosave; a leave save is
@@ -1175,68 +1181,99 @@ For off-box safety, sync the directory to S3 occasionally:
     reset, a ban, a suspension or a deactivation) that leaves the old tokens valid and
     the live session connected, and skips what follows (for example its disconnect, its
     notice email, or a deactivation's housing receipt erase); the realm log names no
-    account. The stall is over once no boot holds or waits for that lock: `SELECT
-    count(*) FROM pg_locks WHERE locktype = 'relation' AND database = (SELECT oid FROM
-    pg_database WHERE datname = current_database()) AND relation =
-    'public.auth_tokens'::regclass AND mode = 'AccessExclusiveLock';` from psql on the
-    realm database returns 0. Then staff send again each ban, suspension or staff
-    password reset made during it, in the order made and skipping one a later unban or
-    unsuspend reversed or a suspension whose end time has passed, whether or not it
-    returned an error or shows landed (a repeat runs its revoke, disconnect and notice
-    email again and writes a second audit row; resend a suspension with its original end
-    time and a staff password reset with the same password), and players redo what
-    returned an error and did not land; nothing else sends a skipped notice email again.
-    A token a skipped revoke left valid stays valid until a sign-out, so then stop every
-    realm on the database, one after another, each stop finishing before the next, which
-    drops every live session and the in-memory desktop login codes in
-    `server/desktop_login.ts` (the sign-out cannot reach them, and a desktop app could
-    still trade one for a fresh token); sign every account out once from psql on the
-    realm database (`DELETE FROM auth_tokens WHERE created_at < now() AND expires_at >
-    now(); DELETE FROM oauth_codes; DELETE FROM oauth_device_codes; DELETE FROM
-    discord_oauth_states;`, companion and OAuth tokens included, no pending OAuth code
-    left to mint one, and no Discord link a leftover token started left to finish; an
-    expired token is refused already; on 40P01 run it again); and, once the dump has
-    ended if the stall was behind one, start the realms again by Index builds below.
-    Re-run the deactivation housing receipt erase for deactivated accounts that still
-    hold receipts by the bullet below that begins "A failed deactivation receipt erase"
-    (a deactivation stopped at its revoke never reached the erase, so it logged no
-    warning). A sign-out undoes nothing a leftover token did before it (a sign-in link
-    it added, or a recovery email it set): this bullet does not recover an account the
-    stall left open to whoever held such a token, and that recovery is owed.
+    account. The stall is over once no session holds or waits for a lock on
+    `auth_tokens` that blocks a token write (a mode that conflicts with the ROW
+    EXCLUSIVE a write takes: a boot's SHARE, which it can still be queued for, its
+    ACCESS EXCLUSIVE, or your own DDL there): `SELECT count(*) FROM pg_locks WHERE
+    locktype = 'relation' AND database = (SELECT oid FROM pg_database WHERE datname =
+    current_database()) AND relation = 'public.auth_tokens'::regclass AND mode IN
+    ('ShareLock', 'ShareRowExclusiveLock', 'ExclusiveLock', 'AccessExclusiveLock');`
+    from psql on the realm database returns 0 on two readings a few seconds apart (a
+    boot that lost a deadlock reads 0 until its restart reaches that table again). Then
+    staff send again each ban, suspension or staff password reset made during it, in the
+    order made and skipping one a later unban or unsuspend reversed or a suspension
+    whose end time has passed, whether or not it returned an error or shows landed (a
+    repeat runs its revoke, disconnect and notice email again and writes a second audit
+    row; resend a suspension with its original end time and a staff password reset with
+    the same password), and players redo what returned an error and did not land;
+    nothing else sends a skipped notice email again. A token a skipped revoke left valid
+    stays valid until a sign-out, so then stop every realm on the database, one after
+    another, each stop finishing before the next, which drops every live session and the
+    in-memory desktop login codes in `server/desktop_login.ts` (the sign-out cannot
+    reach them, and a desktop app could still trade one for a fresh token); sign every
+    account out once from psql on the realm database (`DELETE FROM auth_tokens WHERE
+    created_at < now() AND expires_at > now(); DELETE FROM oauth_codes; DELETE FROM
+    oauth_device_codes; DELETE FROM discord_oauth_states; DELETE FROM
+    github_oauth_states;`, companion and OAuth tokens included, no pending OAuth code
+    left to mint one, and no Discord or GitHub link a leftover token started left to
+    finish; an expired token is refused already; on 40P01 run it again); and, once the
+    dump has ended if the stall was behind one, start the realms again by Index builds
+    below. Re-run the deactivation housing receipt erase for deactivated accounts that
+    still hold receipts by the bullet below that begins "A failed deactivation receipt
+    erase" (a deactivation stopped at its revoke never reached the erase, so it logged
+    no warning). A sign-out undoes nothing a leftover token did before it (for example a
+    sign-in link it added, a recovery email it set, or anything its live session did in
+    game): this bullet does not recover an account the stall left open to whoever held
+    such a token, and that recovery is owed.
   - Index builds: after it listens, a realm's runner takes the schema advisory lock,
-    then for each index of `server/concurrent_indexes.ts` in turn drops it if INVALID
-    and builds it if missing, with CREATE INDEX CONCURRENTLY, then runs the receipts
-    VALIDATE, and only then lets the lock go (well under a second with nothing to build;
-    a build as long as its table takes, and the VALIDATE up to about a minute when a NOT
-    VALID constraint survives). A release can add an index, and a build ended early, by
-    this deadlock, a cancelled or terminated backend or a database restart, leaves one
-    INVALID; a realm's own stop or crash does not end a build already running, which
-    runs on, holding the lock, until it ends. A boot or another realm's runner that
-    waits on that lock while a build runs can deadlock with it (one that began waiting
-    before the build's last wait, for old snapshots, does), and then one of the two is
-    aborted (40P01): the build when it reaches that wait more than `deadlock_timeout`
+    then for each index of `server/concurrent_indexes.ts` in turn drops it if INVALID,
+    builds it if missing, with CREATE INDEX CONCURRENTLY, and drops any index it
+    replaces, then runs the receipts VALIDATE, and only then lets the lock go (well
+    under a second with nothing to build and nothing to wait for, though each create
+    still waits behind a VACUUM, an ANALYZE or DDL on its table; a build as long as its
+    table's scans plus its waits for each transaction that writes the table or holds an
+    older snapshot, the nightly dump among them for its whole run; a drop waits for each
+    transaction holding any lock on its table, the dump included; the VALIDATE up to
+    about a minute when a NOT VALID constraint survives). A release can add an index,
+    and a build ended early, by this deadlock, a cancelled or terminated backend or a
+    database restart, leaves one INVALID, still maintained by every write and used by no
+    read until a runner whose `server/concurrent_indexes.ts` names it drops and builds
+    it again; after a rollback to a release whose list does not name it, none will, so
+    once the gate below reads 0 drop it with `DROP INDEX CONCURRENTLY IF EXISTS
+    <name>;`. A realm's own stop or crash does not end a build already running (a
+    backend running a statement does not read its socket while
+    `client_connection_check_interval` is off, the default), which runs on, holding the
+    lock, until it ends. A boot or another realm's runner that waits on that lock while
+    a build runs can deadlock with it, and then one of the two is aborted (40P01): the
+    build when it reaches its last wait, for old snapshots, more than `deadlock_timeout`
     after the waiter began waiting (on a large table, usually), whose index then stays
-    INVALID, still maintained by every write and used by no read, and the runner's later
-    indexes and VALIDATE stay undone until a later realm's runner redoes them; else the
-    waiter (a boot that loses exits and is restarted; a runner that loses logs it and
-    its realm keeps serving). So every start of a realm this file gives, wherever it
-    says to start, boot or restart one, the first included, goes one at a time: start a
-    realm only once the realm started before it, if any, is `healthy` and `SELECT
-    count(*) FROM pg_locks WHERE locktype = 'advisory' AND classid = 0 AND objid =
-    1464812289 AND objsubid = 1 AND database = (SELECT oid FROM pg_database WHERE
-    datname = current_database());` from psql on the realm database returns 0 on two
-    readings a few seconds apart (no runner or boot holds or waits on the schema
-    advisory lock, `SCHEMA_ADVISORY_LOCK_KEY`; `pg_stat_progress_create_index` reads 0
-    before a build starts, during a drop and between two builds). A start after the
-    first runs beside the realms already serving, outside the quiet window, and its boot
-    can be aborted and restarted (Deadlocks above). If a reading stays above 0, `SELECT
-    l.pid, l.granted, a.wait_event_type, a.wait_event, now() - a.query_start AS waited
-    FROM pg_locks l JOIN pg_stat_activity a USING (pid) WHERE l.locktype = 'advisory'
-    AND l.classid = 0 AND l.objid = 1464812289 AND l.objsubid = 1 AND l.database =
-    (SELECT oid FROM pg_database WHERE datname = current_database());` shows what the
-    holder waits on: never end the holder; a build waiting for old snapshots waits for
-    the oldest open transaction in this database (the nightly dump, or an `idle in
-    transaction` session, which may be ended). Making a waiter wait with no transaction
+    INVALID and whose runner's later indexes and VALIDATE stay undone until a later
+    runner redoes them; else the waiter (a boot that loses exits and is restarted; a
+    runner that loses logs it and its realm keeps serving). So every start of a realm an
+    operator makes by this file, wherever it says to start, boot or restart one, the
+    first included, goes one at a time (a restart by the compose restart policy or the
+    watchdog cannot wait for this, and can meet the deadlock above): start a realm only
+    once the realm started before it, if any, is `healthy` and `SELECT count(*) FROM
+    pg_locks WHERE locktype = 'advisory' AND classid = 0 AND objid = 1464812289 AND
+    objsubid = 1 AND database = (SELECT oid FROM pg_database WHERE datname =
+    current_database());` from psql on the realm database returns 0 on two readings a
+    few seconds apart, the last just before the start (no runner or boot holds or waits
+    on the schema advisory lock, `SCHEMA_ADVISORY_LOCK_KEY`;
+    `pg_stat_progress_create_index` reads 0 before a build starts, during a drop and
+    between two builds). A start after the first runs beside the realms already serving,
+    so outside the quiet window, though still outside the nightly `pg_dump` (The nightly
+    dump above), and its boot can be aborted and restarted (Deadlocks above). If a
+    reading stays above 0, `SELECT l.pid, l.granted, a.wait_event_type, a.wait_event,
+    p.phase, pg_blocking_pids(l.pid) AS blocked_by, a.client_addr, now() - a.query_start
+    AS waited FROM pg_locks l JOIN pg_stat_activity a USING (pid) LEFT JOIN
+    pg_stat_progress_create_index p USING (pid) WHERE l.locktype = 'advisory' AND
+    l.classid = 0 AND l.objid = 1464812289 AND l.objsubid = 1 AND l.database = (SELECT
+    oid FROM pg_database WHERE datname = current_database());` lists the lock's holder
+    (`granted`) and its waiters, what each waits on, and the sessions it waits for
+    (`blocked_by`); the holder's wait decides. On `relation` it is a boot, or a runner's
+    create or drop, queued for a table lock behind its `blocked_by` sessions: if one is
+    the nightly dump (the quiet reading above shows it as `pg_dump`), follow The nightly
+    dump above; otherwise it waits for them to end their transactions. On `virtualxid`
+    it is a build (`phase` names its wait) or a drop, waiting for its `blocked_by`
+    sessions to end their transactions: each writes or locks its table or holds an older
+    snapshot (a REPEATABLE READ transaction such as the nightly dump, or a statement
+    still running; an idle READ COMMITTED transaction holds none). Otherwise it is
+    working: wait. Never end the nightly dump or a realm's session, and end a
+    `blocked_by` session only if it is `idle in transaction` and comes from no realm's
+    `client_addr`. A build may instead be ended, which changes no rows: `SELECT
+    pg_cancel_backend(<pid>);` ends it, one a stopped realm left included, freeing the
+    lock and leaving its index INVALID (above); wait for a build rather than end it,
+    unless the start cannot wait (a rollback). Making a waiter wait with no transaction
     open (polling a session-level try-lock in short statements of its own, idle between
     them, then opening the schema transaction under the lock it took and unlocking after
     COMMIT or ROLLBACK; the gate above would then see a waiter only once it holds the
@@ -1528,7 +1565,8 @@ For off-box safety, sync the directory to S3 occasionally:
   one-time event at the deploy that first creates them.
 - **Community test profile**: on a disposable public test realm, set
   `PROVISION_TEST_ACCOUNTS=1` in the host `.env`, then restart the game
-  container. The flag gives newly created accounts nine level-20 characters,
+  container by Index builds under EVERY BOOT LOCKS THE PARENTS. The flag gives
+  newly created accounts nine level-20 characters,
   one per class, with complete Warfare gear and four maximum-size bags. It does
   not backfill existing accounts. (Rift portal density no longer needs a flag:
   every realm keeps one portal per eligible zone on an hourly rotation, so the
@@ -1540,9 +1578,10 @@ For off-box safety, sync the directory to S3 occasionally:
   `RIFT_UPGRADER_MODEL` unset and keep `RIFT_RUNTIME_ASSETS=0` unless remote AI
   and asset-job costs are explicitly part of the test. Monitor tick performance
   before opening the realm. To roll back, set both community flags to `0` and
-  restart the game container. Disabling stops future roster seeding and dense
-  Rift refill; characters already created remain, and persisted portals close
-  through their normal clear or expiry lifecycle.
+  restart the game container by Index builds under EVERY BOOT LOCKS THE
+  PARENTS. Disabling stops future roster seeding and dense Rift refill;
+  characters already created remain, and persisted portals close through their
+  normal clear or expiry lifecycle.
 - **Bot detector (implementation)**: the open-source tree ships with a no-op stub
   (`server/bot_detector/stub.ts`). Detection hooks are wired in, but they observe
   nothing and never act. To bundle the real behavioral detector, clone the private
@@ -1838,7 +1877,8 @@ For off-box safety, sync the directory to S3 occasionally:
 - **API dispatch (rollback)**: every REST surface (`/api`, `/admin/api`, `/oauth`,
   `/internal`) runs through the in-house request pipeline by default. To roll back to
   the old handler ladder, set `API_DISPATCH=legacy` in the server runtime env and
-  restart the process: it is one flag, no code redeploy. Leaving it unset (or `new`)
+  restart the process (by Index builds under EVERY BOOT LOCKS THE PARENTS): it is
+  one flag, no code redeploy. Leaving it unset (or `new`)
   keeps the new pipeline. The boot log warns with an `ALERT` line only when the legacy
   ladder is serving in production, which after this default flip means the warn fires
   exactly when someone has rolled back (`API_DISPATCH=legacy`), a deliberate choice
@@ -2016,7 +2056,8 @@ For off-box safety, sync the directory to S3 occasionally:
   JSON object of copper price lists on ONE line, any subset of
   `{"bankExpansions":[12 ints],"bankSockets":[4 ints],"vaultUpgrades":[5 ints]}`
   (vault rung 0 is the vault unlock). Boot-time only: the sim resolves it once at
-  world construction, so a change needs a process restart. Each list is accepted
+  world construction, so a change needs a process restart (by Index builds under
+  EVERY BOOT LOCKS THE PARENTS). Each list is accepted
   only at its exact compiled length with entries that are safe integers of at
   least 0 (zero is a legal price); a bad dimension falls back to the compiled
   default BY ITSELF and is reported on the console at boot, the boot does not
@@ -2139,6 +2180,9 @@ affects the realm.
 it needs no separate build:
 
 ```bash
+# This also starts or recreates the game service when it is stopped or its config
+# changed: take the gate's readings in Index builds under EVERY BOOT LOCKS THE
+# PARENTS just before it.
 sudo docker compose --profile discord up -d
 ```
 

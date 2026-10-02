@@ -57,13 +57,15 @@ CREATE INDEX CONCURRENTLY IF NOT EXISTS play_sessions_account_started_id
   ON play_sessions(account_id, started_at, id);
 `;
 
-// A CREATE INDEX CONCURRENTLY killed mid-build (a deploy-watchdog restart, a
-// crash) strands the index INVALID, and IF NOT EXISTS then treats it as
-// existing on every later boot: never rebuilt, unusable to the planner, yet
-// maintained on every play_sessions write. The boot coordinator checks for
-// that carcass and drops it (CONCURRENTLY, so peer realms' session writes
-// never stall behind the drop) before running the create above. to_regclass
-// resolves via search_path and returns NULL when the index does not exist.
+// A CREATE INDEX CONCURRENTLY killed mid-build (an index-build deadlock, a
+// cancelled or terminated backend, a database restart; a realm's own stop or
+// crash leaves it running) strands the index INVALID, and IF NOT EXISTS then
+// treats it as existing on every later boot: never rebuilt, unusable to the
+// planner, yet maintained on every play_sessions write. The boot coordinator
+// checks for that carcass and drops it (CONCURRENTLY, so peer realms' session
+// writes never stall behind the drop) before running the create above.
+// to_regclass resolves via search_path and returns NULL when the index does
+// not exist.
 export const PLAYER_METRICS_INVALID_INDEX_CHECK_SQL = `
 SELECT 1
   FROM pg_index i

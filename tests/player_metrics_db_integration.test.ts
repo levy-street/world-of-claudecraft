@@ -641,9 +641,10 @@ describeDb('player metrics lifecycle SQL (real Postgres)', () => {
     const db = await scopedClient();
     try {
       // Reproduce the real failure shape: a CREATE INDEX CONCURRENTLY that dies
-      // mid-build (here a unique build over duplicate rows; in production a
-      // deploy-watchdog restart) leaves the index INVALID, and IF NOT EXISTS
-      // would then treat it as existing on every later boot.
+      // mid-build (here a unique build over duplicate rows; in production an
+      // index-build deadlock or a cancelled or terminated backend) leaves the
+      // index INVALID, and IF NOT EXISTS would then treat it as existing on
+      // every later boot.
       await db.query('INSERT INTO accounts DEFAULT VALUES');
       await db.query('INSERT INTO play_sessions (account_id) VALUES (1), (1)');
       await db.query('DROP INDEX IF EXISTS play_sessions_account_started_id');

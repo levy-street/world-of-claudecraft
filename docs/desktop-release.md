@@ -377,7 +377,7 @@ calls `https://worldofclaudecraft.com`, so production must run this branch's ser
 before a public desktop build ships. The server side is already on the branch and
 needs no desktop-specific configuration: deploy it like any server update
 (`DEPLOY.md`, "Updating the game": ssh to the box, `cd /opt/eastbrook`,
-`sudo git pull`, `sudo docker compose up -d --build`). What the branch's server
+`sudo git pull`, then its rebuild and its gated start). What the branch's server
 carries for desktop:
 
 - CORS reflection for the desktop origins (`DESKTOP_APP_ORIGINS` in

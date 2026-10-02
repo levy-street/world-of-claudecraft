@@ -276,8 +276,8 @@ bump the version, rebuild, upload, and watch the toast + install cycle.
   production must be running this branch's server (CORS reflection for that
   origin) or every REST call fails. The log file shows the CORS errors
   plainly until then. Deploying is the standard server update in `DEPLOY.md`
-  (ssh, `cd /opt/eastbrook`, `sudo git pull`,
-  `sudo docker compose up -d --build`); the branch's server
+  (ssh, `cd /opt/eastbrook`, `sudo git pull`, then its rebuild and its gated
+  start); the branch's server
   carries all desktop support already (CORS in `server/web_login_guard.ts`,
   the `/desktop-login` handoff in `server/desktop_login.ts`, the
   desktop-origin Turnstile admission in `server/turnstile.ts`). See the

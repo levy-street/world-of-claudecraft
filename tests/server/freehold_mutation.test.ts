@@ -2188,11 +2188,64 @@ describe('the claim renewer', () => {
       /void runConcurrentIndexMigrations\(\)\.catch\(\(err\) => \{\s*console\.error\(/,
     );
     // The places that send an operator here resolve.
-    expect(bullet).toContain('that is the quiet window this file means');
+    expect(bullet).toContain(
+      'that is the quiet window this file means, and a start in it still goes by Index builds below',
+    );
     expect(bullet).toContain('- Index builds: after it listens');
     expect(deploy.replace(/\s+/g, ' ')).toContain(
       'start each realm by Index builds under the EVERY BOOT LOCKS THE PARENTS bullet below',
     );
+    // And every realm start DEPLOY gives points at that gate in its own
+    // paragraph, bullet or code block: each `docker compose` command that can
+    // start the game service (an `up`, `restart` or `start` naming no service
+    // but the bot's), and each operator restart in the phrasings DEPLOY uses
+    // for one. Both lists are whole, so a new start site fails here until it
+    // is classified; a start phrased otherwise is beyond this pin, and the
+    // rule in Index builds that every operator start goes by the gate still
+    // covers it.
+    const units = (text: string) => text.split(/\r?\n[ \t]*\r?\n|\r?\n(?=[ \t]*- )/);
+    expect(units('- a\n  b\n- c\n\nd')).toEqual(['- a\n  b', '- c', 'd']);
+    const COMMAND = /docker compose\b[^\n`]*?\b(?:up|restart|start)\b[^\n`]*/;
+    const PROSE = /\brestart the (?:game container|process)\b|\bneeds a (?:process )?restart\b/;
+    expect('sudo docker compose up -d game').toMatch(COMMAND);
+    expect('sudo docker compose stop game').not.toMatch(COMMAND);
+    expect('then restart the game container.').toMatch(PROSE);
+    // A shell comment's text reads as prose: its markers go before the match.
+    const sites = units(deploy).flatMap((unit) => {
+      const flat = unit.replace(/^[ \t]*#[ \t]*/gm, '').replace(/\s+/g, ' ');
+      return [
+        ...[...unit.matchAll(new RegExp(COMMAND.source, 'g'))].map((m) => ({
+          kind: 'command',
+          site: m[0].trim(),
+          flat,
+        })),
+        ...[...flat.matchAll(new RegExp(PROSE.source, 'g'))].map((m) => ({
+          kind: 'prose',
+          site: m[0],
+          flat,
+        })),
+      ];
+    });
+    expect(sites.filter((s) => s.kind === 'command').map((s) => s.site)).toEqual([
+      'docker compose up -d',
+      'docker compose up -d game',
+      'docker compose --profile discord up -d',
+      'docker compose --profile discord up -d discord-bot',
+      'docker compose --profile discord restart discord-bot',
+      'docker compose --profile discord up -d discord-bot',
+    ]);
+    expect(sites.filter((s) => s.kind === 'prose').map((s) => s.site)).toEqual([
+      'needs a restart',
+      'restart the game container',
+      'restart the game container',
+      'restart the process',
+      'needs a process restart',
+    ]);
+    const botOnly = /^docker compose --profile discord (?:up -d|restart) discord-bot$/;
+    for (const { site, flat } of sites) {
+      if (botOnly.test(site)) continue;
+      expect(flat, site).toContain('Index builds under EVERY BOOT LOCKS THE PARENTS');
+    }
     const seconds = (file: string, name: string): number => {
       const found = source(file).match(new RegExp(`export const ${name} = ([0-9_]+);`));
       expect(found, name).not.toBeNull();

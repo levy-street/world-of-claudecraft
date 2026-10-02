@@ -147,14 +147,13 @@ export const BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_LOCK_TIMEOUT_MS = 5_000;
  * ACCESS EXCLUSIVE on characters/accounts/auth_tokens at statement_timeout
  * 0, freezing every login and save for up to the scan bound. Held inside
  * the lock, that realm waits at the schema advisory lock holding no table
- * lock (only a snapshot, which an index build would wait on: DEPLOY.md, Index
- * builds). The scan
- * runs in its own transaction with SET LOCAL bounds, so the exported helper
- * can never leave a 60s session setting on a future pooled caller, and is
- * self-caught: a failed VALIDATE rolls back, reports loudly, and resolves
- * false, leaving the constraint NOT VALID (new writes still enforce) for
- * the next boot to retry. A 23514 failure is the operator signal that
- * surviving rows violate the CURRENT key shape.
+ * lock (only a snapshot, which an index build would wait on: DEPLOY.md,
+ * Index builds). The scan runs in its own transaction with SET LOCAL
+ * bounds, so the exported helper can never leave a 60s session setting on a
+ * future pooled caller, and is self-caught: a failed VALIDATE rolls back,
+ * reports loudly, and resolves false, leaving the constraint NOT VALID (new
+ * writes still enforce) for the next boot to retry. A 23514 failure is the
+ * operator signal that surviving rows violate the CURRENT key shape.
  */
 export async function validateBankLedgerBatchReceiptsKeyShape(
   client: BankLedgerBatchQueryable,

@@ -4,12 +4,13 @@
 // boot coordinator (ensureSchema in server/db.ts) runs this list after the
 // schema COMMIT, under the session-level form of the schema advisory lock.
 // Order is load-bearing and pinned by tests/schema_wiring.test.ts. Each entry
-// self-heals an INVALID carcass left by an interrupted build (a
-// deploy-watchdog restart, a crash): checkSql finds the carcass, dropSql
-// removes it (CONCURRENTLY, so peer realms' writes never stall behind the
-// drop), and createSql rebuilds it.
-// A replacement may also carry retireSql: it runs strictly after createSql
-// succeeds, so an interrupted build never removes the older serving index.
+// self-heals an INVALID carcass left by an interrupted build (an index-build
+// deadlock, a cancelled or terminated backend, a database restart; a realm's
+// own stop or crash leaves its build running): checkSql finds the carcass,
+// dropSql removes it (CONCURRENTLY, so peer realms' writes never stall behind
+// the drop), and createSql rebuilds it. A replacement may also carry
+// retireSql: it runs strictly after createSql succeeds, so an interrupted
+// build never removes the older serving index.
 
 import {
   ADMIN_OVERVIEW_ACTIVE_SESSIONS_INDEX_SQL,
