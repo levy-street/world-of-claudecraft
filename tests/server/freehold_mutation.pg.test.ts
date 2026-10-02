@@ -3721,7 +3721,16 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       expect(await count('oauth_device_codes')).toBe(1);
       expect(await count('discord_oauth_states')).toBe(1);
       expect(await count('github_oauth_states')).toBe(1);
+      // DEPLOY's check that the sign-out committed, pinned whole: above 0
+      // before it, 0 after it, read from another session.
+      const signedOut = operatorSql('SELECT (SELECT count(*) FROM auth_tokens');
+      expect(signedOut).toBe(
+        'SELECT (SELECT count(*) FROM auth_tokens WHERE expires_at > now()) + (SELECT count(*) FROM oauth_codes) + (SELECT count(*) FROM oauth_device_codes) + (SELECT count(*) FROM discord_oauth_states) + (SELECT count(*) FROM github_oauth_states) AS left;',
+      );
+      const left = async () => Number((await pool.query(signedOut)).rows[0].left);
+      expect(await left()).toBeGreaterThan(0);
       await pool.query(operatorSql('DELETE FROM auth_tokens'));
+      expect(await left()).toBe(0);
       expect(await db.accountAndScopeForToken(full)).toBeNull();
       expect(await db.accountAndScopeForToken(read)).toBeNull();
       expect(await count('auth_tokens WHERE expires_at > now()')).toBe(0);
@@ -4150,25 +4159,34 @@ d('the housing mutation boundary (REAL Postgres)', () => {
             expect(await stop()).toBe('stopped');
             await sleep(300);
             expect(await gate()).toBe(1);
-            // DEPLOY's naming statement, its `idle_for` in seconds.
-            const idleSeconds = async () =>
-              Number(
-                (
-                  await pool.query(
-                    `SELECT EXTRACT(EPOCH FROM n.idle_for) AS s FROM (${named
-                      .replace('<pid>', String(pid))
-                      .replace(/;$/, '')}) n WHERE n.pid = $1`,
-                    [firstPid],
-                  )
-                ).rows[0].s,
-              );
-            const before = await idleSeconds();
+            // DEPLOY's naming statement for that session: its `idle_for` and
+            // `open_for` in seconds, and the exact gap between them (when its
+            // last statement ended, after its transaction began).
+            const reading = async () => {
+              const row = (
+                await pool.query(
+                  `SELECT EXTRACT(EPOCH FROM n.idle_for) AS idle, EXTRACT(EPOCH FROM n.open_for) AS open, EXTRACT(EPOCH FROM n.open_for - n.idle_for)::text AS gap FROM (${named
+                    .replace('<pid>', String(pid))
+                    .replace(/;$/, '')}) n WHERE n.pid = $1`,
+                  [firstPid],
+                )
+              ).rows[0];
+              return { idle: Number(row.idle), open: Number(row.open), gap: String(row.gap) };
+            };
+            // Left open, it grows by exactly as much as its transaction did.
+            const before = await reading();
             await sleep(300);
-            const after = await idleSeconds();
-            expect(after - before).toBeGreaterThanOrEqual(0.25);
-            // A statement in its REPEATABLE READ transaction keeps its snapshot.
+            const after = await reading();
+            expect(after.open - before.open).toBeGreaterThanOrEqual(0.25);
+            expect(after.gap).toBe(before.gap);
+            // Once it runs a statement, it starts over and the gap moves. A
+            // statement leaves the build waiting on it: a virtualxid wait lasts
+            // until the transaction ends.
             await (firstPid === other.pid ? other.client : session).query('SELECT 1');
-            expect(await idleSeconds()).toBeLessThan(after);
+            const reset = await reading();
+            expect(reset.idle).toBeGreaterThan(0);
+            expect(reset.idle).toBeLessThan(before.idle);
+            expect(Number(reset.gap)).toBeGreaterThan(Number(after.gap));
             await pool.query(cancel.replace('<pid>', String(firstPid)));
             await sleep(200);
             expect(await sessionsOf(pid)).toEqual([
@@ -4224,7 +4242,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         // then returns, and a runner that names the index builds it again.
         const lookup = operatorSql('SELECT pid FROM pg_stat_activity');
         expect(lookup).toBe(
-          "SELECT pid FROM pg_stat_activity WHERE state = 'active' AND query LIKE 'DROP INDEX CONCURRENTLY%';",
+          "SELECT pid FROM pg_stat_activity WHERE datname = current_database() AND application_name = 'psql' AND state = 'active' AND query LIKE 'DROP INDEX CONCURRENTLY%';",
         );
         let reader: Awaited<ReturnType<typeof psqlSession>> | undefined;
         const hand = dedicated();
@@ -4233,6 +4251,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           const open = reader;
           await open.client.query('SELECT 1 FROM guilds LIMIT 1');
           await hand.connect();
+          await hand.query("SET application_name = 'psql'");
           const dropped = hand.query(drop.replace('<name>', migration.name)).then(
             () => 'dropped',
             (error: { code?: string }) => error.code,
@@ -4240,8 +4259,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           const handPid = (hand as unknown as { processID: number }).processID;
           const looked = async () =>
             (await pool.query(lookup)).rows.map((r: { pid: number }) => r.pid);
-          expect(await until(looked, [handPid])).toEqual([handPid]);
-          const [dropPid] = await looked();
+          const found = await until(looked, [handPid]);
+          expect(found).toEqual([handPid]);
+          const [dropPid] = found;
           expect(await until(() => waitEventOf(dropPid), 'virtualxid')).toBe('virtualxid');
           expect(await gate()).toBe(0);
           expect(await sessionsOf(dropPid)).toEqual([

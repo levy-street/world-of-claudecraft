@@ -2259,15 +2259,19 @@ describe('the claim renewer', () => {
       return end === -1 ? rest : rest.slice(0, end + 2);
     };
     expect(serviceBlock('discord-bot')).not.toContain('\n  mediawiki-db:\n');
-    // A `--no-deps` start of a service but the game's, and the bot's restart,
-    // start no realm: the bot depends on the game, so only its `--no-deps` up
-    // keeps the game out, and the wiki depends on its own database alone.
+    expect(serviceBlock('mediawiki')).not.toContain('\nvolumes:');
+    // A `--no-deps` start of the bot or the wiki, and the bot's restart, start
+    // no realm: the bot runs the bot, not the server, and depends on the game,
+    // so only its `--no-deps` up keeps the game out; the wiki depends on its own
+    // database alone.
     expect(serviceBlock('discord-bot')).toMatch(/\n {4}depends_on:\n {6}game:\n/);
+    expect(serviceBlock('discord-bot')).toContain('\n    command: ["node", "dist-bot/bot.cjs"]\n');
     const wikiDeps = /\n {4}depends_on:\n((?: {6}.*\n)+)/.exec(serviceBlock('mediawiki'));
     expect(wikiDeps?.[1].match(/^ {6}([\w-]+):/gm)).toEqual(['      mediawiki-db:']);
     const noRealm =
-      /^docker compose (?:--profile [\w-]+ )?up -d --no-deps (?!game$)[\w-]+$|^docker compose --profile discord restart discord-bot$/;
+      /^docker compose (?:--profile discord )?up -d --no-deps (?:discord-bot|mediawiki)$|^docker compose --profile discord restart discord-bot$/;
     expect(noRealm.test('docker compose up -d --no-deps game')).toBe(false);
+    expect(noRealm.test('docker compose up -d --no-deps postgres')).toBe(false);
     expect(noRealm.test('docker compose --profile discord up -d discord-bot')).toBe(false);
     expect(noRealm.test('docker compose --profile discord up -d --no-deps discord-bot')).toBe(true);
     expect(noRealm.test('docker compose up -d --no-deps mediawiki')).toBe(true);
@@ -2324,6 +2328,21 @@ describe('the claim renewer', () => {
     expect(deploy.replace(/\s+/g, ' ')).toContain(
       '`DISCORD_BOT_TOKEN`, `DISCORD_CLIENT_ID`, `DISCORD_GUILD_ID` and `DISCORD_BOT_SECRET` reach the game container too',
     );
+    // And the `.env` variables both blocks read are the image tag and the same
+    // four, so an `.env` edit reaches both containers only through those.
+    const envRefs = (name: string) => [
+      ...new Set([...serviceBlock(name).matchAll(/\$\{([A-Z][A-Z0-9_]*)/g)].map((m) => m[1])),
+    ];
+    expect(envRefs('discord-bot')).toContain('PUBLIC_GAME_URL');
+    expect(envRefs('game')).not.toContain('PUBLIC_GAME_URL');
+    const gameRefs = new Set(envRefs('game'));
+    expect(envRefs('discord-bot').filter((ref) => gameRefs.has(ref))).toEqual([
+      'EASTBROOK_IMAGE_TAG',
+      'DISCORD_BOT_TOKEN',
+      'DISCORD_CLIENT_ID',
+      'DISCORD_GUILD_ID',
+      'DISCORD_BOT_SECRET',
+    ]);
     // A `healthy` realm has committed its boot: the game's own health probe
     // asks /livez, which answers only once the realm listens, after its boot.
     expect(bullet).toContain('a `healthy` realm has committed its boot');

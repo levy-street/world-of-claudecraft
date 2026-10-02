@@ -19,7 +19,10 @@ describe('community test account deploy contract', () => {
     expect(deploy).toContain('PROVISION_TEST_ACCOUNTS=1');
     // Rift density no longer has a flag: one portal per eligible zone is the
     // policy everywhere, so the deploy guide must not resurrect the toggle.
-    expect(deploy).not.toContain('COMMUNITY_TEST_RIFTS=1');
+    expect(deploy).not.toContain('COMMUNITY_TEST_RIFTS');
+    expect(deploy.replace(/\s+/g, ' ')).toContain(
+      '(Rift portal density needs no flag: every realm keeps one portal per eligible zone on an hourly rotation.)',
+    );
     expect(compose).not.toContain('COMMUNITY_TEST_RIFTS');
     expect(deploy).toMatch(/newly created accounts/i);
     expect(deploy).toContain('ALLOW_DEV_COMMANDS');

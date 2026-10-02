@@ -1412,3 +1412,6 @@ What changed the contract above:
 - A twenty-ninth round of eight fresh readers: no P12 change; `DEPLOY.md` commits the sign-out
   before any realm starts, finds a hand drop's pid by its own lookup, starts the bot only after
   the game it shares keys and an image with, and runs a rebuilt wiki on its new image.
+- A thirtieth round of eight fresh readers: no P12 change; `DEPLOY.md` checks from a new session
+  that the sign-out committed, measures a left-open session by its `open_for`, and runs the bot
+  on a release's image only once the realm is verified and only where it already runs.
