@@ -496,12 +496,13 @@ d('account_freehold_hearth against real PostgreSQL', () => {
     expect(await boot(hearthSchema)).toEqual([]);
   });
 
-  it("runs the operator's own runbook SQL: an impostor renamed away, the CHECK put back, nulled and validated", async () => {
-    // The two fenced blocks of DEPLOY.md's advance-token bullet, sent as an
-    // operator sends them (one simple-query block each), against a table whose
-    // probed name holds an impostor and which already stores a non-hex token.
+  it("runs the operator's own runbook SQL, every block, against a real impostor and a missing CHECK", async () => {
+    // The five fenced blocks of DEPLOY.md's advance-token bullet, each sent as
+    // an operator sends it (one simple-query string), against a table whose
+    // probed name holds an impostor, then against one whose name holds nothing.
     const legacy = db.freeholdHearthSchema(LEGACY_SCHEMA);
     const legacyTable = `${LEGACY_SCHEMA}.account_freehold_hearth`;
+    const NAME = 'account_freehold_hearth_advance_token_shape';
     const deploy = readFileSync('DEPLOY.md', 'utf8');
     const start = deploy.indexOf('- THE ADVANCE TOKEN CHECK');
     expect(start).toBeGreaterThan(-1);
@@ -509,37 +510,18 @@ d('account_freehold_hearth against real PostgreSQL', () => {
     const blocks = [...raw.matchAll(/```sql\n([\s\S]*?)```/g)].map((match) =>
       match[1].replaceAll('public.account_freehold_hearth', legacyTable),
     );
-    expect(blocks).toHaveLength(2);
-    const [nullAndValidate, displace] = blocks;
+    expect(blocks).toHaveLength(5);
+    const [restore, nullAndValidate, print, displace, drop] = blocks;
     const named = async (name: string) =>
       (
         await pool.query(
-          `SELECT pg_get_constraintdef(oid) AS def FROM pg_constraint
+          `SELECT oid::text AS oid, pg_get_constraintdef(oid) AS def FROM pg_constraint
             WHERE conrelid = $1::regclass AND conname = $2`,
           [legacyTable, name],
         )
-      ).rows.map((row: { def: string }) => row.def);
-    await pool.query(
-      `ALTER TABLE ${legacyTable} DROP CONSTRAINT account_freehold_hearth_advance_token_shape`,
-    );
-    await pool.query(
-      `ALTER TABLE ${legacyTable} ADD CONSTRAINT account_freehold_hearth_advance_token_shape UNIQUE (advance_token)`,
-    );
-    await pool.query(`INSERT INTO ${legacyTable} (account_id, advance_token) VALUES ($1, $2)`, [
-      CHECK_ACCOUNT,
-      'NOT-A-TOKEN',
-    ]);
-    try {
-      await pool.query(displace);
-      // The impostor kept under its new name; the real CHECK back, NOT VALID,
-      // so the stored bad token was not scanned.
-      expect(await named('account_freehold_hearth_advance_token_shape_displaced')).toEqual([
-        'UNIQUE (advance_token)',
-      ]);
-      expect(await named('account_freehold_hearth_advance_token_shape')).toEqual([
-        "CHECK (((advance_token IS NULL) OR (advance_token ~ '^[0-9a-f]{32}$'::text))) NOT VALID",
-      ]);
-      // The next boot finds the real CHECK: no repair, no warning.
+      ).rows as Array<{ oid: string; def: string }>;
+    /** One boot of the legacy fragment, its WARNING notices kept. */
+    const boot = async () => {
       const client = await pool.connect();
       const warnings: string[] = [];
       const onNotice = (notice: { severity?: string; message?: string }) => {
@@ -552,22 +534,71 @@ d('account_freehold_hearth against real PostgreSQL', () => {
         client.off('notice', onNotice);
         client.release();
       }
-      expect(warnings).toEqual([]);
-      // Then null and validate: the bad token is gone and the CHECK validated.
+      return warnings;
+    };
+    const VALID_DEF =
+      "CHECK (((advance_token IS NULL) OR (advance_token ~ '^[0-9a-f]{32}$'::text)))";
+    try {
+      // PRINT shows this server's print of the real CHECK: the boot's literal.
+      const printed = (await pool.query(print)) as unknown as Array<{
+        rows: Array<{ pg_get_constraintdef?: string }>;
+      }>;
+      expect(printed.flatMap((result) => result.rows ?? [])).toEqual([
+        { pg_get_constraintdef: VALID_DEF },
+      ]);
+      // An impostor under the name, and a non-hex token already stored: the
+      // boot warns (the listener sees it).
+      await pool.query(`ALTER TABLE ${legacyTable} DROP CONSTRAINT IF EXISTS ${NAME}`);
+      await pool.query(`ALTER TABLE ${legacyTable} ADD CONSTRAINT ${NAME} UNIQUE (advance_token)`);
+      await pool.query(`INSERT INTO ${legacyTable} (account_id, advance_token) VALUES ($1, $2)`, [
+        CHECK_ACCOUNT,
+        'NOT-A-TOKEN',
+      ]);
+      expect(await boot()).toHaveLength(1);
+      // DISPLACE: the impostor kept under its new name, the real CHECK back
+      // NOT VALID (the stored bad token not scanned); the next boot is silent
+      // and rebuilds nothing (the CHECK keeps its oid).
+      await pool.query(displace);
+      expect((await named(`${NAME}_displaced`)).map((row) => row.def)).toEqual([
+        'UNIQUE (advance_token)',
+      ]);
+      const restored = await named(NAME);
+      expect(restored.map((row) => row.def)).toEqual([`${VALID_DEF} NOT VALID`]);
+      expect(await boot()).toEqual([]);
+      expect((await named(NAME)).map((row) => row.oid)).toEqual(restored.map((row) => row.oid));
+      // NULL AND VALIDATE: the bad token nulled, the CHECK validated.
       await pool.query(nullAndValidate);
       const kept = await pool.query(
         `SELECT advance_token FROM ${legacyTable} WHERE account_id = $1`,
         [CHECK_ACCOUNT],
       );
       expect(kept.rows).toEqual([{ advance_token: null }]);
-      expect(await named('account_freehold_hearth_advance_token_shape')).toEqual([
-        "CHECK (((advance_token IS NULL) OR (advance_token ~ '^[0-9a-f]{32}$'::text)))",
-      ]);
+      expect((await named(NAME)).map((row) => row.def)).toEqual([VALID_DEF]);
+      // DROP takes the displaced constraint only.
+      await pool.query(drop);
+      expect(await named(`${NAME}_displaced`)).toEqual([]);
+      expect((await named(NAME)).map((row) => row.def)).toEqual([VALID_DEF]);
+      // No row: RESTORE puts the CHECK back with no repair boot, and the next
+      // boot is silent and rebuilds nothing.
+      await pool.query(`ALTER TABLE ${legacyTable} DROP CONSTRAINT ${NAME}`);
+      expect(await named(NAME)).toEqual([]);
+      await pool.query(restore);
+      const back = await named(NAME);
+      expect(back.map((row) => row.def)).toEqual([`${VALID_DEF} NOT VALID`]);
+      expect(await boot()).toEqual([]);
+      expect((await named(NAME)).map((row) => row.oid)).toEqual(back.map((row) => row.oid));
+      await pool.query(nullAndValidate);
+      expect((await named(NAME)).map((row) => row.def)).toEqual([VALID_DEF]);
     } finally {
+      // Whatever failed, the legacy table ends with the real CHECK and no
+      // impostor or test row.
       await pool.query(`DELETE FROM ${legacyTable} WHERE account_id = $1`, [CHECK_ACCOUNT]);
-      await pool.query(
-        `ALTER TABLE ${legacyTable} DROP CONSTRAINT IF EXISTS account_freehold_hearth_advance_token_shape_displaced`,
-      );
+      await pool.query(`ALTER TABLE ${legacyTable} DROP CONSTRAINT IF EXISTS ${NAME}_displaced`);
+      const left = await named(NAME);
+      if (left.length === 0 || !left[0].def.startsWith(VALID_DEF)) {
+        await pool.query(`ALTER TABLE ${legacyTable} DROP CONSTRAINT IF EXISTS ${NAME}`);
+        await pool.query(legacy);
+      }
     }
   });
 

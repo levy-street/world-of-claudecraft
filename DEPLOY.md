@@ -1147,9 +1147,55 @@ For off-box safety, sync the directory to S3 occasionally:
   that CHECK's makes every boot log `[schema]
   account_freehold_hearth_advance_token_shape is not the 32-hex token CHECK, so the
   advance token shape is unchecked` instead. The log judges the text only, so it also
-  fires on an equivalent CHECK PostgreSQL prints differently; the cases below tell
-  them apart. The boot checks `public.account_freehold_hearth`, and every statement
-  below names it so. To null the non-hex tokens and validate the CHECK, send:
+  fires on a correct CHECK a newer PostgreSQL prints differently; the cases below tell
+  them apart by text, never by judgment. The boot checks
+  `public.account_freehold_hearth`, and every statement below names it so. Send each
+  block below whole. On any error, send ROLLBACK first; then on 55P03 wait about 10 s
+  and send it again, at most about five times before finding the holder in
+  `pg_stat_activity` and `pg_locks`; on 42710 or 42P07 use a fresh suffix that keeps
+  the name within 63 bytes (`_displaced2`); on anything else, stop. First read what
+  the name holds: `SELECT contype, convalidated, pg_get_constraintdef(oid) FROM
+  pg_constraint WHERE conrelid = 'public.account_freehold_hearth'::regclass AND
+  conname = 'account_freehold_hearth_advance_token_shape'`, then:
+  - No row: send RESTORE (no repair boot is needed), then NULL AND VALIDATE.
+  - `contype` is `c` and the definition, a ` NOT VALID` suffix aside, is exactly
+    `CHECK (((advance_token IS NULL) OR (advance_token ~ '^[0-9a-f]{32}$'::text)))`:
+    the shape is checked and the boot is silent. If `convalidated` is false, send NULL
+    AND VALIDATE.
+  - Otherwise send PRINT, which shows how this PostgreSQL prints the real CHECK. If
+    `contype` is `c` and the definition, a ` NOT VALID` suffix aside, is exactly what
+    PRINT showed, the shape IS checked and only the probe's literal is stale: do not
+    displace it. Report it whatever `convalidated` says, so the literal in
+    `server/freehold_hearth_db.ts` is updated, and if `convalidated` is false, send
+    NULL AND VALIDATE.
+  - Anything else: in a quiet window with no realm booting or restarting, send
+    DISPLACE, re-run the read (expect `contype` `c` and the exact text with ` NOT
+    VALID`), then send NULL AND VALIDATE. DISPLACE renames the impostor, never a drop,
+    so whatever it enforced is kept, and adds the boot's own CHECK in one short
+    transaction holding ACCESS EXCLUSIVE on the Hearth table alone: every realm's
+    Hearth reads wait at most the lock timeout plus the block, and the next boot finds
+    the real CHECK and is silent. Once the CHECK is validated, send DROP for a
+    displaced constraint whose definition names `advance_token` (only the real CHECK
+    should constrain the token the server writes), and for any other only when nothing
+    needs it; if NULL AND VALIDATE fails on a displaced constraint (23514 or 23502),
+    send DROP for it first. For a foreign key, add `LOCK TABLE` on the table it
+    references `IN ACCESS EXCLUSIVE MODE` right after the `SET LOCAL`, so the parent
+    is taken before the Hearth table as a trip takes them; a parent there stalls every
+    realm's saves and logins for the block.
+
+  RESTORE (the boot's own CHECK, NOT VALID, with no repair boot):
+
+  ```sql
+  BEGIN;
+  SET LOCAL lock_timeout = '2s';
+  ALTER TABLE public.account_freehold_hearth
+    ADD CONSTRAINT account_freehold_hearth_advance_token_shape
+    CHECK (advance_token IS NULL OR advance_token ~ '^[0-9a-f]{32}$') NOT VALID;
+  COMMIT;
+  ```
+
+  NULL AND VALIDATE (not while a realm boots; VALIDATE takes SHARE UPDATE EXCLUSIVE
+  and does not block writes):
 
   ```sql
   UPDATE public.account_freehold_hearth SET advance_token = NULL
@@ -1158,50 +1204,39 @@ For off-box safety, sync the directory to S3 occasionally:
     VALIDATE CONSTRAINT account_freehold_hearth_advance_token_shape;
   ```
 
-  VALIDATE takes SHARE UPDATE EXCLUSIVE and does not block writes. First read what the
-  name holds: `SELECT contype, convalidated, pg_get_constraintdef(oid) FROM
-  pg_constraint WHERE conrelid = 'public.account_freehold_hearth'::regclass AND
-  conname = 'account_freehold_hearth_advance_token_shape'`, then:
-  - No row: the next boot puts the CHECK back `NOT VALID`; then null and validate.
-  - `contype` is `c` and the definition, a ` NOT VALID` suffix aside, is exactly
-    `CHECK (((advance_token IS NULL) OR (advance_token ~ '^[0-9a-f]{32}$'::text)))`:
-    the shape is checked and the boot is silent. If `convalidated` is false, null and
-    validate.
-  - `contype` is `c`, the boot warns, and the definition makes the same two tests
-    (`advance_token IS NULL`, or `advance_token ~ '^[0-9a-f]{32}$'` on the token
-    itself, with no cast but to `text`) in another order or print, as after a
-    PostgreSQL major upgrade: the shape IS checked, so do not displace it. If
-    `convalidated` is false, null and validate, and report it so the probe's literal
-    in `server/freehold_hearth_db.ts` is updated.
-  - Anything else: displace it by a rename, never a drop, and put the real CHECK back
-    in one short transaction, sent as one block in a quiet window with no realm
-    booting or restarting:
+  PRINT (a temporary table, gone with the session):
 
-    ```sql
-    BEGIN;
-    SET LOCAL lock_timeout = '2s';
-    ALTER TABLE public.account_freehold_hearth
-      RENAME CONSTRAINT account_freehold_hearth_advance_token_shape
-      TO account_freehold_hearth_advance_token_shape_displaced;
-    ALTER TABLE public.account_freehold_hearth
-      ADD CONSTRAINT account_freehold_hearth_advance_token_shape
-      CHECK (advance_token IS NULL OR advance_token ~ '^[0-9a-f]{32}$') NOT VALID;
-    COMMIT;
-    ```
+  ```sql
+  CREATE TEMP TABLE advance_token_print (advance_token TEXT
+    CHECK (advance_token IS NULL OR advance_token ~ '^[0-9a-f]{32}$'));
+  SELECT pg_get_constraintdef(oid) FROM pg_constraint
+    WHERE conrelid = 'advance_token_print'::regclass;
+  DROP TABLE advance_token_print;
+  ```
 
-    It takes ACCESS EXCLUSIVE on the Hearth table alone and holds it only to that
-    COMMIT, so every realm's Hearth reads wait at most the lock timeout plus the
-    block. On 55P03, ROLLBACK, wait about 10 s and send it again, at most about five
-    times, then find the holder in `pg_stat_activity` and `pg_locks` before trying
-    again. If the `_displaced` name is taken (42710, or 42P07 for a key, whose index
-    the rename renames too), use a fresh suffix. The rename keeps whatever the
-    displaced constraint enforced, and the next boot finds the real CHECK and is
-    silent; then null and validate. Once the CHECK is validated, drop a displaced
-    constraint whose definition names `advance_token` (only this CHECK should
-    constrain the token the server writes), and any other only when nothing needs it,
-    each the same way, one short transaction under `SET LOCAL lock_timeout` in a quiet
-    window: a foreign key's drop also takes ACCESS EXCLUSIVE on the table it
-    references.
+  DISPLACE:
+
+  ```sql
+  BEGIN;
+  SET LOCAL lock_timeout = '2s';
+  ALTER TABLE public.account_freehold_hearth
+    RENAME CONSTRAINT account_freehold_hearth_advance_token_shape
+    TO account_freehold_hearth_advance_token_shape_displaced;
+  ALTER TABLE public.account_freehold_hearth
+    ADD CONSTRAINT account_freehold_hearth_advance_token_shape
+    CHECK (advance_token IS NULL OR advance_token ~ '^[0-9a-f]{32}$') NOT VALID;
+  COMMIT;
+  ```
+
+  DROP (the displaced constraint only):
+
+  ```sql
+  BEGIN;
+  SET LOCAL lock_timeout = '2s';
+  ALTER TABLE public.account_freehold_hearth
+    DROP CONSTRAINT account_freehold_hearth_advance_token_shape_displaced;
+  COMMIT;
+  ```
 - A failed deactivation receipt erase logs `deactivation housing receipt erase
   failed` with no account id. The erase is idempotent; find the accounts to re-run
   with `SELECT DISTINCT r.account_id FROM freehold_operation_receipts r JOIN accounts
