@@ -1927,7 +1927,11 @@ const MONOLITHS: MonolithRow[] = [
     // room pays the claim, trip and housing-hook wiring that follows.
     // RE-PINNED 9680 -> 9650 at the 07a close: wc -l on the built and reviewed
     // tree. Exact count, zero slack.
-    ceiling: 9650,
+    // LOWERED 9650 -> 9648 at the 07a paired QA: the escrow-failure rule moved
+    // to server/escrow_save_failure.ts (which also excludes a housing refusal),
+    // paying the renewer's save-observer argument with two lines to spare.
+    // wc -l. Exact count, zero slack.
+    ceiling: 9648,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -2028,8 +2032,13 @@ const MONOLITHS: MonolithRow[] = [
     // authority, runExclusive).
     // RE-PINNED 1870 -> 1854 at the 07a close: wc -l on the built and reviewed
     // tree. Exact count, zero slack.
+    // LOWERED 1854 -> 1828 at the 07a paired QA: the entry census behind
+    // stats() moved whole to server/freehold_persist_stats.ts
+    // (censusFreeholdEntries, the store's own predicates handed in), paying
+    // the Hearth adoption delegator and the replay's claim check. wc -l. Exact
+    // count, zero slack.
     file: 'server/freehold_persist.ts',
-    ceiling: 1854,
+    ceiling: 1828,
     seam: 'a sibling server module behind the store ports; see server/CLAUDE.md',
   },
   {
@@ -2440,7 +2449,12 @@ const MONOLITHS: MonolithRow[] = [
     // fragments and the one export loader that follow.
     // RE-PINNED 4475 -> 4461 at the 07a close: wc -l on the built and reviewed
     // tree. Exact count, zero slack.
-    ceiling: 4461,
+    // LOWERED 4461 -> 4454 at the 07a paired QA: the boot identity (DATABASE_URL,
+    // the writer connection, the schema lock key) moved to
+    // server/db_boot_connection.ts, which the index runner imports instead of
+    // db.ts (no import cycle; DATABASE_URL stays re-exported). wc -l. Exact
+    // count, zero slack.
+    ceiling: 4454,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
