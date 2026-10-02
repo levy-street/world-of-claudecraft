@@ -1002,11 +1002,20 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
     // under a lock timeout set first; PRINT builds the CREATE TABLE's own CHECK;
     // NULL AND VALIDATE nulls with the CHECK's own pattern; DROP names only the
     // displaced constraint.
-    const blocks = [...raw.matchAll(/```sql\n([\s\S]*?)```/g)].map((match) =>
-      match[1].replace(/\s+/g, ' ').trim(),
-    );
-    expect(blocks).toHaveLength(5);
-    const [restore, nullAndValidate, print, displace, drop] = blocks;
+    // Each block is read WITH the label above it, so a block an operator is
+    // sent to by name is the block the name heads.
+    const labelled = [
+      ...raw.matchAll(/\n {2}([A-Z][A-Z ]*[A-Z])(?: \([^)]*\))?:\n\n {2}```sql\n([\s\S]*?)```/g),
+    ].map((match) => [match[1], match[2].replace(/\s+/g, ' ').trim()] as const);
+    expect(labelled.map(([label]) => label)).toEqual([
+      'RESTORE',
+      'NULL AND VALIDATE',
+      'PRINT',
+      'DISPLACE',
+      'DROP',
+    ]);
+    expect([...raw.matchAll(/```sql/g)]).toHaveLength(5);
+    const block = Object.fromEntries(labelled);
     const fragment = codeOnly(FREEHOLD_HEARTH_SCHEMA);
     const repair = (fragment.match(
       /ALTER TABLE "public"\.account_freehold_hearth\s+ADD CONSTRAINT account_freehold_hearth_advance_token_shape\s+CHECK \([^;]+\) NOT VALID;/,
@@ -1022,35 +1031,66 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
       .slice(1)
       .map((part) => part.replace(/\s+/g, ' '));
     expect(check[1]).toBe('^[0-9a-f]{32}$');
+    // Every transaction block bounds both its lock wait and an operator's
+    // pause inside it.
     const timed = (...statements: string[]) =>
-      ['BEGIN;', "SET LOCAL lock_timeout = '2s';", ...statements, 'COMMIT;'].join(' ');
-    expect(restore).toBe(timed(repair));
-    expect(nullAndValidate).toBe(
-      `UPDATE public.account_freehold_hearth SET advance_token = NULL WHERE advance_token !~ '${check[1]}'; ALTER TABLE public.account_freehold_hearth VALIDATE CONSTRAINT account_freehold_hearth_advance_token_shape;`,
+      [
+        'BEGIN;',
+        "SET LOCAL lock_timeout = '2s';",
+        "SET LOCAL idle_in_transaction_session_timeout = '5s';",
+        ...statements,
+        'COMMIT;',
+      ].join(' ');
+    expect(block.RESTORE).toBe(timed(repair));
+    expect(block['NULL AND VALIDATE']).toBe(
+      timed(
+        `SELECT count(*) AS non_hex FROM public.account_freehold_hearth WHERE advance_token !~ '${check[1]}';`,
+        `UPDATE public.account_freehold_hearth SET advance_token = NULL WHERE advance_token !~ '${check[1]}';`,
+        'ALTER TABLE public.account_freehold_hearth VALIDATE CONSTRAINT account_freehold_hearth_advance_token_shape;',
+      ),
     );
-    expect(print).toBe(
-      `CREATE TEMP TABLE advance_token_print (advance_token TEXT ${check[0]}); SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conrelid = 'advance_token_print'::regclass; DROP TABLE advance_token_print;`,
+    expect(block.PRINT).toBe(
+      `CREATE TEMP TABLE advance_token_print (advance_token TEXT ${check[0]}); SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conrelid = 'pg_temp.advance_token_print'::regclass; DROP TABLE pg_temp.advance_token_print;`,
     );
-    expect(displace).toBe(
+    expect(block.DISPLACE).toBe(
       timed(
         'ALTER TABLE public.account_freehold_hearth RENAME CONSTRAINT account_freehold_hearth_advance_token_shape TO account_freehold_hearth_advance_token_shape_displaced;',
         repair,
       ),
     );
-    expect(drop).toBe(
+    expect(block.DROP).toBe(
       timed(
         'ALTER TABLE public.account_freehold_hearth DROP CONSTRAINT account_freehold_hearth_advance_token_shape_displaced;',
       ),
     );
-    // The procedure's safety rules in its prose: a CHECK the boot misreads is
-    // kept and always reported, an impostor is renamed and never dropped, the
-    // live name is never dropped, every error rolls back first, and every
-    // statement names the table the boot checks.
+    // The procedure's safety rules in its prose: every block sent with no
+    // realm booting, every error rolled back first and each error code routed
+    // by the block that raised it, the read first, a CHECK the boot misreads
+    // kept and always reported, an impostor renamed and never dropped, a taken
+    // displaced name settled before DISPLACE again, the live name never
+    // dropped, and every statement naming the table the boot checks.
+    expect(bullet).toContain('Send each block below whole, with no realm booting or restarting');
+    expect(bullet).toContain('On any error, send ROLLBACK first');
+    expect(bullet).toContain(
+      'on 42710 from RESTORE a boot put the CHECK back first, so re-run the read',
+    );
+    expect(bullet).toContain('on 42P07 from PRINT send `DROP TABLE pg_temp.advance_token_print;`');
+    expect(bullet).toContain(
+      'on 42710 or 42P07 from DISPLACE an earlier displacement holds the name: read it (the read with `conname` set to the displaced name), send DROP if its definition names `advance_token`, else rename it out of the way, and send DISPLACE again',
+    );
+    expect(bullet.indexOf('First read what the name holds')).toBeLessThan(
+      bullet.indexOf('No row: send RESTORE'),
+    );
     expect(bullet).toContain('do not displace it');
     expect(bullet).toContain('Report it whatever `convalidated` says');
-    expect(bullet).toContain('never a drop');
-    expect(bullet).toContain('On any error, send ROLLBACK first');
-    expect(bullet).not.toMatch(/DROP CONSTRAINT account_freehold_hearth_advance_token_shape(?!_)/);
+    expect(bullet).toContain('DISPLACE renames the impostor, never a drop');
+    expect(bullet).toContain('send DROP for it first; for any other, stop');
+    for (const name of ['RESTORE', 'NULL AND VALIDATE', 'PRINT', 'DISPLACE', 'DROP']) {
+      expect(bullet, name).toContain(`send ${name}`);
+    }
+    expect(bullet).not.toMatch(
+      /DROP CONSTRAINT (?:IF EXISTS )?"?account_freehold_hearth_advance_token_shape(?!_)/,
+    );
     expect(bullet).toContain("'public.account_freehold_hearth'::regclass");
     expect(bullet).not.toMatch(/(?<![.\w])'account_freehold_hearth'::regclass/);
     expect(bullet).not.toMatch(/\b(?:UPDATE|FROM|ALTER TABLE) account_freehold_hearth\b/);
