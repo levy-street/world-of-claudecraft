@@ -1321,3 +1321,6 @@ What changed the contract above:
   fragment's own locks and every repair boot; R-13 adds a chunk cut mid-statement whose rows
   the release passes by; the operator renames a token impostor instead of dropping it; and
   the shutdown budget is pinned whole against `server/main.ts`.
+- A seventh round of eight fresh readers: P12 defines a repair boot instead of listing one,
+  says the storage fragment holds its own tables, and R-13 says when the backend aborts; the
+  operator's token runbook is SQL the pg suite executes.

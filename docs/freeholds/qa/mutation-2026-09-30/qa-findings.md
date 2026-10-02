@@ -385,3 +385,70 @@ L6R2; S6R1, M6R1 and L6R2 are one defect, as are H6R1 and L6R1), 29 nice-to-have
   `f0490968e4` (every repair boot named). M6R6 FIXED `d4b292e105`.
 - L6R1, L6R2 FIXED (see H6R1, S6R1). L6R3 FIXED `a8470bd1fe`. L6R4 FIXED (see H6R5). L6R5
   FIXED (see H6R1).
+
+## Round seven: eight fresh readers over round six (`f14d77d5a0..94c0a55853`)
+
+Round seven's commits: `b3f184beb6` (the token runbook's SQL as two fenced blocks the pg suite
+executes, DEPLOY's first-rollout bullet, and the lock case's holder-first cleanup),
+`71c4d79cfa` (the shutdown pin derives its bounds from the closure), `17c95d6a45` (P12 and the
+contract, structural), and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C7R1 to C7R6 |
+| qa-checklist | PASS | Q7R1 to Q7R6 |
+| server hot path | PASS | H7R1 to H7R6 |
+| privacy and security | PASS | S7R1 to S7R4 |
+| database performance | PASS | D7R1 to D7R7 |
+| test coverage | PASS | T7R1 to T7R8 |
+| docs librarian | PASS | L7R1 to L7R6 |
+| migration safety | PASS | M7R1 to M7R8 |
+
+51 findings: none blocking, 16 should-fix (C7R1, C7R2, H7R1, H7R2, H7R3, L7R1, L7R2, L7R3,
+D7R1, D7R2, Q7R1, Q7R2, T7R1, T7R2, M7R1, M7R2; several are one defect), 35 nice-to-have.
+Nearly every should-fix was an enumeration drawing one more member (repair boots, storage
+tables, `pool.end()` holders, the runbook's branches, the pin's hand-kept bounds), so this
+round replaced each with a structural statement or a whole pin rather than a longer list.
+
+- C7R1 FIXED `b3f184beb6` (with T7R3 and D7R5): every client is taken up front and cleanup
+  rolls the holder back first, each waiter carries its own lock timeout, the queued request
+  has its rejection handler and the polls a 5 s window; a forced wrong-mode assertion now
+  reports in about 7 s and leaves the file's other cases green. C7R2 FIXED `71c4d79cfa` (with
+  H7R1 and T7R1: the sum must fit the grace parsed from the game service). C7R3 FIXED
+  `71c4d79cfa` (the mirror value comes from the captured awaits). C7R4 RULED: the pin matches
+  over comment-stripped source, and a `;` in a string or a nested callback breaks an entry
+  and fails red against the whole list, never green. C7R5, C7R6 FIXED `b3f184beb6`.
+- H7R2 FIXED `71c4d79cfa` (with T7R2): every `_MS` constant and numeric literal an await
+  passes is derived from the captured list, so a newly bounded call site changes the set the
+  contract must name. H7R3 FIXED `71c4d79cfa` (each callee is checked to arm its bound; the
+  contract no longer claims what the callees of the other awaits do). H7R4 FIXED `71c4d79cfa`
+  (the call-site and callee groups are checked apart). H7R5 FIXED `17c95d6a45` (with Q7R3 and
+  D7R6). H7R6 FIXED `71c4d79cfa` (main.ts read once).
+- L7R1 FIXED `b3f184beb6` and `17c95d6a45` (with M7R1 and M7R7): a repair boot is now defined
+  as any boot that rebuilds something a probe guards, with its lock on that object's table,
+  its index build under both parents and a unique rebuild's failure on duplicates. L7R2 FIXED
+  `b3f184beb6` (the log judges the text only, and the cases tell an equivalent CHECK apart).
+  L7R3 FIXED `17c95d6a45`. L7R4 FIXED `17c95d6a45` (with T7R8). L7R5 FIXED `17c95d6a45`. L7R6
+  FIXED `b3f184beb6` (the same two tests in another order or print).
+- S7R1 FIXED `b3f184beb6`: the impostor is renamed and the boot's own CHECK added NOT VALID in
+  one short transaction, so no repair boot is needed; the pg suite runs that exact block and
+  shows the next boot silent, then nulls and validates. S7R2 FIXED `b3f184beb6` (no cast but
+  to `text`). S7R3 FIXED `b3f184beb6` (a fresh suffix on 42710 or 42P07). S7R4 FIXED
+  `b3f184beb6` (a displaced constraint naming `advance_token` is dropped once the CHECK is
+  validated).
+- D7R1 FIXED `b3f184beb6` (the stall lasts the DDL's wait and hold; the block is sent whole,
+  ROLLBACK before a retry). D7R2 FIXED `b3f184beb6` (with Q7R1: a later drop is as guarded and
+  names the foreign key's second lock). D7R3, D7R4 FIXED `b3f184beb6`. D7R5 FIXED (see C7R1).
+  D7R6 FIXED `17c95d6a45`. D7R7 FIXED `17c95d6a45`.
+- Q7R1 FIXED (see D7R2). Q7R2 FIXED `17c95d6a45`. Q7R3 FIXED (see H7R5). Q7R4 NOTED: the
+  round-six `server/CLAUDE.md` rewrap answered H6R5 and L6R4. Q7R5 FIXED `b3f184beb6` (with
+  T7R5: both bullets refuse an unqualified statement, with a positive count). Q7R6 FIXED (see
+  S7R3).
+- T7R1, T7R2 FIXED (see C7R2, H7R2). T7R3 FIXED (see C7R1). T7R4 FIXED `b3f184beb6` (the block
+  is pinned whole, in order). T7R5 FIXED (see Q7R5). T7R6 FIXED in the evidence record: the
+  underscore mutant was applied through a quoted heredoc, but its summary line was written
+  through an unquoted one that expanded the shell's `$-`; the line is corrected. T7R7 FIXED
+  `71c4d79cfa`. T7R8 FIXED (see L7R4).
+- M7R1, M7R7 FIXED (see L7R1). M7R2 FIXED `b3f184beb6` and `17c95d6a45` (the storage fragment
+  holds its locks on its own tables, unenumerated). M7R3, M7R4, M7R5, M7R6 FIXED
+  `b3f184beb6`. M7R8 FIXED `17c95d6a45`.
