@@ -1228,6 +1228,40 @@ describe('admin api auth', () => {
     expect(revokeTokensExcept).toHaveBeenCalledWith(9, null);
   });
 
+  it('a repeat ban or suspension of an account runs its token revoke and disconnect again', async () => {
+    // DEPLOY's stall remedy sends a ban or suspension again even when it shows
+    // landed: a half-landed one skipped these steps, and only a repeat runs them.
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(moderateAccount).mockResolvedValue();
+    for (const action of ['ban', 'ban', 'suspend', 'suspend']) {
+      vi.mocked(isAdminAccount).mockResolvedValueOnce(true).mockResolvedValueOnce(false);
+      const res = fakeRes();
+      await handleAdminApi(
+        fakeReq({
+          method: 'POST',
+          token: VALID_TOKEN,
+          url: `/admin/api/moderation/accounts/9/${action}`,
+          body: {
+            reason: 'abuse',
+            expiresAt:
+              action === 'suspend' ? new Date(Date.now() + 3600_000).toISOString() : undefined,
+          },
+        }),
+        res,
+        fakeGame,
+      );
+      expect(res.statusCode).toBe(200);
+    }
+    expect(moderateAccount).toHaveBeenCalledTimes(4);
+    expect(vi.mocked(revokeTokensExcept).mock.calls).toEqual([
+      [9, null],
+      [9, null],
+      [9, null],
+      [9, null],
+    ]);
+    expect(fakeGame.disconnectAccount).toHaveBeenCalledTimes(4);
+  });
+
   it('mutes account chat and sends a live warning without disconnecting', async () => {
     vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValueOnce(true).mockResolvedValueOnce(false);
@@ -2076,6 +2110,31 @@ describe('admin api password reset', () => {
     expect(vi.mocked(recordPasswordReset).mock.invocationCallOrder[0]).toBeLessThan(
       vi.mocked(updatePasswordHash).mock.invocationCallOrder[0],
     );
+  });
+
+  it('a repeat reset runs its token revoke and disconnect again', async () => {
+    // DEPLOY's stall remedy repeats a staff reset even when it shows landed.
+    actAs(['admin']);
+    vi.mocked(isAdminAccount).mockResolvedValue(false);
+    targetExists();
+    for (let i = 0; i < 2; i++) {
+      const res = fakeRes();
+      await handleAdminApi(
+        post({ password: 'newpass123', reason: 'account recovery' }),
+        res,
+        fakeGame,
+      );
+      expect(res.statusCode).toBe(200);
+    }
+    expect(vi.mocked(updatePasswordHash).mock.calls).toEqual([
+      [9, 'salt:hashed'],
+      [9, 'salt:hashed'],
+    ]);
+    expect(vi.mocked(revokeTokensExcept).mock.calls).toEqual([
+      [9, null],
+      [9, null],
+    ]);
+    expect(fakeGame.disconnectAccount).toHaveBeenCalledTimes(2);
   });
 
   it('rejects out-of-bounds passwords without touching the account', async () => {

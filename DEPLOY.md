@@ -1080,12 +1080,11 @@ For off-box safety, sync the directory to S3 occasionally:
     transaction, that holds a lock conflicting with one the boot takes (any lock at all
     on `auth_tokens`, `characters`, `accounts` or a later table the core schema alters,
     `play_sessions` and `character_leases` among them, since ACCESS EXCLUSIVE conflicts
-    with every mode), and every later statement whose lock conflicts with one the boot
-    holds or waits for, on every realm, queues behind the boot unless its transaction
-    already holds a lock on that table (56 to 59 ms in the bench with plain saves in
-    flight when no deadlock formed; one boot in six waited out `deadlock_timeout`,
-    1,056 ms, and lived while the bench's "old account create", a transaction that
-    inserts an account and then a character, was aborted).
+    with every mode), and later statements on those tables, on every realm, can queue
+    behind the boot (56 to 59 ms in the bench with plain saves in flight when no
+    deadlock formed; one boot in six waited out `deadlock_timeout`, 1,056 ms, and lived
+    while the bench's "old account create", a transaction that inserts an account and
+    then a character, was aborted).
   - Deadlocks: a boot can DEADLOCK with any transaction of either of two shapes: one
     that holds a lock on a table the boot holds only SHARE on (a plain read's ACCESS
     SHARE, or a row lock's ROW SHARE) and then writes it, against the boot's upgrade of
@@ -1140,16 +1139,16 @@ For off-box safety, sync the directory to S3 occasionally:
     FROM pg_locks l JOIN pg_stat_activity a USING (pid) WHERE l.locktype = 'relation'
     AND l.database = (SELECT oid FROM pg_database WHERE datname = current_database())
     AND l.relation = 'public.auth_tokens'::regclass AND l.mode = 'AccessExclusiveLock'
-    AND NOT l.granted;` ends it and names the realm's address, which rolls its schema
+    AND NOT l.granted;` ends it and shows its address, which rolls its schema
     transaction back and releases the queue for now (the dump never asks for that lock;
     the statement also ends any other session waiting for it, such as your own DDL on
     `auth_tokens`, which rolls back). Run it again a few seconds later: no row means
     nothing waits there, and a row means a realm still booting took the place, so stop
-    the realm at that address and run it again. Leave the stopped realms stopped until
-    the dump ends (the quiet reading shows no `pg_dump` row), then boot them in a quiet
-    window, or, after a stall that began while players or staff were active, by the
-    After a stall steps below, which start every realm; never end the dump, and boot no
-    realm until it ends.
+    every realm whose container is still not `healthy` and run it again. Leave the
+    stopped realms stopped until the dump ends (the quiet reading shows no `pg_dump`
+    row), then boot them in a quiet window, or, after a stall that began while players
+    or staff were active, by the After a stall steps below; never end the dump, and boot
+    no realm until it ends.
   - After an abort: an aborted save shows as 40P01 in the realm log (one that carried
     guild bank books also counts `escrow_save_failed`), and what writes it again
     depends on the save: an autosave is written by the next autosave; a leave save is
@@ -1161,35 +1160,42 @@ For off-box safety, sync the directory to S3 occasionally:
     player tries again).
   - After a stall: no request that failed while a boot blocked `auth_tokens` (behind the
     dump or anything else) is retried, a logout or a token revoke included. One that
-    failed before writing changed nothing and stays undone until it is sent again; one
-    that wrote before its failing statement keeps those writes and skips every step
-    after it. That matters for an action that writes the account and then revokes its
-    tokens (for example a password change, a staff password reset, a ban, a suspension
-    or a deactivation): it leaves the old tokens valid and the live session connected,
-    and skips what follows (for example its disconnect, its notice email, or a
-    deactivation's housing receipt erase). Most requests check their token in
-    `auth_tokens` before they write, so few land half, but the realm log names no
-    account. So as soon as the stall is over, staff send again each ban, suspension or
-    staff password reset that returned an error during it, even when it shows landed (a
-    repeat runs the skipped revoke, disconnect and notice email again; a staff password
-    reset can also have left its record without the new password), a player whose
-    password change returned an error changes it again with the new password as the
-    current one, and any other action is sent again only if it did not land; nothing
-    else sends a skipped notice email again. Every token a skipped revoke left stays
-    valid until a sign-out, so then close what nobody saw fail: stop every realm on the
-    database and let each finish shutting down (stopping drops every live session and
-    the in-memory desktop login codes in `server/desktop_login.ts`, which the sign-out
-    cannot reach and which a token it ends could trade for a fresh one), sign every
-    account out once from psql on the realm database (`DELETE FROM auth_tokens WHERE
-    created_at < now() AND expires_at > now(); DELETE FROM oauth_codes; DELETE FROM
-    oauth_device_codes;`, companion and OAuth tokens included, and no pending OAuth code
-    left to mint one; an expired token is refused already; on 40P01 run it again), and
-    start every realm together: their boots line up on the schema advisory lock and
-    finish within moments of each other, before a signed-out client can sign in again,
-    so each boots quiet. Re-run the deactivation housing receipt erase for deactivated
-    accounts that still hold receipts by the bullet below that begins "A failed
-    deactivation receipt erase" (a deactivation stopped at its revoke never reached the
-    erase, so it logged no warning).
+    failed before writing changed nothing; one that wrote before its failing statement
+    keeps those writes and skips every step after it. For an action that writes the
+    account and then revokes its tokens (for example a password change, a staff password
+    reset, a ban, a suspension or a deactivation) that leaves the old tokens valid and
+    the live session connected, and skips what follows (for example its disconnect, its
+    notice email, or a deactivation's housing receipt erase); the realm log names no
+    account. So once the stall is over (its boot COMMITs, or its backend is ended),
+    staff send again each ban, suspension or staff password reset made during it,
+    whether or not it returned an error or shows landed (a repeat runs its revoke and
+    disconnect again; repeat a staff password reset with the same password), and players
+    redo what returned an error; nothing else sends a skipped notice email again. A
+    token a skipped revoke left valid stays valid until a sign-out, and a sign-out
+    undoes nothing such a token did before it (a login link it added among them). So
+    then stop every realm on the database, one after another, each stop finishing before
+    the next, which drops every live session and the in-memory desktop login codes in
+    `server/desktop_login.ts` (the sign-out cannot reach them, and a desktop app could
+    still trade one for a fresh token); sign every account out once from psql on the
+    realm database (`DELETE FROM auth_tokens WHERE created_at < now() AND expires_at >
+    now(); DELETE FROM oauth_codes; DELETE FROM oauth_device_codes;`, companion and
+    OAuth tokens included, and no pending OAuth code left to mint one; an expired token
+    is refused already; on 40P01 run it again); and, once the dump has ended, start the
+    realms again. Each boot after the first can meet the realms started before it, their
+    startup work or their returning players, and a boot that loses exits and is
+    restarted (Deadlocks above). Re-run the deactivation housing receipt erase for
+    deactivated accounts that still hold receipts by the bullet below that begins "A
+    failed deactivation receipt erase" (a deactivation stopped at its revoke never
+    reached the erase, so it logged no warning).
+  - Index builds: after it listens, a realm builds each missing index of
+    `server/concurrent_indexes.ts` concurrently while it holds the schema advisory lock,
+    and a boot or another realm's build that waits on that lock meanwhile deadlocks with
+    it, so one of the two is aborted (40P01): the build, whose index then stays INVALID
+    until a later realm's build drops and rebuilds it, or the waiter (a boot that loses
+    exits and is restarted). So on a release that adds such an index, start the next
+    realm only once `SELECT count(*) FROM pg_stat_progress_create_index WHERE datname =
+    current_database();` from psql on the realm database returns 0; making a waiter hold
+    no snapshot, so that neither is aborted, is owed.
   - The hazard predates housing; removing both paths is owed
     (docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md measures it).
 - FIRST ROLLOUT OF THE HOUSING TABLES: the first boot that carries them also creates

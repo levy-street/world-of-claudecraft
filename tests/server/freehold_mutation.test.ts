@@ -2170,6 +2170,13 @@ describe('the claim renewer', () => {
     expect(bullet).toContain('on `accounts` it is ACCESS EXCLUSIVE from the first');
     expect(bullet).toContain('The boot sends no lock timeout of its own');
     const source = (file: string) => stripComments(readFileSync(file, 'utf8'));
+    // A realm boots before it serves anything, so a stopped boot has served
+    // nothing and a stopped realm's start runs its boot first.
+    expect(bullet).toContain('a boot runs before its realm serves anything');
+    const main = source('server/main.ts');
+    const booted = main.indexOf('await ensureSchema();');
+    expect(booted).toBeGreaterThan(-1);
+    expect(main.indexOf('server.listen(')).toBeGreaterThan(booted);
     const seconds = (file: string, name: string): number => {
       const found = source(file).match(new RegExp(`export const ${name} = ([0-9_]+);`));
       expect(found, name).not.toBeNull();

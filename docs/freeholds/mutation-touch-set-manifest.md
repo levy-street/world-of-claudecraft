@@ -1388,5 +1388,8 @@ What changed the contract above:
   the queue until it is ended.
 - A twenty-first round of eight fresh readers: P12 drops the claim about the boot's own row
   writes, and names the running boot that takes a stopped boot's place once it is ended.
-- A twenty-second round of eight fresh readers: P12 says a queued boot takes an ended boot's
-  place once that backend is ended.
+- A twenty-second round of eight fresh readers: P12 says the running boot queued behind a
+  stopped one takes its place once the stopped boot's backend is ended (this entry's wording
+  corrected in round twenty-three).
+- A twenty-third round of eight fresh readers: no P12 change; `DEPLOY.md` notes that a boot or
+  build waiting on the schema advisory lock deadlocks with a concurrent index build under it.
