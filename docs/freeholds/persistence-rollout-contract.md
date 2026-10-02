@@ -738,8 +738,9 @@ aborted, saves were aborted beside it, and a boot that loses exits and is restar
 hazard of the core schema's boot that predates housing
 (`docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md`), to which 07a adds
 members. The first rollout is the one boot that also builds the tables: do it, and any
-boot beside other realms serving those saves, in a quiet window, and never beside a
-realm that is still shutting down (a shutdown flush save that fails gets one more pass
+boot beside other realms serving those saves, in a quiet window (as `DEPLOY.md` defines
+it, outside the nightly `pg_dump` too), and never beside a realm that is still shutting
+down (a shutdown flush save that fails gets one more pass
 only when it carried guild bank books, and otherwise is not written again).
 
 ### The shutdown drain, and why it sits where it sits

@@ -121,9 +121,9 @@ CREATE TABLE IF NOT EXISTS "__woc_freehold_hearth_schema__".account_freehold_hea
 -- COMMIT. The column's CHECK is probed by NAME too, by name alone (a same-named
 -- constraint of any type counts, so this repair can never fail a boot with
 -- 42710; the column's repair names its CHECK unprobed, so a hand-made
--- constraint of that name on other columns fails it): a column that exists
--- without it (added by hand) gets it back NOT VALID, so every new token is
--- checked again while no boot scans the table to re-validate old rows (the
+-- constraint of that name, on other columns or none, fails it): a column that
+-- exists without it (added by hand) gets it back NOT VALID, so every new token
+-- is checked again while no boot scans the table to re-validate old rows (the
 -- advance only ever wrote hex tokens). A same-named constraint that is not THIS
 -- check (another type, or a CHECK with another body) leaves the shape
 -- unchecked, so the boot says so (a WARNING notice). It compares PostgreSQL's

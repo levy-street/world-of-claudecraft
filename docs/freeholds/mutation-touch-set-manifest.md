@@ -663,33 +663,33 @@ unlike the trigger probe, which checks the exact shape. The Hearth column probe 
 column and then its named CHECK: a column whose CHECK is missing gets it back `NOT VALID`,
 so every new token is checked again while no boot scans the table for old ones. The CHECK is
 probed by name, so a same-named constraint of any type satisfies the probe (that repair can
-never fail a boot with 42710, though the column's repair, which names its CHECK unprobed, fails
-on a hand-made constraint of that name on other columns); one that is not that CHECK (another type, or a CHECK with
-another body, compared on PostgreSQL's own deparse) is left in place and the boot logs a
-WARNING. THE FIRST ROLLOUT WINDOW: because no 07 build deployed, the first 07a boot on
-production creates five FK-bearing tables and the triggers in ONE `ensureSchema` transaction
-with no `lock_timeout`. It takes no parent lock a steady-state boot does not (above): every
-boot queues behind each in-flight `characters` and `accounts` writer on the running fleet,
-and every later save and account write on every realm queues behind the boot until its
-COMMIT (measured with an old realm serving: about 65 ms for the first rollout with plain
-saves in flight, the same as a steady-state boot). ANY boot can DEADLOCK on two paths. The
-UPGRADE path, one table: the boot's first `characters` lock is SHARE (the core
-`characters_account` index create), upgraded to ACCESS EXCLUSIVE by the next statement,
-against a transaction that took a lock on `characters` that SHARE does not wait for (a
-save's G2 row lock, ROW SHARE, or a plain read's ACCESS SHARE) and then writes it. The ORDER
-path, two tables: a transaction that holds any lock on `accounts` and then asks for one on
-`characters`, this manifest's own G1-then-G2 order (every effect-carrying or hooked save,
+never fail a boot with 42710, though the column's repair, which names its CHECK unprobed,
+fails on a hand-made constraint of that name, on other columns or none); one that is not that
+CHECK (another type, or a CHECK with another body, compared on PostgreSQL's own deparse) is
+left in place and the boot logs a WARNING. THE FIRST ROLLOUT WINDOW: because no 07 build
+deployed, the first 07a boot on production creates five FK-bearing tables and the triggers in
+ONE `ensureSchema` transaction with no `lock_timeout`. It takes no parent lock a steady-state
+boot does not (above): every boot queues behind each in-flight `characters` and `accounts`
+writer on the running fleet, and every later save and account write on every realm queues
+behind the boot until its COMMIT (measured with an old realm serving: about 65 ms for the
+first rollout with plain saves in flight, the same as a steady-state boot). ANY boot can
+DEADLOCK on two paths. The UPGRADE path, one table: the boot's first `characters` lock is
+SHARE (the core `characters_account` index create), upgraded to ACCESS EXCLUSIVE by the next
+statement, against a transaction that took a lock on `characters` that SHARE does not wait for
+(a save's G2 row lock, ROW SHARE, or a plain read's ACCESS SHARE) and then writes it. The
+ORDER path, two tables: a transaction that holds any lock on `accounts` and then asks for one
+on `characters`, this manifest's own G1-then-G2 order (every effect-carrying or hooked save,
 the Hearth trip's included, the operation prepare and the character delete), against the
-boot's `characters`-then-`accounts` order. With G1-shaped saves in flight every bench boot
-was eventually aborted and saves were aborted beside it, and a boot that loses exits and is
+boot's `characters`-then-`accounts` order. With G1-shaped saves in flight every bench boot was
+eventually aborted and saves were aborted beside it, and a boot that loses exits and is
 restarted (R-11). A REPAIR boot is any boot that rebuilds something a probe guards (for
-example an index, a guard or trigger, or the advance token column or its CHECK): it holds
-that statement's lock on that object's table to its COMMIT, builds a rebuilt index or a
-re-added column while it holds both parents, for as long as the build takes, which grows
-with the table; a rebuilt unique index that meets duplicate rows fails the boot, which exits
-and is restarted into the same stall until the duplicates are resolved. Stop the other
-realms before a repair boot, and do the first rollout, any repair boot, and any boot beside
-other realms serving such saves, in a quiet window; `DEPLOY.md` carries the operator note.
+example an index, a guard or trigger, or the advance token column or its CHECK): it holds that
+statement's lock on that object's table to its COMMIT, builds a rebuilt index or a re-added
+column while it holds both parents, for as long as the build takes, which grows with the
+table; a rebuilt unique index that meets duplicate rows fails the boot, which exits and is
+restarted into the same stall until the duplicates are resolved. Stop the other realms before
+a repair boot, and do the first rollout, any repair boot, and any boot beside other realms
+serving such saves, in a quiet window; `DEPLOY.md` carries the operator note.
 
 ## 6. Pairwise deadlock review
 
