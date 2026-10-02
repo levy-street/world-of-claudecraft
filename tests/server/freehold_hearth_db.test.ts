@@ -181,7 +181,12 @@ describe('the DDL', () => {
     const constraintProbeAt = code.indexOf(constraintProbe);
     const repairAt = code.indexOf('ADD CONSTRAINT account_freehold_hearth_advance_token_shape');
     expect(code.slice(repairAt).indexOf('NOT VALID;')).toBeGreaterThan(0);
+    // The last arm only WARNS, for a same-named constraint that is not a CHECK.
+    const notCheckAt = code.indexOf("AND contype <> 'c'");
+    expect(notCheckAt).toBeGreaterThan(repairAt);
+    expect(code.indexOf('RAISE WARNING', notCheckAt)).toBeGreaterThan(notCheckAt);
     const endIfAt = code.indexOf('END IF;');
+    expect(endIfAt).toBeGreaterThan(notCheckAt);
     expect(probeAt).toBeGreaterThan(code.indexOf('DO $freehold_hearth_advance_token$'));
     expect(alterAt).toBeGreaterThan(probeAt);
     expect(constraintProbeAt).toBeGreaterThan(alterAt);

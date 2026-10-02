@@ -119,10 +119,11 @@ CREATE TABLE IF NOT EXISTS "__woc_freehold_hearth_schema__".account_freehold_hea
 -- held through the rest of the boot transaction that lock would block every
 -- other realm's Hearth reads, so an ordinary boot only reads the catalog. The
 -- column's CHECK is probed by NAME too, by name alone (a same-named constraint
--- of any type counts, so a hand-made one can never fail a boot): a column that
--- exists without it (added by hand) gets it back NOT VALID, so every new token
--- is checked again while no boot scans the table to re-validate old rows (the
--- advance only ever wrote hex tokens).
+-- of any type counts, so the repair can never fail a boot with 42710): a column
+-- that exists without it (added by hand) gets it back NOT VALID, so every new
+-- token is checked again while no boot scans the table to re-validate old rows
+-- (the advance only ever wrote hex tokens). A same-named constraint that is NOT
+-- a CHECK leaves the shape unchecked, so the boot says so (a WARNING notice).
 DO $freehold_hearth_advance_token$
 BEGIN
   IF NOT EXISTS (
@@ -143,6 +144,13 @@ BEGIN
     ALTER TABLE "__woc_freehold_hearth_schema__".account_freehold_hearth
       ADD CONSTRAINT account_freehold_hearth_advance_token_shape
       CHECK (advance_token IS NULL OR advance_token ~ '^[0-9a-f]{32}$') NOT VALID;
+  ELSIF EXISTS (
+    SELECT 1 FROM pg_catalog.pg_constraint
+     WHERE conrelid = to_regclass('"__woc_freehold_hearth_schema__".account_freehold_hearth')
+       AND conname = 'account_freehold_hearth_advance_token_shape'
+       AND contype <> 'c'
+  ) THEN
+    RAISE WARNING 'account_freehold_hearth_advance_token_shape is not a CHECK constraint, so the advance token shape is unchecked';
   END IF;
 END;
 $freehold_hearth_advance_token$;
@@ -411,9 +419,6 @@ export async function advanceFreeholdHearthOnClient(
   return { kind: 'advanced', readyAtMs: nextReadyAtMs, revision: nextRevision, nowMs };
 }
 
-/** The subject-access read (exportAccountData): the account's one cooldown row,
- *  or null when it has never travelled. Counters ship as text for the same
- *  reason they are read as text everywhere else here. */
 /** The export's ALLOWLIST: the clock and its revision, never the advance token
  *  (a per-attempt server internal). Pinned to a literal in
  *  tests/server/freehold_sql_contract.test.ts with the other housing exports. */
@@ -421,6 +426,9 @@ export const FREEHOLD_HEARTH_EXPORT_SQL = `SELECT ready_at_ms::text AS ready_at_
   FROM account_freehold_hearth
  WHERE account_id = $1`;
 
+/** The subject-access read (exportAccountData): the account's one cooldown row,
+ *  or null when it has never travelled. Counters ship as text for the same
+ *  reason they are read as text everywhere else here. */
 export async function freeholdHearthForExport(
   db: FreeholdQueryable,
   accountId: number,

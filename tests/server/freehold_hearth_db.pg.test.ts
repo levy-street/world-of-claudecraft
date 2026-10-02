@@ -409,6 +409,49 @@ d('account_freehold_hearth against real PostgreSQL', () => {
     await pool.query(`DELETE FROM ${legacyTable} WHERE account_id = $1`, [CHECK_ACCOUNT]);
   });
 
+  it('warns, never fails the boot, when a same-named constraint is not a CHECK', async () => {
+    const legacy = db.freeholdHearthSchema(LEGACY_SCHEMA);
+    const legacyTable = `${LEGACY_SCHEMA}.account_freehold_hearth`;
+    await pool.query(
+      `ALTER TABLE ${legacyTable} DROP CONSTRAINT account_freehold_hearth_advance_token_shape`,
+    );
+    await pool.query(
+      `ALTER TABLE ${legacyTable} ADD CONSTRAINT account_freehold_hearth_advance_token_shape UNIQUE (advance_token)`,
+    );
+    const client = await pool.connect();
+    const notices: string[] = [];
+    const onNotice = (notice: { severity?: string; message?: string }) =>
+      notices.push(`${notice.severity}: ${notice.message}`);
+    client.on('notice', onNotice);
+    try {
+      // The boot completes (no 42710) and says the shape is unchecked.
+      await client.query(legacy);
+    } finally {
+      client.off('notice', onNotice);
+      client.release();
+    }
+    expect(notices).toContain(
+      'WARNING: account_freehold_hearth_advance_token_shape is not a CHECK constraint, so the advance token shape is unchecked',
+    );
+    expect((await tokenShape(LEGACY_SCHEMA)).constraints).toEqual([
+      {
+        conname: 'account_freehold_hearth_advance_token_shape',
+        def: 'UNIQUE (advance_token)',
+      },
+    ]);
+    // The control: with the impostor gone, the next boot puts the CHECK back.
+    await pool.query(
+      `ALTER TABLE ${legacyTable} DROP CONSTRAINT account_freehold_hearth_advance_token_shape`,
+    );
+    await pool.query(legacy);
+    expect((await tokenShape(LEGACY_SCHEMA)).constraints).toEqual([
+      {
+        conname: 'account_freehold_hearth_advance_token_shape',
+        def: "CHECK (((advance_token IS NULL) OR (advance_token ~ '^[0-9a-f]{32}$'::text))) NOT VALID",
+      },
+    ]);
+  });
+
   it("restores the caller's in-flight search_path after the fragment", async () => {
     const client = await pool.connect();
     try {
