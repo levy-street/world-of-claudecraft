@@ -594,7 +594,11 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       ).toEqual([{ app: 'advance_token_runbook', lock: '2s', idle: '5s' }]);
       // The control: a name given in PGOPTIONS loses to psql's own. Neither
       // the URL nor the environment may name the session for it.
-      expect(url).not.toMatch(/[?&](?:application_name|options)=/);
+      // Tested as a boolean, so a failure never prints the URL's password.
+      expect(
+        /[?&](?:application_name|options)=/.test(url),
+        'TEST_DATABASE_URL names the session',
+      ).toBe(false);
       const namedInOptions = await (async () => {
         vi.stubEnv('PGAPPNAME', '');
         try {
