@@ -1477,3 +1477,5 @@ What changed the contract above:
   forty-first names the round that reworded it (worded so in round forty-five, C45R1).
 - A forty-fifth round of eight fresh readers: no P12 change and no change to `DEPLOY.md` or the
   bot; the forty-fourth entry here names the forty-third entry's rewording.
+- A forty-sixth round of eight fresh readers: no P12 change and no change to `DEPLOY.md` or the
+  bot.

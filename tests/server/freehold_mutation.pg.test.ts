@@ -47,7 +47,7 @@
 // tests/guild_bank_pg_integration.test.ts and
 // tests/server/storage_purchase_db.pg.test.ts prove the legacy halves with no
 // housing participant.
-// Cost: 13.6 s
+// Cost: 13.8 s
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import type { Pool as PgPool, PoolClient } from 'pg';
@@ -3277,13 +3277,18 @@ d('the housing mutation boundary (REAL Postgres)', () => {
      *  boot's own catch rolls back and closes its client, so no boot left
      *  waiting on a lock holds one into a later case, and no connection drops
      *  under a client with no error listener. PostgreSQL drops a cancel that
-     *  reaches a session between statements, so it is sent again for up to a
-     *  second; a boot idle in its transaction longer than that (its pool probe,
-     *  say) reads as still waiting and ends at the pool's own deadlines. */
-    async function settled(work: Promise<unknown> | undefined, ms = 5_000): Promise<unknown> {
+     *  reaches a session between statements, so it is sent again for up to
+     *  `grace` (a second); a boot idle in its transaction longer than that (its
+     *  pool probe, say) reads as still waiting and ends at the pool's own
+     *  deadlines. */
+    async function settled(
+      work: Promise<unknown> | undefined,
+      ms = 5_000,
+      grace = 1_000,
+    ): Promise<unknown> {
       const outcome = await within(Promise.resolve(work), ms);
       if (outcome === 'still waiting') {
-        const end = Date.now() + 1_000;
+        const end = Date.now() + grace;
         do {
           await pool
             .query(`SELECT pg_cancel_backend(pid) FROM pg_locks WHERE ${ON_SCHEMA_LOCK}`, [
@@ -3330,8 +3335,8 @@ d('the housing mutation boundary (REAL Postgres)', () => {
      *  reads the lock it waits for and every table lock it holds. `during` runs
      *  while the boot still waits and gets the boot's outcome (`'finished'` or
      *  its error). The boot must settle within ten seconds of the hold's release
-     *  and finish unless `mayFail`; after a failure it is read for a second, to
-     *  end it. */
+     *  and finish unless `mayFail`; after a failure it is read for a second, and
+     *  a boot still waiting then is cancelled and read for up to a second more. */
     async function bootBehind(
       tables: readonly string[],
       opts: {
@@ -3364,7 +3369,8 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         await holder.query('RESET application_name').catch(() => {});
         holder.release();
         // After a failure (a `during` that read the boot already, say) it gets a
-        // second, so its reads never stack past the case's timeout.
+        // second's read and at most a second of cancels, so its reads never
+        // stack past the case's timeout.
         outcome = await settled(boot, ran ? 10_000 : 1_000);
       }
       if (outcome === 'still waiting') throw new Error('the boot behind the hold never settled');
@@ -3409,6 +3415,8 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       const late = sleep(200).then(() => new Error('settled after the deadline'));
       expect(await settled(late, 50)).toBe('still waiting');
       expect(await late).toBeInstanceOf(Error);
+      // Work that never settles is let go once the cancel's grace is spent.
+      expect(await settled(new Promise(() => {}), 50, 200)).toBe('still waiting');
     });
 
     it('locks auth_tokens, then characters, then accounts, and sends no lock timeout', async () => {
@@ -4355,9 +4363,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         try {
           waiting = await pool.connect();
           const waiter = waiting;
-          await runner.query('SELECT pg_advisory_lock($1)', [0x57_4f_43_01]);
+          await runner.query('SELECT pg_advisory_lock($1)', [SCHEMA_LOCK_KEY]);
           if (inTransaction) await waiter.query('BEGIN');
-          const waited = waiter.query(waiterSql, [0x57_4f_43_01]).then(
+          const waited = waiter.query(waiterSql, [SCHEMA_LOCK_KEY]).then(
             () => 'granted',
             (error: { code?: string }) => error.code,
           );
@@ -4384,7 +4392,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           } else {
             // The aborted build leaves its index INVALID.
             expect(await valid()).toEqual([false]);
-            await runner.query('SELECT pg_advisory_unlock($1)', [0x57_4f_43_01]);
+            await runner.query('SELECT pg_advisory_unlock($1)', [SCHEMA_LOCK_KEY]);
             expect(await waited).toBe('granted');
           }
           return first.by;
@@ -4477,7 +4485,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
             held = await psqlSession();
           }
           await realm.connect();
-          await realm.query('SELECT pg_advisory_lock($1)', [0x57_4f_43_01]);
+          await realm.query('SELECT pg_advisory_lock($1)', [SCHEMA_LOCK_KEY]);
           const building = realm.query(migration.createSql).catch(() => 'stopped');
           expect(await until(oldSnapshotWaits, 1)).toBe(1);
           await then({
@@ -4803,7 +4811,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           await locker.query('SELECT 1 FROM guilds LIMIT 1');
           const lockerPid = (await locker.query('SELECT pg_backend_pid() AS p')).rows[0].p;
           await dropper.connect();
-          await dropper.query('SELECT pg_advisory_lock($1)', [0x57_4f_43_01]);
+          await dropper.query('SELECT pg_advisory_lock($1)', [SCHEMA_LOCK_KEY]);
           dropping = dropper.query(migration.dropSql);
           const dropperPid = (dropper as unknown as { processID: number }).processID;
           const waiting = async () => (await decides()).map((row) => `${row.wait_event}`).join(',');
@@ -4830,7 +4838,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           ).toEqual([dropperPid]);
           await locker.query('COMMIT');
           await dropping;
-          await dropper.query('SELECT pg_advisory_unlock($1)', [0x57_4f_43_01]);
+          await dropper.query('SELECT pg_advisory_unlock($1)', [SCHEMA_LOCK_KEY]);
           expect(await valid()).toEqual([]);
         } finally {
           await locker.query('ROLLBACK').catch(() => {});

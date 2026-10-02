@@ -3001,12 +3001,16 @@ describe('the claim renewer', () => {
     ]);
     // Every tracked bot code file still on disk is parsed, so a route is read
     // as its literal's value (an escape in its text included), never as raw
-    // text. The list is checked against a second listing of the whole
-    // directory, so a narrowed pathspec cannot drop a file.
+    // text. Each listing is NUL-separated, so git quotes no name (a quoted name
+    // fails existsSync and would drop from both), and the list is checked
+    // against a second listing of the whole directory, so a narrowed pathspec
+    // cannot drop a file.
     const tracked = (pathspecs: string[]) => {
-      const listed = spawnSync('git', ['ls-files', '--', ...pathspecs], { encoding: 'utf8' });
+      const listed = spawnSync('git', ['ls-files', '-z', '--', ...pathspecs], {
+        encoding: 'utf8',
+      });
       expect(listed.status).toBe(0);
-      return listed.stdout.split('\n').filter((file) => file !== '' && existsSync(file));
+      return listed.stdout.split('\0').filter((file) => file !== '' && existsSync(file));
     };
     const botFiles = tracked(botCode);
     expect(botFiles).toEqual(tracked(['bot']).filter((file) => /\.[mc]?[jt]s$/.test(file)));
@@ -3030,10 +3034,12 @@ describe('the claim renewer', () => {
       'bot/server_client.ts: pushMembersMeta',
       'bot/server_client.ts: flairedIds',
     ]);
-    // Section L of the pg suite reads every boot through `settled`, which ends
+    // Section L of the pg suite reads every boot through `settled`, which cancels
     // a boot still waiting at its deadline; so every boot the section runs
-    // starts in `startBoot`, its one call of `ensureSchema` (a call by another
-    // name is not read).
+    // starts in `startBoot`, its one call of `ensureSchema`, and every
+    // `startBoot` result is read by `settled`, directly or through the name it
+    // is assigned to (a call by another name, through element access, or
+    // through .call or .apply is not read).
     const pgSuite = parsed('tests/server/freehold_mutation.pg.test.ts');
     const sectionL = nodesIn(pgSuite).filter(
       (node) =>
@@ -3060,6 +3066,34 @@ describe('the claim renewer', () => {
       return '(top level)';
     };
     expect(bootCalls.map(declaredIn)).toEqual(['startBoot']);
+    const callsOf = (name: string) =>
+      nodesIn(sectionL[0]).filter(
+        (node): node is ts.CallExpression =>
+          ts.isCallExpression(node) &&
+          ts.isIdentifier(node.expression) &&
+          node.expression.text === name,
+      );
+    // Each `startBoot` call by what takes its result.
+    expect(
+      callsOf('startBoot').map((call) => {
+        const at = call.parent;
+        if (ts.isCallExpression(at) && ts.isIdentifier(at.expression)) return at.expression.text;
+        if (ts.isBinaryExpression(at) && ts.isIdentifier(at.left)) return `= ${at.left.text}`;
+        return ts.SyntaxKind[at.kind];
+      }),
+    ).toEqual(['= boot', '= second', '= third', 'settled']);
+    // Every `settled` call in the section, its arguments as written.
+    expect(
+      callsOf('settled').map((call) => call.arguments.map((arg) => arg.getText()).join(', ')),
+    ).toEqual([
+      'boot, ran ? 10_000 : 1_000',
+      "Promise.resolve('finished'), 50",
+      'late, 50',
+      'new Promise(() => {}), 50, 200',
+      'work',
+      'Promise.allSettled([second, third])',
+      'startBoot(), 10_000',
+    ]);
     // The link-change feed's heal is the bot's resyncs, which DEPLOY gives no
     // cadence; the bot's own suites pin them (tests/discord_bot_linked_sweep.test.ts,
     // tests/discord_bot_member_writes.test.ts and
