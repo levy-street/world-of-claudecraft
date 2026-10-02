@@ -1673,13 +1673,20 @@ describe('the claim renewer', () => {
     expect(start).toBeGreaterThan(0);
     expect(end).toBeGreaterThan(start);
     // Both signals run the closure: its two registrations follow it as one
-    // block, and no other line of main.ts names either signal, so no second
-    // listener, wrapper or removal can stand beside them.
+    // block, and no other line of main.ts, nor any other file under server/,
+    // names either signal, so no second listener, wrapper or removal can
+    // stand beside them in the process.
     expect(
-      main.split("};\n  process.on('SIGINT', shutdown);\n  process.on('SIGTERM', shutdown);\n")
-        .length,
-    ).toBe(2);
+      main.match(/\};\s*process\.on\('SIGINT', shutdown\);\s*process\.on\('SIGTERM', shutdown\);/g)
+        ?.length,
+      'the SIGINT and SIGTERM registrations right after the closure',
+    ).toBe(1);
     expect(main.match(/\bSIG(?:INT|TERM)\b/g)).toEqual(['SIGINT', 'SIGTERM']);
+    expect(
+      sourceFilesUnder('server')
+        .filter((source) => /\bSIG(?:INT|TERM)\b/.test(readFileSync(source.full, 'utf8')))
+        .map((source) => source.file),
+    ).toEqual(['main.ts']);
     const awaits = [...main.slice(start, end).matchAll(/await\s+([^;]+);/g)].map((match) =>
       match[1].replace(/\s+/g, ' ').trim(),
     );
@@ -1961,7 +1968,7 @@ describe('the claim renewer', () => {
      *  plain word (a quoted key, a merge key, a flow map), so an unread form
      *  never passes. Read line by line; every pattern is anchored or a
      *  two-character search, so its work stays linear in the line. */
-    type GameStop = { grace: number | null; signal: string | null };
+    type GameStop = { grace: number | null; signal: string | null; keys: string[] };
     const gameStopOf = (compose: string): GameStop | null => {
       const unquoted = (value: string): string => {
         const quote = value[0];
@@ -1969,7 +1976,7 @@ describe('the claim renewer', () => {
           ? value.slice(1, -1)
           : value;
       };
-      const stop: GameStop = { grace: null, signal: null };
+      const stop: GameStop = { grace: null, signal: null, keys: [] };
       let inServices = false;
       let inGame = false;
       for (const line of compose.split(/\r?\n/)) {
@@ -1986,6 +1993,7 @@ describe('the claim renewer', () => {
           const colon = content.indexOf(':');
           const key = content.slice(4, colon);
           if (!/^[a-z_]+$/.test(key)) return null;
+          stop.keys.push(key);
           const value = unquoted(content.slice(colon + 1).trim());
           if (key === 'stop_grace_period') {
             stop.grace = /^\d+s$/.test(value) ? Number(value.slice(0, -1)) : null;
@@ -2012,16 +2020,19 @@ describe('the claim renewer', () => {
     expect(gameStopOf(service('75s', '    stop_signal: SIGQUIT\n'))).toEqual({
       grace: 75,
       signal: 'SIGQUIT',
+      keys: ['image', 'stop_signal', 'stop_grace_period'],
     });
     expect(
       gameStopOf('services:\n  game:\n    stop_grace_period: 75s\n    stop_signal: SIGQUIT\n'),
-    ).toEqual({ grace: 75, signal: 'SIGQUIT' });
+    ).toEqual({ grace: 75, signal: 'SIGQUIT', keys: ['stop_grace_period', 'stop_signal'] });
     expect(gameStopOf(service('75s', '    stop_signal: "SIGTERM"\n'))?.signal).toBe('SIGTERM');
     expect(
       gameStopOf(
         'services:\n  game:\n    stop_grace_period: 75s\n  bot:\n    stop_signal: SIGQUIT\n',
       ),
-    ).toEqual({ grace: 75, signal: null });
+    ).toEqual({ grace: 75, signal: null, keys: ['stop_grace_period'] });
+    // A flow map is no `  game:` block, so it reads as no grace.
+    expect(graceOf('services:\n  game: {stop_grace_period: 75s}\n')).toBeNull();
     // A key that is not a plain word makes the whole service unread.
     for (const odd of [
       '    "stop_signal": SIGQUIT\n',
@@ -2056,6 +2067,23 @@ describe('the claim renewer', () => {
     ).toBeNull();
     const stop = gameStopOf(readFileSync('docker-compose.yml', 'utf8'));
     expect(stop, 'the game service in docker-compose.yml').not.toBeNull();
+    // The game service's keys, whole: a new one (an `extends` that would pull
+    // in another service's stop settings among them) fails until it is read.
+    expect([...(stop?.keys ?? [])].sort(), 'the game service keys in docker-compose.yml').toEqual([
+      'build',
+      'container_name',
+      'depends_on',
+      'environment',
+      'extra_hosts',
+      'healthcheck',
+      'image',
+      'mem_limit',
+      'memswap_limit',
+      'ports',
+      'restart',
+      'stop_grace_period',
+      'volumes',
+    ]);
     const graceSeconds = stop?.grace ?? null;
     expect(graceSeconds, 'the game service stop_grace_period in docker-compose.yml').not.toBeNull();
     // `docker stop` sends the compose stop_signal, else the image's
@@ -2063,8 +2091,11 @@ describe('the claim renewer', () => {
     expect(['SIGTERM', 'SIGINT'], 'the game service stop_signal in docker-compose.yml').toContain(
       stop?.signal ?? 'SIGTERM',
     );
+    // Dockerfile keywords ignore case, so the pattern does too.
+    const stopSignalLine = /^\s*STOPSIGNAL\b/im;
+    expect('FROM x\nstopsignal SIGQUIT\n').toMatch(stopSignalLine);
     expect(readFileSync('Dockerfile', 'utf8'), 'a STOPSIGNAL in the Dockerfile').not.toMatch(
-      /^\s*STOPSIGNAL\b/m,
+      stopSignalLine,
     );
     expect(totalMs).toBeLessThan(Number(graceSeconds) * 1000);
     expect(
@@ -2080,6 +2111,7 @@ describe('the claim renewer', () => {
     expect(at).toBeGreaterThan(-1);
     const next = deploy.indexOf('\n- ', at + 1);
     expect(next).toBeGreaterThan(at);
+    expect(deploy.slice(at, next)).not.toMatch(/\n#/);
     const bullet = deploy.slice(at, next).replace(/\s+/g, ' ');
     const source = (file: string) => stripComments(readFileSync(file, 'utf8'));
     const seconds = (file: string, name: string): number => {
