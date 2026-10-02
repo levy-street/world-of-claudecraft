@@ -14993,10 +14993,15 @@
     flex-direction: column;
     max-height: min(700px, 80vh);
   }
+  /* Inside the zoomed #ui: viewport lengths divide by --window-scale (raw vh
+     re-multiplies by the zoom and runs the vault off the bottom). The top is
+     the shared .window 10vh restated in the same units, so the sheet ends at
+     98% of the screen at any UI scale. */
   #dungeon-finder-window.df-vault-mode {
-    width: min(980px, 96vw);
-    height: min(780px, 88vh);
-    max-height: min(780px, 88vh);
+    top: calc(var(--app-vh, 100vh) * 0.1 / var(--window-scale));
+    width: min(980px, calc(var(--app-vw, 100vw) * 0.96 / var(--window-scale)));
+    height: min(780px, calc(var(--app-vh, 100vh) * 0.88 / var(--window-scale)));
+    max-height: min(780px, calc(var(--app-vh, 100vh) * 0.88 / var(--window-scale)));
   }
   .df-tabs {
     display: flex;
@@ -24418,11 +24423,19 @@
     justify-content: flex-end;
   }
   @media (min-width: 1100px) and (min-height: 700px) {
+    /* #bank-window lives inside the zoomed #ui (`zoom: var(--ui-scale)`), so
+       every viewport length divides by --window-scale, exactly as the base
+       rule above does: raw vw/vh here re-multiply by the zoom and push the
+       vault off-screen at any UI scale above 1. The 1080px cap is an author
+       length (already zoom space) and centres against the scaled viewport. */
     body.weekly-vault-open #bank-window {
-      left: 2vw;
-      top: max(2vh, calc((100vh - 1080px) / 2));
-      width: 96vw;
-      height: min(96vh, 1080px);
+      left: calc(var(--app-vw, 100vw) * 0.02 / var(--window-scale));
+      top: max(
+        calc(var(--app-vh, 100vh) * 0.02 / var(--window-scale)),
+        calc((var(--app-vh, 100vh) / var(--window-scale) - 1080px) / 2)
+      );
+      width: calc(var(--app-vw, 100vw) * 0.96 / var(--window-scale));
+      height: min(calc(var(--app-vh, 100vh) * 0.96 / var(--window-scale)), 1080px);
     }
     #weekly-rewards-panel {
       flex: 1;
@@ -24454,11 +24467,15 @@
     .weekly-reset strong {
       font-size: 16px;
     }
+    /* The loot button rides in flow at the right end of the status line's row
+       (the status pulls up by the button's 30px plus the panel gap; its 165px
+       right padding keeps the text clear), so it scrolls with the panel and
+       follows a header that wraps taller at a high UI scale. Lifted above the
+       status so the status box never swallows its clicks. */
     .weekly-vault-toolbar {
-      position: absolute;
-      right: 18px;
-      top: 118px;
+      position: relative;
       z-index: 2;
+      align-self: flex-end;
     }
     .weekly-possible-loot-button {
       min-height: 30px;
@@ -24469,6 +24486,9 @@
       padding: 3px 165px 3px 0;
       font-size: 12px;
       min-height: 30px;
+    }
+    .weekly-possible-loot[hidden] + .weekly-choice-status {
+      margin-top: -36px;
     }
     .weekly-saved-rewards {
       flex: none;
@@ -24485,6 +24505,15 @@
       grid-template-rows: repeat(2, minmax(0, 1fr));
       gap: 12px;
       container-type: size;
+    }
+    /* A floor for the full-screen sheet's vault art: the illustration width
+       below derives from this container's height, so on a short scaled
+       viewport (this media gate reads the real, unzoomed viewport) the tracks
+       hold their size and the panel scrolls instead of collapsing every vault
+       to a sliver. Scoped to the bank sheet; the Dungeon Finder's read-only
+       vault keeps its fit-to-window sizing. */
+    body.weekly-vault-open #bank-window .weekly-tracks {
+      min-height: 480px;
     }
     .weekly-track,
     .weekly-track:last-child {
@@ -24548,6 +24577,25 @@
       height: auto;
       aspect-ratio: 1;
       place-self: start center;
+    }
+    /* The overview tiles fill the art row the tile grid actually leaves, so a
+       label that wraps (a narrow tile at a high UI scale, a long locale) takes
+       height from the art instead of the square art spilling under the
+       footer. The art image is object-fit: contain, so it stays square and
+       centred; the earned glow sizes from the cell's shorter side to match. */
+    .weekly-tracks .weekly-vault-illustration {
+      container-type: size;
+      width: 100%;
+      height: 100%;
+      aspect-ratio: auto;
+    }
+    .weekly-tracks .weekly-earned .weekly-vault-illustration::after {
+      inset: auto;
+      top: 50%;
+      left: 50%;
+      width: calc(min(100cqw, 100cqh) * 0.72);
+      aspect-ratio: 1;
+      translate: -50% -50%;
     }
     .weekly-milestone-footer {
       padding: 2px;
