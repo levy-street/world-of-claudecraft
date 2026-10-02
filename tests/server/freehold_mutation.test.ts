@@ -2906,10 +2906,12 @@ describe('the claim renewer', () => {
       outside: [],
     });
     // The API the Discord bot overview names is the one the bot calls the game
-    // through. The client is read whole: every request it makes and every name
-    // of the fetch it makes them with, each with the member it sits in, so a new
-    // route, a second sender of one, or a request made outside call() fails here
-    // until DEPLOY's overview and lever 3 are checked.
+    // through. The client is read whole: every this.call and every name of
+    // fetch or fetchImpl, each with the member it sits in; and every literal in
+    // the bot's code that writes a game API route sits in the client member that
+    // sends it. So a new route, a second sender of one, or a route requested
+    // outside call() by any means fails here until DEPLOY's overview and lever 3
+    // are checked (a route assembled from parts is not read).
     const serverClient = parsed('bot/server_client.ts');
     const memberOf = (node: ts.Node): string => {
       for (let at = node.parent; at !== undefined; at = at.parent) {
@@ -2958,6 +2960,31 @@ describe('the claim renewer', () => {
       "pushMembersMeta: 'POST', '/internal/discord/members-meta'",
       "flairedIds: 'GET', '/internal/discord/flaired-ids'",
     ]);
+    const botCode = ['bot/*.ts', 'bot/*.mts', 'bot/*.cts', 'bot/*.js', 'bot/*.mjs', 'bot/*.cjs'];
+    expect(
+      gitGrep('internal/discord/', botCode).flatMap((file) =>
+        nodesIn(parsed(file))
+          .filter(
+            (node) =>
+              (ts.isStringLiteralLike(node) ||
+                ts.isTemplateHead(node) ||
+                ts.isTemplateMiddle(node) ||
+                ts.isTemplateTail(node)) &&
+              node.text.includes('/internal/discord/'),
+          )
+          .map((node) => `${file}: ${memberOf(node)}`),
+      ),
+    ).toEqual([
+      'bot/server_client.ts: flexBatch',
+      'bot/server_client.ts: drainOutbox',
+      'bot/server_client.ts: roles',
+      'bot/server_client.ts: pushPresence',
+      'bot/server_client.ts: grant',
+      'bot/server_client.ts: setMember',
+      'bot/server_client.ts: markDailyRewardWinners',
+      'bot/server_client.ts: pushMembersMeta',
+      'bot/server_client.ts: flairedIds',
+    ]);
     // The link-change feed's heal is the bot's resyncs, which DEPLOY gives no
     // cadence; the bot's own suites pin them (tests/discord_bot_linked_sweep.test.ts,
     // tests/discord_bot_member_writes.test.ts and
@@ -2969,7 +2996,9 @@ describe('the claim renewer', () => {
     const caseOf = (node: ts.Node): string | undefined => {
       for (let at = node.parent; at !== undefined; at = at.parent) {
         if (ts.isCaseClause(at) || ts.isDefaultClause(at)) {
-          // An empty clause above falls into this one, so its label counts too.
+          // An empty clause above falls into this one, so its label counts too;
+          // a clause with statements that falls through is refused by Biome's
+          // noFallthroughSwitchClause (an error under the recommended preset).
           const clauses = at.parent.clauses;
           let first = clauses.indexOf(at);
           while (first > 0 && clauses[first - 1].statements.length === 0) first -= 1;
@@ -2993,6 +3022,26 @@ describe('the claim renewer', () => {
             : (caseOf(id) ?? 'outside a case'),
         ),
     ).toEqual(["'VOICE_STATE_UPDATE'", "'MESSAGE_CREATE'", 'declared']);
+    // The daily grant itself, read whole: the claim before the call, the
+    // server call, and the dedupe key it sends.
+    const dailyGrant = nodesIn(botMain).find(
+      (node): node is ts.VariableDeclaration =>
+        ts.isVariableDeclaration(node) &&
+        ts.isIdentifier(node.name) &&
+        node.name.text === 'grantDailyActive',
+    );
+    expect(dailyGrant ? linesOf(dailyGrant.parent.parent, botMain) : []).toEqual([
+      'const grantDailyActive = (userId: string): void => {',
+      'if (!userId) return;',
+      'const day = new Date().toISOString().slice(0, 10);',
+      'if (!claimDailyActive(dailyActive, day, userId)) return;',
+      'const g = DISCORD_REWARD_GRANTS.dailyActive;',
+      'void server',
+      // Split at the placeholder, so the literal is plain text.
+      '.grant(userId, g.reason, g.points, `$' + '{g.reason}:$' + '{userId}:$' + '{day}`)',
+      ".catch((e) => console.error('[bot] daily-active grant failed', e));",
+      '};',
+    ]);
     // And every place the bot's code names `grant`, by identifier or string,
     // is the server client's method or inside grantDailyActive, so that method,
     // the daily-active grant's one sender (the client's surface above), has one

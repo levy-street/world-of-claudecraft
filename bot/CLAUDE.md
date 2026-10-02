@@ -285,7 +285,7 @@ not stay phase-locked, and repeated event kicks coalesce into exactly one follow
   bot.
 - Daily engagement grant: a member's first guild message or voice state update carrying a
   channel (a join, a move, a mute) per UTC day, deduped bot-side AND server-side (the
-  grant dedupe key, which carries the Discord id and the day).
+  grant dedupe key, which carries the reason, the Discord id and the day).
 - The adaptive active-to-idle backoff has two consumers: the outbox poll (D1: active
   decaying to idle) and the role sweep (slice interval decaying to the pass interval).
   Every other task sets `activeMs` only, so its cadence is constant. Backoff is only safe

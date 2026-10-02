@@ -1462,5 +1462,8 @@ What changed the contract above:
   daily-active rule without pronouns to untangle, and `bot/logic.ts`'s `claimDailyActive` comment
   says at most once, matching `bot/CLAUDE.md`.
 - A forty-first round of eight fresh readers: no P12 change; `bot/CLAUDE.md`, `bot/main.ts` and
-  `bot/logic.ts` say what the daily grant's dedupe keys on (the Discord id and the day) and claim
+  `bot/logic.ts` say what the daily grant's dedupe key carries (the reason, the Discord id and the day) and claim
   no more about it.
+- A forty-second round of eight fresh readers: no P12 change; `bot/logic.ts`'s `claimDailyActive`
+  comment says the server's reward ledger is unique on the linked account and the grant dedupe
+  key, and `bot/CLAUDE.md` and `bot/main.ts` name the key's three parts.

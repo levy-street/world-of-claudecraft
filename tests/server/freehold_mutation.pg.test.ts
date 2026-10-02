@@ -119,8 +119,9 @@ function gate(at: 'before' | 'after'): Gate {
 }
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
-// A rerun the case expects to have returned, read with a deadline, so a hang
-// fails the case in time for its cleanup to run.
+// A promise the case expects to have settled (a rerun, a boot, a cancelled
+// sleep), read with a deadline, so a hang fails the case in time for its
+// cleanup to run.
 const within = <T>(work: Promise<T>, ms = 5_000): Promise<T | 'still waiting'> => {
   let timer: ReturnType<typeof setTimeout> | undefined;
   return Promise.race([
@@ -3549,7 +3550,6 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       const { materialSourceConnection } = await import('../../server/material_source_connection');
       const rerunner = new Client({ ...materialSourceConnection(verifyUrl(ADMIN_URL)) });
       rerunner.on('error', () => {});
-      const spy = vi.spyOn(Client.prototype, 'query');
       const tokenRead = async () => {
         const client = await pool.connect();
         try {
@@ -3601,6 +3601,8 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         );
       let second: Promise<unknown> | undefined;
       let third: Promise<unknown> | undefined;
+      // Installed here, where the finally below restores it.
+      const spy = vi.spyOn(Client.prototype, 'query');
       try {
         const tables = await everyTable();
         expect(tables.length).toBeGreaterThan(100);
@@ -3702,9 +3704,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
             // So it is stopped and ended too; the stopped third boot exits once
             // it gets the advisory lock, and the next run names nothing.
             stop(running.client);
-            outcomes.push(await second);
+            outcomes.push(await within(Promise.resolve(second)));
             expect(await terminate()).toEqual([[next.pid, true, true]]);
-            outcomes.push(await third);
+            outcomes.push(await within(Promise.resolve(third)));
             expect(await gone(next.pid)).toBe(0);
             expect(await until(advisory, [])).toEqual([]);
             expect(await terminate()).toEqual([]);
@@ -4100,7 +4102,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         expect(await named(freshPid)).toEqual([]);
         expect(await stateOf(freshPid)).toBe('active');
         await pool.query('SELECT pg_cancel_backend($1)', [freshPid]);
-        expect(await sleeping).toBe('57014');
+        expect(await within(sleeping)).toBe('57014');
         done = true;
       } finally {
         if (open) await signer.query('ROLLBACK').catch(() => {});

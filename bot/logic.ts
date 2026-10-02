@@ -976,9 +976,8 @@ export interface DailyActiveState {
  * dropped.
  *
  * Bot-side dedupe only: this decides whether the request is worth sending. The
- * server's grant dedupe key (the reason, the Discord id and the day) is what stops a
- * repeat for that key, so even a clock stepping backwards over UTC midnight cannot
- * double-grant it.
+ * server dedupes too: its reward ledger is unique on the linked account and the grant
+ * dedupe key (the reason, the Discord id and the day).
  */
 export function claimDailyActive(state: DailyActiveState, day: string, userId: string): boolean {
   if (day !== state.day) {
