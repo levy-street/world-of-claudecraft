@@ -565,7 +565,11 @@ d('account_freehold_hearth against real PostgreSQL', () => {
     const command = (raw.match(/\n {2}```sh\n {2}(.*)\n {2}```\n/) ?? ['', ''])[1];
     const pgoptions = (command.match(/-e PGOPTIONS='([^']+)'/) ?? ['', ''])[1];
     const appname = (command.match(/-e PGAPPNAME=(\S+)/) ?? [])[1];
-    const asPsql = async (config: { options: string; application_name?: string }) => {
+    const asPsql = async (config: {
+      options: string;
+      application_name?: string;
+      connectionString?: string;
+    }) => {
       const { Client } = await import('pg');
       const client = new Client({
         connectionString: url,
@@ -594,11 +598,11 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       ).toEqual([{ app: 'advance_token_runbook', lock: '2s', idle: '5s' }]);
       // The control: a name given in PGOPTIONS loses to psql's own. Neither
       // the URL nor the environment may name the session for it.
-      // Tested as a boolean, so a failure never prints the URL's password.
-      expect(
-        /[?&](?:application_name|options)=/.test(url),
-        'TEST_DATABASE_URL names the session',
-      ).toBe(false);
+      // Tested as a boolean, so a failure never prints the URL's password; the
+      // pattern is checked on a URL that does name the session.
+      const namesSession = /[?&](?:application_name|options)=/;
+      expect(namesSession.test('postgres://h/db?application_name=x')).toBe(true);
+      expect(namesSession.test(url), 'TEST_DATABASE_URL names the session').toBe(false);
       const namedInOptions = await (async () => {
         vi.stubEnv('PGAPPNAME', '');
         try {
@@ -768,28 +772,42 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       expect((await named(NAME)).map((row) => row.def)).toEqual([VALID_DEF]);
       // HOLDER lists, in this database, a holder by name, kind and mode, a
       // waiter queued behind it, and a runbook session that holds nothing, and
-      // never the session that sends it.
+      // never the session that sends it or a runbook session in another
+      // database on the server.
+      const elsewhere = new URL(url);
+      elsewhere.pathname = '/postgres';
       const dump = await asPsql({ options: '', application_name: 'pg_dump' });
       const waiter = await asPsql({ options: '-c lock_timeout=10s', application_name: 'realm' });
       const idle = await asPsql({ options: '', application_name: 'advance_token_runbook' });
+      const other = await asPsql({
+        options: '',
+        application_name: 'advance_token_runbook',
+        connectionString: elsewhere.href,
+      });
       let waiting: Promise<unknown> | undefined;
       try {
-        await Promise.all([dump.connect(), waiter.connect(), idle.connect()]);
+        await Promise.all([dump.connect(), waiter.connect(), idle.connect(), other.connect()]);
         const pidOf = async (client: typeof dump) =>
           Number((await client.query('SELECT pg_backend_pid() AS pid')).rows[0].pid);
         const [dumpPid, waiterPid, idlePid] = await Promise.all([dump, waiter, idle].map(pidOf));
         await dump.query('BEGIN');
         await dump.query(`LOCK TABLE ${legacyTable} IN ACCESS SHARE MODE`);
         await waiter.query('BEGIN');
-        waiting = waiter.query(`LOCK TABLE ${legacyTable} IN ACCESS EXCLUSIVE MODE`);
+        // Settled at once, so a failed case never leaves it unhandled.
+        waiting = waiter
+          .query(`LOCK TABLE ${legacyTable} IN ACCESS EXCLUSIVE MODE`)
+          .catch((error: unknown) => error);
         let rows: Array<Record<string, unknown>> = [];
         for (let poll = 0; poll < 100; poll++) {
           rows = await send(block.HOLDER);
-          if (rows.some((row) => row.pid === waiterPid)) break;
+          if (rows.some((row) => row.pid === waiterPid && row.state === 'active')) break;
           await new Promise<void>((resolve) => setTimeout(resolve, 20));
         }
-        expect(rows).toHaveLength(3);
-        expect(rows).toEqual(
+        // Only client sessions are pinned whole: an autovacuum worker on the
+        // table is a row HOLDER should show, and this case does not stage one.
+        const clients = rows.filter((row) => row.backend_type === 'client backend');
+        expect(clients).toHaveLength(3);
+        expect(clients).toEqual(
           expect.arrayContaining([
             {
               pid: dumpPid,
@@ -819,9 +837,9 @@ d('account_freehold_hearth against real PostgreSQL', () => {
         );
       } finally {
         await dump.query('ROLLBACK').catch(() => {});
-        await waiting?.catch(() => {});
+        await waiting;
         await waiter.query('ROLLBACK').catch(() => {});
-        await Promise.all([dump.end(), waiter.end(), idle.end()]);
+        await Promise.all([dump.end(), waiter.end(), idle.end(), other.end()]);
       }
       expect(await send(block.HOLDER)).toEqual([]);
       // A missing column. With its name free, RESTORE fails 42703 and the next
