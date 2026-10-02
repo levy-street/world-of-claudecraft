@@ -595,8 +595,8 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       ).rows.map((row: { mode: string }) => row.mode);
     // Every client up front, and cleanup HOLDER FIRST: a waiter's ROLLBACK
     // queues behind its own blocked statement, which only the holder's release
-    // ends (each waiter also carries its own lock timeout, so none waits on a
-    // failed case for longer than that).
+    // ends (each waiter also carries its own lock timeout, longer than the
+    // polls' 5 s window so a late poll never races it, and bounds a failed case).
     const clients: import('pg').PoolClient[] = [];
     try {
       const holder = await pool.connect();
@@ -610,7 +610,7 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       await holder.query('BEGIN');
       await holder.query(`LOCK TABLE ${table} IN ACCESS EXCLUSIVE MODE`);
       await booter.query('BEGIN');
-      await booter.query("SET LOCAL lock_timeout = '5s'");
+      await booter.query("SET LOCAL lock_timeout = '10s'");
       const waiting = booter.query(hearthSchema).then(
         () => null,
         (error: unknown) => error,
@@ -642,7 +642,7 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       await booter.query(hearthSchema);
       await booter.query('ROLLBACK');
       await queuer.query('BEGIN');
-      await queuer.query("SET LOCAL lock_timeout = '5s'");
+      await queuer.query("SET LOCAL lock_timeout = '10s'");
       const queued = queuer.query(`LOCK TABLE ${table} IN ACCESS EXCLUSIVE MODE`).then(
         () => null,
         (error: unknown) => error,
