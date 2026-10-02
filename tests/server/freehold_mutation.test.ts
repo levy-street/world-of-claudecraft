@@ -6641,6 +6641,10 @@ describe('the Hearth trip admission', () => {
     const cases: Array<[string, unknown, string[]]> = [
       // A newline or any other character outside [\w.$-] becomes '?'.
       ['a control character', named('Bad\nName'), [line('Bad?Name')]],
+      // The kept punctuation stays, and every other character outside the set
+      // (a parenthesis, a space, a Unicode line separator) becomes '?'.
+      ['kept punctuation', named('Freehold.Trip$Error-2'), [line('Freehold.Trip$Error-2')]],
+      ['other disallowed characters', named('A) B\u2028C'), [line('A??B?C')]],
       ['a long class', named('E'.repeat(100)), [line('E'.repeat(64))]],
       // A name that is not a string is reported by the thrown value's type.
       ['a numeric name', named(5), [line('object')]],
