@@ -920,13 +920,14 @@ guard drew a new slow pattern for the third round, so the parse became line by l
 
 - C14R1 FIXED `8c5fa7fc28` (with D14R1 and L14R1): a stuck save fails at its 2 s lock timeout
   with 55P03 and is written again as an aborted save; only a read with no tighter bound holds
-  its client to the 15 s statement timeout, so a realm's pool can fill. The D13R3 line is
-  corrected in this record. C14R2 FIXED `02bbf3d438` (with D14R4 and S14R2: the dump is polled
-  through HOLDER about once a minute, one still there well past its usual length stops, and a
-  runbook session seen beside it goes to the lost connection route). C14R3 FIXED `02bbf3d438`
-  (with S14R4: a report asking for the literal also gives PRINT's output and the server
-  version). C14R4 FIXED `02bbf3d438` (with S14R3, M14R4 and Q14R4: HOLDER reads only this
-  database's locks and sessions).
+  its client to the 15 s statement timeout, so a realm's pool can fill (a write other than a
+  save too, each at its own bound, corrected in rounds fifteen and sixteen, C15R1 and C16R2).
+  The D13R3 line is corrected in this record. C14R2 FIXED `02bbf3d438` (with D14R4 and S14R2:
+  the dump is polled through HOLDER about once a minute, one still there well past its usual
+  length stops, and a runbook session seen beside it goes to the lost connection route). C14R3
+  FIXED `02bbf3d438` (with S14R4: a report asking for the literal also gives PRINT's output
+  and the server version). C14R4 FIXED `02bbf3d438` (with S14R3, M14R4 and Q14R4: HOLDER reads
+  only this database's locks and sessions).
 - Q14R1 FIXED `02bbf3d438` (with T14R6: the environment stub is undone in a `finally`). Q14R2
   NO CHANGE: the case's `finally` already restores a missing column, dropping a held name and
   booting the fragment, which re-adds it. Q14R3 FIXED `8c5fa7fc28` (each bound is named by its
@@ -985,8 +986,8 @@ a save among the stuck clients), and the commit that adds this section.
 45 findings: none blocking, eight should-fix (M15R1, H15R1, H15R2, D15R1, D15R2, Q15R1, T15R1,
 T15R2), 37 nice-to-have. The database reader fails a round on any open should-fix, which is
 the only FAIL. The parse that round fourteen called unable to backtrack still could, through
-its comment strip; that claim, and where round fourteen's save bound landed, are corrected in
-place.
+its comment strip; that claim is corrected in place, and where round fourteen's save bound
+landed is too, in round sixteen's record.
 
 - C15R1 FIXED `6c91150321` and `9224b3c02e` (with D15R2 and M15R6): a stuck read, or a write
   other than a save, holds its client to its statement timeout, 15 s for an ordinary one and
@@ -1036,13 +1037,14 @@ place.
 
 Round sixteen's commits: `8661efb1c3` (an account create on the order path only while
 community test accounts are on, a character create always, the bench's victim named by its
-shape, and every stuck client failing at its own bound, in DEPLOY, the contract and P12),
-`b107b08e95` (the signal registrations pinned whole with no other mention of either signal, no
-STOPSIGNAL in the Dockerfile, the compose grace and signal read apart with odd keys unread,
-the fixture that decided nothing removed), `b1d103a36c` (the dump wait measured from
-yesterday's backup with a fixed stop, HOLDER listing every dump, the lost connection route's
-order and files, the version read's send rule, and the pg case's URL and database checks; kept
-whole with its tests for bisect), and the commit that adds this section.
+shape, in DEPLOY, the contract and P12, and every stuck client failing at its own bound, in
+DEPLOY; where that bound landed corrected in round seventeen), `b107b08e95` (the signal
+registrations pinned whole with no other mention of either signal, no STOPSIGNAL in the
+Dockerfile, the compose grace and signal read apart with odd keys unread, the fixture that
+decided nothing removed), `b1d103a36c` (the dump wait measured from yesterday's backup with a
+fixed stop, HOLDER listing every dump, the lost connection route's order and files, the
+version read's send rule, and the pg case's URL and database checks; kept whole with its tests
+for bisect), and the commit that adds this section.
 
 | Reader | Verdict | Findings |
 |---|---|---|
@@ -1081,28 +1083,95 @@ corrected in place.
 - S16R1 FIXED `b1d103a36c` (the URL is checked with `URL.canParse` before it is parsed). S16R2
   FIXED `b1d103a36c` (with M16R2, C16R1, D16R1 and L16R2): the wait is measured from
   yesterday's file, since tonight's is the one the running dump writes, and stops at twice
-  that length or when there is no such file; the D15R3 line is corrected in this record. S16R3
-  FIXED `b1d103a36c` (with Q16R2 and T16R5: the other session's database is checked to
-  differ). S16R4 OWED: the backup script's umask leaves dumps readable by any local account;
-  it belongs to the deploy path.
+  that length or when there is no such file (replaced by a fixed window in round seventeen,
+  C17R3); the D15R3 line is corrected in this record. S16R3 FIXED `b1d103a36c` (with Q16R2 and
+  T16R5: the other session's database is checked to differ). S16R4 OWED: the backup script's
+  umask leaves dumps readable by any local account; it belongs to the deploy path.
 - D16R1 FIXED (see S16R2). D16R2 FIXED (see M16R1). D16R3 FIXED (see C16R2). D16R4 FIXED
   `b1d103a36c` (a `pg_dump` row with `granted` false is a dump waiting for the Hearth table).
 - T16R1 FIXED `b107b08e95` (the fixture that decided no branch is gone; linearity is held by
   the anchored patterns, as the comment says). T16R2 and T16R3 FIXED `b107b08e95` (a signal
-  after the grace, a quoted one and another service's). T16R4 FIXED `b1d103a36c`. T16R5 FIXED
-  (see S16R3). T16R6 FIXED `b1d103a36c` (an options URL as a second control). T16R7 FIXED (see
+  after the grace, a quoted one and another service's). T16R4 FIXED `b1d103a36c` (the
+  empty-HOLDER check keeps client sessions only; noted in round seventeen). T16R5 FIXED (see
+  S16R3). T16R6 FIXED `b1d103a36c` (an options URL as a second control). T16R7 FIXED (see
   H16R6). T16R8 FIXED `b1d103a36c` (the directory is read from the backup script).
 - L16R1 FIXED `8661efb1c3` (the contract lists the creates on the order path; the D15R1 line
   is corrected in this record). L16R2 FIXED (see S16R2). L16R3 FIXED (see C16R2). L16R4 FIXED
-  (see M16R3). L16R5 FIXED in this record. L16R6 FIXED (see Q16R1). L16R7 FIXED `8661efb1c3`.
-  L16R8 FIXED `b1d103a36c`. L16R9 FIXED `8661efb1c3` (P12 reflowed).
+  (see M16R3). L16R5 FIXED in this record. L16R6 FIXED (see Q16R1). L16R7 FIXED `8661efb1c3`
+  ("fails that way until the dump ends"). L16R8 FIXED `b1d103a36c` (the count names both
+  routes; these two noted in round seventeen). L16R9 FIXED `8661efb1c3` (P12 reflowed).
 - M16R1 FIXED `8661efb1c3` (with D16R2): `createAccount` touches `characters` only while
   community test accounts are on, so only then does an account create take the order path; the
   bench's victim was a transaction of that shape; a character create, which locks the account
-  row and then counts and inserts characters, always does; in DEPLOY, the contract and P12.
-  M16R2 FIXED (see S16R2). M16R3 FIXED `b1d103a36c` (with C16R5 and L16R4: the lost connection
-  route waits a dump out first, by the waits and stops above and never their resend, then
-  polls). M16R4 FIXED `b1d103a36c` (the version read may be sent at any point and is resent as
-  a file that changes nothing). M16R5 FIXED `b1d103a36c` (from the 55P03 route, the file that
-  failed, never HOLDER). M16R6 FIXED `b1d103a36c` (HOLDER lists every `pg_dump` session, with
-  a Hearth lock or not). M16R7 FIXED `8661efb1c3` and `b1d103a36c`.
+  row and then counts and inserts characters, always does (on both paths, corrected in round
+  seventeen, L17R1); in DEPLOY, the contract and P12. M16R2 FIXED (see S16R2). M16R3 FIXED
+  `b1d103a36c` (with C16R5 and L16R4: the lost connection route waits a dump out first, by the
+  waits and stops above and never their resend, then polls). M16R4 FIXED `b1d103a36c` (the
+  version read may be sent at any point and is resent as a file that changes nothing). M16R5
+  FIXED `b1d103a36c` (from the 55P03 route, the file that failed, never HOLDER). M16R6 FIXED
+  `b1d103a36c` (HOLDER lists every `pg_dump` session, with a Hearth lock or not). M16R7 FIXED
+  `8661efb1c3` and `b1d103a36c`.
+
+## Round seventeen: eight fresh readers over round sixteen (`25796f7162..f20c8439a4`)
+
+Round seventeen's commits: `f8276ca1e9` (a character create on both deadlock paths, the
+bench's victim called by the evidence's own label, the evidence saying its shape, and the
+lowered statement bounds beside the raised one), `95612ad273` (the compose game service's keys
+pinned whole, the Dockerfile check case-free, no server file but `main.ts` naming either
+signal, the registration block matched across any whitespace), `c991771d8c` (the dump wait
+bounded by a fixed window pinned to the backup cron, the lost connection route's entry codes
+and resendable files, and the pg case's lockless dump; kept whole with its tests for bisect),
+and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C17R1 to C17R3 |
+| qa-checklist | PASS | Q17R1 to Q17R5 |
+| server hot path | PASS | H17R1 to H17R6 |
+| privacy and security | PASS | S17R1 |
+| database performance | PASS | D17R1 to D17R3 |
+| test coverage | PASS | T17R1 to T17R6 |
+| docs librarian | FAIL | L17R1 to L17R9 |
+| migration safety | PASS | M17R1 to M17R6 |
+
+39 findings: none blocking, five should-fix (T17R1, H17R1 to H17R3, L17R1), 34 nice-to-have.
+The measured dump length drew a new edge case for the third round, so it became a fixed
+window; the signal pin's new forms became whole pins on the game service's keys and on every
+server file.
+
+- C17R1 FIXED (see T17R1). C17R2 FIXED (see H17R2). C17R3 FIXED `c991771d8c` (with M17R1,
+  M17R2, D17R1, L17R5 and S17R1): the wait is a fixed window, a dump seen before 03:15 UTC or
+  after 04:15 UTC stopping it, pinned to the backup job's cron line, so no backup file is read
+  and no date, rewrite or minimum can mislead it.
+- Q17R1 FIXED (see T17R1). Q17R2 FIXED (see H17R2). Q17R3 FIXED `c991771d8c` (the client-only
+  filter's reason is a comment). Q17R4 FIXED (see H17R6). Q17R5 FIXED in this record (T16R4,
+  L16R7 and L16R8 name their changes; the file-name pin it asked for went with the file read).
+- H17R1 FIXED `95612ad273` (with T17R4: no file under `server/` but `main.ts` names either
+  signal, read through the shared walker; a mutant adding a listener in `server/db.ts` fails).
+  H17R2 FIXED `95612ad273` (with C17R2 and Q17R2: the game service's keys are pinned whole, so
+  an `extends` fails until read; its mutant fails). H17R3 FIXED (see T17R1). H17R4 NOTED: the
+  game service's `build` names no `dockerfile:`, so it builds the root Dockerfile the pin
+  reads, and a base image's STOPSIGNAL is beyond what repo text can pin. H17R5 FIXED
+  `95612ad273` (the block is matched across any whitespace, with a named message). H17R6 FIXED
+  `95612ad273` (with Q17R4: that match spans `\r\n`, and the `BACKUP_DIR` read it named is
+  gone).
+- S17R1 FIXED (see C17R3).
+- D17R1 FIXED (see C17R3). D17R2 FIXED `c991771d8c` (the backup script's `pg_dump` line is
+  pinned and the script names no session). D17R3 FIXED `f8276ca1e9` (the evidence says its
+  victim's shape).
+- T17R1 FIXED `95612ad273` (with H17R3, C17R1 and Q17R1: the Dockerfile pattern ignores case,
+  with a lowercase control; a mutant adding `stopsignal SIGQUIT` fails). T17R2 FIXED
+  `c991771d8c` (the cron and `pg_dump` lines are pinned). T17R3 FIXED `c991771d8c` (HOLDER
+  lists a `pg_dump` session that holds no lock). T17R4 FIXED (see H17R1). T17R5 and T17R6
+  FIXED `95612ad273` (no heading inside the bullet's slice; a flow-map game reads as no
+  grace).
+- L17R1 FIXED `f8276ca1e9`: a character create counts `characters` before it inserts, so it
+  takes the upgrade path as well as the order path, in DEPLOY, the contract, P12 and the
+  manifest's change log. L17R2 to L17R4 FIXED in this record. L17R5 FIXED (see C17R3). L17R6
+  FIXED `c991771d8c` (the version read is named where the send rule first uses it). L17R7
+  FIXED `f8276ca1e9` (the victim is called by the evidence's label). L17R8 FIXED `f8276ca1e9`.
+  L17R9 FIXED `c991771d8c` (HOLDER's long line wrapped).
+- M17R1 and M17R2 FIXED (see C17R3). M17R3 FIXED `c991771d8c` (the 55P03 or 40P01 route, in
+  both places). M17R4 and M17R5 FIXED `c991771d8c` (the files that change nothing are the
+  read, the drop rule's read, PRINT and the version read). M17R6 FIXED `f8276ca1e9` (the
+  lowered bounds, 2 s or 10 s, beside the raised one).

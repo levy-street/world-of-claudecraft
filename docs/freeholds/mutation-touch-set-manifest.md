@@ -1361,3 +1361,5 @@ What changed the contract above:
 - A sixteenth round of eight fresh readers: P12 says an account create takes the order path
   only while community test accounts are on, and a character create always does (on both
   paths, corrected in round seventeen).
+- A seventeenth round of eight fresh readers: P12 puts a character create on both deadlock
+  paths and calls the bench's victim by the evidence's own label.
