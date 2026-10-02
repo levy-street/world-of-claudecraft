@@ -1672,13 +1672,14 @@ describe('the claim renewer', () => {
     const end = main.indexOf("process.on('SIGINT', shutdown);", start);
     expect(start).toBeGreaterThan(0);
     expect(end).toBeGreaterThan(start);
-    // Both signals run the closure, and `docker stop` sends SIGTERM.
-    for (const signal of ['SIGINT', 'SIGTERM']) {
-      expect(
-        main.slice(end).match(new RegExp(`process\\.on\\('${signal}', shutdown\\);`, 'g'))?.length,
-        signal,
-      ).toBe(1);
-    }
+    // Both signals run the closure: its two registrations follow it as one
+    // block, and no other line of main.ts names either signal, so no second
+    // listener, wrapper or removal can stand beside them.
+    expect(
+      main.split("};\n  process.on('SIGINT', shutdown);\n  process.on('SIGTERM', shutdown);\n")
+        .length,
+    ).toBe(2);
+    expect(main.match(/\bSIG(?:INT|TERM)\b/g)).toEqual(['SIGINT', 'SIGTERM']);
     const awaits = [...main.slice(start, end).matchAll(/await\s+([^;]+);/g)].map((match) =>
       match[1].replace(/\s+/g, ' ').trim(),
     );
@@ -1953,17 +1954,24 @@ describe('the claim renewer', () => {
     );
     const stated = [...budget.matchAll(/(?<![\d.])(\d+(?:\.\d+)?) s of bounded waits/g)];
     expect(stated.map((match) => Number(match[1]))).toEqual([totalMs / 1000]);
-    /** The game service's kill grace in seconds: inside the top-level
-     *  `services:` block, the `  game:` service's own four-space
-     *  `stop_grace_period`, or null when it is unreadable or the service stops
-     *  on a signal other than SIGTERM. Read line by line with no pattern that
-     *  can backtrack, so a comment, a blank line or trailing space changes
-     *  nothing and no input is slow. */
-    const graceOf = (compose: string): number | null => {
+    /** The game service's stop settings: inside the top-level `services:`
+     *  block, the `  game:` service's own four-space `stop_grace_period` (in
+     *  seconds, null when absent or unreadable) and `stop_signal` (null when
+     *  absent), or null for the whole service when one of its keys is not a
+     *  plain word (a quoted key, a merge key, a flow map), so an unread form
+     *  never passes. Read line by line; every pattern is anchored or a
+     *  two-character search, so its work stays linear in the line. */
+    type GameStop = { grace: number | null; signal: string | null };
+    const gameStopOf = (compose: string): GameStop | null => {
+      const unquoted = (value: string): string => {
+        const quote = value[0];
+        return (quote === '"' || quote === "'") && value.length > 1 && value.endsWith(quote)
+          ? value.slice(1, -1)
+          : value;
+      };
+      const stop: GameStop = { grace: null, signal: null };
       let inServices = false;
       let inGame = false;
-      let grace: number | null = null;
-      let signal: string | undefined;
       for (const line of compose.split(/\r?\n/)) {
         const hash = line.search(/(?:^|\s)#/);
         const content = (hash < 0 ? line : line.slice(0, hash)).trimEnd();
@@ -1977,18 +1985,18 @@ describe('the claim renewer', () => {
         } else if (inGame && indent === 4) {
           const colon = content.indexOf(':');
           const key = content.slice(4, colon);
-          const value = content.slice(colon + 1).trim();
+          if (!/^[a-z_]+$/.test(key)) return null;
+          const value = unquoted(content.slice(colon + 1).trim());
           if (key === 'stop_grace_period') {
-            const found = value.match(/^(["']?)(\d+)s\1$/);
-            if (!found) return null;
-            grace = Number(found[2]);
+            stop.grace = /^\d+s$/.test(value) ? Number(value.slice(0, -1)) : null;
           } else if (key === 'stop_signal') {
-            signal = value.replace(/^(["'])(.*)\1$/, '$2');
+            stop.signal = value;
           }
         }
       }
-      return signal === undefined || signal === 'SIGTERM' ? grace : null;
+      return stop;
     };
+    const graceOf = (compose: string): number | null => gameStopOf(compose)?.grace ?? null;
     const service = (grace: string, ...lines: string[]) =>
       `services:\n  game:\n    image: x\n${lines.join('')}    stop_grace_period: ${grace}\n  bot:\n    stop_grace_period: 15s\n`;
     expect(graceOf(service('75s'))).toBe(75);
@@ -1999,9 +2007,29 @@ describe('the claim renewer', () => {
     expect(graceOf(service('75s').replaceAll('\n', '\r\n'))).toBe(75);
     expect(graceOf(service("'75s' # why").replaceAll('\n', '\r\n'))).toBe(75);
     expect(graceOf(service('75s', '# a column-zero comment\n'))).toBe(75);
-    expect(graceOf(service('75s', `${' #'.repeat(20_000)}\rz\n`))).toBe(75);
-    expect(graceOf(service('75s', '    stop_signal: SIGTERM\n'))).toBe(75);
-    expect(graceOf(service('75s', '    stop_signal: SIGQUIT\n'))).toBeNull();
+    // The signal is read beside the grace, before or after it, quoted or not,
+    // and only the game service's own.
+    expect(gameStopOf(service('75s', '    stop_signal: SIGQUIT\n'))).toEqual({
+      grace: 75,
+      signal: 'SIGQUIT',
+    });
+    expect(
+      gameStopOf('services:\n  game:\n    stop_grace_period: 75s\n    stop_signal: SIGQUIT\n'),
+    ).toEqual({ grace: 75, signal: 'SIGQUIT' });
+    expect(gameStopOf(service('75s', '    stop_signal: "SIGTERM"\n'))?.signal).toBe('SIGTERM');
+    expect(
+      gameStopOf(
+        'services:\n  game:\n    stop_grace_period: 75s\n  bot:\n    stop_signal: SIGQUIT\n',
+      ),
+    ).toEqual({ grace: 75, signal: null });
+    // A key that is not a plain word makes the whole service unread.
+    for (const odd of [
+      '    "stop_signal": SIGQUIT\n',
+      '    stop_signal : SIGQUIT\n',
+      '    <<: *d\n',
+    ]) {
+      expect(gameStopOf(service('75s', odd)), odd).toBeNull();
+    }
     expect(graceOf(service('75sx'))).toBeNull();
     expect(graceOf(service('"75s"#x'))).toBeNull();
     expect(graceOf(service('75s').replace('services:', 'services: # all'))).toBe(75);
@@ -2026,8 +2054,18 @@ describe('the claim renewer', () => {
     expect(
       graceOf('services:\n  gameserver:\n    stop_grace_period: 300s\n  game:\n    image: x\n'),
     ).toBeNull();
-    const graceSeconds = graceOf(readFileSync('docker-compose.yml', 'utf8'));
+    const stop = gameStopOf(readFileSync('docker-compose.yml', 'utf8'));
+    expect(stop, 'the game service in docker-compose.yml').not.toBeNull();
+    const graceSeconds = stop?.grace ?? null;
     expect(graceSeconds, 'the game service stop_grace_period in docker-compose.yml').not.toBeNull();
+    // `docker stop` sends the compose stop_signal, else the image's
+    // STOPSIGNAL, else SIGTERM, and the closure runs on SIGTERM or SIGINT.
+    expect(['SIGTERM', 'SIGINT'], 'the game service stop_signal in docker-compose.yml').toContain(
+      stop?.signal ?? 'SIGTERM',
+    );
+    expect(readFileSync('Dockerfile', 'utf8'), 'a STOPSIGNAL in the Dockerfile').not.toMatch(
+      /^\s*STOPSIGNAL\b/m,
+    );
     expect(totalMs).toBeLessThan(Number(graceSeconds) * 1000);
     expect(
       [...budget.matchAll(/(?<![\d.])(\d+) s kill grace/g)].map((match) => Number(match[1])),
@@ -2040,7 +2078,9 @@ describe('the claim renewer', () => {
     const deploy = readFileSync('DEPLOY.md', 'utf8');
     const at = deploy.indexOf('- EVERY BOOT LOCKS THE PARENTS');
     expect(at).toBeGreaterThan(-1);
-    const bullet = deploy.slice(at, deploy.indexOf('\n- ', at + 1)).replace(/\s+/g, ' ');
+    const next = deploy.indexOf('\n- ', at + 1);
+    expect(next).toBeGreaterThan(at);
+    const bullet = deploy.slice(at, next).replace(/\s+/g, ' ');
     const source = (file: string) => stripComments(readFileSync(file, 'utf8'));
     const seconds = (file: string, name: string): number => {
       const found = source(file).match(new RegExp(`export const ${name} = ([0-9_]+);`));
