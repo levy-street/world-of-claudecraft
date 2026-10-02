@@ -92,6 +92,7 @@ import {
   EVERGARDEN_ZONE,
 } from './content/evergarden';
 import { FACTION_VENDOR_ITEMS, FACTION_VENDOR_NPCS } from './content/faction_vendors';
+import { KATANA_ITEMS } from './content/katanas';
 import {
   FARSHORE_CAMPS,
   FARSHORE_ESCORTS,
@@ -426,6 +427,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   WORLD_QUEST_ITEMS,
   FACTION_VENDOR_ITEMS,
   HOARD_ITEMS,
+  KATANA_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';

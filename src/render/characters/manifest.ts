@@ -1256,6 +1256,10 @@ export const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
  *  polish it always had. Keyed by held-model key (ITEM_WEAPON_VARIANTS /
  *  ITEM_OFFHAND_MODELS values). */
 export const AUTHORED_HELD_MODELS: ReadonlySet<string> = new Set([
+  // procedural katanas (scripts/assets/katana/): per-part metal/wrap materials
+  'katana_sword_a',
+  'katana_sword_b',
+  'katana_sword_c',
   'hammer_varkhul', // Varkhul Forgebreaker (Ignivar raid legendary)
   'varkhul_emberward', // Varkhul Emberward (Ignivar raid legendary)
   // Harbormaster Tamsin's worn gear (scripts/assets/harbormaster_gear/): felt, brass and

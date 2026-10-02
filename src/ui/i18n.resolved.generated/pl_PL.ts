@@ -18451,6 +18451,15 @@ export const pl_PL: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Personel Wojenny Awangardy"
       },
+      "katana_a": {
+        "name": "Blossom Katana"
+      },
+      "katana_b": {
+        "name": "Moonsteel Katana"
+      },
+      "katana_c": {
+        "name": "Crimson Petal Katana"
+      },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"
       },

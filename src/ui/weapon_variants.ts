@@ -10,6 +10,9 @@
 export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   // ---- swords (sword_a..g + the adv set; legendary/epic kept distinct) --------
   worn_sword: 'sword_a',
+  katana_a: 'katana_sword_a', // procedural katanas (scripts/assets/katana/)
+  katana_b: 'katana_sword_b',
+  katana_c: 'katana_sword_c',
   eastbrook_arming_sword: 'sword_b',
   ironedge_longsword: 'sword_b', // crafted (weaponcrafting tier 2)
   thorium_warblade: 'adv_sword_1handed', // crafted; warblades share adv_sword_1handed

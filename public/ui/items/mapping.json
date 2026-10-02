@@ -60,6 +60,30 @@
   "note": "Item icons (resources, consumables, quest items, armor equipment, bags, and per-item weapon paintings). Every ordinary entry carries its own source and license; generated batches carry separate provenance and licenses. WebP only; add art with `npm run assets:items`.",
   "entries": [
     {
+      "itemId": "katana_a",
+      "name": "Blossom Katana",
+      "sourcePack": "woc_procedural_katana",
+      "sourceFile": "procedural PIL render of the katana_sword_a colorway",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "katana_b",
+      "name": "Moonsteel Katana",
+      "sourcePack": "woc_procedural_katana",
+      "sourceFile": "procedural PIL render of the katana_sword_b colorway",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "katana_c",
+      "name": "Crimson Petal Katana",
+      "sourcePack": "woc_procedural_katana",
+      "sourceFile": "procedural PIL render of the katana_sword_c colorway",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "arcane_dust",
       "name": "Chime Dust",
       "sourcePack": "woc_professions_art",

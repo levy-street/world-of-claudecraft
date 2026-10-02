@@ -19978,4 +19978,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Время применения Хватких корней сокращается на 0,5 сек.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'После применения Хватких корней вы можете произносить заклинания на ходу, а ваша скорость передвижения повышается на 20% на 4 сек. Срабатывает не чаще одного раза в 20 сек.',
+  'entities.items.katana_a.name': "Катана цветения",
+  'entities.items.katana_b.name': "Катана лунной стали",
+  'entities.items.katana_c.name': "Катана алых лепестков",
 };

@@ -18662,4 +18662,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '纏縛根鬚的施法時間縮短0.5秒。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '施放纏縛根鬚後，你可以在移動中施法，並使移動速度提高20%，持續4秒。每20秒最多觸發一次。',
+  'entities.items.katana_a.name': "櫻花武士刀",
+  'entities.items.katana_b.name': "月鋼武士刀",
+  'entities.items.katana_c.name': "緋紅花瓣武士刀",
 };

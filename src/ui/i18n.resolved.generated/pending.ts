@@ -9,25 +9,85 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.items.katana_a.name",
+    "entities.items.katana_b.name",
+    "entities.items.katana_c.name"
+  ],
+  "es_ES": [
+    "entities.items.katana_a.name",
+    "entities.items.katana_b.name",
+    "entities.items.katana_c.name"
+  ],
+  "fr_FR": [
+    "entities.items.katana_a.name",
+    "entities.items.katana_b.name",
+    "entities.items.katana_c.name"
+  ],
+  "fr_CA": [
+    "entities.items.katana_a.name",
+    "entities.items.katana_b.name",
+    "entities.items.katana_c.name"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.items.katana_a.name",
+    "entities.items.katana_b.name",
+    "entities.items.katana_c.name"
+  ],
+  "de_DE": [
+    "entities.items.katana_a.name",
+    "entities.items.katana_b.name",
+    "entities.items.katana_c.name"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.items.katana_a.name",
+    "entities.items.katana_b.name",
+    "entities.items.katana_c.name"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "entities.items.katana_a.name",
+    "entities.items.katana_b.name",
+    "entities.items.katana_c.name"
+  ],
+  "nl_NL": [
+    "entities.items.katana_a.name",
+    "entities.items.katana_b.name",
+    "entities.items.katana_c.name"
+  ],
+  "pl_PL": [
+    "entities.items.katana_a.name",
+    "entities.items.katana_b.name",
+    "entities.items.katana_c.name"
+  ],
+  "id_ID": [
+    "entities.items.katana_a.name",
+    "entities.items.katana_b.name",
+    "entities.items.katana_c.name"
+  ],
+  "tr_TR": [
+    "entities.items.katana_a.name",
+    "entities.items.katana_b.name",
+    "entities.items.katana_c.name"
+  ],
+  "sv_SE": [
+    "entities.items.katana_a.name",
+    "entities.items.katana_b.name",
+    "entities.items.katana_c.name"
+  ],
+  "vi_VN": [
+    "entities.items.katana_a.name",
+    "entities.items.katana_b.name",
+    "entities.items.katana_c.name"
+  ],
+  "da_DK": [
+    "entities.items.katana_a.name",
+    "entities.items.katana_b.name",
+    "entities.items.katana_c.name"
+  ]
 };

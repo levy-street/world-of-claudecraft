@@ -19617,4 +19617,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '絡み根の詠唱時間が0.5秒短縮される。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '絡み根を詠唱すると、移動しながら詠唱でき、移動速度が4秒間20%上昇する。20秒に1回しか発生しない。',
+  'entities.items.katana_a.name': "桜の刀",
+  'entities.items.katana_b.name': "月鋼の刀",
+  'entities.items.katana_c.name': "紅花弁の刀",
 };

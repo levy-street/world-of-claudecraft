@@ -1297,6 +1297,9 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     questIds: [],
     vendorItems: [
       'highwatch_warblade',
+      'katana_a',
+      'katana_b',
+      'katana_c',
       'highwatch_greatsword',
       'highwatch_wallshield',
       'craghorn_staff',

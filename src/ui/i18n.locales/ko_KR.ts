@@ -19600,4 +19600,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '옭아매는 뿌리의 시전 시간이 0.5초 감소합니다.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '옭아매는 뿌리를 시전하면 이동 중에도 시전할 수 있고 이동 속도가 4초 동안 20% 증가합니다. 20초에 한 번만 발동합니다.',
+  'entities.items.katana_a.name': "벚꽃 카타나",
+  'entities.items.katana_b.name': "월강 카타나",
+  'entities.items.katana_c.name': "진홍 꽃잎 카타나",
 };

@@ -18644,4 +18644,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '缠缚根须的施法时间缩短0.5秒。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '施放缠缚根须后，你可以在移动中施法，并使移动速度提高20%，持续4秒。每20秒最多触发一次。',
+  'entities.items.katana_a.name': "樱花武士刀",
+  'entities.items.katana_b.name': "月钢武士刀",
+  'entities.items.katana_c.name': "绯红花瓣武士刀",
 };

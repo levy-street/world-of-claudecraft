@@ -18451,6 +18451,15 @@ export const ko_KR: EnTranslations = {
       "vanguard_warstaff": {
         "name": "선봉대의 전투지팡이"
       },
+      "katana_a": {
+        "name": "벚꽃 카타나"
+      },
+      "katana_b": {
+        "name": "월강 카타나"
+      },
+      "katana_c": {
+        "name": "진홍 꽃잎 카타나"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },

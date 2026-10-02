@@ -18451,6 +18451,15 @@ export const en_XA: EnTranslations = {
       "vanguard_warstaff": {
         "name": "[Ʋáñĝúáŕð'š Ŵáŕšţáƒƒ]"
       },
+      "katana_a": {
+        "name": "[Ɓļóššóɱ Ķáţáñá]"
+      },
+      "katana_b": {
+        "name": "[Ɱóóñšţééļ Ķáţáñá]"
+      },
+      "katana_c": {
+        "name": "[Çŕíɱšóñ Þéţáļ Ķáţáñá]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

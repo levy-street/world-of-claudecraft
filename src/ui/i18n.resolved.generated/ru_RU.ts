@@ -18451,6 +18451,15 @@ export const ru_RU: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Боевой посох Авангарда"
       },
+      "katana_a": {
+        "name": "Катана цветения"
+      },
+      "katana_b": {
+        "name": "Катана лунной стали"
+      },
+      "katana_c": {
+        "name": "Катана алых лепестков"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },

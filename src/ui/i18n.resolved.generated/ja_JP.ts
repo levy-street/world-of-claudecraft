@@ -18451,6 +18451,15 @@ export const ja_JP: EnTranslations = {
       "vanguard_warstaff": {
         "name": "ヴァンガードの戦杖"
       },
+      "katana_a": {
+        "name": "桜の刀"
+      },
+      "katana_b": {
+        "name": "月鋼の刀"
+      },
+      "katana_c": {
+        "name": "紅花弁の刀"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
