@@ -410,9 +410,12 @@ describe('retention sweep wiring in server/main.ts', () => {
     expect(MAIN_RAW).toContain(
       'freehold_plot_claims and freehold_operation_receipts are deliberately',
     );
-    // And the receipts are OBSERVED instead of swept: they are on the growth
-    // monitor's watched list.
-    expect(FREEHOLD_RECEIPT_GROWTH_TABLES).toContain('freehold_operation_receipts');
+    // And both keep-forever tables are OBSERVED instead of swept: the growth
+    // monitor's watched list is exactly the two of them.
+    expect(FREEHOLD_RECEIPT_GROWTH_TABLES).toEqual([
+      'freehold_operation_receipts',
+      'freehold_plot_claims',
+    ]);
   });
 
   it('records the keep-forever and bounded decisions at each 07a DDL', () => {

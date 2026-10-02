@@ -26,9 +26,10 @@
 //    read is answered as THROWN so the store holds the plot rather than serving
 //    a row whose claim it cannot prove.
 //
-// A lock or statement timeout on the acquire (55P03, 57014) is contention on
-// the claim row, not a fault in the plot: it answers `claim_busy`, the
-// repairable hold, rather than the generic read hold.
+// A LOCK timeout on the acquire (55P03) is contention on the claim row, not a
+// fault in the plot: it answers `claim_busy`, the repairable hold, counted
+// apart as busy contention. A statement timeout (57014) is a slow database and
+// takes the throw arm, the store's `read_threw` hold, as a full pool does.
 //
 // ONE BUDGET FOR THE WHOLE READ: a single deadline signal, armed before the
 // first checkout, bounds both transactions, their checkout waits included, so
