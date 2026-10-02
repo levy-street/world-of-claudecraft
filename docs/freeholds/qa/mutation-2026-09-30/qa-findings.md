@@ -2122,12 +2122,12 @@ the terminate rule needs no case for it.
   statement returns for it, never the holder's, only if it reads `psql` and `idle in transaction`
   on two readings a few seconds apart, the new `idle_for` growing; `SELECT pg_backend_pid();`
   names each of your own sessions, which you COMMIT or ROLLBACK instead; whoever left one open
-  runs its work again, a sign-out included; C27R2's disposition notes it; `idle_for` grown by the
-  whole time between the readings from round twenty-nine, T29R1, and the sign-out committed before
-  any realm starts and rerun from the stop if undone, S29R1). S28R2 NO CHANGE: a session in `idle
-  in transaction (aborted)` has already released its locks (observed on PostgreSQL 16: no row in
-  `pg_locks`, and another session took ACCESS EXCLUSIVE on the table at once), so it never blocks
-  a build, a drop or a boot.
+  runs its work again, a sign-out included; C27R2's disposition notes it (round twenty-nine,
+  L29R2); `idle_for` grown by the whole time between the readings from round twenty-nine, T29R1,
+  and the sign-out committed before any realm starts and rerun from the stop if undone, S29R1).
+  S28R2 NO CHANGE: a session in `idle in transaction (aborted)` has already released its locks
+  (observed on PostgreSQL 16: no row in `pg_locks`, and another session took ACCESS EXCLUSIVE on
+  the table at once), so it never blocks a build, a drop or a boot.
 - D28R1 FIXED `5c37d09029` (with H28R2 and Q28R4: the naming statement names the sessions waited
   for now, one at a time on `virtualxid`, read again once one ends; section L names two open psql
   sessions one after the other). D28R2 FIXED (see T28R3). D28R3 FIXED (see T28R2). D28R4 FIXED
@@ -2137,21 +2137,22 @@ the terminate rule needs no case for it.
   D28R3: an early end leaves none if still queued for its table lock (worded so in round
   twenty-nine, D29R4); section L cancels a build at `waiting for writers before build`, INVALID
   and not ready, and one queued on `relation`, no index, and reads a cancel at its wait for old
-  snapshots as ready; C27R5's disposition notes it). T28R3 FIXED `5c37d09029` (with C28R4, D28R2
-  and Q28R3: "can be waited for"; section L holds a READ COMMITTED psql session's statement
-  running when the wait begins, lets it end, and the build still waits on the session, named `idle
-  in transaction`, until DEPLOY's terminate; D27R2's disposition notes it). T28R4 FIXED
-  `5c37d09029` (with D28R4 and M28R4: a hand drop waits on `virtualxid` with the gate at 0, the
-  naming statement with its pid names an open psql reader, DEPLOY's terminate ends it and the drop
-  returns; DEPLOY says so and reads the gate again before each drop; C27R4's disposition notes it;
-  the drop's pid found by DEPLOY's own lookup from round twenty-nine, H29R1). T28R5 FIXED
-  `5c37d09029` (the unit case pins DEPLOY's `healthy` sentence and the game health probe's
-  `/livez`, beside the pin of `ensureSchema` before `listen`; the probe read inside the game's
-  healthcheck from round twenty-nine, T29R3). T28R6 FIXED `5c37d09029` (a cancel leaves the open
-  session as it was and the gate at 1). T28R7 FIXED (see Q28R1). T28R8 FIXED (see Q28R7). T28R9
-  FIXED `5c37d09029` (the token's readers are counted in code with comments stripped, and the
-  handler's slice is bounded). T28R10 FIXED `5c37d09029` (the bot exemption has a negative and a
-  positive control). T28R11 FIXED `5c37d09029` (the diagnosis statement is pinned whole). T28R12
+  snapshots as ready; C27R5's disposition notes it (round twenty-nine, L29R2)). T28R3 FIXED
+  `5c37d09029` (with C28R4, D28R2 and Q28R3: "can be waited for"; section L holds a READ COMMITTED
+  psql session's statement running when the wait begins, lets it end, and the build still waits on
+  the session, named `idle in transaction`, until DEPLOY's terminate; D27R2's disposition notes it
+  (round twenty-nine, L29R2)). T28R4 FIXED `5c37d09029` (with D28R4 and M28R4, M28R4 added in
+  round twenty-nine, Q29R3: a hand drop waits on `virtualxid` with the gate at 0, the naming
+  statement with its pid names an open psql reader, DEPLOY's terminate ends it and the drop
+  returns; DEPLOY says so and reads the gate again before each drop; C27R4's disposition notes it
+  (round twenty-nine, L29R2); the drop's pid found by DEPLOY's own lookup from round twenty-nine,
+  H29R1). T28R5 FIXED `5c37d09029` (the unit case pins DEPLOY's `healthy` sentence and the game
+  health probe's `/livez`, beside the pin of `ensureSchema` before `listen`; the probe read inside
+  the game's healthcheck from round twenty-nine, T29R3). T28R6 FIXED `5c37d09029` (a cancel leaves
+  the open session as it was and the gate at 1). T28R7 FIXED (see Q28R1). T28R8 FIXED (see Q28R7).
+  T28R9 FIXED `5c37d09029` (the token's readers are counted in code with comments stripped, and
+  the handler's slice is bounded). T28R10 FIXED `5c37d09029` (the bot exemption has a negative and
+  a positive control). T28R11 FIXED `5c37d09029` (the diagnosis statement is pinned whole). T28R12
   FIXED `5c37d09029` (step 6's `sudo docker compose build` and compose's build services, the game
   and the wiki, are pinned).
 - M28R1 FIXED `5c37d09029` (with C28R6 and Q28R9: the community rollback sets
@@ -2159,32 +2160,34 @@ the terminate rule needs no case for it.
   M29R5). M28R2 FIXED `5c37d09029` (every recreate after an `.env` edit (worded so in round
   twenty-nine, L29R9) runs `up -d --no-deps game`, and Index builds states once that `--no-deps`
   keeps `up` from recreating the database, never while an image built for a coming release waits;
-  M27R3's disposition notes it). M28R3 FIXED (see Q28R7). M28R4 FIXED (see T28R4).
+  M27R3's disposition notes it (round twenty-nine, L29R2)). M28R3 FIXED (see Q28R7). M28R4 FIXED
+  (see T28R4).
 - L28R1 FIXED `5c37d09029` (with C28R5, Q28R8 and H28R1: the stall readings read `healthy` or
-  `Exited` in `sudo docker compose ps --all`; C27R3's disposition notes it). L28R2 FIXED
-  `5c37d09029` (step 6 gives its reason: `up -d` runs each service on its new image). L28R3 FIXED
-  `5c37d09029` (the bot's release caveat recreates it with `--no-deps`; a restart keeps its old
-  image). L28R4 FIXED in this record (round twenty-seven's dispositions name the earlier text each
-  edited: C27R1, C27R2, C27R3, C27R6, Q27R1 and L27R6, the ledger's note by Q28R2). L28R5 FIXED in
-  this record (six readers; round twenty-seven's summary notes it). L28R6 FIXED `5c37d09029` (the
-  dump route's statement ends any other waiter for that lock with it).
-
+  `Exited` in `sudo docker compose ps --all`; C27R3's disposition notes it (round twenty-nine,
+  L29R2)). L28R2 FIXED `5c37d09029` (step 6 gives its reason: `up -d` runs each service on its new
+  image). L28R3 FIXED `5c37d09029` (the bot's release caveat recreates it with `--no-deps`; a
+  restart keeps its old image). L28R4 FIXED in this record (round twenty-seven's dispositions name
+  the earlier text each edited: C27R1, C27R2, C27R3, C27R6, Q27R1 and L27R6, the ledger's note by
+  Q28R2; listed in round twenty-nine, Q29R5). L28R5 FIXED in this record (six readers; round
+  twenty-seven's summary notes it (round twenty-nine, L29R2)). L28R6 FIXED `5c37d09029` (the dump
+  route's statement ends any other waiter for that lock with it).
 ## Round twenty-nine: eight fresh readers over round twenty-eight (`a430d838ad..84ea7d4b8d`)
 
 Round twenty-nine's commits: `e8582aacc9` (DEPLOY: the sign-out runs in psql's default autocommit
 so it has committed before any realm starts, and one a terminate or a ROLLBACK undid runs again
 from the stop of every realm; a hand drop's pid comes from DEPLOY's own lookup from another
 session; `idle_for` must grow by the whole time between the two readings; the bot's first start
-recreates the game first, by the gate, then starts the bot alone; the bot's own recreate and step
-6's bot recreate run the game's image, not while an image built for a coming release waits; the
-key order gives its reason; the step 6 fallback runs a rebuilt service on its new image; a
-recreate may stop the game before its readings, and its rule covers an `.env` edit outside a
-release; the community bullet drops the retired flag's history and the portal clause; section L
-reads `idle_for` grow and start over, finds the hand drop's pid by DEPLOY's lookup, takes every
-session inside its try and catches the running statement; the unit suite reads each compose
-service's own block for the shared Discord keys, the shared image, the wiki's one dependency and
-the game's `/livez` probe, and exempts a `--no-deps` start of any service but the game; the change
-log with it; kept whole for bisect), and the commit that adds this section.
+recreates the game first, by the gate, then starts the bot alone; step 6 recreates the bot on the
+new image, and the bot's own recreate, which runs the game's image, is barred while an image built
+for a coming release waits (worded so in round thirty, L30R7); the key order gives its reason; the
+step 6 fallback runs a rebuilt service on its new image; a recreate may stop the game before its
+readings, and its rule covers an `.env` edit outside a release; the community bullet drops the
+retired flag's history and the portal clause; section L reads `idle_for` grow and start over,
+finds the hand drop's pid by DEPLOY's lookup, takes every session inside its try and catches the
+running statement; the unit suite reads each compose service's own block for the shared Discord
+keys, the shared image, the wiki's one dependency and the game's `/livez` probe, and exempts a
+`--no-deps` start of any service but the game; the change log with it; kept whole for bisect), and
+the commit that adds this section.
 
 | Reader | Verdict | Findings |
 |---|---|---|
@@ -2198,17 +2201,18 @@ log with it; kept whole for bisect), and the commit that adds this section.
 | migration safety | PASS | M29R1 to M29R6 |
 
 48 findings: one blocking (T29R2), 15 should-fix (C29R1, C29R2, S29R1, L29R1 to L29R5, Q29R1,
-Q29R2, H29R1, H29R2, D29R1, M29R1, T29R1), 32 nice-to-have. Six readers found the hand drop's pid
-had no source, and the lookup one of them gave is now DEPLOY's and section L's. The blocking
-finding was a compose claim a test could reach and none did: the keys the bot and the game share
-are now read from each service's own environment block.
+Q29R2, H29R1, H29R2, D29R1, M29R1, T29R1), 32 nice-to-have. Seven readers (corrected in round
+thirty, L30R3) found the hand drop's pid had no source, and the lookup one of them gave is now
+DEPLOY's and section L's. The blocking finding was a compose claim a test could reach and none
+did: the keys the bot and the game share are now read from each service's own environment block.
 
 - C29R1 FIXED (see H29R1). C29R2 FIXED (see H29R2). C29R3 FIXED (see M29R4). C29R4 FIXED
   `e8582aacc9` (the key order gives its reason: while only one of the two runs with a new
   `DISCORD_BOT_SECRET`, every call the bot makes is rejected, and the game goes first because its
-  start waits on the gate and the bot's does not). C29R5 FIXED (see M29R5). C29R6 FIXED (see
-  T29R1). C29R7 FIXED `e8582aacc9` (step 6 then runs the bot on the new image on a host that runs
-  it; the unit list has that site).
+  start waits on the gate and the bot's does not; C28R1's disposition notes it (round thirty,
+  L30R1)). C29R5 FIXED (see M29R5). C29R6 FIXED (see T29R1). C29R7 FIXED `e8582aacc9` (step 6 then
+  runs the bot on the new image on a host that runs it; the unit list has that site; moved after
+  the verification and guarded in round thirty, H30R1).
 - Q29R1 FIXED (see L29R3). Q29R2 FIXED (see H29R1). Q29R3 FIXED in this record (T28R4 names
   M28R4). Q29R4 FIXED (see L29R9). Q29R5 FIXED in this record (L28R4 lists the dispositions it
   edited). Q29R6 FIXED `e8582aacc9` (with H29R4, H29R5, M29R6 and T29R4: `psqlSession` ends its
@@ -2217,38 +2221,122 @@ are now read from each service's own environment block.
   `finish`). Q29R7 FIXED (see T29R3). Q29R8 FIXED (see H29R2).
 - H29R1 FIXED `e8582aacc9` (with C29R1, Q29R2, D29R1, L29R5, S29R2 and M29R2: `SELECT pid FROM
   pg_stat_activity WHERE state = 'active' AND query LIKE 'DROP INDEX CONCURRENTLY%';` from another
-  psql session gives a hand drop's pid; section L pins it whole and finds the drop's pid by it).
-  H29R2 FIXED `e8582aacc9` (with C29R2, M29R3, L29R7 and Q29R8: the step 6 fallback runs a rebuilt
-  service on its new image, the wiki with `up -d --no-deps mediawiki`, which starts no realm; the
-  unit scan exempts a `--no-deps` start of any service but the game, with controls, and pins the
-  wiki's one dependency; the recreate rule covers an `.env` edit outside a release). H29R3 FIXED
-  `e8582aacc9` (the running-statement order no longer repeats the stop's gate reading). H29R4
-  FIXED (see Q29R6). H29R5 FIXED (see Q29R6). H29R6 FIXED `e8582aacc9` (a recreate may stop the
-  game first, then take the readings, then run its `up`). H29R7 FIXED (see M29R4).
+  psql session gives a hand drop's pid; section L pins it whole and finds the drop's pid by it;
+  T28R4's disposition notes it (round thirty, L30R1); scoped to this database's `psql` sessions
+  from round thirty, S30R2). H29R2 FIXED `e8582aacc9` (with C29R2, M29R3, L29R7 and Q29R8: the
+  step 6 fallback runs a rebuilt service on its new image, the wiki with `up -d --no-deps
+  mediawiki`, which starts no realm; the unit scan exempts a `--no-deps` start of any service but
+  the game, with controls, and pins the wiki's one dependency; the recreate rule covers an `.env`
+  edit outside a release; H28R5's disposition notes it (round thirty, L30R1); the exemption
+  narrowed to the bot and the wiki in round thirty, T30R3). H29R3 FIXED `e8582aacc9` (the
+  running-statement order no longer repeats the stop's gate reading). H29R4 FIXED (see Q29R6).
+  H29R5 FIXED (see Q29R6). H29R6 FIXED `e8582aacc9` (a recreate may stop the game first, then take
+  the readings, then run its `up`). H29R7 FIXED (see M29R4).
 - S29R1 FIXED `e8582aacc9` (the sign-out runs in psql's default autocommit with no BEGIN, so it
   has committed before any realm starts, and one a terminate or a ROLLBACK undid runs again from
-  that bullet's stop of every realm, since the realm whose boot waited on it starts serving
-  first). S29R2 FIXED (see H29R1).
+  that bullet's stop of every realm, since the realm whose boot waited on it starts serving first;
+  S28R1's disposition notes it (round thirty, L30R1); checked from a new session from round
+  thirty, S30R1). S29R2 FIXED (see H29R1).
 - D29R1 FIXED (see H29R1). D29R2 FIXED (see T29R1). D29R3 FIXED `e8582aacc9` (the test comment
   says the session can be waited for, here because its snapshot is the only old one). D29R4 FIXED
   in this record (C27R5 and T28R2 read "absent if" and "leaves none if").
 - T29R1 FIXED `e8582aacc9` (with C29R6 and D29R2: DEPLOY asks that `idle_for` grow by the whole
-  time between the two readings; section L reads it grow by at least the 300 ms between two
-  readings, then start over once the session runs a statement). T29R2 FIXED `e8582aacc9`
-  (blocking: the unit case reads each compose service's environment block, with game-only and
-  bot-only controls, and pins that the keys the bot and the game both read are exactly the four
-  DEPLOY names, and DEPLOY's sentence). T29R3 FIXED `e8582aacc9` (with Q29R7: the `/livez` probe
-  is read inside the game service's healthcheck). T29R4 FIXED (see Q29R6). T29R5 FIXED
-  `e8582aacc9` (the bot's image line equals the game's, pinned).
+  time between the two readings; section L reads it grow by at least 0.25 s across a 300 ms sleep
+  between two readings (worded so in round thirty, C30R5), then start over once the session runs a
+  statement; S28R1's disposition notes it (round thirty, L30R1); measured against its `open_for`
+  from round thirty, D30R1). T29R2 FIXED `e8582aacc9` (blocking: the unit case reads each compose
+  service's environment block, with game-only and bot-only controls, and pins that the keys the
+  bot and the game both read are exactly the four DEPLOY names, and DEPLOY's sentence; the `.env`
+  variables both read pinned from round thirty, T30R1). T29R3 FIXED `e8582aacc9` (with Q29R7: the
+  `/livez` probe is read inside the game service's healthcheck; T28R5's disposition notes it
+  (round thirty, L30R1)). T29R4 FIXED (see Q29R6). T29R5 FIXED `e8582aacc9` (the bot's image line
+  equals the game's, pinned).
 - M29R1 FIXED (see L29R1). M29R2 FIXED (see H29R1). M29R3 FIXED (see H29R2). M29R4 FIXED
   `e8582aacc9` (with C29R3, H29R7 and L29R6: the bot runs the game's image, so its `up` starts
   whatever image the tag names now: not while an image built for a coming release waits). M29R5
-  FIXED `e8582aacc9` (with C29R5 and L29R4: the community rollback no longer names portals). M29R6
-  FIXED (see Q29R6).
+  FIXED `e8582aacc9` (with C29R5 and L29R4: the community rollback no longer names portals;
+  M28R1's disposition notes it (round thirty, L30R1)). M29R6 FIXED (see Q29R6).
 - L29R1 FIXED `e8582aacc9` (with M29R1: the bot's first start recreates the game first, by the
   gate, then starts the bot alone with `--no-deps`; the unit list has both sites). L29R2 FIXED in
   this record (round twenty-eight's dispositions name the round twenty-seven text they edited).
-  L29R3 FIXED in this record (with Q29R1: five readers). L29R4 FIXED (see M29R5). L29R5 FIXED (see
-  H29R1). L29R6 FIXED (see M29R4). L29R7 FIXED (see H29R2). L29R8 FIXED `e8582aacc9` (the Rift
-  sentence states the rule, not the retired flag). L29R9 FIXED in this record and in the ledger
-  (with Q29R4: every recreate after an `.env` edit).
+  L29R3 FIXED in this record (with Q29R1: five readers; round twenty-eight's summary notes it
+  (round thirty, L30R1)). L29R4 FIXED (see M29R5). L29R5 FIXED (see H29R1). L29R6 FIXED (see
+  M29R4). L29R7 FIXED (see H29R2). L29R8 FIXED `e8582aacc9` (the Rift sentence states the rule,
+  not the retired flag). L29R9 FIXED in this record and in the ledger (with Q29R4: every recreate
+  after an `.env` edit; M28R2's disposition and round twenty-eight's commit summary note it (round
+  thirty, L30R1)).
+
+## Round thirty: eight fresh readers over round twenty-nine (`84ea7d4b8d..af61694c86`)
+
+Round thirty's commits: `74d696701d` (DEPLOY: from a new psql session, one count over every table
+the sign-out clears must read 0 before any realm starts, else the sign-out is committed or run
+again; a left-open session is ended only when its `idle_for` grew by exactly as much as its
+`open_for` across two readings in psql's default autocommit; the drop lookup reads only this
+database's `psql` sessions; the bot's recreate leaves step 6 for after the verification, guarded
+to run only where the bot runs, and the rollback says what that leaves; the escalation levers
+carry the image bar; the recreate rule's parenthetical names the bot; section L pins the sign-out
+check whole, reads the exact gap between `open_for` and `idle_for` hold and then move, and names
+the hand drop `psql`; the unit suite pins the `.env` variables the bot and the game share, the
+bot's command, the wiki block's end, and an exemption for the bot and the wiki alone; the
+community pin refuses the retired flag's name and reads the Rift sentence; the change log with it;
+kept whole for bisect), and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C30R1 to C30R6 |
+| qa-checklist | PASS | Q30R1 to Q30R8 |
+| server hot path | PASS | H30R1 to H30R7 |
+| privacy and security | PASS | S30R1 to S30R2 |
+| database performance | PASS | D30R1 to D30R3 |
+| test coverage | PASS | T30R1 to T30R6 |
+| docs librarian | PASS | L30R1 to L30R7 |
+| migration safety | PASS | M30R1 to M30R5 |
+
+44 findings: none blocking, 9 should-fix (S30R1, L30R1 to L30R3, D30R1, H30R1, H30R2, T30R1,
+T30R2), 35 nice-to-have. Every reader passed, and three (correctness, qa-checklist and migration
+safety) came back with no should-fix.
+
+- C30R1 FIXED (see D30R1). C30R2 FIXED (see S30R2). C30R3 FIXED (see L30R2). C30R4 FIXED (see
+  Q30R1). C30R5 FIXED in this record (T29R1 reads "at least 0.25 s across a 300 ms sleep"). C30R6
+  FIXED (see L30R7).
+- Q30R1 FIXED in the ledger (with C30R4 and L30R6: the round twenty-nine entry says the bot's
+  first start recreates the game first, by its gate, and every bot recreate keeps to the game's
+  image). Q30R2 FIXED (see L30R3). Q30R3 FIXED in this record: `af61694c86`'s body leaves out
+  C27R5's rewording with T28R2; the commit stays as it is. Q30R4 FIXED in this record (the
+  back-pointers round twenty-nine added to round twenty-eight's dispositions name the round).
+  Q30R5 FIXED (see T30R1). Q30R6 FIXED (see T30R3). Q30R7 FIXED (see S30R2). Q30R8 FIXED (see
+  L30R2).
+- H30R1 FIXED `74d696701d` (with H30R2, H30R7, M30R1, M30R4 and L30R4: the bot's recreate leaves
+  step 6 for after the verification, guarded by the bot container's running state, so it never
+  starts a bot where none runs; the rollback says a rollback before it leaves the bot on the older
+  image, and with `COMPOSE_PROFILES=discord` runs that line again after it). H30R2 FIXED (see
+  H30R1). H30R3 FIXED (see S30R2). H30R4 FIXED (see D30R1). H30R5 FIXED `74d696701d` (with L30R5:
+  the escalation levers carry the image bar). H30R6 FIXED (see T30R3). H30R7 FIXED (see H30R1).
+- S30R1 FIXED `74d696701d` (DEPLOY reads, from a new psql session, one count over every table the
+  sign-out clears and requires 0 before any realm starts, else the sign-out is committed or run
+  again; section L pins the statement whole, reading above 0 before the sign-out and 0 after).
+  S30R2 FIXED `74d696701d` (with C30R2, D30R2, H30R3, M30R3 and Q30R7: the drop lookup reads only
+  this database's `psql` sessions; section L names its hand drop `psql` and takes the drop's pid
+  from the polled lookup).
+- D30R1 FIXED `74d696701d` (with C30R1, H30R4 and T30R4: a session is ended only when, on two
+  readings taken in psql's default autocommit, its `idle_for` grew by exactly as much as its
+  `open_for`; section L reads the exact gap between them unchanged across two readings and moved
+  once the session runs a statement, its `idle_for` then above 0 and below the first reading).
+  D30R2 FIXED (see S30R2). D30R3 FIXED `74d696701d` (the test comment says a virtualxid wait lasts
+  until the transaction ends).
+- T30R1 FIXED `74d696701d` (with Q30R5: the `.env` variables both compose blocks read are pinned,
+  the image tag and the same four, with a bot-only control). T30R2 FIXED `74d696701d` (the
+  community pin refuses the retired flag's name in any form and reads the Rift sentence whole).
+  T30R3 FIXED `74d696701d` (with Q30R6, H30R6 and M30R2: the exemption names only the bot and the
+  wiki, with a negative control for postgres). T30R4 FIXED (see D30R1). T30R5 FIXED `74d696701d`
+  (the bot block runs `node dist-bot/bot.cjs`, pinned). T30R6 FIXED `74d696701d` (the wiki's block
+  is read to stop before the top-level `volumes:`).
+- M30R1 FIXED (see H30R1). M30R2 FIXED (see T30R3). M30R3 FIXED (see S30R2). M30R4 FIXED (see
+  H30R1). M30R5 FIXED (see L30R2).
+- L30R1 FIXED in this record (round twenty-nine's dispositions name the round twenty-eight text
+  they edited). L30R2 FIXED `74d696701d` (with C30R3, M30R5 and Q30R8: a release's step 6 starts
+  every service outside a profile with `up -d`, and the bot once the realm is verified; the
+  recreate's stop-first form is no longer a second parenthetical). L30R3 FIXED in this record
+  (with Q30R2: seven readers). L30R4 FIXED (see H30R1). L30R5 FIXED (see H30R5). L30R6 FIXED (see
+  Q30R1). L30R7 FIXED in this record (with C30R6: the round twenty-nine paragraph says step 6
+  recreates the bot on the new image and only the bot's own recreate is barred).
