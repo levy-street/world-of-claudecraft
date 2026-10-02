@@ -1503,7 +1503,7 @@ describe('preload admission', () => {
     // install the cold '0'.
     let held = true;
     let row: 'ok' | 'throws' = 'ok';
-    let clock: 'ok' | 'fails' = 'ok';
+    let clock: 'ok' | 'fails' | 'newer' = 'ok';
     const h = harness({
       claimHeld: () => held,
       readRow: async () => {
@@ -1512,6 +1512,9 @@ describe('preload admission', () => {
       },
       readHearth: async (): Promise<FreeholdHearthLoad> => {
         if (clock === 'fails') throw new Error('clock read failed');
+        if (clock === 'newer') {
+          return { kind: 'state', state: { readyAtMs: '1700007200000', revision: '6' } };
+        }
         return { kind: 'state', state: { readyAtMs: '1700000000004', revision: '4' } };
       },
     });
@@ -1525,6 +1528,15 @@ describe('preload admission', () => {
     const reloaded = await h.store.preload(ACCOUNT_ID);
     expect(reloaded.hold).toBeNull();
     expect(reloaded).toMatchObject({ hearthReadyAtMs: 1_700_003_600_000, hearthRevision: '5' });
+    // Forward-only, not frozen: through another hold, a reload that reads a
+    // NEWER clock (another realm's revision 6) takes it.
+    row = 'throws';
+    expect((await h.store.preload(ACCOUNT_ID)).hold?.kind).toBe('read_threw');
+    row = 'ok';
+    clock = 'newer';
+    const forward = await h.store.preload(ACCOUNT_ID);
+    expect(forward.hold).toBeNull();
+    expect(forward).toMatchObject({ hearthReadyAtMs: 1_700_007_200_000, hearthRevision: '6' });
   });
 
   it('re-reads a lost claim only for an entry that owes nothing: each clause on its own', () => {
@@ -1535,6 +1547,7 @@ describe('preload admission', () => {
       retrying: false,
       dirty: false,
       leaveCaptured: false,
+      readInFlight: false,
     };
     let asked = 0;
     const lost = () => {
@@ -1557,8 +1570,22 @@ describe('preload admission', () => {
       expect(freeholdRereadsLostClaim({ ...clean, ...over }, lost), JSON.stringify(over)).toBe(
         false,
       );
+      // An in-flight read never outranks owed work: the entry still replays.
+      expect(
+        freeholdRereadsLostClaim({ ...clean, ...over, readInFlight: true }, lost),
+        `${JSON.stringify(over)} with a read in flight`,
+      ).toBe(false);
     }
     expect(asked).toBe(0);
+    // A read in flight joins even once the claim reads held (its acquire
+    // records the claim before its row lands), and never asks the claim.
+    let heldAsked = 0;
+    const heldClaim = () => {
+      heldAsked += 1;
+      return true;
+    };
+    expect(freeholdRereadsLostClaim({ ...clean, readInFlight: true }, heldClaim)).toBe(true);
+    expect(heldAsked).toBe(0);
   });
 
   it('a second preload during a lost-claim re-read JOINS that read and answers its newer row', async () => {
@@ -1584,6 +1611,12 @@ describe('preload admission', () => {
     held = false;
     const first = h.store.preload(ACCOUNT_ID);
     await tick(5);
+    // The re-read really is parked at its gate before the second preload, or
+    // this case would pass without ever reaching the join.
+    expect(reads).toBe(2);
+    // Its claim acquire records the claim before the row lands: the second
+    // preload must still join rather than ask the now-held claim and replay.
+    held = true;
     const second = h.store.preload(ACCOUNT_ID);
     open();
     const [a, b] = await Promise.all([first, second]);
@@ -7902,6 +7935,9 @@ describe('the claimed login read the realm binds, executed on a recording client
     // contention count stays inside it.
     const login = claimedLogin({ acquireError: { code: '55P03' }, rollbackFails: true });
     const got = await login.run();
+    // The ROLLBACK really went out (and failed): without it this case never
+    // reaches the failure it is named for.
+    expect(login.checkouts[0].at(-1)).toBe('rollback');
     expect(got.row).toEqual({ kind: 'claim_busy', plotIndex: 0, plotId: ROW_PLOT_ID });
     expect(login.registry.counters.busy).toBe(1);
     expect(login.registry.counters.busyContention).toBe(1);
@@ -9461,6 +9497,10 @@ describe("the store's claim seam the 07a renewer, trip and mutation read", () =>
     expect(h.store.authority(OWNER_KEY)?.durableRev).toBe('9007199254740993');
     h.store.adoptCommittedRevision(OWNER_KEY, '9007199254740992');
     expect(h.store.authority(OWNER_KEY)?.durableRev).toBe('9007199254740993');
+    // The guard's upper bound from below: BIGINT's largest value, 19 digits,
+    // is still a revision the database can return, so it is adopted.
+    h.store.adoptCommittedRevision(OWNER_KEY, '9223372036854775807');
+    expect(h.store.authority(OWNER_KEY)?.durableRev).toBe('9223372036854775807');
   });
 
   it('adoptCommittedRevision: a fresh account adopts forward from no row at all', async () => {

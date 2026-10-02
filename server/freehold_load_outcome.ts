@@ -253,17 +253,23 @@ export interface FreeholdRereadFacts {
   readonly dirty: boolean;
   /** A leave capture not yet written. */
   readonly leaveCaptured: boolean;
+  /** A durable read for this account in flight (the store's load is
+   *  single-flight per account, so a preload now joins it). */
+  readonly readInFlight: boolean;
 }
 
 /**
  * Whether a preload RE-READS a loaded entry (the claimed read decides again)
  * rather than replaying it: only an entry with a durable row that holds and owes
- * nothing, and only once this process no longer holds the plot's claim (asked
- * last, and only then). Any owed work replays, because a re-read would take the
- * plot back at a newer row's revision and rebase that work onto another realm's
- * edits. A READ already in flight is deliberately NOT owed work here: the
- * re-read joins it (the store's load is single-flight per account), so a second
- * preload during a lost-claim re-read answers that read's newer row, never the
+ * nothing, and then when a read is already in flight or this process no longer
+ * holds the plot's claim (asked last, and only then). Any owed work replays,
+ * because a re-read would take the plot back at a newer row's revision and
+ * rebase that work onto another realm's edits. A READ already in flight is
+ * deliberately NOT owed work here: the re-read joins it (the store's load is
+ * single-flight per account), so a second preload during a lost-claim re-read
+ * answers that read's newer row, never the stale entry. It joins WITHOUT asking
+ * the claim, because that read records the claim as held at its acquire, before
+ * its row lands on the entry: asked in that gap, the claim would replay the
  * stale entry.
  */
 export function freeholdRereadsLostClaim(
@@ -272,7 +278,7 @@ export function freeholdRereadsLostClaim(
 ): boolean {
   if (facts.durableRev === null || facts.held || facts.writeOwed || facts.retrying) return false;
   if (facts.dirty || facts.leaveCaptured) return false;
-  return !claimHeld();
+  return facts.readInFlight || !claimHeld();
 }
 
 /**

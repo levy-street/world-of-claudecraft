@@ -330,8 +330,7 @@ export function createFreeholdPersistStore(ports: FreeholdPersistPorts): Freehol
    * kept, and named here rather than one of them, because each says what its
    * own state MEANS rather than what the current arithmetic happens to imply,
    * and because the equality is a property of arm() that arm() does not
-   * declare. An earlier version of this comment claimed only the deferred
-   * clause was in that position; it was three.
+   * declare.
    */
   const owesWork = (entry: FreeholdPersistEntry): boolean =>
     entry.running ||
@@ -354,6 +353,7 @@ export function createFreeholdPersistStore(ports: FreeholdPersistPorts): Freehol
         retrying: deferredRetries.has(entry),
         dirty: isDirty(entry),
         leaveCaptured: entry.leaveDocument !== null,
+        readInFlight: entry.accountId > 0 && inFlightLoads.has(entry.accountId),
       },
       () => ports.claimHeld?.(entry.plotId) ?? true,
     );
