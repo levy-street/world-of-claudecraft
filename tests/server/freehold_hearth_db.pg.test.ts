@@ -11,7 +11,7 @@
 // advance token column and its catalog-probed ALTER), the four statements of
 // an entry and the verify read, not the core schema, and the production
 // parents exist long before ensureSchema reaches this module.
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { isIdempotentSchemaSkipNotice } from '../../server/schema_notices';
 
 const url = process.env.TEST_DATABASE_URL ?? '';
@@ -455,6 +455,11 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       );
     };
 
+    // The main table holds its validated CHECK, so the silent boots of it
+    // below run the warning arm, not a repair.
+    expect((await tokenShape(SCHEMA)).constraints).toEqual([
+      { conname: 'account_freehold_hearth_advance_token_shape', def: VALID_DEF },
+    ]);
     // Each impostor alone: another type, then a CHECK with another body. The
     // boot completes (no 42710), says the shape is unchecked, and leaves it.
     for (const definition of ['UNIQUE (advance_token)', 'CHECK (true)']) {
@@ -492,35 +497,99 @@ d('account_freehold_hearth against real PostgreSQL', () => {
 
   it("a steady boot's one Hearth table lock is the token probe's: it waits behind ACCESS EXCLUSIVE and is held to no COMMIT", async () => {
     // Deparsing the CHECK opens the table under ACCESS SHARE and releases it at
-    // once. So a boot waits there behind an ACCESS EXCLUSIVE holder (operator
-    // DDL), and inside the boot transaction it holds no lock on the table after.
+    // once. So a boot waits there behind an ACCESS EXCLUSIVE holder or a queued
+    // ACCESS EXCLUSIVE request (operator DDL), and inside the boot transaction
+    // it holds no lock on the table after.
+    const table = `${SCHEMA}.account_freehold_hearth`;
+    // The precondition: the table is in its steady state, so the boot runs the
+    // probe's warning arm and no repair arm.
+    expect((await tokenShape(SCHEMA)).constraints).toEqual([
+      {
+        conname: 'account_freehold_hearth_advance_token_shape',
+        def: "CHECK (((advance_token IS NULL) OR (advance_token ~ '^[0-9a-f]{32}$'::text)))",
+      },
+    ]);
+    const modes = async (client: import('pg').PoolClient, granted: boolean, pid?: number) =>
+      (
+        await client.query(
+          `SELECT mode FROM pg_locks
+            WHERE relation = $1::regclass AND granted = $2 AND ($3::int IS NULL OR pid = $3)`,
+          [table, granted, pid ?? null],
+        )
+      ).rows.map((row: { mode: string }) => row.mode);
     const holder = await pool.connect();
-    const booter = await pool.connect();
     try {
-      await holder.query('BEGIN');
-      await holder.query(`LOCK TABLE ${SCHEMA}.account_freehold_hearth IN ACCESS EXCLUSIVE MODE`);
-      await booter.query('BEGIN');
-      await booter.query("SET LOCAL lock_timeout = '300ms'");
-      await expect(booter.query(hearthSchema)).rejects.toMatchObject({ code: '55P03' });
-      await booter.query('ROLLBACK');
-      await holder.query('ROLLBACK');
-      // The control: with no holder the same boot completes, and holds nothing
-      // on the table afterwards, inside its still-open transaction.
-      await booter.query('BEGIN');
-      await booter.query("SET LOCAL lock_timeout = '300ms'");
-      await booter.query(hearthSchema);
-      const held = await booter.query(
-        `SELECT mode FROM pg_locks
-          WHERE relation = $1::regclass AND pid = pg_backend_pid()`,
-        [`${SCHEMA}.account_freehold_hearth`],
-      );
-      expect(held.rows).toEqual([]);
-      await booter.query('ROLLBACK');
+      const booter = await pool.connect();
+      try {
+        const queuer = await pool.connect();
+        try {
+          // A HOLDER: the boot waits, in the probe's ACCESS SHARE, inside the DO
+          // block's deparse, and a lock timeout ends it with 55P03.
+          await holder.query('BEGIN');
+          await holder.query(`LOCK TABLE ${table} IN ACCESS EXCLUSIVE MODE`);
+          await booter.query('BEGIN');
+          const waiting = booter.query(hearthSchema).then(
+            () => null,
+            (error: unknown) => error,
+          );
+          await vi.waitFor(async () =>
+            expect(await modes(queuer, false)).toEqual(['AccessShareLock']),
+          );
+          await holder.query('ROLLBACK');
+          expect(await waiting).toBeNull();
+          await booter.query('ROLLBACK');
+          await holder.query('BEGIN');
+          await holder.query(`LOCK TABLE ${table} IN ACCESS EXCLUSIVE MODE`);
+          await booter.query('BEGIN');
+          await booter.query("SET LOCAL lock_timeout = '300ms'");
+          const held = await booter.query(hearthSchema).catch((error: unknown) => error);
+          expect(held).toMatchObject({ code: '55P03' });
+          expect(String((held as { where?: string }).where)).toMatch(
+            /pg_get_constraintdef[\s\S]*inline_code_block/,
+          );
+          await booter.query('ROLLBACK');
+          await holder.query('ROLLBACK');
+          // A QUEUED REQUEST: a writer's ROW EXCLUSIVE alone does not stop the
+          // boot, but an ACCESS EXCLUSIVE request queued behind it does.
+          await holder.query('BEGIN');
+          await holder.query(`LOCK TABLE ${table} IN ROW EXCLUSIVE MODE`);
+          await booter.query('BEGIN');
+          await booter.query("SET LOCAL lock_timeout = '300ms'");
+          await booter.query(hearthSchema);
+          await booter.query('ROLLBACK');
+          await queuer.query('BEGIN');
+          const queued = queuer.query(`LOCK TABLE ${table} IN ACCESS EXCLUSIVE MODE`);
+          await vi.waitFor(async () =>
+            expect(await modes(holder, false)).toEqual(['AccessExclusiveLock']),
+          );
+          await booter.query('BEGIN');
+          await booter.query("SET LOCAL lock_timeout = '300ms'");
+          await expect(booter.query(hearthSchema)).rejects.toMatchObject({ code: '55P03' });
+          await booter.query('ROLLBACK');
+          await holder.query('ROLLBACK');
+          await queued;
+          await queuer.query('ROLLBACK');
+          // NOTHING HELD: with no holder the boot completes and keeps no lock on
+          // the table inside its still-open transaction; the positive control
+          // shows the same read sees a lock that IS held.
+          await booter.query('BEGIN');
+          await booter.query(hearthSchema);
+          const pid = (await booter.query('SELECT pg_backend_pid() AS pid')).rows[0].pid as number;
+          expect(await modes(queuer, true, pid)).toEqual([]);
+          await booter.query(`LOCK TABLE ${table} IN ACCESS SHARE MODE`);
+          expect(await modes(queuer, true, pid)).toEqual(['AccessShareLock']);
+          await booter.query('ROLLBACK');
+        } finally {
+          await queuer.query('ROLLBACK').catch(() => {});
+          queuer.release();
+        }
+      } finally {
+        await booter.query('ROLLBACK').catch(() => {});
+        booter.release();
+      }
     } finally {
       await holder.query('ROLLBACK').catch(() => {});
-      await booter.query('ROLLBACK').catch(() => {});
       holder.release();
-      booter.release();
     }
   });
 
