@@ -3844,15 +3844,16 @@ did not check, record wording and two commit bodies, and two readings ruled, Q47
   in section L by the expression it sits in, so a boot read beside or instead of `settled` fails
   until reviewed; the pin's comment says so; T46R3's disposition says a boot whose `startBoot` or
   `settled` call changes fails until reviewed, and notes it (named so in round forty-eight,
-  L48R5); every `during` callback's parameters pinned, so a boot handed to one is named `boot`,
-  from round forty-eight, C48R1). Q47R2 FIXED in this record (round forty-six's summary says the
-  literals became the constant with no pin reading for one; `f198465d44`'s body, which says now
-  pinned, stays as it is). Q47R3 FIXED in this record (`0aa155dbc3`'s subject says every boot read
-  is pinned and its body that the cancel lets go of a boot that never settles, where the case's
-  work is no boot and `settled`'s bound lets it go; both stay as they are). Q47R4 FIXED (see
-  C47R1). Q47R5 FIXED (see C47R2). Q47R6 RULED, no change: round forty-four's intro describes
-  `5aa9f3730d`, whose `settled` sent one cancel and then read for a second; the repeated cancels
-  came in `bbd3b6e4cf`, which round forty-five's record describes.
+  L48R5); every `during` callback's parameters pinned, so a callback that takes the boot it is
+  handed names it `boot` (worded so in round forty-nine, C49R2), from round forty-eight, C48R1).
+  Q47R2 FIXED in this record (round forty-six's summary says the literals became the constant with
+  no pin reading for one; `f198465d44`'s body, which says now pinned, stays as it is). Q47R3 FIXED
+  in this record (`0aa155dbc3`'s subject says every boot read is pinned and its body that the
+  cancel lets go of a boot that never settles, where the case's work is no boot and `settled`'s
+  bound lets it go; both stay as they are). Q47R4 FIXED (see C47R1). Q47R5 FIXED (see C47R2).
+  Q47R6 RULED, no change: round forty-four's intro describes `5aa9f3730d`, whose `settled` sent
+  one cancel and then read for a second; the repeated cancels came in `bbd3b6e4cf`, which round
+  forty-five's record describes.
 - H47R1 FIXED (see C47R3). H47R2 FIXED `0cf1e2f6f9` (with S47R1 and T47R3: each bot listing skips
   only what `git ls-files -z --deleted` reports, so a tracked name that does not decode is kept
   and fails at the parse, as a tracked `bot/` file whose name is not UTF-8 did, rather than
@@ -3913,14 +3914,16 @@ dropped blank lines and two commit bodies.
   of `during` in section L by where it sits, and each callback passed as one by its parameters as
   written, so a boot handed to a callback under a name other than `boot` fails until reviewed; the
   pin block's comment says so; `0cf1e2f6f9`'s body, which says a boot read beside or instead of
-  `settled` fails until reviewed, stays as it is; Q47R1's disposition notes it). C48R2 FIXED in
-  this record (with Q48R2 and L48R4: the blank line before round forty-five's heading is back, and
-  before round twenty-nine's, which the same rewrap fault had dropped). C48R3 FIXED in the ledger
-  (with Q48R3 and L48R3: its ROUND FORTY-SEVEN names the operator the readers pin did not check;
-  `a9114ed955`'s body, which leaves it out, stays as it is). C48R4 FIXED `75daea653c` (with L48R2:
-  the pin block's comment says only a call written `ensureSchema(...)` or `x.ensureSchema(...)` is
-  read; T46R5's disposition notes it). C48R5 FIXED in this record (with L48R6: T45R3 says the
-  ledger's ROUND FORTY-FOUR says no failure path stacks past the timeout).
+  `settled` fails until reviewed, stays as it is; Q47R1's disposition notes it; only arrows taken
+  as callbacks, from round forty-nine, Q49R4). C48R2 FIXED in this record (with Q48R2 and L48R4:
+  the blank line before round forty-five's heading is back, and before round twenty-nine's, which
+  the same rewrap fault had dropped). C48R3 FIXED in the ledger (with Q48R3 and L48R3: its ROUND
+  FORTY-SEVEN names the operator the readers pin did not check; `a9114ed955`'s body, which leaves
+  it out, stays as it is). C48R4 FIXED `75daea653c` (with L48R2: the pin block's comment says only
+  a call written `ensureSchema(...)` or `x.ensureSchema(...)` is read; T46R5's disposition notes
+  it; optional chains named among the calls read, from round forty-nine, L49R4). C48R5 FIXED in
+  this record (with L48R6: T45R3 says the ledger's ROUND FORTY-FOUR says no failure path stacks
+  past the timeout).
 - Q48R1 FIXED (see C48R1). Q48R2 FIXED (see C48R2). Q48R3 FIXED (see C48R3). Q48R4 FIXED in this
   record (round forty-seven's summary names its two rulings).
 - H48R1 FIXED `75daea653c` (the first case's grace is 250 ms, so its third read always ends past
@@ -3928,16 +3931,18 @@ dropped blank lines and two commit bodies.
   three; C47R2's disposition notes it).
 - S48R1 FIXED `75daea653c` (each bot listing is read as raw bytes and compared before decoding, so
   two names that decode alike stay apart; H47R2's disposition notes it). S48R2 FIXED `75daea653c`
-  (the bot pathspecs and the second listing's filter take `.tsx` and `.jsx` files, which the bot's
-  bundler resolves; a tracked `bot/feed.tsx` holding a route is listed by the route pin).
+  (the route pin's bot pathspecs (named so in round forty-nine, L49R1) and the second listing's
+  filter take `.tsx` and `.jsx` files, which the bot's bundler resolves; a tracked `bot/feed.tsx`
+  holding a route is listed by the route pin; the grant pin's too, from round forty-nine, L49R1).
 - D48R1 FIXED `75daea653c` (the first case checks that each counted call is the cancel of the
   schema lock's sessions, statement and key as `settled` sends them).
 - T48R1 FIXED `75daea653c` (the unit suite reads the section's lock key, lock filter, `startBoot`
   and `settled` whole, comments dropped, so the grace's use, the read after each cancel and the
   cancel statement are pinned as written; C47R2's and T46R2's dispositions say what the count
   bounds; C47R2's disposition notes it). T48R2 FIXED `75daea653c` (every name a listing skips is
-  checked missing from disk, so a listing that skips anything else fails; H47R2's disposition
-  notes it). T48R3 FIXED (see C48R1).
+  checked missing from disk, a name that decodes (worded so in round forty-nine, C49R1), so a
+  listing that skips anything else fails; H47R2's disposition notes it; each listed name probed by
+  its raw bytes both ways, from round forty-nine, C49R1). T48R3 FIXED (see C48R1).
 - L48R1 FIXED (see C48R1). L48R2 FIXED (see C48R4). L48R3 FIXED (see C48R3). L48R4 FIXED (see
   C48R2). L48R5 FIXED in this record (C47R2 and Q47R1 say how they reworded T46R2 and T46R3).
   L48R6 FIXED (see C48R5).
@@ -3949,3 +3954,73 @@ dropped blank lines and two commit bodies.
   with a bot file edited, at the check that each skipped name is missing from disk; and a tracked
   `bot/feed.tsx` holding a route, added with intent-to-add and removed after, which the route pin
   lists.
+
+## Round forty-nine: eight fresh readers over round forty-eight (`a9114ed955..6b38b121f2`)
+
+Round forty-nine's commits: `b9789aa5ad` (the unit suite reads section L's code whole by digest,
+comments dropped; pins every mention of `settled` and of `within` in the section as a call, bar
+`settled`'s declaration, and `within` itself whole; takes only arrows as `during` callbacks; the
+bot listings probe each listed name's raw bytes both ways against git's deleted list; bot code may
+hold no JSX, and the grant pin takes `.tsx` and `.jsx` files; the pin block's comment, rewrapped,
+names optional chains among the calls read, says a `during` callback that takes the boot names it
+`boot`, and says the digest backs the named pins; the unit Cost header remeasured, 1.2 s; the
+manifest's forty-ninth entry; kept whole for bisect), and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C49R1 to C49R3 |
+| qa-checklist | PASS | Q49R1 to Q49R5 |
+| server hot path | PASS | H49R1, H49R2 |
+| privacy and security | PASS | S49R1, S49R2 |
+| database performance | PASS | D49R1 |
+| test coverage | PASS | T49R1 to T49R5 |
+| docs librarian | PASS | L49R1 to L49R4 |
+| migration safety | PASS | M49R1 |
+
+23 findings: none blocking, 2 should-fix (C49R1, T49R1), 21 nice-to-have, every reader passing,
+and six (all but correctness and test coverage) with no should-fix. Five readers found the
+skipped-name check probing a decoded name, so for a name that does not decode it checked nothing;
+it now probes each listed name's raw bytes both ways. One found a binding that shadows `settled`
+passing every named pin; since these pins kept drawing one more form, section L is now also read
+whole by digest, so any change to its code fails until reviewed, and the mentions of `settled` and
+`within`, and `within` itself, are pinned. Five found a `during` callback written as a function
+expression able to read its boot through `arguments`; only arrows pass now. The rest were JSX in
+bot code, the grant pin's extensions, comment and ledger wording and a commit body.
+
+- C49R1 FIXED `b9789aa5ad` (with Q49R3, S49R2, T49R3 and L49R3: each listing's names are probed by
+  their raw bytes, and a listed name must be on disk exactly when git does not report it deleted,
+  so a skip of a present file fails whatever its name, the kept files the positive arm; T48R2's
+  disposition notes it). C49R2 FIXED `b9789aa5ad` (with H49R2, Q49R5, T49R5 and L49R2: the pin
+  block's comment is rewrapped and says a `during` callback that takes the boot it is handed names
+  it `boot`, and Q47R1's note says the same). C49R3 FIXED in the ledger (with Q49R1: its ROUND
+  FORTY-EIGHT names the 250 ms grace and the boundary comment).
+- Q49R1 FIXED (see C49R3). Q49R2 FIXED in this record (`6b38b121f2`'s body leaves out D48R1's
+  per-call check, which round forty-eight's summary names; the commit stays as it is). Q49R3 FIXED
+  (see C49R1). Q49R4 FIXED `b9789aa5ad` (with H49R1, D49R1, M49R1 and T49R4: the `during` pin
+  reads only an arrow's parameters, so a function expression, which could read the boot through
+  `arguments`, maps to its PropertyAssignment and fails, and a callback under a computed key drops
+  out of the pin's list and fails too; C48R1's disposition notes it). Q49R5 FIXED (see C49R2).
+- H49R1 FIXED (see Q49R4). H49R2 FIXED (see C49R2).
+- S49R1 FIXED `b9789aa5ad` (bot code may hold no JSX, so a route in JSX text or in an attribute
+  spelled with an HTML entity cannot sit where the route read does not take it). S49R2 FIXED (see
+  C49R1).
+- D49R1 FIXED (see Q49R4).
+- T49R1 FIXED `b9789aa5ad` (every mention of `settled` in section L but its declaration is a call
+  by name, so a binding that shadows it fails; and since the named pins kept drawing one more
+  form, the section's code is read whole by digest, comments dropped, so any change to it fails
+  until reviewed against them). T49R2 FIXED `b9789aa5ad` (`within` is read whole and every mention
+  of it in the section is a call, with a count above zero as the control). T49R3 FIXED (see
+  C49R1). T49R4 FIXED (see Q49R4). T49R5 FIXED (see C49R2).
+- L49R1 FIXED `b9789aa5ad` (the grant pin's bot pathspecs take `.tsx` and `.jsx` files, and S48R2
+  names the route pin's; S48R2's disposition notes it; the feed-verb grep's extensions, outside
+  this pin, are its owner's). L49R2 FIXED (see C49R2). L49R3 FIXED (see C49R1). L49R4 FIXED
+  `b9789aa5ad` (the comment names optional chains among the calls of `ensureSchema` read; C48R4's
+  disposition notes it).
+- M49R1 FIXED (see Q49R4).
+- Mutants on this round's new guards, each killed and its source restored: a binding that shadows
+  `settled`, at the pin of its mentions; `within` reading twice its deadline, at its whole read; a
+  `during` callback as a function expression, and one under a computed key, at the `during` pin; a
+  line no other pin reads changed in section L, at the digest; and, with intent-to-add files
+  removed after, a tracked `bot/feed.tsx` holding JSX, at the no-JSX pin, a tracked bot file whose
+  name is not UTF-8 with `--modified` listed for `--deleted`, at the raw-byte check, and a grant
+  call in a tracked `bot/daily.tsx`, at the grant pin.
