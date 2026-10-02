@@ -1035,7 +1035,9 @@ For off-box safety, sync the directory to S3 occasionally:
   verify's landed and not-landed counts, and the operation recovery passes): counts
   only; the summed milliseconds of the renew passes, the claimed login reads and the
   trips are `woc_freehold_authority_ms_total{measure}` (divide by the matching count
-  for a mean). `woc_freehold_receipt_growth{table, measure}` observes BOTH
+  for a mean). A lost COMMIT answer the verify proves did not land counts
+  `trip_verify_not_landed`, not `trip_failed`, so `trip_failed` is only a trip proved
+  never committed. `woc_freehold_receipt_growth{table, measure}` observes BOTH
   keep-forever authority tables, the receipts and `freehold_plot_claims`, by
   estimated rows and bytes. The claims table rewrites every live row on the 30 s
   cadence on columns no index covers, so those updates are HOT (fillfactor 80);
@@ -1068,10 +1070,17 @@ For off-box safety, sync the directory to S3 occasionally:
   column exists, and hold both until the boot schema transaction COMMITs (no lock
   timeout). A boot therefore queues behind every in-flight save and account write,
   and every later one on every realm queues behind the boot (measured with a realm
-  serving: about 60 ms). A transaction that writes `accounts` and then `characters`
-  can DEADLOCK with any boot, which takes the two the other way round; PostgreSQL
-  aborts one side after `deadlock_timeout` (1 s), and if the boot is the one aborted
-  the realm fails to start and is restarted. That hazard predates housing
+  serving: about 60 ms). ANY transaction that holds any lock on `accounts` and then
+  asks for one on `characters` can DEADLOCK with a boot, which takes them the other
+  way round: every effect-carrying or hooked character save (storage, bank ledger,
+  the Hearth trip) locks its account first, and so do the housing operation prepare
+  and the character delete. PostgreSQL aborts one side at once or after
+  `deadlock_timeout` (1 s). When such saves were in flight in the bench, the BOOT was
+  the side aborted every time: the process exits, the compose policy restarts it, and
+  a restart meets the same race while another realm keeps serving those saves. So
+  boot a realm while the other realms on its database are quiet, and expect the
+  aborted saves (40P01 in the realm log, `trip_failed` for a Hearth trip) to retry.
+  The hazard predates housing; changing the boot's lock order is owed
   (docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md measures it).
 - FIRST ROLLOUT OF THE HOUSING TABLES: the first boot that carries them also creates
   the foreign-key-bearing tables and the delete guards on `accounts` and `characters`
@@ -1083,15 +1092,29 @@ For off-box safety, sync the directory to S3 occasionally:
   REPAIRS a missing or disabled guard drops and recreates it under ACCESS EXCLUSIVE,
   so treat a repair boot the same way.
 - A CORRUPT Hearth row (a `ready_at_ms` past the database clock plus a whole
-  cooldown, which only a backward database clock step or a bad row produces) refuses
-  that account's remote key and counts `trip_corrupt` with a warn line; it is never
-  honored, and it stays refused until repaired. Find them with `SELECT account_id,
-  ready_at_ms FROM account_freehold_hearth WHERE ready_at_ms >
-  (EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::bigint + 3600000` (3,600,000 ms is
-  `HEARTH_KEY_COOLDOWN_MS`), and repair each by clamping it to a full cooldown from
-  now, which grants no free trip: `UPDATE account_freehold_hearth SET ready_at_ms =
-  (EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::bigint + 3600000, revision =
-  revision + 1, updated_at = now() WHERE account_id = $1`.
+  cooldown, which only a backward database clock step or a bad row produces) is never
+  honored. THE QUERY IS THE DETECTOR: a row already bad when its account logs in
+  reaches the realm as an ordinary cooldown (the login installs it and the realm's
+  own clock refuses the key first), so nothing counts or warns; only a key the realm
+  admits and the database then refuses counts `trip_corrupt` with a warn line. A
+  database clock step heals by itself once the clock is back within one cooldown of
+  the row (it then reads as an ordinary cooldown until `ready_at_ms`); a bad row
+  stays. Find and repair them in one guarded, idempotent statement, which clamps
+  each to a full cooldown from now and so grants no free trip: `UPDATE
+  account_freehold_hearth SET ready_at_ms = (EXTRACT(EPOCH FROM clock_timestamp()) *
+  1000)::bigint + 3600000, revision = revision + 1, updated_at = now() WHERE
+  ready_at_ms > (EXTRACT(EPOCH FROM clock_timestamp()) * 1000)::bigint + 3600000
+  RETURNING account_id` (3,600,000 ms is `HEARTH_KEY_COOLDOWN_MS`). A repair reaches a
+  player still online only after every character of the account has left that
+  realm and the realm has dropped the entry, or after a restart: the realm's copy of
+  the clock only ever moves forward.
+- THE ADVANCE TOKEN CHECK: a boot that finds `account_freehold_hearth.advance_token`
+  without its named CHECK puts it back `NOT VALID` (new tokens are checked, old rows
+  are not scanned). To finish that repair, null any non-hex token (`UPDATE
+  account_freehold_hearth SET advance_token = NULL WHERE advance_token !~
+  '^[0-9a-f]{32}$'`), then run `ALTER TABLE account_freehold_hearth VALIDATE
+  CONSTRAINT account_freehold_hearth_advance_token_shape`, which takes SHARE UPDATE
+  EXCLUSIVE and does not block writes.
 - A failed deactivation receipt erase logs `deactivation housing receipt erase
   failed` with no account id. The erase is idempotent; find the accounts to re-run
   with `SELECT DISTINCT r.account_id FROM freehold_operation_receipts r JOIN accounts

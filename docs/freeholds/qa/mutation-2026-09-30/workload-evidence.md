@@ -86,7 +86,11 @@ processes, each with its own holder, over a claims table grown to 198,500 rows (
 path reports three things: lock-wait samples (`pg_stat_activity` polled every 10 ms, attributed
 by statement text and process, so a sample is about 10 ms of one backend waiting), every
 SQLSTATE it threw, and the registry's own contention counters. A character save is modeled as
-its row UPDATE plus, where stated, a hold standing in for its other statements.
+its row UPDATE plus, where stated, a hold standing in for its other statements. Two limits on
+reading it: the 10 ms sampler sees a wait shorter than 10 ms only with a probability equal to
+its share of the interval, so "none" bounds a path's total lock wait to about one sample, not
+to zero; and the two "processes" are two pools in one Node event loop, so a client-side
+latency includes the other pool's JavaScript work.
 
 | Path | Load | Measured | Lock waits, errors |
 |---|---|---|---|
@@ -95,22 +99,32 @@ its row UPDATE plus, where stated, a hold standing in for its other statements.
 | the renewer at 5,000 wanted claims BESIDE the autosave burst (5,000 saves and 5,000 fenced writes, 4 workers each) | 3 cycles | pass 165, 203, 173 ms; renewed 5,000 each, missed 0, lost 0, lock timeouts 0, abandoned 0; saves p99 at most 0.8 ms | none, none |
 | two processes racing for 1,000 plots for 15 s (A's sessions end over the first 10 s, B logs each in at a random moment and retries a busy answer after 1 s; both renew every 1 s and flush every 3 s) | 3,071 B login reads | B acquired all 1,000 after 2,071 busy answers (at most 11 for one plot); A released 1,000, lost 0, missed 3; B login p50 0.7 ms, p99 1.8 ms | fenced write about 40 ms per process in total; none thrown, no 55P03, no 57014 |
 | the P9 verify (`FREEHOLD_VERIFY_WAIT_SQL` under `FREEHOLD_VERIFY_BOUNDS`) behind an in-flight save holding the row 20 ms, with the next save queued 5 ms later | 500 characters, 3 at a time | verify wait p50 15.3 ms, p99 16.4 ms; the queued save p50 10.7 ms, p99 11.6 ms, the SAME as the no-verify control (10.7, 11.6) | the waits the hold explains; none thrown |
+| the renewer's SYNCHRONOUS launch (what the flush bills to the profiler's `saves` bucket), the REAL `renewFreeholdClaims` against a checkout that never answers | 5,000 held claims, 2,500 of them unwanted (the release partition too), 200 launches after 20 warm-up | p50 2.29 ms, p99 4.05 ms, max 4.38 ms, inside one 50 ms tick | not a database path |
 
 The first-rollout boot ran the REAL `ensureSchema()` against a database built by an earlier
 `ensureSchema()` with the 07a objects then removed (a 07 realm's database), while an old realm
-served 8 save workers (row UPDATE plus 5 ms) and one account create-then-delete cycle every
-20 ms. Three rounds, each a first-rollout boot followed by a steady-state boot:
+served 8 save workers and one account create-then-delete cycle every 20 ms. Each round is a
+first-rollout boot followed by a steady-state boot. Two save shapes, because the deadlock below
+depends on which locks a save takes first:
+- PLAIN: every save is its row UPDATE plus 5 ms. Two runs, 3 rounds and then 5 (16 boots).
+- G1: half the save workers take the order every effect-carrying and every hooked save takes
+  (the manifest's G1 then G2): `accounts` FOR KEY SHARE, then the `characters` row FOR NO KEY
+  UPDATE, then the UPDATE plus 5 ms. One run of 5 rounds (10 boots). The workers save as fast as
+  they can, hundreds of saves a second, far above a realm's rate, so it bounds the hazard from
+  above rather than modeling a realm.
 
-| Boot | Wall | Old-realm saves finishing in the boot window | Lock waits |
-|---|---|---|---|
-| first rollout, rounds 1 to 3 | 64, 66, 66 ms | p99 at most 61.3 ms | the old realm's writers queue behind the boot for its duration |
-| steady state, rounds 2 and 3 | 59, 61 ms | p99 at most 8.9 ms | the same queue |
-| steady state, round 1 | 1,057 ms | max 1,053.8 ms | a DEADLOCK: the boot waited about 920 ms on `accounts`, then the old realm's create transaction was aborted with 40P01 |
+| Save shape | Boots | Boots that completed | 40P01 aborts | Old-realm saves through the boot window |
+|---|---|---|---|---|
+| plain | 16 | 16, about 55 to 66 ms each when no deadlock formed | 3, each an old account-create transaction (the boot waited out `deadlock_timeout` and lived) | p99 at most 63.6 ms outside the deadlocked boots (the queue behind the boot) |
+| G1 | 10 | NONE: every boot, first rollout and steady state alike, was the deadlock victim and exited | 10 boots, 29 G1 saves, 3 account creates | p99 up to 1,000 ms (the deadlock timeout) |
 
 Readings:
 
 - **No path threw a lock or statement timeout.** No 55P03 and no 57014 on any path in any phase;
-  the only SQLSTATE in either run is the boot deadlock below.
+  the only SQLSTATE in any run is the boot deadlock below.
+- **The renewer's main-thread launch is a few milliseconds at 5,000 claims.** p99 4.05 ms with
+  half the claims unwanted is what the flush bills to `saves` for this job; the per-chunk
+  continuations after its first await run off the tick, each bounded by one 256-claim chunk.
 - **The renewer and the autosave do not collide.** SKIP LOCKED passed over no row in three
   cycles beside a full burst, and the pass took 165 to 203 ms against the 30 s cadence.
 - **The race resolves through release, not takeover.** B's busy answers end when A's renewer
@@ -125,14 +139,29 @@ Readings:
   `SCHEMA` runs `ALTER TABLE characters ADD COLUMN IF NOT EXISTS` before
   `ALTER TABLE accounts ADD COLUMN IF NOT EXISTS`, and a no-op `ADD COLUMN IF NOT EXISTS` still
   takes ACCESS EXCLUSIVE (probed on this server). So the housing fragments' trigger creation runs
-  under locks the boot already holds, and the first-rollout boot measures the same as a steady
-  one.
-- **The boot deadlock is pre-existing, not 07a's.** A transaction that writes `accounts` and then
-  `characters` (the bench's account create) can deadlock with ANY boot, because the boot takes the
-  two in the other order. It happened once in six boots, on a STEADY-STATE boot, and PostgreSQL
-  resolved it at `deadlock_timeout` (1 s) by aborting the old realm's transaction. In general
-  either side can be the one aborted; a boot that loses fails, and the realm is restarted.
-  Recorded for the rollout docs, with any change to the boot's lock order left to the maintainer.
+  under locks the boot already holds, and a first-rollout boot measures the same as a steady one.
+- **Any boot can deadlock with a transaction that locks `accounts` before `characters`.** The
+  boot takes `characters` and then `accounts`, and ACCESS EXCLUSIVE conflicts with every lock
+  mode, so ANY lock held on `accounts` (a plain read's, the G1 FOR KEY SHARE) by a transaction
+  that then asks for ANY lock on `characters` closes the cycle. That is the order every
+  effect-carrying save and every hooked save takes (G1 then G2), the operation prepare's
+  (`accounts` then `characters` FOR KEY SHARE) and the character delete's. A second path: the
+  boot's first lock on `characters` is SHARE (the core `CREATE INDEX IF NOT EXISTS
+  characters_account`), upgraded to ACCESS EXCLUSIVE by the next statement, so a save that took
+  its G2 row lock beside that SHARE and then UPDATEs deadlocks on the upgrade.
+- **Which side loses depends on who waits first.** With plain saves the boot lived and an old
+  account create lost, 3 times in 16 boots. With G1-shaped saves in flight the BOOT lost every
+  time: PostgreSQL detected the cycle as the boot joined the wait queue and aborted it, and a boot
+  that fails exits the process (`server/main.ts`), which the compose policy restarts. At a real
+  realm's save rate the window is far narrower than this bench's, but a realm booting while
+  another realm on the same database serves effect-carrying saves can fail to start, and retries
+  meet the same race.
+- **It predates housing; 07a adds members.** The hazard is the core schema's lock order against
+  the G1 order that storage and bank-ledger saves already took. 07a adds the Hearth trip's hooked
+  save (and, once a kind exists, operation prepares and closes) to the class, and changes nothing
+  about the boot's order. Changing that order (taking `accounts` before `characters`, which would
+  expose a character INSERT's `characters`-then-`accounts` foreign-key order instead) is a
+  maintainer decision, recorded as owed.
 
 ## The script
 
@@ -976,6 +1005,8 @@ main().then(
 
 ## The first-rollout boot script
 
+`SAVE_SHAPE=plain` or `SAVE_SHAPE=g1` and `ROUNDS` select the run.
+
 ```ts
 // 07a first-rollout boot evidence against the scratch PostgreSQL 16, in a
 // THROWAWAY DATABASE (created and dropped here, never a shared one): the REAL
@@ -995,6 +1026,12 @@ const dbUrl = (() => {
   return u.toString();
 })();
 const PLAYERS = 5_000;
+// SAVE_SHAPE=plain: a save is its row UPDATE. SAVE_SHAPE=g1: half the save
+// workers take the effect-carrying and hooked saves' order instead, the
+// account FOR KEY SHARE (G1) first, then the character row (G2), then the
+// UPDATE.
+const SAVE_SHAPE = process.env.SAVE_SHAPE === 'g1' ? 'g1' : 'plain';
+const ROUNDS = Number(process.env.ROUNDS ?? 3);
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 const pct = (xs: number[], p: number) => {
   if (xs.length === 0) return 0;
@@ -1047,9 +1084,9 @@ async function main() {
       `INSERT INTO characters (account_id, name, class, realm, level, state)
        SELECT id, 'Bench' || id, 'warrior', 'bench', 5, '{}'::jsonb FROM accounts`,
     );
-    const ids = (await old.query('SELECT id FROM characters ORDER BY id')).rows.map((r) =>
-      Number(r.id),
-    );
+    const rows = (await old.query('SELECT id, account_id FROM characters ORDER BY id')).rows;
+    const ids = rows.map((r) => Number(r.id));
+    const accountOf = new Map(rows.map((r) => [Number(r.id), Number(r.account_id)]));
     await old.query('ANALYZE');
 
     const errors = new Map<string, number>();
@@ -1080,11 +1117,16 @@ async function main() {
       }
     };
     const workers = [
-      ...Array.from({ length: 8 }, async () => {
+      ...Array.from({ length: 8 }, async (_, worker) => {
+        const g1 = SAVE_SHAPE === 'g1' && worker % 2 === 0;
         while (load.on) {
           const id = ids[Math.floor(Math.random() * ids.length)];
           const started = performance.now();
-          await tx('old save', async (c) => {
+          await tx(g1 ? 'old G1 save' : 'old save', async (c) => {
+            if (g1) {
+              await c.query('SELECT id FROM accounts WHERE id = $1 FOR KEY SHARE', [accountOf.get(id)]);
+              await c.query('SELECT id FROM characters WHERE id = $1 FOR NO KEY UPDATE', [id]);
+            }
             await c.query(
               `UPDATE characters SET state = jsonb_build_object('t', $2::int), level = level WHERE id = $1`,
               [id, ++seq],
@@ -1159,7 +1201,8 @@ async function main() {
     };
 
     await sleep(1_000);
-    for (let round = 1; round <= 3; round++) {
+    console.log(`save shape ${SAVE_SHAPE}, ${ROUNDS} rounds`);
+    for (let round = 1; round <= ROUNDS; round++) {
       await old.query(UNDO_07A);
       const shape = await old.query(
         `SELECT to_regclass('freehold_plot_claims') IS NULL AND to_regclass('freehold_operations') IS NULL AS is07`,
@@ -1196,4 +1239,64 @@ main().then(
     process.exit(1);
   },
 );
+```
+
+## The renewer launch script
+
+```ts
+// The renewer's synchronous launch (what the flush bills to the profiler's
+// saves bucket) at 5,000 held claims, 2,500 of them unwanted so the release
+// partition is exercised too: the REAL renewFreeholdClaims against a pool whose
+// checkout never answers, so the call returns at its first await. 200 launches,
+// each on a fresh registry; the first 20 discarded as warm-up.
+import {
+  createFreeholdClaimRegistry,
+  renewFreeholdClaims,
+} from '../../../../server/freehold_claim_registry';
+
+const HELD = 5_000;
+const ownerKey = (accountId: number) => `account:${accountId}`;
+const claims = Array.from({ length: HELD }, (_, i) => ({
+  plotId: `plot:${(i * 2654435761 % 2 ** 32).toString(16).padStart(8, '0')}${i}`,
+  accountId: i + 1,
+  generation: '1',
+  acquiredAtMs: 0,
+}));
+// The wiring's predicate shape: the store's map, the sim's map, the in-flight
+// map, the young-claim age; half the owners are wanted.
+const storeRefs = new Map<string, number>(
+  claims.filter((c) => c.accountId % 2 === 0).map((c) => [ownerKey(c.accountId), 1]),
+);
+const simLive = new Map<string, unknown>();
+const stuck = { connect: () => new Promise<never>(() => {}) };
+const samples: number[] = [];
+for (let run = 0; run < 220; run++) {
+  const registry = createFreeholdClaimRegistry();
+  for (const claim of claims) registry.record(claim);
+  const start = performance.now();
+  void renewFreeholdClaims({
+    registry,
+    pool: stuck as never,
+    holder: 'bench#holder',
+    ttlSeconds: 90,
+    wanted: (claim, now) => {
+      const key = ownerKey(claim.accountId);
+      return (
+        (storeRefs.get(key) ?? 0) > 0 ||
+        simLive.has(key) ||
+        registry.inFlight(claim.plotId) ||
+        now - claim.acquiredAtMs < 10_000
+      );
+    },
+    nowMs: () => 1_000_000,
+    warn: () => {},
+  });
+  if (run >= 20) samples.push(performance.now() - start);
+}
+samples.sort((a, b) => a - b);
+const at = (p: number) => samples[Math.min(samples.length - 1, Math.floor(p * samples.length))];
+console.log(
+  `renewer launch at ${HELD} held (half unwanted), ${samples.length} launches: p50 ${at(0.5).toFixed(2)} ms, p99 ${at(0.99).toFixed(2)} ms, max ${samples[samples.length - 1].toFixed(2)} ms`,
+);
+process.exit(0);
 ```

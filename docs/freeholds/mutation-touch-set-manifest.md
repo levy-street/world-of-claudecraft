@@ -525,7 +525,13 @@ one pass resolves every intent an account can hold; exact under G5a) · G6 `INSE
 CONFLICT (operation_id) DO NOTHING RETURNING` · C. Answers `prepared`, `duplicate` (same
 id and fingerprint, still open), `closed` (a receipt holds the id with the SAME
 fingerprint, with its outcome), `conflict` (same id, different fingerprint, open or
-closed: a closed id never reports "applied" for a different request) or `capacity`.
+closed: a closed id never reports "applied" for a different request; and ANOTHER account's
+id, open or closed, whatever its fingerprint) or `capacity`. A close never tells a caller
+that an id it does not own exists either: with no open intent, only the caller's own
+receipt answers `already_closed`, any other `missing`. The id itself must not be a
+cross-account handle: 08, which registers the first kind, mints ids server-side and
+crypto-random, or keys them by account, never accepting a client-chosen one (a client could
+otherwise take an id another account will use and leave it `conflict` forever).
 
 **P8. Operation apply** (a hook participant inside P1; the intent's account is a declared
 account participant, so it was locked at G1): G5b · G6 `SELECT ... FROM
@@ -624,10 +630,12 @@ places all four in the late block, in the order plots, Hearth, claims, operation
 (`tests/schema_wiring.test.ts` pins them at storage minus four to storage minus one).
 "Catalog-only" means no lock on a housing or parent TABLE: catalog reads, plus the two
 `CREATE OR REPLACE FUNCTION` rewrites of the guard and erase functions, which rewrite their
-`pg_proc` rows on EVERY boot (keeping their oids) and lock only those function objects. The
-pg suite proves it: re-applying both fragments completes inside a 1 s `lock_timeout` beside
-a writer holding ROW EXCLUSIVE on all five tables and keeps every index, trigger,
-constraint and function oid, while each unprobed statement it replaces times out there
+`pg_proc` rows on EVERY boot (keeping their oids): a catalog row write, no table lock. The
+pg suite proves it for all four housing fragments: re-applying them completes inside a 1 s
+`lock_timeout` beside a writer holding ROW EXCLUSIVE on every table they name (the plot,
+Hearth, claims, intents and receipts tables and both parents) and keeps every index,
+trigger, constraint and function oid, while each unprobed statement it replaces times out
+there; and the operation fragment hands the caller's own `search_path` back
 (`tests/server/freehold_mutation.pg.test.ts`, section K). The index probes check a NAME
 only, as `IF NOT EXISTS` does: a same-named index with another definition is never
 repaired, unlike the trigger probe, which checks the exact shape. The Hearth column probe
@@ -639,23 +647,27 @@ transaction with no `lock_timeout`. It takes no parent lock a steady-state boot 
 (above): every boot queues behind each in-flight `characters` and `accounts` writer on the
 running fleet, and every later save and account write on every realm queues behind the
 boot until its COMMIT (measured with an old realm serving: about 65 ms for the first
-rollout, the same as a steady-state boot). A transaction that writes `accounts` and then
-`characters` can DEADLOCK with ANY boot, because the boot takes the two in the other order:
-PostgreSQL aborts one side at `deadlock_timeout` (1 s), measured once in six boots on a
-STEADY-STATE boot, so the hazard is the core schema's, not 07a's; a boot that loses fails
-and the realm is restarted. Do the first rollout (and any trigger repair boot) in a quiet
-window anyway, since it is the one boot that also builds the new tables; `DEPLOY.md`
-carries the operator note.
+rollout, the same as a steady-state boot). ANY boot can DEADLOCK with a transaction that
+holds any lock on `accounts` and then asks for one on `characters`, which is this
+manifest's own G1-then-G2 order: every effect-carrying or hooked save (the Hearth trip
+included), the operation prepare and the character delete. A second path: the boot's first
+`characters` lock is SHARE (the core `characters_account` index create), upgraded to ACCESS
+EXCLUSIVE by the next statement, against a save that took its G2 row lock beside it. With
+G1-shaped saves in flight the bench's boot was the victim every time, and a boot that loses
+exits and is restarted (R-11). Do the first rollout, any trigger repair boot, and any boot
+beside other realms serving such saves, in a quiet window; `DEPLOY.md` carries the operator
+note.
 
 ## 6. Pairwise deadlock review
 
 - P1 against P2 (a trip and a store write of one plot): both take G4 first on the one claim
   row, and the second waits. P1 waits under its 2 s lock bound (a timeout answers a refused
-  trip). The ordinary P2 statement carries NO lock bound: it waits under the pool's 15 s
-  statement default, so its real bound is the trip transaction's own walls, and at
-  shutdown the 10 s drain deadline gives up on it first (the ambiguous-retry and
-  first-insert transactions carry a 2 s lock bound, `FREEHOLD_FENCED_WRITE_BOUNDS`, and a
-  timeout there is a thrown blip the store retries). No cycle.
+  trip). The ordinary P2 statement carries NO lock bound: its real bound is the LESSER of
+  the pool's 15 s statement default and the trip transaction's remaining wall. At shutdown
+  the 10 s drain stops awaiting it first, but the statement keeps its pool client until one
+  of those bounds fires (R-12). The ambiguous-retry and first-insert transactions carry a
+  2 s lock bound, `FREEHOLD_FENCED_WRITE_BOUNDS`, and a timeout there is a thrown blip the
+  store retries. No cycle.
 - P1 against P4 (a trip and a takeover): the takeover's upsert waits on the trip's G4 lock;
   when the trip commits, the upsert re-evaluates its WHERE on the latest version and, if
   the old claim is still expired, advances the generation. The trip is ordered BEFORE the
@@ -940,6 +952,12 @@ proved or measured as of the 07a QA: the plan pins in the two pg suites
 (`tests/server/freehold_claim.pg.test.ts`, `tests/server/freehold_mutation.pg.test.ts`
 section J), and the drain, renewer, contention, P9 and first-rollout evidence in
 [qa/mutation-2026-09-30/workload-evidence.md](qa/mutation-2026-09-30/workload-evidence.md).
+The pool arithmetic at the flush (the realm pool's 10 clients, the background gate
+admitting all but 3, and the three periodic clients outside it, the renewer, the lease
+heartbeat and the bank-ledger FIFO tail, which can take all 3 at that instant: composition
+headroom, not a reserve) is stated at `renewGameFreeholdClaims`
+(`server/freehold_persist_wiring.ts`) and pinned as literals in
+`tests/server/tunables.test.ts`.
 
 ## 11. Where each acceptance finding landed
 
@@ -1041,6 +1059,18 @@ merge in a `finally`; N4 the server default pin; N5 the log pin; N6 the 15 route
   hooked save that ran long shortens that cooldown by at most its own 65 s wall, against a
   3,600,000 ms cooldown. Deliberate: one epoch per entry keeps the counters and the
   cooldown judgment consistent, and the corrupt test already reads `clock_timestamp()`.
+
+- R-11 (revision 6, the QA): ANY boot can deadlock with a transaction that locks `accounts`
+  before `characters` (P12), and with effect-carrying or hooked saves in flight the boot is
+  the side PostgreSQL aborts, so the realm exits and is restarted. It predates housing (the
+  core schema's lock order against the storage and ledger saves' G1 order); 07a adds the
+  Hearth trip's hooked save to the class. Bounded only operationally (boot beside quiet
+  realms); changing the boot's lock order is owed to the maintainer.
+- R-12 (revision 6, the QA): at shutdown the drain stops awaiting a P2 write blocked on a
+  claim row a trip holds, but that statement keeps its pool client for up to the pool's
+  15 s statement default; at the drain's concurrency of 8 on a 10-client pool that can
+  leave two clients for the renewer stop, the claim release and the lease release, each of
+  which has its own bound and none of which can then over-run it.
 
 ## 13. The persistence-rollout contract edits this work owes
 
@@ -1146,7 +1176,10 @@ other finding is applied or recorded here.
 ## 16. What the QA of the built code refined (revision 6)
 
 The 07a QA (2026-10-01) read `0008427d14..11316ac3cd` with fresh domain reviewers and fixed
-in the code what they found; the record is in `docs/freeholds/qa/persistence-2026-09-08/findings.md`.
+in the code what they found. Every finding of both rounds, with what became of it (fixed
+with its commit, ruled, residual or flagged for the maintainer), is in
+[qa/mutation-2026-09-30/qa-findings.md](qa/mutation-2026-09-30/qa-findings.md), and the
+run's record in the 07a QA section of `docs/freeholds/qa/persistence-2026-09-08/findings.md`.
 What changed the contract above:
 - AS BUILT, two names the packet used were never built as exports, on purpose:
   `releaseFreeholdClaim` (a per-plot release is the renewer's unwanted arm, P6, and the
@@ -1165,9 +1198,12 @@ What changed the contract above:
   same plot; a plot-writing mutation must run inside the store's FIFO.
 - A throw after a PROVED COMMIT reports `committed`, never `failed`; the trip's post-COMMIT
   steps are caught and counted; its ticket is bound to the character and the lease nonce.
-- The renewer bills its synchronous launch to the `saves` phase, stops (bounded by its pass
-  wall) before the shutdown release, and lock timeouts in a fenced write, a renew chunk or
-  a release chunk are counted; the login's busy arm is 55P03 only (P4).
+- The renewer bills its synchronous launch to the profiler's `saves` bucket (p99 4 ms at
+  5,000 claims, measured), stops before the shutdown release (bounded by one renew chunk's
+  wall, `FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs`, and a chunk that reaches its connection after
+  the stop sends nothing), and lock timeouts in a fenced write, a renew chunk or a release
+  chunk are counted; the login's busy arm is 55P03 only, counted with busy in one place
+  (P4).
 - The fragments' DDL path names no `pg_catalog`, so a same-named decoy in the target schema
   cannot bind into a CHECK (proved in real PG with a control that names it); the Hearth
   token CHECK is repaired by name, `NOT VALID` (P12).
@@ -1182,3 +1218,16 @@ What changed the contract above:
 - Takeover counts every generation advance over an existing row, a realm's own re-acquire
   after its release included (P6 says so, and so does the metric's help); a re-claim over a
   released row is the common case (the QA's login bench: 2,500 of 5,000).
+- The fix round's own fresh readers (eight) refined it further: the persist store re-reads
+  a lost-claim entry only when it owes nothing (a dirty, quiesced or capture-holding entry
+  replays, since a re-read would rebase its unwritten work onto another realm's row), and a
+  re-read moves the Hearth clock forward only; the trip ticket is the SAME session object;
+  the trip's clock reads can no longer escape before its outcome is counted, and a throw
+  after it is warned with the error's class only; a throwing live apply is reported through
+  `onCommittedThrew`; the renew chunk re-checks the stop inside its transaction; every
+  housing export statement is a named constant with its columns pinned; the Hearth token
+  CHECK is probed by name alone. The authority snapshot is still read three times per
+  scrape, deliberately: each read is O(1) (three small counter copies), so a second memo
+  beside `housingStats` would buy nothing. The storage fragment still names `pg_catalog`
+  second (its decoy exposure is owed against that fragment, not changed here). R-11 and
+  R-12 are new.
