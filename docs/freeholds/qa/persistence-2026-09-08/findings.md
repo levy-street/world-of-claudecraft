@@ -5828,8 +5828,14 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - ROUND FORTY-TWO, eight fresh readers over round forty-one: 21 findings, none blocking, 7
   should-fix, every reader passing, four with no should-fix. Every game route literal in the bot's
   code is pinned to the client member that sends it and the daily grant is read whole; section L's
-  deadline covers the dump case's boots and the cancelled sleep; the bot's grant comments name the
-  ledger's account and the key's three parts. Fixed in `08e04fb5dc`; L42R4 flagged.
+  deadline covers the dump case's second and third boots and the cancelled sleep (worded so in
+  round forty-three, C43R1); the bot's grant comments name the ledger's account and the key's
+  three parts. Fixed in `08e04fb5dc`; L42R4 flagged.
+- ROUND FORTY-THREE, eight fresh readers over round forty-two: 21 findings, none blocking, 8
+  should-fix, every reader passing, two with no should-fix. Section L reads every boot it waits on
+  with a deadline, a stopped boot checked at its read; the bot route pin filters on the text its
+  grep finds and proves every literal shape on a sample; the rest were record slips. Fixed in
+  `47c18284f6`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5861,7 +5867,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then 647,
   then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then
   648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648,
-  then 648 passed, never a skip.
+  then 648, then 648 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):

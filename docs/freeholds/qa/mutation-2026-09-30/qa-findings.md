@@ -3379,7 +3379,8 @@ for another; they now say what the dedupe keys on and nothing about its count.
 - M41R1 FIXED `799052ee16` (section L reads each rerun it expects to have returned, `rerun`,
   `tableRerun` and `leafRerun`, through a 5 s deadline, so a rerun that never returns fails the
   case with time left for its cleanup, and later cases are not held behind it; the dump case's
-  boots and the cancelled sleep too, from round forty-two, T42R3). M41R2 FIXED (see L41R1).
+  second and third boots and the cancelled sleep too, from round forty-two, T42R3, worded so in
+  round forty-three, C43R1). M41R2 FIXED (see L41R1).
 - Mutants on this round's new guards, each killed and its source restored: a second client method
   sending the grant route; a request made outside `call()`; an empty case falling into the
   voice-state case; `bound` reading one level of pattern only, a guard mutant; and, in section L,
@@ -3394,10 +3395,10 @@ writes a game API route to the client member that sends it, so a route requested
 or by an aliased sender fails, and reads `grantDailyActive` whole, its dedupe key's template
 included; the client's comment says what its read covers, and the fall-through case read names
 Biome's rule as its boundary; section L installs the dump case's spy where its finally restores it
-and reads the dump case's boots and the cancelled sleep through its deadline; bot/logic.ts says
-the server's ledger is unique on the linked account and the grant dedupe key, and bot/CLAUDE.md
-and bot/main.ts name the key's three parts; the change log with it; kept whole for bisect), and
-the commit that adds this section.
+and reads the dump case's second and third boots and the cancelled sleep through its deadline
+(worded so in round forty-three, C43R1); bot/logic.ts says the server's ledger is unique on the
+linked account and the grant dedupe key, and bot/CLAUDE.md and bot/main.ts name the key's three
+parts; the change log with it; kept whole for bisect), and the commit that adds this section.
 
 | Reader | Verdict | Findings |
 |---|---|---|
@@ -3415,7 +3416,8 @@ nice-to-have, every reader passing, and four (server hot path, privacy and secur
 performance, migration safety) with no should-fix. Two readers found the grant route's one sender
 pinned only inside the client; every route literal in the bot's code is now pinned to the member
 that sends it. Four found the `claimDailyActive` comment's dedupe claim narrower than the ledger's
-account and key; it now names them. Three record slips were fixed in place.
+account and key; it now names them. Five record slips were fixed in place (counted so in round
+forty-three, C43R2).
 
 - C42R1 FIXED `08e04fb5dc` (with T42R1, S42R1 and Q42R5: every string or template part in the
   bot's code that writes `/internal/discord/` is listed with its file and member, and is exactly
@@ -3434,13 +3436,15 @@ account and key; it now names them. Three record slips were fixed in place.
 - D42R1 FIXED (see L42R1). Beside its findings, the report noted that the dump case installed its
   query spy before the statement pins that precede the try whose finally restores it, so a pin's
   failure left the spy for later cases; it is installed at the try now (`08e04fb5dc`).
-- T42R1 FIXED (see C42R1). T42R2 FIXED `08e04fb5dc` (the fall-through read's comment says a clause
-  with statements that falls through is refused by Biome's noFallthroughSwitchClause, an error
-  under the recommended preset; T41R4's disposition notes it). T42R3 FIXED `08e04fb5dc` (the dump
-  case's two boots and the working session's cancelled sleep are read through the deadline too, so
-  a cancel that never lands fails the case in time; M41R1's disposition notes it). T42R4 FIXED
-  `08e04fb5dc` (`grantDailyActive` is read whole: the claim before the call, the server call and
-  the dedupe key's template).
+- T42R1 FIXED (see C42R1). T42R2 FIXED `08e04fb5dc` (with Q42R6, named so in round forty-three,
+  Q43R1: the fall-through read's comment says a clause with statements that falls through is
+  refused by Biome's noFallthroughSwitchClause, an error under the recommended preset; T41R4's
+  disposition notes it). T42R3 FIXED `08e04fb5dc` (the dump case's second and third boots and the
+  working session's cancelled sleep are read through the deadline too, so a cancel that never
+  lands fails the case in time; M41R1's disposition notes it; the first boot, the boot behind a
+  hold and the cleanup's wait too, from round forty-three, C43R1). T42R4 FIXED `08e04fb5dc`
+  (`grantDailyActive` is read whole: the claim before the call, the server call and the dedupe
+  key's template).
 - L42R1 FIXED `08e04fb5dc` (with H42R1, D42R1 and C42R2: `claimDailyActive`'s comment says the
   server dedupes too, its reward ledger unique on the linked account and the grant dedupe key, and
   claims no outcome past that; L41R1's disposition notes it). L42R2 FIXED in this record (with
@@ -3452,4 +3456,65 @@ account and key; it now names them. Three record slips were fixed in place.
 - Mutants on this round's new guards, each killed and its source restored: a game route requested
   from another bot file; an aliased sender in the client; the dedupe key without its day; the
   claim made after the call; and, in section L, the cancel never sent to the working session,
-  which fails case 3 at its deadline, the later case passing.
+  which fails case 3 at its deadline, the other three cases passing (worded so in round
+  forty-three, L43R4).
+
+## Round forty-three: eight fresh readers over round forty-two (`6a9dc9cdb1..1df2e74943`)
+
+Round forty-three's commits: `47c18284f6` (section L reads the dump case's first boot through its
+deadline and checks at each stopped boot's read that it ended with an error; the boot behind a
+hold is read through a ten second deadline and fails if it never settles, and the dump case's
+cleanup wait is bounded; the bot route pin filters on the slashless text its grep finds, a sample
+proving it catches every literal shape a route can sit in; the client's comment drops a claim past
+its stated boundary; the manifest's forty-first entry is rewrapped and names round forty-two; kept
+whole for bisect), and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C43R1 to C43R3 |
+| qa-checklist | PASS | Q43R1 to Q43R4 |
+| server hot path | PASS | H43R1, H43R2 |
+| privacy and security | PASS | S43R1 |
+| database performance | PASS | none |
+| test coverage | PASS | T43R1 to T43R5 |
+| docs librarian | PASS | L43R1 to L43R4 |
+| migration safety | PASS | M43R1, M43R2 |
+
+21 findings: none blocking, 8 should-fix (C43R1, C43R2, Q43R1, Q43R2, H43R1, T43R1, L43R1, M43R1),
+13 nice-to-have, every reader passing, and two (privacy and security, database performance) with
+no should-fix, database performance with no finding at all. Four readers found the dump case's
+first boot read with no deadline while the record and the ledger said the deadline covered the
+dump case's boots; every boot section L reads now has one. The rest were record slips: a count, a
+one-way cross-reference and a change log entry edited in place without a note.
+
+- C43R1 FIXED `47c18284f6` (with H43R1, T43R1 and M43R1: the dump case reads every boot it stops
+  through the five second deadline and checks at the read that it ended with an error, the boot
+  behind a hold is read through a ten second deadline and fails if it never settles, and round
+  forty-two's intro, T42R3 and M41R1's note say which boots round forty-two bounded; T42R3's
+  disposition notes it). C43R2 FIXED in this record (with Q43R2 and L43R2: round forty-two's
+  summary counts five record slips). C43R3 FIXED (see H43R2).
+- Q43R1 FIXED in this record (T42R2 names Q42R6). Q43R2 FIXED (see C43R2). Q43R3 FIXED (see
+  L43R1). Q43R4 FIXED `47c18284f6` (the client's comment drops "by any means", so its claim stops
+  at its stated boundary).
+- H43R1 FIXED (see C43R1). H43R2 FIXED `47c18284f6` (with C43R3, T43R3, L43R3 and T43R4: the route
+  pin filters on `internal/discord/`, the text its grep finds, so a route written without its
+  leading slash is listed; a sample proves the filter catches a string, a plain template and a
+  template's head, middle and tail).
+- S43R1 FIXED `47c18284f6` (with T43R2 and M43R2: the dump case's cleanup reads its boots through
+  the deadline, so a hung boot cannot hold the cleanup past the case's timeout; the wide deadline
+  T43R2 asked for on the boot behind a hold is C43R1's).
+- T43R1 FIXED (see C43R1). T43R2 FIXED (see S43R1). T43R3 FIXED (see H43R2). T43R4 FIXED (see
+  H43R2). T43R5 FIXED `47c18284f6` (a stopped boot's outcome is checked where it is read, so a
+  deadline that fires fails at that read, not at a later count).
+- L43R1 FIXED `47c18284f6` (with Q43R3: the manifest's forty-first entry is rewrapped to
+  98 columns and names round forty-two, Q42R4, for the key's three parts). L43R2 FIXED (see
+  C43R2). L43R3 FIXED (see H43R2). L43R4 FIXED in this record (round forty-two's mutants bullet
+  says the other three cases passed).
+- M43R1 FIXED (see C43R1). M43R2 FIXED (see S43R1).
+- Mutants on this round's new guards, each killed and its source restored: a game route written
+  without its leading slash in another bot file; a game route in a template's middle part in
+  another bot file; the route filter without its template middle arm; the route filter back on the
+  leading slash; and, in section L, the dump case's first boot never settling, which fails at its
+  read after the five second deadline; that boot finishing instead of ending with an error, which
+  fails at its read; and the boot behind a hold never settling, which fails both cases that hold
+  one after the ten second deadline.
