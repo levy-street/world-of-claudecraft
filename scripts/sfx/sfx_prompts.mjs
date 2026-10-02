@@ -627,6 +627,26 @@ export const SFX = [
     prompt:
       'A large explosion used when the Terrorspark Groundshaker shell lands. Single blast, no music, no voice.',
   },
+  // The fragmentation shell's three layers, rendered by scripts/gen_groundshaker_frag_sfx.mjs.
+  {
+    key: 'impact_groundshaker_frag_burst',
+    custom: true,
+    duration: 0.9,
+    prompt:
+      'A black-powder shell bursting in the air, a whump-crack with tumbling iron. Single burst, no music.',
+  },
+  {
+    key: 'impact_groundshaker_frag_bomblet',
+    custom: true,
+    duration: 0.5,
+    prompt: 'A small black-powder bomblet popping on the ground with a spray of dirt. Single pop.',
+  },
+  {
+    key: 'impact_groundshaker_frag_tail',
+    custom: true,
+    duration: 1.9,
+    prompt: 'Dirt clods and pebbles pattering down over a fading explosion rumble. No music.',
+  },
   {
     key: 'spell_nova',
     custom: true,

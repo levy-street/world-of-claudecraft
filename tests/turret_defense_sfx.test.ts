@@ -9,6 +9,7 @@ import {
   TURRET_BREACH_SFX,
   TURRET_FIRE_SFX,
   TURRET_FRAG_BURST_SFX,
+  TURRET_FRAG_TAIL_SFX,
   TURRET_IMPACT_SFX,
   TURRET_ROLL_SFX,
   TURRET_SLAM_SFX,
@@ -18,7 +19,10 @@ import {
   type TurretSfxOwnShot,
   type TurretSfxShots,
   turretBlastSize,
+  turretBombletDraw,
   turretBreachCueInto,
+  turretFragTailCueInto,
+  turretHeardInto,
   turretSfxCueInto,
   turretSlamCueInto,
 } from '../src/game/turret_defense_sfx';
@@ -30,7 +34,7 @@ import {
 import { fireAndFlyLookTemplate } from '../src/sim/content/fire_and_fly_looks';
 import type { TurretEvent, TurretHit } from '../src/sim/minigames/turret_defense';
 import type { TurretFeedback } from '../src/sim/minigames/turret_feedback';
-import { TURRET_BOMBLETS } from '../src/sim/minigames/turret_fragmentation';
+import { TURRET_BOMBLETS, turretFragBomblets } from '../src/sim/minigames/turret_fragmentation';
 import { TurretOwnShotLedger } from '../src/ui/hud/vehicle/turret_own_shot_core';
 import type { TurretSessionView } from '../src/world_api/vehicles';
 import { resolveArmedTurretPlan } from './helpers/turret_armed_plan';
@@ -215,6 +219,7 @@ describe('Fire and Fly sound player', () => {
           TURRET_ROLL_SFX,
           TURRET_FRAG_BURST_SFX,
           TURRET_BOMBLET_SFX,
+          TURRET_FRAG_TAIL_SFX,
         ]),
         ...templates.flatMap((id) => [`${id}_hurt`, `${id}_death`]),
       ].sort(),
@@ -475,15 +480,41 @@ const fragBurst: TurretEvent = {
   z: 230,
   bomblets: [],
 };
-const bomblet = (index: number, hits: TurretHit[] = []): TurretEvent => ({
+const bomblet = (index: number, hits: TurretHit[] = [], x = 100, z = 230): TurretEvent => ({
   type: 'bomblet',
   shotId: 4,
   index,
-  x: 100,
+  x,
   y: 5,
-  z: 230,
+  z,
   hits,
 });
+
+/** The frag's real star from the tower at origin toward (100, 230), burst at tick 16. */
+const STAR = turretFragBomblets(100, 230, 0, 1, 16);
+/** The whole frag as the engine's feedback: the burst, then each bomblet on its landing tick. */
+function fragRing(firstSeq: number): TurretFeedback[] {
+  return [
+    entry(firstSeq, 16, fragBurst),
+    ...STAR.map((b, i) => entry(firstSeq + 1 + i, b.landTick, bomblet(b.index, [], b.x, b.z))),
+  ];
+}
+/** Feeds `ring` one sim tick (50 ms) at a time from `from` to `to`; returns every play. */
+function playTicks(
+  sounds: TurretDefenseSfx,
+  s: ReturnType<typeof sink>,
+  ring: TurretFeedback[],
+  from: number,
+  to: number,
+  clockMs: { now: number },
+  view: (entries: TurretFeedback[]) => TurretSessionView = session,
+) {
+  for (let tick = from; tick <= to; tick++) {
+    clockMs.now = tick * 50;
+    sounds.update(view(ring.filter((e) => e.tick <= tick)), tick);
+  }
+  return s.playAt.mock.calls;
+}
 
 describe('Fire and Fly weapon sound cues', () => {
   it("ships every weapon clip as a spatial manifest key; the slam is never the breach's", () => {
@@ -493,6 +524,7 @@ describe('Fire and Fly weapon sound cues', () => {
       TURRET_ROLL_SFX,
       TURRET_FRAG_BURST_SFX,
       TURRET_BOMBLET_SFX,
+      TURRET_FRAG_TAIL_SFX,
     ]) {
       expect(clips[key]?.spatial, key).toBe(true);
     }
@@ -524,24 +556,75 @@ describe('Fire and Fly weapon sound cues', () => {
     expect(burst?.z).toBeCloseTo(200 + 15.7, 9);
   });
 
-  it('booms each bomblet light and bright on its own cooldown, cut short but the last', () => {
-    const shell = { ...(turretSfxCueInto(impact([]), origin, cue()) as TurretSfxCue) };
-    const first = { ...(turretSfxCueInto(bomblet(0), origin, cue()) as TurretSfxCue) };
-    expect(first).toMatchObject({ key: TURRET_BOMBLET_SFX, gain: 0.45, rate: 1.4, x: 100 });
-    expect(first.z).toBeCloseTo(200 + 15.7, 9);
-    expect(first.gain).toBeLessThan(shell.gain);
-    expect(first.cooldownKey).toBeTruthy();
-    expect(first.cooldownKey).not.toBe(TURRET_IMPACT_SFX);
-    expect(first.release).toBeGreaterThan(0);
-    expect(first.cooldown).toBe(0);
-    expect(turretSfxCueInto(bomblet(TURRET_BOMBLETS - 1), origin, cue())?.release).toBe(0);
+  it('ships the frag as its own three black-powder layers, loaded with the seat only', () => {
+    const clips: Record<string, { preload: string; category: string; gain: number }> = SFX_CLIPS;
+    const keys = [TURRET_FRAG_BURST_SFX, TURRET_BOMBLET_SFX, TURRET_FRAG_TAIL_SFX];
+    expect(new Set([...keys, TURRET_IMPACT_SFX, 'impact_warrior_shieldcrack']).size).toBe(5);
+    for (const key of keys) {
+      expect(clips[key], key).toMatchObject({ preload: 'lazy', category: 'combat' });
+    }
+    expect(clips[TURRET_FRAG_BURST_SFX].gain).toBeGreaterThan(clips[TURRET_BOMBLET_SFX].gain);
+    expect(clips[TURRET_BOMBLET_SFX].gain).toBeGreaterThan(clips[TURRET_FRAG_TAIL_SFX].gain);
   });
 
-  it('a reused cue drops the bomblet cut and cooldown for the next sound', () => {
+  it('pops each bomblet where it lands, whole, on its own cooldown, with its own stable level and pitch', () => {
+    const first = { ...(turretSfxCueInto(bomblet(0), origin, cue()) as TurretSfxCue) };
+    expect(first).toMatchObject({ key: TURRET_BOMBLET_SFX, x: 100, jitter: false, release: 0 });
+    expect(first.z).toBeCloseTo(200 + 15.7, 9);
+    expect(first.cooldownKey).toBeTruthy();
+    expect(first.cooldownKey).not.toBe(TURRET_BOMBLET_SFX);
+    expect(first.cooldown).toBe(0);
+    const again = turretSfxCueInto(bomblet(0), origin, cue());
+    expect(again).toMatchObject({ gain: first.gain, rate: first.rate });
+    const looks = new Set<string>();
+    for (let index = 0; index < TURRET_BOMBLETS; index++) {
+      const one = turretSfxCueInto(bomblet(index), origin, cue()) as TurretSfxCue;
+      expect(20 * Math.log10(one.gain)).toBeGreaterThanOrEqual(-1);
+      expect(20 * Math.log10(one.gain)).toBeLessThan(1);
+      expect(one.rate).toBeGreaterThanOrEqual(0.9);
+      expect(one.rate).toBeLessThan(1.1);
+      looks.add(`${one.gain}:${one.rate}`);
+    }
+    expect(looks.size).toBe(TURRET_BOMBLETS);
+  });
+
+  it('draws each bomblet from its shot and index only, spread over the whole range', () => {
+    expect(turretBombletDraw(4, 3, 1)).toBe(turretBombletDraw(4, 3, 1));
+    expect(turretBombletDraw(4, 3, 1)).not.toBe(turretBombletDraw(5, 3, 1));
+    expect(turretBombletDraw(4, 3, 1)).not.toBe(turretBombletDraw(4, 3, 2));
+    let low = 1;
+    let high = -1;
+    for (let shot = 1; shot <= 200; shot++) {
+      for (let index = 0; index < TURRET_BOMBLETS; index++) {
+        const draw = turretBombletDraw(shot, index, 1);
+        expect(draw).toBeGreaterThanOrEqual(-1);
+        expect(draw).toBeLessThan(1);
+        low = Math.min(low, draw);
+        high = Math.max(high, draw);
+      }
+    }
+    expect(low).toBeLessThan(-0.9);
+    expect(high).toBeGreaterThan(0.9);
+  });
+
+  it('settles the dirt and rumble of a frag at its burst point', () => {
+    expect(turretFragTailCueInto(100, 9, 230, cue())).toMatchObject({
+      key: TURRET_FRAG_TAIL_SFX,
+      x: 100,
+      y: 9,
+      z: 230,
+      gain: 1,
+      rate: 1,
+      jitter: true,
+      cooldownKey: '',
+      release: 0,
+    });
+  });
+
+  it('a reused cue drops the bomblet cooldown for the next sound', () => {
     const out = cue();
     turretSfxCueInto(bomblet(0), origin, out);
     turretSfxCueInto(impact([]), origin, out);
-    expect(out.release).toBe(0);
     expect(out.cooldownKey).toBe('');
     expect(out.cooldown).toBeUndefined();
   });
@@ -605,10 +688,21 @@ describe('Fire and Fly bomblet voices', () => {
     const starts = ripple(TURRET_BOMBLETS, arrive, s);
     expect(starts).toHaveLength(TURRET_BOMBLETS);
     for (let i = 0; i < starts.length; i++) expect(starts[i] - arrive(i)).toBeLessThan(FRAME_MS);
-    const opts = s.playAt.mock.calls.map((c) => c[4] as { release?: number; cooldownKey?: string });
-    expect(opts.slice(0, -1).every((o) => (o.release ?? 0) > 0)).toBe(true);
-    expect(opts[opts.length - 1].release).toBeUndefined();
+    const opts = s.playAt.mock.calls
+      .filter((c) => c[0] === TURRET_BOMBLET_SFX)
+      .map((c) => c[4] as { release?: number; cooldownKey?: string; jitter?: boolean });
+    expect(opts.every((o) => o.release === undefined && o.jitter === false)).toBe(true);
     expect(new Set(opts.map((o) => o.cooldownKey)).size).toBe(1);
+  });
+
+  it("never holds a whole frag's eight-bomblet ripple at its own spacing", () => {
+    expect(TURRET_BOMBLETS).toBe(8);
+    const voices = new TurretBombletVoices();
+    for (let i = 0; i < TURRET_BOMBLETS; i++) {
+      const at = 50 * i - (i % 2 === 1 ? FRAME_MS : 0);
+      expect(voices.ready(at), `bomblet ${i}`).toBe(true);
+      voices.start(at);
+    }
   });
 
   it('plays every bomblet a read bunched into one frame, one at a time within the cap', () => {
@@ -622,6 +716,41 @@ describe('Fire and Fly bomblet voices', () => {
     const starts = ripple(2 * TURRET_BOMBLETS, (i) => 25 * i);
     expect(starts.length).toBeGreaterThanOrEqual(TURRET_BOMBLETS);
     expectSpaced(starts);
+  });
+
+  /** The whole frag read in one frame, then 60 fps frames; each play with its frame time. */
+  function bunchedFrag(ring: TurretFeedback[], clocks: (frame: number) => number) {
+    const s = sink();
+    let now = 0;
+    const sounds = player(s, () => now);
+    const plays: { key: string; at: number }[] = [];
+    for (let frame = 0; frame < 30; frame++) {
+      now = frame * FRAME_MS;
+      const before = s.playAt.mock.calls.length;
+      sounds.update(session(ring), clocks(frame));
+      for (const call of s.playAt.mock.calls.slice(before)) plays.push({ key: call[0], at: now });
+    }
+    return plays;
+  }
+  const wholeFrag = () => [
+    entry(1, 30, fragBurst),
+    ...STAR.map((b, i) => entry(2 + i, 30, bomblet(b.index, [], b.x, b.z))),
+  ];
+
+  it("settles a frag's tail after its last pop, even when a bunched read holds the pops", () => {
+    const plays = bunchedFrag(wholeFrag(), () => 30);
+    const keys = plays.map((p) => p.key);
+    expect(keys.filter((k) => k === TURRET_BOMBLET_SFX)).toHaveLength(TURRET_BOMBLETS);
+    expect(keys.filter((k) => k === TURRET_FRAG_TAIL_SFX)).toHaveLength(1);
+    expect(keys[keys.length - 1]).toBe(TURRET_FRAG_TAIL_SFX);
+    const lastPop = plays.filter((p) => p.key === TURRET_BOMBLET_SFX).pop();
+    expect(lastPop?.at).toBeGreaterThan(0);
+    expect(plays[plays.length - 1].at).toBe(lastPop?.at);
+  });
+
+  it('drops the tail with a held last bomblet gone stale before its turn', () => {
+    const plays = bunchedFrag(wholeFrag(), (frame) => (frame === 0 ? 30 : 41));
+    expect(plays.map((p) => p.key)).not.toContain(TURRET_FRAG_TAIL_SFX);
   });
 
   it('holds no voice for a boom the sink refused', () => {
@@ -729,6 +858,87 @@ describe('Fire and Fly weapon sound player', () => {
     expect(calls(s)).toEqual([TURRET_FIRE_SFX, TURRET_FRAG_BURST_SFX, TURRET_BOMBLET_SFX]);
   });
 
+  it('sounds a frag as its burst, its eight bomblets where they land, then its tail once at the burst point', () => {
+    const s = sink();
+    const clock = { now: 0 };
+    const sounds = player(s, () => clock.now);
+    const played = playTicks(sounds, s, fragRing(1), 15, 40, clock);
+    expect(played.map((c) => c[0])).toEqual([
+      TURRET_FRAG_BURST_SFX,
+      ...STAR.slice(0, -1).map(() => TURRET_BOMBLET_SFX),
+      TURRET_BOMBLET_SFX,
+      TURRET_FRAG_TAIL_SFX,
+    ]);
+    const pops = played.filter((c) => c[0] === TURRET_BOMBLET_SFX);
+    STAR.forEach((b, i) => {
+      const heard = { x: b.x, z: b.z };
+      turretHeardInto(origin, heard);
+      expect(pops[i][1]).toBeCloseTo(heard.x, 9);
+      expect(pops[i][2]).toBe(5);
+      expect(pops[i][3]).toBeCloseTo(heard.z, 9);
+    });
+    const burstHeard = { x: 100, z: 230 };
+    turretHeardInto(origin, burstHeard);
+    for (const key of [TURRET_FRAG_BURST_SFX, TURRET_FRAG_TAIL_SFX]) {
+      const at = played.find((c) => c[0] === key) as (typeof played)[number];
+      expect(at[1]).toBeCloseTo(burstHeard.x, 9);
+      expect(at[2]).toBe(9);
+      expect(at[3]).toBeCloseTo(burstHeard.z, 9);
+    }
+  });
+
+  it("settles a frag's tail at its last bomblet when its burst went unread", () => {
+    const s = sink();
+    const last = STAR[STAR.length - 1];
+    player(s).update(session([entry(1, 30, bomblet(last.index, [], last.x, last.z))]), 30);
+    const heard = { x: last.x, z: last.z };
+    turretHeardInto(origin, heard);
+    expect(s.playAt.mock.calls.map((c) => c[0])).toEqual([
+      TURRET_BOMBLET_SFX,
+      TURRET_FRAG_TAIL_SFX,
+    ]);
+    expect(s.playAt.mock.calls[1][1]).toBeCloseTo(heard.x, 9);
+    expect(s.playAt.mock.calls[1][3]).toBeCloseTo(heard.z, 9);
+  });
+
+  it('settles the tail of a frag whose kept burst was overwritten at its last bomblet', () => {
+    const s = sink();
+    const burstOf = (shotId: number): TurretEvent => ({
+      type: 'fragBurst',
+      shotId,
+      x: 100 + shotId,
+      y: 9,
+      z: 230,
+      bomblets: [],
+    });
+    const lastOf = (shotId: number): TurretEvent => ({
+      type: 'bomblet',
+      shotId,
+      index: TURRET_BOMBLETS - 1,
+      x: 90,
+      y: 5,
+      z: 250,
+      hits: [],
+    });
+    const ring = [1, 2, 3, 4, 5].map((shot) => entry(shot, 30, burstOf(shot)));
+    ring.push(entry(6, 30, lastOf(1)));
+    let now = 0;
+    const sounds = player(s, () => now);
+    sounds.update(session(ring), 30);
+    now = 1000;
+    sounds.update(session([...ring, entry(7, 30, lastOf(2))]), 30);
+    const tails = s.playAt.mock.calls.filter((c) => c[0] === TURRET_FRAG_TAIL_SFX);
+    expect(tails).toHaveLength(2);
+    const bombletHeard = { x: 90, z: 250 };
+    turretHeardInto(origin, bombletHeard);
+    expect(tails[0][1]).toBeCloseTo(bombletHeard.x, 9);
+    expect(tails[0][2]).toBe(5);
+    const burstHeard = { x: 102, z: 230 };
+    turretHeardInto(origin, burstHeard);
+    expect(tails[1][1]).toBeCloseTo(burstHeard.x, 9);
+    expect(tails[1][2]).toBe(9);
+  });
+
   it("reports someone else's frag from its entry, lighter", () => {
     const s = sink();
     player(s).update(session([entry(1, 10, fragFired)]), 10);
@@ -739,10 +949,11 @@ describe('Fire and Fly weapon sound player', () => {
   it("with the page's ledger, a frag click's report plays once and its fired entry is latched", () => {
     const shots = new TurretOwnShotLedger();
     const out = sink();
+    const clock = { now: 0 };
     const sounds = new TurretDefenseSfx(
       out,
       () => null,
-      () => 0,
+      () => clock.now,
       shots,
     );
     sounds.update(seated([]), 10);
@@ -752,6 +963,14 @@ describe('Fire and Fly weapon sound player', () => {
     expect(out.playAt.mock.calls[0][4]).toMatchObject({ rate: 1.1 });
     sounds.update(seated([entry(1, 12, fragFired)]), 12);
     expect(calls(out)).toEqual([TURRET_FIRE_SFX]);
+    const ring = [entry(1, 12, fragFired), ...fragRing(2)];
+    playTicks(sounds, out, ring, 12, 40, clock, seated);
+    expect(calls(out)).toEqual([
+      TURRET_FIRE_SFX,
+      TURRET_FRAG_BURST_SFX,
+      ...STAR.map(() => TURRET_BOMBLET_SFX),
+      TURRET_FRAG_TAIL_SFX,
+    ]);
   });
 
   it("with the page's ledger, an own Shockwave slams once on the click and rolls from its entry", () => {

@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "d7be5a4bdc514a6e65341eb051ba3145b682de28d6d172c3a133a36e8ad6ad62",
-  "catalogHash": "5ceb09f16510e4038a3996c7ab80cb7eb914bce4a302e701d2728fb71876fd89",
+  "bundleId": "d16d20b81e011cdc623915e9aa59c45210d84b1ae21fb223b285497d06737791",
+  "catalogHash": "9ecc855bc0dd744c93d35f14362bac0d21295545b8e5e9fde24a0343b12e77db",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -1022,6 +1022,42 @@
         }
       ],
       "gain": 1.778279,
+      "playbackRate": 1
+    },
+    "impact_groundshaker_frag_bomblet": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/impact_groundshaker_frag_bomblet.mp3?v=3b60df4fa433",
+          "bytes": 11954,
+          "sha256": "3b60df4fa43312f7d3cc9e04530612685faf84de95bce6f10899d5d199a70ed4"
+        }
+      ],
+      "gain": 1.071519,
+      "playbackRate": 1
+    },
+    "impact_groundshaker_frag_burst": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/impact_groundshaker_frag_burst.mp3?v=64248189f3e3",
+          "bytes": 25747,
+          "sha256": "64248189f3e3779f24257649edbbf3ad3e95aabd65f5e2a1bc5a65f5494f0e29"
+        }
+      ],
+      "gain": 1.348963,
+      "playbackRate": 1
+    },
+    "impact_groundshaker_frag_tail": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/impact_groundshaker_frag_tail.mp3?v=67e9d788d536",
+          "bytes": 47063,
+          "sha256": "67e9d788d5363a66ac277c02e76594208520a3c6014d0a224a8680136f7388bd"
+        }
+      ],
+      "gain": 0.851138,
       "playbackRate": 1
     },
     "impact_holy": {

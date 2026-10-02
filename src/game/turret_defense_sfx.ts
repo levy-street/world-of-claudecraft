@@ -1,12 +1,13 @@
 // Fire and Fly sounds: the cannon's report at the muzzle, the shell's blast where
 // it lands, a barrel's heavier boom, the crunch of a monster's strike on the
 // turret, the limited weapons (the Shockwave's slam and roll, the frag shell's
-// burst and its bomblets), and the monsters' cries, thumps and knocks
-// (turret_monster_sfx.ts), each read once per feedback entry (by sequence
-// number) from the seat HUD's frame. Every clip a seat can play is preloaded
-// when the seat is first seen. The player's own shot and Shockwave report on the
-// click, from the own-shot ledger (turret_own_shot_core.ts); the `fired` or
-// `shockwave` entry it confirms plays that report no more.
+// burst, its bomblets and the dirt and rumble after the last), and the monsters'
+// cries, thumps and knocks (turret_monster_sfx.ts), each read once per feedback
+// entry (by sequence number) from the seat HUD's frame. Every clip a seat can
+// play is preloaded when the seat is first seen. The player's own shot and
+// Shockwave report on the click, from the own-shot ledger
+// (turret_own_shot_core.ts); the `fired` or `shockwave` entry it confirms plays
+// that report no more.
 
 import type { TurretEvent } from '../sim/minigames/turret_defense';
 import type { TurretFeedback } from '../sim/minigames/turret_feedback';
@@ -36,14 +37,16 @@ export const TURRET_BREACH_SFX = 'impact_warrior_faultline';
 export const TURRET_SLAM_SFX = 'impact_warrior_quake';
 /** The Shockwave's ring rolling out from the tower's foot. */
 export const TURRET_ROLL_SFX = 'melee_warrior_quake_release';
-/** A frag shell cracking open in the air over its point. */
-export const TURRET_FRAG_BURST_SFX = 'impact_warrior_shieldcrack';
-/** Each bomblet: the shell's blast, lighter and brighter. */
-export const TURRET_BOMBLET_SFX = TURRET_IMPACT_SFX;
+/** A frag shell bursting in the air over its point: a black-powder whump-crack. */
+export const TURRET_FRAG_BURST_SFX = 'impact_groundshaker_frag_burst';
+/** Each bomblet: a short black-powder pop with a spray of dirt. */
+export const TURRET_BOMBLET_SFX = 'impact_groundshaker_frag_bomblet';
+/** After a frag's last bomblet, at its burst point: clods pattering down over the rumble. */
+export const TURRET_FRAG_TAIL_SFX = 'impact_groundshaker_frag_tail';
 /** Bomblet voices sounding at once (started within the last TURRET_BOMBLET_VOICE_MS). */
 export const TURRET_BOMBLET_VOICES = 4;
 /**
- * How long a bomblet counts as sounding: the loud head of its cut boom. A frag's six
+ * How long a bomblet counts as sounding: the loud head of its pop. A frag's eight
  * land one tick (50 ms) apart, so its own ripple keeps at most three sounding, a
  * frame of jitter included; only overlapping bursts or a read that bunches them
  * reach the cap.
@@ -54,10 +57,9 @@ export const TURRET_BOMBLET_VOICE_MS = 150;
  * Under a frag's own 50 ms spacing read a frame early, so its ripple is never held.
  */
 export const TURRET_BOMBLET_GAP_MS = 30;
-const BOMBLET_GAIN = 0.45;
-const BOMBLET_RATE = 1.4;
-/** A bomblet's boom is cut to this (seconds) so six do not pile their long tails; the last keeps its tail. */
-const BOMBLET_RELEASE = 0.3;
+/** Each bomblet's own level (dB) and pitch spread, drawn from its shot and index. */
+const BOMBLET_GAIN_SPREAD_DB = 1;
+const BOMBLET_RATE_SPREAD = 0.1;
 /** Own cooldown namespaces: the ripple is not throttled by, nor throttles, a shell's blast or a knock. */
 const BOMBLET_COOLDOWN = 'turret_bomblet';
 const SLAM_COOLDOWN = 'turret_slam';
@@ -69,6 +71,8 @@ const SEAT_SFX = [
   TURRET_SLAM_SFX,
   TURRET_ROLL_SFX,
   TURRET_FRAG_BURST_SFX,
+  TURRET_BOMBLET_SFX,
+  TURRET_FRAG_TAIL_SFX,
   TURRET_THUMP_LIGHT_SFX,
   TURRET_THUMP_HEAVY_SFX,
   TURRET_KNOCK_SFX,
@@ -92,6 +96,13 @@ const FAR_SHARE = 0.35;
 const STALE_TICKS = 10;
 
 type TurretBreach = Extract<TurretEvent, { type: 'breach' }>;
+type TurretFragBurstEvent = Extract<TurretEvent, { type: 'fragBurst' }>;
+type TurretBombletEvent = Extract<TurretEvent, { type: 'bomblet' }>;
+/**
+ * Frags whose burst point is kept for their tail, more than one seat lands at once; a frag
+ * whose slot was reused settles its tail at its last bomblet instead.
+ */
+const FRAG_BURSTS_KEPT = 4;
 
 export interface TurretSfxSink {
   playAt(key: string, x: number, y: number, z: number, opts?: PlayOpts): boolean;
@@ -228,6 +239,28 @@ export function turretFireCueInto(
   );
 }
 
+/**
+ * A stable draw in [-1, 1) for one bomblet of one shot: every read of the same
+ * bomblet, on any client, gives it the same level and pitch.
+ */
+export function turretBombletDraw(shotId: number, index: number, salt: number): number {
+  let h = Math.imul(shotId ^ 0x2545f491, 0x9e3779b1) ^ Math.imul(index + 1, 0x85ebca6b) ^ salt;
+  h = Math.imul(h ^ (h >>> 16), 0x7feb352d);
+  h = Math.imul(h ^ (h >>> 15), 0x846ca68b);
+  h ^= h >>> 16;
+  return (h >>> 0) / 2147483648 - 1;
+}
+
+/** The dirt and rumble after a frag's last bomblet, at its burst point. */
+export function turretFragTailCueInto(
+  x: number,
+  y: number,
+  z: number,
+  out: TurretSfxCue,
+): TurretSfxCue {
+  return cueInto(out, TURRET_FRAG_TAIL_SFX, x, y, z, 1, 1, true);
+}
+
 /** The tower's slam for a Shockwave, at its foot. */
 export function turretSlamCueInto(
   x: number,
@@ -287,16 +320,18 @@ export function turretSfxCueInto(
       // The ring's rumble, always from the entry: the ring is timed on it, not on the click.
       return cueInto(out, TURRET_ROLL_SFX, event.x, event.y, event.z, 0.6, 0.8, true);
     case 'fragBurst':
-      cueInto(out, TURRET_FRAG_BURST_SFX, event.x, event.y, event.z, 1.3, 1, true);
+      cueInto(out, TURRET_FRAG_BURST_SFX, event.x, event.y, event.z, 1, 1, true);
       break;
-    case 'bomblet':
-      cueInto(out, TURRET_BOMBLET_SFX, event.x, event.y, event.z, BOMBLET_GAIN, BOMBLET_RATE, true);
+    case 'bomblet': {
+      const gainDb = BOMBLET_GAIN_SPREAD_DB * turretBombletDraw(event.shotId, event.index, 1);
+      const rate = 1 + BOMBLET_RATE_SPREAD * turretBombletDraw(event.shotId, event.index, 2);
+      cueInto(out, TURRET_BOMBLET_SFX, event.x, event.y, event.z, 10 ** (gainDb / 20), rate, false);
       out.cooldownKey = BOMBLET_COOLDOWN;
       // TurretBombletVoices spaces the starts; the sink's cooldown, on the audio
       // clock, could refuse a start it admits.
       out.cooldown = 0;
-      out.release = event.index === TURRET_BOMBLETS - 1 ? 0 : BOMBLET_RELEASE;
       break;
+    }
     default:
       return null;
   }
@@ -340,6 +375,14 @@ export class TurretDefenseSfx {
   private readonly bomblets = new TurretBombletVoices();
   /** Bomblets read while the gap or the cap held them, oldest first; a frag's worth at most. */
   private readonly waiting: TurretFeedback[] = [];
+  /** The burst points of the frags still landing, for their tails; overwritten in turn. */
+  private readonly bursts = Array.from({ length: FRAG_BURSTS_KEPT }, () => ({
+    shotId: -1,
+    x: 0,
+    y: 0,
+    z: 0,
+  }));
+  private nextBurst = 0;
   private readonly preloaded = new Set<string>();
   /** The newest own-shot serial already reported; a rebuilt player starts past the page's. */
   private launched: number;
@@ -373,6 +416,7 @@ export class TurretDefenseSfx {
       this.monsters.reset();
       this.bomblets.reset();
       this.waiting.length = 0;
+      for (const burst of this.bursts) burst.shotId = -1;
       for (const key of SEAT_SFX) this.preload(key);
       for (const key of turretVoiceKeys(session.defense.plan, this.voiceCue)) this.preload(key);
     }
@@ -399,6 +443,7 @@ export class TurretDefenseSfx {
         this.offerBomblet(entry, session, now);
         continue;
       }
+      if (event.type === 'fragBurst') this.keepBurst(event);
       const cue = turretSfxCueInto(event, session.origin, this.cue);
       if (cue) this.play(cue);
       else this.monsters.offer(event, session, now);
@@ -429,9 +474,30 @@ export class TurretDefenseSfx {
     this.startBomblet(next, session, now);
   }
 
+  /** A frag's tail follows its last bomblet's turn; a last bomblet dropped unplayed takes it along. */
   private startBomblet(entry: TurretFeedback, session: TurretSessionView, now: number): void {
-    const cue = turretSfxCueInto(entry.event, session.origin, this.cue);
+    const event = entry.event;
+    const cue = turretSfxCueInto(event, session.origin, this.cue);
     if (cue && this.play(cue)) this.bomblets.start(now);
+    if (event.type === 'bomblet' && event.index === TURRET_BOMBLETS - 1) this.playTail(event);
+  }
+
+  private keepBurst(event: TurretFragBurstEvent): void {
+    const slot = this.bursts[this.nextBurst];
+    this.nextBurst = (this.nextBurst + 1) % FRAG_BURSTS_KEPT;
+    slot.shotId = event.shotId;
+    slot.x = event.x;
+    slot.y = event.y;
+    slot.z = event.z;
+  }
+
+  /** The tail at its frag's burst point, or at the last bomblet when the burst went unread. */
+  private playTail(event: TurretBombletEvent): void {
+    let at: { readonly x: number; readonly y: number; readonly z: number } = event;
+    for (const burst of this.bursts) if (burst.shotId === event.shotId) at = burst;
+    const cue = turretFragTailCueInto(at.x, at.y, at.z, this.cue);
+    turretHeardInto(this.origin, cue);
+    this.play(cue);
   }
 
   /** The report of every own shot marked since the last read, on the click's frame. */

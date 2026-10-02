@@ -788,6 +788,39 @@
       }
     ]
   },
+  "impact_groundshaker_frag_bomblet": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "impact_groundshaker_frag_bomblet.mp3",
+        "sha256": "3b60df4fa43312f7d3cc9e04530612685faf84de95bce6f10899d5d199a70ed4",
+        "size": 11954,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "impact_groundshaker_frag_burst": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "impact_groundshaker_frag_burst.mp3",
+        "sha256": "64248189f3e3779f24257649edbbf3ad3e95aabd65f5e2a1bc5a65f5494f0e29",
+        "size": 25747,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "impact_groundshaker_frag_tail": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "impact_groundshaker_frag_tail.mp3",
+        "sha256": "67e9d788d5363a66ac277c02e76594208520a3c6014d0a224a8680136f7388bd",
+        "size": 47063,
+        "peakDb": -7.2
+      }
+    ]
+  },
   "impact_holy": {
     "ceilingDb": 6.5,
     "tracks": [
