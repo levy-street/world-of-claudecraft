@@ -1371,6 +1371,11 @@ const serverModules = () =>
     text: readFileSync(full, 'utf8'),
   })));
 
+/** A line break that leaves a markdown bullet: one followed by a line that is
+ *  neither indented nor blank. A blank line (CRLF too) and the end of the text
+ *  stay inside it. */
+const OUTSIDE_BULLET = /\n(?![ \r\n]|$)/;
+
 describe('the claim renewer', () => {
   const claim = (plotId: string, accountId: number) => ({
     plotId,
@@ -1684,7 +1689,7 @@ describe('the claim renewer', () => {
     expect(end).toBeGreaterThan(start);
     // Both signals run the closure: its two registrations follow it as one
     // block, no other line of main.ts and no other file under server/ names
-    // either signal, and no file under server/ removes every listener at once.
+    // either signal, and no file under server/ mentions removeAllListeners.
     // That is this pin's reach: a listener in a dependency is beyond what repo
     // text pins.
     expect(
@@ -1695,16 +1700,26 @@ describe('the claim renewer', () => {
     expect(main.match(/\bSIG(?:INT|TERM)\b/g)).toEqual(['SIGINT', 'SIGTERM']);
     // The walk reaches nested modules, so neither scan passes on a short list.
     expect(serverModules().length).toBeGreaterThan(500);
-    expect(serverModules().map(({ file }) => file)).toContain('http/game_metrics.ts');
+    expect(
+      serverModules().some(({ file }) => file.includes('/')),
+      'the walk reaches a module in a subdirectory of server/',
+    ).toBe(true);
     expect(
       serverModules()
         .filter(({ text }) => /\bSIG(?:INT|TERM)\b/.test(text))
         .map(({ file }) => file),
+      'the server/ modules that name SIGINT or SIGTERM: only main.ts may',
     ).toEqual(['main.ts']);
+    // Any mention fails, in a comment or on another emitter too: the word is
+    // absent from server/, and a bare call on process drops the shutdown
+    // listeners whatever its spelling.
+    const removesAll = /\bremoveAllListeners\b/;
+    expect("process['removeAllListeners']?.()").toMatch(removesAll);
     expect(
       serverModules()
-        .filter(({ text }) => /\bremoveAllListeners\(\s*\)/.test(text))
+        .filter(({ text }) => removesAll.test(text))
         .map(({ file }) => file),
+      'the server/ modules that mention removeAllListeners: none may',
     ).toEqual([]);
     const awaits = [...main.slice(start, end).matchAll(/await\s+([^;]+);/g)].map((match) =>
       match[1].replace(/\s+/g, ' ').trim(),
@@ -2084,8 +2099,10 @@ describe('the claim renewer', () => {
     expect(
       graceOf('services:\n  gameserver:\n    stop_grace_period: 300s\n  game:\n    image: x\n'),
     ).toBeNull();
-    // `docker compose` with no `-f` reads every compose file it finds in the
-    // directory, an override among them; the repo tracks exactly one.
+    // `docker compose` with no `-f` reads one primary compose file, chosen by
+    // name (a `compose.yaml` shadows `docker-compose.yml`), plus its override;
+    // the repo tracks exactly one of those names. A `-f` or `COMPOSE_FILE` on
+    // the host can name others, which no repo text pins.
     expect(
       spawnSync('git', ['ls-files', '--', '*compose*.yml', '*compose*.yaml'], { encoding: 'utf8' })
         .stdout.split('\n')
@@ -2131,9 +2148,12 @@ describe('the claim renewer', () => {
   });
 
   it("states DEPLOY's boot lock order and stall bounds as the code sets them", () => {
-    // The boot bullet names the core schema's first tables in its order and
-    // each bound beside its number, so a change to either side fails here
-    // until the other follows.
+    // The boot bullet names the parents in the boot's lock order, the lock
+    // each one takes first, and each stall bound beside its number. The order,
+    // the first locks and the missing lock timeout are observed on the real
+    // boot in tests/server/freehold_mutation.pg.test.ts (section L), which
+    // pins the same names; the bounds are read here from the pool that
+    // applies them.
     const deploy = readFileSync('DEPLOY.md', 'utf8');
     const at = deploy.indexOf('- EVERY BOOT LOCKS THE PARENTS');
     expect(at).toBeGreaterThan(-1);
@@ -2141,9 +2161,14 @@ describe('the claim renewer', () => {
     expect(next).toBeGreaterThan(at);
     // Every line after the first is the bullet's own (indented or blank), so
     // the slice never runs into a following paragraph or section.
-    expect('- a\n  b\nPara\n').toMatch(/\n(?![ \n])/);
-    expect(deploy.slice(at, next)).not.toMatch(/\n(?![ \n])/);
+    expect('- a\n  b\nPara\n').toMatch(OUTSIDE_BULLET);
+    expect('- a\r\n  b\r\n\r\n  c\n').not.toMatch(OUTSIDE_BULLET);
+    expect(deploy.slice(at, next)).not.toMatch(OUTSIDE_BULLET);
     const bullet = deploy.slice(at, next).replace(/\s+/g, ' ');
+    expect(bullet).toContain('first on `auth_tokens`, then `characters`, then `accounts`');
+    expect(bullet).toContain('On `auth_tokens` and `characters` its first lock is SHARE');
+    expect(bullet).toContain('on `accounts` it is ACCESS EXCLUSIVE from the first');
+    expect(bullet).toContain('The boot sends no lock timeout of its own');
     const source = (file: string) => stripComments(readFileSync(file, 'utf8'));
     const seconds = (file: string, name: string): number => {
       const found = source(file).match(new RegExp(`export const ${name} = ([0-9_]+);`));
@@ -2151,14 +2176,8 @@ describe('the claim renewer', () => {
       return Number((found as RegExpMatchArray)[1].replaceAll('_', '')) / 1000;
     };
     const db = source('server/db.ts');
-    const from = db.indexOf('export const SCHEMA = `');
-    expect(from).toBeGreaterThan(-1);
-    const schema = db.slice(from, db.indexOf('\n`;', from));
-    const altered = [
-      ...new Set([...schema.matchAll(/^ALTER TABLE (\w+)/gm)].map((match) => match[1])),
-    ].slice(0, 3);
-    expect(altered).toEqual(['auth_tokens', 'characters', 'accounts']);
-    expect(bullet).toContain('first on `auth_tokens`, then `characters`, then `accounts`');
+    expect(db).toContain('connectionTimeoutMillis: DB_POOL_CONNECT_TIMEOUT_MS,');
+    expect(db).toContain('statement_timeout: DB_STATEMENT_TIMEOUT_MS,');
     expect(bullet).toContain(
       `\`DB_STATEMENT_TIMEOUT_MS\` (${seconds('server/db.ts', 'DB_STATEMENT_TIMEOUT_MS')} s)`,
     );

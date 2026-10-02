@@ -669,33 +669,37 @@ CHECK (another type, or a CHECK with another body, compared on PostgreSQL's own 
 left in place and the boot logs a WARNING. THE FIRST ROLLOUT WINDOW: because no 07 build
 deployed, the first 07a boot on production creates five FK-bearing tables and the triggers in
 ONE `ensureSchema` transaction with no `lock_timeout`. It takes no parent lock a steady-state
-boot does not (above): every boot queues behind each in-flight `characters` and `accounts`
-writer on the running fleet, and every later save and account write on every realm queues
-behind the boot until its COMMIT (measured with an old realm serving: 55 to 66 ms for the
-first rollout with plain saves in flight when no deadlock formed, three boots of 16 waiting
+boot does not (above): every boot queues behind each open transaction, running or idle, that
+holds a lock on a table it locks, and every later statement on those tables on every realm
+queues behind the boot until its COMMIT (measured with an old realm serving: 55 to 66 ms for
+the first rollout with plain saves in flight when no deadlock formed, three boots of 16 waiting
 out `deadlock_timeout` for about 1 s, near a steady-state boot's 56 to 59 ms, one of six
-waiting 1,056 ms; each boot that waited lived, and the bench's "old account create", an
-account then a character, beside it was aborted). ANY boot can DEADLOCK on two paths, since
-the core schema locks its tables in its statement order, `auth_tokens`, then `characters`,
-then `accounts`. The UPGRADE path, one table: the boot's lock on a table is SHARE first (its
-index create), upgraded to ACCESS EXCLUSIVE by the next statement, against a transaction that
-took a lock on that table that SHARE does not wait for (a save's G2 row lock or the character
-delete's, ROW SHARE, or a plain read's ACCESS SHARE, a character create's count among them)
-and then writes it. The ORDER path, two tables: a transaction that holds any lock on a table
-and then asks for one on a table the boot locks earlier, this manifest's own G1-then-G2 order
-among them (every effect-carrying or hooked save, the Hearth trip's included, the operation
-prepare, the character create and delete, a password reset's `accounts` then `auth_tokens`,
-and an account create while community test accounts are on), against the boot's order. The
-shapes decide it, not a list. With G1-shaped saves in flight every bench boot was eventually
-aborted and saves were aborted beside it, and a boot that loses exits and is restarted (R-11).
-A REPAIR boot is any boot that rebuilds something a probe
-guards (for example an index, a guard or trigger, or the advance token column or its CHECK):
-it holds that statement's lock on that object's table to its COMMIT, builds a rebuilt index or
-a re-added column while it holds both parents, for as long as the build takes, which grows
-with the table; a rebuilt unique index that meets duplicate rows fails the boot, which exits
-and is restarted into the same stall until the duplicates are resolved. Stop the other realms
-before a repair boot, and do the first rollout, any repair boot, and any boot beside other
-realms serving such saves, in a quiet window; `DEPLOY.md` carries the operator note.
+waiting 1,056 ms; each boot that waited lived, and the bench's "old account create", an account
+then a character, beside it was aborted). ANY boot can DEADLOCK on two paths, since the core
+schema locks its tables in its statement order, `auth_tokens`, then `characters`, then
+`accounts`, and also writes rows every boot (an UPDATE of `accounts`, an INSERT into
+`account_weapon_cosmetics`), so a row lock counts as a lock on both. The UPGRADE path, one
+table: on `auth_tokens` and `characters` the boot's first lock is SHARE (an index create),
+upgraded to ACCESS EXCLUSIVE by the next statement (on `accounts` it is ACCESS EXCLUSIVE from
+the first, so no upgrade happens there), against a transaction that took a lock on that table
+that SHARE does not wait for (a save's G2 row lock or the character delete's, ROW SHARE, or a
+plain read's ACCESS SHARE, a character create's count among them) and then writes it. The ORDER
+path, two tables: a transaction that holds any lock on a table and then asks for one on a table
+the boot locks earlier, this manifest's own G1-then-G2 order among them (every effect-carrying
+or hooked save, the Hearth trip's included, the operation prepare, the character create and
+delete, a password reset's `accounts` then `auth_tokens`, and an account create while community
+test accounts are on), against the boot's order. The shapes decide it, not a list. The order,
+each parent's first lock and the boot's missing lock timeout are observed on the real boot
+(`tests/server/freehold_mutation.pg.test.ts`, section L). With G1-shaped saves in flight every
+bench boot was eventually aborted and saves were aborted beside it, and a boot that loses exits
+and is restarted (R-11). A REPAIR boot is any boot that rebuilds something a probe guards (for
+example an index, a guard or trigger, or the advance token column or its CHECK): it holds that
+statement's lock on that object's table to its COMMIT, builds a rebuilt index or a re-added
+column while it holds both parents, for as long as the build takes, which grows with the table;
+a rebuilt unique index that meets duplicate rows fails the boot, which exits and is restarted
+into the same stall until the duplicates are resolved. Stop the other realms before a repair
+boot, and do the first rollout, any repair boot, and any boot beside other realms serving such
+saves, in a quiet window; `DEPLOY.md` carries the operator note.
 
 ## 6. Pairwise deadlock review
 
@@ -1101,20 +1105,21 @@ merge in a `finally`; N4 the server default pin; N5 the log pin; N6 the 15 route
   cooldown judgment consistent, and the corrupt test already reads `clock_timestamp()`.
 
 - R-11 (revision 6, the QA): ANY boot can deadlock on the two paths P12 names (the boot's
-  SHARE-then-upgrade on `characters`, and its `characters`-then-`accounts` order against a
-  transaction that locks `accounts` first). With effect-carrying or hooked saves in flight,
-  every bench boot was eventually aborted, so the realm exits and is restarted, and saves on
-  the serving realms were aborted beside it. What writes an aborted save again depends on
-  the save: the next autosave for an autosave; the leave save's bounded retry
-  (`server/leave_character_save.ts`) for a leave save; for a shutdown flush save, one more
-  pass only when it carried guild bank books, otherwise nothing, so a realm shutting down
-  beside a boot can lose a character's last window. A Hearth trip counts `trip_failed` and
-  the player presses again. It predates housing (the core schema's boot against the storage
-  and ledger saves' G1 and G2 order); 07a adds the Hearth trip's hooked save to the class.
-  Bounded only operationally (boot beside quiet realms, and one realm's shutdown finished
-  before another boots). Owed to the maintainer, both halves: remove the boot's lock upgrade
-  on `characters` (probe the core `characters_account` index the way the housing indexes are
-  probed, or take ACCESS EXCLUSIVE on `characters` first), and change the boot's table order
+  SHARE-then-upgrade on `auth_tokens` or `characters`, and its order, `auth_tokens`, then
+  `characters`, then `accounts`, against a transaction that locks a later table first). With
+  effect-carrying or hooked saves in flight, every bench boot was eventually aborted, so the
+  realm exits and is restarted, and saves on the serving realms were aborted beside it. What
+  writes an aborted save again depends on the save: the next autosave for an autosave; the
+  leave save's bounded retry (`server/leave_character_save.ts`) for a leave save; for a
+  shutdown flush save, one more pass only when it carried guild bank books, otherwise nothing,
+  so a realm shutting down beside a boot can lose a character's last window. A Hearth trip
+  counts `trip_failed` and the player presses again. It predates housing (the core schema's
+  boot against the storage and ledger saves' G1 and G2 order); 07a adds the Hearth trip's
+  hooked save to the class. Bounded only operationally (boot beside quiet realms, and one
+  realm's shutdown finished before another boots). Owed to the maintainer, both halves: remove
+  the boot's lock upgrades on `auth_tokens` and `characters` (probe the core
+  `auth_tokens_account` and `characters_account` indexes the way the housing indexes are
+  probed, or take ACCESS EXCLUSIVE on each table first), and change the boot's table order
   (which would expose a character INSERT's `characters`-then-`accounts` foreign-key order
   instead).
 - R-12 (revision 6, the QA): at shutdown the drain stops awaiting a P2 write blocked on a
@@ -1369,3 +1374,8 @@ What changed the contract above:
 - An eighteenth round of eight fresh readers: P12 says the core schema locks `auth_tokens`
   before the parents and states both deadlock paths as shapes, the character delete and a
   password reset among the examples.
+- A nineteenth round of eight fresh readers: P12 says the boot queues behind any open
+  transaction holding a lock on a table it locks, that only `auth_tokens` and `characters`
+  take SHARE before ACCESS EXCLUSIVE, and that a row lock counts; the order, the first locks
+  and the missing lock timeout are observed on the real boot; R-11's owed fix covers
+  `auth_tokens` too.

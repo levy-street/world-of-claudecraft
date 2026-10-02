@@ -153,15 +153,18 @@ Readings:
 - **The P9 hold costs the next save nothing.** The verify waits only as long as the save it is
   verifying holds the row, and the save queued behind both finishes exactly when it does without
   the verify.
-- **The first rollout adds no boot lock.** Every boot, steady state included, already takes
-  ACCESS EXCLUSIVE on `characters` and then `accounts` and holds both to its COMMIT: the core
-  `SCHEMA` runs `ALTER TABLE characters ADD COLUMN IF NOT EXISTS` before
-  `ALTER TABLE accounts ADD COLUMN IF NOT EXISTS`, and a no-op `ADD COLUMN IF NOT EXISTS` still
-  takes ACCESS EXCLUSIVE (probed on this server). So the housing fragments' trigger creation runs
-  under locks the boot already holds, and a first-rollout boot measures the same as a steady one.
-- **Any boot can deadlock on two paths.** The boot takes `characters` and then `accounts`, and
-  its first lock on `characters` is SHARE (the core `CREATE INDEX IF NOT EXISTS
-  characters_account`), upgraded to ACCESS EXCLUSIVE by the very next statement:
+- **The first rollout adds no boot lock.** Every boot, steady state included, already takes ACCESS
+  EXCLUSIVE on `auth_tokens`, then `characters`, then `accounts` (`auth_tokens` named in round
+  nineteen, from the probe note above) and holds them to its COMMIT: the core `SCHEMA` runs `ALTER
+  TABLE characters ADD COLUMN IF NOT EXISTS` before `ALTER TABLE accounts ADD COLUMN IF NOT
+  EXISTS`, and a no-op `ADD COLUMN IF NOT EXISTS` still takes ACCESS EXCLUSIVE (probed on this
+  server). So the housing fragments' trigger creation runs under locks the boot already holds, and
+  a first-rollout boot measures the same as a steady one.
+- **Any boot can deadlock on two paths.** The boot takes `auth_tokens`, then `characters`, then
+  `accounts` (the order above, corrected in round nineteen), and its first lock on `characters`,
+  as on `auth_tokens`, is SHARE (the core `CREATE INDEX IF NOT EXISTS characters_account`),
+  upgraded to ACCESS EXCLUSIVE by the very next statement; this bench measured the `characters`
+  half:
   - THE UPGRADE PATH, one table: a transaction that holds a lock on `characters` that the
     boot's SHARE does not wait for (the ROW SHARE a FOR NO KEY UPDATE row lock takes, the G2
     step, or a plain read's ACCESS SHARE), then writes it, waits on the SHARE while the boot's
@@ -193,11 +196,11 @@ Readings:
   schema's lock order against the G1 and G2 orders that storage and bank-ledger saves already
   took. 07a adds the Hearth trip's hooked save (and, once a kind exists, operation prepares and
   closes) to the class and changes nothing about the boot. A fix must remove BOTH paths: the
-  boot's SHARE-then-upgrade on `characters` (probe the core `characters_account` index the way the
-  housing indexes are probed, or take ACCESS EXCLUSIVE on `characters` first), and the
-  `characters`-then-`accounts` order (taking `accounts` first would expose a character INSERT's
-  `characters`-then-`accounts` foreign-key order instead). It is a maintainer decision, recorded
-  as owed.
+  boot's SHARE-then-upgrade on `auth_tokens` and `characters` (probe the core
+  `auth_tokens_account` and `characters_account` indexes the way the housing indexes are probed,
+  or take ACCESS EXCLUSIVE on each table first), and its table order (taking `accounts` first
+  would expose a character INSERT's `characters`-then-`accounts` foreign-key order instead); the
+  `auth_tokens` half was named in round nineteen. It is a maintainer decision, recorded as owed.
 
 ## The script
 
