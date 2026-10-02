@@ -1462,10 +1462,15 @@ What changed the contract above:
   daily-active rule without pronouns to untangle, and `bot/logic.ts`'s `claimDailyActive` comment
   says at most once, matching `bot/CLAUDE.md`.
 - A forty-first round of eight fresh readers: no P12 change; `bot/CLAUDE.md`, `bot/main.ts` and
-  `bot/logic.ts` say what the daily grant's dedupe key carries and claim no more about it (the
-  key's three parts named in all three in round forty-two, Q42R4).
+  `bot/logic.ts` say what the daily grant's dedupe key carries and claim no more about it,
+  `bot/logic.ts` naming its three parts (the other two gained the reason in round forty-two,
+  Q42R4; worded so in round forty-four, Q44R3).
 - A forty-second round of eight fresh readers: no P12 change; `bot/logic.ts`'s `claimDailyActive`
   comment says the server's reward ledger is unique on the linked account and the grant dedupe
   key, and `bot/CLAUDE.md` and `bot/main.ts` name the key's three parts.
 - A forty-third round of eight fresh readers: no P12 change and no change to `DEPLOY.md` or the
-  bot; the forty-first entry here says which round named the dedupe key's three parts.
+  bot; the forty-first entry here says which round reworded it (worded so in round forty-four,
+  Q44R3).
+- A forty-fourth round of eight fresh readers: no P12 change and no change to `DEPLOY.md` or the
+  bot; the forty-first entry here says `bot/logic.ts` named the key's three parts in that round
+  and the other two gained the reason in round forty-two.

@@ -121,7 +121,8 @@ function gate(at: 'before' | 'after'): Gate {
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 // A promise the case expects to have settled (a rerun, a boot, a cancelled
 // sleep), read with a deadline, so a hang fails the case in time for its
-// cleanup to run.
+// cleanup to run (section L reads its boots through `settled`, which also
+// ends a boot still waiting).
 const within = <T>(work: Promise<T>, ms = 5_000): Promise<T | 'still waiting'> => {
   let timer: ReturnType<typeof setTimeout> | undefined;
   return Promise.race([
@@ -3239,17 +3240,50 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       throw new Error('the boot never queued behind the held lock');
     }
 
+    /** The pg_locks rows of this database's sessions holding or waiting for
+     *  the schema advisory lock (its key is $1). */
+    const ON_SCHEMA_LOCK = `locktype = 'advisory' AND classid = 0 AND objid = $1 AND objsubid = 1
+            AND database = (SELECT oid FROM pg_database WHERE datname = current_database())`;
+
     /** The sessions of this database holding or waiting for the schema
      *  advisory lock, as `granted` or `waiting`. */
     async function advisory(): Promise<string[]> {
       const res = await pool.query(
         `SELECT CASE WHEN granted THEN 'granted' ELSE 'waiting' END AS s FROM pg_locks
-          WHERE locktype = 'advisory' AND classid = 0 AND objid = $1 AND objsubid = 1
-            AND database = (SELECT oid FROM pg_database WHERE datname = current_database())
+          WHERE ${ON_SCHEMA_LOCK}
           ORDER BY 1`,
         [0x57_4f_43_01],
       );
       return res.rows.map((r: { s: string }) => r.s);
+    }
+
+    /** Starts the REAL boot (`ensureSchema`), its outcome `'finished'` or its
+     *  error. Every boot this section runs starts here. */
+    const startBoot = (): Promise<unknown> =>
+      db.ensureSchema().then(
+        () => 'finished',
+        (error: unknown) => error,
+      );
+
+    /** Reads a boot (or several, settled together) through a deadline, and
+     *  every boot this section waits on is read here. A boot still waiting at
+     *  it has every session on the schema advisory lock cancelled, not
+     *  terminated: its statement ends with 57014 and its own catch rolls back
+     *  and closes its client, so no boot outlives its case and no connection
+     *  drops under a client with no error listener. The read after the cancel
+     *  is a second at most. */
+    async function settled(work: Promise<unknown> | undefined, ms = 5_000): Promise<unknown> {
+      const outcome = await within(Promise.resolve(work), ms);
+      if (outcome === 'still waiting') {
+        await pool
+          .query(
+            `SELECT pg_cancel_backend(pid) FROM pg_locks WHERE ${ON_SCHEMA_LOCK}`,
+            [0x57_4f_43_01],
+          )
+          .catch(() => {});
+        await within(Promise.resolve(work), 1_000);
+      }
+      return outcome;
     }
 
     /** Polls, to a deadline, until `read` returns `want`. */
@@ -3283,7 +3317,8 @@ d('the housing mutation boundary (REAL Postgres)', () => {
      *  own session name), runs the REAL boot (`ensureSchema`) beside it, and
      *  reads the lock it waits for and every table lock it holds. `during` runs
      *  while the boot still waits and gets the boot's outcome (`'finished'` or
-     *  its error); the boot must finish unless `mayFail`. */
+     *  its error). The boot must settle within ten seconds of the hold's release
+     *  (a second, after a failure), and finish unless `mayFail`. */
     async function bootBehind(
       tables: readonly string[],
       opts: {
@@ -3300,23 +3335,24 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       let boot: Promise<unknown> | undefined;
       let result: { on: string; waits: string; held: string[] } | undefined;
       let outcome: unknown;
+      let ran = false;
       try {
         if (mode === 'ACCESS SHARE') await holder.query("SET application_name = 'pg_dump'");
         await holder.query('BEGIN');
         await holder.query(`LOCK TABLE ${tables.join(', ')} IN ${mode} MODE`);
         const holderPid = (await holder.query('SELECT pg_backend_pid() AS p')).rows[0].p;
-        boot = db.ensureSchema().then(
-          () => 'finished',
-          (error: unknown) => error,
-        );
+        boot = startBoot();
         const seen = await waiter(holderPid);
         result = { on: seen.rel, waits: seen.mode, held: await heldBy(seen.pid) };
         if (during) await during({ pid: seen.pid, holderPid }, boot);
+        ran = true;
       } finally {
         await holder.query('ROLLBACK').catch(() => {});
         await holder.query('RESET application_name').catch(() => {});
         holder.release();
-        outcome = await within(Promise.resolve(boot), 10_000);
+        // After a failure (a `during` that read the boot already, say) it gets a
+        // second, so its reads never stack past the case's timeout.
+        outcome = await settled(boot, ran ? 10_000 : 1_000);
       }
       if (outcome === 'still waiting') throw new Error('the boot behind the hold never settled');
       if (!mayFail && outcome !== 'finished') throw outcome;
@@ -3602,10 +3638,10 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         );
       let second: Promise<unknown> | undefined;
       let third: Promise<unknown> | undefined;
-      // A stopped realm's boot ends with its socket's error, read where it is
-      // read, so a boot that never ends fails there.
+      // A stopped realm's boot ends with an error, checked where it is read, so
+      // a boot that never ends fails at that read.
       const stoppedBoot = async (work: Promise<unknown> | undefined) => {
-        const outcome = await within(Promise.resolve(work));
+        const outcome = await settled(work);
         expect(outcome).toBeInstanceOf(Error);
         return outcome;
       };
@@ -3631,9 +3667,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
             }
             // A second realm, still running, queues on the advisory lock behind
             // the waiting boot, and a third one, stopped, queues there too.
-            second = db.ensureSchema().catch((error: unknown) => error);
+            second = startBoot();
             expect(await until(advisory, ['granted', 'waiting'])).toEqual(['granted', 'waiting']);
-            third = db.ensureSchema().catch((error: unknown) => error);
+            third = startBoot();
             expect(await until(advisory, ['granted', 'waiting', 'waiting'])).toEqual([
               'granted',
               'waiting',
@@ -3737,11 +3773,11 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         expect(await quiet()).toEqual([]);
       } finally {
         spy.mockRestore();
-        await within(Promise.allSettled([second, third]));
+        await settled(Promise.allSettled([second, third]));
         await rerunner.end().catch(() => {});
       }
       // Booted again after the dump, the realm comes up.
-      await db.ensureSchema();
+      expect(await settled(startBoot(), 10_000)).toBe('finished');
     });
 
     it("DEPLOY's sign-out ends every live token and pending OAuth code", async () => {

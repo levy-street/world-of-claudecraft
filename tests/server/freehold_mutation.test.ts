@@ -2911,7 +2911,8 @@ describe('the claim renewer', () => {
     // the bot's code that writes a game API route sits in the client member that
     // sends it. So a new route, a second sender of one, or a route requested
     // outside call() fails here until DEPLOY's overview and lever 3 are checked
-    // (a route assembled from parts is not read).
+    // (a route assembled from parts, or spelled so URL parsing rewrites it, is
+    // not read).
     const serverClient = parsed('bot/server_client.ts');
     const memberOf = (node: ts.Node): string => {
       for (let at = node.parent; at !== undefined; at = at.parent) {
@@ -2950,7 +2951,7 @@ describe('the claim renewer', () => {
       'call: fetchImpl',
       "flexBatch: 'POST', '/internal/discord/flex-batch'",
       "drainOutbox: 'GET', '/internal/discord/outbox'",
-      // Split at the placeholder, so the literal is plain text.
+      // Split at each placeholder, for Biome's noTemplateCurlyInString.
       "roles: 'GET', `/internal/discord/roles?discord_user_id=$" +
         '{encodeURIComponent(discordUserId)}`',
       "pushPresence: 'POST', '/internal/discord/presence'",
@@ -2975,11 +2976,12 @@ describe('the claim renewer', () => {
           [
             "a('/internal/discord/one');",
             'b(`/internal/discord/two`);',
-            // Split at the placeholder, so the literal is plain text.
+            // Split at each placeholder, for Biome's noTemplateCurlyInString.
             'c(`/internal/discord/three/$' + '{x}`);',
             'd(`$' + '{base}/internal/discord/four/$' + '{x}/tail`);',
             'e(`$' + '{base}/internal/discord/five`);',
             "f(new URL('internal/discord/six', base));",
+            "h('/internal\\/discord/seven');",
             "g('/api/elsewhere');",
           ].join('\n'),
           ts.ScriptTarget.Latest,
@@ -2995,9 +2997,18 @@ describe('the claim renewer', () => {
       ts.SyntaxKind.TemplateMiddle,
       ts.SyntaxKind.TemplateTail,
       ts.SyntaxKind.StringLiteral,
+      ts.SyntaxKind.StringLiteral,
     ]);
+    // Every tracked bot code file is parsed, so a route is read as its
+    // literal's value (an escape in its text included), never as raw text.
+    const listed = spawnSync('git', ['ls-files', '--', ...botCode], { encoding: 'utf8' });
+    expect(listed.status).toBe(0);
+    const botFiles = listed.stdout.split('\n').filter((file) => file !== '');
+    expect(botFiles).toEqual(
+      expect.arrayContaining(['bot/logic.ts', 'bot/main.ts', 'bot/server_client.ts']),
+    );
     expect(
-      gitGrep('internal/discord/', botCode).flatMap((file) =>
+      botFiles.flatMap((file) =>
         nodesIn(parsed(file))
           .filter(writesRoute)
           .map((node) => `${file}: ${memberOf(node)}`),
@@ -3065,7 +3076,7 @@ describe('the claim renewer', () => {
       'if (!claimDailyActive(dailyActive, day, userId)) return;',
       'const g = DISCORD_REWARD_GRANTS.dailyActive;',
       'void server',
-      // Split at the placeholder, so the literal is plain text.
+      // Split at each placeholder, for Biome's noTemplateCurlyInString.
       '.grant(userId, g.reason, g.points, `$' + '{g.reason}:$' + '{userId}:$' + '{day}`)',
       ".catch((e) => console.error('[bot] daily-active grant failed', e));",
       '};',
@@ -6291,7 +6302,7 @@ describe('the claim renewer', () => {
         "'pg-native'",
         'migrate_mail_bot_welcome_purge.cjs',
       ),
-      // Split at the placeholder, so the literal is plain text.
+      // Split at each placeholder, for Biome's noTemplateCurlyInString.
       'console.log(`[build:server] bot detector: $' +
         "{usePrivate ? 'private' : 'stub (no-op)'}`);",
     ]);
@@ -6452,7 +6463,7 @@ describe('the claim renewer', () => {
         .filter((line) => !/^\s*#/.test(line) && composeRuntime(line))
         .map(flat),
     ).toEqual([
-      // Split at the placeholder, so the literal is plain text.
+      // Split at each placeholder, for Biome's noTemplateCurlyInString.
       'NODE_OPTIONS: $' + '{NODE_OPTIONS:-}',
       'command: ["node", "dist-bot/bot.cjs"]',
     ]);
