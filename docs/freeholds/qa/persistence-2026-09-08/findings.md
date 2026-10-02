@@ -5803,10 +5803,16 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   ended sign-out is gone. Fixed in `2afa2c6f0a`; L37R4 flagged.
 - ROUND THIRTY-EIGHT, eight fresh readers over round thirty-seven: 27 findings, none blocking, 5
   should-fix, every reader passing, five with no should-fix. The Discord bot overview drops its
-  pure-consumer claim and the restart note names every loss; the unit suite ties the winner read
-  and its marks, the daily-active grant's cases, the resync's defaults and calls and the files
-  that drain a feed, drops every comment, and lists every statement reaching a read declaration.
-  Fixed in `41db868baa`.
+  pure-consumer claim and the restart note names what of the outbox a stop loses (worded so in
+  round thirty-nine, Q39R2); the unit suite ties the winner read and its marks, the daily-active
+  grant's cases, the resync's defaults and calls and the files that drain a feed, drops every
+  comment, and lists every statement reaching a read declaration. Fixed in `41db868baa`.
+- ROUND THIRTY-NINE, eight fresh readers over round thirty-eight: 33 findings, none blocking, 5
+  should-fix, every reader passing, five with no should-fix. DEPLOY states rules where precision
+  kept drawing new ties: the bot's resyncs heal with no cadence promised, and the daily-active
+  points follow the only-in-answer-to-an-event rule with no list of events; the overview points to
+  both places that say what a stop costs; the unit suite pins the overview, its pointers' sections
+  and the bot's internal API. Fixed in `a5b04edb93`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5833,11 +5839,11 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 ### EVIDENCE
 
 - `npx tsc --noEmit` exit 0 at every round's tip.
-- Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then
-  641, then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
-  then 644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then
-  647, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648,
-  then 648, then 648, then 648, then 648, then 648, then 648, then 648 passed, never a skip.
+- Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then 641,
+  then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644, then
+  644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then 647,
+  then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then
+  648, then 648, then 648, then 648, then 648, then 648, then 648, then 648 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
@@ -5911,7 +5917,8 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   comment still says three in-memory feeds and three requeues, where there are four;
   `server/discord_link_changes.ts`'s `isEvictableFlexNoise` comment says the bot can never
   re-learn a link transition's id from a resync, against the same file's header and the bot's
-  hourly reconciliation (round thirty-eight's reports).
+  hourly reconciliation (round thirty-eight, outside its findings, noted in its section in round
+  thirty-nine, L39R2).
 - The `.npmrc` pin is a maintainer decision. Recommendation: a content rule in the malware scan,
   pinned in `tests/malware_scan.test.ts`, refusing any `node-options`, `registry` or script hook
   line in `.npmrc`. That is cheaper and narrower than exempting a test that reads the file.
