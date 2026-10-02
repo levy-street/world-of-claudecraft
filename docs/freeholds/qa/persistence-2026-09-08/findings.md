@@ -5598,6 +5598,11 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   with another body, three commits were red on a pin that landed before its DEPLOY text (the
   unpushed range was rewritten so none is), and the G2 bench shape was found not to isolate
   the upgrade path. Fixed in `226841c7cc` through `ce11607af0`.
+- ROUND FIVE, eight fresh readers over round four: 33 findings, none blocking, 7 should-fix.
+  The token probe's deparse was found to take a brief ACCESS SHARE on the Hearth table (held
+  to no COMMIT, now stated and proved), the shutdown budget now names its bounded awaits
+  and says every other await has no deadline, and DEPLOY quotes the whole CHECK the boot
+  compares. Fixed in `cd03d3045f` through `e714944344`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5617,7 +5622,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 
 - `npx tsc --noEmit` exit 0 at every round's tip.
 - Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then 641,
-  then 642 passed, never a skip.
+  then 642, then 643 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):

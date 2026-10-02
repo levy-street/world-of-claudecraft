@@ -227,8 +227,9 @@ the rewrite's.
   S4R4 and M4R4: the probe compares the whole deparsed definition, so a CHECK with another
   body warns too). C4R4 FIXED `b197b681b0` (with H4R2 and Q4R3: once per registry).
 - H4R1 FIXED `ce11607af0` (with L4R1): the shutdown budget adds the concurrent Steam and Epic
-  mirror stop, 47 s of bounded drains, and names the drains with no deadline at their call
-  sites; this corrects H3R2's 42 s, which stands above as round three wrote it.
+  mirror stop, 47 s of bounded drains, and names in `persistence-rollout-contract.md` the
+  drains that take no deadline at their call sites; this corrects H3R2's 42 s, which stands
+  above as round three wrote it.
 - Q4R1 FIXED by rewriting the unpushed range: the two DEPLOY pins left the token-probe commit
   for their own commit, `87169095d0`, right after the DEPLOY text they read (`ffbe38eb94`), so
   no commit is red on that case; the tree at the tip was unchanged. Q4R2 FIXED in this record
@@ -261,3 +262,64 @@ the rewrite's.
   reaches it (a same-named constraint with the column missing), probing the name first would
   make every fresh install's CHECK `NOT VALID`, and the comment's claim is scoped to the
   repair branch.
+
+## Round five: eight fresh readers over round four (`a299a3bc58..b915d30173`)
+
+Round five's commits: `cd03d3045f` (the in-flight join keyed on the preload's account),
+`e872a45953` (the token probe's brief lock stated and pinned, with DEPLOY's token and
+first-rollout bullets), `44ce2571bb` (the trip warn's character set), `e714944344` (the
+shutdown budget's bounded waits and the other records), and the commit that adds this
+section. The first qa-checklist reader stalled with no tool running and was replaced by a
+fresh one with the same brief.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C5R1, C5R2 |
+| qa-checklist | PASS | Q5R1 to Q5R4 |
+| server hot path | PASS | H5R1 to H5R5 |
+| privacy and security | PASS | S5R1 to S5R3 |
+| database performance | PASS | D5R1 to D5R4 |
+| test coverage | PASS | T5R1 to T5R5 |
+| docs librarian | PASS | L5R1 to L5R5 |
+| migration safety | PASS | M5R1 to M5R5 |
+
+33 findings: none blocking, 7 should-fix (S5R1, C5R1, H5R1, L5R1, T5R1, D5R1, D5R2), 26
+nice-to-have.
+
+- C5R1 FIXED `e872a45953`: deparsing the CHECK opens the Hearth table under ACCESS SHARE (a
+  probe on PostgreSQL 16.14 answered 55P03 behind an ACCESS EXCLUSIVE holder for a CHECK and
+  at once for a UNIQUE; the database and migration readers had said it takes no lock). The
+  fragment comment, DEPLOY, P12 and the contract now say a steady boot's one table lock is
+  that brief ACCESS SHARE, held to no COMMIT, and a pg case proves both halves; a mutant
+  restoring the type-only compare makes the boot stop waiting and fails it. C5R2 FIXED
+  `cd03d3045f` (the read records the claim once its COMMIT is proved).
+- Q5R1 FIXED `e872a45953` (with D5R1 and M5R4: DEPLOY quotes the whole CHECK the boot
+  compares, pinned to the probe's literal, and says a correct CHECK a deparse change trips
+  is not dropped but reported). Q5R2 FIXED `e714944344`. Q5R3 FIXED `e714944344`. Q5R4 FIXED
+  in this record (the H4R1 disposition above names the contract).
+- H5R1 FIXED `e714944344` (with L5R1): the enumeration of drains with no deadline drew one
+  more missing step each round, so the budget now names the awaits that take a deadline and
+  states that EVERY other await in the closure takes none, `pool.end()` included. H5R2
+  RULED: the launch observer is shared with the market and rift writers' billing, so an
+  observer that keeps throwing breaks theirs the same way and a Freeholds-only counter
+  would not show the fault; the one warning says later throws are not logged. H5R3, H5R5
+  FIXED `e714944344`. H5R4 FIXED `cd03d3045f` (one helper).
+- S5R1 FIXED `e714944344` (the close comment states P7's sent-back and collapse duties).
+  S5R2 FIXED `e872a45953` (the DROP runs under a lock timeout, retried on 55P03). S5R3 FIXED
+  `cd03d3045f` (the in-flight fact reads the preload's own account).
+- D5R1 FIXED `e872a45953` (see Q5R1). D5R2 FIXED `e714944344` (with L5R4: the abort at once
+  rests on its timing, a 10 ms `DELETE FROM accounts` sample in its round included). D5R3
+  FIXED `e714944344` (R-13 and the contract name the socket close and the cancel, which runs
+  on the canceller's own pool). D5R4 FIXED `e714944344` (the gate's floor of one).
+- T5R1 FIXED `44ce2571bb`: a narrowed and a widened character set each fail their own arm.
+  T5R2 FIXED `e872a45953` (the main schema stays silent beside the impostor). T5R3 FIXED
+  `cd03d3045f`. T5R4, T5R5 FIXED `e872a45953`.
+- L5R1 FIXED (see H5R1). L5R2 FIXED `e714944344` (with M5R3). L5R3 FIXED `e714944344` (the
+  renewer stop comment in `server/main.ts`). L5R4 FIXED (see D5R2). L5R5 FIXED `e714944344`.
+- M5R1, M5R2 FIXED `e872a45953` (the statements name `public.account_freehold_hearth`; a
+  foreign-key impostor's DROP locks the referenced table too). M5R3 FIXED (see L5R2). M5R4
+  FIXED (see Q5R1). M5R5 FIXED `e714944344` (only a lock SHARE does not wait for, then a
+  write, closes the upgrade path).
+- Outside this round, noted for the librarian sweep: the Part 5 record in
+  `docs/freeholds/qa/persistence-2026-09-08/findings.md` cites two hashes that are not
+  objects in this repository.

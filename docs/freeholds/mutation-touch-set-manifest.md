@@ -1300,3 +1300,7 @@ What changed the contract above:
   which save each retry reaches, R-12 counts gate permits rather than admission slots, and
   R-13 names the chunk's own wall as its cut. P7 states the id duty for an id a client
   sends back.
+- A fifth round of eight fresh readers: the in-flight join reads the preload's own account;
+  the Hearth token probe's deparse takes a brief ACCESS SHARE on its table, held to no
+  COMMIT (P12 says so, proved on PostgreSQL); R-12 keeps the gate's floor of one and R-13
+  names the cancel.
