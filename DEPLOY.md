@@ -1157,25 +1157,22 @@ For off-box safety, sync the directory to S3 occasionally:
   advance token shape is unchecked` instead. The log judges the text only, so it also
   fires on a correct CHECK a newer PostgreSQL prints differently; the cases below tell
   them apart by text, never by judgment. The boot checks
-  `public.account_freehold_hearth`, and every statement below names it so. Send each
-  block below whole, with no realm booting or restarting: every block but PRINT locks
-  the Hearth table, and a boot that waits behind one holds both parents. On any error,
-  send ROLLBACK first. Then: on 55P03 or 40P01 wait about 10 s and send the same block
-  again, at most about five times before finding the holder in `pg_stat_activity` and
-  `pg_locks`; on 42710 from RESTORE the name was taken since the read, so re-run the
-  read; on 42703 from RESTORE the column itself is missing, so the next boot re-adds
-  it with its CHECK, a repair boot (above), and every Hearth trip fails until then, so
-  run that boot in the next quiet window; on 42P07 from PRINT send `DROP TABLE
-  pg_temp.advance_token_print;` and PRINT again; on 42710 or 42P07 from DISPLACE an
-  earlier displacement holds the name, so settle it by the drop rule and send DISPLACE
-  again, and if the drop rule's read finds no row a bare relation holds the name, so
-  stop and report it; on an integrity error (SQLSTATE class 23) from NULL AND
-  VALIDATE, see the drop rule; on 25P03 or a lost connection, reconnect and re-run the
-  read, which shows whether the block landed; on anything else, stop. First read what
-  the name holds: `SELECT contype, convalidated, pg_get_constraintdef(oid), (SELECT
-  array_agg(attname) FROM pg_attribute WHERE attrelid = conrelid AND attnum = ANY
-  (conkey)) AS columns FROM pg_constraint WHERE conrelid =
-  'public.account_freehold_hearth'::regclass AND conname =
+  `public.account_freehold_hearth`, and every statement below names it so. Send the
+  read and each block below as its own file through non-interactive psql, never pasted
+  into an interactive session, with no realm booting or restarting: `sudo docker exec
+  -i -e PGOPTIONS='-c lock_timeout=2s -c idle_in_transaction_session_timeout=5s -c
+  application_name=advance_token_runbook' eastbrook-db psql -X -v ON_ERROR_STOP=1 -v
+  VERBOSITY=sqlstate -U eastbrook eastbrook < block.sql`. Each send is one session: it
+  stops at the first error and exits on a lost connection rather than reconnecting,
+  its lock waits and pauses are bounded, it prints an error as its SQLSTATE code
+  alone, never a message or a DETAIL (a DETAIL can carry an account id), and an error
+  ends the session, which rolls the block back. The read deparses under a brief ACCESS
+  SHARE on the Hearth table, as the boot's probe does; every block but PRINT locks the
+  table to its COMMIT, and a boot that waits behind one holds both parents. First read
+  what the name holds: `SELECT contype, convalidated, pg_get_constraintdef(oid),
+  cardinality(conkey) AS keys, (SELECT array_agg(attname) FROM pg_attribute WHERE
+  attrelid = conrelid AND attnum = ANY (conkey)) AS columns FROM pg_constraint WHERE
+  conrelid = 'public.account_freehold_hearth'::regclass AND conname =
   'account_freehold_hearth_advance_token_shape'`, then:
   - No row: send RESTORE, then NULL AND VALIDATE; no repair boot is needed.
   - `contype` is `c` and the definition, a ` NOT VALID` suffix aside, is exactly
@@ -1189,26 +1186,39 @@ For off-box safety, sync the directory to S3 occasionally:
     `server/freehold_hearth_db.ts` is updated, and if `convalidated` is false, send
     NULL AND VALIDATE.
   - Anything else: send DISPLACE, re-run the read (expect `contype` `c` and the text
-    PRINT showed, with ` NOT VALID`), then send NULL AND VALIDATE. DISPLACE renames
-    the impostor, never a drop, so whatever it enforced is kept, and adds the boot's
-    own CHECK in one short transaction holding ACCESS EXCLUSIVE on the Hearth table
-    alone: every realm's Hearth reads wait at most the lock timeout plus the block.
-    The next boot finds the real CHECK and is silent if PRINT showed the exact text
-    above; if PRINT differed, every boot keeps warning, so report it as in the case
-    above.
+    PRINT showed, with ` NOT VALID`), send NULL AND VALIDATE, then settle the
+    displaced impostor by the drop rule. DISPLACE renames the impostor, never a drop,
+    so whatever it enforced is kept, and adds the boot's own CHECK in one short
+    transaction holding ACCESS EXCLUSIVE on the Hearth table alone: every realm's
+    Hearth reads wait at most the lock timeout plus the block. The next boot finds the
+    real CHECK and is silent if PRINT showed the exact text above; if PRINT differed,
+    every boot keeps warning, so report it as in the case above.
   - The drop rule for a displaced constraint: read it (the same read with `conname`
     set to `account_freehold_hearth_advance_token_shape_displaced`). Send DROP only
-    when its `columns` are exactly `{advance_token}` and its `contype` is not `f`:
-    only the real CHECK should constrain the token the server writes. For anything
-    else, stop and report it: dropping a constraint on other columns loses what it
-    guards, and a foreign key's drop also locks the table it references. Send that
-    DROP once the CHECK is validated, or earlier on the DISPLACE collision route (the
-    server writes only hex tokens, so the moment between that DROP and DISPLACE checks
-    nothing the writer does not). If NULL AND VALIDATE fails with an integrity error,
-    read the constraint's name from the error's first line, never copying its DETAIL,
-    which carries the row's account id; if it is the displaced constraint and this
-    rule allows its DROP, send DROP and then NULL AND VALIDATE again; for any other,
-    stop.
+    when its `keys` is 1, its `columns` are exactly `{advance_token}` and its
+    `contype` is not `f`: only the real CHECK should constrain the token the server
+    writes. For anything else, stop and report it: dropping a constraint on other
+    columns, or on the whole row, loses what it guards, and a foreign key's drop also
+    locks the table it references. Send that DROP once the CHECK is validated, earlier
+    on the DISPLACE collision route (the server writes only hex tokens, so the moment
+    between that DROP and DISPLACE checks nothing the writer does not), or when NULL
+    AND VALIDATE fails with a code starting 23: then read the displaced constraint,
+    and if this rule allows its DROP, send DROP and then NULL AND VALIDATE again; if
+    there is no displaced constraint, this rule does not allow its DROP, or NULL AND
+    VALIDATE fails again, stop.
+  - Route an error on its code: on 55P03 or 40P01 wait about 10 s and send the same
+    file again, at most about five times before finding the holder in
+    `pg_stat_activity` and `pg_locks`; on 42710 from RESTORE the name was taken since
+    the read, so re-run the read; on 42703 from RESTORE the column itself is missing
+    and every Hearth trip fails until the next boot re-adds it with its CHECK, a
+    repair boot (above), so stop the other realms and run it in the next quiet window;
+    on 42710 or 42P07 from DISPLACE an earlier displacement holds the name, so settle
+    it by the drop rule and send DISPLACE again, and if the drop rule's read finds no
+    row a bare relation holds the name, so stop and report it; on a code starting 23
+    (an integrity error) from NULL AND VALIDATE, see the drop rule; on a lost
+    connection, wait until `pg_stat_activity` shows no other `advance_token_runbook`
+    session, then re-run the read (after DROP, the drop rule's read), which shows
+    whether the block landed; on anything else, stop.
 
   RESTORE (the boot's own CHECK, NOT VALID, with no repair boot):
 
@@ -1223,8 +1233,8 @@ For off-box safety, sync the directory to S3 occasionally:
   ```
 
   NULL AND VALIDATE (report the count it prints, never the tokens; the rows it nulls
-  stay locked to its COMMIT, and VALIDATE takes SHARE UPDATE EXCLUSIVE, which does not
-  block writes):
+  stay locked to its COMMIT, for as long as VALIDATE scans the table, which grows with
+  it, and VALIDATE takes SHARE UPDATE EXCLUSIVE, which does not block writes):
 
   ```sql
   BEGIN;

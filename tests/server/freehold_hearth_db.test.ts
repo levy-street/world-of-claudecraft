@@ -1063,60 +1063,83 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
         'ALTER TABLE public.account_freehold_hearth DROP CONSTRAINT account_freehold_hearth_advance_token_shape_displaced;',
       ),
     );
-    // The procedure's safety rules in its prose: every block sent with no
-    // realm booting, every error rolled back first and each error code routed
-    // by the block that raised it, the read first, a CHECK the boot misreads
-    // kept and always reported, an impostor renamed and never dropped, a taken
-    // displaced name settled before DISPLACE again, the live name never
-    // dropped, and every statement naming the table the boot checks.
-    expect(bullet).toContain('Send each block below whole, with no realm booting or restarting');
-    expect(bullet).toContain('On any error, send ROLLBACK first');
+    // The procedure's safety rules in its prose: the read and every block sent
+    // as one non-interactive session with no realm booting, under the blocks'
+    // own lock and pause bounds, printing a code and never a DETAIL, each code
+    // routed by the block that raised it, the read first, a CHECK the boot
+    // misreads kept and always reported, an impostor renamed and never
+    // dropped, a taken displaced name settled before DISPLACE again, the live
+    // name never dropped, and every statement naming the table the boot checks.
+    expect(bullet).toContain(
+      'Send the read and each block below as its own file through non-interactive psql, never pasted into an interactive session, with no realm booting or restarting',
+    );
+    expect(bullet).toContain(
+      "`sudo docker exec -i -e PGOPTIONS='-c lock_timeout=2s -c idle_in_transaction_session_timeout=5s -c application_name=advance_token_runbook' eastbrook-db psql -X -v ON_ERROR_STOP=1 -v VERBOSITY=sqlstate -U eastbrook eastbrook < block.sql`",
+    );
+    expect(bullet).toContain(
+      'it prints an error as its SQLSTATE code alone, never a message or a DETAIL (a DETAIL can carry an account id), and an error ends the session, which rolls the block back',
+    );
     // The error routes are a CLOSED set, each code tied to the block that
     // raises it, plus the lock retry, the integrity route, the lost session
-    // and the stop for anything else.
+    // and the stop for anything else; and the codes the prose names are
+    // exactly these, so a route added beside them must join this list.
+    expect([...bullet.matchAll(/\b\d[0-9A-Z]{4}\b/g)].map((match) => match[0])).toEqual([
+      '55P03',
+      '40P01',
+      '42710',
+      '42703',
+      '42710',
+      '42P07',
+    ]);
     expect(
       [...bullet.matchAll(/on ([0-9A-Z]{5}(?: or [0-9A-Z]{5})*) from ([A-Z][A-Z ]*[A-Z])\b/g)].map(
         (match) => `${match[1]} from ${match[2]}`,
       ),
-    ).toEqual([
-      '42710 from RESTORE',
-      '42703 from RESTORE',
-      '42P07 from PRINT',
-      '42710 or 42P07 from DISPLACE',
-    ]);
-    expect(bullet).toContain('on 55P03 or 40P01 wait about 10 s and send the same block again');
+    ).toEqual(['42710 from RESTORE', '42703 from RESTORE', '42710 or 42P07 from DISPLACE']);
+    expect(bullet).toContain('on 55P03 or 40P01 wait about 10 s and send the same file again');
     expect(bullet).toContain(
       'on 42710 from RESTORE the name was taken since the read, so re-run the read',
     );
-    expect(bullet).toContain('on 42703 from RESTORE the column itself is missing');
-    expect(bullet).toContain('on 42P07 from PRINT send `DROP TABLE pg_temp.advance_token_print;`');
+    expect(bullet).toContain(
+      'a repair boot (above), so stop the other realms and run it in the next quiet window',
+    );
     expect(bullet).toContain(
       'on 42710 or 42P07 from DISPLACE an earlier displacement holds the name, so settle it by the drop rule and send DISPLACE again',
     );
     expect(bullet).toContain(
-      'on an integrity error (SQLSTATE class 23) from NULL AND VALIDATE, see the drop rule',
+      'on a code starting 23 (an integrity error) from NULL AND VALIDATE, see the drop rule',
     );
-    expect(bullet).toContain('on 25P03 or a lost connection, reconnect and re-run the read');
+    expect(bullet).toContain(
+      "on a lost connection, wait until `pg_stat_activity` shows no other `advance_token_runbook` session, then re-run the read (after DROP, the drop rule's read)",
+    );
     expect(bullet).toContain('on anything else, stop');
     const readAt = bullet.indexOf('First read what the name holds');
     expect(readAt).toBeGreaterThan(-1);
     expect(readAt).toBeLessThan(bullet.indexOf('No row: send RESTORE'));
+    expect(bullet).toContain(
+      "AND conname = 'account_freehold_hearth_advance_token_shape'`, then: - No row: send RESTORE",
+    );
     expect(bullet).toContain('do not displace it');
     expect(bullet).toContain('Report it whatever `convalidated` says');
     expect(bullet).toContain('DISPLACE renames the impostor, never a drop');
-    // The drop rule drops only a constraint on the token alone, never a
-    // foreign key, and an integrity error is read by its first line only.
     expect(bullet).toContain(
-      'Send DROP only when its `columns` are exactly `{advance_token}` and its `contype` is not `f`',
+      'send NULL AND VALIDATE, then settle the displaced impostor by the drop rule',
+    );
+    // The drop rule drops only a constraint on the token alone (one key, so
+    // never the whole row), never a foreign key, and on an integrity error
+    // only after its own read.
+    expect(bullet).toContain(
+      'Send DROP only when its `keys` is 1, its `columns` are exactly `{advance_token}` and its `contype` is not `f`',
     );
     expect(bullet).toContain('For anything else, stop and report it');
-    expect(bullet).toContain('never copying its DETAIL');
-    expect(bullet).toContain('send DROP and then NULL AND VALIDATE again; for any other, stop');
-    // Every name the prose sends an operator to heads a block (or is ROLLBACK),
-    // and every block is sent to.
+    expect(bullet).toContain(
+      'then read the displaced constraint, and if this rule allows its DROP, send DROP and then NULL AND VALIDATE again; if there is no displaced constraint, this rule does not allow its DROP, or NULL AND VALIDATE fails again, stop',
+    );
+    // Every name the prose sends an operator to heads a block, and every block
+    // is sent to.
     expect(
       new Set([...bullet.matchAll(/send ([A-Z][A-Z ]*[A-Z])\b/g)].map((match) => match[1])),
-    ).toEqual(new Set([...Object.keys(block), 'ROLLBACK']));
+    ).toEqual(new Set(Object.keys(block)));
     expect(bullet).not.toMatch(
       /DROP CONSTRAINT (?:IF EXISTS )?"?account_freehold_hearth_advance_token_shape(?!_)/,
     );

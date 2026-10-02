@@ -498,9 +498,9 @@ d('account_freehold_hearth against real PostgreSQL', () => {
 
   it("runs the operator's own runbook SQL, every block, against a real impostor, a taken displaced name and a missing CHECK", async () => {
     // The five labelled blocks of DEPLOY.md's advance-token bullet, each sent
-    // as an operator sends it (one simple-query string on one session),
-    // against a table whose probed name holds an impostor, then one whose
-    // name holds nothing.
+    // as the bullet's psql command sends it (one file, one session), against a
+    // table whose probed name holds an impostor, one whose name holds nothing,
+    // and one whose displaced impostor fails NULL AND VALIDATE.
     const legacy = db.freeholdHearthSchema(LEGACY_SCHEMA);
     const legacyTable = `${LEGACY_SCHEMA}.account_freehold_hearth`;
     const NAME = 'account_freehold_hearth_advance_token_shape';
@@ -554,28 +554,51 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       );
     const VALID_DEF =
       "CHECK (((advance_token IS NULL) OR (advance_token ~ '^[0-9a-f]{32}$'::text)))";
-    const session = await pool.connect();
+    // The bullet's own send command: its PGOPTIONS become each send's startup
+    // options, so every send below is one session under exactly the bounds
+    // and the name the operator's psql carries, and an error ends it (the
+    // client closes; nothing sends ROLLBACK), which rolls the block back.
+    const flat = raw.replace(/\n\s*/g, ' ');
+    const pgoptions = (flat.match(/PGOPTIONS='([^']+)'/) ?? ['', ''])[1];
+    const send = async (sql: string) => {
+      const { Client } = await import('pg');
+      const client = new Client({ connectionString: url, options: pgoptions });
+      await client.connect();
+      try {
+        return rowsOf(await client.query(sql));
+      } finally {
+        await client.end();
+      }
+    };
+    const PARENT = `${LEGACY_SCHEMA}.runbook_token_parent`;
     try {
+      expect(
+        await send(
+          "SELECT current_setting('application_name') AS app, current_setting('lock_timeout') AS lock, current_setting('idle_in_transaction_session_timeout') AS idle",
+        ),
+      ).toEqual([{ app: 'advance_token_runbook', lock: '2s', idle: '5s' }]);
       // PRINT shows this server's print of the real CHECK: the boot's literal.
-      expect(rowsOf(await session.query(block.PRINT))).toEqual([
-        { pg_get_constraintdef: VALID_DEF },
-      ]);
+      // Its temp table ends with its session, so PRINT sent again cannot meet
+      // its own leftover.
+      for (let round = 0; round < 2; round++) {
+        expect(await send(block.PRINT)).toEqual([{ pg_get_constraintdef: VALID_DEF }]);
+      }
       // The bullet's own read, run as written: by the probed name, and with
       // `conname` set to the displaced name for the drop rule.
-      const flat = raw.replace(/\n\s*/g, ' ');
       const readSql = (flat.match(/`(SELECT contype, convalidated, [^`]+)`/) ?? [
         '',
         '',
       ])[1].replaceAll('public.account_freehold_hearth', legacyTable);
-      expect(readSql).toContain('array_agg(attname)');
-      const read = async (displaced: boolean) =>
-        rowsOf(
-          await session.query(
-            displaced
-              ? readSql.replace(`conname = '${NAME}'`, `conname = '${NAME}_displaced'`)
-              : readSql,
-          ),
+      expect(readSql).toContain('cardinality(conkey) AS keys');
+      const read = (displaced: boolean) =>
+        send(
+          displaced
+            ? readSql.replace(`conname = '${NAME}'`, `conname = '${NAME}_displaced'`)
+            : readSql,
         );
+      // The drop rule as the bullet states it, over that read's row.
+      const dropAllowed = (row: Record<string, unknown>) =>
+        row.keys === 1 && row.columns === '{advance_token}' && row.contype !== 'f';
       // An impostor under the name and a non-hex token stored: the boot warns.
       await pool.query(`ALTER TABLE ${legacyTable} DROP CONSTRAINT IF EXISTS ${NAME}`);
       await pool.query(`ALTER TABLE ${legacyTable} ADD CONSTRAINT ${NAME} UNIQUE (advance_token)`);
@@ -591,27 +614,50 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       ]);
       // An earlier displacement holding the displaced name, in each shape: a
       // key, whose index collides first (42P07), and a CHECK, whose name does
-      // (42710). DISPLACE changes nothing; ROLLBACK first; the drop rule's read
-      // shows the token alone and no foreign key, so DROP it; then go on.
+      // (42710). DISPLACE changes nothing; the drop rule's read shows one key,
+      // the token alone and no foreign key, so DROP it; then go on.
       for (const [earlier, code, contype] of [
         ['UNIQUE (advance_token)', '42P07', 'u'],
         ['CHECK (advance_token IS NULL OR length(advance_token) = 32)', '42710', 'c'],
       ] as const) {
         await pool.query(`ALTER TABLE ${legacyTable} ADD CONSTRAINT ${NAME}_displaced ${earlier}`);
-        await expect(session.query(block.DISPLACE), earlier).rejects.toMatchObject({ code });
-        await session.query('ROLLBACK');
+        await expect(send(block.DISPLACE), earlier).rejects.toMatchObject({ code });
         expect(
           (await named(NAME)).map((row) => row.def),
           earlier,
         ).toEqual(['UNIQUE (advance_token)']);
         const settled = await read(true);
-        expect(settled, earlier).toHaveLength(1);
-        expect(settled[0].contype, earlier).toBe(contype);
-        expect(String(settled[0].columns), earlier).toMatch(/^\{?advance_token\}?$/);
-        await session.query(block.DROP);
+        expect(settled, earlier).toEqual([
+          expect.objectContaining({ contype, keys: 1, columns: '{advance_token}' }),
+        ]);
+        expect(dropAllowed(settled[0]), earlier).toBe(true);
+        await send(block.DROP);
         expect(await named(`${NAME}_displaced`), earlier).toEqual([]);
       }
-      await session.query(block.DISPLACE);
+      // What the drop rule stops on, each read as the operator reads it and
+      // each failing one clause alone or the token-plus-key shape: another
+      // column, the whole row beside the token (whose read lists the token
+      // alone, so only `keys` tells), a foreign key, and a key over the
+      // account and the token.
+      await pool.query(`CREATE TABLE ${PARENT} (token TEXT PRIMARY KEY)`);
+      for (const [shape, keys, columns, contype] of [
+        ['UNIQUE (account_id)', 1, '{account_id}', 'u'],
+        [
+          'CHECK (advance_token IS NULL OR length(account_freehold_hearth::text) > 0)',
+          2,
+          '{advance_token}',
+          'c',
+        ],
+        [`FOREIGN KEY (advance_token) REFERENCES ${PARENT} NOT VALID`, 1, '{advance_token}', 'f'],
+        ['UNIQUE (account_id, advance_token)', 2, '{account_id,advance_token}', 'u'],
+      ] as const) {
+        await pool.query(`ALTER TABLE ${legacyTable} ADD CONSTRAINT ${NAME}_displaced ${shape}`);
+        const stopped = await read(true);
+        expect(stopped, shape).toEqual([expect.objectContaining({ contype, keys, columns })]);
+        expect(dropAllowed(stopped[0]), shape).toBe(false);
+        await pool.query(`ALTER TABLE ${legacyTable} DROP CONSTRAINT ${NAME}_displaced`);
+      }
+      await send(block.DISPLACE);
       // The impostor kept under the displaced name, the real CHECK back NOT
       // VALID (the stored bad token not scanned); the next boot is silent and
       // rebuilds nothing (the CHECK keeps its oid).
@@ -623,35 +669,62 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       expect(await boot()).toEqual([]);
       expect((await named(NAME)).map((row) => row.oid)).toEqual(restored.map((row) => row.oid));
       // NULL AND VALIDATE reports the count, nulls the bad token, validates.
-      expect(rowsOf(await session.query(block['NULL AND VALIDATE']))).toEqual([{ non_hex: '1' }]);
-      const kept = await pool.query(
-        `SELECT advance_token FROM ${legacyTable} WHERE account_id = $1`,
-        [CHECK_ACCOUNT],
-      );
-      expect(kept.rows).toEqual([{ advance_token: null }]);
+      expect(await send(block['NULL AND VALIDATE'])).toEqual([{ non_hex: '1' }]);
+      const token = async () =>
+        (
+          await pool.query(`SELECT advance_token FROM ${legacyTable} WHERE account_id = $1`, [
+            CHECK_ACCOUNT,
+          ])
+        ).rows;
+      expect(await token()).toEqual([{ advance_token: null }]);
       expect((await named(NAME)).map((row) => row.def)).toEqual([VALID_DEF]);
       // DROP takes the displaced constraint only.
-      await session.query(block.DROP);
+      await send(block.DROP);
       expect(await named(`${NAME}_displaced`)).toEqual([]);
       expect((await named(NAME)).map((row) => row.def)).toEqual([VALID_DEF]);
       // No row: RESTORE puts the CHECK back with no repair boot, and the next
       // boot is silent and rebuilds nothing.
       await pool.query(`ALTER TABLE ${legacyTable} DROP CONSTRAINT ${NAME}`);
       expect(await named(NAME)).toEqual([]);
-      await session.query(block.RESTORE);
+      await send(block.RESTORE);
       const back = await named(NAME);
       expect(back.map((row) => row.def)).toEqual([`${VALID_DEF} NOT VALID`]);
       expect(await boot()).toEqual([]);
       expect((await named(NAME)).map((row) => row.oid)).toEqual(back.map((row) => row.oid));
-      expect(rowsOf(await session.query(block['NULL AND VALIDATE']))).toEqual([{ non_hex: '0' }]);
+      expect(await send(block['NULL AND VALIDATE'])).toEqual([{ non_hex: '0' }]);
+      expect((await named(NAME)).map((row) => row.def)).toEqual([VALID_DEF]);
+      // The integrity route: an impostor that forbids a NULL token, displaced,
+      // fails NULL AND VALIDATE with a code starting 23, which changes
+      // nothing; its read allows its DROP, and NULL AND VALIDATE then lands.
+      await pool.query(`ALTER TABLE ${legacyTable} DROP CONSTRAINT ${NAME}`);
+      await pool.query(`UPDATE ${legacyTable} SET advance_token = $2 WHERE account_id = $1`, [
+        CHECK_ACCOUNT,
+        'z'.repeat(32),
+      ]);
+      await pool.query(
+        `ALTER TABLE ${legacyTable} ADD CONSTRAINT ${NAME} CHECK (advance_token IS NOT NULL)`,
+      );
+      await send(block.DISPLACE);
+      await expect(send(block['NULL AND VALIDATE'])).rejects.toMatchObject({
+        code: expect.stringMatching(/^23/),
+      });
+      expect(await token()).toEqual([{ advance_token: 'z'.repeat(32) }]);
+      expect((await named(NAME)).map((row) => row.def)).toEqual([`${VALID_DEF} NOT VALID`]);
+      const blocking = await read(true);
+      expect(blocking).toEqual([
+        expect.objectContaining({ contype: 'c', keys: 1, columns: '{advance_token}' }),
+      ]);
+      expect(dropAllowed(blocking[0])).toBe(true);
+      await send(block.DROP);
+      expect(await send(block['NULL AND VALIDATE'])).toEqual([{ non_hex: '1' }]);
+      expect(await token()).toEqual([{ advance_token: null }]);
       expect((await named(NAME)).map((row) => row.def)).toEqual([VALID_DEF]);
     } finally {
-      // Whatever failed, the session leaves no open transaction, and the legacy
-      // table ends with the real CHECK and no impostor or test row.
-      await session.query('ROLLBACK').catch(() => {});
-      session.release();
+      // Whatever failed, the legacy table ends with the real CHECK and no
+      // impostor, test row or parent.
       await pool.query(`DELETE FROM ${legacyTable} WHERE account_id = $1`, [CHECK_ACCOUNT]);
       await pool.query(`ALTER TABLE ${legacyTable} DROP CONSTRAINT IF EXISTS ${NAME}_displaced`);
+      await pool.query(`DROP TABLE IF EXISTS ${PARENT}`);
       const left = await named(NAME);
       if (left.length === 0 || !left[0].def.startsWith(VALID_DEF)) {
         await pool.query(`ALTER TABLE ${legacyTable} DROP CONSTRAINT IF EXISTS ${NAME}`);
@@ -660,7 +733,7 @@ d('account_freehold_hearth against real PostgreSQL', () => {
     }
   });
 
-  it("a steady boot's one Hearth table lock is the token probe's: it waits behind ACCESS EXCLUSIVE and is held to no COMMIT", async () => {
+  it("a steady-state boot's one Hearth table lock is the token probe's: it waits behind ACCESS EXCLUSIVE and is held to no COMMIT", async () => {
     // Deparsing the CHECK opens the table under ACCESS SHARE and releases it at
     // once. So a boot waits there behind an ACCESS EXCLUSIVE holder or a queued
     // ACCESS EXCLUSIVE request (operator DDL), and inside the boot transaction
