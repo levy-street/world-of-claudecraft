@@ -3111,10 +3111,11 @@ describe('the claim renewer', () => {
     // read takes it. That node_modules/ws/ holds ws's own published code is
     // this read's premise, not one it checks. The root package.json pin later
     // in this file holds part of it (no patch of ws, and no ws spec or
-    // override but a plain version range), and so do the two checks after it
-    // (git tracks no pnpm workspace file or pnpmfile); that pin's comment
-    // names this read. Whatever else could write there, an install script, a
-    // build step or where the lockfile fetches that range from, is not read.
+    // override but a plain version range), and so do two tracked-file checks
+    // after it (git tracks no pnpm workspace file or pnpmfile); that pin's
+    // comment names this read. Whatever else could write there, an install
+    // script, a build step or where the lockfile fetches that range from, is
+    // not read.
     const fromPackage = (file: string) => file.startsWith('node_modules/');
     expect(
       [
@@ -3137,6 +3138,7 @@ describe('the claim renewer', () => {
         'node_modules/ws/lib/x_node_modules/y/i.js',
         'node_modules/ws/lib/x_node_modules.js',
         'node_modules/ws/lib/node_modules_x/y/i.js',
+        'node_modules/ws/lib/node_modules',
         'node_modules/e/node_modules/ws/i.js',
         'node_modules/e/lib/x_node_modules/ws/i.js',
       ].filter(fromWs),
@@ -6679,7 +6681,7 @@ describe('the claim renewer', () => {
     // imports; what vite.config.ts's alias resolves TO (each variable's
     // declaration and every line naming one), its `define` table, and every
     // call it makes to the only writer and spawner it imports; the root
-    // package.json's keys, its dependency specs that are not version ranges,
+    // package.json's keys, its dependency and override specs but plain ranges,
     // pnpm's keys and patched package names, and every resolution flag its
     // scripts pass; the tracked package, .npmrc, jsconfig, tsconfig, pnpm
     // workspace, pnpmfile and private/ inventories and each tsconfig's
@@ -7392,11 +7394,14 @@ describe('the claim renewer', () => {
     ]);
     expect(pkg.imports).toBeUndefined();
     expect(pkg.exports).toBeUndefined();
-    // A plain version range is an exact version or one led by ^ or ~; any
-    // other spec is listed, so one that names a path, a tarball, a tag or a
-    // wider range fails until it is reviewed here.
+    // A plain version range is an exact version, three numbers of at most
+    // nine digits with no leading zero, or one led by ^ or ~; any other spec,
+    // a prerelease included, is listed, so one that names a path, a tarball, a
+    // tag or a wider range fails until it is reviewed here.
     const nonRange = (spec: string): string | null =>
-      /^[\^~]?\d+\.\d+\.\d+(?:-[0-9A-Za-z.]+)?$/.test(spec) ? null : spec.replace(/@[^@/]*$/, '');
+      /^[\^~]?(?:0|[1-9]\d{0,8})\.(?:0|[1-9]\d{0,8})\.(?:0|[1-9]\d{0,8})$/.test(spec)
+        ? null
+        : spec.replace(/@[^@/]*$/, '');
     const specs = (table: unknown): string[] =>
       Object.entries((table ?? {}) as Record<string, string>).flatMap(([name, spec]) => {
         const kept = nonRange(spec);
@@ -7410,7 +7415,16 @@ describe('the claim renewer', () => {
     for (const [spec, kept] of [
       ['^1.19.0', null],
       ['1.2.3', null],
-      ['~1.2.3-beta.1', null],
+      ['^0.10.0', null],
+      ['~1.2.3-beta.1', '~1.2.3-beta.1'],
+      ['1.2.3-.', '1.2.3-.'],
+      ['^1.2.3-..tgz', '^1.2.3-..tgz'],
+      ['1.2.3-x/../ws.tgz', '1.2.3-x/../ws.tgz'],
+      ['^1234567890.0.0', '^1234567890.0.0'],
+      ['01.2.3', '01.2.3'],
+      ['>1.2.3', '>1.2.3'],
+      ['^1.2', '^1.2'],
+      ['1.2.x', '1.2.x'],
       ['8/../vendor/ws.tgz', '8/../vendor/ws.tgz'],
       ['1.2.3/../ws.tgz', '1.2.3/../ws.tgz'],
       ['~/ws', '~/ws'],
