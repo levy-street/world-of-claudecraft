@@ -5804,9 +5804,9 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - ROUND THIRTY-EIGHT, eight fresh readers over round thirty-seven: 27 findings, none blocking, 5
   should-fix, every reader passing, five with no should-fix. The Discord bot overview drops its
   pure-consumer claim and the restart note names what a taken batch loses and lever 3 the rest
-  (worded so in round thirty-nine, Q39R2, and round forty, L40R2); the unit suite ties the winner
-  read and its marks, the daily-active grant's cases, the resync's defaults and calls and the
-  files that drain a feed, drops every comment, and lists every statement reaching a read
+  (this entry worded so in round thirty-nine, Q39R2, and round forty, L40R2); the unit suite ties
+  the winner read and its marks, the daily-active grant's cases, the resync's defaults and calls
+  and the files that drain a feed, drops every comment, and lists every statement reaching a read
   declaration. Fixed in `41db868baa`.
 - ROUND THIRTY-NINE, eight fresh readers over round thirty-eight: 33 findings, none blocking, 5
   should-fix, every reader passing, five with no should-fix. DEPLOY states rules where precision
@@ -5820,6 +5820,11 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   `grant`, and every arm of the declaration reader on a sample; the fetch count went with the
   claim DEPLOY never made; lever 3's daily-active rule reads plainly and `claimDailyActive` says
   at most once. Fixed in `1fe98e4a80`.
+- ROUND FORTY-ONE, eight fresh readers over round forty: 21 findings, none blocking, 6 should-fix,
+  every reader passing, four with no should-fix. The unit suite reads the bot's game client whole,
+  so the grant route has one sender and no request leaves `call()`; section L reads each rerun
+  with a deadline; the bot's grant comments say what the dedupe keys on and no more. Fixed in
+  `799052ee16`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5850,8 +5855,8 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644, then
   644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then 647,
   then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then
-  648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648 passed,
-  never a skip.
+  648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648
+  passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):

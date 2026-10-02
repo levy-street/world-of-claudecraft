@@ -3097,18 +3097,19 @@ to the code.
   T38R3 FIXED `41db868baa` (with C38R4's daily-active half, named so in round thirty-nine, Q39R1:
   `grantDailyActive` is named only by its declaration and its calls in the `VOICE_STATE_UPDATE`
   and `MESSAGE_CREATE` cases of bot/main.ts; C37R1's disposition notes it; no other bot module
-  naming a grant, from round thirty-nine, Q39R4). T38R4 FIXED `41db868baa` (with C38R3 and Q38R2:
-  `linesOf` reads leading and trailing comment ranges at every token's start and end, JSDoc aside,
-  with a sample control holding a trailing comment, an inline block comment, a regex and a string;
-  the space beside a comment dropped from inside a line stays, so such a comment trips a pin,
-  which its comment says; Q37R1's disposition notes it; own-line and multi-line comments in the
-  sample, from round thirty-nine, T39R4). T38R5 FIXED `41db868baa` (with M38R2 and Q38R3: the
-  `everyMs` defaults of `dueForFullResync` and `fullResyncIfDue`, and every call to either in
-  bot/, none passing an interval of its own; C37R1's disposition notes it; removed with the hourly
-  claim they tied, from round thirty-nine, C39R1). T38R6 FIXED `41db868baa` (the tracked code
-  outside tests/ that names a feed's drain or requeue is exactly the four feed modules and
-  server/internal.ts; Q37R1's disposition notes it; a git failure never read as no match, from
-  round thirty-nine, H39R4). T38R7 FIXED (see L38R4).
+  naming a grant, from round thirty-nine, Q39R4; an empty case falling into either read too, from
+  round forty-one, T41R4). T38R4 FIXED `41db868baa` (with C38R3 and Q38R2: `linesOf` reads leading
+  and trailing comment ranges at every token's start and end, JSDoc aside, with a sample control
+  holding a trailing comment, an inline block comment, a regex and a string; the space beside a
+  comment dropped from inside a line stays, so such a comment trips a pin, which its comment says;
+  Q37R1's disposition notes it; own-line and multi-line comments in the sample, from round
+  thirty-nine, T39R4). T38R5 FIXED `41db868baa` (with M38R2 and Q38R3: the `everyMs` defaults of
+  `dueForFullResync` and `fullResyncIfDue`, and every call to either in bot/, none passing an
+  interval of its own; C37R1's disposition notes it; removed with the hourly claim they tied, from
+  round thirty-nine, C39R1). T38R6 FIXED `41db868baa` (the tracked code outside tests/ that names
+  a feed's drain or requeue is exactly the four feed modules and server/internal.ts; Q37R1's
+  disposition notes it; a git failure never read as no match, from round thirty-nine, H39R4).
+  T38R7 FIXED (see L38R4).
 - L38R1 FIXED `41db868baa` (DEPLOY's Discord bot overview says the bot holds nothing durable and
   reads and writes the game only through the internal API, so a stop leaves the game running, and
   points to the third escalation lever for what a stop costs; C37R1's disposition notes it; pinned
@@ -3176,7 +3177,8 @@ only-in-answer-to-an-event rule, with no list of events; what DEPLOY still claim
   forms of call they missed, go with the hourly claim, and the bot's own suites pin the resyncs
   (`tests/discord_bot_linked_sweep.test.ts`, `tests/discord_bot_member_writes.test.ts`,
   `tests/discord_bot_sweep_cycle.test.ts`); L38R2's and T38R5's dispositions and H38R3's ruling
-  note it). C39R2 FIXED (see C39R1). C39R3 FIXED (see D39R1). C39R4 FIXED (see L39R4).
+  note it, the ruling from round forty, Q40R5, named so in round forty-one, Q41R3). C39R2 FIXED
+  (see C39R1). C39R3 FIXED (see D39R1). C39R4 FIXED (see L39R4).
 - Q39R1 FIXED in this record (T38R3's disposition names C38R4's daily-active half). Q39R2 FIXED in
   the ledger (round thirty-eight's entry says the restart note names what of the outbox a stop
   loses; `41db868baa`'s body says every loss and stays as written, later hashes resting on it;
@@ -3216,12 +3218,13 @@ only-in-answer-to-an-event rule, with no list of events; what DEPLOY still claim
 - L39R1 FIXED `a5b04edb93` (bot/CLAUDE.md and two bot/main.ts comments say a guild message or a
   voice state carrying a channel grants the daily-active points, at most once a UTC day, since a
   failed grant call is not retried, which answers the reader's aside too; `claimDailyActive`'s
-  comment as well, from round forty, L40R1). L39R2 FIXED in this record (round thirty-eight's
-  section names the two stale feed-owner comments outside its findings, and the ledger's OWED item
-  points to it). L39R3 FIXED (see T39R1). L39R4 FIXED `a5b04edb93` (with H39R2, M39R1, C39R4 and
-  Q39R8: the compose comment says the stop_grace_period paragraph names what a taken batch loses
-  and the third escalation lever under its Incident runbook the rest, pinned; L38R4's disposition
-  notes it). L39R5 FIXED (see C39R1). L39R6 FIXED (see T39R5).
+  comment as well, from round forty, L40R1; each claiming only what the dedupe keys on, from round
+  forty-one, D41R1). L39R2 FIXED in this record (round thirty-eight's section names the two stale
+  feed-owner comments outside its findings, and the ledger's OWED item points to it). L39R3 FIXED
+  (see T39R1). L39R4 FIXED `a5b04edb93` (with H39R2, M39R1, C39R4 and Q39R8: the compose comment
+  says the stop_grace_period paragraph names what a taken batch loses and the third escalation
+  lever under its Incident runbook the rest, pinned; L38R4's disposition notes it). L39R5 FIXED
+  (see C39R1). L39R6 FIXED (see T39R5).
 - M39R1 FIXED (see L39R4).
 - Mutants on this round's new guards, each killed and its source restored: the overview saying a
   stop never affects the realm; the Verifying health heading renamed; the stop_grace_period
@@ -3260,10 +3263,10 @@ the commit that adds this section.
 28 findings: none blocking, 7 should-fix (Q40R1, Q40R2, T40R1 to T40R4, L40R1), 21 nice-to-have,
 every reader passing, and five (correctness, server hot path, privacy and security, database
 performance, migration safety) with no should-fix, privacy and security with no finding at all.
-Five readers found the server client's fetch count narrower than its comment; DEPLOY claims no
-single fetch, so the count went. The other ties that drew a further form now read their subject
-whole: the stop_grace_period paragraph, every place the bot's code names `grant`, and every arm of
-the declaration reader on a sample.
+Six readers (counted so in round forty-one, Q41R2) found the server client's fetch count narrower
+than its comment; DEPLOY claims no single fetch, so the count went. The other ties that drew a
+further form now read their subject whole: the stop_grace_period paragraph, every place the bot's
+code names `grant`, and every arm of the declaration reader on a sample.
 
 - C40R1 FIXED (see T40R2). C40R2 FIXED (see T40R1). C40R3 FIXED (see T40R3). C40R4 FIXED (see
   L40R3).
@@ -3274,34 +3277,105 @@ the declaration reader on a sample.
 - D40R1 FIXED (see T40R3).
 - T40R1 FIXED `1fe98e4a80` (with C40R2: every place the bot's code names `grant`, by identifier or
   string, is the server client's method or inside `grantDailyActive`, so a direct grant anywhere
-  else, bot/main.ts included, fails; Q39R4's disposition notes it). T40R2 FIXED `1fe98e4a80` (with
-  C40R1, Q40R2 and T40R6: the sample reaches a function, a class, an enum, a namespace, an object
-  binding and an array binding with a hole, lists the outside statement naming each, and holds one
-  naming none; deleting any arm of `declared` or `bound`, or the boundary's filter, fails it, five
-  guard mutants; T39R5's disposition notes it). T40R3 FIXED `1fe98e4a80` (with D40R1, H40R1,
-  M40R2, C40R3 and Q40R4: DEPLOY claims no single fetch, so the tie's count and its comment's "one
-  fetch" go, and the tie says only that every path `call()` sends is under `/internal/discord/`;
-  T39R1's disposition notes it). T40R4 FIXED `1fe98e4a80` (with Q40R1: the stop_grace_period
-  paragraph is pinned whole where the pointers say it is, inside Verifying health, so moving its
-  batch-loss sentence fails; T39R2's disposition notes it). T40R5 FIXED `1fe98e4a80` (the Incident
-  runbook lies below the overview's Enabling block, as the overview says; T39R2's disposition
-  notes it). T40R6 FIXED (see T40R2). T40R7 FIXED `1fe98e4a80` (with H40R2, M40R1 and Q40R3: the
-  winner tie reads the mark call's name as an identifier or a string; D39R1's disposition notes
-  it). T40R8 FIXED in this record (the pg file, unchanged this round, measured 13.44 s and 13.38 s
-  at one worker on an idle host, so its 13.4 s header stands; two runs at 18.3 s and 18.2 s
-  overlapped a large build on the host and are not counted).
+  else, bot/main.ts included, fails; Q39R4's disposition notes it; the grant route's one sender
+  pinned by the client's whole surface, from round forty-one, T41R1). T40R2 FIXED `1fe98e4a80`
+  (with C40R1, Q40R2 and T40R6: the sample reaches a function, a class, an enum, a namespace, an
+  object binding and an array binding with a hole, lists the outside statement naming each, and
+  holds one naming none; deleting any arm of `declared` or `bound`, or the boundary's filter,
+  fails it, five guard mutants; T39R5's disposition notes it; a nested binding too, from round
+  forty-one, T41R3). T40R3 FIXED `1fe98e4a80` (with D40R1, H40R1, M40R2, C40R3 and Q40R4: DEPLOY
+  claims no single fetch, so the tie's count and its comment's "one fetch" go, and the tie says
+  only that every path `call()` sends is under `/internal/discord/`; T39R1's disposition notes it;
+  the client read whole, every request and every name of its fetch, from round forty-one, T41R2).
+  T40R4 FIXED `1fe98e4a80` (with Q40R1: the stop_grace_period paragraph is pinned whole where the
+  pointers say it is, inside Verifying health, so moving its batch-loss sentence fails; T39R2's
+  disposition notes it). T40R5 FIXED `1fe98e4a80` (the Incident runbook lies below the overview's
+  Enabling block, as the overview says; T39R2's disposition notes it). T40R6 FIXED (see T40R2).
+  T40R7 FIXED `1fe98e4a80` (with H40R2, M40R1 and Q40R3: the winner tie reads the mark call's name
+  as an identifier or a string; D39R1's disposition notes it). T40R8 FIXED in this record (the pg
+  file, unchanged this round, measured 13.44 s and 13.38 s at one worker on an idle host, so its
+  13.4 s header stands; two runs at 18.3 s and 18.2 s overlapped a large build on the host and are
+  not counted).
 - L40R1 FIXED `1fe98e4a80` (`claimDailyActive`'s comment in bot/logic.ts says the dedupe key keeps
   the reward to at most once a day and a claimed key is never released, so a failed grant call is
-  not retried; L39R1's disposition notes it). L40R2 FIXED in the ledger (round thirty-eight's
-  entry says the restart note names what a taken batch loses and lever 3 the rest; Q39R2's
-  disposition notes it). L40R3 FIXED `1fe98e4a80` (with H40R3, C40R4 and Q40R6: lever 3 says
-  nothing the bot does only in answer to an event, the daily-active points it grants a linked
-  member included, is done for an event that fell in the stop; T39R3's disposition notes it).
-  L40R4 FIXED in this record (round thirty-nine's mutants bullet names the line they first ran
-  before).
+  not retried; L39R1's disposition notes it; worded as what the dedupe keys on, no more, from
+  round forty-one, L41R1). L40R2 FIXED in the ledger (round thirty-eight's entry says the restart
+  note names what a taken batch loses and lever 3 the rest; Q39R2's disposition notes it). L40R3
+  FIXED `1fe98e4a80` (with H40R3, C40R4 and Q40R6: lever 3 says nothing the bot does only in
+  answer to an event, the daily-active points it grants a linked member included, is done for an
+  event that fell in the stop; T39R3's disposition notes it). L40R4 FIXED in this record (round
+  thirty-nine's mutants bullet names the line they first ran before).
 - M40R1 FIXED (see T40R7). M40R2 FIXED (see T40R3).
 - Mutants on this round's new guards, each killed and its source restored: the batch-loss sentence
   split out of the grace paragraph; an Incident runbook heading above the overview; a string-keyed
   mark call in the poll; a direct grant on the guild seed. Guard mutants on the declaration
   reader, each failing at the sample: the class, enum and namespace arms of `declared` deleted in
   turn, `bound` reading no binding pattern, and the boundary list without its filter.
+
+## Round forty-one: eight fresh readers over round forty (`9344adc9c4..c6d8366c12`)
+
+Round forty-one's commits: `799052ee16` (the unit suite reads the bot's game client whole, every
+request it makes and every name of its fetch with the member each sits in, so a second sender of
+the grant route or a request outside `call()` fails; the grant rule's comment names its scope and
+its git grep runs a plain prefilter; the daily-active case reads an empty clause falling into it;
+the declaration reader's sample nests a binding; section L reads each rerun with a 5 s deadline,
+so a hang fails the case in time for its cleanup; bot/CLAUDE.md, bot/main.ts and bot/logic.ts say
+what the daily grant's dedupe keys on and no more; the pg file's Cost 13.3 s; the change log with
+it; kept whole for bisect), and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C41R1 to C41R4 |
+| qa-checklist | PASS | Q41R1 to Q41R5 |
+| server hot path | PASS | H41R1 |
+| privacy and security | PASS | S41R1 |
+| database performance | PASS | D41R1 |
+| test coverage | PASS | T41R1 to T41R4 |
+| docs librarian | PASS | L41R1 to L41R3 |
+| migration safety | PASS | M41R1 to M41R2 |
+
+21 findings: none blocking, 6 should-fix (C41R1, Q41R1, Q41R2, T41R1, T41R2, L41R1), 15
+nice-to-have, every reader passing, and four (server hot path, privacy and security, database
+performance, migration safety) with no should-fix. Five readers found the grant rule blind to a
+second sender of the grant route, and one the client's requests outside `call()` unpinned once the
+fetch count went; the client is now read whole. The bot's grant comments had swapped one overclaim
+for another; they now say what the dedupe keys on and nothing about its count.
+
+- C41R1 FIXED (see T41R1). C41R2 FIXED (see T41R1). C41R3 FIXED (see L41R1). C41R4 FIXED (see
+  Q41R2).
+- Q41R1 FIXED (see T41R1). Q41R2 FIXED in this record (with L41R2 and C41R4: round forty's summary
+  counts six readers, T40R3's own and the five beside it). Q41R3 FIXED in this record (C39R1's
+  back-pointer now names its round and finding, so the nine notes `c6d8366c12`'s body counts are
+  there). Q41R4 FIXED `799052ee16` (the grant rule's git grep runs the plain prefilter `grant`,
+  the parser deciding, so no regex extension git builds differ on is needed). Q41R5 FIXED in the
+  ledger (round thirty-eight's entry says this entry was worded so in rounds thirty-nine and
+  forty).
+- H41R1 FIXED (see T41R1).
+- S41R1 FIXED (see T41R1).
+- D41R1 FIXED `799052ee16` (with L41R1's bot/CLAUDE.md and bot/main.ts halves: they say the dedupe
+  keys on the Discord id and the day, and claim no count; L39R1's disposition notes it).
+- T41R1 FIXED `799052ee16` (with C41R1, C41R2, Q41R1, H41R1 and S41R1: bot/server_client.ts is
+  read whole, every `this.call` with its member, method and path, and every name of `fetch` or
+  `fetchImpl` with its member, so the grant route's one sender is the `grant` method, which the
+  grant rule gives one caller; the rule's comment says the member reward `setMember` earns is the
+  server's own grant, outside it; T40R1's disposition notes it). T41R2 FIXED `799052ee16` (the
+  same whole read shows `fetchImpl` called in `call()` alone, its default the constructor's one
+  bare `fetch`, so a request outside `call()` fails; T40R3's disposition notes it). T41R3 FIXED
+  `799052ee16` (the sample's array binding nests an object binding, so `bound` reading one level
+  only fails it, a guard mutant; T40R2's disposition notes it). T41R4 FIXED `799052ee16` (each
+  `grantDailyActive` call's case reads every empty clause falling into it, so a new label above
+  either fails; T38R3's disposition notes it).
+- L41R1 FIXED `799052ee16` (with C41R3 and M41R2: `claimDailyActive`'s comment says it only
+  decides whether the request is worth sending and that the server's key, the reason, the Discord
+  id and the day, stops a repeat for that key; L40R1's disposition notes it). L41R2 FIXED (see
+  Q41R2). L41R3 FIXED (see Q41R3).
+- M41R1 FIXED `799052ee16` (section L reads each rerun it expects to have returned, `rerun`,
+  `tableRerun` and `leafRerun`, through a 5 s deadline, so a rerun that never returns fails the
+  case with time left for its cleanup, and later cases are not held behind it). M41R2 FIXED (see
+  L41R1).
+- Mutants on this round's new guards, each killed and its source restored: a second client method
+  sending the grant route; a request made outside `call()`; an empty case falling into the
+  voice-state case; `bound` reading one level of pattern only, a guard mutant; and, in section L,
+  DEPLOY's nightly statement naming the waiting realm but ending nothing, which fails case 3 at
+  its deadline with "still waiting" and the dump case at its text pin, the two later cases
+  passing.
