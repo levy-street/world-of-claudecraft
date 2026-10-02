@@ -5897,16 +5897,23 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   Fixed in `33eff5391f`.
 - ROUND FIFTY-TWO, eight fresh readers over round fifty-one: 16 findings, none blocking, 4
   should-fix, every reader passing, five with no should-fix. The bundle read takes a package only
-  from the root `node_modules`; the reads of the scopes around section L and of the declarations
-  there are proven on samples, and the functions around it bind no name of their own; the rest
-  were ledger and record wording, a comment, a lookup's throw, the build options' copy and the
-  package order. Fixed in `e4cf5bb85e`.
+  from the root `node_modules`; the reads of the declarations around section L and of the names
+  the functions around it bind are proven on samples (worded so in round fifty-four, Q54R1; the
+  scopes' statements read from round fifty-three), and the functions around it bind no name of
+  their own; the rest were ledger and record wording, a comment, a lookup's throw, the build
+  options' copy and the package order. Fixed in `e4cf5bb85e`.
 - ROUND FIFTY-THREE, eight fresh readers over round fifty-two: 16 findings, none blocking, 6
   should-fix, every reader passing, four with no should-fix. Section L's ancestors are pinned by
   kind, so a scope wrapped around it fails; a bundled package is named by the directory after its
   last `node_modules`, and git tracks nothing under the root one; the statements read of the
   scopes around section L is proven on a sample; the rest were record and ledger links and
   wording, two comments, a sibling sample and a commit body. Fixed in `071897e08f`.
+- ROUND FIFTY-FOUR, eight fresh readers over round fifty-three: 14 findings, none blocking, 5
+  should-fix, every reader passing, three with no should-fix. The bundle read names no package,
+  after its naming drew one more form in each of three rounds: every module from a package lies
+  under `node_modules/ws/` with no `node_modules` further along its path; the check that git
+  tracks nothing under `node_modules` reads the index; the rest were record and ledger wording for
+  rounds fifty-two and fifty-three, a comment note and an evidence line. Fixed in `f667650406`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5939,7 +5946,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then
   648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648,
   then 648, then 648, then 648, then 649, then 649, then 649, then 649, then 649, then 649, then
-  649, then 649, then 649 passed, never a skip.
+  649, then 649, then 649, then 649 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):

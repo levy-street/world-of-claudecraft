@@ -4198,11 +4198,13 @@ forty-nine's `.tsx` mutant that its log rules out (counted so in round fifty-two
 
 Round fifty-two's commits: `e4cf5bb85e` (the bundle read takes a package only from the root
 `node_modules`, proven on a sample, sorts its packages, ties its build options to the script's
-pinned lines and proves its lookup throws outside the bundle; the reads of the scopes around
-section L and of the declarations there are each proven on a sample, and the functions around the
-section may bind no name of their own, type parameters and a function expression's name included;
-the parse map's comment says which reads take it; the manifest's fifty-second entry; kept whole
-for bisect), and the commit that adds this section.
+pinned lines and proves its lookup throws outside the bundle; the read of the declarations around
+section L and the read of the names the functions around it bind are each proven on a sample
+(worded so in round fifty-four, L54R1; `e4cf5bb85e`'s title and body, which say every read of the
+scopes is, stay as they are), and the functions around the section may bind no name of their own,
+type parameters and a function expression's name included; the parse map's comment says which
+reads take it; the manifest's fifty-second entry; kept whole for bisect), and the commit that adds
+this section.
 
 | Reader | Verdict | Findings |
 |---|---|---|
@@ -4246,11 +4248,13 @@ a lookup's throw, the build options' copy and the package order.
 - T52R1 FIXED `e4cf5bb85e` (the declarations read is one function, proven on a sample of each
   statement form it counts, type alias, interface, enum, import-equals and namespace among them).
   T52R2 FIXED `e4cf5bb85e` (the read of the scopes around a node is one function, proven on a
-  sample whose arrow and named function expression each bind names). T52R3 FIXED `e4cf5bb85e` (a
-  lookup of a file outside the bundle is shown to throw). T52R4 FIXED `e4cf5bb85e` (the test's
-  build options are written as the script writes them and compared with the script's pinned lines,
-  its outfile aside). T52R5 FIXED (see Q52R1). T52R6 FIXED `e4cf5bb85e` (the bundle's packages are
-  sorted before they are compared).
+  sample whose arrow and named function expression each bind names; its statements read proven on
+  a sample from round fifty-three, T53R2, noted so in round fifty-four, Q54R1). T52R3 FIXED
+  `e4cf5bb85e` (a lookup of a file outside the bundle is shown to throw). T52R4 FIXED `e4cf5bb85e`
+  (the test's build options are written as the script writes them and compared with the script's
+  pinned lines, its outfile aside). T52R5 FIXED (see Q52R1). T52R6 FIXED `e4cf5bb85e` (the
+  bundle's packages are sorted before they are compared; the package list replaced by the rule
+  that every package module lies under `node_modules/ws/`, from round fifty-four, S54R1).
 - L52R1 FIXED (see Q52R1). L52R2 FIXED (see C52R2).
 - M52R1 FIXED (see D52R1). M52R2 FIXED (see D52R1).
 - Mutants on this round's new guards, each killed and its source restored: a module of this
@@ -4266,10 +4270,11 @@ a lookup's throw, the build options' copy and the package order.
 Round fifty-three's commits: `071897e08f` (section L's ancestors are pinned by kind, so a loop,
 `catch`, `case`, class or namespace wrapped around it fails; the statements read of the scopes
 around a node is proven on a sample; a bundled package is named by the directory after its last
-`node_modules`, its scope kept, proven on a sample that holds a nested package and a sibling
-`node_modules_x` directory; git must track nothing under the root `node_modules`; the package
-rule's comment and the samples' comment; the manifest's fifty-third entry; kept whole for bisect),
-and the commit that adds this section.
+`node_modules`, its scope kept, proven on a sample of a nested and a scoped package; the package
+rule's sample holds a sibling `node_modules_x` directory; git must track nothing under the root
+`node_modules`; the package rule's comment, the pin block's comment and the names-around pin's
+comment (worded so in round fifty-four, C54R1); the manifest's fifty-third entry; kept whole for
+bisect), and the commit that adds this section.
 
 | Reader | Verdict | Findings |
 |---|---|---|
@@ -4308,11 +4313,14 @@ and ledger wording.
   (round fifty-two's summary says `a23c145fa5`'s body leaves out the functions' own names and
   stays as it is).
 - S53R1 FIXED `071897e08f` (with C53R2: git must track nothing under the root `node_modules`, the
-  premise the package rule's comment now states).
+  premise the package rule's comment now states; read from the index itself, so a tracked file
+  deleted on disk fails too, from round fifty-four, C54R3).
 - T53R1 FIXED `071897e08f` (a bundled package is named by the directory after its last
   `node_modules`, its scope kept, proven on a sample of a nested and a scoped package; S52R1's
-  disposition notes it). T53R2 FIXED `071897e08f` (the statements read of the scopes around a node
-  is proven on a sample whose section sits in a block under an `if`, three statement lists deep).
+  disposition notes it; the naming replaced by the rule that every package module lies under
+  `node_modules/ws/`, from round fifty-four, S54R1). T53R2 FIXED `071897e08f` (the statements read
+  of the scopes around a node is proven on a sample whose section sits in a block under an `if`,
+  three statement lists deep; T52R2's disposition notes it, named so in round fifty-four, Q54R1).
   T53R3 FIXED `071897e08f` (the package rule's sample holds a sibling `node_modules_x` directory,
   so a prefix without its slash fails).
 - L53R1 FIXED (see Q53R1). L53R2 FIXED in the ledger (its ROUND FIFTY-ONE says one of the
@@ -4322,9 +4330,69 @@ and ledger wording.
   bindings round fifty's pin counted).
 - M53R1 FIXED `071897e08f` (section L's ancestors are pinned by kind, from its expression
   statement through the suite's block, arrow and call to the source file, so a `for` head, a
-  `catch`, a `case` clause, a class or a namespace around it fails).
+  `catch`, a `case` clause, a class or a namespace around it fails, and the pin block's comment
+  says so, noted in round fifty-four, L54R3).
 - Mutants on this round's new guards, each killed and its source restored: section L wrapped in a
   `for` loop over realms, at its ancestors' pin; a package named by its root directory again, at
   the package name sample; the statements read narrowed to the nearest block, at its sample; the
   package prefix without its slash, at the package rule's sample; and a file under
   `node_modules/ws` force-added to git, removed after, at the tracked-files check.
+
+## Round fifty-four: eight fresh readers over round fifty-three (`a23c145fa5..3bc65ff291`)
+
+Round fifty-four's commits: `f667650406` (the bundle read names no package: every module from a
+package must lie under `node_modules/ws/` and hold no `node_modules` further along its path,
+proven on a sample of a sibling prefix, a scoped package, one nested in ws, a second package
+nested in another and a directory whose name holds `node_modules` on each side of ws, and at least
+one bundled module must come from a package; the check that git tracks nothing under the root
+`node_modules` reads the index itself; the package rule's comment; the manifest's fifty-fourth
+entry; kept whole for bisect), and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C54R1 to C54R3 |
+| qa-checklist | PASS | Q54R1 to Q54R4 |
+| server hot path | PASS | none |
+| privacy and security | PASS | S54R1 |
+| database performance | PASS | none |
+| test coverage | PASS | T54R1, T54R2 |
+| docs librarian | PASS | L54R1 to L54R4 |
+| migration safety | PASS | none |
+
+14 findings: none blocking, 5 should-fix (C54R1, Q54R1, S54R1, T54R1, L54R1), 9 nice-to-have,
+every reader passing, and three (server hot path, database performance, migration safety) with no
+finding at all. Two readers found last round's package naming taking any `node_modules/` text for
+that directory, so a second package whose modules sit under a directory such as
+`x_node_modules/ws/` was named ws, and three more named it as a nice-to-have. The naming had drawn
+one more form in each of three rounds, so the read now names no package: every module from a
+package must lie under `node_modules/ws/` with no `node_modules` further along its path. Two found
+round fifty-two's intro, T52R2 and the ledger's ROUND FIFTY-TWO crediting round fifty-two with the
+statements read of the scopes, which round fifty-three first proved on a sample. One found round
+fifty-three's intro placing a sample in the wrong read and leaving out a reworded comment, which
+three more named as nice-to-haves. The rest were the tracked-files check skipping a file deleted
+on disk, M53R1's comment and an evidence line.
+
+- C54R1 FIXED in this record (with Q54R2, Q54R4 and L54R2: round fifty-three's intro says the
+  package naming is proven on a sample of a nested and a scoped package, puts the sibling
+  `node_modules_x` directory in the package rule's sample, and names the pin block's comment and
+  the names-around pin's comment). C54R2 FIXED (see S54R1). C54R3 FIXED `f667650406` (the check
+  that git tracks nothing under the root `node_modules` reads the index itself, so a tracked file
+  deleted on disk fails; S53R1's disposition notes it).
+- Q54R1 FIXED in this record and the ledger (with L54R1: round fifty-two's intro and the ledger's
+  ROUND FIFTY-TWO credit round fifty-two with the declarations read and the read of the names the
+  functions around section L bind, the scopes' statements read coming from round fifty-three;
+  T52R2's disposition notes T53R2, which names it back; `e4cf5bb85e`'s title and body stay as they
+  are). Q54R2 FIXED (see C54R1). Q54R3 FIXED (see S54R1). Q54R4 FIXED (see C54R1).
+- S54R1 FIXED `f667650406` (with C54R2, Q54R3, T54R1 and L54R4: the bundle read names no package;
+  every module from a package must lie under `node_modules/ws/` and hold no `node_modules` further
+  along its path, proven on a sample, and at least one bundled module must come from a package;
+  the package rule's comment says so; T52R6's and T53R1's dispositions note it).
+- T54R1 FIXED (see S54R1). T54R2 FIXED in the evidence (U119's line says the loop ran without
+  braces, as its log's kinds show).
+- L54R1 FIXED (see Q54R1). L54R2 FIXED (see C54R1). L54R3 FIXED in this record (M53R1 says the pin
+  block's comment says so). L54R4 FIXED (see S54R1).
+- Mutants on this round's new guards, each killed and its source restored: the ws rule without its
+  nested-path check, and with its prefix missing its slash, each at its sample; a second package
+  imported by `bot/logic.ts`, at the rule over the bundle; the bundle read finding no package
+  module, at the check that one does; and a file under `node_modules/ws` tracked and deleted on
+  disk, removed from the index after, at the index check.
