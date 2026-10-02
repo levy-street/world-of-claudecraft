@@ -133,7 +133,7 @@ librarian sweep.
   `c0ba5b5dcd`. SR5, SR6 FIXED `7ba009dbdd`. SR7 RULED: the storage refusal's message is
   pinned unchanged on purpose (`tests/federated_auth_db.test.ts`), so its id-free typed
   class is OWED to the storage path, outside 07a.
-- LR1 FIXED by this file and the ledger section. LR2, LR3, LR4 FIXED `9c15aa3ea1`. LR5, LR6,
+- LR1 FIXED by this file and the ledger section (written in `ffbe38eb94`, see L3R1). LR2, LR3, LR4 FIXED `9c15aa3ea1`. LR5, LR6,
   LR8, LR10, LR12, LR13 FIXED `2bd8e76cf9`. LR7 and LR11 FLAGGED (L13; the decision labels).
   LR9 FIXED in part `c0ba5b5dcd`, the rest FLAGGED (L15).
 - QR1 FIXED by this file. QR2 FIXED `2bd8e76cf9` (L4 FLAGGED). QR3 FIXED `fddc60bf6c`. QR4
@@ -145,3 +145,55 @@ librarian sweep.
   `clock_timestamp()` after the row-lock wait, pinned by "judges corrupt on the clock AFTER
   the lock wait" in `tests/server/freehold_hearth_db.pg.test.ts`. CR5 to CR9 FIXED
   `7ba009dbdd`.
+
+## Round three: eight fresh readers over round two (`a2a969d13b..54ac963ce0`)
+
+Round three's commits: `85d6b83d76` (the in-flight re-read), `5652fe5b6f` (trip identity, the
+live binding, the stop's checkout cut), `4ca51f5114` (the token probe warning), `95eadbea2f`
+(pins), `46d12cca49` (the `saves` rule), `ffbe38eb94` (boot deadlock docs and the ledger),
+`87169095d0` (the pins on that DEPLOY text), and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | FAIL (one blocking) | C3R1 to C3R5 |
+| qa-checklist | PASS | Q3R1 to Q3R7 |
+| server hot path | PASS | H3R1 to H3R6 |
+| privacy and security | PASS | S3R1 to S3R6 |
+| database performance | FAIL (doc readings) | D3R1 to D3R6 |
+| test coverage | FAIL (one blocking pin) | T3R1 to T3R10 |
+| docs librarian | FAIL (one blocking pointer) | L3R1 to L3R13 |
+| migration safety | PASS | M3R1 to M3R8 |
+
+- C3R1 (blocking) FIXED `85d6b83d76`: a second preload during a lost-claim re-read joins it; a
+  mutant restoring the round-two predicate fails the new case. C3R2 FIXED `85d6b83d76`. C3R3,
+  C3R4 FIXED `5652fe5b6f`. C3R5 FIXED `5652fe5b6f` (the wording; the stop's accounting was
+  already right: a stopped chunk counts as abandoned).
+- Q3R1, Q3R2, Q3R3, Q3R4, Q3R5 FIXED `5652fe5b6f`. Q3R6 FIXED `95eadbea2f` (the contract
+  suite restated; `tests/server/freehold_mutation.test.ts` measured within its stated 0.8 s).
+  Q3R7 COVERED: `tests/server/freehold_hearth_db.test.ts` "the operator's corrupt-row repair"
+  pins the literal to `HEARTH_KEY_COOLDOWN_MS` since `c0ba5b5dcd`.
+- H3R1 RESIDUAL R-13 (`ffbe38eb94`; the stop docblock in `5652fe5b6f`). H3R2 FIXED
+  `ffbe38eb94` (the whole serial chain, 42 s of bounded drains). H3R3, H3R4 FIXED `5652fe5b6f`.
+  H3R5 FIXED `46d12cca49`. H3R6 FIXED `ffbe38eb94` (the cold first launch measured, 4.5 to
+  4.7 ms).
+- S3R1 FIXED `4ca51f5114` (the close comment) and `ffbe38eb94` (the rule at P7). S3R2 FIXED
+  `ffbe38eb94`. S3R3 FIXED `5652fe5b6f` (see Q3R2). S3R4 FIXED `5652fe5b6f`. S3R5 FIXED
+  `4ca51f5114`. S3R6 FIXED `4ca51f5114`.
+- D3R1 FIXED `ffbe38eb94`: the rollout G1 run relabeled as ten consecutive first-rollout
+  attempts, and true steady-state boots measured (schema committed and checked first) under
+  plain, G2 and G1 saves. D3R2 FIXED `ffbe38eb94`: the G2 run (no `accounts` lock) aborted 2 of
+  6 boots, one at once, so the docs name both paths and both halves of the owed fix. D3R3 FIXED
+  `ffbe38eb94` (R-12 restated). D3R4 FIXED `95eadbea2f`. D3R5 FIXED `4ca51f5114` (the
+  whitespace is the hoist's; the statement is the same). D3R6 FIXED (see S3R1).
+- T3R1 (blocking) FIXED `5652fe5b6f`: the loud arm counts its applies; a mutant dropping the
+  inner guard runs the apply twice and fails it. T3R2 FIXED `5652fe5b6f`. T3R3 FIXED
+  `85d6b83d76` (a failed ROLLBACK is shown to keep both counts; the transaction wrapper's
+  rollback never replaces the error). T3R4 FIXED `85d6b83d76`. T3R5 FIXED `85d6b83d76`. T3R6,
+  T3R9 FIXED `95eadbea2f`. T3R7 FIXED `5652fe5b6f`. T3R8 FIXED `95eadbea2f`. T3R10 FIXED
+  `85d6b83d76`.
+- L3R1 (blocking) FIXED `ffbe38eb94`: the ledger's 07a QA section now exists. L3R2 to L3R4,
+  L3R6 to L3R11 FIXED `ffbe38eb94`. L3R5, L3R12, L3R13 FIXED `46d12cca49`.
+- M3R1, M3R2 FIXED `ffbe38eb94`, pinned in `87169095d0` (a read-only detector first and no
+  repair during a clock step; both sides of the deadlock and its save-side cost). M3R3 FIXED `ffbe38eb94`. M3R4 FIXED
+  `4ca51f5114` (the comment claims only the repair branch). M3R5 FIXED `ffbe38eb94`. M3R6 FIXED
+  `95eadbea2f`. M3R7 FIXED `4ca51f5114`. M3R8 FIXED `ffbe38eb94`.
