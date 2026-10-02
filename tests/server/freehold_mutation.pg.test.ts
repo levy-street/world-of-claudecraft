@@ -47,7 +47,7 @@
 // tests/guild_bank_pg_integration.test.ts and
 // tests/server/storage_purchase_db.pg.test.ts prove the legacy halves with no
 // housing participant.
-// Cost: 13.8 s
+// Cost: 13.4 s
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import type { Pool as PgPool, PoolClient } from 'pg';
@@ -4023,8 +4023,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         // A walk that ends at two sessions naming none: a stopped realm's
         // statement queued for ACCESS EXCLUSIVE behind both an open sign-out
         // and a dump-shaped ACCESS SHARE. Each decides by its own rule: the
-        // sign-out is ended, the dump never is, and the realm's statement
-        // behind it is ended by The nightly dump's statement.
+        // sign-out is ended, after which the next walk ends at the dump alone;
+        // the dump never is, and the realm's statement behind it is ended by
+        // The nightly dump's statement.
         const twice = hex().repeat(2);
         await db.saveToken(twice, accountId);
         await dumpShaped.query("SET application_name = 'pg_dump'");
@@ -4055,7 +4056,11 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           ]),
         );
         await pool.query(terminateSql.replace('<pid>', String(leafHolderPid)));
+        expect(await until(() => gone(leafHolderPid), 0)).toBe(0);
         expect(await waitOf(rerunPid)).toBe('relation');
+        expect((await walk(rerunPid)).leaves).toEqual([
+          { pid: dumpPid, application_name: 'pg_dump', state: 'idle in transaction' },
+        ]);
         const nightly = operatorSql('SELECT a.pid, a.client_addr');
         expect((await pool.query(nightly)).rows.map((r: { pid: number }) => r.pid)).toEqual([
           leafRealmPid,
@@ -4068,19 +4073,22 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         await dumpShaped.query('ROLLBACK');
         expect(await leftOn(fresh)).toBe(0);
         expect(await db.accountAndScopeForToken(twice)).toBeNull();
-        // A session that is working, waiting on no lock, names none.
+        // A session that is working, waiting on no lock, names none, read while
+        // it is still working and then cancelled.
         const freshPid = await pidOf(fresh);
-        const sleeping = fresh.query('SELECT pg_sleep(0.5)');
-        expect(
-          await until(
-            async () =>
-              (await pool.query('SELECT state FROM pg_stat_activity WHERE pid = $1', [freshPid]))
-                .rows[0]?.state,
-            'active',
-          ),
-        ).toBe('active');
+        waiting.push(freshPid);
+        const sleeping = fresh.query('SELECT pg_sleep(30)').then(
+          () => 'slept',
+          (error: { code?: string }) => error.code,
+        );
+        const stateOf = async (pid: number) =>
+          (await pool.query('SELECT state FROM pg_stat_activity WHERE pid = $1', [pid])).rows[0]
+            ?.state;
+        expect(await until(() => stateOf(freshPid), 'active')).toBe('active');
         expect(await named(freshPid)).toEqual([]);
-        await sleeping;
+        expect(await stateOf(freshPid)).toBe('active');
+        await pool.query('SELECT pg_cancel_backend($1)', [freshPid]);
+        expect(await sleeping).toBe('57014');
         done = true;
       } finally {
         if (open) await signer.query('ROLLBACK').catch(() => {});

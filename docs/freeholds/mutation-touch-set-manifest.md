@@ -1444,3 +1444,8 @@ What changed the contract above:
   whole (what waits for the bot, what the outbox drops for good, each feed's own drop rule, the
   polled process alone) and says a batch a poll already took is lost if the bot stops before
   posting it.
+- A thirty-seventh round of eight fresh readers: no P12 change; `DEPLOY.md` says a stop stops
+  everything the bot does, that what it does only in answer to a Discord event is never done for
+  one during the stop (the daily-active points among it), which items the outbox holds and that
+  the winner days stay in the database and are served again until marked, and names the hourly
+  full resync as the link-change feed's heal.

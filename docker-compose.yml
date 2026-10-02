@@ -385,9 +385,10 @@ services:
     # because the bot has no save or drain obligations: nothing durable lives in this
     # process, and it installs no SIGTERM handler, so node's default disposition ends
     # it immediately and the grace window is rarely consumed at all. Any positive
-    # value is therefore enough; safety comes from the outbox living server-side and
-    # redelivering anything unacked on the next poll, not from covering an in-flight
-    # call (a Discord call can ride DISCORD_CALL_TIMEOUT_MS for 15s on its own).
+    # value is therefore enough; safety comes from the outbox living server-side, which
+    # hands the restarted bot what is still queued (DEPLOY's bot restart note names what
+    # a stop loses), not from covering an in-flight call (a Discord call can ride
+    # DISCORD_CALL_TIMEOUT_MS for 15s on its own).
     stop_grace_period: 15s
     # Container memory ceiling. A relay bot's working set is tens of MiB, so 512m is
     # generous headroom rather than a tight fit; the ceiling exists for the neighbours,

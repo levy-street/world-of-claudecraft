@@ -19,12 +19,13 @@
 // TimeoutOverflowWarning to stderr; it is that case's subject, not a fault to
 // chase.
 //
-// Cost: 0.8 s
+// Cost: 0.9 s
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import ts from 'typescript';
 import { describe, expect, it, vi } from 'vitest';
 import { LEASE_TTL_SECONDS } from '../../server/character_lease_db';
 import {
@@ -2311,7 +2312,7 @@ describe('the claim renewer', () => {
       "Without the `discord` profile (no `--profile discord`, no `discord` in `COMPOSE_PROFILES` in `.env`, and no command that names `discord-bot`, which enables its profile by itself) the service simply never starts, which is the supported way to run a realm with no Discord integration; with `discord` in `COMPOSE_PROFILES`, every `up -d` that names no service starts it too, a release's step 6 included.",
       "While the third escalation lever (below) holds, either edit is made without the bot's `up`, which would lift that lever: the `up` that lifts it runs the bot with the edit.",
       "so once the realm is verified run the bot's guarded line under the release steps (a restart keeps its old image, and a bot the third escalation lever stopped stays stopped), or those cards post",
-      "the outbox lives on the server and hands the restarted bot what is still queued, within the bounds lever 3 below gives, and a queue pop only while its offer stands; a batch a poll already took (its 200 is the outbox's only acknowledgement) is lost if the bot stops before posting it.",
+      "the outbox lives on the server and hands the restarted bot what is still queued, within the bounds lever 3 below gives, and a queue pop only while its offer stands; the queued items of a batch a poll already took (its 200 is the outbox's only acknowledgement) are lost if the bot stops before posting them, while its winner days are served again until the bot marks them posted.",
       'Act on it, for a running bot only (one the third escalation lever stopped starts again only as that lever says), with:',
       "The fix is to enable the intents (the restart policy's next attempt picks them up) or to correct the token in `.env` and recreate the game and then the bot by Environment keys above (a `restart` keeps the old token), never to disable the restart policy.",
       '**Escalation levers**, in order. The first two are each an `.env` edit (not while an image built for a coming release waits; Environment keys above) plus `sudo docker compose --profile discord up -d --no-deps discord-bot`; the third, a stop, starts no image and is open even then:',
@@ -2338,230 +2339,437 @@ describe('the claim renewer', () => {
     expect(leverEnd).toBeGreaterThan(-1);
     const lever = leverItem.slice(0, leverEnd).replace(/\s+/g, ' ');
     expect(lever).toContain(
-      "The game is unaffected. The bot is a pure consumer, so stopping it costs Discord-side work alone: the role, nickname, presence, relay, activity, link-change and queue-pop delivery it makes waits until it is started again, and what the outbox drops meanwhile never comes. The outbox holds those items in the memory of the game process the bot polls (the one `GAME_SERVER_URL` names), the winner days excepted, which the game reads from the database. Each feed holds at most its cap (`RELAY_MAX_QUEUE`, `ACTIVITY_MAX_QUEUE`, `LINK_CHANGE_MAX_QUEUE`, `QUEUE_POP_MAX_QUEUE`) and, once full, drops by its own rule: the relay, activity and queue-pop feeds their oldest items, the link-change feed its link and unlink items last (the bot's periodic re-read of the linked set heals what it drops); a queue pop also lapses with its offer; and any end of the game process while it holds (a recreate for a shared key's edit or a release, a stop or restart, a crash, the watchdog's restart) drops everything still queued.",
+      "The game keeps running, and stopping the bot stops everything it does until it is started again. The role, nickname, presence, relay, activity, winner, link-change and queue-pop delivery it makes waits, and what the outbox drops meanwhile never comes. Discord does not resend the events the bot missed, so what it does only in answer to an event is never done for one during the stop: a linked member whose only post or voice join of a day fell in the stop gets no daily-active points for that day. The outbox holds its relay, activity, link-change and queue-pop items in the memory of the game process the bot polls (the one `GAME_SERVER_URL` names); the winner days stay in the database, where the game reads them. Each feed holds at most its cap (`RELAY_MAX_QUEUE`, `ACTIVITY_MAX_QUEUE`, `LINK_CHANGE_MAX_QUEUE`, `QUEUE_POP_MAX_QUEUE`) and, once full, drops by its own rule: the relay, activity and queue-pop feeds their oldest items, the link-change feed its link and unlink items last (the bot's hourly full resync heals what it drops); a queue pop also lapses with its offer; and any end of the game process while it holds (a recreate for a shared key's edit or a release, a stop or restart, a crash, the watchdog's restart) drops everything still queued.",
     );
-    // Those are the feeds the outbox drains from memory: a new feed drained by a
-    // `drain<Name>(` call fails here until DEPLOY names it.
-    const code = (file: string) =>
-      readFileSync(file, 'utf8')
-        .replace(/\/\*[\s\S]*?\*\//g, '')
-        .replace(/(^|[^:])\/\/.*$/gm, '$1');
-    expect(
+    // The outbox's code is read through the TypeScript parser, so a comment
+    // marker inside a comment, a string or a regex is never taken for one.
+    const parsed = (file: string) =>
+      ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true);
+    const nodesIn = (root: ts.Node): ts.Node[] => {
+      const all: ts.Node[] = [];
+      const visit = (node: ts.Node) => {
+        all.push(node);
+        ts.forEachChild(node, visit);
+      };
+      visit(root);
+      return all;
+    };
+    // A node's text with every comment in it dropped (each lies in the trivia
+    // at some node's start or end), each line trimmed, blank lines left out.
+    const linesOf = (node: ts.Node, source: ts.SourceFile): string[] => {
+      const start = node.getStart(source);
+      const comments = new Map<number, number>();
+      for (const at of nodesIn(node)) {
+        for (const pos of [at.pos, at.end]) {
+          for (const range of ts.getLeadingCommentRanges(source.text, pos) ?? []) {
+            if (range.pos >= start && range.end <= node.end) comments.set(range.pos, range.end);
+          }
+        }
+      }
+      let text = '';
+      let from = start;
+      for (const [pos, end] of [...comments].sort((x, y) => x[0] - y[0])) {
+        text += source.text.slice(from, pos);
+        from = end;
+      }
+      text += source.text.slice(from, node.end);
+      return text
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line !== '');
+    };
+    // Those are the feeds the outbox drains from memory: every `drain<Name>`
+    // that server/internal.ts names, called or not, so a new feed drained
+    // through one fails here until DEPLOY names it. Each drain call is pinned
+    // whole (a queue pop lapses against the clock it is given), and the
+    // requeues are exactly the four in the one catch whose try holds every
+    // drain, so a 200 is the outbox's only acknowledgement.
+    const internal = parsed('server/internal.ts');
+    const namedIn = (pattern: RegExp) =>
       [
         ...new Set(
-          [...code('server/internal.ts').matchAll(/\bdrain([A-Z]\w*)\(/g)].map((m) => m[1]),
+          nodesIn(internal)
+            .filter(ts.isIdentifier)
+            .map((id) => id.text)
+            .filter((text) => pattern.test(text)),
         ),
-      ].sort(),
-    ).toEqual(['Activity', 'LinkChanges', 'QueuePops', 'Relay']);
-    // Each feed's cap and drop rule, read whole: every top-level declaration
-    // in the feed's module whose code names its queue or its cap (the queue is
-    // module-private, so these are all the code that can reach it), and the
-    // declarations that decide the link-change feed's drop order without
-    // naming its queue, its ladder and the ladder's two named rungs; comments
-    // stripped, each line trimmed, a cap's value left to the feed's owner. So
-    // a feed that keeps, drops or caps its items another way, at any site, or
-    // a queue pop the drain keeps past its offer, fails here until DEPLOY's
-    // rule is checked. The feeds' own suites pin the rules by behavior:
-    // tests/server/discord_relay_queue.test.ts,
+      ].sort();
+    const callsTo = (pattern: RegExp) =>
+      nodesIn(internal).filter(
+        (node): node is ts.CallExpression =>
+          ts.isCallExpression(node) &&
+          ts.isIdentifier(node.expression) &&
+          pattern.test(node.expression.text),
+      );
+    const catchOf = (node: ts.Node): ts.CatchClause | undefined =>
+      node.parent === undefined
+        ? undefined
+        : ts.isCatchClause(node.parent)
+          ? node.parent
+          : catchOf(node.parent);
+    expect(namedIn(/^drain[A-Z]/)).toEqual([
+      'drainActivity',
+      'drainLinkChanges',
+      'drainQueuePops',
+      'drainRelay',
+    ]);
+    const drains = callsTo(/^drain[A-Z]/);
+    expect(drains.map((call) => linesOf(call, internal).join(' '))).toEqual([
+      'drainRelay()',
+      'drainActivity()',
+      'drainLinkChanges(OUTBOX_LINK_CHANGE_PAGE)',
+      'drainQueuePops(Date.now())',
+    ]);
+    expect(namedIn(/^requeue[A-Z]/)).toEqual([
+      'requeueActivity',
+      'requeueLinkChanges',
+      'requeueQueuePops',
+      'requeueRelay',
+    ]);
+    const requeues = callsTo(/^requeue[A-Z]/);
+    expect(requeues.map((call) => linesOf(call, internal).join(' '))).toEqual([
+      'requeueRelay(relayItems)',
+      'requeueActivity(activityItems)',
+      'requeueLinkChanges(linkChangeItems)',
+      'requeueQueuePops(queuePopItems)',
+    ]);
+    const clauses = new Set(requeues.map(catchOf));
+    expect(clauses.size).toBe(1);
+    const tryBlock = ([...clauses][0]?.parent as ts.TryStatement | undefined)?.tryBlock;
+    expect(tryBlock).toBeDefined();
+    for (const call of drains) {
+      expect(call.pos >= (tryBlock?.pos ?? 0) && call.end <= (tryBlock?.end ?? 0)).toBe(true);
+    }
+    // Each feed's cap and drop rule, read whole: every top-level statement of
+    // the feed's module that names its queue or a cap, and every declaration
+    // of the module such a statement names, until none is left (the ladder,
+    // its rungs, a dedupe or pending helper); comments dropped, each line
+    // trimmed, a numeric constant's value left to the feed's owner. So a feed
+    // that admits, keeps, drops or caps its items another way fails here until
+    // DEPLOY's rule is checked. The feeds' own suites pin the rules by
+    // behavior: tests/server/discord_relay_queue.test.ts,
     // tests/server/discord_activity_queue.test.ts,
     // tests/server/discord_queue_pops.test.ts and
-    // tests/server/discord_link_changes.test.ts. Not read: a helper these
-    // call that names no queue (a dedupe or pending index), which can neither
-    // add an item to a queue nor drop one.
-    const queueCode = (file: string, rungs: string[] = []) =>
-      code(file)
-        .split(/\n(?=[^\s}\])])/)
-        .filter(
-          (unit) =>
-            /\bQUEUE\b|_MAX_QUEUE\b/.test(unit) ||
-            rungs.some((name) => new RegExp(`^(?:const|function) ${name}\\b`).test(unit)),
-        )
-        .flatMap((unit) =>
-          unit
-            .split('\n')
-            .map((line) => line.trim())
-            .filter((line) => line !== ''),
-        )
-        .map((line) => line.replace(/^(export const \w+_MAX_QUEUE = )\d+;$/, '$1<n>;'));
-    expect(queueCode('server/discord_relay.ts')).toEqual([
-      'const QUEUE: QueuedRelay[] = [];',
-      'export const RELAY_MAX_QUEUE = <n>;',
-      'const MAX_QUEUE = RELAY_MAX_QUEUE;',
-      'export function enqueueRelay(item: QueuedRelay): void {',
-      'QUEUE.push(item);',
-      'if (QUEUE.length > MAX_QUEUE) QUEUE.splice(0, QUEUE.length - MAX_QUEUE);',
-      '}',
-      'export function drainRelay(): QueuedRelay[] {',
-      'return QUEUE.splice(0, QUEUE.length);',
-      '}',
-      'export function requeueRelay(items: readonly QueuedRelay[]): void {',
-      'if (items.length === 0) return;',
-      'QUEUE.unshift(...items);',
-      'if (QUEUE.length > MAX_QUEUE) QUEUE.splice(0, QUEUE.length - MAX_QUEUE);',
-      '}',
-      'export function relayQueueDepth(): number {',
-      'return QUEUE.length;',
-      '}',
-    ]);
-    expect(queueCode('server/discord_activity.ts')).toEqual([
-      'const QUEUE: QueuedActivity[] = [];',
-      'export const ACTIVITY_MAX_QUEUE = <n>;',
-      'const MAX_QUEUE = ACTIVITY_MAX_QUEUE;',
-      'export function enqueueActivity(item: QueuedActivity, dedupeKey: string | null, now: number): void {',
-      'if (dedupeKey && !claimDedupeKey(dedupeKey, now)) return;',
-      'QUEUE.push(item);',
-      'if (QUEUE.length > MAX_QUEUE) QUEUE.splice(0, QUEUE.length - MAX_QUEUE);',
-      '}',
-      'export function drainActivity(): QueuedActivity[] {',
-      'return QUEUE.splice(0, QUEUE.length);',
-      '}',
-      'export function requeueActivity(items: readonly QueuedActivity[]): void {',
-      'if (items.length === 0) return;',
-      'QUEUE.unshift(...items);',
-      'if (QUEUE.length > MAX_QUEUE) QUEUE.splice(0, QUEUE.length - MAX_QUEUE);',
-      '}',
-      'export function activityQueueDepth(): number {',
-      'return QUEUE.length;',
-      '}',
-    ]);
-    expect(queueCode('server/discord_queue_pops.ts')).toEqual([
-      'export const QUEUE_POP_MAX_QUEUE = <n>;',
-      'const QUEUE: QueuedQueuePop[] = [];',
-      'export function enqueueQueuePop(item: QueuedQueuePop): void {',
-      'const open = pending.get(item.accountId);',
-      'if (open) {',
-      'Object.assign(open, item);',
-      'return;',
-      '}',
-      'QUEUE.push(item);',
-      'pending.set(item.accountId, item);',
-      'while (QUEUE.length > QUEUE_POP_MAX_QUEUE) {',
-      'const dropped = QUEUE.shift();',
-      'if (dropped && pending.get(dropped.accountId) === dropped) pending.delete(dropped.accountId);',
-      '}',
-      '}',
-      'export function drainQueuePops(now: number): QueuedQueuePop[] {',
-      'const all = QUEUE.splice(0, QUEUE.length);',
-      'pending.clear();',
-      'return all.filter((item) => item.expiresAtMs > now);',
-      '}',
-      'export function requeueQueuePops(items: readonly QueuedQueuePop[]): void {',
-      'if (items.length === 0) return;',
-      'const requeued: QueuedQueuePop[] = [];',
-      'for (const item of items) {',
-      'const open = pending.get(item.accountId);',
-      'if (open) {',
-      'Object.assign(open, item);',
-      '} else {',
-      'requeued.push(item);',
-      'pending.set(item.accountId, item);',
-      '}',
-      '}',
-      'QUEUE.unshift(...requeued);',
-      'while (QUEUE.length > QUEUE_POP_MAX_QUEUE) {',
-      'const dropped = QUEUE.shift();',
-      'if (dropped && pending.get(dropped.accountId) === dropped) pending.delete(dropped.accountId);',
-      '}',
-      '}',
-      'export function queuePopQueueDepth(): number {',
-      'return QUEUE.length;',
-      '}',
-      'export function resetQueuePopsForTests(): void {',
-      'QUEUE.length = 0;',
-      'pending.clear();',
-      'delayedCandidates.clear();',
-      'watchLastBatchedAt.clear();',
-      'activeBatch = null;',
-      'lastBatchCompletedAt = Number.NEGATIVE_INFINITY;',
-      'resetQueuePingCacheForTests();',
-      'watching = false;',
-      '}',
-    ]);
+    // tests/server/discord_link_changes.test.ts. Not read: types, and another
+    // module's code, whose names the read code uses are pinned; and a statement
+    // outside the read set, of which every one naming a state the read set
+    // declares is pinned by name.
+    const feedCode = (file: string) => {
+      const source = parsed(file);
+      const statements = source.statements.filter(
+        (statement) =>
+          !ts.isImportDeclaration(statement) &&
+          !ts.isInterfaceDeclaration(statement) &&
+          !ts.isTypeAliasDeclaration(statement),
+      );
+      const names = new Map(
+        statements.map((statement) => [
+          statement,
+          new Set(
+            nodesIn(statement)
+              .filter(ts.isIdentifier)
+              .map((id) => id.text),
+          ),
+        ]),
+      );
+      const namesOf = (statement: ts.Statement) => [...(names.get(statement) ?? [])];
+      const declared = (statement: ts.Statement): string[] =>
+        ts.isFunctionDeclaration(statement) || ts.isClassDeclaration(statement)
+          ? statement.name
+            ? [statement.name.text]
+            : []
+          : ts.isVariableStatement(statement)
+            ? statement.declarationList.declarations.flatMap((declaration) =>
+                ts.isIdentifier(declaration.name) ? [declaration.name.text] : [],
+              )
+            : [];
+      const read = new Set(
+        statements.filter((statement) =>
+          namesOf(statement).some((name) => /^QUEUE$|MAX_QUEUE$/.test(name)),
+        ),
+      );
+      for (let grown = true; grown; ) {
+        grown = false;
+        const reached = new Set([...read].flatMap(namesOf));
+        for (const statement of statements) {
+          if (!read.has(statement) && declared(statement).some((name) => reached.has(name))) {
+            read.add(statement);
+            grown = true;
+          }
+        }
+      }
+      const kept = statements.filter((statement) => read.has(statement));
+      const state = new Set(
+        kept.flatMap((statement) => (ts.isVariableStatement(statement) ? declared(statement) : [])),
+      );
+      const imported = new Set(
+        source.statements.filter(ts.isImportDeclaration).flatMap((statement) =>
+          nodesIn(statement)
+            .filter(ts.isIdentifier)
+            .map((id) => id.text),
+        ),
+      );
+      return {
+        lines: kept
+          .flatMap((statement) => linesOf(statement, source))
+          .map((line) =>
+            line.replace(/^((?:export )?const \w+(?:: number)? = )[\d_ *]+;$/, '$1<n>;'),
+          ),
+        imports: [...new Set(kept.flatMap(namesOf))].filter((name) => imported.has(name)).sort(),
+        outside: statements
+          .filter(
+            (statement) =>
+              !read.has(statement) && namesOf(statement).some((name) => state.has(name)),
+          )
+          .map((statement) => declared(statement).join(', ') || linesOf(statement, source)[0]),
+      };
+    };
+    expect(feedCode('server/discord_relay.ts')).toEqual({
+      lines: [
+        'const QUEUE: QueuedRelay[] = [];',
+        'export const RELAY_MAX_QUEUE = <n>;',
+        'const MAX_QUEUE = RELAY_MAX_QUEUE;',
+        'export function enqueueRelay(item: QueuedRelay): void {',
+        'QUEUE.push(item);',
+        'if (QUEUE.length > MAX_QUEUE) QUEUE.splice(0, QUEUE.length - MAX_QUEUE);',
+        '}',
+        'export function drainRelay(): QueuedRelay[] {',
+        'return QUEUE.splice(0, QUEUE.length);',
+        '}',
+        'export function requeueRelay(items: readonly QueuedRelay[]): void {',
+        'if (items.length === 0) return;',
+        'QUEUE.unshift(...items);',
+        'if (QUEUE.length > MAX_QUEUE) QUEUE.splice(0, QUEUE.length - MAX_QUEUE);',
+        '}',
+        'export function relayQueueDepth(): number {',
+        'return QUEUE.length;',
+        '}',
+      ],
+      imports: [],
+      outside: [],
+    });
+    expect(feedCode('server/discord_activity.ts')).toEqual({
+      lines: [
+        'const QUEUE: QueuedActivity[] = [];',
+        'export const ACTIVITY_MAX_QUEUE = <n>;',
+        'const MAX_QUEUE = ACTIVITY_MAX_QUEUE;',
+        'const DEDUPE_TTL_MS = <n>;',
+        'export const MAX_RECENT_KEYS = <n>;',
+        'const recentKeys = new Map<string, number>();',
+        'export function claimDedupeKey(key: string, now: number): boolean {',
+        'const last = recentKeys.get(key);',
+        'if (last !== undefined && now - last < DEDUPE_TTL_MS) return false;',
+        'recentKeys.delete(key);',
+        'recentKeys.set(key, now);',
+        'if (recentKeys.size > MAX_RECENT_KEYS) {',
+        'for (const [k, t] of recentKeys) {',
+        'if (now - t >= DEDUPE_TTL_MS) recentKeys.delete(k);',
+        '}',
+        'if (recentKeys.size > MAX_RECENT_KEYS) {',
+        'const over = recentKeys.size - MAX_RECENT_KEYS;',
+        'let evicted = 0;',
+        'for (const k of recentKeys.keys()) {',
+        'if (evicted++ >= over) break;',
+        'recentKeys.delete(k);',
+        '}',
+        '}',
+        '}',
+        'return true;',
+        '}',
+        'export function enqueueActivity(item: QueuedActivity, dedupeKey: string | null, now: number): void {',
+        'if (dedupeKey && !claimDedupeKey(dedupeKey, now)) return;',
+        'QUEUE.push(item);',
+        'if (QUEUE.length > MAX_QUEUE) QUEUE.splice(0, QUEUE.length - MAX_QUEUE);',
+        '}',
+        'export function drainActivity(): QueuedActivity[] {',
+        'return QUEUE.splice(0, QUEUE.length);',
+        '}',
+        'export function requeueActivity(items: readonly QueuedActivity[]): void {',
+        'if (items.length === 0) return;',
+        'QUEUE.unshift(...items);',
+        'if (QUEUE.length > MAX_QUEUE) QUEUE.splice(0, QUEUE.length - MAX_QUEUE);',
+        '}',
+        'export function activityQueueDepth(): number {',
+        'return QUEUE.length;',
+        '}',
+      ],
+      imports: [],
+      outside: ['releaseDedupeKey'],
+    });
+    expect(feedCode('server/discord_queue_pops.ts')).toEqual({
+      lines: [
+        'export const QUEUE_POP_MAX_QUEUE = <n>;',
+        'const QUEUE: QueuedQueuePop[] = [];',
+        'const pending = new Map<number, QueuedQueuePop>();',
+        'let watching = false;',
+        'export function enqueueQueuePop(item: QueuedQueuePop): void {',
+        'const open = pending.get(item.accountId);',
+        'if (open) {',
+        'Object.assign(open, item);',
+        'return;',
+        '}',
+        'QUEUE.push(item);',
+        'pending.set(item.accountId, item);',
+        'while (QUEUE.length > QUEUE_POP_MAX_QUEUE) {',
+        'const dropped = QUEUE.shift();',
+        'if (dropped && pending.get(dropped.accountId) === dropped) pending.delete(dropped.accountId);',
+        '}',
+        '}',
+        'export function drainQueuePops(now: number): QueuedQueuePop[] {',
+        'const all = QUEUE.splice(0, QUEUE.length);',
+        'pending.clear();',
+        'return all.filter((item) => item.expiresAtMs > now);',
+        '}',
+        'export function requeueQueuePops(items: readonly QueuedQueuePop[]): void {',
+        'if (items.length === 0) return;',
+        'const requeued: QueuedQueuePop[] = [];',
+        'for (const item of items) {',
+        'const open = pending.get(item.accountId);',
+        'if (open) {',
+        'Object.assign(open, item);',
+        '} else {',
+        'requeued.push(item);',
+        'pending.set(item.accountId, item);',
+        '}',
+        '}',
+        'QUEUE.unshift(...requeued);',
+        'while (QUEUE.length > QUEUE_POP_MAX_QUEUE) {',
+        'const dropped = QUEUE.shift();',
+        'if (dropped && pending.get(dropped.accountId) === dropped) pending.delete(dropped.accountId);',
+        '}',
+        '}',
+        'export function queuePopQueueDepth(): number {',
+        'return QUEUE.length;',
+        '}',
+        'export function resetQueuePopsForTests(): void {',
+        'QUEUE.length = 0;',
+        'pending.clear();',
+        'delayedCandidates.clear();',
+        'watchLastBatchedAt.clear();',
+        'activeBatch = null;',
+        'lastBatchCompletedAt = Number.NEGATIVE_INFINITY;',
+        'resetQueuePingCacheForTests();',
+        'watching = false;',
+        '}',
+        'const delayedCandidates = new Map<number, DelayedCandidate>();',
+        'const watchLastBatchedAt = new Map<number, number>();',
+        'let activeBatch: Promise<void> | null = null;',
+        'let lastBatchCompletedAt = Number.NEGATIVE_INFINITY;',
+      ],
+      imports: ['resetQueuePingCacheForTests'],
+      outside: [
+        'queuePopsWatching',
+        'delayedQueuePopCandidateCount',
+        'queueWatchTrackedAccountCount',
+        'nextBatchIds',
+        'startBatch',
+        'observeQueuePops',
+      ],
+    });
+    expect(feedCode('server/discord_link_changes.ts')).toEqual({
+      lines: [
+        'export const LINK_CHANGE_MAX_QUEUE = <n>;',
+        'function isPlaytimeNoise(item: QueuedLinkChange): boolean {',
+        "return item.discordId === undefined && item.kinds.length === 1 && item.kinds[0] === 'points';",
+        '}',
+        'function isEvictableFlexNoise(item: QueuedLinkChange): boolean {',
+        'return (',
+        "item.discordId === undefined && !item.kinds.includes('link') && !item.kinds.includes('unlink')",
+        ');',
+        '}',
+        'export const LINK_CHANGE_DEDUPE_TTL_MS = <n>;',
+        'const QUEUE: QueuedLinkChange[] = [];',
+        'const pending = new Map<number, { item: QueuedLinkChange; at: number }>();',
+        'const mintedAt = new WeakMap<QueuedLinkChange, number>();',
+        'function forgetPending(item: QueuedLinkChange): void {',
+        'if (pending.get(item.accountId)?.item === item) pending.delete(item.accountId);',
+        '}',
+        'const EVICTION_LADDER: ReadonlyArray<(item: QueuedLinkChange) => boolean> = [',
+        'isPlaytimeNoise,',
+        'isEvictableFlexNoise,',
+        "(item) => !item.kinds.includes('link') && !item.kinds.includes('unlink'),",
+        '() => true,',
+        '];',
+        'function trimToCap(): void {',
+        'const excess = QUEUE.length - LINK_CHANGE_MAX_QUEUE;',
+        'if (excess <= 0) return;',
+        'const drop = new Set<QueuedLinkChange>();',
+        'for (const rung of EVICTION_LADDER) {',
+        'if (drop.size >= excess) break;',
+        'for (const item of QUEUE) {',
+        'if (drop.size >= excess) break;',
+        'if (!drop.has(item) && rung(item)) drop.add(item);',
+        '}',
+        '}',
+        'let write = 0;',
+        'for (const item of QUEUE) {',
+        'if (drop.has(item)) forgetPending(item);',
+        'else QUEUE[write++] = item;',
+        '}',
+        'QUEUE.length = write;',
+        '}',
+        'export function enqueueLinkChange(change: QueuedLinkChange, now: number): void {',
+        'const open = pending.get(change.accountId);',
+        'if (open && now - open.at < LINK_CHANGE_DEDUPE_TTL_MS) {',
+        'for (const kind of change.kinds) {',
+        'if (!open.item.kinds.includes(kind)) open.item.kinds.push(kind);',
+        '}',
+        'if (open.item.discordId === undefined && change.discordId !== undefined) {',
+        'open.item.discordId = change.discordId;',
+        '}',
+        'return;',
+        '}',
+        'const kinds: LinkChangeKind[] = [];',
+        'for (const kind of change.kinds) {',
+        'if (!kinds.includes(kind)) kinds.push(kind);',
+        '}',
+        'const item: QueuedLinkChange = { accountId: change.accountId, kinds };',
+        'if (change.discordId !== undefined) item.discordId = change.discordId;',
+        'QUEUE.push(item);',
+        'pending.set(item.accountId, { item, at: now });',
+        'mintedAt.set(item, now);',
+        'trimToCap();',
+        '}',
+        'export function drainLinkChanges(max?: number): QueuedLinkChange[] {',
+        'if (max === undefined || max >= QUEUE.length) {',
+        'pending.clear();',
+        'return QUEUE.splice(0, QUEUE.length);',
+        '}',
+        'const page = QUEUE.splice(0, Math.max(0, max));',
+        'for (const item of page) forgetPending(item);',
+        'return page;',
+        '}',
+        'export function requeueLinkChanges(items: readonly QueuedLinkChange[]): void {',
+        'if (items.length === 0) return;',
+        'QUEUE.unshift(...items);',
+        'for (const item of items) {',
+        'const at = mintedAt.get(item);',
+        'if (at !== undefined && !pending.has(item.accountId)) pending.set(item.accountId, { item, at });',
+        '}',
+        'trimToCap();',
+        '}',
+        'export function linkChangeDepth(): number {',
+        'return QUEUE.length;',
+        '}',
+      ],
+      imports: [],
+      outside: [],
+    });
+    // The link-change feed's heal, the bot's hourly full resync.
+    const memberWrites = parsed('bot/member_writes.ts');
     expect(
-      queueCode('server/discord_link_changes.ts', [
-        'EVICTION_LADDER',
-        'isPlaytimeNoise',
-        'isEvictableFlexNoise',
-      ]),
-    ).toEqual([
-      'export const LINK_CHANGE_MAX_QUEUE = <n>;',
-      'function isPlaytimeNoise(item: QueuedLinkChange): boolean {',
-      "return item.discordId === undefined && item.kinds.length === 1 && item.kinds[0] === 'points';",
-      '}',
-      'function isEvictableFlexNoise(item: QueuedLinkChange): boolean {',
-      'return (',
-      "item.discordId === undefined && !item.kinds.includes('link') && !item.kinds.includes('unlink')",
-      ');',
-      '}',
-      'const QUEUE: QueuedLinkChange[] = [];',
-      'const EVICTION_LADDER: ReadonlyArray<(item: QueuedLinkChange) => boolean> = [',
-      'isPlaytimeNoise,',
-      'isEvictableFlexNoise,',
-      "(item) => !item.kinds.includes('link') && !item.kinds.includes('unlink'),",
-      '() => true,',
-      '];',
-      'function trimToCap(): void {',
-      'const excess = QUEUE.length - LINK_CHANGE_MAX_QUEUE;',
-      'if (excess <= 0) return;',
-      'const drop = new Set<QueuedLinkChange>();',
-      'for (const rung of EVICTION_LADDER) {',
-      'if (drop.size >= excess) break;',
-      'for (const item of QUEUE) {',
-      'if (drop.size >= excess) break;',
-      'if (!drop.has(item) && rung(item)) drop.add(item);',
-      '}',
-      '}',
-      'let write = 0;',
-      'for (const item of QUEUE) {',
-      'if (drop.has(item)) forgetPending(item);',
-      'else QUEUE[write++] = item;',
-      '}',
-      'QUEUE.length = write;',
-      '}',
-      'export function enqueueLinkChange(change: QueuedLinkChange, now: number): void {',
-      'const open = pending.get(change.accountId);',
-      'if (open && now - open.at < LINK_CHANGE_DEDUPE_TTL_MS) {',
-      'for (const kind of change.kinds) {',
-      'if (!open.item.kinds.includes(kind)) open.item.kinds.push(kind);',
-      '}',
-      'if (open.item.discordId === undefined && change.discordId !== undefined) {',
-      'open.item.discordId = change.discordId;',
-      '}',
-      'return;',
-      '}',
-      'const kinds: LinkChangeKind[] = [];',
-      'for (const kind of change.kinds) {',
-      'if (!kinds.includes(kind)) kinds.push(kind);',
-      '}',
-      'const item: QueuedLinkChange = { accountId: change.accountId, kinds };',
-      'if (change.discordId !== undefined) item.discordId = change.discordId;',
-      'QUEUE.push(item);',
-      'pending.set(item.accountId, { item, at: now });',
-      'mintedAt.set(item, now);',
-      'trimToCap();',
-      '}',
-      'export function drainLinkChanges(max?: number): QueuedLinkChange[] {',
-      'if (max === undefined || max >= QUEUE.length) {',
-      'pending.clear();',
-      'return QUEUE.splice(0, QUEUE.length);',
-      '}',
-      'const page = QUEUE.splice(0, Math.max(0, max));',
-      'for (const item of page) forgetPending(item);',
-      'return page;',
-      '}',
-      'export function requeueLinkChanges(items: readonly QueuedLinkChange[]): void {',
-      'if (items.length === 0) return;',
-      'QUEUE.unshift(...items);',
-      'for (const item of items) {',
-      'const at = mintedAt.get(item);',
-      'if (at !== undefined && !pending.has(item.accountId)) pending.set(item.accountId, { item, at });',
-      '}',
-      'trimToCap();',
-      '}',
-      'export function linkChangeDepth(): number {',
-      'return QUEUE.length;',
-      '}',
-    ]);
+      memberWrites.statements
+        .filter(
+          (statement) =>
+            ts.isVariableStatement(statement) &&
+            statement.declarationList.declarations.some(
+              (declaration) =>
+                ts.isIdentifier(declaration.name) &&
+                declaration.name.text === 'FULL_RESYNC_INTERVAL_MS',
+            ),
+        )
+        .flatMap((statement) => linesOf(statement, memberWrites)),
+    ).toEqual(['export const FULL_RESYNC_INTERVAL_MS = 60 * 60_000;']);
     expect(serviceBlock('discord-bot')).toContain('\n      GAME_SERVER_URL: http://game:8787\n');
     expect(lever).toContain(
       "While it holds, every start of the bot lifts it: any `up` of the bot (the first two levers', an Environment keys edit's, the Enabling block's), a `start` or `restart`, and, with `discord` in `COMPOSE_PROFILES` in `.env`, every `up -d` that names no service (stop it again after one, as the release steps say). So while it holds, start the bot only to lift it: an `.env` edit for the bot reaches it then. Lift it only as the first two levers run it, with `sudo docker compose --profile discord up -d --no-deps discord-bot` (not while an image built for a coming release waits), never with `start` or `restart`, which revive the stopped container on the image it was created from, which need not be the one the game runs once a release or a rollback has run since.",
@@ -2626,21 +2834,15 @@ describe('the claim renewer', () => {
     const pulledIn = /\n {4}(?:env_file|extends):/;
     expect('\n  game:\n    env_file:\n      - .env\n').toMatch(pulledIn);
     expect('\n  game:\n    extends:\n      service: base\n').toMatch(pulledIn);
-    const anchor = /(?:^|[\s[{,:-])&(?!&(?:\s|$)|>\s)[^\s,[\]{}]/m;
-    for (const control of [
-      'x-env: &shared\n',
-      '  - &first a\n',
-      'env: [&a x]\n',
-      'x-env: &$shared\n',
-      'x-env: &&shared\n',
-      uncommented('x-env: &shared # note\n'),
-    ]) {
-      expect(control).toMatch(anchor);
-    }
-    for (const literal of ['run: a && b\n', 'url: http://x/?a=1&b=2\n', 'run: x 2>&1 &> y\n']) {
-      expect(literal).not.toMatch(anchor);
-    }
-    expect(uncommented(compose)).not.toMatch(anchor);
+    // A YAML anchor is written with `&`, and the file holds no `&` at all, so
+    // it defines no anchor of any name or form (a later `&&` in a command
+    // fails here too, a prompt to review it).
+    const ampersands = (text: string) => text.split('\n').filter((line) => line.includes('&'));
+    expect(ampersands('x-env: &&shared\n  A: b\n# a & b\n')).toEqual([
+      'x-env: &&shared',
+      '# a & b',
+    ]);
+    expect(ampersands(compose)).toEqual([]);
     // A comment line inside a block scalar is text Compose reads, so neither
     // block holds one.
     const blockScalar = /(?:^|[\s:])[|>][-+0-9]*[ \t]*(?:#.*)?$/m;
