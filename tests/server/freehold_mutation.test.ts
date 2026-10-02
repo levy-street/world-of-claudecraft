@@ -3108,11 +3108,13 @@ describe('the claim renewer', () => {
     // package lies under node_modules/ws/ and holds no node_modules further
     // along its path, so a second package, one nested in ws, or a ws module
     // under any other directory whose name holds node_modules fails until a
-    // read takes it. That node_modules/ws/ holds ws's own published code rests
-    // on the root package.json pin later in this file (no patch of ws, and no
-    // ws spec or override but a version range), so a change there for ws needs
-    // this read reviewed too; where the lockfile fetches that range from is
-    // not read.
+    // read takes it. That node_modules/ws/ holds ws's own published code is
+    // this read's premise, not one it checks. The root package.json pin later
+    // in this file holds part of it (no patch of ws, and no ws spec or
+    // override but a plain version range), and so do the two checks after it
+    // (git tracks no pnpm workspace file or pnpmfile); that pin's comment
+    // names this read. Whatever else could write there, an install script, a
+    // build step or where the lockfile fetches that range from, is not read.
     const fromPackage = (file: string) => file.startsWith('node_modules/');
     expect(
       [
@@ -3134,6 +3136,7 @@ describe('the claim renewer', () => {
         'node_modules/ws/node_modules/x/i.js',
         'node_modules/ws/lib/x_node_modules/y/i.js',
         'node_modules/ws/lib/x_node_modules.js',
+        'node_modules/ws/lib/node_modules_x/y/i.js',
         'node_modules/e/node_modules/ws/i.js',
         'node_modules/e/lib/x_node_modules/ws/i.js',
       ].filter(fromWs),
@@ -7363,9 +7366,12 @@ describe('the claim renewer', () => {
     ]);
 
     // The root package.json: its keys (so no `imports`, `exports` or
-    // `browser` map); every dependency or override spec that is not a version
+    // `browser` map); every dependency or override spec but a plain version
     // range, without its version; pnpm's keys and the packages it patches;
-    // and every resolution flag its scripts pass, as text.
+    // and every resolution flag its scripts pass, as text. The bot's bundle
+    // read, earlier in this file, takes node_modules/ws/ as ws's own published
+    // code partly on this pin, so a change here for ws needs that read
+    // reviewed too.
     expect(Object.keys(pkg)).toEqual([
       'name',
       'version',
@@ -7386,8 +7392,11 @@ describe('the claim renewer', () => {
     ]);
     expect(pkg.imports).toBeUndefined();
     expect(pkg.exports).toBeUndefined();
+    // A plain version range is an exact version or one led by ^ or ~; any
+    // other spec is listed, so one that names a path, a tarball, a tag or a
+    // wider range fails until it is reviewed here.
     const nonRange = (spec: string): string | null =>
-      /^[\^~<>=*]|^\d/.test(spec) ? null : spec.replace(/@[^@/]*$/, '');
+      /^[\^~]?\d+\.\d+\.\d+(?:-[0-9A-Za-z.]+)?$/.test(spec) ? null : spec.replace(/@[^@/]*$/, '');
     const specs = (table: unknown): string[] =>
       Object.entries((table ?? {}) as Record<string, string>).flatMap(([name, spec]) => {
         const kept = nonRange(spec);
@@ -7401,6 +7410,12 @@ describe('the claim renewer', () => {
     for (const [spec, kept] of [
       ['^1.19.0', null],
       ['1.2.3', null],
+      ['~1.2.3-beta.1', null],
+      ['8/../vendor/ws.tgz', '8/../vendor/ws.tgz'],
+      ['1.2.3/../ws.tgz', '1.2.3/../ws.tgz'],
+      ['~/ws', '~/ws'],
+      ['>=1.2.3', '>=1.2.3'],
+      ['latest', 'latest'],
       ['link:./server', 'link:./server'],
       ['./server/claims', './server/claims'],
       ['npm:typescript@^7.0.2', 'npm:typescript'],
