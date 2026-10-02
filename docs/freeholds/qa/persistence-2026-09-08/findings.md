@@ -5702,14 +5702,24 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - ROUND TWENTY-ONE, eight fresh readers over round twenty: 47 findings, one blocking, 22
   should-fix. Round twenty's route ended one stalled boot, but a realm still booting takes its
   place; the route now stops every realm still booting and runs the statement until no row is
-  left, which section L shows with a running and a stopped second boot. The quiet window means
-  no players online, the stall's remedy covers its timing, pending OAuth codes, failed actions
-  and lost notice emails, and section L runs the sign-out. Fixed in `41abd4f842`.
+  left, which section L shows with a running and a stopped boot behind it. The quiet window
+  means no players online, the stall's remedy covers its timing, pending OAuth codes, failed
+  actions and lost notice emails, and section L runs the sign-out. Fixed in `41abd4f842`.
+- ROUND TWENTY-TWO, eight fresh readers over round twenty-one: 43 findings, one blocking, 15
+  should-fix. The blocking finding was round twenty-one's own pin: the sign-out ran its OAuth
+  deletes on empty tables; section L now seeds a code of each kind. The stall's remedy sends
+  security actions again at once, even when they show landed, then stops every realm, signs
+  every account out and starts every realm together, so each boot stays quiet and the in-memory
+  desktop login codes go too. Fixed in `9704a64ebf`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
 - A cross-realm lost update the round-two fix introduced and round three caught (above), with a
   mutant that reproduces it.
+- DEPLOY's route for a boot stalled behind the nightly dump left the queue held twice over: a
+  stopped realm's backend keeps its place, and ending it hands the place to the next realm still
+  booting. DEPLOY now stops every booting realm and ends each, which section L runs against the
+  real boot.
 - The boot deadlock class (R-11), predating housing, with both halves of its fix owed to the
   maintainer.
 - A renew chunk whose COMMIT was already sent when its own wall cut it can still land after the
@@ -5725,8 +5735,8 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - `npx tsc --noEmit` exit 0 at every round's tip.
 - Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then
   641, then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
-  then 644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647
-  passed, never a skip.
+  then 644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then
+  647 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
