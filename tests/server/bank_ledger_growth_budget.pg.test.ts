@@ -1305,9 +1305,10 @@ d('bank ledger durable growth budget against real PostgreSQL', () => {
     // queue behind. (Run after the unlock instead, that second realm would
     // already be executing boot DDL, whose IF NOT EXISTS statements take
     // ACCESS EXCLUSIVE / SHARE locks even when skipping, and would block
-    // mid-DDL behind the scan.) The key literal mirrors db.ts
-    // SCHEMA_ADVISORY_LOCK_KEY (not exported; tests/schema_wiring.test.ts
-    // pins the lock-to-VALIDATE wiring around that constant).
+    // mid-DDL behind the scan.) The key literal mirrors
+    // server/db_boot_connection.ts SCHEMA_ADVISORY_LOCK_KEY
+    // (tests/schema_wiring.test.ts pins the lock-to-VALIDATE wiring around
+    // that constant).
     const SCHEMA_ADVISORY_LOCK_KEY = 0x57_4f_43_01;
     const schema = 'bank_ledger_batch_validate_serialize_pg_test';
     const { Client } = await import('pg');

@@ -36,7 +36,10 @@ talk only to the **`SimContext` seam** (`sim_context.ts`).
 - **`sim_context.ts`**: **the seam.** `SimContext` = live primitive views (`rng`/`time`/
   `entities`/`players`/grids/the shared collections) + the cross-system callbacks. The
   file's comments are the authoritative callback registry (signature + which slice owns
-  each). Append-only: add callbacks, never rename or repurpose one.
+  each). Append-only: add members, never rename or repurpose one. The one sanctioned
+  exception is `freeholdKeyAdmission`, re-typed in place from a boolean to the
+  `FreeholdKeyAdmission` answer so a host still returning `true` fails closed (`busy`)
+  instead of admitting; its comment in `sim_context.ts` records why.
 - **`types.ts`**: ALL shared types AND the global tuning constants + classic-era formulas (`TICK_RATE`, `DT`, `GCD`, ranges, `XP_TABLE`, hit/armor/rage math, post-cap `virtualLevel`/prestige). Plus the `SimEvent` union and the `Entity` shape.
 - `character_state.ts`: the persisted character-save shapes, a TYPE-ONLY leaf extracted from `sim.ts` (`CharacterState`/`PetState` and the `Saved*` sparse forms; `sim.ts` keeps a public re-export so every importer stands). No runtime code, so a change here is a save-compat decision first.
 - `data.ts`: merges `content/*` into the flat tables (`ABILITIES`, `MOBS`, `NPCS`, `QUESTS`, `ITEMS`, `CAMPS`, `DUNGEONS`) and owns world-layout consts (`WORLD_SIZE`, `instanceOrigin`, `arenaOrigin`, `zoneAt`, `dungeonAt`).

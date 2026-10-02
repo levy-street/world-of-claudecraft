@@ -26,10 +26,15 @@
 // KEEP FOREVER, deliberately exempt from the retention sweep: one row per plot
 // id ever claimed, cascading with its account, so it is bounded by the plots.
 import { randomBytes } from 'node:crypto';
-import type { FreeholdQueryable } from './freehold_db';
+import { FREEHOLD_PLOT_ID_RE, type FreeholdQueryable } from './freehold_db';
 
-/** The per-attempt write token: 16 random bytes as hex, one per write. */
+/** The per-attempt write token: 16 random bytes as hex, one per write. The
+ *  Hearth advance token shares this shape (server/freehold_hearth_db.ts). */
 export const FREEHOLD_WRITE_TOKEN_RE = /^[0-9a-f]{32}$/;
+
+/** A fencing generation (or a durable revision) as exact positive bigint text,
+ *  the shape every housing module checks before it reaches SQL. */
+export const FREEHOLD_GENERATION_TEXT_RE = /^[1-9][0-9]{0,18}$/;
 
 export function mintFreeholdWriteToken(): string {
   return randomBytes(16).toString('hex');
@@ -111,7 +116,10 @@ export type FreeholdClaimAcquire =
   | {
       readonly kind: 'acquired';
       readonly generation: string;
-      /** A different holder's expired claim was taken, advancing the fence. */
+      /** The fence advanced over an existing row: another holder's expired
+       *  claim, or a RELEASED claim, this holder's own included (a re-acquire
+       *  after its own release counts too; PostgreSQL 16's upsert cannot return
+       *  the prior holder, and a release is final, so the generation must move). */
       readonly takeover: boolean;
     }
   | { readonly kind: 'busy' };
@@ -152,7 +160,7 @@ function requireText(name: string, value: string, max: number): string {
 }
 
 function requirePlotId(plotId: string): string {
-  if (typeof plotId !== 'string' || !/^[A-Za-z0-9_:-]{1,64}$/.test(plotId)) {
+  if (typeof plotId !== 'string' || !FREEHOLD_PLOT_ID_RE.test(plotId)) {
     throw new RangeError('freehold claim plot id must match the plot id charset');
   }
   return plotId;
@@ -166,7 +174,7 @@ function requireTtl(ttlSeconds: number): number {
 }
 
 function requireGeneration(generation: string): string {
-  if (typeof generation !== 'string' || !/^[1-9][0-9]{0,18}$/.test(generation)) {
+  if (typeof generation !== 'string' || !FREEHOLD_GENERATION_TEXT_RE.test(generation)) {
     throw new RangeError('freehold claim generation must be positive bigint text');
   }
   return generation;
@@ -548,9 +556,9 @@ export async function lockFreeholdClaimFenceOnClient(
   fence: FreeholdClaimFence,
 ): Promise<boolean> {
   const res = await tx.query(FREEHOLD_CLAIM_READ_FENCE_SQL, [
-    fence.plotId,
-    fence.holder,
-    fence.generation,
+    requirePlotId(fence.plotId),
+    requireText('holder', fence.holder, FREEHOLD_LIVE_HOLDER_MAX),
+    requireGeneration(fence.generation),
   ]);
-  return (res.rows?.length ?? 0) === 1;
+  return (res.rowCount ?? res.rows?.length ?? 0) === 1;
 }

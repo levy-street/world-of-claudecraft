@@ -223,8 +223,10 @@ export function createFreeholdReceiptGrowthMonitor(
 
       const controller = new AbortController();
       activeAbort = controller;
-      const startedAtMs = deps.nowMs();
       try {
+        // Inside the try: a clock port that throws is a reported failure whose
+        // permit still returns and whose abort handle still clears.
+        const startedAtMs = deps.nowMs();
         const rows = await read(deps.pool, controller.signal);
         if (stopped || controller.signal.aborted) return;
         if (!observe(rows, startedAtMs)) {

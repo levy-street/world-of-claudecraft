@@ -29,6 +29,7 @@ delete process.env.DB_POOL_MAX_CLIENTS;
 // is likewise reached EXCLUSIVELY through dynamic imports inside its tests.
 delete process.env.STORAGE_PRICES;
 
+import { BACKGROUND_DB_MAJOR_PRODUCER_HEADROOM } from '../../server/background_db_gate';
 import { DESKTOP_LOGIN_TTL_MS } from '../../server/desktop_login';
 import {
   ASSET_UPLOAD_POLICY,
@@ -1139,11 +1140,15 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     // keys beside the three 07a added.
     const housingExport = stripComments(read('server/freehold_account_export.ts'));
     const loaderBody = bodyOf(housingExport, 'export async function freeholdAccountExport');
+    // Every read on ONE checked-out client, released in a finally.
+    expect(loaderBody).toContain('const client = await pool.connect();');
+    expect(loaderBody).toContain('client.release();');
+    expect(loaderBody.indexOf('finally')).toBeLessThan(loaderBody.indexOf('client.release();'));
     for (const call of [
-      'freeholdsForExport(pool, accountId)',
-      'freeholdHearthForExport(pool, accountId)',
-      'freeholdClaimsForExport(pool, accountId)',
-      'freeholdOperationsForExport(pool, accountId)',
+      'freeholdsForExport(client, accountId)',
+      'freeholdHearthForExport(client, accountId)',
+      'freeholdClaimsForExport(client, accountId)',
+      'freeholdOperationsForExport(client, accountId)',
     ]) {
       expect(loaderBody, call).toContain(call);
     }
@@ -1707,5 +1712,26 @@ describe('WORLD_PVP_DISABLED (the World PvP realm kill switch)', () => {
     );
     // Documented for operators, commented out so the built-in default (open) applies.
     expect(read('.env.example')).toContain('#WORLD_PVP_DISABLED=0');
+  });
+});
+
+describe('the pool headroom covers the clients outside the background gate at the flush', () => {
+  it('leaves room for the claim renewer, the lease heartbeat and one request-path client', () => {
+    // The literal first (the constant-self-comparison trap), then the relation
+    // the claim renewer's wiring states (server/freehold_persist_wiring.ts):
+    // both periodic writers run OUTSIDE the gate, one client each, on the same
+    // 30 s flush, so the headroom must cover them plus at least one request.
+    expect(BACKGROUND_DB_MAJOR_PRODUCER_HEADROOM).toBe(3);
+    const claimRenewer = 1;
+    const leaseHeartbeat = 1;
+    const requestPath = 1;
+    expect(BACKGROUND_DB_MAJOR_PRODUCER_HEADROOM).toBeGreaterThanOrEqual(
+      claimRenewer + leaseHeartbeat + requestPath,
+    );
+    // And the wiring that states that arithmetic still says the renewer runs on
+    // the raw pool outside the gate, one client at a time.
+    const wiring = read('server/freehold_persist_wiring.ts');
+    expect(wiring).toContain('THE POOL ARITHMETIC AT THE FLUSH');
+    expect(wiring).toContain('ON THE RAW POOL, OUTSIDE backgroundDbGate, by decision');
   });
 });

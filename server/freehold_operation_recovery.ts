@@ -12,7 +12,8 @@
 // tryAcquire, so a busy gate skips the pass rather than queueing behind
 // player work (the account's next claim tries again).
 //
-// NO PRODUCTION KIND EXISTS in this release (the 07a Step 0 ruling), so the
+// NO PRODUCTION KIND EXISTS in this release (the scope statement at the head
+// of docs/freeholds/mutation-touch-set-manifest.md), so the
 // realm's reconciler map is EMPTY and a scheduled pass returns before any
 // statement: the call site is live and costs nothing until 08 registers the
 // first kind. An intent whose kind has no reconciler is held open, counted
@@ -43,6 +44,21 @@ export interface FreeholdOperationRecoveryCounters {
   threw: number;
 }
 
+/** Fresh zeroed recovery counters: the one initializer the recovery pass and
+ *  the authority registry's unregistered answer share. */
+export function createFreeholdOperationRecoveryCounters(): FreeholdOperationRecoveryCounters {
+  return {
+    passes: 0,
+    skippedNoPermit: 0,
+    discovered: 0,
+    applied: 0,
+    closed: 0,
+    held: 0,
+    unknownKind: 0,
+    threw: 0,
+  };
+}
+
 export interface FreeholdOperationRecoveryDeps {
   readonly reconcilers: ReadonlyMap<string, FreeholdOperationReconciler>;
   discover(accountId: number): Promise<OpenFreeholdOperation[]>;
@@ -55,20 +71,13 @@ export interface FreeholdOperationRecoveryDeps {
 export function createFreeholdOperationRecovery(deps: FreeholdOperationRecoveryDeps): {
   /** Fire and forget; never rejects. */
   schedule(accountId: number): void;
-  /** Resolves when every scheduled pass has settled (tests and shutdown). */
+  /** Resolves when every scheduled pass has settled (a test read: the
+   *  shutdown closure does not wait on recovery, which no kind can reach in
+   *  this release). */
   idle(): Promise<void>;
   readonly counters: FreeholdOperationRecoveryCounters;
 } {
-  const counters: FreeholdOperationRecoveryCounters = {
-    passes: 0,
-    skippedNoPermit: 0,
-    discovered: 0,
-    applied: 0,
-    closed: 0,
-    held: 0,
-    unknownKind: 0,
-    threw: 0,
-  };
+  const counters = createFreeholdOperationRecoveryCounters();
   const running = new Map<number, Promise<void>>();
 
   async function pass(accountId: number): Promise<void> {

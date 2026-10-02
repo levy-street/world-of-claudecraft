@@ -9,14 +9,19 @@
 //   renewer keeps it wanted while a trip proves it;
 // - the re-dispatch, which replays every gate the frame path runs before a
 //   Hearth Key use reaches the sim (hearthKeyUseRefusal: the draining and
-//   vault-lock drops, spectating, jailed, dark) and answers each exactly as
-//   the frame path does, save one: after a COMMITTED advance the key is
-//   already spent (R-2), so a vault-lock drop answers busy rather than
+//   vault-lock drops, spectating, jailed, dark) and answers each with the
+//   frame path's player-facing event, save one: after a COMMITTED advance the
+//   key is already spent (R-2), so a vault-lock drop answers busy rather than
 //   nothing (a draining realm stays silent: it is going down), and every
 //   precheck (a session gone by then included) is a realm drop the trip
-//   counts apart, since the sim never saw the use. Then it runs the item use
-//   through the sim while the ticket is set. It takes no heavy-self receipt
-//   mark: the use frame that started the trip already took one, and an
+//   counts apart, since the sim never saw the use. Two frame-path side effects
+//   are deliberately NOT repeated: the command outcome (the use frame that
+//   started the trip already received its own, and a re-dispatch is no frame)
+//   and the dark-realm probe counter (it counts client frames probing a dark
+//   realm, which a server re-dispatch is not; the flag is read once at boot,
+//   so a realm that lit the trip cannot turn dark under it). Then it runs the
+//   item use through the sim while the ticket is set. It takes no heavy-self
+//   receipt mark: the use frame that started the trip already took one, and an
 //   admitted entry changes no heavy self field (it moves the player and
 //   claims a room, both outside the heavy block, and grants or spends
 //   nothing), pinned in tests/server/freehold_wire.test.ts.
@@ -42,7 +47,7 @@ export interface GameFreeholdHearthTripDeps<S extends FreeholdHearthTripSession>
   sessionForPid(
     pid: number,
   ): (S & { readonly spectating?: unknown; readonly jailed?: unknown }) | undefined;
-  readonly store: Pick<FreeholdPersistStore, 'authority'>;
+  readonly store: Pick<FreeholdPersistStore, 'authority' | 'adoptHearthReading'>;
   readonly claims: FreeholdClaimRegistry;
   readonly pool: FreeholdTxPool;
   /** saveCharacter(session, { housing, backgroundDbPermit: true }). */
@@ -107,6 +112,10 @@ export function createGameFreeholdHearthTrips<S extends FreeholdHearthTripSessio
         return 'dropped';
       }
       if (refusal === null) {
+        // By item id, without the frame's bag slot, on purpose: the key is
+        // one permanent, never-consumed copy, so id resolution finds it
+        // wherever it sits now, while a slot carried from the frame could
+        // name another item if the key moved bags during the trip.
         deps.sim().useItem(HEARTH_KEY_ITEM_ID, session.pid);
         return undefined;
       }
@@ -119,6 +128,8 @@ export function createGameFreeholdHearthTrips<S extends FreeholdHearthTripSessio
     },
     mergeReadyAt: (ownerKey, readyAtMs) =>
       mergeFreeholdKeyReadyAt(deps.sim().ctx, ownerKey, readyAtMs),
+    adoptDurable: (ownerKey, readyAtMs, revision) =>
+      deps.store.adoptHearthReading(ownerKey, readyAtMs, revision),
     // A walk of the roster, run only for an abandoned trip that carries a
     // durable clock (a leave or takeover inside its own transaction): rare.
     ownerOnline: (ownerKey) => {

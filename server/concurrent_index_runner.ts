@@ -1,13 +1,13 @@
 // The post-listen CONCURRENTLY index runner, moved whole out of server/db.ts
 // (the monolith ratchet). db.ts re-exports it, so server/main.ts and every pg
-// suite keep importing it from './db'. The two db.ts bindings it reads (the
-// dedicated boot client's connection and the schema advisory lock key) are
-// read only inside the function body, so the db.ts and runner import cycle
-// never touches a binding while either module is still evaluating.
+// suite keep importing it from './db'. The two boot bindings it reads (the
+// dedicated boot client's connection and the schema advisory lock key) come
+// from the leaf server/db_boot_connection.ts, never from db.ts, so the two
+// modules form no import cycle.
 
 import { validateBankLedgerBatchReceiptsKeyShape } from './bank_ledger_batch_db';
 import { CONCURRENT_INDEX_MIGRATIONS } from './concurrent_indexes';
-import { SCHEMA_ADVISORY_LOCK_KEY, SOURCE_WRITER_CONNECTION } from './db';
+import { SCHEMA_ADVISORY_LOCK_KEY, SOURCE_WRITER_CONNECTION } from './db_boot_connection';
 import { attachSchemaNoticeForwarder } from './schema_notices';
 
 /**

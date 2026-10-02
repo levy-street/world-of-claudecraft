@@ -4,6 +4,7 @@
 // milliseconds only, never player identity.
 
 import { type FreeholdJoinVerdict, freeholdJoinVerdictCounts } from './freehold_join_answer';
+import type { FreeholdPersistEntry } from './freehold_persist_types';
 
 /** Scrape-safe counters. COUNTS, BYTE TOTALS AND MILLISECOND TOTALS ONLY: no
  *  owner key, no account id, no plot id ever appears here, because these are
@@ -171,6 +172,68 @@ export type FreeholdPersistCounters = ReturnType<typeof createFreeholdPersistCou
 
 /** What the store folds from its entries and its own gauges on each scrape. */
 export type FreeholdPersistOccupancy = Omit<FreeholdPersistStats, keyof FreeholdPersistCounters>;
+
+/** The entry half of a scrape's occupancy, counted in ONE walk of the store's
+ *  map (moved whole out of the store's stats(), which keeps only its own
+ *  private sizes). The store hands in its OWN dirty and held predicates, so the
+ *  census can never disagree with what the store acts on, and its clock, read
+ *  only when some entry is dirty, as before. */
+export function censusFreeholdEntries(
+  entries: Iterable<FreeholdPersistEntry>,
+  isDirty: (entry: FreeholdPersistEntry) => boolean,
+  isHeld: (entry: FreeholdPersistEntry) => boolean,
+  nowMs: () => number,
+): Pick<
+  FreeholdPersistOccupancy,
+  | 'loaded'
+  | 'dirty'
+  | 'running'
+  | 'pending'
+  | 'held'
+  | 'quiesced'
+  | 'retrying'
+  | 'retryingOffline'
+  | 'oldestDirtyAgeMs'
+> {
+  let dirty = 0;
+  let running = 0;
+  let pending = 0;
+  let held = 0;
+  let quiesced = 0;
+  let retrying = 0;
+  let retryingOffline = 0;
+  let loaded = 0;
+  let oldestDirtyAtMs = 0;
+  for (const entry of entries) {
+    if (isDirty(entry)) dirty++;
+    if (entry.running) running++;
+    if (entry.pending) pending++;
+    if (entry.hold !== null) held++;
+    if (entry.quiesced) quiesced++;
+    // On the clock and still writing (a later quiesce ends the posture); the
+    // offline share holds up to TWO records each (its state and its capture).
+    if (entry.retryAtMs > 0 && !isHeld(entry)) {
+      retrying++;
+      if (entry.refs === 0) retryingOffline++;
+    }
+    if (entry.loaded) loaded++;
+    if (entry.dirtySinceMs > 0 && (oldestDirtyAtMs === 0 || entry.dirtySinceMs < oldestDirtyAtMs)) {
+      oldestDirtyAtMs = entry.dirtySinceMs;
+    }
+  }
+  const oldestDirtyAgeMs = oldestDirtyAtMs === 0 ? 0 : Math.max(0, nowMs() - oldestDirtyAtMs);
+  return {
+    loaded,
+    dirty,
+    running,
+    pending,
+    held,
+    quiesced,
+    retrying,
+    retryingOffline,
+    oldestDirtyAgeMs,
+  };
+}
 
 /** One scrape: the occupancy plus a COPY of every counter, the two record
  *  measures cloned so a caller can never reach the store's live ones. */

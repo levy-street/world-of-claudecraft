@@ -40,6 +40,7 @@ import {
   FreeholdCommitAmbiguous,
   type FreeholdTxPool,
   freeholdCommitMayHaveLanded,
+  freeholdLockTimeout,
   runFreeholdTransaction,
 } from './freehold_tx';
 
@@ -84,10 +85,17 @@ export function createFreeholdFencedWriter(
       writeToken,
       notedAtMs: deps.nowMs(),
     });
+  // A lock or statement bound that ran out is contention or a slow database,
+  // counted apart so it never reads as a refusal (the write rethrows as before).
+  const countTimeout = (error: unknown): void => {
+    if (freeholdLockTimeout(error)) registry.counters.lockTimeouts++;
+  };
 
   async function insertFirst(input: FreeholdUpsert): Promise<FreeholdFencedUpsertResult> {
     const token = mintFreeholdWriteToken();
     const pending = registry.pendingToken(input.plotId);
+    // Counted once the COMMIT is proved, never from inside the transaction.
+    let adopted = false;
     try {
       const result = await runFreeholdTransaction(
         deps.pool,
@@ -115,7 +123,7 @@ export function createFreeholdFencedWriter(
             }
             const current = await freeholdDurableRevOnClient(tx, input.accountId, input.plotIndex);
             if (current === null) throw new InsertNotLanded({ kind: 'missing' });
-            registry.counters.selfAdopted++;
+            adopted = true;
             const updated = await upsertFencedFreehold(
               tx,
               { ...input, expectedDurableRev: current },
@@ -129,6 +137,7 @@ export function createFreeholdFencedWriter(
           return inserted;
         },
       );
+      if (adopted) registry.counters.selfAdopted++;
       registry.clearPending(input.plotId);
       registry.record({
         plotId: input.plotId,
@@ -139,6 +148,7 @@ export function createFreeholdFencedWriter(
       return result;
     } catch (error) {
       if (error instanceof InsertNotLanded) return error.result;
+      countTimeout(error);
       // No claim is recorded on this arm: the renewer retires the token once
       // nothing wants the owner, and a proved login read of the plot supersedes it.
       if (error instanceof FreeholdCommitAmbiguous) notePending(input, token);
@@ -165,12 +175,14 @@ export function createFreeholdFencedWriter(
       try {
         result = await upsertFencedFreehold(deps.pool, input, fence);
       } catch (error) {
+        countTimeout(error);
         // One autocommit statement: once it was sent, only a proved rollback
         // says it did not land.
         if (freeholdCommitMayHaveLanded(error)) notePending(input, token);
         throw error;
       }
     } else {
+      let adopted = false;
       try {
         result = await runFreeholdTransaction(
           deps.pool,
@@ -187,22 +199,29 @@ export function createFreeholdFencedWriter(
               );
               if (current === null) return { kind: 'missing' };
               expected = current;
-              registry.counters.selfAdopted++;
+              adopted = true;
             }
             return upsertFencedFreehold(tx, { ...input, expectedDurableRev: expected }, fence);
           },
         );
       } catch (error) {
+        countTimeout(error);
         // A NEW ambiguity replaces the old question; any other failure leaves
         // the old one open for the next attempt to ask again.
         if (error instanceof FreeholdCommitAmbiguous) notePending(input, token);
         throw error;
       }
+      if (adopted) registry.counters.selfAdopted++;
       registry.clearPending(input.plotId);
     }
     if (result.kind === 'fenced') {
       registry.counters.fencedWrites++;
-      registry.drop(input.plotId);
+      // Only the claim this write was fenced UNDER: a newer one recorded while
+      // it was in flight (a re-login at a later generation) is not this
+      // write's to drop, the renewer's dropHeld identity rule.
+      if (registry.forPlot(input.plotId)?.generation === claim.generation) {
+        registry.drop(input.plotId);
+      }
     }
     return result;
   }

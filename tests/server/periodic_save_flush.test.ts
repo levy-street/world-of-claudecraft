@@ -213,10 +213,12 @@ describe('the coordinator does not regrow its own calls beside the runner', () =
     ]) {
       expect(body.split(call).length - 1, `${call} in flushPeriodicSaves`).toBe(1);
     }
-    // And it is handed this realm's sim, store and claim registry.
+    // And it is handed this realm's sim, store and claim registry, and the
+    // save observer that bills its synchronous launch to this flush's sample.
     expect(body).toContain(
-      'renewGameFreeholdClaims(this.sim, this.freeholdPersist, this.freeholdClaims)',
+      'renewGameFreeholdClaims(this.sim, this.freeholdPersist, this.freeholdClaims, (ms) =>',
     );
+    expect(body).toContain('this.onSaveMs(ms, sample),');
   });
 
   it("wires the claim renewer as the autosave runner's renewFreeholdClaims write", () => {
@@ -227,7 +229,7 @@ describe('the coordinator does not regrow its own calls beside the runner', () =
     // would leave the runner's renewal slot (and its order) to something else.
     // The count above cannot tell either from the real wiring.
     const RENEWER =
-      'renewFreeholdClaims: () => renewGameFreeholdClaims(this.sim, this.freeholdPersist, this.freeholdClaims),';
+      'renewFreeholdClaims: () => renewGameFreeholdClaims(this.sim, this.freeholdPersist, this.freeholdClaims, (ms) => this.onSaveMs(ms, sample), ),';
     const autosaveRenewer = (game: string): string | null => {
       const body = methodBody(game, '  private flushPeriodicSaves(');
       const gate = body.indexOf('if (this.saveTimer < AUTOSAVE_SECONDS) return;');
@@ -242,7 +244,7 @@ describe('the coordinator does not regrow its own calls beside the runner', () =
     // Negative controls, each a real mutation of the coordinator's text that
     // keeps the count above green.
     const member =
-      'renewFreeholdClaims: () =>\n        renewGameFreeholdClaims(this.sim, this.freeholdPersist, this.freeholdClaims),';
+      'renewFreeholdClaims: () =>\n        renewGameFreeholdClaims(this.sim, this.freeholdPersist, this.freeholdClaims, (ms) =>\n          this.onSaveMs(ms, sample),\n        ),';
     expect(game).toContain(member);
     const hoisted = game
       .replace(member, 'renewFreeholdClaims: async () => {},')

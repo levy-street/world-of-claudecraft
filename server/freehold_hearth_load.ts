@@ -11,6 +11,7 @@
 
 import { FREEHOLD_MAX_STORED_BYTES } from '../src/sim/freehold/persisted';
 import { boundedDatabaseError } from './freehold_bounded_error';
+import { FREEHOLD_GENERATION_TEXT_RE } from './freehold_claim_db';
 import type { FreeholdRowLoad } from './freehold_db';
 import type { FreeholdHearthLoad } from './freehold_hearth_db';
 import type { FreeholdHearthAnswer, FreeholdPersistPorts } from './freehold_persist';
@@ -25,6 +26,29 @@ export const ABSENT_HEARTH_REVISION = '0';
 export interface FreeholdHearthReading {
   readonly readyAtMs: number;
   readonly revision: string;
+}
+
+/**
+ * Adopt onto a store entry a durable Hearth clock a LATER transaction proved
+ * (a remote trip's committed advance, or the clock its cooldown refusal read),
+ * FORWARD ONLY BY REVISION: an older or equal revision is a stale reading and
+ * never replaces a newer one, so a replay of the entry (a relog on this process
+ * before the entry is swept) answers the newest clock this process knows,
+ * never the one it read at login. A revision that is not positive bigint text,
+ * or a ready time that is not a positive finite number, changes nothing.
+ * Answers whether it adopted.
+ */
+export function adoptFreeholdHearthReading(
+  entry: { hearthReadyAtMs: number; hearthRevision: string },
+  readyAtMs: number,
+  revision: string,
+): boolean {
+  if (typeof revision !== 'string' || !FREEHOLD_GENERATION_TEXT_RE.test(revision)) return false;
+  if (!Number.isFinite(readyAtMs) || readyAtMs <= 0) return false;
+  if (BigInt(revision) <= BigInt(entry.hearthRevision)) return false;
+  entry.hearthReadyAtMs = readyAtMs;
+  entry.hearthRevision = revision;
+  return true;
 }
 
 /** The cold clock, and the ONE place its shape is written. */

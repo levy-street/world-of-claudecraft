@@ -129,7 +129,6 @@ import {
   runMarketBackfill,
 } from './market_backfill';
 import { MARKET_SOLD_VOLUME_SCHEMA } from './market_sold_volume_db';
-import { materialSourceConnection } from './material_source_connection';
 import { applyMaterialSourceSchema, applyMaterialSourceWriterGuard } from './material_source_host';
 import { OAUTH_SCHEMA } from './oauth_db';
 import { runOfflineCharacterSave } from './offline_character_save_db';
@@ -178,14 +177,15 @@ export { marketStateKey } from './market_backfill';
 // The actual load lives in server/env.ts so import-time readers other than
 // db.ts (realm.ts via main.ts's first import) share one bootstrap.
 import './env';
+// The boot identity (the URL, the writer connection, the schema lock key) is a
+// leaf the index runner shares without an import cycle.
+import {
+  DATABASE_URL,
+  SCHEMA_ADVISORY_LOCK_KEY,
+  SOURCE_WRITER_CONNECTION,
+} from './db_boot_connection';
 
-export const DATABASE_URL =
-  process.env.DATABASE_URL ??
-  (() => {
-    throw new Error(
-      'DATABASE_URL is required. For local dev, copy .env.example to .env and run through docker compose.',
-    );
-  })();
+export { DATABASE_URL };
 
 // Max Postgres clients this realm process keeps in its pool (count). Shared
 // across the HTTP request path and the game loop. The pool is timeout-bounded on
@@ -293,11 +293,6 @@ export const DB_HEAVY_STATEMENT_TIMEOUT_MS = CHARACTER_SAVE_STATEMENT_TIMEOUT_MS
 // statement_timeout is the working limit; this only catches a black-holed server
 // that accepted a query and never answers, so no server-side timer ever fires.
 export const DB_QUERY_TIMEOUT_MS = CHARACTER_SAVE_TRANSACTION_TIMEOUT_MS;
-
-// The code-owned material-source writer capability as a STARTUP option (so it
-// describes THIS binary, never a shared PGOPTIONS an old one inherits), on the
-// pool below and both boot Clients (material_source_connection.ts owns how).
-export const SOURCE_WRITER_CONNECTION = materialSourceConnection(DATABASE_URL);
 
 export const pool = new Pool({
   connectionString: SOURCE_WRITER_CONNECTION.connectionString,
@@ -1229,8 +1224,6 @@ SELECT assoc.account_id, ib.reason
   JOIN daily_reward_ip_bans ib
     ON ib.ip_address = assoc.ip_address;
 `;
-
-export const SCHEMA_ADVISORY_LOCK_KEY = 0x57_4f_43_01; // "WOC\x01"
 
 export async function ensureSchema(): Promise<void> {
   // In the process-per-realm model several server processes boot against the

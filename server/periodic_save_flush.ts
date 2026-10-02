@@ -71,21 +71,10 @@ export interface PeriodicSaveWrites {
    *  the rest (server/freehold_claim_registry.ts), on the lease heartbeat's own
    *  cadence and policy, so a crashed holder's claims expire and an idle loaded
    *  plot's do not. Never rejects on a database fault or a throwing host hook;
-   *  it rejects only on a broken clock or deadline port, and that reaches
-   *  onError like any rejection, in exactly these cases: an injected
-   *  passDeadlineMs that is not a whole number of ms from 1 to 2^31 - 1, the
-   *  range AbortSignal.timeout honours (suites only): a RangeError before
-   *  anything runs; a nowMs start reading that throws (even from a clock port
-   *  that started a pass itself first: that pass runs on): before this call
-   *  takes the flag, so a later call on a sane clock runs once the flag is
-   *  free; a nowMs start reading that is not a finite number while no pass runs
-   *  (the flag is re-checked first, so a clock port that started a pass itself
-   *  leaves this call a counted skip instead): before this call takes the flag,
-   *  so a later call on a sane clock runs once the flag is free; a nowMs that
-   *  throws at a deadline check mid-pass: the pass stops there with that error;
-   *  an injected deadlineSignal factory that throws (suites only): after the
-   *  wanted tests and before any statement. Production binds Date.now and no
-   *  injected deadline, so it meets none of them. */
+   *  it rejects only on a broken clock or deadline port, in the cases
+   *  renewFreeholdClaims's own JSDoc lists (server/freehold_claim_registry.ts,
+   *  the one copy of that list), and that reaches onError like any rejection.
+   *  Production binds Date.now and no injected deadline, so it meets none. */
   renewFreeholdClaims(): Promise<void>;
   /** Drop idle bank-vault ledger guard state. Synchronous, and not a write. */
   pruneIdleGuards(): void | number;

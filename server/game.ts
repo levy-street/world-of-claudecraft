@@ -436,6 +436,7 @@ import {
   fullEntityJson,
   liteEntityJson,
 } from './entity_wire_cache';
+import { countsAsEscrowSaveFailure } from './escrow_save_failure';
 import { observeEventRecords } from './event_record_observers';
 import { parseGuildPledgeSettingsCommand } from './guild_pledge_settings_cmd';
 import { recordLevelUp } from './progress_events';
@@ -2538,7 +2539,9 @@ export class GameServer {
       pruneIdleGuards: () => this.bankVaultLedgerGuardCoordinator.pruneIdle(),
       heartbeatLeases: () => heartbeatCharacterLeases(),
       renewFreeholdClaims: () =>
-        renewGameFreeholdClaims(this.sim, this.freeholdPersist, this.freeholdClaims),
+        renewGameFreeholdClaims(this.sim, this.freeholdPersist, this.freeholdClaims, (ms) =>
+          this.onSaveMs(ms, sample),
+        ),
     });
   }
 
@@ -4114,15 +4117,10 @@ export class GameServer {
             // escrow_refused_retry per guild on the retry arm, and this
             // escrow_save_failed once for the session on the TERMINAL arm,
             // where the save really did fail for good. A durable-ledger growth
-            // refusal is excluded for the same reason: it is a capacity ceiling
-            // with its own handling, not a failed write.
-            if (
-              carriesGuildBooks &&
-              !(err instanceof GuildBankEscrowRefused) &&
-              !(err instanceof BankLedgerGrowthLimitExceeded)
-            ) {
+            // refusal and a housing mutation refusal are excluded for the same
+            // reason (server/escrow_save_failure.ts names each).
+            if (countsAsEscrowSaveFailure(err, carriesGuildBooks))
               gameMetricsCounters().guildBankIncident('escrow_save_failed');
-            }
             // A refused book aborts the character row too; run no post-save work.
             if (err instanceof GuildBankEscrowRefused) {
               this.handleGuildBankEscrowRefusal(session, err.results, opts.final === true);

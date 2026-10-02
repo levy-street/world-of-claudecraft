@@ -778,7 +778,7 @@ export function registerGameStateMetrics(
 
   new Counter({
     name: WOC_FREEHOLD_AUTHORITY_TOTAL,
-    help: "Housing authority CUMULATIVE counts by fixed measure (07a). claim_*: global plot claims acquired, taken over from an expired holder, refused busy because another realm holds them, renewed, missed heartbeats (a renewal that threw or skipped a locked row, never a loss), lost to another holder, released, writes fenced, and this realm's own ambiguous writes adopted; the renewer's passes, the triggers skipped because a pass still ran, the chunks its deadline abandoned, the newer claims a landed release killed (a same-generation re-login it raced), the wanted tests that threw, the onLost host hooks that threw, and the stranded pending tokens it retired; the claimed login reads. trip_*: remote Hearth trips started, advanced, refused on the durable cooldown, refused on a corrupt or unsupported clock, refused by a participant, failed, never reaching the hook, left unresolved after a lost commit, committed but refused by the sim on re-dispatch, committed but dropped on re-dispatch by a draining realm or a fenced vault, denied before any queue, metered by the per-account refusal memo, and abandoned because the session left. Counts only: their durations are woc_freehold_authority_ms_total.",
+    help: "Housing authority CUMULATIVE counts by fixed measure (07a). claim_*: global plot claims acquired, taken over (the fence advanced over an existing row: another holder's expired claim, or a released claim, this realm's own re-acquire after its release included), refused busy (another realm holds them, or the claim row was locked past the acquire's lock bound), the busy subset that was that lock contention, renewed, missed heartbeats (a renewal that threw or skipped a locked row, never a loss), lost to another holder, released, writes fenced, this realm's own ambiguous writes adopted, and the lock or statement bounds that ran out in a fenced write or a renew or release chunk; the renewer's passes, the triggers skipped because a pass still ran, the chunks its deadline abandoned, the newer claims a landed release killed (a same-generation re-login it raced), the wanted tests that threw, the onLost host hooks that threw (no production host binds one in this release, so zero), and the stranded pending tokens it retired; the claimed login reads. trip_*: remote Hearth trips started, advanced (and the subset whose lost COMMIT answer the verify proved landed), refused on the durable cooldown, refused on a corrupt or unsupported clock, refused by a participant, failed (proved not committed), lost COMMIT answers the verify proved did not land, never reaching the hook, left unresolved after a lost commit, committed but refused by the sim on re-dispatch, committed but dropped on re-dispatch by a draining realm or a fenced vault, denied before any queue, metered by the per-account refusal memo, abandoned because the session left, and trips whose step after their counted outcome threw. recovery_*: the operation recovery passes run, skipped for want of an immediate background permit, the open intents they discovered, applied, closed and held, those of a kind with no reconciler, and the passes or reconciles that threw (all zero while no operation kind is registered). Counts only: their durations are woc_freehold_authority_ms_total.",
     labelNames: ['measure'],
     registers: [registry],
     collect() {
@@ -789,6 +789,8 @@ export function registerGameStateMetrics(
       this.inc({ measure: 'claim_acquired' }, c.acquired);
       this.inc({ measure: 'claim_takeovers' }, c.takeovers);
       this.inc({ measure: 'claim_busy' }, c.busy);
+      this.inc({ measure: 'claim_busy_contention' }, c.busyContention);
+      this.inc({ measure: 'claim_lock_timeouts' }, c.lockTimeouts);
       this.inc({ measure: 'claim_renewed' }, c.renewed);
       this.inc({ measure: 'claim_missed_heartbeats' }, c.missedHeartbeats);
       this.inc({ measure: 'claim_lost' }, c.lost);
@@ -806,11 +808,13 @@ export function registerGameStateMetrics(
       const t = stats.trips;
       this.inc({ measure: 'trip_started' }, t.started);
       this.inc({ measure: 'trip_advanced' }, t.advanced);
+      this.inc({ measure: 'trip_verify_landed' }, t.verifiedLanded);
       this.inc({ measure: 'trip_cooldown' }, t.cooldown);
       this.inc({ measure: 'trip_corrupt' }, t.corrupt);
       this.inc({ measure: 'trip_unsupported' }, t.unsupported);
       this.inc({ measure: 'trip_refused' }, t.refused);
       this.inc({ measure: 'trip_failed' }, t.failed);
+      this.inc({ measure: 'trip_verify_not_landed' }, t.verifiedNotLanded);
       this.inc({ measure: 'trip_not_run' }, t.notRun);
       this.inc({ measure: 'trip_unresolved' }, t.unresolved);
       this.inc({ measure: 'trip_refused_after_commit' }, t.refusedAfterCommit);
@@ -818,6 +822,16 @@ export function registerGameStateMetrics(
       this.inc({ measure: 'trip_refused_pre_queue' }, t.refusedPreQueue);
       this.inc({ measure: 'trip_metered' }, t.metered);
       this.inc({ measure: 'trip_abandoned' }, t.abandoned);
+      this.inc({ measure: 'trip_threw_after_outcome' }, t.threwAfterOutcome);
+      const r = stats.recovery;
+      this.inc({ measure: 'recovery_passes' }, r.passes);
+      this.inc({ measure: 'recovery_skipped_no_permit' }, r.skippedNoPermit);
+      this.inc({ measure: 'recovery_discovered' }, r.discovered);
+      this.inc({ measure: 'recovery_applied' }, r.applied);
+      this.inc({ measure: 'recovery_closed' }, r.closed);
+      this.inc({ measure: 'recovery_held' }, r.held);
+      this.inc({ measure: 'recovery_unknown_kind' }, r.unknownKind);
+      this.inc({ measure: 'recovery_threw' }, r.threw);
     },
   });
 
@@ -912,7 +926,7 @@ export function registerGameStateMetrics(
 
   new Gauge({
     name: WOC_FREEHOLD_RECEIPT_GROWTH,
-    help: 'Keep-forever housing tables (the operation receipts: permanent replay authority, never swept) by fixed table and measure, refreshed once per minute by one O(1) catalog read and served from the process-local readout, never queried at scrape time. rows_estimate is pg_class.reltuples, the planner estimate vacuum and analyze maintain, and has no series while PostgreSQL does not know it (before the first vacuum or analyze); bytes is pg_total_relation_size (heap, indexes and TOAST). A table this database has not applied has neither. observation_age_seconds is the age of the last accepted pass, for every watched table once one has landed, so a monitor that keeps skipping (a busy gate or pool) or failing is visible instead of serving frozen values.',
+    help: 'Keep-forever housing tables (the operation receipts: permanent replay authority; the plot claims: one row per plot id ever claimed, so a generation never restarts; neither swept) by fixed table and measure, refreshed once per minute by one O(1) catalog read and served from the process-local readout, never queried at scrape time. rows_estimate is pg_class.reltuples, the planner estimate vacuum and analyze maintain, and has no series while PostgreSQL does not know it (before the first vacuum or analyze); bytes is pg_total_relation_size (heap, indexes and TOAST). A table this database has not applied has neither. observation_age_seconds is the age of the last accepted pass, for every watched table once one has landed, so a monitor that keeps skipping (a busy gate or pool) or failing is visible instead of serving frozen values.',
     labelNames: ['table', 'measure'],
     registers: [registry],
     collect() {

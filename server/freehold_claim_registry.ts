@@ -70,7 +70,7 @@ import {
   releaseFreeholdClaimRows,
   renewFreeholdClaimRows,
 } from './freehold_claim_db';
-import { type FreeholdTxPool, runFreeholdTransaction } from './freehold_tx';
+import { type FreeholdTxPool, freeholdLockTimeout, runFreeholdTransaction } from './freehold_tx';
 
 /** Ids per renew or release statement. A bound on one statement's lock set and
  *  on how much one blocked row can delay, not a capacity: every wanted claim is
@@ -127,6 +127,13 @@ export interface FreeholdClaimCounters {
   acquired: number;
   takeovers: number;
   busy: number;
+  /** The subset of `busy` that was lock CONTENTION on the claim row (the
+   *  acquire's lock bound ran out), not another realm's live claim. */
+  busyContention: number;
+  /** Lock or statement bounds (55P03, 57014) that ran out in a fenced plot
+   *  write or a renew or release chunk: contention or a slow database, apart
+   *  from a refusal or a missed heartbeat's other causes. */
+  lockTimeouts: number;
   renewed: number;
   missedHeartbeats: number;
   lost: number;
@@ -152,7 +159,9 @@ export interface FreeholdClaimCounters {
   releaseRaced: number;
   /** Wanted tests that threw: each claim kept as wanted. */
   wantedThrew: number;
-  /** onLost host hooks that threw, each swallowed (the claim stays dropped). */
+  /** onLost host hooks that threw, each swallowed (the claim stays dropped).
+   *  No production host binds onLost in this release (the hook is the
+   *  extension point a later consumer binds), so a realm reads zero. */
   onLostThrew: number;
   /** Pending tokens on unclaimed plots retired because nothing wants the owner. */
   pendingSwept: number;
@@ -189,6 +198,8 @@ export function createFreeholdClaimCounters(): FreeholdClaimCounters {
     acquired: 0,
     takeovers: 0,
     busy: 0,
+    busyContention: 0,
+    lockTimeouts: 0,
     renewed: 0,
     missedHeartbeats: 0,
     lost: 0,
@@ -334,10 +345,17 @@ export interface FreeholdClaimRenewerDeps {
   readonly deadlineSignal?: () => AbortSignal;
 }
 
-/** Per registry: whether a pass is running, and where the next one starts. */
+/** Per registry: whether a pass is running, where the next one starts, and
+ *  the shutdown stop. */
 interface RenewerState {
   running: boolean;
   cursor: string | null;
+  /** Set by stopFreeholdClaimRenewer: no pass starts again, and the running
+   *  one stops before its next chunk, so the shutdown's release-all never
+   *  races a renew that would push released rows out by a whole TTL. */
+  stopping: boolean;
+  /** Resolves once the running pass's finally has run; null while none runs. */
+  settled: Promise<void> | null;
 }
 
 /** What ONE pass warns once, at its end, on every exit (counts only). */
@@ -444,9 +462,10 @@ export async function renewFreeholdClaims(deps: FreeholdClaimRenewerDeps): Promi
   const deadlineMs = passDeadlineOf(deps);
   let state = renewers.get(deps.registry);
   if (!state) {
-    state = { running: false, cursor: null };
+    state = { running: false, cursor: null, stopping: false, settled: null };
     renewers.set(deps.registry, state);
   }
+  if (state.stopping) return;
   if (state.running) {
     deps.registry.counters.renewPassesSkipped++;
     return;
@@ -474,6 +493,10 @@ export async function renewFreeholdClaims(deps: FreeholdClaimRenewerDeps): Promi
     throw new Error('freehold claim renew pass start clock reading is not a finite number');
   }
   state.running = true;
+  let settle: () => void = () => {};
+  state.settled = new Promise<void>((resolve) => {
+    settle = resolve;
+  });
   const tally: PassTally = { raced: 0, lostHookThrew: 0 };
   try {
     await renewPass(deps, state, startMs, deadlineMs, tally);
@@ -512,8 +535,36 @@ export async function renewFreeholdClaims(deps: FreeholdClaimRenewerDeps): Promi
       }
     } finally {
       state.running = false;
+      state.settled = null;
+      settle();
     }
   }
+}
+
+/**
+ * Stop the renewer for shutdown (server/main.ts, right before
+ * releaseAllFreeholdClaims): no pass starts again, the running one stops
+ * before its next chunk, and this resolves once that pass has settled or one
+ * chunk's wall (FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs) has passed, whichever is
+ * first. Without it, a renew chunk still holding its rows when the release-all
+ * runs is passed over by SKIP LOCKED, then commits a renewal that keeps those
+ * plots claimed by a dead process for a whole TTL. Never rejects.
+ */
+export async function stopFreeholdClaimRenewer(registry?: FreeholdClaimRegistry): Promise<void> {
+  if (!registry) return;
+  const state = renewers.get(registry);
+  if (!state) {
+    renewers.set(registry, { running: false, cursor: null, stopping: true, settled: null });
+    return;
+  }
+  state.stopping = true;
+  const settled = state.settled;
+  if (!settled) return;
+  const bound = AbortSignal.timeout(FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs);
+  await new Promise<void>((resolve) => {
+    void settled.then(resolve);
+    bound.addEventListener('abort', () => resolve(), { once: true });
+  });
 }
 
 async function renewPass(
@@ -575,7 +626,7 @@ async function renewPass(
   // though the clock did not, and the signal still bounds the pass. So the
   // only mid-pass clock rejection is a clock port that THROWS.
   const expired = (): boolean => {
-    if (deadline.aborted) return true;
+    if (state.stopping || deadline.aborted) return true;
     const readMs: unknown = deps.nowMs();
     return typeof readMs === 'number' && Number.isFinite(readMs) && readMs - nowMs >= deadlineMs;
   };
@@ -587,7 +638,9 @@ async function renewPass(
   const abandon = (left: number): void => {
     counters.renewChunksAbandoned += left;
     warn(
-      `freehold claim renew pass hit its ${deadlineMs} ms deadline; ${left} chunks wait for the next pass or were left undecided`,
+      state.stopping
+        ? `freehold claim renew pass stopped for shutdown; ${left} chunks are left to the shutdown release`
+        : `freehold claim renew pass hit its ${deadlineMs} ms deadline; ${left} chunks wait for the next pass or were left undecided`,
     );
   };
   // Drops the claim only while the registry still holds the very object this
@@ -636,7 +689,8 @@ async function renewPass(
         },
         { signal: deadline },
       ));
-    } catch {
+    } catch (error) {
+      if (freeholdLockTimeout(error)) counters.lockTimeouts++;
       // Cut by the deadline (at its checkout or in flight): abandoned with
       // the rest. Otherwise one missed heartbeat per claim, kept.
       if (expired()) {
@@ -777,7 +831,8 @@ async function renewPass(
         },
         { checkoutSignal: deadline },
       );
-    } catch {
+    } catch (error) {
+      if (freeholdLockTimeout(error)) counters.lockTimeouts++;
       // Nothing went out (the checkout cut, or a failure before the
       // statement): nothing can have landed, so the claims stay.
       if (sent.length === 0) {

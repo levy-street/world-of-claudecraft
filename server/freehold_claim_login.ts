@@ -69,10 +69,12 @@ class ClaimBusy extends Error {
   }
 }
 
-const contentionCode = (error: unknown): boolean => {
-  const code = (error as { code?: unknown } | null)?.code;
-  return code === '55P03' || code === '57014';
-};
+/** The acquire's LOCK bound ran out: another transaction holds the claim row
+ *  right now (a renewal, a trip, a write), which is contention to be held as
+ *  busy and counted apart. A statement timeout (57014) is a slow database, not
+ *  a held row, so it takes the throw arm (the store's read_threw hold). */
+const contentionCode = (error: unknown): boolean =>
+  (error as { code?: unknown } | null)?.code === '55P03';
 
 export interface FreeholdClaimLoginDeps {
   readonly pool: FreeholdTxPool;
@@ -152,7 +154,10 @@ async function claimedLoginRead(
           ttlSeconds: deps.ttlSeconds,
         });
       } catch (error) {
-        if (contentionCode(error)) throw new ClaimBusy(plotId);
+        if (contentionCode(error)) {
+          registry.counters.busyContention++;
+          throw new ClaimBusy(plotId);
+        }
         throw error;
       }
       if (claim.kind === 'busy') throw new ClaimBusy(plotId);

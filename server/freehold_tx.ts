@@ -9,7 +9,10 @@
 //   each set, so a lock wait answers 55P03 inside its own bound instead of
 //   eating the statement's, and a stalled client cannot hold a row lock;
 // - the wall deadline is DbTransactionDeadline's, which destroys the socket
-//   and cancels the detached backend when it fires;
+//   when it fires and cancels the detached backend through the canceller the
+//   realm registers at boot (setFreeholdTxBackendCanceller, wired by
+//   server/main.ts to the process-wide cancelDetachedBackend); a host that
+//   registers none (a test) leaves that backend to its own statement_timeout;
 // - COMMIT's command TAG is checked (commitChecked): a transaction an earlier
 //   statement aborted answers COMMIT with a ROLLBACK tag and no error, and on
 //   the login read that would have meant believing a claim that rolled back.
@@ -47,6 +50,24 @@ export interface FreeholdTxBounds {
   readonly idleMs: number;
   /** The whole transaction's wall, including COMMIT. */
   readonly wallMs: number;
+}
+
+let registeredCancelBackend: ((processId: number) => Promise<void>) | undefined;
+
+/** The realm's detached-backend canceller for every housing transaction a
+ *  deadline cuts (a per-call `cancelBackend` still wins). Passing undefined
+ *  unregisters it, which is what a test teardown does. */
+export function setFreeholdTxBackendCanceller(
+  cancel: ((processId: number) => Promise<void>) | undefined,
+): void {
+  registeredCancelBackend = cancel;
+}
+
+/** A lock bound or a statement bound ran out (55P03, 57014): contention or a
+ *  slow database, which the housing counters keep apart from a refusal. */
+export function freeholdLockTimeout(error: unknown): boolean {
+  const code = (error as { code?: unknown } | null)?.code;
+  return code === '55P03' || code === '57014';
 }
 
 /** COMMIT was sent and nothing proves it did not land. */
@@ -165,7 +186,7 @@ export async function runFreeholdTransaction<T>(
     operation: bounds.operation,
     timeoutMs: bounds.wallMs,
     signal: opts.signal,
-    cancelBackend: opts.cancelBackend,
+    cancelBackend: opts.cancelBackend ?? registeredCancelBackend,
   });
   let commitSent = false;
   try {

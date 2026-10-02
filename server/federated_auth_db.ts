@@ -44,10 +44,13 @@ export async function deleteUnusedFederatedProvision(
   } catch (error) {
     // A 55006 is one of the two parent-delete guards refusing, told apart by
     // its CONSTRAINT field matched exactly (PostgreSQL puts no trigger name on
-    // the error): storage_purchase_guard_account_delete while a possibly-debited
-    // purchase is open, freehold_operation_guard_account_delete while a housing
-    // intent is open (directly, or through the characters cascade's own guard).
-    // Any other 55006 is not a guard this code knows, so it surfaces raw.
+    // the error; parentDeleteGuardOf matches STORAGE_PURCHASE_OPEN_CONSTRAINT
+    // and FREEHOLD_OPERATION_OPEN_CONSTRAINT): the storage value is raised by
+    // the storage_purchase_guard_account_delete trigger while a possibly-debited
+    // purchase is open, the housing value by the
+    // freehold_operation_guard_account_delete trigger while a housing intent is
+    // open (directly, or through the characters cascade's own guard). Any other
+    // 55006 is not a guard this code knows, so it surfaces raw.
     const guard = parentDeleteGuardOf(error);
     if (guard === 'storage_purchase') {
       throw new Error(

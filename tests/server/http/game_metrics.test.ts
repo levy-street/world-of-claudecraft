@@ -872,6 +872,25 @@ function receiptGrowthSamples(text: string): Record<string, string> {
 
 // The readout is module-global, so these cases run in order: the cold scrape
 // first, before anything in this file observes a pass.
+/** Every pass in the block below also carries the second watched table (the
+ *  keep-forever plot claims), present with its own known values, so each
+ *  exact-map assertion names its series too. */
+const CLAIMS_ROW = {
+  table: 'freehold_plot_claims',
+  present: true,
+  reltuples: 5,
+  totalBytes: '4096',
+} as const;
+const observeWithClaims = (
+  rows: Parameters<typeof observeFreeholdReceiptGrowth>[0],
+  observedAtMs: number,
+): boolean => observeFreeholdReceiptGrowth([...rows, CLAIMS_ROW], observedAtMs);
+const claimsSamples = (age: unknown): Record<string, unknown> => ({
+  'freehold_plot_claims/rows_estimate': '5',
+  'freehold_plot_claims/bytes': '4096',
+  'freehold_plot_claims/observation_age_seconds': age,
+});
+
 describe('registerGameStateMetrics: woc_freehold_receipt_growth', () => {
   it('exports the family with no series before the monitor has observed a pass', async () => {
     expect(WOC_FREEHOLD_RECEIPT_GROWTH).toBe('woc_freehold_receipt_growth');
@@ -885,7 +904,7 @@ describe('registerGameStateMetrics: woc_freehold_receipt_growth', () => {
 
   it('exports rows_estimate and bytes per fixed table, read at scrape time', async () => {
     expect(
-      observeFreeholdReceiptGrowth(
+      observeWithClaims(
         [
           {
             table: 'freehold_operation_receipts',
@@ -905,6 +924,7 @@ describe('registerGameStateMetrics: woc_freehold_receipt_growth', () => {
       'freehold_operation_receipts/rows_estimate': '1234',
       'freehold_operation_receipts/bytes': '57344',
       'freehold_operation_receipts/observation_age_seconds': expect.any(String),
+      ...claimsSamples(expect.any(String)),
     });
     // The bounded label set: the fixed table list and the three measures, and
     // nothing else ever becomes a label on this family.
@@ -927,7 +947,7 @@ describe('registerGameStateMetrics: woc_freehold_receipt_growth', () => {
     // A later pass moves the SAME registry's series: the gauge reads the
     // readout at scrape time, never a value pushed at registration.
     expect(
-      observeFreeholdReceiptGrowth(
+      observeWithClaims(
         [
           {
             table: 'freehold_operation_receipts',
@@ -943,12 +963,13 @@ describe('registerGameStateMetrics: woc_freehold_receipt_growth', () => {
       'freehold_operation_receipts/rows_estimate': '2000',
       'freehold_operation_receipts/bytes': '65536',
       'freehold_operation_receipts/observation_age_seconds': expect.any(String),
+      ...claimsSamples(expect.any(String)),
     });
   });
 
   it('exports the last pass age and recomputes it on every scrape, so a stall is visible', async () => {
     expect(
-      observeFreeholdReceiptGrowth(
+      observeWithClaims(
         [{ table: 'freehold_operation_receipts', present: true, reltuples: 7, totalBytes: '8' }],
         1_000,
       ),
@@ -967,10 +988,11 @@ describe('registerGameStateMetrics: woc_freehold_receipt_growth', () => {
         'freehold_operation_receipts/rows_estimate': '7',
         'freehold_operation_receipts/bytes': '8',
         'freehold_operation_receipts/observation_age_seconds': '60',
+        ...claimsSamples('60'),
       });
       // A pass stamped in the future (clock skew) clamps to zero, never negative.
       expect(
-        observeFreeholdReceiptGrowth(
+        observeWithClaims(
           [{ table: 'freehold_operation_receipts', present: true, reltuples: 7, totalBytes: '8' }],
           90_000,
         ),
@@ -990,7 +1012,7 @@ describe('registerGameStateMetrics: woc_freehold_receipt_growth', () => {
     // Seen first with a known estimate, so the omission below proves the
     // series is dropped, not merely never set.
     expect(
-      observeFreeholdReceiptGrowth(
+      observeWithClaims(
         [{ table: 'freehold_operation_receipts', present: true, reltuples: 10, totalBytes: '1' }],
         Date.now(),
       ),
@@ -1001,7 +1023,7 @@ describe('registerGameStateMetrics: woc_freehold_receipt_growth', () => {
     );
 
     expect(
-      observeFreeholdReceiptGrowth(
+      observeWithClaims(
         [
           {
             table: 'freehold_operation_receipts',
@@ -1018,6 +1040,7 @@ describe('registerGameStateMetrics: woc_freehold_receipt_growth', () => {
     expect(receiptGrowthSamples(await registry.metrics())).toEqual({
       'freehold_operation_receipts/bytes': '16384',
       'freehold_operation_receipts/observation_age_seconds': expect.any(String),
+      ...claimsSamples(expect.any(String)),
     });
   });
 
@@ -1025,7 +1048,7 @@ describe('registerGameStateMetrics: woc_freehold_receipt_growth', () => {
     const registry = new Registry();
     registerGameStateMetrics(registry, stubSource());
     expect(
-      observeFreeholdReceiptGrowth(
+      observeWithClaims(
         [
           {
             table: 'freehold_operation_receipts',
@@ -1043,6 +1066,7 @@ describe('registerGameStateMetrics: woc_freehold_receipt_growth', () => {
     // Only the pass age: the absence was observed, so it is fresh, not stale.
     expect(receiptGrowthSamples(text)).toEqual({
       'freehold_operation_receipts/observation_age_seconds': expect.any(String),
+      ...claimsSamples(expect.any(String)),
     });
   });
 });
@@ -2478,6 +2502,8 @@ describe('the housing authority families (07a)', () => {
       acquired: 101,
       takeovers: 102,
       busy: 103,
+      busyContention: 120,
+      lockTimeouts: 121,
       renewed: 104,
       missedHeartbeats: 105,
       lost: 106,
@@ -2511,6 +2537,19 @@ describe('the housing authority families (07a)', () => {
       abandoned: 212,
       tripMsTotal: 214,
       droppedAfterCommit: 215,
+      verifiedLanded: 216,
+      verifiedNotLanded: 217,
+      threwAfterOutcome: 218,
+    },
+    recovery: {
+      passes: 301,
+      skippedNoPermit: 302,
+      discovered: 303,
+      applied: 304,
+      closed: 305,
+      held: 306,
+      unknownKind: 307,
+      threw: 308,
     },
   };
   const measured = (text: string, measure: string): string | undefined =>
@@ -2523,14 +2562,20 @@ describe('the housing authority families (07a)', () => {
     text.split('\n').filter((line) => line.startsWith(`${family}{`));
 
   it('publishes the held claims and every claim and trip COUNT by fixed measure', async () => {
+    // The family names as literals: a rename breaks every dashboard and alert,
+    // so it has to change these on purpose.
+    expect(WOC_FREEHOLD_CLAIMS_HELD).toBe('woc_freehold_claims_held');
+    expect(WOC_FREEHOLD_AUTHORITY_TOTAL).toBe('woc_freehold_authority_total');
     const registry = new Registry();
     registerGameStateMetrics(registry, stubSource({ freeholdAuthority: () => stats }));
     const text = await registry.metrics();
-    expect(sampleValue(text, new RegExp(`^${WOC_FREEHOLD_CLAIMS_HELD} (\\d+)$`, 'm'))).toBe('3');
+    expect(sampleValue(text, /^woc_freehold_claims_held (\d+)$/m)).toBe('3');
     const expected: Record<string, string> = {
       claim_acquired: '101',
       claim_takeovers: '102',
       claim_busy: '103',
+      claim_busy_contention: '120',
+      claim_lock_timeouts: '121',
       claim_renewed: '104',
       claim_missed_heartbeats: '105',
       claim_lost: '106',
@@ -2547,11 +2592,13 @@ describe('the housing authority families (07a)', () => {
       claim_login_reads: '116',
       trip_started: '201',
       trip_advanced: '202',
+      trip_verify_landed: '216',
       trip_cooldown: '203',
       trip_corrupt: '204',
       trip_unsupported: '205',
       trip_refused: '206',
       trip_failed: '207',
+      trip_verify_not_landed: '217',
       trip_not_run: '213',
       trip_unresolved: '208',
       trip_refused_after_commit: '209',
@@ -2559,6 +2606,15 @@ describe('the housing authority families (07a)', () => {
       trip_refused_pre_queue: '210',
       trip_metered: '211',
       trip_abandoned: '212',
+      trip_threw_after_outcome: '218',
+      recovery_passes: '301',
+      recovery_skipped_no_permit: '302',
+      recovery_discovered: '303',
+      recovery_applied: '304',
+      recovery_closed: '305',
+      recovery_held: '306',
+      recovery_unknown_kind: '307',
+      recovery_threw: '308',
     };
     for (const [measure, value] of Object.entries(expected)) {
       expect(measured(text, measure), measure).toBe(value);
@@ -2575,8 +2631,13 @@ describe('the housing authority families (07a)', () => {
       .find((line) => line.startsWith('# HELP woc_freehold_authority_total '));
     expect(help).toContain('Counts only');
     expect(help).toContain('woc_freehold_authority_ms_total');
-    // claim_on_lost_threw is named in the help, beside its renewer siblings.
-    expect(help).toContain('the wanted tests that threw, the onLost host hooks that threw,');
+    // claim_on_lost_threw is named in the help, beside its renewer siblings,
+    // with the reason a realm reads zero.
+    expect(help).toContain(
+      'the wanted tests that threw, the onLost host hooks that threw (no production host binds one in this release, so zero),',
+    );
+    // A takeover's meaning includes a re-acquire after this realm's own release.
+    expect(help).toContain("this realm's own re-acquire after its release included");
     expect(help).not.toMatch(/summed/i);
   });
 

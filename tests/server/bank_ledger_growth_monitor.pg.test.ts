@@ -16,6 +16,7 @@ import {
   createBankLedgerGrowthMonitor,
   readBankLedgerGrowthBudget,
 } from '../../server/bank_ledger_growth_monitor';
+import { freeholdClaimSchema } from '../../server/freehold_claim_db';
 import { freeholdOperationSchema } from '../../server/freehold_operation_db';
 import {
   createFreeholdReceiptGrowthMonitor,
@@ -313,7 +314,7 @@ describeDb('bank-ledger growth monitor against real PostgreSQL', () => {
     expect(performance.now() - endStartedAt).toBeLessThan(1_000);
   });
 
-  it('reads a real receipts table through one catalog statement: absent, unknown, then estimated', async () => {
+  it('reads the real keep-forever housing tables through one catalog statement: absent, unknown, then estimated', async () => {
     const pool = trackedPool('freehold-receipt-growth');
     // The monitor names no clock or timer; real ones are bound here, as
     // server/main.ts binds them.
@@ -326,6 +327,7 @@ describeDb('bank-ledger growth monitor against real PostgreSQL', () => {
     // absent reading rather than an undefined-table error.
     expect(await readFreeholdReceiptGrowth(pool, scheduleDeadline)).toEqual([
       { table: 'freehold_operation_receipts', present: false, reltuples: null, totalBytes: null },
+      { table: 'freehold_plot_claims', present: false, reltuples: null, totalBytes: null },
     ]);
 
     // The real DDL, applied the way ensureSchema applies it (one transaction,
@@ -336,6 +338,7 @@ describeDb('bank-ledger growth monitor against real PostgreSQL', () => {
     const setup = await pool.connect();
     try {
       await setup.query('BEGIN');
+      await setup.query(freeholdClaimSchema('public'));
       await setup.query(freeholdOperationSchema('public'));
       await setup.query('COMMIT');
     } finally {
@@ -355,20 +358,25 @@ describeDb('bank-ledger growth monitor against real PostgreSQL', () => {
       scheduleRepeating: () => () => {},
     });
     const fresh = await readFreeholdReceiptGrowth(pool, scheduleDeadline);
-    expect(fresh).toHaveLength(1);
+    expect(fresh).toHaveLength(2);
     expect(fresh[0]).toMatchObject({ table: 'freehold_operation_receipts', present: true });
     expect(Number(fresh[0]?.reltuples)).toBe(-1);
+    expect(fresh[1]).toMatchObject({ table: 'freehold_plot_claims', present: true });
+    expect(Number(fresh[1]?.reltuples)).toBe(-1);
     await monitor.refresh();
-    const sizeOf = async () =>
+    const sizeOf = async (table: string) =>
       Number(
         (
           await pool.query(
-            `SELECT pg_catalog.pg_total_relation_size('public.freehold_operation_receipts'::pg_catalog.regclass) AS size`,
+            `SELECT pg_catalog.pg_total_relation_size($1::text::pg_catalog.regclass) AS size`,
+            [`public.${table}`],
           )
         ).rows[0].size,
       );
-    const freshBytes = await sizeOf();
+    const freshBytes = await sizeOf('freehold_operation_receipts');
+    const claimsBytes = await sizeOf('freehold_plot_claims');
     expect(freshBytes).toBeGreaterThan(0);
+    expect(claimsBytes).toBeGreaterThan(0);
     expect(freeholdReceiptGrowthReadout().tables).toEqual([
       {
         table: 'freehold_operation_receipts',
@@ -376,6 +384,7 @@ describeDb('bank-ledger growth monitor against real PostgreSQL', () => {
         rowsEstimate: null,
         bytes: freshBytes,
       },
+      { table: 'freehold_plot_claims', present: true, rowsEstimate: null, bytes: claimsBytes },
     ]);
 
     // Grown and analyzed: the estimate is the planner's figure and the bytes
@@ -385,8 +394,10 @@ describeDb('bank-ledger growth monitor against real PostgreSQL', () => {
        SELECT 'fop:' || g, 'test_kind', 'cancelled' FROM pg_catalog.generate_series(1, 300) AS g`,
     );
     await pool.query('ANALYZE public.freehold_operation_receipts');
+    // The claims table, analyzed EMPTY: a known zero, never the unknown -1.
+    await pool.query('ANALYZE public.freehold_plot_claims');
     await monitor.refresh();
-    const grownBytes = await sizeOf();
+    const grownBytes = await sizeOf('freehold_operation_receipts');
     expect(grownBytes).toBeGreaterThan(freshBytes);
     expect(freeholdReceiptGrowthReadout().tables).toEqual([
       {
@@ -394,6 +405,12 @@ describeDb('bank-ledger growth monitor against real PostgreSQL', () => {
         present: true,
         rowsEstimate: 300,
         bytes: grownBytes,
+      },
+      {
+        table: 'freehold_plot_claims',
+        present: true,
+        rowsEstimate: 0,
+        bytes: await sizeOf('freehold_plot_claims'),
       },
     ]);
     expect(onError).not.toHaveBeenCalled();
@@ -410,11 +427,12 @@ describeDb('bank-ledger growth monitor against real PostgreSQL', () => {
     walk((plan.rows[0]['QUERY PLAN'] as Array<{ Plan: Record<string, unknown> }>)[0].Plan);
     expect(relations).toContain('pg_class');
     expect(relations).not.toContain('freehold_operation_receipts');
+    expect(relations).not.toContain('freehold_plot_claims');
     expect(relations.every((name) => name === 'pg_class')).toBe(true);
 
     await monitor.stop();
     await pool.query(
-      'DROP TABLE public.freehold_operation_receipts, public.freehold_operations, public.characters, public.accounts CASCADE',
+      'DROP TABLE public.freehold_operation_receipts, public.freehold_operations, public.freehold_plot_claims, public.characters, public.accounts CASCADE',
     );
     await closePool(pool);
   });

@@ -6,7 +6,9 @@
 // (the "points-at = Sim" column of 02-WORKING-MEMORY.md's callback registry). As a
 // later slice extracts an owner, it reimplements that callback inside its own module
 // WITHOUT renaming it here, so consumers never change. Treat the surface as
-// APPEND-ONLY: add callbacks, never repurpose or rename one.
+// APPEND-ONLY: add members, never repurpose or rename one. The one sanctioned
+// exception is `freeholdKeyAdmission` (its comment below says why it fails
+// closed).
 //
 // This module is `src/sim`-pure: it imports only sibling sim types (no render/ui/
 // game/net/DOM/Three, no `Math.random`/`Date.now`), so it runs unchanged in Node,
@@ -375,9 +377,10 @@ export interface SimContextPrimitives {
   // parity traces default off; the stock offline world and the headless env opt
   // in; the realm maps it from its env. Read-only, exactly the resolved Sim.cfg field.
   readonly freeholdsEnabled: boolean;
-  // Re-typed in place by 07a, the one deliberate exception to "members are added,
-  // never repurposed": the boolean became the three-valued answer, every host
-  // moved with it, and an untyped host still returning true now fails closed.
+  // Re-typed in place, the one sanctioned exception to "members are added,
+  // never repurposed": the boolean became the FreeholdKeyAdmission answer
+  // (admit, pending, deny), every host moved with it, and an untyped
+  // host still returning true now fails closed (`busy`), never admits.
   readonly freeholdKeyAdmission: (ownerKey: string, pid: number) => FreeholdKeyAdmission;
   readonly freeholdKeyReadyAtMs: Map<string, number>;
   readonly instanceScanCounters: {

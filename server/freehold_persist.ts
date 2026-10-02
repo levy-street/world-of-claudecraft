@@ -49,7 +49,12 @@ import { PENDING_FREEHOLD_PLOT_ID } from '../src/sim/freehold/state';
 import { boundedDatabaseError } from './freehold_bounded_error';
 import { createFreeholdCapacityWarn } from './freehold_capacity_warn';
 import { FREEHOLD_PRIMARY_PLOT_INDEX, type FreeholdFencedUpsertResult } from './freehold_db';
-import { ABSENT_HEARTH_REVISION, COLD_HEARTH, readFreeholdLoginPair } from './freehold_hearth_load';
+import {
+  ABSENT_HEARTH_REVISION,
+  adoptFreeholdHearthReading,
+  COLD_HEARTH,
+  readFreeholdLoginPair,
+} from './freehold_hearth_load';
 import { freeholdJoinAnswer } from './freehold_join_answer';
 import {
   FREEHOLD_ABSENT_DURABLE_REV,
@@ -76,6 +81,7 @@ import {
   FREEHOLD_PERSIST_WRITE_PERMIT_WAIT_MS,
 } from './freehold_persist_bounds';
 import {
+  censusFreeholdEntries,
   createFreeholdPersistCounters,
   type FreeholdPersistStats,
   freeholdPersistStatsOf,
@@ -764,8 +770,10 @@ export function createFreeholdPersistStore(ports: FreeholdPersistPorts): Freehol
     }
     // Load-once, like loadFreehold: a re-preload replays what the entry knows
     // (so a rejoin after the sim evicted the record re-installs the real
-    // house) and never mints a second plot id or reads the row twice.
-    if (entry?.loaded) {
+    // house) and never mints a second plot id or reads the row twice, while
+    // this process still holds the plot's claim; without it (released or
+    // taken: claimHeld), the claimed read below decides again.
+    if (entry?.loaded && (entry.durableRev === null || (ports.claimHeld?.(entry.plotId) ?? true))) {
       entry.accountId = accountId;
       entry.orphanPasses = 0;
       // blocked(), not `hold === null`. A QUIESCED entry has no hold and yet is
@@ -1777,6 +1785,11 @@ export function createFreeholdPersistStore(ports: FreeholdPersistPorts): Freehol
       return ports.enqueue(ownerKey, signal, job);
     },
 
+    adoptHearthReading(ownerKey: string, readyAtMs: number, revision: string): void {
+      const entry = entries.get(ownerKey);
+      if (entry) adoptFreeholdHearthReading(entry, readyAtMs, revision);
+    },
+
     adoptCommittedRevision(ownerKey: string, durableRev: string): void {
       const entry = entries.get(ownerKey);
       if (!entry || blocked(entry) || !/^[1-9][0-9]*$/.test(durableRev)) return;
@@ -1785,49 +1798,10 @@ export function createFreeholdPersistStore(ports: FreeholdPersistPorts): Freehol
     },
 
     stats(): FreeholdPersistStats {
-      let dirty = 0;
-      let running = 0;
-      let pending = 0;
-      let held = 0;
-      let quiesced = 0;
-      let retrying = 0;
-      let retryingOffline = 0;
-      let loaded = 0;
-      let oldestDirtyAtMs = 0;
-      for (const entry of entries.values()) {
-        if (isDirty(entry)) dirty++;
-        if (entry.running) running++;
-        if (entry.pending) pending++;
-        if (entry.hold !== null) held++;
-        if (entry.quiesced) quiesced++;
-        // On the clock and still writing (a later quiesce ends the posture); the
-        // offline share holds up to TWO records each (its state and its capture).
-        if (entry.retryAtMs > 0 && !isHeld(entry)) {
-          retrying++;
-          if (entry.refs === 0) retryingOffline++;
-        }
-        if (entry.loaded) loaded++;
-        if (
-          entry.dirtySinceMs > 0 &&
-          (oldestDirtyAtMs === 0 || entry.dirtySinceMs < oldestDirtyAtMs)
-        ) {
-          oldestDirtyAtMs = entry.dirtySinceMs;
-        }
-      }
-      const oldestDirtyAgeMs =
-        oldestDirtyAtMs === 0 ? 0 : Math.max(0, ports.nowMs() - oldestDirtyAtMs);
       return freeholdPersistStatsOf(
         {
           entries: entries.size,
-          loaded,
-          dirty,
-          running,
-          pending,
-          held,
-          quiesced,
-          retrying,
-          retryingOffline,
-          oldestDirtyAgeMs,
+          ...censusFreeholdEntries(entries.values(), isDirty, isHeld, () => ports.nowMs()),
           deferredWrites: deferredWrites.size,
           deferredRetries: deferredRetries.size,
           activeWrites,

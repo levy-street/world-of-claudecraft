@@ -228,7 +228,11 @@ import {
   touchLogin,
   walletForAccount,
 } from './db';
-import { closeBackendCancelPool, getBackendCancelCounts } from './db_backend_cancel';
+import {
+  cancelDetachedBackend,
+  closeBackendCancelPool,
+  getBackendCancelCounts,
+} from './db_backend_cancel';
 import { configureDeedsRuntime } from './deeds';
 import {
   buildDeedsBoardEntries,
@@ -263,7 +267,7 @@ import { pruneDiscordOAuthStates, pruneDiscordPendingLogins } from './discord_db
 import { emailAccountCreated } from './email';
 import { stopEpicMirror } from './epic/mirror';
 import { freeholdAuthorityStats, heldClaims } from './freehold_authority_registry';
-import { releaseAllFreeholdClaims } from './freehold_claim_registry';
+import { releaseAllFreeholdClaims, stopFreeholdClaimRenewer } from './freehold_claim_registry';
 import { freeholdsEnabled } from './freehold_config';
 import { FREEHOLD_PERSIST_SHUTDOWN_DRAIN_MS } from './freehold_persist';
 import {
@@ -273,6 +277,7 @@ import {
   freeholdPreloadUnavailable,
 } from './freehold_persist_registry';
 import { createFreeholdReceiptGrowthMonitor } from './freehold_receipt_growth_monitor';
+import { setFreeholdTxBackendCanceller } from './freehold_tx';
 import { GameServer } from './game';
 import {
   closeGeneralChatQuotaPool,
@@ -465,6 +470,7 @@ import {
 import { configureSuspicionFlagDataset, suspicionFlagsIdle } from './suspicion_flags';
 import { listSuspicionFlagDataset } from './suspicion_flags_db';
 import { passesTurnstile } from './turnstile';
+import { unrefTimerPorts } from './unref_timer_ports';
 import { pruneUnstuckReportsBatch } from './unstuck_db';
 import { stopUnstuckRecords, UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS } from './unstuck_records';
 import { MAX_ASSET_BYTES } from './user_assets';
@@ -3658,24 +3664,17 @@ export async function startServer(): Promise<http.Server> {
     onError: (error) => console.error('bank ledger growth monitor failed:', error),
   });
   // The keep-forever housing tables are observed, never swept: one O(1)
-  // catalog read per minute under the same yield-first admission.
+  // catalog read per minute under the same yield-first admission. Its clock
+  // and timers are ports bound here, so the module names none.
   const freeholdReceiptGrowthMonitor = createFreeholdReceiptGrowthMonitor({
     pool,
     tryAcquireBackgroundPermit: () => majorBackgroundDbGate.tryAcquire(),
     onError: (error) => console.error('freehold receipt growth monitor failed:', error),
-    // Its clock and timers are ports bound here, so the module names none.
-    nowMs: Date.now,
-    scheduleDeadline: (callback, ms) => {
-      const timer = setTimeout(callback, ms);
-      timer.unref();
-      return () => clearTimeout(timer);
-    },
-    scheduleRepeating: (callback, ms) => {
-      const timer = setInterval(callback, ms);
-      timer.unref();
-      return () => clearInterval(timer);
-    },
+    ...unrefTimerPorts(),
   });
+  // A housing transaction a wall deadline cuts cancels its detached backend
+  // through the one process-wide canceller (server/freehold_tx.ts).
+  setFreeholdTxBackendCanceller(cancelDetachedBackend);
   const generalChatQuotaListener = createGeneralChatQuotaListener({
     activeAccountIds: () => [...game.liveAccountIds()],
     onResync: (accountIds, policies) => {
@@ -4437,7 +4436,10 @@ export async function startServer(): Promise<http.Server> {
     await Promise.all([stopSteamMirror(5000), stopEpicMirror(5000)]);
     // Release this process's plot claims after the housing drain above, so a
     // replacement process can take the plots at once; a crash leaves them to
-    // expire after LEASE_TTL_SECONDS. Never rejects.
+    // expire after LEASE_TTL_SECONDS. The renewer stops first (bounded by one
+    // chunk's wall), so no renewal still in flight outlives the release. Never
+    // rejects.
+    await stopFreeholdClaimRenewer(heldClaims());
     await releaseAllFreeholdClaims({ pool, holder: PROCESS_LEASE_HOLDER, registry: heldClaims() });
     // Drop every character load lease this process holds so a clean restart can
     // reload its characters immediately instead of waiting out the lease TTL.

@@ -30,11 +30,16 @@
 // plot id, a token or a holder.
 import type { FreeholdKeyAdmission } from '../src/sim/freehold/hearth_key';
 import type { FreeholdClaimFence } from './freehold_claim_db';
+import { FREEHOLD_PERSIST_LOAD_PERMIT_WAIT_MS } from './freehold_login_bounds';
 import type { FreeholdMutationOutcome, FreeholdMutationRequest } from './freehold_mutation';
 
-/** The refusal memo's window: the player-waiting admission bound
- *  (FREEHOLD_PERSIST_LOAD_PERMIT_WAIT_MS), reused rather than guessed. */
-export const FREEHOLD_HEARTH_TRIP_MEMO_MS = 5_000;
+/** The refusal memo's window: the player-waiting admission bound, reused
+ *  rather than guessed. */
+export const FREEHOLD_HEARTH_TRIP_MEMO_MS = FREEHOLD_PERSIST_LOAD_PERMIT_WAIT_MS;
+/** The bound on the trip save's WAITS (the character FIFO, the market writer,
+ *  the background permit): the same player-waiting bound, named for its own
+ *  use so a retune of one is a visible decision about the other. */
+export const FREEHOLD_HEARTH_TRIP_WAIT_MS = FREEHOLD_PERSIST_LOAD_PERMIT_WAIT_MS;
 
 export interface FreeholdHearthTripSession {
   readonly pid: number;
@@ -69,6 +74,15 @@ export interface FreeholdHearthTripCounters {
   metered: number;
   /** The session left, or changed, before the outcome was applied. */
   abandoned: number;
+  /** Committed advances whose COMMIT answer was lost and the verify proved
+   *  landed: a subset of `advanced`. */
+  verifiedLanded: number;
+  /** Lost COMMIT answers the verify proved did NOT land (apart from `failed`,
+   *  which is proved not committed without a verify). */
+  verifiedNotLanded: number;
+  /** A trip whose step AFTER its counted outcome threw (the re-dispatch into
+   *  the sim, a merge): the outcome above stands, this counts the throw. */
+  threwAfterOutcome: number;
   /** Every trip's wall time from its start to its outcome, summed (ms, through
    *  the host clock): divided by `started` it is the mean trip latency. */
   tripMsTotal: number;
@@ -80,8 +94,34 @@ export interface FreeholdHearthTripCounters {
  *  jailed and dark gates too), undefined otherwise. */
 export type FreeholdHearthRedispatch = 'dropped' | undefined;
 
+/** Fresh zeroed trip counters: the one initializer the trip module and the
+ *  authority registry's unregistered answer share. */
+export function createFreeholdHearthTripCounters(): FreeholdHearthTripCounters {
+  return {
+    started: 0,
+    advanced: 0,
+    cooldown: 0,
+    corrupt: 0,
+    unsupported: 0,
+    refused: 0,
+    failed: 0,
+    notRun: 0,
+    unresolved: 0,
+    refusedAfterCommit: 0,
+    droppedAfterCommit: 0,
+    refusedPreQueue: 0,
+    metered: 0,
+    abandoned: 0,
+    verifiedLanded: 0,
+    verifiedNotLanded: 0,
+    threwAfterOutcome: 0,
+    tripMsTotal: 0,
+  };
+}
+
 export interface FreeholdHearthTripHost {
-  /** The live session for a pid, or undefined. */
+  /** The LIVE session object for a pid (the same object every call while the
+   *  session lives), or undefined. */
   sessionForPid(pid: number): FreeholdHearthTripSession | undefined;
   /** The plot store's view of the owner (null: no entry). */
   authority(ownerKey: string): {
@@ -103,6 +143,10 @@ export interface FreeholdHearthTripHost {
   redispatch(session: FreeholdHearthTripSession, advanced: boolean): FreeholdHearthRedispatch;
   /** mergeFreeholdKeyReadyAt: forward only, a durable value may deny, never admit. */
   mergeReadyAt(ownerKey: string, readyAtMs: number): void;
+  /** The plot store's remembered clock for the owner (adoptHearthReading):
+   *  forward only by revision, so a relog on this process replays this clock,
+   *  never the one read at login. */
+  adoptDurable(ownerKey: string, readyAtMs: number, revision: string): void;
   /** Whether any live player still holds the owner key (the sim roster the
    *  last-leave clock eviction reads): a merge for an owner with none would
    *  install a clock nothing ever evicts. */
@@ -111,13 +155,22 @@ export interface FreeholdHearthTripHost {
   accountOf(ownerKey: string): number | null;
   readonly cooldownMs: number;
   nowMs(): number;
+  /** The trip save's wait signal; AbortSignal.timeout(ms) unless a host binds
+   *  its own (a test clock). */
+  waitSignal?(ms: number): AbortSignal;
   warn(message: string): void;
 }
 
+type TicketVerdict = 'admit' | 'deny';
+
+/** Bound to the (ownerKey, pid, characterId, leaseNonce) of the session it was
+ *  minted for (the manifest's section 4): consumed only by that session. */
 interface Ticket {
   readonly ownerKey: string;
   readonly pid: number;
-  readonly verdict: 'admit' | 'deny';
+  readonly characterId: number;
+  readonly leaseNonce: string | undefined;
+  readonly verdict: TicketVerdict;
   consumed: boolean;
 }
 
@@ -126,29 +179,14 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
   /** A session left: prune the EXPIRED refusals. An unexpired one stays, so a
    *  relog inside its window is still metered. */
   onSessionLeft(): void;
-  /** Whether a trip is in flight for the account (the claim stays wanted). */
+  /** Whether a trip is in flight for the account (a test read: the claim is
+   *  kept wanted by the host's holdInFlight, never by this). */
   inFlight(accountId: number): boolean;
   /** The refusal memo's live entry count (a test and gauge read). */
   refusalMemoSize(): number;
   readonly counters: FreeholdHearthTripCounters;
 } {
-  const counters: FreeholdHearthTripCounters = {
-    started: 0,
-    advanced: 0,
-    cooldown: 0,
-    corrupt: 0,
-    unsupported: 0,
-    refused: 0,
-    failed: 0,
-    notRun: 0,
-    unresolved: 0,
-    refusedAfterCommit: 0,
-    droppedAfterCommit: 0,
-    refusedPreQueue: 0,
-    metered: 0,
-    abandoned: 0,
-    tripMsTotal: 0,
-  };
+  const counters = createFreeholdHearthTripCounters();
   // One entry per account with a trip in flight: the trip's identity and the
   // pid it re-dispatches. Bounded by the trip's save, never by a leave: the
   // save's WAITS (the character FIFO, the market writer, the background permit)
@@ -167,8 +205,12 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
   let ticket: Ticket | null = null;
   let nextTrip = 0;
 
+  // The SAME live session object (the frame path's own first gate), and still
+  // the same character under the same lease nonce and not leaving: a takeover
+  // that reused a pid or a nonce can never inherit the trip's re-dispatch.
   const sameSession = (a: FreeholdHearthTripSession, b: FreeholdHearthTripSession | undefined) =>
     b !== undefined &&
+    b === a &&
     b.characterId === a.characterId &&
     b.leaseNonce === a.leaseNonce &&
     b.left !== true &&
@@ -178,9 +220,16 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
   function redispatchWithTicket(
     ownerKey: string,
     session: FreeholdHearthTripSession,
-    verdict: 'admit' | 'deny',
+    verdict: TicketVerdict,
   ): 'consumed' | 'dropped' | 'refused' {
-    const minted: Ticket = { ownerKey, pid: session.pid, verdict, consumed: false };
+    const minted: Ticket = {
+      ownerKey,
+      pid: session.pid,
+      characterId: session.characterId,
+      leaseNonce: session.leaseNonce,
+      verdict,
+      consumed: false,
+    };
     ticket = minted;
     let met: FreeholdHearthRedispatch;
     try {
@@ -211,7 +260,9 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
           operations: [],
           hearth: { accountId, cooldownMs: host.cooldownMs },
         },
-        AbortSignal.timeout(FREEHOLD_HEARTH_TRIP_MEMO_MS),
+        host.waitSignal
+          ? host.waitSignal(FREEHOLD_HEARTH_TRIP_WAIT_MS)
+          : AbortSignal.timeout(FREEHOLD_HEARTH_TRIP_WAIT_MS),
       );
     } catch (error) {
       outcome = { kind: 'failed', error };
@@ -220,12 +271,16 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
       if (pending.get(accountId)?.trip === trip) pending.delete(accountId);
       counters.tripMsTotal += Math.max(0, host.nowMs() - startedAtMs);
     }
-    let verdict: 'admit' | 'deny' = 'deny';
+    let verdict: TicketVerdict = 'deny';
     let readyAtMs: number | null = null;
+    // The revision the durable clock was proved at, for the store's memory.
+    let revision: string | null = null;
     if (outcome.kind === 'committed' && outcome.hearth) {
       counters.advanced++;
+      if (outcome.verified) counters.verifiedLanded++;
       verdict = 'admit';
       readyAtMs = Number(outcome.hearth.readyAtMs);
+      revision = outcome.hearth.revision;
     } else if (outcome.kind === 'refused' && outcome.refusal.kind === 'hearth') {
       const result = outcome.refusal.result;
       if (result.kind === 'cooldown') {
@@ -234,6 +289,7 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
         // between the two buy a trip the durable clock refused.
         counters.cooldown++;
         readyAtMs = Number(result.readyAtMs);
+        revision = result.revision;
       } else if (result.kind === 'corrupt') {
         counters.corrupt++;
         host.warn('freehold hearth trip refused: the stored ready time is past any cooldown');
@@ -247,9 +303,14 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
       counters.unresolved++;
     } else if (outcome.kind === 'not_run') {
       counters.notRun++;
+    } else if (outcome.kind === 'not_landed') {
+      counters.verifiedNotLanded++;
     } else {
       counters.failed++;
     }
+    // The store remembers the newest proved clock whatever happens to the
+    // session, so a relog on this process replays it rather than the login's.
+    if (readyAtMs !== null && revision !== null) host.adoptDurable(ownerKey, readyAtMs, revision);
     if (
       verdict !== 'admit' &&
       !(
@@ -291,6 +352,16 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
   return {
     admission(ownerKey, pid) {
       if (ticket !== null && ticket.ownerKey === ownerKey && ticket.pid === pid) {
+        // The ticket names its session; any other session on that pid (a
+        // takeover inside the re-dispatch) is refused and never consumes it.
+        const live = host.sessionForPid(pid);
+        if (
+          !live ||
+          live.characterId !== ticket.characterId ||
+          live.leaseNonce !== ticket.leaseNonce
+        ) {
+          return 'deny';
+        }
         ticket.consumed = true;
         return ticket.verdict;
       }
@@ -335,7 +406,14 @@ export function createFreeholdHearthTrips(host: FreeholdHearthTripHost): {
         session,
         authority.durableRev !== null ? claim : undefined,
         trip,
-      );
+      )
+        // Every outcome was counted before anything that can throw runs (the
+        // re-dispatch into the sim, a merge), so a throw here is its own count
+        // and line, never an unhandled rejection.
+        .catch(() => {
+          counters.threwAfterOutcome++;
+          host.warn('freehold hearth trip threw after its outcome was counted');
+        });
       return 'pending';
     },
     onSessionLeft() {

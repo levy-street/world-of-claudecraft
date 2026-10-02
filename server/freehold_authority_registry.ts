@@ -5,58 +5,40 @@
 // here rather than through GameServer, answering zeros when none is registered
 // (a test host, or a realm before its first construction). Counts only: no
 // account id, owner key, plot id, token or holder can reach a scrape from here.
-import type { FreeholdClaimCounters, FreeholdClaimRegistry } from './freehold_claim_registry';
-import type { FreeholdHearthTripCounters } from './freehold_hearth_trip';
+import {
+  createFreeholdClaimCounters,
+  type FreeholdClaimCounters,
+  type FreeholdClaimRegistry,
+} from './freehold_claim_registry';
+import {
+  createFreeholdHearthTripCounters,
+  type FreeholdHearthTripCounters,
+} from './freehold_hearth_trip';
+import {
+  createFreeholdOperationRecoveryCounters,
+  type FreeholdOperationRecoveryCounters,
+} from './freehold_operation_recovery';
 
 export interface FreeholdAuthorityStats {
   /** Claims this process holds right now. */
   readonly claimsHeld: number;
   readonly claims: Readonly<FreeholdClaimCounters>;
   readonly trips: Readonly<FreeholdHearthTripCounters>;
+  /** The operation recovery passes (zero while no kind is registered). */
+  readonly recovery: Readonly<FreeholdOperationRecoveryCounters>;
 }
 
-const ZERO_CLAIMS: FreeholdClaimCounters = {
-  acquired: 0,
-  takeovers: 0,
-  busy: 0,
-  renewed: 0,
-  missedHeartbeats: 0,
-  lost: 0,
-  released: 0,
-  fencedWrites: 0,
-  selfAdopted: 0,
-  renewPasses: 0,
-  renewPassMsTotal: 0,
-  renewPassesSkipped: 0,
-  renewChunksAbandoned: 0,
-  releaseRaced: 0,
-  wantedThrew: 0,
-  onLostThrew: 0,
-  pendingSwept: 0,
-  loginReads: 0,
-  loginReadMsTotal: 0,
-};
-
-const ZERO_TRIPS: FreeholdHearthTripCounters = {
-  started: 0,
-  advanced: 0,
-  cooldown: 0,
-  corrupt: 0,
-  unsupported: 0,
-  refused: 0,
-  failed: 0,
-  notRun: 0,
-  unresolved: 0,
-  refusedAfterCommit: 0,
-  droppedAfterCommit: 0,
-  refusedPreQueue: 0,
-  metered: 0,
-  abandoned: 0,
-  tripMsTotal: 0,
-};
+// The unregistered answer: the same initializers the live sources use, so a
+// counter added to either can never be missing from a scrape of zeros.
+const ZERO_CLAIMS: FreeholdClaimCounters = Object.freeze(createFreeholdClaimCounters());
+const ZERO_TRIPS: FreeholdHearthTripCounters = Object.freeze(createFreeholdHearthTripCounters());
+const ZERO_RECOVERY: FreeholdOperationRecoveryCounters = Object.freeze(
+  createFreeholdOperationRecoveryCounters(),
+);
 
 let claims: FreeholdClaimRegistry | null = null;
 let trips: { readonly counters: FreeholdHearthTripCounters } | null = null;
+let recovery: FreeholdOperationRecoveryCounters | null = null;
 
 /** Passing nulls unregisters, which is what a test teardown does. */
 export function registerFreeholdAuthority(
@@ -67,6 +49,12 @@ export function registerFreeholdAuthority(
 ): void {
   claims = source?.claims ?? null;
   trips = source?.trips ?? null;
+}
+
+/** The realm store's operation recovery counters (registered by its
+ *  composition root, server/freehold_persist_wiring.ts); null unregisters. */
+export function registerFreeholdRecovery(counters: FreeholdOperationRecoveryCounters | null): void {
+  recovery = counters;
 }
 
 /** The LIVE registry, for the one caller that must act on it rather than read
@@ -83,5 +71,6 @@ export function freeholdAuthorityStats(): FreeholdAuthorityStats {
     claimsHeld: claims ? claims.count() : 0,
     claims: { ...(claims?.counters ?? ZERO_CLAIMS) },
     trips: { ...(trips?.counters ?? ZERO_TRIPS) },
+    recovery: { ...(recovery ?? ZERO_RECOVERY) },
   };
 }

@@ -985,7 +985,7 @@ export const FREEHOLD_EXPORT_MAX_RENDERED_BYTES = 425_984;
  *     unbounded: `owned_bytes` is the authoritative rendered length and it is
  *     itself NULL when the pre-gate refused to render at all. */
 export async function freeholdsForExport(
-  db: Pool,
+  db: FreeholdQueryable,
   accountId: number,
 ): Promise<Record<string, unknown>[]> {
   // THE SAME STRUCTURAL REFUSAL every other entry point in this module runs.
@@ -1029,7 +1029,7 @@ export async function freeholdsForExport(
       LIMIT ${FREEHOLD_EXPORT_ROW_LIMIT}`,
     [accountId],
   );
-  const rows = res.rows;
+  const rows = res.rows ?? [];
   // SAY SO WHEN IT STOPS. Reaching the limit exactly is indistinguishable from
   // having exactly that many rows, and the account that reaches it is the
   // corrupt one this export exists to serve.

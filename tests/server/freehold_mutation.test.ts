@@ -443,6 +443,7 @@ const REQUEST: FreeholdMutationRequest = {
       operationId: 'fop:x',
       accountId: 7,
       fingerprint: 'f'.repeat(64),
+      plotId: 'plot:a',
       fenceGeneration: '2',
       expectedDurableRev: '4',
     },
@@ -504,7 +505,7 @@ describe('the housing hook', () => {
       accountIds: [9, 7, 9],
       plots: [],
       operations: [],
-      hearth: null,
+      hearth: { accountId: 7, cooldownMs: 60_000 },
       claimProofs: [],
     });
     expect(hook.accountIds).toEqual([7, 9]);
@@ -3461,8 +3462,8 @@ describe('the claim renewer', () => {
     const bindsOnLost = (body: string): boolean => /\bonLost\b/.test(body);
     const body = bodyOf(source);
     // Positive control: the body was found, whole, and it is the renewer call.
-    expect(body).toContain('return renewFreeholdClaims({');
-    expect(body).toContain('wanted: (claim, nowMs) =>');
+    expect(body).toContain('const pass = renewFreeholdClaims({');
+    expect(body).toContain('wanted: gameFreeholdClaimWanted(sim, store, claims),');
     expect(body).toContain('warn: (message) => console.warn(message),');
     expect(bindsOnLost(body)).toBe(false);
     // The mutant this pin exists for, a hook bound inside that very call, is
@@ -3473,23 +3474,18 @@ describe('the claim renewer', () => {
       source
         .slice(at)
         .replace(
-          '    wanted: (claim, nowMs) =>',
-          '    onLost: () => {},\n    wanted: (claim, nowMs) =>',
+          '    wanted: gameFreeholdClaimWanted(sim, store, claims),',
+          '    onLost: () => {},\n    wanted: gameFreeholdClaimWanted(sim, store, claims),',
         );
     expect(mutant).not.toBe(source);
     expect(bindsOnLost(bodyOf(mutant))).toBe(true);
   });
 
-  it('states the cases a pass rejects in word for word the same list in its JSDoc, the periodic flush member doc and the manifest', () => {
-    // Each copy runs from the first `:` after its one "exactly these cases"
-    // to the first `.` that ends a sentence (AbortSignal.timeout's does not),
-    // read with comment markers, markdown backticks and each item's leading
-    // bullet dropped and whitespace collapsed, item by item (split on `;`):
-    // the JSDoc's bullets, the member doc's run-on sentence and the
-    // manifest's paragraph then read alike, and any word that differs fails.
-    // The agreement so covers the first sentence after that `:` alone (the
-    // extractor stops at its full stop): the whole list, one sentence in each
-    // copy, and none of what follows it, which each copy words its own way.
+  it('states the cases a pass rejects ONCE, in its JSDoc, and the flush member doc and the manifest point there', () => {
+    // The JSDoc's list runs from the first `:` after its one "exactly these
+    // cases" to the first `.` that ends a sentence (AbortSignal.timeout's does
+    // not), read with comment markers dropped and whitespace collapsed, item
+    // by item (split on `;`).
     const anchor = 'exactly these cases';
     const listOf = (text: string): string[] => {
       // Comment markers stripped and whitespace collapsed FIRST, so a reflow
@@ -3513,31 +3509,38 @@ describe('the claim renewer', () => {
     };
     const registrySource = readFileSync('server/freehold_claim_registry.ts', 'utf8');
     const jsdoc = listOf(registrySource);
-    const memberDoc = listOf(readFileSync('server/periodic_save_flush.ts', 'utf8'));
-    const manifest = listOf(readFileSync('docs/freeholds/mutation-touch-set-manifest.md', 'utf8'));
     // Positive control: the whole list was found, from its first case to the
-    // end of its last, as its five cases in every copy (a `;` split that
-    // broke, or two cases merged, fails the count), with no empty item.
+    // end of its last, as its five cases (a `;` split that broke, or two cases
+    // merged, fails the count), with no empty item.
     expect(jsdoc[0]).toMatch(/^an injected passDeadlineMs that is not a whole number/);
     expect(jsdoc.at(-1)).toMatch(/after the wanted tests and before any statement$/);
     expect(jsdoc.every((item) => item.length > 0)).toBe(true);
     expect(jsdoc).toHaveLength(5);
-    expect(memberDoc).toHaveLength(5);
-    expect(manifest).toHaveLength(5);
-    expect(memberDoc).toEqual(jsdoc);
-    expect(manifest).toEqual(jsdoc);
-    // Negative control: one word changed in one copy fails the comparison
-    // through the same extractor, which still finds the whole list.
-    const changed = registrySource.replace(
-      /(exactly\s+(?:\*\s+)?these\s+(?:\*\s+)?cases[\s\S]*?)a sane clock/,
-      '$1a sound clock',
+    // The other two readers point at that one list and carry no copy of it:
+    // neither names a case (the deadline port's parameter appears nowhere in
+    // either), so a copy that could drift from the JSDoc cannot come back.
+    const memberDoc = readFileSync('server/periodic_save_flush.ts', 'utf8');
+    const manifest = readFileSync('docs/freeholds/mutation-touch-set-manifest.md', 'utf8');
+    const flat = (text: string) => text.replace(/\s*\n\s*(?:\*\s*)?/g, ' ');
+    expect(flat(memberDoc)).toContain(
+      "in the cases renewFreeholdClaims's own JSDoc lists (server/freehold_claim_registry.ts, the one copy of that list)",
     );
-    expect(changed).not.toBe(registrySource);
-    const changedList = listOf(changed);
-    expect(changedList).toHaveLength(jsdoc.length);
-    expect(changedList).not.toEqual(memberDoc);
+    expect(flat(manifest)).toContain(
+      "The cases in which the pass rejects are listed ONCE, in `renewFreeholdClaims`'s JSDoc (`server/freehold_claim_registry.ts`)",
+    );
+    for (const [name, text] of [
+      ['the periodic flush member doc', memberDoc],
+      ['the manifest', manifest],
+    ] as const) {
+      expect(text, name).not.toContain(anchor);
+      expect(text, name).not.toContain('passDeadlineMs');
+      expect(listOf(text), name).toEqual([]);
+    }
+    // Negative control: a copy pasted back into the member doc is seen.
+    const pasted = `${memberDoc}\n// It rejects in exactly these cases: ${jsdoc.join('; ')}.`;
+    expect(listOf(pasted)).toEqual(jsdoc);
     // And an anchor broken across comment lines reads the same list, so the
-    // flatten-first read is pinned whatever any copy's wrap is today.
+    // flatten-first read is pinned whatever the JSDoc's wrap is today.
     const split = registrySource.replace(/exactly these cases/, 'exactly\n * these\n * cases');
     expect(split).not.toBe(registrySource);
     expect(listOf(split)).toEqual(jsdoc);
@@ -3656,20 +3659,19 @@ describe('the claim renewer', () => {
       'server/freehold_persist_wiring.ts': { raw: 3, tokens: 2, strings: 0 },
       // The flush member's key, bound to the wiring's renewGameFreeholdClaims.
       'server/game.ts': { raw: 1, tokens: 1, strings: 0 },
-      // The flush member in the interface, and its name in the write list.
-      'server/periodic_save_flush.ts': { raw: 2, tokens: 2, strings: 1 },
+      // The flush member in the interface, its name in the write list, and one
+      // comment naming the renewer's JSDoc (the one copy of its reject list).
+      'server/periodic_save_flush.ts': { raw: 3, tokens: 2, strings: 1 },
     });
-    // The wiring's two are exactly its unaliased import and the call the
-    // case above reads.
+    // The wiring's two are exactly its unaliased import (one member of a
+    // multi-line import list) and the call the case above reads, held as the
+    // pass it returns after billing its synchronous launch.
     expect(
       stripComments(sourceOf('server/freehold_persist_wiring.ts'))
         .split('\n')
         .filter((line) => /\brenewFreeholdClaims\b/.test(line))
         .map((line) => line.trim()),
-    ).toEqual([
-      "import { type FreeholdClaimRegistry, renewFreeholdClaims } from './freehold_claim_registry';",
-      'return renewFreeholdClaims({',
-    ]);
+    ).toEqual(['renewFreeholdClaims,', 'const pass = renewFreeholdClaims({']);
 
     // Negative controls, each put through the same counter on top of a real
     // file: every shape a list of matchers let past moves the raw and
@@ -5627,6 +5629,8 @@ describe('the Hearth trip admission', () => {
       release = r;
     });
     const merges: number[] = [];
+    // Every durable clock the store was handed: [readyAtMs, revision].
+    const adopted: [number, string][] = [];
     const redispatched: string[] = [];
     // The advanced flag each re-dispatch carried, and every warn line.
     const hosted: boolean[] = [];
@@ -5659,6 +5663,7 @@ describe('the Hearth trip admission', () => {
         return undefined;
       },
       mergeReadyAt: (_key, ms) => merges.push(ms),
+      adoptDurable: (_key, ms, revision) => adopted.push([ms, revision]),
       ownerOnline: () => opts.online?.() ?? true,
       accountOf: (key) => {
         const match = /^account:([1-9][0-9]*)$/.exec(key);
@@ -5677,6 +5682,7 @@ describe('the Hearth trip admission', () => {
       sessions,
       settle,
       merges,
+      adopted,
       redispatched,
       hosted,
       warnings,
@@ -5794,6 +5800,7 @@ describe('the Hearth trip admission', () => {
         // The sim refused (died in the window) before asking admission.
       },
       mergeReadyAt: () => {},
+      adoptDurable: () => {},
       ownerOnline: () => true,
       accountOf: () => 7,
       cooldownMs: 1,
@@ -6080,6 +6087,7 @@ describe('the Hearth use precheck the re-dispatch replays', () => {
         },
         store: {
           authority: () => ({ loaded: true, blocked: false, plotId: 'plot:a', durableRev: null }),
+          adoptHearthReading: () => {},
         },
         claims: {
           forAccount: () => undefined,

@@ -8,8 +8,9 @@
 // the second freehold (D67) shares this single row precisely so a second home
 // cannot double the travel budget.
 //
-// The client's freeholdKeyReadyAtMs mirror is a committed UI value and never an
-// authorization. The rule this module exists to serve is that every accepted
+// The server Sim's freeholdKeyReadyAtMs mirror (never on the wire) is a
+// committed value the sim may deny with locally, and never an authorization.
+// The rule this module exists to serve is that every accepted
 // remote entry re-reads and advances this row inside the entry transaction,
 // under the account participant lock, so a cached or forged client value cannot
 // buy a trip.
@@ -24,7 +25,7 @@
 // online it is a forward-only mirror the trip merges this row's value into: it
 // may deny a use locally, it never admits one.
 //
-// TWO INVARIANTS a future reader must not break WHEN THAT CALLER LANDS:
+// TWO INVARIANTS every caller must keep:
 //   1. ONE clock reading per accepted entry, taken from the DATABASE, after
 //      the account participant lock. now() is the transaction timestamp on
 //      purpose: two statements inside one accepted entry can never disagree
@@ -43,6 +44,7 @@
 // inside 2^53 today, but every comparison and every sum here is BigInt so the
 // module cannot silently start rounding if that ever stops being true.
 import type { Pool } from 'pg';
+import { FREEHOLD_WRITE_TOKEN_RE } from './freehold_claim_db';
 import type { FreeholdQueryable } from './freehold_db';
 
 /** Absent means READY, with the zero revision: an account that has never
@@ -115,7 +117,11 @@ CREATE TABLE IF NOT EXISTS "__woc_freehold_hearth_schema__".account_freehold_hea
 -- The same column for a database whose table predates it. PROBED FIRST: an
 -- ALTER TABLE takes ACCESS EXCLUSIVE before it ever checks IF NOT EXISTS, and
 -- held through the rest of the boot transaction that lock would block every
--- other realm's Hearth reads, so an ordinary boot only reads the catalog.
+-- other realm's Hearth reads, so an ordinary boot only reads the catalog. The
+-- column's CHECK is probed by NAME too: a column that exists without it (added
+-- by hand) gets it back NOT VALID, so every new token is checked again while
+-- no boot scans the table to re-validate old rows (the advance only ever wrote
+-- hex tokens).
 DO $freehold_hearth_advance_token$
 BEGIN
   IF NOT EXISTS (
@@ -128,6 +134,15 @@ BEGIN
       ADD COLUMN IF NOT EXISTS advance_token TEXT
       CONSTRAINT account_freehold_hearth_advance_token_shape
       CHECK (advance_token IS NULL OR advance_token ~ '^[0-9a-f]{32}$');
+  ELSIF NOT EXISTS (
+    SELECT 1 FROM pg_catalog.pg_constraint
+     WHERE conrelid = to_regclass('"__woc_freehold_hearth_schema__".account_freehold_hearth')
+       AND conname = 'account_freehold_hearth_advance_token_shape'
+       AND contype = 'c'
+  ) THEN
+    ALTER TABLE "__woc_freehold_hearth_schema__".account_freehold_hearth
+      ADD CONSTRAINT account_freehold_hearth_advance_token_shape
+      CHECK (advance_token IS NULL OR advance_token ~ '^[0-9a-f]{32}$') NOT VALID;
   END IF;
 END;
 $freehold_hearth_advance_token$;
@@ -229,9 +244,11 @@ export type FreeholdHearthAdvance =
     }
   /** A stored ready time past `now + cooldown`: no accepted advance can write
    *  that, so only a backward database clock step or a bad row produced it.
-   *  Refused and written nothing, never trusted as authoritative (the rollout
-   *  contract's owed fail-closed rule): honoring it would lock the key for as
-   *  long as the bad value says, possibly for life. */
+   *  Refused and written nothing (the rollout contract's fail-closed rule): the
+   *  refusal does NOT unlock the key, which stays refused until the row is
+   *  repaired, but it is counted and warned (trip_corrupt) instead of being
+   *  honored silently, and no advance ever builds on the bad value. DEPLOY.md
+   *  carries the operator's query and repair. */
   | {
       readonly kind: 'corrupt';
       readonly readyAtMs: string;
@@ -331,7 +348,7 @@ export async function advanceFreeholdHearthOnClient(
   advanceToken: string | null = null,
 ): Promise<FreeholdHearthAdvance> {
   requireHearthAccountId(accountId);
-  if (advanceToken !== null && !/^[0-9a-f]{32}$/.test(advanceToken)) {
+  if (advanceToken !== null && !FREEHOLD_WRITE_TOKEN_RE.test(advanceToken)) {
     throw new RangeError('hearth advance token must be 32 lowercase hex characters');
   }
   if (!Number.isSafeInteger(cooldownMs) || cooldownMs < 0) {
@@ -397,7 +414,7 @@ export async function advanceFreeholdHearthOnClient(
  *  or null when it has never travelled. Counters ship as text for the same
  *  reason they are read as text everywhere else here. */
 export async function freeholdHearthForExport(
-  db: Pool,
+  db: FreeholdQueryable,
   accountId: number,
 ): Promise<Record<string, unknown> | null> {
   const res = await db.query(
@@ -406,5 +423,5 @@ export async function freeholdHearthForExport(
       WHERE account_id = $1`,
     [accountId],
   );
-  return res.rows[0] ?? null;
+  return res.rows?.[0] ?? null;
 }

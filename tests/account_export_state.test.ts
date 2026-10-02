@@ -2,7 +2,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const db = vi.hoisted(() => {
   process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_export_units';
-  return { query: vi.fn(), connect: vi.fn() };
+  const query = vi.fn();
+  // The housing section reads on ONE checked-out client
+  // (server/freehold_account_export.ts): the client answers through the same
+  // query mock, so every fixture below serves both shapes.
+  const connect = vi.fn(async () => ({
+    query: (...args: unknown[]) => query(...args),
+    release: () => {},
+  }));
+  return { query, connect };
 });
 vi.mock('pg', () => ({
   Pool: function Pool() {

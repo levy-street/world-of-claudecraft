@@ -19,16 +19,18 @@
 //   a TRUE account delete the account reference goes NULL and an erase trigger
 //   nulls the plot id and the fingerprint with it.
 //
-// NO PRODUCTION KIND IS REGISTERED in this release (the 07a Step 0 ruling):
-// nothing outside the tests prepares an operation, so these tables stay empty
+// NO PRODUCTION KIND IS REGISTERED in this release (the scope statement at the
+// head of docs/freeholds/mutation-touch-set-manifest.md; 08 registers the
+// first): nothing outside the tests prepares an operation, so these tables stay empty
 // in a shipped realm, and a dev path (the D81 fixture, the /dev set) never
 // reaches this module (pinned by a source scan).
 //
 // Housing advisory locks use the TWO-int4 form with fixed housing class ids,
 // a keyspace disjoint from storage's single-int8 idempotency-key locks and from
 // every other advisory user, so no housing lock can collide with a legacy one.
-import { createHash, randomBytes } from 'node:crypto';
-import type { FreeholdQueryable } from './freehold_db';
+import { createHash } from 'node:crypto';
+import { FREEHOLD_GENERATION_TEXT_RE } from './freehold_claim_db';
+import { FREEHOLD_PLOT_ID_RE, type FreeholdQueryable } from './freehold_db';
 import { type FreeholdTxPool, runFreeholdTransaction } from './freehold_tx';
 
 /** "FHA\x01": the per-account housing class (prepare, close). */
@@ -45,7 +47,10 @@ export const FREEHOLD_OPERATION_EXPORT_RECEIPT_LIMIT = 200;
  *  later kind can raise it without relaxing a constraint the pins forbid). */
 export const FREEHOLD_OPERATION_MAX_COPY_REFS = 64;
 
-/** The guard's stable identity, matched EXACTLY by the 55006 consumers. */
+/** The guard's RAISE identity, interpolated into the DDL below. The 55006
+ *  consumers match the CONSTRAINT exactly (parentDeleteGuardOf in
+ *  server/character_delete_db.ts); the MESSAGE is the stable text a log line
+ *  prints, never matched. */
 export const FREEHOLD_OPERATION_OPEN_MESSAGE = 'freehold_operation_open';
 export const FREEHOLD_OPERATION_OPEN_CONSTRAINT = 'freehold_operations_open_delete_guard';
 
@@ -55,11 +60,6 @@ export const FREEHOLD_OPERATION_FINGERPRINT_RE = /^[0-9a-f]{64}$/;
 
 export type FreeholdOperationCloseOutcome = 'cancelled' | 'refused';
 export type FreeholdOperationOutcome = 'applied' | FreeholdOperationCloseOutcome;
-
-/** A crypto-random opaque id: never guessable, never derived from an account. */
-export function mintFreeholdOperationId(): string {
-  return `fop:${randomBytes(16).toString('hex')}`;
-}
 
 /** SHA-256 over the canonical request. Deliberately binds NO account or
  *  character id (the intent's columns bind those), so a fingerprint cannot be
@@ -103,7 +103,11 @@ SELECT set_config(
   current_setting('search_path'),
   true
 );
-SET LOCAL search_path = "__woc_freehold_operation_schema__", pg_catalog, pg_temp;
+-- pg_catalog is deliberately NOT named: unnamed, PostgreSQL searches it FIRST, so
+-- a same-named function or operator in the target schema can never bind into a
+-- CHECK or DEFAULT below, while unqualified CREATEs still land in the target
+-- schema (named second, pg_catalog is searched after it and a decoy binds).
+SET LOCAL search_path = "__woc_freehold_operation_schema__", pg_temp;
 
 -- OPEN intents only: a row exists while its operation is open, and apply or
 -- close deletes it. Bounded per account (the prepare cap), so it needs no
@@ -230,8 +234,8 @@ BEGIN
   IF open_operation IS NOT NULL THEN
     RAISE EXCEPTION USING
       ERRCODE = '55006',
-      MESSAGE = 'freehold_operation_open',
-      CONSTRAINT = 'freehold_operations_open_delete_guard';
+      MESSAGE = '${FREEHOLD_OPERATION_OPEN_MESSAGE}',
+      CONSTRAINT = '${FREEHOLD_OPERATION_OPEN_CONSTRAINT}';
   END IF;
   RETURN OLD;
 END;
@@ -387,14 +391,14 @@ function requireMatch(name: string, value: string, re: RegExp): string {
 
 function requireRevOrNull(name: string, value: string | null): string | null {
   if (value === null) return null;
-  return requireMatch(name, value, /^[1-9][0-9]{0,18}$/);
+  return requireMatch(name, value, FREEHOLD_GENERATION_TEXT_RE);
 }
 
 function requireIntent(intent: FreeholdOperationIntent): FreeholdOperationIntent {
   requireMatch('id', intent.operationId, FREEHOLD_OPERATION_ID_RE);
   requireId('account id', intent.accountId);
   if (intent.characterId !== null) requireId('character id', intent.characterId);
-  if (intent.plotId !== null) requireMatch('plot id', intent.plotId, /^[A-Za-z0-9_:-]{1,64}$/);
+  if (intent.plotId !== null) requireMatch('plot id', intent.plotId, FREEHOLD_PLOT_ID_RE);
   requireMatch('kind', intent.kind, FREEHOLD_OPERATION_KIND_RE);
   requireMatch('fingerprint', intent.fingerprint, FREEHOLD_OPERATION_FINGERPRINT_RE);
   if (
@@ -422,7 +426,9 @@ export const FREEHOLD_OPERATION_ACCOUNT_LOCK_SQL = 'SELECT pg_advisory_xact_lock
 export const FREEHOLD_OPERATION_ID_LOCK_SQL =
   'SELECT pg_advisory_xact_lock($1::int, hashtext($2::text))';
 export const FREEHOLD_OPERATION_RECEIPT_READ_SQL =
-  'SELECT outcome, fingerprint FROM freehold_operation_receipts WHERE operation_id = $1';
+  'SELECT outcome, fingerprint, account_id FROM freehold_operation_receipts WHERE operation_id = $1';
+export const FREEHOLD_OPERATION_INTENT_READ_SQL =
+  'SELECT fingerprint, account_id FROM freehold_operations WHERE operation_id = $1';
 export const FREEHOLD_OPERATION_OPEN_COUNT_SQL =
   'SELECT count(*)::int AS open FROM freehold_operations WHERE account_id = $1';
 export const FREEHOLD_OPERATION_INSERT_SQL = `INSERT INTO freehold_operations
@@ -475,23 +481,26 @@ export async function prepareFreeholdOperation(
       FREEHOLD_ADVISORY_OPERATION_CLASS,
       i.operationId,
     ]);
+    // An existing id answers only its OWN account's identical request: the
+    // fingerprint binds no account (by design, above), so two accounts sending
+    // the same canonical request under one id would otherwise read each other's
+    // outcome or believe a foreign intent durable. An erased tombstone (a
+    // deleted account) has no account and no fingerprint left: conflict.
+    const ownedBy = (row: { account_id?: unknown }) =>
+      row.account_id !== null && Number(row.account_id) === i.accountId;
     const receipt = await tx.query(FREEHOLD_OPERATION_RECEIPT_READ_SQL, [i.operationId]);
-    const closed = receipt.rows[0] as { outcome?: unknown; fingerprint?: unknown } | undefined;
+    const closed = receipt.rows[0] as
+      | { outcome?: unknown; fingerprint?: unknown; account_id?: unknown }
+      | undefined;
     if (closed) {
-      // A closed id never reports its outcome for a DIFFERENT request. An
-      // erased tombstone (a deleted account) has no fingerprint left, and no
-      // live account can be asking about it.
-      return closed.fingerprint === i.fingerprint
+      return ownedBy(closed) && closed.fingerprint === i.fingerprint
         ? ({ kind: 'closed', outcome: String(closed.outcome) } as const)
         : ({ kind: 'conflict' } as const);
     }
-    const existing = await tx.query(
-      'SELECT fingerprint FROM freehold_operations WHERE operation_id = $1',
-      [i.operationId],
-    );
-    const open = existing.rows[0] as { fingerprint?: unknown } | undefined;
+    const existing = await tx.query(FREEHOLD_OPERATION_INTENT_READ_SQL, [i.operationId]);
+    const open = existing.rows[0] as { fingerprint?: unknown; account_id?: unknown } | undefined;
     if (open) {
-      return open.fingerprint === i.fingerprint
+      return ownedBy(open) && open.fingerprint === i.fingerprint
         ? ({ kind: 'duplicate' } as const)
         : ({ kind: 'conflict' } as const);
     }
@@ -524,6 +533,8 @@ export type FreeholdOperationApplyRefusal =
   | 'account'
   | 'already_closed'
   | 'fingerprint'
+  /** The apply names another plot than the intent was prepared for. */
+  | 'plot'
   | 'fence'
   | 'expected_rev';
 
@@ -569,7 +580,9 @@ export async function closeFreeholdOperationOnClient(
     readonly accountId: number;
     readonly fingerprint: string;
     readonly outcome: FreeholdOperationOutcome;
-    /** Checked only for an apply: the fence and revision it was prepared under. */
+    /** Checked only for an apply: the plot, fence and revision it was prepared
+     *  under. */
+    readonly plotId?: string | null;
     readonly fenceGeneration?: string | null;
     readonly expectedDurableRev?: string | null;
     readonly appliedDurableRev?: string | null;
@@ -606,6 +619,8 @@ export async function closeFreeholdOperationOnClient(
       typeof intent.fence_generation === 'string' ? intent.fence_generation : null;
     const preparedRev =
       typeof intent.expected_durable_rev === 'string' ? intent.expected_durable_rev : null;
+    const preparedPlot = typeof intent.plot_id === 'string' ? intent.plot_id : null;
+    if (preparedPlot !== (close.plotId ?? null)) return 'plot';
     if (preparedFence !== (close.fenceGeneration ?? null)) return 'fence';
     if (preparedRev !== (close.expectedDurableRev ?? null)) return 'expected_rev';
   }

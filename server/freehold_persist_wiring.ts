@@ -13,8 +13,13 @@ import { FREEHOLD_VISIT_POLICIES } from '../src/sim/freehold/types';
 import type { SimContext } from '../src/sim/sim_context';
 import { LEASE_TTL_SECONDS, PROCESS_LEASE_HOLDER } from './character_lease_db';
 import { pool, runWithStatementTimeout } from './db';
+import { registerFreeholdRecovery } from './freehold_authority_registry';
 import { readClaimedLoginDurables } from './freehold_claim_login';
-import { type FreeholdClaimRegistry, renewFreeholdClaims } from './freehold_claim_registry';
+import {
+  type FreeholdClaimRegistry,
+  type FreeholdHeldClaim,
+  renewFreeholdClaims,
+} from './freehold_claim_registry';
 import { freeholdForAccount, mintFreeholdPlotId } from './freehold_db';
 import { createFreeholdFencedWriter } from './freehold_fenced_write';
 import { loadFreeholdHearth } from './freehold_hearth_db';
@@ -68,10 +73,11 @@ export function createGameFreeholdPersistStore(deps: {
   const recovery = createFreeholdOperationRecovery({
     reconcilers: FREEHOLD_OPERATION_RECONCILERS,
     discover: (accountId) => openFreeholdOperationsForAccount(pool, accountId),
-    tryAcquirePermit: () => gate?.tryAcquire?.() ?? null,
+    tryAcquirePermit: freeholdRecoveryPermitPort(gate),
     holdInFlight: (plotId) => deps.claims.holdInFlight(plotId),
     warn: (message) => console.warn(message),
   });
+  registerFreeholdRecovery(recovery.counters);
   const fencedWrite = createFreeholdFencedWriter({
     pool,
     registry: deps.claims,
@@ -159,6 +165,7 @@ export function createGameFreeholdPersistStore(deps: {
     ...freeholdLivenessPorts(() => deps.sim.ctx),
     enabled: () => deps.sim.ctx.freeholdsEnabled,
     mintPlotId: () => mintFreeholdPlotId(),
+    claimHeld: (plotId) => deps.claims.forPlot(plotId) !== undefined,
     // No gate means no admission control on this host, not an unbounded wait.
     acquirePermit: gate
       ? (signal) => gate.acquire(signal)
@@ -171,12 +178,50 @@ export function createGameFreeholdPersistStore(deps: {
 }
 
 /**
- * One pass of the claim renewer for the realm's store (the periodic flush's
- * `renewFreeholdClaims`). A claim is WANTED while the store still needs the
+ * The recovery pass's admission: an IMMEDIATE background permit (a busy gate,
+ * or one without tryAcquire, skips the pass rather than queueing behind player
+ * work; the account's next claim tries again). No gate at all means no
+ * admission control on this host (the store's own rule above), so the pass is
+ * admitted, never skipped forever.
+ */
+export function freeholdRecoveryPermitPort(gate?: {
+  tryAcquire?(): { release(): void } | null;
+}): () => { release(): void } | null {
+  if (!gate) return () => ({ release: () => {} });
+  return () => gate.tryAcquire?.() ?? null;
+}
+
+/**
+ * Whether the realm still wants one held claim: the store still needs the
  * owner (a session reference or owed work), the sim still holds the owner's
  * live record, a mutation or recovery pass is in flight for the plot, or the
  * claim is younger than the login budget (a handshake between its first ask
- * and its join bind). Every other claim is released. Never rejects.
+ * and its join bind). Pure over its three live sources, so each arm is
+ * testable without a database.
+ */
+export function gameFreeholdClaimWanted(
+  sim: { readonly ctx: Pick<SimContext, 'freeholds'> },
+  store: Pick<FreeholdPersistStore, 'wantsClaim'>,
+  claims: Pick<FreeholdClaimRegistry, 'inFlight'>,
+): (claim: FreeholdHeldClaim, nowMs: number) => boolean {
+  return (claim, nowMs) => {
+    const ownerKey = freeholdOwnerKeyForAccount(claim.accountId);
+    return (
+      store.wantsClaim(ownerKey) ||
+      sim.ctx.freeholds.has(ownerKey) ||
+      claims.inFlight(claim.plotId) ||
+      nowMs - claim.acquiredAtMs < FREEHOLD_PERSIST_LOGIN_BUDGET_MS
+    );
+  };
+}
+
+/**
+ * One pass of the claim renewer for the realm's store (the periodic flush's
+ * `renewFreeholdClaims`): every claim gameFreeholdClaimWanted keeps is renewed,
+ * every other one released. Never rejects. Its SYNCHRONOUS launch (the copy,
+ * sort and wanted tests before the first await) is reported to `onSyncMs`, the
+ * GameServer's save observer, so it bills the Tick Profiler's `saves` phase
+ * beside saveFreeholds instead of hiding in `lateness`.
  *
  * ON THE RAW POOL, OUTSIDE backgroundDbGate, by decision: the autosave wave
  * holds that gate at exactly the moment this pass starts (same 30 s flush), so
@@ -187,26 +232,30 @@ export function createGameFreeholdPersistStore(deps: {
  * ONE pool client per realm, and its whole pass is capped by
  * FREEHOLD_CLAIM_RENEW_PASS_DEADLINE_MS (pinned by the renewer's peak-1 case in
  * tests/server/freehold_mutation.test.ts).
+ *
+ * THE POOL ARITHMETIC AT THE FLUSH, stated rather than assumed: the background
+ * gate admits the pool maximum less BACKGROUND_DB_MAJOR_PRODUCER_HEADROOM, and
+ * the clients outside it are this renewer's one, the lease heartbeat's one
+ * statement and the bank-ledger FIFO tail's one, so at the flush instant those
+ * three can take every client the headroom leaves (it is composition headroom,
+ * not a reserve: server/background_db_gate.ts). The renewer's share is one
+ * chunk at a time (about 7 ms measured, docs/freeholds/qa/mutation-2026-09-30/
+ * workload-evidence.md), and tests/server/tunables.test.ts pins the headroom
+ * at least the renewer plus the heartbeat plus one request-path client.
  */
 export function renewGameFreeholdClaims(
   sim: { readonly ctx: SimContext },
   store: Pick<FreeholdPersistStore, 'wantsClaim'>,
   claims: FreeholdClaimRegistry,
+  onSyncMs?: (ms: number) => void,
 ): Promise<void> {
-  return renewFreeholdClaims({
+  const launchedAt = performance.now();
+  const pass = renewFreeholdClaims({
     registry: claims,
     pool,
     holder: PROCESS_LEASE_HOLDER,
     ttlSeconds: LEASE_TTL_SECONDS,
-    wanted: (claim, nowMs) => {
-      const ownerKey = freeholdOwnerKeyForAccount(claim.accountId);
-      return (
-        store.wantsClaim(ownerKey) ||
-        sim.ctx.freeholds.has(ownerKey) ||
-        claims.inFlight(claim.plotId) ||
-        nowMs - claim.acquiredAtMs < FREEHOLD_PERSIST_LOGIN_BUDGET_MS
-      );
-    },
+    wanted: gameFreeholdClaimWanted(sim, store, claims),
     // NO onLost, by decision. A claim the pass drops (another holder took it,
     // or our landed release raced a same-generation re-login) has already left
     // the registry, and every write, trip and mutation reads its claim from
@@ -218,4 +267,6 @@ export function renewGameFreeholdClaims(
     nowMs: Date.now,
     warn: (message) => console.warn(message),
   });
+  onSyncMs?.(performance.now() - launchedAt);
+  return pass;
 }

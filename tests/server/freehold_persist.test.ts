@@ -7608,15 +7608,32 @@ describe('the claimed login read the realm binds, executed on a recording client
     expect(login.claimed).toEqual([]);
   });
 
-  for (const code of ['55P03', '57014']) {
-    it(`a ${code} on the acquire is contention: claim_busy, never the read hold`, async () => {
-      const login = claimedLogin({ acquireError: { code } });
-      const got = await login.run();
-      expect(got.row).toEqual({ kind: 'claim_busy', plotIndex: 0, plotId: ROW_PLOT_ID });
-      expect(login.checkouts[0]).not.toContain('SELECT row probe');
-      expect(login.registry.forAccount(ACCOUNT_ID)).toBeUndefined();
-    });
-  }
+  it('a 55P03 on the acquire is lock contention: claim_busy, counted apart, never the read hold', async () => {
+    const login = claimedLogin({ acquireError: { code: '55P03' } });
+    const got = await login.run();
+    expect(got.row).toEqual({ kind: 'claim_busy', plotIndex: 0, plotId: ROW_PLOT_ID });
+    expect(login.checkouts[0]).not.toContain('SELECT row probe');
+    expect(login.registry.forAccount(ACCOUNT_ID)).toBeUndefined();
+    // Busy, and the contention subset of busy: an operator can tell a held
+    // claim row from another realm's live claim.
+    expect(login.registry.counters.busy).toBe(1);
+    expect(login.registry.counters.busyContention).toBe(1);
+  });
+
+  it('a 57014 on the acquire is a slow database, not a held row: the throw arm, never busy', async () => {
+    const login = claimedLogin({ acquireError: { code: '57014' } });
+    await expect(login.run()).rejects.toThrow('claim row contended');
+    expect(login.registry.forAccount(ACCOUNT_ID)).toBeUndefined();
+    expect(login.registry.counters.busy).toBe(0);
+    expect(login.registry.counters.busyContention).toBe(0);
+  });
+
+  it("another realm's live claim is busy without the contention count", async () => {
+    const login = claimedLogin({ busy: true });
+    await login.run();
+    expect(login.registry.counters.busy).toBe(1);
+    expect(login.registry.counters.busyContention).toBe(0);
+  });
 
   it('any OTHER acquire fault fails the plot closed (the contention control)', async () => {
     const login = claimedLogin({ acquireError: { code: '23505' } });

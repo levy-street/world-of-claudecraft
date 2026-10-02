@@ -90,6 +90,13 @@ export interface FreeholdPersistPorts {
    *  answer and belongs inside the write, where its result is actually used. */
   liveRev(ownerKey: string): number | null;
   mintPlotId(): string;
+  /** 07a: whether this process still holds the global claim on a plot. A
+   *  preload's REPLAY of a loaded entry that has a durable row asks it first: a
+   *  claim the renewer released (a handshake slower than the login grace) or
+   *  another realm took is read again rather than replayed, so a join never
+   *  installs a house its writes would then answer `fenced` for. Unbound (a
+   *  host with no claims), every replay proceeds. */
+  claimHeld?(plotId: string): boolean;
   acquirePermit(signal: AbortSignal): Promise<{ release(): void } | null>;
   enqueue<T>(key: string, signal: AbortSignal, write: () => Promise<T>): Promise<T>;
   nowMs(): number;
@@ -150,6 +157,11 @@ export interface FreeholdPersistStore {
    *  mutation that writes the plot row is serialized with the store's own
    *  writes. Cancellable until the job starts. */
   runExclusive<T>(ownerKey: string, signal: AbortSignal, job: () => Promise<T>): Promise<T>;
+  /** 07a: adopt a durable Hearth clock a remote trip proved (its committed
+   *  advance, or the clock its cooldown refusal read), forward only by
+   *  revision, so a replay of this entry never answers an older clock than the
+   *  process knows (adoptFreeholdHearthReading). A no-op for an unknown owner. */
+  adoptHearthReading(ownerKey: string, readyAtMs: number, revision: string): void;
   /** 07a: adopt a revision a mutation committed for this owner's row, from
    *  inside runExclusive right after the COMMIT, so the store's next CAS expects
    *  it instead of answering stale. Forward only; a no-op for an unknown or

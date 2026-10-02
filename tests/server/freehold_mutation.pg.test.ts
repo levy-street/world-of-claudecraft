@@ -551,8 +551,11 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           operationId: t.intent.operationId,
           accountId: t.acct,
           fingerprint: over.fingerprint ?? t.intent.fingerprint,
-          fenceGeneration: '1',
-          expectedDurableRev: '1',
+          plotId: t.plotId,
+          // An apply writes its own plot under the same fence and revision
+          // (commitFreeholdMutation refuses a request where they differ).
+          fenceGeneration: over.generation ?? t.fence.generation,
+          expectedDurableRev: over.plotRev ?? '1',
         },
       ],
       hearth: over.hearth ? { accountId: t.acct, cooldownMs: COOLDOWN_MS } : null,
@@ -561,6 +564,19 @@ d('the housing mutation boundary (REAL Postgres)', () => {
 
   const transferDeps = (t: Transfer) =>
     depsFor({ characterId: t.ch, state: bagsState('after', 0), nonce: t.nonce });
+
+  /** commitFreeholdMutation with the plot store's owner FIFO: it refuses a
+   *  plot-writing mutation without one, and this suite has no store, so the
+   *  FIFO is the identity (a caller's own opts still win). */
+  const commit = (
+    deps: FreeholdMutationDeps,
+    request: FreeholdMutationRequest,
+    opts: Parameters<typeof mutation.commitFreeholdMutation>[2] = {},
+  ) =>
+    mutation.commitFreeholdMutation(deps, request, {
+      serialize: <T>(job: () => Promise<T>) => job(),
+      ...opts,
+    });
 
   /** Where the chair is, read back from PG: bags count and layout count. */
   async function custody(t: Transfer): Promise<{ bags: number; layout: number }> {
@@ -609,10 +625,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
     it('a wrong operation fingerprint refuses and rolls the character half back', async () => {
       const t = await transferFixture();
       const wrong = 'f'.repeat(64);
-      const outcome = await mutation.commitFreeholdMutation(
-        transferDeps(t),
-        transferRequest(t, { fingerprint: wrong }),
-      );
+      const outcome = await commit(transferDeps(t), transferRequest(t, { fingerprint: wrong }));
       expect(outcome).toEqual({
         kind: 'refused',
         refusal: { kind: 'operation', operationId: t.intent.operationId, reason: 'fingerprint' },
@@ -632,7 +645,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         kind: 'updated',
         durableRev: '2',
       });
-      const outcome = await mutation.commitFreeholdMutation(transferDeps(t), transferRequest(t));
+      const outcome = await commit(transferDeps(t), transferRequest(t));
       expect(outcome).toEqual({
         kind: 'refused',
         refusal: { kind: 'plot', plotId: t.plotId, result: 'stale' },
@@ -659,14 +672,14 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         ...hearthRequest(p.acct),
         claimProofs: [{ ...plot.fence, generation }],
       });
-      const stale = await mutation.commitFreeholdMutation(
+      const stale = await commit(
         depsFor({ characterId: p.ch, state: bagsState('stale-proof', 0), nonce: p.nonce }),
         trip('2'),
       );
       expect(stale).toEqual({ kind: 'refused', refusal: { kind: 'claim', plotId: plot.plotId } });
       expect(await hearthOf(p.acct)).toBeNull();
       expect(await blobOf(p.ch)).toEqual({ level: 5, marker: 'before' });
-      const held = await mutation.commitFreeholdMutation(
+      const held = await commit(
         depsFor({ characterId: p.ch, state: bagsState('proved', 0), nonce: p.nonce }),
         trip('1'),
       );
@@ -678,7 +691,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
 
     it('a rotated lease nonce fences the save out: the hook never runs and the Hearth is untouched', async () => {
       const p = await player();
-      const outcome = await mutation.commitFreeholdMutation(
+      const outcome = await commit(
         depsFor({ characterId: p.ch, state: bagsState('displaced', 0), nonce: 'fm-rotated' }),
         hearthRequest(p.acct),
       );
@@ -686,7 +699,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       expect(await hearthOf(p.acct)).toBeNull();
       expect(await blobOf(p.ch)).toEqual({ level: 5, marker: 'before' });
       // Control: the live nonce is the only difference, and it commits.
-      const live = await mutation.commitFreeholdMutation(
+      const live = await commit(
         depsFor({ characterId: p.ch, state: bagsState('live', 0), nonce: p.nonce }),
         hearthRequest(p.acct),
       );
@@ -726,11 +739,11 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           'SELECT 1 FROM freehold_plot_claims WHERE plot_id = $1 FOR NO KEY UPDATE',
           [pa.plotId],
         );
-        one = mutation.commitFreeholdMutation(
+        one = commit(
           depsFor({ characterId: a.ch, state: bagsState('order-a', 0), nonce: a.nonce }),
           request([a.acct, b.acct], [write(a.acct, pa), write(b.acct, pb)]),
         );
-        two = mutation.commitFreeholdMutation(
+        two = commit(
           depsFor({ characterId: b.ch, state: bagsState('order-b', 0), nonce: b.nonce }),
           request([b.acct, a.acct], [write(b.acct, pb), write(a.acct, pa)]),
         );
@@ -780,7 +793,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       const p = await player();
       const ghost = await makeAccount();
       await pool.query('DELETE FROM accounts WHERE id = $1', [ghost]);
-      const outcome = await mutation.commitFreeholdMutation(
+      const outcome = await commit(
         depsFor({ characterId: p.ch, state: bagsState('ghost', 0), nonce: p.nonce }),
         { ...hearthRequest(p.acct), accountIds: [p.acct, ghost] },
       );
@@ -842,7 +855,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           ])
         ).rows[0].v as string;
       const before = await versionOf();
-      const outcome = await mutation.commitFreeholdMutation(transferDeps(t), transferRequest(t));
+      const outcome = await commit(transferDeps(t), transferRequest(t));
       expect(outcome).toEqual({
         kind: 'committed',
         plots: [{ plotId: t.plotId, durableRev: '2' }],
@@ -869,7 +882,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
 
     it('a refusal after the character UPDATE (the operation half) leaves the chair in the bags', async () => {
       const t = await transferFixture();
-      const outcome = await mutation.commitFreeholdMutation(
+      const outcome = await commit(
         transferDeps(t),
         transferRequest(t, { fingerprint: '0'.repeat(64) }),
       );
@@ -879,10 +892,14 @@ d('the housing mutation boundary (REAL Postgres)', () => {
 
     it('a refusal at the plot CAS leaves the chair in the bags', async () => {
       const t = await transferFixture();
-      const outcome = await mutation.commitFreeholdMutation(
-        transferDeps(t),
-        transferRequest(t, { plotRev: '9' }),
+      // Another write moved the ROW past the revision the intent and the
+      // request both expect (the realistic stale shape: the request agrees with
+      // its intent, the database moved on).
+      await pool.query(
+        'UPDATE account_freeholds SET durable_rev = durable_rev + 1 WHERE plot_id = $1',
+        [t.plotId],
       );
+      const outcome = await commit(transferDeps(t), transferRequest(t));
       expect(outcome).toEqual({
         kind: 'refused',
         refusal: { kind: 'plot', plotId: t.plotId, result: 'stale' },
@@ -906,7 +923,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           ttlSeconds: 90,
         }),
       ).toEqual({ kind: 'acquired', generation: '2', takeover: true });
-      const outcome = await mutation.commitFreeholdMutation(transferDeps(t), transferRequest(t));
+      const outcome = await commit(transferDeps(t), transferRequest(t));
       expect(outcome).toEqual({ kind: 'refused', refusal: { kind: 'claim', plotId: t.plotId } });
       expect(await custody(t)).toEqual({ bags: 1, layout: 0 });
       expect(await claimRow(t.plotId)).toEqual({
@@ -925,7 +942,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
          VALUES ($1, $2, $3, 'refused')`,
         [t.intent.operationId, t.acct, KIND],
       );
-      const outcome = await mutation.commitFreeholdMutation(transferDeps(t), transferRequest(t));
+      const outcome = await commit(transferDeps(t), transferRequest(t));
       expect(outcome).toEqual({
         kind: 'refused',
         refusal: { kind: 'operation', operationId: t.intent.operationId, reason: 'already_closed' },
@@ -936,15 +953,12 @@ d('the housing mutation boundary (REAL Postgres)', () => {
 
     it('a replay of an applied transfer refuses: the chair is never in two places', async () => {
       const t = await transferFixture();
-      expect(
-        await mutation.commitFreeholdMutation(transferDeps(t), transferRequest(t)),
-      ).toMatchObject({ kind: 'committed' });
+      expect(await commit(transferDeps(t), transferRequest(t))).toMatchObject({
+        kind: 'committed',
+      });
       expect(await custody(t)).toEqual({ bags: 0, layout: 1 });
       // The replay reads the new revision and would append a second copy.
-      const replay = await mutation.commitFreeholdMutation(
-        transferDeps(t),
-        transferRequest(t, { plotRev: '2', chairs: 2 }),
-      );
+      const replay = await commit(transferDeps(t), transferRequest(t, { plotRev: '2', chairs: 2 }));
       expect(replay).toEqual({
         kind: 'refused',
         refusal: { kind: 'operation', operationId: t.intent.operationId, reason: 'already_closed' },
@@ -966,7 +980,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         DEFERRABLE INITIALLY DEFERRED FOR EACH ROW
         WHEN (NEW.plot_id = '${plotId}') EXECUTE FUNCTION fm_commit_fault()`);
       try {
-        const outcome = await mutation.commitFreeholdMutation(transferDeps(t), transferRequest(t));
+        const outcome = await commit(transferDeps(t), transferRequest(t));
         expect(outcome.kind).toBe('failed');
         expect((outcome as { error: { code?: string } }).error.code).toBe('23514');
       } finally {
@@ -977,9 +991,10 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       expect(await intentCount(t.intent.operationId)).toBe(1);
       expect(await receiptsOf(t.intent.operationId)).toEqual([]);
       // Control: the same transfer with the fault removed commits once.
-      expect(
-        await mutation.commitFreeholdMutation(transferDeps(t), transferRequest(t)),
-      ).toMatchObject({ kind: 'committed', verified: false });
+      expect(await commit(transferDeps(t), transferRequest(t))).toMatchObject({
+        kind: 'committed',
+        verified: false,
+      });
       expect(await custody(t)).toEqual({ bags: 0, layout: 1 });
     });
 
@@ -1029,9 +1044,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       const planned = await plan(t);
       expect(planned.kind).toBe('planned');
       if (planned.kind !== 'planned') throw new Error('unreachable');
-      expect(await mutation.commitFreeholdMutation(transferDeps(t), planned.request)).toMatchObject(
-        { kind: 'committed' },
-      );
+      expect(await commit(transferDeps(t), planned.request)).toMatchObject({ kind: 'committed' });
       expect(await custody(t)).toEqual({ bags: 0, layout: 1 });
     });
   });
@@ -1046,10 +1059,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       const t = await transferFixture();
       await pool.query('INSERT INTO account_freehold_hearth (account_id) VALUES ($1)', [t.acct]);
       const lost = armLostCommit(db);
-      const pending = mutation.commitFreeholdMutation(
-        transferDeps(t),
-        transferRequest(t, { hearth: true }),
-      );
+      const pending = commit(transferDeps(t), transferRequest(t, { hearth: true }));
       const real = await lost;
       try {
         await waitForLockWaiters(VERIFY_WAIT_TEXT);
@@ -1073,10 +1083,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       const landedToken = (await claimRow(t.plotId))?.write_token;
       expect(landedToken).toMatch(HEX32);
 
-      const retry = await mutation.commitFreeholdMutation(
-        transferDeps(t),
-        transferRequest(t, { hearth: true }),
-      );
+      const retry = await commit(transferDeps(t), transferRequest(t, { hearth: true }));
       expect(retry).toEqual({
         kind: 'refused',
         refusal: { kind: 'operation', operationId: t.intent.operationId, reason: 'already_closed' },
@@ -1093,7 +1100,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       const lost = armLostCommit(db);
       // The verify's checkouts, counted: the wait and the reads share ONE.
       let verifyCheckouts = 0;
-      const pending = mutation.commitFreeholdMutation(
+      const pending = commit(
         {
           ...transferDeps(t),
           pool: {
@@ -1119,15 +1126,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       expect((await hearthOf(t.acct))?.revision).toBe('0');
       expect(await intentCount(t.intent.operationId)).toBe(1);
 
-      const later = await mutation.commitFreeholdMutation(
-        transferDeps(t),
-        transferRequest(t, { hearth: true }),
-      );
+      const later = await commit(transferDeps(t), transferRequest(t, { hearth: true }));
       expect(later).toMatchObject({ kind: 'committed', verified: false });
-      const again = await mutation.commitFreeholdMutation(
-        transferDeps(t),
-        transferRequest(t, { hearth: true }),
-      );
+      const again = await commit(transferDeps(t), transferRequest(t, { hearth: true }));
       expect(again).toMatchObject({ kind: 'refused', refusal: { reason: 'already_closed' } });
       expect(await custody(t)).toEqual({ bags: 0, layout: 1 });
       expect((await hearthOf(t.acct))?.revision).toBe('1');
@@ -1138,7 +1139,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       const p = await player();
       expect(await hearthOf(p.acct)).toBeNull();
       const lost = armLostCommit(db);
-      const pending = mutation.commitFreeholdMutation(
+      const pending = commit(
         depsFor({ characterId: p.ch, state: bagsState('first-use', 0), nonce: p.nonce }),
         hearthRequest(p.acct),
       );
@@ -1196,7 +1197,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         await pool.query('INSERT INTO account_freehold_hearth (account_id) VALUES ($1)', [acct]);
       }
       const g = gate('after');
-      const first = mutation.commitFreeholdMutation(
+      const first = commit(
         depsFor({
           characterId: c1,
           state: bagsState('realm-one', 0),
@@ -1206,7 +1207,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         hearthRequest(acct),
       );
       await g.reached;
-      const second = mutation.commitFreeholdMutation(
+      const second = commit(
         depsFor({
           characterId: c2,
           state: bagsState('realm-two', 0),
@@ -1265,7 +1266,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         [p.acct, COOLDOWN_MS + 3_600_000],
       );
       const before = await hearthOf(p.acct);
-      const outcome = await mutation.commitFreeholdMutation(
+      const outcome = await commit(
         depsFor({ characterId: p.ch, state: bagsState('corrupt', 0), nonce: p.nonce }),
         hearthRequest(p.acct),
       );
@@ -1283,7 +1284,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           WHERE account_id = $1`,
         [p.acct, COOLDOWN_MS / 2],
       );
-      const cooled = await mutation.commitFreeholdMutation(
+      const cooled = await commit(
         depsFor({ characterId: p.ch, state: bagsState('cooled', 0), nonce: p.nonce }),
         hearthRequest(p.acct),
       );
@@ -1307,9 +1308,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       expect(await ops.prepareFreeholdOperation(pool, t.intent)).toEqual({ kind: 'duplicate' });
       const other = { ...t.intent, fingerprint: 'a'.repeat(64) };
       expect(await ops.prepareFreeholdOperation(pool, other)).toEqual({ kind: 'conflict' });
-      expect(
-        await mutation.commitFreeholdMutation(transferDeps(t), transferRequest(t)),
-      ).toMatchObject({ kind: 'committed' });
+      expect(await commit(transferDeps(t), transferRequest(t))).toMatchObject({
+        kind: 'committed',
+      });
       expect(await intentCount(t.intent.operationId)).toBe(0);
       expect(await receiptsOf(t.intent.operationId)).toEqual([
         {
@@ -1553,12 +1554,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       const t = await transferFixture();
       // An applied tombstone first (the transfer, with a Hearth advance so the
       // account owns every housing row class), then a second, OPEN intent.
-      expect(
-        await mutation.commitFreeholdMutation(
-          transferDeps(t),
-          transferRequest(t, { hearth: true }),
-        ),
-      ).toMatchObject({ kind: 'committed' });
+      expect(await commit(transferDeps(t), transferRequest(t, { hearth: true }))).toMatchObject({
+        kind: 'committed',
+      });
       expect((await hearthOf(t.acct))?.revision).toBe('1');
       const open = intentOf(t.acct, t.ch, { plotId: t.plotId });
       expect(await ops.prepareFreeholdOperation(pool, open)).toEqual({ kind: 'prepared' });
@@ -1674,9 +1672,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
 
     it('eraseFreeholdOperationReceiptsForAccount nulls the same columns for a living account, and only its own', async () => {
       const t = await transferFixture();
-      expect(
-        await mutation.commitFreeholdMutation(transferDeps(t), transferRequest(t)),
-      ).toMatchObject({ kind: 'committed' });
+      expect(await commit(transferDeps(t), transferRequest(t))).toMatchObject({
+        kind: 'committed',
+      });
       const bystander = await transferFixture();
       expect(
         await ops.cancelFreeholdOperation(pool, {
@@ -1755,7 +1753,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       const own = `fm.hooked.${seq()}`;
       const g = gate('after');
       const probe = orderProbe({ ledger: ledgerRead(own), hearth: hearthRead(p.acct) });
-      const hooked = mutation.commitFreeholdMutation(
+      const hooked = commit(
         depsFor({
           characterId: p.ch,
           state: bagsState('housing', 0),
@@ -1797,7 +1795,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       const t = await transferFixture();
       const key = `fm.autosave.${seq()}`;
       const g = gate('before');
-      const hooked = mutation.commitFreeholdMutation(
+      const hooked = commit(
         depsFor({
           characterId: t.ch,
           state: bagsState('housing', 0),
@@ -1891,7 +1889,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       const k1 = `fm-storage-${seq()}`;
       const l1 = `fm.ledger.${seq()}`;
       const firstProbe = probeFor(k1, l1);
-      const committed = await mutation.commitFreeholdMutation(
+      const committed = await commit(
         depsFor({
           characterId: p.ch,
           state: bagsState('bought', 0),
@@ -1917,7 +1915,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       const k2 = `fm-storage-${seq()}`;
       const l2 = `fm.ledger.${seq()}`;
       const secondProbe = probeFor(k2, l2);
-      const refused = await mutation.commitFreeholdMutation(
+      const refused = await commit(
         depsFor({
           characterId: p.ch,
           state: bagsState('refused', 0),
@@ -1947,7 +1945,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       const p = await player();
       const key = `fm-start-${seq()}`;
       const g = gate('after');
-      const hooked = mutation.commitFreeholdMutation(
+      const hooked = commit(
         depsFor({
           characterId: p.ch,
           state: bagsState('housing', 0),
@@ -2026,7 +2024,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         { treasury: treasuryRead, ledger: ledgerRead(k1), hearth: hearthRead(p.acct) },
         { committedTreasury: treasuryRead },
       );
-      const committed = await mutation.commitFreeholdMutation(
+      const committed = await commit(
         depsFor({
           characterId: p.ch,
           state: bagsState('guild', 0),
@@ -2050,7 +2048,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
 
       const k2 = `fm.guild.${seq()}`;
       const second = guildLedger(k2, 300);
-      const refused = await mutation.commitFreeholdMutation(
+      const refused = await commit(
         depsFor({
           characterId: p.ch,
           state: bagsState('guild-refused', 0),
@@ -2124,12 +2122,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
     it('exports claims, intents and receipts by allowlist, and marks receipts past the limit', async () => {
       expect(ops.FREEHOLD_OPERATION_EXPORT_RECEIPT_LIMIT).toBe(200);
       const t = await transferFixture();
-      expect(
-        await mutation.commitFreeholdMutation(
-          transferDeps(t),
-          transferRequest(t, { hearth: true }),
-        ),
-      ).toMatchObject({ kind: 'committed' });
+      expect(await commit(transferDeps(t), transferRequest(t, { hearth: true }))).toMatchObject({
+        kind: 'committed',
+      });
       const open = intentOf(t.acct, t.ch, { plotId: t.plotId });
       expect(await ops.prepareFreeholdOperation(pool, open)).toEqual({ kind: 'prepared' });
       await bulkReceipts(t.acct, 200, `${seq()}`);

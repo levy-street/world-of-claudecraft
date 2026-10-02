@@ -25,10 +25,15 @@
 // server/freehold_mutation_db.ts and every participant's statements in its own
 // *_db.ts module; no GameServer import (the save is injected), so a Vitest
 // drives every arm without a database.
+import {
+  CHARACTER_DELETE_VERIFY_LOCK_TIMEOUT_MS,
+  DELETE_RESTORE_STATEMENT_TIMEOUT_MS,
+} from './character_delete_db';
 import type {
   CharacterSaveHousingHook,
   CharacterSaveHousingQueryable,
 } from './character_save_housing';
+import { CHARACTER_SAVE_SIGNAL_STATEMENT_TIMEOUT_MS } from './character_save_transaction';
 import type { DbTransactionDeadlineClient } from './db_transaction_deadline';
 import {
   type FreeholdClaimFence,
@@ -64,14 +69,15 @@ import {
  *  triggers run at commit (the manifest's section 3, measured), so COMMIT is
  *  bounded by the save's lock_timeout (2 s, the growth budget's lock wait) and
  *  its 65 s wall with the backend cancel. */
-export const FREEHOLD_HOOK_STATEMENT_TIMEOUT_MS = 15_000;
+export const FREEHOLD_HOOK_STATEMENT_TIMEOUT_MS = CHARACTER_SAVE_SIGNAL_STATEMENT_TIMEOUT_MS;
 
-/** The verify's bounds: CHARACTER_DELETE_VERIFY_SQL's (statement 15 s, lock
- *  10 s, idle 2 s) under a wall that covers both. */
+/** The verify's bounds: CHARACTER_DELETE_VERIFY_SQL's (its statement and lock
+ *  bounds, assigned from the character-delete verify's own constants, and an
+ *  idle bound of 2 s) under a wall that covers both. */
 export const FREEHOLD_VERIFY_BOUNDS = Object.freeze({
   operation: 'freehold mutation verify',
-  statementMs: 15_000,
-  lockMs: 10_000,
+  statementMs: DELETE_RESTORE_STATEMENT_TIMEOUT_MS,
+  lockMs: CHARACTER_DELETE_VERIFY_LOCK_TIMEOUT_MS,
   idleMs: 2_000,
   wallMs: 30_000,
 });
@@ -88,6 +94,10 @@ export interface FreeholdOperationApply {
    *  foreign-key lock is one the save already holds at G1. */
   readonly accountId: number;
   readonly fingerprint: string;
+  /** The plot the intent was prepared for (null for a plot-less one). A
+   *  plot-scoped apply writes that plot in the SAME request under the same
+   *  fence and revision, so the receipt's applied revision is that write's. */
+  readonly plotId: string | null;
   readonly fenceGeneration: string | null;
   readonly expectedDurableRev: string | null;
 }
@@ -166,6 +176,14 @@ function addOne(rev: string): string {
 }
 
 function assertRequest(request: FreeholdMutationRequest): void {
+  // The verify needs per-attempt evidence: a Hearth advance token or a plot
+  // write token. A proof-only request has none (it could only ever verify as
+  // unresolved), and an operation's receipt is not per-attempt evidence (any
+  // attempt that closed the intent leaves the same `applied` row), so an
+  // operation rides a token-bearing participant or is refused here.
+  if (request.hearth === null && request.plots.length === 0) {
+    throw new Error('a housing mutation carries a Hearth advance or a plot write');
+  }
   const accounts = new Set(request.accountIds);
   if (request.hearth && !accounts.has(request.hearth.accountId)) {
     throw new Error('the Hearth account must be a declared account participant');
@@ -183,10 +201,37 @@ function assertRequest(request: FreeholdMutationRequest): void {
       throw new Error('an operation account must be a declared account participant');
     }
   }
-  const plotIds = new Set(request.plots.map((plot) => plot.upsert.plotId));
-  if (plotIds.size !== request.plots.length) throw new Error('one write per plot');
+  const writes = new Map(request.plots.map((plot) => [plot.upsert.plotId, plot]));
+  if (writes.size !== request.plots.length) throw new Error('one write per plot');
   const opIds = new Set(request.operations.map((op) => op.operationId));
   if (opIds.size !== request.operations.length) throw new Error('one apply per operation');
+  for (const op of request.operations) {
+    if (op.plotId === null) {
+      if (op.fenceGeneration !== null || op.expectedDurableRev !== null) {
+        throw new Error('a plot-less operation apply carries no fence and no revision');
+      }
+      continue;
+    }
+    const write = writes.get(op.plotId);
+    if (
+      !write ||
+      write.fence.generation !== op.fenceGeneration ||
+      write.upsert.expectedDurableRev !== op.expectedDurableRev
+    ) {
+      throw new Error(
+        'a plot-scoped operation apply writes its own plot under the same fence and revision',
+      );
+    }
+  }
+  for (const proof of request.claimProofs) {
+    const write = writes.get(proof.plotId);
+    if (
+      write &&
+      (write.fence.holder !== proof.holder || write.fence.generation !== proof.generation)
+    ) {
+      throw new Error('a claim proof and a write fence for one plot must agree');
+    }
+  }
 }
 
 /**
@@ -249,6 +294,7 @@ export function createFreeholdSaveHook(
         accountId: op.accountId,
         fingerprint: op.fingerprint,
         outcome: 'applied',
+        plotId: op.plotId,
         fenceGeneration: op.fenceGeneration,
         expectedDurableRev: op.expectedDurableRev,
         appliedDurableRev: op.expectedDurableRev === null ? null : addOne(op.expectedDurableRev),
@@ -273,6 +319,17 @@ export function createFreeholdSaveHook(
         });
       }
       plots.push({ plotId: plot.upsert.plotId, durableRev: result.durableRev });
+    }
+    // The receipts above recorded expected + 1 for each plot-scoped apply; the
+    // CAS just answered the real revision. They cannot differ while the CAS
+    // bumps by one, and if that ever changed this throws (every half rolls
+    // back) rather than commit a receipt naming a revision nobody wrote.
+    for (const op of request.operations) {
+      if (op.plotId === null || op.expectedDurableRev === null) continue;
+      const written = plots.find((plot) => plot.plotId === op.plotId);
+      if (written?.durableRev !== addOne(op.expectedDurableRev)) {
+        throw new Error('a housing receipt revision disagrees with its plot write');
+      }
     }
     // G8.
     let hearth: HookState['hearth'] = null;
@@ -413,13 +470,19 @@ export interface FreeholdMutationDeps {
 }
 
 /**
- * Commit one housing mutation. Never throws: every exit is an outcome.
+ * Commit one housing mutation. Every exit is an outcome; only a malformed
+ * request (a programming error) rejects.
  *
- * `serialize` is the plot store's owner FIFO for a mutation that writes a plot
- * row (taken inside the character FIFO, before the market writer: the
- * manifest's Q3); `onCommitted` runs synchronously inside it right after a
- * proved COMMIT, so a live plan applied there is visible to the store's next
- * write. The verify runs inside the same character-FIFO job.
+ * `serialize` is the plot store's owner FIFO, REQUIRED for a mutation that
+ * writes a plot row (taken inside the character FIFO, before the market writer:
+ * the manifest's Q3): the verify reads the plot's write token, which is sound
+ * only while no store write can re-stamp it. `onCommitted` runs synchronously
+ * inside it right after a proved COMMIT, so a live plan applied there is
+ * visible to the store's next write; it must not throw, and a throw is
+ * swallowed so it can never rewrite a proved commit into a failure. A save
+ * that throws AFTER a proved COMMIT (a legacy tail, a host hook) is still
+ * `committed`: the durable halves stand. The verify runs inside the same
+ * character-FIFO job.
  */
 export async function commitFreeholdMutation(
   deps: FreeholdMutationDeps,
@@ -432,6 +495,9 @@ export async function commitFreeholdMutation(
     ) => void;
   } = {},
 ): Promise<FreeholdMutationOutcome> {
+  if (request.plots.length > 0 && !opts.serialize) {
+    throw new Error('a housing mutation that writes a plot runs inside the plot store FIFO');
+  }
   let built!: ReturnType<typeof createFreeholdSaveHook>;
   const committedOutcome = (verified: boolean) =>
     ({
@@ -455,15 +521,26 @@ export async function commitFreeholdMutation(
       throw error;
     }
   };
+  const runOnCommitted = (verified: boolean) => {
+    try {
+      opts.onCommitted?.(committedOutcome(verified));
+    } catch {
+      // Contract: onCommitted does not throw. The durable halves committed, so
+      // a live apply that throws is the caller's to repair on its next
+      // authoritative reload; it never turns the outcome into a failure.
+    }
+  };
   // Around the whole FIFO job: the live apply right after a proved commit,
-  // inside the plot store's owner FIFO when the caller serializes.
+  // inside the plot store's owner FIFO when the caller serializes. A job that
+  // throws AFTER its commit still applies: the commit stands.
   const applyAfterCommit = async <T>(job: () => Promise<T>): Promise<T> => {
     try {
       const result = await job();
-      if (built.state.committed) opts.onCommitted?.(committedOutcome(false));
+      if (built.state.committed) runOnCommitted(false);
       return result;
     } catch (error) {
-      if (built.state.verify === 'landed') opts.onCommitted?.(committedOutcome(true));
+      if (built.state.committed) runOnCommitted(false);
+      else if (built.state.verify === 'landed') runOnCommitted(true);
       throw error;
     }
   };
@@ -477,6 +554,9 @@ export async function commitFreeholdMutation(
   try {
     await deps.save(built.hook);
   } catch (error) {
+    // A proved COMMIT stands whatever threw after it (a legacy tail in the
+    // save, a host hook), so it is never reported as proved-not-committed.
+    if (built.state.committed) return committedOutcome(false);
     if (error instanceof FreeholdMutationRefused)
       return { kind: 'refused', refusal: error.refusal };
     const verdict = built.state.verify;

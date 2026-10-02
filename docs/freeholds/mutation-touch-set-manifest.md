@@ -462,19 +462,10 @@ subtracted, so a BigInt or a throwing `valueOf` cannot throw there though the cl
 and the signal still bounds the pass, so a clock that THROWS is the only mid-pass clock
 rejection. A finite BACKWARD mid-pass reading (a wall clock stepped back) is compared with
 the start like any other and gives a negative difference, so it never trips the clock half
-until the clock catches up; the signal still bounds the pass. So the pass rejects in exactly
-these cases, the list the renewer's JSDoc and the periodic flush's member doc state word for
-word (production binds `Date.now` and no injected deadline, so it meets none of them): an
-injected `passDeadlineMs` that is not a whole number of ms from 1 to 2^31 - 1, the range
-`AbortSignal.timeout` honours (suites only): a `RangeError` before anything runs; a `nowMs`
-start reading that throws (even from a clock port that started a pass itself first: that
-pass runs on): before this call takes the flag, so a later call on a sane clock runs once
-the flag is free; a `nowMs` start reading that is not a finite number while no pass runs
-(the flag is re-checked first, so a clock port that started a pass itself leaves this call a
-counted skip instead): before this call takes the flag, so a later call on a sane clock runs
-once the flag is free; a `nowMs` that throws at a deadline check mid-pass: the pass stops
-there with that error; an injected `deadlineSignal` factory that throws (suites only): after
-the wanted tests and before any statement. (Node clamps 0, and anything from 2^31 to 2^32 -
+until the clock catches up; the signal still bounds the pass. The cases in which the pass
+rejects are listed ONCE, in `renewFreeholdClaims`'s JSDoc
+(`server/freehold_claim_registry.ts`); production binds `Date.now` and no injected deadline,
+so it meets none of them. (Node clamps 0, and anything from 2^31 to 2^32 -
 1, to 1 ms, which would abandon every chunk of every pass, so those clamped values are
 refused, like every other value outside 1 to 2^31 - 1, rather than handed on.) The closing
 read, and the duration taken from it, run while the flag is still held (a clock that calls

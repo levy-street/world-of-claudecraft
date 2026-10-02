@@ -41,7 +41,8 @@ const PINNED_SQL = `SELECT watched.table_name,
        relation.oid IS NOT NULL AS present,
        relation.reltuples::float8 AS reltuples,
        pg_catalog.pg_total_relation_size(relation.oid) AS total_bytes
-  FROM (VALUES (1, 'freehold_operation_receipts'::text, pg_catalog.to_regclass('public.freehold_operation_receipts'))) AS watched(slot, table_name, relid)
+  FROM (VALUES (1, 'freehold_operation_receipts'::text, pg_catalog.to_regclass('freehold_operation_receipts')),
+               (2, 'freehold_plot_claims'::text, pg_catalog.to_regclass('freehold_plot_claims'))) AS watched(slot, table_name, relid)
   LEFT JOIN pg_catalog.pg_class AS relation ON relation.oid = watched.relid
  ORDER BY watched.slot`;
 
@@ -83,12 +84,41 @@ const presentRow = (reltuples: unknown, totalBytes: unknown): FreeholdReceiptGro
   totalBytes,
 });
 
+/** The second watched table (the keep-forever plot claims), present and
+ *  vacuumed: every whole answer carries it after the receipts row. */
+const CLAIMS_ROW: FreeholdReceiptGrowthRow = {
+  table: 'freehold_plot_claims',
+  present: true,
+  reltuples: 7,
+  totalBytes: '8192',
+};
+const CLAIMS_RAW = {
+  table_name: 'freehold_plot_claims',
+  present: true,
+  reltuples: 7,
+  total_bytes: '8192',
+};
+const CLAIMS_READING = {
+  table: 'freehold_plot_claims',
+  present: true,
+  rowsEstimate: 7,
+  bytes: 8192,
+};
+/** One whole answer, in list order: the receipts row given, then the claims. */
+const pass = (receipts: FreeholdReceiptGrowthRow): FreeholdReceiptGrowthRow[] => [
+  receipts,
+  CLAIMS_ROW,
+];
+
 describe('freehold receipt growth monitor: the catalog read', () => {
   it('pins its low-frequency and fail-fast bounds and the watched list', () => {
     expect(FREEHOLD_RECEIPT_GROWTH_MONITOR_INTERVAL_MS).toBe(60_000);
     expect(FREEHOLD_RECEIPT_GROWTH_MONITOR_WALL_TIMEOUT_MS).toBe(1_500);
     expect(FREEHOLD_RECEIPT_GROWTH_MONITOR_STATEMENT_TIMEOUT_MS).toBe(1_000);
-    expect([...FREEHOLD_RECEIPT_GROWTH_TABLES]).toEqual(['freehold_operation_receipts']);
+    expect([...FREEHOLD_RECEIPT_GROWTH_TABLES]).toEqual([
+      'freehold_operation_receipts',
+      'freehold_plot_claims',
+    ]);
     expect(Object.isFrozen(FREEHOLD_RECEIPT_GROWTH_TABLES)).toBe(true);
   });
 
@@ -117,6 +147,7 @@ describe('freehold receipt growth monitor: the catalog read', () => {
             reltuples: 1234,
             total_bytes: '57344',
           },
+          CLAIMS_RAW,
         ]);
       }
       return result([]);
@@ -128,7 +159,7 @@ describe('freehold receipt growth monitor: the catalog read', () => {
 
     await expect(
       readFreeholdReceiptGrowth(availablePool(vi.fn(async () => client)), idleDeadline),
-    ).resolves.toEqual([presentRow(1234, '57344')]);
+    ).resolves.toEqual(pass(presentRow(1234, '57344')));
     expect(queryMock.mock.calls.map(([text]) => text)).toEqual([
       'SET statement_timeout = 1000',
       PINNED_SQL,
@@ -146,6 +177,7 @@ describe('freehold receipt growth monitor: the catalog read', () => {
       if (text === PINNED_SQL) {
         return result([
           { table_name: 'freehold_operation_receipts', present: false, reltuples: null },
+          CLAIMS_RAW,
         ]);
       }
       return result([]);
@@ -163,6 +195,7 @@ describe('freehold receipt growth monitor: the catalog read', () => {
         reltuples: null,
         totalBytes: undefined,
       },
+      CLAIMS_ROW,
     ]);
     expect(release).toHaveBeenCalledWith(resetError);
   });
@@ -329,12 +362,13 @@ describe('freehold receipt growth monitor: the catalog read', () => {
 
 describe('freehold receipt growth monitor: decoding and the readout', () => {
   it('renders the -1 never-vacuumed estimate as unknown, never as zero rows', () => {
-    expect(decodeFreeholdReceiptGrowthRows([presentRow(-1, '16384')])).toEqual([
+    expect(decodeFreeholdReceiptGrowthRows(pass(presentRow(-1, '16384')))).toEqual([
       { table: 'freehold_operation_receipts', present: true, rowsEstimate: null, bytes: 16384 },
+      CLAIMS_READING,
     ]);
     // A real zero (vacuumed, empty) stays a known zero, and an estimate rounds.
-    expect(decodeFreeholdReceiptGrowthRows([presentRow(0, '8192')])?.[0]?.rowsEstimate).toBe(0);
-    expect(decodeFreeholdReceiptGrowthRows([presentRow(1234.6, 8192)])?.[0]?.rowsEstimate).toBe(
+    expect(decodeFreeholdReceiptGrowthRows(pass(presentRow(0, '8192')))?.[0]?.rowsEstimate).toBe(0);
+    expect(decodeFreeholdReceiptGrowthRows(pass(presentRow(1234.6, 8192)))?.[0]?.rowsEstimate).toBe(
       1235,
     );
   });
@@ -347,39 +381,51 @@ describe('freehold receipt growth monitor: decoding and the readout', () => {
       bytes: null,
     };
     expect(
-      decodeFreeholdReceiptGrowthRows([
-        { table: 'freehold_operation_receipts', present: false, reltuples: null, totalBytes: null },
-      ]),
-    ).toEqual([absent]);
+      decodeFreeholdReceiptGrowthRows(
+        pass({
+          table: 'freehold_operation_receipts',
+          present: false,
+          reltuples: null,
+          totalBytes: null,
+        }),
+      ),
+    ).toEqual([absent, CLAIMS_READING]);
     // Dropped between to_regclass and the size read: a NULL size is absence too.
-    expect(decodeFreeholdReceiptGrowthRows([presentRow(5, null)])).toEqual([absent]);
+    expect(decodeFreeholdReceiptGrowthRows(pass(presentRow(5, null)))).toEqual([
+      absent,
+      CLAIMS_READING,
+    ]);
   });
 
   it.each([
     ['no row', []],
-    ['an extra row', [presentRow(1, '1'), presentRow(1, '1')]],
-    ['a table outside the fixed list', [{ ...presentRow(1, '1'), table: 'accounts' }]],
-    ['a non-boolean presence flag', [{ ...presentRow(1, '1'), present: 't' }]],
-    ['an undecodable estimate', [presentRow('not-a-number', '1')]],
-    ['a null estimate on a present table', [presentRow(null, '1')]],
-    ['a negative size', [presentRow(1, '-5')]],
-    ['an unsafe size', [presentRow(1, '9007199254740993')]],
+    ['a missing second table', [presentRow(1, '1')]],
+    ['an extra row', [presentRow(1, '1'), CLAIMS_ROW, CLAIMS_ROW]],
+    ['the two tables out of list order', [CLAIMS_ROW, presentRow(1, '1')]],
+    ['a table outside the fixed list', pass({ ...presentRow(1, '1'), table: 'accounts' })],
+    ['a non-boolean presence flag', pass({ ...presentRow(1, '1'), present: 't' })],
+    ['an undecodable estimate', pass(presentRow('not-a-number', '1'))],
+    ['a null estimate on a present table', pass(presentRow(null, '1'))],
+    ['a negative size', pass(presentRow(1, '-5'))],
+    ['an unsafe size', pass(presentRow(1, '9007199254740993'))],
+    ['a malformed second row alone', [presentRow(1, '1'), { ...CLAIMS_ROW, totalBytes: '-1' }]],
   ])('refuses a malformed answer: %s', (_label, rows) => {
     expect(decodeFreeholdReceiptGrowthRows(rows as FreeholdReceiptGrowthRow[])).toBeNull();
   });
 
   it('projects an accepted pass into the scrape readout and leaves it on a refused one', () => {
-    expect(observeFreeholdReceiptGrowth([presentRow(42, '24576')], 5_000)).toBe(true);
+    expect(observeFreeholdReceiptGrowth(pass(presentRow(42, '24576')), 5_000)).toBe(true);
     const accepted = freeholdReceiptGrowthReadout();
     expect(accepted).toEqual({
       tables: [
         { table: 'freehold_operation_receipts', present: true, rowsEstimate: 42, bytes: 24576 },
+        CLAIMS_READING,
       ],
       observedAtMs: 5_000,
     });
 
-    expect(observeFreeholdReceiptGrowth([presentRow('bad', '1')], 6_000)).toBe(false);
-    expect(observeFreeholdReceiptGrowth([presentRow(1, '1')], Number.NaN)).toBe(false);
+    expect(observeFreeholdReceiptGrowth(pass(presentRow('bad', '1')), 6_000)).toBe(false);
+    expect(observeFreeholdReceiptGrowth(pass(presentRow(1, '1')), Number.NaN)).toBe(false);
     expect(freeholdReceiptGrowthReadout()).toEqual(accepted);
   });
 });
@@ -482,9 +528,13 @@ describe('freehold receipt growth monitor: lifecycle and admission', () => {
       ...PORTS,
       pool: availablePool(),
       tryAcquireBackgroundPermit: () => ({ release }),
-      read: async () => [
-        { table: 'freehold_operation_receipts', present: false, reltuples: null, totalBytes: null },
-      ],
+      read: async () =>
+        pass({
+          table: 'freehold_operation_receipts',
+          present: false,
+          reltuples: null,
+          totalBytes: null,
+        }),
       onError,
     });
 
@@ -493,6 +543,7 @@ describe('freehold receipt growth monitor: lifecycle and admission', () => {
     expect(onError).not.toHaveBeenCalled();
     expect(freeholdReceiptGrowthReadout().tables).toEqual([
       { table: 'freehold_operation_receipts', present: false, rowsEstimate: null, bytes: null },
+      CLAIMS_READING,
     ]);
     expect(release).toHaveBeenCalledTimes(1);
   });
@@ -517,7 +568,7 @@ describe('freehold receipt growth monitor: lifecycle and admission', () => {
     });
     const refresh = monitor.refresh();
     await vi.waitFor(() => expect(order).toEqual(['clock', 'read']));
-    finishRead([presentRow(-1, '8192')]);
+    finishRead(pass(presentRow(-1, '8192')));
     await refresh;
 
     // One clock reading, taken before the read: the age describes the snapshot.
@@ -525,6 +576,7 @@ describe('freehold receipt growth monitor: lifecycle and admission', () => {
     expect(freeholdReceiptGrowthReadout()).toEqual({
       tables: [
         { table: 'freehold_operation_receipts', present: true, rowsEstimate: null, bytes: 8192 },
+        CLAIMS_READING,
       ],
       observedAtMs: 1_000,
     });
@@ -552,7 +604,7 @@ describe('freehold receipt growth monitor: lifecycle and admission', () => {
       .fn()
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([presentRow(1, '1')])
+      .mockResolvedValueOnce(pass(presentRow(1, '1')))
       .mockRejectedValueOnce(new Error('next streak'));
     const monitor = createFreeholdReceiptGrowthMonitor({
       ...PORTS,
@@ -672,7 +724,7 @@ describe('freehold receipt growth monitor: lifecycle and admission', () => {
     await Promise.resolve();
     expect(stopReturned).toBe(false);
 
-    finishRead([presentRow(999, '1')]);
+    finishRead(pass(presentRow(999, '1')));
     await stop;
     await refresh;
     expect(stopReturned).toBe(true);

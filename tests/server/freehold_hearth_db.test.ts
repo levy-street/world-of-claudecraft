@@ -142,20 +142,22 @@ describe('the DDL', () => {
       1,
     );
     expect(table).not.toContain('advance_token TEXT NOT NULL');
-    // The constraint is NAMED, exactly twice in the whole fragment (the table and
-    // the probe's ALTER), never a third anonymous copy.
-    expect(count(code, 'CONSTRAINT account_freehold_hearth_advance_token_shape')).toBe(2);
+    // The constraint is NAMED, exactly three times in the whole fragment (the
+    // table, the column probe's ALTER, and the constraint repair's ALTER),
+    // never an anonymous copy: the check text appears once per named site.
+    expect(count(code, 'CONSTRAINT account_freehold_hearth_advance_token_shape')).toBe(3);
     expect(count(code, "CHECK (advance_token IS NULL OR advance_token ~ '^[0-9a-f]{32}$')")).toBe(
-      2,
+      3,
     );
   });
 
   it('adds the column to an older table only behind a catalog probe, so a reboot issues no ALTER', () => {
     const code = codeOnly(FREEHOLD_HEARTH_SCHEMA);
-    // The positive pin the probe exists for: the ALTER is present, and it is
-    // the only one.
+    // The positive pin the probe exists for: the column ALTER is present once,
+    // and the only other ALTER is the constraint repair behind its own probe.
     expect(count(code, 'ADD COLUMN IF NOT EXISTS advance_token TEXT')).toBe(1);
-    expect(count(code, 'ALTER TABLE')).toBe(1);
+    expect(count(code, 'ALTER TABLE')).toBe(2);
+    expect(count(code, 'ADD CONSTRAINT account_freehold_hearth_advance_token_shape')).toBe(1);
     expect(count(code, 'DO $freehold_hearth_advance_token$')).toBe(1);
     expect(count(code, '$freehold_hearth_advance_token$;')).toBe(1);
     // The probe reads pg_attribute for THIS table's live column, by the
@@ -167,10 +169,20 @@ describe('the DDL', () => {
     // would take ACCESS EXCLUSIVE at every boot, probe or no probe.
     const probeAt = code.indexOf(probe);
     const alterAt = code.indexOf('ALTER TABLE "public".account_freehold_hearth');
+    // The constraint repair's own probe reads pg_constraint by NAME for THIS
+    // table, and its ALTER adds the check NOT VALID (no boot scans old rows).
+    const constraintProbe =
+      "ELSIF NOT EXISTS (\n    SELECT 1 FROM pg_catalog.pg_constraint\n     WHERE conrelid = to_regclass('\"public\".account_freehold_hearth')\n       AND conname = 'account_freehold_hearth_advance_token_shape'\n       AND contype = 'c'\n  ) THEN";
+    expect(count(code, constraintProbe)).toBe(1);
+    const constraintProbeAt = code.indexOf(constraintProbe);
+    const repairAt = code.indexOf('ADD CONSTRAINT account_freehold_hearth_advance_token_shape');
+    expect(code.slice(repairAt).indexOf('NOT VALID;')).toBeGreaterThan(0);
     const endIfAt = code.indexOf('END IF;');
     expect(probeAt).toBeGreaterThan(code.indexOf('DO $freehold_hearth_advance_token$'));
     expect(alterAt).toBeGreaterThan(probeAt);
-    expect(endIfAt).toBeGreaterThan(alterAt);
+    expect(constraintProbeAt).toBeGreaterThan(alterAt);
+    expect(repairAt).toBeGreaterThan(constraintProbeAt);
+    expect(endIfAt).toBeGreaterThan(repairAt);
     // And the CREATE TABLE comes first, so a fresh database never needs the ALTER.
     expect(
       code.indexOf('CREATE TABLE IF NOT EXISTS "public".account_freehold_hearth'),

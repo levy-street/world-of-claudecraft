@@ -24,19 +24,27 @@ export interface FreeholdAccountExport {
   readonly freeholdOperationReceipts: unknown[];
 }
 
+/** Every read on ONE checked-out client, in sequence: an export in a brownout
+ *  queues for a pool client once, not once per read. No transaction: each read
+ *  is its own bounded allowlist, as before. */
 export async function freeholdAccountExport(
-  pool: Pool,
+  pool: Pick<Pool, 'connect'>,
   accountId: number,
 ): Promise<FreeholdAccountExport> {
-  const freeholds = await freeholdsForExport(pool, accountId);
-  const freeholdHearth = await freeholdHearthForExport(pool, accountId);
-  const freeholdClaims = await freeholdClaimsForExport(pool, accountId);
-  const operations = await freeholdOperationsForExport(pool, accountId);
-  return {
-    freeholds,
-    freeholdHearth,
-    freeholdClaims,
-    freeholdOperations: operations.intents,
-    freeholdOperationReceipts: operations.receipts,
-  };
+  const client = await pool.connect();
+  try {
+    const freeholds = await freeholdsForExport(client, accountId);
+    const freeholdHearth = await freeholdHearthForExport(client, accountId);
+    const freeholdClaims = await freeholdClaimsForExport(client, accountId);
+    const operations = await freeholdOperationsForExport(client, accountId);
+    return {
+      freeholds,
+      freeholdHearth,
+      freeholdClaims,
+      freeholdOperations: operations.intents,
+      freeholdOperationReceipts: operations.receipts,
+    };
+  } finally {
+    client.release();
+  }
 }
