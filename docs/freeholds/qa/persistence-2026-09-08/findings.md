@@ -5935,9 +5935,16 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   should-fix, every reader passing, five with no should-fix. The range classifier cut an alias's
   tail whole and left a build-metadata or separator widening unproven; after one more form in each
   of three rounds, the pin reads each spec by its shape and pins every other spec by name with its
-  whole shape. The rest were comment and record wording and a pointer to the ledger. A reader's
-  command downloaded Electron into `node_modules` by mistake; it was removed. Fixed in
-  `2c3244385b`.
+  whole shape. The rest were two more widenings, comment and record wording and a pointer to the
+  ledger (worded so in round fifty-nine, Q59R2). A reader's command downloaded Electron into
+  `node_modules/electron` and the user cache by mistake; those files were removed (worded so in
+  round fifty-nine, Q59R3). Fixed in `2c3244385b`.
+- ROUND FIFTY-NINE, eight fresh readers over round fifty-eight: 16 findings, none blocking, 2
+  should-fix, every reader passing, six with no should-fix. The shape read wrote an alias's
+  package-name digits as 0, so a spec that is not plain is now pinned as written; three of the
+  four dependency tables were unproven, so every table is now proven read on a sample. The rest
+  were record and ledger wording, a commit body and samples of the boundary on a number's value.
+  Fixed in `1b00d9801e`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5963,12 +5970,14 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - The renewer guard's `package.json` pin read a dependency spec as a version range by its first
   character, so a tarball or path spec led by a digit or a tilde, which pnpm installs from a local
   path rather than the registry, passed as one (round fifty-six, T56R1; worded so in round
-  fifty-seven, L57R2); so did a spec semver rejects, led by `^` and ending in a tarball name, a
-  prerelease with an empty identifier or an overlong number (round fifty-seven, C57R1; worded so
-  in round fifty-eight, C58R2), and an alias whose tail the pin cut whole (round fifty-eight,
-  S58R1). The pin now reads each spec by its shape, its digit runs written 0: only `0.0.0`, led by
-  nothing, `^` or `~`, is a plain range, and every other spec is pinned by name with its whole
-  shape.
+  fifty-seven, L57R2); so did a spec semver rejects, a prerelease with an empty identifier or an
+  overlong number, led by `^` and ending in a tarball name (round fifty-seven, C57R1; worded so in
+  round fifty-eight, C58R2, and round fifty-nine, L59R2). An alias with any tail read as one of
+  the two pinned aliases, since the pin cut its tail whole (round fifty-eight, S58R1; worded so in
+  round fifty-nine, C59R1), and the shape read that followed wrote an alias's package-name digits
+  as 0, so an alias to a sibling package kept its shape (round fifty-nine, S59R1). The pin now
+  takes a spec as plain only when its shape, its digit runs written 0, is `0.0.0`, led by nothing,
+  `^` or `~`, and pins every other spec by name as written, every table proven read.
 
 ### EVIDENCE
 
@@ -5979,7 +5988,8 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then
   648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648,
   then 648, then 648, then 648, then 649, then 649, then 649, then 649, then 649, then 649, then
-  649, then 649, then 649, then 649, then 649, then 649, then 649, then 649 passed, never a skip.
+  649, then 649, then 649, then 649, then 649, then 649, then 649, then 649, then 649 passed,
+  never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):

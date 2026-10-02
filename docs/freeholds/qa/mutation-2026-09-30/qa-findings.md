@@ -4521,9 +4521,10 @@ overlong number and a wider range are listed, proven on samples of each, of a pr
 a tarball name and of one holding a path; the renewer guard's summary names override specs and
 plain ranges; the bundle read's package rule comment says two tracked-file checks after the pin;
 the ws rule's sample holds a file named `node_modules`; the manifest's fifty-seventh entry; kept
-whole for bisect; its body, which says such a spec fell through to pnpm's local resolver and that
-the samples hold each widening that reopens the gap, stays as it is, noted in round fifty-eight,
-C58R2 and T58R1), and the commit that adds this section.
+whole for bisect; its body, which says a spec ending in a tarball name fell through to pnpm's
+local resolver (worded so in round fifty-nine, L59R3), and that the samples hold each widening
+that reopens the gap, stays as it is, noted in round fifty-eight, C58R2 and T58R1), and the commit
+that adds this section.
 
 | Reader | Verdict | Findings |
 |---|---|---|
@@ -4585,9 +4586,10 @@ or `~`, as a plain range, and pins every other spec by name with its whole shape
 with their tails; samples of a prerelease, build metadata, a tarball ending, a slash between or
 before the numbers, a repeated or dot prefix, a literal `N.N.N`, wider ranges, paths, a tag, a
 link and alias tails; the comments say the pin reads specs by their shape; the manifest's
-fifty-eighth entry; kept whole for bisect), and the commit that adds this section. Six readers ran
-twice: a network error ended their first runs before they reported, and their second runs, over
-the same tip, are the ones recorded.
+fifty-eighth entry; kept whole for bisect; its body, whose parenthesis names this round's forms
+only, stays as it is, noted in round fifty-nine, C59R2), and the commit that adds this section.
+Six readers ran twice: a network error ended their first runs before they reported, and their
+second runs, over the same tip, are the ones recorded.
 
 | Reader | Verdict | Findings |
 |---|---|---|
@@ -4633,11 +4635,70 @@ the user cache; those files were removed, and no tracked file changed.
   `0.0.0`, led by nothing, `^` or `~`, as a plain range, and pins every other spec by name with
   its whole shape, so an alias keeps its tail; a number's value is not read, a stated boundary,
   since pnpm takes a spec with a leading zero or an overlong number from the registry or fails;
-  samples hold each form the readers named; the comments say so; C57R1's disposition notes it;
-  `138e7bd758`'s body, which says the samples held each widening that reopens the gap, stays as it
-  is). T58R2 FIXED (see T58R1). T58R3 FIXED (see T58R1).
+  samples hold each form the readers named; the comments say so; C57R1's disposition and the
+  ledger's item under WHAT IT FOUND THAT WAS NOT A COMMENT note it, named so in round fifty-nine,
+  Q59R1; `138e7bd758`'s body, which says the samples held each widening that reopens the gap,
+  stays as it is; a spec that is not plain pinned as written, and every table proven read, from
+  round fifty-nine, S59R1 and T59R1). T58R2 FIXED (see T58R1). T58R3 FIXED (see T58R1).
 - L58R1 FIXED (see C58R1). L58R2 FIXED (see C58R1). L58R3 FIXED (see T58R1).
 - Mutants on this round's shape read, each killed and its source restored: the shape writing only
   the first digit run, absorbing a slash with the digits, and with an alias's tail cut again, each
   at the pin over the real specs; a two-number shape taken as plain, the shape absorbing a tarball
   ending after a number, and a repeated prefix taken as one, each at the samples.
+
+## Round fifty-nine: eight fresh readers over round fifty-eight (`e289b68462..c73737285c`)
+
+Round fifty-nine's commits: `1b00d9801e` (the `package.json` pin still takes a spec as plain by
+its shape and now pins every other spec by name as written, so an alias keeps the package it names
+and a bump of a listed spec is a review prompt; the four tables are read through one function,
+proven on a sample with one listed spec in each, in their order; a leading zero and an overlong
+number are shown plain, and an alias to a sibling `@typescript` package is a sample; the comments
+say so; the manifest's fifty-ninth entry; kept whole for bisect), and the commit that adds this
+section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C59R1, C59R2 |
+| qa-checklist | PASS | Q59R1 to Q59R3 |
+| server hot path | PASS | none |
+| privacy and security | PASS | S59R1, S59R2 |
+| database performance | PASS | none |
+| test coverage | PASS | T59R1 to T59R3 |
+| docs librarian | PASS | L59R1 to L59R6 |
+| migration safety | PASS | none |
+
+16 findings: none blocking, 2 should-fix (S59R1, T59R1), 14 nice-to-have, every reader passing,
+and six (correctness, qa-checklist, server hot path, database performance, docs librarian,
+migration safety) with no should-fix, three of them with no finding at all. One reader found the
+shape read writing an alias's package-name digits as 0 too, so an alias to a sibling package kept
+the pinned shape and passed; a spec that is not plain is now pinned as written. One found three of
+the four dependency tables unproven, since both listed specs sit in one, so a dropped table, the
+one holding ws included, passed; every table is now proven read on a sample. The rest were the
+record's and the ledger's account of round fifty-eight (a pointer to the ledger, the wording of
+the range finding, the other widenings and the Electron cache), a commit body's parenthesis, the
+antecedent of a note on round fifty-seven, two notes on how far the shape read reaches, and
+samples of the boundary on a number's value.
+
+- C59R1 FIXED in the ledger (with T59R2 and L59R2: its item under WHAT IT FOUND THAT WAS NOT A
+  COMMENT groups the range finding as the record does and says an alias with any tail read as one
+  of the two pinned aliases). C59R2 FIXED in this record (with L59R4: round fifty-eight's intro
+  says `2c3244385b`'s body, whose parenthesis names that round's forms only, stays as it is).
+- Q59R1 FIXED in this record (with L59R1: T58R1's disposition names the ledger's item under WHAT
+  IT FOUND THAT WAS NOT A COMMENT). Q59R2 FIXED in the ledger (its ROUND FIFTY-EIGHT names the two
+  more widenings). Q59R3 FIXED in the ledger (with L59R5: its ROUND FIFTY-EIGHT says Electron went
+  into `node_modules/electron` and the user cache).
+- S59R1 FIXED `1b00d9801e` (with S59R2 and T59R3: a spec that is not plain is pinned by name as
+  written, so an alias keeps the package it names and a name's digits are read, proven on a sample
+  of an alias to `@typescript/typescript7`; a bump of a listed spec is a review prompt; the
+  comments say so; T58R1's disposition notes it). S59R2 FIXED (see S59R1).
+- T59R1 FIXED `1b00d9801e` (the four tables are read through one function, proven on a sample with
+  one listed spec in each, in their order, and a plain spec in the first; T58R1's disposition
+  notes it). T59R2 FIXED (see C59R1). T59R3 FIXED (see S59R1).
+- L59R1 FIXED (see Q59R1). L59R2 FIXED (see C59R1). L59R3 FIXED in this record (round
+  fifty-seven's intro says its body names a spec ending in a tarball name). L59R4 FIXED (see
+  C59R2). L59R5 FIXED (see Q59R3). L59R6 FIXED `1b00d9801e` (a leading zero and an overlong number
+  are shown plain on samples).
+- Mutants on this round's table read, listed specs and samples, each killed and its source
+  restored: the dependencies, optionalDependencies and overrides tables each dropped, the tables
+  read out of order, and a listed spec shaped again, each at the table sample; and the shape
+  reading a leading zero, at the plain samples.
