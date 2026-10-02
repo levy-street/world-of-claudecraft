@@ -2164,15 +2164,16 @@ the terminate rule needs no case for it.
   (see T28R4).
 - L28R1 FIXED `5c37d09029` (with C28R5, Q28R8 and H28R1: the stall readings read `healthy` or
   `Exited` in `sudo docker compose ps --all`; C27R3's disposition notes it (round twenty-nine,
-  L29R2)). L28R2 FIXED `5c37d09029` (step 6 gives its reason: `up -d` runs each service on its new
-  image). L28R3 FIXED `5c37d09029` (the bot's release caveat recreates it with `--no-deps`; a
-  restart keeps its old image; by the bot's guarded line once the realm is verified, a
-  lever-stopped bot left stopped, from round thirty-three, S33R2, noted in round thirty-four,
-  Q34R2). L28R4 FIXED in this record (round twenty-seven's dispositions name the earlier text each
-  edited: C27R1, C27R2, C27R3, C27R6, Q27R1 and L27R6, the ledger's note by Q28R2; listed in round
-  twenty-nine, Q29R5). L28R5 FIXED in this record (six readers; round twenty-seven's summary notes
-  it (round twenty-nine, L29R2)). L28R6 FIXED `5c37d09029` (the dump route's statement ends any
-  other waiter for that lock with it).
+  L29R2); the stall-over reading also `Created` for one never started from round thirty-four,
+  C34R1, noted in round thirty-five, Q35R3). L28R2 FIXED `5c37d09029` (step 6 gives its reason:
+  `up -d` runs each service on its new image). L28R3 FIXED `5c37d09029` (the bot's release caveat
+  recreates it with `--no-deps`; a restart keeps its old image; by the bot's guarded line once the
+  realm is verified, a lever-stopped bot left stopped, from round thirty-three, S33R2, noted in
+  round thirty-four, Q34R2). L28R4 FIXED in this record (round twenty-seven's dispositions name
+  the earlier text each edited: C27R1, C27R2, C27R3, C27R6, Q27R1 and L27R6, the ledger's note by
+  Q28R2; listed in round twenty-nine, Q29R5). L28R5 FIXED in this record (six readers; round
+  twenty-seven's summary notes it (round twenty-nine, L29R2)). L28R6 FIXED `5c37d09029` (the dump
+  route's statement ends any other waiter for that lock with it).
 ## Round twenty-nine: eight fresh readers over round twenty-eight (`a430d838ad..84ea7d4b8d`)
 
 Round twenty-nine's commits: `e8582aacc9` (DEPLOY: the sign-out runs in psql's default autocommit
@@ -2623,7 +2624,8 @@ the bot as lifting it, and the unit scan lists every start site whole.
   edit without the bot's `up` while the lever holds; the reason given against `start` and
   `restart` reads "need not be"; H32R2's disposition notes it). S33R2 FIXED `d987076ce9` (the
   release caveat moves the bot by the guarded line once the realm is verified, a lever-stopped bot
-  left stopped, and the unit scan drops its old start site; L28R3's disposition notes it).
+  left stopped, and the unit scan drops its old start site; L28R3's disposition notes it (round
+  thirty-four, Q34R2)).
 - D33R1 FIXED (see M33R1).
 - T33R1 FIXED `d987076ce9` and in this record (the `Cost:` header is the Duration line's tests
   time at one worker, 13.3 s; round thirty-two's 11.0 s left out the file's hooks, and
@@ -2695,8 +2697,9 @@ of alias forms. Round thirty-three edited eight of round thirty-two's dispositio
 seven as its evidence said.
 
 - C34R1 FIXED `8d7ad08a07` (with L34R1 and S34R1: the stall-over reading accepts a realm container
-  left `Created`, one never started, as the sign-out check does). C34R2 FIXED (see D34R1). C34R3
-  FIXED (see D34R1). C34R4 FIXED (see T34R3).
+  left `Created`, one never started, as the sign-out check does; L28R1's disposition notes it
+  (round thirty-five, Q35R3); its wording pinned from round thirty-five, T35R3). C34R2 FIXED (see
+  D34R1). C34R3 FIXED (see D34R1). C34R4 FIXED (see T34R3).
 - Q34R1 FIXED `8d7ad08a07` (the release steps re-stop the bot if the third lever held before such
   a start, which lifts it; C32R1's disposition notes it). Q34R2 FIXED in this record (L28R3 notes
   S33R2's change, and S33R2 names it back). Q34R3 FIXED by rewording that commit's body before
@@ -2707,8 +2710,8 @@ seven as its evidence said.
 - H34R1 FIXED (see D34R1). H34R2 FIXED `8d7ad08a07` (the other-database control asks only that the
   unscoped lookup contain the hand drop's pid, so another database's drop on a shared server
   cannot fail it). H34R3 FIXED `8d7ad08a07` (a failed order in the sign-out case terminates every
-  backend it left waiting before its clients end, so no queued statement commits after the test).
-  H34R4 FIXED (see T34R3).
+  backend it left waiting before its clients end, so no queued statement commits after the test;
+  only this database's live sessions from round thirty-five, M35R2). H34R4 FIXED (see T34R3).
 - S34R1 FIXED (see C34R1). S34R2 FIXED (see T34R3).
 - D34R1 FIXED `8d7ad08a07` (with H34R1, C34R2, T34R1, C34R3 and D34R3: a rerun that waits is
   followed by the naming statement, pid after pid, until it names none, and the last session named
@@ -2717,27 +2720,103 @@ seven as its evidence said.
   reads the whole chain on the rows (`tuple`) and on the table (`relation`), each realm's socket
   destroyed first so its backend keeps its place, the open sign-out naming none, and in the dump
   case a rerun behind the stopped boot names the boot, then `pg_dump`, which names none, and
-  returns once The nightly dump's statement ends the boot; M33R1's disposition notes it). D34R2
-  FIXED `8d7ad08a07` and in this record (with M34R2: round thirty-three's claims say only the
-  sign-out case read every pid by `pg_backend_pid`, and the hand drop's pid is now read so too;
-  `d987076ce9`'s body says every pid; the commit stays as it is; Q33R8's disposition notes it).
-  D34R3 FIXED (see D34R1).
+  returns once The nightly dump's statement ends the boot; M33R1's disposition notes it; every pid
+  named walked, each session reached that names none deciding, from round thirty-five, T35R2).
+  D34R2 FIXED `8d7ad08a07` and in this record (with M34R2: round thirty-three's claims say only
+  the sign-out case read every pid by `pg_backend_pid`, and the hand drop's pid is now read so
+  too; `d987076ce9`'s body says every pid; the commit stays as it is; Q33R8's disposition notes
+  it). D34R3 FIXED (see D34R1).
 - T34R1 FIXED (see D34R1). T34R2 FIXED `8d7ad08a07` (the unit suite pins the `.env.example`
   sentence, comment markers stripped, and the DEPLOY heading it names). T34R3 FIXED `8d7ad08a07`
   (with Q34R5, S34R2, C34R4 and H34R4: the compose file defines no YAML anchor, so no alias or
   merge key in any form can reach a block, with anchor and literal-ampersand controls; `env_file`
-  and `extends` stay refused per block; C33R1's disposition notes it). T34R4 FIXED `8d7ad08a07`
-  (neither block holds a block scalar, whose comment-shaped lines Compose reads, with a control).
-  T34R5 FIXED `8d7ad08a07` (lever 3's slice ends at the first paragraph not indented under its
-  list item; T33R8's disposition notes it).
+  and `extends` stay refused per block; C33R1's disposition notes it; an anchor of any name from
+  round thirty-five, Q35R6). T34R4 FIXED `8d7ad08a07` (neither block holds a block scalar, whose
+  comment-shaped lines Compose reads, with a control; in any position, a list item's or a tagged
+  one too, from round thirty-five, C35R2). T34R5 FIXED `8d7ad08a07` (lever 3's slice ends at the
+  first paragraph not indented under its list item; T33R8's disposition notes it).
 - L34R1 FIXED (see C34R1). L34R2 FIXED (see Q34R4). L34R3 FIXED in the ledger (round
   thirty-three's entry says a key edit no longer starts a lever-stopped bot, worded so in round
   thirty-four).
 - M34R1 FIXED `8d7ad08a07` (lever 3 says queued outbox items wait in the game process, the winner
   days excepted, so a recreate of the game while the lever holds drops the relay, activity,
   link-change and queue-pop items queued since the stop; `server/internal.ts` drains those feeds
-  from memory). M34R2 FIXED (see D34R2).
+  from memory; each feed's cap, a queue pop's lapse and any end of the game process stated from
+  round thirty-five, S35R1). M34R2 FIXED (see D34R2).
 - Mutants on this round's new guards, each killed and its source restored: a YAML anchor at the
   top of the compose file; a block scalar in the game block; `.env.example` without "a stopped one
   included"; lever 3's rule moved out of its list item below the levers; the Enabling heading
   renamed.
+
+## Round thirty-five: eight fresh readers over round thirty-four (`96484d6336..b23acc2b44`)
+
+Round thirty-five's commits: `72daa3ee3a` (DEPLOY: lever 3 states the bot outbox's bounds as the
+code sets them, each in-memory feed keeping only its newest items once full under the cap DEPLOY
+names, a queue pop lapsing with its offer, and any end of the game process dropping what is
+queued; the bot restart note says redelivery is within each cap; a waiting rerun's walk visits
+every pid named, and each session it reaches that names none decides, or, with none named for the
+rerun, the rerun is working; section L walks a step that names two stopped realms to the one open
+sign-out, pins the first stall-over reading, scopes its failure-path terminate to this database's
+live sessions, and ends the dump case's rerun before the holder is released on a failed order; the
+unit suite ties the outbox to `server/internal.ts`'s drains and each feed's cap, bans a block
+scalar in any position and an anchor of any name; the change log with it; kept whole for bisect),
+and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C35R1 to C35R4 |
+| qa-checklist | PASS | Q35R1 to Q35R7 |
+| server hot path | PASS | H35R1 |
+| privacy and security | PASS | S35R1 |
+| database performance | PASS | D35R1 to D35R3 |
+| test coverage | PASS | T35R1 to T35R6 |
+| docs librarian | PASS | L35R1 to L35R4 |
+| migration safety | PASS | M35R1 to M35R2 |
+
+28 findings: none blocking, 11 should-fix (C35R1, C35R2, Q35R1 to Q35R3, H35R1, S35R1, D35R1,
+L35R1, T35R1, T35R2), 17 nice-to-have, every reader passing, and one (migration safety) with no
+should-fix. Six readers found lever 3's outbox sentence promising more than the capped, expiring,
+in-memory feeds give; it now states their bounds, with the feeds and their caps tied to the code.
+Round thirty-four edited five of round thirty-three's dispositions in place (four forward notes
+and S33R2's back-pointer), not four as its evidence said.
+
+- C35R1 FIXED (see S35R1). C35R2 FIXED `72daa3ee3a` (with T35R1: a block scalar is refused
+  wherever its indicator ends a line, after a key, a list dash or a tag, with three positive and
+  three literal controls; T34R4's disposition notes it). C35R3 FIXED (see D35R2). C35R4 FIXED (see
+  T35R2).
+- Q35R1 FIXED (see S35R1). Q35R2 FIXED in this record (with L35R2: S33R2's back-pointer names
+  round thirty-four, Q34R2). Q35R3 FIXED in this record (L28R1 notes C34R1's `Created`, and C34R1
+  names it back). Q35R4 FIXED (see T35R2). Q35R5 FIXED (see T35R2). Q35R6 FIXED `72daa3ee3a` (the
+  anchor ban reads an anchor of any name, `&$shared` among its controls, and still passes `&&`,
+  `2>&1` and `&>`; T34R3's disposition notes it). Q35R7 FIXED in this record (with L35R4: round
+  thirty-four edited five of round thirty-three's dispositions in place).
+- H35R1 FIXED (see S35R1).
+- S35R1 FIXED `72daa3ee3a` (with C35R1, Q35R1, H35R1, D35R1, L35R1, M35R1 and T35R4: lever 3 says
+  the queued outbox items wait in the game process, the winner days excepted, and only within
+  bounds: each feed keeps only its newest items once full (`RELAY_MAX_QUEUE`,
+  `ACTIVITY_MAX_QUEUE`, `LINK_CHANGE_MAX_QUEUE`, `QUEUE_POP_MAX_QUEUE`), a queue pop lapses with
+  its offer, and any end of the game process while the lever holds drops everything queued; the
+  bot restart note says redelivery is within each feed's cap; the unit suite holds
+  `server/internal.ts`'s drains to exactly the four feeds, each file's cap to its exported
+  constant, and the queue pops' lapse to its filter; M34R1's disposition notes it).
+- D35R1 FIXED (see S35R1). D35R2 FIXED `72daa3ee3a` (with C35R3 and T35R6: the dump case's rerun
+  is ended, on a failed order, before the dump-shaped holder is released, so it commits no
+  sign-out after the test). D35R3 FIXED (see T35R2).
+- T35R1 FIXED (see C35R2). T35R2 FIXED `72daa3ee3a` (with Q35R4, Q35R5, D35R3 and C35R4: the
+  rerun's walk gives the naming statement each pid named, in turn, until each names none, and
+  every session reached that names none decides, the open sign-out "is ended by the rule there",
+  and with no session named for the rerun at all it is working; section L queues two stopped
+  realms on the table, so the first step names both, and the walk over every pid named reaches
+  exactly one session that names none, the open sign-out; D34R1's disposition notes it). T35R3
+  FIXED `72daa3ee3a` (section L pins the first stall-over reading with `Created`; C34R1's
+  disposition notes it). T35R4 FIXED (see S35R1). T35R5 FIXED `72daa3ee3a` (an anchor followed by
+  a comment, read through the comment stripper, is among the anchor controls). T35R6 FIXED (see
+  D35R2).
+- L35R1 FIXED (see S35R1). L35R2 FIXED (see Q35R2). L35R3 FIXED in the ledger (round
+  thirty-three's entry names L34R3 beside its round). L35R4 FIXED (see Q35R7).
+- M35R1 FIXED (see S35R1). M35R2 FIXED `72daa3ee3a` (the failure-path terminate reads only this
+  database's live sessions, so a reused pid on a shared server is never ended; H34R3's disposition
+  notes it).
+- Mutants on this round's new guards, each killed and its source restored: a list-item block
+  scalar in the game block; a fifth outbox drain in `server/internal.ts`; the relay cap renamed;
+  an anchor named with a sigil; the stall-over reading without `Created`.
