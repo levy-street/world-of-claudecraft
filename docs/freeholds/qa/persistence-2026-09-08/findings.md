@@ -5724,6 +5724,11 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   on the schema advisory lock itself, which section L reads on both sides. The credential pin
   reads secret-shaped columns, the sign-out clears Discord link states, and the index-build
   deadlock runs in two forced orders. Fixed in `9458280c1f`.
+- ROUND TWENTY-FIVE, eight fresh readers over round twenty-four: 45 findings, none blocking, 15
+  should-fix. The stall bullet's account aftermath, which drew a new item every round, is now a
+  stated boundary with its recovery owed; the start gate is one rule for every realm start the
+  file gives, the first included; section L crosses both waiter kinds with both timings and
+  shows a stopped build holding the lock to its end. Fixed in `7171f7717a`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5753,7 +5758,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then
   641, then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
   then 644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then
-  647, then 648, then 648 passed, never a skip.
+  647, then 648, then 648, then 648 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
@@ -5766,12 +5771,17 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 ### OWED, NOT CLAIMED
 
 - Both halves of the boot's deadlock fix (R-11), a maintainer decision.
+- Recovering an account a stall left open: a leftover token that a skipped revoke kept valid
+  can, before the sign-out, add a sign-in link or set a recovery email, and DEPLOY's stall
+  bullet undoes neither. A recovery procedure (finding such accounts and their changes) is a
+  maintainer decision.
 - The index-build deadlock: the runner and every boot take the schema advisory lock with a
   blocking call that holds a snapshot while it waits, which a concurrent build then waits on.
-  Making a waiter wait with no transaction open (polling a session-level try-lock between its
-  own short statements, then opening the schema transaction under it) is a maintainer decision;
-  the runner's comment that a waiting boot holds nothing is what the probe refutes, and that fix
-  corrects it.
+  Making a waiter wait with no transaction open (polling a session-level try-lock in short
+  statements of its own, idle between them, then opening the schema transaction under the lock
+  it took) is a maintainer decision; the growth budget's note that a waiting realm holds nothing
+  (inside its SQL fragment's function body, `server/bank_ledger_growth_budget.ts`) is the one
+  such comment left, for that fix to correct.
 - A boot that queues behind the nightly dump with no operator awake (a crash restart at night)
   stalls every realm's token traffic until the dump ends, and DEPLOY's route needs an operator
   to end its backend. Bounding the boot instead (a boot lock timeout with a retry, or
