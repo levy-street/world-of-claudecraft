@@ -23,7 +23,7 @@
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 import { LEASE_TTL_SECONDS } from '../../server/character_lease_db';
@@ -108,6 +108,15 @@ import {
 import { hearthKeyUseRefusal } from '../../server/freehold_wire';
 import { SOURCE_EXTENSIONS, sourceFilesUnder } from '../helpers/source_files_under';
 import { stripComments } from '../helpers/strip_comments';
+
+/** The two shutdown callees that fix their own bound, whitespace-normalized:
+ *  pinned whole so their one bounded wait cannot change unseen. */
+const STOP_RENEWER_BODY =
+  "export async function stopFreeholdClaimRenewer(registry?: FreeholdClaimRegistry): Promise<void> { if (!registry) return; const state = renewers.get(registry); if (!state) { renewers.set(registry, { running: false, cursor: null, stopping: true, stop: new AbortController(), settled: null, }); return; } state.stopping = true; state.stop.abort(); const settled = state.settled; if (!settled) return; const bound = AbortSignal.timeout(FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs); await new Promise<void>((resolve) => { const done = (): void => { bound.removeEventListener('abort', done); resolve(); }; void settled.then(done); bound.addEventListener('abort', done, { once: true }); });";
+const RELEASE_ALL_BODY =
+  "export async function releaseAllFreeholdClaims(deps: { readonly pool: FreeholdTxPool; readonly holder: string; readonly registry?: FreeholdClaimRegistry; readonly warn?: (message: string) => void; }): Promise<number> { const deadline = AbortSignal.timeout(FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS); try { const released = await runFreeholdTransaction( deps.pool, { ...FREEHOLD_CLAIM_RENEW_BOUNDS, operation: 'freehold claim release all', wallMs: FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS, }, (tx) => releaseAllFreeholdClaimRows(tx, deps.holder), { signal: deadline }, ); if (deps.registry) { for (const claim of deps.registry.all()) deps.registry.drop(claim.plotId); deps.registry.counters.released += released; } return released; } catch { (deps.warn ?? console.warn)( 'freehold claims were not released at shutdown; they expire after the lease TTL', ); return 0; }";
+/** What an argument spelling a deadline looks like, for the allowlist screen. */
+const DEADLINE_SPELLING = /\d|_MS\b|[a-z]Ms\b|[Ss]ignal|[Dd]eadline|[Tt]imeout/;
 
 /** server/main.ts with its comments stripped, read once for every case here. */
 let mainSourceCache: string | undefined;
@@ -1678,8 +1687,8 @@ describe('the claim renewer', () => {
           readonly fn: string;
           readonly name: string;
           readonly value: number;
-          /** How the callee waits on its bound, given the variable holding it. */
-          readonly wired: (binding: string) => string;
+          /** The callee's whole body, whitespace-normalized. */
+          readonly body: string;
         };
     const none: Bound = { kind: 'none' };
     const drain = (name: string, file: string): Bound => ({ kind: 'constant', name, file });
@@ -1731,7 +1740,7 @@ describe('the claim renewer', () => {
           fn: 'stopFreeholdClaimRenewer',
           name: 'FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs',
           value: FREEHOLD_CLAIM_RENEW_BOUNDS.wallMs,
-          wired: (binding) => `${binding}.addEventListener('abort', done`,
+          body: STOP_RENEWER_BODY,
         },
       ],
       [
@@ -1741,7 +1750,7 @@ describe('the claim renewer', () => {
           fn: 'releaseAllFreeholdClaims',
           name: 'FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS',
           value: FREEHOLD_CLAIM_RELEASE_ALL_DEADLINE_MS,
-          wired: (binding) => `{ signal: ${binding} }`,
+          body: RELEASE_ALL_BODY,
         },
       ],
       [
@@ -1773,7 +1782,17 @@ describe('the claim renewer', () => {
     for (const listed of noDeadlineArguments) {
       const entry = closure.find(([text]) => text === listed);
       expect(entry?.[1].kind === 'none' || entry?.[1].kind === 'callee', listed).toBe(true);
-      expect(listed, listed).not.toMatch(/\d|_MS\b|signal|deadline|timeout/i);
+      expect(listed, listed).not.toMatch(DEADLINE_SPELLING);
+    }
+    // The screen itself catches each deadline spelling it is there for.
+    for (const spelled of [
+      'f(5000)',
+      'f({ signal: s })',
+      'f(X_MS)',
+      'f({ waitMs: w })',
+      'f(timeout)',
+    ]) {
+      expect(spelled, spelled).toMatch(DEADLINE_SPELLING);
     }
     /** The module main.ts imports `name` from, by its own import line. */
     const importedFrom = (name: string): string => {
@@ -1791,7 +1810,7 @@ describe('the claim renewer', () => {
         ),
       ].some(
         (match) =>
-          `server/${match[2]}.ts` === from &&
+          join(dirname(file), `${match[2]}.ts`) === from &&
           match[1].split(',').some((part) => part.trim() === name),
       );
     // Each bound's value, read from the code that sets it.
@@ -1829,7 +1848,11 @@ describe('the claim renewer', () => {
       } else if (bound.kind === 'concurrent literals') {
         // Every member of the group is one call with one literal bound.
         expect(text.startsWith('Promise.all([') && text.endsWith('])')).toBe(true);
-        const members = text.slice('Promise.all(['.length, -'])'.length).split(', ');
+        const members = text
+          .slice('Promise.all(['.length, -'])'.length)
+          .split(',')
+          .map((member) => member.trim())
+          .filter(Boolean);
         expect(members.length).toBeGreaterThan(1);
         const values = members.map((member) => {
           const found = member.match(/^[\w.]+\((\d[\d_]*)\)$/);
@@ -1838,19 +1861,13 @@ describe('the claim renewer', () => {
         });
         concurrent.push(Math.max(...values));
       } else if (bound.kind === 'callee') {
-        // The entry calls the callee whose body is read; that body arms its
-        // bound into one variable, waits on THAT variable, and awaits nothing
-        // else, so no unbounded wait sits ahead of its deadline.
+        // The callee's WHOLE body is pinned, whitespace aside: its bound, the
+        // variable that holds it, the one wait on that variable and everything
+        // around it. Any edit to a shutdown-critical callee fails here until
+        // it is re-read against the contract.
         expect(text.startsWith(`${bound.fn}(`), bound.fn).toBe(true);
-        const body = bodyOf(bound.fn);
-        const armed = body.match(
-          new RegExp(
-            `const (\\w+) = AbortSignal\\.timeout\\(${bound.name.replace('.', '\\.')}\\);`,
-          ),
-        );
-        expect(armed, bound.fn).not.toBeNull();
-        expect(body).toContain(bound.wired((armed as RegExpMatchArray)[1]));
-        expect(body.match(/\bawait\b/g)?.length, bound.fn).toBe(1);
+        expect(bodyOf(bound.fn).replace(/\s+/g, ' '), bound.fn).toBe(bound.body);
+        expect(bound.body).toContain(`AbortSignal.timeout(${bound.name})`);
         counted.push({ name: bound.name, value: bound.value, group: 'callee' });
       }
     }
@@ -1879,9 +1896,14 @@ describe('the claim renewer', () => {
     expect(named.sort()).toEqual(
       counted.map(({ name, value }) => `${name}=${value.toLocaleString('en-US')}`).sort(),
     );
-    // No other bound is named in another spelling.
+    // No other bound is named in another spelling (a capitalised token that
+    // names no bound would join this list by name, never by loosening it).
+    const notBounds = new Set<string>([]);
     expect(
-      [...budget.matchAll(/`([A-Z][A-Z0-9_]*(?:\.\w+)?)`/g)].map((match) => match[1]).sort(),
+      [...budget.matchAll(/`([A-Z][A-Z0-9_]*(?:\.\w+)?)`/g)]
+        .map((match) => match[1])
+        .filter((token) => !notBounds.has(token))
+        .sort(),
     ).toEqual(counted.map(({ name }) => name).sort());
     // Each concurrent group said once, counted once at its longest member.
     const concurrently = [...groups['call site'].matchAll(/run concurrently, ([\d,]+) ms/g)].map(
@@ -1892,15 +1914,17 @@ describe('the claim renewer', () => {
       (sum, { value }) => sum + value,
       concurrent.reduce((sum, value) => sum + value, 0),
     );
-    const stated = budget.match(/(?<![\d.])(\d+(?:\.\d+)?) s of bounded waits/);
-    expect(Number(stated?.[1])).toBe(totalMs / 1000);
+    const stated = [...budget.matchAll(/(?<![\d.])(\d+(?:\.\d+)?) s of bounded waits/g)];
+    expect(stated.map((match) => Number(match[1]))).toEqual([totalMs / 1000]);
     const grace = readFileSync('docker-compose.yml', 'utf8').match(
-      /\n {2}game:\n(?: {4}.*\n)*? {4}stop_grace_period: (\d+)s\n/,
+      /\n {2}game:\n(?:(?: {4}.*)?\n)*? {4}stop_grace_period: (\d+)s\n/,
     );
     expect(grace).not.toBeNull();
     const graceSeconds = Number((grace as RegExpMatchArray)[1]);
     expect(totalMs).toBeLessThan(graceSeconds * 1000);
-    expect(Number(budget.match(/(?<![\d.])(\d+) s kill grace/)?.[1])).toBe(graceSeconds);
+    expect(
+      [...budget.matchAll(/(?<![\d.])(\d+) s kill grace/g)].map((match) => Number(match[1])),
+    ).toEqual([graceSeconds]);
   });
 
   it('chunks at the bound, one transaction per chunk', async () => {
