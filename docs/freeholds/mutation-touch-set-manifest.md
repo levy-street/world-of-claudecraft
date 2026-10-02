@@ -642,15 +642,20 @@ claims, operations (`tests/schema_wiring.test.ts` pins them at storage minus fou
 minus one). "Catalog-only" means no lock on a housing or parent TABLE held to the boot
 COMMIT: catalog reads, plus the two `CREATE OR REPLACE FUNCTION` rewrites of the guard and
 erase functions, which rewrite their `pg_proc` rows on EVERY boot (keeping their oids): a
-catalog row write, no table lock. The one table lock is the Hearth token probe's: deparsing
-the CHECK takes ACCESS SHARE on `account_freehold_hearth` and releases it at once, so the
-boot waits there only behind an ACCESS EXCLUSIVE holder or request on that table and holds
-nothing to its COMMIT (`tests/server/freehold_hearth_db.pg.test.ts` proves both halves). The
-pg suite proves it for all four housing fragments: re-applying them completes inside a 1 s
-`lock_timeout` beside a writer holding ROW EXCLUSIVE on every table they name (the plot,
-Hearth, claims, intents and receipts tables and both parents) and keeps every index,
-trigger, constraint and function oid, while each unprobed statement it replaces times out
-there; and the operation fragment hands the caller's own `search_path` back
+catalog row write, no table lock. The housing fragments' one table lock is the Hearth token
+probe's: deparsing the CHECK takes ACCESS SHARE on `account_freehold_hearth` and releases it
+at once, so the boot waits there only behind an ACCESS EXCLUSIVE holder or a queued ACCESS
+EXCLUSIVE request on that table, never behind a writer, and holds nothing to its COMMIT
+(`tests/server/freehold_hearth_db.pg.test.ts` proves the wait's mode and place, the holder
+and queued-request cases, a writer's case, and the nothing-held case with a positive
+control). It waits there while holding both parents, so DDL on that table stalls every
+realm's saves and logins too. The storage fragment, which is not housing, keeps its unprobed
+`ADD COLUMN IF NOT EXISTS` and index creates on `storage_purchases`, held to every boot's
+COMMIT. The pg suite proves it for all four housing fragments: re-applying them completes
+inside a 1 s `lock_timeout` beside a writer holding ROW EXCLUSIVE on every table they name
+(the plot, Hearth, claims, intents and receipts tables and both parents) and keeps every
+index, trigger, constraint and function oid, while each unprobed statement it replaces times
+out there; and the operation fragment hands the caller's own `search_path` back
 (`tests/server/freehold_mutation.pg.test.ts`, section K). The index probes check a NAME
 only, as `IF NOT EXISTS` does: a same-named index with another definition is never repaired,
 unlike the trigger probe, which checks the exact shape. The Hearth column probe checks the
@@ -675,8 +680,9 @@ path, two tables: a transaction that holds any lock on `accounts` and then asks 
 the Hearth trip's included, the operation prepare and the character delete), against the
 boot's `characters`-then-`accounts` order. With G1-shaped saves in flight every bench boot
 was eventually aborted and saves were aborted beside it, and a boot that loses exits and is
-restarted (R-11). Do the first rollout, any trigger repair boot, and any boot beside other
-realms serving such saves, in a quiet window; `DEPLOY.md` carries the operator note.
+restarted (R-11). Do the first rollout, any repair boot (a guard or trigger rebuilt, or the
+advance token column or its CHECK put back), and any boot beside other realms serving such
+saves, in a quiet window; `DEPLOY.md` carries the operator note.
 
 ## 6. Pairwise deadlock review
 
@@ -1121,7 +1127,11 @@ merge in a `finally`; N4 the server default pin; N5 the log pin; N6 the 15 route
   shutdown release-all passed its locked rows (SKIP LOCKED). Chunks run one at a time and
   the stop starts no other, which keeps at most one renew chunk of plots
   (`FREEHOLD_CLAIM_RENEW_CHUNK`) claimed for at most one lease TTL: the crash bound. A chunk
-  that had not reached its statement is cut at its checkout or sends no renewal.
+  that had not reached its statement is cut at its checkout or sends no renewal. A chunk cut
+  mid-statement may also still hold its rows when the release-all passes by (the cancel is
+  best-effort and the backend aborts only at its next read), so SKIP LOCKED leaves those
+  plots to wait out their current lease: within the same bound, at most one chunk for at
+  most one TTL.
 
 ## 13. The persistence-rollout contract edits this work owes
 

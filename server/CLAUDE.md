@@ -262,19 +262,18 @@ that shape.
   chunk) of work). Per-character blobs and DB round trips are not in it, and a job that
   reports into no phase shows up as `lateness` with nothing to attribute it to.
   Rules: a new realm collection never persists as one whole-book `world_state` blob
-  rewritten on the autosave cadence (the market and
-  rift blobs are the legacy shape, not the template; the mail book, partitioned per dirty
-  recipient, shows what the fix looks like): write per-row, overlay, or
-  dirty-bucket, so a quiet interval writes nothing; a recurring job's cost, or an
-  event-driven durability write's, must not scale with total book size, only with what
-  changed or with the bounded result it produces (aggregate inside Postgres when the
-  input is a stored blob; a handler that awaits a whole-book save "so the grant is
-  durable", the retired `persistMailBlob` per-parcel shape, is the same
-  defect on a different clock); and a new recurring job bills its cost to
-  a profiler phase in the same change (an observer into `saves` for a new shared-blob
-  writer or a synchronous launch on the autosave flush, as the Freeholds jobs are, and
-  named in the `saves` list above in the same change; a registered phase of its own
-  otherwise), never silently.
+  rewritten on the autosave cadence (the market and rift blobs are the legacy shape, not
+  the template; the mail book, partitioned per dirty recipient, shows what the fix looks
+  like): write per-row, overlay, or dirty-bucket, so a quiet interval writes nothing; a
+  recurring job's cost, or an event-driven durability write's, must not scale with total
+  book size, only with what changed or with the bounded result it produces (aggregate
+  inside Postgres when the input is a stored blob; a handler that awaits a whole-book save
+  "so the grant is durable", the retired `persistMailBlob` per-parcel shape, is the same
+  defect on a different clock); and a new recurring job bills its cost to a profiler phase
+  in the same change (an observer into `saves` for a new shared-blob writer or a
+  synchronous launch on the autosave flush, as the Freeholds jobs are, and named in the
+  `saves` list above in the same change; a registered phase of its own otherwise), never
+  silently.
 
 - **Fresh-bot load tests cannot see this bug class.** Fresh characters carry empty
   books, boards, and inboxes, so a bot fleet proves interest-scan and movement cost,

@@ -761,10 +761,10 @@ export function createFreeholdPersistStore(ports: FreeholdPersistPorts): Freehol
       if (touched) touched.orphanPasses = 0;
       return { ...loaded, state: null, recordWithheld: true };
     }
-    // Load-once, like loadFreehold: a re-preload replays what the entry knows
-    // (so a rejoin after the sim evicted the record re-installs the real
-    // house) and never mints a second plot id; the one re-read is a clean
-    // entry's lost claim (freeholdRereadsLostClaim), which joins a read in flight.
+    // Load-once: a re-preload replays what the entry knows (a rejoin re-installs
+    // the real house) and never mints a second plot id; the one re-read is a
+    // clean entry's lost claim (freeholdRereadsLostClaim), joining a read in
+    // flight for THIS account (a loaded entry already carries it: defensive).
     if (entry?.loaded && !rereadsLostClaim(entry, accountId)) {
       entry.accountId = accountId;
       entry.orphanPasses = 0;
