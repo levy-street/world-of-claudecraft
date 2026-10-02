@@ -39,9 +39,12 @@ describe('countsAsEscrowSaveFailure', () => {
     // ONE increment of the incident in the whole coordinator, and it is the
     // statement the rule gates: no second, ungated path can count a refusal.
     expect(game.split("guildBankIncident('escrow_save_failed')").length - 1).toBe(1);
-    const rule = game.indexOf('countsAsEscrowSaveFailure(err, carriesGuildBooks)');
+    // The whole gate, un-negated, then nothing but the count under it.
+    const gate = 'if (countsAsEscrowSaveFailure(err, carriesGuildBooks))';
+    expect(game.split(gate).length - 1).toBe(1);
+    const rule = game.indexOf(gate);
     const count = game.indexOf("guildBankIncident('escrow_save_failed')");
     expect(count).toBeGreaterThan(rule);
-    expect(game.slice(rule, count)).not.toMatch(/[;}]/);
+    expect(game.slice(rule + gate.length, count)).not.toMatch(/[;}]/);
   });
 });

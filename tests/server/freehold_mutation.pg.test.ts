@@ -2962,6 +2962,10 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         expect(
           (initPlan as unknown as Record<string, unknown>)['Conflict Arbiter Indexes'],
         ).toEqual(['account_freehold_hearth_pkey']);
+        // The suite's own literal IS the shipped statement, so the plan is the
+        // production wait's.
+        const mutationDb = await import('../../server/freehold_mutation_db');
+        expect(VERIFY_WAIT_TEXT).toBe(mutationDb.FREEHOLD_VERIFY_WAIT_SQL);
         expect(
           reach(await explain(VERIFY_WAIT_TEXT, [p.ch]), 'characters', 'characters_pkey'),
         ).toEqual(['characters_pkey']);
@@ -3021,7 +3025,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
          UNION ALL
          SELECT 'constraint ' || n.conname || ' ' || n.oid || ' ' || n.convalidated
            FROM pg_constraint n
-          WHERE n.conrelid = ANY($1::regclass[]) AND n.conname LIKE 'freehold_%'
+          WHERE n.conrelid = ANY($1::regclass[]) AND n.conname ~ '^(account_)?freehold'
          UNION ALL
          SELECT 'function ' || p.proname || ' ' || p.oid
            FROM pg_proc p
@@ -3091,6 +3095,11 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         expect.stringMatching(/^trigger freehold_operation_receipt_erase \d+ O$/),
       ]);
       expect(before.filter((o) => o.startsWith('function '))).toHaveLength(2);
+      // The plot and Hearth fragments' constraints are in the snapshot too.
+      expect(before).toContainEqual(
+        expect.stringMatching(/^constraint account_freehold_hearth_advance_token_shape \d+ true$/),
+      );
+      expect(before).toContainEqual(expect.stringMatching(/^constraint account_freeholds_/));
       const hearth = await import('../../server/freehold_hearth_db');
       expect(
         await applyBesideWriters(

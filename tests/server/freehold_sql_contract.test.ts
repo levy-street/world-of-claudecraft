@@ -10,7 +10,7 @@
 // tests/server/freehold_mutation.test.ts, compares most of these statements
 // only to the same imported constants, which no mutant of their text can fail.
 //
-// Cost: 27 ms
+// Cost: 52 ms
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import { freeholdAccountExport } from '../../server/freehold_account_export';
@@ -141,11 +141,14 @@ describe('the account export allowlists', () => {
 
 describe('the housing account export', () => {
   it('reads on ONE client and releases it once, on a throwing read as on success', async () => {
+    const sent: string[] = [];
     const run = async (failAt: number | null) => {
       let reads = 0;
+      sent.length = 0;
       const release = vi.fn();
       const client = {
-        query: vi.fn(async () => {
+        query: vi.fn(async (text: string) => {
+          sent.push(text);
           reads += 1;
           if (reads === failAt) throw new Error('the read failed');
           return { rows: [], rowCount: 0 };
@@ -160,6 +163,15 @@ describe('the housing account export', () => {
       return { out, connects: connect.mock.calls.length, releases: release.mock.calls.length };
     };
     expect(await run(null)).toEqual({ out: 'ok', connects: 1, releases: 1 });
+    // And what it SENDS is exactly the pinned statements, in order, so a loader
+    // that went back to inline SQL (an internal column included) fails here.
+    expect(sent).toEqual([
+      FREEHOLD_PLOT_EXPORT_SQL,
+      FREEHOLD_HEARTH_EXPORT_SQL,
+      FREEHOLD_CLAIM_EXPORT_SQL,
+      FREEHOLD_OPERATION_EXPORT_INTENTS_SQL,
+      FREEHOLD_OPERATION_EXPORT_RECEIPTS_SQL,
+    ]);
     // A read that throws mid-export (a lock or statement timeout, a lost
     // socket) still hands the client back, once.
     expect(await run(2)).toEqual({ out: 'the read failed', connects: 1, releases: 1 });
