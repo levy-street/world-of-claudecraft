@@ -5790,11 +5790,17 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - ROUND THIRTY-SIX, eight fresh readers over round thirty-five: 23 findings, none blocking, 9
   should-fix, every reader passing and every one with a should-fix. Lever 3 states a stop's cost
   whole: each feed's own drop rule (the link-change feed spends its link and unlink items last,
-  where round thirty-five's entry had every feed keep its newest), the polled process alone, and a
-  batch a poll already took lost if the bot stops before posting it; the unit suite reads each
-  feed's queue code whole after the round's mutants found a one-site trim change passing its ties;
-  section L walks a rerun to two leaves, each decided by its own rule. Fixed in `d300324c33` and
-  `eb59d4a243`.
+  where round thirty-five's lever 3 had every feed keep its newest, worded so in round
+  thirty-seven, L37R3), the polled process alone, and a batch a poll already took lost if the bot
+  stops before posting it; the unit suite reads each feed's queue code whole after the round's
+  mutants found a one-site trim change passing its ties; section L walks a rerun to two leaves,
+  each decided by its own rule. Fixed in `d300324c33` and `eb59d4a243`.
+- ROUND THIRTY-SEVEN, eight fresh readers over round thirty-six: 28 findings, none blocking, 7
+  should-fix, every reader passing, three with no should-fix. Lever 3 says a stop stops everything
+  the bot does, the daily-active points for an event during it never granted, and names the
+  outbox's own items; the outbox's code is read through the TypeScript parser, each feed's with
+  every declaration it names; the compose file may hold no `&`; section L walks again once the
+  ended sign-out is gone. Fixed in `2afa2c6f0a`; L37R4 flagged.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5825,7 +5831,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   641, then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
   then 644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then
   647, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648,
-  then 648, then 648, then 648, then 648, then 648 passed, never a skip.
+  then 648, then 648, then 648, then 648, then 648, then 648 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
@@ -5886,6 +5892,11 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   - L4: widening the `saves` profiler bucket to the two Freeholds flush jobs.
   - L13: whether THE LIGHTING RULING still lists remote-key authority as unsigned.
   - The remaining delivery labels in code comments.
+- The bot's stop: the compose file runs it as `node` in exec form with no `init`, and it installs
+  no SIGTERM handler, so whether it ends at once, as the comment beside `stop_grace_period` says,
+  or ignores SIGTERM as PID 1 until the 15 s SIGKILL (and so may post, or take and lose, a batch
+  meanwhile) is unverified on this host, which runs no container; `init: true` or a handler is a
+  maintainer decision (L37R4).
 - The `.npmrc` pin is a maintainer decision. Recommendation: a content rule in the malware scan,
   pinned in `tests/malware_scan.test.ts`, refusing any `node-options`, `registry` or script hook
   line in `.npmrc`. That is cheaper and narrower than exempting a test that reads the file.

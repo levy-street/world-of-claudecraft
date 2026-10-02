@@ -2875,13 +2875,17 @@ suite now reads each feed's queue code whole (`eb59d4a243`).
   activity and queue-pop feeds their oldest items, the link-change feed its link and unlink items
   last, which the bot's periodic re-read of the linked set heals; the unit suite ties each rule to
   its code, the relay and activity trims, the queue pops' `shift` and the link-change feed's
-  `EVICTION_LADDER` whole, read whole at every site from `eb59d4a243` (the mutants below), and
-  names the feeds' own suites as the rules' behavior pins; S35R1's disposition, round
-  thirty-five's intro and summary, and the ledger's round thirty-five entry note it). C36R2 FIXED
-  `d300324c33` (with L36R3 and H36R2: the bot restart note says the outbox hands the restarted bot
-  what is still queued, within the bounds lever 3 gives, a queue pop only while its offer stands,
-  and that a batch a poll already took, whose 200 is the outbox's only acknowledgement, is lost if
-  the bot stops before posting it; S35R1's disposition notes it).
+  `EVICTION_LADDER` whole, read whole at every site from `eb59d4a243` (the mutants below), and,
+  from `eb59d4a243`, names all four feeds' own suites as the rules' behavior pins (corrected in
+  round thirty-seven, Q37R3); S35R1's disposition, round thirty-five's intro and summary, and the
+  ledger's round thirty-five entry note it; a stop stopping everything the bot does, the
+  daily-active points, the outbox's own items and the hourly full resync, and each feed's queue
+  code read through the parser with every declaration it names, from round thirty-seven, C37R1 and
+  C37R2). C36R2 FIXED `d300324c33` (with L36R3 and H36R2: the bot restart note says the outbox
+  hands the restarted bot what is still queued, within the bounds lever 3 gives, a queue pop only
+  while its offer stands, and that a batch a poll already took, whose 200 is the outbox's only
+  acknowledgement, is lost if the bot stops before posting it; S35R1's disposition notes it; its
+  winner days served again until the bot marks them, from round thirty-seven, S37R1).
 - Q36R1 FIXED (see C36R1). Q36R2 FIXED in this record (`72daa3ee3a`'s body has five sentences, one
   past the commit rule, and repeats the drop clause C36R1 corrects; the commit stays, since
   rewording it would change the hashes this record names after it, and round thirty-five's intro
@@ -2900,14 +2904,18 @@ suite now reads each feed's queue code whole (`eb59d4a243`).
 - T36R1 FIXED (see C36R1). T36R2 FIXED `d300324c33` (with Q36R4: the drain scan and the feeds are
   read with comments stripped, the lapse filter inside `drainQueuePops`, now within its feed's
   whole pin from `eb59d4a243`, and the comment says a feed drained by a `drain<Name>(` call fails
-  until DEPLOY names it; S35R1's disposition notes it). T36R3 FIXED `d300324c33` (section L queues
-  a stopped realm behind an open sign-out and a dump-shaped ACCESS SHARE, so the walk from the
-  rerun reaches two sessions that name none; the sign-out is ended by the rule, the dump never is,
-  and the realm's statement behind it is ended by The nightly dump's statement; T35R2's
-  disposition notes it). T36R4 FIXED `d300324c33` (the anchor ban reads a name that starts with
-  `&`, `&&shared` among its controls, and still passes `a && b`, `2>&1` and `&>`; Q35R6's
-  disposition notes it). T36R5 FIXED `d300324c33` (section L pins that a working session, one in
-  `pg_sleep`, names none; T35R2's disposition notes it).
+  until DEPLOY names it; S35R1's disposition notes it; read through the TypeScript parser, each
+  drain and requeue call whole, from round thirty-seven, Q37R1). T36R3 FIXED `d300324c33` (section
+  L queues a stopped realm behind an open sign-out and a dump-shaped ACCESS SHARE, so the walk
+  from the rerun reaches two sessions that name none; the sign-out is ended by the rule, the dump
+  never is, and the realm's statement behind it is ended by The nightly dump's statement; T35R2's
+  disposition notes it; the next walk, once the sign-out is gone, ending at the dump alone, from
+  round thirty-seven, D37R1). T36R4 FIXED `d300324c33` (the anchor ban reads a name that starts
+  with `&`, `&&shared` among its controls, and still passes `a && b`, `2>&1` and `&>`; Q35R6's
+  disposition notes it; replaced by a ban on any `&` in the file, from round thirty-seven, Q37R4).
+  T36R5 FIXED `d300324c33` (section L pins that a working session, one in `pg_sleep`, names none;
+  T35R2's disposition notes it; read while it still works and then cancelled, from round
+  thirty-seven, D37R2).
 - L36R1 FIXED (see C36R1). L36R2 FIXED (see C36R1). L36R3 FIXED (see C36R2). L36R4 FIXED (see
   Q36R3).
 - M36R1 FIXED (see C36R1).
@@ -2923,3 +2931,95 @@ suite now reads each feed's queue code whole (`eb59d4a243`).
   pops trim that stops early, a link-change requeue without its trim, a playtime rung that takes a
   link item, a new function that hands the relay queue out, and a trim that walks the queue newest
   first.
+
+## Round thirty-seven: eight fresh readers over round thirty-six (`597d697861..b8109600b0`)
+
+Round thirty-seven's commits: `2afa2c6f0a` (DEPLOY: lever 3 says the game keeps running and a stop
+stops everything the bot does until it is started again, that what it does only in answer to a
+Discord event is never done for one during the stop (a linked member whose only post or voice join
+of a day fell in it gets no daily-active points that day), that the outbox holds its relay,
+activity, link-change and queue-pop items while the winner days stay in the database, and that the
+hourly full resync heals the link-change feed; the restart note says a taken batch's winner days
+are served again until the bot marks them; the compose file's bot comment points to that note;
+section L waits for the ended sign-out to be gone and walks again to the dump alone, and reads a
+working session while it still works before cancelling it; the unit suite reads the outbox's code
+through the TypeScript parser, each drain and requeue call whole and each feed's queue code with
+every declaration it names, ties the resync's interval, and bans any `&` in the compose file; Cost
+13.4 s and 0.9 s; the change log with it; kept whole for bisect), and the commit that adds this
+section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C37R1 to C37R4 |
+| qa-checklist | PASS | Q37R1 to Q37R4 |
+| server hot path | PASS | H37R1 to H37R2 |
+| privacy and security | PASS | S37R1 to S37R2 |
+| database performance | PASS | D37R1 to D37R3 |
+| test coverage | PASS | T37R1 to T37R7 |
+| docs librarian | PASS | L37R1 to L37R4 |
+| migration safety | PASS | M37R1 to M37R2 |
+
+28 findings: none blocking, 7 should-fix (C37R1, C37R2, Q37R1, D37R1, T37R1, T37R2, L37R1), 21
+nice-to-have, every reader passing, and three (server hot path, privacy and security, migration
+safety) with no should-fix. Lever 3 had called the bot a pure consumer whose stop costs
+Discord-side work alone, which the daily-active points it grants contradict, and had the outbox
+hold role, nickname and presence items it never holds; it now says a stop stops everything the bot
+does and names the outbox's own items. The comment stripper the outbox ties read through hid real
+code behind a `/*` in a line comment; the outbox's code is now read through the TypeScript parser,
+and each feed's queue code reaches every declaration it names, `forgetPending` and
+`claimDedupeKey` among them.
+
+- C37R1 FIXED `2afa2c6f0a` (with L37R1, H37R2, S37R2 and T37R6: lever 3 says the game keeps
+  running and a stop stops everything the bot does until it is started again: the role, nickname,
+  presence, relay, activity, winner, link-change and queue-pop delivery waits, what the outbox
+  drops never comes, and what the bot does only in answer to a Discord event is never done for one
+  during the stop, a linked member whose only post or voice join of a day fell in it getting no
+  daily-active points that day; the outbox holds its relay, activity, link-change and queue-pop
+  items in the polled process and the winner days stay in the database; the link-change feed's
+  heal is the bot's hourly full resync, its `FULL_RESYNC_INTERVAL_MS` pinned; C36R1's disposition
+  notes it). C37R2 FIXED `2afa2c6f0a` (with T37R1, C37R4 and Q37R2: each feed's queue code is read
+  through the TypeScript parser as every top-level statement that names its queue or a cap and
+  every declaration of the module such a statement names, until none is left, so `claimDedupeKey`,
+  `forgetPending`, the ladder and its rungs, the pending indexes and a bare `MAX_QUEUE` alias are
+  read by the rule rather than by a list; the names another module supplies are pinned (only the
+  queue pops' test reset), and every statement outside the read set that names a state it declares
+  is pinned by name (the activity feed's `releaseDedupeKey` and six watch and batch functions of
+  the queue pops); C36R1's disposition notes it). C37R3 FIXED (see D37R1). C37R4 FIXED (see
+  C37R2).
+- Q37R1 FIXED `2afa2c6f0a` (with T37R4 and T37R5: server/internal.ts is read through the
+  TypeScript parser, every `drain<Name>` it names, called or not, each drain call pinned whole
+  (`drainQueuePops(Date.now())`, so a pop lapses against the clock), and the four requeues the
+  only ones, all in the one catch whose try holds every drain; a line comment holding `/*` inside
+  a feed function leaves the pin unchanged, a control; T36R2's disposition notes it). Q37R2 FIXED
+  (see C37R2). Q37R3 FIXED in this record (C36R1's disposition says the four feeds' suites are
+  named from `eb59d4a243`, noted there). Q37R4 FIXED `2afa2c6f0a` (with T37R7: the compose file
+  may hold no `&` at all, so it defines no anchor of any name or form, a later `&&` in a command
+  included; T36R4's disposition notes it).
+- H37R1 FIXED (see D37R2). H37R2 FIXED (see C37R1).
+- S37R1 FIXED `2afa2c6f0a` (with L37R2: the restart note says the queued items of a batch a poll
+  already took are lost if the bot stops before posting them, while its winner days are served
+  again until the bot marks them posted; C36R2's disposition notes it). S37R2 FIXED (see C37R1).
+- D37R1 FIXED `2afa2c6f0a` (with C37R3, M37R2 and T37R2: section L waits for the ended sign-out's
+  backend to be gone, reads the rerun still waiting, and walks again to exactly one leaf, the
+  dump; T36R3's disposition notes it). D37R2 FIXED `2afa2c6f0a` (with D37R3, H37R1, T37R3 and
+  M37R1: the working session sleeps 30 s behind a rejection handler, names none while a second
+  read shows it still active, and is then cancelled, its query answering 57014, its backend in the
+  failure path's terminate list; T36R5's disposition notes it). D37R3 FIXED (see D37R2).
+- T37R1 FIXED (see C37R2). T37R2 FIXED (see D37R1). T37R3 FIXED (see D37R2). T37R4 FIXED (see
+  Q37R1). T37R5 FIXED (see Q37R1). T37R6 FIXED (see C37R1). T37R7 FIXED (see Q37R4).
+- L37R1 FIXED (see C37R1). L37R2 FIXED (see S37R1). L37R3 FIXED in the ledger (round thirty-six's
+  entry says round thirty-five's lever 3, not its entry, had every feed keep its newest). L37R4
+  FLAGGED (the compose file runs the bot as `node` in exec form with no `init`, and the bot
+  installs no SIGTERM handler; whether node then ends at once, as the comment beside
+  `stop_grace_period` says, or as PID 1 ignores SIGTERM until the 15 s SIGKILL and so may post or
+  take a batch meanwhile, this host could not run; a maintainer decision, under OWED in the
+  ledger; that comment's redelivery clause now points to DEPLOY's restart note).
+- M37R1 FIXED (see D37R2). M37R2 FIXED (see D37R1).
+- Mutants on this round's new guards, each killed and its source restored: in the unit suite, a
+  drain call after a line comment holding `/*`, the queue pops drained against a fixed clock, a
+  requeue outside the catch, `forgetPending` a no-op, `claimDedupeKey` refusing every key, a
+  function naming only the relay's `MAX_QUEUE` alias, the bot's full resync made two-hourly, an
+  `&&` in a compose comment, and a new writer of the link-change pending index; in section L, a
+  naming statement that names a working session (failing at that arm) and one that hides a
+  `pg_dump` session (failing at the two-leaf walk). A control, a line comment holding `/*` inside
+  a feed function, leaves the unit suite green.
