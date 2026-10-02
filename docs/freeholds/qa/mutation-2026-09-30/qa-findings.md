@@ -4072,13 +4072,13 @@ the pathspecs, a second parse of each bot file, comment and record wording, and 
 
 - C50R1 FIXED `e448b6d828` (with D50R1 and M50R1: every name section L reads that the suite's
   callback or the module declares is pinned with how many times those scopes declare it, once
-  each, so a second binding of `within`, or of any other such name, fails; T49R2's disposition
-  notes it; the scopes' parameters and a hoisted `var` pinned out and types counted, from round
-  fifty-one, C51R2, and `e448b6d828`'s body, which says a second binding that would shadow one
-  fails, stays as it is). C50R2 FIXED in this record (Q49R4 says a callback moved under a computed
-  key fails at the `during` pin and one added under one fails at the digest). C50R3 FIXED in the
-  ledger (with Q50R2 and L50R2: its ROUND FORTY-EIGHT note follows the clauses round forty-nine
-  reworded).
+  each, so a second variable, function, class or import binding of `within`, or of any other such
+  name, fails (worded so in round fifty-three, L53R5); T49R2's disposition notes it; the scopes'
+  parameters and a hoisted `var` pinned out and types counted, from round fifty-one, C51R2, and
+  `e448b6d828`'s body, which says a second binding that would shadow one fails, stays as it is).
+  C50R2 FIXED in this record (Q49R4 says a callback moved under a computed key fails at the
+  `during` pin and one added under one fails at the digest). C50R3 FIXED in the ledger (with Q50R2
+  and L50R2: its ROUND FORTY-EIGHT note follows the clauses round forty-nine reworded).
 - Q50R1 FIXED in this record and the ledger (round forty-nine's summary and the ledger's ROUND
   FORTY-NINE name `within` read by no pin; `376b3c0122`'s body, which leaves it out, stays as it
   is). Q50R2 FIXED (see C50R3). Q50R3 FIXED `e448b6d828` (with T50R3: the grant pin greps
@@ -4160,18 +4160,19 @@ forty-nine's `.tsx` mutant that its log rules out (counted so in round fifty-two
   enums, namespaces and import-equals count among the names declared there; the pin block's
   comment says so, and the ledger's ROUND FIFTY says what round fifty's pin held; C50R1's
   disposition notes it; type parameters and a function expression's name pinned out too, from
-  round fifty-two, D52R1). C51R3 FIXED `33eff5391f` (with S51R1, T51R2, S51R2 and T51R3: the route
-  read takes its modules from esbuild's own list of the bot's bundle, built with the options of
-  `scripts/build_bot.mjs`, which are read whole; the bundle's modules from this repository must be
-  the bot's code files and the two shared sim modules, and its packages `ws` alone, so the
-  tsconfig alias, a `./..` path, a `.tsx` esbuild prefers or a `.json` import fails until a read
-  takes it; S50R2's disposition notes it; a package taken only from the root `node_modules`, from
-  round fifty-two, S52R1). C51R4 FIXED in this record (with Q51R2 and L51R1: C49R1 and T50R2
-  describe the mutant they name rather than an id only the evidence holds). C51R5 FIXED in this
-  record (with H51R1 and Q51R3: round fifty's intro and H50R1 say which reads share the one parse,
-  the grant pin parsing its own). C51R6 RULED, no change: round forty-nine's mutant of a tracked
-  `bot/feed.tsx` ran with `botCode` holding `.tsx`, and its log shows the no-JSX pin failing, the
-  listing check passing.
+  round fifty-two, D52R1, and the ledger's ROUND FIFTY reworded to the bindings round fifty's pin
+  counted, from round fifty-two, C52R1). C51R3 FIXED `33eff5391f` (with S51R1, T51R2, S51R2 and
+  T51R3: the route read takes its modules from esbuild's own list of the bot's bundle, built with
+  the options of `scripts/build_bot.mjs`, which are read whole; the bundle's modules from this
+  repository must be the bot's code files and the two shared sim modules, and its packages `ws`
+  alone, so the tsconfig alias, a `./..` path, a `.tsx` esbuild prefers or a `.json` import fails
+  until a read takes it; S50R2's disposition notes it; a package taken only from the root
+  `node_modules`, from round fifty-two, S52R1). C51R4 FIXED in this record (with Q51R2 and L51R1:
+  C49R1 and T50R2 describe the mutant they name rather than an id only the evidence holds). C51R5
+  FIXED in this record (with H51R1 and Q51R3: round fifty's intro and H50R1 say which reads share
+  the one parse, the grant pin parsing its own). C51R6 RULED, no change: round forty-nine's mutant
+  of a tracked `bot/feed.tsx` ran with `botCode` holding `.tsx`, and its log shows the no-JSX pin
+  failing, the listing check passing.
 - Q51R1 FIXED (see C51R2). Q51R2 FIXED (see C51R4). Q51R3 FIXED (see C51R5). Q51R4 FIXED in this
   record and the ledger (with L51R3: round fifty's summary and the ledger's ROUND FIFTY name the
   check that kept bot names are distinct; `c6e7f080f9`'s body, which leaves it out, stays as it
@@ -4222,22 +4223,26 @@ repository under such a directory went unread; only the root `node_modules` coun
 a sample. One found two reads the last round added never exercised on the tree, the declarations
 around section L and the parameters of the functions around it; each is now proven on a sample,
 and the functions may bind no name of their own, type parameters and a function expression's name
-included, which two readers named. One found the ledger crediting round fifty's pin with
+included, which two readers named (`a23c145fa5`'s body, which leaves this last out, stays as it
+is, noted in round fifty-three, Q53R3). One found the ledger crediting round fifty's pin with
 declarations it did not count. The rest were the parse map's comment, round fifty-one's summaries,
 a lookup's throw, the build options' copy and the package order.
 
 - C52R1 FIXED in the ledger (its ROUND FIFTY says round fifty's pin counted variable, function,
-  class and import bindings, the other declarations from round fifty-one). C52R2 FIXED in this
-  record and the ledger (with Q52R2 and L52R2: round fifty-one's summary and the ledger's ROUND
-  FIFTY-ONE name C51R6's ruling; `17478cc191`'s body, which leaves it out, stays as it is).
+  class and import bindings, the other declarations from round fifty-one; C51R2's disposition
+  notes it, named so in round fifty-three, Q53R1). C52R2 FIXED in this record and the ledger (with
+  Q52R2 and L52R2: round fifty-one's summary and the ledger's ROUND FIFTY-ONE name C51R6's ruling;
+  `17478cc191`'s body, which leaves it out, stays as it is).
 - Q52R1 FIXED `e4cf5bb85e` (with T52R5 and L52R1: the parse map's comment says the reads below
   take it, not that no other read parses a file). Q52R2 FIXED (see C52R2).
 - S52R1 FIXED `e4cf5bb85e` (a module is a package only under the root `node_modules`, which
   `.npmrc` keeps hoisted, proven on a sample that a deeper `node_modules` or a
-  `vendor_node_modules` directory is this repository's; C51R3's disposition notes it).
+  `vendor_node_modules` directory is this repository's; C51R3's disposition notes it; a package
+  named by the directory after its last `node_modules`, from round fifty-three, T53R1).
 - D52R1 FIXED `e4cf5bb85e` (with M52R1 and M52R2: the functions around section L may bind no name
-  of their own, type parameters and a function expression's name counted beside its parameters,
-  and the pin block's comment says so; C51R2's disposition notes it).
+  of their own, type parameters and a function expression's name counted beside their parameters
+  (worded so in round fifty-three, L53R3), and the pin block's comment says so; C51R2's
+  disposition notes it).
 - T52R1 FIXED `e4cf5bb85e` (the declarations read is one function, proven on a sample of each
   statement form it counts, type alias, interface, enum, import-equals and namespace among them).
   T52R2 FIXED `e4cf5bb85e` (the read of the scopes around a node is one function, proven on a
@@ -4255,3 +4260,71 @@ a lookup's throw, the build options' copy and the package order.
   type parameter on the suite's callback, and the callback as a function expression named
   `within`, at the pin of names the functions around bind; the test's build options drifting from
   the script, at their tie; and the bundle lookup failing open again, at its throw.
+
+## Round fifty-three: eight fresh readers over round fifty-two (`17478cc191..a23c145fa5`)
+
+Round fifty-three's commits: `071897e08f` (section L's ancestors are pinned by kind, so a loop,
+`catch`, `case`, class or namespace wrapped around it fails; the statements read of the scopes
+around a node is proven on a sample; a bundled package is named by the directory after its last
+`node_modules`, its scope kept, proven on a sample that holds a nested package and a sibling
+`node_modules_x` directory; git must track nothing under the root `node_modules`; the package
+rule's comment and the samples' comment; the manifest's fifty-third entry; kept whole for bisect),
+and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C53R1 to C53R3 |
+| qa-checklist | PASS | Q53R1 to Q53R3 |
+| server hot path | PASS | none |
+| privacy and security | PASS | S53R1 |
+| database performance | PASS | none |
+| test coverage | PASS | T53R1 to T53R3 |
+| docs librarian | PASS | L53R1 to L53R5 |
+| migration safety | PASS | M53R1 |
+
+16 findings: none blocking, 6 should-fix (Q53R1, Q53R2, T53R1, T53R2, L53R1, M53R1), 10
+nice-to-have, every reader passing, and four (correctness, server hot path, privacy and security,
+database performance) with no should-fix, server hot path and database performance with no finding
+at all. One reader found that section L wrapped in a `for` head, a `catch`, a `case` clause or a
+class would bind names that neither the scopes read nor the declarations read takes; the section's
+ancestors are now pinned by kind. One found last round's package naming take the directory after
+the root `node_modules`, so a package nested in another was named as its parent, and the
+statements read of the scopes around a node never proven on a sample; a package is now named by
+the directory after its last `node_modules`, and that read is proven on a sample. Two found
+C52R1's correction missing from C51R2's disposition, and one found the ledger's ROUND FIFTY still
+crediting round fifty's pin with the scopes' parameters and a hoisted `var`. The rest were two
+comments, the files git tracks under `node_modules`, a sibling sample, a commit body, and record
+and ledger wording.
+
+- C53R1 FIXED `071897e08f` (the package rule's comment says a path with `node_modules` deeper in
+  it or above the working directory is read as this repository's and fails until a read takes it).
+  C53R2 FIXED (see S53R1). C53R3 FIXED `071897e08f` (the comment says the reads of the scopes, the
+  `var` forms and the declarations are each proven on a sample first, and the section's own place
+  is pinned by its ancestors' kinds).
+- Q53R1 FIXED in this record (with L53R1: C51R2's disposition notes C52R1's rewording of the
+  ledger's ROUND FIFTY, and C52R1 names it back). Q53R2 FIXED in the ledger (its ROUND FIFTY says
+  the scopes' parameters and a hoisted `var` were pinned out from round fifty-one, and type
+  parameters and a function expression's name from round fifty-two). Q53R3 FIXED in this record
+  (round fifty-two's summary says `a23c145fa5`'s body leaves out the functions' own names and
+  stays as it is).
+- S53R1 FIXED `071897e08f` (with C53R2: git must track nothing under the root `node_modules`, the
+  premise the package rule's comment now states).
+- T53R1 FIXED `071897e08f` (a bundled package is named by the directory after its last
+  `node_modules`, its scope kept, proven on a sample of a nested and a scoped package; S52R1's
+  disposition notes it). T53R2 FIXED `071897e08f` (the statements read of the scopes around a node
+  is proven on a sample whose section sits in a block under an `if`, three statement lists deep).
+  T53R3 FIXED `071897e08f` (the package rule's sample holds a sibling `node_modules_x` directory,
+  so a prefix without its slash fails).
+- L53R1 FIXED (see Q53R1). L53R2 FIXED in the ledger (its ROUND FIFTY-ONE says one of the
+  should-fix was ruled on a misread). L53R3 FIXED in this record (D52R1 says their parameters).
+  L53R4 FIXED in the ledger (its ROUND FIFTY-TWO writes `node_modules` in backticks). L53R5 FIXED
+  in this record (C50R1 says a second variable, function, class or import binding fails, the
+  bindings round fifty's pin counted).
+- M53R1 FIXED `071897e08f` (section L's ancestors are pinned by kind, from its expression
+  statement through the suite's block, arrow and call to the source file, so a `for` head, a
+  `catch`, a `case` clause, a class or a namespace around it fails).
+- Mutants on this round's new guards, each killed and its source restored: section L wrapped in a
+  `for` loop over realms, at its ancestors' pin; a package named by its root directory again, at
+  the package name sample; the statements read narrowed to the nearest block, at its sample; the
+  package prefix without its slash, at the package rule's sample; and a file under
+  `node_modules/ws` force-added to git, removed after, at the tracked-files check.
