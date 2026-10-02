@@ -1333,3 +1333,5 @@ What changed the contract above:
   (`DEPLOY.md` says how), the storage fragment's probed repairs are repair boots, R-13
   bounds a cut backend's abort by its statement timeout, the runbook's five blocks are SQL
   the suite runs, and every shutdown await carries an explicit classification.
+- A ninth round of eight fresh readers: P12 stops the other realms before every repair boot,
+  and the runbook routes each error by the block that raised it.

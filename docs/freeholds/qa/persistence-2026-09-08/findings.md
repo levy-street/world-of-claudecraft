@@ -5620,6 +5620,11 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   each run by the pg suite, one printing how this server deparses the real CHECK), every
   shutdown await is classified rather than matched by spelling, and the repair boot's cost
   and recovery are stated. Fixed in `8568019ac5` through `52bd1cc535`.
+- ROUND NINE, eight fresh readers over round eight: 54 findings, none blocking, 18 should-fix,
+  on the runbook's error paths and the pin's edge forms. Each error code is now routed by the
+  block that raised it and the collision path runs in the pg suite, every repair boot stops
+  the other realms, duplicate rows are copied aside before any change, and the pin states its
+  boundary. Fixed in `a40e7d3dee` through `4d2a51e2b6`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5639,7 +5644,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 
 - `npx tsc --noEmit` exit 0 at every round's tip.
 - Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then 641,
-  then 642, then 643, then 643, then 644, then 644 passed, never a skip.
+  then 642, then 643, then 643, then 644, then 644, then 644 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
