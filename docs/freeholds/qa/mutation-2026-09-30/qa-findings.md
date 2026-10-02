@@ -491,10 +491,11 @@ classified.
 - Q8R2 FIXED by amending the round-seven record commit (now `2d0c81144b`) and by the T7R6
   disposition naming the out-of-tree evidence summary. Q8R3 FIXED in this record (with L8R5).
   Q8R4 FIXED from this round on: commits split by type, with partial staging where one file
-  carried both, save `bad933db50` and round nine's `50374c36fc`, which keep the runbook with
-  the tests that execute its blocks from `DEPLOY.md` (either half alone fails at its own
-  commit). Q8R5, Q8R6 FIXED `bad933db50` (setup inside the case, a `finally` that restores the
-  CHECK, and the next boot's CHECK oid unchanged). Q8R8 FIXED (see S8R2).
+  carried both, save `bad933db50`, round nine's `50374c36fc`, round ten's `5122865156` and
+  round eleven's `8d56b42d43`, which keep the runbook with the tests that execute its blocks
+  from `DEPLOY.md` (either half alone fails at its own commit). Q8R5, Q8R6 FIXED `bad933db50`
+  (setup inside the case, a `finally` that restores the CHECK, and the next boot's CHECK oid
+  unchanged). Q8R8 FIXED (see S8R2).
 - H8R2 FIXED `8568019ac5` (the concurrent pair is one classified entry, summed once; sequential
   stops would be two). H8R3 FIXED `8568019ac5` (each callee sliced to its own closing brace,
   its bound both armed and waited on). H8R4, H8R5 FIXED `8568019ac5` (the contract names
@@ -642,3 +643,92 @@ variant of DROP); each option was removed rather than specified further.
 - M10R5 FIXED `5122865156` (25P03 or a lost connection re-reads). M10R6 FIXED `5122865156`
   (every Hearth trip fails until the missing column's repair boot, so it runs in the next
   quiet window).
+
+## Round eleven: eight fresh readers over round ten (`09d329c2cb..952be30c6b`)
+
+Round eleven's commits: `5d5912617f` (the allowlist screen matches identifier words, each
+callee is traced to where `server/main.ts` imports it, its body pinned with layout aside),
+`8d56b42d43` (the read and every block are sent as one non-interactive psql session that
+bounds and names itself and prints a code, never a DETAIL; the drop rule needs one key; the
+routes follow the rule they name; the pg case sends each block so and runs every stop shape
+and the integrity route; kept whole with its tests for bisect), `4373df398d` (one steady-state
+term, a quiet window outside the nightly `pg_dump`, the duplicate recovery scoped to housing,
+the column repair's 42710 stated), and the commit that adds this section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C11R1 to C11R5 |
+| qa-checklist | PASS | Q11R1 to Q11R7 |
+| server hot path | PASS | H11R1 to H11R5 |
+| privacy and security | PASS | S11R1 to S11R6 |
+| database performance | PASS | D11R1 to D11R6 |
+| test coverage | PASS | T11R1 to T11R8 |
+| docs librarian | PASS | L11R1 to L11R9 |
+| migration safety | PASS | M11R1 to M11R5, and one note outside the diff |
+
+51 findings: none blocking, 16 should-fix (H11R1, H11R2, T11R1 to T11R3, C11R1, Q11R1 to
+Q11R3, M11R1, M11R2, D11R1, L11R1 to L11R4), 35 nice-to-have, and one note outside the diff.
+Four readers found the same regression: round ten's screen fix had narrowed the screen. The
+runbook's one unstated step, how a block is sent, became one command rather than another
+route.
+
+- C11R1 FIXED (see H11R1). C11R2 FIXED `8d56b42d43` (with M11R4 and S11R2: after DROP, the
+  drop rule's read shows whether it landed). C11R3 FIXED `8d56b42d43` (with Q11R4, S11R3,
+  D11R5 and L11R5: an integrity error from NULL AND VALIDATE is the third time DROP may be
+  sent, after the drop rule's own read). C11R4 FIXED `8d56b42d43` (with S11R1 and M11R3: the
+  read reports `keys`, the length of `conkey`, and DROP needs 1; on PostgreSQL 16 a whole-row
+  CHECK reads `keys` 2 beside `columns` `{advance_token}`, run in the pg suite). C11R5 FIXED
+  `8d56b42d43` (psql now stops at the first error, so no 25P02 line follows it).
+- Q11R1 FIXED (see H11R1). Q11R2 FIXED `4373df398d` (with L11R1: DEPLOY, the Hearth fragment's
+  comment and the manifest say steady-state boot; the pg case title follows in `8d56b42d43`).
+  Q11R3 FIXED `8d56b42d43` (with T11R2 and S11R6: every five-character code in the bullet is
+  pinned as one ordered list, so a route in any wording joins it). Q11R4 FIXED (see C11R3).
+  Q11R5 FIXED `5d5912617f` (with T11R8: the empty set is gone). Q11R6 NOTED: `a2dd8eb879`'s
+  body omits the own-directory re-export and the blank-line grace parse, and `952be30c6b`'s
+  body credits the manifest with the tip's pg total and the preflight, which went to the
+  ledger; this section and round ten's say what each commit did, and rewording them would
+  change every hash these records cite. Q11R7 FIXED (see T11R3).
+- H11R1 FIXED `5d5912617f` (with T11R1, C11R1 and Q11R1): the screen splits each identifier at
+  its humps and underscores and matches whole words in any case, so SCREAMING_SNAKE bounds
+  count again and `heldClaims` stays clear; its self-test covers each word in each spelling
+  and one near miss. H11R2 FIXED `5d5912617f`: each callee is read where `server/main.ts`
+  imports it from, directly or through one named re-export; a mutant importing the renewer's
+  stop from another module fails the pin. H11R3 FIXED `5d5912617f` (with T11R5: posix paths).
+  H11R4 FIXED `5d5912617f` (bodies are compared with layout dropped; a mutant doubling the
+  renewer's bound still fails). H11R5 FIXED `5d5912617f` (comment lines, a quoted value and a
+  trailing comment parse; a compound duration still fails loudly).
+- S11R1 FIXED (see C11R4). S11R2 FIXED (see C11R2). S11R3 FIXED (see C11R3). S11R4 FIXED
+  `4373df398d` (the bullet says the boot's fatal log line prints the DETAIL too; trimming that
+  log is OWED). S11R5 FIXED (see D11R1). S11R6 FIXED (see Q11R3).
+- D11R1 FIXED `8d56b42d43` (with S11R5 and C11R5): one non-interactive psql command, whose
+  PGOPTIONS bound every lock wait and pause and name the session, with ON_ERROR_STOP and
+  VERBOSITY sqlstate (terse would hide the code every route keys on); pasting into an
+  interactive session is ruled out, and the pg case sends each block under the command's own
+  options, so an error ends the session with no ROLLBACK sent. D11R2 FIXED `8d56b42d43` (a
+  lost connection waits until no other `advance_token_runbook` session remains). D11R3 FIXED
+  `8d56b42d43` (NULL AND VALIDATE's row locks last for VALIDATE's scan, which grows with the
+  table; no statement timeout was added, since a cut VALIDATE only sends the operator to
+  stop). D11R4 FIXED `8d56b42d43` (the read's brief ACCESS SHARE is stated, and the command's
+  lock timeout bounds it). D11R5 FIXED (see C11R3). D11R6 FIXED `4373df398d` (the quiet window
+  is defined once, outside the nightly `pg_dump`).
+- T11R1 FIXED (see H11R1). T11R2 FIXED (see Q11R3). T11R3 FIXED `8d56b42d43` (with Q11R7: four
+  stop shapes, each through the bullet's own read and each failing the rule: another column,
+  the whole row beside the token, a foreign key, and a key over the account and the token).
+  T11R4 FIXED `8d56b42d43` (the read's `conname` clause is pinned). T11R5 FIXED (see H11R3).
+  T11R6 FIXED `5d5912617f` (by fixture, a nested re-export resolves in its own directory).
+  T11R7 FIXED `5d5912617f` (by fixture, a wrapped group splits into its members). T11R8 FIXED
+  (see Q11R5).
+- L11R1 FIXED (see Q11R2). L11R2 FIXED `8d56b42d43` (the 42703 route stops the other realms).
+  L11R3 FIXED in this record (the Q8R4 line names round ten's and round eleven's commits).
+  L11R4 FIXED `4373df398d` (with M11R1): the duplicate recovery is housing's; the storage
+  guard's own failure, its message and its HINT are outside the bullet, and a runbook for them
+  is OWED. L11R5 FIXED (see C11R3). L11R6 FIXED `8d56b42d43` (with M11R2: case four ends at
+  the drop rule). L11R7 FIXED in this record's manifest line. L11R8 FIXED in the ledger. L11R9
+  FIXED `8d56b42d43` (the routes are the last sub-bullet, after the read and the drop rule
+  they name).
+- M11R1 FIXED (see L11R4). M11R2 FIXED (see L11R6). M11R3 FIXED (see C11R4). M11R4 FIXED (see
+  C11R2). M11R5 FIXED `4373df398d` (the columns come only from the boot's own statement;
+  housing's index is built only when absent, so a rolled-back build leaves no row). The note
+  outside the diff FIXED `4373df398d`: the fragment's comment and P12 say the column's repair
+  names its CHECK unprobed, so a hand-made constraint of that name on other columns fails that
+  boot with 42710 (confirmed on PostgreSQL 16).

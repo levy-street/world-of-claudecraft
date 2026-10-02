@@ -1337,5 +1337,10 @@ What changed the contract above:
 - A ninth round of eight fresh readers: P12 stops the other realms before every repair boot,
   and the runbook routes each error by the block that raised it.
 - A tenth round of eight fresh readers: P12 names a re-added column in a repair boot's cost;
-  the runbook drops only a token-only displacement and changes no rows on a failed unique
-  rebuild, and both shutdown callees that fix their own bound are pinned whole.
+  the runbook's drop rule takes only a token-only displacement, a failed unique rebuild
+  escalates with no row changed, and both shutdown callees that fix their own bound are pinned
+  whole.
+- An eleventh round of eight fresh readers: P12 says steady-state boot throughout and that the
+  column's repair, unlike the CHECK's, can fail on a hand-made constraint of the token's name;
+  the runbook sends each block as one psql session that prints a code, never a DETAIL, and its
+  drop rule needs one key.

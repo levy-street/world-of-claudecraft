@@ -5626,10 +5626,16 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   the other realms, duplicate rows are copied aside before any change, and the pin states its
   boundary. Fixed in `a40e7d3dee` through `4d2a51e2b6`.
 - ROUND TEN, eight fresh readers over round nine: 47 findings, none blocking, 17 should-fix,
-  mostly options the two rounds before had added. Each was removed rather than specified
-  further: a failed unique rebuild now changes no rows and escalates, the drop rule drops only
-  a token-only displacement and stops on anything else, and both shutdown callees are pinned
-  whole. Fixed in `a2dd8eb879` through `6479a603bf`.
+  mostly options the two rounds before had added. Each such option was removed rather than
+  specified further: a failed unique rebuild changes no rows and escalates, the drop rule
+  drops only a token-only displacement and stops on anything else, and both shutdown callees
+  are pinned whole. Fixed in `a2dd8eb879` through `6479a603bf`.
+- ROUND ELEVEN, eight fresh readers over round ten: 51 findings, none blocking, 16 should-fix.
+  The allowlist screen round ten had narrowed now matches identifier words rather than
+  spellings, and each shutdown callee is traced to where `server/main.ts` imports it. The
+  runbook's one unstated step, how a block is sent, became one psql command whose session
+  bounds and names itself and prints a code, never a DETAIL, and the drop rule reads the
+  constraint's key count. Fixed in `5d5912617f` through `4373df398d`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5649,7 +5655,8 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 
 - `npx tsc --noEmit` exit 0 at every round's tip.
 - Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then 641,
-  then 642, then 643, then 643, then 644, then 644, then 644, then 644 passed, never a skip.
+  then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644 passed, never
+  a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
@@ -5674,6 +5681,11 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   bounded sum's margin under the 75 s grace rests on evidence.
 - A read-only preflight before a deploy, or a boot line naming the repair it performs, so a
   repair boot is known before it starts and the other realms can be stopped first.
+- A runbook entry for the storage guard's duplicate open purchases, whose message carries a
+  character id and whose HINT asks for a reconcile, with a ruling on whether they follow
+  housing's change-no-rows rule; it belongs to the storage path.
+- The boot's fatal log prints a pg error whole, its DETAIL included; logging only its code,
+  message, table and constraint belongs to the boot path.
 - A golden for the Hearth admission's pending and deny arms.
 - The receipts gauge's rate budget (08, 15).
 - The maintainer's rulings on three items:
