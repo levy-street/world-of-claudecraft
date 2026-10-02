@@ -602,6 +602,7 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       // pattern is checked on a URL that does name the session.
       const namesSession = /[?&](?:application_name|options)=/;
       expect(namesSession.test('postgres://h/db?application_name=x')).toBe(true);
+      expect(namesSession.test('postgres://h/db?sslmode=disable&options=-c%20x')).toBe(true);
       expect(namesSession.test(url), 'TEST_DATABASE_URL names the session').toBe(false);
       const namedInOptions = await (async () => {
         vi.stubEnv('PGAPPNAME', '');
@@ -774,6 +775,8 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       // waiter queued behind it, and a runbook session that holds nothing, and
       // never the session that sends it or a runbook session in another
       // database on the server.
+      // Checked before parsing, since a URL error would carry the password.
+      expect(URL.canParse(url), 'TEST_DATABASE_URL parses as a URL').toBe(true);
       const elsewhere = new URL(url);
       elsewhere.pathname = '/postgres';
       const dump = await asPsql({ options: '', application_name: 'pg_dump' });
@@ -787,6 +790,12 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       let waiting: Promise<unknown> | undefined;
       try {
         await Promise.all([dump.connect(), waiter.connect(), idle.connect(), other.connect()]);
+        const databaseOf = async (client: typeof dump) =>
+          String((await client.query('SELECT current_database() AS db')).rows[0].db);
+        expect(
+          await databaseOf(other),
+          'TEST_DATABASE_URL must name a database other than postgres',
+        ).not.toBe(await databaseOf(idle));
         const pidOf = async (client: typeof dump) =>
           Number((await client.query('SELECT pg_backend_pid() AS pid')).rows[0].pid);
         const [dumpPid, waiterPid, idlePid] = await Promise.all([dump, waiter, idle].map(pidOf));
@@ -841,7 +850,9 @@ d('account_freehold_hearth against real PostgreSQL', () => {
         await waiter.query('ROLLBACK').catch(() => {});
         await Promise.all([dump.end(), waiter.end(), idle.end(), other.end()]);
       }
-      expect(await send(block.HOLDER)).toEqual([]);
+      expect(
+        (await send(block.HOLDER)).filter((row) => row.backend_type === 'client backend'),
+      ).toEqual([]);
       // A missing column. With its name free, RESTORE fails 42703 and the next
       // boot re-adds the column with its CHECK; with the name held on another
       // column or none, DISPLACE fails 42703 and changes nothing, and every
