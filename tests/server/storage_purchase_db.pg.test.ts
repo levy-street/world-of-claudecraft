@@ -2331,5 +2331,102 @@ d('storage_purchases against real PostgreSQL', () => {
       // And the erase has nothing left to do for it.
       expect(await ops.eraseFreeholdOperationReceiptsForAccount(pool, 45)).toBe(0);
     });
+
+    it('binds the built-ins into its CHECKs even with a same-named decoy in the target schema', async () => {
+      // Two throwaway schemas, each with stand-in parents and two decoys that
+      // would pass anything: a jsonb_typeof always answering 'array' and a text
+      // ~ operator always answering true. One gets the fragment as shipped, the
+      // other the path with pg_catalog NAMED second (the control: the shape that
+      // lets a decoy bind).
+      const shipped = `${SCHEMA}_decoy`;
+      const named = `${SCHEMA}_decoy_named`;
+      const decoyed = async (schema: string) => {
+        await pool.query(`DROP SCHEMA IF EXISTS ${schema} CASCADE`);
+        await pool.query(`CREATE SCHEMA ${schema}`);
+        await pool.query(
+          `CREATE TABLE ${schema}.accounts (id INT PRIMARY KEY, deactivated_at TIMESTAMPTZ)`,
+        );
+        await pool.query(
+          `CREATE TABLE ${schema}.characters (id INT PRIMARY KEY, account_id INT, realm TEXT)`,
+        );
+        await pool.query(`INSERT INTO ${schema}.accounts (id) VALUES (1)`);
+        await pool.query(
+          `CREATE FUNCTION ${schema}.jsonb_typeof(jsonb) RETURNS text
+             LANGUAGE sql IMMUTABLE AS $$ SELECT 'array'::text $$`,
+        );
+        await pool.query(
+          `CREATE FUNCTION ${schema}.decoy_match(text, text) RETURNS boolean
+             LANGUAGE sql IMMUTABLE AS $$ SELECT true $$`,
+        );
+        await pool.query(
+          `CREATE OPERATOR ${schema}.~ (LEFTARG = text, RIGHTARG = text, FUNCTION = ${schema}.decoy_match)`,
+        );
+      };
+      /** A row both decoys would wave through: a malformed id and an object. */
+      const insertMalformed = (schema: string) =>
+        pool.query(
+          `INSERT INTO ${schema}.freehold_operations
+             (operation_id, account_id, kind, fingerprint, copy_refs)
+           VALUES ('not an id!', 1, 'pg_test_kind', $1, '{}'::jsonb)`,
+          [FP_A],
+        );
+      /** How many catalog edges tie the table's constraints to the decoys. */
+      const decoyEdges = async (schema: string) =>
+        Number(
+          (
+            await pool.query(
+              `SELECT count(*)::int AS n
+                 FROM pg_depend d
+                 JOIN pg_constraint c ON d.classid = 'pg_constraint'::regclass AND d.objid = c.oid
+                WHERE c.conrelid = $1::regclass
+                  AND ((d.refclassid = 'pg_proc'::regclass AND d.refobjid IN
+                         (SELECT oid FROM pg_proc WHERE pronamespace = $2::regnamespace))
+                    OR (d.refclassid = 'pg_operator'::regclass AND d.refobjid IN
+                         (SELECT oid FROM pg_operator WHERE oprnamespace = $2::regnamespace)))`,
+              [`${schema}.freehold_operations`, schema],
+            )
+          ).rows[0].n,
+        );
+      try {
+        await decoyed(shipped);
+        await pool.query(ops.freeholdOperationSchema(shipped));
+        expect(await decoyEdges(shipped)).toBe(0);
+        await expect(insertMalformed(shipped)).rejects.toMatchObject({ code: '23514' });
+        // Each built-in is live on its own: a well-formed id with an object
+        // still fails jsonb_typeof, an array with a bad id still fails ~.
+        await expect(
+          pool.query(
+            `INSERT INTO ${shipped}.freehold_operations
+               (operation_id, account_id, kind, fingerprint, copy_refs)
+             VALUES ('pg-op-decoy-1', 1, 'pg_test_kind', $1, '{}'::jsonb)`,
+            [FP_A],
+          ),
+        ).rejects.toMatchObject({
+          code: '23514',
+          constraint: 'freehold_operations_copy_refs_array',
+        });
+        await expect(
+          pool.query(
+            `INSERT INTO ${shipped}.freehold_operations
+               (operation_id, account_id, kind, fingerprint, copy_refs)
+             VALUES ('not an id!', 1, 'pg_test_kind', $1, '[]'::jsonb)`,
+            [FP_A],
+          ),
+        ).rejects.toMatchObject({ code: '23514', constraint: 'freehold_operations_id_shape' });
+
+        await decoyed(named);
+        const fragment = ops.freeholdOperationSchema(named);
+        const line = `SET LOCAL search_path = "${named}", pg_temp;`;
+        expect(fragment.split(line)).toHaveLength(2);
+        await pool.query(
+          fragment.replace(line, `SET LOCAL search_path = "${named}", pg_catalog, pg_temp;`),
+        );
+        expect(await decoyEdges(named)).toBeGreaterThan(0);
+        expect((await insertMalformed(named)).rowCount).toBe(1);
+      } finally {
+        await pool.query(`DROP SCHEMA IF EXISTS ${shipped} CASCADE`);
+        await pool.query(`DROP SCHEMA IF EXISTS ${named} CASCADE`);
+      }
+    });
   });
 });

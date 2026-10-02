@@ -143,6 +143,16 @@ function scansReach(root: ExplainPlanNode, relation: string, index: string): str
   });
 }
 
+/** Each read of `relation` reaches ONE of `indexes` (a predicate two indexes
+ *  both serve, where the planner's pick is not the property): the index each
+ *  read used, or why it used none. */
+function scansReachOneOf(root: ExplainPlanNode, relation: string, indexes: string[]): string[] {
+  return relationScans(root, relation).map((node) => {
+    const hit = indexes.find((index) => checkRelationUsesPartialIndex(node, relation, index).ok);
+    return hit ?? `"${relation}" (${node['Node Type']}) reached none of ${indexes.join(', ')}`;
+  });
+}
+
 const planShape = (node: ExplainPlanNode): string => {
   const rel = node['Relation Name']
     ? `(${node['Relation Name']}${node['Index Name'] ? ` via ${node['Index Name']}` : ''})`
@@ -553,6 +563,69 @@ d('the global plot claim against real PostgreSQL', () => {
     ).toEqual({ kind: 'updated', durableRev: '2' });
     expect(await plotRow(2)).toMatchObject({ durable_rev: '2', tier: 'manor', condition: 90 });
     expect((await claimRow(plotId))?.write_token).toBe(fenceB.writeToken);
+  });
+
+  it('at the realm TTL: a claim two autosave passes stale is still held, and one renewal restores the whole TTL', async () => {
+    // The realm's own LEASE_TTL_SECONDS, read from its source (importing it
+    // would load server/db), with time moved by shifting the row: the database
+    // clock cannot be advanced. AUTOSAVE_SECONDS (server/game.ts) is 30, so a
+    // claim whose renewer missed one pass is 60 s stale at the next one.
+    const ttl = Number(
+      /export const LEASE_TTL_SECONDS = (\d+);/.exec(
+        readFileSync(
+          fileURLToPath(new URL('../../server/character_lease_db.ts', import.meta.url)),
+          'utf8',
+        ),
+      )?.[1],
+    );
+    expect(ttl).toBe(90);
+    const plotId = plot('realm-ttl');
+    expect(await acquire(poolA, HOLDER_A, plotId, 40, ttl)).toEqual({
+      kind: 'acquired',
+      generation: '1',
+      takeover: false,
+    });
+    /** expires_at minus heartbeat_at, in microseconds (two clock reads apart). */
+    const span = (row: { expires_us: string; heartbeat_us: string } | null) =>
+      Number(BigInt(row?.expires_us ?? '0') - BigInt(row?.heartbeat_us ?? '0'));
+    const age = (seconds: number) =>
+      probe.query(
+        `UPDATE ${SCHEMA}.freehold_plot_claims
+            SET heartbeat_at = heartbeat_at - make_interval(secs => $2),
+                expires_at = expires_at - make_interval(secs => $2)
+          WHERE plot_id = $1`,
+        [plotId, seconds],
+      );
+    expect(span(await claimRow(plotId))).toBeGreaterThanOrEqual(ttl * 1_000_000);
+    expect(span(await claimRow(plotId))).toBeLessThan((ttl + 1) * 1_000_000);
+
+    // Two passes and a second stale: still A's, so B is busy.
+    await age(61);
+    const stale = await claimRow(plotId);
+    expect(stale).toMatchObject({ holder: HOLDER_A, generation: '1', live: true });
+    expect(await acquire(poolB, HOLDER_B, plotId, 40, ttl)).toEqual({ kind: 'busy' });
+
+    const registry = reg.createFreeholdClaimRegistry();
+    registry.record(held(plotId, 40));
+    const { deps } = renewDeps(registry, ttl);
+    await reg.renewFreeholdClaims(deps);
+    expect(registry.counters).toMatchObject({ renewed: 1, missedHeartbeats: 0, lost: 0 });
+    const renewed = await claimRow(plotId);
+    expect(renewed).toMatchObject({ holder: HOLDER_A, generation: '1', live: true });
+    expect(span(renewed)).toBeGreaterThanOrEqual(ttl * 1_000_000);
+    expect(span(renewed)).toBeLessThan((ttl + 1) * 1_000_000);
+    // Restored from the stale expiry by at least the 61 s it had lost.
+    expect(
+      Number(BigInt(renewed?.expires_us ?? '0') - BigInt(stale?.expires_us ?? '0')),
+    ).toBeGreaterThanOrEqual(61 * 1_000_000);
+
+    // The control: with no renewal for the whole TTL, B takes it over.
+    await age(ttl + 1);
+    expect(await acquire(poolB, HOLDER_B, plotId, 40, ttl)).toEqual({
+      kind: 'acquired',
+      generation: '2',
+      takeover: true,
+    });
   });
 
   it('writes through a matching fence once, stamps no token on a stale write, and writes nothing through a wrong fence', async () => {
@@ -1052,9 +1125,13 @@ d('the global plot claim against real PostgreSQL', () => {
     } finally {
       hog.release();
     }
-    // The abandoned checkout is handed back, not leaked: the pool still serves.
+    // The abandoned checkout is handed back, not leaked: the pool's ONE client
+    // is idle again (a leak would leave it checked out, and the read below
+    // would only fail by its own timeout), and the pool still serves.
     await sleep(20);
     expect(tight.waitingCount).toBe(0);
+    expect(tight.totalCount).toBe(1);
+    expect(tight.idleCount).toBe(1);
     expect((await tight.query('SELECT 1 AS one')).rows).toEqual([{ one: 1 }]);
     await tight.end();
   });
@@ -1419,9 +1496,13 @@ d('the global plot claim against real PostgreSQL', () => {
       // client, which the refused read's checkout received when the hog let
       // go, so this read can only succeed (inside its own 400 ms budget) once
       // that checkout released it.
+      await sleep(20);
+      expect(tight.totalCount).toBe(1);
+      expect(tight.idleCount).toBe(1);
       const answer = await loginMod.readClaimedLoginDurables(starved, 31);
       expect(answer.row).toMatchObject({ kind: 'row', row: { plotId, durableRev: '1' } });
       expect(tight.totalCount).toBe(1);
+      expect(tight.idleCount).toBe(1);
       expect(tight.waitingCount).toBe(0);
       expect(registry.forPlot(plotId)).toMatchObject({ accountId: 31, generation: '1' });
       expect(onClaimed).toHaveBeenCalledWith(31);
@@ -1546,7 +1627,65 @@ d('the global plot claim against real PostgreSQL', () => {
         scansReach(releaseAllPlan, 'freehold_plot_claims', 'freehold_plot_claims_holder'),
       ).toEqual(['freehold_plot_claims_holder', 'freehold_plot_claims_holder']);
 
-      // RECORDED, not pinned: the renew chunk's plan.
+      // Every other claim statement, each read on an index, never a scan of
+      // the keep-forever table. The chunked renew, release and re-reads may
+      // take the plot key or the holder index (both serve them, and which one
+      // is the planner's call at a given size: workload-evidence.md records a
+      // BitmapAnd of the two on the grown table); the per-plot fences and
+      // reads take the plot key; the export and the account cascade take the
+      // account index.
+      const pkey = 'freehold_plot_claims_pkey';
+      const holderIdx = 'freehold_plot_claims_holder';
+      const accountIdx = 'freehold_plot_claims_account';
+      const chunked: [string, string, unknown[]][] = [
+        ['renew', claimDb.FREEHOLD_CLAIM_RENEW_SQL, [HOLDER_A, LONG_TTL_SECONDS, [plotId]]],
+        ['release', claimDb.FREEHOLD_CLAIM_RELEASE_SQL, [HOLDER_A, [plotId]]],
+        ['still held', claimDb.FREEHOLD_CLAIM_STILL_HELD_SQL, [HOLDER_A, [plotId]]],
+        ['release read', claimDb.FREEHOLD_CLAIM_RELEASE_READ_SQL, [HOLDER_A, [plotId]]],
+        ['release wait', claimDb.FREEHOLD_CLAIM_RELEASE_WAIT_SQL, [HOLDER_A, [plotId]]],
+      ];
+      for (const [name, text, values] of chunked) {
+        const reads = scansReachOneOf(await explain(text, values), 'freehold_plot_claims', [
+          pkey,
+          holderIdx,
+        ]);
+        expect(reads.length, name).toBeGreaterThan(0);
+        for (const read of reads) expect([pkey, holderIdx], `${name}: ${read}`).toContain(read);
+      }
+      const perPlot: [string, string, unknown[]][] = [
+        ['read fence', claimDb.FREEHOLD_CLAIM_READ_FENCE_SQL, [plotId, HOLDER_A, '1']],
+        ['write fence', claimDb.FREEHOLD_CLAIM_FENCE_SQL, [plotId, HOLDER_A, '1', 'a'.repeat(32)]],
+        ['token lock', claimDb.FREEHOLD_CLAIM_TOKEN_LOCK_SQL, [plotId, HOLDER_A, '1']],
+        ['verify read', claimDb.FREEHOLD_CLAIM_VERIFY_SQL, [plotId]],
+      ];
+      for (const [name, text, values] of perPlot) {
+        expect(scansReach(await explain(text, values), 'freehold_plot_claims', pkey), name).toEqual(
+          [pkey],
+        );
+      }
+      const insertPlan = await explain(claimDb.FREEHOLD_CLAIM_INSERT_SQL, [
+        plot('plansinsert'),
+        29,
+        REALM_A,
+        HOLDER_A,
+        'a'.repeat(32),
+        LONG_TTL_SECONDS,
+      ]);
+      expect(
+        (insertPlan as unknown as Record<string, unknown>)['Conflict Arbiter Indexes'],
+      ).toEqual([pkey]);
+      expect(relationScans(insertPlan, 'freehold_plot_claims')).toEqual([]);
+      for (const [name, text] of [
+        ['export', claimDb.FREEHOLD_CLAIM_EXPORT_SQL],
+        // The accounts row's ON DELETE CASCADE, as the statement it runs.
+        ['account cascade', 'DELETE FROM freehold_plot_claims WHERE account_id = $1'],
+      ] as const) {
+        expect(
+          scansReach(await explain(text, [29]), 'freehold_plot_claims', accountIdx),
+          name,
+        ).toEqual([accountIdx]);
+      }
+      // RECORDED too: the renew chunk's whole plan shape at this size.
       const renewPlan = await explain(claimDb.FREEHOLD_CLAIM_RENEW_SQL, [
         HOLDER_A,
         LONG_TTL_SECONDS,

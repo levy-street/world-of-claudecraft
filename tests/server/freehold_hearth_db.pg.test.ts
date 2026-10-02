@@ -358,6 +358,57 @@ d('account_freehold_hearth against real PostgreSQL', () => {
     expect((await tokenShape(LEGACY_SCHEMA)).constraints).toHaveLength(1);
   });
 
+  it('puts back a CHECK the column lost, NOT VALID: new tokens are checked again, old rows are not scanned', async () => {
+    // Runs on the table the case above upgraded: the column stays, its named
+    // CHECK goes (a hand edit), and a malformed token lands while it is gone.
+    const legacy = db.freeholdHearthSchema(LEGACY_SCHEMA);
+    const legacyTable = `${LEGACY_SCHEMA}.account_freehold_hearth`;
+    await pool.query(
+      `ALTER TABLE ${legacyTable} DROP CONSTRAINT account_freehold_hearth_advance_token_shape`,
+    );
+    await pool.query(`INSERT INTO ${legacyTable} (account_id, advance_token) VALUES ($1, $2)`, [
+      CHECK_ACCOUNT,
+      'NOT-A-TOKEN',
+    ]);
+    expect((await tokenShape(LEGACY_SCHEMA)).constraints).toEqual([]);
+    // The control: with the CHECK missing, the probe's second arm reaches its
+    // ALTER, which cannot pass a live reader.
+    expect(await applyBesideAReader(legacy, legacyTable)).toEqual({ ok: false, code: '55P03' });
+
+    await pool.query(legacy);
+    expect((await tokenShape(LEGACY_SCHEMA)).constraints).toEqual([
+      {
+        conname: 'account_freehold_hearth_advance_token_shape',
+        def: "CHECK (((advance_token IS NULL) OR (advance_token ~ '^[0-9a-f]{32}$'::text))) NOT VALID",
+      },
+    ]);
+    // The old row was never scanned: it is still there, as written.
+    const kept = await pool.query(
+      `SELECT advance_token FROM ${legacyTable} WHERE account_id = $1`,
+      [CHECK_ACCOUNT],
+    );
+    expect(kept.rows).toEqual([{ advance_token: 'NOT-A-TOKEN' }]);
+    // Every NEW token is checked again, on an update as on an insert.
+    await expect(
+      pool.query(`UPDATE ${legacyTable} SET advance_token = $2 WHERE account_id = $1`, [
+        READY_ACCOUNT,
+        '0123456789ABCDEF0123456789ABCDEF',
+      ]),
+    ).rejects.toMatchObject({
+      code: '23514',
+      constraint: 'account_freehold_hearth_advance_token_shape',
+    });
+    await pool.query(`UPDATE ${legacyTable} SET advance_token = $2 WHERE account_id = $1`, [
+      READY_ACCOUNT,
+      TOKEN,
+    ]);
+    // Repaired once, the next boot is a catalog read again with one CHECK.
+    expect(await applyBesideAReader(legacy, legacyTable)).toEqual({ ok: true });
+    await pool.query(legacy);
+    expect((await tokenShape(LEGACY_SCHEMA)).constraints).toHaveLength(1);
+    await pool.query(`DELETE FROM ${legacyTable} WHERE account_id = $1`, [CHECK_ACCOUNT]);
+  });
+
   it("restores the caller's in-flight search_path after the fragment", async () => {
     const client = await pool.connect();
     try {

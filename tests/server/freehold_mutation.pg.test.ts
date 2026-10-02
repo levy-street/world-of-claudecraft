@@ -21,8 +21,9 @@
 // (hook refusals rolling back the character save, exactly-one custody across
 // every fault of a bags-to-plot transfer, the ambiguous-COMMIT verify waiting on
 // the character row, the two-realm Hearth race, the operation lifecycle and cap,
-// the D88 parent-delete guard and receipt erasure, the legacy-effect
-// interleaves, no client across the prepare, and the export allowlist). The
+// the D88 parent-delete guard, its races and receipt erasure, the legacy-effect
+// interleaves, no client across the prepare, the export allowlist, the index
+// every statement reaches, and a catalog-only fragment re-apply). The
 // nearest suites do not pin it: tests/server/freehold_mutation.test.ts drives
 // the same decisions with fakes (no transaction to roll back, no row to wait
 // on), tests/server/freehold_hearth_db.pg.test.ts and
@@ -30,7 +31,7 @@
 // with no character save around them, and tests/guild_bank_pg_integration.test.ts
 // and tests/server/storage_purchase_db.pg.test.ts prove the legacy halves with
 // no housing participant.
-// Cost: 2.4 s
+// Cost: 3.4 s
 import { randomUUID } from 'node:crypto';
 import type { Pool as PgPool, PoolClient } from 'pg';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -46,6 +47,11 @@ import type { FreeholdMutationDeps, FreeholdMutationRequest } from '../../server
 import type { FreeholdOperationIntent } from '../../server/freehold_operation_db';
 import type { StorageAppliedEffect } from '../../server/storage_purchase_db';
 import type { GuildBankOpDelta } from '../../src/sim/guild_bank';
+import {
+  checkRelationUsesPartialIndex,
+  type ExplainPlanNode,
+  rootPlanFromExplainRow,
+} from '../helpers/pg_plan';
 
 const ADMIN_URL = process.env.TEST_DATABASE_URL ?? '';
 const VERIFY_DB = 'wocc_freehold_mutation_verify';
@@ -73,22 +79,23 @@ const VERIFY_WAIT_TEXT = 'SELECT 1 FROM characters WHERE id = $1 FOR SHARE';
 type Db = typeof import('../../server/db');
 
 interface Gate {
-  readonly reached: Promise<void>;
+  /** Resolves with the HOLDING save's backend pid once it parks. */
+  readonly reached: Promise<number>;
   readonly open: () => void;
   readonly hold: {
     readonly at: 'before' | 'after';
-    reach(): void;
+    reach(pid: number): void;
     readonly release: Promise<void>;
   };
 }
 
 function gate(at: 'before' | 'after'): Gate {
   let open!: () => void;
-  let reach!: () => void;
+  let reach!: (pid: number) => void;
   const release = new Promise<void>((resolve) => {
     open = resolve;
   });
-  const reached = new Promise<void>((resolve) => {
+  const reached = new Promise<number>((resolve) => {
     reach = resolve;
   });
   return { reached, open, hold: { at, reach, release } };
@@ -130,6 +137,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
   let plots: typeof import('../../server/freehold_db');
   let housing: typeof import('../../server/character_save_housing');
   let charDelete: typeof import('../../server/character_delete_db');
+  let federated: typeof import('../../server/federated_auth_db');
   let outbox: typeof import('../../server/bank_ledger_outbox');
   let storage: typeof import('../../server/storage_purchase_db');
   let realm: string;
@@ -156,6 +164,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
     plots = await import('../../server/freehold_db');
     housing = await import('../../server/character_save_housing');
     charDelete = await import('../../server/character_delete_db');
+    federated = await import('../../server/federated_auth_db');
     outbox = await import('../../server/bank_ledger_outbox');
     storage = await import('../../server/storage_purchase_db');
     realm = (await import('../../server/realm')).REALM;
@@ -249,7 +258,12 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       plotId,
       tier: 'cottage',
       layoutJson: JSON.stringify(
-        Array.from({ length: chairs }, (_, i) => ({ itemId: CHAIR, copyRef: `${COPY_REF}:${i}` })),
+        // The first chair IS the copy the transfer intent names, so custody can
+        // be read by exact copy identity, not only by item count.
+        Array.from({ length: chairs }, (_, i) => ({
+          itemId: CHAIR,
+          copyRef: i === 0 ? COPY_REF : `${COPY_REF}:${i}`,
+        })),
       ),
       trophiesJson: '[]',
       condition: 100,
@@ -378,15 +392,20 @@ d('the housing mutation boundary (REAL Postgres)', () => {
             ? {
                 ...hook,
                 run: async (tx) => {
+                  // The holding backend, so a case can require that a waiter is
+                  // blocked by THIS save and not by anything else in the database.
+                  const holder = hold
+                    ? Number((await tx.query('SELECT pg_backend_pid() AS pid')).rows?.[0]?.pid)
+                    : 0;
                   if (hold?.at === 'before') {
-                    hold.reach();
+                    hold.reach(holder);
                     await hold.release;
                   }
                   await observe?.(tx, 'before');
                   try {
                     await hook.run(tx);
                   } finally {
-                    if (hold?.at === 'after') hold.reach();
+                    if (hold?.at === 'after') hold.reach(holder);
                   }
                   await observe?.(tx, 'after');
                   if (hold?.at === 'after') await hold.release;
@@ -431,12 +450,15 @@ d('the housing mutation boundary (REAL Postgres)', () => {
    *  of the wait starting, so the waiter's own 2 s lock_timeout never runs out
    *  while the case releases it; the bound only sizes how long a slow runner may
    *  take to REACH the wait before the case fails with its own message. */
-  async function waitForLockWaiters(pattern: string, count = 1): Promise<void> {
+  async function waitForLockWaiters(pattern: string, count = 1, blockedBy?: number): Promise<void> {
     for (let i = 0; i < 400; i++) {
+      // With `blockedBy`, only a waiter THAT backend blocks counts, so a stray
+      // waiter elsewhere in the database cannot satisfy the case.
       const res = await pool.query(
         `SELECT count(*)::int AS n FROM pg_stat_activity
-          WHERE datname = $1 AND wait_event_type = 'Lock' AND query LIKE $2`,
-        [VERIFY_DB, pattern],
+          WHERE datname = $1 AND wait_event_type = 'Lock' AND query LIKE $2
+            AND ($3::int IS NULL OR $3::int = ANY(pg_blocking_pids(pid)))`,
+        [VERIFY_DB, pattern, blockedBy ?? null],
       );
       if (res.rows[0].n >= count) return;
       await sleep(8);
@@ -508,6 +530,48 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           // The real client is the case's to finish.
           release: () => {},
         } as unknown as PoolClient;
+      };
+    });
+  }
+
+  /** The ambiguous COMMIT as the wire really loses it (the QA contract's
+   *  shape): the NEXT checkout of `target.pool` sends its COMMIT to the server
+   *  for real while its socket has stopped reading, waits until the server has
+   *  FINISHED that COMMIT (the backend is idle again, whichever way it ended),
+   *  then destroys the socket, so node-postgres itself rejects the pending
+   *  COMMIT as a connection lost after the command went out. Resolves once the
+   *  socket is gone. */
+  function armDestroyAfterCommit(target: Db): Promise<void> {
+    const owner = target.pool as unknown as { connect?: () => Promise<PoolClient> };
+    const original = Object.getPrototypeOf(owner).connect as () => Promise<PoolClient>;
+    return new Promise((resolveDestroyed, rejectArm) => {
+      owner.connect = async () => {
+        delete owner.connect;
+        const real = await original.call(owner);
+        const wire = real as unknown as {
+          processID: number;
+          connection: { stream: { pause(): void; destroy(): void } };
+          query: (text: unknown, ...rest: unknown[]) => Promise<unknown>;
+        };
+        const query = wire.query.bind(real);
+        wire.query = (text: unknown, ...rest: unknown[]) => {
+          if (text !== 'COMMIT') return query(text, ...rest);
+          wire.connection.stream.pause();
+          const sent = query('COMMIT');
+          void (async () => {
+            for (let i = 0; i < 400; i++) {
+              const state = await pool.query('SELECT state FROM pg_stat_activity WHERE pid = $1', [
+                wire.processID,
+              ]);
+              if (state.rows[0]?.state === 'idle') break;
+              await sleep(5);
+            }
+            wire.connection.stream.destroy();
+            resolveDestroyed();
+          })().catch(rejectArm);
+          return sent;
+        };
+        return real;
       };
     });
   }
@@ -863,6 +927,16 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         verified: false,
       });
       expect(await custody(t)).toEqual({ bags: 0, layout: 1 });
+      // By exact copy identity: the layout holds THE copy the intent named,
+      // exactly once.
+      const layout = await pool.query(
+        'SELECT layout FROM account_freeholds WHERE account_id = $1 AND plot_index = 0',
+        [t.acct],
+      );
+      expect(
+        (layout.rows[0].layout as { copyRef?: string }[]).map((entry) => entry.copyRef),
+      ).toEqual([COPY_REF]);
+      expect(t.intent.copyRefs).toEqual([COPY_REF]);
       expect(await intentCount(t.intent.operationId)).toBe(0);
       expect(await receiptsOf(t.intent.operationId)).toEqual([
         {
@@ -878,6 +952,16 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       // row version.
       expect((await claimRow(t.plotId))?.write_token).toMatch(HEX32);
       expect(await versionOf()).not.toBe(before);
+      // A STALE reload's store write (revision 1, the empty layout it read
+      // before the transfer) cannot erase the acknowledged custody: it answers
+      // stale and the chair stays in the layout, nowhere else.
+      expect(
+        await plots.upsertFencedFreehold(pool, plotUpsert(t.acct, t.plotId, 0, '1'), {
+          ...t.fence,
+          writeToken: claims.mintFreeholdWriteToken(),
+        }),
+      ).toMatchObject({ kind: 'stale', durableRev: '2' });
+      expect(await custody(t)).toEqual({ bags: 0, layout: 1 });
     });
 
     it('a refusal after the character UPDATE (the operation half) leaves the chair in the bags', async () => {
@@ -931,7 +1015,74 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         generation: '2',
         write_token: null,
       });
+      // The operation is still open and recoverable: no receipt was written.
+      expect(await intentCount(t.intent.operationId)).toBe(1);
+      expect(await receiptsOf(t.intent.operationId)).toEqual([]);
     });
+
+    it.each(['holder', 'generation'] as const)(
+      'a write fence that differs from the live claim in its %s ALONE refuses, and a matching control commits',
+      async (dimension) => {
+        const t = await transferFixture();
+        const holderA = db.PROCESS_LEASE_HOLDER;
+        // A plot write with no operation: only the write fence decides.
+        const plotOnly = (generation: string): FreeholdMutationRequest => ({
+          accountIds: [t.acct],
+          claimProofs: [],
+          operations: [],
+          hearth: null,
+          plots: [
+            { upsert: plotUpsert(t.acct, t.plotId, 1, '1'), fence: { ...t.fence, generation } },
+          ],
+        });
+        const expire = () =>
+          pool.query(
+            `UPDATE freehold_plot_claims SET expires_at = clock_timestamp() - interval '1 second'
+              WHERE plot_id = $1`,
+            [t.plotId],
+          );
+        const acquireAs = (holder: string) =>
+          claims.acquireFreeholdClaim(pool, {
+            plotId: t.plotId,
+            accountId: t.acct,
+            realm,
+            holder,
+            ttlSeconds: 90,
+          });
+        let live: string;
+        if (dimension === 'holder') {
+          // The holder's own release renames it and KEEPS the generation, so a
+          // late write of the releasing process differs in the holder alone.
+          expect(await claims.releaseFreeholdClaimRows(pool, holderA, [t.plotId])).toEqual(
+            new Set([t.plotId]),
+          );
+          expect(await claimRow(t.plotId)).toMatchObject({
+            holder: `${holderA}#released`,
+            generation: '1',
+          });
+          live = '2';
+        } else {
+          // A, then B, then A again: holder A is back, at generation 3, so a
+          // late write of A's FIRST tenure differs in the generation alone.
+          await expire();
+          expect(await acquireAs(db2.PROCESS_LEASE_HOLDER)).toMatchObject({ generation: '2' });
+          await expire();
+          expect(await acquireAs(holderA)).toMatchObject({ generation: '3' });
+          live = '3';
+        }
+        const stale = await commit(transferDeps(t), plotOnly('1'));
+        expect(stale).toEqual({ kind: 'refused', refusal: { kind: 'claim', plotId: t.plotId } });
+        expect(await custody(t)).toEqual({ bags: 1, layout: 0 });
+        expect((await claimRow(t.plotId))?.write_token).toBeNull();
+        // Control through the SAME write fence: holder and generation both
+        // matching the live claim commits.
+        if (dimension === 'holder')
+          expect(await acquireAs(holderA)).toMatchObject({ generation: '2' });
+        expect(await commit(transferDeps(t), plotOnly(live))).toMatchObject({ kind: 'committed' });
+        expect(await custody(t)).toEqual({ bags: 0, layout: 1 });
+        expect((await claimRow(t.plotId))?.write_token).toMatch(HEX32);
+      },
+    );
 
     it('a duplicate receipt for a still-open intent refuses through the unique guard', async () => {
       const t = await transferFixture();
@@ -980,7 +1131,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         DEFERRABLE INITIALLY DEFERRED FOR EACH ROW
         WHEN (NEW.plot_id = '${plotId}') EXECUTE FUNCTION fm_commit_fault()`);
       try {
-        const outcome = await commit(transferDeps(t), transferRequest(t));
+        // The Hearth advance rides too, AFTER the faulting plot write (G8 after
+        // G7): the fault at COMMIT must take it back with every other half.
+        const outcome = await commit(transferDeps(t), transferRequest(t, { hearth: true }));
         expect(outcome.kind).toBe('failed');
         expect((outcome as { error: { code?: string } }).error.code).toBe('23514');
       } finally {
@@ -990,12 +1143,15 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       expect(await custody(t)).toEqual({ bags: 1, layout: 0 });
       expect(await intentCount(t.intent.operationId)).toBe(1);
       expect(await receiptsOf(t.intent.operationId)).toEqual([]);
+      // Not even the first-use Hearth row survived.
+      expect(await hearthOf(t.acct)).toBeNull();
       // Control: the same transfer with the fault removed commits once.
-      expect(await commit(transferDeps(t), transferRequest(t))).toMatchObject({
+      expect(await commit(transferDeps(t), transferRequest(t, { hearth: true }))).toMatchObject({
         kind: 'committed',
         verified: false,
       });
       expect(await custody(t)).toEqual({ bags: 0, layout: 1 });
+      expect((await hearthOf(t.acct))?.revision).toBe('1');
     });
 
     it('a kind plan that refuses the missing-copy shape writes nothing, and its commit control moves the chair once', async () => {
@@ -1062,7 +1218,11 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       const pending = commit(transferDeps(t), transferRequest(t, { hearth: true }));
       const real = await lost;
       try {
-        await waitForLockWaiters(VERIFY_WAIT_TEXT);
+        await waitForLockWaiters(
+          VERIFY_WAIT_TEXT,
+          1,
+          (real as unknown as { processID: number }).processID,
+        );
         // Before the hung transaction resolves a plain read sees nothing landed:
         // the answer a racing unlocked verify would have given.
         expect(await custody(t)).toEqual({ bags: 1, layout: 0 });
@@ -1114,7 +1274,11 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       );
       const real = await lost;
       try {
-        await waitForLockWaiters(VERIFY_WAIT_TEXT);
+        await waitForLockWaiters(
+          VERIFY_WAIT_TEXT,
+          1,
+          (real as unknown as { processID: number }).processID,
+        );
         await real.query('ROLLBACK');
       } finally {
         real.release();
@@ -1135,6 +1299,62 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       expect(await receiptsOf(t.intent.operationId)).toHaveLength(1);
     });
 
+    it('a REAL socket loss after COMMIT was sent, landed: the classifier sees the driver error, the verify proves it, no second apply', async () => {
+      const t = await transferFixture();
+      await pool.query('INSERT INTO account_freehold_hearth (account_id) VALUES ($1)', [t.acct]);
+      const destroyed = armDestroyAfterCommit(db);
+      const outcome = await commit(transferDeps(t), transferRequest(t, { hearth: true }));
+      await destroyed;
+      expect(outcome).toMatchObject({
+        kind: 'committed',
+        plots: [{ plotId: t.plotId, durableRev: '2' }],
+        hearth: { kind: 'advanced', revision: '1' },
+        verified: true,
+      });
+      expect(await custody(t)).toEqual({ bags: 0, layout: 1 });
+      expect(await receiptsOf(t.intent.operationId)).toHaveLength(1);
+      const retry = await commit(transferDeps(t), transferRequest(t, { hearth: true }));
+      expect(retry).toMatchObject({ kind: 'refused', refusal: { reason: 'already_closed' } });
+      expect((await hearthOf(t.acct))?.revision).toBe('1');
+      expect(await custody(t)).toEqual({ bags: 0, layout: 1 });
+    });
+
+    it('a REAL socket loss after a COMMIT the server then FAILED: not_landed, and exactly one later apply', async () => {
+      const plotId = `plot:fmrealloss${seq()}`;
+      const t = await transferFixture(plotId);
+      await pool.query('INSERT INTO account_freehold_hearth (account_id) VALUES ($1)', [t.acct]);
+      // Fault injection on the disposable database only: this plot's COMMIT
+      // fails at the server, and the socket is destroyed before its error is read.
+      await pool.query(`CREATE OR REPLACE FUNCTION fm_real_loss_fault() RETURNS trigger
+        LANGUAGE plpgsql AS $$ BEGIN
+          RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'fm real loss fault';
+        END $$`);
+      await pool.query(`CREATE CONSTRAINT TRIGGER fm_real_loss_fault AFTER UPDATE ON account_freeholds
+        DEFERRABLE INITIALLY DEFERRED FOR EACH ROW
+        WHEN (NEW.plot_id = '${plotId}') EXECUTE FUNCTION fm_real_loss_fault()`);
+      let outcome: Awaited<ReturnType<typeof commit>>;
+      try {
+        const destroyed = armDestroyAfterCommit(db);
+        outcome = await commit(transferDeps(t), transferRequest(t, { hearth: true }));
+        await destroyed;
+      } finally {
+        await pool.query('DROP TRIGGER IF EXISTS fm_real_loss_fault ON account_freeholds');
+        await pool.query('DROP FUNCTION IF EXISTS fm_real_loss_fault()');
+      }
+      // Not the 23514: the driver never read it. The verify decided.
+      expect(outcome.kind).toBe('not_landed');
+      expect(await custody(t)).toEqual({ bags: 1, layout: 0 });
+      expect((await hearthOf(t.acct))?.revision).toBe('0');
+      expect(await intentCount(t.intent.operationId)).toBe(1);
+      const later = await commit(transferDeps(t), transferRequest(t, { hearth: true }));
+      expect(later).toMatchObject({ kind: 'committed', verified: false });
+      const again = await commit(transferDeps(t), transferRequest(t, { hearth: true }));
+      expect(again).toMatchObject({ kind: 'refused', refusal: { reason: 'already_closed' } });
+      expect(await custody(t)).toEqual({ bags: 0, layout: 1 });
+      expect((await hearthOf(t.acct))?.revision).toBe('1');
+      expect(await receiptsOf(t.intent.operationId)).toHaveLength(1);
+    });
+
     it('first use: the verify waits on the character row, then sees the Hearth row the hung transaction inserted', async () => {
       const p = await player();
       expect(await hearthOf(p.acct)).toBeNull();
@@ -1145,7 +1365,11 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       );
       const real = await lost;
       try {
-        await waitForLockWaiters(VERIFY_WAIT_TEXT);
+        await waitForLockWaiters(
+          VERIFY_WAIT_TEXT,
+          1,
+          (real as unknown as { processID: number }).processID,
+        );
         // The inserted row is invisible until COMMIT: a locked read of the
         // Hearth row could not wait for it, which is why the wait is on the
         // character row.
@@ -1206,7 +1430,7 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         }),
         hearthRequest(acct),
       );
-      await g.reached;
+      const holder = await g.reached;
       const second = commit(
         depsFor({
           characterId: c2,
@@ -1216,8 +1440,9 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         }),
         hearthRequest(acct),
       );
-      // The second realm really waits on the first one's Hearth row.
-      await waitForLockWaiters('%account_freehold_hearth%');
+      // The second realm really waits on the first one's Hearth row, blocked
+      // by that very save.
+      await waitForLockWaiters('%account_freehold_hearth%', 1, holder);
       g.open();
       const [one, two] = await Promise.all([first, second]);
       return { acct, c1, c2, one, two };
@@ -1308,6 +1533,11 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       expect(await ops.prepareFreeholdOperation(pool, t.intent)).toEqual({ kind: 'duplicate' });
       const other = { ...t.intent, fingerprint: 'a'.repeat(64) };
       expect(await ops.prepareFreeholdOperation(pool, other)).toEqual({ kind: 'conflict' });
+      // The fingerprint binds no account: ANOTHER account sending the identical
+      // request under the same id is a conflict, never a duplicate of this one.
+      const foreign = { ...t.intent, accountId: await makeAccount(), characterId: null };
+      expect(foreign.fingerprint).toBe(t.intent.fingerprint);
+      expect(await ops.prepareFreeholdOperation(pool, foreign)).toEqual({ kind: 'conflict' });
       expect(await commit(transferDeps(t), transferRequest(t))).toMatchObject({
         kind: 'committed',
       });
@@ -1326,8 +1556,10 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         kind: 'closed',
         outcome: 'applied',
       });
-      // A closed id never reports its outcome for a different request.
+      // A closed id never reports its outcome for a different request, nor to
+      // another account sending the identical one.
       expect(await ops.prepareFreeholdOperation(pool, other)).toEqual({ kind: 'conflict' });
+      expect(await ops.prepareFreeholdOperation(pool, foreign)).toEqual({ kind: 'conflict' });
       expect(await intentCount(t.intent.operationId)).toBe(0);
     });
 
@@ -1548,6 +1780,152 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         }),
       ).toBeNull();
       expect((await pool.query('DELETE FROM accounts WHERE id = $1', [acct])).rowCount).toBe(1);
+    });
+
+    it('the federated provision cleanup refuses with its typed error under either guard, and lands once closed', async () => {
+      // An unused federated account: no password, no token, no link. Its open
+      // intent is account-level (the accounts guard) or names its character
+      // (the characters cascade's guard); both arrive as the one typed refusal.
+      for (const scope of ['account', 'character'] as const) {
+        const acct = await makeAccount();
+        await pool.query('UPDATE accounts SET password_set = FALSE WHERE id = $1', [acct]);
+        const ch = scope === 'character' ? await makeCharacter(acct) : null;
+        const open = intentOf(acct, ch, null);
+        expect(await ops.prepareFreeholdOperation(pool, open)).toEqual({ kind: 'prepared' });
+        const refused = await federated.deleteUnusedFederatedProvision(pool as never, acct).then(
+          () => null,
+          (error: unknown) => error,
+        );
+        expect(refused, scope).toBeInstanceOf(federated.FederatedProvisionFreeholdOperationOpen);
+        expect(refused, scope).toMatchObject({
+          code: 'FEDERATED_PROVISION_FREEHOLD_OPERATION_OPEN',
+          accountId: acct,
+          cause: { code: '55006', constraint: 'freehold_operations_open_delete_guard' },
+        });
+        expect(await intentCount(open.operationId), scope).toBe(1);
+        expect(
+          await ops.cancelFreeholdOperation(pool, {
+            operationId: open.operationId,
+            accountId: acct,
+            fingerprint: open.fingerprint,
+            outcome: 'cancelled',
+          }),
+        ).toBeNull();
+        // Control: the same cleanup lands once the intent closes.
+        expect(await federated.deleteUnusedFederatedProvision(pool as never, acct), scope).toBe(
+          true,
+        );
+        expect(
+          (await pool.query('SELECT count(*)::int AS n FROM accounts WHERE id = $1', [acct]))
+            .rows[0].n,
+        ).toBe(0);
+      }
+    });
+
+    it('a character or an account delete racing a parked hooked save waits it out and lands: never a deadlock', async () => {
+      for (const target of ['character', 'account'] as const) {
+        const p = await player();
+        const g = gate('after');
+        const hooked = commit(
+          depsFor({
+            characterId: p.ch,
+            state: bagsState('parked', 0),
+            nonce: p.nonce,
+            hold: g.hold,
+          }),
+          hearthRequest(p.acct),
+        );
+        const holder = await g.reached;
+        // The save holds G1 (accounts KEY SHARE), the character row, and the
+        // Hearth row; the delete needs the conflicting parent lock first.
+        const deleted = pool.query(
+          target === 'character'
+            ? 'DELETE FROM characters WHERE id = $1'
+            : 'DELETE FROM accounts WHERE id = $1',
+          [target === 'character' ? p.ch : p.acct],
+        );
+        await waitForLockWaiters(
+          target === 'character' ? 'DELETE FROM characters%' : 'DELETE FROM accounts%',
+          1,
+          holder,
+        );
+        g.open();
+        const [h, d] = await Promise.allSettled([hooked, deleted]);
+        // Neither side was chosen as a deadlock victim (40P01).
+        expect(h, target).toMatchObject({ status: 'fulfilled', value: { kind: 'committed' } });
+        expect(d, target).toMatchObject({ status: 'fulfilled', value: { rowCount: 1 } });
+        const left = await pool.query(
+          'SELECT (SELECT count(*)::int FROM characters WHERE id = $1) AS characters, (SELECT count(*)::int FROM account_freehold_hearth WHERE account_id = $2) AS hearth',
+          [p.ch, p.acct],
+        );
+        expect(left.rows[0], target).toEqual({
+          characters: 0,
+          // An account delete cascades the Hearth row away; a character delete
+          // never touches the account's clock.
+          hearth: target === 'account' ? 0 : 1,
+        });
+      }
+    });
+
+    it('a prepare and a character delete racing each other: exactly one of them wins, in either order', async () => {
+      // The prepare first: parked on its per-account advisory lock AFTER its
+      // parent KEY SHARE locks, so the delete queues behind it, then finds
+      // the committed intent and is refused.
+      {
+        const p = await player();
+        const blocker = await pool.connect();
+        try {
+          await blocker.query('BEGIN');
+          await blocker.query('SELECT pg_advisory_xact_lock($1::int, $2::int)', [
+            ops.FREEHOLD_ADVISORY_ACCOUNT_CLASS,
+            p.acct,
+          ]);
+          const open = intentOf(p.acct, p.ch, null);
+          const prepared = ops.prepareFreeholdOperation(pool, open);
+          await waitForLockWaiters('SELECT pg_advisory_xact_lock($1::int, $2::int)');
+          const deleted = pool.query('DELETE FROM characters WHERE id = $1', [p.ch]).then(
+            () => null,
+            (error: unknown) => error,
+          );
+          await waitForLockWaiters('DELETE FROM characters%');
+          await blocker.query('COMMIT');
+          expect(await prepared).toEqual({ kind: 'prepared' });
+          expect(await deleted).toMatchObject({
+            code: '55006',
+            constraint: 'freehold_operations_open_delete_guard',
+          });
+          expect(await intentCount(open.operationId)).toBe(1);
+          expect(
+            (await pool.query('SELECT count(*)::int AS n FROM characters WHERE id = $1', [p.ch]))
+              .rows[0].n,
+          ).toBe(1);
+        } finally {
+          await blocker.query('ROLLBACK').catch(() => {});
+          blocker.release();
+        }
+      }
+      // The delete first: it holds the character row, the prepare's KEY SHARE
+      // queues behind it, and once the delete commits the prepare finds no
+      // parent and records nothing.
+      {
+        const p = await player();
+        const deleter = await pool.connect();
+        try {
+          await deleter.query('BEGIN');
+          await deleter.query('DELETE FROM characters WHERE id = $1', [p.ch]);
+          const open = intentOf(p.acct, p.ch, null);
+          const prepared = ops.prepareFreeholdOperation(pool, open);
+          await waitForLockWaiters(
+            'SELECT id FROM characters WHERE id = $1 AND account_id = $2 FOR KEY SHARE',
+          );
+          await deleter.query('COMMIT');
+          expect(await prepared).toEqual({ kind: 'parent_missing' });
+          expect(await intentCount(open.operationId)).toBe(0);
+        } finally {
+          await deleter.query('ROLLBACK').catch(() => {});
+          deleter.release();
+        }
+      }
     });
 
     it('refuses both deletes while an intent is open, then each row class lands as declared', async () => {
@@ -1941,9 +2319,22 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       expect((await hearthOf(p.acct))?.revision).toBe('1');
     });
 
-    it('a storage purchase start waits on the hooked save and both commit', async () => {
+    it('a storage purchase start waits on the hooked save and both commit, and a refused hooked save rolls back alone', async () => {
       const p = await player();
+      const startOf = (key: string) =>
+        storage.beginStoragePurchase(pool, {
+          realm,
+          accountId: p.acct,
+          characterId: p.ch,
+          itemId: 'strongbox_rung_01',
+          expectedCostClaudium: 100,
+          idempotencyKey: key,
+          claimToken: randomUUID(),
+        });
+      // Round one: the hooked save carries a pending ledger batch and commits,
+      // with the start parked on its character row.
       const key = `fm-start-${seq()}`;
+      const l1 = `fm.ledger.${seq()}`;
       const g = gate('after');
       const hooked = commit(
         depsFor({
@@ -1951,25 +2342,128 @@ d('the housing mutation boundary (REAL Postgres)', () => {
           state: bagsState('housing', 0),
           nonce: p.nonce,
           hold: g.hold,
+          ledgerEffects: personalLedger(p.ch, p.acct, l1),
         }),
         hearthRequest(p.acct),
       );
-      await g.reached;
-      const start = storage.beginStoragePurchase(pool, {
-        realm,
-        accountId: p.acct,
-        characterId: p.ch,
-        itemId: 'strongbox_rung_01',
-        expectedCostClaudium: 100,
-        idempotencyKey: key,
-        claimToken: randomUUID(),
-      });
-      await waitForLockWaiters('SELECT id FROM characters WHERE id = $1 FOR UPDATE');
+      const holder = await g.reached;
+      const start = startOf(key);
+      await waitForLockWaiters('SELECT id FROM characters WHERE id = $1 FOR UPDATE', 1, holder);
       g.open();
       const [h, s] = await Promise.all([hooked, start]);
       expect(h).toMatchObject({ kind: 'committed', hearth: { revision: '1' } });
       expect(s).toMatchObject({ inserted: true, existing: { status: 'pending' } });
       expect(await blobOf(p.ch)).toEqual({ level: 6, marker: 'housing' });
+      expect(await ledgerReceipts(l1)).toBe(1);
+      // Round two: the Hearth is now in cooldown, so the hooked save is REFUSED
+      // while the next start waits on it. The start commits; every hooked half
+      // (the character blob and its ledger batch) rolls back. (A character has
+      // one pending purchase at a time, so round one's is cleared first.)
+      await pool.query('DELETE FROM storage_purchases WHERE idempotency_key = $1', [key]);
+      const key2 = `fm-start-${seq()}`;
+      const l2 = `fm.ledger.${seq()}`;
+      const g2 = gate('before');
+      const refused = commit(
+        depsFor({
+          characterId: p.ch,
+          state: bagsState('refused', 0),
+          nonce: p.nonce,
+          level: 9,
+          hold: g2.hold,
+          ledgerEffects: personalLedger(p.ch, p.acct, l2),
+        }),
+        hearthRequest(p.acct),
+      );
+      const holder2 = await g2.reached;
+      const start2 = startOf(key2);
+      await waitForLockWaiters('SELECT id FROM characters WHERE id = $1 FOR UPDATE', 1, holder2);
+      g2.open();
+      const [r, s2] = await Promise.all([refused, start2]);
+      expect(r).toMatchObject({
+        kind: 'refused',
+        refusal: { kind: 'hearth', result: { kind: 'cooldown' } },
+      });
+      expect(s2).toMatchObject({ inserted: true, existing: { status: 'pending' } });
+      expect(await blobOf(p.ch)).toEqual({ level: 6, marker: 'housing' });
+      expect(await ledgerReceipts(l2)).toBe(0);
+      expect((await hearthOf(p.acct))?.revision).toBe('1');
+    });
+
+    it('a hooked market-and-mail save writes its mail partition before the suffix, and a refusal rolls the partition back with every half', async () => {
+      const p = await player();
+      const recipientKey = `fmmail${seq()}`;
+      const mailKey = `mail:${realm}:r:${recipientKey}`;
+      const letter = (subject: string) =>
+        ({
+          id: seq(),
+          recipientKey,
+          from: 'FmVerify',
+          subject,
+          body: '',
+          money: 0,
+          items: [],
+        }) as never;
+      const mailRow = async (db_: Pick<import('pg').Pool, 'query'>) =>
+        ((await db_.query('SELECT data FROM world_state WHERE key = $1', [mailKey])).rows[0]?.data
+          ?.mail ?? null) as { subject: string }[] | null;
+      const seen: { inside: unknown; outside: unknown }[] = [];
+      const save = (marker: string, letters: never[]) =>
+        commit(
+          {
+            pool,
+            characterId: p.ch,
+            save: (hook) =>
+              db.saveCharacterAndMarketState(
+                p.ch,
+                6,
+                bagsState(marker, 0),
+                null,
+                [{ recipientKey, letters }],
+                p.nonce,
+                [],
+                [],
+                [],
+                undefined,
+                undefined,
+                [],
+                {
+                  ...hook,
+                  // The order probe: the mail partition is written INSIDE the
+                  // transaction before the housing suffix runs, and nothing
+                  // outside sees it until COMMIT.
+                  run: async (tx) => {
+                    const insideRow = (
+                      await tx.query('SELECT data FROM world_state WHERE key = $1', [mailKey])
+                    ).rows?.[0] as { data?: { mail?: unknown } } | undefined;
+                    const inside = insideRow?.data?.mail;
+                    seen.push({
+                      inside: (inside as { subject: string }[] | undefined)?.map((l) => l.subject),
+                      outside: (await mailRow(pool))?.map((l) => l.subject) ?? null,
+                    });
+                    await hook.run(tx);
+                  },
+                },
+              ),
+          },
+          hearthRequest(p.acct),
+        );
+      const first = await save('mailed', [letter('one')]);
+      expect(first).toMatchObject({ kind: 'committed', hearth: { revision: '1' } });
+      expect((await mailRow(pool))?.map((l) => l.subject)).toEqual(['one']);
+      expect(await blobOf(p.ch)).toEqual({ level: 6, marker: 'mailed' });
+      // The Hearth refuses now: the second letter and the character half roll
+      // back with the refusal.
+      const refused = await save('refused', [letter('one'), letter('two')]);
+      expect(refused).toMatchObject({
+        kind: 'refused',
+        refusal: { kind: 'hearth', result: { kind: 'cooldown' } },
+      });
+      expect((await mailRow(pool))?.map((l) => l.subject)).toEqual(['one']);
+      expect(await blobOf(p.ch)).toEqual({ level: 6, marker: 'mailed' });
+      expect(seen).toEqual([
+        { inside: ['one'], outside: null },
+        { inside: ['one', 'two'], outside: ['one'] },
+      ]);
     });
 
     it('a hooked guild-bank save lands the book delta and the Hearth together, and a refusal rolls both back', async () => {
@@ -2040,7 +2534,13 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       expect(await ledgerReceipts(k1)).toBe(1);
       expect(await blobOf(p.ch)).toEqual({ level: 6, marker: 'guild' });
       // Order: the ledger batch and the guild book were both written before the
-      // housing suffix began; nothing is visible outside until COMMIT.
+      // housing suffix began; nothing is visible outside until COMMIT. This
+      // probe sees both at 'before', so it cannot tell ledger-before-guild from
+      // the reverse; that relative order is a DATA dependency of the legacy
+      // save (writeClaimedGuildBankEffectsOnClient consumes the ledger write's
+      // result) and is pinned by tests/server/bank_ledger_save_effects_db.test.ts
+      // ('orders a hooked guild save: ledger receipts, then the guild replay,
+      // then the housing hook, then COMMIT').
       expect(probe.seen).toEqual([
         { when: 'before', treasury: 500, ledger: 1, hearth: null, committedTreasury: null },
         { when: 'after', treasury: 500, ledger: 1, hearth: '1', committedTreasury: null },
@@ -2215,6 +2715,353 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       ).toBe(false);
       expect(exported.freeholdClaims).toEqual([]);
       expect(exported.freeholdOperations).toEqual([]);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // J. Every operation, guard and Hearth statement on its index (the manifest's
+  // section 10: one EXPLAIN pin per new statement; the claim statements are
+  // pinned in tests/server/freehold_claim.pg.test.ts).
+  // ---------------------------------------------------------------------------
+  describe('J. plans: every operation, guard and Hearth statement reaches its index', () => {
+    const readsOf = (root: ExplainPlanNode, relation: string): ExplainPlanNode[] => {
+      const out: ExplainPlanNode[] = [];
+      const visit = (node: ExplainPlanNode) => {
+        if (node['Relation Name'] === relation && node['Node Type'] !== 'ModifyTable')
+          out.push(node);
+        for (const child of node.Plans ?? []) visit(child);
+      };
+      visit(root);
+      return out;
+    };
+    const nodeTypes = (root: ExplainPlanNode): string[] => [
+      root['Node Type'],
+      ...(root.Plans ?? []).flatMap(nodeTypes),
+    ];
+    /** Every read of `relation` reaches `index`: the index, or why not. */
+    const reach = (root: ExplainPlanNode, relation: string, index: string): string[] =>
+      readsOf(root, relation).map((node) => {
+        const check = checkRelationUsesPartialIndex(node, relation, index);
+        return check.ok ? index : (check.reason ?? 'refused');
+      });
+
+    it('pins each statement to its index on production-shaped tables, never a sequential scan', async () => {
+      const p = await player();
+      const other = await player();
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN');
+        // Production-shaped, inside this transaction only: one account's long
+        // receipt history beside many erased and foreign tombstones, and open
+        // intents on several accounts, so each predicate's own index is the
+        // selective one and fresh statistics say so.
+        await client.query(
+          `INSERT INTO freehold_operation_receipts
+                  (operation_id, account_id, kind, outcome, closed_at)
+           SELECT 'fop:jplan:' || $2 || ':' || g,
+                  CASE WHEN g % 3 = 0 THEN $1::int WHEN g % 3 = 1 THEN $3::int END,
+                  'fm_bulk', 'cancelled', now() - make_interval(secs => g)
+             FROM generate_series(1, 900) AS g`,
+          [p.acct, seq(), other.acct],
+        );
+        for (const who of [p, other]) {
+          for (let i = 0; i < 4; i++) {
+            await client.query(
+              `INSERT INTO freehold_operations
+                      (operation_id, account_id, character_id, kind, fingerprint)
+               VALUES ($1, $2, $3, 'fm_bulk', $4)`,
+              [`fop:jopen:${seq()}`, who.acct, who.ch, 'e'.repeat(64)],
+            );
+          }
+        }
+        await client.query('ANALYZE freehold_operation_receipts');
+        await client.query('ANALYZE freehold_operations');
+        await client.query('ANALYZE account_freehold_hearth');
+        // A small table is cheaper read whole, so the planner would rightly
+        // scan it and prove nothing: seqscan off asks whether each predicate
+        // CAN reach an index, and which one.
+        await client.query('SET LOCAL enable_seqscan = off');
+        const explain = async (text: string, values?: unknown[]) =>
+          rootPlanFromExplainRow(
+            (await client.query(`EXPLAIN (FORMAT JSON) ${text}`, values)).rows[0],
+          );
+        const byAccount = 'freehold_operations_account';
+        const byCharacter = 'freehold_operations_character';
+        const receiptsByAccount = 'freehold_operation_receipts_account';
+        // The account reads: the recovery discovery, the prepare cap, the export.
+        for (const [name, text, values] of [
+          ['open count', ops.FREEHOLD_OPERATION_OPEN_COUNT_SQL, [p.acct]],
+          ['discover', ops.FREEHOLD_OPERATION_DISCOVER_SQL, [p.acct, 8]],
+          ['export intents', ops.FREEHOLD_OPERATION_EXPORT_INTENTS_SQL, [p.acct]],
+          // The account guard trigger's own query, by its literal text.
+          [
+            'account guard',
+            'SELECT operation_id FROM freehold_operations WHERE account_id = $1 LIMIT 1',
+            [p.acct],
+          ],
+        ] as const) {
+          expect(
+            reach(await explain(text, [...values]), 'freehold_operations', byAccount),
+            name,
+          ).toEqual([byAccount]);
+        }
+        // The character delete's pre-read and the character guard trigger's
+        // query, on the PARTIAL character index.
+        for (const [name, text] of [
+          ['delete pre-read', charDelete.CHARACTER_DELETE_FREEHOLD_OPERATION_SQL],
+          [
+            'character guard',
+            'SELECT operation_id FROM freehold_operations WHERE character_id = $1 LIMIT 1',
+          ],
+        ] as const) {
+          expect(
+            reach(await explain(text, [p.ch]), 'freehold_operations', byCharacter),
+            name,
+          ).toEqual([byCharacter]);
+        }
+        // The guard function queries exactly those predicates.
+        expect(ops.FREEHOLD_OPERATION_SCHEMA).toContain(
+          'WHERE character_id = OLD.id\n     LIMIT 1;',
+        );
+        expect(ops.FREEHOLD_OPERATION_SCHEMA).toContain('WHERE account_id = OLD.id\n     LIMIT 1;');
+        // The receipts export: the ordered partial index serves the newest-first
+        // limit with NO sort over the account's whole history.
+        const exportPlan = await explain(ops.FREEHOLD_OPERATION_EXPORT_RECEIPTS_SQL, [p.acct, 201]);
+        expect(reach(exportPlan, 'freehold_operation_receipts', receiptsByAccount)).toEqual([
+          receiptsByAccount,
+        ]);
+        expect(nodeTypes(exportPlan)).not.toContain('Sort');
+        expect(nodeTypes(exportPlan)).not.toContain('Incremental Sort');
+        // The soft-delete erase, which is also the exact statement the true
+        // delete's ON DELETE SET NULL issues.
+        expect(
+          reach(
+            await explain(ops.FREEHOLD_OPERATION_RECEIPTS_ERASE_SQL, [p.acct]),
+            'freehold_operation_receipts',
+            receiptsByAccount,
+          ),
+        ).toEqual([receiptsByAccount]);
+        // The per-id statements on the primary keys.
+        for (const [name, text, relation, index] of [
+          [
+            'receipt read',
+            ops.FREEHOLD_OPERATION_RECEIPT_READ_SQL,
+            'freehold_operation_receipts',
+            'freehold_operation_receipts_pkey',
+          ],
+          [
+            'intent lock',
+            ops.FREEHOLD_OPERATION_INTENT_LOCK_SQL,
+            'freehold_operations',
+            'freehold_operations_pkey',
+          ],
+          [
+            'intent read',
+            ops.FREEHOLD_OPERATION_INTENT_READ_SQL,
+            'freehold_operations',
+            'freehold_operations_pkey',
+          ],
+          [
+            'intent delete',
+            ops.FREEHOLD_OPERATION_DELETE_SQL,
+            'freehold_operations',
+            'freehold_operations_pkey',
+          ],
+        ] as const) {
+          expect(reach(await explain(text, ['fop:jplan:none']), relation, index), name).toEqual([
+            index,
+          ]);
+        }
+        // The inserts read nothing of their own table: their arbiters are the PKs.
+        const insertPlan = await explain(ops.FREEHOLD_OPERATION_INSERT_SQL, [
+          'fop:jplan:new',
+          p.acct,
+          p.ch,
+          null,
+          'fm_bulk',
+          'e'.repeat(64),
+          '[]',
+          null,
+          null,
+        ]);
+        expect(
+          (insertPlan as unknown as Record<string, unknown>)['Conflict Arbiter Indexes'],
+        ).toEqual(['freehold_operations_pkey']);
+        const receiptInsert = await explain(ops.FREEHOLD_OPERATION_RECEIPT_INSERT_SQL, [
+          'fop:jplan:new',
+          p.acct,
+          null,
+          'fm_bulk',
+          'applied',
+          'e'.repeat(64),
+          null,
+        ]);
+        expect(
+          (receiptInsert as unknown as Record<string, unknown>)['Conflict Arbiter Indexes'],
+        ).toEqual(['freehold_operation_receipts_pkey']);
+        expect(reach(receiptInsert, 'accounts', 'accounts_pkey')).toEqual(['accounts_pkey']);
+        // The Hearth's locked read and its verify read, on the account key: the
+        // shipped statements themselves.
+        const hearthDb = await import('../../server/freehold_hearth_db');
+        for (const text of [
+          hearthDb.FREEHOLD_HEARTH_VERIFY_SQL,
+          hearthDb.FREEHOLD_HEARTH_READ_FOR_UPDATE_SQL,
+          hearthDb.FREEHOLD_HEARTH_ACCOUNT_LOCK_SQL,
+        ]) {
+          const relation = text.includes('FROM accounts') ? 'accounts' : 'account_freehold_hearth';
+          const index = relation === 'accounts' ? 'accounts_pkey' : 'account_freehold_hearth_pkey';
+          expect(reach(await explain(text, [p.acct]), relation, index)).toEqual([index]);
+        }
+        // Negative control: a predicate no index serves still scans, and the
+        // reader refuses it.
+        expect(
+          reach(
+            await explain('SELECT 1 FROM freehold_operation_receipts WHERE kind = $1', ['fm_bulk']),
+            'freehold_operation_receipts',
+            receiptsByAccount,
+          ),
+        ).toEqual([
+          '"freehold_operation_receipts" used Seq Scan instead of "freehold_operation_receipts_account"',
+        ]);
+      } finally {
+        const rolledBack = await client.query('ROLLBACK').then(
+          () => true,
+          () => false,
+        );
+        client.release(!rolledBack);
+        // ANALYZE writes pg_class counts in place, outside the transaction:
+        // bring them back to what the tables hold for every later case.
+        await pool.query('VACUUM (ANALYZE) freehold_operation_receipts');
+        await pool.query('VACUUM (ANALYZE) freehold_operations');
+        await pool.query('ANALYZE account_freehold_hearth');
+      }
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // K. A steady-state boot re-applies the claim and operation fragments as
+  //    catalog reads: no lock any live housing or parent writer conflicts with.
+  // ---------------------------------------------------------------------------
+  describe('K. a steady-state re-apply of the claim and operation fragments is catalog-only', () => {
+    /** Every table the two fragments create, index or attach a trigger to. */
+    const TABLES = [
+      'freehold_plot_claims',
+      'freehold_operations',
+      'freehold_operation_receipts',
+      'characters',
+      'accounts',
+    ];
+
+    /** Every object the fragments own, by oid: a re-create changes the oid. */
+    async function owned() {
+      const res = await pool.query(
+        `SELECT 'index ' || c.relname || ' ' || c.oid || ' ' || c.relfilenode AS o
+           FROM pg_index i JOIN pg_class c ON c.oid = i.indexrelid
+          WHERE i.indrelid = ANY($1::regclass[])
+         UNION ALL
+         SELECT 'trigger ' || t.tgname || ' ' || t.oid || ' ' || t.tgenabled::text
+           FROM pg_trigger t
+          WHERE t.tgrelid = ANY($1::regclass[]) AND t.tgname LIKE 'freehold_operation_%'
+         UNION ALL
+         SELECT 'constraint ' || n.conname || ' ' || n.oid || ' ' || n.convalidated
+           FROM pg_constraint n
+          WHERE n.conrelid = ANY($1::regclass[]) AND n.conname LIKE 'freehold_%'
+         UNION ALL
+         SELECT 'function ' || p.proname || ' ' || p.oid
+           FROM pg_proc p
+          WHERE p.proname IN ('guard_open_freehold_operation_parent_delete',
+                              'erase_freehold_operation_receipt')
+         ORDER BY 1`,
+        [TABLES],
+      );
+      return res.rows.map((r: { o: string }) => r.o);
+    }
+
+    /** Runs `sql` while another transaction holds ROW EXCLUSIVE (what every
+     *  live claim write, operation write, character save and account update
+     *  holds) on all five tables, under `lockTimeout`. Returns the
+     *  strongest relation lock the applier itself took on them, or the code
+     *  it failed with. */
+    async function applyBesideWriters(sql: string, commit: boolean, lockTimeout = '1s') {
+      const writer = await pool.connect();
+      const applier = await pool.connect();
+      try {
+        await writer.query('BEGIN');
+        for (const table of TABLES) await writer.query(`LOCK TABLE ${table} IN ROW EXCLUSIVE MODE`);
+        await applier.query('BEGIN');
+        await applier.query(`SET LOCAL lock_timeout = '${lockTimeout}'`);
+        try {
+          await applier.query(sql);
+        } catch (error) {
+          await applier.query('ROLLBACK');
+          return { code: (error as { code?: string }).code };
+        }
+        const held = await applier.query(
+          `SELECT relation::regclass::text AS rel, mode FROM pg_locks
+            WHERE pid = pg_backend_pid() AND locktype = 'relation'
+              AND relation = ANY($1::regclass[]) AND mode <> 'AccessShareLock'
+            ORDER BY 1, 2`,
+          [TABLES],
+        );
+        await applier.query(commit ? 'COMMIT' : 'ROLLBACK');
+        return { stronger: held.rows };
+      } finally {
+        await applier.query('ROLLBACK').catch(() => {});
+        await writer.query('ROLLBACK').catch(() => {});
+        writer.release();
+        applier.release();
+      }
+    }
+
+    it('re-applies both fragments beside live writers on every table, and keeps every object it owns', async () => {
+      const before = await owned();
+      // The catalog the fragments own is all present (a vacuous snapshot
+      // would compare two empty lists).
+      expect(
+        before.filter((o) => o.startsWith('index freehold_')).map((o) => o.split(' ')[1]),
+      ).toEqual([
+        'freehold_operation_receipts_account',
+        'freehold_operation_receipts_pkey',
+        'freehold_operations_account',
+        'freehold_operations_character',
+        'freehold_operations_pkey',
+        'freehold_plot_claims_account',
+        'freehold_plot_claims_holder',
+        'freehold_plot_claims_pkey',
+      ]);
+      expect(before.filter((o) => o.startsWith('trigger '))).toEqual([
+        expect.stringMatching(/^trigger freehold_operation_guard_account_delete \d+ O$/),
+        expect.stringMatching(/^trigger freehold_operation_guard_character_delete \d+ O$/),
+        expect.stringMatching(/^trigger freehold_operation_receipt_erase \d+ O$/),
+      ]);
+      expect(before.filter((o) => o.startsWith('function '))).toHaveLength(2);
+      expect(
+        await applyBesideWriters(
+          `${claims.FREEHOLD_CLAIM_SCHEMA}\n${ops.FREEHOLD_OPERATION_SCHEMA}`,
+          true,
+        ),
+      ).toEqual({ stronger: [] });
+      expect(await owned()).toEqual(before);
+    });
+
+    it('the control: each statement the probes skip WOULD queue behind those writers', async () => {
+      // The shapes the probes skip, one per table class: an unprobed no-op
+      // index create takes SHARE, and the trigger reconcile (run only when a
+      // probe finds a trigger wrong) takes the parent's ACCESS EXCLUSIVE. Either
+      // one in every boot would hold every other realm's writes behind this
+      // realm's boot COMMIT. Each runs in a transaction that rolls back.
+      for (const sql of [
+        'CREATE INDEX IF NOT EXISTS freehold_plot_claims_holder ON freehold_plot_claims (holder)',
+        'CREATE INDEX IF NOT EXISTS freehold_operations_account ON freehold_operations (account_id, created_at)',
+        `CREATE INDEX IF NOT EXISTS freehold_operation_receipts_account
+           ON freehold_operation_receipts (account_id, closed_at DESC, operation_id DESC)
+           WHERE account_id IS NOT NULL`,
+        'DROP TRIGGER IF EXISTS freehold_operation_guard_character_delete ON characters',
+        'DROP TRIGGER IF EXISTS freehold_operation_guard_account_delete ON accounts',
+      ]) {
+        // A short bound: the control only has to show the statement queues.
+        expect(await applyBesideWriters(sql, false, '150ms'), sql).toEqual({ code: '55P03' });
+      }
     });
   });
 });
