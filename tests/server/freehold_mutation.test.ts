@@ -26,7 +26,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from 'node:os';
 import { join, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildSync } from 'esbuild';
+import { type BuildOptions, buildSync } from 'esbuild';
 import ts from 'typescript';
 import { describe, expect, it, vi } from 'vitest';
 import { LEASE_TTL_SECONDS } from '../../server/character_lease_db';
@@ -3057,16 +3057,16 @@ describe('the claim renewer', () => {
     // named, and its modules from this repository must be the bot's code files
     // and the two shared sim modules, so a module reached by an alias, a relative
     // path of any spelling, an extension esbuild prefers or a non-code import
-    // fails until a read takes it. Each is parsed once, for the reads below.
+    // fails until a read takes it. Each is parsed once into the map the reads
+    // below take.
     const buildScript = parsed('scripts/build_bot.mjs');
-    expect(
-      nodesIn(buildScript)
-        .filter(
-          (node): node is ts.CallExpression =>
-            ts.isCallExpression(node) && node.expression.getText(buildScript) === 'esbuild.build',
-        )
-        .map((call) => linesOf(call, buildScript)),
-    ).toEqual([
+    const buildCalls = nodesIn(buildScript)
+      .filter(
+        (node): node is ts.CallExpression =>
+          ts.isCallExpression(node) && node.expression.getText(buildScript) === 'esbuild.build',
+      )
+      .map((call) => linesOf(call, buildScript));
+    expect(buildCalls).toEqual([
       [
         'esbuild.build({',
         "entryPoints: ['bot/main.ts'],",
@@ -3078,26 +3078,43 @@ describe('the claim renewer', () => {
         '})',
       ],
     ]);
-    const bundled = Object.keys(
-      buildSync({
-        entryPoints: ['bot/main.ts'],
-        bundle: true,
-        platform: 'node',
-        format: 'cjs',
-        external: ['bufferutil', 'utf-8-validate'],
-        write: false,
-        metafile: true,
-        logLevel: 'silent',
-      }).metafile?.inputs ?? {},
+    // The options built here are the script's, each written as the script
+    // writes it, its outfile aside.
+    const botBuild = {
+      entryPoints: ['bot/main.ts'],
+      bundle: true,
+      platform: 'node',
+      format: 'cjs',
+      external: ['bufferutil', 'utf-8-validate'],
+    } satisfies BuildOptions;
+    const literal = (value: unknown): string =>
+      Array.isArray(value)
+        ? `[${value.map(literal).join(', ')}]`
+        : typeof value === 'string'
+          ? `'${value}'`
+          : String(value);
+    expect(Object.entries(botBuild).map(([key, value]) => `${key}: ${literal(value)},`)).toEqual(
+      buildCalls[0].slice(1, -1).filter((line) => !line.startsWith('outfile:')),
     );
-    expect([
-      ...new Set(
-        bundled
-          .filter((file) => file.includes('node_modules/'))
-          .map((file) => file.split('node_modules/').pop()?.split('/')[0]),
-      ),
-    ]).toEqual(['ws']);
-    const bundledHere = bundled.filter((file) => !file.includes('node_modules/')).sort();
+    const bundled = Object.keys(
+      buildSync({ ...botBuild, write: false, metafile: true, logLevel: 'silent' }).metafile
+        ?.inputs ?? {},
+    );
+    // A package is a module under the root node_modules (.npmrc pins the
+    // hoisted layout); any other path, one with node_modules deeper in it
+    // included, is this repository's and is read.
+    const fromPackage = (file: string) => file.startsWith('node_modules/');
+    expect(
+      [
+        'node_modules/ws/lib/a.js',
+        'src/x/vendor_node_modules/ws/r.ts',
+        'src/x/node_modules/ws/r.ts',
+      ].filter(fromPackage),
+    ).toEqual(['node_modules/ws/lib/a.js']);
+    expect(
+      [...new Set(bundled.filter(fromPackage).map((file) => file.split('/')[1]))].sort(),
+    ).toEqual(['ws']);
+    const bundledHere = bundled.filter((file) => !fromPackage(file)).sort();
     expect(bundledHere).toEqual(
       [...botFiles, 'src/sim/discord_roles.ts', 'src/sim/discord_tier.ts'].sort(),
     );
@@ -3107,6 +3124,7 @@ describe('the claim renewer', () => {
       if (nodes === undefined) throw new Error(`${file} is not in the bot's bundle`);
       return nodes;
     };
+    expect(() => nodesOf('bot/absent.ts')).toThrow("bot/absent.ts is not in the bot's bundle");
     // The bot writes no JSX: a route in JSX text, or in an attribute spelled
     // with an HTML entity, is not a literal the route read takes, so any JSX in
     // the bot's code fails here until that read takes it. Each JSX root is
@@ -3160,9 +3178,10 @@ describe('the claim renewer', () => {
     // written, so the section is also read whole, by digest: any change to its
     // code fails until it is reviewed against them, a form inside the section
     // they do not read (a shadowing binding, a computed key) included. Around
-    // the section, every name it reads from there is declared once, those scopes
-    // take no parameters and the suite holds no `var`, so no binding there
-    // shadows another; code around it is read only where a pin names it.
+    // the section, every name it reads from there is declared once, the
+    // functions around it bind no name of their own and the suite holds no
+    // `var`, so no binding there shadows another; code around it is read only
+    // where a pin names it.
     const pgSuite = parsed('tests/server/freehold_mutation.pg.test.ts');
     const sectionL = nodesIn(pgSuite).filter(
       (node) =>
@@ -3261,23 +3280,49 @@ describe('the claim renewer', () => {
     // Every name the section reads from the scopes around it (the suite's
     // callback and the module), with how many times those scopes' statements
     // declare it, types included, so a second binding there, which would shadow
-    // the first, fails. Those scopes take no parameters, and the suite holds no
-    // `var`, which could hoist into them from a nested block; both are pinned,
-    // the `var` read proven on a sample first.
+    // the first, fails. The functions around it bind no name of their own (a
+    // parameter, a type parameter, a function expression's name), and the
+    // suite holds no `var`, which could hoist into them from a nested block.
+    // Each read is proven on a sample first.
     const bindings = (name: ts.BindingName): string[] =>
       ts.isIdentifier(name)
         ? [name.text]
         : name.elements.flatMap((element) =>
             ts.isOmittedExpression(element) ? [] : bindings(element.name),
           );
-    const around: ts.Statement[] = [];
-    const aroundParameters: string[] = [];
-    for (let at = sectionL[0].parent; at !== undefined; at = at.parent) {
-      if (ts.isBlock(at) || ts.isSourceFile(at)) around.push(...at.statements);
-      if (ts.isFunctionLike(at))
-        aroundParameters.push(...at.parameters.flatMap((parameter) => bindings(parameter.name)));
-    }
-    expect(aroundParameters).toEqual([]);
+    const scopesAround = (node: ts.Node) => {
+      const statements: ts.Statement[] = [];
+      const ownNames: string[] = [];
+      for (let at = node.parent; at !== undefined; at = at.parent) {
+        if (ts.isBlock(at) || ts.isSourceFile(at)) statements.push(...at.statements);
+        if (ts.isFunctionLike(at))
+          ownNames.push(
+            ...(at.typeParameters ?? []).map((parameter) => parameter.name.text),
+            ...at.parameters.flatMap((parameter) => bindings(parameter.name)),
+            ...(ts.isFunctionExpression(at) && at.name !== undefined ? [at.name.text] : []),
+          );
+      }
+      return { statements, ownNames };
+    };
+    const sampleSuite = ts.createSourceFile(
+      'sample.ts',
+      "describe('s', function named<T>(a: T) { describe('t', <U,>(b: U) => { describe('L. x', () => {}); }); });",
+      ts.ScriptTarget.Latest,
+      true,
+    );
+    expect(
+      nodesIn(sampleSuite)
+        .filter(
+          (node): node is ts.CallExpression =>
+            ts.isCallExpression(node) &&
+            node.arguments.length > 0 &&
+            ts.isStringLiteralLike(node.arguments[0]) &&
+            node.arguments[0].text.startsWith('L. '),
+        )
+        .map((node) => scopesAround(node).ownNames),
+    ).toEqual([['U', 'b', 'T', 'a', 'named']]);
+    const { statements: around, ownNames: aroundOwnNames } = scopesAround(sectionL[0]);
+    expect(aroundOwnNames).toEqual([]);
     const hoistable = (root: ts.Node) =>
       nodesIn(root).filter(
         (node) =>
@@ -3294,7 +3339,7 @@ describe('the claim renewer', () => {
       ),
     ).toBe(3);
     expect(hoistable(pgSuite)).toBe(0);
-    const declaredAround = around.flatMap((statement): string[] => {
+    const declares = (statement: ts.Statement): string[] => {
       if (ts.isVariableStatement(statement))
         return statement.declarationList.declarations.flatMap((decl) => bindings(decl.name));
       if (
@@ -3321,7 +3366,18 @@ describe('the claim renewer', () => {
         ];
       }
       return [];
-    });
+    };
+    expect(
+      ts
+        .createSourceFile(
+          'sample.ts',
+          "type A = 1; interface B {} enum C { x } import D = E.F; namespace G {} declare module 'h' {} function I() {} class J {} const [K, { l: M }] = [1, { l: 2 }]; import N, { O as P } from 'q'; import * as R from 's';",
+          ts.ScriptTarget.Latest,
+          true,
+        )
+        .statements.flatMap(declares),
+    ).toEqual(['A', 'B', 'C', 'D', 'G', 'I', 'J', 'K', 'M', 'N', 'P', 'R']);
+    const declaredAround = around.flatMap(declares);
     const readAround = new Set(
       nodesIn(sectionL[0])
         .filter((node): node is ts.Identifier => ts.isIdentifier(node))
