@@ -2200,10 +2200,10 @@ describe('the claim renewer', () => {
     // start the game service (an `up`, `restart` or `start`, but for a bot
     // `restart` or a bot `up --no-deps`: the bot depends on the game service,
     // so a plain bot `up` starts a stopped realm), and each operator restart in
-    // the phrasings DEPLOY uses for one. Both lists are whole, so a new start site fails here until it
-    // is classified; a start phrased otherwise is beyond this pin, and the
-    // rule in Index builds that every operator start goes by the gate still
-    // covers it.
+    // the phrasings DEPLOY uses for one. Both lists are whole, so a new start
+    // site fails here until it is classified; a start phrased otherwise is
+    // beyond this pin, and the rule in Index builds that every operator start
+    // goes by the gate still covers it.
     const units = (text: string) => text.split(/\r?\n[ \t]*\r?\n|\r?\n(?=[ \t]*- )/);
     expect(units('- a\n  b\n- c\n\nd')).toEqual(['- a\n  b', '- c', 'd']);
     const COMMAND = /docker compose\b[^\n`]*?\b(?:up|restart|start)\b[^\n`]*/;
@@ -2229,12 +2229,15 @@ describe('the claim renewer', () => {
     });
     expect(sites.filter((s) => s.kind === 'command').map((s) => s.site)).toEqual([
       'docker compose up -d',
-      'docker compose up -d game',
-      'docker compose up -d game',
-      'docker compose up -d game',
-      'docker compose up -d game',
+      'docker compose up -d --no-deps game',
+      'docker compose --profile discord up -d --no-deps discord-bot',
+      'docker compose up -d --no-deps game',
+      'docker compose up -d --no-deps game',
+      'docker compose up -d --no-deps game',
+      'docker compose up -d --no-deps game',
       'docker compose --profile discord up -d',
       'docker compose --profile discord up -d --no-deps discord-bot',
+      'docker compose up -d --no-deps game',
       'docker compose --profile discord restart discord-bot',
       'docker compose --profile discord up -d --no-deps discord-bot',
     ]);
@@ -2254,10 +2257,33 @@ describe('the claim renewer', () => {
     );
     expect(compose.slice(botAt + 1)).toMatch(inBotBlock);
     const botOnly = /^docker compose --profile discord (?:up -d --no-deps|restart) discord-bot$/;
+    expect(botOnly.test('docker compose --profile discord up -d discord-bot')).toBe(false);
+    expect(botOnly.test('docker compose --profile discord up -d --no-deps discord-bot')).toBe(true);
+    // The gate's own bullet states the recreate once; every other site points to it.
+    const ownGate = (flat: string) => flat.trimStart().startsWith('- Index builds: ');
+    expect(sites.filter(({ flat }) => ownGate(flat)).map(({ site }) => site)).toEqual([
+      'docker compose up -d --no-deps game',
+    ]);
     for (const { site, flat } of sites) {
-      if (botOnly.test(site)) continue;
+      if (botOnly.test(site) || ownGate(flat)) continue;
       expect(flat, site).toContain('Index builds under EVERY BOOT LOCKS THE PARENTS');
     }
+    // Release step 6 builds every service with a build section, and those are
+    // the game's and the wiki's.
+    expect(deploy).toContain('\nsudo docker compose build\n');
+    const builtServices: string[] = [];
+    let service = '';
+    for (const line of compose.split('\n')) {
+      const key = /^ {2}([\w-]+):\s*$/.exec(line);
+      if (key) service = key[1];
+      else if (/^ {4}build:/.test(line)) builtServices.push(service);
+      else if (/^\S/.test(line)) service = '';
+    }
+    expect(builtServices).toEqual(['game', 'mediawiki']);
+    // A `healthy` realm has committed its boot: the game's health probe asks
+    // /livez, which answers only once the realm listens, after its boot.
+    expect(bullet).toContain('a `healthy` realm has committed its boot');
+    expect(compose).toContain("require('http').get('http://127.0.0.1:8787/livez'");
     const seconds = (file: string, name: string): number => {
       const found = source(file).match(new RegExp(`export const ${name} = ([0-9_]+);`));
       expect(found, name).not.toBeNull();
@@ -2284,12 +2310,15 @@ describe('the claim renewer', () => {
     // one route that takes it mints nothing (its handler and both statements
     // are pinned whole in section L of tests/server/freehold_mutation.pg.test.ts).
     // That holds only while nothing else reads by the token: every whole-token
-    // mention of the column and of its lookup in server/, per file, so a new
-    // reader fails here until it is reviewed.
+    // mention of the column and of its lookup in server/'s code, comments
+    // stripped, per file, so a new reader fails here until it is reviewed.
     const mentions = (pattern: RegExp) =>
       Object.fromEntries(
         serverModules()
-          .map(({ file, text }) => [`server/${file}`, text.match(pattern)?.length ?? 0] as const)
+          .map(
+            ({ file, text }) =>
+              [`server/${file}`, stripComments(text).match(pattern)?.length ?? 0] as const,
+          )
           .filter(([, count]) => count > 0),
       );
     const column = /\bunsubscribe_token\b/g;
@@ -2306,9 +2335,9 @@ describe('the claim renewer', () => {
     const account = stripComments(readFileSync('server/account.ts', 'utf8'));
     const handler = account.indexOf('export async function handleEmailUnsubscribe(');
     expect(handler).toBeGreaterThan(-1);
-    expect(account.slice(handler, account.indexOf('\n}\n', handler))).toContain(
-      'await accountByUnsubscribeToken(raw)',
-    );
+    const handlerEnd = account.indexOf('\n}\n', handler);
+    expect(handlerEnd).toBeGreaterThan(handler);
+    expect(account.slice(handler, handlerEnd)).toContain('await accountByUnsubscribeToken(raw)');
   });
 
   it('chunks at the bound, one transaction per chunk', async () => {

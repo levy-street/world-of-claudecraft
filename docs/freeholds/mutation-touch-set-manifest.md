@@ -1405,3 +1405,7 @@ What changed the contract above:
   a held build waits for and how to end an operator's open one, lists an INVALID index for the
   rollback drop, takes the stall reading with every realm `healthy` or stopped, and keeps the
   bot's own `up` from starting the game.
+- A twenty-eighth round of eight fresh readers: no P12 change; `DEPLOY.md` names a held build's
+  sessions one at a time and ends an operator's open `psql` one only on two readings, recreates
+  the game with `up -d --no-deps game`, and has the game recreated before the bot when a key both
+  read changes.

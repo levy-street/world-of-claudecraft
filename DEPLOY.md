@@ -150,7 +150,10 @@ sudo docker compose stop game
 # 6. Rebuild, then start. Build first, so the gate's readings below are not minutes
 #    old when the realm starts (running this build before step 4 also shortens the
 #    outage: the images are then ready the moment the countdown ends). It builds every
-#    service with a build section, the wiki's among them, as `up -d --build` did.
+#    service with a build section, the wiki's among them, so `up -d` below runs each on
+#    its new image; if a build other than the game's fails, run
+#    `sudo docker compose build game`, start by the gate below, and build the rest
+#    afterwards.
 sudo docker compose build
 #    Then start only by the gate in Index builds under EVERY BOOT LOCKS THE PARENTS,
 #    its readings taken just before: an index build the stopped process began runs on
@@ -206,9 +209,9 @@ EMAIL_FROM="World of ClaudeCraft <noreply@worldofclaudecraft.com>"
 EMAIL_BASE_URL=https://worldofclaudecraft.com
 ```
 
-Then `docker compose up -d game`, which stops and starts the realm in one
-step: take the gate's readings in Index builds under EVERY BOOT LOCKS THE
-PARENTS just before it. The startup log line `email transport selected`
+Then `sudo docker compose up -d --no-deps game`, which recreates the realm
+with the new `.env` by Index builds under EVERY BOOT LOCKS THE PARENTS (its
+readings just before it). The startup log line `email transport selected`
 confirms which transport is live; every send attempt is audited in the
 `email_log` table. A provider with a plain HTTP API works too: set
 `EMAIL_API_URL`, `EMAIL_API_KEY`, and `EMAIL_FROM` instead (see
@@ -521,8 +524,10 @@ For off-box safety, sync the directory to S3 occasionally:
     binary-to-server gap short. One more version-skewed CONSUMER rides this
     deploy: the discord-bot container's activity feed predates the packet's
     masterwork and deed card kinds (and the expansion's vale_cup kind), so
-    restart the bot with the server or those cards post as empty embeds
-    Discord rejects until it picks up the new build.)
+    recreate the bot with the server,
+    `sudo docker compose --profile discord up -d --no-deps discord-bot` (a
+    restart keeps its old image), or those cards post as empty embeds Discord
+    rejects until it runs the new build.)
   Release-specific caveat for the professions tuning deploy, REWRITTEN
   2026-09-01 under ruling qr-19-stale-client-deploy-window and CORRECTED at its
   review round. SCOPE FIRST, because the rewrite dropped this and two sentences
@@ -1189,35 +1194,36 @@ For off-box safety, sync the directory to S3 occasionally:
     current_database()) AND relation = 'public.auth_tokens'::regclass AND mode IN
     ('ShareLock', 'ShareRowExclusiveLock', 'ExclusiveLock', 'AccessExclusiveLock');`
     from psql on the realm database returns 0 on two readings a few seconds apart, taken
-    while every realm container on the database reads `healthy` or is stopped in
-    `sudo docker compose ps` (a `healthy` realm has committed its boot; a boot that lost
-    a deadlock reads 0 until its restart reaches that table again, and the restart
-    policy waits longer before each restart of a container that keeps exiting). Then
-    staff send again each ban, suspension or staff password reset made during it, in the
-    order made and skipping one a later unban or unsuspend reversed or a suspension
-    whose end time has passed, whether or not it returned an error or shows landed (a
-    repeat runs its revoke, disconnect and notice email again and writes a second audit
-    row; resend a suspension with its original end time and a staff password reset with
-    the same password), and players redo what returned an error and did not land;
-    nothing else sends a skipped notice email again. A token a skipped revoke left valid
-    stays valid until a sign-out, so then stop every realm on the database, one after
-    another, each stop finishing before the next, which drops every live session and the
-    in-memory desktop login codes in `server/desktop_login.ts` (the sign-out cannot
-    reach them, and a desktop app could still trade one for a fresh token); sign every
-    account out once from psql on the realm database (`DELETE FROM auth_tokens WHERE
-    created_at < now() AND expires_at > now(); DELETE FROM oauth_codes; DELETE FROM
-    oauth_device_codes; DELETE FROM discord_oauth_states; DELETE FROM
-    github_oauth_states;`, companion and OAuth tokens included, no pending OAuth code
-    left to mint one, and no Discord or GitHub link a leftover token started left to
-    finish; an expired token is refused already; on 40P01 run it again); and, once the
-    dump has ended if the stall was behind one, start the realms again by Index builds
-    below. Re-run the deactivation housing receipt erase for deactivated accounts that
-    still hold receipts by the bullet below that begins "A failed deactivation receipt
-    erase" (a deactivation stopped at its revoke never reached the erase, so it logged
-    no warning). A sign-out undoes nothing a leftover token did before it (for example a
-    sign-in link it added, a recovery email it set, or anything its live session did in
-    game): this bullet does not recover an account the stall left open to whoever held
-    such a token, and that recovery is owed.
+    while every realm container on the database shows `healthy` or `Exited` in
+    `sudo docker compose ps --all` (a `healthy` realm has committed its boot, its health
+    probe answering only once the boot's schema transaction has committed and the realm
+    listens; a boot that lost a deadlock reads 0 until its restart reaches that table
+    again, and the restart policy waits longer before each restart of a container that
+    keeps exiting). Then staff send again each ban, suspension or staff password reset
+    made during it, in the order made and skipping one a later unban or unsuspend
+    reversed or a suspension whose end time has passed, whether or not it returned an
+    error or shows landed (a repeat runs its revoke, disconnect and notice email again
+    and writes a second audit row; resend a suspension with its original end time and a
+    staff password reset with the same password), and players redo what returned an
+    error and did not land; nothing else sends a skipped notice email again. A token a
+    skipped revoke left valid stays valid until a sign-out, so then stop every realm on
+    the database, one after another, each stop finishing before the next, which drops
+    every live session and the in-memory desktop login codes in
+    `server/desktop_login.ts` (the sign-out cannot reach them, and a desktop app could
+    still trade one for a fresh token); sign every account out once from psql on the
+    realm database (`DELETE FROM auth_tokens WHERE created_at < now() AND expires_at >
+    now(); DELETE FROM oauth_codes; DELETE FROM oauth_device_codes; DELETE FROM
+    discord_oauth_states; DELETE FROM github_oauth_states;`, companion and OAuth tokens
+    included, no pending OAuth code left to mint one, and no Discord or GitHub link a
+    leftover token started left to finish; an expired token is refused already; on 40P01
+    run it again); and, once the dump has ended if the stall was behind one, start the
+    realms again by Index builds below. Re-run the deactivation housing receipt erase
+    for deactivated accounts that still hold receipts by the bullet below that begins "A
+    failed deactivation receipt erase" (a deactivation stopped at its revoke never
+    reached the erase, so it logged no warning). A sign-out undoes nothing a leftover
+    token did before it (for example a sign-in link it added, a recovery email it set,
+    or anything its live session did in game): this bullet does not recover an account
+    the stall left open to whoever held such a token, and that recovery is owed.
   - Index builds: after it listens, a realm's runner takes the schema advisory lock,
     then for each index of `server/concurrent_indexes.ts` in turn drops it if INVALID,
     builds it if missing, with CREATE INDEX CONCURRENTLY, and drops any index it
@@ -1229,15 +1235,17 @@ For off-box safety, sync the directory to S3 occasionally:
     transaction holding any lock on its table, the dump included; the VALIDATE up to
     about a minute when a NOT VALID constraint survives). A release can add an index,
     and a build ended early, by this deadlock, a cancelled or terminated backend or a
-    database restart, leaves one INVALID (or none, if it ended before its first wait),
-    used by no read and maintained by every write once its build got past `building
-    index`, until a runner whose `server/concurrent_indexes.ts` names it drops and
-    builds it again. After a rollback to a release whose list does not name it, none
+    database restart, leaves one INVALID (or none, if it ended still queued for its
+    table lock), used by no read and maintained by every write once its build got past
+    `building index`, until a runner whose `server/concurrent_indexes.ts` names it drops
+    and builds it again. After a rollback to a release whose list does not name it, none
     will: once the gate below reads 0 (no runner builds then, so every INVALID index is
     left over) and outside the nightly `pg_dump`, `SELECT indexrelid::regclass AS name
     FROM pg_index WHERE NOT indisvalid;` from psql on the realm database lists them, and
-    `DROP INDEX CONCURRENTLY IF EXISTS <name>;` drops each; start no realm until it
-    returns (the gate does not see a drop run by hand). A realm's own stop or crash does
+    `DROP INDEX CONCURRENTLY IF EXISTS <name>;` drops each, the gate read 0 again just
+    before; start no realm until it returns (the gate does not see a drop run by hand;
+    if it does not return, the naming statement below with the drop's pid names the
+    session it waits for, and the same rule decides). A realm's own stop or crash does
     not end a build already running (a backend running a statement does not read its
     socket while `client_connection_check_interval` is off, the default), which runs on,
     holding the lock, until it ends. A boot or another realm's runner that waits on that
@@ -1257,42 +1265,53 @@ For off-box safety, sync the directory to S3 occasionally:
     two readings a few seconds apart, the last just before the start (no runner or boot
     holds or waits on the schema advisory lock, `SCHEMA_ADVISORY_LOCK_KEY`;
     `pg_stat_progress_create_index` reads 0 before a build starts, during a drop and
-    between two builds). A start after the first runs beside the realms already serving,
-    so outside the quiet window, though still outside the nightly `pg_dump` (The nightly
-    dump above), and its boot can be aborted and restarted (Deadlocks above). If a
-    reading stays above 0, `SELECT l.pid, l.granted, a.wait_event_type, a.wait_event,
-    p.phase, pg_blocking_pids(l.pid) AS blocked_by, now() - a.query_start AS waited FROM
-    pg_locks l JOIN pg_stat_activity a USING (pid) LEFT JOIN
-    pg_stat_progress_create_index p USING (pid) WHERE l.locktype = 'advisory' AND
-    l.classid = 0 AND l.objid = 1464812289 AND l.objsubid = 1 AND l.database = (SELECT
-    oid FROM pg_database WHERE datname = current_database());` lists the lock's holder
-    (`granted`) and its waiters, what each waits on, and the pids each waits for
+    between two builds). A start that recreates the game container after an `.env` edit
+    is `sudo docker compose up -d --no-deps game`, its readings just before it, since it
+    stops and starts the realm in one step (`--no-deps` keeps `up` from recreating the
+    database the game depends on, and `up` starts whatever image the tag names now, so
+    never while an image built for a coming release waits). A start after the first runs
+    beside the realms already serving, so outside the quiet window, though still outside
+    the nightly `pg_dump` (The nightly dump above), and its boot can be aborted and
+    restarted (Deadlocks above). If a reading stays above 0, `SELECT l.pid, l.granted,
+    a.wait_event_type, a.wait_event, p.phase, pg_blocking_pids(l.pid) AS blocked_by,
+    now() - a.query_start AS waited FROM pg_locks l JOIN pg_stat_activity a USING (pid)
+    LEFT JOIN pg_stat_progress_create_index p USING (pid) WHERE l.locktype = 'advisory'
+    AND l.classid = 0 AND l.objid = 1464812289 AND l.objsubid = 1 AND l.database =
+    (SELECT oid FROM pg_database WHERE datname = current_database());` lists the lock's
+    holder (`granted`) and its waiters, what each waits on, and the pids each waits for
     (`blocked_by`), and `SELECT pid, application_name, state, now() - xact_start AS
-    open_for FROM pg_stat_activity WHERE pid = ANY(pg_blocking_pids(<pid>));` names the
-    sessions the holder `<pid>` waits for. The holder's wait decides. On `relation` it
-    is a boot, or a runner's create, drop or receipts VALIDATE (which gives up at its
-    own lock timeout), queued for a table lock: if one of those sessions is the nightly
-    dump (`pg_dump`), follow The nightly dump above; otherwise it waits for them to end
-    their transactions. On `virtualxid` it is a build (`phase` names its wait) or a
-    drop, waiting for each of those sessions to end its transaction: each wrote or
-    locked its table, or held an older snapshot when the wait began (a REPEATABLE READ
-    transaction such as the nightly dump, or a statement running then; an idle READ
-    COMMITTED transaction holds none, but one whose statement was running then is waited
-    for until its transaction ends). Otherwise it is working: wait. End one of those
-    sessions only if it reads `psql` and `idle in transaction`, an operator's session
-    left open (if it is yours, COMMIT or ROLLBACK it instead, knowing what it holds),
-    with `SELECT pg_terminate_backend(<pid>);`, which rolls its transaction back (a
-    cancel does nothing to an idle session). A build may instead be ended, which changes
-    no table rows: `SELECT pg_cancel_backend(<pid>);` ends it, one a stopped realm left
+    open_for, now() - state_change AS idle_for FROM pg_stat_activity WHERE pid =
+    ANY(pg_blocking_pids(<pid>));` names the sessions the holder `<pid>` waits for now
+    (on `virtualxid` a build or a drop waits for them one at a time, so it names one;
+    read it again once that one ends). The holder's wait decides. On `relation` it is a
+    boot, or a runner's create, drop or receipts VALIDATE (which gives up at its own
+    lock timeout), queued for a table lock: if one of those sessions is the nightly dump
+    (`pg_dump`), follow The nightly dump above; otherwise it waits for them to end their
+    transactions. On `virtualxid` it is a build (`phase` names its wait) or a drop,
+    waiting for each of those sessions to end its transaction: each wrote or locked its
+    table, or held an older snapshot when the wait began (a REPEATABLE READ transaction
+    such as the nightly dump, or a statement running then; an idle READ COMMITTED
+    transaction holds none, but one whose statement was running then can be waited for
+    until its transaction ends). Otherwise it is working: wait. End one of those
+    sessions, by the `pid` the naming statement returns for it, never the holder's, only
+    if it reads `psql` and `idle in transaction` on two readings a few seconds apart,
+    its `idle_for` growing: an operator's session left open. If it is yours
+    (`SELECT pg_backend_pid();` in each psql session you have open names its pid),
+    COMMIT or ROLLBACK it instead, knowing what it holds; else end it with `SELECT
+    pg_terminate_backend(<pid>);`, which rolls its transaction back (a cancel does
+    nothing to an idle session), so whoever left it open runs again what it had not
+    committed, a sign-out above included. A build may instead be ended, which changes no
+    table rows: `SELECT pg_cancel_backend(<pid>);` ends it, one a stopped realm left
     included, freeing the lock and leaving its index INVALID or none (above); wait for a
     build rather than end it, unless the start cannot wait (a rollback) and the nightly
     `pg_dump` is not running (a start during the dump queues its boot behind it whatever
     the gate reads). End nothing else: not the nightly dump, and no realm's session but
-    a build ended so or a boot The nightly dump above ends. Making a waiter wait with no
-    transaction open (polling a session-level try-lock in short statements of its own,
-    idle between them, then opening the schema transaction under the lock it took and
-    unlocking after COMMIT or ROLLBACK; the gate above would then see a waiter only once
-    it holds the lock), so that neither is aborted, is owed.
+    a build ended so or a boot The nightly dump above ends (its statement ends any other
+    session waiting for that lock with it). Making a waiter wait with no transaction
+    open (polling a session-level try-lock in short statements of its own, idle between
+    them, then opening the schema transaction under the lock it took and unlocking after
+    COMMIT or ROLLBACK; the gate above would then see a waiter only once it holds the
+    lock), so that neither is aborted, is owed.
   - The hazard predates housing; removing both deadlock paths (Deadlocks above) is owed
     (docs/freeholds/qa/mutation-2026-09-30/workload-evidence.md measures it).
 - FIRST ROLLOUT OF THE HOUSING TABLES: the first boot that carries them also creates
@@ -1580,23 +1599,25 @@ For off-box safety, sync the directory to S3 occasionally:
   one-time event at the deploy that first creates them.
 - **Community test profile**: on a disposable public test realm, set
   `PROVISION_TEST_ACCOUNTS=1` in the host `.env`, then recreate the game
-  container with `sudo docker compose up -d game` (a restart keeps the old
-  `.env` value) by Index builds under EVERY BOOT LOCKS THE PARENTS. The flag
-  gives newly created accounts nine level-20 characters, one per class, with
-  complete Warfare gear and four maximum-size bags. It does not backfill
-  existing accounts. (Rift portal density no longer needs a flag: every realm
-  keeps one portal per eligible zone on an hourly rotation, so the former
-  `COMMUNITY_TEST_RIFTS` toggle is gone.) The flag is off by default and does
-  not enable dev commands, so keep `ALLOW_DEV_COMMANDS=0` on a public realm.
+  container with `sudo docker compose up -d --no-deps game` (a restart keeps
+  the old `.env` value) by Index builds under EVERY BOOT LOCKS THE PARENTS.
+  The flag gives newly created accounts nine level-20 characters, one per
+  class, with complete Warfare gear and four maximum-size bags. It does not
+  backfill existing accounts. (Rift portal density no longer needs a flag:
+  every realm keeps one portal per eligible zone on an hourly rotation, so the
+  former `COMMUNITY_TEST_RIFTS` toggle is gone.) The flag is off by default
+  and does not enable dev commands, so keep `ALLOW_DEV_COMMANDS=0` on a public
+  realm.
 
   For the initial community test, leave `RIFT_UPGRADER_URL` and
   `RIFT_UPGRADER_MODEL` unset and keep `RIFT_RUNTIME_ASSETS=0` unless remote
   AI and asset-job costs are explicitly part of the test. Monitor tick
-  performance before opening the realm. To roll back, set both community flags
-  to `0` and recreate the game container with `sudo docker compose up -d game`
-  by Index builds under EVERY BOOT LOCKS THE PARENTS. Disabling stops future
-  roster seeding and dense Rift refill; characters already created remain, and
-  persisted portals close through their normal clear or expiry lifecycle.
+  performance before opening the realm. To roll back, set
+  `PROVISION_TEST_ACCOUNTS=0` and recreate the game container with
+  `sudo docker compose up -d --no-deps game` by Index builds under EVERY BOOT
+  LOCKS THE PARENTS. Disabling stops future roster seeding; characters already
+  created remain, and persisted portals close through their normal clear or
+  expiry lifecycle.
 - **Bot detector (implementation)**: the open-source tree ships with a no-op stub
   (`server/bot_detector/stub.ts`). Detection hooks are wired in, but they observe
   nothing and never act. To bundle the real behavioral detector, clone the private
@@ -2072,15 +2093,15 @@ For off-box safety, sync the directory to S3 occasionally:
   `{"bankExpansions":[12 ints],"bankSockets":[4 ints],"vaultUpgrades":[5 ints]}`
   (vault rung 0 is the vault unlock). Boot-time only: the sim resolves it once at
   world construction, so a change needs the game container recreated with
-  `sudo docker compose up -d game` (a restart keeps the old `.env` value) by Index
-  builds under EVERY BOOT LOCKS THE PARENTS. Each list is accepted only at its
-  exact compiled length with entries that are safe integers of at least 0 (zero is
-  a legal price); a bad dimension falls back to the compiled default BY ITSELF and
-  is reported on the console at boot, the boot does not fail, and an applied
-  override logs which dimensions it covers, so check the boot log after any
-  change: silence means unset, and a rejection can never look like unset. Clients
-  always render the server-sent prices (the walked guard test keeps them
-  price-free), so no client release is needed for a retune. Caveat before a
+  `sudo docker compose up -d --no-deps game` (a restart keeps the old `.env`
+  value) by Index builds under EVERY BOOT LOCKS THE PARENTS. Each list is accepted
+  only at its exact compiled length with entries that are safe integers of at
+  least 0 (zero is a legal price); a bad dimension falls back to the compiled
+  default BY ITSELF and is reported on the console at boot, the boot does not
+  fail, and an applied override logs which dimensions it covers, so check the boot
+  log after any change: silence means unset, and a rejection can never look like
+  unset. Clients always render the server-sent prices (the walked guard test keeps
+  them price-free), so no client release is needed for a retune. Caveat before a
   production SOCKET retune: `scripts/bank_audit.mjs` mirrors the compiled socket
   ladder and would flag legitimate unlocks as `bad_socket_price` under an
   override.
@@ -2213,9 +2234,13 @@ exception is `GAME_SERVER_URL`, which compose pins to the in-network address, so
 repointing it is a `docker-compose.yml` edit), so changing a tunable is an edit plus
 `sudo docker compose --profile discord up -d --no-deps discord-bot`, never an image
 rebuild (`--no-deps` keeps `up` from starting or recreating the game service the bot
-depends on). Every numeric key falls back to its built-in default on an empty or
-non-positive value, so an unset key is always safe and a blank line in `.env` never
-means zero.
+depends on). `DISCORD_BOT_TOKEN`, `DISCORD_CLIENT_ID`, `DISCORD_GUILD_ID` and
+`DISCORD_BOT_SECRET` reach the game container too, so after changing one, first
+recreate the game with `sudo docker compose up -d --no-deps game` by Index builds
+under EVERY BOOT LOCKS THE PARENTS, then the bot (a bot holding a `DISCORD_BOT_SECRET`
+the game does not has every call rejected). Every numeric key falls back to its
+built-in default on an empty or non-positive value, so an unset key is always safe and
+a blank line in `.env` never means zero.
 
 **Required** (the bot throws at boot without them):
 
