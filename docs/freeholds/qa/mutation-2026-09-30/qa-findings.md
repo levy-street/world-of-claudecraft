@@ -3842,7 +3842,9 @@ did not check, record wording and two commit bodies, and two readings ruled, Q47
 - Q47R1 FIXED `0cf1e2f6f9` (with L47R1: the dump case's later boots are named `secondBoot` and
   `thirdBoot`, and the unit suite pins every read of `boot`, `secondBoot`, `thirdBoot` and `work`
   in section L by the expression it sits in, so a boot read beside or instead of `settled` fails
-  until reviewed; the pin's comment says so; T46R3's disposition says a boot whose `startBoot` or
+  until reviewed; the pin's comment says so (a binding that shadows `settled` passed that pin; the
+  pin of each mention of `settled` and section L's digest make it fail, from round forty-nine,
+  T49R1, named so in round fifty, L50R1); T46R3's disposition says a boot whose `startBoot` or
   `settled` call changes fails until reviewed, and notes it (named so in round forty-eight,
   L48R5); every `during` callback's parameters pinned, so a callback that takes the boot it is
   handed names it `boot` (worded so in round forty-nine, C49R2), from round forty-eight, C48R1).
@@ -3933,7 +3935,9 @@ dropped blank lines and two commit bodies.
   two names that decode alike stay apart; H47R2's disposition notes it). S48R2 FIXED `75daea653c`
   (the route pin's bot pathspecs (named so in round forty-nine, L49R1) and the second listing's
   filter take `.tsx` and `.jsx` files, which the bot's bundler resolves; a tracked `bot/feed.tsx`
-  holding a route is listed by the route pin; the grant pin's too, from round forty-nine, L49R1).
+  holding a route is listed by the route pin, and one holding JSX fails at the no-JSX pin, from
+  round forty-nine, S49R1, named so in round fifty, L50R3; the grant pin's too, from round
+  forty-nine, L49R1).
 - D48R1 FIXED `75daea653c` (the first case checks that each counted call is the cancel of the
   schema lock's sessions, statement and key as `settled` sends them).
 - T48R1 FIXED `75daea653c` (the unit suite reads the section's lock key, lock filter, `startBoot`
@@ -3984,12 +3988,14 @@ it now probes each listed name's raw bytes both ways. One found a binding that s
 passing every named pin; since these pins kept drawing one more form, section L is now also read
 whole by digest, so any change to its code fails until reviewed, and the mentions of `settled` and
 `within`, and `within` itself, are pinned. Five found a `during` callback written as a function
-expression able to read its boot through `arguments`; only arrows pass now. The rest were JSX in
-bot code, the grant pin's extensions, comment and ledger wording and a commit body.
+expression able to read its boot through `arguments`; only arrows pass now. The rest were `within`
+read by no pin, JSX in bot code, the grant pin's extensions, comment and ledger wording and a
+commit body (counted so in round fifty, Q50R1).
 
 - C49R1 FIXED `b9789aa5ad` (with Q49R3, S49R2, T49R3 and L49R3: each listing's names are probed by
   their raw bytes, and a listed name must be on disk exactly when git does not report it deleted,
-  so a skip of a present file fails whatever its name, the kept files the positive arm; T48R2's
+  so a skip of a present file fails whatever its name, the kept files the positive arm and U98
+  below the other, which a clean tree never reaches (named so in round fifty, T50R2); T48R2's
   disposition notes it). C49R2 FIXED `b9789aa5ad` (with H49R2, Q49R5, T49R5 and L49R2: the pin
   block's comment is rewrapped and says a `during` callback that takes the boot it is handed names
   it `boot`, and Q47R1's note says the same). C49R3 FIXED in the ledger (with Q49R1: its ROUND
@@ -3998,18 +4004,22 @@ bot code, the grant pin's extensions, comment and ledger wording and a commit bo
   per-call check, which round forty-eight's summary names; the commit stays as it is). Q49R3 FIXED
   (see C49R1). Q49R4 FIXED `b9789aa5ad` (with H49R1, D49R1, M49R1 and T49R4: the `during` pin
   reads only an arrow's parameters, so a function expression, which could read the boot through
-  `arguments`, maps to its PropertyAssignment and fails, and a callback under a computed key drops
-  out of the pin's list and fails too; C48R1's disposition notes it). Q49R5 FIXED (see C49R2).
+  `arguments`, maps to its PropertyAssignment and fails, and a callback moved under a computed key
+  drops out of the pin's list, which fails one entry short, while one added under a computed key
+  fails at the digest (worded so in round fifty, C50R2); C48R1's disposition notes it). Q49R5
+  FIXED (see C49R2).
 - H49R1 FIXED (see Q49R4). H49R2 FIXED (see C49R2).
 - S49R1 FIXED `b9789aa5ad` (bot code may hold no JSX, so a route in JSX text or in an attribute
-  spelled with an HTML entity cannot sit where the route read does not take it). S49R2 FIXED (see
-  C49R1).
+  spelled with an HTML entity cannot sit where the route read does not take it; S48R2's
+  disposition notes it, named so in round fifty, L50R3). S49R2 FIXED (see C49R1).
 - D49R1 FIXED (see Q49R4).
 - T49R1 FIXED `b9789aa5ad` (every mention of `settled` in section L but its declaration is a call
   by name, so a binding that shadows it fails; and since the named pins kept drawing one more
   form, the section's code is read whole by digest, comments dropped, so any change to it fails
-  until reviewed against them). T49R2 FIXED `b9789aa5ad` (`within` is read whole and every mention
-  of it in the section is a call, with a count above zero as the control). T49R3 FIXED (see
+  until reviewed against them; Q47R1's disposition notes it, named so in round fifty, L50R1).
+  T49R2 FIXED `b9789aa5ad` (`within` is read whole and every mention of it in the section is a
+  call, with a count above zero as the control; every name section L reads from around it pinned
+  with how often it is declared there, once each, from round fifty, C50R1). T49R3 FIXED (see
   C49R1). T49R4 FIXED (see Q49R4). T49R5 FIXED (see C49R2).
 - L49R1 FIXED `b9789aa5ad` (the grant pin's bot pathspecs take `.tsx` and `.jsx` files, and S48R2
   names the route pin's; S48R2's disposition notes it; the feed-verb grep's extensions, outside
@@ -4024,3 +4034,73 @@ bot code, the grant pin's extensions, comment and ledger wording and a commit bo
   removed after, a tracked `bot/feed.tsx` holding JSX, at the no-JSX pin, a tracked bot file whose
   name is not UTF-8 with `--modified` listed for `--deleted`, at the raw-byte check, and a grant
   call in a tracked `bot/daily.tsx`, at the grant pin.
+
+## Round fifty: eight fresh readers over round forty-nine (`6b38b121f2..376b3c0122`)
+
+Round fifty's commits: `e448b6d828` (the unit suite pins every name section L reads from the
+scopes around it, the suite's callback and the module, with how many times those scopes declare
+it, once each; the bot's directory holds no module but code and `bot/CLAUDE.md`; the bot's imports
+from outside its directory are pinned and those modules read for routes; kept bot names are
+distinct; each bot file is parsed once; the JSX check is proven on a sample of each JSX root; the
+grant pin reads `botCode`; the pin block's comment names the module-level `within` and says code
+around the section is read only where a pin names it, and the digest's comment says how `linesOf`
+reads; the manifest's fiftieth entry; kept whole for bisect), and the commit that adds this
+section.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C50R1 to C50R3 |
+| qa-checklist | PASS | Q50R1 to Q50R5 |
+| server hot path | PASS | H50R1 |
+| privacy and security | PASS | S50R1 to S50R3 |
+| database performance | PASS | D50R1, D50R2 |
+| test coverage | PASS | T50R1 to T50R5 |
+| docs librarian | PASS | L50R1 to L50R3 |
+| migration safety | PASS | M50R1 |
+
+23 findings: none blocking, 4 should-fix (C50R1, D50R1, T50R1, M50R1), 19 nice-to-have, every
+reader passing, and four (qa-checklist, server hot path, privacy and security, docs librarian)
+with no should-fix. Three readers found that a `within` bound in the suite's callback, outside
+section L, would shadow the one read whole, past every pin and the digest; every name the section
+reads from around it is now pinned with how often those scopes declare it. Two found the no-JSX
+check proven on one root only; it is proven on a sample of each now. The rest were modules the
+bot's bundler loads beside its code, the grant pin's copy of the pathspecs, a second parse of each
+bot file, comment and record wording, and a commit body.
+
+- C50R1 FIXED `e448b6d828` (with D50R1 and M50R1: every name section L reads that the suite's
+  callback or the module declares is pinned with how many times those scopes declare it, once
+  each, so a second binding of `within`, or of any other such name, fails; T49R2's disposition
+  notes it). C50R2 FIXED in this record (Q49R4 says a callback moved under a computed key fails at
+  the `during` pin and one added under one fails at the digest). C50R3 FIXED in the ledger (with
+  Q50R2 and L50R2: its ROUND FORTY-EIGHT note follows the clauses round forty-nine reworded).
+- Q50R1 FIXED in this record and the ledger (round forty-nine's summary and the ledger's ROUND
+  FORTY-NINE name `within` read by no pin; `376b3c0122`'s body, which leaves it out, stays as it
+  is). Q50R2 FIXED (see C50R3). Q50R3 FIXED `e448b6d828` (with T50R3: the grant pin greps
+  `botCode`, so the two reads take the same pathspecs). Q50R4 FIXED `e448b6d828` (the digest's
+  comment says `linesOf` drops comments, trims lines and leaves blank lines out). Q50R5 FIXED
+  `e448b6d828` (with T50R1: the JSX check's predicate is proven on a sample holding an element, a
+  self-closing element and a fragment, each found, before it reads the bot's files).
+- H50R1 FIXED `e448b6d828` (with T50R5: each bot code file is parsed once and its nodes shared by
+  the JSX check, the outside-import read and the route read).
+- S50R1 FIXED `e448b6d828` (every tracked file in the bot's directory that is not code is named,
+  `bot/CLAUDE.md` alone, so a module the bundler loads beside code fails until a read takes it).
+  S50R2 FIXED `e448b6d828` (every string in bot code that starts `../` is pinned with its file,
+  the three imports of `src/sim/discord_roles` and `src/sim/discord_tier`, and those two modules
+  are read for routes, none found). S50R3 FIXED `e448b6d828` (the kept bot names are checked
+  distinct, so two names that decode alike fail).
+- D50R1 FIXED (see C50R1). D50R2 FIXED `e448b6d828` (the pin block's comment says the digest
+  covers forms inside the section, every name read from around it is declared once there, and code
+  around it is read only where a pin names it).
+- T50R1 FIXED (see Q50R5). T50R2 FIXED in this record (C49R1 names U98 as the proof of the
+  direction a clean tree never reaches). T50R3 FIXED (see Q50R3). T50R4 FIXED `e448b6d828` (the
+  comment names the `within` it pins as the module-level one). T50R5 FIXED (see H50R1).
+- L50R1 FIXED in this record (Q47R1 says a binding that shadows `settled` passed its pin and names
+  T49R1, which names it back). L50R2 FIXED (see C50R3). L50R3 FIXED in this record (S48R2 names
+  the no-JSX pin from S49R1, which names it back).
+- M50R1 FIXED (see C50R1).
+- Mutants on this round's new guards, each killed and its source restored: a `within` bound again
+  in the suite's callback, at the pin of the names read from around section L; the JSX predicate
+  without its element arm, at the sample; a route moved into `src/sim/discord_tier.ts`, at the
+  read of the bot's outside modules; a new import from outside the bot's directory, at the import
+  pin; and, added with intent-to-add and removed after, a tracked `bot/routes.json` holding a
+  route, at the list of the bot's non-code files.

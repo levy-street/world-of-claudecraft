@@ -5867,15 +5867,22 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   should-fix, every reader passing, four with no should-fix. Section L's boot helpers are read
   whole and every `during` callback's parameters pinned, so a boot handed to one under another
   name fails until reviewed; the cancel count checks each statement under a 250 ms grace; the
-  boundary comment states which calls of `ensureSchema` are read; the bot listings compare raw
+  boundary comment states which calls of `ensureSchema` are read (these two worded so in round
+  forty-nine, C49R3, the note moved here in round fifty, C50R3); the bot listings compare raw
   bytes, check what they skip and take JSX files; the rest were record wording, two dropped blank
-  lines and two commit bodies (worded so in round forty-nine, C49R3). Fixed in `75daea653c`.
+  lines and two commit bodies. Fixed in `75daea653c`.
 - ROUND FORTY-NINE, eight fresh readers over round forty-eight: 23 findings, none blocking, 2
   should-fix, every reader passing, six with no should-fix. Section L is read whole by digest
   beside its named pins, so a form they do not read still fails until reviewed; the skipped-name
   check probes raw bytes both ways; only arrows pass as `during` callbacks; bot code may hold no
-  JSX; the rest were the grant pin's extensions, comment and ledger wording and a commit body.
-  Fixed in `b9789aa5ad`.
+  JSX; `within` is read whole (named so in round fifty, Q50R1); the rest were the grant pin's
+  extensions, comment and ledger wording and a commit body. Fixed in `b9789aa5ad`.
+- ROUND FIFTY, eight fresh readers over round forty-nine: 23 findings, none blocking, 4
+  should-fix, every reader passing, four with no should-fix. Every name section L reads from the
+  scopes around it is pinned with how often they declare it, once each, so no binding there
+  shadows another; the JSX check is proven on a sample of each root; the bot's non-code files and
+  its imports from outside its directory are pinned; the rest were a second parse, the grant pin's
+  pathspecs, comment and record wording and a commit body. Fixed in `e448b6d828`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5907,8 +5914,8 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then 647,
   then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then
   648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648,
-  then 648, then 648, then 648, then 649, then 649, then 649, then 649, then 649 passed, never a
-  skip.
+  then 648, then 648, then 648, then 649, then 649, then 649, then 649, then 649, then 649 passed,
+  never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
