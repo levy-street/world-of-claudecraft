@@ -5764,6 +5764,12 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   that enables the discord profile in `.env` is told step 6 already started the bot; the third
   escalation lever stays open while a release image waits; and the sign-out check is read against
   a sign-out still open in its own session. Fixed in `ffc36d2487`.
+- ROUND THIRTY-TWO, eight fresh readers over round thirty-one: 39 findings, none blocking, 15
+  should-fix, every reader passing. A sign-out check above 0 runs the sign-out again in autocommit
+  whatever its session shows, and a rerun that waits is named; on a host that enables the discord
+  profile in `.env` a lever-stopped bot is stopped again after every start that names no service,
+  a rollback's included; and the third escalation lever lifts only by the levers' own `up`. Fixed
+  in `9dea958302`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5793,8 +5799,8 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then
   641, then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
   then 644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then
-  647, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648
-  passed, never a skip.
+  647, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648,
+  then 648 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
