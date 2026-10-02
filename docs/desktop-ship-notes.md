@@ -274,14 +274,14 @@ bump the version, rebuild, upload, and watch the toast + install cycle.
 - **Production server dependency**: the packaged app calls
   `https://worldofclaudecraft.com` from origin `app://worldofclaudecraft`;
   production must be running this branch's server (CORS reflection for that
-  origin) or every REST call fails. The log file shows the CORS errors
-  plainly until then. Deploying is the standard server update in `DEPLOY.md`
-  (ssh, `cd /opt/eastbrook`, `sudo git pull`, then its rebuild and its gated
-  start); the branch's server
-  carries all desktop support already (CORS in `server/web_login_guard.ts`,
-  the `/desktop-login` handoff in `server/desktop_login.ts`, the
-  desktop-origin Turnstile admission in `server/turnstile.ts`). See the
-  "Deploying the game server" section of `docs/desktop-release.md`.
+  origin) or every REST call fails. The log file shows the CORS errors plainly
+  until then. Deploying is the standard server update in `DEPLOY.md` (ssh,
+  `cd /opt/eastbrook`, `sudo git pull`, then its rebuild and its gated start);
+  the branch's server carries all desktop support already (CORS in
+  `server/web_login_guard.ts`, the `/desktop-login` handoff in
+  `server/desktop_login.ts`, the desktop-origin Turnstile admission in
+  `server/turnstile.ts`). See the "Deploying the game server" section of
+  `docs/desktop-release.md`.
 - **Electron lifecycle**: pinned to 43.x (current stable; EOL 2027-01-05).
   Before the 44 bump (~Aug 2026): audit renderer `clipboard` usage (removed
   from renderers in 44) and drop 32-bit assumptions. electron-builder stays on

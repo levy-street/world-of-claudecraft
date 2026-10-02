@@ -2197,9 +2197,10 @@ describe('the claim renewer', () => {
     );
     // And every realm start DEPLOY gives points at that gate in its own
     // paragraph, bullet or code block: each `docker compose` command that can
-    // start the game service (an `up`, `restart` or `start` naming no service
-    // but the bot's), and each operator restart in the phrasings DEPLOY uses
-    // for one. Both lists are whole, so a new start site fails here until it
+    // start the game service (an `up`, `restart` or `start`, but for a bot
+    // `restart` or a bot `up --no-deps`: the bot depends on the game service,
+    // so a plain bot `up` starts a stopped realm), and each operator restart in
+    // the phrasings DEPLOY uses for one. Both lists are whole, so a new start site fails here until it
     // is classified; a start phrased otherwise is beyond this pin, and the
     // rule in Index builds that every operator start goes by the gate still
     // covers it.
@@ -2229,19 +2230,30 @@ describe('the claim renewer', () => {
     expect(sites.filter((s) => s.kind === 'command').map((s) => s.site)).toEqual([
       'docker compose up -d',
       'docker compose up -d game',
+      'docker compose up -d game',
+      'docker compose up -d game',
+      'docker compose up -d game',
       'docker compose --profile discord up -d',
-      'docker compose --profile discord up -d discord-bot',
+      'docker compose --profile discord up -d --no-deps discord-bot',
       'docker compose --profile discord restart discord-bot',
-      'docker compose --profile discord up -d discord-bot',
+      'docker compose --profile discord up -d --no-deps discord-bot',
     ]);
     expect(sites.filter((s) => s.kind === 'prose').map((s) => s.site)).toEqual([
       'needs a restart',
-      'restart the game container',
-      'restart the game container',
       'restart the process',
-      'needs a process restart',
     ]);
-    const botOnly = /^docker compose --profile discord (?:up -d|restart) discord-bot$/;
+    // The bot's dependency, which is why only those two bot forms are exempt.
+    const compose = readFileSync('docker-compose.yml', 'utf8');
+    const botAt = compose.indexOf('\n  discord-bot:\n');
+    expect(botAt).toBeGreaterThan(-1);
+    // Read inside the bot's own block: its lines are indented past the service key.
+    const inBotBlock = /^ {2}discord-bot:\n(?: {4}.*\n|\n)*? {4}depends_on:\n {6}game:\n/;
+    expect('  discord-bot:\n    image: x\n    depends_on:\n      game:\n').toMatch(inBotBlock);
+    expect('  discord-bot:\n    image: x\n  other:\n    depends_on:\n      game:\n').not.toMatch(
+      inBotBlock,
+    );
+    expect(compose.slice(botAt + 1)).toMatch(inBotBlock);
+    const botOnly = /^docker compose --profile discord (?:up -d --no-deps|restart) discord-bot$/;
     for (const { site, flat } of sites) {
       if (botOnly.test(site)) continue;
       expect(flat, site).toContain('Index builds under EVERY BOOT LOCKS THE PARENTS');
@@ -2264,6 +2276,38 @@ describe('the claim renewer', () => {
     );
     expect(bullet).toContain(
       `\`DB_POOL_CONNECT_TIMEOUT_MS\` (${seconds('server/db.ts', 'DB_POOL_CONNECT_TIMEOUT_MS')} s)`,
+    );
+  });
+
+  it('reads an account by its unsubscribe token only in the one-click unsubscribe', () => {
+    // DEPLOY's sign-out leaves `accounts.unsubscribe_token` alone because the
+    // one route that takes it mints nothing (its handler and both statements
+    // are pinned whole in section L of tests/server/freehold_mutation.pg.test.ts).
+    // That holds only while nothing else reads by the token: every whole-token
+    // mention of the column and of its lookup in server/, per file, so a new
+    // reader fails here until it is reviewed.
+    const mentions = (pattern: RegExp) =>
+      Object.fromEntries(
+        serverModules()
+          .map(({ file, text }) => [`server/${file}`, text.match(pattern)?.length ?? 0] as const)
+          .filter(([, count]) => count > 0),
+      );
+    const column = /\bunsubscribe_token\b/g;
+    expect('ON accounts(unsubscribe_token) WHERE accounts_unsubscribe_token'.match(column)).toEqual(
+      ['unsubscribe_token'],
+    );
+    // Its DDL (3), its issue statement and the row read back (4), its lookup (1).
+    expect(mentions(column)).toEqual({ 'server/db.ts': 8 });
+    // The definition, then account.ts's import and its one call.
+    expect(mentions(/\baccountByUnsubscribeToken\b/g)).toEqual({
+      'server/account.ts': 2,
+      'server/db.ts': 1,
+    });
+    const account = stripComments(readFileSync('server/account.ts', 'utf8'));
+    const handler = account.indexOf('export async function handleEmailUnsubscribe(');
+    expect(handler).toBeGreaterThan(-1);
+    expect(account.slice(handler, account.indexOf('\n}\n', handler))).toContain(
+      'await accountByUnsubscribeToken(raw)',
     );
   });
 

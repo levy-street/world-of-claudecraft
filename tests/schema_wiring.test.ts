@@ -1352,8 +1352,8 @@ describe('ensureSchema wires every schema module at boot', () => {
     // cancelled or terminated backend, a database restart; a realm's own stop
     // or crash leaves it running) strands an INVALID index that IF NOT EXISTS
     // treats as existing on every later boot: never rebuilt, unusable to the
-    // planner, yet maintained on every play_sessions write. Boot must drop the
-    // carcass and rebuild.
+    // planner, yet, once its build got past building the index, maintained on
+    // every play_sessions write. Boot must drop the carcass and rebuild.
     h.state.invalidMetricsIndexExists = true;
     await runConcurrentIndexMigrations();
     const sessionLock = h.calls.findIndex((sql) => sql.includes('pg_advisory_lock($1)'));

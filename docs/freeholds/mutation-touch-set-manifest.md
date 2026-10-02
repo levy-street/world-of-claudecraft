@@ -1401,3 +1401,7 @@ What changed the contract above:
 - A twenty-sixth round of eight fresh readers: no P12 change; `DEPLOY.md` counts every lock
   mode that blocks a token write in the stall-over reading, decides by the holder's wait in the
   gate's diagnosis, and points every realm start it gives at the gate.
+- A twenty-seventh round of eight fresh readers: no P12 change; `DEPLOY.md` names the sessions
+  a held build waits for and how to end an operator's open one, lists an INVALID index for the
+  rollback drop, takes the stall reading with every realm `healthy` or stopped, and keeps the
+  bot's own `up` from starting the game.

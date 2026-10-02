@@ -31,11 +31,13 @@
 // counted), and the deadlock between a boot or a runner waiting on the schema
 // advisory lock and an index build under it, timing alone deciding the side
 // that loses, with DEPLOY's gate read on both sides, its diagnosis read on a
-// stalled boot and on a build at its wait, a stopped realm's build shown
-// holding the lock to its end, DEPLOY's cancel ending one at once and its
-// rollback drop removing the carcass a runner then builds again). The nearest
-// suites do not pin it: tests/server/freehold_mutation.test.ts drives the same
-// decisions with fakes (no transaction to roll back, no row to wait on),
+// stalled boot, on a build at its wait and on a runner's drop, a stopped
+// realm's build shown holding the lock until DEPLOY's terminate ends the
+// session it waits for, DEPLOY's cancel ending a stopped or a serving realm's
+// build at once, and its listing and rollback drop removing the carcass a
+// runner then builds again). The nearest suites do not pin it:
+// tests/server/freehold_mutation.test.ts drives the same decisions with fakes
+// (no transaction to roll back, no row to wait on),
 // tests/server/freehold_hearth_db.pg.test.ts and
 // tests/server/freehold_db.pg.test.ts prove the Hearth and plot statements
 // alone with no character save around them, and
@@ -3946,6 +3948,18 @@ d('the housing mutation boundary (REAL Postgres)', () => {
       // wait for old snapshots by an open REPEATABLE READ transaction (the
       // kind the nightly dump holds); `then` runs there, and `stop` closes
       // the realm's socket as its stop or crash would.
+      // A realm's runner building the index on its own client, held at its
+      // wait for old snapshots by an operator's REPEATABLE READ psql session
+      // left open (the kind of snapshot the nightly dump also holds); `then`
+      // runs there, and `stop` closes the realm's socket as its stop or crash
+      // would. Both sessions are dedicated clients, since either may be ended.
+      const { Client } = await import('pg');
+      const { materialSourceConnection } = await import('../../server/material_source_connection');
+      const dedicated = () => {
+        const client = new Client({ ...materialSourceConnection(verifyUrl(ADMIN_URL)) });
+        client.on('error', () => {});
+        return client;
+      };
       const heldBuild = async (
         then: (build: {
           pid: number;
@@ -3955,18 +3969,13 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         }) => Promise<void>,
       ) => {
         await pool.query(`DROP INDEX IF EXISTS ${migration.name}`);
-        const { Client } = await import('pg');
-        const { materialSourceConnection } = await import(
-          '../../server/material_source_connection'
-        );
-        const realm = new Client({ ...materialSourceConnection(verifyUrl(ADMIN_URL)) });
-        realm.on('error', () => {});
-        let snapshot: PoolClient | undefined;
+        const realm = dedicated();
+        const snapshot = dedicated();
         try {
-          snapshot = await pool.connect();
-          const open = snapshot;
-          await open.query('BEGIN ISOLATION LEVEL REPEATABLE READ');
-          const snapshotPid = (await open.query('SELECT pg_backend_pid() AS p')).rows[0].p;
+          await snapshot.connect();
+          await snapshot.query("SET application_name = 'psql'");
+          await snapshot.query('BEGIN ISOLATION LEVEL REPEATABLE READ');
+          const snapshotPid = (await snapshot.query('SELECT pg_backend_pid() AS p')).rows[0].p;
           await realm.connect();
           await realm.query('SELECT pg_advisory_lock($1)', [0x57_4f_43_01]);
           const building = realm.query(migration.createSql).catch(() => 'stopped');
@@ -3980,11 +3989,10 @@ d('the housing mutation boundary (REAL Postgres)', () => {
               ).connection.stream.destroy();
               return building;
             },
-            release: () => open.query('COMMIT'),
+            release: () => snapshot.query('COMMIT'),
           });
         } finally {
-          await snapshot?.query('ROLLBACK').catch(() => {});
-          snapshot?.release();
+          await snapshot.end().catch(() => {});
           await realm.end().catch(() => {});
         }
       };
@@ -4000,6 +4008,40 @@ d('the housing mutation boundary (REAL Postgres)', () => {
             blocked_by: r.blocked_by,
           }),
         );
+      // DEPLOY's statements that name and end sessions, each pinned whole.
+      const named = operatorSql('SELECT pid, application_name, state');
+      expect(named).toBe(
+        'SELECT pid, application_name, state, now() - xact_start AS open_for FROM pg_stat_activity WHERE pid = ANY(pg_blocking_pids(<pid>));',
+      );
+      const terminate = operatorSql('SELECT pg_terminate_backend(');
+      expect(terminate).toBe('SELECT pg_terminate_backend(<pid>);');
+      const cancel = operatorSql('SELECT pg_cancel_backend(');
+      expect(cancel).toBe('SELECT pg_cancel_backend(<pid>);');
+      const listing = operatorSql('SELECT indexrelid::regclass AS name');
+      expect(listing).toBe(
+        'SELECT indexrelid::regclass AS name FROM pg_index WHERE NOT indisvalid;',
+      );
+      const drop = operatorSql('DROP INDEX CONCURRENTLY IF EXISTS');
+      expect(drop).toBe('DROP INDEX CONCURRENTLY IF EXISTS <name>;');
+      const sessionsOf = async (pid: number) =>
+        (await pool.query(named.replace('<pid>', String(pid)))).rows.map(
+          (r: { pid: number; application_name: string; state: string }) => ({
+            pid: r.pid,
+            application_name: r.application_name,
+            state: r.state,
+          }),
+        );
+      const { CONCURRENT_INDEX_MIGRATIONS: registry } = await import(
+        '../../server/concurrent_indexes'
+      );
+      const registryOids = async () =>
+        (
+          await pool.query(
+            'SELECT relname, oid::text AS oid FROM pg_class WHERE relname = ANY($1) ORDER BY 1',
+            [registry.map((m) => m.name)],
+          )
+        ).rows;
+      let done = false;
       try {
         // Which side loses turns on timing alone, whichever kind of waiter:
         // already waiting when a quick build reaches its last wait, the waiter
@@ -4010,63 +4052,139 @@ d('the housing mutation boundary (REAL Postgres)', () => {
         expect(await round('SELECT pg_advisory_lock($1)', false, late)).toBe('build');
         expect(retried).toBeLessThan(2);
         // The build that lost left its index INVALID; the next runner drops
-        // it and builds it again, and a run with nothing to build is quick.
+        // it and builds it again. A run with nothing to build then builds
+        // nothing (every registry index keeps its oid) and is quick.
         expect(await valid()).toEqual([false]);
         expect(await until(gate, 0)).toBe(0);
         await db.runConcurrentIndexMigrations();
         expect(await valid()).toEqual([true]);
+        const built = await registryOids();
+        expect(built).toHaveLength(registry.length);
         const nothingToBuild = Date.now();
         await db.runConcurrentIndexMigrations();
-        expect(Date.now() - nothingToBuild).toBeLessThan(5_000);
+        expect(Date.now() - nothingToBuild).toBeLessThan(1_000);
+        expect(await registryOids()).toEqual(built);
         // A realm's stop does not end its build: the diagnosis names the build,
-        // its wait and the snapshot it waits for; with the check on the socket
-        // off, the build still holds the lock after its socket closes, until
-        // it ends, valid.
-        await heldBuild(async ({ pid, snapshotPid, stop, release }) => {
-          expect(await decides()).toEqual([
-            {
-              pid,
-              granted: true,
-              wait_event_type: 'Lock',
-              wait_event: 'virtualxid',
-              phase: 'waiting for old snapshots',
-              blocked_by: [snapshotPid],
-            },
-          ]);
-          expect(
-            (await pool.query('SHOW client_connection_check_interval')).rows[0]
-              .client_connection_check_interval,
-          ).toBe('0');
-          expect(await stop()).toBe('stopped');
-          await sleep(300);
-          expect(await gate()).toBe(1);
-          await release();
-          expect(await until(gate, 0)).toBe(0);
-          expect(await valid()).toEqual([true]);
-        });
+        // its wait and the snapshot it waits for (an idle READ COMMITTED
+        // transaction beside it holds no snapshot and is not waited for); with
+        // the check on the socket off, the build still holds the lock after
+        // its socket closes. DEPLOY's reading names the open psql session, and
+        // its terminate ends it, so the build ends, valid.
+        const idle = await pool.connect();
+        try {
+          await idle.query('BEGIN');
+          await idle.query('SELECT 1');
+          await heldBuild(async ({ pid, snapshotPid, stop }) => {
+            expect(await decides()).toEqual([
+              {
+                pid,
+                granted: true,
+                wait_event_type: 'Lock',
+                wait_event: 'virtualxid',
+                phase: 'waiting for old snapshots',
+                blocked_by: [snapshotPid],
+              },
+            ]);
+            expect(
+              (await pool.query('SHOW client_connection_check_interval')).rows[0]
+                .client_connection_check_interval,
+            ).toBe('0');
+            expect(await stop()).toBe('stopped');
+            await sleep(300);
+            expect(await gate()).toBe(1);
+            expect(await sessionsOf(pid)).toEqual([
+              { pid: snapshotPid, application_name: 'psql', state: 'idle in transaction' },
+            ]);
+            await pool.query(terminate.replace('<pid>', String(snapshotPid)));
+            expect(await until(gate, 0)).toBe(0);
+            expect(await valid()).toEqual([true]);
+          });
+        } finally {
+          await idle.query('ROLLBACK').catch(() => {});
+          idle.release();
+        }
         // DEPLOY's cancel ends a stopped realm's build at once: the lock is
-        // free and the index INVALID. After a rollback no runner names it, and
-        // DEPLOY's drop removes it; a runner that names it builds it again.
+        // free and the index INVALID. After a rollback no runner names it:
+        // DEPLOY's listing finds it and its drop removes it, and a runner that
+        // names it builds it again.
         await heldBuild(async ({ pid, stop }) => {
           expect(await stop()).toBe('stopped');
-          const cancel = operatorSql('SELECT pg_cancel_backend(');
-          expect(cancel).toBe('SELECT pg_cancel_backend(<pid>);');
           const holders = (await decides()).filter((row) => row.granted).map((row) => row.pid);
           expect(holders).toEqual([pid]);
           await pool.query(cancel.replace('<pid>', String(holders[0])));
           expect(await until(gate, 0)).toBe(0);
           expect(await valid()).toEqual([false]);
         });
-        const drop = operatorSql('DROP INDEX CONCURRENTLY IF EXISTS');
-        expect(drop).toBe('DROP INDEX CONCURRENTLY IF EXISTS <name>;');
+        expect((await pool.query(listing)).rows.map((r: { name: string }) => r.name)).toEqual([
+          migration.name,
+        ]);
         await pool.query(drop.replace('<name>', migration.name));
         expect(await valid()).toEqual([]);
         await db.runConcurrentIndexMigrations();
+        expect(await valid()).toEqual([true]);
+        // A serving realm's runner frees the lock too: DEPLOY's cancel ends its
+        // build, and the runner unlocks in its finally and rejects (its realm
+        // logs it and keeps serving), the old snapshot still open.
+        await pool.query(`DROP INDEX IF EXISTS ${migration.name}`);
+        const open = await pool.connect();
+        try {
+          await open.query('BEGIN ISOLATION LEVEL REPEATABLE READ');
+          await open.query('SELECT 1');
+          const running = db.runConcurrentIndexMigrations().then(
+            () => 'finished',
+            (error: { code?: string }) => error.code,
+          );
+          expect(await until(oldSnapshotWaits, 1)).toBe(1);
+          const holders = (await decides()).filter((row) => row.granted).map((row) => row.pid);
+          expect(holders).toHaveLength(1);
+          await pool.query(cancel.replace('<pid>', String(holders[0])));
+          expect(await running).toBe('57014');
+          expect(await gate()).toBe(0);
+          expect(await valid()).toEqual([false]);
+        } finally {
+          await open.query('ROLLBACK').catch(() => {});
+          open.release();
+        }
+        // A runner's drop of that INVALID index waits on `virtualxid` with no
+        // phase, for each session holding any lock on its table.
+        const reader = await pool.connect();
+        const dropper = dedicated();
+        try {
+          await reader.query('BEGIN');
+          await reader.query('SELECT 1 FROM guilds LIMIT 1');
+          const readerPid = (await reader.query('SELECT pg_backend_pid() AS p')).rows[0].p;
+          await dropper.connect();
+          await dropper.query('SELECT pg_advisory_lock($1)', [0x57_4f_43_01]);
+          const dropping = dropper.query(migration.dropSql);
+          const dropperPid = (dropper as unknown as { processID: number }).processID;
+          const waiting = async () => (await decides()).map((row) => `${row.wait_event}`).join(',');
+          expect(await until(waiting, 'virtualxid')).toBe('virtualxid');
+          expect(await decides()).toEqual([
+            {
+              pid: dropperPid,
+              granted: true,
+              wait_event_type: 'Lock',
+              wait_event: 'virtualxid',
+              phase: null,
+              blocked_by: [readerPid],
+            },
+          ]);
+          await reader.query('COMMIT');
+          await dropping;
+          await dropper.query('SELECT pg_advisory_unlock($1)', [0x57_4f_43_01]);
+          expect(await valid()).toEqual([]);
+        } finally {
+          await reader.query('ROLLBACK').catch(() => {});
+          reader.release();
+          await dropper.end().catch(() => {});
+        }
+        await db.runConcurrentIndexMigrations();
+        done = true;
       } finally {
-        // Cleanup after a failed order: with the lock free, a runner rebuilds
-        // whatever the order left (a lock still held would block it for good,
-        // so the reads below fail instead).
-        if ((await until(gate, 0)) === 0) await db.runConcurrentIndexMigrations();
+        // Cleanup after a failed order only: with the lock free, a runner
+        // rebuilds whatever the order left (a lock still held would block it
+        // for good, so the reads below fail instead).
+        if (!done && (await until(gate, 0)) === 0) await db.runConcurrentIndexMigrations();
       }
       expect(await valid()).toEqual([true]);
       expect(await gate()).toBe(0);
