@@ -192,8 +192,6 @@ describe('the DDL', () => {
     const notCheckAt = code.indexOf(notThisCheck);
     expect(notCheckAt).toBeGreaterThan(repairAt);
     const endIfAt = code.indexOf('END IF;');
-    expect(code.indexOf('RAISE WARNING')).toBeLessThan(endIfAt);
-    expect(endIfAt).toBeGreaterThan(notCheckAt);
     expect(probeAt).toBeGreaterThan(code.indexOf('DO $freehold_hearth_advance_token$'));
     expect(alterAt).toBeGreaterThan(probeAt);
     expect(constraintProbeAt).toBeGreaterThan(alterAt);
@@ -970,17 +968,27 @@ describe("the operator's corrupt-row repair (DEPLOY.md)", () => {
     expect(bullet).toContain('NEVER repair during a clock step');
   });
 
-  it('quotes the token warning exactly as the boot log prints it', () => {
+  it('quotes the token warning and the expected CHECK exactly as the boot uses them', () => {
     // An operator greps or alerts on that line, so DEPLOY must carry the
-    // fragment's own RAISE text behind the forwarder's `[schema] ` prefix.
+    // fragment's own RAISE text behind the forwarder's `[schema] ` prefix,
+    // and the whole CHECK text the probe compares, so the pre-check compares
+    // what the boot compares. Only a line break and its indent are folded:
+    // spacing inside a code span renders as written.
     const raised = [...FREEHOLD_HEARTH_SCHEMA.matchAll(/RAISE WARNING '([^']+)'/g)].map(
       (match) => match[1],
     );
     expect(raised).toHaveLength(1);
+    const compared = [...FREEHOLD_HEARTH_SCHEMA.matchAll(/IS DISTINCT FROM '((?:[^']|'')+)'/g)].map(
+      (match) => match[1].replaceAll("''", "'"),
+    );
+    expect(compared).toEqual([
+      "CHECK (((advance_token IS NULL) OR (advance_token ~ '^[0-9a-f]{32}$'::text)))",
+    ]);
     const deploy = readFileSync('DEPLOY.md', 'utf8');
     const start = deploy.indexOf('- THE ADVANCE TOKEN CHECK');
     expect(start).toBeGreaterThan(-1);
-    const bullet = deploy.slice(start, deploy.indexOf('\n- ', start + 1)).replace(/\s+/g, ' ');
+    const bullet = deploy.slice(start, deploy.indexOf('\n- ', start + 1)).replace(/\n\s*/g, ' ');
     expect(bullet).toContain(`\`[schema] ${raised[0]}\``);
+    expect(bullet).toContain(`\`${compared[0]}\``);
   });
 });

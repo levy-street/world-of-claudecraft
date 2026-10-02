@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS "__woc_freehold_hearth_schema__".account_freehold_hea
 -- The same column for a database whose table predates it. PROBED FIRST: an
 -- ALTER TABLE takes ACCESS EXCLUSIVE before it ever checks IF NOT EXISTS, and
 -- held through the rest of the boot transaction that lock would block every
--- other realm's Hearth reads, so an ordinary boot only reads the catalog. The
+-- other realm's Hearth reads, so an ordinary boot holds no lock to its COMMIT. The
 -- column's CHECK is probed by NAME too, by name alone (a same-named constraint
 -- of any type counts, so the repair can never fail a boot with 42710): a column
 -- that exists without it (added by hand) gets it back NOT VALID, so every new
@@ -126,9 +126,11 @@ CREATE TABLE IF NOT EXISTS "__woc_freehold_hearth_schema__".account_freehold_hea
 -- THIS check (another type, or a CHECK with another body) leaves the shape
 -- unchecked, so the boot says so (a WARNING notice). It compares PostgreSQL's
 -- own deparse of the definition, a NOT VALID suffix stripped, to the CHECK's
--- whole text: one catalog read, no table lock. A major upgrade that deparsed
--- this CHECK differently would warn on a correct one; the pre-check in
--- DEPLOY.md tells the two apart.
+-- whole text: one catalog read, plus the ACCESS SHARE on the table that the
+-- deparse takes and releases at once, so it waits only behind an ACCESS
+-- EXCLUSIVE holder or request and holds nothing to the boot's COMMIT. A major
+-- upgrade that deparsed this CHECK differently would warn on a correct one;
+-- DEPLOY.md quotes the whole expected text and says what to do then.
 DO $freehold_hearth_advance_token$
 BEGIN
   IF NOT EXISTS (

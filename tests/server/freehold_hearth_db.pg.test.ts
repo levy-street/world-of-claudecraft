@@ -468,6 +468,9 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       // only the idempotent-DDL skips, by code and reporting routine).
       expect(isIdempotentSchemaSkipNotice(warnings[0]), definition).toBe(false);
       expect(await namedDefs()).toEqual([definition]);
+      // The arm reads only its OWN table: the main schema's healthy CHECK stays
+      // silent while the legacy table holds the impostor.
+      expect(await boot(hearthSchema), definition).toEqual([]);
     }
     // The controls, each SILENT: with the impostor gone the next boot puts the
     // CHECK back NOT VALID, and a boot over that repaired CHECK, or over the
@@ -485,6 +488,40 @@ d('account_freehold_hearth against real PostgreSQL', () => {
       { conname: 'account_freehold_hearth_advance_token_shape', def: VALID_DEF },
     ]);
     expect(await boot(hearthSchema)).toEqual([]);
+  });
+
+  it("a steady boot's one Hearth table lock is the token probe's: it waits behind ACCESS EXCLUSIVE and is held to no COMMIT", async () => {
+    // Deparsing the CHECK opens the table under ACCESS SHARE and releases it at
+    // once. So a boot waits there behind an ACCESS EXCLUSIVE holder (operator
+    // DDL), and inside the boot transaction it holds no lock on the table after.
+    const holder = await pool.connect();
+    const booter = await pool.connect();
+    try {
+      await holder.query('BEGIN');
+      await holder.query(`LOCK TABLE ${SCHEMA}.account_freehold_hearth IN ACCESS EXCLUSIVE MODE`);
+      await booter.query('BEGIN');
+      await booter.query("SET LOCAL lock_timeout = '300ms'");
+      await expect(booter.query(hearthSchema)).rejects.toMatchObject({ code: '55P03' });
+      await booter.query('ROLLBACK');
+      await holder.query('ROLLBACK');
+      // The control: with no holder the same boot completes, and holds nothing
+      // on the table afterwards, inside its still-open transaction.
+      await booter.query('BEGIN');
+      await booter.query("SET LOCAL lock_timeout = '300ms'");
+      await booter.query(hearthSchema);
+      const held = await booter.query(
+        `SELECT mode FROM pg_locks
+          WHERE relation = $1::regclass AND pid = pg_backend_pid()`,
+        [`${SCHEMA}.account_freehold_hearth`],
+      );
+      expect(held.rows).toEqual([]);
+      await booter.query('ROLLBACK');
+    } finally {
+      await holder.query('ROLLBACK').catch(() => {});
+      await booter.query('ROLLBACK').catch(() => {});
+      holder.release();
+      booter.release();
+    }
   });
 
   it("restores the caller's in-flight search_path after the fragment", async () => {
