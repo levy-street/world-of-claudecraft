@@ -5743,9 +5743,15 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   `9a729218d5`.
 - ROUND TWENTY-EIGHT, eight fresh readers over round twenty-seven: 48 findings, none blocking, 7
   should-fix, every reader passing. Four Discord keys the game reads too now have the game
-  recreated first; every recreate runs `up -d --no-deps game`; the terminate rule goes by the
-  named session's pid on two readings; and the test-coverage reader's five gaps are each a real
-  PostgreSQL order or a unit pin. Fixed in `5c37d09029`.
+  recreated first; every recreate after an `.env` edit (worded so in round twenty-nine) runs
+  `up -d --no-deps game`; the terminate rule goes by the named session's pid on two readings; and
+  the test-coverage reader's five gaps are each a real PostgreSQL order or a unit pin. Fixed in
+  `5c37d09029`.
+- ROUND TWENTY-NINE, eight fresh readers over round twenty-eight: 48 findings, one blocking, 15
+  should-fix. The sign-out now commits before any realm starts and reruns from the stop if
+  undone; a hand drop's pid comes from DEPLOY's own lookup; the bot's first start and every bot
+  recreate keep to the game's gate and image; and the keys the bot and the game share are pinned
+  from each service's own environment. Fixed in `e8582aacc9`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5775,7 +5781,8 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then
   641, then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
   then 644, then 644, then 644, then 644, then 644, then 644, then 645, then 646, then 647, then
-  647, then 648, then 648, then 648, then 648, then 648, then 648 passed, never a skip.
+  647, then 648, then 648, then 648, then 648, then 648, then 648, then 648 passed, never a
+  skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
