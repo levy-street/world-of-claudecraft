@@ -863,6 +863,7 @@ import {
   tSim,
 } from './sim_i18n';
 import { openSimpleMenu } from './simple_context_menu';
+import { livePlayerPid } from './social_row_menu_core';
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
 import { stackSizeTooltipLine } from './stack_size_tooltip_view';
@@ -5174,6 +5175,10 @@ export class Hud {
     showPrompt: (text, acceptLabel, onAccept, onDecline) =>
       this.showPrompt(text, acceptLabel, onAccept, onDecline),
     startWhisper: (name) => this.startWhisper(name),
+    openSelfMenu: (x, y) => this.openSelfContextMenu(x, y),
+    openUnitMenu: (pid, name, x, y) => this.openContextMenu(pid, name, x, y),
+    openNameMenu: (name, x, y) => this.openChatPlayerContextMenu(name, x, y),
+    isMobileLayout: () => this.isMobileLayout(),
   });
   // Set by main.ts once the realm's /api/status advert answers, which lands AFTER
   // this window is constructed: a hosted dev/PBE realm booted with
@@ -17586,7 +17591,7 @@ export class Hud {
     // A portrait chip only when the player is close enough to have a live entity;
     // for a name seen in /world or /lfg the title is name-only. Player Info still
     // works either way (it falls back to the public character sheet).
-    const livePidForMenu = this.playerPidByName(name);
+    const livePidForMenu = livePlayerPid(this.sim.entities.values(), name);
     const ent = livePidForMenu !== null ? this.sim.entities.get(livePidForMenu) : undefined;
     const actions = chatPlayerContextActions({
       playerName: name,
@@ -17613,7 +17618,7 @@ export class Hud {
     this.ctxMenuOpener = opener ?? null;
     this.bindContextMenuActions((act) => {
       if (this.openStreamerLink(act, actions)) return;
-      const livePid = this.playerPidByName(name);
+      const livePid = livePlayerPid(this.sim.entities.values(), name);
       if (act === 'info') this.openPlayerInfo(name, livePid);
       else if (act === 'whisper') this.startWhisper(name);
       else if (act === 'invite') {
@@ -17670,14 +17675,6 @@ export class Hud {
         activate();
       });
     });
-  }
-
-  private playerPidByName(name: string): number | null {
-    const wanted = name.toLowerCase();
-    for (const e of this.sim.entities.values()) {
-      if (e.kind === 'player' && e.name.toLowerCase() === wanted) return e.id;
-    }
-    return null;
   }
 
   // Body in report_window.ts (the Phase 9b headroom extraction); this

@@ -399,6 +399,8 @@ const UI_PURE_CORES = [
   'src/ui/preview_prewarm_core.ts',
   'src/ui/talents_view.ts',
   'src/ui/social_view.ts',
+  // Which player menu a Social row right-click opens (self / unit frame / by name).
+  'src/ui/social_row_menu_core.ts',
   'src/ui/guild_ranks_view.ts',
   'src/ui/who_tab_view.ts',
   'src/ui/tab_strip_view.ts',

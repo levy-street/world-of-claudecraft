@@ -939,6 +939,15 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     reflowAllow: { '.getBoundingClientRect': 1, '.scrollTop': 4 },
     driverAllow: {},
   },
+  // The Social window's row right-click: ONE row rect, read lazily and only when a
+  // contextmenu arrives at 0,0 (a keyboard or synthetic open), to seat the player
+  // menu under the row. A pointer right-click uses its own coords and reads nothing;
+  // no repaint or clock ever reaches it.
+  {
+    file: 'social_window.ts',
+    reflowAllow: { '.getBoundingClientRect': 1 },
+    driverAllow: {},
+  },
   // The two touch gesture layers of the mobile action ring, one entry each because they
   // are twins: ONE button/seat rect plus ONE computed-style read, taken when a press
   // OPENS the overlay (the radial's reveal, the strip's pointerdown measure) and never
