@@ -5927,10 +5927,17 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   wording. Fixed in `d2873d8e4a`.
 - ROUND FIFTY-SEVEN, eight fresh readers over round fifty-six: 17 findings, none blocking, 3
   should-fix, every reader passing, five with no should-fix. The plain range still took a spec
-  semver rejects ending in a tarball name, which pnpm installs from a local path; a plain range
-  now takes no prerelease and bounds each number. The renewer guard's summary names override
-  specs; the rest were record wording, a comment's pointer and a sample entry. Fixed in
-  `138e7bd758`.
+  semver rejects, led by `^` and ending in a tarball name, which pnpm installs from a local path
+  (worded so in round fifty-eight, C58R2); a plain range now takes no prerelease and bounds each
+  number. The renewer guard's summary names override specs; the rest were record wording, a
+  comment's pointer and a sample entry. Fixed in `138e7bd758`.
+- ROUND FIFTY-EIGHT, eight fresh readers over round fifty-seven: 15 findings, none blocking, 3
+  should-fix, every reader passing, five with no should-fix. The range classifier cut an alias's
+  tail whole and left a build-metadata or separator widening unproven; after one more form in each
+  of three rounds, the pin reads each spec by its shape and pins every other spec by name with its
+  whole shape. The rest were comment and record wording and a pointer to the ledger. A reader's
+  command downloaded Electron into `node_modules` by mistake; it was removed. Fixed in
+  `2c3244385b`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5956,9 +5963,12 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 - The renewer guard's `package.json` pin read a dependency spec as a version range by its first
   character, so a tarball or path spec led by a digit or a tilde, which pnpm installs from a local
   path rather than the registry, passed as one (round fifty-six, T56R1; worded so in round
-  fifty-seven, L57R2); so did a spec semver rejects ending in a tarball name, a prerelease with an
-  empty identifier or an overlong number (round fifty-seven, C57R1). A range is now only three
-  numbers of at most nine digits with no leading zero, led by nothing, `^` or `~`.
+  fifty-seven, L57R2); so did a spec semver rejects, led by `^` and ending in a tarball name, a
+  prerelease with an empty identifier or an overlong number (round fifty-seven, C57R1; worded so
+  in round fifty-eight, C58R2), and an alias whose tail the pin cut whole (round fifty-eight,
+  S58R1). The pin now reads each spec by its shape, its digit runs written 0: only `0.0.0`, led by
+  nothing, `^` or `~`, is a plain range, and every other spec is pinned by name with its whole
+  shape.
 
 ### EVIDENCE
 
@@ -5969,7 +5979,7 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then
   648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648, then 648,
   then 648, then 648, then 648, then 649, then 649, then 649, then 649, then 649, then 649, then
-  649, then 649, then 649, then 649, then 649, then 649, then 649 passed, never a skip.
+  649, then 649, then 649, then 649, then 649, then 649, then 649, then 649 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):

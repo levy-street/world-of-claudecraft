@@ -4521,7 +4521,9 @@ overlong number and a wider range are listed, proven on samples of each, of a pr
 a tarball name and of one holding a path; the renewer guard's summary names override specs and
 plain ranges; the bundle read's package rule comment says two tracked-file checks after the pin;
 the ws rule's sample holds a file named `node_modules`; the manifest's fifty-seventh entry; kept
-whole for bisect), and the commit that adds this section.
+whole for bisect; its body, which says such a spec fell through to pnpm's local resolver and that
+the samples hold each widening that reopens the gap, stays as it is, noted in round fifty-eight,
+C58R2 and T58R1), and the commit that adds this section.
 
 | Reader | Verdict | Findings |
 |---|---|---|
@@ -4536,21 +4538,24 @@ whole for bisect), and the commit that adds this section.
 
 17 findings: none blocking, 3 should-fix (C57R1, T57R1, L57R1), 14 nice-to-have, every reader
 passing, and five (qa-checklist, server hot path, privacy and security, database performance,
-migration safety) with no should-fix, three of them with no finding at all. Two readers found the
+migration safety) with no should-fix, three of them with no finding at all. One reader found the
 last round's plain range still taking a spec semver rejects, a prerelease with an empty identifier
-or an overlong number ending in a tarball name, or a prerelease holding a path, which pnpm then
-installs from a local path; three more named the prerelease or the wider ranges in four
-nice-to-haves. A plain range now takes no prerelease and bounds each number. One found the renewer
-guard's summary still naming the old range rule. The rest were the record's account of where a
-tilde path installs from, two record wordings, the comment's pointer to the checks after the pin,
-and a sample entry.
+or an overlong number, led by `^` and ending in a tarball name, which pnpm then installs from a
+local path, and one found no sample failing a grammar widened to take a prerelease holding a path
+(worded so in round fifty-eight, C58R1); one of them and two more named the prerelease or the
+wider ranges in four nice-to-haves (worded so in round fifty-eight, L58R2). A plain range now
+takes no prerelease and bounds each number. One found the renewer guard's summary still naming the
+old range rule. The rest were the record's account of where a tilde path installs from, two record
+wordings, the comment's pointer to the checks after the pin, and a sample entry.
 
 - C57R1 FIXED `138e7bd758` (with T57R1, S57R1, S57R2, Q57R2 and T57R2: a plain range is three
   numbers of at most nine digits with no leading zero, led by nothing, `^` or `~`, so a
   prerelease, an overlong number and a wider range are listed, proven on samples of a prerelease
   with an empty identifier, one ending in a tarball name, one holding a path, an overlong number,
   a leading zero, a `>` range, a missing patch number and an `x` patch, and the comment says so;
-  T56R1's disposition notes it). C57R2 FIXED (see L57R2).
+  T56R1's disposition and the ledger's item under WHAT IT FOUND THAT WAS NOT A COMMENT note it,
+  named so in round fifty-eight, Q58R5; the grammar replaced by a read of each spec's shape, from
+  round fifty-eight, T58R1). C57R2 FIXED (see L57R2).
 - Q57R1 FIXED (see L57R2). Q57R2 FIXED (see C57R1). Q57R3 FIXED (see L57R3). Q57R4 FIXED
   `138e7bd758` (with T57R5: the package rule's comment says two tracked-file checks after the pin,
   which its parenthesis names).
@@ -4571,3 +4576,68 @@ and a sample entry.
   leading zero, with its prefix widened to `>` and `<`, and with its patch number optional, each
   at the classifier's samples; and the ws rule reading `node_modules` only before a non-letter, at
   the ws rule's sample.
+
+## Round fifty-eight: eight fresh readers over round fifty-seven (`d9225b5fb6..e289b68462`)
+
+Round fifty-eight's commits: `2c3244385b` (the `package.json` pin reads each dependency and
+override spec by its shape, each run of digits written 0, takes only `0.0.0`, led by nothing, `^`
+or `~`, as a plain range, and pins every other spec by name with its whole shape, the two aliases
+with their tails; samples of a prerelease, build metadata, a tarball ending, a slash between or
+before the numbers, a repeated or dot prefix, a literal `N.N.N`, wider ranges, paths, a tag, a
+link and alias tails; the comments say the pin reads specs by their shape; the manifest's
+fifty-eighth entry; kept whole for bisect), and the commit that adds this section. Six readers ran
+twice: a network error ended their first runs before they reported, and their second runs, over
+the same tip, are the ones recorded.
+
+| Reader | Verdict | Findings |
+|---|---|---|
+| correctness | PASS | C58R1, C58R2 |
+| qa-checklist | PASS | Q58R1 to Q58R5 |
+| server hot path | PASS | H58R1 |
+| privacy and security | PASS | S58R1 |
+| database performance | PASS | none |
+| test coverage | PASS | T58R1 to T58R3 |
+| docs librarian | PASS | L58R1 to L58R3 |
+| migration safety | PASS | none |
+
+15 findings: none blocking, 3 should-fix (Q58R1, S58R1, T58R1), 12 nice-to-have, every reader
+passing, and five (correctness, server hot path, database performance, docs librarian, migration
+safety) with no should-fix, two of them with no finding at all. Three readers found the range
+classifier still open: an alias's tail was cut whole whatever it held, so an alias to a local
+tarball read as one of the two pinned ones, and no sample killed a grammar widened to build
+metadata or to a slash between the numbers, either of which takes a spec pnpm installs from a
+local path or git; one of them named two more widenings as nice-to-haves. The classifier had drawn
+one more form in each of three rounds, so the pin now reads each spec by its shape and pins every
+spec that is not a plain range by name with its whole shape. Three found the classifier's comment
+reading as a list of three forms, and three found round fifty-seven's summary and ledger entry
+misstating which spec pnpm installs from a local path and miscounting its readers, in six
+nice-to-haves. The rest was a missing pointer to the ledger. One reader's command loaded the root
+package's Electron entry by mistake, which downloaded Electron into `node_modules/electron` and
+the user cache; those files were removed, and no tracked file changed.
+
+- C58R1 FIXED in this record (with L58R1, L58R2, Q58R2 and Q58R3: round fifty-seven's summary says
+  one reader found the plain range taking a spec semver rejects, led by `^` and ending in a
+  tarball name, and one found no sample failing a grammar widened to take a prerelease holding a
+  path, and that one of them and two more named the rest in four nice-to-haves). C58R2 FIXED in
+  this record and the ledger (round fifty-seven's summary, the ledger's ROUND FIFTY-SEVEN and its
+  item under WHAT IT FOUND THAT WAS NOT A COMMENT say such a spec is led by `^`; `138e7bd758`'s
+  body, which says a spec ending in a tarball name fell through to pnpm's local resolver, stays as
+  it is).
+- Q58R1 FIXED (see T58R1). Q58R2 FIXED (see C58R1). Q58R3 FIXED (see C58R1). Q58R4 FIXED (see
+  T58R1). Q58R5 FIXED in this record (C57R1's disposition names the ledger's item under WHAT IT
+  FOUND THAT WAS NOT A COMMENT).
+- H58R1 FIXED (see T58R1).
+- S58R1 FIXED (see T58R1).
+- T58R1 FIXED `2c3244385b` (with Q58R1, S58R1, T58R2, T58R3, H58R1, L58R3 and Q58R4: the
+  `package.json` pin reads each spec by its shape, each run of digits written 0, takes only
+  `0.0.0`, led by nothing, `^` or `~`, as a plain range, and pins every other spec by name with
+  its whole shape, so an alias keeps its tail; a number's value is not read, a stated boundary,
+  since pnpm takes a spec with a leading zero or an overlong number from the registry or fails;
+  samples hold each form the readers named; the comments say so; C57R1's disposition notes it;
+  `138e7bd758`'s body, which says the samples held each widening that reopens the gap, stays as it
+  is). T58R2 FIXED (see T58R1). T58R3 FIXED (see T58R1).
+- L58R1 FIXED (see C58R1). L58R2 FIXED (see C58R1). L58R3 FIXED (see T58R1).
+- Mutants on this round's shape read, each killed and its source restored: the shape writing only
+  the first digit run, absorbing a slash with the digits, and with an alias's tail cut again, each
+  at the pin over the real specs; a two-number shape taken as plain, the shape absorbing a tarball
+  ending after a number, and a repeated prefix taken as one, each at the samples.
