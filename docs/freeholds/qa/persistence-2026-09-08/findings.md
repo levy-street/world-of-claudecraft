@@ -5637,12 +5637,18 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   bounds itself and prints a code, never a DETAIL, and the drop rule reads the constraint's
   key count. Fixed in `5d5912617f` through `4373df398d`.
 - ROUND TWELVE, eight fresh readers over round eleven: 46 findings, two blocking, 11
-  should-fix. Five readers found that psql sends its own application name after PGOPTIONS, so
-  the runbook's session never carried its name: it is set through PGAPPNAME now, and the pg
-  case connects as psql does. The grace parse round eleven loosened could hang the worker on a
-  failed match; each line now takes one shape. The spelling screen, missing a new spelling for
-  the third round, is removed for the stated boundary. Fixed in `ce340075f5` through
-  `2b19063caa`.
+  should-fix. Six readers found that psql always sends a startup application name, which the
+  server applies after PGOPTIONS, so the runbook's session never carried its name: it is set
+  through PGAPPNAME now, and the pg case connects as psql does. The grace parse round eleven
+  loosened could hang the worker on a failed match; each line now takes one shape. The
+  spelling screen, missing a new spelling for the third round, is removed for the stated
+  boundary. Fixed in `ce340075f5` through `2b19063caa`.
+- ROUND THIRTEEN, eight fresh readers over round twelve: 38 findings, one blocking, 6
+  should-fix. Naming the runbook's session made an unscripted check find itself, so the holder
+  and lost connection checks became one HOLDER read that excludes its sender and selects no
+  query text; a lost send is resent once, and the missing-column routes run in the pg suite.
+  The blocking finding was a code pin whose control proved nothing; it has one now. Fixed in
+  `27261249b0` through `fae6b76048`.
 
 ### WHAT IT FOUND THAT WAS NOT A COMMENT
 
@@ -5662,8 +5668,8 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
 
 - `npx tsc --noEmit` exit 0 at every round's tip.
 - Every `*.pg*` file armed against PostgreSQL 16.14 on each round's tip: 626, then 640, then 641,
-  then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644
-  passed, never a skip.
+  then 642, then 643, then 643, then 644, then 644, then 644, then 644, then 644, then 644,
+  then 644 passed, never a skip.
 - Mutants on each round's new guards, each killed and its source restored.
 - Benches, recorded with their scripts in
   [../mutation-2026-09-30/workload-evidence.md](../mutation-2026-09-30/workload-evidence.md):
@@ -5693,6 +5699,9 @@ commit, is in [../mutation-2026-09-30/qa-findings.md](../mutation-2026-09-30/qa-
   housing's change-no-rows rule; it belongs to the storage path.
 - The boot's fatal log prints a pg error whole, its DETAIL included; logging only its code,
   message, table and constraint belongs to the boot path.
+- A ruling on a rename-only block that frees the advance token CHECK's name for the column's
+  repair boot, so a missing column with its name held need not keep the realms down until the
+  report is answered (C13R3).
 - A golden for the Hearth admission's pending and deny arms.
 - The receipts gauge's rate budget (08, 15).
 - The maintainer's rulings on three items:

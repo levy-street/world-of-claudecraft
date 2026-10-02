@@ -1347,3 +1347,5 @@ What changed the contract above:
 - A twelfth round of eight fresh readers: P12 says a constraint of the CHECK's name on other
   columns or none fails the column repair, and the runbook names its session through
   PGAPPNAME, which psql's own name cannot override.
+- A thirteenth round of eight fresh readers: P12 gives the bench's boot times, and the runbook
+  gains a HOLDER read that never shows a query, a client address or its own session.
