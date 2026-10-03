@@ -209,7 +209,10 @@ describe('the turret plan key', () => {
     const grouped: TurretWaveDef = {
       groups: Array.from({ length: G.groups }, () => wave([wolf]).groups[0]),
       coreDamage: 60,
-      kegs: Array.from({ length: G.kegLots }, () => ({ mode: 'crown', count: 1 }) as const),
+      kegs: Array.from(
+        { length: G.kegLots },
+        () => ({ mode: 'crown', count: 1, size: 'small' }) as const,
+      ),
       kegCap: L.barrels,
     };
     const resolved = resolveTurretPlan({
@@ -389,8 +392,8 @@ describe('the turret plan key', () => {
       'lots laying more kegs than the field holds',
       (p: Wire) =>
         (p.waves[0].kegs = [
-          { mode: 'crown', count: 20 },
-          { mode: 'crown', count: 20 },
+          { mode: 'crown', count: 20, size: 'large' },
+          { mode: 'crown', count: 20, size: 'large' },
         ]),
     ],
     [

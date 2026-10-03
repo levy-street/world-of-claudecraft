@@ -445,7 +445,12 @@ const shot = shape<TurretShot>({
   weapon: optional(lit('frag')),
 });
 
-const barrel = shape<TurretBarrel>({ id: count, ...at, litTick: tick, blowTick: tick });
+const barrel = shape<Omit<TurretBarrel, 'spacing'>>({
+  id: count,
+  ...at,
+  litTick: tick,
+  blowTick: tick,
+});
 
 const defense = shape<Omit<TurretDefenseView, 'plan'>>({
   cx: num,
@@ -528,18 +533,25 @@ const group = tagged<TurretGroupPlan, 'brick'>('brick', {
 
 const kegCount = within(1, LIMITS.barrels);
 const lotGroup = within(0, TURRET_GROUP_LIMITS.groups - 1);
+// How many of a lot's spots are clusters is checked against its count by turretKegLotsValid.
+const clusterSize: Dec<2 | 3> = (v) => (v === 2 || v === 3 ? v : BAD);
+const clustered = { cluster: optional(clusterSize), clusters: optional(kegCount) };
 const alongLot = shape<Extract<PathLot, { placement: 'front' | 'side' }>>({
   mode: lit('path'),
   group: lotGroup,
   placement: oneOf('front', 'side'),
   minRadius: optional(nonNegative),
   maxRadius: optional(nonNegative),
+  spaced: optional(yes),
+  cluster: optional(clusterSize),
 });
 const axisLot = shape<Extract<PathLot, { placement: 'axis' }>>({
   mode: lit('path'),
   group: lotGroup,
   placement: lit('axis'),
   fromTower: positive,
+  spaced: optional(yes),
+  cluster: optional(clusterSize),
 });
 const kegLot = tagged<TurretKegLotDef, 'mode'>('mode', {
   random: shape<Extract<TurretKegLotDef, { mode: 'random' }>>({
@@ -548,10 +560,14 @@ const kegLot = tagged<TurretKegLotDef, 'mode'>('mode', {
     minRadius: nonNegative,
     maxRadius: nonNegative,
     lanes: optional(yes),
+    spaced: optional(yes),
+    ...clustered,
   }),
   crown: shape<Extract<TurretKegLotDef, { mode: 'crown' }>>({
     mode: lit('crown'),
     count: kegCount,
+    size: oneOf('small', 'large'),
+    ...clustered,
   }),
   path: (v) => (record(v) && v.placement === 'axis' ? axisLot(v) : alongLot(v)),
 });

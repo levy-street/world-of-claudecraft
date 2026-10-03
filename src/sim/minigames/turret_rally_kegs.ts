@@ -3,16 +3,17 @@
 // yards off the axis, so the advancing column brushes past it; a side keg stands on the
 // same stretch at the column's rim; an axis keg stands just off the advance axis at a set
 // distance from the tower. None stands where its blast reaches a member standing at the
-// rally, nor nearer the tower than the keg ring's inner edge. Each spot follows the
-// barrels' own rules (dry, spaced, clear of bodies) and the keg cap; a keg that finds no
-// clear spot in its draws is left out. Pure: private stateless draws only.
+// rally, nor nearer the tower than the keg ring's inner edge (a cluster's kegs spread up to
+// about a yard round its spot). Each spot (a keg or a cluster) follows the barrels' own rules (dry, spaced, clear of bodies) and the keg cap;
+// one that finds no clear spot in its draws is left out. Pure: private stateless draws only.
 
 import { TURRET_EXPLOSIVE_BARREL, TURRET_RALLY } from '../content/turret_defense';
 import type { ThrowProbe } from './thrown_body';
-import { standTurretBarrel, type TurretBarrel, turretBarrelSpotClear } from './turret_barrels';
+import { layTurretKegs, type TurretBarrel } from './turret_barrels';
 import type { TurretDefenseState } from './turret_defense';
 import { TURRET_STREAM, type TurretDrawSource, turretDraw } from './turret_defense_rng';
 import { TURRET_HUNT_LIMITS } from './turret_hunt_plan';
+import { TURRET_KEG_LONE, type TurretKegLay } from './turret_keg_clusters';
 import {
   type TurretRally,
   turretPackSize,
@@ -108,8 +109,9 @@ export function turretClearOfRallies(state: TurretDefenseState, x: number, z: nu
 }
 
 /**
- * Lays one keg of a pack on its route by its rally, the pack's `k`-th path keg: the first of
- * its draws on a clear spot, none when every draw is covered. Returns it once placed.
+ * Lays one spot of a pack on its route by its rally, the pack's `k`-th path keg (its keg, or
+ * its cluster's by `lay`): the first of its draws on a clear spot, none when every draw is
+ * covered. Returns the kegs placed.
  */
 export function placeTurretRallyKeg(
   state: TurretDefenseState,
@@ -118,9 +120,11 @@ export function placeTurretRallyKeg(
   k: number,
   tick: number,
   probe: ThrowProbe,
-): TurretBarrel | null {
+  lay: TurretKegLay = TURRET_KEG_LONE,
+): TurretBarrel[] {
   const tries = TURRET_EXPLOSIVE_BARREL.placementTries;
   const reach = turretRallyReach(rallySize(state, rally));
+  const clear = (x: number, z: number) => turretClearOfRallies(state, x, z);
   for (let attempt = 0; attempt < tries; attempt++) {
     const key = 2 * (k * tries + attempt);
     const spot = turretRallyKegSpot(
@@ -132,9 +136,9 @@ export function placeTurretRallyKeg(
       draw(state, rally.id, key + 1),
       reach,
     );
-    if (!turretBarrelSpotClear(state, spot.x, spot.z, tick, probe)) continue;
-    if (!turretClearOfRallies(state, spot.x, spot.z)) continue;
-    return standTurretBarrel(state, spot.x, spot.z, probe);
+    const site = { stream: TURRET_STREAM.rallyKegCluster, index: rally.id, key };
+    const stood = layTurretKegs(state, spot.x, spot.z, lay, site, tick, probe, clear);
+    if (stood) return stood;
   }
-  return null;
+  return [];
 }

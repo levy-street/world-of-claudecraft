@@ -8,6 +8,7 @@ import { FIRE_AND_FLY_TOWER } from '../fire_and_fly_field';
 import {
   DT,
   type TurretBowlingDef,
+  type TurretCrownSize,
   type TurretKegLotDef,
   type TurretMedalBars,
   type TurretSizeClass,
@@ -333,16 +334,36 @@ export const TURRET_SURGERS = {
 } as const;
 
 /**
- * The tower crown's kegs (minigames/turret_keg_lots.ts), just beyond the Shockwave's 12 yd
- * reach. The slam lights no keg, but a thrown body striking one faster than the bowling
- * minimum does. Measured on flat ground (probe g1/ff_crown_band.mts, a slam on bodies at
- * the foot, a keg stood on each body's own line): a medium body lights it from 13.15 yd
- * out (its feet come under a keg's top at 12.2 yd), a large one at any distance from 11
- * to 15, a huge one out to 13.55 (it is fast only to 11.9; its 1.7 yd contact reach does
- * the rest); a small one flies over everything to 17.5. This band is where a medium,
- * large or huge body a slam throws at a crown keg lights it.
+ * The tower crown's kegs (minigames/turret_keg_lots.ts): a band around the tower, by the
+ * size of body a lot is laid for, where a slam's thrown bodies come down. The slam lights
+ * no keg, but a thrown body striking one faster than the bowling minimum does. Measured on
+ * flat ground (probe g1/ff_crown_band.mts, a slam on bodies at the foot, a keg stood on
+ * each body's own line): a small body flies over everything to 17.5 yd and lights a keg
+ * from 18.35 to 26.3; a medium one from 13.15 to 21, a large one from 8 to 15.7, a huge one
+ * from 8 to 13.55. `small` keeps a margin inside its band; `large` is where a medium, a
+ * large and a huge body all light it, just beyond the Shockwave's 12 yd reach.
  */
-export const TURRET_KEG_CROWN = { minRadius: 13.2, maxRadius: 13.5 } as const;
+export const TURRET_KEG_CROWN: Readonly<
+  Record<TurretCrownSize, { readonly minRadius: number; readonly maxRadius: number }>
+> = {
+  small: { minRadius: 18.5, maxRadius: 24 },
+  large: { minRadius: 13.2, maxRadius: 13.5 },
+};
+
+/**
+ * How far apart a spaced lot stands its kegs (minigames/turret_keg_clusters.ts). A keg's
+ * blast lights another whose centre stands within its blast radius plus a keg's: an
+ * isolated keg stands past that with a margin, so none sets off another by its blast; a
+ * cluster's kegs stand close on purpose, so lighting one sets off the rest.
+ */
+export const TURRET_KEG_SPACING = {
+  chainReach: TURRET_EXPLOSIVE_BARREL.blastRadius + TURRET_EXPLOSIVE_BARREL.radius,
+  /** The closest a spaced keg or a cluster's keg stands to any keg but its cluster's (yd). */
+  isolated: TURRET_EXPLOSIVE_BARREL.blastRadius + TURRET_EXPLOSIVE_BARREL.radius + 2.5,
+  /** A cluster's kegs stand this far apart (yd, drawn per cluster). */
+  clusterMin: 1.5,
+  clusterMax: 2,
+} as const;
 
 export const TURRET_PHYSICS = {
   /** Gameplay gravity (yd/s^2), snappier than the player's. */

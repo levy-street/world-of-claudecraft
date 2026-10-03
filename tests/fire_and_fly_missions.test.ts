@@ -380,9 +380,9 @@ describe('the plan knobs', () => {
         })),
       });
     const ring = { mode: 'random', count: 4, minRadius: 16, maxRadius: 30 } as const;
-    const capped = resolveTurretPlan(lots([ring, { mode: 'crown', count: 3 }], 9));
+    const capped = resolveTurretPlan(lots([ring, { mode: 'crown', count: 3, size: 'large' }], 9));
     for (const wave of capped.waves) {
-      expect(wave.kegs).toEqual([ring, { mode: 'crown', count: 3 }]);
+      expect(wave.kegs).toEqual([ring, { mode: 'crown', count: 3, size: 'large' }]);
       expect(wave.kegCap).toBe(9);
     }
     const tooMany = { ...ring, count: TURRET_PLAN_LIMITS.barrels / 2 + 1 };

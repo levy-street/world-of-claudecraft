@@ -4,7 +4,7 @@
 // plan could break is a predicate here, shared by the resolver and the online decoder. Pure:
 // content in, numbers out, no draw.
 
-import { TURRET_TEMPLATE_SIZES } from '../content/turret_defense';
+import { TURRET_KEG_CROWN, TURRET_TEMPLATE_SIZES } from '../content/turret_defense';
 import type {
   MobTemplate,
   TurretGapDef,
@@ -20,6 +20,7 @@ import {
   turretRallyBandValid,
   turretRallyKegValid,
 } from './turret_hunt_plan';
+import { turretKegClusterValid, turretKegLotKegs } from './turret_keg_clusters';
 
 /** Where a walking group comes from: a brick's sides, or bunches each from its own side. */
 export type TurretArrivalPlan =
@@ -320,13 +321,21 @@ function lotShapeValid(lot: TurretKegLotDef, barrels: number): boolean {
         Number.isFinite(lot.maxRadius) &&
         lot.minRadius >= 0 &&
         lot.minRadius <= lot.maxRadius &&
-        (lot.lanes === undefined || lot.lanes === true)
+        (lot.lanes === undefined || lot.lanes === true) &&
+        (lot.spaced === undefined || lot.spaced === true) &&
+        turretKegClusterValid(lot, lot.count)
       );
     case 'crown':
-      return intWithin(lot.count, 1, barrels);
+      return (
+        intWithin(lot.count, 1, barrels) &&
+        Object.hasOwn(TURRET_KEG_CROWN, lot.size) &&
+        turretKegClusterValid(lot, lot.count)
+      );
     case 'path':
       return (
         Number.isSafeInteger(lot.group) &&
+        (lot.spaced === undefined || lot.spaced === true) &&
+        turretKegClusterValid({ cluster: lot.cluster }, 1) &&
         (lot.placement === 'front' || lot.placement === 'side'
           ? turretRallyKegValid({ placement: lot.placement }) && routeBandValid(lot)
           : lot.placement === 'axis' &&
@@ -338,7 +347,7 @@ function lotShapeValid(lot: TurretKegLotDef, barrels: number): boolean {
 /** The kegs a wave's lots lay at most. */
 function turretKegLotsCount(kegs: readonly TurretKegLotDef[]): number {
   let n = 0;
-  for (const lot of kegs) n += lot.mode === 'path' ? 1 : lot.count;
+  for (const lot of kegs) n += turretKegLotKegs(lot);
   return n;
 }
 

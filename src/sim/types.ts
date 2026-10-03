@@ -10361,19 +10361,39 @@ export type TurretGroupDef = TurretBrickDef & {
    */
   delayTicks?: number;
 };
+/** The bodies a crown lot is laid for: small ones, or medium, large and huge ones. */
+export type TurretCrownSize = 'small' | 'large';
+/**
+ * A lot's kegs in tight clusters (minigames/turret_keg_clusters.ts): `cluster` kegs 1.5 to
+ * 2 yd apart around one spot, so lighting one sets off the rest; `clusters` of the lot's
+ * spots, the first ones, come as clusters (absent: all). Each keg counts against the cap.
+ */
+export interface TurretKegClusterDef {
+  cluster?: 2 | 3;
+  clusters?: number;
+}
 /**
  * A wave's kegs (minigames/turret_keg_lots.ts), every lot placed at the wave's start, never
  * mid-combat; a keg that finds no clear spot is left out, and the kegs standing never pass
- * the wave's cap.
+ * the wave's cap. A spaced lot (`spaced`, every crown lot, every lot with clusters) stands
+ * each keg or cluster out of chain reach of every other keg standing, and every lot laid
+ * after it keeps its kegs as far from them (TURRET_KEG_SPACING.isolated).
  */
 export type TurretKegLotDef =
   /**
-   * Spread evenly around the field at a drawn distance in the band; `lanes`: inside the sides
-   * the wave's groups come through, in turn.
+   * `count` spots spread evenly around the field at a drawn distance in the band; `lanes`:
+   * inside the sides the wave's groups come through, in turn.
    */
-  | { mode: 'random'; count: number; minRadius: number; maxRadius: number; lanes?: true }
-  /** Just beyond the Shockwave's reach, where the bodies a slam throws come down. */
-  | { mode: 'crown'; count: number }
+  | ({
+      mode: 'random';
+      count: number;
+      minRadius: number;
+      maxRadius: number;
+      lanes?: true;
+      spaced?: true;
+    } & TurretKegClusterDef)
+  /** `count` spots in the band where a slam's thrown bodies of `size` come down. */
+  | ({ mode: 'crown'; count: number; size: TurretCrownSize } & TurretKegClusterDef)
   /**
    * On the route of the wave's `group` (its side drawn at the wave's start; never a surger's):
    * a pack's 12 to 16 yd tower-side of its rally, any other group's at a drawn distance from
@@ -10388,8 +10408,17 @@ export type TurretKegLotDef =
       placement: 'front' | 'side';
       minRadius?: number;
       maxRadius?: number;
+      spaced?: true;
+      cluster?: 2 | 3;
     }
-  | { mode: 'path'; group: number; placement: 'axis'; fromTower: number };
+  | {
+      mode: 'path';
+      group: number;
+      placement: 'axis';
+      fromTower: number;
+      spaced?: true;
+      cluster?: 2 | 3;
+    };
 export interface TurretWaveDef {
   /** In order: a group's index names it (a path keg lot's `group`) and orders a tick's spawns. */
   groups: readonly TurretGroupDef[];

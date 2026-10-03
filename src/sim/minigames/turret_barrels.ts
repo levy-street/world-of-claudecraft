@@ -20,6 +20,12 @@ import {
 } from './thrown_body';
 import type { TurretBlast, TurretDefenseState, TurretEvent } from './turret_defense';
 import { TURRET_STREAM, turretDraw } from './turret_defense_rng';
+import {
+  TURRET_KEG_LONE,
+  type TurretKegClusterSite,
+  type TurretKegLay,
+  turretKegClusterSpots,
+} from './turret_keg_clusters';
 
 export interface TurretBarrel {
   id: number;
@@ -31,6 +37,11 @@ export interface TurretBarrel {
   litTick: number;
   /** The tick it blows, -1 while it stands unlit. */
   blowTick: number;
+  /**
+   * How near another keg may stand (yd), set only past the barrels' own spacing (a spaced
+   * lot's keg): later lots keep it too. Sim-only, never on the wire.
+   */
+  spacing?: number;
 }
 
 /** A bearing blocked either side of `center` by `half` (rad), x += sin, z += cos. */
@@ -140,19 +151,23 @@ export function turretSpawnBearing(
   return turretFreeBearing(u, arcs, sector);
 }
 
-/** Dry, free of every barrel by the spacing, and of every body still on the field. */
+/**
+ * Dry, free of every barrel by `spacing` (absent: the barrels' own) or by the barrel's own
+ * when it keeps more, and of every body still on the field.
+ */
 export function turretBarrelSpotClear(
   state: TurretDefenseState,
   x: number,
   z: number,
   tick: number,
   probe: ThrowProbe,
+  spacing: number = TURRET_EXPLOSIVE_BARREL.minSpacing,
 ): boolean {
   // A mapped water level can lie under dry ground: only a surface above it is water.
   const water = probe.water(x, z);
   if (water !== null && water > groundOr(probe, x, z, Number.NEGATIVE_INFINITY)) return false;
   for (const b of state.barrels) {
-    if (Math.hypot(b.x - x, b.z - z) < TURRET_EXPLOSIVE_BARREL.minSpacing) return false;
+    if (Math.hypot(b.x - x, b.z - z) < Math.max(spacing, b.spacing ?? 0)) return false;
   }
   for (const m of state.monsters) {
     if (m.state === 'gone') continue;
@@ -166,12 +181,16 @@ export function turretBarrelSpotClear(
   return true;
 }
 
-/** Stands a new unlit barrel at (x, z) on the ground there. Returns it. */
+/**
+ * Stands a new unlit barrel at (x, z) on the ground there, keeping `spacing` from every
+ * keg laid after it when that is past the barrels' own. Returns it.
+ */
 export function standTurretBarrel(
   state: TurretDefenseState,
   x: number,
   z: number,
   probe: ThrowProbe,
+  spacing: number = TURRET_EXPLOSIVE_BARREL.minSpacing,
 ): TurretBarrel {
   const barrel: TurretBarrel = {
     id: state.nextBarrelId++,
@@ -180,9 +199,43 @@ export function standTurretBarrel(
     z,
     litTick: -1,
     blowTick: -1,
+    ...(spacing > TURRET_EXPLOSIVE_BARREL.minSpacing ? { spacing } : {}),
   };
   state.barrels.push(barrel);
   return barrel;
+}
+
+/**
+ * Lays one spot of a lot at (x, z): its keg, or its cluster's (on the site's draws), when
+ * every keg of it is clear (turretBarrelSpotClear at the lay's spacing, and `clear` if
+ * given). A cluster stands whole or not at all. Returns the kegs stood, null when any is
+ * covered.
+ */
+export function layTurretKegs(
+  state: TurretDefenseState,
+  x: number,
+  z: number,
+  lay: TurretKegLay,
+  site: TurretKegClusterSite,
+  tick: number,
+  probe: ThrowProbe,
+  clear?: (x: number, z: number) => boolean,
+): TurretBarrel[] | null {
+  const spots =
+    lay.kegs > 1
+      ? turretKegClusterSpots(
+          x,
+          z,
+          lay.kegs,
+          turretDraw(state, site.stream, site.index, 2 * site.key),
+          turretDraw(state, site.stream, site.index, 2 * site.key + 1),
+        )
+      : [{ x, z }];
+  for (const spot of spots) {
+    if (!turretBarrelSpotClear(state, spot.x, spot.z, tick, probe, lay.spacing)) return null;
+    if (clear && !clear(spot.x, spot.z)) return null;
+  }
+  return spots.map((spot) => standTurretBarrel(state, spot.x, spot.z, probe, lay.spacing));
 }
 
 /** A ring of kegs: how many, at a drawn distance in the band (yd from the tower's centre). */
@@ -199,14 +252,17 @@ export interface TurretKegRingOptions {
   readonly keyBase?: number;
   /** Barrels standing at once, these included (absent: TURRET_EXPLOSIVE_BARREL.cap). */
   readonly cap?: number;
+  /** How the `i`-th spot is laid (absent: a lone keg at the barrels' own spacing). */
+  readonly lay?: (i: number) => TurretKegLay;
 }
 
 /**
  * Adds a ring of barrels: bearings spread evenly around the circle from a drawn
  * offset, each wandering inside its share, at a drawn distance in the ring; on
  * lanes, the barrels take the sides in turn, each at a drawn bearing inside its
- * side. A barrel that finds no clear spot in its draws is left out, and the
- * barrels standing never pass the cap. Returns the ones placed.
+ * side. A spot that finds no clear place in its draws is left out, and the
+ * barrels standing never pass the cap: the ring holds the first spots whose kegs
+ * fit under it. Returns the ones placed.
  */
 export function placeTurretBarrels(
   state: TurretDefenseState,
@@ -217,7 +273,12 @@ export function placeTurretBarrels(
 ): TurretBarrel[] {
   const placed: TurretBarrel[] = [];
   const cap = options.cap ?? TURRET_EXPLOSIVE_BARREL.cap;
-  const count = Math.min(ring.count, cap - state.barrels.length);
+  const layOf = options.lay ?? (() => TURRET_KEG_LONE);
+  let count = 0;
+  for (let room = cap - state.barrels.length; count < ring.count; count++) {
+    room -= layOf(count).kegs;
+    if (room < 0) break;
+  }
   if (!(count > 0)) return placed;
   const { wave } = state;
   const base = options.keyBase ?? 0;
@@ -240,8 +301,10 @@ export function placeTurretBarrels(
           (ring.maxRadius - ring.minRadius);
       const x = state.cx + Math.sin(bearing) * r;
       const z = state.cz + Math.cos(bearing) * r;
-      if (!turretBarrelSpotClear(state, x, z, tick, probe)) continue;
-      placed.push(standTurretBarrel(state, x, z, probe));
+      const site = { stream: TURRET_STREAM.kegCluster, index: wave, key };
+      const stood = layTurretKegs(state, x, z, layOf(i), site, tick, probe);
+      if (!stood) continue;
+      placed.push(...stood);
       break;
     }
   }

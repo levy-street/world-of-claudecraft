@@ -1,7 +1,7 @@
 // Fire and Fly waves as groups of bricks (src/sim/minigames/turret_wave_groups.ts and its
 // bricks: turret_surgers.ts, turret_keg_lots.ts, the plan in turret_group_plan.ts): groups
 // spawning on their own clocks, the surgers setting off away from the action, the keg lots all
-// laid at a wave's start (random, tower crown, on a route), and the resolver's rules. No
+// laid at a wave's start (random, tower crown by size, on a route), and the resolver's rules. No
 // shipped scenario uses surgers or the new keg modes yet: these run on synthetic plans.
 import { describe, expect, it } from 'vitest';
 import { TURRET_SCENARIO_STANDARD } from '../src/sim/content/fire_and_fly_scenarios';
@@ -11,6 +11,7 @@ import {
   TURRET_BOWLING,
   TURRET_EXPLOSIVE_BARREL,
   TURRET_KEG_CROWN,
+  TURRET_KEG_SPACING,
   TURRET_RALLY,
   TURRET_SHOCKWAVE,
   TURRET_SIZE_CLASSES,
@@ -457,28 +458,41 @@ describe('keg lots', () => {
     );
   });
 
-  it("stands crown kegs just beyond the Shockwave's reach, in the band its thrown bodies come down in", () => {
-    expect(TURRET_KEG_CROWN.minRadius).toBeGreaterThan(TURRET_SHOCKWAVE.reach);
-    const wave = walkersWavePlan([0], { kegs: [{ mode: 'crown', count: 6 }] });
-    for (const seed of [1, 2, 3, 4, 5, 6]) {
-      const state = createTurretDefense(testPlan([kind('small')], [wave]), { x: 0, z: 0 }, seed, 0);
-      const placed = placeTurretFieldKegs(state, wave, 0, flat);
-      expect(placed.length).toBeGreaterThanOrEqual(5);
-      for (const b of placed) {
-        const d = Math.hypot(b.x, b.z);
-        expect(d).toBeGreaterThanOrEqual(TURRET_KEG_CROWN.minRadius - 1e-9);
-        expect(d).toBeLessThanOrEqual(TURRET_KEG_CROWN.maxRadius + 1e-9);
+  it("stands a crown lot's kegs in its size's band, out of chain reach of each other", () => {
+    expect(TURRET_KEG_CROWN.large.minRadius).toBeGreaterThan(TURRET_SHOCKWAVE.reach);
+    expect(TURRET_KEG_CROWN.small.minRadius).toBeGreaterThan(TURRET_KEG_CROWN.large.maxRadius);
+    for (const size of ['small', 'large'] as const) {
+      const band = TURRET_KEG_CROWN[size];
+      const wave = walkersWavePlan([0], { kegs: [{ mode: 'crown', count: 4, size }] });
+      for (const seed of [1, 2, 3, 4, 5, 6]) {
+        const plan = testPlan([kind('small')], [wave]);
+        const state = createTurretDefense(plan, { x: 0, z: 0 }, seed, 0);
+        const placed = placeTurretFieldKegs(state, wave, 0, flat);
+        expect(placed.length).toBeGreaterThanOrEqual(3);
+        for (const b of placed) {
+          const d = Math.hypot(b.x, b.z);
+          expect(d).toBeGreaterThanOrEqual(band.minRadius - 1e-9);
+          expect(d).toBeLessThanOrEqual(band.maxRadius + 1e-9);
+          for (const o of placed)
+            if (o !== b)
+              expect(Math.hypot(o.x - b.x, o.z - b.z)).toBeGreaterThanOrEqual(
+                TURRET_KEG_SPACING.isolated,
+              );
+        }
       }
     }
   });
 
-  it.each(['medium', 'large', 'huge'] as const)(
-    'lets a slam on a %s crowd at the foot throw bodies onto the crown kegs and light them',
+  const crownFor = (size: TurretSizeClass) => (size === 'small' ? 'small' : 'large');
+
+  it.each(['small', 'medium', 'large', 'huge'] as const)(
+    "lets a slam on a %s crowd at the foot throw bodies onto its crown's kegs and light them",
     (size) => {
       let lit = 0;
-      for (const seed of [1, 2, 3]) {
+      for (const seed of [1, 2, 3, 4]) {
         const k = kind(size);
-        const wave = walkersWavePlan([0], { kegs: [{ mode: 'crown', count: 8 }] });
+        const crownLot = { mode: 'crown', count: 4, size: crownFor(size) } as const;
+        const wave = walkersWavePlan([0], { kegs: [crownLot] });
         const state = createTurretDefense(testPlan([k], [wave], 1), { x: 0, z: 0 }, seed, 0);
         run(state, TURRET_TIMING.introTicks);
         for (const g of state.spawning) g.nextTick = Number.MAX_SAFE_INTEGER;
@@ -518,10 +532,11 @@ describe('keg lots', () => {
     },
   );
 
-  it.each(['medium', 'large', 'huge'] as const)(
-    'lights a crown keg at either edge of the band when a slam throws a %s body down its line',
+  it.each(['small', 'medium', 'large', 'huge'] as const)(
+    "lights a keg at either edge of its crown's band when a slam throws a %s body down its line",
     (size) => {
       const k = kind(size);
+      const band = TURRET_KEG_CROWN[crownFor(size)];
       const footState = (seed: number, a: number) => {
         const state = createTurretDefense(
           testPlan([k], [walkersWavePlan([0])], 1),
@@ -570,7 +585,7 @@ describe('keg lots', () => {
           const len = Math.hypot(to.x - from.x, to.z - from.z);
           const ux = (to.x - from.x) / len;
           const uz = (to.z - from.z) / len;
-          for (const edge of [TURRET_KEG_CROWN.minRadius, TURRET_KEG_CROWN.maxRadius]) {
+          for (const edge of [band.minRadius, band.maxRadius]) {
             const along = (at: number) => Math.hypot(from.x + ux * at, from.z + uz * at);
             let lo = 0;
             let hi = 30;

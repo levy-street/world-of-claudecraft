@@ -68,8 +68,9 @@ const t = (seconds: number) => Math.round(seconds * 20);
 /**
  * A scenario no content uses yet, built to play every brick and every keg mode: walkers from
  * one side with surgers setting off away from them, a pack beside a small group, a big one,
- * a surge, a second set of surgers and a sprint group, and kegs at random (spread and on the
- * lanes), on the tower crown and on routes (one in its own distance band).
+ * a surge, a second set of surgers and a sprint group, and kegs at random (spread, one spot a
+ * cluster of three, and on the lanes), on the tower crown for small bodies and for large ones,
+ * and on routes (one spaced, one in its own distance band, a pack's a cluster of two).
  */
 export const TURRET_BRICKS_SCENARIO: TurretScenarioDef = {
   ...TURRET_SCENARIO_STANDARD,
@@ -98,10 +99,11 @@ export const TURRET_BRICKS_SCENARIO: TurretScenarioDef = {
         },
       ],
       kegs: [
-        { mode: 'random', count: 2, minRadius: 16, maxRadius: 30 },
-        { mode: 'crown', count: 2 },
-        { mode: 'path', group: 0, placement: 'front' },
+        { mode: 'random', count: 2, minRadius: 16, maxRadius: 30, cluster: 3, clusters: 1 },
+        { mode: 'crown', count: 2, size: 'small' },
+        { mode: 'path', group: 0, placement: 'front', spaced: true },
       ],
+      kegCap: 8,
     },
     {
       coreDamage: 90,
@@ -164,10 +166,10 @@ export const TURRET_BRICKS_SCENARIO: TurretScenarioDef = {
         },
       ],
       kegs: [
-        { mode: 'path', group: 0, placement: 'front' },
+        { mode: 'path', group: 0, placement: 'front', cluster: 2 },
         { mode: 'path', group: 1, placement: 'side', minRadius: 20, maxRadius: 26 },
         { mode: 'path', group: 2, placement: 'axis', fromTower: 22 },
-        { mode: 'crown', count: 2 },
+        { mode: 'crown', count: 2, size: 'large' },
         { mode: 'random', count: 2, minRadius: 18, maxRadius: 28, lanes: true },
       ],
       kegCap: 12,

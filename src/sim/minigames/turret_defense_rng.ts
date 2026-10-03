@@ -24,6 +24,8 @@ export const TURRET_STREAM = {
   rallyKeg: 13,
   surgeSide: 14,
   kegRoute: 15,
+  kegCluster: 16,
+  rallyKegCluster: 17,
 } as const;
 
 /** 64 bits derived once per run from the salt and the seed; never on any view or wire. */

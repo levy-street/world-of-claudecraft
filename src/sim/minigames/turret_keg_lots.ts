@@ -4,7 +4,9 @@
 // them (turret_rally.ts), then the path lots, each on the route of a group whose side is
 // drawn at the wave's start: a pack's by its rally (turret_rally_kegs.ts), any other's on
 // its side's axis inside the keg ring. No path keg stands where its blast reaches a pack
-// gathering at its rally. Pure: private stateless draws only.
+// gathering at its rally. A spot is one keg or a tight cluster, and a spaced lot keeps each
+// out of chain reach of every keg standing (turret_keg_clusters.ts). Pure: private
+// stateless draws only.
 
 import {
   TURRET_BARREL_RING,
@@ -13,15 +15,11 @@ import {
   TURRET_RALLY,
 } from '../content/turret_defense';
 import type { ThrowProbe } from './thrown_body';
-import {
-  placeTurretBarrels,
-  standTurretBarrel,
-  type TurretBarrel,
-  turretBarrelSpotClear,
-} from './turret_barrels';
+import { layTurretKegs, placeTurretBarrels, type TurretBarrel } from './turret_barrels';
 import type { TurretDefenseState } from './turret_defense';
 import { TURRET_STREAM, turretDraw } from './turret_defense_rng';
 import type { TurretWavePlan } from './turret_group_plan';
+import { type TurretKegLay, turretKegLay } from './turret_keg_clusters';
 import { turretRallyId } from './turret_rally';
 import { placeTurretRallyKeg, type TurretPathKeg, turretClearOfRallies } from './turret_rally_kegs';
 import { turretGroupLanes, turretWaveLanes } from './turret_wave_groups';
@@ -45,12 +43,13 @@ export function placeTurretFieldKegs(
   const cap = capOf(wave);
   wave.kegs.forEach((lot, li) => {
     const keyBase = li * LOT_KEYS;
+    const lay = (i: number) => turretKegLay(lot, i);
     if (lot.mode === 'random') {
       const lanes = lot.lanes ? turretWaveLanes(state, state.wave, wave) : null;
-      placed.push(...placeTurretBarrels(state, lot, tick, probe, { lanes, keyBase, cap }));
+      placed.push(...placeTurretBarrels(state, lot, tick, probe, { lanes, keyBase, cap, lay }));
     } else if (lot.mode === 'crown') {
-      const ring = { count: lot.count, ...TURRET_KEG_CROWN };
-      placed.push(...placeTurretBarrels(state, ring, tick, probe, { keyBase, cap }));
+      const ring = { count: lot.count, ...TURRET_KEG_CROWN[lot.size] };
+      placed.push(...placeTurretBarrels(state, ring, tick, probe, { keyBase, cap, lay }));
     }
   });
   return placed;
@@ -98,9 +97,11 @@ function placeRouteKeg(
   keg: TurretRouteKeg,
   bearing: number,
   keyBase: number,
+  lay: TurretKegLay,
   tick: number,
   probe: ThrowProbe,
-): TurretBarrel | null {
+): TurretBarrel[] {
+  const clear = (x: number, z: number) => turretClearOfRallies(state, x, z);
   for (let attempt = 0; attempt < TURRET_EXPLOSIVE_BARREL.placementTries; attempt++) {
     const key = keyBase + 2 * attempt;
     const spot = turretRouteKegSpot(
@@ -111,11 +112,11 @@ function placeRouteKeg(
       turretDraw(state, TURRET_STREAM.kegRoute, state.wave, key),
       turretDraw(state, TURRET_STREAM.kegRoute, state.wave, key + 1),
     );
-    if (!turretBarrelSpotClear(state, spot.x, spot.z, tick, probe)) continue;
-    if (!turretClearOfRallies(state, spot.x, spot.z)) continue;
-    return standTurretBarrel(state, spot.x, spot.z, probe);
+    const site = { stream: TURRET_STREAM.kegCluster, index: state.wave, key };
+    const stood = layTurretKegs(state, spot.x, spot.z, lay, site, tick, probe, clear);
+    if (stood) return stood;
   }
-  return null;
+  return [];
 }
 
 /**
@@ -135,20 +136,21 @@ export function placeTurretPathKegs(
     if (lot.mode !== 'path') return;
     const k = taken.get(lot.group) ?? 0;
     taken.set(lot.group, k + 1);
-    if (state.barrels.length >= cap) return;
+    const lay = turretKegLay(lot, 0);
+    if (state.barrels.length + lay.kegs > cap) return;
     const group = wave.groups[lot.group];
-    let barrel: TurretBarrel | null = null;
     if (group.brick === 'pack') {
       const id = turretRallyId(state.wave, group.pack);
       const rally = state.rallies?.find((r) => r.id === id);
-      if (rally) barrel = placeTurretRallyKeg(state, rally, lot, k, tick, probe);
+      if (rally) placed.push(...placeTurretRallyKeg(state, rally, lot, k, tick, probe, lay));
     } else {
       const lanes = turretGroupLanes(state, state.wave, wave, lot.group);
       const lane = lanes[k % Math.max(1, lanes.length)];
-      if (lane)
-        barrel = placeRouteKeg(state, lot, lane.from + lane.width / 2, li * LOT_KEYS, tick, probe);
+      if (lane) {
+        const bearing = lane.from + lane.width / 2;
+        placed.push(...placeRouteKeg(state, lot, bearing, li * LOT_KEYS, lay, tick, probe));
+      }
     }
-    if (barrel) placed.push(barrel);
   });
   return placed;
 }

@@ -490,6 +490,11 @@ describe('Fire and Fly online: the socket-free round trip', () => {
     const kegs = plan.waves.flatMap((w) => w.kegs);
     expect(kegs.some((k) => k.mode === 'random' && k.lanes)).toBe(true);
     expect(kegs.some((k) => k.mode === 'path' && k.placement !== 'axis' && k.minRadius)).toBe(true);
+    expect(new Set(kegs.map((k) => (k.mode === 'crown' ? k.size : null)))).toEqual(
+      new Set([null, 'small', 'large']),
+    );
+    expect(kegs.some((k) => k.mode === 'random' && k.cluster)).toBe(true);
+    expect(kegs.some((k) => k.mode === 'path' && k.cluster)).toBe(true);
   }, 60_000);
 
   it.each(TURRET_MISSIONS.map((s) => [s.boardKey, s] as const))(

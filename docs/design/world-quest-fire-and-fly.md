@@ -229,16 +229,20 @@ a keg that finds no clear spot is left out:
 - **Random** (`random`): `count` kegs spread evenly around the field at a drawn
   distance between `minRadius` and `maxRadius`; with `lanes`, inside the sides the
   wave's groups come through, in turn.
-- **Tower crown** (`crown`): `count` kegs on a ring just beyond the Shockwave's 12 yd
-  reach (`TURRET_KEG_CROWN`, 13.2 to 13.5 yd), where the bodies a slam throws come down.
-  The slam lights no keg itself, but a thrown body striking one faster than the
-  bowling minimum does: measured on flat ground with a keg on each body's own line (a
-  slam throws a little off the radial line), a medium body lights it from 13.15 yd out
-  (its feet come under a keg's top at 12.2), a large one anywhere from 11 to 15 yd, a
-  huge one out to 13.55 (fast only to 11.9, its contact reach does the rest); a small
-  one flies over everything to 17.5 yd. So a slam on a crowd at the foot throws it
-  onto the crown kegs. A slam lights a crown keg only when a body flies its way: the
-  kegs are few and the throws spread, so most slams light some, not all.
+- **Tower crown** (`crown`, `size`): `count` kegs, a few (two to four), at drawn
+  angles in a band around the tower where the bodies a slam throws come down
+  (`TURRET_KEG_CROWN`): not a ring of kegs, a zone a level drops a few into. The slam
+  lights no keg itself, but a thrown body striking one faster than the bowling minimum
+  does, so a crowd slammed off the tower's foot sets off the crown. How far a body flies
+  depends on its size, so a crown lot names the bodies it is laid for: `small` stands
+  its kegs 18.5 to 24 yd out (a small body flies over everything to 17.5 yd, then
+  lights a keg on its line from 18.35 to 26.3), `large` 13.2 to 13.5 yd out, just
+  beyond the Shockwave's 12 yd reach, where a medium (13.15 to 21), a large (8 to
+  15.7) and a huge body (8 to 13.55) all light one. Measured on flat ground with a keg
+  on each body's own line (a slam throws a little off the radial line; by a probe, not
+  shipped). A slam lights a crown keg only when a
+  body flies its way: the kegs are few and the throws spread, so most slams light some,
+  not all.
 - **Path** (`path`, `group`, `placement`): on the route of one group of the wave, its
   side drawn at the wave's start: a pack's by its rally (above), any other group's on
   its side's axis at a drawn distance from the tower between the lot's `minRadius` and
@@ -248,11 +252,40 @@ a keg that finds no clear spot is left out:
   side. Never on a surger (its side waits for the
   action), and never where its blast reaches a pack gathering at its rally.
 
+Two rules shape where a lot's kegs stand against each other (`turret_keg_clusters.ts`):
+
+- **Spacing.** A keg's blast lights every other keg within 9.5 yd (its blast radius
+  plus a keg's: `TURRET_KEG_SPACING.chainReach`). A spaced lot stands each of its kegs
+  at least 12 yd (`isolated`) from every keg already standing, this wave's and those
+  left from earlier waves, and every lot laid after it keeps its own kegs that far from
+  a spaced keg too, so an isolated keg's blast sets off no other keg (a body it throws
+  can still strike one). A spot that finds no room in the lot's draws
+  (`TURRET_EXPLOSIVE_BARREL.placementTries`) is left out. Every crown lot and every lot
+  with clusters is spaced; a random or path lot opts in with `spaced`. The shipped
+  scenarios set none of it and keep the barrels' own 6 yd (`minSpacing`), so they
+  replay as before; measured by a probe (not shipped), about half of their waves start
+  with two kegs within chain reach (every wave of The Powder Store, whose lane kegs
+  crowd on purpose), the closest pairs 6 yd apart. A spaced keg also keeps a wave's
+  lane and route kegs at its distance, which share its sides: on a crowded field they
+  find a spot less often.
+- **Clusters.** A lot may lay its kegs as tight clusters (`cluster`, 2 or 3, and
+  `clusters`, how many of its spots, the first ones; absent, all): the kegs of a
+  cluster stand 1.5 to 2 yd apart around one spot, the spot itself spaced from every
+  other keg and cluster, and it stands whole or not at all. Each keg counts against the
+  wave's cap. Lighting one sets off the rest through the ordinary chain: a thrown body
+  striking one keg lights it alone, it blows after the fuse (0.25 s), and its blast
+  lights the others, which blow together one fuse later. The player sees and hears two
+  blasts a quarter second apart on one spot, the second one doubled or tripled (each
+  keg's flash, ring, shards, fire column and boom, stacked on one tick). A shell or a
+  blast reaching the cluster lights every keg at once, and they all blow on one tick.
+  The kegs need no new render pools or wire fields: a cluster is only kegs standing
+  close.
+
 The random, crown and path kegs are laid in that order: the field lots, then the
 wave's rallies open clear of them, then the path lots. Pinned by
-`tests/turret_wave_groups.test.ts` (synthetic plans: no shipped scenario uses surgers
-or the crown and route kegs yet) and, online, by the bricks run in
-`tests/turret_online_round_trip.test.ts`.
+`tests/turret_wave_groups.test.ts` and `tests/turret_keg_clusters.test.ts` (synthetic
+plans: no shipped scenario uses surgers, the crown, route kegs, spacing or clusters
+yet) and, online, by the bricks run in `tests/turret_online_round_trip.test.ts`.
 
 ## The trials
 

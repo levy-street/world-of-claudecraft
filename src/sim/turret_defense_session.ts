@@ -12,6 +12,7 @@ import { TURRET_TIMING } from './content/turret_defense';
 import { DUNGEON_X_THRESHOLD } from './data';
 import { gliderActionsLocked } from './glider_action_lock';
 import type { ThrowProbe } from './minigames/thrown_body';
+import type { TurretBarrel } from './minigames/turret_barrels';
 import {
   createTurretDefense,
   fireTurret,
@@ -86,6 +87,8 @@ type TurretDefenseBookkeeping =
   | 'frags';
 
 export type TurretMonsterView = ReadonlyDeep<Omit<TurretMonster, TurretMonsterBookkeeping>>;
+/** A spaced keg's spacing only steers later placements. */
+export type TurretBarrelView = ReadonlyDeep<Omit<TurretBarrel, 'spacing'>>;
 
 /**
  * The engine state minus its clock (`tick` advances outside the revision; read
@@ -96,10 +99,11 @@ export type TurretMonsterView = ReadonlyDeep<Omit<TurretMonster, TurretMonsterBo
 export type TurretDefenseView = ReadonlyDeep<
   Omit<
     TurretDefenseState,
-    'tick' | 'seed' | 'runKey' | 'monsters' | 'result' | TurretDefenseBookkeeping
+    'tick' | 'seed' | 'runKey' | 'monsters' | 'barrels' | 'result' | TurretDefenseBookkeeping
   >
 > & {
   readonly monsters: readonly TurretMonsterView[];
+  readonly barrels: readonly TurretBarrelView[];
   readonly result?: ReadonlyDeep<TurretResult>;
 };
 
@@ -464,7 +468,7 @@ function cloneView(session: TurretSession): TurretSessionView {
       plan,
       shots: shots.map((shot) => ({ ...shot })),
       monsters: monsters.map(monsterView),
-      barrels: barrels.map((barrel) => ({ ...barrel })),
+      barrels: barrels.map(({ spacing: _spacing, ...barrel }) => barrel),
       ...(rallies?.length ? { rallies: rallies.map((rally) => ({ ...rally })) } : {}),
       stats: { ...stats },
     },
