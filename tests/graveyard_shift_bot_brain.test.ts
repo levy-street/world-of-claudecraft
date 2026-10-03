@@ -151,6 +151,8 @@ describe('Graveyard Shift party in a real fight', () => {
     const { sim, run } = shiftSim();
     engage(sim, run);
     runTicks(sim, 40);
+    // Shadow Pulse costs Dread: hand Morthen a full bar for the cast.
+    sim.player.resource = sim.player.maxResource;
     sim.castAbility('gshift_shadow_pulse');
     expect(sim.player.castingAbility).toBe('gshift_shadow_pulse');
     const castTick = sim.ctx.tickCount;
@@ -169,6 +171,8 @@ describe('Graveyard Shift party in a real fight', () => {
     const { sim, run } = shiftSim();
     engage(sim, run);
     runTicks(sim, 40);
+    // Shadow Pulse costs Dread: hand Morthen a full bar for the cast.
+    sim.player.resource = sim.player.maxResource;
     sim.castAbility('gshift_shadow_pulse');
     const seen = new Map<number, number>();
     for (let i = 0; i < 12; i++) {
