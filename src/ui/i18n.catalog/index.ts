@@ -239,6 +239,7 @@ export const en = {
     graveyardShift: {
       identityAura: 'Morthen the Gravecaller',
       markAura: 'Marked for the Barrow',
+      adventurerAura: 'Adventurer',
       resource: 'Dread',
       errors: {
         notEnoughDread: 'Not enough Dread!',
@@ -288,7 +289,7 @@ export const en = {
         },
         healerOom: {
           oom: 'oom',
-          drink: 'sitting to drink, nobody pull anything',
+          emotionalSupport: "I'm healing with pure emotional support at this point",
           iKnow: 'yes I know the boss is already pulled, I KNOW',
         },
         wipeThreat: {

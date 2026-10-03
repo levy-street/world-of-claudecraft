@@ -5,6 +5,7 @@
 // back to a raw id. Every number in a description is read from the kit's own
 // effects, so the tooltip cannot drift from what a cast does.
 
+import { adventurerMarkerAura } from '../sim/graveyard_shift/hostility';
 import { MORTHEN_KIT, soloEffect } from '../sim/graveyard_shift/kit';
 import { BARROW_MARK_NAME } from '../sim/graveyard_shift/kit_effects';
 import { morthenIdentityAura } from '../sim/graveyard_shift/morthen_identity';
@@ -40,6 +41,8 @@ const KIT_TEXT: Readonly<Record<string, KitText>> = {
 };
 
 const MARK_AURA_KEY: TranslationKey = 'devCommand.graveyardShift.markAura';
+const ADVENTURER_AURA_KEY: TranslationKey = 'devCommand.graveyardShift.adventurerAura';
+const ADVENTURER_AURA_NAME = adventurerMarkerAura(0).name;
 
 const IDENTITY_AURA_KEY: TranslationKey = 'devCommand.graveyardShift.identityAura';
 const IDENTITY_AURA_NAME = morthenIdentityAura(0).name;
@@ -72,6 +75,7 @@ export function graveyardShiftAbilityNameFromSource(name: string): string | null
 export function graveyardShiftAuraName(name: string): string | null {
   if (name === IDENTITY_AURA_NAME) return t(IDENTITY_AURA_KEY);
   if (name === BARROW_MARK_NAME) return t(MARK_AURA_KEY);
+  if (name === ADVENTURER_AURA_NAME) return t(ADVENTURER_AURA_KEY);
   return graveyardShiftAbilityNameFromSource(name);
 }
 

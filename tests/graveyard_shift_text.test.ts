@@ -102,4 +102,9 @@ describe('Graveyard Shift display text', () => {
       expect(prose).not.toMatch(/gshift_/);
     }
   });
+
+  it('names the adventurer marker aura through its key', () => {
+    expect(graveyardShiftAuraName('Adventurer')).toBe('Adventurer');
+    expect(auraDisplayNameFromSource('Adventurer')).toBe('Adventurer');
+  });
 });

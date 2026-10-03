@@ -80,7 +80,7 @@ export function burstBarrowMarks(
 }
 
 // The nearest corpse within reach that this run has not raised yet: a fallen
-// adventurer, or any dead creature.
+// adventurer, or an ownerless dead creature.
 export function raisableCorpse(ctx: SimContext, caster: Entity, radius: number): Entity | null {
   const run = ctx.graveyardShiftRuns.get(caster.id);
   if (!run) return null;
@@ -89,6 +89,9 @@ export function raisableCorpse(ctx: SimContext, caster: Entity, radius: number):
   for (const e of ctx.entities.values()) {
     if (!e.dead || e.id === caster.id || run.raisedCorpseIds.has(e.id)) continue;
     if (e.kind !== 'player' && e.kind !== 'mob') continue;
+    // Never an owned corpse (Morthen's own fallen skeletons would rise again and
+    // again, each death feeding his Dread): adventurers and ownerless creatures.
+    if (e.ownerId !== null) continue;
     const d = dist2d(e.pos, caster.pos);
     if (d < bestDist || (d === bestDist && best && e.id < best.id)) {
       best = e;

@@ -317,4 +317,13 @@ describe('the HUD renders a keyed say through t()', () => {
       'return ev.textKey ? t(ev.textKey as TranslationKey, ev.textValues) : ev.text;',
     );
   });
+
+  it('sends no copy of a line to the client-less party itself', () => {
+    const { sim, run } = shiftSim();
+    const tank = botEntity(sim, run, 'tank');
+    place(sim, sim.player, tank.pos.x, tank.pos.z + 6);
+    const heard = runTicks(sim, 20 * 4);
+    expect(heard.length).toBeGreaterThan(0);
+    for (const b of run.bots) expect(heardBy(heard, b.pid)).toEqual([]);
+  });
 });

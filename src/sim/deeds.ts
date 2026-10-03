@@ -34,6 +34,7 @@ import { pointsSpent } from './content/talents';
 import { ITEMS, MOBS, zoneAt } from './data';
 import { canWearDevBadgeTitle, devBadgeTitleTier } from './dev_badge_titles';
 import { hasMorthenIdentity } from './graveyard_shift/morthen_identity';
+import { isGraveyardShiftBotPid } from './graveyard_shift/run_state';
 import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
 import {
   accountReliquaryOwnership,
@@ -1301,6 +1302,8 @@ export function updateDeeds(ctx: SimContext): void {
     // on the run, not the aura: a death or clean slate can shed the aura a tick
     // before the teardown hands the real level back.
     if (ctx.graveyardShiftRuns.has(pid)) continue;
+    // Nor do its adventurer bots earn deeds (client-less, removed at the end).
+    if (ctx.graveyardShiftRuns.size > 0 && isGraveyardShiftBotPid(ctx, pid)) continue;
     evaluateDeedsKeyed(ctx, meta, e, keySnapshots[i]);
     // Grants re-mark the player dirty (manual-site semantics); the in-pass
     // fixpoint already resolved everything, so drop the redundant mark.

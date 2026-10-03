@@ -1272,6 +1272,14 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/drowned_litany_boss.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/drowned_litany_rite.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/drowned_litany_rooms.ts'), 'utf8'),
+    // The Graveyard Shift prototype's player-facing sim text: the kit's cast refusal,
+    // the Dread rules and the say lines. Its run lifecycle is left out on purpose:
+    // the shift is reachable only through /dev, so its start refusals and the end
+    // line are dev-channel English until the content step keys them.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/graveyard_shift/kit_effects.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/graveyard_shift/dread.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/graveyard_shift/bot_say.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/graveyard_shift/bot_lines.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/market.ts'), 'utf8'),
     // The buy-order board (Wanted tab): place / deliver / withdraw errors and
     // loot lines, matched by error_text_i18n_core + sim_i18n RULES.

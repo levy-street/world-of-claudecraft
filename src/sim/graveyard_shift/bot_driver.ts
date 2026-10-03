@@ -5,6 +5,7 @@
 
 import { advanceBotSteer } from '../bots/steer';
 import { castAbility } from '../combat/casting_lifecycle';
+import { isLockedOut, isSilenced } from '../combat/cc';
 import { instanceClaimHolds } from '../instances/dungeons';
 import type { SimContext } from '../sim_context';
 import { angleTo, dist2d, type Entity, MELEE_RANGE, steadyAngleTo } from '../types';
@@ -133,8 +134,9 @@ function thinkTank(
   if (kickReady(ctx, bot, boss) && kick(ctx, bot, e, 'pummel', boss)) return;
   if (target.id !== boss.id && tryCast(ctx, bot, e, 'taunt', target)) return;
   if (dist2d(e.pos, target.pos) <= MELEE_RANGE && !e.autoAttack) ctx.startAutoAttack(bot.pid);
-  const sunders = target.auras.find((a) => a.kind === 'sunder')?.stacks ?? 0;
-  if (sunders < 3 && tryCast(ctx, bot, e, 'sunder_armor', target)) return;
+  if (!e.auras.some((a) => a.id === 'battle_shout') && tryCast(ctx, bot, e, 'battle_shout', e)) {
+    return;
+  }
   tryCast(ctx, bot, e, 'heroic_strike', target);
 }
 
@@ -147,7 +149,6 @@ function thinkDps(
 ): void {
   if (kickReady(ctx, bot, boss) && kick(ctx, bot, e, 'counterspell', boss)) return;
   if (!target || e.castingAbility) return;
-  if (tryCast(ctx, bot, e, 'fire_blast', target)) return;
   const filler = bot.brain.rng.chance(0.5) ? 'frostbolt' : 'fireball';
   tryCast(ctx, bot, e, filler, target);
 }
@@ -187,8 +188,13 @@ function thinkHealer(
     if (need.hpFrac < 0.8 && !renewed && tryCast(ctx, bot, e, 'renew', ally)) return;
     if (need.hpFrac < 0.65 && tryCast(ctx, bot, e, 'lesser_heal', ally)) return;
   }
+  // Everyone healthy and mana to spare: the healer chips in on Morthen.
   const everyoneUp = allies.every((ally) => ally.hpFrac > 0.8);
-  if (everyoneUp && e.resource > e.maxResource * 0.5) tryCast(ctx, bot, e, 'smite', boss);
+  if (!everyoneUp || e.resource <= e.maxResource * 0.5) return;
+  const dotted = boss.auras.some((a) => a.id === 'shadow_word_pain' && a.sourceId === e.id);
+  if (!dotted && tryCast(ctx, bot, e, 'shadow_word_pain', boss)) return;
+  if (tryCast(ctx, bot, e, 'mind_blast', boss)) return;
+  tryCast(ctx, bot, e, 'smite', boss);
 }
 
 function kickReady(ctx: SimContext, bot: GraveyardShiftBot, boss: Entity): boolean {
@@ -201,8 +207,9 @@ function kickReady(ctx: SimContext, bot: GraveyardShiftBot, boss: Entity): boole
   );
 }
 
-// A player switches to the caster and stops their own cast to land a kick: drop
-// the cast in progress, then interrupt, when the interrupt is otherwise castable.
+// A player switches to the caster and stops their own cast to land a kick, but
+// only when the kick can actually go out (ready, affordable, in reach and sight):
+// a tank peeling a skeleton keeps swinging at it while its kick is down.
 function kick(
   ctx: SimContext,
   bot: GraveyardShiftBot,
@@ -210,15 +217,17 @@ function kick(
   abilityId: string,
   boss: Entity,
 ): boolean {
+  const res = ctx.resolvedAbility(abilityId, bot.pid);
+  if (!res || (e.cooldowns.get(res.cooldownId ?? abilityId) ?? 0) > 0) return false;
+  const reach = res.def.range > 0 ? res.def.range : MELEE_RANGE;
+  if (e.resource < res.cost || dist2d(e.pos, boss.pos) > reach) return false;
+  if (!ctx.hasLineOfSight(e, boss)) return false;
+  if (res.def.school !== 'physical' && (isSilenced(e) || isLockedOut(e, res.def.school))) {
+    return false;
+  }
   // The verbs strike the current target: switch to the caster first.
   if (e.targetId !== boss.id) ctx.targetEntity(boss.id, bot.pid);
-  if (e.castingAbility) {
-    const res = ctx.resolvedAbility(abilityId, bot.pid);
-    const reach = res && res.def.range > 0 ? res.def.range : MELEE_RANGE;
-    const ready = !!res && (e.cooldowns.get(res.cooldownId ?? abilityId) ?? 0) <= 0;
-    if (!ready || e.resource < (res?.cost ?? 0) || dist2d(e.pos, boss.pos) > reach) return false;
-    ctx.cancelCast(e);
-  }
+  if (e.castingAbility) ctx.cancelCast(e);
   return tryCast(ctx, bot, e, abilityId, boss);
 }
 
@@ -236,6 +245,10 @@ function tryCast(
   if ((e.cooldowns.get(res.cooldownId ?? abilityId) ?? 0) > 0) return false;
   if (!res.def.offGcd && e.gcdRemaining > 0) return false;
   if (e.castingAbility || e.resource < res.cost) return false;
+  // Silenced or school-locked (Sexton's Chain): the real path would refuse.
+  if (res.def.school !== 'physical' && (isSilenced(e) || isLockedOut(e, res.def.school))) {
+    return false;
+  }
   const reach = res.def.range > 0 ? res.def.range : MELEE_RANGE;
   if (dist2d(e.pos, target.pos) > reach) return false;
   if (target.id !== e.id && !ctx.hasLineOfSight(e, target)) return false;

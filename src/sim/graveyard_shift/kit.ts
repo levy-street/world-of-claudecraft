@@ -1,4 +1,6 @@
-// Morthen's player kit for a Graveyard Shift run. Mode-local AbilityDefs: never
+// Morthen's player kit for a Graveyard Shift run. The English descriptions here
+// are short summaries for code readers: what the HUD shows comes from the
+// catalog (ui/graveyard_shift_text_core.ts), with the resolved numbers. Mode-local AbilityDefs: never
 // in ABILITIES (no icon, wiki or catalog obligations while the run is a dev
 // prototype); casting resolves them through meta.known like any ability. Built
 // only from existing effect kinds. Numbers come from the shipped `morthen`
@@ -31,7 +33,7 @@ export const MORTHEN_KIT: readonly AbilityDef[] = [
       { type: 'gainResource', amount: GRAVECALL_DREAD },
       { type: 'gshiftMark', maxStacks: 3, duration: 15 },
     ],
-    description: `Hurls a bolt of grave shadow at the target for 20 to 32 Shadow damage, marks it for the barrow (up to 3 marks) and generates ${GRAVECALL_DREAD} Dread.`,
+    description: `Hurls a bolt of grave shadow at the target, marks it for the barrow and generates ${GRAVECALL_DREAD} Dread.`,
   },
   {
     // The template's Shadow Pulse (12 to 18 damage, 12 yards, every 10 sec) as a
@@ -53,7 +55,7 @@ export const MORTHEN_KIT: readonly AbilityDef[] = [
       { type: 'aoeKnockback', radius: 12, distance: 8, dazeMult: 0.7, dazeDuration: 3 },
     ],
     description:
-      'After 2 sec, a pulse of shadow deals 12 to 18 Shadow damage to enemies within 12 yards and hurls them back.',
+      'After 2 sec, a pulse of shadow bursts the barrow marks of nearby enemies, damages them and hurls them back.',
   },
   {
     // The paladin pull's travel numbers, plus a short silence and a kick.

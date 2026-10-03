@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import { buildRealmSimConfig } from '../server/sim_boot_config';
+import { offlineWorldConfig } from '../src/game/offline_world_config';
 import { CRYPT_DOOR_POS, dungeonAt } from '../src/sim/data';
 import { graveyardShiftRunFor } from '../src/sim/graveyard_shift';
 import { Sim } from '../src/sim/sim';
+import { inertVaultConsumptionAdmission } from '../src/sim/sim_context';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function shiftSim(
@@ -261,4 +264,22 @@ describe('Graveyard Shift run shell', () => {
       expect(draws(true)).toEqual(draws(false));
     },
   );
+
+  it('refuses a shift started in combat', () => {
+    const sim = shiftSim();
+    sim.player.inCombat = true;
+    expect(start(sim)).toBeNull();
+    expect(logs(sim)).toContain('[dev] Leave combat first.');
+  });
+
+  it('only the offline world turns the run on: the realm boot config leaves it off', () => {
+    const realm = buildRealmSimConfig(undefined, inertVaultConsumptionAdmission);
+    expect(realm.offlineHost).toBeUndefined();
+    const offline = offlineWorldConfig({
+      playerClass: 'warrior',
+      name: 'Probe',
+      devCommands: true,
+    });
+    expect(offline.offlineHost).toBe(true);
+  });
 });

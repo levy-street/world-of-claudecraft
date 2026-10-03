@@ -101,13 +101,18 @@ SAY LINES (the living bots talk aloud, heard only up close).
   `moveInput`), pre-checking cooldown, GCD, resource, range and sight so the real
   path never refuses. The party waits idle until Morthen comes within
   `PARTY_ENGAGE_RADIUS` or lands a hit.
-- **Kicks:** a bot switches its target to Morthen and drops its own cast to land
-  an interrupt (the verbs strike the current target); a pushed-back cast bar is
-  the same cast, not a new stimulus.
-- **Roles:** tank (pummel a cast after the reaction delay, taunt a minion off the
-  healer, sunder to 3, Reaver Strike, auto-attack in melee), healer (shield,
-  renew, lesser heal on the triage pick after a reaction delay, smite when all are
-  healthy), mage (counterspell a cast, Fire Blast, then Frostbolt or Fireball).
+- **Kicks:** a bot whose interrupt is ready, affordable and in reach switches its
+  target to Morthen and drops its own cast to land it (the verbs strike the current
+  target); a pushed-back cast bar is the same cast, not a new stimulus.
+- **Roles,** built from what the bots really know at level 10: tank (pummel a cast
+  after the reaction delay, taunt a minion off the healer, Battle Shout when it is
+  missing, Reaver Strike, auto-attack in melee), healer (shield, renew, lesser heal
+  on the triage pick after a reaction delay; Shadow Word: Pain, Mind Blast and
+  smite on Morthen when everyone is healthy), mage (counterspell a cast, then
+  Frostbolt or Fireball). Control spells they know (Charge's stun, Psychic Scream,
+  Polymorph, Frost Nova) are filtered out by the fairness rule.
+- **Never into a refusal:** the driver skips a cast while silenced or school-locked
+  (Sexton's Chain) and only switches to Morthen for a kick that can go out.
 
 ## Dread
 - **A `ResourceType` of its own** (`'dread'`, 0 to 100), never rage, energy or mana,
@@ -187,15 +192,23 @@ SAY LINES (the living bots talk aloud, heard only up close).
 - **The slot has no exit object** (`exitId === null`), so everything that resolves a
   claim through `claimedInstanceAt` / `instanceClaimIdAt` (the instance combat hold,
   corpse rebinding, unstuck lookups) treats it as unclaimed. In-run Unstuck refuses.
-  Revisit when mobs and bots arrive.
+  The fight runs on plain hate and leash rules; no issue seen in the run tests.
 
 - **Session damage tallies count.** `meta.counters.damageDealt` / `damageTaken`
   (session-only `RewardCounters`, never persisted) include the run's blows; kills,
   deaths, XP, loot, honor and deeds do not move.
 - **Morthen ignores stat auras.** `applyMorthenProfile` overwrites every field a
   recalc folds auras into (armor, haste, power, crit, dodge, maxHp), so a buff or a
-  debuff on him (an armor cut, an attack slow, an AP debuff) changes nothing. Decide
-  when bots fight him: fold aura deltas over the template, or keep the boss inert.
+  debuff on him (an armor cut, an attack slow, an AP debuff) changes nothing. Kept
+  inert for the prototype (the party's kit carries no such debuff today); decide
+  after the first playtest whether to fold aura deltas over the template.
+- **Open after the prototype:** the bots never form a party (their party buffs land
+  on themselves only); the nameplate title and the greyed gear window wait for the
+  content step; the concept's "party gives up" lines need the corpse run, which the
+  prototype does not have; only the ferry counts as a transport refusal; the Raise
+  the Fallen slot lights up with no corpse in reach (the cast is refused cleanly);
+  `hasMorthenIdentity` is an aura scan on the swing, proc and recalc paths of every
+  host, cheap and accepted rather than gated on a run existing.
 
 ## Modules
 | File | Owns |

@@ -66,6 +66,7 @@ export function canStartGraveyardShift(ctx: SimContext, pid: number): string | n
     return 'Leave the instance first.';
   }
   if (ctx.partyOf(pid)) return 'Leave your party first.';
+  if (e.inCombat) return 'Leave combat first.';
   if (ctx.tradeFor(pid) || ctx.duelFor(pid)) return 'Finish your trade or duel first.';
   if (ctx.arenaMatches.has(pid) || ctx.bgMatches.has(pid)) return 'Finish your match first.';
   if (arenaQueuedFormat(ctx, pid) !== null || bgGroupContaining(ctx, pid) !== null) {

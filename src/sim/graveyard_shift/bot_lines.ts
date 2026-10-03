@@ -44,7 +44,9 @@ export const BOT_LINES: Readonly<Record<BotSayTrigger, readonly BotLine[]>> = {
   ],
   healerOom: [
     line('healerOom', 'oom', 'oom', { by: 'healer' }),
-    line('healerOom', 'drink', 'sitting to drink, nobody pull anything', { by: 'healer' }),
+    line('healerOom', 'emotionalSupport', "I'm healing with pure emotional support at this point", {
+      by: 'healer',
+    }),
     line('healerOom', 'iKnow', 'yes I know the boss is already pulled, I KNOW', { by: 'healer' }),
   ],
   wipeThreat: [

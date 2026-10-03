@@ -213,6 +213,7 @@ export const en_XA: EnTranslations = {
     "graveyardShift": {
       "identityAura": "[Ɱóŕţĥéñ ţĥé Ĝŕáʋéçáļļéŕ]",
       "markAura": "[Ɱáŕķéð ƒóŕ ţĥé Ɓáŕŕóŵ]",
+      "adventurerAura": "[Áðʋéñţúŕéŕ]",
       "resource": "[Ðŕéáð]",
       "errors": {
         "notEnoughDread": "[Ñóţ éñóúĝĥ Ðŕéáð!]",
@@ -256,7 +257,7 @@ export const en_XA: EnTranslations = {
         },
         "healerOom": {
           "oom": "[óóɱ]",
-          "drink": "[šíţţíñĝ ţó ðŕíñķ, ñóƀóðý þúļļ áñýţĥíñĝ]",
+          "emotionalSupport": "[Í'ɱ ĥéáļíñĝ ŵíţĥ þúŕé éɱóţíóñáļ šúþþóŕţ áţ ţĥíš þóíñţ]",
           "iKnow": "[ýéš Í ķñóŵ ţĥé ƀóšš íš áļŕéáðý þúļļéð, Í ĶÑÓŴ]"
         },
         "wipeThreat": {

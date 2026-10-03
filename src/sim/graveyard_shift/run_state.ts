@@ -65,3 +65,12 @@ export function graveyardShiftRunKey(ownerPid: number): string {
 export function graveyardShiftRunFor(ctx: SimContext, pid: number): GraveyardShiftRun | null {
   return ctx.graveyardShiftRuns.get(pid) ?? null;
 }
+
+// Whether a pid is one of a run's adventurers. Keyed on the roster, not the
+// marker aura: a death strips auras, and a fallen adventurer is still one.
+export function isGraveyardShiftBotPid(ctx: SimContext, pid: number): boolean {
+  for (const run of ctx.graveyardShiftRuns.values()) {
+    if (run.bots.some((bot) => bot.pid === pid)) return true;
+  }
+  return false;
+}

@@ -206,4 +206,53 @@ describe('Graveyard Shift party in a real fight', () => {
     };
     expect(trace()).toEqual(trace());
   });
+
+  it('a tank whose kick is down keeps its own target through a Morthen cast', () => {
+    const { sim, run } = shiftSim();
+    engage(sim, run);
+    runTicks(sim, 60);
+    const tankBot = run.bots.find((b) => b.role === 'tank')!;
+    const tank = sim.entities.get(tankBot.pid)!;
+    const [skeleton] = run.allyIds.map((id) => sim.entities.get(id)!);
+    sim.targetEntity(skeleton.id, tank.id);
+    tank.cooldowns.set('pummel', 30);
+    sim.player.resource = sim.player.maxResource;
+    sim.castAbility('gshift_shadow_pulse');
+    const targets = new Set<number | null>();
+    for (let i = 0; i < 30 && sim.player.castingAbility; i++) {
+      sim.tick();
+      targets.add(tank.targetId);
+    }
+    expect(targets.has(sim.playerId)).toBe(false);
+  });
+
+  it("never casts into a silence (no refused casts after Sexton's Chain)", () => {
+    const { sim, run } = shiftSim();
+    engage(sim, run);
+    runTicks(sim, 40);
+    const mage = bot(sim, run, 'dps');
+    const p = sim.player;
+    p.facing = Math.atan2(mage.pos.x - p.pos.x, mage.pos.z - p.pos.z);
+    sim.targetEntity(mage.id);
+    p.cooldowns.delete('gshift_sextons_chain');
+    p.gcdRemaining = 0;
+    sim.castAbility('gshift_sextons_chain');
+    const events = runTicks(sim, 40);
+    expect(mage.auras.some((a) => a.kind === 'silence') || events.length > 0).toBe(true);
+    expect(
+      events.some(
+        (ev) => ev.type === 'error' && (ev as any).pid === mage.id && /silenced/i.test(ev.text),
+      ),
+    ).toBe(false);
+  });
+
+  it('adventurers earn no deeds, not even for falling', () => {
+    const { sim, run } = shiftSim();
+    const healer = bot(sim, run, 'healer');
+    const earned = new Set((sim as any).players.get(healer.id).deedsEarned.keys());
+    (sim as any).dealDamage(null, healer, healer.maxHp + 50, false, 'physical', null, 'hit', true);
+    runTicks(sim, 40);
+    const after = [...(sim as any).players.get(healer.id).deedsEarned.keys()];
+    expect(after.filter((id: string) => !earned.has(id))).toEqual([]);
+  });
 });

@@ -145,4 +145,17 @@ describe('Graveyard Shift kit effects', () => {
       sim.events.some((ev) => ev.type === 'error' && ev.text === 'There is no corpse to raise.'),
     ).toBe(true);
   });
+
+  it("never raises Morthen's own fallen skeletons", () => {
+    const { sim, run } = shiftSim();
+    setUp(sim, run);
+    const [ally] = run.allyIds.map((id) => sim.entities.get(id)!);
+    (sim as any).dealDamage(null, ally, ally.maxHp + 50, false, 'physical', null, 'hit', true);
+    expect(ally.dead).toBe(true);
+    castAt(sim, 'gshift_raise_fallen', null);
+    expect(
+      sim.events.some((ev) => ev.type === 'error' && ev.text === 'There is no corpse to raise.'),
+    ).toBe(true);
+    expect(run.raisedCorpseIds.size).toBe(0);
+  });
 });

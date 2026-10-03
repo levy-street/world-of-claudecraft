@@ -10,6 +10,7 @@ import { SAY_RANGE } from '../sim';
 import type { SimContext } from '../sim_context';
 import { dist2d, type Entity, TICK_RATE } from '../types';
 import { BOT_LINES, type BotLine, type BotSayTrigger, botLineAllowed } from './bot_lines';
+import { isGraveyardShiftAdventurer } from './hostility';
 import type { GraveyardShiftBot, GraveyardShiftRun } from './run_state';
 
 // One line every 3 sec across the party, and 10 sec between two lines of a bot.
@@ -164,7 +165,8 @@ function speak(
 function emitBotSay(ctx: SimContext, speaker: Entity, said: BotLine): void {
   for (const meta of ctx.players.values()) {
     const p = ctx.entities.get(meta.entityId);
-    if (!p || dist2d(p.pos, speaker.pos) > SAY_RANGE) continue;
+    // The party's own members need no copy: they are client-less.
+    if (!p || isGraveyardShiftAdventurer(p) || dist2d(p.pos, speaker.pos) > SAY_RANGE) continue;
     ctx.emit({
       type: 'chat',
       fromPid: speaker.id,
