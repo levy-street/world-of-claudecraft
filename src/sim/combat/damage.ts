@@ -29,6 +29,7 @@ import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
 import { graveyardShiftLethalClamp } from '../graveyard_shift/death_intercept';
+import { dreadFromDamageDealt } from '../graveyard_shift/dread';
 import { hasMorthenIdentity } from '../graveyard_shift/morthen_identity';
 import { emitIgnivarRaidNarrativeOnDeath } from '../ignivar_raid_lore';
 import {
@@ -1227,6 +1228,8 @@ export function dealDamage(
           baseRage * (isWarrior ? talentMult * rageGenAuraMult(source) * seasonedCrit : 1),
       );
     }
+    // Morthen's Dread (Graveyard Shift) fills from every hit he lands.
+    dreadFromDamageDealt(source, amount);
   }
   if (target.kind === 'player') {
     const meta = ctx.players.get(target.id);

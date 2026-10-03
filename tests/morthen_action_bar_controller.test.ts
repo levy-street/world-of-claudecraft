@@ -147,6 +147,7 @@ describe('Morthen bar on a real offline run', () => {
     expect(VehicleActionBarController.blocksPlayerActions(sim)).toBe(false);
     sim.chat('/dev graveyardshift start');
     expect(VehicleActionBarController.blocksPlayerActions(sim)).toBe(true);
+    sim.player.resource = 40;
     bar.update();
     expect(morthenButtons()[4].getAttribute('aria-label')).toBe('Action slot 5: Barrow Shroud');
     bar.chooseSlot(4);

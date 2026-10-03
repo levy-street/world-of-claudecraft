@@ -132,6 +132,7 @@ describe('UnitFramePainter: the player instance routes every write through the e
       { m: 'toggleClass', args: [RES_CONTAINER, 'energy', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'focus', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'mana', true] },
+      { m: 'toggleClass', args: [RES_CONTAINER, 'dread', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'is-empty', false] },
       { m: 'setTransform', args: [RES_FILL, 'scaleX(0.8)'] },
       { m: 'setText', args: [RES_TEXT, '80 / 100'] },
@@ -145,7 +146,7 @@ describe('UnitFramePainter: the player instance routes every write through the e
     expect(calls.some((c) => c.args[1] === 'dead' || c.args[1] === 'oor')).toBe(false);
   });
 
-  it('drives the rage, energy, and focus discriminator exclusively', () => {
+  it('drives the rage, energy, focus, and dread discriminator exclusively', () => {
     const rage = paint(playerDescriptor({ resourceKind: 'rage' }));
     expect(rage).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'rage', true] });
     expect(rage).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'mana', false] });
@@ -154,6 +155,11 @@ describe('UnitFramePainter: the player instance routes every write through the e
     const focus = paint(playerDescriptor({ resourceKind: 'focus' }));
     expect(focus).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'focus', true] });
     expect(focus).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'mana', false] });
+    // Morthen's Dread bar (Graveyard Shift) gets its own color class.
+    const dread = paint(playerDescriptor({ resourceKind: 'dread' }));
+    expect(dread).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'dread', true] });
+    expect(dread).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'mana', false] });
+    expect(focus).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'dread', false] });
   });
 
   it('shrinks the empty resource rail and restores it when text returns', () => {

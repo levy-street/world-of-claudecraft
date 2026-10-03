@@ -212,10 +212,14 @@ export const en: EnTranslations = {
     },
     "graveyardShift": {
       "identityAura": "Morthen the Gravecaller",
+      "resource": "Dread",
+      "errors": {
+        "notEnoughDread": "Not enough Dread!"
+      },
       "abilities": {
         "gravecall": {
           "name": "Gravecall",
-          "description": "Hurl a bolt of grave shadow at your target for {min} to {max} Shadow damage."
+          "description": "Hurl a bolt of grave shadow at your target for {min} to {max} Shadow damage. Generates {dread} Dread."
         },
         "shadowPulse": {
           "name": "Shadow Pulse",

@@ -45,11 +45,11 @@ const ABSORB_TEXT_OPTS: Intl.NumberFormatOptions = { maximumFractionDigits: 0, u
 
 /**
  * The resource-bar discriminator the painter routes to a class on the resource
- * container. The four power types are mutually exclusive; `none` is the
+ * container. The five power types are mutually exclusive; `none` is the
  * no-resource-bar case a target frame needs. The player always uses a live power
  * type and never `none`.
  */
-export type UnitResourceClass = 'rage' | 'energy' | 'focus' | 'mana' | 'none';
+export type UnitResourceClass = 'rage' | 'energy' | 'focus' | 'mana' | 'dread' | 'none';
 
 /**
  * The resource input the descriptor carries. `none` marks a unit with no resource
@@ -221,6 +221,7 @@ export function unitResourceClass(kind: UnitResourceKind): UnitResourceClass {
   if (kind === 'rage') return 'rage';
   if (kind === 'energy') return 'energy';
   if (kind === 'focus') return 'focus';
+  if (kind === 'dread') return 'dread';
   // 'mana' or null: the player's default branch, byte-identical to the old ternary.
   return 'mana';
 }

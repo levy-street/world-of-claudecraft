@@ -1,0 +1,33 @@
+// Dread, Morthen's resource on a Graveyard Shift run: 0 to 100, starts empty,
+// never regenerates or decays (updateRegen has no 'dread' arm). It is earned by
+// dealing damage (the rage-from-damage-dealt hook in combat/damage.ts calls
+// dreadFromDamageDealt) and by Gravecall's gainResource effect, and spent by
+// Shadow Pulse and Barrow Shroud through the ordinary cost path. A pure leaf:
+// combat/damage.ts and the profile import it without a cycle. Draws no rng.
+
+import type { Entity, ResourceType } from '../types';
+
+export const DREAD_MAX = 100;
+
+// One Dread per 20 damage dealt, any school, swing or spell. Rate check: the
+// template swing (41 to 65 every 2.6 sec) and Gravecall (20 to 32 every 6 sec)
+// deal about 24 damage a second before mitigation, so about 1.2 Dread a second,
+// and Gravecall's own grant (GRAVECALL_DREAD every 6 sec) adds about 1.7 more.
+// Steady hitting therefore funds a 30 Dread Shadow Pulse every 10 to 12 sec,
+// a little slower against armor or with misses.
+export const DREAD_PER_DAMAGE = 1 / 20;
+export const GRAVECALL_DREAD = 10;
+
+export function dreadFromDamageDealt(source: Entity, amount: number): void {
+  if (source.resourceType !== 'dread' || amount <= 0) return;
+  source.resource = Math.min(source.maxResource, source.resource + amount * DREAD_PER_DAMAGE);
+}
+
+// The Dread a recalc hands back: the pool before the recalc when it was
+// already Dread, else empty (the identity just landed). The base recalc pass
+// rewrites the resource for the real class first, so the profile must not
+// read e.resource after it.
+export function carriedDread(prevType: ResourceType | null, prevResource: number): number {
+  if (prevType !== 'dread') return 0;
+  return Math.max(0, Math.min(DREAD_MAX, prevResource));
+}

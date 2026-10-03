@@ -1297,7 +1297,9 @@ export function castAbility(
               ? 'Not enough energy!'
               : p.resourceType === 'focus'
                 ? 'Not enough Focus!'
-                : 'Not enough mana!',
+                : p.resourceType === 'dread'
+                  ? 'Not enough Dread!'
+                  : 'Not enough mana!',
     );
     return;
   }
@@ -2949,7 +2951,12 @@ function applyAbility(
       ? Math.ceil(shamanAdjustedCost * paladinManaCostMultiplier(p))
       : shamanAdjustedCost;
   if (p.resource < payableCost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
-    ctx.error(p.id, `Not enough ${p.resourceType ?? 'resource'}!`);
+    ctx.error(
+      p.id,
+      p.resourceType === 'dread'
+        ? 'Not enough Dread!'
+        : `Not enough ${p.resourceType ?? 'resource'}!`,
+    );
     return;
   }
   if (canCastFree && !togglingOff && consumeFreeCostFor(ctx, p, ability.id)) {

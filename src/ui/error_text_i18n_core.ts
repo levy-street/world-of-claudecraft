@@ -98,6 +98,7 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
     'Not enough energy!': 'hud.errors.notEnoughEnergy',
     'Not enough mana!': 'hud.errors.notEnoughMana',
     'Not enough Devotion!': 'hud.errors.notEnoughDevotion',
+    'Not enough Dread!': 'devCommand.graveyardShift.errors.notEnoughDread',
     'Not enough health.': 'hud.errors.notEnoughHealth',
     'Your target must dodge first.': 'hud.errors.targetMustDodge',
     'That ability requires combo points.': 'hud.errors.requiresCombo',

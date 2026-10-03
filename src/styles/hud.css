@@ -3359,6 +3359,9 @@
   .focus {
     --bar-color: var(--color-focus);
   }
+  .dread {
+    --bar-color: var(--color-dread);
+  }
   /* Damage-absorb shield overlay (Power Word: Shield, Ice Barrier, …): a hatched
      translucent segment laid over the health bar, extending past current health. */
   .bar-absorb {

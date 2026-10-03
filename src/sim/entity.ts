@@ -330,8 +330,10 @@ export function recalcPlayerStats(
   if (hasMorthenIdentity(e) && equipment !== MORTHEN_BARE_EQUIPMENT) {
     const prevHp = e.hp;
     const prevMaxHp = e.maxHp;
+    const prevResourceType = e.resourceType;
+    const prevResource = e.resource;
     recalcPlayerStats(e, cls, MORTHEN_BARE_EQUIPMENT, undefined, MORTHEN_BARE_EQUIPMENT_INSTANCES);
-    applyMorthenProfile(e, prevHp, prevMaxHp);
+    applyMorthenProfile(e, prevHp, prevMaxHp, prevResourceType, prevResource);
     return;
   }
   const def = CLASSES[cls];

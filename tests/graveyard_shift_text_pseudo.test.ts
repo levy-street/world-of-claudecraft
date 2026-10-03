@@ -44,4 +44,18 @@ describe('Graveyard Shift names under the pseudo-locale', () => {
     expect(abilityDisplayNameFromSource("Sexton's Chain")).toBe(PSEUDO.abilities.sextonsChain.name);
     expect(castDisplayName('gshift_shadow_pulse')).toBe(PSEUDO.abilities.shadowPulse.name);
   });
+
+  it('keys the Dread refusal and the Dread resource label', async () => {
+    window.history.replaceState({}, '', '/?lang=en_XA');
+    vi.resetModules();
+    const [{ localizeErrorText }, { resourceDisplayName }] = await Promise.all([
+      import('../src/ui/error_text_i18n_core'),
+      import('../src/ui/ability_tooltip_lines'),
+    ]);
+    const deps = { raidLockouts: () => [], formatLockoutDuration: () => '' };
+    expect(PSEUDO.errors.notEnoughDread).not.toBe('Not enough Dread!');
+    expect(localizeErrorText('Not enough Dread!', deps)).toBe(PSEUDO.errors.notEnoughDread);
+    expect(PSEUDO.resource).not.toBe('Dread');
+    expect(resourceDisplayName('dread')).toBe(PSEUDO.resource);
+  });
 });

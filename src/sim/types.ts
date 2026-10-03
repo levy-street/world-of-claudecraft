@@ -338,7 +338,8 @@ export const ALL_CLASSES: PlayerClass[] = [
   'warlock',
   'druid',
 ];
-export type ResourceType = 'rage' | 'mana' | 'energy' | 'focus';
+// 'dread' is Morthen's bar on a Graveyard Shift run (graveyard_shift/dread.ts).
+export type ResourceType = 'rage' | 'mana' | 'energy' | 'focus' | 'dread';
 export const OVERHEAD_EMOTE_IDS = [
   'wave',
   'laugh',

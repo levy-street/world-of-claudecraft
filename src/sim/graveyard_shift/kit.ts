@@ -3,12 +3,14 @@
 // prototype); casting resolves them through meta.known like any ability. Built
 // only from existing effect kinds. Numbers come from the shipped `morthen`
 // template where it has one; the rest are first-playtest values to tune. Costs
-// are 0 until the Dread resource lands. `class: 'warrior'` is a neutral carrier
+// are Dread (dread.ts): Gravecall builds it, Shadow Pulse and Barrow Shroud
+// spend it, Sexton's Chain is free. `class: 'warrior'` is a neutral carrier
 // (the clockwork_shock_bomb precedent): the class-keyed hooks key on warlock
 // and mage abilities, never on warrior ones.
 
 import type { KnownAbility } from '../content/classes';
 import type { AbilityDef, AbilityEffect } from '../types';
+import { GRAVECALL_DREAD } from './dread';
 import { MORTHEN_SOLO_DAMAGE_MULT } from './morthen_profile';
 
 export const MORTHEN_KIT: readonly AbilityDef[] = [
@@ -24,8 +26,12 @@ export const MORTHEN_KIT: readonly AbilityDef[] = [
     range: 20,
     school: 'shadow',
     requiresTarget: true,
-    effects: [{ type: 'directDamage', min: 20, max: 32, spellPowerCoeff: 0 }],
-    description: 'Hurls a bolt of grave shadow at the target for 20 to 32 Shadow damage.',
+    effects: [
+      { type: 'directDamage', min: 20, max: 32, spellPowerCoeff: 0 },
+      { type: 'gainResource', amount: GRAVECALL_DREAD },
+    ],
+    description:
+      'Hurls a bolt of grave shadow at the target for 20 to 32 Shadow damage and generates 10 Dread.',
   },
   {
     // The template's Shadow Pulse (12 to 18 damage, 12 yards, every 10 sec) as a
@@ -34,7 +40,7 @@ export const MORTHEN_KIT: readonly AbilityDef[] = [
     name: 'Shadow Pulse',
     class: 'warrior',
     learnLevel: 1,
-    cost: 0,
+    cost: 30,
     castTime: 2,
     cooldown: 10,
     range: 0,
@@ -72,7 +78,7 @@ export const MORTHEN_KIT: readonly AbilityDef[] = [
     name: 'Barrow Shroud',
     class: 'warrior',
     learnLevel: 1,
-    cost: 0,
+    cost: 40,
     castTime: 0,
     cooldown: 45,
     range: 0,

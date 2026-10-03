@@ -5,7 +5,8 @@
 
 import { MOBS } from '../data';
 import { mobBaseStats } from '../mob_base_stats';
-import type { Entity } from '../types';
+import type { Entity, ResourceType } from '../types';
+import { carriedDread, DREAD_MAX } from './dread';
 
 export const MORTHEN_TEMPLATE_ID = 'morthen';
 
@@ -22,8 +23,16 @@ export function morthenLevel(): number {
 }
 
 // `prevHp` / `prevMaxHp` are the pool before the recalc, so the health fraction
-// is carried over Morthen's own maximum and rounded once.
-export function applyMorthenProfile(e: Entity, prevHp: number, prevMaxHp: number): void {
+// is carried over Morthen's own maximum and rounded once. `prevResourceType` /
+// `prevResource` carry the Dread bar the same way (the base pass reset it to
+// the real class's resource).
+export function applyMorthenProfile(
+  e: Entity,
+  prevHp: number,
+  prevMaxHp: number,
+  prevResourceType: ResourceType | null,
+  prevResource: number,
+): void {
   const base = mobBaseStats(MOBS[MORTHEN_TEMPLATE_ID], e.level);
   const hpFrac = prevMaxHp > 0 ? prevHp / prevMaxHp : 1;
   e.maxHp = base.maxHp * MORTHEN_SOLO_HP_MULT;
@@ -34,6 +43,9 @@ export function applyMorthenProfile(e: Entity, prevHp: number, prevMaxHp: number
     speed: base.weapon.speed,
   };
   e.offhandWeapon = null;
+  e.resourceType = 'dread';
+  e.maxResource = DREAD_MAX;
+  e.resource = carriedDread(prevResourceType, prevResource);
   e.dualWielding = false;
   // A mob carries no primary stats and the entity defaults for every derived
   // combat number: nothing of the real class's base stats reaches the kit.

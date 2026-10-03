@@ -107,6 +107,11 @@ describe('resourceTypeCode', () => {
     expect(resourceTypeCode(undefined)).toBe(0);
   });
 
+  test('codes Dread as no pool: the offline-only Graveyard Shift bar has no wire code', () => {
+    expect(resourceTypeCode('dread')).toBe(0);
+    expect(Object.keys(RESOURCE_TYPE_CODES)).not.toContain('dread');
+  });
+
   test('gives every type a distinct non-zero code', () => {
     const codes = Object.values(RESOURCE_TYPE_CODES);
     expect(new Set(codes).size).toBe(codes.length);

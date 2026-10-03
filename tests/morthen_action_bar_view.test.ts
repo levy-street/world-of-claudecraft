@@ -19,6 +19,7 @@ function player(over: Partial<MorthenBarPlayer> = {}): MorthenBarPlayer {
     gcdRemaining: 0,
     cooldowns: new Map<string, number>(),
     pos: { x: 0, y: 0, z: 0 },
+    resource: 100,
     ...over,
   };
 }

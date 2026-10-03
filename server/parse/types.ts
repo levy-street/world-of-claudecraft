@@ -2,6 +2,7 @@
 // tests script a fake sim and the real Sim satisfies them at the hook site.
 // The recorder is a read-only observer: nothing in server/parse/ may mutate
 // the sim, draw rng, or import DOM/render/ui code.
+import type { ResourceType } from '../../src/sim/types';
 import type { FightParticipant, Surface } from './contract';
 import type { ParseCounters } from './counters';
 
@@ -30,7 +31,7 @@ export interface RecorderEntityView {
    * than assumed fixed for the fight. */
   resource?: number;
   maxResource?: number;
-  resourceType?: 'rage' | 'mana' | 'energy' | 'focus' | null;
+  resourceType?: ResourceType | null;
   auras?: readonly { id: string; name: string; sourceId: number; stacks?: number }[];
 }
 

@@ -212,10 +212,14 @@ export const en_XA: EnTranslations = {
     },
     "graveyardShift": {
       "identityAura": "[Ɱóŕţĥéñ ţĥé Ĝŕáʋéçáļļéŕ]",
+      "resource": "[Ðŕéáð]",
+      "errors": {
+        "notEnoughDread": "[Ñóţ éñóúĝĥ Ðŕéáð!]"
+      },
       "abilities": {
         "gravecall": {
           "name": "[Ĝŕáʋéçáļļ]",
-          "description": "[Ĥúŕļ á ƀóļţ óƒ ĝŕáʋé šĥáðóŵ áţ ýóúŕ ţáŕĝéţ ƒóŕ {min} ţó {max} Šĥáðóŵ ðáɱáĝé.]"
+          "description": "[Ĥúŕļ á ƀóļţ óƒ ĝŕáʋé šĥáðóŵ áţ ýóúŕ ţáŕĝéţ ƒóŕ {min} ţó {max} Šĥáðóŵ ðáɱáĝé. Ĝéñéŕáţéš {dread} Ðŕéáð.]"
         },
         "shadowPulse": {
           "name": "[Šĥáðóŵ Þúļšé]",

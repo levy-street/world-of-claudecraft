@@ -172,6 +172,7 @@ describe('Graveyard Shift Morthen identity', () => {
     expect(
       sim.events.some((e) => e.type === 'error' && e.text === 'You do not know that ability.'),
     ).toBe(true);
+    sim.player.resource = 100;
     sim.castAbility('gshift_barrow_shroud');
     expect(sim.player.auras.some((a) => a.kind === 'shield_wall' && a.value === 0.6)).toBe(true);
     sim.castAbility('gshift_shadow_pulse');
@@ -181,6 +182,7 @@ describe('Graveyard Shift Morthen identity', () => {
   it('runs the kit on the standard global cooldown whatever the real class', () => {
     const sim = shiftSim('rogue');
     start(sim);
+    sim.player.resource = 30;
     sim.castAbility('gshift_shadow_pulse');
     expect(sim.player.gcdRemaining).toBeCloseTo(1.5, 5);
   });

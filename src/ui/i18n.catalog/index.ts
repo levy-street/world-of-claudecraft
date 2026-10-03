@@ -238,11 +238,15 @@ export const en = {
     // prototype; the strings move to a player namespace when the mode ships.
     graveyardShift: {
       identityAura: 'Morthen the Gravecaller',
+      resource: 'Dread',
+      errors: {
+        notEnoughDread: 'Not enough Dread!',
+      },
       abilities: {
         gravecall: {
           name: 'Gravecall',
           description:
-            'Hurl a bolt of grave shadow at your target for {min} to {max} Shadow damage.',
+            'Hurl a bolt of grave shadow at your target for {min} to {max} Shadow damage. Generates {dread} Dread.',
         },
         shadowPulse: {
           name: 'Shadow Pulse',

@@ -93,7 +93,11 @@ function descriptionValues(def: AbilityDef): InterpolationValues {
   switch (def.id) {
     case 'gshift_gravecall': {
       const hit = effectOf(def, 'directDamage');
-      return { min: amount(hit?.min), max: amount(hit?.max) };
+      return {
+        min: amount(hit?.min),
+        max: amount(hit?.max),
+        dread: amount(effectOf(def, 'gainResource')?.amount),
+      };
     }
     case 'gshift_shadow_pulse': {
       const blast = effectOf(def, 'aoeDamage');

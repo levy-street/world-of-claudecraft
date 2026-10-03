@@ -63,7 +63,7 @@ describe('Graveyard Shift display text', () => {
   it('describes each kit ability with the numbers its effects carry', () => {
     const text = (id: string) => graveyardShiftAbilityDescription(id)!;
     expect(text('gshift_gravecall')).toBe(
-      'Hurl a bolt of grave shadow at your target for 20 to 32 Shadow damage.',
+      'Hurl a bolt of grave shadow at your target for 20 to 32 Shadow damage. Generates 10 Dread.',
     );
     expect(text('gshift_shadow_pulse')).toBe(
       'Release a pulse of shadow that deals 12 to 18 Shadow damage to each enemy within 12 yards in your line of sight. Each enemy hit is knocked back 8 yards and slowed by 30% for 3 sec.',

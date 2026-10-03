@@ -44,7 +44,7 @@ import type { UnitFrameView } from './unit_frame';
 
 // The mutually-exclusive resource-type classes the painter toggles on the resource
 // container. Exactly one is on for a live power bar; all are off for `none`.
-const RES_TYPE_CLASSES = ['rage', 'energy', 'focus', 'mana'] as const;
+const RES_TYPE_CLASSES = ['rage', 'energy', 'focus', 'mana', 'dread'] as const;
 const EMPTY_RESOURCE_CLASS = 'is-empty';
 // The shield-overlay class (the shield reaches the bar's right edge).
 const OVERSHIELD_CLASS = 'overshield';

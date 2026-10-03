@@ -8,7 +8,7 @@
 import { effectivePlayerAttackRange } from '../../../sim/combat/player_attack_reach';
 import { MORTHEN_KIT } from '../../../sim/graveyard_shift/kit';
 import { type AbilityDef, dist2d, GCD, type Vec3 } from '../../../sim/types';
-import { abilityRangeLine } from '../../ability_tooltip_lines';
+import { abilityRangeLine, resourceDisplayName } from '../../ability_tooltip_lines';
 import { esc } from '../../esc';
 import {
   graveyardShiftAbilityDescription,
@@ -46,6 +46,8 @@ export interface MorthenBarPlayer {
   gcdRemaining: number;
   cooldowns: { get(id: string): number | undefined };
   pos: Vec3;
+  /** The Dread bar: a slot whose cost it cannot pay paints unusable. */
+  resource: number;
 }
 
 /** The current target, or null when there is none. */
@@ -105,7 +107,10 @@ export function createMorthenActionBarView() {
         slot.cooldownTotal = total;
         slot.cooldownPercent = shown > 0 ? Math.min(100, (shown / Math.max(0.01, total)) * 100) : 0;
         slot.cdText = cooldown > COOLDOWN_TEXT_THRESHOLD ? formatNumber(Math.ceil(cooldown)) : '';
-        slot.usable = !player.dead && (!def.requiresTarget || liveTarget !== null);
+        slot.usable =
+          !player.dead &&
+          player.resource >= def.cost &&
+          (!def.requiresTarget || liveTarget !== null);
         slot.outOfRange =
           def.requiresTarget &&
           liveTarget !== null &&
@@ -127,13 +132,21 @@ function seconds(value: number): string {
   return formatNumber(value, { maximumFractionDigits: 1 });
 }
 
-/** The slot's tooltip HTML: the name, the range / cast / cooldown line, the prose. */
+/** The slot's tooltip HTML: the name, the Dread cost / range / cast / cooldown line, the prose. */
 export function morthenSlotTooltipHtml(slot: number, spellHaste = 0): string {
   const def = morthenSlotAbility(slot);
   if (!def) {
     return `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div>`;
   }
   const stats: string[] = [];
+  if (def.cost > 0) {
+    stats.push(
+      t('abilityUi.tooltip.cost', {
+        cost: formatNumber(def.cost),
+        resource: resourceDisplayName('dread'),
+      }),
+    );
+  }
   const range = abilityRangeLine(def);
   if (range) stats.push(range);
   // Spell haste shortens the shown cast exactly as the sim does (abilityCastLine).

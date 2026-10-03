@@ -18,7 +18,9 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.graveyardShift.abilities.sextonsChain.name",
     "devCommand.graveyardShift.abilities.shadowPulse.description",
     "devCommand.graveyardShift.abilities.shadowPulse.name",
-    "devCommand.graveyardShift.identityAura"
+    "devCommand.graveyardShift.errors.notEnoughDread",
+    "devCommand.graveyardShift.identityAura",
+    "devCommand.graveyardShift.resource"
   ],
   "es_ES": [
     "devCommand.graveyardShift.abilities.barrowShroud.description",
@@ -29,7 +31,9 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.graveyardShift.abilities.sextonsChain.name",
     "devCommand.graveyardShift.abilities.shadowPulse.description",
     "devCommand.graveyardShift.abilities.shadowPulse.name",
-    "devCommand.graveyardShift.identityAura"
+    "devCommand.graveyardShift.errors.notEnoughDread",
+    "devCommand.graveyardShift.identityAura",
+    "devCommand.graveyardShift.resource"
   ],
   "fr_FR": [
     "devCommand.graveyardShift.abilities.barrowShroud.description",
@@ -40,7 +44,9 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.graveyardShift.abilities.sextonsChain.name",
     "devCommand.graveyardShift.abilities.shadowPulse.description",
     "devCommand.graveyardShift.abilities.shadowPulse.name",
-    "devCommand.graveyardShift.identityAura"
+    "devCommand.graveyardShift.errors.notEnoughDread",
+    "devCommand.graveyardShift.identityAura",
+    "devCommand.graveyardShift.resource"
   ],
   "fr_CA": [
     "devCommand.graveyardShift.abilities.barrowShroud.description",
@@ -51,7 +57,9 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.graveyardShift.abilities.sextonsChain.name",
     "devCommand.graveyardShift.abilities.shadowPulse.description",
     "devCommand.graveyardShift.abilities.shadowPulse.name",
-    "devCommand.graveyardShift.identityAura"
+    "devCommand.graveyardShift.errors.notEnoughDread",
+    "devCommand.graveyardShift.identityAura",
+    "devCommand.graveyardShift.resource"
   ],
   "en_CA": [],
   "it_IT": [
@@ -63,7 +71,9 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.graveyardShift.abilities.sextonsChain.name",
     "devCommand.graveyardShift.abilities.shadowPulse.description",
     "devCommand.graveyardShift.abilities.shadowPulse.name",
-    "devCommand.graveyardShift.identityAura"
+    "devCommand.graveyardShift.errors.notEnoughDread",
+    "devCommand.graveyardShift.identityAura",
+    "devCommand.graveyardShift.resource"
   ],
   "de_DE": [
     "devCommand.graveyardShift.abilities.barrowShroud.description",
@@ -74,7 +84,9 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.graveyardShift.abilities.sextonsChain.name",
     "devCommand.graveyardShift.abilities.shadowPulse.description",
     "devCommand.graveyardShift.abilities.shadowPulse.name",
-    "devCommand.graveyardShift.identityAura"
+    "devCommand.graveyardShift.errors.notEnoughDread",
+    "devCommand.graveyardShift.identityAura",
+    "devCommand.graveyardShift.resource"
   ],
   "zh_CN": [
     "devCommand.graveyardShift.abilities.barrowShroud.description",
@@ -85,7 +97,9 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.graveyardShift.abilities.sextonsChain.name",
     "devCommand.graveyardShift.abilities.shadowPulse.description",
     "devCommand.graveyardShift.abilities.shadowPulse.name",
-    "devCommand.graveyardShift.identityAura"
+    "devCommand.graveyardShift.errors.notEnoughDread",
+    "devCommand.graveyardShift.identityAura",
+    "devCommand.graveyardShift.resource"
   ],
   "zh_TW": [
     "devCommand.graveyardShift.abilities.barrowShroud.description",
@@ -96,7 +110,9 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.graveyardShift.abilities.sextonsChain.name",
     "devCommand.graveyardShift.abilities.shadowPulse.description",
     "devCommand.graveyardShift.abilities.shadowPulse.name",
-    "devCommand.graveyardShift.identityAura"
+    "devCommand.graveyardShift.errors.notEnoughDread",
+    "devCommand.graveyardShift.identityAura",
+    "devCommand.graveyardShift.resource"
   ],
   "ko_KR": [
     "devCommand.graveyardShift.abilities.barrowShroud.description",
@@ -107,7 +123,9 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.graveyardShift.abilities.sextonsChain.name",
     "devCommand.graveyardShift.abilities.shadowPulse.description",
     "devCommand.graveyardShift.abilities.shadowPulse.name",
-    "devCommand.graveyardShift.identityAura"
+    "devCommand.graveyardShift.errors.notEnoughDread",
+    "devCommand.graveyardShift.identityAura",
+    "devCommand.graveyardShift.resource"
   ],
   "ja_JP": [
     "devCommand.graveyardShift.abilities.barrowShroud.description",
@@ -118,7 +136,9 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.graveyardShift.abilities.sextonsChain.name",
     "devCommand.graveyardShift.abilities.shadowPulse.description",
     "devCommand.graveyardShift.abilities.shadowPulse.name",
-    "devCommand.graveyardShift.identityAura"
+    "devCommand.graveyardShift.errors.notEnoughDread",
+    "devCommand.graveyardShift.identityAura",
+    "devCommand.graveyardShift.resource"
   ],
   "pt_BR": [
     "devCommand.graveyardShift.abilities.barrowShroud.description",
@@ -129,7 +149,9 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.graveyardShift.abilities.sextonsChain.name",
     "devCommand.graveyardShift.abilities.shadowPulse.description",
     "devCommand.graveyardShift.abilities.shadowPulse.name",
-    "devCommand.graveyardShift.identityAura"
+    "devCommand.graveyardShift.errors.notEnoughDread",
+    "devCommand.graveyardShift.identityAura",
+    "devCommand.graveyardShift.resource"
   ],
   "ru_RU": [
     "devCommand.graveyardShift.abilities.barrowShroud.description",
@@ -140,7 +162,9 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.graveyardShift.abilities.sextonsChain.name",
     "devCommand.graveyardShift.abilities.shadowPulse.description",
     "devCommand.graveyardShift.abilities.shadowPulse.name",
-    "devCommand.graveyardShift.identityAura"
+    "devCommand.graveyardShift.errors.notEnoughDread",
+    "devCommand.graveyardShift.identityAura",
+    "devCommand.graveyardShift.resource"
   ],
   "cs_CZ": [
     "devCommand.graveyardShift.abilities.barrowShroud.description",
@@ -151,7 +175,9 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.graveyardShift.abilities.sextonsChain.name",
     "devCommand.graveyardShift.abilities.shadowPulse.description",
     "devCommand.graveyardShift.abilities.shadowPulse.name",
-    "devCommand.graveyardShift.identityAura"
+    "devCommand.graveyardShift.errors.notEnoughDread",
+    "devCommand.graveyardShift.identityAura",
+    "devCommand.graveyardShift.resource"
   ],
   "nl_NL": [
     "devCommand.graveyardShift.abilities.barrowShroud.description",
@@ -162,7 +188,9 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.graveyardShift.abilities.sextonsChain.name",
     "devCommand.graveyardShift.abilities.shadowPulse.description",
     "devCommand.graveyardShift.abilities.shadowPulse.name",
-    "devCommand.graveyardShift.identityAura"
+    "devCommand.graveyardShift.errors.notEnoughDread",
+    "devCommand.graveyardShift.identityAura",
+    "devCommand.graveyardShift.resource"
   ],
   "pl_PL": [
     "devCommand.graveyardShift.abilities.barrowShroud.description",
@@ -173,7 +201,9 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.graveyardShift.abilities.sextonsChain.name",
     "devCommand.graveyardShift.abilities.shadowPulse.description",
     "devCommand.graveyardShift.abilities.shadowPulse.name",
-    "devCommand.graveyardShift.identityAura"
+    "devCommand.graveyardShift.errors.notEnoughDread",
+    "devCommand.graveyardShift.identityAura",
+    "devCommand.graveyardShift.resource"
   ],
   "id_ID": [
     "devCommand.graveyardShift.abilities.barrowShroud.description",
@@ -184,7 +214,9 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.graveyardShift.abilities.sextonsChain.name",
     "devCommand.graveyardShift.abilities.shadowPulse.description",
     "devCommand.graveyardShift.abilities.shadowPulse.name",
-    "devCommand.graveyardShift.identityAura"
+    "devCommand.graveyardShift.errors.notEnoughDread",
+    "devCommand.graveyardShift.identityAura",
+    "devCommand.graveyardShift.resource"
   ],
   "tr_TR": [
     "devCommand.graveyardShift.abilities.barrowShroud.description",
@@ -195,7 +227,9 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.graveyardShift.abilities.sextonsChain.name",
     "devCommand.graveyardShift.abilities.shadowPulse.description",
     "devCommand.graveyardShift.abilities.shadowPulse.name",
-    "devCommand.graveyardShift.identityAura"
+    "devCommand.graveyardShift.errors.notEnoughDread",
+    "devCommand.graveyardShift.identityAura",
+    "devCommand.graveyardShift.resource"
   ],
   "sv_SE": [
     "devCommand.graveyardShift.abilities.barrowShroud.description",
@@ -206,7 +240,9 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.graveyardShift.abilities.sextonsChain.name",
     "devCommand.graveyardShift.abilities.shadowPulse.description",
     "devCommand.graveyardShift.abilities.shadowPulse.name",
-    "devCommand.graveyardShift.identityAura"
+    "devCommand.graveyardShift.errors.notEnoughDread",
+    "devCommand.graveyardShift.identityAura",
+    "devCommand.graveyardShift.resource"
   ],
   "vi_VN": [
     "devCommand.graveyardShift.abilities.barrowShroud.description",
@@ -217,7 +253,9 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.graveyardShift.abilities.sextonsChain.name",
     "devCommand.graveyardShift.abilities.shadowPulse.description",
     "devCommand.graveyardShift.abilities.shadowPulse.name",
-    "devCommand.graveyardShift.identityAura"
+    "devCommand.graveyardShift.errors.notEnoughDread",
+    "devCommand.graveyardShift.identityAura",
+    "devCommand.graveyardShift.resource"
   ],
   "da_DK": [
     "devCommand.graveyardShift.abilities.barrowShroud.description",
@@ -228,6 +266,8 @@ export const pending: Record<string, readonly string[]> = {
     "devCommand.graveyardShift.abilities.sextonsChain.name",
     "devCommand.graveyardShift.abilities.shadowPulse.description",
     "devCommand.graveyardShift.abilities.shadowPulse.name",
-    "devCommand.graveyardShift.identityAura"
+    "devCommand.graveyardShift.errors.notEnoughDread",
+    "devCommand.graveyardShift.identityAura",
+    "devCommand.graveyardShift.resource"
   ]
 };

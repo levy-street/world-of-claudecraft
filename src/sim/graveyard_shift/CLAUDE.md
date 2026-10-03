@@ -4,8 +4,8 @@ The player covers Morthen's shift in a private copy of the Hollow Crypt against 
 party of adventurer bots. Concept and lot plan live outside the repo while this is
 a prototype; this directory is built lot by lot. Today: the RUN SHELL (enter,
 exit, survive every exit), the MORTHEN IDENTITY (the owner becomes Morthen in
-the sim), the ADVENTURER PARTY (three bots, hostility, win and loss) and the
-PARTY BRAIN (the bots fight like a pickup group).
+the sim, on his own Dread bar: `dread.ts`), the ADVENTURER PARTY (three bots,
+hostility, win and loss) and the PARTY BRAIN (the bots fight like a pickup group).
 
 ## Contract
 - **Offline only while a prototype.** `canStartGraveyardShift` refuses unless
@@ -99,6 +99,24 @@ PARTY BRAIN (the bots fight like a pickup group).
   renew, lesser heal on the triage pick after a reaction delay, smite when all are
   healthy), mage (counterspell a cast, Fire Blast, then Frostbolt or Fireball).
 
+## Dread
+- **A `ResourceType` of its own** (`'dread'`, 0 to 100), never rage, energy or mana,
+  so no class-keyed or type-keyed branch fires: `updateRegen` has no arm for it
+  (no regen, no decay), the respawn and arena top-offs fall to 0.
+- **The profile owns the bar.** `applyMorthenProfile` sets the type and maximum and
+  takes the pool from BEFORE the recalc (`carriedDread`), because the base pass has
+  already reset the resource for the real class. The identity landing starts it at 0;
+  removal hands the real type back through the recalc, and the teardown's pool
+  restore puts the exact real value back.
+- **Earned** from every point of damage dealt (`dreadFromDamageDealt`, called from the
+  rage-from-damage hook in `combat/damage.ts`, rate `DREAD_PER_DAMAGE`) and from
+  Gravecall's `gainResource`. **Spent** by Shadow Pulse (30) and Barrow Shroud (40)
+  through the ordinary cost path; a short cast is refused with "Not enough Dread!"
+  (both cost checks in `casting_lifecycle.ts`), re-localized by
+  `error_text_i18n_core.ts` into a `devCommand.graveyardShift.*` key.
+- **Not persisted.** Offline only; `persistedResource` would write a warrior's Dread
+  as rage and a mana class's stale `savedMana`, a step-3 item with the save override.
+
 ## Known limits of the shell (each owned by a later lot)
 - **A non-damage death still runs `handleDeath`** (death counter, deeds death
   hooks, the `playerDeath` event). Lethal damage is clamped first; only `/dev kill`
@@ -131,6 +149,7 @@ PARTY BRAIN (the bots fight like a pickup group).
 | `death_intercept.ts` | the lethal-blow clamp `dealDamage` calls |
 | `bot_brain.ts` | pure leaf: reaction, interrupt and control rules, triage, target scoring, seeds |
 | `bot_driver.ts` | the per-tick party driver through the real player verbs |
+| `dread.ts` | pure leaf: the Dread rate, the damage hook, the carry rule |
 | `run_lifecycle.ts` | `canStartGraveyardShift`, `startGraveyardShift`, `endGraveyardShift`, `updateGraveyardShift` (the one tick entry, called just before the delve runs) |
 | `index.ts` | the public barrel |
 
