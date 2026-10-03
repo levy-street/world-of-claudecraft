@@ -108,14 +108,16 @@ hostility, win and loss) and the PARTY BRAIN (the bots fight like a pickup group
   already reset the resource for the real class. The identity landing starts it at 0;
   removal hands the real type back through the recalc, and the teardown's pool
   restore puts the exact real value back.
-- **Earned** from every point of damage dealt (`dreadFromDamageDealt`, called from the
-  rage-from-damage hook in `combat/damage.ts`, rate `DREAD_PER_DAMAGE`) and from
+- **Earned** from every hit landed (`dreadFromDamageDealt`, called from the
+  rage-from-damage hook in `combat/damage.ts`, rate `DREAD_PER_DAMAGE` rounded to a
+  whole point per hit so the pool stays an integer) and from
   Gravecall's `gainResource`. **Spent** by Shadow Pulse (30) and Barrow Shroud (40)
   through the ordinary cost path; a short cast is refused with "Not enough Dread!"
   (both cost checks in `casting_lifecycle.ts`), re-localized by
   `error_text_i18n_core.ts` into a `devCommand.graveyardShift.*` key.
 - **Not persisted.** Offline only; `persistedResource` would write a warrior's Dread
-  as rage and a mana class's stale `savedMana`, a step-3 item with the save override.
+  as rage and a mana class's stale `savedMana` (pinned in `tests/dread_resource.test.ts`),
+  a step of its own (save override, client mirror).
 
 ## Known limits of the shell (each owned by a later lot)
 - **A non-damage death still runs `handleDeath`** (death counter, deeds death

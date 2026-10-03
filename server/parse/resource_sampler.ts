@@ -42,7 +42,7 @@ export function resourceTypeCode(type: RecorderEntityView['resourceType']): numb
   // Dread is Morthen's bar on an offline-only Graveyard Shift run: it never
   // reaches a server fight and has no wire code, so it reads as no pool.
   if (type === undefined || type === null || type === 'dread') return 0;
-  return RESOURCE_TYPE_CODES[type];
+  return RESOURCE_TYPE_CODES[type] ?? 0;
 }
 
 export class ResourceSampler {

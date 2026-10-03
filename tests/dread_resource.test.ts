@@ -7,12 +7,14 @@ import {
   carriedDread,
   DREAD_MAX,
   DREAD_PER_DAMAGE,
+  dreadForHit,
   dreadFromDamageDealt,
   GRAVECALL_DREAD,
 } from '../src/sim/graveyard_shift/dread';
 import { MORTHEN_KIT } from '../src/sim/graveyard_shift/kit';
+import { persistedResource } from '../src/sim/serialize_resource';
 import { Sim } from '../src/sim/sim';
-import type { Aura, Entity, PlayerClass } from '../src/sim/types';
+import type { Aura, Entity, PlayerClass, SimEvent } from '../src/sim/types';
 import { resourceDisplayName } from '../src/ui/ability_tooltip_lines';
 import {
   createMorthenActionBarView,
@@ -69,6 +71,14 @@ function hitWolf(sim: Sim, wolf: Entity, amount: number) {
   (sim as any).dealDamage(sim.player, wolf, amount, false, 'shadow', null, 'hit', true);
 }
 
+// Every damage the player dealt this tick, from the tick's own events.
+function playerHits(sim: Sim, events: readonly SimEvent[]): number[] {
+  const hits: number[] = [];
+  for (const e of events)
+    if (e.type === 'damage' && e.sourceId === sim.playerId) hits.push(e.amount);
+  return hits;
+}
+
 function errors(sim: Sim): string[] {
   return sim.events.filter((e) => e.type === 'error').map((e) => (e as { text: string }).text);
 }
@@ -117,16 +127,41 @@ describe('Dread: the bar Morthen fights on', () => {
     expect(sim.player.resource).toBeCloseTo(10, 9);
   });
 
-  it('fills from real swings: the bar tracks every point of damage dealt', () => {
+  it('earns a whole point per hit, rounded to nearest, so the bar stays an integer', () => {
+    expect(dreadForHit(9)).toBe(0);
+    expect(dreadForHit(10)).toBe(1);
+    expect(dreadForHit(29)).toBe(1);
+    expect(dreadForHit(30)).toBe(2);
+    expect(dreadForHit(53)).toBe(3);
+    expect(dreadForHit(0)).toBe(0);
+    expect(dreadForHit(-40)).toBe(0);
+  });
+
+  it('never holds a fractional pool the frame would round up to a refused cost', () => {
+    // Ten 59-damage hits: a fractional pool would sit at 29.5, read "30" on the
+    // frame, and refuse the 30 Dread Pulse. Whole points per hit make it 30.
+    const sim = shiftSim('warrior');
+    start(sim);
+    const wolf = frozenWolfAhead(sim, 2);
+    for (let i = 0; i < 10; i++) hitWolf(sim, wolf, 59);
+    expect(sim.player.resource).toBe(30);
+    sim.castAbility('gshift_shadow_pulse');
+    expect(errors(sim)).not.toContain('Not enough Dread!');
+    expect(sim.player.castingAbility).toBe('gshift_shadow_pulse');
+  });
+
+  it('fills from real swings: the bar sums the whole Dread of every hit dealt', () => {
     const sim = shiftSim('warrior');
     start(sim);
     frozenWolfAhead(sim, 2);
-    const dealtBefore = meta(sim).counters.damageDealt;
     sim.player.autoAttack = true;
-    for (let i = 0; i < 20 * 10; i++) sim.tick();
-    const dealt = meta(sim).counters.damageDealt - dealtBefore;
-    expect(dealt).toBeGreaterThan(0);
-    expect(sim.player.resource).toBeCloseTo(Math.min(DREAD_MAX, dealt * DREAD_PER_DAMAGE), 6);
+    const hits: number[] = [];
+    for (let i = 0; i < 20 * 10; i++) hits.push(...playerHits(sim, sim.tick()));
+    expect(hits.length).toBeGreaterThan(1);
+    const earned = hits.reduce((sum, amount) => sum + dreadForHit(amount), 0);
+    expect(earned).toBeGreaterThan(0);
+    expect(Number.isInteger(sim.player.resource)).toBe(true);
+    expect(sim.player.resource).toBe(Math.min(DREAD_MAX, earned));
   });
 
   it('a real character dealing the same hit gains nothing from the Dread hook', () => {
@@ -148,7 +183,12 @@ describe('Dread: the bar Morthen fights on', () => {
     const dealt = meta(sim).counters.damageDealt - dealtBefore;
     expect(wolf.hp).toBeLessThan(wolf.maxHp);
     expect(dealt).toBeGreaterThanOrEqual(20);
-    expect(sim.player.resource).toBeCloseTo(GRAVECALL_DREAD + dealt * DREAD_PER_DAMAGE, 6);
+    expect(sim.player.resource).toBe(GRAVECALL_DREAD + dreadForHit(dealt));
+  });
+
+  it('Gravecall states the grant it really gives', () => {
+    const gravecall = MORTHEN_KIT.find((def) => def.id === 'gshift_gravecall')!;
+    expect(gravecall.description).toContain(`generates ${GRAVECALL_DREAD} Dread`);
   });
 
   it('Barrow Shroud spends 40 and Shadow Pulse spends 30', () => {
@@ -219,6 +259,12 @@ describe('Dread: the bar Morthen fights on', () => {
     for (let i = 0; i < 20 * 30; i++) sim.tick();
     expect(sim.player.inCombat).toBe(false);
     expect(sim.player.resource).toBe(50);
+    // The frozen wolf stays engaged once hit, so the in-combat leg runs last.
+    const wolf = frozenWolfAhead(sim, 2);
+    hitWolf(sim, wolf, 1);
+    for (let i = 0; i < 20 * 10; i++) sim.tick();
+    expect(sim.player.inCombat).toBe(true);
+    expect(sim.player.resource).toBe(50);
   });
 
   it.each(['warrior', 'mage'] as const)(
@@ -276,6 +322,12 @@ describe('Dread leaf rules', () => {
     expect(e.resource).toBe(30);
     dreadFromDamageDealt(e, 1e6);
     expect(e.resource).toBe(100);
+  });
+
+  it('pins what a save would write today: a warrior Dread as rage, a mana class its parked mana', () => {
+    expect(persistedResource('rage', 'dread', 70, 0)).toBe(70);
+    expect(persistedResource('mana', 'dread', 70, 0)).toBe(0);
+    expect(persistedResource('mana', 'dread', 70, 312)).toBe(312);
   });
 
   it('carries only a previous Dread pool, clamped to the bar', () => {

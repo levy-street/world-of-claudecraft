@@ -30,8 +30,7 @@ export const MORTHEN_KIT: readonly AbilityDef[] = [
       { type: 'directDamage', min: 20, max: 32, spellPowerCoeff: 0 },
       { type: 'gainResource', amount: GRAVECALL_DREAD },
     ],
-    description:
-      'Hurls a bolt of grave shadow at the target for 20 to 32 Shadow damage and generates 10 Dread.',
+    description: `Hurls a bolt of grave shadow at the target for 20 to 32 Shadow damage and generates ${GRAVECALL_DREAD} Dread.`,
   },
   {
     // The template's Shadow Pulse (12 to 18 damage, 12 yards, every 10 sec) as a

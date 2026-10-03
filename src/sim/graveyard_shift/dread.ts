@@ -9,7 +9,10 @@ import type { Entity, ResourceType } from '../types';
 
 export const DREAD_MAX = 100;
 
-// One Dread per 20 damage dealt, any school, swing or spell. Rate check: the
+// One Dread per 20 damage dealt, any school, swing or spell, rounded to a whole
+// point per hit so the pool stays an integer: the frame text (rounded) then
+// never shows a cost the cast refuses, and no float drift leaves a pool a hair
+// under a cost. Rounding to nearest keeps the average rate. Rate check: the
 // template swing (41 to 65 every 2.6 sec) and Gravecall (20 to 32 every 6 sec)
 // deal about 24 damage a second before mitigation, so about 1.2 Dread a second,
 // and Gravecall's own grant (GRAVECALL_DREAD every 6 sec) adds about 1.7 more.
@@ -18,9 +21,18 @@ export const DREAD_MAX = 100;
 export const DREAD_PER_DAMAGE = 1 / 20;
 export const GRAVECALL_DREAD = 10;
 
+// The whole Dread one hit of `amount` damage earns.
+export function dreadForHit(amount: number): number {
+  return amount > 0 ? Math.round(amount * DREAD_PER_DAMAGE) : 0;
+}
+
+// Every hit he lands counts, including the noRage ones (reflects and the like)
+// that rage-from-damage skips: Dread measures harm done, not swings taken.
 export function dreadFromDamageDealt(source: Entity, amount: number): void {
-  if (source.resourceType !== 'dread' || amount <= 0) return;
-  source.resource = Math.min(source.maxResource, source.resource + amount * DREAD_PER_DAMAGE);
+  if (source.resourceType !== 'dread') return;
+  const gain = dreadForHit(amount);
+  if (gain === 0) return;
+  source.resource = Math.min(source.maxResource, source.resource + gain);
 }
 
 // The Dread a recalc hands back: the pool before the recalc when it was

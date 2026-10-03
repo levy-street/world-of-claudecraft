@@ -112,6 +112,10 @@ describe('resourceTypeCode', () => {
     expect(Object.keys(RESOURCE_TYPE_CODES)).not.toContain('dread');
   });
 
+  test('codes a type outside the union (a stray JSON string) as no pool', () => {
+    expect(resourceTypeCode('runic' as unknown as 'mana')).toBe(0);
+  });
+
   test('gives every type a distinct non-zero code', () => {
     const codes = Object.values(RESOURCE_TYPE_CODES);
     expect(new Set(codes).size).toBe(codes.length);
