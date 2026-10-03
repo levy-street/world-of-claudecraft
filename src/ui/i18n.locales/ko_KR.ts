@@ -19256,7 +19256,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.fireAndFly.brief.deluge':
     '족히 백은 넘는 놈들이네. 늑대, 멧돼지, 거미, 굴착꾼까지, 작은 짐승들의 물결이 사방에서 한꺼번에 밀려들고, 물러날 줄을 모른다네. 버티게, 마지막 순간까지 기세가 꺾이지 않을 테니.',
   'questUi.worldQuest.fireAndFly.brief.brittle':
-    '그 낡은 탑은 지난 철에 끔찍한 일격을 맞았고, 금은 끝내 아물지 않았네. 오늘 밤 망자들이 일어나 탑으로 진군해 오지. 많아야 열 번 맞으면 무너질 걸세. 이쪽에 남은 건 그 탑뿐이니, 지켜 주게.',
+    '그 낡은 탑은 지난 철에 끔찍한 일격을 맞았고, 금은 끝내 아물지 않았네. 오늘 밤 망자들이 일어나 탑으로 진군해 오지. 많아야 일곱 번 맞으면 무너질 걸세. 이쪽에 남은 건 그 탑뿐이니, 지켜 주게.',
   'questUi.worldQuest.fireAndFly.brief.powder':
     '화약고가 넘쳐나서, 평소의 두 배나 되는 화약통을 밖에, 그것도 놈들이 지나는 길 한복판에 쌓아 둘 수밖에 없었네. 그런데 화약 냄새에 이끌려 대장간의 괴물들이 몰려오고 있지. 뜨거워질 걸세, 포수.',
   'questUi.worldQuest.fireAndFly.greeting.trials':

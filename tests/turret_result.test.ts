@@ -51,9 +51,9 @@ describe('the medal bars of each scenario', () => {
     });
     // One tower and one medal rule for every trial since lot R5b.
     expect(bars).toEqual([
-      ['introduction', 95, 60],
-      ['standard', 95, 60],
-      ['hard', 95, 60],
+      ['introduction', 67, 42],
+      ['standard', 67, 42],
+      ['hard', 67, 42],
     ]);
     expect(turretMedalBarPoints(0.9, 100)).toBe(90);
     expect(turretMedalBarPoints(0.901, 100)).toBe(91);
@@ -101,15 +101,15 @@ describe('the points', () => {
   const plan = resolveTurretPlan();
 
   it('adds each term: kills, tower points kept, keg kills and bodies bowled over', () => {
-    const r = turretResult(plan, final('won', 99, { kills: 71, barrelKills: 4, bowled: 17 }));
+    const r = turretResult(plan, final('won', 69, { kills: 71, barrelKills: 4, bowled: 17 }));
     expect(r.breakdown).toEqual({
       kills: 71 * TURRET_POINTS.kill,
-      integrity: 99 * TURRET_POINTS.integrity,
+      integrity: 69 * TURRET_POINTS.integrity,
       kegKills: 4 * TURRET_POINTS.kegKill,
       bowled: 17 * TURRET_POINTS.bowled,
       charges: 0,
     });
-    expect(r.points).toBe(1420 + 19_800 + 20 + 17);
+    expect(r.points).toBe(1420 + 13_800 + 20 + 17);
     expect(r).toMatchObject({ won: true, medal: 'gold' });
   });
 
@@ -134,7 +134,7 @@ describe('the points', () => {
     const most = { barrelKills: 10_000, bowled: 10_000 };
 
     it('a tower point more outranks every bonus, the kills equal', () => {
-      for (const integrity of [1, 59, 60, 89, 99]) {
+      for (const integrity of [1, 41, 42, 66, 69]) {
         const cleaner = turretResult(plan, final('won', integrity + 1, { kills: 70 }));
         const funnier = turretResult(plan, final('won', integrity, { kills: 70, ...most }));
         expect(cleaner.points).toBeGreaterThan(funnier.points);
@@ -155,8 +155,11 @@ describe('the points', () => {
     });
 
     it('breaks a tie between equal defenses by the fun parts', () => {
-      const plain = turretResult(plan, final('won', 100, { kills: 71 }));
-      const kegs = turretResult(plan, final('won', 100, { kills: 71, barrelKills: 3, bowled: 9 }));
+      const plain = turretResult(plan, final('won', plan.integrity, { kills: 71 }));
+      const kegs = turretResult(
+        plan,
+        final('won', plan.integrity, { kills: 71, barrelKills: 3, bowled: 9 }),
+      );
       expect(kegs.points - plain.points).toBe(3 * TURRET_POINTS.kegKill + 9);
     });
   });
@@ -175,17 +178,22 @@ describe("a won mission's unused charges", () => {
     expect(mission.arsenal).toEqual({ shockwave: 4, fragmentation: 1 });
     // Both resupplies came: 6 Shockwaves and 3 frags given, 2 and 1 spent.
     const stats = { kills: 30, shockwaves: 2, frags: 1, resupplies: 2 };
-    const r = turretResult(mission, final('won', 100, stats));
+    const r = turretResult(mission, final('won', mission.integrity, stats));
     expect(r.breakdown.charges).toBe((4 + 2) * TURRET_POINTS.unusedCharge);
-    expect(r.points).toBe(30 * TURRET_POINTS.kill + 100 * TURRET_POINTS.integrity + 360);
-    const none = turretResult(mission, final('won', 100, { ...stats, shockwaves: 6, frags: 3 }));
+    expect(r.points).toBe(
+      30 * TURRET_POINTS.kill + mission.integrity * TURRET_POINTS.integrity + 360,
+    );
+    const none = turretResult(
+      mission,
+      final('won', mission.integrity, { ...stats, shockwaves: 6, frags: 3 }),
+    );
     expect(none.breakdown.charges).toBe(0);
   });
 
   it('scores nothing for a lost mission or any trial, and moves no medal', () => {
     const lost = turretResult(mission, final('lost', 0, { resupplies: 1 }));
     expect(lost.breakdown.charges).toBe(0);
-    const won = turretResult(trial, final('won', 100));
+    const won = turretResult(trial, final('won', trial.integrity));
     expect(trial.chargeBonus).toBe(false);
     expect(won.breakdown.charges).toBe(0);
     const gold = turretMedalBarPoints(mission.medals.gold.minIntegrityShare, mission.integrity);
@@ -195,8 +203,8 @@ describe("a won mission's unused charges", () => {
   });
 
   it('outranks no tower point kept: spending a charge that saves one always pays', () => {
-    const hoarder = turretResult(mission, final('won', 97, { kills: 30 }));
-    const spender = turretResult(mission, final('won', 98, { kills: 30, shockwaves: 1 }));
+    const hoarder = turretResult(mission, final('won', 68, { kills: 30 }));
+    const spender = turretResult(mission, final('won', 69, { kills: 30, shockwaves: 1 }));
     expect(spender.points).toBeGreaterThan(hoarder.points);
   });
 });
@@ -267,7 +275,7 @@ describe('the result at the end of a run', () => {
     state.phase = 'wave';
     state.wave = plan.waves.length - 1;
     state.spawnCursor = plan.waves[state.wave].spawns.length;
-    state.integrity = 94;
+    state.integrity = 66;
     const events = tickTurretDefense(state, START + TURRET_TIMING.introTicks, flat);
     expect(state.phase).toBe('won');
     expect(state.result).toMatchObject({ won: true, medal: 'silver' });

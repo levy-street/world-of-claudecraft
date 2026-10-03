@@ -197,9 +197,9 @@ not a classic-era formula. Pinned by `tests/turret_scenarios.test.ts` and
 
 - **Medal** from the share of the tower's points still standing: bronze for any
   win, silver and gold at the scenario's bars (`medals` on the scenario), none for
-  a loss. Since lot R5b every trial and mission holds a 100-point tower
-  (`TURRET_TOWER_POINTS`) under one rule (`TURRET_MEDALS`): gold while it keeps 95
-  percent, silver 60. The Cracked Tower keeps its 10 points (its idea) and gold for
+  a loss. Every trial and mission holds a 70-point tower (`TURRET_TOWER_POINTS`, 100
+  in lot R5b, 70 after the playtest that found the tower's foot carried no threat) under one rule (`TURRET_MEDALS`): gold while it keeps 95
+  percent, silver 60. The Cracked Tower keeps its 7 points (its idea) and gold for
   a tower nothing struck. The difficulty is in the waves, never in the bars; pinned
   by `tests/turret_scenarios.test.ts`.
 - **Points** (`TURRET_POINTS`) rank runs holding the same medal: a share per

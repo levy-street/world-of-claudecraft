@@ -4,6 +4,7 @@ import {
   TURRET_DEFAULT_SCENARIO,
   TURRET_SCENARIOS,
 } from '../src/sim/content/fire_and_fly_scenarios';
+import { TURRET_TOWER_POINTS } from '../src/sim/content/turret_defense';
 import { WISP_MAZE_QUEST_ID } from '../src/sim/content/world_quest_wisp_maze';
 import { DUNGEON_X_THRESHOLD, dungeonAt, PLAYER_START } from '../src/sim/data';
 import { handleDevTurretChat } from '../src/sim/dev_turret_defense';
@@ -88,14 +89,14 @@ describe('/dev turret', () => {
     const plan = sim.turretSession?.defense.plan;
     expect(plan?.scenarioId).toBe(TURRET_DEFAULT_SCENARIO.id);
     expect(plan?.scenarioId).toBe('fire_and_fly_standard');
-    expect(sim.turretSession?.defense.integrity).toBe(100);
+    expect(sim.turretSession?.defense.integrity).toBe(TURRET_TOWER_POINTS);
   });
 
   it.each([
-    ['introduction', 'introduction', 100],
-    ['hard', 'hard', 100],
-    ['HARD', 'hard', 100],
-    ['fire_and_fly_introduction', 'introduction', 100],
+    ['introduction', 'introduction', TURRET_TOWER_POINTS],
+    ['hard', 'hard', TURRET_TOWER_POINTS],
+    ['HARD', 'hard', TURRET_TOWER_POINTS],
+    ['fire_and_fly_introduction', 'introduction', TURRET_TOWER_POINTS],
   ])('runs the scenario named by /dev turret %s', (word, key, integrity) => {
     const { sim } = rig();
     const scenario = TURRET_SCENARIOS.find((s) => s.boardKey === key)!;

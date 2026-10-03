@@ -7,6 +7,7 @@ import {
   TURRET_SCENARIO_INTRODUCTION,
   TURRET_SCENARIO_STANDARD,
 } from '../src/sim/content/fire_and_fly_scenarios';
+import { TURRET_TOWER_POINTS } from '../src/sim/content/turret_defense';
 import {
   FIRE_AND_FLY_NPC_DEF,
   FIRE_AND_FLY_NPC_ID,
@@ -129,20 +130,20 @@ describe('the score of a won run', () => {
   it('scores a practice win after the day reward, as the glider practice feeds its ladders', () => {
     const { sim, meta } = atTheGate();
     sim.talkToNpc(FIRE_AND_FLY_NPC_ID);
-    forceWin(meta, 99);
+    forceWin(meta, 69);
     const paid = sim.tick();
     expect(scores(paid)).toHaveLength(1);
     expect(meta.worldQuestLog.get(FIRE_AND_FLY_QUEST_ID)?.state).toBe('completed');
     sim.leaveVehicle();
     sim.talkToNpc(FIRE_AND_FLY_NPC_ID);
     expect(seat(meta).worldQuest?.practice).toBe(true);
-    forceWin(meta, 70);
+    forceWin(meta, 50);
     const practice = sim.tick();
     expect(scores(practice)).toEqual([
       expect.objectContaining({
         board: 'fire_and_fly_standard_v2_lifetime',
         medal: 'silver',
-        metric: 70 * 200 + 20 * 20,
+        metric: 50 * 200 + 20 * 20,
       }),
     ]);
     // The day's best stays the gold run.
@@ -152,7 +153,7 @@ describe('the score of a won run', () => {
   it('emits once per run however many won ticks follow', () => {
     const { sim, meta } = atTheGate();
     sim.talkToNpc(FIRE_AND_FLY_NPC_ID);
-    forceWin(meta, 100);
+    forceWin(meta, TURRET_TOWER_POINTS);
     const events = [...sim.tick(), ...sim.tick(), ...sim.tick(), ...sim.tick()];
     expect(scores(events)).toHaveLength(1);
     expect(seat(meta).worldQuest?.scored).toBe(true);
@@ -161,7 +162,7 @@ describe('the score of a won run', () => {
   it('never scores a dev seat', () => {
     const { sim, meta } = atTheGate();
     sim.chat('/dev turret');
-    forceWin(meta, 100);
+    forceWin(meta, TURRET_TOWER_POINTS);
     expect(scores([...sim.tick(), ...sim.tick()])).toEqual([]);
     expect(meta.fireAndFlyRecords).toEqual({});
   });
@@ -184,7 +185,7 @@ describe('the score of a won run', () => {
   it('never scores a win on the tick the day rolls over', () => {
     const { sim, meta } = atTheGate();
     sim.talkToNpc(FIRE_AND_FLY_NPC_ID);
-    forceWin(meta, 100);
+    forceWin(meta, TURRET_TOWER_POINTS);
     sim.resetDay = '2026-09-07';
     expect(scores([...sim.tick(), ...sim.tick()])).toEqual([]);
     expect(meta.fireAndFlyRecords).toEqual({});
@@ -193,7 +194,7 @@ describe('the score of a won run', () => {
   it('keeps the records in the world quest save and restores them', () => {
     const { sim, meta } = atTheGate();
     sim.startWorldQuestActivity(FIRE_AND_FLY_QUEST_ID, { courseId: TURRET_SCENARIO_STANDARD.id });
-    forceWin(meta, 99);
+    forceWin(meta, 69);
     sim.tick();
     const saved = savedWorldQuestState(meta).worldQuests;
     expect(saved?.fireAndFlyRecords).toEqual(meta.fireAndFlyRecords);
@@ -206,10 +207,10 @@ describe('the score of a won run', () => {
   it('serves the offline personal page through IWorld', async () => {
     const { sim, meta } = atTheGate();
     sim.talkToNpc(FIRE_AND_FLY_NPC_ID);
-    forceWin(meta, 99);
+    forceWin(meta, 69);
     sim.tick();
     const page = await sim.worldQuestLeaderboard('fire_and_fly_standard_v2_daily');
     expect(page).toMatchObject({ board: 'fire_and_fly_standard_v2_daily', personal: true });
-    expect(page.self).toMatchObject({ rank: 1, medal: 'gold', metric: 99 * 200 + 20 * 20 });
+    expect(page.self).toMatchObject({ rank: 1, medal: 'gold', metric: 69 * 200 + 20 * 20 });
   });
 });

@@ -123,16 +123,16 @@ describe('the turret HUD view', () => {
     expect(frame.integrityNow).toBe(String(intro.integrity));
     expect(frame.integrityText).toBe(`${intro.integrity}/${intro.integrity}`);
     expect(frame.integrity).toBe(1);
-    session.defense.integrity = 20;
+    session.defense.integrity = 14;
     session.defense.rev++;
     const hurt = view.tick(turretSessionView(session), START);
-    expect(hurt.integrity).toBeCloseTo(20 / intro.integrity, 12);
-    expect(hurt.integrityText).toBe(`20/${intro.integrity}`);
+    expect(hurt.integrity).toBeCloseTo(14 / intro.integrity, 12);
+    expect(hurt.integrityText).toBe(`14/${intro.integrity}`);
     expect(hurt.low).toBe(true);
     session.defense.phase = 'lost';
     session.defense.rev++;
     const ended = view.tick(turretSessionView(session), START);
-    expect(ended.result?.rows[TURRET_RESULT_ROWS - 1].value).toBe(`20/${intro.integrity}`);
+    expect(ended.result?.rows[TURRET_RESULT_ROWS - 1].value).toBe(`14/${intro.integrity}`);
   });
 
   it('names the seat, its rail and its Leave and Replay buttons in the tower wording', () => {
@@ -175,7 +175,7 @@ describe('the turret HUD view', () => {
     const session = seat();
     session.defense.phase = 'wave';
     session.defense.wave = 2;
-    session.defense.integrity = 20;
+    session.defense.integrity = 14;
     const frame = new TurretHudView().tick(turretSessionView(session), START);
     expect(frame.wave).toBe('Wave 3/6');
     expect(frame.slot).toBe(
@@ -189,7 +189,7 @@ describe('the turret HUD view', () => {
     const session = seat();
     session.defense.phase = 'won';
     session.defense.wave = 5;
-    session.defense.integrity = 72;
+    session.defense.integrity = 50;
     Object.assign(session.defense.stats, {
       shots: 40,
       hits: 30,
@@ -213,13 +213,13 @@ describe('the turret HUD view', () => {
       leaving: '',
       pointRows: [
         { label: 'Kills (55)', value: '+1,100' },
-        { label: 'Tower kept (72)', value: '+14,400' },
+        { label: 'Tower kept (50)', value: '+10,000' },
         { label: 'Keg kills (3)', value: '+15' },
         // The bonus stops under one tower point, however many bodies were bowled over.
         { label: 'Bowled over (1,234)', value: '+184' },
         // A trial scores no charge kept: the painter hides the blank row.
         { label: '', value: '' },
-        { label: 'Total points', value: '15,699' },
+        { label: 'Total points', value: '11,299' },
       ],
       rows: [
         { label: 'Kills', value: '55' },
@@ -230,7 +230,7 @@ describe('the turret HUD view', () => {
         // Used of those given: no points attached (a weapon kill scores as any kill).
         { label: 'Shockwaves', value: '1/2' },
         { label: 'Fragmentation Shells', value: '3/3' },
-        { label: 'Tower', value: `72/${TURRET_SCENARIO_STANDARD.integrity}` },
+        { label: 'Tower', value: `50/${TURRET_SCENARIO_STANDARD.integrity}` },
       ],
     });
     expect(frame.result?.rows).toHaveLength(TURRET_RESULT_ROWS);
@@ -278,7 +278,7 @@ describe('the turret HUD view', () => {
     const session = seat();
     session.defense.phase = 'won';
     session.defense.wave = 5;
-    session.defense.integrity = 99;
+    session.defense.integrity = 69;
     Object.assign(session.defense.stats, { kills: 71, barrelKills: 4, bowled: 17 });
     session.defense.result = turretResult(session.defense.plan, session.defense);
     const offline = turretSessionView(session);
@@ -289,7 +289,7 @@ describe('the turret HUD view', () => {
     const onlineResult = new TurretHudView().tick(online, START).result;
     expect(onlineResult?.scored).toBe(true);
     expect(onlineResult?.medalText).toBe('Gold medal');
-    expect(onlineResult?.pointRows[5]).toEqual({ label: 'Total points', value: '21,257' });
+    expect(onlineResult?.pointRows[5]).toEqual({ label: 'Total points', value: '15,257' });
     expect(onlineResult).toEqual(offlineResult);
   });
 
@@ -303,9 +303,9 @@ describe('the turret HUD view', () => {
       const result = view.tick(turretSessionView(session), START).result;
       return [result?.medal, result?.medalText];
     };
-    expect(medalAt(99)).toEqual(['gold', 'Gold medal']);
-    expect(medalAt(60)).toEqual(['silver', 'Silver medal']);
-    expect(medalAt(59)).toEqual(['bronze', 'Bronze medal']);
+    expect(medalAt(69)).toEqual(['gold', 'Gold medal']);
+    expect(medalAt(42)).toEqual(['silver', 'Silver medal']);
+    expect(medalAt(41)).toEqual(['bronze', 'Bronze medal']);
   });
 
   it('hides the medal and the points while an ended view carries no result', () => {
@@ -463,8 +463,8 @@ describe('the turret HUD live line', () => {
       session.defense.result = turretResult(session.defense.plan, session.defense);
       return new TurretHudView().tick(turretSessionView(session), START).announce;
     };
-    expect(ended('won', 99)).toBe('Victory! Gold medal');
-    expect(ended('won', 59)).toBe('Victory! Bronze medal');
+    expect(ended('won', 69)).toBe('Victory! Gold medal');
+    expect(ended('won', 41)).toBe('Victory! Bronze medal');
     expect(ended('lost', 0)).toBe('The tower has fallen');
   });
 

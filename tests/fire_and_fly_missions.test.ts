@@ -268,11 +268,11 @@ describe('the mission table', () => {
     for (const wave of waves) expect(wave.arrival).toBeUndefined();
   });
 
-  it('gives The Cracked Tower 10 tower points and no large or huge monster', () => {
+  it('gives The Cracked Tower 7 tower points and no large or huge monster', () => {
     const plan = resolveTurretPlan(TURRET_MISSION_BRITTLE);
-    expect(plan.integrity).toBe(10);
+    expect(plan.integrity).toBe(7);
     for (const kind of plan.kinds) expect(['small', 'medium']).toContain(kind.sizeClass);
-    // Gold is an untouched tower, silver six points of ten.
+    // Gold is an untouched tower, silver at 60 percent of it.
     expect(plan.medals).toEqual({
       gold: { minIntegrityShare: 1 },
       silver: { minIntegrityShare: 0.6 },

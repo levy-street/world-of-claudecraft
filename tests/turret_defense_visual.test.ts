@@ -1983,6 +1983,13 @@ describe('Fire and Fly own shot on screen', () => {
       let dispatched = 0;
       let phantoms = 0;
       const shotsFired = () => sim.turretSession?.defense.stats.shots ?? 0;
+      // The clicks land on a ring, not on the monsters, so a minute of them lets the tower
+      // fall; a run lost while a click is in flight refuses it, which no mirror can foresee.
+      // The tower is mended before every tick: the seat stays live for the whole window.
+      const mendTower = () => {
+        const vehicle = sim.meta(pid)?.vehicle;
+        if (vehicle?.kind === 'turret') vehicle.defense.integrity = vehicle.defense.plan.integrity;
+      };
       for (let frame = 0; frame < FPS * (seconds + 5); frame++) {
         now = frame / FPS;
         while (serverTicks * DT <= now) {
@@ -1991,6 +1998,7 @@ describe('Fire and Fly own shot on screen', () => {
             dispatchVehicleCommand(sim, pid, JSON.parse(JSON.stringify(uplink.shift()!.command)));
             if (sentPlayed[dispatched++] && shotsFired() === before) phantoms++;
           }
+          mendTower();
           const events = sim.tick().filter((e) => e.pid === pid);
           for (const e of events) {
             if (e.type === 'turretDefense' && e.event.type === 'fired') fired++;
@@ -2041,6 +2049,7 @@ describe('Fire and Fly own shot on screen', () => {
         } else host.visual.update(client.turretSession, client.turretClock, now, 1 / FPS);
         host.sounds.update(client.turretSession, client.turretClock);
       }
+      expect(sim.turretSession?.defense.phase).toBe('wave');
       expect(fired).toBeGreaterThan(20);
       expect(shotsFired()).toBe(fired);
       expect(sentPlayed).toHaveLength(dispatched);

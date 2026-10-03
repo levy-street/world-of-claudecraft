@@ -293,7 +293,7 @@ describe('the slam', () => {
     const events = run(state, strike + 20);
     expect(ofType(events, 'breach')).toEqual([]);
     expect(ofType(events, 'shockwaveHit').flatMap((e) => e.hits.map((h) => h.id))).toEqual([m.id]);
-    expect(state.integrity).toBe(100);
+    expect(state.integrity).toBe(state.plan.integrity);
     expect(m.hp).toBeGreaterThan(0);
   });
 

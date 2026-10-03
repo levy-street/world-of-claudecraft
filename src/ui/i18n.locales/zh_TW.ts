@@ -18347,7 +18347,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.fireAndFly.brief.deluge':
     '少說也有上百隻：狼、野豬、蜘蛛和掘地者，一股小獸的洪流從四面八方同時湧來，從不退去。頂住，直到最後一刻它都不會減弱。',
   'questUi.worldQuest.fireAndFly.brief.brittle':
-    '這座老塔上個季節挨了一記重擊，裂縫始終沒有合上。今夜亡者復起，朝它進軍：最多十下，它就會倒塌。這一側我們只剩下它了，守住它。',
+    '這座老塔上個季節挨了一記重擊，裂縫始終沒有合上。今夜亡者復起，朝它進軍：最多七下，它就會倒塌。這一側我們只剩下它了，守住它。',
   'questUi.worldQuest.fireAndFly.brief.powder':
     '火藥庫已經塞不下了，我只好把兩倍的火藥桶堆在外面，正好擋在牠們的必經之路上。偏偏這時熔爐的怪物們來了，是被火藥味引來的。要熱鬧起來了，砲手。',
   'questUi.worldQuest.fireAndFly.greeting.trials':

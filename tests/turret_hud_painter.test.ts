@@ -2,12 +2,12 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { TURRET_MISSION_BRITTLE } from '../src/sim/content/fire_and_fly_missions';
 import {
   TURRET_SCENARIO_HARD,
-  TURRET_SCENARIO_INTRODUCTION,
   TURRET_SCENARIO_STANDARD,
 } from '../src/sim/content/fire_and_fly_scenarios';
-import { TURRET_TIMING } from '../src/sim/content/turret_defense';
+import { TURRET_TIMING, TURRET_TOWER_POINTS } from '../src/sim/content/turret_defense';
 import { createTurretDefense } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { turretResult } from '../src/sim/minigames/turret_result';
@@ -144,12 +144,14 @@ describe('the turret HUD painter', () => {
     painter.show(true);
     painter.paint(view.tick(turretSessionView(seat()), START), 'Esc');
     expect(painter.rail.getAttribute('aria-valuemin')).toBe('0');
-    expect(painter.rail.getAttribute('aria-valuemax')).toBe('100');
-    expect(painter.rail.getAttribute('aria-valuenow')).toBe('100');
+    expect(painter.rail.getAttribute('aria-valuemax')).toBe(String(TURRET_TOWER_POINTS));
+    expect(painter.rail.getAttribute('aria-valuenow')).toBe(String(TURRET_TOWER_POINTS));
     view.reset();
-    const intro = seat(resolveTurretPlan(TURRET_SCENARIO_INTRODUCTION));
-    painter.paint(view.tick(turretSessionView(intro), START), 'Esc');
-    const max = String(TURRET_SCENARIO_INTRODUCTION.integrity);
+    // The Cracked Tower holds fewer points than every other seat: the rail must follow it.
+    const brittle = seat(resolveTurretPlan(TURRET_MISSION_BRITTLE));
+    painter.paint(view.tick(turretSessionView(brittle), START), 'Esc');
+    const max = String(TURRET_MISSION_BRITTLE.integrity);
+    expect(max).not.toBe(String(TURRET_TOWER_POINTS));
     expect(painter.rail.getAttribute('aria-valuemax')).toBe(max);
     expect(painter.rail.getAttribute('aria-valuenow')).toBe(max);
     expect(painter.rail.querySelector('.turret-rail-value')!.textContent).toBe(`${max}/${max}`);
@@ -244,7 +246,7 @@ describe('the turret HUD painter', () => {
   it('names the medal beside its tinted disc and lists the points, then writes nothing more', () => {
     const { painter, writes, view } = rig();
     painter.show(true);
-    const won = ended('won', 99);
+    const won = ended('won', 69);
     painter.paint(view.tick(turretSessionView(won), START), 'Esc');
     const medal = painter.strip.querySelector<HTMLElement>('.turret-card-medal')!;
     const icon = medal.querySelector<HTMLElement>('.turret-card-medal-icon')!;
@@ -262,22 +264,22 @@ describe('the turret HUD painter', () => {
       ]),
     ).toEqual([
       ['Kills (71)', '+1,420'],
-      ['Tower kept (99)', '+19,800'],
+      ['Tower kept (69)', '+13,800'],
       ['Keg kills (0)', '0'],
       ['Bowled over (0)', '0'],
       ['', ''],
-      ['Total points', '21,220'],
+      ['Total points', '15,220'],
     ]);
     // A trial scores no charge kept: its row is hidden, the total stays the last row.
     const rows = [...points.querySelectorAll<HTMLElement>('.ui-stat-row')];
     expect(rows.map((row) => row.style.display)).toEqual(['', '', '', '', 'none', '']);
     expect(points.lastElementChild!.classList.contains('turret-card-total')).toBe(true);
-    const view99 = turretSessionView(won);
+    const wonView = turretSessionView(won);
     writes.mockClear();
-    for (let i = 0; i < 10; i++) painter.paint(view.tick(view99, START + i), 'Esc');
+    for (let i = 0; i < 10; i++) painter.paint(view.tick(wonView, START + i), 'Esc');
     expect(writes).not.toHaveBeenCalled();
 
-    painter.paint(view.tick(turretSessionView(ended('won', 70)), START), 'Esc');
+    painter.paint(view.tick(turretSessionView(ended('won', 50)), START), 'Esc');
     expect(medal.querySelector('.turret-card-medal-text')!.textContent).toBe('Silver medal');
     expect(tints(medal)).toEqual(['silver']);
     painter.paint(view.tick(turretSessionView(ended('lost', 0)), START), 'Esc');

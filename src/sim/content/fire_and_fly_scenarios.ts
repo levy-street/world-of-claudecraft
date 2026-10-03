@@ -11,7 +11,7 @@
 // a field-aware one, the stand-in for a good player (shells led onto the strike that
 // comes first, a keg as a group passes it, a frag on a pack standing clear of any
 // keg, a Shockwave at 2 strikes due), which reads the field exactly, and the same policy
-// reading it 0.4 s late. Every trial's tower holds 100 points under the one medal rule
+// reading it 0.4 s late. Every trial's tower holds 70 points under the one medal rule
 // (gold keeps 95 percent, silver 60), so the waves carry the difficulty (lot R5b): a
 // player firing 0.4 s after each reload golds the Recruit's Trial
 // every run (a school, not a test: everyone up to 2 s wins it, with silver at 1 s); Standing

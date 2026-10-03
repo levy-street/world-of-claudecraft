@@ -141,9 +141,10 @@ describe('the scenario table', () => {
     }
   });
 
-  it('gives every trial and mission a 100-point tower and the one medal rule, The Cracked Tower its own', () => {
-    // Lot R5b: the difficulty is in the waves, never in the tower or the bars.
-    expect(TURRET_TOWER_POINTS).toBe(100);
+  it('gives every trial and mission a 70-point tower and the one medal rule, The Cracked Tower its own', () => {
+    // Lot R5b: the difficulty is in the waves, never in the tower or the bars; 70 points
+    // since the playtest that found a crowd at the tower's foot carried no threat.
+    expect(TURRET_TOWER_POINTS).toBe(70);
     expect(TURRET_MEDALS).toEqual({
       gold: { minIntegrityShare: 0.95 },
       silver: { minIntegrityShare: 0.6 },
@@ -151,19 +152,19 @@ describe('the scenario table', () => {
     for (const def of [...TURRET_SCENARIOS, ...TURRET_MISSIONS]) {
       const plan = resolveTurretPlan(def);
       if (def.boardKey === 'brittle') {
-        // Its 10 points are its identity: gold is a tower nothing struck.
-        expect([plan.integrity, plan.medals.gold.minIntegrityShare]).toEqual([10, 1]);
+        // Its 7 points are its identity: gold is a tower nothing struck.
+        expect([plan.integrity, plan.medals.gold.minIntegrityShare]).toEqual([7, 1]);
         expect(plan.medals.silver).toEqual(TURRET_MEDALS.silver);
         continue;
       }
-      expect(plan.integrity, def.id).toBe(100);
+      expect(plan.integrity, def.id).toBe(70);
       expect(plan.medals, def.id).toEqual(TURRET_MEDALS);
     }
   });
 
-  it('keeps Standard the original run: the same wave table and 100 tower points', () => {
+  it('keeps Standard the original run: the same wave table and the common tower', () => {
     expect(TURRET_SCENARIO_STANDARD.waves).toBe(TURRET_WAVES);
-    expect(TURRET_SCENARIO_STANDARD.integrity).toBe(100);
+    expect(TURRET_SCENARIO_STANDARD.integrity).toBe(TURRET_TOWER_POINTS);
     for (const wave of TURRET_WAVES) expect(wave.arrival).toBeUndefined();
     for (const e of TURRET_WAVES.flatMap((w) => w.entries)) expect(e.hpScale).toBeUndefined();
   });
@@ -263,7 +264,7 @@ describe('resolving a scenario into a plan', () => {
     const plan = resolveTurretPlan();
     expect(resolveTurretPlan(TURRET_SCENARIO_STANDARD)).toEqual(plan);
     expect(plan.scenarioId).toBe('fire_and_fly_standard');
-    expect(plan.integrity).toBe(100);
+    expect(plan.integrity).toBe(70);
     expect(plan.arsenal).toEqual({ shockwave: 8, fragmentation: 0 });
     for (const wave of plan.waves) expect(wave.arrival).toEqual({ kind: 'ring' });
     // The resolved plan, byte for byte: lot R4 retuned the table for the 0.8 s strike, lot
@@ -303,7 +304,8 @@ describe('resolving a scenario into a plan', () => {
         ...TURRET_SCENARIO_STANDARD,
         medals: { gold: { minIntegrityShare: gold }, silver: { minIntegrityShare: silver } },
       });
-    expect(bars(1, 0.99)).not.toThrow();
+    // Silver one whole point under gold, the closest the bars may stand.
+    expect(bars(1, 0.98)).not.toThrow();
     for (const [gold, silver] of [
       [0.6, 0.6],
       [0.5, 0.6],

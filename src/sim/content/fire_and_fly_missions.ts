@@ -4,8 +4,8 @@
 // mini-game tuning, not classic-era formulas. A tuning change after boards open mints
 // a new board version. Each runs eight waves on one curve: a warm-up, a fast climb,
 // then the last two or three waves pushing its idea to the extreme, each wave setting
-// off on the tick the one before is cleared. Every tower holds 100 points (The Cracked
-// Tower's 10 are its idea) under one medal rule (turret_defense.ts). The Pack is set (lot
+// off on the tick the one before is cleared. Every tower holds 70 points (The Cracked
+// Tower's 7 are its idea) under one medal rule (turret_defense.ts). The Pack is set (lot
 // R5b) against the field-aware policy of the scenarios file at a 0.4 s pace: a member
 // falls to two good shells, a leader to five or six, and at the worst moment of a run
 // three to five monsters stand at the tower's foot (median; up to eight); that player golds
@@ -419,7 +419,7 @@ export const TURRET_MISSION_DELUGE: TurretScenarioDef = {
 const STEADY_GAP = gap(0.9, 1.7);
 
 /**
- * The tower holds only 10 points: a small monster's strike costs 1 or 2 of them, a
+ * The tower holds only 7 points: a small monster's strike costs 1 or 2 of them, a
  * medium's up to 4, so every monster must fall before it winds up. No large or huge
  * one comes: a single full-health strike of theirs would end the run. The fodder walks in
  * at its own pace, then the armoured dead come quicker from two and three flanks, and the
@@ -429,7 +429,7 @@ const STEADY_GAP = gap(0.9, 1.7);
 export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
   id: 'fire_and_fly_brittle',
   boardKey: 'brittle',
-  integrity: 10,
+  integrity: 7,
   medals: { gold: { minIntegrityShare: 1 }, silver: TURRET_MEDALS.silver },
   arsenal: { shockwave: 3, fragmentation: 1 },
   supply: MISSION_SUPPLY,

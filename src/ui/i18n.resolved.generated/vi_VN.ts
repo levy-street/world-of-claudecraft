@@ -12704,7 +12704,7 @@ export const vi_VN: EnTranslations = {
           "pack": "Our fortifications are being overrun! They come in packs, each one fiercer than the last, and you can hear them howling from the ramparts. Help us drive them back before they break over the walls!",
           "giants": "The ground has been shaking since dawn: colossi of bronze, of lava and of stone are coming down from the hills. They are slow, but nothing stops them, and if they reach the tower it will not stand for long. I am counting on you.",
           "deluge": "There must be a hundred of them and more: wolves, boars, spiders and tunnelers, a tide of small beasts pouring in from every side at once, and it never ebbs. Hold fast, it will not ease off before the very end.",
-          "brittle": "The old tower took a terrible blow last season, and the crack never closed. Tonight the dead have risen and march on it: ten blows at most, and down it comes. It is all we have left on this side, so keep it standing.",
+          "brittle": "The old tower took a terrible blow last season, and the crack never closed. Tonight the dead have risen and march on it: seven blows at most, and down it comes. It is all we have left on this side, so keep it standing.",
           "powder": "The powder store is bursting, so I had to stack twice the kegs outside, right across their path. And now the creatures of the forge are coming, drawn by the smell of the powder. Things are about to get hot, gunner."
         },
         "greeting": {

@@ -247,9 +247,10 @@ export const TURRET_ARENA = {
 
 /**
  * Every scenario's tower holds this many points, trials and missions alike (The Cracked
- * Tower's 10 are its identity): the difficulty is in the waves, never in the tower.
+ * Tower's 7 are its identity): the difficulty is in the waves, never in the tower. 70
+ * rather than 100 so that monsters at the foot weigh on the run (Matthieu's playtest).
  */
-export const TURRET_TOWER_POINTS = 100;
+export const TURRET_TOWER_POINTS = 70;
 
 /**
  * One medal rule everywhere: gold while the tower keeps 95 percent of its points, silver

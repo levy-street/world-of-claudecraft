@@ -378,7 +378,7 @@ const questStringsEn = {
           deluge:
             'There must be a hundred of them and more: wolves, boars, spiders and tunnelers, a tide of small beasts pouring in from every side at once, and it never ebbs. Hold fast, it will not ease off before the very end.',
           brittle:
-            'The old tower took a terrible blow last season, and the crack never closed. Tonight the dead have risen and march on it: ten blows at most, and down it comes. It is all we have left on this side, so keep it standing.',
+            'The old tower took a terrible blow last season, and the crack never closed. Tonight the dead have risen and march on it: seven blows at most, and down it comes. It is all we have left on this side, so keep it standing.',
           powder:
             'The powder store is bursting, so I had to stack twice the kegs outside, right across their path. And now the creatures of the forge are coming, drawn by the smell of the powder. Things are about to get hot, gunner.',
         },
