@@ -6,6 +6,7 @@ import type { BotSteer } from '../bots/steer';
 import type { Rng } from '../rng';
 import type { ArenaReturnPools, InstanceSlot } from '../sim';
 import type { SimContext } from '../sim_context';
+import type { BotSayState } from './bot_say';
 import type { MorthenParked } from './morthen_transform';
 
 export type GraveyardShiftOutcome = 'won' | 'lost' | 'aborted';
@@ -53,6 +54,8 @@ export interface GraveyardShiftRun {
   // Set by a mid-tick decision (a command or, later, a lethal hit); the run tick
   // tears down, never the code path that decided.
   pendingOutcome: GraveyardShiftOutcome | null;
+  // The adventurers' say-line state (bot_say.ts), created on its first tick.
+  say?: BotSayState;
 }
 
 export function graveyardShiftRunKey(ownerPid: number): string {

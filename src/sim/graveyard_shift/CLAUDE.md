@@ -6,7 +6,8 @@ a prototype; this directory is built lot by lot. Today: the RUN SHELL (enter,
 exit, survive every exit), the MORTHEN IDENTITY (the owner becomes Morthen in
 the sim, on his own Dread bar: `dread.ts`), the ADVENTURER PARTY (three bots,
 hostility, win and loss), the PARTY BRAIN (the bots fight like a pickup group)
-Morthen's SKELETON ALLIES and the KIT EFFECTS (barrow marks, Raise the Fallen).
+Morthen's SKELETON ALLIES, the KIT EFFECTS (barrow marks, Raise the Fallen) and the
+SAY LINES (the living bots talk aloud, heard only up close).
 
 ## Contract
 - **Offline only while a prototype.** `canStartGraveyardShift` refuses unless
@@ -156,6 +157,25 @@ Morthen's SKELETON ALLIES and the KIT EFFECTS (barrow marks, Raise the Fallen).
 - The solo multiplier scales the burst bonus too (`soloEffect`), and the tooltips
   read the resolved effects, so the bar shows what lands.
 
+## The say lines
+- **Local only** (`bot_say.ts`): a LIVING adventurer speaks a keyed line on the
+  `say` channel, pid-routed to every player within `SAY_RANGE` of it (the
+  `emitMobYell` shape, never `Sim.chat()`); the dead are silent and nothing rides
+  party chat. The event carries `textKey` (`devCommand.graveyardShift.say.*`) and
+  the English as `text`; the HUD's say line and bubble render it through
+  `localizeChatBody`, so player-authored say (no key) stays verbatim.
+- **Observed state, never a timer:** the `engaged` flip (notice), an adventurer
+  going down (death), the healer under 15 percent mana (oom), two down or the
+  living party under 35 percent average health (wipe threat), each on its edge;
+  a loss (`pendingOutcome` 'lost' or a dead owner) makes a living bot say a win
+  line on the tick the teardown runs, ahead of it in the run loop.
+- **Pacing:** an observed event waits up to 10 sec for a voice (first in, first
+  said); one line per 3 sec across the party, 10 sec per bot, no line twice in a
+  run. The closing win line skips the cooldowns (the teardown follows it).
+- **Its own Rng** (`botSaySeed`, salted off the run seed): the speaker and line
+  draws never touch the shared stream or the bots' brain rngs. The state rides
+  the run (`run.say`), created on the first tick. The pools are `bot_lines.ts`.
+
 ## Known limits of the shell (each owned by a later lot)
 - **A non-damage death still runs `handleDeath`** (death counter, deeds death
   hooks, the `playerDeath` event). Lethal damage is clamped first; only `/dev kill`
@@ -191,6 +211,8 @@ Morthen's SKELETON ALLIES and the KIT EFFECTS (barrow marks, Raise the Fallen).
 | `bot_driver.ts` | the per-tick party driver through the real player verbs |
 | `dread.ts` | pure leaf: the Dread rate, the damage hook, the carry rule |
 | `kit_effects.ts` | the barrow mark, the mark burst, Raise the Fallen and its cast refusal |
+| `bot_lines.ts` | pure leaf: the say pools per trigger (line id, catalog key, English, role limits) |
+| `bot_say.ts` | the say observer: triggers, pacing, the private say Rng, the pid-routed emit |
 | `run_lifecycle.ts` | `canStartGraveyardShift`, `startGraveyardShift`, `endGraveyardShift`, `updateGraveyardShift` (the one tick entry, called just before the delve runs) |
 | `index.ts` | the public barrel |
 

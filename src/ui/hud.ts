@@ -12433,7 +12433,7 @@ export class Hud {
             default:
               this.chatLogFrom(
                 ev.from,
-                ev.text,
+                localizeChatBody(ev),
                 CHAT_TEMPLATE_KEYS.say,
                 'say',
                 ev.fromPid,
@@ -12455,7 +12455,7 @@ export class Hud {
             const visibleText =
               ev.channel === 'yell'
                 ? localizeAuthoredYellText(ev.text, bubbleSpeaker?.kind, ev.classId)
-                : ev.text;
+                : localizeChatBody(ev);
             const masked = this.maskChat(this.chatLinkPlainText(visibleText));
             const bubble = ev.channel === 'emote' ? `${ev.from} ${masked}` : masked;
             this.renderer.showChatBubble(bubbleSpeakerId, bubble, bubbleStyle);

@@ -239,6 +239,35 @@ export const nl_NL: EnTranslations = {
           "name": "Barrow Shroud",
           "description": "Wrap yourself in grave mist, reducing all damage you take by {pct} for {seconds} sec. Usable during the global cooldown, and does not trigger it."
         }
+      },
+      "say": {
+        "notice": {
+          "pulledEarly": "boss pulled early??",
+          "whoPulled": "WHO PULLED",
+          "didntTouch": "I DIDNT TOUCH IT",
+          "walkingTowards": "uh, is the boss supposed to be walking towards us",
+          "notInSpot": "wait he's not in his spot. is this a new patch",
+          "watchedGuide": "I watched a guide, he's easy, just don't stand in purple"
+        },
+        "death": {
+          "rip": "rip",
+          "healerHealer": "healer?? HEALER??",
+          "lag": "lag. that was lag. we all saw it"
+        },
+        "healerOom": {
+          "oom": "oom",
+          "drink": "sitting to drink, nobody pull anything",
+          "iKnow": "yes I know the boss is already pulled, I KNOW"
+        },
+        "wipeThreat": {
+          "popEverything": "pop everything. POP EVERYTHING",
+          "wedding": "who's been saving a cooldown for their wedding",
+          "blamePet": "if we wipe I'm blaming the pet"
+        },
+        "partyWins": {
+          "firstTry": "WE DID IT, first try",
+          "respect": "the boss almost had us, respect"
+        }
       }
     }
   },

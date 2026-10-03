@@ -28,6 +28,7 @@ import { TICK_RATE } from '../types';
 import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import { graveyardShiftRunSeed } from './bot_brain';
 import { updateGraveyardShiftBots } from './bot_driver';
+import { updateGraveyardShiftSay } from './bot_say';
 import { applyMorthenIdentity, removeMorthenIdentity } from './morthen_transform';
 import {
   dismissGraveyardShiftAllies,
@@ -186,6 +187,7 @@ function pruneStrayBots(ctx: SimContext, run: GraveyardShiftRun): void {
 export function updateGraveyardShift(ctx: SimContext): void {
   if (ctx.graveyardShiftRuns.size === 0) return;
   for (const run of [...ctx.graveyardShiftRuns.values()]) {
+    updateGraveyardShiftSay(ctx, run);
     const p = ctx.entities.get(run.ownerPid);
     if (!p || !ctx.players.has(run.ownerPid)) endGraveyardShift(ctx, run, 'aborted');
     else if (run.pendingOutcome) endGraveyardShift(ctx, run, run.pendingOutcome);
