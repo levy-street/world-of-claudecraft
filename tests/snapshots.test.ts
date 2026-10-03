@@ -56,7 +56,7 @@ import { gameMetricsCounters } from '../server/http/game_signals';
 import { consumeMovementFramesV2 } from '../server/movement_input_timeline_v2';
 import { updateMovementOverrideEpochs } from '../server/movement_override_epoch';
 import { KeyedSerialWriteAborted } from '../server/serial_writer';
-import { turretWireNumber } from '../server/turret_self_wire';
+import { TURRET_SEAT_KEYS, turretWireNumber } from '../server/turret_self_wire';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { EMPTY_MST_CRAFTS } from '../src/net/crafting_wire';
 import { ClientWorld } from '../src/net/online';
@@ -5787,8 +5787,45 @@ const ALL_DELTA_KEYS = [
   'tmap',
   'trade',
   'tslot',
+  'tu0',
+  'tu1',
+  'tu10',
+  'tu11',
+  'tu12',
+  'tu13',
+  'tu14',
+  'tu15',
+  'tu16',
+  'tu17',
+  'tu18',
+  'tu19',
+  'tu2',
+  'tu20',
+  'tu21',
+  'tu22',
+  'tu23',
+  'tu24',
+  'tu25',
+  'tu26',
+  'tu27',
+  'tu28',
+  'tu29',
+  'tu3',
+  'tu30',
+  'tu31',
+  'tu4',
+  'tu5',
+  'tu6',
+  'tu7',
+  'tu8',
+  'tu9',
+  'tua',
+  'tub',
   'tur',
   'turp',
+  'tus',
+  'tut',
+  'tuv',
   'vault',
   'vehicle',
   'wba',
@@ -6522,10 +6559,15 @@ describe('full self-state snapshot delta fixture', () => {
       // design. Its non-null arrival (and the by-reference mirror) is pinned
       // in tests/vault_wire.test.ts instead.
       // This fixture stands at a different banker; the weekly keeper gate stays closed.
-      // The Fire and Fly keys (tur, turp) share meta.vehicle with the cannon seat this
-      // fixture holds, so they arrive as explicit nulls; their seated arrival is pinned in
-      // the Fire and Fly round trip below.
-      if (key === 'cvault' || key === 'weeklyRewards' || key === 'tur' || key === 'turp') {
+      // The Fire and Fly keys (turp and the seat state family) share meta.vehicle with the
+      // cannon seat this fixture holds, so they arrive as explicit nulls; their seated
+      // arrival is pinned in the Fire and Fly round trip below.
+      if (
+        key === 'cvault' ||
+        key === 'weeklyRewards' ||
+        key === 'turp' ||
+        TURRET_SEAT_KEYS.includes(key)
+      ) {
         expect(snap.self[key], `self.${key} must arrive as the explicit null`).toBeNull();
         continue;
       }
@@ -7210,8 +7252,9 @@ describe('Fire and Fly seat over the wire (GameServer to ClientWorld)', () => {
       ...(frame.t === 'events' ? frame.list : []).filter(
         (ev: SimEvent) => ev.type === 'turretDefense',
       ),
-      ...(frame.t === 'snap' && frame.self?.tur ? [frame.self.tur] : []),
-      ...(frame.t === 'snap' && frame.self?.turp ? [frame.self.turp] : []),
+      ...(frame.t === 'snap'
+        ? ['turp', ...TURRET_SEAT_KEYS].map((key) => frame.self?.[key]).filter((v) => v != null)
+        : []),
     ]);
     expect(onlooker).toEqual([]);
 
@@ -7258,7 +7301,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 117 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 154 unique keys in sorted order', () => {
     // 109 plus the release batch's pending Town Focus and Spell Crit core keys.
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
@@ -7318,9 +7361,11 @@ describe('delta-key contract pins (anti-drift)', () => {
     // release/v0.44.0 base merge, for 111.
     // The Fire and Fly seat's state and plan keys tur and turp
     // (server/turret_self_wire.ts), for 115, its recruitment key ffr, for 116,
-    // and the character's own records ffrec, for 117.
-    expect(ALL_DELTA_KEYS).toHaveLength(117);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(117);
+    // and the character's own records ffrec, for 117. The seat state then splits
+    // into its key family (tur plus tuv, tua, tus, tub, tut and the 32 monster
+    // buckets tu0 to tu31), for 154.
+    expect(ALL_DELTA_KEYS).toHaveLength(154);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(154);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7426,6 +7471,14 @@ describe('delta-key contract pins (anti-drift)', () => {
     const re = new RegExp(DELTA_CALL.source, 'g');
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
+    // The Fire and Fly seat state family is emitted by computed name over its exported key
+    // list (32 monster buckets have no literal call each), so the list joins the scrape, and
+    // the emitter is pinned to emit exactly that list.
+    expect(src).toContain('maybeRaw(TURRET_SEAT_KEYS[i], parts[i])');
+    for (const key of TURRET_SEAT_KEYS) {
+      expect(scraped.has(key), `${key} also emitted by a literal call`).toBe(false);
+      scraped.add(key);
+    }
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
     expect(scraped.has('app')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
@@ -7492,7 +7545,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The release batch's pending Town Focus and Spell Crit core keys make 111.
     // The Fire and Fly seat's tur and turp (server/turret_self_wire.ts) make 115, and
     // its recruitment ffr (server/quest_snapshot_wire.ts) 116, and its records ffrec 117.
-    expect(scraped.size).toBe(117);
+    // The seat state's key family (37 keys beside tur) makes 154.
+    expect(scraped.size).toBe(154);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { turretPlanWireJson, turretStateWireJson } from '../server/turret_self_wire';
+import { turretPlanWireJson } from '../server/turret_self_wire';
 import { decodeTurretPlan, decodeTurretSeat } from '../src/net/turret_session_wire';
 import { FIRE_AND_FLY_DUNGEON_ID } from '../src/sim/content/fire_and_fly_arena';
 import {
@@ -31,6 +31,7 @@ import {
 import { TurretHudView } from '../src/ui/hud/vehicle/turret_hud_view';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
 import type { TurretSessionView } from '../src/world_api/vehicles';
+import { turretStateWireJson } from './helpers/turret_seat_wire';
 
 function seatFor(scenario: TurretScenarioDef): TurretSession {
   return {

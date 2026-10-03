@@ -1,11 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  emitTurretSelfKeys,
-  turretPlanWireJson,
-  turretStateWireJson,
-} from '../server/turret_self_wire';
+import { emitTurretSelfKeys, turretPlanWireJson } from '../server/turret_self_wire';
 import { TURRET_SCENARIO_HARD } from '../src/sim/content/fire_and_fly_scenarios';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import { horizontalAt, type ThrowProbe } from '../src/sim/minigames/thrown_body';
@@ -29,6 +25,7 @@ import { Sim } from '../src/sim/sim';
 import { turretSessionView } from '../src/sim/turret_defense_session';
 import type { PrivateSalt, TurretSession, WorldContent } from '../src/sim/types';
 import { WORLD_SEED } from '../src/sim/world_seed';
+import { turretStateWireJson } from './helpers/turret_seat_wire';
 
 const drawLog = vi.hoisted(() => [] as { stream: number; runKey?: TurretRunKey }[]);
 
@@ -212,7 +209,7 @@ describe('the salt stays on the host', () => {
     expect(offline.session.defense).not.toHaveProperty('runKey');
   });
 
-  it('never puts the salt or the run key on the view, the tur and turp keys, the events or the save', () => {
+  it('never puts the salt or the run key on the view, the seat and plan keys, the events or the save', () => {
     const { sim, pid, meta, session } = seatedSim(SALT);
     const events: unknown[] = [];
     for (let i = 0; i < 400; i++) {

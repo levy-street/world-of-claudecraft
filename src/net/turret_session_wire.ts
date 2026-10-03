@@ -1,5 +1,5 @@
-// Decoders for the Fire and Fly wire: the owner-only `turp` (plan) and `tur`
-// (seat state) self keys and the `turretDefense` feedback event. Untrusted JSON:
+// Decoders for the Fire and Fly wire: the owner-only `turp` (plan) and seat
+// state self keys and the `turretDefense` feedback event. Untrusted JSON:
 // every field is re-validated against the sim's own types (a spec per shape, so
 // a field the sim adds fails tsc here until it is decoded), numbers finite,
 // enums closed, arrays bounded, and a malformed payload rejects the whole
@@ -562,7 +562,81 @@ function chargesScored(defense: Omit<TurretDefenseView, 'plan'>, turretPlan: Tur
   return outcome.breakdown.charges === kept * TURRET_POINTS.unusedCharge;
 }
 
-/** The `tur` key against its plan: the seat minus the feedback ring, or null. */
+/**
+ * The seat state's self key family, as server/turret_self_wire.ts emits it: `tur` the seat
+ * and its rarely moving scalars with the bucket count, `tuv` the revision, `tua` the aim,
+ * `tus` the shells, `tub` the kegs, `tut` the stats, then the monster buckets `tu0` on, a
+ * monster riding bucket `id % count`. Every key is read, up to the most buckets a seat may
+ * declare, so a bucket past the declared count is seen and refused.
+ */
+const MAX_MONSTER_BUCKETS = 64;
+const SECTION_KEYS = ['tur', 'tuv', 'tua', 'tus', 'tub', 'tut'] as const;
+const BUCKET_KEYS: readonly string[] = Array.from(
+  { length: MAX_MONSTER_BUCKETS },
+  (_, i) => `tu${i}`,
+);
+export const TURRET_SEAT_WIRE_KEYS: readonly string[] = [...SECTION_KEYS, ...BUCKET_KEYS];
+
+/** No seat decodes from it: what an inconsistent family assembles to. */
+const INCONSISTENT = false;
+
+/**
+ * The family's last received values (absent never received, null cleared) joined back into
+ * the one seat object `decodeTurretSeat` reads: null when every key is cleared, the seat
+ * with its monsters in the engine's order (ascending id), or a value no seat decodes from
+ * when the family is partial or inconsistent (a cleared or missing key beside live ones, a
+ * bucket count out of range, a bucket past it, a monster in a bucket its id does not map
+ * to, an id twice).
+ */
+export function assembleTurretSeatWire(parts: Readonly<Record<string, unknown>>): unknown {
+  const seatPart = parts.tur;
+  if (seatPart === null || seatPart === undefined) {
+    return TURRET_SEAT_WIRE_KEYS.every((key) => parts[key] == null) ? null : INCONSISTENT;
+  }
+  const aim = parts.tua;
+  if (!record(seatPart) || !record(seatPart.defense) || !record(aim)) return INCONSISTENT;
+  if (SECTION_KEYS.some((key) => parts[key] == null)) return INCONSISTENT;
+  const count = seatPart.buckets;
+  if (!Number.isSafeInteger(count) || (count as number) < 1) return INCONSISTENT;
+  if ((count as number) > MAX_MONSTER_BUCKETS) return INCONSISTENT;
+  const monsters: Record<string, unknown>[] = [];
+  const ids = new Set<number>();
+  for (const [bucket, key] of BUCKET_KEYS.entries()) {
+    const rows = parts[key];
+    if (bucket >= (count as number)) {
+      if (rows != null) return INCONSISTENT;
+      continue;
+    }
+    if (!Array.isArray(rows) || monsters.length + rows.length > MAX_MONSTERS) return INCONSISTENT;
+    for (const row of rows) {
+      const id = record(row) ? row.id : undefined;
+      if (typeof id !== 'number' || !Number.isSafeInteger(id) || id < 0) return INCONSISTENT;
+      if (id % (count as number) !== bucket || ids.has(id)) return INCONSISTENT;
+      ids.add(id);
+      monsters.push(row as Record<string, unknown>);
+    }
+  }
+  monsters.sort((a, b) => (a.id as number) - (b.id as number));
+  const { origin, waveCount, monstersLeft, defense } = seatPart;
+  return {
+    origin,
+    waveCount,
+    monstersLeft,
+    defense: {
+      ...defense,
+      rev: parts.tuv,
+      readyTick: aim.readyTick,
+      aimX: aim.aimX,
+      aimZ: aim.aimZ,
+      shots: parts.tus,
+      barrels: parts.tub,
+      stats: parts.tut,
+      monsters,
+    },
+  };
+}
+
+/** The seat state against its plan (the family joined back): the seat minus its feedback ring, or null. */
 export function decodeTurretSeat(value: unknown, turretPlan: TurretPlan): TurretSeatState | null {
   const decoded = seat(value);
   if (decoded === BAD) return null;

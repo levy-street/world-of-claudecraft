@@ -244,12 +244,37 @@ The server runs the one shared engine; the client only draws it.
   Leaving uses the ordinary vehicle exit.
 - **Wire keys** (`server/turret_self_wire.ts`, decoded by
   `src/net/turret_session_wire.ts`). The owner-only `turp` self key carries the
-  resolved plan once per seat; `tur` carries the seat state minus the ring and the
-  plan, serialized once per engine revision, pruned of fields the client never
-  reads and rounded on the wire (`turretWireNumber`), so the online view matches
-  the authoritative one within a millimetre. The feedback ring is rebuilt on the
-  client from the `turretDefense` events (`src/net/turret_feedback_mirror.ts`).
-  Every decoder re-validates untrusted JSON and rejects a malformed value whole.
+  resolved plan once per seat. The seat state minus the ring and the plan rides a
+  family of owner-only keys (`TURRET_SEAT_KEYS`): `tur` the seat and its rarely
+  moving scalars (with the bucket count), `tuv` the engine revision, `tua` the aim
+  and reload, `tus` the shells, `tub` the kegs, `tut` the stats, and one key per
+  monster bucket (`TURRET_MONSTER_KEYS`), a monster riding bucket `id` modulo
+  `TURRET_MONSTER_BUCKETS`. A monster's record only changes at a transition (spawn,
+  hit, launch, bounce, landing, windup, strike, death), so the self record's
+  per-session diff resends only the keys whose text moved, with no change to the
+  snapshot protocol: a fresh session, a resume and a spectator switch get every key,
+  a left seat gets explicit nulls on all of them. The family is built once per
+  engine revision (one revision per record, never a mix), pruned of fields the
+  client never reads and rounded on the wire (`turretWireNumber`), so the online
+  view matches the authoritative one within a millimetre; an unchanged key keeps
+  its string, so the diff stays a reference compare. The client keeps the last
+  value per key and joins them back into the one seat (`assembleTurretSeatWire`,
+  the monsters in the engine's ascending id order) before the seat decoder; a
+  partial or inconsistent family (a cleared key beside live ones, a bucket count
+  out of range, a monster in the wrong bucket, an id twice) fails closed like an
+  unreadable seat. The offline and RL hosts read the `Sim` directly and never see
+  these keys. The feedback ring is rebuilt on the client from the `turretDefense`
+  events (`src/net/turret_feedback_mirror.ts`). Every decoder re-validates
+  untrusted JSON and rejects a malformed value whole.
+- **Bandwidth.** A revision usually moves the revision, the aim, the stats and a
+  monster bucket or two, so a crowded wave costs little more than a sparse one.
+  `tests/turret_online_round_trip.test.ts` pins each scenario's mean bytes per
+  second (`SEAT_BYTES_PER_SECOND_BY_TRIAL`, `SEAT_BYTES_PER_SECOND_BY_MISSION`) and
+  every run's worst one-second window of the state (`SEAT_WORST_SECOND_CEILING`) and
+  of the state, the plan and the seat's own events together
+  (`SEAT_WIRE_WORST_SECOND_CEILING`; the events now weigh more than the state on an
+  armed run), far under a walking crowd's worst second; a content change that
+  crosses one re-measures.
 - **The own-shot ledger** (`src/ui/hud/vehicle/turret_own_shot_core.ts`). A click
   the server will surely accept plays at once (the head's recoil, the muzzle, the
   shell and the report), then is adopted by the server's `fired` entry and
@@ -342,7 +367,7 @@ fifth waves end, every weapon its arsenal holds gains one charge
 its resupplies in its stats (`resupplies`), so the charges left are the arsenal plus
 the resupplies less the charges spent (`turretChargesGiven`, `turretChargesLeft` in
 `src/sim/minigames/turret_charges.ts`), the same count on the server, in the online
-mirror (the `tur` stats, bounded by the decoder against the plan's resupply waves)
+mirror (the `tut` stats key, bounded by the decoder against the plan's resupply waves)
 and in the own-shot ledger's click-time charges. A `resupply` feedback entry puts
 "Resupply: +1 ..." under the cleared wave's banner. Pinned by
 `tests/turret_defense_engine.test.ts`, `tests/turret_session_wire.test.ts`,
@@ -403,7 +428,7 @@ The clean aimer still golds every trial and mission (`tests/turret_scenarios.tes
   `tests/turret_weapon_tooltip.test.ts`.
 - **Online.** The server checks every weapon action like a shot (a wave running,
   a charge left, the reload or the rearm done); the charges reach the client in the
-  `tur` stats and the bomblets and the rolling front in the feedback ring.
+  `tut` stats key and the bomblets and the rolling front in the feedback ring.
 - **Look and sound.** The slam's stone ring (`src/render/turret_shockwave_core.ts`)
   and the burst (`src/render/cannon_frag_core.ts`) draw through the shell visuals
   (`cannon_shell_visuals.ts`, `turret_weapons_visual.ts`); both have their own sounds. The result card

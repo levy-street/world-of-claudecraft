@@ -28,9 +28,11 @@ import { HoardBossCueMirror } from './hoard_boss_cue_mirror';
 import { applyQuestSelfWire } from './quest_snapshot_wire';
 import { TurretFeedbackMirror } from './turret_feedback_mirror';
 import {
+  assembleTurretSeatWire,
   decodeTurretPlan,
   decodeTurretSeat,
   sameTurretSeat,
+  TURRET_SEAT_WIRE_KEYS,
   type TurretSeatState,
 } from './turret_session_wire';
 import { decodeVehicleSession } from './vehicle_session_wire';
@@ -58,7 +60,7 @@ export type QuestWorldCommand =
 /** Cold owner mirrors shared by quest snapshots and world-boss map state. */
 export class QuestWorldWireState {
   vehicleSession: VehicleSession | null = null;
-  /** The `tur` and `turp` keys plus the event-built ring: the same object until one moves. */
+  /** The seat state keys and `turp` plus the event-built ring: the same object until one moves. */
   turretSession: TurretSessionView | null = null;
   /** The last applied snapshot's tick while seated, else null. */
   turretClock: number | null = null;
@@ -92,6 +94,8 @@ export class QuestWorldWireState {
   // Lazy like the cue mirror's reads: bare test clients skip field initializers.
   private turretFeedback?: TurretFeedbackMirror;
   private turretPlan: TurretPlan | null = null;
+  /** The seat state family's last values by key: absent never received, null cleared. */
+  private turretSeatParts: Record<string, unknown> = {};
   private turretSeatWire: unknown = null;
   private turretSeat: TurretSeatState | null = null;
   /** A leave was sent for a seat this client could not read; cleared once it reads one again. */
@@ -125,10 +129,11 @@ export class QuestWorldWireState {
     self: Parameters<typeof applyQuestSelfWire>[1] & {
       wba?: unknown;
       vehicle?: unknown;
-      tur?: unknown;
       turp?: unknown;
       ffr?: unknown;
       ffrec?: unknown;
+      /** The seat state's key family (`TURRET_SEAT_WIRE_KEYS`) among the rest. */
+      readonly [key: string]: unknown;
     },
     simTime?: unknown,
     tick?: unknown,
@@ -154,12 +159,12 @@ export class QuestWorldWireState {
     return this.turretFeedback;
   }
 
-  private applyTurretSelfWire(self: { tur?: unknown; turp?: unknown }, tick: unknown): void {
+  private applyTurretSelfWire(self: Readonly<Record<string, unknown>>, tick: unknown): void {
     const ring = this.turretRing();
     const planMoved = self.turp !== undefined;
-    const seatMoved = self.tur !== undefined;
+    const seatMoved = this.readTurretSeatParts(self);
     if (planMoved) this.turretPlan = decodeTurretPlan(self.turp);
-    if (seatMoved) this.turretSeatWire = self.tur;
+    if (seatMoved) this.turretSeatWire = assembleTurretSeatWire(this.turretSeatParts);
     if (planMoved || seatMoved) {
       const prior = this.turretSeat;
       this.turretSeat = this.turretPlan
@@ -180,6 +185,19 @@ export class QuestWorldWireState {
       this.turretSession && typeof tick === 'number' && Number.isSafeInteger(tick) && tick >= 0
         ? tick
         : null;
+  }
+
+  /** Keeps every seat state key this record carries; true when one moved. */
+  private readTurretSeatParts(self: Readonly<Record<string, unknown>>): boolean {
+    this.turretSeatParts ??= {};
+    let moved = false;
+    for (const key of TURRET_SEAT_WIRE_KEYS) {
+      const value = self[key];
+      if (value === undefined) continue;
+      this.turretSeatParts[key] = value;
+      moved = true;
+    }
+    return moved;
   }
 
   /**
@@ -205,6 +223,7 @@ export class QuestWorldWireState {
     this.turretSession = null;
     this.turretClock = null;
     this.turretPlan = null;
+    this.turretSeatParts = {};
     this.turretSeatWire = null;
     this.turretSeat = null;
     this.turretUnreadableLeft = false;

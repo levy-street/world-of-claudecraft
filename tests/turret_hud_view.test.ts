@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { turretPlanWireJson, turretStateWireJson } from '../server/turret_self_wire';
+import { turretPlanWireJson } from '../server/turret_self_wire';
 import { decodeTurretPlan, decodeTurretSeat } from '../src/net/turret_session_wire';
 import {
   TURRET_MISSION_DELUGE,
@@ -29,6 +29,7 @@ import {
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
 import type { TurretSessionView } from '../src/world_api/vehicles';
 import { resolveArmedTurretPlan } from './helpers/turret_armed_plan';
+import { turretStateWireJson } from './helpers/turret_seat_wire';
 import { probeAllocationStability } from './util/alloc_probe';
 
 vi.mock('../src/ui/i18n', async (importOriginal) => {

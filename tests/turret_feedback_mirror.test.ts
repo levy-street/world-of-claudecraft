@@ -4,6 +4,7 @@ import { TurretFeedbackMirror } from '../src/net/turret_feedback_mirror';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { TURRET_FEEDBACK_LIMIT } from '../src/sim/minigames/turret_feedback';
 import type { SimEvent } from '../src/sim/types';
+import { TURRET_SEAT_CLEARED, turretSeatKeys } from './helpers/turret_seat_wire';
 
 function entry(seq: number, tick = seq): SimEvent {
   return { type: 'turretDefense', pid: 1, seq, tick, event: { type: 'waveCleared', wave: 0 } };
@@ -94,7 +95,7 @@ describe('the turret feedback mirror', () => {
 describe('the turret seat on the quest wire state', () => {
   const planJson = JSON.parse(JSON.stringify(resolveTurretPlan()));
 
-  /** The smallest valid `tur` value: a fresh seat before its first wave. */
+  /** The smallest valid seat the state keys join back into: a fresh seat before its first wave. */
   function seat(rev: number) {
     return {
       origin: { x: 10, y: 5, z: 20 },
@@ -152,7 +153,7 @@ describe('the turret seat on the quest wire state', () => {
     const client = new Client();
     expect(client.turretSession).toBeNull();
     expect(client.turretClock).toBeNull();
-    client.applyQuestSelfSnapshot({ turp: planJson, tur: seat(0) }, 5, 101);
+    client.applyQuestSelfSnapshot({ turp: planJson, ...turretSeatKeys(seat(0)) }, 5, 101);
     expect(client.turretSession?.defense.rev).toBe(0);
     expect(client.turretSession?.feedback).toEqual([]);
     expect(client.turretClock).toBe(101);
@@ -164,7 +165,7 @@ describe('the turret seat on the quest wire state', () => {
 
   it('keeps one object until the state key or the ring moves', () => {
     const client = new Client();
-    client.applyQuestSelfSnapshot({ turp: planJson, tur: seat(0) }, 5, 101);
+    client.applyQuestSelfSnapshot({ turp: planJson, ...turretSeatKeys(seat(0)) }, 5, 101);
     const first = client.turretSession;
     client.applyQuestSelfSnapshot({}, 5, 102);
     expect(client.turretSession).toBe(first);
@@ -176,7 +177,7 @@ describe('the turret seat on the quest wire state', () => {
     expect(ringMoved).not.toBe(first);
     expect(ringMoved?.defense).toBe(first?.defense);
     expect(ringMoved?.feedback.map((f) => f.seq)).toEqual([1]);
-    client.applyQuestSelfSnapshot({ tur: seat(1) }, 5, 104);
+    client.applyQuestSelfSnapshot(turretSeatKeys(seat(1)), 5, 104);
     expect(client.turretSession).not.toBe(ringMoved);
     expect(client.turretSession?.defense.rev).toBe(1);
     expect(client.turretSession?.defense.plan).toBe(first?.defense.plan);
@@ -185,20 +186,21 @@ describe('the turret seat on the quest wire state', () => {
 
   it('clears on a null seat, a malformed seat, a missing plan, a dropped socket and a reset', () => {
     const client = new Client();
-    const seated = () => client.applyQuestSelfSnapshot({ turp: planJson, tur: seat(0) }, 5, 101);
+    const seated = () =>
+      client.applyQuestSelfSnapshot({ turp: planJson, ...turretSeatKeys(seat(0)) }, 5, 101);
     seated();
     client.route(entry(1));
-    client.applyQuestSelfSnapshot({ tur: null }, 5, 102);
+    client.applyQuestSelfSnapshot(TURRET_SEAT_CLEARED, 5, 102);
     expect(client.turretSession).toBeNull();
     expect(client.turretClock).toBeNull();
-    client.applyQuestSelfSnapshot({ tur: seat(2) }, 5, 103);
+    client.applyQuestSelfSnapshot(turretSeatKeys(seat(2)), 5, 103);
     expect(client.turretSession?.feedback).toEqual([]);
 
     expect(client.commands).toEqual([]);
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    client.applyQuestSelfSnapshot({ tur: { ...seat(3), waveCount: -1 } }, 5, 104);
+    client.applyQuestSelfSnapshot(turretSeatKeys({ ...seat(3), waveCount: -1 }), 5, 104);
     expect(client.turretSession).toBeNull();
-    client.applyQuestSelfSnapshot({ turp: null, tur: seat(4) }, 5, 105);
+    client.applyQuestSelfSnapshot({ turp: null, ...turretSeatKeys(seat(4)) }, 5, 105);
     expect(client.turretSession).toBeNull();
     // A seat the server holds but this client cannot read: one leave for the whole stretch.
     expect(client.commands).toEqual([{ cmd: 'vehicle_leave' }]);
@@ -216,5 +218,38 @@ describe('the turret seat on the quest wire state', () => {
     expect(client.turretSession).toBeNull();
     client.applyQuestSelfSnapshot({}, 5, 107);
     expect(client.turretSession).toBeNull();
+  });
+
+  it('reads only the keys a record moves, and leaves once on a partial family', () => {
+    const client = new Client();
+    client.applyQuestSelfSnapshot({ turp: planJson, ...turretSeatKeys(seat(0)) }, 5, 101);
+    const first = client.turretSession;
+    // A revision that moved only the revision key: every other key keeps its last value.
+    client.applyQuestSelfSnapshot({ tuv: 1 }, 5, 102);
+    expect(client.turretSession).not.toBe(first);
+    expect(client.turretSession?.defense.rev).toBe(1);
+    expect({ ...client.turretSession!.defense, rev: 0 }).toEqual(first?.defense);
+
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      // A cleared section beside a live seat: no seat decodes, and the client leaves it once.
+      client.applyQuestSelfSnapshot({ tus: null }, 5, 103);
+      expect(client.turretSession).toBeNull();
+      client.applyQuestSelfSnapshot({ tuv: 2 }, 5, 104);
+      expect(client.turretSession).toBeNull();
+      expect(client.commands).toEqual([{ cmd: 'vehicle_leave' }]);
+      // The whole family again (a resume): the seat reads, and a later stretch leaves again.
+      client.applyQuestSelfSnapshot(turretSeatKeys(seat(3)), 5, 105);
+      expect(client.turretSession?.defense.rev).toBe(3);
+      client.applyQuestSelfSnapshot({ tur: null }, 5, 106);
+      expect(client.turretSession).toBeNull();
+      expect(client.commands).toEqual([{ cmd: 'vehicle_leave' }, { cmd: 'vehicle_leave' }]);
+      // Every key cleared is a left seat, not an unreadable one.
+      client.applyQuestSelfSnapshot(TURRET_SEAT_CLEARED, 5, 107);
+      client.applyQuestSelfSnapshot({}, 5, 108);
+      expect(client.commands).toHaveLength(2);
+    } finally {
+      warn.mockRestore();
+    }
   });
 });

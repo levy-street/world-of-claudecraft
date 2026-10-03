@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { dispatchWorldQuestWire, isWorldQuestWireCommand } from '../server/quest_command_wire';
 import { emitQuestSelfKeys } from '../server/quest_snapshot_wire';
-import { emitTurretSelfKeys, turretWireNumber } from '../server/turret_self_wire';
+import { emitTurretSelfKeys, TURRET_SEAT_KEYS, turretWireNumber } from '../server/turret_self_wire';
 import { dispatchVehicleCommand } from '../server/vehicle_command_wire';
 import { type QuestWorldCommand, QuestWorldWireState } from '../src/net/quest_world_wire_state';
 import { TURRET_MISSIONS } from '../src/sim/content/fire_and_fly_missions';
@@ -33,28 +33,42 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 import { TurretFeedbackReader } from '../src/ui/hud/vehicle/turret_feedback_reader_core';
 
 const RUN_BOUND = 20 * 60 * 8;
-const TUR_BYTES_PER_SECOND_CEILING = 15_000;
-// Regression guards per trial, set about 10 percent over the measured won runs (introduction about
-// 14.0 KB/s since its last waves crowd 17 monsters in, the Veterans' Test about 53.1 KB/s with
-// its 122 monsters, its last wave 25 at once: the giants and their charge). With the self
-// record's base the seat's mean stays under the re-decision envelope of BANDWIDTH_OPINION.md
-// (about 100 KB/s), but its worst second reaches the envelope's 153 KB on some seeds; these
-// guards pin the mean only, against silent growth.
-const TUR_BYTES_PER_SECOND_BY_TRIAL: Record<string, number> = {
-  introduction: 15_500,
-  hard: 58_500,
+// The seat state's bytes per second (its key family, each key's `,"key":` counted; lot H4),
+// pinned about 10 percent over the measured won runs on this seed against silent growth: only
+// the keys a revision moved resend, so a crowd costs little and Standing Watch, the trials
+// and most missions sit near 2.4 KB/s (the revision, the aim and the stats move every shot).
+// Before the split the whole state rode one key: 14.9 KB/s here, 53.2 on the Veterans' Test
+// and 61.9 on The Pack.
+const SEAT_BYTES_PER_SECOND_CEILING = 2_650;
+// Per trial: the introduction about 2.4 KB/s, the Veterans' Test about 6.2 (122 monsters, its
+// last wave 25 at once).
+const SEAT_BYTES_PER_SECOND_BY_TRIAL: Record<string, number> = {
+  introduction: 2_650,
+  hard: 6_850,
 };
-// The same guard per mission, about 10 percent over its measured won run (The Pack about
-// 61.8 KB/s, the highest: 156 monsters in packs of twelve to fourteen, two at once at the end,
-// thrown and scattered; The Deluge about 26.0 with its hundred-odd monsters; Heavy Tread 10.0
-// since its giants come closer together, The Cracked Tower 13.4, The Powder Store 15.2).
-const TUR_BYTES_PER_SECOND_BY_MISSION: Record<string, number> = {
-  pack: 68_000,
-  giants: 11_000,
-  deluge: 28_700,
-  brittle: 14_800,
-  powder: 16_700,
+// Per mission: The Pack about 6.8 KB/s, the highest (156 monsters in packs of twelve to
+// fourteen, thrown and scattered), The Deluge 3.2, The Powder Store 2.7, Heavy Tread 2.4,
+// The Cracked Tower 2.4.
+const SEAT_BYTES_PER_SECOND_BY_MISSION: Record<string, number> = {
+  pack: 7_500,
+  giants: 2_650,
+  deluge: 3_550,
+  brittle: 2_600,
+  powder: 3_050,
 };
+// Every run's worst one-second window of the seat state (a sliding 20-tick sum, one full resend
+// of a mid-run resume included), against the re-decision line of BANDWIDTH_OPINION.md (a seat's
+// worst second past a walking crowd's, 153 KB with the self record's base). Measured: the
+// Veterans' Test 17.8 KB, The Pack 16.1 (Sim seeds 1 to 8, bare and armed: at most 19.3), every
+// other scenario under 8 (before the split: 124 to 128 KB on those two). A content lot that
+// crosses it has to say so and re-measure.
+const SEAT_WORST_SECOND_CEILING = 21_000;
+// The same window over everything the seat adds to its player's socket: the state keys, the
+// plan's `turp` and the seat's own events (the bomblets and the feedback entries), which since
+// the split weigh more than the state on an armed run. Measured with the probe (no resume):
+// The Pack armed 37.3 KB on this seed and up to 42.4 on Sim seeds 1 to 8, the Veterans' Test
+// 31.1; with the self record's base about 12 KB more, still far under the 153 KB line.
+const SEAT_WIRE_WORST_SECOND_CEILING = 47_000;
 const DRIFT_BOUND_YD = 0.005;
 const FORGED_PID = 987_654;
 const ground = { ground: (x: number, z: number) => groundHeight(x, z, WORLD_SEED) };
@@ -82,7 +96,12 @@ class WireClient extends QuestWorldWireState {
   }
 }
 
-/** The server's per-session byte diff over the two turret keys, parsed as the client does. */
+const SEAT_KEYS: ReadonlySet<string> = new Set(TURRET_SEAT_KEYS);
+
+/**
+ * The server's per-session byte diff over the turret keys, parsed as the client does.
+ * `bytes` counts what each key puts on the socket, its `,"key":` included.
+ */
 function wirePass(
   sent: Record<string, string>,
   sim: Sim,
@@ -94,8 +113,9 @@ function wirePass(
     (key, serialized) => {
       if (sent[key] === serialized) return;
       sent[key] = serialized;
-      if (bytes) bytes[key] = (bytes[key] ?? 0) + serialized.length;
-      extra += `,"${key}":${serialized}`;
+      const field = `,"${key}":${serialized}`;
+      if (bytes) bytes[key] = (bytes[key] ?? 0) + field.length;
+      extra += field;
     },
     sim.meta(pid)!,
     sim.tickCount,
@@ -103,7 +123,25 @@ function wirePass(
   return JSON.parse(`{${extra.slice(1)}}`);
 }
 
-/** A value as the `tur` key carries it: the rounding the server applies, both sides alike. */
+/** The seat state's bytes in one pass's counts. */
+function seatBytes(bytes: Record<string, number>): number {
+  let sum = 0;
+  for (const key of TURRET_SEAT_KEYS) sum += bytes[key] ?? 0;
+  return sum;
+}
+
+/** The heaviest one-second window: the largest sum over 20 consecutive ticks. */
+function worstSecond(perTick: readonly number[]): number {
+  let worst = 0;
+  let sum = 0;
+  for (const [i, n] of perTick.entries()) {
+    sum += n - (i >= 20 ? perTick[i - 20] : 0);
+    worst = Math.max(worst, sum);
+  }
+  return worst;
+}
+
+/** A value as the seat state keys carry it: the rounding the server applies, both sides alike. */
 function rounded(value: unknown): unknown {
   return JSON.parse(JSON.stringify(value, turretWireNumber));
 }
@@ -200,6 +238,11 @@ function playOnline(command: string, aim = true, armed = false) {
   let phase = '';
   let ticks = 0;
   const bytes: Record<string, number> = {};
+  const seatPerTick: number[] = [];
+  const seatWirePerTick: number[] = [];
+  let resumed = false;
+  let late: { client: WireClient; sent: Record<string, string> } | null = null;
+  let lateTicks = 0;
   const drift = { march: 0, fly: 0, skid: 0 };
   const drawn = { march: 0, fly: 0, skid: 0 };
   const drawnSegments = new Set<string>();
@@ -207,9 +250,12 @@ function playOnline(command: string, aim = true, armed = false) {
     const events = sim.tick();
     ticks++;
     let fed = 0;
+    let eventBytes = 0;
     for (const event of events) {
       if (event.pid !== pid) continue;
+      eventBytes += JSON.stringify(event).length;
       client.route(event);
+      late?.client.route(event);
       if (event.type !== 'turretDefense') continue;
       fed++;
       const e = event.event;
@@ -217,12 +263,37 @@ function playOnline(command: string, aim = true, armed = false) {
       routed.add(e.type === 'fired' && e.weapon ? `fired ${e.weapon}` : e.type);
     }
     const prior = client.turretSession;
-    const self = wirePass(sent, sim, pid, bytes);
+    const seen = sim.meta(pid)?.vehicle as TurretSession | undefined;
+    const lastWave = seen ? seen.defense.plan.waves.length - 1 : -1;
+    const resume = !resumed && seen?.defense.phase === 'wave' && seen.defense.wave === lastWave;
+    if (resume) {
+      // A resume or a spectator switch: the server forgets what this session holds.
+      for (const key of Object.keys(sent)) delete sent[key];
+      resumed = true;
+    }
+    const counts: Record<string, number> = {};
+    const self = wirePass(sent, sim, pid, counts);
+    for (const [key, n] of Object.entries(counts)) bytes[key] = (bytes[key] ?? 0) + n;
+    seatPerTick.push(seatBytes(counts));
+    seatWirePerTick.push(seatBytes(counts) + (counts.turp ?? 0) + eventBytes);
+    if (resume) expect(Object.keys(self).sort()).toEqual(['turp', ...TURRET_SEAT_KEYS].sort());
     client.applyQuestSelfSnapshot(self, sim.time, sim.tickCount);
 
     const authoritative = turretSessionFor(sim.ctx, pid);
     expect(client.turretClock).toBe(turretClockFor(sim.ctx, pid));
-    if (self.tur === undefined && self.turp === undefined && fed === 0 && prior) {
+    if (!late && seen?.defense.phase === 'wave' && seen.defense.wave === 1) {
+      late = { client: new WireClient(sim, pid), sent: {} };
+    }
+    if (late) {
+      // A session that joins mid-wave: every key from scratch, then the same diffs.
+      late.client.applyQuestSelfSnapshot(wirePass(late.sent, sim, pid), sim.time, sim.tickCount);
+      const { feedback: _ring, ...seat } = authoritative!;
+      expect(rounded({ ...late.client.turretSession!, feedback: [] })).toEqual(
+        rounded({ ...seat, feedback: [] }),
+      );
+      lateTicks++;
+    }
+    if (Object.keys(self).length === 0 && fed === 0 && prior) {
       // Nothing moved on the wire: the same object on both sides, so still equal.
       expect(client.turretSession).toBe(prior);
       expect(authoritative).toBe(priorTruth);
@@ -277,8 +348,12 @@ function playOnline(command: string, aim = true, armed = false) {
     shots++;
   }
   expect(phase).toBe(aim ? 'won' : 'lost');
+  if (aim) expect(resumed).toBe(true);
+  expect(lateTicks).toBeGreaterThan(0);
   expect(lullTried).toBe(armed);
   expect(identical).toBeGreaterThan(0);
+  expect(worstSecond(seatPerTick)).toBeLessThan(SEAT_WORST_SECOND_CEILING);
+  expect(worstSecond(seatWirePerTick)).toBeLessThan(SEAT_WIRE_WORST_SECOND_CEILING);
   for (const kind of aim ? (['march', 'fly', 'skid'] as const) : (['march'] as const)) {
     expect(drawn[kind]).toBeGreaterThan(0);
     expect(drift[kind]).toBeLessThan(DRIFT_BOUND_YD);
@@ -292,18 +367,17 @@ function playOnline(command: string, aim = true, armed = false) {
     shots,
     slams,
     routed,
-    turBytesPerSecond: bytes.tur / (ticks / 20),
+    seatBytesPerSecond: seatBytes(bytes) / (ticks / 20),
   };
 }
 
 describe('Fire and Fly online: the socket-free round trip', () => {
   it('mirrors the authoritative seat within the wire rounding every tick of a won run, then clears on leave', () => {
-    const { sim, pid, client, sent, before, shots, turBytesPerSecond } = playOnline('/dev turret');
+    const { sim, pid, client, sent, before, shots, seatBytesPerSecond } = playOnline('/dev turret');
     expect(shots).toBeGreaterThan(50);
-    // The whole state per revision (D31, no delta), pruned and rounded: 14.8 KB/s over this
-    // run (14.5 before the limited weapons' stats and rearm tick joined the seat, 23.7 before
-    // the pruning); a later lot that grows the seat's `tur` rate fails here.
-    expect(turBytesPerSecond).toBeLessThan(TUR_BYTES_PER_SECOND_CEILING);
+    // Only the moved keys of the state per revision, pruned and rounded: 2.4 KB/s over this
+    // run (14.9 as one key, 23.7 before the pruning); a later lot that grows it fails here.
+    expect(seatBytesPerSecond).toBeLessThan(SEAT_BYTES_PER_SECOND_CEILING);
     const ring = client.turretSession!.feedback;
     expect(ring.map((f) => f.seq)).toEqual(ring.map((_, i) => ring[0].seq + i));
 
@@ -319,7 +393,7 @@ describe('Fire and Fly online: the socket-free round trip', () => {
 
   it("mirrors every tick of a won mission that spends its limited weapons: charges, resupplies, rearm and every weapon's entries", () => {
     // The Cracked Tower gives both weapons and resupplies them after waves 3 and 5.
-    const { sim, pid, client, slams, routed, turBytesPerSecond } = playOnline(
+    const { sim, pid, client, slams, routed, seatBytesPerSecond } = playOnline(
       '/dev turret brittle',
       true,
       true,
@@ -350,16 +424,16 @@ describe('Fire and Fly online: the socket-free round trip', () => {
       'resupply',
     ])
       expect(routed.has(kind), kind).toBe(true);
-    // The ring and the bomblets never ride `tur`, only the charges spent and resupplied (in
+    // The ring and the bomblets never ride the state keys, only the charges spent and resupplied (in
     // the stats) and the Shockwave's rearm tick do.
-    expect(turBytesPerSecond).toBeLessThan(TUR_BYTES_PER_SECOND_BY_MISSION.brittle);
+    expect(seatBytesPerSecond).toBeLessThan(SEAT_BYTES_PER_SECOND_BY_MISSION.brittle);
   });
 
   it.each(
     TURRET_SCENARIOS.filter((s) => s !== TURRET_DEFAULT_SCENARIO).map((s) => [s.boardKey, s]),
   )('mirrors every tick of a won %s run, its plan carried to the client', (key, scenario) => {
-    const { client, turBytesPerSecond } = playOnline(`/dev turret ${key}`);
-    expect(turBytesPerSecond).toBeLessThan(TUR_BYTES_PER_SECOND_BY_TRIAL[key]);
+    const { client, seatBytesPerSecond } = playOnline(`/dev turret ${key}`);
+    expect(seatBytesPerSecond).toBeLessThan(SEAT_BYTES_PER_SECOND_BY_TRIAL[key]);
     const seat = client.turretSession!;
     expect(seat.defense.plan.scenarioId).toBe(scenario.id);
     expect(seat.defense.plan.integrity).toBe(scenario.integrity);
@@ -369,8 +443,8 @@ describe('Fire and Fly online: the socket-free round trip', () => {
   it.each(TURRET_MISSIONS.map((s) => [s.boardKey, s] as const))(
     'mirrors every tick of a won %s mission, its plan carried to the client',
     (key, mission) => {
-      const { client, turBytesPerSecond } = playOnline(`/dev turret ${key}`);
-      expect(turBytesPerSecond).toBeLessThan(TUR_BYTES_PER_SECOND_BY_MISSION[key]);
+      const { client, seatBytesPerSecond } = playOnline(`/dev turret ${key}`);
+      expect(seatBytesPerSecond).toBeLessThan(SEAT_BYTES_PER_SECOND_BY_MISSION[key]);
       const seat = client.turretSession!;
       expect(seat.defense.phase).toBe('won');
       expect(seat.defense.plan.scenarioId).toBe(mission.id);
@@ -505,7 +579,7 @@ describe('Fire and Fly online: the socket-free round trip', () => {
     expect(client.turretClock).toBe(deadline - 1);
     step();
     expect(sim.meta(pid)?.vehicle ?? null).toBeNull();
-    expect(sent.tur).toBe('null');
+    for (const key of TURRET_SEAT_KEYS) expect(sent[key]).toBe('null');
     expect(client.turretSession).toBeNull();
     expect(client.turretClock).toBeNull();
     expect(sim.entities.get(pid)!.pos).toEqual(before);

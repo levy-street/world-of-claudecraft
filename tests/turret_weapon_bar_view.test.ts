@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { turretPlanWireJson, turretStateWireJson } from '../server/turret_self_wire';
+import { turretPlanWireJson } from '../server/turret_self_wire';
 import { QuestWorldWireState } from '../src/net/quest_world_wire_state';
 import { TURRET_MISSION_PACK } from '../src/sim/content/fire_and_fly_missions';
 import {
@@ -26,6 +26,7 @@ import {
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
 import type { TurretSessionView } from '../src/world_api/vehicles';
 import { resolveArmedTurretPlan } from './helpers/turret_armed_plan';
+import { turretStateWireKeys } from './helpers/turret_seat_wire';
 
 afterEach(() => setLanguage('en'));
 
@@ -251,7 +252,7 @@ describe('the turret weapon sockets view', () => {
     // The state key holds a revision back until a later tick, as the server sends it.
     const snapshot = (tick: number, withSeat = true) =>
       mirror.applyQuestSelfSnapshot(
-        withSeat ? { turp, tur: JSON.parse(turretStateWireJson(session, tick)) } : {},
+        withSeat ? { turp, ...turretStateWireKeys(session, tick) } : {},
         0,
         tick,
       );

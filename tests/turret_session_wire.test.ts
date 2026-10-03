@@ -1,13 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import {
+  TURRET_MONSTER_BUCKETS,
+  TURRET_MONSTER_KEYS,
   turretPlanWireJson,
-  turretStateWireJson,
   turretWireNumber,
 } from '../server/turret_self_wire';
 import {
+  assembleTurretSeatWire,
   decodeTurretFeedback,
   decodeTurretPlan,
   decodeTurretSeat,
+  TURRET_SEAT_WIRE_KEYS,
   type TurretSeatState,
 } from '../src/net/turret_session_wire';
 import {
@@ -33,6 +36,7 @@ import type { SimEvent, TurretSession, TurretWaveDef, WorldContent } from '../sr
 import { turretSessionFor } from '../src/sim/vehicles';
 import { groundHeight } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
+import { turretSeatKeys, turretStateWireJson } from './helpers/turret_seat_wire';
 
 const ground = { ground: (x: number, z: number) => groundHeight(x, z, WORLD_SEED) };
 const EMPTY_WORLD: WorldContent = { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] };
@@ -45,7 +49,7 @@ function wire(value: unknown): Wire {
   return JSON.parse(JSON.stringify(value));
 }
 
-/** A value as the `tur` key carries it: the rounding the server applies, both sides alike. */
+/** A value as the seat state keys carry it: the rounding the server applies, both sides alike. */
 function rounded(value: unknown): unknown {
   return JSON.parse(JSON.stringify(value, turretWireNumber));
 }
@@ -56,7 +60,7 @@ function seatOf(view: TurretSessionView): TurretSeatState {
 }
 
 interface Run {
-  /** Every distinct seat revision of the run, each with its `tur` JSON. */
+  /** Every distinct seat revision of the run, each with the seat its state keys join into. */
   revisions: { view: TurretSessionView; json: string }[];
   events: Extract<SimEvent, { type: 'turretDefense' }>[];
   session: TurretSession;
@@ -605,6 +609,81 @@ describe('the turret seat key', () => {
 
   it('reads null as no seat', () => {
     expect(decodeTurretSeat(null, plan)).toBeNull();
+  });
+});
+
+describe('the seat state key family', () => {
+  const joined = (parts: Record<string, unknown>) =>
+    decodeTurretSeat(assembleTurretSeatWire(parts), plan);
+  /** A mid-wave seat's family, the monsters spread over several buckets. */
+  function family(): Record<string, unknown> {
+    const parts = turretSeatKeys(midWave());
+    const filled = TURRET_MONSTER_KEYS.filter((key) => (parts[key] as unknown[]).length > 0);
+    expect(filled.length).toBeGreaterThan(1);
+    return parts;
+  }
+  /** The first bucket holding a monster, and that monster. */
+  function firstMonster(parts: Record<string, unknown>): { key: string; row: { id: number } } {
+    const key = TURRET_MONSTER_KEYS.find((k) => (parts[k] as unknown[]).length > 0)!;
+    return { key, row: (parts[key] as { id: number }[])[0] };
+  }
+
+  it('joins every revision back into the seat, the monsters in ascending id order', () => {
+    for (const { view } of [...won.revisions, ...lost.revisions]) {
+      const decoded = joined(turretSeatKeys(view));
+      expect(rounded(decoded)).toEqual(rounded(seatOf(view)));
+      const ids = decoded!.defense.monsters.map((m) => m.id);
+      expect(ids).toEqual([...ids].sort((a, b) => a - b));
+    }
+  });
+
+  it('reads a fully cleared family as no seat, and nothing it has not received as no seat', () => {
+    const cleared = Object.fromEntries(TURRET_SEAT_WIRE_KEYS.map((key) => [key, null]));
+    expect(assembleTurretSeatWire(cleared)).toBeNull();
+    expect(assembleTurretSeatWire({})).toBeNull();
+  });
+
+  it('fails closed on a partial family: a missing or cleared key beside live ones', () => {
+    for (const key of ['tur', 'tuv', 'tua', 'tus', 'tub', 'tut', 'tu0']) {
+      const missing = family();
+      delete missing[key];
+      expect(joined(missing), `${key} missing`).toBeNull();
+      expect(assembleTurretSeatWire(missing), `${key} missing`).not.toBeNull();
+      expect(joined({ ...family(), [key]: null }), `${key} cleared`).toBeNull();
+    }
+    expect(joined({ ...family(), tua: 7 })).toBeNull();
+    expect(joined({ ...family(), tu3: {} })).toBeNull();
+  });
+
+  it('fails closed on a monster in a bucket its id does not map to, or an id twice', () => {
+    const misplaced = family();
+    const { key, row } = firstMonster(misplaced);
+    const other =
+      TURRET_MONSTER_KEYS[(TURRET_MONSTER_KEYS.indexOf(key) + 1) % TURRET_MONSTER_BUCKETS];
+    misplaced[key] = (misplaced[key] as unknown[]).slice(1);
+    misplaced[other] = [...(misplaced[other] as unknown[]), row];
+    expect(joined(misplaced)).toBeNull();
+
+    const twice = family();
+    const first = firstMonster(twice);
+    twice[first.key] = [...(twice[first.key] as unknown[]), first.row];
+    expect(joined(twice)).toBeNull();
+
+    const unnumbered = family();
+    const bare = firstMonster(unnumbered);
+    unnumbered[bare.key] = [{ ...bare.row, id: -bare.row.id - 1 }];
+    expect(joined(unnumbered)).toBeNull();
+  });
+
+  it('fails closed on a bucket count out of range, or a bucket past the count', () => {
+    const seat = family().tur as Record<string, unknown>;
+    expect(seat.buckets).toBe(TURRET_MONSTER_BUCKETS);
+    for (const buckets of [0, -1, 1.5, '32', null, 65, TURRET_MONSTER_BUCKETS / 2]) {
+      expect(joined({ ...family(), tur: { ...seat, buckets } }), String(buckets)).toBeNull();
+    }
+    const past = TURRET_SEAT_WIRE_KEYS.at(-1)!;
+    expect(joined({ ...family(), [past]: [] })).toBeNull();
+    expect(joined({ ...family(), [past]: null })).not.toBeNull();
   });
 });
 
