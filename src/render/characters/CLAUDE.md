@@ -226,6 +226,16 @@ live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
 construction, so a shaman's `ghost_wolf` aura resolves to `form_ghost_wolf` (the tinted
 `wolf_basic.glb`) while the druid's `form_cat` loads its own `druid_cat_form.glb`.
 
+The borrowed identity body is prepared by the compile gate alone, with no stage at
+run start: taking it on or shedding it is a base-visual replace (`updateBaseVisual`),
+so the outgoing body keeps drawing until the new rig links (the `ENTITY_GATE_STAND_INS`
+row for that call site). In a private Graveyard Shift slot the real Morthen never
+spawns, so nothing warms `skel_boss` beforehand; a headless offline tour across
+`/dev graveyardshift start` and `end` recorded no `live-program` and no `gate-timeout`
+event, because the rig links no program the player bodies on screen have not already
+linked. Re-measure (and stage it the `interior_encounter_prewarm.ts` way) if the rig
+gains a material of its own.
+
 ## Animation
 - `AnimState` (the renderer-derived input) and `BaseState`
   (`idle|walk|walkBack|run|cast|spin|swim|sit|jump|prowlIdle|prowlWalk|...`) live in `anim_state.ts`, which

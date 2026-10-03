@@ -267,6 +267,16 @@ describe('entity gate stand-ins actually stand in', () => {
     expect(anyCharacterRigDrawing(slots({ visual: outgoing }))).toBe(true);
   });
 
+  it('base-visual swap gate: names the borrowed identity body it also hides', () => {
+    // The Graveyard Shift Morthen body changes visualKeyFor, so taking it on and
+    // shedding it both ride the same base-visual replace as a race or mech swap.
+    const row = ENTITY_GATE_STAND_INS.find(
+      (r) => r.callSite === 'this.gateSwapFlagOnCompile(next.root, () => {',
+    );
+    expect(row?.hides).toContain('race or mech swap');
+    expect(row?.hides).toContain('identity_body_core.ts');
+  });
+
   it('far-bake gate: the articulated rig stands in until the baked mesh links', () => {
     expect(farMeshShown(true, true, true)).toBe(false); // pending: rig keeps drawing
     expect(farMeshShown(true, true, false)).toBe(true); // settled: mesh takes over
