@@ -4,7 +4,8 @@ The player covers Morthen's shift in a private copy of the Hollow Crypt against 
 party of adventurer bots. Concept and lot plan live outside the repo while this is
 a prototype; this directory is built lot by lot. Today: the RUN SHELL (enter,
 exit, survive every exit), the MORTHEN IDENTITY (the owner becomes Morthen in
-the sim) and the ADVENTURER PARTY (three idle bots, hostility, win and loss).
+the sim), the ADVENTURER PARTY (three bots, hostility, win and loss) and the
+PARTY BRAIN (the bots fight like a pickup group).
 
 ## Contract
 - **Offline only while a prototype.** `canStartGraveyardShift` refuses unless
@@ -41,7 +42,10 @@ the sim) and the ADVENTURER PARTY (three idle bots, hostility, win and loss).
   `sim.ts` and the lock sites can import it without a cycle).
 - **Stats:** `recalcPlayerStats` re-enters over no gear and no talents, then
   `applyMorthenProfile` lays the `morthen` template on top through `mobBaseStats`
-  (the createMob formula): 1191 hp, 41 to 65 at 2.6 sec, 234 armor at level 10.
+  (the createMob formula), then the solo multipliers (`MORTHEN_SOLO_HP_MULT` x3,
+  `MORTHEN_SOLO_DAMAGE_MULT` x2 on the weapon and the kit's damage): 3573 hp, 82 to
+  130 at 2.6 sec, 234 armor at level 10. The raw template lost to the party in
+  under 45 sec without a kill; the multipliers are the playtest's tuning knobs.
   Every recalc path (buff, expiry, equip) therefore lands on the same numbers.
 - **Level and talents:** the real level and `talentMods` are parked on the run
   (`MorthenParked`); the owner is pinned to the template's level with
@@ -77,6 +81,24 @@ the sim) and the ADVENTURER PARTY (three idle bots, hostility, win and loss).
   leaves the claim is removed from the run; a shift nobody finishes ends after
   `GRAVEYARD_SHIFT_MAX_SECONDS`. The teardown removes every bot.
 
+## The party brain
+- **Pure rules** (`bot_brain.ts`, no `SimContext`, no shared rng): reaction delay
+  (8 to 18 ticks, never faster), no interrupt in the first 0.3 sec of a cast, no
+  crowd control on the boss, healer triage (tank weighs 1.5, self 0.6: the
+  exploitable flaw), target scoring (assist the tank, finish the wounded, answer
+  attackers, tunnel vision), and the per-run and per-slot private seeds.
+- **Driver** (`bot_driver.ts`): thinks every 4 ticks (staggered by roster slot),
+  moves every tick (walk to role range and line of sight, steer around cover with
+  the shared `bots/steer.ts` core, never move while casting), and acts only
+  through the real verbs (`castAbility`, `targetEntity`, `startAutoAttack`,
+  `moveInput`), pre-checking cooldown, GCD, resource, range and sight so the real
+  path never refuses. The party waits idle until Morthen comes within
+  `PARTY_ENGAGE_RADIUS` or lands a hit.
+- **Roles:** tank (pummel a cast after the reaction delay, taunt a minion off the
+  healer, sunder to 3, Reaver Strike, auto-attack in melee), healer (shield,
+  renew, lesser heal on the triage pick after a reaction delay, smite when all are
+  healthy), mage (counterspell a cast, Fire Blast, then Frostbolt or Fireball).
+
 ## Known limits of the shell (each owned by a later lot)
 - **A non-damage death still runs `handleDeath`** (death counter, deeds death
   hooks, the `playerDeath` event). Lethal damage is clamped first; only `/dev kill`
@@ -107,6 +129,8 @@ the sim) and the ADVENTURER PARTY (three idle bots, hostility, win and loss).
 | `run_party.ts` | the fixed party, its spawn after the identity and its removal |
 | `hostility.ts` | pure leaf: the adventurer marker and the Morthen-versus-adventurer pair rule |
 | `death_intercept.ts` | the lethal-blow clamp `dealDamage` calls |
+| `bot_brain.ts` | pure leaf: reaction, interrupt and control rules, triage, target scoring, seeds |
+| `bot_driver.ts` | the per-tick party driver through the real player verbs |
 | `run_lifecycle.ts` | `canStartGraveyardShift`, `startGraveyardShift`, `endGraveyardShift`, `updateGraveyardShift` (the one tick entry, called just before the delve runs) |
 | `index.ts` | the public barrel |
 

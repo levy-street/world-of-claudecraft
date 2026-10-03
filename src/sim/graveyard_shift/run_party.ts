@@ -5,15 +5,18 @@
 // plus the adventurer marker aura the hostility rule keys on. Never a
 // characterId, so the tutorial sweep and persistence never see them.
 
+import { freshBotSteer } from '../bots/steer';
 import { instanceOriginOf } from '../instances/dungeons';
+import { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
 import { settleTeleportArrival } from '../teleport_arrival';
 import type { PlayerClass } from '../types';
+import { type BotRole, botSeed } from './bot_brain';
 import { adventurerMarkerAura } from './hostility';
 import { GRAVEYARD_SHIFT_ARRIVAL, GRAVEYARD_SHIFT_BOT_SPOTS } from './run_layout';
 import type { GraveyardShiftBot, GraveyardShiftRun } from './run_state';
 
-export type GraveyardShiftRole = 'tank' | 'healer' | 'dps';
+export type GraveyardShiftRole = BotRole;
 
 // Fixed prototype composition (names IP-checked with the concept).
 export const GRAVEYARD_SHIFT_PARTY: readonly {
@@ -45,7 +48,20 @@ export function spawnGraveyardShiftParty(ctx: SimContext, run: GraveyardShiftRun
     e.facing = Math.atan2(GRAVEYARD_SHIFT_ARRIVAL.x - spot.x, GRAVEYARD_SHIFT_ARRIVAL.z - spot.z);
     e.prevFacing = e.facing;
     e.auras.push(adventurerMarkerAura(pid));
-    const bot: GraveyardShiftBot = { pid, role: member.role };
+    const bot: GraveyardShiftBot = {
+      pid,
+      role: member.role,
+      brain: {
+        rng: new Rng(botSeed(run.seed, index)),
+        steer: freshBotSteer(),
+        goalId: null,
+        seenCast: null,
+        seenRemaining: 0,
+        kickAt: null,
+        healTargetId: null,
+        healAt: 0,
+      },
+    };
     run.bots.push(bot);
   });
 }

@@ -26,6 +26,8 @@ import { revivePlayerAt } from '../spirit';
 import { settleTeleportArrival } from '../teleport_arrival';
 import { TICK_RATE } from '../types';
 import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
+import { graveyardShiftRunSeed } from './bot_brain';
+import { updateGraveyardShiftBots } from './bot_driver';
 import { applyMorthenIdentity, removeMorthenIdentity } from './morthen_transform';
 import { GRAVEYARD_SHIFT_ARRIVAL, graveyardShiftDoorDrop } from './run_layout';
 import { removeGraveyardShiftParty, spawnGraveyardShiftParty } from './run_party';
@@ -109,7 +111,9 @@ export function startGraveyardShift(ctx: SimContext, pid: number): string | null
     petStowed: !stashedBefore && ctx.delvePetStash.has(pid),
     parked,
     startedTick: ctx.tickCount,
+    seed: graveyardShiftRunSeed(ctx.cfg.seed, ctx.tickCount, pid),
     bots: [],
+    engaged: false,
     pendingOutcome: null,
   };
   ctx.graveyardShiftRuns.set(pid, run);
@@ -186,6 +190,8 @@ export function updateGraveyardShift(ctx: SimContext): void {
       pruneStrayBots(ctx, run);
       if (run.bots.every((bot) => ctx.entities.get(bot.pid)?.dead !== false)) {
         endGraveyardShift(ctx, run, 'won');
+      } else {
+        updateGraveyardShiftBots(ctx, run);
       }
     }
   }
