@@ -18345,7 +18345,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.fireAndFly.brief.giants':
     '從黎明起大地就在顫抖：青銅、熔岩和岩石鑄成的巨像正從山上走下來。牠們很慢，但什麼也擋不住牠們，一旦衝到塔下，塔撐不了多久。我就靠你了。',
   'questUi.worldQuest.fireAndFly.brief.deluge':
-    '少說也有上百隻：狼、野豬、蜘蛛和掘地者，一股小獸的洪流從四面八方同時湧來，從不退去。頂住，直到最後一刻它都不會減弱。',
+    '少說也有上百隻：狼、野豬、蜘蛛和掘地者，一股小獸的洪流從四面八方湧來。它退去時別信它：它總會捲土重來，更加兇猛，後面還有更大的傢伙蹚水而來。',
   'questUi.worldQuest.fireAndFly.brief.brittle':
     '這座老塔上個季節挨了一記重擊，裂縫始終沒有合上。今夜亡者復起，朝它進軍：最多七下，它就會倒塌。這一側我們只剩下它了，守住它。',
   'questUi.worldQuest.fireAndFly.brief.powder':

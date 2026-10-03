@@ -141,13 +141,13 @@ describe('the mission table', () => {
     },
   );
 
-  it('runs every mission on one eight-wave curve, its last two waves the largest', () => {
+  it('runs every mission over eight waves, the last one the largest', () => {
+    // Recomposed missions (The Deluge first) climb with lulls between strong moments, so only
+    // the length, a gentle first wave and the largest last wave hold across the table.
     for (const mission of TURRET_MISSIONS) {
       const spawns = spawnsOf(mission);
       expect(spawns).toHaveLength(8);
-      const last = Math.min(spawns[6], spawns[7]);
-      for (const n of spawns.slice(0, 6)) expect(n).toBeLessThan(last);
-      expect(spawns[7]).toBeGreaterThanOrEqual(spawns[6]);
+      expect(spawns[7]).toBe(Math.max(...spawns));
       expect(spawns[0]).toBeLessThanOrEqual(Math.min(...spawns.slice(1)));
     }
   });
@@ -281,28 +281,40 @@ describe('the mission table', () => {
     expect(spawnsOf(TURRET_MISSION_GIANTS).slice(5)).toEqual([12, 18, 26]);
   });
 
-  it('makes The Deluge dozens of small monsters from everywhere, every wave bigger and quicker', () => {
+  it('makes The Deluge a tide of small beasts, quicker than any mission, with surges and surprises', () => {
     const plan = resolveTurretPlan(TURRET_MISSION_DELUGE);
-    for (const kind of plan.kinds) {
-      expect(kind.sizeClass).toBe('small');
-      expect(kind.marchSpeed).toBeGreaterThan(
-        MOBS[kind.templateId].moveSpeed * TURRET_TIMING.marchFactor,
-      );
-    }
-    const spawns = spawnsOf(TURRET_MISSION_DELUGE);
-    expect(Math.min(...spawns)).toBeGreaterThanOrEqual(14);
-    expect(spawns.reduce((a, b) => a + b)).toBeGreaterThanOrEqual(100);
     const waves = TURRET_MISSION_DELUGE.waves;
-    for (let i = 1; i < waves.length; i++) {
-      expect(spawns[i]).toBeGreaterThan(spawns[i - 1]);
-      expect(entriesOf(waves[i])[0].speedScale ?? 1).toBeGreaterThan(
-        entriesOf(waves[i - 1])[0].speedScale ?? 1,
-      );
-      expect(walkersOf(waves[i]).gapMaxTicks).toBeLessThanOrEqual(
-        walkersOf(waves[i - 1]).gapMaxTicks,
-      );
-    }
-    for (const wave of waves) expect(sidesOf(wave)).toBe('ring');
+    const bricks = waves.map((w) => w.groups.map((g) => g.brick));
+    // Varied waves, not one shape: walkers, small groups, a pack, surgers, two surges, one big one.
+    const all = new Set(bricks.flat());
+    for (const b of ['walkers', 'smallGroup', 'pack', 'surgers', 'surge', 'bigOne'] as const)
+      expect(all.has(b), b).toBe(true);
+    // The two strong moments: the fourth wave's surge from one side, the last wave's from two.
+    const surges = waves.flatMap((w, i) =>
+      w.groups.flatMap((g) => (g.brick === 'surge' ? [[i, g.sides] as const] : [])),
+    );
+    expect(surges).toEqual([
+      [3, 1],
+      [7, 2],
+    ]);
+    // Small beasts only, but for the one big monster with its escort.
+    const big = plan.kinds.filter((k) => k.sizeClass !== 'small');
+    expect(big.map((k) => k.templateId)).toEqual(['fen_troll']);
+    expect(waves.flatMap((w) => w.groups).filter((g) => g.brick === 'bigOne')).toHaveLength(1);
+    // No sponge: a small beast falls to two good shells at most, the troll to a handful.
+    plan.waves.forEach((wave) => {
+      for (const kind of new Set(wave.spawns)) {
+        const shells = Math.ceil(plan.kinds[kind].maxHp / wave.coreDamage);
+        expect(shells).toBeLessThanOrEqual(plan.kinds[kind].sizeClass === 'small' ? 2 : 6);
+      }
+    });
+    // Its accent: about half its monsters run at one and a half times their template's pace or
+    // more. (Compared with the other missions once they are recomposed too.)
+    const entries = waves.flatMap((w) => w.groups.flatMap((g) => g.entries));
+    const total = entries.reduce((a, e) => a + e.count, 0);
+    const quick = entries.filter((e) => (e.speedScale ?? 1) >= 1.5);
+    expect(quick.reduce((a, e) => a + e.count, 0) / total).toBeGreaterThan(0.4);
+    expect(spawnsOf(TURRET_MISSION_DELUGE).reduce((a, b) => a + b)).toBeGreaterThanOrEqual(100);
   });
 
   it('gives The Cracked Tower 7 tower points and no large or huge monster', () => {

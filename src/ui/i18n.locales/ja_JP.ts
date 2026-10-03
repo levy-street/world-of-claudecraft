@@ -19287,7 +19287,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.fireAndFly.brief.giants':
     '夜明けから大地が揺れている。青銅と溶岩と石の巨像どもが丘を下ってくるのだ。動きは鈍いが何ものにも止められず、塔までたどり着かれたら長くはもたん。頼りにしているぞ。',
   'questUi.worldQuest.fireAndFly.brief.deluge':
-    '百匹は下らん、いやそれ以上だ。狼、猪、蜘蛛、穴掘りども、小さな獣の大波があらゆる方向から一度に押し寄せ、引くことを知らん。踏ん張れ、最後の最後まで勢いは衰えんぞ。',
+    '百匹は下らん、いやそれ以上だ。狼、猪、蜘蛛、穴掘りども、小さな獣の大波があらゆる方向から押し寄せてくる。引いたと思っても油断するな、必ずもっと強く戻ってくるし、その後ろからもっとでかい奴が迫ってくる。',
   'questUi.worldQuest.fireAndFly.brief.brittle':
     'あの古い塔は前の季節にひどい一撃を食らい、ひびはついに塞がらなかった。今宵、死者どもが蘇り、塔へと押し寄せてくる。せいぜい七発で崩れ落ちる。こちら側に残された最後の砦だ、守り抜いてくれ。',
   'questUi.worldQuest.fireAndFly.brief.powder':

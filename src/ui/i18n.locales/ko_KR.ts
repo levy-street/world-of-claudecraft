@@ -19254,7 +19254,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.fireAndFly.brief.giants':
     '새벽부터 땅이 흔들리고 있네. 청동과 용암과 바위로 된 거상들이 언덕을 내려오고 있지. 느리긴 해도 무엇으로도 막을 수 없고, 탑에 닿기라도 하면 오래 버티지 못할 걸세. 자네만 믿겠네.',
   'questUi.worldQuest.fireAndFly.brief.deluge':
-    '족히 백은 넘는 놈들이네. 늑대, 멧돼지, 거미, 굴착꾼까지, 작은 짐승들의 물결이 사방에서 한꺼번에 밀려들고, 물러날 줄을 모른다네. 버티게, 마지막 순간까지 기세가 꺾이지 않을 테니.',
+    '족히 백은 넘는 놈들이네. 늑대, 멧돼지, 거미, 굴착꾼까지, 작은 짐승들의 물결이 사방에서 밀려든다네. 물러난다고 믿지 말게, 언제나 더 거세게 돌아오고, 그 뒤로 더 큰 놈이 헤치고 다가오니.',
   'questUi.worldQuest.fireAndFly.brief.brittle':
     '그 낡은 탑은 지난 철에 끔찍한 일격을 맞았고, 금은 끝내 아물지 않았네. 오늘 밤 망자들이 일어나 탑으로 진군해 오지. 많아야 일곱 번 맞으면 무너질 걸세. 이쪽에 남은 건 그 탑뿐이니, 지켜 주게.',
   'questUi.worldQuest.fireAndFly.brief.powder':

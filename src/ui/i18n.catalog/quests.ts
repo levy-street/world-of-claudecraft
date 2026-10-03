@@ -376,7 +376,7 @@ const questStringsEn = {
           giants:
             'The ground has been shaking since dawn: colossi of bronze, of lava and of stone are coming down from the hills. They are slow, but nothing stops them, and if they reach the tower it will not stand for long. I am counting on you.',
           deluge:
-            'There must be a hundred of them and more: wolves, boars, spiders and tunnelers, a tide of small beasts pouring in from every side at once, and it never ebbs. Hold fast, it will not ease off before the very end.',
+            'There must be a hundred of them and more: wolves, boars, spiders and tunnelers, a tide of small beasts pouring in from every side. When it ebbs, do not trust it: it always comes back stronger, and something bigger is wading in behind.',
           brittle:
             'The old tower took a terrible blow last season, and the crack never closed. Tonight the dead have risen and march on it: seven blows at most, and down it comes. It is all we have left on this side, so keep it standing.',
           powder:

@@ -25,7 +25,12 @@ import {
   type TurretWaveDef,
   type TurretWaveEntry,
 } from '../types';
-import { TURRET_MEDALS, TURRET_TOWER_POINTS, turretKegRing } from './turret_defense';
+import {
+  TURRET_BARREL_RING,
+  TURRET_MEDALS,
+  TURRET_TOWER_POINTS,
+  turretKegRing,
+} from './turret_defense';
 
 const ticks = (seconds: number): number => Math.round(seconds / DT);
 const gap = (min: number, max: number) =>
@@ -468,11 +473,44 @@ export const TURRET_MISSION_GIANTS: TurretScenarioDef = {
 const FRAIL = 0.8;
 
 /**
- * Dozens of small, fast monsters from everywhere, never the same template two waves
- * running so its rigs never cover two full waves at once. Each wave is bigger, quicker and
- * closer-spaced than the last, the shells a little softer, until the last two pour in
- * forty-eight and sixty at three and four times their templates' pace: an unbroken swarm.
+ * A tide of small beasts that never lets the gunner settle: varied waves of walkers, small
+ * groups and a pack, quicker than any other mission's, with a monster or two surging in from
+ * a side away from the fight, and two surges as its strong moments (the fourth wave's from one
+ * side, the last wave's from two). A Fen Troll walking in with its escort is the one big
+ * monster. A small beast falls to one or two good shells; kegs stand spaced, a crown of them
+ * where the Shockwave throws the small ones, a cluster now and then.
  */
+const TIDE_GAP = gap(0.35, 0.55);
+const spaced = (count: number, cluster?: 2 | 3): TurretKegLotDef => ({
+  mode: 'random',
+  count,
+  ...TURRET_BARREL_RING,
+  spaced: true,
+  ...(cluster ? { cluster } : {}),
+});
+const smallCrown = (count: number): TurretKegLotDef => ({ mode: 'crown', count, size: 'small' });
+const front = (group: number, cluster?: 2 | 3): TurretKegLotDef => ({
+  mode: 'path',
+  group,
+  placement: 'front',
+  spaced: true,
+  ...(cluster ? { cluster } : {}),
+});
+const surgers = (
+  entries: readonly TurretWaveEntry[],
+  sides: number,
+  delay: number,
+): TurretGroupDef => ({
+  brick: 'surgers',
+  entries,
+  sides,
+  widthTurn: 0.04,
+  ...gap(0.4, 0.8),
+  delayTicks: ticks(delay),
+});
+const QUICK = { speedScale: 1.6, speedScaleMax: 2 } as const;
+const RUNNER = { speedScale: 2.2, speedScaleMax: 2.4 } as const;
+
 export const TURRET_MISSION_DELUGE: TurretScenarioDef = {
   id: 'fire_and_fly_deluge',
   boardKey: 'deluge',
@@ -482,106 +520,223 @@ export const TURRET_MISSION_DELUGE: TurretScenarioDef = {
   supply: MISSION_SUPPLY,
   waves: [
     {
+      // The tide rises: wolves walking in from all around.
       groups: [
         walkers(
-          [{ templateId: 'forest_wolf', count: 16, level: 2, speedScale: 1.6 }],
-          gap(0.3, 0.6),
+          [{ templateId: 'forest_wolf', count: 8, level: 2, speedScale: 1.1, speedScaleMax: 1.3 }],
+          gap(1, 1.6),
         ),
       ],
       coreDamage: 60,
-      kegs: KEGS(3),
+      kegs: [spaced(2)],
     },
     {
+      // Boars walking, then two quick bunches of wolves.
       groups: [
-        walkers(
-          [
-            { templateId: 'wild_boar', count: 10, level: 3, speedScale: 1.7, hpScale: FRAIL },
-            { templateId: 'webwood_spider', count: 10, level: 3, speedScale: 1.7, hpScale: FRAIL },
-          ],
-          gap(0.25, 0.5),
-        ),
-      ],
-      coreDamage: 56,
-      kegs: KEGS(3),
-    },
-    {
-      groups: [
-        walkers(
-          [
-            { templateId: 'forest_wolf', count: 12, level: 2, speedScale: 1.8 },
-            { templateId: 'tunnel_rat', count: 12, level: 5, speedScale: 1.8, hpScale: FRAIL },
-          ],
-          gap(0.2, 0.4),
-        ),
+        walkers([{ templateId: 'wild_boar', count: 6, level: 3, speedScale: 1.1 }], gap(1, 1.5)),
+        {
+          ...bunches(
+            [{ templateId: 'forest_wolf', count: 8, level: 2, ...QUICK }],
+            gap(0.2, 0.35),
+            4,
+            5,
+            0.06,
+          ),
+          delayTicks: ticks(6),
+        },
       ],
       coreDamage: 60,
-      kegs: KEGS(4),
+      kegs: [spaced(2)],
     },
     {
+      // Bunches from three sides, then the first monster surging in from behind.
       groups: [
-        walkers(
+        bunches(
           [
-            { templateId: 'wild_boar', count: 14, level: 3, speedScale: 2 },
-            { templateId: 'webwood_spider', count: 14, level: 4, speedScale: 2, hpScale: FRAIL },
+            {
+              templateId: 'webwood_spider',
+              count: 8,
+              level: 3,
+              speedScale: 1.3,
+              speedScaleMax: 1.6,
+            },
+            {
+              templateId: 'tunnel_rat',
+              count: 7,
+              level: 5,
+              speedScale: 1.3,
+              speedScaleMax: 1.6,
+              hpScale: FRAIL,
+            },
           ],
-          gap(0.15, 0.35),
+          gap(0.2, 0.35),
+          5,
+          4,
+          0.06,
         ),
+        surgers([{ templateId: 'forest_wolf', count: 1, level: 2, ...RUNNER }], 1, 10),
       ],
       coreDamage: 60,
-      kegs: KEGS(4),
+      kegs: [front(0)],
     },
     {
+      // The first surge: a few walkers, then a score of quick beasts from one side.
       groups: [
         walkers(
-          [
-            { templateId: 'tunnel_rat', count: 18, level: 6, speedScale: 2.2, hpScale: FRAIL },
-            { templateId: 'forest_wolf', count: 18, level: 2, speedScale: 2.2 },
-          ],
-          gap(0.1, 0.25),
+          [{ templateId: 'forest_wolf', count: 6, level: 2, speedScale: 1.2 }],
+          gap(0.8, 1.2),
         ),
+        {
+          brick: 'surge',
+          sides: 1,
+          widthTurn: 0.08,
+          entries: [
+            {
+              templateId: 'tunnel_rat',
+              count: 10,
+              level: 5,
+              speedScale: 1.9,
+              speedScaleMax: 2.3,
+              hpScale: FRAIL,
+            },
+            { templateId: 'forest_wolf', count: 8, level: 2, speedScale: 1.9, speedScaleMax: 2.3 },
+          ],
+          ...TIDE_GAP,
+          delayTicks: ticks(5),
+        },
       ],
       coreDamage: 60,
-      kegs: KEGS(5),
+      kegs: [smallCrown(2)],
     },
     {
+      // A false lull: slow boars, a pack of them gathering, and two beasts surging in.
+      groups: [
+        walkers(
+          [{ templateId: 'wild_boar', count: 5, level: 3, speedScale: 0.9, speedScaleMax: 1 }],
+          gap(1.2, 1.8),
+        ),
+        {
+          brick: 'pack',
+          minRadius: 28,
+          maxRadius: 34,
+          holdTicks: ticks(4),
+          spreadTicks: ticks(2),
+          widthTurn: 0.1,
+          advanceScale: 1.1,
+          entries: [{ templateId: 'wild_boar', count: 7, level: 3, ...MUSTER, leads: true }],
+          delayTicks: ticks(3),
+        },
+        surgers([{ templateId: 'forest_wolf', count: 2, level: 2, ...RUNNER }], 2, 12),
+      ],
+      coreDamage: 60,
+      kegs: [front(1, 2)],
+    },
+    {
+      // Bunches from three sides, beasts surging in, then boars from all around.
+      groups: [
+        bunches(
+          [
+            {
+              templateId: 'webwood_spider',
+              count: 9,
+              level: 4,
+              speedScale: 1.4,
+              speedScaleMax: 1.8,
+              hpScale: FRAIL,
+            },
+            {
+              templateId: 'tunnel_rat',
+              count: 9,
+              level: 5,
+              speedScale: 1.4,
+              speedScaleMax: 1.8,
+              hpScale: FRAIL,
+            },
+          ],
+          gap(0.2, 0.35),
+          6,
+          3,
+          0.06,
+        ),
+        surgers([{ templateId: 'forest_wolf', count: 2, level: 2, ...RUNNER }], 2, 8),
+        {
+          ...walkers(
+            [{ templateId: 'wild_boar', count: 6, level: 3, speedScale: 1.2, speedScaleMax: 1.4 }],
+            gap(0.7, 1.1),
+          ),
+          delayTicks: ticks(14),
+        },
+      ],
+      coreDamage: 60,
+      kegs: [spaced(2), front(0)],
+    },
+    {
+      // A quick stream from all around, a beast from behind, then the Fen Troll and its escort.
       groups: [
         walkers(
           [
-            { templateId: 'webwood_spider', count: 22, level: 4, speedScale: 3 },
-            { templateId: 'wild_boar', count: 22, level: 3, speedScale: 3 },
+            { templateId: 'forest_wolf', count: 7, level: 2, ...QUICK },
+            { templateId: 'tunnel_rat', count: 7, level: 5, ...QUICK, hpScale: FRAIL },
           ],
-          gap(0.08, 0.18),
+          gap(0.5, 0.8),
         ),
+        surgers([{ templateId: 'forest_wolf', count: 1, level: 2, ...RUNNER }], 1, 6),
+        {
+          brick: 'bigOne',
+          widthTurn: 0.05,
+          ...gap(0.4, 0.7),
+          entries: [
+            { templateId: 'fen_troll', count: 1, level: 10, bossLast: true },
+            { templateId: 'wild_boar', count: 3, level: 3, speedScale: 1.1 },
+          ],
+          delayTicks: ticks(10),
+        },
       ],
-      coreDamage: 55,
-      kegs: KEGS(5),
+      coreDamage: 60,
+      kegs: [smallCrown(2), spaced(1, 3)],
     },
     {
+      // The great surge from two sides, beasts surging in between, then the tide all around.
       groups: [
-        walkers(
-          [
-            { templateId: 'forest_wolf', count: 26, level: 2, speedScale: 3.6 },
-            { templateId: 'tunnel_rat', count: 22, level: 6, speedScale: 3.6, hpScale: FRAIL },
+        {
+          brick: 'surge',
+          sides: 2,
+          widthTurn: 0.08,
+          entries: [
+            { templateId: 'forest_wolf', count: 6, level: 2, speedScale: 2, speedScaleMax: 2.4 },
+            {
+              templateId: 'webwood_spider',
+              count: 6,
+              level: 4,
+              speedScale: 2,
+              speedScaleMax: 2.4,
+              hpScale: FRAIL,
+            },
+            {
+              templateId: 'tunnel_rat',
+              count: 6,
+              level: 5,
+              speedScale: 2,
+              speedScaleMax: 2.4,
+              hpScale: FRAIL,
+            },
           ],
-          gap(0.06, 0.14),
-        ),
+          ...gap(0.4, 0.6),
+        },
+        surgers([{ templateId: 'forest_wolf', count: 2, level: 2, ...RUNNER }], 2, 10),
+        {
+          ...walkers(
+            [
+              { templateId: 'wild_boar', count: 6, level: 3, ...QUICK },
+              { templateId: 'webwood_spider', count: 6, level: 4, ...QUICK, hpScale: FRAIL },
+            ],
+            gap(0.6, 0.9),
+          ),
+          delayTicks: ticks(16),
+        },
       ],
-      coreDamage: 50,
-      kegs: KEGS(5),
-    },
-    {
-      groups: [
-        walkers(
-          [
-            { templateId: 'webwood_spider', count: 26, level: 4, speedScale: 4.2 },
-            { templateId: 'wild_boar', count: 24, level: 3, speedScale: 4.2 },
-            { templateId: 'forest_wolf', count: 10, level: 2, speedScale: 4.2 },
-          ],
-          gap(0.05, 0.12),
-        ),
-      ],
-      coreDamage: 45,
-      kegs: KEGS(5),
+      coreDamage: 60,
+      kegs: [smallCrown(2), spaced(2)],
     },
   ],
 };
