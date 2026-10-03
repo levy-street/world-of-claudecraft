@@ -59,6 +59,11 @@ hostility, win and loss) and the PARTY BRAIN (the bots fight like a pickup group
   deed evaluation; the kit runs on the standard GCD whatever the real class.
 - **Immunities:** the template's `ccImmune` and `slowImmune`, through
   `playerAuraGuarded` (`morthenBlocksAura`); interrupt lockouts still land.
+- **Look (render side, no sim state):** every client draws an identity holder on
+  the `morthen` mob's own rig and colour (`src/render/characters/identity_body_core.ts`,
+  read by `visualKeyFor` and `createCharacterVisual`); the authored look is never
+  composed. The swap rides the renderer's gated base-visual replace. Body size
+  stays the player's (1.0), the real boss is drawn at its template scale.
 - **Real action bar frozen:** `Sim.actionBarReadOnly` is true while the offline
   primary holds the identity, so the HUD never prunes or saves the real bar.
 

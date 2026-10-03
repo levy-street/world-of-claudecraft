@@ -214,7 +214,10 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
 
 ## Keys & dispatch
 Every drawable is a `VisualDef` in `VISUALS` (player classes, creature families,
-humanoid mobs, NPCs, forms). Dispatch precedence in `visualKeyFor`: players to
+humanoid mobs, NPCs, forms). Dispatch precedence in `visualKeyFor`: a player
+holding a borrowed creature identity (`identity_body_core.ts`, today the Graveyard
+Shift's Morthen) to that creature's mob key, with the look provider bypassed and
+the creature's own colour and default skin (`createCharacterVisual`); other players to
 `player_<class>` (or `player_mech` for the mech skin catalog); mobs to
 `MOB_KEYS[templateId]`, then `FAMILY_KEYS[MOBS[id].family]` (the family ids
 live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
