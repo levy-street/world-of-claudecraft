@@ -131,9 +131,9 @@ describe('the scenario table', () => {
     expect(TURRET_DEFAULT_SCENARIO).toBe(TURRET_SCENARIO_STANDARD);
     for (const s of TURRET_SCENARIOS) {
       expect(s.boardKey).toMatch(/^[a-z]+$/);
-      // Only the Veterans' Test is resupplied, once, after its fifth wave, with no bonus.
+      // Only the Veterans' Test is resupplied, after its fourth and fifth waves, with no bonus.
       if (s === TURRET_SCENARIO_HARD)
-        expect(s.supply).toEqual({ resupplyAfterWaves: [5], unusedChargeBonus: false });
+        expect(s.supply).toEqual({ resupplyAfterWaves: [4, 5], unusedChargeBonus: false });
       else expect(s.supply).toBeUndefined();
       expect(s.medals.silver.minIntegrityShare).toBeGreaterThan(0);
       expect(s.medals.silver.minIntegrityShare).toBeLessThan(s.medals.gold.minIntegrityShare);
@@ -168,23 +168,28 @@ describe('the scenario table', () => {
     for (const e of TURRET_WAVES.flatMap((w) => w.entries)) expect(e.hpScale).toBeUndefined();
   });
 
-  it('makes Introduction short, small, on the whole ring, on the same tower', () => {
+  it('makes Introduction a gentle climb of small monsters at their own pace, on the same tower', () => {
     const intro = TURRET_SCENARIO_INTRODUCTION;
-    expect(intro.waves).toHaveLength(3);
+    expect(intro.waves).toHaveLength(7);
     // One tower for every trial since lot R5b: the waves carry the difficulty.
     expect(intro.integrity).toBe(TURRET_SCENARIO_STANDARD.integrity);
     // Its first wave spaces its spawns wider than Standing Watch's, then they close up.
     expect(intro.waves[0].gapMinTicks).toBeGreaterThan(TURRET_WAVES[0].gapMinTicks);
-    for (const wave of intro.waves) {
-      expect(wave.arrival).toBeUndefined();
+    const sizes = intro.waves.map((w) => w.entries.reduce((n, e) => n + e.count, 0));
+    for (const [w, wave] of intro.waves.entries()) {
+      // The load climbs a step a wave, the only fall being the grouped wave past the kegs.
+      if (w > 0 && wave.arrival?.kind !== 'burst')
+        expect(sizes[w]).toBeGreaterThanOrEqual(sizes[w - 1]);
+      expect(wave.gapMinTicks).toBeLessThanOrEqual(intro.waves[0].gapMinTicks);
       for (const e of wave.entries) {
         expect(TURRET_TEMPLATE_SIZES[e.templateId]).toBe('small');
         expect(e.hpScale).toBeUndefined();
+        // No monster runs faster than its template: the cannon is learnt, not raced.
+        expect(e.speedScale ?? 1).toBeLessThanOrEqual(1);
       }
     }
-    const count = (s: TurretScenarioDef) =>
-      s.waves.reduce((n, w) => n + w.entries.reduce((m, e) => m + e.count, 0), 0);
-    expect(count(intro)).toBeLessThanOrEqual(count(TURRET_SCENARIO_STANDARD) / 2);
+    expect(Math.max(...sizes)).toBe(sizes.at(-1));
+    expect(sizes[0]).toBeLessThanOrEqual(4);
   });
 
   it('makes Hard use every arrival pattern, tougher monsters and more of the large ones', () => {
@@ -226,7 +231,7 @@ describe('the scenario table', () => {
     expect(giants.map((e) => e.templateId).sort()).toEqual(['frostmane_yeti', 'idol_guardian']);
     const charge = last.entries.at(-1)!;
     expect(charge).toMatchObject({ templateId: 'boneclad_revenant', bossLast: true });
-    expect(charge.count).toBe(18);
+    expect(charge.count).toBe(19);
     for (const giant of giants) {
       expect(giant.bossLast).toBeUndefined();
       expect(charge.speedScale!).toBeGreaterThan(1.5 * giant.speedScale!);
@@ -275,7 +280,7 @@ describe('resolving a scenario into a plan', () => {
       expect(plan.scenarioId).toBe(s.id);
       expect(plan.integrity).toBe(s.integrity);
       expect(plan.arsenal).toEqual(TRIAL_ARSENALS[key]);
-      expect(plan.resupplyWaves).toEqual(key === 'hard' ? [4] : []);
+      expect(plan.resupplyWaves).toEqual(key === 'hard' ? [3, 4] : []);
       expect(plan.chargeBonus).toBe(false);
       expect(plan.waves).toHaveLength(s.waves.length);
       expect(Object.isFrozen(plan.arsenal)).toBe(true);
@@ -758,19 +763,15 @@ describe('full runs of every scenario with the scripted aimers', () => {
     }
   });
 
-  // The Veterans' Test is the hardest by its medals, not its length: its rushes end
-  // sooner than Standard's steady waves, so the two last about as long. The 2 to 4 minute
+  // The Veterans' Test is the hardest by its medals, not its length, and the Recruit's
+  // Trial climbs over seven gentle waves rather than three quick ones. The 2 to 4 minute
   // band is the design's for a 1 s aimer; this sloppy one fires sooner, so its runs are a
   // little shorter.
-  it('keeps Introduction the shortest and the other two within 2 to 4 minutes for the same aimer', () => {
-    const [intro, standard, hard] = TURRET_SCENARIOS.map(
-      (s) => fullRun(s, 42, hills, aimSloppily).seconds,
-    );
-    expect(intro).toBeLessThan(standard);
-    expect(intro).toBeLessThan(hard);
-    for (const seconds of [standard, hard]) {
-      expect(seconds).toBeGreaterThan(120);
-      expect(seconds).toBeLessThan(240);
+  it('keeps every trial within 2 to 4 minutes for the same aimer', () => {
+    for (const s of TURRET_SCENARIOS) {
+      const seconds = fullRun(s, 42, hills, aimSloppily).seconds;
+      expect(seconds, s.boardKey).toBeGreaterThan(120);
+      expect(seconds, s.boardKey).toBeLessThan(240);
     }
   });
 });

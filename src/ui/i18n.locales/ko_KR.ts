@@ -18895,7 +18895,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turretArsenal.resupplyShock': '보급: 충격파 {shock}',
   'hudChrome.turretArsenal.resupplyFrag': '보급: 파편탄 {frag}',
   'hudChrome.turretArsenal.resupplyRule':
-    '{waves}번째 웨이브가 끝나면 이 임무의 각 무기 충전이 하나씩 늘어납니다.',
+    '{waves}번째 웨이브가 끝나면 각 무기 충전이 하나씩 늘어납니다.',
   'hudChrome.turretArsenal.resupplyRuleOnce':
     '{wave}번째 웨이브가 끝나면 각 무기 충전이 하나씩 늘어납니다.',
   'hudChrome.turretArsenal.bonusRule':
@@ -19244,11 +19244,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.fireAndFly.scenarios.brittle': '금 간 탑',
   'questUi.worldQuest.fireAndFly.scenarios.powder': '화약고',
   'questUi.worldQuest.fireAndFly.brief.introduction':
-    '모든 포수는 여기서 시작하네, 신병. 늑대, 멧돼지, 쥐, 거미 같은 작은 짐승들이 짧은 세 번의 웨이브로 탑 사방에서 느긋하게 다가오지. 탑은 석공 손을 막 떠난 참이라 꽤 많이 물어뜯겨도 버틴다네.',
+    '자네가 이번 신병인가? 이게 자네 대포일세. 성미 까다로운 노부인이지만, 약속을 어긴 적은 한 번도 없지. 숲에서 짐승 몇 마리가 나올 걸세. 노린 것을 맞힐 줄 안다는 걸 보여 주게.',
   'questUi.worldQuest.fireAndFly.brief.standard':
-    '내 포수들이 매일 밤 성벽에서 서는 경계 근무일세. 여섯 번의 웨이브가 사방에서 몰려오지. 늑대와 멧돼지로 시작해 산적과 트롤을 거쳐 오우거, 걸어 다니는 시체, 살아 있는 바위 거인까지 이어지고, 마지막 웨이브는 다른 놈들보다 훨씬 거대한 것이 장식하지.',
+    '대포 하나로 늘 충분한 건 아니지. 탑마다 비장의 한 수가 숨어 있네. 성벽 발치에 몰려드는 것은 무엇이든 쓸어 버리는 충격파일세. 오늘 밤 자네는 그걸 쓰는 법을, 무엇보다 때를 고르는 법을 배우게 될 걸세.',
   'questUi.worldQuest.fireAndFly.brief.hard':
-    '포대를 맡기기 전에 고참병들에게 치르게 하는 포위전일세. 여섯 번의 웨이브는 정식 경계 근무보다 억세고 덩치 큰 놈이 더 많으며, 더 촘촘히 두세 방향에서 동시에 오거나 떼 지어 몰려오지. 마지막 웨이브에는 거구들이 걸어 들어오고 갑옷을 두른 망자들이 세 방향에서 그 뒤를 바짝 쫓아 달려오니, 이번 탑은 더 튼튼하게 지어 두었지.',
+    '장인들의 공방에서 나온 가장 파괴적인 무기, 파편탄일세. 조금 느리긴 해도, 터지면 주변에 서 있는 건 아무것도 남지 않지. 포수 명부에 이름을 올리기 전에 모든 포수는 이걸 다룰 줄 알아야 하네.',
   'questUi.worldQuest.fireAndFly.brief.pack':
     '우리 요새가 밀려드는 놈들에게 집어삼켜지고 있네! 놈들은 무리 지어 오는데, 무리마다 앞선 무리보다 더 사납지. 성벽 위에서도 놈들의 울부짖음이 들린다네. 성벽을 넘어오기 전에 놈들을 밀어내도록 도와주게!',
   'questUi.worldQuest.fireAndFly.brief.giants':

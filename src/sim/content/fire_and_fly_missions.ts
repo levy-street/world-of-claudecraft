@@ -108,7 +108,8 @@ export const TURRET_MISSION_PACK: TurretScenarioDef = {
   boardKey: 'pack',
   integrity: TURRET_TOWER_POINTS,
   medals: TURRET_MEDALS,
-  arsenal: { fragmentation: 5 },
+  // The frag is its signature; a recruited gunner carries the Shockwave too.
+  arsenal: { shockwave: 1, fragmentation: 5 },
   supply: MISSION_SUPPLY,
   waves: [
     {

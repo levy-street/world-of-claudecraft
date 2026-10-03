@@ -162,7 +162,7 @@ describe('the turret weapon tooltips', () => {
     expect(turretSupplyLines({ resupplyWaves: [], chargeBonus: false })).toEqual([]);
     const lines = turretSupplyLines({ resupplyWaves: [2, 4], chargeBonus: true });
     expect(lines).toEqual([
-      'Each weapon of the mission gains one charge as waves 3 and 5 end.',
+      'Each weapon gains one charge as waves 3 and 5 end.',
       `A won mission scores ${TURRET_POINTS.unusedCharge} points for each charge left unused.`,
     ]);
     const html = turretWeaponTooltip('shock', 61, 3, { resupplyWaves: [2, 4], chargeBonus: true });

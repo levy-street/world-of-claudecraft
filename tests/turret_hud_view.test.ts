@@ -577,10 +577,11 @@ describe('the turret feedback cursor', () => {
     expect(banner(plan(TURRET_MISSION_DELUGE), touch)).toBe(
       'Blast the monsters before they reach the tower. Tap a socket for a Shockwave or a Fragmentation Shell.',
     );
-    expect(banner(plan(TURRET_MISSION_PACK), pad)).toBe(
+    const fragOnly = plan({ ...TURRET_MISSION_PACK, arsenal: { fragmentation: 5 } });
+    expect(banner(fragOnly, pad)).toBe(
       'Blast the monsters before they reach the tower. LB: Fragmentation Shell.',
     );
-    expect(banner(plan(TURRET_MISSION_PACK), touch)).toBe(
+    expect(banner(fragOnly, touch)).toBe(
       'Blast the monsters before they reach the tower. Tap the socket for a Fragmentation Shell.',
     );
     const shockOnly = plan({ ...TURRET_MISSION_GIANTS, arsenal: { shockwave: 2 } });
@@ -616,7 +617,7 @@ describe('the turret feedback cursor', () => {
     });
   });
 
-  it("puts the Veterans' Test's one resupply under its final wave's banner, as the engine batches it", () => {
+  it("puts the Veterans' Test's last resupply under its final wave's banner, as the engine batches it", () => {
     // The real engine, a clean nearest-first aimer, to the tick wave 5 (index 4) clears.
     const plan = resolveTurretPlan(TURRET_SCENARIO_HARD);
     const engine = createTurretDefense(plan, { x: 0, z: 0 }, 3, START);
@@ -624,7 +625,7 @@ describe('the turret feedback cursor', () => {
     let batch: TurretEvent[] = [];
     for (let t = START + 1; t < START + 20 * 600 && !batch.length; t++) {
       const events = tickTurretDefense(engine, t, flat);
-      if (events.some((e) => e.type === 'resupply')) batch = events;
+      if (events.some((e) => e.type === 'resupply' && e.wave === 4)) batch = events;
       if (t < engine.readyTick) continue;
       let best: { x: number; z: number } | null = null;
       let bestD = Number.POSITIVE_INFINITY;
@@ -646,7 +647,7 @@ describe('the turret feedback cursor', () => {
       { type: 'resupply', wave: 4, shockwave: 1, fragmentation: 1 },
       { type: 'waveStart', wave: 5, count: plan.waves[5].spawns.length },
     ]);
-    expect(engine.stats.resupplies).toBe(1);
+    expect(engine.stats.resupplies).toBe(2);
     const session = seat(START, plan);
     push(session, START + 60, ...batch);
     expect(new TurretFeedbackCursor().consume(turretSessionView(session))).toEqual({

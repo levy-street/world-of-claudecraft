@@ -13,11 +13,12 @@
 // keg, a Shockwave at 2 strikes due), which reads the field exactly, and the same policy
 // reading it 0.4 s late. Every trial's tower holds 100 points under the one medal rule
 // (gold keeps 95 percent, silver 60), so the waves carry the difficulty (lot R5b): a
-// player firing 0.4 s after each reload and reading the field exactly golds the
-// Recruit's Trial about three runs in five, and everyone up to 1 s wins it; Standing
+// player firing 0.4 s after each reload golds the Recruit's Trial
+// every run (a school, not a test: everyone up to 2 s wins it, with silver at 1 s); Standing
 // Watch nearly always (its gold target of about half is set aside: every wave set that
 // reached it left the 1 s player, who must win it most runs, losing them all), its
-// Shockwaves carrying a 1 s player to a win about three runs in four; the Veterans' Test about a third, under a tenth bare, the gold lost
+// Shockwaves carrying a 1 s player to a win about three runs in four; the Veterans' Test
+// about two runs in five, resupplied after its fourth and fifth waves, the gold lost
 // in the last wave, where a 1 s player now loses most runs. A monster at the foot
 // strikes 0.8 s after it gets there, every wave sets off on the tick the one before is
 // cleared, and no monster is a sponge: a few good shells fell anything but a giant.
@@ -34,10 +35,8 @@ import {
 
 const ticks = (seconds: number): number => Math.round(seconds / DT);
 
-/** The first wave's spawns: under a second and a half apart, room to aim each one. */
-const INTRO_GAP = { gapMinTicks: ticks(0.75), gapMaxTicks: ticks(1.25) } as const;
-/** The trial's monsters run nearly twice their templates' march: the cannon is tested. */
-const INTRO_PACE = 1.87;
+/** The first waves' spawns: two seconds and more apart, time to aim each one. */
+const INTRO_GAP = { gapMinTicks: ticks(2), gapMaxTicks: ticks(3) } as const;
 const HARD_GAP = { gapMinTicks: ticks(0.4), gapMaxTicks: ticks(0.8) } as const;
 /** Inside a pack, the members follow each other closely. */
 const PACK_GAP = { gapMinTicks: ticks(0.15), gapMaxTicks: ticks(0.25) } as const;
@@ -51,11 +50,10 @@ const CHARGER_HP = 2.2;
 const GIANT_HP = 1.1;
 
 /**
- * Three short waves of the smallest monsters on the whole ring, running in quickly
- * from every side, with room for mistakes: one shell fells a first-wave wolf, then each
- * monster takes two, and the spawns close up wave by wave. A small monster's strike costs
- * 2 points, so gold forgives two of them: a player firing 0.4 s after each reload keeps
- * it about two runs in three, and anyone up to 1 s still wins.
+ * The cannon's school: seven waves of the smallest monsters at their own pace, the load
+ * climbing a step a wave, never a flood: a lone wolf at a time, then pairs, small groups,
+ * a group walking past the kegs, and the busiest wave last. A first-wave wolf falls to one
+ * shell, the rest to two. A small monster's strike costs 2 points, so gold forgives two.
  */
 export const TURRET_SCENARIO_INTRODUCTION: TurretScenarioDef = {
   id: 'fire_and_fly_introduction',
@@ -65,30 +63,70 @@ export const TURRET_SCENARIO_INTRODUCTION: TurretScenarioDef = {
   // The cannon and the kegs only: the weapons come one per trial after it.
   waves: [
     {
-      entries: [{ templateId: 'forest_wolf', count: 8, level: 1, speedScale: INTRO_PACE }],
-      coreDamage: 78,
+      entries: [{ templateId: 'forest_wolf', count: 4, level: 1 }],
+      coreDamage: 60,
       ...INTRO_GAP,
       barrels: { count: 2, ...TURRET_BARREL_RING },
     },
     {
-      entries: [
-        { templateId: 'wild_boar', count: 9, level: 3, speedScale: INTRO_PACE },
-        { templateId: 'forest_wolf', count: 6, level: 2, speedScale: INTRO_PACE },
-      ],
-      coreDamage: 47,
-      gapMinTicks: ticks(0.45),
-      gapMaxTicks: ticks(0.8),
+      entries: [{ templateId: 'forest_wolf', count: 6, level: 1 }],
+      coreDamage: 60,
+      gapMinTicks: ticks(1.6),
+      gapMaxTicks: ticks(2.4),
       barrels: { count: 2, ...TURRET_BARREL_RING },
     },
     {
       entries: [
-        { templateId: 'tunnel_rat', count: 14, level: 4, speedScale: INTRO_PACE },
-        { templateId: 'webwood_spider', count: 12, level: 3, speedScale: INTRO_PACE },
+        { templateId: 'wild_boar', count: 5, level: 2 },
+        { templateId: 'forest_wolf', count: 3, level: 2 },
       ],
-      coreDamage: 52,
-      gapMinTicks: ticks(0.45),
-      gapMaxTicks: ticks(0.65),
+      coreDamage: 36,
+      gapMinTicks: ticks(1.4),
+      gapMaxTicks: ticks(2),
       barrels: { count: 2, ...TURRET_BARREL_RING },
+    },
+    {
+      entries: [
+        { templateId: 'forest_wolf', count: 5, level: 2 },
+        { templateId: 'wild_boar', count: 5, level: 3 },
+      ],
+      coreDamage: 36,
+      gapMinTicks: ticks(1.2),
+      gapMaxTicks: ticks(1.8),
+      barrels: { count: 2, ...TURRET_BARREL_RING },
+      arrival: { kind: 'flanks', count: 2, widthTurn: 0.14 },
+    },
+    {
+      entries: [
+        { templateId: 'wild_boar', count: 6, level: 3 },
+        { templateId: 'forest_wolf', count: 4, level: 2 },
+      ],
+      coreDamage: 38,
+      gapMinTicks: ticks(0.3),
+      gapMaxTicks: ticks(0.5),
+      barrels: { count: 3, ...TURRET_BARREL_RING, placement: 'lanes' },
+      arrival: { kind: 'burst', groupSize: 5, groupGapTicks: ticks(6), widthTurn: 0.04 },
+    },
+    {
+      entries: [
+        { templateId: 'tunnel_rat', count: 8, level: 4 },
+        { templateId: 'webwood_spider', count: 7, level: 3 },
+      ],
+      coreDamage: 40,
+      gapMinTicks: ticks(0.85),
+      gapMaxTicks: ticks(1.3),
+      barrels: { count: 2, ...TURRET_BARREL_RING },
+    },
+    {
+      entries: [
+        { templateId: 'tunnel_rat', count: 10, level: 4 },
+        { templateId: 'webwood_spider', count: 10, level: 3 },
+      ],
+      coreDamage: 40,
+      gapMinTicks: ticks(0.7),
+      gapMaxTicks: ticks(1.05),
+      barrels: { count: 3, ...TURRET_BARREL_RING },
+      arrival: { kind: 'flanks', count: 3, widthTurn: 0.14 },
     },
   ],
 };
@@ -117,9 +155,10 @@ export const TURRET_SCENARIO_HARD: TurretScenarioDef = {
   medals: TURRET_MEDALS,
   // It brings in the fragmentation shell beside fewer Shockwaves.
   arsenal: { shockwave: 2, fragmentation: 4 },
-  // One Shockwave and one frag more as the fifth wave ends, so every gunner meets the
-  // last charge with a tool for the giants and the dead; no bonus for charges left.
-  supply: { resupplyAfterWaves: [5], unusedChargeBonus: false },
+  // One Shockwave and one frag more as the fourth and the fifth waves end, so even a
+  // gunner who fires each charge the moment it comes meets the last charge with two of
+  // each for the giants and the dead; no bonus for charges left.
+  supply: { resupplyAfterWaves: [4, 5], unusedChargeBonus: false },
   waves: [
     {
       entries: [
@@ -176,14 +215,14 @@ export const TURRET_SCENARIO_HARD: TurretScenarioDef = {
       // The giants set off first, a little quicker than their templates; the charge
       // spawns behind them and runs them down, so both reach the tower together. No
       // sponge: a charger falls to three good shells, a giant to five or six; the charge
-      // is many (18 at 2.4 times their pace) so the cannon alone lets several through,
+      // is many (19 at 2.4 times their pace) so the cannon alone lets several through,
       // while the Shockwave and frags saved for this wave turn most of it back.
       entries: [
         { templateId: 'frostmane_yeti', count: 3, level: 20, hpScale: GIANT_HP, speedScale: 1.15 },
         { templateId: 'idol_guardian', count: 1, level: 20, hpScale: GIANT_HP, speedScale: 1.15 },
         {
           templateId: 'boneclad_revenant',
-          count: 18,
+          count: 19,
           level: 19,
           bossLast: true,
           hpScale: CHARGER_HP,

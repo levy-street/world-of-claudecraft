@@ -236,9 +236,11 @@ it('shows no socket for a weapon the scenario does not give, and its key does no
   expect(world.useVehicleAction).not.toHaveBeenCalled();
   bar.chooseSlot(0);
   expect(world.useVehicleAction).toHaveBeenLastCalledWith('turret_shockwave', { x: 0, z: 0 });
-  // The Pack gives fragmentation shells alone: the Shockwave socket goes, key 1 is silent.
+  // A plan with fragmentation shells alone: the Shockwave socket goes, key 1 is silent.
   world.useVehicleAction.mockClear();
-  seatIn(seat('wave', resolveTurretPlan(TURRET_MISSION_PACK)));
+  seatIn(
+    seat('wave', resolveTurretPlan({ ...TURRET_MISSION_PACK, arsenal: { fragmentation: 5 } })),
+  );
   expect(sockets().map((b) => b.style.display)).toEqual(['none', '']);
   bar.chooseSlot(0);
   expect(world.useVehicleAction).not.toHaveBeenCalled();
@@ -259,14 +261,14 @@ it("adds a mission's resupply waves and points per charge left to each tooltip",
   seatIn(seat('wave', resolveTurretPlan(TURRET_MISSION_DELUGE)));
   for (const socket of sockets()) {
     const html = tooltips.get(socket)!();
-    expect(html).toContain('Each weapon of the mission gains one charge as waves 3, 5, and 7 end.');
+    expect(html).toContain('Each weapon gains one charge as waves 3, 5, and 7 end.');
     expect(html).toContain('A won mission scores 60 points for each charge left unused.');
   }
   // The Veterans' Test's one resupply, with no mission wording and no score for charges left.
   seatIn(seat('wave', resolveTurretPlan(TURRET_SCENARIO_HARD)));
   for (const socket of sockets()) {
     const html = tooltips.get(socket)!();
-    expect(html).toContain('Each weapon gains one charge as wave 5 ends.');
+    expect(html).toContain('Each weapon gains one charge as waves 4 and 5 end.');
     expect(html).not.toContain('mission');
   }
   seatIn(seat('wave', resolveTurretPlan(TURRET_SCENARIO_STANDARD)));

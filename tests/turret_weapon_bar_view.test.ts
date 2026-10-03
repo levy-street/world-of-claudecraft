@@ -194,7 +194,7 @@ describe('the turret weapon sockets view', () => {
     expect(presence(TURRET_SCENARIO_INTRODUCTION)).toEqual([false, false]);
     expect(presence(TURRET_SCENARIO_STANDARD)).toEqual([true, false]);
     expect(presence(TURRET_SCENARIO_HARD)).toEqual([true, true]);
-    expect(presence(TURRET_MISSION_PACK)).toEqual([false, true]);
+    expect(presence(TURRET_MISSION_PACK)).toEqual([true, true]);
     expect(turretWeaponInArsenal({ shockwave: 0, fragmentation: 1 }, 'shock')).toBe(false);
     expect(turretWeaponInArsenal({ shockwave: 0, fragmentation: 1 }, 'frag')).toBe(true);
   });

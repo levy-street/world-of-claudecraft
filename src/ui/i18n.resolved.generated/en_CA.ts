@@ -562,7 +562,7 @@ export const en_CA: EnTranslations = {
       "resupplyBoth": "Resupply: {shock} Shockwave, {frag} Fragmentation Shell",
       "resupplyShock": "Resupply: {shock} Shockwave",
       "resupplyFrag": "Resupply: {frag} Fragmentation Shell",
-      "resupplyRule": "Each weapon of the mission gains one charge as waves {waves} end.",
+      "resupplyRule": "Each weapon gains one charge as waves {waves} end.",
       "resupplyRuleOnce": "Each weapon gains one charge as wave {wave} ends.",
       "bonusRule": "A won mission scores {points} points for each charge left unused.",
       "pointsCharges": "Charges kept ({count})"
@@ -12698,9 +12698,9 @@ export const en_CA: EnTranslations = {
           "powder": "The Powder Store"
         },
         "brief": {
-          "introduction": "Every gunner starts here, recruit. Three short waves of small game, wolves, boars, rats and spiders, amble in from all around the tower without much hurry. The tower is fresh from the masons and can take a good many bites.",
-          "standard": "This is the watch my crews stand on the walls every night. Six waves from every side, opening with wolves and boars and climbing through bandits and trolls to ogres, the walking dead and hulks of living stone, and the last one closes on something far bigger than the rest.",
-          "hard": "The siege I put the old hands through before I trust them with a battery. Six waves, tougher than the Standing Watch and heavier on the big brutes, arriving closer together from two or three sides at once or in tight packs. In the last one the giants walk in with a charge of armoured dead running at their heels from three sides, so I have had this tower built stouter.",
+          "introduction": "So you are the new recruit? Here is your cannon: a temperamental old lady, but she has never once missed an appointment. A few beasts are about to come out of the woods, so show me you can hit what you aim at.",
+          "standard": "One cannon is not always enough. Every tower keeps an ace up its sleeve, the Shockwave, which sweeps away whatever crowds at the foot of the walls. Tonight you learn to use it, and above all to pick your moment.",
+          "hard": "Here is the most destructive weapon ever to leave the artificers' workshop: the Fragmentation Shell. It is a little slow, but when it bursts, nothing around it is left standing. Every gunner must master it before their name goes on the gunners' roll.",
           "pack": "Our fortifications are being overrun! They come in packs, each one fiercer than the last, and you can hear them howling from the ramparts. Help us drive them back before they break over the walls!",
           "giants": "The ground has been shaking since dawn: colossi of bronze, of lava and of stone are coming down from the hills. They are slow, but nothing stops them, and if they reach the tower it will not stand for long. I am counting on you.",
           "deluge": "There must be a hundred of them and more: wolves, boars, spiders and tunnelers, a tide of small beasts pouring in from every side at once, and it never ebbs. Hold fast, it will not ease off before the very end.",

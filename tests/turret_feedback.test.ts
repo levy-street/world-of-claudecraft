@@ -67,10 +67,10 @@ describe('the turret feedback ring', () => {
     // start and kegs on the same tick. The most one tick has recorded in a measured run is 58
     // entries (lot N2d), 41 in lot R5b's measured runs, far under any of these.
     expect(Object.fromEntries(bursts)).toEqual({
-      introduction: 515,
+      introduction: 401,
       standard: 506,
-      hard: 772,
-      pack: 1220,
+      hard: 821,
+      pack: 1290,
       giants: 781,
       deluge: 1888,
       brittle: 1303,

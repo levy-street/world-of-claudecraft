@@ -18011,7 +18011,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turretArsenal.resupplyBoth': '补给：冲击波 {shock}，破片弹 {frag}',
   'hudChrome.turretArsenal.resupplyShock': '补给：冲击波 {shock}',
   'hudChrome.turretArsenal.resupplyFrag': '补给：破片弹 {frag}',
-  'hudChrome.turretArsenal.resupplyRule': '第 {waves} 波结束时，本任务的每种武器各增加一次次数。',
+  'hudChrome.turretArsenal.resupplyRule': '第 {waves} 波结束时，每种武器各增加一次次数。',
   'hudChrome.turretArsenal.resupplyRuleOnce': '第 {wave} 波结束时，每种武器各增加一次次数。',
   'hudChrome.turretArsenal.bonusRule': '赢下任务时，每剩余一次未用次数得 {points} 分。',
   'hudChrome.turretArsenal.pointsCharges': '保留次数（{count}）',
@@ -18327,11 +18327,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.fireAndFly.scenarios.brittle': '裂塔',
   'questUi.worldQuest.fireAndFly.scenarios.powder': '火药库',
   'questUi.worldQuest.fireAndFly.brief.introduction':
-    '每个炮手都从这里起步，新兵。三小波小兽，狼、野猪、老鼠和蜘蛛，从塔楼四周慢悠悠地晃过来。这座塔刚出石匠之手，挨得住不少啃咬。',
+    '你就是新来的新兵？这是你的炮：一位脾气古怪的老太太，可她从没误过一次约。几头野兽马上要从林子里出来了，让我看看你能不能打中你瞄准的东西。',
   'questUi.worldQuest.fireAndFly.brief.standard':
-    '这是我的炮组每晚在城墙上的值守。六波敌人从四面八方涌来，先是狼和野猪，再到强盗和巨魔，然后是食人魔、行尸和活岩巨像，最后一波压阵的是个远比其他怪物庞大的家伙。',
+    '一门炮并不总是够用。每座塔都藏着一手绝活：冲击波，能把聚在城墙脚下的一切统统扫开。今晚你要学会用它，更要学会挑准时机。',
   'questUi.worldQuest.fireAndFly.brief.hard':
-    '这是我让老兵们经受的围攻，过了这关我才会把炮台交给他们。六波敌人，比正式值守更强悍，大块头更多，来得更密，同时从两三个方向或成群扑来。最后一波，巨物们缓步逼近，一队披甲的亡者紧随其后，从三个方向狂奔而来，所以这座塔楼造得格外坚固。',
+    '这是工匠作坊里造出过的最具毁灭性的武器：破片弹。它稍微慢了点，可一旦炸开，周围什么都站不住。每个炮手在名字写进炮手名册之前，都得先掌握它。',
   'questUi.worldQuest.fireAndFly.brief.pack':
     '我们的防线快被冲垮了！它们成群而来，一群比一群凶悍，连城墙上都听得见它们的嚎叫。帮我们把它们打回去，别让它们冲上城墙！',
   'questUi.worldQuest.fireAndFly.brief.giants':

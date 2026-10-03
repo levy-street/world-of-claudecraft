@@ -18938,7 +18938,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turretArsenal.resupplyShock': '補給：衝撃波 {shock}',
   'hudChrome.turretArsenal.resupplyFrag': '補給：榴散弾 {frag}',
   'hudChrome.turretArsenal.resupplyRule':
-    'ウェーブ {waves} の終わりに、この任務の各兵器のチャージが一つ増える。',
+    'ウェーブ {waves} の終わりに、各兵器のチャージが一つ増える。',
   'hudChrome.turretArsenal.resupplyRuleOnce':
     'ウェーブ {wave} の終わりに、各兵器のチャージが一つ増える。',
   'hudChrome.turretArsenal.bonusRule':
@@ -19277,11 +19277,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.fireAndFly.scenarios.brittle': 'ひび割れた塔',
   'questUi.worldQuest.fireAndFly.scenarios.powder': '火薬庫',
   'questUi.worldQuest.fireAndFly.brief.introduction':
-    'どの砲手もここから始めるんだ、新兵。狼に猪、鼠に蜘蛛といった小さな獣が、短い三つの波で塔の四方からのんびり寄ってくる。塔は石工の手を離れたばかりで、多少かじられてもびくともしない。',
+    'お前が今度の新兵か？これがお前の大砲だ。気難しい婆さんだが、約束の場に遅れたことは一度もない。森から獣が何匹か出てくる。狙ったものに当てられるところを見せてみろ。',
   'questUi.worldQuest.fireAndFly.brief.standard':
-    'これはうちの砲手たちが毎晩城壁で務める見張りだ。六つの波が四方から押し寄せる。始めは狼と猪、やがて山賊とトロール、オーガ、歩く死者、生きた岩の巨体へと続き、最後の波はほかの何よりもずっと大きなものが締めくくる。',
+    '大砲一門でいつも足りるとは限らん。どの塔にも奥の手が隠してある。城壁の足元に群がるものを一掃する衝撃波だ。今夜はその使い方を、何よりも使いどころの見極め方を覚えてもらう。',
   'questUi.worldQuest.fireAndFly.brief.hard':
-    '砲台を任せる前に古参兵に課す包囲戦だ。六つの波は本番の見張りより手強く、大物が多く、間を置かずに二方向か三方向から同時に、あるいは固まった群れで来る。最後の波では巨体どもが歩いて来て、そのすぐ後ろから鎧をまとった死者の一団が三方向から駆けて来るので、この塔は頑丈に造らせてある。',
+    '工匠たちの工房から生まれた中で最も破壊的な兵器、榴散弾だ。少々のろいが、炸裂すれば周りに立っているものは何も残らん。砲手の名簿に名を載せる前に、誰もがこれを使いこなさねばならん。',
   'questUi.worldQuest.fireAndFly.brief.pack':
     'われらの砦が呑まれかけている！奴らは群れで来る、それも群れごとに凶暴さを増してな。城壁の上まで遠吠えが聞こえてくる。乗り越えられる前に、奴らを押し返すのに手を貸してくれ！',
   'questUi.worldQuest.fireAndFly.brief.giants':

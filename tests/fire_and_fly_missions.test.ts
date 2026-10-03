@@ -64,7 +64,7 @@ function variant(over: Partial<TurretScenarioDef>): TurretScenarioDef {
 
 /** Each mission's signature weapon: the one its idea asks for, in charges at the start. */
 const MISSION_ARSENALS: Record<string, { shockwave: number; fragmentation: number }> = {
-  pack: { shockwave: 0, fragmentation: 5 },
+  pack: { shockwave: 1, fragmentation: 5 },
   giants: { shockwave: 4, fragmentation: 1 },
   deluge: { shockwave: 3, fragmentation: 2 },
   brittle: { shockwave: 3, fragmentation: 1 },

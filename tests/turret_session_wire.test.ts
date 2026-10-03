@@ -170,7 +170,7 @@ describe('the turret plan key', () => {
         fragmentation: scenario.arsenal?.fragmentation ?? 0,
       });
       // Only the Veterans' Test is resupplied (after its fifth wave), and no trial scores charges.
-      expect(decoded?.resupplyWaves).toEqual(_key === 'hard' ? [4] : []);
+      expect(decoded?.resupplyWaves).toEqual(_key === 'hard' ? [3, 4] : []);
       expect(decoded?.chargeBonus).toBe(false);
       expect(decoded?.waves.map((w) => w.arrival)).toEqual(
         scenario.waves.map((w) => w.arrival ?? { kind: 'ring' }),
