@@ -29,8 +29,9 @@ export const MORTHEN_KIT: readonly AbilityDef[] = [
     effects: [
       { type: 'directDamage', min: 20, max: 32, spellPowerCoeff: 0 },
       { type: 'gainResource', amount: GRAVECALL_DREAD },
+      { type: 'gshiftMark', maxStacks: 3, duration: 15 },
     ],
-    description: `Hurls a bolt of grave shadow at the target for 20 to 32 Shadow damage and generates ${GRAVECALL_DREAD} Dread.`,
+    description: `Hurls a bolt of grave shadow at the target for 20 to 32 Shadow damage, marks it for the barrow (up to 3 marks) and generates ${GRAVECALL_DREAD} Dread.`,
   },
   {
     // The template's Shadow Pulse (12 to 18 damage, 12 yards, every 10 sec) as a
@@ -46,6 +47,8 @@ export const MORTHEN_KIT: readonly AbilityDef[] = [
     school: 'shadow',
     requiresTarget: false,
     effects: [
+      // The marks burst first, each adding its share before the blast.
+      { type: 'gshiftMarkBurst', bonusPerStack: 8, radius: 12 },
       { type: 'aoeDamage', min: 12, max: 18, radius: 12 },
       { type: 'aoeKnockback', radius: 12, distance: 8, dazeMult: 0.7, dazeDuration: 3 },
     ],
@@ -87,12 +90,31 @@ export const MORTHEN_KIT: readonly AbilityDef[] = [
     effects: [{ type: 'selfBuff', kind: 'shield_wall', value: 0.6, duration: 6 }],
     description: 'Wraps you in grave mist, reducing damage taken by 60% for 6 sec.',
   },
+  {
+    // The concept's fun engine: kill the healer, raise the healer.
+    id: 'gshift_raise_fallen',
+    name: 'Raise the Fallen',
+    class: 'warrior',
+    learnLevel: 1,
+    cost: 0,
+    castTime: 0,
+    cooldown: 15,
+    range: 0,
+    school: 'shadow',
+    requiresTarget: false,
+    effects: [{ type: 'gshiftRaiseFallen', radius: 20, duration: 20 }],
+    description:
+      'Raises the nearest corpse within 20 yards as a skeleton that fights for you for 20 sec. Each corpse rises once.',
+  },
 ];
 
 // The authored numbers above are the template's; the known list carries them
 // through the solo damage multiplier (morthen_profile.ts), so what lands, the
 // tooltips and the bar all read the resolved effects.
-function soloEffect(effect: AbilityEffect): AbilityEffect {
+export function soloEffect(effect: AbilityEffect): AbilityEffect {
+  if (effect.type === 'gshiftMarkBurst') {
+    return { ...effect, bonusPerStack: effect.bonusPerStack * MORTHEN_SOLO_DAMAGE_MULT };
+  }
   if (effect.type === 'directDamage' || effect.type === 'aoeDamage') {
     return {
       ...effect,

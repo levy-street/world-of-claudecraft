@@ -94,7 +94,7 @@ describe('Morthen bar inside the vehicle bar family', () => {
     expect(world.castAbility).toHaveBeenCalledWith('gshift_shadow_pulse');
   });
 
-  it('shows five keyed slots and hides the player bars through the body class', () => {
+  it('shows six keyed slots and hides the player bars through the body class', () => {
     const world = fakeWorld(true);
     const cancel = vi.fn();
     const bar = makeBar(world, cancel);
@@ -105,13 +105,14 @@ describe('Morthen bar inside the vehicle bar family', () => {
     expect(document.body.classList.contains('morthen-shift')).toBe(true);
     expect(cancel).toHaveBeenCalledTimes(1);
     const buttons = morthenButtons();
-    expect(buttons).toHaveLength(5);
+    expect(buttons).toHaveLength(6);
     expect(buttons.map((b) => b.querySelector('.keybind')!.textContent)).toEqual([
       '1',
       '2',
       '3',
       '4',
       '5',
+      '6',
     ]);
     expect(buttons[1].getAttribute('aria-label')).toBe('Action slot 2: Gravecall');
     expect(root.querySelector('.vehicle-bar-title')!.textContent).toBe('Morthen the Gravecaller');

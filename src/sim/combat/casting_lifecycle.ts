@@ -1,5 +1,6 @@
 import { BENISON_4PC_WHISPER_HEAL_BONUS } from '../content/ignivar_set_bonuses';
 import { gliderActionsLocked } from '../glider_action_lock';
+import { graveyardShiftCastError } from '../graveyard_shift/kit_effects';
 import { hasMorthenIdentity } from '../graveyard_shift/morthen_identity';
 import { shadowActionsLocked } from '../shadow_action_lock';
 import { BENISON_WHISPER_AURA_ID } from './priest/benison_dawnweave';
@@ -1200,7 +1201,8 @@ export function castAbility(
     ctx.error(p.id, 'Not enough Soul Fragments!');
     return;
   }
-  const necromancyError = necromancyCastError(ctx, p, ability, aim);
+  const necromancyError =
+    necromancyCastError(ctx, p, ability, aim) ?? graveyardShiftCastError(ctx, p, ability);
   if (necromancyError) {
     ctx.error(p.id, necromancyError);
     return;
@@ -2932,7 +2934,8 @@ function applyAbility(
     ctx.error(p.id, 'Not enough Soul Fragments!');
     return;
   }
-  const necromancyError = necromancyCastError(ctx, p, ability);
+  const necromancyError =
+    necromancyCastError(ctx, p, ability) ?? graveyardShiftCastError(ctx, p, ability);
   if (necromancyError) {
     ctx.error(p.id, necromancyError);
     return;

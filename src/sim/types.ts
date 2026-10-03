@@ -493,6 +493,8 @@ export type AuraKind =
   | 'form_morthen'
   // Graveyard Shift: a pure marker on the run's adventurer bots (graveyard_shift/hostility.ts).
   | 'gshift_adventurer'
+  // Graveyard Shift: Gravecall's stacking barrow mark on an adventurer.
+  | 'gshift_mark'
   // Feral (cat form): Energy regeneration multiplier while active (value = fraction, 1 = +100%).
   | 'buff_energyregen'
   | 'stealth'
@@ -3095,6 +3097,10 @@ export type AbilityEffect =
   // rageOnInterrupt: rage minted when a cast is ACTUALLY cut (Pummel's
   // incentive design), scaled like ability-granted rage; never on a whiff.
   | { type: 'interrupt'; lockout: number; rageOnInterrupt?: number }
+  // Graveyard Shift kit effects (graveyard_shift/kit_effects.ts).
+  | { type: 'gshiftMark'; maxStacks: number; duration: number }
+  | { type: 'gshiftMarkBurst'; bonusPerStack: number; radius: number }
+  | { type: 'gshiftRaiseFallen'; radius: number; duration: number }
   | {
       type: 'chainDamage';
       min: number;

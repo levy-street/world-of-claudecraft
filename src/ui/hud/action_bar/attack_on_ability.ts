@@ -28,6 +28,11 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   weaponStrike: 'damage',
   directDamage: 'damage',
   interrupt: 'other',
+  // Graveyard Shift kit (graveyard_shift/kit_effects.ts): the mark rides a damage
+  // cast, the burst deals damage, a raise is utility.
+  gshiftMark: 'other',
+  gshiftMarkBurst: 'damage',
+  gshiftRaiseFallen: 'other',
   dispel: 'other',
   // Silence locks the school but does not break on damage, so it never blocks the engage.
   silence: 'other',

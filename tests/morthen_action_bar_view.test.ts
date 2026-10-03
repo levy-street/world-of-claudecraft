@@ -38,10 +38,12 @@ describe('morthen action bar view', () => {
       'gshift_shadow_pulse',
       'gshift_sextons_chain',
       'gshift_barrow_shroud',
+      'gshift_raise_fallen',
     ]);
     const state = createMorthenActionBarView().tick(player(), null, keys);
     expect(state.slots.map((slot) => slot.kind)).toEqual([
       'attack',
+      'ability',
       'ability',
       'ability',
       'ability',
@@ -51,17 +53,24 @@ describe('morthen action bar view', () => {
       MORTHEN_KIT.map((def) => def.id),
     );
     expect(morthenSlotAbility(0)).toBeNull();
-    expect(morthenSlotAbility(5)).toBeNull();
+    expect(morthenSlotAbility(6)).toBeNull();
   });
 
   it('labels every slot with its key and a localized name, never a raw id', () => {
     const state = createMorthenActionBarView().tick(player(), null, keys);
-    expect(state.slots.map((slot) => slot.keybindLabel)).toEqual(['K1', 'K2', 'K3', 'K4', 'K5']);
+    expect(state.slots.map((slot) => slot.keybindLabel)).toEqual([
+      'K1',
+      'K2',
+      'K3',
+      'K4',
+      'K5',
+      'K6',
+    ]);
     expect(state.slots[0].ariaLabel).toBe('Action slot 1: Attack');
     expect(state.slots[1].ariaLabel).toBe('Action slot 2: Gravecall');
     expect(state.slots[3].ariaLabel).toBe("Action slot 4: Sexton's Chain");
     for (const slot of state.slots) expect(slot.ariaLabel).not.toMatch(/gshift_/);
-    expect(state.slots[1].ariaDescription).toContain('20 to 32 Shadow damage');
+    expect(state.slots[1].ariaDescription).toContain('40 to 64 Shadow damage');
   });
 
   it('borrows shipped ability icons for the kit and the Attack art for slot 0', () => {
@@ -72,6 +81,7 @@ describe('morthen action bar view', () => {
       'psychic_scream',
       'oath_chain',
       'shellskin',
+      'raise_skeletal_warrior',
     ]);
   });
 
@@ -154,7 +164,7 @@ describe('morthen action bar view', () => {
     expect(pulse).toContain('Shadow Pulse');
     expect(pulse).toContain('2 sec cast');
     expect(pulse).toContain('10 sec cooldown');
-    expect(pulse).toContain('12 to 18 Shadow damage');
+    expect(pulse).toContain('24 to 36 Shadow damage');
     expect(pulse).not.toContain('yd range');
     const gravecall = morthenSlotTooltipHtml(1);
     expect(gravecall).toContain('Instant');
@@ -191,12 +201,12 @@ describe('morthen slot routing', () => {
     expect(morthenControlsActive({})).toBe(false);
   });
 
-  it('casts the kit by id from slots 1 to 4', () => {
+  it('casts the kit by id from slots 1 to 5', () => {
     const w = world(true);
-    for (let slot = 1; slot <= 4; slot++) morthenChooseSlot(w, slot);
+    for (let slot = 1; slot <= 5; slot++) morthenChooseSlot(w, slot);
     expect(w.castAbility.mock.calls.map(([id]) => id)).toEqual(MORTHEN_KIT.map((def) => def.id));
-    morthenChooseSlot(w, 5);
-    expect(w.castAbility).toHaveBeenCalledTimes(4);
+    morthenChooseSlot(w, 6);
+    expect(w.castAbility).toHaveBeenCalledTimes(5);
   });
 
   it('toggles auto-attack from slot 0', () => {

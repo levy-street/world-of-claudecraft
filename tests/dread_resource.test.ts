@@ -359,10 +359,11 @@ describe('Dread on the HUD', () => {
     const view = createMorthenActionBarView();
     const keys = (slot: number) => `${slot + 1}`;
     const short = view.tick(player(29), null, keys).slots.map((slot) => slot.usable);
-    // Attack, Gravecall (no target), Pulse (29 < 30), Chain (no target), Shroud (29 < 40).
-    expect(short).toEqual([true, false, false, false, false]);
+    // Attack, Gravecall (no target), Pulse (29 < 30), Chain (no target), Shroud (29 < 40),
+    // Raise the Fallen (free, no target needed).
+    expect(short).toEqual([true, false, false, false, false, true]);
     const paid = view.tick(player(40), null, keys).slots.map((slot) => slot.usable);
-    expect(paid).toEqual([true, false, true, false, true]);
+    expect(paid).toEqual([true, false, true, false, true, true]);
     expect(morthenSlotTooltipHtml(2)).toContain('30 Dread');
     expect(morthenSlotTooltipHtml(4)).toContain('40 Dread');
     expect(morthenSlotTooltipHtml(2)).toMatch(/tt-stat">30 Dread/);

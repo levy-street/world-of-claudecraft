@@ -5,7 +5,8 @@
 // back to a raw id. Every number in a description is read from the kit's own
 // effects, so the tooltip cannot drift from what a cast does.
 
-import { MORTHEN_KIT } from '../sim/graveyard_shift/kit';
+import { MORTHEN_KIT, soloEffect } from '../sim/graveyard_shift/kit';
+import { BARROW_MARK_NAME } from '../sim/graveyard_shift/kit_effects';
 import { morthenIdentityAura } from '../sim/graveyard_shift/morthen_identity';
 import type { AbilityDef, AbilityEffect } from '../sim/types';
 import { formatNumber, type InterpolationValues, type TranslationKey, t } from './i18n';
@@ -32,7 +33,13 @@ const KIT_TEXT: Readonly<Record<string, KitText>> = {
     name: 'devCommand.graveyardShift.abilities.barrowShroud.name',
     description: 'devCommand.graveyardShift.abilities.barrowShroud.description',
   },
+  gshift_raise_fallen: {
+    name: 'devCommand.graveyardShift.abilities.raiseFallen.name',
+    description: 'devCommand.graveyardShift.abilities.raiseFallen.description',
+  },
 };
+
+const MARK_AURA_KEY: TranslationKey = 'devCommand.graveyardShift.markAura';
 
 const IDENTITY_AURA_KEY: TranslationKey = 'devCommand.graveyardShift.identityAura';
 const IDENTITY_AURA_NAME = morthenIdentityAura(0).name;
@@ -64,16 +71,18 @@ export function graveyardShiftAbilityNameFromSource(name: string): string | null
  *  (which carries its ability's English name). Null for every other aura. */
 export function graveyardShiftAuraName(name: string): string | null {
   if (name === IDENTITY_AURA_NAME) return t(IDENTITY_AURA_KEY);
+  if (name === BARROW_MARK_NAME) return t(MARK_AURA_KEY);
   return graveyardShiftAbilityNameFromSource(name);
 }
 
+// The effect as it lands: the kit's known list carries every effect through the
+// solo multiplier (kit.ts soloEffect), so tooltips read the resolved numbers.
 function effectOf<K extends AbilityEffect['type']>(
   def: AbilityDef,
   type: K,
 ): Extract<AbilityEffect, { type: K }> | undefined {
-  return def.effects.find((effect): effect is Extract<AbilityEffect, { type: K }> => {
-    return effect.type === type;
-  });
+  const found = def.effects.find((effect) => effect.type === type);
+  return found ? (soloEffect(found) as Extract<AbilityEffect, { type: K }>) : undefined;
 }
 
 function amount(value: number | undefined): string {
@@ -97,6 +106,8 @@ function descriptionValues(def: AbilityDef): InterpolationValues {
         min: amount(hit?.min),
         max: amount(hit?.max),
         dread: amount(effectOf(def, 'gainResource')?.amount),
+        marks: amount(effectOf(def, 'gshiftMark')?.maxStacks),
+        markSeconds: amount(effectOf(def, 'gshiftMark')?.duration),
       };
     }
     case 'gshift_shadow_pulse': {
@@ -105,6 +116,7 @@ function descriptionValues(def: AbilityDef): InterpolationValues {
       return {
         min: amount(blast?.min),
         max: amount(blast?.max),
+        perMark: amount(effectOf(def, 'gshiftMarkBurst')?.bonusPerStack),
         radius: amount(blast?.radius),
         distance: amount(push?.distance),
         slow: slowPercent(push?.dazeMult),
@@ -120,6 +132,10 @@ function descriptionValues(def: AbilityDef): InterpolationValues {
         lockout: amount(effectOf(def, 'interrupt')?.lockout),
         silence: amount(effectOf(def, 'silence')?.duration),
       };
+    }
+    case 'gshift_raise_fallen': {
+      const raise = effectOf(def, 'gshiftRaiseFallen');
+      return { radius: amount(raise?.radius), seconds: amount(raise?.duration) };
     }
     case 'gshift_barrow_shroud': {
       const shroud = effectOf(def, 'selfBuff');

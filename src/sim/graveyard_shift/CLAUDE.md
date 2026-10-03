@@ -6,7 +6,7 @@ a prototype; this directory is built lot by lot. Today: the RUN SHELL (enter,
 exit, survive every exit), the MORTHEN IDENTITY (the owner becomes Morthen in
 the sim, on his own Dread bar: `dread.ts`), the ADVENTURER PARTY (three bots,
 hostility, win and loss), the PARTY BRAIN (the bots fight like a pickup group)
-and Morthen's SKELETON ALLIES.
+Morthen's SKELETON ALLIES and the KIT EFFECTS (barrow marks, Raise the Fallen).
 
 ## Contract
 - **Offline only while a prototype.** `canStartGraveyardShift` refuses unless
@@ -141,6 +141,21 @@ and Morthen's SKELETON ALLIES.
 - The party treats them as adds: the tank taunts one off the healer, and damage
   dealers may tunnel on them (the exploitable flaw).
 
+## Kit effects
+- **Three effect kinds of their own** (`gshiftMark`, `gshiftMarkBurst`,
+  `gshiftRaiseFallen` in the `AbilityEffect` union), reached from
+  `combat/effect_dispatch.ts` by one-line delegations into `kit_effects.ts`.
+- **Barrow mark:** Gravecall stacks a `gshift_mark` aura on its target (up to 3,
+  refreshed each hit). **Burst:** Shadow Pulse first deals a bonus per mark to every
+  marked enemy it reaches and strips the marks, then its own blast lands.
+- **Raise the Fallen:** the nearest corpse within reach that the run has not raised
+  (a fallen adventurer or any dead creature) rises as a temporary skeleton owned by
+  Morthen (aggressive, tracked with the allies). With nothing to raise, castAbility
+  refuses before the cooldown through `graveyardShiftCastError` (both cast paths,
+  beside the necromancy check), re-localized by the client error matcher.
+- The solo multiplier scales the burst bonus too (`soloEffect`), and the tooltips
+  read the resolved effects, so the bar shows what lands.
+
 ## Known limits of the shell (each owned by a later lot)
 - **A non-damage death still runs `handleDeath`** (death counter, deeds death
   hooks, the `playerDeath` event). Lethal damage is clamped first; only `/dev kill`
@@ -175,6 +190,7 @@ and Morthen's SKELETON ALLIES.
 | `bot_brain.ts` | pure leaf: reaction, interrupt and control rules, triage, target scoring, seeds |
 | `bot_driver.ts` | the per-tick party driver through the real player verbs |
 | `dread.ts` | pure leaf: the Dread rate, the damage hook, the carry rule |
+| `kit_effects.ts` | the barrow mark, the mark burst, Raise the Fallen and its cast refusal |
 | `run_lifecycle.ts` | `canStartGraveyardShift`, `startGraveyardShift`, `endGraveyardShift`, `updateGraveyardShift` (the one tick entry, called just before the delve runs) |
 | `index.ts` | the public barrel |
 

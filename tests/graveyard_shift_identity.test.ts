@@ -72,6 +72,7 @@ const KIT_IDS = [
   'gshift_shadow_pulse',
   'gshift_sextons_chain',
   'gshift_barrow_shroud',
+  'gshift_raise_fallen',
 ];
 
 // A frozen level-10 wolf `dz` yards down the nave in front of Morthen, targeted.
@@ -140,17 +141,13 @@ describe('Graveyard Shift Morthen identity', () => {
   it('the kit lands at the solo damage multiplier over the template numbers', () => {
     const sim = shiftSim('warrior');
     start(sim);
-    const effects = (id: string) => meta(sim).known.find((k: any) => k.def.id === id).effects;
-    expect(effects('gshift_gravecall')[0]).toMatchObject({
-      type: 'directDamage',
-      min: 40,
-      max: 64,
-    });
-    expect(effects('gshift_shadow_pulse')[0]).toMatchObject({
-      type: 'aoeDamage',
-      min: 24,
-      max: 36,
-    });
+    const effect = (id: string, type: string) =>
+      meta(sim)
+        .known.find((k: any) => k.def.id === id)
+        .effects.find((e: any) => e.type === type);
+    expect(effect('gshift_gravecall', 'directDamage')).toMatchObject({ min: 40, max: 64 });
+    expect(effect('gshift_shadow_pulse', 'aoeDamage')).toMatchObject({ min: 24, max: 36 });
+    expect(effect('gshift_shadow_pulse', 'gshiftMarkBurst')).toMatchObject({ bonusPerStack: 16 });
   });
 
   it('the profile survives a stat recalc from a buff landing and expiring', () => {

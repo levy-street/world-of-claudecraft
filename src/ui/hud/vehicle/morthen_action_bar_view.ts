@@ -33,6 +33,7 @@ const KIT_ICON_KEYS: Readonly<Record<string, string>> = {
   gshift_shadow_pulse: 'psychic_scream',
   gshift_sextons_chain: 'oath_chain',
   gshift_barrow_shroud: 'shellskin',
+  gshift_raise_fallen: 'raise_skeletal_warrior',
 };
 export const MORTHEN_ATTACK_ICON_KEY = 'attack';
 

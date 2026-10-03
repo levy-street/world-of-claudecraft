@@ -24,6 +24,7 @@ const NAMES: Record<string, string> = {
   gshift_shadow_pulse: 'Shadow Pulse',
   gshift_sextons_chain: "Sexton's Chain",
   gshift_barrow_shroud: 'Barrow Shroud',
+  gshift_raise_fallen: 'Raise the Fallen',
 };
 
 const kitDef = (id: string): AbilityDef => MORTHEN_KIT.find((def) => def.id === id)!;
@@ -63,16 +64,19 @@ describe('Graveyard Shift display text', () => {
   it('describes each kit ability with the numbers its effects carry', () => {
     const text = (id: string) => graveyardShiftAbilityDescription(id)!;
     expect(text('gshift_gravecall')).toBe(
-      'Hurl a bolt of grave shadow at your target for 20 to 32 Shadow damage. Generates 10 Dread.',
+      'Hurl a bolt of grave shadow at your target for 40 to 64 Shadow damage and mark it for the barrow for 15 sec, stacking up to 3 marks. Generates 10 Dread.',
     );
     expect(text('gshift_shadow_pulse')).toBe(
-      'Release a pulse of shadow that deals 12 to 18 Shadow damage to each enemy within 12 yards in your line of sight. Each enemy hit is knocked back 8 yards and slowed by 30% for 3 sec.',
+      'Release a pulse of shadow that deals 24 to 36 Shadow damage to each enemy within 12 yards in your line of sight, plus 16 Shadow damage for each barrow mark it carries, consuming the marks. Each enemy hit is knocked back 8 yards and slowed by 30% for 3 sec.',
     );
     expect(text('gshift_sextons_chain')).toBe(
       'Drag your target to within 3 yards of you and slow it by 50% for 2 sec. A spell it is casting is interrupted and that school is locked for 2 sec, and the target is silenced for 2 sec.',
     );
     expect(text('gshift_barrow_shroud')).toBe(
       'Wrap yourself in grave mist, reducing all damage you take by 60% for 6 sec. Usable during the global cooldown, and does not trigger it.',
+    );
+    expect(text('gshift_raise_fallen')).toBe(
+      'Raise the nearest corpse within 20 yards as a skeleton that fights for you for 20 sec. Each corpse rises only once.',
     );
     expect(graveyardShiftAbilityDescription('fireball')).toBeNull();
   });
@@ -84,7 +88,7 @@ describe('Graveyard Shift display text', () => {
     hit.min = 21;
     hit.max = 33;
     try {
-      expect(graveyardShiftAbilityDescription(def.id)).toContain('21 to 33 Shadow damage');
+      expect(graveyardShiftAbilityDescription(def.id)).toContain('42 to 66 Shadow damage');
     } finally {
       hit.min = min;
       hit.max = max;

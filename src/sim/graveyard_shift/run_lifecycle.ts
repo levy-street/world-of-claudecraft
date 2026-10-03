@@ -119,6 +119,7 @@ export function startGraveyardShift(ctx: SimContext, pid: number): string | null
     seed: graveyardShiftRunSeed(ctx.cfg.seed, ctx.tickCount, pid),
     bots: [],
     allyIds: [],
+    raisedCorpseIds: new Set(),
     engaged: false,
     pendingOutcome: null,
   };

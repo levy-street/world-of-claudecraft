@@ -212,22 +212,28 @@ export const zh_TW: EnTranslations = {
     },
     "graveyardShift": {
       "identityAura": "Morthen the Gravecaller",
+      "markAura": "Marked for the Barrow",
       "resource": "Dread",
       "errors": {
-        "notEnoughDread": "Not enough Dread!"
+        "notEnoughDread": "Not enough Dread!",
+        "noCorpse": "There is no corpse to raise."
       },
       "abilities": {
         "gravecall": {
           "name": "Gravecall",
-          "description": "Hurl a bolt of grave shadow at your target for {min} to {max} Shadow damage. Generates {dread} Dread."
+          "description": "Hurl a bolt of grave shadow at your target for {min} to {max} Shadow damage and mark it for the barrow for {markSeconds} sec, stacking up to {marks} marks. Generates {dread} Dread."
         },
         "shadowPulse": {
           "name": "Shadow Pulse",
-          "description": "Release a pulse of shadow that deals {min} to {max} Shadow damage to each enemy within {radius} yards in your line of sight. Each enemy hit is knocked back {distance} yards and slowed by {slow} for {slowSeconds} sec."
+          "description": "Release a pulse of shadow that deals {min} to {max} Shadow damage to each enemy within {radius} yards in your line of sight, plus {perMark} Shadow damage for each barrow mark it carries, consuming the marks. Each enemy hit is knocked back {distance} yards and slowed by {slow} for {slowSeconds} sec."
         },
         "sextonsChain": {
           "name": "Sexton's Chain",
           "description": "Drag your target to within {stop} yards of you and slow it by {slow} for {slowSeconds} sec. A spell it is casting is interrupted and that school is locked for {lockout} sec, and the target is silenced for {silence} sec."
+        },
+        "raiseFallen": {
+          "name": "Raise the Fallen",
+          "description": "Raise the nearest corpse within {radius} yards as a skeleton that fights for you for {seconds} sec. Each corpse rises only once."
         },
         "barrowShroud": {
           "name": "Barrow Shroud",

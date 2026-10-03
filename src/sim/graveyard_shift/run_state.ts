@@ -46,6 +46,8 @@ export interface GraveyardShiftRun {
   readonly bots: GraveyardShiftBot[];
   // Morthen's living skeleton allies (run_allies.ts), in spawn order.
   readonly allyIds: number[];
+  // Corpses Raise the Fallen already used (each rises once).
+  readonly raisedCorpseIds: Set<number>;
   // The party has noticed Morthen (he came close or landed a hit).
   engaged: boolean;
   // Set by a mid-tick decision (a command or, later, a lethal hit); the run tick
