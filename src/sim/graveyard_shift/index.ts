@@ -2,6 +2,7 @@
 // shift in the Hollow Crypt against adventurer bots. Public surface only; see
 // the local CLAUDE.md for the module map.
 
+export { graveyardShiftPairHostile, isGraveyardShiftAdventurer } from './hostility';
 export { hasMorthenIdentity } from './morthen_identity';
 export { knownAbilitiesFor } from './morthen_transform';
 export {

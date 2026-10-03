@@ -1213,9 +1213,10 @@ const MONOLITHS: MonolithRow[] = [
     // (the residual is the import and the isControlAura delegate the ctx binding
     // keeps), which paid for the run's seam lines (the graveyard_shift import,
     // the run map and its ctx view, the tick call, the offlineHost config copy,
-    // and the action-bar freeze getter; the known-list rule swapped in place).
-    // Exact count, zero slack.
-    ceiling: 11632,
+    // the action-bar freeze getter, the adventurer join/leave ctx bindings and
+    // the run hostility arm; the known-list rule swapped in place). Exact count,
+    // zero slack.
+    ceiling: 11639,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

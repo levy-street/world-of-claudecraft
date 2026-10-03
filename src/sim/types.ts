@@ -490,6 +490,8 @@ export type AuraKind =
   | 'form_metamorph'
   // Graveyard Shift: the run owner is Morthen (graveyard_shift/morthen_identity.ts).
   | 'form_morthen'
+  // Graveyard Shift: a pure marker on the run's adventurer bots (graveyard_shift/hostility.ts).
+  | 'gshift_adventurer'
   // Feral (cat form): Energy regeneration multiplier while active (value = fraction, 1 = +100%).
   | 'buff_energyregen'
   | 'stealth'

@@ -228,6 +228,9 @@ const CALLBACK_KEYS = [
   'setPlayerLevel',
   'notice',
   'spawnDevBot',
+  // Graveyard Shift adventurer party join and leave.
+  'addPlayer',
+  'removePlayer',
   'spawnDevVendor',
   'startCascadePlaytest',
   'startDevSandbox',
@@ -619,6 +622,8 @@ function makeFakeHost() {
     setPlayerLevel: vi.fn(),
     notice: vi.fn(),
     spawnDevBot: vi.fn(),
+    addPlayer: vi.fn(),
+    removePlayer: vi.fn(),
     spawnDevVendor: vi.fn(),
     startCascadePlaytest: vi.fn(),
     startDevSandbox: vi.fn(),

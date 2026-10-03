@@ -1060,6 +1060,14 @@ export interface SimContextCallbacks {
   // devCommands). Adds a stationary whisperable player near the primary; returns the
   // new pid, or -1 if the name is blank or already taken. Stays on Sim.
   spawnDevBot(name: string): number;
+  // Graveyard Shift adventurer bots (graveyard_shift/run_party.ts): the Sim's
+  // own player join and leave, exposed so a run can field and clear its party.
+  addPlayer(
+    cls: PlayerClass,
+    name: string,
+    opts?: { bot?: boolean; tutorialGreetingSent?: boolean },
+  ): number;
+  removePlayer(pid: number): void;
   // /dev vendor: spawn the free-epic dev vendor next to the caller. Returns id or -1.
   spawnDevVendor(pid?: number): number;
   // /dev cascade: set up the controlled Cascada temporal playtest scenario (dummy +
@@ -1808,6 +1816,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     setPlayerLevel: host.setPlayerLevel,
     notice: host.notice,
     spawnDevBot: host.spawnDevBot,
+    addPlayer: host.addPlayer,
+    removePlayer: host.removePlayer,
     spawnDevVendor: host.spawnDevVendor,
     startCascadePlaytest: host.startCascadePlaytest,
     startDevSandbox: host.startDevSandbox,

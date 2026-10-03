@@ -24,9 +24,11 @@ import {
 import { bgGroupContaining } from '../social/battleground';
 import { revivePlayerAt } from '../spirit';
 import { settleTeleportArrival } from '../teleport_arrival';
+import { TICK_RATE } from '../types';
 import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import { applyMorthenIdentity, removeMorthenIdentity } from './morthen_transform';
 import { GRAVEYARD_SHIFT_ARRIVAL, graveyardShiftDoorDrop } from './run_layout';
+import { removeGraveyardShiftParty, spawnGraveyardShiftParty } from './run_party';
 import { claimGraveyardShiftSlot, releaseGraveyardShiftSlot } from './run_slot';
 import {
   type GraveyardShiftOutcome,
@@ -35,6 +37,9 @@ import {
 } from './run_state';
 
 export const GRAVEYARD_SHIFT_MIN_LEVEL = 10;
+
+// A shift that neither side finishes (a stuck bot, an idle owner) ends here.
+export const GRAVEYARD_SHIFT_MAX_SECONDS = 15 * 60;
 
 // Why the owner cannot start a shift right now, or null. Dev-channel English:
 // the run is reachable only through /dev while it is a prototype.
@@ -103,9 +108,12 @@ export function startGraveyardShift(ctx: SimContext, pid: number): string | null
     pools,
     petStowed: !stashedBefore && ctx.delvePetStash.has(pid),
     parked,
+    startedTick: ctx.tickCount,
+    bots: [],
     pendingOutcome: null,
   };
   ctx.graveyardShiftRuns.set(pid, run);
+  spawnGraveyardShiftParty(ctx, run);
   return null;
 }
 
@@ -120,6 +128,7 @@ export function endGraveyardShift(
   outcome: GraveyardShiftOutcome,
 ): void {
   ctx.graveyardShiftRuns.delete(run.ownerPid);
+  removeGraveyardShiftParty(ctx, run);
   const p = ctx.entities.get(run.ownerPid);
   const meta = ctx.players.get(run.ownerPid);
   if (p && meta) {
@@ -148,6 +157,17 @@ function fizzleProjectilesFrom(ctx: SimContext, pid: number): void {
   ctx.pendingProjectiles = retained;
 }
 
+// A bot that leaves the claim (a door trigger, a knockback through a wall) is
+// out of the fight: it leaves the run rather than stalling it.
+function pruneStrayBots(ctx: SimContext, run: GraveyardShiftRun): void {
+  for (let i = run.bots.length - 1; i >= 0; i--) {
+    const bot = ctx.entities.get(run.bots[i].pid);
+    if (bot && instanceClaimHolds(run.slot, bot.pos)) continue;
+    if (bot) ctx.removePlayer(run.bots[i].pid);
+    run.bots.splice(i, 1);
+  }
+}
+
 // The single per-tick entry: every exit the run did not decide itself is caught
 // here, one tick late at most. Free when no run exists.
 export function updateGraveyardShift(ctx: SimContext): void {
@@ -160,5 +180,13 @@ export function updateGraveyardShift(ctx: SimContext): void {
     else if (run.slot.partyKey !== run.key || !instanceClaimHolds(run.slot, p.pos)) {
       endGraveyardShift(ctx, run, 'aborted');
     } else if (ctx.partyOf(run.ownerPid)) endGraveyardShift(ctx, run, 'aborted');
+    else if (ctx.tickCount - run.startedTick >= GRAVEYARD_SHIFT_MAX_SECONDS * TICK_RATE) {
+      endGraveyardShift(ctx, run, 'aborted');
+    } else {
+      pruneStrayBots(ctx, run);
+      if (run.bots.every((bot) => ctx.entities.get(bot.pid)?.dead !== false)) {
+        endGraveyardShift(ctx, run, 'won');
+      }
+    }
   }
 }

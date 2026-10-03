@@ -2,6 +2,8 @@ import { FORGE_INTERACT_RANGE, FORGE_STATIONS } from '../sim/content/world_quest
 import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
 import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
 import { ESCORTS } from '../sim/data';
+import { isGraveyardShiftAdventurer } from '../sim/graveyard_shift/hostility';
+import { hasMorthenIdentity } from '../sim/graveyard_shift/morthen_identity';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import {
   dist2d,
@@ -101,6 +103,13 @@ export function activePvpOpponentIds(
   if (bg?.state === 'active') {
     for (const row of bg.players) {
       if (row.team !== bg.myTeam && row.pid !== selfId) ids.add(row.pid);
+    }
+  }
+  // Graveyard Shift: while the local player is Morthen, the run's adventurers
+  // (the sim's pair rule, graveyard_shift/hostility.ts) are attackable too.
+  if (world.entities && hasMorthenIdentity(world.player)) {
+    for (const e of world.entities.values()) {
+      if (e.kind === 'player' && isGraveyardShiftAdventurer(e)) ids.add(e.id);
     }
   }
   // Enemy-owned pets, resolved AFTER every player arm above so the owner set is

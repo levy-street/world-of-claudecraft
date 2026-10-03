@@ -3,8 +3,8 @@
 The player covers Morthen's shift in a private copy of the Hollow Crypt against a
 party of adventurer bots. Concept and lot plan live outside the repo while this is
 a prototype; this directory is built lot by lot. Today: the RUN SHELL (enter,
-exit, survive every exit) and the MORTHEN IDENTITY (the owner becomes Morthen in
-the sim). No bots, allies, Dread or HUD bar yet: the kit casts only by id.
+exit, survive every exit), the MORTHEN IDENTITY (the owner becomes Morthen in
+the sim) and the ADVENTURER PARTY (three idle bots, hostility, win and loss).
 
 ## Contract
 - **Offline only while a prototype.** `canStartGraveyardShift` refuses unless
@@ -58,15 +58,37 @@ the sim). No bots, allies, Dread or HUD bar yet: the kit casts only by id.
 - **Real action bar frozen:** `Sim.actionBarReadOnly` is true while the offline
   primary holds the identity, so the HUD never prunes or saves the real bar.
 
+## The adventurer party
+- **Real players with no client** (`run_party.ts`): `ctx.addPlayer` (bot join,
+  greeting already sent), level 10, placed in Morthen's chamber in line of sight
+  (owner decision for the prototype), in a fixed roster order: warrior tank
+  Bulwarkbro, priest healer Mendolyn, mage Pyrotechnic. No `PlayerMeta` flag (never
+  `isDevBot`) and never a `characterId`; membership is the run's roster plus the
+  permanent `gshift_adventurer` marker aura.
+- **Hostility** (`hostility.ts`): one pure pair rule on the two entities' auras,
+  Morthen against an adventurer both ways, adventurers friendly to each other.
+  `Sim.isHostileTo` adds it as its own player arm (never through world PvP, so no
+  honor or stake is paid), and the client reads the same rule in
+  `pvp_hostile_core.ts` (red names, hostile frame) and `game/interactions.ts`
+  (attack cursor, right-click attack).
+- **Win, loss, stall:** every adventurer dead (or gone) wins; a lethal blow on
+  Morthen from any source is clamped to 1 hp by `death_intercept.ts` (called from
+  `dealDamage`) and loses, and a loss beats a same-tick wipe; an adventurer that
+  leaves the claim is removed from the run; a shift nobody finishes ends after
+  `GRAVEYARD_SHIFT_MAX_SECONDS`. The teardown removes every bot.
+
 ## Known limits of the shell (each owned by a later lot)
-- **A death still runs `handleDeath`** (death counter, deeds death hooks, the
-  `playerDeath` event). Only `/dev kill` reaches it today. The lethal-hit intercept
-  must clamp BEFORE `handleDeath` so the real character's counters never move.
+- **A non-damage death still runs `handleDeath`** (death counter, deeds death
+  hooks, the `playerDeath` event). Lethal damage is clamped first; only `/dev kill`
+  and other direct `handleDeath` paths reach it, and the watch then ends the run.
 - **The slot has no exit object** (`exitId === null`), so everything that resolves a
   claim through `claimedInstanceAt` / `instanceClaimIdAt` (the instance combat hold,
   corpse rebinding, unstuck lookups) treats it as unclaimed. In-run Unstuck refuses.
   Revisit when mobs and bots arrive.
 
+- **Session damage tallies count.** `meta.counters.damageDealt` / `damageTaken`
+  (session-only `RewardCounters`, never persisted) include the run's blows; kills,
+  deaths, XP, loot, honor and deeds do not move.
 - **Morthen ignores stat auras.** `applyMorthenProfile` overwrites every field a
   recalc folds auras into (armor, haste, power, crit, dodge, maxHp), so a buff or a
   debuff on him (an armor cut, an attack slow, an AP debuff) changes nothing. Decide
@@ -82,6 +104,9 @@ the sim). No bots, allies, Dread or HUD bar yet: the kit casts only by id.
 | `morthen_profile.ts` | `applyMorthenProfile` and the pinned level, from the `morthen` template |
 | `morthen_transform.ts` | `applyMorthenIdentity` / `removeMorthenIdentity`, `knownAbilitiesFor` |
 | `kit.ts` | the mode-local kit `AbilityDef`s and their `KnownAbility` list |
+| `run_party.ts` | the fixed party, its spawn after the identity and its removal |
+| `hostility.ts` | pure leaf: the adventurer marker and the Morthen-versus-adventurer pair rule |
+| `death_intercept.ts` | the lethal-blow clamp `dealDamage` calls |
 | `run_lifecycle.ts` | `canStartGraveyardShift`, `startGraveyardShift`, `endGraveyardShift`, `updateGraveyardShift` (the one tick entry, called just before the delve runs) |
 | `index.ts` | the public barrel |
 

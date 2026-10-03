@@ -12,6 +12,15 @@ export const GRAVEYARD_SHIFT_DUNGEON_ID = 'hollow_crypt';
 // stands at z 98), facing back down the nave toward the entrance (-z).
 export const GRAVEYARD_SHIFT_ARRIVAL = { x: 0, z: 92, facing: Math.PI } as const;
 
+// The prototype party waits inside Morthen's chamber, in line of sight of the
+// arrival point (owner decision: the concept's "busy in the next room" opening
+// comes with the final version). Ordered by roster index: spawn order is fixed.
+export const GRAVEYARD_SHIFT_BOT_SPOTS: readonly { x: number; z: number }[] = [
+  { x: -3, z: 82 },
+  { x: 2, z: 76 },
+  { x: 6, z: 79 },
+];
+
 // Where a run hands its owner back outside: the borrowed dungeon's own exit
 // drop (its authored leaveOffset, else the door's default four yards out), the
 // same point leaveDungeon walks a leaver to.

@@ -8,6 +8,11 @@ import type { MorthenParked } from './morthen_transform';
 
 export type GraveyardShiftOutcome = 'won' | 'lost' | 'aborted';
 
+export interface GraveyardShiftBot {
+  readonly pid: number;
+  readonly role: 'tank' | 'healer' | 'dps';
+}
+
 export interface GraveyardShiftRun {
   readonly ownerPid: number;
   // The claimed slot's partyKey, distinct from every instanceKeyFor key so
@@ -19,6 +24,10 @@ export interface GraveyardShiftRun {
   readonly petStowed: boolean;
   // The owner's real level and talent modifiers while they are Morthen.
   readonly parked: MorthenParked;
+  // Sim tick the run started on (the stall timeout counts from it).
+  readonly startedTick: number;
+  // The adventurer party, in roster order (spawn order is fixed).
+  readonly bots: GraveyardShiftBot[];
   // Set by a mid-tick decision (a command or, later, a lethal hit); the run tick
   // tears down, never the code path that decided.
   pendingOutcome: GraveyardShiftOutcome | null;

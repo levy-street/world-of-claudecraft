@@ -28,6 +28,7 @@ import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
+import { graveyardShiftLethalClamp } from '../graveyard_shift/death_intercept';
 import { hasMorthenIdentity } from '../graveyard_shift/morthen_identity';
 import { emitIgnivarRaidNarrativeOnDeath } from '../ignivar_raid_lore';
 import {
@@ -812,6 +813,8 @@ export function dealDamage(
       return amount;
     }
   }
+
+  amount = graveyardShiftLethalClamp(ctx, target, amount);
 
   // Fiesta takedowns score a point and put the victim on a (growing) respawn
   // timer instead of permanently eliminating them — the party never stops.
