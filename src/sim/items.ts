@@ -1,4 +1,5 @@
 import { gliderActionsLocked } from './glider_action_lock';
+import { hasMorthenIdentity } from './graveyard_shift/morthen_identity';
 import { shadowActionsLocked } from './shadow_action_lock';
 import { useCartographersInk, useTreasureMap } from './treasure_vault';
 // Inventory items + vendor: the player-facing equip/use/discard and buy/sell/buyback
@@ -549,7 +550,7 @@ export function equipItem(
   slotIndex?: number,
 ): void {
   const r = ctx.resolve(pid);
-  if (!r) return;
+  if (!r || hasMorthenIdentity(r.e)) return;
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
   if (!def?.slot || (def.kind !== 'weapon' && def.kind !== 'armor' && def.kind !== 'held_offhand'))
@@ -804,7 +805,7 @@ export function benchDuplicateUniqueEquipped(meta: PlayerMeta): string[] {
 // with none the unequip is refused (nothing is ever force-dropped).
 export function unequipItem(ctx: SimContext, slot: EquipSlot, pid?: number): boolean {
   const r = ctx.resolve(pid);
-  if (!r) return false;
+  if (!r || hasMorthenIdentity(r.e)) return false;
   const { meta, e: p } = r;
   const itemId = meta.equipment[slot];
   if (!itemId) return false;
@@ -849,7 +850,8 @@ export function useItem(
     meta.vehicle ||
     wispMazeActionsLocked(meta.worldQuestLog) ||
     shadowActionsLocked(meta.worldQuestLog) ||
-    gliderActionsLocked(meta.worldQuestLog)
+    gliderActionsLocked(meta.worldQuestLog) ||
+    hasMorthenIdentity(p)
   )
     return;
   // Every consumable use branch (food/drink, potion, and the shared

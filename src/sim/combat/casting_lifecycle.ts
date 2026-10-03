@@ -1,5 +1,6 @@
 import { BENISON_4PC_WHISPER_HEAL_BONUS } from '../content/ignivar_set_bonuses';
 import { gliderActionsLocked } from '../glider_action_lock';
+import { hasMorthenIdentity } from '../graveyard_shift/morthen_identity';
 import { shadowActionsLocked } from '../shadow_action_lock';
 import { BENISON_WHISPER_AURA_ID } from './priest/benison_dawnweave';
 // Player cast lifecycle, extracted from the Sim monolith (C4a).
@@ -74,6 +75,7 @@ import {
   FACING_HOLD_DIST,
   FISHING_CAST_ID,
   GATHER_CAST_ID,
+  GCD,
   isFormAuraKind,
   isNonSpellCast,
   MELEE_ARC,
@@ -1801,7 +1803,9 @@ export function castAbility(
   // so gear/Bloodlust/Temporal Acceleration haste speeds the whole rotation, not just
   // cast bars. spellHasteMult is 1 for anyone without spell haste, so their GCD is
   // unchanged.
-  const gcd = Math.max(MIN_GCD, ctx.playerGcdFor(meta.cls) / spellHasteMult(p));
+  // Morthen's kit runs on the standard GCD whatever the run owner's real class.
+  const baseGcd = hasMorthenIdentity(p) ? GCD : ctx.playerGcdFor(meta.cls);
+  const gcd = Math.max(MIN_GCD, baseGcd / spellHasteMult(p));
   // A channel keeps its duration, so it must not eat a next_cast_instant charge.
   let consumedInstantAura: Aura | null = null;
   if (

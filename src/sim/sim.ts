@@ -210,7 +210,6 @@ import type { DelveShopGate, DelveShopOffer } from './data';
 import {
   ABILITIES,
   ALL_RECIPES,
-  abilitiesKnownAt,
   arenaOrigin,
   CLASSES,
   DELVE_COMPANIONS,
@@ -5694,7 +5693,7 @@ export class Sim {
     // shared known-list builder, so ClientWorld's recomputed list matches.)
     // questsDone gates quest-earned abilities (paladin recall_the_fallen); it is
     // restored before this runs at load, so a returning character keeps them.
-    meta.known = abilitiesKnownAt(meta.cls, e.level, meta.talentMods, meta.questsDone);
+    meta.known = gshiftMod.knownAbilitiesFor(meta, e);
     if (announce) {
       for (const k of meta.known) {
         const prev = before.get(k.def.id);
@@ -5791,7 +5790,7 @@ export class Sim {
   // Dev/test convenience: jump a player to a level (learns abilities, recalcs stats).
   setPlayerLevel(level: number, pid?: number): void {
     const r = this.resolve(pid);
-    if (!r) return;
+    if (!r || gshiftMod.hasMorthenIdentity(r.e)) return;
     r.e.level = Math.max(1, Math.min(MAX_LEVEL, level));
     // Keep lifetimeXp consistent with the level so post-cap progression starts
     // from a sane baseline (virtualLevel never falls below the real level). Only
@@ -9458,7 +9457,10 @@ export class Sim {
   accountAdmin = true;
   // Offline play never spectates: this session is always its own viewer.
   readonly spectating: string | null = null;
-  readonly actionBarReadOnly = false;
+  // A Graveyard Shift run's foreign kit must never reseed the real bar.
+  get actionBarReadOnly(): boolean {
+    return gshiftMod.hasMorthenIdentity(this.entities.get(this.primaryId));
+  }
   socialInfo: null = null;
   friendAdd(_name: string): void {}
   friendRemove(_name: string): void {}

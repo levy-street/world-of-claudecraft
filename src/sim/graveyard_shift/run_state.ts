@@ -4,6 +4,7 @@
 
 import type { ArenaReturnPools, InstanceSlot } from '../sim';
 import type { SimContext } from '../sim_context';
+import type { MorthenParked } from './morthen_transform';
 
 export type GraveyardShiftOutcome = 'won' | 'lost' | 'aborted';
 
@@ -16,6 +17,8 @@ export interface GraveyardShiftRun {
   // What the owner carried in, handed back on every exit (arena parenthesis).
   readonly pools: ArenaReturnPools;
   readonly petStowed: boolean;
+  // The owner's real level and talent modifiers while they are Morthen.
+  readonly parked: MorthenParked;
   // Set by a mid-tick decision (a command or, later, a lethal hit); the run tick
   // tears down, never the code path that decided.
   pendingOutcome: GraveyardShiftOutcome | null;

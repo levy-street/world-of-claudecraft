@@ -1207,10 +1207,15 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    // Lowered for the Ice Block crowd-control guard: the predicates moved to
-    // src/sim/combat/ice_block_guard.ts; the residual is the import and the
-    // isControlAura delegate the ctx binding keeps. Exact count, zero slack.
-    ceiling: 11630,
+    // Re-pinned for the Graveyard Shift prototype, a net lowering from the
+    // release base's 11642 once its own growth is counted: the
+    // Ice Block crowd-control predicates moved to src/sim/combat/ice_block_guard.ts
+    // (the residual is the import and the isControlAura delegate the ctx binding
+    // keeps), which paid for the run's seam lines (the graveyard_shift import,
+    // the run map and its ctx view, the tick call, the offlineHost config copy,
+    // and the action-bar freeze getter; the known-list rule swapped in place).
+    // Exact count, zero slack.
+    ceiling: 11632,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

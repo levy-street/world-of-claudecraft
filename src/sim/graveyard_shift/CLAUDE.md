@@ -2,8 +2,9 @@
 
 The player covers Morthen's shift in a private copy of the Hollow Crypt against a
 party of adventurer bots. Concept and lot plan live outside the repo while this is
-a prototype; this directory is built lot by lot, and today holds the RUN SHELL only
-(enter, exit, survive every exit). No identity, bots or kit yet.
+a prototype; this directory is built lot by lot. Today: the RUN SHELL (enter,
+exit, survive every exit) and the MORTHEN IDENTITY (the owner becomes Morthen in
+the sim). No bots, allies, Dread or HUD bar yet: the kit casts only by id.
 
 ## Contract
 - **Offline only while a prototype.** `canStartGraveyardShift` refuses unless
@@ -19,8 +20,8 @@ a prototype; this directory is built lot by lot, and today holds the RUN SHELL o
   returns at once, so a world without a run is byte-identical to one without
   this module (pinned in `tests/graveyard_shift_run.test.ts`).
 - **One teardown.** Every exit funnels into `endGraveyardShift`: the arena pools
-  snapshot (`snapshotArenaReturnPools`) goes back, the stowed pet returns (any pet
-  summoned during the run is dismissed first), the slot is freed. A dead owner,
+  snapshot (`snapshotArenaReturnPools`) goes back, the stowed pet returns (Morthen
+  cannot summon one on shift), the slot is freed. A dead owner,
   corpse or released ghost, is revived at the Crypt door drop. It is an
   arena-style CLEAN SLATE, not an exact restore: auras carried in (buffs, food,
   flasks) are shed and not given back, as in every arena-shaped mode (owner
@@ -33,6 +34,30 @@ a prototype; this directory is built lot by lot, and today holds the RUN SHELL o
   shared rng, no exit portal, no lockout. Its key (`gshift:<pid>`) is never an
   `instanceKeyFor` key, so Reset All Instances and the Crypt door ignore it.
 
+## The Morthen identity
+- **One permanent, undispellable aura** (`gshift_morthen_identity`, kind
+  `form_morthen`, kept OUT of `FORM_AURA_KINDS`) is the whole switch; every rule
+  keys on `hasMorthenIdentity` (`morthen_identity.ts`, a pure leaf so `entity.ts`,
+  `sim.ts` and the lock sites can import it without a cycle).
+- **Stats:** `recalcPlayerStats` re-enters over no gear and no talents, then
+  `applyMorthenProfile` lays the `morthen` template on top through `mobBaseStats`
+  (the createMob formula): 1191 hp, 41 to 65 at 2.6 sec, 234 armor at level 10.
+  Every recalc path (buff, expiry, equip) therefore lands on the same numbers.
+- **Level and talents:** the real level and `talentMods` are parked on the run
+  (`MorthenParked`); the owner is pinned to the template's level with
+  `emptyModifiers()`. Removal runs BEFORE the teardown's clean slate and pool
+  restore, so the hp clamp sees the real maximum.
+- **Kit:** `knownAbilitiesFor` (the one known-list rule, called in place by
+  `Sim.refreshKnownAbilities`) returns only `MORTHEN_KIT`: the real class kit is
+  uncastable. The kit is mode-local, never in `ABILITIES`.
+- **Locks (silent while dev-gated):** item use, equip and unequip, mounts, pet
+  commands, talent commits and the equipment mods refresh, XP, the warrior stance,
+  deed evaluation; the kit runs on the standard GCD whatever the real class.
+- **Immunities:** the template's `ccImmune` and `slowImmune`, through
+  `playerAuraGuarded` (`morthenBlocksAura`); interrupt lockouts still land.
+- **Real action bar frozen:** `Sim.actionBarReadOnly` is true while the offline
+  primary holds the identity, so the HUD never prunes or saves the real bar.
+
 ## Known limits of the shell (each owned by a later lot)
 - **A death still runs `handleDeath`** (death counter, deeds death hooks, the
   `playerDeath` event). Only `/dev kill` reaches it today. The lethal-hit intercept
@@ -42,12 +67,21 @@ a prototype; this directory is built lot by lot, and today holds the RUN SHELL o
   corpse rebinding, unstuck lookups) treats it as unclaimed. In-run Unstuck refuses.
   Revisit when mobs and bots arrive.
 
+- **Morthen ignores stat auras.** `applyMorthenProfile` overwrites every field a
+  recalc folds auras into (armor, haste, power, crit, dodge, maxHp), so a buff or a
+  debuff on him (an armor cut, an attack slow, an AP debuff) changes nothing. Decide
+  when bots fight him: fold aura deltas over the template, or keep the boss inert.
+
 ## Modules
 | File | Owns |
 |---|---|
 | `run_state.ts` | `GraveyardShiftRun`, its key, the owner lookup |
 | `run_layout.ts` | pure placements as slot-origin offsets (the borrowed dungeon id, the arrival point, the door drop) |
 | `run_slot.ts` | claim and release of the private Crypt slot |
+| `morthen_identity.ts` | pure leaf: the identity aura, `hasMorthenIdentity`, the bare gear sentinels, `morthenBlocksAura` |
+| `morthen_profile.ts` | `applyMorthenProfile` and the pinned level, from the `morthen` template |
+| `morthen_transform.ts` | `applyMorthenIdentity` / `removeMorthenIdentity`, `knownAbilitiesFor` |
+| `kit.ts` | the mode-local kit `AbilityDef`s and their `KnownAbility` list |
 | `run_lifecycle.ts` | `canStartGraveyardShift`, `startGraveyardShift`, `endGraveyardShift`, `updateGraveyardShift` (the one tick entry, called just before the delve runs) |
 | `index.ts` | the public barrel |
 

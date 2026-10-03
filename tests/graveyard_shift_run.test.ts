@@ -199,10 +199,9 @@ describe('Graveyard Shift run shell', () => {
     expect(carried).not.toBeNull();
     start(sim);
     expect(sim.petOf(sim.playerId)).toBeNull();
-    // A pet summoned on shift never displaces the carried one.
+    // Morthen knows only his kit: no pet can be summoned on shift.
     castAndFinish(sim, 'summon_imp');
-    const onShift = sim.petOf(sim.playerId)!;
-    expect(onShift).not.toBeNull();
+    expect(sim.petOf(sim.playerId)).toBeNull();
     sim.chat('/dev graveyardshift end');
     sim.tick();
     const pets = [...sim.entities.values()].filter(
@@ -210,7 +209,6 @@ describe('Graveyard Shift run shell', () => {
     );
     expect(pets).toHaveLength(1);
     expect(pets[0].templateId).toBe(carried.templateId);
-    expect(pets[0].id).not.toBe(onShift.id);
     expect(sim.ctx.delvePetStash.has(sim.playerId)).toBe(false);
   });
 

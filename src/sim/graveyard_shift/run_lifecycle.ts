@@ -11,7 +11,7 @@ import { gliderActionsLocked } from '../glider_action_lock';
 import { instanceClaimHolds, instanceOriginOf, leaveDungeon } from '../instances/dungeons';
 import { isInJailCage } from '../jail';
 import { forceDismount } from '../mounts';
-import { petOf, restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
+import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import { shadowActionsLocked } from '../shadow_action_lock';
 import type { SimContext } from '../sim_context';
@@ -25,6 +25,7 @@ import { bgGroupContaining } from '../social/battleground';
 import { revivePlayerAt } from '../spirit';
 import { settleTeleportArrival } from '../teleport_arrival';
 import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
+import { applyMorthenIdentity, removeMorthenIdentity } from './morthen_transform';
 import { GRAVEYARD_SHIFT_ARRIVAL, graveyardShiftDoorDrop } from './run_layout';
 import { claimGraveyardShiftSlot, releaseGraveyardShiftSlot } from './run_slot';
 import {
@@ -94,12 +95,14 @@ export function startGraveyardShift(ctx: SimContext, pid: number): string | null
   p.facing = GRAVEYARD_SHIFT_ARRIVAL.facing;
   p.prevFacing = GRAVEYARD_SHIFT_ARRIVAL.facing;
   readyArenaFighter(ctx, p, { clearPrep: true });
+  const parked = applyMorthenIdentity(ctx, r.meta, p);
   const run: GraveyardShiftRun = {
     ownerPid: pid,
     key,
     slot,
     pools,
     petStowed: !stashedBefore && ctx.delvePetStash.has(pid),
+    parked,
     pendingOutcome: null,
   };
   ctx.graveyardShiftRuns.set(pid, run);
@@ -118,7 +121,10 @@ export function endGraveyardShift(
 ): void {
   ctx.graveyardShiftRuns.delete(run.ownerPid);
   const p = ctx.entities.get(run.ownerPid);
-  if (p && ctx.players.has(run.ownerPid)) {
+  const meta = ctx.players.get(run.ownerPid);
+  if (p && meta) {
+    fizzleProjectilesFrom(ctx, run.ownerPid);
+    removeMorthenIdentity(ctx, meta, p, run.parked);
     const died = p.dead || p.ghost;
     if (died) {
       const door = graveyardShiftDoorDrop();
@@ -127,17 +133,19 @@ export function endGraveyardShift(
     readyArenaFighter(ctx, p, { clearPrep: true });
     restoreArenaReturnPools(ctx, p, run.pools);
     if (instanceClaimHolds(run.slot, p.pos)) leaveDungeon(ctx, run.ownerPid);
-    if (run.petStowed) {
-      // A pet summoned (or revived) during the run would make the stash restore
-      // bail out and lose the one carried in.
-      const livePet = petOf(ctx, run.ownerPid, true);
-      if (livePet) ctx.despawnPet(livePet);
-      restorePetFromDelveStash(ctx, run.ownerPid);
-    }
+    if (run.petStowed) restorePetFromDelveStash(ctx, run.ownerPid);
     if (!died) ctx.emit({ type: 'respawn', pid: run.ownerPid });
     ctx.emit({ type: 'log', text: `[dev] Graveyard Shift ended (${outcome}).`, pid: run.ownerPid });
   }
   releaseGraveyardShiftSlot(ctx, run.slot, run.key);
+}
+
+// A kit bolt still in flight must not land from the restored real character.
+function fizzleProjectilesFrom(ctx: SimContext, pid: number): void {
+  const retained = ctx.pendingProjectiles.filter((proj) => proj.sourceId !== pid);
+  if (retained.length === ctx.pendingProjectiles.length) return;
+  for (const proj of ctx.pendingProjectiles) if (proj.sourceId === pid) proj.fizzle?.();
+  ctx.pendingProjectiles = retained;
 }
 
 // The single per-tick entry: every exit the run did not decide itself is caught

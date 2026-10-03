@@ -27,6 +27,7 @@ import { armWorldQuestTracingForDev } from './dev_world_quest_tracing';
 import { armWorldQuestWispMazeForDev } from './dev_world_quest_wisp_maze';
 import { createGroundObject, createMob } from './entity';
 import { awardFactionReputation, FACTION_IDS } from './factions';
+import { hasMorthenIdentity } from './graveyard_shift/morthen_identity';
 import {
   ignivarDevRaidTravelRoster,
   setupIgnivarDevRaid,
@@ -181,6 +182,10 @@ export function handleDevChat(
   if (handleGraveyardShiftDevChat(ctx, raw, pid)) return null; // dev/graveyard_shift_dev.ts
   const levelMatch = /^\/(?:dev\s+level|devlevel)\s+(\d+)\s*$/i.exec(raw);
   if (levelMatch) {
+    if (hasMorthenIdentity(ctx.entities.get(pid))) {
+      emitDevLog(ctx, pid, '[dev] Not while on a Graveyard Shift.');
+      return null;
+    }
     const level = Number(levelMatch[1]);
     ctx.setPlayerLevel(level, pid);
     emitDevLog(ctx, pid, `[dev] Level set to ${clampInteger(level, 1, MAX_LEVEL)}.`);
@@ -831,6 +836,10 @@ export function handleDevChat(
   }
 
   const bisMatch = /^\/(?:dev\s+bis|devbis)(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (bisMatch && hasMorthenIdentity(ctx.entities.get(pid))) {
+    emitDevLog(ctx, pid, '[dev] Not while on a Graveyard Shift.');
+    return null;
+  }
   if (bisMatch) {
     const meta = ctx.players.get(pid);
     if (!meta) return null;

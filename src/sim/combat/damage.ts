@@ -28,6 +28,7 @@ import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
+import { hasMorthenIdentity } from '../graveyard_shift/morthen_identity';
 import { emitIgnivarRaidNarrativeOnDeath } from '../ignivar_raid_lore';
 import {
   claimedInstanceForMob,
@@ -1913,7 +1914,8 @@ export function grantXp(
   opts?: { fromKill?: boolean },
 ): void {
   const p = ctx.entities.get(meta.entityId);
-  if (!p || amount <= 0) return;
+  // A Graveyard Shift run is a parenthesis: Morthen earns the real character no XP.
+  if (!p || amount <= 0 || hasMorthenIdentity(p)) return;
   // Rested XP bonus: the classic-era rule only doubles KILL xp (not quests), and
   // never past the cap (no level bar to advance). The bonus equals the rested
   // amount drawn down, so the effective award is up to 2x while the pool lasts.

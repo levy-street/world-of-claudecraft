@@ -7,9 +7,16 @@ import type { TalentModifiers } from './content/talents';
 import { resolveActiveWeaponSkin } from './content/weapon_skin_rules';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
 import { canDualWield, isShieldItem } from './equipment_rules';
+import {
+  hasMorthenIdentity,
+  MORTHEN_BARE_EQUIPMENT,
+  MORTHEN_BARE_EQUIPMENT_INSTANCES,
+} from './graveyard_shift/morthen_identity';
+import { applyMorthenProfile } from './graveyard_shift/morthen_profile';
 import { activeItemInstanceStats } from './item_instance_stats';
 import { meetsLevelRequirement } from './item_level_req';
 import { lootQualityWeapon } from './loot_quality';
+import { mobBaseStats } from './mob_base_stats';
 import { pvpFractionsFromRatings, pvpVitalityFromRating } from './pvp';
 import type {
   Entity,
@@ -318,6 +325,15 @@ export function recalcPlayerStats(
   mods: TalentModifiers | undefined,
   equipmentInstance: PlayerEquipmentInstances,
 ): void {
+  // Graveyard Shift: the run owner fights as Morthen. Re-enter over no gear and
+  // no talents (the sentinel stops the recursion), then lay the template on top.
+  if (hasMorthenIdentity(e) && equipment !== MORTHEN_BARE_EQUIPMENT) {
+    const prevHp = e.hp;
+    const prevMaxHp = e.maxHp;
+    recalcPlayerStats(e, cls, MORTHEN_BARE_EQUIPMENT, undefined, MORTHEN_BARE_EQUIPMENT_INSTANCES);
+    applyMorthenProfile(e, prevHp, prevMaxHp);
+    return;
+  }
   const def = CLASSES[cls];
   const lvl = e.level;
   const s: Stats = {
@@ -826,23 +842,14 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   e.name = template.name;
   e.level = level;
   e.hostile = true;
-  // Elite scaling, classic-style: ~2.3x health, ~1.5x damage.
-  const hpMult = template.elite ? 2.3 : 1;
-  const dmgMult = template.elite ? 1.5 : 1;
-  e.maxHp = Math.round((template.hpBase + template.hpPerLevel * (level - 1)) * hpMult);
+  const base = mobBaseStats(template, level);
+  e.maxHp = base.maxHp;
   e.hp = e.maxHp;
   if (template.damageFloorPct !== undefined) {
     e.damageFloorHp = Math.ceil(e.maxHp * template.damageFloorPct);
   }
-  const dmg = (template.dmgBase + template.dmgPerLevel * (level - 1)) * dmgMult;
-  e.weapon = {
-    min: Math.round(dmg * 0.8),
-    max: Math.round(dmg * 1.25),
-    speed: template.attackSpeed,
-  };
-  // Armor scales from level 1 like hp/dmg above: a template has no armorBase,
-  // so a level-1 mob gets 0 and each level adds armorPerLevel.
-  e.stats.armor = Math.round(template.armorPerLevel * (level - 1));
+  e.weapon = base.weapon;
+  e.stats.armor = base.armor;
   e.moveSpeed = template.moveSpeed;
   e.scale = template.scale;
   e.color = template.color;
