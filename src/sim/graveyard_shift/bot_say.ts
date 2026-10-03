@@ -67,7 +67,7 @@ export function freshBotSayState(runSeed: number): BotSayState {
 const living = (e: Entity | undefined): e is Entity => !!e && !e.dead && !e.ghost;
 
 // Observes the run, queues what changed, and speaks at most one line. Called
-// once per run tick before the teardown, so the party's win line is heard.
+// once per run tick before the teardown, so the party's win line is logged.
 export function updateGraveyardShiftSay(ctx: SimContext, run: GraveyardShiftRun): void {
   run.say ??= freshBotSayState(run.seed);
   const state = run.say;

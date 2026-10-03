@@ -168,10 +168,14 @@ SAY LINES (the living bots talk aloud, heard only up close).
   going down (death), the healer under 15 percent mana (oom), two down or the
   living party under 35 percent average health (wipe threat), each on its edge;
   a loss (`pendingOutcome` 'lost' or a dead owner) makes a living bot say a win
-  line on the tick the teardown runs, ahead of it in the run loop.
+  line on the tick the teardown runs, ahead of it in the run loop. That line
+  reaches the chat log only: the teardown removes the speaker before the HUD
+  draws, so no bubble shows. An end or a win says nothing.
 - **Pacing:** an observed event waits up to 10 sec for a voice (first in, first
-  said); one line per 3 sec across the party, 10 sec per bot, no line twice in a
-  run. The closing win line skips the cooldowns (the teardown follows it).
+  said), then drops; one waiting slot per trigger, so two deaths seen on the
+  same tick make one death line. One line per 3 sec across the party, 10 sec
+  per bot, no line twice in a run. The closing win line skips the cooldowns
+  (the teardown follows it).
 - **Its own Rng** (`botSaySeed`, salted off the run seed): the speaker and line
   draws never touch the shared stream or the bots' brain rngs. The state rides
   the run (`run.say`), created on the first tick. The pools are `bot_lines.ts`.

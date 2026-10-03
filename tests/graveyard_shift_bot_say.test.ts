@@ -58,9 +58,16 @@ function isBotSay(ev: SimEvent): ev is ChatEvent {
   return ev.type === 'chat' && ev.channel === 'say' && !!ev.textKey?.includes('.say.');
 }
 
-function runTicks(sim: Sim, n: number, out: Heard[] = []): Heard[] {
+// Every bot chat off the say channel lands in `stray` (party chat, whisper...).
+function runTicks(sim: Sim, n: number, out: Heard[] = [], stray?: ChatEvent[]): Heard[] {
+  const run = graveyardShiftRunFor(sim.ctx, sim.playerId);
+  const botPids = new Set(run?.bots.map((b) => b.pid));
   for (let i = 0; i < n; i++) {
-    for (const ev of sim.tick()) if (isBotSay(ev)) out.push({ tick: sim.ctx.tickCount, ev });
+    for (const ev of sim.tick()) {
+      if (ev.type !== 'chat') continue;
+      if (ev.channel !== 'say' && botPids.has(ev.fromPid)) stray?.push(ev);
+      else if (isBotSay(ev)) out.push({ tick: sim.ctx.tickCount, ev });
+    }
   }
   return out;
 }
@@ -208,18 +215,44 @@ describe('Graveyard Shift say lines (run)', () => {
     expect(heard.map((h) => triggerOf(h.ev))).toEqual(['partyWins']);
   });
 
+  it('Morthen dying outright (the /dev kill path) also makes the party cheer', () => {
+    const { sim } = shiftSim();
+    runTicks(sim, 2);
+    sim.chat('/dev kill');
+    expect(sim.player.dead).toBe(true);
+    const heard = heardBy(runTicks(sim, 3), sim.playerId);
+    expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBeNull();
+    expect(heard.map((h) => triggerOf(h.ev))).toEqual(['partyWins']);
+  });
+
+  it('an end or a pending win makes no win line', () => {
+    for (const outcome of ['aborted', 'won'] as const) {
+      const { sim, run } = shiftSim();
+      runTicks(sim, 2);
+      if (outcome === 'aborted') sim.chat('/dev graveyardshift end');
+      else run.pendingOutcome = 'won';
+      expect(run.pendingOutcome).toBe(outcome);
+      const heard = runTicks(sim, 3);
+      expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBeNull();
+      expect(heard).toEqual([]);
+    }
+  });
+
   it('holds the rate limits and never repeats a line through a full fight', () => {
     const { sim, run } = shiftSim();
     const tank = botEntity(sim, run, 'tank');
     place(sim, sim.player, tank.pos.x, tank.pos.z + 6);
     const heard: Heard[] = [];
-    runTicks(sim, 5, heard);
+    const stray: ChatEvent[] = [];
+    runTicks(sim, 5, heard, stray);
     kill(sim, botEntity(sim, run, 'dps'));
-    runTicks(sim, 30, heard);
+    runTicks(sim, 30, heard, stray);
     botEntity(sim, run, 'healer').resource = 0;
-    runTicks(sim, 150, heard);
+    runTicks(sim, 150, heard, stray);
     kill(sim, botEntity(sim, run, 'healer'));
-    runTicks(sim, 600, heard);
+    runTicks(sim, 600, heard, stray);
+    // Nothing the bots say rides party chat or any channel but say.
+    expect(stray).toEqual([]);
     const mine = heardBy(heard, sim.playerId);
     expect(mine.length).toBeGreaterThanOrEqual(4);
     const keys = mine.map((h) => h.ev.textKey);
