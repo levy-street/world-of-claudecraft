@@ -35,19 +35,21 @@ import { TurretFeedbackReader } from '../src/ui/hud/vehicle/turret_feedback_read
 const RUN_BOUND = 20 * 60 * 8;
 const TUR_BYTES_PER_SECOND_CEILING = 15_000;
 // Regression guards per trial, set about 10 percent over the measured won runs (introduction about
-// 14.0 KB/s since its last waves crowd 17 monsters in, the Veterans' Test about 31.3 KB/s with
-// its 114 monsters, rushing in on three sides at once); all stay under the fleet's mean egress
-// per account (BANDWIDTH_OPINION.md), so no trim is owed, only no silent growth.
+// 14.0 KB/s since its last waves crowd 17 monsters in, the Veterans' Test about 53.1 KB/s with
+// its 122 monsters, its last wave 25 at once: the giants and their charge). With the self
+// record's base the seat's mean stays under the re-decision envelope of BANDWIDTH_OPINION.md
+// (about 100 KB/s), but its worst second reaches the envelope's 153 KB on some seeds; these
+// guards pin the mean only, against silent growth.
 const TUR_BYTES_PER_SECOND_BY_TRIAL: Record<string, number> = {
   introduction: 15_500,
-  hard: 34_500,
+  hard: 58_500,
 };
 // The same guard per mission, about 10 percent over its measured won run (The Pack about
-// 39.6 KB/s, the highest: two fast packs of ten close together, thrown and scattered; The Deluge
-// about 26.0 with its hundred-odd monsters; Heavy Tread 10.0 since its giants come closer
-// together, The Cracked Tower 13.4, The Powder Store 15.2).
+// 61.8 KB/s, the highest: 156 monsters in packs of twelve to fourteen, two at once at the end,
+// thrown and scattered; The Deluge about 26.0 with its hundred-odd monsters; Heavy Tread 10.0
+// since its giants come closer together, The Cracked Tower 13.4, The Powder Store 15.2).
 const TUR_BYTES_PER_SECOND_BY_MISSION: Record<string, number> = {
-  pack: 43_500,
+  pack: 68_000,
   giants: 11_000,
   deluge: 28_700,
   brittle: 14_800,

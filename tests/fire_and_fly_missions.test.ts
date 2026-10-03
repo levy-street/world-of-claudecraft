@@ -110,27 +110,43 @@ describe('the mission table', () => {
     },
   );
 
-  it('sends The Pack in tight packs of six or more, from a narrow side each', () => {
+  it('sends The Pack in tight packs of twelve or more, each setting off at once from a narrow side', () => {
     for (const wave of TURRET_MISSION_PACK.waves) {
-      expect(wave.arrival?.kind).toBe('burst');
-      if (wave.arrival?.kind !== 'burst') continue;
-      expect(wave.arrival.groupSize).toBeGreaterThanOrEqual(6);
-      expect(wave.arrival.widthTurn).toBeLessThanOrEqual(0.05);
-      expect(wave.gapMaxTicks).toBeLessThanOrEqual(5);
+      const arrival = wave.arrival;
+      expect(['burst', 'flanks']).toContain(arrival?.kind);
+      if (arrival?.kind === 'burst') expect(arrival.groupSize).toBeGreaterThanOrEqual(12);
+      if (arrival?.kind === 'flanks') {
+        expect(arrival.count).toBe(2);
+        expect(wave.entries.reduce((n, e) => n + e.count, 0) / 2).toBeGreaterThanOrEqual(12);
+      }
+      if (arrival?.kind === 'burst' || arrival?.kind === 'flanks')
+        expect(arrival.widthTurn).toBeLessThanOrEqual(0.05);
+      expect(wave.gapMaxTicks).toBeLessThanOrEqual(2);
     }
     expect(spawnsOf(TURRET_MISSION_PACK).reduce((a, b) => a + b)).toBeGreaterThan(
-      spawnsOf(TURRET_SCENARIO_STANDARD).reduce((a, b) => a + b),
+      1.5 * spawnsOf(TURRET_SCENARIO_STANDARD).reduce((a, b) => a + b),
     );
   });
 
-  it("sends two packs of ten from the second wave of The Pack, the second on the first one's heels, faster than their templates", () => {
-    for (const wave of TURRET_MISSION_PACK.waves.slice(1)) {
-      expect(wave.arrival).toMatchObject({ kind: 'burst', groupSize: 10 });
+  it('sends two packs of fourteen a few seconds apart, then two packs at once from opposite sides, never slower wave on wave', () => {
+    const waves = TURRET_MISSION_PACK.waves;
+    for (const wave of waves.slice(0, 3)) {
+      expect(wave.arrival).toMatchObject({ kind: 'burst', groupSize: 14 });
       if (wave.arrival?.kind !== 'burst') continue;
-      expect(wave.arrival.groupGapTicks).toBeLessThanOrEqual(10);
-      expect(wave.entries.reduce((n, e) => n + e.count, 0)).toBe(20);
-      for (const entry of wave.entries) expect(entry.speedScale).toBeGreaterThan(1);
+      expect(wave.arrival.groupGapTicks).toBeGreaterThanOrEqual(40);
+      expect(wave.entries.reduce((n, e) => n + e.count, 0)).toBe(28);
     }
+    for (const wave of waves.slice(3)) {
+      expect(wave.arrival).toMatchObject({ kind: 'flanks', count: 2 });
+      expect(wave.entries.reduce((n, e) => n + e.count, 0)).toBe(24);
+    }
+    const fastest = waves.map((w) => Math.max(...w.entries.map((e) => e.speedScale ?? 1)));
+    for (const speed of fastest) expect(speed).toBeGreaterThan(2);
+    for (let i = 1; i < fastest.length; i++)
+      expect(fastest[i]).toBeGreaterThanOrEqual(fastest[i - 1]);
+    for (let i = 3; i < fastest.length; i++) expect(fastest[i]).toBeGreaterThan(fastest[i - 1]);
+    for (const wave of waves)
+      for (const entry of wave.entries) expect(entry.hpScale).toBeUndefined();
   });
 
   it('makes Heavy Tread few, large or huge, slower and tougher than their templates', () => {

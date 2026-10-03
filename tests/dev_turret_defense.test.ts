@@ -93,8 +93,8 @@ describe('/dev turret', () => {
 
   it.each([
     ['introduction', 'introduction', 150],
-    ['hard', 'hard', 100],
-    ['HARD', 'hard', 100],
+    ['hard', 'hard', 150],
+    ['HARD', 'hard', 150],
     ['fire_and_fly_introduction', 'introduction', 150],
   ])('runs the scenario named by /dev turret %s', (word, key, integrity) => {
     const { sim } = rig();

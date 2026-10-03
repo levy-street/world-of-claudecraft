@@ -55,13 +55,14 @@ describe('the turret feedback ring', () => {
       const burst = blasts * (1 + widest * 2) + shells + cap + widest * 3 + 1 + front + 2;
       return [scenario.boardKey, burst] as const;
     });
-    // The Powder Store's 12 standing kegs set the bound beside its resupplied frags; The
-    // Deluge's and the Veterans' Test's 24-monster waves come next.
+    // The Pack's 28-monster waves set the bound beside its seven resupplied frags; the
+    // Veterans' Test's 25-monster finale, The Powder Store's 12 standing kegs and The
+    // Deluge's 24-monster waves come next.
     expect(Object.fromEntries(bursts)).toEqual({
       introduction: 342,
       standard: 357,
-      hard: 721,
-      pack: 686,
+      hard: 750,
+      pack: 950,
       giants: 213,
       deluge: 721,
       brittle: 402,
@@ -69,7 +70,7 @@ describe('the turret feedback ring', () => {
     });
     const burst = Math.max(...bursts.map(([, n]) => n));
     expect(TURRET_FEEDBACK_LIMIT).toBeGreaterThanOrEqual(burst);
-    expect(TURRET_FEEDBACK_LIMIT).toBe(726);
+    expect(TURRET_FEEDBACK_LIMIT).toBe(950);
     const ring: TurretFeedback[] = [];
     recordTurretFeedback(
       ring,

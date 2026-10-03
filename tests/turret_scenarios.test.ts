@@ -165,7 +165,8 @@ describe('the scenario table', () => {
       new Set(['arc', 'flanks', 'burst']),
     );
     expect(hard.waves.filter((w) => w.arrival?.kind !== 'arc').length).toBeGreaterThan(4);
-    expect(Math.max(...hard.waves.flatMap((w) => w.entries).map((e) => e.hpScale ?? 1))).toBe(1.8);
+    const beforeLast = hard.waves.slice(0, -1).flatMap((w) => w.entries);
+    expect(Math.max(...beforeLast.map((e) => e.hpScale ?? 1))).toBe(1.8);
     const count = (s: TurretScenarioDef, sizes: readonly string[]) =>
       s.waves
         .flatMap((w) => w.entries)
@@ -174,13 +175,15 @@ describe('the scenario table', () => {
     const all = ['small', 'medium', 'large', 'huge'];
     const std = TURRET_SCENARIO_STANDARD;
     expect(count(hard, all)).toBeGreaterThanOrEqual(count(std, all) * 1.3);
-    expect(count(hard, ['large', 'huge'])).toBeGreaterThan(count(std, ['large', 'huge']) * 2.5);
+    expect(count(hard, ['large', 'huge'])).toBeGreaterThanOrEqual(
+      count(std, ['large', 'huge']) * 2,
+    );
     expect(count(hard, ['huge'])).toBeGreaterThan(count(std, ['huge']));
     expect(hard.waves[0].gapMinTicks).toBeLessThan(TURRET_WAVES[0].gapMinTicks);
     expect(hard.waves[0].gapMaxTicks).toBeLessThan(TURRET_WAVES[0].gapMaxTicks);
   });
 
-  it('gives Hard tight packs, two rushes on three sides at once, the giant last', () => {
+  it('gives Hard tight packs, two rushes on three sides at once, then the giants run down by a charge', () => {
     const [, packs, rush, , lastRush, last] = TURRET_SCENARIO_HARD.waves;
     expect(packs.arrival).toMatchObject({ kind: 'burst', groupSize: 10 });
     expect(packs.gapMaxTicks).toBeLessThanOrEqual(5);
@@ -188,7 +191,27 @@ describe('the scenario table', () => {
       expect(wave.arrival).toMatchObject({ kind: 'flanks', count: 3 });
       expect(wave.gapMaxTicks).toBeLessThanOrEqual(2);
     }
-    expect(last.entries.at(-1)).toMatchObject({ templateId: 'idol_guardian', bossLast: true });
+    // The giants set off first; the charge spawns after them from three sides, several
+    // times their pace and about as tough, so both reach the tower together.
+    expect(last.arrival).toMatchObject({ kind: 'flanks', count: 3 });
+    const giants = last.entries.filter((e) => TURRET_TEMPLATE_SIZES[e.templateId] === 'huge');
+    expect(giants.map((e) => e.templateId).sort()).toEqual(['frostmane_yeti', 'idol_guardian']);
+    const charge = last.entries.at(-1)!;
+    expect(charge).toMatchObject({ templateId: 'boneclad_revenant', bossLast: true });
+    expect(charge.count).toBeGreaterThan(15);
+    for (const giant of giants) {
+      expect(giant.bossLast).toBeUndefined();
+      expect(charge.speedScale!).toBeGreaterThan(2.5 * giant.speedScale!);
+    }
+    const plan = resolveTurretPlan(TURRET_SCENARIO_HARD);
+    const lastPlan = plan.waves.at(-1)!;
+    const huge = (kind: number) => plan.kinds[kind].sizeClass === 'huge';
+    const giantCount = giants.reduce((n, e) => n + e.count, 0);
+    expect(lastPlan.spawns.slice(0, giantCount).every(huge)).toBe(true);
+    expect(lastPlan.spawns.slice(giantCount).some(huge)).toBe(false);
+    const hp = (kind: number) => plan.kinds[kind].maxHp;
+    const yeti = lastPlan.spawns.find(huge)!;
+    expect(hp(lastPlan.spawns.at(-1)!)).toBeGreaterThan(hp(yeti));
   });
 
   it("keeps Hard's kegs wave by wave as many as Standard's: they were barely used", () => {
@@ -671,7 +694,9 @@ describe('full runs of every scenario with the scripted aimers', () => {
     ] as const) {
       const r = fullRun(TURRET_SCENARIO_HARD, 42, probe, aim);
       expect(['won', 'lost']).toContain(r.state.phase);
-      expect(r.state.integrity).toBe(Math.max(0, 100 - r.state.stats.pointsLost));
+      expect(r.state.integrity).toBe(
+        Math.max(0, TURRET_SCENARIO_HARD.integrity - r.state.stats.pointsLost),
+      );
       if (r.state.phase === 'won') {
         expect(r.state.stats.kills + r.state.stats.breaches).toBe(r.monsters);
       }

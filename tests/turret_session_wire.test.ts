@@ -275,7 +275,10 @@ describe('the turret plan key', () => {
         p.medals.silver.minIntegrityShare = 0.91;
       },
     ],
-    ["a silver bar at a win's last point", (p: Wire) => (p.medals.silver.minIntegrityShare = 0.01)],
+    [
+      "a silver bar at a win's last point",
+      (p: Wire) => (p.medals.silver.minIntegrityShare = 1 / p.integrity),
+    ],
   ])('rejects %s', (_, forge) => {
     const forged = wire(resolveTurretPlan(TURRET_SCENARIO_HARD));
     forge(forged);

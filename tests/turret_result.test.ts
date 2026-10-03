@@ -52,7 +52,7 @@ describe('the medal bars of each scenario', () => {
     expect(bars).toEqual([
       ['introduction', 148, 128],
       ['standard', 99, 60],
-      ['hard', 97, 60],
+      ['hard', 147, 90],
     ]);
     expect(turretMedalBarPoints(0.9, 100)).toBe(90);
     expect(turretMedalBarPoints(0.901, 100)).toBe(91);
@@ -266,7 +266,7 @@ describe('the result at the end of a run', () => {
     state.phase = 'wave';
     state.wave = plan.waves.length - 1;
     state.spawnCursor = plan.waves[state.wave].spawns.length;
-    state.integrity = 84;
+    state.integrity = 126;
     const events = tickTurretDefense(state, START + TURRET_TIMING.introTicks, flat);
     expect(state.phase).toBe('won');
     expect(state.result).toMatchObject({ won: true, medal: 'silver' });

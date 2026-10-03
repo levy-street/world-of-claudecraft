@@ -11,12 +11,13 @@
 // Trial golds aimers within 0.8 s and gives one at 1 s mostly silver, 2 s silver or
 // bronze, never a loss; Standing Watch's gold goes from about half to three quarters
 // of the 0.8 s aimers' runs and from none to about half of the 1 s aimer's with the
-// Shockwave; the Veterans' Test golds nearly every run of the 0.4 s aimer, bare or
-// armed, and the 0.8 s aimers about a fifth of their runs bare, three fifths armed:
-// the Shockwave alone does as much (the rushes), the fragmentation shell alone a little
-// (also in the rushes: the packs cost little even bare), and the 1 s aimer gets silver
-// or bronze, gold rarely and only with a weapon. The armed figures hold for that policy
-// only.
+// Shockwave. The Veterans' Test is measured against a sharper policy too, the best
+// scripted stand-in for a good player (a Shockwave at 3 windups, a frag on the pack
+// about to strike once several close in at once): the 0.4 s aimer golds about a
+// fifth of its runs bare and over half with it, nearly all the gold lost in the last
+// wave; the 0.8 s aimers never gold, and the 1 s aimer wins with silver or bronze,
+// losing about one run in ten bare and none with that policy. The armed figures hold
+// for those policies only.
 
 import { DT, type TurretScenarioDef } from '../types';
 import { TURRET_MISSIONS } from './fire_and_fly_missions';
@@ -33,6 +34,8 @@ const PACK_GAP = { gapMinTicks: ticks(0.15), gapMaxTicks: ticks(0.25) } as const
 const RUSH_GAP = { gapMinTicks: ticks(0.05), gapMaxTicks: ticks(0.1) } as const;
 const HARD_HP = 1.8;
 const BRUTE_HP = 1.4;
+/** The Veterans' Test's last charge: armoured dead as tough as its giants. */
+const CHARGER_HP = 6.2;
 
 /**
  * Three short waves of the smallest monsters on the whole ring, with room for mistakes:
@@ -92,15 +95,18 @@ export const TURRET_SCENARIO_STANDARD: TurretScenarioDef = {
 
 /**
  * Standard's six waves made meaner: tight fast packs, a rush on three sides at once
- * (the Shockwave's), a stream from one side, a second rush, then the giant at the end.
- * The fodder takes 80 percent more health, the large ones 40, and the kegs stay as many
- * as Standard's.
+ * (the Shockwave's), a stream from one side, a second rush, then the giants walking in
+ * with a charge of armoured dead hard on their heels from three sides. The fodder
+ * takes 80 percent more health, the large ones 40, and the kegs stay as many as
+ * Standard's.
  */
 export const TURRET_SCENARIO_HARD: TurretScenarioDef = {
   id: 'fire_and_fly_hard',
   boardKey: 'hard',
-  integrity: 100,
-  medals: { gold: { minIntegrityShare: 0.97 }, silver: { minIntegrityShare: 0.6 } },
+  // A sturdier tower than the other trials: gold still lets 3 points go, but a run the
+  // last wave mauls stays winnable, so the recruitment it closes stays open.
+  integrity: 150,
+  medals: { gold: { minIntegrityShare: 0.98 }, silver: { minIntegrityShare: 0.6 } },
   // It brings in the fragmentation shell beside fewer Shockwaves.
   arsenal: { shockwave: 2, fragmentation: 4 },
   waves: [
@@ -156,23 +162,27 @@ export const TURRET_SCENARIO_HARD: TurretScenarioDef = {
       arrival: { kind: 'flanks', count: 3, widthTurn: 0.1 },
     },
     {
+      // The giants set off first, a little quicker than their templates; the charge
+      // spawns behind them and runs them down, so both reach the tower together. Each
+      // charger is nearly as tough as a giant: the cannon alone lets one through in most
+      // runs, while the Shockwave and frags saved for this wave turn most charges back.
       entries: [
-        { templateId: 'boneclad_revenant', count: 7, level: 19, hpScale: HARD_HP },
-        { templateId: 'thornpeak_ogre', count: 6, level: 16, hpScale: BRUTE_HP },
-        { templateId: 'frostmane_yeti', count: 3, level: 20, hpScale: HARD_HP, speedScale: 0.65 },
+        { templateId: 'frostmane_yeti', count: 3, level: 20, hpScale: HARD_HP, speedScale: 1.15 },
+        { templateId: 'idol_guardian', count: 1, level: 20, hpScale: HARD_HP, speedScale: 1.15 },
         {
-          templateId: 'idol_guardian',
-          count: 1,
-          level: 20,
+          templateId: 'boneclad_revenant',
+          count: 21,
+          level: 19,
           bossLast: true,
-          hpScale: HARD_HP,
-          speedScale: 0.65,
+          hpScale: CHARGER_HP,
+          speedScale: 3.2,
         },
       ],
       coreDamage: 360,
-      ...PACK_GAP,
+      gapMinTicks: 3,
+      gapMaxTicks: 7,
       barrels: { count: 5, ...TURRET_BARREL_RING },
-      arrival: { kind: 'burst', groupSize: 4, groupGapTicks: ticks(5), widthTurn: 0.08 },
+      arrival: { kind: 'flanks', count: 3, widthTurn: 0.1 },
     },
   ],
 };
