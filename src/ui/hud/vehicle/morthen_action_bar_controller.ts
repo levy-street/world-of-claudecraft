@@ -1,4 +1,4 @@
-// The Graveyard Shift bar: while the player holds the Morthen identity, five
+// The Graveyard Shift bar: while the player holds the Morthen identity, six
 // slots (Attack plus the kit) stand in for the action, stance and pet bars, which
 // the morthen-shift body class hides. Same family as the cloak bar: the pure view
 // core (morthen_action_bar_view.ts) painted through the PainterHost writers, the
@@ -10,16 +10,13 @@ import {
   morthenChooseSlot,
   morthenControlsActive,
 } from '../../../game/morthen_controls';
+import { MORTHEN_BAR_SLOTS } from '../../../sim/graveyard_shift/kit';
 import { playerSpellHasteFrac } from '../../ability_tooltip_lines';
-import { t } from '../../i18n';
+import { getI18nRevision, t } from '../../i18n';
 import { iconDataUrl } from '../../icons';
 import type { PainterHostWriters } from '../../painter_host';
 import { ActionBarPainter, type ActionBarSlotElements } from '../action_bar/action_bar_painter';
-import {
-  createMorthenActionBarView,
-  MORTHEN_BAR_SLOTS,
-  morthenSlotTooltipHtml,
-} from './morthen_action_bar_view';
+import { createMorthenActionBarView, morthenSlotTooltipHtml } from './morthen_action_bar_view';
 
 export const MORTHEN_SHIFT_BODY_CLASS = 'morthen-shift';
 
@@ -29,6 +26,7 @@ export class MorthenActionBarController {
   private readonly view = createMorthenActionBarView();
   private readonly painter: ActionBarPainter;
   private active = false;
+  private titleRevision = -1;
   constructor(
     private readonly world: MorthenControlWorld,
     private readonly writers: PainterHostWriters,
@@ -89,10 +87,15 @@ export class MorthenActionBarController {
       this.writers.setDisplay(this.root, active ? 'grid' : 'none');
     }
     if (!active) return;
+    // The title is static text: resolved once per language, not per frame.
+    const revision = getI18nRevision();
+    if (revision !== this.titleRevision) {
+      this.titleRevision = revision;
+      this.writers.setText(this.title, t('devCommand.graveyardShift.identityAura'));
+    }
     const player = this.world.player;
     const target =
       player.targetId === null ? null : (this.world.entities.get(player.targetId) ?? null);
-    this.writers.setText(this.title, t('devCommand.graveyardShift.identityAura'));
     this.painter.paint(this.view.tick(player, target, this.keyLabel));
   }
 }

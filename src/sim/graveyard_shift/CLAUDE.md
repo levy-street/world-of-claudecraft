@@ -219,7 +219,7 @@ SAY LINES (the living bots talk aloud, heard only up close).
 | `morthen_identity.ts` | pure leaf: the identity aura, `hasMorthenIdentity`, the bare gear sentinels, `morthenBlocksAura` |
 | `morthen_profile.ts` | `applyMorthenProfile` and the pinned level, from the `morthen` template |
 | `morthen_transform.ts` | `applyMorthenIdentity` / `removeMorthenIdentity`, `knownAbilitiesFor` |
-| `kit.ts` | the mode-local kit `AbilityDef`s and their `KnownAbility` list |
+| `kit.ts` | the mode-local kit `AbilityDef`s, their `KnownAbility` list and the bar's slot layout |
 | `run_party.ts` | the fixed party, its spawn after the identity and its removal |
 | `hostility.ts` | pure leaf: the adventurer marker and the Morthen-versus-adventurer pair rule |
 | `death_intercept.ts` | the lethal-blow clamp `dealDamage` calls |

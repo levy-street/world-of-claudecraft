@@ -1,16 +1,26 @@
 import { describe, expect, it, vi } from 'vitest';
 import { morthenChooseSlot, morthenControlsActive } from '../src/game/morthen_controls';
-import { MORTHEN_KIT } from '../src/sim/graveyard_shift/kit';
+import { MORTHEN_BAR_SLOTS, MORTHEN_KIT, morthenSlotAbility } from '../src/sim/graveyard_shift/kit';
 import { morthenIdentityAura } from '../src/sim/graveyard_shift/morthen_identity';
 import { GCD } from '../src/sim/types';
+import { graveyardShiftAbilityDescription } from '../src/ui/graveyard_shift_text_core';
 import {
   createMorthenActionBarView,
-  MORTHEN_BAR_SLOTS,
   type MorthenBarPlayer,
   type MorthenBarTarget,
-  morthenSlotAbility,
   morthenSlotTooltipHtml,
 } from '../src/ui/hud/vehicle/morthen_action_bar_view';
+import { setLanguage } from '../src/ui/i18n';
+
+// A spy over the real description builder, so a case can count how often the view
+// resolves the full tooltip prose.
+vi.mock('../src/ui/graveyard_shift_text_core', async (importOriginal) => {
+  const real = await importOriginal<typeof import('../src/ui/graveyard_shift_text_core')>();
+  return {
+    ...real,
+    graveyardShiftAbilityDescription: vi.fn(real.graveyardShiftAbilityDescription),
+  };
+});
 
 function player(over: Partial<MorthenBarPlayer> = {}): MorthenBarPlayer {
   return {
@@ -149,6 +159,25 @@ describe('morthen action bar view', () => {
     expect(view.tick(player({ autoAttack: true }), null, keys).slots[0].queued).toBe(true);
     const dead = view.tick(player({ dead: true }), target(4), keys);
     expect(dead.slots.every((slot) => !slot.usable)).toBe(true);
+  });
+
+  it('resolves the slot prose once per language, never on every tick', () => {
+    const describeAbility = vi.mocked(graveyardShiftAbilityDescription);
+    const view = createMorthenActionBarView();
+    describeAbility.mockClear();
+    const first = view.tick(player(), null, keys).slots[1].ariaDescription;
+    expect(describeAbility).toHaveBeenCalledTimes(MORTHEN_KIT.length);
+    view.tick(player({ gcdRemaining: 1 }), target(3), keys);
+    view.tick(player({ resource: 0 }), null, keys);
+    expect(describeAbility).toHaveBeenCalledTimes(MORTHEN_KIT.length);
+    expect(view.tick(player(), null, keys).slots[1].ariaDescription).toBe(first);
+    setLanguage('de_DE');
+    try {
+      view.tick(player(), null, keys);
+      expect(describeAbility).toHaveBeenCalledTimes(MORTHEN_KIT.length * 2);
+    } finally {
+      setLanguage('en');
+    }
   });
 
   it('reuses the same state object and slot array every tick', () => {

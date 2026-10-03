@@ -38,6 +38,18 @@ describe('Graveyard Shift display text', () => {
     expect(isGraveyardShiftAbilityId('fireball')).toBe(false);
   });
 
+  it('gives every kit ability a name row and a description row', () => {
+    // Iterates the kit itself, so a new ability without its text rows reds here.
+    for (const def of MORTHEN_KIT) {
+      const name = graveyardShiftAbilityName(def.id);
+      const description = graveyardShiftAbilityDescription(def.id);
+      expect(name, def.id).toBeTruthy();
+      expect(description, def.id).toBeTruthy();
+      expect(name).not.toMatch(/gshift_/);
+      expect(description).not.toMatch(/gshift_/);
+    }
+  });
+
   it('names every kit ability through its key in every name resolver', () => {
     for (const def of MORTHEN_KIT) {
       const name = NAMES[def.id];

@@ -1,8 +1,11 @@
 // @vitest-environment happy-dom
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { morthenIdentityAura } from '../src/sim/graveyard_shift/morthen_identity';
 import { Sim } from '../src/sim/sim';
 import type { Aura, Entity } from '../src/sim/types';
+import { MORTHEN_SHIFT_BODY_CLASS } from '../src/ui/hud/vehicle/morthen_action_bar_controller';
 import { VehicleActionBarController } from '../src/ui/hud/vehicle/vehicle_action_bar_controller';
 import { makeWriterFacet } from '../src/ui/painter_host';
 import { EMPTY_TEST_WORLD } from './sim_shared';
@@ -43,11 +46,15 @@ function fakeWorld(identity: boolean) {
   };
 }
 
-function makeBar(world: object, cancel = vi.fn()) {
+function makeWriters() {
+  return makeWriterFacet(new Map(), new Map(), new Map(), new Map(), vi.fn(), () => {});
+}
+
+function makeBar(world: object, cancel = vi.fn(), writers = makeWriters()) {
   document.body.innerHTML = '<div id="ui"></div>';
   return new VehicleActionBarController({
     world: world as ConstructorParameters<typeof VehicleActionBarController>[0]['world'],
-    writers: makeWriterFacet(new Map(), new Map(), new Map(), new Map(), vi.fn(), () => {}),
+    writers,
     keyLabel: (slot) => String(slot + 1),
     consumePeek: () => false,
     cancelOnEnter: [{ cancel }],
@@ -125,6 +132,18 @@ describe('Morthen bar inside the vehicle bar family', () => {
     expect(document.body.classList.contains('morthen-shift')).toBe(false);
   });
 
+  it('writes the bar title once, not on every frame', () => {
+    const writers = makeWriters();
+    const setText = vi.spyOn(writers, 'setText');
+    const bar = makeBar(fakeWorld(true), vi.fn(), writers);
+    const title = document.querySelector('#morthen-action-bar .vehicle-bar-title');
+    bar.update();
+    bar.update();
+    bar.update();
+    expect(setText.mock.calls.filter(([el]) => el === title)).toHaveLength(1);
+    expect(title!.textContent).toBe('Morthen the Gravecaller');
+  });
+
   it('ignores slot presses once the identity is gone', () => {
     const world = fakeWorld(false);
     const bar = makeBar(world);
@@ -160,5 +179,33 @@ describe('Morthen bar on a real offline run', () => {
     sim.chat('/dev graveyardshift end');
     sim.tick();
     expect(VehicleActionBarController.blocksPlayerActions(sim)).toBe(false);
+  });
+});
+
+describe('Morthen bar hide rule', () => {
+  it('hides every player bar under the morthen-shift body class', () => {
+    // happy-dom applies no stylesheet, so the rule is pinned as text: the body
+    // class the controller toggles must sit in the selector that hides the bars.
+    const css = readFileSync(resolve(process.cwd(), 'src/styles/hud.css'), 'utf8');
+    const rule = css.match(/body:is\(([^)]*)\)\s*:is\(([^)]*)\)\s*\{([^}]*)\}/);
+    expect(rule).not.toBeNull();
+    const [, bodyClasses, bars, body] = rule!;
+    expect(bodyClasses.split(',').map((c) => c.trim())).toContain(`.${MORTHEN_SHIFT_BODY_CLASS}`);
+    expect(bars.split(',').map((b) => b.trim())).toEqual(
+      expect.arrayContaining([
+        '#actionbar',
+        '#actionbar2',
+        '#actionbar3',
+        '#cross-hotbar',
+        '#stancebar',
+        '#petbar',
+        '#mobile-action-ring',
+        '#mobile-action-radial',
+        '#mobile-consumable-strip',
+        '#mobile-stance-radial',
+        '#mobile-combat-controls',
+      ]),
+    );
+    expect(body).toMatch(/display:\s*none\s*!important/);
   });
 });

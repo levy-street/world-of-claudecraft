@@ -1,31 +1,21 @@
 // Pure view core for the Graveyard Shift bar: while the player holds the Morthen
-// identity, five slots replace the action bar. Slot 0 toggles auto-attack, slots
-// 1 to 4 are the mode-local kit in MORTHEN_KIT order, so the default keys 1 to 5
+// identity, six slots replace the action bar. Slot 0 toggles auto-attack, slots
+// 1 to 5 are the mode-local kit in MORTHEN_KIT order, so the default keys 1 to 6
 // drive them. The state array is allocated once and mutated in place each tick
 // (the action-bar family's allocation contract); the controller paints it through
 // ActionBarPainter.
 
 import { effectivePlayerAttackRange } from '../../../sim/combat/player_attack_reach';
-import { MORTHEN_KIT } from '../../../sim/graveyard_shift/kit';
-import { type AbilityDef, dist2d, GCD, type Vec3 } from '../../../sim/types';
+import { MORTHEN_BAR_SLOTS, morthenSlotAbility } from '../../../sim/graveyard_shift/kit';
+import { dist2d, GCD, type Vec3 } from '../../../sim/types';
 import { abilityRangeLine, resourceDisplayName } from '../../ability_tooltip_lines';
 import { esc } from '../../esc';
 import {
   graveyardShiftAbilityDescription,
   graveyardShiftAbilityName,
 } from '../../graveyard_shift_text_core';
-import { formatNumber, t } from '../../i18n';
+import { formatNumber, getI18nRevision, t } from '../../i18n';
 import { type ActionBarState, makeSlotState } from '../action_bar/action_bar_view';
-
-export const MORTHEN_ATTACK_SLOT = 0;
-
-/** The bar layout: null is the Attack toggle, then the kit in order. */
-export const MORTHEN_BAR_SLOTS: readonly (AbilityDef | null)[] = [null, ...MORTHEN_KIT];
-
-/** The kit ability a slot casts, or null for the Attack slot and any slot past the bar. */
-export function morthenSlotAbility(slot: number): AbilityDef | null {
-  return MORTHEN_BAR_SLOTS[slot] ?? null;
-}
 
 /** Icon art borrowed from shipped abilities until the kit gets its own. */
 const KIT_ICON_KEYS: Readonly<Record<string, string>> = {
@@ -64,18 +54,44 @@ export function createMorthenActionBarView() {
     slots: MORTHEN_BAR_SLOTS.map(() => makeSlotState()),
     manySpells: false,
   };
+  // The slot labels and the full tooltip prose change only with the language, so
+  // they are resolved once per i18n revision, never per frame.
+  const ariaLabels: string[] = MORTHEN_BAR_SLOTS.map(() => '');
+  const ariaDescriptions: string[] = MORTHEN_BAR_SLOTS.map(() => '');
+  let textRevision = -1;
+  function refreshText(): void {
+    for (let i = 0; i < MORTHEN_BAR_SLOTS.length; i++) {
+      const def = MORTHEN_BAR_SLOTS[i];
+      ariaLabels[i] = t('abilityUi.actionBar.slotAria', {
+        slot: formatNumber(i + 1),
+        ability: def
+          ? (graveyardShiftAbilityName(def.id) ?? def.id)
+          : t('abilityUi.actionBar.attackName'),
+      });
+      ariaDescriptions[i] = def
+        ? (graveyardShiftAbilityDescription(def.id) ?? '')
+        : t('abilityUi.actionBar.attackTooltip');
+    }
+  }
   return {
     tick(
       player: MorthenBarPlayer,
       target: MorthenBarTarget | null,
       keyLabel: (slot: number) => string,
     ): ActionBarState {
+      const revision = getI18nRevision();
+      if (revision !== textRevision) {
+        textRevision = revision;
+        refreshText();
+      }
       const liveTarget = target && !target.dead ? target : null;
       const distance = liveTarget ? dist2d(player.pos, liveTarget.pos) : null;
       for (let i = 0; i < state.slots.length; i++) {
         const slot = state.slots[i];
         const def = MORTHEN_BAR_SLOTS[i];
         slot.keybindLabel = keyLabel(i);
+        slot.ariaLabel = ariaLabels[i];
+        slot.ariaDescription = ariaDescriptions[i];
         if (!def) {
           slot.kind = 'attack';
           slot.abilityId = null;
@@ -90,11 +106,6 @@ export function createMorthenActionBarView() {
             distance !== null &&
             distance > effectivePlayerAttackRange(liveTarget, 0);
           slot.queued = player.autoAttack;
-          slot.ariaLabel = t('abilityUi.actionBar.slotAria', {
-            slot: formatNumber(i + 1),
-            ability: t('abilityUi.actionBar.attackName'),
-          });
-          slot.ariaDescription = t('abilityUi.actionBar.attackTooltip');
           continue;
         }
         const cooldown = Math.max(0, player.cooldowns.get(def.id) ?? 0);
@@ -118,11 +129,6 @@ export function createMorthenActionBarView() {
           distance !== null &&
           distance > effectivePlayerAttackRange(liveTarget, def.range);
         slot.queued = false;
-        slot.ariaLabel = t('abilityUi.actionBar.slotAria', {
-          slot: formatNumber(i + 1),
-          ability: graveyardShiftAbilityName(def.id) ?? def.id,
-        });
-        slot.ariaDescription = graveyardShiftAbilityDescription(def.id) ?? '';
       }
       return state;
     },
