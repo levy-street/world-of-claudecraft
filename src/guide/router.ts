@@ -18,7 +18,10 @@ export class GuideRouter {
   start(): void {
     document.addEventListener('click', this.handleClick);
     window.addEventListener('popstate', this.handlePopState);
-    this.onNavigate(window.location.pathname);
+    // Keep the fragment on the first route too, the popstate reason below: a
+    // shared deep link (a search hit, an FAQ answer) renders client-side after
+    // load, so the browser's own fragment scroll has nothing to land on yet.
+    this.onNavigate(window.location.pathname + window.location.hash);
   }
 
   /** Programmatic navigation (also used by the router's own intercepts). */

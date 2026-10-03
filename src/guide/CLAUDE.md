@@ -64,6 +64,17 @@ lists shelves, pages, and relic names only: it never emits drop sources, firstFi
 clear counts, or personal progress. Rich localized spec/mastery prose resolves live through
 `src/ui/talent_i18n.ts`, not baked here.
 
+**The professions carve-out (where to get things).** The professions pages publish exact
+numbers, and they also say WHERE a material, pattern, or formula comes from, because that
+is the question players ask. `scripts/wiki/acquisition_sources.mjs` holds the rule in one
+place: an instanced source is named by KIND only (dungeon, Heroic dungeon, raid, rift),
+never by instance or boss; an elite, boss, or world boss carrier in the open world is named
+by its zone only (the names the bestiary withholds); ordinary and rare creatures are named,
+as the bestiary names them; quartermasters, vendors, and standing tiers are named. The NPC
+Locations page (`pages/npcs.ts`) lists standing overworld NPCs only, never anyone inside an
+instance or spawned for an encounter. Pinned in `tests/guide_prof_materials.test.ts` and
+`tests/wiki_acquisition_sources.test.ts`.
+
 ## i18n: the guide-specific deltas
 Guide strings are `guide.*` `t()` keys; the English source lives in
 `src/ui/i18n.catalog/guide.ts` with no per-locale blocks, so a new key compiles

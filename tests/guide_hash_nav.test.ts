@@ -107,3 +107,31 @@ describe('Guide fragment handling on popstate and language change', () => {
     expect(focusSpy).toHaveBeenCalled();
   });
 });
+
+describe('Guide FAQ deep links', () => {
+  it('opens the FAQ answer a search hit lands on', () => {
+    const { firePopstate } = mountApp(`${GUIDE_BASE}/professions/faq`);
+    const target = document.getElementById('prof-faq-14') as HTMLDetailsElement | null;
+    expect(target?.tagName).toBe('DETAILS');
+    expect(target?.open).toBe(false);
+    setUrl(`${GUIDE_BASE}/professions/faq#prof-faq-14`);
+    firePopstate();
+    const landed = document.getElementById('prof-faq-14') as HTMLDetailsElement | null;
+    expect(landed?.open).toBe(true);
+    // Its siblings stay closed: only the targeted answer opens.
+    expect((document.getElementById('prof-faq-13') as HTMLDetailsElement | null)?.open).toBe(false);
+  });
+
+  it('opens it on a first load of a shared deep link too', () => {
+    mountApp(`${GUIDE_BASE}/professions/faq#prof-faq-15`);
+    expect((document.getElementById('prof-faq-15') as HTMLDetailsElement | null)?.open).toBe(true);
+    expect((document.getElementById('prof-faq-14') as HTMLDetailsElement | null)?.open).toBe(false);
+  });
+
+  it('opens it when a same-page link changes only the hash', () => {
+    mountApp(`${GUIDE_BASE}/professions/faq`);
+    setUrl(`${GUIDE_BASE}/professions/faq#prof-faq-16`);
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+    expect((document.getElementById('prof-faq-16') as HTMLDetailsElement | null)?.open).toBe(true);
+  });
+});

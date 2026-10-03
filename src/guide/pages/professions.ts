@@ -24,6 +24,7 @@ import { craftById, craftDetailHtml, craftLabel, stationLabel } from './professi
 import { economyDetailHtml } from './professions_economy';
 import { faqDetailHtml } from './professions_faq';
 import { gatheringById, gatheringDetailHtml, gatheringLabel } from './professions_gathering';
+import { materialsDetailHtml } from './professions_materials';
 import { provisioningDetailHtml } from './professions_provisioning';
 import type { GuidePage, PageContext } from './types';
 import { lead, paras, related } from './ui';
@@ -134,7 +135,7 @@ function overviewHtml(): string {
       ${lead('guide.professions.intro')}
       <section class="guide-block" id="prof-what">
         <h2>${esc(t('guide.professions.whatHeading'))}</h2>
-        ${paras('guide.professions.whatBody')}
+        ${paras('guide.professions.whatBodyAllTen')}
       </section>
       ${ringSection()}
       ${gatheringSection()}
@@ -178,9 +179,11 @@ function overviewHtml(): string {
         ${paras('guide.professions.startBody')}
       </section>
       ${related([
+        { href: hrefFor('professions/materials'), key: 'guide.profPages.mat.title' },
         { href: hrefFor('professions/provisioning'), key: 'guide.profPages.prov.title' },
         { href: hrefFor('professions/economy'), key: 'guide.profPages.econ.title' },
         { href: hrefFor('professions/faq'), key: 'guide.profPages.faq.title' },
+        { href: hrefFor('npcs'), key: 'guide.nav.npcs' },
         { href: hrefFor('gear'), key: 'guide.nav.gear' },
         { href: hrefFor('economy'), key: 'guide.nav.economy' },
       ])}
@@ -198,6 +201,7 @@ export const professions: GuidePage = {
     if (id === 'economy') return t('guide.profPages.econ.title');
     if (id === 'faq') return t('guide.profPages.faq.title');
     if (id === 'provisioning') return t('guide.profPages.prov.title');
+    if (id === 'materials') return t('guide.profPages.mat.title');
     return t('guide.nav.professions');
   },
   render(ctx: PageContext) {
@@ -210,6 +214,7 @@ export const professions: GuidePage = {
     if (id === 'economy') return economyDetailHtml();
     if (id === 'faq') return faqDetailHtml();
     if (id === 'provisioning') return provisioningDetailHtml();
+    if (id === 'materials') return materialsDetailHtml();
     return notFoundInline();
   },
 };

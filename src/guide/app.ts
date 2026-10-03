@@ -24,6 +24,11 @@ function isRtl(tag: string): boolean {
   return RTL_LANGS.has(tag.split('-')[0]);
 }
 
+/** Open a fragment target that is a closed <details> (an FAQ answer). */
+function openDetailsTarget(target: Element | null): void {
+  if (target instanceof HTMLDetailsElement) target.open = true;
+}
+
 export class GuideApp {
   private readonly mount: HTMLElement;
   private readonly router: GuideRouter;
@@ -40,6 +45,12 @@ export class GuideApp {
   start(): void {
     this.rebuildChrome();
     this.applyDocumentLang();
+    // A same-page fragment link (the router leaves those to the browser) can
+    // target a closed FAQ answer; open it so the reader lands on the answer.
+    window.addEventListener('hashchange', () => {
+      const hash = window.location.hash;
+      if (hash.length > 1) openDetailsTarget(this.chrome.mainEl.querySelector(hash));
+    });
     this.router.start();
   }
 
@@ -171,6 +182,9 @@ export class GuideApp {
     if (hash.length > 1) {
       const target = this.chrome.mainEl.querySelector(hash);
       if (target) {
+        // A search hit on an FAQ question targets its <details>: open it, so the
+        // reader lands on the answer rather than a closed summary line.
+        openDetailsTarget(target);
         (target as HTMLElement).scrollIntoView({ behavior: 'instant', block: 'start' });
         return;
       }

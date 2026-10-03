@@ -37,6 +37,7 @@ export const guideStrings = {
     world: 'World',
     quests: 'Quests',
     factions: 'Factions & Standing',
+    npcs: 'NPC Locations',
     dungeons: 'Dungeons & Raids',
     delves: 'Delves',
     rifts: 'Rifts',
@@ -136,6 +137,12 @@ export const guideStrings = {
     // Reliquary term of the glossary reliquaryName row in every locale.
     typeReliquaryPage: 'Reliquary Page',
     typeRelic: 'Relic',
+    // A crafting material row on the Materials page, and an NPC row on the NPC
+    // Locations page.
+    typeMaterial: 'Material',
+    typeNpc: 'NPC',
+    // A Professions FAQ question, linked to its own open answer.
+    typeQuestion: 'Question',
   },
 
   // Home / overview landing.
@@ -2371,6 +2378,21 @@ export const guideStrings = {
   // names, roles, hubs, the six tier names and each faction's titles, the quartermasters,
   // and where standing is read; no thresholds, per-quest amounts, item stats, prices, or
   // level numbers (src/sim/factions.ts, src/sim/content/faction_vendors.ts).
+  // NPC Locations (/wiki/npcs): where every standing overworld NPC is, generated
+  // from the live NPC table. Directions use the HUD compass strip's own N / NE / E
+  // abbreviations (hudChrome.compass.*), so the page and the compass agree.
+  npcsPage: {
+    heading: 'NPC Locations',
+    intro:
+      'Where every trainer, vendor, quartermaster, and quest giver in the open world stands. Each entry names the town, or how far to walk from it and in which compass direction.',
+    colNpc: 'NPC',
+    colRole: 'Role',
+    colWhere: 'Where',
+    inTown: 'In {town}',
+    awayFmt: '{yards} yd {direction} of {town}',
+    eventNote:
+      'NPCs that appear only for a world quest, an encounter, or a quest step are not listed here, and neither is anyone inside a dungeon or raid.',
+  },
   factionsPage: {
     heading: 'Factions and Standing',
     intro:
@@ -2830,6 +2852,11 @@ export const guideStrings = {
     // existing key as written (no reword; the phase's judgment, 2026-08-29).
     whatBody:
       "Professions are the working life of the world: the gathering trades that pull raw material straight out of the land, and a ring of ten crafts that turn it into gear, meals, potions, and tools. Everything feeds something else here. The ore you mine becomes a blade, the blade takes an enchant, and the enchant needs dust broken out of old gear, so a gatherer, a crafter, and a tinkerer are all links in one chain.\n\nThere is no profession limit to agonize over. Every character can raise nine of the ten crafts and every gathering profession side by side (Engineering is the one holdout: its recipes all start above the free ceiling, so its ladder waits for the Bombardier's oath); the only exclusive choice is your archetype, the identity you eventually swear to, though once you attune the crafts that fall dormant behind it climb only on their common recipes, and past skill 75 not at all. Skill never goes down, and nothing you learn is ever taken away.",
+    // Re-keyed from whatBody: Engineering's trainer now teaches rungs from
+    // skill 0 (Cogwheel Blank, Bronze Hoe), so the old 'one holdout' clause
+    // was false; retired whatBody stays for the overlays (i18n_retired_keys).
+    whatBodyAllTen:
+      'Professions are the working life of the world: the gathering trades that pull raw material straight out of the land, and a ring of ten crafts that turn it into gear, meals, potions, and tools. Everything feeds something else here. The ore you mine becomes a blade, the blade takes an enchant, and the enchant needs dust broken out of old gear, so a gatherer, a crafter, and a tinkerer are all links in one chain.\n\nThere is no profession limit to agonize over. Every character can raise all ten crafts and every gathering profession side by side; the only exclusive choice is your archetype, the identity you eventually swear to, though once you attune the crafts that fall dormant behind it climb only on their common recipes, and past skill 75 not at all. Skill never goes down, and nothing you learn is ever taken away.',
     ringHeading: 'The craft ring',
     ringBody:
       "Every craft on the ring caps at 125 skill: Weaponcrafting, Armorcrafting, Jewelcrafting, Inscription, Tailoring, Leatherworking, Cooking, Alchemy, Engineering, and Enchanting. At a cap the trade keeps working, harvests still yield, crafts still resolve, and masterworks can still happen; only the number stops climbing. Pick a card below for a craft's full recipe tables and numbers.",
@@ -2979,6 +3006,53 @@ export const guideStrings = {
     // endgame content AND sell on the marks counter, so the row has to name
     // both or it sends a reader to one and hides the other.
     sourceDropAndVendor: 'From a found pattern, or the Heroic Quartermaster',
+    // WHERE a pattern or formula comes from (scripts/wiki/acquisition_sources.mjs):
+    // one line per drop place and per quartermaster, replacing the bare "found"
+    // and the blanket "Heroic Quartermaster" for every pattern row whose sources
+    // the tables name. Instanced places by kind only (the spoiler policy).
+    sourceDropWorld: 'Drops in the open world',
+    sourceDropDungeon: 'Drops in dungeons',
+    sourceDropHeroic: 'Drops in Heroic dungeons',
+    sourceDropRaid: 'Drops in a raid',
+    sourceDropRift: 'Drops in rifts',
+    sourceCrucible: 'Sold by the Crucible Quartermaster for {item}',
+    sourceFaction: 'Sold by the {faction} quartermaster at {tier} standing',
+    sourceAllied: 'Sold by any faction quartermaster at {tier} standing',
+    // The Materials page (/wiki/professions/materials): every material a bill
+    // asks for and where it comes from, generated from the live tables.
+    mat: {
+      title: 'Materials',
+      intro:
+        'Every material a recipe or enchant asks for, and where to get it. The list is read straight off the live game, so it never falls behind a patch.',
+      colUsedBy: 'Used by',
+      colWhere: 'Where to get it',
+      nodeFmt: '{profession} nodes in {zones}',
+      nodeZoneFmt: '{zone} (tier {tier})',
+      nodeFine: 'The fine grade needs a tier {tier} tool',
+      corpseFmt: 'Harvested from {creatures}',
+      creatureFmt: '{name} ({zone})',
+      moreFmt: '{count} more',
+      corpseElite: 'Harvested from elite creatures in {zones}',
+      // A premium specimen has no carrier of its own: it comes only with a
+      // rare-or-better harvest of its base material ({base} links to that row).
+      specimenFmt: 'A bonus on rare or better harvests of {base}',
+      farmFmt: 'Grown on a farm plot: Farming {skill}, tier {tier} hoe, {minutes} min to grow',
+      farmFine: 'A fine harvest of the same crop',
+      fishingFmt: 'Fished in {zones}',
+      fishingZoneFmt: '{zone} (Fishing {skill}, tier {tier} rod)',
+      vendorFmt: 'Sold by {vendors} for {price}',
+      craftedFmt: 'Crafted with {crafts}',
+      dropFmt: 'Drops from {creatures}',
+      eliteDropFmt: 'Drops from elite creatures in {zones}',
+      // A loot row that drops only while its quest is active; {source} is one of
+      // the sourceDrop* lines above ("Drops in a raid").
+      questOnlyFmt: '{source}, only while on its quest',
+      disenchant: 'Disenchanting',
+      salvage: 'Salvaging',
+      bossCreditFmt:
+        '{min} to {max} from each Heroic dungeon or raid final boss, once a day per boss and difficulty',
+      riftCreditFmt: 'Rift first clears: {a} at rank A, {s} at rank S, once a day',
+    },
     gainFmt: '{reduced} / {minimal} / {zero}',
     // A gain boundary above the craft's enforced maxSkill cap is unreachable,
     // so the cell says so rather than printing a skill number no player can
@@ -3630,6 +3704,42 @@ export const guideStrings = {
       q11: 'How do I make an orange item?',
       a11Promotion:
         "Craft or buy an apex Masterwrought piece, then perfect it: with 125 skill in the craft that made it, each attempt spends one Maker's Ember, one Sundered Essence, and one Prismglass Setting, succeeds four times in five, and never harms the piece when it misses. The first attempt binds the piece to you, and four successful ranks make it Perfected. Then spend one Deed of Making, an inscriptionist's skill-125 writ anyone can buy or commission, to promote the Perfected copy into a legendary named whatever you choose. The promotion is deterministic: no roll, stats unchanged, only the name and the color change.",
+      // The most-asked profession questions in live chat (ranked from the
+      // 2026-07-06 to 2026-09-28 chat log), answered directly so the wiki
+      // search lands on them. Values in braces are filled from the generated
+      // data at render time (professions_faq.ts FAQ_ANSWER_VALUES), never typed.
+      q12: 'How do I enchant a piece of gear?',
+      a12: 'Right-click (or tap) an enchanting material in your bags, such as Chime Dust, and choose Apply Enchant. Pick the enchant you want, then the piece to put it on: anything in your bags, or anything you are wearing, which is enchanted where it sits. You need no trainer and no station. Every enchant, the slot it fits, and its exact bonus are listed on the Enchanting page.',
+      q13: 'Where do I find ore, herbs, and timber, and why does my tool do nothing?',
+      a13: "Ore veins, herb patches, and timber stands grow in every zone, with the higher tiers further north; the Mining, Herbalism, and Logging pages map every node by zone and tier. To harvest one you need the matching tool (a pick, sickle, or axe) of at least the node's tier somewhere in your bags. It never needs equipping, and bare hands never harvest. A tool above tier 1 also needs enough proficiency before it works: {wieldLadder}. Each node respawns separately for every player.",
+      wieldStepFmt: 'tier {tier} at {skill}',
+      q14: 'Where is the Enchanting trainer?',
+      a14: 'There is none. Disenchanting and enchanting need no trainer and no station, and your Enchanting skill rises as you enchant; a few enchants ask for skill or a formula first, and the Enchanting page says where each formula comes from. The two charm recipes are taught by {toolworksMaster} at the toolworks in {toolworksHub}. Jewelcrafting is taught at the forge by {forgeMaster} in {forgeHub}, and Inscription at the apothecary by {apothecaryMaster} in {apothecaryHub}.',
+      q15: 'Can I still trade or sell gear after enchanting it?',
+      a15: 'Yes. Enchanting never binds an item: an enchanted piece can be traded, mailed, or sold just as before, and the enchant goes with it. If a piece will not trade, it was already soulbound, and its tooltip says so. Perfecting is the one craft step that binds: the first attempt binds the piece to you.',
+      q16: 'How do I disenchant an item, and what does it give?',
+      a16: 'Right-click (or tap) a weapon, armor piece, or held off-hand in your bags and choose Disenchant. No trainer or station is needed. It gives {yields}. From rare up you also get a typed secondary material that depends on what the piece was made of. Chime Dust, Chime Essence, and Chime Shards, the enchanting materials, come from disenchanting.',
+      disenchantYieldFmt: '{material} from {quality}',
+      q17: 'What is the skill cap for each profession?',
+      a17: 'At the cap everything keeps working: harvests still yield and crafts still resolve, and only the number stops climbing.',
+      capGroupFmt: '{names}: {cap}',
+      q18: 'How many professions can I learn, and can I change them?',
+      a18: 'There is no limit. Every character can raise all ten crafts and every gathering trade side by side, and skill is never lost. The one real choice is your archetype: a pair of neighboring crafts you attune to through a quest. Those two become your majors with no ceiling short of the cap, the others are held to lower tiers, and you can move to another pair later through another quest. The Professions page explains the archetypes in full.',
+      q19: 'Where do I buy a fishing rod or a better pick, sickle, axe, or hoe?',
+      a19: 'Most of the vendor tools are sold by {vendors}. Every gathering page lists its full tool ladder with each vendor, price, and the proficiency each tool needs.',
+      toolLadderFmt:
+        '{profession}: up to tier {vendorTier} from vendors, tier {craftTier} and up crafted by Engineering',
+      npcInTownFmt: '{name} in {town}',
+      q20: 'How do I start leveling Engineering?',
+      a20: 'Start at the toolworks in {hub}, where {master} teaches the first Engineering recipes: {starters}. Until you attune to a pair, every craft climbs through the rare tier, recipes asking skill {freeCeiling} or less. Past that, Engineering needs the Bombardier pair (Engineering and Alchemy), whose attunement quest {master} also gives.',
+      recipeAtSkillFmt: '{name} at skill {skill}',
+      q21: 'Where are the crafting stations?',
+      a21: 'Station-bound recipes are crafted within {radius} yards of the right station, and field recipes craft anywhere. The stations and their masters:',
+      stationFmt: '{station} ({master}, {hub})',
+      q22: 'Where do I get a material I need?',
+      a22: 'Type its name into the wiki search, or find it on the Materials page, which lists every crafting material with every way to get it: the zones and node tiers it is gathered from, the creatures that carry it, the vendors that sell it, and the recipes that make it.',
+      q23: 'How does fishing work?',
+      a23: 'Stand by water and use your fishing pole from your bags or action bar to cast. A fish bites after {biteMin} to {biteMax} seconds; use the pole again while it is on the hook, within {reelWindow} seconds, to land it. Using it before the bite ends the cast empty. Better rods shorten the wait and widen the reel window, and some waters need a better rod before you can cast there at all.',
     },
     // Gather nodes on the zone map and minimap (map_window_view.ts
     // MapGatherNodeMarker, minimap_painter.ts's struck lock) and the desktop

@@ -24,6 +24,7 @@ import { howToPlay } from './how_to_play';
 import { interfacePage } from './interface';
 import { models } from './models';
 import { mounts } from './mounts';
+import { npcs } from './npcs';
 import { professions } from './professions';
 import { progression } from './progression';
 import { quests } from './quests';
@@ -55,6 +56,7 @@ const PAGES: Record<string, GuidePage> = {
   economy,
   quests,
   factions,
+  npcs,
   dungeons,
   delves,
   rifts,

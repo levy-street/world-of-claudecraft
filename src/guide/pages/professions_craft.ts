@@ -29,8 +29,11 @@ import {
   GUIDE_PROF_ENCHANTING,
   GUIDE_PROF_MASTERWORK,
   type GuideProfCraft,
+  type GuideProfDropPlace,
   type GuideProfMaterial,
+  type GuideProfOffer,
   type GuideProfRecipe,
+  type GuideProfTeachingSources,
 } from '../content.generated';
 import { hrefFor } from '../routes';
 import { paras, related } from './ui';
@@ -111,12 +114,56 @@ function materialsCell(materials: GuideProfMaterial[]): string {
     .join('');
 }
 
+const DROP_PLACE_KEY: Record<GuideProfDropPlace, TranslationKey> = {
+  world: 'guide.profPages.sourceDropWorld',
+  dungeon: 'guide.profPages.sourceDropDungeon',
+  heroic: 'guide.profPages.sourceDropHeroic',
+  raid: 'guide.profPages.sourceDropRaid',
+  rift: 'guide.profPages.sourceDropRift',
+};
+
+/** Where an item drops, by kind only ("Drops in rifts"): the spoiler policy
+ *  never names the instance or boss. Exported for the Materials page. */
+export function dropPlaceLabel(place: GuideProfDropPlace): string {
+  return t(DROP_PLACE_KEY[place]);
+}
+
+/** One quartermaster that sells an item, named for the reader. Exported for the
+ *  Materials page. */
+export function offerLabel(offer: GuideProfOffer): string {
+  if (offer.kind === 'heroic') return t('guide.profPages.sourceVendor');
+  if (offer.kind === 'crucible') {
+    return t('guide.profPages.sourceCrucible', { item: t(itemNameKey(offer.sigilId)) });
+  }
+  const tier = t(`hudChrome.reputation.tier.${offer.tier}` as TranslationKey);
+  if (offer.factionId === null) return t('guide.profPages.sourceAllied', { tier });
+  return t('guide.profPages.sourceFaction', {
+    faction: t(`hudChrome.reputation.faction.${offer.factionId}` as TranslationKey),
+    tier,
+  });
+}
+
+/** Every place a pattern or formula drops, then every quartermaster that sells
+ *  it, one line each. */
+export function teachingSourceLines(sources: GuideProfTeachingSources): string[] {
+  return [...sources.drops.map(dropPlaceLabel), ...sources.offers.map(offerLabel)];
+}
+
+const sourceSpans = (lines: string[], cls = 'guide-prof-src'): string =>
+  lines.map((line) => `<span class="${cls}">${esc(line)}</span>`).join('');
+
 function sourceCell(r: GuideProfRecipe): string {
   if (r.acquisition === 'trainer') {
     return r.feeCopper > 0
       ? esc(t('guide.profPages.sourceTrainerFee', { fee: formatMoney(r.feeCopper) }))
       : esc(t('guide.profPages.sourceTrainerFree'));
   }
+  // A pattern row names WHERE: each drop place and each quartermaster. This
+  // replaced the bare channel strings below, which said "found" without saying
+  // where, and named the Heroic Quartermaster for the Crucible Quartermaster's
+  // whole stock. The channel strings stay as the fallback for a drop row no
+  // table carries.
+  if (r.sources) return sourceSpans(teachingSourceLines(r.sources));
   // BOTH channels (Masterwrought phase 11f): a pattern that drops AND sells on
   // the marks counter. Sits FIRST because either single label below is a lie
   // about the other channel, and the harmful direction is specific: a farming
@@ -355,7 +402,11 @@ function enchantingSections(): string {
           row.perfectedOnly
             ? `<span class="guide-prof-combo">${esc(t('guide.profPages.ench.perfectedOnly'))}</span>`
             : ''
-        }${row.requiresFormula ? `<span class="guide-prof-combo">${esc(t('guide.profPages.ench.formulaRequired'))}</span>` : ''}</td>
+        }${row.requiresFormula ? `<span class="guide-prof-combo">${esc(t('guide.profPages.ench.formulaRequired'))}</span>` : ''}${
+          row.formulaSources
+            ? sourceSpans(teachingSourceLines(row.formulaSources), 'guide-prof-formula-src')
+            : ''
+        }</td>
         <td>${esc(slotLabel(row.slot))}</td>
         <td>${esc(tierLabel(row.tier))}</td>
         <td>${esc(formatNumber(row.skillReq))}</td>

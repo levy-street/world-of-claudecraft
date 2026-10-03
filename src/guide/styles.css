@@ -3073,6 +3073,19 @@ a.guide-poi:hover {
   font-weight: 400;
   color: var(--g-text-dim);
 }
+/* One source per line: a recipe's drop places and sellers, a formula's sources,
+   and each way to get a material on the Materials page. */
+.guide-prof-src {
+  display: block;
+}
+.guide-prof-src + .guide-prof-src {
+  margin-top: 0.35em;
+}
+.guide-prof-formula-src {
+  display: block;
+  font-size: 0.85em;
+  color: var(--g-text-dim);
+}
 .guide-set-name {
   color: var(--g-text);
   font-weight: 600;
