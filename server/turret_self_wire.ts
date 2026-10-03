@@ -149,7 +149,8 @@ export function emitTurretSelfKeys(
   maybeRaw('turp', session ? turretPlanWireJson(session.defense.plan) : 'null');
   if (!session) {
     maybeRaw(TURRET_SEAT_KEYS[0], 'null');
-    const revision = held[TURRET_SEAT_KEYS[1]];
+    // The revision key is non-null on every seated pass and nulled with the rest on leave.
+    const revision = held.tuv;
     if (revision === undefined || revision === 'null') return;
     for (let i = 1; i < TURRET_SEAT_KEYS.length; i++) maybeRaw(TURRET_SEAT_KEYS[i], 'null');
     return;

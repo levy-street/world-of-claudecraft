@@ -84,6 +84,16 @@ describe('the turret self keys', () => {
     ]);
   });
 
+  it('gates a left seat on its revision key, never on the seat key it nulls first', () => {
+    expect(TURRET_SEAT_KEYS[0]).toBe('tur');
+    expect(TURRET_SEAT_KEYS).toContain('tuv');
+    const onlyRevision = { tuv: '7' };
+    expect(keys({ vehicle: null }, 0, onlyRevision).map(([key]) => key)).toEqual([
+      'turp',
+      ...TURRET_SEAT_KEYS,
+    ]);
+  });
+
   it('nulls every family key a left seat still holds, plan first', () => {
     const held = Object.fromEntries(TURRET_SEAT_KEYS.map((key) => [key, '[]']));
     expect(keys({ vehicle: null }, 0, held)).toEqual([
