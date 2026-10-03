@@ -527,6 +527,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the SELF debuff row: never tier-gated (your own debuffs are the ACTIONABLE read, docs/design/graphics-settings-fairness.md), so it paints every frame on every graphics preset, same as the target debuffs strip',
   },
   {
+    call: 'this.dungeonPrompts.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'the dungeon encounter prompts (the Iron Cage escape, Gaoler Ossick chain alert, the Wildheart Basin and Gravewyrm Sanctum alerts): ungated per frame because the escape press feedback, the chain reach and the hazard readouts are what the player reacts to; each painter hides itself when its view is not visible and every value rides the elided writers, so an idle frame writes nothing',
+  },
+  {
     call: 'this.targetDotsPainter.update',
     band: 'frame',
     gate: '',
@@ -1872,7 +1879,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // surface (51 / 96 measured on the merged tree). The release's Eastbrook
       // ferry countdown panel (hud ferryHud) is one more chrome surface at the
       // fourth release/v0.44.0 base merge (97 measured on the merged tree).
-    ).toEqual({ window: 51, chrome: 97, none: 18 });
+      // chrome 97 -> 98 on the dungeon rework: the dungeon encounter prompts'
+      // one per-frame paint (hud/dungeon/dungeon_prompts.ts), no window root.
+    ).toEqual({ window: 51, chrome: 98, none: 18 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

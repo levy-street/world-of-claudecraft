@@ -44,11 +44,9 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'A Bacia de Wildheart',
-    desc: 'Armas marcantes de Zulgar e do Mestre de Feras Senhor das Presas.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroico: A Bacia de Wildheart',
-    desc: 'Épicos exclusivos do modo heroico de Zulgar, Voz da Bacia.',
   },
   conquerors_nythraxis: {
     name: 'Raide de Nythraxis',

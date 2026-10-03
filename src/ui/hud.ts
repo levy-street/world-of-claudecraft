@@ -207,6 +207,7 @@ import {
   resolvePlayerSocialFlags,
   serializeIgnoreList,
 } from './chat_ignore_core';
+import { CHAT_TEMPLATE_KEYS } from './chat_template_keys';
 import { wireChromeFocus } from './chrome_focus_wiring';
 import { ClaudiumLauncherBalance } from './claudium_launcher_balance_core';
 import { createClaudiumPurchaseFacet } from './claudium_purchase_bridge';
@@ -273,6 +274,7 @@ import { dropdownKeyNav } from './dropdown_nav';
 import { DungeonFinderProposalPopup } from './dungeon_finder_proposal_popup';
 import { DungeonFinderWindow } from './dungeon_finder_window';
 import { emoteIconUrl } from './emote_icons';
+import { DEFAULT_EMOTE_WHEEL, EMOTE_WHEEL_LIMIT } from './emote_wheel_defaults';
 import { crossHotbarActionSlot, EmpowerHold } from './empower_hold_core';
 import {
   combatAbilityName,
@@ -461,6 +463,7 @@ import { DelveMapPainter } from './hud/delve/delve_map_painter';
 import { DelveTrackerController } from './hud/delve/delve_tracker_controller';
 import { LockpickController } from './hud/delve/lockpick_controller';
 import { RiteController } from './hud/delve/rite_controller';
+import { DungeonPrompts, fctAvoidanceText, wardHealthText, wardHitText } from './hud/dungeon';
 import { factionRewardTooltipLines } from './hud/faction_reward_tooltip_view';
 import { FiestaController } from './hud/fiesta/fiesta_controller';
 import { GuildBoardWindow } from './hud/guild_board';
@@ -1187,18 +1190,6 @@ const AMBIENT_MAX_DEFER_MS = 4000;
 const classCss = (cls: string): string =>
   `#${((CLASSES as Record<string, { color: number }>)[cls]?.color ?? 0x5fa8ff).toString(16).padStart(6, '0')}`;
 
-const EMOTE_WHEEL_LIMIT = 8;
-const DEFAULT_EMOTE_WHEEL: OverheadEmoteId[] = [
-  'wave',
-  'laugh',
-  'question',
-  'cheer',
-  'dance',
-  'point',
-  'flex',
-  'cry',
-];
-
 // The OFFLINE ignore store. Online, the ignore list is server-persisted and
 // arrives on the `social` frame, so this set is not consulted at all (see the
 // chat event filter): keeping a second, name-keyed local list live online is
@@ -1209,22 +1200,6 @@ const CRAFTING_TAB_KEY = 'woc_crafting_tab';
 // The persisted top-left keys for the movable unit frames live in
 // frame_pos_reset.ts (imported above) so the one-time reset clears the same
 // keys the MovableFrames read.
-const CHAT_TEMPLATE_KEYS = {
-  party: 'hud.chat.templates.party',
-  battleground: 'hud.chat.templates.battleground',
-  raidWarning: 'hud.chat.templates.raidWarning',
-  yell: 'hud.chat.templates.yell',
-  whisper: 'hud.chat.templates.whisper',
-  toWhisper: 'hud.chat.templates.toWhisper',
-  general: 'hud.chat.templates.general',
-  world: 'hud.chat.templates.world',
-  lfg: 'hud.chat.templates.lfg',
-  guild: 'hud.chat.templates.guild',
-  officer: 'hud.chat.templates.officer',
-  emote: 'hud.chat.templates.emote',
-  roll: 'hud.chat.templates.roll',
-  say: 'hud.chat.templates.say',
-} satisfies Record<string, TranslationKey>;
 
 function localizeChatBody(ev: Extract<SimEvent, { type: 'chat' }>): string {
   return ev.textKey ? t(ev.textKey as TranslationKey, ev.textValues) : ev.text;
@@ -5614,6 +5589,12 @@ export class Hud {
     layer: () => document.getElementById('ui'),
     writers: this.writerFacet,
   });
+  // Dungeon prompts: the Iron Cage escape (a tap is an interact press), Ossick's chains.
+  private readonly dungeonPrompts = new DungeonPrompts({
+    layer: () => document.getElementById('ui'),
+    writers: this.writerFacet,
+    onPress: () => this.sim.interact(),
+  });
   // Character window painter (char_view.ts core + char_window.ts painter). It composes
   // presentation helpers with HUD-built stats/progression plus the unequip + drag
   // plumbing. The shared 3D turntable preview and the cosmetic skin picker stay
@@ -8931,6 +8912,14 @@ export class Hud {
     // paint call for why).
     this.buffBarPainter.paint(this.buffBarView.tick(p));
     this.debuffBarPainter.paint(this.debuffBarView.tick(p));
+    // Caged or chained in the Sunken Gaol: the prompts, every frame (press feedback, reach).
+    this.dungeonPrompts.paint({
+      player: p,
+      world: this.sim,
+      party: this.sim.partyInfo?.members,
+      interactKey: keyCapLabel(this.keybinds.primaryLabel('interact')),
+      touch: this.isMobileLayout(),
+    });
 
     // Target dots: the multi-target tracker for the debuffs the LOCAL player has
     // out, across every enemy in interest range. Same band as the aura strips
@@ -9017,7 +9006,7 @@ export class Hud {
         const hpMode = healthTextMode(this.optionsHooks?.settings?.get('targetFrameHealthText'), 3);
         targetFrame.hpText = target.dead
           ? t('hud.core.dead')
-          : unitFrameHealthText(target.hp, target.maxHp, hpMode);
+          : (wardHealthText(target) ?? unitFrameHealthText(target.hp, target.maxHp, hpMode));
         targetFrame.showAbsorbText = !target.dead && hpMode !== 0;
         this.targetFramePainter.paint(unitFrameViewInto(this.targetFrameBuffer, targetFrame));
       }
@@ -11193,16 +11182,7 @@ export class Hud {
               this.fctPainter.spawn(
                 {
                   ...shape,
-                  text:
-                    ev.kind === 'miss'
-                      ? t('hud.combat.floatingMiss')
-                      : ev.kind === 'dodge'
-                        ? t('hud.combat.floatingDodge')
-                        : ev.kind === 'parry'
-                          ? t('hud.combat.floatingParry')
-                          : ev.kind === 'evade'
-                            ? t('hud.combat.floatingEvade')
-                            : t('hud.combat.floatingResist'),
+                  text: fctAvoidanceText(ev.kind),
                   target: tgt,
                 },
                 now,
@@ -11259,7 +11239,7 @@ export class Hud {
             this.fctPainter.spawn(
               {
                 ...hitShape,
-                text: `${ev.amount}${ev.crit ? '!' : ''}`,
+                text: wardHitText(tgt) ?? `${ev.amount}${ev.crit ? '!' : ''}`,
                 target: tgt,
               },
               now,

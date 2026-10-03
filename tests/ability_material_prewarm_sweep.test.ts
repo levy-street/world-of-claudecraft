@@ -74,6 +74,16 @@ const EXCLUDED: Record<string, string> = {
     'the mount gate links it at the first sighting while the rig is still hidden, for owners and ' +
     'observers alike. A boot twin, or a plume on the owned-mount prewarm rig ' +
     '(mount_prewarm.ts), was declined: the gate only delays a cosmetic.',
+  'maw_glow.ts':
+    'Wildheart Basin interior scenery, not a cast: buildMawGlow() fills the card cache while ' +
+    'basin_interior.ts assembles the interior group, so the interior compile gate links every ' +
+    'halo and pool before the dungeon shows; afterwards only their opacity moves. ' +
+    'src/render/CLAUDE.md: a program only ONE encounter can reach warms at that interior attach.',
+  'sanctum_face.ts':
+    'Gravewyrm Sanctum interior scenery, not a cast: the frozen Korzul parts are fetched by ' +
+    'ensureFrozenWyrm(), which sanctum_interior.ts awaits before buildSanctumFace() builds every ' +
+    'face material with the interior, linked by its compile gate. Same ruling as the battleground ' +
+    'caches: reachable only inside that one interior, so never in the boot manifest.',
   'frost_ice_fields.ts':
     'Zone scenery, not a cast: prepareFrostIceParts() fills the cache while buildFrostIceFields ' +
     'assembles the Frostveil spire group, which frost_sky.ts adds to the zone scene, so the zone ' +
@@ -253,9 +263,11 @@ describe('the lazy-material sweep', () => {
     // the warlock meteor rocks, plus the two rig-adornment stand-ins), the
     // two excluded scenery bakes, and the rocket-sled plume pair. The
     // battleground caches are the remaining non-bundle hit. Plus the World
-    // Quests branch's calligraphy guidance bundle: 18 / 17.
-    expect(hits.length).toBeGreaterThanOrEqual(18);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(17);
+    // Quests branch's calligraphy guidance bundle, and the five-dungeon
+    // rework's two excluded interior bundles (the Wildheart maw glow cards and
+    // the Sanctum's frozen Korzul): 20 / 19.
+    expect(hits.length).toBeGreaterThanOrEqual(20);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(19);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

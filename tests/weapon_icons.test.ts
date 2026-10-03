@@ -63,7 +63,11 @@ describe('painted weapon inventory icons', () => {
     // faction-vendor-icons-2026-09-16), landed by the wq-reputation merge.
     // 141 -> 145: the four Warfare Season 2 honor weapons, painted in
     // warfare-season2-weapons-2026-09-25 (second release/v0.44.0 base merge).
-    expect(baseWeapons).toHaveLength(145);
+    // 145 -> 154: the five-dungeon rework's nine weapons, each painted in its
+    // dungeon's batch (asserted in the registry test below), the Hollow
+    // Crypt's three (sextons_spadehaft, sextons_burial_spade, rimeweb_fang)
+    // in hollow-crypt-icons-2026-10-03.
+    expect(baseWeapons).toHaveLength(154);
     expect([...WEAPON_IMAGE_IDS].sort()).toEqual(baseWeapons);
     expect(Object.keys(ITEM_WEAPON_VARIANTS).sort()).toEqual(baseWeapons);
     for (const id of baseWeapons) {
@@ -78,7 +82,8 @@ describe('painted weapon inventory icons', () => {
     );
     // 16 with heroic_duskwhisper (aliases the duskwhisper base painting); 19
     // with the three Nythraxis gap-fill one-handers' raid-tier variants.
-    expect(heroics).toHaveLength(19);
+    // 25 with the dungeon rework's six generated Heroic weapons.
+    expect(heroics).toHaveLength(25);
     for (const heroic of heroics) {
       expect(WEAPON_IMAGE_IDS.has(heroic.id), heroic.id).toBe(false);
       expect(weaponIconUrl(heroic.id), heroic.id).toBe(
@@ -107,7 +112,10 @@ describe('painted weapon inventory icons', () => {
     // Eight with the faction quartermaster epics' batch
     // (faction-vendor-icons-2026-09-16, asserted below as `factionBatch`), nine
     // with the Warfare Season 2 weapons (warfare-season2-weapons-2026-09-25).
-    expect(weaponBatches).toHaveLength(9);
+    // Thirteen with the dungeon rework's four icon batches (Sunken Bastion,
+    // Drowned Temple, Wildheart Basin, Gravewyrm Sanctum), fourteen with the
+    // Hollow Crypt's, asserted below as `reworkWeaponIds`.
+    expect(weaponBatches).toHaveLength(14);
     const historicalBatch = weaponBatches.find(
       ({ batchId }) => batchId === 'placeholder-art-completion-weapons-2026-08-09',
     );
@@ -243,6 +251,36 @@ describe('painted weapon inventory icons', () => {
       'vanguard_verdict_greatsword',
       'vanguard_warstaff',
     ]);
+    // The dungeon rework's weapons ship deterministic SVG compositions in one
+    // batch per dungeon (scripts/generate_<dungeon>_item_icons.mjs).
+    const reworkBatchIds = [
+      'sunken-bastion-icons-2026-09-29',
+      'drowned-temple-icons-2026-09-30',
+      'wildheart-basin-icons-2026-10-02',
+      'gravewyrm-sanctum-icons-2026-10-03',
+      'hollow-crypt-icons-2026-10-03',
+    ];
+    for (const batchId of reworkBatchIds) {
+      expect(
+        weaponBatches.some((batch) => batch.batchId === batchId),
+        batchId,
+      ).toBe(true);
+    }
+    const reworkWeaponIds = weaponBatches
+      .filter(({ batchId }) => batchId !== undefined && reworkBatchIds.includes(batchId))
+      .flatMap(({ itemIds }) => itemIds.filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id)))
+      .sort();
+    expect(reworkWeaponIds).toEqual([
+      'falls_blessed_staff',
+      'gaolyard_cudgel',
+      'hammer_of_the_open_lock',
+      'knight_commanders_longsword',
+      'rimeweb_fang',
+      'sextons_burial_spade',
+      'sextons_spadehaft',
+      'tideglass_shiv',
+      'tideglass_warmaul',
+    ]);
     expect(historicalBatch?.itemIds).toEqual(
       expected.filter(
         (id) =>
@@ -253,7 +291,8 @@ describe('painted weapon inventory icons', () => {
           !varkhulWeaponIds.includes(id) &&
           !gapWeaponIds.includes(id) &&
           !factionWeaponIds.includes(id) &&
-          !season2WeaponIds.includes(id),
+          !season2WeaponIds.includes(id) &&
+          !reworkWeaponIds.includes(id),
       ),
     );
     expect(
@@ -305,7 +344,8 @@ describe('painted weapon inventory icons', () => {
         !varkhulWeaponIds.includes(id) &&
         !gapWeaponIds.includes(id) &&
         !factionWeaponIds.includes(id) &&
-        !season2WeaponIds.includes(id),
+        !season2WeaponIds.includes(id) &&
+        !reworkWeaponIds.includes(id),
     );
     expect(chunkA.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(0, 40));
     expect(chunkB.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(40, 80));

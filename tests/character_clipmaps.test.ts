@@ -1,10 +1,12 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { PALADIN_SYNTHESIZED_CLIP_SOURCES } from '../src/render/characters/assets';
+import {
+  PALADIN_SYNTHESIZED_CLIP_SOURCES,
+  synthesizesPaladinClips,
+} from '../src/render/characters/assets';
 import {
   type ClipMap,
-  modularVisualKey,
   VISUALS,
   type VisualDef,
   visualAssetUrlForGraphics,
@@ -133,10 +135,11 @@ function loadedClipNames(def: VisualDef, standardMaterials: boolean, key?: strin
   const names = new Set<string>();
   for (const url of urls) for (const name of animationNamesOf(url)) names.add(name);
   // The two paladin attack clips are synthesized at prepare time from a GLB
-  // source clip (assets.ts's PALADIN_SYNTHESIZED_CLIP_SOURCES), for the classic
-  // and modular keys alike: a synthesized name resolves exactly when its source
-  // does, so a trimmed-away source still fails this gate.
-  if (key === 'player_paladin' || key === modularVisualKey('paladin')) {
+  // source clip (assets.ts's PALADIN_SYNTHESIZED_CLIP_SOURCES), for every key
+  // assets.ts synthesizes them on (classic, modular, the temple Reflection): a
+  // synthesized name resolves exactly when its source does, so a trimmed-away
+  // source still fails this gate.
+  if (key !== undefined && synthesizesPaladinClips(key)) {
     for (const [synthesized, source] of Object.entries(PALADIN_SYNTHESIZED_CLIP_SOURCES)) {
       if (names.has(source)) names.add(synthesized);
     }
@@ -149,6 +152,9 @@ function requiredClipNames(clips: ClipMap): string[] {
   return [
     clips.idle,
     clips.combatIdle,
+    clips.stunned,
+    clips.turn,
+    clips.entrance,
     clips.prowlIdle,
     clips.prowlWalk,
     clips.walk,
@@ -182,6 +188,16 @@ function requiredClipNames(clips: ClipMap): string[] {
   ].filter((name): name is string => !!name);
 }
 
+/** Every clip a rig can name: its own ClipMap plus each boss stance it can
+ *  swap to (VisualDef.phaseClips) and that stance's entry one-shot. */
+function allRequiredClipNames(def: VisualDef): string[] {
+  const phases = Object.values(def.phaseClips ?? {}).flatMap((p) => [
+    ...requiredClipNames(p.clips),
+    ...(p.enter ? [p.enter] : []),
+  ]);
+  return [...requiredClipNames(def.clips), ...phases];
+}
+
 /** Emote specs are a fallback CHAIN (firstLoadedEmoteClip), so one is enough. */
 function emoteChains(clips: ClipMap): [string, readonly string[]][] {
   return Object.entries(clips.emote ?? {}).map(([id, spec]) => [id, spec.clips]);
@@ -193,6 +209,9 @@ function emoteChains(clips: ClipMap): [string, readonly string[]][] {
 const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'idle',
   'combatIdle',
+  'stunned',
+  'turn',
+  'entrance',
   'prowlIdle',
   'prowlWalk',
   'walk',
@@ -246,8 +265,17 @@ const CLIPLESS_RIGS = new Set([
   'mount_rickshaw_mount',
   'mob_glimmerwisp',
   'mob_duskwisp',
+  // the Drowned Temple's Tidewisp: a tinted glimmerwisp.glb, the same
+  // unrigged mesh as mob_glimmerwisp
+  'temple_tidewisp',
   'mob_spider_egg_sac',
   'mob_healing_tide_totem',
+  // The Wildheart Basin's Sunbone Totem: the shipped carved mask totem as a
+  // stationary prop mob (wildheart_creature_looks.ts), no rig to lose.
+  'wildheart_sunbone_totem',
+  // The Gravewyrm Sanctum's Soul Brazier: the shipped infernal brazier as a
+  // stationary prop mob (sanctum_creature_looks.ts), its fire drawn by the fx.
+  'sanctum_soul_brazier',
   // Nyxaris's Bound Pulsar: the nucleus as a static prop; every motion it has is
   // drawn round it procedurally (src/render/hoard_pulsars.ts)
   'mob_bound_pulsar',
@@ -312,7 +340,7 @@ describe('character ClipMaps match the shipped GLBs', () => {
       const missing: string[] = [];
       for (const [key, def] of rigs) {
         const loaded = loadedClipNames(def, standardMaterials, key);
-        for (const name of new Set(requiredClipNames(def.clips))) {
+        for (const name of new Set(allRequiredClipNames(def))) {
           if (name === SENTINEL_CLIP_NAME) continue;
           if (!loaded.has(name)) missing.push(`${key}: ${name}`);
         }
@@ -335,7 +363,7 @@ describe('character ClipMaps match the shipped GLBs', () => {
         const bodyUrl = visualAssetUrlForGraphics(def.url, standardMaterials);
         const rigNodes = nodeNamesOf(bodyUrl);
         const referenced = new Set([
-          ...requiredClipNames(def.clips),
+          ...allRequiredClipNames(def),
           ...emoteChains(def.clips).flatMap(([, chain]) => chain),
         ]);
         const sources = [

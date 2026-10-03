@@ -97,9 +97,66 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/decor_torch_fx.ts', layer: 'ground', strict: true },
   { file: 'src/render/impact_site.ts', layer: 'ground', strict: true },
   { file: 'src/render/hill_ring.ts', layer: 'ground', strict: true },
+  // The Sanctum Seal Gate's rime fan and the cold mist it breathes out over
+  // the plaza: the world's own marks, under every telegraph.
+  { file: 'src/render/sanctum_seal_gate.ts', layer: 'ground', strict: true },
   // A Buried Hoard boss room's additive floor light under its kit props, kept on
   // the order it shipped with (2, the ground band's second rung).
   { file: 'src/render/hoard_room_kit.ts', layer: 'ground', strict: true },
+  // The Hollow Crypt's torch pools and the soul column's floor pool: the world's
+  // own light on the ring floor, under every telegraph Morthen will paint.
+  { file: 'src/render/hollow_crypt/crypt_lights.ts', layer: 'ground', strict: true },
+  // The engraved rite circle and cloister rosette: dim world marks on the floor.
+  { file: 'src/render/hollow_crypt/crypt_floor_marks.ts', layer: 'ground', strict: true },
+  // The Sunken Bastion's lantern and brazier pools on its floors.
+  { file: 'src/render/sunken_bastion/bastion_lights.ts', layer: 'ground', strict: true },
+  // The Bastion's storm rain: its splash rings lie on the floor under every
+  // telegraph (ground band); the falling streaks and far sheets keep their own
+  // orders (weather standing up from the ground, off the ladder).
+  { file: 'src/render/sunken_bastion/bastion_rain.ts', layer: 'ground', strict: false },
+  // The Mere Hydra's Tsunami: its lingering foam lies on the swept half's floor
+  // and water, and the wave wall and its spray ride the same band, so the
+  // encounter-band telegraph of the swept half always paints over all of it.
+  { file: 'src/render/drowned_temple/temple_tsunami_fx.ts', layer: 'ground', strict: true },
+  // Ysolei's cosmetic layer: the Undertow's spiral and the Rising Tide's sheets
+  // lie on the island floor, and her tide and crash bursts rise from it, all in
+  // the ground band so temple_fx.ts's encounter-band rings and flood half-disc
+  // always paint over them.
+  { file: 'src/render/drowned_temple/temple_ysolei_fx.ts', layer: 'ground', strict: true },
+  // The Wildheart Basin's brazier pools on its floors (the world's own light).
+  { file: 'src/render/wildheart_basin/basin_lights.ts', layer: 'ground', strict: true },
+  // The spirit light pooled on the jaguar maw's jaw once the way out opens.
+  { file: 'src/render/wildheart_basin/maw_glow.ts', layer: 'ground', strict: true },
+  // The Basin's telegraphs (the shared kit) and its creature effects: the
+  // Stomp's shock rings, the spore fog, the pulses and the bursts.
+  { file: 'src/render/wildheart_basin/basin_fx.ts', layer: 'encounter', strict: true },
+  // The Basin's three bosses (composed by basin_fx.ts): their cast telegraphs
+  // on the shared kit, the charge sigils and the sun glyph overlays.
+  { file: 'src/render/wildheart_basin/basin_boss_fx.ts', layer: 'encounter', strict: true },
+  // The basin's shared splashes (the Saurian's water, the pit's sand, the pods'
+  // goo, Gorge's acid: crowns and ripples) on the ground band: cosmetic, so
+  // every telegraph paints over them.
+  { file: 'src/render/wildheart_basin/basin_splash.ts', layer: 'ground', strict: true },
+  // The Pack Bond's ground glows under master and jaguar (the lowest encounter rung).
+  { file: 'src/render/wildheart_basin/bond_cord.ts', layer: 'encounter', strict: true },
+  // The Gravewyrm Sanctum's telegraphs (the shared kit), the soulfire patches'
+  // glow and flames, the shock rings and the particle pools.
+  { file: 'src/render/gravewyrm_sanctum_fx/sanctum_fx.ts', layer: 'encounter', strict: true },
+  // The Sanctum trash's aura glows pooled under the goaded and stoked mobs.
+  {
+    file: 'src/render/gravewyrm_sanctum_fx/sanctum_trash_fx.ts',
+    layer: 'encounter',
+    strict: true,
+  },
+  // The Sledge Tusker's enrage glow pooled on the ice round its feet.
+  { file: 'src/render/gravewyrm_sanctum_fx/tusker_fx.ts', layer: 'encounter', strict: true },
+  // The Gravewyrm Sanctum's three bosses: their cast telegraphs on the shared
+  // kit, the plate overlays, the meltwater, the rings, the landing shadow.
+  {
+    file: 'src/render/gravewyrm_sanctum_bosses/sanctum_boss_fx.ts',
+    layer: 'encounter',
+    strict: true,
+  },
   // A worn trinket's ground glow (the Last Flame Lantern): a player-band floor
   // effect that every encounter telegraph must still paint over.
   { file: 'src/render/trinket_relics.ts', layer: 'player', strict: true },
@@ -129,6 +186,13 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/renderer.ts', layer: 'player', strict: false },
   // boss and encounter mechanics
   { file: 'src/render/ignivar_encounter.ts', layer: 'encounter', strict: true },
+  // The Sunken Bastion's boss visuals (its trash and boss telegraphs lay their
+  // cones, rings, lanes and glyphs through the shared kit below).
+  { file: 'src/render/sunken_bastion/bastion_boss_fx.ts', layer: 'encounter', strict: true },
+  { file: 'src/render/sunken_bastion/bastion_creature_fx.ts', layer: 'encounter', strict: true },
+  // The shared dungeon floor telegraph (the crypt's and the Bastion's cones,
+  // rings, lanes and kick glyphs, and their edge curtains).
+  { file: 'src/render/floor_telegraph/telegraph_kit.ts', layer: 'encounter', strict: true },
   { file: 'src/render/ignivar_forge_wave.ts', layer: 'encounter', strict: true },
   { file: 'src/render/ignivar_frontal_telegraph.ts', layer: 'encounter', strict: true },
   { file: 'src/render/ignivar_soak_telegraph.ts', layer: 'encounter', strict: true },
@@ -171,6 +235,11 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/hoard_orbital_lightning.ts', layer: 'encounter', strict: true },
   { file: 'src/render/hoard_pulsars.ts', layer: 'encounter', strict: true },
   { file: 'src/render/hoard_tentacles.ts', layer: 'encounter', strict: true },
+  // The Gravewyrm Sanctum's fire pools, the vault's meltwater pools and the
+  // Thaw Works' stains and melt channel: the floor's own marks.
+  { file: 'src/render/gravewyrm_sanctum/sanctum_lights.ts', layer: 'ground', strict: true },
+  { file: 'src/render/gravewyrm_sanctum/sanctum_vault.ts', layer: 'ground', strict: true },
+  { file: 'src/render/gravewyrm_sanctum/sanctum_works.ts', layer: 'ground', strict: true },
   // the player's own ground aim guide (additive: it brightens what lies under it)
   { file: 'src/render/ground_aim_reticle_visual.ts', layer: 'reticle', strict: true },
 ];
@@ -239,8 +308,47 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/ship_wake.ts',
   'src/render/underwater.ts',
   'src/render/weather.ts',
-  'src/render/wildheart_props.ts',
-  'src/render/wildheart_terrain.ts',
+  // The Hollow Crypt's sky and air: the mist sea far below every terrace, the
+  // vertical soul column, wisps, dust and moonbeams (no floor mark; its floor
+  // pool lives in crypt_lights.ts on the ground rung).
+  'src/render/hollow_crypt/crypt_atmosphere.ts',
+  // The Sunken Bastion's sky, sea, fog banks, rain and gulls; the Fogbeacon's
+  // beam and fog streams; the surf off the cliff feet; the standing water (on
+  // the water surface order 0, under the whole ladder); and the gates' fog
+  // walls, which stand up across a passage. None is a floor mark.
+  'src/render/sunken_bastion/bastion_sky_sea.ts',
+  'src/render/sunken_bastion/bastion_beacon.ts',
+  'src/render/sunken_bastion/bastion_shore.ts',
+  'src/render/sunken_bastion/bastion_water.ts',
+  'src/render/sunken_bastion/bastion_gates.ts',
+  // The Drowned Temple's sky, lagoon, mist and light-fish; the crater and its
+  // falls; the gates (a water veil, wards, a rising stair, the Moonbridge);
+  // the Moon Altar's column, the pool water and the prism beam; the Mere
+  // Hydra's body and breath; and the Reflections' tethers in the air. Its
+  // floor marks are the shared telegraph kit's (the ladder's own rungs).
+  'src/render/drowned_temple/temple_sky_lagoon.ts',
+  'src/render/drowned_temple/temple_crater.ts',
+  'src/render/drowned_temple/temple_gates.ts',
+  'src/render/drowned_temple/temple_landmarks.ts',
+  'src/render/drowned_temple/temple_hydra.ts',
+  'src/render/drowned_temple/temple_fx.ts',
+  // The Wildheart Basin's water (the ford, the river, the plunge pool: water
+  // surfaces under the whole ladder), its waterfalls (curtains, foam, spray,
+  // mist, rainbows standing up from the water) and its air (the gorge haze
+  // over the void, god rays, motes, birds). None is a floor mark; its floor
+  // marks are the shared telegraph kit's and its brazier pools sit on the
+  // ground rung (basin_lights.ts).
+  'src/render/wildheart_basin/basin_water.ts',
+  'src/render/wildheart_basin/basin_falls.ts',
+  'src/render/wildheart_basin/basin_air.ts',
+  // The Gravewyrm Sanctum's sky dome (behind the world) and the Calving Face
+  // (a wall of ice past the lake's shelf: its clear shell, the shard's halo,
+  // the wyrm's eye and the ice bursts of its stages stand in the air beyond
+  // every arena). None is a floor mark; the Sanctum's floor marks (the fire
+  // pools, the vault's meltwater, the Thaw Works' stains) sit on the ground
+  // rung below.
+  'src/render/gravewyrm_sanctum/sanctum_sky.ts',
+  'src/render/gravewyrm_sanctum/sanctum_face.ts',
   // battleground objective marks and world markers far from any raid floor
   'src/render/battleground.ts',
   'src/render/battleground_fx.ts',

@@ -39,6 +39,7 @@ import {
   interactObjectForQuests,
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
+import { tryCageStruggle } from './encounters/sunken_bastion/turnkey';
 import { tryStartEscort } from './escort';
 import { interactIgnivarRaidLore } from './ignivar_raid_lore';
 import { isInRaidInstance } from './instances/dungeons';
@@ -457,6 +458,9 @@ export function interact(
     ctx.error(r.meta.entityId, "You can't do that while dead.");
     return;
   }
+  // Locked in the Gaol Turnkey's Iron Cage: the interact press is an escape
+  // press (rate-limited and counted by the encounter), never anything else.
+  if (tryCageStruggle(ctx, p)) return;
   if (p.targetId !== null) {
     const target = ctx.entities.get(p.targetId);
     if (

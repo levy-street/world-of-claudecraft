@@ -250,6 +250,27 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       // The release's Eastbrook ferry round trip rides the deed_cat_exploration crest
       // until its commissioned art lands (docs/design/deeds.md, Icons).
       'exp_harbor_to_harbor',
+      // The five-dungeon rework's encounter deeds ride the deed_cat_dungeon
+      // crest the same way until their paintings are commissioned.
+      'dgn_olen_buttress',
+      'dgn_ossick_moored',
+      'dgn_vael_beacon',
+      'dgn_turretback',
+      'dgn_selthe_pitch',
+      'dgn_colossus_mirror',
+      'dgn_ysolei_high_and_dry',
+      'dgn_mere_hydra',
+      'dgn_crypt_knellwyrm',
+      'dgn_turnkey_cage',
+      'dgn_beastmaster_apart',
+      'dgn_gorgebloom_clean',
+      'dgn_zulgar_uncaught',
+      'dgn_great_saurian',
+      'dgn_korgath_all_chains',
+      'dgn_korgath_still_bound',
+      'dgn_velkhar_cold',
+      'dgn_korzul_thin_ice',
+      'dgn_sledge_tusker',
     ]);
     // RE-PINNED at this merge of release/v0.42.0 into feature/masterwrought:
     // 300 live (counted directly off the resolved src/sim/content/deeds.ts
@@ -261,8 +282,9 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // ledger above, so the painted count holds at 289.
     // 318 with the release's ferry round trip, the pending ledger's last row,
     // so the painted count still holds at 289. 319 with the Buried Hoards Coinsack
-    // catch (2026-09-28 merge), also pending: still 289 painted.
-    expect(DEED_ORDER).toHaveLength(319);
+    // catch (2026-09-28 merge), also pending: still 289 painted. 338 with the
+    // five-dungeon rework's 19 encounter deeds, all pending: still 289 painted.
+    expect(DEED_ORDER).toHaveLength(338);
     expect(DEED_IMAGE_IDS.size).toBe(289);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

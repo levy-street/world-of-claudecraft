@@ -108,7 +108,9 @@ describe('heroic tuning data contract', () => {
         ]),
       ),
     ).toEqual({
-      hollow_crypt: [3.8, 20, 6, 1.3],
+      // The rework's summoned adds (Marrow's bones, Rimeweb's hatchlings) are
+      // floored at 9.5 (tests/heroic_difficulty_floors.test.ts).
+      hollow_crypt: [3.8, 20, 9.5, 1.3],
       sunken_bastion: [4.0, 18, 9.75, 1.3],
       drowned_temple: [5.2, 16.5, 9.15, 1.25],
       gravewyrm_sanctum: [4.0, 15.5, 8.55, 1.2],
@@ -176,9 +178,9 @@ describe('mobTemplateForDungeonDifficulty', () => {
     const add = mobTemplateForDungeonDifficulty(SYNTHETIC, 'hollow_crypt', 'heroic', {
       summonedAdd: true,
     });
-    // hollow_crypt addDamageMultiplier is 6 (no crypt boss summons, inert).
-    expect(add.dmgBase).toBeCloseTo(120, 10);
-    expect(add.dmgPerLevel).toBeCloseTo(12, 10);
+    // hollow_crypt addDamageMultiplier is 9.5 (Marrow and Rimeweb summon).
+    expect(add.dmgBase).toBeCloseTo(190, 10);
+    expect(add.dmgPerLevel).toBeCloseTo(19, 10);
     // Health, armor, level, and the speed floor stay on the dungeon-wide tuning.
     expect(add.hpBase).toBeCloseTo(380, 10);
     expect(add.hpPerLevel).toBeCloseTo(38, 10);

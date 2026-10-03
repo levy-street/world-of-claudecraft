@@ -33,6 +33,7 @@ import {
 } from '../src/sim/content/dungeon_difficulty';
 import { DUNGEON_DEFS } from '../src/sim/content/dungeons';
 import { MOBS } from '../src/sim/data';
+import { KORGATH_TUNING, KORZUL_TUNING } from '../src/sim/encounters/gravewyrm_sanctum/ids';
 import { createMob } from '../src/sim/entity';
 import {
   applyDungeonMobTuning,
@@ -64,9 +65,23 @@ const TRASH_FLOOR = 100;
 const BOSS_FLOOR = 200;
 const ADD_FLOOR = 50;
 
-// The dungeon's five spawn-list templates plus Velkhar's summoned add.
-const TRASH_IDS = ['sanctum_boneguard', 'sanctum_drakonid'] as const;
-const ADD_IDS = ['raised_bonewalker'] as const;
+// The dungeon's spawn-list templates plus Velkhar's summoned add. The Ice Tomb
+// rework (docs/design/dungeon-rework/gravewyrm_sanctum.md) adds the Broodsworn
+// cultists, the ogres and the Glacier Splinters on the trash floor, the
+// NON-elite Rime Whelps in the add band (they come in fours), and the Sledge
+// Tusker in the 150 showpiece band.
+const TRASH_IDS = [
+  'sanctum_boneguard',
+  'sanctum_drakonid',
+  'broodsworn_thawcaller',
+  'broodsworn_goadsmith',
+  'broodsworn_pyre_tender',
+  'ogre_sledge_hauler',
+  'glacier_splinter',
+] as const;
+const ADD_IDS = ['raised_bonewalker', 'rime_whelp'] as const;
+const SHOWPIECE_IDS = ['sledge_tusker'] as const;
+const SHOWPIECE_FLOOR = 150;
 const BOSS_IDS = [
   'korgath_the_bound',
   'grand_necromancer_velkhar',
@@ -103,6 +118,9 @@ describe('normal Gravewyrm Sanctum tuning data', () => {
       const summoned = MOBS[spawn.mobId]?.summonAdds?.mobId;
       if (summoned) spawnIds.add(summoned);
     }
+    // Velkhar's Raised Bonewalkers climb out of his thaw pools (his encounter,
+    // encounters/gravewyrm_sanctum/velkhar.ts, not a template summonAdds).
+    spawnIds.add('raised_bonewalker');
     expect([...spawnIds].sort()).toEqual(Object.keys(tuning.damageMultiplierByMob).sort());
     // The mechanic override map may only re-price mobs the melee map covers.
     for (const id of Object.keys(tuning.mechanicDamageMultiplierByMob ?? {})) {
@@ -117,15 +135,43 @@ describe('normal Gravewyrm Sanctum tuning data', () => {
       sanctum_boneguard: 3.8,
       sanctum_drakonid: 3.7,
       raised_bonewalker: 3.75,
+      broodsworn_thawcaller: 3.8,
+      broodsworn_goadsmith: 3.8,
+      broodsworn_pyre_tender: 3.8,
+      rime_whelp: 4,
+      ogre_sledge_hauler: 3.4,
+      glacier_splinter: 3.7,
+      sledge_tusker: 4.8,
       korgath_the_bound: 9.5,
       grand_necromancer_velkhar: 6.6,
       korzul_the_gravewyrm: 8.5,
     });
-    // Korzul's avoidable Grave Inferno prices off the tank-swing line: 15x
-    // makes standing all four pulses (raw 1050-1350) lethal to a ~1000hp
-    // fresh melee pool while his melee stays on the boss calibration above.
+    // The rework's kit mechanics are stated LANDED (factor 1), Korzul's whole
+    // phase B kit included (encounters/gravewyrm_sanctum/korzul.ts): his
+    // Inferno moved off the template, so its old 15x override is gone.
     expect(tuning.mechanicDamageMultiplierByMob).toEqual({
-      korzul_the_gravewyrm: 15,
+      sanctum_drakonid: 1,
+      broodsworn_thawcaller: 1,
+      broodsworn_goadsmith: 1,
+      broodsworn_pyre_tender: 1,
+      rime_whelp: 1,
+      ogre_sledge_hauler: 1,
+      glacier_splinter: 1,
+      sledge_tusker: 1,
+      korgath_the_bound: 1,
+      grand_necromancer_velkhar: 1,
+      korzul_the_gravewyrm: 1,
+    });
+    // The bosses' and the Tusker's pools from fight length x 150 party DPS.
+    expect(tuning.healthMultiplierByMob).toEqual({
+      sledge_tusker: 5.43,
+      korgath_the_bound: 5.53,
+      sanctum_shackle_hammer: 2,
+      sanctum_shackle_tongs: 2,
+      sanctum_shackle_anvil: 2,
+      sanctum_shackle_bellows: 2,
+      grand_necromancer_velkhar: 7.61,
+      korzul_the_gravewyrm: 7.83,
     });
   });
 });
@@ -136,9 +182,15 @@ describe('normal Gravewyrm Sanctum health', () => {
     expect(normalMaxHp('sanctum_drakonid', 19)).toBe(2300); // was 1150
     expect(normalMaxHp('sanctum_drakonid', 20)).toBe(2410); // was 1205
     expect(normalMaxHp('raised_bonewalker', 18)).toBe(594); // was 297
-    expect(normalMaxHp('korgath_the_bound', 20)).toBe(4342); // was 2171
-    expect(normalMaxHp('grand_necromancer_velkhar', 20)).toBe(3942); // was 1971
-    expect(normalMaxHp('korzul_the_gravewyrm', 20)).toBe(6127); // was 3064
+    // The Ice Tomb rework sizes the bosses and the Tusker on their own (target
+    // fight length x 150 party DPS): about 12,000, 15,000, 24,000 and 9,000.
+    expect(normalMaxHp('korgath_the_bound', 20)).toBe(12007); // was 4342
+    expect(normalMaxHp('grand_necromancer_velkhar', 20)).toBe(15000); // was 3942
+    expect(normalMaxHp('korzul_the_gravewyrm', 20)).toBe(23988); // was 6127
+    expect(normalMaxHp('sledge_tusker', 20)).toBe(8992);
+    // The new trash doubles like the shipped trash.
+    expect(normalMaxHp('broodsworn_thawcaller', 20)).toBe(2093);
+    expect(normalMaxHp('rime_whelp', 18)).toBe(522);
   });
 });
 
@@ -166,6 +218,17 @@ describe('normal Gravewyrm Sanctum melee floors vs the reference warrior', () =>
     }
   });
 
+  it('every Sledge Tusker swing lands in the 150 showpiece band', () => {
+    for (const id of SHOWPIECE_IDS) {
+      const { minLevel, maxLevel } = MOBS[id];
+      for (let level = minLevel; level <= maxLevel; level++) {
+        const swing = minSwingOnReferenceWarrior(id, level);
+        expect(swing, `${id} at level ${level}`).toBeGreaterThanOrEqual(SHOWPIECE_FLOOR);
+        expect(swing, `${id} at level ${level} below the bosses`).toBeLessThan(BOSS_FLOOR + 20);
+      }
+    }
+  });
+
   it('every boss swing lands for at least 200 at every spawnable level', () => {
     for (const id of BOSS_IDS) {
       const { minLevel, maxLevel } = MOBS[id];
@@ -189,32 +252,28 @@ describe('normal Gravewyrm Sanctum mechanic scaling', () => {
         tuning.mechanicDamageMultiplierByMob?.[id] ?? tuning.damageMultiplierByMob[id];
       expect(mob.mechanicDamageMult, id).toBe(expected);
     }
-    // The one live override, asserted concretely: Korzul's entity mechanics
-    // run at 15x while his melee template transform stays at 8.5x.
+    // Korzul's landed kit runs at factor 1 while his melee template
+    // transform stays at 8.5x.
     const korzul = createMob(1, MOBS.korzul_the_gravewyrm, 20, { x: 0, y: 0, z: 0 });
     applyDungeonMobTuning(korzul, SANCTUM, 'normal');
-    expect(korzul.mechanicDamageMult).toBe(15);
+    expect(korzul.mechanicDamageMult).toBe(1);
   });
 
-  it('scales Grave Inferno by the mechanic override and Korgath stomp by his melee factor', () => {
+  it('states Grave Inferno and Korgath kit LANDED in their encounters', () => {
     const tuning = sanctumTuning();
-    // Korzul's aoePulse is GONE (2026-07): Grave Inferno replaced it, a
-    // stationary 8s channel with four escalating avoidable pulses.
+    // Korzul's aoePulse is GONE (2026-07), and his Grave Inferno moved off the
+    // template into the encounter (phase B), so the plate under him can cut it.
     expect(MOBS.korzul_the_gravewyrm.aoePulse).toBeUndefined();
-    const inferno = MOBS.korzul_the_gravewyrm.infernoChannel;
-    const korgathStomp = MOBS.korgath_the_bound.stomp;
-    expect(inferno).toBeTruthy();
-    expect(korgathStomp?.min).toBeTruthy();
-    if (!inferno || korgathStomp?.min === undefined || korgathStomp.max === undefined) return;
-    // Raw (unmitigated) mechanic damage after the per-mob multiplier: the
-    // FOURTH (largest) inferno pulse on normal, and the stomp band.
-    const mult = tuning.mechanicDamageMultiplierByMob?.korzul_the_gravewyrm;
-    expect(mult).toBe(15);
-    if (mult === undefined) return;
-    expect(inferno.min * inferno.pulses * mult).toBe(420);
-    expect(inferno.max * inferno.pulses * mult).toBe(540);
-    expect(korgathStomp.min * tuning.damageMultiplierByMob.korgath_the_bound).toBe(190);
-    expect(korgathStomp.max * tuning.damageMultiplierByMob.korgath_the_bound).toBe(285);
+    expect(MOBS.korzul_the_gravewyrm.infernoChannel).toBeUndefined();
+    // The FOURTH (largest) Inferno pulse on normal, landed (factor 1).
+    expect(tuning.mechanicDamageMultiplierByMob?.korzul_the_gravewyrm).toBe(1);
+    expect(KORZUL_TUNING.infernoMin * KORZUL_TUNING.infernoPulses).toBe(280);
+    expect(KORZUL_TUNING.infernoMax * KORZUL_TUNING.infernoPulses).toBe(360);
+    // Korgath's Shuddering Stomp moved off the template into his encounter
+    // (KORGATH_TUNING, telegraphed with a bar): 190 to 285 LANDED at factor 1.
+    expect(MOBS.korgath_the_bound.stomp).toBeUndefined();
+    expect(tuning.mechanicDamageMultiplierByMob?.korgath_the_bound).toBe(1);
+    expect([KORGATH_TUNING.stompMin, KORGATH_TUNING.stompMax]).toEqual([190, 285]);
   });
 
   it('leaves untuned normal dungeons untouched', () => {
@@ -256,25 +315,27 @@ describe('heroic Gravewyrm Sanctum transform stays on its own calibration', () =
       hpPerLevel: 96,
       armorPerLevel: 31.2,
     },
+    // The Ice Tomb rework gives the bosses their own heroic pools (target
+    // fight length x 230 heroic party DPS).
     korgath_the_bound: {
       dmgBase: 266,
       dmgPerLevel: 55.1,
-      hpBase: 1040,
-      hpPerLevel: 144,
+      hpBase: 2046.2,
+      hpPerLevel: 283.32,
       armorPerLevel: 36,
     },
     grand_necromancer_velkhar: {
       dmgBase: 247,
       dmgPerLevel: 53.2,
-      hpBase: 920,
-      hpPerLevel: 132,
+      hpBase: 2490.9,
+      hpPerLevel: 357.39,
       armorPerLevel: 24,
     },
     korzul_the_gravewyrm: {
       dmgBase: 285,
       dmgPerLevel: 57,
-      hpBase: 1680,
-      hpPerLevel: 192,
+      hpBase: 4704,
+      hpPerLevel: 537.6,
       armorPerLevel: 40.8,
     },
   };
@@ -305,8 +366,10 @@ describe('heroic Gravewyrm Sanctum transform stays on its own calibration', () =
   });
 
   it('stamps the heroic boss mechanic multiplier from the per-mob override', () => {
+    // Korzul's landed kit at the five-man heroic boss factor (2.5): the
+    // quench-water lands 150 a second.
     const boss = createMob(1, MOBS.korzul_the_gravewyrm, 22, { x: 0, y: 0, z: 0 });
     applyDungeonMobTuning(boss, SANCTUM, 'heroic');
-    expect(boss.mechanicDamageMult).toBe(19);
+    expect(boss.mechanicDamageMult).toBe(2.5);
   });
 });

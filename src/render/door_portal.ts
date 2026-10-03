@@ -984,6 +984,9 @@ export function doorArchAuthoredElsewhere(
   placements: readonly { key: string; x?: number; z?: number }[] = FORGEFATHER_FORTRESS_PLACEMENTS,
 ): boolean {
   if (dungeonId === 'nythraxis_crypt') return true;
+  // The Gravewyrm Sanctum's Seal Gate (sanctum_seal_gate.ts) is the door: its
+  // pylons frame the walk-in lane and its cold mist film is the portal look.
+  if (dungeonId === 'gravewyrm_sanctum') return true;
   // The raid family's overworld door belongs to its chain HEAD (the
   // Forge-Lift since the lift became the first room; the Halls id stays
   // covered so a chain reshuffle can never resurrect the generic arch
@@ -1023,11 +1026,13 @@ export function buildDoorBody(
   // geometry, and the Forgefather raid door yields to the owner's placed
   // dungeon_entrance facade with its mist gate (ignivar_mist_gate.ts) the
   // moment one is baked into the fortress table; until then it keeps the
-  // generic arch so the door is never invisible.
+  // generic arch so the door is never invisible. The Sanctum's Seal Gate
+  // (sanctum_seal_gate.ts) draws its pylons and its mouth mist itself.
   if (entering && doorArchAuthoredElsewhere(dungeonId)) {
     // The shared 4.6x4.2 box is a deliberate one-size click affordance: it
     // covers the crypt arch AND the facade's doorway (about 3.3yd wide at
-    // the owner's scale), and the walk-in trigger owns actual entry.
+    // the owner's scale) AND the Seal Gate's 4yd lane, and the walk-in
+    // trigger owns actual entry.
     const clickBox = new THREE.Mesh(doorNythraxisClickGeometry(), doorNythraxisClickMaterial());
     clickBox.position.y = 2.1;
     body.add(clickBox);

@@ -3891,6 +3891,18 @@ export const hudChromeStrings = {
         'For {duration} sec, your auto-attacks, shots and physical abilities (not bleeds) also strike the enemy nearest your target within {reach} yd for {share}% of the damage dealt.',
       lantern:
         'Set a lantern at your feet for {duration} sec. A direct heal from anyone on you or a party member within {radius} yd of it also heals the most wounded other party member in its light for {share}% of the heal.',
+      shackle:
+        'Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.',
+      spiritPack:
+        'Call a spirit jaguar to fight beside you for {duration} sec. It runs to your target and bites it for {min} to {max} Physical damage every {every} sec, switching to any other enemy you target. With no enemy targeted it attacks the enemy nearest you within {range} yd. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, fixed when it is called. Requires an enemy target within {range} yd.',
+      seedburst:
+        'Plant a seed on your target within {range} yd. After {delay} sec it bursts where the target stands, or where it died, dealing {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if the target died first. Damage increases with Spell Power, fixed when it is planted. The seed withers if you die before it bursts.',
+      tether:
+        'Chain yourself to a friendly player within {range} yd for {duration} sec. {share}% of the damage that would reach their health is dealt to you instead. Ends early if you die. Requires a friendly player target other than you.',
+      harvest:
+        'For {duration} sec, each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health ({health}) and {pct}% of your maximum mana.',
+      quench:
+        'Your next {hits} melee or ranged weapon hits within {duration} sec deal {damage} extra Frost damage. The last of them also quenches the target, slowing its attacks by {slow}% for {slowDuration} sec. Unused hits are lost when it ends. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.',
       heartNova:
         'Spend all heat stacks on a fire nova that deals {perHeat} Fire damage per stack ({max} at {maxHeat} stacks) to each enemy within {radius} yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack.',
     },
@@ -5118,6 +5130,41 @@ export const hudChromeStrings = {
     },
   },
   auraEffect: {
+    // The Wildheart Basin's marks and boss auras (src/ui/wildheart_aura_effect.ts).
+    wildheart: {
+      packBond:
+        'Takes {pct}% less damage while its partner stands close. Pull the Beastmaster and his jaguar apart to break it.',
+      packBondFury: 'Deals {pct}% more damage while its partner stands close.',
+      stalked:
+        'The Great Jaguar hunts you and ignores taunts. Each bite deals {min} to {max} physical damage ({heroicMin} to {heroicMax} on Heroic) and opens a bleed. Kite it away from its master.',
+      waryStuns: 'A stun has landed on it. Further stuns slide off until this ends.',
+      waryRoots: 'A root has landed on it. Further roots slide off until this ends.',
+      warySlows: 'A slow has landed on it. Further slows slide off until this ends.',
+      pollinated:
+        'Touching a Seedpod makes it sprout a Thorn Sprout at once. Stay off the seeds and let a clean player stomp them; an untouched pod sprouts after {seconds} sec (on Heroic it burrows after {heroic} sec and rises beside the nearest player).',
+      prey: 'Zulgar hunts you. Lead him across a lit sun glyph to slow him by {slow}%. If he catches you, you are Mauled for {damage} damage ({heroic} on Heroic) and knocked down for {stun} sec.',
+      avatar:
+        'Moves {pct}% faster and hunts its Prey. Slows and roots take hold, and stuns last half as long.',
+      vanished: 'Hidden and immune to damage. He is about to pounce on the farthest player.',
+    },
+    // The Gravewyrm Sanctum's boss auras (src/ui/sanctum_aura_effect.ts).
+    sanctum: {
+      lockbound:
+        'Takes {pct}% less damage: {per}% for each of his chains that still holds. Break a Seal Shackle to drop its chain.',
+      enrage: 'Deals {pct}% more damage.',
+      grasp:
+        'Stands in meltwater and deals {pct}% more damage. If it dies in meltwater it sinks and rises again {seconds} sec later; kill it on cold ice to keep it down.',
+      twiceWoken: 'Rose again from the meltwater and deals {pct}% more damage.',
+      doused: 'His plate broke under him and the quench-water put out his Grave Inferno.',
+      airborne:
+        'In the air and cannot be attacked. He lands with Crashing Descent on the plate where the most players stand, dealing {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd.',
+      wyrmsEye:
+        'When this ends, Korzul pours Plunging Fire over the whole plate you stand on: {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone on it, and the plate cracks, or breaks if it was already cracked. Stand on sound ice, away from the group.',
+      quenchWater:
+        'In open quench-water: slowed by {slow}% and burned for {damage} damage every second ({heroic} on Heroic). Swim to any plate or the shore.',
+      shardFlare:
+        'The heart-shard flares: Grave Breath every {breath} sec and Wing Gale every {gale} sec.',
+    },
     sharedPyre:
       "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
     varkhulSharedPyre:
@@ -5306,6 +5353,22 @@ export const hudChromeStrings = {
       riftGuard: 'You take {pct}% less damage.',
       sprint: 'Movement speed increased by {pct}%. Does not stack with other speed increases.',
       brand: 'Healing received is reduced by {pct}%.',
+      shackle: 'Chained in place: cannot move.',
+      shackleSlow: 'Chained: movement speed reduced by {pct}%.',
+      spiritPack:
+        'A spirit jaguar fights beside you, biting your target for {min} to {max} Physical damage every {every} sec.',
+      seedburst:
+        'A Gorgebloom seed. When this expires it bursts for {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if this enemy dies before then.',
+      tether:
+        "Chained by Foreman's Last Link: {pct}% of the damage that would reach your health is dealt to the one who chained you instead.",
+      tetherLink: 'You take {pct}% of the damage your chained ally would take.',
+      harvest:
+        'Each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health and mana.',
+      quench:
+        "Your next {stacks} weapon hits deal {damage} extra Frost damage. The last one slows the target's attacks by {slow}%.",
+      quenchOther:
+        "The next {stacks} weapon hits deal extra Frost damage. The last one slows the target's attacks by {slow}%.",
+      quenched: 'Attack speed slowed by {pct}%.',
       forgeHeat:
         "Heat: {stacks}/{max}. Using Forgefather's Temper spends it all, and its weapon fire deals {pct}% more damage.",
       tempered:
@@ -8699,6 +8762,10 @@ export const hudChromeStrings = {
       mist_surge: 'Mist Surge (pulsing area damage)',
       summons_adds: 'Summons reinforcements',
       lunar_tide: 'Lunar Tide (pulsing area damage)',
+      chorus_and_solo: 'Chorus and Solo (stack on one mark, spread from the other)',
+      tideglass_reflections: "Tideglass Reflections (kill each other's mirror images)",
+      rising_tide: 'Rising Tide (half the island floods, move to the dry half)',
+      undertow: 'Undertow (pulls everyone in, run out before the crash)',
       enrage: 'Enrages at low health',
       shuddering_stomp: 'Shuddering Stomp (area stun)',
       grave_inferno: 'Grave Inferno (channeled fire AoE, stay spread)',
@@ -8728,6 +8795,11 @@ export const hudChromeStrings = {
         'The Deathless Court (heroic only, the royal court rises after Deathless Rage)',
       bloodmane_rend: 'Bloodmane Rend (bleed, watch for target swaps)',
       tusk_sweep: 'Tusk Sweep (frontal cleave)',
+      grave_breath: 'Grave Breath (frontal fire cone, it cracks the ice it covers)',
+      plate_floor:
+        'Breaking Ice (his fire cracks and sinks the lake plates, stay out of the open water)',
+      wyrm_flights:
+        "Flights (at 70% and 40%: walk Wyrm's Eye onto sound ice, stack where he should land)",
       ancestral_sap: 'Ancestral Sap (heals its allies)',
       call_of_the_hunt: 'Call of the Hunt (hastens nearby allies)',
       thickhide_ward: 'Thickhide Ward (shields nearby allies)',
@@ -8754,7 +8826,128 @@ export const hudChromeStrings = {
       shared_pyre: 'Shared Pyre (gathering circle, split the damage)',
       anvils_decree: "Anvil's Decree (three raid-wide hammer strikes, heal through)",
       masters_assembly: "The Master's Assembly (block the forge beams, rotate blockers)",
+      // The Sunken Bastion's fifth pass (encounters/sunken_bastion).
+      iron_cage: 'Iron Cage (mash your interact key to break out, allies can smash the bars)',
+      drowned_anchor: 'Drowned Anchor (break the chain before its victim is dragged into the pit)',
+      shackle_pair: 'Shackle Pair (two chained players must stay close together)',
+      reaper_behind: "Shadow Crossing (he rises behind a player, step out of the scythe's arc)",
+      // The Wildheart Basin rework (encounters/wildheart_basin).
+      pack_bond: 'Pack Bond (together they take half damage: drag them 15 yards apart)',
+      stalk:
+        'Stalk (the jaguar hunts a marked player, never the tank; alone, it hunts you: kite, slow, root and stun it)',
+      shared_health: 'Shared Health (one pool: hit whichever is safest)',
+      heel_frenzied_bond:
+        'Heel! and Frenzied Bond (the jaguar leaps home, the bond reaches 20 yards)',
+      seed_rain: 'Seed Rain (clean players stomp the seeds before they sprout)',
+      pollinate: 'Pollinate (golden players stay off the seeds, or they sprout at once)',
+      vine_lash: 'Vine Lash (step out of the thorny lane or be rooted)',
+      gorge: 'Gorge (a heavy bite and a poison on the tank)',
+      burrowing_seeds:
+        'Burrowing Seeds and Pollen Cloud (seeds rise by a player at 6 seconds, gold spreads)',
+      spirit_of_the_hunt:
+        'Spirit of the Hunt (the Prey kites the avatar through lit sun glyphs; a Mauled player gets a head start)',
+      twin_prey_ambush: 'Twin Prey and Ambush (two Prey, then a pounce on the farthest player)',
+      // Korgath the Bound (encounters/gravewyrm_sanctum/korgath.ts).
+      seal_shackles:
+        'Seal Shackles (each chain you break makes him take 20 percent more damage and frees one of his attacks)',
+      chain_strain: 'Strain (step away from every pillar whose chain still holds)',
+      korgath_stomp: 'Shuddering Stomp (step out of the ring round him)',
+      rerivet_last_link:
+        'Re-rivet and Last Link (kick the Goadsmith re-pinning a chain; one chain left means Strain every 10 seconds)',
+      // Grand Necromancer Velkhar (encounters/gravewyrm_sanctum/velkhar.ts).
+      waking_thaw: 'Waking Thaw (the dead climb out of the thaw pools)',
+      unquenched_held: 'Held or Unquenched (kill the dead on cold ice, never in meltwater)',
+      soulfire_trench: 'Soulfire Trench (a line of soulfire, then a strip of meltwater)',
+      shadow_volley: 'Shadow Volley (shadow damage to everyone)',
+      warm_hands_twice_woken:
+        'Warm Hands and Twice-Woken (heroic only, keep the dead moving; a risen one returns stronger)',
     },
+  },
+  // The Gaol Turnkey's Iron Cage escape prompt (src/ui/hud/dungeon/cage_escape).
+  bastionCage: {
+    title: 'Locked in the Iron Cage!',
+    promptKey: 'Press {key} again and again to break free',
+    // Retired: the unbound desktop case names the click (promptClick) now, since a
+    // player with no interact key has nothing to press but the panel itself.
+    promptNoKey: 'Press your interact key again and again to break free',
+    promptClick: 'Click here again and again to break free',
+    promptTap: 'Tap here again and again to break free',
+    buttonAria: 'Break free from the Iron Cage',
+    progressAria: 'Escape progress: {pct}',
+  },
+  // Gaoler Ossick's chain alert (src/ui/hud/dungeon/gaol_chain_view.ts).
+  bastionChain: {
+    anchoredTitle: 'Chained to the Drowned Anchor!',
+    anchoredLine: 'Your group must break the chain before the winch drags you into the pit',
+    allyTitle: 'Break the chain!',
+    allyLine: '{name} is being dragged to the pit: hit the Drowned Anchor',
+    shackledTitle: 'Shackled to {name}',
+    shackledLine: 'Stay within {range} yards of each other ({dist} yards apart)',
+    strainedLine: 'Too far apart! The chain bites both of you: close to {range} yards',
+    brokenAria: 'Chain broken: {pct}',
+    reachAria: 'Chain reach used: {pct}',
+    // The Drowned Anchor's health is its chain's links (one per hit, however
+    // hard): the alert's count, its rule, the target frame's health text and
+    // the floating text a hit on it shows. Wordy (M16): non-Latin fills here.
+    linksLeft: 'Chain links left: {count} of {total}',
+    linkRule: 'Every hit on the anchor breaks one link, however hard it lands',
+    linksTarget: '{count} of {total} links',
+    linkBroken: 'Link broken!',
+  },
+  // The Wildheart Basin's encounter alert (src/ui/hud/dungeon/wildheart_alert_view.ts).
+  wildheartAlert: {
+    preyTitle: 'You are the Prey!',
+    preyLine: 'Zulgar hunts you: run him through the lit sun glyphs',
+    preyWaitLine: 'He chases the other Prey now: be ready, he switches',
+    stalkedTitle: 'Stalked!',
+    stalkedLine: 'The jaguar hunts you: kite it away from its master',
+    pollinatedTitle: 'Pollinated!',
+    pollinatedLine: 'Stay off the seeds: your touch makes them sprout',
+    bondTitle: 'Pack Bond',
+    bondLine: 'Together they take half damage: pull them apart',
+    timeAria: '{seconds} seconds left',
+  },
+  // The Gravewyrm Sanctum's encounter alert (src/ui/hud/dungeon/sanctum_alert_view.ts).
+  // Wordy (M16): non-Latin fills in the overlays.
+  sanctumAlert: {
+    quenchTitle: 'In the quench-water!',
+    quenchLine: 'It burns and slows you: swim to the nearest ice or the shore',
+    plungeTitle: 'Plunging Fire!',
+    plungeLine: 'Your whole plate is about to burn: get off it now',
+    descentTitle: 'Crashing Descent!',
+    descentLine: 'He lands right here: step out of his shadow',
+    eyeTitle: "Wyrm's Eye on you!",
+    eyeLine: 'Your plate burns when the mark ends: stay on sound ice, away from the group',
+    eyeCrackedLine: 'You stand on cracked ice: walk to a sound plate before the mark ends',
+    flailTitle: 'Chain Flail!',
+    flailLine: 'The chain whips down the painted lane: step out of it',
+    chargeTitle: 'Threshold Charge!',
+    chargeLine: 'He charges down the lane: get out of it, away from the edge',
+    trenchTitle: 'Soulfire Trench!',
+    trenchLine: 'Soulfire cuts the lane and leaves meltwater: get out of it',
+    strainTitle: 'Strain!',
+    strainLine: 'The intact pillars are about to lash out: get away from them',
+    infernoTitle: 'Grave Inferno!',
+    infernoLine: 'Each pulse burns harder: get out of his reach',
+    stompTitle: 'Shuddering Stomp!',
+    stompLine: 'Get away from him before his foot comes down',
+    breathTitle: 'Grave Breath!',
+    breathLine: 'You stand in the breath cone: get out to the side',
+    maulTitle: 'Maul Arc!',
+    maulLine: 'He swings through everything in front of him: get behind him',
+    tailTitle: 'Tail Sweep!',
+    tailLine: 'You stand behind him: get out before the tail hits',
+    meltwaterTitle: 'In the meltwater',
+    meltwaterLine: 'Your Bonewalker stands in meltwater: drag it onto the cold ice',
+    meltwaterTargetLine: 'If your target dies in meltwater it rises again: wait for cold ice',
+    crackedTitle: 'Cracked ice',
+    crackedLine: 'Fire here breaks this plate: keep his fire off it',
+    flightTitle: 'Korzul takes flight',
+    flightLine: 'Stack on sound ice to choose where he lands, then step off',
+    lockboundTitle: 'Lockbound',
+    lockboundLine:
+      '{chains} chains hold: he takes {pct}% less damage. Break the Seal Shackles to strip it.',
+    timeAria: '{seconds} seconds left',
   },
   // The Book of Deeds window: the deed catalog browser (summary strip,
   // category rail, entry cards, title picker), the watchlist HUD tracker, and

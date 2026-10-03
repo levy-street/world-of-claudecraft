@@ -44,6 +44,7 @@ import {
 import { applyFarshoreShipwreckShore } from './farshore_shipwreck_shore';
 import { GALE_DECK_FREEBOARD } from './gale_harbor';
 import { applyGliderApproachPath } from './glider_approach_path';
+import { instancedFieldHeight } from './instances/authored_field/registry';
 import { applyKeepSitePad, keepSitePadWeight } from './keep_site';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
@@ -67,7 +68,6 @@ import { cragLayer, highlandMask, reliefBase, ridged2, warpedCoords } from './te
 import { applyGardenwalkWestPass, applyThornpeakPocketGrade } from './thornpeak_walk_grades';
 import type { BiomeId, HeightStamp, ZoneDef } from './types';
 import { overworldWalkSurface } from './walk_lifts';
-import { wildheartFieldHeight } from './wildheart_field';
 import { applyWispMazePad } from './wisp_maze_ground';
 
 // Terrain is a pure function of (x, z, seed): both the sim (ground clamping)
@@ -3830,9 +3830,12 @@ export function groundHeight(x: number, z: number, seed: number): number {
   }
   if (x > DUNGEON_X_THRESHOLD) {
     const dungeon = dungeonAt(x);
-    if (dungeon?.interior === 'wildheart') {
+    // Open-air fields (Wildheart, the Hollow Crypt): the interior's own
+    // height function (instances/authored_field/registry.ts).
+    const fieldHeight = dungeon ? instancedFieldHeight(dungeon.interior) : null;
+    if (dungeon && fieldHeight) {
       const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
-      return DUNGEON_FLOOR_Y + wildheartFieldHeight(x - origin.x, z - origin.z);
+      return DUNGEON_FLOOR_Y + fieldHeight(x - origin.x, z - origin.z);
     }
     if (dungeon?.interior === 'lastkeep') {
       // The Last Keep's authored rooms carry per-room lifts (door ramps

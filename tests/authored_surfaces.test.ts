@@ -103,6 +103,13 @@ const LEGACY_UNFLAGGED_DEFS = new Set([
   'mount_stormfeather_griffin',
   'mount_terrorspark_groundshaker',
   'mount_thunderstrut_gobbler',
+  // The five-dungeon rework's re-tints of a legacy body above: they spread the
+  // base def (the Drowned Temple's Tidewisp over mob_glimmerwisp, the Wildheart
+  // Basin's Totem-Binder and Howdah Hexcaller over mob_wildheart_hexcaller), so
+  // they keep the floor their shared GLB was tuned under.
+  'temple_tidewisp',
+  'wildheart_howdah_hexcaller',
+  'wildheart_totem_binder',
 ]);
 
 /** Held ITEM models with authored materials that still take the kit polish
@@ -170,6 +177,42 @@ const AUTHORED_ATLAS_DEFS = [
   'mount_goblin_rocket_sled',
   'mount_rallycart_rxt',
   'mount_avian_strider',
+  // the Blender-built dungeon bosses and bodies: the Sunken Bastion's Vael,
+  // Iron Cage, Drowned Anchor and Gaol Turnkey, and the Hollow Crypt's Lich
+  // Bishop (Morthen)
+  'bastion_vael',
+  'bastion_gaol_cage',
+  'bastion_drowned_anchor',
+  'bastion_turnkey',
+  'crypt_morthen_lich',
+  // the Gravewyrm Sanctum's three Blender bosses (characters/sanctum_boss_looks.ts)
+  'sanctum_korgath',
+  'sanctum_velkhar',
+  'sanctum_korzul',
+  'sanctum_seal_shackle',
+  // the Hollow Crypt's Blender gargoyle, drake and Knellwyrm, the Drowned
+  // Temple's Ysolei, the Gravewyrm Sanctum's Sledge Tusker and Soul Brazier
+  // prop, and the Wildheart Basin's Blender bodies and mask-totem prop
+  'mob_crypt_gargoyle',
+  'mob_crypt_drake',
+  'mob_crypt_knellwyrm',
+  'temple_ysolei',
+  'sanctum_sledge_tusker',
+  'sanctum_soul_brazier',
+  'wildheart_great_saurian',
+  'wildheart_gorgebloom',
+  'wildheart_vine_lasher',
+  'wildheart_thorn_sprout',
+  'wildheart_fanglord_jaguar',
+  'wildheart_sunbone_totem',
+  // the rework's re-tints of a flagged body, which inherit the flag with the
+  // spread base def (characters/sanctum_creature_looks.ts)
+  'sanctum_boneguard',
+  'sanctum_raised_bonewalker',
+  'sanctum_pyre_tender',
+  'sanctum_rime_whelp',
+  'sanctum_sledge_hauler',
+  'sanctum_glacier_splinter',
 ];
 
 describe('authored surfaces', () => {

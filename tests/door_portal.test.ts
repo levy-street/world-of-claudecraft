@@ -92,6 +92,28 @@ describe('buildDoorBody: Nythraxis crypt click-box', () => {
   });
 });
 
+describe('buildDoorBody: the Gravewyrm Sanctum Seal Gate', () => {
+  it('the entering Sanctum door is only the invisible click box: no arch, no swirl disc', () => {
+    expect(doorArchAuthoredElsewhere('gravewyrm_sanctum')).toBe(true);
+    const { body, portal } = buildDoorBody(true, 'gravewyrm_sanctum', false);
+    const ms = meshes(body);
+    expect(ms.length).toBe(1);
+    expect(portal).toBeUndefined();
+    // the click box covers the Seal Gate's 4yd walk-in lane (|x| < 2)
+    const box = ms[0].geometry as THREE.BoxGeometry;
+    expect(box.parameters.width).toBeGreaterThanOrEqual(4);
+    expect(ms[0].position.y).toBeCloseTo(2.1);
+    const material = ms[0].material as THREE.MeshBasicMaterial;
+    expect(material.opacity).toBeLessThan(0.01);
+  });
+
+  it('only the entering side yields: the exit inside the instance keeps its portal', () => {
+    const { body, portal } = buildDoorBody(false, 'gravewyrm_sanctum', false);
+    expect(meshes(body).length).toBe(5);
+    expect(portal).toBeDefined();
+  });
+});
+
 describe('shared-resource tagging (disposal guard contract)', () => {
   it('door geometries and materials are marked shared so per-view disposal skips them', () => {
     const { body, portal } = buildDoorBody(true, null, false);

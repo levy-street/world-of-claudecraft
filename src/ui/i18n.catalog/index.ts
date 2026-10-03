@@ -1949,6 +1949,15 @@ export const en = {
       molten_fletching: { name: 'Molten Fletching' },
       last_flame_lantern: { name: 'Last Flame Lantern' },
       heart_of_the_crucible: { name: 'Heart of the Crucible' },
+      // The Sunken Bastion's heroic Gaoler Ossick.
+      gaolers_iron_key: { name: "Gaoler's Iron Key" },
+      // The Wildheart Basin's heroic Fanglord Beastmaster and Gorgebloom.
+      fanglords_whistle: { name: "Fanglord's Whistle" },
+      gorgebloom_seedpod: { name: 'Gorgebloom Seedpod' },
+      // The Gravewyrm Sanctum's heroic Korgath, Velkhar and Korzul.
+      foremans_last_link: { name: "Foreman's Last Link" },
+      phial_of_the_tithe: { name: 'Phial of the Tithe' },
+      quenchwater_flask: { name: 'Quenchwater Flask' },
       // Faction Quartermaster vendor items
       rift_watchers_band: { name: "Rift Watcher's Band" },
       rift_surveyors_satchel: { name: "Rift Surveyor's Satchel" },

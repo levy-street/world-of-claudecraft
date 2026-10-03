@@ -747,35 +747,55 @@ function setMembers(
 // HEROIC_BOSS_LOOT gear only (mount reins excluded; Horizons owns mounts).
 // Tests pin these lists against the live table so a new heroic gear row fails
 // until it is deliberately added here.
+/** New heroic epics whose Reliquary slot waits for their painted icon art
+ *  (a relic cell needs committed dark-card art; weapons cannot park on the
+ *  art-pending list). Each joins its heroic page in the art pass. */
+export const RELIQUARY_ART_PENDING_HEROIC: readonly string[] = [
+  'sextons_burial_spade',
+  'rimesilk_hood',
+];
+
 export const RELIQUARY_HEROIC_GEAR = {
+  // The Hollow Crypt rework spread Morthen's heroic epics over the four bosses
+  // (hollow_crypt.md 8.2); they share the one shipped heroic page.
+  sexton_marrow: ['cryptplate_helm'],
+  rimeweb: ['bonechill_striders', 'bonechill_cord'],
+  cantor_ilvane: ['shadowpulse_handwraps'],
   morthen: [
     'morthens_cryptforged_hauberk',
-    'shadowpulse_handwraps',
-    'bonechill_striders',
     'lunarward_cinch',
-    'cryptplate_helm',
     'shadowpulse_slippers',
-    'bonechill_cord',
     'bastion_sigil',
   ],
+  // The Sunken Bastion rework moved three of Vael's heroic epics onto Olen and
+  // the new Gaoler Ossick (sunken_bastion.md 8.2); they share the one heroic page.
+  knight_commander_olen: [
+    'drowned_commanders_breastplate',
+    'mistforged_pauldrons',
+    'tideguard_faceguard',
+  ],
+  gaoler_ossick: ['gaolyard_striders', 'sash_of_the_sunken_court', 'gaolers_iron_key'],
   vael_the_mistcaller: [
     'mistcallers_fang',
     'tidebound_spaulders',
-    'sash_of_the_sunken_court',
-    'mistforged_pauldrons',
-    'tideguard_faceguard',
     'sunken_court_mantle',
     'dreamroot_boots',
     'stormjar',
   ],
+  // The Drowned Temple rework moved four of Ysolei's heroic pieces onto
+  // Choirmother Selthe and the new Tideglass Colossus (drowned_temple.md 8.2)
+  // and gave each a new heroic epic; they share the one heroic page.
+  choirmother_selthe: ['choirmothers_casque', 'pale_chorus_vestment'],
+  tideglass_colossus: [
+    'tidewoven_trousers',
+    'lunar_choir_leggings',
+    'tideworn_warboots',
+    'tideglass_warmaul',
+  ],
   ysolei: [
     'lunar_tide_greatstaff',
-    'tidewoven_trousers',
-    'choirmothers_casque',
     'stormbark_mantle',
-    'lunar_choir_leggings',
     'choir_blessed_spaulders',
-    'tideworn_warboots',
     'menders_hourglass',
   ],
   korzul_the_gravewyrm: [
@@ -786,14 +806,24 @@ export const RELIQUARY_HEROIC_GEAR = {
     'gravescale_girdle',
     'wyrmchoir_handwraps',
     'wildsoul_maul',
+    // The Gravewyrm Sanctum rework's Quenchwater Flask (gravewyrm_sanctum.md 9.2).
+    'quenchwater_flask',
   ],
+  // The Gravewyrm Sanctum rework (gravewyrm_sanctum.md 9.2): Korgath and
+  // Velkhar each pay a new epic and a trinket, Korzul a trinket; all three
+  // share the one heroic page.
+  korgath_the_bound: ['foremans_last_link', 'hammer_of_the_open_lock'],
+  grand_necromancer_velkhar: ['phial_of_the_tithe', 'vestments_of_the_waking_rite'],
+  // The Wildheart Basin rework moved two of Zulgar's heroic epics onto the
+  // promoted Fanglord Beastmaster and the Gorgebloom (wildheart_basin.md 8.2)
+  // and gave each a new epic and a trinket; they share the one heroic page.
+  wildheart_beastmaster: ['bloodmane_war_legguards', 'fanglords_whistle', 'fanglords_hide_mantle'],
+  the_gorgebloom: ['sunbone_oracles_crown', 'gorgebloom_seedpod', 'thornroot_greathelm'],
   wildheart_high_priest: [
     'basin_stalkers_tunic',
     'verdant_heart_vestment',
     'sunbone_ritual_hauberk',
     'greatfang_of_the_basin',
-    'sunbone_oracles_crown',
-    'bloodmane_war_legguards',
     'paired_talons',
   ],
   nythraxis_scourge_of_thornpeak: [
@@ -1013,7 +1043,9 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     name: 'The Hollow Crypt',
     desc: 'Signature spoils claimed from Morthen and the Hollow Crypt.',
     clearSource: { kind: 'dungeon', dungeonId: 'hollow_crypt', difficulty: 'any' },
-    // Morthen is the only Crypt mob that drops any of these five.
+    // Morthen is the only Crypt mob that drops any of these five. The rework's
+    // three new rare chase rows (Spadehaft, Fang, Hymnal) join this page with
+    // their painted art (the dark-card rule), not before.
     sourceDefault: fromBoss('morthen'),
     relics: items(
       'cryptbone_greaves',
@@ -1029,17 +1061,29 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     name: 'Heroic Hollow Crypt',
     desc: 'Heroic-only epics from Morthen the Gravecaller.',
     clearSource: { kind: 'dungeon', dungeonId: 'hollow_crypt', difficulty: 'heroic' },
-    sourceDefault: fromBoss('morthen'),
-    relics: items(...RELIQUARY_HEROIC_GEAR.morthen),
+    // The shipped eight keep their slots and order; the rework moved four of
+    // them to the new bosses (hinted per boss). Its two new epics join with
+    // their painted art (RELIQUARY_ART_PENDING_HEROIC).
+    relics: items(
+      ['morthens_cryptforged_hauberk', fromBoss('morthen')],
+      ['shadowpulse_handwraps', fromBoss('cantor_ilvane')],
+      ['bonechill_striders', fromBoss('rimeweb')],
+      ['lunarward_cinch', fromBoss('morthen')],
+      ['cryptplate_helm', fromBoss('sexton_marrow')],
+      ['shadowpulse_slippers', fromBoss('morthen')],
+      ['bonechill_cord', fromBoss('rimeweb')],
+      ['bastion_sigil', fromBoss('morthen')],
+    ),
   },
   {
     id: 'conquerors_sunken_bastion',
     shelf: 'conquerors',
     name: 'The Sunken Bastion',
-    desc: 'Rare and epic spoils from Olen and Vael the Fogbinder.',
+    desc: 'Rare and epic spoils from Olen, Gaoler Ossick and Vael the Fogbinder.',
     clearSource: { kind: 'dungeon', dungeonId: 'sunken_bastion', difficulty: 'any' },
-    // Two bosses, and every relic drops from exactly one of them, so the page
-    // takes no default: each row names its own.
+    // Three bosses, and every relic drops from exactly one of them, so the page
+    // takes no default: each row names its own. The rework's two rare chase
+    // weapons append after the shipped slots.
     relics: items(
       ['tideguard_greaves', fromBoss('knight_commander_olen')],
       ['tideguard_sabatons', fromBoss('knight_commander_olen')],
@@ -1049,41 +1093,71 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       ['drowned_prayer_sandals', fromBoss('vael_the_mistcaller')],
       ['eelscale_treads', fromBoss('vael_the_mistcaller')],
       ['mistcallers_duffel', fromBoss('vael_the_mistcaller')],
+      ['knight_commanders_longsword', fromBoss('knight_commander_olen')],
+      ['gaolyard_cudgel', fromBoss('gaoler_ossick')],
     ),
   },
   {
     id: 'conquerors_sunken_bastion_heroic',
     shelf: 'conquerors',
     name: 'Heroic Sunken Bastion',
-    desc: 'Heroic-only epics from Vael the Fogbinder.',
+    desc: 'Heroic-only epics from Olen, Gaoler Ossick and Vael the Fogbinder.',
     clearSource: { kind: 'dungeon', dungeonId: 'sunken_bastion', difficulty: 'heroic' },
-    // Every heroic page defaults to the boss its RELIQUARY_HEROIC_GEAR list is
-    // keyed by: that key IS the HEROIC_BOSS_LOOT mob id awarding the gear.
-    sourceDefault: fromBoss('vael_the_mistcaller'),
-    relics: items(...RELIQUARY_HEROIC_GEAR.vael_the_mistcaller),
+    // The shipped eight keep their slots and order; the rework moved three of
+    // them to Olen and Ossick and appends its new epics. Three bosses pay the
+    // page, so every row names its own.
+    relics: items(
+      ['mistcallers_fang', fromBoss('vael_the_mistcaller')],
+      ['tidebound_spaulders', fromBoss('vael_the_mistcaller')],
+      ['sash_of_the_sunken_court', fromBoss('gaoler_ossick')],
+      ['mistforged_pauldrons', fromBoss('knight_commander_olen')],
+      ['tideguard_faceguard', fromBoss('knight_commander_olen')],
+      ['sunken_court_mantle', fromBoss('vael_the_mistcaller')],
+      ['dreamroot_boots', fromBoss('vael_the_mistcaller')],
+      ['stormjar', fromBoss('vael_the_mistcaller')],
+      ['drowned_commanders_breastplate', fromBoss('knight_commander_olen')],
+      ['gaolyard_striders', fromBoss('gaoler_ossick')],
+      ['gaolers_iron_key', fromBoss('gaoler_ossick')],
+    ),
   },
   {
     id: 'conquerors_drowned_temple',
     shelf: 'conquerors',
     name: 'The Drowned Temple',
-    desc: 'Rare spoils from Choirmother Selthe and Ysolei, Avatar of the Drowned Moon.',
+    desc: 'Rare spoils from Choirmother Selthe, the Tideglass Colossus and Ysolei, Avatar of the Drowned Moon.',
     clearSource: { kind: 'dungeon', dungeonId: 'drowned_temple', difficulty: 'any' },
+    // Three bosses pay the page, so every row names its own. The rework's two
+    // rare chase rows append after the shipped slots.
     relics: items(
       ['ysols_pearl_greaves', fromBoss('ysolei')],
       ['moonshroud_breastplate', fromBoss('ysolei')],
       ['moonshroud_robe', fromBoss('ysolei')],
       ['moonshroud_tunic', fromBoss('ysolei')],
       ['selthes_seastriders', fromBoss('choirmother_selthe')],
+      ['chorus_conch', fromBoss('choirmother_selthe')],
+      ['tideglass_shiv', fromBoss('tideglass_colossus')],
     ),
   },
   {
     id: 'conquerors_drowned_temple_heroic',
     shelf: 'conquerors',
     name: 'Heroic Drowned Temple',
-    desc: 'Heroic-only epics from Ysolei.',
+    desc: 'Heroic-only epics from Choirmother Selthe, the Tideglass Colossus and Ysolei.',
     clearSource: { kind: 'dungeon', dungeonId: 'drowned_temple', difficulty: 'heroic' },
-    sourceDefault: fromBoss('ysolei'),
-    relics: items(...RELIQUARY_HEROIC_GEAR.ysolei),
+    // The shipped eight keep their slots and order; the rework moved four of
+    // them to Selthe and the Colossus and appends its two new epics.
+    relics: items(
+      ['lunar_tide_greatstaff', fromBoss('ysolei')],
+      ['tidewoven_trousers', fromBoss('tideglass_colossus')],
+      ['choirmothers_casque', fromBoss('choirmother_selthe')],
+      ['stormbark_mantle', fromBoss('ysolei')],
+      ['lunar_choir_leggings', fromBoss('tideglass_colossus')],
+      ['choir_blessed_spaulders', fromBoss('ysolei')],
+      ['tideworn_warboots', fromBoss('tideglass_colossus')],
+      ['menders_hourglass', fromBoss('ysolei')],
+      ['pale_chorus_vestment', fromBoss('choirmother_selthe')],
+      ['tideglass_warmaul', fromBoss('tideglass_colossus')],
+    ),
   },
   {
     id: 'conquerors_gravewyrm_sanctum',
@@ -1181,33 +1255,61 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     id: 'conquerors_gravewyrm_sanctum_heroic',
     shelf: 'conquerors',
     name: 'Heroic Gravewyrm Sanctum',
-    desc: 'Heroic-only epics from Korzul the Gravewyrm.',
+    desc: 'Heroic-only epics and trinkets from Korgath the Bound, Grand Necromancer Velkhar and Korzul the Gravewyrm.',
     clearSource: { kind: 'dungeon', dungeonId: 'gravewyrm_sanctum', difficulty: 'heroic' },
-    sourceDefault: fromBoss('korzul_the_gravewyrm'),
-    relics: items(...RELIQUARY_HEROIC_GEAR.korzul_the_gravewyrm),
+    // The shipped seven keep their slots and order; the rework (gravewyrm_
+    // sanctum.md section 10) appends Korzul's Quenchwater Flask, then Korgath's
+    // and Velkhar's new epics and trinkets, each hinted to its boss.
+    relics: items(
+      ...RELIQUARY_HEROIC_GEAR.korzul_the_gravewyrm.map(
+        (id) => [id, fromBoss('korzul_the_gravewyrm')] as const,
+      ),
+      ['hammer_of_the_open_lock', fromBoss('korgath_the_bound')],
+      ['vestments_of_the_waking_rite', fromBoss('grand_necromancer_velkhar')],
+      ['foremans_last_link', fromBoss('korgath_the_bound')],
+      ['phial_of_the_tithe', fromBoss('grand_necromancer_velkhar')],
+    ),
   },
   {
     id: 'conquerors_wildheart_basin',
     shelf: 'conquerors',
     name: 'The Wildheart Basin',
-    desc: 'Signature weapons from Zulgar and the Fanglord.',
+    desc: 'Signature weapons from the Fanglord Beastmaster, the Gorgebloom and Zulgar.',
     clearSource: { kind: 'dungeon', dungeonId: 'wildheart_basin', difficulty: 'any' },
+    // The rework (wildheart_basin.md section 9) appends the Gorgebloom's rare
+    // chase row; Duskwhisper and the Beastspear name the promoted Fanglord
+    // Beastmaster, a real boss now.
     relics: items(
       ['fanglords_beastspear', fromBoss('wildheart_beastmaster')],
       ['duskwhisper', fromBoss('wildheart_beastmaster')],
       ['wildheart_tuskblade', fromBoss('wildheart_high_priest')],
       ['wildheart_hexwood_staff', fromBoss('wildheart_high_priest')],
       ['wildheart_fangknife', fromBoss('wildheart_high_priest')],
+      ['falls_blessed_staff', fromBoss('the_gorgebloom')],
     ),
   },
   {
     id: 'conquerors_wildheart_basin_heroic',
     shelf: 'conquerors',
     name: 'Heroic Wildheart Basin',
-    desc: 'Heroic-only epics from Zulgar, Voice of the Basin.',
+    desc: 'Heroic-only epics and trinkets from the Fanglord Beastmaster, the Gorgebloom and Zulgar, Voice of the Basin.',
     clearSource: { kind: 'dungeon', dungeonId: 'wildheart_basin', difficulty: 'heroic' },
-    sourceDefault: fromBoss('wildheart_high_priest'),
-    relics: items(...RELIQUARY_HEROIC_GEAR.wildheart_high_priest),
+    // The shipped seven keep their slots and order; the rework moved two of
+    // them to the Beastmaster and the Gorgebloom and appends their new epics
+    // and trinkets.
+    relics: items(
+      ['basin_stalkers_tunic', fromBoss('wildheart_high_priest')],
+      ['verdant_heart_vestment', fromBoss('wildheart_high_priest')],
+      ['sunbone_ritual_hauberk', fromBoss('wildheart_high_priest')],
+      ['greatfang_of_the_basin', fromBoss('wildheart_high_priest')],
+      ['sunbone_oracles_crown', fromBoss('the_gorgebloom')],
+      ['bloodmane_war_legguards', fromBoss('wildheart_beastmaster')],
+      ['paired_talons', fromBoss('wildheart_high_priest')],
+      ['fanglords_whistle', fromBoss('wildheart_beastmaster')],
+      ['fanglords_hide_mantle', fromBoss('wildheart_beastmaster')],
+      ['gorgebloom_seedpod', fromBoss('the_gorgebloom')],
+      ['thornroot_greathelm', fromBoss('the_gorgebloom')],
+    ),
   },
   // ---- Raid ----
   {

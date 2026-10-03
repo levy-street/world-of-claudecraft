@@ -75,6 +75,8 @@ import {
   DRAKELANDS_ROADS,
   DRAKELANDS_ZONE,
 } from './content/drakelands';
+import { DROWNED_TEMPLE_MOBS } from './content/drowned_temple';
+import { DROWNED_TEMPLE_ITEMS } from './content/drowned_temple_items';
 import { DUNGEON_DEFS, DUNGEON_KEEPSAKE_ITEMS, DUNGEON_MOBS } from './content/dungeons';
 import { FORGEFATHER_ISLE_TERRAIN_EDITS } from './content/ember_coast';
 import {
@@ -136,6 +138,8 @@ import {
   GALECREST_ZONE,
 } from './content/galecrest';
 import { GATHER_NODES as GATHER_NODES_CONTENT } from './content/gather_nodes';
+import { GRAVEWYRM_SANCTUM_MOBS } from './content/gravewyrm_sanctum';
+import { GRAVEWYRM_SANCTUM_ITEMS } from './content/gravewyrm_sanctum_items';
 import {
   type GraveyardDef,
   LAST_KEEP_GRAVEYARD_ID,
@@ -147,6 +151,9 @@ import {
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import { HEALING_TRAINING_MOBS } from './content/healing_training';
 import { HOARD_ITEMS } from './content/hoard_loot';
+import { HOLLOW_CRYPT_MOBS } from './content/hollow_crypt';
+import { HOLLOW_CRYPT_ITEMS } from './content/hollow_crypt_items';
+import { HOLLOW_CRYPT_TRASH_MOBS } from './content/hollow_crypt_trash';
 import {
   IGNIVAR_RAID_LORE_NPCS,
   IGNIVAR_RAID_LORE_QUEST_ORDER,
@@ -225,6 +232,8 @@ import {
 } from './content/recipes';
 import { RIFT_ITEMS } from './content/rift/items';
 import { HOARD_MOBS, RIFT_MOBS } from './content/rift/mobs';
+import { SUNKEN_BASTION_MOBS } from './content/sunken_bastion';
+import { SUNKEN_BASTION_ITEMS } from './content/sunken_bastion_items';
 import {
   TEMPLE_CAMPS,
   TEMPLE_DUNGEON_DEFS,
@@ -240,6 +249,7 @@ import {
 import { WARLOCK_PET_MOBS } from './content/warlock_pets';
 import { WEEKLY_EMISSARY_NPC_DEF } from './content/weekly_quests';
 import { WILDHEART_DUNGEON_DEFS, WILDHEART_ITEMS, WILDHEART_MOBS } from './content/wildheart';
+import { WILDHEART_BASIN_ITEMS } from './content/wildheart_items';
 import {
   WILLOWFEN_CAMPS,
   WILLOWFEN_ITEMS,
@@ -419,6 +429,11 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   GALECREST_ITEMS,
   FARSHORE_ITEMS,
   WILDHEART_ITEMS,
+  HOLLOW_CRYPT_ITEMS,
+  SUNKEN_BASTION_ITEMS,
+  DROWNED_TEMPLE_ITEMS,
+  WILDHEART_BASIN_ITEMS,
+  GRAVEWYRM_SANCTUM_ITEMS,
   PROVING_SHORE_ITEMS,
   DUNGEON_KEEPSAKE_ITEMS,
   IGNIVAR_DROP_ITEMS,
@@ -451,6 +466,11 @@ export const MOBS: Record<string, MobTemplate> = {
   ...REALM_MOBS,
   ...DRAKELANDS_MOBS,
   ...WILDHEART_MOBS,
+  ...HOLLOW_CRYPT_MOBS,
+  ...HOLLOW_CRYPT_TRASH_MOBS,
+  ...SUNKEN_BASTION_MOBS,
+  ...DROWNED_TEMPLE_MOBS,
+  ...GRAVEWYRM_SANCTUM_MOBS,
   ...FROSTVEIL_MOBS,
   ...AMBERFALL_MOBS,
   ...WILLOWFEN_MOBS,

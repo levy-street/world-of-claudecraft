@@ -122,6 +122,8 @@ import {
   resetMechanicSpacing,
   tickMechanicSpacing,
 } from './mechanic_spacing';
+import { packBreathStagger } from './pack_cast_stagger';
+import { flierSightRadius, flierWaitingAloft, updateMobPatrol } from './patrol';
 import { playerDummyShedHp } from './practice_dummies';
 import {
   impairedZoneFuseMult,
@@ -133,6 +135,7 @@ import {
 } from './rift_escape_window';
 import { rallyFleeingAllies } from './social_aggro';
 import { isTrivialTo, retargetMob, tickForcedTarget } from './targeting';
+import { restoreCastHold } from './trash_kit/cast_hold';
 import { emitMobYell } from './yells';
 
 // This module ENFORCES the aggro ceiling and the wander ring; the numbers themselves live
@@ -407,6 +410,18 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   // leaked-mob safety net below must not re-hostile them. Ambush mobs damage
   // them through seeded threat; players heal them via the escort arm in
   // Sim.isFriendlyTo. Yumi-cat pattern, verbatim.
+  // An encounter's scripted entrance owns this mob (encounters/hollow_crypt:
+  // Morthen rising, the Knellwyrm flying in): inert and non-hostile, and the
+  // safety net below must not re-hostile it until the script hands it back.
+  if (mob.encounterHeld) {
+    mob.hostile = false;
+    mob.aiState = 'idle';
+    mob.inCombat = false;
+    mob.aggroTargetId = null;
+    clearThreat(mob);
+    return;
+  }
+
   if (isEscortNpcTemplate(mob.templateId)) {
     mob.hostile = false;
     mob.aiState = 'idle';
@@ -452,7 +467,11 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     return;
   }
 
-  if (!mob.hostile) mob.hostile = true;
+  // (A flying patrol waiting on the wing is the one exception: out of every
+  // ground attack's reach, it is nobody's target until it is pulled, the way
+  // the Knellwyrm's flight in reads. Set here, at the top of its own AI step,
+  // so every system reading the flag this tick sees one answer.)
+  mob.hostile = !flierWaitingAloft(ctx, mob);
 
   const isNythraxis = mob.templateId === NYTHRAXIS_BOSS_ID;
   const isIgnivar = mob.templateId === IGNIVAR_BOSS_ID;
@@ -593,7 +612,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
           4,
           Math.min(MAX_AGGRO_RADIUS, template.aggroRadius + (mob.level - e.level) * 1.5),
         );
-        radius *= ctx.delveDetectMult(e);
+        radius = flierSightRadius(mob, radius, template.aggroRadius) * ctx.delveDetectMult(e);
         if (hasEscapeStealth(e)) return;
         // stealthed rogues are harder to detect, relative to observer level
         if (e.auras.some((a) => a.kind === 'stealth'))
@@ -605,7 +624,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         }
       });
       if (detected) {
-        ctx.aggroMob(mob, detected, true);
+        // (A flier seen off its loop is a target from this tick.)
+        if (ctx.aggroMob(mob, detected, true)) mob.hostile = true;
         break;
       }
       // Dormant-until-pulled mobs (the downed forge mechs, and any hand-placed
@@ -614,6 +634,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       // A synthetic mob whose templateId does not resolve (perf-capture rigs)
       // has no template flag; tolerate that like the hardLeashRadius read does.
       if (template?.idleStationary || mob.idleStationary) break;
+      // A dungeon patrol walks its loop instead of wandering (mob/patrol.ts).
+      if (updateMobPatrol(ctx, mob)) break;
       mob.wanderTimer -= DT;
       // ONE idle sub-stream for the whole wander step, threaded through all three
       // draw sites below (the ambient stable horses do the same, mob/ambient.ts).
@@ -1398,13 +1420,17 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
   // castTime (the telegraph; it keeps meleeing), then the breath lands on
   // every living player inside `range` yards AND the `arcDeg` cone about the
   // mob's CURRENT facing, so sidestepping the cone during the bar is the
-  // counterplay. Cadence lazy-seeds on the first engaged tick (the first
+  // counterplay. (In a dungeon that sets DungeonDef.areaCastsPlant the mob is
+  // planted for the bar, so that facing is the one the bar began with.) Cadence lazy-seeds on the first engaged tick (the first
   // breath lands one full interval into the fight, the stomp/bigCast
   // telegraph convention) and is appended AFTER every existing driver so no
   // existing mechanic's rng draw moves.
   const breath = MOBS[mob.templateId]?.breathCone;
   if (breath && !riftMechanicSuppressed(mob, 'breathCone')) {
     if (mob.castingAbility === breath.castId) {
+      // A dungeon mob holds the spot and the facing its bar began with
+      // (mob/trash_kit/cast_hold.ts): the cone lands where it was drawn.
+      if (restoreCastHold(mob)) ctx.rebucket(mob);
       mob.castRemaining = Math.max(0, mob.castRemaining - DT);
       if (mob.castRemaining <= 0) {
         mob.castingAbility = null;
@@ -1449,7 +1475,9 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
       // open-world dragonkin only (no rift boss carries it), and the governed
       // table requires a MANDATORY per-entity timer field. If a rift boss
       // ever takes a breath cone, register breathTimer there first.
-      mob.breathTimer ??= breath.every;
+      // A pack's breaths alternate (mob/pack_cast_stagger.ts); a lone mob's
+      // first breath still lands one full interval in.
+      mob.breathTimer ??= breath.every + packBreathStagger(ctx, mob, breath.every);
       mob.breathTimer -= DT;
       if (mob.breathTimer <= 0 && mob.castingAbility === null) {
         mob.breathTimer = breath.every + breath.castTime;

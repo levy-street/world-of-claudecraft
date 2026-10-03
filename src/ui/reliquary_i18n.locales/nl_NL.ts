@@ -44,11 +44,9 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Het Wildhartbekken',
-    desc: 'Kenmerkende wapens van Zulgar en de Slagtandheer Beestenmeester.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroïsch: Het Wildhartbekken',
-    desc: 'Alleen heroïsch verkrijgbare epics van Zulgar, Stem van het Bekken.',
   },
   conquerors_nythraxis: {
     name: 'Nythraxis-raid',

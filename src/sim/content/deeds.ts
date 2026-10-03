@@ -3597,6 +3597,193 @@ export const DEEDS: Record<string, DeedDef> = {
       ],
     },
   },
+  // The Sunken Bastion rework (docs/design/dungeon-rework/sunken_bastion.md,
+  // "Deeds"): one per boss core and one for the showpiece, granted by the
+  // encounter modules (src/sim/encounters/sunken_bastion) to every player in
+  // the claim at the kill. Cosmetic only; appended at the END per the
+  // append-only contract.
+  dgn_olen_buttress: {
+    id: 'dgn_olen_buttress',
+    name: 'Hold the Wall',
+    desc: 'Defeat Knight-Commander Olen without him ever gaining Unbroken Oath.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_ossick_moored: {
+    id: 'dgn_ossick_moored',
+    name: 'Safe Harbor',
+    desc: 'Defeat Gaoler Ossick without anyone being dragged into the Drowning Pit.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_vael_beacon: {
+    id: 'dgn_vael_beacon',
+    name: "By the Beacon's Light",
+    desc: 'Defeat Vael the Fogbinder without bursting a single Fog Shade.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_turretback: {
+    id: 'dgn_turretback',
+    name: 'Eviction Notice',
+    desc: 'Defeat the Turretback Hermit before it withdraws into its shell.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  // The Drowned Temple rework (docs/design/dungeon-rework/drowned_temple.md,
+  // "Deeds"): one per boss core and one for the Mere Hydra, granted by the
+  // encounter modules (src/sim/encounters/drowned_temple) to every player in
+  // the claim at the kill. Cosmetic only; appended at the END per the
+  // append-only contract. Names are generic English phrases, checked at
+  // authoring (2026-09-30).
+  dgn_selthe_pitch: {
+    id: 'dgn_selthe_pitch',
+    name: 'Every Voice in Tune',
+    desc: 'Defeat Choirmother Selthe with every Chorus shared by two or more and no Solo touching anyone else.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_colossus_mirror: {
+    id: 'dgn_colossus_mirror',
+    name: 'Break the Glass',
+    desc: 'Defeat the Tideglass Colossus with every Reflection broken within 15 seconds of rising.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_ysolei_high_and_dry: {
+    id: 'dgn_ysolei_high_and_dry',
+    name: 'High and Dry',
+    desc: 'Defeat Ysolei, Avatar of the Drowned Moon, without anyone being struck by her Tidal Crash.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_mere_hydra: {
+    id: 'dgn_mere_hydra',
+    name: 'All Heads Down',
+    desc: 'Slay all three heads of the Mere Hydra within 10 seconds of each other.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  // The Hollow Crypt's fourth pass: the Knellwyrm finale Morthen's dying rite
+  // summons (src/sim/encounters/hollow_crypt/knellwyrm.ts), granted to every
+  // player in the claim at the kill. Cosmetic only; appended at the END per
+  // the append-only contract. Generic English idiom, checked 2026-09-30.
+  dgn_crypt_knellwyrm: {
+    id: 'dgn_crypt_knellwyrm',
+    name: 'Not a Hair Singed',
+    desc: 'Defeat the Knellwyrm without anyone being burned by its Pyre Strafe.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  // The Sunken Bastion's fifth pass: the Gaol Turnkey, the gaol's miniboss
+  // (src/sim/encounters/sunken_bastion/turnkey.ts), granted to every player in
+  // the claim at the kill. Cosmetic only; appended at the END per the
+  // append-only contract. Generic English idiom, checked 2026-09-30.
+  dgn_turnkey_cage: {
+    id: 'dgn_turnkey_cage',
+    name: 'No Cage Can Hold Us',
+    desc: 'Defeat the Gaol Turnkey without anyone being crushed in an Iron Cage.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  // The Wildheart Basin rework (docs/design/dungeon-rework/wildheart_basin.md
+  // section 9): one encounter deed per boss core and one for the Great
+  // Saurian, granted by the encounter modules (src/sim/encounters/
+  // wildheart_basin) to every player in the claim at the kill. Cosmetic only;
+  // appended at the END per the append-only contract. The design's "Divide and
+  // Conquer" is an exact World of Warcraft achievement name (the IP check,
+  // 2026-10-02), so it ships as "Kept at Bay"; the other three names returned
+  // no game use.
+  dgn_beastmaster_apart: {
+    id: 'dgn_beastmaster_apart',
+    name: 'Kept at Bay',
+    desc: 'Defeat the Fanglord Beastmaster and his Great Jaguar with Pack Bond up for less than 10 seconds in all.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_gorgebloom_clean: {
+    id: 'dgn_gorgebloom_clean',
+    name: 'Weed Control',
+    desc: 'Defeat the Gorgebloom without a single Thorn Sprout growing.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_zulgar_uncaught: {
+    id: 'dgn_zulgar_uncaught',
+    name: 'Never Caught',
+    desc: 'Defeat Zulgar, Voice of the Basin without anyone being Mauled.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_great_saurian: {
+    id: 'dgn_great_saurian',
+    name: 'Toppled Titan',
+    desc: 'Defeat the Great Saurian and its Howdah Hexcaller within 20 seconds of each other.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  // The Gravewyrm Sanctum rework (docs/design/dungeon-rework/gravewyrm_sanctum.md
+  // section 10): one deed per boss core and one for the Sledge Tusker, granted
+  // by the encounter modules (src/sim/encounters/gravewyrm_sanctum) to every
+  // player in the claim at the kill. Cosmetic only; appended at the END per the
+  // append-only contract. The five names are common English phrases with no
+  // distinctive game use (the IP check, 2026-10-03; "Cold Comfort" is also a
+  // Guild Wars 2 achievement title, an everyday idiom kept as shared
+  // vocabulary).
+  dgn_korgath_all_chains: {
+    id: 'dgn_korgath_all_chains',
+    name: 'A Kinder End',
+    desc: 'Defeat Korgath the Bound with all four of his chains broken.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_korgath_still_bound: {
+    id: 'dgn_korgath_still_bound',
+    name: 'The Lock Holds',
+    desc: 'Defeat Korgath the Bound on Heroic difficulty with at least two of his chains never broken.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_velkhar_cold: {
+    id: 'dgn_velkhar_cold',
+    name: 'Cold Comfort',
+    desc: 'Defeat Grand Necromancer Velkhar without a single Raised Bonewalker rising a second time.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_korzul_thin_ice: {
+    id: 'dgn_korzul_thin_ice',
+    name: 'Thin Ice',
+    desc: 'Defeat Korzul the Gravewyrm with at least twelve of the nineteen lake plates unbroken.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_sledge_tusker: {
+    id: 'dgn_sledge_tusker',
+    name: 'Cold Cargo',
+    desc: 'Defeat the Sledge Tusker without anyone being hit by its Trample.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

@@ -721,6 +721,21 @@ Exact-phrase and coined-token searches against the major game wikis.
 | Cocoon / Cocooned | Vysska's cast and the wrapped player's stun | KEEP. Single common English words. |
 | Draining Silk | her feeding's damage line | KEEP. No match. |
 
+### The Sunken Bastion rework (web-verified 2026-09-29)
+
+Exact-phrase and coined-token searches against the major game wikis, at authoring. The
+design-time verdicts live in `docs/design/dungeon-rework/sunken_bastion.md` section 10.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Mistweaver | REJECTED before shipping | The Mistweaver is a World of Warcraft Monk specialization. The trash mob keeps its id (`mistweaver`, never shown); its display name is Mist Chanter. |
+| Mist Chanter | the fog-warding trash caster | KEEP. No match; plain English. |
+| Oathwarden | REJECTED before shipping | Kyril Oathwarden is a Guild Wars boss: a coined surname. Olen's rare is the Knight-Commander's Longsword and his heroic epic the Drowned Commander's Breastplate. |
+| Keelhauler | REJECTED before shipping | Keelhauler Legplates (World of Warcraft item) and the Keelhauler pistol (Starfield). Ossick's weapon and striders take Gaolyard instead. |
+| Shacklebreaker | REJECTED before shipping | A crafted armor set in The Elder Scrolls Online. The gloves are Rusted Shackle Grips. |
+| Knight-Commander's Longsword, Drowned Commander's Breastplate, Gaoler's Chain Girdle, Rusted Shackle Grips, Drowned Warden's Mantle, Gaolyard Cudgel, Gaolyard Striders, Gaoler's Iron Key | the new loot | KEEP. No match for any full name; generic English compounds. |
+| Fogweaver | considered, not used | A World of Warcraft item prefix (Fogweaver Gauntlets). |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

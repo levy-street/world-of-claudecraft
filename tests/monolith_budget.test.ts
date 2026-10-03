@@ -537,7 +537,12 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18093,
+    // LOWERED to 18083 by the Sunken Bastion fifth pass: the chat line templates
+    // (chat_template_keys.ts) and the emote wheel defaults (emote_wheel_defaults.ts)
+    // moved out, buying the Iron Cage escape prompt's composition (hud/dungeon).
+    // LOWERED to 18082 when Ossick's chain alert joined it: both prompts now
+    // compose behind one DungeonPrompts member and one frame call (hud/dungeon).
+    ceiling: 18073,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -995,7 +1000,17 @@ const MONOLITHS: MonolithRow[] = [
     // RE-PINNED 12687 -> 12688 at the second release merge into the same branch,
     // after PR 3847 landed on the release (its renderer.ts wiring adds one line;
     // the release pin stays 12684): wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 12688,
+    // LOWERED 12688 -> 12687 with the Hollow Crypt rework: the gate object
+    // views (the Ignivar gates plus the in-dungeon gates) route through one
+    // plan and builder in src/render/gate_objects.ts. wc -l. Exact count.
+    // Lowered to 12673 when the frost- and fire-cone spellfx branches were
+    // folded into one (the Hollow Crypt drake paints its own breath).
+    // Lowered after extracting the per-view far-mesh decision (the moving
+    // holdout and the hysteresis latch) into src/render/far_lod_latch.ts.
+    // LOWERED 12663 -> 12661: the boot-attached static dressing list (lake
+    // flora, the Farshore strand, now the Sanctum's Seal Gate) moved into
+    // src/render/static_world_features.ts. wc -l. Exact count.
+    ceiling: 12661,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1207,7 +1222,9 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 11642,
+    // Lowered when the Stormbrass Foundry was parked: the Lift Warden's spawn
+    // call and its import left the coordinator (11636, measured).
+    ceiling: 11636,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1868,7 +1885,10 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 5354 and the
     // branch 5426; the two sides' additions compose to 5356 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 5356,
+    // LOWERED 5356 -> 5355 with the Hollow Crypt rework: the snapshot-head
+    // syncs (telegraphs, ferry gates, and the new dungeon gate mirror) moved
+    // into src/net/snapshot_head_syncs.ts. wc -l. Exact count.
+    ceiling: 5355,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -2181,7 +2201,14 @@ const MONOLITHS: MonolithRow[] = [
     // 2486 to 2513 into the row's slack: the berth gate bookkeeping (setColliderGateOpen,
     // gridIndex-ordered reopen, lazy wishes) needs the grid's private state, net of the
     // decoration collider builder moving out to decoration_collider.ts. wc -l. Exact count.
-    ceiling: 2513,
+    // LOWERED 2513 -> 2486 with the Hollow Crypt rework: the static interior
+    // collider table and interiorCollidersFor moved into interior_collider_sets.ts
+    // (which now also applies the per-slot dungeon gate view). wc -l. Exact count.
+    // LOWERED 2486 -> 2392 with the interior collider cell index: the push-out
+    // kernel (pushOut, resolveAgainst, passesOver, rotY, colliderTopAt) moved
+    // verbatim to collider_pushout.ts, the index itself is
+    // interior_collider_cells.ts. wc -l. Exact count.
+    ceiling: 2392,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {
@@ -2222,7 +2249,9 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again after the dais foundation-block stacking (and its
     // per-position hash) moved to src/render/dais_blocks_core.ts for the
     // Nythraxis flanking platforms (v0.42.2). Exact count, zero slack.
-    ceiling: 2420,
+    // Lowered 2420 -> 2411: the open-air field builders moved to
+    // src/render/open_air_fields.ts (the Drowned Temple joined that table).
+    ceiling: 2411,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

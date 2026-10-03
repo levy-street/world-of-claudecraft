@@ -19,6 +19,7 @@
 
 import { DUNGEONS, MOBS } from '../data';
 import { markChainPullInbound } from '../mob/chain_pull_transit';
+import { patrolFlierAloft } from '../mob/patrol';
 import type { SimContext } from '../sim_context';
 import { addThreat } from '../threat';
 import type { Entity } from '../types';
@@ -48,12 +49,15 @@ export function chainPullInstanceOnBossAggro(
       mob.id === boss.id ||
       mob.kind !== 'mob' ||
       mob.dead ||
-      !mob.hostile ||
+      // (a flying patrol on the wing is not hostile, and still comes with the rest)
+      (!mob.hostile && !patrolFlierAloft(mob)) ||
       mob.ownerId !== null ||
       mob.aiState !== 'idle'
     ) {
       continue;
     }
+    // A flier pulled off its loop is a target from this tick.
+    mob.hostile = true;
     mob.aiState = 'chase';
     mob.aggroTargetId = target.id;
     mob.inCombat = true;

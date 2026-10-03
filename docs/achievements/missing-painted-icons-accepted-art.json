@@ -8,14 +8,14 @@
     "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
   },
   "scope": {
-    "targetRows": 213,
+    "targetRows": 219,
     "rasterPaintings": 194,
     "abilities": 90,
     "items": 101,
     "deeds": 3,
-    "heroicWeaponResolvers": 19,
+    "heroicWeaponResolvers": 25,
     "originalInventoryRows": 197,
-    "supplementalCurrentHeadRows": 15
+    "supplementalCurrentHeadRows": 21
   },
   "contracts": {
     "ability": {
@@ -298,6 +298,17 @@
         "validationStatus": "implemented and focused tests passing"
       },
       {
+        "id": "heroic_falls_blessed_staff",
+        "baseId": "falls_blessed_staff",
+        "variant": "staff_c",
+        "bagIconUrl": "/ui/weapons/staff_c.jpg",
+        "portraitPath": "public/ui/weapons/staff_c.jpg",
+        "heldModelPath": "public/models/weapons/staff_c.glb",
+        "canonicalDisplayName": "Falls-Blessed Staff",
+        "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Falls-Blessed Staff; inherits base visual variant staff_c.",
+        "validationStatus": "implemented and focused tests passing"
+      },
+      {
         "id": "heroic_fang_of_korzul",
         "baseId": "fang_of_korzul",
         "variant": "dagger_c",
@@ -317,6 +328,17 @@
         "heldModelPath": "public/models/weapons/spear_a.glb",
         "canonicalDisplayName": "Fanglord's Beastspear",
         "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Fanglord's Beastspear; inherits base visual variant spear_a.",
+        "validationStatus": "implemented and focused tests passing"
+      },
+      {
+        "id": "heroic_gaolyard_cudgel",
+        "baseId": "gaolyard_cudgel",
+        "variant": "hammer_b",
+        "bagIconUrl": "/ui/weapons/hammer_b.jpg",
+        "portraitPath": "public/ui/weapons/hammer_b.jpg",
+        "heldModelPath": "public/models/weapons/hammer_b.glb",
+        "canonicalDisplayName": "Gaolyard Cudgel",
+        "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Gaolyard Cudgel; inherits base visual variant hammer_b.",
         "validationStatus": "implemented and focused tests passing"
       },
       {
@@ -353,6 +375,17 @@
         "validationStatus": "implemented and focused tests passing"
       },
       {
+        "id": "heroic_knight_commanders_longsword",
+        "baseId": "knight_commanders_longsword",
+        "variant": "sword_d",
+        "bagIconUrl": "/ui/weapons/sword_d.jpg",
+        "portraitPath": "public/ui/weapons/sword_d.jpg",
+        "heldModelPath": "public/models/weapons/sword_d.glb",
+        "canonicalDisplayName": "Knight-Commander's Longsword",
+        "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Knight-Commander's Longsword; inherits base visual variant sword_d.",
+        "validationStatus": "implemented and focused tests passing"
+      },
+      {
         "id": "heroic_maul_of_the_scourged_wilds",
         "baseId": "maul_of_the_scourged_wilds",
         "variant": "hammer_d",
@@ -372,6 +405,28 @@
         "heldModelPath": "public/models/weapons/adv_staff.glb",
         "canonicalDisplayName": "Nightfang's Greatstaff",
         "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Nightfang's Greatstaff; inherits base visual variant adv_staff.",
+        "validationStatus": "implemented and focused tests passing"
+      },
+      {
+        "id": "heroic_rimeweb_fang",
+        "baseId": "rimeweb_fang",
+        "variant": "dagger_c",
+        "bagIconUrl": "/ui/weapons/dagger_c.jpg",
+        "portraitPath": "public/ui/weapons/dagger_c.jpg",
+        "heldModelPath": "public/models/weapons/dagger_c.glb",
+        "canonicalDisplayName": "Rimeweb Fang",
+        "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Rimeweb Fang; inherits base visual variant dagger_c.",
+        "validationStatus": "implemented and focused tests passing"
+      },
+      {
+        "id": "heroic_sextons_spadehaft",
+        "baseId": "sextons_spadehaft",
+        "variant": "adv_axe_2handed",
+        "bagIconUrl": "/ui/weapons/adv_axe_2handed.jpg",
+        "portraitPath": "public/ui/weapons/adv_axe_2handed.jpg",
+        "heldModelPath": "public/models/weapons/adv_axe_2handed.glb",
+        "canonicalDisplayName": "Sexton's Spadehaft",
+        "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Sexton's Spadehaft; inherits base visual variant adv_axe_2handed.",
         "validationStatus": "implemented and focused tests passing"
       },
       {
@@ -405,6 +460,17 @@
         "heldModelPath": "public/models/weapons/purple_sword.glb",
         "canonicalDisplayName": "Thornpeak Wardblade",
         "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Thornpeak Wardblade; inherits base visual variant purple_sword.",
+        "validationStatus": "implemented and focused tests passing"
+      },
+      {
+        "id": "heroic_tideglass_shiv",
+        "baseId": "tideglass_shiv",
+        "variant": "dagger_c",
+        "bagIconUrl": "/ui/weapons/dagger_c.jpg",
+        "portraitPath": "public/ui/weapons/dagger_c.jpg",
+        "heldModelPath": "public/models/weapons/dagger_c.glb",
+        "canonicalDisplayName": "Tideglass Shiv",
+        "canonicalGameplayMeaningOrAcquisition": "Generated Heroic stat upgrade of Tideglass Shiv; inherits base visual variant dagger_c.",
         "validationStatus": "implemented and focused tests passing"
       },
       {

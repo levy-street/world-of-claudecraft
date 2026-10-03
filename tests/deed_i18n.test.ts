@@ -98,15 +98,29 @@ describe('deed_i18n English resolution', () => {
     // name and a desc, no title) at the fourth release/v0.44.0 base merge.
     // 319 with the Buried Hoards Coinsack catch (cmb_coinsack_caught: a name and a
     // desc, no title) at the 2026-09-28 merge into feature/buried-hoards.
-    expect(manifest.filter((row) => row.field === 'name').length).toBe(319);
+    // 323 with the Sunken Bastion rework's four encounter deeds (a name and a
+    // desc each, no title).
+    // 327 with the Drowned Temple rework's four (a name and a desc each).
+    // 329 with the Hollow Crypt's Knellwyrm deed and the Sunken Bastion's Gaol
+    // Turnkey deed (a name and a desc each).
+    // 333 with the Wildheart Basin rework's four (a name and a desc each).
+    // 338 with the Gravewyrm Sanctum rework's five (a name and a desc each).
+    expect(manifest.filter((row) => row.field === 'name').length).toBe(338);
     // 289 descs at the release/v0.43.0 merge: plus the eight world-quest deeds.
     // 296 with the seven faction standing deeds. 298 with the two Clue Scroll
-    // casket deeds.
-    expect(manifest.filter((row) => row.field === 'desc').length).toBe(300);
+    // casket deeds. 304 with the Sunken Bastion rework's four encounter deeds.
+    // 308 with the Drowned Temple rework's four. 310 with the Knellwyrm and
+    // the Gaol Turnkey deeds. 314 with the Wildheart Basin's four. 319 with
+    // the Gravewyrm Sanctum's five.
+    expect(manifest.filter((row) => row.field === 'desc').length).toBe(319);
     // 668 rows: 318 names + 299 descs + 51 titles (the three faction Champion
     // titles Riftwarden, Dawnkeeper and Forgemaster join the 47, then the
-    // Clue Scroll Treasure Hunter title); 670 with the Coinsack deed's name and desc.
-    expect(manifest.length).toBe(670);
+    // Clue Scroll Treasure Hunter title); 670 with the Coinsack deed's name and desc;
+    // 678 with the Sunken Bastion's four and 686 with the Drowned Temple's four
+    // (a name and a desc each); 690 with the Knellwyrm and Gaol Turnkey deeds;
+    // 698 with the Wildheart Basin's four; 708 with the Gravewyrm Sanctum's
+    // five.
+    expect(manifest.length).toBe(708);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(51);
     expect(manifest.filter((row) => row.id === 'hid_forgebreaker')).toEqual([
       { id: 'hid_forgebreaker', field: 'name', source: 'A Spring Unchained' },

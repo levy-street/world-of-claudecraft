@@ -136,9 +136,12 @@ describe('heroic boss adds swing at addDamageMultiplier', () => {
       // Fire-time mechanic scaling rides the add multiplier too.
       expect(add.mechanicDamageMult).toBe(tuning.addDamageMultiplier);
     }
-    // The summoner himself carries the Sanctum boss override (see
-    // damageMultiplierByMob), not the trash-wide multiplier.
-    expect(boss.mechanicDamageMult).toBe(tuning.damageMultiplierByMob?.grand_necromancer_velkhar);
+    // The summoner himself carries the Sanctum boss's own mechanic factor (his
+    // telegraphed Soulfire Trench and Shadow Volley), not the trash-wide one.
+    expect(boss.mechanicDamageMult).toBe(
+      tuning.mechanicDamageMultiplierByMob?.grand_necromancer_velkhar,
+    );
+    expect(boss.mechanicDamageMult).toBe(2.5);
     // Summoned adds are wave pressure, not extra bosses: halved to the 250
     // floor in 2026-07, then 40% softer again in v0.30 (the 150 floor), so
     // their multiplier sits well BELOW the trash-wide one despite the

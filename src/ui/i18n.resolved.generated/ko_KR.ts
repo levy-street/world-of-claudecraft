@@ -3132,6 +3132,12 @@ export const ko_KR: EnTranslations = {
         "kindlingOrb": "{duration}초 동안 곁에 잉걸불 구슬을 소환합니다. 적에게 주문을 시전할 때마다 구슬이 그 적에게 화염구를 발사하여 {damage}의 화염 피해를 입힙니다. 피해량은 주문력으로 증가합니다.",
         "pierce": "{duration}초 동안 자동 공격, 사격, 물리 능력(출혈 제외)이 적중하면 대상에게서 {reach}미터 이내의 가장 가까운 적도 공격하여 입힌 피해의 {share}%를 입힙니다.",
         "lantern": "{duration}초 동안 발밑에 등불을 놓습니다. 누구든 등불에서 {radius}미터 이내의 자신 또는 파티원에게 직접 치유를 하면, 불빛 안에서 가장 많이 다친 다른 파티원도 그 치유량의 {share}%만큼 치유됩니다.",
+        "shackle": "{range}미터 이내의 대상을 {duration}초 동안 사슬로 묶어 제자리에 고정합니다. 우두머리처럼 제어 효과에 면역인 생물은 대신 이동 속도가 {slow}% 감소하며, 감속에도 면역이면 효과가 없습니다.",
+        "spiritPack": "{duration}초 동안 영혼 재규어를 불러 곁에서 싸우게 합니다. 재규어는 대상에게 달려가 {every}초마다 물어뜯어 {min}~{max}의 물리 피해를 주며, 다른 적을 대상으로 지정하면 그 적에게로 옮겨 갑니다. 지정한 적이 없으면 {range}미터 내에서 당신과 가장 가까운 적을 공격합니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽에 비례해 증가하며, 불러낼 때 결정됩니다. {range}미터 내의 적대적 대상이 필요합니다.",
+        "seedburst": "{range}미터 내의 대상에게 씨앗을 심습니다. {delay}초 후 씨앗이 대상이 있는 곳(또는 죽은 곳)에서 터져 {radius}미터 내의 모든 적에게 {damage}의 자연 피해를 줍니다. 대상이 먼저 죽었다면 피해가 {bonus}% 증가합니다({empowered}). 피해량은 주문력에 비례해 증가하며, 심을 때 결정됩니다. 씨앗이 터지기 전에 당신이 죽으면 씨앗은 시듭니다.",
+        "tether": "{range}미터 내의 아군 플레이어와 {duration}초 동안 사슬로 연결됩니다. 그 아군의 생명력에 닿을 피해의 {share}%를 대신 당신이 받습니다. 당신이 죽으면 일찍 끝납니다. 자신이 아닌 아군 플레이어를 대상으로 지정해야 합니다.",
+        "harvest": "{duration}초 동안 당신으로부터 {radius}미터 내에서 적대적인 생물이 죽을 때마다 최대 생명력의 {pct}%({health})와 최대 마나의 {pct}%를 회복합니다.",
+        "quench": "{duration}초 내에 다음 {hits}번의 근접 또는 원거리 무기 적중이 {damage}의 냉기 피해를 추가로 입힙니다. 마지막 적중은 대상을 담금질하여 {slowDuration}초 동안 공격 속도를 {slow}% 늦춥니다. 효과가 끝나면 남은 적중은 사라집니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽에 비례해 증가합니다.",
         "heartNova": "열기를 모두 소모하여 화염 폭발을 일으켜 {radius}미터 이내의 모든 적에게 열기 1중첩당 {perHeat}의 화염 피해를 입히고({maxHeat}중첩일 때 {max}), 적중한 모든 생물을 도발합니다. 피해량은 전투력으로 증가합니다. 열기가 필요합니다."
       }
     },
@@ -3906,6 +3912,29 @@ export const ko_KR: EnTranslations = {
       }
     },
     "auraEffect": {
+      "wildheart": {
+        "packBond": "짝이 가까이 있는 동안 받는 피해가 {pct}% 감소합니다. 야수조련사와 재규어를 떼어 놓으면 유대가 끊어집니다.",
+        "packBondFury": "짝이 가까이 있는 동안 주는 피해가 {pct}% 증가합니다.",
+        "stalked": "거대 재규어가 당신을 사냥하며 도발을 무시합니다. 물 때마다 {min}~{max}의 물리 피해(영웅 난이도 {heroicMin}~{heroicMax})를 주고 출혈을 일으킵니다. 주인에게서 멀리 끌고 가세요.",
+        "waryStuns": "이미 기절을 한 번 받았습니다. 이 효과가 끝날 때까지 추가 기절은 통하지 않습니다.",
+        "waryRoots": "이미 속박을 한 번 받았습니다. 이 효과가 끝날 때까지 추가 속박은 통하지 않습니다.",
+        "warySlows": "이미 감속을 한 번 받았습니다. 이 효과가 끝날 때까지 추가 감속은 통하지 않습니다.",
+        "pollinated": "씨앗 꼬투리를 건드리면 즉시 가시 새싹이 자라납니다. 씨앗을 피하고 깨끗한 플레이어가 밟게 하세요. 아무도 건드리지 않은 꼬투리는 {seconds}초 뒤 싹이 틉니다(영웅 난이도에서는 {heroic}초 뒤 땅속으로 파고들어 가장 가까운 플레이어 곁에서 솟아납니다).",
+        "prey": "줄가르가 당신을 사냥합니다. 빛나는 태양 문양을 밟게 하면 {slow}% 느려집니다. 붙잡히면 물어뜯겨 {damage}의 피해(영웅 난이도 {heroic})를 입고 {stun}초 동안 쓰러집니다.",
+        "avatar": "이동 속도가 {pct}% 증가하고 사냥감을 쫓습니다. 감속과 속박은 통하며 기절 지속 시간은 절반이 됩니다.",
+        "vanished": "모습을 감추고 피해에 면역입니다. 곧 가장 먼 플레이어를 덮칩니다."
+      },
+      "sanctum": {
+        "lockbound": "받는 피해가 {pct}% 감소합니다: 아직 버티는 사슬 하나당 {per}%. 봉인 족쇄를 부수면 그 사슬이 떨어집니다.",
+        "enrage": "주는 피해가 {pct}% 증가합니다.",
+        "grasp": "녹은 물에 서 있어 주는 피해가 {pct}% 증가합니다. 녹은 물에서 죽으면 가라앉았다가 {seconds}초 후 다시 일어납니다. 차가운 얼음 위에서 죽여야 다시 일어나지 않습니다.",
+        "twiceWoken": "녹은 물에서 다시 일어나 주는 피해가 {pct}% 증가합니다.",
+        "doused": "발밑 얼음판이 깨져 담금질 물이 무덤의 지옥불을 꺼뜨렸습니다.",
+        "airborne": "공중에 있어 공격할 수 없습니다. 가장 많은 플레이어가 선 얼음판에 추락 강하로 내려앉아 {radius}야드 안의 모두에게 {min}~{max}의 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다.",
+        "wyrmsEye": "이 효과가 끝나면 코르줄이 당신이 선 얼음판 전체에 내리꽂는 불길을 쏟아붓습니다: 그 위의 모두에게 {min}~{max}의 피해(영웅 난이도 {heroicMin}~{heroicMax})를 주고, 얼음판에 금이 가거나 이미 금이 가 있었다면 부서집니다. 멀쩡한 얼음 위에서 파티와 떨어져 서십시오.",
+        "quenchWater": "열린 담금질 물속: 이동 속도가 {slow}% 감소하고 매초 {damage}의 피해(영웅 난이도 {heroic})로 불탑니다. 아무 얼음판이나 물가로 헤엄치십시오.",
+        "shardFlare": "심장 파편이 타오릅니다: 무덤 숨결이 {breath}초마다, 날개 돌풍이 {gale}초마다 옵니다."
+      },
       "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
       "varkhulSharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%). 부족한 플레이어 1명당 원 안의 플레이어를 포함한 공격대 전체가 최대 생명력의 {missingPenalty}%에 해당하는 피해를 추가로 받습니다.",
       "makersBrand": "{duration}초 동안 중첩당 발쿨에게 받는 피해가 {pct}% 증가합니다. 최대 {max}회 중첩됩니다. 탱커는 {swap}중첩에서 교대하세요.",
@@ -4028,6 +4057,16 @@ export const ko_KR: EnTranslations = {
         "riftGuard": "받는 피해가 {pct}% 감소합니다.",
         "sprint": "이동 속도가 {pct}% 증가합니다. 다른 이동 속도 증가 효과와 중첩되지 않습니다.",
         "brand": "받는 치유량이 {pct}% 감소합니다.",
+        "shackle": "사슬에 묶임: 이동할 수 없습니다.",
+        "shackleSlow": "사슬에 묶임: 이동 속도가 {pct}% 감소합니다.",
+        "spiritPack": "영혼 재규어가 곁에서 싸우며 {every}초마다 대상을 물어뜯어 {min}~{max}의 물리 피해를 줍니다.",
+        "seedburst": "탐식화의 씨앗입니다. 이 효과가 끝나면 터져 {radius}미터 내의 모든 적에게 {damage}의 자연 피해를 줍니다. 그 전에 이 적이 죽으면 피해가 {bonus}% 증가합니다({empowered}).",
+        "tether": "십장의 마지막 고리에 묶임: 당신의 생명력에 닿을 피해의 {pct}%를 당신을 묶은 자가 대신 받습니다.",
+        "tetherLink": "묶인 아군이 받을 피해의 {pct}%를 당신이 받습니다.",
+        "harvest": "당신으로부터 {radius}미터 내에서 적대적인 생물이 죽을 때마다 최대 생명력과 마나의 {pct}%를 회복합니다.",
+        "quench": "다음 {stacks}번의 무기 적중이 {damage}의 냉기 피해를 추가로 입힙니다. 마지막 적중은 대상의 공격 속도를 {slow}% 늦춥니다.",
+        "quenchOther": "다음 {stacks}번의 무기 적중이 냉기 피해를 추가로 입힙니다. 마지막 적중은 대상의 공격 속도를 {slow}% 늦춥니다.",
+        "quenched": "공격 속도가 {pct}% 감소합니다.",
         "forgeHeat": "열기: {stacks}/{max}. 대장장이 아버지의 담금질을 사용하면 열기를 모두 소모하며, 그 무기 화염 피해가 {pct}% 증가합니다.",
         "tempered": "근접 및 원거리 무기가 적중하면 {damage}의 화염 피해를 추가로 입힙니다(소모한 열기로 {pct}% 증가). 결정타마다 {killExtend}초 연장되며, 총 최대 {maxDuration}초입니다.",
         "temperedOther": "근접 및 원거리 무기가 적중하면 화염 피해를 추가로 입히며, 소모한 열기로 {pct}% 증가합니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽으로 증가합니다.",
@@ -5953,6 +5992,10 @@ export const ko_KR: EnTranslations = {
         "mist_surge": "안개 쇄도(주기적 광역 피해)",
         "summons_adds": "증원 소환",
         "lunar_tide": "달의 파도(주기적 광역 피해)",
+        "chorus_and_solo": "합창과 독창 (한 표식에는 모이고 다른 표식에서는 흩어지기)",
+        "tideglass_reflections": "조수유리 투영체 (서로의 거울상을 처치)",
+        "rising_tide": "밀물 (섬의 절반이 잠김, 마른 쪽으로 이동)",
+        "undertow": "역류 (모두를 끌어당김, 충돌 전에 벗어나기)",
         "enrage": "체력이 낮으면 격노",
         "shuddering_stomp": "전율의 발구르기(광역 기절)",
         "grave_inferno": "무덤의 지옥불(시전 화염 광역, 분산 유지)",
@@ -5978,6 +6021,9 @@ export const ko_KR: EnTranslations = {
         "deathless_court": "불사의 궁정(영웅 전용, 불사의 격노 이후 왕실 궁정이 일어남)",
         "bloodmane_rend": "블러드메인 렌드(출혈, 대상 교체 주의)",
         "tusk_sweep": "터스크 스윕(전방 휩쓸기)",
+        "grave_breath": "무덤 숨결 (전방 화염 원뿔, 덮은 얼음에 금이 감)",
+        "plate_floor": "깨지는 얼음 (불길이 호수 얼음판을 깨뜨려 가라앉힘, 드러난 물에 들어가지 말 것)",
+        "wyrm_flights": "비행 단계 (70%와 40%: 고룡의 눈은 멀쩡한 얼음 위로, 착지시킬 곳에 모일 것)",
         "ancestral_sap": "조상의 수액(아군 치유)",
         "call_of_the_hunt": "사냥의 부름(주변 아군 가속)",
         "thickhide_ward": "두꺼운 가죽 결계(주변 아군 보호막)",
@@ -6001,8 +6047,107 @@ export const ko_KR: EnTranslations = {
         "forgestorm": "대장간 폭풍(떨어지는 운석 원, 밖으로 이동)",
         "shared_pyre": "공유 화장단(집결 원, 피해 분담)",
         "anvils_decree": "모루의 칙령(공격대 전체 망치 강타 세 번, 치유로 버티기)",
-        "masters_assembly": "장인의 조립(대장간 광선 막기, 막는 사람 교대)"
+        "masters_assembly": "장인의 조립(대장간 광선 막기, 막는 사람 교대)",
+        "iron_cage": "강철 우리 (상호작용 키를 연타해 탈출, 아군은 창살을 부술 수 있음)",
+        "drowned_anchor": "익사의 닻 (희생자가 구덩이로 끌려가기 전에 사슬을 끊으세요)",
+        "shackle_pair": "쌍둥이 족쇄 (사슬로 묶인 두 플레이어는 붙어서 움직여야 함)",
+        "reaper_behind": "그림자 건너기 (플레이어 뒤에서 솟아오름, 낫의 궤적에서 벗어나세요)",
+        "pack_bond": "무리의 유대 (함께 있으면 피해 절반: 15야드 떼어 놓으세요)",
+        "stalk": "추적 (재규어가 표식 대상을 사냥하며 탱커는 노리지 않고, 혼자일 때는 당신을 노림: 끌고 다니며 감속, 속박, 기절시키세요)",
+        "shared_health": "생명력 공유 (하나의 생명력: 가장 안전한 쪽을 공격하세요)",
+        "heel_frenzied_bond": "돌아와! 및 광포한 유대 (재규어가 주인에게 도약, 유대 범위 20야드)",
+        "seed_rain": "씨앗 비 (깨끗한 플레이어가 싹트기 전에 씨앗을 밟으세요)",
+        "pollinate": "수분 (황금빛 플레이어는 씨앗을 피하세요, 즉시 싹이 틉니다)",
+        "vine_lash": "덩굴 채찍 (가시 통로에서 벗어나지 않으면 속박됩니다)",
+        "gorge": "포식 (방어 담당에게 강력한 물기와 독)",
+        "burrowing_seeds": "파고드는 씨앗과 꽃가루 구름 (6초 뒤 플레이어 곁에서 솟아나고, 황금빛이 퍼집니다)",
+        "spirit_of_the_hunt": "사냥의 영혼 (사냥감이 화신을 빛나는 태양 문양으로 끌고 가세요. 물어뜯긴 플레이어는 도망칠 시간을 얻습니다)",
+        "twin_prey_ambush": "두 사냥감과 매복 (사냥감 둘, 이후 가장 먼 플레이어를 덮칩니다)",
+        "seal_shackles": "봉인 족쇄(사슬을 하나 끊을 때마다 그가 받는 피해가 20% 늘고 공격 하나가 풀려남)",
+        "chain_strain": "사슬 당기기(사슬이 아직 남은 모든 기둥에서 물러서기)",
+        "korgath_stomp": "전율의 발구르기(그의 주변 고리 밖으로 나가기)",
+        "rerivet_last_link": "재리벳과 마지막 고리(사슬을 다시 박는 몰이막대장이를 차단, 사슬이 하나 남으면 10초마다 사슬 당기기)",
+        "waking_thaw": "깨어나는 해빙 (망자들이 해빙 웅덩이에서 기어 나옵니다)",
+        "unquenched_held": "봉인 또는 꺼지지 않음 (망자는 차가운 얼음 위에서 처치하고, 녹은 물에서는 절대 처치하지 마세요)",
+        "soulfire_trench": "영혼불 도랑 (영혼불 줄기, 이후 녹은 물 띠가 남습니다)",
+        "shadow_volley": "암흑 화살 세례 (모두에게 암흑 피해)",
+        "warm_hands_twice_woken": "따뜻한 손과 두 번 깨어남 (영웅 전용, 망자를 계속 움직이게 하세요. 다시 일어난 자는 더 강해집니다)"
       }
+    },
+    "bastionCage": {
+      "title": "강철 우리에 갇혔습니다!",
+      "promptKey": "{key} 키를 연타해 탈출하세요",
+      "promptNoKey": "상호작용 키를 연타해 탈출하세요",
+      "promptClick": "여기를 연속 클릭해 탈출하세요",
+      "promptTap": "여기를 연타해 탈출하세요",
+      "buttonAria": "강철 우리에서 탈출하기",
+      "progressAria": "탈출 진행도: {pct}"
+    },
+    "bastionChain": {
+      "anchoredTitle": "익사의 닻에 묶였다!",
+      "anchoredLine": "권양기가 구덩이로 끌고 가기 전에 파티가 사슬을 끊어야 합니다",
+      "allyTitle": "사슬을 끊어라!",
+      "allyLine": "{name} 님이 구덩이로 끌려가고 있습니다: 익사의 닻을 공격하세요",
+      "shackledTitle": "{name} 님과 족쇄로 묶임",
+      "shackledLine": "서로 {range}야드 이내에 머무르세요 (현재 {dist}야드)",
+      "strainedLine": "너무 멀어졌습니다! 사슬이 두 사람을 조입니다: {range}야드 이내로 모이세요",
+      "brokenAria": "사슬 파괴: {pct}",
+      "reachAria": "사슬 당김: {pct}",
+      "linksLeft": "남은 사슬 고리: {count}/{total}",
+      "linkRule": "닻을 칠 때마다 위력과 상관없이 고리가 하나씩 끊어진다",
+      "linksTarget": "사슬 고리 {count}/{total}",
+      "linkBroken": "고리 파괴!"
+    },
+    "wildheartAlert": {
+      "preyTitle": "당신이 사냥감입니다!",
+      "preyLine": "줄가르가 당신을 쫓습니다: 빛나는 태양 문양으로 끌고 가세요",
+      "preyWaitLine": "지금은 다른 사냥감을 쫓습니다: 대비하세요, 대상이 바뀝니다",
+      "stalkedTitle": "추적당함!",
+      "stalkedLine": "재규어가 당신을 사냥합니다: 주인에게서 멀리 끌고 가세요",
+      "pollinatedTitle": "수분됨!",
+      "pollinatedLine": "씨앗에서 떨어지세요: 닿으면 싹이 틉니다",
+      "bondTitle": "무리의 유대",
+      "bondLine": "함께 있으면 받는 피해가 절반입니다: 떼어 놓으세요",
+      "timeAria": "{seconds}초 남음"
+    },
+    "sanctumAlert": {
+      "quenchTitle": "담금질 물속이다!",
+      "quenchLine": "불타고 느려진다: 가장 가까운 얼음이나 물가로 헤엄쳐라",
+      "plungeTitle": "내리꽂는 불길!",
+      "plungeLine": "발밑 얼음판 전체가 곧 불탄다: 당장 벗어나라",
+      "descentTitle": "추락 강하!",
+      "descentLine": "바로 여기에 내려앉는다: 그림자에서 벗어나라",
+      "eyeTitle": "고룡의 눈이 당신을 노린다!",
+      "eyeLine": "표식이 끝나면 서 있는 얼음판이 불탄다: 멀쩡한 얼음 위에서 파티와 떨어져라",
+      "eyeCrackedLine": "금 간 얼음 위에 서 있다: 표식이 끝나기 전에 멀쩡한 얼음판으로 가라",
+      "flailTitle": "사슬 도리깨!",
+      "flailLine": "사슬이 그려진 선을 따라 내리친다: 선에서 벗어나라",
+      "chargeTitle": "문턱 돌진!",
+      "chargeLine": "선을 따라 돌진한다: 선에서 벗어나고 가장자리에서 멀어져라",
+      "trenchTitle": "영혼불 도랑!",
+      "trenchLine": "영혼불이 선을 가르고 녹은 물을 남긴다: 벗어나라",
+      "strainTitle": "사슬 당기기!",
+      "strainLine": "온전한 기둥이 곧 터진다: 기둥에서 멀어져라",
+      "infernoTitle": "무덤의 지옥불!",
+      "infernoLine": "파동마다 더 거세진다: 그의 사거리 밖으로 나가라",
+      "stompTitle": "전율의 발구르기!",
+      "stompLine": "발이 내려오기 전에 그에게서 멀어져라",
+      "breathTitle": "무덤 숨결!",
+      "breathLine": "숨결 부채꼴 안에 있다: 옆으로 빠져라",
+      "maulTitle": "망치 휘두르기!",
+      "maulLine": "앞에 있는 모든 것을 휩쓴다: 뒤로 돌아가라",
+      "tailTitle": "꼬리 휩쓸기!",
+      "tailLine": "그의 뒤에 서 있다: 꼬리가 오기 전에 벗어나라",
+      "meltwaterTitle": "녹은 물속",
+      "meltwaterLine": "당신의 뼈걸음이가 녹은 물에 서 있다: 차가운 얼음 위로 끌어내라",
+      "meltwaterTargetLine": "대상이 녹은 물에서 죽으면 다시 일어난다: 차가운 얼음 위까지 기다려라",
+      "crackedTitle": "금 간 얼음",
+      "crackedLine": "여기에 불이 닿으면 이 얼음판이 부서진다: 그의 불길을 여기서 돌려라",
+      "flightTitle": "코르줄이 날아오른다",
+      "flightLine": "멀쩡한 얼음 위에 모여 착지 지점을 고른 뒤 흩어져라",
+      "lockboundTitle": "자물쇠 속박",
+      "lockboundLine": "사슬 {chains}개가 버틴다: 받는 피해 {pct}% 감소. 봉인 족쇄를 부숴 벗겨내라.",
+      "timeAria": "{seconds}초 남음"
     },
     "cosmetics": {
       "title": "외형",
@@ -8184,8 +8329,8 @@ export const ko_KR: EnTranslations = {
       "hollowBody": "도굴당한 예배당 묘소로, 갓 죽은 자들이 안식하기를 거부하는 곳. 새 파티의 첫 진정한 시험대입니다.",
       "bastionBody": "습지에 삼켜진 침수된 요새로, 물에 빠진 수호자들과 차오르는 밀물 그 자체가 지키고 있습니다.",
       "templeBody": "습지 길에서 벗어난 곳에 가라앉은 신전으로, 호기심 많고 만반의 준비를 갖춘 이들을 위한 샛길입니다.",
-      "sanctumBody": "가시봉우리의 어두운 심장부로, 교단의 오랜 작업이 끔찍한 정점에 다다르는 곳.",
-      "wildheartBody": "따뜻한 비에 젖은 정글 칼데라에서 두 개의 높은 사냥길이 비취빛 세노테를 감싼다. 야수 소굴과 선조의 폐허를 지나 의식 피라미드에 올라 정상에서 누가 기다리는지 확인하라.",
+      "sanctumBody": "가시봉우리 높은 곳에 숨겨진 빙하. 한 마리 용이 얼음 속에 갇혀 있고, 교단은 훔친 영혼을 불태워 그 얼음을 녹이고 있다. 높은 고개에서 얼음 탑과 대장장이의 끊어진 사슬, 교단의 불길을 지나 빙하 발치의 얼어붙은 호수까지 내려간다.",
+      "wildheartBody": "가라앉은 우상 뒤에 숨겨진 정글 칼데라. 절벽에 둘러싸여 폭포 소리가 울려 퍼진다. 강 여울을 건너고, 사냥 단구와 폭포를 지나, 폐허가 된 식민지를 가로질러 거대한 석조 재규어 머리 아래의 계단식 성소로 올라가라.",
       "raidName": "최종 단계 공격대",
       "raidBody": "봉인된 왕실 문 너머에는 10인 시련이 기다립니다. 여러 단계로 이어지는 전투와, 공격대 전원이 함께 꺼뜨려야 하는 불사의 힘입니다. 입장할 자격을 스스로 얻은 뒤, 친구 아홉을 데려오세요.",
       "heroicTitle": "영웅 난이도",
@@ -12241,7 +12386,96 @@ export const ko_KR: EnTranslations = {
       "hoard_cast_screech": "귀를 찢는 비명",
       "hoard_cast_mimic_bite": "탐욕스러운 물기",
       "hoard_cast_mimic_leap": "짓누르는 도약",
-      "hoard_cast_coin_spit": "저주받은 금화"
+      "hoard_cast_coin_spit": "저주받은 금화",
+      "crypt_grave_bolt": "무덤 화살",
+      "crypt_raise_bones": "뼈 일으키기",
+      "crypt_murder_call": "까마귀떼 부름",
+      "crypt_stone_shriek": "돌의 비명",
+      "crypt_grave_cleave": "무덤 가르기",
+      "crypt_barrowflame_breath": "무덤불꽃 숨결",
+      "crypt_tail_lash": "꼬리 채찍",
+      "crypt_wing_gust": "날개 돌풍",
+      "crypt_morthen_rite_wakes": "의식의 각성",
+      "crypt_morthen_rise": "무덤부름의 승천",
+      "crypt_morthen_proclaim": "무덤의 선포",
+      "crypt_morthen_descend": "강림",
+      "crypt_knellwyrm_arrive": "하늘에서 강하",
+      "crypt_knellwyrm_pyre_strafe": "화장의 강습",
+      "crypt_knellwyrm_strafe_run": "강습 비행",
+      "crypt_knellwyrm_dread_bellow": "공포의 포효",
+      "bastion_brine_mend": "소금물 치유",
+      "bastion_fog_ward": "안개 보호막",
+      "bastion_halberd_sweep": "미늘창 휩쓸기",
+      "bastion_piercing_bolt": "관통 화살",
+      "bastion_claw_sweep": "집게 휩쓸기",
+      "bastion_shell_slam": "껍질 내려찍기",
+      "bastion_oathbound_charge": "맹세의 돌진",
+      "bastion_gaolers_cudgel": "간수의 곤봉",
+      "bastion_mist_surge": "안개 해일",
+      "bastion_drowning_hymn": "익사의 성가",
+      "bastion_iron_cage": "강철 우리",
+      "bastion_drowned_anchor_cast": "익사의 닻",
+      "bastion_shackle_pair": "쌍둥이 족쇄",
+      "bastion_shadowstep": "그림자 건너기",
+      "bastion_reaping_scythe": "수확의 낫",
+      "bastion_veil_rise": "안개 장막",
+      "temple_lullaby": "자장가",
+      "temple_call_the_tide": "조수의 부름",
+      "temple_static_coil": "정전기 똬리",
+      "temple_snapper_snap": "물어뜯기",
+      "temple_trident_sweep": "삼지창 휩쓸기",
+      "temple_sea_song": "바다의 노래",
+      "temple_tidal_slap": "조수 후려치기",
+      "temple_tide_breath": "얼어붙는 숨결",
+      "temple_moonlight_lance": "달빛 창",
+      "temple_prism_flare": "프리즘 섬광",
+      "temple_resonant_slam": "공명의 강타",
+      "temple_undertow": "역류",
+      "temple_lunar_tide": "달의 조수",
+      "temple_skewering_trident": "꿰뚫는 삼지창",
+      "temple_pale_mending": "창백한 치유",
+      "temple_glimmer_venom": "반짝이는 독",
+      "temple_pearl_slam": "진주 강타",
+      "temple_lightning_spit": "번개 침",
+      "temple_crushing_torrent": "짓누르는 급류",
+      "temple_hydra_tsunami": "해일",
+      "temple_ysolei_call": "달의 자손 부르기",
+      "temple_ysolei_wrath": "익사한 분노",
+      "wildheart_ancestral_sap": "선조의 수액",
+      "wildheart_plant_totem": "토템 심기",
+      "wildheart_entangling_lash": "휘감는 채찍",
+      "wildheart_saurian_tail_swipe": "꼬리 휩쓸기",
+      "wildheart_saurian_stomp": "대지를 뒤흔드는 발구르기",
+      "wildheart_beast_pit_quake": "야수 구덩이 진동",
+      "wildheart_jaguar_heel": "돌아와!",
+      "wildheart_gorgebloom_seed_rain": "씨앗 비",
+      "wildheart_gorgebloom_vine_lash": "덩굴 채찍",
+      "wildheart_gorgebloom_gorge": "포식",
+      "wildheart_zulgar_pulse": "야생심장 파동",
+      "wildheart_zulgar_spirit_hunt": "사냥의 영혼",
+      "sanctum_cinder_breath": "잿불 숨결",
+      "sanctum_warming_rite": "온기의 의식",
+      "sanctum_goad": "몰아세우기",
+      "sanctum_plant_brazier": "영혼 화로 설치",
+      "sanctum_ice_block_toss": "얼음덩이 던지기",
+      "sanctum_tusker_tusk_sweep": "엄니 휩쓸기",
+      "sanctum_tusker_trample": "짓밟기",
+      "sanctum_korgath_maul_arc": "대망치 호격",
+      "sanctum_korgath_chain_flail": "사슬 채찍",
+      "sanctum_korgath_threshold_charge": "문턱 돌진",
+      "sanctum_korgath_foremans_bellow": "감독관의 포효",
+      "sanctum_korgath_strain": "사슬 당기기",
+      "sanctum_korgath_stomp": "전율의 발구르기",
+      "sanctum_goadsmith_rerivet": "재리벳",
+      "sanctum_velkhar_soulfire_trench": "영혼불 도랑",
+      "sanctum_velkhar_shadow_volley": "암흑 화살 세례",
+      "sanctum_korzul_break_free": "얼음 깨기",
+      "sanctum_korzul_grave_breath": "무덤 숨결",
+      "sanctum_korzul_tail_sweep": "꼬리 휩쓸기",
+      "sanctum_korzul_grave_inferno": "무덤 지옥불",
+      "sanctum_korzul_wing_gale": "날개 돌풍",
+      "sanctum_korzul_plunging_fire": "쏟아지는 불길",
+      "sanctum_korzul_crashing_descent": "추락 강하"
     }
   },
   "questUi": {
@@ -18451,6 +18685,162 @@ export const ko_KR: EnTranslations = {
       "vanguard_warstaff": {
         "name": "선봉대의 전투지팡이"
       },
+      "gravedirt_treads": {
+        "name": "무덤흙 장화"
+      },
+      "bellrope_girdle": {
+        "name": "종줄 허리띠"
+      },
+      "sextons_spadehaft": {
+        "name": "성구지기의 삽자루"
+      },
+      "rimesilk_mantle": {
+        "name": "서리비단 어깨망토"
+      },
+      "bonechill_carapace_vest": {
+        "name": "뼈서리 갑각 조끼"
+      },
+      "rimeweb_hunters_leggings": {
+        "name": "서리거미줄 사냥꾼 다리보호구"
+      },
+      "rimeweb_fang": {
+        "name": "서리거미줄 송곳니"
+      },
+      "cantors_cassock": {
+        "name": "성가대장의 사제복"
+      },
+      "choirward_leggings": {
+        "name": "성가수호 다리보호구"
+      },
+      "choristers_gloves": {
+        "name": "성가대원의 장갑"
+      },
+      "cantors_hymnal": {
+        "name": "성가대장의 찬송가집"
+      },
+      "gravecallers_vestments": {
+        "name": "무덤부름의 제의"
+      },
+      "unquiet_stalkers_hood": {
+        "name": "불안한 추적자의 두건"
+      },
+      "sextons_burial_spade": {
+        "name": "성구지기의 매장삽"
+      },
+      "rimesilk_hood": {
+        "name": "서리비단 두건"
+      },
+      "knight_commanders_longsword": {
+        "name": "기사단장의 장검"
+      },
+      "gaolers_chain_girdle": {
+        "name": "간수의 사슬 허리띠"
+      },
+      "rusted_shackle_grips": {
+        "name": "녹슨 족쇄 장갑"
+      },
+      "drowned_wardens_mantle": {
+        "name": "익사한 감시자의 망토"
+      },
+      "gaolyard_cudgel": {
+        "name": "감옥 뜰의 곤봉"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "익사한 지휘관의 흉갑"
+      },
+      "gaolyard_striders": {
+        "name": "감옥 뜰의 장화"
+      },
+      "jailers_iron_gauntlets": {
+        "name": "간수의 강철 건틀릿"
+      },
+      "turnkeys_keyring_belt": {
+        "name": "옥지기의 열쇠고리 허리띠"
+      },
+      "turnkeys_lantern_cowl": {
+        "name": "옥지기의 등불 두건"
+      },
+      "conchplate_girdle": {
+        "name": "소라판 허리띠"
+      },
+      "pale_chorus_leggings": {
+        "name": "창백한 합창 다리보호구"
+      },
+      "refrain_silk_gloves": {
+        "name": "후렴 비단 장갑"
+      },
+      "chorus_conch": {
+        "name": "합창의 소라고둥"
+      },
+      "tideglass_pauldrons": {
+        "name": "조수유리 어깨보호구"
+      },
+      "moonburn_treads": {
+        "name": "달그을림 신발"
+      },
+      "prism_etched_cowl": {
+        "name": "프리즘 새김 두건"
+      },
+      "tideglass_shiv": {
+        "name": "조수유리 단도"
+      },
+      "pale_chorus_vestment": {
+        "name": "창백한 합창 제의"
+      },
+      "tideglass_warmaul": {
+        "name": "조수유리 전투망치"
+      },
+      "beastpit_warbelt": {
+        "name": "야수 구덩이 전투 허리띠"
+      },
+      "jaguar_hide_jerkin": {
+        "name": "재규어 가죽 조끼"
+      },
+      "hexbone_handwraps": {
+        "name": "저주뼈 손싸개"
+      },
+      "rootbound_sabatons": {
+        "name": "뿌리 얽힌 철장화"
+      },
+      "pollen_dusted_leggings": {
+        "name": "꽃가루 묻은 다리보호구"
+      },
+      "bloomsilk_cowl": {
+        "name": "꽃비단 두건"
+      },
+      "falls_blessed_staff": {
+        "name": "폭포의 축복을 받은 지팡이"
+      },
+      "fanglords_hide_mantle": {
+        "name": "송곳니 군주의 가죽 어깨걸이"
+      },
+      "thornroot_greathelm": {
+        "name": "가시관 대투구"
+      },
+      "foremans_grips": {
+        "name": "십장의 장갑"
+      },
+      "serac_stride_boots": {
+        "name": "빙탑 걸음 장화"
+      },
+      "seal_rune_mantle": {
+        "name": "봉인 룬 어깨망토"
+      },
+      "thawbound_legguards": {
+        "name": "해빙 족쇄 다리보호구"
+      },
+      "pyre_tenders_hood": {
+        "name": "화장터지기의 두건"
+      },
+      "meltwater_cord": {
+        "name": "녹은 물 허리끈"
+      },
+      "hammer_of_the_open_lock": {
+        "name": "열린 자물쇠의 망치"
+      },
+      "vestments_of_the_waking_rite": {
+        "name": "깨움 의식의 예복"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -19306,6 +19696,24 @@ export const ko_KR: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "도가니의 심장"
       },
+      "gaolers_iron_key": {
+        "name": "간수의 쇠열쇠"
+      },
+      "fanglords_whistle": {
+        "name": "송곳니 군주의 호루라기"
+      },
+      "gorgebloom_seedpod": {
+        "name": "탐식화 씨앗꼬투리"
+      },
+      "foremans_last_link": {
+        "name": "십장의 마지막 고리"
+      },
+      "phial_of_the_tithe": {
+        "name": "십일조의 약병"
+      },
+      "quenchwater_flask": {
+        "name": "담금질 물 플라스크"
+      },
       "rift_watchers_band": {
         "name": "균열 감시자의 반지"
       },
@@ -19557,6 +19965,69 @@ export const ko_KR: EnTranslations = {
       "morthen": {
         "name": "무덤부름 모르덴"
       },
+      "ossuary_sentinel": {
+        "name": "납골당 파수병"
+      },
+      "hollow_gravedigger": {
+        "name": "공허의 무덤파기꾼"
+      },
+      "rime_egg_sac": {
+        "name": "서리 알주머니"
+      },
+      "rimeweb_hatchling": {
+        "name": "서리거미줄 새끼거미"
+      },
+      "rimeweb_spinner": {
+        "name": "서리거미줄 실잣는거미"
+      },
+      "candlewright_acolyte": {
+        "name": "초장이 수행사제"
+      },
+      "hollow_chorister": {
+        "name": "공허의 성가대원"
+      },
+      "bound_soul": {
+        "name": "속박된 영혼"
+      },
+      "rimeweb": {
+        "name": "림웹"
+      },
+      "cantor_ilvane": {
+        "name": "성가대장 일베인"
+      },
+      "crypt_ossuary_warrior": {
+        "name": "납골당 전사"
+      },
+      "crypt_gravecaller_adept": {
+        "name": "무덤부름 수련생"
+      },
+      "crypt_ossuary_cutthroat": {
+        "name": "납골당 멱따개"
+      },
+      "crypt_gravecaller_necromancer": {
+        "name": "무덤부름 강령술사"
+      },
+      "crypt_bone_minion": {
+        "name": "뼈 하수인"
+      },
+      "crypt_bone_brute": {
+        "name": "뼈 야수병"
+      },
+      "crypt_chapel_gargoyle": {
+        "name": "예배당 가고일"
+      },
+      "crypt_crow_caller": {
+        "name": "까마귀 부르미"
+      },
+      "crypt_carrion_crow": {
+        "name": "썩은고기 까마귀"
+      },
+      "crypt_ossuary_drake": {
+        "name": "납골당 뼈드레이크"
+      },
+      "crypt_knellwyrm": {
+        "name": "조종룡"
+      },
       "bastion_revenant": {
         "name": "요새 망령"
       },
@@ -19571,6 +20042,102 @@ export const ko_KR: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "안개엮는자 바엘"
+      },
+      "drowned_watchman": {
+        "name": "익사한 파수꾼"
+      },
+      "fogbound_arbalest": {
+        "name": "안개에 묶인 쇠뇌병"
+      },
+      "barnacle_crawler": {
+        "name": "따개비 게"
+      },
+      "bastion_warhound": {
+        "name": "요새 전투견"
+      },
+      "mistweaver": {
+        "name": "안개 영창자"
+      },
+      "drowned_sergeant": {
+        "name": "익사한 부사관"
+      },
+      "shackled_prisoner": {
+        "name": "족쇄 찬 죄수"
+      },
+      "gaol_turnkey": {
+        "name": "감옥 열쇠지기"
+      },
+      "turretback_hermit": {
+        "name": "탑을 진 소라게"
+      },
+      "vael_fog_shade": {
+        "name": "안개엮는자 바엘"
+      },
+      "gaoler_ossick": {
+        "name": "간수 오시크"
+      },
+      "bastion_gaol_cage": {
+        "name": "강철 우리"
+      },
+      "bastion_drowned_anchor": {
+        "name": "익사의 닻"
+      },
+      "lagoon_snapper": {
+        "name": "석호 늑대거북"
+      },
+      "lagoon_eel": {
+        "name": "석호 뱀장어"
+      },
+      "moonlit_siren": {
+        "name": "달빛 세이렌"
+      },
+      "tidewisp": {
+        "name": "조수 정령"
+      },
+      "drowned_pilgrim": {
+        "name": "익사한 순례자"
+      },
+      "mere_hydra_head_left": {
+        "name": "호수 히드라"
+      },
+      "mere_hydra_head_center": {
+        "name": "호수 히드라"
+      },
+      "mere_hydra_head_right": {
+        "name": "호수 히드라"
+      },
+      "tideglass_colossus": {
+        "name": "조수유리 거상"
+      },
+      "tideglass_reflection": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_warrior": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_paladin": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_hunter": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_rogue": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_priest": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_shaman": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_mage": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_warlock": {
+        "name": "조수유리 투영체"
+      },
+      "tideglass_reflection_druid": {
+        "name": "조수유리 투영체"
       },
       "sanctum_boneguard": {
         "name": "성소 뼈수호자"
@@ -20100,8 +20667,74 @@ export const ko_KR: EnTranslations = {
       "wildheart_beastmaster": {
         "name": "송곳니 군주 야수조련사"
       },
+      "sunbone_totem_binder": {
+        "name": "태양뼈 토템 결속자"
+      },
+      "sunbone_totem": {
+        "name": "태양뼈 토템"
+      },
+      "basin_raptor": {
+        "name": "분지 랩터"
+      },
+      "spore_toad": {
+        "name": "포자 두꺼비"
+      },
+      "vine_lasher": {
+        "name": "엉킨덩굴 채찍꾼"
+      },
+      "great_saurian": {
+        "name": "거대 용각수"
+      },
+      "howdah_hexcaller": {
+        "name": "가마 사술사"
+      },
+      "fanglord_jaguar": {
+        "name": "송곳니 군주의 거대 재규어"
+      },
+      "the_gorgebloom": {
+        "name": "탐식화"
+      },
       "wildheart_high_priest": {
         "name": "분지의 목소리 줄가르"
+      },
+      "broodsworn_thawcaller": {
+        "name": "용서약단 해빙술사"
+      },
+      "broodsworn_goadsmith": {
+        "name": "용서약단 몰이막대장이"
+      },
+      "broodsworn_pyre_tender": {
+        "name": "용서약단 장작불지기"
+      },
+      "soul_brazier": {
+        "name": "영혼 화로"
+      },
+      "rime_whelp": {
+        "name": "서리 새끼용"
+      },
+      "ogre_sledge_hauler": {
+        "name": "썰매 끄는 오우거"
+      },
+      "glacier_splinter": {
+        "name": "빙하 파편"
+      },
+      "sledge_tusker": {
+        "name": "썰매 끄는 거대엄니"
+      },
+      "sanctum_shackle_hammer": {
+        "name": "망치 족쇄"
+      },
+      "sanctum_shackle_tongs": {
+        "name": "집게 족쇄"
+      },
+      "sanctum_shackle_anvil": {
+        "name": "모루 족쇄"
+      },
+      "sanctum_shackle_bellows": {
+        "name": "풀무 족쇄"
+      },
+      "thorn_sprout": {
+        "name": "가시 새싹"
       },
       "ironvein_foreman": {
         "name": "철맥 감독관"
@@ -23710,7 +24343,7 @@ export const ko_KR: EnTranslations = {
       },
       "wildheart_basin": {
         "name": "야생심장 분지",
-        "enterText": "따뜻한 비가 오래된 돌 위에서 치익 소리를 냅니다. 야생심장 분지가 눈앞에 펼쳐집니다.",
+        "enterText": "우상의 아가리를 지나자 분지 높이 걸린 바위 턱이 나타난다. 폭포가 절벽 가장자리에서 쏟아져 내리고, 저 아래에서는 무언가 거대한 것이 여울을 건너고 있다.",
         "leaveText": "돌송곳니 아래를 지나 팜리치의 햇살 속으로 돌아갑니다."
       },
       "the_last_keep": {

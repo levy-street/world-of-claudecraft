@@ -2336,21 +2336,27 @@ export const ZONE3_OBJECTS: GroundObjectDef[] = [
   {
     itemId: 'gravewyrm_sigil',
     name: 'Gravewyrm Sigil',
+    // Laid around the Smith's Seal Gate (src/sim/sanctum_seal_gate.ts): three
+    // moved into the gate plaza when the gate's pylons and tunnel were built
+    // over their old spots (-3, 857), (3, 861) and (8, 866).
     positions: [
       { x: -8, z: 852 },
-      { x: -3, z: 857 },
-      { x: 3, z: 861 },
-      { x: 8, z: 866 },
+      { x: -4.5, z: 855 },
+      { x: 3, z: 854 },
+      { x: 8.8, z: 846 },
     ],
   },
   {
     itemId: 'sanctum_key_shard',
     name: 'Sanctum Key Shard',
+    // "Scattered in the gate plaza": the forecourt in front of the Seal Gate,
+    // moved there from (-6, 872), (-2, 876), (2, 873) and (6, 878), which now
+    // lie inside the gate tunnel (src/sim/sanctum_seal_gate.ts).
     positions: [
-      { x: -6, z: 872 },
-      { x: -2, z: 876 },
-      { x: 2, z: 873 },
-      { x: 6, z: 878 },
+      { x: -6.5, z: 846.5 },
+      { x: -2.8, z: 849 },
+      { x: 2.8, z: 843.5 },
+      { x: 6.8, z: 851.5 },
     ],
   },
   {

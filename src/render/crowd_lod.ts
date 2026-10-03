@@ -178,7 +178,18 @@ export interface CharacterLodBands {
   actionableStaticRangeSq: number;
   midCadence: number;
   farCadence: number;
+  /**
+   * The far-band range multiplier actually applied, carried frame to frame in
+   * the caller-owned plan: it follows `farAnimRangeScale` at no more than
+   * FAR_SCALE_SLEW_PER_FRAME per call, so budget-pressure noise cannot swing
+   * the frozen-mesh edge back and forth under a standing creature (the far-LOD
+   * flicker, far_lod_latch_core.ts). Absent on a fresh plan, which snaps.
+   */
+  appliedFarScale?: number;
 }
+
+/** Most the applied far-band multiplier moves per frame (1.3 to 1 in ~75 frames). */
+export const FAR_SCALE_SLEW_PER_FRAME = 0.004;
 
 /**
  * Build the frame's band plan from the crowd signal and the tier/pressure scale.
@@ -228,7 +239,14 @@ export function characterLodBandsInto(
 ): CharacterLodBands {
   const crowdSq = crowdLodScaleSq(visibleRigs);
   const lodRangeSq = baseLodRangeSq * crowdSq;
-  const farScale = farAnimRangeScale(tierFarScale, visibleRigs, pressure);
+  const target = farAnimRangeScale(tierFarScale, visibleRigs, pressure);
+  const prev = out.appliedFarScale;
+  const farScale =
+    prev === undefined
+      ? target
+      : prev +
+        Math.max(-FAR_SCALE_SLEW_PER_FRAME, Math.min(FAR_SCALE_SLEW_PER_FRAME, target - prev));
+  out.appliedFarScale = farScale;
   const staticRangeSq = lodRangeSq * farScale * farScale;
   out.shadowRangeSq = baseShadowRangeSq * crowdSq;
   out.lodRangeSq = lodRangeSq;

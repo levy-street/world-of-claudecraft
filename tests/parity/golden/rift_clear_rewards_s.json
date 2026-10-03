@@ -721,7 +721,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1054,
-      "state": "fae2f7b1",
+      "state": "4c1e7402",
       "events": "e217e632",
       "rng": {
         "draws": 344,
@@ -732,7 +732,7 @@
       "tick": 67,
       "time": 3.35,
       "nextId": 1054,
-      "state": "e360a1b4",
+      "state": "5e15b715",
       "events": "741638a5",
       "rng": {
         "draws": 398,
@@ -945,7 +945,7 @@
             "items": [
               {
                 "count": 1,
-                "itemId": "gravewyrm_claws"
+                "itemId": "gaolyard_striders"
               },
               {
                 "count": 1,
@@ -1002,7 +1002,7 @@
       "tick": 67,
       "time": 3.35,
       "nextId": 1054,
-      "state": "e360a1b4",
+      "state": "5e15b715",
       "events": "741638a5",
       "rng": {
         "draws": 398,
@@ -1215,7 +1215,7 @@
             "items": [
               {
                 "count": 1,
-                "itemId": "gravewyrm_claws"
+                "itemId": "gaolyard_striders"
               },
               {
                 "count": 1,

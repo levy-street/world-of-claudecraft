@@ -17,6 +17,9 @@ export interface PooledCharacterVisual extends PoolableVisual {
   setEntityColor(color: number): void;
   setFarBakeGate(gate: FarBakeGate | null): void;
   clearElementResponse?(): void;
+  /** Forget per-entity presentation state (a glow pulse, a turn in progress,
+   *  an entrance already played) so the next entity starts clean. */
+  resetForReuse?(): void;
 }
 
 /** What the renderer supplies, read at call time (the gate is a renderer
@@ -54,6 +57,7 @@ export class PooledVisualLifecycle<V extends PooledCharacterVisual> {
     if (!visual) return null;
     resetPooledRoot(visual.root, true);
     visual.clearElementResponse?.();
+    visual.resetForReuse?.();
     visual.setFar(false);
     visual.setGhost(false);
     // Re-tint BEFORE the gate goes in: a tint is a uniform on programs the
@@ -74,6 +78,7 @@ export class PooledVisualLifecycle<V extends PooledCharacterVisual> {
   store(key: string, visual: V): void {
     resetPooledRoot(visual.root, false);
     visual.clearElementResponse?.();
+    visual.resetForReuse?.();
     this.pool.store(key, visual, this.host.maxPooled());
   }
 }

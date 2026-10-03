@@ -2793,7 +2793,7 @@ function mobLocomotion(): Scenario {
     name: 'mob_locomotion',
     coverage: [
       'attack arm aoePulse rng.range(pulse.min,pulse.max) + spellfx (mogger Ground Pound)',
-      'attack arm War Stomp rng.range(stomp.min,stomp.max) + stomp_stun aura (korgath)',
+      'attack arm War Stomp rng.range(stomp.min,stomp.max) + stomp_stun aura (ossuary_sentinel: the Korgath Stomp moved into his encounter)',
       'attack arm Banshee terrify rng.range(-PI,PI) fear facing + fear_incap aura on the non-tank bystander; the aggro target is exempt (sister_nhalia)',
       'idle arm wander draws (range(0,2PI) heading + range(2,9) radius -> groundPos wanderTarget)',
       'evade arm arrival -> resetEvadingMob (rng.range(2,8), full-heal, clearThreat, telegraph re-arm)',
@@ -2849,8 +2849,8 @@ function mobLocomotion(): Scenario {
       rec.notes.pulserId = pulser.id;
       rec.snapshot('aoe-pulse');
 
-      // War Stomp: draws rng.range(20,30) + lands a stomp_stun aura on the player.
-      const stomper = fireMechanic('korgath_the_bound', 20, (m) => {
+      // War Stomp: draws rng.range(8,12) + lands a stomp_stun aura on the player.
+      const stomper = fireMechanic('ossuary_sentinel', 8, (m) => {
         m.stompTimer = 0.001;
       });
       rec.notes.stomperId = stomper.id;

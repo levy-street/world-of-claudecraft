@@ -171,6 +171,17 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   vanguard_oath_blade: 'sword',
   vanguard_fang_dagger: 'dagger',
   vanguard_warstaff: 'staff',
+  // The five-dungeon rework's weapons (the *_items.ts module of each dungeon).
+  // A spade reads as a two-hand axe, the Tunnelking's Spade precedent.
+  sextons_spadehaft: 'axe',
+  sextons_burial_spade: 'axe',
+  rimeweb_fang: 'dagger',
+  knight_commanders_longsword: 'sword',
+  gaolyard_cudgel: 'mace',
+  tideglass_shiv: 'dagger',
+  tideglass_warmaul: 'mace',
+  falls_blessed_staff: 'staff',
+  hammer_of_the_open_lock: 'mace',
 };
 
 /**

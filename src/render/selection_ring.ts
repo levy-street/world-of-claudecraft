@@ -55,3 +55,25 @@ export function drapeRingLocalY(
   }
   return outY;
 }
+
+/** A unit this far over the ground under it is on the wing (a flying patrol,
+ *  a statue on its perch), well past any jump or knock-up. */
+export const SELECTION_RING_AIRBORNE = 5;
+
+/**
+ * Is the reticle drawn? It is a decal on the GROUND under the unit, so it stays
+ * put under a jump; under a unit flying yards overhead it would mark a spot on
+ * the floor where nothing stands and nothing can be hit, so it is hidden until
+ * the unit comes down.
+ */
+export function reticleGrounded(unitY: number, groundY: number): boolean {
+  return unitY - groundY <= SELECTION_RING_AIRBORNE;
+}
+
+/** `reticleGrounded` for a unit's view and the reticle lying under it. */
+export function reticleShownUnder(
+  unit: { position: { y: number } },
+  reticle: { position: { y: number } },
+): boolean {
+  return reticleGrounded(unit.position.y, reticle.position.y);
+}

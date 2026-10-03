@@ -1,6 +1,7 @@
 import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
 import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
 import { ESCORTS } from '../sim/data';
+import { TURNKEY_CAGED } from '../sim/encounters/sunken_bastion/ids';
 import type { FarmPlotView } from '../world_api/farming';
 import { handleEscortPress } from './escort_interact';
 import {
@@ -112,6 +113,12 @@ export function tryNearbyInteraction(
   // The gather-node arm's inputs; absent means the press knows no nodes.
   gather?: NearbyGatherOptions,
 ): InteractionOutcome {
+  // Locked in the Gaol Turnkey's Iron Cage: every interact press is an escape
+  // press (the sim counts and rate-limits it), never a scan of the room.
+  if (world.player.auras?.some((a) => a.id === TURNKEY_CAGED)) {
+    world.interact();
+    return true;
+  }
   const candidate = resolveNearbyInteractionCandidate(
     world,
     harvestStateReliable,

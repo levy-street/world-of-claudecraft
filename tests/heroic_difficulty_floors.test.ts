@@ -120,6 +120,8 @@ describe('heroic five-man floors', () => {
   it('every spawn-list mob swings for at least 500 on the reference warrior', () => {
     for (const dungeonId of FIVE_MANS) {
       for (const mobId of spawnListMobIds(dungeonId)) {
+        // An egg sac (broodEgg) never swings: it only hatches the real add.
+        if (MOBS[mobId]?.broodEgg) continue;
         expect(
           minSwing(mobId, dungeonId, 'heroic'),
           `${dungeonId}/${mobId}`,
@@ -160,11 +162,16 @@ describe('heroic five-man doubled health', () => {
     expect(maxHpAt('crypt_shambler', 'hollow_crypt', 'heroic')).toBe(4108); // was 2054
     expect(maxHpAt('morthen', 'hollow_crypt', 'heroic')).toBe(7883); // was 3942
     expect(maxHpAt('bastion_revenant', 'sunken_bastion', 'heroic')).toBe(4554); // was 2277
-    expect(maxHpAt('vael_the_mistcaller', 'sunken_bastion', 'heroic')).toBe(8777); // was 4388
+    // The Sunken Bastion rework prices Vael's pool per boss (150 s at heroic
+    // party DPS, dungeon_difficulty.ts healthMultiplierByMob), off the doubling.
+    expect(maxHpAt('vael_the_mistcaller', 'sunken_bastion', 'heroic')).toBe(34449);
     expect(maxHpAt('drowned_templeguard', 'drowned_temple', 'heroic')).toBe(6219); // was 3110
-    expect(maxHpAt('ysolei', 'drowned_temple', 'heroic')).toBe(13132); // was 6566
+    // The Temple rework prices Ysolei from fight length x heroic DPS (150 s).
+    expect(maxHpAt('ysolei', 'drowned_temple', 'heroic')).toBe(34497);
     expect(maxHpAt('moonspawn', 'drowned_temple', 'heroic', { summonedAdd: true })).toBe(1867); // was 933
-    expect(maxHpAt('korzul_the_gravewyrm', 'gravewyrm_sanctum', 'heroic')).toBe(13138); // was 6569
+    // The Ice Tomb rework prices Korzul from fight length x heroic DPS (160 s
+    // on the ground; phase B adds his flights).
+    expect(maxHpAt('korzul_the_gravewyrm', 'gravewyrm_sanctum', 'heroic')).toBe(36785);
   });
 });
 
@@ -222,7 +229,8 @@ describe('heroic tuning data contract', () => {
         ]),
       ),
     ).toEqual({
-      hollow_crypt: [3.8, 20, 6],
+      // 6 -> 9.5: the rework's wing bosses summon adds (the 150 add floor).
+      hollow_crypt: [3.8, 20, 9.5],
       sunken_bastion: [4.0, 18, 9.75],
       drowned_temple: [5.2, 16.5, 9.15],
       gravewyrm_sanctum: [4.0, 15.5, 8.55],
@@ -238,6 +246,18 @@ describe('heroic tuning data contract', () => {
       korgath_the_bound: 19,
       grand_necromancer_velkhar: 19,
       korzul_the_gravewyrm: 19,
+      // The Ice Tomb rework's lighter cultists and NON-elite whelps ride the 500 floor.
+      broodsworn_thawcaller: 16.6,
+      broodsworn_pyre_tender: 16.6,
+      rime_whelp: 30.5,
+    });
+    // The rework's lighter casters, cutthroat and non-elite crows ride the 500 floor.
+    expect(HEROIC_DUNGEON_TUNING.hollow_crypt.damageMultiplierByMob).toEqual({
+      crypt_gravecaller_adept: 24,
+      crypt_gravecaller_necromancer: 24,
+      crypt_crow_caller: 24,
+      crypt_ossuary_cutthroat: 23,
+      crypt_carrion_crow: 66,
     });
     expect(HEROIC_DUNGEON_TUNING.nythraxis_boss_arena.damageMultiplierByMob).toEqual({
       nythraxis_scourge_of_thornpeak: 1.488,

@@ -59,6 +59,10 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   // when nobody was harvesting; draws no rng.
   cancelCorpseHarvestForCorpse(ctx, mob);
   mob.corpseHarvestState = undefined;
+  // A fresh life pays again (an encounter's regrown part: Entity.regrown).
+  mob.regrown = undefined;
+  // A death burst belongs to one life (mob/trash_kit/death_burst.ts).
+  mob.deathBurst = undefined;
   mob.dead = false;
   mob.lootable = false;
   mob.loot = null;

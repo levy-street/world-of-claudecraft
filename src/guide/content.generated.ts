@@ -2506,7 +2506,7 @@ export const GUIDE_DUNGEONS: GuideDungeon[] = [
     "id": "sunken_bastion",
     "isRaid": false,
     "suggestedPlayers": 5,
-    "min": 12,
+    "min": 11,
     "max": 13,
     "name": "The Sunken Bastion"
   },
@@ -2522,7 +2522,7 @@ export const GUIDE_DUNGEONS: GuideDungeon[] = [
     "id": "gravewyrm_sanctum",
     "isRaid": false,
     "suggestedPlayers": 5,
-    "min": 19,
+    "min": 18,
     "max": 20,
     "name": "Gravewyrm Sanctum"
   },
@@ -2530,7 +2530,7 @@ export const GUIDE_DUNGEONS: GuideDungeon[] = [
     "id": "wildheart_basin",
     "isRaid": false,
     "suggestedPlayers": 5,
-    "min": 20,
+    "min": 19,
     "max": 20,
     "name": "The Wildheart Basin"
   },
@@ -6004,6 +6004,139 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "exploration",
     "renown": 5,
     "feat": false
+  },
+  {
+    "id": "dgn_olen_buttress",
+    "name": "Hold the Wall",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_ossick_moored",
+    "name": "Safe Harbor",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_vael_beacon",
+    "name": "By the Beacon's Light",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_turretback",
+    "name": "Eviction Notice",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_selthe_pitch",
+    "name": "Every Voice in Tune",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_colossus_mirror",
+    "name": "Break the Glass",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_ysolei_high_and_dry",
+    "name": "High and Dry",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_mere_hydra",
+    "name": "All Heads Down",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_crypt_knellwyrm",
+    "name": "Not a Hair Singed",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_turnkey_cage",
+    "name": "No Cage Can Hold Us",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_beastmaster_apart",
+    "name": "Kept at Bay",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_gorgebloom_clean",
+    "name": "Weed Control",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_zulgar_uncaught",
+    "name": "Never Caught",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_great_saurian",
+    "name": "Toppled Titan",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_korgath_all_chains",
+    "name": "A Kinder End",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_korgath_still_bound",
+    "name": "The Lock Holds",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_velkhar_cold",
+    "name": "Cold Comfort",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_korzul_thin_ice",
+    "name": "Thin Ice",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_sledge_tusker",
+    "name": "Cold Cargo",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
   }
 ];
 
@@ -6110,6 +6243,14 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Fogbinder's Duffel"
+      },
+      {
+        "kind": "item",
+        "name": "Knight-Commander's Longsword"
+      },
+      {
+        "kind": "item",
+        "name": "Gaolyard Cudgel"
       }
     ]
   },
@@ -6149,6 +6290,18 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Stormjar"
+      },
+      {
+        "kind": "item",
+        "name": "Drowned Commander's Breastplate"
+      },
+      {
+        "kind": "item",
+        "name": "Gaolyard Striders"
+      },
+      {
+        "kind": "item",
+        "name": "Gaoler's Iron Key"
       }
     ]
   },
@@ -6176,6 +6329,14 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Selthe's Sea-Striders"
+      },
+      {
+        "kind": "item",
+        "name": "Chorus Conch"
+      },
+      {
+        "kind": "item",
+        "name": "Tideglass Shiv"
       }
     ]
   },
@@ -6215,6 +6376,14 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Mender's Hourglass"
+      },
+      {
+        "kind": "item",
+        "name": "Pale Chorus Vestment"
+      },
+      {
+        "kind": "item",
+        "name": "Tideglass Warmaul"
       }
     ]
   },
@@ -6385,6 +6554,26 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Wildsoul Maul"
+      },
+      {
+        "kind": "item",
+        "name": "Quenchwater Flask"
+      },
+      {
+        "kind": "item",
+        "name": "Hammer of the Open Lock"
+      },
+      {
+        "kind": "item",
+        "name": "Vestments of the Waking Rite"
+      },
+      {
+        "kind": "item",
+        "name": "Foreman's Last Link"
+      },
+      {
+        "kind": "item",
+        "name": "Phial of the Tithe"
       }
     ]
   },
@@ -6412,6 +6601,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Fangknife of Zulgar"
+      },
+      {
+        "kind": "item",
+        "name": "Falls-Blessed Staff"
       }
     ]
   },
@@ -6447,6 +6640,22 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Paired Talons"
+      },
+      {
+        "kind": "item",
+        "name": "Fanglord's Whistle"
+      },
+      {
+        "kind": "item",
+        "name": "Fanglord's Hide Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Gorgebloom Seedpod"
+      },
+      {
+        "kind": "item",
+        "name": "Thorncrowned Greathelm"
       }
     ]
   },

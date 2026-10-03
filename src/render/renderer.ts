@@ -240,8 +240,6 @@ import {
   CHARACTER_LOD_RANGE_SQ,
   type CharacterLodBands,
   characterLodBandsInto,
-  movingHoldoutActive,
-  showsStaticFarMesh,
 } from './crowd_lod';
 import { groundCueY } from './dais_lift';
 import { buildDawnholdFeatures, type DawnholdFeaturesView } from './dawnhold_features';
@@ -319,6 +317,7 @@ import {
 import { EvilEyeMarkers } from './evil_eye_markers';
 import { enableAndWatchRendererExtensions } from './extension_drift_sentinel';
 import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
+import { latchFarLod } from './far_lod_latch';
 import {
   buildFarTerrain,
   FAR_VISTA_ENTRY_MAX_WAIT_MS,
@@ -333,7 +332,6 @@ import {
   horizonHazePlan,
 } from './far_terrain_core';
 import { buildFarmPatchProps, type FarmBedSeat, FarmPatchVisuals } from './farm_patches';
-import { buildFarshoreFeatures } from './farshore_features';
 import { groundQuestObjectYaw } from './farshore_salvage_assets';
 import { buildFenFeatures, type FenFeaturesView } from './fen_features';
 import { buildFenbridgeTownView, type FenbridgeTownView } from './fenbridge_town';
@@ -377,6 +375,7 @@ import { FrozenOrbFx, handleFrozenOrbSpellfxEvent } from './frozen_orb_fx';
 import { buildGaleFeatures, type GaleFeaturesView } from './gale_features';
 import { buildGardenFeatures, type GardenFeaturesView } from './garden_features';
 import { gardenMazeCameraLift } from './garden_maze_core';
+import { buildGateObject, gateObjectPlan, isStableObjectTransition } from './gate_objects';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { buildGatherNodes, type GatherNodesView, resolveGatherNodePick } from './gather_nodes';
 import {
@@ -413,18 +412,17 @@ import { HillRingVisuals } from './hill_ring';
 import { createHitchFrameAligner } from './hitch_frame_align_core';
 import { HOARD_BODY_IDS, hoardEntrance } from './hoard_entrance';
 import * as hoardValley from './hoard_valley_frame';
+import { paintsOwnBreath } from './hollow_crypt/crypt_creature_fx_core';
 import { buildHollowGates, type HollowGatesView } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import {
   buildIgnivarWaterConduit,
   isIgnivarWaterConduitTemplate,
-  isStableIgnivarWaterConduitTransition,
   syncIgnivarWaterConduitVisibility,
 } from './ignivar_conduit';
 import { ignivarBossFacingLocked } from './ignivar_encounter_core';
 import { attachIgnivarModelVfx } from './ignivar_model_vfx';
-import { buildIgnivarRaidGate, ignivarRaidGatePlan } from './ignivar_raid_gate';
 import { damageContact } from './impact_contact';
 import { buildImpactSite, buildImpactSitePrewarmGroup, type ImpactSiteView } from './impact_site';
 import { deferredPassArms, initialFrameDeferral, type LinkDebt } from './initial_frame_core';
@@ -502,7 +500,7 @@ import { NecromancyArmyPortalFx, spawnArmyPortalBurstEvent } from './necromancy_
 import { NecromancyGroundFx } from './necromancy_ground_fx';
 import { NeedleOfFateVfx } from './needle_of_fate_vfx';
 import { isNeedleOfFateProjectile } from './needle_of_fate_vfx_core';
-import { POS_EXTRAPOLATION_CAP, remoteEntityAlpha } from './net_interp_core';
+import { remoteEntityAlpha } from './net_interp_core';
 import { buildNightAccents, type NightAccentsView } from './night_accents';
 import { buildNightFeatures, type NightFeaturesView } from './night_features';
 import {
@@ -719,7 +717,7 @@ import {
 import { sceneKeyLightUniform } from './scene_sampling';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { captureRendererScreenshot } from './screenshot_capture';
-import { drapeRingLocalY } from './selection_ring';
+import { drapeRingLocalY, reticleShownUnder } from './selection_ring';
 import {
   createSelfRenderPositionState,
   noteSelfIdentity,
@@ -771,6 +769,7 @@ import {
   lookAtFrozen,
   refreshFrozenWorldMatrix,
 } from './static_matrix';
+import { buildStaticWorldFeatures } from './static_world_features';
 import { buildStationProps } from './stations';
 import { shouldRenderStealthGhost } from './stealth';
 import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
@@ -834,7 +833,6 @@ import {
 } from './warrior_cast_fx_core';
 import { RecklessSkullPainter } from './warrior_cast_fx_painter';
 import { buildWater, setWaterDayNight, setWaterSunDirection, type WaterView } from './water';
-import { buildWaterFlora } from './water_flora';
 import {
   buildWeaponVfxPrewarmGroup,
   disposeWeaponEmissiveCache,
@@ -2542,16 +2540,15 @@ export class Renderer {
     // The light budget must exist BEFORE any attachZoneFeature call: a static
     // feature that ships glowLights pushes into it during the loop below.
     this.fireLights = props.fireLights;
-    // World-spanning modeled dressing, all static: the Duskfall cave mouths,
-    // lily-and-reed water flora on every temperate lake, and the Farshore's
-    // palm strand. Attached like the per-zone features so the distance cull
-    // applies: the gates and the palm strand have compact footprints of their
-    // own, and water flora registers one cull child per zone.
+    // World-spanning modeled dressing, all static: the Duskfall cave mouths
+    // plus static_world_features.ts (lake flora, the Farshore's palm strand,
+    // the Sanctum's Seal Gate). Attached like the per-zone features so the
+    // distance cull applies: the gates and the palm strand have compact
+    // footprints, and water flora registers one cull child per zone.
     this.hollowGates = buildHollowGates(this.sim.cfg.seed);
     for (const staticFeature of [
       this.hollowGates,
-      buildWaterFlora(this.sim.cfg.seed),
-      buildFarshoreFeatures(this.sim.cfg.seed),
+      ...buildStaticWorldFeatures(this.sim.cfg.seed),
     ]) {
       this.attachZoneFeature(staticFeature);
     }
@@ -7065,7 +7062,7 @@ export class Renderer {
   }
 
   handleEvent(ev: SimEvent): void {
-    this.riftDeathZoneVisuals?.handleEvent(ev);
+    if (this.riftDeathZoneVisuals?.handleEvent(ev)) return;
     switch (ev.type) {
       case 'castStart': {
         if (ev.ability === 'needle_of_fate') {
@@ -7176,34 +7173,19 @@ export class Renderer {
           this.pulseAt(ev.sourceId, ev.school, 1.2, 0.35);
           break;
         }
-        if (ev.fx === 'frostCone') {
+        if (ev.fx === 'frostCone' || ev.fx === 'fireCone') {
           const source = this.sim.entities.get(ev.sourceId);
-          if (source) {
+          // A creature that paints its own breath (the crypt drake) skips the generic cone.
+          if (source && !paintsOwnBreath(source.templateId)) {
+            const fire = ev.fx === 'fireCone';
             this.glacialFrontVisual.spawn(
               source.pos.x,
               groundHeight(source.pos.x, source.pos.z, this.sim.cfg.seed),
               source.pos.z,
               source.facing,
-              ev.range ?? 7,
+              ev.range ?? (fire ? 6 : 7),
               ev.level ?? 1,
-              ev.angle ?? 70,
-              ev.fx,
-            );
-            this.triggerAttack(ev.sourceId);
-          }
-          break;
-        }
-        if (ev.fx === 'fireCone') {
-          const source = this.sim.entities.get(ev.sourceId);
-          if (source) {
-            this.glacialFrontVisual.spawn(
-              source.pos.x,
-              groundHeight(source.pos.x, source.pos.z, this.sim.cfg.seed),
-              source.pos.z,
-              source.facing,
-              ev.range ?? 6,
-              ev.level ?? 1,
-              ev.angle ?? 55,
+              ev.angle ?? (fire ? 55 : 70),
               ev.fx,
             );
             this.triggerAttack(ev.sourceId);
@@ -7799,10 +7781,9 @@ export class Renderer {
     // (rift_portal) and the in-rift descent are "entering" portals; the egress is a
     // "leaving" portal. Pylons and the other puzzle props are bespoke procedural
     // bodies (handled in the next branch).
-    const raidGatePlan =
-      e.kind === 'object' ? ignivarRaidGatePlan(e.templateId, e.dungeonId) : null;
+    const raidGatePlan = e.kind === 'object' ? gateObjectPlan(e) : null;
     if (raidGatePlan) {
-      body = buildIgnivarRaidGate(raidGatePlan);
+      body = buildGateObject(raidGatePlan);
       height = raidGatePlan.height;
       objectMesh = body;
     } else if (
@@ -9974,15 +9955,6 @@ export class Renderer {
       const ea = isSelf
         ? Math.min(1, alpha)
         : remoteEntityAlpha(now, e.netUpdatedAt, e.netInterval, alpha);
-      const movingFarHoldout = movingHoldoutActive(
-        e.pos,
-        e.prevPos,
-        ea,
-        !isSelf && e.netUpdatedAt !== undefined && e.netInterval !== undefined
-          ? POS_EXTRAPOLATION_CAP
-          : 1,
-        e.vx !== 0 || e.vz !== 0,
-      );
       let wantShadow = true;
       let inProxyBand = false;
       if (isSelf) {
@@ -10043,7 +10015,8 @@ export class Renderer {
             for (const caster of v.objectCasters) (caster as THREE.Mesh).castShadow = wantShadow;
           }
         }
-        if (v.visual) v.isFar = showsStaticFarMesh(d2, lodBands, actionablePose, movingFarHoldout);
+        if (v.visual)
+          v.isFar = latchFarLod(v, e, ea, isSelf, d2, lodBands, actionablePose, this.time);
       }
       // online, entities beyond nameplate range stream below snapshot rate;
       // each interpolates on its own clock so they move smoothly instead of
@@ -10093,7 +10066,7 @@ export class Renderer {
         // strand the object invisible through the whole 80-96yd hysteresis band
         // if the viewer retreats before the rebuild lands.
         if (v.builtTemplateId !== undefined && v.builtTemplateId !== e.templateId) {
-          if (isStableIgnivarWaterConduitTransition(v.builtTemplateId, e.templateId)) {
+          if (isStableObjectTransition(v.builtTemplateId, e.templateId)) {
             v.builtTemplateId = e.templateId;
           } else {
             this.removeView(id);
@@ -10691,7 +10664,7 @@ export class Renderer {
       // predictor's onGround inside a rift (the predictor samples the same flat
       // ground, so it would still report airborne on the platform).
       const inRift = isRiftPos(ax) && this.sim.riftFloor !== null;
-      if (e.kind === 'player' && e.onGround && !swimming) {
+      if ((e.kind === 'player' || active.flies) && e.onGround && !swimming) {
         // Cached per remote body and resampled on entity_ground_sample_core's
         // cadence; the local player samples every frame as before.
         const standY = sampleStandingSurface(v.groundSample, this.sim, ax, ay, az, dt, isSelf);
@@ -11361,7 +11334,7 @@ export class Renderer {
         ringMat.color.setHex(this.isHostileSelectionTarget(target) ? 0xcc2222 : 0xd4af37);
         if (!this.lowGfx) ringMat.color.multiplyScalar(SELECTION_RING_BOOST); // subtle bloom edge
         ringMat.opacity = 0.78 + 0.2 * Math.sin(this.time * 4.5); // gentle pulse
-        this.selectionRing.visible = true;
+        this.selectionRing.visible = reticleShownUnder(tv.group, this.selectionRing);
       } else {
         this.selectionRing.visible = false;
       }

@@ -63,7 +63,11 @@ Everything else is a sibling module in one of these families:
   the frozen single-draw far mesh takes over. Its extension eases out on the
   crowd knee, the per-tier `GFX.farCharacterAnimScale` ceiling, and live budget
   pressure; cosmetic-only, and `showsStaticFarMesh` keeps anything a player
-  reacts to out of the frozen mesh inside the uncrowded base range).
+  reacts to out of the frozen mesh inside the uncrowded base range). The per-view
+  swap goes through `far_lod_latch.ts` / `far_lod_latch_core.ts` (distance
+  hysteresis, a dwell, a moving grace; the applied far scale slews per frame), so a
+  noisy edge never flickers a creature between rig and far mesh; an actionable pose
+  still returns to the rig at once.
 - **Zone-feature cull:** `zone_feature_sweep.ts` is the per-frame sweep the renderer
   drives over every attached feature cull group, a thin consumer of
   `zone_feature_visibility_core.ts` (the fog or detail-horizon rule on the group's

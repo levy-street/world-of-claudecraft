@@ -68,6 +68,8 @@ const MOB_AURA_ICON_IDENTITIES: ReadonlyMap<string, string> = new Map([
   ['spellvuln_stormcrag_elemental', 'mob_spell_vuln'],
   ['stackpoison_mirefen_broodmother', 'mob_stack_poison'],
   ['stackpoison_rift_boss_venom', 'mob_stack_poison'],
+  ['stackpoison_rimeweb', 'mob_stack_poison'],
+  ['stackpoison_rimeweb_spinner', 'mob_stack_poison'],
   ['stagger_deeprock_kobold', 'mob_stagger_hit'],
   ['stoneskin_ancient_guardian', 'mob_stoneskin'],
   ['stoneskin_marrowlord_varkas', 'mob_stoneskin'],
@@ -86,11 +88,10 @@ const MOB_AURA_ICON_IDENTITIES: ReadonlyMap<string, string> = new Map([
   ['venom_webwood_spider', 'mob_venom'],
   ['vulnerability_gravecaller_cultist', 'mob_vulnerability'],
   ['warcry_deepfen_murloc', 'mob_warcry'],
-  ['warcry_wildheart_beastmaster', 'mob_warcry'],
+  ['warcry_drowned_sergeant', 'mob_warcry'],
   ['ward_grave_silt_bulwark', 'mob_ward_allies'],
   ['ward_mogger', 'mob_ward_allies'],
   ['ward_treant_elder', 'mob_ward_allies'],
-  ['ward_wildheart_beastmaster', 'mob_ward_allies'],
   ['wither_fen_troll', 'mob_wither'],
 ]);
 

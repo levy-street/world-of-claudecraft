@@ -3132,6 +3132,12 @@ export const zh_CN: EnTranslations = {
         "kindlingOrb": "在你身旁召唤一颗余烬宝珠，持续 {duration} 秒。你每对敌人施放一个法术，它便向该敌人射出一道火焰弹，造成 {damage} 点火焰伤害。伤害随法术强度提高。",
         "pierce": "在 {duration} 秒内，你的自动攻击、射击和物理技能（流血除外）命中还会打击距离你的目标最近的、{reach} 码内的一个敌人，造成所造成伤害的 {share}%。",
         "lantern": "在你脚下放置一盏提灯，持续 {duration} 秒。任何人对提灯 {radius} 码内的你或队伍成员施放的直接治疗，还会以该治疗量的 {share}% 治疗灯光中受伤最重的另一名队伍成员。",
+        "shackle": "用锁链将 {range} 码内的目标束缚在原地，持续 {duration} 秒。免疫控制的生物（例如首领）改为移动速度降低 {slow}%，除非它也免疫减速。",
+        "spiritPack": "召唤一只灵魂美洲豹在你身边战斗，持续{duration}秒。它会奔向你的目标，每{every}秒撕咬一次，造成{min}到{max}点物理伤害，并会转而攻击你选中的其他敌人。若你没有选中敌人，它会攻击{range}码内离你最近的敌人。伤害随攻击强度或远程攻击强度（取较高者）提高，在召唤时确定。需要{range}码内的敌对目标。",
+        "seedburst": "在{range}码内的目标身上种下一颗种子。{delay}秒后，种子在目标所在处（或其死亡处）爆裂，对{radius}码内的每个敌人造成{damage}点自然伤害；若目标先行死亡，伤害提高{bonus}%（{empowered}）。伤害随法术强度提高，在种下时确定。若你在种子爆裂前死亡，种子会枯萎。",
+        "tether": "用锁链将你与{range}码内的一名友方玩家相连，持续{duration}秒。本应伤及其生命值的伤害中有{share}%改由你承受。你死亡时提前结束。需要以你之外的友方玩家为目标。",
+        "harvest": "在{duration}秒内，每有一个敌对生物在你{radius}码内死亡，就为你恢复{pct}%的最大生命值（{health}）和{pct}%的最大法力值。",
+        "quench": "在{duration}秒内，你接下来的{hits}次近战或远程武器命中额外造成{damage}点冰霜伤害。最后一次命中还会淬火目标，使其攻击速度降低{slow}%，持续{slowDuration}秒。效果结束时未用完的命中次数会失效。伤害随攻击强度或远程攻击强度中较高者提高。",
         "heartNova": "消耗所有热量释放一道火焰新星，对 {radius} 码内的每个敌人每层热量造成 {perHeat} 点火焰伤害（{maxHeat} 层时为 {max} 点），并嘲讽其命中的每个生物。伤害随攻击强度提高。需要至少一层热量。"
       }
     },
@@ -3906,6 +3912,29 @@ export const zh_CN: EnTranslations = {
       }
     },
     "auraEffect": {
+      "wildheart": {
+        "packBond": "伙伴靠近时受到的伤害降低{pct}%。将驯兽师和他的美洲豹拉开即可打破羁绊。",
+        "packBondFury": "伙伴靠近时造成的伤害提高{pct}%。",
+        "stalked": "巨型美洲豹在追猎你，且无视嘲讽。每次撕咬造成{min}到{max}点物理伤害（英雄难度{heroicMin}到{heroicMax}点）并造成流血。把它引离它的主人。",
+        "waryStuns": "它已被击晕过一次。在此效果结束前，后续的击晕都会失效。",
+        "waryRoots": "它已被定身过一次。在此效果结束前，后续的定身都会失效。",
+        "warySlows": "它已被减速过一次。在此效果结束前，后续的减速都会失效。",
+        "pollinated": "触碰种荚会使其立刻长出荆棘幼芽。远离种子，让未授粉的玩家去踩碎它们；无人触碰的种荚会在{seconds}秒后发芽（英雄难度下它会在{heroic}秒后钻入地下，在最近的玩家身旁破土而出）。",
+        "prey": "祖尔加在追猎你。引他踏过点亮的太阳符文，使他减速{slow}%。若被他追上，你会被撕咬，受到{damage}点伤害（英雄难度{heroic}点）并被击倒{stun}秒。",
+        "avatar": "移动速度提高{pct}%，追猎它的猎物。减速和定身可以生效，击晕的持续时间减半。",
+        "vanished": "隐匿且免疫伤害。他即将扑向最远的玩家。"
+      },
+      "sanctum": {
+        "lockbound": "受到的伤害降低{pct}%：每条仍然完好的锁链提供{per}%。打破一个封印镣铐即可让其锁链脱落。",
+        "enrage": "造成的伤害提高{pct}%。",
+        "grasp": "站在融水中，造成的伤害提高{pct}%。如果它死在融水中，会沉下并在{seconds}秒后再次复生；在寒冰上击杀它才能让它不再起来。",
+        "twiceWoken": "从融水中再次复生，造成的伤害提高{pct}%。",
+        "doused": "他脚下的冰板碎裂，淬火之水扑灭了他的墓场炼狱。",
+        "airborne": "身在空中，无法被攻击。他会以坠击降落落在站人最多的冰板上，对{radius}码内的所有人造成{min}到{max}点伤害（英雄难度{heroicMin}到{heroicMax}点）。",
+        "wyrmsEye": "此效果结束时，科祖尔会向你所在的整块冰板倾泻俯冲烈焰：对其上所有人造成{min}到{max}点伤害（英雄难度{heroicMin}到{heroicMax}点），冰板开裂，若已开裂则碎裂。站在完好的冰面上，远离队伍。",
+        "quenchWater": "身处开阔的淬火之水：移动速度降低{slow}%，每秒受到{damage}点灼烧伤害（英雄难度{heroic}点）。游向任意冰板或岸边。",
+        "shardFlare": "心之碎片闪耀：墓穴吐息每{breath}秒一次，振翼狂风每{gale}秒一次。"
+      },
       "sharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。每缺少一名玩家，还会对整个团队（包括圈内玩家）造成最大生命值 {missingPenalty}% 的伤害。",
       "makersBrand": "持续 {duration} 秒，每层使你受到瓦尔库尔的伤害提高 {pct}%。最多叠加 {max} 层。坦克应在 {swap} 层时换坦。",
@@ -4028,6 +4057,16 @@ export const zh_CN: EnTranslations = {
         "riftGuard": "你受到的伤害降低 {pct}%。",
         "sprint": "移动速度提高 {pct}%。不与其他速度提高效果叠加。",
         "brand": "受到的治疗效果降低 {pct}%。",
+        "shackle": "被锁链束缚：无法移动。",
+        "shackleSlow": "锁链缠身：移动速度降低 {pct}%。",
+        "spiritPack": "一只灵魂美洲豹在你身边战斗，每{every}秒撕咬你的目标一次，造成{min}到{max}点物理伤害。",
+        "seedburst": "噬花的种子。此效果结束时爆裂，对{radius}码内的每个敌人造成{damage}点自然伤害；若此敌人在此之前死亡，伤害提高{bonus}%（{empowered}）。",
+        "tether": "被工头的最后一环锁住：本应伤及你生命值的伤害中有{pct}%改由锁住你的人承受。",
+        "tetherLink": "你承受被锁住的盟友本应受到的伤害的{pct}%。",
+        "harvest": "每有一个敌对生物在你{radius}码内死亡，就为你恢复{pct}%的最大生命值和法力值。",
+        "quench": "你接下来的{stacks}次武器命中额外造成{damage}点冰霜伤害。最后一次命中使目标的攻击速度降低{slow}%。",
+        "quenchOther": "接下来的{stacks}次武器命中造成额外冰霜伤害。最后一次命中使目标的攻击速度降低{slow}%。",
+        "quenched": "攻击速度降低 {pct}%。",
         "forgeHeat": "热量：{stacks}/{max}。使用熔铸之父的淬火会消耗所有热量，使其武器火焰伤害提高 {pct}%。",
         "tempered": "你的近战和远程武器命中额外造成 {damage} 点火焰伤害（消耗的热量使其提高 {pct}%）。每次致命一击延长 {killExtend} 秒，总计最多 {maxDuration} 秒。",
         "temperedOther": "近战和远程武器命中额外造成火焰伤害，消耗的热量使其提高 {pct}%。伤害随攻击强度或远程攻击强度中较高者提高。",
@@ -5953,6 +5992,10 @@ export const zh_CN: EnTranslations = {
         "mist_surge": "迷雾涌动（周期性范围伤害）",
         "summons_adds": "召唤增援",
         "lunar_tide": "月潮（周期性范围伤害）",
+        "chorus_and_solo": "合唱与独唱（一个标记集合分摊，另一个标记分散）",
+        "tideglass_reflections": "潮镜倒影（击杀彼此的镜像）",
+        "rising_tide": "涨潮（半座岛被淹没，移动到干燥的一侧）",
+        "undertow": "暗流（将所有人拉近，在冲击前跑开）",
         "enrage": "低血量时狂怒",
         "shuddering_stomp": "震颤践踏（范围眩晕）",
         "grave_inferno": "墓场炼狱（引导火焰AoE，保持分散）",
@@ -5978,6 +6021,9 @@ export const zh_CN: EnTranslations = {
         "deathless_court": "不死王庭（仅英雄难度，不死之怒后王庭众魂会苏醒）",
         "bloodmane_rend": "血鬃撕裂（流血，注意目标切换）",
         "tusk_sweep": "獠牙横扫（正面顺劈）",
+        "grave_breath": "坟墓吐息（正面火焰锥形，会使覆盖的冰面开裂）",
+        "plate_floor": "碎冰（他的火焰会使湖面冰板开裂并沉没，远离开阔水面）",
+        "wyrm_flights": "飞行阶段（70%和40%时：带着巨龙之眼走到完好的冰面上，在他应降落的地方集合）",
         "ancestral_sap": "祖灵汁液（治疗其盟友）",
         "call_of_the_hunt": "狩猎召唤（加速附近盟友）",
         "thickhide_ward": "厚皮护盾（护盾附近盟友）",
@@ -6001,8 +6047,107 @@ export const zh_CN: EnTranslations = {
         "forgestorm": "熔炉风暴（坠落的陨石圈，移出）",
         "shared_pyre": "共享柴堆（集合圈，分摊伤害）",
         "anvils_decree": "铁砧法令（三次全团锤击，用治疗撑过）",
-        "masters_assembly": "大师装配（阻挡熔炉光束，轮换阻挡者）"
+        "masters_assembly": "大师装配（阻挡熔炉光束，轮换阻挡者）",
+        "iron_cage": "铁笼（连按交互键挣脱，队友可以砸开铁栏）",
+        "drowned_anchor": "溺亡之锚（在受害者被拖进深坑前砸断锁链）",
+        "shackle_pair": "双人镣铐（被锁在一起的两名玩家必须靠在一起）",
+        "reaper_behind": "穿影（死神从玩家身后升起，离开镰刀的弧线）",
+        "pack_bond": "兽群羁绊（两者相邻时伤害减半：将它们拉开15码）",
+        "stalk": "潜行追猎（美洲豹追猎被标记的玩家，从不追坦克；单人时它追你：风筝它，减速、定身、击晕它）",
+        "shared_health": "共享生命（同一血池：攻击最安全的那个）",
+        "heel_frenzied_bond": "回来！与狂热羁绊（美洲豹跃回主人身边，羁绊范围扩至20码）",
+        "seed_rain": "种子雨（未授粉的玩家在种子发芽前踩碎它们）",
+        "pollinate": "授粉（金色的玩家远离种子，否则它们会立刻发芽）",
+        "vine_lash": "藤鞭（离开荆棘通道，否则会被定身）",
+        "gorge": "吞噬（对坦克的重咬和毒素）",
+        "burrowing_seeds": "钻地种子与花粉云（种子6秒后在玩家身旁破土，金色会传染）",
+        "spirit_of_the_hunt": "狩猎之魂（猎物引着化身穿过点亮的太阳符文；被撕咬的玩家获得逃跑的先机）",
+        "twin_prey_ambush": "双重猎物与伏击（两个猎物，随后扑向最远的玩家）",
+        "seal_shackles": "封印镣铐（每打断一条锁链，他受到的伤害提高20%，并解放他的一种攻击）",
+        "chain_strain": "绷链（远离每根锁链仍完好的柱子）",
+        "korgath_stomp": "震颤践踏（离开他周围的圆环）",
+        "rerivet_last_link": "重铆与最后一环（打断重新铆上锁链的刺棒匠；只剩一条锁链时，每10秒绷链一次）",
+        "waking_thaw": "苏醒融冰（亡者从融冰池中爬出）",
+        "unquenched_held": "封存或未熄（在寒冰上击杀亡者，切勿在融水中）",
+        "soulfire_trench": "魂火沟壑（一道魂火，随后留下一条融水带）",
+        "shadow_volley": "暗影箭雨（对所有人造成暗影伤害）",
+        "warm_hands_twice_woken": "温热之手与二度苏醒（仅限英雄难度，让亡者保持移动；复起者会更强）"
       }
+    },
+    "bastionCage": {
+      "title": "你被关进了铁笼！",
+      "promptKey": "连按 {key} 挣脱",
+      "promptNoKey": "连按交互键挣脱",
+      "promptClick": "连续单击这里挣脱",
+      "promptTap": "连续点击这里挣脱",
+      "buttonAria": "从铁笼中挣脱",
+      "progressAria": "挣脱进度：{pct}"
+    },
+    "bastionChain": {
+      "anchoredTitle": "被溺亡之锚锁住了！",
+      "anchoredLine": "在绞盘把你拖进深坑之前，队友必须砸断锁链",
+      "allyTitle": "砸断锁链！",
+      "allyLine": "{name} 正被拖向深坑：攻击溺亡之锚",
+      "shackledTitle": "与 {name} 锁在一起",
+      "shackledLine": "彼此保持在 {range} 码以内（当前相距 {dist} 码）",
+      "strainedLine": "离得太远！锁链会伤害你们两人：靠近到 {range} 码以内",
+      "brokenAria": "锁链破损：{pct}",
+      "reachAria": "锁链绷紧：{pct}",
+      "linksLeft": "剩余锁链环：{count}/{total}",
+      "linkRule": "每次击中锚，无论伤害多少，都会断开一环",
+      "linksTarget": "锁链环 {count}/{total}",
+      "linkBroken": "断开一环！"
+    },
+    "wildheartAlert": {
+      "preyTitle": "你是猎物！",
+      "preyLine": "祖尔加在追猎你：引他穿过点亮的太阳符文",
+      "preyWaitLine": "他正在追另一个猎物：做好准备，他会切换",
+      "stalkedTitle": "被追猎！",
+      "stalkedLine": "美洲豹在追猎你：把它引离它的主人",
+      "pollinatedTitle": "已授粉！",
+      "pollinatedLine": "远离种子：你的触碰会让它们发芽",
+      "bondTitle": "兽群羁绊",
+      "bondLine": "在一起时它们伤害减半：把它们拉开",
+      "timeAria": "剩余{seconds}秒"
+    },
+    "sanctumAlert": {
+      "quenchTitle": "身陷淬火之水！",
+      "quenchLine": "它会灼烧并减速你：游向最近的冰面或岸边",
+      "plungeTitle": "俯冲烈焰！",
+      "plungeLine": "你脚下的整块冰板即将燃烧：立刻离开",
+      "descentTitle": "坠击降落！",
+      "descentLine": "他就落在这里：离开他的阴影",
+      "eyeTitle": "巨龙之眼盯上了你！",
+      "eyeLine": "印记结束时你所在的冰板会燃烧：待在完好的冰面上，远离队伍",
+      "eyeCrackedLine": "你站在开裂的冰面上：在印记结束前走到完好的冰板上",
+      "flailTitle": "锁链连枷！",
+      "flailLine": "锁链会沿着标出的路线抽下：离开那条线",
+      "chargeTitle": "门槛冲锋！",
+      "chargeLine": "他会沿路线冲锋：离开路线，远离边缘",
+      "trenchTitle": "魂火沟壑！",
+      "trenchLine": "魂火会切开这条路线并留下融水：离开它",
+      "strainTitle": "绷链！",
+      "strainLine": "完好的石柱即将爆发：远离它们",
+      "infernoTitle": "墓场炼狱！",
+      "infernoLine": "每次脉冲都更猛烈：离开他的范围",
+      "stompTitle": "震颤践踏！",
+      "stompLine": "在他的脚落下前远离他",
+      "breathTitle": "墓穴吐息！",
+      "breathLine": "你站在吐息锥形范围内：向侧面躲开",
+      "maulTitle": "重锤横扫！",
+      "maulLine": "他会横扫面前的一切：绕到他身后",
+      "tailTitle": "尾击横扫！",
+      "tailLine": "你站在他身后：在尾巴扫来前离开",
+      "meltwaterTitle": "身处融水",
+      "meltwaterLine": "你的骸骨行者站在融水中：把它拖到寒冰上",
+      "meltwaterTargetLine": "你的目标若死在融水中会再次复生：等它到寒冰上",
+      "crackedTitle": "开裂的冰面",
+      "crackedLine": "这里的火焰会击碎这块冰板：别让他的火焰落在这里",
+      "flightTitle": "科祖尔腾空而起",
+      "flightLine": "聚集在完好的冰面上决定他的落点，然后散开",
+      "lockboundTitle": "锁缚",
+      "lockboundLine": "{chains}条锁链仍在：他受到的伤害降低{pct}%。打破封印镣铐来解除它。",
+      "timeAria": "剩余{seconds}秒"
     },
     "cosmetics": {
       "title": "外观",
@@ -8184,8 +8329,8 @@ export const zh_CN: EnTranslations = {
       "hollowBody": "一座被盗墓的教堂地穴，新逝的死者拒绝安息。这是新队伍面临的第一场真正考验。",
       "bastionBody": "一座沉入沼泽、被淹没守军和不断上涨的潮水所占据的失落要塞。",
       "templeBody": "沼泽小路旁一座沉没的圣殿，是为好奇者与有备而来者准备的岔路。",
-      "sanctumBody": "棘峰的黑暗核心，邪教漫长的图谋在此达到可怖的顶点。",
-      "wildheartBody": "一座被暖雨浸透的丛林火山口，两条高起的猎径环绕着碧色深潭。穿过兽巢与先祖遗迹，在仪式金字塔顶端看看是谁在等待。",
+      "sanctumBody": "隐藏在棘峰高处的一座冰川，一条巨龙被封冻在冰中，邪教正焚烧窃取的灵魂将它解冻。从高山隘口一路下行，穿过冰塔、铁匠断裂的锁链与邪教的火堆，直到冰川脚下的冰封湖面。",
+      "wildheartBody": "藏在沉没神像背后的隐秘丛林火山口，四周悬崖环绕，瀑布轰鸣。涉过河流浅滩，穿越狩猎台地与瀑布，走过殖民地废墟，攀上巨大石雕美洲豹头下的阶梯神殿。",
       "raidName": "终局团队副本",
       "raidBody": "在一扇封印的皇家大门之后，等待着一场十人试炼：一场多阶段的战斗，以及一股不死之力，需要整支团队齐心协力将其镇压。先赢得入场资格，再带上九位好友。",
       "heroicTitle": "英雄模式",
@@ -12241,7 +12386,96 @@ export const zh_CN: EnTranslations = {
       "hoard_cast_screech": "震耳尖啸",
       "hoard_cast_mimic_bite": "贪婪撕咬",
       "hoard_cast_mimic_leap": "碾压跳跃",
-      "hoard_cast_coin_spit": "诅咒金币"
+      "hoard_cast_coin_spit": "诅咒金币",
+      "crypt_grave_bolt": "墓穴之箭",
+      "crypt_raise_bones": "唤起骸骨",
+      "crypt_murder_call": "鸦群召唤",
+      "crypt_stone_shriek": "石之尖啸",
+      "crypt_grave_cleave": "墓穴横扫",
+      "crypt_barrowflame_breath": "冢焰吐息",
+      "crypt_tail_lash": "尾鞭",
+      "crypt_wing_gust": "翼风",
+      "crypt_morthen_rite_wakes": "仪式苏醒",
+      "crypt_morthen_rise": "唤墓者升起",
+      "crypt_morthen_proclaim": "墓之宣告",
+      "crypt_morthen_descend": "降临",
+      "crypt_knellwyrm_arrive": "自天而降",
+      "crypt_knellwyrm_pyre_strafe": "火葬扫射",
+      "crypt_knellwyrm_strafe_run": "俯冲扫射",
+      "crypt_knellwyrm_dread_bellow": "恐惧咆哮",
+      "bastion_brine_mend": "盐水愈合",
+      "bastion_fog_ward": "雾之护佑",
+      "bastion_halberd_sweep": "戟之横扫",
+      "bastion_piercing_bolt": "穿刺弩矢",
+      "bastion_claw_sweep": "巨钳横扫",
+      "bastion_shell_slam": "壳塔重击",
+      "bastion_oathbound_charge": "誓约冲锋",
+      "bastion_gaolers_cudgel": "狱卒短棍",
+      "bastion_mist_surge": "迷雾涌流",
+      "bastion_drowning_hymn": "溺亡圣咏",
+      "bastion_iron_cage": "铁笼",
+      "bastion_drowned_anchor_cast": "溺亡之锚",
+      "bastion_shackle_pair": "双人镣铐",
+      "bastion_shadowstep": "穿影",
+      "bastion_reaping_scythe": "收割之镰",
+      "bastion_veil_rise": "雾幕",
+      "temple_lullaby": "摇篮曲",
+      "temple_call_the_tide": "潮汐召唤",
+      "temple_static_coil": "静电盘绕",
+      "temple_snapper_snap": "猛咬",
+      "temple_trident_sweep": "三叉戟横扫",
+      "temple_sea_song": "海之歌",
+      "temple_tidal_slap": "潮汐掌击",
+      "temple_tide_breath": "冰冻吐息",
+      "temple_moonlight_lance": "月光长枪",
+      "temple_prism_flare": "棱镜闪耀",
+      "temple_resonant_slam": "共鸣猛击",
+      "temple_undertow": "暗流",
+      "temple_lunar_tide": "月潮",
+      "temple_skewering_trident": "穿刺三叉戟",
+      "temple_pale_mending": "苍白愈合",
+      "temple_glimmer_venom": "微光毒液",
+      "temple_pearl_slam": "珍珠猛击",
+      "temple_lightning_spit": "闪电喷吐",
+      "temple_crushing_torrent": "碾压激流",
+      "temple_hydra_tsunami": "海啸",
+      "temple_ysolei_call": "月裔召唤",
+      "temple_ysolei_wrath": "溺亡之怒",
+      "wildheart_ancestral_sap": "先祖树汁",
+      "wildheart_plant_totem": "安置图腾",
+      "wildheart_entangling_lash": "缠绕鞭笞",
+      "wildheart_saurian_tail_swipe": "甩尾",
+      "wildheart_saurian_stomp": "撼地践踏",
+      "wildheart_beast_pit_quake": "兽坑震荡",
+      "wildheart_jaguar_heel": "回来！",
+      "wildheart_gorgebloom_seed_rain": "种子雨",
+      "wildheart_gorgebloom_vine_lash": "藤鞭",
+      "wildheart_gorgebloom_gorge": "吞噬",
+      "wildheart_zulgar_pulse": "荒野之心脉冲",
+      "wildheart_zulgar_spirit_hunt": "狩猎之魂",
+      "sanctum_cinder_breath": "余烬吐息",
+      "sanctum_warming_rite": "回暖仪式",
+      "sanctum_goad": "驱策",
+      "sanctum_plant_brazier": "放置灵魂火盆",
+      "sanctum_ice_block_toss": "投掷冰块",
+      "sanctum_tusker_tusk_sweep": "獠牙横扫",
+      "sanctum_tusker_trample": "践踏",
+      "sanctum_korgath_maul_arc": "重锤弧斩",
+      "sanctum_korgath_chain_flail": "锁链鞭笞",
+      "sanctum_korgath_threshold_charge": "门槛冲锋",
+      "sanctum_korgath_foremans_bellow": "工头的咆哮",
+      "sanctum_korgath_strain": "绷链",
+      "sanctum_korgath_stomp": "震颤践踏",
+      "sanctum_goadsmith_rerivet": "重铆",
+      "sanctum_velkhar_soulfire_trench": "魂火沟壑",
+      "sanctum_velkhar_shadow_volley": "暗影箭雨",
+      "sanctum_korzul_break_free": "破冰而出",
+      "sanctum_korzul_grave_breath": "坟墓吐息",
+      "sanctum_korzul_tail_sweep": "尾扫",
+      "sanctum_korzul_grave_inferno": "墓场炼狱",
+      "sanctum_korzul_wing_gale": "翼风",
+      "sanctum_korzul_plunging_fire": "倾泻烈焰",
+      "sanctum_korzul_crashing_descent": "坠击降落"
     }
   },
   "questUi": {
@@ -18451,6 +18685,162 @@ export const zh_CN: EnTranslations = {
       "vanguard_warstaff": {
         "name": "先锋之战杖"
       },
+      "gravedirt_treads": {
+        "name": "墓土踏靴"
+      },
+      "bellrope_girdle": {
+        "name": "钟绳腰带"
+      },
+      "sextons_spadehaft": {
+        "name": "司事的锹柄"
+      },
+      "rimesilk_mantle": {
+        "name": "霜丝肩衣"
+      },
+      "bonechill_carapace_vest": {
+        "name": "寒骨甲壳背心"
+      },
+      "rimeweb_hunters_leggings": {
+        "name": "霜网猎手护腿"
+      },
+      "rimeweb_fang": {
+        "name": "霜网之牙"
+      },
+      "cantors_cassock": {
+        "name": "领唱者的法衣"
+      },
+      "choirward_leggings": {
+        "name": "圣咏守卫护腿"
+      },
+      "choristers_gloves": {
+        "name": "唱诗者的手套"
+      },
+      "cantors_hymnal": {
+        "name": "领唱者的圣咏集"
+      },
+      "gravecallers_vestments": {
+        "name": "唤墓者的祭袍"
+      },
+      "unquiet_stalkers_hood": {
+        "name": "不安潜行者兜帽"
+      },
+      "sextons_burial_spade": {
+        "name": "司事的葬铲"
+      },
+      "rimesilk_hood": {
+        "name": "霜丝兜帽"
+      },
+      "knight_commanders_longsword": {
+        "name": "骑士指挥官长剑"
+      },
+      "gaolers_chain_girdle": {
+        "name": "狱卒锁链腰带"
+      },
+      "rusted_shackle_grips": {
+        "name": "锈蚀镣铐护手"
+      },
+      "drowned_wardens_mantle": {
+        "name": "溺亡看守披肩"
+      },
+      "gaolyard_cudgel": {
+        "name": "狱庭短棍"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "溺亡指挥官胸甲"
+      },
+      "gaolyard_striders": {
+        "name": "狱庭长靴"
+      },
+      "jailers_iron_gauntlets": {
+        "name": "狱卒的铁护手"
+      },
+      "turnkeys_keyring_belt": {
+        "name": "牢头的钥匙腰带"
+      },
+      "turnkeys_lantern_cowl": {
+        "name": "牢头的提灯兜帽"
+      },
+      "conchplate_girdle": {
+        "name": "螺甲腰带"
+      },
+      "pale_chorus_leggings": {
+        "name": "苍白合唱护腿"
+      },
+      "refrain_silk_gloves": {
+        "name": "叠句丝手套"
+      },
+      "chorus_conch": {
+        "name": "合唱海螺"
+      },
+      "tideglass_pauldrons": {
+        "name": "潮镜肩铠"
+      },
+      "moonburn_treads": {
+        "name": "月灼便靴"
+      },
+      "prism_etched_cowl": {
+        "name": "棱镜蚀刻兜帽"
+      },
+      "tideglass_shiv": {
+        "name": "潮镜匕首"
+      },
+      "pale_chorus_vestment": {
+        "name": "苍白合唱法衣"
+      },
+      "tideglass_warmaul": {
+        "name": "潮镜战槌"
+      },
+      "beastpit_warbelt": {
+        "name": "兽坑战腰带"
+      },
+      "jaguar_hide_jerkin": {
+        "name": "美洲豹皮短上衣"
+      },
+      "hexbone_handwraps": {
+        "name": "咒骨裹手"
+      },
+      "rootbound_sabatons": {
+        "name": "缚根铁靴"
+      },
+      "pollen_dusted_leggings": {
+        "name": "沾满花粉的护腿"
+      },
+      "bloomsilk_cowl": {
+        "name": "花绸兜帽"
+      },
+      "falls_blessed_staff": {
+        "name": "瀑布祝福法杖"
+      },
+      "fanglords_hide_mantle": {
+        "name": "獠牙领主的兽皮肩甲"
+      },
+      "thornroot_greathelm": {
+        "name": "荆冠巨盔"
+      },
+      "foremans_grips": {
+        "name": "工头护手"
+      },
+      "serac_stride_boots": {
+        "name": "冰塔跋涉长靴"
+      },
+      "seal_rune_mantle": {
+        "name": "封印符文披肩"
+      },
+      "thawbound_legguards": {
+        "name": "融缚护腿"
+      },
+      "pyre_tenders_hood": {
+        "name": "守柴人兜帽"
+      },
+      "meltwater_cord": {
+        "name": "融水束带"
+      },
+      "hammer_of_the_open_lock": {
+        "name": "开锁之锤"
+      },
+      "vestments_of_the_waking_rite": {
+        "name": "苏醒仪式法衣"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -19306,6 +19696,24 @@ export const zh_CN: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "熔炉之心"
       },
+      "gaolers_iron_key": {
+        "name": "狱卒铁钥匙"
+      },
+      "fanglords_whistle": {
+        "name": "獠牙领主的哨子"
+      },
+      "gorgebloom_seedpod": {
+        "name": "噬花种荚"
+      },
+      "foremans_last_link": {
+        "name": "工头的最后一环"
+      },
+      "phial_of_the_tithe": {
+        "name": "什一税之瓶"
+      },
+      "quenchwater_flask": {
+        "name": "淬火水瓶"
+      },
       "rift_watchers_band": {
         "name": "裂隙守望者指环"
       },
@@ -19557,6 +19965,69 @@ export const zh_CN: EnTranslations = {
       "morthen": {
         "name": "唤墓者莫森"
       },
+      "ossuary_sentinel": {
+        "name": "骨堂哨兵"
+      },
+      "hollow_gravedigger": {
+        "name": "空洞掘墓人"
+      },
+      "rime_egg_sac": {
+        "name": "霜卵囊"
+      },
+      "rimeweb_hatchling": {
+        "name": "霜网幼蛛"
+      },
+      "rimeweb_spinner": {
+        "name": "霜网织丝蛛"
+      },
+      "candlewright_acolyte": {
+        "name": "烛匠侍僧"
+      },
+      "hollow_chorister": {
+        "name": "空洞唱诗者"
+      },
+      "bound_soul": {
+        "name": "缚魂"
+      },
+      "rimeweb": {
+        "name": "霜网"
+      },
+      "cantor_ilvane": {
+        "name": "领唱者伊尔凡"
+      },
+      "crypt_ossuary_warrior": {
+        "name": "骨堂战士"
+      },
+      "crypt_gravecaller_adept": {
+        "name": "唤墓者学徒"
+      },
+      "crypt_ossuary_cutthroat": {
+        "name": "骨堂割喉者"
+      },
+      "crypt_gravecaller_necromancer": {
+        "name": "唤墓者死灵法师"
+      },
+      "crypt_bone_minion": {
+        "name": "骸骨仆从"
+      },
+      "crypt_bone_brute": {
+        "name": "骸骨蛮兵"
+      },
+      "crypt_chapel_gargoyle": {
+        "name": "礼拜堂石像鬼"
+      },
+      "crypt_crow_caller": {
+        "name": "唤鸦者"
+      },
+      "crypt_carrion_crow": {
+        "name": "食腐乌鸦"
+      },
+      "crypt_ossuary_drake": {
+        "name": "骨堂骨龙"
+      },
+      "crypt_knellwyrm": {
+        "name": "丧钟巨龙"
+      },
       "bastion_revenant": {
         "name": "堡垒亡魂"
       },
@@ -19571,6 +20042,102 @@ export const zh_CN: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "缚雾者维尔"
+      },
+      "drowned_watchman": {
+        "name": "溺亡守望者"
+      },
+      "fogbound_arbalest": {
+        "name": "缚雾弩手"
+      },
+      "barnacle_crawler": {
+        "name": "藤壶爬蟹"
+      },
+      "bastion_warhound": {
+        "name": "堡垒战犬"
+      },
+      "mistweaver": {
+        "name": "雾之吟唱者"
+      },
+      "drowned_sergeant": {
+        "name": "溺亡军士"
+      },
+      "shackled_prisoner": {
+        "name": "戴镣囚徒"
+      },
+      "gaol_turnkey": {
+        "name": "牢狱钥匙官"
+      },
+      "turretback_hermit": {
+        "name": "背塔寄居蟹"
+      },
+      "vael_fog_shade": {
+        "name": "缚雾者维尔"
+      },
+      "gaoler_ossick": {
+        "name": "狱卒奥西克"
+      },
+      "bastion_gaol_cage": {
+        "name": "铁笼"
+      },
+      "bastion_drowned_anchor": {
+        "name": "溺亡之锚"
+      },
+      "lagoon_snapper": {
+        "name": "泻湖鳄龟"
+      },
+      "lagoon_eel": {
+        "name": "泻湖鳗鱼"
+      },
+      "moonlit_siren": {
+        "name": "月光塞壬"
+      },
+      "tidewisp": {
+        "name": "潮汐精魂"
+      },
+      "drowned_pilgrim": {
+        "name": "溺亡朝圣者"
+      },
+      "mere_hydra_head_left": {
+        "name": "湖泊九头蛇"
+      },
+      "mere_hydra_head_center": {
+        "name": "湖泊九头蛇"
+      },
+      "mere_hydra_head_right": {
+        "name": "湖泊九头蛇"
+      },
+      "tideglass_colossus": {
+        "name": "潮镜巨像"
+      },
+      "tideglass_reflection": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_warrior": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_paladin": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_hunter": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_rogue": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_priest": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_shaman": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_mage": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_warlock": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_druid": {
+        "name": "潮镜倒影"
       },
       "sanctum_boneguard": {
         "name": "圣所骨卫"
@@ -20100,8 +20667,74 @@ export const zh_CN: EnTranslations = {
       "wildheart_beastmaster": {
         "name": "獠牙领主驯兽师"
       },
+      "sunbone_totem_binder": {
+        "name": "日骨图腾缚灵者"
+      },
+      "sunbone_totem": {
+        "name": "日骨图腾"
+      },
+      "basin_raptor": {
+        "name": "盆地迅猛龙"
+      },
+      "spore_toad": {
+        "name": "孢子蟾蜍"
+      },
+      "vine_lasher": {
+        "name": "乱藤鞭者"
+      },
+      "great_saurian": {
+        "name": "巨型蜥脚兽"
+      },
+      "howdah_hexcaller": {
+        "name": "驮轿巫咒师"
+      },
+      "fanglord_jaguar": {
+        "name": "獠牙领主的巨型美洲豹"
+      },
+      "the_gorgebloom": {
+        "name": "噬花"
+      },
       "wildheart_high_priest": {
         "name": "盆地之声祖尔加"
+      },
+      "broodsworn_thawcaller": {
+        "name": "龙誓融冰召唤者"
+      },
+      "broodsworn_goadsmith": {
+        "name": "龙誓刺棒匠"
+      },
+      "broodsworn_pyre_tender": {
+        "name": "龙誓柴堆看守"
+      },
+      "soul_brazier": {
+        "name": "灵魂火盆"
+      },
+      "rime_whelp": {
+        "name": "霜凇幼龙"
+      },
+      "ogre_sledge_hauler": {
+        "name": "食人魔拉橇工"
+      },
+      "glacier_splinter": {
+        "name": "冰川碎片"
+      },
+      "sledge_tusker": {
+        "name": "拖橇巨牙兽"
+      },
+      "sanctum_shackle_hammer": {
+        "name": "铁锤镣铐"
+      },
+      "sanctum_shackle_tongs": {
+        "name": "铁钳镣铐"
+      },
+      "sanctum_shackle_anvil": {
+        "name": "铁砧镣铐"
+      },
+      "sanctum_shackle_bellows": {
+        "name": "风箱镣铐"
+      },
+      "thorn_sprout": {
+        "name": "荆棘幼芽"
       },
       "ironvein_foreman": {
         "name": "铁脉工头"
@@ -23710,7 +24343,7 @@ export const zh_CN: EnTranslations = {
       },
       "wildheart_basin": {
         "name": "荒野之心盆地",
-        "enterText": "温热的雨水在古老石面上嘶嘶作响。荒野之心盆地在你眼前展开。",
+        "enterText": "你穿过神像巨口，踏上高悬于盆地之上的岩架。瀑布自崖顶轰然而下，而在远处下方，某个庞然大物正涉过浅滩。",
         "leaveText": "你从石牙之下穿回棕榈之境的阳光中。"
       },
       "the_last_keep": {

@@ -7,6 +7,38 @@ import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { ITEMS, MOBS } from '../../sim/data';
 import {
+  COLOSSUS_MOONLIGHT_LANCE,
+  COLOSSUS_PRISM_FLARE,
+  COLOSSUS_RESONANT_SLAM,
+  SELTHE_SEA_SONG,
+  SELTHE_TIDAL_SLAP,
+  YSOLEI_CALL,
+  YSOLEI_LUNAR_TIDE,
+  YSOLEI_UNDERTOW,
+  YSOLEI_WRATH,
+} from '../../sim/encounters/drowned_temple/ids';
+import {
+  KNELLWYRM_ARRIVE,
+  KNELLWYRM_DREAD_BELLOW,
+  KNELLWYRM_PYRE_STRAFE,
+  KNELLWYRM_STRAFE_RUN,
+  MORTHEN_DESCEND,
+  MORTHEN_PROCLAIM,
+  MORTHEN_RISE,
+  MORTHEN_RITE_WAKES,
+} from '../../sim/encounters/hollow_crypt/ids';
+import {
+  OLEN_OATHBOUND_CHARGE,
+  OSSICK_ANCHOR,
+  OSSICK_CUDGEL,
+  OSSICK_SHACKLE,
+  VAEL_DROWNING_HYMN,
+  VAEL_MIST_SURGE,
+  VAEL_REAPING_SCYTHE,
+  VAEL_SHADOWSTEP,
+  VAEL_VEIL_RISE,
+} from '../../sim/encounters/sunken_bastion/ids';
+import {
   VARKHUL_ANVILS_DECREE_CAST_ID,
   VARKHUL_BOSS_ID,
   VARKHUL_FORGE_HAMMER_ABILITY_ID,
@@ -20,6 +52,34 @@ import {
 } from '../../sim/ignivar_raid_ids';
 import { DUNGEON_MINIBOSS_STOMP_ABILITY_ID } from '../../sim/mob/dungeon_miniboss_stomp';
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../../sim/mob/healer_channel';
+import {
+  BASTION_BRINE_MEND,
+  BASTION_CLAW_SWEEP,
+  BASTION_FOG_WARD,
+  BASTION_HALBERD_SWEEP,
+  BASTION_PIERCING_BOLT,
+  BASTION_SHELL_SLAM,
+} from '../../sim/mob/trash_kit/bastion_cast_ids';
+import {
+  CRYPT_BARROWFLAME_BREATH,
+  CRYPT_GRAVE_BOLT,
+  CRYPT_GRAVE_CLEAVE,
+  CRYPT_MURDER_CALL,
+  CRYPT_PERCH_DIVE,
+  CRYPT_RAISE_BONES,
+  CRYPT_SKY_LANDING,
+  CRYPT_STONE_SHRIEK,
+  CRYPT_TAIL_LASH,
+  CRYPT_WING_GUST,
+} from '../../sim/mob/trash_kit/cast_ids';
+import {
+  TEMPLE_CALL_THE_TIDE,
+  TEMPLE_LIGHTNING_SPIT,
+  TEMPLE_LULLABY,
+  TEMPLE_SNAP,
+  TEMPLE_STATIC_COIL,
+  TEMPLE_TRIDENT_SWEEP,
+} from '../../sim/mob/trash_kit/temple_cast_ids';
 import { NYTHRAXIS_BONE_SPIKE_ID } from '../../sim/nythraxis_bone_spike';
 import {
   HOARD_CAST_BAT_DIVE,
@@ -57,9 +117,23 @@ import {
   HOARD_GESTURE_FROST_GUST,
   HOARD_GESTURE_ICE_AGE_RELEASE,
 } from '../hoard_boss_gestures_core';
+import {
+  MORTHEN_SCYTHE_HELD,
+  MORTHEN_SCYTHE_UNFOLD,
+  MORTHEN_STAFF_HELD,
+  MORTHEN_TOLL,
+} from '../hollow_crypt/morthen_fx_core';
 import type { LocoGaitThresholds } from '../locomotion';
+import { BASTION_OPEN_CELLS_GESTURE } from '../sunken_bastion/bastion_creature_fx_core';
 import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
+import type { BoneDialDef } from './bone_dials';
+import type { ClipTrackDrops } from './clip_track_drops';
+import type { MeshToggleDef } from './gesture_mesh_toggles';
+import type { GlowPulseSet } from './glow_pulse_core';
 import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
+import { SANCTUM_BOSS_LOOKS, SANCTUM_BOSS_MOB_KEYS } from './sanctum_boss_looks';
+import { SANCTUM_MOB_KEYS, sanctumCreatureLooks } from './sanctum_creature_looks';
+import { WILDHEART_MOB_KEYS, wildheartPlaceholderLooks } from './wildheart_creature_looks';
 
 export interface EmoteClipSpec {
   clips: readonly string[];
@@ -92,6 +166,16 @@ export interface ClipMap {
    *  Its pose should match what the rig's attack and hit one-shots open and
    *  close on, so those blend into and out of it without a snap. */
   combatIdle?: string;
+  /** The dazed loop a standing body holds while a stun rides it, in place of
+   *  `idle` / `combatIdle` (stun_idle_core.ts). Absent = it stands in its idle. */
+  stunned?: string;
+  /** The loop a rooted body holds while it turns in place to face a new target,
+   *  in place of `idle` / `combatIdle` (turn_in_place_core.ts; pair it with
+   *  VisualDef.turnRate). Absent = it turns in its idle. */
+  turn?: string;
+  /** A one-shot the body plays once when it first arrives, on its
+   *  VisualDef.entranceGesture (the Thorn Sprout bursting out of its pod). */
+  entrance?: string;
   /** Low stalking poses for a concealed quadruped. Absent = ordinary gait. */
   prowlIdle?: string;
   prowlWalk?: string;
@@ -212,6 +296,17 @@ export interface VisualDef {
    *  tail): the ground anchor is the lowest skinned vertex, so without the
    *  sink the body is lifted until the tail tip touches and the feet float. */
   hover?: number;
+  /** A creature that flies, or waits perched high over the floor (the Hollow
+   *  Crypt's drake and gargoyles): its airborne state is read from its drawn
+   *  height over the standing surface, as a player's is (a mob's `onGround`
+   *  never leaves true), so `jump` plays while it is up (LOOPED, never clamped:
+   *  a flight loop or a perch), `fall` while it plunges and `land` on touchdown. */
+  flight?: boolean;
+  /** A plain auto-attack trigger never stomps a `clips.castPlayOut` clip while
+   *  it plays (as the cast loop or as its play-out): a breath's exhale or a
+   *  tail sweep's follow-through lands in full, and the swing it would have
+   *  shown is simply skipped. Per-ability triggers still play. */
+  castPlayOutHoldsAttacks?: boolean;
   /** yaw applied so the model faces +Z (facing-0 convention) */
   yaw?: number;
   /** Optional texture-aware ambient lift for exceptionally dark authored bodies.
@@ -226,6 +321,11 @@ export interface VisualDef {
    *  albedo. For rigs whose authored PBR response reads as gloss under an
    *  interior light rig (the Ignivar raid roster). */
   matte?: boolean;
+  /** Creased smooth shading for a faceted, flat-shaded rig: the crease angle
+   *  in degrees below which neighbouring facets blend (smooth_normals.ts).
+   *  Normals only: the triangles, the skin and the silhouette are unchanged,
+   *  and only this def's clones take the smoothed geometry. */
+  smoothNormals?: number;
   /** The body atlas is an AUTHORED baked texture (a Tripo or Blender export
    *  that carries its own shading, largely dark texels), not a KayKit palette.
    *  On the low graphics tier the Lambert rebuild adds a small uniform
@@ -257,6 +357,10 @@ export interface VisualDef {
    *  (the Nythraxis Bone Spike, which shares its footprint with the raider
    *  it pins). Presentation-side targeting help only: the sim never reads it. */
   clickRadius?: number;
+  /** Draw no body for this entity (its click capsule, nameplate and bars
+   *  stay): a part of a larger creature drawn once by its dungeon's own
+   *  visuals (the Mere Hydra's heads). */
+  bodyless?: boolean;
   /** material tint: explicit color, 'entity' (use e.color), or none */
   tint?: number | 'entity';
   /** lerp amount toward the tint (default 0.4) */
@@ -334,6 +438,51 @@ export interface VisualDef {
    *  state; CharacterVisual's enterDeath/revive flip it. Node names as
    *  authored in the GLB. */
   corpseMeshSwap?: { hide: string; show: string };
+  /** Boss stance vocabularies keyed by a presentation gesture id (Morthen's
+   *  bell staff and the scythe it unfolds into, src/render/hollow_crypt/
+   *  morthen_fx_core.ts). The gesture, sent through the renderer's
+   *  triggerAttack seam, swaps the rig's whole ClipMap in place and plays the
+   *  stance's `enter` one-shot when it names one; a gesture for the stance
+   *  already held does nothing. `clips` should be one of these stances. */
+  phaseClips?: Record<string, { clips: ClipMap; enter?: string }>;
+  /** Bones turned on top of the clips by presentation gestures (the same
+   *  triggerAttack seam a stance swap rides): a boss's gauge needle, armour
+   *  plates that flip face. See bone_dials.ts for the contract. */
+  dials?: readonly BoneDialDef[];
+  /** Rotation tracks dropped from named clips when the visual is prepared, for
+   *  bones a dial owns (the Warden's plates through its flip clip, the Prime
+   *  Draft's hatch leaves through its hatch clips). See clip_track_drops.ts. */
+  clipTrackDrops?: ClipTrackDrops;
+  /** Position tracks removed from named clips when the visual is prepared: an
+   *  airborne clip that carries its altitude on its root, for a body the sim
+   *  already lifts (Korzul's hover clips). See clip_track_drops.ts. */
+  clipPositionDrops?: ClipTrackDrops;
+  /** Mesh nodes hidden or shown by presentation gestures (the same triggerAttack
+   *  seam): the Great Saurian's howdah once it breaks. See gesture_mesh_toggles.ts. */
+  meshToggles?: readonly MeshToggleDef[];
+  /** One-shot clips a plain auto-attack never cuts while they play (a set-piece
+   *  like the howdah breaking lands in full; the swing it would show is skipped). */
+  oneShotsHoldAttacks?: readonly string[];
+  /** A rooted body slews its drawn heading toward the sim's facing at this rate
+   *  (rad/s) instead of snapping, holding `clips.turn` while it catches up
+   *  (turn_in_place_core.ts). Absent = the model follows the facing at once. */
+  turnRate?: number;
+  /** The body's own emissive map flared by presentation gestures (the same
+   *  triggerAttack seam) and faded out on death: the Gorgebloom's gullet and
+   *  pollen sacs. See glow_pulse_core.ts. */
+  glowPulses?: GlowPulseSet;
+  /** The presentation gesture that plays `clips.entrance`, ONCE per entity: a
+   *  repeat for the same entity does nothing, so an effect may keep offering
+   *  it until the view exists (the view is often built a frame or two after
+   *  the entity appears). */
+  entranceGesture?: string;
+  /** Its per-ability cast clips are timed so a contact frame lands on the
+   *  bar's end (castTimeScaleByAbility): the bar takes the body at once,
+   *  cutting a plain swing or flinch (never a one-shot in
+   *  oneShotsHoldAttacks), and the clip's time is held to the bar's elapsed
+   *  time, so a clip that entered late still strikes on the bar's end
+   *  (anim_state.ts castClipSyncTime). */
+  castClipSync?: boolean;
 }
 
 /** The slice of a VisualDef that decides how held weapons attach (which bones, and
@@ -782,11 +931,15 @@ const WILDHEART_HEXCALLER: ClipMap = {
 // across all 5 Wildheart Basin mobs. This clip is baked off wildheart_high_priest.glb's
 // own donor poses (a climactic Cast hold into Jump's own pose repurposed as a downward
 // slam/roar release), so only mob_wildheart_high_priest gets it; the other 4 Wildheart
-// mobs are untouched. Wired into both attack and cast; deliberately the longest and most
-// dramatic of the five, befitting the dungeon boss.
+// mobs are untouched. Deliberately the longest and most dramatic of the five, befitting
+// the dungeon boss: it is his CAST (the Pulse and the Spirit of the Hunt bars). His
+// melee swing is Wildheart_High_Priest_Swing (same builder, off his own Attack donor):
+// played as a swing the slam heaved his whole body (its Jump donor turns the pelvis
+// 140 degrees), so the swing keeps his legs and pelvis on the idle stance and lets the
+// arms, shoulders and spine carry a wind-up, a rake down and a recovery.
 const WILDHEART_HIGH_PRIEST: ClipMap = {
   ...TRIPO_BIPED_FULL_RIG,
-  attack: ['Wildheart_High_Priest_Attack'],
+  attack: ['Wildheart_High_Priest_Swing'],
   cast: 'Wildheart_High_Priest_Attack',
 };
 
@@ -888,6 +1041,17 @@ const KOBOLD_DIGGER: ClipMap = {
 };
 
 // floating/flying rigs (goleling/dragon) — hover instead of walking
+/** The clip set every Drowned Temple creature authors (scripts/assets/drowned_temple_creatures). */
+const TEMPLE_CLIPS = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack', 'Attack2'],
+  hit: ['Hit'],
+  death: 'Death',
+  cast: 'Cast',
+};
+
 const FLOATING: ClipMap = {
   idle: 'Flying_Idle',
   walk: 'Fast_Flying',
@@ -1548,6 +1712,44 @@ export const NYTHRAXIS_BONE_SPIKE_SELF_ILLUMINATION = 0.35;
  *  (0.88 * 2.6/1.6 * 0.9 = 1.29): a click anywhere near the spike lands on
  *  it, not on the raider it pins (owner call, 2026-09-11). */
 export const NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS = 2.6;
+
+// Morthen the Gravecaller as the Lich Bishop (scripts/assets/hollow_crypt_creatures/
+// build_morthen.py): two whole vocabularies on one rig. With the BELL STAFF he
+// glides, strikes with the bell head and the shaft, tolls the bell for his
+// Shadow Pulse, and his entrance rides his cast bar: he unfurls as he rises
+// (Rise), raises his off hand as he speaks the names (SummonSouls; the v2 body
+// carries no Book of Names) and holds his ward
+// as he comes down (ShieldRitual). At his Last Rites the staff's crest UNFOLDS
+// INTO A SCYTHE (Transform) and every clip after it carries the blade out.
+const MORTHEN_STAFF_CLIPS: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['StaffStrike', 'StaffStrike2'],
+  attackByAbility: { [MORTHEN_TOLL]: 'BellToll' },
+  attackTimeScaleByAbility: { [MORTHEN_TOLL]: 1 },
+  hit: ['Hit'],
+  death: 'Death',
+  cast: 'SummonSouls',
+  castByAbility: {
+    [MORTHEN_RITE_WAKES]: 'Rise',
+    [MORTHEN_RISE]: 'Rise',
+    [MORTHEN_PROCLAIM]: 'SummonSouls',
+    [MORTHEN_DESCEND]: 'ShieldRitual',
+  },
+  castTimeScaleByAbility: { [MORTHEN_RISE]: 1, [MORTHEN_PROCLAIM]: 1, [MORTHEN_DESCEND]: 1 },
+};
+const MORTHEN_SCYTHE_CLIPS: ClipMap = {
+  idle: 'ScytheIdle',
+  walk: 'ScytheWalk',
+  run: 'ScytheRun',
+  attack: ['ScytheSweep', 'ScytheSweep2'],
+  attackByAbility: { [MORTHEN_TOLL]: 'ScytheToll' },
+  attackTimeScaleByAbility: { [MORTHEN_TOLL]: 1 },
+  hit: ['ScytheHit'],
+  death: 'ScytheDeath',
+  cast: 'ScytheSummon',
+};
 
 export const VISUALS: Record<string, VisualDef> = {
   // -- player classes ------------------------------------------------------
@@ -3607,6 +3809,792 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.25,
   },
 
+  // -- the Hollow Crypt trash (sim/content/hollow_crypt_trash.ts) ----------------
+  // The KayKit skeletons with the trash kit's casts on their own gestures: the
+  // Grave Cleave winds up the two-hand chop over its bar, the Raise Bones
+  // channel lifts both arms, the Grave Bolt is the shooting cast.
+  crypt_skel_warrior: {
+    url: `${ENEMIES}/skeleton_warrior.glb`,
+    animUrls: [`${ENEMIES}/skeleton_warrior_hit_variety_anims.glb`],
+    height: 3.3,
+    clips: {
+      ...skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+      castByAbility: { [CRYPT_GRAVE_CLEAVE]: '2H_Melee_Attack_Chop' },
+      castTimeScaleByAbility: { [CRYPT_GRAVE_CLEAVE]: 0.7 },
+    },
+    tint: 'entity',
+    tintStrength: 0.25,
+  },
+  crypt_skel_adept: {
+    url: `${ENEMIES}/skeleton_mage.glb`,
+    animUrls: [`${ENEMIES}/skeleton_mage_hit_variety_anims.glb`],
+    height: 3.2,
+    clips: {
+      ...skeletonClips(['2H_Melee_Attack_Chop']),
+      castByAbility: { [CRYPT_GRAVE_BOLT]: 'Spellcast_Shoot' },
+      castTimeScaleByAbility: { [CRYPT_GRAVE_BOLT]: 0.6 },
+    },
+    attach: [{ url: `${WEAPONS}/skeleton_staff.glb`, bone: 'handslot.r' }],
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  crypt_skel_necromancer: {
+    url: `${ENEMIES}/necromancer.glb`,
+    animUrls: [`${ENEMIES}/necromancer_hit_variety_anims.glb`],
+    height: 3.3,
+    clips: {
+      ...skeletonClips(['2H_Melee_Attack_Chop']),
+      castByAbility: { [CRYPT_RAISE_BONES]: 'Spellcast_Raise' },
+    },
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  // The rest of the Hollow Crypt roster on the same rigs, raised a head or more
+  // over a player (2.6) so nothing in the crypt stands at player size: the
+  // cutthroat, the Bone Minion (it grows into the Brute), the Brute itself, the
+  // Sexton, the Cantor and her choir, Morthen, and Rimeweb over her brood.
+  crypt_skel_cutthroat: {
+    url: `${ENEMIES}/skeleton_rogue.glb`,
+    animUrls: [`${ENEMIES}/skeleton_rogue_hit_variety_anims.glb`],
+    height: 3.2,
+    clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    tint: 'entity',
+    tintStrength: 0.25,
+  },
+  crypt_skel_minion: {
+    url: `${ENEMIES}/skeleton_minion.glb`,
+    animUrls: [`${ENEMIES}/skeleton_minion_hit_variety_anims.glb`],
+    height: 3.5,
+    clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    tint: 'entity',
+    tintStrength: 0.25,
+  },
+  crypt_skel_brute: {
+    url: `${ENEMIES}/skeleton_golem.glb`,
+    height: 4.6,
+    clips: {
+      ...skeletonLargeClips(['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop']),
+      attack: ['Golem_Slam'],
+    },
+    animUrls: [`${ENEMIES}/skeleton_golem_anims.glb`],
+    weaponFix: [{ node: 'Skeleton_Golem_Axe', rotY: Math.PI }],
+    tint: 'entity',
+    tintStrength: 0.25,
+  },
+  crypt_skel_sexton: {
+    url: `${ENEMIES}/skeleton_mage.glb`,
+    animUrls: [`${ENEMIES}/skeleton_mage_hit_variety_anims.glb`],
+    height: 3.4,
+    clips: skeletonClips(['2H_Melee_Attack_Chop']),
+    attach: [{ url: `${WEAPONS}/skeleton_staff.glb`, bone: 'handslot.r' }],
+    tint: 'entity',
+    tintStrength: 0.25,
+  },
+  crypt_skel_cantor: {
+    url: `${ENEMIES}/skeleton_mage.glb`,
+    animUrls: [`${ENEMIES}/skeleton_mage_hit_variety_anims.glb`],
+    height: 3.2,
+    clips: skeletonClips(['2H_Melee_Attack_Chop']),
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  crypt_skel_chorister: {
+    url: `${ENEMIES}/necromancer.glb`,
+    animUrls: [`${ENEMIES}/necromancer_hit_variety_anims.glb`],
+    height: 3.3,
+    clips: skeletonClips(['2H_Melee_Attack_Chop']),
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  // Morthen, the Lich Bishop (the clip sets above): about three players tall
+  // at his template's 1.35, hovering on his smoke a hand over the flags.
+  crypt_morthen_lich: {
+    url: `${CREATURES}/crypt_morthen_lich.glb`,
+    height: 6.994,
+    hover: 0.122,
+    clips: MORTHEN_STAFF_CLIPS,
+    phaseClips: {
+      [MORTHEN_STAFF_HELD]: { clips: MORTHEN_STAFF_CLIPS },
+      [MORTHEN_SCYTHE_HELD]: { clips: MORTHEN_SCYTHE_CLIPS },
+      [MORTHEN_SCYTHE_UNFOLD]: { clips: MORTHEN_SCYTHE_CLIPS, enter: 'Transform' },
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.08,
+    clickRadius: 2.2,
+  },
+  mob_crypt_rimeweb: {
+    url: `${CREATURES}/spider.glb`,
+    height: 2.7,
+    clips: SPIDER,
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  // A hooded cultist of the Gravecallers with a crooked staff: calls the crows.
+  mob_crypt_crow_caller: {
+    url: `${PLAYERS}/rogue_hooded.glb`,
+    animUrls: [`${PLAYERS}/rogue_hooded_hit_variety_anims.glb`],
+    height: 3.3,
+    clips: {
+      ...kaykit(['2H_Melee_Attack_Chop']),
+      castByAbility: { [CRYPT_MURDER_CALL]: 'Spellcast_Raise' },
+    },
+    attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
+    tint: 'entity',
+    tintStrength: 0.6,
+  },
+  // The Chapel Gargoyle (scripts/assets/hollow_crypt_creatures/build_stone_gargoyle.py):
+  // a great, heavy stone brute with baked cracked-stone surfaces, authored about
+  // 4.5 yd tall crouched and raised to scale 1.5 by its template, so it looms
+  // well over three players high on its arch (a player stands 2.6). It is a statue while it
+  // perches (`Perch`, read as airborne up on the cap), cracks free on the pull
+  // (`Awaken`, keyed on the dive cue), plunges (`Dive`), slams down (`DiveLand`),
+  // fights from a braced crouch (`Ready`), rakes with its talons and rears to
+  // shriek. Its talons curl just under its feet: the negative hover plants them.
+  mob_crypt_gargoyle: {
+    url: `${CREATURES}/crypt_gargoyle.glb`,
+    authoredAtlas: true,
+    height: 5.81,
+    hover: -0.22,
+    flight: true,
+    clips: {
+      idle: 'Perch',
+      combatIdle: 'Ready',
+      walk: 'Walk',
+      run: 'Run',
+      jump: 'Perch',
+      fall: 'Dive',
+      land: 'DiveLand',
+      attack: ['ClawRake', 'ClawRake2'],
+      attackByAbility: { [CRYPT_PERCH_DIVE]: 'Awaken' },
+      attackTimeScaleByAbility: { [CRYPT_PERCH_DIVE]: 1.9 },
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Screech',
+      castByAbility: { [CRYPT_STONE_SHRIEK]: 'Screech' },
+    },
+    selfIllumination: 0.18,
+  },
+  // The Carrion Crow is always on the wing: `hover` lifts it and its Death clip
+  // drops the body onto the floor.
+  mob_crypt_crow: {
+    url: `${CREATURES}/crypt_crow.glb`,
+    height: 1.7,
+    hover: 2.2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    selfIllumination: 0.15,
+  },
+  // The Ossuary Drake (scripts/assets/hollow_crypt_creatures/build_bone_drake.py):
+  // a colossal skeletal wyvern, its head about 10 yd up and its wings about 34
+  // across, centred on its SHOULDERS so the jaws that pour the Barrowflame hang
+  // over the breath cone's apex. It flies its patrol (`Fly`: two downbeats and a
+  // long glide), cries as it breaks off (`SkyRoar`, the landing cue), glides
+  // down (`Glide`), lands (`Land`), walks and runs on its wing knuckles, bites
+  // (never claws), and plays each strike to its bar: the breath inhales over the
+  // 2 s bar and its exhale plays OUT after it; the tail sweeps and the wings
+  // buffet exactly at their bars' ends. Plain swings never cut those short.
+  mob_crypt_drake: {
+    url: `${CREATURES}/crypt_drake.glb`,
+    authoredAtlas: true,
+    height: 13.63,
+    hover: -0.19,
+    flight: true,
+    clips: {
+      idle: 'Idle',
+      idleBeat: { clip: 'Roar', everySec: 16, jitterSec: 5 },
+      walk: 'Walk',
+      run: 'Run',
+      jump: 'Fly',
+      fall: 'Glide',
+      land: 'Land',
+      attack: ['Bite', 'Bite2'],
+      attackByAbility: { [CRYPT_SKY_LANDING]: 'SkyRoar' },
+      attackTimeScaleByAbility: { [CRYPT_SKY_LANDING]: 1 },
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Roar',
+      castByAbility: {
+        [CRYPT_BARROWFLAME_BREATH]: 'Breath',
+        [CRYPT_TAIL_LASH]: 'TailSweep',
+        [CRYPT_WING_GUST]: 'WingBuffet',
+      },
+      castTimeScaleByAbility: {
+        [CRYPT_BARROWFLAME_BREATH]: 1,
+        [CRYPT_TAIL_LASH]: 1,
+        [CRYPT_WING_GUST]: 1,
+      },
+      castPlayOut: ['Breath', 'TailSweep', 'WingBuffet'],
+      flourish: 'Roar',
+    },
+    castPlayOutHoldsAttacks: true,
+    selfIllumination: 0.12,
+  },
+
+  // The Knellwyrm (scripts/assets/hollow_crypt_creatures/build_knellwyrm.py):
+  // the Ossuary Drake's charred kin, built on its skeleton and rig, with ghost
+  // fire burning through its skull, ribs, spine and tail and a crown of horns.
+  // Authored at the drake's size; its template raises it a quarter again. It
+  // glides in from the sky (the arrival bar), takes wing for its Pyre Strafe,
+  // flies the lane with its neck plunged and jaws wide, and rears up with its
+  // wings flung wide for Dread Bellow; the drake's strikes play to their bars.
+  mob_crypt_knellwyrm: {
+    url: `${CREATURES}/crypt_knellwyrm.glb`,
+    authoredAtlas: true,
+    height: 15.07,
+    hover: -0.19,
+    flight: true,
+    clips: {
+      idle: 'Idle',
+      idleBeat: { clip: 'Roar', everySec: 14, jitterSec: 4 },
+      walk: 'Walk',
+      run: 'Run',
+      jump: 'Fly',
+      fall: 'Glide',
+      land: 'Land',
+      attack: ['Bite', 'Bite2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Roar',
+      castByAbility: {
+        [CRYPT_BARROWFLAME_BREATH]: 'Breath',
+        [CRYPT_TAIL_LASH]: 'TailSweep',
+        [CRYPT_WING_GUST]: 'WingBuffet',
+        [KNELLWYRM_ARRIVE]: 'Glide',
+        [KNELLWYRM_PYRE_STRAFE]: 'TakeWing',
+        [KNELLWYRM_STRAFE_RUN]: 'Strafe',
+        [KNELLWYRM_DREAD_BELLOW]: 'Bellow',
+      },
+      castTimeScaleByAbility: {
+        [CRYPT_BARROWFLAME_BREATH]: 1,
+        [CRYPT_TAIL_LASH]: 1,
+        [CRYPT_WING_GUST]: 1,
+        [KNELLWYRM_PYRE_STRAFE]: 1,
+        [KNELLWYRM_DREAD_BELLOW]: 1,
+      },
+      castPlayOut: ['Breath', 'TailSweep', 'WingBuffet', 'Bellow'],
+      flourish: 'Roar',
+    },
+    castPlayOutHoldsAttacks: true,
+    selfIllumination: 0.2,
+  },
+
+  // -- the Sunken Bastion trash (sim/content/sunken_bastion.ts) ------------------
+  // The Bastion's drowned garrison and its sea beasts, each its own Blender
+  // body (scripts/assets/sunken_bastion_creatures/: drowned.py, turnkey.py,
+  // hag.py, crawler.py, hound.py), all well past the player's size, each with
+  // the clips of its one job: the watchman's halberd sweep, the arbalest's
+  // aimed lane shot, the sergeant's rallying roar, the sea hag's lure and ward.
+  // The drowned stand head and shoulders over a player (about 1.6x for a
+  // prisoner, 2x for the elite sailors, 2.6x for the sergeant); presentation
+  // only, the templates' gameplay is untouched.
+  bastion_drowned_revenant: {
+    url: `${CREATURES}/drowned_revenant.glb`,
+    height: 4.7,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+  },
+  bastion_skel_watchman: {
+    url: `${CREATURES}/drowned_watchman.glb`,
+    height: 4.85,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      // The pole is drawn back through the bar and sweeps as it ends.
+      castByAbility: { [BASTION_HALBERD_SWEEP]: 'HalberdSweep' },
+      castTimeScaleByAbility: { [BASTION_HALBERD_SWEEP]: 1.05 },
+    },
+  },
+  // A heavy crossbow (long stock, wide steel prod, a drawn string and a
+  // loaded bolt). Shoot is the Rusted Bolt: shouldered over the 0.6 s windup,
+  // the loose on the release frame, the kick, then the windlass cranked and a
+  // fresh bolt laid in. Aim is the Piercing Bolt: held down the lane over the
+  // 2 s bar, the loose landing as the bar ends, the reload playing out after.
+  // The bolts themselves fly in sunken_bastion/bastion_creature_fx.ts.
+  bastion_skel_arbalest: {
+    url: `${CREATURES}/drowned_arbalest.glb`,
+    height: 5.4,
+    attackTimeScale: 1,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Shoot'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      castByAbility: { [BASTION_PIERCING_BOLT]: 'Aim' },
+      castTimeScaleByAbility: { [BASTION_PIERCING_BOLT]: 1 },
+      castPlayOut: ['Aim'],
+    },
+    castPlayOutHoldsAttacks: true,
+  },
+  bastion_skel_sergeant: {
+    url: `${CREATURES}/drowned_sergeant.glb`,
+    height: 4.85,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      // Rally the Watch: the cutlass thrust high and the roar.
+      flourish: 'Rally',
+    },
+  },
+  // The Mist Chanter: a hunched sea hag with an anglerfish-lure staff.
+  bastion_mistweaver: {
+    url: `${CREATURES}/mist_chanter.glb`,
+    height: 3.5,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      // Chilling Mist: the lure thrust out; Fog Ward: the staff raised high.
+      cast: 'Cast',
+      castByAbility: { [BASTION_FOG_WARD]: 'Ward' },
+    },
+    selfIllumination: 0.08,
+  },
+  // The Tidebound Acolyte: a living cultist of Vael's hymn in sea-green robes.
+  bastion_acolyte: {
+    url: `${PLAYERS}/mage.glb`,
+    animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
+    height: HUMANOID_H * 1.35,
+    clips: {
+      ...kaykit(['2H_Melee_Attack_Chop']),
+      castByAbility: { [BASTION_BRINE_MEND]: 'Spellcast_Raise' },
+    },
+    show: ['Mage_Hat'],
+    attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
+    tint: 'entity',
+    tintStrength: 0.55,
+  },
+
+  // The Sunken Bastion's bosses (sim/encounters/sunken_bastion). Knight-
+  // Commander Olen: a towering drowned knight behind a great shield, planting
+  // himself and roaring his oath over the Oathbound Charge's bar.
+  bastion_olen: {
+    url: `${ENEMIES}/skeleton_warrior.glb`,
+    animUrls: [`${ENEMIES}/skeleton_warrior_hit_variety_anims.glb`],
+    height: 5.4,
+    clips: {
+      ...skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal'], 'Taunt'),
+      castByAbility: { [OLEN_OATHBOUND_CHARGE]: 'Taunt' },
+      castTimeScaleByAbility: { [OLEN_OATHBOUND_CHARGE]: 1 },
+    },
+    attach: [
+      { url: `${WEAPONS}/skeleton_blade.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/skeleton_shield_large_a.glb`, bone: 'handslot.l' },
+    ],
+    tint: 0x6f8a86,
+    tintStrength: 0.35,
+  },
+  // Gaoler Ossick: the gaol's hulking warden, hurling the Drowned Anchor with a
+  // one-hand throw, flinging the Shackle Pair with a two-hand heave, and
+  // bringing the cudgel down in his great slam.
+  bastion_ossick: {
+    url: `${ENEMIES}/skeleton_golem.glb`,
+    height: 6.2,
+    clips: {
+      ...skeletonLargeClips(['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop']),
+      attack: ['Golem_Slam'],
+      castByAbility: {
+        [OSSICK_ANCHOR]: '1H_Melee_Attack_Chop',
+        [OSSICK_SHACKLE]: '2H_Melee_Attack_Chop',
+        [OSSICK_CUDGEL]: 'Golem_Slam',
+      },
+    },
+    animUrls: [`${ENEMIES}/skeleton_golem_anims.glb`],
+    weaponFix: [{ node: 'Skeleton_Golem_Axe', rotY: Math.PI }],
+    tint: 0x5b6a64,
+    tintStrength: 0.35,
+  },
+  // Vael the Fogbinder, Death itself, and his shadow copies wear ONE look (the
+  // veil hides him among them; only the Fogbeacon's beam tells them apart):
+  // the hooded skeletal reaper built in Blender (scripts/assets/
+  // sunken_bastion_creatures/reaper.py), a great scythe in hand, soul fire in
+  // his sockets, ribs and lantern, hovering a hand over the flags. The scythe
+  // is modelled in his right fist and never turns against it (the arms and
+  // body swing it; tests/vael_reaper.test.ts). Authored at size (`height` and
+  // `hover` are the build's IDLE_HEIGHT and MINZ half a second into Idle, the
+  // upright scythe's blade on top; the hood's peak about 6.5), drawn at the
+  // template's 1.35. The Shadow Crossing's bar sinks him through the floor
+  // (Vanish) and rises him out of the pool (Emerge); the sweep off the pool is
+  // his flourish, fired by the Reaping Scythe's cue.
+  bastion_vael: {
+    url: `${CREATURES}/vael_reaper.glb`,
+    height: 9.21,
+    hover: 0.406,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      castByAbility: {
+        [VAEL_MIST_SURGE]: 'Cast',
+        [VAEL_DROWNING_HYMN]: 'Hymn',
+        [VAEL_SHADOWSTEP]: 'Vanish',
+        [VAEL_REAPING_SCYTHE]: 'Emerge',
+        // The Fog Veil: all four figures rise out of the roof the same way.
+        [VAEL_VEIL_RISE]: 'Emerge',
+      },
+      flourish: 'ScytheSweep',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.06,
+    clickRadius: 2.2,
+  },
+
+  // The Bastion's beasts and gaol bodies, scaled well past the player.
+  // The Barnacle Crawler: a barnacled rock crab with a face (stalked amber
+  // eyes, hooked mandibles round a toothed maw) and three brine sacs in its
+  // crust. Its Death swells the sacs and BURSTS them at 1.5 s, on the Brine
+  // Burst's own fuse; Attack2 is its lunge bite.
+  bastion_crawler: {
+    url: `${CREATURES}/bastion_crawler.glb`,
+    height: 3.2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    selfIllumination: 0.06,
+  },
+  // The Bastion Warhound: a shark-headed sea hound in the garrison's spiked
+  // war-collar. Its Lunge flies in the Leap pose and lands on Land.
+  bastion_warhound: {
+    url: `${CREATURES}/bastion_warhound.glb`,
+    height: 3.0,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Leap',
+      land: 'Land',
+    },
+    selfIllumination: 0.06,
+  },
+  bastion_prisoner: {
+    url: `${CREATURES}/drowned_prisoner.glb`,
+    height: 4.6,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+  },
+  // The Gaol Turnkey (scripts/assets/sunken_bastion_creatures/turnkey.py): a
+  // bloated, waterlogged jailer on the organic kit (baked drowned skin and
+  // leather, rusted iron, barnacles and weed, an iron collar and its broken
+  // chain), no player body. It flails its great ring of keys overhead
+  // (KeySwing) and lashes the key chain flat across its front (ChainLash);
+  // opening the cells it hoists its lantern and rattles the keys
+  // (LanternRaise, played from the lantern flare in
+  // sunken_bastion/bastion_creature_fx.ts).
+  bastion_turnkey: {
+    url: `${CREATURES}/gaol_turnkey.glb`,
+    // The gaol's miniboss: drawn at a boss's size (about 8.3 at its 1.3),
+    // over three players tall.
+    height: 6.4,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['KeySwing', 'ChainLash'],
+      attackByAbility: { [BASTION_OPEN_CELLS_GESTURE]: 'LanternRaise' },
+      attackTimeScaleByAbility: { [BASTION_OPEN_CELLS_GESTURE]: 1 },
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.05,
+  },
+  // The Turnkey's Iron Cage and Ossick's Drowned Anchor (scripts/assets/
+  // sunken_bastion_creatures/gaol_props.py): hittable encounter bodies. The
+  // cage drops onto its prisoner (the sim lowers it through pos.y) with its
+  // snapped chain swinging; both rattle when struck. Authored at size.
+  bastion_gaol_cage: {
+    url: `${CREATURES}/gaol_cage.glb`,
+    height: 8.27,
+    hover: -0.33,
+    clips: {
+      idle: 'Idle',
+      walk: 'Idle',
+      run: 'Idle',
+      attack: ['Idle'],
+      hit: ['Hit'],
+      death: 'Idle',
+    },
+    authoredAtlas: true,
+    clickRadius: 2,
+  },
+  bastion_drowned_anchor: {
+    url: `${CREATURES}/drowned_anchor.glb`,
+    height: 6.64,
+    hover: -0.07,
+    clips: {
+      idle: 'Idle',
+      walk: 'Idle',
+      run: 'Idle',
+      attack: ['Idle'],
+      hit: ['Hit'],
+      death: 'Idle',
+    },
+    authoredAtlas: true,
+    clickRadius: 1.8,
+  },
+
+  // The Turretback Hermit, the Bastion's showpiece (scripts/assets/
+  // sunken_bastion_creatures/build_creature.py): a colossal hermit crab
+  // wearing a fallen watchtower turret, the tower swaying on its back. Its
+  // casts play their own clips: the great claw drawn back and raked across
+  // its front (Claw Sweep), and the rear-and-slam of the tower (Shell Slam).
+  mob_turretback: {
+    url: `${CREATURES}/turretback_hermit.glb`,
+    height: 15,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      castByAbility: { [BASTION_CLAW_SWEEP]: 'ClawSweep', [BASTION_SHELL_SLAM]: 'ShellSlam' },
+      castTimeScaleByAbility: { [BASTION_CLAW_SWEEP]: 1, [BASTION_SHELL_SLAM]: 1 },
+    },
+    selfIllumination: 0.12,
+  },
+
+  // -- the Drowned Temple (sim/content/drowned_temple.ts, temple.ts) ----------
+  // The lagoon temple's own roster, each its own Blender body (scripts/assets/
+  // drowned_temple_creatures/), all well past the player's size, each with
+  // the clips of its jobs. Heights allow for the templates' own scale, so the
+  // drawn sizes land at about 2x the player for the trash, 3x for the bosses'
+  // kin and far more for the Colossus and Ysolei. Presentation only.
+  temple_templeguard: {
+    url: `${CREATURES}/temple_templeguard.glb`,
+    height: 4.6,
+    clips: {
+      ...TEMPLE_CLIPS,
+      castByAbility: { [TEMPLE_TRIDENT_SWEEP]: 'TridentSweep' },
+      castTimeScaleByAbility: { [TEMPLE_TRIDENT_SWEEP]: 1.3 },
+    },
+    selfIllumination: 0.14,
+  },
+  temple_pilgrim: {
+    url: `${CREATURES}/temple_pilgrim.glb`,
+    height: 4.4,
+    clips: TEMPLE_CLIPS,
+    selfIllumination: 0.16,
+  },
+  temple_acolyte: {
+    url: `${CREATURES}/temple_acolyte.glb`,
+    height: 4.4,
+    clips: {
+      ...TEMPLE_CLIPS,
+      castByAbility: { [TEMPLE_LULLABY]: 'Lullaby' },
+    },
+    selfIllumination: 0.05,
+  },
+  temple_siren: {
+    url: `${CREATURES}/temple_siren.glb`,
+    height: 5.4,
+    clips: {
+      ...TEMPLE_CLIPS,
+      castByAbility: { [TEMPLE_CALL_THE_TIDE]: 'Sing' },
+    },
+    selfIllumination: 0.06,
+  },
+  // The Lagoon Eel (scripts/assets/drowned_temple_creatures/eel.py): an
+  // S-wave climbs its column with the head held level. A new eel body swaps
+  // in here: keep its clip names (Idle, Walk, Run, Attack, Attack2, Hit,
+  // Death, Cast, Coil, Spit) or remap them in this row.
+  temple_eel: {
+    url: `${CREATURES}/temple_eel.glb`,
+    height: 6.2,
+    clips: {
+      ...TEMPLE_CLIPS,
+      castByAbility: { [TEMPLE_STATIC_COIL]: 'Coil', [TEMPLE_LIGHTNING_SPIT]: 'Spit' },
+      castTimeScaleByAbility: { [TEMPLE_STATIC_COIL]: 1, [TEMPLE_LIGHTNING_SPIT]: 1 },
+      castPlayOut: ['Spit'],
+    },
+    selfIllumination: 0.22,
+  },
+  temple_snapper: {
+    url: `${CREATURES}/temple_snapper.glb`,
+    height: 3.4,
+    clips: {
+      ...TEMPLE_CLIPS,
+      castByAbility: { [TEMPLE_SNAP]: 'Snap' },
+      castTimeScaleByAbility: { [TEMPLE_SNAP]: 1.3 },
+    },
+    selfIllumination: 0.22,
+  },
+  temple_sentinel: {
+    url: `${CREATURES}/temple_sentinel.glb`,
+    height: 5.6,
+    clips: TEMPLE_CLIPS,
+    selfIllumination: 0.14,
+  },
+  // The Glimmerscale Lurker's Pounce flies in the Leap pose and lands on Land.
+  temple_lurker: {
+    url: `${CREATURES}/temple_lurker.glb`,
+    height: 2.4,
+    clips: { ...TEMPLE_CLIPS, jump: 'Leap', land: 'Land' },
+    selfIllumination: 0.18,
+  },
+  // The bosses. Choirmother Selthe sings her court's rhythm: the Sea-Song on
+  // the golden conch, the Tidal Slap backhand (the marks play from
+  // drowned_temple/temple_boss_fx.ts).
+  temple_selthe: {
+    url: `${CREATURES}/temple_selthe.glb`,
+    height: 6.5,
+    clips: {
+      ...TEMPLE_CLIPS,
+      castByAbility: { [SELTHE_SEA_SONG]: 'SeaSong', [SELTHE_TIDAL_SLAP]: 'Slap' },
+      castTimeScaleByAbility: { [SELTHE_TIDAL_SLAP]: 1.5 },
+    },
+    selfIllumination: 0.08,
+  },
+  // The Tideglass Colossus: stone blocks round a blazing prism. It walks its
+  // foe down (sixth pass): Walk and Run are its own lumbering gait. The
+  // template's 2.2 scale (its long reach) draws it at 15 world units. A new
+  // Colossus body swaps in here: keep its clip names (Idle, Walk, Run, Attack,
+  // Attack2, Hit, Death, Flare, Lance, Slam) or remap them below.
+  temple_colossus: {
+    url: `${CREATURES}/temple_colossus.glb`,
+    height: 15 / 2.2,
+    clips: {
+      ...TEMPLE_CLIPS,
+      castByAbility: {
+        [COLOSSUS_PRISM_FLARE]: 'Flare',
+        [COLOSSUS_MOONLIGHT_LANCE]: 'Lance',
+        [COLOSSUS_RESONANT_SLAM]: 'Slam',
+      },
+      castTimeScaleByAbility: {
+        [COLOSSUS_PRISM_FLARE]: 1.1,
+        [COLOSSUS_MOONLIGHT_LANCE]: 1.1,
+        [COLOSSUS_RESONANT_SLAM]: 1.6,
+      },
+    },
+    selfIllumination: 0.06,
+  },
+  // Ysolei, Avatar of the Drowned Moon: the colossal lunar sea-serpent built
+  // in Blender by Codex (sources on the codex/ysolei branch; original work, no
+  // donor assets), coiled on the Moon Altar. Native scale is kept: her raised
+  // head stands about seven players tall. Her Idle measures 23.97 native units
+  // (the halo's top to the coil's underside, 0.34 under her pivot), so at the
+  // template's 2.5 scale the height is 23.97 / 2.5 and the hover sinks the
+  // coil's underside back under the floor. Authored PBR materials (no atlas,
+  // no tint). Each clip rides a real cast bar: Lunar_Tide (1.5 s charge, then
+  // the wave), Undertow (the 3 s channel, jaws wide; the crash plays out),
+  // Summon (Moonspawn Call), Enrage (Drowned Wrath); Bite and Tail_Sweep are
+  // her swings, Rise her flourish on a reset, and she is stationary.
+  temple_ysolei: {
+    url: `${CREATURES}/temple_ysolei.glb`,
+    height: 23.97 / 2.5,
+    hover: -0.339 / 2.5,
+    authoredAtlas: true,
+    // The widest override the click-capsule guard allows (2x CLICK_RADIUS_CAP,
+    // tests/nythraxis_bone_spike_model.test.ts): wider swallows the raid's clicks.
+    clickRadius: 4.4,
+    clips: {
+      idle: 'Idle',
+      walk: 'Idle',
+      run: 'Idle',
+      attack: ['Bite', 'Tail_Sweep'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Summon',
+      flourish: 'Rise',
+      castByAbility: {
+        [YSOLEI_LUNAR_TIDE]: 'Lunar_Tide',
+        [YSOLEI_UNDERTOW]: 'Undertow',
+        [YSOLEI_CALL]: 'Summon',
+        [YSOLEI_WRATH]: 'Enrage',
+      },
+      castTimeScaleByAbility: {
+        [YSOLEI_LUNAR_TIDE]: 1,
+        [YSOLEI_UNDERTOW]: 1,
+        [YSOLEI_CALL]: 1,
+        [YSOLEI_WRATH]: 1,
+      },
+      castPlayOut: ['Lunar_Tide', 'Undertow', 'Summon', 'Enrage'],
+    },
+    castPlayOutHoldsAttacks: true,
+  },
+  // The Mere Hydra's three heads: bodyless targets (the click capsule stays),
+  // the one Hydra model drawn at the pool by drowned_temple/temple_hydra.ts.
+  temple_hydra_head: {
+    url: `${CREATURES}/mere_hydra.glb`,
+    height: 14,
+    clips: {
+      idle: 'Idle',
+      walk: 'Idle',
+      run: 'Idle',
+      attack: ['Snap'],
+      hit: ['Hit'],
+      death: 'Death',
+    },
+    bodyless: true,
+    clickRadius: 2.6,
+  },
+  // A Tidewisp: a glimmerwisp of living lagoon water. glimmerwisp.glb is an
+  // unrigged bespoke mesh that ships no clips (see mob_glimmerwisp), so this
+  // names STATIC_PROP and registers in CLIPLESS_RIGS
+  // (tests/character_clipmaps.test.ts) instead of borrowing FLOATING.
+  temple_tidewisp: {
+    url: `${CREATURES}/glimmerwisp.glb`,
+    height: 1.8,
+    hover: 0.5,
+    clips: STATIC_PROP,
+    yaw: -Math.PI / 2,
+    tint: 0x6fe3e0,
+    tintStrength: 0.6,
+    selfIllumination: 0.3,
+  },
+
   // -- humanoid mobs (KayKit adventurers) ------------------------------------
   mob_bandit: {
     url: `${PLAYERS}/rogue_hooded.glb`,
@@ -4426,6 +5414,32 @@ for (const cls of ALL_CLASSES) {
   };
 }
 
+// The Tideglass Colossus's Reflections (sim/content/drowned_temple.ts): one
+// glass copy of each class's own body, silvered and lit from within, a head
+// taller than the player it mirrors (the owner's look rides the template id,
+// `tideglass_reflection_<class>`, so no wire field is needed).
+for (const cls of ALL_CLASSES) {
+  const base = VISUALS[`player_${cls}`];
+  VISUALS[`temple_reflection_${cls}`] = {
+    ...base,
+    height: base.height * 1.15,
+    // A tint multiplies, so near-white read as the plain class look: a cold
+    // tideglass blue with a strong inner light makes the copy read as glass.
+    tint: 0x7fb2ff,
+    tintStrength: 0.88,
+    selfIllumination: 0.62,
+    envMapIntensity: 2.2,
+  };
+}
+
+// The Wildheart Basin's placeholder creatures (wildheart_creature_looks.ts).
+Object.assign(VISUALS, wildheartPlaceholderLooks(VISUALS));
+// The Gravewyrm Sanctum's creatures: the Sledge Tusker's Blender body and the
+// re-tinted trash placeholders (sanctum_creature_looks.ts).
+Object.assign(VISUALS, sanctumCreatureLooks(VISUALS));
+// The Gravewyrm Sanctum's three bosses (sanctum_boss_looks.ts).
+Object.assign(VISUALS, SANCTUM_BOSS_LOOKS);
+
 /** The composed-body variant of a class visual (every class has one). */
 export function modularVisualKey(cls: PlayerClass): string {
   return `player_${cls}_modular`;
@@ -4564,6 +5578,9 @@ const MOB_KEYS: Record<string, string> = {
   guardian_stampede_0: 'greyjaw',
   guardian_stampede_1: 'mob_boar',
   guardian_stampede_2: 'mob_raptor',
+  // The Fanglord's Whistle's spirit jaguar (a transient trinket guardian):
+  // the jade spirit cat of wildheart_creature_looks.ts.
+  guardian_fanglords_spirit_jaguar: 'wildheart_spirit_jaguar',
   wild_boar: 'mob_boar',
   // beasts that would otherwise fall back to the wolf model (FAMILY_KEYS.beast)
   old_cragmaw: 'mob_bear',
@@ -4614,16 +5631,17 @@ const MOB_KEYS: Record<string, string> = {
   sister_nhalia_drowned_canticle: 'mob_dark_caster',
   deacon_voss: 'mob_dark_caster',
   wyrmcult_necromancer: 'mob_dark_caster',
-  vael_the_mistcaller: 'mob_dark_caster',
+  vael_the_mistcaller: 'bastion_vael',
+  vael_fog_shade: 'bastion_vael',
   grand_necromancer_velkhar: 'mob_dark_caster',
   gorrak: 'mob_bruiser',
   mogger: 'mob_bruiser',
   // undead variants by role
   boneclad_revenant: 'skel_warrior',
   marrowlord_varkas: 'skel_warrior',
-  bastion_revenant: 'skel_warrior',
-  knight_commander_olen: 'skel_warrior',
-  sanctum_boneguard: 'skel_warrior',
+  bastion_revenant: 'bastion_drowned_revenant',
+  tidebound_acolyte: 'bastion_acolyte',
+  knight_commander_olen: 'bastion_olen',
   nythraxis_scourge_of_thornpeak: 'skel_golem',
   nythraxis_skeleton_warrior: 'skel_warrior',
   nythraxis_heroic_warrior_add: 'skel_warrior',
@@ -4636,9 +5654,60 @@ const MOB_KEYS: Record<string, string> = {
   necromancy_gravewing: 'mob_gravewing',
   brother_aldric_raid: 'npc_aldric',
   hollow_acolyte: 'skel_mage',
-  sexton_marrow: 'skel_mage',
-  morthen: 'skel_boss',
+  sexton_marrow: 'crypt_skel_sexton',
+  morthen: 'crypt_morthen_lich',
+  cantor_ilvane: 'crypt_skel_cantor',
+  hollow_chorister: 'crypt_skel_chorister',
+  rimeweb: 'mob_crypt_rimeweb',
   crypt_shambler: 'skel_rogue',
+  // The Hollow Crypt trash (sim/content/hollow_crypt_trash.ts).
+  crypt_ossuary_warrior: 'crypt_skel_warrior',
+  crypt_gravecaller_adept: 'crypt_skel_adept',
+  crypt_ossuary_cutthroat: 'crypt_skel_cutthroat',
+  crypt_gravecaller_necromancer: 'crypt_skel_necromancer',
+  crypt_bone_minion: 'crypt_skel_minion',
+  crypt_bone_brute: 'crypt_skel_brute',
+  crypt_chapel_gargoyle: 'mob_crypt_gargoyle',
+  crypt_crow_caller: 'mob_crypt_crow_caller',
+  crypt_carrion_crow: 'mob_crypt_crow',
+  crypt_ossuary_drake: 'mob_crypt_drake',
+  crypt_knellwyrm: 'mob_crypt_knellwyrm',
+  // The Sunken Bastion trash (sim/content/sunken_bastion.ts).
+  drowned_watchman: 'bastion_skel_watchman',
+  fogbound_arbalest: 'bastion_skel_arbalest',
+  barnacle_crawler: 'bastion_crawler',
+  bastion_warhound: 'bastion_warhound',
+  mistweaver: 'bastion_mistweaver',
+  drowned_sergeant: 'bastion_skel_sergeant',
+  shackled_prisoner: 'bastion_prisoner',
+  gaol_turnkey: 'bastion_turnkey',
+  bastion_gaol_cage: 'bastion_gaol_cage',
+  bastion_drowned_anchor: 'bastion_drowned_anchor',
+  turretback_hermit: 'mob_turretback',
+  gaoler_ossick: 'bastion_ossick',
+  // The Drowned Temple (sim/content/drowned_temple.ts, temple.ts).
+  drowned_templeguard: 'temple_templeguard',
+  drowned_pilgrim: 'temple_pilgrim',
+  pale_choir_acolyte: 'temple_acolyte',
+  moonlit_siren: 'temple_siren',
+  lagoon_eel: 'temple_eel',
+  lagoon_snapper: 'temple_snapper',
+  pearlguard_sentinel: 'temple_sentinel',
+  glimmerscale_lurker: 'temple_lurker',
+  tidewisp: 'temple_tidewisp',
+  choirmother_selthe: 'temple_selthe',
+  tideglass_colossus: 'temple_colossus',
+  ysolei: 'temple_ysolei',
+  mere_hydra_head_left: 'temple_hydra_head',
+  mere_hydra_head_center: 'temple_hydra_head',
+  mere_hydra_head_right: 'temple_hydra_head',
+  tideglass_reflection: 'temple_reflection_warrior',
+  ...WILDHEART_MOB_KEYS,
+  ...SANCTUM_MOB_KEYS,
+  ...SANCTUM_BOSS_MOB_KEYS,
+  ...Object.fromEntries(
+    ALL_CLASSES.map((cls) => [`tideglass_reflection_${cls}`, `temple_reflection_${cls}`]),
+  ),
   // delve enemies
   reliquary_ledger_wraith: 'delve_skel_wraith',
   reliquary_funeral_ringer: 'delve_skel_ringer',

@@ -46,6 +46,7 @@ import {
   isCataloguedRelicItem,
   isCataloguedRelicMark,
   RELIQUARY_ACTIVITY_SOURCE_IDS,
+  RELIQUARY_ART_PENDING_HEROIC,
   RELIQUARY_HEROIC_GEAR,
   RELIQUARY_HORIZON_MOUNTS,
   RELIQUARY_HORIZON_TITLES,
@@ -471,7 +472,15 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Clue Scroll Treasure Hunter title joins it: 445.
     // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) takes a horizons_mounts slot: 446.
     // the trinket slot's 18 trinkets (PR 4173): twelve item relics plus the five Crucible raid trinkets: 463.
-    expect(full).toEqual({ owned: 495, total: 495 });
+    // The Sunken Bastion rework adds five item relics (two rare weapons, two
+    // heroic epics, the Gaoler's Iron Key): 500.
+    // The Drowned Temple rework adds four (two rare chase rows, two heroic
+    // epics): 504.
+    // The Wildheart Basin rework adds five (the Falls-Blessed Staff, two heroic
+    // epics, two trinkets): 509.
+    // The Gravewyrm Sanctum rework adds five (two heroic epics, three
+    // trinkets): 514.
+    expect(full).toEqual({ owned: 514, total: 514 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -504,7 +513,10 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 412 at the release/v0.43.0 merge: the Arcane Calligraphy gold title slot.
     // 415 with the three faction standing Champion title slots. 416 with the
     // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge). 434 with the trinket slot's 18 trinkets (PR 4173).
-    expect(character).toEqual({ owned: 466, total: 466 });
+    // 471 with the Sunken Bastion rework's five new relics; 475 with the Drowned
+    // Temple rework's four; 480 with the Wildheart Basin rework's five.
+    // 485 with the Gravewyrm Sanctum rework's five.
+    expect(character).toEqual({ owned: 485, total: 485 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -568,7 +580,11 @@ describe('Reliquary Conqueror catalog structure', () => {
       // the trinket slot's 18 trinkets (PR 4173): twelve slots plus two per Crucible raid trinket: 511.
       // +139 at the second release/v0.44.0 base merge: the Warfare Season 2 page: 650.
       // +32 at the 2026-09-28 merge into feature/buried-hoards: the Buried Hoards page: 682.
-    ).toBe(682);
+      // +5: the Sunken Bastion rework's new relics on its two pages: 687.
+      // +4: the Drowned Temple rework's new relics on its two pages: 691.
+      // +5: the Wildheart Basin rework's new relics on its two pages: 696.
+      // +5: the Gravewyrm Sanctum rework's new relics on its heroic page: 701.
+    ).toBe(701);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -803,7 +819,11 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // Plus the five Crucible raid trinkets (each on its boss's Normal and
     // Heroic page, one id each): 350.
     // +139: the Warfare Season 2 page (second release/v0.44.0 base merge): 489.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(521);
+    // +5: the Sunken Bastion rework's new relics: 526.
+    // +4: the Drowned Temple rework's new relics: 530.
+    // +5: the Wildheart Basin rework's new relics: 535.
+    // +5: the Gravewyrm Sanctum rework's new relics: 540.
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(540);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -1061,11 +1081,27 @@ describe('Reliquary clear sources map to live content', () => {
 
 describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
   const HEROIC_PAGE_BY_BOSS: Record<string, string> = {
+    // The Hollow Crypt rework: four bosses, one shared heroic page.
+    sexton_marrow: 'conquerors_hollow_crypt_heroic',
+    rimeweb: 'conquerors_hollow_crypt_heroic',
+    cantor_ilvane: 'conquerors_hollow_crypt_heroic',
     morthen: 'conquerors_hollow_crypt_heroic',
+    // The Sunken Bastion rework: three bosses, one shared heroic page.
+    knight_commander_olen: 'conquerors_sunken_bastion_heroic',
+    gaoler_ossick: 'conquerors_sunken_bastion_heroic',
     vael_the_mistcaller: 'conquerors_sunken_bastion_heroic',
+    // The Drowned Temple rework: three bosses, one shared heroic page.
+    choirmother_selthe: 'conquerors_drowned_temple_heroic',
+    tideglass_colossus: 'conquerors_drowned_temple_heroic',
     ysolei: 'conquerors_drowned_temple_heroic',
     korzul_the_gravewyrm: 'conquerors_gravewyrm_sanctum_heroic',
+    // The Wildheart Basin rework: three bosses, one shared heroic page.
+    wildheart_beastmaster: 'conquerors_wildheart_basin_heroic',
+    the_gorgebloom: 'conquerors_wildheart_basin_heroic',
     wildheart_high_priest: 'conquerors_wildheart_basin_heroic',
+    // The Gravewyrm Sanctum rework: three bosses, one shared heroic page.
+    korgath_the_bound: 'conquerors_gravewyrm_sanctum_heroic',
+    grand_necromancer_velkhar: 'conquerors_gravewyrm_sanctum_heroic',
     [NYTHRAXIS_RAID_BOSS_ID]: 'conquerors_nythraxis_heroic',
     ignivar_herald_of_the_last_flame: 'conquerors_ignivar_heroic',
     varkhul_forgefather_of_the_last_flame: 'conquerors_varkhul_heroic',
@@ -1171,8 +1207,16 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     }
     // Anti-vacuity: something is actually excluded, and every id of every excluded boss is
     // a carve-out, so GEAR_BOSSES cannot silently shed a boss that still owes the catalog.
+    // Korgath and Velkhar were the last all-carve-out bosses until the
+    // Gravewyrm Sanctum rework gave each a new epic and trinket, so no whole
+    // boss drops out today; the walk still proves the filter excludes ids.
     const droppedBosses = Object.keys(HEROIC_BOSS_LOOT).filter((b) => !GEAR_BOSSES.includes(b));
-    expect(droppedBosses.length).toBeGreaterThan(0);
+    const excludesSomething = Object.values(HEROIC_BOSS_LOOT).some(
+      (entries) =>
+        catalogueableHeroicIds(entries).length <
+        new Set(entries.flatMap((e) => (typeof e.itemId === 'string' ? [e.itemId] : []))).size,
+    );
+    expect(excludesSomething).toBe(true);
     for (const bossId of droppedBosses) {
       for (const entry of HEROIC_BOSS_LOOT[bossId]) {
         if (entry.preserveSourceTier) continue;
@@ -1198,7 +1242,10 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     // dead data without this pin.
     expect(Object.keys(RELIQUARY_HEROIC_GEAR).sort()).toEqual(AUTHORED_BOSSES);
     for (const bossId of AUTHORED_BOSSES) {
-      const liveGear = catalogueableHeroicIds(HEROIC_BOSS_LOOT[bossId]);
+      // New epics waiting for their art are carved out until the art pass.
+      const liveGear = catalogueableHeroicIds(HEROIC_BOSS_LOOT[bossId]).filter(
+        (id) => !RELIQUARY_ART_PENDING_HEROIC.includes(id),
+      );
       const authored = [
         ...(RELIQUARY_HEROIC_GEAR[bossId as keyof typeof RELIQUARY_HEROIC_GEAR] ?? []),
       ]
@@ -1208,14 +1255,23 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     }
   });
 
-  it('each heroic page relics exactly match RELIQUARY_HEROIC_GEAR for its boss', () => {
+  it('each heroic page relics exactly match RELIQUARY_HEROIC_GEAR for its bosses', () => {
+    // A page may serve several bosses of one dungeon (the Hollow Crypt's four):
+    // it lists exactly the union of their heroic gear.
+    const byPage = new Map<string, string[]>();
     for (const [bossId, pageId] of Object.entries(HEROIC_PAGE_BY_BOSS)) {
+      byPage.set(pageId, [...(byPage.get(pageId) ?? []), bossId]);
+    }
+    for (const [pageId, bosses] of byPage) {
       const page = RELIQUARY_PAGES_BY_ID[pageId];
       expect(page, pageId).toBeDefined();
-      const gear = RELIQUARY_HEROIC_GEAR[bossId as keyof typeof RELIQUARY_HEROIC_GEAR];
-      expect(gear, bossId).toBeDefined();
-      if (!page || !gear) continue;
-      expect(itemRelicIds(page).sort()).toEqual([...gear].slice().sort());
+      const gear = bosses.flatMap((bossId) => {
+        const list = RELIQUARY_HEROIC_GEAR[bossId as keyof typeof RELIQUARY_HEROIC_GEAR];
+        expect(list, bossId).toBeDefined();
+        return [...(list ?? [])];
+      });
+      if (!page) continue;
+      expect(itemRelicIds(page).sort()).toEqual([...new Set(gear)].sort());
     }
   });
 
@@ -2079,6 +2135,7 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     const page = RELIQUARY_PAGES_BY_ID.conquerors_drowned_temple;
     expect(page.desc).toBeDefined();
     expect(page.desc).toContain(MOBS.choirmother_selthe.name);
+    expect(page.desc).toContain(MOBS.tideglass_colossus.name);
     expect(page.desc).toContain(MOBS.ysolei.name);
   });
 
@@ -2090,11 +2147,25 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     // alone, "Nythraxis" on the heroic page) are not pinnable against MOBS
     // and stay curated prose.
     const DESC_BOSSES: Record<string, string[]> = {
-      conquerors_sunken_bastion: ['vael_the_mistcaller'],
-      conquerors_sunken_bastion_heroic: ['vael_the_mistcaller'],
+      // The Bastion rework's fog shades wear Vael's own name (the veil hides
+      // him among them), so a desc naming him names them too.
+      conquerors_sunken_bastion: ['gaoler_ossick', 'vael_the_mistcaller', 'vael_fog_shade'],
+      conquerors_sunken_bastion_heroic: ['gaoler_ossick', 'vael_the_mistcaller', 'vael_fog_shade'],
+      // The Drowned Temple heroic page names its first two bosses in full and
+      // Ysolei by her short form.
+      conquerors_drowned_temple_heroic: ['choirmother_selthe', 'tideglass_colossus'],
       conquerors_gravewyrm_sanctum: ['korzul_the_gravewyrm'],
-      conquerors_gravewyrm_sanctum_heroic: ['korzul_the_gravewyrm'],
-      conquerors_wildheart_basin_heroic: ['wildheart_high_priest'],
+      // The Gravewyrm Sanctum heroic page names all three bosses in full.
+      conquerors_gravewyrm_sanctum_heroic: [
+        'korgath_the_bound',
+        'grand_necromancer_velkhar',
+        'korzul_the_gravewyrm',
+      ],
+      // The Wildheart Basin pages name the Fanglord Beastmaster in full (and
+      // Zulgar in full on the heroic page); "the Gorgebloom" is the lower-case
+      // running form of "The Gorgebloom".
+      conquerors_wildheart_basin: ['wildheart_beastmaster'],
+      conquerors_wildheart_basin_heroic: ['wildheart_beastmaster', 'wildheart_high_priest'],
       conquerors_hollow_crypt_heroic: ['morthen'],
       conquerors_nythraxis: ['nythraxis_scourge_of_thornpeak'],
       conquerors_ignivar: ['ignivar_herald_of_the_last_flame'],
@@ -2122,7 +2193,7 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
       if (named.length > 0) derivedPairs[page.id] = named;
     }
     const expected: Record<string, string[]> = {
-      conquerors_drowned_temple: ['choirmother_selthe', 'ysolei'],
+      conquerors_drowned_temple: ['choirmother_selthe', 'tideglass_colossus', 'ysolei'],
       ...Object.fromEntries(
         Object.entries(DESC_BOSSES).map(([pageId, mobIds]) => [pageId, [...mobIds].sort()]),
       ),
@@ -2139,7 +2210,14 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     const derived = dungeonRarePlusLootIds('hollow_crypt');
     // Literal: update when catalog content lands (snug vacuity floor).
     expect(derived.length).toBeGreaterThanOrEqual(1);
-    expect(pageIds.filter((id) => isRarePlus(id)).sort()).toEqual(derived);
+    // The rework's three new rare chase rows join the page with their painted
+    // art (a relic cell needs committed dark-card art); until then they are
+    // the only derived rare+ ids the page leaves out.
+    const ART_PENDING_RARES = ['cantors_hymnal', 'rimeweb_fang', 'sextons_spadehaft'];
+    for (const id of ART_PENDING_RARES) expect(derived, id).toContain(id);
+    expect(pageIds.filter((id) => isRarePlus(id)).sort()).toEqual(
+      derived.filter((id) => !ART_PENDING_RARES.includes(id)),
+    );
     const CURATED_UNCOMMON = [
       'cryptbone_greaves',
       'cryptbone_helm',
@@ -3138,17 +3216,21 @@ function slotKey(pageId: string, slotId: string): string {
  *  the authoring, the same regime as the totals pins above. */
 const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_hollow_crypt: 1,
-  conquerors_hollow_crypt_heroic: 1,
-  conquerors_sunken_bastion: 2,
-  conquerors_sunken_bastion_heroic: 1,
-  conquerors_drowned_temple: 2,
-  conquerors_drowned_temple_heroic: 1,
+  // The Hollow Crypt rework: four bosses pay the heroic page.
+  conquerors_hollow_crypt_heroic: 4,
+  conquerors_sunken_bastion: 3,
+  conquerors_sunken_bastion_heroic: 3,
+  conquerors_drowned_temple: 3,
+  conquerors_drowned_temple_heroic: 3,
   // NINE since Masterwrought phase 11l: the trophy recipe route added
   // fromProfession('leatherworking') beside the quiver's korzul hint.
   conquerors_gravewyrm_sanctum: 9,
-  conquerors_gravewyrm_sanctum_heroic: 1,
-  conquerors_wildheart_basin: 2,
-  conquerors_wildheart_basin_heroic: 1,
+  // The Gravewyrm Sanctum rework: all three bosses pay the heroic page.
+  conquerors_gravewyrm_sanctum_heroic: 3,
+  // The Wildheart Basin rework: the Gorgebloom's staff joins the normal page;
+  // all three bosses pay the heroic page.
+  conquerors_wildheart_basin: 3,
+  conquerors_wildheart_basin_heroic: 3,
   conquerors_nythraxis: 1,
   conquerors_nythraxis_heroic: 1,
   // The Crucible raid pages: each room's one boss drops every relic, so all
@@ -3229,7 +3311,8 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
  *  default could never be right for them. Named literally (not derived from the
  *  authoring) so under-authoring one of them cannot quietly pass. */
 const KNOWN_MULTI_SOURCE_PAGES = [
-  // The four dungeons whose relics span two or more of their own bosses.
+  // The dungeons whose relics span two or more of their own bosses.
+  'conquerors_hollow_crypt_heroic',
   'conquerors_sunken_bastion',
   'conquerors_drowned_temple',
   'conquerors_gravewyrm_sanctum',
@@ -4730,11 +4813,17 @@ describe('Reliquary source hint coverage', () => {
       if (inherited === 0) offenders.push(`${page.id} defaults but every relic owns a hint`);
     }
     expect(offenders).toEqual([]);
-    // All fifteen defaults are live today (nine boss pages, the storefront
+    // All thirteen defaults are live today (seven boss pages, the storefront
     // on the skins page, the four Crucible raid pages, and Forgebreaker's
     // one Weaponcrafting door); update
     // deliberately with the authoring.
-    expect(defaults).toBe(15);
+    // The Hollow Crypt heroic page dropped its default with the rework's four
+    // bosses: 14. The Sunken Bastion heroic page dropped its default the same
+    // way with the rework's three bosses: 13. The Drowned Temple heroic page
+    // did the same with its three: 12. The Wildheart Basin heroic page did the
+    // same with its three: 11.
+    // The Gravewyrm Sanctum heroic page did the same with its three: 10.
+    expect(defaults).toBe(10);
   });
 });
 
@@ -4752,8 +4841,11 @@ describe('reliquaryRelicSource precedence', () => {
       { sourceKind: 'boss', sourceId: 'korzul_the_gravewyrm' },
     ]);
     // A relic hint WINS over a page default that disagrees.
-    const defaulted = RELIQUARY_PAGES_BY_ID.conquerors_hollow_crypt;
-    expect(defaulted.sourceDefault).toEqual({ sourceKind: 'boss', sourceId: 'morthen' });
+    const defaulted = RELIQUARY_PAGES_BY_ID.conquerors_thunzharr;
+    expect(defaulted.sourceDefault).toEqual({
+      sourceKind: 'boss',
+      sourceId: 'thunzharr_waking_peak',
+    });
     expect(
       reliquaryRelicSource(defaulted, {
         kind: 'item',
@@ -4781,8 +4873,11 @@ describe('reliquaryRelicSource precedence', () => {
     // The precedence rule multi-hint made possible to get wrong: a resolver
     // that concatenated instead of replacing would quietly append a door the
     // authoring left out, and every count pin in this file would still pass.
-    const defaulted = RELIQUARY_PAGES_BY_ID.conquerors_hollow_crypt;
-    expect(defaulted.sourceDefault).toEqual({ sourceKind: 'boss', sourceId: 'morthen' });
+    const defaulted = RELIQUARY_PAGES_BY_ID.conquerors_thunzharr;
+    expect(defaulted.sourceDefault).toEqual({
+      sourceKind: 'boss',
+      sourceId: 'thunzharr_waking_peak',
+    });
     const answered = reliquaryRelicSource(defaulted, {
       kind: 'item',
       itemId: 'cryptbone_helm',
@@ -4795,13 +4890,13 @@ describe('reliquaryRelicSource precedence', () => {
       { sourceKind: 'boss', sourceId: 'ysolei' },
       { sourceKind: 'vendor', sourceId: 'brother_halven' },
     ]);
-    expect(answered.some((h) => h.sourceId === 'morthen')).toBe(false);
+    expect(answered.some((h) => h.sourceId === 'thunzharr_waking_peak')).toBe(false);
   });
 
   it('falls back to the page default as a one-element list, then to the empty list', () => {
     const bare: ReliquaryRelicDef = { kind: 'item', itemId: 'cryptbone_helm' };
-    expect(reliquaryRelicSource(RELIQUARY_PAGES_BY_ID.conquerors_hollow_crypt, bare)).toEqual([
-      { sourceKind: 'boss', sourceId: 'morthen' },
+    expect(reliquaryRelicSource(RELIQUARY_PAGES_BY_ID.conquerors_thunzharr, bare)).toEqual([
+      { sourceKind: 'boss', sourceId: 'thunzharr_waking_peak' },
     ]);
     // A page with no default answers the empty list for an un-hinted relic.
     // That IS the answer ("content names no source"), not a missing value.
@@ -4822,7 +4917,7 @@ describe('reliquaryRelicSource precedence', () => {
     // page reusing a live catalog id must answer with its OWN default; an
     // id-keyed lookup would silently hand back the live row's boss instead.
     const shadow: ReliquaryPageDef = {
-      id: 'conquerors_hollow_crypt',
+      id: 'conquerors_thunzharr',
       shelf: 'conquerors',
       name: 'Synthetic shadow of a live page id',
       sourceDefault: { sourceKind: 'zone', sourceId: 'synthetic_zone' },
@@ -4832,7 +4927,7 @@ describe('reliquaryRelicSource precedence', () => {
     // source, so this test cannot pass by the two happening to agree.
     expect(RELIQUARY_PAGES_BY_ID[shadow.id].sourceDefault).toEqual({
       sourceKind: 'boss',
-      sourceId: 'morthen',
+      sourceId: 'thunzharr_waking_peak',
     });
     expect(reliquaryRelicSource(shadow, shadow.relics[0])).toEqual([
       { sourceKind: 'zone', sourceId: 'synthetic_zone' },

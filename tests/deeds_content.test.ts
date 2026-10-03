@@ -146,8 +146,17 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // 10 and the tenth at 25: +35).
     // 318 / 3535 with the release's Eastbrook ferry round trip
     // (exp_harbor_to_harbor at renown 5) at the fourth release/v0.44.0 base merge.
-    expect(DEED_ORDER.length).toBe(319);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3545);
+    // 327 / 3625 with the Drowned Temple rework's four encounter deeds
+    // (renown 10 each: +40).
+    // 328 / 3635 with the Hollow Crypt fourth pass's Knellwyrm deed (+10).
+    // 329 / 3645 with the Sunken Bastion fifth pass's Gaol Turnkey deed (+10).
+    // 333 / 3685 with the Wildheart Basin rework's four encounter deeds
+    // (renown 10 each: +40).
+    // 338 / 3735 with the Gravewyrm Sanctum rework's five encounter deeds
+    // (renown 10 each: +50). The Stormbrass Foundry's eight deeds left with
+    // the parked dungeon (never shipped).
+    expect(DEED_ORDER.length).toBe(338);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3735);
   });
 
   it('ships the audited per-category counts', () => {
@@ -171,7 +180,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       combat: 11,
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank), +5 Crucible raid
       // deeds (per-boss clear pairs plus the Varkhul flawless task).
-      dungeon: 36,
+      // +4 the Drowned Temple rework's encounter deeds.
+      // +1 the Sunken Bastion fifth pass's Gaol Turnkey deed.
+      // +4 the Wildheart Basin rework's encounter deeds.
+      // +5 the Gravewyrm Sanctum rework's encounter deeds.
+      dungeon: 55,
       delve: 13,
       // +4 farming first-harvest chronicles (chr_*_first_harvest).
       chronicle: 53,
@@ -409,6 +422,31 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // The release's Eastbrook ferry round trip, appended last at the fourth
       // release/v0.44.0 base merge.
       'exp_harbor_to_harbor',
+      // The Sunken Bastion rework's four encounter deeds (manual grants).
+      'dgn_olen_buttress',
+      'dgn_ossick_moored',
+      'dgn_vael_beacon',
+      'dgn_turretback',
+      // The Drowned Temple rework's four encounter deeds (manual grants).
+      'dgn_selthe_pitch',
+      'dgn_colossus_mirror',
+      'dgn_ysolei_high_and_dry',
+      'dgn_mere_hydra',
+      // The Hollow Crypt's Knellwyrm finale (manual grant).
+      'dgn_crypt_knellwyrm',
+      // The Sunken Bastion fifth pass's Gaol Turnkey miniboss (manual grant).
+      'dgn_turnkey_cage',
+      // The Wildheart Basin rework: its four encounter deeds.
+      'dgn_beastmaster_apart',
+      'dgn_gorgebloom_clean',
+      'dgn_zulgar_uncaught',
+      'dgn_great_saurian',
+      // The Gravewyrm Sanctum rework: one deed per boss core and the Tusker.
+      'dgn_korgath_all_chains',
+      'dgn_korgath_still_bound',
+      'dgn_velkhar_cold',
+      'dgn_korzul_thin_ice',
+      'dgn_sledge_tusker',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -1040,7 +1078,29 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // shipped trigger or renown value was touched.
   // Re-baselined at the 2026-09-28 release merge into feature/buried-hoards: one NEW
   // deed (cmb_coinsack_caught) joins; no existing trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = '765c2ea13a8a87d5b43a3f725ab56e1c58464f850dc2ec0e10048adc12f67829';
+  // Re-baselined for the Sunken Bastion rework's four appended encounter deeds
+  // (dgn_olen_buttress, dgn_ossick_moored, dgn_vael_beacon, dgn_turretback),
+  // re-minted THE AUDITABLE WAY: the 765c2ea1... literal rotated down into
+  // PRE_APPEND_CATALOG_SHA256 and the proof below reproduces it exactly.
+  // Re-baselined for the Drowned Temple rework's four appended encounter deeds
+  // (dgn_selthe_pitch, dgn_colossus_mirror, dgn_ysolei_high_and_dry,
+  // dgn_mere_hydra) the same auditable way: the 299661d4... literal rotated
+  // down into PRE_APPEND_CATALOG_SHA256.
+  // Re-baselined for the Hollow Crypt fourth pass's appended Knellwyrm deed
+  // (dgn_crypt_knellwyrm) the same auditable way: the 777ad913... literal
+  // rotated down into PRE_APPEND_CATALOG_SHA256.
+  // Re-baselined for the Sunken Bastion fifth pass's appended Gaol Turnkey
+  // deed (dgn_turnkey_cage) the same auditable way: the eed1c94d... literal
+  // rotated down into PRE_APPEND_CATALOG_SHA256.
+  // Re-baselined when the Stormbrass Foundry was parked: its eight deeds
+  // (never shipped) left the catalog, so the Wildheart Basin rework's four
+  // encounter deeds (dgn_beastmaster_apart, dgn_gorgebloom_clean,
+  // dgn_zulgar_uncaught, dgn_great_saurian) and the Gravewyrm Sanctum
+  // rework's five (dgn_korgath_all_chains, dgn_korgath_still_bound,
+  // dgn_velkhar_cold, dgn_korzul_thin_ice, dgn_sledge_tusker) now append
+  // straight after dgn_turnkey_cage, minted the same auditable way: the
+  // Turnkey's bfd70a94... literal rotated down into PRE_APPEND_CATALOG_SHA256.
+  const FROZEN_CATALOG_SHA256 = '668cf4cbf66f29ab425ac55c43fce082fede5b6144432ee94bae9e51bd75316c';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1107,9 +1167,39 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // after exp_clue_ten_caskets at the fourth release/v0.44.0 base merge; the
   // previous mint is the clue pair's 0d91bc68... literal (rotated down here),
   // and stripping the one id must reproduce it exactly.
+  //
+  // The Sunken Bastion rework appends its four encounter deeds after
+  // exp_harbor_to_harbor; the previous mint is the 765c2ea1... literal
+  // (rotated down here), and stripping the four must reproduce it exactly.
+  //
+  // The Drowned Temple rework appends its four encounter deeds after
+  // dgn_turretback; the previous mint is the 299661d4... literal (rotated
+  // down here), and stripping the four must reproduce it exactly.
+  //
+  // The Hollow Crypt's fourth pass appends the Knellwyrm deed after
+  // dgn_mere_hydra; the previous mint is the 777ad913... literal.
+  //
+  // The Sunken Bastion's fifth pass appends the Gaol Turnkey deed after
+  // dgn_crypt_knellwyrm; the previous mint is the eed1c94d... literal.
+  //
+  // The Wildheart Basin rework's four deeds and the Gravewyrm Sanctum
+  // rework's five append after dgn_turnkey_cage (the Stormbrass Foundry's
+  // deeds that once sat between them left with the parked dungeon); the
+  // previous mint is the Turnkey's bfd70a94... literal (rotated down here),
+  // and stripping the nine must reproduce it exactly.
   const PRE_APPEND_CATALOG_SHA256 =
-    '0d91bc68e18b88a6b0c4dc7088c118d556b3bbec0be1617506b36b8172123eb6';
-  const APPENDED_SINCE: readonly string[] = ['cmb_coinsack_caught', 'exp_harbor_to_harbor'];
+    'bfd70a94893390e2b0b26eaad7891366626e891a8e1674e51af0dfede2f8f1f9';
+  const APPENDED_SINCE: readonly string[] = [
+    'dgn_beastmaster_apart',
+    'dgn_gorgebloom_clean',
+    'dgn_zulgar_uncaught',
+    'dgn_great_saurian',
+    'dgn_korgath_all_chains',
+    'dgn_korgath_still_bound',
+    'dgn_velkhar_cold',
+    'dgn_korzul_thin_ice',
+    'dgn_sledge_tusker',
+  ];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
@@ -1121,8 +1211,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // known seat, never a scattered insert or a retro-edit (the digest below
     // proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'exp_clue_first_casket',
-      'exp_clue_ten_caskets',
+      'dgn_crypt_knellwyrm',
+      'dgn_turnkey_cage',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1342,8 +1432,11 @@ describe('table shape', () => {
     // The one-time Forgebreaker quest's hidden celebration appends after it,
     // then the world-quest block, then the faction standing ladder, then the
     // Clue Scroll casket pair, then the release's ferry round trip as the
-    // final entry.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_harbor_to_harbor');
+    // entry, then the Sunken Bastion's four encounter deeds, the Turretback
+    // Hermit's last, then the Drowned Temple's four, the Mere Hydra's last,
+    // then the Knellwyrm and the Gaol Turnkey, then the Wildheart Basin's
+    // four and the Gravewyrm Sanctum's five, the Sledge Tusker's last.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_sledge_tusker');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

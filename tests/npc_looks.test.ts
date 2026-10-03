@@ -63,7 +63,12 @@ describe('npc looks roster', () => {
     expect(npcLook).not.toBeNull();
     expect(npcLookFor('sexton_marrow')).toBe(npcLook);
     expect(npcLookFor('sexton_marrow', 'mob')).toBeNull();
-    expect(visualKeyFor({ kind: 'mob', templateId: 'sexton_marrow' } as never)).toBe('skel_mage');
+    // The Hollow Crypt rework gave the boss his own skeleton-mage body (a taller
+    // rig with a staff), still a mob visual and never the composed NPC look.
+    const mobKey = visualKeyFor({ kind: 'mob', templateId: 'sexton_marrow' } as never);
+    expect(mobKey).toBe('crypt_skel_sexton');
+    expect(VISUALS[mobKey].url).toBe(VISUALS.skel_mage.url);
+    expect(VISUALS[mobKey].modular).toBeFalsy();
   });
 
   // Aldric's hub ids are covered by the dedicated null test above; asserting

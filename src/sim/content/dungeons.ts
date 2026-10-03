@@ -20,6 +20,7 @@ import {
   VARKHUL_BOSS_ID,
 } from '../ignivar_raid_ids';
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../mob/healer_channel';
+import { SANCTUM_CINDER_BREATH } from '../mob/trash_kit/sanctum_cast_ids';
 import type {
   DungeonDef,
   DungeonSpawn,
@@ -31,12 +32,29 @@ import type {
 import { CRUCIBLE_PROFESSION_PATTERN_LOOT } from './crucible_collections';
 import { HEROIC_FINALE_COPPER, NYTHRAXIS_HEROIC_COPPER } from './dungeon_difficulty';
 import {
+  GRAVEWYRM_SANCTUM_GATE_OBJECTS,
+  GRAVEWYRM_SANCTUM_GATES,
+  GRAVEWYRM_SANCTUM_SPAWNS,
+  GRAVEWYRM_SANCTUM_STORY_OBJECTS,
+} from './gravewyrm_sanctum';
+import { GRAVEWYRM_SANCTUM_ANCHORS } from './gravewyrm_sanctum_layout';
+import { HOLLOW_CRYPT_GATE_OBJECTS, HOLLOW_CRYPT_GATES, HOLLOW_CRYPT_SPAWNS } from './hollow_crypt';
+import { HOLLOW_CRYPT_ANCHORS } from './hollow_crypt_layout';
+import {
   IGNIVAR_LORE_OBJECTS,
   IGNIVAR_MAELIN_NPC_ID,
   IGNIVAR_MAELIN_PROJECTION_NPC_ID,
   IGNIVAR_RECORD_IDS,
 } from './ignivar_raid_lore';
 import { NYTHRAXIS_EQUIPMENT_LOOT } from './nythraxis_loot';
+import {
+  BRINE_MEND_KIT,
+  SUNKEN_BASTION_ENCOUNTER_OBJECTS,
+  SUNKEN_BASTION_GATE_OBJECTS,
+  SUNKEN_BASTION_GATES,
+  SUNKEN_BASTION_SPAWNS,
+} from './sunken_bastion';
+import { SUNKEN_BASTION_ANCHORS } from './sunken_bastion_layout';
 
 // Keepsake ground-object items owned by the walk-in castle interiors below
 // (their zone item modules are other workstreams' files), merged into ITEMS
@@ -486,8 +504,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
   sexton_marrow: {
     id: 'sexton_marrow',
     name: 'Sexton Marrow',
-    minLevel: 9,
-    maxLevel: 9,
+    // Level 8 in the rework (boss 1 of 4); the Burial Toll waves below are the
+    // placeholder for his graves-and-bell encounter module.
+    minLevel: 8,
+    maxLevel: 8,
     family: 'undead',
     elite: true,
     // Named mid-boss: the boss CC/snare immunity rule applies on both
@@ -510,10 +530,28 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       name: 'Onrush',
       school: 'physical',
     },
+    summonAdds: { mobId: 'restless_bones', count: 2, atHpPct: [0.66, 0.33] },
+    yells: { summon: 'The bell tolls, and the graves give up their dead!' },
+    // The rework's per-boss table (hollow_crypt.md 8.1): one guaranteed piece,
+    // one armor archetype each, plus the Spadehaft chase row. Heroic rides
+    // HEROIC_BOSS_LOOT.sexton_marrow.
     loot: [
-      { copper: 400, chance: 1 },
-      { itemId: 'quilted_trousers', chance: 0.4, normalOnly: true },
-      { itemId: 'oiled_boots', chance: 0.4, normalOnly: true },
+      { copper: 800, chance: 1 },
+      {
+        itemId: 'quilted_trousers',
+        chance: 0.25,
+        rollGroup: 'marrow_guaranteed',
+        normalOnly: true,
+      },
+      { itemId: 'oiled_boots', chance: 0.25, rollGroup: 'marrow_guaranteed', normalOnly: true },
+      {
+        itemId: 'gravedirt_treads',
+        chance: 0.25,
+        rollGroup: 'marrow_guaranteed',
+        normalOnly: true,
+      },
+      { itemId: 'bellrope_girdle', chance: 0.25, rollGroup: 'marrow_guaranteed', normalOnly: true },
+      { itemId: 'sextons_spadehaft', chance: 0.1, normalOnly: true },
     ],
     scale: 1.2,
     color: 0x839192,
@@ -521,6 +559,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
   morthen: {
     id: 'morthen',
     name: 'Morthen the Gravecaller',
+    // The 9 yd lich: melee reaches him from his robes' hem (MobTemplate.bodyRadius).
+    bodyRadius: 2.5,
     minLevel: 10,
     maxLevel: 10,
     family: 'undead',
@@ -548,14 +588,16 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
         rollGroup: 'morthen_guaranteed_uncommon',
         normalOnly: true,
       },
+      // Quilted Trousers and Oiled Leather Boots moved to Sexton Marrow in the
+      // rework (hollow_crypt.md 8.1); the Gravecaller's own pieces replace them.
       {
-        itemId: 'quilted_trousers',
+        itemId: 'gravecallers_vestments',
         chance: 0.33,
         rollGroup: 'morthen_guaranteed_uncommon',
         normalOnly: true,
       },
       {
-        itemId: 'oiled_boots',
+        itemId: 'unquiet_stalkers_hood',
         chance: 0.33,
         rollGroup: 'morthen_guaranteed_uncommon',
         normalOnly: true,
@@ -622,7 +664,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'linen_scrap', chance: 0.5 },
       { itemId: 'mistveil_grips', chance: 0.06, rollGroup: 'acolyte_bonus' },
     ],
-    desperateHeal: { belowHpPct: 0.3, healPct: 0.25 },
+    // Brine Mend (the Bastion rework): an interruptible heal on a hurt ally,
+    // replacing the silent desperate heal. Kick it.
+    trashKit: BRINE_MEND_KIT,
     scale: 1.0,
     color: 0x1f618d,
   },
@@ -655,8 +699,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
   knight_commander_olen: {
     id: 'knight_commander_olen',
     name: 'Knight-Commander Olen',
-    minLevel: 13,
-    maxLevel: 13,
+    // Level 12 in the rework, so the dungeon ramps 12, 13, 13 (about 6,000
+    // health through the Bastion's normal tuning row).
+    minLevel: 12,
+    maxLevel: 12,
     family: 'undead',
     elite: true,
     // Named mid-boss: CC- and snare-immune on both difficulties (see morthen).
@@ -670,29 +716,39 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 24,
     moveSpeed: 7,
     aggroRadius: 14,
-    charge: {
-      minRange: 5,
-      maxRange: 30,
-      cooldown: 12,
-      stunDuration: 0.5,
-      name: 'Onrush',
-      school: 'physical',
-    },
+    // The Oathbound Charge (encounters/sunken_bastion/olen.ts) replaces his
+    // Onrush; the Reaping Arc cleave stays below.
     loot: [
       { copper: 800, chance: 1 },
+      // The rework (sunken_bastion.md 8.1): the Fenmist Robe joins the
+      // guaranteed group so every archetype has a piece, plus the Longsword
+      // chase row. The Longsword rides his shipped rare bonus group, so a kill
+      // still pays at most one rare beside the guaranteed uncommon.
+      // Heroic rides HEROIC_BOSS_LOOT.knight_commander_olen.
       {
         itemId: 'trollhide_leggings',
-        chance: 0.5,
+        chance: 0.34,
         rollGroup: 'olen_guaranteed_uncommon',
         normalOnly: true,
       },
       {
         itemId: 'marshstrider_boots',
-        chance: 0.5,
+        chance: 0.33,
         rollGroup: 'olen_guaranteed_uncommon',
         normalOnly: true,
       },
-      { itemId: 'fenmist_robe', chance: 0.25, rollGroup: 'olen_bonus', normalOnly: true },
+      {
+        itemId: 'fenmist_robe',
+        chance: 0.33,
+        rollGroup: 'olen_guaranteed_uncommon',
+        normalOnly: true,
+      },
+      {
+        itemId: 'knight_commanders_longsword',
+        chance: 0.1,
+        rollGroup: 'olen_bonus',
+        normalOnly: true,
+      },
       { itemId: 'tideguard_greaves', chance: 0.1, rollGroup: 'olen_bonus', normalOnly: true },
       { itemId: 'tideguard_sabatons', chance: 0.1, rollGroup: 'olen_bonus', normalOnly: true },
       { itemId: 'eelscale_leggings', chance: 0.1, rollGroup: 'olen_bonus', normalOnly: true },
@@ -720,7 +776,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 26,
     moveSpeed: 7,
     aggroRadius: 16,
-    aoePulse: { min: 16, max: 24, radius: 12, every: 10, name: 'Mist Surge' },
+    // Mist Surge, the Fog Veil and the Drowning Hymn are his encounter module
+    // (encounters/sunken_bastion/vael.ts); the thralls stay template-driven.
     summonAdds: { mobId: 'drowned_thrall', count: 2, atHpPct: [0.6, 0.3] },
     loot: [
       { copper: 5000, heroicCopper: HEROIC_FINALE_COPPER, chance: 1 },
@@ -804,6 +861,20 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 26,
     moveSpeed: 7,
     aggroRadius: 13,
+    // Cinder Breath (the Ice Tomb rework): the drowned brood still breathes
+    // cinders. A telegraphed 90 degree cone across its front; only the tank
+    // belongs in it.
+    breathCone: {
+      castId: SANCTUM_CINDER_BREATH,
+      name: 'Cinder Breath',
+      castTime: 2,
+      every: 12,
+      range: 8,
+      arcDeg: 90,
+      min: 150,
+      max: 180,
+      school: 'fire',
+    },
     loot: [
       { copper: 350, chance: 1 },
       { itemId: 'cracked_wyrm_scale', chance: 0.5 },
@@ -859,23 +930,24 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 7,
     aggroRadius: 15,
     enrage: { belowHpPct: 0.3, dmgMult: 1.5, hasteMult: 1.3 },
-    stomp: { radius: 10, every: 12, duration: 1.5, min: 20, max: 30, name: 'Shuddering Stomp' },
+    // Shuddering Stomp and his chain kit run in encounters/gravewyrm_sanctum/
+    // korgath.ts (KORGATH_TUNING), telegraphed with a bar.
     loot: [
       { copper: 5000, chance: 1 },
       {
-        itemId: 'boneplate_vest',
+        itemId: 'foremans_grips',
         chance: 0.34,
         rollGroup: 'korgath_guaranteed_uncommon',
         normalOnly: true,
       },
       {
-        itemId: 'revenant_silk_robe',
+        itemId: 'serac_stride_boots',
         chance: 0.33,
         rollGroup: 'korgath_guaranteed_uncommon',
         normalOnly: true,
       },
       {
-        itemId: 'nightwalk_jerkin',
+        itemId: 'seal_rune_mantle',
         chance: 0.33,
         rollGroup: 'korgath_guaranteed_uncommon',
         normalOnly: true,
@@ -912,23 +984,25 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 20,
     moveSpeed: 7,
     aggroRadius: 15,
-    summonAdds: { mobId: 'raised_bonewalker', count: 3, atHpPct: [0.66, 0.33] },
+    // His Raised Bonewalkers (the Waking Thaw and the kept 66 and 33 percent
+    // waves) climb out of the thaw pools: encounters/gravewyrm_sanctum/velkhar.ts
+    // owns them, so the template carries no summonAdds.
     loot: [
       { copper: 5000, chance: 1 },
       {
-        itemId: 'boneplate_vest',
+        itemId: 'thawbound_legguards',
         chance: 0.34,
         rollGroup: 'velkhar_guaranteed_uncommon',
         normalOnly: true,
       },
       {
-        itemId: 'revenant_silk_robe',
+        itemId: 'pyre_tenders_hood',
         chance: 0.33,
         rollGroup: 'velkhar_guaranteed_uncommon',
         normalOnly: true,
       },
       {
-        itemId: 'nightwalk_jerkin',
+        itemId: 'meltwater_cord',
         chance: 0.33,
         rollGroup: 'velkhar_guaranteed_uncommon',
         normalOnly: true,
@@ -998,26 +1072,12 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 34,
     moveSpeed: 7,
     aggroRadius: 18,
-    // Grave Inferno (2026-07): the old Necrotic Shockwave aoePulse hit every
-    // melee for an unavoidable, unmitigated 570-798 each 8s. Replaced by a
-    // Geddon-style stationary channel: 8s rooted, no melee, four escalating
-    // fire pulses (base x1/2/3/4 x the per-mob mechanic multiplier), 14yd.
-    // Moving out at the windup eats the small first pulse or nothing.
-    // The 50% hp gate (2026-07-26) guarantees the channel fires once per kill
-    // on BOTH difficulties: a group out-pacing the 30s cadence used to skip
-    // the mechanic entirely. One gate only, and it lands before the 30% enrage
-    // so the burn phase never stacks on enraged melee.
-    infernoChannel: {
-      every: 30,
-      duration: 8,
-      pulses: 4,
-      min: 7,
-      max: 9,
-      radius: 14,
-      name: 'Grave Inferno',
-      school: 'fire',
-      atHpPct: [0.5],
-    },
+    // The great wyrm: melee reaches him from his body's edge (about 5 yd).
+    bodyRadius: 5,
+    // Grave Inferno, the breath, the tail, the flights and the plate floor are
+    // the encounter's (encounters/gravewyrm_sanctum/korzul.ts, design 6.3):
+    // the Inferno moved off the template (infernoChannel) so the plate under
+    // him can break it (Doused). Its numbers are stated LANDED there.
     enrage: { belowHpPct: 0.3, dmgMult: 1.5, hasteMult: 1.3 },
     loot: [
       // 15000c base rolls to 9000c to 21000c (the 0.6x to 1.4x loot band):
@@ -1339,68 +1399,14 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
   },
 };
 
-// Trash packs of 2 elites (spaced beyond social-aggro range so groups can
-// pull them one pack at a time), a miniboss pair, then Morthen with guards.
-const CRYPT_SPAWN_LIST: DungeonSpawn[] = [
-  { mobId: 'crypt_shambler', x: -3, z: 18 },
-  { mobId: 'crypt_shambler', x: 3, z: 19 },
-  { mobId: 'crypt_shambler', x: -9, z: 38 },
-  { mobId: 'hollow_acolyte', x: -5, z: 39 },
-  { mobId: 'crypt_shambler', x: 9, z: 54 },
-  { mobId: 'hollow_acolyte', x: 5, z: 55 },
-  { mobId: 'bonechill_widow', x: -5, z: 68 },
-  { mobId: 'bonechill_widow', x: -1, z: 70 },
-  { mobId: 'sexton_marrow', x: -4, z: 82 },
-  { mobId: 'hollow_acolyte', x: 1, z: 83 },
-  { mobId: 'morthen', x: 0, z: 98 },
-  { mobId: 'crypt_shambler', x: -4, z: 96 },
-  { mobId: 'crypt_shambler', x: 4, z: 96 },
-];
-
 // Sunken Bastion: same 13-spawn pacing as the crypt — packs of 2 elites,
 // the Knight-Commander as miniboss, then Vael on the dais with two guards.
-const BASTION_SPAWN_LIST: DungeonSpawn[] = [
-  { mobId: 'bastion_revenant', x: -3, z: 18 },
-  { mobId: 'bastion_revenant', x: 3, z: 19 },
-  { mobId: 'bastion_revenant', x: -9, z: 38 },
-  { mobId: 'tidebound_acolyte', x: -5, z: 39 },
-  { mobId: 'tidebound_acolyte', x: 9, z: 54 },
-  { mobId: 'bastion_revenant', x: 5, z: 55 },
-  { mobId: 'bastion_revenant', x: -5, z: 68 },
-  { mobId: 'tidebound_acolyte', x: -1, z: 70 },
-  { mobId: 'knight_commander_olen', x: -4, z: 82 },
-  { mobId: 'bastion_revenant', x: 1, z: 83 },
-  { mobId: 'vael_the_mistcaller', x: 0, z: 98 },
-  { mobId: 'tidebound_acolyte', x: -4, z: 96 },
-  { mobId: 'bastion_revenant', x: 4, z: 96 },
-];
+// The Sunken Bastion's spawns, packs and gates live in sunken_bastion.ts (the
+// open-air sea fortress rework).
 
-// Gravewyrm Sanctum: three chambers — the Boneworks (z<60), the Ritual Vault
-// (75-115) and the Wyrm's Hollow (115+) — with Korgath holding the first
-// waist, Velkhar the second, and Korzul on the great dais at the end.
-const SANCTUM_SPAWN_LIST: DungeonSpawn[] = [
-  { mobId: 'sanctum_boneguard', x: -3, z: 20 },
-  { mobId: 'sanctum_boneguard', x: 3, z: 21 },
-  { mobId: 'sanctum_boneguard', x: -8, z: 30 },
-  { mobId: 'sanctum_drakonid', x: -4, z: 31 },
-  { mobId: 'sanctum_drakonid', x: 7, z: 44 },
-  { mobId: 'sanctum_boneguard', x: 3, z: 45 },
-  { mobId: 'sanctum_boneguard', x: -6, z: 58 },
-  { mobId: 'sanctum_drakonid', x: -2, z: 59 },
-  { mobId: 'korgath_the_bound', x: 0, z: 72 },
-  { mobId: 'sanctum_drakonid', x: -7, z: 86 },
-  { mobId: 'sanctum_boneguard', x: -3, z: 87 },
-  { mobId: 'sanctum_boneguard', x: 6, z: 100 },
-  { mobId: 'sanctum_drakonid', x: 2, z: 101 },
-  { mobId: 'grand_necromancer_velkhar', x: 0, z: 114 },
-  { mobId: 'sanctum_boneguard', x: -4, z: 112 },
-  { mobId: 'sanctum_boneguard', x: 4, z: 112 },
-  { mobId: 'sanctum_drakonid', x: -5, z: 130 },
-  { mobId: 'sanctum_drakonid', x: -1, z: 132 },
-  { mobId: 'korzul_the_gravewyrm', x: 0, z: 146 },
-  { mobId: 'sanctum_drakonid', x: -5, z: 144 },
-  { mobId: 'sanctum_drakonid', x: 5, z: 144 },
-];
+// Gravewyrm Sanctum: the Ice Tomb of the Wyrm rework (gravewyrm_sanctum.ts):
+// its spawns, packs, gates and story markers live there, on the open-air
+// glacier cirque of gravewyrm_sanctum_layout.ts.
 
 const NYTHRAXIS_RAID_SPAWN_LIST: DungeonSpawn[] = [
   { mobId: 'nythraxis_scourge_of_thornpeak', x: 0, z: 96 },
@@ -1547,13 +1553,23 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     name: 'The Hollow Crypt',
     index: 0,
     doorPos: { x: 80, z: 90 }, // entrance portal at the chapel ruin
-    // Arrive back near the exit portal so the first pack (z 18+) is outside aggro
-    // range on entry: no mob can pull the moment you zone in. See dungeon_entry_clearance test.
-    entry: { x: 0, z: -2 },
-    exitOffset: { x: 0, z: -6 },
-    spawns: CRYPT_SPAWN_LIST,
-    interior: 'crypt',
-    tombDressing: 'coffins',
+    // The open-air necropolis rework (content/hollow_crypt*.ts): arrival on
+    // the Lychgate Landing, 70 yd above and behind the first pack, so no mob
+    // can pull the moment you zone in. See dungeon_entry_clearance test.
+    entry: { x: HOLLOW_CRYPT_ANCHORS.entry.x, z: HOLLOW_CRYPT_ANCHORS.entry.z },
+    exitOffset: { x: HOLLOW_CRYPT_ANCHORS.exit.x, z: HOLLOW_CRYPT_ANCHORS.exit.z },
+    // Morthen's ring sits on the crag ~340 yd from the door: a second exit
+    // opens beside the altar once the Knellwyrm his dying rite summons falls
+    // (the run's last fight; Morthen stays the final boss for lockouts).
+    bossExitPortal: { x: -12, z: 190, after: 'crypt_knellwyrm' },
+    spawns: HOLLOW_CRYPT_SPAWNS,
+    objects: HOLLOW_CRYPT_GATE_OBJECTS,
+    gates: HOLLOW_CRYPT_GATES,
+    // No skipping: every pack is gated, and pulling Morthen early still wakes
+    // anything left alive (instances/boss_chain_pull.ts).
+    bossChainPull: true,
+    areaCastsPlant: true,
+    interior: 'hollow_crypt',
     suggestedPlayers: 5,
     enterText: 'You descend into the Hollow Crypt...',
     leaveText: 'You climb back into daylight.',
@@ -1563,11 +1579,22 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     name: 'The Sunken Bastion',
     index: 1,
     doorPos: { x: 45, z: 515 }, // drowned keep south of the Gravecaller camp
-    entry: { x: 0, z: -2 }, // clear-of-aggro arrival (see dungeon_entry_clearance test)
-    exitOffset: { x: 0, z: -6 },
-    spawns: BASTION_SPAWN_LIST,
-    interior: 'crypt',
-    tombDressing: 'cargo',
+    // The open-air sea fortress rework (content/sunken_bastion*.ts): arrival on
+    // the Sea-Gate Landing, 50 yd above and behind the first pack, so no mob
+    // can pull the moment you zone in. See dungeon_entry_clearance test.
+    entry: { x: SUNKEN_BASTION_ANCHORS.entry.x, z: SUNKEN_BASTION_ANCHORS.entry.z },
+    exitOffset: { x: SUNKEN_BASTION_ANCHORS.exit.x, z: SUNKEN_BASTION_ANCHORS.exit.z },
+    // Vael's roof sits at the top of the headland, 440 yd of climbing from the
+    // door: a second exit opens beside the Fogbeacon on his death.
+    bossExitPortal: { x: 10, z: 192 },
+    spawns: SUNKEN_BASTION_SPAWNS,
+    objects: [...SUNKEN_BASTION_GATE_OBJECTS, ...SUNKEN_BASTION_ENCOUNTER_OBJECTS],
+    gates: SUNKEN_BASTION_GATES,
+    // No skipping: every pack is gated, and pulling Vael early still wakes
+    // anything left alive (instances/boss_chain_pull.ts).
+    bossChainPull: true,
+    areaCastsPlant: true,
+    interior: 'sunken_bastion',
     suggestedPlayers: 5,
     enterText: 'You wade down into the Sunken Bastion...',
     leaveText: 'You climb out of the drowning dark.',
@@ -1576,11 +1603,23 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     id: 'gravewyrm_sanctum',
     name: 'Gravewyrm Sanctum',
     index: 2,
-    doorPos: { x: 0, z: 858 }, // sealed gate in the graveyard, off the Sanctum Approach slope
-    entry: { x: 0, z: -2 }, // clear-of-aggro arrival (see dungeon_entry_clearance test)
-    exitOffset: { x: 0, z: -6 },
-    spawns: SANCTUM_SPAWN_LIST,
-    interior: 'sanctum',
+    doorPos: { x: 0, z: 858 }, // the Smith's Seal Gate in the graveyard, off the Sanctum Approach slope
+    // The Ice Tomb rework (content/gravewyrm_sanctum*.ts): arrival on the Gate
+    // Landing, 5 yd above and 44 yd from the first pack, so no mob can pull the
+    // moment you step out of the gate tunnel. See dungeon_entry_clearance test.
+    entry: { x: GRAVEWYRM_SANCTUM_ANCHORS.entry.x, z: GRAVEWYRM_SANCTUM_ANCHORS.entry.z },
+    exitOffset: { x: GRAVEWYRM_SANCTUM_ANCHORS.exit.x, z: GRAVEWYRM_SANCTUM_ANCHORS.exit.z },
+    // The Wyrm's Hollow lies 410 yd down the cirque from the gate: a second
+    // exit opens on the Shore of the Held once Korzul falls.
+    bossExitPortal: { x: -14, z: 138 },
+    spawns: GRAVEWYRM_SANCTUM_SPAWNS,
+    objects: [...GRAVEWYRM_SANCTUM_GATE_OBJECTS, ...GRAVEWYRM_SANCTUM_STORY_OBJECTS],
+    gates: GRAVEWYRM_SANCTUM_GATES,
+    // No skipping: every pack is gated, and pulling Korzul early still wakes
+    // anything left alive (instances/boss_chain_pull.ts).
+    bossChainPull: true,
+    areaCastsPlant: true,
+    interior: 'gravewyrm_sanctum',
     suggestedPlayers: 5,
     enterText: 'The air goes cold. Something vast breathes below...',
     leaveText: 'You stagger back into the mountain wind.',

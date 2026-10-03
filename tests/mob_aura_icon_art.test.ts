@@ -162,8 +162,14 @@ describe('mob aura icon art', () => {
     // the Buried Hoard Marrow Golem (rift_marrow_golem) carries frenzyOnHit,
     // whose shared blood_frenzy runtime id already resolves to painted art, so
     // the identity count holds.
+    // The five-dungeon rework holds the carriers at 110 and moves the
+    // identities to 91: the Drowned Sergeant's warcry and the two Rimeweb
+    // stack poisons (the spinner and the brood mother) join, the Wildheart
+    // Beastmaster's ward and warcry leave with his promotion to a scripted
+    // boss, and Olen's Onrush (the shared mob_charge_stun id) gives way to his
+    // Oathbound Charge. Every new runtime id resolves to existing painted art.
     expect(census.carrierCount).toBe(110);
-    expect(census.identities.size).toBe(90);
+    expect(census.identities.size).toBe(91);
     expect([...MOB_AURA_IMAGE_IDS].sort()).toEqual([...new Set(census.identities.values())].sort());
     expect(MOB_AURA_IMAGE_IDS.size).toBe(44);
     for (const [runtimeId, artIdentity] of census.identities) {

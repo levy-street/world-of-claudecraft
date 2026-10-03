@@ -195,20 +195,62 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       ignivar_crucible_warden: 2,
     },
   },
+  // The Ice Tomb rework (docs/design/dungeon-rework/gravewyrm_sanctum.md): the
+  // pools come from target fight length x planning party DPS at level 20
+  // (about 150): the Sledge Tusker 60 s (about 9,000), Korgath 80 s on his
+  // body (about 12,000; phase B adds his four Seal Shackles), Velkhar 100 s
+  // (about 15,000), Korzul 160 s on the ground (about 24,000). The new trash
+  // swings on the trash floor (100), the non-elite Rime Whelps in the 50 band,
+  // the Tusker in the 150 band; every new kit mechanic (the Scaleguard's
+  // Cinder Breath among them) is stated LANDED (factor 1).
   gravewyrm_sanctum: {
     id: 'gravewyrm_sanctum',
     difficulty: 'normal',
     healthMultiplier: 2.0,
+    healthMultiplierByMob: {
+      sledge_tusker: 5.43,
+      // Korgath's body about 12,000 (80 s), plus his four Seal Shackles at
+      // about 1,500 each (encounters/gravewyrm_sanctum/korgath.ts): about 105 s
+      // with all four broken, longer the more chains the group leaves on.
+      korgath_the_bound: 5.53,
+      sanctum_shackle_hammer: 2,
+      sanctum_shackle_tongs: 2,
+      sanctum_shackle_anvil: 2,
+      sanctum_shackle_bellows: 2,
+      grand_necromancer_velkhar: 7.61,
+      korzul_the_gravewyrm: 7.83,
+    },
     damageMultiplierByMob: {
       sanctum_boneguard: 3.8,
       sanctum_drakonid: 3.7,
       raised_bonewalker: 3.75,
+      broodsworn_thawcaller: 3.8,
+      broodsworn_goadsmith: 3.8,
+      broodsworn_pyre_tender: 3.8,
+      rime_whelp: 4,
+      ogre_sledge_hauler: 3.4,
+      glacier_splinter: 3.7,
+      sledge_tusker: 4.8,
       korgath_the_bound: 9.5,
       grand_necromancer_velkhar: 6.6,
       korzul_the_gravewyrm: 8.5,
     },
     mechanicDamageMultiplierByMob: {
-      korzul_the_gravewyrm: 15,
+      sanctum_drakonid: 1,
+      broodsworn_thawcaller: 1,
+      broodsworn_goadsmith: 1,
+      broodsworn_pyre_tender: 1,
+      rime_whelp: 1,
+      ogre_sledge_hauler: 1,
+      glacier_splinter: 1,
+      sledge_tusker: 1,
+      // Korgath's chain kit is stated LANDED (KORGATH_TUNING).
+      korgath_the_bound: 1,
+      // Velkhar's Soulfire Trench and Shadow Volley are stated LANDED.
+      grand_necromancer_velkhar: 1,
+      // His whole kit (encounters/gravewyrm_sanctum/korzul.ts) is stated
+      // LANDED: Grave Breath, the Inferno's pulses, the flights, the water.
+      korzul_the_gravewyrm: 1,
     },
   },
   nythraxis_boss_arena: {
@@ -271,20 +313,114 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
   // (= healthMultiplier), so the hexcaller's Ancestral Sap heals 72-100 and
   // Thickhide Ward absorbs 140, both keeping pace with the doubled pools.
   // Pinned by tests/wildheart_normal_tuning.test.ts.
+  // The Sunken Bastion rework (docs/design/dungeon-rework/sunken_bastion.md):
+  // a health-only record. The bosses' pools come from target fight length x
+  // planning party DPS at levels 12 to 13 (about 75): Olen 80 s (about 6,000),
+  // Ossick 85 s (about 6,800), Vael 150 s (about 12,000), and the Turretback
+  // Hermit 60 s (about 4,500). Everything else keeps its raw template, so the
+  // mechanics land at their authored normal numbers.
+  sunken_bastion: {
+    id: 'sunken_bastion',
+    difficulty: 'normal',
+    healthMultiplier: 1,
+    healthMultiplierByMob: {
+      knight_commander_olen: 6.42,
+      gaoler_ossick: 6.84,
+      vael_the_mistcaller: 8.05,
+      turretback_hermit: 3.66,
+      // The gaol's miniboss: 50 s (about 3,600) on the Hermit's template pool.
+      gaol_turnkey: 2.93,
+    },
+    // The crawler and the prisoner carry a heroic-priced base swing (see
+    // their templates); normal damps it back to the fodder line.
+    damageMultiplierByMob: {
+      barnacle_crawler: 0.345,
+      shackled_prisoner: 0.345,
+    },
+    // ...but the damp is melee only: Brine Burst keeps its authored number.
+    mechanicDamageMultiplierByMob: {
+      barnacle_crawler: 1,
+      shackled_prisoner: 1,
+    },
+  }, // The Drowned Temple rework (docs/design/dungeon-rework/drowned_temple.md):
+  // a health-only record. The bosses' pools come from target fight length x
+  // planning party DPS at levels 16 to 18 (about 110 to 120): Selthe 90 s
+  // (about 9,900), the Tideglass Colossus 100 s (about 11,500), Ysolei 150 s
+  // (about 18,000), and the Mere Hydra's three heads about 2,000 each (55 s
+  // for the three). Everything else keeps its raw template, so the mechanics
+  // land at their authored normal numbers.
+  drowned_temple: {
+    id: 'drowned_temple',
+    difficulty: 'normal',
+    healthMultiplier: 1,
+    healthMultiplierByMob: {
+      choirmother_selthe: 7.97,
+      tideglass_colossus: 7.35,
+      ysolei: 8.27,
+      mere_hydra_head_left: 1.38,
+      mere_hydra_head_center: 1.38,
+      mere_hydra_head_right: 1.38,
+    },
+    damageMultiplierByMob: {},
+  },
+
+  // The rework (docs/design/dungeon-rework/wildheart_basin.md): the bosses'
+  // pools come from target fight length x planning party DPS at level 20
+  // (about 150): the Great Saurian 65 s (about 10,000), the Beastmaster and
+  // his jaguar 100 s on ONE shared pool (about 15,000, both bodies sized to
+  // it: encounters/wildheart_basin/beastmaster.ts), the Gorgebloom 100 s
+  // (about 15,000), Zulgar 160 s (about 24,800).
+  // The Beastmaster leaves the old 150 rare band for the boss band (200);
+  // the jaguar and the Saurian swing in the 150 band, the non-elite raptors
+  // (they come in fours) in the 50 band, the rest of the new trash (the
+  // Gorgebloom's Thorn Sprouts too) on the trash floor. The kit mechanics,
+  // the three bosses' included, are stated LANDED (factor 1).
   wildheart_basin: {
     id: 'wildheart_basin',
     difficulty: 'normal',
     healthMultiplier: 2.0,
+    healthMultiplierByMob: {
+      great_saurian: 6.04,
+      wildheart_beastmaster: 7.82,
+      fanglord_jaguar: 9.46,
+      the_gorgebloom: 8.47,
+      wildheart_high_priest: 7.21,
+    },
     damageMultiplierByMob: {
       wildheart_stalker: 3.7,
       wildheart_ravager: 3.15,
       wildheart_hexcaller: 3.9,
-      wildheart_beastmaster: 4.2,
+      sunbone_totem_binder: 3.75,
+      sunbone_totem: 1,
+      basin_raptor: 3.45,
+      spore_toad: 4,
+      vine_lasher: 3.45,
+      great_saurian: 4.8,
+      howdah_hexcaller: 3.9,
+      thorn_sprout: 3.9,
+      wildheart_beastmaster: 5.55,
+      fanglord_jaguar: 4.6,
+      the_gorgebloom: 6.4,
       wildheart_high_priest: 5.65,
+    },
+    mechanicDamageMultiplierByMob: {
+      sunbone_totem_binder: 1,
+      sunbone_totem: 1,
+      basin_raptor: 1,
+      spore_toad: 1,
+      vine_lasher: 1,
+      great_saurian: 1,
+      howdah_hexcaller: 1,
+      thorn_sprout: 1,
+      wildheart_beastmaster: 1,
+      fanglord_jaguar: 1,
+      the_gorgebloom: 1,
+      wildheart_high_priest: 1,
     },
     rangedDamageMultiplierByMob: {
       wildheart_stalker: 2.7,
       wildheart_hexcaller: 2.5,
+      howdah_hexcaller: 2.5,
     },
   },
 };
@@ -361,9 +497,21 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     level: 22,
     healthMultiplier: 3.8,
     damageMultiplier: 20,
-    // No hollow_crypt boss summons adds; inert, but rides the v0.30 40% add
-    // nerf with the other heroics so a future summoner starts on-model.
-    addDamageMultiplier: 6,
+    // The rework's wing bosses summon non-elite adds (Sexton Marrow's
+    // restless_bones at his Burial Toll, Rimeweb's hatchlings at her Brood
+    // Call): lifted onto the shared 150 summoned-add floor with the other
+    // heroics (tests/heroic_difficulty_floors.test.ts).
+    addDamageMultiplier: 9.5,
+    // Spawn-list trash below the 500 heroic mob floor on the shared factor is
+    // lifted onto it on its own: the lighter-swinging casters and cutthroat,
+    // and the NON-elite Carrion Crows (no 1.5x elite swing) of the flocks.
+    damageMultiplierByMob: {
+      crypt_gravecaller_adept: 24,
+      crypt_gravecaller_necromancer: 24,
+      crypt_crow_caller: 24,
+      crypt_ossuary_cutthroat: 23,
+      crypt_carrion_crow: 66,
+    },
     armorMultiplier: 1.3,
     finalBossId: 'morthen',
     marksPerParticipant: 1,
@@ -379,6 +527,37 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // 150); a tanked triple wave stacked on the boss was still overwhelming
     // healers after the 2026-07 retune.
     addDamageMultiplier: 9.75,
+    // The rework (docs/design/dungeon-rework/sunken_bastion.md): the bosses'
+    // pools set per boss from target fight length x heroic party DPS (about
+    // 230): Olen 80 s, Ossick 85 s, Vael 150 s; the Turretback Hermit 60 s.
+    healthMultiplierByMob: {
+      knight_commander_olen: 12,
+      gaoler_ossick: 12.75,
+      vael_the_mistcaller: 15.7,
+      turretback_hermit: 7.3,
+      gaol_turnkey: 5.84,
+    },
+    // The light trash (the warhound, the ranged arbalest and the ward-casting
+    // mistweaver) carry softer templates; lift them to the 500 heroic floor.
+    damageMultiplierByMob: {
+      bastion_warhound: 19.6,
+      fogbound_arbalest: 21.6,
+      mistweaver: 21.6,
+    },
+    // Avoidable mechanics priced apart from the tank-swing floor: a missed
+    // trash dodge costs a cloth wearer about 40 percent (1,250 at level 20
+    // heroic), a fumbled boss core is lethal, an unavoidable pulse 15 percent.
+    mechanicDamageMultiplierByMob: {
+      drowned_watchman: 8,
+      fogbound_arbalest: 8,
+      barnacle_crawler: 8,
+      bastion_warhound: 8,
+      turretback_hermit: 8,
+      knight_commander_olen: 6,
+      gaoler_ossick: 6,
+      vael_the_mistcaller: 6,
+      gaol_turnkey: 6,
+    },
     armorMultiplier: 1.3,
     finalBossId: 'vael_the_mistcaller',
     marksPerParticipant: 1,
@@ -392,6 +571,40 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // Ysolei's moonspawn summons are non-elite; 40% add nerf (v0.30), the
     // summoned floor drops from 250 to 150.
     addDamageMultiplier: 9.15,
+    // The rework (docs/design/dungeon-rework/drowned_temple.md): the bosses'
+    // pools set per boss from target fight length x heroic party DPS (about
+    // 230): Selthe 90 s, the Colossus 100 s, Ysolei 150 s, the Hydra's heads
+    // 55 s for the three.
+    healthMultiplierByMob: {
+      choirmother_selthe: 12.9,
+      tideglass_colossus: 12.05,
+      ysolei: 13.66,
+      mere_hydra_head_left: 2.4,
+      mere_hydra_head_center: 2.4,
+      mere_hydra_head_right: 2.4,
+    },
+    // The fodder pilgrims and the ranged siren carry softer templates; lift
+    // them to the 500 heroic floor.
+    damageMultiplierByMob: {
+      drowned_pilgrim: 27,
+      moonlit_siren: 17.5,
+    },
+    // Avoidable mechanics priced apart from the tank-swing floor: a missed
+    // trash dodge costs a cloth wearer about 40 percent (1,250 at level 20
+    // heroic), a fumbled boss core is lethal, an unavoidable pulse 15 percent.
+    mechanicDamageMultiplierByMob: {
+      drowned_templeguard: 5.5,
+      lagoon_snapper: 5.5,
+      lagoon_eel: 5.5,
+      glimmerscale_lurker: 5.5,
+      tidewisp: 5.5,
+      mere_hydra_head_left: 6,
+      mere_hydra_head_center: 6,
+      mere_hydra_head_right: 6,
+      choirmother_selthe: 4.5,
+      tideglass_colossus: 5,
+      ysolei: 5,
+    },
     armorMultiplier: 1.25,
     finalBossId: 'ysolei',
     marksPerParticipant: 1,
@@ -408,10 +621,51 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // The Sanctum bosses must out-hit their retuned NORMAL selves (normal
     // floors them at 200-301 post-mitigation since the v0.30 fresh-group
     // pressure pass): 19x lands 652-708, comfortably above.
+    // The Ice Tomb rework's pools from target fight length x heroic party DPS
+    // (about 230): the Sledge Tusker 60 s, Korgath 105 s, Velkhar 100 s,
+    // Korzul 160 s on the ground (phase B retunes them with their cores).
+    healthMultiplierByMob: {
+      sledge_tusker: 7.69,
+      // Korgath's body 80 s (about 18,400) plus four shackles of about 2,300.
+      korgath_the_bound: 7.87,
+      sanctum_shackle_hammer: 3.07,
+      sanctum_shackle_tongs: 3.07,
+      sanctum_shackle_anvil: 3.07,
+      sanctum_shackle_bellows: 3.07,
+      grand_necromancer_velkhar: 10.83,
+      korzul_the_gravewyrm: 11.2,
+    },
     damageMultiplierByMob: {
       korgath_the_bound: 19,
       grand_necromancer_velkhar: 19,
       korzul_the_gravewyrm: 19,
+      // The lighter-swinging cultists and the NON-elite Rime Whelps are lifted
+      // onto the 500 floor on their own.
+      broodsworn_thawcaller: 16.6,
+      broodsworn_pyre_tender: 16.6,
+      rime_whelp: 30.5,
+    },
+    // Avoidable mechanics priced apart from the tank-swing floor: a missed
+    // trash dodge costs a heroic cloth wearer about 40 percent, the Tusker's
+    // avoidables about 45 percent (the five-man heroic convention).
+    mechanicDamageMultiplierByMob: {
+      sanctum_drakonid: 3,
+      broodsworn_thawcaller: 3,
+      broodsworn_goadsmith: 3,
+      broodsworn_pyre_tender: 3,
+      rime_whelp: 3,
+      ogre_sledge_hauler: 3,
+      glacier_splinter: 3,
+      sledge_tusker: 2.5,
+      // Korgath's chain kit: a missed avoidable costs a heroic cloth wearer
+      // about 45 percent, a fumbled Strain or Stomp about 55 (the five-man
+      // heroic boss convention).
+      korgath_the_bound: 2.5,
+      // The bosses' telegraphed mechanics on the five-man heroic factor.
+      grand_necromancer_velkhar: 2.5,
+      // Korzul's landed kit at the five-man heroic boss factor (the
+      // quench-water lands 60 x 2.5 = 150 a second, design 6.3).
+      korzul_the_gravewyrm: 2.5,
     },
     armorMultiplier: 1.2,
     finalBossId: 'korzul_the_gravewyrm',
@@ -428,8 +682,42 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // 455 post-mitigation at 15.5x): the open-field roster sits between
     // Orkadia's casters and the Sanctum band.
     damageMultiplier: 17.25,
-    // No Wildheart boss summons adds; kept at the half convention, inert.
+    // The kit adds (the Sunbone Totems, the Howdah Hexcaller, the Gorgebloom's
+    // Thorn Sprouts) ride the trash kit's spawner, never summonAdds; kept at
+    // the half convention.
     addDamageMultiplier: 8.625,
+    // The rework's pools from target fight length x heroic party DPS (about
+    // 230): the Saurian 65 s, the Beastmaster and his jaguar 100 s on one
+    // shared pool (about 23,000), the Gorgebloom 100 s, Zulgar 160 s.
+    healthMultiplierByMob: {
+      great_saurian: 8.36,
+      wildheart_beastmaster: 11.04,
+      fanglord_jaguar: 13.34,
+      the_gorgebloom: 12.05,
+      wildheart_high_priest: 9.98,
+    },
+    // The non-elite raptors are lifted onto the 500 floor on their own.
+    damageMultiplierByMob: {
+      basin_raptor: 30.5,
+    },
+    // Avoidable mechanics priced apart from the tank-swing floor: a missed
+    // trash dodge costs a heroic cloth wearer about 40 percent, the Saurian's
+    // and the three bosses' avoidables about 45 percent (the five-man heroic
+    // convention): their mechanics are stated landed on normal, so 2.5x here.
+    mechanicDamageMultiplierByMob: {
+      sunbone_totem_binder: 3,
+      sunbone_totem: 3,
+      basin_raptor: 3,
+      spore_toad: 3,
+      vine_lasher: 3,
+      howdah_hexcaller: 3,
+      thorn_sprout: 3,
+      great_saurian: 2.5,
+      wildheart_beastmaster: 2.5,
+      fanglord_jaguar: 2.5,
+      the_gorgebloom: 2.5,
+      wildheart_high_priest: 2.5,
+    },
     armorMultiplier: 1.2,
     finalBossId: 'wildheart_high_priest',
     marksPerParticipant: 1,

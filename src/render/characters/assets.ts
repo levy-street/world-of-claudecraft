@@ -28,6 +28,7 @@ import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
 import { applyRiggedWornDetail, applySurfaceDetail } from '../worn_stone';
 import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor } from './back_grips';
+import { applyClipPositionDrops, applyClipTrackDrops } from './clip_track_drops';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { coalesceFarBakeGroups, farBakeGroupRanges } from './far_bake_groups_core';
 import { padMissingUv } from './far_bake_uv_pad';
@@ -103,7 +104,9 @@ import { attachSharedDepthMaterials, clearSharedDepthMaterials } from './shadow_
 import { characterMeshCastsShadow } from './shadow_policy';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { optimizeSkinGpuLayout } from './skin_gpu_layout';
+import { notePosedCullCentre } from './skinned_cull_bounds';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
+import { applySmoothNormals } from './smooth_normals';
 import { buildStubbleDecal, headNodeName } from './stubble';
 import { TINTED_MATERIAL_IDLE_CACHE_MAX, TintedMaterialCache } from './tinted_material_cache_core';
 import { prepareWarriorAbilityClips } from './warrior_ability_clips';
@@ -1709,6 +1712,9 @@ export function assembleModel(
       }
     });
   }
+  // A faceted rig shaded smooth (VisualDef.smoothNormals), before anything
+  // measures or bakes it.
+  if (def.smoothNormals !== undefined) applySmoothNormals(root, def.smoothNormals);
   // Two-state prop mobs (the dragonkin egg) ship BOTH state meshes at the
   // origin: seed the ALIVE state (hide the corpse shell); CharacterVisual's
   // enterDeath/revive flip it (created-already-dead corpses flip on their
@@ -2445,6 +2451,17 @@ export const PALADIN_SYNTHESIZED_CLIP_SOURCES: Readonly<Record<string, string>> 
   [PALADIN_BASTION_SWEEP_CLIP]: '1H_Melee_Attack_Slice_Diagonal',
 };
 
+/** Every visual key whose clip map names the synthesized paladin clips: the
+ *  classic and modular paladin, plus the Drowned Temple's paladin Reflection
+ *  (manifest.ts copies the class def, attackByAbility included). */
+export function synthesizesPaladinClips(key: string): boolean {
+  return (
+    key === 'player_paladin' ||
+    key === modularVisualKey('paladin') ||
+    key === 'temple_reflection_paladin'
+  );
+}
+
 /** Test-only observation window into the shared tinted-material cache. */
 export const tintedMaterialInternalsForTest = {
   cacheSize: (): number => matCache.size,
@@ -2463,10 +2480,11 @@ export function prepareVisual(key: string): PreparedVisual {
   for (const url of def.animUrls ?? []) {
     for (const clip of resolvedGltf(url).animations) clips.set(clip.name, clip);
   }
-  // The modular paladin mirrors the classic clip map (attackByAbility includes
-  // the synthesized Verdict and Sweep names), so it needs the same synthesis:
-  // its animUrls lead with the class GLB, which supplies both source clips.
-  if (key === 'player_paladin' || key === modularVisualKey('paladin')) {
+  // The modular paladin and the paladin Reflection mirror the classic clip map
+  // (attackByAbility includes the synthesized Verdict and Sweep names), so they
+  // need the same synthesis: the modular animUrls lead with the class GLB, and
+  // the Reflection draws the class GLB itself, which supplies both sources.
+  if (synthesizesPaladinClips(key)) {
     const verdictBase = clips.get(PALADIN_SYNTHESIZED_CLIP_SOURCES[PALADIN_TEMPLARS_VERDICT_CLIP]);
     if (!verdictBase) throw new Error('Paladin Templar Verdict requires 2H_Melee_Attack_Chop');
     clips.set(PALADIN_TEMPLARS_VERDICT_CLIP, createPaladinTemplarsVerdictClip(verdictBase));
@@ -2477,6 +2495,8 @@ export function prepareVisual(key: string): PreparedVisual {
     clips.set(PALADIN_BASTION_SWEEP_CLIP, createPaladinBastionSweepClip(sweepBase));
   }
 
+  applyClipTrackDrops(clips, def.clipTrackDrops);
+  applyClipPositionDrops(clips, def.clipPositionDrops);
   prepareWarriorAbilityClips(key, clips, def.clips.attackByAbility);
   prepareWarriorActionFallbacks(key, clips, gltf.scene);
   // Pose a throwaway clone mid-idle, measure it, and bake the static mesh. No
@@ -2502,17 +2522,23 @@ export function prepareVisual(key: string): PreparedVisual {
 
   // body bounds from the skinned meshes only (weapons would skew the height)
   const bounds = new THREE.Box3();
+  const local = new THREE.Box3();
   const v = new THREE.Vector3();
   temp.traverse((o) => {
     const sm = o as THREE.SkinnedMesh;
     if (!sm.isSkinnedMesh || !meshChainVisible(sm, temp)) return;
     const pos = sm.geometry.getAttribute('position');
+    // The posed centre in the mesh's own space too: the cull sphere's centre
+    // (skinned_cull_bounds.ts; a quantized rig's geometry centre is not it).
+    local.makeEmpty();
     for (let i = 0; i < pos.count; i++) {
       v.fromBufferAttribute(pos as THREE.BufferAttribute, i);
       sm.applyBoneTransform(i, v);
+      local.expandByPoint(v);
       v.applyMatrix4(sm.matrixWorld);
       bounds.expandByPoint(v);
     }
+    if (!local.isEmpty()) notePosedCullCentre(sm.geometry, local.getCenter(v));
   });
   // Non-skinned models (procedural form GLBs animated by node transforms, with no
   // skeleton — e.g. the chicken-cow Travel Form) contribute no skinned meshes, so
@@ -2738,6 +2764,10 @@ function farBakeMeshes(root: THREE.Object3D): THREE.Mesh[] {
   root.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh || mesh.userData.faceDecal) return;
+    // An authored opt-out (glTF node extras `farBake: false`): a translucent,
+    // vertex-alpha part (Morthen's soul smoke) has no faithful frozen form, since the
+    // bake keeps no vertex colour; far away it is dropped, not drawn as a dark shell.
+    if (mesh.userData.farBake === false) return;
     if (!meshChainVisible(mesh, root)) return;
     if (!mesh.geometry?.getAttribute('position')) return;
     out.push(mesh);

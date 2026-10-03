@@ -92,8 +92,10 @@ describe('feasts settle on the surface below their placer', () => {
 
   it('keeps an airborne feast on the raised dungeon dais', () => {
     const sim = world();
-    enterDungeon(sim.ctx, 'hollow_crypt', sim.player.id);
-    const origin = instanceOrigin(DUNGEONS.hollow_crypt.index, 0);
+    // The shared crypt nave's dais lives on in the Abandoned Crypt (the Hollow
+    // Crypt moved to its own open-air field in the rework).
+    enterDungeon(sim.ctx, 'nythraxis_crypt', sim.player.id);
+    const origin = instanceOrigin(DUNGEONS.nythraxis_crypt.index, 0);
     const { x, z } = CRYPT_LAYOUT.dais;
     const floor = DUNGEON_FLOOR_Y + DAIS_HEIGHT;
     stand(sim, origin.x + x, origin.z + z, floor + 2, true);

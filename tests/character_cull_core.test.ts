@@ -15,7 +15,11 @@ import {
   setCharacterCullShadow,
   skinnedCullSphereRadius,
 } from '../src/render/character_cull_core';
-import { applySkinnedCullBounds } from '../src/render/characters/skinned_cull_bounds';
+import {
+  applySkinnedCullBounds,
+  measurePosedCullCentre,
+  notePosedCullCentre,
+} from '../src/render/characters/skinned_cull_bounds';
 import { MOUNTS } from '../src/sim/content/mounts';
 import { RUN_SPEED } from '../src/sim/types';
 
@@ -379,6 +383,81 @@ describe('skinned cull bounds', () => {
     root.position.set(0, 0, 60);
     root.updateMatrixWorld(true);
     expect(frustum.intersectsObject(mesh)).toBe(false);
+  });
+});
+
+describe('the posed cull centre (quantized skinned rigs)', () => {
+  /** A one-bone rig whose geometry lives in a packed space 20 times larger
+   *  than where the skin lands it, the way a gltfpack/meshopt quantized GLB
+   *  folds its dequantization into the inverse bind matrix (the frog rig's
+   *  eyes). The eye primitive sits 0.5 above the root once skinned, at 10 in
+   *  its own geometry. */
+  function packedEye(): { root: THREE.Group; mesh: THREE.SkinnedMesh } {
+    const root = new THREE.Group();
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute(
+      'position',
+      new THREE.Float32BufferAttribute([-0.4, 9.6, 0, 0.4, 9.6, 0, 0, 10.4, 0], 3),
+    );
+    geometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(Array(12).fill(0), 4));
+    geometry.setAttribute(
+      'skinWeight',
+      new THREE.Float32BufferAttribute([1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0], 4),
+    );
+    const mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshBasicMaterial());
+    const bone = new THREE.Bone();
+    mesh.add(bone);
+    // An explicit bind matrix: bind() without one recomputes the inverses.
+    mesh.bind(
+      new THREE.Skeleton([bone], [new THREE.Matrix4().makeScale(0.05, 0.05, 0.05)]),
+      new THREE.Matrix4(),
+    );
+    root.add(mesh);
+    root.updateMatrixWorld(true);
+    mesh.skeleton.update();
+    return { root, mesh };
+  }
+
+  it('measures where the skin lands the vertices, not the packed geometry', () => {
+    const { mesh } = packedEye();
+    const centre = measurePosedCullCentre(mesh);
+    expect(centre?.y).toBeCloseTo(0.5, 5);
+    mesh.geometry.computeBoundingSphere();
+    expect(mesh.geometry.boundingSphere?.center.y).toBeCloseTo(10, 5);
+  });
+
+  it('centres the padded sphere on the noted posed centre, so the eye is never culled', () => {
+    const camera = viewCamera();
+    const frustum = new THREE.Frustum().setFromProjectionMatrix(
+      new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse),
+    );
+    // Without a note the sphere keeps the packed centre: a rig standing in
+    // view, its eye's sphere floating far above the frame, is culled.
+    const bare = packedEye();
+    applySkinnedCullBounds(bare.mesh, bare.root, 0.05);
+    bare.root.position.set(0, 0, -6);
+    bare.root.scale.setScalar(20);
+    bare.root.updateMatrixWorld(true);
+    expect(frustum.intersectsObject(bare.mesh)).toBe(false);
+    // prepareVisual notes the posed centre; the live clone shares the geometry.
+    const noted = packedEye();
+    const centre = measurePosedCullCentre(noted.mesh);
+    if (!centre) throw new Error('no posed centre');
+    notePosedCullCentre(noted.mesh.geometry, centre);
+    applySkinnedCullBounds(noted.mesh, noted.root, 0.05);
+    expect(noted.mesh.boundingSphere?.center.y).toBeCloseTo(0.5, 5);
+    noted.root.position.set(0, 0, -6);
+    noted.root.scale.setScalar(20);
+    noted.root.updateMatrixWorld(true);
+    expect(frustum.intersectsObject(noted.mesh)).toBe(true);
+  });
+
+  it('prepareVisual notes every measured skinned geometry', () => {
+    const assets = readFileSync(
+      fileURLToPath(new URL('../src/render/characters/assets.ts', import.meta.url)),
+      'utf8',
+    );
+    expect(assets).toMatch(/notePosedCullCentre\(sm\.geometry, local\.getCenter\(v\)\)/);
   });
 });
 

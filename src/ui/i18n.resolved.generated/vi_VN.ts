@@ -3132,6 +3132,12 @@ export const vi_VN: EnTranslations = {
         "kindlingOrb": "Triệu hồi một quả cầu tro than bên cạnh bạn trong {duration} giây. Mỗi phép thuật bạn thi triển ở kẻ thù làm nó bắn một tia ở kẻ thù đó {damage} sát thương Lửa. Sát thương tăng theo Sức Mạnh Phép Thuật.",
         "pierce": "Trong {duration} giây, các tấn công tự động, bắn và khả năng vật lý của bạn (không chảy máu) cũng tấn công kẻ thù gần mục tiêu nhất của bạn trong {reach} thước {share}% sát thương gây ra.",
         "lantern": "Đặt một chiếc lụp ở chân bạn trong {duration} giây. Một chữa lành trực tiếp từ bất kỳ ai trên bạn hoặc thành viên nhóm trong {radius} thước của nó cũng chữa lành thành viên nhóm khác bị thương nhất khác trong ánh sáng của nó {share}% chữa lành.",
+        "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
+        "spiritPack": "Call a spirit jaguar to fight beside you for {duration} sec. It runs to your target and bites it for {min} to {max} Physical damage every {every} sec, switching to any other enemy you target. With no enemy targeted it attacks the enemy nearest you within {range} yd. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, fixed when it is called. Requires an enemy target within {range} yd.",
+        "seedburst": "Plant a seed on your target within {range} yd. After {delay} sec it bursts where the target stands, or where it died, dealing {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if the target died first. Damage increases with Spell Power, fixed when it is planted. The seed withers if you die before it bursts.",
+        "tether": "Chain yourself to a friendly player within {range} yd for {duration} sec. {share}% of the damage that would reach their health is dealt to you instead. Ends early if you die. Requires a friendly player target other than you.",
+        "harvest": "For {duration} sec, each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health ({health}) and {pct}% of your maximum mana.",
+        "quench": "Your next {hits} melee or ranged weapon hits within {duration} sec deal {damage} extra Frost damage. The last of them also quenches the target, slowing its attacks by {slow}% for {slowDuration} sec. Unused hits are lost when it ends. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.",
         "heartNova": "Dùng hết tất cả chồng nhiệt trên một nova lửa gây {perHeat} sát thương Lửa mỗi chồng ({max} tại {maxHeat} chồng) cho mỗi kẻ thù trong {radius} thước và chế áp mọi sinh vật nó đánh trúng. Sát thương tăng theo Sức Mạnh Tấn Công. Yêu cầu một chồng nhiệt."
       }
     },
@@ -3906,6 +3912,29 @@ export const vi_VN: EnTranslations = {
       }
     },
     "auraEffect": {
+      "wildheart": {
+        "packBond": "Takes {pct}% less damage while its partner stands close. Pull the Beastmaster and his jaguar apart to break it.",
+        "packBondFury": "Deals {pct}% more damage while its partner stands close.",
+        "stalked": "The Great Jaguar hunts you and ignores taunts. Each bite deals {min} to {max} physical damage ({heroicMin} to {heroicMax} on Heroic) and opens a bleed. Kite it away from its master.",
+        "waryStuns": "A stun has landed on it. Further stuns slide off until this ends.",
+        "waryRoots": "A root has landed on it. Further roots slide off until this ends.",
+        "warySlows": "A slow has landed on it. Further slows slide off until this ends.",
+        "pollinated": "Touching a Seedpod makes it sprout a Thorn Sprout at once. Stay off the seeds and let a clean player stomp them; an untouched pod sprouts after {seconds} sec (on Heroic it burrows after {heroic} sec and rises beside the nearest player).",
+        "prey": "Zulgar hunts you. Lead him across a lit sun glyph to slow him by {slow}%. If he catches you, you are Mauled for {damage} damage ({heroic} on Heroic) and knocked down for {stun} sec.",
+        "avatar": "Moves {pct}% faster and hunts its Prey. Slows and roots take hold, and stuns last half as long.",
+        "vanished": "Hidden and immune to damage. He is about to pounce on the farthest player."
+      },
+      "sanctum": {
+        "lockbound": "Takes {pct}% less damage: {per}% for each of his chains that still holds. Break a Seal Shackle to drop its chain.",
+        "enrage": "Deals {pct}% more damage.",
+        "grasp": "Stands in meltwater and deals {pct}% more damage. If it dies in meltwater it sinks and rises again {seconds} sec later; kill it on cold ice to keep it down.",
+        "twiceWoken": "Rose again from the meltwater and deals {pct}% more damage.",
+        "doused": "His plate broke under him and the quench-water put out his Grave Inferno.",
+        "airborne": "In the air and cannot be attacked. He lands with Crashing Descent on the plate where the most players stand, dealing {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd.",
+        "wyrmsEye": "When this ends, Korzul pours Plunging Fire over the whole plate you stand on: {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone on it, and the plate cracks, or breaks if it was already cracked. Stand on sound ice, away from the group.",
+        "quenchWater": "In open quench-water: slowed by {slow}% and burned for {damage} damage every second ({heroic} on Heroic). Swim to any plate or the shore.",
+        "shardFlare": "The heart-shard flares: Grave Breath every {breath} sec and Wing Gale every {gale} sec."
+      },
       "sharedPyre": "Gây {total}% máu tối đa của mỗi người chơi, chia đều cho số người chơi đứng trong vòng tròn ({perPlayer}% mỗi người khi có {players} người).",
       "varkhulSharedPyre": "Gây {total}% máu tối đa của mỗi người chơi, chia đều cho những người chơi đứng trong vòng tròn ({perPlayer}% mỗi người khi có {players} người). Mỗi người chơi còn thiếu cũng gây thêm {missingPenalty}% máu tối đa lên toàn bộ raid, kể cả những người đang đứng trong vòng tròn.",
       "makersBrand": "Trong {duration} giây, mỗi tầng cộng dồn tăng thêm {pct}% sát thương nhận từ Varkhul. Cộng dồn tối đa {max} tầng. Tank nên đổi người ở {swap} tầng.",
@@ -4028,6 +4057,16 @@ export const vi_VN: EnTranslations = {
         "riftGuard": "Bạn chịu {pct}% ít sát thương hơn.",
         "sprint": "Tốc độ di chuyển tăng {pct}%. Không chồng với các tăng tốc độ khác.",
         "brand": "Chữa lành nhận được giảm {pct}%.",
+        "shackle": "Chained in place: cannot move.",
+        "shackleSlow": "Chained: movement speed reduced by {pct}%.",
+        "spiritPack": "A spirit jaguar fights beside you, biting your target for {min} to {max} Physical damage every {every} sec.",
+        "seedburst": "A Gorgebloom seed. When this expires it bursts for {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if this enemy dies before then.",
+        "tether": "Chained by Foreman's Last Link: {pct}% of the damage that would reach your health is dealt to the one who chained you instead.",
+        "tetherLink": "You take {pct}% of the damage your chained ally would take.",
+        "harvest": "Each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health and mana.",
+        "quench": "Your next {stacks} weapon hits deal {damage} extra Frost damage. The last one slows the target's attacks by {slow}%.",
+        "quenchOther": "The next {stacks} weapon hits deal extra Frost damage. The last one slows the target's attacks by {slow}%.",
+        "quenched": "Attack speed slowed by {pct}%.",
         "forgeHeat": "Nhiệt: {stacks}/{max}. Sử dụng Tính Khí Cha Lò Rèn tiêu tệm tất cả, và lửa vũ khí của nó gây sát thương thêm {pct}%.",
         "tempered": "Các cú đánh vũ khí cận chiến và tầm xa của bạn gây thêm {damage} sát thương Lửa ({pct}% nhiều hơn từ nhiệt tiêu tệm). Mỗi cú giết thêm {killExtend} giây, tối đa {maxDuration} giây tính tổng cộng.",
         "temperedOther": "Các cú đánh vũ khí cận chiến và tầm xa gây thêm sát thương Lửa, {pct}% nhiều hơn từ nhiệt tiêu tệm. Sát thương tăng theo Sức Mạnh Tấn Công hoặc Sức Mạnh Tấn Công Tầm Xa, tùy theo cái nào cao hơn.",
@@ -5953,6 +5992,10 @@ export const vi_VN: EnTranslations = {
         "mist_surge": "Sóng Sương Mù (sát thương vùng theo nhịp)",
         "summons_adds": "Triệu hồi quân tiếp viện",
         "lunar_tide": "Triều Nguyệt (sát thương vùng theo nhịp)",
+        "chorus_and_solo": "Chorus and Solo (stack on one mark, spread from the other)",
+        "tideglass_reflections": "Tideglass Reflections (kill each other's mirror images)",
+        "rising_tide": "Rising Tide (half the island floods, move to the dry half)",
+        "undertow": "Undertow (pulls everyone in, run out before the crash)",
         "enrage": "Nổi giận khi máu thấp",
         "shuddering_stomp": "Giậm Chân Rùng Rợn (làm choáng vùng)",
         "grave_inferno": "Địa Ngục Mộ Phần (AoE lửa kênh, giữ khoảng cách)",
@@ -5978,6 +6021,9 @@ export const vi_VN: EnTranslations = {
         "deathless_court": "Triều Đình Bất Tử (chỉ heroic, triều đình hoàng gia trỗi dậy sau Cơn Thịnh Nộ Bất Tử)",
         "bloodmane_rend": "Bloodmane Rend (chảy máu, theo dõi các giao dịch hoán đổi mục tiêu)",
         "tusk_sweep": "Quét ngà (khe hở trán)",
+        "grave_breath": "Grave Breath (frontal fire cone, it cracks the ice it covers)",
+        "plate_floor": "Breaking Ice (his fire cracks and sinks the lake plates, stay out of the open water)",
+        "wyrm_flights": "Flights (at 70% and 40%: walk Wyrm's Eye onto sound ice, stack where he should land)",
         "ancestral_sap": "Sap tổ tiên (chữa lành các đồng minh của nó)",
         "call_of_the_hunt": "Call of the Hunt (đẩy nhanh các đồng minh gần đó)",
         "thickhide_ward": "Thickhide Ward (khiên chắn cho các đồng minh gần đó)",
@@ -6001,8 +6047,107 @@ export const vi_VN: EnTranslations = {
         "forgestorm": "Forgestorm (vòng tròn sao băng rơi xuống, di chuyển ra ngoài)",
         "shared_pyre": "Dãy Pyre Chung (tập hợp vòng tròn, chia sẻ sát thương)",
         "anvils_decree": "Nghị định của Anvil (ba cuộc tấn công búa toàn diện, chữa lành)",
-        "masters_assembly": "Hội đồng tổng thể (chặn dầm rèn, xoay chặn)"
+        "masters_assembly": "Hội đồng tổng thể (chặn dầm rèn, xoay chặn)",
+        "iron_cage": "Iron Cage (mash your interact key to break out, allies can smash the bars)",
+        "drowned_anchor": "Drowned Anchor (break the chain before its victim is dragged into the pit)",
+        "shackle_pair": "Shackle Pair (two chained players must stay close together)",
+        "reaper_behind": "Shadow Crossing (he rises behind a player, step out of the scythe's arc)",
+        "pack_bond": "Pack Bond (together they take half damage: drag them 15 yards apart)",
+        "stalk": "Stalk (the jaguar hunts a marked player, never the tank; alone, it hunts you: kite, slow, root and stun it)",
+        "shared_health": "Shared Health (one pool: hit whichever is safest)",
+        "heel_frenzied_bond": "Heel! and Frenzied Bond (the jaguar leaps home, the bond reaches 20 yards)",
+        "seed_rain": "Seed Rain (clean players stomp the seeds before they sprout)",
+        "pollinate": "Pollinate (golden players stay off the seeds, or they sprout at once)",
+        "vine_lash": "Vine Lash (step out of the thorny lane or be rooted)",
+        "gorge": "Gorge (a heavy bite and a poison on the tank)",
+        "burrowing_seeds": "Burrowing Seeds and Pollen Cloud (seeds rise by a player at 6 seconds, gold spreads)",
+        "spirit_of_the_hunt": "Spirit of the Hunt (the Prey kites the avatar through lit sun glyphs; a Mauled player gets a head start)",
+        "twin_prey_ambush": "Twin Prey and Ambush (two Prey, then a pounce on the farthest player)",
+        "seal_shackles": "Seal Shackles (each chain you break makes him take 20 percent more damage and frees one of his attacks)",
+        "chain_strain": "Strain (step away from every pillar whose chain still holds)",
+        "korgath_stomp": "Shuddering Stomp (step out of the ring round him)",
+        "rerivet_last_link": "Re-rivet and Last Link (kick the Goadsmith re-pinning a chain; one chain left means Strain every 10 seconds)",
+        "waking_thaw": "Waking Thaw (the dead climb out of the thaw pools)",
+        "unquenched_held": "Held or Unquenched (kill the dead on cold ice, never in meltwater)",
+        "soulfire_trench": "Soulfire Trench (a line of soulfire, then a strip of meltwater)",
+        "shadow_volley": "Shadow Volley (shadow damage to everyone)",
+        "warm_hands_twice_woken": "Warm Hands and Twice-Woken (heroic only, keep the dead moving; a risen one returns stronger)"
       }
+    },
+    "bastionCage": {
+      "title": "Locked in the Iron Cage!",
+      "promptKey": "Press {key} again and again to break free",
+      "promptNoKey": "Press your interact key again and again to break free",
+      "promptClick": "Click here again and again to break free",
+      "promptTap": "Tap here again and again to break free",
+      "buttonAria": "Break free from the Iron Cage",
+      "progressAria": "Escape progress: {pct}"
+    },
+    "bastionChain": {
+      "anchoredTitle": "Chained to the Drowned Anchor!",
+      "anchoredLine": "Your group must break the chain before the winch drags you into the pit",
+      "allyTitle": "Break the chain!",
+      "allyLine": "{name} is being dragged to the pit: hit the Drowned Anchor",
+      "shackledTitle": "Shackled to {name}",
+      "shackledLine": "Stay within {range} yards of each other ({dist} yards apart)",
+      "strainedLine": "Too far apart! The chain bites both of you: close to {range} yards",
+      "brokenAria": "Chain broken: {pct}",
+      "reachAria": "Chain reach used: {pct}",
+      "linksLeft": "Chain links left: {count} of {total}",
+      "linkRule": "Every hit on the anchor breaks one link, however hard it lands",
+      "linksTarget": "{count} of {total} links",
+      "linkBroken": "Link broken!"
+    },
+    "wildheartAlert": {
+      "preyTitle": "You are the Prey!",
+      "preyLine": "Zulgar hunts you: run him through the lit sun glyphs",
+      "preyWaitLine": "He chases the other Prey now: be ready, he switches",
+      "stalkedTitle": "Stalked!",
+      "stalkedLine": "The jaguar hunts you: kite it away from its master",
+      "pollinatedTitle": "Pollinated!",
+      "pollinatedLine": "Stay off the seeds: your touch makes them sprout",
+      "bondTitle": "Pack Bond",
+      "bondLine": "Together they take half damage: pull them apart",
+      "timeAria": "{seconds} seconds left"
+    },
+    "sanctumAlert": {
+      "quenchTitle": "In the quench-water!",
+      "quenchLine": "It burns and slows you: swim to the nearest ice or the shore",
+      "plungeTitle": "Plunging Fire!",
+      "plungeLine": "Your whole plate is about to burn: get off it now",
+      "descentTitle": "Crashing Descent!",
+      "descentLine": "He lands right here: step out of his shadow",
+      "eyeTitle": "Wyrm's Eye on you!",
+      "eyeLine": "Your plate burns when the mark ends: stay on sound ice, away from the group",
+      "eyeCrackedLine": "You stand on cracked ice: walk to a sound plate before the mark ends",
+      "flailTitle": "Chain Flail!",
+      "flailLine": "The chain whips down the painted lane: step out of it",
+      "chargeTitle": "Threshold Charge!",
+      "chargeLine": "He charges down the lane: get out of it, away from the edge",
+      "trenchTitle": "Soulfire Trench!",
+      "trenchLine": "Soulfire cuts the lane and leaves meltwater: get out of it",
+      "strainTitle": "Strain!",
+      "strainLine": "The intact pillars are about to lash out: get away from them",
+      "infernoTitle": "Grave Inferno!",
+      "infernoLine": "Each pulse burns harder: get out of his reach",
+      "stompTitle": "Shuddering Stomp!",
+      "stompLine": "Get away from him before his foot comes down",
+      "breathTitle": "Grave Breath!",
+      "breathLine": "You stand in the breath cone: get out to the side",
+      "maulTitle": "Maul Arc!",
+      "maulLine": "He swings through everything in front of him: get behind him",
+      "tailTitle": "Tail Sweep!",
+      "tailLine": "You stand behind him: get out before the tail hits",
+      "meltwaterTitle": "In the meltwater",
+      "meltwaterLine": "Your Bonewalker stands in meltwater: drag it onto the cold ice",
+      "meltwaterTargetLine": "If your target dies in meltwater it rises again: wait for cold ice",
+      "crackedTitle": "Cracked ice",
+      "crackedLine": "Fire here breaks this plate: keep his fire off it",
+      "flightTitle": "Korzul takes flight",
+      "flightLine": "Stack on sound ice to choose where he lands, then step off",
+      "lockboundTitle": "Lockbound",
+      "lockboundLine": "{chains} chains hold: he takes {pct}% less damage. Break the Seal Shackles to strip it.",
+      "timeAria": "{seconds} seconds left"
     },
     "cosmetics": {
       "title": "Mỹ phẩm",
@@ -12241,7 +12386,96 @@ export const vi_VN: EnTranslations = {
       "hoard_cast_screech": "Tiếng Kêu Điếc",
       "hoard_cast_mimic_bite": "Cắn Tham Lam",
       "hoard_cast_mimic_leap": "Bước Nhảy Tàn Phế",
-      "hoard_cast_coin_spit": "Phun Tiền Nguyền"
+      "hoard_cast_coin_spit": "Phun Tiền Nguyền",
+      "crypt_grave_bolt": "Grave Bolt",
+      "crypt_raise_bones": "Raise Bones",
+      "crypt_murder_call": "Murder Call",
+      "crypt_stone_shriek": "Stone Shriek",
+      "crypt_grave_cleave": "Grave Cleave",
+      "crypt_barrowflame_breath": "Barrowflame Breath",
+      "crypt_tail_lash": "Tail Lash",
+      "crypt_wing_gust": "Wing Gust",
+      "crypt_morthen_rite_wakes": "The Rite Wakes",
+      "crypt_morthen_rise": "Rise of the Gravecaller",
+      "crypt_morthen_proclaim": "Grave Proclamation",
+      "crypt_morthen_descend": "Descent",
+      "crypt_knellwyrm_arrive": "Descending from the Sky",
+      "crypt_knellwyrm_pyre_strafe": "Pyre Strafe",
+      "crypt_knellwyrm_strafe_run": "Strafing Run",
+      "crypt_knellwyrm_dread_bellow": "Dread Bellow",
+      "bastion_brine_mend": "Brine Mend",
+      "bastion_fog_ward": "Fog Ward",
+      "bastion_halberd_sweep": "Halberd Sweep",
+      "bastion_piercing_bolt": "Piercing Bolt",
+      "bastion_claw_sweep": "Claw Sweep",
+      "bastion_shell_slam": "Shell Slam",
+      "bastion_oathbound_charge": "Oathbound Charge",
+      "bastion_gaolers_cudgel": "Gaoler's Cudgel",
+      "bastion_mist_surge": "Mist Surge",
+      "bastion_drowning_hymn": "Drowning Hymn",
+      "bastion_iron_cage": "Iron Cage",
+      "bastion_drowned_anchor_cast": "Drowned Anchor",
+      "bastion_shackle_pair": "Shackle Pair",
+      "bastion_shadowstep": "Shadow Crossing",
+      "bastion_reaping_scythe": "Reaping Scythe",
+      "bastion_veil_rise": "Fog Veil",
+      "temple_lullaby": "Lullaby",
+      "temple_call_the_tide": "Call the Tide",
+      "temple_static_coil": "Static Coil",
+      "temple_snapper_snap": "Snap",
+      "temple_trident_sweep": "Trident Sweep",
+      "temple_sea_song": "Sea-Song",
+      "temple_tidal_slap": "Tidal Slap",
+      "temple_tide_breath": "Freezing Breath",
+      "temple_moonlight_lance": "Moonlight Lance",
+      "temple_prism_flare": "Prism Flare",
+      "temple_resonant_slam": "Resonant Slam",
+      "temple_undertow": "Undertow",
+      "temple_lunar_tide": "Lunar Tide",
+      "temple_skewering_trident": "Skewering Trident",
+      "temple_pale_mending": "Pale Mending",
+      "temple_glimmer_venom": "Glimmer Venom",
+      "temple_pearl_slam": "Pearl Slam",
+      "temple_lightning_spit": "Lightning Spit",
+      "temple_crushing_torrent": "Crushing Torrent",
+      "temple_hydra_tsunami": "Tsunami",
+      "temple_ysolei_call": "Moonspawn Call",
+      "temple_ysolei_wrath": "Drowned Wrath",
+      "wildheart_ancestral_sap": "Ancestral Sap",
+      "wildheart_plant_totem": "Plant Totem",
+      "wildheart_entangling_lash": "Entangling Lash",
+      "wildheart_saurian_tail_swipe": "Tail Swipe",
+      "wildheart_saurian_stomp": "Earthshaking Stomp",
+      "wildheart_beast_pit_quake": "Beast Pit Quake",
+      "wildheart_jaguar_heel": "Heel!",
+      "wildheart_gorgebloom_seed_rain": "Seed Rain",
+      "wildheart_gorgebloom_vine_lash": "Vine Lash",
+      "wildheart_gorgebloom_gorge": "Gorge",
+      "wildheart_zulgar_pulse": "Wildheart Pulse",
+      "wildheart_zulgar_spirit_hunt": "Spirit of the Hunt",
+      "sanctum_cinder_breath": "Cinder Breath",
+      "sanctum_warming_rite": "Warming Rite",
+      "sanctum_goad": "Goad",
+      "sanctum_plant_brazier": "Plant Soul Brazier",
+      "sanctum_ice_block_toss": "Ice Block Toss",
+      "sanctum_tusker_tusk_sweep": "Tusk Sweep",
+      "sanctum_tusker_trample": "Trample",
+      "sanctum_korgath_maul_arc": "Maul Arc",
+      "sanctum_korgath_chain_flail": "Chain Flail",
+      "sanctum_korgath_threshold_charge": "Threshold Charge",
+      "sanctum_korgath_foremans_bellow": "Foreman's Bellow",
+      "sanctum_korgath_strain": "Strain",
+      "sanctum_korgath_stomp": "Shuddering Stomp",
+      "sanctum_goadsmith_rerivet": "Re-rivet",
+      "sanctum_velkhar_soulfire_trench": "Soulfire Trench",
+      "sanctum_velkhar_shadow_volley": "Shadow Volley",
+      "sanctum_korzul_break_free": "Break Free",
+      "sanctum_korzul_grave_breath": "Grave Breath",
+      "sanctum_korzul_tail_sweep": "Tail Sweep",
+      "sanctum_korzul_grave_inferno": "Grave Inferno",
+      "sanctum_korzul_wing_gale": "Wing Gale",
+      "sanctum_korzul_plunging_fire": "Plunging Fire",
+      "sanctum_korzul_crashing_descent": "Crashing Descent"
     }
   },
   "questUi": {
@@ -18451,6 +18685,162 @@ export const vi_VN: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Trượng Chiến Vanguard"
       },
+      "gravedirt_treads": {
+        "name": "Gravedirt Treads"
+      },
+      "bellrope_girdle": {
+        "name": "Bellrope Girdle"
+      },
+      "sextons_spadehaft": {
+        "name": "Sexton's Spadehaft"
+      },
+      "rimesilk_mantle": {
+        "name": "Rimesilk Mantle"
+      },
+      "bonechill_carapace_vest": {
+        "name": "Bonechill Carapace Vest"
+      },
+      "rimeweb_hunters_leggings": {
+        "name": "Rimeweb Hunter's Leggings"
+      },
+      "rimeweb_fang": {
+        "name": "Rimeweb Fang"
+      },
+      "cantors_cassock": {
+        "name": "Cantor's Cassock"
+      },
+      "choirward_leggings": {
+        "name": "Choirward Leggings"
+      },
+      "choristers_gloves": {
+        "name": "Chorister's Gloves"
+      },
+      "cantors_hymnal": {
+        "name": "Cantor's Hymnal"
+      },
+      "gravecallers_vestments": {
+        "name": "Gravecaller's Vestments"
+      },
+      "unquiet_stalkers_hood": {
+        "name": "Unquiet Stalker's Hood"
+      },
+      "sextons_burial_spade": {
+        "name": "Sexton's Burial Spade"
+      },
+      "rimesilk_hood": {
+        "name": "Rimesilk Hood"
+      },
+      "knight_commanders_longsword": {
+        "name": "Knight-Commander's Longsword"
+      },
+      "gaolers_chain_girdle": {
+        "name": "Gaoler's Chain Girdle"
+      },
+      "rusted_shackle_grips": {
+        "name": "Rusted Shackle Grips"
+      },
+      "drowned_wardens_mantle": {
+        "name": "Drowned Warden's Mantle"
+      },
+      "gaolyard_cudgel": {
+        "name": "Gaolyard Cudgel"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "Drowned Commander's Breastplate"
+      },
+      "gaolyard_striders": {
+        "name": "Gaolyard Striders"
+      },
+      "jailers_iron_gauntlets": {
+        "name": "Jailer's Iron Gauntlets"
+      },
+      "turnkeys_keyring_belt": {
+        "name": "Turnkey's Keyring Belt"
+      },
+      "turnkeys_lantern_cowl": {
+        "name": "Turnkey's Lantern Cowl"
+      },
+      "conchplate_girdle": {
+        "name": "Conchplate Girdle"
+      },
+      "pale_chorus_leggings": {
+        "name": "Pale Chorus Leggings"
+      },
+      "refrain_silk_gloves": {
+        "name": "Refrain Silk Gloves"
+      },
+      "chorus_conch": {
+        "name": "Chorus Conch"
+      },
+      "tideglass_pauldrons": {
+        "name": "Tideglass Pauldrons"
+      },
+      "moonburn_treads": {
+        "name": "Moonburn Treads"
+      },
+      "prism_etched_cowl": {
+        "name": "Prism-Etched Cowl"
+      },
+      "tideglass_shiv": {
+        "name": "Tideglass Shiv"
+      },
+      "pale_chorus_vestment": {
+        "name": "Pale Chorus Vestment"
+      },
+      "tideglass_warmaul": {
+        "name": "Tideglass Warmaul"
+      },
+      "beastpit_warbelt": {
+        "name": "Beastpit Warbelt"
+      },
+      "jaguar_hide_jerkin": {
+        "name": "Jaguar-Hide Jerkin"
+      },
+      "hexbone_handwraps": {
+        "name": "Hexbone Handwraps"
+      },
+      "rootbound_sabatons": {
+        "name": "Rootbound Sabatons"
+      },
+      "pollen_dusted_leggings": {
+        "name": "Pollen-Dusted Leggings"
+      },
+      "bloomsilk_cowl": {
+        "name": "Bloomsilk Cowl"
+      },
+      "falls_blessed_staff": {
+        "name": "Falls-Blessed Staff"
+      },
+      "fanglords_hide_mantle": {
+        "name": "Fanglord's Hide Mantle"
+      },
+      "thornroot_greathelm": {
+        "name": "Thorncrowned Greathelm"
+      },
+      "foremans_grips": {
+        "name": "Foreman's Grips"
+      },
+      "serac_stride_boots": {
+        "name": "Serac-Stride Boots"
+      },
+      "seal_rune_mantle": {
+        "name": "Seal-Rune Mantle"
+      },
+      "thawbound_legguards": {
+        "name": "Thawbound Legguards"
+      },
+      "pyre_tenders_hood": {
+        "name": "Pyre-Tender's Hood"
+      },
+      "meltwater_cord": {
+        "name": "Meltwater Cord"
+      },
+      "hammer_of_the_open_lock": {
+        "name": "Hammer of the Open Lock"
+      },
+      "vestments_of_the_waking_rite": {
+        "name": "Vestments of the Waking Rite"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },
@@ -19306,6 +19696,24 @@ export const vi_VN: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "Trái Tim Của Lò Thiêu"
       },
+      "gaolers_iron_key": {
+        "name": "Gaoler's Iron Key"
+      },
+      "fanglords_whistle": {
+        "name": "Fanglord's Whistle"
+      },
+      "gorgebloom_seedpod": {
+        "name": "Gorgebloom Seedpod"
+      },
+      "foremans_last_link": {
+        "name": "Foreman's Last Link"
+      },
+      "phial_of_the_tithe": {
+        "name": "Phial of the Tithe"
+      },
+      "quenchwater_flask": {
+        "name": "Quenchwater Flask"
+      },
       "rift_watchers_band": {
         "name": "Vòng Tay Người Canh Vực"
       },
@@ -19557,6 +19965,69 @@ export const vi_VN: EnTranslations = {
       "morthen": {
         "name": "Morthen Kẻ Gọi Mộ"
       },
+      "ossuary_sentinel": {
+        "name": "Ossuary Sentinel"
+      },
+      "hollow_gravedigger": {
+        "name": "Hollow Gravedigger"
+      },
+      "rime_egg_sac": {
+        "name": "Rime Egg Sac"
+      },
+      "rimeweb_hatchling": {
+        "name": "Rimeweb Hatchling"
+      },
+      "rimeweb_spinner": {
+        "name": "Rimeweb Spinner"
+      },
+      "candlewright_acolyte": {
+        "name": "Candlewright Acolyte"
+      },
+      "hollow_chorister": {
+        "name": "Hollow Chorister"
+      },
+      "bound_soul": {
+        "name": "Bound Soul"
+      },
+      "rimeweb": {
+        "name": "Rimeweb"
+      },
+      "cantor_ilvane": {
+        "name": "Cantor Ilvane"
+      },
+      "crypt_ossuary_warrior": {
+        "name": "Ossuary Warrior"
+      },
+      "crypt_gravecaller_adept": {
+        "name": "Gravecaller Adept"
+      },
+      "crypt_ossuary_cutthroat": {
+        "name": "Ossuary Cutthroat"
+      },
+      "crypt_gravecaller_necromancer": {
+        "name": "Gravecaller Necromancer"
+      },
+      "crypt_bone_minion": {
+        "name": "Bone Minion"
+      },
+      "crypt_bone_brute": {
+        "name": "Bone Brute"
+      },
+      "crypt_chapel_gargoyle": {
+        "name": "Chapel Gargoyle"
+      },
+      "crypt_crow_caller": {
+        "name": "Crow Caller"
+      },
+      "crypt_carrion_crow": {
+        "name": "Carrion Crow"
+      },
+      "crypt_ossuary_drake": {
+        "name": "Ossuary Drake"
+      },
+      "crypt_knellwyrm": {
+        "name": "Knellwyrm"
+      },
       "bastion_revenant": {
         "name": "Oán Linh Pháo Đài"
       },
@@ -19571,6 +20042,102 @@ export const vi_VN: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "Vael Fogbinder"
+      },
+      "drowned_watchman": {
+        "name": "Drowned Watchman"
+      },
+      "fogbound_arbalest": {
+        "name": "Fogbound Arbalest"
+      },
+      "barnacle_crawler": {
+        "name": "Barnacle Crawler"
+      },
+      "bastion_warhound": {
+        "name": "Bastion Warhound"
+      },
+      "mistweaver": {
+        "name": "Mist Chanter"
+      },
+      "drowned_sergeant": {
+        "name": "Drowned Sergeant"
+      },
+      "shackled_prisoner": {
+        "name": "Shackled Prisoner"
+      },
+      "gaol_turnkey": {
+        "name": "Gaol Turnkey"
+      },
+      "turretback_hermit": {
+        "name": "The Turretback Hermit"
+      },
+      "vael_fog_shade": {
+        "name": "Vael the Fogbinder"
+      },
+      "gaoler_ossick": {
+        "name": "Gaoler Ossick"
+      },
+      "bastion_gaol_cage": {
+        "name": "Iron Cage"
+      },
+      "bastion_drowned_anchor": {
+        "name": "Drowned Anchor"
+      },
+      "lagoon_snapper": {
+        "name": "Lagoon Snapper"
+      },
+      "lagoon_eel": {
+        "name": "Lagoon Eel"
+      },
+      "moonlit_siren": {
+        "name": "Moonlit Siren"
+      },
+      "tidewisp": {
+        "name": "Tidewisp"
+      },
+      "drowned_pilgrim": {
+        "name": "Drowned Pilgrim"
+      },
+      "mere_hydra_head_left": {
+        "name": "Mere Hydra"
+      },
+      "mere_hydra_head_center": {
+        "name": "Mere Hydra"
+      },
+      "mere_hydra_head_right": {
+        "name": "Mere Hydra"
+      },
+      "tideglass_colossus": {
+        "name": "Tideglass Colossus"
+      },
+      "tideglass_reflection": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_warrior": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_paladin": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_hunter": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_rogue": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_priest": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_shaman": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_mage": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_warlock": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_druid": {
+        "name": "Tideglass Reflection"
       },
       "sanctum_boneguard": {
         "name": "Vệ Xương Thánh Đường"
@@ -20100,8 +20667,74 @@ export const vi_VN: EnTranslations = {
       "wildheart_beastmaster": {
         "name": "Thuần Thú Sư Lãnh Chúa Nanh"
       },
+      "sunbone_totem_binder": {
+        "name": "Sunbone Totem-Binder"
+      },
+      "sunbone_totem": {
+        "name": "Sunbone Totem"
+      },
+      "basin_raptor": {
+        "name": "Basin Raptor"
+      },
+      "spore_toad": {
+        "name": "Spore Toad"
+      },
+      "vine_lasher": {
+        "name": "Snarlvine Lasher"
+      },
+      "great_saurian": {
+        "name": "Great Saurian"
+      },
+      "howdah_hexcaller": {
+        "name": "Howdah Hexcaller"
+      },
+      "fanglord_jaguar": {
+        "name": "Fanglord's Great Jaguar"
+      },
+      "the_gorgebloom": {
+        "name": "The Gorgebloom"
+      },
       "wildheart_high_priest": {
         "name": "Zulgar, Tiếng Nói Của Vùng Trũng"
+      },
+      "broodsworn_thawcaller": {
+        "name": "Broodsworn Thawcaller"
+      },
+      "broodsworn_goadsmith": {
+        "name": "Broodsworn Goadsmith"
+      },
+      "broodsworn_pyre_tender": {
+        "name": "Broodsworn Pyre-Tender"
+      },
+      "soul_brazier": {
+        "name": "Soul Brazier"
+      },
+      "rime_whelp": {
+        "name": "Rime Whelp"
+      },
+      "ogre_sledge_hauler": {
+        "name": "Ogre Sledge-Hauler"
+      },
+      "glacier_splinter": {
+        "name": "Glacier Splinter"
+      },
+      "sledge_tusker": {
+        "name": "Sledge Tusker"
+      },
+      "sanctum_shackle_hammer": {
+        "name": "Hammer Shackle"
+      },
+      "sanctum_shackle_tongs": {
+        "name": "Tongs Shackle"
+      },
+      "sanctum_shackle_anvil": {
+        "name": "Anvil Shackle"
+      },
+      "sanctum_shackle_bellows": {
+        "name": "Bellows Shackle"
+      },
+      "thorn_sprout": {
+        "name": "Thorn Sprout"
       },
       "ironvein_foreman": {
         "name": "Quản Đốc Mạch Sắt"

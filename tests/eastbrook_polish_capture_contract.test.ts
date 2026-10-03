@@ -700,7 +700,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '164b585f770570b773faa8e35c466bcd4ab2840a6572507aa9528bc52572cbc5';
+  // Re-minted for the five-dungeon rework (feature/drowned-temple-rework): its renderer
+  // integrations moved the runtimeRender.renderer leaf. No capture was retaken.
+  'c1c0d84e172633171ca00bd1d10dd30c6120e69a0914c0fdcc6b9946e2c5770a';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

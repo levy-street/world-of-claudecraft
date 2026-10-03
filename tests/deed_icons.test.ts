@@ -380,10 +380,12 @@ describe('Book of Deeds webp icons', () => {
     // pending set on the exploration crest: 318 live, still 289 painted.
     // The Buried Hoards Coinsack catch (cmb_coinsack_caught) joins on the combat
     // crest beside the ferry round trip: 319 live, still 289 painted.
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(319);
+    // The five-dungeon rework's 19 encounter deeds join the pending set on the
+    // dungeon crest: 338 live, still 289 painted.
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(338);
     expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(289);
-    expect(DEED_ART_PENDING_IDS).toHaveLength(30);
-    expect(DEED_ART_PENDING_IDS.at(-1)).toBe('exp_harbor_to_harbor');
+    expect(DEED_ART_PENDING_IDS).toHaveLength(49);
+    expect(DEED_ART_PENDING_IDS.at(-1)).toBe('dgn_sledge_tusker');
     expect(DEED_ORDER.length - DEED_IMAGE_IDS.size).toBe(DEED_ART_PENDING_IDS.length);
     for (const id of artless) {
       const catCrestId = deedCrestId(id, DEEDS[id].category);

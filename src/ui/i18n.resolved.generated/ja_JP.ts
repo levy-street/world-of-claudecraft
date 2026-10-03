@@ -3132,6 +3132,12 @@ export const ja_JP: EnTranslations = {
         "kindlingOrb": "{duration}秒間、残り火のオーブを自分のそばに呼び出す。敵に呪文を唱えるたびに、オーブがその敵に火の弾を放ち、{damage}の火炎ダメージを与える。ダメージは呪文力で増加する。",
         "pierce": "{duration}秒間、オートアタック、射撃、物理アビリティ（出血を除く）の命中が、ターゲットから{reach}ヤード以内で最も近い敵にも与えたダメージの{share}%を与える。",
         "lantern": "{duration}秒間、足元にランタンを置く。ランタンから{radius}ヤード以内の自分またはパーティメンバーに誰かが直接回復を行うと、その光の中で最も傷ついた別のパーティメンバーもその回復量の{share}%回復する。",
+        "shackle": "{range}ヤード以内の対象を{duration}秒間その場に鎖で縛る。ボスなど行動阻害に耐性のあるクリーチャーは、代わりに移動速度が{slow}%低下する（減速にも耐性がある場合は無効）。",
+        "spiritPack": "{duration}秒間、霊のジャガーを呼び出して共に戦わせる。ジャガーは対象へ駆け寄り、{every}秒ごとに噛みついて{min}～{max}の物理ダメージを与え、あなたが別の敵を対象にするとそちらへ移る。敵を対象にしていない場合は、{range}ヤード以内であなたに最も近い敵を攻撃する。ダメージは攻撃力または遠隔攻撃力の高い方に応じて増加し、呼び出した時点で確定する。{range}ヤード以内の敵対的な対象が必要。",
+        "seedburst": "{range}ヤード以内の対象に種を植える。{delay}秒後、種は対象のいる場所（または死んだ場所）で弾け、{radius}ヤード以内の各敵に{damage}の自然ダメージを与える。対象が先に死んでいた場合は{bonus}%増加（{empowered}）。ダメージは呪文力に応じて増加し、植えた時点で確定する。種が弾ける前にあなたが死ぬと、種は枯れる。",
+        "tether": "{range}ヤード以内の味方プレイヤー1人と{duration}秒間鎖でつながる。その味方の体力に届くはずのダメージの{share}%を代わりにあなたが受ける。あなたが死亡すると早期に終了する。自分以外の味方プレイヤーを対象にする必要がある。",
+        "harvest": "{duration}秒間、あなたから{radius}ヤード以内で敵対的なクリーチャーが死亡するたびに、最大体力の{pct}%（{health}）と最大マナの{pct}%を回復する。",
+        "quench": "{duration}秒以内の次の{hits}回の近接または遠隔武器の命中が、追加で{damage}の冷気ダメージを与える。最後の命中は対象を焼き入れし、{slowDuration}秒間その攻撃速度を{slow}%低下させる。効果が終わると未使用の命中は失われる。ダメージは攻撃力または遠隔攻撃力の高い方に応じて増加する。",
         "heartNova": "熱をすべて消費して炎のノヴァを放ち、{radius}ヤード以内の各敵に熱1スタックにつき{perHeat}の火炎ダメージを与え（{maxHeat}スタックで{max}）、命中したすべてのクリーチャーを挑発する。ダメージは攻撃力で増加する。熱が必要。"
       }
     },
@@ -3906,6 +3912,29 @@ export const ja_JP: EnTranslations = {
       }
     },
     "auraEffect": {
+      "wildheart": {
+        "packBond": "相棒が近くにいる間、受けるダメージが{pct}%減少する。獣使いとジャガーを引き離せば絆は切れる。",
+        "packBondFury": "相棒が近くにいる間、与えるダメージが{pct}%増加する。",
+        "stalked": "大ジャガーがあなたを狙い、挑発を受け付けない。噛みつきは{min}～{max}の物理ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）を与え、出血させる。主から引き離せ。",
+        "waryStuns": "一度スタンを受けた。この効果が切れるまで、以降のスタンは効かない。",
+        "waryRoots": "一度拘束を受けた。この効果が切れるまで、以降の拘束は効かない。",
+        "warySlows": "一度鈍足を受けた。この効果が切れるまで、以降の鈍足は効かない。",
+        "pollinated": "種莢に触れると、すぐに茨の芽が生える。種には近づかず、花粉のない者に踏み潰させよう。放置された種莢は{seconds}秒で芽吹く（ヒロイックでは{heroic}秒で地中に潜り、最も近い者の傍から現れる）。",
+        "prey": "ズルガーがあなたを狙っている。光る太陽紋を踏ませると{slow}%鈍足になる。捕まると引き裂かれ、{damage}のダメージ（ヒロイックでは{heroic}）を受けて{stun}秒間倒される。",
+        "avatar": "移動速度が{pct}%上昇し、獲物を狩る。鈍足と拘束は効き、スタンの持続時間は半分になる。",
+        "vanished": "姿を消し、ダメージを受けない。最も遠い者へ飛びかかろうとしている。"
+      },
+      "sanctum": {
+        "lockbound": "受けるダメージが{pct}%減少：まだ残っている鎖1本につき{per}%。封印の枷を壊すとその鎖が外れる。",
+        "enrage": "与えるダメージが{pct}%増加。",
+        "grasp": "融け水の中に立ち、与えるダメージが{pct}%増加。融け水の中で死ぬと沈み、{seconds}秒後に再び起き上がる。冷たい氷の上で倒せば二度と起きない。",
+        "twiceWoken": "融け水から再び起き上がり、与えるダメージが{pct}%増加。",
+        "doused": "足元の氷板が割れ、焼き入れの水が墓場のインフェルノを消した。",
+        "airborne": "空中にいて攻撃できない。最も多くのプレイヤーが立つ氷板へ墜落の降下で着地し、{radius}ヤード以内の全員に{min}から{max}のダメージ（ヒロイックでは{heroicMin}から{heroicMax}）を与える。",
+        "wyrmsEye": "この効果が切れると、コルズルが立っている氷板全体に降り注ぐ炎を浴びせる：上にいる全員に{min}から{max}のダメージ（ヒロイックでは{heroicMin}から{heroicMax}）、氷板にひびが入り、すでにひびがあれば砕ける。無傷の氷の上で仲間から離れて立て。",
+        "quenchWater": "開いた焼き入れの水の中：移動速度が{slow}%低下し、毎秒{damage}のダメージ（ヒロイックでは{heroic}）で焼かれる。どれかの氷板か岸まで泳げ。",
+        "shardFlare": "心臓の欠片が燃え上がる：墓のブレスが{breath}秒ごと、翼の突風が{gale}秒ごとになる。"
+      },
       "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
       "varkhulSharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。不足しているプレイヤー1人につき、サークル内を含むレイド全体が最大体力の{missingPenalty}%のダメージを受ける。",
       "makersBrand": "{duration}秒間、1スタックごとにヴァルクルから受けるダメージが{pct}%増加する。最大{max}スタック。タンクは{swap}スタックで交代すること。",
@@ -4028,6 +4057,16 @@ export const ja_JP: EnTranslations = {
         "riftGuard": "受けるダメージが{pct}%減少する。",
         "sprint": "移動速度が{pct}%増加する。他の移動速度上昇効果とは重複しない。",
         "brand": "受ける回復量が{pct}%減少する。",
+        "shackle": "鎖で縛られている：移動できない。",
+        "shackleSlow": "鎖につながれている：移動速度が{pct}%低下。",
+        "spiritPack": "霊のジャガーが共に戦い、{every}秒ごとに対象へ噛みついて{min}～{max}の物理ダメージを与える。",
+        "seedburst": "ゴージブルームの種。この効果が切れると弾け、{radius}ヤード以内の各敵に{damage}の自然ダメージを与える。それまでにこの敵が死んだ場合は{bonus}%増加（{empowered}）。",
+        "tether": "親方の最後の鎖環でつながれている：あなたの体力に届くはずのダメージの{pct}%を、代わりにあなたをつないだ者が受ける。",
+        "tetherLink": "つないだ味方が受けるはずのダメージの{pct}%をあなたが受ける。",
+        "harvest": "あなたから{radius}ヤード以内で敵対的なクリーチャーが死亡するたびに、最大体力と最大マナの{pct}%を回復する。",
+        "quench": "次の{stacks}回の武器の命中が追加で{damage}の冷気ダメージを与える。最後の命中は対象の攻撃速度を{slow}%低下させる。",
+        "quenchOther": "次の{stacks}回の武器の命中が追加の冷気ダメージを与える。最後の命中は対象の攻撃速度を{slow}%低下させる。",
+        "quenched": "攻撃速度が{pct}%低下。",
         "forgeHeat": "熱：{stacks}/{max}。鍛冶父の焼き入れを使うと熱をすべて消費し、その武器の炎のダメージが{pct}%増加する。",
         "tempered": "近接および遠隔武器の命中が追加で{damage}の火炎ダメージを与える（消費した熱で{pct}%増加）。とどめの一撃ごとに{killExtend}秒延長され、合計で最大{maxDuration}秒。",
         "temperedOther": "近接および遠隔武器の命中が追加の火炎ダメージを与え、消費した熱で{pct}%増加する。ダメージは攻撃力と遠隔攻撃力の高い方で増加する。",
@@ -5953,6 +5992,10 @@ export const ja_JP: EnTranslations = {
         "mist_surge": "ミストサージ（周期的な範囲ダメージ）",
         "summons_adds": "増援を召喚",
         "lunar_tide": "ルナタイド（周期的な範囲ダメージ）",
+        "chorus_and_solo": "合唱と独唱（片方の印には集まり、もう片方からは離れる）",
+        "tideglass_reflections": "潮硝子の映し身（互いの映し身を倒す）",
+        "rising_tide": "満ち潮（島の半分が浸水、乾いた側へ移動）",
+        "undertow": "引き潮（全員を引き寄せる、衝撃の前に逃げる）",
         "enrage": "低体力で激怒",
         "shuddering_stomp": "身震いの踏みつけ（範囲スタン）",
         "grave_inferno": "墓場のインフェルノ（詠唱火炎AoE、散開を維持）",
@@ -5978,6 +6021,9 @@ export const ja_JP: EnTranslations = {
         "deathless_court": "不死の宮廷（英雄限定、不死の憤怒の後に王家の廷臣が蘇る）",
         "bloodmane_rend": "ブラッドメインレンド（出血、対象交代に注意）",
         "tusk_sweep": "タスクスイープ（前方クリーブ）",
+        "grave_breath": "墓所のブレス（前方の炎の扇形、範囲内の氷にひびが入る）",
+        "plate_floor": "砕ける氷（炎で湖の氷板が割れて沈む、開いた水面に入らない）",
+        "wyrm_flights": "飛行フェーズ（70%と40%：ワームの目は無傷の氷の上へ、着地させたい場所に集合）",
         "ancestral_sap": "アンセストラルサップ（味方を回復）",
         "call_of_the_hunt": "コール・オブ・ザ・ハント（周囲の味方を加速）",
         "thickhide_ward": "シックハイドウォード（周囲の味方を守護）",
@@ -6001,8 +6047,107 @@ export const ja_JP: EnTranslations = {
         "forgestorm": "フォージストーム（降り注ぐ隕石円、範囲外へ移動）",
         "shared_pyre": "共有の火葬（集合円、ダメージを分担）",
         "anvils_decree": "金床の勅令（全体への三連ハンマー打撃、回復で耐える）",
-        "masters_assembly": "匠の組立（鍛冶場の光線を遮る、遮る役を交代）"
+        "masters_assembly": "匠の組立（鍛冶場の光線を遮る、遮る役を交代）",
+        "iron_cage": "鉄の檻（インタラクトキーを連打して脱出、味方は格子を叩き壊せる）",
+        "drowned_anchor": "溺死の錨（犠牲者が穴へ引きずり込まれる前に鎖を断つ）",
+        "shackle_pair": "連鎖の枷（鎖でつながれた二人は離れずに動く）",
+        "reaper_behind": "影渡り（死神はプレイヤーの背後に現れる、大鎌の弧から出る）",
+        "pack_bond": "群れの絆（並ぶと被ダメージ半減：15ヤード引き離せ）",
+        "stalk": "忍び狩り（ジャガーが印の者を狙う。タンクは狙わず、ソロではあなたを狙う：引き回し、鈍足・拘束・スタンを）",
+        "shared_health": "体力共有（共通の体力：最も安全な方を攻撃）",
+        "heel_frenzied_bond": "戻れ！と狂乱の絆（ジャガーが主の元へ跳び、絆が20ヤードに広がる）",
+        "seed_rain": "種の雨（花粉のない者が芽吹く前に種を踏み潰す）",
+        "pollinate": "受粉（金色の者は種に触れるな、すぐに芽吹く）",
+        "vine_lash": "蔓の鞭（茨の帯から出ろ、さもなくば拘束される）",
+        "gorge": "貪り食い（タンクへの強烈な噛みつきと毒）",
+        "burrowing_seeds": "潜る種と花粉の雲（種は6秒で誰かの傍から芽吹き、金色は広がる）",
+        "spirit_of_the_hunt": "狩りの魂（獲物は化身を光る太陽紋へ導く。噛み倒された者には逃げる猶予がある）",
+        "twin_prey_ambush": "双つの獲物と待ち伏せ（獲物が二人、その後最も遠い者へ飛びかかる）",
+        "seal_shackles": "封印の枷（鎖を1本断つごとに彼の被ダメージが20%増え、攻撃が1つ解き放たれる）",
+        "chain_strain": "鎖の引き締め（鎖がまだ残る柱から離れる）",
+        "korgath_stomp": "震える踏みつけ（彼の周りの輪から出る）",
+        "rerivet_last_link": "再鋲打ちと最後の環（鎖を打ち直す突き棒鍛冶を阻止する。鎖が残り1本になると10秒ごとに鎖の引き締め）",
+        "waking_thaw": "目覚めの雪解け（死者が融氷の池から這い上がる）",
+        "unquenched_held": "封じか不滅か（死者は冷たい氷の上で倒せ、融水の中では倒すな）",
+        "soulfire_trench": "魂火の溝（魂火の線、その後に融水の帯が残る）",
+        "shadow_volley": "影の斉射（全員に闇ダメージ）",
+        "warm_hands_twice_woken": "温かな手と二度目の目覚め（英雄のみ、死者を動かし続けよ。再び起きた者は強くなる）"
       }
+    },
+    "bastionCage": {
+      "title": "鉄の檻に閉じ込められた！",
+      "promptKey": "{key} を連打して脱出",
+      "promptNoKey": "インタラクトキーを連打して脱出",
+      "promptClick": "ここをクリック連打して脱出",
+      "promptTap": "ここを連打して脱出",
+      "buttonAria": "鉄の檻から脱出する",
+      "progressAria": "脱出の進行度：{pct}"
+    },
+    "bastionChain": {
+      "anchoredTitle": "溺死の錨に繋がれた！",
+      "anchoredLine": "巻き上げ機に穴へ引きずり込まれる前に、仲間が鎖を断ち切らなければならない",
+      "allyTitle": "鎖を断て！",
+      "allyLine": "{name} が穴へ引きずられている：溺死の錨を攻撃せよ",
+      "shackledTitle": "{name} と枷で繋がれている",
+      "shackledLine": "互いに {range} ヤード以内にいること（現在 {dist} ヤード）",
+      "strainedLine": "離れすぎ！鎖が二人を締め付ける：{range} ヤード以内に戻れ",
+      "brokenAria": "鎖の破損：{pct}",
+      "reachAria": "鎖の張り具合：{pct}",
+      "linksLeft": "残りの鎖の環：{count}/{total}",
+      "linkRule": "錨への一撃ごとに、威力に関係なく環が一つ外れる",
+      "linksTarget": "鎖の環 {count}/{total}",
+      "linkBroken": "環を断った！"
+    },
+    "wildheartAlert": {
+      "preyTitle": "お前が獲物だ！",
+      "preyLine": "ズルガーが狙っている：光る太陽紋を通らせろ",
+      "preyWaitLine": "今はもう一人の獲物を追っている：備えろ、標的が変わる",
+      "stalkedTitle": "狙われている！",
+      "stalkedLine": "ジャガーが狙っている：主から引き離せ",
+      "pollinatedTitle": "受粉した！",
+      "pollinatedLine": "種に近づくな：触れると芽吹く",
+      "bondTitle": "群れの絆",
+      "bondLine": "並んでいると被ダメージ半減：引き離せ",
+      "timeAria": "残り{seconds}秒"
+    },
+    "sanctumAlert": {
+      "quenchTitle": "焼き入れの水の中だ！",
+      "quenchLine": "焼かれて鈍る：一番近い氷か岸まで泳げ",
+      "plungeTitle": "降り注ぐ炎！",
+      "plungeLine": "足元の氷板全体が燃え上がる：今すぐ降りろ",
+      "descentTitle": "墜落の降下！",
+      "descentLine": "ここに降りてくる：影から出ろ",
+      "eyeTitle": "ワームの眼に狙われた！",
+      "eyeLine": "印が消えると立っている氷板が燃える：無傷の氷の上で仲間から離れろ",
+      "eyeCrackedLine": "ひびの入った氷の上だ：印が消える前に無傷の氷板へ移れ",
+      "flailTitle": "鎖の殻竿！",
+      "flailLine": "鎖が描かれた線に沿って振り下ろされる：線から出ろ",
+      "chargeTitle": "敷居の突進！",
+      "chargeLine": "線に沿って突進してくる：線から出て、端から離れろ",
+      "trenchTitle": "魂火の溝！",
+      "trenchLine": "魂火が線を裂き、融け水を残す：そこから出ろ",
+      "strainTitle": "鎖の引き絞り！",
+      "strainLine": "無傷の柱が今にも弾ける：柱から離れろ",
+      "infernoTitle": "墓場のインフェルノ！",
+      "infernoLine": "脈動のたびに激しくなる：彼の届く範囲から出ろ",
+      "stompTitle": "身震いの踏みつけ！",
+      "stompLine": "足が下りる前に彼から離れろ",
+      "breathTitle": "墓のブレス！",
+      "breathLine": "ブレスの扇の中にいる：横へ抜けろ",
+      "maulTitle": "大槌の弧！",
+      "maulLine": "前方すべてをなぎ払う：背後へ回れ",
+      "tailTitle": "尾のなぎ払い！",
+      "tailLine": "背後に立っている：尾が来る前に離れろ",
+      "meltwaterTitle": "融け水の中",
+      "meltwaterLine": "お前のボーンウォーカーが融け水の中にいる：冷たい氷の上へ引きずり出せ",
+      "meltwaterTargetLine": "ターゲットは融け水の中で死ぬと再び起き上がる：冷たい氷の上まで待て",
+      "crackedTitle": "ひびの入った氷",
+      "crackedLine": "ここに炎が当たるとこの氷板は砕ける：彼の炎をここに向けさせるな",
+      "flightTitle": "コルズルが飛び立つ",
+      "flightLine": "無傷の氷の上に集まって降下地点を選び、その後に離れろ",
+      "lockboundTitle": "錠縛",
+      "lockboundLine": "鎖が{chains}本残っている：被ダメージが{pct}%減少。封印の枷を壊して剥がせ。",
+      "timeAria": "残り{seconds}秒"
     },
     "cosmetics": {
       "title": "コスメティック",
@@ -8184,8 +8329,8 @@ export const ja_JP: EnTranslations = {
       "hollowBody": "墓荒らしに遭った礼拝堂の地下墓所。死んだばかりの者たちが安らぎを拒んでいます。新たなパーティにとって、最初の本当の試練です。",
       "bastionBody": "沼地に呑まれて失われた水没の要塞。溺れた守備兵と、満ちゆく潮そのものに守られています。",
       "templeBody": "沼地の道から外れた場所に沈む祠。好奇心旺盛で、しっかり備えた者のための寄り道です。",
-      "sanctumBody": "ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。",
-      "wildheartBody": "温かな雨に濡れた密林のカルデラ。翡翠色の泉を囲む二本の高い狩猟路を進み、獣の巣と祖霊の遺跡を越えて、儀式のピラミッドの頂で誰が待っているか確かめよ。",
+      "sanctumBody": "ソーンピークの高みに隠された氷河。一頭の竜が氷の中に囚われ、カルトは盗んだ魂を燃やしてその氷を解かそうとしている。高い峠から氷の塔、鍛冶神の砕けた鎖、カルトの炎を越えて、氷河の麓の凍った湖へと下っていきます。",
+      "wildheartBody": "沈んだ偶像の奥に隠されたジャングルのカルデラ。断崖に囲まれ、滝の轟きが響く。川の浅瀬を渡り、狩りの段丘と滝を抜け、植民地の廃墟を越えて、巨大な石のジャガーの頭の下にそびえる階段状の神殿へ登れ。",
       "raidName": "エンドコンテンツのレイド",
       "raidBody": "封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数段階の戦いと、レイド全員で力を合わせて封じねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。",
       "heroicTitle": "ヒロイックモード",
@@ -12241,7 +12386,96 @@ export const ja_JP: EnTranslations = {
       "hoard_cast_screech": "耳をつんざく叫び",
       "hoard_cast_mimic_bite": "貪欲な噛みつき",
       "hoard_cast_mimic_leap": "押し潰す跳躍",
-      "hoard_cast_coin_spit": "呪われた金貨"
+      "hoard_cast_coin_spit": "呪われた金貨",
+      "crypt_grave_bolt": "墓所の矢",
+      "crypt_raise_bones": "骨の蘇生",
+      "crypt_murder_call": "鴉群の呼び声",
+      "crypt_stone_shriek": "石の絶叫",
+      "crypt_grave_cleave": "墓所の薙ぎ払い",
+      "crypt_barrowflame_breath": "塚炎の吐息",
+      "crypt_tail_lash": "尾の一撃",
+      "crypt_wing_gust": "翼の突風",
+      "crypt_morthen_rite_wakes": "儀式の目覚め",
+      "crypt_morthen_rise": "墓呼びの昇天",
+      "crypt_morthen_proclaim": "墓所の宣告",
+      "crypt_morthen_descend": "降臨",
+      "crypt_knellwyrm_arrive": "天より降下",
+      "crypt_knellwyrm_pyre_strafe": "火葬の掃射",
+      "crypt_knellwyrm_strafe_run": "掃射飛行",
+      "crypt_knellwyrm_dread_bellow": "恐怖の咆哮",
+      "bastion_brine_mend": "塩水の癒し",
+      "bastion_fog_ward": "霧の守り",
+      "bastion_halberd_sweep": "ハルバード薙ぎ",
+      "bastion_piercing_bolt": "貫通の矢",
+      "bastion_claw_sweep": "爪の薙ぎ払い",
+      "bastion_shell_slam": "甲羅叩きつけ",
+      "bastion_oathbound_charge": "誓約の突進",
+      "bastion_gaolers_cudgel": "牢番の棍棒",
+      "bastion_mist_surge": "霧の奔流",
+      "bastion_drowning_hymn": "溺れの聖歌",
+      "bastion_iron_cage": "鉄の檻",
+      "bastion_drowned_anchor_cast": "溺死の錨",
+      "bastion_shackle_pair": "連鎖の枷",
+      "bastion_shadowstep": "影渡り",
+      "bastion_reaping_scythe": "刈り取りの大鎌",
+      "bastion_veil_rise": "霧のヴェール",
+      "temple_lullaby": "子守歌",
+      "temple_call_the_tide": "潮の呼び声",
+      "temple_static_coil": "静電のとぐろ",
+      "temple_snapper_snap": "噛みつき",
+      "temple_trident_sweep": "三叉槍の薙ぎ払い",
+      "temple_sea_song": "海の歌",
+      "temple_tidal_slap": "潮の平手打ち",
+      "temple_tide_breath": "凍てつく吐息",
+      "temple_moonlight_lance": "月光の槍",
+      "temple_prism_flare": "プリズムの閃光",
+      "temple_resonant_slam": "共鳴の叩きつけ",
+      "temple_undertow": "引き潮",
+      "temple_lunar_tide": "月の潮",
+      "temple_skewering_trident": "串刺しの三叉槍",
+      "temple_pale_mending": "蒼白の癒し",
+      "temple_glimmer_venom": "煌めく毒",
+      "temple_pearl_slam": "真珠の叩きつけ",
+      "temple_lightning_spit": "稲妻の吐きかけ",
+      "temple_crushing_torrent": "押し潰す奔流",
+      "temple_hydra_tsunami": "津波",
+      "temple_ysolei_call": "月の落とし子の呼び声",
+      "temple_ysolei_wrath": "溺れし憤怒",
+      "wildheart_ancestral_sap": "祖霊の樹液",
+      "wildheart_plant_totem": "トーテム設置",
+      "wildheart_entangling_lash": "絡みつく鞭",
+      "wildheart_saurian_tail_swipe": "尾の薙ぎ払い",
+      "wildheart_saurian_stomp": "大地を揺るがす踏みつけ",
+      "wildheart_beast_pit_quake": "獣穴の地震",
+      "wildheart_jaguar_heel": "戻れ！",
+      "wildheart_gorgebloom_seed_rain": "種の雨",
+      "wildheart_gorgebloom_vine_lash": "蔓の鞭",
+      "wildheart_gorgebloom_gorge": "貪り食い",
+      "wildheart_zulgar_pulse": "ワイルドハートの脈動",
+      "wildheart_zulgar_spirit_hunt": "狩りの魂",
+      "sanctum_cinder_breath": "残り火のブレス",
+      "sanctum_warming_rite": "温めの儀式",
+      "sanctum_goad": "駆り立て",
+      "sanctum_plant_brazier": "魂の火鉢を置く",
+      "sanctum_ice_block_toss": "氷塊投げ",
+      "sanctum_tusker_tusk_sweep": "牙薙ぎ",
+      "sanctum_tusker_trample": "踏みつぶし",
+      "sanctum_korgath_maul_arc": "大槌の弧撃",
+      "sanctum_korgath_chain_flail": "鎖の鞭打ち",
+      "sanctum_korgath_threshold_charge": "境界の突進",
+      "sanctum_korgath_foremans_bellow": "親方の咆哮",
+      "sanctum_korgath_strain": "鎖の引き締め",
+      "sanctum_korgath_stomp": "震える踏みつけ",
+      "sanctum_goadsmith_rerivet": "再鋲打ち",
+      "sanctum_velkhar_soulfire_trench": "魂火の溝",
+      "sanctum_velkhar_shadow_volley": "影の斉射",
+      "sanctum_korzul_break_free": "氷の封印を破る",
+      "sanctum_korzul_grave_breath": "墓所のブレス",
+      "sanctum_korzul_tail_sweep": "尾の薙ぎ払い",
+      "sanctum_korzul_grave_inferno": "墓場のインフェルノ",
+      "sanctum_korzul_wing_gale": "翼の烈風",
+      "sanctum_korzul_plunging_fire": "降り注ぐ炎",
+      "sanctum_korzul_crashing_descent": "墜落着地"
     }
   },
   "questUi": {
@@ -18451,6 +18685,162 @@ export const ja_JP: EnTranslations = {
       "vanguard_warstaff": {
         "name": "ヴァンガードの戦杖"
       },
+      "gravedirt_treads": {
+        "name": "墓土のトレッド"
+      },
+      "bellrope_girdle": {
+        "name": "鐘縄の帯"
+      },
+      "sextons_spadehaft": {
+        "name": "墓守の鋤柄"
+      },
+      "rimesilk_mantle": {
+        "name": "霜絹のマントル"
+      },
+      "bonechill_carapace_vest": {
+        "name": "骨冷えの甲殻ベスト"
+      },
+      "rimeweb_hunters_leggings": {
+        "name": "霜網の狩人のレギンス"
+      },
+      "rimeweb_fang": {
+        "name": "霜網の牙"
+      },
+      "cantors_cassock": {
+        "name": "聖歌隊長の法衣"
+      },
+      "choirward_leggings": {
+        "name": "聖歌守りのレギンス"
+      },
+      "choristers_gloves": {
+        "name": "聖歌隊員の手袋"
+      },
+      "cantors_hymnal": {
+        "name": "聖歌隊長の賛美歌集"
+      },
+      "gravecallers_vestments": {
+        "name": "墓呼びの祭服"
+      },
+      "unquiet_stalkers_hood": {
+        "name": "安らがぬ追跡者のフード"
+      },
+      "sextons_burial_spade": {
+        "name": "墓守の埋葬鋤"
+      },
+      "rimesilk_hood": {
+        "name": "霜絹のフード"
+      },
+      "knight_commanders_longsword": {
+        "name": "騎士団長の長剣"
+      },
+      "gaolers_chain_girdle": {
+        "name": "牢番の鎖帯"
+      },
+      "rusted_shackle_grips": {
+        "name": "錆びた枷の手袋"
+      },
+      "drowned_wardens_mantle": {
+        "name": "溺れた看守の肩衣"
+      },
+      "gaolyard_cudgel": {
+        "name": "牢獄庭の棍棒"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "溺れた指揮官の胸当て"
+      },
+      "gaolyard_striders": {
+        "name": "牢獄庭の長靴"
+      },
+      "jailers_iron_gauntlets": {
+        "name": "看守の鉄篭手"
+      },
+      "turnkeys_keyring_belt": {
+        "name": "牢番の鍵束ベルト"
+      },
+      "turnkeys_lantern_cowl": {
+        "name": "牢番のランタン頭巾"
+      },
+      "conchplate_girdle": {
+        "name": "巻貝板の腰帯"
+      },
+      "pale_chorus_leggings": {
+        "name": "蒼白聖歌のレギンス"
+      },
+      "refrain_silk_gloves": {
+        "name": "リフレインの絹手袋"
+      },
+      "chorus_conch": {
+        "name": "聖歌の巻貝"
+      },
+      "tideglass_pauldrons": {
+        "name": "潮硝子の肩当て"
+      },
+      "moonburn_treads": {
+        "name": "月焼けの靴"
+      },
+      "prism_etched_cowl": {
+        "name": "プリズム刻みの頭巾"
+      },
+      "tideglass_shiv": {
+        "name": "潮硝子の小刀"
+      },
+      "pale_chorus_vestment": {
+        "name": "蒼白聖歌の祭服"
+      },
+      "tideglass_warmaul": {
+        "name": "潮硝子の戦槌"
+      },
+      "beastpit_warbelt": {
+        "name": "獣の穴の戦帯"
+      },
+      "jaguar_hide_jerkin": {
+        "name": "ジャガー革のジャーキン"
+      },
+      "hexbone_handwraps": {
+        "name": "呪骨のハンドラップ"
+      },
+      "rootbound_sabatons": {
+        "name": "根縛りのサバトン"
+      },
+      "pollen_dusted_leggings": {
+        "name": "花粉まみれのレギンス"
+      },
+      "bloomsilk_cowl": {
+        "name": "花絹のカウル"
+      },
+      "falls_blessed_staff": {
+        "name": "滝に祝福された杖"
+      },
+      "fanglords_hide_mantle": {
+        "name": "牙王の獣皮マントル"
+      },
+      "thornroot_greathelm": {
+        "name": "茨冠のグレートヘルム"
+      },
+      "foremans_grips": {
+        "name": "親方の籠手"
+      },
+      "serac_stride_boots": {
+        "name": "氷塔渡りのブーツ"
+      },
+      "seal_rune_mantle": {
+        "name": "封印ルーンのマントル"
+      },
+      "thawbound_legguards": {
+        "name": "融けた枷のレッグガード"
+      },
+      "pyre_tenders_hood": {
+        "name": "火葬番の頭巾"
+      },
+      "meltwater_cord": {
+        "name": "雪解け水の飾り紐"
+      },
+      "hammer_of_the_open_lock": {
+        "name": "開かれた錠の大槌"
+      },
+      "vestments_of_the_waking_rite": {
+        "name": "目覚めの儀の祭服"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -19306,6 +19696,24 @@ export const ja_JP: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "るつぼの心臓"
       },
+      "gaolers_iron_key": {
+        "name": "牢番の鉄鍵"
+      },
+      "fanglords_whistle": {
+        "name": "牙王の呼び笛"
+      },
+      "gorgebloom_seedpod": {
+        "name": "ゴージブルームの種莢"
+      },
+      "foremans_last_link": {
+        "name": "親方の最後の鎖環"
+      },
+      "phial_of_the_tithe": {
+        "name": "十分の一税の小瓶"
+      },
+      "quenchwater_flask": {
+        "name": "焼き入れ水のフラスコ"
+      },
       "rift_watchers_band": {
         "name": "裂け目の監視者の指輪"
       },
@@ -19557,6 +19965,69 @@ export const ja_JP: EnTranslations = {
       "morthen": {
         "name": "墓呼びのモーセン"
       },
+      "ossuary_sentinel": {
+        "name": "納骨堂の番兵"
+      },
+      "hollow_gravedigger": {
+        "name": "虚ろの墓掘り"
+      },
+      "rime_egg_sac": {
+        "name": "霜の卵嚢"
+      },
+      "rimeweb_hatchling": {
+        "name": "霜網の子蜘蛛"
+      },
+      "rimeweb_spinner": {
+        "name": "霜網の紡ぎ手"
+      },
+      "candlewright_acolyte": {
+        "name": "蝋燭職人の侍祭"
+      },
+      "hollow_chorister": {
+        "name": "虚ろの聖歌隊員"
+      },
+      "bound_soul": {
+        "name": "縛られし魂"
+      },
+      "rimeweb": {
+        "name": "リムウェブ"
+      },
+      "cantor_ilvane": {
+        "name": "聖歌隊長イルヴェイン"
+      },
+      "crypt_ossuary_warrior": {
+        "name": "納骨堂の戦士"
+      },
+      "crypt_gravecaller_adept": {
+        "name": "墓呼びの徒弟"
+      },
+      "crypt_ossuary_cutthroat": {
+        "name": "納骨堂の喉裂き"
+      },
+      "crypt_gravecaller_necromancer": {
+        "name": "墓呼びの死霊術師"
+      },
+      "crypt_bone_minion": {
+        "name": "骨の下僕"
+      },
+      "crypt_bone_brute": {
+        "name": "骨の巨兵"
+      },
+      "crypt_chapel_gargoyle": {
+        "name": "礼拝堂のガーゴイル"
+      },
+      "crypt_crow_caller": {
+        "name": "鴉呼び"
+      },
+      "crypt_carrion_crow": {
+        "name": "腐肉喰らいの鴉"
+      },
+      "crypt_ossuary_drake": {
+        "name": "納骨堂の骨竜"
+      },
+      "crypt_knellwyrm": {
+        "name": "弔鐘竜"
+      },
       "bastion_revenant": {
         "name": "砦の亡霊"
       },
@@ -19571,6 +20042,102 @@ export const ja_JP: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "フォグバインダーのヴァエル"
+      },
+      "drowned_watchman": {
+        "name": "溺れた見張り番"
+      },
+      "fogbound_arbalest": {
+        "name": "霧縛りの弩兵"
+      },
+      "barnacle_crawler": {
+        "name": "フジツボガニ"
+      },
+      "bastion_warhound": {
+        "name": "砦の軍用犬"
+      },
+      "mistweaver": {
+        "name": "霧の詠唱者"
+      },
+      "drowned_sergeant": {
+        "name": "溺れた軍曹"
+      },
+      "shackled_prisoner": {
+        "name": "枷の囚人"
+      },
+      "gaol_turnkey": {
+        "name": "牢の鍵番"
+      },
+      "turretback_hermit": {
+        "name": "塔背負いのヤドカリ"
+      },
+      "vael_fog_shade": {
+        "name": "フォグバインダーのヴァエル"
+      },
+      "gaoler_ossick": {
+        "name": "牢番オシック"
+      },
+      "bastion_gaol_cage": {
+        "name": "鉄の檻"
+      },
+      "bastion_drowned_anchor": {
+        "name": "溺死の錨"
+      },
+      "lagoon_snapper": {
+        "name": "潟湖のスナッパー"
+      },
+      "lagoon_eel": {
+        "name": "潟湖のウナギ"
+      },
+      "moonlit_siren": {
+        "name": "月照らしのセイレーン"
+      },
+      "tidewisp": {
+        "name": "潮の精"
+      },
+      "drowned_pilgrim": {
+        "name": "溺れた巡礼者"
+      },
+      "mere_hydra_head_left": {
+        "name": "湖のヒュドラ"
+      },
+      "mere_hydra_head_center": {
+        "name": "湖のヒュドラ"
+      },
+      "mere_hydra_head_right": {
+        "name": "湖のヒュドラ"
+      },
+      "tideglass_colossus": {
+        "name": "潮硝子の巨像"
+      },
+      "tideglass_reflection": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_warrior": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_paladin": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_hunter": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_rogue": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_priest": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_shaman": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_mage": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_warlock": {
+        "name": "潮硝子の映し身"
+      },
+      "tideglass_reflection_druid": {
+        "name": "潮硝子の映し身"
       },
       "sanctum_boneguard": {
         "name": "聖所の骨衛兵"
@@ -20100,8 +20667,74 @@ export const ja_JP: EnTranslations = {
       "wildheart_beastmaster": {
         "name": "牙王の獣使い"
       },
+      "sunbone_totem_binder": {
+        "name": "陽骨のトーテム使い"
+      },
+      "sunbone_totem": {
+        "name": "陽骨のトーテム"
+      },
+      "basin_raptor": {
+        "name": "盆地のラプトル"
+      },
+      "spore_toad": {
+        "name": "胞子ガエル"
+      },
+      "vine_lasher": {
+        "name": "絡み蔓の鞭打ち"
+      },
+      "great_saurian": {
+        "name": "グレート・サウリアン"
+      },
+      "howdah_hexcaller": {
+        "name": "輿の呪術師"
+      },
+      "fanglord_jaguar": {
+        "name": "牙王の大ジャガー"
+      },
+      "the_gorgebloom": {
+        "name": "ゴージブルーム"
+      },
       "wildheart_high_priest": {
         "name": "盆地の声ズルガー"
+      },
+      "broodsworn_thawcaller": {
+        "name": "竜誓団の解氷術師"
+      },
+      "broodsworn_goadsmith": {
+        "name": "竜誓団の突き棒鍛冶"
+      },
+      "broodsworn_pyre_tender": {
+        "name": "竜誓団の薪守り"
+      },
+      "soul_brazier": {
+        "name": "魂の火鉢"
+      },
+      "rime_whelp": {
+        "name": "霧氷の幼竜"
+      },
+      "ogre_sledge_hauler": {
+        "name": "オーガのそり引き"
+      },
+      "glacier_splinter": {
+        "name": "氷河の破片"
+      },
+      "sledge_tusker": {
+        "name": "そり引きの巨牙獣"
+      },
+      "sanctum_shackle_hammer": {
+        "name": "大槌の枷"
+      },
+      "sanctum_shackle_tongs": {
+        "name": "火ばさみの枷"
+      },
+      "sanctum_shackle_anvil": {
+        "name": "金床の枷"
+      },
+      "sanctum_shackle_bellows": {
+        "name": "ふいごの枷"
+      },
+      "thorn_sprout": {
+        "name": "茨の芽"
       },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
@@ -23710,7 +24343,7 @@ export const ja_JP: EnTranslations = {
       },
       "wildheart_basin": {
         "name": "ワイルドハート盆地",
-        "enterText": "温かな雨が古い石の上で音を立てる。ワイルドハート盆地が目の前に開けた。",
+        "enterText": "偶像の口をくぐると、盆地を見下ろす高い岩棚に出た。崖の縁から滝が轟き落ち、はるか下では何か巨大なものが浅瀬を渡っている。",
         "leaveText": "石の牙の下をくぐり、パームリーチの陽光へ戻った。"
       },
       "the_last_keep": {

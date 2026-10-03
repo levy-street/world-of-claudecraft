@@ -1,3 +1,5 @@
+import { BODY_EDGE_MELEE_REACH } from './combat/player_attack_reach';
+import { MOBS } from './data';
 import { VARKHUL_BOSS_ID } from './ignivar_raid_ids';
 import { MELEE_RANGE } from './types';
 
@@ -153,6 +155,18 @@ function buildCombatProfileForMob(templateId: string, scale: number): MobCombatP
       meleeRange: scaledDefaultMobMeleeRange(THUNZHARR_REACH_SCALE),
       desiredRange: scaledDefaultMobMeleeRange(THUNZHARR_REACH_SCALE) * 0.8,
     };
+  // A towering boss with an authored body (MobTemplate.bodyRadius): its swing
+  // reaches one yard past where a player's melee reaches it, so nobody hits
+  // it from outside its own reach, and it settles at its body's edge.
+  const body = MOBS[templateId]?.bodyRadius;
+  if (body !== undefined && body > 0) {
+    const reach = Math.max(scaledDefaultMobMeleeRange(scale), body + BODY_EDGE_MELEE_REACH + 1);
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      meleeRange: reach,
+      desiredRange: Math.min(reach - 1, body + 1.5),
+    };
+  }
   return {
     ...DEFAULT_MOB_COMBAT_PROFILE,
     meleeRange: scaledDefaultMobMeleeRange(scale),

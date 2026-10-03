@@ -101,8 +101,11 @@ describe('KayKit hit-reaction stagger (issue #2889 round 2)', () => {
     // is one more kaykit() consumer, and it wires the rogue donor exactly as
     // this test requires (its bodies would otherwise have no Hit_B_Stagger).
     // One literal in the loop covers every derived def, so the count moved by
-    // one rather than by the number of prop sets.
-    expect(occurrences).toBe(37);
+    // one rather than by the number of prop sets. 48 since the five-dungeon
+    // rework: its 11 new kaykit()/skeletonClips() bodies (the Hollow Crypt's
+    // skeletons and crow caller, the Sunken Bastion's acolyte and Olen) each
+    // wire their own rig's donor, one literal apiece.
+    expect(occurrences).toBe(48);
 
     // Spot-check the two entries that already had an animUrls array before
     // this task (must be APPENDED to, not overwritten).

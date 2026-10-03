@@ -50,11 +50,9 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Котловина Дикого Сердца',
-    desc: 'Знаковое оружие Зулгара и Повелителя клыков.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Героизм: Котловина Дикого Сердца',
-    desc: 'Эпические предметы, которые падают только в героическом режиме с Зулгара, Голоса Котловины.',
   },
   // The arena entity reads Рейдовая арена Нитраксиса; the page collects the
   // raid's spoils rather than naming the room, so the arena noun is dropped and

@@ -334,6 +334,29 @@ function buildSourceIndex(): Map<string, ItemSource> {
   bump('varkhul_emberward', 42, true); // 55 (the new-raid legendary tier)
   bump('voidsong_dirk', 39, false); // 49
   bump('heart_of_the_rift', 39, false); // 49
+  // The dungeon rework (docs/design/dungeon-rework/) re-leveled three bosses
+  // for pacing: Sexton Marrow 9 to 8, Knight-Commander Olen 13 to 12 and
+  // Choirmother Selthe 18 to 16 (and the Quilted Trousers moved from Morthen,
+  // level 10, to Marrow). Players own the shipped pieces those bosses pay, so
+  // each keeps the source tier it shipped at: its item level, its derived
+  // equip gate and its stat line are unchanged. Only the rework's new pieces
+  // price at the new boss levels. bump() is highest-wins, so these pins only
+  // ever restore the shipped tier.
+  for (const [id, level] of [
+    ['quilted_trousers', 10],
+    ['marrowtread_boots', 9],
+    ['sextons_slippers', 9],
+    ['gravewalker_softboots', 9],
+    ['knight_commanders_greaves', 13],
+    ['tideguard_greaves', 13],
+    ['tideguard_sabatons', 13],
+    ['eelscale_leggings', 13],
+    ['drownstep_sabatons', 18],
+    ['drownstep_slippers', 18],
+    ['drownstep_treads', 18],
+    ['selthes_seastriders', 18],
+  ] as const)
+    bump(id, level, false);
   return idx;
 }
 

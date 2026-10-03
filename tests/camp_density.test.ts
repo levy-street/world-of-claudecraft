@@ -404,6 +404,8 @@ describe('the density model covers the shipped world', () => {
       .map((t) => t.id)
       .sort();
     expect(noXp).toEqual([
+      'bastion_drowned_anchor',
+      'bastion_gaol_cage',
       'dragonkin_egg',
       'hoard_abyssal_tentacle',
       'hoard_bloat_cap',
@@ -414,8 +416,25 @@ describe('the density model covers the shipped world', () => {
       'hoard_healing_tide_totem',
       'hoard_silk_cocoon',
       'nythraxis_bone_spike',
+      'rime_egg_sac',
+      'sanctum_shackle_anvil',
+      'sanctum_shackle_bellows',
+      'sanctum_shackle_hammer',
+      'sanctum_shackle_tongs',
       'spider_egg',
       'spider_egg_sac',
+      'thorn_sprout',
+      'tideglass_reflection',
+      'tideglass_reflection_druid',
+      'tideglass_reflection_hunter',
+      'tideglass_reflection_mage',
+      'tideglass_reflection_paladin',
+      'tideglass_reflection_priest',
+      'tideglass_reflection_rogue',
+      'tideglass_reflection_shaman',
+      'tideglass_reflection_warlock',
+      'tideglass_reflection_warrior',
+      'vael_fog_shade',
       'yumi_cat',
     ]);
     // Two are camp-spawned: the sac is placed by delve room logic, the cat is a
@@ -426,6 +445,13 @@ describe('the density model covers the shipped world', () => {
     // Scurrier slips into a hoard room on its own roll (src/sim/rift/hoard_goblin.ts;
     // both pinned at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards),
     // so no camp cluster can ever hold those and the density model never sees them.
+    // The five-dungeon rework's no-XP templates are instance-only the same way:
+    // the Sunken Bastion's Drowned Anchor and Iron Cage and Vael's fog shades
+    // (encounters/sunken_bastion), the Hollow Crypt's rime egg sacs (its
+    // DungeonDef spawn list), the Gravewyrm Sanctum's four Seal Shackles
+    // (encounters/gravewyrm_sanctum/korgath.ts), the Wildheart Basin's Thorn
+    // Sprout (encounters/wildheart_basin/gorgebloom.ts) and the Drowned
+    // Temple's Tideglass Reflections (encounters/drowned_temple/tideglass_colossus.ts).
     //
     // spider_egg is the second, and it is deliberately NOT added to the
     // dense-by-design exemption: the Broodmother clutch sits in ordinary Widow
@@ -446,11 +472,15 @@ describe('the density model covers the shipped world', () => {
       .filter((t) => t.broodEgg)
       .map((t) => t.id)
       .sort();
-    expect(shells).toEqual([DENSE_BY_DESIGN_SHELL]);
-    // ...and that one shell is counted as a hatchling that is genuinely
-    // farmable: guaranteed coin and real kill XP. A shell whose hatchling paid
-    // nothing would be the only case where skipping it were honest, and the
-    // world has none.
+    // The second clutch family is the Hollow Crypt rework's rime_egg_sac, a
+    // dungeon spawn-list shell (content/hollow_crypt.ts) with no CAMPS row (the
+    // camped no-XP pin above holds only the Drakemaw shell and spider_egg), so
+    // the belt exemption, keyed by DENSE_BY_DESIGN_SHELL's id, never sees it.
+    expect(shells).toEqual([DENSE_BY_DESIGN_SHELL, 'rime_egg_sac']);
+    // ...and each shell is counted as a hatchling that is genuinely
+    // farmable: guaranteed coin and real kill XP (the rimeweb_hatchling too).
+    // A shell whose hatchling paid nothing would be the only case where
+    // skipping it were honest, and the world has none.
     for (const id of shells) {
       const hatch = MOBS[id].broodEgg?.hatchMobId;
       expect(hatch, `${id} must hatch something`).toBeTruthy();
