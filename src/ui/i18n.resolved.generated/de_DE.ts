@@ -12700,11 +12700,15 @@ export const de_DE: EnTranslations = {
           "introduction": "Every gunner starts here, recruit. Three short waves of small game, wolves, boars, rats and spiders, amble in from all around the tower without much hurry. The tower is fresh from the masons and can take a good many bites.",
           "standard": "This is the watch my crews stand on the walls every night. Six waves from every side, opening with wolves and boars and climbing through bandits and trolls to ogres, the walking dead and hulks of living stone, and the last one closes on something far bigger than the rest.",
           "hard": "The siege I put the old hands through before I trust them with a battery. Six waves, tougher than the Standing Watch and heavier on the big brutes, arriving closer together from two or three sides at once or in tight packs. In the last one the giants walk in with a charge of armoured dead running at their heels from three sides, so I have had this tower built stouter.",
-          "pack": "In the wild they hunt in packs, and so do these: a dozen and more to a pack, faster than any you have seen, and this tower built stouter to take them. Six waves of two packs each, a few breaths apart at first, then both at once from either side of the tower. Wolves and boars first, then painted tribal hunters with their beasts, and at the very end grey wolves the size of a hay cart.",
-          "giants": "Not many of them this time, but every one is huge: bronze sentinels, brutes of molten rock and colossi of living stone, slow on their feet and very hard to bring down. Six waves, and when one of them reaches the tower it hits like a falling wall.",
-          "deluge": "Dozens of small, quick beasts, wolves, boars, spiders and deeprock tunnelers, pouring in from every side with hardly a gap between them. Six waves of it, like rain off the hills: none of them is tough, but they never stop coming.",
-          "brittle": "This tower took a bad hit last season and the crack never closed: ten blows at most and it comes down. Six waves of the restless dead, bone soldiers, hooded shamblers and shadow hounds, at a steady pace: nothing large, but every strike that lands counts.",
-          "powder": "The powder store is full to the rafters, so I have set twice the usual kegs out there, right on the paths the monsters take. The forge's own come for it over six waves, ember imps, bronze automatons, brutes of molten rock and one thief with a sack, from one side, from two flanks, or in packs."
+          "pack": "Our fortifications are being overrun! They come in packs, each one fiercer than the last, and you can hear them howling from the ramparts. Help us drive them back before they break over the walls!",
+          "giants": "The ground has been shaking since dawn: colossi of bronze, of lava and of stone are coming down from the hills. They are slow, but nothing stops them, and if they reach the tower it will not stand for long. I am counting on you.",
+          "deluge": "There must be a hundred of them and more: wolves, boars, spiders and tunnelers, a tide of small beasts pouring in from every side at once, and it never ebbs. Hold fast, it will not ease off before the very end.",
+          "brittle": "The old tower took a terrible blow last season, and the crack never closed. Tonight the dead have risen and march on it: ten blows at most, and down it comes. It is all we have left on this side, so keep it standing.",
+          "powder": "The powder store is bursting, so I had to stack twice the kegs outside, right across their path. And now the creatures of the forge are coming, drawn by the smell of the powder. Things are about to get hot, gunner."
+        },
+        "greeting": {
+          "trials": "You are coming along, recruit. A few more trials and I will put your name on the gunners' roll.",
+          "recruited": "Back again, gunner! The ramparts need you more than ever, and I have a few missions here just waiting for your cannon."
         }
       },
       "calligraphyTitle": "Arkane Kalligraphie",

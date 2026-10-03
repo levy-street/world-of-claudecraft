@@ -7,6 +7,7 @@
 
 import { TURRET_MISSIONS } from '../../../sim/content/fire_and_fly_missions';
 import { TURRET_SCENARIOS } from '../../../sim/content/fire_and_fly_scenarios';
+import { FIRE_AND_FLY_NPC_DEF } from '../../../sim/content/world_quest_fire_and_fly';
 import {
   FIRE_AND_FLY_MASTERY_MAX_STARS,
   type PersonalFireAndFlyRecords,
@@ -46,6 +47,7 @@ export interface GunneryBoardInput {
   selectedId: string | null;
   speakerName: string;
   speakerTitle: string;
+  /** Alder's greeting to a newcomer; a recruit in the trials or a recruited gunner gets his own. */
   greeting: string;
 }
 
@@ -135,6 +137,14 @@ const STATE_TEXT: Record<Exclude<GunneryRowState, 'medal'>, TranslationKey> = {
   locked: 'hudChrome.gunneryBoard.locked',
 };
 
+/** Which of Alder's greetings the recruitment calls for. */
+export type GunneryGreetingStage = 'welcome' | 'trials' | 'recruited';
+
+const GREETING_TEXT: Record<Exclude<GunneryGreetingStage, 'welcome'>, TranslationKey> = {
+  trials: 'questUi.worldQuest.fireAndFly.greeting.trials',
+  recruited: 'questUi.worldQuest.fireAndFly.greeting.recruited',
+};
+
 const whole = (value: number): string => formatNumber(value, { maximumFractionDigits: 0 });
 
 /** Every scenario on the board, in the instructor's order: the trials, then the missions. */
@@ -163,6 +173,47 @@ export function gunneryBriefKey(boardKey: string): TranslationKey | null {
   return Object.hasOwn(FIRE_AND_FLY_TRIAL_TEXT, boardKey)
     ? FIRE_AND_FLY_TRIAL_TEXT[boardKey].brief
     : null;
+}
+
+export function gunneryGreetingStage(
+  recruitment: Readonly<FireAndFlyRecruitment>,
+): GunneryGreetingStage {
+  if (recruitment.recruited) return 'recruited';
+  return recruitment.trialsWon > 0 ? 'trials' : 'welcome';
+}
+
+/** The greeting the board shows: `welcome` until a trial is won. */
+export function gunneryGreeting(
+  recruitment: Readonly<FireAndFlyRecruitment>,
+  welcome: string,
+): string {
+  const stage = gunneryGreetingStage(recruitment);
+  return stage === 'welcome' ? welcome : t(GREETING_TEXT[stage]);
+}
+
+/** The greeting an NPC's dialog shows: Alder's follows his stage, any other NPC keeps its own. */
+export function npcGreeting(
+  templateId: string,
+  world: { readonly fireAndFlyRecruitment: Readonly<FireAndFlyRecruitment> },
+  greeting: string,
+): string {
+  return templateId === FIRE_AND_FLY_NPC_DEF.id
+    ? gunneryGreeting(world.fireAndFlyRecruitment, greeting)
+    : greeting;
+}
+
+/**
+ * The voice clip an NPC greets with on open: Alder speaks the line of his greeting
+ * stage (the welcome is his NPC greeting's own clip), every other NPC its greeting.
+ */
+export function greetingVoiceKey(
+  templateId: string,
+  world: { readonly fireAndFlyRecruitment: Readonly<FireAndFlyRecruitment> },
+): string {
+  const key = `greeting__${templateId}`;
+  if (templateId !== FIRE_AND_FLY_NPC_DEF.id) return key;
+  const stage = gunneryGreetingStage(world.fireAndFlyRecruitment);
+  return stage === 'welcome' ? key : `${key}__${stage}`;
 }
 
 /** Whether the recruitment counts `scenarioId` as a won trial. */
@@ -350,7 +401,7 @@ export function buildGunneryBoardView(input: GunneryBoardInput): GunneryBoardVie
     title: t('hudChrome.gunneryBoard.title'),
     speakerName: input.speakerName,
     speakerTitle: input.speakerTitle,
-    greeting: input.greeting,
+    greeting: gunneryGreeting(input.recruitment, input.greeting),
     closeLabel: t('questUi.dialog.close'),
     listLabel: t('hudChrome.gunneryBoard.listLabel'),
     recruitmentText: recruited

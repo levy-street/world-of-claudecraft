@@ -1105,6 +1105,40 @@ describe("Master Gunner Alder's Gunnery Board", () => {
   const press = (el: HTMLElement, key: string) =>
     el.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
 
+  it("greets with the recruitment's line on the board and plays that line's clip", () => {
+    const alder = FIRE_AND_FLY_NPC_DEF.id;
+    const greeting = (root: HTMLElement) => root.querySelector('.gb-greeting')?.textContent;
+    const fresh = alderHarness({ trialsWon: 0, recruited: false });
+    expect(fresh.voice.play).toHaveBeenCalledWith(`greeting__${alder}`);
+    expect(greeting(fresh.element)).toBe(
+      `"${t('entities.npcs.fire_and_fly_instructor.greeting')}"`,
+    );
+    const underWay = alderHarness({ trialsWon: 2, recruited: false });
+    expect(underWay.voice.play).toHaveBeenCalledWith(`greeting__${alder}__trials`);
+    expect(greeting(underWay.element)).toBe(
+      `"${t('questUi.worldQuest.fireAndFly.greeting.trials')}"`,
+    );
+    const recruited = alderHarness({ trialsWon: 3, recruited: true });
+    expect(recruited.voice.play).toHaveBeenCalledWith(`greeting__${alder}__recruited`);
+    expect(recruited.voice.play).toHaveBeenCalledTimes(1);
+    expect(greeting(recruited.element)).toBe(
+      `"${t('questUi.worldQuest.fireAndFly.greeting.recruited')}"`,
+    );
+  });
+
+  it('keeps the shown greeting and its clip on one stage when the board cannot open', () => {
+    const h = alderHarness({ trialsWon: 3, recruited: true });
+    h.controller.close();
+    (h.world.player as { dead: boolean }).dead = true;
+    h.voice.play.mockClear();
+    h.controller.open(77);
+    expect(h.element.querySelector('[data-gb-row]')).toBeNull();
+    expect(h.element.querySelector('.qd-text')?.textContent).toBe(
+      `"${t('questUi.worldQuest.fireAndFly.greeting.recruited')}"`,
+    );
+    expect(h.voice.play).toHaveBeenCalledWith(`greeting__${FIRE_AND_FLY_NPC_DEF.id}__recruited`);
+  });
+
   it('paints the board instead of listing the scenarios as start buttons', () => {
     const h = alderHarness({ trialsWon: 1, recruited: false });
     expect(h.element.querySelector('#quest-dialog-title')?.textContent).toBe('Gunnery Board');

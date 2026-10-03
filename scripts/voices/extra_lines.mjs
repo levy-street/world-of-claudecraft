@@ -93,4 +93,19 @@ export const EXTRA_LINES = [
     voiceNpc: 'ferryman_odo',
     text: 'The bell is rung for you. Eastbrook waits across the water, and you are ready for it.',
   },
+  // Master Gunner Alder's greetings once a trial is won, then once recruited (his
+  // first greeting is his NPC record's). Played by key from the Gunnery Board's
+  // greeting stage (src/ui/hud/quest/gunnery_board_view.ts greetingVoiceKey), in
+  // the voice his NPC id resolves to; the text is the English of the
+  // questUi.worldQuest.fireAndFly.greeting rows (tests/gunnery_board_view.test.ts).
+  {
+    key: 'greeting__fire_and_fly_instructor__trials',
+    voiceNpc: 'marshal_redbrook',
+    text: "You are coming along, recruit. A few more trials and I will put your name on the gunners' roll.",
+  },
+  {
+    key: 'greeting__fire_and_fly_instructor__recruited',
+    voiceNpc: 'marshal_redbrook',
+    text: 'Back again, gunner! The ramparts need you more than ever, and I have a few missions here just waiting for your cannon.',
+  },
 ];

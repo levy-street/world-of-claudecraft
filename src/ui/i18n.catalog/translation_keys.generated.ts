@@ -15208,6 +15208,8 @@ export type TranslationKeyFlat =
   | 'questUi.worldQuest.fireAndFly.brief.powder'
   | 'questUi.worldQuest.fireAndFly.brief.standard'
   | 'questUi.worldQuest.fireAndFly.complete'
+  | 'questUi.worldQuest.fireAndFly.greeting.recruited'
+  | 'questUi.worldQuest.fireAndFly.greeting.trials'
   | 'questUi.worldQuest.fireAndFly.objective'
   | 'questUi.worldQuest.fireAndFly.ready'
   | 'questUi.worldQuest.fireAndFly.scenarios.brittle'

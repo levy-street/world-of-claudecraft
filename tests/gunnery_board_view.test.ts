@@ -1,4 +1,8 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { EXTRA_LINES } from '../scripts/voices/extra_lines.mjs';
+import { voiceIdFor } from '../scripts/voices/npc_voice_prompts.mjs';
+import { GameVoice } from '../src/game/voice';
+import { VOICE_LINES } from '../src/game/voice_manifest.generated';
 import { QuestWorldWireState } from '../src/net/quest_world_wire_state';
 import { TURRET_MISSIONS } from '../src/sim/content/fire_and_fly_missions';
 import {
@@ -6,6 +10,7 @@ import {
   TURRET_SCENARIO_INTRODUCTION,
   TURRET_SCENARIOS,
 } from '../src/sim/content/fire_and_fly_scenarios';
+import { FIRE_AND_FLY_NPC_DEF } from '../src/sim/content/world_quest_fire_and_fly';
 import { recordPersonalFireAndFlyScore } from '../src/sim/fire_and_fly_personal_records';
 import type { FireAndFlyRecruitment } from '../src/sim/fire_and_fly_recruitment';
 import { fireAndFlyScoreboardId } from '../src/sim/fire_and_fly_scoreboards';
@@ -16,16 +21,21 @@ import {
   buildGunneryBoardView,
   type GunneryBest,
   type GunneryBoardInput,
+  greetingVoiceKey,
   gunneryBestsFromRecords,
   gunneryBoardDefaultSelection,
   gunneryBoardStep,
   gunneryBriefKey,
+  gunneryGreeting,
+  gunneryGreetingStage,
   gunneryMasteryStars,
+  npcGreeting,
 } from '../src/ui/hud/quest/gunnery_board_view';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
 
 const FRESH: FireAndFlyRecruitment = { trialsWon: 0, recruited: false };
 const ONE_WON: FireAndFlyRecruitment = { trialsWon: 1, recruited: false };
+const TWO_WON: FireAndFlyRecruitment = { trialsWon: 2, recruited: false };
 const RECRUITED: FireAndFlyRecruitment = { trialsWon: TURRET_SCENARIOS.length, recruited: true };
 const NO_BESTS: ReadonlyMap<string, GunneryBest> = new Map();
 
@@ -237,6 +247,92 @@ describe('the detail panel', () => {
     expect(view.detail.brief).toBe(t('questUi.worldQuest.fireAndFly.brief.brittle'));
     expect(view.detail.kicker).toBe('Mission');
   });
+  it("gives the five missions Alder's plea, each its own, never a wave count", () => {
+    const briefs = TURRET_MISSIONS.map((mission) => {
+      const key = gunneryBriefKey(mission.boardKey);
+      expect(key).not.toBeNull();
+      return key ? t(key) : '';
+    });
+    expect(new Set(briefs).size).toBe(TURRET_MISSIONS.length);
+    for (const brief of briefs) {
+      expect(brief.length).toBeGreaterThan(0);
+      expect(brief).not.toMatch(/\bwaves?\b/i);
+    }
+  });
+});
+
+describe("Alder's greeting", () => {
+  const ALDER = FIRE_AND_FLY_NPC_DEF.id;
+  const trials = 'questUi.worldQuest.fireAndFly.greeting.trials' as const;
+  const recruited = 'questUi.worldQuest.fireAndFly.greeting.recruited' as const;
+
+  it('follows the recruitment: welcome, then trials under way, then recruited', () => {
+    expect(gunneryGreetingStage(FRESH)).toBe('welcome');
+    expect(gunneryGreetingStage(ONE_WON)).toBe('trials');
+    expect(gunneryGreetingStage(TWO_WON)).toBe('trials');
+    expect(gunneryGreetingStage(RECRUITED)).toBe('recruited');
+    expect(gunneryGreetingStage({ trialsWon: 0, recruited: true })).toBe('recruited');
+  });
+
+  it("heads the board with the stage's line, the NPC greeting before any trial is won", () => {
+    expect(buildGunneryBoardView(input()).greeting).toBe('Take a trial.');
+    expect(buildGunneryBoardView(input({ recruitment: ONE_WON })).greeting).toBe(t(trials));
+    expect(buildGunneryBoardView(input({ recruitment: TWO_WON })).greeting).toBe(t(trials));
+    expect(buildGunneryBoardView(input({ recruitment: RECRUITED })).greeting).toBe(t(recruited));
+    expect(gunneryGreeting(RECRUITED, 'Take a trial.')).not.toBe(t(trials));
+  });
+
+  it('speaks each stage under its own clip key, any other NPC its greeting', () => {
+    const at = (recruitment: FireAndFlyRecruitment) => ({ fireAndFlyRecruitment: recruitment });
+    expect(greetingVoiceKey(ALDER, at(FRESH))).toBe(`greeting__${ALDER}`);
+    expect(greetingVoiceKey(ALDER, at(ONE_WON))).toBe(`greeting__${ALDER}__trials`);
+    expect(greetingVoiceKey(ALDER, at(RECRUITED))).toBe(`greeting__${ALDER}__recruited`);
+    expect(greetingVoiceKey('marshal_redbrook', at(RECRUITED))).toBe('greeting__marshal_redbrook');
+  });
+
+  it("stages Alder's dialog greeting and leaves every other NPC's untouched", () => {
+    const at = (recruitment: FireAndFlyRecruitment) => ({ fireAndFlyRecruitment: recruitment });
+    expect(npcGreeting(ALDER, at(FRESH), 'Take a trial.')).toBe('Take a trial.');
+    expect(npcGreeting(ALDER, at(RECRUITED), 'Take a trial.')).toBe(t(recruited));
+    expect(npcGreeting('marshal_redbrook', at(RECRUITED), 'Hail.')).toBe('Hail.');
+  });
+
+  it("declares both new lines in Alder's voice, speaking the English the board shows", () => {
+    const byKey = new Map(
+      (EXTRA_LINES as { key: string; voiceNpc: string; text: string }[]).map((l) => [l.key, l]),
+    );
+    for (const [recruitment, key] of [
+      [ONE_WON, trials],
+      [RECRUITED, recruited],
+    ] as const) {
+      const line = byKey.get(greetingVoiceKey(ALDER, { fireAndFlyRecruitment: recruitment }));
+      expect(line).toBeDefined();
+      expect(line?.voiceNpc).toBe(voiceIdFor(ALDER));
+      expect(line?.text).toBe(t(key));
+    }
+  });
+
+  it('stays silent while a stage has no rendered clip', () => {
+    const audio = vi.fn();
+    vi.stubGlobal('Audio', audio);
+    try {
+      for (const recruitment of [ONE_WON, RECRUITED]) {
+        const key = greetingVoiceKey(ALDER, { fireAndFlyRecruitment: recruitment });
+        if (Object.hasOwn(VOICE_LINES, key)) continue;
+        const voice = new GameVoice();
+        voice.play(key);
+        expect(voice.isPlaying()).toBe(false);
+      }
+      const absent = `greeting__${ALDER}__absent`;
+      expect(Object.hasOwn(VOICE_LINES, absent)).toBe(false);
+      const voice = new GameVoice();
+      voice.play(absent);
+      expect(voice.isPlaying()).toBe(false);
+      expect(audio).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
 });
 
 describe('the one action', () => {
@@ -338,13 +434,33 @@ describe('the same input, the same board', () => {
     expect(board(client)).toEqual(offline);
   });
 
+  it('greets a recruit in the trials with the same line and clip on both hosts', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    const meta = sim.meta(sim.playerId);
+    if (!meta) throw new Error('no player meta');
+    meta.fireAndFlyRecruitment = { trialsWon: 1, recruited: false };
+    const client = new QuestWorldWireState();
+    client.applyQuestSelfSnapshot(JSON.parse(JSON.stringify({ ffr: meta.fireAndFlyRecruitment })));
+    const alder = FIRE_AND_FLY_NPC_DEF.id;
+    const greeting = (world: Pick<Sim, 'fireAndFlyRecruitment'>) =>
+      buildGunneryBoardView(input({ recruitment: world.fireAndFlyRecruitment })).greeting;
+    expect(greeting(sim)).toBe(t('questUi.worldQuest.fireAndFly.greeting.trials'));
+    expect(greeting(client)).toBe(greeting(sim));
+    expect(greetingVoiceKey(alder, client)).toBe(`greeting__${alder}__trials`);
+    expect(greetingVoiceKey(alder, client)).toBe(greetingVoiceKey(alder, sim));
+  });
+
   it('follows the language', async () => {
     const english = t('questUi.worldQuest.fireAndFly.brief.pack');
+    const trialsEnglish = t('questUi.worldQuest.fireAndFly.greeting.trials');
+    const recruitedEnglish = t('questUi.worldQuest.fireAndFly.greeting.recruited');
     await ensureLocaleLoaded('zh_CN');
     setLanguage('zh_CN');
     const view = buildGunneryBoardView(input({ recruitment: RECRUITED, selectedId: PACK.id }));
     expect(view.title).toBe(t('hudChrome.gunneryBoard.title'));
     expect(view.title).not.toBe('Gunnery Board');
     expect(view.detail.brief).not.toBe(english);
+    expect(view.greeting).not.toBe(recruitedEnglish);
+    expect(buildGunneryBoardView(input({ recruitment: ONE_WON })).greeting).not.toBe(trialsEnglish);
   });
 });

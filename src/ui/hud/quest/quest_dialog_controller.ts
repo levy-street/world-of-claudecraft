@@ -36,6 +36,7 @@ import { isWarfareVendorNpc } from '../vendor/warfare_vendor_view';
 import { clueStepRowFor, clueStepRowSig } from './clue_step_row_view';
 import { clueReplyKey, clueTalkFor } from './clue_talk_row_core';
 import { gossipMenuIsEmpty } from './gossip_menu';
+import { greetingVoiceKey, npcGreeting } from './gunnery_board_view';
 import { GunneryBoardWindow } from './gunnery_board_window';
 import { masterCraftTarget } from './master_craft_core';
 import { PROF_INTRO_QUEST_ID, professionIntroHintVisible } from './prof_intro_hint_core';
@@ -179,7 +180,7 @@ export class QuestDialogController {
     this.ensureFocusTrap();
     this.deps.closeTransient();
     this.gunneryBoard.reset();
-    this.deps.voice.play(`greeting__${npc.templateId}`);
+    this.deps.voice.play(greetingVoiceKey(npc.templateId, world));
     this.voiceNpcId = npc.id;
     this.renderGossip(npc);
   }
@@ -918,8 +919,9 @@ export class QuestDialogController {
       ? `<span class="quest-muted"> &lt;${esc(view.speakerTitle)}&gt;</span>`
       : '';
     let html = `<div class="panel-title"><span id="quest-dialog-title">${esc(view.speakerName)}${subtitle}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
-    if (view.greeting) {
-      html += `<div class="qd-text">"${esc(view.greeting)}"</div>`;
+    const greeting = npcGreeting(npc.templateId, world, view.greeting);
+    if (greeting) {
+      html += `<div class="qd-text">"${esc(greeting)}"</div>`;
     }
     if (view.questTitle) {
       html += `<div class="qd-sub">${esc(view.questTitle)}</div>`;
