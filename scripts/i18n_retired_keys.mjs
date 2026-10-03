@@ -26,6 +26,9 @@
  * so this list can never be used to silence a key that a page really does try to render.
  */
 export const RETIRED_KEYS = [
+  // Engineering's trainer teaches from skill 0 now, so the 'one holdout'
+  // clause was false; re-keyed as guide.professions.whatBodyAllTen.
+  'guide.professions.whatBody',
   // Crucible collections add a raid-funded route beside the original ladder.
   'guide.professions.endgameBody',
   'guide.professions.endgamePatternsBody',

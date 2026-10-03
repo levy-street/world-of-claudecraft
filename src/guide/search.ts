@@ -22,6 +22,7 @@ import {
 import { GLOSSARY_TERMS } from './pages/glossary';
 import { npcTitleKey } from './pages/npcs';
 import { craftLabel, itemNameKey } from './pages/professions_craft';
+import { FAQ_QUESTION_KEYS, faqAnchor } from './pages/professions_faq';
 import { gatheringLabel } from './pages/professions_gathering';
 import { materialAnchor, npcAnchor } from './pages/professions_materials';
 import { GUIDE_ROUTES, hrefFor } from './routes';
@@ -65,6 +66,15 @@ export function buildIndex(): SearchEntry[] {
   add(t('guide.profPages.econ.title'), t('guide.search.typePage'), hrefFor('professions/economy'));
   add(t('guide.profPages.faq.title'), t('guide.search.typePage'), hrefFor('professions/faq'));
   add(t('guide.profPages.mat.title'), t('guide.search.typePage'), hrefFor('professions/materials'));
+  // Every Professions FAQ question, phrased the way players ask it in chat,
+  // lands on its own answer (the app opens the <details> it targets).
+  FAQ_QUESTION_KEYS.forEach((key, i) => {
+    add(
+      t(key),
+      t('guide.search.typeQuestion'),
+      `${hrefFor('professions/faq')}#${faqAnchor(i + 1)}`,
+    );
+  });
   // Every crafting material lands on its own Materials row ("where do I get
   // Glyphsteel Bar" is the question the page exists for). The localized name
   // is the label; the English source name rides the haystack so an English

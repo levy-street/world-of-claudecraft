@@ -19650,4 +19650,53 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.npcsPage.awayFmt': '{town}에서 {direction} 방향으로 {yards}야드',
   'guide.npcsPage.eventNote':
     '전역 퀘스트, 우두머리 전투, 특정 퀘스트 단계에서만 나타나는 NPC는 여기에 없으며, 던전과 공격대 안의 NPC도 마찬가지입니다.',
+  // Guide: the most-asked profession questions (FAQ 12 to 23) and the corrected overview.
+  'guide.profPages.faq.q12': '장비에 마법을 부여하려면 어떻게 해야 하나요？',
+  'guide.profPages.faq.a12':
+    '배낭의 마법부여 재료(예: 울림 가루)를 우클릭하거나 탭하고 마법부여 적용을 선택하세요. 원하는 마법부여를 선택한 후 장비를 어디에 부여할지 선택합니다. 배낭의 아무것이나 또는 입고 있는 아무것이나 상관없습니다. 훈련사나 작업대가 필요 없습니다. 모든 마법부여, 그 슬롯, 정확한 보너스는 마법부여 페이지에 나열되어 있습니다.',
+  'guide.profPages.faq.q13':
+    '광석, 풀, 목재는 어디서 구할 수 있나요？내 도구가 작동하지 않는 이유는 무엇인가요？',
+  'guide.profPages.faq.a13':
+    '광맥, 풀 마리, 임지는 모든 지역에 있으며, 더 높은 티어는 북쪽에 있습니다. 채광, 약초학, 벌목 페이지가 지역 및 티어별로 모든 노드를 매핑합니다. 노드를 채집하려면 배낭에 노드 이상의 일치하는 도구(곡괭이, 낫, 도끼)가 필요합니다. 장착할 필요가 없으며 맨손으로는 절대 채집할 수 없습니다. 티어 1 이상의 도구도 충분한 숙련도가 필요합니다: {wieldLadder}. 각 노드는 플레이어마다 별도로 재생성됩니다.',
+  'guide.profPages.faq.q14': '마법부여 훈련사는 어디에 있나요？',
+  'guide.profPages.faq.a14':
+    '없습니다. 마력 추출과 마법부여 적용에는 훈련사나 작업대가 필요 없습니다. 마법부여 숙련도는 마법부여를 할 때마다 올라갑니다. 일부 마법부여는 먼저 숙련도나 도안이 필요하며, 마법부여 페이지에서 각 도안의 출처를 설명합니다. 두 부적 도안은 {toolworksHub}의 공작소의 {toolworksMaster}가 가르칩니다. 보석세공은 {forgeHub}의 대장간의 {forgeMaster}가, 각인은 {apothecaryHub}의 약방의 {apothecaryMaster}가 가르칩니다.',
+  'guide.profPages.faq.q15': '마법부여 후에도 장비를 거래하거나 판매할 수 있나요？',
+  'guide.profPages.faq.a15':
+    '네. 마법부여는 아이템을 귀속시키지 않습니다. 마법부여된 장비는 이전과 같이 거래, 우편 발송, 판매할 수 있습니다. 마법부여도 함께 이동합니다. 아이템을 거래할 수 없으면 이미 귀속된 것이며, 도구 설명에 표시됩니다. 완성화는 귀속시키는 유일한 제작 단계입니다. 첫 번째 시도에서 아이템이 당신에게 귀속됩니다.',
+  'guide.profPages.faq.q16': '아이템을 마력 추출하려면 어떻게 하고, 무엇을 얻나요？',
+  'guide.profPages.faq.a16':
+    '배낭의 무기, 방어구 또는 보조손 장비를 우클릭하거나 탭하고 마력 추출을 선택하세요. 훈련사나 작업대가 필요 없습니다. {yields}를 얻습니다. 희귀 이상에서는 그 아이템이 무엇으로 만들어졌는지에 따라 달라지는 유형이 정해진 보조 재료도 얻습니다. 울림 가루, 울림 정수, 울림 파편은 마법부여 재료이며 모두 마력 추출에서 나옵니다.',
+  'guide.profPages.faq.q17': '각 전문 기술의 숙련도 상한은 무엇인가요？',
+  'guide.profPages.faq.a17':
+    '상한에 도달해도 모든 것이 그대로 작동합니다. 채집은 여전히 산출됩니다. 제작은 여전히 완료됩니다. 숫자만 올라가지 않습니다.',
+  'guide.profPages.faq.q18': '몇 개의 전문 기술을 배울 수 있나요？변경할 수 있나요？',
+  'guide.profPages.faq.a18':
+    '제한이 없습니다. 모든 캐릭터가 열 가지 제작 기술과 모든 채집 기술을 동시에 올릴 수 있습니다. 숙련도는 절대 잃어버리지 않습니다. 유일한 진정한 선택은 당신의 원형, 즉 언젠가 맹세할 인접한 두 가지 제작 기술입니다. 이 둘은 당신의 주요 기술이 되며 상한에 도달할 때까지 상한이 없습니다. 다른 것들은 더 낮은 등급으로 제한되며, 다른 퀘스트를 통해 다른 쌍으로 이동할 수 있습니다. 전문 기술 페이지는 원형을 완전히 설명합니다.',
+  'guide.profPages.faq.q19': '낚싯대나 더 나은 곡괭이, 낫, 도끼, 또는 호미는 어디서 사나요？',
+  'guide.profPages.faq.a19':
+    '대부분의 상인 도구는 {vendors}에 의해 판매됩니다. 각 채집 페이지는 각 상인, 가격 및 각 도구가 필요로 하는 숙련도와 함께 완전한 도구 사다리를 나열합니다.',
+  'guide.profPages.faq.q20': '기계공학 수련을 시작하려면 어떻게 해야 하나요？',
+  'guide.profPages.faq.a20':
+    '{hub}의 공작소에서 시작합니다. {master}가 첫 번째 기계공학 도안을 가르칩니다: {starters}. 쌍에 맞추기 전에 각 제작 기술은 희귀 등급을 통해 올라갑니다. 숙련도 {freeCeiling} 이하를 필요로 하는 도안입니다. 그 너머로는 기계공학이 폭격수 쌍(기계공학 및 연금술)이 필요합니다. {master}도 그 맞춤 퀘스트를 제공합니다.',
+  'guide.profPages.faq.q21': '제작 작업대는 어디에 있나요？',
+  'guide.profPages.faq.a21':
+    '작업대 종속 도안은 올바른 작업대로부터 {radius}야드 이내에서 제작됩니다. 필드 도안은 어디서나 제작할 수 있습니다. 작업대 및 그 주인:',
+  'guide.profPages.faq.q22': '필요한 재료를 어떻게 얻나요？',
+  'guide.profPages.faq.a22':
+    '위키 검색에 이름을 입력하거나 재료 페이지에서 찾아보세요. 재료 페이지는 모든 제작 재료와 그것을 얻는 모든 방법을 나열합니다. 채집하는 지역 및 노드 등급, 그것을 가진 생물, 그것을 판매하는 상인, 그것을 만드는 도안입니다.',
+  'guide.profPages.faq.q23': '낚시는 어떻게 작동하나요？',
+  'guide.profPages.faq.a23':
+    '물가에 서서 배낭이나 액션바에서 낚싯대를 사용하여 던집니다. 물고기는 {biteMin}에서 {biteMax}초 후에 문제에 물립니다. 물린 동안 다시 한 번 낚싯대를 사용하여 {reelWindow}초 이내에 걸어주세요. 물기 전에 사용하면 빈 캐스트가 끝납니다. 더 나은 낚싯대는 대기 시간을 단축하고 수축 창을 넓힙니다. 특정 물에서는 그곳에서 던지기 전에 더 나은 낚싯대가 필요할 수도 있습니다.',
+  'guide.profPages.faq.wieldStepFmt': '등급{tier}, 숙련도{skill}',
+  'guide.profPages.faq.disenchantYieldFmt': '{quality}에서 {material}',
+  'guide.profPages.faq.toolLadderFmt':
+    '{profession}: 상인에서 등급{vendorTier}까지, 등급{craftTier} 이상은 기계공학 제작',
+  'guide.profPages.faq.recipeAtSkillFmt': '{name}(숙련도 {skill})',
+  'guide.profPages.faq.capGroupFmt': '{names}: {cap}',
+  'guide.profPages.faq.npcInTownFmt': '{town}의 {name}',
+  'guide.profPages.faq.stationFmt': '{station}({master}, {hub})',
+  'guide.search.typeQuestion': '질문',
+  'guide.professions.whatBodyAllTen':
+    '전문 기술은 이 세계의 생활입니다. 채집 기술들이 땅에서 원료를 곧장 캐내고, 열 가지 제작 기술의 원환이 그것을 장비와 음식, 물약, 도구로 바꿉니다. 모든 것이 맞물립니다. 캐낸 광석은 검이 되고, 검은 마법부여를 받으며, 그 마법부여는 낡은 장비를 분해한 가루를 필요로 하니, 채집가와 제작자와 땜장이가 모두 한 사슬의 고리입니다.\n\n전문 기술 수 제한에 애태울 일은 없습니다. 모든 캐릭터가 열 가지 제작 기술 전부와 모든 채집 기술을 나란히 올릴 수 있습니다. 유일한 배타적 선택은 언젠가 맹세할 원형뿐입니다. 다만 일단 조율하고 나면 그 뒤에서 휴면에 든 제작 기술은 공용 도안으로만 오르고, 숙련도 75를 넘어서는 전혀 오르지 않습니다. 숙련도는 절대 내려가지 않고, 배운 것을 빼앗기지도 않습니다.',
 };

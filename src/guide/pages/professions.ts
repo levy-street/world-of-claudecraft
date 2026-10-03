@@ -135,7 +135,7 @@ function overviewHtml(): string {
       ${lead('guide.professions.intro')}
       <section class="guide-block" id="prof-what">
         <h2>${esc(t('guide.professions.whatHeading'))}</h2>
-        ${paras('guide.professions.whatBody')}
+        ${paras('guide.professions.whatBodyAllTen')}
       </section>
       ${ringSection()}
       ${gatheringSection()}

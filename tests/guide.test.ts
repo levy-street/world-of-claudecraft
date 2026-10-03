@@ -2534,7 +2534,7 @@ describe('Guide professions gathering accuracy', () => {
   it('describes the gathering trades count-free and names every one of them', () => {
     setLanguage('en');
     const bodies = [
-      ['guide.professions.whatBody', t('guide.professions.whatBody')],
+      ['guide.professions.whatBodyAllTen', t('guide.professions.whatBodyAllTen')],
       ['guide.professions.gatherHubBody', t('guide.professions.gatherHubBody')],
     ] as const;
     for (const [key, value] of bodies) {
@@ -4530,7 +4530,7 @@ describe('Guide professions pages and routes', () => {
     // The LITERAL first: FAQ_ANSWER_KEYS against PROF_FAQ_COUNT alone is two
     // exports of one module agreeing with each other, so dropping an answer and
     // decrementing the count would pass. The count is what the page renders.
-    expect(PROF_FAQ_COUNT, 'the professions FAQ has eleven rows').toBe(11);
+    expect(PROF_FAQ_COUNT, 'the professions FAQ has twenty-three rows').toBe(23);
     expect(FAQ_ANSWER_KEYS).toHaveLength(PROF_FAQ_COUNT);
     for (const key of FAQ_ANSWER_KEYS) {
       expect(t(key as never).length, key).toBeGreaterThan(0);

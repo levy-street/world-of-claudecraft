@@ -18711,4 +18711,52 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.npcsPage.awayFmt': '{town}以{direction}{yards}碼',
   'guide.npcsPage.eventNote':
     '只在世界任務、首領戰或某個任務步驟中出現的 NPC 不在此列，地城和團隊副本中的 NPC 也不在此列。',
+  // Guide: the most-asked profession questions (FAQ 12 to 23) and the corrected overview.
+  'guide.profPages.faq.q12': '我怎樣給裝備附魔？',
+  'guide.profPages.faq.a12':
+    '右鍵點擊（或點擊）你背包裡的附魔材料，比如鈴音之塵，然後選擇施加附魔。選擇你想要的附魔，再選擇裝備要放在哪裡：背包裡的任何東西，或者你穿的任何東西，它都在原地被附魔。你不需要訓練師，也不需要站點。每種附魔、它能裝在的位置，以及確切的加成，都列在附魔頁上。',
+  'guide.profPages.faq.q13': '我在哪裡找礦、草藥和木材，為什麼我的工具不起作用？',
+  'guide.profPages.faq.a13':
+    '礦脈、草藥地塊和林地在每個區域都有，更高階的在北邊；採礦、草藥學和伐木頁面按區域和等級標註了每個節點。要採集一個節點，你需要在背包裡有匹配的工具（鎬、鐮刀或斧頭），等級至少等於節點的等級。它永遠不需要裝備，光手是永遠採不了的。一級以上的工具還需要足夠的熟練度才能用：{wieldLadder}。每個節點在每個玩家那裡分別重生。',
+  'guide.profPages.faq.q14': '附魔訓練師在哪裡？',
+  'guide.profPages.faq.a14':
+    '沒有。分解和附魔都不需要訓練師和站點，你的附魔技能會隨著附魔而上升；少數幾種附魔要求技能或配方在先，附魔頁說明了每個配方的來源。兩個護符配方由{toolworksHub}的工坊的{toolworksMaster}教。珠寶設計由{forgeHub}的鍛造坊的{forgeMaster}教，銘文學由{apothecaryHub}的藥坊的{apothecaryMaster}教。',
+  'guide.profPages.faq.q15': '附魔後我還能交易或出售裝備嗎？',
+  'guide.profPages.faq.a15':
+    '可以。附魔永遠不會綁定一件物品：一件附魔後的裝備可以像之前一樣交易、郵寄或出售，附魔也隨之而去。如果一件物品不能交易，那是因為它已經靈魂綁定了，它的提示框會說明。完美化是唯一會綁定的製作步驟：第一次嘗試會把這件物品綁定給你。',
+  'guide.profPages.faq.q16': '我怎樣分解物品，它會給什麼？',
+  'guide.profPages.faq.a16':
+    '右鍵點擊（或點擊）你背包裡的一件武器、護甲或副手持握物品，然後選擇分解。不需要訓練師或站點。它會給{yields}。從稀有起，你還會得到一種副魔法材料，取決於這件物品是由什麼做的。鈴音之塵、鈴音精華和鈴音碎片就是附魔材料，都來自分解。',
+  'guide.profPages.faq.q17': '每個專業的技能上限是多少？',
+  'guide.profPages.faq.a17':
+    '達到上限後一切照常：採集仍然有產出，製作仍然能完成，只有數字停止上升。',
+  'guide.profPages.faq.q18': '我能學多少個專業，我能改變嗎？',
+  'guide.profPages.faq.a18':
+    '沒有限制。每個角色都能同時修習十種製作行業和每種採集行業，技能永不丟失。唯一真正的選擇是你的原型：一對相鄰的製作行業，你通過一個任務來調適它們。這兩個成為你的主修，沒有上限直到達到總上限，其他被限制在更低的等級，你可以通過另一個任務改為另一對。專業頁說明了原型的全部內容。',
+  'guide.profPages.faq.q19': '我在哪裡買釣竿或更好的鎬、鐮刀、斧頭或鋤頭？',
+  'guide.profPages.faq.a19':
+    '大部分商人的工具由{vendors}出售。每個採集頁列出了完整的工具梯，包括每個商人、價格，以及每個工具需要的熟練度。',
+  'guide.profPages.faq.q20': '我怎樣開始升級工程學？',
+  'guide.profPages.faq.a20':
+    '從{hub}的工坊開始，{master}教第一批工程學配方：{starters}。在你調適一對之前，每種製作行業都通過稀有等級上升，配方需要的技能{freeCeiling}或以下。超過那個，工程學需要爆破手配對（工程學和鍊金術），{master}也給它的調適任務。',
+  'guide.profPages.faq.q21': '製作站點在哪裡？',
+  'guide.profPages.faq.a21':
+    '站點綁定的配方在距離該站點{radius}碼以內製作，自由配方在任何地方製作。站點和它們的主人：',
+  'guide.profPages.faq.q22': '我怎樣得到需要的材料？',
+  'guide.profPages.faq.a22':
+    '在指南搜尋中輸入它的名字，或者在材料頁找它，材料頁列出了每種製作材料獲得的每一種方式：它從哪個區域和哪些節點等級採集，哪些生物攜帶它，哪些商人出售它，哪些配方製作它。',
+  'guide.profPages.faq.q23': '釣魚怎樣工作？',
+  'guide.profPages.faq.a23':
+    '站在水邊，從背包或快捷欄用釣竿投擲。魚在{biteMin}到{biteMax}秒後咬鉤；在咬鉤時再用一次釣竿，在{reelWindow}秒內，把它釣起來。在咬鉤前用它會結束空竿。更好的竿會縮短等待時間，拓寬卷竿窗口，某些水域甚至需要更好的竿才能在那裡投擲。',
+  'guide.profPages.faq.wieldStepFmt': '等級{tier}，{skill}熟練度時',
+  'guide.profPages.faq.disenchantYieldFmt': '來自{quality}的{material}',
+  'guide.profPages.faq.toolLadderFmt':
+    '{profession}：商人提供至{vendorTier}等級，{craftTier}等級及以上由工程學製作',
+  'guide.profPages.faq.recipeAtSkillFmt': '{name}（技能{skill}）',
+  'guide.profPages.faq.capGroupFmt': '{names}：{cap}',
+  'guide.profPages.faq.npcInTownFmt': '{town}的{name}',
+  'guide.profPages.faq.stationFmt': '{station}（{master}，{hub}）',
+  'guide.search.typeQuestion': '問題',
+  'guide.professions.whatBodyAllTen':
+    '專業是這個世界的營生：各類採集行業把原料直接從大地中取出，十種製作行業組成的輪環再把它們變成裝備、飯菜、藥水與工具。在這裡萬物環環相扣：你挖出的礦石成為刀劍，刀劍接受附魔，而附魔又需要從舊裝備中分解出的粉塵，所以採集者、工匠與修補匠同是一條鏈上的環節。\n\n這裡沒有值得為之煩惱的專業數量限制。每個角色都能同時修習十種製作行業和全部採集行業；唯一的排他選擇是你的原型，也就是你最終宣誓的身分。不過一旦調諧，落入休眠的製作行業便只能靠普通配方攀升，過了技能75便再無寸進。技能永不下降，學會的東西也永遠不會被奪走。',
 };

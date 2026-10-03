@@ -171,6 +171,9 @@ export class GuideApp {
     if (hash.length > 1) {
       const target = this.chrome.mainEl.querySelector(hash);
       if (target) {
+        // A search hit on an FAQ question targets its <details>: open it, so the
+        // reader lands on the answer rather than a closed summary line.
+        if (target instanceof HTMLDetailsElement) target.open = true;
         (target as HTMLElement).scrollIntoView({ behavior: 'instant', block: 'start' });
         return;
       }
