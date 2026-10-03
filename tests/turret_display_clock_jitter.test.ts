@@ -86,6 +86,7 @@ function runLink(delayMs: number, jitterMs: number, clock: TurretDisplayClock): 
         },
         sim.meta(pid)!,
         sim.tickCount,
+        sent,
       );
       const delay = (delayMs + rng.range(-jitterMs, jitterMs)) / 1000;
       lastArrival = Math.max(lastArrival, serverTicks * DT + delay);

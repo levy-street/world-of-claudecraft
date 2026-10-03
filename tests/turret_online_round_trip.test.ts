@@ -119,6 +119,7 @@ function wirePass(
     },
     sim.meta(pid)!,
     sim.tickCount,
+    sent,
   );
   return JSON.parse(`{${extra.slice(1)}}`);
 }
@@ -742,5 +743,34 @@ describe('Fire and Fly online: the socket-free round trip', () => {
     expect(rounded({ ...client.turretSession!, feedback: [] })).toEqual(
       rounded({ ...seat, feedback: [] }),
     );
+  });
+
+  it('clears the seat without a leave when a spectator switches to a player who never sat', () => {
+    const { sim, pid: seated } = serverPlayer();
+    const idle = sim.addPlayer('warrior', 'Idle', { characterId: 8 });
+    sim.drainEvents();
+    sim.chat('/dev turret', seated);
+    const client = new WireClient(sim, seated);
+    let sent: Record<string, string> = {};
+    for (let i = 0; i < 200; i++) {
+      for (const event of turretEvents(sim.tick(), seated)) client.route(event);
+      client.applyQuestSelfSnapshot(wirePass(sent, sim, seated), sim.time, sim.tickCount);
+    }
+    expect(client.turretSession).not.toBeNull();
+    const leaves = vi.spyOn(client, 'leaveVehicle');
+
+    // A fresh diff memory on a never-seated anchor: only the plan and the seat key, as nulls.
+    sent = {};
+    sim.tick();
+    const record = wirePass(sent, sim, idle);
+    expect(Object.keys(record)).toEqual(['turp', 'tur']);
+    client.applyQuestSelfSnapshot(record, sim.time, sim.tickCount);
+    expect(client.turretSession).toBeNull();
+    expect(client.turretClock).toBeNull();
+    expect(leaves).not.toHaveBeenCalled();
+    for (let i = 0; i < 20; i++) {
+      sim.tick();
+      expect(wirePass(sent, sim, idle)).toEqual({});
+    }
   });
 });

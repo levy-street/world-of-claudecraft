@@ -56,9 +56,13 @@ function numbersIn(value: unknown, key = '', out: [string, number][] = []): [str
   return out;
 }
 
-function keys(meta: Parameters<typeof emitTurretSelfKeys>[1], tick = 0): [string, string][] {
+function keys(
+  meta: Parameters<typeof emitTurretSelfKeys>[1],
+  tick = 0,
+  held: Readonly<Record<string, string>> = {},
+): [string, string][] {
   const out: [string, string][] = [];
-  emitTurretSelfKeys((key, serialized) => out.push([key, serialized]), meta, tick);
+  emitTurretSelfKeys((key, serialized) => out.push([key, serialized]), meta, tick, held);
   return out;
 }
 
@@ -68,8 +72,21 @@ function family(meta: Parameters<typeof emitTurretSelfKeys>[1], tick: number) {
 }
 
 describe('the turret self keys', () => {
-  it('emits explicit nulls on every key off the seat, plan first', () => {
+  it('gives a session that never sat only the plan and the seat key, as explicit nulls', () => {
     expect(keys({ vehicle: null })).toEqual([
+      ['turp', 'null'],
+      ['tur', 'null'],
+    ]);
+    const cleared = Object.fromEntries(TURRET_SEAT_KEYS.map((key) => [key, 'null']));
+    expect(keys({ vehicle: null }, 0, cleared)).toEqual([
+      ['turp', 'null'],
+      ['tur', 'null'],
+    ]);
+  });
+
+  it('nulls every family key a left seat still holds, plan first', () => {
+    const held = Object.fromEntries(TURRET_SEAT_KEYS.map((key) => [key, '[]']));
+    expect(keys({ vehicle: null }, 0, held)).toEqual([
       ['turp', 'null'],
       ...TURRET_SEAT_KEYS.map((key) => [key, 'null']),
     ]);

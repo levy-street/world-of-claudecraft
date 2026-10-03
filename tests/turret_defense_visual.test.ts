@@ -2004,6 +2004,7 @@ describe('Fire and Fly own shot on screen', () => {
             },
             sim.meta(pid)!,
             sim.tickCount,
+            sent,
           );
           arrival = Math.max(arrival, serverTicks * DT + delay());
           downlink.push({

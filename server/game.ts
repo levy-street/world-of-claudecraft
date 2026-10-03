@@ -8769,7 +8769,7 @@ export class GameServer {
     // Durable riding, the mount lesson and race, the world-quest vehicle
     // session, the Book of Deeds cosmetics and played time: one leaf
     // (quest_snapshot_wire.ts) owns the per-field rules.
-    questSnap.emitActivitySelfKeys(maybe, this.sim, meta, anchorSession.pid, maybeRaw);
+    questSnap.emitActivitySelfKeys(maybe, this.sim, meta, anchorSession.pid, maybeRaw, sent);
     selfLap?.('self.craft');
     // Heavy, rarely-changing fields: building + stringifying these every tick for
     // every player is the dominant avoidable broadcast cost. Skip them unless a

@@ -187,10 +187,17 @@ export class QuestWorldWireState {
         : null;
   }
 
-  /** Keeps every seat state key this record carries; true when one moved. */
+  /**
+   * Keeps every seat state key this record carries; true when one moved. A null `tur` is
+   * the server's "no seat": it clears the whole family, since the server only nulls the
+   * other keys a session still holds.
+   */
   private readTurretSeatParts(self: Readonly<Record<string, unknown>>): boolean {
-    this.turretSeatParts ??= {};
     let moved = false;
+    if (self.tur === null) {
+      this.turretSeatParts = {};
+      moved = true;
+    }
     for (const key of TURRET_SEAT_WIRE_KEYS) {
       const value = self[key];
       if (value === undefined) continue;

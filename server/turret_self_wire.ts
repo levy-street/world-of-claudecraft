@@ -41,7 +41,6 @@ export const TURRET_SEAT_KEYS: readonly string[] = [
 
 const stateParts = new WeakMap<TurretSession, { rev: number; tick: number; parts: string[] }>();
 const planJson = new WeakMap<TurretPlan, string>();
-const NULL_PARTS: readonly string[] = TURRET_SEAT_KEYS.map(() => 'null');
 
 // A march multiplies its direction and its speed by the length of the walk.
 const FINE_KEYS: ReadonlySet<string> = new Set(['dx', 'dz', 'speed']);
@@ -124,22 +123,37 @@ export function turretPlanWireJson(plan: TurretPlan): string {
   return json;
 }
 
-/** The owner-only `turp` (plan) and seat family keys; explicit nulls clear a left seat. */
+/**
+ * The owner-only `turp` (plan) and seat family keys. `held` is what this session last
+ * received (the self record's per-session diff memory, read only): an unseated session
+ * gets `turp` and `tur` as explicit nulls (a null `tur` clears the whole family on the
+ * client), and the other family keys only while it still holds them, so a session that
+ * never sat pays two diffs per pass and a left seat's keys are nulled once, keeping the
+ * diff memory in step with the client.
+ */
 export function emitTurretSelfKeys(
   maybeRaw: EmitRawSelfKey,
   meta: Pick<PlayerMeta, 'vehicle'>,
   tick: number,
+  held: Readonly<Record<string, string>>,
 ): void {
   const session = meta.vehicle?.kind === 'turret' ? meta.vehicle : null;
-  // Per pass, every connected session (seated or not) pays a field read and the family's 38
-  // diffs of strings it already holds (a reference compare each), a seated one also a memo
-  // hit. A rebuild happens once per engine revision of a seated player (an aim drag moves
-  // it every tick) and costs about 1.3 times one stringify of the whole state, every
-  // monster stringified apart and each new part compared by content with the prior one.
-  // Content-bounded per seated player: at most two consecutive waves' monsters (a corpse
-  // lingers `corpseTicks`, as long as the pause between waves), the barrel cap and the
-  // shells in flight. The plan rides first so a new seat's keys decode together.
+  // Per pass, a seated session pays a memo hit and the family's 38 diffs of strings it
+  // already holds (a reference compare each). A rebuild happens once per engine revision of
+  // a seated player (an aim drag moves it every tick) and costs about 1.3 times one
+  // stringify of the whole state, every monster stringified apart and each new part
+  // compared by content with the prior one. Content-bounded per seated player: at most two
+  // consecutive waves' monsters (a corpse lingers `corpseTicks`, as long as the pause
+  // between waves), the barrel cap and the shells in flight. The plan rides first so a new
+  // seat's keys decode together.
   maybeRaw('turp', session ? turretPlanWireJson(session.defense.plan) : 'null');
-  const parts = session ? turretStateWireParts(session, tick) : NULL_PARTS;
+  if (!session) {
+    maybeRaw(TURRET_SEAT_KEYS[0], 'null');
+    const revision = held[TURRET_SEAT_KEYS[1]];
+    if (revision === undefined || revision === 'null') return;
+    for (let i = 1; i < TURRET_SEAT_KEYS.length; i++) maybeRaw(TURRET_SEAT_KEYS[i], 'null');
+    return;
+  }
+  const parts = turretStateWireParts(session, tick);
   for (let i = 0; i < TURRET_SEAT_KEYS.length; i++) maybeRaw(TURRET_SEAT_KEYS[i], parts[i]);
 }

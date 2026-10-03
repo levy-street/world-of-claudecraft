@@ -5866,7 +5866,12 @@ const CAPABILITY_DELTA_KEYS = ['auras', 'de'] as const;
  *  `de` is capability-only (CAPABILITY_DELTA_KEYS above). `auras` stays dense:
  *  a legacy session gets it on the base self record and a stable-wire session
  *  gets the first-send delta. */
-const DENSE_DELTA_KEYS = ALL_DELTA_KEYS.filter((key) => key !== 'app' && key !== 'de');
+// The Fire and Fly seat family past its seat key reaches only a session that sat: a session
+// that never did gets `turp` and `tur` as nulls and nothing else of the family.
+const TURRET_SEATED_ONLY_KEYS: readonly string[] = TURRET_SEAT_KEYS.slice(1);
+const DENSE_DELTA_KEYS = ALL_DELTA_KEYS.filter(
+  (key) => key !== 'app' && key !== 'de' && !TURRET_SEATED_ONLY_KEYS.includes(key),
+);
 
 // The terse wire key -> IWorld member name rename map, in sorted order. The wire
 // string IS the protocol (contract #4): a terse key renamed on one side passes tsc
@@ -6550,6 +6555,11 @@ describe('full self-state snapshot delta fixture', () => {
         expect(snap.self, 'self.de sent to a legacy session').not.toHaveProperty(key);
         continue;
       }
+      // The Fire and Fly seat family past its seat key reaches only a seated session.
+      if (TURRET_SEATED_ONLY_KEYS.includes(key)) {
+        expect(snap.self, `self.${key} reaches only a seated session`).not.toHaveProperty(key);
+        continue;
+      }
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
       // each was dirtied to a non-default value, so none rides the wire as null
       // EXCEPT cvault: this harness player carries a live delve run (the drun
@@ -6559,14 +6569,14 @@ describe('full self-state snapshot delta fixture', () => {
       // design. Its non-null arrival (and the by-reference mirror) is pinned
       // in tests/vault_wire.test.ts instead.
       // This fixture stands at a different banker; the weekly keeper gate stays closed.
-      // The Fire and Fly keys (turp and the seat state family) share meta.vehicle with the
-      // cannon seat this fixture holds, so they arrive as explicit nulls; their seated
-      // arrival is pinned in the Fire and Fly round trip below.
+      // The Fire and Fly keys share meta.vehicle with the cannon seat this fixture holds,
+      // so `turp` and `tur` arrive as explicit nulls; their seated arrival is pinned in the
+      // Fire and Fly round trip below.
       if (
         key === 'cvault' ||
         key === 'weeklyRewards' ||
         key === 'turp' ||
-        TURRET_SEAT_KEYS.includes(key)
+        key === TURRET_SEAT_KEYS[0]
       ) {
         expect(snap.self[key], `self.${key} must arrive as the explicit null`).toBeNull();
         continue;

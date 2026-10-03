@@ -223,7 +223,7 @@ describe('the salt stays on the host', () => {
     expect(view.defense).not.toHaveProperty('runKey');
     expect(view.defense).not.toHaveProperty('seed');
     const raw: string[] = [];
-    emitTurretSelfKeys((_key, json) => raw.push(json), meta, sim.tickCount);
+    emitTurretSelfKeys((_key, json) => raw.push(json), meta, sim.tickCount, {});
     const texts = [
       JSON.stringify(view),
       turretStateWireJson(session, sim.tickCount),

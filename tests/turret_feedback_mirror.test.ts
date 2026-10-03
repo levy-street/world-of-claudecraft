@@ -241,12 +241,18 @@ describe('the turret seat on the quest wire state', () => {
       // The whole family again (a resume): the seat reads, and a later stretch leaves again.
       client.applyQuestSelfSnapshot(turretSeatKeys(seat(3)), 5, 105);
       expect(client.turretSession?.defense.rev).toBe(3);
-      client.applyQuestSelfSnapshot({ tur: null }, 5, 106);
+      client.applyQuestSelfSnapshot({ tub: null }, 5, 106);
       expect(client.turretSession).toBeNull();
       expect(client.commands).toEqual([{ cmd: 'vehicle_leave' }, { cmd: 'vehicle_leave' }]);
+      // A null seat key is the server's "no seat": the whole family clears, with no leave,
+      // even beside parts the server never nulled (a never-seated spectate anchor).
+      client.applyQuestSelfSnapshot(turretSeatKeys(seat(4)), 5, 107);
+      client.applyQuestSelfSnapshot({ tur: null }, 5, 108);
+      expect(client.turretSession).toBeNull();
+      expect(client.commands).toHaveLength(2);
       // Every key cleared is a left seat, not an unreadable one.
-      client.applyQuestSelfSnapshot(TURRET_SEAT_CLEARED, 5, 107);
-      client.applyQuestSelfSnapshot({}, 5, 108);
+      client.applyQuestSelfSnapshot(TURRET_SEAT_CLEARED, 5, 110);
+      client.applyQuestSelfSnapshot({}, 5, 111);
       expect(client.commands).toHaveLength(2);
     } finally {
       warn.mockRestore();

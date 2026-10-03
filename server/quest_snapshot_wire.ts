@@ -25,6 +25,7 @@ export function emitActivitySelfKeys(
   meta: PlayerMeta,
   pid: number,
   maybeRaw: EmitRawSelfKey,
+  sent: Readonly<Record<string, string>>,
 ): void {
   // Riding skill: persisted, so the client knows whether to show the riding
   // trainer UI without waiting on a mount/select command to fail. Wire key
@@ -36,7 +37,7 @@ export function emitActivitySelfKeys(
   emit('mntLesson', sim.mountLessonActiveFor(pid));
   emit('mntRace', sim.mountRaceViewFor(pid));
   emit('vehicle', sim.vehicleSessionFor(pid));
-  emitTurretSelfKeys(maybeRaw, meta, sim.tickCount);
+  emitTurretSelfKeys(maybeRaw, meta, sim.tickCount, sent);
   // Book of Deeds: the Renown total and the two selected cosmetic ids
   // (title and nameplate border), cheap scalars diffed per tick (grants land
   // from sim sites that never mark this session dirty, and neither cosmetic
